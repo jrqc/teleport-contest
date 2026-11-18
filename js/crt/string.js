@@ -150,7 +150,7 @@ export function memmove(d, s, n) {
     return d;
 }
 /** The n bytes at typed-array pointer p, as a Uint8Array over the same memory (bounds-checked). */
-function bytesView(p, n) {
+export function bytesView(p, n) {
     const b = p.buf, bpe = b.BYTES_PER_ELEMENT;
     const start = p.off * bpe;
     if (p.off < 0 || start + n > b.byteLength) throw new CTrap(`memory access out of bounds (${start}+${n} of ${b.byteLength} bytes)`);

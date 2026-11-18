@@ -154,7 +154,7 @@ export function cstrlen(p) {
 export function cstrToJs(p) {
     const n = cstrlen(p);
     let s = '';
-    for (let i = 0; i < n; i++) s += String.fromCharCode(p.buf[p.off + i]);
+    for (let i = 0; i < n; i++) s += String.fromCharCode(p.buf[p.off + i] & 0xff);
     return s;
 }
 

@@ -203,16 +203,17 @@ export class TUEmitter {
         if (t.k === 'rec' || t.k === 'arr') {
             const tt = t.k === 'arr' && t.n === null && initExpr ? this.T(initExpr) : t;
             body.push(`${isStatic ? '' : 'export '}const ${name} = ${this.zero(tt)};`);
+            init.push(...this.zeroStmts(name, tt, ''));   // $init runs once per segment: a fresh C process each time
             if (initExpr) this.emitInitInto(name, tt, initExpr, init, '');
         } else if (!isStatic) {
             // external scalar: lives on $G (globals.js declares it with its zero value)
             if (initExpr) init.push(`${name} = ${this.rv(initExpr).c};`);
         } else if (this.prog.isBoxedGlobal(this, g.name)) {
             body.push(`const ${name} = ${this.box(t, this.zero(t))};   // address taken`);
-            if (initExpr) init.push(`${name}[0] = ${this.rv(initExpr).c};`);
+            init.push(`${name}[0] = ${initExpr ? this.rv(initExpr).c : this.zero(t)};`);
         } else {
             body.push(`let ${name} = ${this.zero(t)};`);
-            if (initExpr) init.push(`${name} = ${this.rv(initExpr).c};`);
+            init.push(`${name} = ${initExpr ? this.rv(initExpr).c : this.zero(t)};`);
         }
     }
 
@@ -356,16 +357,17 @@ export class TUEmitter {
         const saveFn = this.fn;
         if (t.k === 'rec' || t.k === 'arr') {
             const tt = t.k === 'arr' && t.n === null && d.init ? this.T(kids(d)[0]) : t;
+            init.push(...this.zeroStmts(nm, tt, ''));
             if (d.init) this.emitInitInto(nm, tt, kids(d)[0], init, '');
             this.staticLocals.push({ decl: `const ${nm} = ${this.zero(tt)};   // static in ${this.fn.name}()`, init });
         } else {
             const addr = this.addressTaken(saveFn.decl).has(d.id);
             if (addr) {
                 info.boxed = true;
-                if (d.init) init.push(`${nm}[0] = ${this.rv(kids(d)[0]).c};`);
+                init.push(`${nm}[0] = ${d.init ? this.rv(kids(d)[0]).c : this.zero(t)};`);
                 this.staticLocals.push({ decl: `const ${nm} = ${this.box(t, this.zero(t))};   // static in ${this.fn.name}()`, init });
             } else {
-                if (d.init) init.push(`${nm} = ${this.rv(kids(d)[0]).c};`);
+                init.push(`${nm} = ${d.init ? this.rv(kids(d)[0]).c : this.zero(t)};`);
                 this.staticLocals.push({ decl: `let ${nm} = ${this.zero(t)};   // static in ${this.fn.name}()`, init });
             }
         }
@@ -1600,7 +1602,7 @@ export class TUEmitter {
         if (fnName && f.startsWith('$c.') && !f.startsWith('$c.missing(')) {
             // runtime (or hand-written) function: async only through a callback argument that may
             // be async, and then through its `$async` twin (signal handlers never run)
-            asyncCall = fnName !== 'signal' && args.some((a) => this.mayBeAsyncFn(a));
+            asyncCall = this.prog.blockingCrt.has(fnName) || (fnName !== 'signal' && args.some((a) => this.mayBeAsyncFn(a)));
             if (asyncCall) {
                 if (!this.prog.crt.has(`${fnName}$async`)) this.err(n, `possibly async callback passed to runtime function ${fnName}, which has no $async variant`);
                 f = `$c.${fnName}$async`;

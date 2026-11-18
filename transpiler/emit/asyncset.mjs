@@ -7,8 +7,9 @@
 //   - an indirect call is awaited when some address-taken async function has
 //     the callee's (coarse) signature, and such a call makes its caller async.
 // Signatures are coarse (integers by size, all data pointers alike), which can
-// only add targets: conservative. Roots: tty_nhgetch (input boundary) and
-// tty_delay_output (animation frames), plus annotation "blocking" entries.
+// only add targets: conservative. Roots: the runtime's blocking reads (getchar:
+// tty_nhgetch's tgetch, and a few direct prompts), tty_nhgetch (input boundary)
+// and tty_delay_output (animation frames).
 // transpiler/analysis/async.mjs is the Stage 1 inventory of the same idea.
 const kids = (n) => n.inner || [];
 
@@ -26,7 +27,7 @@ export function sigOf(scope, t) {
 }
 
 export class AsyncSet {
-    constructor({ roots = ['tty_nhgetch', 'tty_delay_output'], cut = [] } = {}) {
+    constructor({ roots = ['getchar', 'tty_nhgetch', 'tty_delay_output'], cut = [] } = {}) {
         this.roots = roots;
         this.cut = new Set(cut);
         this.calls = new Map();       // fn key -> Set(callee key | '#'+sig)
@@ -103,7 +104,7 @@ export class AsyncSet {
         const seen = new Set();
         this.via = new Map();
         const q = [];
-        for (const r of this.roots) if (this.calls.has(r)) { seen.add(r); q.push(r); }
+        for (const r of this.roots) { seen.add(r); q.push(r); }   // a root may be a runtime function (getchar)
         while (q.length) {
             const x = q.pop();
             if (this.cut.has(x)) continue;
