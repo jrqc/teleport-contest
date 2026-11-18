@@ -98,7 +98,7 @@ function fieldsSrc(scope, L, cls) {
  * Source of the class for record `key`.
  * @param scope ctypes Scope; @param cls key -> class name
  */
-export function classSource(scope, key, cls, origin, tail = false) {
+export function classSource(scope, key, cls, origin, tail = false, cell = false) {
     const r = scope.record(key);
     const L = scope.recordLayout(key);
     const name = cls(key);
@@ -108,6 +108,15 @@ export function classSource(scope, key, cls, origin, tail = false) {
     out.push(`    static $size = ${L.size};   // sizeof: lets the runtime turn byte counts into element counts`);
     out.push(fieldsSrc(scope, L, cls));
     if (r.union) out.push('    static $union = true;');
+    if (r.union && cell) {
+        // a union cell (design 3.4.2): C's bytes; member accessors come from $fields (js/crt/ucell.js)
+        out.push('    static $cell = true;   // punning possible (transpiler/out/union-pun.md): kept as bytes');
+        out.push('    constructor() { $c.cellInit(this); }');
+        out.push('    $copyFrom(s) { return $c.cellCopy(this, s); }');
+        out.push(`    $clone() { return new ${name}().$copyFrom(this); }`);
+        out.push('}');
+        return out.join('\n');
+    }
     if (tail) out.push('    static $tail = true;   // allocated with a trailing byte area (annotations types[].tail)');
     if (r.union) {
         // one value slot $v; $k is the member last stored or used as an embedded aggregate.

@@ -55,7 +55,7 @@ export class FieldRef {
  * outside the array (one past the end, or before the start while iterating) is
  * an ElemPtr, which can be compared and moved but not dereferenced.
  */
-const ELEM_OK = new Set(['__arr', '__idx', 'then', 'constructor', 'toJSON']);
+const ELEM_OK = new Set(['__arr', '__idx', 'then', 'constructor', 'toJSON', '$const']);
 const ELEM_TRAP = {
     get(t, k) {
         if (typeof k === 'symbol' || ELEM_OK.has(k)) return t[k];
@@ -262,11 +262,24 @@ export function ptrConst(n) {
     return p;
 }
 /** A pointer converted to an integer: 0 for NULL, the value for ptrConst, else a handle number. */
+// Pointers that compare equal (peq) get the same handle: a Ptr by (buffer, offset), a
+// FieldRef by (object, field), an array element by (array, index), anything else by identity.
 let nextHandle = 2 ** 40;
-const HANDLES = new WeakMap();
+const HANDLES = new WeakMap();      // object -> handle
+const AT = new WeakMap();           // buffer / object / array -> Map(position -> handle)
+function handleAt(base, pos) {
+    let m = AT.get(base);
+    if (m === undefined) AT.set(base, (m = new Map()));
+    let h = m.get(pos);
+    if (h === undefined) { h = nextHandle; nextHandle += 16; m.set(pos, h); }
+    return h;
+}
 export function ptrToInt(p) {
-    if (p === null) return 0;
+    if (p === null || p === undefined) return 0;
     if (p.$const !== undefined) return Number(p.$const);
+    if (p instanceof Ptr) return handleAt(p.buf, p.off);
+    if (p instanceof FieldRef) return handleAt(p.obj, p.key);
+    if (typeof p === 'object' && p.__arr !== undefined) return handleAt(p.__arr, p.__idx);
     let h = HANDLES.get(p);
     if (h === undefined) { h = nextHandle; nextHandle += 16; HANDLES.set(p, h); }
     return h;

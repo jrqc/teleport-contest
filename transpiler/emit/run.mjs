@@ -26,7 +26,13 @@ const heapCrtNames = new Set(Object.keys(await import('../../js/crt/heaplibc.js'
 const ann = parseJsonc(readFileSync(path.join(ROOT, 'transpiler/annotations.jsonc'), 'utf8'));
 const handwritten = Object.entries(ann.functions || {}).filter(([, f]) => f.handwritten).map(([k]) => k.replace(/^.*::/, ''));   // "file::name" for statics
 const tails = Object.entries(ann.types || {}).filter(([, t]) => t.tail).map(([k]) => k.replace(/^(struct|union) /, ''));
-const prog = new Program({ crtNames, heapCrtNames, handwritten, tails, asyncCut: (ann.edges && ann.edges.cut || []).map((c) => c.to) });
+// union cells (design 3.4.2, D1): the punning check's verdict; an annotation types["union X"].repr overrides
+const punVerdicts = JSON.parse(readFileSync(path.join(ROOT, 'transpiler/out/union-pun.json'), 'utf8'));
+const cells = Object.entries(punVerdicts).filter(([k, v]) => {
+    const a = (ann.types || {})[k];
+    return a && a.repr ? a.repr === 'union-cell' : v.verdict === 'union-cell';
+}).map(([k]) => k.replace(/^union /, ''));
+const prog = new Program({ crtNames, heapCrtNames, handwritten, tails, cells, asyncCut: (ann.edges && ann.edges.cut || []).map((c) => c.to) });
 const luaDb = JSON.parse(readFileSync(path.join(ROOT, 'transpiler/out/compile_commands.json'), 'utf8')).filter((e) => e.group === 'lua');
 prog.missingFn = new Set();
 

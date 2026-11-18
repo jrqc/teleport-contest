@@ -19,6 +19,7 @@
 //   { raw: n }                              bytes the port does not model (written as zeros)
 import { Ptr, FieldRef } from './mem.js';
 import { CTrap, i64, u64 } from './int.js';
+import { cellBytes } from './ucell.js';
 
 /** A non-null pointer read back from a save file: truthy, traps when dereferenced. */
 export const STALE = new Proxy(Object.freeze({ $stale: true }), {
@@ -54,6 +55,7 @@ function wKind(dv, off, k, v) {
 function wRec(dv, off, o) {
     const C = o.constructor;
     if (!C.$fields) throw new CTrap('serialize: not a record');
+    if (C.$cell) { new Uint8Array(dv.buffer, dv.byteOffset + off, C.$size).set(cellBytes(o)); return; }   // a union cell: its bytes (ucell.js)
     const F = fieldsOf(C);
     if (C.$union) {
         if (o.$k === '$raw') { new Uint8Array(dv.buffer, dv.byteOffset + off, C.$size).set(o.$v.subarray(0, C.$size)); return; }
@@ -107,6 +109,7 @@ function rKind(dv, off, k, cur) {
 function rRec(dv, off, o) {
     const C = o.constructor;
     if (!C.$fields) throw new CTrap('deserialize: not a record');
+    if (C.$cell) { cellBytes(o).set(new Uint8Array(dv.buffer, dv.byteOffset + off, C.$size)); o.$p = new Map(); return; }   // pointers come back as ptrConst values
     if (C.$union) {
         o.$v = new Uint8Array(dv.buffer, dv.byteOffset + off, C.$size).slice();
         o.$k = '$raw';

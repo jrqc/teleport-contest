@@ -208,6 +208,14 @@ dereference throws. NetHack really does this: `del_light_source` (`src/light.c:1
 object id into `tmp_id.a_uint` and compares it as `tmp_id.a_obj` with `curr->id.a_obj`, which
 holds an id as well while a restored light source awaits fixup (`LSF_NEEDS_FIXUP`).
 
+*Implementation (Stage 3, `js/crt/ucell.js`):* each cell owns a `$size`-byte `ArrayBuffer`
+(not the Lua heap, which only heap-mode code uses); accessors come from the generated
+`static $fields()` tables; a record member is a view object whose prototype is the member's
+class. Pointer handles come from `ptrToInt` (`js/crt/mem.js`), which gives pointers that
+compare equal one handle (a `Ptr` by buffer and offset). Save files carry the cell's bytes.
+The emitter takes the cell set from `transpiler/out/union-pun.json` (`types["union X"].repr`
+overrides).
+
 **Result of the check (Stage 2, `transpiler/out/union-pun.md`):** of NetHack's 5 unions,
 1 is an object and 4 are union cells.
 

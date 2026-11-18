@@ -11,6 +11,7 @@ export * from './qsort.js';
 export { nhl_alloc } from '../hand/nhlua.js';   // annotations functions.nhl_alloc
 export * from './alloc.js';
 export { unraw, STALE } from './serial.js';
+export { cellInit, cellCopy } from './ucell.js';
 export * from './proc.js';
 export * from './fs.js';
 export * from './scanf.js';
