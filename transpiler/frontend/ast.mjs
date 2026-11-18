@@ -33,7 +33,10 @@ export function loadAst(entry) {
     }
     args.push('-fsyntax-only', '-Xclang', '-ast-dump=json', file);
     return new Promise((resolve, reject) => {
-        const child = spawn('clang', args, { cwd: dir, stdio: ['ignore', 'pipe', 'pipe'] });
+        // __DATE__/__TIME__ must not depend on when we transpile (output determinism, design 2.6):
+        // pin them to the recorder's fixed "now" (2026-05-02 12:00 UTC)
+        const env = { ...process.env, SOURCE_DATE_EPOCH: '1777723200' };
+        const child = spawn('clang', args, { cwd: dir, env, stdio: ['ignore', 'pipe', 'pipe'] });
         const chunks = [];
         let stderr = '';
         child.stdout.on('data', (c) => chunks.push(c));
