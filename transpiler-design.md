@@ -403,7 +403,10 @@ Why not an existing JS Lua (fengari or similar): different hashing, different GC
 different `lua_Debug` information, any of which can change screens or RNG order. A
 transpiled VM is behaviorally identical by construction and costs no extra method.
 
-Script loading: `luaL_loadbuffer` on the embedded script text with the same chunk names
-(`@dat/xxx.lua` style names as the C build uses), so error messages and debug info match.
+Script loading needs no special code: C loads each script in `nhl_loadlua` (`src/nhlua.c:2343`)
+by reading it through `dlb_fopen`, preprocessing the text, and calling `luaL_loadbuffer` with
+the chunk name `"(<file>.lua)"`. That function is transpiled like any other, so the port only
+has to make the embedded files readable through `dlb_fopen` (section 8); chunk names, error
+messages and debug info then match by construction.
 Lua's standard I/O and OS libraries (`liolib.c`, `loslib.c`) are transpiled too but sandboxed
 by NetHack itself (`NHL_SB_*` flags); their libc needs map to `stdio.js`/`sys.js`.
