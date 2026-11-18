@@ -14,7 +14,7 @@
 // The segment ends when the program waits for a key and none is left, or exits.
 import * as $c from './crt/index.js';
 import { game as gstate } from './gstate.js';
-import { vfsWriteFile } from './storage.js';
+import { vfsReadFile, vfsWriteFile } from './storage.js';
 import { $initAll } from './nh/index.js';
 import { main } from './nh/unixmain.js';
 import { files as dataFiles, dirs as dataDirs } from './data/index.js';
@@ -132,9 +132,11 @@ export async function runSegment(input, _prevGame = null) {
 
     // ---- a fresh process ----
     gstate.mockStorage = input.storage || null;
-    // The recorder starts each session with empty score files (record-session.mjs
-    // clearStaleState + ensureScorefiles, first segment only); later segments keep them.
-    if (!_prevGame) for (const f of ['record', 'logfile', 'xlogfile']) vfsWriteFile(`${HACKDIR}/${f}`, '');
+    // The recorder creates the score files before each segment (record-session.mjs
+    // ensureScorefiles: open for append, so a missing file is created empty and an
+    // existing one is kept). Storage is fresh per session, as the recorder's first
+    // segment clears them (clearStaleState).
+    for (const f of ['record', 'logfile', 'xlogfile']) if (vfsReadFile(`${HACKDIR}/${f}`) === null) vfsWriteFile(`${HACKDIR}/${f}`, '');
     $c.resetStdio();
     $c.resetFs();
     $c.mountData(HACKDIR, dataFiles);

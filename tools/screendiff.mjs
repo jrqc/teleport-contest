@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // tools/screendiff.mjs: cell-level screen diff, C vs JS (CLAUDE.md tool 4.3).
 // Runs every segment of a session through js/jsmain.js the way the judge does
-// (one shared storage), finds the first step whose screen differs (or the step
+// (one shared storage, the judge's input fields, no prevGame; cells and cursor compared), finds the first step whose screen differs (or the step
 // given), and prints both screens as text with the differing cells listed
 // (char / color / attr), plus the cursor and the keys leading there.
 // Usage: node tools/screendiff.mjs sessions/X.session.json [step] [--all]
@@ -23,10 +23,9 @@ const segs = normalizeSession(JSON.parse(readFileSync(file, 'utf8'))).segments;
 const store = new Map();
 const storage = { getItem: (k) => (store.has(k) ? store.get(k) : null), setItem: (k, v) => store.set(k, String(v)), removeItem: (k) => store.delete(k), get length() { return store.size; }, key: (i) => [...store.keys()][i] ?? null };
 const C = [], J = [], keys = [];
-let prev = null;
 for (const seg of segs) {
-    const g = await runSegment({ ...seg, storage }, prev);
-    prev = g;
+    // exactly the judge's input (frozen/ps_test_runner.mjs replayInputFor): no prevGame, no steps
+    const g = await runSegment({ seed: seg.seed, datetime: seg.datetime, nethackrc: seg.nethackrc, moves: seg.moves, storage });
     const n = seg.steps.length;
     for (let i = 0; i < n; i++) {
         C.push({ screen: seg.steps[i].screen, cursor: seg.steps[i].cursor });
@@ -55,7 +54,10 @@ function show(i) {
         }
     }
 }
-const same = (i) => J[i].screen !== undefined && JSON.stringify(decodeScreen(C[i].screen)) === JSON.stringify(decodeScreen(J[i].screen));
+// as the judge (frozen/ps_test_runner.mjs): cells and the cursor
+const cursorOk = (c, j) => !Array.isArray(c) || (Array.isArray(j) && c[0] === j[0] && c[1] === j[1] && c[2] === j[2]);
+const same = (i) => J[i].screen !== undefined && cursorOk(C[i].cursor, J[i].cursor)
+    && JSON.stringify(decodeScreen(C[i].screen)) === JSON.stringify(decodeScreen(J[i].screen));
 if (want !== undefined) show(Number(want));
 else {
     const bad = [];
