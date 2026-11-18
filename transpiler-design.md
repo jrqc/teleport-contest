@@ -100,11 +100,16 @@ Two worlds, decided **per type** (CLAUDE.md 2.1) and recorded in `transpiler/ann
 
 | C type (LP64, Darwin) | JS representation | Operations |
 |---|---|---|
-| `char` (signed on Darwin x86_64), `schar`, `short`, `int`, `unsigned char/short` | Number holding the exact C value | After each arithmetic result: the C conversion via a runtime helper (`i32(x)` = `x|0`, `i8`, `u8`, `i16`, `u16`); division `idiv(a,b)` truncates; `%` via `irem` |
+| `char` (signed on Darwin arm64), `schar`, `short`, `int`, `unsigned char/short` | Number holding the exact C value | After each arithmetic result: the C conversion via a runtime helper (`i32(x)` = `x|0`, `i8`, `u8`, `i16`, `u16`); division `idiv(a,b)` truncates; `%` via `irem` |
 | `unsigned int` | Number in 0..2³²−1 | `u32(x)` = `x>>>0`; multiplication via `Math.imul` + `>>>0` |
 | `long`, `unsigned long`, `long long`, `size_t`, `time_t` (64-bit) | Number while the value is in ±2⁵³; exact 64-bit path via BigInt | Emitted as checked helpers (`add64`, `mul64`, ...) that stay on Number unless the exact result leaves ±2⁵³, then compute in BigInt and wrap. Values that really need 64 bits (hashes, ISAAC, MD4) are rare and live in byte-level code |
-| `float`, `double` | Number (`float` stored via `Math.fround`) | x86-64 SSE: no excess precision, so JS doubles match |
+| `float`, `double`, `long double` | Number (`float` stored via `Math.fround`) | arm64: IEEE double arithmetic without excess precision, so JS doubles match; `long double` is 8 bytes (= `double`) on Darwin arm64 |
 | `_Bool`/`boolean` (`boolean` is `signed char` in NetHack) | Number 0/1 per C rules | Conversions exactly as clang's AST marks them |
+
+**ABI: the reference recorder is an arm64 binary** (Apple M2, LP64, little-endian, signed
+`char`), so arm64 is the target ABI, also for record layouts. A shell running under Rosetta
+(x86_64 Node) still builds arm64 binaries here; all native tests pin `-arch arm64`. An x86-64
+build of the same C differs only where C is undefined (e.g. it traps on division by zero).
 
 Integer promotion and the usual arithmetic conversions are **not re-derived**: clang's AST
 already contains every implicit cast (`IntegralCast`, `IntegralToBoolean`, ...), and the
@@ -188,7 +193,7 @@ return what was written. Integer-only record members (`coord v_launch2` in `unio
 vlaunchinfo`) are stored as a sub-object.
 
 **3.4.2 Heap unions.** The union's bytes live in the heap with clang's layout, so every pun
-behaves exactly as on x86-64 (little-endian, leftover upper bytes included). A heap union
+behaves exactly as on arm64 (little-endian, leftover upper bytes included). A heap union
 embedded in an object record (e.g. `union any id` in `struct light_source`) is a **union
 cell**: the container stays an object, and its field holds a view over the union's own heap
 bytes, created with the container. Whole-record copies copy the cell's bytes, so there is still
@@ -305,7 +310,7 @@ would otherwise evaluate differently. Every rule is pinned by a differential tes
 
 | C | JS |
 |---|---|
-| Integer arithmetic | Exact helpers per result type (3.1); `x / y` → `idiv(x, y)`, `x % y` → `irem(x, y)`, shifts with C width/sign rules; division by zero → a runtime trap (C would crash; such a case is a divergence to investigate) |
+| Integer arithmetic | Exact helpers per result type (3.1); `x / y` → `idiv(x, y)`, `x % y` → `irem(x, y)`, shifts with C width/sign rules. Cases C leaves undefined behave like the arm64 instructions clang emits at `-O0`, because the recorder runs through them: `x / 0` is 0, `x % 0` is `x`, `INT_MIN / -1` wraps, shift counts are masked, float→int saturates and NaN gives 0 (all measured natively in `tests/c-diff/int/`) |
 | Implicit/explicit integer conversions | One helper per conversion (`i8`, `u8`, `i16`, `u16`, `i32`, `u32`, `i64`, `u64`), straight from the AST cast nodes |
 | Floating point | Native Number; `float` via `Math.fround`; float→int conversion truncates (`Math.trunc` + range rules) |
 | `sizeof`, `offsetof`, `_Alignof` | The constant clang computes for the recorder's ABI (from `-fdump-record-layouts`), even in the object world, because the values flow into logic (`SIZE(arr)`, buffer sizes for `Snprintf`) |
@@ -363,8 +368,8 @@ functions unless a buffer would overflow (then the process aborts; the runtime t
 | `heap.js` | Typed-array heap for the heap world: growable `ArrayBuffer`, `DataView` accessors, a deterministic `malloc`/`realloc`/`free` | Unit tests; Lua test scripts |
 | `string.js`, `ctype.js` | `str*`, `mem*`, `strto*`, `ato*`, `ctype` in the C locale (byte semantics, Darwin's tables) | Native differential tests |
 | `printf.js` | One formatting engine for `sprintf`/`snprintf`/`vsnprintf`/`fprintf` and `sscanf` parsing | Byte-exact against Darwin libc: every format string literal found in the AST plus fuzzed values; includes `%g`/`%.14g` (Lua `tostring` of numbers) |
-| `qsort.js` | **Darwin libc `qsort`**, ported exactly (patch 002 sorts an index array with it, and `sortloot_cmp` can consume RNG, so the comparator call sequence is observable). Reference platform: **macOS 15.8.1 (build 24H32), Darwin 24.6.0, x86_64**, the machine on which the 44/44 byte-identical re-record was verified. The macOS version of the official recording machine is not documented; the 44/44 result shows its `qsort` behaves the same on every sort the public sessions perform | Comparator call sequences logged in native C (on the reference platform) vs JS on random, sorted, reversed and inconsistent inputs |
-| `time.js` | `time()` returns the recorder's pinned "real now" (a US-daylight instant, see the `tm_isdst` quirk), `localtime`/`mktime`/`difftime` with `America/New_York` rules coded explicitly (US rules before and after 2007; no dependency on `Intl` data) | Native `localtime`/`mktime` with `TZ=America/New_York` for 1970–2100 |
+| `qsort.js` | **Darwin libc `qsort`**, ported exactly (patch 002 sorts an index array with it, and `sortloot_cmp` can consume RNG, so the comparator call sequence is observable). Reference platform: **macOS 15.8.1 (build 24H32), Darwin 24.6.0, Apple M2, arm64**, the machine and architecture on which the 44/44 byte-identical re-record was verified (Apple Libc's `qsort.c` is identical from Libc-1534.100.14 through Libc-1752.120.2). The macOS version of the official recording machine is not documented; the 44/44 result shows its `qsort` behaves the same on every sort the public sessions perform | Comparator call sequences logged in native C (on the reference platform) vs JS on random, sorted, reversed and inconsistent inputs |
+| `time.js` | `time()` returns the recorder's pinned "real now" (2026-05-02 12:00 UTC, a US-daylight instant: the `tm_isdst` quirk), `localtime`/`localtime_r` with `America/New_York` rules coded explicitly from 1955 (no `Intl`/tzdata dependency), `mktime` as a statement-level port of Darwin's tzcode (`stdtime/FreeBSD/localtime.c`, Libc-1669.60.4: `time1`/`time2`/`time2sub`, including its binary search, whose path decides fall-back-overlap results, and the PCTS retry), `difftime` | Native `localtime`/`mktime` with `TZ=America/New_York`, 1955–2100: 171,224 cases incl. every transition |
 | `stdio.js` | `FILE` objects: read-only embedded data files (section 8), writable files (`record`, `logfile`, `xlogfile`, saves, bones) through the frozen `js/storage.js` VFS | Unit tests |
 | `env.js` | The recorder environment as constants: `getenv` table (exactly the variables `record-session.mjs` sets: `HOME`, `TERM`, `TZ`, `NETHACK_SEED`, `NETHACK_FIXED_DATETIME`, `NETHACK_RNGLOG`, `NETHACK_NO_DELAY`, `NOMUX_MARKERS`, `NETHACK_RAW_KEYS`, `NETHACKDIR`/`HACKDIR`), the documented `HOME` path, `getuid`/`getpid` constants | Re-recorded sessions |
 | `sys.js` | Process and system calls only reachable outside normal play: `signal` (no-op), `fork`/`exec*`/`popen` (fail like a missing program), `sleep` (no-op), `chdir`, `access`, `stat`, `unlink` on the VFS | — |

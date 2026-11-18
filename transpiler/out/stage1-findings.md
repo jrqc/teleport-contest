@@ -2,7 +2,8 @@
 
 Date: 2026-11-18. Everything here was measured with the scripts in `transpiler/analysis/`
 (regenerate all numbers with `transpiler/analysis/stage1.sh`) and the reference recorder in
-`tools/recorder-env/`. Machine: macOS 15.8.1 x86_64, Apple clang 17.0.0, 8 GB RAM.
+`tools/recorder-env/`. Machine: macOS 15.8.1 (24H32), Apple M2, Apple clang 17.0.0, 8 GB RAM. **The reference recorder
+is an arm64 binary** (the analysis shell runs x86_64 Node under Rosetta, but clang builds arm64).
 
 ## 1. Reference recorder (steps 1.1–1.2)
 
@@ -107,7 +108,7 @@ sequence (which depends on the sort algorithm) is observable: the runtime must r
 Darwin's `qsort` exactly.
 
 Reference platform for that port and its tests: **macOS 15.8.1 (build 24H32), Darwin 24.6.0
-(xnu-11417.140.6), x86_64**, the machine where the 44/44 re-record was verified. The official
+(xnu-11417.140.6), Apple M2, arm64**, the machine where the 44/44 re-record was verified. The official
 recording machine's macOS version is not documented.
 
 ## 5. Async set (step 1.5)
