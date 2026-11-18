@@ -463,3 +463,56 @@ The current skeleton modules from the contest template (`allmain.js`, `mklev.js`
 - **Screens.** At each `nomux_capture_write_input_boundary` the runtime records screen, cursor
   and RNG delta (5, `screen.js`); `nomux_capture_write_screen` from `tty_delay_output` becomes
   `await game.animationFrame()`.
+
+## 9. Annotations and checker
+
+### 9.1 Format
+
+**`transpiler/annotations.jsonc`**: JSON with `//` comments. Not YAML: Node has no YAML parser
+built in, and adding one as a dependency would touch `package.json`, which is part of the
+judged Phase 2 diff (`docs/PHASES.md`). Keys are C names (`file::name` for `static`
+functions and file-scope variables), so they survive line-number changes.
+
+```jsonc
+{
+  "types": {
+    "struct engr": { "repr": "object", "model": "trailing-text", "fields": { "engr_txt": 3 },
+                     "why": "text buffers allocated after the struct (engrave.c newengr)" },
+    "union any":   { "repr": "union-slot" }          // default from the analyzer, listed for review
+  },
+  "groups": {
+    "lua": { "files": "lib/lua-5.4.8/src/*.c", "repr": "heap" }
+  },
+  "functions": {
+    "isaac64_init":        { "extern": "js/isaac64.js" },     // frozen implementation
+    "isaac64_next_uint64": { "extern": "js/isaac64.js" },
+    "nh_deterministic_qsort": { "handwritten": "js/crt/qsort.js", "c": "src/hacklib.c" }
+  },
+  "pointers": {
+    "src/sfstruct.c::sf_genericptr": { "targets": ["..."] }  // unresolved indirect call
+  },
+  "edges": {
+    "cut": [ { "from": "win/tty/wintty.c::cls", "to": "win/tty/wintty.c::winch_handler",
+               "why": "SIGWINCH cannot occur in the port" } ]
+  }
+}
+```
+
+### 9.2 Rules
+
+- The analyzer produces a default for every type, union, pointer site and function; an
+  annotation **overrides** it and must say why (`why`). Representation is never decided in
+  generated code.
+- Hand-written replacements (`handwritten:`) are the last resort: each points at its C
+  function, and the checker reports their total line count (target: under 1% of the output).
+- Edge cuts are only allowed for paths that cannot run in the port, never to make code faster.
+
+### 9.3 Checker (tool 4.8, runs on every transpile)
+
+Fails on: (1) a hard-pattern site with no decision (no analyzer default and no annotation);
+(2) a **stale** annotation (its C name no longer exists in the call graph or record set);
+(3) an unresolved indirect call site without `pointers:` targets; (4) a union marked
+`union-slot` that the static pun check (3.4) flags; (5) a `handwritten:` entry whose C
+function changed since the annotation was written (hash of the function's source text stored
+next to the entry). It prints the decision table, the heap-backed type set, the async-set
+size and the hand-written line count, so every run shows the current state.
