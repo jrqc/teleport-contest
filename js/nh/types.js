@@ -3114,6 +3114,7 @@ export class emin {
 export class engr {
     static $size = 64;   // sizeof: lets the runtime turn byte counts into element counts
     static $fields() { return [["nxt_engr", 0, 'ptr'], ["engr_txt", 8, { arr: 'ptr', n: 3, es: 8 }], ["engr_x", 32, 'i16'], ["engr_y", 34, 'i16'], ["engr_szeach", 36, 'u32'], ["engr_alloc", 40, 'u32'], ["engr_time", 48, 'i64'], ["engr_type", 56, 'i8'], ["guardobjects", 56, { bits: 1, unit: 4, bo: 8, signed: false }], ["nowipeout", 56, { bits: 1, unit: 4, bo: 9, signed: false }], ["eread", 56, { bits: 1, unit: 4, bo: 10, signed: false }], ["erevealed", 56, { bits: 1, unit: 4, bo: 11, signed: false }]]; }   // C layout, for save files (serial.js)
+    static $tail = true;   // allocated with a trailing byte area (annotations types[].tail)
     constructor() {
         this.nxt_engr = null;
         this.engr_txt = $c.nulls(3);

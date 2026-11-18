@@ -242,7 +242,7 @@ export async function read_engr_at(x, y) {   // engrave.c:318
         if (sensed) {
             maxelen = 232;
             elen = $c.i32($c.strlen(ep.engr_txt[0 /* actual_text */]));
-            off = $c.i32($c.pdiff(ep.engr_txt[0 /* actual_text */], $c.radd(ep, 1)));
+            off = $c.i32($c.pdiff(ep.engr_txt[0 /* actual_text */], $c.recTail(ep)));
             if (elen > maxelen) {
                 $c.__builtin___strncpy_chk(new $c.Ptr(buf, 0), ep.engr_txt[0 /* actual_text */], $c.u64(maxelen), 256);
                 buf[maxelen] = 0;
@@ -285,7 +285,7 @@ export async function make_engr_at(x, y, s, pristine_s, e_time, e_type) {   // e
     $G.head_engr = ep;
     ep.engr_x = x;
     ep.engr_y = y;
-    ep.engr_txt[0 /* actual_text */] = $c.radd(ep, 1);
+    ep.engr_txt[0 /* actual_text */] = $c.recTail(ep);
     ep.engr_txt[1 /* remembered_text */] = ep.engr_txt[0 /* actual_text */].add(smem);
     ep.engr_txt[2 /* pristine_text */] = ep.engr_txt[1 /* remembered_text */].add(smem);
     for (i = 0; i < 3 /* text_states */; i = i + 1 | 0) {
@@ -1080,7 +1080,7 @@ export async function save_engravings(nhfp) {   // engrave.c:1551
             szeach = ep.engr_szeach;
             await sfo_unsigned(nhfp, new $c.Ptr(engr_alloc, 0), $c.lit("engraving-engr_alloc"));
             await sfo_engr(nhfp, ep, $c.lit("engraving"));
-            ep.engr_txt[0 /* actual_text */] = $c.radd(ep, 1);
+            ep.engr_txt[0 /* actual_text */] = $c.recTail(ep);
             ep.engr_txt[1 /* remembered_text */] = ep.engr_txt[0 /* actual_text */].add(szeach);
             ep.engr_txt[2 /* pristine_text */] = ep.engr_txt[1 /* remembered_text */].add(szeach);
             await sfo_char(nhfp, ep.engr_txt[0 /* actual_text */], $c.lit("engraving-actual_text"), szeach | 0);
@@ -1112,7 +1112,7 @@ export async function rest_engravings(nhfp) {   // engrave.c:1584
         szeach = ep.engr_szeach;
         ep.nxt_engr = $G.head_engr;
         $G.head_engr = ep;
-        ep.engr_txt[0 /* actual_text */] = $c.radd(ep, 1);
+        ep.engr_txt[0 /* actual_text */] = $c.recTail(ep);
         ep.engr_txt[1 /* remembered_text */] = ep.engr_txt[0 /* actual_text */].add(szeach);
         ep.engr_txt[2 /* pristine_text */] = ep.engr_txt[1 /* remembered_text */].add(szeach);
         await sfi_char(nhfp, ep.engr_txt[0 /* actual_text */], $c.lit("engraving-actual_text"), szeach | 0);
