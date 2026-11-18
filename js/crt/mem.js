@@ -145,14 +145,31 @@ export function peq(a, b) {
     if (a.__arr !== undefined) return a.__arr === b.__arr && a.__idx === b.__idx;
     return false;
 }
-/** Ordering of data pointers (<, <=, >, >= in C): -1, 0, 1. Only within one buffer/array. */
+// Unrelated objects are ordered by a stable ordinal (first seen in a comparison). C orders
+// them by address, which the port does not model; a consistent total order still gives C's
+// answer to every range test (p >= buf && p < buf + n is false for a p in another object),
+// the only use NetHack makes of it (end.c done_in_by: multi_reason inside multireasonbuf).
+const ORD = new WeakMap();
+let nextOrd = 1;
+function ordinal(o) {
+    let n = ORD.get(o);
+    if (n === undefined) { n = nextOrd++; ORD.set(o, n); }
+    return n;
+}
+const baseOf = (p) => (p instanceof Ptr ? p.buf : p instanceof FieldRef ? p.obj : p.__arr !== undefined ? flatPos(p)[0] : p);
+/** Ordering of data pointers (<, <=, >, >= in C): -1, 0, 1. */
 export function pcmp(a, b) {
     let x, y;
     if (a instanceof Ptr && b instanceof Ptr && a.buf === b.buf) { x = a.off; y = b.off; }
     else if (a && b && a.__arr !== undefined && a.__arr === b.__arr) { x = a.__idx; y = b.__idx; }
     else if (peq(a, b)) return 0;
     else if (a && b && a.__arr !== undefined && b.__arr !== undefined && flatPos(a)[0] === flatPos(b)[0]) { x = flatPos(a)[1]; y = flatPos(b)[1]; }
-    else throw new CTrap('ordering of unrelated pointers');
+    else if (a instanceof Ptr && b instanceof Ptr && ArrayBuffer.isView(a.buf) && ArrayBuffer.isView(b.buf) && a.buf.buffer === b.buf.buffer) {
+        // views of one buffer (rows of a contiguous matrix): byte addresses
+        x = a.buf.byteOffset + a.off * a.buf.BYTES_PER_ELEMENT; y = b.buf.byteOffset + b.off * b.buf.BYTES_PER_ELEMENT;
+    } else if (a && b && typeof a === 'object' && typeof b === 'object' && a.$const === undefined && b.$const === undefined) {
+        x = ordinal(baseOf(a)); y = ordinal(baseOf(b));
+    } else throw new CTrap('ordering of a pointer made from an integer');
     return x < y ? -1 : x > y ? 1 : 0;
 }
 

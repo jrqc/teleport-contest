@@ -8,7 +8,7 @@
 // __builtin_object_size of the destination; (size_t)-1 means unknown. Darwin
 // aborts on overflow; these throw CTrap.
 import { CTrap, i32, u64, i64, norm } from './int.js';
-import { BytePtr, Ptr, FieldRef, cstrlen } from './mem.js';
+import { BytePtr, Ptr, FieldRef, cstrlen, recArray } from './mem.js';
 import { RawBlock, asArr } from './alloc.js';
 import { isspace, isdigit, isalpha, tolower } from './ctype.js';
 
@@ -175,9 +175,48 @@ export function memset(d, c, n) {
 export function memcpy(d, s, n) {   // overlapping memcpy is undefined in C; copy like memmove
     return memmove(d, s, n);
 }
+// Allocated storage takes the effective type of what is memcpy'd into it (C11 6.5p6).
+// A block the declared pointer type made a pointer array (nhlua.c: genericptr_t *gmst_ubak =
+// alloc(sizeof u)) that receives a record or other non-pointer data keeps a shadow copy of
+// that data ($eff); copies out of the block read the shadow.
+const isPtrArray = (p) => p instanceof Ptr && Array.isArray(p.buf) && p.buf.$block !== undefined && p.off === 0;
+function shadowOf(S, n) {
+    if (isRec(S)) {
+        const runs = recRun(S, n, 'memcpy');
+        const a = recArray(S.constructor, runs.length);
+        runs.forEach((r, i) => a[i].$copyFrom(r));
+        return a[0];
+    }
+    if (S instanceof Ptr && ArrayBuffer.isView(S.buf)) {
+        const View = S.buf.constructor;
+        if (n % View.BYTES_PER_ELEMENT) throw new CTrap('memcpy of part of an array element');
+        const v = new Ptr(new View(n / View.BYTES_PER_ELEMENT), 0);
+        bytesView(v, n).set(bytesView(S, n));
+        return v;
+    }
+    if (S instanceof Ptr && Array.isArray(S.buf) && isAgg(S.buf[S.off])) {
+        const out = [];
+        let left = n;
+        for (let i = 0; left > 0; i++) { const v = S.buf[S.off + i]; left -= sizeOfVal(v); out.push(cloneVal(v)); }
+        if (left !== 0) throw new CTrap('memcpy of part of an array element');
+        return new Ptr(out, 0);
+    }
+    return null;
+}
+function cloneVal(v) {
+    if (ArrayBuffer.isView(v)) return v.slice();
+    if (Array.isArray(v)) return v.map((x) => (isAgg(x) ? cloneVal(x) : x));
+    return v.$clone();
+}
 export function memmove(d, s, n) {
     n = Number(n);
     const D = asBytes(d), Sx = asBytes(s);
+    if (isPtrArray(Sx) && Sx.buf.$eff) return memmove(D, Sx.buf.$eff, n);
+    if (isPtrArray(D) && n <= D.buf.$block.size && n > D.buf.$block.size - 8 && !isPtrArray(Sx)
+        && (D.buf.$eff || D.buf.every((x) => x === null || x === 0))) {
+        const sh = shadowOf(Sx, n);
+        if (sh !== null) { D.buf.$eff = sh; return d; }
+    }
     if (isRec(D) || isRec(Sx)) {
         if (!(isRec(D) && isRec(Sx) && D.constructor === Sx.constructor)) throw new CTrap('memcpy between a record and other data');
         const ds = recRun(D, n, 'memcpy'), ss = recRun(Sx, n, 'memcpy');

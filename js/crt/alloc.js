@@ -87,6 +87,7 @@ function materialize(p, View) {
         if (View === 'ptr' || View === 'i64') {
             const a = new Array(Math.floor(p.size / 8)).fill(View === 'ptr' ? null : 0);
             a.$kind = View;
+            a.$block = p;   // allocated storage: may take another effective type (string.js memmove)
             v = new Ptr(a, 0);
             if (p.views.size) throw new CTrap('block used as pointers and as other data');
         } else {
