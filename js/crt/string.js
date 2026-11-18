@@ -11,6 +11,7 @@ import { CTrap, i32, u64, i64, norm } from './int.js';
 import { BytePtr, Ptr, FieldRef, cstrlen, recArray } from './mem.js';
 import { RawBlock, asArr } from './alloc.js';
 import { isspace, isdigit, isalpha, tolower } from './ctype.js';
+import { deserialize } from './serial.js';
 
 // bytes compare as unsigned char (Darwin); char buffers are Int8Array, so mask
 const at = (p, i) => p.get(i) & 0xff;
@@ -141,8 +142,13 @@ export function memset(d, c, n) {
     n = Number(n); c &= 0xff;
     const D = asBytes(d);
     if (isRec(D)) {
-        if (c !== 0) throw new CTrap('memset of a record with a nonzero byte');
-        for (const r of recRun(D, n, 'memset')) { r.$copyFrom(new r.constructor()); if (r.__tail) r.__tail.fill(0); }   // (struct engr: + trailing area)
+        for (const r of recRun(D, n, 'memset')) {
+            if (c === 0) r.$copyFrom(new r.constructor());
+            // every byte c: each field decodes the pattern (bones.c savebones: ' ' over struct
+            // cemetery); a pointer field becomes a non-null pointer that traps when used
+            else deserialize(r, new Uint8Array(r.constructor.$size).fill(c));
+            if (r.__tail) r.__tail.fill(c);   // (struct engr: + trailing area)
+        }
         return d;
     }
     if (D instanceof FieldRef) {   // &scalar_or_pointer_field: one element
