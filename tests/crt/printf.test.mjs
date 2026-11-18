@@ -81,7 +81,7 @@ function argOf(type, v) {
 test('formatting matches Darwin snprintf byte for byte', () => {
     const dir = mkdtempSync(path.join(tmpdir(), 'printf-'));
     const exe = path.join(dir, 'printf-ref');
-    execFileSync('clang', ['-O0', '-w', '-o', exe, path.join(HERE, '../c-diff/printf/printf-ref.c')]);
+    execFileSync('clang', ['-arch', 'arm64', '-O0', '-w', '-o', exe, path.join(HERE, '../c-diff/printf/printf-ref.c')]);
     const all = cases();
     const native = execFileSync(exe, { input: all.join('\n') + '\n', maxBuffer: 1 << 28 }).toString().trim().split('\n');
     assert.equal(native.length, all.length);

@@ -17,7 +17,7 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 function nativeCases() {
     const dir = mkdtempSync(path.join(tmpdir(), 'qsort-'));
     const exe = path.join(dir, 'qsort-ref');
-    execFileSync('clang', ['-O0', '-o', exe, path.join(HERE, '../c-diff/qsort/qsort-ref.c')]);
+    execFileSync('clang', ['-arch', 'arm64', '-O0', '-o', exe, path.join(HERE, '../c-diff/qsort/qsort-ref.c')]);
     const lines = execFileSync(exe, { maxBuffer: 1 << 30 }).toString().trim().split('\n');
     const cases = [];
     let cur = null;

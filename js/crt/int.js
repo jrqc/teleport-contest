@@ -1,5 +1,6 @@
 // js/crt/int.js: exact C integer semantics for the recorder's ABI
-// (LP64, x86-64, Darwin; transpiler-design.md 3.1). Hand-written runtime.
+// (LP64, arm64 Darwin: the reference recorder is an arm64 binary on Apple
+// Silicon; transpiler-design.md 3.1). Hand-written runtime.
 //
 // Representation:
 //   char, short, int and their unsigned forms: a Number holding the exact value.
@@ -9,10 +10,12 @@
 //   on any mix (JS compares Number and BigInt exactly).
 // Operations are the C operations on promoted types (int, unsigned int, long,
 // unsigned long); narrower types are reached through the conversions.
-// Signed overflow wraps (two's complement), as clang's x86-64 code does at -O0.
-// Shift counts are masked to the operand width, as the x86-64 shift
-// instructions do. Division by zero and INT_MIN / -1 trap on x86-64 (SIGFPE):
-// they throw CTrap.
+// Cases C leaves undefined behave as the arm64 instructions clang emits at -O0
+// (measured natively, tests/c-diff/int/int-vectors.c), because the recorder
+// keeps running through them:
+//   signed overflow wraps; shift counts are masked to the operand width;
+//   x / 0 == 0 and x % 0 == x (sdiv/udiv, msub); INT_MIN / -1 == INT_MIN and
+//   INT_MIN % -1 == 0; float -> integer saturates and NaN gives 0 (fcvtzs/fcvtzu).
 
 export class CTrap extends Error {
     constructor(what) { super(`C trap: ${what}`); this.name = 'CTrap'; }
@@ -48,19 +51,32 @@ export function u64(x) {
 }
 export const bool = (x) => (x == 0 ? 0 : 1);   // _Bool; == so that 0n counts
 
-// floating point -> integer: truncation; out of range or NaN gives what the
-// x86-64 cvttsd2si instruction gives (the "integer indefinite" value).
+// floating point -> integer: truncation, saturating at the type's limits, NaN -> 0
+// (arm64 fcvtzs / fcvtzu).
 export function dtoi32(d) {
+    if (Number.isNaN(d)) return 0;
     const t = Math.trunc(d) + 0;   // + 0: trunc(-0.5) is -0
-    return (t >= -2147483648 && t <= 2147483647) ? t : -2147483648;
+    return t > 2147483647 ? 2147483647 : t < -2147483648 ? -2147483648 : t;
+}
+export function dtou32(d) {
+    if (Number.isNaN(d)) return 0;
+    const t = Math.trunc(d) + 0;
+    return t > 4294967295 ? 4294967295 : t < 0 ? 0 : t;
 }
 export function dtoi64(d) {
+    if (Number.isNaN(d)) return 0;
     const t = Math.trunc(d) + 0;
-    if (Number.isNaN(t) || t < -(2 ** 63) || t >= 2 ** 63) return -(2n ** 63n);
+    if (t >= 2 ** 63) return 2n ** 63n - 1n;
+    if (t < -(2 ** 63)) return -(2n ** 63n);
     return Number.isSafeInteger(t) ? t : BigInt(t);
 }
-// double -> unsigned int: clang converts through a 64-bit cvttsd2si.
-export const dtou32 = (d) => u32(dtoi64(d));
+export function dtou64(d) {
+    if (Number.isNaN(d)) return 0;
+    const t = Math.trunc(d) + 0;
+    if (t >= 2 ** 64) return 2n ** 64n - 1n;
+    if (t < 0) return 0;
+    return Number.isSafeInteger(t) ? t : BigInt(t);
+}
 /** Integer (either form) -> double, rounded to nearest as C does. */
 export const itod = (x) => Number(x);
 export const fround = Math.fround;   // float storage
@@ -70,13 +86,11 @@ export const add32 = (a, b) => (a + b) | 0;
 export const sub32 = (a, b) => (a - b) | 0;
 export const mul32 = (a, b) => Math.imul(a, b);
 export function div32(a, b) {
-    if (b === 0) throw new CTrap('integer division by zero');
-    if (a === -2147483648 && b === -1) throw new CTrap('INT_MIN / -1');
-    return ((a - a % b) / b) | 0;   // exact: dividend minus remainder is a multiple of b; |0 drops -0
+    if (b === 0) return 0;                               // arm64 sdiv
+    return ((a - a % b) / b) | 0;   // exact: dividend minus remainder is a multiple of b; |0 wraps INT_MIN/-1, drops -0
 }
 export function rem32(a, b) {
-    if (b === 0) throw new CTrap('integer division by zero');
-    if (a === -2147483648 && b === -1) throw new CTrap('INT_MIN % -1');
+    if (b === 0) return a;                               // arm64: a - (a / 0) * 0
     return (a % b) | 0;       // JS % has the dividend's sign, like C; |0 turns -0 into 0
 }
 export const neg32 = (a) => (-a) | 0;
@@ -92,11 +106,11 @@ export const addu32 = (a, b) => (a + b) >>> 0;
 export const subu32 = (a, b) => (a - b) >>> 0;
 export const mulu32 = (a, b) => Math.imul(a, b) >>> 0;
 export function divu32(a, b) {
-    if (b === 0) throw new CTrap('integer division by zero');
+    if (b === 0) return 0;
     return (a - a % b) / b;
 }
 export function remu32(a, b) {
-    if (b === 0) throw new CTrap('integer division by zero');
+    if (b === 0) return a;
     return a % b;
 }
 export const negu32 = (a) => (-a) >>> 0;
@@ -121,18 +135,15 @@ export function mul64(a, b) {
     if (isNum(a) && isNum(b)) { const r = a * b; if (Number.isSafeInteger(r)) return r + 0; }
     return norm(BigInt.asIntN(64, big(a) * big(b)));
 }
-const INT64_MIN = -(2n ** 63n);
 export function div64(a, b) {
-    if (b == 0) throw new CTrap('integer division by zero');
+    if (b == 0) return 0;                                  // arm64 sdiv
     if (isNum(a) && isNum(b)) return (a - a % b) / b + 0;   // exact for safe integers; +0 drops -0
-    if (big(a) === INT64_MIN && big(b) === -1n) throw new CTrap('LONG_MIN / -1');
-    return norm(big(a) / big(b));                          // BigInt division truncates, like C
+    return norm(BigInt.asIntN(64, big(a) / big(b)));        // truncates like C; LONG_MIN / -1 wraps
 }
 export function rem64(a, b) {
-    if (b == 0) throw new CTrap('integer division by zero');
+    if (b == 0) return a;
     if (isNum(a) && isNum(b)) return (a % b) + 0;          // fmod is exact
-    if (big(a) === INT64_MIN && big(b) === -1n) throw new CTrap('LONG_MIN % -1');
-    return norm(big(a) % big(b));
+    return norm(big(a) % big(b));                          // LONG_MIN % -1 == 0
 }
 export const neg64 = (a) => (isNum(a) ? -a + 0 : norm(BigInt.asIntN(64, -a)));
 export function not64(a) {
@@ -168,12 +179,12 @@ export function mulu64(a, b) {
     return wrapU(big(a) * big(b));
 }
 export function divu64(a, b) {
-    if (b == 0) throw new CTrap('integer division by zero');
+    if (b == 0) return 0;
     if (isNum(a) && isNum(b)) return (a - a % b) / b;
     return norm(big(a) / big(b));
 }
 export function remu64(a, b) {
-    if (b == 0) throw new CTrap('integer division by zero');
+    if (b == 0) return a;
     if (isNum(a) && isNum(b)) return a % b;
     return norm(big(a) % big(b));
 }

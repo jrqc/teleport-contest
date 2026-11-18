@@ -1,15 +1,21 @@
 /* int-vectors.c: native reference for js/crt/int.js (tool 4.5/4.6).
  * Prints "<op> <a> <b> <result>" lines (decimal; doubles as %.17g).
- * Build: clang -O0 -fwrapv int-vectors.c   (-fwrapv: signed overflow wraps, the
- * semantics the JS helpers implement; the recorder's -O0 code wraps the same way).
- * Undefined cases are skipped: division by zero, MIN / -1, shift counts outside
- * [0, width), out-of-range float->int. Usage: int-vectors [cases-per-op] */
+ * Build: clang -arch arm64 -O0 -fwrapv int-vectors.c (the reference recorder is
+ * an arm64 binary; -fwrapv: signed overflow wraps, as its -O0 code does).
+ * Cases C leaves undefined are included where the recorder would run through
+ * them (division by zero, MIN / -1, out-of-range and NaN float->int: the arm64
+ * instructions define them); divisors come through `volatile` so clang cannot
+ * fold them. Shift counts stay in [0, width). Usage: int-vectors [cases-per-op] */
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <limits.h>
 
 static uint64_t s = 0x9E3779B97F4A7C15ULL;
+static volatile int32_t zero32 = 0, m1_32 = -1;
+static volatile int64_t zero64 = 0, m1_64 = -1;
+static volatile uint32_t zerou32 = 0;
+static volatile uint64_t zerou64 = 0;
 static uint64_t rnd64(void) { s ^= s << 13; s ^= s >> 7; s ^= s << 17; return s; }
 
 /* values biased to edges: small numbers, powers of two +-1, extremes, random */
@@ -108,15 +114,39 @@ int main(int argc, char **argv) {
         printf("u32 %llu 0 %u\n", (unsigned long long) UA, (uint32_t) UA);
         printf("i32 %d 0 %d\n", (int) (signed char) a, (int) (signed char) a); /* char is signed */
 
+        /* undefined in C, defined by the arm64 instructions */
+        printf("div32 %d 0 %d\n", a, a / zero32);
+        printf("rem32 %d 0 %d\n", a, a % zero32);
+        printf("divu32 %u 0 %u\n", ua, ua / zerou32);
+        printf("remu32 %u 0 %u\n", ua, ua % zerou32);
+        printf("div64 %lld 0 %lld\n", (long long) A, (long long) (A / zero64));
+        printf("rem64 %lld 0 %lld\n", (long long) A, (long long) (A % zero64));
+        printf("divu64 %llu 0 %llu\n", (unsigned long long) UA, (unsigned long long) (UA / zerou64));
+        printf("remu64 %llu 0 %llu\n", (unsigned long long) UA, (unsigned long long) (UA % zerou64));
+
         /* integer <-> double */
         printf("itod %lld 0 %.17g\n", (long long) A, (double) A);
         printf("itod %llu 0 %.17g\n", (unsigned long long) UA, (double) UA);
         {
             double d = (double) (int64_t) val(64) / (double) (1 + rnd64() % 1000);
-            if (d > -2147483648.0 && d < 2147483648.0) printf("dtoi32 %.17g 0 %d\n", d, (int) d);
-            if (d > -9223372036854775808.0 && d < 9223372036854775808.0) printf("dtoi64 %.17g 0 %lld\n", d, (long long) d);
-            if (d > -1.0 && d < 4294967296.0) printf("dtou32 %.17g 0 %u\n", d, (unsigned) d);
+            volatile double vd = d * ((rnd64() % 4) == 0 ? 1e10 : 1.0);   /* some out of range */
+            printf("dtoi32 %.17g 0 %d\n", vd, (int) vd);
+            printf("dtoi64 %.17g 0 %lld\n", vd, (long long) vd);
+            printf("dtou32 %.17g 0 %u\n", vd, (unsigned) vd);
+            printf("dtou64 %.17g 0 %llu\n", vd, (unsigned long long) vd);
         }
+    }
+    printf("div32 -2147483648 -1 %d\n", INT_MIN / m1_32);
+    printf("rem32 -2147483648 -1 %d\n", INT_MIN % m1_32);
+    printf("div64 -9223372036854775808 -1 %lld\n", (long long) (LLONG_MIN / m1_64));
+    printf("rem64 -9223372036854775808 -1 %lld\n", (long long) (LLONG_MIN % m1_64));
+    {
+        volatile double nan_ = 0.0 / 0.0, e[] = { 1e300, -1e300, 4294967296.0, -1.0, -0.5, 2147483648.0, 9.3e18, 1.9e19 };
+        int k;
+        printf("dtoi32 nan 0 %d\ndtoi64 nan 0 %lld\ndtou32 nan 0 %u\ndtou64 nan 0 %llu\n", (int) nan_, (long long) nan_, (unsigned) nan_, (unsigned long long) nan_);
+        for (k = 0; k < 8; k++)
+            printf("dtoi32 %.17g 0 %d\ndtoi64 %.17g 0 %lld\ndtou32 %.17g 0 %u\ndtou64 %.17g 0 %llu\n",
+                   e[k], (int) e[k], e[k], (long long) e[k], e[k], (unsigned) e[k], e[k], (unsigned long long) e[k]);
     }
     printf("char_is_signed 0 0 %d\n", (char) -1 < 0);
     return 0;
