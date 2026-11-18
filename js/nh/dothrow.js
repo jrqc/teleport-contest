@@ -489,7 +489,7 @@ export async function walk_path(src_cc, dest_cc, check_proc, arg) {   // dothrow
     }
     i = $c.i16(err = 0);
     if (dx < dy) {
-        while (($t1 = i, i = $c.$t116(i + 1), $t1) < dy) {
+        while (($t1 = i, i = $c.i16($t1 + 1), $t1) < dy) {
             prev_x = x;
             prev_y = y;
             y = $c.i16(y + y_change | 0);
@@ -503,7 +503,7 @@ export async function walk_path(src_cc, dest_cc, check_proc, arg) {   // dothrow
             }
         }
     } else {
-        while (($t2 = i, i = $c.$t216(i + 1), $t2) < dx) {
+        while (($t2 = i, i = $c.i16($t2 + 1), $t2) < dx) {
             prev_x = x;
             prev_y = y;
             x = $c.i16(x + x_change | 0);
