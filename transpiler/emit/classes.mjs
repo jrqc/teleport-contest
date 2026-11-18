@@ -98,7 +98,7 @@ function fieldsSrc(scope, L, cls) {
  * Source of the class for record `key`.
  * @param scope ctypes Scope; @param cls key -> class name
  */
-export function classSource(scope, key, cls, origin) {
+export function classSource(scope, key, cls, origin, tail = false) {
     const r = scope.record(key);
     const L = scope.recordLayout(key);
     const name = cls(key);
@@ -108,6 +108,7 @@ export function classSource(scope, key, cls, origin) {
     out.push(`    static $size = ${L.size};   // sizeof: lets the runtime turn byte counts into element counts`);
     out.push(fieldsSrc(scope, L, cls));
     if (r.union) out.push('    static $union = true;');
+    if (tail) out.push('    static $tail = true;   // allocated with a trailing byte area (annotations types[].tail)');
     if (r.union) {
         // one value slot $v; $k is the member last stored or used as an embedded aggregate.
         // Copying copies an embedded record/array member deeply and anything else (scalars,

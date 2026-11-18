@@ -103,6 +103,11 @@ function flatPos(p) {
     while (a.__outer !== undefined) { i += a.__oidx * a.length; a = a.__outer; }
     return [a, i];
 }
+/** (char *) (p + 1) for a record with a trailing area (annotation types[].tail): its bytes. */
+export function recTail(p) {
+    if (!p.__tail) throw new CTrap('(char *) (p + 1): the record has no trailing area');
+    return new Ptr(p.__tail, 0);
+}
 /** p + n for a record pointer. */
 export function radd(p, n) {
     if (n === 0) return p;

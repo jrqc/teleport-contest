@@ -1266,6 +1266,13 @@ export class TUEmitter {
             if (isPtr(from) && isPtr(to) && pkind(to) === 'rec' && pkind(from) !== 'rec' && this.S.records.has(to.to.key)) {
                 return E(`$c.asRec(${e.c}, $T.${this.cls(to.to.key)}, ${this.S.sizeof(to.to)})`, PREC.call);
             }
+            // (char *) (p + 1) for a record with a trailing area (annotations types[].tail)
+            if (isPtr(from) && isPtr(to) && pkind(from) === 'rec' && to.to.k === 'int' && to.to.size === 1 && this.prog.tails.has(from.to.key)) {
+                const s0 = this.skipParens(sub);
+                if (s0.kind === 'BinaryOperator' && s0.opcode === '+' && this.fold(kids(s0)[1]) !== null && Number(this.fold(kids(s0)[1])) === 1) {
+                    return E(`$c.recTail(${this.rv(kids(s0)[0]).c})`, PREC.call);
+                }
+            }
             // void *, and long * (alloc()'s return type, still an untyped block) -> typed pointer
             const fromLong = isPtr(from) && from.to.k === 'int' && from.to.size === 8;
             if (isPtr(from) && isPtr(to) && (pkind(from) === 'void' || fromLong) && pkind(to) === 'ref' && !(to.to.k === 'int' && to.to.size === 8)) {

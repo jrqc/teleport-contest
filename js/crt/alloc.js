@@ -58,8 +58,12 @@ export function asRec(p, T, size) {
     if (p.views !== null) throw new CTrap('block used as bytes, then as a record');
     let o;
     // always an array (of one, often): p + 1 is a valid C pointer past the record
-    if (p.size >= size && p.size % size === 0) o = recArray(T, p.size / size)[0];
-    else if (p.size > size) { o = new T(); o.__tail = new Uint8Array(p.size - size); }   // trailing text (struct engr)
+    // a record with a trailing area (annotation types[].tail: struct engr and its text, D4) is
+    // always one record and its bytes, even when the size happens to be a multiple
+    if (T.$tail && p.size >= size) { o = new T(); o.__tail = new Int8Array(p.size - size); }
+    else if (p.size >= size && p.size % size === 0) o = recArray(T, p.size / size)[0];
+    else if (p.size > size && p.size - size < size) o = new T();   // alloc() rounds sizes up to 8 (ForceAlignedLength): slack
+    else if (p.size > size) throw new CTrap(`block of ${p.size} bytes used as a record of ${size} (not an array, no trailing area: annotation types[].tail)`);
     else throw new CTrap(`block of ${p.size} bytes used as a record of ${size}`);
     p.obj = o;
     return o;

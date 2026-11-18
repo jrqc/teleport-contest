@@ -51,6 +51,7 @@ export class Program {
         this.bridgeFns = new Map();   // heap function name -> { decl type, scope } used from the object world
         this.objKeys = new Set();     // record keys object-world code instantiates (classes): copied across the bridge
         this.heapCrt = opts.heapCrtNames || new Set();
+        this.tails = new Set(opts.tails || []);   // record keys with a trailing area (annotations types[].tail)
         this.isHeapFile = opts.isHeapFile || null;   // tests: put every TU in the heap world
     }
     addCallFacts(tu) { this.async.addTU(tu); }
@@ -263,7 +264,7 @@ export class Program {
                 done.add(key);
                 again = true;
                 const scope = this.classScope.get(key);
-                srcs.push({ name, src: classSource(scope, key, (k) => this.className(k, scope)) });
+                srcs.push({ name, src: classSource(scope, key, (k) => this.className(k, scope), undefined, this.tails.has(key)) });
             }
         }
         srcs.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));

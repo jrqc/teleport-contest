@@ -1,0 +1,455 @@
+{
+ "commit": "266380b",
+ "timestamp": "2026-11-18T17:48:59.631Z",
+ "totals": {
+  "passed": 0,
+  "sessions": 44,
+  "screens": 0,
+  "screensTotal": 11405,
+  "rng": 0,
+  "rngTotal": 792838,
+  "maxMs": 1292.91
+ },
+ "sessions": {
+  "seed0002-healer-reflection-drummer": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 595,
+   "rng": 0,
+   "rngTotal": 27158,
+   "cursors": 0,
+   "ms": 346.49,
+   "error": null
+  },
+  "seed0004-feeding-pony": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 409,
+   "rng": 0,
+   "rngTotal": 12084,
+   "cursors": 0,
+   "ms": 340.95,
+   "error": null
+  },
+  "seed0006-wizard-water-demon": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 123,
+   "rng": 0,
+   "rngTotal": 6736,
+   "cursors": 0,
+   "ms": 329.76,
+   "error": null
+  },
+  "seed0007-rogue-snake-swamp": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 302,
+   "rng": 0,
+   "rngTotal": 16373,
+   "cursors": 0,
+   "ms": 338.9,
+   "error": null
+  },
+  "seed0009-swimmer-mforce": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 73,
+   "rng": 0,
+   "rngTotal": 3713,
+   "cursors": 0,
+   "ms": 340.91,
+   "error": null
+  },
+  "seed0012-monk-vault-escort": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 308,
+   "rng": 0,
+   "rngTotal": 13878,
+   "cursors": 0,
+   "ms": 345.56,
+   "error": null
+  },
+  "seed0013-friday13-save-then-fullmoon-restore": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 99,
+   "rng": 0,
+   "rngTotal": 4804,
+   "cursors": 0,
+   "ms": 469.4,
+   "error": null
+  },
+  "seed0013-rogue-friday13-combat": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 59,
+   "rng": 0,
+   "rngTotal": 4838,
+   "cursors": 0,
+   "ms": 340.96,
+   "error": null
+  },
+  "seed0014-dequa-fountain-explore": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 714,
+   "rng": 0,
+   "rngTotal": 59178,
+   "cursors": 0,
+   "ms": 331.52,
+   "error": null
+  },
+  "seed0015-valk-level2-pit-dog-wait": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 44,
+   "rng": 0,
+   "rngTotal": 8563,
+   "cursors": 0,
+   "ms": 330.89,
+   "error": null
+  },
+  "seed0016-healer-newmoon-eat-zap": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 36,
+   "rng": 0,
+   "rngTotal": 3656,
+   "cursors": 0,
+   "ms": 352.06,
+   "error": null
+  },
+  "seed0017-samurai-altar-pray": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 67,
+   "rng": 0,
+   "rngTotal": 3465,
+   "cursors": 0,
+   "ms": 369.02,
+   "error": null
+  },
+  "seed0030-ten-diverse-deaths": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 1953,
+   "rng": 0,
+   "rngTotal": 105529,
+   "cursors": 0,
+   "ms": 1292.91,
+   "error": null
+  },
+  "seed0060-orc-rogue-kick-search": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 41,
+   "rng": 0,
+   "rngTotal": 3626,
+   "cursors": 0,
+   "ms": 350.27,
+   "error": null
+  },
+  "seed0077-rogue-chargen": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 33,
+   "rng": 0,
+   "rngTotal": 3242,
+   "cursors": 0,
+   "ms": 346.37,
+   "error": null
+  },
+  "seed0101-ranger-quiver-throw-travel-engrave": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 27,
+   "rng": 0,
+   "rngTotal": 2371,
+   "cursors": 0,
+   "ms": 343.47,
+   "error": null
+  },
+  "seed0102-ranger-name-cancel": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 25,
+   "rng": 0,
+   "rngTotal": 4485,
+   "cursors": 0,
+   "ms": 355.69,
+   "error": null
+  },
+  "seed0103-knight-ride-pony": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 60,
+   "rng": 0,
+   "rngTotal": 2640,
+   "cursors": 0,
+   "ms": 301.77,
+   "error": null
+  },
+  "seed0104-knight-ride-combat": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 43,
+   "rng": 0,
+   "rngTotal": 3223,
+   "cursors": 0,
+   "ms": 298.56,
+   "error": null
+  },
+  "seed0105-valk-chat-lamp-ration": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 30,
+   "rng": 0,
+   "rngTotal": 2499,
+   "cursors": 0,
+   "ms": 366.05,
+   "error": null
+  },
+  "seed0106-priest-extcmd-sweep": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 267,
+   "rng": 0,
+   "rngTotal": 4194,
+   "cursors": 0,
+   "ms": 309.04,
+   "error": null
+  },
+  "seed0107-samurai-twoweapon-enhance": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 98,
+   "rng": 0,
+   "rngTotal": 2902,
+   "cursors": 0,
+   "ms": 319.21,
+   "error": null
+  },
+  "seed0108-wizard-extcmd-wishlist": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 303,
+   "rng": 0,
+   "rngTotal": 16958,
+   "cursors": 0,
+   "ms": 299.62,
+   "error": null
+  },
+  "seed0116-wizard-wear-shop": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 127,
+   "rng": 0,
+   "rngTotal": 12562,
+   "cursors": 0,
+   "ms": 385.47,
+   "error": null
+  },
+  "seed0200-monk-north-search": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 40,
+   "rng": 0,
+   "rngTotal": 3822,
+   "cursors": 0,
+   "ms": 312.41,
+   "error": null
+  },
+  "seed0360-wizard-world-tour": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 833,
+   "rng": 0,
+   "rngTotal": 120639,
+   "cursors": 0,
+   "ms": 332.36,
+   "error": null
+  },
+  "seed0361-archeologist-tour": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 366,
+   "rng": 0,
+   "rngTotal": 53865,
+   "cursors": 0,
+   "ms": 337.4,
+   "error": null
+  },
+  "seed0367-priest-quest-tour": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 324,
+   "rng": 0,
+   "rngTotal": 50125,
+   "cursors": 0,
+   "ms": 343.23,
+   "error": null
+  },
+  "seed0373-barbarian-quest-tour": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 124,
+   "rng": 0,
+   "rngTotal": 35386,
+   "cursors": 0,
+   "ms": 333.08,
+   "error": null
+  },
+  "seed0383-wizard-hallucinate": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 219,
+   "rng": 0,
+   "rngTotal": 16915,
+   "cursors": 0,
+   "ms": 339.46,
+   "error": null
+  },
+  "seed0398-wizard-wandpoly-pile": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 87,
+   "rng": 0,
+   "rngTotal": 3026,
+   "cursors": 0,
+   "ms": 373.22,
+   "error": null
+  },
+  "seed0399-wizard-hallu-actions": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 532,
+   "rng": 0,
+   "rngTotal": 11409,
+   "cursors": 0,
+   "ms": 336.51,
+   "error": null
+  },
+  "seed0501-priest-cast-read-turn": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 28,
+   "rng": 0,
+   "rngTotal": 2238,
+   "cursors": 0,
+   "ms": 348.28,
+   "error": null
+  },
+  "seed0700-samurai-explore-descend": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 51,
+   "rng": 0,
+   "rngTotal": 3230,
+   "cursors": 0,
+   "ms": 342.09,
+   "error": null
+  },
+  "seed0900-tourist-explore-actions": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 84,
+   "rng": 0,
+   "rngTotal": 2983,
+   "cursors": 0,
+   "ms": 346.5,
+   "error": null
+  },
+  "seed1150-caveman-explore-move": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 51,
+   "rng": 0,
+   "rngTotal": 3137,
+   "cursors": 0,
+   "ms": 335,
+   "error": null
+  },
+  "seed1500-rogue-explore-move": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 40,
+   "rng": 0,
+   "rngTotal": 2768,
+   "cursors": 0,
+   "ms": 344.29,
+   "error": null
+  },
+  "seed1800-tourist-eat-throw": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 26,
+   "rng": 0,
+   "rngTotal": 2458,
+   "cursors": 0,
+   "ms": 339.5,
+   "error": null
+  },
+  "seed2200-wizard-quaff-zap-read": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 230,
+   "rng": 0,
+   "rngTotal": 3018,
+   "cursors": 0,
+   "ms": 335.65,
+   "error": null
+  },
+  "seed2600-wizard-custom-binds": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 38,
+   "rng": 0,
+   "rngTotal": 11647,
+   "cursors": 0,
+   "ms": 366.03,
+   "error": null
+  },
+  "seed4500-knight-coverage": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 1814,
+   "rng": 0,
+   "rngTotal": 108275,
+   "cursors": 0,
+   "ms": 339.02,
+   "error": null
+  },
+  "seed5002-wizard-coverage-pair": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 410,
+   "rng": 0,
+   "rngTotal": 12167,
+   "cursors": 0,
+   "ms": 434.8,
+   "error": null
+  },
+  "seed5006-tourist-stress-disaster": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 249,
+   "rng": 0,
+   "rngTotal": 13923,
+   "cursors": 0,
+   "ms": 463.7,
+   "error": null
+  },
+  "seed8000-tourist-starter": {
+   "passed": false,
+   "screens": 0,
+   "screensTotal": 23,
+   "rng": 0,
+   "rngTotal": 3130,
+   "cursors": 0,
+   "ms": 339.98,
+   "error": null
+  }
+ }
+}
