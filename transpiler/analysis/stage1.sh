@@ -9,5 +9,6 @@ tail -1 transpiler/out/inventory/run.log
 node --max-old-space-size=4000 transpiler/analysis/aggregate.mjs
 node transpiler/analysis/macros.mjs > /dev/null
 node --max-old-space-size=4000 transpiler/analysis/heap.mjs
+node --max-old-space-size=4000 transpiler/analysis/union-pun.mjs
 node transpiler/analysis/async.mjs | head -5
 node transpiler/analysis/hotspots.mjs 0 | tail -1

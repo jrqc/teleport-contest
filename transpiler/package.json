@@ -1,0 +1,13 @@
+{
+  "name": "teleport-transpiler",
+  "private": true,
+  "description": "NetHack 5.0 C to JavaScript transpiler (not judged; see ../transpiler-design.md)",
+  "type": "module",
+  "engines": { "node": ">=22.0.0" },
+  "scripts": {
+    "analyze": "bash analysis/stage1.sh",
+    "union-pun": "node analysis/union-pun.mjs",
+    "test": "node --test ../tests/"
+  },
+  "dependencies": {}
+}

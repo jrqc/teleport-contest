@@ -6,6 +6,7 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { loadAst, ROOT } from '../frontend/ast.mjs';
 import { inventoryTU } from './inventory-tu.mjs';
+import { unionCensusTU } from './union-census-tu.mjs';
 
 const db = JSON.parse(readFileSync(path.join(ROOT, 'transpiler/out/compile_commands.json'), 'utf8'));
 const filter = process.argv[2];
@@ -23,6 +24,7 @@ async function worker() {
             const { root, stderr } = await loadAst(e);
             const inv = inventoryTU(root, e.file);
             inv.group = e.group;
+            inv.unionCensus = unionCensusTU(root);   // union punning check (design 3.4)
             inv.clangWarnings = (stderr.match(/warning:/g) || []).length;
             const name = e.file.replace(/^tools\/recorder-env\/build\/nethack-c\/recorder\//, '').replace(/\//g, '__');
             writeFileSync(path.join(OUT, name + '.json'), JSON.stringify(inv));

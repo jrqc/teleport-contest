@@ -1,0 +1,841 @@
+{
+ "union <anon@lib/lua-5.4.8/src/lauxlib.h:196>": {
+  "file": "lib/lua-5.4.8/src/lauxlib.h",
+  "line": 196,
+  "members": [
+   "double n",
+   "double u",
+   "void * s",
+   "long long i",
+   "long l",
+   "char[1024] b"
+  ],
+  "accesses": 3,
+  "classes": 1,
+  "verdict": "union-cell",
+  "puns": [],
+  "escapes": [
+   "&.char[1024] lib/lua-5.4.8/src/lauxlib.c:559 prepbuffsize [f:struct luaL_Buffer.init]",
+   "&.char[1024] lib/lua-5.4.8/src/lauxlib.c:601 luaL_pushresult [f:struct luaL_Buffer.init]",
+   "&.char[1024] lib/lua-5.4.8/src/lauxlib.c:635 luaL_buffinit [f:struct luaL_Buffer.init]"
+  ],
+  "punCount": 0,
+  "escapeCount": 3
+ },
+ "union <anon@lib/lua-5.4.8/src/llex.h:49>": {
+  "file": "lib/lua-5.4.8/src/llex.h",
+  "line": 49,
+  "members": [
+   "double r",
+   "long long i",
+   "struct TString * ts"
+  ],
+  "accesses": 10,
+  "classes": 2,
+  "verdict": "object",
+  "puns": [],
+  "escapes": [],
+  "punCount": 0,
+  "escapeCount": 0
+ },
+ "union <anon@lib/lua-5.4.8/src/lobject.h:165>": {
+  "file": "lib/lua-5.4.8/src/lobject.h",
+  "line": 165,
+  "members": [
+   "union StackValue * p",
+   "long offset"
+  ],
+  "accesses": 606,
+  "classes": 6,
+  "verdict": "union-cell",
+  "puns": [
+   {
+    "class": "f:struct CallInfo.func",
+    "read": "union StackValue *",
+    "readAt": "lib/lua-5.4.8/src/lapi.c:63 index2value",
+    "written": "long",
+    "writtenAt": "w lib/lua-5.4.8/src/ldo.c:171 relstack [f:struct CallInfo.func]"
+   },
+   {
+    "class": "f:struct CallInfo.func",
+    "read": "long",
+    "readAt": "lib/lua-5.4.8/src/ldo.c:188 correctstack",
+    "written": "union StackValue *",
+    "writtenAt": "w lib/lua-5.4.8/src/ldo.c:188 correctstack [f:struct CallInfo.func]"
+   },
+   {
+    "class": "f:struct lua_State.top",
+    "read": "union StackValue *",
+    "readAt": "lib/lua-5.4.8/src/lapi.c:65 index2value",
+    "written": "long",
+    "writtenAt": "w lib/lua-5.4.8/src/ldo.c:165 relstack [f:struct lua_State.top]"
+   },
+   {
+    "class": "f:struct lua_State.top",
+    "read": "long",
+    "readAt": "lib/lua-5.4.8/src/ldo.c:182 correctstack",
+    "written": "union StackValue *",
+    "writtenAt": "rw lib/lua-5.4.8/src/lapi.c:135 lua_xmove [f:struct lua_State.top]"
+   },
+   {
+    "class": "f:struct CallInfo.top",
+    "read": "union StackValue *",
+    "readAt": "lib/lua-5.4.8/src/lapi.c:121 lua_checkstack",
+    "written": "long",
+    "writtenAt": "w lib/lua-5.4.8/src/ldo.c:170 relstack [f:struct CallInfo.top]"
+   },
+   {
+    "class": "f:struct CallInfo.top",
+    "read": "long",
+    "readAt": "lib/lua-5.4.8/src/ldo.c:187 correctstack",
+    "written": "union StackValue *",
+    "writtenAt": "w lib/lua-5.4.8/src/lapi.c:122 lua_checkstack [f:struct CallInfo.top]"
+   },
+   {
+    "class": "f:struct lua_State.tbclist",
+    "read": "union StackValue *",
+    "readAt": "lib/lua-5.4.8/src/lapi.c:200 lua_settop",
+    "written": "long",
+    "writtenAt": "w lib/lua-5.4.8/src/ldo.c:166 relstack [f:struct lua_State.tbclist]"
+   },
+   {
+    "class": "f:struct lua_State.tbclist",
+    "read": "long",
+    "readAt": "lib/lua-5.4.8/src/ldo.c:183 correctstack",
+    "written": "union StackValue *",
+    "writtenAt": "w lib/lua-5.4.8/src/ldo.c:183 correctstack [f:struct lua_State.tbclist]"
+   }
+  ],
+  "escapes": [],
+  "punCount": 8,
+  "escapeCount": 0
+ },
+ "union <anon@lib/lua-5.4.8/src/lobject.h:391>": {
+  "file": "lib/lua-5.4.8/src/lobject.h",
+  "line": 391,
+  "members": [
+   "unsigned long lnglen",
+   "struct TString * hnext"
+  ],
+  "accesses": 23,
+  "classes": 1,
+  "verdict": "union-cell",
+  "puns": [
+   {
+    "class": "f:struct TString.u",
+    "read": "unsigned long",
+    "readAt": "lib/lua-5.4.8/src/lapi.c:420 lua_tolstring",
+    "written": "struct TString *",
+    "writtenAt": "w lib/lua-5.4.8/src/lstring.c:72 tablerehash [f:struct TString.u]"
+   },
+   {
+    "class": "f:struct TString.u",
+    "read": "struct TString *",
+    "readAt": "lib/lua-5.4.8/src/lstring.c:70 tablerehash",
+    "written": "unsigned long",
+    "writtenAt": "w lib/lua-5.4.8/src/lstring.c:159 luaS_createlngstrobj [f:struct TString.u]"
+   }
+  ],
+  "escapes": [
+   "&.struct TString * lib/lua-5.4.8/src/lstring.c:169 luaS_remove [f:struct TString.u]"
+  ],
+  "punCount": 2,
+  "escapeCount": 1
+ },
+ "union <anon@lib/lua-5.4.8/src/lobject.h:483>": {
+  "file": "lib/lua-5.4.8/src/lobject.h",
+  "line": 483,
+  "members": [
+   "double n",
+   "double u",
+   "void * s",
+   "long long i",
+   "long l"
+  ],
+  "accesses": 0,
+  "classes": 0,
+  "verdict": "object",
+  "puns": [],
+  "escapes": [],
+  "punCount": 0,
+  "escapeCount": 0
+ },
+ "union <anon@lib/lua-5.4.8/src/lobject.h:629>": {
+  "file": "lib/lua-5.4.8/src/lobject.h",
+  "line": 629,
+  "members": [
+   "struct TValue * p",
+   "long offset"
+  ],
+  "accesses": 24,
+  "classes": 1,
+  "verdict": "union-cell",
+  "puns": [
+   {
+    "class": "f:struct UpVal.v",
+    "read": "struct TValue *",
+    "readAt": "lib/lua-5.4.8/src/lapi.c:1101 lua_load",
+    "written": "long",
+    "writtenAt": "w lib/lua-5.4.8/src/ldo.c:168 relstack [f:struct UpVal.v]"
+   },
+   {
+    "class": "f:struct UpVal.v",
+    "read": "long",
+    "readAt": "lib/lua-5.4.8/src/ldo.c:185 correctstack",
+    "written": "struct TValue *",
+    "writtenAt": "w lib/lua-5.4.8/src/ldo.c:185 correctstack [f:struct UpVal.v]"
+   }
+  ],
+  "escapes": [],
+  "punCount": 2,
+  "escapeCount": 0
+ },
+ "union <anon@lib/lua-5.4.8/src/lobject.h:633>": {
+  "file": "lib/lua-5.4.8/src/lobject.h",
+  "line": 633,
+  "members": [
+   "struct UpVal::(unnamed at ./lobject.h:634:5) open",
+   "struct TValue value"
+  ],
+  "accesses": 18,
+  "classes": 1,
+  "verdict": "union-cell",
+  "puns": [],
+  "escapes": [
+   "&.struct TValue lib/lua-5.4.8/src/lfunc.c:53 luaF_initupvals [f:struct UpVal.u]",
+   "&.struct UpVal::(unnamed at ./lobject.h:634:5) lib/lua-5.4.8/src/lfunc.c:73 newupval [f:struct UpVal.u]",
+   "&.struct UpVal::(unnamed at ./lobject.h:634:5) lib/lua-5.4.8/src/lfunc.c:95 luaF_findupval [f:struct UpVal.u]",
+   "&.struct TValue lib/lua-5.4.8/src/lfunc.c:197 luaF_closeupval [f:struct UpVal.u]",
+   "&.struct TValue lib/lua-5.4.8/src/lgc.c:306 reallymarkobject [f:struct UpVal.u]"
+  ],
+  "punCount": 0,
+  "escapeCount": 7
+ },
+ "union <anon@lib/lua-5.4.8/src/lparser.h:70>": {
+  "file": "lib/lua-5.4.8/src/lparser.h",
+  "line": 70,
+  "members": [
+   "long long ival",
+   "double nval",
+   "struct TString * strval",
+   "int info",
+   "struct expdesc::(unnamed at ./lparser.h:75:5) ind",
+   "struct expdesc::(unnamed at ./lparser.h:79:5) var"
+  ],
+  "accesses": 129,
+  "classes": 1,
+  "verdict": "union-cell",
+  "puns": [
+   {
+    "class": "f:struct expdesc.u",
+    "read": "long long",
+    "readAt": "lib/lua-5.4.8/src/lcode.c:62 tonumeral",
+    "written": "double",
+    "writtenAt": "w lib/lua-5.4.8/src/lcode.c:699 const2exp [f:struct expdesc.u]"
+   },
+   {
+    "class": "f:struct expdesc.u",
+    "read": "long long",
+    "readAt": "lib/lua-5.4.8/src/lcode.c:62 tonumeral",
+    "written": "struct TString *",
+    "writtenAt": "w lib/lua-5.4.8/src/lcode.c:711 const2exp [f:struct expdesc.u]"
+   },
+   {
+    "class": "f:struct expdesc.u",
+    "read": "long long",
+    "readAt": "lib/lua-5.4.8/src/lcode.c:62 tonumeral",
+    "written": "int",
+    "writtenAt": "w lib/lua-5.4.8/src/lcode.c:740 str2K [f:struct expdesc.u]"
+   },
+   {
+    "class": "f:struct expdesc.u",
+    "read": "long long",
+    "readAt": "lib/lua-5.4.8/src/lcode.c:62 tonumeral",
+    "written": "struct expdesc::(unnamed at ./lparser.h:75:5)",
+    "writtenAt": "w lib/lua-5.4.8/src/lcode.c:1290 luaK_indexed [f:struct expdesc.u]"
+   },
+   {
+    "class": "f:struct expdesc.u",
+    "read": "long long",
+    "readAt": "lib/lua-5.4.8/src/lcode.c:62 tonumeral",
+    "written": "struct expdesc::(unnamed at ./lparser.h:79:5)",
+    "writtenAt": "w lib/lua-5.4.8/src/lparser.c:269 init_var [f:struct expdesc.u]"
+   },
+   {
+    "class": "f:struct expdesc.u",
+    "read": "double",
+    "readAt": "lib/lua-5.4.8/src/lcode.c:65 tonumeral",
+    "written": "long long",
+    "writtenAt": "w lib/lua-5.4.8/src/lcode.c:696 const2exp [f:struct expdesc.u]"
+   },
+   {
+    "class": "f:struct expdesc.u",
+    "read": "double",
+    "readAt": "lib/lua-5.4.8/src/lcode.c:65 tonumeral",
+    "written": "struct TString *",
+    "writtenAt": "w lib/lua-5.4.8/src/lcode.c:711 const2exp [f:struct expdesc.u]"
+   },
+   {
+    "class": "f:struct expdesc.u",
+    "read": "double",
+    "readAt": "lib/lua-5.4.8/src/lcode.c:65 tonumeral",
+    "written": "int",
+    "writtenAt": "w lib/lua-5.4.8/src/lcode.c:740 str2K [f:struct expdesc.u]"
+   }
+  ],
+  "escapes": [],
+  "punCount": 30,
+  "escapeCount": 0
+ },
+ "union <anon@lib/lua-5.4.8/src/lstate.h:181>": {
+  "file": "lib/lua-5.4.8/src/lstate.h",
+  "line": 181,
+  "members": [
+   "struct CallInfo::(unnamed at ./lstate.h:182:5) l",
+   "struct CallInfo::(unnamed at ./lstate.h:187:5) c"
+  ],
+  "accesses": 124,
+  "classes": 1,
+  "verdict": "union-cell",
+  "puns": [
+   {
+    "class": "f:struct CallInfo.u",
+    "read": "struct CallInfo::(unnamed at ./lstate.h:187:5)",
+    "readAt": "lib/lua-5.4.8/src/lapi.c:1078 lua_pcallk",
+    "written": "struct CallInfo::(unnamed at ./lstate.h:182:5)",
+    "writtenAt": "w lib/lua-5.4.8/src/ldebug.c:120 settraps [f:struct CallInfo.u]"
+   },
+   {
+    "class": "f:struct CallInfo.u",
+    "read": "struct CallInfo::(unnamed at ./lstate.h:182:5)",
+    "readAt": "lib/lua-5.4.8/src/ldebug.c:46 currentpc",
+    "written": "struct CallInfo::(unnamed at ./lstate.h:187:5)",
+    "writtenAt": "w lib/lua-5.4.8/src/lapi.c:1015 lua_callk [f:struct CallInfo.u]"
+   }
+  ],
+  "escapes": [],
+  "punCount": 2,
+  "escapeCount": 0
+ },
+ "union <anon@lib/lua-5.4.8/src/lstate.h:193>": {
+  "file": "lib/lua-5.4.8/src/lstate.h",
+  "line": 193,
+  "members": [
+   "int funcidx",
+   "int nyield",
+   "int nres",
+   "struct CallInfo::(unnamed at ./lstate.h:197:5) transferinfo"
+  ],
+  "accesses": 12,
+  "classes": 1,
+  "verdict": "union-cell",
+  "puns": [
+   {
+    "class": "f:struct CallInfo.u2",
+    "read": "struct CallInfo::(unnamed at ./lstate.h:197:5)",
+    "readAt": "lib/lua-5.4.8/src/ldebug.c:373 auxgetinfo",
+    "written": "int",
+    "writtenAt": "w lib/lua-5.4.8/src/lapi.c:1071 lua_pcallk [f:struct CallInfo.u2]"
+   },
+   {
+    "class": "f:struct CallInfo.u2",
+    "read": "int",
+    "readAt": "lib/lua-5.4.8/src/ldo.c:687 finishpcallk",
+    "written": "struct CallInfo::(unnamed at ./lstate.h:197:5)",
+    "writtenAt": "w lib/lua-5.4.8/src/ldo.c:349 luaD_hook [f:struct CallInfo.u2]"
+   }
+  ],
+  "escapes": [],
+  "punCount": 2,
+  "escapeCount": 0
+ },
+ "union <anon@lib/lua-5.4.8/src/lstrlib.c:1409>": {
+  "file": "lib/lua-5.4.8/src/lstrlib.c",
+  "line": 1409,
+  "members": [
+   "int dummy",
+   "char little"
+  ],
+  "accesses": 3,
+  "classes": 1,
+  "verdict": "object",
+  "puns": [],
+  "escapes": [],
+  "punCount": 0,
+  "escapeCount": 0
+ },
+ "union <anon@lib/lua-5.4.8/src/lstrlib.c:1490>": {
+  "file": "lib/lua-5.4.8/src/lstrlib.c",
+  "line": 1490,
+  "members": [
+   "double n",
+   "double u",
+   "void * s",
+   "long long i",
+   "long l"
+  ],
+  "accesses": 0,
+  "classes": 0,
+  "verdict": "object",
+  "puns": [],
+  "escapes": [],
+  "punCount": 0,
+  "escapeCount": 0
+ },
+ "union Closure": {
+  "file": "lib/lua-5.4.8/src/lobject.h",
+  "line": 661,
+  "members": [
+   "struct CClosure c",
+   "struct LClosure l"
+  ],
+  "accesses": 44,
+  "classes": 2,
+  "verdict": "union-cell",
+  "puns": [],
+  "escapes": [
+   "&.struct CClosure lib/lua-5.4.8/src/lapi.c:79 index2value [f:union GCUnion.cl]",
+   "&.struct CClosure lib/lua-5.4.8/src/lapi.c:263 lua_copy [f:union GCUnion.cl]",
+   "&.struct CClosure lib/lua-5.4.8/src/lapi.c:442 lua_tocfunction [f:union GCUnion.cl]",
+   "&.struct LClosure lib/lua-5.4.8/src/lapi.c:1096 lua_load [f:union GCUnion.cl]",
+   "&.struct LClosure lib/lua-5.4.8/src/lapi.c:1117 lua_dump [f:union GCUnion.cl]"
+  ],
+  "punCount": 0,
+  "escapeCount": 36
+ },
+ "union GCUnion": {
+  "file": "lib/lua-5.4.8/src/lstate.h",
+  "line": 353,
+  "members": [
+   "struct GCObject gc",
+   "struct TString ts",
+   "struct Udata u",
+   "union Closure cl",
+   "struct Table h",
+   "struct Proto p",
+   "struct lua_State th",
+   "struct UpVal upv"
+  ],
+  "accesses": 251,
+  "classes": 1,
+  "verdict": "union-cell",
+  "puns": [],
+  "escapes": [
+   "&.union Closure lib/lua-5.4.8/src/lapi.c:79 index2value [d:union GCUnion]",
+   "&.union Closure lib/lua-5.4.8/src/lapi.c:263 lua_copy [d:union GCUnion]",
+   "&.struct GCObject lib/lua-5.4.8/src/lapi.c:263 lua_copy [d:union GCUnion]",
+   "&.struct TString lib/lua-5.4.8/src/lapi.c:420 lua_tolstring [d:union GCUnion]",
+   "&.struct TString lib/lua-5.4.8/src/lapi.c:422 lua_tolstring [d:union GCUnion]"
+  ],
+  "punCount": 0,
+  "escapeCount": 251
+ },
+ "union Node": {
+  "file": "lib/lua-5.4.8/src/lobject.h",
+  "line": 699,
+  "members": [
+   "struct NodeKey u",
+   "struct TValue i_val"
+  ],
+  "accesses": 66,
+  "classes": 2,
+  "verdict": "union-cell",
+  "puns": [],
+  "escapes": [
+   "&.struct TValue lib/lua-5.4.8/src/lgc.c:452 traverseweakvalue [d:union Node]",
+   "&.struct TValue lib/lua-5.4.8/src/lgc.c:457 traverseweakvalue [d:union Node]",
+   "&.struct TValue lib/lua-5.4.8/src/lgc.c:498 traverseephemeron [d:union Node]",
+   "&.struct TValue lib/lua-5.4.8/src/lgc.c:502 traverseephemeron [d:union Node]",
+   "&.struct TValue lib/lua-5.4.8/src/lgc.c:505 traverseephemeron [d:union Node]"
+  ],
+  "punCount": 0,
+  "escapeCount": 25
+ },
+ "union StackValue": {
+  "file": "lib/lua-5.4.8/src/lobject.h",
+  "line": 148,
+  "members": [
+   "struct TValue val",
+   "struct StackValue::(unnamed at ./lobject.h:150:3) tbclist"
+  ],
+  "accesses": 320,
+  "classes": 1,
+  "verdict": "union-cell",
+  "puns": [],
+  "escapes": [
+   "&.struct TValue lib/lua-5.4.8/src/lapi.c:66 index2value [d:union StackValue]",
+   "&.struct TValue lib/lua-5.4.8/src/lapi.c:71 index2value [d:union StackValue]",
+   "&.struct TValue lib/lua-5.4.8/src/lapi.c:78 index2value [d:union StackValue]",
+   "&.struct TValue lib/lua-5.4.8/src/lapi.c:79 index2value [d:union StackValue]",
+   "&.struct TValue lib/lua-5.4.8/src/lapi.c:137 lua_xmove [d:union StackValue]"
+  ],
+  "punCount": 0,
+  "escapeCount": 316
+ },
+ "union UValue": {
+  "file": "lib/lua-5.4.8/src/lobject.h",
+  "line": 449,
+  "members": [
+   "struct TValue uv",
+   "double n",
+   "double u",
+   "void * s",
+   "long long i",
+   "long l"
+  ],
+  "accesses": 4,
+  "classes": 1,
+  "verdict": "union-cell",
+  "puns": [],
+  "escapes": [
+   "&.struct TValue lib/lua-5.4.8/src/lapi.c:813 lua_getiuservalue [f:struct Udata.uv]",
+   "&.struct TValue lib/lua-5.4.8/src/lapi.c:983 lua_setiuservalue [f:struct Udata.uv]",
+   "&.struct TValue lib/lua-5.4.8/src/lgc.c:569 traverseudata [f:struct Udata.uv]",
+   "&.struct TValue lib/lua-5.4.8/src/lstring.c:271 luaS_newudata [f:struct Udata.uv]"
+  ],
+  "punCount": 0,
+  "escapeCount": 4
+ },
+ "union Value": {
+  "file": "lib/lua-5.4.8/src/lobject.h",
+  "line": 49,
+  "members": [
+   "struct GCObject * gc",
+   "void * p",
+   "int ( *)(struct lua_State *) f",
+   "long long i",
+   "double n",
+   "unsigned char ub"
+  ],
+  "accesses": 427,
+  "classes": 2,
+  "verdict": "union-cell",
+  "puns": [
+   {
+    "class": "f:struct TValue.value_",
+    "read": "struct GCObject *",
+    "readAt": "lib/lua-5.4.8/src/lapi.c:79 index2value",
+    "written": "double",
+    "writtenAt": "w lib/lua-5.4.8/src/lapi.c:507 lua_pushnumber [f:struct TValue.value_]"
+   },
+   {
+    "class": "f:struct TValue.value_",
+    "read": "struct GCObject *",
+    "readAt": "lib/lua-5.4.8/src/lapi.c:79 index2value",
+    "written": "long long",
+    "writtenAt": "w lib/lua-5.4.8/src/lapi.c:515 lua_pushinteger [f:struct TValue.value_]"
+   },
+   {
+    "class": "f:struct TValue.value_",
+    "read": "struct GCObject *",
+    "readAt": "lib/lua-5.4.8/src/lapi.c:79 index2value",
+    "written": "int ( *)(struct lua_State *)",
+    "writtenAt": "w lib/lua-5.4.8/src/lapi.c:582 lua_pushcclosure [f:struct TValue.value_]"
+   },
+   {
+    "class": "f:struct TValue.value_",
+    "read": "struct GCObject *",
+    "readAt": "lib/lua-5.4.8/src/lapi.c:79 index2value",
+    "written": "void *",
+    "writtenAt": "w lib/lua-5.4.8/src/lapi.c:618 lua_pushlightuserdata [f:struct TValue.value_]"
+   },
+   {
+    "class": "f:struct TValue.value_",
+    "read": "double",
+    "readAt": "lib/lua-5.4.8/src/lapi.c:312 lua_isnumber",
+    "written": "long long",
+    "writtenAt": "w lib/lua-5.4.8/src/lapi.c:515 lua_pushinteger [f:struct TValue.value_]"
+   },
+   {
+    "class": "f:struct TValue.value_",
+    "read": "double",
+    "readAt": "lib/lua-5.4.8/src/lapi.c:312 lua_isnumber",
+    "written": "struct GCObject *",
+    "writtenAt": "w lib/lua-5.4.8/src/lapi.c:530 lua_pushlstring [f:struct TValue.value_]"
+   },
+   {
+    "class": "f:struct TValue.value_",
+    "read": "double",
+    "readAt": "lib/lua-5.4.8/src/lapi.c:312 lua_isnumber",
+    "written": "int ( *)(struct lua_State *)",
+    "writtenAt": "w lib/lua-5.4.8/src/lapi.c:582 lua_pushcclosure [f:struct TValue.value_]"
+   },
+   {
+    "class": "f:struct TValue.value_",
+    "read": "double",
+    "readAt": "lib/lua-5.4.8/src/lapi.c:312 lua_isnumber",
+    "written": "void *",
+    "writtenAt": "w lib/lua-5.4.8/src/lapi.c:618 lua_pushlightuserdata [f:struct TValue.value_]"
+   }
+  ],
+  "escapes": [],
+  "punCount": 40,
+  "escapeCount": 0
+ },
+ "union Vardesc": {
+  "file": "lib/lua-5.4.8/src/lparser.h",
+  "line": 96,
+  "members": [
+   "struct Vardesc::(unnamed at ./lparser.h:97:3) vd",
+   "struct TValue k"
+  ],
+  "accesses": 22,
+  "classes": 1,
+  "verdict": "union-cell",
+  "puns": [],
+  "escapes": [
+   "&.struct TValue lib/lua-5.4.8/src/lcode.c:77 const2val [d:union Vardesc]",
+   "&.struct TValue lib/lua-5.4.8/src/lparser.c:1754 localstat [d:union Vardesc]"
+  ],
+  "punCount": 0,
+  "escapeCount": 2
+ },
+ "union any": {
+  "file": "include/wintype.h",
+  "line": 11,
+  "members": [
+   "void * a_void",
+   "struct obj * a_obj",
+   "struct monst * a_monst",
+   "int a_int",
+   "int a_xint16",
+   "int a_xint8",
+   "char a_char",
+   "signed char a_schar",
+   "unsigned char a_uchar",
+   "unsigned int a_uint",
+   "long a_long",
+   "unsigned long a_ulong",
+   "short a_coordxy",
+   "int * a_iptr",
+   "short * a_xint16ptr",
+   "signed char * a_xint8ptr",
+   "long * a_lptr",
+   "short * a_coordxyptr",
+   "unsigned long * a_ulptr",
+   "unsigned int * a_uptr",
+   "char * a_string",
+   "int ( *)(void) a_nfunc",
+   "unsigned long a_mask32",
+   "long long a_int64",
+   "unsigned long long a_uint64"
+  ],
+  "accesses": 760,
+  "classes": 101,
+  "verdict": "union-cell",
+  "puns": [
+   {
+    "class": "d:union any",
+    "read": "struct obj *",
+    "readAt": "src/apply.c:2400 fig_transform",
+    "written": "long",
+    "writtenAt": "w src/botl.c:1937 s_to_anything [d:union any]"
+   },
+   {
+    "class": "d:union any",
+    "read": "struct obj *",
+    "readAt": "src/apply.c:2400 fig_transform",
+    "written": "int",
+    "writtenAt": "w src/botl.c:1940 s_to_anything [d:union any]"
+   },
+   {
+    "class": "d:union any",
+    "read": "struct obj *",
+    "readAt": "src/apply.c:2400 fig_transform",
+    "written": "unsigned int",
+    "writtenAt": "w src/botl.c:1943 s_to_anything [d:union any]"
+   },
+   {
+    "class": "d:union any",
+    "read": "struct obj *",
+    "readAt": "src/apply.c:2400 fig_transform",
+    "written": "unsigned long",
+    "writtenAt": "w src/botl.c:1946 s_to_anything [d:union any]"
+   },
+   {
+    "class": "d:union any",
+    "read": "struct obj *",
+    "readAt": "src/apply.c:2400 fig_transform",
+    "written": "void *",
+    "writtenAt": "w src/botl.c:1968 s_to_anything [d:union any]"
+   },
+   {
+    "class": "d:union any",
+    "read": "struct obj *",
+    "readAt": "src/apply.c:2400 fig_transform",
+    "written": "struct monst *",
+    "writtenAt": "w src/timeout.c:2542 write_timer [f:struct fe.arg]"
+   },
+   {
+    "class": "d:union any",
+    "read": "struct obj *",
+    "readAt": "src/apply.c:2400 fig_transform",
+    "written": "char *",
+    "writtenAt": "w src/role.c:3001 setup_algnmenu [l:setup_algnmenu::any@2984]"
+   },
+   {
+    "class": "d:union any",
+    "read": "struct obj *",
+    "readAt": "src/apply.c:2400 fig_transform",
+    "written": "char",
+    "writtenAt": "w src/pager.c:1731 do_look [l:do_look::any@1708]"
+   }
+  ],
+  "escapes": [
+   "&.unsigned long src/botl.c:1611 eval_notify_windowport_field [f:struct istat_s.a]"
+  ],
+  "punCount": 496,
+  "escapeCount": 1
+ },
+ "union customization_content": {
+  "file": "include/sym.h",
+  "line": 153,
+  "members": [
+   "struct custom_symbol sym",
+   "struct custom_urep urep",
+   "struct custom_nhcolor ccolor"
+  ],
+  "accesses": 27,
+  "classes": 1,
+  "verdict": "union-cell",
+  "puns": [
+   {
+    "class": "f:struct customization_detail.content",
+    "read": "struct custom_nhcolor",
+    "readAt": "src/glyphs.c:508 add_custom_nhcolor_entry",
+    "written": "struct custom_urep",
+    "writtenAt": "w src/glyphs.c:517 add_custom_nhcolor_entry [f:struct customization_detail.content]"
+   },
+   {
+    "class": "f:struct customization_detail.content",
+    "read": "struct custom_nhcolor",
+    "readAt": "src/glyphs.c:508 add_custom_nhcolor_entry",
+    "written": "struct custom_symbol",
+    "writtenAt": "w src/glyphs.c:777 purge_custom_entries [f:struct customization_detail.content]"
+   },
+   {
+    "class": "f:struct customization_detail.content",
+    "read": "struct custom_urep",
+    "readAt": "src/glyphs.c:554 apply_customizations",
+    "written": "struct custom_nhcolor",
+    "writtenAt": "w src/glyphs.c:509 add_custom_nhcolor_entry [f:struct customization_detail.content]"
+   },
+   {
+    "class": "f:struct customization_detail.content",
+    "read": "struct custom_urep",
+    "readAt": "src/glyphs.c:554 apply_customizations",
+    "written": "struct custom_symbol",
+    "writtenAt": "w src/glyphs.c:777 purge_custom_entries [f:struct customization_detail.content]"
+   }
+  ],
+  "escapes": [],
+  "punCount": 4,
+  "escapeCount": 0
+ },
+ "union str_or_len": {
+  "file": "include/hack.h",
+  "line": 93,
+  "members": [
+   "char * str",
+   "int len"
+  ],
+  "accesses": 33,
+  "classes": 4,
+  "verdict": "object",
+  "puns": [],
+  "escapes": [],
+  "punCount": 0,
+  "escapeCount": 0
+ },
+ "union vlaunchinfo": {
+  "file": "include/trap.h",
+  "line": 11,
+  "members": [
+   "short v_launch_otyp",
+   "struct nhcoord v_launch2",
+   "unsigned char v_conjoined",
+   "short v_tnote"
+  ],
+  "accesses": 37,
+  "classes": 1,
+  "verdict": "union-cell",
+  "puns": [
+   {
+    "class": "f:struct trap.vl",
+    "read": "unsigned char",
+    "readAt": "src/dig.c:1264 use_pick_axe2",
+    "written": "struct nhcoord",
+    "writtenAt": "w src/sp_lev.c:602 flip_level [f:struct trap.vl]"
+   },
+   {
+    "class": "f:struct trap.vl",
+    "read": "unsigned char",
+    "readAt": "src/dig.c:1264 use_pick_axe2",
+    "written": "short",
+    "writtenAt": "w src/trap.c:506 maketrap [f:struct trap.vl]"
+   },
+   {
+    "class": "f:struct trap.vl",
+    "read": "struct nhcoord",
+    "readAt": "src/hack.c:606 moverock_core",
+    "written": "unsigned char",
+    "writtenAt": "rw src/dig.c:1264 use_pick_axe2 [f:struct trap.vl]"
+   },
+   {
+    "class": "f:struct trap.vl",
+    "read": "struct nhcoord",
+    "readAt": "src/hack.c:606 moverock_core",
+    "written": "short",
+    "writtenAt": "w src/trap.c:506 maketrap [f:struct trap.vl]"
+   },
+   {
+    "class": "f:struct trap.vl",
+    "read": "short",
+    "readAt": "src/nhlua.c:448 nhl_gettrap",
+    "written": "unsigned char",
+    "writtenAt": "rw src/dig.c:1264 use_pick_axe2 [f:struct trap.vl]"
+   },
+   {
+    "class": "f:struct trap.vl",
+    "read": "short",
+    "readAt": "src/nhlua.c:448 nhl_gettrap",
+    "written": "struct nhcoord",
+    "writtenAt": "w src/sp_lev.c:602 flip_level [f:struct trap.vl]"
+   }
+  ],
+  "escapes": [],
+  "punCount": 6,
+  "escapeCount": 0
+ },
+ "union vptrs": {
+  "file": "include/obj.h",
+  "line": 17,
+  "members": [
+   "struct obj * v_nexthere",
+   "struct obj * v_ocontainer",
+   "struct monst * v_ocarry"
+  ],
+  "accesses": 198,
+  "classes": 1,
+  "verdict": "union-cell",
+  "puns": [
+   {
+    "class": "f:struct obj.v",
+    "read": "struct obj *",
+    "readAt": "src/apply.c:262 its_dead",
+    "written": "struct monst *",
+    "writtenAt": "w src/mkobj.c:661 replace_object [f:struct obj.v]"
+   },
+   {
+    "class": "f:struct obj.v",
+    "read": "struct monst *",
+    "readAt": "src/apply.c:1542 splash_lit",
+    "written": "struct obj *",
+    "writtenAt": "w src/do.c:178 flooreffects [f:struct obj.v]"
+   }
+  ],
+  "escapes": [],
+  "punCount": 2,
+  "escapeCount": 0
+ }
+}
