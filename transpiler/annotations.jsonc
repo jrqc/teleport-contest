@@ -26,7 +26,13 @@
     // an entry here could only move a union to "object" with an approved
     // "discriminant" (design 3.4).
   },
-  "functions": {},
+  "functions": {
+    // patch 002: byte arithmetic on an arbitrary base (base + idx * size) and a byte-copy
+    // permutation; the override keeps the algorithm (index sort with Darwin qsort, ties by
+    // index) and moves elements by value. Async twin for comparators in the async set.
+    "nh_deterministic_qsort": { "handwritten": "js/crt/qsort.js", "c": "src/hacklib.c", "csha": "8d897f33de168cc9",
+                                "why": "byte pointer arithmetic over an untyped base; see the comment in js/crt/qsort.js" }
+  },
   "pointers": {},
   "edges": { "cut": [] }
 }

@@ -140,7 +140,7 @@ export class TUEmitter {
         const fns = [], globals = [];
         for (const n of kids(this.tu.root)) {
             if (!this.isOwn(n)) continue;
-            if (n.kind === 'FunctionDecl' && kids(n).some((c) => c.kind === 'CompoundStmt')) fns.push(n);
+            if (n.kind === 'FunctionDecl' && kids(n).some((c) => c.kind === 'CompoundStmt')) { if (!this.prog.handwritten.has(n.name)) fns.push(n); }
             else if (n.kind === 'VarDecl' && n.storageClass !== 'extern') globals.push(n);
         }
         this.globalDecls = globals;
@@ -287,7 +287,7 @@ export class TUEmitter {
         const t = this.T(f);
         const params = kids(f).filter((c) => c.kind === 'ParmVarDecl');
         const body = kids(f).find((c) => c.kind === 'CompoundStmt');
-        this.fn = { name: f.name, decl: f, t, locals: new Map(), names: new Set(), vars: [], temps: 0, tempNames: [], labels: new Map(), labelSeq: 0, isVariadic: t.variadic };
+        this.fn = { name: f.name, decl: f, t, locals: new Map(), names: new Set(), vars: [], temps: 0, tempNames: [], labels: new Map(), labelSeq: 0, isVariadic: t.variadic, isAsync: this.prog.isAsync(this, f.name) };
         // locals: hoist every VarDecl
         const addrTaken = this.addressTaken(body);
         const declare = (d, isParam) => {
@@ -320,7 +320,7 @@ export class TUEmitter {
         const exp = f.storageClass === 'static' ? '' : 'export ';
         const pnames = ps.map((p) => (p.boxed || (p.t.k === 'rec') ? `${p.name}$in` : p.name));
         if (this.fn.isVariadic) pnames.push('...$va');
-        const asyncKw = this.prog.isAsync(f.name) ? 'async ' : '';
+        const asyncKw = this.fn.isAsync ? 'async ' : '';
         lines.push(`${exp}${asyncKw}function ${jsName(f.name)}(${pnames.join(', ')}) {   // ${pos}`);
         // parameter boxing / struct copies
         for (const p of ps) {
@@ -1596,10 +1596,30 @@ export class TUEmitter {
         let f;
         if (fnName) f = this.prog.functionRef(this, fnName);
         else f = par(this.rv(callee), PREC.call);
+        let asyncCall;
+        if (fnName && f.startsWith('$c.') && !f.startsWith('$c.missing(')) {
+            // runtime (or hand-written) function: async only through a callback argument that may
+            // be async, and then through its `$async` twin (signal handlers never run)
+            asyncCall = fnName !== 'signal' && args.some((a) => this.mayBeAsyncFn(a));
+            if (asyncCall) {
+                if (!this.prog.crt.has(`${fnName}$async`)) this.err(n, `possibly async callback passed to runtime function ${fnName}, which has no $async variant`);
+                f = `$c.${fnName}$async`;
+            }
+        } else asyncCall = fnName ? this.prog.isAsync(this, fnName) : this.prog.isAsyncIndirect(this, this.T(callee));
         let e = E(`${f}(${argc.join(', ')})`, PREC.call);
-        const asyncCall = fnName ? this.prog.isAsync(fnName) : this.prog.isAsyncIndirect(this, callee);
-        if (asyncCall) e = E(`await ${par(e, PREC.unary)}`, PREC.unary);
+        if (asyncCall) {
+            if (!this.fn || !this.fn.isAsync) this.err(n, `await of ${fnName || 'an indirect call'} in a function outside the async set`);
+            e = E(`await ${par(e, PREC.unary)}`, PREC.unary);
+        }
         return e;
+    }
+    /** Whether an argument is a function (pointer) that may be async. */
+    mayBeAsyncFn(a) {
+        const s = this.stripCasts(a);
+        if (s.kind === 'DeclRefExpr' && s.referencedDecl && s.referencedDecl.kind === 'FunctionDecl') return this.prog.isAsync(this, s.referencedDecl.name);
+        let t = this.tu.scope.resolve(this.T(a));
+        if (t.k === 'ptr') t = this.tu.scope.resolve(t.to);
+        return t.k === 'fn' && this.prog.isAsyncIndirect(this, t);
     }
     argValue(a) {
         const t = this.T(a);

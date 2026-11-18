@@ -11,6 +11,7 @@ import { TUEmitter, EmitError } from './tu.mjs';
 import { classSource, zeroOf } from './classes.mjs';
 import { jsName, field } from './names.mjs';
 import { ROOT } from '../frontend/ast.mjs';
+import { AsyncSet, sigOf } from './asyncset.mjs';
 
 const kids = (n) => n.inner || [];
 const hasBody = (n) => kids(n).some((c) => c.kind === 'CompoundStmt');
@@ -25,12 +26,16 @@ export class Program {
     /**
      * Two passes, so that no more than one TU's AST is in memory: addFacts(tu)
      * for every TU (definitions), then emitTU(tu) for every TU, then finish().
-     * @param opts { crtNames: Set of $c exports, asyncSet: Set of function names }
+     * @param opts { crtNames: Set of $c exports, asyncRoots?, asyncCut? }
+     * The async set is computed from the facts pass (asyncset.mjs); TUs that are
+     * not emitted (Lua, until its backend exists) still add call facts (addCallFacts).
      */
     constructor(opts) {
         this.root = ROOT;
         this.crt = opts.crtNames;
-        this.asyncSet = opts.asyncSet || new Set();
+        this.async = new AsyncSet({ roots: opts.asyncRoots, cut: opts.asyncCut });
+        this.handwritten = new Set(opts.handwritten || []);   // annotation functions[].handwritten: the runtime defines them
+        this.asyncDone = false;
         this.fnDef = new Map();     // name -> { module, file } (external linkage definitions)
         this.varDef = new Map();    // name -> { module, file, t, scope, hasInit } (external linkage definitions)
         this.classNames = new Map();   // record key -> class name
@@ -38,12 +43,14 @@ export class Program {
         this.usedNames = new Set();
         this.modules = [];          // link order
     }
+    addCallFacts(tu) { this.async.addTU(tu); }
     addFacts(tu) {
+        this.async.addTU(tu);
         tu.module = moduleName(tu.file);
         this.modules.push(tu.module);
         for (const n of kids(tu.root)) {
             if (!own(n)) continue;
-            if (n.kind === 'FunctionDecl' && hasBody(n) && n.storageClass !== 'static') {
+            if (n.kind === 'FunctionDecl' && hasBody(n) && n.storageClass !== 'static' && !this.handwritten.has(n.name)) {
                 if (this.fnDef.has(n.name)) throw new EmitError(`function ${n.name} defined in ${this.fnDef.get(n.name).file} and ${tu.file}`);
                 this.fnDef.set(n.name, { module: tu.module, file: tu.file });
             }
@@ -112,7 +119,7 @@ export class Program {
         const fn = new Set(), vars = new Map();
         for (const n of kids(tu.tu.root)) {
             if (!own(n)) continue;
-            if (n.kind === 'FunctionDecl' && hasBody(n)) fn.add(n.name);
+            if (n.kind === 'FunctionDecl' && hasBody(n) && !this.handwritten.has(n.name)) fn.add(n.name);
             if (n.kind === 'VarDecl' && n.storageClass !== 'extern') vars.set(n.name, n);
         }
         return { fn, var: vars };
@@ -151,8 +158,18 @@ export class Program {
         const d = this.varDef.get(name);
         return !d || d.module === tu.tu.module;
     }
-    isAsync(name) { return this.asyncSet.has(name); }
-    isAsyncIndirect() { return false; }   // function-pointer targets: from the async analysis (M1 step 2)
+    asyncReady() { if (!this.asyncDone) { this.async.finish(); this.asyncDone = true; } return this.async; }
+    /** Whether the function `name` as seen from TU em is async (statics are per file). */
+    isAsync(em, name) {
+        em.tu._staticFns = em.tu._staticFns || new Set(kids(em.tu.root).filter((n) => n.kind === 'FunctionDecl' && n.storageClass === 'static').map((n) => n.name));
+        return this.asyncReady().has(AsyncSet.key(em.tu.file, name, em.tu._staticFns.has(name)));
+    }
+    /** Whether a call through a function pointer of type `t` (pointer to fn, or fn) must be awaited. */
+    isAsyncIndirect(em, t) {
+        let ft = em.tu.scope.resolve(t);
+        if (ft.k === 'ptr') ft = em.tu.scope.resolve(ft.to);
+        return ft.k === 'fn' && this.asyncReady().hasSig(sigOf(em.tu.scope, ft));
+    }
 
     noteImport(tu, module, name) {
         if (module === tu.tu.module) return;

@@ -16,6 +16,9 @@
 // [i, j] and receives the comparator's int; swaps and copies are synchronous
 // callbacks, run in algorithm order. qsortSync / qsortAsync drive it.
 
+import { Ptr } from './mem.js';
+import { CTrap } from './int.js';
+
 export const TEMP = -1;
 
 const flsl = (x) => (x <= 0 ? 0 : Math.floor(Math.log2(x)) + 1);
@@ -158,4 +161,72 @@ export function qsortValues(arr, cmp) {
     });
     function set(i, v) { if (i === TEMP) tmp = v; else arr[i] = v; }
     return arr;
+}
+
+// ---------- nh_deterministic_qsort (patch 002, src/hacklib.c): hand-written override ----------
+// The C wrapper sorts an index array with qsort, comparing compar(base + a.idx * size,
+// base + b.idx * size) and breaking ties by index, then permutes the elements through a
+// byte copy. Byte arithmetic on an arbitrary base cannot be transpiled into the object
+// world, so it is written here (annotation functions["nh_deterministic_qsort"]): the
+// comparator sees element pointers exactly as transpiled code makes them, and elements
+// move by value (records by $copyFrom, so pointers to array positions keep their meaning).
+function elements(base, n) {
+    if (base instanceof Ptr) {
+        return {
+            at: (i) => base.add(i),
+            get: (i) => { const v = base.get(i); return v !== null && typeof v === 'object' ? cloneVal(v) : v; },
+            put: (i, v) => { const t = base.get(i); if (ArrayBuffer.isView(t)) t.set(v); else if (t && t.$copyFrom) t.$copyFrom(v); else base.set(i, v); },
+        };
+    }
+    if (base && base.__arr) {   // an element of a record array
+        const a = base.__arr, o = base.__idx;
+        if (o + n > a.length) throw new CTrap('qsort past the end of a record array');
+        return { at: (i) => a[o + i], get: (i) => a[o + i].$clone(), put: (i, v) => a[o + i].$copyFrom(v) };
+    }
+    if (n === 1 || n === 0) return null;
+    throw new CTrap('qsort of a base that is neither a scalar/pointer array nor a record array');
+}
+function cloneVal(v) {
+    if (ArrayBuffer.isView(v)) return v.slice();
+    if (v.$clone) return v.$clone();
+    return v;   // a pointer
+}
+function idxOps(order, cmpIdx) {
+    let tmp;
+    const get = (i) => (i === TEMP ? tmp : order[i]);
+    const set = (i, v) => { if (i === TEMP) tmp = v; else order[i] = v; };
+    return {
+        cmp: (i, j) => cmpIdx(get(i), get(j)),
+        swap: (i, j) => { const t = get(i); set(i, get(j)); set(j, t); },
+        copy: (d, s) => set(d, get(s)),
+    };
+}
+const tie = (c, a, b) => (c ? c : a < b ? -1 : a > b ? 1 : 0);
+function permute(el, order) {
+    const vals = order.map((k) => el.get(k));
+    vals.forEach((v, i) => el.put(i, v));
+}
+export function nh_deterministic_qsort(base, nmemb, size, compar) {
+    const n = Number(nmemb);
+    if (base === null || compar === null || Number(size) === 0 || n < 2) return;
+    const el = elements(base, n);
+    const order = Array.from({ length: n }, (_, i) => i);
+    qsortSync(n, idxOps(order, (a, b) => tie(compar(el.at(a), el.at(b)), a, b)));
+    permute(el, order);
+}
+/** The same, for a comparator in the async set (sortloot_cmp can reach a window port call). */
+export async function nh_deterministic_qsort$async(base, nmemb, size, compar) {
+    const n = Number(nmemb);
+    if (base === null || compar === null || Number(size) === 0 || n < 2) return;
+    const el = elements(base, n);
+    const order = Array.from({ length: n }, (_, i) => i);
+    let tmp;
+    const get = (i) => (i === TEMP ? tmp : order[i]);
+    const set = (i, v) => { if (i === TEMP) tmp = v; else order[i] = v; };
+    await qsortAsync(n, {
+        cmp: async (i, j) => { const a = get(i), b = get(j); return tie(await compar(el.at(a), el.at(b)), a, b); },
+        swap: (i, j) => { const t = get(i); set(i, get(j)); set(j, t); },
+        copy: (d, s) => set(d, get(s)),
+    });
+    permute(el, order);
 }

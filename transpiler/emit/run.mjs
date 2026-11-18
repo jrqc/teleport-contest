@@ -9,6 +9,7 @@ import path from 'node:path';
 import { loadAst, ROOT } from '../frontend/ast.mjs';
 import { tuScope } from '../ir/scope.mjs';
 import { Program } from './program.mjs';
+import { parseJsonc } from '../annotations/jsonc.mjs';
 
 const args = process.argv.slice(2);
 let out = path.join(ROOT, 'transpiler/build/nh');
@@ -17,9 +18,10 @@ if (oi >= 0) { out = path.resolve(args[oi + 1]); args.splice(oi, 2); }
 const db = JSON.parse(readFileSync(path.join(ROOT, 'transpiler/out/compile_commands.json'), 'utf8')).filter((e) => e.group === 'nethack');
 const only = new Set(args);
 const crtNames = new Set(Object.keys(await import('../../js/crt/index.js')));
-const asyncInfo = JSON.parse(readFileSync(path.join(ROOT, 'transpiler/out/inventory/async.json'), 'utf8'));
-const asyncSet = new Set(asyncInfo.asyncSet || asyncInfo.async || []);
-const prog = new Program({ crtNames, asyncSet });
+const ann = parseJsonc(readFileSync(path.join(ROOT, 'transpiler/annotations.jsonc'), 'utf8'));
+const handwritten = Object.entries(ann.functions || {}).filter(([, f]) => f.handwritten).map(([k]) => k);
+const prog = new Program({ crtNames, handwritten, asyncCut: (ann.edges && ann.edges.cut || []).map((c) => c.to) });
+const luaDb = JSON.parse(readFileSync(path.join(ROOT, 'transpiler/out/compile_commands.json'), 'utf8')).filter((e) => e.group === 'lua');
 prog.missingFn = new Set();
 
 const load = async (e) => {
@@ -28,6 +30,9 @@ const load = async (e) => {
 };
 const t0 = Date.now();
 for (const e of db) { prog.addFacts(await load(e)); process.stderr.write('.'); }
+// Lua is not emitted yet (heap backend), but its calls back into NetHack shape the async set
+for (const e of luaDb) { prog.addCallFacts(await load(e)); process.stderr.write(','); }
+process.stderr.write(` async ${JSON.stringify(prog.asyncReady().stats())}\n`);
 process.stderr.write(` facts ${((Date.now() - t0) / 1000).toFixed(0)}s\n`);
 mkdirSync(out, { recursive: true });
 const crtLink = path.join(out, '..', 'crt');
