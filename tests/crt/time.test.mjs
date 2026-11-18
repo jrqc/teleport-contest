@@ -45,7 +45,7 @@ test('localtime and mktime match Darwin in America/New_York, 1955-2100', () => {
 test('time() is the recorder pinned now and stores through tloc', () => {
     let stored;
     assert.equal(time(null), REAL_NOW);
-    assert.equal(time({ set: (v) => { stored = v; } }), REAL_NOW);
+    assert.equal(time({ set: (i, v) => { assert.equal(i, 0); stored = v; } }), REAL_NOW);
     assert.equal(stored, 1777723200);
 });
 
