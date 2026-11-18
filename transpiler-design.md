@@ -603,3 +603,28 @@ is unaffected (one key at a time).
 | M4 | Character creation | All chargen screens and RNG through `u_init` match for all 44 sessions |
 | M5 | Level 1 (incl. Lua special levels and dungeon setup) | RNG matches through the first `mklev` for all 44 sessions |
 | M6 | Full play, save/restore, bones | Score climbs with no regressions; target: majority of public steps |
+
+## 13. Feasibility verdict
+
+**Feasible, with the design above.** The numbers that decide it:
+
+- **NetHack fits the readable object world almost entirely.** With unions as shared-slot
+  objects and save files through generated serializers, 1 of 345 NetHack record types has
+  byte-level evidence (`struct engr`), and it has a small, local fix. Without those two
+  decisions the set would be 104 types including `monst` and `obj`, which would make most of the
+  game accessor code: still correct, but far less readable.
+- **Lua is raw memory but self-contained.** Heap mode for 32 files (23k lines) behind a narrow
+  C API boundary, transpiled by the same tool. It does not change in Phase 2.
+- **Async is large (51–68% of functions) but fully mechanical**: computed from the call graph,
+  emitted, and checked statically. That avoids the failure mode of Bau's first attempt.
+- **Every other hard construct has a mechanical rule**: 653 gotos, 4 `setjmp` sites, 28
+  variadic functions, 1,671 indirect calls, 241 bit-fields.
+- **Performance** has a 720× budget over C (estimate, to measure at M3).
+- **Reproducibility is proven at the C level**: 44/44 sessions re-record byte-identical, so
+  every divergence the JS port shows will be a translation bug, not an environment mystery.
+
+What is *not* realistic: a scoring port before the Phase 1 freeze on 2026-11-29 (R8). M0–M2
+are weeks of work; the first matching screens come at M3.
+
+No fallback is needed. If D1 is rejected, the same transpiler still works with unions in the
+heap (scenario S2: 23 NetHack heap types), at a readability and speed cost.
