@@ -192,10 +192,30 @@ behaves exactly as on x86-64 (little-endian, leftover upper bytes included). A h
 embedded in an object record (e.g. `union any id` in `struct light_source`) is a **union
 cell**: the container stays an object, and its field holds a view over the union's own heap
 bytes, created with the container. Whole-record copies copy the cell's bytes, so there is still
-one copy of the data (one-copy rule). Pointer members store a handle (an index into the
-runtime's handle table): a pointer written as `a_obj` and read as `a_void` gives back the same
-object, as in C. An integer read of a pointer member returns the handle number, where C returns
-an address; C addresses vary between runs (ASLR), so recorded output cannot depend on them.
+one copy of the data (one-copy rule). Pointer members store a **handle that behaves like an
+address**: handles are allocated deterministically from a high, aligned range (above 2⁴⁰), so
+they never equal a small integer. A pointer written as `a_obj` and read as `a_void` gives back
+the same object, as in C. An integer read of a pointer member returns the handle number (C
+returns an address; C addresses vary between runs, so recorded output cannot depend on them).
+A pointer read of bytes that were written as an integer returns an interned non-dereferenceable
+pointer value `ptrConst(n)`: equal values compare equal, never equal to a real object, and a
+dereference throws. NetHack really does this: `del_light_source` (`src/light.c:104`) writes an
+object id into `tmp_id.a_uint` and compares it as `tmp_id.a_obj` with `curr->id.a_obj`, which
+holds an id as well while a restored light source awaits fixup (`LSF_NEEDS_FIXUP`).
+
+**Result of the check (Stage 2, `transpiler/out/union-pun.md`):** of NetHack's 5 unions,
+1 is an object and 4 are union cells.
+
+| Union | Accesses | Verdict | Why |
+|---|---|---|---|
+| `union str_or_len` (`hack.h`) | 33 | object | every class reads what it writes |
+| `union any` (`hack.h`) | 760 | union cell | definite pun (`light.c` above), 496 possible pun pairs, one escaping member address (`botl.c:1611`, `&istat_s.a.a_ulong`) |
+| `union vptrs` (`obj.h`, `struct obj.v`) | 198 | union cell | `v_ocarry` (`struct monst *`) and `v_nexthere`/`v_ocontainer` (`struct obj *`) share `obj.v`; selected by `obj->where`, which the static check cannot prove |
+| `union vlaunchinfo` (`trap.h`, `struct trap.vl`) | 37 | union cell | `short`, `coord` and `uchar` members share `trap.vl`, selected by trap type |
+| `union customization_content` (`sym.h`) | 27 | union cell | three record members selected by the customization kind |
+
+The last three look tag-discriminated, not punned. Moving one of them to the object world
+would need an owner-approved `discriminant:` annotation (above); until then they stay cells.
 
 ### 3.5 Heap-backed type set (the feasibility number)
 
