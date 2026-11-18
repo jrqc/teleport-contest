@@ -93,8 +93,14 @@ export async function runSegment(input, prevGame = null) → game
 ```
 
 - A session is one or more segments (save/restore, chained `#quit`/new game, bones). The harness
-  calls `runSegment` once per segment with the previous `game` as `prevGame`, and concatenates
-  per-segment outputs itself. Each returned game reports **only its own segment**.
+  calls `runSegment` once per segment and concatenates per-segment outputs itself. Each returned
+  game reports **only its own segment**.
+- **`docs/API.md` is wrong about `prevGame`** (and README.md implies the same): it says each
+  segment gets the previous segment's `game`. The judge's runner (`frozen/ps_test_runner.mjs`,
+  `runSession`) calls `runSegment(input)` with **no `prevGame`**, and `input` has only `seed`,
+  `datetime`, `nethackrc`, `moves`, `storage`. Never use `prevGame` to tell a first segment from
+  a later one, and carry no cross-segment state except through `input.storage`. (Found
+  2026-11-18: emptying the record file when `prevGame` was null broke seed0030 under the judge.)
 - Cross-segment state (save files, bones, the record file) goes through `input.storage`
   (Web-Storage-shaped; the same instance for every segment of a session) via the frozen
   `js/storage.js` VFS (`vfsReadFile` / `vfsWriteFile` / `vfsDeleteFile` / `vfsListFiles`).
