@@ -1,7 +1,10 @@
 # Transpiler design: NetHack 5.0 → JavaScript
 
 Stage 1 output (CLAUDE.md section 3). Status: **approved by the owner on 2026-11-18 with the
-conditions recorded in section 12.2**; Stage 2 started. All numbers come from
+conditions recorded in section 12.2**. Stage 2 done; Stage 3 reached 44/44 public sessions
+(screens 11,405/11,405, RNG 792,838/792,838) on 2026-11-18. Section 14 records where the
+implementation departs from or adds to the original design; where they disagree, section 14
+and the code win. All numbers come from
 `transpiler/out/stage1-findings.md`, which also lists the commands that regenerate them.
 
 ## 1. Scope, inputs and the numbers that drive the design
@@ -444,12 +447,16 @@ Being conservative is safe: an extra `async` changes no behavior, only speed (se
 ### 6.4 Input and segment end
 
 - Scoring (`runSegment`): keys come from `input.moves`, one byte per key (latin1, matching the
-  fixed recorder, issue #23). When `tty_nhgetch` needs a key and none is left, the boundary screen
-  has already been captured; the read throws `SegmentEnd`, which `runSegment` catches to return
-  the game. Death or quit before the keys run out ends the segment the same way C does
-  (`nh_terminate`, final capture).
-- Browser play (`/play/<owner>/`): `nextKey()` awaits the frozen `Terminal`'s keyboard queue.
-  Same generated code, different key source, so live play is O(1) per key (no replay).
+  fixed recorder, issue #23), `\r` mapped to `\n` as the recorder's tty does. All input reaches
+  the game through `getchar$async` (`js/crt/proc.js`). When it needs a key and none is left,
+  the boundary screen has already been written; it calls the glue's `onStarve` and returns a
+  promise that never settles, and `runSegment` returns on that signal. (The design said
+  "throw `SegmentEnd`"; a throw would run C cleanup code that the recorder never ran, so the
+  program is left suspended instead.) Death or quit before the keys run out ends the segment
+  the way C does (`exit` → `ProcessExit`).
+- Browser play: the same `getchar$async` asks an optional `proc.readKey` hook once the scripted
+  keys are used up; `js/allmain.js` sets it to a coroutine handshake (section 14.9). Same
+  generated code, different key source, so live play is O(1) per key (no replay).
 
 ## 7. Lua
 
@@ -492,33 +499,45 @@ as `$HOME/.nethackrc` before start, as the recorder harness does.
 
 ### 8.2 Layout under `js/`
 
+As built (2026-11-18):
+
 ```
-js/jsmain.js            hand-written glue: runSegment (8.3)
-js/rng.js               hand-written: RNG log sink and contract exports, uses frozen isaac64.js
-js/crt/*.js             hand-written runtime (section 5)
-js/nh/src/<file>.js     generated, one per NetHack .c (src/, win/tty/, sys/unix/, sys/share/)
-js/nh/layout/<hdr>.js   generated record classes, sizes, offsets, one per header
-js/lua/<file>.js        generated Lua 5.4.8 (heap mode)
-js/data/<file>.js       generated embedded data files
-js/hand/*.js            escape hatches listed in annotations.jsonc (target: very few)
+js/jsmain.js            hand-written glue: runSegment (8.3); re-exports NethackGame
+js/nhprocess.js         hand-written: one process run (reset, environment, VFS mounts, main()),
+                        OSC 7777 marker parser, screen encoder, RNG log sink
+js/allmain.js           hand-written: NethackGame, moveloop_core (browser play, 14.9)
+js/game_display.js      hand-written: GameDisplay, a frozen Terminal that draws marker screens
+js/gstate.js            the template's shared `game` object (index.html and the runners import it)
+js/crt/*.js             hand-written runtime (section 5, 14)
+js/nh/<file>.js         generated, one per C file: NetHack (src/, win/tty/, sys/unix/,
+                        sys/share/), Lua 5.4.8 (heap world), record classes, luabridge.js,
+                        index.js ($initAll); 175 files
+js/data/<file>.js       generated embedded data files (154)
+js/hand/*.js            escape hatches listed in annotations.jsonc: nhlua.js (nhl_alloc),
+                        files.js (docompress_file); plus crt/qsort.js for nh_deterministic_qsort
 js/isaac64.js, js/terminal.js, js/storage.js   frozen, untouched
 ```
 
-The current skeleton modules from the contest template (`allmain.js`, `mklev.js`,
-`fastforward.js`, ...) are removed once generated code replaces them (CLAUDE.md 2).
+There is no separate `rng.js`: the patched `rnd.c` is transpiled, calls the frozen ISAAC64
+through `js/crt/isaac64-glue.js`, and writes its log lines to a device file that
+`nhprocess.js` reads. The template skeleton was deleted in one commit when the generated
+build first ran end to end (D5). Generated `js/nh` and `js/data` are committed (the judge runs
+the repo as is); they are regenerated, never edited.
 
 ### 8.3 Glue
 
-- **`runSegment(input, prevGame)`**: (1) resets all module state, (2) installs the segment's
+- **`runSegment(input)`**: the judge passes no `prevGame` (CLAUDE.md 1.5; `docs/API.md`
+  says otherwise), so nothing may depend on it. (1) resets all module state, (2) installs the segment's
   environment (seed, datetime, nethackrc, storage, key queue), (3) runs the transpiled
   `main()` of `sys/unix/unixmain.c` with the recorder's argument vector (`nethack -u <name>`),
   (4) stops at `SegmentEnd` or process exit (`nh_terminate`), (5) returns the game object with
   `getScreens()`, `getRngLog()`, `getCursors()`, `getAnimationFramesByStep()` for this segment
   only.
 - **Module state reset.** C runs every segment as a new process; ES modules are singletons in
-  one JS process. Each generated module therefore exports `__reset()`, which re-runs its
-  file-scope initializers (globals, static locals, string tables); `jsmain.js` calls all of them
-  in a generated, fixed order before each segment. Nothing else carries over: cross-segment
+  one JS process. Each generated module therefore exports an initializer that re-runs its
+  file-scope initializers (globals, static locals, string tables); the generated
+  `js/nh/index.js` `$initAll()` calls all of them in a fixed order before each segment, after
+  the runtime resets (`resetStdio`, `resetFs`, `resetProcess`, the heap). Nothing else carries over: cross-segment
   state goes only through `storage` (saves, bones, `record`).
 - **RNG.** `rnd.c` (patched) is transpiled, except its ISAAC64 calls, which an annotation maps to
   the frozen `js/isaac64.js` (contract: `rng.js` must use it). The patched code writes log lines
@@ -526,9 +545,11 @@ The current skeleton modules from the contest template (`allmain.js`, `mklev.js`
   an in-memory sink and applies exactly the transformation `record-session.mjs`'s
   `parseRngLines` applies; `getRngLog()` returns entries **without** the `@ caller` tag
   (contract), and a separate debug log keeps the full line for the triage tool (4.2).
-- **Screens.** At each `nomux_capture_write_input_boundary` the runtime records screen, cursor
-  and RNG delta (5, `screen.js`); `nomux_capture_write_screen` from `tty_delay_output` becomes
-  `await game.animationFrame()`.
+- **Screens.** The patched tty (patch 006) is transpiled as is: at each input boundary and
+  animation frame it writes an OSC 7777 marker with its shadow screen to stdout
+  (`NOMUX_MARKERS=1`). `nhprocess.js` parses the markers from the stdout sink exactly as
+  `record-session.mjs` does and encodes the screens with its `encodeScreenAnsiRle`; animation
+  frames are collected per step from the `anim` markers. No `screen.js` module was needed.
 
 ## 9. Annotations and checker
 
@@ -673,6 +694,10 @@ is unaffected (one key at a time).
 | M5 | Level 1 (incl. Lua special levels and dungeon setup) | RNG matches through the first `mklev` for all 44 sessions |
 | M6 | Full play, save/restore, bones | Score climbs with no regressions; target: majority of public steps |
 
+Status 2026-11-18: M0, M1, M3–M6 reached (44/44 public sessions pass, every screen and RNG
+call); D7 done (pushed after the 44/44 run). M2 (function-level differential tests) is still
+open: the session scores got ahead of it, and it is now the next test-quality item (14.11).
+
 ## 13. Feasibility verdict
 
 **Feasible, with the design above.** The numbers that decide it:
@@ -698,3 +723,113 @@ are weeks of work; the first matching screens come at M3.
 
 No fallback is needed. If union cells turn out impractical, the same transpiler still works with unions in the
 heap (scenario S2: 23 NetHack heap types), at a readability and speed cost.
+
+Update 2026-11-18: the estimate was pessimistic. The first full public pass came at the end of
+Stage 3's first iteration week: 44/44 sessions, 11,405/11,405 screens, 792,838/792,838 RNG
+calls, slowest session about 7 s against the 900 s limit, 2.2 ms per key in interactive play.
+
+## 14. Implementation record (Stages 2–3)
+
+What the implementation settled that the design above left open or got wrong. Each item names
+the code that holds it. The rule behind every item: model the C behavior the recorder actually
+exhibits, in the runtime or the emitter, never per session.
+
+### 14.1 Heap world and bridge
+
+- `js/crt/heap.js`: one `ArrayBuffer` with the Darwin arm64 layout; regions: static data, a
+  downward stack, then a deterministic `malloc`. Pointers are Numbers; function pointers index
+  a function table. `reset()` per process.
+- `js/crt/bridge.js` + generated `js/nh/luabridge.js`: every call across the NetHack ↔ Lua C
+  API boundary goes through a per-function descriptor generated from the C types (scalars pass
+  through; `char *` is copied to or viewed on the heap; records both worlds use are copied in
+  and back; function pointers get wrappers with stable identity). A `longjmp` crosses the
+  bridge as a JS exception.
+- `nhl_alloc` is the one allocator for both worlds (hand override `js/hand/nhlua.js`).
+- Lua is compiled with `-DLUA_USE_JUMPTABLE=0` (annotation group `lua`): the computed-goto
+  dispatch and the switch fallback run the same opcode bodies in the same order, and the
+  switch is what JS can express.
+
+### 14.2 Save files
+
+As designed (3.6), with the details fixed in `js/crt/serial.js`: records are written in C
+layout from generated `$fields()` tables, pointers as 0/1 flags (a non-null one restores as a
+`STALE` value that traps on use), unions and union cells as raw bytes decoded on first use.
+
+### 14.3 Union cells (3.4.2 as built)
+
+The four punning unions (`any`, `vptrs`, `vlaunchinfo`, `customization_content`;
+`transpiler/out/union-pun.json`) are emitted as cell classes over `js/crt/ucell.js`: each cell
+owns its `sizeof` bytes in a `DataView`; scalar members read and write the bytes; pointer
+members store a canonical handle (`ptrToInt`) in the bytes and the object in a side map keyed
+by offset; record members are views. Writing one member and reading another therefore gives
+C's reinterpretation. Found by Sokoban wall colors (a glyph written as one member and read as
+another).
+
+### 14.4 Pointers
+
+- **Canonical handles**: `ptrToInt` keys a byte pointer on (buffer, offset), a field reference
+  on (object, key), an array element on (array, index), so two pointers to the same place give
+  the same integer, as in C.
+- **Ordering unrelated objects** (`pcmp`): C compares addresses; `done_in_by` (end.c) orders
+  pointers into different objects. Unrelated objects get a stable ordinal on first comparison;
+  typed-array views of one `ArrayBuffer` compare by byte address; `ptrConst` sentinels trap.
+- **Tail records** (D4): `(char *)(p + 1)` on an annotated `tail` record (`struct engr`)
+  becomes `$c.recTail(p)`, the trailing byte area. `alloc` slack smaller than one record is
+  accepted; anything else traps.
+
+### 14.5 Effective type of allocated storage
+
+C11 6.5p6: allocated storage takes the type of what is stored into it. Lua's `gmst_ubak`
+backup (nhlua.c) `memcpy`s non-pointer data into a block NetHack also treats as pointers. A
+pointer-array block that receives such a copy keeps a shadow byte copy (`$eff`,
+`js/crt/string.js` memmove path), and later copies out of it reproduce the bytes.
+
+### 14.6 Contiguous scalar-array fields
+
+A record with two or more one-dimensional scalar-array fields gets one `ArrayBuffer` (`$m`)
+with each field a view at its C offset (`transpiler/emit/classes.mjs`). An overrun of one
+field then reaches the next, as in C. Found by restore: a 49-byte copy into `plname[32]`.
+
+### 14.7 libc details found by sessions
+
+- `memset` of a record with a nonzero byte (bones.c cemetery) is done by deserializing a filled
+  buffer (`serial.deserialize`), so every field gets C's value.
+- `fdopen` streams share the descriptor's file offset (`js/crt/stdio.js`); the save header was
+  being written at offset 0 again without it.
+- The score files (`record`, `logfile`, `xlogfile`) are created empty only when missing, as the
+  recorder's harness opens them for append. Truncating them on every segment broke seed0030.
+
+### 14.8 External processes: `docompress_file`
+
+The recorder really `fork`s and `exec`s `/usr/bin/compress` at save and restore. The hand
+override (`js/hand/files.js`, owner-approved) keeps the parent's C code after `wait()` and
+models the child by its observable effects: the file moves between `name` and `name.Z` with its
+bytes unchanged (the VFS stores the bytes; compression is not observable to the game), and the
+child's terminal output is dropped because screens come from the in-process markers.
+
+### 14.9 Browser play
+
+`js/allmain.js` runs the same process (`js/nhprocess.js`) as a coroutine. `proc.readKey` parks
+the game at every key read; `moveloop_core()` grants one key from the display's queue (frozen
+`Terminal.readKey`, keyboard or `pushKey`), consulting `display.onEmptyQueue` first, and returns
+when the game parks again or exits (`game.program_state.gameover`). `GameDisplay`
+(`js/game_display.js`) draws each marker screen, encoded as the recordings are (blank runs as
+cursor moves, so spaces after reverse video are plain, as the judge sees them).
+Checks: `frozen/playability_runner.mjs` PLAYABLE at 2.18 ms per key (threshold 5);
+`tools/playcheck.mjs` compares the interactive display with every recorded step (44/44);
+`tools/browser-replay.html` replays a session in headless Chrome.
+
+### 14.10 Emitter fixes worth keeping in mind
+
+- Postfix `++`/`--` on narrow types builds the new value from the saved old value (a textual
+  rewrite once turned `$c.i16` into `$c.$t116`).
+
+### 14.11 Open items
+
+- M2 differential tests (12.3).
+- Held-out pool: the leaderboard reports **56 held-out sessions, 13,126 steps** (CLAUDE.md 1.4
+  says 44 and 10,538). Triage the judge's held-out results with tools 4.2/4.3 when it scores the
+  current commit.
+- Phase 2: hand-written glue in `js/` is now about 4,100 lines (runtime, glue, two overrides);
+  changes to it count in the diff like generated code, so keep it stable.
+

@@ -59,7 +59,9 @@ Everyone may keep submitting after the Phase 1 freeze; only the top 10 compete i
 - **One point per step**: a step is an input boundary (each time C's `tty_nhgetch()` blocks for
   a key; the first frame is before any key). A step scores if the 24×80 grid matches exactly:
   character + color + attributes (+ cursor position). Partial sessions earn partial credit.
-- Public pool: 11,284 steps. Held-out pool: 10,538 steps. Maximum: **21,822**.
+- Public pool: 11,284 steps. Held-out pool: 10,538 steps. Maximum: **21,822**. (The leaderboard
+  data on 2026-11-18 shows different pools: public 44 sessions / 11,405 points, held-out
+  **56 sessions / 13,126 points**, 100 sessions in all. Trust the leaderboard.)
 - PRNG match is reported as advisory progress only, but it is the prerequisite: one wrong or
   missing RNG call cascades and every later screen diverges.
 - Whole-session passes (every screen and RNG call) are the tiebreaker. Cursor is a tiebreaker.
