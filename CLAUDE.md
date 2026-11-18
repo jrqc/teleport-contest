@@ -101,8 +101,15 @@ export async function runSegment(input, prevGame = null) → game
 - RNG log entries are exactly `rn2(N)=M`, `rnd(N)=M`, `rn1(N,B)=M`, `rnl(N)=M`, `rne(N)=M`,
   `rnz(N)=M`, `d(N,B)=M`, compared positionally. The C recordings carry `@ caller(file:line)`
   tags; **never put those in `getRngLog()`** (keep a separate debug log, see 4.2).
-- NetHack has **three PRNG contexts**: core, Lua (special levels), display (hallucination).
-  All three must be reproduced in the right order with the right values.
+- NetHack has **two PRNG streams** (two ISAAC64 states in `rnd.c`): **core** and **display**
+  (hallucination; logged separately via `NETHACK_RNGLOG_DISP`, not part of the session RNG
+  logs). Both must be reproduced in the right order with the right values. The contest README
+  speaks of three contexts, but the C source shows that Lua special-level scripts have no
+  stream of their own: `dat/nhlib.lua` replaces `math.random` with a shim that calls `nh.rn2` /
+  `nh.random`, i.e. the **core** RNG. Patch 004 ("Lua context") only tags those core calls with
+  the Lua source location (`@ random src=nhlib.lua:8 ...`). Lua's own xoshiro `math.random` is
+  seeded but never used by the scripts. (Verified in Stage 1; see
+  `transpiler/out/stage1-findings.md`.)
 - Recorded screens/RNG are never passed in. 900-second wall-clock limit per session.
 
 ### 1.6 Rules and hard constraints
@@ -119,10 +126,18 @@ export async function runSegment(input, prevGame = null) → game
 ### 1.7 The C reference build (`nethack-c/`)
 
 - `nethack-c/build-recorder.sh` applies the patches in `nethack-c/patches/` (001 seed + fixed
-  datetime, 002 deterministic/stable `qsort`, 003–005 RNG logging for the core/Lua/display
-  contexts, 006 deterministic 24×80 capture) and builds the recorder with **clang** (needs
+  datetime, 002 deterministic/stable `qsort`, 003–005 RNG logging: core, Lua call-site tags
+  on the core stream, display, 006 deterministic 24×80 capture) and builds the recorder with **clang** (needs
   `clang`, `make`, `bison`, `flex`). Env vars: `NETHACK_SEED`, `NETHACK_FIXED_DATETIME`,
   `NETHACK_RNGLOG`, `NETHACK_RNGLOG_DISP`, `HACKDIR`.
+- **That build alone does not reproduce the sessions.** It installs no `sysconf` (the game
+  refuses to start), the HEAD version of patch 006 fails seed0013, the recorder's `time()`
+  leaks the real clock's DST flag (2.4, Time), and `scripts/record-session.mjs` drops the last
+  step at random and leaves lock files between segments. Use the reference environment
+  instead: `bash tools/recorder-env/build-reference.sh`, then
+  `node tools/recorder-env/verify-rerecord.mjs` (44/44 byte-identical) and
+  `tools/recorder-env/record-session.mjs` for our own recordings. Details:
+  `tools/recorder-env/README.md`. `nethack-c/` and `scripts/` stay unmodified.
 - **Why clang:** C argument evaluation order is unspecified. Clang evaluates left to right (like
   JS); gcc right to left. `d(rn2(5), rn2(3))` consumes RNG in a different order under gcc. The
   transpiler must preserve **clang's** evaluation order everywhere, and the same for any other
@@ -232,8 +247,9 @@ similar). Generated code calls helpers and never re-implements semantics inline.
 | Strings | `char` arrays with NUL terminator semantics; `strcpy`/`strcat`/`strncpy`/`sprintf` into buffers must behave like C (including truncation). |
 | Formatting | `sprintf`/`snprintf` must be byte-exact for every format NetHack uses (`%d %ld %s %-10s %c %x %5.2f …`). Screens depend on it. |
 | Control flow | `goto`, `switch` fall-through, `setjmp`/`longjmp` (as exceptions) translated mechanically. |
-| Sorting | `qsort` must be the **exact algorithm from patch 002**, not JS `Array.sort`, so inconsistent comparators behave identically. |
-| Time | `time()`/`localtime()` must use the segment's pinned `datetime` (moon phase, Friday 13th, shopkeeper greetings). |
+| Sorting | Patch 002 (`nh_deterministic_qsort`, `src/hacklib.c`) is a wrapper, not an algorithm: it sorts an index array with **Darwin libc `qsort`**, breaking ties by original index (stable). The runtime must reproduce **Darwin's `qsort` exactly** (never JS `Array.sort`), because comparator call order is observable: `sortloot_cmp` can consume core RNG (`observe_object → discover_object → exercise → rn2`, `xname → tin_variety → rn2`, `wipeout_text → rn2`). The other 13 comparators reach no RNG. Verify by logging comparator call sequences against native C. |
+| Time | `time()`/`localtime()` must use the segment's pinned `datetime` (moon phase, Friday 13th, shopkeeper greetings) in `TZ=America/New_York`. Quirk to reproduce: patch 001's `time_from_yyyymmddhhmmss()` copies the recording machine's *real* `struct tm` (incl. `tm_isdst`) before `mktime()`; the official recordings were made in US daylight time, so the pinned time behaves as `mktime` with `tm_isdst=1` (a winter date's local hour comes out one hour earlier, e.g. 12:00 → 11:00). |
+| Recorder environment | Strings that come from the recording machine are documented constants (`docs/recording-environment.md`, contest issues #16/#17; davidbau: hard-coding them is legitimate): `HOME=/Users/davidbau/git/mazesofmenace/teleport/maud/test/comparison/c-harness/results` (config file shown as `$HOME/.nethackrc`, wrapped at column 80, e.g. seed2200 step 158), `TERM=xterm-256color`, `TZ=America/New_York`, Darwin libc behavior. Keep them in one runtime module, never scattered in generated code. |
 | libc | Implement only the libc subset NetHack actually calls; the Stage 1 inventory lists it. |
 
 ### 2.5 Async input (the problem that sank Bau's first attempt)
@@ -260,9 +276,11 @@ Generated `js/` must be **deterministic and low-churn**:
 
 ### 2.7 Lua
 
-NetHack 5.0 runs special levels and dungeon descriptions through Lua, with its own PRNG
-context. The investigation must determine where the Lua interpreter source comes from (in the
-3.7 lineage it was fetched or vendored separately; check 5.0) and whether to **transpile the
+NetHack 5.0 runs special levels and dungeon descriptions through Lua; their randomness goes
+through the core RNG (1.5). **Source (answered in Stage 1):** NetHack 5.0 uses **Lua 5.4.8**,
+not vendored in the repo: the build downloads it (`make fetch-lua`) into `lib/lua-5.4.8/` and
+builds `liblua.a` (32 files: core + standard libraries, `-O2 -DLUA_COMPAT_5_3
+-DLUA_USE_MACOSX`). The open question is whether to **transpile the
 Lua interpreter's C source with the same transpiler** (preferred: one method, faithful
 semantics) and embed the `.lua` scripts as string data, versus an existing JS Lua
 implementation (riskier: subtle semantic and RNG-order differences).
@@ -283,9 +301,10 @@ Do not start a later stage without the owner's go-ahead.
 
 Investigate with tools, not by reading 443k lines end to end:
 
-1. **Set up:** init the submodule, build the recorder (`nethack-c/build-recorder.sh`), record
-   the exact clang command lines/defines used, and confirm the public sessions re-record
-   byte-equal (`scripts/verify-rerecord.mjs`).
+1. **Set up:** init the submodule, build the recorder (`nethack-c/build-recorder.sh`; in
+   practice `tools/recorder-env/build-reference.sh`, see 1.7), record the exact clang command
+   lines/defines used, and confirm the public sessions re-record byte-equal
+   (`tools/recorder-env/verify-rerecord.mjs`). Done in Stage 1: 44/44.
 2. **Inventory** (clang AST queries, script it and save outputs under `transpiler/out/`):
    - Files and line counts per directory (C vs Lua vs generated/data).
    - Counts and locations of every hard pattern from 2.2, plus `goto`, `setjmp`/`longjmp`,
@@ -294,7 +313,7 @@ Investigate with tools, not by reading 443k lines end to end:
    - The libc and system calls actually used.
    - The call graph from `main`/`moveloop` to every blocking input function; size of the async set.
    - Every runtime data file the game opens and how it is generated (`makedefs`, Lua files).
-   - Every PRNG call site per context (core/Lua/display).
+   - Every PRNG call site per stream (core, display), plus Lua-script call sites.
 3. **Hotspots:** group the unsafe sites by file and type. Read only those closely and propose a
    decision for each (auto-object, heap-backed, hand rewrite).
 4. **Write `transpiler-design.md`** containing at least:
@@ -318,7 +337,7 @@ Investigate with tools, not by reading 443k lines end to end:
 
 Build in this order, test-first: front end → analysis and annotations checker → runtime/libc
 with differential tests → per-construct code generation with golden and differential tests →
-async transform → whole-program emit → glue (`jsmain.js`, `rng.js` with three contexts, data
+async transform → whole-program emit → glue (`jsmain.js`, `rng.js` with the core and display streams and Lua call-site tags, data
 embedding) → test tooling from section 4.
 
 ### Stage 3: run, test, improve (automated loop)
@@ -388,8 +407,12 @@ frozen/, sessions/, nethack-c/, docs/   ← contest-provided; do not modify
 
 ## 6. Working conventions for Claude Code
 
-- Facts about the contest come from the repo's `README.md`, `docs/API.md` and `docs/PHASES.md`.
-  If this file and those disagree, those win; point out the difference.
+- **Sources of truth.** Contest rules, API and scoring come from the repo's `README.md`,
+  `docs/API.md`, `docs/PHASES.md` and `docs/recording-environment.md`: if this file and those
+  disagree on rules or the API, those win. **Game behavior** (what the C program actually
+  does: RNG streams, call order, screens) is decided by the **C source** (the patched tree
+  the reference recorder builds) and the recordings it reproduces: if the docs describe
+  behavior differently from the code, the code wins. Either way, point out the difference.
 - When unsure about C behavior, write a tiny C test, compile it with clang, and check. Don't guess.
 - Commit in small steps with clear messages. Keep generated `js/` in separate commits from
   transpiler changes so diffs stay reviewable.
