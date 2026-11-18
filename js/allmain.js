@@ -18,6 +18,18 @@
 import { bootProcess, encodeScreen } from './nhprocess.js';
 import { game } from './gstate.js';
 import { GameDisplay } from './game_display.js';
+import { KEY_BINDINGS } from './terminal.js';
+import { iflags } from './nh/decl.js';
+
+// Arrow keys for browser play (the terminal's default is xterm's ESC [ A..D, which
+// the tty port reads as three commands). Chosen at every key read from the game's
+// number_pad option (iflags.num_pad): off, the vi keys (Shift+arrow runs); on, the
+// digits (Shift+arrow moves one step too: number_pad has no shifted run key).
+const NUMPAD_ARROWS = {
+    ArrowUp: '8', ArrowDown: '2', ArrowLeft: '4', ArrowRight: '6',
+    'Shift+ArrowUp': '8', 'Shift+ArrowDown': '2', 'Shift+ArrowLeft': '4', 'Shift+ArrowRight': '6',
+};
+const arrowBindings = () => (iflags.num_pad ? NUMPAD_ARROWS : KEY_BINDINGS.VI_KEYS);
 
 let current = null;
 
@@ -58,7 +70,7 @@ export class NethackGame {
                 const go = new Promise((res) => { this._grant = res; });
                 this._park();
                 await go;
-                const k = await this.display.readKey();
+                const k = await this.display.readKey({ bindings: arrowBindings() });
                 return k === 13 ? 10 : k;   // the recorder's tty (ICRNL)
             },
         });
