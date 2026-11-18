@@ -8,3 +8,6 @@ transpiler/out/inventory/tu/
 transpiler/build/
 
 # generated js/nh and js/data are committed, in commits separate from transpiler changes
+
+# macOS Finder metadata
+.DS_Store
