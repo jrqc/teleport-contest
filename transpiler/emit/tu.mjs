@@ -1553,26 +1553,27 @@ export class TUEmitter {
         const t = this.T(sub);
         let lv = this.stable(this.lvalue(sub), sub);
         const cur = lv.get();
-        let nv;
         const one = E(op === '++' ? '1' : '-1', op === '++' ? PREC.prim : PREC.unary);
-        if (isPtr(t)) nv = this.padd(cur, one, t);
-        else if (isFloat(t)) nv = E(`${par(cur, PREC.add)} ${op === '++' ? '+' : '-'} 1`, PREC.add);
-        else if (t.k === 'int') {
-            if (t.size === 8) nv = E(`$c.${op === '++' ? 'add' : 'sub'}${t.signed ? '64' : 'u64'}(${cur.c}, 1)`, PREC.call);
-            else {
-                const sum = E(`${par(cur, PREC.add)} ${op === '++' ? '+' : '-'} 1`, PREC.add);
-                nv = t.size === 4 ? (t.signed ? E(`${par(sum, PREC.bor)} | 0`, PREC.bor) : E(`${par(sum, PREC.shift)} >>> 0`, PREC.shift))
+        // the new value computed from `v` (the operand, or the postfix temporary)
+        const next = (v) => {
+            if (isPtr(t)) return this.padd(v, one, t);
+            if (isFloat(t)) return E(`${par(v, PREC.add)} ${op === '++' ? '+' : '-'} 1`, PREC.add);
+            if (t.k === 'int') {
+                if (t.size === 8) return E(`$c.${op === '++' ? 'add' : 'sub'}${t.signed ? '64' : 'u64'}(${v.c}, 1)`, PREC.call);
+                const sum = E(`${par(v, PREC.add)} ${op === '++' ? '+' : '-'} 1`, PREC.add);
+                return t.size === 4 ? (t.signed ? E(`${par(sum, PREC.bor)} | 0`, PREC.bor) : E(`${par(sum, PREC.shift)} >>> 0`, PREC.shift))
                     : E(`$c.${t.signed ? 'i' : 'u'}${t.size * 8}(${sum.c})`, PREC.call);
             }
-        } else this.err(n, `++/-- on ${show(t)}`);
+            this.err(n, `++/-- on ${show(t)}`);
+        };
         const pre = lv.pre ? [lv.pre] : [];
         if (ctx === 'd' || n.isPostfix === false) {
-            const set = lv.set(nv.c);
+            const set = lv.set(next(cur).c);
             return pre.length ? E([...pre, set.c].join(', '), PREC.comma) : set;
         }
         // postfix with a used value: old value through a temporary
         const tmp = this.temp();
-        return E([...pre, `${tmp} = ${cur.c}`, lv.set(nv.c.replace(cur.c, tmp)).c, tmp].join(', '), PREC.comma);
+        return E([...pre, `${tmp} = ${cur.c}`, lv.set(next(E(tmp, PREC.prim)).c).c, tmp].join(', '), PREC.comma);
     }
 
     sizeofExpr(n) {
