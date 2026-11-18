@@ -516,3 +516,30 @@ Fails on: (1) a hard-pattern site with no decision (no analyzer default and no a
 function changed since the annotation was written (hash of the function's source text stored
 next to the entry). It prints the decision table, the heap-backed type set, the async-set
 size and the hand-written line count, so every run shows the current state.
+
+## 10. Test tooling and the iteration loop
+
+Everything lives outside `js/` and runs from one entry point, `node tools/loop.mjs`, which
+writes `results/<timestamp>/` (machine-readable) and appends a summary to `results/LOG.md`.
+
+| # | Tool | Built from | Gate |
+|---|---|---|---|
+| 4.1 | Score runner | `frozen/score.sh`, parses `__RESULTS_JSON__`, diffs per session against the previous run | Any per-session drop in screens or RNG = **regression**, printed first, loop stops |
+| 4.2 | First-divergence triage | Recorded RNG (with `@ caller` tags) vs the JS debug log (full lines, same tags, because patch 003 is transpiled) | Groups failing sessions by the first diverging C function |
+| 4.3 | Screen diff | `frozen/screen-decode.mjs`, cell-level char/color/attr/cursor | — |
+| 4.4 | Targeted recorder | `tools/recorder-env/record-session.mjs` (fixed recorder) | Own sessions in `tests/sessions/`, never in `sessions/` |
+| 4.5 | Differential C corpus | `tests/c-diff/` (started: `order/eval-order.c`): one program per construct and hotspot pattern, run native vs transpiled | Byte-identical stdout |
+| 4.6 | Runtime unit tests | `js/crt/` against native results (int ops, `printf` formats from the AST, Darwin `qsort` comparator sequences, `localtime`) | All green |
+| 4.7 | Determinism and churn | Transpile twice → byte-identical; `git diff --numstat -- js/` vs a baseline tag | Non-identical output fails |
+| 4.8 | Annotation checker | Section 9.3 | Fails on missing/stale decisions |
+| 4.9 | Static checks | `node --check`, import graph, forbidden APIs (`fs`, `child_process`, network, `WebAssembly`), frozen files unchanged, async/await consistency (6.3) | Any failure stops the loop |
+| 4.10 | Performance | Wall time per session | Warn above 90 s (10% of the limit) |
+
+Loop: transpile → 4.7/4.8/4.9 → 4.5/4.6 → 4.1 → 4.2 on the first failing sessions → fix the
+**transpiler, runtime or an annotation** (never generated `js/`) → repeat. Fixes start at the
+earliest divergence of the most blocking C function (CLAUDE.md section 4 loop rules).
+
+Bootstrapping before the full game runs: the C corpus (4.5) and **function-level differential
+tests**: selected pure NetHack functions (`rnd.c`, `hacklib.c` string helpers, `objnam.c`
+naming, `mkobj.c` with a seeded RNG) linked natively into a small C driver and compared with
+their transpiled versions. This catches most translation bugs before any session runs.
