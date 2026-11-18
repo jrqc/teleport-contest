@@ -1,0 +1,399 @@
+# CLAUDE.md — Teleport Contest: NetHack 5.0 → JavaScript via a hybrid transpiler
+
+This file is the standing brief for Claude Code in this repository. Read it fully before doing
+anything. It covers (1) the contest and its rules, (2) the approach we chose, (3) the staged
+workflow, and (4) the automated test loop.
+
+Owner: Gürbüz Demiroğlu. Goal: **build a working port by transpiling, not to win**. Leaderboard
+placement is a side effect. Correctness, generality and a clean, repeatable method matter more
+than points.
+
+---
+
+## 1. The contest
+
+### 1.1 What it is
+
+The Teleport Contest (David Bau, announced 2026-05-06,
+<https://davidbau.com/archives/2026/05/06/the_teleport_contest.html>) asks entrants to port
+**NetHack 5.0** (released 2026-05-02; about 442,901 lines of C and Lua) to plain JavaScript whose
+external behavior is **bit-exact** with the C original: the same PRNG (pseudo-random number
+generator) sequence and the same 24×80 terminal screen after every keystroke.
+
+| Resource | Location |
+|---|---|
+| Announcement post | davidbau.com/archives/2026/05/06/the_teleport_contest.html |
+| Contest repo (fork this) | github.com/davidbau/teleport-contest |
+| Leaderboard | mazesofmenace.ai/leaderboard/ |
+| Session viewer | mazesofmenace.ai/sessions-viewer/ (local copy: `tools/session-viewer/`) |
+| Reference C source | github.com/NetHack/NetHack, tag `NetHack-5.0.0_Release`, submodule at `nethack-c/upstream/` |
+| Contract details | `docs/API.md` (runSegment API, comparator, sandbox), `docs/PHASES.md` (phases, diff penalty) |
+
+### 1.2 How to participate
+
+1. Fork and clone: `gh repo fork davidbau/teleport-contest --clone --remote`
+2. `git submodule update --init` (pulls the NetHack C source into `nethack-c/upstream/`)
+3. Set the category: `bash frozen/set-category.sh transpiled` (scoring refuses to run until a
+   category is set; ours is **transpiled**: more than 50% of the code is produced by tools from
+   the C source).
+4. Score locally: `bash frozen/score.sh`. Score one session:
+   `node frozen/ps_test_runner.mjs sessions/<name>.session.json`
+5. Push to `main`. GitHub Actions on the fork scores the 44 public sessions on every push. The
+   official judge auto-discovers forks every **2 hours** and scores the latest commit against
+   all **88** sessions (44 public + 44 held-out). There is no other submission step.
+
+### 1.3 Dates (all 00:00 UTC)
+
+| Date | Event |
+|---|---|
+| 2026-05-06 | Contest opened |
+| 2026-11-29 | Phase 1 freeze: judge tags `phase1/<owner>/<sha>`; top 10 qualify for Phase 2 |
+| 2026-11-30 | Phase 2 target ("NetHack 5.1") and diff-penalty formula announced |
+| 2026-12-31 | Phase 2 deadline |
+
+Everyone may keep submitting after the Phase 1 freeze; only the top 10 compete in Phase 2.
+**Our own stages (section 3) are named "Stage", not "Phase", to avoid confusion.**
+
+### 1.4 Scoring
+
+- **One point per step**: a step is an input boundary (each time C's `tty_nhgetch()` blocks for
+  a key; the first frame is before any key). A step scores if the 24×80 grid matches exactly:
+  character + color + attributes (+ cursor position). Partial sessions earn partial credit.
+- Public pool: 11,284 steps. Held-out pool: 10,538 steps. Maximum: **21,822**.
+- PRNG match is reported as advisory progress only, but it is the prerequisite: one wrong or
+  missing RNG call cascades and every later screen diverges.
+- Whole-session passes (every screen and RNG call) are the tiebreaker. Cursor is a tiebreaker.
+- Animation frames (`await game.animationFrame()` inside the `nh_delay_output()` equivalent) are
+  a supplemental `Anim%` column, not part of the ranking.
+- Screen comparator (`frozen/screen-decode.mjs`): both sides are decoded to a cell grid, so
+  encodings that render the same pixels match. Version banner lines are collapsed; DEC
+  line-drawing glyphs are translated; invisible attributes on spaces are ignored, but inverse
+  video and underline on spaces count.
+- The runner prints human-readable output to stderr and a JSON block after the marker
+  `__RESULTS_JSON__` on stdout. Our tooling parses that block.
+
+**Phase 2 scoring** (`docs/PHASES.md`): `final ≈ parity_on_5.1 / (1 + lines_changed_in_js / N)`.
+The diff is `git diff phase1/<tag> HEAD -- 'js/**'` (excluding frozen files), summing added and
+deleted lines; whitespace-only and comment-only changes are normalized out. **Only `js/` (plus
+`package.json`, `index.html`) is judged. Code outside `js/` (our transpiler, annotations,
+tooling) never counts toward the diff.** This is the single most important design constraint
+for a transpiler: when the C source changes, re-running the transpiler must change as few
+`js/` lines as possible (see 2.6).
+
+### 1.5 The API contract (`docs/API.md`)
+
+`js/jsmain.js` must export:
+
+```js
+export async function runSegment(input, prevGame = null) → game
+// input: { seed, datetime /* "YYYYMMDDHHMMSS" */, nethackrc /* OPTIONS=… text */,
+//          moves /* raw key string from the first keystroke, incl. chargen */, storage }
+// game:  { getScreens(): string[], getRngLog(): string[], getCursors(): [col,row,vis][],
+//          getAnimationFramesByStep?(): {screen,cursor}[][] }
+```
+
+- A session is one or more segments (save/restore, chained `#quit`/new game, bones). The harness
+  calls `runSegment` once per segment with the previous `game` as `prevGame`, and concatenates
+  per-segment outputs itself. Each returned game reports **only its own segment**.
+- Cross-segment state (save files, bones, the record file) goes through `input.storage`
+  (Web-Storage-shaped; the same instance for every segment of a session) via the frozen
+  `js/storage.js` VFS (`vfsReadFile` / `vfsWriteFile` / `vfsDeleteFile` / `vfsListFiles`).
+- RNG log entries are exactly `rn2(N)=M`, `rnd(N)=M`, `rn1(N,B)=M`, `rnl(N)=M`, `rne(N)=M`,
+  `rnz(N)=M`, `d(N,B)=M`, compared positionally. The C recordings carry `@ caller(file:line)`
+  tags; **never put those in `getRngLog()`** (keep a separate debug log, see 4.2).
+- NetHack has **three PRNG contexts**: core, Lua (special levels), display (hallucination).
+  All three must be reproduced in the right order with the right values.
+- Recorded screens/RNG are never passed in. 900-second wall-clock limit per session.
+
+### 1.6 Rules and hard constraints
+
+| Constraint | Consequence for us |
+|---|---|
+| Plain ES6 modules, run as-is in Node 22+ and Chrome, **no build step** | The transpiler runs offline; we commit its generated JS into `js/`. |
+| **No WASM**, no network, no filesystem, no threads, no native addons | The "Emscripten-like" part must be pure JS (typed arrays/`DataView`), not WebAssembly. Game data files and `.lua` scripts must be embedded into JS modules. |
+| Frozen files `js/isaac64.js`, `js/terminal.js`, `js/storage.js` (copies in `frozen/`) are overlaid by the judge | Never edit them. Import and use them. `rng.js` may be replaced but must use `isaac64.js` and the exact log format. |
+| Sandbox: Node `--permission`, read-only access to the fork, no `child_process` | No runtime tricks; everything happens in-process. |
+| Port faithfully, **including bugs** | The transpiler must preserve C semantics, never "fix" behavior. |
+| All forks are public | Method, prompts and harness are visible. That is intended. |
+
+### 1.7 The C reference build (`nethack-c/`)
+
+- `nethack-c/build-recorder.sh` applies the patches in `nethack-c/patches/` (001 seed + fixed
+  datetime, 002 deterministic/stable `qsort`, 003–005 RNG logging for the core/Lua/display
+  contexts, 006 deterministic 24×80 capture) and builds the recorder with **clang** (needs
+  `clang`, `make`, `bison`, `flex`). Env vars: `NETHACK_SEED`, `NETHACK_FIXED_DATETIME`,
+  `NETHACK_RNGLOG`, `NETHACK_RNGLOG_DISP`, `HACKDIR`.
+- **Why clang:** C argument evaluation order is unspecified. Clang evaluates left to right (like
+  JS); gcc right to left. `d(rn2(5), rn2(3))` consumes RNG in a different order under gcc. The
+  transpiler must preserve **clang's** evaluation order everywhere, and the same for any other
+  unspecified behavior clang resolves a particular way.
+- The transpiler must see the **same preprocessed source** as the recorder: the same `#define`s,
+  hints file, config headers and patches. Port the patched tree, not raw upstream.
+- `scripts/record-session.mjs` re-records a session from a recipe using the recorder binary. We
+  use it to record our own targeted sessions (4.4).
+- Session files (`sessions/*.session.json`, v5): `segments[] → {seed, datetime, nethackrc,
+  moves, steps[] → {key, rng[] (with "@ caller(file:line)"), screen, cursor,
+  animation_frames?}}`. The C caller tags tell us exactly which C function made each RNG call.
+  That is the backbone of our debugging tools.
+
+### 1.8 Bau's lessons (from the post; treat as rules)
+
+1. **Be skeptical.** His agents invented a confident but false explanation ("sparse boundary
+   frames" in `replay_core.js`) for failing tests. The real bug was async/await not wired
+   correctly for waiting on input. Agents resisted removing workarounds because removal exposed
+   real bugs. If an explanation needs a special mechanism, assume it is wrong until proven.
+2. **Strategy over stats.** Progress stalled for weeks on a few failing sessions while agents
+   padded results with easy new tests. Fix architectural root causes first; write tests that
+   break a long-term problem into short-term ones.
+3. **Invest in tooling** for humans and agents to understand code and game state.
+4. **Restart when contaminated.** He discarded more than 200,000 lines because wrong async
+   assumptions had spread into comments, names and architecture. For us, the equivalent is that
+   generated code is disposable: fix the transpiler and regenerate.
+
+---
+
+## 2. Our approach: hybrid transpiler (C → readable JS + byte-level fallback)
+
+We are **not** building on Bau's skeleton game logic this iteration (`js/fastforward.js`,
+`js/mklev.js`, etc. are discarded). We keep only what the contract requires: the frozen files,
+the `runSegment` contract and the RNG log format. Everything else in `js/` is generated by our
+transpiler or is a small, tracked hand-written runtime. Bau's `js/jsmain.js` and `js/rng.js` may
+be read and partly reused as a reference for the API glue and the exact RNG log format.
+
+### 2.1 Core idea
+
+| Part of the C code | Translation |
+|---|---|
+| Code that uses structs through field names, arrays by index, plain control flow (the vast majority) | **Readable JS**: one JS module per C file, same function names and order, structs as objects/classes. |
+| Code that treats memory as raw bytes (unions, pointer casts between types, `memcpy`/`fwrite`/`fread` of structs, `sizeof`-dependent logic, cross-object pointer arithmetic) | **Emscripten-like fallback in pure JS**: affected data types live in a flat byte heap (`ArrayBuffer` + `DataView`/typed arrays) with C-exact layout. |
+| Readable code that touches a heap-backed type | Goes through **generated accessor wrappers** (getters/setters on a class), so the code still reads `mon.mhp -= 3` while the single copy lives in the heap. |
+
+**The one-copy rule:** a data type has exactly one representation. If any code treats a type
+as bytes, every instance of that type lives in the heap and all readable code reaches it
+through wrappers. Never keep an object copy and a byte copy of the same data. The decision is
+**per data type, not per function**, and it propagates: a heap-backed struct pointing to
+another struct may force that struct into the heap too. Iterate to a fixed point.
+
+### 2.2 Unsafe-pattern analysis (automatic)
+
+Before generating code, the transpiler runs an analysis over the clang AST (abstract syntax
+tree) that:
+
+1. Finds raw-memory operations: unions; casts between unrelated pointer types; `void*` /
+   `genericptr_t` round trips; `memcpy`/`memmove`/`memset`/`memcmp` on structs; `fwrite`/
+   `fread`/`bwrite`/`mread`-style I/O of structs; `sizeof`/`offsetof` used in logic; pointer
+   subtraction/comparison across objects; pointer arithmetic beyond a single array.
+2. Marks the affected struct types heap-backed, propagates marks to a fixed point, and marks the
+   functions that need byte-level code.
+3. Writes a report (`transpiler/out/unsafe-report.md`): each site, file:line, pattern, the
+   resulting decision, and how far marks propagated.
+
+The analysis is **conservative**: when it cannot prove a type is safe, it marks it heap-backed.
+Correctness never depends on human review; review only removes marks to regain readability.
+
+### 2.3 Annotations ("decorator-like" pattern)
+
+Decisions are recorded in a **side file**, not in the C source and not as JS decorators (JS
+decorators are not part of ES6/Node 22 without a build step, and the output must not depend on
+them). Proposed file: `transpiler/annotations.yaml` (format decided in Stage 1), keyed by C
+names so it survives C version changes:
+
+```yaml
+types:
+  monst:   { repr: object }          # override: proven safe after hand-rewriting savemon()
+  obj:     { repr: heap }            # touched by byte-level save code
+functions:
+  savemon: { handwritten: js/hand/save.js }   # escape hatch, keep rare
+  tty_nhgetch: { blocking: true }             # async root
+pointers:
+  "genericptr_t@restore.c:123": { points_to: obj }
+```
+
+Rules:
+- The analyzer produces defaults; annotations **override**. A checker fails the build on any
+  unsafe site that has no decision (default or explicit), and on stale annotations whose C name
+  no longer exists.
+- Hand-written replacements (`js/hand/`) are a last resort, listed in annotations, each with a
+  comment linking the C function. Track their total line count; it should stay small.
+- Agents never decide data representation ad hoc in generated code. Representation lives in the
+  annotation file and the analyzer only.
+
+### 2.4 C semantics the runtime must get exactly right
+
+All semantic-gap handling lives in one hand-written, heavily tested runtime (`js/crt/` or
+similar). Generated code calls helpers and never re-implements semantics inline.
+
+| Area | Requirement |
+|---|---|
+| Data model | Match the recorder's ABI (LP64 on Linux/macOS: `int` 32, `long` 64, pointers 64). `sizeof` and struct layout/padding must equal clang's for heap-backed types. |
+| Integers | Exact C arithmetic: truncating division and `%`, unsigned wraparound, integer promotions, signed/unsigned `char`, shifts, 64-bit via `BigInt` only where needed (performance). |
+| Evaluation order | Left to right, matching clang (side effects in arguments and operands). |
+| Structs | Assignment and pass-by-value **copy**; object references must never alias where C copies. |
+| Strings | `char` arrays with NUL terminator semantics; `strcpy`/`strcat`/`strncpy`/`sprintf` into buffers must behave like C (including truncation). |
+| Formatting | `sprintf`/`snprintf` must be byte-exact for every format NetHack uses (`%d %ld %s %-10s %c %x %5.2f …`). Screens depend on it. |
+| Control flow | `goto`, `switch` fall-through, `setjmp`/`longjmp` (as exceptions) translated mechanically. |
+| Sorting | `qsort` must be the **exact algorithm from patch 002**, not JS `Array.sort`, so inconsistent comparators behave identically. |
+| Time | `time()`/`localtime()` must use the segment's pinned `datetime` (moon phase, Friday 13th, shopkeeper greetings). |
+| libc | Implement only the libc subset NetHack actually calls; the Stage 1 inventory lists it. |
+
+### 2.5 Async input (the problem that sank Bau's first attempt)
+
+C blocks in `tty_nhgetch()`; JS must `await`. The transpiler computes the **async set**
+automatically from the call graph: every function that can transitively reach a blocking root
+(`tty_nhgetch`, and others the investigation finds, e.g. `--More--` waits, `getlin`,
+`yn_function`, `nh_delay_output` for animation frames) is emitted `async`, and every call to it
+becomes `await`. Calls through function pointers (e.g. the window-procs table) must be handled
+conservatively. Screen capture happens immediately before each blocking key read, mirroring the
+recorder. Never hand-patch async behavior in generated code.
+
+### 2.6 Output stability (Phase 2 readiness)
+
+Generated `js/` must be **deterministic and low-churn**:
+- Same input → byte-identical output (test this).
+- One JS file per C file, functions in source order, C names preserved. No global counters,
+  hashes or traversal-order-dependent names in identifiers.
+- Struct layouts and offsets as named constants in one place per struct, so a changed struct
+  does not ripple through every file.
+- No cross-file inlining or whole-program renumbering.
+- Optionally carry C comments/line markers into the output (comment-only changes are free in
+  the diff).
+
+### 2.7 Lua
+
+NetHack 5.0 runs special levels and dungeon descriptions through Lua, with its own PRNG
+context. The investigation must determine where the Lua interpreter source comes from (in the
+3.7 lineage it was fetched or vendored separately; check 5.0) and whether to **transpile the
+Lua interpreter's C source with the same transpiler** (preferred: one method, faithful
+semantics) and embed the `.lua` scripts as string data, versus an existing JS Lua
+implementation (riskier: subtle semantic and RNG-order differences).
+
+---
+
+## 3. Staged workflow
+
+| Stage | Who triggers | Output | Done when |
+|---|---|---|---|
+| **1. Investigate and design** | Owner asks | `transpiler-design.md` | Design reviewed and approved by the owner |
+| **2. Implement the transpiler** | Owner asks after approval | `transpiler/` + runtime + tooling | Transpiler unit/differential tests green; full NetHack transpiles without errors |
+| **3. Run and iterate** | Owner asks | Generated `js/`, scores | Automated loop running; score climbing; no regressions |
+
+Do not start a later stage without the owner's go-ahead.
+
+### Stage 1: investigate the code, then write `transpiler-design.md`
+
+Investigate with tools, not by reading 443k lines end to end:
+
+1. **Set up:** init the submodule, build the recorder (`nethack-c/build-recorder.sh`), record
+   the exact clang command lines/defines used, and confirm the public sessions re-record
+   byte-equal (`scripts/verify-rerecord.mjs`).
+2. **Inventory** (clang AST queries, script it and save outputs under `transpiler/out/`):
+   - Files and line counts per directory (C vs Lua vs generated/data).
+   - Counts and locations of every hard pattern from 2.2, plus `goto`, `setjmp`/`longjmp`,
+     varargs, function pointers, bit-fields, `static` locals, global state, macros that expand
+     to statements or declarations.
+   - The libc and system calls actually used.
+   - The call graph from `main`/`moveloop` to every blocking input function; size of the async set.
+   - Every runtime data file the game opens and how it is generated (`makedefs`, Lua files).
+   - Every PRNG call site per context (core/Lua/display).
+3. **Hotspots:** group the unsafe sites by file and type. Read only those closely and propose a
+   decision for each (auto-object, heap-backed, hand rewrite).
+4. **Write `transpiler-design.md`** containing at least:
+   - Inventory summary tables and the hotspot list, with the propagated heap-backed type set and
+     its size (the key feasibility number).
+   - Implementation language and front end (e.g. libclang/`clang -Xclang -ast-dump=json` from
+     Node or Python), with reasoning.
+   - Memory model: object representation, pointer representation (object reference, array +
+     index, heap address), and the boundary between object and heap worlds.
+   - Translation rules per C construct; runtime/libc plan; async plan; Lua plan; data-file
+     embedding plan; output layout under `js/` and how `jsmain.js`/`rng.js` glue it to the API.
+   - Annotation file format and checker.
+   - Test tooling plan (section 4) and the iteration loop.
+   - Performance estimate against the 900-second session limit.
+   - Risks, open questions for the owner, and a milestone plan with measurable exit criteria
+     (e.g. "chargen screens match for all sessions").
+   - An honest feasibility verdict. If the numbers say a pure transpiler is unrealistic, say so
+     and propose the fallback.
+
+### Stage 2: implement the transpiler
+
+Build in this order, test-first: front end → analysis and annotations checker → runtime/libc
+with differential tests → per-construct code generation with golden and differential tests →
+async transform → whole-program emit → glue (`jsmain.js`, `rng.js` with three contexts, data
+embedding) → test tooling from section 4.
+
+### Stage 3: run, test, improve (automated loop)
+
+```
+transpile → static checks → transpiler test suite → score → triage first divergences
+     ↑                                                                  │
+     └──────────────── fix the transpiler / runtime / annotations ──────┘
+```
+
+---
+
+## 4. Test tooling (automated)
+
+All tools live outside `js/` (e.g. `tools/` and `transpiler/`) and run headless from one entry
+point (e.g. `npm run loop` / `node tools/loop.mjs`). Every run writes machine-readable results
+to `results/<timestamp>/` and a short human summary.
+
+| # | Tool | What it does |
+|---|---|---|
+| 4.1 | **Score runner** | Runs `frozen/score.sh` (overlays frozen files first), parses `__RESULTS_JSON__`, stores per-session screen/RNG scores, diffs against the previous run, and flags **any regression** loudly. |
+| 4.2 | **First-divergence triage** | For each failing session: first mismatching RNG index, the C caller `func(file:line)` from the recording, the JS-side caller from our separate debug log (generated code knows its C origin), the last N matching calls for context, and the first mismatching screen step. Output groups failures by C function, so one root cause shows up as one item. |
+| 4.3 | **Screen diff** | Uses `frozen/screen-decode.mjs` to print a cell-level diff (char/color/attr/cursor) of C vs JS at a given step. Works with `tools/session-viewer/`. |
+| 4.4 | **Targeted session recorder** | Wraps `scripts/record-session.mjs` to record short sessions that exercise a specific subsystem or a hotspot, so failures can be isolated. These form our own extra test set (separate from `sessions/`). |
+| 4.5 | **Transpiler differential tests** | A corpus of small C programs (one per construct and per hotspot pattern; plus extracted NetHack functions where feasible). Compile with clang and run natively; transpile and run in Node; compare output byte for byte. Includes integer-semantics and `sprintf` fuzzing against native C. |
+| 4.6 | **Runtime unit tests** | `crt` helpers (integer ops, string functions, `qsort` from patch 002, time) tested against native results. |
+| 4.7 | **Determinism and churn check** | Transpile twice and require byte-identical output. Report `git diff --numstat -- js/` against a baseline tag, to watch Phase-2-style churn. |
+| 4.8 | **Annotation checker** | Fails on unsafe sites without a decision and on stale annotations. |
+| 4.9 | **Static checks** | `node --check` on every generated file; import graph resolves; no forbidden APIs (`fs`, `child_process`, network, `WebAssembly`); frozen files untouched. |
+| 4.10 | **Performance check** | Per-session wall time against the 900 s limit, with headroom. |
+
+### Loop rules
+
+- **Never hand-edit generated files in `js/`.** Fix the transpiler, the runtime or an
+  annotation, then regenerate. Hand-written code is only allowed in the runtime and in the
+  listed `js/hand/` escape hatches.
+- **No special-casing sessions, seeds, roles or steps**, and no tables of expected values. Any
+  such fix will fail on held-out sessions.
+- **Root cause first:** fix the earliest divergence of the most-blocking C function before
+  anything downstream. Do not chase easy screens.
+- **No regressions:** a change that raises one session but lowers another is rejected unless the
+  owner approves.
+- **Skepticism (Bau's lesson 1):** if a proposed fix needs a new special mechanism to explain the
+  data, stop and look for the simpler underlying bug.
+- Keep a short `results/LOG.md`: date, change, score delta, root cause found.
+
+---
+
+## 5. Repository layout (target)
+
+```
+CLAUDE.md                 ← this file
+transpiler-design.md      ← Stage 1 output
+transpiler/               ← transpiler source, annotations, analyzer (NOT judged)
+  annotations.yaml
+  out/                    ← inventory, unsafe report, call graphs
+tools/                    ← test loop, triage, screen diff, recorders (NOT judged)
+tests/                    ← C differential corpus, runtime tests (NOT judged)
+results/                  ← per-run results + LOG.md (NOT judged)
+js/                       ← judged: generated modules + runtime + glue + frozen files
+  jsmain.js, rng.js       ← glue to the contest API
+  crt/                    ← hand-written C runtime (semantics helpers, libc subset)
+  hand/                   ← rare hand-written overrides, each listed in annotations
+  isaac64.js, terminal.js, storage.js   ← FROZEN, never edit
+frozen/, sessions/, nethack-c/, docs/   ← contest-provided; do not modify
+```
+
+## 6. Working conventions for Claude Code
+
+- Facts about the contest come from the repo's `README.md`, `docs/API.md` and `docs/PHASES.md`.
+  If this file and those disagree, those win; point out the difference.
+- When unsure about C behavior, write a tiny C test, compile it with clang, and check. Don't guess.
+- Commit in small steps with clear messages. Keep generated `js/` in separate commits from
+  transpiler changes so diffs stay reviewable.
+- Report progress as numbers (screens matched, RNG %, sessions passed, regressions) plus the top
+  root causes. No claims of "fixed" without a score run.
+- Ask the owner before: changing the overall approach, adding hand-written overrides beyond a
+  few, deleting large parts of the transpiler, or pushing to `main`.
