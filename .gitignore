@@ -7,6 +7,4 @@ tools/recorder-env/build/
 transpiler/out/inventory/tu/
 transpiler/build/
 
-# generated (committed at milestones, separate commits)
-js/nh/
-js/data/
+# generated js/nh and js/data are committed, in commits separate from transpiler changes
