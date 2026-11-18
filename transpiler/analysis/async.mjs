@@ -15,7 +15,11 @@ import { ROOT } from '../frontend/ast.mjs';
 
 const INV = path.join(ROOT, 'transpiler/out/inventory');
 const { nodes, addrTaken } = JSON.parse(readFileSync(path.join(INV, 'callgraph.json'), 'utf8'));
-const norm = (t) => (t || '').replace(/\s+/g, ' ').replace(/\( /g, '(').replace(/ \)/g, ')').trim();
+// Qualifiers are ignored when matching pointer types to targets (coarser
+// matching only adds targets: conservative); "* *" and "**" are the same type.
+const norm = (t) => (t || '').replace(/\b(const|volatile|restrict|__restrict)\b/g, ' ')
+    .replace(/\s+/g, ' ').replace(/\*\s+(?=\*)/g, '*').replace(/\( /g, '(').replace(/ \)/g, ')')
+    .replace(/ ,/g, ',').trim();
 
 // address-taken definitions grouped by canonical function type
 const byType = new Map();

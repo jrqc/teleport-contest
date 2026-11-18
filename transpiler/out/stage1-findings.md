@@ -122,6 +122,9 @@ screen (`nomux_capture_write_input_boundary`); `nh_terminate` does a final captu
 | Conservative: + every address-taken function of matching type | 4,467 (68%) |
 | Conservative, without five error-only entry points (`panic`, compress, SIGWINCH, Lua panic) | 4,249 |
 
+Stage 2 update: fixing type normalization in `async.mjs` (qualifiers, `void * *`) resolves the 5
+unresolved sites below; the conservative set becomes 4,469 (4,251 without error paths).
+
 The conservative set is inflated by type-only function-pointer resolution (e.g. every
 `void (void)` pointer may reach every address-taken `void (void)` function). Field-sensitive
 resolution (which functions are stored into which struct field) will tighten it in Stage 2.

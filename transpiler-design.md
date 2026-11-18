@@ -31,7 +31,7 @@ then produces the same RNG caller tags and captures at the same points as the re
 | Question | Measured | Consequence |
 |---|---|---|
 | How much code? | 6,592 functions (NetHack 5,533, Lua 1,059), 65k call sites | Too much to hand-port; generation must be complete and mechanical |
-| How much needs async? | 3,349–4,467 functions (51–68%) | Async is the normal case, not the exception; must be computed, never hand-patched |
+| How much needs async? | 3,349–4,469 functions (51–68%) | Async is the normal case, not the exception; must be computed, never hand-patched |
 | Which types must be byte-level? | NetHack: 104 → 37 → 23 → **1** depending on decisions (section 3.5); Lua: 20–40 | Readable object code is feasible for NetHack; Lua is raw memory throughout |
 | Hard sites in NetHack | 1,481 after excluding string handling; unions dominate | A small number of rules covers most of them |
 | `goto` | 536 in 172 NetHack functions, 117 + 78 computed in Lua | Needs a general goto lowering, not pattern matching |
@@ -398,11 +398,13 @@ read stdin outside normal play; they become async through the same rule if reach
 2. Function-pointer targets, most precise first: (a) **field-sensitive** sets, i.e. which
    functions are stored into which struct field or variable (initializers such as `tty_procs`
    and the extended-command table, plus assignments); (b) fallback: every address-taken function
-   of the same type. Stage 1 used only (b): 4,467 async functions (68%); direct edges alone
+   of the same type. Stage 1 used only (b): 4,469 async functions (68%); direct edges alone
    give 3,349 (51%). (a) will land in between.
 3. Reverse reachability from the roots, fixed point.
-4. Unresolvable sites (5 in Stage 1: `member:fn`, `member:sf_genericptr`) must be decided
-   in `annotations.jsonc` (`pointers:` with explicit targets); the checker fails otherwise.
+4. Unresolvable sites must be decided in `annotations.jsonc` (`pointers:` with explicit
+   targets); the checker fails otherwise. Stage 1 reported 5 (`member:fn`,
+   `member:sf_genericptr`); both were type-normalization bugs (a `const`-qualified pointer
+   typedef, `void * *` vs `void **`), fixed in Stage 2: now 0.
 5. Edge cuts are allowed only as annotations with a reason, and only for paths that cannot run
    in the port (e.g. `SIGWINCH` resize). `panic` is **not** cut: it can display messages and
    prompt.
