@@ -11,18 +11,17 @@
 // effective values on every bare location as `_f` (file) and `_l` (line).
 // `_f` is normalized: repo-relative for project files, absolute for system
 // headers.
-import { spawn } from 'node:child_process';
+import { spawn, execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 export const ROOT = path.resolve(HERE, '..', '..');
 
-/** Run clang for one compile_commands.json entry; resolve to the AST root. */
-export function loadAst(entry) {
+/** clang arguments for one compile_commands.json entry, without the compiler, "-c", the source and "-o x". */
+function baseArgs(entry) {
     const dir = path.resolve(ROOT, entry.directory);
     const file = path.relative(dir, path.resolve(ROOT, entry.file));
-    // drop the compiler name, "-c", the source file and "-o x"
     const args = [];
     const a = entry.arguments.slice(1);
     for (let i = 0; i < a.length; i++) {
@@ -31,11 +30,26 @@ export function loadAst(entry) {
         if (path.resolve(dir, a[i]) === path.resolve(ROOT, entry.file)) continue;
         args.push(a[i]);
     }
+    // annotation-driven defines (annotations.jsonc "defines"), e.g. the Lua VM's dispatch
+    args.push(...(entry.extraArgs || []));
+    return { dir, file, args };
+}
+// __DATE__/__TIME__ must not depend on when we transpile (output determinism, design 2.6):
+// pin them to the recorder's fixed "now" (2026-05-02 12:00 UTC)
+const clangEnv = () => ({ ...process.env, SOURCE_DATE_EPOCH: '1777723200' });
+
+/** The TU's preprocessed text (clang -E -P), for facts the JSON AST omits (offsetof members). */
+export function preprocess(entry) {
+    const { dir, file, args } = baseArgs(entry);
+    return execFileSync('clang', [...args, '-E', '-P', file], { cwd: dir, env: clangEnv(), maxBuffer: 1 << 28 }).toString('latin1');
+}
+
+/** Run clang for one compile_commands.json entry; resolve to the AST root. */
+export function loadAst(entry) {
+    const { dir, file, args } = baseArgs(entry);
     args.push('-fsyntax-only', '-Xclang', '-ast-dump=json', file);
     return new Promise((resolve, reject) => {
-        // __DATE__/__TIME__ must not depend on when we transpile (output determinism, design 2.6):
-        // pin them to the recorder's fixed "now" (2026-05-02 12:00 UTC)
-        const env = { ...process.env, SOURCE_DATE_EPOCH: '1777723200' };
+        const env = clangEnv();
         const child = spawn('clang', args, { cwd: dir, env, stdio: ['ignore', 'pipe', 'pipe'] });
         const chunks = [];
         let stderr = '';

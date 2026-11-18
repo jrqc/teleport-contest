@@ -257,7 +257,7 @@ function strtoX(s, endptr, base, unsigned, bits) {
         any = true;
         if (!over) { acc = acc * B + BigInt(d); if (acc > LIM) over = true; }
     }
-    if (endptr) endptr.set(any ? s.add(i) : s);   // no digits: endptr = the original string
+    if (endptr) endptr.set(0, any ? s.add(i) : s);   // no digits: endptr = the original string
     if (!any) { void start; return 0; }
     let v;
     if (over) v = unsigned ? LIM : (neg ? -LIM : LIM);
@@ -308,7 +308,7 @@ export function strtod(s, endptr) {
         let digits = '', anyd = false;
         while (isdigit(at(s, i))) { digits += String.fromCharCode(at(s, i++)); anyd = true; }
         if (at(s, i) === 46) { const save = i; i++; let frac = ''; while (isdigit(at(s, i))) { frac += String.fromCharCode(at(s, i++)); anyd = true; } if (!anyd) i = save; else digits += '.' + frac; }
-        if (!anyd) { if (endptr) endptr.set(s); return 0; }
+        if (!anyd) { if (endptr) endptr.set(0, s); return 0; }
         if ((at(s, i) | 0x20) === 101) {
             let k = i + 1, e = '';
             if (at(s, k) === 45 || at(s, k) === 43) e += String.fromCharCode(at(s, k++));
@@ -317,7 +317,7 @@ export function strtod(s, endptr) {
         v = Number(txt + (digits.startsWith('.') ? '0' + digits : digits));   // JS parsing is correctly rounded
     }
     void begin;
-    if (endptr) endptr.set(s.add(i));
+    if (endptr) endptr.set(0, s.add(i));
     return v;
 }
 function hexToDouble(mant, exp2) {

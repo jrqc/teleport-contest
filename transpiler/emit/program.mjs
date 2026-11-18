@@ -8,6 +8,8 @@
 // order: TU link order, like C's static initialization, which has no order).
 import path from 'node:path';
 import { TUEmitter, EmitError } from './tu.mjs';
+import { HeapEmitter } from './heap.mjs';
+import { bridgeModule } from './bridge.mjs';
 import { classSource, zeroOf } from './classes.mjs';
 import { jsName, field } from './names.mjs';
 import { ROOT } from '../frontend/ast.mjs';
@@ -21,6 +23,8 @@ const own = (n) => { const l = n.loc && (n.loc.expansionLoc || n.loc); return !!
 const LIBC_VARS = new Set(['errno', 'ospeed', 'environ']);
 const ident = (m) => m.replace(/[^A-Za-z0-9_$]/g, '_');
 export const moduleName = (file) => path.basename(file).replace(/\.c$/, '');
+/** Heap-world TUs (decision D2): the Lua interpreter. */
+export const isHeapFile = (file) => /(^|\/)lib\/lua[^/]*\//.test(file);
 
 export class Program {
     /**
@@ -43,23 +47,30 @@ export class Program {
         this.classScope = new Map();   // record key -> scope that defines it
         this.usedNames = new Set();
         this.modules = [];          // link order
+        this.heapModules = new Set();
+        this.bridgeFns = new Map();   // heap function name -> { decl type, scope } used from the object world
+        this.memberKeys = new Set();  // record keys whose fields object-world code accesses
+        this.heapCrt = opts.heapCrtNames || new Set();
+        this.isHeapFile = opts.isHeapFile || null;   // tests: put every TU in the heap world
     }
     addCallFacts(tu) { this.async.addTU(tu); }
     addFacts(tu) {
         this.async.addTU(tu);
         tu.module = moduleName(tu.file);
         this.modules.push(tu.module);
+        const heap = (this.isHeapFile || isHeapFile)(tu.file);
+        if (heap) this.heapModules.add(tu.module);
         for (const n of kids(tu.root)) {
             if (!own(n)) continue;
             if (n.kind === 'FunctionDecl' && hasBody(n) && n.storageClass !== 'static' && !this.handwritten.has(n.name)) {
                 if (this.fnDef.has(n.name)) throw new EmitError(`function ${n.name} defined in ${this.fnDef.get(n.name).file} and ${tu.file}`);
-                this.fnDef.set(n.name, { module: tu.module, file: tu.file });
+                this.fnDef.set(n.name, { module: tu.module, file: tu.file, heap, ctype: n.type.qualType, scope: tu.scope, node: { type: n.type } });
             }
             if (n.kind === 'VarDecl' && n.storageClass !== 'extern' && n.storageClass !== 'static') {
                 const t = tu.scope.type(n.type.desugaredQualType || n.type.qualType);
                 const prev = this.varDef.get(n.name);
                 // tentative definitions in several TUs (common symbols) merge into one
-                if (!prev || (n.init && !prev.hasInit)) this.varDef.set(n.name, { module: tu.module, file: tu.file, t, scope: tu.scope, hasInit: !!n.init });
+                if (!prev || (n.init && !prev.hasInit)) this.varDef.set(n.name, { module: tu.module, file: tu.file, t, scope: tu.scope, hasInit: !!n.init, heap });
             }
         }
     }
@@ -106,11 +117,39 @@ export class Program {
     functionRef(tu, name) {
         if (this.definedIn(tu, name, 'fn')) return jsName(name);
         const d = this.fnDef.get(name);
+        if (d && d.heap && !tu.heap) {
+            // an object-world use of a heap-world function: through the generated bridge
+            this.bridgeFns.set(name, d);
+            this.noteImport(tu, 'luabridge', jsName(name));
+            return jsName(name);
+        }
         if (d) { this.noteImport(tu, d.module, jsName(name)); return jsName(name); }
         if (this.crt.has(name)) return `$c.${name}`;
         if (this.missingFn) { this.missingFn.add(name); return `$c.missing(${JSON.stringify(name)})`; }
         if (this.crt.has(name)) return `$c.${name}`;
         throw new EmitError(`undefined function ${name}`);
+    }
+    /** A function as heap-world code calls it: { kind: local|heap|hl|crt|missing, code, async }. */
+    heapFunctionRef(tu, name) {
+        if (this.definedIn(tu, name, 'fn')) return { kind: 'local', code: jsName(name) };
+        const d = this.fnDef.get(name);
+        if (d && d.heap) { this.noteImport(tu, d.module, jsName(name)); return { kind: 'heap', code: jsName(name) }; }
+        if (d) throw new EmitError(`heap-world call of object-world function ${name}`);
+        if (this.heapCrt.has(name)) return { kind: 'hl', code: `$hl.${name}` };
+        if (this.crt.has(name)) return { kind: 'crt', code: `$c.${name}`, async: this.blockingCrt.has(name) };
+        if (this.missingFn) { this.missingFn.add(name); return { kind: 'missing', code: `$c.missing(${JSON.stringify(name)})` }; }
+        throw new EmitError(`undefined function ${name}`);
+    }
+    /** The address constant of a file-scope variable in heap-world code. */
+    heapGlobalRef(tu, name) {
+        tu._defs = tu._defs || this.localDefs(tu);
+        const local = tu._defs.var.get(name);
+        const d = this.varDef.get(name);
+        if (local && (local.storageClass === 'static' || !d || d.module === tu.tu.module)) return jsName(name);
+        if (d && d.heap) { this.noteImport(tu, d.module, jsName(name)); return jsName(name); }
+        if (d) throw new EmitError(`heap-world use of object-world variable ${name}`);
+        if (this.heapCrt.has(name)) return `$hl.${name}`;
+        throw new EmitError(`undefined variable ${name} (heap world)`);
     }
     definedIn(tu, name, kind) {
         tu._defs = tu._defs || this.localDefs(tu);
@@ -190,13 +229,16 @@ export class Program {
     emitTU(tu) {
         tu.module = moduleName(tu.file);
         tu.addr = this.addrTakenIds(tu.root);
-        const em = new TUEmitter(tu, this);
+        const em = this.heapModules.has(tu.module) ? new HeapEmitter(tu, this) : new TUEmitter(tu, this);
+        em.heap = this.heapModules.has(tu.module);
         const code = em.run();   // imports are collected while emitting
         return { path: `${tu.module}.js`, code, errors: em.errors.map((e) => `${tu.file}: ${e}`) };
     }
     /** The shared modules, after every TU was emitted: Map(path -> text). */
     finish() {
-        return new Map([['types.js', this.typesModule()], ['globals.js', this.globalsModule()], ['index.js', this.indexModule()]]);
+        const m = new Map([['types.js', this.typesModule()], ['globals.js', this.globalsModule()], ['index.js', this.indexModule()]]);
+        if (this.heapModules.size) m.set('luabridge.js', bridgeModule(this));
+        return m;
     }
     /** Small programs (tests): all TUs in memory. */
     emitAll(tus) {
@@ -232,7 +274,8 @@ export class Program {
             '/** Zero every variable (before the modules\' $init: a fresh C process per segment). */', 'export function $initG() {'];
         const names = [...this.varDef.keys()].sort();
         for (const n of names) {
-            const { t, scope, file } = this.varDef.get(n);
+            const { t, scope, file, heap } = this.varDef.get(n);
+            if (heap) continue;
             if (t.k === 'rec' || t.k === 'arr') continue;
             out.push(`    $G.${field(n)} = ${zeroOf(t, (k) => this.className(k, scope))};   // ${file}`);
         }
@@ -242,7 +285,10 @@ export class Program {
     indexModule() {
         const out = ['// index.js: module list and static initialization order (generated). Do not edit.'];
         for (const m of this.modules) out.push(`import { $init as ${ident(m)}$init } from './${m}.js';`);
-        out.push("import { $initG } from './globals.js';", '', 'export function $initAll() {', '    $initG();');
+        out.push("import { $initG } from './globals.js';");
+        if (this.heapModules.size) out.push("import { reset as $heapReset } from '../crt/heap.js';");
+        out.push('', 'export function $initAll() {', '    $initG();');
+        if (this.heapModules.size) out.push('    $heapReset();   // the heap world: a fresh stack and malloc heap');
         for (const m of this.modules) out.push(`    ${ident(m)}$init();`);
         out.push('}', '');
         return out.join('\n');

@@ -6,7 +6,11 @@
 {
   "groups": {
     // design 3.5 / 7, decision D2: the Lua VM is raw memory throughout
+    // defines: lvm.c's computed-goto dispatch (ljumptab.h, on by default under
+    // __GNUC__) and its switch fallback run the same opcode bodies in the same
+    // order (lvm.c vmdispatch/vmcase); the switch is the one JS can express
     "lua": { "files": "lib/lua-5.4.8/src/", "repr": "heap",
+             "defines": ["-DLUA_USE_JUMPTABLE=0"],
              "why": "value-stack pointer arithmetic, GC unions and casts, offsetof, computed goto" },
     // contract (docs/API.md): rng.js must use the frozen ISAAC64 implementation.
     // Its JS signatures differ from C's (isaac64_init(seed_bytes) returns the

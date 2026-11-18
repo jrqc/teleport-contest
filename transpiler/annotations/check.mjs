@@ -52,6 +52,7 @@ export function checkAnnotations(ann, facts) {
         needWhy(`groups.${name}`, g);
         if (!GROUP_REPRS.includes(g.repr)) err(`groups.${name}: repr "${g.repr}" not one of ${GROUP_REPRS.join(', ')}`);
         if (typeof g.files !== 'string' || ![...fnFiles].some((f) => f.startsWith(g.files))) err(`groups.${name}: stale, no analyzed file matches "${g.files}"`);
+        if (g.defines !== undefined && !(Array.isArray(g.defines) && g.defines.every((d) => typeof d === 'string' && /^-D\w+(=.*)?$/.test(d)))) err(`groups.${name}: "defines" must be a list of -DNAME[=value]`);
         if (g.repr === 'extern') {
             if (!g.module || !facts.fileExists(g.module)) err(`groups.${name}: extern module "${g.module}" does not exist`);
             if (!g.adapter) err(`groups.${name}: extern group needs an "adapter"`);

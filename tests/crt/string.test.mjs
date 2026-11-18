@@ -51,7 +51,7 @@ function runJs([op, ha, hb, n]) {
     const B = hb === '-' ? new Uint8Array(0) : Uint8Array.from(Buffer.from(hb, 'hex'));
     const a = cstr(A), b = cstr(B);
     let endp = null;
-    const ref = { set: (p) => { endp = p; } };
+    const ref = { set: (i, p) => { if (i !== 0) throw new Error(`endptr.set(${i})`); endp = p; } };
     const off = (p) => (p === null ? -1 : p.off);
     const sgn = (x) => Math.sign(x);
     switch (op) {

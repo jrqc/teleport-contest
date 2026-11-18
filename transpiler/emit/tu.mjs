@@ -22,15 +22,18 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { show } from '../ir/ctypes.mjs';
+import { preprocess } from '../frontend/ast.mjs';
 import { jsName, field } from './names.mjs';
 import { zeroOf, typedArrayOf, arrayInit } from './classes.mjs';
 
-const PREC = { comma: 1, assign: 2, cond: 2, or: 3, and: 4, bor: 5, bxor: 6, band: 7, eq: 8, rel: 9, shift: 10, add: 11, mul: 12, unary: 14, postfix: 15, call: 17, prim: 18 };
-const E = (c, p = PREC.prim) => ({ c, p });
-const par = (e, p) => (e.p < p ? `(${e.c})` : e.c);
+export const PREC = { comma: 1, assign: 2, cond: 2, or: 3, and: 4, bor: 5, bxor: 6, band: 7, eq: 8, rel: 9, shift: 10, add: 11, mul: 12, unary: 14, postfix: 15, call: 17, prim: 18 };
+export const E = (c, p = PREC.prim) => ({ c, p });
+export const par = (e, p) => (e.p < p ? `(${e.c})` : e.c);
+/** Unary minus text of E e (never `--x`). */
+export const neg = (e) => (e.c.startsWith('-') ? `-(${e.c})` : `-${par(e, PREC.unary)}`);
 
-const isEmpty = (n) => !n || !n.kind;
-const kids = (n) => (n.inner || []);
+export const isEmpty = (n) => !n || !n.kind;
+export const kids = (n) => (n.inner || []);
 
 export class EmitError extends Error {}
 
@@ -93,7 +96,7 @@ const isInt = (t) => t.k === 'int';
 const isFloat = (t) => t.k === 'float';
 const isPtr = (t) => t.k === 'ptr';
 /** Pointer kind by pointee: 'rec', 'fn', 'void', 'ref'. */
-function pkind(t) {
+export function pkind(t) {
     const p = t.to;
     if (p.k === 'rec') return 'rec';
     if (p.k === 'fn' || p.k === 'builtinfn') return 'fn';
@@ -101,7 +104,7 @@ function pkind(t) {
     return 'ref';
 }
 /** Integer literal text for value v (BigInt) of type t. */
-function intLit(v, t) {
+export function intLit(v, t) {
     if (t && t.size === 8 && (v > 9007199254740991n || v < -9007199254740991n)) return E(`${v}n`);
     if (v < 0n) return E(`${v}`, PREC.unary);
     return E(`${v}`);
@@ -879,7 +882,10 @@ export class TUEmitter {
             const { items } = this.initItems(n);
             return items.length ? this.rv(items[0]) : E(this.zero(this.T(n)));
         }
-        return this.ex(n, 'v');
+        // a comma expression as a value is parenthesized: consumers splice .c into
+        // initializers, assignments and argument lists
+        const e = this.ex(n, 'v');
+        return e.p <= PREC.comma ? E(`(${e.c})`) : e;
     }
     /** condition context: a JS truthy value is enough */
     cond(n) {
@@ -1400,7 +1406,7 @@ export class TUEmitter {
             const P = this.rv(p);
             let I = this.rv(i);
             if (is64(it)) I = E(`$c.idx(${I.c})`, PREC.call);
-            if (op === '-') I = E(`-${par(I, PREC.unary)}`, PREC.unary);
+            if (op === '-') I = E(`${neg(I)}`, PREC.unary);
             return this.padd(P, I, pt);
         }
         this.err(n, `pointer operator ${op}`);
@@ -1470,7 +1476,7 @@ export class TUEmitter {
         if (isPtr(lt)) {
             let I = Rc;
             if (is64(this.T(b))) I = E(`$c.idx(${I.c})`, PREC.call);
-            if (op === '-') I = E(`-${par(I, PREC.unary)}`, PREC.unary);
+            if (op === '-') I = E(`${neg(I)}`, PREC.unary);
             v = this.padd(cur, I, lt);
         } else if (isFloat(ct)) {
             const L = isInt(lt) ? (is64(lt) ? E(`Number(${cur.c})`, PREC.call) : cur) : cur;
@@ -1511,10 +1517,10 @@ export class TUEmitter {
         }
         case '-': {
             const A = this.rv(sub);
-            if (isFloat(t)) return E(`-${par(A, PREC.unary)}`, PREC.unary);
+            if (isFloat(t)) return E(`${neg(A)}`, PREC.unary);
             if (t.size === 8) return E(`$c.${t.signed ? 'neg64' : 'negu64'}(${A.c})`, PREC.call);
-            if (t.signed) return E(`-${par(A, PREC.unary)} | 0`, PREC.bor);
-            return E(`-${par(A, PREC.unary)} >>> 0`, PREC.shift);
+            if (t.signed) return E(`${neg(A)} | 0`, PREC.bor);
+            return E(`${neg(A)} >>> 0`, PREC.shift);
         }
         case '+': return this.rv(sub);
         case '~': {
@@ -1562,6 +1568,33 @@ export class TUEmitter {
         this.err(n, `unsupported ${n.name}`);
         return null;
     }
+    /**
+     * The OffsetOfExprs of a TU, in AST (source) order, pair one to one with the
+     * __builtin_offsetof( occurrences of its preprocessed text: [, type, member path].
+     */
+    offsetofFromPreprocessed(n) {
+        if (!this.tu.entry) return null;
+        if (!this._ofs) {
+            const nodes = [];
+            const walk = (x) => { if (!x || typeof x !== 'object') return; if (x.kind === 'OffsetOfExpr') nodes.push(x); for (const c of kids(x)) walk(c); };
+            walk(this.tu.root);
+            const text = preprocess(this.tu.entry);
+            const occ = [];
+            const re = /__builtin_offsetof\s*\(/g;
+            let mm;
+            while ((mm = re.exec(text))) {
+                // the balanced argument text
+                let i = re.lastIndex, depth = 1;
+                while (depth && i < text.length) { const ch = text[i++]; if (ch === '(') depth++; else if (ch === ')') depth--; }
+                const inner = text.slice(re.lastIndex, i - 1);
+                const comma = inner.lastIndexOf(',');
+                occ.push([null, inner.slice(0, comma).trim(), inner.slice(comma + 1).trim()]);
+            }
+            if (occ.length !== nodes.length) this.err(n, `offsetof: ${nodes.length} AST nodes but ${occ.length} in the preprocessed text`);
+            this._ofs = new Map(nodes.map((x, i) => [x, occ[i]]));
+        }
+        return this._ofs.get(n) || null;
+    }
     offsetofValue(n) {
         // the JSON AST has no member path for offsetof: read it from the source text
         const r = n.range && n.range.begin;
@@ -1572,7 +1605,8 @@ export class TUEmitter {
         let text = this.texts.get(file);
         if (!text) { text = readFileSync(file, 'latin1'); this.texts.set(file, text); }
         const src = text.slice(b.offset, e.offset + (e.tokLen || 1));
-        const m = /offsetof\s*\(\s*(.+?)\s*,\s*([A-Za-z_][\w.[\]\s]*)\)\s*$/s.exec(src);
+        let m = /offsetof\s*\(\s*(.+?)\s*,\s*([A-Za-z_][\w.[\]\s]*)\)\s*$/s.exec(src);
+        if (!m) m = this.offsetofFromPreprocessed(n);   // inside a macro: the k-th __builtin_offsetof of the TU
         if (!m) this.err(n, `cannot parse offsetof from ${JSON.stringify(src)}`);
         let t = this.S.type(m[1]);
         let off = 0;
