@@ -1,13 +1,13 @@
 #!/usr/bin/env node
-// tools/nhtry.mjs: run js/nhmain.js on sessions and report matched screens / RNG prefix
-// per session (development aid until nhmain.js becomes jsmain.js; frozen/score.sh is the judge).
+// tools/nhtry.mjs: run js/jsmain.js on sessions and report matched screens / RNG prefix
+// per session (a quick development aid; frozen/score.sh is the judge).
 // Usage: node tools/nhtry.mjs [session.json ...]   (default: all of sessions/)
 import { readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 globalThis.__nhQuiet = true;
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const { runSegment } = await import(path.join(ROOT, 'js/nhmain.js'));
+const { runSegment } = await import(path.join(ROOT, 'js/jsmain.js'));
 const { decodeScreen } = await import(path.join(ROOT, 'frozen/screen-decode.mjs'));
 const strip = (r) => r.replace(/ @ .*$/, '');
 const files = process.argv.slice(2).length ? process.argv.slice(2) : readdirSync(path.join(ROOT, 'sessions')).filter((f) => f.endsWith('.session.json')).map((f) => path.join(ROOT, 'sessions', f));
