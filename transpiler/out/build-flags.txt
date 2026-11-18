@@ -1,0 +1,25 @@
+# Recorder build configuration (captured 2026-11-17, step 1.1)
+host:      macOS 15.8.1 x86_64, Apple clang 17.0.0 (clang-1700.3.19.1)
+tree:      nethack-c/recorder = upstream 16ff59115 (NetHack-5.0.0_Release) + patches 001-006
+hints:     sys/unix/hints/macosx-minimal (copied from nethack-c/macosx-minimal)
+CFLAGS:    -g -I../include -DNOTPARMDECL -DNO_TIMED_DELAY      (no -O: unoptimized)
+SYSCFLAGS: -DLUA_USE_MACOSX
+Lua:       lib/lua-5.4.8, built with `make CC=clang SYSCFLAGS=-DLUA_USE_MACOSX a`
+env:       SOURCE_DATE_EPOCH=1777723200
+window:    tty only (WINTTYSRC), linked -lncurses
+per-file:  cc -g -I../include -DNOTPARMDECL -DNO_TIMED_DELAY -c -o X.o <src>   (cc == Apple clang)
+
+# Differences vs Linux (linux-minimal hints): CFLAGS lacks -DNOTPARMDECL -DNO_TIMED_DELAY,
+# SYSCFLAGS=-DLUA_USE_POSIX, links -ltinfo. Which host made the official recordings: see step 1.2.
+# patches/README.md lists 8 patches (007, 008) but only 001-006 exist in the repo.
+# Full make -n output: transpiler/out/make-n-src.txt
+
+# Step 1.2 result (2026-11-18): reference recorder = tools/recorder-env/build-reference.sh
+# (patch 006 from 52960eb, sysconf, DST-pinned time()). verify-rerecord: 44/44 byte-identical,
+# twice. Current HEAD patch 006: 43/44 (seed0013 final cursor). See tools/recorder-env/README.md.
+#
+# Facts the JS port must reproduce (not just the recorder):
+# - Pinned datetime -> time_t via mktime() with tm_isdst taken from the recording machine's
+#   real clock, which was in US daylight time: effectively mktime(tm_isdst=1) in America/New_York.
+#   For a winter date this gives local hour = pinned hour - 1 (e.g. 12:00 -> 11:00 EST).
+# - localtime() in America/New_York (DST rules needed for any pinned date).

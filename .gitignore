@@ -1,2 +1,5 @@
 node_modules/
 .cache/
+
+# reference recorder build (tools/recorder-env/build-reference.sh)
+tools/recorder-env/build/
