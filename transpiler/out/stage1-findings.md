@@ -106,6 +106,10 @@ the call graph: 13 reach no RNG. **`sortloot_cmp` can consume core RNG** on norm
 sequence (which depends on the sort algorithm) is observable: the runtime must reproduce
 Darwin's `qsort` exactly.
 
+Reference platform for that port and its tests: **macOS 15.8.1 (build 24H32), Darwin 24.6.0
+(xnu-11417.140.6), x86_64**, the machine where the 44/44 re-record was verified. The official
+recording machine's macOS version is not documented.
+
 ## 5. Async set (step 1.5)
 
 Blocking roots (from the patched code): `tty_nhgetch` is the only key read that captures a

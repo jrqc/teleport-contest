@@ -1,9 +1,8 @@
 # Transpiler design: NetHack 5.0 → JavaScript
 
-Stage 1 output (CLAUDE.md section 3). Status: **draft for owner review**. Nothing in Stage 2 starts
-before approval. All numbers come from `transpiler/out/stage1-findings.md`, which also lists the
-commands that regenerate them. Open decisions for the owner are marked **[DECISION]** and collected
-in section 12.
+Stage 1 output (CLAUDE.md section 3). Status: **approved by the owner on 2026-11-18 with the
+conditions recorded in section 12.2**; Stage 2 started. All numbers come from
+`transpiler/out/stage1-findings.md`, which also lists the commands that regenerate them.
 
 ## 1. Scope, inputs and the numbers that drive the design
 
@@ -87,12 +86,12 @@ async set, heap set, function-pointer targets) are computed once over all IR and
 
 ## 3. Memory model
 
-Two worlds, decided **per type** (CLAUDE.md 2.1) and recorded in `transpiler/annotations.yaml`:
+Two worlds, decided **per type** (CLAUDE.md 2.1) and recorded in `transpiler/annotations.jsonc`:
 
 - **Object world** (default, all of NetHack but one type): records are JS objects, arrays
   are JS arrays or typed arrays, pointers are JS values (3.3). Generated code reads like C:
   `mtmp.data.mlet`, `levl[x][y].typ`.
-- **Heap world** (Lua, plus `struct engr` unless rewritten, 3.5): C-exact bytes in one
+- **Heap world** (Lua, and punning unions as union cells, 3.4): C-exact bytes in one
   `ArrayBuffer` with clang's layout; pointers are integer addresses. Object-world code that
   touches a heap type goes through generated accessor classes (`get mhp()` over a `DataView`),
   so there is exactly one copy of the data (the one-copy rule).
@@ -150,35 +149,53 @@ Static rules decide the kind per expression from the C type and the address-of a
 the emitted code never inspects pointer kinds at run time, except in the few generic paths
 (`void *` round trips, `memcpy`), which dispatch on the value.
 
-### 3.4 Unions
+### 3.4 Unions (decision D1, approved with the punning condition)
 
-Unions are what separates 104 heap types from 1 (3.5). **[DECISION U]** Proposed: a union in
-the object world is a **shared-slot object** that reproduces little-endian punning exactly for
-the cases NetHack uses:
+**Rule: a union whose objects are ever written through one member and read through a member
+of a different type ("punning") is heap-backed. Only unions proven free of punning are
+objects.** "Different type" means different canonical C type: `int` vs `long`, but also
+`struct obj *` vs `void *` (`a_obj` written, `a_void` read). Zero-initialization (static
+init, `memset`, `= zeroany`) and whole-union copies are not member accesses.
 
-- One integer slot holds the union's low 64 bits as an exact integer. Writing an integer
-  member replaces only that member's bytes (writing `a_char` changes the low 8 bits; writing
-  `a_long` all 64); reading an integer member extracts its bytes with its signedness. This is
-  exactly what x86-64 does for every integer-to-integer pun (e.g. write `a_int`, read
-  `a_long`), including leftover upper bytes.
-- One reference slot holds a pointer member's value. Reading a pointer member returns it, so
-  pointer-to-pointer puns (`a_obj` read as `a_void`) behave as in C.
-- Integer-to-pointer or pointer-to-integer punning cannot be represented: the accessor
-  **throws** (`UnionPunError`, always on, cheap). It can never silently diverge; if a session
-  ever hits it, that union becomes heap-backed by annotation.
-- Record members made only of integers are encoded into the integer slot by their clang
-  byte layout, so they pun with integer members exactly: `union vlaunchinfo` (`trap.h`) mixes
-  `coord v_launch2` with `short`/`uchar` members.
-- A union with other record members is shared-slot only if a static check shows each object
-  is accessed through one member; otherwise it goes to the heap. To check in Stage 2:
-  `union customization_content` (`sym.h`: three record members, selected by the containing
-  `customization_detail`'s kind; not yet verified).
-- Pointer/integer unions are fine while the code reads what it wrote: `union str_or_len`
-  (`hack.h`: `char *str` / `int len`); only `.str` is accessed in the analyzed code.
+**Per-union punning check** (`transpiler/analysis/union-pun.mjs`, part of the analysis and
+of the annotation checker, 9.3):
 
-Alternative: unions heap-backed (scenario S2): `obj`, `trap` and 21 more NetHack types in the
-heap, every access through accessors. Correct by construction but much less readable, slower,
-and with more Phase 2 churn.
+1. **Access census.** Every member access on a union value in the AST, with the member's
+   canonical type and its kind: write (left side of `=`), read-write (`op=`, `++`, `--`),
+   read, or address-taken (`&u.m`).
+2. **Storage classes.** Each access is attributed to the storage it touches: a record field
+   path (`struct light_source.id`), a global, or a function's local or parameter. Classes are
+   merged (union-find) across whole-union assignments, initializers, argument passing and
+   return values, so a value written in one function and read in another lands in one class.
+3. **Verdict per union.**
+   - **No punning (proven)**: in every class, all member reads and writes have one canonical
+     type, and no member's address escapes. → object world (3.4.1).
+   - **Possible punning**: anything else, including an address-taken member. → heap-backed
+     (3.4.2). Conservative by construction: a union is only an object when the census proves it.
+4. **Report** (`transpiler/out/union-pun.md`): per union, the classes, the member types
+   written and read in each, and the sites that make it punning.
+5. **Runtime confirmation.** Debug builds record, per union object, the type of the member
+   last written; a read of a different type throws `UnionPunError` in object unions (it
+   cannot happen if the census is right) and is logged in heap unions (actual puns, as
+   evidence for the report).
+
+An annotation can override "possible punning" only for a union whose member is selected by
+a tag field (`discriminant: "kind"`, checked at run time as in step 5), and only with the
+owner's approval, listed in the report.
+
+**3.4.1 Object unions.** A JS object with one slot per member type (in practice one): reads
+return what was written. Integer-only record members (`coord v_launch2` in `union
+vlaunchinfo`) are stored as a sub-object.
+
+**3.4.2 Heap unions.** The union's bytes live in the heap with clang's layout, so every pun
+behaves exactly as on x86-64 (little-endian, leftover upper bytes included). A heap union
+embedded in an object record (e.g. `union any id` in `struct light_source`) is a **union
+cell**: the container stays an object, and its field holds a view over the union's own heap
+bytes, created with the container. Whole-record copies copy the cell's bytes, so there is still
+one copy of the data (one-copy rule). Pointer members store a handle (an index into the
+runtime's handle table): a pointer written as `a_obj` and read as `a_void` gives back the same
+object, as in C. An integer read of a pointer member returns the handle number, where C returns
+an address; C addresses vary between runs (ASLR), so recorded output cannot depend on them.
 
 ### 3.5 Heap-backed type set (the feasibility number)
 
@@ -187,13 +204,27 @@ and with more Phase 2 churn.
 | S0 literal rule | 104 | 40 |
 | S1 + save files via serializers (3.6) | 37 | 40 |
 | S2 + pointer fields in heap records hold object handles | 23 | 35 |
-| **S3 + unions as shared-slot objects (proposed)** | **1** (`struct engr`) | 20 |
+| **S3 + unions as objects or union cells (approved D1)** | **1** (`struct engr`) + punning unions as cells | 20 |
 
-With S3 the only NetHack type with byte-level evidence is `struct engr`, whose three text
-buffers live in the same allocation right after the struct (`newengr(smem * 3)`,
-`engr_text_space(ep)`, `src/engrave.c:428`). Proposed: an annotation that models it as an
-object with three `Uint8Array` text fields (one escape hatch, `js/hand/engr.js` if the
-generated form is not enough), so **NetHack stays entirely in the object world**.
+S3's record count no longer depends on unions: a punning union becomes a union cell (3.4.2)
+and does not move its container to the heap. How many of the 23 unions are cells is measured
+by the punning check, the first Stage 2 analysis; candidates are `union any` (342 `a_int`
+accesses, read through `a_void` in generic code) and `union vptrs` in `struct obj`.
+
+The only NetHack record with byte-level evidence is then **`struct engr` (decision D4)**. C
+allocates the struct and its text in one block: `newengr(smem * 3)` (`src/engrave.c:429`),
+`engr_text_space(ep)` = `(char *) (ep + 1)`, and the three `engr_txt[]` pointers point into
+that space at offsets 0, `smem`, `2 * smem`. The code then treats them as real byte pointers:
+it advances `engr_txt[actual_text]++` past leading spaces (line 285), computes
+`engr_txt[actual_text] - engr_text_space(ep)` (line 378), copies with `strncpy`/`Strcpy` (lines
+381, 398), and resets the pointers to the buffer starts when saving (line 1565), which brings
+stripped leading spaces back after a restore. The annotation therefore gives `struct engr` a
+**trailing byte area**: `newengr(n)` creates the object plus one `Uint8Array(n)`,
+`engr_text_space(ep)` is `BytePtr(ep.__tail, 0)`, and the three pointers are ordinary byte
+pointers into it. Lengths, truncation, NUL handling, pointer increments and differences, and
+the save-time reset then behave as in C, from generated code. A write past the end of the
+area throws where C would corrupt memory. The `memset` over struct plus text (line 430) maps to
+a helper that clears both.
 
 **Lua goes to the heap world as a whole** (all 32 Lua TUs in heap mode), regardless of the
 scenario: its value stack is pointer arithmetic on `StackValue` (about 480 sites), the GC casts
@@ -312,7 +343,7 @@ functions unless a buffer would overflow (then the process aborts; the runtime t
 | `heap.js` | Typed-array heap for the heap world: growable `ArrayBuffer`, `DataView` accessors, a deterministic `malloc`/`realloc`/`free` | Unit tests; Lua test scripts |
 | `string.js`, `ctype.js` | `str*`, `mem*`, `strto*`, `ato*`, `ctype` in the C locale (byte semantics, Darwin's tables) | Native differential tests |
 | `printf.js` | One formatting engine for `sprintf`/`snprintf`/`vsnprintf`/`fprintf` and `sscanf` parsing | Byte-exact against Darwin libc: every format string literal found in the AST plus fuzzed values; includes `%g`/`%.14g` (Lua `tostring` of numbers) |
-| `qsort.js` | **Darwin libc `qsort`**, ported exactly (patch 002 sorts an index array with it, and `sortloot_cmp` can consume RNG, so the comparator call sequence is observable) | Comparator call sequences logged in native C vs JS on random, sorted, reversed and inconsistent inputs |
+| `qsort.js` | **Darwin libc `qsort`**, ported exactly (patch 002 sorts an index array with it, and `sortloot_cmp` can consume RNG, so the comparator call sequence is observable). Reference platform: **macOS 15.8.1 (build 24H32), Darwin 24.6.0, x86_64**, the machine on which the 44/44 byte-identical re-record was verified. The macOS version of the official recording machine is not documented; the 44/44 result shows its `qsort` behaves the same on every sort the public sessions perform | Comparator call sequences logged in native C (on the reference platform) vs JS on random, sorted, reversed and inconsistent inputs |
 | `time.js` | `time()` returns the recorder's pinned "real now" (a US-daylight instant, see the `tm_isdst` quirk), `localtime`/`mktime`/`difftime` with `America/New_York` rules coded explicitly (US rules before and after 2007; no dependency on `Intl` data) | Native `localtime`/`mktime` with `TZ=America/New_York` for 1970–2100 |
 | `stdio.js` | `FILE` objects: read-only embedded data files (section 8), writable files (`record`, `logfile`, `xlogfile`, saves, bones) through the frozen `js/storage.js` VFS | Unit tests |
 | `env.js` | The recorder environment as constants: `getenv` table (exactly the variables `record-session.mjs` sets: `HOME`, `TERM`, `TZ`, `NETHACK_SEED`, `NETHACK_FIXED_DATETIME`, `NETHACK_RNGLOG`, `NETHACK_NO_DELAY`, `NOMUX_MARKERS`, `NETHACK_RAW_KEYS`, `NETHACKDIR`/`HACKDIR`), the documented `HOME` path, `getuid`/`getpid` constants | Re-recorded sessions |
@@ -351,7 +382,7 @@ read stdin outside normal play; they become async through the same rule if reach
    give 3,349 (51%). (a) will land in between.
 3. Reverse reachability from the roots, fixed point.
 4. Unresolvable sites (5 in Stage 1: `member:fn`, `member:sf_genericptr`) must be decided
-   in `annotations.yaml` (`pointers:` with explicit targets); the checker fails otherwise.
+   in `annotations.jsonc` (`pointers:` with explicit targets); the checker fails otherwise.
 5. Edge cuts are allowed only as annotations with a reason, and only for paths that cannot run
    in the port (e.g. `SIGWINCH` resize). `panic` is **not** cut: it can display messages and
    prompt.
@@ -434,7 +465,7 @@ js/nh/src/<file>.js     generated, one per NetHack .c (src/, win/tty/, sys/unix/
 js/nh/layout/<hdr>.js   generated record classes, sizes, offsets, one per header
 js/lua/<file>.js        generated Lua 5.4.8 (heap mode)
 js/data/<file>.js       generated embedded data files
-js/hand/*.js            escape hatches listed in annotations.yaml (target: very few)
+js/hand/*.js            escape hatches listed in annotations.jsonc (target: very few)
 js/isaac64.js, js/terminal.js, js/storage.js   frozen, untouched
 ```
 
@@ -468,17 +499,19 @@ The current skeleton modules from the contest template (`allmain.js`, `mklev.js`
 
 ### 9.1 Format
 
-**`transpiler/annotations.jsonc`**: JSON with `//` comments. Not YAML: Node has no YAML parser
-built in, and adding one as a dependency would touch `package.json`, which is part of the
-judged Phase 2 diff (`docs/PHASES.md`). Keys are C names (`file::name` for `static`
+**`transpiler/annotations.jsonc`** (decision D3): JSON with `//` comments, read with a
+20-line comment stripper and `JSON.parse`. A YAML parser would be possible: only `js/**`
+counts in the Phase 2 diff (`docs/PHASES.md`), and transpiler dependencies go in
+`transpiler/package.json`, outside both the diff and the judged files. JSONC is chosen
+because it needs no dependency at all and the annotations are small, regular data. Keys are C names (`file::name` for `static`
 functions and file-scope variables), so they survive line-number changes.
 
 ```jsonc
 {
   "types": {
-    "struct engr": { "repr": "object", "model": "trailing-text", "fields": { "engr_txt": 3 },
+    "struct engr": { "repr": "object", "tail": { "alloc": "newengr", "space": "engr_text_space" },
                      "why": "text buffers allocated after the struct (engrave.c newengr)" },
-    "union any":   { "repr": "union-slot" }          // default from the analyzer, listed for review
+    "union any":   { "repr": "union-cell" }   // from the punning check; "object" needs proof
   },
   "groups": {
     "lua": { "files": "lib/lua-5.4.8/src/*.c", "repr": "heap" }
@@ -512,7 +545,8 @@ functions and file-scope variables), so they survive line-number changes.
 Fails on: (1) a hard-pattern site with no decision (no analyzer default and no annotation);
 (2) a **stale** annotation (its C name no longer exists in the call graph or record set);
 (3) an unresolved indirect call site without `pointers:` targets; (4) a union marked
-`union-slot` that the static pun check (3.4) flags; (5) a `handwritten:` entry whose C
+`object` that the punning check (3.4) does not prove free of punning, unless
+it has an owner-approved `discriminant:`; (5) a `handwritten:` entry whose C
 function changed since the annotation was written (hash of the function's source text stored
 next to the entry). It prints the decision table, the heap-backed type set, the async-set
 size and the hand-written line count, so every run shows the current state.
@@ -580,26 +614,26 @@ is unaffected (one key at a time).
 | R8 | Schedule: Phase 1 freeze is **2026-11-29**, 11 days away | High / no Phase 1 qualification | The owner's goal is a working port by transpiling, not a ranking; work continues after the freeze (CLAUDE.md 1.3) |
 | R9 | Phase 2 churn: a changed header shifts layouts or async marks in many files | Medium / diff penalty | Layout modules per header (4.5), stable names, per-function temporaries; churn report (4.7) from M1 |
 
-### 12.2 Decisions for the owner
+### 12.2 Decisions (owner review, 2026-11-18)
 
-| ID | Decision | Proposal |
+| ID | Decision | Outcome |
 |---|---|---|
-| D1 (U) | Union representation | **S3**: shared-slot objects with exact little-endian integer punning, throwing on pointer/integer puns (3.4). Leaves 1 NetHack heap type |
-| D2 | Lua | Transpile Lua 5.4.8 in heap mode with the same transpiler (section 7) |
-| D3 | Annotation file format | `transpiler/annotations.jsonc` instead of the `annotations.yaml` named in CLAUDE.md 2.3 (no YAML parser without a dependency) |
-| D4 | `struct engr` | Object with three text fields via annotation; `js/hand/engr.js` only if needed |
-| D5 | Template skeleton in `js/` | Delete `fastforward.js`, `mklev.js` etc. when generated code replaces them (CLAUDE.md 2 already says so; confirm the timing) |
-| D6 | Upstream report | Tell the contest about the `tm_isdst` leak, the missing `sysconf` and the `record-session.mjs` race? (Outward-facing, only with your go-ahead) |
-| D7 | Push | Still holding; push once the transpiler produces a running port, or earlier? |
+| D1 | Union representation | **Approved with a condition**: unions with type punning stay heap-backed (as union cells, 3.4.2); only unions the per-union punning check proves free of punning are objects (3.4) |
+| D2 | Lua | **Approved**: transpile Lua 5.4.8 in heap mode (section 7) |
+| D3 | Annotation format | **Approved**: `transpiler/annotations.jsonc`; reasoning corrected (9.1): only `js/**` counts in the Phase 2 diff, and transpiler dependencies go in `transpiler/package.json` |
+| D4 | `struct engr` | **Approved**: object with a trailing byte area, matching C's truncation and length behavior (3.5) |
+| D5 | Template skeleton in `js/` | Delete it in **one separate commit**, once the first generated build runs end to end through `runSegment` |
+| D6 | Upstream report | Issue texts drafted in `transpiler/out/upstream-issue-drafts.md`; **the owner posts them** |
+| D7 | Push | **After M3** |
 
 ### 12.3 Milestones
 
 | M | Scope | Exit criterion (measurable) |
 |---|---|---|
 | M0 | Runtime core + C corpus | `tests/c-diff/` constructs and `js/crt/` unit tests green against native clang (int ops, `printf` formats from the AST, Darwin `qsort` sequences, `localtime`) |
-| M1 | IR + emitter for the whole tree | All 172 TUs emit; `node --check` and import graph pass; two transpiles byte-identical; annotation checker clean |
+| M1 | Punning check, IR + emitter for the whole tree | Union verdicts in `union-pun.md`; all 172 TUs emit; `node --check` and import graph pass; two transpiles byte-identical; annotation checker clean |
 | M2 | Function-level differential tests | `rnd.c`, `hacklib.c`, `objnam.c`, `mkobj.c` samples byte-identical to native |
-| M3 | Game boots in JS | Step-0 screen matches for all 44 public sessions; first wall-time measurement |
+| M3 | Game boots in JS | Step-0 screen matches for all 44 public sessions; first wall-time measurement. The first end-to-end `runSegment` run triggers the skeleton deletion commit (D5); M3 reached → push (D7) |
 | M4 | Character creation | All chargen screens and RNG through `u_init` match for all 44 sessions |
 | M5 | Level 1 (incl. Lua special levels and dungeon setup) | RNG matches through the first `mklev` for all 44 sessions |
 | M6 | Full play, save/restore, bones | Score climbs with no regressions; target: majority of public steps |
@@ -608,11 +642,12 @@ is unaffected (one key at a time).
 
 **Feasible, with the design above.** The numbers that decide it:
 
-- **NetHack fits the readable object world almost entirely.** With unions as shared-slot
-  objects and save files through generated serializers, 1 of 345 NetHack record types has
-  byte-level evidence (`struct engr`), and it has a small, local fix. Without those two
-  decisions the set would be 104 types including `monst` and `obj`, which would make most of the
-  game accessor code: still correct, but far less readable.
+- **NetHack fits the readable object world almost entirely.** With save files through
+  generated serializers and punning unions as union cells, 1 of 345 NetHack record types has
+  byte-level evidence (`struct engr`), and it has a small, local model. Punning unions add
+  heap-backed union cells without moving their containers (`monst`, `obj`) to the heap.
+  Without those decisions the set would be 104 types including `monst` and `obj`, which would
+  make most of the game accessor code: still correct, but far less readable.
 - **Lua is raw memory but self-contained.** Heap mode for 32 files (23k lines) behind a narrow
   C API boundary, transpiled by the same tool. It does not change in Phase 2.
 - **Async is large (51–68% of functions) but fully mechanical**: computed from the call graph,
@@ -626,5 +661,5 @@ is unaffected (one key at a time).
 What is *not* realistic: a scoring port before the Phase 1 freeze on 2026-11-29 (R8). M0–M2
 are weeks of work; the first matching screens come at M3.
 
-No fallback is needed. If D1 is rejected, the same transpiler still works with unions in the
+No fallback is needed. If union cells turn out impractical, the same transpiler still works with unions in the
 heap (scenario S2: 23 NetHack heap types), at a readability and speed cost.
