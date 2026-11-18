@@ -563,3 +563,43 @@ Even a combined 100× slowdown gives ~125 s for the longest session: within the 
 (smaller async set), sync clones of hot functions that cannot block (selected by annotation,
 checked statically), typed-array fast paths in the heap accessors. The browser `/play/` path
 is unaffected (one key at a time).
+
+## 12. Risks, open decisions and milestones
+
+### 12.1 Risks
+
+| # | Risk | Likelihood / impact | Mitigation |
+|---|---|---|---|
+| R1 | A union pun the static check misses (integer ↔ pointer) | Low / one session diverges | Accessor throws `UnionPunError` (never silent); move that union to the heap by annotation |
+| R2 | Irreducible `goto` graphs make some functions unreadable | Medium / readability only | State-machine fallback per function; counted in the checker output |
+| R3 | Reads of uninitialized memory: C reads stack garbage or stale heap, JS reads zero | Low–medium / hard to find | Clang `-Wuninitialized`/`-Wsometimes-uninitialized` pass over the tree listed in the report; fixed behavior is only matched where the recordings show it |
+| R4 | Lua `pairs()` order depends on the address-seeded string hash | Low / save-variable or event order | Recorded sessions are stable across C runs; if a divergence points here, reproduce C's seed computation with the JS heap's addresses |
+| R5 | Use-after-free that C "gets away with" | Low / divergence | `free` in the object world can poison objects in debug runs to find such reads |
+| R6 | Darwin libc details (`qsort`, `%g`, `strtod`, `localtime`) | Medium / screens or RNG | Ported from Darwin's libc source and fuzzed against native (4.6) |
+| R7 | Async overhead exceeds the time budget | Low / timeouts | Section 11 mitigations; measured at M3 |
+| R8 | Schedule: Phase 1 freeze is **2026-11-29**, 11 days away | High / no Phase 1 qualification | The owner's goal is a working port by transpiling, not a ranking; work continues after the freeze (CLAUDE.md 1.3) |
+| R9 | Phase 2 churn: a changed header shifts layouts or async marks in many files | Medium / diff penalty | Layout modules per header (4.5), stable names, per-function temporaries; churn report (4.7) from M1 |
+
+### 12.2 Decisions for the owner
+
+| ID | Decision | Proposal |
+|---|---|---|
+| D1 (U) | Union representation | **S3**: shared-slot objects with exact little-endian integer punning, throwing on pointer/integer puns (3.4). Leaves 1 NetHack heap type |
+| D2 | Lua | Transpile Lua 5.4.8 in heap mode with the same transpiler (section 7) |
+| D3 | Annotation file format | `transpiler/annotations.jsonc` instead of the `annotations.yaml` named in CLAUDE.md 2.3 (no YAML parser without a dependency) |
+| D4 | `struct engr` | Object with three text fields via annotation; `js/hand/engr.js` only if needed |
+| D5 | Template skeleton in `js/` | Delete `fastforward.js`, `mklev.js` etc. when generated code replaces them (CLAUDE.md 2 already says so; confirm the timing) |
+| D6 | Upstream report | Tell the contest about the `tm_isdst` leak, the missing `sysconf` and the `record-session.mjs` race? (Outward-facing, only with your go-ahead) |
+| D7 | Push | Still holding; push once the transpiler produces a running port, or earlier? |
+
+### 12.3 Milestones
+
+| M | Scope | Exit criterion (measurable) |
+|---|---|---|
+| M0 | Runtime core + C corpus | `tests/c-diff/` constructs and `js/crt/` unit tests green against native clang (int ops, `printf` formats from the AST, Darwin `qsort` sequences, `localtime`) |
+| M1 | IR + emitter for the whole tree | All 172 TUs emit; `node --check` and import graph pass; two transpiles byte-identical; annotation checker clean |
+| M2 | Function-level differential tests | `rnd.c`, `hacklib.c`, `objnam.c`, `mkobj.c` samples byte-identical to native |
+| M3 | Game boots in JS | Step-0 screen matches for all 44 public sessions; first wall-time measurement |
+| M4 | Character creation | All chargen screens and RNG through `u_init` match for all 44 sessions |
+| M5 | Level 1 (incl. Lua special levels and dungeon setup) | RNG matches through the first `mklev` for all 44 sessions |
+| M6 | Full play, save/restore, bones | Score climbs with no regressions; target: majority of public steps |
