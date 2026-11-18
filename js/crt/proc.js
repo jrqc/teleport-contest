@@ -20,18 +20,20 @@ export const proc = {
     keys: [],             // pending input bytes
     keyPos: 0,
     onStarve: null,       // called when the program waits for a key and none is left
+    readKey: null,        // interactive play: async () => key code, asked when the queue is empty
     cwd: '/',
     uid: 501, gid: 20, pid: 4242,
     login: 'davidbau',
     umask: 0o022,
     signals: new Map(),
 };
-export function resetProcess({ env = {}, keys = '', cwd = '/', onStarve = null } = {}) {
+export function resetProcess({ env = {}, keys = '', cwd = '/', onStarve = null, readKey = null } = {}) {
     proc.env = new Map(Object.entries(env));
     proc.envPtrs = new Map();
     proc.keys = Array.from(keys, (ch) => ch.charCodeAt(0) & 0xff);
     proc.keyPos = 0;
     proc.onStarve = onStarve;
+    proc.readKey = readKey;
     proc.cwd = cwd;
     proc.umask = 0o022;
     proc.signals = new Map();
@@ -69,10 +71,12 @@ export function __assert_rtn(func, file, line, expr) {
 }
 
 // ---------- keyboard: the blocking root (design 6) ----------
-/** getchar() from the key queue. When the queue is empty the program is waiting for
- * input that will never come: the glue is told and the promise never settles. */
+/** getchar() from the key queue. When the queue is empty: interactive play asks
+ * readKey; otherwise the program is waiting for input that will never come, the glue
+ * is told and the promise never settles. */
 export async function getchar$async() {
     if (proc.keyPos < proc.keys.length) return proc.keys[proc.keyPos++];
+    if (proc.readKey) return (await proc.readKey()) & 0xff;
     if (proc.onStarve) proc.onStarve();
     return new Promise(() => {});
 }
