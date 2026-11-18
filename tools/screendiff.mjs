@@ -33,7 +33,7 @@ for (const seg of segs) {
         J.push({ screen: g.getScreens()[i], cursor: g.getCursors()[i] });
         keys.push(seg.steps[i].key);
     }
-    if (g.error) console.log(`[segment error] ${g.error.stack.split('\n').slice(0, 4).join(' | ')}`);
+    if (g.error) console.log(`[segment error] ${g.error.stack.split('\n').slice(0, process.env.STACK ? 14 : 4).join(' | ')}`);
 }
 const text = (grid) => grid.map((r) => r.map((c) => c.ch || ' ').join('').replace(/\s+$/, ''));
 const cellsDiffer = (a, b) => a.ch !== b.ch || a.color !== b.color || a.attr !== b.attr;

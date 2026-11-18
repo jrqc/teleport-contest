@@ -149,9 +149,18 @@ export function classSource(scope, key, cls, origin, tail = false, cell = false)
         out.push('    }');
     } else {
         out.push('    constructor() {');
+        // one-dimensional scalar-array fields share one buffer at their C offsets, so a copy past
+        // the end of one reaches the next as in C (restore.c get_plname_from_file: 49 bytes into
+        // plname[32] of struct instance_globals_saved_p); only with two or more such fields
+        const flat = (f) => { const t = scope.resolve(f.type); return f.js && f.bits === null && t.k === 'arr' && t.n && typedArrayOf(scope.resolve(t.of)); };
+        const shared = L.fields.filter(flat).length >= 2;
+        if (shared) out.push(`        const $m = new ArrayBuffer(${L.size});   // the scalar-array fields' bytes (C layout)`);
         for (const f of L.fields) {
             if (!f.js) continue;
-            out.push(`        this.${field(f.js)} = ${zeroOf(f.type, cls)};`);
+            if (shared && flat(f)) {
+                const t = scope.resolve(f.type);
+                out.push(`        this.${field(f.js)} = new ${typedArrayOf(scope.resolve(t.of))}($m, ${f.offset}, ${t.n});`);
+            } else out.push(`        this.${field(f.js)} = ${zeroOf(f.type, cls)};`);
         }
         out.push('    }');
         out.push('    $copyFrom(s) {');

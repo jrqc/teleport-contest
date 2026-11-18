@@ -114,7 +114,10 @@ export function fdopen(fd, mode) {
     if (!d || !d.node) { $libc.errno = 9; return null; }
     const mf = modeFlags(mode);
     const f = new FILE(d.path);
-    f.node = d.node; f.path = d.path; f.pos = d.pos; f.rd = mf.rd; f.wr = mf.wr; f.append = mf.append; f.fd = fd;
+    f.node = d.node; f.path = d.path; f.rd = mf.rd; f.wr = mf.wr; f.append = mf.append; f.fd = fd;
+    // the stream has no position of its own: it reads and writes at the descriptor's file
+    // offset, which write(fd)/lseek(fd) also move (sfstruct.c bufon, then bwrite through either)
+    Object.defineProperty(f, 'pos', { get: () => d.pos, set: (v) => { d.pos = v; }, configurable: true });
     openStreams.add(f);
     return f;
 }

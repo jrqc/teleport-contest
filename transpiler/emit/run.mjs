@@ -32,7 +32,9 @@ const cells = Object.entries(punVerdicts).filter(([k, v]) => {
     const a = (ann.types || {})[k];
     return a && a.repr ? a.repr === 'union-cell' : v.verdict === 'union-cell';
 }).map(([k]) => k.replace(/^union /, ''));
-const prog = new Program({ crtNames, heapCrtNames, handwritten, tails, cells, asyncCut: (ann.edges && ann.edges.cut || []).map((c) => c.to) });
+const handModules = Object.fromEntries(Object.entries(ann.functions || {}).filter(([, f]) => f.handwritten && f.handwritten.startsWith('js/hand/'))
+    .map(([k, f]) => [k.replace(/^.*::/, ''), '../' + f.handwritten.replace(/^js\//, '').replace(/\.js$/, '')]));
+const prog = new Program({ crtNames, heapCrtNames, handwritten, handModules, tails, cells, asyncCut: (ann.edges && ann.edges.cut || []).map((c) => c.to) });
 const luaDb = JSON.parse(readFileSync(path.join(ROOT, 'transpiler/out/compile_commands.json'), 'utf8')).filter((e) => e.group === 'lua');
 prog.missingFn = new Set();
 

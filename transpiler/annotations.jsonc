@@ -40,7 +40,11 @@
     // Lua object through lua_Alloc); the override has an object-world face and a
     // heap-world face ($heap) the bridge hands to lua_newstate
     "src/nhlua.c::nhl_alloc": { "handwritten": "js/hand/nhlua.js", "c": "src/nhlua.c", "csha": "d2c4c38939beb4e5",
-                            "why": "allocates heap-world memory for Lua and object-world memory for NetHack" }
+                            "why": "allocates heap-world memory for Lua and object-world memory for NetHack" },
+    // the recorder fork()s and execv()s /usr/bin/compress at every save and restore; the
+    // override keeps the parent's C code and models the child by its observable effects
+    "src/files.c::docompress_file": { "handwritten": "js/hand/files.js", "c": "src/files.c", "csha": "2154351b20f53c30",
+                                      "why": "fork/exec of an external compressor; see the comment in js/hand/files.js" }
   },
   "pointers": {},
   "edges": { "cut": [] }

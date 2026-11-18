@@ -39,6 +39,7 @@ export class Program {
         this.crt = opts.crtNames;
         this.async = new AsyncSet({ roots: opts.asyncRoots, cut: opts.asyncCut });
         this.handwritten = new Set(opts.handwritten || []);
+        this.handMod = new Map(Object.entries(opts.handModules || {}));   // name -> module path from js/nh ('../hand/x')
         this.blockingCrt = new Set(['getchar']);   // runtime reads that wait for a key (async roots)   // annotation functions[].handwritten: the runtime defines them
         this.asyncDone = false;
         this.fnDef = new Map();     // name -> { module, file } (external linkage definitions)
@@ -117,6 +118,8 @@ export class Program {
 
     // ---------- references ----------
     functionRef(tu, name) {
+        // a hand-written replacement in js/hand/ that the runtime index does not export: imported directly
+        if (this.handMod.has(name) && !this.crt.has(name)) { this.noteImport(tu, this.handMod.get(name), jsName(name)); return jsName(name); }
         if (this.definedIn(tu, name, 'fn')) return jsName(name);
         const d = this.fnDef.get(name);
         if (d && d.heap && !tu.heap) {
