@@ -136,6 +136,7 @@ function scenario(kinds, { pointer }) {
 
 const ALL = ['union', 'save-io', 'mem-raw', 'cast', 'offsetof'];
 const res = {
+    recordFiles: Object.fromEntries([...recs].sort().map(([k, r]) => [k, `${r.file}:${r.line}`])),
     records: { total: recs.size, nethack: [...recs.values()].filter((r) => r.group === 'nethack').length, lua: [...recs.values()].filter((r) => r.group === 'lua').length },
     evidence: Object.fromEntries([...ev].sort().map(([k, e]) => [k, Object.fromEntries(Object.entries(e).map(([kk, v]) => [kk, v.length > 6 ? [...v.slice(0, 6), `... ${v.length} total`] : v]))])),
     S0: scenario(ALL, { pointer: true }),

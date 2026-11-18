@@ -1,0 +1,32 @@
+// transpiler/annotations.jsonc: representation and call-graph decisions that
+// override the analyzer's defaults (transpiler-design.md section 9).
+// Keys are C names: "struct x" / "union u" for records, function names (or
+// "file::name" for static functions). Every entry says why. Checked by
+// transpiler/annotations/check.mjs on every transpile.
+{
+  "groups": {
+    // design 3.5 / 7, decision D2: the Lua VM is raw memory throughout
+    "lua": { "files": "lib/lua-5.4.8/src/", "repr": "heap",
+             "why": "value-stack pointer arithmetic, GC unions and casts, offsetof, computed goto" },
+    // contract (docs/API.md): rng.js must use the frozen ISAAC64 implementation.
+    // Its JS signatures differ from C's (isaac64_init(seed_bytes) returns the
+    // context), so calls go through a small hand-written adapter.
+    "isaac64": { "files": "src/isaac64.c", "repr": "extern", "module": "js/isaac64.js",
+                 "adapter": "js/crt/isaac64-glue.js",
+                 "why": "frozen file overlaid by the judge" }
+  },
+  "types": {
+    // design 3.5, decision D4
+    "struct engr": {
+      "repr": "object",
+      "tail": { "alloc": "newengr", "space": "engr_text_space" },
+      "why": "text buffers live in the same allocation after the struct (engrave.c newengr); modeled as a trailing byte area so engr_txt[] stay real byte pointers"
+    }
+    // Unions: no entries. The punning check (transpiler/out/union-pun.md) decides;
+    // an entry here could only move a union to "object" with an approved
+    // "discriminant" (design 3.4).
+  },
+  "functions": {},
+  "pointers": {},
+  "edges": { "cut": [] }
+}
