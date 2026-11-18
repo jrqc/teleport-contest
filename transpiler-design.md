@@ -47,3 +47,40 @@ then produces the same RNG caller tags and captures at the same points as the re
 - Window ports other than tty, platforms other than the recorder's (macOS, Darwin libc).
 - "Fixing" anything: bugs, unspecified behavior and Darwin libc quirks are reproduced as the
   recorder resolves them.
+
+## 2. Front end and implementation language
+
+**Choice: Node.js (plain ES modules), driving `clang -fsyntax-only -Xclang -ast-dump=json`,
+with the recorder's exact compile commands.** This is already built and tested in Stage 1
+(`transpiler/frontend/`): all 172 TUs parse, in 36 s, with locations resolved.
+
+Reasons:
+
+- **Same compiler as the recorder.** The AST comes from the same Apple clang 17 with the same
+  flags and headers, so macro expansion, `sizeof`, struct layout, implicit conversions and
+  constant folding are exactly what the recorder binary was built from. No second C parser to
+  disagree with clang.
+- **Full semantic information.** The JSON AST carries resolved types, implicit casts
+  (`IntegralCast`, `LValueToRValue`, `BitCast`, ...), referenced declarations, and both
+  spelling and expansion locations for macros (needed for RNG caller tags and readable output).
+- **One language for tooling and output.** Transpiler, runtime, tests and the scoring harness are
+  all JS; runtime helpers can be unit-tested in the same process that generates code.
+- **No native dependencies.** libclang bindings (Python `clang.cindex` or a Node addon) would
+  pin a second clang version; the JSON dump is the stable interface of the clang we already run.
+
+Known costs and how they are handled:
+
+| Cost | Handling |
+|---|---|
+| Dumps are large (up to 133 MB per TU, ~10 GB total) | Processed one TU at a time in memory (two in parallel on 8 GB); never written to disk |
+| Locations are delta-encoded (file/line omitted when unchanged) | `resolveLocations()` replays them in output order (done) |
+| Typedefs only desugared at the top level (`NhRect *` stays sugared) | Canonicalize types from the TU's `TypedefDecl`s (done); for codegen use clang's `-ast-dump` type IDs where needed |
+| Headers are re-parsed in every TU | Declarations are merged across TUs by `file:line` (done in the inventory) |
+| Some facts are not in the AST (record layout, bit-field offsets) | `-Xclang -fdump-record-layouts` for heap-backed records; checked against `sizeof`/`offsetof` probes compiled with the same flags |
+| Macro bodies are not in the JSON AST | Read from source (`transpiler/analysis/macros.mjs`) only for readability decisions; semantics always come from the expanded AST |
+
+Pipeline per TU: clang JSON → resolved AST → **lowered IR** (a small, typed C-level tree
+with explicit evaluation order, explicit conversions and explicit lvalues) → analysis passes
+(heap marks, async marks, goto structuring) → JS emitter. Whole-program facts (call graph,
+async set, heap set, function-pointer targets) are computed once over all IR and cached in
+`transpiler/out/`, so each TU can then be emitted independently and deterministically.
