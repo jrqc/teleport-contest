@@ -237,15 +237,17 @@ in the Phase 2 diff and maps JS stack traces and the debug RNG log back to C.
 
 C leaves most operand orders unspecified; the recorder fixes them the way **clang's code
 generator** does. The IR records that order explicitly and introduces temporaries only where JS
-would otherwise evaluate differently. Rules (each pinned by a differential test in
-`tests/c-diff/order/`, compiled with the recorder's flags, before it is relied on):
+would otherwise evaluate differently. Every rule is pinned by a differential test in
+`tests/c-diff/order/`, compiled with the recorder's flags. The rows below are **measured**
+(`eval-order.c`, same result at `-g` and `-O2`):
 
-| Construct | Order to reproduce | Note |
+| Construct | Measured clang order | JS difference |
 |---|---|---|
-| Function arguments | left to right | Same as JS |
-| Binary operators, array subscripts `a[i][j]` | left operand, then right | Same as JS |
-| Simple assignment `lhs = rhs` | clang evaluates the **right side first**, then the lvalue | JS evaluates the lvalue's object/index first: `levl[rn2(x)][rn2(y)].typ = f(rn2(z))` needs temporaries |
-| Compound assignment `lhs op= rhs`, `++`/`--` | lvalue first, then right side | |
+| Function arguments | left to right (`xy`) | Same as JS |
+| Binary operators | left operand, then right (`lr`) | Same as JS |
+| Simple assignment `a[i][j] = r` | **right side first**, then the lvalue (`rij`) | JS evaluates the lvalue's object and index first: `levl[rn2(x)][rn2(y)].typ = f(rn2(z))` needs temporaries |
+| Compound assignment `a[i][j] += r` | **right side first**, then the lvalue (`rij`) | Same treatment as simple assignment |
+| `b[i]++` | the lvalue's index (`i`) | Same as JS |
 | `&&`, `||`, `?:`, `,` | sequenced as C defines | Same as JS |
 
 ### 4.2 Expressions
