@@ -2454,6 +2454,66 @@
   }
  },
  "libc": {
+  "__builtin_object_size": {
+   "kind": "builtin",
+   "nethack": 3038,
+   "lua": 48,
+   "files": [
+    "allmain.c",
+    "alloc.c",
+    "apply.c",
+    "artifact.c",
+    "attrib.c",
+    "bones.c",
+    "botl.c",
+    "cfgfiles.c"
+   ]
+  },
+  "__builtin___sprintf_chk": {
+   "kind": "builtin",
+   "nethack": 1341,
+   "lua": 0,
+   "files": [
+    "allmain.c",
+    "alloc.c",
+    "apply.c",
+    "artifact.c",
+    "attrib.c",
+    "bones.c",
+    "botl.c",
+    "cfgfiles.c"
+   ]
+  },
+  "__builtin___strcpy_chk": {
+   "kind": "builtin",
+   "nethack": 883,
+   "lua": 3,
+   "files": [
+    "alloc.c",
+    "apply.c",
+    "artifact.c",
+    "attrib.c",
+    "bones.c",
+    "botl.c",
+    "cfgfiles.c",
+    "cmd.c"
+   ]
+  },
+  "__builtin___strcat_chk": {
+   "kind": "builtin",
+   "nethack": 555,
+   "lua": 0,
+   "files": [
+    "artifact.c",
+    "bones.c",
+    "botl.c",
+    "cfgfiles.c",
+    "cmd.c",
+    "dbridge.c",
+    "detect.c",
+    "dig.c"
+   ]
+  },
   "free": {
    "kind": "builtin",
    "nethack": 491,
@@ -2482,6 +2542,21 @@
     "calendar.c",
     "cfgfiles.c",
     "cmd.c"
+   ]
+  },
+  "__builtin_expect": {
+   "kind": "builtin",
+   "nethack": 91,
+   "lua": 265,
+   "files": [
+    "artifact.c",
+    "attrib.c",
+    "coloratt.c",
+    "do_name.c",
+    "dog.c",
+    "dogmove.c",
+    "dothrow.c",
+    "eat.c"
    ]
   },
   "strchr": {
@@ -2544,6 +2619,21 @@
     "explode.c"
    ]
   },
+  "__builtin___memset_chk": {
+   "kind": "builtin",
+   "nethack": 113,
+   "lua": 0,
+   "files": [
+    "artifact.c",
+    "bones.c",
+    "botl.c",
+    "cfgfiles.c",
+    "cmd.c",
+    "decl.c",
+    "detect.c",
+    "dig.c"
+   ]
+  },
   "__assert_rtn": {
    "kind": "sys",
    "nethack": 91,
@@ -2557,6 +2647,21 @@
     "dogmove.c",
     "dothrow.c",
     "eat.c"
+   ]
+  },
+  "__builtin___memcpy_chk": {
+   "kind": "builtin",
+   "nethack": 45,
+   "lua": 31,
+   "files": [
+    "cmd.c",
+    "coloratt.c",
+    "hacklib.c",
+    "isaac64.c",
+    "lauxlib.c",
+    "lobject.c",
+    "loslib.c",
+    "lstate.c"
    ]
   },
   "atoi": {
@@ -2589,6 +2694,21 @@
     "report.c"
    ]
   },
+  "__builtin___strncpy_chk": {
+   "kind": "builtin",
+   "nethack": 47,
+   "lua": 0,
+   "files": [
+    "botl.c",
+    "cfgfiles.c",
+    "cmd.c",
+    "coloratt.c",
+    "do_name.c",
+    "do_wear.c",
+    "dokick.c",
+    "engrave.c"
+   ]
+  },
   "__error": {
    "kind": "sys",
    "nethack": 23,
@@ -2616,6 +2736,21 @@
     "nhlua.c",
     "pager.c",
     "rumors.c"
+   ]
+  },
+  "__builtin___strncat_chk": {
+   "kind": "builtin",
+   "nethack": 41,
+   "lua": 0,
+   "files": [
+    "engrave.c",
+    "nhlua.c",
+    "o_init.c",
+    "objnam.c",
+    "options.c",
+    "pager.c",
+    "report.c",
+    "topten.c"
    ]
   },
   "fgets": {
@@ -2686,6 +2821,36 @@
     "rnd.c"
    ]
   },
+  "__builtin_va_start": {
+   "kind": "builtin",
+   "nethack": 23,
+   "lua": 5,
+   "files": [
+    "cfgfiles.c",
+    "end.c",
+    "hacklib.c",
+    "lapi.c",
+    "lauxlib.c",
+    "ldebug.c",
+    "lobject.c",
+    "pline.c"
+   ]
+  },
+  "__builtin_va_end": {
+   "kind": "builtin",
+   "nethack": 23,
+   "lua": 5,
+   "files": [
+    "cfgfiles.c",
+    "end.c",
+    "hacklib.c",
+    "lapi.c",
+    "lauxlib.c",
+    "ldebug.c",
+    "lobject.c",
+    "pline.c"
+   ]
+  },
   "fflush": {
    "kind": "sys",
    "nethack": 17,
@@ -2725,6 +2890,16 @@
     "mkmaze.c",
     "nhlua.c",
     "options.c",
+    "rnd.c"
+   ]
+  },
+  "__builtin___snprintf_chk": {
+   "kind": "builtin",
+   "nethack": 6,
+   "lua": 14,
+   "files": [
+    "lobject.c",
+    "lstrlib.c",
     "rnd.c"
    ]
   },
@@ -2964,6 +3139,17 @@
     "lstrlib.c"
    ]
   },
+  "__builtin___vsnprintf_chk": {
+   "kind": "builtin",
+   "nethack": 7,
+   "lua": 0,
+   "files": [
+    "cfgfiles.c",
+    "end.c",
+    "hacklib.c",
+    "pline.c"
+   ]
+  },
   "tparm": {
    "kind": "sys",
    "nethack": 7,
@@ -3194,6 +3380,15 @@
    "lua": 3,
    "files": [
     "lmathlib.c"
+   ]
+  },
+  "__builtin_huge_val": {
+   "kind": "builtin",
+   "nethack": 0,
+   "lua": 3,
+   "files": [
+    "lmathlib.c",
+    "lstrlib.c"
    ]
   },
   "mktime": {

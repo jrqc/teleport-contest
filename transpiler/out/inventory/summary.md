@@ -70,25 +70,37 @@
 
 | Function | kind | NetHack sites | Lua sites | files |
 |---|---|---|---|---|
+| __builtin_object_size | builtin | 3038 | 48 | allmain.c alloc.c apply.c artifact.c attrib.c bones.c botl.c cfgfiles.c |
+| __builtin___sprintf_chk | builtin | 1341 | 0 | allmain.c alloc.c apply.c artifact.c attrib.c bones.c botl.c cfgfiles.c |
+| __builtin___strcpy_chk | builtin | 883 | 3 | alloc.c apply.c artifact.c attrib.c bones.c botl.c cfgfiles.c cmd.c |
+| __builtin___strcat_chk | builtin | 555 | 0 | artifact.c bones.c botl.c cfgfiles.c cmd.c dbridge.c detect.c dig.c |
 | free | builtin | 491 | 1 | apply.c artifact.c bones.c botl.c cfgfiles.c cmd.c coloratt.c date.c |
 | strlen | builtin | 421 | 21 | alloc.c apply.c attrib.c bones.c botl.c calendar.c cfgfiles.c cmd.c |
+| __builtin_expect | builtin | 91 | 265 | artifact.c attrib.c coloratt.c do_name.c dog.c dogmove.c dothrow.c eat.c |
 | strchr | builtin | 288 | 25 | botl.c cfgfiles.c cmd.c coloratt.c detect.c do.c do_name.c dogmove.c |
 | strcmp | builtin | 223 | 11 | artifact.c attrib.c bones.c botl.c cfgfiles.c cmd.c do.c do_name.c |
 | strncmp | builtin | 141 | 1 | bones.c botl.c cfgfiles.c cmd.c do_name.c do_wear.c drawing.c dungeon.c |
 | abs | builtin | 114 | 1 | apply.c artifact.c attrib.c ball.c cmd.c do_wear.c eat.c explode.c |
+| __builtin___memset_chk | builtin | 113 | 0 | artifact.c bones.c botl.c cfgfiles.c cmd.c decl.c detect.c dig.c |
 | __assert_rtn | sys | 91 | 0 | artifact.c attrib.c coloratt.c do_name.c dog.c dogmove.c dothrow.c eat.c |
+| __builtin___memcpy_chk | builtin | 45 | 31 | cmd.c coloratt.c hacklib.c isaac64.c lauxlib.c lobject.c loslib.c lstate.c |
 | atoi | sys | 74 | 0 | botl.c calendar.c cfgfiles.c coloratt.c date.c files.c mkmaze.c objnam.c |
 | fprintf | builtin | 54 | 8 | dungeon.c files.c glyphs.c lauxlib.c ldblib.c liolib.c pline.c report.c |
+| __builtin___strncpy_chk | builtin | 47 | 0 | botl.c cfgfiles.c cmd.c coloratt.c do_name.c do_wear.c dokick.c engrave.c |
 | __error | sys | 23 | 21 | cfgfiles.c files.c lauxlib.c liolib.c loslib.c report.c unixunix.c |
 | fclose | sys | 40 | 3 | cfgfiles.c files.c lauxlib.c liolib.c loadlib.c nhlua.c pager.c rumors.c |
+| __builtin___strncat_chk | builtin | 41 | 0 | engrave.c nhlua.c o_init.c objnam.c options.c pager.c report.c topten.c |
 | fgets | sys | 32 | 1 | cfgfiles.c files.c ldblib.c pager.c rumors.c topten.c version.c windows.c |
 | exit | builtin | 32 | 1 | cfgfiles.c decl.c end.c loslib.c report.c unixmain.c unixtty.c unixunix.c |
 | signal | sys | 33 | 0 | allmain.c end.c files.c ioctl.c report.c save.c unixmain.c unixunix.c |
 | tgetstr | sys | 33 | 0 | termcap.c |
 | fopen | builtin | 28 | 4 | cfgfiles.c files.c lauxlib.c liolib.c loadlib.c nhlua.c pager.c rnd.c |
+| __builtin_va_start | builtin | 23 | 5 | cfgfiles.c end.c hacklib.c lapi.c lauxlib.c ldebug.c lobject.c pline.c |
+| __builtin_va_end | builtin | 23 | 5 | cfgfiles.c end.c hacklib.c lapi.c lauxlib.c ldebug.c lobject.c pline.c |
 | fflush | sys | 17 | 10 | getline.c lauxlib.c lbaselib.c ldblib.c liolib.c report.c sfbase.c sfstruct.c |
 | putchar | sys | 27 | 0 | termcap.c topl.c unixtty.c unixunix.c wintty.c |
 | getenv | sys | 23 | 3 | cfgfiles.c date.c loadlib.c loslib.c mkmaze.c nhlua.c options.c rnd.c |
+| __builtin___snprintf_chk | builtin | 6 | 14 | lobject.c lstrlib.c rnd.c |
 | strrchr | builtin | 20 | 0 | cmd.c files.c hacklib.c mkmaze.c o_init.c objnam.c options.c pline.c |
 | strstr | builtin | 15 | 2 | files.c hacklib.c invent.c lauxlib.c loadlib.c mon.c objnam.c options.c |
 | isspace | builtin | 15 | 2 | coloratt.c earlyarg.c end.c liolib.c lstrlib.c options.c unixmain.c |
@@ -109,6 +121,7 @@
 | ftell | sys | 8 | 0 | nhlua.c rumors.c |
 | getc | sys | 0 | 7 | lauxlib.c liolib.c |
 | isdigit | builtin | 0 | 7 | lbaselib.c liolib.c lstrlib.c |
+| __builtin___vsnprintf_chk | builtin | 7 | 0 | cfgfiles.c end.c hacklib.c pline.c |
 | tparm | sys | 7 | 0 | termcap.c |
 | strspn | builtin | 0 | 6 | lbaselib.c liolib.c lobject.c lstrlib.c |
 | floor | builtin | 0 | 6 | lmathlib.c lobject.c lvm.c |
@@ -133,6 +146,7 @@
 | popen | sys | 2 | 1 | liolib.c report.c unixmain.c |
 | __srget | sys | 0 | 3 | liolib.c |
 | log | builtin | 0 | 3 | lmathlib.c |
+| __builtin_huge_val | builtin | 0 | 3 | lmathlib.c lstrlib.c |
 | mktime | sys | 2 | 1 | calendar.c date.c loslib.c |
 | setgid | sys | 3 | 0 | files.c pline.c unixunix.c |
 | getgid | sys | 3 | 0 | files.c pline.c unixunix.c |

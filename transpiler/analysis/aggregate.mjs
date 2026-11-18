@@ -111,10 +111,16 @@ for (const s of SITES) {
 }
 
 // ---------- libc / system calls ----------
+const globalDefsAll = new Set(FN.map((f) => f.name));
 const libc = Object.create(null);
 for (const f of FN) {
     for (const [callee, c] of Object.entries(f.calls)) {
-        const kind = fnDeclKind[callee];
+        // implicit builtins (e.g. __builtin___sprintf_chk from macOS fortify
+        // macros) have no FunctionDecl node: no kind -> builtin
+        // clang places an implicit builtin's declaration at its first use (a
+        // project file), so __builtin* names are classified by name
+        const kind = callee.startsWith('__builtin') ? 'builtin'
+            : (fnDeclKind[callee] || (globalDefsAll.has(callee) ? 'proj' : 'builtin'));
         if (kind === 'sys' || kind === 'builtin') {
             const e = libc[callee] || (libc[callee] = { kind, nethack: 0, lua: 0, callers: new Set() });
             e[groupOfFile(f.file)] += c;
