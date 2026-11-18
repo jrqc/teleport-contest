@@ -543,3 +543,23 @@ Bootstrapping before the full game runs: the C corpus (4.5) and **function-level
 tests**: selected pure NetHack functions (`rnd.c`, `hacklib.c` string helpers, `objnam.c`
 naming, `mkobj.c` with a seeded RNG) linked natively into a small C driver and compared with
 their transpiled versions. This catches most translation bugs before any session runs.
+
+## 11. Performance estimate
+
+Measured: the longest public session (seed4500: 1,814 steps, 108,275 RNG calls) runs in
+**1.25 s** in C including the harness; the limit is 900 s per session, a factor of 720.
+
+Estimated (not measured; first real number at milestone M3):
+
+| Cost | Estimate | Reasoning |
+|---|---|---|
+| Object-world NetHack code vs `-g -O0` C | 1–5× | V8 JIT on monomorphic classes is competitive with unoptimized C; integer helpers inline |
+| `async`/`await` on ~60% of functions | 2–10× on call-heavy paths | Each async call allocates a promise; most calls complete synchronously but still pay the microtask |
+| Lua in heap mode (DataView accessors) | 10–50× for Lua time | Emscripten-like code without WASM; Lua is a fraction of runtime (level creation) |
+| Screen capture per step | small | 1,920 cells per step |
+
+Even a combined 100× slowdown gives ~125 s for the longest session: within the limit with
+7× headroom. Mitigations if needed, in order: field-sensitive function-pointer resolution
+(smaller async set), sync clones of hot functions that cannot block (selected by annotation,
+checked statically), typed-array fast paths in the heap accessors. The browser `/play/` path
+is unaffected (one key at a time).
