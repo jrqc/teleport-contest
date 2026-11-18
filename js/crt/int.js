@@ -98,8 +98,8 @@ export const not32 = (a) => ~a;
 export const and32 = (a, b) => a & b;
 export const or32 = (a, b) => a | b;
 export const xor32 = (a, b) => a ^ b;
-export const shl32 = (a, n) => a << n;          // JS masks n & 31, like x86
-export const shr32 = (a, n) => a >> n;          // arithmetic, like clang on x86
+export const shl32 = (a, n) => a << n;          // JS masks n & 31, like arm64 LSL (w)
+export const shr32 = (a, n) => a >> n;          // arithmetic (ASR), like clang on arm64
 
 // ---------- unsigned int ----------
 export const addu32 = (a, b) => (a + b) >>> 0;

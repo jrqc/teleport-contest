@@ -8,10 +8,12 @@
 // __builtin_object_size of the destination; (size_t)-1 means unknown. Darwin
 // aborts on overflow; these throw CTrap.
 import { CTrap, i32, u64, i64, norm } from './int.js';
-import { BytePtr, cstrlen } from './mem.js';
+import { BytePtr, Ptr, cstrlen } from './mem.js';
+import { RawBlock, asArr } from './alloc.js';
 import { isspace, isdigit, isalpha, tolower } from './ctype.js';
 
-const at = (p, i) => p.get(i);
+// bytes compare as unsigned char (Darwin); char buffers are Int8Array, so mask
+const at = (p, i) => p.get(i) & 0xff;
 const UNKNOWN = (s) => s === -1 || s === 18446744073709551615n || s === 2 ** 64 - 1;
 function chk(objsize, need, what) {
     if (!UNKNOWN(objsize) && need > Number(objsize)) throw new CTrap(`detected buffer overflow (${what})`);
@@ -101,20 +103,65 @@ export function __builtin___strncat_chk(d, s, n, objsize) {
 }
 
 // ---------- byte memory (BytePtr operands) ----------
-export function memset(d, c, n) { n = Number(n); c &= 0xff; for (let i = 0; i < n; i++) d.set(i, c); return d; }
+// Object-world operands: a record object (memset to 0 resets it, memcpy of a
+// whole record copies it), a RawBlock (bytes not yet typed), or a Ptr.
+const isRec = (x) => x !== null && typeof x === 'object' && typeof x.$copyFrom === 'function';
+function asBytes(p) {
+    if (p instanceof RawBlock) return p.obj !== null ? p.obj : asArr(p, Uint8Array);
+    return p;
+}
+export function memset(d, c, n) {
+    n = Number(n); c &= 0xff;
+    const D = asBytes(d);
+    if (isRec(D)) {
+        if (c !== 0) throw new CTrap('memset of a record with a nonzero byte');
+        D.$copyFrom(new D.constructor());
+        if (D.__tail) D.__tail.fill(0);   // struct + trailing area (struct engr)
+        return d;
+    }
+    if (D instanceof Ptr && !ArrayBuffer.isView(D.buf)) {   // array of pointers / 64-bit values: only 0 is meaningful
+        if (c !== 0 || n % 8 !== 0) throw new CTrap('memset of a pointer array with a nonzero byte');
+        const z = D.buf.$kind === 'i64' || typeof D.buf[D.off] === 'number' ? 0 : null;
+        for (let i = 0; i < n / 8; i++) D.set(i, z);
+        return d;
+    }
+    bytesView(D, n).fill(c);
+    return d;
+}
 export function memcpy(d, s, n) {   // overlapping memcpy is undefined in C; copy like memmove
     return memmove(d, s, n);
 }
 export function memmove(d, s, n) {
     n = Number(n);
-    if (n > 0) { at(s, n - 1); d.set(n - 1, at(d, n - 1)); }   // bounds first, like a fault before any write
-    if (d.buf === s.buf && d.off > s.off) for (let i = n - 1; i >= 0; i--) d.buf[d.off + i] = s.buf[s.off + i];
-    else for (let i = 0; i < n; i++) d.buf[d.off + i] = s.buf[s.off + i];
+    const D = asBytes(d), Sx = asBytes(s);
+    if (isRec(D) || isRec(Sx)) {
+        if (!(isRec(D) && isRec(Sx) && D.constructor === Sx.constructor)) throw new CTrap('memcpy between a record and other data');
+        D.$copyFrom(Sx);
+        return d;
+    }
+    if (!ArrayBuffer.isView(D.buf) || !ArrayBuffer.isView(Sx.buf)) {   // pointer arrays: element-wise (8 bytes each)
+        if (n % 8 !== 0) throw new CTrap('partial copy of a pointer array');
+        const k = n / 8;
+        if (D.buf === Sx.buf && D.off > Sx.off) for (let i = k - 1; i >= 0; i--) D.set(i, Sx.get(i));
+        else for (let i = 0; i < k; i++) D.set(i, Sx.get(i));
+        return d;
+    }
+    bytesView(D, n).set(bytesView(Sx, n));   // TypedArray.set copies as if through a temporary (memmove)
     return d;
+}
+/** The n bytes at typed-array pointer p, as a Uint8Array over the same memory (bounds-checked). */
+function bytesView(p, n) {
+    const b = p.buf, bpe = b.BYTES_PER_ELEMENT;
+    const start = p.off * bpe;
+    if (p.off < 0 || start + n > b.byteLength) throw new CTrap(`memory access out of bounds (${start}+${n} of ${b.byteLength} bytes)`);
+    return new Uint8Array(b.buffer, b.byteOffset + start, n);
 }
 export function memcmp(a, b, n) {
     n = Number(n);
-    for (let i = 0; i < n; i++) { const x = at(a, i), y = at(b, i); if (x !== y) return x - y; }
+    const A = asBytes(a), B = asBytes(b);
+    if (!ArrayBuffer.isView(A.buf) || !ArrayBuffer.isView(B.buf)) throw new CTrap('memcmp of non-byte data');
+    const x = bytesView(A, n), y = bytesView(B, n);
+    for (let i = 0; i < n; i++) if (x[i] !== y[i]) return x[i] - y[i];
     return 0;
 }
 export function memchr(s, c, n) {
@@ -238,4 +285,4 @@ function hexToDouble(mant, exp2) {
     return v * 2 ** exp2;
 }
 export const atof = (s) => strtod(s, null);
-export { BytePtr };
+

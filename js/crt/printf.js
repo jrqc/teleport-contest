@@ -118,7 +118,7 @@ export function cformat(fmt, va) {
         let c = buf[i];
         if (c === undefined) throw new CTrap('format string not NUL-terminated');
         if (c === 0) return out;
-        if (c !== 0x25) { out.push(c); i++; continue; }
+        if (c !== 0x25) { out.push(c & 0xff); i++; continue; }   // char buffers may be Int8Array
         // %[flags][width][.prec][length]conv
         i++;
         let left = false, plus = false, space = false, alt = false, zero = false;
@@ -184,7 +184,7 @@ export function cformat(fmt, va) {
                     const b = p.buf[j];
                     if (b === undefined) throw new CTrap('%s: string not NUL-terminated');
                     if (b === 0) break;
-                    bytes.push(b);
+                    bytes.push(b & 0xff);
                 }
             }
             bodyBytes = bytes;

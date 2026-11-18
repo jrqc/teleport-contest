@@ -1,0 +1,85 @@
+// js/crt/alloc.js: malloc and friends in the object world (transpiler-design.md 3.7).
+// Hand-written runtime.
+//
+// malloc(n) returns a RawBlock: n untyped bytes. C code then casts the void *
+// to the type it allocated for; the generated cast materializes the block
+// once, as that type, and every later cast of the same block returns the same
+// value:
+//   struct T *: a T (n == sizeof T), an array of T (n a multiple: the first
+//               element, with __arr/__idx), or a T with a trailing byte area
+//               __tail (n larger: struct engr and its text, decision D4).
+//   scalar *:   a Ptr over a typed array view of the block's ArrayBuffer (char,
+//               short, int ...); several views of one block share the bytes.
+//   pointer * / 64-bit *: a Ptr over a plain array (n / 8 elements).
+// free() is a no-op (GC); reading freed memory would need explicit modeling.
+import { CTrap } from './int.js';
+import { Ptr, recArray } from './mem.js';
+
+export class RawBlock {
+    constructor(n) { this.size = Number(n); this.ab = null; this.obj = null; this.views = null; }
+}
+export const malloc = (n) => new RawBlock(n);
+export const calloc = (n, sz) => new RawBlock(Number(n) * Number(sz));
+export function free(_p) { /* garbage collected */ }
+
+/** realloc: only for byte/scalar buffers (Ptr over a typed array or plain array) and raw blocks. */
+export function realloc(p, n) {
+    n = Number(n);
+    if (p === null) return new RawBlock(n);
+    if (p instanceof RawBlock && p.obj === null && p.views === null) { const b = new RawBlock(n); return b; }
+    if (p instanceof Ptr && p.off === 0) {
+        const old = p.buf;
+        if (ArrayBuffer.isView(old)) {
+            const View = old.constructor;
+            const b = new RawBlock(n);
+            const v = asArr(b, View);
+            v.buf.set(old.subarray(0, Math.min(old.length, v.buf.length)));
+            return b;
+        }
+        if (Array.isArray(old)) {
+            const b = new RawBlock(n);
+            const v = asArr(b, old.$kind || 'ptr');
+            for (let i = 0; i < Math.min(old.length, v.buf.length); i++) v.buf[i] = old[i];
+            return b;
+        }
+    }
+    throw new CTrap('realloc of a block that is not a plain buffer');
+}
+
+/** (struct T *) p, with T's class and sizeof. Identity for anything but a fresh RawBlock. */
+export function asRec(p, T, size) {
+    if (!(p instanceof RawBlock)) return p;
+    if (p.obj !== null) return p.obj;
+    if (p.views !== null) throw new CTrap('block used as bytes, then as a record');
+    let o;
+    if (p.size === size) o = new T();
+    else if (p.size > size && p.size % size === 0) o = recArray(T, p.size / size)[0];
+    else if (p.size > size) { o = new T(); o.__tail = new Uint8Array(p.size - size); }   // trailing text (struct engr)
+    else throw new CTrap(`block of ${p.size} bytes used as a record of ${size}`);
+    p.obj = o;
+    return o;
+}
+
+/** (E *) p for a scalar or pointer element type: View is a typed array class, 'ptr' or 'i64'. */
+export function asArr(p, View) {
+    if (!(p instanceof RawBlock)) return p;
+    if (p.obj !== null) {
+        if (p.obj instanceof Ptr) return p.obj;
+        throw new CTrap('block used as a record, then as an array');
+    }
+    p.views = p.views || new Map();
+    let v = p.views.get(View);
+    if (v === undefined) {
+        if (View === 'ptr' || View === 'i64') {
+            const a = new Array(Math.floor(p.size / 8)).fill(View === 'ptr' ? null : 0);
+            a.$kind = View;
+            v = new Ptr(a, 0);
+            if (p.views.size) throw new CTrap('block used as pointers and as other data');
+        } else {
+            if (!p.ab) p.ab = new ArrayBuffer(p.size);
+            v = new Ptr(new View(p.ab, 0, Math.floor(p.size / View.BYTES_PER_ELEMENT)), 0);
+        }
+        p.views.set(View, v);
+    }
+    return v;
+}
