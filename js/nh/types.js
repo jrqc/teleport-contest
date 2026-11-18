@@ -219,6 +219,7 @@ export class Race {
     static $size = 112;   // sizeof: lets the runtime turn byte counts into element counts
     static $fields() { return [["noun", 0, 'ptr'], ["adj", 8, 'ptr'], ["coll", 16, 'ptr'], ["filecode", 24, 'ptr'], ["individual", 32, { rec: $T.RoleName }], ["mnum", 48, 'i16'], ["mummynum", 50, 'i16'], ["zombienum", 52, 'i16'], ["allow", 54, 'i16'], ["selfmask", 56, 'i16'], ["lovemask", 58, 'i16'], ["hatemask", 60, 'i16'], ["attrmin", 62, { arr: 'i16', n: 6, es: 2 }], ["attrmax", 74, { arr: 'i16', n: 6, es: 2 }], ["hpadv", 86, { rec: $T.RoleAdvance }], ["enadv", 98, { rec: $T.RoleAdvance }]]; }   // C layout, for save files (serial.js)
     constructor() {
+        const $m = new ArrayBuffer(112);   // the scalar-array fields' bytes (C layout)
         this.noun = null;
         this.adj = null;
         this.coll = null;
@@ -231,8 +232,8 @@ export class Race {
         this.selfmask = 0;
         this.lovemask = 0;
         this.hatemask = 0;
-        this.attrmin = new Int16Array(6);
-        this.attrmax = new Int16Array(6);
+        this.attrmin = new Int16Array($m, 62, 6);
+        this.attrmax = new Int16Array($m, 74, 6);
         this.hpadv = new $T.RoleAdvance();
         this.enadv = new $T.RoleAdvance();
     }
@@ -263,6 +264,7 @@ export class Role {
     static $size = 312;   // sizeof: lets the runtime turn byte counts into element counts
     static $fields() { return [["name", 0, { rec: $T.RoleName }], ["rank", 16, { arr: { rec: $T.RoleName }, n: 9, es: 16 }], ["lgod", 160, 'ptr'], ["ngod", 168, 'ptr'], ["cgod", 176, 'ptr'], ["filecode", 184, 'ptr'], ["homebase", 192, 'ptr'], ["intermed", 200, 'ptr'], ["mnum", 208, 'i16'], ["petnum", 210, 'i16'], ["ldrnum", 212, 'i16'], ["guardnum", 214, 'i16'], ["neminum", 216, 'i16'], ["enemy1num", 218, 'i16'], ["enemy2num", 220, 'i16'], ["enemy1sym", 222, 'i8'], ["enemy2sym", 223, 'i8'], ["questarti", 224, 'i16'], ["allow", 226, 'i16'], ["attrbase", 228, { arr: 'i16', n: 6, es: 2 }], ["attrdist", 240, { arr: 'i16', n: 6, es: 2 }], ["hpadv", 252, { rec: $T.RoleAdvance }], ["enadv", 264, { rec: $T.RoleAdvance }], ["xlev", 276, 'i16'], ["initrecord", 278, 'i16'], ["spelbase", 280, 'i32'], ["spelheal", 284, 'i32'], ["spelshld", 288, 'i32'], ["spelarmr", 292, 'i32'], ["spelstat", 296, 'i32'], ["spelspec", 300, 'i32'], ["spelsbon", 304, 'i32']]; }   // C layout, for save files (serial.js)
     constructor() {
+        const $m = new ArrayBuffer(312);   // the scalar-array fields' bytes (C layout)
         this.name = new $T.RoleName();
         this.rank = $c.recArray($T.RoleName, 9);
         this.lgod = null;
@@ -282,8 +284,8 @@ export class Role {
         this.enemy2sym = 0;
         this.questarti = 0;
         this.allow = 0;
-        this.attrbase = new Int16Array(6);
-        this.attrdist = new Int16Array(6);
+        this.attrbase = new Int16Array($m, 228, 6);
+        this.attrdist = new Int16Array($m, 240, 6);
         this.hpadv = new $T.RoleAdvance();
         this.enadv = new $T.RoleAdvance();
         this.xlev = 0;
@@ -439,6 +441,7 @@ export class __sFILE {
     static $size = 152;   // sizeof: lets the runtime turn byte counts into element counts
     static $fields() { return [["_p", 0, 'ptr'], ["_r", 8, 'i32'], ["_w", 12, 'i32'], ["_flags", 16, 'i16'], ["_file", 18, 'i16'], ["_bf", 24, { rec: $T.__sbuf }], ["_lbfsize", 40, 'i32'], ["_cookie", 48, 'ptr'], ["_close", 56, 'ptr'], ["_read", 64, 'ptr'], ["_seek", 72, 'ptr'], ["_write", 80, 'ptr'], ["_ub", 88, { rec: $T.__sbuf }], ["_extra", 104, 'ptr'], ["_ur", 112, 'i32'], ["_ubuf", 116, { arr: 'u8', n: 3, es: 1 }], ["_nbuf", 119, { arr: 'u8', n: 1, es: 1 }], ["_lb", 120, { rec: $T.__sbuf }], ["_blksize", 136, 'i32'], ["_offset", 144, 'i64']]; }   // C layout, for save files (serial.js)
     constructor() {
+        const $m = new ArrayBuffer(152);   // the scalar-array fields' bytes (C layout)
         this._p = null;
         this._r = 0;
         this._w = 0;
@@ -454,8 +457,8 @@ export class __sFILE {
         this._ub = new $T.__sbuf();
         this._extra = null;
         this._ur = 0;
-        this._ubuf = new Uint8Array(3);
-        this._nbuf = new Uint8Array(1);
+        this._ubuf = new Uint8Array($m, 116, 3);
+        this._nbuf = new Uint8Array($m, 119, 1);
         this._lb = new $T.__sbuf();
         this._blksize = 0;
         this._offset = 0;
@@ -618,13 +621,14 @@ export class _config_error_frame {
     static $size = 1304;   // sizeof: lets the runtime turn byte counts into element counts
     static $fields() { return [["line_num", 0, 'i32'], ["num_errors", 4, 'i32'], ["origline_shown", 8, 'i8'], ["fromfile", 9, 'i8'], ["secure", 10, 'i8'], ["origline", 11, { arr: 'i8', n: 1024, es: 1 }], ["source", 1035, { arr: 'i8', n: 256, es: 1 }], ["next", 1296, 'ptr']]; }   // C layout, for save files (serial.js)
     constructor() {
+        const $m = new ArrayBuffer(1304);   // the scalar-array fields' bytes (C layout)
         this.line_num = 0;
         this.num_errors = 0;
         this.origline_shown = 0;
         this.fromfile = 0;
         this.secure = 0;
-        this.origline = new Int8Array(1024);
-        this.source = new Int8Array(256);
+        this.origline = new Int8Array($m, 11, 1024);
+        this.source = new Int8Array($m, 1035, 256);
         this.next = null;
     }
     $copyFrom(s) {
@@ -684,6 +688,7 @@ export class _doengrave_ctx {
     static $size = 1224;   // sizeof: lets the runtime turn byte counts into element counts
     static $fields() { return [["dengr", 0, 'i8'], ["doblind", 1, 'i8'], ["doknown", 2, 'i8'], ["eow", 3, 'i8'], ["jello", 4, 'i8'], ["ptext", 5, 'i8'], ["teleengr", 6, 'i8'], ["zapwand", 7, 'i8'], ["disprefresh", 8, 'i8'], ["frosted", 9, 'i8'], ["adding", 10, 'i8'], ["ret", 12, 'i32'], ["type", 16, 'i32'], ["oetype", 20, 'i32'], ["otmp", 24, 'ptr'], ["oep", 32, 'ptr'], ["buf", 40, { arr: 'i8', n: 256, es: 1 }], ["ebuf", 296, { arr: 'i8', n: 256, es: 1 }], ["fbuf", 552, { arr: 'i8', n: 256, es: 1 }], ["qbuf", 808, { arr: 'i8', n: 128, es: 1 }], ["post_engr_text", 936, { arr: 'i8', n: 256, es: 1 }], ["writer", 1192, 'ptr'], ["everb", 1200, 'ptr'], ["eloc", 1208, 'ptr'], ["len", 1216, 'u64']]; }   // C layout, for save files (serial.js)
     constructor() {
+        const $m = new ArrayBuffer(1224);   // the scalar-array fields' bytes (C layout)
         this.dengr = 0;
         this.doblind = 0;
         this.doknown = 0;
@@ -700,11 +705,11 @@ export class _doengrave_ctx {
         this.oetype = 0;
         this.otmp = null;
         this.oep = null;
-        this.buf = new Int8Array(256);
-        this.ebuf = new Int8Array(256);
-        this.fbuf = new Int8Array(256);
-        this.qbuf = new Int8Array(128);
-        this.post_engr_text = new Int8Array(256);
+        this.buf = new Int8Array($m, 40, 256);
+        this.ebuf = new Int8Array($m, 296, 256);
+        this.fbuf = new Int8Array($m, 552, 256);
+        this.qbuf = new Int8Array($m, 808, 128);
+        this.post_engr_text = new Int8Array($m, 936, 256);
         this.writer = null;
         this.everb = null;
         this.eloc = null;
@@ -846,6 +851,7 @@ export class _readobjnam_data {
     static $size = 744;   // sizeof: lets the runtime turn byte counts into element counts
     static $fields() { return [["otmp", 0, 'ptr'], ["bp", 8, 'ptr'], ["origbp", 16, 'ptr'], ["oclass", 24, 'i8'], ["un", 32, 'ptr'], ["dn", 40, 'ptr'], ["actualn", 48, 'ptr'], ["name", 56, 'ptr'], ["p", 64, 'ptr'], ["cnt", 72, 'i32'], ["spe", 76, 'i32'], ["spesgn", 80, 'i32'], ["typ", 84, 'i32'], ["very", 88, 'i32'], ["rechrg", 92, 'i32'], ["blessed", 96, 'i32'], ["uncursed", 100, 'i32'], ["iscursed", 104, 'i32'], ["ispoisoned", 108, 'i32'], ["isgreased", 112, 'i32'], ["eroded", 116, 'i32'], ["eroded2", 120, 'i32'], ["erodeproof", 124, 'i32'], ["locked", 128, 'i32'], ["unlocked", 132, 'i32'], ["broken", 136, 'i32'], ["real", 140, 'i32'], ["fake", 144, 'i32'], ["halfeaten", 148, 'i32'], ["mntmp", 152, 'i32'], ["contents", 156, 'i32'], ["islit", 160, 'i32'], ["unlabeled", 164, 'i32'], ["ishistoric", 168, 'i32'], ["isdiluted", 172, 'i32'], ["trapped", 176, 'i32'], ["doorless", 180, 'i32'], ["open", 184, 'i32'], ["closed", 188, 'i32'], ["flags", 192, 'i32'], ["tmp", 196, 'i32'], ["tinv", 200, 'i32'], ["tvariety", 204, 'i32'], ["mgend", 208, 'i32'], ["wetness", 212, 'i32'], ["gsize", 216, 'i32'], ["ftype", 220, 'i32'], ["zombify", 224, 'i8'], ["globbuf", 225, { arr: 'i8', n: 256, es: 1 }], ["fruitbuf", 481, { arr: 'i8', n: 256, es: 1 }]]; }   // C layout, for save files (serial.js)
     constructor() {
+        const $m = new ArrayBuffer(744);   // the scalar-array fields' bytes (C layout)
         this.otmp = null;
         this.bp = null;
         this.origbp = null;
@@ -894,8 +900,8 @@ export class _readobjnam_data {
         this.gsize = 0;
         this.ftype = 0;
         this.zombify = 0;
-        this.globbuf = new Int8Array(256);
-        this.fruitbuf = new Int8Array(256);
+        this.globbuf = new Int8Array($m, 225, 256);
+        this.fruitbuf = new Int8Array($m, 481, 256);
     }
     $copyFrom(s) {
         this.otmp = s.otmp;
@@ -2015,10 +2021,11 @@ export class cemetery {
     static $size = 184;   // sizeof: lets the runtime turn byte counts into element counts
     static $fields() { return [["next", 0, 'ptr'], ["who", 8, { arr: 'i8', n: 49, es: 1 }], ["how", 57, { arr: 'i8', n: 101, es: 1 }], ["when", 158, { arr: 'i8', n: 15, es: 1 }], ["frpx", 174, 'i16'], ["frpy", 176, 'i16'], ["bonesknown", 178, 'i8']]; }   // C layout, for save files (serial.js)
     constructor() {
+        const $m = new ArrayBuffer(184);   // the scalar-array fields' bytes (C layout)
         this.next = null;
-        this.who = new Int8Array(49);
-        this.how = new Int8Array(101);
-        this.when = new Int8Array(15);
+        this.who = new Int8Array($m, 8, 49);
+        this.how = new Int8Array($m, 57, 101);
+        this.when = new Int8Array($m, 158, 15);
         this.frpx = 0;
         this.frpy = 0;
         this.bonesknown = 0;
@@ -2852,10 +2859,11 @@ export class dungeon {
     static $size = 92;   // sizeof: lets the runtime turn byte counts into element counts
     static $fields() { return [["dname", 0, { arr: 'i8', n: 24, es: 1 }], ["proto", 24, { arr: 'i8', n: 15, es: 1 }], ["fill_lvl", 39, { arr: 'i8', n: 15, es: 1 }], ["themerms", 54, { arr: 'i8', n: 15, es: 1 }], ["boneid", 69, 'i8'], ["flags", 72, { rec: $T.d_flags }], ["entry_lev", 76, 'i16'], ["num_dunlevs", 78, 'i16'], ["dunlev_ureached", 80, 'i16'], ["ledger_start", 84, 'i32'], ["depth_start", 88, 'i32']]; }   // C layout, for save files (serial.js)
     constructor() {
-        this.dname = new Int8Array(24);
-        this.proto = new Int8Array(15);
-        this.fill_lvl = new Int8Array(15);
-        this.themerms = new Int8Array(15);
+        const $m = new ArrayBuffer(92);   // the scalar-array fields' bytes (C layout)
+        this.dname = new Int8Array($m, 0, 24);
+        this.proto = new Int8Array($m, 24, 15);
+        this.fill_lvl = new Int8Array($m, 39, 15);
+        this.themerms = new Int8Array($m, 54, 15);
         this.boneid = 0;
         this.flags = new $T.d_flags();
         this.entry_lev = 0;
@@ -3179,6 +3187,7 @@ export class eshk {
     static $size = 4960;   // sizeof: lets the runtime turn byte counts into element counts
     static $fields() { return [["parentmid", 0, 'u32'], ["robbed", 8, 'i64'], ["credit", 16, 'i64'], ["debit", 24, 'i64'], ["loan", 32, 'i64'], ["shoptype", 40, 'i32'], ["shoproom", 44, 'i8'], ["unused", 45, 'i8'], ["following", 46, 'i8'], ["surcharge", 47, 'i8'], ["dismiss_kops", 48, 'i8'], ["shk", 50, { rec: $T.nhcoord }], ["shd", 54, { rec: $T.nhcoord }], ["shoplevel", 58, { rec: $T.d_level }], ["billct", 64, 'i32'], ["bill", 72, { arr: { rec: $T.bill_x }, n: 200, es: 24 }], ["bill_p", 4872, 'ptr'], ["break_seq", 4880, 'i64'], ["seq_peaceful", 4888, 'i8'], ["visitct", 4892, 'i32'], ["customer", 4896, { arr: 'i8', n: 32, es: 1 }], ["shknam", 4928, { arr: 'i8', n: 32, es: 1 }]]; }   // C layout, for save files (serial.js)
     constructor() {
+        const $m = new ArrayBuffer(4960);   // the scalar-array fields' bytes (C layout)
         this.parentmid = 0;
         this.robbed = 0;
         this.credit = 0;
@@ -3199,8 +3208,8 @@ export class eshk {
         this.break_seq = 0;
         this.seq_peaceful = 0;
         this.visitct = 0;
-        this.customer = new Int8Array(32);
-        this.shknam = new Int8Array(32);
+        this.customer = new Int8Array($m, 4896, 32);
+        this.shknam = new Int8Array($m, 4928, 32);
     }
     $copyFrom(s) {
         this.parentmid = s.parentmid;
@@ -3395,6 +3404,7 @@ export class flag {
     static $size = 208;   // sizeof: lets the runtime turn byte counts into element counts
     static $fields() { return [["acoustics", 0, 'i8'], ["armorstatus", 1, 'i8'], ["autodig", 2, 'i8'], ["autoquiver", 3, 'i8'], ["autoopen", 4, 'i8'], ["beginner", 5, 'i8'], ["biff", 6, 'i8'], ["bones", 7, 'i8'], ["confirm", 8, 'i8'], ["dark_room", 9, 'i8'], ["debug", 10, 'i8'], ["end_own", 11, 'i8'], ["explore", 12, 'i8'], ["female", 13, 'i8'], ["friday13", 14, 'i8'], ["goldX", 15, 'i8'], ["help", 16, 'i8'], ["tips", 17, 'i8'], ["tutorial", 18, 'i8'], ["ignintr", 19, 'i8'], ["implicit_uncursed", 20, 'i8'], ["ins_chkpt", 21, 'i8'], ["invlet_constant", 22, 'i8'], ["legacy", 23, 'i8'], ["lit_corridor", 24, 'i8'], ["mention_decor", 25, 'i8'], ["mention_walls", 26, 'i8'], ["nap", 27, 'i8'], ["nopick_dropped", 28, 'i8'], ["null", 29, 'i8'], ["pickup", 30, 'i8'], ["pickup_stolen", 31, 'i8'], ["pickup_thrown", 32, 'i8'], ["pushweapon", 33, 'i8'], ["quick_farsight", 34, 'i8'], ["rest_on_space", 35, 'i8'], ["safe_dog", 36, 'i8'], ["safe_wait", 37, 'i8'], ["showexp", 38, 'i8'], ["showscore", 39, 'i8'], ["showvers", 40, 'i8'], ["silent", 41, 'i8'], ["sortpack", 42, 'i8'], ["sparkle", 43, 'i8'], ["standout", 44, 'i8'], ["terrainstatus", 45, 'i8'], ["time", 46, 'i8'], ["tombstone", 47, 'i8'], ["verbose", 48, 'i8'], ["weaponstatus", 49, 'i8'], ["end_top", 52, 'i32'], ["end_around", 56, 'i32'], ["autounlock", 60, 'u32'], ["moonphase", 64, 'u32'], ["suppress_alert", 72, 'u64'], ["paranoia_bits", 80, 'u32'], ["versinfo", 84, 'u32'], ["pickup_burden", 88, 'i32'], ["pile_limit", 92, 'i32'], ["discosort", 96, 'i8'], ["sortloot", 97, 'i8'], ["vanq_sortmode", 98, 'u8'], ["inv_order", 99, { arr: 'i8', n: 18, es: 1 }], ["pickup_types", 117, { arr: 'i8', n: 18, es: 1 }], ["end_disclose", 135, { arr: 'i8', n: 7, es: 1 }], ["menu_style", 142, 'i8'], ["made_fruit", 143, 'i8'], ["initrole", 144, 'i32'], ["initrace", 148, 'i32'], ["initgend", 152, 'i32'], ["initalign", 156, 'i32'], ["randomall", 160, 'i32'], ["pantheon", 164, 'i32'], ["lootabc", 168, 'i8'], ["showrace", 169, 'i8'], ["travelcmd", 170, 'i8'], ["runmode", 172, 'i32'], ["reserved1", 176, 'i32'], ["reserved2", 180, 'i32'], ["reserved3", 184, 'i32'], ["reserved4", 188, 'i32'], ["reserved5", 192, 'i32'], ["reserved6", 196, 'i32'], ["reserved7", 200, 'i32'], ["reserved8", 204, 'i32']]; }   // C layout, for save files (serial.js)
     constructor() {
+        const $m = new ArrayBuffer(208);   // the scalar-array fields' bytes (C layout)
         this.acoustics = 0;
         this.armorstatus = 0;
         this.autodig = 0;
@@ -3457,9 +3467,9 @@ export class flag {
         this.discosort = 0;
         this.sortloot = 0;
         this.vanq_sortmode = 0;
-        this.inv_order = new Int8Array(18);
-        this.pickup_types = new Int8Array(18);
-        this.end_disclose = new Int8Array(7);
+        this.inv_order = new Int8Array($m, 99, 18);
+        this.pickup_types = new Int8Array($m, 117, 18);
+        this.end_disclose = new Int8Array($m, 135, 7);
         this.menu_style = 0;
         this.made_fruit = 0;
         this.initrole = 0;
@@ -4247,17 +4257,18 @@ export class instance_globals_c {
     static $size = 584;   // sizeof: lets the runtime turn byte counts into element counts
     static $fields() { return [["command_queue", 0, { arr: 'ptr', n: 2, es: 8 }], ["cond_hilites", 16, { arr: 'u64', n: 24, es: 8 }], ["condmenu_sortorder", 208, 'i32'], ["Cmd", 216, { rec: $T.cmd }], ["clicklook_cc", 296, { rec: $T.nhcoord }], ["chosen_windowtype", 300, { arr: 'i8', n: 16, es: 1 }], ["cmd_key", 316, 'i32'], ["cmd_bind", 320, 'ptr'], ["command_count", 328, 'i64'], ["current_wand", 336, 'ptr'], ["catname", 344, { arr: 'i8', n: 63, es: 1 }], ["crash_email", 408, 'ptr'], ["crash_name", 416, 'ptr'], ["crash_urlmax", 424, 'i32'], ["currentgraphics", 428, 'i32'], ["cmdline_rcfile", 432, 'ptr'], ["config_section_chosen", 440, 'ptr'], ["config_section_current", 448, 'ptr'], ["chosen_symset_start", 456, 'i8'], ["chosen_symset_end", 457, 'i8'], ["cached_pickinv_win", 460, 'i32'], ["core_invent_state", 464, 'i32'], ["cmdline_windowsys", 472, 'ptr'], ["color_colorings", 480, 'ptr'], ["current_container", 488, 'ptr'], ["class_filter", 496, 'i8'], ["cvt_buf", 497, { arr: 'i8', n: 64, es: 1 }], ["chosen_soundlib", 564, 'u32'], ["coder", 568, 'ptr'], ["corpsenm_digested", 576, 'i16'], ["converted_savefile_loaded", 578, 'i8'], ["havestate", 579, 'i8']]; }   // C layout, for save files (serial.js)
     constructor() {
+        const $m = new ArrayBuffer(584);   // the scalar-array fields' bytes (C layout)
         this.command_queue = $c.nulls(2);
         this.cond_hilites = $c.zeros(24);
         this.condmenu_sortorder = 0;
         this.Cmd = new $T.cmd();
         this.clicklook_cc = new $T.nhcoord();
-        this.chosen_windowtype = new Int8Array(16);
+        this.chosen_windowtype = new Int8Array($m, 300, 16);
         this.cmd_key = 0;
         this.cmd_bind = null;
         this.command_count = 0;
         this.current_wand = null;
-        this.catname = new Int8Array(63);
+        this.catname = new Int8Array($m, 344, 63);
         this.crash_email = null;
         this.crash_name = null;
         this.crash_urlmax = 0;
@@ -4273,7 +4284,7 @@ export class instance_globals_c {
         this.color_colorings = null;
         this.current_container = null;
         this.class_filter = 0;
-        this.cvt_buf = new Int8Array(64);
+        this.cvt_buf = new Int8Array($m, 497, 64);
         this.chosen_soundlib = 0;
         this.coder = null;
         this.corpsenm_digested = 0;
@@ -4429,9 +4440,10 @@ export class instance_globals_g {
     static $size = 95000;   // sizeof: lets the runtime turn byte counts into element counts
     static $fields() { return [["gbuf", 0, { arr: { arr: { rec: $T.gbuf_entry }, n: 80, es: 56 }, n: 21, es: 4480 }], ["gbuf_start", 94080, { arr: 'i16', n: 21, es: 2 }], ["gbuf_stop", 94122, { arr: 'i16', n: 21, es: 2 }], ["getposx", 94164, 'i16'], ["getposy", 94166, 'i16'], ["gloc_filter_map", 94168, 'ptr'], ["gloc_filter_floodfill_match_glyph", 94176, 'i32'], ["gtyp", 94180, 'i16'], ["gx", 94182, 'i16'], ["gy", 94184, 'i16'], ["gate_str", 94192, 'ptr'], ["gems", 94200, { arr: { rec: $T.valuable_data }, n: 23, es: 16 }], ["glyph_reset_timestamp", 94568, 'i64'], ["gmst_stored", 94576, 'i8'], ["gmst_moves", 94584, 'i64'], ["gmst_invent", 94592, 'ptr'], ["gmst_ubak", 94600, 'ptr'], ["gmst_disco", 94608, 'ptr'], ["gmst_mvitals", 94616, 'ptr'], ["gmst_spl_book", 94624, { arr: { rec: $T.spell }, n: 43, es: 8 }], ["gamelog", 94968, 'ptr'], ["gas_cloud_diss_within", 94976, 'i8'], ["gas_cloud_diss_seen", 94980, 'i32'], ["glyphmap_perlevel_flags", 94984, 'i64'], ["havestate", 94992, 'i8']]; }   // C layout, for save files (serial.js)
     constructor() {
+        const $m = new ArrayBuffer(95000);   // the scalar-array fields' bytes (C layout)
         this.gbuf = $c.arrayOf(21, () => $c.recArray($T.gbuf_entry, 80));
-        this.gbuf_start = new Int16Array(21);
-        this.gbuf_stop = new Int16Array(21);
+        this.gbuf_start = new Int16Array($m, 94080, 21);
+        this.gbuf_stop = new Int16Array($m, 94122, 21);
         this.getposx = 0;
         this.getposy = 0;
         this.gloc_filter_map = null;
@@ -4597,16 +4609,17 @@ export class instance_globals_l {
     static $size = 696;   // sizeof: lets the runtime turn byte counts into element counts
     static $fields() { return [["last_command_count", 0, 'i64'], ["locknum", 8, 'i32'], ["lockptr", 12, 'i32'], ["lock", 16, { arr: 'i8', n: 46, es: 1 }], ["lastinvnr", 64, 'i32'], ["light_base", 72, 'ptr'], ["luathemes", 80, { arr: 'ptr', n: 16, es: 8 }], ["last_hider", 208, 'u32'], ["luacore", 216, 'ptr'], ["lua_warnbuf", 224, { arr: 'i8', n: 256, es: 1 }], ["loglua", 480, 'i32'], ["lua_sid", 484, 'i32'], ["loot_reset_justpicked", 488, 'i8'], ["looseball", 496, 'ptr'], ["loosechain", 504, 'ptr'], ["lev_message", 512, 'ptr'], ["lregions", 520, 'ptr'], ["launchplace", 528, { rec: $T.launchplace }], ["last_winchoice", 544, 'ptr'], ["lua_ver", 552, { arr: 'i8', n: 20, es: 1 }], ["lua_copyright", 572, { arr: 'i8', n: 120, es: 1 }], ["havestate", 692, 'i8']]; }   // C layout, for save files (serial.js)
     constructor() {
+        const $m = new ArrayBuffer(696);   // the scalar-array fields' bytes (C layout)
         this.last_command_count = 0;
         this.locknum = 0;
         this.lockptr = 0;
-        this.lock = new Int8Array(46);
+        this.lock = new Int8Array($m, 16, 46);
         this.lastinvnr = 0;
         this.light_base = null;
         this.luathemes = $c.nulls(16);
         this.last_hider = 0;
         this.luacore = null;
-        this.lua_warnbuf = new Int8Array(256);
+        this.lua_warnbuf = new Int8Array($m, 224, 256);
         this.loglua = 0;
         this.lua_sid = 0;
         this.loot_reset_justpicked = 0;
@@ -4616,8 +4629,8 @@ export class instance_globals_l {
         this.lregions = null;
         this.launchplace = new $T.launchplace();
         this.last_winchoice = null;
-        this.lua_ver = new Int8Array(20);
-        this.lua_copyright = new Int8Array(120);
+        this.lua_ver = new Int8Array($m, 552, 20);
+        this.lua_copyright = new Int8Array($m, 572, 120);
         this.havestate = 0;
     }
     $copyFrom(s) {
@@ -4653,11 +4666,12 @@ export class instance_globals_m {
     static $size = 384;   // sizeof: lets the runtime turn byte counts into element counts
     static $fields() { return [["mkot_trap_warn_count", 0, 'i32'], ["mrank_sz", 4, 'i32'], ["multi", 8, 'i64'], ["multi_reason", 16, 'ptr'], ["multireasonbuf", 24, { arr: 'i8', n: 128, es: 1 }], ["m_shot", 152, { rec: $T.multishot }], ["mrg_to_wielded", 164, 'i8'], ["menu_colorings", 168, 'ptr'], ["migrating_objs", 176, 'ptr'], ["mydogs", 184, 'ptr'], ["migrating_mons", 192, 'ptr'], ["maploc", 200, 'ptr'], ["mswallower", 208, 'ptr'], ["mhitu_dieroll", 216, 'i32'], ["made_branch", 220, 'i8'], ["min_rx", 222, 'i16'], ["max_rx", 224, 'i16'], ["min_ry", 226, 'i16'], ["max_ry", 228, 'i16'], ["mkcorpstat_norevive", 230, 'i8'], ["mesg_given", 232, 'i32'], ["mtarget", 240, 'ptr'], ["marcher", 248, 'ptr'], ["m_using", 256, 'i8'], ["m", 264, { rec: $T.musable }], ["mapped_menu_cmds", 304, { arr: 'i8', n: 33, es: 1 }], ["mapped_menu_op", 337, { arr: 'i8', n: 33, es: 1 }], ["max_regions", 372, 'i32'], ["mentioned_water", 376, 'i8'], ["havestate", 377, 'i8']]; }   // C layout, for save files (serial.js)
     constructor() {
+        const $m = new ArrayBuffer(384);   // the scalar-array fields' bytes (C layout)
         this.mkot_trap_warn_count = 0;
         this.mrank_sz = 0;
         this.multi = 0;
         this.multi_reason = null;
-        this.multireasonbuf = new Int8Array(128);
+        this.multireasonbuf = new Int8Array($m, 24, 128);
         this.m_shot = new $T.multishot();
         this.mrg_to_wielded = 0;
         this.menu_colorings = null;
@@ -4678,8 +4692,8 @@ export class instance_globals_m {
         this.marcher = null;
         this.m_using = 0;
         this.m = new $T.musable();
-        this.mapped_menu_cmds = new Int8Array(33);
-        this.mapped_menu_op = new Int8Array(33);
+        this.mapped_menu_cmds = new Int8Array($m, 304, 33);
+        this.mapped_menu_op = new Int8Array($m, 337, 33);
         this.max_regions = 0;
         this.mentioned_water = 0;
         this.havestate = 0;
@@ -4775,6 +4789,7 @@ export class instance_globals_o {
     static $size = 560;   // sizeof: lets the runtime turn byte counts into element counts
     static $fields() { return [["objs_deleted", 0, 'ptr'], ["occupants", 8, { arr: { rec: $T.entity }, n: 2, es: 24 }], ["occupation", 56, 'ptr'], ["occtime", 64, 'i32'], ["otg_temp", 68, 'i32'], ["otg_otmp", 72, 'ptr'], ["occtxt", 80, 'ptr'], ["ov_primary_syms", 88, { arr: 'u8', n: 196, es: 1 }], ["ov_rogue_syms", 284, { arr: 'u8', n: 196, es: 1 }], ["only", 480, { rec: $T.nhcoord }], ["oclass_prob_totals", 484, { arr: 'i16', n: 18, es: 2 }], ["opt_phase", 520, 'u32'], ["opt_initial", 524, 'i8'], ["opt_from_file", 525, 'i8'], ["opt_need_redraw", 526, 'i8'], ["opt_need_glyph_reset", 527, 'i8'], ["opt_need_promptstyle", 528, 'i8'], ["opt_reset_customcolors", 529, 'i8'], ["opt_reset_customsymbols", 530, 'i8'], ["opt_update_basic_palette", 531, 'i8'], ["opt_symset_changed", 532, 'i8'], ["oldcap", 536, 'i32'], ["oldfruit", 544, 'ptr'], ["oracle_flg", 552, 'i32'], ["override_confirmation", 556, 'i8'], ["obj_zapped", 557, 'i8'], ["havestate", 558, 'i8']]; }   // C layout, for save files (serial.js)
     constructor() {
+        const $m = new ArrayBuffer(560);   // the scalar-array fields' bytes (C layout)
         this.objs_deleted = null;
         this.occupants = $c.recArray($T.entity, 2);
         this.occupation = null;
@@ -4782,10 +4797,10 @@ export class instance_globals_o {
         this.otg_temp = 0;
         this.otg_otmp = null;
         this.occtxt = null;
-        this.ov_primary_syms = new Uint8Array(196);
-        this.ov_rogue_syms = new Uint8Array(196);
+        this.ov_primary_syms = new Uint8Array($m, 88, 196);
+        this.ov_rogue_syms = new Uint8Array($m, 284, 196);
         this.only = new $T.nhcoord();
-        this.oclass_prob_totals = new Int16Array(18);
+        this.oclass_prob_totals = new Int16Array($m, 484, 18);
         this.opt_phase = 0;
         this.opt_initial = 0;
         this.opt_from_file = 0;
@@ -4843,6 +4858,7 @@ export class instance_globals_p {
     static $size = 536;   // sizeof: lets the runtime turn byte counts into element counts
     static $fields() { return [["polearm_range_min", 0, 'i32'], ["polearm_range_max", 4, 'i32'], ["plnamelen", 8, 'i32'], ["pl_race", 12, 'i8'], ["plinemsg_types", 16, 'ptr'], ["petname_used", 24, 'i32'], ["preferred_pet", 28, 'i8'], ["primary_syms", 29, { arr: 'u8', n: 196, es: 1 }], ["perm_invent_toggling_direction", 228, 'i32'], ["picked_filter", 232, 'i8'], ["pickup_encumbrance", 236, 'i32'], ["pline_flags", 240, 'u32'], ["prevmsg", 244, { arr: 'i8', n: 256, es: 1 }], ["potion_nothing", 500, 'i32'], ["potion_unkn", 504, 'i32'], ["p_aligntyp", 508, 'i8'], ["p_trouble", 512, 'i32'], ["p_type", 516, 'i32'], ["propellor", 520, 'ptr'], ["poly_zapped", 528, 'i32'], ["havestate", 532, 'i8']]; }   // C layout, for save files (serial.js)
     constructor() {
+        const $m = new ArrayBuffer(536);   // the scalar-array fields' bytes (C layout)
         this.polearm_range_min = 0;
         this.polearm_range_max = 0;
         this.plnamelen = 0;
@@ -4850,12 +4866,12 @@ export class instance_globals_p {
         this.plinemsg_types = null;
         this.petname_used = 0;
         this.preferred_pet = 0;
-        this.primary_syms = new Uint8Array(196);
+        this.primary_syms = new Uint8Array($m, 29, 196);
         this.perm_invent_toggling_direction = 0;
         this.picked_filter = 0;
         this.pickup_encumbrance = 0;
         this.pline_flags = 0;
-        this.prevmsg = new Int8Array(256);
+        this.prevmsg = new Int8Array($m, 244, 256);
         this.potion_nothing = 0;
         this.potion_unkn = 0;
         this.p_aligntyp = 0;
@@ -4911,12 +4927,13 @@ export class instance_globals_r {
     static $size = 408;   // sizeof: lets the runtime turn byte counts into element counts
     static $fields() { return [["rogue_syms", 0, { arr: 'u8', n: 196, es: 1 }], ["r", 196, { arr: { arr: { rec: $T.rogueroom }, n: 3, es: 16 }, n: 3, es: 48 }], ["ransacked", 340, 'i8'], ["regions", 344, 'ptr'], ["rip", 352, 'ptr'], ["role_pa", 360, { arr: 'i8', n: 4, es: 1 }], ["role_post_attribs", 364, 'i8'], ["rfilter", 366, { rec: $T.role_filter }], ["repo", 384, { rec: $T.repo }], ["havestate", 400, 'i8']]; }   // C layout, for save files (serial.js)
     constructor() {
-        this.rogue_syms = new Uint8Array(196);
+        const $m = new ArrayBuffer(408);   // the scalar-array fields' bytes (C layout)
+        this.rogue_syms = new Uint8Array($m, 0, 196);
         this.r = $c.arrayOf(3, () => $c.recArray($T.rogueroom, 3));
         this.ransacked = 0;
         this.regions = null;
         this.rip = null;
-        this.role_pa = new Int8Array(4);
+        this.role_pa = new Int8Array($m, 360, 4);
         this.role_post_attribs = 0;
         this.rfilter = new $T.role_filter();
         this.repo = new $T.repo();
@@ -4947,18 +4964,19 @@ export class instance_globals_s {
     static $size = 1408;   // sizeof: lets the runtime turn byte counts into element counts
     static $fields() { return [["spec_dbon_applies", 0, 'i32'], ["stairs", 8, 'ptr'], ["smeq", 16, { arr: 'i32', n: 41, es: 4 }], ["stoned", 180, 'i8'], ["subrooms", 184, 'ptr'], ["save_dlevel", 192, { rec: $T.d_level }], ["symset", 200, { arr: { rec: $T.symsetentry }, n: 2, es: 40 }], ["sym_customizations", 280, { arr: { arr: { rec: $T.symset_customization }, n: 4, es: 32 }, n: 3, es: 128 }], ["showsyms", 664, { arr: 'u8', n: 196, es: 1 }], ["symset_count", 860, 'i32'], ["symset_which_set", 864, 'i32'], ["SAVEF", 868, { arr: 'i8', n: 54, es: 1 }], ["sortlootmode", 924, 'u32'], ["skipdrin", 928, 'i8'], ["somebody_can_move", 929, 'i8'], ["symset_list", 936, 'ptr'], ["save_menucolors", 944, 'i8'], ["save_colorings", 952, 'ptr'], ["simple_options_help", 960, 'i8'], ["sellobj_first", 961, 'i8'], ["shop_filter", 962, 'i8'], ["saved_pline_index", 964, 'u32'], ["saved_plines", 968, { arr: 'ptr', n: 50, es: 8 }], ["sex_change_ok", 1368, 'i32'], ["sell_response", 1372, 'i8'], ["sell_how", 1376, 'i32'], ["spl_sortmode", 1380, 'i32'], ["spl_orderindx", 1384, 'ptr'], ["stealoid", 1392, 'u32'], ["stealmid", 1396, 'u32'], ["seethru", 1400, 'i32'], ["havestate", 1404, 'i8']]; }   // C layout, for save files (serial.js)
     constructor() {
+        const $m = new ArrayBuffer(1408);   // the scalar-array fields' bytes (C layout)
         this.spec_dbon_applies = 0;
         this.stairs = null;
-        this.smeq = new Int32Array(41);
+        this.smeq = new Int32Array($m, 16, 41);
         this.stoned = 0;
         this.subrooms = null;
         this.save_dlevel = new $T.d_level();
         this.symset = $c.recArray($T.symsetentry, 2);
         this.sym_customizations = $c.arrayOf(3, () => $c.recArray($T.symset_customization, 4));
-        this.showsyms = new Uint8Array(196);
+        this.showsyms = new Uint8Array($m, 664, 196);
         this.symset_count = 0;
         this.symset_which_set = 0;
-        this.SAVEF = new Int8Array(54);
+        this.SAVEF = new Int8Array($m, 868, 54);
         this.sortlootmode = 0;
         this.skipdrin = 0;
         this.somebody_can_move = 0;
@@ -5223,9 +5241,10 @@ export class instance_globals_saved_p {
     static $size = 96;   // sizeof: lets the runtime turn byte counts into element counts
     static $fields() { return [["plname", 0, { arr: 'i8', n: 32, es: 1 }], ["pl_character", 32, { arr: 'i8', n: 32, es: 1 }], ["pl_fruit", 64, { arr: 'i8', n: 32, es: 1 }]]; }   // C layout, for save files (serial.js)
     constructor() {
-        this.plname = new Int8Array(32);
-        this.pl_character = new Int8Array(32);
-        this.pl_fruit = new Int8Array(32);
+        const $m = new ArrayBuffer(96);   // the scalar-array fields' bytes (C layout)
+        this.plname = new Int8Array($m, 0, 32);
+        this.pl_character = new Int8Array($m, 32, 32);
+        this.pl_fruit = new Int8Array($m, 64, 32);
     }
     $copyFrom(s) {
         this.plname.set(s.plname);
@@ -5443,14 +5462,15 @@ export class instance_globals_v {
     static $size = 200;   // sizeof: lets the runtime turn byte counts into element counts
     static $fields() { return [["valset", 0, { arr: 'i8', n: 27, es: 1 }], ["valuables", 32, { arr: { rec: $T.val_list }, n: 3, es: 16 }], ["vis", 80, 'i8'], ["vault_x", 82, 'i16'], ["vault_y", 84, 'i16'], ["vamp_rise_msg", 86, 'i8'], ["val_for_n_or_more", 88, 'i64'], ["valid_menu_classes", 96, { arr: 'i8', n: 24, es: 1 }], ["viz_array", 120, 'ptr'], ["viz_rmin", 128, 'ptr'], ["viz_rmax", 136, 'ptr'], ["vision_full_recalc", 144, 'i8'], ["voice", 152, { rec: $T.sound_voice }], ["havestate", 192, 'i8']]; }   // C layout, for save files (serial.js)
     constructor() {
-        this.valset = new Int8Array(27);
+        const $m = new ArrayBuffer(200);   // the scalar-array fields' bytes (C layout)
+        this.valset = new Int8Array($m, 0, 27);
         this.valuables = $c.recArray($T.val_list, 3);
         this.vis = 0;
         this.vault_x = 0;
         this.vault_y = 0;
         this.vamp_rise_msg = 0;
         this.val_for_n_or_more = 0;
-        this.valid_menu_classes = new Int8Array(24);
+        this.valid_menu_classes = new Int8Array($m, 96, 24);
         this.viz_array = null;
         this.viz_rmin = null;
         this.viz_rmax = null;
@@ -5485,11 +5505,12 @@ export class instance_globals_w {
     static $size = 192;   // sizeof: lets the runtime turn byte counts into element counts
     static $fields() { return [["warn_obj_cnt", 0, 'i32'], ["wailmsg", 8, 'i64'], ["wasinwater", 16, 'u8'], ["warnsyms", 17, { arr: 'u8', n: 6, es: 1 }], ["wizkit", 23, { arr: 'i8', n: 128, es: 1 }], ["wc", 152, 'i32'], ["wportal", 160, 'ptr'], ["wsettings", 168, { rec: $T.win_settings }], ["were_changes", 176, 'i64'], ["havestate", 184, 'i8']]; }   // C layout, for save files (serial.js)
     constructor() {
+        const $m = new ArrayBuffer(192);   // the scalar-array fields' bytes (C layout)
         this.warn_obj_cnt = 0;
         this.wailmsg = 0;
         this.wasinwater = 0;
-        this.warnsyms = new Uint8Array(6);
-        this.wizkit = new Int8Array(128);
+        this.warnsyms = new Uint8Array($m, 17, 6);
+        this.wizkit = new Int8Array($m, 23, 128);
         this.wc = 0;
         this.wportal = null;
         this.wsettings = new $T.win_settings();
@@ -5723,10 +5744,11 @@ export class lchoice {
     static $size = 2056;   // sizeof: lets the runtime turn byte counts into element counts
     static $fields() { return [["idx", 0, 'i32'], ["lev", 4, { arr: 'i8', n: 512, es: 1 }], ["playerlev", 516, { arr: 'i8', n: 512, es: 1 }], ["dgn", 1028, { arr: 'i16', n: 512, es: 2 }], ["menuletter", 2052, 'i8']]; }   // C layout, for save files (serial.js)
     constructor() {
+        const $m = new ArrayBuffer(2056);   // the scalar-array fields' bytes (C layout)
         this.idx = 0;
-        this.lev = new Int8Array(512);
-        this.playerlev = new Int8Array(512);
-        this.dgn = new Int16Array(512);
+        this.lev = new Int8Array($m, 4, 512);
+        this.playerlev = new Int8Array($m, 516, 512);
+        this.dgn = new Int16Array($m, 1028, 512);
         this.menuletter = 0;
     }
     $copyFrom(s) {
@@ -8676,6 +8698,7 @@ export class sysopt_s {
     static $size = 184;   // sizeof: lets the runtime turn byte counts into element counts
     static $fields() { return [["support", 0, 'ptr'], ["recover", 8, 'ptr'], ["wizards", 16, 'ptr'], ["fmtd_wizard_list", 24, 'ptr'], ["explorers", 32, 'ptr'], ["shellers", 40, 'ptr'], ["genericusers", 48, 'ptr'], ["debugfiles", 56, 'ptr'], ["msghandler", 64, 'ptr'], ["env_dbgfl", 72, 'i32'], ["maxplayers", 76, 'i32'], ["seduce", 80, 'i32'], ["check_save_uid", 84, 'i32'], ["check_plname", 88, 'i32'], ["bones_pools", 92, 'i32'], ["livelog", 96, 'i64'], ["persmax", 104, 'i32'], ["pers_is_uid", 108, 'i32'], ["entrymax", 112, 'i32'], ["pointsmin", 116, 'i32'], ["tt_oname_maxrank", 120, 'i32'], ["gdbpath", 128, 'ptr'], ["greppath", 136, 'ptr'], ["crashreporturl", 144, 'ptr'], ["panictrace_gdb", 152, 'i32'], ["panictrace_libc", 156, 'i32'], ["saveformat", 160, { arr: 'i32', n: 2, es: 4 }], ["bonesformat", 168, { arr: 'i32', n: 2, es: 4 }], ["accessibility", 176, 'i32'], ["hideusage", 180, 'i32']]; }   // C layout, for save files (serial.js)
     constructor() {
+        const $m = new ArrayBuffer(184);   // the scalar-array fields' bytes (C layout)
         this.support = null;
         this.recover = null;
         this.wizards = null;
@@ -8702,8 +8725,8 @@ export class sysopt_s {
         this.crashreporturl = null;
         this.panictrace_gdb = 0;
         this.panictrace_libc = 0;
-        this.saveformat = new Int32Array(2);
-        this.bonesformat = new Int32Array(2);
+        this.saveformat = new Int32Array($m, 160, 2);
+        this.bonesformat = new Int32Array($m, 168, 2);
         this.accessibility = 0;
         this.hideusage = 0;
     }
@@ -9082,6 +9105,7 @@ export class toptenentry {
     static $size = 208;   // sizeof: lets the runtime turn byte counts into element counts
     static $fields() { return [["tt_next", 0, 'ptr'], ["points", 8, 'i64'], ["deathdnum", 16, 'i32'], ["deathlev", 20, 'i32'], ["maxlvl", 24, 'i32'], ["hp", 28, 'i32'], ["maxhp", 32, 'i32'], ["deaths", 36, 'i32'], ["ver_major", 40, 'i32'], ["ver_minor", 44, 'i32'], ["patchlevel", 48, 'i32'], ["deathdate", 56, 'i64'], ["birthdate", 64, 'i64'], ["uid", 72, 'i32'], ["plrole", 76, { arr: 'i8', n: 4, es: 1 }], ["plrace", 80, { arr: 'i8', n: 4, es: 1 }], ["plgend", 84, { arr: 'i8', n: 4, es: 1 }], ["plalign", 88, { arr: 'i8', n: 4, es: 1 }], ["name", 92, { arr: 'i8', n: 11, es: 1 }], ["death", 103, { arr: 'i8', n: 101, es: 1 }]]; }   // C layout, for save files (serial.js)
     constructor() {
+        const $m = new ArrayBuffer(208);   // the scalar-array fields' bytes (C layout)
         this.tt_next = null;
         this.points = 0;
         this.deathdnum = 0;
@@ -9096,12 +9120,12 @@ export class toptenentry {
         this.deathdate = 0;
         this.birthdate = 0;
         this.uid = 0;
-        this.plrole = new Int8Array(4);
-        this.plrace = new Int8Array(4);
-        this.plgend = new Int8Array(4);
-        this.plalign = new Int8Array(4);
-        this.name = new Int8Array(11);
-        this.death = new Int8Array(101);
+        this.plrole = new Int8Array($m, 76, 4);
+        this.plrace = new Int8Array($m, 80, 4);
+        this.plgend = new Int8Array($m, 84, 4);
+        this.plalign = new Int8Array($m, 88, 4);
+        this.name = new Int8Array($m, 92, 11);
+        this.death = new Int8Array($m, 103, 101);
     }
     $copyFrom(s) {
         this.tt_next = s.tt_next;
@@ -10016,6 +10040,7 @@ export class you {
     static $size = 2760;   // sizeof: lets the runtime turn byte counts into element counts
     static $fields() { return [["ux", 0, 'i16'], ["uy", 2, 'i16'], ["dx", 4, 'i32'], ["dy", 8, 'i32'], ["dz", 12, 'i32'], ["tx", 16, 'i16'], ["ty", 18, 'i16'], ["ux0", 20, 'i16'], ["uy0", 22, 'i16'], ["uz", 24, { rec: $T.d_level }], ["uz0", 28, { rec: $T.d_level }], ["utolev", 32, { rec: $T.d_level }], ["utotype", 36, 'u8'], ["ucamefrom", 38, { rec: $T.d_level }], ["umoved", 42, 'i8'], ["last_str_turn", 44, 'i32'], ["ulevel", 48, 'i32'], ["ulevelmax", 52, 'i32'], ["ulevelpeak", 56, 'i32'], ["utrap", 60, 'u32'], ["utraptype", 64, 'u32'], ["urooms", 68, { arr: 'i8', n: 5, es: 1 }], ["urooms0", 73, { arr: 'i8', n: 5, es: 1 }], ["uentered", 78, { arr: 'i8', n: 5, es: 1 }], ["ushops", 83, { arr: 'i8', n: 5, es: 1 }], ["ushops0", 88, { arr: 'i8', n: 5, es: 1 }], ["ushops_entered", 93, { arr: 'i8', n: 5, es: 1 }], ["ushops_left", 98, { arr: 'i8', n: 5, es: 1 }], ["uhunger", 104, 'i32'], ["uhs", 108, 'u32'], ["uprops", 112, { arr: { rec: $T.prop }, n: 69, es: 24 }], ["umconf", 1768, 'u32'], ["usick_type", 1772, { bits: 2, unit: 4, bo: 0, signed: false }], ["nv_range", 1776, 'i32'], ["xray_range", 1780, 'i32'], ["unblind_telepat_range", 1784, 'i32'], ["bglyph", 1788, 'i32'], ["cglyph", 1792, 'i32'], ["bc_order", 1796, 'i32'], ["bc_felt", 1800, 'i32'], ["umonster", 1804, 'i32'], ["umonnum", 1808, 'i32'], ["mh", 1812, 'i32'], ["mhmax", 1816, 'i32'], ["mtimedone", 1820, 'i32'], ["macurr", 1824, { rec: $T.attribs }], ["mamax", 1830, { rec: $T.attribs }], ["ulycn", 1836, 'i32'], ["ucreamed", 1840, 'u32'], ["uswldtim", 1844, 'u32'], ["uswallow", 1848, { bits: 1, unit: 4, bo: 0, signed: false }], ["uinwater", 1848, { bits: 1, unit: 4, bo: 1, signed: false }], ["uundetected", 1848, { bits: 1, unit: 4, bo: 2, signed: false }], ["mfemale", 1848, { bits: 1, unit: 4, bo: 3, signed: false }], ["uinvulnerable", 1848, { bits: 1, unit: 4, bo: 4, signed: false }], ["uburied", 1848, { bits: 1, unit: 4, bo: 5, signed: false }], ["uedibility", 1848, { bits: 1, unit: 4, bo: 6, signed: false }], ["uhandedness", 1848, { bits: 1, unit: 4, bo: 7, signed: false }], ["udg_cnt", 1852, 'u32'], ["uevent", 1856, { rec: $T.u_event }], ["uhave", 1860, { rec: $T.u_have }], ["uconduct", 1864, { rec: $T.u_conduct }], ["uroleplay", 2008, { rec: $T.u_roleplay }], ["acurr", 2032, { rec: $T.attribs }], ["aexe", 2038, { rec: $T.attribs }], ["abon", 2044, { rec: $T.attribs }], ["amax", 2050, { rec: $T.attribs }], ["atemp", 2056, { rec: $T.attribs }], ["atime", 2062, { rec: $T.attribs }], ["ualign", 2068, { rec: $T.align }], ["ualignbase", 2080, { arr: 'i8', n: 2, es: 1 }], ["uluck", 2082, 'i8'], ["moreluck", 2083, 'i8'], ["uhitinc", 2084, 'i8'], ["udaminc", 2085, 'i8'], ["uac", 2086, 'i8'], ["uspellprot", 2087, 'u8'], ["usptime", 2088, 'u8'], ["uspmtime", 2089, 'u8'], ["uhp", 2092, 'i32'], ["uhpmax", 2096, 'i32'], ["uhppeak", 2100, 'i32'], ["uen", 2104, 'i32'], ["uenmax", 2108, 'i32'], ["uenpeak", 2112, 'i32'], ["uhpinc", 2116, { arr: 'i16', n: 30, es: 2 }], ["ueninc", 2176, { arr: 'i16', n: 30, es: 2 }], ["ugangr", 2236, 'i32'], ["ugifts", 2240, 'i32'], ["ublessed", 2244, 'i32'], ["ublesscnt", 2248, 'i32'], ["umoney0", 2256, 'i64'], ["uspare1", 2264, 'i64'], ["uexp", 2272, 'i64'], ["urexp", 2280, 'i64'], ["ucleansed", 2288, 'i64'], ["usleep", 2296, 'i64'], ["uinvault", 2304, 'i32'], ["ustuck", 2312, 'ptr'], ["usteed", 2320, 'ptr'], ["ustuck_mid", 2328, 'u32'], ["usteed_mid", 2332, 'u32'], ["ugallop", 2336, 'i64'], ["urideturns", 2344, 'i32'], ["umortality", 2348, 'i32'], ["ugrave_arise", 2352, 'i32'], ["weapon_slots", 2356, 'i32'], ["skills_advanced", 2360, 'i32'], ["skill_record", 2364, { arr: 'i16', n: 60, es: 2 }], ["weapon_skills", 2484, { arr: { rec: $T.skills }, n: 38, es: 6 }], ["twoweap", 2712, 'i8'], ["mcham", 2714, 'i16'], ["umovement", 2716, 'i16'], ["uachieved", 2718, { arr: 'i8', n: 32, es: 1 }], ["umonst", 2752, 'ptr']]; }   // C layout, for save files (serial.js)
     constructor() {
+        const $m = new ArrayBuffer(2760);   // the scalar-array fields' bytes (C layout)
         this.ux = 0;
         this.uy = 0;
         this.dx = 0;
@@ -10037,13 +10062,13 @@ export class you {
         this.ulevelpeak = 0;
         this.utrap = 0;
         this.utraptype = 0;
-        this.urooms = new Int8Array(5);
-        this.urooms0 = new Int8Array(5);
-        this.uentered = new Int8Array(5);
-        this.ushops = new Int8Array(5);
-        this.ushops0 = new Int8Array(5);
-        this.ushops_entered = new Int8Array(5);
-        this.ushops_left = new Int8Array(5);
+        this.urooms = new Int8Array($m, 68, 5);
+        this.urooms0 = new Int8Array($m, 73, 5);
+        this.uentered = new Int8Array($m, 78, 5);
+        this.ushops = new Int8Array($m, 83, 5);
+        this.ushops0 = new Int8Array($m, 88, 5);
+        this.ushops_entered = new Int8Array($m, 93, 5);
+        this.ushops_left = new Int8Array($m, 98, 5);
         this.uhunger = 0;
         this.uhs = 0;
         this.uprops = $c.recArray($T.prop, 69);
@@ -10086,7 +10111,7 @@ export class you {
         this.atemp = new $T.attribs();
         this.atime = new $T.attribs();
         this.ualign = new $T.align();
-        this.ualignbase = new Int8Array(2);
+        this.ualignbase = new Int8Array($m, 2080, 2);
         this.uluck = 0;
         this.moreluck = 0;
         this.uhitinc = 0;
@@ -10101,8 +10126,8 @@ export class you {
         this.uen = 0;
         this.uenmax = 0;
         this.uenpeak = 0;
-        this.uhpinc = new Int16Array(30);
-        this.ueninc = new Int16Array(30);
+        this.uhpinc = new Int16Array($m, 2116, 30);
+        this.ueninc = new Int16Array($m, 2176, 30);
         this.ugangr = 0;
         this.ugifts = 0;
         this.ublessed = 0;
@@ -10124,12 +10149,12 @@ export class you {
         this.ugrave_arise = 0;
         this.weapon_slots = 0;
         this.skills_advanced = 0;
-        this.skill_record = new Int16Array(60);
+        this.skill_record = new Int16Array($m, 2364, 60);
         this.weapon_skills = $c.recArray($T.skills, 38);
         this.twoweap = 0;
         this.mcham = 0;
         this.umovement = 0;
-        this.uachieved = new Int8Array(32);
+        this.uachieved = new Int8Array($m, 2718, 32);
         this.umonst = null;
     }
     $copyFrom(s) {

@@ -2,6 +2,7 @@
 import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
+import { docompress_file } from './../hand/files.js';
 import { timet_to_seconds } from './allmain.js';
 import { alloc } from './alloc.js';
 import { getnow, hhmmss, yyyymmdd } from './calendar.js';
@@ -9,7 +10,7 @@ import { config_error_add, config_error_done, config_error_init, get_configfile,
 import { flags, gb, gc, gd, gh, gi, gl, gn, gs, gu, gw, hands_obj, iflags, program_state, svc, svd, svl, svm, svn, svp, u } from './decl.js';
 import { In_quest, Is_special, maxledgerno } from './dungeon.js';
 import { after_opt_showpaths } from './earlyarg.js';
-import { done1, nh_terminate } from './end.js';
+import { nh_terminate } from './end.js';
 import { inv_cnt } from './hack.js';
 import { c_eos, copynchars, eos, fuzzymatch, mungspaces, nh_snprintf, s_suffix, strip_newline, strncmpi } from './hacklib.js';
 import { addinv, merge_choice } from './invent.js';
@@ -28,7 +29,6 @@ import { bclose, close_check } from './sfstruct.js';
 import { pmatch } from './strutil.js';
 import { clear_symsetentry, proc_symset_line } from './symbols.js';
 import { sysopt } from './sys.js';
-import { more } from './topl.js';
 import { sethanguphandler } from './unixmain.js';
 import { regularize } from './unixunix.js';
 import { validate, version_string } from './version.js';
@@ -687,93 +687,6 @@ async function redirect(filename, mode, stream, uncomp) {   // files.c:1563
         $c.fprintf($c.__stderrp, $c.lit("freopen of %s for %scompress failed; (%d) %s\n"), filename, uncomp ? $c.lit("un") : $c.lit(""), $c.__error().get(0), details);
         await nh_terminate(1);
     }
-}
-async function docompress_file(filename, uncomp) {   // files.c:1591
-    let cfn = null, xtra = null, cf = null, args = $c.nulls(10), i = 0, f = 0, childstatus = Int32Array.of(0), ln = 0, istty = 0, numbuf = new Int8Array(40), details = null;
-    cfn = null;
-    i = 0;
-    istty = $c.i8(windowprocs.wp_id === 1 ? 1 : 0);
-    xtra = $c.lit(".Z");
-    ln = $c.u32($c.addu64($c.strlen(filename), $c.strlen(xtra)));
-    cfn = $c.asArr(await alloc(ln + 1 >>> 0), Int8Array);
-    $c.__builtin___strcpy_chk(cfn, filename, -1);
-    $c.__builtin___strcat_chk(cfn, xtra, -1);
-    if (uncomp) {
-        if ((cf = $c.fopen(cfn, $c.lit("r"))) === null) {
-            $c.free(cfn);
-            return;
-        }
-        $c.fclose(cf);
-    }
-    args[0] = $c.lit("/usr/bin/compress");
-    if (uncomp) {
-        args[i = i + 1 | 0] = $c.lit("-d");
-    }
-    args[i = i + 1 | 0] = null;
-    if (istty) {
-        await windowprocs.win_mark_synch();
-    }
-    f = $c.fork();
-    if (f === 0) {
-        if (istty) {
-            await windowprocs.win_raw_print($c.lit(""));
-        }
-        if (uncomp) {
-            await redirect(cfn, $c.lit("r"), $c.__stdinp, uncomp);
-            await redirect(filename, $c.lit("w+"), $c.__stdoutp, uncomp);
-        } else {
-            await redirect(filename, $c.lit("r"), $c.__stdinp, uncomp);
-            await redirect(cfn, $c.lit("w+"), $c.__stdoutp, uncomp);
-        }
-        $c.setgid($c.getgid());
-        $c.setuid($c.getuid());
-        $c.execv(args[0], new $c.Ptr(args, 0));
-        $c.perror(null);
-        $c.fprintf($c.__stderrp, $c.lit("Exec to %scompress %s failed.\n"), uncomp ? $c.lit("un") : $c.lit(""), filename);
-        $c.free(cfn);
-        await nh_terminate(1);
-    } else if (f === -1) {
-        $c.perror(null);
-        await pline($c.lit("Fork to %scompress %s failed."), uncomp ? $c.lit("un") : $c.lit(""), filename);
-        $c.free(cfn);
-        return;
-    }
-    childstatus[0] = 1;
-    $c.signal(2, $c.ptrConst(1));
-    $c.signal(3, $c.ptrConst(1));
-    $c.__error().set(0, 0);
-    if ($c.wait(new $c.Ptr(childstatus, 0)) === -1) {
-        details = $c.strerror($c.__error().get(0));
-        if (!details) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(numbuf, 0), 0, 40, $c.lit("(%d)"), $c.__error().get(0));
-            details = new $c.Ptr(numbuf, 0);
-        }
-        await raw_printf($c.lit("Wait when %scompressing %s failed; %s."), uncomp ? $c.lit("un") : $c.lit(""), filename, details);
-    }
-    $c.signal(2, done1);
-    if (flags.debug) {
-        $c.signal(3, null);
-    }
-    if (childstatus[0] === 0) {
-        if (uncomp) {
-            $c.unlink(cfn);
-        } else {
-            $c.unlink(filename);
-        }
-    } else {
-        if (uncomp) {
-            await raw_printf($c.lit("Unable to uncompress %s"), filename);
-            $c.unlink(filename);
-        } else {
-            $c.unlink(cfn);
-        }
-        if (istty && iflags.window_inited) {
-            await windowprocs.win_clear_nhwindow($G.WIN_MESSAGE);
-            await more();
-        }
-    }
-    $c.free(cfn);
-    return;
 }
 export async function nh_compress(filename) {   // files.c:1787
     await docompress_file(filename, 0);
