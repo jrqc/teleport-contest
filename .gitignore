@@ -3,3 +3,5 @@ node_modules/
 
 # reference recorder build (tools/recorder-env/build-reference.sh)
 tools/recorder-env/build/
+# per-TU inventory intermediates (regenerate: transpiler/analysis/stage1.sh)
+transpiler/out/inventory/tu/

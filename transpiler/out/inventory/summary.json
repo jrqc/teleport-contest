@@ -1,0 +1,4920 @@
+{
+ "generated": "transpiler/analysis/aggregate.mjs",
+ "translationUnits": {
+  "total": 172,
+  "nethack": 140,
+  "lua": 32
+ },
+ "lines": [
+  {
+   "label": "src/*.c (game core, linked)",
+   "files": 130,
+   "lines": 250645,
+   "how": "full"
+  },
+  {
+   "label": "include/*.h",
+   "files": 90,
+   "lines": 31071,
+   "how": "full"
+  },
+  {
+   "label": "win/tty/*.c (linked)",
+   "files": 4,
+   "lines": 8445,
+   "how": "full"
+  },
+  {
+   "label": "sys/unix + sys/share (linked)",
+   "files": 6,
+   "lines": 2416,
+   "how": "full"
+  },
+  {
+   "label": "Lua 5.4.8 *.c (liblua.a: core + libs)",
+   "files": 32,
+   "lines": 23274,
+   "how": "full"
+  },
+  {
+   "label": "Lua 5.4.8 *.h",
+   "files": 27,
+   "lines": 5436,
+   "how": "full"
+  },
+  {
+   "label": "dat/*.lua (level/dungeon scripts)",
+   "files": 131,
+   "lines": 17223,
+   "how": "data + RNG scan"
+  }
+ ],
+ "functions": {
+  "nethack": {
+   "definitions": 5533,
+   "static": 2102,
+   "variadic": 23,
+   "withGoto": 172,
+   "gotos": 536,
+   "labels": 232,
+   "withStaticLocals": 349,
+   "staticLocals": 525,
+   "switches": 677,
+   "returnsStructByValue": 0,
+   "directCallSites": 60728,
+   "indirectCallSites": 1671
+  },
+  "lua": {
+   "definitions": 1059,
+   "static": 721,
+   "variadic": 5,
+   "withGoto": 8,
+   "gotos": 117,
+   "labels": 99,
+   "withStaticLocals": 15,
+   "staticLocals": 20,
+   "switches": 89,
+   "returnsStructByValue": 0,
+   "directCallSites": 4516,
+   "indirectCallSites": 17
+  }
+ },
+ "globals": {
+  "definitions": {
+   "nethack": 827,
+   "lua": 32
+  },
+  "staticLocals": 545
+ },
+ "records": {
+  "total": 427,
+  "structs": 404,
+  "unions": 23,
+  "withBitfields": 27,
+  "bitfields": 241,
+  "fnptrFields": 146
+ },
+ "sites": {
+  "union-def": {
+   "nethack": 5,
+   "lua": 19,
+   "inMacro": 0,
+   "topDetail": [
+    [
+     "<anon@1409>",
+     1
+    ],
+    [
+     "<anon@1490>",
+     1
+    ],
+    [
+     "<anon@165>",
+     1
+    ],
+    [
+     "<anon@181>",
+     1
+    ],
+    [
+     "<anon@193>",
+     1
+    ],
+    [
+     "<anon@196>",
+     1
+    ],
+    [
+     "<anon@391>",
+     1
+    ],
+    [
+     "<anon@483>",
+     1
+    ],
+    [
+     "<anon@49>",
+     1
+    ],
+    [
+     "<anon@629>",
+     1
+    ],
+    [
+     "<anon@633>",
+     1
+    ],
+    [
+     "<anon@70>",
+     1
+    ],
+    [
+     "Closure",
+     1
+    ],
+    [
+     "GCUnion",
+     1
+    ],
+    [
+     "Node",
+     1
+    ],
+    [
+     "StackValue",
+     1
+    ],
+    [
+     "UValue",
+     1
+    ],
+    [
+     "Value",
+     1
+    ],
+    [
+     "Vardesc",
+     1
+    ],
+    [
+     "any",
+     1
+    ],
+    [
+     "customization_content",
+     1
+    ],
+    [
+     "str_or_len",
+     1
+    ],
+    [
+     "vlaunchinfo",
+     1
+    ],
+    [
+     "vptrs",
+     1
+    ]
+   ],
+   "topFiles": [
+    [
+     "lib/lua-5.4.8/src/lobject.h",
+     10
+    ],
+    [
+     "lib/lua-5.4.8/src/lstate.h",
+     3
+    ],
+    [
+     "lib/lua-5.4.8/src/lparser.h",
+     2
+    ],
+    [
+     "lib/lua-5.4.8/src/lstrlib.c",
+     2
+    ],
+    [
+     "include/hack.h",
+     1
+    ],
+    [
+     "include/obj.h",
+     1
+    ],
+    [
+     "include/sym.h",
+     1
+    ],
+    [
+     "include/trap.h",
+     1
+    ],
+    [
+     "include/wintype.h",
+     1
+    ],
+    [
+     "lib/lua-5.4.8/src/lauxlib.h",
+     1
+    ],
+    [
+     "lib/lua-5.4.8/src/llex.h",
+     1
+    ]
+   ]
+  },
+  "ptr-arith": {
+   "nethack": 597,
+   "lua": 591,
+   "inMacro": 630,
+   "topDetail": [
+    [
+     "char + int",
+     307
+    ],
+    [
+     "union StackValue + int",
+     281
+    ],
+    [
+     "char - int",
+     262
+    ],
+    [
+     "char += int",
+     154
+    ],
+    [
+     "union StackValue - int",
+     79
+    ],
+    [
+     "struct TValue + int",
+     23
+    ],
+    [
+     "union StackValue -= int",
+     14
+    ],
+    [
+     "unsigned int += int",
+     14
+    ],
+    [
+     "unsigned int - int",
+     8
+    ],
+    [
+     "struct artifact + int",
+     5
+    ],
+    [
+     "union StackValue += int",
+     5
+    ],
+    [
+     "char -= int",
+     4
+    ],
+    [
+     "struct engr + int",
+     4
+    ],
+    [
+     "struct rm += int",
+     4
+    ],
+    [
+     "union Node += int",
+     4
+    ],
+    [
+     "short + int",
+     3
+    ],
+    [
+     "unsigned int -= int",
+     3
+    ],
+    [
+     "union Node + int",
+     2
+    ],
+    [
+     "unsigned int + int",
+     2
+    ],
+    [
+     "unsigned long long + int",
+     2
+    ],
+    [
+     "ptr + int",
+     1
+    ],
+    [
+     "ptr - int",
+     1
+    ],
+    [
+     "struct arti_info + int",
+     1
+    ],
+    [
+     "struct attack + int",
+     1
+    ],
+    [
+     "struct glyph_map_entry + int",
+     1
+    ]
+   ],
+   "topFiles": [
+    [
+     "lib/lua-5.4.8/src/lvm.c",
+     291
+    ],
+    [
+     "src/objnam.c",
+     285
+    ],
+    [
+     "lib/lua-5.4.8/src/lstrlib.c",
+     67
+    ],
+    [
+     "lib/lua-5.4.8/src/lapi.c",
+     55
+    ],
+    [
+     "lib/lua-5.4.8/src/ldo.c",
+     45
+    ],
+    [
+     "src/hacklib.c",
+     25
+    ],
+    [
+     "src/pager.c",
+     24
+    ],
+    [
+     "src/topten.c",
+     22
+    ],
+    [
+     "lib/lua-5.4.8/src/lobject.c",
+     20
+    ],
+    [
+     "src/options.c",
+     20
+    ],
+    [
+     "lib/lua-5.4.8/src/ltm.c",
+     19
+    ],
+    [
+     "lib/lua-5.4.8/src/ldebug.c",
+     17
+    ]
+   ]
+  },
+  "union-access": {
+   "nethack": 969,
+   "lua": 1900,
+   "inMacro": 1576,
+   "topDetail": [
+    [
+     "union <anon@tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lobject.h:165>.p",
+     489
+    ],
+    [
+     "union any.a_int",
+     342
+    ],
+    [
+     "union StackValue.val",
+     316
+    ],
+    [
+     "union Value.gc",
+     198
+    ],
+    [
+     "union vptrs.v_nexthere",
+     118
+    ],
+    [
+     "union any.a_char",
+     110
+    ],
+    [
+     "union Value.i",
+     103
+    ],
+    [
+     "union GCUnion.gc",
+     97
+    ],
+    [
+     "union <anon@tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lstate.h:181>.l",
+     81
+    ],
+    [
+     "union any.a_obj",
+     72
+    ],
+    [
+     "union Value.n",
+     69
+    ],
+    [
+     "union <anon@tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lparser.h:70>.info",
+     67
+    ],
+    [
+     "union GCUnion.h",
+     45
+    ],
+    [
+     "union vptrs.v_ocarry",
+     44
+    ],
+    [
+     "union any.a_long",
+     43
+    ],
+    [
+     "union Node.u",
+     39
+    ],
+    [
+     "union GCUnion.ts",
+     38
+    ],
+    [
+     "union GCUnion.cl",
+     37
+    ],
+    [
+     "union str_or_len.str",
+     32
+    ],
+    [
+     "union vptrs.v_ocontainer",
+     31
+    ],
+    [
+     "union Closure.l",
+     29
+    ],
+    [
+     "union any.a_void",
+     26
+    ],
+    [
+     "union Node.i_val",
+     25
+    ],
+    [
+     "union <anon@tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lparser.h:70>.ind",
+     23
+    ],
+    [
+     "union <anon@tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lobject.h:629>.p",
+     22
+    ]
+   ],
+   "topFiles": [
+    [
+     "lib/lua-5.4.8/src/lvm.c",
+     593
+    ],
+    [
+     "lib/lua-5.4.8/src/lapi.c",
+     357
+    ],
+    [
+     "src/botl.c",
+     198
+    ],
+    [
+     "lib/lua-5.4.8/src/ldo.c",
+     177
+    ],
+    [
+     "lib/lua-5.4.8/src/lgc.c",
+     135
+    ],
+    [
+     "lib/lua-5.4.8/src/ldebug.c",
+     121
+    ],
+    [
+     "lib/lua-5.4.8/src/lcode.c",
+     118
+    ],
+    [
+     "src/options.c",
+     98
+    ],
+    [
+     "lib/lua-5.4.8/src/ltable.c",
+     84
+    ],
+    [
+     "src/pickup.c",
+     78
+    ],
+    [
+     "lib/lua-5.4.8/src/lparser.c",
+     73
+    ],
+    [
+     "lib/lua-5.4.8/src/lfunc.c",
+     58
+    ]
+   ]
+  },
+  "ptr-compare": {
+   "nethack": 206,
+   "lua": 38,
+   "inMacro": 112,
+   "topDetail": [
+    [
+     "char < char",
+     117
+    ],
+    [
+     "char > char",
+     33
+    ],
+    [
+     "char >= char",
+     24
+    ],
+    [
+     "struct permonst >= struct permonst",
+     15
+    ],
+    [
+     "struct permonst <= struct permonst",
+     14
+    ],
+    [
+     "union StackValue < union StackValue",
+     12
+    ],
+    [
+     "char <= char",
+     5
+    ],
+    [
+     "union StackValue >= union StackValue",
+     5
+    ],
+    [
+     "union Node < union Node",
+     4
+    ],
+    [
+     "struct attack < struct attack",
+     3
+    ],
+    [
+     "struct bill_x < struct bill_x",
+     2
+    ],
+    [
+     "struct permonst < struct permonst",
+     2
+    ],
+    [
+     "union StackValue > union StackValue",
+     2
+    ],
+    [
+     "struct mkroom < struct mkroom",
+     1
+    ],
+    [
+     "struct permonst > struct permonst",
+     1
+    ],
+    [
+     "struct prop < struct prop",
+     1
+    ],
+    [
+     "union Node > union Node",
+     1
+    ],
+    [
+     "void < void",
+     1
+    ],
+    [
+     "void > void",
+     1
+    ]
+   ],
+   "topFiles": [
+    [
+     "src/objnam.c",
+     95
+    ],
+    [
+     "src/hacklib.c",
+     13
+    ],
+    [
+     "lib/lua-5.4.8/src/lstrlib.c",
+     10
+    ],
+    [
+     "src/mon.c",
+     8
+    ],
+    [
+     "src/topten.c",
+     7
+    ],
+    [
+     "lib/lua-5.4.8/src/lapi.c",
+     6
+    ],
+    [
+     "lib/lua-5.4.8/src/lgc.c",
+     6
+    ],
+    [
+     "src/do_name.c",
+     6
+    ],
+    [
+     "src/options.c",
+     6
+    ],
+    [
+     "src/pager.c",
+     6
+    ],
+    [
+     "lib/lua-5.4.8/src/ldo.c",
+     5
+    ],
+    [
+     "lib/lua-5.4.8/src/lfunc.c",
+     4
+    ]
+   ]
+  },
+  "addr-of": {
+   "nethack": 5165,
+   "lua": 1221,
+   "inMacro": 2197,
+   "topDetail": [
+    [
+     "field record",
+     2169
+    ],
+    [
+     "element record",
+     1464
+    ],
+    [
+     "var record",
+     1228
+    ],
+    [
+     "var scalar",
+     979
+    ],
+    [
+     "field scalar",
+     309
+    ],
+    [
+     "element scalar",
+     157
+    ],
+    [
+     "param record",
+     47
+    ],
+    [
+     "param scalar",
+     25
+    ],
+    [
+     "var function",
+     6
+    ],
+    [
+     "field array",
+     2
+    ]
+   ],
+   "topFiles": [
+    [
+     "src/uhitm.c",
+     256
+    ],
+    [
+     "lib/lua-5.4.8/src/lvm.c",
+     211
+    ],
+    [
+     "src/sp_lev.c",
+     194
+    ],
+    [
+     "src/dungeon.c",
+     181
+    ],
+    [
+     "src/mon.c",
+     181
+    ],
+    [
+     "src/trap.c",
+     177
+    ],
+    [
+     "src/options.c",
+     151
+    ],
+    [
+     "lib/lua-5.4.8/src/lapi.c",
+     144
+    ],
+    [
+     "src/zap.c",
+     139
+    ],
+    [
+     "lib/lua-5.4.8/src/lgc.c",
+     133
+    ],
+    [
+     "lib/lua-5.4.8/src/lparser.c",
+     117
+    ],
+    [
+     "src/pickup.c",
+     108
+    ]
+   ]
+  },
+  "ptr-cast": {
+   "nethack": 1029,
+   "lua": 417,
+   "inMacro": 743,
+   "topDetail": [
+    [
+     "char -> void",
+     196
+    ],
+    [
+     "struct GCObject -> union GCUnion",
+     165
+    ],
+    [
+     "struct mi -> void",
+     100
+    ],
+    [
+     "long -> char",
+     43
+    ],
+    [
+     "union StackValue -> char",
+     35
+    ],
+    [
+     "void -> char",
+     35
+    ],
+    [
+     "struct TString -> union GCUnion",
+     30
+    ],
+    [
+     "struct Table -> union GCUnion",
+     28
+    ],
+    [
+     "char -> union StackValue",
+     20
+    ],
+    [
+     "int -> void",
+     19
+    ],
+    [
+     "struct monst -> void",
+     19
+    ],
+    [
+     "void -> int",
+     14
+    ],
+    [
+     "struct Proto -> union GCUnion",
+     13
+    ],
+    [
+     "struct fe -> void",
+     13
+    ],
+    [
+     "struct obj -> void",
+     13
+    ],
+    [
+     "ptr -> void",
+     12
+    ],
+    [
+     "short -> void",
+     12
+    ],
+    [
+     "void -> struct luaL_Stream",
+     11
+    ],
+    [
+     "long -> void",
+     10
+    ],
+    [
+     "struct UpVal -> union GCUnion",
+     9
+    ],
+    [
+     "struct lua_State -> union GCUnion",
+     9
+    ],
+    [
+     "long -> ptr",
+     8
+    ],
+    [
+     "struct LClosure -> union GCUnion",
+     8
+    ],
+    [
+     "struct ls_t -> void",
+     8
+    ],
+    [
+     "struct nhcoord -> void",
+     8
+    ]
+   ],
+   "topFiles": [
+    [
+     "include/sfmacros.h",
+     214
+    ],
+    [
+     "lib/lua-5.4.8/src/lapi.c",
+     68
+    ],
+    [
+     "lib/lua-5.4.8/src/lgc.c",
+     64
+    ],
+    [
+     "lib/lua-5.4.8/src/ldo.c",
+     57
+    ],
+    [
+     "src/options.c",
+     56
+    ],
+    [
+     "lib/lua-5.4.8/src/lvm.c",
+     51
+    ],
+    [
+     "src/sp_lev.c",
+     38
+    ],
+    [
+     "src/dungeon.c",
+     34
+    ],
+    [
+     "src/botl.c",
+     30
+    ],
+    [
+     "win/tty/wintty.c",
+     30
+    ],
+    [
+     "lib/lua-5.4.8/src/lparser.c",
+     27
+    ],
+    [
+     "src/region.c",
+     27
+    ]
+   ]
+  },
+  "ptr-diff": {
+   "nethack": 128,
+   "lua": 90,
+   "inMacro": 118,
+   "topDetail": [
+    [
+     "char - char",
+     143
+    ],
+    [
+     "union StackValue - union StackValue",
+     35
+    ],
+    [
+     "struct mkroom - struct mkroom",
+     19
+    ],
+    [
+     "struct permonst - struct permonst",
+     6
+    ],
+    [
+     "union Node - union Node",
+     5
+    ],
+    [
+     "unsigned int - unsigned int",
+     3
+    ],
+    [
+     "struct prop - struct prop",
+     2
+    ],
+    [
+     "struct artifact - struct artifact",
+     1
+    ],
+    [
+     "struct bill_x - struct bill_x",
+     1
+    ],
+    [
+     "struct dungeon - struct dungeon",
+     1
+    ],
+    [
+     "struct ext_func_tab - struct ext_func_tab",
+     1
+    ],
+    [
+     "struct shclass - struct shclass",
+     1
+    ]
+   ],
+   "topFiles": [
+    [
+     "src/objnam.c",
+     55
+    ],
+    [
+     "lib/lua-5.4.8/src/ldo.c",
+     32
+    ],
+    [
+     "lib/lua-5.4.8/src/lstrlib.c",
+     14
+    ],
+    [
+     "lib/lua-5.4.8/src/lapi.c",
+     7
+    ],
+    [
+     "src/mkroom.c",
+     6
+    ],
+    [
+     "src/options.c",
+     6
+    ],
+    [
+     "lib/lua-5.4.8/src/lobject.c",
+     5
+    ],
+    [
+     "lib/lua-5.4.8/src/ltable.c",
+     5
+    ],
+    [
+     "lib/lua-5.4.8/src/ltm.c",
+     5
+    ],
+    [
+     "src/mon.c",
+     5
+    ],
+    [
+     "lib/lua-5.4.8/src/lfunc.c",
+     4
+    ],
+    [
+     "lib/lua-5.4.8/src/loadlib.c",
+     4
+    ]
+   ]
+  },
+  "ptr-incdec": {
+   "nethack": 541,
+   "lua": 307,
+   "inMacro": 206,
+   "topDetail": [
+    [
+     "char ++",
+     470
+    ],
+    [
+     "unsigned int ++",
+     123
+    ],
+    [
+     "union StackValue ++",
+     54
+    ],
+    [
+     "char --",
+     42
+    ],
+    [
+     "union StackValue --",
+     22
+    ],
+    [
+     "struct ext_func_tab ++",
+     16
+    ],
+    [
+     "ptr ++",
+     15
+    ],
+    [
+     "struct mkroom ++",
+     13
+    ],
+    [
+     "struct bill_x ++",
+     9
+    ],
+    [
+     "struct rm ++",
+     8
+    ],
+    [
+     "struct artifact ++",
+     6
+    ],
+    [
+     "struct worn ++",
+     6
+    ],
+    [
+     "struct nhcoord ++",
+     5
+    ],
+    [
+     "struct sortloot_item ++",
+     5
+    ],
+    [
+     "short ++",
+     4
+    ],
+    [
+     "union Node ++",
+     4
+    ],
+    [
+     "unsigned int --",
+     4
+    ],
+    [
+     "struct attack ++",
+     3
+    ],
+    [
+     "struct val_list ++",
+     3
+    ],
+    [
+     "gbuf_entry ++",
+     2
+    ],
+    [
+     "struct Jitem ++",
+     2
+    ],
+    [
+     "struct alt_spellings ++",
+     2
+    ],
+    [
+     "struct def_skill ++",
+     2
+    ],
+    [
+     "struct icp ++",
+     2
+    ],
+    [
+     "struct innate ++",
+     2
+    ]
+   ],
+   "topFiles": [
+    [
+     "lib/lua-5.4.8/src/lvm.c",
+     131
+    ],
+    [
+     "src/options.c",
+     53
+    ],
+    [
+     "src/hacklib.c",
+     48
+    ],
+    [
+     "lib/lua-5.4.8/src/llex.c",
+     41
+    ],
+    [
+     "lib/lua-5.4.8/src/lapi.c",
+     38
+    ],
+    [
+     "lib/lua-5.4.8/src/lstrlib.c",
+     31
+    ],
+    [
+     "src/objnam.c",
+     30
+    ],
+    [
+     "src/botl.c",
+     26
+    ],
+    [
+     "src/cmd.c",
+     25
+    ],
+    [
+     "src/invent.c",
+     24
+    ],
+    [
+     "win/tty/wintty.c",
+     20
+    ],
+    [
+     "src/cfgfiles.c",
+     18
+    ]
+   ]
+  },
+  "fnptr-param": {
+   "nethack": 57,
+   "lua": 17,
+   "inMacro": 0,
+   "topDetail": [
+    [
+     "fn: int (*)(void)",
+     7
+    ],
+    [
+     "fn: int (*)(int)",
+     5
+    ],
+    [
+     "fhito: int (*)(struct obj *, struct obj *)",
+     4
+    ],
+    [
+     "func: char *(*)(struct obj *)",
+     4
+    ],
+    [
+     "func: void (*)(short, short, void *)",
+     4
+    ],
+    [
+     "fn: int (*)(struct obj *)",
+     3
+    ],
+    [
+     "k: int (*)(struct lua_State *, int, long)",
+     3
+    ],
+    [
+     "proc: signed char (*)(char *)",
+     3
+    ],
+    [
+     "altfunc: char *(*)(struct obj *)",
+     2
+    ],
+    [
+     "bfunc: signed char (*)(struct monst *)",
+     2
+    ],
+    [
+     "f: void *(*)(void *, void *, unsigned long, unsigned long)",
+     2
+    ],
+    [
+     "fhitm: int (*)(struct monst *, struct obj *)",
+     2
+    ],
+    [
+     "filterfunc: signed char (*)(struct obj *)",
+     2
+    ],
+    [
+     "reader: const char *(*)(struct lua_State *, void *, unsigned long *)",
+     2
+    ],
+    [
+     "rng: int (*)(int)",
+     2
+    ],
+    [
+     "allow: signed char (*)(struct obj *)",
+     1
+    ],
+    [
+     "bfunc: signed char (*)(struct monst *, short, short)",
+     1
+    ],
+    [
+     "check_proc: signed char (*)(void *, short, short)",
+     1
+    ],
+    [
+     "ckfn: int (*)(struct obj *)",
+     1
+    ],
+    [
+     "compar: int (*)(const void *, const void *)",
+     1
+    ],
+    [
+     "f: int (*)(short, short)",
+     1
+    ],
+    [
+     "f: int (*)(struct lua_State *)",
+     1
+    ],
+    [
+     "f: void (*)(struct lua_State *, void *)",
+     1
+    ],
+    [
+     "f: void (*)(void *, const char *, int)",
+     1
+    ],
+    [
+     "filter: signed char (*)(short, short)",
+     1
+    ]
+   ],
+   "topFiles": [
+    [
+     "lib/lua-5.4.8/src/lapi.c",
+     8
+    ],
+    [
+     "src/cmd.c",
+     7
+    ],
+    [
+     "src/invent.c",
+     6
+    ],
+    [
+     "src/objnam.c",
+     6
+    ],
+    [
+     "src/rnd.c",
+     5
+    ],
+    [
+     "lib/lua-5.4.8/src/ldo.c",
+     4
+    ],
+    [
+     "src/mon.c",
+     4
+    ],
+    [
+     "src/cfgfiles.c",
+     3
+    ],
+    [
+     "src/getpos.c",
+     3
+    ],
+    [
+     "src/muse.c",
+     3
+    ],
+    [
+     "src/pickup.c",
+     3
+    ],
+    [
+     "src/zap.c",
+     3
+    ]
+   ]
+  },
+  "fnptr-var": {
+   "nethack": 27,
+   "lua": 12,
+   "inMacro": 0,
+   "topDetail": [
+    [
+     "func: void (*)(const char *, ...)",
+     4
+    ],
+    [
+     "cleanup_func: void (*)(union any *, long)",
+     3
+    ],
+    [
+     "f: int (*)(struct lua_State *)",
+     3
+    ],
+    [
+     "errfunc: void (*)(const char *, ...)",
+     2
+    ],
+    [
+     "func: int (*)(void)",
+     2
+    ],
+    [
+     "hook: void (*)(struct lua_State *, struct lua_Debug *)",
+     2
+    ],
+    [
+     "ofilter: signed char (*)(struct obj *)",
+     2
+    ],
+    [
+     "actionfunc: int (*)(struct obj *)",
+     1
+    ],
+    [
+     "adjust_filter: int (*)(struct obj *)",
+     1
+    ],
+    [
+     "allocf: void *(*)(void *, void *, unsigned long, unsigned long)",
+     1
+    ],
+    [
+     "buzzfn: void (*)(int, int, short, short, int, int)",
+     1
+    ],
+    [
+     "cf: volatile int (*)(struct lua_State *)",
+     1
+    ],
+    [
+     "checkfunc: int (*)(struct obj *)",
+     1
+    ],
+    [
+     "ckfn: int (*)(struct obj *)",
+     1
+    ],
+    [
+     "f: int (*)(void)",
+     1
+    ],
+    [
+     "f: void *(*)(void *, void *, unsigned long, unsigned long)",
+     1
+    ],
+    [
+     "filter: signed char (*)(struct obj *)",
+     1
+    ],
+    [
+     "fnc: int (*)(void)",
+     1
+    ],
+    [
+     "func: void (*)(struct lua_State *, struct lua_Debug *)",
+     1
+    ],
+    [
+     "func: void (*)(struct obj *)",
+     1
+    ],
+    [
+     "inout_func: int (*)(struct obj *)",
+     1
+    ],
+    [
+     "loc_f: int (*)(short, short)",
+     1
+    ],
+    [
+     "no_hook: signed char (*)(char *)",
+     1
+    ],
+    [
+     "old: int (*)(struct lua_State *)",
+     1
+    ],
+    [
+     "old_getvalid: signed char (*)(short, short)",
+     1
+    ]
+   ],
+   "topFiles": [
+    [
+     "src/invent.c",
+     4
+    ],
+    [
+     "src/pickup.c",
+     4
+    ],
+    [
+     "lib/lua-5.4.8/src/loadlib.c",
+     3
+    ],
+    [
+     "src/cmd.c",
+     3
+    ],
+    [
+     "src/timeout.c",
+     3
+    ],
+    [
+     "lib/lua-5.4.8/src/lapi.c",
+     2
+    ],
+    [
+     "lib/lua-5.4.8/src/ldblib.c",
+     2
+    ],
+    [
+     "lib/lua-5.4.8/src/lauxlib.c",
+     1
+    ],
+    [
+     "lib/lua-5.4.8/src/ldo.c",
+     1
+    ],
+    [
+     "lib/lua-5.4.8/src/liolib.c",
+     1
+    ],
+    [
+     "lib/lua-5.4.8/src/lstate.c",
+     1
+    ],
+    [
+     "lib/lua-5.4.8/src/ltable.c",
+     1
+    ]
+   ]
+  },
+  "ptr-cast-implicit": {
+   "nethack": 1372,
+   "lua": 294,
+   "inMacro": 1413,
+   "topDetail": [
+    [
+     "char -> void",
+     1173
+    ],
+    [
+     "void -> char",
+     86
+    ],
+    [
+     "void -> struct lua_State",
+     62
+    ],
+    [
+     "int -> void",
+     20
+    ],
+    [
+     "void -> struct obj",
+     16
+    ],
+    [
+     "void -> struct CallInfo",
+     14
+    ],
+    [
+     "ptr -> void",
+     13
+    ],
+    [
+     "struct _cmd_queue -> void",
+     12
+    ],
+    [
+     "void -> struct Table",
+     12
+    ],
+    [
+     "void -> struct GCObject",
+     11
+    ],
+    [
+     "void -> short",
+     10
+    ],
+    [
+     "void -> struct __sFILE",
+     10
+    ],
+    [
+     "NhRegion -> void",
+     9
+    ],
+    [
+     "struct lua_State -> void",
+     9
+    ],
+    [
+     "void -> struct TValue",
+     9
+    ],
+    [
+     "void -> struct UpVal",
+     8
+    ],
+    [
+     "void -> struct monst",
+     7
+    ],
+    [
+     "void -> union Node",
+     7
+    ],
+    [
+     "short -> void",
+     6
+    ],
+    [
+     "struct TValue -> void",
+     6
+    ],
+    [
+     "unsigned int -> void",
+     6
+    ],
+    [
+     "void -> ptr",
+     6
+    ],
+    [
+     "void -> struct TString",
+     6
+    ],
+    [
+     "unsigned long -> void",
+     5
+    ],
+    [
+     "struct monst -> void",
+     4
+    ]
+   ],
+   "topFiles": [
+    [
+     "src/objnam.c",
+     168
+    ],
+    [
+     "src/options.c",
+     133
+    ],
+    [
+     "src/pager.c",
+     109
+    ],
+    [
+     "src/nhlua.c",
+     101
+    ],
+    [
+     "src/insight.c",
+     82
+    ],
+    [
+     "src/botl.c",
+     65
+    ],
+    [
+     "src/do_name.c",
+     44
+    ],
+    [
+     "lib/lua-5.4.8/src/lstrlib.c",
+     35
+    ],
+    [
+     "win/tty/termcap.c",
+     32
+    ],
+    [
+     "src/cmd.c",
+     29
+    ],
+    [
+     "lib/lua-5.4.8/src/lgc.c",
+     27
+    ],
+    [
+     "src/topten.c",
+     27
+    ]
+   ]
+  },
+  "offsetof": {
+   "nethack": 0,
+   "lua": 16,
+   "inMacro": 16,
+   "topDetail": [
+    [
+     "unsigned long",
+     16
+    ]
+   ],
+   "topFiles": [
+    [
+     "lib/lua-5.4.8/src/lgc.c",
+     5
+    ],
+    [
+     "lib/lua-5.4.8/src/lstate.c",
+     3
+    ],
+    [
+     "lib/lua-5.4.8/src/lstring.c",
+     3
+    ],
+    [
+     "lib/lua-5.4.8/src/lapi.c",
+     2
+    ],
+    [
+     "lib/lua-5.4.8/src/lfunc.c",
+     2
+    ],
+    [
+     "lib/lua-5.4.8/src/lstrlib.c",
+     1
+    ]
+   ]
+  },
+  "sizeof": {
+   "nethack": 1749,
+   "lua": 363,
+   "inMacro": 1702,
+   "topDetail": [
+    [
+     "char[256] @nh_snprintf",
+     114
+    ],
+    [
+     "const char *const @-",
+     48
+    ],
+    [
+     "const char *const @rn2",
+     29
+    ],
+    [
+     "char[128] @nh_snprintf",
+     28
+    ],
+    [
+     "char[20] @nh_snprintf",
+     28
+    ],
+    [
+     "char[256] @-",
+     25
+    ],
+    [
+     "unsigned long @-",
+     23
+    ],
+    [
+     "const struct Role @-",
+     21
+    ],
+    [
+     "const struct Role[14] @-",
+     21
+    ],
+    [
+     "char @__builtin___memcpy_chk",
+     20
+    ],
+    [
+     "int @-",
+     19
+    ],
+    [
+     "char[256] @fgets",
+     18
+    ],
+    [
+     "long long @-",
+     16
+    ],
+    [
+     "char[1] @-",
+     15
+    ],
+    [
+     "char[256] @copynchars",
+     15
+    ],
+    [
+     "const struct Race @-",
+     15
+    ],
+    [
+     "const struct Race[6] @-",
+     15
+    ],
+    [
+     "const struct luaL_Reg @lua_createtable",
+     15
+    ],
+    [
+     "char @-",
+     14
+    ],
+    [
+     "double @luaL_checkversion_",
+     13
+    ],
+    [
+     "long long @luaL_checkversion_",
+     13
+    ],
+    [
+     "const int @rn2",
+     11
+    ],
+    [
+     "struct enum_dump @-",
+     10
+    ],
+    [
+     "const char *const[5] @-",
+     9
+    ],
+    [
+     "const int @-",
+     9
+    ]
+   ],
+   "topFiles": [
+    [
+     "include/sfmacros.h",
+     256
+    ],
+    [
+     "src/options.c",
+     119
+    ],
+    [
+     "src/role.c",
+     80
+    ],
+    [
+     "src/botl.c",
+     64
+    ],
+    [
+     "lib/lua-5.4.8/src/lstrlib.c",
+     51
+    ],
+    [
+     "src/timeout.c",
+     46
+    ],
+    [
+     "lib/lua-5.4.8/src/lparser.c",
+     41
+    ],
+    [
+     "src/objnam.c",
+     40
+    ],
+    [
+     "lib/lua-5.4.8/src/lundump.c",
+     38
+    ],
+    [
+     "src/files.c",
+     38
+    ],
+    [
+     "src/sfbase.c",
+     37
+    ],
+    [
+     "src/wizcmds.c",
+     32
+    ]
+   ]
+  },
+  "int-to-ptr": {
+   "nethack": 19,
+   "lua": 1,
+   "inMacro": 16,
+   "topDetail": [
+    [
+     "int -> void (*)(int)",
+     15
+    ],
+    [
+     "int -> struct bill_x *",
+     4
+    ],
+    [
+     "unsigned long -> void *",
+     1
+    ]
+   ],
+   "topFiles": [
+    [
+     "src/end.c",
+     4
+    ],
+    [
+     "src/files.c",
+     4
+    ],
+    [
+     "src/shk.c",
+     3
+    ],
+    [
+     "src/save.c",
+     2
+    ],
+    [
+     "sys/unix/unixmain.c",
+     2
+    ],
+    [
+     "sys/unix/unixunix.c",
+     2
+    ],
+    [
+     "lib/lua-5.4.8/src/lapi.c",
+     1
+    ],
+    [
+     "src/zap.c",
+     1
+    ],
+    [
+     "sys/share/ioctl.c",
+     1
+    ]
+   ]
+  },
+  "ptr-to-int": {
+   "nethack": 0,
+   "lua": 9,
+   "inMacro": 8,
+   "topDetail": [
+    [
+     "struct lua_State * -> unsigned long",
+     2
+    ],
+    [
+     "const char * -> unsigned long",
+     1
+    ],
+    [
+     "const int (*)(struct lua_State *) -> unsigned long",
+     1
+    ],
+    [
+     "int (*)(struct lua_State *) -> unsigned long",
+     1
+    ],
+    [
+     "struct GCObject * -> unsigned long",
+     1
+    ],
+    [
+     "struct lua_State *(*)(void *(*)(void *, void *, unsigned long, unsigned long), void *) -> unsigned long",
+     1
+    ],
+    [
+     "unsigned int * -> unsigned long",
+     1
+    ],
+    [
+     "void * -> unsigned long",
+     1
+    ]
+   ],
+   "topFiles": [
+    [
+     "lib/lua-5.4.8/src/lstate.c",
+     3
+    ],
+    [
+     "lib/lua-5.4.8/src/ltable.c",
+     3
+    ],
+    [
+     "lib/lua-5.4.8/src/lapi.c",
+     1
+    ],
+    [
+     "lib/lua-5.4.8/src/lmathlib.c",
+     1
+    ],
+    [
+     "lib/lua-5.4.8/src/lstring.c",
+     1
+    ]
+   ]
+  },
+  "va_start": {
+   "nethack": 23,
+   "lua": 5,
+   "inMacro": 28,
+   "topDetail": [
+    [
+     "",
+     28
+    ]
+   ],
+   "topFiles": [
+    [
+     "src/pline.c",
+     19
+    ],
+    [
+     "lib/lua-5.4.8/src/lapi.c",
+     2
+    ],
+    [
+     "lib/lua-5.4.8/src/lauxlib.c",
+     1
+    ],
+    [
+     "lib/lua-5.4.8/src/ldebug.c",
+     1
+    ],
+    [
+     "lib/lua-5.4.8/src/lobject.c",
+     1
+    ],
+    [
+     "src/cfgfiles.c",
+     1
+    ],
+    [
+     "src/end.c",
+     1
+    ],
+    [
+     "src/hacklib.c",
+     1
+    ],
+    [
+     "sys/share/unixtty.c",
+     1
+    ]
+   ]
+  },
+  "va_arg": {
+   "nethack": 1,
+   "lua": 15,
+   "inMacro": 16,
+   "topDetail": [
+    [
+     "int",
+     10
+    ],
+    [
+     "char *",
+     1
+    ],
+    [
+     "const char *",
+     1
+    ],
+    [
+     "double",
+     1
+    ],
+    [
+     "long",
+     1
+    ],
+    [
+     "long long",
+     1
+    ],
+    [
+     "void *",
+     1
+    ]
+   ],
+   "topFiles": [
+    [
+     "lib/lua-5.4.8/src/lapi.c",
+     8
+    ],
+    [
+     "lib/lua-5.4.8/src/lobject.c",
+     7
+    ],
+    [
+     "src/pline.c",
+     1
+    ]
+   ]
+  },
+  "mem": {
+   "nethack": 158,
+   "lua": 37,
+   "inMacro": 189,
+   "topDetail": [
+    [
+     "memcpy(char, char; size=expr:BinaryOperator) partial",
+     14
+    ],
+    [
+     "memset(char; size=expr:BinaryOperator) partial",
+     8
+    ],
+    [
+     "memset(struct dig_info; size=struct dig_info) whole-clear",
+     7
+    ],
+    [
+     "memset(struct fe; size=struct fe) whole-clear",
+     6
+    ],
+    [
+     "memcpy(char, char; size=expr:DeclRefExpr) partial",
+     5
+    ],
+    [
+     "memset(char[5]; size=char[5]) whole-clear",
+     4
+    ],
+    [
+     "memset(struct dest_area; size=struct dest_area) whole-clear",
+     4
+    ],
+    [
+     "memcmp(char, char; size=expr:DeclRefExpr) partial",
+     3
+    ],
+    [
+     "memcpy(char, unsigned long; size=unsigned long) partial",
+     3
+    ],
+    [
+     "memcpy(unsigned char, unsigned char; size=expr:DeclRefExpr) partial",
+     3
+    ],
+    [
+     "memset(struct damage; size=struct damage) whole-clear",
+     3
+    ],
+    [
+     "memset(struct ls_t; size=struct ls_t) whole-clear",
+     3
+    ],
+    [
+     "memset(unsigned char; size=expr:BinaryOperator) partial",
+     3
+    ],
+    [
+     "memcpy(char, char[10]; size=expr:DeclRefExpr) partial",
+     2
+    ],
+    [
+     "memcpy(char, char[4]; size=expr:BinaryOperator) partial",
+     2
+    ],
+    [
+     "memcpy(char, char[7]; size=lit:6) partial",
+     2
+    ],
+    [
+     "memcpy(char[1], char; size=expr:BinaryOperator) partial",
+     2
+    ],
+    [
+     "memcpy(struct spell[43], struct spell[43]; size=struct spell[43]) whole-copy",
+     2
+    ],
+    [
+     "memcpy(unsigned long long, unsigned long long[8]; size=unsigned long long[8]) partial",
+     2
+    ],
+    [
+     "memset(char[256]; size=char[256]) whole-clear",
+     2
+    ],
+    [
+     "memset(long; size=long) whole-clear",
+     2
+    ],
+    [
+     "memset(struct hilite_s; size=struct hilite_s) whole-clear",
+     2
+    ],
+    [
+     "memset(struct trap; size=struct trap) whole-clear",
+     2
+    ],
+    [
+     "memset(struct u_realtime; size=struct u_realtime) whole-clear",
+     2
+    ],
+    [
+     "memset(struct you; size=struct you) whole-clear",
+     2
+    ]
+   ],
+   "topFiles": [
+    [
+     "lib/lua-5.4.8/src/lobject.c",
+     11
+    ],
+    [
+     "src/nhlua.c",
+     9
+    ],
+    [
+     "src/cmd.c",
+     8
+    ],
+    [
+     "src/hack.c",
+     8
+    ],
+    [
+     "src/report.c",
+     8
+    ],
+    [
+     "lib/lua-5.4.8/src/lstrlib.c",
+     7
+    ],
+    [
+     "src/decl.c",
+     7
+    ],
+    [
+     "src/dungeon.c",
+     6
+    ],
+    [
+     "src/nhmd4.c",
+     6
+    ],
+    [
+     "src/read.c",
+     6
+    ],
+    [
+     "src/timeout.c",
+     6
+    ],
+    [
+     "src/botl.c",
+     5
+    ]
+   ]
+  },
+  "io": {
+   "nethack": 151,
+   "lua": 7,
+   "inMacro": 136,
+   "topDetail": [
+    [
+     "bwrite(short; size=short)",
+     4
+    ],
+    [
+     "bwrite(signed char; size=signed char)",
+     4
+    ],
+    [
+     "mread(short; size=short)",
+     4
+    ],
+    [
+     "mread(signed char; size=signed char)",
+     4
+    ],
+    [
+     "fwrite(char; size=lit:1)",
+     3
+    ],
+    [
+     "bwrite(int; size=int)",
+     2
+    ],
+    [
+     "bwrite(long; size=long)",
+     2
+    ],
+    [
+     "bwrite(unsigned char; size=unsigned char)",
+     2
+    ],
+    [
+     "bwrite(unsigned int; size=unsigned int)",
+     2
+    ],
+    [
+     "bwrite(unsigned long; size=unsigned long)",
+     2
+    ],
+    [
+     "bwrite(unsigned short; size=unsigned short)",
+     2
+    ],
+    [
+     "fread(char; size=char)",
+     2
+    ],
+    [
+     "fwrite(char; size=char)",
+     2
+    ],
+    [
+     "fwrite(char[2]; size=char)",
+     2
+    ],
+    [
+     "mread(int; size=int)",
+     2
+    ],
+    [
+     "mread(long; size=long)",
+     2
+    ],
+    [
+     "mread(unsigned char; size=unsigned char)",
+     2
+    ],
+    [
+     "mread(unsigned int; size=unsigned int)",
+     2
+    ],
+    [
+     "mread(unsigned long; size=unsigned long)",
+     2
+    ],
+    [
+     "mread(unsigned short; size=unsigned short)",
+     2
+    ],
+    [
+     "bwrite(char; size=expr:BinaryOperator)",
+     1
+    ],
+    [
+     "bwrite(long long; size=long long)",
+     1
+    ],
+    [
+     "bwrite(struct arti_info; size=struct arti_info)",
+     1
+    ],
+    [
+     "bwrite(struct branch; size=struct branch)",
+     1
+    ],
+    [
+     "bwrite(struct bubble; size=struct bubble)",
+     1
+    ]
+   ],
+   "topFiles": [
+    [
+     "include/sfmacros.h",
+     128
+    ],
+    [
+     "src/sfstruct.c",
+     11
+    ],
+    [
+     "lib/lua-5.4.8/src/lbaselib.c",
+     3
+    ],
+    [
+     "lib/lua-5.4.8/src/liolib.c",
+     3
+    ],
+    [
+     "src/hacklib.c",
+     2
+    ],
+    [
+     "src/report.c",
+     2
+    ],
+    [
+     "sys/unix/unixmain.c",
+     2
+    ],
+    [
+     "sys/unix/unixunix.c",
+     2
+    ],
+    [
+     "lib/lua-5.4.8/src/lauxlib.c",
+     1
+    ],
+    [
+     "src/cfgfiles.c",
+     1
+    ],
+    [
+     "src/nhlua.c",
+     1
+    ],
+    [
+     "win/tty/termcap.c",
+     1
+    ]
+   ]
+  },
+  "setjmp": {
+   "nethack": 2,
+   "lua": 2,
+   "inMacro": 2,
+   "topDetail": [
+    [
+     "_longjmp",
+     1
+    ],
+    [
+     "_setjmp",
+     1
+    ],
+    [
+     "longjmp",
+     1
+    ],
+    [
+     "setjmp",
+     1
+    ]
+   ],
+   "topFiles": [
+    [
+     "lib/lua-5.4.8/src/ldo.c",
+     2
+    ],
+    [
+     "src/nhlua.c",
+     2
+    ]
+   ]
+  },
+  "indirect-goto": {
+   "nethack": 0,
+   "lua": 78,
+   "inMacro": 78,
+   "topDetail": [
+    [
+     "",
+     78
+    ]
+   ],
+   "topFiles": [
+    [
+     "lib/lua-5.4.8/src/lvm.c",
+     78
+    ]
+   ]
+  }
+ },
+ "libc": {
+  "free": {
+   "kind": "builtin",
+   "nethack": 491,
+   "lua": 1,
+   "files": [
+    "apply.c",
+    "artifact.c",
+    "bones.c",
+    "botl.c",
+    "cfgfiles.c",
+    "cmd.c",
+    "coloratt.c",
+    "date.c"
+   ]
+  },
+  "strlen": {
+   "kind": "builtin",
+   "nethack": 421,
+   "lua": 21,
+   "files": [
+    "alloc.c",
+    "apply.c",
+    "attrib.c",
+    "bones.c",
+    "botl.c",
+    "calendar.c",
+    "cfgfiles.c",
+    "cmd.c"
+   ]
+  },
+  "strchr": {
+   "kind": "builtin",
+   "nethack": 288,
+   "lua": 25,
+   "files": [
+    "botl.c",
+    "cfgfiles.c",
+    "cmd.c",
+    "coloratt.c",
+    "detect.c",
+    "do.c",
+    "do_name.c",
+    "dogmove.c"
+   ]
+  },
+  "strcmp": {
+   "kind": "builtin",
+   "nethack": 223,
+   "lua": 11,
+   "files": [
+    "artifact.c",
+    "attrib.c",
+    "bones.c",
+    "botl.c",
+    "cfgfiles.c",
+    "cmd.c",
+    "do.c",
+    "do_name.c"
+   ]
+  },
+  "strncmp": {
+   "kind": "builtin",
+   "nethack": 141,
+   "lua": 1,
+   "files": [
+    "bones.c",
+    "botl.c",
+    "cfgfiles.c",
+    "cmd.c",
+    "do_name.c",
+    "do_wear.c",
+    "drawing.c",
+    "dungeon.c"
+   ]
+  },
+  "abs": {
+   "kind": "builtin",
+   "nethack": 114,
+   "lua": 1,
+   "files": [
+    "apply.c",
+    "artifact.c",
+    "attrib.c",
+    "ball.c",
+    "cmd.c",
+    "do_wear.c",
+    "eat.c",
+    "explode.c"
+   ]
+  },
+  "__assert_rtn": {
+   "kind": "sys",
+   "nethack": 91,
+   "lua": 0,
+   "files": [
+    "artifact.c",
+    "attrib.c",
+    "coloratt.c",
+    "do_name.c",
+    "dog.c",
+    "dogmove.c",
+    "dothrow.c",
+    "eat.c"
+   ]
+  },
+  "atoi": {
+   "kind": "sys",
+   "nethack": 74,
+   "lua": 0,
+   "files": [
+    "botl.c",
+    "calendar.c",
+    "cfgfiles.c",
+    "coloratt.c",
+    "date.c",
+    "files.c",
+    "mkmaze.c",
+    "objnam.c"
+   ]
+  },
+  "fprintf": {
+   "kind": "builtin",
+   "nethack": 54,
+   "lua": 8,
+   "files": [
+    "dungeon.c",
+    "files.c",
+    "glyphs.c",
+    "lauxlib.c",
+    "ldblib.c",
+    "liolib.c",
+    "pline.c",
+    "report.c"
+   ]
+  },
+  "__error": {
+   "kind": "sys",
+   "nethack": 23,
+   "lua": 21,
+   "files": [
+    "cfgfiles.c",
+    "files.c",
+    "lauxlib.c",
+    "liolib.c",
+    "loslib.c",
+    "report.c",
+    "unixunix.c"
+   ]
+  },
+  "fclose": {
+   "kind": "sys",
+   "nethack": 40,
+   "lua": 3,
+   "files": [
+    "cfgfiles.c",
+    "files.c",
+    "lauxlib.c",
+    "liolib.c",
+    "loadlib.c",
+    "nhlua.c",
+    "pager.c",
+    "rumors.c"
+   ]
+  },
+  "fgets": {
+   "kind": "sys",
+   "nethack": 32,
+   "lua": 1,
+   "files": [
+    "cfgfiles.c",
+    "files.c",
+    "ldblib.c",
+    "pager.c",
+    "rumors.c",
+    "topten.c",
+    "version.c",
+    "windows.c"
+   ]
+  },
+  "exit": {
+   "kind": "builtin",
+   "nethack": 32,
+   "lua": 1,
+   "files": [
+    "cfgfiles.c",
+    "decl.c",
+    "end.c",
+    "loslib.c",
+    "report.c",
+    "unixmain.c",
+    "unixtty.c",
+    "unixunix.c"
+   ]
+  },
+  "signal": {
+   "kind": "sys",
+   "nethack": 33,
+   "lua": 0,
+   "files": [
+    "allmain.c",
+    "end.c",
+    "files.c",
+    "ioctl.c",
+    "report.c",
+    "save.c",
+    "unixmain.c",
+    "unixunix.c"
+   ]
+  },
+  "tgetstr": {
+   "kind": "sys",
+   "nethack": 33,
+   "lua": 0,
+   "files": [
+    "termcap.c"
+   ]
+  },
+  "fopen": {
+   "kind": "builtin",
+   "nethack": 28,
+   "lua": 4,
+   "files": [
+    "cfgfiles.c",
+    "files.c",
+    "lauxlib.c",
+    "liolib.c",
+    "loadlib.c",
+    "nhlua.c",
+    "pager.c",
+    "rnd.c"
+   ]
+  },
+  "fflush": {
+   "kind": "sys",
+   "nethack": 17,
+   "lua": 10,
+   "files": [
+    "getline.c",
+    "lauxlib.c",
+    "lbaselib.c",
+    "ldblib.c",
+    "liolib.c",
+    "report.c",
+    "sfbase.c",
+    "sfstruct.c"
+   ]
+  },
+  "putchar": {
+   "kind": "sys",
+   "nethack": 27,
+   "lua": 0,
+   "files": [
+    "termcap.c",
+    "topl.c",
+    "unixtty.c",
+    "unixunix.c",
+    "wintty.c"
+   ]
+  },
+  "getenv": {
+   "kind": "sys",
+   "nethack": 23,
+   "lua": 3,
+   "files": [
+    "cfgfiles.c",
+    "date.c",
+    "loadlib.c",
+    "loslib.c",
+    "mkmaze.c",
+    "nhlua.c",
+    "options.c",
+    "rnd.c"
+   ]
+  },
+  "strrchr": {
+   "kind": "builtin",
+   "nethack": 20,
+   "lua": 0,
+   "files": [
+    "cmd.c",
+    "files.c",
+    "hacklib.c",
+    "mkmaze.c",
+    "o_init.c",
+    "objnam.c",
+    "options.c",
+    "pline.c"
+   ]
+  },
+  "strstr": {
+   "kind": "builtin",
+   "nethack": 15,
+   "lua": 2,
+   "files": [
+    "files.c",
+    "hacklib.c",
+    "invent.c",
+    "lauxlib.c",
+    "loadlib.c",
+    "mon.c",
+    "objnam.c",
+    "options.c"
+   ]
+  },
+  "isspace": {
+   "kind": "builtin",
+   "nethack": 15,
+   "lua": 2,
+   "files": [
+    "coloratt.c",
+    "earlyarg.c",
+    "end.c",
+    "liolib.c",
+    "lstrlib.c",
+    "options.c",
+    "unixmain.c"
+   ]
+  },
+  "sscanf": {
+   "kind": "builtin",
+   "nethack": 16,
+   "lua": 0,
+   "files": [
+    "coloratt.c",
+    "end.c",
+    "files.c",
+    "minion.c",
+    "options.c",
+    "pager.c",
+    "rumors.c",
+    "topten.c"
+   ]
+  },
+  "getuid": {
+   "kind": "sys",
+   "nethack": 13,
+   "lua": 0,
+   "files": [
+    "files.c",
+    "mail.c",
+    "pline.c",
+    "restore.c",
+    "save.c",
+    "topten.c",
+    "unixmain.c",
+    "unixunix.c"
+   ]
+  },
+  "fseek": {
+   "kind": "sys",
+   "nethack": 12,
+   "lua": 0,
+   "files": [
+    "nhlua.c",
+    "pager.c",
+    "rumors.c"
+   ]
+  },
+  "perror": {
+   "kind": "sys",
+   "nethack": 11,
+   "lua": 0,
+   "files": [
+    "files.c",
+    "pline.c",
+    "unixmain.c",
+    "unixtty.c",
+    "unixunix.c",
+    "wintty.c"
+   ]
+  },
+  "close": {
+   "kind": "sys",
+   "nethack": 9,
+   "lua": 1,
+   "files": [
+    "cfgfiles.c",
+    "files.c",
+    "loslib.c",
+    "report.c",
+    "sfstruct.c",
+    "unixunix.c"
+   ]
+  },
+  "open": {
+   "kind": "sys",
+   "nethack": 10,
+   "lua": 0,
+   "files": [
+    "cfgfiles.c",
+    "files.c",
+    "report.c",
+    "unixunix.c"
+   ]
+  },
+  "unlink": {
+   "kind": "sys",
+   "nethack": 10,
+   "lua": 0,
+   "files": [
+    "files.c",
+    "unixunix.c"
+   ]
+  },
+  "fpathconf": {
+   "kind": "sys",
+   "nethack": 10,
+   "lua": 0,
+   "files": [
+    "unixtty.c"
+   ]
+  },
+  "strerror": {
+   "kind": "builtin",
+   "nethack": 5,
+   "lua": 3,
+   "files": [
+    "cfgfiles.c",
+    "files.c",
+    "lauxlib.c",
+    "liolib.c",
+    "report.c",
+    "unixmain.c"
+   ]
+  },
+  "fwrite": {
+   "kind": "builtin",
+   "nethack": 4,
+   "lua": 4,
+   "files": [
+    "cfgfiles.c",
+    "lbaselib.c",
+    "liolib.c",
+    "sfstruct.c",
+    "termcap.c",
+    "unixmain.c"
+   ]
+  },
+  "time": {
+   "kind": "sys",
+   "nethack": 3,
+   "lua": 5,
+   "files": [
+    "calendar.c",
+    "lmathlib.c",
+    "loslib.c",
+    "lstate.c",
+    "ltablib.c",
+    "unixunix.c"
+   ]
+  },
+  "isupper": {
+   "kind": "builtin",
+   "nethack": 7,
+   "lua": 1,
+   "files": [
+    "attrib.c",
+    "hacklib.c",
+    "lstrlib.c",
+    "makemon.c",
+    "mon.c"
+   ]
+  },
+  "atol": {
+   "kind": "sys",
+   "nethack": 8,
+   "lua": 0,
+   "files": [
+    "botl.c",
+    "options.c"
+   ]
+  },
+  "getchar": {
+   "kind": "sys",
+   "nethack": 8,
+   "lua": 0,
+   "files": [
+    "dungeon.c",
+    "unixunix.c",
+    "wintty.c"
+   ]
+  },
+  "ftell": {
+   "kind": "sys",
+   "nethack": 8,
+   "lua": 0,
+   "files": [
+    "nhlua.c",
+    "rumors.c"
+   ]
+  },
+  "getc": {
+   "kind": "sys",
+   "nethack": 0,
+   "lua": 7,
+   "files": [
+    "lauxlib.c",
+    "liolib.c"
+   ]
+  },
+  "isdigit": {
+   "kind": "builtin",
+   "nethack": 0,
+   "lua": 7,
+   "files": [
+    "lbaselib.c",
+    "liolib.c",
+    "lstrlib.c"
+   ]
+  },
+  "tparm": {
+   "kind": "sys",
+   "nethack": 7,
+   "lua": 0,
+   "files": [
+    "termcap.c"
+   ]
+  },
+  "strspn": {
+   "kind": "builtin",
+   "nethack": 0,
+   "lua": 6,
+   "files": [
+    "lbaselib.c",
+    "liolib.c",
+    "lobject.c",
+    "lstrlib.c"
+   ]
+  },
+  "floor": {
+   "kind": "builtin",
+   "nethack": 0,
+   "lua": 6,
+   "files": [
+    "lmathlib.c",
+    "lobject.c",
+    "lvm.c"
+   ]
+  },
+  "memcmp": {
+   "kind": "builtin",
+   "nethack": 0,
+   "lua": 6,
+   "files": [
+    "loslib.c",
+    "lstring.c",
+    "lstrlib.c",
+    "lundump.c"
+   ]
+  },
+  "fread": {
+   "kind": "builtin",
+   "nethack": 2,
+   "lua": 3,
+   "files": [
+    "lauxlib.c",
+    "liolib.c",
+    "nhlua.c",
+    "unixmain.c"
+   ]
+  },
+  "memchr": {
+   "kind": "builtin",
+   "nethack": 1,
+   "lua": 4,
+   "files": [
+    "glyphs.c",
+    "lstrlib.c"
+   ]
+  },
+  "localtime": {
+   "kind": "sys",
+   "nethack": 5,
+   "lua": 0,
+   "files": [
+    "calendar.c"
+   ]
+  },
+  "access": {
+   "kind": "sys",
+   "nethack": 5,
+   "lua": 0,
+   "files": [
+    "cfgfiles.c",
+    "files.c"
+   ]
+  },
+  "read": {
+   "kind": "sys",
+   "nethack": 5,
+   "lua": 0,
+   "files": [
+    "hacklib.c",
+    "report.c",
+    "sfstruct.c",
+    "unixunix.c",
+    "wintty.c"
+   ]
+  },
+  "tgetnum": {
+   "kind": "sys",
+   "nethack": 5,
+   "lua": 0,
+   "files": [
+    "termcap.c"
+   ]
+  },
+  "isalnum": {
+   "kind": "builtin",
+   "nethack": 1,
+   "lua": 3,
+   "files": [
+    "lbaselib.c",
+    "lstrlib.c",
+    "report.c"
+   ]
+  },
+  "localeconv": {
+   "kind": "sys",
+   "nethack": 0,
+   "lua": 4,
+   "files": [
+    "liolib.c",
+    "lobject.c",
+    "lstrlib.c"
+   ]
+  },
+  "pow": {
+   "kind": "builtin",
+   "nethack": 0,
+   "lua": 4,
+   "files": [
+    "lmathlib.c",
+    "lobject.c",
+    "lvm.c"
+   ]
+  },
+  "tolower": {
+   "kind": "builtin",
+   "nethack": 2,
+   "lua": 2,
+   "files": [
+    "hacklib.c",
+    "lstrlib.c"
+   ]
+  },
+  "malloc": {
+   "kind": "builtin",
+   "nethack": 4,
+   "lua": 0,
+   "files": [
+    "alloc.c",
+    "hacklib.c",
+    "unixmain.c"
+   ]
+  },
+  "creat": {
+   "kind": "sys",
+   "nethack": 4,
+   "lua": 0,
+   "files": [
+    "files.c",
+    "unixunix.c"
+   ]
+  },
+  "fork": {
+   "kind": "sys",
+   "nethack": 4,
+   "lua": 0,
+   "files": [
+    "files.c",
+    "pline.c",
+    "report.c",
+    "unixunix.c"
+   ]
+  },
+  "write": {
+   "kind": "sys",
+   "nethack": 4,
+   "lua": 0,
+   "files": [
+    "hacklib.c",
+    "report.c",
+    "sfstruct.c",
+    "unixunix.c"
+   ]
+  },
+  "fileno": {
+   "kind": "sys",
+   "nethack": 4,
+   "lua": 0,
+   "files": [
+    "ioctl.c",
+    "wintty.c"
+   ]
+  },
+  "realloc": {
+   "kind": "builtin",
+   "nethack": 2,
+   "lua": 1,
+   "files": [
+    "alloc.c",
+    "lauxlib.c",
+    "unixmain.c"
+   ]
+  },
+  "pclose": {
+   "kind": "sys",
+   "nethack": 2,
+   "lua": 1,
+   "files": [
+    "liolib.c",
+    "report.c",
+    "unixmain.c"
+   ]
+  },
+  "popen": {
+   "kind": "sys",
+   "nethack": 2,
+   "lua": 1,
+   "files": [
+    "liolib.c",
+    "report.c",
+    "unixmain.c"
+   ]
+  },
+  "__srget": {
+   "kind": "sys",
+   "nethack": 0,
+   "lua": 3,
+   "files": [
+    "liolib.c"
+   ]
+  },
+  "log": {
+   "kind": "builtin",
+   "nethack": 0,
+   "lua": 3,
+   "files": [
+    "lmathlib.c"
+   ]
+  },
+  "mktime": {
+   "kind": "sys",
+   "nethack": 2,
+   "lua": 1,
+   "files": [
+    "calendar.c",
+    "date.c",
+    "loslib.c"
+   ]
+  },
+  "setgid": {
+   "kind": "sys",
+   "nethack": 3,
+   "lua": 0,
+   "files": [
+    "files.c",
+    "pline.c",
+    "unixunix.c"
+   ]
+  },
+  "getgid": {
+   "kind": "sys",
+   "nethack": 3,
+   "lua": 0,
+   "files": [
+    "files.c",
+    "pline.c",
+    "unixunix.c"
+   ]
+  },
+  "setuid": {
+   "kind": "sys",
+   "nethack": 3,
+   "lua": 0,
+   "files": [
+    "files.c",
+    "pline.c",
+    "unixunix.c"
+   ]
+  },
+  "sleep": {
+   "kind": "sys",
+   "nethack": 3,
+   "lua": 0,
+   "files": [
+    "files.c",
+    "report.c",
+    "shk.c"
+   ]
+  },
+  "stat": {
+   "kind": "sys",
+   "nethack": 3,
+   "lua": 0,
+   "files": [
+    "mail.c",
+    "unixunix.c"
+   ]
+  },
+  "execl": {
+   "kind": "sys",
+   "nethack": 3,
+   "lua": 0,
+   "files": [
+    "mail.c",
+    "unixunix.c"
+   ]
+  },
+  "getpid": {
+   "kind": "sys",
+   "nethack": 3,
+   "lua": 0,
+   "files": [
+    "report.c",
+    "unixmain.c"
+   ]
+  },
+  "puts": {
+   "kind": "sys",
+   "nethack": 3,
+   "lua": 0,
+   "files": [
+    "windows.c",
+    "wintty.c"
+   ]
+  },
+  "fputs": {
+   "kind": "sys",
+   "nethack": 3,
+   "lua": 0,
+   "files": [
+    "windows.c",
+    "wintty.c"
+   ]
+  },
+  "tcsetattr": {
+   "kind": "sys",
+   "nethack": 3,
+   "lua": 0,
+   "files": [
+    "ioctl.c",
+    "unixtty.c"
+   ]
+  },
+  "chdir": {
+   "kind": "sys",
+   "nethack": 3,
+   "lua": 0,
+   "files": [
+    "unixmain.c",
+    "unixunix.c"
+   ]
+  },
+  "tgoto": {
+   "kind": "sys",
+   "nethack": 3,
+   "lua": 0,
+   "files": [
+    "termcap.c"
+   ]
+  },
+  "freopen": {
+   "kind": "sys",
+   "nethack": 1,
+   "lua": 1,
+   "files": [
+    "files.c",
+    "lauxlib.c"
+   ]
+  },
+  "ferror": {
+   "kind": "sys",
+   "nethack": 0,
+   "lua": 2,
+   "files": [
+    "lauxlib.c",
+    "liolib.c"
+   ]
+  },
+  "toupper": {
+   "kind": "builtin",
+   "nethack": 0,
+   "lua": 2,
+   "files": [
+    "lbaselib.c",
+    "lstrlib.c"
+   ]
+  },
+  "ldexp": {
+   "kind": "builtin",
+   "nethack": 0,
+   "lua": 2,
+   "files": [
+    "lcode.c",
+    "lmathlib.c"
+   ]
+  },
+  "abort": {
+   "kind": "builtin",
+   "nethack": 1,
+   "lua": 1,
+   "files": [
+    "end.c",
+    "ldo.c"
+   ]
+  },
+  "isxdigit": {
+   "kind": "builtin",
+   "nethack": 0,
+   "lua": 2,
+   "files": [
+    "liolib.c",
+    "lstrlib.c"
+   ]
+  },
+  "flockfile": {
+   "kind": "sys",
+   "nethack": 0,
+   "lua": 2,
+   "files": [
+    "liolib.c"
+   ]
+  },
+  "ungetc": {
+   "kind": "sys",
+   "nethack": 0,
+   "lua": 2,
+   "files": [
+    "liolib.c"
+   ]
+  },
+  "funlockfile": {
+   "kind": "sys",
+   "nethack": 0,
+   "lua": 2,
+   "files": [
+    "liolib.c"
+   ]
+  },
+  "clearerr": {
+   "kind": "sys",
+   "nethack": 1,
+   "lua": 1,
+   "files": [
+    "cmd.c",
+    "liolib.c"
+   ]
+  },
+  "setvbuf": {
+   "kind": "sys",
+   "nethack": 1,
+   "lua": 1,
+   "files": [
+    "liolib.c",
+    "rnd.c"
+   ]
+  },
+  "ceil": {
+   "kind": "builtin",
+   "nethack": 0,
+   "lua": 2,
+   "files": [
+    "lmathlib.c"
+   ]
+  },
+  "fmod": {
+   "kind": "builtin",
+   "nethack": 0,
+   "lua": 2,
+   "files": [
+    "lmathlib.c",
+    "lvm.c"
+   ]
+  },
+  "log10": {
+   "kind": "builtin",
+   "nethack": 0,
+   "lua": 2,
+   "files": [
+    "lmathlib.c"
+   ]
+  },
+  "frexp": {
+   "kind": "builtin",
+   "nethack": 0,
+   "lua": 2,
+   "files": [
+    "lmathlib.c",
+    "ltable.c"
+   ]
+  },
+  "dlerror": {
+   "kind": "sys",
+   "nethack": 0,
+   "lua": 2,
+   "files": [
+    "loadlib.c"
+   ]
+  },
+  "strtod": {
+   "kind": "builtin",
+   "nethack": 0,
+   "lua": 2,
+   "files": [
+    "lobject.c"
+   ]
+  },
+  "strpbrk": {
+   "kind": "builtin",
+   "nethack": 0,
+   "lua": 2,
+   "files": [
+    "lobject.c",
+    "lstrlib.c"
+   ]
+  },
+  "rename": {
+   "kind": "sys",
+   "nethack": 1,
+   "lua": 1,
+   "files": [
+    "files.c",
+    "loslib.c"
+   ]
+  },
+  "clock": {
+   "kind": "sys",
+   "nethack": 0,
+   "lua": 2,
+   "files": [
+    "loslib.c",
+    "ltablib.c"
+   ]
+  },
+  "difftime": {
+   "kind": "sys",
+   "nethack": 1,
+   "lua": 1,
+   "files": [
+    "allmain.c",
+    "loslib.c"
+   ]
+  },
+  "isalpha": {
+   "kind": "builtin",
+   "nethack": 0,
+   "lua": 2,
+   "files": [
+    "lstrlib.c"
+   ]
+  },
+  "iscntrl": {
+   "kind": "builtin",
+   "nethack": 0,
+   "lua": 2,
+   "files": [
+    "lstrlib.c"
+   ]
+  },
+  "islower": {
+   "kind": "builtin",
+   "nethack": 0,
+   "lua": 2,
+   "files": [
+    "lstrlib.c"
+   ]
+  },
+  "rewind": {
+   "kind": "sys",
+   "nethack": 2,
+   "lua": 0,
+   "files": [
+    "files.c",
+    "topten.c"
+   ]
+  },
+  "opendir": {
+   "kind": "sys",
+   "nethack": 2,
+   "lua": 0,
+   "files": [
+    "files.c"
+   ]
+  },
+  "readdir": {
+   "kind": "sys",
+   "nethack": 2,
+   "lua": 0,
+   "files": [
+    "files.c"
+   ]
+  },
+  "closedir": {
+   "kind": "sys",
+   "nethack": 2,
+   "lua": 0,
+   "files": [
+    "files.c"
+   ]
+  },
+  "execv": {
+   "kind": "sys",
+   "nethack": 2,
+   "lua": 0,
+   "files": [
+    "files.c",
+    "pline.c"
+   ]
+  },
+  "wait": {
+   "kind": "sys",
+   "nethack": 2,
+   "lua": 0,
+   "files": [
+    "files.c",
+    "unixunix.c"
+   ]
+  },
+  "fcntl": {
+   "kind": "sys",
+   "nethack": 2,
+   "lua": 0,
+   "files": [
+    "files.c"
+   ]
+  },
+  "getcwd": {
+   "kind": "sys",
+   "nethack": 2,
+   "lua": 0,
+   "files": [
+    "files.c",
+    "unixmain.c"
+   ]
+  },
+  "strtoul": {
+   "kind": "builtin",
+   "nethack": 2,
+   "lua": 0,
+   "files": [
+    "nhlua.c",
+    "unixmain.c"
+   ]
+  },
+  "waitpid": {
+   "kind": "sys",
+   "nethack": 2,
+   "lua": 0,
+   "files": [
+    "pline.c",
+    "report.c"
+   ]
+  },
+  "backtrace": {
+   "kind": "sys",
+   "nethack": 2,
+   "lua": 0,
+   "files": [
+    "report.c"
+   ]
+  },
+  "backtrace_symbols": {
+   "kind": "sys",
+   "nethack": 2,
+   "lua": 0,
+   "files": [
+    "report.c"
+   ]
+  },
+  "tcgetattr": {
+   "kind": "sys",
+   "nethack": 2,
+   "lua": 0,
+   "files": [
+    "ioctl.c",
+    "unixtty.c"
+   ]
+  },
+  "chmod": {
+   "kind": "sys",
+   "nethack": 2,
+   "lua": 0,
+   "files": [
+    "unixmain.c"
+   ]
+  },
+  "getlogin": {
+   "kind": "sys",
+   "nethack": 2,
+   "lua": 0,
+   "files": [
+    "unixmain.c"
+   ]
+  },
+  "sigaction": {
+   "kind": "sys",
+   "nethack": 2,
+   "lua": 0,
+   "files": [
+    "unixmain.c"
+   ]
+  },
+  "tgetflag": {
+   "kind": "sys",
+   "nethack": 2,
+   "lua": 0,
+   "files": [
+    "termcap.c"
+   ]
+  },
+  "tputs": {
+   "kind": "sys",
+   "nethack": 2,
+   "lua": 0,
+   "files": [
+    "termcap.c"
+   ]
+  },
+  "feof": {
+   "kind": "sys",
+   "nethack": 0,
+   "lua": 1,
+   "files": [
+    "lauxlib.c"
+   ]
+  },
+  "_longjmp": {
+   "kind": "builtin",
+   "nethack": 0,
+   "lua": 1,
+   "files": [
+    "ldo.c"
+   ]
+  },
+  "_setjmp": {
+   "kind": "builtin",
+   "nethack": 0,
+   "lua": 1,
+   "files": [
+    "ldo.c"
+   ]
+  },
+  "tmpfile": {
+   "kind": "sys",
+   "nethack": 0,
+   "lua": 1,
+   "files": [
+    "liolib.c"
+   ]
+  },
+  "fseeko": {
+   "kind": "sys",
+   "nethack": 0,
+   "lua": 1,
+   "files": [
+    "liolib.c"
+   ]
+  },
+  "ftello": {
+   "kind": "sys",
+   "nethack": 0,
+   "lua": 1,
+   "files": [
+    "liolib.c"
+   ]
+  },
+  "fabs": {
+   "kind": "builtin",
+   "nethack": 0,
+   "lua": 1,
+   "files": [
+    "lmathlib.c"
+   ]
+  },
+  "sin": {
+   "kind": "builtin",
+   "nethack": 0,
+   "lua": 1,
+   "files": [
+    "lmathlib.c"
+   ]
+  },
+  "cos": {
+   "kind": "builtin",
+   "nethack": 0,
+   "lua": 1,
+   "files": [
+    "lmathlib.c"
+   ]
+  },
+  "tan": {
+   "kind": "builtin",
+   "nethack": 0,
+   "lua": 1,
+   "files": [
+    "lmathlib.c"
+   ]
+  },
+  "asin": {
+   "kind": "builtin",
+   "nethack": 0,
+   "lua": 1,
+   "files": [
+    "lmathlib.c"
+   ]
+  },
+  "acos": {
+   "kind": "builtin",
+   "nethack": 0,
+   "lua": 1,
+   "files": [
+    "lmathlib.c"
+   ]
+  },
+  "atan2": {
+   "kind": "builtin",
+   "nethack": 0,
+   "lua": 1,
+   "files": [
+    "lmathlib.c"
+   ]
+  },
+  "sqrt": {
+   "kind": "builtin",
+   "nethack": 0,
+   "lua": 1,
+   "files": [
+    "lmathlib.c"
+   ]
+  },
+  "log2": {
+   "kind": "builtin",
+   "nethack": 0,
+   "lua": 1,
+   "files": [
+    "lmathlib.c"
+   ]
+  },
+  "exp": {
+   "kind": "builtin",
+   "nethack": 0,
+   "lua": 1,
+   "files": [
+    "lmathlib.c"
+   ]
+  },
+  "cosh": {
+   "kind": "builtin",
+   "nethack": 0,
+   "lua": 1,
+   "files": [
+    "lmathlib.c"
+   ]
+  },
+  "sinh": {
+   "kind": "builtin",
+   "nethack": 0,
+   "lua": 1,
+   "files": [
+    "lmathlib.c"
+   ]
+  },
+  "tanh": {
+   "kind": "builtin",
+   "nethack": 0,
+   "lua": 1,
+   "files": [
+    "lmathlib.c"
+   ]
+  },
+  "dlclose": {
+   "kind": "sys",
+   "nethack": 0,
+   "lua": 1,
+   "files": [
+    "loadlib.c"
+   ]
+  },
+  "dlopen": {
+   "kind": "sys",
+   "nethack": 0,
+   "lua": 1,
+   "files": [
+    "loadlib.c"
+   ]
+  },
+  "dlsym": {
+   "kind": "sys",
+   "nethack": 0,
+   "lua": 1,
+   "files": [
+    "loadlib.c"
+   ]
+  },
+  "system": {
+   "kind": "sys",
+   "nethack": 0,
+   "lua": 1,
+   "files": [
+    "loslib.c"
+   ]
+  },
+  "remove": {
+   "kind": "sys",
+   "nethack": 0,
+   "lua": 1,
+   "files": [
+    "loslib.c"
+   ]
+  },
+  "mkstemp": {
+   "kind": "sys",
+   "nethack": 0,
+   "lua": 1,
+   "files": [
+    "loslib.c"
+   ]
+  },
+  "gmtime_r": {
+   "kind": "sys",
+   "nethack": 0,
+   "lua": 1,
+   "files": [
+    "loslib.c"
+   ]
+  },
+  "localtime_r": {
+   "kind": "sys",
+   "nethack": 0,
+   "lua": 1,
+   "files": [
+    "loslib.c"
+   ]
+  },
+  "strftime": {
+   "kind": "sys",
+   "nethack": 0,
+   "lua": 1,
+   "files": [
+    "loslib.c"
+   ]
+  },
+  "setlocale": {
+   "kind": "sys",
+   "nethack": 0,
+   "lua": 1,
+   "files": [
+    "loslib.c"
+   ]
+  },
+  "isgraph": {
+   "kind": "builtin",
+   "nethack": 0,
+   "lua": 1,
+   "files": [
+    "lstrlib.c"
+   ]
+  },
+  "ispunct": {
+   "kind": "builtin",
+   "nethack": 0,
+   "lua": 1,
+   "files": [
+    "lstrlib.c"
+   ]
+  },
+  "strcoll": {
+   "kind": "sys",
+   "nethack": 0,
+   "lua": 1,
+   "files": [
+    "lvm.c"
+   ]
+  },
+  "strtol": {
+   "kind": "builtin",
+   "nethack": 1,
+   "lua": 0,
+   "files": [
+    "cfgfiles.c"
+   ]
+  },
+  "lseek": {
+   "kind": "sys",
+   "nethack": 1,
+   "lua": 0,
+   "files": [
+    "files.c"
+   ]
+  },
+  "qsort": {
+   "kind": "sys",
+   "nethack": 1,
+   "lua": 0,
+   "files": [
+    "hacklib.c"
+   ]
+  },
+  "setjmp": {
+   "kind": "builtin",
+   "nethack": 1,
+   "lua": 0,
+   "files": [
+    "nhlua.c"
+   ]
+  },
+  "longjmp": {
+   "kind": "builtin",
+   "nethack": 1,
+   "lua": 0,
+   "files": [
+    "nhlua.c"
+   ]
+  },
+  "CC_MD4_Init": {
+   "kind": "sys",
+   "nethack": 1,
+   "lua": 0,
+   "files": [
+    "report.c"
+   ]
+  },
+  "CC_MD4_Update": {
+   "kind": "sys",
+   "nethack": 1,
+   "lua": 0,
+   "files": [
+    "report.c"
+   ]
+  },
+  "CC_MD4_Final": {
+   "kind": "sys",
+   "nethack": 1,
+   "lua": 0,
+   "files": [
+    "report.c"
+   ]
+  },
+  "execve": {
+   "kind": "sys",
+   "nethack": 1,
+   "lua": 0,
+   "files": [
+    "report.c"
+   ]
+  },
+  "fputc": {
+   "kind": "sys",
+   "nethack": 1,
+   "lua": 0,
+   "files": [
+    "rnd.c"
+   ]
+  },
+  "fdopen": {
+   "kind": "sys",
+   "nethack": 1,
+   "lua": 0,
+   "files": [
+    "sfstruct.c"
+   ]
+  },
+  "fgetc": {
+   "kind": "sys",
+   "nethack": 1,
+   "lua": 0,
+   "files": [
+    "topten.c"
+   ]
+  },
+  "fscanf": {
+   "kind": "builtin",
+   "nethack": 1,
+   "lua": 0,
+   "files": [
+    "topten.c"
+   ]
+  },
+  "ioctl": {
+   "kind": "sys",
+   "nethack": 1,
+   "lua": 0,
+   "files": [
+    "ioctl.c"
+   ]
+  },
+  "kill": {
+   "kind": "sys",
+   "nethack": 1,
+   "lua": 0,
+   "files": [
+    "ioctl.c"
+   ]
+  },
+  "regcomp": {
+   "kind": "sys",
+   "nethack": 1,
+   "lua": 0,
+   "files": [
+    "posixregex.c"
+   ]
+  },
+  "regerror": {
+   "kind": "sys",
+   "nethack": 1,
+   "lua": 0,
+   "files": [
+    "posixregex.c"
+   ]
+  },
+  "regexec": {
+   "kind": "sys",
+   "nethack": 1,
+   "lua": 0,
+   "files": [
+    "posixregex.c"
+   ]
+  },
+  "regfree": {
+   "kind": "sys",
+   "nethack": 1,
+   "lua": 0,
+   "files": [
+    "posixregex.c"
+   ]
+  },
+  "cfgetospeed": {
+   "kind": "sys",
+   "nethack": 1,
+   "lua": 0,
+   "files": [
+    "unixtty.c"
+   ]
+  },
+  "vprintf": {
+   "kind": "builtin",
+   "nethack": 1,
+   "lua": 0,
+   "files": [
+    "unixtty.c"
+   ]
+  },
+  "umask": {
+   "kind": "sys",
+   "nethack": 1,
+   "lua": 0,
+   "files": [
+    "unixmain.c"
+   ]
+  },
+  "fstat": {
+   "kind": "sys",
+   "nethack": 1,
+   "lua": 0,
+   "files": [
+    "unixunix.c"
+   ]
+  },
+  "isatty": {
+   "kind": "sys",
+   "nethack": 1,
+   "lua": 0,
+   "files": [
+    "unixunix.c"
+   ]
+  },
+  "tgetent": {
+   "kind": "sys",
+   "nethack": 1,
+   "lua": 0,
+   "files": [
+    "termcap.c"
+   ]
+  },
+  "setbuf": {
+   "kind": "sys",
+   "nethack": 1,
+   "lua": 0,
+   "files": [
+    "wintty.c"
+   ]
+  }
+ },
+ "indirectCalls": [
+  [
+   "nethack  member:win_putstr",
+   373
+  ],
+  [
+   "nethack  member:win_destroy_nhwindow",
+   153
+  ],
+  [
+   "nethack  member:win_create_nhwindow",
+   144
+  ],
+  [
+   "nethack  member:win_display_nhwindow",
+   110
+  ],
+  [
+   "nethack  member:win_end_menu",
+   89
+  ],
+  [
+   "nethack  member:win_start_menu",
+   85
+  ],
+  [
+   "nethack  var:rn2_on_display_rng",
+   75
+  ],
+  [
+   "nethack  member:win_delay_output",
+   43
+  ],
+  [
+   "nethack  member:win_raw_print",
+   37
+  ],
+  [
+   "nethack  member:win_wait_synch",
+   29
+  ],
+  [
+   "nethack  member:win_clear_nhwindow",
+   28
+  ],
+  [
+   "nethack  var:func",
+   18
+  ],
+  [
+   "nethack  member:win_curs",
+   11
+  ],
+  [
+   "nethack  member:win_display_file",
+   11
+  ],
+  [
+   "nethack  deref",
+   9
+  ],
+  [
+   "nethack  member:win_exit_nhwindows",
+   8
+  ],
+  [
+   "nethack  var:loc_f",
+   8
+  ],
+  [
+   "nethack  var:selection_flood_check_func",
+   8
+  ],
+  [
+   "nethack  member:optfn",
+   7
+  ],
+  [
+   "nethack  member:win_mark_synch",
+   7
+  ],
+  [
+   "nethack  member:sound_exit_nhsound",
+   6
+  ],
+  [
+   "nethack  member:win_cliparound",
+   6
+  ],
+  [
+   "nethack  member:win_putmixed",
+   6
+  ],
+  [
+   "nethack  member:win_putmsghistory",
+   6
+  ],
+  [
+   "nethack  var:obj_ok",
+   6
+  ],
+  [
+   "nethack  var:rn2",
+   6
+  ],
+  [
+   "nethack  var:vis_func",
+   6
+  ],
+  [
+   "lua  member:frealloc",
+   5
+  ],
+  [
+   "nethack  member:win_preference_update",
+   5
+  ],
+  [
+   "nethack  member:win_status_update",
+   5
+  ],
+  [
+   "nethack  member:sf_aligntyp",
+   4
+  ],
+  [
+   "nethack  member:sf_any",
+   4
+  ],
+  [
+   "nethack  member:sf_arti_info",
+   4
+  ],
+  [
+   "nethack  member:sf_bitfield",
+   4
+  ],
+  [
+   "nethack  member:sf_boolean",
+   4
+  ],
+  [
+   "nethack  member:sf_branch",
+   4
+  ],
+  [
+   "nethack  member:sf_bubble",
+   4
+  ],
+  [
+   "nethack  member:sf_cemetery",
+   4
+  ],
+  [
+   "nethack  member:sf_char",
+   4
+  ],
+  [
+   "nethack  member:sf_context_info",
+   4
+  ],
+  [
+   "nethack  member:sf_coordxy",
+   4
+  ],
+  [
+   "nethack  member:sf_d_level",
+   4
+  ],
+  [
+   "nethack  member:sf_damage",
+   4
+  ],
+  [
+   "nethack  member:sf_dest_area",
+   4
+  ],
+  [
+   "nethack  member:sf_dgn_topology",
+   4
+  ],
+  [
+   "nethack  member:sf_dungeon",
+   4
+  ],
+  [
+   "nethack  member:sf_ebones",
+   4
+  ],
+  [
+   "nethack  member:sf_edog",
+   4
+  ],
+  [
+   "nethack  member:sf_egd",
+   4
+  ],
+  [
+   "nethack  member:sf_emin",
+   4
+  ],
+  [
+   "nethack  member:sf_engr",
+   4
+  ],
+  [
+   "nethack  member:sf_epri",
+   4
+  ],
+  [
+   "nethack  member:sf_eshk",
+   4
+  ],
+  [
+   "nethack  member:sf_fe",
+   4
+  ],
+  [
+   "nethack  member:sf_flag",
+   4
+  ],
+  [
+   "nethack  member:sf_fruit",
+   4
+  ],
+  [
+   "nethack  member:sf_gamelog_line",
+   4
+  ],
+  [
+   "nethack  member:sf_genericptr",
+   4
+  ],
+  [
+   "nethack  member:sf_int",
+   4
+  ],
+  [
+   "nethack  member:sf_int16",
+   4
+  ],
+  [
+   "nethack  member:sf_int32",
+   4
+  ],
+  [
+   "nethack  member:sf_int64",
+   4
+  ],
+  [
+   "nethack  member:sf_kinfo",
+   4
+  ],
+  [
+   "nethack  member:sf_levelflags",
+   4
+  ],
+  [
+   "nethack  member:sf_linfo",
+   4
+  ],
+  [
+   "nethack  member:sf_long",
+   4
+  ],
+  [
+   "nethack  member:sf_ls_t",
+   4
+  ],
+  [
+   "nethack  member:sf_mapseen_feat",
+   4
+  ],
+  [
+   "nethack  member:sf_mapseen_flags",
+   4
+  ],
+  [
+   "nethack  member:sf_mapseen_rooms",
+   4
+  ],
+  [
+   "nethack  member:sf_mkroom",
+   4
+  ],
+  [
+   "nethack  member:sf_monst",
+   4
+  ],
+  [
+   "nethack  member:sf_mvitals",
+   4
+  ],
+  [
+   "nethack  member:sf_nhcoord",
+   4
+  ],
+  [
+   "nethack  member:sf_nhrect",
+   4
+  ],
+  [
+   "nethack  member:sf_obj",
+   4
+  ],
+  [
+   "nethack  member:sf_objclass",
+   4
+  ],
+  [
+   "nethack  member:sf_q_score",
+   4
+  ],
+  [
+   "nethack  member:sf_rm",
+   4
+  ],
+  [
+   "nethack  member:sf_s_level",
+   4
+  ]
+ ],
+ "addrTakenFunctions": 1127,
+ "rng": {
+  "core": {
+   "rnd": 1024,
+   "rn2": 3937,
+   "d": 374,
+   "rnl": 72,
+   "rnz": 20,
+   "rne": 17
+  },
+  "display": 28,
+  "coreFns": 868,
+  "displayFns": 21,
+  "otherPrng": {}
+ },
+ "unions": [
+  {
+   "name": "Value",
+   "file": "lib/lua-5.4.8/src/lobject.h",
+   "line": 49,
+   "fields": [
+    "gc: struct GCObject *",
+    "p: void *",
+    "f: int (*)(struct lua_State *)",
+    "i: long long",
+    "n: double",
+    "ub: unsigned char"
+   ]
+  },
+  {
+   "name": "StackValue",
+   "file": "lib/lua-5.4.8/src/lobject.h",
+   "line": 148,
+   "fields": [
+    "val: struct TValue",
+    "tbclist: struct (unnamed struct at ./lobject.h:150:3)"
+   ]
+  },
+  {
+   "name": null,
+   "file": "lib/lua-5.4.8/src/lobject.h",
+   "line": 165,
+   "fields": [
+    "p: union StackValue *",
+    "offset: long"
+   ]
+  },
+  {
+   "name": null,
+   "file": "lib/lua-5.4.8/src/lobject.h",
+   "line": 391,
+   "fields": [
+    "lnglen: unsigned long",
+    "hnext: struct TString *"
+   ]
+  },
+  {
+   "name": "UValue",
+   "file": "lib/lua-5.4.8/src/lobject.h",
+   "line": 449,
+   "fields": [
+    "uv: struct TValue",
+    "n: double",
+    "u: double",
+    "s: void *",
+    "i: long long",
+    "l: long"
+   ]
+  },
+  {
+   "name": null,
+   "file": "lib/lua-5.4.8/src/lobject.h",
+   "line": 483,
+   "fields": [
+    "n: double",
+    "u: double",
+    "s: void *",
+    "i: long long",
+    "l: long"
+   ]
+  },
+  {
+   "name": null,
+   "file": "lib/lua-5.4.8/src/lobject.h",
+   "line": 629,
+   "fields": [
+    "p: struct TValue *",
+    "offset: long"
+   ]
+  },
+  {
+   "name": null,
+   "file": "lib/lua-5.4.8/src/lobject.h",
+   "line": 633,
+   "fields": [
+    "open: struct (unnamed struct at ./lobject.h:634:5)",
+    "value: struct TValue"
+   ]
+  },
+  {
+   "name": "Closure",
+   "file": "lib/lua-5.4.8/src/lobject.h",
+   "line": 661,
+   "fields": [
+    "c: struct CClosure",
+    "l: struct LClosure"
+   ]
+  },
+  {
+   "name": "Node",
+   "file": "lib/lua-5.4.8/src/lobject.h",
+   "line": 699,
+   "fields": [
+    "u: struct NodeKey",
+    "i_val: struct TValue"
+   ]
+  },
+  {
+   "name": null,
+   "file": "lib/lua-5.4.8/src/lstate.h",
+   "line": 181,
+   "fields": [
+    "l: struct (unnamed struct at ./lstate.h:182:5)",
+    "c: struct (unnamed struct at ./lstate.h:187:5)"
+   ]
+  },
+  {
+   "name": null,
+   "file": "lib/lua-5.4.8/src/lstate.h",
+   "line": 193,
+   "fields": [
+    "funcidx: int",
+    "nyield: int",
+    "nres: int",
+    "transferinfo: struct (unnamed struct at ./lstate.h:197:5)"
+   ]
+  },
+  {
+   "name": "GCUnion",
+   "file": "lib/lua-5.4.8/src/lstate.h",
+   "line": 353,
+   "fields": [
+    "gc: struct GCObject",
+    "ts: struct TString",
+    "u: struct Udata",
+    "cl: union Closure",
+    "h: struct Table",
+    "p: struct Proto",
+    "th: struct lua_State",
+    "upv: struct UpVal"
+   ]
+  },
+  {
+   "name": null,
+   "file": "lib/lua-5.4.8/src/lauxlib.h",
+   "line": 196,
+   "fields": [
+    "n: double",
+    "u: double",
+    "s: void *",
+    "i: long long",
+    "l: long",
+    "b: char[1024]"
+   ]
+  },
+  {
+   "name": null,
+   "file": "lib/lua-5.4.8/src/llex.h",
+   "line": 49,
+   "fields": [
+    "r: double",
+    "i: long long",
+    "ts: struct TString *"
+   ]
+  },
+  {
+   "name": null,
+   "file": "lib/lua-5.4.8/src/lparser.h",
+   "line": 70,
+   "fields": [
+    "ival: long long",
+    "nval: double",
+    "strval: struct TString *",
+    "info: int",
+    "ind: struct (unnamed struct at ./lparser.h:75:5)",
+    "var: struct (unnamed struct at ./lparser.h:79:5)"
+   ]
+  },
+  {
+   "name": "Vardesc",
+   "file": "lib/lua-5.4.8/src/lparser.h",
+   "line": 96,
+   "fields": [
+    "vd: struct (unnamed struct at ./lparser.h:97:3)",
+    "k: struct TValue"
+   ]
+  },
+  {
+   "name": null,
+   "file": "lib/lua-5.4.8/src/lstrlib.c",
+   "line": 1409,
+   "fields": [
+    "dummy: int",
+    "little: char"
+   ]
+  },
+  {
+   "name": "any",
+   "file": "include/wintype.h",
+   "line": 11,
+   "fields": [
+    "a_void: void *",
+    "a_obj: struct obj *",
+    "a_monst: struct monst *",
+    "a_int: int",
+    "a_xint16: int",
+    "a_xint8: int",
+    "a_char: char",
+    "a_schar: signed char",
+    "a_uchar: unsigned char",
+    "a_uint: unsigned int",
+    "a_long: long",
+    "a_ulong: unsigned long",
+    "a_coordxy: short",
+    "a_iptr: int *",
+    "a_xint16ptr: short *",
+    "a_xint8ptr: signed char *",
+    "a_lptr: long *",
+    "a_coordxyptr: short *",
+    "a_ulptr: unsigned long *",
+    "a_uptr: unsigned int *",
+    "a_string: const char *",
+    "a_nfunc: int (*)(void)",
+    "a_mask32: unsigned long",
+    "a_int64: long long",
+    "a_uint64: unsigned long long"
+   ]
+  },
+  {
+   "name": "customization_content",
+   "file": "include/sym.h",
+   "line": 153,
+   "fields": [
+    "sym: struct custom_symbol",
+    "urep: struct custom_urep",
+    "ccolor: struct custom_nhcolor"
+   ]
+  },
+  {
+   "name": "vlaunchinfo",
+   "file": "include/trap.h",
+   "line": 11,
+   "fields": [
+    "v_launch_otyp: short",
+    "v_launch2: struct nhcoord",
+    "v_conjoined: unsigned char",
+    "v_tnote: short"
+   ]
+  },
+  {
+   "name": "vptrs",
+   "file": "include/obj.h",
+   "line": 17,
+   "fields": [
+    "v_nexthere: struct obj *",
+    "v_ocontainer: struct obj *",
+    "v_ocarry: struct monst *"
+   ]
+  },
+  {
+   "name": "str_or_len",
+   "file": "include/hack.h",
+   "line": 93,
+   "fields": [
+    "str: char *",
+    "len: int"
+   ]
+  }
+ ],
+ "bitfieldRecords": [
+  "struct d_flags (include/dungeon.h:16): 6",
+  "struct mapseen_feat (include/dungeon.h:191): 13",
+  "struct mapseen_flags (include/dungeon.h:213): 16",
+  "struct mapseen_rooms (include/dungeon.h:241): 2",
+  "struct objclass (include/objclass.h:47): 13",
+  "struct instance_flags (include/flag.h:251): 3",
+  "struct symsetentry (include/sym.h:74): 4",
+  "struct trap (include/trap.h:18): 4",
+  "struct victual_info (include/context.h:59): 4",
+  "struct tribute_info (include/context.h:104): 2",
+  "struct engr (include/engrave.h:18): 4",
+  "struct obj (include/obj.h:35): 28",
+  "struct q_score (include/quest.h:8): 21",
+  "struct rm (include/rm.h:159): 7",
+  "struct levelflags (include/rm.h:431): 27",
+  "struct fe (include/timeout.h:62): 1",
+  "struct egd (include/mextra.h:77): 3",
+  "struct edog (include/mextra.h:172): 1",
+  "struct ebones (include/mextra.h:189): 3",
+  "struct monst (include/monst.h:96): 35",
+  "struct u_have (include/you.h:30): 6",
+  "struct u_event (include/you.h:39): 15",
+  "struct you (include/you.h:365): 9",
+  "struct mvitals (include/hack.h:680): 2",
+  "struct throw_and_return_weapon (include/hack.h:864): 1",
+  "struct arti_info (include/artifact.h:82): 9",
+  "struct <anon> (src/eat.c:138): 2"
+ ],
+ "fnptrFields": [
+  "union Value.f",
+  "struct CClosure.f",
+  "struct Zio.reader",
+  "struct <anon>.k",
+  "struct global_State.frealloc",
+  "struct global_State.panic",
+  "struct global_State.warnf",
+  "struct lua_State.hook",
+  "struct luaL_Reg.func",
+  "struct luaL_Stream.closef",
+  "struct <anon>.writer",
+  "struct allopt_t.optfn",
+  "union any.a_nfunc",
+  "struct sound_procs.sound_init_nhsound",
+  "struct sound_procs.sound_exit_nhsound",
+  "struct sound_procs.sound_achievement",
+  "struct sound_procs.sound_soundeffect",
+  "struct sound_procs.sound_hero_playnotes",
+  "struct sound_procs.sound_play_usersound",
+  "struct sound_procs.sound_ambience",
+  "struct sound_procs.sound_verbal",
+  "struct window_procs.win_init_nhwindows",
+  "struct window_procs.win_player_selection",
+  "struct window_procs.win_askname",
+  "struct window_procs.win_get_nh_event",
+  "struct window_procs.win_exit_nhwindows",
+  "struct window_procs.win_suspend_nhwindows",
+  "struct window_procs.win_resume_nhwindows",
+  "struct window_procs.win_create_nhwindow",
+  "struct window_procs.win_clear_nhwindow",
+  "struct window_procs.win_display_nhwindow",
+  "struct window_procs.win_destroy_nhwindow",
+  "struct window_procs.win_curs",
+  "struct window_procs.win_putstr",
+  "struct window_procs.win_putmixed",
+  "struct window_procs.win_display_file",
+  "struct window_procs.win_start_menu",
+  "struct window_procs.win_add_menu",
+  "struct window_procs.win_end_menu",
+  "struct window_procs.win_select_menu",
+  "struct window_procs.win_message_menu",
+  "struct window_procs.win_mark_synch",
+  "struct window_procs.win_wait_synch",
+  "struct window_procs.win_cliparound",
+  "struct window_procs.win_print_glyph",
+  "struct window_procs.win_raw_print",
+  "struct window_procs.win_raw_print_bold",
+  "struct window_procs.win_nhgetch",
+  "struct window_procs.win_nh_poskey",
+  "struct window_procs.win_nhbell",
+  "struct window_procs.win_doprev_message",
+  "struct window_procs.win_yn_function",
+  "struct window_procs.win_getlin",
+  "struct window_procs.win_get_ext_cmd",
+  "struct window_procs.win_number_pad",
+  "struct window_procs.win_delay_output",
+  "struct window_procs.win_outrip",
+  "struct window_procs.win_preference_update",
+  "struct window_procs.win_getmsghistory",
+  "struct window_procs.win_putmsghistory",
+  "struct window_procs.win_status_init",
+  "struct window_procs.win_status_finish",
+  "struct window_procs.win_status_enablefield",
+  "struct window_procs.win_status_update",
+  "struct window_procs.win_can_suspend",
+  "struct window_procs.win_update_inventory",
+  "struct window_procs.win_ctrl_nhwindow",
+  "struct instance_globals_a.afternmv",
+  "struct instance_globals_o.occupation",
+  "struct poison_effect_message.delivery_func",
+  "struct match_config_line_stmt.fn",
+  "struct ext_func_tab.ef_funct",
+  "struct find_struct.callback",
+  "struct <anon>.f",
+  "struct rnglist_t.fn",
+  "struct sf_procs.sf_arti_info",
+  "struct sf_procs.sf_nhrect",
+  "struct sf_procs.sf_branch",
+  "struct sf_procs.sf_bubble",
+  "struct sf_procs.sf_cemetery",
+  "struct sf_procs.sf_context_info",
+  "struct sf_procs.sf_nhcoord",
+  "struct sf_procs.sf_damage",
+  "struct sf_procs.sf_dest_area",
+  "struct sf_procs.sf_dgn_topology",
+  "struct sf_procs.sf_dungeon",
+  "struct sf_procs.sf_d_level",
+  "struct sf_procs.sf_ebones",
+  "struct sf_procs.sf_edog",
+  "struct sf_procs.sf_egd",
+  "struct sf_procs.sf_emin",
+  "struct sf_procs.sf_engr",
+  "struct sf_procs.sf_epri",
+  "struct sf_procs.sf_eshk",
+  "struct sf_procs.sf_fe",
+  "struct sf_procs.sf_flag",
+  "struct sf_procs.sf_fruit",
+  "struct sf_procs.sf_gamelog_line",
+  "struct sf_procs.sf_kinfo",
+  "struct sf_procs.sf_levelflags",
+  "struct sf_procs.sf_ls_t",
+  "struct sf_procs.sf_linfo",
+  "struct sf_procs.sf_mapseen_feat",
+  "struct sf_procs.sf_mapseen_flags",
+  "struct sf_procs.sf_mapseen_rooms",
+  "struct sf_procs.sf_mkroom",
+  "struct sf_procs.sf_monst",
+  "struct sf_procs.sf_mvitals",
+  "struct sf_procs.sf_obj",
+  "struct sf_procs.sf_objclass",
+  "struct sf_procs.sf_q_score",
+  "struct sf_procs.sf_rm",
+  "struct sf_procs.sf_spell",
+  "struct sf_procs.sf_stairway",
+  "struct sf_procs.sf_s_level",
+  "struct sf_procs.sf_trap",
+  "struct sf_procs.sf_version_info",
+  "struct sf_procs.sf_you",
+  "struct sf_procs.sf_any",
+  "struct sf_procs.sf_aligntyp",
+  "struct sf_procs.sf_boolean",
+  "struct sf_procs.sf_coordxy",
+  "struct sf_procs.sf_genericptr",
+  "struct sf_procs.sf_int",
+  "struct sf_procs.sf_int16",
+  "struct sf_procs.sf_int32",
+  "struct sf_procs.sf_int64",
+  "struct sf_procs.sf_long",
+  "struct sf_procs.sf_schar",
+  "struct sf_procs.sf_short",
+  "struct sf_procs.sf_size_t",
+  "struct sf_procs.sf_time_t",
+  "struct sf_procs.sf_uchar",
+  "struct sf_procs.sf_uint16",
+  "struct sf_procs.sf_uint32",
+  "struct sf_procs.sf_uint64",
+  "struct sf_procs.sf_ulong",
+  "struct sf_procs.sf_unsigned",
+  "struct sf_procs.sf_ushort",
+  "struct sf_procs.sf_xint16",
+  "struct sf_procs.sf_xint8",
+  "struct sf_procs.sf_char",
+  "struct sf_procs.sf_bitfield",
+  "struct <anon>.f",
+  "struct <anon>.cleanup",
+  "struct win_choices.ini_routine"
+ ]
+}

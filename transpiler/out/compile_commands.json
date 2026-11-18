@@ -1,0 +1,2442 @@
+[
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/allmain.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/allmain.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/alloc.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/alloc.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/apply.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/apply.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/artifact.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/artifact.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/attrib.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/attrib.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/ball.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/ball.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/bones.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/bones.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/botl.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/botl.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/calendar.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/calendar.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/cfgfiles.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/cfgfiles.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/cmd.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/cmd.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/coloratt.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/coloratt.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/dbridge.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/dbridge.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/decl.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/decl.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/detect.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/detect.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/dig.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/dig.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/display.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/display.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/dlb.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/dlb.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/do.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/do.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/do_name.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/do_name.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/do_wear.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/do_wear.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/dog.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/dog.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/dogmove.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/dogmove.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/dokick.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/dokick.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/dothrow.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/dothrow.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/drawing.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/drawing.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/dungeon.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/dungeon.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/earlyarg.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/earlyarg.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/eat.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/eat.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/end.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/end.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/engrave.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/engrave.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/exper.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/exper.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/explode.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/explode.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/extralev.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/extralev.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/files.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/files.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/fountain.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/fountain.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/getpos.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/getpos.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/glyphs.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/glyphs.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/hack.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/hack.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/iactions.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/iactions.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/insight.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/insight.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/invent.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/invent.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/isaac64.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/isaac64.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/light.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/light.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/lock.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/lock.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/mail.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/mail.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/makemon.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/makemon.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/mcastu.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/mcastu.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/mdlib.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/mdlib.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/mhitm.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/mhitm.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/mhitu.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/mhitu.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/minion.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/minion.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/mklev.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/mklev.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/mkmap.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/mkmap.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/mkmaze.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/mkmaze.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/mkobj.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/mkobj.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/mkroom.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/mkroom.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/mon.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/mon.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/mondata.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/mondata.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/monmove.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/monmove.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/monst.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/monst.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/mplayer.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/mplayer.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/mthrowu.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/mthrowu.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/muse.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/muse.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/music.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/music.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/nhlua.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/nhlua.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/nhlsel.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/nhlsel.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/nhlobj.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/nhlobj.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/nhmd4.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/nhmd4.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/objects.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/objects.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/o_init.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/o_init.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/objnam.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/objnam.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/options.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/options.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/pager.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/pager.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/pickup.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/pickup.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/pline.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/pline.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/polyself.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/polyself.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/potion.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/potion.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/pray.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/pray.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/priest.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/priest.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/quest.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/quest.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/questpgr.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/questpgr.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/read.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/read.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/rect.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/rect.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/region.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/region.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/report.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/report.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/restore.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/restore.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/rip.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/rip.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/rnd.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/rnd.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/role.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/role.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/rumors.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/rumors.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/save.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/save.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/selvar.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/selvar.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/sfbase.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/sfbase.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/sfstruct.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/sfstruct.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/shk.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/shk.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/shknam.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/shknam.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/sit.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/sit.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/sounds.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/sounds.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/sp_lev.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/sp_lev.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/spell.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/spell.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/stairs.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/stairs.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/symbols.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/symbols.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/sys.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/sys.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/steal.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/steal.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/steed.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/steed.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/strutil.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/strutil.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/teleport.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/teleport.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/timeout.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/timeout.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/topten.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/topten.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/track.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/track.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/trap.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/trap.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/u_init.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/u_init.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/uhitm.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/uhitm.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/utf8map.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/utf8map.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/vault.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/vault.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/vision.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/vision.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/weapon.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/weapon.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/were.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/were.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/wield.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/wield.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/windows.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/windows.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/wizard.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/wizard.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/wizcmds.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/wizcmds.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/worm.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/worm.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/worn.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/worn.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/write.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/write.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/zap.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/zap.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/sys/share/posixregex.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/sys/share/posixregex.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/sys/share/ioctl.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/sys/share/ioctl.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/sys/unix/unixmain.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/sys/unix/unixmain.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/sys/share/unixtty.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/sys/share/unixtty.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/sys/unix/unixunix.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/sys/unix/unixunix.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/sys/unix/unixres.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/sys/unix/unixres.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/win/tty/getline.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/win/tty/getline.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/win/tty/termcap.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/win/tty/termcap.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/win/tty/topl.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/win/tty/topl.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/win/tty/wintty.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/win/tty/wintty.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/version.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/version.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/date.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/date.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/src/hacklib.c",
+  "arguments": [
+   "clang",
+   "-g",
+   "-I../include",
+   "-DNOTPARMDECL",
+   "-DNO_TIMED_DELAY",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/src/hacklib.c"
+  ],
+  "group": "nethack"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lapi.c",
+  "arguments": [
+   "clang",
+   "-O2",
+   "-Wall",
+   "-Wextra",
+   "-DLUA_COMPAT_5_3",
+   "-DLUA_USE_MACOSX",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lapi.c"
+  ],
+  "group": "lua"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lcode.c",
+  "arguments": [
+   "clang",
+   "-O2",
+   "-Wall",
+   "-Wextra",
+   "-DLUA_COMPAT_5_3",
+   "-DLUA_USE_MACOSX",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lcode.c"
+  ],
+  "group": "lua"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lctype.c",
+  "arguments": [
+   "clang",
+   "-O2",
+   "-Wall",
+   "-Wextra",
+   "-DLUA_COMPAT_5_3",
+   "-DLUA_USE_MACOSX",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lctype.c"
+  ],
+  "group": "lua"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/ldebug.c",
+  "arguments": [
+   "clang",
+   "-O2",
+   "-Wall",
+   "-Wextra",
+   "-DLUA_COMPAT_5_3",
+   "-DLUA_USE_MACOSX",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/ldebug.c"
+  ],
+  "group": "lua"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/ldo.c",
+  "arguments": [
+   "clang",
+   "-O2",
+   "-Wall",
+   "-Wextra",
+   "-DLUA_COMPAT_5_3",
+   "-DLUA_USE_MACOSX",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/ldo.c"
+  ],
+  "group": "lua"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/ldump.c",
+  "arguments": [
+   "clang",
+   "-O2",
+   "-Wall",
+   "-Wextra",
+   "-DLUA_COMPAT_5_3",
+   "-DLUA_USE_MACOSX",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/ldump.c"
+  ],
+  "group": "lua"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lfunc.c",
+  "arguments": [
+   "clang",
+   "-O2",
+   "-Wall",
+   "-Wextra",
+   "-DLUA_COMPAT_5_3",
+   "-DLUA_USE_MACOSX",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lfunc.c"
+  ],
+  "group": "lua"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lgc.c",
+  "arguments": [
+   "clang",
+   "-O2",
+   "-Wall",
+   "-Wextra",
+   "-DLUA_COMPAT_5_3",
+   "-DLUA_USE_MACOSX",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lgc.c"
+  ],
+  "group": "lua"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/llex.c",
+  "arguments": [
+   "clang",
+   "-O2",
+   "-Wall",
+   "-Wextra",
+   "-DLUA_COMPAT_5_3",
+   "-DLUA_USE_MACOSX",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/llex.c"
+  ],
+  "group": "lua"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lmem.c",
+  "arguments": [
+   "clang",
+   "-O2",
+   "-Wall",
+   "-Wextra",
+   "-DLUA_COMPAT_5_3",
+   "-DLUA_USE_MACOSX",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lmem.c"
+  ],
+  "group": "lua"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lobject.c",
+  "arguments": [
+   "clang",
+   "-O2",
+   "-Wall",
+   "-Wextra",
+   "-DLUA_COMPAT_5_3",
+   "-DLUA_USE_MACOSX",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lobject.c"
+  ],
+  "group": "lua"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lopcodes.c",
+  "arguments": [
+   "clang",
+   "-O2",
+   "-Wall",
+   "-Wextra",
+   "-DLUA_COMPAT_5_3",
+   "-DLUA_USE_MACOSX",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lopcodes.c"
+  ],
+  "group": "lua"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lparser.c",
+  "arguments": [
+   "clang",
+   "-O2",
+   "-Wall",
+   "-Wextra",
+   "-DLUA_COMPAT_5_3",
+   "-DLUA_USE_MACOSX",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lparser.c"
+  ],
+  "group": "lua"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lstate.c",
+  "arguments": [
+   "clang",
+   "-O2",
+   "-Wall",
+   "-Wextra",
+   "-DLUA_COMPAT_5_3",
+   "-DLUA_USE_MACOSX",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lstate.c"
+  ],
+  "group": "lua"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lstring.c",
+  "arguments": [
+   "clang",
+   "-O2",
+   "-Wall",
+   "-Wextra",
+   "-DLUA_COMPAT_5_3",
+   "-DLUA_USE_MACOSX",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lstring.c"
+  ],
+  "group": "lua"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/ltable.c",
+  "arguments": [
+   "clang",
+   "-O2",
+   "-Wall",
+   "-Wextra",
+   "-DLUA_COMPAT_5_3",
+   "-DLUA_USE_MACOSX",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/ltable.c"
+  ],
+  "group": "lua"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/ltm.c",
+  "arguments": [
+   "clang",
+   "-O2",
+   "-Wall",
+   "-Wextra",
+   "-DLUA_COMPAT_5_3",
+   "-DLUA_USE_MACOSX",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/ltm.c"
+  ],
+  "group": "lua"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lundump.c",
+  "arguments": [
+   "clang",
+   "-O2",
+   "-Wall",
+   "-Wextra",
+   "-DLUA_COMPAT_5_3",
+   "-DLUA_USE_MACOSX",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lundump.c"
+  ],
+  "group": "lua"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lvm.c",
+  "arguments": [
+   "clang",
+   "-O2",
+   "-Wall",
+   "-Wextra",
+   "-DLUA_COMPAT_5_3",
+   "-DLUA_USE_MACOSX",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lvm.c"
+  ],
+  "group": "lua"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lzio.c",
+  "arguments": [
+   "clang",
+   "-O2",
+   "-Wall",
+   "-Wextra",
+   "-DLUA_COMPAT_5_3",
+   "-DLUA_USE_MACOSX",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lzio.c"
+  ],
+  "group": "lua"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lauxlib.c",
+  "arguments": [
+   "clang",
+   "-O2",
+   "-Wall",
+   "-Wextra",
+   "-DLUA_COMPAT_5_3",
+   "-DLUA_USE_MACOSX",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lauxlib.c"
+  ],
+  "group": "lua"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lbaselib.c",
+  "arguments": [
+   "clang",
+   "-O2",
+   "-Wall",
+   "-Wextra",
+   "-DLUA_COMPAT_5_3",
+   "-DLUA_USE_MACOSX",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lbaselib.c"
+  ],
+  "group": "lua"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lcorolib.c",
+  "arguments": [
+   "clang",
+   "-O2",
+   "-Wall",
+   "-Wextra",
+   "-DLUA_COMPAT_5_3",
+   "-DLUA_USE_MACOSX",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lcorolib.c"
+  ],
+  "group": "lua"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/ldblib.c",
+  "arguments": [
+   "clang",
+   "-O2",
+   "-Wall",
+   "-Wextra",
+   "-DLUA_COMPAT_5_3",
+   "-DLUA_USE_MACOSX",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/ldblib.c"
+  ],
+  "group": "lua"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/liolib.c",
+  "arguments": [
+   "clang",
+   "-O2",
+   "-Wall",
+   "-Wextra",
+   "-DLUA_COMPAT_5_3",
+   "-DLUA_USE_MACOSX",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/liolib.c"
+  ],
+  "group": "lua"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lmathlib.c",
+  "arguments": [
+   "clang",
+   "-O2",
+   "-Wall",
+   "-Wextra",
+   "-DLUA_COMPAT_5_3",
+   "-DLUA_USE_MACOSX",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lmathlib.c"
+  ],
+  "group": "lua"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/loadlib.c",
+  "arguments": [
+   "clang",
+   "-O2",
+   "-Wall",
+   "-Wextra",
+   "-DLUA_COMPAT_5_3",
+   "-DLUA_USE_MACOSX",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/loadlib.c"
+  ],
+  "group": "lua"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/loslib.c",
+  "arguments": [
+   "clang",
+   "-O2",
+   "-Wall",
+   "-Wextra",
+   "-DLUA_COMPAT_5_3",
+   "-DLUA_USE_MACOSX",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/loslib.c"
+  ],
+  "group": "lua"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lstrlib.c",
+  "arguments": [
+   "clang",
+   "-O2",
+   "-Wall",
+   "-Wextra",
+   "-DLUA_COMPAT_5_3",
+   "-DLUA_USE_MACOSX",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lstrlib.c"
+  ],
+  "group": "lua"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/ltablib.c",
+  "arguments": [
+   "clang",
+   "-O2",
+   "-Wall",
+   "-Wextra",
+   "-DLUA_COMPAT_5_3",
+   "-DLUA_USE_MACOSX",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/ltablib.c"
+  ],
+  "group": "lua"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lutf8lib.c",
+  "arguments": [
+   "clang",
+   "-O2",
+   "-Wall",
+   "-Wextra",
+   "-DLUA_COMPAT_5_3",
+   "-DLUA_USE_MACOSX",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/lutf8lib.c"
+  ],
+  "group": "lua"
+ },
+ {
+  "directory": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src",
+  "file": "tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/linit.c",
+  "arguments": [
+   "clang",
+   "-O2",
+   "-Wall",
+   "-Wextra",
+   "-DLUA_COMPAT_5_3",
+   "-DLUA_USE_MACOSX",
+   "-c",
+   "/Users/selinbekir/Desktop/teleport-contest/tools/recorder-env/build/nethack-c/recorder/lib/lua-5.4.8/src/linit.c"
+  ],
+  "group": "lua"
+ }
+]

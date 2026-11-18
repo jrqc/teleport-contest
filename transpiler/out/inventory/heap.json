@@ -1,0 +1,930 @@
+{
+ "records": {
+  "total": 428,
+  "nethack": 345,
+  "lua": 83
+ },
+ "evidence": {
+  "struct CClosure": {
+   "cast": [
+    "lib/lua-5.4.8/src/lapi.c:263 lua_copy struct CClosure -> union GCUnion",
+    "lib/lua-5.4.8/src/lapi.c:597 lua_pushcclosure struct CClosure -> union GCUnion",
+    "lib/lua-5.4.8/src/lapi.c:1365 aux_upvalue struct CClosure -> union GCUnion"
+   ]
+  },
+  "struct GCObject": {
+   "cast": [
+    "lib/lua-5.4.8/src/lapi.c:79 index2value struct GCObject -> union GCUnion",
+    "lib/lua-5.4.8/src/lapi.c:263 lua_copy struct GCObject -> union GCUnion",
+    "lib/lua-5.4.8/src/lapi.c:420 lua_tolstring struct GCObject -> union GCUnion",
+    "lib/lua-5.4.8/src/lapi.c:422 lua_tolstring struct GCObject -> union GCUnion",
+    "lib/lua-5.4.8/src/lapi.c:429 lua_rawlen struct GCObject -> union GCUnion",
+    "lib/lua-5.4.8/src/lapi.c:430 lua_rawlen struct GCObject -> union GCUnion",
+    "... 166 total"
+   ]
+  },
+  "struct LClosure": {
+   "cast": [
+    "lib/lua-5.4.8/src/lapi.c:1460 lua_upvaluejoin struct LClosure -> union GCUnion",
+    "lib/lua-5.4.8/src/lfunc.c:56 luaF_initupvals struct LClosure -> union GCUnion",
+    "lib/lua-5.4.8/src/lparser.c:1946 luaY_parser struct LClosure -> union GCUnion",
+    "lib/lua-5.4.8/src/lparser.c:1952 luaY_parser struct LClosure -> union GCUnion",
+    "lib/lua-5.4.8/src/lundump.c:326 luaU_undump struct LClosure -> union GCUnion",
+    "lib/lua-5.4.8/src/lundump.c:329 luaU_undump struct LClosure -> union GCUnion",
+    "... 8 total"
+   ]
+  },
+  "struct LX": {
+   "cast": [
+    "lib/lua-5.4.8/src/lstate.c:284 close_state char -> struct LX",
+    "lib/lua-5.4.8/src/lstate.c:316 luaE_freethread char -> struct LX"
+   ]
+  },
+  "struct Proto": {
+   "cast": [
+    "lib/lua-5.4.8/src/lcode.c:568 addk struct Proto -> union GCUnion",
+    "lib/lua-5.4.8/src/lgc.c:588 traverseproto struct Proto -> union GCUnion",
+    "lib/lua-5.4.8/src/lgc.c:608 traverseLclosure struct Proto -> union GCUnion",
+    "lib/lua-5.4.8/src/lparser.c:184 registerlocalvar struct Proto -> union GCUnion",
+    "lib/lua-5.4.8/src/lparser.c:380 newupvalue struct Proto -> union GCUnion",
+    "lib/lua-5.4.8/src/lparser.c:710 addprototype struct Proto -> union GCUnion",
+    "... 13 total"
+   ]
+  },
+  "struct TString": {
+   "cast": [
+    "lib/lua-5.4.8/src/lapi.c:530 lua_pushlstring struct TString -> union GCUnion",
+    "lib/lua-5.4.8/src/lapi.c:545 lua_pushstring struct TString -> union GCUnion",
+    "lib/lua-5.4.8/src/lapi.c:647 auxgetstr struct TString -> union GCUnion",
+    "lib/lua-5.4.8/src/lapi.c:838 auxsetstr struct TString -> union GCUnion",
+    "lib/lua-5.4.8/src/lapi.c:1291 lua_concat struct TString -> union GCUnion",
+    "lib/lua-5.4.8/src/lcode.c:99 luaK_exp2const struct TString -> union GCUnion",
+    "... 30 total"
+   ]
+  },
+  "struct TValue": {
+   "cast": [
+    "lib/lua-5.4.8/src/ldo.c:168 relstack struct TValue -> union StackValue",
+    "lib/lua-5.4.8/src/lfunc.c:91 luaF_findupval struct TValue -> union StackValue",
+    "lib/lua-5.4.8/src/lfunc.c:93 luaF_findupval struct TValue -> union StackValue",
+    "lib/lua-5.4.8/src/lfunc.c:196 luaF_closeupval struct TValue -> union StackValue",
+    "lib/lua-5.4.8/src/llex.c:139 luaX_newstring struct TValue -> union Node",
+    "lib/lua-5.4.8/src/ltable.c:342 findindex struct TValue -> union Node"
+   ]
+  },
+  "struct Table": {
+   "cast": [
+    "lib/lua-5.4.8/src/lapi.c:766 lua_createtable struct Table -> union GCUnion",
+    "lib/lua-5.4.8/src/lapi.c:793 lua_getmetatable struct Table -> union GCUnion",
+    "lib/lua-5.4.8/src/lapi.c:903 aux_rawset struct Table -> union GCUnion",
+    "lib/lua-5.4.8/src/lapi.c:927 lua_rawseti struct Table -> union GCUnion",
+    "lib/lua-5.4.8/src/lapi.c:949 lua_setmetatable struct Table -> union GCUnion",
+    "lib/lua-5.4.8/src/lapi.c:957 lua_setmetatable struct Table -> union GCUnion",
+    "... 28 total"
+   ]
+  },
+  "struct Udata": {
+   "cast": [
+    "lib/lua-5.4.8/src/lapi.c:449 touserdata struct Udata -> char",
+    "lib/lua-5.4.8/src/lapi.c:957 lua_setmetatable struct Udata -> union GCUnion",
+    "lib/lua-5.4.8/src/lapi.c:1348 lua_newuserdatauv struct Udata -> union GCUnion",
+    "lib/lua-5.4.8/src/lapi.c:1352 lua_newuserdatauv struct Udata -> char",
+    "lib/lua-5.4.8/src/lgc.c:570 traverseudata struct Udata -> union GCUnion"
+   ]
+  },
+  "struct UpVal": {
+   "cast": [
+    "lib/lua-5.4.8/src/lapi.c:1102 lua_load struct UpVal -> union GCUnion",
+    "lib/lua-5.4.8/src/lapi.c:1375 aux_upvalue struct UpVal -> union GCUnion",
+    "lib/lua-5.4.8/src/lapi.c:1460 lua_upvaluejoin struct UpVal -> union GCUnion",
+    "lib/lua-5.4.8/src/lfunc.c:56 luaF_initupvals struct UpVal -> union GCUnion",
+    "lib/lua-5.4.8/src/lfunc.c:204 luaF_closeupval struct UpVal -> union GCUnion",
+    "lib/lua-5.4.8/src/lgc.c:611 traverseLclosure struct UpVal -> union GCUnion",
+    "... 9 total"
+   ]
+  },
+  "struct _cond_map": {
+   "obj-copy": [
+    "src/botl.c:3496 status_hilite_linestr_gather_conditions memset(struct _cond_map[30]; size=expr:BinaryOperator) partial"
+   ]
+  },
+  "struct arti_info": {
+   "save-io": [
+    "include/sfmacros.h:9 sfo_arti_info struct arti_info -> char",
+    "include/sfmacros.h:9 historical_sfo_arti_info bwrite(struct arti_info; size=struct arti_info)",
+    "include/sfmacros.h:9 historical_sfi_arti_info mread(struct arti_info; size=struct arti_info)"
+   ]
+  },
+  "struct branch": {
+   "save-io": [
+    "include/sfmacros.h:11 sfo_branch struct branch -> char",
+    "include/sfmacros.h:11 historical_sfo_branch bwrite(struct branch; size=struct branch)",
+    "include/sfmacros.h:11 historical_sfi_branch mread(struct branch; size=struct branch)"
+   ]
+  },
+  "struct bubble": {
+   "save-io": [
+    "include/sfmacros.h:12 sfo_bubble struct bubble -> char",
+    "include/sfmacros.h:12 historical_sfo_bubble bwrite(struct bubble; size=struct bubble)",
+    "include/sfmacros.h:12 historical_sfi_bubble mread(struct bubble; size=struct bubble)"
+   ]
+  },
+  "struct cemetery": {
+   "save-io": [
+    "include/sfmacros.h:13 sfo_cemetery struct cemetery -> char",
+    "include/sfmacros.h:13 historical_sfo_cemetery bwrite(struct cemetery; size=struct cemetery)",
+    "include/sfmacros.h:13 historical_sfi_cemetery mread(struct cemetery; size=struct cemetery)"
+   ]
+  },
+  "struct context_info": {
+   "save-io": [
+    "include/sfmacros.h:14 sfo_context_info struct context_info -> char",
+    "include/sfmacros.h:14 historical_sfo_context_info bwrite(struct context_info; size=struct context_info)",
+    "include/sfmacros.h:14 historical_sfi_context_info mread(struct context_info; size=struct context_info)"
+   ]
+  },
+  "struct d_level": {
+   "save-io": [
+    "include/sfmacros.h:20 sfo_d_level struct d_level -> char",
+    "include/sfmacros.h:20 historical_sfo_d_level bwrite(struct d_level; size=struct d_level)",
+    "include/sfmacros.h:20 historical_sfi_d_level mread(struct d_level; size=struct d_level)"
+   ]
+  },
+  "struct damage": {
+   "save-io": [
+    "include/sfmacros.h:16 sfo_damage struct damage -> char",
+    "include/sfmacros.h:16 historical_sfo_damage bwrite(struct damage; size=struct damage)",
+    "include/sfmacros.h:16 historical_sfi_damage mread(struct damage; size=struct damage)"
+   ]
+  },
+  "struct dest_area": {
+   "save-io": [
+    "include/sfmacros.h:17 sfo_dest_area struct dest_area -> char",
+    "include/sfmacros.h:17 historical_sfo_dest_area bwrite(struct dest_area; size=struct dest_area)",
+    "include/sfmacros.h:17 historical_sfi_dest_area mread(struct dest_area; size=struct dest_area)"
+   ]
+  },
+  "struct dgn_topology": {
+   "save-io": [
+    "include/sfmacros.h:18 sfo_dgn_topology struct dgn_topology -> char",
+    "include/sfmacros.h:18 historical_sfo_dgn_topology bwrite(struct dgn_topology; size=struct dgn_topology)",
+    "include/sfmacros.h:18 historical_sfi_dgn_topology mread(struct dgn_topology; size=struct dgn_topology)"
+   ]
+  },
+  "struct dungeon": {
+   "save-io": [
+    "include/sfmacros.h:19 sfo_dungeon struct dungeon -> char",
+    "include/sfmacros.h:19 historical_sfo_dungeon bwrite(struct dungeon; size=struct dungeon)",
+    "include/sfmacros.h:19 historical_sfi_dungeon mread(struct dungeon; size=struct dungeon)"
+   ]
+  },
+  "struct ebones": {
+   "save-io": [
+    "include/sfmacros.h:21 sfo_ebones struct ebones -> char",
+    "include/sfmacros.h:21 historical_sfo_ebones bwrite(struct ebones; size=struct ebones)",
+    "include/sfmacros.h:21 historical_sfi_ebones mread(struct ebones; size=struct ebones)"
+   ]
+  },
+  "struct edog": {
+   "save-io": [
+    "include/sfmacros.h:22 sfo_edog struct edog -> char",
+    "include/sfmacros.h:22 historical_sfo_edog bwrite(struct edog; size=struct edog)",
+    "include/sfmacros.h:22 historical_sfi_edog mread(struct edog; size=struct edog)"
+   ]
+  },
+  "struct egd": {
+   "save-io": [
+    "include/sfmacros.h:23 sfo_egd struct egd -> char",
+    "include/sfmacros.h:23 historical_sfo_egd bwrite(struct egd; size=struct egd)",
+    "include/sfmacros.h:23 historical_sfi_egd mread(struct egd; size=struct egd)"
+   ]
+  },
+  "struct emin": {
+   "save-io": [
+    "include/sfmacros.h:24 sfo_emin struct emin -> char",
+    "include/sfmacros.h:24 historical_sfo_emin bwrite(struct emin; size=struct emin)",
+    "include/sfmacros.h:24 historical_sfi_emin mread(struct emin; size=struct emin)"
+   ]
+  },
+  "struct engr": {
+   "cast": [
+    "src/engrave.c:378 read_engr_at struct engr -> char",
+    "src/engrave.c:435 make_engr_at struct engr -> char",
+    "src/engrave.c:1565 save_engravings struct engr -> char",
+    "src/engrave.c:1600 rest_engravings struct engr -> char"
+   ],
+   "obj-copy": [
+    "src/engrave.c:430 make_engr_at memset(struct engr; size=expr:BinaryOperator) partial"
+   ],
+   "save-io": [
+    "include/sfmacros.h:25 sfo_engr struct engr -> char",
+    "include/sfmacros.h:25 historical_sfo_engr bwrite(struct engr; size=struct engr)",
+    "include/sfmacros.h:25 historical_sfi_engr mread(struct engr; size=struct engr)"
+   ]
+  },
+  "struct epri": {
+   "save-io": [
+    "include/sfmacros.h:26 sfo_epri struct epri -> char",
+    "include/sfmacros.h:26 historical_sfo_epri bwrite(struct epri; size=struct epri)",
+    "include/sfmacros.h:26 historical_sfi_epri mread(struct epri; size=struct epri)"
+   ]
+  },
+  "struct eshk": {
+   "save-io": [
+    "include/sfmacros.h:27 sfo_eshk struct eshk -> char",
+    "include/sfmacros.h:27 historical_sfo_eshk bwrite(struct eshk; size=struct eshk)",
+    "include/sfmacros.h:27 historical_sfi_eshk mread(struct eshk; size=struct eshk)"
+   ]
+  },
+  "struct fe": {
+   "save-io": [
+    "include/sfmacros.h:28 sfo_fe struct fe -> char",
+    "include/sfmacros.h:28 historical_sfo_fe bwrite(struct fe; size=struct fe)",
+    "include/sfmacros.h:28 historical_sfi_fe mread(struct fe; size=struct fe)"
+   ]
+  },
+  "struct flag": {
+   "save-io": [
+    "include/sfmacros.h:29 sfo_flag struct flag -> char",
+    "include/sfmacros.h:29 historical_sfo_flag bwrite(struct flag; size=struct flag)",
+    "include/sfmacros.h:29 historical_sfi_flag mread(struct flag; size=struct flag)"
+   ]
+  },
+  "struct fruit": {
+   "save-io": [
+    "include/sfmacros.h:30 sfo_fruit struct fruit -> char",
+    "include/sfmacros.h:30 historical_sfo_fruit bwrite(struct fruit; size=struct fruit)",
+    "include/sfmacros.h:30 historical_sfi_fruit mread(struct fruit; size=struct fruit)"
+   ]
+  },
+  "struct gamelog_line": {
+   "save-io": [
+    "include/sfmacros.h:31 sfo_gamelog_line struct gamelog_line -> char",
+    "include/sfmacros.h:31 historical_sfo_gamelog_line bwrite(struct gamelog_line; size=struct gamelog_line)",
+    "include/sfmacros.h:31 historical_sfi_gamelog_line mread(struct gamelog_line; size=struct gamelog_line)"
+   ]
+  },
+  "struct kinfo": {
+   "save-io": [
+    "include/sfmacros.h:32 sfo_kinfo struct kinfo -> char",
+    "include/sfmacros.h:32 historical_sfo_kinfo bwrite(struct kinfo; size=struct kinfo)",
+    "include/sfmacros.h:32 historical_sfi_kinfo mread(struct kinfo; size=struct kinfo)"
+   ]
+  },
+  "struct levelflags": {
+   "save-io": [
+    "include/sfmacros.h:33 sfo_levelflags struct levelflags -> char",
+    "include/sfmacros.h:33 historical_sfo_levelflags bwrite(struct levelflags; size=struct levelflags)",
+    "include/sfmacros.h:33 historical_sfi_levelflags mread(struct levelflags; size=struct levelflags)"
+   ]
+  },
+  "struct linfo": {
+   "save-io": [
+    "include/sfmacros.h:35 sfo_linfo struct linfo -> char",
+    "include/sfmacros.h:35 historical_sfo_linfo bwrite(struct linfo; size=struct linfo)",
+    "include/sfmacros.h:35 historical_sfi_linfo mread(struct linfo; size=struct linfo)"
+   ]
+  },
+  "struct ls_t": {
+   "save-io": [
+    "include/sfmacros.h:34 sfo_ls_t struct ls_t -> char",
+    "include/sfmacros.h:34 historical_sfo_ls_t bwrite(struct ls_t; size=struct ls_t)",
+    "include/sfmacros.h:34 historical_sfi_ls_t mread(struct ls_t; size=struct ls_t)"
+   ]
+  },
+  "struct lua_State": {
+   "cast": [
+    "lib/lua-5.4.8/src/lapi.c:626 lua_pushthread struct lua_State -> union GCUnion",
+    "lib/lua-5.4.8/src/lgc.c:405 restartcollection struct lua_State -> union GCUnion",
+    "lib/lua-5.4.8/src/lgc.c:633 traversethread struct lua_State -> union GCUnion",
+    "lib/lua-5.4.8/src/lgc.c:1092 sweep2old struct lua_State -> union GCUnion",
+    "lib/lua-5.4.8/src/lgc.c:1518 luaC_freeallobjects struct lua_State -> union GCUnion",
+    "lib/lua-5.4.8/src/lgc.c:1534 atomic struct lua_State -> union GCUnion",
+    "... 12 total"
+   ]
+  },
+  "struct mapseen_feat": {
+   "save-io": [
+    "include/sfmacros.h:36 sfo_mapseen_feat struct mapseen_feat -> char",
+    "include/sfmacros.h:36 historical_sfo_mapseen_feat bwrite(struct mapseen_feat; size=struct mapseen_feat)",
+    "include/sfmacros.h:36 historical_sfi_mapseen_feat mread(struct mapseen_feat; size=struct mapseen_feat)"
+   ]
+  },
+  "struct mapseen_flags": {
+   "save-io": [
+    "include/sfmacros.h:37 sfo_mapseen_flags struct mapseen_flags -> char",
+    "include/sfmacros.h:37 historical_sfo_mapseen_flags bwrite(struct mapseen_flags; size=struct mapseen_flags)",
+    "include/sfmacros.h:37 historical_sfi_mapseen_flags mread(struct mapseen_flags; size=struct mapseen_flags)"
+   ]
+  },
+  "struct mapseen_rooms": {
+   "save-io": [
+    "include/sfmacros.h:38 sfo_mapseen_rooms struct mapseen_rooms -> char",
+    "include/sfmacros.h:38 historical_sfo_mapseen_rooms bwrite(struct mapseen_rooms; size=struct mapseen_rooms)",
+    "include/sfmacros.h:38 historical_sfi_mapseen_rooms mread(struct mapseen_rooms; size=struct mapseen_rooms)"
+   ]
+  },
+  "struct mkroom": {
+   "save-io": [
+    "include/sfmacros.h:39 sfo_mkroom struct mkroom -> char",
+    "include/sfmacros.h:39 historical_sfo_mkroom bwrite(struct mkroom; size=struct mkroom)",
+    "include/sfmacros.h:39 historical_sfi_mkroom mread(struct mkroom; size=struct mkroom)"
+   ]
+  },
+  "struct monst": {
+   "save-io": [
+    "include/sfmacros.h:40 sfo_monst struct monst -> char",
+    "include/sfmacros.h:40 historical_sfo_monst bwrite(struct monst; size=struct monst)",
+    "include/sfmacros.h:40 historical_sfi_monst mread(struct monst; size=struct monst)"
+   ]
+  },
+  "struct mvitals": {
+   "obj-copy": [
+    "src/nhlua.c:1912 nhl_gamestate memcpy(struct mvitals[383], void *; size=struct mvitals[383]) partial",
+    "src/nhlua.c:1944 nhl_gamestate memcpy(void *, struct mvitals[383]; size=struct mvitals[383]) partial"
+   ],
+   "save-io": [
+    "include/sfmacros.h:41 sfo_mvitals struct mvitals -> char",
+    "include/sfmacros.h:41 historical_sfo_mvitals bwrite(struct mvitals; size=struct mvitals)",
+    "include/sfmacros.h:41 historical_sfi_mvitals mread(struct mvitals; size=struct mvitals)"
+   ]
+  },
+  "struct nhcoord": {
+   "obj-copy": [
+    "src/mklev.c:562 alloc_doors memset(struct nhcoord; size=expr:BinaryOperator) partial",
+    "src/mklev.c:564 alloc_doors memcpy(struct nhcoord, struct nhcoord; size=expr:BinaryOperator) partial",
+    "src/mklev.c:564 alloc_doors memcpy(struct nhcoord, struct nhcoord; size=expr:BinaryOperator) partial"
+   ],
+   "save-io": [
+    "include/sfmacros.h:15 sfo_nhcoord struct nhcoord -> char",
+    "include/sfmacros.h:15 historical_sfo_nhcoord bwrite(struct nhcoord; size=struct nhcoord)",
+    "include/sfmacros.h:15 historical_sfi_nhcoord mread(struct nhcoord; size=struct nhcoord)"
+   ]
+  },
+  "struct nhrect": {
+   "obj-copy": [
+    "src/region.c:139 add_rect_to_reg memcpy(struct nhrect, struct nhrect; size=expr:BinaryOperator) partial",
+    "src/region.c:139 add_rect_to_reg memcpy(struct nhrect, struct nhrect; size=expr:BinaryOperator) partial"
+   ],
+   "save-io": [
+    "include/sfmacros.h:10 sfo_nhrect struct nhrect -> char",
+    "include/sfmacros.h:10 historical_sfo_nhrect bwrite(struct nhrect; size=struct nhrect)",
+    "include/sfmacros.h:10 historical_sfi_nhrect mread(struct nhrect; size=struct nhrect)"
+   ]
+  },
+  "struct obj": {
+   "save-io": [
+    "include/sfmacros.h:42 sfo_obj struct obj -> char",
+    "include/sfmacros.h:42 historical_sfo_obj bwrite(struct obj; size=struct obj)",
+    "include/sfmacros.h:42 historical_sfi_obj mread(struct obj; size=struct obj)"
+   ]
+  },
+  "struct objclass": {
+   "save-io": [
+    "include/sfmacros.h:43 sfo_objclass struct objclass -> char",
+    "include/sfmacros.h:43 historical_sfo_objclass bwrite(struct objclass; size=struct objclass)",
+    "include/sfmacros.h:43 historical_sfi_objclass mread(struct objclass; size=struct objclass)"
+   ]
+  },
+  "struct q_score": {
+   "save-io": [
+    "include/sfmacros.h:44 sfo_q_score struct q_score -> char",
+    "include/sfmacros.h:44 historical_sfo_q_score bwrite(struct q_score; size=struct q_score)",
+    "include/sfmacros.h:44 historical_sfi_q_score mread(struct q_score; size=struct q_score)"
+   ]
+  },
+  "struct rm": {
+   "save-io": [
+    "include/sfmacros.h:45 sfo_rm struct rm -> char",
+    "include/sfmacros.h:45 historical_sfo_rm bwrite(struct rm; size=struct rm)",
+    "include/sfmacros.h:45 historical_sfi_rm mread(struct rm; size=struct rm)"
+   ]
+  },
+  "struct s_level": {
+   "save-io": [
+    "include/sfmacros.h:48 sfo_s_level struct s_level -> char",
+    "include/sfmacros.h:48 historical_sfo_s_level bwrite(struct s_level; size=struct s_level)",
+    "include/sfmacros.h:48 historical_sfi_s_level mread(struct s_level; size=struct s_level)"
+   ]
+  },
+  "struct spell": {
+   "save-io": [
+    "include/sfmacros.h:46 sfo_spell struct spell -> char",
+    "include/sfmacros.h:46 historical_sfo_spell bwrite(struct spell; size=struct spell)",
+    "include/sfmacros.h:46 historical_sfi_spell mread(struct spell; size=struct spell)"
+   ]
+  },
+  "struct stairway": {
+   "save-io": [
+    "include/sfmacros.h:47 sfo_stairway struct stairway -> char",
+    "include/sfmacros.h:47 historical_sfo_stairway bwrite(struct stairway; size=struct stairway)",
+    "include/sfmacros.h:47 historical_sfi_stairway mread(struct stairway; size=struct stairway)"
+   ]
+  },
+  "struct trap": {
+   "save-io": [
+    "include/sfmacros.h:49 sfo_trap struct trap -> char",
+    "include/sfmacros.h:49 historical_sfo_trap bwrite(struct trap; size=struct trap)",
+    "include/sfmacros.h:49 historical_sfi_trap mread(struct trap; size=struct trap)"
+   ]
+  },
+  "struct version_info": {
+   "save-io": [
+    "src/sfbase.c:335 sfo_version_info struct version_info -> char",
+    "src/sfbase.c:370 sfi_version_info struct version_info -> char",
+    "src/sfstruct.c:100 historical_sfo_version_info bwrite(struct version_info; size=struct version_info)",
+    "src/sfstruct.c:100 historical_sfi_version_info mread(struct version_info; size=struct version_info)"
+   ]
+  },
+  "struct you": {
+   "obj-copy": [
+    "src/nhlua.c:1907 nhl_gamestate memcpy(struct you, void *; size=struct you) partial",
+    "src/nhlua.c:1939 nhl_gamestate memcpy(void *, struct you; size=struct you) partial"
+   ],
+   "save-io": [
+    "include/sfmacros.h:50 sfo_you struct you -> char",
+    "include/sfmacros.h:50 historical_sfo_you bwrite(struct you; size=struct you)",
+    "include/sfmacros.h:50 historical_sfi_you mread(struct you; size=struct you)"
+   ]
+  },
+  "union <anon@lib/lua-5.4.8/src/lauxlib.h:196>": {
+   "union": [
+    "lib/lua-5.4.8/src/lauxlib.h:196  union definition"
+   ]
+  },
+  "union <anon@lib/lua-5.4.8/src/llex.h:49>": {
+   "union": [
+    "lib/lua-5.4.8/src/llex.h:49  union definition"
+   ]
+  },
+  "union <anon@lib/lua-5.4.8/src/lobject.h:165>": {
+   "union": [
+    "lib/lua-5.4.8/src/lobject.h:165  union definition"
+   ]
+  },
+  "union <anon@lib/lua-5.4.8/src/lobject.h:391>": {
+   "union": [
+    "lib/lua-5.4.8/src/lobject.h:391  union definition"
+   ]
+  },
+  "union <anon@lib/lua-5.4.8/src/lobject.h:483>": {
+   "union": [
+    "lib/lua-5.4.8/src/lobject.h:483  union definition"
+   ]
+  },
+  "union <anon@lib/lua-5.4.8/src/lobject.h:629>": {
+   "union": [
+    "lib/lua-5.4.8/src/lobject.h:629  union definition"
+   ]
+  },
+  "union <anon@lib/lua-5.4.8/src/lobject.h:633>": {
+   "union": [
+    "lib/lua-5.4.8/src/lobject.h:633  union definition"
+   ]
+  },
+  "union <anon@lib/lua-5.4.8/src/lparser.h:70>": {
+   "union": [
+    "lib/lua-5.4.8/src/lparser.h:70  union definition"
+   ]
+  },
+  "union <anon@lib/lua-5.4.8/src/lstate.h:181>": {
+   "union": [
+    "lib/lua-5.4.8/src/lstate.h:181  union definition"
+   ]
+  },
+  "union <anon@lib/lua-5.4.8/src/lstate.h:193>": {
+   "union": [
+    "lib/lua-5.4.8/src/lstate.h:193  union definition"
+   ]
+  },
+  "union <anon@lib/lua-5.4.8/src/lstrlib.c:1409>": {
+   "union": [
+    "lib/lua-5.4.8/src/lstrlib.c:1409  union definition"
+   ]
+  },
+  "union <anon@lib/lua-5.4.8/src/lstrlib.c:1490>": {
+   "union": [
+    "lib/lua-5.4.8/src/lstrlib.c:1490  union definition"
+   ]
+  },
+  "union Closure": {
+   "union": [
+    "lib/lua-5.4.8/src/lobject.h:661  union definition"
+   ]
+  },
+  "union GCUnion": {
+   "cast": [
+    "lib/lua-5.4.8/src/lapi.c:79 index2value struct GCObject -> union GCUnion",
+    "lib/lua-5.4.8/src/lapi.c:263 lua_copy struct GCObject -> union GCUnion",
+    "lib/lua-5.4.8/src/lapi.c:263 lua_copy struct CClosure -> union GCUnion",
+    "lib/lua-5.4.8/src/lapi.c:420 lua_tolstring struct GCObject -> union GCUnion",
+    "lib/lua-5.4.8/src/lapi.c:422 lua_tolstring struct GCObject -> union GCUnion",
+    "lib/lua-5.4.8/src/lapi.c:429 lua_rawlen struct GCObject -> union GCUnion",
+    "... 268 total"
+   ],
+   "union": [
+    "lib/lua-5.4.8/src/lstate.h:353  union definition"
+   ]
+  },
+  "union Node": {
+   "cast": [
+    "lib/lua-5.4.8/src/llex.c:139 luaX_newstring struct TValue -> union Node",
+    "lib/lua-5.4.8/src/ltable.c:342 findindex struct TValue -> union Node"
+   ],
+   "union": [
+    "lib/lua-5.4.8/src/lobject.h:699  union definition"
+   ]
+  },
+  "union StackValue": {
+   "cast": [
+    "lib/lua-5.4.8/src/lapi.c:1059 lua_pcallk union StackValue -> char",
+    "lib/lua-5.4.8/src/lapi.c:1064 lua_pcallk union StackValue -> char",
+    "lib/lua-5.4.8/src/lapi.c:1071 lua_pcallk union StackValue -> char",
+    "lib/lua-5.4.8/src/ldebug.c:837 luaG_errormsg char -> union StackValue",
+    "lib/lua-5.4.8/src/ldebug.c:837 luaG_errormsg union StackValue -> char",
+    "lib/lua-5.4.8/src/ldo.c:165 relstack union StackValue -> char",
+    "... 59 total"
+   ],
+   "obj-copy": [
+    "lib/lua-5.4.8/src/lvm.c:1831 luaV_execute memcpy(union StackValue, union StackValue; size=expr:BinaryOperator) partial",
+    "lib/lua-5.4.8/src/lvm.c:1831 luaV_execute memcpy(union StackValue, union StackValue; size=expr:BinaryOperator) partial"
+   ],
+   "union": [
+    "lib/lua-5.4.8/src/lobject.h:148  union definition"
+   ]
+  },
+  "union UValue": {
+   "union": [
+    "lib/lua-5.4.8/src/lobject.h:449  union definition"
+   ]
+  },
+  "union Value": {
+   "union": [
+    "lib/lua-5.4.8/src/lobject.h:49  union definition"
+   ]
+  },
+  "union Vardesc": {
+   "union": [
+    "lib/lua-5.4.8/src/lparser.h:96  union definition"
+   ]
+  },
+  "union any": {
+   "save-io": [
+    "include/sfmacros.h:51 sfo_any union any -> char",
+    "include/sfmacros.h:51 historical_sfo_any bwrite(union any; size=union any)",
+    "include/sfmacros.h:51 historical_sfi_any mread(union any; size=union any)"
+   ],
+   "union": [
+    "include/wintype.h:11  union definition"
+   ]
+  },
+  "union customization_content": {
+   "union": [
+    "include/sym.h:153  union definition"
+   ]
+  },
+  "union str_or_len": {
+   "union": [
+    "include/hack.h:93  union definition"
+   ]
+  },
+  "union vlaunchinfo": {
+   "union": [
+    "include/trap.h:11  union definition"
+   ]
+  },
+  "union vptrs": {
+   "union": [
+    "include/obj.h:17  union definition"
+   ]
+  }
+ },
+ "S0": {
+  "size": 144,
+  "nethack": 104,
+  "lua": 40,
+  "types": {
+   "struct <anon@include/hack.h:879>": "contains union str_or_len",
+   "struct <anon@include/region.h:32>": "contains struct nhrect",
+   "struct <anon@include/rm.h:473>": "contains struct rm",
+   "struct <anon@include/sp_lev.h:138>": "contains union str_or_len",
+   "struct <anon@include/sp_lev.h:154>": "contains union str_or_len",
+   "struct <anon@lib/lua-5.4.8/src/lobject.h:150>": "contains union Value",
+   "struct <anon@lib/lua-5.4.8/src/lparser.h:97>": "contains union Value",
+   "struct AbsLineInfo": "pointed-to by struct Proto",
+   "struct CClosure": "cast",
+   "struct CallInfo": "pointed-to by struct lua_State",
+   "struct Cmd_bind": "pointed-to by struct instance_globals_c",
+   "struct GCObject": "cast",
+   "struct LClosure": "cast",
+   "struct LG": "contains struct LX",
+   "struct LX": "cast",
+   "struct LocVar": "pointed-to by struct Proto",
+   "struct NodeKey": "contains union Value",
+   "struct Proto": "cast",
+   "struct TString": "cast",
+   "struct TValue": "cast",
+   "struct Table": "cast",
+   "struct Udata": "cast",
+   "struct UpVal": "cast",
+   "struct Upvaldesc": "pointed-to by struct Proto",
+   "struct _cmd_queue": "pointed-to by struct instance_globals_c",
+   "struct _room": "contains union str_or_len",
+   "struct accessibility_data": "contains struct nhcoord",
+   "struct arti_info": "save-io",
+   "struct bill_x": "pointed-to by struct eshk",
+   "struct branch": "save-io",
+   "struct bubble": "save-io",
+   "struct cemetery": "save-io",
+   "struct const_globals": "contains struct obj",
+   "struct container": "pointed-to by struct bubble",
+   "struct context_info": "save-io",
+   "struct customization_detail": "contains union customization_content",
+   "struct d_level": "save-io",
+   "struct damage": "save-io",
+   "struct dest_area": "save-io",
+   "struct dgn_topology": "save-io",
+   "struct dig_info": "contains struct d_level",
+   "struct dungeon": "save-io",
+   "struct ebones": "save-io",
+   "struct edog": "save-io",
+   "struct egd": "save-io",
+   "struct emin": "save-io",
+   "struct engr": "save-io",
+   "struct engrave_info": "contains struct nhcoord",
+   "struct epri": "save-io",
+   "struct eshk": "save-io",
+   "struct ext_func_tab": "pointed-to by struct Cmd_bind",
+   "struct fe": "save-io",
+   "struct flag": "save-io",
+   "struct found_things": "contains struct nhcoord",
+   "struct fruit": "save-io",
+   "struct gamelog_line": "save-io",
+   "struct global_State": "contains struct TValue",
+   "struct hilite_s": "contains union any",
+   "struct instance_flags": "contains struct nhcoord",
+   "struct instance_globals_b": "contains struct istat_s",
+   "struct instance_globals_c": "contains struct nhcoord",
+   "struct instance_globals_g": "contains struct spell",
+   "struct instance_globals_k": "contains struct nhcoord",
+   "struct instance_globals_n": "contains struct rm",
+   "struct instance_globals_o": "contains struct nhcoord",
+   "struct instance_globals_r": "contains struct repo",
+   "struct instance_globals_s": "contains struct d_level",
+   "struct instance_globals_saved_c": "contains struct context_info",
+   "struct instance_globals_saved_d": "contains struct dungeon",
+   "struct instance_globals_saved_i": "contains struct nhcoord",
+   "struct instance_globals_saved_k": "contains struct kinfo",
+   "struct instance_globals_saved_l": "contains struct linfo",
+   "struct instance_globals_saved_m": "contains struct mvitals",
+   "struct instance_globals_saved_q": "contains struct q_score",
+   "struct instance_globals_saved_r": "contains struct mkroom",
+   "struct instance_globals_saved_s": "contains struct spell",
+   "struct instance_globals_saved_u": "contains struct dest_area",
+   "struct instance_globals_t": "contains union any",
+   "struct instance_globals_u": "contains struct d_level",
+   "struct instance_globals_y": "contains struct monst",
+   "struct istat_s": "contains union any",
+   "struct kinfo": "save-io",
+   "struct levelflags": "save-io",
+   "struct linfo": "save-io",
+   "struct ls_t": "save-io",
+   "struct lua_State": "cast",
+   "struct lua_longjmp": "pointed-to by struct lua_State",
+   "struct mapseen": "contains struct d_level",
+   "struct mapseen_feat": "save-io",
+   "struct mapseen_flags": "save-io",
+   "struct mapseen_rooms": "save-io",
+   "struct menucoloring": "pointed-to by struct instance_globals_c",
+   "struct mextra": "pointed-to by struct monst",
+   "struct mfndposdata": "contains struct nhcoord",
+   "struct mi": "contains union any",
+   "struct mkroom": "save-io",
+   "struct monst": "save-io",
+   "struct mvitals": "save-io",
+   "struct nhcoord": "save-io",
+   "struct nhrect": "save-io",
+   "struct nhregex": "pointed-to by struct menucoloring",
+   "struct obj": "save-io",
+   "struct objclass": "save-io",
+   "struct oextra": "pointed-to by struct obj",
+   "struct permonst": "pointed-to by struct monst",
+   "struct q_score": "save-io",
+   "struct repo": "contains struct nhcoord",
+   "struct rm": "save-io",
+   "struct s_level": "save-io",
+   "struct selectionvar": "contains struct nhrect",
+   "struct sp_coder": "pointed-to by struct instance_globals_c",
+   "struct spell": "save-io",
+   "struct stairway": "save-io",
+   "struct symsetentry": "pointed-to by struct instance_globals_s",
+   "struct tmp_glyph": "contains struct nhcoord",
+   "struct tport_hideaway": "contains struct spell",
+   "struct trap": "save-io",
+   "struct tty_mi": "contains union any",
+   "struct version_info": "save-io",
+   "struct you": "save-io",
+   "union <anon@lib/lua-5.4.8/src/lauxlib.h:196>": "union",
+   "union <anon@lib/lua-5.4.8/src/llex.h:49>": "union",
+   "union <anon@lib/lua-5.4.8/src/lobject.h:165>": "union",
+   "union <anon@lib/lua-5.4.8/src/lobject.h:391>": "union",
+   "union <anon@lib/lua-5.4.8/src/lobject.h:483>": "union",
+   "union <anon@lib/lua-5.4.8/src/lobject.h:629>": "union",
+   "union <anon@lib/lua-5.4.8/src/lobject.h:633>": "union",
+   "union <anon@lib/lua-5.4.8/src/lparser.h:70>": "union",
+   "union <anon@lib/lua-5.4.8/src/lstate.h:181>": "union",
+   "union <anon@lib/lua-5.4.8/src/lstate.h:193>": "union",
+   "union <anon@lib/lua-5.4.8/src/lstrlib.c:1409>": "union",
+   "union <anon@lib/lua-5.4.8/src/lstrlib.c:1490>": "union",
+   "union Closure": "union",
+   "union GCUnion": "union",
+   "union Node": "union",
+   "union StackValue": "union",
+   "union UValue": "union",
+   "union Value": "union",
+   "union Vardesc": "union",
+   "union any": "union",
+   "union customization_content": "union",
+   "union str_or_len": "union",
+   "union vlaunchinfo": "union",
+   "union vptrs": "union"
+  }
+ },
+ "S1": {
+  "size": 77,
+  "nethack": 37,
+  "lua": 40,
+  "types": {
+   "struct <anon@include/hack.h:879>": "contains union str_or_len",
+   "struct <anon@include/region.h:32>": "contains union any",
+   "struct <anon@include/sp_lev.h:138>": "contains union str_or_len",
+   "struct <anon@include/sp_lev.h:154>": "contains union str_or_len",
+   "struct <anon@lib/lua-5.4.8/src/lobject.h:150>": "contains union Value",
+   "struct <anon@lib/lua-5.4.8/src/lparser.h:97>": "contains union Value",
+   "struct AbsLineInfo": "pointed-to by struct Proto",
+   "struct CClosure": "cast",
+   "struct CallInfo": "pointed-to by struct lua_State",
+   "struct GCObject": "cast",
+   "struct LClosure": "cast",
+   "struct LG": "contains struct LX",
+   "struct LX": "cast",
+   "struct LocVar": "pointed-to by struct Proto",
+   "struct NodeKey": "contains union Value",
+   "struct Proto": "cast",
+   "struct TString": "cast",
+   "struct TValue": "cast",
+   "struct Table": "cast",
+   "struct Udata": "cast",
+   "struct UpVal": "cast",
+   "struct Upvaldesc": "pointed-to by struct Proto",
+   "struct _room": "contains union str_or_len",
+   "struct bill_x": "pointed-to by struct eshk",
+   "struct const_globals": "contains struct obj",
+   "struct customization_detail": "contains union customization_content",
+   "struct ebones": "pointed-to by struct mextra",
+   "struct edog": "pointed-to by struct mextra",
+   "struct egd": "pointed-to by struct mextra",
+   "struct emin": "pointed-to by struct mextra",
+   "struct engr": "cast",
+   "struct epri": "pointed-to by struct mextra",
+   "struct eshk": "pointed-to by struct mextra",
+   "struct fe": "contains union any",
+   "struct global_State": "contains struct TValue",
+   "struct hilite_s": "contains union any",
+   "struct instance_globals_b": "contains struct istat_s",
+   "struct instance_globals_t": "contains union any",
+   "struct instance_globals_y": "contains struct monst",
+   "struct istat_s": "contains union any",
+   "struct ls_t": "contains union any",
+   "struct lua_State": "cast",
+   "struct lua_longjmp": "pointed-to by struct lua_State",
+   "struct mextra": "pointed-to by struct monst",
+   "struct mi": "contains union any",
+   "struct monst": "pointed-to by union any",
+   "struct nhrect": "pointed-to by struct <anon@include/region.h:32>",
+   "struct obj": "pointed-to by union any",
+   "struct oextra": "pointed-to by struct obj",
+   "struct permonst": "pointed-to by struct monst",
+   "struct selectionvar": "contains struct nhrect",
+   "struct trap": "contains union vlaunchinfo",
+   "struct tty_mi": "contains union any",
+   "union <anon@lib/lua-5.4.8/src/lauxlib.h:196>": "union",
+   "union <anon@lib/lua-5.4.8/src/llex.h:49>": "union",
+   "union <anon@lib/lua-5.4.8/src/lobject.h:165>": "union",
+   "union <anon@lib/lua-5.4.8/src/lobject.h:391>": "union",
+   "union <anon@lib/lua-5.4.8/src/lobject.h:483>": "union",
+   "union <anon@lib/lua-5.4.8/src/lobject.h:629>": "union",
+   "union <anon@lib/lua-5.4.8/src/lobject.h:633>": "union",
+   "union <anon@lib/lua-5.4.8/src/lparser.h:70>": "union",
+   "union <anon@lib/lua-5.4.8/src/lstate.h:181>": "union",
+   "union <anon@lib/lua-5.4.8/src/lstate.h:193>": "union",
+   "union <anon@lib/lua-5.4.8/src/lstrlib.c:1409>": "union",
+   "union <anon@lib/lua-5.4.8/src/lstrlib.c:1490>": "union",
+   "union Closure": "union",
+   "union GCUnion": "union",
+   "union Node": "union",
+   "union StackValue": "union",
+   "union UValue": "union",
+   "union Value": "union",
+   "union Vardesc": "union",
+   "union any": "union",
+   "union customization_content": "union",
+   "union str_or_len": "union",
+   "union vlaunchinfo": "union",
+   "union vptrs": "union"
+  }
+ },
+ "S2": {
+  "size": 58,
+  "nethack": 23,
+  "lua": 35,
+  "types": {
+   "struct <anon@include/hack.h:879>": "contains union str_or_len",
+   "struct <anon@include/region.h:32>": "contains union any",
+   "struct <anon@include/sp_lev.h:138>": "contains union str_or_len",
+   "struct <anon@include/sp_lev.h:154>": "contains union str_or_len",
+   "struct <anon@lib/lua-5.4.8/src/lobject.h:150>": "contains union Value",
+   "struct <anon@lib/lua-5.4.8/src/lparser.h:97>": "contains union Value",
+   "struct CClosure": "cast",
+   "struct GCObject": "cast",
+   "struct LClosure": "cast",
+   "struct LG": "contains struct LX",
+   "struct LX": "cast",
+   "struct NodeKey": "contains union Value",
+   "struct Proto": "cast",
+   "struct TString": "cast",
+   "struct TValue": "cast",
+   "struct Table": "cast",
+   "struct Udata": "cast",
+   "struct UpVal": "cast",
+   "struct _room": "contains union str_or_len",
+   "struct const_globals": "contains struct obj",
+   "struct customization_detail": "contains union customization_content",
+   "struct engr": "cast",
+   "struct fe": "contains union any",
+   "struct global_State": "contains struct TValue",
+   "struct hilite_s": "contains union any",
+   "struct instance_globals_b": "contains struct istat_s",
+   "struct instance_globals_t": "contains union any",
+   "struct istat_s": "contains union any",
+   "struct ls_t": "contains union any",
+   "struct lua_State": "cast",
+   "struct mi": "contains union any",
+   "struct obj": "contains union vptrs",
+   "struct trap": "contains union vlaunchinfo",
+   "struct tty_mi": "contains union any",
+   "union <anon@lib/lua-5.4.8/src/lauxlib.h:196>": "union",
+   "union <anon@lib/lua-5.4.8/src/llex.h:49>": "union",
+   "union <anon@lib/lua-5.4.8/src/lobject.h:165>": "union",
+   "union <anon@lib/lua-5.4.8/src/lobject.h:391>": "union",
+   "union <anon@lib/lua-5.4.8/src/lobject.h:483>": "union",
+   "union <anon@lib/lua-5.4.8/src/lobject.h:629>": "union",
+   "union <anon@lib/lua-5.4.8/src/lobject.h:633>": "union",
+   "union <anon@lib/lua-5.4.8/src/lparser.h:70>": "union",
+   "union <anon@lib/lua-5.4.8/src/lstate.h:181>": "union",
+   "union <anon@lib/lua-5.4.8/src/lstate.h:193>": "union",
+   "union <anon@lib/lua-5.4.8/src/lstrlib.c:1409>": "union",
+   "union <anon@lib/lua-5.4.8/src/lstrlib.c:1490>": "union",
+   "union Closure": "union",
+   "union GCUnion": "union",
+   "union Node": "union",
+   "union StackValue": "union",
+   "union UValue": "union",
+   "union Value": "union",
+   "union Vardesc": "union",
+   "union any": "union",
+   "union customization_content": "union",
+   "union str_or_len": "union",
+   "union vlaunchinfo": "union",
+   "union vptrs": "union"
+  }
+ },
+ "S3": {
+  "size": 21,
+  "nethack": 1,
+  "lua": 20,
+  "types": {
+   "struct CClosure": "cast",
+   "struct GCObject": "cast",
+   "struct LClosure": "cast",
+   "struct LG": "contains struct LX",
+   "struct LX": "cast",
+   "struct Proto": "cast",
+   "struct TString": "cast",
+   "struct TValue": "cast",
+   "struct Table": "cast",
+   "struct Udata": "cast",
+   "struct UpVal": "cast",
+   "struct engr": "cast",
+   "struct global_State": "contains struct TValue",
+   "struct lua_State": "cast",
+   "union <anon@lib/lua-5.4.8/src/lobject.h:633>": "contains struct TValue",
+   "union Closure": "contains struct CClosure",
+   "union GCUnion": "cast",
+   "union Node": "cast",
+   "union StackValue": "cast",
+   "union UValue": "contains struct TValue",
+   "union Vardesc": "contains struct TValue"
+  }
+ }
+}
