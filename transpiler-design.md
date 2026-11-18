@@ -410,3 +410,56 @@ has to make the embedded files readable through `dlb_fopen` (section 8); chunk n
 messages and debug info then match by construction.
 Lua's standard I/O and OS libraries (`liolib.c`, `loslib.c`) are transpiled too but sandboxed
 by NetHack itself (`NHL_SB_*` flags); their libc needs map to `stdio.js`/`sys.js`.
+
+## 8. Data files, output layout and glue
+
+### 8.1 Embedded data
+
+Every file the game opens from its data directory is embedded: 131 `*.lua` scripts (~0.9 MB),
+the `makedefs` outputs and text files (`data`, `rumors`, `oracles`, `engrave`, `epitaph`,
+`bogusmon`, `options`, `tribute`, help files; ~0.9 MB) and the reference `sysconf`. They are
+taken **from the reference recorder's install directory** (so they are byte-identical to what
+the recorder read), one generated module per file in `js/data/`, as string literals (non-ASCII
+bytes escaped) decoded to a `Uint8Array` on first open. `dlb_fopen`/`fopen` on the data
+directory resolve to them through `stdio.js`. The segment's `nethackrc` is written to the VFS
+as `$HOME/.nethackrc` before start, as the recorder harness does.
+
+### 8.2 Layout under `js/`
+
+```
+js/jsmain.js            hand-written glue: runSegment (8.3)
+js/rng.js               hand-written: RNG log sink and contract exports, uses frozen isaac64.js
+js/crt/*.js             hand-written runtime (section 5)
+js/nh/src/<file>.js     generated, one per NetHack .c (src/, win/tty/, sys/unix/, sys/share/)
+js/nh/layout/<hdr>.js   generated record classes, sizes, offsets, one per header
+js/lua/<file>.js        generated Lua 5.4.8 (heap mode)
+js/data/<file>.js       generated embedded data files
+js/hand/*.js            escape hatches listed in annotations.yaml (target: very few)
+js/isaac64.js, js/terminal.js, js/storage.js   frozen, untouched
+```
+
+The current skeleton modules from the contest template (`allmain.js`, `mklev.js`,
+`fastforward.js`, ...) are removed once generated code replaces them (CLAUDE.md 2).
+
+### 8.3 Glue
+
+- **`runSegment(input, prevGame)`**: (1) resets all module state, (2) installs the segment's
+  environment (seed, datetime, nethackrc, storage, key queue), (3) runs the transpiled
+  `main()` of `sys/unix/unixmain.c` with the recorder's argument vector (`nethack -u <name>`),
+  (4) stops at `SegmentEnd` or process exit (`nh_terminate`), (5) returns the game object with
+  `getScreens()`, `getRngLog()`, `getCursors()`, `getAnimationFramesByStep()` for this segment
+  only.
+- **Module state reset.** C runs every segment as a new process; ES modules are singletons in
+  one JS process. Each generated module therefore exports `__reset()`, which re-runs its
+  file-scope initializers (globals, static locals, string tables); `jsmain.js` calls all of them
+  in a generated, fixed order before each segment. Nothing else carries over: cross-segment
+  state goes only through `storage` (saves, bones, `record`).
+- **RNG.** `rnd.c` (patched) is transpiled, except its ISAAC64 calls, which an annotation maps to
+  the frozen `js/isaac64.js` (contract: `rng.js` must use it). The patched code writes log lines
+  to the `NETHACK_RNGLOG` file (`2808 rn2(12) = 2 @ mon.c:1145`). `rng.js` provides that file as
+  an in-memory sink and applies exactly the transformation `record-session.mjs`'s
+  `parseRngLines` applies; `getRngLog()` returns entries **without** the `@ caller` tag
+  (contract), and a separate debug log keeps the full line for the triage tool (4.2).
+- **Screens.** At each `nomux_capture_write_input_boundary` the runtime records screen, cursor
+  and RNG delta (5, `screen.js`); `nomux_capture_write_screen` from `tty_delay_output` becomes
+  `await game.animationFrame()`.
