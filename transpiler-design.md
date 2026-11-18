@@ -323,3 +323,64 @@ functions unless a buffer would overflow (then the process aborts; the runtime t
 The values that come from the recording machine (`HOME`, `TERM`, `TZ`, the daylight-time
 "now", Darwin libc behavior) are documented constants (`docs/recording-environment.md`, issues
 #16/#17) and live only in `env.js` and `time.js`.
+
+## 6. Async plan
+
+The problem that sank Bau's first attempt (CLAUDE.md 1.8, 2.5). The rule here: async-ness is a
+**computed whole-program fact**, emitted mechanically, and checked; never decided by hand.
+
+### 6.1 Roots
+
+From the patched C code (step 1.5):
+
+| Root | Why it blocks | JS |
+|---|---|---|
+| `tty_nhgetch` | The only key read that captures a screen (`nomux_capture_write_input_boundary`, then `getchar`/`read`). Every step boundary | `await input.nextKey()` |
+| `tty_delay_output` | Captures an animation frame (`nomux_capture_write_screen` under `NETHACK_NO_DELAY`) | `await game.animationFrame()` (contract, `docs/API.md`) |
+
+Other `getchar` callers (`getlock`'s "Destroy old game?", `ask_about_panic_save`, `dumpit`)
+read stdin outside normal play; they become async through the same rule if reachable.
+
+### 6.2 Computing the set
+
+1. Call graph from the IR: direct edges plus function-pointer edges.
+2. Function-pointer targets, most precise first: (a) **field-sensitive** sets, i.e. which
+   functions are stored into which struct field or variable (initializers such as `tty_procs`
+   and the extended-command table, plus assignments); (b) fallback: every address-taken function
+   of the same type. Stage 1 used only (b): 4,467 async functions (68%); direct edges alone
+   give 3,349 (51%). (a) will land in between.
+3. Reverse reachability from the roots, fixed point.
+4. Unresolvable sites (5 in Stage 1: `member:fn`, `member:sf_genericptr`) must be decided
+   in `annotations.yaml` (`pointers:` with explicit targets); the checker fails otherwise.
+5. Edge cuts are allowed only as annotations with a reason, and only for paths that cannot run
+   in the port (e.g. `SIGWINCH` resize). `panic` is **not** cut: it can display messages and
+   prompt.
+
+Being conservative is safe: an extra `async` changes no behavior, only speed (section 11).
+
+### 6.3 Emission
+
+- Functions in the set are emitted `async`; every call to one is `await`ed. A call through a
+  function pointer is awaited if any possible target is async (`await` on a non-promise value is
+  harmless).
+- **Callbacks into runtime code.** Runtime routines that call generated code must accept async
+  callbacks: `qsort.js` (comparators such as `sortloot_cmp` are in the async set through
+  `panic`) gets an async variant used whenever the comparator is async, with the identical
+  algorithm.
+- **Lua.** Lua scripts call NetHack C functions (`nh.pline`, `nh.getlin`, ...) that can block
+  on `--More--` or input, so the Lua VM's call path (`luaD_call`, `luaV_execute`, ...) is in
+  the async set too (755 Lua functions in the conservative set). Lua is generated code, so this
+  follows from the same rule with no special case.
+- **Static check** (part of tool 4.9): parse every generated module and fail the build on any
+  call to an async function without `await`, and on any `await` inside a function not in the
+  set.
+
+### 6.4 Input and segment end
+
+- Scoring (`runSegment`): keys come from `input.moves`, one byte per key (latin1, matching the
+  fixed recorder, issue #23). When `tty_nhgetch` needs a key and none is left, the boundary screen
+  has already been captured; the read throws `SegmentEnd`, which `runSegment` catches to return
+  the game. Death or quit before the keys run out ends the segment the same way C does
+  (`nh_terminate`, final capture).
+- Browser play (`/play/<owner>/`): `nextKey()` awaits the frozen `Terminal`'s keyboard queue.
+  Same generated code, different key source, so live play is O(1) per key (no replay).
