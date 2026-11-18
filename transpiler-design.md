@@ -295,3 +295,31 @@ would otherwise evaluate differently. Every rule is pinned by a differential tes
   anything elsewhere.
 - Struct layouts, sizes and offsets live in one generated module per header
   (`js/nh/layout/<header>.js`), so a changed struct changes one file.
+
+## 5. Runtime and libc (`js/crt/`)
+
+All semantic-gap code is hand-written once, in `js/crt/`, and unit-tested against native C
+(CLAUDE.md 2.4). Generated code only calls it. The libc surface is measured: 190 distinct
+functions, 130 used by NetHack (`transpiler/out/inventory/summary.md`); on macOS most string
+and format calls arrive as fortified builtins (`__builtin___sprintf_chk` 1,341 sites,
+`__builtin___strcpy_chk` 883, `__builtin___strcat_chk` 555), which behave like the plain
+functions unless a buffer would overflow (then the process aborts; the runtime throws).
+
+| Module | Contents | Verified against |
+|---|---|---|
+| `int.js` | Conversions and exact arithmetic (3.1), 64-bit checked helpers | Fuzzed against native C for every operator × type pair |
+| `mem.js` | `BytePtr`, `Ref` kinds, `ElemPtr`, `copyInto`/`clone`, union slots, `ptrConst`, `memcpy`/`memset`/`memcmp` dispatch over pointer kinds | Unit tests |
+| `heap.js` | Typed-array heap for the heap world: growable `ArrayBuffer`, `DataView` accessors, a deterministic `malloc`/`realloc`/`free` | Unit tests; Lua test scripts |
+| `string.js`, `ctype.js` | `str*`, `mem*`, `strto*`, `ato*`, `ctype` in the C locale (byte semantics, Darwin's tables) | Native differential tests |
+| `printf.js` | One formatting engine for `sprintf`/`snprintf`/`vsnprintf`/`fprintf` and `sscanf` parsing | Byte-exact against Darwin libc: every format string literal found in the AST plus fuzzed values; includes `%g`/`%.14g` (Lua `tostring` of numbers) |
+| `qsort.js` | **Darwin libc `qsort`**, ported exactly (patch 002 sorts an index array with it, and `sortloot_cmp` can consume RNG, so the comparator call sequence is observable) | Comparator call sequences logged in native C vs JS on random, sorted, reversed and inconsistent inputs |
+| `time.js` | `time()` returns the recorder's pinned "real now" (a US-daylight instant, see the `tm_isdst` quirk), `localtime`/`mktime`/`difftime` with `America/New_York` rules coded explicitly (US rules before and after 2007; no dependency on `Intl` data) | Native `localtime`/`mktime` with `TZ=America/New_York` for 1970–2100 |
+| `stdio.js` | `FILE` objects: read-only embedded data files (section 8), writable files (`record`, `logfile`, `xlogfile`, saves, bones) through the frozen `js/storage.js` VFS | Unit tests |
+| `env.js` | The recorder environment as constants: `getenv` table (exactly the variables `record-session.mjs` sets: `HOME`, `TERM`, `TZ`, `NETHACK_SEED`, `NETHACK_FIXED_DATETIME`, `NETHACK_RNGLOG`, `NETHACK_NO_DELAY`, `NOMUX_MARKERS`, `NETHACK_RAW_KEYS`, `NETHACKDIR`/`HACKDIR`), the documented `HOME` path, `getuid`/`getpid` constants | Re-recorded sessions |
+| `sys.js` | Process and system calls only reachable outside normal play: `signal` (no-op), `fork`/`exec*`/`popen` (fail like a missing program), `sleep` (no-op), `chdir`, `access`, `stat`, `unlink` on the VFS | — |
+| `term.js` | termcap/terminfo for `TERM=xterm-256color` as a static capability table captured from the recorder machine (`tgetstr`, `tgetnum`, `tgetflag`, `tgoto`, `tparm`, `tputs`) | Captured once from native |
+| `screen.js` | Screen capture glue: the patched tty keeps its own shadow screen (patch 006, transpiled); at each input boundary the runtime encodes it in the session format (port of `encodeScreenAnsiRle`/`payloadToLines` from `scripts/record-session.mjs`), records the cursor, and mirrors it into the frozen `Terminal` (`setCell`) for the browser | `frozen/screen-decode.mjs` on recorded sessions |
+
+The values that come from the recording machine (`HOME`, `TERM`, `TZ`, the daylight-time
+"now", Darwin libc behavior) are documented constants (`docs/recording-environment.md`, issues
+#16/#17) and live only in `env.js` and `time.js`.
