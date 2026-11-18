@@ -219,6 +219,7 @@ export class Scope {
         this.enumConsts = new Map(); // constant name -> BigInt value
         this.cache = new Map();
         this.layouts = new Map();
+        this.fieldById = new Map();   // FieldDecl id -> layout field (after recordLayout)
         this.normAnon = (l) => l;
     }
 
@@ -261,7 +262,7 @@ export class Scope {
                     bits = Number(ce && ce.value !== undefined ? ce.value : NaN);
                     if (!Number.isInteger(bits)) throw new Error(`ctypes: bit-field width of ${key}.${c.name} not constant`);
                 }
-                fields.push({ name: c.name || '', typeStr: c.type.desugaredQualType || c.type.qualType, sugared: c.type.qualType, bits });
+                fields.push({ name: c.name || '', id: c.id, typeStr: c.type.desugaredQualType || c.type.qualType, sugared: c.type.qualType, bits });
             }
             const prev = s.records.get(key);
             if (!prev) s.records.set(key, { key, union: n.tagUsed === 'union', fields });
@@ -384,11 +385,11 @@ export class Scope {
                 if (f.bits !== null) {
                     if (f.name) align = Math.max(align, fl.align);
                     size = Math.max(size, Math.ceil(f.bits / 8));
-                    fields.push({ name: f.name, type, offset: 0, bitOffset: 0, bits: f.bits });
+                    fields.push({ name: f.name, id: f.id, type, offset: 0, bitOffset: 0, bits: f.bits });
                 } else {
                     align = Math.max(align, fl.align);
                     size = Math.max(size, fl.size);
-                    fields.push({ name: f.name, type, offset: 0, bitOffset: 0, bits: null });
+                    fields.push({ name: f.name, id: f.id, type, offset: 0, bitOffset: 0, bits: null });
                 }
                 continue;
             }
@@ -397,21 +398,24 @@ export class Scope {
                 if (f.bits === 0) { bit = Math.ceil(bit / (fl.align * 8)) * fl.align * 8; continue; }
                 if (Math.floor(bit / unit) !== Math.floor((bit + f.bits - 1) / unit)) bit = Math.ceil(bit / unit) * unit;
                 const offset = Math.floor(bit / unit) * fl.size;
-                fields.push({ name: f.name, type, offset, bitOffset: bit - offset * 8, bits: f.bits });
+                fields.push({ name: f.name, id: f.id, type, offset, bitOffset: bit - offset * 8, bits: f.bits });
                 bit += f.bits;
                 if (f.name) align = Math.max(align, fl.align);
             } else {
                 const a = fl.align * 8;
                 bit = Math.ceil(bit / a) * a;
-                fields.push({ name: f.name, type, offset: bit / 8, bitOffset: 0, bits: null });
+                fields.push({ name: f.name, id: f.id, type, offset: bit / 8, bitOffset: 0, bits: null });
                 bit += fl.size * 8;
                 align = Math.max(align, fl.align);
             }
         }
         if (!r.union) size = Math.ceil(bit / 8);
         size = Math.ceil(size / align) * align;
+        // JS property names: C names; an anonymous struct/union member (C11) is "$a<index>"
+        fields.forEach((f, i) => { f.js = f.name ? f.name : (f.type.k === 'rec' ? `$a${i}` : null); });
         L = { size, align, fields };
         this.layouts.set(key, L);
+        for (const f of fields) if (f.id) this.fieldById.set(f.id, f);
         return L;
     }
 }

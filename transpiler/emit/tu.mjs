@@ -148,7 +148,9 @@ export class TUEmitter {
         const init = [];
         // globals: declarations (zero values) at module level, initializers in $init
         for (const g of globals) {
-            try { this.emitGlobal(g, body, init); } catch (e) { this.fail(e, g, body); }
+            // a global's declaration line is pushed first; a failure loses only its initializer
+            const b = [], i = [];
+            try { this.emitGlobal(g, b, i); body.push(...b); init.push(...i); } catch (e) { body.push(...b); this.fail(e, g, body, init); }
         }
         for (const f of fns) {
             try { body.push(this.emitFunction(f)); } catch (e) { this.fail(e, f, body); }
@@ -171,15 +173,16 @@ export class TUEmitter {
         lines.push('}');
         return lines.join('\n') + '\n';
     }
-    fail(e, n, body) {
-        if (!(e instanceof EmitError)) throw e;
+    fail(e, n, body, init) {
+        if (!(e instanceof EmitError) && !/^ctypes:/.test(e.message)) throw e;
         this.errors.push(e.message);
         body.push(`// EMIT ERROR (${n.name}): ${e.message.replace(/\n/g, ' ')}`);
-        body.push(`export function ${jsName(n.name)}() { throw new $c.CTrap(${jsStr('not transpiled: ' + n.name)}); }`);
+        if (n.kind === 'FunctionDecl') body.push(`${n.storageClass === 'static' ? '' : 'export '}function ${jsName(n.name)}() { throw new $c.CTrap(${jsStr('not transpiled: ' + n.name)}); }`);
+        else if (init) init.push(`throw new $c.CTrap(${jsStr('initializer not transpiled: ' + n.name)});`);
     }
-    isOwn(n) {
+    isOwn(n) {   // see program.mjs own()
         const l = n.loc && (n.loc.expansionLoc || n.loc);
-        return l && l._f === this.tu.file;
+        return !!(l && l._f && !path.isAbsolute(l._f));
     }
 
     // ================= globals =================
@@ -192,6 +195,7 @@ export class TUEmitter {
     emitGlobal(g, body, init) {
         const t = this.T(g);
         const isStatic = g.storageClass === 'static';
+        if (!isStatic && !this.prog.ownsVar(this, g.name)) return;   // another TU's tentative definition
         const name = this.globalAccess(g.name, t, isStatic);
         this.fn = null;
         this.temps = null;
@@ -248,6 +252,7 @@ export class TUEmitter {
                 items.forEach((it, i) => {
                     const f = fs[i];
                     if (!f) this.err(n, `initializer for ${t.key} has too many items`);
+                    if (this.skipParens(it).kind === 'ImplicitValueInitExpr') return;
                     if (f.bits !== null) out.push(`${ind}${dst}.${field(f.js)} = ${this.bitStore(this.rv(it).c, f)};`);
                     else this.emitInitInto(`${dst}.${field(f.js)}`, f.type, it, out, ind);
                 });
@@ -308,6 +313,7 @@ export class TUEmitter {
         };
         walkDecls(body);
         for (const s of statics) this.declareStaticLocal(s);
+        this.planGotos(body);
         const stmts = this.block(body, '    ');
         const lines = [];
         const pos = this.posOf(f);
@@ -327,6 +333,7 @@ export class TUEmitter {
             else if (v.isVa) decls.push(`${v.name} = null`);
             else decls.push(`${v.name} = ${this.zero(v.t)}`);
         }
+        if (this.fn.usesGoto) decls.push('$goto = null');
         for (const tn of this.fn.tempNames) decls.push(tn);
         if (decls.length) lines.push(`    let ${decls.join(', ')};`);
         lines.push(...stmts);
@@ -392,12 +399,13 @@ export class TUEmitter {
 
     // ================= statements =================
     block(n, ind) {
-        if (n.kind === 'CompoundStmt') return this.stmtList(kids(n), ind);
+        if (n.kind === 'CompoundStmt') return this.stmtList(kids(n), ind, n);
         return this.stmt(n, ind);
     }
-    /** A statement list with goto lowering for labels that are direct members. */
-    stmtList(list, ind) {
-        const plan = this.gotoPlan(list);
+    /** A statement list, with goto lowering (planGotos) when it holds jump targets. */
+    stmtList(list, ind, node) {
+        if (node && node._dispatch) return this.emitDispatch(list, node, ind);
+        const plan = node && node._simple ? this.gotoPlan(list) : null;
         if (!plan) return list.flatMap((s) => this.stmt(s, ind));
         return this.emitRegions(list, plan, 0, list.length, ind);
     }
@@ -406,7 +414,7 @@ export class TUEmitter {
         const pos = this.posOf(n);
         const tag = pos ? `   // ${pos}` : '';
         switch (n.kind) {
-        case 'CompoundStmt': return [`${ind}{`, ...this.stmtList(kids(n), ind + '    '), `${ind}}`];
+        case 'CompoundStmt': return [`${ind}{`, ...this.stmtList(kids(n), ind + '    ', n), `${ind}}`];
         case 'NullStmt': return [];
         case 'DeclStmt': {
             const out = [];
@@ -433,7 +441,7 @@ export class TUEmitter {
         }
         case 'IfStmt': {
             const [c, th, el] = kids(n);
-            const out = [`${ind}if (${this.cond(c).c}) {${tag}`, ...this.block(th, ind + '    ')];
+            const out = [`${ind}if (${this.inwardIf(n, th, el, this.cond(c))}) {${tag}`, ...this.block(th, ind + '    ')];
             if (n.hasElse) {
                 if (el.kind === 'IfStmt') {
                     const rest = this.stmt(el, ind);
@@ -448,7 +456,7 @@ export class TUEmitter {
         }
         case 'WhileStmt': {
             const [c, b] = kids(n);
-            return this.loop(n, ind, (lab) => [`${ind}${lab}while (${this.cond(c).c}) {${tag}`, ...this.loopBody(n, b, ind), `${ind}}`]);
+            return this.loop(n, ind, (lab) => [`${ind}${lab}while (${this.inwardLoop(n, this.cond(c))}) {${tag}`, ...this.loopBody(n, b, ind), `${ind}}`]);
         }
         case 'DoStmt': {
             const [b, c] = kids(n);
@@ -456,10 +464,12 @@ export class TUEmitter {
         }
         case 'ForStmt': {
             const [init, , c, inc, b] = kids(n);
-            const i = isEmpty(init) ? '' : this.exprStmtText(init);
-            const cc = isEmpty(c) ? '' : this.cond(c).c;
+            let i = isEmpty(init) ? '' : init.kind === 'DeclStmt' ? this.declInitExpr(init) : this.exprStmtText(init);
+            const cc = isEmpty(c) ? (n._inward ? this.inwardLoop(n, E('true')) : '') : this.inwardLoop(n, this.cond(c));
             const ic = isEmpty(inc) ? '' : this.exprStmtText(inc);
-            return this.loop(n, ind, (lab) => [`${ind}${lab}for (${i}; ${cc}; ${ic}) {${tag}`, ...this.loopBody(n, b, ind), `${ind}}`]);
+            const pre = [];
+            if (n._inward && i) { pre.push(`${ind}if ($goto === null) ${i};   // a jump into the loop skips its initialization`); i = ''; }
+            return [...pre, ...this.loop(n, ind, (lab) => [`${ind}${lab}for (${i}; ${cc}; ${ic}) {${tag}`, ...this.loopBody(n, b, ind), `${ind}}`])];
         }
         case 'SwitchStmt': return this.switchStmt(n, ind, tag);
         case 'BreakStmt': return [`${ind}${this.jumpText('break')};`];
@@ -474,12 +484,20 @@ export class TUEmitter {
             return [`${ind}return ${v};${tag}`];
         }
         case 'LabelStmt': {
-            // a label not handled by the enclosing list's goto plan: only valid if unused
-            const target = this.fn.labels.get(n.declId);
-            if (target && target.used && !target.handled) this.err(n, `goto ${n.name}: unsupported jump structure`);
-            return this.stmt(kids(n)[0], ind);
+            const sub = this.stmt(kids(n)[0], ind);
+            if (this.fn.dispatchTargets && this.fn.dispatchTargets.has(n.declId)) return [`${ind}$goto = null;   // ${n.name}:`, ...sub];
+            return sub;
         }
         case 'GotoStmt': {
+            const g = this.fn.gotoMode.get(n);
+            if (g && g.mode === 'switch') {
+                if (!g.sw._sjs) this.err(n, 'goto: switch re-entry loop not active');
+                return [`${ind}$goto = ${jsStr(this.labelName(n.targetLabelDeclId))}; continue ${g.sw._sjs};${tag}`];
+            }
+            if (g && g.mode === 'dispatch') {
+                if (!g.list._djs) this.err(n, 'goto: dispatch loop not active');
+                return [`${ind}$goto = ${jsStr(this.labelName(n.targetLabelDeclId))}; continue ${g.list._djs};${tag}`];
+            }
             const L = this.fn.labels.get(n.targetLabelDeclId);
             if (!L || !L.active) this.err(n, 'goto into or out of an unsupported region');
             L.used = true;
@@ -495,6 +513,18 @@ export class TUEmitter {
         return [];
     }
     exprStmtText(n) { return this.ex(n, 'd').c; }
+    /** `for (int i = 0, j = 1; ...)`: the declarations' scalar initializers as one comma expression. */
+    declInitExpr(ds) {
+        const parts = [];
+        for (const d of kids(ds)) {
+            if (d.kind !== 'VarDecl' || !d.init) continue;
+            const v = this.fn.locals.get(d.id);
+            if (v.t.k === 'rec' || v.t.k === 'arr') this.err(ds, 'aggregate declared in a for initializer');
+            const val = this.rv(kids(d)[0]).c;
+            parts.push(v.boxed ? `${v.name}[0] = ${val}` : `${v.name} = ${val}`);
+        }
+        return parts.join(', ');
+    }
 
     // break/continue targets: each C loop/switch pushes a frame; jumps go to the innermost
     // C target, labeled when a JS construct (goto lowering) sits in between.
@@ -552,9 +582,20 @@ export class TUEmitter {
         for (const it of items) if (it.stmt && kids(it.stmt).some(nested) && it.stmt.kind !== 'SwitchStmt') this.err(n, 'case label inside a nested statement');
         const inner = [];
         const stmts = [];
+        const targets = n._targets ? [...n._targets] : [];
         for (const it of items) {
             for (const l of it.labels) inner.push({ label: `${ind}    ${l}` });
+            // jump targets inside this item: a synthetic case to enter it ($goto holds the label)
+            for (const id of targets) if (this.containsLabel(it.stmt, id)) inner.push({ label: `${ind}    case ${jsStr(this.labelName(id))}:` });
             if (it.stmt) inner.push({ stmt: it.stmt });
+        }
+        // re-entry loop for jumps inside the switch body (break leaves the switch, then the loop)
+        let sjs = null, sfr = null;
+        if (n._internal) {
+            sjs = `S${++this.fn.labelSeq}`;
+            n._sjs = sjs;
+            sfr = { kind: 'js', captures: (k) => k === 'continue' };
+            this.fn.jumps.splice(this.fn.jumps.length - 1, 0, sfr);   // outside the C switch frame
         }
         // goto lowering among the switch body's statements is not needed so far
         for (const x of inner) {
@@ -562,7 +603,17 @@ export class TUEmitter {
             else stmts.push(...this.stmt(x.stmt, ind + '        '));
         }
         this.fn.jumps.pop();
-        out.push(`${ind}${fr.js ? fr.js + ': ' : ''}switch (${this.rv(c).c}) {${tag}`);
+        if (sfr) { this.fn.jumps.splice(this.fn.jumps.indexOf(sfr), 1); n._sjs = null; }
+        let sv = this.rv(c).c;
+        if (targets.length) sv = `$goto !== null ? $goto : ${par(this.rv(c), PREC.cond + 1)}`;   // entered by a jump: the C expression is not evaluated
+        if (sjs) {
+            out.push(`${ind}${sjs}: for (;;) {`);
+            out.push(`${ind}    ${fr.js ? fr.js + ': ' : ''}switch (${sv}) {${tag}`);
+            out.push(...stmts.map((x) => '    ' + x));
+            out.push(`${ind}    }`, `${ind}    break;`, `${ind}}`);
+            return out;
+        }
+        out.push(`${ind}${fr.js ? fr.js + ': ' : ''}switch (${sv}) {${tag}`);
         out.push(...stmts);
         out.push(`${ind}}`);
         return out;
@@ -582,6 +633,166 @@ export class TUEmitter {
     }
 
     // ---------- goto lowering ----------
+    // planGotos decides, per statement list, how its jumps are lowered:
+    //  simple:   every label is a direct member and the jump regions nest ->
+    //            labeled blocks (forward) and labeled loops (backward), gotoPlan.
+    //  dispatch: otherwise, and for every list a jump passes through on its way
+    //            into a nested label -> `D: for (;;) { switch ($goto) { case null:
+    //            ... case 'L': ... } break; }`; goto L is `$goto = 'L'; continue D`.
+    // Statements on the path from a list into a nested label get `_inward`
+    // (the labels): if/while/for/switch conditions then steer to the label
+    // without evaluating the C condition, and the label resets $goto.
+    planGotos(body) {
+        const labels = new Map(), gotos = [];
+        const walk = (n, path) => {
+            if (!n || typeof n !== 'object' || !n.kind) return;
+            if (n.kind === 'LabelStmt') labels.set(n.declId, { node: n, path });
+            if (n.kind === 'GotoStmt') gotos.push({ node: n, path });
+            if (n.kind === 'CompoundStmt') kids(n).forEach((c, i) => walk(c, [...path, { node: n, idx: i }]));
+            else if (/Stmt$/.test(n.kind) || n.kind === 'LabelStmt') {
+                const sw = n.kind === 'SwitchStmt';
+                for (const c of kids(n)) {
+                    if (sw && c.kind === 'CompoundStmt') { c._switchBody = true; c._switchOf = n; kids(c).forEach((x, i) => walk(x, [...path, { node: n }, { node: c, idx: i }])); }
+                    else walk(c, [...path, { node: n }]);
+                }
+            }
+        };
+        walk(body, []);
+        this.fn.labelNames = new Map([...labels].map(([id, l]) => [id, l.node.name]));
+        this.fn.gotoMode = new Map();
+        if (!gotos.length) return;
+        const pairsBy = new Map();   // list node -> [{ g, L, direct }]
+        const inwardLists = new Set();
+        for (const g of gotos) {
+            const L = labels.get(g.node.targetLabelDeclId);
+            if (!L) this.err(g.node, 'goto to an unknown label');
+            const full = [...L.path, { node: L.node }];
+            let lca = null, k = -1;
+            for (let i = 0; i < Math.min(g.path.length, full.length); i++) {
+                if (g.path[i].node !== full[i].node) break;
+                const nd = g.path[i].node;
+                if (nd.kind === 'CompoundStmt') { lca = nd; k = i; }
+                if (g.path[i].idx !== full[i].idx) break;
+            }
+            if (!lca) this.err(g.node, 'goto without a common statement list');
+            // direct: below the list entry there are only LabelStmts down to the label
+            const below = full.slice(k + 1);
+            const direct = below.every((x) => x.node.kind === 'LabelStmt');
+            if (!pairsBy.has(lca)) pairsBy.set(lca, []);
+            pairsBy.get(lca).push({ g, L, direct, below });
+        }
+        this.fn.dispatchTargets = new Set();
+        const markBelow = (p, id) => {
+            for (const x of p.below) {
+                if (x.node.kind === 'CompoundStmt' && x.node._switchBody) { this.switchTarget(x.node._switchOf, id); continue; }
+                if (x.node.kind === 'CompoundStmt') {
+                    x.node._entries = x.node._entries || new Set();
+                    x.node._entries.add(x.idx);
+                    inwardLists.add(x.node);
+                    x.node._dispatch = x.node._dispatch || new Set();
+                    x.node._dispatch.add(id);
+                } else if (x.node.kind !== 'LabelStmt' && x.node.kind !== 'SwitchStmt') { x.node._inward = x.node._inward || new Set(); x.node._inward.add(id); }
+            }
+        };
+        for (const [list, pairs] of pairsBy) {
+            if (list._switchBody) {
+                // jumps within one switch body: re-enter the switch at a synthetic case
+                const sw = list._switchOf;
+                sw._internal = true;
+                for (const p of pairs) {
+                    const id = p.L.node.declId;
+                    this.fn.gotoMode.set(p.g.node, { mode: 'switch', sw });
+                    this.switchTarget(sw, id);
+                    markBelow(p, id);
+                }
+                continue;
+            }
+            let simple = pairs.every((p) => p.direct);
+            if (simple) { try { this.gotoPlan(kids(list)); } catch (e) { if (!(e instanceof EmitError)) throw e; simple = false; } }
+            if (simple) { list._simple = true; for (const p of pairs) this.fn.gotoMode.set(p.g.node, { mode: 'simple' }); continue; }
+            list._dispatch = list._dispatch || new Set();
+            for (const p of pairs) {
+                this.fn.gotoMode.set(p.g.node, { mode: 'dispatch', list });
+                const id = p.L.node.declId;
+                list._dispatch.add(id);
+                this.fn.dispatchTargets.add(id);
+                // the path below the list entry: lists dispatch (an inner list only to enter
+                // past its first statement), switches get a synthetic case, others steer
+                markBelow(p, id);
+            }
+        }
+        for (const l of inwardLists) {
+            if (!pairsBy.has(l) && [...l._entries].every((i) => i === 0)) { l._dispatch = null; inwardLists.delete(l); }
+        }
+        // a list both simple and on an inward path becomes dispatch (its own jumps too)
+        for (const [list, pairs] of pairsBy) {
+            if (!list._simple || !inwardLists.has(list)) continue;
+            list._simple = false;
+            for (const p of pairs) {
+                this.fn.gotoMode.set(p.g.node, { mode: 'dispatch', list });
+                list._dispatch.add(p.L.node.declId);
+                this.fn.dispatchTargets.add(p.L.node.declId);
+            }
+        }
+        if (this.fn.dispatchTargets.size) this.fn.usesGoto = true;
+    }
+    switchTarget(sw, id) {
+        sw._targets = sw._targets || new Set();
+        sw._targets.add(id);
+        this.fn.dispatchTargets.add(id);
+        this.fn.usesGoto = true;
+    }
+    labelName(id) { return this.fn.labelNames.get(id); }
+    containsLabel(n, id) {
+        if (!n || typeof n !== 'object') return false;
+        if (n.kind === 'LabelStmt' && n.declId === id) return true;
+        return kids(n).some((c) => this.containsLabel(c, id));
+    }
+    /** if condition with jumps into the then- or else-branch. */
+    inwardIf(n, th, el, cond) {
+        if (!n._inward) return cond.c;
+        const inThen = [...n._inward].filter((l) => this.containsLabel(th, l)).map((l) => `$goto === ${jsStr(this.labelName(l))}`);
+        const inElse = [...n._inward].filter((l) => el && this.containsLabel(el, l)).map((l) => `$goto !== ${jsStr(this.labelName(l))}`);
+        let c = par(cond, PREC.and + 1);
+        if (inElse.length) c = `${inElse.join(' && ')} && ${c}`;
+        if (inThen.length) c = `${inThen.join(' || ')} || ${inElse.length ? `(${c})` : par(cond, PREC.or + 1)}`;
+        return c;
+    }
+    inwardLoop(n, cond) {
+        if (!n._inward) return cond.c;
+        return `${[...n._inward].map((l) => `$goto === ${jsStr(this.labelName(l))}`).join(' || ')} || ${par(cond, PREC.or + 1)}`;
+    }
+    emitDispatch(list, node, ind) {
+        const js = `D${++this.fn.labelSeq}`;
+        node._djs = js;
+        const fr = { kind: 'js', captures: () => true };   // the loop and the switch capture plain break/continue
+        this.fn.jumps = this.fn.jumps || [];
+        this.fn.jumps.push(fr);
+        // entry points: the child holding each target label
+        const entry = new Map();   // child index -> [label ids]
+        for (const id of node._dispatch) {
+            const i = list.findIndex((c) => this.containsLabel(c, id));
+            if (i < 0) this.err(node, 'dispatch target not in its list');
+            if (!entry.has(i)) entry.set(i, []);
+            entry.get(i).push(id);
+        }
+        const body = [];
+        const ind2 = ind + '        ';
+        body.push(`${ind}    switch ($goto) {`);
+        if (!entry.has(0)) body.push(`${ind}    case null:`);
+        list.forEach((c, i) => {
+            if (entry.has(i)) {
+                const labs = entry.get(i).map((id) => `case ${jsStr(this.labelName(id))}:`);
+                if (i === 0) labs.unshift('case null:');
+                body.push(`${ind}    ${labs.join(' ')}`);
+            }
+            body.push(...this.stmt(c, ind2));
+        });
+        body.push(`${ind}    }`);
+        this.fn.jumps.pop();
+        node._djs = null;
+        return [`${ind}${js}: for (;;) {`, ...body, `${ind}    break;`, `${ind}}`];
+    }
     /**
      * For a statement list: find labels that are direct members and gotos to
      * them from inside the list. A forward goto becomes `break L` out of a
@@ -622,11 +833,7 @@ export class TUEmitter {
         rs.sort((a, b) => a.from - b.from || b.to - a.to);
         for (let i = 0; i < rs.length; i++) for (let j = i + 1; j < rs.length; j++) {
             const a = rs[i], b = rs[j];
-            if (b.from < a.to && b.to > a.to) {
-                // overlapping forward regions: extend the outer one (still correct: break skips more only if b ends later)
-                if (a.mode === 'fwd' && b.mode === 'fwd') { a.from = Math.min(a.from, b.from); continue; }
-                throw new EmitError('crossing goto regions');
-            }
+            if (b.from < a.to && b.to > a.to) throw new EmitError('crossing goto regions');   // planGotos then dispatches
         }
         return rs;
     }
@@ -665,7 +872,13 @@ export class TUEmitter {
     isFresh(n) { n = this.skipParens(n); return n.kind === 'CallExpr'; }
 
     /** rvalue */
-    rv(n) { return this.ex(n, 'v'); }
+    rv(n) {
+        if (n.kind === 'InitListExpr' && this.T(n).k !== 'rec' && this.T(n).k !== 'arr') {   // int x = { 3 }; p = DUMMY
+            const { items } = this.initItems(n);
+            return items.length ? this.rv(items[0]) : E(this.zero(this.T(n)));
+        }
+        return this.ex(n, 'v');
+    }
     /** condition context: a JS truthy value is enough */
     cond(n) {
         n = this.skipParens(n);
@@ -803,6 +1016,11 @@ export class TUEmitter {
         case 'VAArgExpr': {
             const ap = this.rv(kids(n)[0]);
             return E(`${par(ap, PREC.call)}.next()`, PREC.call);
+        }
+        case 'ImplicitValueInitExpr': {
+            const t = this.T(n);
+            if (t.k === 'rec' || t.k === 'arr') this.err(n, 'aggregate zero value in an expression');
+            return E(this.zero(t));
         }
         case 'InitListExpr': this.err(n, 'initializer list in an expression');
         // eslint-disable-next-line no-fallthrough
@@ -1030,7 +1248,7 @@ export class TUEmitter {
             const from = this.T(sub);
             const e = this.rv(sub);
             // void * (malloc's RawBlock, or any pointer) -> typed pointer: materialize once (js/crt/alloc.js)
-            if (isPtr(from) && isPtr(to) && pkind(to) === 'rec' && pkind(from) !== 'rec') {
+            if (isPtr(from) && isPtr(to) && pkind(to) === 'rec' && pkind(from) !== 'rec' && this.S.records.has(to.to.key)) {
                 return E(`$c.asRec(${e.c}, $T.${this.cls(to.to.key)}, ${this.S.sizeof(to.to)})`, PREC.call);
             }
             if (isPtr(from) && isPtr(to) && pkind(from) === 'void' && pkind(to) === 'ref') {

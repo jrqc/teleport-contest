@@ -34,3 +34,14 @@ export const fflush = (_f) => 0;
 export const ferror = (f) => f.err;
 export const feof = (f) => f.eof;
 export function clearerr(f) { f.err = 0; f.eof = 0; }
+
+// ---------- process-level globals NetHack references ----------
+/** errno: <errno.h> defines it as (*__error()). */
+const errnoBox = new Int32Array(1);
+import { Ptr as ErrnoPtr } from './mem.js';
+export const __error = () => new ErrnoPtr(errnoBox, 0);
+/**
+ * Libc scalar variables C code may read or assign (generated code: $c.$libc.name):
+ * errno (when declared directly), termcap's ospeed (unixtty.c), environ (report.c).
+ */
+export const $libc = { errno: 0, ospeed: 0, environ: null };

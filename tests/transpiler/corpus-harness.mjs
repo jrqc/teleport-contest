@@ -32,8 +32,8 @@ export async function transpile(srcs, dir) {
         const { root } = await loadAst({ directory: path.relative(ROOT, path.dirname(src)) || '.', file: rel, arguments: ['clang', ...FLAGS, '-c', src] });
         tus.push({ root, scope: tuScope(root, path.dirname(src)), file: rel, dir: path.dirname(src) });
     }
-    const prog = new Program(tus, { crtNames });
-    const { files, errors } = prog.emitAll();
+    const prog = new Program({ crtNames });
+    const { files, errors } = prog.emitAll(tus);
     const out = path.join(dir, 'nh');
     mkdirSync(out, { recursive: true });
     try { symlinkSync(path.join(ROOT, 'js/crt'), path.join(dir, 'crt')); } catch { /* exists */ }

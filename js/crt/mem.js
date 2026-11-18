@@ -194,3 +194,4 @@ export function ptrToInt(p) {
     return h;
 }
 export function unreachable() { throw new CTrap('__builtin_unreachable reached'); }
+export function missing(name) { return () => { throw new CTrap(`call of ${name}, which is not defined in the transpiled program`); }; }

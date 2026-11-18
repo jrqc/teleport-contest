@@ -14,40 +14,44 @@ import { ROOT } from '../frontend/ast.mjs';
 
 const kids = (n) => n.inner || [];
 const hasBody = (n) => kids(n).some((c) => c.kind === 'CompoundStmt');
-const own = (n, file) => { const l = n.loc && (n.loc.expansionLoc || n.loc); return l && l._f === file; };
+// A definition belongs to the TU being compiled when it comes from any non-system file (the
+// .c file, or a header or macro expansion it includes: artilist.h, sfprocs.h).
+const own = (n) => { const l = n.loc && (n.loc.expansionLoc || n.loc); return !!(l && l._f && !path.isAbsolute(l._f)); };
+const LIBC_VARS = new Set(['errno', 'ospeed', 'environ']);
 const ident = (m) => m.replace(/[^A-Za-z0-9_$]/g, '_');
 export const moduleName = (file) => path.basename(file).replace(/\.c$/, '');
 
 export class Program {
     /**
-     * @param tus [{ root, scope, file, dir }]
+     * Two passes, so that no more than one TU's AST is in memory: addFacts(tu)
+     * for every TU (definitions), then emitTU(tu) for every TU, then finish().
      * @param opts { crtNames: Set of $c exports, asyncSet: Set of function names }
      */
-    constructor(tus, opts) {
-        this.tus = tus;
+    constructor(opts) {
         this.root = ROOT;
         this.crt = opts.crtNames;
         this.asyncSet = opts.asyncSet || new Set();
-        this.fnDef = new Map();     // name -> tu (external linkage definitions)
-        this.varDef = new Map();    // name -> { tu, t, decl } (external linkage definitions)
+        this.fnDef = new Map();     // name -> { module, file } (external linkage definitions)
+        this.varDef = new Map();    // name -> { module, file, t, scope, hasInit } (external linkage definitions)
         this.classNames = new Map();   // record key -> class name
         this.classScope = new Map();   // record key -> scope that defines it
         this.usedNames = new Set();
-        for (const tu of tus) {
-            tu.module = moduleName(tu.file);
-            tu.addr = this.addrTakenIds(tu.root);
-            for (const n of kids(tu.root)) {
-                if (!own(n, tu.file)) continue;
-                if (n.kind === 'FunctionDecl' && hasBody(n) && n.storageClass !== 'static') {
-                    if (this.fnDef.has(n.name)) throw new EmitError(`function ${n.name} defined in ${this.fnDef.get(n.name).file} and ${tu.file}`);
-                    this.fnDef.set(n.name, tu);
-                }
-                if (n.kind === 'VarDecl' && n.storageClass !== 'extern' && n.storageClass !== 'static') {
-                    const t = tu.scope.type(n.type.desugaredQualType || n.type.qualType);
-                    const prev = this.varDef.get(n.name);
-                    // tentative definitions in several TUs (common symbols) merge into one
-                    if (!prev || (n.init && !prev.decl.init)) this.varDef.set(n.name, { tu, t, decl: n });
-                }
+        this.modules = [];          // link order
+    }
+    addFacts(tu) {
+        tu.module = moduleName(tu.file);
+        this.modules.push(tu.module);
+        for (const n of kids(tu.root)) {
+            if (!own(n)) continue;
+            if (n.kind === 'FunctionDecl' && hasBody(n) && n.storageClass !== 'static') {
+                if (this.fnDef.has(n.name)) throw new EmitError(`function ${n.name} defined in ${this.fnDef.get(n.name).file} and ${tu.file}`);
+                this.fnDef.set(n.name, { module: tu.module, file: tu.file });
+            }
+            if (n.kind === 'VarDecl' && n.storageClass !== 'extern' && n.storageClass !== 'static') {
+                const t = tu.scope.type(n.type.desugaredQualType || n.type.qualType);
+                const prev = this.varDef.get(n.name);
+                // tentative definitions in several TUs (common symbols) merge into one
+                if (!prev || (n.init && !prev.hasInit)) this.varDef.set(n.name, { module: tu.module, file: tu.file, t, scope: tu.scope, hasInit: !!n.init });
             }
         }
     }
@@ -96,6 +100,8 @@ export class Program {
         const d = this.fnDef.get(name);
         if (d) { this.noteImport(tu, d.module, jsName(name)); return jsName(name); }
         if (this.crt.has(name)) return `$c.${name}`;
+        if (this.missingFn) { this.missingFn.add(name); return `$c.missing(${JSON.stringify(name)})`; }
+        if (this.crt.has(name)) return `$c.${name}`;
         throw new EmitError(`undefined function ${name}`);
     }
     definedIn(tu, name, kind) {
@@ -105,7 +111,7 @@ export class Program {
     localDefs(tu) {
         const fn = new Set(), vars = new Map();
         for (const n of kids(tu.tu.root)) {
-            if (!own(n, tu.tu.file)) continue;
+            if (!own(n)) continue;
             if (n.kind === 'FunctionDecl' && hasBody(n)) fn.add(n.name);
             if (n.kind === 'VarDecl' && n.storageClass !== 'extern') vars.set(n.name, n);
         }
@@ -115,14 +121,20 @@ export class Program {
         tu._defs = tu._defs || this.localDefs(tu);
         const local = tu._defs.var.get(name);
         if (local && local.storageClass === 'static') return jsName(name);
+        if (local && this.varDef.has(name) && this.varDef.get(name).module !== tu.tu.module && (t.k === 'rec' || t.k === 'arr')) {
+            // a tentative definition another TU owns (a header defines it in every includer)
+            this.noteImport(tu, this.varDef.get(name).module, jsName(name));
+            return jsName(name);
+        }
         if (!(t.k === 'rec' || t.k === 'arr')) {
             if (local || this.varDef.has(name)) return `$G.${field(name)}`;
+            if (LIBC_VARS.has(name)) return `$c.$libc.${name}`;
             if (this.crt.has(name)) return `$c.${name}`;
             throw new EmitError(`undefined variable ${name}`);
         }
         if (local) return jsName(name);
         const d = this.varDef.get(name);
-        if (d) { this.noteImport(tu, d.tu.module, jsName(name)); return jsName(name); }
+        if (d) { this.noteImport(tu, d.module, jsName(name)); return jsName(name); }
         if (this.crt.has(name)) return `$c.${name}`;
         throw new EmitError(`undefined variable ${name}`);
     }
@@ -133,6 +145,11 @@ export class Program {
         if (!local || local.storageClass !== 'static') return false;
         const t = tu.T(local);
         return tu.tu.addr.has(local.id) && t.k !== 'rec' && t.k !== 'arr';
+    }
+    /** Whether this TU emits the definition of external variable `name`. */
+    ownsVar(tu, name) {
+        const d = this.varDef.get(name);
+        return !d || d.module === tu.tu.module;
     }
     isAsync(name) { return this.asyncSet.has(name); }
     isAsyncIndirect() { return false; }   // function-pointer targets: from the async analysis (M1 step 2)
@@ -151,18 +168,25 @@ export class Program {
     }
 
     // ---------- output ----------
-    /** Emit every TU; returns { files: Map(path -> text), errors: [] }. Paths are relative to the output dir. */
-    emitAll() {
+    /** Emit one TU (after addFacts for all): { path, code, errors }. */
+    emitTU(tu) {
+        tu.module = moduleName(tu.file);
+        tu.addr = this.addrTakenIds(tu.root);
+        const em = new TUEmitter(tu, this);
+        const code = em.run();   // imports are collected while emitting
+        return { path: `${tu.module}.js`, code, errors: em.errors.map((e) => `${tu.file}: ${e}`) };
+    }
+    /** The shared modules, after every TU was emitted: Map(path -> text). */
+    finish() {
+        return new Map([['types.js', this.typesModule()], ['globals.js', this.globalsModule()], ['index.js', this.indexModule()]]);
+    }
+    /** Small programs (tests): all TUs in memory. */
+    emitAll(tus) {
+        for (const tu of tus) this.addFacts(tu);
         const files = new Map();
         const errors = [];
-        for (const tu of this.tus) {
-            const em = new TUEmitter(tu, this);
-            files.set(`${tu.module}.js`, em.run());   // imports are collected while emitting
-            for (const e of em.errors) errors.push(`${tu.file}: ${e}`);
-        }
-        files.set('types.js', this.typesModule());
-        files.set('globals.js', this.globalsModule());
-        files.set('index.js', this.indexModule());
+        for (const tu of tus) { const r = this.emitTU(tu); files.set(r.path, r.code); errors.push(...r.errors); }
+        for (const [k, v] of this.finish()) files.set(k, v);
         return { files, errors };
     }
     typesModule() {
@@ -188,18 +212,18 @@ export class Program {
         const out = ['// globals.js: external scalar and pointer variables (generated by transpiler/emit). Do not edit.', 'export const $G = {'];
         const names = [...this.varDef.keys()].sort();
         for (const n of names) {
-            const { t, tu } = this.varDef.get(n);
+            const { t, scope, file } = this.varDef.get(n);
             if (t.k === 'rec' || t.k === 'arr') continue;
-            out.push(`    ${field(n)}: ${zeroOf(t, (k) => this.className(k, tu.scope))},   // ${tu.file}`);
+            out.push(`    ${field(n)}: ${zeroOf(t, (k) => this.className(k, scope))},   // ${file}`);
         }
         out.push('};', '');
         return out.join('\n');
     }
     indexModule() {
         const out = ['// index.js: module list and static initialization order (generated). Do not edit.'];
-        for (const tu of this.tus) out.push(`import { $init as ${tu.module.replace(/[^A-Za-z0-9_$]/g, "_")}$init } from './${tu.module}.js';`);
+        for (const m of this.modules) out.push(`import { $init as ${ident(m)}$init } from './${m}.js';`);
         out.push('', 'export function $initAll() {');
-        for (const tu of this.tus) out.push(`    ${tu.module.replace(/[^A-Za-z0-9_$]/g, "_")}$init();`);
+        for (const m of this.modules) out.push(`    ${ident(m)}$init();`);
         out.push('}', '');
         return out.join('\n');
     }
