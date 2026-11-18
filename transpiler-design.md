@@ -225,3 +225,71 @@ stays in the object world and needs no hand-written code.
 - `alloc`/`malloc` of a record → `new T()`; of bytes → `new Uint8Array(n)`; `free` → no-op in
   the object world (GC), real `free` in the heap world. Reading freed memory in C would behave
   differently; any such case is a C bug that must then be modeled explicitly (risk R5).
+
+## 4. Translation rules
+
+The emitter works on the lowered IR (section 2), where every implicit conversion is explicit and
+every evaluation order is fixed. One JS module per C file, functions in source order, C names
+kept (CLAUDE.md 2.6). Each emitted statement carries a `// file.c:line` comment, which is free
+in the Phase 2 diff and maps JS stack traces and the debug RNG log back to C.
+
+### 4.1 Evaluation order
+
+C leaves most operand orders unspecified; the recorder fixes them the way **clang's code
+generator** does. The IR records that order explicitly and introduces temporaries only where JS
+would otherwise evaluate differently. Rules (each pinned by a differential test in
+`tests/c-diff/order/`, compiled with the recorder's flags, before it is relied on):
+
+| Construct | Order to reproduce | Note |
+|---|---|---|
+| Function arguments | left to right | Same as JS |
+| Binary operators, array subscripts `a[i][j]` | left operand, then right | Same as JS |
+| Simple assignment `lhs = rhs` | clang evaluates the **right side first**, then the lvalue | JS evaluates the lvalue's object/index first: `levl[rn2(x)][rn2(y)].typ = f(rn2(z))` needs temporaries |
+| Compound assignment `lhs op= rhs`, `++`/`--` | lvalue first, then right side | |
+| `&&`, `||`, `?:`, `,` | sequenced as C defines | Same as JS |
+
+### 4.2 Expressions
+
+| C | JS |
+|---|---|
+| Integer arithmetic | Exact helpers per result type (3.1); `x / y` → `idiv(x, y)`, `x % y` → `irem(x, y)`, shifts with C width/sign rules; division by zero → a runtime trap (C would crash; such a case is a divergence to investigate) |
+| Implicit/explicit integer conversions | One helper per conversion (`i8`, `u8`, `i16`, `u16`, `i32`, `u32`, `i64`, `u64`), straight from the AST cast nodes |
+| Floating point | Native Number; `float` via `Math.fround`; float→int conversion truncates (`Math.trunc` + range rules) |
+| `sizeof`, `offsetof`, `_Alignof` | The constant clang computes for the recorder's ABI (from `-fdump-record-layouts`), even in the object world, because the values flow into logic (`SIZE(arr)`, buffer sizes for `Snprintf`) |
+| Record assignment / pass by value | `copyInto(dst, src)` / `clone(src)` (3.2) |
+| Member access `p->f`, `s.f` | `p.f` (object world) or accessor `p.f` on a heap view class (heap types) |
+| Address-of, pointer arithmetic, deref | Per pointer kind (3.3) |
+| String literals | Interned read-only `Uint8Array` constants per module (NUL-terminated) |
+| Compound literals, designated initializers | Constructor call plus field stores in initializer order |
+
+### 4.3 Statements and control flow
+
+| C | JS |
+|---|---|
+| `if`, `while`, `do`, `for`, `break`, `continue`, `return` | The same JS statements |
+| `switch` with fall-through | JS `switch` (same fall-through semantics); `case` labels nested inside inner blocks fall back to the goto lowering |
+| `goto` (536 in NetHack, 117 in Lua) | Structured lowering: a forward jump becomes a labeled block (`L: { ... break L; }`), a backward jump a labeled loop (`L: for (;;) { ... continue L; }`). Irreducible control flow falls back to a `switch`-in-a-loop state machine for that function only |
+| Computed goto (`lvm.c` jump table, 78 sites) | Lowered to a `switch` over the jump table's label set (same semantics as the non-jump-table build of the same source) |
+| `setjmp`/`longjmp` (4 sites) | `try`/`catch` with a unique token per `jmp_buf`; `longjmp` throws it. Lua's `luaD_throw`/`luaD_rawrunprotected` and the `nhl_pcall` step-limit sandbox |
+| Labels used only as `goto` targets | No output beyond the lowering |
+
+### 4.4 Functions
+
+| C | JS |
+|---|---|
+| Function definition | `function name(...)` (or `async function`, section 6); `static` → not exported; others exported |
+| Parameters | By value; record parameters are cloned at entry if the function writes to them |
+| Variadic functions (23 in NetHack) | Rest parameter plus a `VaList` object; `va_start`/`va_arg(ap, T)`/`va_end` → `VaList` methods that read the next argument with T's conversion |
+| Calls through function pointers (1,671) | Call of the JS function value (`await`ed if any possible target is async) |
+| Static locals (545) | Module-level variables `<function>$<name>`, initialized once in source order |
+| Macros | Already expanded in the AST. The patch 003 RNG macros therefore become calls that set the caller tag with the literal `__FILE__`/`__LINE__`/`__func__` values, which reproduces the recorder's tags exactly |
+
+### 4.5 Names and stability
+
+- C identifiers kept; collisions with JS reserved words or globals (`delete`, `new`,
+  `constructor`, `arguments`, ...) get a fixed suffix (`delete_`), from a fixed list.
+- No counters or hashes in generated names. Temporaries are named after the C construct and
+  numbered per function (`t1`, `t2`, ...), so a change inside one function cannot rename
+  anything elsewhere.
+- Struct layouts, sizes and offsets live in one generated module per header
+  (`js/nh/layout/<header>.js`), so a changed struct changes one file.
