@@ -16,3 +16,4 @@ export * from './termcap.js';
 import * as fsModule from './fs.js';
 import { setFs } from './stdio.js';
 setFs(fsModule);
+export * from './isaac64-glue.js';

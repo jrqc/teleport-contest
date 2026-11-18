@@ -8,7 +8,7 @@
 // __builtin_object_size of the destination; (size_t)-1 means unknown. Darwin
 // aborts on overflow; these throw CTrap.
 import { CTrap, i32, u64, i64, norm } from './int.js';
-import { BytePtr, Ptr, cstrlen } from './mem.js';
+import { BytePtr, Ptr, FieldRef, cstrlen } from './mem.js';
 import { RawBlock, asArr } from './alloc.js';
 import { isspace, isdigit, isalpha, tolower } from './ctype.js';
 
@@ -105,6 +105,33 @@ export function __builtin___strncat_chk(d, s, n, objsize) {
 // ---------- byte memory (BytePtr operands) ----------
 // Object-world operands: a record object (memset to 0 resets it, memcpy of a
 // whole record copies it), a RawBlock (bytes not yet typed), or a Ptr.
+/** The records n bytes starting at record r cover: r alone, or a run of its array (whole elements only). */
+function recRun(r, n, what) {
+    const sz = r.constructor.$size;
+    if (sz === undefined || n === sz) return [r];
+    if (n > sz && r.__tail && n <= sz + r.__tail.length) return [r];   // struct + trailing area (struct engr)
+    if (n < sz || n % sz !== 0) throw new CTrap(`${what} of ${n} bytes over records of ${sz}`);
+    const k = n / sz;
+    if (!r.__arr || r.__idx + k > r.__arr.length) throw new CTrap(`${what} of ${k} records past the end of the array`);
+    return r.__arr.slice(r.__idx, r.__idx + k);
+}
+const isAgg = (v) => v !== null && typeof v === 'object' && (ArrayBuffer.isView(v) || Array.isArray(v) || isRec(v));
+function sizeOfVal(v) {
+    if (ArrayBuffer.isView(v)) return v.byteLength;
+    if (Array.isArray(v)) return v.length && isAgg(v[0]) ? v.reduce((a, x) => a + sizeOfVal(x), 0) : v.length * 8;
+    if (isRec(v)) return v.constructor.$size;
+    throw new CTrap('sizeof of an unknown value');
+}
+function zeroVal(v) {
+    if (ArrayBuffer.isView(v)) v.fill(0);
+    else if (Array.isArray(v)) { for (let i = 0; i < v.length; i++) { if (isAgg(v[i])) zeroVal(v[i]); else v[i] = v[i] === null || typeof v[i] === 'object' ? null : 0; } }
+    else v.$copyFrom(new v.constructor());
+}
+function copyVal(a, b) {
+    if (ArrayBuffer.isView(a)) a.set(b);
+    else if (Array.isArray(a)) { for (let i = 0; i < a.length; i++) { if (isAgg(a[i])) copyVal(a[i], b[i]); else a[i] = b[i]; } }
+    else a.$copyFrom(b);
+}
 const isRec = (x) => x !== null && typeof x === 'object' && typeof x.$copyFrom === 'function';
 function asBytes(p) {
     if (p instanceof RawBlock) return p.obj !== null ? p.obj : asArr(p, Uint8Array);
@@ -115,8 +142,25 @@ export function memset(d, c, n) {
     const D = asBytes(d);
     if (isRec(D)) {
         if (c !== 0) throw new CTrap('memset of a record with a nonzero byte');
-        D.$copyFrom(new D.constructor());
-        if (D.__tail) D.__tail.fill(0);   // struct + trailing area (struct engr)
+        for (const r of recRun(D, n, 'memset')) { r.$copyFrom(new r.constructor()); if (r.__tail) r.__tail.fill(0); }   // (struct engr: + trailing area)
+        return d;
+    }
+    if (D instanceof FieldRef) {   // &scalar_or_pointer_field: one element
+        if (c !== 0) throw new CTrap('memset of a field with a nonzero byte');
+        const cur = D.get(0);
+        D.set(0, cur === null || typeof cur === 'object' || typeof cur === 'function' ? null : 0);
+        return d;
+    }
+    if (D instanceof Ptr && !ArrayBuffer.isView(D.buf) && isAgg(D.buf[D.off])) {   // array of arrays/records
+        if (c !== 0) throw new CTrap('memset of nested arrays with a nonzero byte');
+        let left = n;
+        for (let i = D.off; left > 0; i++) {
+            if (i >= D.buf.length) throw new CTrap('memset past the end of an array');
+            const v = D.buf[i];
+            left -= sizeOfVal(v);
+            zeroVal(v);
+        }
+        if (left !== 0) throw new CTrap('memset of part of an array element');
         return d;
     }
     if (D instanceof Ptr && !ArrayBuffer.isView(D.buf)) {   // array of pointers / 64-bit values: only 0 is meaningful
@@ -136,7 +180,18 @@ export function memmove(d, s, n) {
     const D = asBytes(d), Sx = asBytes(s);
     if (isRec(D) || isRec(Sx)) {
         if (!(isRec(D) && isRec(Sx) && D.constructor === Sx.constructor)) throw new CTrap('memcpy between a record and other data');
-        D.$copyFrom(Sx);
+        const ds = recRun(D, n, 'memcpy'), ss = recRun(Sx, n, 'memcpy');
+        if (D.__arr && D.__arr === Sx.__arr && D.__idx > Sx.__idx) for (let i = ds.length - 1; i >= 0; i--) ds[i].$copyFrom(ss[i]);
+        else for (let i = 0; i < ds.length; i++) ds[i].$copyFrom(ss[i]);
+        return d;
+    }
+    if (D instanceof FieldRef || Sx instanceof FieldRef) { D.set(0, Sx.get(0)); return d; }   // one scalar or pointer
+    if (D instanceof Ptr && Sx instanceof Ptr && !ArrayBuffer.isView(D.buf) && isAgg(D.buf[D.off])) {   // arrays of arrays/records
+        let left = n, i = 0;
+        const pairs = [];
+        while (left > 0) { const v = D.buf[D.off + i]; left -= sizeOfVal(v); pairs.push([v, Sx.buf[Sx.off + i]]); i++; }
+        if (left !== 0) throw new CTrap('memcpy of part of an array element');
+        for (const [a, b] of pairs) copyVal(a, b);
         return d;
     }
     if (!ArrayBuffer.isView(D.buf) || !ArrayBuffer.isView(Sx.buf)) {   // pointer arrays: element-wise (8 bytes each)

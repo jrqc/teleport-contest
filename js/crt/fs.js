@@ -10,8 +10,8 @@
 //     scripts, makedefs output, sysconf ...), registered by the glue.
 // A written file is flushed to storage when closed. POSIX fd calls and the
 // FILE functions in stdio.js both work on these nodes.
-import { CTrap } from './int.js';
-import { Ptr, cstrToJs } from './mem.js';
+import { CTrap, i64 } from './int.js';
+import { Ptr, FieldRef, cstrToJs } from './mem.js';
 import { $libc, stdout, stderr } from './stdio.js';
 import { bytesView } from './string.js';
 import { proc } from './proc.js';
@@ -148,6 +148,13 @@ export function close(fd) {
 /** Bytes at a buffer pointer: typed-array Ptrs only (records go through save-file serializers). */
 function bufBytes(buf, n) {
     if (buf instanceof Ptr && ArrayBuffer.isView(buf.buf)) return bytesView(buf, n);
+    if (buf instanceof FieldRef && [1, 2, 4, 8].includes(n)) {   // &scalar_field: its little-endian bytes
+        const b = new Uint8Array(8);
+        new DataView(b.buffer).setBigInt64(0, BigInt(buf.get(0)), true);
+        const view = b.subarray(0, n);
+        view.$store = () => { const dv = new DataView(b.buffer); const v = n === 8 ? dv.getBigInt64(0, true) : n === 4 ? dv.getInt32(0, true) : n === 2 ? dv.getInt16(0, true) : dv.getInt8(0); buf.set(0, typeof v === 'bigint' ? i64(v) : v); };
+        return view;
+    }
     throw new CTrap('read/write of a buffer that is not a byte or scalar array');
 }
 export function read(fd, buf, n) {
@@ -157,7 +164,9 @@ export function read(fd, buf, n) {
     if (f.std !== undefined) throw new CTrap('read() from a standard stream');
     const src = f.node.bytes();
     const k = Math.max(0, Math.min(n, src.length - f.pos));
-    bufBytes(buf, k).set(src.subarray(f.pos, f.pos + k));
+    const dst = bufBytes(buf, buf instanceof FieldRef ? n : k);
+    dst.set(src.subarray(f.pos, f.pos + k));
+    if (dst.$store) dst.$store();
     f.pos += k;
     return k;
 }
@@ -269,3 +278,8 @@ export function readdir(d) {
 }
 export const closedir = () => 0;
 export { EACCES };
+/** A file that exists for this run only (the segment's $HOME/.nethackrc, written by the harness). */
+export function putFile(path, text) {
+    const n = new Node(latin1ToBytes(text), { persist: false });
+    fsState.nodes.set(path, n);
+}

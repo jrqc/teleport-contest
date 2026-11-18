@@ -233,7 +233,7 @@ export function mktime(tm) {
 
 /** time(tloc): REAL_NOW; stores through tloc when it is not NULL. */
 export function time(tloc) {
-    if (tloc) tloc.set(REAL_NOW);
+    if (tloc) tloc.set(0, REAL_NOW);
     return REAL_NOW;
 }
 export const difftime = (a, b) => Number(a) - Number(b);

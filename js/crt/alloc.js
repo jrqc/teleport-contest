@@ -17,6 +17,11 @@ import { Ptr, recArray } from './mem.js';
 
 export class RawBlock {
     constructor(n) { this.size = Number(n); this.ab = null; this.obj = null; this.views = null; }
+    // Used directly as a long * (NetHack's alloc() returns long *, the caller casts it on):
+    // the block becomes an array of 64-bit values on first access.
+    get(i = 0) { return materialize(this, 'i64').get(i); }
+    set(i, v) { return materialize(this, 'i64').set(i, v); }
+    add(n) { return materialize(this, 'i64').add(n); }
 }
 export const malloc = (n) => new RawBlock(n);
 export const calloc = (n, sz) => new RawBlock(Number(n) * Number(sz));
@@ -52,8 +57,8 @@ export function asRec(p, T, size) {
     if (p.obj !== null) return p.obj;
     if (p.views !== null) throw new CTrap('block used as bytes, then as a record');
     let o;
-    if (p.size === size) o = new T();
-    else if (p.size > size && p.size % size === 0) o = recArray(T, p.size / size)[0];
+    // always an array (of one, often): p + 1 is a valid C pointer past the record
+    if (p.size >= size && p.size % size === 0) o = recArray(T, p.size / size)[0];
     else if (p.size > size) { o = new T(); o.__tail = new Uint8Array(p.size - size); }   // trailing text (struct engr)
     else throw new CTrap(`block of ${p.size} bytes used as a record of ${size}`);
     p.obj = o;
@@ -63,6 +68,11 @@ export function asRec(p, T, size) {
 /** (E *) p for a scalar or pointer element type: View is a typed array class, 'ptr' or 'i64'. */
 export function asArr(p, View) {
     if (!(p instanceof RawBlock)) return p;
+    // (long *) malloc(n): alloc()'s own return type, not yet the caller's; stay untyped
+    if (View === 'i64' && p.obj === null && p.views === null) return p;
+    return materialize(p, View);
+}
+function materialize(p, View) {
     if (p.obj !== null) {
         if (p.obj instanceof Ptr) return p.obj;
         throw new CTrap('block used as a record, then as an array');

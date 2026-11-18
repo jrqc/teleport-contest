@@ -15,7 +15,11 @@ const args = process.argv.slice(2);
 let out = path.join(ROOT, 'transpiler/build/nh');
 const oi = args.indexOf('--out');
 if (oi >= 0) { out = path.resolve(args[oi + 1]); args.splice(oi, 2); }
-const db = JSON.parse(readFileSync(path.join(ROOT, 'transpiler/out/compile_commands.json'), 'utf8')).filter((e) => e.group === 'nethack');
+const ann0 = parseJsonc(readFileSync(path.join(ROOT, 'transpiler/annotations.jsonc'), 'utf8'));
+// extern groups (isaac64): not transpiled; the runtime adapter defines their functions
+const externFiles = Object.values(ann0.groups || {}).filter((g) => g.repr === 'extern').map((g) => g.files);
+const isExtern = (e) => externFiles.some((f) => path.relative(ROOT, path.resolve(ROOT, e.file)).endsWith(f));
+const db = JSON.parse(readFileSync(path.join(ROOT, 'transpiler/out/compile_commands.json'), 'utf8')).filter((e) => e.group === 'nethack' && !isExtern(e));
 const only = new Set(args);
 const crtNames = new Set(Object.keys(await import('../../js/crt/index.js')));
 const ann = parseJsonc(readFileSync(path.join(ROOT, 'transpiler/annotations.jsonc'), 'utf8'));

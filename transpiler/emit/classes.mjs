@@ -72,26 +72,33 @@ export function classSource(scope, key, cls, origin) {
     const out = [];
     out.push(`// ${r.union ? 'union' : 'struct'} ${key.startsWith('@') ? '(anonymous)' : key}${origin ? ` (${origin})` : ''}`);
     out.push(`export class ${name} {`);
+    out.push(`    static $size = ${L.size};   // sizeof: lets the runtime turn byte counts into element counts`);
     if (r.union) {
+        // one value slot $v; $k is the member last stored or used as an embedded aggregate.
+        // Copying copies an embedded record/array member deeply and anything else (scalars,
+        // pointers) as the value it is.
         const first = L.fields.find((f) => f.js);
-        out.push(`    constructor() { this.$v = ${first ? zeroOf(first.type, cls) : '0'}; }`);
+        out.push(`    constructor() { this.$v = ${first ? zeroOf(first.type, cls) : '0'}; this.$k = ${first ? `'${field(first.js)}'` : 'null'}; }`);
+        const agg = [];
         for (const f of L.fields) {
             if (!f.js) continue;
             const fn = field(f.js);
             if (f.type.k === 'rec' || f.type.k === 'arr') {
-                // the slot holds this member's representation once it is used as this member
-                const test = f.type.k === 'rec' ? `this.$v instanceof $T.${cls(f.type.key)}` : `typeof this.$v === 'object' && this.$v !== null && this.$v.$m === '${fn}'`;
-                const mk = f.type.k === 'rec' ? zeroOf(f.type, cls) : `Object.assign(${zeroOf(f.type, cls)}, { $m: '${fn}' })`;
-                out.push(`    get ${fn}() { if (!(${test})) this.$v = ${mk}; return this.$v; }`);
-                out.push(`    set ${fn}(x) { this.$v = x; }`);
+                agg.push(fn);
+                out.push(`    get ${fn}() { if (this.$k !== '${fn}') { this.$v = ${zeroOf(f.type, cls)}; this.$k = '${fn}'; } return this.$v; }`);
+                out.push(`    set ${fn}(x) { this.$v = x; this.$k = '${fn}'; }`);
             } else {
                 out.push(`    get ${fn}() { return this.$v; }`);
-                out.push(`    set ${fn}(x) { this.$v = x; }`);
+                out.push(`    set ${fn}(x) { this.$v = x; this.$k = '${fn}'; }`);
             }
         }
         out.push('    $copyFrom(s) {');
         out.push('        const v = s.$v;');
-        out.push("        this.$v = v !== null && typeof v === 'object' ? (v.$clone ? v.$clone() : Object.assign(v.slice(), { $m: v.$m })) : v;");
+        if (agg.length) {
+            out.push(`        if (${agg.map((a) => `s.$k === '${a}'`).join(' || ')}) this.$v = v.$clone ? v.$clone() : v.slice();`);
+            out.push('        else this.$v = v;');
+        } else out.push('        this.$v = v;');
+        out.push('        this.$k = s.$k;');
         out.push('        return this;');
         out.push('    }');
     } else {

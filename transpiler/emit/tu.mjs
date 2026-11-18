@@ -1253,7 +1253,9 @@ export class TUEmitter {
             if (isPtr(from) && isPtr(to) && pkind(to) === 'rec' && pkind(from) !== 'rec' && this.S.records.has(to.to.key)) {
                 return E(`$c.asRec(${e.c}, $T.${this.cls(to.to.key)}, ${this.S.sizeof(to.to)})`, PREC.call);
             }
-            if (isPtr(from) && isPtr(to) && pkind(from) === 'void' && pkind(to) === 'ref') {
+            // void *, and long * (alloc()'s return type, still an untyped block) -> typed pointer
+            const fromLong = isPtr(from) && from.to.k === 'int' && from.to.size === 8;
+            if (isPtr(from) && isPtr(to) && (pkind(from) === 'void' || fromLong) && pkind(to) === 'ref' && !(to.to.k === 'int' && to.to.size === 8)) {
                 const el = to.to;
                 const view = typedArrayOf(el) || (el.k === 'ptr' ? "'ptr'" : el.k === 'int' ? "'i64'" : null);
                 if (view) return E(`$c.asArr(${e.c}, ${view})`, PREC.call);
