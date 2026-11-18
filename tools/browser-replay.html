@@ -1,0 +1,21 @@
+<!doctype html><meta charset="utf-8"><title>replay</title><body><pre id="out">running</pre><div id="game-container"></div>
+<!-- tools/browser-replay.html: replays a public session through the interactive glue in a browser. Serve the repo root (python3 -m http.server) and open /tools/browser-replay.html; headless: chrome --headless=new --virtual-time-budget=60000 --dump-dom URL. -->
+<script type="module">
+const out = document.getElementById('out');
+try {
+  const [{ GameDisplay }, { NethackGame }, { game }, { moveloop_core }] = await Promise.all([
+    import('../js/game_display.js'), import('../js/jsmain.js'), import('../js/gstate.js'), import('../js/allmain.js')]);
+  const sess = await (await fetch('../sessions/seed0106-priest-extcmd-sweep.session.json')).json();
+  const seg = sess.segments[0];
+  const d = new GameDisplay('game-container');
+  for (const ch of seg.moves) d.pushKey(ch.charCodeAt(0));
+  const g = new NethackGame({ seed: seg.seed, datetime: seg.datetime, nethackrc: seg.nethackrc });
+  g._pendingDisplay = d; game.nhDisplay = d;
+  const t0 = performance.now();
+  await g.start();
+  let n = 0;
+  while (d.inputQueueLength > 0 && !game.program_state.gameover) { await moveloop_core(); n++; }
+  const ms = performance.now() - t0;
+  out.textContent = 'DONE steps=' + n + ' ms=' + ms.toFixed(0) + '\n' + d.grid.map((r) => r.map((c) => c.ch).join('').trimEnd()).join('\n');
+} catch (e) { out.textContent = 'ERROR ' + e.stack; }
+</script>
