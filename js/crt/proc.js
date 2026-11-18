@@ -104,3 +104,14 @@ export const fpathconf = () => fail(22);
 export const backtrace = () => 0;
 export const backtrace_symbols = () => null;
 export const CC_MD4_Init = () => 1, CC_MD4_Update = () => 1, CC_MD4_Final = () => 1;
+
+// ---------- setjmp / longjmp in the object world ----------
+// NetHack's one use (nhlua.c nhl_pcall / nhl_hookfn): setjmp(nud->jb) arms a
+// handler, and the Lua count hook longjmps there only when a pcall exceeds its
+// instruction budget, to panic("Lua time exceeded"). The transpiled VM runs the
+// same instructions as C, so it exceeds the budget exactly when C does; that
+// path is not modeled (a trap), and setjmp's direct return is 0.
+export function setjmp(_buf) { return 0; }
+export const _setjmp = setjmp;
+export function longjmp(_buf, _v) { throw new CTrap('longjmp in the object world: Lua instruction budget exceeded (panic "Lua time exceeded" not modeled)'); }
+export const _longjmp = longjmp;

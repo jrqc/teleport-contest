@@ -24,7 +24,7 @@ const only = new Set(args);
 const crtNames = new Set(Object.keys(await import('../../js/crt/index.js')));
 const heapCrtNames = new Set(Object.keys(await import('../../js/crt/heaplibc.js')));
 const ann = parseJsonc(readFileSync(path.join(ROOT, 'transpiler/annotations.jsonc'), 'utf8'));
-const handwritten = Object.entries(ann.functions || {}).filter(([, f]) => f.handwritten).map(([k]) => k);
+const handwritten = Object.entries(ann.functions || {}).filter(([, f]) => f.handwritten).map(([k]) => k.replace(/^.*::/, ''));   // "file::name" for statics
 const prog = new Program({ crtNames, heapCrtNames, handwritten, asyncCut: (ann.edges && ann.edges.cut || []).map((c) => c.to) });
 const luaDb = JSON.parse(readFileSync(path.join(ROOT, 'transpiler/out/compile_commands.json'), 'utf8')).filter((e) => e.group === 'lua');
 prog.missingFn = new Set();

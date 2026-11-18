@@ -7,6 +7,7 @@ import { VaList } from './va.js';
 import { cformat } from './printf.js';
 import { Ptr, cstrlen, cstrToJs } from './mem.js';
 import { CTrap } from './int.js';
+import { serialize, deserialize } from './serial.js';
 
 export class FILE {
     constructor(name) { this.name = name; this.sink = null; this.err = 0; this.eof = 0; this.node = null; this.path = null; this.pos = 0; this.rd = false; this.wr = false; this.append = false; this.unget = -1; this.fd = -1; this.closed = false; }
@@ -152,8 +153,9 @@ export function fread(p, size, nmemb, f) {
     size = Number(size); nmemb = Number(nmemb);
     const total = size * nmemb;
     if (!total) return 0;
-    if (!(p instanceof Ptr) || !ArrayBuffer.isView(p.buf)) throw new CTrap('fread into a buffer that is not a byte or scalar array');
-    const dst = new Uint8Array(p.buf.buffer, p.buf.byteOffset + p.off * p.buf.BYTES_PER_ELEMENT, total);
+    // records, scalar fields and pointer arrays: through save-file bytes (serial.js)
+    const bytes = p instanceof Ptr && ArrayBuffer.isView(p.buf);
+    const dst = bytes ? new Uint8Array(p.buf.buffer, p.buf.byteOffset + p.off * p.buf.BYTES_PER_ELEMENT, total) : new Uint8Array(total);
     let k = 0;
     if (f.unget >= 0) { dst[k++] = f.unget; f.unget = -1; }
     const avail = Math.max(0, f.node.size - f.pos);
@@ -161,13 +163,14 @@ export function fread(p, size, nmemb, f) {
     dst.set(f.node.data.subarray(f.pos, f.pos + m), k);
     f.pos += m; k += m;
     if (k < total) f.eof = 1;
+    if (!bytes) deserialize(p, dst);
     return Math.floor(k / size);
 }
 export function fwrite(p, size, nmemb, f) {
     size = Number(size); nmemb = Number(nmemb);
     const total = size * nmemb;
     if (!total) return 0;
-    if (!(p instanceof Ptr) || !ArrayBuffer.isView(p.buf)) throw new CTrap('fwrite of a buffer that is not a byte or scalar array');
+    if (!(p instanceof Ptr) || !ArrayBuffer.isView(p.buf)) { f.write(serialize(p, total)); return nmemb; }   // records etc.: serial.js
     f.write(new Uint8Array(p.buf.buffer, p.buf.byteOffset + p.off * p.buf.BYTES_PER_ELEMENT, total).slice());
     return nmemb;
 }

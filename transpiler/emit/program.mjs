@@ -49,7 +49,7 @@ export class Program {
         this.modules = [];          // link order
         this.heapModules = new Set();
         this.bridgeFns = new Map();   // heap function name -> { decl type, scope } used from the object world
-        this.memberKeys = new Set();  // record keys whose fields object-world code accesses
+        this.objKeys = new Set();     // record keys object-world code instantiates (classes): copied across the bridge
         this.heapCrt = opts.heapCrtNames || new Set();
         this.isHeapFile = opts.isHeapFile || null;   // tests: put every TU in the heap world
     }
@@ -236,8 +236,10 @@ export class Program {
     }
     /** The shared modules, after every TU was emitted: Map(path -> text). */
     finish() {
+        // the bridge first: it names the classes of the records it copies
+        const bridge = this.heapModules.size ? bridgeModule(this) : null;
         const m = new Map([['types.js', this.typesModule()], ['globals.js', this.globalsModule()], ['index.js', this.indexModule()]]);
-        if (this.heapModules.size) m.set('luabridge.js', bridgeModule(this));
+        if (bridge) m.set('luabridge.js', bridge);
         return m;
     }
     /** Small programs (tests): all TUs in memory. */

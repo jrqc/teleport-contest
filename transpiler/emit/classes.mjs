@@ -39,7 +39,15 @@ export function arrayInit(t, cls) {
     case 'int': return `$c.zeros(${n})`;
     case 'ptr': case 'fn': return `$c.nulls(${n})`;
     case 'rec': return `$c.recArray($T.${cls(e.key)}, ${n})`;
-    case 'arr': return `$c.arrayOf(${n}, () => ${arrayInit(e, cls)})`;
+    case 'arr': {
+        // a multidimensional scalar array: rows are views of one flat typed array (contiguous, as in C)
+        const dims = [n];
+        let x = e;
+        while (x.k === 'arr') { dims.push(x.n || 0); x = x.of; }
+        const xa = typedArrayOf(x);
+        if (xa) return `$c.matrix(${xa}, [${dims.join(', ')}])`;
+        return `$c.arrayOf(${n}, () => ${arrayInit(e, cls)})`;
+    }
     default: throw new Error(`arrayInit: ${e.k}`);
     }
 }
@@ -61,6 +69,31 @@ function copyStmts(d, s, t, cls, ind, depth = 0) {
     }
 }
 
+/** Serializer kind of type t (js/crt/serial.js), as JS source. */
+function kindSrc(scope, t, cls) {
+    t = scope.resolve(t);
+    switch (t.k) {
+    case 'int': return `'${t.signed ? 'i' : 'u'}${t.size * 8}'`;
+    case 'float': return t.size === 4 ? "'f32'" : "'f64'";
+    case 'ptr': case 'fn': case 'builtinfn': return "'ptr'";
+    case 'rec': return `{ rec: $T.${cls(t.key)} }`;
+    case 'arr': return `{ arr: ${kindSrc(scope, t.of, cls)}, n: ${t.n || 0}, es: ${scope.sizeof(t.of)} }`;
+    default: return `{ raw: ${scope.sizeof(t)} }`;
+    }
+}
+/** static $fields(): the record's C layout for save files (serial.js). */
+function fieldsSrc(scope, L, cls) {
+    const items = [];
+    for (const f of L.fields) {
+        if (!f.js) continue;
+        if (f.bits !== null) {
+            const ft = scope.resolve(f.type);
+            items.push(`[${JSON.stringify(field(f.js))}, ${f.offset}, { bits: ${f.bits}, unit: ${scope.sizeof(ft)}, bo: ${f.bitOffset}, signed: ${!!ft.signed} }]`);
+        } else items.push(`[${JSON.stringify(field(f.js))}, ${f.offset}, ${kindSrc(scope, f.type, cls)}]`);
+    }
+    return `    static $fields() { return [${items.join(', ')}]; }   // C layout, for save files (serial.js)`;
+}
+
 /**
  * Source of the class for record `key`.
  * @param scope ctypes Scope; @param cls key -> class name
@@ -73,6 +106,8 @@ export function classSource(scope, key, cls, origin) {
     out.push(`// ${r.union ? 'union' : 'struct'} ${key.startsWith('@') ? '(anonymous)' : key}${origin ? ` (${origin})` : ''}`);
     out.push(`export class ${name} {`);
     out.push(`    static $size = ${L.size};   // sizeof: lets the runtime turn byte counts into element counts`);
+    out.push(fieldsSrc(scope, L, cls));
+    if (r.union) out.push('    static $union = true;');
     if (r.union) {
         // one value slot $v; $k is the member last stored or used as an embedded aggregate.
         // Copying copies an embedded record/array member deeply and anything else (scalars,
@@ -83,21 +118,22 @@ export function classSource(scope, key, cls, origin) {
         for (const f of L.fields) {
             if (!f.js) continue;
             const fn = field(f.js);
+            // $k '$raw': the bytes read from a save file, decoded by the member read (serial.js unraw)
             if (f.type.k === 'rec' || f.type.k === 'arr') {
                 agg.push(fn);
-                out.push(`    get ${fn}() { if (this.$k !== '${fn}') { this.$v = ${zeroOf(f.type, cls)}; this.$k = '${fn}'; } return this.$v; }`);
+                out.push(`    get ${fn}() { if (this.$k === '$raw') return $c.unraw(this, '${fn}'); if (this.$k !== '${fn}') { this.$v = ${zeroOf(f.type, cls)}; this.$k = '${fn}'; } return this.$v; }`);
                 out.push(`    set ${fn}(x) { this.$v = x; this.$k = '${fn}'; }`);
             } else {
-                out.push(`    get ${fn}() { return this.$v; }`);
+                out.push(`    get ${fn}() { return this.$k === '$raw' ? $c.unraw(this, '${fn}') : this.$v; }`);
                 out.push(`    set ${fn}(x) { this.$v = x; this.$k = '${fn}'; }`);
             }
         }
         out.push('    $copyFrom(s) {');
         out.push('        const v = s.$v;');
         if (agg.length) {
-            out.push(`        if (${agg.map((a) => `s.$k === '${a}'`).join(' || ')}) this.$v = v.$clone ? v.$clone() : v.slice();`);
+            out.push(`        if (${[...agg, '$raw'].map((a) => `s.$k === '${a}'`).join(' || ')}) this.$v = v.$clone ? v.$clone() : v.slice();`);
             out.push('        else this.$v = v;');
-        } else out.push('        this.$v = v;');
+        } else out.push("        this.$v = s.$k === '$raw' ? v.slice() : v;");
         out.push('        this.$k = s.$k;');
         out.push('        return this;');
         out.push('    }');

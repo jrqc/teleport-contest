@@ -131,7 +131,14 @@ export class TUEmitter {
         n._ty = this.S.type(s);
         return n._ty;
     }
-    cls(key) { return this.prog.className(key, this.S); }
+    /** The serializer kind of scalar or pointer type t (js/crt/serial.js): FieldRef reads restore it. */
+    serialKind(t) {
+        t = this.S.resolve(t);
+        if (t.k === 'int') return `${t.signed ? 'i' : 'u'}${t.size * 8}`;
+        if (t.k === 'float') return t.size === 4 ? 'f32' : 'f64';
+        return 'ptr';
+    }
+    cls(key) { if (!this.heap) this.prog.objKeys.add(key); return this.prog.className(key, this.S); }
     zero(t) { return zeroOf(t, (k) => this.cls(k)); }
     err(n, msg) {
         const l = n && n.loc && (n.loc.expansionLoc || n.loc);
@@ -1081,7 +1088,7 @@ export class TUEmitter {
                 addr: () => {
                     if (t.k === 'rec') return E(base);
                     if (t.k === 'arr') return E(`new $c.Ptr([${base}], 0)`, PREC.call);
-                    if (isG) return E(`new $c.FieldRef($G, ${jsStr(base.slice(3))})`, PREC.call);
+                    if (isG) return E(`new $c.FieldRef($G, ${jsStr(base.slice(3))}, ${jsStr(this.serialKind(t))})`, PREC.call);
                     this.err(n, `address of unboxed variable ${base}`);
                     return null;
                 },
@@ -1105,7 +1112,7 @@ export class TUEmitter {
                         if (t.k === 'rec') return E(acc, PREC.call);
                         if (t.k === 'arr') return E(`new $c.Ptr([${acc}], 0)`, PREC.call);
                         if (f.bits !== null) this.err(n, 'address of a bit-field');
-                        return E(`new $c.FieldRef(${o.c}, ${jsStr(fname)})`, PREC.call);
+                        return E(`new $c.FieldRef(${o.c}, ${jsStr(fname)}, ${jsStr(this.serialKind(t))})`, PREC.call);
                     },
                     rebase: mk,
                 };

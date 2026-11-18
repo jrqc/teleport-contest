@@ -35,7 +35,12 @@
     // permutation; the override keeps the algorithm (index sort with Darwin qsort, ties by
     // index) and moves elements by value. Async twin for comparators in the async set.
     "nh_deterministic_qsort": { "handwritten": "js/crt/qsort.js", "c": "src/hacklib.c", "csha": "8d897f33de168cc9",
-                                "why": "byte pointer arithmetic over an untyped base; see the comment in js/crt/qsort.js" }
+                                "why": "byte pointer arithmetic over an untyped base; see the comment in js/crt/qsort.js" },
+    // design 7.3: one allocator for two memories (NetHack's nud record, and every
+    // Lua object through lua_Alloc); the override has an object-world face and a
+    // heap-world face ($heap) the bridge hands to lua_newstate
+    "src/nhlua.c::nhl_alloc": { "handwritten": "js/hand/nhlua.js", "c": "src/nhlua.c", "csha": "d2c4c38939beb4e5",
+                            "why": "allocates heap-world memory for Lua and object-world memory for NetHack" }
   },
   "pointers": {},
   "edges": { "cut": [] }

@@ -94,8 +94,8 @@ export function localtimeInto(t, tm) {
 
 const staticTm = new Tm();   // localtime()'s static result, overwritten by every call
 /** localtime(&t): pointer to a static struct tm (as in C). */
-export const localtime = (t) => localtimeInto(Number(t), staticTm);
-export const localtime_r = (t, tm) => localtimeInto(Number(t), tm);
+export const localtime = (tp) => localtimeInto(Number(tp.get(0)), staticTm);
+export const localtime_r = (tp, tm) => localtimeInto(Number(tp.get(0)), tm);
 
 // ---------- mktime: port of Darwin Libc stdtime/FreeBSD/localtime.c ----------
 // (Libc-1669.60.4: time1 / time2 / time2sub / tmcomp). The binary search over

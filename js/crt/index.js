@@ -8,7 +8,9 @@ export * from './string.js';
 export * from './ctype.js';
 export * from './time.js';
 export * from './qsort.js';
+export { nhl_alloc } from '../hand/nhlua.js';   // annotations functions.nhl_alloc
 export * from './alloc.js';
+export { unraw, STALE } from './serial.js';
 export * from './proc.js';
 export * from './fs.js';
 export * from './scanf.js';

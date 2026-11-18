@@ -8,7 +8,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { localtime, mktime, Tm, time, REAL_NOW } from '../../js/crt/time.js';
-import { cstrToJs } from '../../js/crt/mem.js';
+import { cstrToJs, Ptr } from '../../js/crt/mem.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const fields = (t) => [t.tm_sec, t.tm_min, t.tm_hour, t.tm_mday, t.tm_mon, t.tm_year, t.tm_wday, t.tm_yday,
@@ -25,7 +25,7 @@ test('localtime and mktime match Darwin in America/New_York, 1955-2100', () => {
     for (const l of lines) {
         if (l.startsWith('L ')) {
             const [, t, ...want] = l.split(' ');
-            const got = fields(localtime(Number(t)));
+            const got = fields(localtime(new Ptr([Number(t)], 0)));   // localtime(&t)
             if (got !== want.join(' ')) fails.push(`${l}\n   JS ${got}`);
             nL++;
         } else {

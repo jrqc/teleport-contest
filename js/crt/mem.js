@@ -42,7 +42,8 @@ export function retype(p, View) {
 
 /** &obj.field for a scalar or pointer field: deref only (arithmetic beyond +0 traps). */
 export class FieldRef {
-    constructor(obj, key) { this.obj = obj; this.key = key; }
+    // kind: the field's serializer kind (serial.js), so bytes read into it keep its type
+    constructor(obj, key, kind = null) { this.obj = obj; this.key = key; this.kind = kind; }
     add(n) { if (Number(n) !== 0) throw new CTrap(`arithmetic on the address of field ${this.key}`); return this; }
     get(i = 0) { if (i !== 0) throw new CTrap(`index ${i} from field ${this.key}`); return this.obj[this.key]; }
     set(i, v) { if (i !== 0) throw new CTrap(`index ${i} from field ${this.key}`); this.obj[this.key] = v; return v; }
@@ -54,8 +55,17 @@ export class FieldRef {
  * outside the array (one past the end, or before the start while iterating) is
  * an ElemPtr, which can be compared and moved but not dereferenced.
  */
+const ELEM_OK = new Set(['__arr', '__idx', 'then', 'constructor', 'toJSON']);
+const ELEM_TRAP = {
+    get(t, k) {
+        if (typeof k === 'symbol' || ELEM_OK.has(k)) return t[k];
+        throw new CTrap(`read of .${k} through a pointer outside its array (index ${t.__idx} of ${t.__arr.length})`);
+    },
+    set(t, k) { throw new CTrap(`write of .${k} through a pointer outside its array (index ${t.__idx} of ${t.__arr.length})`); },
+};
 export class ElemPtr {
-    constructor(arr, idx) { this.__arr = arr; this.__idx = idx; }
+    // a Proxy: dereferencing a position outside the array traps instead of reading undefined
+    constructor(arr, idx) { this.__arr = arr; this.__idx = idx; return new Proxy(this, ELEM_TRAP); }
 }
 /** An array of n records of class T (zero-initialized), with back-references. */
 export function recArray(T, n) {
@@ -63,8 +73,36 @@ export function recArray(T, n) {
     for (let i = 0; i < n; i++) { const o = new T(); o.__arr = a; o.__idx = i; a[i] = o; }
     return a;
 }
-/** Element i of a record array as a pointer value (&a[i]): the object, or an ElemPtr outside it. */
-export const relem = (a, i) => (i >= 0 && i < a.length ? a[i] : new ElemPtr(a, i));
+/**
+ * Element i of a record array as a pointer value (&a[i]): the object, or an
+ * ElemPtr outside it. Outside a row of a multidimensional array, the position
+ * carries into the neighboring rows (contiguous C layout).
+ */
+export function relem(a, i) {
+    if (i >= 0 && i < a.length) return a[i];
+    const o = a.__outer;
+    if (o !== undefined && a.length > 0) {
+        const L = a.length, q = Math.floor(i / L), r = i - q * L;
+        const row = rowAt(o, a.__oidx + q);
+        if (row !== null) return row[r];
+    }
+    return new ElemPtr(a, i);
+}
+/** Row k of array-of-arrays o, carrying into o's own neighbors; null outside the whole object. */
+function rowAt(o, k) {
+    if (k >= 0 && k < o.length) return o[k];
+    const up = o.__outer;
+    if (up === undefined || o.length === 0) return null;
+    const L = o.length, q = Math.floor(k / L);
+    const parent = rowAt(up, o.__oidx + q);
+    return parent === null ? null : parent[k - q * L];
+}
+/** The position of a record array element in its outermost array, in elements (for differences and ordering). */
+function flatPos(p) {
+    let a = p.__arr, i = p.__idx;
+    while (a.__outer !== undefined) { i += a.__oidx * a.length; a = a.__outer; }
+    return [a, i];
+}
 /** p + n for a record pointer. */
 export function radd(p, n) {
     if (n === 0) return p;
@@ -74,8 +112,12 @@ export function radd(p, n) {
 }
 /** p - q for record pointers into the same array (element count). */
 export function rdiff(p, q) {
-    if (p.__arr === undefined || p.__arr !== q.__arr) {
+    if (p.__arr === undefined || q.__arr === undefined || p.__arr !== q.__arr) {
         if (p === q) return 0;
+        if (p.__arr !== undefined && q.__arr !== undefined) {
+            const [a, i] = flatPos(p), [b, j] = flatPos(q);
+            if (a === b) return i - j;
+        }
         throw new CTrap('difference of pointers to different arrays');
     }
     return p.__idx - q.__idx;
@@ -104,6 +146,7 @@ export function pcmp(a, b) {
     if (a instanceof Ptr && b instanceof Ptr && a.buf === b.buf) { x = a.off; y = b.off; }
     else if (a && b && a.__arr !== undefined && a.__arr === b.__arr) { x = a.__idx; y = b.__idx; }
     else if (peq(a, b)) return 0;
+    else if (a && b && a.__arr !== undefined && b.__arr !== undefined && flatPos(a)[0] === flatPos(b)[0]) { x = flatPos(a)[1]; y = flatPos(b)[1]; }
     else throw new CTrap('ordering of unrelated pointers');
     return x < y ? -1 : x > y ? 1 : 0;
 }
@@ -160,11 +203,41 @@ export function cstrToJs(p) {
 
 // ---------- helpers for generated code ----------
 /** n zeros: arrays of 64-bit integers (Number|BigInt elements). */
-export const zeros = (n) => new Array(n).fill(0);
+export const zeros = (n) => { const a = new Array(n).fill(0); a.$kind = 'i64'; return a; };
 /** n NULL pointers. */
-export const nulls = (n) => new Array(n).fill(null);
+export const nulls = (n) => { const a = new Array(n).fill(null); a.$kind = 'ptr'; return a; };
 /** An array of n sub-arrays (multi-dimensional C arrays). */
-export function arrayOf(n, make) { const a = new Array(n); for (let i = 0; i < n; i++) a[i] = make(); return a; }
+/**
+ * An array of n arrays (T a[n][m]...). Each inner plain array records its place
+ * (__outer, __oidx): C lays the rows out contiguously, so record pointer
+ * arithmetic may run from one row into the next (mkmaze.c get_level_extends:
+ * lev += ROWNO walks levl[x][y] -> levl[x+1][y]).
+ */
+export function arrayOf(n, make) {
+    const a = new Array(n);
+    for (let i = 0; i < n; i++) {
+        const r = make();
+        if (Array.isArray(r)) { r.__outer = a; r.__oidx = i; }
+        a[i] = r;
+    }
+    return a;
+}
+/**
+ * T a[d0][d1]... for a scalar T with typed-array class View: nested arrays whose
+ * innermost rows are views of one flat typed array, so the rows are contiguous
+ * as in C (byte functions may cross from one row into the next).
+ */
+export function matrix(View, dims) {
+    const flat = new View(dims.reduce((a, b) => a * b, 1));
+    const build = (d, off) => {
+        if (d === dims.length - 1) return flat.subarray(off, off + dims[d]);
+        const step = dims.slice(d + 1).reduce((a, b) => a * b, 1);
+        const a = new Array(dims[d]);
+        for (let i = 0; i < dims[d]; i++) { const r = build(d + 1, off + i * step); if (Array.isArray(r)) { r.__outer = a; r.__oidx = i; } a[i] = r; }
+        return a;
+    };
+    return build(0, 0);
+}
 /** A 64-bit integer used as an index or pointer offset: a safe Number. */
 export function idx(x) {
     if (typeof x === 'number') return x;

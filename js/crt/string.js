@@ -204,11 +204,17 @@ export function memmove(d, s, n) {
     bytesView(D, n).set(bytesView(Sx, n));   // TypedArray.set copies as if through a temporary (memmove)
     return d;
 }
-/** The n bytes at typed-array pointer p, as a Uint8Array over the same memory (bounds-checked). */
+/**
+ * The n bytes at typed-array pointer p, as a Uint8Array over the same memory
+ * (bounds-checked). The bound is the end of the underlying object, which for a
+ * row of a multidimensional array (mem.js matrix: views of one flat array) is
+ * the end of the whole array, as in C (vision.c memset(**rows, 0, ROWNO * COLNO)).
+ */
 export function bytesView(p, n) {
     const b = p.buf, bpe = b.BYTES_PER_ELEMENT;
     const start = p.off * bpe;
-    if (p.off < 0 || start + n > b.byteLength) throw new CTrap(`memory access out of bounds (${start}+${n} of ${b.byteLength} bytes)`);
+    const limit = b.buffer.byteLength - b.byteOffset;
+    if (p.off < 0 || start + n > limit) throw new CTrap(`memory access out of bounds (${start}+${n} of ${limit} bytes)`);
     return new Uint8Array(b.buffer, b.byteOffset + start, n);
 }
 export function memcmp(a, b, n) {
