@@ -384,3 +384,26 @@ Being conservative is safe: an extra `async` changes no behavior, only speed (se
   (`nh_terminate`, final capture).
 - Browser play (`/play/<owner>/`): `nextKey()` awaits the frozen `Terminal`'s keyboard queue.
   Same generated code, different key source, so live play is O(1) per key (no replay).
+
+## 7. Lua
+
+**Decision proposed: transpile Lua 5.4.8's C source with the same transpiler, in heap mode,
+and embed the `.lua` scripts as strings.** (CLAUDE.md 2.7 prefers this; the numbers support it.)
+
+| Fact (Stage 1) | Consequence |
+|---|---|
+| NetHack 5.0 uses Lua **5.4.8**, downloaded at build time (`make fetch-lua`), 32 files in `liblua.a`, built with `-O2 -DLUA_COMPAT_5_3 -DLUA_USE_MACOSX` | The exact source is in the reference tree; transpile it with those flags |
+| Scripts get randomness only through the **core** RNG: `nhlib.lua` replaces `math.random` with a shim over `nh.rn2`/`nh.random`; Lua's own xoshiro generator is seeded but unused | No separate Lua RNG to emulate; RNG order is fixed by the scripts' execution order, which the transpiled VM reproduces exactly |
+| 25,078 Lua-tagged RNG calls in the public sessions; the tags come from `nhl_rnglog_set_lua_caller` (patch 004) reading `lua_Debug` | Transpiling the VM and `ldebug.c` reproduces the tags (source names and line numbers) for the debug log |
+| Lua internals are raw memory (stack pointer arithmetic, GC unions, `offsetof`, computed goto) | Heap mode for all Lua TUs (3.5) |
+| Lua's string-hash seed (`luai_makeseed`, `lstate.c:71`) mixes `time()` with heap and stack addresses | Address-dependent: in C it varies with ASLR; only `pairs()` iteration order over string keys depends on it. The scripts use `pairs()` in 3 places (`nhlib.lua:159` save-variable serialization, `nhlib.lua:233` tutorial events, `nhcore.lua:48` callbacks). The JS heap gives fixed addresses. Since the 44 public sessions re-record identically across runs, recorded output does not depend on that order; risk R4 tracks it |
+
+Why not an existing JS Lua (fengari or similar): different hashing, different GC timing (Lua
+`__gc` and weak tables), different error messages and number formatting (`%.14g`), and
+different `lua_Debug` information, any of which can change screens or RNG order. A
+transpiled VM is behaviorally identical by construction and costs no extra method.
+
+Script loading: `luaL_loadbuffer` on the embedded script text with the same chunk names
+(`@dat/xxx.lua` style names as the C build uses), so error messages and debug info match.
+Lua's standard I/O and OS libraries (`liolib.c`, `loslib.c`) are transpiled too but sandboxed
+by NetHack itself (`NHL_SB_*` flags); their libc needs map to `stdio.js`/`sys.js`.
