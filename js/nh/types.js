@@ -1682,63 +1682,9 @@ export class any {
     static $size = 8;   // sizeof: lets the runtime turn byte counts into element counts
     static $fields() { return [["a_void", 0, 'ptr'], ["a_obj", 0, 'ptr'], ["a_monst", 0, 'ptr'], ["a_int", 0, 'i32'], ["a_xint16", 0, 'i32'], ["a_xint8", 0, 'i32'], ["a_char", 0, 'i8'], ["a_schar", 0, 'i8'], ["a_uchar", 0, 'u8'], ["a_uint", 0, 'u32'], ["a_long", 0, 'i64'], ["a_ulong", 0, 'u64'], ["a_coordxy", 0, 'i16'], ["a_iptr", 0, 'ptr'], ["a_xint16ptr", 0, 'ptr'], ["a_xint8ptr", 0, 'ptr'], ["a_lptr", 0, 'ptr'], ["a_coordxyptr", 0, 'ptr'], ["a_ulptr", 0, 'ptr'], ["a_uptr", 0, 'ptr'], ["a_string", 0, 'ptr'], ["a_nfunc", 0, 'ptr'], ["a_mask32", 0, 'u64'], ["a_int64", 0, 'i64'], ["a_uint64", 0, 'u64']]; }   // C layout, for save files (serial.js)
     static $union = true;
-    constructor() { this.$v = null; this.$k = 'a_void'; }
-    get a_void() { return this.$k === '$raw' ? $c.unraw(this, 'a_void') : this.$v; }
-    set a_void(x) { this.$v = x; this.$k = 'a_void'; }
-    get a_obj() { return this.$k === '$raw' ? $c.unraw(this, 'a_obj') : this.$v; }
-    set a_obj(x) { this.$v = x; this.$k = 'a_obj'; }
-    get a_monst() { return this.$k === '$raw' ? $c.unraw(this, 'a_monst') : this.$v; }
-    set a_monst(x) { this.$v = x; this.$k = 'a_monst'; }
-    get a_int() { return this.$k === '$raw' ? $c.unraw(this, 'a_int') : this.$v; }
-    set a_int(x) { this.$v = x; this.$k = 'a_int'; }
-    get a_xint16() { return this.$k === '$raw' ? $c.unraw(this, 'a_xint16') : this.$v; }
-    set a_xint16(x) { this.$v = x; this.$k = 'a_xint16'; }
-    get a_xint8() { return this.$k === '$raw' ? $c.unraw(this, 'a_xint8') : this.$v; }
-    set a_xint8(x) { this.$v = x; this.$k = 'a_xint8'; }
-    get a_char() { return this.$k === '$raw' ? $c.unraw(this, 'a_char') : this.$v; }
-    set a_char(x) { this.$v = x; this.$k = 'a_char'; }
-    get a_schar() { return this.$k === '$raw' ? $c.unraw(this, 'a_schar') : this.$v; }
-    set a_schar(x) { this.$v = x; this.$k = 'a_schar'; }
-    get a_uchar() { return this.$k === '$raw' ? $c.unraw(this, 'a_uchar') : this.$v; }
-    set a_uchar(x) { this.$v = x; this.$k = 'a_uchar'; }
-    get a_uint() { return this.$k === '$raw' ? $c.unraw(this, 'a_uint') : this.$v; }
-    set a_uint(x) { this.$v = x; this.$k = 'a_uint'; }
-    get a_long() { return this.$k === '$raw' ? $c.unraw(this, 'a_long') : this.$v; }
-    set a_long(x) { this.$v = x; this.$k = 'a_long'; }
-    get a_ulong() { return this.$k === '$raw' ? $c.unraw(this, 'a_ulong') : this.$v; }
-    set a_ulong(x) { this.$v = x; this.$k = 'a_ulong'; }
-    get a_coordxy() { return this.$k === '$raw' ? $c.unraw(this, 'a_coordxy') : this.$v; }
-    set a_coordxy(x) { this.$v = x; this.$k = 'a_coordxy'; }
-    get a_iptr() { return this.$k === '$raw' ? $c.unraw(this, 'a_iptr') : this.$v; }
-    set a_iptr(x) { this.$v = x; this.$k = 'a_iptr'; }
-    get a_xint16ptr() { return this.$k === '$raw' ? $c.unraw(this, 'a_xint16ptr') : this.$v; }
-    set a_xint16ptr(x) { this.$v = x; this.$k = 'a_xint16ptr'; }
-    get a_xint8ptr() { return this.$k === '$raw' ? $c.unraw(this, 'a_xint8ptr') : this.$v; }
-    set a_xint8ptr(x) { this.$v = x; this.$k = 'a_xint8ptr'; }
-    get a_lptr() { return this.$k === '$raw' ? $c.unraw(this, 'a_lptr') : this.$v; }
-    set a_lptr(x) { this.$v = x; this.$k = 'a_lptr'; }
-    get a_coordxyptr() { return this.$k === '$raw' ? $c.unraw(this, 'a_coordxyptr') : this.$v; }
-    set a_coordxyptr(x) { this.$v = x; this.$k = 'a_coordxyptr'; }
-    get a_ulptr() { return this.$k === '$raw' ? $c.unraw(this, 'a_ulptr') : this.$v; }
-    set a_ulptr(x) { this.$v = x; this.$k = 'a_ulptr'; }
-    get a_uptr() { return this.$k === '$raw' ? $c.unraw(this, 'a_uptr') : this.$v; }
-    set a_uptr(x) { this.$v = x; this.$k = 'a_uptr'; }
-    get a_string() { return this.$k === '$raw' ? $c.unraw(this, 'a_string') : this.$v; }
-    set a_string(x) { this.$v = x; this.$k = 'a_string'; }
-    get a_nfunc() { return this.$k === '$raw' ? $c.unraw(this, 'a_nfunc') : this.$v; }
-    set a_nfunc(x) { this.$v = x; this.$k = 'a_nfunc'; }
-    get a_mask32() { return this.$k === '$raw' ? $c.unraw(this, 'a_mask32') : this.$v; }
-    set a_mask32(x) { this.$v = x; this.$k = 'a_mask32'; }
-    get a_int64() { return this.$k === '$raw' ? $c.unraw(this, 'a_int64') : this.$v; }
-    set a_int64(x) { this.$v = x; this.$k = 'a_int64'; }
-    get a_uint64() { return this.$k === '$raw' ? $c.unraw(this, 'a_uint64') : this.$v; }
-    set a_uint64(x) { this.$v = x; this.$k = 'a_uint64'; }
-    $copyFrom(s) {
-        const v = s.$v;
-        this.$v = s.$k === '$raw' ? v.slice() : v;
-        this.$k = s.$k;
-        return this;
-    }
+    static $cell = true;   // punning possible (transpiler/out/union-pun.md): kept as bytes
+    constructor() { $c.cellInit(this); }
+    $copyFrom(s) { return $c.cellCopy(this, s); }
     $clone() { return new any().$copyFrom(this); }
 }
 
@@ -2557,20 +2503,9 @@ export class customization_content {
     static $size = 24;   // sizeof: lets the runtime turn byte counts into element counts
     static $fields() { return [["sym", 0, { rec: $T.custom_symbol }], ["urep", 0, { rec: $T.custom_urep }], ["ccolor", 0, { rec: $T.custom_nhcolor }]]; }   // C layout, for save files (serial.js)
     static $union = true;
-    constructor() { this.$v = new $T.custom_symbol(); this.$k = 'sym'; }
-    get sym() { if (this.$k === '$raw') return $c.unraw(this, 'sym'); if (this.$k !== 'sym') { this.$v = new $T.custom_symbol(); this.$k = 'sym'; } return this.$v; }
-    set sym(x) { this.$v = x; this.$k = 'sym'; }
-    get urep() { if (this.$k === '$raw') return $c.unraw(this, 'urep'); if (this.$k !== 'urep') { this.$v = new $T.custom_urep(); this.$k = 'urep'; } return this.$v; }
-    set urep(x) { this.$v = x; this.$k = 'urep'; }
-    get ccolor() { if (this.$k === '$raw') return $c.unraw(this, 'ccolor'); if (this.$k !== 'ccolor') { this.$v = new $T.custom_nhcolor(); this.$k = 'ccolor'; } return this.$v; }
-    set ccolor(x) { this.$v = x; this.$k = 'ccolor'; }
-    $copyFrom(s) {
-        const v = s.$v;
-        if (s.$k === 'sym' || s.$k === 'urep' || s.$k === 'ccolor' || s.$k === '$raw') this.$v = v.$clone ? v.$clone() : v.slice();
-        else this.$v = v;
-        this.$k = s.$k;
-        return this;
-    }
+    static $cell = true;   // punning possible (transpiler/out/union-pun.md): kept as bytes
+    constructor() { $c.cellInit(this); }
+    $copyFrom(s) { return $c.cellCopy(this, s); }
     $clone() { return new customization_content().$copyFrom(this); }
 }
 
@@ -9693,22 +9628,9 @@ export class vlaunchinfo {
     static $size = 4;   // sizeof: lets the runtime turn byte counts into element counts
     static $fields() { return [["v_launch_otyp", 0, 'i16'], ["v_launch2", 0, { rec: $T.nhcoord }], ["v_conjoined", 0, 'u8'], ["v_tnote", 0, 'i16']]; }   // C layout, for save files (serial.js)
     static $union = true;
-    constructor() { this.$v = 0; this.$k = 'v_launch_otyp'; }
-    get v_launch_otyp() { return this.$k === '$raw' ? $c.unraw(this, 'v_launch_otyp') : this.$v; }
-    set v_launch_otyp(x) { this.$v = x; this.$k = 'v_launch_otyp'; }
-    get v_launch2() { if (this.$k === '$raw') return $c.unraw(this, 'v_launch2'); if (this.$k !== 'v_launch2') { this.$v = new $T.nhcoord(); this.$k = 'v_launch2'; } return this.$v; }
-    set v_launch2(x) { this.$v = x; this.$k = 'v_launch2'; }
-    get v_conjoined() { return this.$k === '$raw' ? $c.unraw(this, 'v_conjoined') : this.$v; }
-    set v_conjoined(x) { this.$v = x; this.$k = 'v_conjoined'; }
-    get v_tnote() { return this.$k === '$raw' ? $c.unraw(this, 'v_tnote') : this.$v; }
-    set v_tnote(x) { this.$v = x; this.$k = 'v_tnote'; }
-    $copyFrom(s) {
-        const v = s.$v;
-        if (s.$k === 'v_launch2' || s.$k === '$raw') this.$v = v.$clone ? v.$clone() : v.slice();
-        else this.$v = v;
-        this.$k = s.$k;
-        return this;
-    }
+    static $cell = true;   // punning possible (transpiler/out/union-pun.md): kept as bytes
+    constructor() { $c.cellInit(this); }
+    $copyFrom(s) { return $c.cellCopy(this, s); }
     $clone() { return new vlaunchinfo().$copyFrom(this); }
 }
 
@@ -9717,19 +9639,9 @@ export class vptrs {
     static $size = 8;   // sizeof: lets the runtime turn byte counts into element counts
     static $fields() { return [["v_nexthere", 0, 'ptr'], ["v_ocontainer", 0, 'ptr'], ["v_ocarry", 0, 'ptr']]; }   // C layout, for save files (serial.js)
     static $union = true;
-    constructor() { this.$v = null; this.$k = 'v_nexthere'; }
-    get v_nexthere() { return this.$k === '$raw' ? $c.unraw(this, 'v_nexthere') : this.$v; }
-    set v_nexthere(x) { this.$v = x; this.$k = 'v_nexthere'; }
-    get v_ocontainer() { return this.$k === '$raw' ? $c.unraw(this, 'v_ocontainer') : this.$v; }
-    set v_ocontainer(x) { this.$v = x; this.$k = 'v_ocontainer'; }
-    get v_ocarry() { return this.$k === '$raw' ? $c.unraw(this, 'v_ocarry') : this.$v; }
-    set v_ocarry(x) { this.$v = x; this.$k = 'v_ocarry'; }
-    $copyFrom(s) {
-        const v = s.$v;
-        this.$v = s.$k === '$raw' ? v.slice() : v;
-        this.$k = s.$k;
-        return this;
-    }
+    static $cell = true;   // punning possible (transpiler/out/union-pun.md): kept as bytes
+    constructor() { $c.cellInit(this); }
+    $copyFrom(s) { return $c.cellCopy(this, s); }
     $clone() { return new vptrs().$copyFrom(this); }
 }
 
