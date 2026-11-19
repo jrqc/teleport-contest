@@ -276,6 +276,14 @@ held-out session, untested; **L** = possible, but needs an unusual input.
   except a function named `ll_require` in generated Lua). The judge ran it successfully, so the
   sandbox works for the paths taken; a path that touches `process`, `fs` or a timer would fail
   only under the judge.
+- **T7 result 2026-11-19 (commit 208d3d2).** `tools/sandbox-score.mjs` runs the frozen
+  runner's worker (the process that calls `runSegment`) under `--permission`, with reads
+  limited to the fork ("judge") or to `js/`, `frozen/` and the session file ("strict"), and
+  compares with the unsandboxed run. Node 26.5.0 and 22.23.5: 44/44 sessions, 11405/11405
+  screens, 792838/792838 RNG under both policies; no access denial logged; slowest session
+  8.1 s. A negative check confirms the flags deny reads elsewhere, writes, child processes and
+  workers. Not modeled: the judge's IPC split (our code cannot observe it) and its machine
+  speed. In the loop: `npm run sandbox` (in `transpiler/`).
 
 ### F18. Memory model — L
 
@@ -414,6 +422,10 @@ green. Recorded tests live in `tests/sessions/` (not `sessions/`) and are scored
 | T11 | **Native run-to-run stability** | Record the same recipe several times with ASLR on; any difference marks an address-dependent behavior | Small | F10 |
 | T12 | **libc differential fuzzing** | Extend the `printf` fuzzing to `strtod`, `atoi`/`atol`, `sscanf`, `strncpy`/`strncat` truncation, `regexec` once it exists, against native Darwin | Small | F16, F2 |
 | T13 | **Determinism and churn** (exists: 4.7) | Kept in the loop; add the Phase 2 `git diff --numstat -- js/` report per commit | — | Phase 2 |
+
+Built so far: **T10** (done, settled F5), **T1** (`tests/nh/capture-buffer.test.mjs`), **T7**
+(`tools/sandbox-score.mjs`, see F17), and the regex part of **T12** (`tests/c-diff/regex/`,
+`tests/nh/regex.test.mjs`, see F2).
 
 Order proposed: T10 and T1 first (they decide how to fix F1/F5, the likeliest causes), then
 T7, T3 + T2 (they find the most per hour), T4 (it tells where to aim T2/T3), T6, T5, T8, T9,

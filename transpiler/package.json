@@ -8,7 +8,8 @@
     "analyze": "bash analysis/stage1.sh",
     "union-pun": "node analysis/union-pun.mjs",
     "test": "node --test '../tests/**/*.test.mjs'",
-    "check-annotations": "node annotations/check.mjs"
+    "check-annotations": "node annotations/check.mjs",
+    "sandbox": "node ../tools/sandbox-score.mjs"
   },
   "dependencies": {}
 }
