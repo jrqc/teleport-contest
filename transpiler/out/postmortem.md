@@ -75,6 +75,10 @@ held-out session, untested; **L** = possible, but needs an unusual input.
   special case: HEAD is the recorder the 56/56 recordings need. Doing it as a recorder-env
   patch mix (HEAD's buffer size, old raw-mode behavior; see F5) needs a check that public
   sessions still re-record 44/44.
+- **Status 2026-11-19: fixed** (owner-approved). `tools/recorder-env/build-reference.sh` now
+  applies 6ee30e6's buffer size on top of 52960eb's patch 006; the C recorder built that way
+  still re-records 44/44; regenerating changed exactly one line in `js/nh` (`termcap.js`:
+  `new Int8Array(61825)`); score unchanged. Test T1 below is in place.
 - **Test.** A unit test that fills a capture with the worst case (80 columns of alternating
   fg colors and DEC shifts on all 24 rows); a recorded session in Gehennom or on a lava-heavy
   level (wizard-mode `^V` to Gehennom, `#terrain`).
@@ -135,6 +139,14 @@ held-out session, untested; **L** = possible, but needs an unusual input.
   behavior unless the difference is not reachable in the public cases.
 - **Test.** Re-record the 44 public sessions with HEAD's 006 and list exactly which steps
   differ (only seed0013's final cursor per the README); this decides how wide the conflict is.
+- **T10 result (2026-11-19): settled, low impact.** With 6ee30e6's patch 006 unchanged
+  (`PATCH006=head BUILD_DIR=tools/recorder-env/build-head`), 43/44 public sessions re-record
+  byte-identically. The only difference in all 11,405 steps is the **cursor** at seed0013
+  segment 0 step 48, the last screen after `S` `y` ("Be seeing you..."): public `[0,1]`,
+  HEAD `[0,0]`. Every screen is identical, and the sessions that end in death (seed0030's ten
+  deaths, seed5006) are unaffected. A cursor mismatch costs that step, so if the held-out
+  sessions were recorded with HEAD, the cost is **at most one step per segment that ends in
+  a save** (raw output after the windows are suspended). The port keeps the public behavior.
 
 ### F6. Silent out-of-bounds access on arrays — M
 
@@ -270,6 +282,74 @@ held-out session, untested; **L** = possible, but needs an unusual input.
 
 All the traps above are loud: a trap ends the segment with an error on stderr. The judge's
 output is not visible to us, but the same trap in our own runs names the C construct.
+
+## 1A. Readability and Phase 2 (owner request, 2026-11-19)
+
+Phase 2 scores `parity / (1 + lines_changed_in_js / N)`, with comment-only and whitespace-only
+changes normalized out. Every line of generated code that encodes something incidental to the
+C source (a line number, a renumbered constant, an inlined macro body) changes whenever 5.1
+moves that incidental thing, so these are churn as well as readability problems. Figures are
+for `js/nh` as generated on 2026-11-19 (about 246,000 lines, Lua excluded).
+
+| # | Issue | Evidence | Churn risk | Readability |
+|---|---|---|---|---|
+| P1 | **C line numbers in code** (RNG caller tags) | Patch 003's `rn2`/`rnd`/… macros expand at every call site to `rng_log_enabled() ? (rng_log_set_caller("mon.c", 597, "make_corpse"), rn2(x)) : rn2(x)` (`js/nh/mon.js:452`). 2,719 sites on 2,547 lines | **Very high**: any line added or removed above a call in a C file changes the line number of every later RNG site in that file. A typical 5.1 change to `mon.c` would touch most of its RNG lines | Poor: each RNG call is written twice inside a conditional |
+| P2 | **Numeric constants** | Enum values and `#define` constants are emitted as clang's folded value with the name in a comment: `mksobj_at(461 /* FIRST_GLASS_GEM */ + …)`, `typ < 16 /* POOL */`. 27,665 occurrences on 16,420 lines; most frequent families: `PM_*` monster indices (2,920), `GLYPH_*` (1,619), `S_*`, `A_*` and property indices | **High**: 5.1 adding one monster or object renumbers every later `PM_*` / object index, and every use site changes (only the number changes; the comment keeps the name) | Fair (the comment names it) |
+| P3 | **Expanded macros** | Function-like macros are inlined: `Blind` (youprop.h:103) becomes `(u.uprops[15 /* BLINDED */].intrinsic \|\| u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked` at every use; `rn1`, `IS_POOL`, `isok`-style predicates likewise | High: a changed macro body changes every use site in every file instead of one definition | Poor: the C reads `Blind`, the JS reads its expansion |
+| P4 | **Dropped comments** | C comments are not carried; only a `// file.c:line` marker per function | None (comments are free in the diff) | Losing them makes the output harder to follow; carrying them costs nothing in Phase 2 |
+| P5 | **Function line markers** | `export function nomux_capture_screen() {   // termcap.c:796` | None (comment-only lines normalize out) | Good; keep |
+
+Fix plan (in the transpiler only; no hand edits):
+
+1. **P1, RNG caller tags out of the code.** The tags only feed our debug log; `getRngLog()`
+   strips them and scoring never sees them. Recognize the patch-003 macro expansion at the
+   call site (clang's macro-expansion locations identify it) and emit the plain call,
+   `rn2(x)`. The C caller for triage then comes from a **source map written outside `js/`**
+   (`transpiler/out/srcmap/<file>.json`: generated JS line → C file, line and function) plus the
+   JS stack at the RNG call in debug runs only (`tools/`, not shipped). Removes about 2,550
+   lines of line-number churn and halves the text of every RNG call. Check: the RNG sequence is
+   unchanged (score) and tool 4.2 still names C callers.
+2. **P2, named constants.** Emit each enum constant and object-like `#define` that the code uses
+   as a named export of a generated constants module per header (`js/nh/consts/<hdr>.js`:
+   `export const PM_GIANT_ANT = 0;`) and reference it by name (`PM.PM_GIANT_ANT` or an
+   imported binding). A renumbering then changes one line per constant in one file. Exceptions,
+   emitted as values: constants inside `case` labels where the switch must stay a JS `switch`
+   (named constants work there too, so probably none), array sizes in typed-array constructors
+   (keep the value; the name in a comment). Check: generated code byte-identical in behavior
+   (score), and a churn experiment: insert a monster in a scratch copy of `monst.c`/`monsters.h`
+   and count changed `js/` lines before and after.
+3. **P3, macros as functions where it is exact.** For function-like macros whose expansion is
+   an expression, emit one JS function per macro in the header's module and call it, **only
+   when the call is semantically identical to the expansion**: each argument at the call site
+   is free of side effects and of `await` (otherwise evaluating it once instead of N times or
+   in a different order would change behavior), the macro does not take addresses of or assign
+   to its arguments, and it does not depend on the caller's local names. Other sites keep the
+   expansion. Property macros (`Blind`, `Levitation`, …) and predicates (`IS_POOL`, `rn1`)
+   qualify. Check: score, and the count of expansion sites converted.
+4. **P4, comments.** Carry C comments from the source text (clang's AST omits most of them):
+   attach each comment to the next emitted statement by source location. Free in Phase 2.
+
+Order: P1 (largest churn per unit of work), P2, P3, P4. Each step is a separate transpiler
+commit plus a generated commit, with a score run and the churn report (T13).
+
+**Rendering without the capture layer (owner request, longer term).** Today screens come from
+the recorder's patch 006, transpiled: a shadow screen in `termcap.c`, captured into a marker on
+stdout at every input boundary, parsed and re-encoded by `js/nhprocess.js`. That ties the port
+to one patch version (F1, F5) and keeps recorder code in `js/`. Plan:
+
+- Render from the tty port's own state: wintty keeps its window buffers, and `tty_curs`/
+  `xputs`/`cmov`/SGR output go through termcap.c. A JS terminal emulator over the tty's stdout
+  bytes (the escape sequences the real terminal would receive, under `TERM=xterm-256color`),
+  feeding the frozen `Terminal`, gives the screen a real xterm would show, with no capture code.
+- The capture points stay where the C recorder takes them (`tty_nhgetch` input boundaries and
+  `tty_delay_output` frames), but as a small hand-written hook, not patch code.
+- Risk: the recorder's capture and a terminal emulator differ wherever patch 006 models the
+  screen differently from what xterm does (it has its own raw-mode row counter, the cause of
+  F5). Building it means a side-by-side run: emulator grid vs capture payload at every step of
+  every session, until they agree everywhere; only then switch. Outcome on the 44 public sessions
+  decides whether the scored screens can come from the emulator.
+- Effect on Phase 2: patch 006 changes would no longer reach `js/`; 5.1 changes to tty output
+  would reach it only through the transpiled wintty/termcap code, as they should.
 
 ## 2. What the evidence suggests for the 4 failing sessions
 
