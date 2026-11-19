@@ -85,6 +85,16 @@ held-out session, untested; **L** = possible, but needs an unusual input.
 
 ### F2. regex is unimplemented — M–H
 
+> **Fixed 2026-11-19.** Darwin's own regex is now transpiled: TRE and `regerror` from Apple
+> Libc-1752.120.2 plus a C-locale shim (`transpiler/third_party/README.md`), in the heap
+> world behind the generated bridge (`regex_t` copied in and out; `regerror`'s buffer copied
+> back). Libc-1669.60.4, the tag macOS 15 nominally ships, differed from the installed
+> system on `{256}` (error 18, `REG_BADMAX`); 1752 matches. Differential: 80,418 cases
+> (fuzzed, NetHack-style, Apple's `tests/regex/datafiles`, six flag combinations): the
+> system regex, the vendored build compiled natively and the transpiled JS agree on every
+> compile code, `regerror` text, match result and submatch offset. Loop test:
+> `tests/nh/regex.test.mjs` (4,126 golden cases, plus NetHack's `posixregex.c` path).
+
 - **Evidence.** `js/nh/posixregex.js` binds `regcomp`, `regexec`, `regerror`, `regfree` to
   `missing(...)`, which traps (`js/crt/mem.js:305`). Callers: `MENUCOLOR` (coloratt.c:596),
   `MSGTYPE` (options.c:7740), autopickup exceptions (options.c:9331),

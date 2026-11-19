@@ -41,13 +41,21 @@ export class EmitError extends Error {}
 /** clang prints string literals with C escapes; return one JS char per byte. */
 export function decodeCString(lit) {
     if (lit[0] === 'L' || lit[0] === 'u' || lit[0] === 'U') throw new EmitError(`wide string literal ${lit}`);
-    const s = lit.slice(1, -1);
+    return decodeEscapes(lit, lit.slice(1, -1), false);
+}
+/** A wide (L"...") literal: its wchar_t values (Darwin: 32-bit, one per code point). */
+export function decodeWideString(lit) {
+    if (lit[0] !== 'L') throw new EmitError(`u/U string literal ${lit}`);
+    const s = decodeEscapes(lit, lit.slice(2, -1), true);
+    return Array.from(s, (c) => c.codePointAt(0));
+}
+function decodeEscapes(lit, s, wide) {
     let out = '';
     for (let i = 0; i < s.length; i++) {
         const c = s[i];
         if (c !== '\\') {
             const code = c.codePointAt(0);
-            if (code > 0x7f) {   // UTF-8 source text: emit its bytes
+            if (code > 0x7f && wide) { out += String.fromCodePoint(code); if (code > 0xffff) i++; } else if (code > 0x7f) {   // UTF-8 source text: emit its bytes
                 const bytes = Buffer.from(String.fromCodePoint(code), 'utf8');
                 for (const b of bytes) out += String.fromCharCode(b);
                 if (code > 0xffff) i++;
@@ -60,7 +68,7 @@ export function decodeCString(lit) {
         if (d === 'x') {
             let h = '';
             while (/[0-9a-fA-F]/.test(s[i + 1] || '')) h += s[++i];
-            out += String.fromCharCode(parseInt(h, 16) & 0xff);
+            out += wide ? String.fromCodePoint(parseInt(h, 16)) : String.fromCharCode(parseInt(h, 16) & 0xff);
             continue;
         }
         if (/[0-7]/.test(d)) {

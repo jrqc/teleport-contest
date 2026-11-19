@@ -12,6 +12,10 @@
     "lua": { "files": "lib/lua-5.4.8/src/", "repr": "heap",
              "defines": ["-DLUA_USE_JUMPTABLE=0"],
              "why": "value-stack pointer arithmetic, GC unions and casts, offsetof, computed goto" },
+    // postmortem F2: the recorder's regcomp/regexec are Darwin Libc's (TRE); the
+    // vendored sources (transpiler/third_party/README.md) are raw memory like Lua's
+    "darwin-regex": { "files": "transpiler/third_party/darwin-", "repr": "heap",
+                      "why": "TRE: unions, pointer casts, its own allocator; behind the same C API bridge as Lua" },
     // contract (docs/API.md): rng.js must use the frozen ISAAC64 implementation.
     // Its JS signatures differ from C's (isaac64_init(seed_bytes) returns the
     // context), so calls go through a small hand-written adapter.

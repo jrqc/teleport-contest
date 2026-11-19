@@ -1,0 +1,4126 @@
+5	0	{,2}[[=a=]][[=a=]]0	
+0	0	]a	A \x80BB
+5	0	\xff|{1,3}ab|cd{,2}	\xe0BA9*bB9
+9	0	+||{2})[abc]	*\xe0\xe0\x0a\xffx
+0	0	0\x5c(\x80?[[:upper:]]	\xffc\xff\x0a\x80x\xe9\x0a
+5	0	{,2}[[:alpha:]]	9\xe9
+7	0	\xff.*[\x5c1(	\xffA\x80 x\x80x
+0	0	[]a]ab|cd9+	B
+5	0	)a	 
+9	0	[[=a=]][{2}	Ax *x\xe0a\xe9A
+5	0	{,2}	
+5	0	[[:digit:]]x^ \x5c).	x
+3	0	Bx{1,3}\x5c|A	b\xff.*0 x*.c
+5	0	(a|b)*[a-z][	 \xe9\xffc0
+9	0	*[[:space:]][[:space:]]\x5c{*{2}	x
+1	0	[[:alpha:]]\x5c1\x5c{	9a abx.\x80c
+7	0	((a|b)**\xe9ab|cd	b*x\x0a\x0a*
+3	0	[[:space:]]	
+1	0	c[abc]	A99cc.
+5	0	]]ab|cd\x5c(\xff	.\xe0
+1	0	*^	\xe0c\x80.\xe0a BAc
+7	0	A[[:alpha:]]	 a*
+1	0	A	0*\xe0bBxb 
+5	0	[[.a.]][abc][[:space:]][[:alpha:]]B	\x0a*9\x0a\xe99*.* x
+5	0	*.*[a-]	a\xffAb\x80c\x0a
+9	0	[^a]$([a-]b[[:alpha:]]	*x
+5	0	*+\xff+\x5c{	b\x80A\xe0A
+7	0	(	c\xe9x
+5	0	\x5c{|	\xe0x0.0\xe0
+9	0	 \x5c{2}a[[:space:]]	.*AB\x0ab\x80.\xe9b
+7	0	.*[[:upper:]]$\x5c*[abc]	x\xff.a\xe9x\xe0\xff
+1	0	^[	
+9	0	][[:alpha:]][a-z][[.a.]]a	xAA\xff\xe90
+5	0	{\x5c([[.a.]]A[^a]	\x0a\xe9\xffa\x80B\xff
+9	0	[[:upper:]][[.a.]]	aAb
+9	0	\x5c*^x[[[:upper:]]	\x0abAAx\x0ax0\xff\xe0
+3	0	[a-z]\x5c{{\x5c*\xe9	\xe0\x0aA
+5	0	[\xe9\xe0][a-z]	A0\xe0
+7	0	[[:digit:]]	*
+7	0	[^a]	b9\x80
+5	0	{,2}?\x5c1	\xe0\xe9.
+9	0	[a-]\x5c[[:digit:]]|\x5c1	cxA\xe0B\xff0\xff
+3	0	?	 cA0\xe0A\xe9a
+7	0	.[[:digit:]]	\xff\xe09B \x0a\x80aA\xe0
+0	0	\xff {1,3}[]a](x	 bxc\xffcc\xffA
+5	0	?\x5c*$$[a-]	\xe0ax0
+0	0	[\xe9\xe0].*[abc]	xbB9a9
+3	0	][\xe9\xe0][a-]	\x0aB9a\xff
+5	0	.\x5c{[{\xe9{1,3}	
+7	0	[[:alpha:]]	a \xe9\xe0x 9Ba\xe00
+3	0	c\x5c)b{,2}	\x0a0*x\x80\xff0.
+9	0	.*(a|b)*[.	 \xffc\xe9B*\x809\x0a
+1	0	\xe9ab|cd[^a]	AA\x0aa9\x0a*
+9	0	[[:digit:]][[=a=]]	x*B0A*.BA\xe0
+5	0	x[\xe9\xe0][a-z]	\xe0a\xff ..BBb\x80\xff
+1	0	?[a-z]	B\x80\xff\x0a\xe0\xe0\xff 
+0	0	[]a]B(9	A0\x80\xe0 A0b
+5	0	ba[^a]{\x5c{	\x80xc*
+5	0	[\x5c*	b 
+5	0	{{,2}[a-]	\x80
+3	0	\x5c(	0AaA 
+5	0	\xff[[:alpha:]]{2}x	\x809b\x0ab
+5	0	\x5c\x5c(|[[=a=]][^a]	\x80\x80xbbxABc
+0	0	({	\xff
+5	0	[.+c	
+5	0	(a|b)**	A
+7	0	\xe9	 ***\x80b
+1	0	B*[^a]{1,3}+	*aa\xe9.BB
+0	0	\x5c.{,2}0	\xff.c9Bc
+0	0	[a-][]a]	c\x0a\xe09
+5	0	[[:digit:]]\xe9	9
+5	0	 []a]ab|cd[abc][[abc]	
+0	0	+?{a	\x800\xe0ac
+7	0	(*[[:alpha:]]\x5c.\xff[[:digit:]]	x0\x80
+5	0	B+{B	\xe9x\x0a
+1	0	{1,3}\x5c1	*x\x0a\xff\x0a\xff\x0acx
+9	0	b[[:space:]]\x5c{([[:digit:]]	\xe9
+5	0	[^a]*[[:space:]]	B\xff A x
+5	0	[a-z][^a]$[[:alpha:]]	*\xe9cx
+9	0	[abc][[:alpha:]]	 \x80c0x9
+5	0	)[abc]\x5c)[a-]{1,3})	\xff
+9	0	[\xe9\xe0]^[\xe9\xe0].*9	xx\xff\x80.
+7	0	[[:space:]]0	c\xff*\x0aAa\x80
+7	0	[abc]|b.	B*\xe0xbab\xe0
+5	0	{,2}(a|b)*c[[:digit:]]	A \xe0\x0ax 9\x80
+5	0	[]a]{\x5c.\x5c({	A\x80BaA9x9
+0	0	[[:digit:]]9.{2}	  \xe9a 
+5	0	\x5c	*A\xff\x0a9*x\x80bx\xe0
+5	0	B?] \x5c(x	\x80\xff0c
+5	0	^[^a][abc]\xe9(a|b)*+	\xe0\xe9\xe90\xe9\xe9b.9\x0a
+7	0	?.*	\xff.\x80a\xffac 0
+5	0	ab|cd[abc]x0[]a]?	b\xffB9\xe0x0
+9	0	[]a]\xff[\xe9\xe0]	a.
+5	0	B[[:alpha:]]c[[.a.]]	a
+5	0	[a-z][\xe9\xe0]{1,3}[[.a.]][[:upper:]]	a
+7	0	*[[:upper:]]*\x5c)	B\xe0  ..b09*
+5	0	{,2}{,2}[[=a=]]{,2}	*  9bx9b
+7	0	B\x5c.^	 \x80\x0aAB\xe0\xff \xe9a
+0	0	[\xe9\xe0]| [a-z]0	Bbbx  
+5	0	\x5c.	
+0	0	A0{	0\x80*\x0a\x0a
+0	0	\x5c.[[:digit:]]	b\xe0BB9b\xe0 \x0a\xe9b
+5	0	|A.**	c. \xff0\xe9\xe0\xe0b.a
+5	0	?$	x\xe0.a\xe0b\x80\xe00.
+1	0	[]a][..B]	bbx**\x80 0\xe09b
+5	0	|9	A9b\xe0\xe09\xe9
+5	0	[a-z]\x5c*	AB.0\x80 c\x80\xff
+7	0	*	 \xe9A\x80c00.\x0aB.
+5	0	{2}x\x80[a-][^a].*	\x80BA90b\xe9\xff9
+7	0	[a-]\x5c{	B.\xe0. \xe0BA.\x80
+7	0	*{,2}\x5c(	\xffa
+5	0	B[[abc]	 .c\xe9\xff\x80*
+0	0	+	\xff0\x0a\xe90Aacx*.
+5	0	A\x5c{	B\x80cx\x80.*9B
+9	0	[[:upper:]]\x5c*	\x0a.c.\xe99cBB.0
+5	0	ab|cd[[:upper:]]	. \xe9\xff.b
+5	0	\x80xab|cd+	x9.\xe0*
+5	0	[[:upper:]][[:alpha:]]	A
+5	0	{2}\x5c)[a-]	B0Aaa\x0ab.*
+5	0	ab|cd$]\x5c(\x80	\xe9bc*9\x0a
+7	0	{2}(a|b)*0{,2}	b
+5	0	(a|b)*{1,3}[[=a=]]+{^	*\x0abc a9\xe0a 
+5	0	ab|cd[[:digit:]]a	\x80c
+5	0	b\x5c|\x5c	abc\xe09
+5	0	]	0Bcc\xe9b\xe09A \xe0
+7	0	{,2}|[\xe9\xe0]	a
+9	0	ab|cd0	\xff 
+5	0	 	bcbb\xff\x0a\xe0\xe9\xe0BA
+5	0	Ba9	aB\xe9
+3	0	c^0?	9\xe9
+0	0	][[:alpha:]]	x\xe0
+3	0	$][	0 aa.**\xe0*b
+5	0	$[a-z]\x5c) 	.x \x80ba9\xe9
+3	0	\x5c1\x5c\x5c{	9
+5	0	9+[[:upper:]])(	b*
+3	0	[abc]	
+5	0	+aA^*[abc]	Ax9\xffa9.0\x80
+5	0	[\xe9\xe0][a-]A{,2}	\xe0
+5	0	$\x80	xac \xff\x0aBxB
+9	0	\x5c*{1,3}\x5c*\x5c.\x5c.	0caxbc\x0a
+0	0	?b	cc*\x80\xe9.A
+5	0	9[a-]	\xe0c
+1	0	[[.a.]][*	BA\x80 
+5	0	[[:alpha:]]\x5c.[a-z]{,2}A\x5c*	0c cc\xe9*
+1	0	a[[:space:]][\xe9\xe0][a-]|	. \xe0B\x0ac
+7	0	[[:digit:]]b[abc]9	9
+5	0	\x5c(	xc\x0ab b0A\xe0\xe9
+3	0	b)B[[:alpha:]]	0\x80\xe0Ax
+5	0	A{2}{1,3}B	ac
+7	0	[[:space:]][a-z]	\x80xA\x80 Aa
+9	0	[a-z]	a
+5	0	[[=a=]][[:digit:]]\x5c. 	a* 
+9	0	\xe9[\xe9\xe0]\x80a	\x0a
+3	0	[[:upper:]][[=a=]]\x5c.	A\xe0\xe9A\xe9\xffB 
+3	0	\x5c1(a|b)**{2}	\x80\xffa
+5	0	\x5c(	\xffc..*\xe9b
+7	0	[[[:space:]][a-][\xe9\xe0]	\xe9\x0aB\xff
+3	0	({2}	b\x80\xff\xe0*xB
+5	0	[a-].*[^a]	\xe0
+7	0	][abc]a	b\xffBx
+9	0	^.*[[.a.]][[:alpha:]][[.a.]]\x5c{	**
+0	0	{9c	 x 
+0	0	?[abc][a-]$*	 
+5	0	]\x80{x[abc]\x80	xxaa\xe0
+1	0	{1,3}9[]a] 0[[=a=]]	BxA\x0a\xff0.\xff\xe9
+7	0	[[=a=]][a-z][\xe9\xe0]	\xff\xe0.*\xffc0 \xe9.
+5	0	(a|b)*{,2}[^a]\x5c	c
+5	0	$[[:digit:]]A	\xe9bA\xff.AAc. *
+1	0	[a-z]a\x5c.]\x5c(	\xe0\x80\xe0b
+5	0	.	c\x80a\xe9c 0
+3	0	{[\xe9\xe0]\x5c*b	\x0aBa0 0B
+5	0	[]a]	0cb
+1	0	+$A*\x5c1	axx0
+9	0	{,2}b[]a]]|+	cc\x80\xff\x0a
+3	0	a{2}[[.a.]]	c\xffbb b9c
+7	0	.*	\xe9cc
+1	0	.*0+[[=a=]]	\x80
+5	0	x	aAAcAb.\x0a.\xff
+7	0	|{[]a]c\x5c]	9\xff9\x0a
+3	0	[[:upper:]][^a]	
+7	0	[[:space:]]\x5c{[[:digit:]]a	A*A0cx.B
+3	0	{2}x\xff0AB	aBaA\xe9
+0	0	\x5c)	\xff\x0aB\xffBaB\xe9*
+5	0	(a|b)*	b\x0a\xe0 \x0ax \x80\xe9
+1	0	(a|b)*{,2}{1,3}	\xe00B
+9	0	9[a-]	x
+0	0	\x5cab|cd.*	\xe00x.0\xe0\x0a
+5	0	+\x80(c\xff)	A\xe0Ax0\x80\xff\x80
+5	0	aA	*.9\xe909
+5	0	[\xe9\xe0][[=a=]]	0\xe9 \xe0\x0aA
+3	0	\x80{,2}0[^a][[:digit:]]	\xe0\xe9\xe9\x80
+3	0	  [[:alpha:]]	\xe9c*BAb
+5	0	\x5c.\xff	9xc
+1	0	?\x5c(a|b)*\x5c{	B9c0aB
+7	0	[[:upper:]][[:upper:]].A.*[a-]	 \x80.9..\xe0\x0a\xe0
+9	0	.*[[:space:]]^[[:digit:]]99	* \xffc\xe9x\xe0 
+9	0	?[a-]	
+5	0	9[[:space:]]\xff\x5c.[[:alpha:]]	
+5	0	a)B\x5c{9	x\x80.\x80 .\x80
+7	0	(c?[a-][[:upper:]][[:upper:]]	
+9	0	{2}	xaa0. 9B\x0axx
+1	0	[[.a.]][[:upper:]]	
+3	0	\x5c1[^a]\x5c{{,2}\x5c1	x\xffx
+0	0	b[\xe9\xe0]xab|cd.*	.c\x0ab*.
+5	0	 	0\xe9x9ac\x80\xe0
+5	0	0[[:upper:]]9[]a][[:upper:]][[:space:]]	 \xe9ab9*\xff
+3	0	$|	\x0aA0x.\xe9
+3	0	{,2}x) [\xe9\xe0]B	b\x80Aaaa\x80\xffA 9
+3	0	.| {2}[a-]	 \xffA
+3	0	[[:space:]]\xff\x5c)\xe9.*$	\xe0 9\xe9.\xe9
+7	0	9	c*0
+7	0	\x5c)[a-][[=a=]]\x5c.\x5c)	x
+1	0	\x5c)[^a]	c0\xe0* 9*x\xff0x
+5	0	\xe9(bc{	\xe9AA
+5	0	.*[[:upper:]]	99.\xe9\x0a.aB
+3	0	]\x80[\xe9\xe0]	
+9	0	[[:alpha:]]	a\xe0\xe0*\xe0\xe9
+5	0	[^a]c.[[=a=]]b[\xe9\xe0]	0*9\xff0ca.x9B
+5	0	+\x5c{|{1,3}0	\x0aaBx\x80B9B\xffA
+5	0	*^\x5c(\x5c)	aa*b*9\xe0a
+5	0	\xff(a|b)*[[.a.]]{2}	xax
+0	0	.*	\x0a. .\x0aa\xff\x0a9\xe9 
+5	0	)	\x800aaxab\x80
+5	0	[[:digit:]]9aa.	 b* b*a\xff*
+7	0	)	.\x0ab9A\xe9a\xe9\x800
+0	0	{2}[a-z]|[]a]	xA
+7	0	.*[abc]{1,3}[[:alpha:]]*	 abc\xe0 Bb\xff0
+9	0	[abc]	.ca\xe90c
+0	0	a[^a]?\xffx	b\xff.
+1	0	).*	bc*\xffc\x0a\x80\xe0
+7	0	?||	 A\x0a
+1	0	A	.B99
+3	0	 +*]	Aa .x\x80
+9	0	A^	
+7	0	)\xe9	.\x0a0c0xA\xff\xff*
+5	0	[\xe9+[abc]	\xff
+3	0	\x5c.\x80	\x80\x0a*x\xe9. a
+3	0	||x0[	\xff\xe9. b\xe0*
+3	0	[abc][\xe9\xe0]c{1,3}	9.\x80\xe9\x80a *\xe9\xe9
+5	0	 [abc][]a]c{	
+9	0	[[:space:]][[.a.]]B\x5c*[\xe9\xe0]	9
+9	0	\x5c)	\xe9a9
+5	0	9ab|cd\x80?]	*.ac
+7	0	(a|b)*^*\x5c1 	0 cbx*
+9	0	$[[:alpha:]][	
+3	0	[[.a.]]\x5c{	\x0a\x0ax.\xe0*
+0	0	\x5c.x[]a]\x5c1[abc])	\x80B\x0ac
+5	0	{,2}*A[^a][a-z][]a]	\xe099
+5	0	|[[=a=]]^{1,3}?	\xff
+3	0	\x5c)	\x0ax\xe00\xe0.c*bB
+5	0	${	
+9	0	$.*\x5c( bc	.aaxx 9
+5	0	[a-].*	 A\xff\xe9A\x80b\x80*0A
+1	0	{1,3}+[[.a.]]{2}	b**\x0a* . 9
+3	0	9[[=a=]] [^a]	x*\x80 B
+1	0	{2}\x5c)	\xe0\x80x\xe9\xe0.\x80\x0aa
+3	0	\x5c.B[^a][[:alpha:]]\xff	\xe0.\xe0c
+3	0	(a|b)*\x5c{2}9ab|cd	a*0c\x0ab\x0a\x0a\x80
+1	0	\x5c1[a-][a-]*[	\x0a \xe9
+1	0	[^a].*	\xff A
+5	0	 	AA*
+5	0	\x80	x
+9	0	[[:upper:]]a	0aA  
+5	0	*	.\xe09x
+5	0	[[:alpha:]]a0[[=a=]]$	c\xffBb\xe0B
+5	0	\x80	*\xe0\xe9a\x0a\x0ax x\x80\xff
+9	0	a$	c9.\xe9a9\xe0
+9	0	[^a]{,2}	Bb\xe9\x0a
+3	0	[[:space:]]{	
+9	0	B	a**x\xff
+9	0	[abc]	b9b.*9ax
+5	0	$(a|b)*(a|b)*x	cc
+3	0	\x5c([a-]\x5c)	a
+0	0	[]a]{,2}	\xe9
+5	0	AB$+^[\xe9\xe0]	a
+5	0	{1,3}[]a]b	Ac\x0abc\x0a
+5	0	[[:space:]]\x5c)[[:upper:]]	
+5	0	[]a]^	
+1	0	[a-z](?(a|b)*	B0*\xffA
+9	0	\x5c*\x5c[abc](a|b)*B	\xe0*0
+5	0	[[=a=]].\x80\x5c1	\xe0\xe0
+3	0	\x5c*\x80[[:space:]][[:space:]]\x80A	.\x80 bB\x0a.\x0a\xff*\xe9
+5	0	\x5c1+\x5c.c	a0\xffbBA9\xe9b
+5	0	{1,3}\x5c.[abc]{2}\x5c{B	**0x\x0ab\x0a
+5	0	\x5c1	\x0ax0. \xe0
+5	0	+]	\x80AcB A
+0	0	\x5c.[[=a=]][[:upper:]]	\x0abAA \xe0 \xff
+1	0	xA{9{	0b\xe00\x809
+1	0	?[[.a.]]a[[:upper:]]	\xe0.\xff
+5	0	*\x5c1	\xff
+7	0	x	99\x80A\x80\xffa00
+1	0	(\x5c\x5c)|{{	
+5	0	]\x5c1([[:digit:]][[.a.]]	x.0B \x80
+5	0	$|\x5c(^A	
+5	0	0*(a|b)*\xff	\x80
+5	0	*[[:alpha:]]	\xe9\xff\x0a\xe9\x0a\xe0\x0a
+5	0	{A	\xe090\xe90Ab
+5	0	\x5c.	A
+5	0	\xe9b	c*x*B\x80
+5	0	$[[:alpha:]]\xe9|]	b\xe9 \x80x \x80\xe99xA
+9	0	\x80?[a-z]|x\x80	\xe0c\xff0cBb\xe0\x0ax\x80
+3	0	[a-]B\x80ab|cd	x\x80\xff.
+3	0	9\x5c((	A99A\xe00cxb.
+9	0	$\x5c.[[:upper:]]\x5c{.*[]a]	A
+9	0	[[=a=]](a|b)*\x5c{	c\xe90\xe9
+5	0	^[[:upper:]]|[[.a.]]\x5c.	\x0a\x80A\xffx0c\xe00
+0	0	\x5c*{1,3}{2}	c
+9	0	\xe9 	*a
+5	0	?x	\x80c.\xe00*9
+1	0	x	B*a.\xff*.c
+0	0	[[:digit:]]ab|cd\x5c.([[:upper:]]\x5c	*9a\x0a
+5	0	\x5c([\xe9\xe0][^a])	A
+0	0	\x5c*[[:space:]]\xe9[[.a.]]	Ba\x0a
+0	0	^[[.a.]]c	a bc\xffb
+0	0	\xe9(a|b)*[\xe9\xe0]	\x80
+1	0	[[:alpha:]]	BB
+5	0	b9	\xff0*\xe9\x800*
+5	0	\xe9*	9\xe0 
+0	0	\x5c*^	 \xff
+3	0	|[a-]\x5c	\x0ab
+3	0	A(*]	bBx.A\x80\xff
+5	0	x[[=a=]].	09\xe0\xe0cBx\xff
+5	0	\xe9	
+5	0	bab|cd\x5c{ 	\xe0\xe9\xffB9
+9	0	[a-]*	 
+1	0	[[:space:]]{2}\x5c*	9x*A\x0a
+0	0	ab|cd]	\xe0 \xe0x09\x0a0\x0a
+9	0	[[.a.]][]a]	. A*
+5	0	{1,3}c[\xe9\xe0]\xe9[[:upper:]]	90*b
+5	0	)(a|b)*]	0\xe9\x80\x80x\xe0B\xe0\xe09\x0a
+7	0	\xe9b[[=a=]]ab|cd[abc][[=a=]]	 \xff\x0axA0axb\xe9
+0	0	[[:space:]][	b\x0aa
+5	0	9b{2}	\xffxx\x0a\x80
+0	0	{2}[abc]	ax.xacx
+7	0	(	\x0a**a.\x80\xe9
+5	0	[?[a-]b[[:upper:]]	.*
+5	0	\x5c*)	90BB\xe9xa*.\x80
+3	0	|ab|cd\x5c(\x80{,2}	A\xffc\x0abB.
+5	0	ab|cd[	\xe00\xff\xffa
+5	0	(a|b)*9\x5c(\x5c(Bab|cd	\xe9c\x0a\x0aA\x80*
+0	0	{,2}.	
+5	0	*\x5c19	.\x80a\xe9bA
+1	0	0|[a-][[:space:]]	B\xe0*
+1	0	\x5c	9c9\xe0.9
+1	0	[[:alpha:]]{,2}[a-z]\x5c{ 	\x80\x80*\x800 \x0a9x
+9	0	[[.a.]]{,2}B?	
+5	0	\xff	\xe9\x80B
+3	0	[[.a.]]	Aaa\xe9x
+3	0	{,2}[{	
+1	0	\x80BA	\x0a\x80B*\x80\x0a\x0a
+9	0	\x5c{[a-z][[:space:]]	b9ba0
+1	0	\xe9$[[:space:]]b9[]a]	
+5	0	[[:alpha:]]{1,3}\x5c)[[:digit:]]	x\x0a*\x0a*\x80*\xff
+5	0	A\x5c{[]a][]a](a|b)*]	a.x
+5	0	][a-z]	
+5	0	b? \x5c(	\xe0 .A*b\xe0 
+0	0	ab|cd[abc](a|b)*[[.a.]]{2}ab|cd	\x0ab.090\xe0A
+9	0	\x5c1[]a]\x5c1	.\xe09\x0a9
+5	0	\xe9.[]a][[:space:]]+	0\x0aba
+0	0	[abc](ab|cd	 \xe0Ac9A\xe0bBba
+0	0	 \xff\x5c)[[.a.]]	c\xe9\xff B
+7	0	\x5c.+]c	B\xe0
+3	0	A)c]\x5c(	
+3	0	]\x5c.{1,3}[\xe9\xe0]	
+0	0	\xff\x5c	* 0\xe9A\x0axB\xe00
+5	0	\x5c)*{1,3}\x5c1[[:alpha:]][abc]	\x0aAa0\x80\xe0*0b\x0a0
+9	0	[a-z]\xe9(a|b)*	0
+5	0	ab|cdx\x5c{B[[=a=]]	 9\xe9 a
+5	0	\x5c.{1,3}\x5c)	ba
+3	0	)x)[[:upper:]][[=a=]]	\x80\x80B9.
+0	0	c\x5c(	 0\xff. .009a
+3	0	[	\x0aA9\xff0c
+1	0	[a-][]a]?[abc]	xb\xff\xff
+5	0	^\xe99\x5c.\x5c.\x5c)	
+1	0	\x5c(\x5c.?\xe9[]a][[:space:]]	 \xe0\xff0*\x80
+5	0	BbB	x\xe9\xe9\xe9*
+0	0	\x5c{[abc]\x5cab|cd	Abx\xffBa
+9	0	x[[=a=]]	B\x0a\x0a\x0aa\xe0\x80
+5	0	\x5c([[=a=]] \x5c1	90ac\xff0A
+0	0	[[:alpha:]]\x5c*$	
+0	0	[[.a.]]	x\xff*xBxA90*
+9	0	ab|cd\x5c1	BAb.\xff\x80\xff
+9	0	B[[:upper:]][^a]	.c.\xe9B9A
+5	0	[[.a.]]\x5c)\x5c1{,2}$	x9bx.\x0a0
+0	0	{]	\x0a0Ba\x0a0\xff\x0aB\xe0
+0	0	).*\x5c{{2}9	0\xe0
+5	0	\x5c(\x5c($b\x5c.[[:upper:]]	x\xe9aAc. A*
+9	0	[abc]{,2}	\xff9Bb.B
+1	0	[[:alpha:]][a-z]\x5c)*\xe9	a
+0	0	+	B\xe9
+0	0	[^a]{2}ab|cd	\xffAb  ac 0a
+1	0	B(	a9b.9\xe0\xe0a\xe99c
+0	0	\x5c)$\xff	\xe9 c\xff.ca \xe0*x
+7	0	\x5c*	\x0a b\xffx\xe9\xff
+3	0	.*[\xe9\xe0]	Acx.\xe0Axb
+3	0	0B]	cx\xe9\xffx\x8099\xff
+9	0	][[:digit:]][9	B\xe9a
+5	0	|[^a]x+	\x80\xffb9*
+9	0	[[:alpha:]]ab|cd$\x5c[[:space:]]	\xff
+0	0	)[]a]\x5c.\x80\x5c	Bc
+0	0	 B]\xff[\xe9\xe0]\x80	a BxB*
+7	0	9[[.a.]]ab|cd0[A	A\xe9 
+5	0	xb$[a-](\x5c*	b.0x
+0	0	^	\x80 .a\xff\xe0cb\xff.A
+1	0	+	 .x0. 9A
+5	0	[[:upper:]]{1,3}[[:alpha:]]	b\xffB0 c00
+1	0	{a	\xe9c.9\xffbB9x
+7	0	+ [a-z]\x5c(	\xff\x0aa\x800.caca
+5	0	[[:digit:]][a-]{1,3}\x5c*	 x\x80aa \x0a
+1	0	\x5c	\xe0B99a*
+3	0	.[a-z]{1,3}.**	a*b\xe9***0b
+5	0	x[[=a=]]|	a.\xff0*axA \xff
+5	0	[[:space:]]	09
+0	0	+	 a
+5	0	0x[abc]A{2}+	.
+5	0	$a(a|b)*\x5c1	a\xe0 \xe9 *9c\x0a\xff
+0	0	{1,3}\xff\xe9[^a]	bA\x0a\x0a
+1	0	a[\xe9\xe0][a-]B[abc]	 \xe0B\x0aAA\xe0\x80\x0aB
+5	0	?]\x80	x\xe9 a \x80*0. \x0a
+0	0	Ax	\xff\xff 
+9	0	{,2}?\x5c)	aA
+5	0	[+\x5c.[\xe9\xe0][[.a.]]	
+9	0	\xff[[:upper:]]+	\x0axA\xe9
+3	0	{	Ab\xffB*\x0a9
+1	0	[[.a.]][[[:digit:]]\x5c.	*A\x0aB \x80.
+1	0	|[[:space:]][^a]?	 c9.\xe0
+1	0	\x80\xff\x5c*[a-z]c|	*
+5	0	[]a]\x80	.\x80\x80\xff*AB0Aa 
+1	0	[a-z]\xffc	xAb.\x80
+5	0	\x80[[:upper:]]]\x5c1	.aB\x0aA\x80\x80
+0	0	$[]a]bB	aB\xe9*\x0a\xe0
+5	0	.*[a-z]	\xffA9
+5	0	c[^a]\x5c*{1,3}\x5c(ab|cd	*\x80\x0a\x80
+3	0	\x5c1b^*[\xe9\xe0]A	\xe9.*aa
+3	0	[[.a.]]{2}b[a-z]	\x80\x0a0\x0a\xff
+5	0	[[.a.]]|]][[:alpha:]][abc]	a. B\xe9c.b\x80.
+1	0	[a-])	b*x
+3	0	{,2}	b\xff9*\xe0a\xe9\x0a
+1	0	[[:upper:]]][\xe9\xe0]	AxbxAB
+5	0	B	b09\xe0\x80.\xe9*\x80\x80
+7	0	{2}\x5c*[a-]A+\x5c	A
+9	0	[[:alpha:]]	A\x0a*\xe0*
+5	0	c{,2}a0.*	xA . \xe9xac\x80B
+9	0	\x5c{A[[.a.]]9[\xe9\xe0][]a]	
+5	0	[[.a.]][[:alpha:]](x\x5c	bc
+5	0	{0]+{,2}[[.a.]]	A  
+0	0	\x5c	A  *.c\xff*
+5	0	{+\x80	\x80.\x0a\xe0.
+5	0	^{,2}[a-z]\x5c1\x5c.	.c\x809\xff AB 
+5	0	)[a-][[:space:]][abc]\x5c(9	\xe0x\xe0\xe9
+5	0	xA[abc]	
+7	0	c9[[:space:]]x	*.\xe9\x80*b9
+3	0	\x5c((9B$	bbAbc0\x0a
+5	0	a	
+5	0	\x5c)\x80	B
+5	0	 \xff[[[:digit:]]	
+5	0	{1,3}	
+5	0	\x5c*.*c[[:space:]]0	xcB.A\xff9
+5	0	{1,3}	*\x0a0c0Ab. c
+0	0	{2}(a|b)*\x5c)	 \xe90\x0a \xe9.\x80 
+5	0	\x5c)[^9(9	**B*.\xe0\xff\x809
+1	0	.*[[.a.]]	\xff9
+5	0	^	\x0a\x80 b9
+7	0	\x5c.	\x0aA
+1	0	])	*
+5	0	\x5c*[[:upper:]]	AA \xe9\xff\x0a
+0	0	(a|b)*[abc]\x5c.+.	bb9\x0a 
+7	0	\x5c).[]a][a-]ab|cd|	a9cB\xe0B
+1	0	[\xe9\xe0]ab|cd9{,2}?	cBAx\x0a.
+5	0	\xe9[\xe9b	
+5	0	\xe9x[]a]|\x5c{[^a]	bc
+5	0	[a-z][abc]\xff\xe9	A0.B\xe9\xffb
+1	0	[[:digit:]]\x5c	*.
+5	0	\x5c(	.x\xe0\xe9
+5	0	^{1,3}{2}	a*\xe0.\x0a0xcA*
+3	0	[^a](.*)[[:space:]]	A\xe9*\xe0AA9
+1	0	ab|cd \x5c.*B\x5c)	9\x80 *\x0a\x0ab
+9	0	\x5c.[^a]	
+1	0	\xe9\x5c(\x5c.[[=a=]]^	\x0a\x0a\xe0
+0	0	{1,3}$\x5c*	x.B* 
+5	0	\x5c{	B\xff*AbA*a
+5	0	{	.cc 
+9	0	[[:digit:]]x\x5c)	c\x80 B 
+1	0	[[:digit:]][]a][	9\xff\xff\xff
+1	0	[[=a=]][[.a.]]$	0.0\xe9\xffb\xe0 \x80
+0	0	[\x5c.	b \xe9c \x0a*0
+3	0	{,2}b[[=a=]]? a	x..\xffb9.*\xe0
+1	0	\x5c.	\xe9\x80ax* c
+5	0	[a-z]	9\xffxa 9cx\xffa
+9	0	b[{x0|	0\xff*.\x0aA9
+5	0	{	x.
+5	0	{[[:alpha:]]\x5c.\x80[[:digit:]]?	
+1	0	+[[:alpha:]]+	
+5	0	c\xe9\x5c)[]a](a|b)*	9A
+9	0	{2}\x5c)\xe90(a|b)*{	0bb 9*\x0acx
+1	0	[[:alpha:]]	\x0a a
+5	0	\x5c)AcB[a-z]B	A\x0a 
+3	0	9**	c0A\x0a
+3	0	[[=a=]]B|	0\x80\xe0 0*xb*
+3	0	[^a].x[a-][abc]	
+1	0	^\x80]	*0\xe0\xffx \x80xx\xe9*
+9	0	|b([a-z]	xxb
+3	0	[[:alpha:]]]	\x80
+1	0	a^{1,3}a	9c99
+5	0	.[[.a.]]	\xff*9A\xffcbc
+0	0	\x5c(\x80{1,3}]\x5c1	.
+9	0	\x5c.[[:alpha:]][abc]	\xff\x80A
+5	0	{(a|b)**	\x80*.*0.\xe0b
+9	0	9	\xe0
+0	0	[^a](a|b)*.*\xff[[:space:]]*	\xe9 \x0a\xe9aab\xe0
+0	0	b\x5c1[\xe9\xe0]	a*a\xff*\x0a
+1	0	9\x5c.{,2}\x5c*\x5c1|	9.\x80A9c\xff 
+5	0	.*[a-]9BAb	* 0xA*x\xe9*\x80
+3	0	a{1,3}[^a]A\x5c)?	0\x80
+0	0	\x5c)+(a\x5c1	xaa\xe0
+0	0	\x80	b.c\x0a\x80.\xe9\x80. 
+5	0	(a|b)*cc^[a-z]c	B\x80ca\x80\xffb\x80c
+0	0	{1,3}	\x80 b\xe9
+1	0	{1,3}+0]?(a|b)*	**\xe0\xe9bA* \xe9c\x0a
+3	0	[[:upper:]][^a]?b	\xffb
+9	0	{{	\x0a.Ba\x80x
+5	0	\x5c	x9A*.c
+1	0	0|(|[[:upper:]]	A0
+3	0	[a-]x[[=a=]])a	 xbA\x0a\x80a
+5	0	9b\xff0.\x5c{	\xe9BA\xff
+1	0	|\x5c([]a]9	x0ac\xe0\xffa0
+0	0	\x5c*	.\xff9\xe9. 9 
+0	0	+[+\x5c.$	*\x0aBx.0xcx
+1	0	][[:space:]]a\x5c.[[:space:]]	\x80\xe0
+5	0	\x5c*|\x5c{[\xe9\xe0]\xff	\x0aA
+0	0	\xff)	 \xff9ac\xe9\x80cx
+1	0	*cc|	  00
+3	0	\x5c[a-z] [[:digit:]])+	* A
+7	0	[a-]?	9.\xe0Bx.\x80A*
+5	0	[[:upper:]].*{,2}[\xe9\xe0]	
+9	0	\x5c(\x5c	
+1	0	][	B0
+3	0	c9\x5c{\x5c{	9\xe9A\x800\xffa0a
+5	0	[[:alpha:]]	.0
+7	0	0[{,2}[[=a=]]	9*\x80a \xe9B*
+5	0	*(a|b)*	 \xff\xe0ab *
+7	0	Ax$	B\xe0..
+1	0	ba	cax90
+3	0	*\x80c	\xe0A\xffA.x\xff
+0	0	ab|cd	\xe0A**b*c0bx
+5	0	)	00ca0
+3	0	*	BA9b\xe0\xe0\x0a\x0aA 
+3	0	ab|cd\xe9	9
+9	0	{2}\x5c{1,3}9[^a]x	
+5	0	A.|)	\xe9x\x80*\x80b9\xe9bx*
+5	0	c|\x5c	\x0a
+5	0	(a|b)*	\xe9\xff\xe9\x80\xff0xbab
+9	0	)ab|cd^[[=a=]]	a
+3	0	$\x5c(\x5c*	x0
+5	0	+[[.a.]]	\x0a
+7	0	(a|b)*[[.a.]]	 9
+7	0	${1,3}[[.a.]]	9\xe9A.90*c\x0ab\xe9
+0	0	(a|b)*	0\x0a0B9c
+0	0	\x80\x5c1B	\x80
+1	0	{2}\x5c([[:digit:]]]c|	0
+5	0	?[[:alpha:]].*\x5c{	
+5	0	[[.a.]]	a\xe9
+7	0	)]ab|cd$	.9.a\xe9c\x80\xff9b0
+0	0	[^a].[]a]\x5c)	B
+5	0	]	a
+7	0	[[:space:]]{,2}${2}+	
+9	0	^[a-z](a|b)*{$[[:digit:]]	c
+5	0	{,2}[^a][9\x5c{	
+7	0	B[\xe9\xe0]\x5c{	c\xe9A
+3	0	[a-]	b\x0aAB
+1	0	[^a][[:space:]][^a][[:space:]]	.
+9	0	|	\xff
+1	0	{,2}[[.a.]][[=a=]]	b \x0a*B90
+5	0	|\x5c)+	*\xe9A\xe0 0 0
+5	0	[a-]a\x5c{[[:digit:]]	.\xffA. \x80
+5	0	[a-](	\xe00xc.. xA\x0a
+5	0	+[]a][abc]\xff[[:space:]]	A.9\xe0
+5	0	^?{	b\x0a\x0a\x80\xe00
+1	0	b(a|b)** 	\xe9a \xff9B\x80.\xffB
+3	0	{2}	9 bx\x80B\xe0.\x0a
+5	0	a {2}[]a]	x.cc\x80c.
+0	0	A\xe9\x5c.][[:space:]]	b 
+1	0	^[^\xe9*]	A**
+9	0	c\xe9\xe9x{,2}[abc]	 \x80
+0	0	\x5c{[a-z]	a\x0aA.aB
+9	0	{1,3}9A^	A.\x80
+0	0	[[.a.]]\xe9[^a][[=a=]][]a]	*
+5	0	\x5c{[abc]$\x5c*ab|cd	 BAcb  00
+5	0	c?[[.a.]]	c\xe9\x80\xe9AAa*
+0	0	[\xe9\xe0]	9b**\x80b\xff  \x0a0
+0	0	\x80\x5c(c\x5c.|9	\xe9\xff\x80bc 0\xe9A
+1	0	[[:alpha:]]c[\xe9\xe0]+[[=a=]][a-]	B
+3	0	?[[:upper:]]	\xe0\xff0A0B09
+3	0	[]a]\x5c)c	. \x80b
+3	0	[[:upper:]][[.a.]]]x	\xe99Bx\xe0\xe0* A x
+3	0	[]a]\x5c({,2}[[:space:]]a[[.a.]]	A\xff\x0a0
+7	0	\xff|[]a]	cb
+3	0	a.	\x80\xe0\xe9\x80\x80
+0	0	**(a|b)*a	\xffaAb\x0a\xe9A*\xffA*
+1	0	cc	 \x0aaBab
+5	0	([a-]	**.\xff\x0a\x0a
+0	0	)\x5c{	0\xe0\x80*bab\xe0*
+3	0	.*	\xff*\x0ax 9aAxa
+7	0	\xe9..* 	 A9  c  Bx*
+0	0	9(a	B*0\xe99a0\x0a
+5	0	a.**[[=a=]]{1,3}*	
+5	0	[)$\x5c*	*
+5	0	$*B\x5c{[	0\xff.
+3	0	a((\x5c)[[:alpha:]]*	\xe0a\xe9c\x0a\xe0
+0	0	\x5c)[[:digit:]]\xe9	
+0	0	[abc]{,2}\x5c)[[=a=]]	\x80\x809
+5	0	\xff$[a-z]	b9\xe9 \x80c
+5	0	{,2}b[[:upper:]])	c\xffxB\xe0 *
+5	0	[^a]\x5c)ab|cd	
+7	0	\x5c)[[.a.]][[=a=]]A[[.a.]]0	\xe0\xe9B
+1	0	[a-z][[:alpha:]]ab|cd ?[]a]	cx
+5	0	[[:digit:]]*\x5c{\x5c1	b.
+9	0	\x5c(+]\x5c1	\x0a\xe9.
+9	0	[\xe9\xe0]{,2}\x80	bbA\xe09\x0a0B\xe9x\xe0
+9	0	\x5c\x5c1\x5c([a-z].*	c.\x80A9 \xff\x0a\xe90\xff
+5	0	9|[[:alpha:]]09	a*
+5	0	[^a][[:digit:]]c\xe9	AB99
+1	0	.*\xe9B	Ax\xffb9b9\xffx
+5	0	[[.a.]]\xff[[:upper:]]	x
+0	0	*a\x5c1	
+9	0	{?\x5c*.[]a]	
+7	0	\x80.*?)	c \xe9
+0	0	{2}*{	
+5	0	\x80\x5c{0\x5c([[:upper:]]	 c\x0a*B\xe0
+5	0	x*	.
+0	0	+[[:alpha:]]{1,3}[]a]ab|cd[	\xff
+9	0	[[:upper:]]*a^\x5c*	bxa 0c\x0aB.b
+0	0	.*	.\x0a*\x80B\xe0x\x0acb
+5	0	)	*0\xff c*ABa9
+7	0	[a-] .*	\xe9B0
+5	0	?{,2}	b\x809\xe9a\x0a\xe9
+7	0	{,2}[[:upper:]][a-z]{2}[[:upper:]](a|b)*	BaB\x0a
+7	0	]{,2}	\xff\x800\x80
+1	0	[[:alpha:]]{,2}	\xff\x0a\xff
+5	0	[[=a=]]{1,3}B) [abc]	9 9\xff\xff
+5	0	x	 * \xe0\xffx9\xe0
+5	0	[]a]A[[=a=]]$[[:digit:]]	\xe00\xe9A**\xe0cb\xe0
+3	0	[\xe9\xe0]	
+5	0	A{*[[=a=]]*)	  9x
+3	0	.[\xe9\xe0][[:space:]][[:alpha:]]^\x5c*	a.9\xe9Ba
+7	0	\x5c(\x5c{[[:digit:]][^a]	\xe0\x0aBcxb  b \x0a
+3	0	(.([a-]	\xe9.
+3	0	[[:space:]]x^	\xff\x80 *
+7	0	{1,3}	.\xe0ccA\xe90*\x0a.B
+5	0	.	* 0\x0a
+9	0	\xff	*.\x80c\x80b
+7	0	\xff+[[=a=]]0{1,3}	
+5	0	\x5c(a\xff(\x5c1	\xffxa9aBx\xe9x\x80\xe9
+9	0	aab|cdab|cd{\x5c1	\x0a
+1	0	{	\xe0\xe9a \xe0xx\x80
+5	0	.[a-z][[:upper:]]*	  cb\x80
+9	0	\xff[^a]\x5c*(a|b)*	9c\xe0c\x0a\x80\xe0
+0	0	\x5c)[[:upper:]]9	*\xff
+5	0	\x5c\xe9[a-z][[:upper:]](a|b)*	\xe0\xe0 
+3	0	\x5c1[a-]ab|cd(\x5c(	A0
+9	0	[[:upper:]]\x5c*\xe9$	9a
+9	0	^	b\x0ac9Bb bb9
+5	0	\x5c*\x5c{	 \x80c
+5	0	^{1,3}ab|cd[[[:space:]]\xff	a.\xe0bA00.9A\x0a
+5	0	a	.x\xffB\xe9x.
+5	0	[[:space:]]A\x5c1{1,3}	A.\xe9Bx9. 
+3	0	[[:space:]]ab|cd9	\xe9 a\xe00a\x80. x
+5	0	[[.a.]]]	 
+9	0	\x5c*[]a][a-z].*	9ca00\x0a
+5	0	[^a]	0..9\x80 ac
+1	0	ab|cd\x5c1[[:space:]]{,2}\x5c)	b\x0a
+5	0	{1,3}.[]a]\x5c)$[abc]	xBb\xff\xff\x80*b\x0ab
+0	0	[\xe9\xe0]ab|cdab|cd[ab|cd[[:space:]]	  c\x80\xe00\x0a\x80\xe0b
+1	0	[abc][]a]\x5c10	BA
+9	0	$	c\xe9*0b0
+9	0	+\x5c(\x5cx0c	A*\xe09x
+0	0	^.*$	Ab
+1	0	{))	\xe0B\xffbc \xff**a\xe0
+0	0	?	
+5	0	ab|cd\x5c(\x5c{][^a]	aA\xe99b 9b
+5	0	\x5c1\x5c1[^a]\x5c1	x
+7	0	[[=a=]]	Bc*\x80*\x80cb. \xff
+7	0	{1,3}.{1,3}	\x0a*aa
+9	0	[[:alpha:]][(a|b)*[\xe9\xe0] 	9Aa
+5	0	([]a]$	\x0a\xff
+0	0	c)	\x80\x80
+1	0	a[a-][[:space:]][[=a=]]	b
+5	0	\x80	BcB*
+0	0	$[a-z]c	
+0	0	{,2}0\x5c)(a|b)*]	cx9\x0a
+3	0	\x5c]	
+5	0	[[=a=]]	
+5	0	$){	9\xffab0Bca\x0a\xe9
+1	0	[\xff\x809[a-z]	\xe90\xe9.
+3	0	+(	bxcBa .\xff0\xe9A
+0	0	[a-][abc].*[[:alpha:]]ab|cd	*9xc\x80
+3	0	\x5c([[=a=]]?*[[:space:]]0	*.9\xff\xe9B99.
+3	0	[abc][a-z]|*bx	a.c99*\xff*
+9	0	.[abc][[=a=]]\x80[[:digit:]]\x5c{	b\x80\xffBbA\x0ax9\x0a
+9	0	[[:upper:]]\x5c.\x5c(\x5c.(a|b)*[[:upper:]]	a*.B\xe9.09b
+5	0	]$	xA \xe9Bcb 0*
+5	0	[]a]	
+5	0	ab|cd? ]	
+3	0	\x5c*x+\x5c1[a-][[:digit:]]	 0BaAc
+7	0	)9x]\xff[a-]	 x BAa
+1	0	\x5c1[[=a=]]	\x80*a\xe90b\x0a\x80\xe9*A
+1	0	\x5c*.b	\xe9\xe9.\xe0a\x80 BA
+5	0	[[:alpha:]]	\x0a\x80*a.A\xff0
+1	0	{2}[[:alpha:]]b[[:alpha:]]c	
+3	0	|[[:upper:]]	\xe9.a\xe90\xffaa\x0a0.
+0	0	[[=a=]].*a\x80	A9
+5	0	9\x5c{0B	c9bA\x0a\xe0x  
+7	0	\x5c.	\xe9A\xe9B\x80 ba 
+9	0	\x5c.	B\x0a.a
+5	0	$	.*a0b* aA0\xe9
+5	0	\x5c*)+x\x5c{	\xe0aBB09b\x80Ac\x80
+7	0	[[.a.]]{x{	\xffb \xff009.\xe9
+5	0	{)? A[[=a=]]	\xe9\xe9\xe0\x0a
+1	0	\x5c)[a-][[:space:]][a-]\x5c{	B9B 
+3	0	.[^a][]a]\x5c*	\x80\xe9a0b
+5	0	?	c\x80
+5	0	c	 ccBacA 9\x0aA
+3	0	[\xe9\xe0][[:upper:]]	B\xe0\xe9.9Ax9
+3	0	\x80\xff\x5c(	..\xe0\xff*x.b0 
+3	0	\xe9[a-]]{\x5c*[	
+5	0	+\x5c(\xff(a|b)*	\xffc**cb9\x0a*
+3	0	.*{\x5c(\x5c	aa\xe0  A\x0a*
+7	0	[[abc][[.a.]]\x5c1{1,3}	x
+3	0	bbab|cd	\xffBA\x0a
+5	0	[[:alpha:]]?[[=a=]]\xe9A\x5c)	a.\x0a. .. .xa
+3	0	0\x5c.b[[:alpha:]][[:alpha:]]	c 
+5	0	[]a]*\x5c(	\xe9A
+5	0	[abc]\x5c) \x5cab|cd	a\xe0x\xe0x9x0
+5	0	^[[:digit:]].{,2}	a\xe9.
+3	0	ab|cd(a|b)*x\x5c(.	A0\xff\x80\xe0\xe9bax\x80
+5	0	{2}0a[a-]b	A\x809
+1	0	ab|cd\x5c)(a|b)*	\xe9.x
+9	0	]	\xe9\x0aA\xe0c0\xe9\xe09.\x0a
+5	0	c(a|b)*?\x5c[[:space:]]	BA0\x0a
+9	0	\xff)	9\xe9ab*Bc\xe0c
+5	0	\x5c1[[:alpha:]]\x5c*Aab|cd	9*A\xe9x.x\xe0c
+1	0	\xff[^a])	9BAAB\xff
+5	0	\x5c.\xe9.*	\x80x 9\x80Ab
+5	0	(a|b)*9|[a-z][a-z]\x5c)	*A\xff9.aAx
+5	0	\x5c{*\x5c)	A
+5	0	[[:alpha:]]c{b	*\xff*B\xe9A\x0aB
+9	0	[a-z]\x5c{1,3}|	x
+5	0	A[]a]A[a-]{1,3}	\xe99.*\x0a.\xff\xe9\xe9
+5	0	\x80{1,3}	0Bb\xffB*\xe9**A
+9	0	c\x5c(	
+9	0	?.*{1,3}[^a]	A\xe0
+5	0	$c?{2}	 \x0a\xe90...B* \x80
+7	0	[a-z][[:alpha:]]\x5c*b	\xff A
+9	0	.*\x5c{\x5c.?	0
+3	0	\xff+	
+7	0	\x80([^a]	.\xff\xe99
+9	0	(a|b)*	B.0c\xe9 \x80 \x80ac
+5	0	{1,3}[a-z]\x80	\xe0.\x80A
+5	0	\xff\xff\x80{2}|	\xe0bB
+5	0	[abc]	**\x0a
+5	0	\x5c*	AxB\xe0\xe0
+5	0	\x5c([a-] 	0
+5	0	A)\x5c.	\x809A
+5	0	.*\x5c) [\xe9\xe0]\x5c({,2}	 \xe9\xe0aa\xe0A.\xe9\x0a
+3	0	0{1,3}	\xe9a
+5	0	[{2}	*\xe0xc**\xe9\xe0.09
+5	0	[[:space:]]?[[:space:]]	b\x80
+1	0	[\xe9\xe0]b [^a]\x5c([[=a=]]	 b\x80
+3	0	[]a]A	B
+5	0	{,2}[]a]c(a|b)*\x5c*	
+5	0	.*	\xff \x0aABB
+5	0	*[abc]	A 
+5	0	{1,3}[[.a.]][abc]{1,3}	A*a
+7	0	[\x5c.[a-z]0x	\x0a*.
+3	0	[a-z][a-z]\x5c)\x5c*	x
+1	0	({1,3}c	\xffA
+5	0	A+x	a 9c9*
+5	0	\x5cx]	 \xffA
+9	0	(a|b)*[]a]+	\xe9b\x0a
+0	0	[abc]?	\xe0\x80Bb
+7	0	*[^a][[=a=]]	b\xffa\x800A
+5	0	+[[:upper:]]ab|cd[[:space:]])	9\xe0\x0aB.*
+5	0	[[:upper:]]?	 xA\x0aac\xe0\x0aAB
+5	0	^[a-z]	0Bxa\xe9a*xx
+0	0	{,2}	
+5	0	\x5c)[|b\xe9	Bca
+3	0	$	\x0a\xe09\xffABAc\x0a \xff
+3	0	\x5c..	\xffcc
+0	0	[^a]0	A\x80\x0aA9B\xe0
+0	0	{2}0{,2}$ab|cd)	c\xe9.c.
+0	0	(c^.*	x. \xff\x80c.\xffc*
+0	0	[[.a.]]]	
+3	0	(\x80	A0x\x80\x80B
+7	0	B\x5c..*\x5c*?[[=a=]]	\xffA9*\xff\xffB*
+5	0	0b|	**BB\xff  *\xe9\x80
+3	0	+{1,3}\x5c(\x5c	9a
+0	0	\x5c{	xa\x80A.
+5	0	\x5ca	\xff9
+5	0	?\x5c*	0*Axcba.xx9
+1	0	{)B[abc]$	a\x0a\x0acc A
+0	0	\x80\x5c.B\x5c{.*\xff	b90acxc\xe0x b
+0	0	$[[:digit:]]\x5c*	A \xe9A b
+7	0	]c*	\x0a
+5	0	*^[[:upper:]]	
+1	0	[[:upper:]]\x800	\x80B\xe0\x80a.c\x80\xe9
+5	0	[a-z]	*..bcA\x8099\xe0
+5	0	([[:alpha:]]]\x5c(\x5c 	9\x0a\xe90Ab.x \x80
+5	0	.c	9\xe9\x80\x0a0b
+1	0	b[[:upper:]]([]a]	\xe90Aaxc. cB
+0	0	[\xe9\xe0]{	
+5	0	A|b\x5c([[:space:]]|	\x0a\x80\xe99\xe9cA*\x80
+5	0	)[a-z]a[[=a=]]A	x\xe0a\xe9\xffx\x0acAB 
+5	0	 \x5c.[[:alpha:]][]a][abc][[:upper:]]	**.\xe99 \xe9cb\xe0b
+5	0	[a-z]B(a|b)**+	 \x8009cB9x
+9	0	\x5c{\x5c(	B\x0a9Aa. \xe9B0
+1	0	\x5c*c\x5c1	\xff\x0a\xffxb\x0a.B. a
+5	0	)	b\x80\xffbxb\x0ac
+5	0	?\x80\x5c*{ \x5c1	a\xe9*.\x0a\x80
+5	0	[]a]	bc\x80
+5	0	[]a][]a])b[a-](	B
+5	0	.*]*B	 B
+5	0	ab|cdBb	\xe90Bc
+3	0	{2}	b
+5	0	[a-z]x\x5c1]	 .*A 
+0	0	*)|{$\x5c)	x..b 
+0	0	|ab|cd[abc]]A	aA\x80A\xe0B\xe99c\x80
+7	0	[^a])+[abc]\x5c*(a|b)*	\x0a\xe9A\x80B9\x80\xff\xff9\xff
+5	0	((a|b)*[[=a=]][\xe9\xe0]\x5c(	\xe9.\xe9B\x0a \x80*
+0	0	([]a]{,2}	\x0axa9cc\x0a*.x*
+1	0	${1,3}\x5c	0
+5	0	+	.\x0a\xe9\xe0BB** 
+9	0	.*{(a|b)* 	\xe0x9b\x0aA
+5	0	\x5c	aa*0 A\x0a9
+1	0	{2})	b\xe9\x80\x0a \x80*Bc\x0ax
+0	0	B^[[.a.]]([[:upper:]]	A\xff\xe0cB\xe9\x80\xffb
+7	0	[[:space:]]*	9\xff
+0	0	.\x5c{\x5c.|	
+9	0	) \xe9[^a]	.
+9	0	]	cx\x80.
+5	0	.0{,2}	..a c
+9	0	B\x5c)[abc][[:alpha:]]\x5c)(	ab.b\x80a\xe9\xe0
+5	0	\x5c)c	0\xe9x\xe9\x80. \xe9x\x0a9
+7	0	0?	
+5	0	(a|b)*	.b*\xffA9\x809x\xe9b
+9	0	[a-z]	0.\xff
+3	0	\x5c)(ab|cd]{	
+3	0	x	
+0	0	[^a]9	\xe0x9.\x80b
+1	0	\x5c1[^a]|	x A\x0a\xe9  \x0a9\xe9
+1	0	 	9**
+5	0	{2}	\x80b
+5	0	(a|b)*{2}\x5c.{2}\x80	\x0axaB b9\xe9b
+7	0	B.*9]	.\xffc.c\x80\x80
+5	0	[[:digit:]]\x5c1	
+5	0	[a-z]{\x5c.	\xe0.
+5	0	A*{2}*\x5c*	\x0a\xe9\xe9a0\x0a9\xe0a.
+5	0	)[^a][[.a.]]\x5c1	x
+5	0	0[[:upper:]][]a].[a-]	A0\xff
+3	0	[[=a=]]	
+9	0	[^a]{\x5c.[^a]+	a
+9	0	[a-]\xff\xff	0.cBBcxx
+7	0	(a|b)*\xff[abc]	b.0A0a
+3	0	B	\xe9\x800b 
+5	0	\x5c)\x5c{ab|cd	0\x80x
+7	0	B\x80[abc]\x5c.+x	c
+7	0	[[:digit:]]^	c\xe0\x80B\x80.0
+9	0	[[.a.]]$\x5c*	\xe0a\xe9
+3	0	*[[:alpha:]][]	x\x80cA c
+5	0	$	*
+3	0	0\xff)(a|b)*]	\xe0Bcc
+0	0	\x5c)\x5c.	0*b.\x80\xff\xe0\xe9\xe9A
+3	0	{[]a]\x5c(c	
+3	0	[abc][[:digit:]].*	Bcb 
+1	0	[abc]^ab|cd	\xffcaBA9 \xff.a
+5	0	ax{{2}*	\xff99\xff\x80\xffx\x0a.x\x0a
+0	0	[[.a.]]	 0c9 \xe0x
+7	0	\x5c1a	
+5	0	[[:alpha:]]\x5c)ab|cd9	
+5	0	?	*ab\xff\x0a
+5	0	ab|cd$	\xff\x80.\xff A\x80bb
+7	0	\x5c(c{,2}[[=a=]](a|b)*[\xe9\xe0]	\x80
+5	0	(	\x0a\x0axB
+5	0	B*	\x0a0\xe9\x0a\xe9\xff\xe0\xe0
+1	0	\x5cb\x5c.[[:upper:]]0	b*a
+0	0	[\x5c{|	.c\x0a 
+7	0	\xe9*	
+5	0	9\xe9c[[:upper:]]ab|cd	 b.b
+0	0	[a-]\x5c*[[:upper:]][]a][]a]	\x0aB
+5	0	0\x5c*|	a\xe9xc\x0ab\x0a\x80\xff
+0	0	a[{1,3}|){1,3}	b0b\x0a\xe0a
+5	0	+b	B\xe0\xe0
+3	0	\x80	B9*0b
+1	0	[[=a=]][\xe9\xe0]	x\xffc9a
+3	0	[[.a.]]	xb.b\xe9b\xe9.a
+3	0	[^a][^a][^a]\xe9	 \x80*
+7	0	{{2}[[.a.]]]]	9cb.xBb
+5	0	\x5c{.*{1,3}cB	.Ax\xe0\x80\x80\xe9\x0a\x0a
+0	0	\x5c)ab|cdc	\x80a
+9	0	+a[	c.
+5	0	[[:alpha:]]\x5c9.	0
+5	0	aB\x5c.B	
+7	0	[^a][[=a=]]*B	a\x80*cA
+9	0	[\xe9\xe0]\x5c).{	*x
+7	0	x[a-]{1,3}.*(\xff	\xe0c A.BcA
+3	0	^[a-]^\xff^	c
+5	0	[a-z][a-z]+[\x5c{	AaA9\xe0b*\x80\xe0.*
+1	0	{)a\xff?	\x0ax\xff.
+3	0	(a|b)*	9c\xff\x0a\xe90*\xe9A.c
+5	0	\xe9[[=a=]]\x5c.++	 a\xe0BA\x0ab
+0	0	[[:upper:]]++	 x\x80
+9	0	[[.a.]]\x80	*B\xe0\x80*B\xe0\xe0
+1	0	[^a]	\x80b0\xe00\x0ac*
+1	0	?[a-z][[:alpha:]]\x5c.0	\xff0\xe9c \xffA0\x0aA
+5	0	([[.a.]][abc]	
+5	0	0({,2}	9bc\x80x99x. 
+3	0	[^a]a\x5c*[abc]b\x5c.	Bx\xe9b0A\x0a
+0	0	+	Bb.c\xffacA
+5	0	x\x5c{[[:alpha:]][[:alpha:]][]a][[:digit:]]	xa*a0
+3	0	.*\x80	c9\x80aBc \x0a
+5	0	[[:space:]].ab|cd\x5c1^	  c\xff
+9	0	\x5c(|	A\xe0a\xe0\xe0 \xe9\xe0 
+5	0	\x5c\x5c*\x80\x5c.[[:digit:]] 	bc * 0
+1	0	[[:space:]]	9\x0a\xff.aA\x80
+5	0	a[]a]\x5c	
+5	0	\x5c(	9\x0aBb*\x0a0*
+5	0	.*	.*aB\xe0c\x809c
+0	0	\xe9B[\x5c([[=a=]][\xe9\xe0]	A\x80c\x80a.acB\x0a
+1	0	[[:alpha:]](\x5c(	a\xe9x\xff
+5	0	9Aa)[\xe9\xe0]A	\xff\xe0\x80 \xe9xc
+3	0	+[[:alpha:]](a|b)*] 	A0B*c\xff\x0aabc\xff
+5	0	0	99b.b.9a9\xe9\xe0
+5	0	{1,3}	 cc\xff\x80cb c\xffa
+5	0	\x5c{	ca*.x\x0a9x
+5	0	\x5c*a	 xb\x80*
+0	0	ab|cd{,2}[]a]x[[:space:]]\x5c(	\x0aAb .\xe0a\x80 \x80
+1	0	[[:upper:]]{,2}	  \x0a9aBB\x80bc*
+5	0	[[[.a.]]]]\xe99	
+7	0	0|\xff)	.
+0	0	^[[.a.]]	99
+0	0	\x5c)[a-][9(	9*\xe9x\xe9*b 
+7	0	a[[:space:]]\x5c1	\xff\xe9 bc\x0a.0
+1	0	*\xff\x5c.\x5c)A	B\x0a
+0	0	[[:upper:]]\x5c(B[a-z]	xb\xe9cb0b
+0	0	\x80c	 \xe0c\xff0c  .
+3	0	\x5c{$[a	\xffB ..\x0aacca0
+5	0	(a|b)*ab|cd\x5c1{1,3}	cc*\xe90aAA
+7	0	])	\x80bx \xffa
+7	0	\xe9	99b\xe99x
+0	0	\xff[[:alpha:]]\x5c.\x80)	
+7	0	[a-]ab|cd[[=a=]]	\xff BbAa
+5	0	{1,3}).	\x80 b9\xffb.
+5	0	$[abc]	\xe0A\x80cb
+3	0	[\xe9\xe0]{[]a]A[a-z]	\x80x9*\xe0.0x\xffA9
+9	0	?	BA A*c.\x80\x80
+9	0	[[:space:]]ab|cd\x80a	.b\xffx\xe9\x80b9\xe9\x80
+3	0	\x5c(A\xe9	*
+5	0	c\x5c(\x5cab|cd{	9B\x0a\xe0ax\x80
+5	0	0(a|b)*{\x80	\x80*.A90
+1	0	(a|b)*[[:alpha:]]	c\xe0\xe9\x800\x0aBBbB
+5	0	[[:digit:]][^a][]a]a	\x80\xff
+7	0	[[:alpha:]]){	b\xffc\xffcA\x0a
+3	0	{2}	 
+5	0	\x5c{[]a]a	\x80c\xe0\x0acA9\xff
+5	0	\xff{c(a|b)*?	 
+5	0	\x5c*]c\x5c()	\x0a.
+5	0	[abc][[:upper:]][abc] x	b Aba
+5	0	0\x5c(\x5c(0	\xe0\xe9*
+1	0	^^ab|cd)0{2}	
+5	0	)[]a].*\x80.|	xa00\xffc\x0a
+5	0	{,2}\x5c(|	*\xffA0Ba cc\x0a*
+0	0	\x5c]99	\xff\x0a\xff*cx\xff
+1	0	c[[:space:]](a|b)*[a-]c	b
+7	0	c?[[=a=]](a|b)*[]a]+	
+9	0	*\xff	a0c*a
+1	0	[[=a=]](	\x0a.A
+5	0	[abc]]\x5c\x5c1	b\x0a
+9	0	\xff{2}b	x\x0a*c*B90\x80A\xe0
+5	0	[[:alpha:]][a-z])][a-z]]	\x0a\xff9A
+7	0	\x5c1[[:digit:]]x?(a|b)*+	a\xe09
+5	0	0B[abc]	.\x800\xe9xx\x80\x0a*\xff
+5	0	[]a]	\xe9\xffA\x0ac0.cxbc
+0	0	?\x5c([[:alpha:]]|{2}	\xff\x80x.
+5	0	ab|cd*	\x80 a.*A.bB.c
+0	0	]B.0[[=a=]]	 * .\xff\x80 \x800.\x80
+1	0	A.\x5c({2}[[[=a=]]	9\xe0B.\xe09
+5	0	\x5c{0	A9
+9	0	9{.*(a|b)*ab|cd	0\xe0x.\xe0a.c\x80A
+7	0	+{\x5c1	\xe9\xe0 b\x80
+5	0	\xffA[[=a=]]B	\xe9*
+5	0	\x5c([[:upper:]][a-](	\xff.9
+5	0	\x5c*B	bxA*9ax
+0	0	[]a]{\x5c.]	cb\xe9Bx\x800.
+0	0	\x5c)\x5c(([abc]{,2}	B.\xff.9 b0
+5	0	c\x5c	.\x0a\xe0\x80
+1	0	.{2}[[:digit:]]	\xff9c\xe0*\x80*
+3	0	\xff\xe9*	\xff\xe0b9.*
+1	0	\xe9[\xe9\xe0]	B*0\x0a\x0a*
+7	0	[[:alpha:]]\x5c1$xB^	\xff\xe0*\xe0
+5	0	[\x5c{\x5c1ab|cd[\xe9\xe0]	c\x80
+3	0	]\x5c1\x5c{	\xe0\x0a
+5	0	\x5ca	 \xe0
+9	0	\xffx	\x0a9a\x0a\xff\xe0\x809*
+5	0	\x5c1+[a-](a|b)*0[[:upper:]]	b\xff\xe0
+7	0	ab|cd.*|\x5cA	\x80*\x0a\x80.\xe9*B
+5	0	[[:upper:]]	\x0a\x0a
+7	0	|{,2}\x80\x5c{	xc0b
+5	0	.\xe9\x80[]a][]a]	\xffb0a.
+7	0	[[.a.]][abc]9	*ax\xe9 \x80cAx\xff\xe9
+5	0	*	\xe9\x0a
+9	0	0aab|cd\x5c)\x5c*	xcB\xe9a\x0a\x80\x0aB*
+5	0	[\xe9\xe0][[=a=]])?	0\xe9a
+5	0	]	B0\xe9
+0	0	\x5c19\x5c*[[:digit:]]*\x5c*	xc.aB0.*
+5	0	ab|cd[[:space:]]+	.
+9	0	cb[]a]	axb *0\xff\x0aBb\xe0
+1	0	)\xff?	\xe9*
+5	0	[abc]{,2}b\xff\x5c\x80	\x0a\x800
+5	0	[^a]?\xff?	A\xffB
+5	0	][[:space:]][a-z]{	ba\xffAb\xe9A
+9	0	?{2}[[:upper:]]b[a-]	aAB
+5	0	\xffx[abc]\x5c) a	B
+1	0	{$\x5c(	\x0a\xe0x.xx\xff*\xff\x0ab
+5	0	\x5c)(	
+5	0	[^a]{2}[abc]ab|cd$	.0x9
+0	0	[[:upper:]]+[a-]	\x80\x0a0.A*.\x0a.x
+3	0	[[:alpha:]][\xe9\xe0]^	00A\x80
+9	0	[]a]{2}|	b\xffB*\xe9*A\x0a9\x0a
+0	0	[[:space:]]\x5c	
+3	0	\x5c*[{,2}\x5c{\x80	 \xe9\xff
+9	0	.* [[:digit:]]\x80	\xff99a a\xffc\x80
+1	0	b|\x5c.[a-z]	 \xe9\x0a.B0\x80b 
+1	0	[[=a=]][[:space:]][[:alpha:]][abc]	B \xffx*xB \xe0 
+0	0	?ab|cd	\x0a *\xff*
+3	0	\x5c({ab|cd[[:alpha:]]	B 
+7	0	?[abc]\x5c1{2}\x80	\x80a\xff\xffA9.bb\x0a
+3	0	*.*\x5c)[a-]	\xffbB\xffxcAx.
+3	0	.*\x5c1[\xe9\xe0]9	a\x80\xe9 *.
+5	0	{^[{2}ab|cdB	 0.
+1	0	[[:upper:]]0	ab
+5	0	\x5c*\x5c1|	xc.
+0	0	$	 bBa\xff \xe09\xff99
+0	0	{,2}\x5c{A|	\xe0\x80\x80x*
+5	0	[[:digit:]]	axxaab
+9	0	\xe9A|	\x80x9c 9x\x0a\x0a
+5	0	[[:upper:]]	Ba\xe0\xffx\x0a
+5	0	[abc]\xff[[.a.]]\x5c.\x5c([[:digit:]]	.
+9	0	\xff[[=a=]]	
+1	0	BA(a|b)*ab|cd[]a]	c*b\xe9
+5	0	?	A
+7	0	\x5c{?\xff\x80[[.a.]]{2}	0 Bx\x80
+7	0	\x5c{[[:digit:]]	.\x0a9c
+7	0	)[a-z]\x5c[^a]	\x0a
+5	0	.[[:alpha:]]\x5c(\x5c1	\x80\x80
+5	0	{,2} \x5c){ 9	\xe0 aA*
+7	0	ab|cd	\x0a9\xe9x0\x80\xffx
+0	0	(?\xffx[[:upper:]]	\xe9 BB9 
+7	0	B[[:space:]] \x5c1{1,3}\x5c*	\x0a9\x809b
+5	0	|	b
+5	0	\x5c( $	\x0a\x80*A\xe09  .
+1	0	.	BAaA
+7	0	.*\xe9	x90cc9
+9	0	\xe9$\x80	\x80c*bAca\xe9b\x80
+0	0	(]{,2}\x5c[	 cB\xffB*\xe9\x0a
+5	0	+[\xe9\xe0][	\x0a
+5	0	[[:digit:]][[:upper:]]0\x5c*.*	 9bx*\xffB\x80
+5	0	[[=a=]]^^+B	 0*Ba..b.
+5	0	\xe9	
+5	0	\xe9([a-z][^a]	
+1	0	.*.*A(a|b)*	\xff.0\xe00*\xff
+5	0	\x5c.[[:alpha:]]?(	b\xe90\x0a\x0ax\x80a9
+3	0	{\x5c(	B\xe09\xe0\xe9
+5	0	+[^a].\x5c(a|b)*[[:alpha:]]	99ca
+5	0	[abc][\x5c*.*[[.a.]][[.a.]]	B
+3	0	{1,3}\x5c(*\x5c	Bxb0. \xff\xe9\xff0\x0a
+9	0	[[=a=]]|	A
+7	0	[a-]|[^a]	\x809.0A*\x0ax
+5	0	{2}[[.a.]]B	\xe0 9\xe9
+0	0	)\x5c(\xe9	c0b0b
+9	0	[[:space:]]B[[:digit:]] 	x \xe0bbB\xe0B
+0	0	\x5cab|cd(\x80\x5c.	 Bc\xe9
+5	0	0.*	B0**\x80A\xe9 9\x0a*
+5	0	[]a]\x5c)([\xe9\xe0]	B\xe0\xe9A9\xe9
+1	0	x*[abc].\x5c.[[.a.]]	A\x0a0\x80 
+0	0	$)b^	B.* \x0a9
+3	0	[abc]x\x5c	.
+0	0	[\xe9\xe0]{	\x0a\xe0x
+3	0	\x5c(|A	\xe9
+0	0	]^\xe9b	\x80a.  A0xc A
+9	0	\x5c(	x.b
+5	0	 {A)[[:digit:]]	bxb\xe0\xffxaA
+5	0	[^a]\x5c(	.a\xe0B\x80\x0aB.x
+0	0	[^a]{1,3}c[abc]	*\xe0A0c\xff \xffa
+3	0	)+(	\xffb
+5	0	\x5c*[[:digit:]][[:alpha:]]0[[:upper:]]	
+1	0	\x5c(]{\x5c*(a|b)*	BB9a
+1	0	99	B.b9\xff\x0acb\xe0\x0a\xe9
+3	0	\x5c.[[:space:]][]a](a|b)*\x5c.+	AA*\xffa
+3	0	x{,2}+[[:upper:]][[=a=]]	 *c\x800A\xff\xe0\xffa\xe0
+9	0	\x5c\x5cab|cd	xAacb\xe9a9
+3	0	*([a-]\x5c(	**a
+5	0	*	
+5	0	{2}\x5c. [[:upper:]]+^	\xffx
+7	0	*[[:alpha:]]\x5c*	0\xe9b
+9	0	x\x5c.	Aaxc\xe0\xff
+0	0	(|{(a|b)*	 c\x0a\xe0
+9	0	[a-z][[:digit:]]|	B\xff*axA*
+5	0	.*]	Bc0\x80aA9 
+1	0	[[.a.]]\xe9(	c
+3	0	[[:digit:]]{1,3} )[]a]ab|cd	9
+5	0	Ax[[:upper:]][a-z][[:digit:]]	\xe0x
+0	0	\xe99a\xff[[:alpha:]]	x
+5	0	[^a]	\x0a\xe0\xff0xb *\xe0\xff
+0	0	{1,3}\xff	\x0acb\xe9\x0a\x80bx
+5	0	\x5c)[abc]a+	\xffc\x0a*bb9cbx
+9	0	[B	\x0a\xe9ccc\xe0ax
+1	0	ab|cd\xe9\x5c)	*0\x80\xe0c.
+5	0	\x5c)\xe9\x5c)[a-z]	b*
+5	0	[{2}	x c\x0a 0
+3	0	.[^a]\x5c(\x5c.	cc*\xe0x*xxA
+0	0	\x80	B\xe0a0\xe0\x0ab\xff\xffBx
+5	0	9	*
+5	0	 \x5c1+){1,3}	
+7	0	[abc]\x5c	* \xe0A
+7	0	]	A
+9	0	+[[:space:]]A	\x0aab\x0abb
+7	0	[[:space:]]\x5c*?+A	0\x80cB9 B9bc
+9	0	\x5c*?	\x80.
+7	0	[[\xe9\xe0]	00a \xe9
+3	0	 +*\x5c9	xb.A0\xe99c 
+5	0	][a-z][[:space:]]	
+0	0	B[a-][[:alpha:]]	9B*b \xe0c
+1	0	{2}.*{1,3}BB{1,3}	xxAAx\xe0
+9	0	[a-][a-z]	\xe9
+5	0	^{2}[]a][[:alpha:]]	0
+5	0	[\xe9\xe0]	a
+3	0	(a|b)*\x5c(	c0c \xe9A
+0	0	[[=a=]]	\x809B\x0a
+3	0	[a-z][a-z]$[[:space:]]	\x80cc\xe0c
+9	0	]	 \xe9a9
+5	0	{1,3}abB(a|b)*+	*\xff..B\xe9bA
+5	0	{1,3}9ab|cd[]a]	0\x0a\xe0\xe9cc
+5	0	\xe9(a|b)*[^a]\x5c)	0B..\xe99.c0
+0	0	x[\xe9\xe0] 9)9	\xe9B\x0aAcaAb0.
+9	0	0[\xe9\xe0]x\x80*	\x80c9x
+5	0	[[[.a.]]\xff\x5c{\x5c{B	xB\xe0
+7	0	[[:alpha:]][[:upper:]][\xe9\xe0][{,2}	a ab
+9	0	]\x80[^a]	.bbAx*\x0a9\xffc
+7	0	\x5c1(a|b)*\x5c.\x5c(c\xff	bBc\xff*
+5	0	[\x80	\x0a \xff9
+9	0	x|.*\xff	 9Bx\x80a9 .\xff.
+5	0	[\x5c.+\x5c.+A	\x0a\x0a.\xe9.*\x80
+0	0	?\x5c1][[:space:]]a	a b.\xe0\xe0*0* c
+7	0	[[:upper:]]\x5c*	\xe0.
+5	0	^	
+1	0	[[:digit:]](a|b)*[?(a|b)*(	Ab0\x0aB
+5	0	\x5c{\xff [a-]	\xff\xff 0\x80B
+5	0	$[^a][[.a.]]\x5c1	\xe0 0*cb x
+9	0	a\x5c.B[\xe9\xe0]	 \xe9\x80
+7	0	[[.a.]]\x5c)\x5c[^a]	
+5	0	[[:alpha:]][B0	x
+9	0	[abc]c\x5c*[a-z]	0\xe000c \x0aB9
+7	0	\x5c{a)\x5c..	\xe99x
+1	0	\x5c(\x5c1\x5c([[=a=]]\x5c{a	9\xe0\xff
+0	0	$[a-z][\xe9\xe0][[:upper:]]	c. \x80bc
+0	0	{{2}	a*AB\xff\x0a\x0a a\xff
+0	0	(a|b)*	\xe9\x80 a0b0\xe9 
+9	0	|\x5c([[=a=]]	A\xff*\xff\xe9\xffxBc\x0aa
+9	0	[[:alpha:]]{2}[\xe9\xe0]	bx
+5	0	ab|cd\x5c1c[a-z]	.9x\x0a*
+9	0	+[[=a=]][a-]b	\xe00
+3	0	[[:digit:]]\x5c	b
+5	0	[]a] $	9 a
+5	0	[[:digit:]]0[	x.99\xe0
+1	0	|?[[=a=]]\x5c)	\xe9a0
+1	0	\xff.cc	A\x80*bc\xe0
+3	0	 [[.a.]]$	x\x80Aa\xff\x80ca
+5	0	\x5c{	a0cA\x80\xffxb00
+5	0	\x5c([^a]^[a-][[=a=]]	\x80b09\xe0
+7	0	$	AB
+9	0	(a|b)*{1,3}[[:alpha:]]|c	0b\x0a.ba0
+0	0	B{2}\x5c(	Ac\xff 
+5	0	^][[=a=]](	b.BBBx
+1	0	{1,3}[[.a.]][\xe9\xe0]	\x80.a\xff 
+5	0	\x5c.|[abc]\x5c)	
+1	0	[[:upper:]][[:alpha:]].	 
+5	0	^9\x80[]a]	a\x0a\x0ab\xffa\xe0\x0a*\xff
+5	0	?	Axx9\xe9
+3	0	[^a][[:upper:]]\x5c|	*\xe9.a\xe0\x80b
+5	0	[[.a.]].*[\xe9\xe0]\x5c)ab|cd[[:upper:]]	b\x0aB\x80bb
+9	0	{\x5c.\x5c.\x5c.{1,3}	.
+5	0	][[:upper:]][^a]{1,3}.	\xe9 b\x0a
+5	0	[[:digit:]]\x80*[[:digit:]]	\xffcb\xff9\xe0
+5	0	 \x5c.	
+3	0	|[[:upper:]][[:digit:]]b	x  x0\xe0A\xe9
+7	0	[[:digit:]][[=a=]]{	x
+9	0	.{,2}]A{1,3}\x5c.	\x0a\x0axc*
+9	0	\x5c*]	b.. c\xff\xffb
+3	0	[[.a.]]{1,3}ab|cd	a.BB
+5	0	.*([]a]\x5c*A\x80	c
+5	0	\x5c.\x5c.	xbB
+1	0	{1,3}*	x
+7	0	){2}[\xe9\xe0][abc][[:alpha:]]	\xe9B
+1	0	a\xe9[[:alpha:]]	c9*\x0a\x0aa\x0aca
+5	0	[abc]b\xe9x[[:space:]]\x80	B
+3	0	\x5c{0	Ba\x0a\x809x* a*
+7	0	 ]	\xe9\xe0x.0 \xe0\x80
+7	0	|][[:upper:]]\x5c*	.9*\x80\xe09*9\xe0
+0	0	B\x80	
+0	0	?{1,3}[[=a=]]\x5c)?[a-z]	\xe0\x0a Aa0\xffA\xe0A
+3	0	[[:alpha:]](\x5c.	\xffB*B* B\xe09A
+5	0	([\xe9\xe0]A	\x80\xff\xe0a\xe9A\xe9
+5	0	|b[[:upper:]]9\xff\x5c)	b\xe0
+0	0	a\x80[a-][[:alpha:]]	x\xe9 c
+9	0	{,2}\xff	.
+5	0	[[:alpha:]]	A
+9	0	\x80	 \xe9x\xe0a.b9\xe9\xff
+1	0	\x5c	\xffa
+0	0	[[:digit:]]ab|cd\x80|	.09.b.0
+5	0	[[:alpha:]]	\x80\xe9B
+1	0	 0	\x80x.\x0a\xff
+3	0	\x5c.\xff(a|b)*[[:upper:]]	x9
+0	0	[abc]^\x5c*.[{,2}	\xe0x9
+5	0	\x5c{2}[[.a.]][[.a.]]\x80	xc\xff\x0a
+0	0	|A{1,3}[[:digit:]]	x0B00\xffc
+1	0	.*ab|cd\x5c{(a|b)*[[.a.]]	
+5	0	{2}\x5c\x5c?[\xe9\xe0]	aBab0\xe0
+0	0	\xffb*[[]a]	ca \xff*
+3	0	[[:digit:]]0$c$	\xe900Bx9b\xe9\xe9cb
+3	0	 	cB\xffB\x80 
+5	0	)\xe9[[:space:]]\xe9[^a]	c
+3	0	([^a][[\xe9\xe0]|	\xff.ac\x809 a*
+0	0	[[.a.]](..	a\xe90\xff*90\xe9
+0	0	[[.a.]]\x5c19c[[:space:]]	x\xe0
+5	0	cb|][[:alpha:]]\xff	\x0a\xe9 
+7	0	0[[:alpha:]]+^	\x0a\x0a\x0a\xe9\x8090\x80BBx
+1	0	\x5c(.	\x0a\xff
+7	0	|[[:upper:]]9)\x5c{(a|b)*	0.\xff\xe9Bx\xe9
+9	0	[\x80[^a]B	 \x80
+7	0	{+A[a-z][[.a.]]	90Bx
+7	0	[]a]	c \xe990x
+5	0	\x5c.+9A[\xe9\xe0]	
+7	0	\x5c)ba[a-]	\xe0 BA\xe0\xe9
+7	0	+[[:digit:]]	b
+7	0	\x5c.	B*b.B*bbxA\xe0
+5	0	[]a](a|b)*ab|cd	A\x80\xe0A0.
+5	0	[\xe9\xe0]0.*\x5c1[[:alpha:]]	x\x0a\xe9.\xff0c
+5	0	[\xe9\xe0] 	 B*xA a \xe9
+5	0	.*[[.a.]]*{,2}{	\xe0
+5	0	0.*]	
+1	0	[[=a=]]\xff{2}\x5c)a	\xff
+0	0	a[[:digit:]]a	\xe0A
+0	0	$[[.a.]]$	\x0a\x0aac*a0c\x0a
+1	0	[[=a=]]]+A9]	\xe90*c\x0a9\x80a0\x80
+5	0	0	\xe9\x0aAab
+1	0	?	x
+1	0	\xff\x5c({,2}[]a] 	\x0a9b\x0aA\x0a \xe0
+5	0	[[=a=]]	\xe0\x0a*\xe999\xe0
+1	0	{2}\x80 bc	\x80B\xe9A
+0	0	\x5c.[[:space:]]9\x5c.	 
+9	0	[]a]	.
+0	0	c\x5c	9a\xe90\x809\xe9A\x0a
+7	0	\x5c*.ab[[.a.]]	\xe00\x0aaAx\xe9*\xff
+5	0	 	b.c\x0aBb
+9	0	[\xe9\xe0]{1,3} [*^	\xff*
+5	0	[[:upper:]]\x5c*A\x5c)\x5c\x5c.	.B 
+5	0	[a-][[:space:]]	cA\xe0c\xff9b
+5	0	{1,3}+(a|b)*[[:alpha:]]{1,3}.*	*xc\xff\x80 Ba0
+5	0	[a-z](	\xe09 0
+5	0	\xe9(a|b)*?c\x5c)x	\xe0abA\xe9\xff\xe9A\xff0
+9	0	^\xff	
+0	0	\x5c\xff0	9\xff\xffc
+5	0	x\x80{1,3}{2}	.cA
+3	0	\x5c{[]a]B[[:digit:]]	x
+5	0	?[abc]\x5c({,2}{,2}\x5c1	9B.\xff\xe0*xbc 
+7	0	[^a]\x5c(]A0\x5c{	
+9	0	)[\xe9\xe0]x	 BA\xe9\xe0.\xe9B*\xe0B
+3	0	[abc]a[a-]* ?	\x0a\xff A
+9	0	\xff\x5c([[:digit:]]	x*cb\x0a\xe0 
+9	0	\x5c*	
+7	0	x[[=a=]][^a][a-]	0\x0aaA
+0	0	\x5c[\xe9\xe0][a-z]\x5c[^a]	\xe0
+7	0	|	\x0a\x0a
+3	0	+ab|cd[^a]a[[=a=]]]	0\x0acB
+3	0	\x5c\x5c)\x5c1[a-z](a|b)*	*aaB \xffa\xe0\x0a9
+5	0	\x5c)[abc][[.a.]]ab|cd?	
+1	0	[[.a.]]\x5c1b	\x0a*c
+3	0	\x5c.A[	aA0x0a9b*
+5	0	[a-][abc][[:digit:]]	Bc \x0a..\xe9*\x0a\x0a
+5	0	[abc]+	\xe9A\xe0
+3	0	[[=a=]]\xe9$	\xff*
+0	0	[{,2}a{1,3}.*B	A\x80B\x80aA\x0a 
+5	0	x?[a-]^b	*aab\xe9*\x809
+5	0	+\x5c(*\xe9\x5c)	\xe9\xff\x80AB\x0a\xff9
+5	0	[]a]	0bc\xffx
+7	0	?\x80	c9.*0*A\x0a \xe9
+3	0	+	9
+3	0	\x5c\x5c.[[.a.]][[:space:]]{2}(a|b)*	*a*b\x80\xe0\x80\xe9
+7	0	\x80	*c\xff0 b
+1	0	[[:digit:]][]a][[:alpha:]]?[[[=a=]]	.\x0aaA\x0a\x80b0*\xe0 
+0	0	[^a][a-][[:digit:]]	\xe0\x80\x80bax
+5	0	\x5c{0]?	b\x80
+9	0	*[]a]c\xff$	\x80B\xe0Bx\xe99*\x80\x80
+3	0	0c{\x5c1	.\x0a.0\xe9B. \xff*
+9	0	[a-][[[:space:]]	Bc* 9\x80
+1	0	{1,3}c[\xe9\xe0](a|b)*	Bb.
+5	0	.*b	\xe9xB\x0a\xe9\xe9\xe9b\xff
+9	0	([[({2}	9\xe0 0
+5	0	0{2}[\xe9\xe0][[:digit:]].*	\xff
+5	0	[[:space:]][\xe9\xe0]	c.b0A0\xe0c
+5	0	9\x5c\x5c)	cAB \x8099A
+9	0	[abc]	x.* x0ca\x80 
+1	0	{2}9	A\xffcx9ba
+0	0	*^{2}	Ba
+5	0	ca	caB
+0	0	{,2}^	. 9\xe0 Bx B
+0	0	[[:upper:]]	bb9
+0	0	[[:upper:]]	B.a B9
+9	0	([abc]|0	c
+5	0	[[:upper:]]\x5c.{2}\x5c\x80x	\x800*\x0a.\xff\xe0\x0a. A
+5	0	ab|cd?+	
+5	0	(a|b)* +	\xe9 \x80.
+0	0	\xe9?	\xe9.\xe0\xe9B.x\xe9\x0a
+7	0	90[[:digit:]]	\x0aa.
+0	0	[\xe9\xe0] [[:alpha:]]*[\xe9\xe0]	\x0a\x80\x0a.\xe99\x0a\xe00A
+5	0	.*\x5c{\xff	\xe9*Axa 9
+5	0	0*{1,3}[abc]\x80	b\xe99\xe90.* \x80\xff\xe0
+3	0	^[[:space:]]?[a-z]{1,3}	cbB\x0a\xe0* 
+5	0	[[.a.]]{,2}$\x80]	
+5	0	9	\xe0A
+5	0	$\x5c[[:space:]][[=a=]]	bAb0ab0aB\xe0 
+9	0	*[]a][[[:digit:]]{	\xe9\x80aa
+5	0	[a-z]\xe9*x\x5c	 9\x80
+0	0	\xe99b{2}*	
+0	0	[[:digit:]]][[:upper:]]	cca*
+0	0	[[:upper:]]+[a-z]	\xe0A\xe0\x80A9A
+1	0	[[:space:]]{2}	*\x0ac
+1	0	x\x5c{\x5c(b[]a]	.cca\xe0\xe9x9
+9	0	x\x80[[:alpha:]]x\x5c*	AB\xe09*0\x0a\xe9\xff
+5	0	[^a]\xff{2}[[:upper:]][[:upper:]]	
+9	0	\x5c**{1,3}^(	0c \x0a\xe9.A
+5	0	\x5c.[[:digit:]]^a(a|b)*	a\x0aA\x0a\x80\x0a.a\xe0cA
+5	0	{\xff(\x5c.B	\x80cAA b0*
+5	0	0[[:space:]][\xe9\xe0]	
+5	0	.\x80B[[.a.]]\x5c{[[.a.]]	\x0a*.\x80a\xe9 *
+7	0	( 	c. \x80.c
+0	0	.[a-z][[:upper:]][[:space:]]\xff[^a]	Aa\x80
+5	0	{,2})\x80	\x0a*A\xe0\x0aB
+9	0	[[a-][abc][abc]ab|cd]	\x0a
+5	0	[[:space:]]	 *\xe0
+5	0	A{2}[\xe9\xe0]{,2}\x5c{[[.a.]]	*
+1	0	a$x	\x80\xe9a 0
+7	0	(a|b)*.*\x5c*c$\x80	aBbcaAc
+5	0	\x5c*	a.\x0a
+3	0	\x5c)\x5c(|{,2}cc	cAb\xff\xff 9
+5	0	[]a][	.\xffx0B0\xff\x0a
+1	0	\x5c1b\x5c.	0\xe9\xe0\x80
+5	0	(a|b)*	
+1	0	|[[:space:]][a-z]	\xe0\xe9
+5	0	\x5c{9{2}(a|b)*	BxA9A*9\xe9*
+5	0	[\xe9\xe0][[.a.]]9[	b.
+9	0	?9	0a09\xff
+1	0	[abc]c[a-z].[[:digit:]]	\xffb\x80cA\x80a\x80B*.
+9	0	 a	aa0 A.\xe9 c0\xe9
+5	0	\x80|{2}	B0
+5	0	(\xff[9	AxB\x0a*\xff
+5	0	(	Bc\xff*xx*
+5	0	.*[[:alpha:]]*	x\xff.
+1	0	b	9 \x0a\x0a c\x0aA x
+0	0	A	.ca9b\xff\xffxb
+9	0	[\xe9\xe0]	b9\xe9\x0a
+1	0	?[\xe9\xe0]^\x5c1	\xe0a*x
+3	0	[[:alpha:]]c[[:alpha:]] c.	0
+7	0	[?[[:upper:]]\x80\x5c.[[:digit:]]	b9*a\xffAA\x0a
+5	0	B][^a]\x5c{[^a]b	
+5	0	cBA*0	\xff.c\x80xB\x80c9\xff
+7	0	x\x5c*\x5c(\x5c*	0ba\xe0a
+9	0	(a|b)*	9xA..0a
+1	0	\x5c.+\x5c)\x5c{.	\xe0
+1	0	{2}ab|cd[a-]b\x5c)[a-]	B
+0	0	?^	* \xff*xAB\x0a\xe0
+5	0	[^a][abc]\x5c(x[[=a=]]{	Ba0\xe00\xffBBa
+0	0	[abc][[:upper:]]]\x5c*[[:digit:]]	a
+9	0	.*\x80)|	\xffA*
+3	0	^[^a]\x5c.\xff	c\xe0x9\xff
+5	0	[	 c.\x0abcc
+5	0	){2}\xe9[[:upper:]]|	90aB0b
+3	0	|	\xe9
+9	0	0x0^[[.a.]]	Bc.a\x0a
+5	0	$\x80[abc]\xff	\xe09\x80.B*A\x80
+5	0	{{,2}\x5c1\x5c)\xe9	AA90* ABb
+5	0	[[:digit:]]ab|cd{*[[:digit:]]	B
+5	0	)[[:space:]]	a* 0b
+3	0	(a|b)*[	\x80cb\x80
+1	0	].*?[[=a=]][[=a=]][[.a.]]	*B9\xe9\x0aa
+0	0	c+\xff?	BaB\xe9 x 
+7	0	(a|b)*ab|cd[]a]\x5c*	*A
+0	0	[]a]?[[:space:]]	b09\x0a9*\xe9\x80a\xe0
+5	0	00[^a]	\x0aB\xff\xe0\xe99
+7	0	{2}\xe9[[.a.]]	 x0
+5	0	][\xe9\xe0]\x5c([]a]	\xe00\xff*x0.\x0a9B\x0a
+0	0	\x5c\x5c(	\x80*\x80..c
+3	0	{,2}[\xe9\xe0]\xe9	\x0a0AA0\xe9.b0B 
+1	0	\xff+	x\x80.0cx\xff9\xff
+3	0	  	x0\x80c\x80\xff**
+5	0	9{2}\x5c*[\xe9\xe0]	  .
+5	0	|\xff\x5c{[abc]	0\x80AaA\xe0
+5	0	?{?	9.9\xffbb*b
+5	0	\x5c\x5c\xff^{1,3}	9b\xff9 \x0aa99
+5	0	\x5c*\xe9	.
+9	0	[[:space:]][[=a=]]	
+3	0	0\x5c.\x80[\xe9\xe0]\x5c\x5c{	9. \xe9a99\xffBB
+1	0	A	909\xe0\xe0
+5	0	\x80[\xe9\xe0]\x5c{[[.a.]]	 \x0a\xe9
+9	0	\xe9.[]a]|[[:digit:]]	.
+0	0	)\x5c.\xff[	\xe0
+5	0	A[\xe9\xe0]	\xff0\xe0x\xe0a
+5	0	[[:space:]]	x\xff\xe990.
+5	0	+?{2}$\x80\x80	*\xff
+3	0	0\xe90	B\xe9
+5	0	(^(a|b)*\x5c(	A\x0aa\xff090\xe0\xe9a
+5	0	[^a].*	c\xe0B\xff\xe99c
+0	0	{1,3}[^a][[:digit:]]	09 a
+9	0	[a-]	\xff\x0ax\xffa*
+5	0	]\x5c.][a-][abc][a-z]	
+3	0	[[:alpha:]][abc])\xff\x5c.	\xe0\x0a
+5	0	a.*ab|cd[ 	aa\xffb\xe9 a
+3	0	\x5c1\x5c1\x80[\xe9\xe0]	A\x0ax
+3	0	[[:alpha:]]\x5c)$	\x809*A.9\xe0*\x0aa
+5	0	$[[:alpha:]]B[\x5c*[	
+7	0	.[[:space:]][[:space:]]	
+7	0	$[abc][[:upper:]]	BA\xff\x800 *\x80\xff0
+0	0	[\xe9\xe0]|	B\xe9b
+0	0	\x5c*{2}	
+0	0	{2}[^a][[=a=]]	Ac*c99*c
+5	0	[^a]\x5cab|cd|[[:alpha:]].	 x*A
+5	0	A9 	a\xe0xb
+5	0	\xffB{[[:space:]]^	
+3	0	\x5c)(	\xffB\xffB.9
+3	0	]^\x5c*\xffc	Bx\xff\x0a9*BB
+5	0	]|.*	c*cb.A9
+5	0	+\xe9[abc].{,2}|	.0\x80\x80\x0ac0\x0ab.a
+5	0	([[=a=]]] 	.c\xff\xe09bc\x80
+1	0	\x800\x5c)\x5c{{2}{1,3}	cA\xffAxaa*\x80
+5	0	[abc][[.a.]]*	Bbbb*.\xe9Bx*9
+0	0	a\x5c\x5c*[[:space:]]a[abc]	\xe9\x0a a\x80.\x80\xff
+3	0	.*\x80b\x5c.)	\xff
+5	0	\x5c	
+1	0	\x5c)\x5c(	\xe9\x80a\xe09b
+5	0	ab|cd0{,2}(\x80\x5c1	axB  
+7	0	{1,3}[[:alpha:]]b\xe9\x5c	 \x0ax\xe00
+3	0	? 	.b
+5	0	^\x5c(0.*)	A0\x0ac0b00BxA
+5	0	[{1,3}+[^a]{1,3}	\xe0b\x0ac
+1	0	[[:alpha:]]	x\xff*0\xe0a
+9	0	.]^\x5c	A\xe9B\xe0B\x80
+5	0	.*\xff{2}[[:space:]]\x5c{[\xe9\xe0]	B
+7	0	^.*\xe9[a-]	 .bxc\x0a
+1	0	\x5c.\x5c{[]a][[:digit:]]	9x \x800B\x80\x80\xff.
+5	0	B{,2}?(	A\x80A
+0	0	[	*c\xff0a0\xff\xe0
+0	0	[abc].	0 c
+7	0	B{\x5c.	0B9\xff\xffbca0Ba
+0	0	A|	acBc
+5	0	(([[^a]	\xffB\xe9\x0ax\xffBBB.
+5	0	\xe9B[^a][]a]a0	xA*\x80\x80baBBA
+0	0	[^a]*?\x5c{[[:alpha:]]	x
+5	0	b[[:digit:]][c\xff	B9\xffA . 
+7	0	\xe9[a-](a|b)*)\x5c1.*	\xe9A\x80
+3	0	$)	\xe9aa9\xe0ccBc.
+9	0	|\x5c*a	b\x80\xe9\xff \xe0*xx
+1	0	{\x5c)	Bc\xe0B9B\x80\x0ab
+0	0	.*[[:digit:]]	a.c\x0aA* 
+5	0	{,2}[a-]	AxB9\xff\xffB\x0ac\x0a\xe0
+5	0	 .*\x5c1	
+9	0	[]a]\x80	
+5	0	*(a|b)*	a.A\xe0c*
+1	0	[[:space:]][[:digit:]]	\xff .\x0aBbb*\x80\xff\xe0
+0	0	ab|cd*[]a]\x5c([\x5c1	bx
+9	0	\x5c	\x0a
+5	0	A[a-][^a]\x5c(	\xe0\xe09
+9	0	[[:upper:]]\x5c*$$	\x0a\xffA*0 
+5	0	*	B09bBa
+5	0	(a|b)*|b	bxxa9cb\xe0A
+1	0	|][a-z]b\x80	a\xe9\xe0ca.
+7	0	.[^a][[:space:]]	\xffbccbca.
+5	0	]*.*(a|b)*[[:alpha:]]ab|cd	xAA\xe9
+7	0	*ab|cd\x5c([[.a.]]((	Ba\xff 
+9	0	+[a-]A\x5c*	 .\xe0c b
+7	0	ab|cd	09.a.\xffA9\xe0a\xe9
+7	0	\xe9+|[abc]c\x5c1	\xffa\x80\xe9a\xe99 \xff
+7	0	\x5c[a-z][abc]	09BB\xff9b
+9	0	\xe9*xab|cd\x5c)\xff	\xff\x0a c
+0	0	\xe9c(\x5c(	0\x80c*c
+5	0	9.*[[:space:]]{	
+3	0	{,2}]\xe9\xe9x	
+1	0	[^a]{2}	\x0ax\x80c09 0
+5	0	[[:digit:]][[:digit:]]{[abc]{2}	b*\xe9ca
+7	0	${(a|b)*0\x5c(	.\xe90A09bA9*0
+9	0	\x5c.x*\x5c.[[:space:]]	.ba x\xe9 
+9	0	{[abc]	b\xe0xb\x0a9
+0	0	[a-]A[]a]c	
+5	0	[[[=a=]]	\x0a*\x0a* \xffB.
+0	0	)c[[.a.]] 	\x0ax\xff \xff\x0a
+5	0	\xff]\x5c	9\xe9 
+3	0	x[[:digit:]]\x5c.9	\xffbc.
+5	0	\xff[abc](ac[^a]	a\x0a
+5	0	[abc]A	099xA*
+5	0	{,2}(\x5c*\x5c(	b\x800bxa
+1	0	\x5c*a|a	\xe9x.9\xff\x0a\x0a
+1	0	[\xe9\xe0]	\x80\x80AB9bb\xff0 \xff
+5	0	{1,3}{	B\xff
+1	0	(a|b)*+	Ax A
+9	0	[a-][abc]\x5c	*c\xe0\xe0\xe0aA
+7	0	 [[:upper:]]\x5c{^*\x5c1	\xe9\xffx
+5	0	{1,3}a[^a][[:upper:]][[:digit:]]	\x80*a\x0a\x0aAa\xffx\xe0\xe9
+5	0	)	A9\x0a\xe9\xe9xb\xe0\x0a
+1	0	{1,3}{2}x	ca\x80ba\x800
+5	0	([[:digit:]]B	 \x0ax\xe9B\x0ax
+3	0	[[[:alpha:]]?{[]a]\x5c*	a\xff
+7	0	[a-]]\x5c*\x5c(*	.
+1	0	[[.a.]]	x0\xe0
+3	0	[]a][[:space:]]].\x5c(\x5c(	
+5	0	]\x5c(9{,2}	A\xe99\xe9B9\xe9
+3	0	a\xff[]a]AB	9
+7	0	?+\x5c{[\xe9\xe0]	.\xe0.\xe0 *a\xe90
+0	0	{,2}	b \x0aA\x0a
+5	0	(a|b)*[a-z][]a]B^	b9
+5	0	$[[.*	aA \xe9x0B
+7	0	\x5c*\x5c*[[:alpha:]][a-][a-][a-]	\xe9000A\x0aa
+0	0	[abc] 	9B
+0	0	9|	AABa
+1	0	{.*	\xffab0
+3	0	[a-]	A x*a*\x80B\x80\x80\xff
+5	0	\x80{1,3}\x5c.{2}b)	00\x80\xe0\xe0\x0a
+1	0	{^\x5c{A|	.b*\x0a\xe0b
+0	0	\x5c{[[=a=]][^a]\x5c.\x5c1	\xffa\xe9\x80c*0\xe9\xe0
+5	0	+[[:upper:]][a-z]	B.
+0	0	[^a]	0A*
+5	0	[[:digit:]]	
+7	0	\xff	b0 \xe0ax\xe0\x0a\xe00.
+1	0	|[[.a.]]	.\xe9\xe00*\x80\xe9
+9	0	ab|cd	 
+5	0	.*{1,3}B	\xe909
+7	0	ab|cd.{1,3}{,2}	x\x80A 9\xe9\x80\xe0
+9	0	\x5c(\x5c{{	bAb*AAAxB\x80
+5	0	(a|b)*\x5c{	
+5	0	[a-][abc]{2}	
+3	0	ab|cd9\x5c(0)|	B\xe9x*0
+0	0	\xffB+	9*Bx
+7	0	ab|cd\x5c.a([^a]	 .ABb B
+7	0	^	A\xe000xc0*
+0	0	*\x5c1({2}	\x0a0*\xe9
+3	0	*B[[=a=]](a|b)*{,2}$	*B.\xe99a\xe9
+5	0	0^(a|b)*(	xxB9ac\xe9ax\x0a
+3	0	)\xe9) 	
+5	0	[[:digit:]][[:alpha:]].	\x0a*c\x0a*90\xe9\xffBB
+5	0	[[:space:]]\x5c)|{2}[]a]	\x0a \xe9\xffa
+7	0	[[:space:]](a|b)*	\xe9\x80B9c\xffB b\x80b
+0	0	[abc]\x5c)?	\xe9\x80x
+5	0	?\x5c(?	b9*ccca.abb
+9	0	0	9*\x0ax\xe0**bB0a
+3	0	{1,3} {c	
+5	0	\x5c{	*.\xffa9\x80
+5	0	[[:digit:]]	\xe09 \x0a bc9\x80.
+3	0	[[:alpha:]][a-]	B0 9\xe9\xe00c*
+1	0	 [a-z]([[.a.]]	a.\x0ac\x0a
+5	0	(..\x80	99
+5	0	(a|b)**	0 \xe9\x0a\x0a.B.
+5	0	0[^a])	
+9	0	 (a|b)*	cbABA\xe0\xe9b\x80c
+3	0	[[:space:]]\x5c).[[:alpha:]]	\x0a.\x0a
+9	0	[.*	.\x800*bBB
+5	0	.$b	xxc\x0a.*BB\x80
+9	0	[[:space:]]\xe9{1,3}[\xe9\xe0]	9a*a\xe9
+0	0	|[\xe9\xe0]	\x0a*
+5	0	|[a-z]\x5c.[\xe9\xe0][[:digit:]]	\xe9x0c9a\xff\xe0\x80 a
+0	0	[[:upper:]][^a][[=a=]]	.c.AB\xe0
+1	0	\xff.*	B
+7	0	\xffA	0\xe0 00 \xe0
+5	0	\x5c{|[[:upper:]]	Ac\x80 B\xff0
+3	0	[^a][a-z]	
+5	0	.[[:alpha:]]	bxB*0x
+7	0	9x	
+1	0	*\x80A	\x800c\x80c9a.9\xff
+5	0	{2}	0\xffxcAb\xe0*c\xff\xe0
+0	0	c\x5c.	
+5	0	b+*0	\x80\xe0
+0	0	[[:space:]][[:upper:]]\x5c[a-]	
+5	0	{2}	b \x0a\xff
+1	0	(^[[:alpha:]]a9	A
+5	0	\x5c.	b.\x0aB
+5	0	\x5c{{2}ab|cdc	\x80c\x809*Ax.\xe0a0
+0	0	[^a]\x80	\xe9*B
+5	0	[a-]0A.*\x5c{(a|b)*	\x80c.
+5	0	(x.	\x0aAc9.x
+5	0	{1,3}	a.Aa\x0ac*\xe0xb9
+5	0	?{,2})?	cc\xff
+5	0	\x5c.\x5c.\x5c(b\x80	A\x0a\xe9\xff\x0a9*\xff*a 
+9	0	)?ab|cd\x5c){1,3}?	*
+9	0	c^[]a]+)0	  *\xe0Bbx9c
+5	0	)[^a]	b \x0a
+0	0	[]a][]a]9.*c	\xff\xff
+9	0	\xe9[]a]9	b*BAA\x0aBB\x80 
+5	0	A)(a|b)*|	\x0a *aA \x80Bc
+9	0	(	\xe9cA. .c9 
+0	0	B+\x5c{^[[:alpha:]]	c\x0a\xe9 *Ba
+3	0	[\xe9\xe0]0\xff(a|b)*b	c\x80b
+0	0	\x5c(	
+0	0	c\x5c{ca\x5c)	\x80\xe9A
+1	0	A) +.	A0\xff\xe9bB
+1	0	\xe9[^a]A.*	A**.\xff0
+1	0	{,2}?\x5c. 0	a\xff
+7	0	[abc]c[[:digit:]]A	B0ax\x0a
+7	0	[a-z]ab|cd	a
+1	0	\x5c	aabx\x0a \x80 \x80 \x0a
+5	0	\x5c{	 B\x0acb0b
+5	0	[bB[(a|b)*\x5c(	\xff*\xe0\x0axx\x80
+5	0	[[=a=]](.*\x80	.\xe9
+5	0	b[[:digit:]]^.*	\x0ax\xe9
+5	0	[a-][[:digit:]]x+?	\xffb9.00bAxBc
+5	0	ab|cd[[[.a.]]\x5c.	\xe0\xff\xe9*9BA
+9	0	{2}[]a]*[[:digit:]]^	9 9A\xe0\xe0\xe090
+5	0	)]+B	
+0	0	$[[:digit:]]	\x809*\x0aa
+1	0	{\x5c){1,3}[\xe9\xe0]	\xe0\xe9 \x80\xff 0A9\xe9.
+0	0	\x5c.\x5c${,2}[]a]	  .b\x80.bb\x80
+7	0	[a-z]	
+5	0	[[:digit:]]{1,3}{1,3}(	 A\xff AA9\x80*B.
+7	0	[abc][[:upper:]]	\x0a bb\x80
+5	0	[[:upper:]][^a]\xff[^a]?	*ca
+5	0	+	\x80\xe9.\xe0\x80A
+5	0	 ^[a-]\x5c)\x5c)|	\x80\xe9a\x0a\x0a\xe0\xe99\xe9
+7	0	*[^a].*	 x9 
+5	0	b(?$ab|cd[[:space:]]	0c\xe9\xff99\xff\x0axb 
+3	0	$	.0\x0aab9xc9 0
+5	0	.*	B\x0ac\xff.
+9	0	B+(	
+5	0	[[:alpha:]]|	cA
+5	0	\x80\xff[a-z]	\xe9
+1	0	$A[\xe9\xe0]	\xe0\xe9\xe0\xe9\x0ax\xe9
+7	0	\x5c1?9{1,3}^[[:upper:]]	\xffBx9
+3	0	\xe9[abc]	x\xe9\x0a\xe0A9x
+7	0	\x80*	\x0a
+1	0	\x5c**\x5c1	0A\xe9.A\xff
+7	0	^\x5c*]	B\x0a   B\xffc9\xe9
+9	0	Ab{2}[a-]{	\x80\x80\x0aB
+9	0	(	\x0ax \xffA\xe99\xe0\x80
+5	0	0||{2}{,2}[[=a=]]	
+1	0	[]a]\x5c*	.B**9.\xff \x80
+0	0	[a-z]\x5c1c[[:digit:]][[:space:]]	99 xbcAa
+7	0	\x5c*.	a\xe0B
+0	0	[?	abxbax0\xff90\x80
+9	0	$	B*
+5	0	[[.a.]]\xff\x5c1{,2}|[[=a=]]	a\xe0a\x80
+0	0	\x5c0\xff\x5c.	x\x0aca.\xe9B
+1	0	\xff^	.\x80\xff xB\x0a\x0a\xffA\xe0
+5	0	Ac[]a]9*	BcB\xe90\xe9
+1	0	a0\x5c)\x5c(a[abc]	c\x0a*0\xe00.aa 
+5	0	?^[\xe9\xe0][[:upper:]]+	
+5	0	[\xe9\xe0]|$	0
+3	0	9\xe9 0c	*\xe0\x80\x0aac\x80\xe0b
+1	0	\x5c{{2} )x$	9xx\x0a9B
+7	0	(a	\xff*
+5	0	\x5c*[\xe9\xe0]\x80	0AcB
+3	0	[[:alpha:]]$ \x5c1	
+5	0	^\x5c1\xff[\xe9\xe0]{2}	A
+1	0	[[:digit:]]| x\x5c*\x5c{	aaA bxx
+1	0	c[[:alpha:]]x\x5c(	*\x80aa0
+5	0	A\x5c1[abc]	
+7	0	\xff	.\x80.
+7	0	[^a]\xe9\x5c(	9cB0b
+7	0	bB	9.\x80AAB9A\x0ac
+1	0	9ab|cd*[a-z].*[[:digit:]]	\x0ac\xe9\x80*\xe0\x0a0xB
+0	0	?\xe9+[\xe9\xe0]^	\xff\xe9\xe0\xe0xa\x0a.0*
+5	0	a*.a[a-]	9\xe0B9\xe0b\x80 \xff 
+7	0	[[:digit:]]	c*\xe9
+3	0	[[.a.]]a	\x0aB\x80.\x0a
+0	0	\x5c{\xffc	0\xe9A 
+9	0	axc[[:alpha:]]]	\xe9
+7	0	A	cBacc
+3	0	\x5c{.*[abc]a\xe9	b.0* *a\x80\xe0
+7	0	[[.a.]]	b
+5	0	\x5c{)[a-]\x5c{[]a]x	\xffB\xe9B
+7	0	[a-z]\x5c(+{1,3}.	Bx\xe9\xe9
+9	0	\x5c{[[:alpha:]]	\xe0.\xe0\x80Bx0A c
+7	0	^	9\xe9a
+5	0	[[.a.]][[:digit:]][a-z]	aA*B90B.b\xe9x
+5	0	\x5c)Bx$].	\xe9\xff.\xe9\xe9\x80\xe0\xe0
+1	0	\x5c{[\x5c{\x5c.	.b\xff\x80a\xe0cx\xff\x0a
+5	0	[[[=a=]]\x5c{0	
+5	0	.*	
+5	0	.\x5c(\xe9.*A	\x80\xff \xe0\x0ab9
+3	0	A[]a]	bBa.
+1	0	{\x5c([abc]	
+1	0	\x5c.\xff	x\xff\xe9b90.\xe9\xe0
+9	0	\x5c(	..\xff*0x9
+5	0	{2}^x	
+3	0	[[:space:]]	b\xff\xe9\xe9\x0a\x80c\x0aB
+5	0	|	
+9	0	\x5c1\x5c.{\xff{1,3}{,2}	9\x0a\xe0\xff\x0a\x0a.\xff0\xff\x0a
+1	0	x(a|b)*\x5c(({,2}	\xe9\x80c
+0	0	*c	B .ab
+0	0	\x5c{[abc]	cxA9.
+5	0	|	BxB \xffb
+5	0	(*{9)	Ab0\xe9AB 
+9	0	{,2}[[:digit:]]{2}{1,3}[[.a.]]\xff	x\x80\x0a\x80A\xe9  \xff
+9	0	($	 *\xe9*b. *
+7	0	\x5c[[:upper:]]	
+5	0	{,2}(a|b)*A	c\xff\xffc\xffx0Ab0B
+7	0	\x5c(][[.a.]]\x80ab|cd(a|b)*	
+7	0	\x5c*[abc]	
+5	0	b	00A
+1	0	{,2}^\x5c*	bAbc\x80B
+7	0	($ {1,3}.	A\x80bBb.9a\xe9
+9	0	(a|b)*]	9x\xe0 a\xff00xa
+3	0	[[:alpha:]]\x5c\x5c[^a]	BB\xe09
+9	0	0[[:space:]].*ab|cd	
+5	0	[[:digit:]]	*0b\x80*A9b\xff
+7	0	{1,3}[[:alpha:]]+	0\xe0A\x0a0b\xe0
+3	0	[9)	9x0b
+9	0	\x5c.	\xe0cb\xe9 *x
+0	0	?	\xe0
+9	0	\x5c	*
+5	0	{\x5c*	\x80.\xe9A x
+0	0	[[.a.]]	\xff*
+5	0	(a|b)*?*b\x5c*.*	0\xff9\xe9B\xe09\xe0\xe0
+5	0	\x5c)[[.a.]].	\x0a\xff
+5	0	a0	*a\xe9
+1	0	0	\xe0\x80.\xe00B9\x0a\xe9
+3	0	aA.[]a]{,2}	\xe9\x80a*Bx9\xe0\x0a
+0	0	[\xe9\xe0]$	 \x0ax.
+0	0	*{B* {,2}	c\xe0\xe9\xffB0\x80
+0	0	[[:digit:]]?{[\xe9\xe0]{2}[abc]	0
+5	0	\x80Ac[^a]	a cb\xe9\x0a 
+3	0	^[[.a.]][\xe9\xe0][a-z]^[[:digit:]]	\xff
+1	0	B\x5c{x	 00\xff\x80b0
+7	0	)[[:digit:]]0[[:digit:]]\xffa	0a
+7	0	[a-z]\x5c1[[.a.]]	\xff
+0	0	\x5c)\x5c([abc]$	.\x0aBccAB\xe0\xff9c
+5	0	(a|b)*c\xff[\xe9\xe0]\x5c)	\xe99 x.B
+3	0	(a|b)*b	\xff0B\x800x
+3	0	[]a][[:upper:]][^a]	\xffc99\x80.\xe0
+7	0	^[[:upper:]][a-z]	9x\x80\x0a\xe9*.c.09
+0	0	]	09
+5	0	( 	\xffc.
+0	0	\xff[a-z]	c\x80\xff*0\xe0 
+1	0	{,2}\x5c*[[:upper:]]	A*c A* \x0a
+5	0	B9	 \xe00
+5	0	B[	9\xe90cb\x800\x0a\x0a
+5	0	ab|cd\x80[a-z]x	b
+9	0	(a|b)*[[.a.]]{1,3}[[:digit:]]	A\xe9
+0	0	[[:upper:]]	0\x80\x809\xffAbcx
+5	0	\x5c([.[abc]9	\xff\x0a9
+1	0	B+a[[.a.]][^a][[:space:]]	B90 \x80. Bx9\xff
+1	0	 {1,3}?	b
+3	0	[[:upper:]]	\x800\xffB9b*\x0a\xff\x0ab
+0	0	\xe9{,2}[B[[:space:]]0	a\xe0 c9
+5	0	{\x5c{+ 	\x0a900
+5	0	[[=a=]]\xff	\xe0\xff\xff\xff*xBx
+3	0	B|\x80	c\x80c*\xe0\x0aa
+0	0	b	\x80*\x0a\xe9\x0a 9\x80\x80
+9	0	\x80.*	xa.B9x
+5	0	\x5c)	\xffB\xffBcB
+5	0	[a-z]\x5c(][]a][[:digit:]]	\xe9a.c\x0ab\xe9
+9	0	\xff\xe9	.\x0ax\xe90\xe90a\xe9
+9	0	(a|b)*[abc][[:alpha:]]ab|cd	.c0.0\x0a\x0a\xe0 .
+0	0	9	\xe0\xe9\x80a.0\xe0 \xe9
+1	0	[\xe9\xe0]0	c\xff0\xff
+1	0	+.	
+1	0	 \x5c{[[:space:]]$\x5c\x5c)	\xe9\x0ab\xff\xe0*9bBA\xe9
+5	0	{1,3}b	\xffB\xff
+5	0	\xe9(9.	\xe0\xe9AA\x0a*\x80\xe0\x80
+1	0	0\x5c{^[[.a.]]	\xe9x\x80\xff\xe9*\xe9*.
+0	0	?	\xe0\x0a\xe0\xff\x0a0 
+5	0	[a-]	
+3	0	0[a-z]\x5c.[ca	
+7	0	*]	*\xe9c\x80 .A\x0a\xe0.c
+5	0	|	\x0a\xe9
+0	0	*[[:upper:]].|\x5c.*	 b..*9
+0	0	^	xBa
+5	0	[[:alpha:]]{2}\xff	\xe0
+5	0	\x5c)?	\xff*aBaA*\xe9*b\x0a
+9	0	\x5c1	.\x80cx9\xff\x0a xx
+5	0	\x5c1	x\xff..9
+5	0	9]	 \xe0B 9\x809\xff
+1	0	\x5c(b\x5c{b[[=a=]]\x5c	0.0x\xe0 
+5	0	$	a9\xff\x80
+5	0	B	 cab0B.\xffxa0
+5	0	[a-z]x[[:alpha:]]	*\x80
+0	0	\x5c1 |^	0c a\xe9\xe90A9
+7	0	[]a]	0c\xe9A\xffA*\x0a\xff
+9	0	[[:digit:]][[:upper:]]	
+3	0	a[]a]	B
+7	0	+\x80	bb 
+7	0	[[=a=]]|b9{,2}	.
+3	0	c{1,3}][[.a.]][a-]	.A
+9	0	\x5c*B\x5c(0+	\x0aa\xe9\xe9\x0a \xe9\xff\xe9 
+7	0	)\x5c{$\xe9[abc]	c\xe90*0B\xe90*
+3	0	*?[[]a][a-][]a]	b\x80\xff*\xe9\x0a\x80\xe0.\x80b
+7	0	[[:upper:]][abc][[:upper:]][\xe9\xe0]$	
+1	0	[[.a.]]\xe9	ca.A x
+7	0	)[a-][]a]|	\x0a\xff
+1	0	[[:alpha:]]\x5c[)\xe9	
+5	0	\x5c(.	b\xffa0.
+7	0	\x5c*[a-z]\x5c1	\x80
+7	0	)	b \x80A\x0ax aA\x80*
+9	0	[[.a.]]?	*0A*\xe9
+0	0	[^a]\x5c1	
+5	0	{1,3}[^a]	x\x809xc0B\xe0B
+9	0	 {\x5c)a	baa\x0a\xe0
+3	0	]c[a-]	\xe00 \x80\x0a.
+5	0	\x5c*x[\xe9\xe0]$[[.a.]]	\xe0*\x0a\xe9\xff
+9	0	+ ?9{1,3}	a.a\x0a
+3	0	[a-z]{1,3}[[:digit:]][abc]0	\xe0\xe0\xffa*.0
+1	0	[[:digit:]]{	* 9x*
+5	0	A	ac\xe0
+5	0	0\x5c{\xe9[[=a=]]	
+9	0	({.\x5c)A[]a]	x\xe9\xe9
+5	0	B\xe9[[:space:]] \xe9\x5c.	Ac
+5	0	b	0A\xe90 \xff.A
+9	0	A+x	.b\x80\xe9x0
+7	0	\x5c1	a*\xe00.bc\x80
+3	0	|x	\xe9\x80\x80B\xe0 
+5	0	c[(a|b)*x[[:digit:]]	B.* cAaxc\xff0
+5	0	[ab|cd){,2}\xe9[\xe9\xe0]	
+5	0	[^a][[:alpha:]][a-]\x80[\x5c*	a\xff*aa \xe0\xe0*
+5	0	^ab|cd(\x5c	9\xe9\x80
+5	0	[]a]|	b\xe9
+0	0	\xff[[:alpha:]]{*(	\xe9 \x0a 0\xff9\x0a9
+1	0	$?b[[:digit:]]	B b\x0a.0.0\xe9
+1	0	c[\x5c*	\xe9\xffA\xe0
+5	0	 .*\x5c*[]a][abc]	aa.c.\x0a
+5	0	9]	cAB
+0	0	c\x5c*^\x5c)	xc\xff
+0	0	[]a][[:space:]]a?	 bx9B\xe0*.
+0	0	\xff[^a][[:upper:]])	x*\xe9B
+7	0	.*9$[\xe9\xe0]	
+1	0	[[=a=]] \xff[[:alpha:]]	0.B\xe0\x0a\x0a\xff
+9	0	{1,3}	
+0	0	[[:upper:]]	\x80*\xe0a.a**\xff
+1	0	0ab|cdaa	0
+0	0	\x5c*[[=a=]]{1,3}b	\x800a\xe9\x0a*0
+5	0	\x5c*	a0cb\xff
+5	0	\x5c)	\x80 .\x809.Bx \xe0\xe0
+5	0	.*\x5c{[[:digit:]]^	\xff9\x0aaxA*B \xff
+5	0	\x5c)\x5c[[:digit:]]+	0\x80\xffc\x80\x0a
+5	0	[abc]{2}?[\x5c1	. b\x0a
+5	0	B{]{,2}	.BBx*a\xffb 
+9	0	[^a][[:digit:]]\xe9ab|cd{{1,3}	\xe9
+3	0	[abc]	\xff.
+3	0	 [[.a.]][	
+9	0	9*cAx+	b
+5	0	x0[[:alpha:]]?	. 
+5	0	\x5c*B[]a]*.*[[=a=]]	*
+1	0	({2}9c[abc]+	\xe9 *a
+5	0	\x5c{A$	\x0a  \xff.  \xff.\x0a.
+5	0	\x5c(]	a \xe9BbA Bb*\xe0
+5	0	\x5c)x9\x5c*	Bx \xff
+1	0	[a-][a-][[=a=]] |	aa\x80Bbc\xff
+5	0	0	9\xffb
+7	0	[[:upper:]])[[:space:]].*[a-z]]	 9
+7	0	.)	aB9\xff0a
+5	0	9\x5c{	a90\x0a
+9	0	[[:alpha:]].	c* 
+3	0	\xe9$\x5c[[:space:]]	\x0ac.
+1	0	[[:digit:]]\x5c1x	.b\xe0\x80\x80b*b
+1	0	^[abc]	
+1	0	.*{2}\x5c1*(	* 
+3	0	ab|cd	Ac\x0a\xe0 
+5	0	{[[:digit:]][a-z]	\xe9\xe9c\x0a0\xe0\xe0\xff
+5	0	\x5c(ab|cd\xe9	A
+5	0	[[:space:]]9	\xe0  b\xe0\x0a*A
+9	0	)\x5c{{1,3}c(	Bx\x0a
+1	0	*?\x5c1\x5c.[^a]{2}	 
+0	0	[[:upper:]][[:space:]]^*[[:alpha:]]	9\x80 a
+5	0	^)?	Ac \x80
+0	0	 []a]]]	9\xffc\x80\x80a\x0aB
+5	0	?{	\x80
+0	0	\x5c$[[:alpha:]]	9 B\xe9c9
+1	0	[[.a.]]\xff.*	A9
+5	0	{[[:alpha:]][[:space:]]*B[abc]	c.\xff\x80\xe0\xe9 xb
+5	0	[[.a.]]0	
+1	0	+(a|b)*x\x5c*ab|cdb	Bc\xe9 
+5	0	*9?](a|b)*[^a]	\x80\xe0
+5	0	\x5c*\x5c)*{1,3}$*	xB.0a\xe9*.
+0	0	]\x5c. ?[[=a=]]	0\x0ab*\xff
+5	0	[[abc][[.a.]]	\x80
+1	0	[a-z]\x5c*[\xe9\xe0][\xe9\xe0]	A .
+9	0	ab|cd	\xe0
+5	0	(a|b)*\x5c*c{1,3}[[=a=]][[=a=]]	Aa\xe9cBcb9
+5	0	{,2})\x5c1[[:upper:]]?)	\xff.0ca \x0aac
+0	0	[a-z][[.a.]]+\x5c.\x5c[]a]	*
+1	0	\xe9|[[.a.]]{,2}\xff	\xff
+0	0	[a-z][^a]\x80	\xff* \x80bb \x0a
+9	0	c	*B\x80a\x0a\xe9\xe9\xe9ca
+5	0	[[:upper:]]\x5c*|b(a|b)*	B.c.0
+9	0	|b+\x5c(^	\xe9\x0aBbB\xe0A
+9	0	\xe9\x5c*x0	9A.*aB.\x0ab*
+5	0	)\xff$	\xffcx
+1	0	ab|cd)[^a]\x5c.[a-]	.00c*
+5	0	[[:space:]]x[[:upper:]]\x5c{	B\x0a*\x80
+7	0	\x5c{+?[\xe9\xe0]	c
+9	0	{[\xe9\xe0][[=a=]]\x5c\x5c{	\x0a.
+5	0	[[:upper:]]AaB	x\x80A
+5	0	[[:alpha:]]{2}	\xe0\xe9cB\x0aca0\x800
+5	0	.*[\xe9\xe0]	\x80
+0	0	{2}[[.a.]][a-]^	ca999.Bb.\xe9
+0	0	|[[:digit:]] A.[[:alpha:]]	 \x0a9*B
+0	0	.	c
+0	0	](a|b)*(a|b)**.*[[=a=]]	c\x0a\xff99\xe0c.bAB
+5	0	[^a][[=a=]]\x5c)|	a*Bc\x0ax
+5	0	?x[\xe9\xe0]\xe9\x80{,2}	\xff\x0a\xffB
+3	0	{,2}{\xff[\x5c*	0 x
+0	0	ab[[:space:]][[:space:]]	9A\xe9\xffac9
+5	0	B?[)\x5c19	
+3	0	[[:upper:]]	Ax0B\x800
+7	0	{)\xff 	
+5	0	{2}xb	*\x80a\x0a9*\xff
+1	0	[[:alpha:]]x[[:upper:]]	xaxBb
+3	0	(b\x5c($\x5c{{1,3}	\xe0\x80\x80b\xff\x80\xe0
+3	0	\x5c*	A*0B
+5	0	[^a][abc][[=a=]]\x5c(	\x0a
+5	0	[\xe9\xe0][[:upper:]][^a]{2}	.B *B
+5	0	{,2}{1,3}	\xff\x0a*\x0ab
+9	0	([[:digit:]]{2}*[a-]	\xe0\xe9\xffxbc*c
+5	0	[a-]^[[:space:]][^a] 	0\xe9c B\xe9\xff\x809\xe0\x80
+5	0	\x5c.	A9*BaAc0 9
+9	0	x	A0\xe9 \xff*c\xff
+5	0	\xff\x5c{[^a][[:alpha:]]	aBaxa
+9	0	{\x5c{\x5c{9ca	a\x80 \x0ac\xe9..
+0	0	[a-].*)	aAbcAx 
+5	0	.*([[:space:]] 	\x80B.c\xff \xffc x
+5	0	\x5cx\xe9	\xe0a
+1	0	A([	\x0aa
+5	0	[]a]{\xff\x5c1$b	cx\xe9B \xe0
+5	0	B0(+	 x0bc.\x800\xe9
+5	0	{1,3}{1,3}	aAbc9c
+5	0	\x5c[[:digit:]]	 B0.Acxb\xe9\xe9
+7	0	[abc]	acB\xe0B \x0a\x0ab
+1	0	{2}\x5c{\xff\x5c)	B.
+5	0	.*ca	\x0ac90.\xff0
+3	0	[a-z]\x5c(cB[[:space:]]	
+5	0	{	b\xe9\xe0 \xff
+3	0	{][[:upper:]]	c\x80x\xe9 0a
+9	0	\x80\x5c1\x80{{	cxB\xff
+1	0	[^a]	\xe0
+7	0	B\x80|	 \xe0B
+9	0	[[:digit:]]\x5c{|	cB\x0a\xffB**
+5	0	{2}{2}	*\x80
+3	0	*ab|cd{ab|cd^	*\x0a
+9	0	\x5c(\x5c{[a-z]*[^a]	\x80\xe9a.
+7	0	\xff[[:upper:]]{1,3}[[.a.]]b[a-z]	
+3	0	{2}[?\x5c	a\xe9a
+5	0	9\x5c*][[:space:]]	\xff\xe0c* 
+1	0	[[.a.]]{2}	c\x0a.
+5	0	(\x80ab|cd.\x5c\xe9	B\x80\xff\x0a*.\xff
+5	0	 [[.a.]]$	9xa\xe0x
+5	0	|A\x5c(\xe9	
+5	0	[\xff\x5c1	.\xe9A
+5	0	(+[\xe9\xe0]A	x
+1	0	{\x5c(.*[[=a=]][abc][[=a=]]	a0*a9Ba.\xe9B
+9	0	a{{1,3}[\xe9\xe0]^	BA\x0ab.0 B\xe9
+7	0	[^a][[:digit:]][a-z])(a|b)*	.
+5	0	[^a]*\x5c*9ab|cd[[:alpha:]]	*\xe0\x0aA0
+3	0	.*	c\x0a0\xe9
+7	0	A?[[=a=]]	\x80\xe9c0\xff \xe9\x0acB
+5	0	{2}^\x5c{a.*	\xe0xacc\xffaa. \xe0
+9	0	b	b.B\x80
+5	0	ab|cd[abc]{2})B	
+5	0	\x5c*\x5c{9\xe9A\x80	B
+5	0	{1,3}	 x*B\xe90\xe0*
+3	0	\x5cb[a-]	
+0	0	x\x5c.	\x0a99.
+7	0	[[:space:]]{1,3}\xe9[]a](a|b)*	ax\xe9x
+5	0	\x5c1	\x0aA0B .*a\xe9\xff
+3	0	[[.a.]][[.a.]]	\xe9A*.
+0	0	{{,2}b.*[[:upper:]]\x5c{	\x80B  b9
+5	0	\x5c.*	c *.a
+5	0	\x5c{{1,3}[]a])\x5c	cbcb\x80x
+5	0	[a-z]ab|cdA	\xff
+5	0	\xff9	aa.c\x0ax0xcA
+0	0	*B B{2}	 Ba\x0a
+1	0	[[=a=]].*	\x0axAb\x80
+1	0	9(a|b)*\x5c*[a	99
+3	0	{,2}\x5c{A[[:alpha:]]	c
+5	0	[\xe9\xe0][a-]\x5c)	A\x80b
+5	0	ab|cd	 B \xffAc
+1	0	(a|b)*	c\xe9\x0a.0.\xe0x\xffB
+1	0	[	
+5	0	^	a
+3	0	[[:alpha:]]?A^Aab|cd	\xe0A\xe9
+0	0	[a-][abc][^a]{	
+9	0	?	B aa
+3	0	\x5c){\xe9	\xffa
+7	0	[\xe9\xe0]\x5c)?.?[[.a.]]	\x80\x80\xff* Ac
+5	0	[[=a=]][a-z]	\xe9
+5	0	b?\xe99\x5c.[a-]	b\xe9cc a
+0	0	\x5c.$	\x0a
+5	0	bA	 9\xe99\xe0 \xe0 
+5	0	[\x5c[[.a.]]b	\xe0ac\xe0\x0a
+5	0	\x5c?[\xe9\xe0]\x80a[\xe9\xe0]	\xe0  \xff\x0a A9
+5	0	[a-]^	\xe9 Ab.\x0axB9
+3	0	.*a\x5c(|^{,2}	**\xe0x0
+0	0	)c	Bbx\xe009A\x80
+5	0	{,2}\xff	*B\x80\xe0
+1	0	A	
+1	0	$AA{	b\x0a
+1	0	\x5c[a-]	\xe0
+5	0	\xff [[=a=]][[:upper:]]9{2}	\x0a\x809.A\xffB00\xe0
+5	0	^[[:upper:]]\x5c19	\xe9\xff.*c\xe0
+5	0	[[:upper:]]\xff?[\xe9\xe0].*	0b
+0	0	[a-]	 bB.\x0a\x0a
+3	0	\x5c|[[:upper:]]	 *xa\xff
+5	0	+\xe9	a  A\x0a
+5	0	*[^a][abc]\x5c1	9cB*900cBx
+5	0	[[:space:]]\x80[abc]	
+5	0	{	
+5	0	[^a]9[[:digit:]]\x5c(	0 bax\xff\x80
+0	0	 	99.\xe9a\xe9b\x800
+1	0	\x5c1[\xe9\xe0]	a*.A0Bb
+3	0	9	0c\xe0b B\xe0
+5	0	[a-]..*c.	A\xe9*xB
+3	0	+\x5c{0B\x5c(	\xe9b9
+3	0	9([^a]{1,3}	b\xe0
+7	0	(\x5c.[^a]	caAA.9c
+5	0	[\xe9\xe0]\x5cc({2}[[=a=]]	c9.0*\xe0\x0ac\x80\xe00
+5	0	{,2}	.\x80\xe0 \x809b\x80.
+1	0	\x80\x80x(	Bb*
+5	0	\x5c1A	b
+5	0	{1,3}	B
+9	0	b|cab|cd	0.b \x800\xe9B\xe9bb
+3	0	x($c	c
+3	0	\x5c	*b
+7	0	.[[:alpha:]].*A?\xe9	A
+3	0	\x5c.\xff^	\xff
+7	0	[a-z]]A	0\xff
+5	0	[]a] [a-z]0^	 cA\xff*
+5	0	0	\x80*a\xe0 A 
+7	0	[abc]	00x\xe00c\x0a\x800
+7	0	][[:upper:]]\x80 [[:upper:]]	x
+7	0	\x5c{[abc]	Ba9x.\xe0acxx
+9	0	ab|cd[[:digit:]]ab|cdA	xc\xe9\x809a\x80ba
+5	0	[abc]\xff	 \xffb\xff0*c\xe900
+5	0	x?[a-]9ab|cd{1,3}	\xe9\xe9
+3	0	[[:digit:]]	A\xe0aa\xffA9b\xe0
+1	0	[[:digit:]][[:space:]]	Ac\x0a\xe9 
+7	0	[\xe9\xe0]a	c* BBB\xe90B
+5	0	{,2}^(a|b)*{2}	a\xe9b
+5	0	 [abc][	\x0a\xff\xff
+7	0	\x5c*0	\x80\xe0x\xe0\xe00\xe0A *b
+0	0	.*ab|cd	0\x0aab
+1	0	\x5c1{[[:upper:]]	A*\xe0B 
+5	0	[^a]\x5c{b+[]a].	.* \x0a\xe9A\xe0A\x80A\xe0
+7	0	9	c.\x0ac
+9	0	\x800	 BA\xff *\x0a
+9	0	[\xe9\xe0][a-z]{,2}B]\x5c{	9\xe9.9.*b00\xe9
+5	0	c[ABx	cBc9 c\xff9 A 
+5	0	[[.a.]]b\xe9[[:alpha:]][[:upper:]]	0x\xe0\x80\x80\xe9.xBx\xe0
+5	0	$*[a-])	.x\x0a9\x80A\xe0\xe9c9\xe9
+0	0	\xff	xAA\xe9cA\xe9
+7	0	[a-z]B\x5c*	9 \xe9a 
+5	0	ab|cd{1,3}	0.xb0\xff \xe9.
+5	0	\x5c{+(a|b)*\x5c{	Ac
+7	0	\x5c{	\xff\xffB9.b
+5	0	?)	0\x0a  cA*b.9
+5	0	\x5c\x5c1	0
+1	0	\x5c)(a|b)*[a-z]	\x80a b\xff\xe0
+1	0	\x5c*[[:upper:]][	B
+7	0	ab|cd	 b\x80b\xe9\xff.\xe9
+5	0	b$.[[:upper:]][\x80	cB
+7	0	[^a]x	\x80b\xe0 x0
+0	0	{[[:upper:]]\x5c{{\x80	9\x0a
+5	0	[[:upper:]]	0A
+0	0	[a-z]\xe9\xe9	\xe0.bAx\x0a
+3	0	\xe9	*b\x80c*Bx
+7	0	{2}[[:digit:]]9\xff$[[:upper:]]	x\x0aB*
+5	0	\xffb	\x80 90B bA
+1	0	?\x5c*	\x80 B.a*c
+5	0	\x5c	.x
+5	0	?	*
+0	0	\x5c.[\xe9\xe0]{2}	0\xff \xe0* .*
+5	0	\x5c{*[]a]\xe9B[\xe9\xe0]	\xe0\xff
+0	0	[[:upper:]]{\xff{,2}[[:alpha:]])	0\xff0
+5	0	c[[a-z][a-]	\x800x\x80 0\xffxB0a
+1	0	.*{,2}\x5c1	\x8099xA9 a
+0	0	{2}	.bxa.\xe9\xe9cA
+5	0	\x5c([a-z]{	B\xe9\xff9BaAx\xe0c
+5	0	B0\x5c1	cx*c a .c 
+5	0	B	xa\x800\xff
+7	0	0)	*c0A0
+5	0	||{,2}[\xe9\xe0][[:space:]][\xe9\xe0]	*xaA\xe900x
+5	0	*[a-z]A{1,3}	\xe0\x80A\xe0
+9	0	.*\x5c.	A*\xe9 
+5	0	({,2}\x5c.? 	c\xe0Axb\xe0\x8000x
+3	0	{1,3})\x5c.	b\xe0a9\x0a. \xe99B
+5	0	[[=a=]]	\x80b0b\xe9*b
+5	0	\x80.*ab|cd\x80	Aa
+9	0	\xe9A\x5c1.*.*	.
+5	0	ab|cd	  a\xff.9\xe0
+0	0	9\x5c\xe9^	9\x0a.\xe0\xff\x80.B\xff\x80
+5	0	{,2}[[=a=]]	A\xff\x0a\xff\xe9\x0abc\x800
+5	0	[abc](a|b)*\xe9]c	\xe0
+5	0	\xff{2}$*[[:digit:]]	0\xff9AA\xe9cB
+0	0	 \x5c(\x5c{[^a]	AcB\xff
+5	0	+[\xe9\xe0]\xff\xff|[	a0*0x\xe9c
+3	0	[a-])	\x80*0\xff.a 
+1	0	^	c0
+0	0	.*[[.a.]]\x5c)	\x80* \xe9
+1	0	[^a]?|[^a]\x5c.	\x0a\x0ab\xe999A\xe0
+5	0	\x5c(	\x80\xe0ca* bbB
+1	0	B{1,3}	x0A.
+5	0	.*[[=a=]]{[a-z]A\x5c*	\x0a*A9b
+5	0	A[[:alpha:]][[.a.]]*	x9
+5	0	{2}[[:upper:]]	xBa\x80B9 9A\xe9x
+3	0	B	\x809*xxa* 
+9	0	.\x5c(	00b\x80
+5	0	.A\x5c.	ABb\xff.B\xff
+9	0	\x5c{\x5c..* {,2}	AA\x80\xe9a\x80 \xffB\xe0*
+0	0	?\x5c.{1,3}[[=a=]]A	\x0abA \xe9\xe0
+5	0	B*[\xe9\xe0]\x5cb	c0 
+9	0	[[:upper:]]{,2}\xff[^a][^a]	c..\xe9a. .\xff
+3	0	\x5c{A$A	B9bB...*\x80*
+3	0	[abc]\x5c.	a\x80B BA.\xe0.ac
+5	0	.	.aa\xe9c
+1	0	a{1,3}\x5c)	B\x0a x
+1	0	\xffAa{1,3}	\x0a cA
+1	0	|.*\x5c.?	0\x80bx9 \xe9\x80\x809x
+3	0	{,2}({,2}[a-z][]a][abc]	*9\x80
+5	0	?[[:space:]]	b\xe0\x80x0\x809
+7	0	({1,3}{1,3}	x\x80
+5	0	\x5c)	Ax 
+5	0	[[.a.]]({](a|b)*\x5c)	a\x809\x80
+5	0	)	b \xe0A9B\x80
+5	0	\xe9[a-]\xff	A\xe099Bc\x80c9
+7	0	\x5c	\xffx\xe9\x80bc\x0a.
+5	0	\xff.\x5c(	\x80
+5	0	*[a-z][abc][[=a=]]b	\x0ab\x0a\xe0B.
+7	0	[[=a=]]{{2}	
+9	0	ab|cd\xe9B	B\x80b 0cb\x80\xe00
+0	0	\x5c)[[:alpha:]]\x5c.|	 0 B.*0*Ba
+9	0	\xe9\xe9[^a][abc]\x5c)(	\xe0\x0ac
+0	0	ab|cd[[:digit:]]\x5c	*\x0acx.\x0a
+3	0	0(ab|cd	0\xe9\xe9Ax.\x0a*x\xff
+1	0	(.*cA\x80[a-z]	.\x80c9\x80ba\x80
+5	0	[abc]\xe9(\x5c)\xe9[\xe9\xe0]	\xe9\x809.0. 00
+5	0	b[a-]	b9\xe0\xe0\x80xB
+3	0	B\x5c(\x5c{[{2}?	
+5	0	[ab|cd[a-z][a-z][a-]	\x0a \xffaB\x0aa90
+3	0	[\xe9\xe0].[[=a=]]A	axb. b\x80.*
+5	0	.{^[a-z]|	a
+7	0	9?\x5cab|cd\x5c(^	
+5	0	[[a-z]	A
+9	0	[[:alpha:]]	9BbB9.bc0\xe99
+7	0	\x5c1\xe9	*c 0c\xff 
+5	0	$[\xe9\xe0]	 \xe9c0aa90\x0a\xe9
+7	0	([a-]A	BaA \x80.c\x0abc
+7	0	0	\xe0x9*a0b
+7	0	^[abc]	.Axb\x80
+5	0	|\x5c?()	0B.\xe0A.\x0aa
+0	0	?\xe9[[[.a.]]	\xe9xcx99\xe0\xffx
+0	0	[\xe9\xe0][a-]?a	\xe9\xff\x80b \x80\xe9
+5	0	{1,3}?|	.a B
+5	0	*\x5c.[[:space:]]]+	b\xff.
+9	0	\x5c(	a\xff*aa.\x80\xff.0
+5	0	c	b*\x0a\x80b\xe0c99\x80b
+5	0	)]	
+5	0	[^a]	 bB\xe9c0\xff\xe9
+7	0	\xff	\xe0Ac
+5	0	[[=a=]]{2}[]a]^\x5c)	00x0Aa\xe9a\x0a.
+5	0	\x5c)	0B\xe0\x80.b
+7	0	]	9c\xe9.a
+0	0	a.\x5c*{,2}{0	\xe9
+5	0	[[:alpha:]]^(\xff\x5c)?	\x800B**\x80.cb\xe0
+9	0	 ({2}+	a.c*\x800\xe00\x80b
+3	0	[]a][[:upper:]]*\xff*[a-z]	x
+5	0	*	 \xe0
+9	0	c	\x0a0a \x80aca\xe9
+3	0	[a-][a-z]	\x80b*
+7	0	9	A 9B\xe0  a
+5	0	[]a]{2}9	9
+0	0	(a|b)*+Axab|cd[abc]	\xe9bxa\x0a\xe9b
+9	0	\xe9	 9\x0a b*\x809
+3	0	0)b	\xe9
+5	0	[[:space:]])([]a][]a]	\x80\x80\x80
+0	0	.*[	bc\x80a
+5	0	[a-z]B\xff	 0\xffAcA
+3	0	{1,3}[[abc][a-z][\xe9\xe0][	b\xff\xe9B\x0a\xe00a
+7	0	+\xff\x5c([a-]	\xe0cBxA
+5	0	[]a]0\xe9*Aa	
+1	0	[]a]\x5c){,2}\x80	\xe0xa
+0	0	?{,2}	9b*900\x80
+0	0	[a-][[=a=]]	xc
+5	0	 [[:digit:]]\xff	*xA **\x0a
+3	0	.*.*[abc][[:upper:]]\xff[[:digit:]]	c\x0a0
+3	0	0(a|b)*	.0\x0ac*0 .*9
+5	0	\x5c1[[.a.]]\xff[]a]	\x0a9\x0ax\xe9 .\x80A
+9	0	\x5c	\x80c 0*\xff
+5	0	|[[.a.]]0B\x5c.	\x80\xff cAxB0*b
+3	0	*\x5c{^	\xe0*9\x0aa0c\x80c
+9	0	[a-z]x	
+9	0	\x5c)[a-].[abc]\xe9\x5c)	9\xe9BB0ABBbB
+5	0	\x5c{	\xe0a\x0aA\x0aAc*\x0a
+9	0	.[a-z]	Bc9a\xe0x* b.
+5	0	a[^a]B{1,3}[[.a.]]\x5c{	
+5	0	^[[=a=]]Acx*	a\x0abacA
+5	0	?	c\x0a\x0ab
+7	0	*\x5c([[:upper:]]\x5c{1,3}	\x0a\xe9 .c\x0abx.
+5	0	\x5c)^[\xe9\xe0]A[[=a=]]{2}	0\x0a*\xe0*9\x80*
+9	0	\x5c{{1,3}|\x5c(.(a|b)*	acxA0 ..
+0	0	\xe9	a9.
+3	0	A[[:digit:]]]]	x\xe0 9b\xe9\xe0
+7	0	[[=a=]]*[[:digit:]]0\x5c1	.*cA \x0a90\xffx
+1	0	[[:upper:]])[[=a=]]ab|cd[abc]	\x0aa\xe0\xffA\x809
+0	0	[a-][abc]\x5c[a-]\x5c(\x80	\x80\x0a9B
+3	0	x[^a](a|b)*[a-]	c*Ba.A\xffa
+0	0	[[.a.]].*	0a
+5	0	{{	\xe0BB\x0a\xff\x80\xff \x0a
+9	0	)9{[[:upper:]]|[	0c\xe0ca
+7	0	[^a]\x5ca[	a\xe0\x80bb.00x
+7	0	[\xe9\xe0][^a]{2}\x5c.{,2}	\xffB\xffa\xe9a\xe0a
+5	0	\x5c.	B \x0a\x80\x80
+3	0	{,2}(a|b)*{2}\x5c.{1,3}[[:digit:]]	\x0a.9 *A\x80BB\x80
+5	0	^\xff\xe9[[=a=]][a-z]{,2}	.Bc
+1	0	B\xff	\xe0 
+3	0	c	
+5	0	[[:upper:]]xx[]a]$$	0\x80\xe9\x0a*
+5	0	*0	0 \x80\xe9xB.\x0a
+5	0	]	9*b\x0a
+5	0	[[:space:]](a|b)*\xe9	0a\xe9cAA
+3	0	[[:digit:]]	B \x80b
+0	0	[a-]\x5c{	9a0B0.\xe9
+1	0	[.*|{,2}	.cxx\xe9\xe9\xe0\xe9.B\x0a
+0	0	|([abc]?(	axb\xe0\xffc\xe0\xe9cAA
+5	0	ab|cd\x5c1(a|b)*\x5c*	B*ac\xffx
+9	0	{2}+A	Bc\xe9*B*c\xff
+9	0	[[:digit:]]+A\x5c*[[.a.]]\x80	Ax\xe9
+7	0	\x5c.(A|+[	x\x0a\xe9B\xe0B\x80B99c
+3	0	a(	\xe0 \xe0a* a\x80b0c
+0	0	\x5c)[[.a.]]|*)	cA\x0abB.B
+1	0	\x5c	xx\xffa0  9
+7	0	\x80[[:digit:]] \x5c	
+5	0	\x5c(c\x5c1^b	\xff\xff0AA\xe9\x0a9\xe9
+1	0	c	0aB\xff\x0a9\xffA
+5	0	A(a|b)*ab|cd\x5c	0 0\x0a90A
+3	0	?	\x80\xff.\xe90b99
+9	0	[]a][ [	\x0a
+7	0	[[.a.]].0]	\xe9.\x80*\x80
+9	0	[[:space:]]Bab|cd9	.B*\xff\x80c.
+5	0	([[:alpha:]]b|	0.x\x80\x0a9 \x80
+3	0	ab|cdB{2}[a-z]\x5c*0	ba c.xxA\xff\x80\x80
+5	0	\xff	9a
+5	0	^9	c\x0a9b.a**\x809
+7	0	[[:alpha:]][a-]	\x80.x0BBB90\x80\xe0
+7	0	x{0[[.a.]][\xe9\xe0](	
+5	0	|a[[=a=]])	*\x80\x80 *0
+9	0	[[:digit:]]\xe9+	 \xffc\xffA..\xe9\xe9xA
+1	0	[[=a=]].[[:upper:]]\x80	\xe9\x80\xe9xa09c
+5	0	\x5c*[[:upper:]]\xe9[a-z][a-z] 	x\xffc0
+5	0	0[[:upper:]]{,2}	B\xe0
+1	0	\x5c((a|b)*^)x{2}	\xffa\xff0A 
+5	0	{{|($x	0 b\xffb\xe9\xff0\x0a9
+5	0	[\xe9\xe0]0[a-]	.0\xff \x0a*
+1	0	\xff\x5c*	*\xe0
+9	0	[*c[^a]	xx
+3	0	)||	\x80\xffaA\x0a\x80.\xe0\xe0
+9	0	[[=a=]]^[]a].[[:space:]].	\xff\xffab9b\x80\xe9
+5	0	x\x5c.A{1,3}\xff	B Ac*\xe9 B9
+1	0	**[\x809|	
+3	0	\x5c([[	c9\xe00A0
+7	0	$	*\x80A9cA9
+5	0	|\xff9[a-z]|[[:space:]]	x\x80\x80b.
+3	0	][]a][[:digit:]]	B9B\xe0 *
+7	0	(a|b)*\x80 [[:alpha:]][]a]	\x0a.0*ab
+3	0	[[:alpha:]]{1,3}A	*c
+0	0	^+[[:alpha:]]	\xe09A c
+0	0	(a|b)*\x5c.{1,3}9	\x80c
+5	0	[[:alpha:]]^\x5c({1,3}[\xe9\xe0]0	x
+7	0	?((b	\x80Bb
+7	0	$ab|cd+c$	
+0	0	b\x5c10\xe9[[:space:]][a-z]	 cxx.Ba
+7	0	[[.a.]][abc][a-z]	9Bc0a.\x80\xe9\x0ab
+5	0	[\xe9\xe0]\x5c)*	\xe9.\xe0 c
+5	0	0	\x0axb0*
+3	0	\x5c[a-]	\xe0\xe9b\xe0 *\xe9
+7	0	\x5c\x5c1)[[:alpha:]].*0	
+5	0	A[\x5c1[a-z]b	B\xe9
+1	0	x\xff \x80{2}[[:upper:]]	
+5	0	[[.a.]]x(a|b)*[a-z]\x5c*?	*\xe9\x0a0\xe9*.\xe0
+9	0	[[:space:]]	99\xe0x
+5	0	[[.a.]]{1,3}\xff+	a0\xe0  x9B
+5	0	\x5c]	b0AA\xe9\x80\xe0aa.B
+0	0	{2}ab|cd0[^a]?[[:digit:]]	0
+9	0	9.*[[.a.]]^	.xc\xe0*x9x\xe9Bb
+7	0	[ *0(a|b)*\x5c(	B\xe0bb9cbB
+9	0	{2})[abc]*\xe9	c*b.
+5	0	\xff][]a]	.\xe0a\xe9*A\xe9\xe90
+5	0	[[.a.]].xb[]a]	9x\xff
+1	0	[abc]\x5c{,2}(a|b)*?[^a]	x\xe0.A
+9	0	\x5c.(a|b)*\x5c)	\xe0\xff9a0 ca*b\x80
+0	0	[[=a=]]([[=a=]]\x5c{?[^a]	*
+0	0	[[:space:]][\xe9\xe0]	x\xff\x80\x80\xe9c\x80\x0ax
+7	0	[x	 0\xe9\xe0.. x.
+9	0	x{2}\x5c(\x5c	\x0a*.\xe0\x80A90a\xff
+1	0	$	.00\xe9\x80B\xe0.
+7	0	*A	 \xe9 \x80b\x0a
+1	0	\xff\xe9[\xe9\xe0]	\xff0\x80
+5	0	{1,3}?\x5c\x5c)[\xe9\xe0](a|b)*	 *AABcB0c
+1	0	\x80	\x80\xe0b
+0	0	(	c
+1	0	[\xe9\xe0][abc][{,2}	\xff*b*\xe9\x80
+5	0	[[:upper:]]\xff[[:digit:]][[=a=]]	
+5	0	(	 *
+9	0	B+	x0a\xe0axb
+5	0	\x5c)9[[:alpha:]][a-z]	A
+9	0	b{,2}[[abc](a|b)*	ba*\xe9.A..\xe00
+9	0	c[abc][]a]a	\x0aAcc b
+5	0	b[[:space:]]ab|cd\xe9\x5c()	\x80*
+5	0	[]a](\x5c*	
+5	0	\x5c([[:upper:]]	0\x80
+1	0	[a-][[:alpha:]][a-z]00	c\x80
+5	0	ab|cd	\xff\xffax\xe90AA9\xe9\x0a
+7	0	(a|b)*0$	*A\x80
+9	0	\xff.*	0\xffc*A \xff
+1	0	\xe9\x80{?	\x0ac9\x80
+5	0	[[:alpha:]]9{2}[[:digit:]]c	c\x80\xff0
+5	0	{.{,2}	\x80B\xe0*  x
+5	0	[[:alpha:]](+0a[[:alpha:]]	\xe0b\xe0\xff0\x80.Ba
+0	0	[	
+1	0	||	xxB\x0a\xffa9AB\xe0 
+9	0	[a-][[:upper:]][a-z]	BAA ax9cB9b
+0	0	\x5c1	\x0a9b\xe0B
+1	0	|.	a0b\x0a\xff\xe00
+0	0	{,2}B{,2}\x5c(.	B\x0ab\x0a0bx
+1	0	c[[=a=]]\x5c.\x5c)	.*
+3	0	{1,3}[[.a.]]	0a\xe0\xff\xe9ba\xe9
+5	0	ab|cd	a\x0ax
+7	0	]{2}[a-z]?[[=a=]]	.a \x0aa0\x80
+0	0	[[.a.]]B*[a-][	a9
+1	0	\xff	A\xff.*.9.\x80\xff\x0a
+5	0	{,2}	\xe9a9
+9	0	c	\xe9bc9\xe9
+0	0	[[.a.]]	
+9	0	\xff(a|b)*|	
+5	0	[b[a-z]+{2}[a-z]	 *b*
+1	0	.*[[:alpha:]][[:upper:]]\x5c{[abc]\x80	b
+3	0	[[:alpha:]]xab|cd.	\x0a\x0a\x80 9A
+9	0	 b	
+5	0	[[:upper:]]|(\x5c.	 A00 \xe0 AA.
+3	0	b	
+0	0	)[^a]{	x\x0ac
+5	0	cab|cd)	B**\xff.9
+9	0	A?[^a]	0B\xe99a. x
+5	0	x	0. .Bb\x0a\xe0.\xff
+5	0	\x5c.[]a][^a]	* \x80
+3	0	A($[abc]	
+9	0	AB	 a09\xe9x\xe9B\xe0
+1	0	{2}^[a-z]c\x80.*	\x0aB.c
+5	0	[a-]+{,2})	\x0abb09A
+5	0	\x5c{[[:digit:]]	0\xe9\xff.b.B*\x80
+9	0	\x5c{[[:upper:]][]a]	b.B\x0a0
+9	0	[a-]A*+	x\xff9aB*Ba
+1	0	\x5c)\xff(a|b)*[[:upper:]][abc]	\xe0\xff.009
+7	0	[abc].]b.[	BbB \xff\xe999\x0a
+5	0	\x5c{[[:alpha:]]\xff{	Ax0
+0	0	\x5c)[a-z]\x5c*	\x0a0 \xe0\xe99c\xe9\xffc
+0	0	[[:alpha:]][^a]|$?|	xABB
+3	0	[a-z].*[[:alpha:]].*	\xff0 \xe0\x0a\xff9*B\xff\x80
+5	0	^$[A	\xe9.xAB\xe9A0\x80A*
+0	0	9[[:alpha:]][a-]c	\xff.\xff*0BB
+5	0	ab|cd[]a]\xff?	\xffb\xe0*AxA\xe0\x0a
+0	0	9+c\x5c).*$	99x\x0ac*.x
+0	0	*	9.A9A\x809aa
+1	0	[[:space:]]\x5c.a\x5c([[:digit:]]	.9\xe9.
+5	0	\xe9ab|cd[[:space:]]B[[.a.]]	\xff\x0acA
+1	0	+\x5c.b^	\x80ba c
+7	0	B[]a]	b
+5	0	\xe9x[^a]{2}[[.a.]]	cA*B.\x80.a
+9	0	\x5c)+ 	\xe0c\xe0Bc*.a9\xff9
+9	0	?9[[=a=]]\x5c*	b.\xe9\xffA
+7	0	c**A[[:space:]]{,2}	9b* c.\xe0
+5	0	[[:digit:]]{?+	\xe9 09x*cc\xe0
+7	0	)?(	a\xff9*.\xe9
+7	0	|A\x5c)[^a]	A\xe0\xe90
+5	0	 bB(a|b)*[{,2}	a\x80AB0\xff
+5	0	{\x80\x5c*\x5c)c[\xe9\xe0]	xa
+3	0	*x	AB\xe0
+5	0	$	A\xe9\xe0
+0	0	*{1,3}\xe99	\x0aB\x80.\x0a90\xe0\xe0
+1	0	B{2}*{2}	9\xe90a\xe9\x0axb
+5	0	[a-]{,2}\xff9	cB\xe0\x0a.**\xff
+1	0	\x5c{\x5c1	
+5	0	|.[[:upper:]][a-z]ab|cd*	\x80\xffc
+3	0	x[[:space:]]\x80	\xffb\xe0c\xe99\xe9\x0ac
+9	0	[abc](a|b)*)	 
+0	0	c{1,3}[a-z](a|b)*	\x0a0\xe9*c
+5	0	(a|b)*\x5c1[a-z][abc][[\xe9\xe0]	 x\x80\xffa.\x0a
+0	0	b{1,3}[a-].*	
+3	0	^A	Aa
+7	0	^\x5c.{	 x\xe9.a\x80x*
+1	0	.*]	
+7	0	.*[]a]A\xe9	.a\x80.\xe9B9*
+9	0	\x5c\xff9[[:space:]](	\xe9xx 
+5	0	|.	.b\xe0bb
+1	0	\x5c{ab|cda]{1,3}	cB\xe9\x80\xffAA\x0a xA
+5	0	\x5c.0	0a.*B\xe9B0Ax\xff
+0	0	[[:digit:]]\xff[[:upper:]]	\xe9bc9\xff x
+7	0	[]a]	
+5	0	\x80\x5c1	Aa.
+9	0	[\xe9\xe0]	\x80*
+3	0	\x5c{xab|cd[a-z][	*B\x0axx0\x80 \xe9c
+7	0	\x80]	a
+1	0	*{2}\x5c*9	9.c\xffBB*0x\x80.
+3	0	^[[:upper:]][[:digit:]]\xe9	9\x0a
+5	0	^\xff[a-][a-]	x\x8099A\xe9
+5	0	{{,2}A*[[:space:]][[:alpha:]]	0\x80BccBb\x0a
+1	0	  b(	0
+7	0	?{2}\xe9(a|b)*[\xe9\xe0]	
+1	0	[[:alpha:]][\x5c*	Ax\xe9.*c\x8090
+3	0	[^a]*^	\x0a.Aa\xff.b*x\xe0
+1	0	.0	 \x0a\xff
+5	0	[abc][[:upper:]]	\xe0\xe00 x\xff\xff.A\x80\xff
+1	0	?\x5c{	.\xe9\xffA9..B
+3	0	\xff\xe9\x80\x5c(	cax
+7	0	(a|b)*c[]a]	9A\xff
+5	0	|\x5c1x\x5c\x5c(	9A\xff*\xe9
+5	0	\xe9\xe9]^\x5c{	b c9
+0	0	[[[:space:]]	\xff.
+5	0	a	\x80*
+0	0	.	\xe9A\xffa*.c9\x0a
+7	0	+.*	\xff B\x80\xff\x80c.
+5	0	[\xe9\xe0]b]{1,3}	\x0ab \x0aA\xe0\xffbaa.
+5	0	(a|b)*^.*\x5c(\x5c*	BcB\xe9\x0a \xe9\xff
+1	0	][[:upper:]][[.a.]]\x5c	Aa.B\x80
+5	0	[abc]$b+{	\xe00*BxB
+5	0	ab|cd{1,3}*[[:digit:]]	\xe9*
+7	0	0[[=a=]]9	aB\x80\xe0x\x0a\xff\xe0\xff0\xe9
+0	0	[	c\x0a
+5	0	[^a]	
+0	0	\x5c.]	\xff\xe0A  *\xff\xe9
+3	0	|0{,2}]\x5c1	A b\xff*a.
+3	0	[[:space:]]	a*\x80B*A.00\xe00
+1	0	\x5c{\xff|	c**9\xe0\xe9c\x80 \xff
+7	0	A[[[.a.]]	xab\x80xx\xe0\x80Bc0
+7	0	{2}\x5c.{	
+0	0	.(a|b)*{,2}\x5c.	\xe0
+5	0	A\x5c*	Axx0ca
+1	0	({1,3}b	BA
+3	0	|)\xff	babcB0\xffB 
+1	0	(x	\x0aBBA\xffbA
+1	0	\xe9ab|cd[]a]\x5c(	*\xe0A0B\xe0 c
+5	0	[[:digit:]]c$.*.*	Bc\x80
+3	0	\xff[[=a=]][[{1,3}	\xff9\x80c\x0a\xe0\xe990
+1	0	(]\x5c.ab|cd	\xe9 \x0a
+5	0	 	
+5	0	)+	9\xff\xe0a.b
+5	0	b[abc]	\x80\xe0
+5	0	|[\xe9\xe0]*{\x5c{	.\xe00\x0ax0\x0ax9\xe9
+0	0	\x5c[a-]\x5c({2}	
+1	0	 a{,2}a(a|b)*	b\x0a\xe0\xe0 9\xe9a\x0a
+1	0	]{1,3}\xff	B \xe9\x0a\x0ac bBaa
+1	0	\x5c	 
+9	0	[[=a=]]{2}0	
+7	0	b{1,3}]\xe9^^	*ac 9\xe9.
+5	0	[[:alpha:]]	BB\x0a\xe9.b0.aA
+5	0	\xff\x5c.a]{,2}\x5c{	\xe9 B90*a
+1	0	{\x5c)	\xe0 \xe09a 9b
+0	0	|)	A.Aa0\xe9\x0a\xe0A0
+5	0	[]a]\x5c.	.*
+5	0	\x80[a-]^	BAB\xe9c\x0a*c0 \xe0
+5	0	\x5c{[[:space:]]0[]a][[:space:]][[:space:]]	**0\x80*Bb9b\xe0
+3	0	x[[.a.]]\x5c.{1,3}[[.a.]][]a]	90x\x0a\x0a0.\x80
+5	0	b{[[:upper:]]a[{2}	 a\x80B9
+1	0	\x80[[:space:]]\x5c1	\x809\x80b\xe9b Ax
+5	0	\x5c\xe9]	*a \xe9 
+3	0	\xff	\x80\xe9\x800a.a
+5	0	[]a][[:space:]]b	b9 a* A\x80c
+1	0	.*{	B\x0a\xe0.0\xe9
+1	0	{2}9\x5c)	\x800bAa\x0a\xe9
+1	0	\x5cA(	*0\xff\xe9
+0	0	|	0x\xffc\xe0bbx.\x0a
+5	0	.	\xe9 A
+7	0	ab|cdab|cd[[:alpha:]]	B9A\xffc\xff\x0a
+7	0	?ab|cd	* \xe0ba \xffxx\x80B
+9	0	{,2}[[:space:]]ab|cd	a*\x800b\x80\x0a \xe00
+1	0	ab|cd.B[[:digit:]]	c
+5	0	99[[[:digit:]]	
+5	0	x{2}\x5c(\x5c.[[=a=]]	\xe9xc\xe0\xffb\x0a\x0a
+5	0	[	A 0\x0a.\xffA9.\x0a\xe9
+5	0	9\x5c).*[[:alpha:]]	c \x0a9\xe0B cB
+9	0	\x5c(\x5c(	\x80.0\x0a
+5	0	\x5c.	.cB
+5	0	b\x5c*[^a]	x
+1	0	A[[=a=]]	A0\x80\x0ax c\xe9
+7	0	[[:upper:]]\x80?)	A \xffa0BBx9
+5	0	.xx{2}(	x*\xe0\xe0b0A\xe9.\x80
+5	0	\x5c\x5c{	\x80\xe99\x0aA\xff
+5	0	[a-z]|\x5c1\x5c.	0B\x0a
+9	0	0+[*)]	\xff\xffc*
+5	0	\xff\x5c*)[[:alpha:]][[]a]	a9c90Aaca
+5	0	)[[:upper:]][[:space:]]	\xff9\x0aa09c9.0\x80
+5	0	\xe9\x5c.\x5c\xff\x5c1.	\x0a*xBc\xe99A
+0	0	[^a]\x5c\x80[abc]	*\xff.a\xe0\x800BB
+3	0	aa[[:upper:]]{ 	\x0a.\x80
+1	0	{2}A	xa*B9A
+5	0	a[[.a.]]	9\x80Ab\x0a\xe0\xff\xe99
+5	0	\x5c(b	xA
+0	0	$	*90bc.
+5	0	|| 	\xe0 ccB0*\x0a
+1	0	?[\xe9\xe0]\xff.^	A.a.\x0aBb0
+5	0	[\xe9\xe0]	A\x80\x0a\xe9\xffc\xe9
+5	0	\x5c).*	A\xff
+0	0	\x5c.\x5c)	\x80 b\xe0\xff90*b
+5	0	\x5c1	Ba
+3	0	c[a-z]\x5c1\x80*	Aa\x80
+5	0	[a-]\x5c(	 .\x80.\x80B\x0a\xe0\xe0*9
+9	0	x\x5c.[[:digit:]]	..0 B0\xe9
+9	0	[^a]?B?[[:upper:]]x	
+5	0	\x80	xba\xff\xe9c\xe9.\xe9AB
+9	0	[[:digit:]]{1,3}{,2}x	xc9 *a
+0	0	[[:digit:]][[:upper:]]{1,3}	
+0	0	[a-]9]	\xff990cx
+3	0	.*[]a]	.c9\xffx
+5	0	( 	a\x0aBac\xff*Aa
+5	0	{1,3}	9\x0a\xe9a.\x80x
+1	0	A([a-][[:digit:]]\x5c 	\x800\xff\xffAB\xe9\xff\xe09A
+5	0	.*\x5c)(ab|cd[[=a=]]	bA
+9	0	?\x5c*$	aAb*\xe0c\xe9\x0a90
+1	0	{1,3}b c	\x80\xe0c\xe0BaB\x0ab\xe9\xe0
+3	0	\x5c*\xe9[[:alpha:]]b\x5c.	\x80
+9	0	A	B*.a.\xe9A\xe0\x0a\xff
+1	0	A\xffA]?	\xe09B
+0	0	[a-](	\x0a\xe9
+1	0	{(a|b)*?ab|cd	\x0a\xe0 
+5	0	x|[[:upper:]]\xe9ax	9. bx
+0	0	9ab|cd	\x80*cbc
+5	0	a	a\x80x .B
+3	0	[abc]..**[]a]	
+5	0	{2}?c	0\x0aB. 
+7	0	[^a](a|b)*{,2}[[:upper:]]\xff	0\x8000*0\x80\xe9\xe0.
+5	0	( 0[[:upper:]]	\x80xB
+9	0	$.*a{b\x5c	\xff9*0 *\xe9
+9	0	*.*\xff	\x80\x0a.\x80\xff.ax
+5	0	{2}\x80)	\xe9.\x80x.x*\x0axA
+5	0	{,2}ab|cd*a	x*aaA
+1	0	bc0[[:space:]]	*
+5	0	ab|cd^x[]a]\x5c{b	0\xe9Abb\xff
+5	0	.	
+0	0	[[:digit:]]B	\xff*
+5	0	\x5c.\x5c{ab|cd	\xe0
+7	0	\xe9	x\xffA.\x80\xe9B*.B
+0	0	[a-z]]	\x0ab9 \x800b\x80B
+3	0	|	\x0a\x80AA\x0ab
+5	0	+\x5c1	b.ba \xe0 a\xe9x
+3	0	.*]](	ccB\x0a\xe0
+5	0	\x5c(\x5c([\xe9\xe0]\x80	.*x\x80*
+7	0	[[:space:]][]a]x	Bx\xff0\x80
+1	0	\x80\x5c{\x5c{b\x5c1	\x0a\xe9b9\xff\xe9x\x0a
+5	0	\x5c)	9\x0a\x80a
+5	0	\x80a\x5c*.*x	\x0a...9c\x0a\x0a
+0	0	c\x5c({2}	 .\xe9\xff ...
+9	0	(*[[:upper:]]0\xffb	ABcb
+9	0	[[:upper:]]{,2}[[:upper:]]	9c*
+9	0	?[[:alpha:]]	\xe0\xff9 \xffc
+1	0	\x5c(\x5c)|	\xe0\xffBAB \xffB\xe0A
+5	0	\x80\x5c	\xe9A\xe0b
+1	0	bab|cdx[^a].	\x80c \xe909\x0ab\xe0a
+0	0	\xe9\x5c.	9
+9	0	[[:space:]]{2}?0	\xff
+9	0	|[a-z]\x5c.^\x80	\x0ac9*.b
+5	0	\xe9[a-][[:space:]]{1,3}	cB\x0acax0x\x0a*
+7	0	[[=a=]]\x5c0|x	xb\xff
+5	0	[[:upper:]][]a].*	b
+1	0	[\x5c{.*[[=a=]] [[:space:]]	\x0a\x809\x0a. \xff\xff
+3	0	\xff)\x5c..	\xffB.Ba 
+5	0	]	c 99Bc0\x80A
+9	0	[abc]\x5c1+^ 	.*.\xe0B\xe9\xe00
+7	0	]	**\xffa.9..
+9	0	9B\x5c{	\xe0A \xff9\xe9
+3	0	+^\x5c*\xff	c.*B.\x0aa\x80
+5	0	[^a] []a]([[:digit:]]	*BA\x80\x80x
+9	0	.	b\x80bx\x80
+5	0	\x5c*$x{1,3}$[	c.\xff
+3	0	0\x80(a|b)*\x5c*	*\xff*
+5	0	[^a]	90a\x80.\x0ac\xff\xe9\xe0x
+5	0	9x[[:alpha:]]	\xff\x0a.\xff
+3	0	?(a|b)*[^a][[:upper:]]^\x5c*	b\xe9bBbx\x0a
+5	0	[\xe9\xe0]{,2}?[[:upper:]]	
+3	0	[[:digit:]]\x5c{c[[:space:]].*[[:alpha:]]	 \xe9
+0	0	{\x5c(\x5c{2}[a-z]	B\xe0\xe9x \xe0.\x80
+5	0	[[.a.]]{2}[[:alpha:]]\x5c(	 \x0aBc
+5	0	9	x\x80AxbA
+5	0	{,2}[[:alpha:]]	a*09\xe0
+9	0	*.	A 0  0\x0a909
+7	0	+\x5c)	\x80cbx*\x80\xe9AA\x0aa
+1	0	{{1,3}9\x80[\xe9\xe0]	.
+5	0	\x80\x5c)[[:space:]][abc]{2}	\xe9\xffB\xe0
+3	0	A\x5c{{2}	\xff*A\x80aa
+5	0	[]a]\xe9c[\xe9\xe0]\xe9a	0xBc
+5	0	\x5c)(\x5c1[\xe9\xe0][[=a=]][\xe9\xe0]	.a\x80.A
+7	0	[[:space:]] \x5c)	
+5	0	{2}x[[:alpha:]]	A
+1	0	9B\xff([{2}	\x8000  Bc
+5	0	)){\x5c.[	
+5	0	c	\xe99B\x0aaA* ac
+3	0	.*[a-][^a][[:digit:]]?{,2}	\xe9\x0axc.\xffx
+9	0	\x5c*{1,3}\x80\x5c[a-z]ab|cd	\xe0
+5	0	[a-]\x5c10	\xe0c\xff\x80b*AB
+5	0	]	x\xe0x9c x\x0ab.
+1	0	{,2}(9	B\xff\xe0aa\xffA*a
+1	0	{[abc]	a\xff\x0a 
+7	0	c[a-]\x5c)	
+5	0	\x5c.[a-]9{1,3}	Ba0a\xe0\x80cxb0
+5	0	\x80[^a]9	b \x0aBb\x80 bA\x0a
+1	0	\x5c)	b9\xe9..bxAa
+5	0	[a-z]	
+5	0	[[=a=]].*\x5c 	\x80cx\xff\xff*\xff\x80b\xe9 
+5	0	([a-z]\x5c*{1,3}[[:upper:]][[:upper:]]	\xffb
+3	0	[$	
+9	0	.*[a-]x{1,3}	0\x80\xe0\xe90cb
+5	0	.*a	cc a\x80  \xe9 
+3	0	]{2}	0aa9\x0aBAx
+5	0	(a|b)*\x5c[]a]ab|cd	.0\x800b
+5	0	a(\xe9\x5c)[[:upper:]][[:alpha:]]	BB\x0a\xe9\xffx\xff\xe0A 
+7	0	|\xff[[:space:]][[:upper:]]0	\x0a\xffc\x0ax9\xe9b0\xff\xe9
+5	0	]	.xcbxB\xff\xe0\x80
+1	0	ab|cd[a-].\x80	B.\xe9
+5	0	a^	\x0a**
+9	0	)\xe9	 \x80ba\x80Ax
+3	0	[[=a=]] |x	\x0a\xe0\xe09\xe09a
+0	0	?\xff\x5c?	\x0a\xff0Aba.
+9	0	ab|cd[[:upper:]]\x5c1\x80[[=a=]]	9b. \xff
+5	0	[^a](a|b)*[[=a=]]]b[\xe9\xe0]	b\xe9x\x80B\xe9a9
+0	0	\x5c.[a-z][\xe9\xe0][^a]\x5c*	0*\xe9  0b
+1	0	{ \x5c)[abc].\x5c)	* 
+5	0	x[[=a=]]	\x0a\xe9\x0a.\xe0\xffxB\xff
+3	0	[a-z] \x5c1{1,3}]	axBAAc Ab.
+3	0	[[:alpha:]]?	0B\xe9ABb A.b
+5	0	. \x5c.*[	\xe0\x809\xe0B\xe9aA9b
+5	0	[a-][[:upper:]][a-]c\xe9(a|b)*	
+7	0	\x5c*]b.*[[:upper:]](	0cb 
+5	0	9	
+5	0	\x5c(A+x	Bx.9\x0a0Bx. 
+1	0	[[:digit:]]+	Bax\xe90bA\xe00x
+9	0	+ab|cd.\x5c)[[:upper:]]	a\xffc0
+0	0	ab|cd[abc]x\x5c	b0  \xe0 \x80
+7	0	\x5c(.*0(a|b)*[[=a=]]	Bc9
+3	0	{\x5c1	0\xe0 bb\xffxx\xff
+9	0	\x5c*{,2}0[\xe9\xe0]	\xe0\x0a*B \x0a.c\xe9\x0a
+5	0	[[:space:]]9\x5c)[[:digit:]]	\x0ac
+0	0	\x5c1c\x5c1	ax9\xe0\xe9
+0	0	(\xe9[\xe9\xe0])$\x5c)	. B\xff9
+0	0	)[a-z]{2}{1,3}\x5c*	x x\x80\xe0\xffx9\xe0
+5	0	x)9\x5c.	
+1	0	\xff\x5cA$[\x5c(	c0\xe9x9\xff0
+5	0	+^A^	\xe9\x80
+5	0	(a|b)*c9)[[.a.]]{	Bc
+9	0	{,2}|(	a\xff\x0a\xffc\xe0x\xe0
+3	0	x(a|b)* 	
+5	0	[[=a=]]?*(a|b)*^	\xe0\x80\xff.
+5	0	0[[:alpha:]]{,2}[abc]	
+0	0	\x5c^[[.a.]]	 xx\x80B
+0	0	$[[:space:]]\x5c[\xe9\xe0]	*cA\x0a
+5	0	\x5c{	\xe9c0 x\xff\x80\xe0B*
+0	0	[^a][[:upper:]]	ab*\x0a\x800A\xe9**\x0a
+5	0	\x5c{c\x5c*$\x5c)	0\xffB\xe0\x0a\xe0
+7	0	{2}\xff\x5c{	
+9	0	{2}.{2}B	
+5	0	[[:space:]][^a]+]A	\x0a.x*
+3	0	.*[a-]\x5c	A
+5	0	\x5c*^\x80 (a|b)*(a|b)*	\xff0a
+3	0	\x5c[^a][[a-]B	\xe9b9\xffx*
+9	0	+{1,3}b	a0\xff9 c\x80B
+5	0	[[:space:]])[[=a=]][[=a=]]	A0\x0aaB
+5	0	($ab|cd\x5c{9.*	bcx*ax*\xe0\xe9\xff
+9	0	[]a]|*c(	\xe09*\x0a\xffb\xe00
+5	0	\xffx[^a]+.*[[:digit:]]	c \x0a\x800Aac90x
+3	0	{2}	\x0a\x809\xffc*
+5	0	B[[:space:]][]a]B\x5c{	
+3	0	\x5c{	x
+5	0	(	\x80* \xff
+7	0	[[.a.]]9[a-]	
+0	0	ab|cd	c\xffA\x0ax\xe0.
+3	0	.\x5c)	aa\xe0A*ABx09
+5	0	b{,2}	B0\xff\xe0
+7	0	\x5c)\x5c\x80$(a|b)*	c
+5	0	\xe9[[:alpha:]].\xe9(a|b)*	\x0a\xe0bc*
+0	0	[\xe9\xe0]	x\xe0B\x80
+5	0	A[[:space:]]{,2}	xa0a\xffcA9\xff\xe0
+7	0	|?+\xe9	xab\x80
+1	0	\x5c.B[[:space:]]|x{	\xe0\xe0
+9	0	{2}[[:alpha:]]?*	x0*c\xff\xe0AB*\xffa
+7	0	ab|cd[[:digit:]]^?b	 \xff\xe0.B\x0a\xff ba\xe9
+5	0	(a|b)*\x5c{1,3}*( 	\x0a.
+3	0	?[c	B..\x0a\xe0
+5	0	[abc]	ca B\xe9\xe9*A
+0	0	+	bx\xe90
+5	0	. 	\xe0bxB 
+9	0	{	 bx
+7	0	(a|b)*{1,3}.	ca.\xe9
+0	0	[abc][[.a.]]*[^a]{1,3}	\x80abb00\x80
+5	0	^[[=a=]]{[[:alpha:]]{2}9	c0
+5	0	x[[.a.]][[:space:]]b	*cB.\xe9\xe9\xe9A\xffA\x0a
+3	0	.	 .\xff Aa\xe9xx0b
+7	0	B{,2}	\x0a \xe0c
+3	0	B{1,3}{1,3}{1,3}	\xe0.xBBBc
+5	0	\x5c.{,2}\xff[\xe9\xe0][[.a.]]c	\xe9\xe9B.Bb\x0a0\x0a.0
+3	0	\xe9	b\x0a
+0	0	$\x5c))$[[=a=]]\x5c*	AA0.\xff\xe0.xa9*
+3	0	9{\xe9	\xe9c\xffx*\xe9 9\xe0*
+5	0	[]a]{1,3}b	9\xff0
+5	0	+	
+0	0	[[:alpha:]]?^{1,3}	*\x0aac0A9\xe9
+5	0	^{	b\x80\xe0a\xff0.
+9	0	[[:upper:]]	\x80\x0a0
+1	0	.*[[:alpha:]]$\xff+B	c
+7	0	\xe9[[:digit:]]\xff?	\x0aBc*\xe0
+0	0	 c{1,3}cB	0\xe99
+7	0	[^a]\x5c1*A*[[=a=]]	A\x0a9\x80B0
+5	0	\x5c*xb	0\x0ac\x0a\x80bc\xe0\x0a\x80
+0	0	$?[[:digit:]]9A$	\xffBA\xe0\xe9\xe9xbB
+7	0	\x5c*	
+5	0	[[:upper:]][[:alpha:]]ab|cd)9[[:digit:]]	9.\x0aB \xe9Bxbb
+3	0	[]a]|B	b\xffB\xe9\xe0bcB
+3	0	bcA{1,3}	\x80* \xff
+1	0	[[:digit:]]\x5c$	0A.Bx\xe0\xff0Ab
+1	0	[abc][[:digit:]][[=a=]]A|	
+0	0	$0	B99\x80
+1	0	[a-z](a|b)*[[=a=]].*)[]a]	 0 \xffb.\x80b\xe0\x80
+3	0	[[=a=]]	*.
+5	0	[abc](9x	cA\xe9\x80
+9	0	 	990
+3	0	\x5c.	b\xe9bx\x0a \xe9
+1	0	[.*	\x80c 0
+7	0	x9*\x5c1\x80{1,3}	\xff\xe0AA0
+1	0	\x5c*	\x0a.0 
+5	0	x\xe9{2}(|	.\xe9xa\xe9\x0ax
+0	0	[[:space:]] [a-z][\xe9\xe0]+\xe9	\x80x
+5	0	c*	A\xe0900x
+7	0	[[:upper:]]9(	\xff
+5	0	|^\x5c.	B9\xe99\xff0cB
+0	0	\xe9[[=a=]]\x5c)a{2}\x5c1	
+3	0	\x80?)[]a]	 9\xff.
+5	0	[a-]a	0\x80\x0a 
+7	0	)\x80\x5c(.ab|cd\xff	9
+3	0	.\xe9[abc]	x\xff\x80\xe9\xe9 \xe9\xff .x
+3	0	\x80([\x5c*ab|cd*	 \x80 b \xe9ba
+7	0	\x5c0\x5c[a-z]{1,3}[\xe9\xe0]	*B
+5	0	[[=a=]]B.*\x5c([[.a.]]\x5c{	x*
+3	0	[[:upper:]]{2}	\xe9\xe9 \x80AA\xe9\xe0
+5	0	[[:alpha:]] ]0\xe9	B *\xffx*\xff
+5	0	\x5c)[ab|cd \xff	\xe9
+5	0	\x5c1	
+5	0	[a-]9[[:digit:]]	\x0a\x80a9
+0	0	[a-z]	.AB\x80A9
+5	0	[[:upper:]]ab|cdA\x80[abc]9	\x80 *\xe9*\xe9.\xff.\xe9
+1	0	[[:alpha:]][^a][[:upper:]]	\xffb 
+5	0	[[.a.]][[:alpha:]][[.a.]].	\x0a\x0acA.A\x0a\x80\xe99\x0a
+9	0	 \x5c1A	*.B
+0	0	\x5c	b\xff\xff\x800\x80.c\x0a0b
+5	0	{,2}x*\x5c(?.*	
+9	0	[[:alpha:]]	\x0ab
+5	0	\x5c	9
+5	0	)[abc].*[abc]0A	
+0	0	\x5c{	ba\xffA
+9	0	(	cAabx\xe9c
+9	0	{2}	\xe0B0 \x0a
+5	0	)(	\x0acbB
+7	0	\x5c1\x5c*\x5c.x[a-]	\xe0 \x809
+0	0	Bb(	\x80b\xe9c
+9	0	]\x80\xe9ab|cd|	
+5	0	\x5c([a-][[:alpha:]]ab|cd{1,3}[abc]	a\xff.ac\x809\xe0
+9	0	[a-z]\x5c(	
+5	0	\xe9^[[=a=]]bA\x5c.	\x0a9a\xffc*.Bc
+0	0	[[:upper:]]?[^a]	c90
+7	0	^|\x5c)[[.a.]]	Bb0*9*\xe0.\x0axa
+7	0	(a|b)*\x5c.A{1,3}{?	 a9 \x80
+5	0	[{2}[[:alpha:]]\x5c.[^a]\xff	\xff*b.\xe9. b
+9	0	\x5c.\x5c*[a-]ab|cd[[=a=]]	0b\xe9**
+7	0	b[a-z][\xe9\xe0]	\x0a0\xe99 Ax\xe9
+1	0	^[{,2}[[:space:]]	b\xe9\xe0x 0 Baa
+5	0	[\xe9\xe0][[:alpha:]][[.a.]]$\xff\x5c(	B
+1	0	\x5c(\xe9 A	BbA\xe9BA*x
+9	0	\xe9	c\x80AAaBaAxcb
+7	0	A\x809[a-]	9\x0axb99.a
+9	0	[[:digit:]]\xe9(a|b)*[[:space:]]B	*xa
+1	0	+{1,3}.*{1,3}$B	b9\xff\x800.\xe9\x0a
+5	0	a	\xff\x0acA9BB.a
+5	0	]	0*\xe0A\xe0
+1	0	|[[.a.]]	c.\x0a9\xe9.BB
+5	0	{1,3}{2}\x5c)[a-z]\x5c{\x5c.	\x0a
+7	0	\xe9	
+5	0	c).*a	ba
+3	0	c\x5c1?{,2}	xA0 
+3	0	) 9[[:alpha:]]\x5c(\x5c1	AAB.c*b*\xe0x
+5	0	||[[[:upper:]]{,2}	ax\x80.
+5	0	\x5c{?x{\x5c*	aBc\x800
+3	0	a[{[[:digit:]]c$	\x80*\xff.A.a\x80.\xe9
+1	0	\x5c*	B \xe0 A\xe0
+5	0	09[[:alpha:]]9	b*9\xff\x80
+3	0	|	b0\xe0c
+7	0	|\x5c([a-z][a-]	\x80
+5	0	.*{,2}+	0\x80B
+3	0	[[.a.]]$(a|b)*9[[:upper:]]x	cA\xe9A
+0	0	a [[=a=]][[:space:]](a|b)*	x9
+5	0	\x5c*	B\xe0**x0\xff
+9	0	{,2}{1,3}	Ac
+5	0	[[:upper:]]\xe9$\x5c)[[.a.]]\x5c)	\x0aB\xe9\xe0\xe9a9 
+1	0	{2}	B.c.\xe0\x0a\xff0\xe9a
+1	0	[a-z]\x80(	aa0\xe0 
+5	0	c{2}[[.a.]]	\xe09*A \x80\xe00Ac
+3	0	|\x5c*[[:upper:]]	
+0	0	b[]a]b	.  \x0a
+1	0	?[a-].	cc.
+1	0	\x5c*A*[]a]|	   x
+7	0	[[=a=]]{1,3}[abc][a-z]	*a\xe0.\xe0b*
+7	0	\x5c)[abc]ab|cd	\x80c\x0a\xe0.
+1	0	[abc][\xe9\xe0]^{1,3}	
+5	0	\x5c*	
+0	0	)\x5c(	  . \xff0\xe9cb c
+1	0	()	bA
+7	0	+	xxA*\xe0cb*B\x0a
+9	0	\xff[]a]\xff{	BBc 9
+1	0	\x5c{[[.a.]]b	bB
+5	0	+[[:alpha:]](a|b)*	*\x0a\xe0\xe9\x80\x80
+5	0	[[]a] 0)[]a]	
+1	0	^[abc][[:digit:]]\xe9{1,3}[	..b0\xffb
+0	0	{$\x5c{^	*\xffx\x80\xffa0b
+9	0	9a$[]a][[:upper:]]^	B0\x80b\x80..9 \xe0
+5	0	[[=a=]]	 0\xffb.\xe9
+0	0	\xe9	0b\xe0\xffxB*b
+7	0	[abc][a-][[.a.]]]\x5c19	\xe09A\x0a
+5	0	x	\xe09
+5	0	\x5c1c[[:digit:]]|[a-]	.b \x0a\xffB\x80\xe9
+5	0	[[:digit:]][^a]	BA \x0abBcxcx*
+5	0	\xff)+	\xe0\x80.\xffa\xe0\xe0AA
+5	0	B  a{.	\xe9ac A.
+3	0	[[:alpha:]]\x5c*[[:alpha:]]	
+3	0	\x5c|(	B
+7	0	[\xe9\xe0]..*	\x80A\xff b
+5	0	ab|cd)]\x5c{{,2}	9.\xe0\x80.xa*x\xff*
+7	0	{2}[a-][[=a=]]	\xe9
+5	0	[a-z][[=a=]][[=a=]]	\xe9B\x0a\x0a.A\xffbB0
+7	0	[a-z]	 cA0
+5	0	[]a]+{2}?	.ax*a\xffaacc
+5	0	([[:digit:]]+\x5c1+c	 
+5	0	\x5c	\xe9A\xe99B c
+9	0	\xff\xe9\x5c*	c
+0	0	\xe9$.[a-z](	b0*9\x0aa 
+3	0	]{1,3}\xff*\x80?	 0axa
+7	0	\x5c((a|b)*\x5c.)$	\x0a9.B\xe9B.\x0a\xffb
+0	0	+|[[:upper:]]$\x5c*(	.\x0aca  
+5	0	)?\x5c*A\x5c(	Abc
+3	0	\x80$[[=a=]]	9b\x800\xe99b\xe0
+5	0	\x5c1[a-z][[.a.]][[:space:]])|	A 
+1	0	\xe9	 \x0aB\x80.a\xe9*c
+5	0	9\x80\xff){2}	 
+9	0	\x80x	0c
+5	0	0\x5c*($\x5c*	*\xffb\xe0
+1	0	\x80[a-z]{,2}.	a
+9	0	(	.*a0\xffA\xe9\xe9
+5	0	B.*\xe9|	\xff\x80x\xe0\xe0B
+0	0	){\x5c.A\xff	B\xe9\x800\x0aB.\x800
+7	0	[^a]\x5c1	A0xBbbb\xe00A
+5	0	x\x5c\x5c*	
+0	0	x[[.a.]][[:space:]]^	B\x80A\x0aB\x80c\x80\x80
+7	0	x	a
+0	0	\x5c(B\x5c1	
+9	0	[]a]\x80.[[:alpha:]][abc]	\x80
+3	0	[\xe9\xe0]\xe9	bB\xe0x\xff
+5	0	[abc][[:digit:]][[.a.]][a-]\x5c{	\xe0
+7	0	]{1,3}$\x5c{	 
+7	0	b	\xffa\x80\xff\x80B
+7	0	{[]a]A0[a-z]c	.9a.B\x80a0\xe9*
+9	0	\x5c{0b(9[[=a=]]	\x80x\x0aB
+5	0	)	\xff9B*a\xe0B9A 
+5	0	(a|b)*	AcA\xe9
+0	0	[a-]	9\xe0 \xff
+3	0	[^a].c][	A
+1	0	+[[=a=]]	 xA* 
+7	0	{2}\x5c*A[[[:space:]]	 9b9bA\xff.9a
+3	0	\x5c)\x5c	
+0	0	\x5c..{,2}	c.00x*9x\xe0
+0	0	^+	 x 0b
+3	0	 \xe9^(a|b)*b	\x80c\xffc
+5	0	$\x5c)\x5c)\x5c1*{1,3}	a \x0a
+1	0	B[abc]a.*	00
+0	0	[a-z]?][abc]\x5c)	\x0a* *\xe0\x80cAax
+3	0	{1,3}[a-z]	c \xe9.c0B*
+5	0	[^a]{\x5c{B.*[a-]	\x0axxab*B
+1	0	\x5c([a-].{1,3}	A*\x0a0\xe0 *.\x0a
+5	0	{	AB
+9	0	{[[=a=]][abc][\xe9\xe0]|	A\xe00.
+5	0	\x5c.[{,2}\x80$(a|b)*	
+1	0	{,2}	\xe0\x80\x80\x80Bc \xffc9
+0	0	\x5c([a-z]\xff*	
+0	0	{1,3}c\xe9\x5c.^	9 cA
+9	0	 \x5c(	A \x0a\xe9\x0a*Ac9A9
+5	0	b[^a]	\x80b\x0ab\x0a.B.c\x80b
+5	0	c\xff0|{1,3}	 Baa\xff9\xffc c
+3	0	90	Bbax*.a. \xff
+5	0	\x80[[.a.]]	\xff* \xe9
+5	0	{	 \x0a9\xe09 \x0a \x80.
+5	0	]\x5c{\x5c.x[\xe9\xe0]	 a0b\xff\xff\x80a9
+5	0	[\xe9\xe0]\x80x	.0x.b\xe0
+9	0	{{2}	a\x80*\xff A*a.\xff*
+5	0	{2}b\x5c([]a]\x5c1\xff	b\x0a 
+9	0	[]a] [^a])[[.a.]]a	9\xe9a\x80aAa\xe0\x80A
+0	0	a[[:alpha:]][]a]	.\x0a\xff\xe9 
+5	0	 ]\xe9(a|b)*	b0\xff.c
+1	0	|{[\xe9\xe0]	*
+5	0	[a-]{ab|cd?\xe9	*\xe9\x0acxb\x0a.A\xe9
+0	0	)\x5c(?[[:space:]]	B\xe0..bxB
+5	0	a\xe9{,2} \x5c1	\xe0bb0AaA.\xe0
+9	0	x	a0.\x0aB
+3	0	[[.a.]][|a(a|b)*	xbA\xff\xff0
+9	0	\x5c1]	*B\x80\x80\xe0cbBBB\xe9
+0	0	^(a|b)*9	\xff\x0a*b 
+7	0	[[:upper:]]{,2}.*0	 \x0aa00\xe0Axx
+9	0	{1,3}c	cc*\x0ax\xe0
+7	0	 	b\x0a.
+5	0	[^a][a-z]{1,3}]	\xff.b*b\x80
+5	0	\x5c*	x*0a0A9bx*
+1	0	{1,3}{A[	b BB\xe9Aa\x80B\xff
+9	0	\xe9{1,3}[\xe9\xe0]\xe9+	 \xe0x\xe0aAc\xe9cA
+9	0	)(a|b)*	0*0\xffB \x80\x80*b9
+5	0	\x80	.\xe9xB9.\x80\xe9\xff9\xe9
+9	0	[[:space:]]	09\xff\x0a\xe0 *\xe9x* 
+5	0	\x5c1a \x5c)	aaAb\xe0
+9	0	)\x5c)ab|cd	\xe09\x0aABbA c
+5	0	[a-][\xe9\xe0]	.\xe9.\xffB\x80\xff\x80c
+5	0	[\xe9\xe0]\xe9B^\xe9	\xe0
+0	0	|[^a]^	\xe9A.b\x0a*a0
+1	0	?	\xe0x
+1	0	A	A\x0a
+5	0	{*^\x5c{{2}*	 c.9a.\xe9\x80cb0
+5	0	\x80\x5c)0{	c
+5	0	[[[.a.]]	\xffb0.\x0a\xe0*
+5	0	.*{,2}{1,3}[\xe9\xe0]A\x80	90c\x0aa
+3	0	\xe9	
+5	0	{\x5c[a-z][[.a.]](a|b)*[abc]	*bBBc**\xffc\xe9\x80
+9	0	\x5c.0({,2}	*0
+7	0	[a-z]\x80[[:space:]][[:space:]]	.xc0\x0a.\x0a0
+0	0	\xff(a|b)*.{,2}(a|b)*{	A\xe0Axa\xe9\xe9\x0a
+5	0	\x5c*b\xff	.
+5	0	x.*\x5c)cx.*	\xff\xffB
+5	0	9\x5c*)\x80	 *0B\x0a
+0	0	[a-]^	b9 bA\x0a99\x0ab0
+3	0	?	a\xff\xe0B0B\xe9\xe9
+3	0	.*\xff	9\xffB9\x80\xff
+9	0	\x5c{?(b{[^a]	99
+1	0	\x5c{	\x0a \xe9
+0	0	[a-]9a9){,2}	\xe0. 9x\xe00
+5	0	.	
+5	0	.*	0\x800
+5	0	{1,3}c	*acx\xe0\xe9\x0a.
+0	0	[[:space:]]\x5c*[[:alpha:]]	\x0a\xe9B0c \x80\xe9c
+9	0	\xe9.*\xe9[abc]c\x5c1	ca\xffx*\x0a\xe9\x80
+3	0	*[[:alpha:]]0|[[:digit:]]{	
+5	0	{2}\x5c)\x5c1[abc][a-z]	b\xe0x0
+3	0	[]a][[:space:]][abc]\x5c.	9*b0 9b\xe9a\xe0x
+5	0	c[[.a.]][^a]b	\xff\x80cB
+5	0	9?*[[:digit:]][a-z][a-z]	\xffxx\x80\xe9\xff \x0axb.
+5	0	A	BbaaAcb\xe0\x80a\x80
+1	0	*	
+9	0	[[:upper:]][\xe9\xe0][[=a=]]..	 9\xff\xe0
+5	0	[^a]{2}	c\x80\xe9
+9	0	 []a][[.a.]]0b\x5c)	\xe00a\x0a*
+1	0	$	0B
+0	0	[[:alpha:]]{2}	\x0a
+7	0	[a-z][[:upper:]]*\xe9[[=a=]]	bx
+9	0	\x5c1]\x5c.\x5cab|cd	*c c\x80.\xffc\xe9\xe0*
+0	0	..$\x5c1	\x0a\xe9\xffB*c\x0a\x80.
+9	0	\x5c*b+c[[:space:]][[:space:]]	cA\xe9\xff
+5	0	\x5cA^?\x5c{.*	\xe90\xff
+0	0	(B\x5c1\xff	
+5	0	{B\xe9 	A9
+3	0	x[[:upper:]]\x5c\xffx	\xe0B09\xffc00
+0	0	\xffab|cd\x5c1^\x5c{	\x80\x80\xe9B\xff. 9*\x80 
+5	0	\x5c{c{[[:alpha:]][)	.B\x0aB\x809\xe9\x0a\xe9c*
+7	0	[abc]	B
+9	0	[\xe9\xe0]\x5c*[^a]	.\x80*A\x80
+5	0	|.*(	\xe0\x0aa0b
+7	0	\xe9[[:digit:]](a|b)*.*\x5c*	B..\xe90\xe0\x0a
+9	0	.ab|cd(a|b)*b\xff	\xffx\x0a
+1	0	\x5c($\x5c1	A9B\xff*B
+7	0	[abc]b	\xff\xe90
+7	0	{2}[a-z] [abc]{2}[[=a=]]	..\x80xbbx9*\x0a
+5	0	$	\xe9\xe0babA\xe9
+5	0	0[a-z]c	A0Ab\x80\x80*bba*
+5	0	\x5c*\x5c.[abc][^a]	b\xff\x80Ac\xe0\xe9\xe0
+5	0	+x\x5c*\x5c{	c\xe90*
+5	0	[[:alpha:]]a(a|b)*a	*\x0ab\xe9a 
+5	0	9	A\xe9c\x0ac.\xff
+7	0	\x5c*	ab\xff0\xff b\xff\x0a
+0	0	([	9 \x0ax\x80A
+0	0	.B[^a]\x5c[a-z][[:alpha:]]	Abaa\x80x
+9	0	[^a]++[	\xe9\x80\x0a**b x
+7	0	A).*[[:alpha:]][abc]\x5c.	*\xe9\xe0\xff\x80a*0
+3	0	xc[^a]\x5c.[a-]	a\xff\x80a A \xe0\xe9 \xe9
+7	0	\x5c{\x5c*).*\x5c)	\x80Axcb\x0a.b
+3	0	[[:upper:]][*{2}	*\xe9
+7	0	[[:space:]]\x80	xx*\xe0.abAx*
+5	0	{\x5c(	\x0a\xe0B\xff\xe0*\xe9
+1	0	\x5c{({1,3}(a|b)*c[a-]	xbbx\xff*\x80
+5	0	c*(a|b)*{2}.*	*\x80\x80a0 A *
+5	0	{1,3}B(a|b)*ab|cd[[:alpha:]][^a]	\x0a\x0a*\x80ca\x80
+7	0	$?[[[:alpha:]](a|b)*	\xff
+5	0	(a|b)*\xe9	A\xff
+3	0	\x5c.[a-z])[a-].*?	\xff0.ba
+5	0	[a-]b]	x*A\xe0c\x0aa
+5	0	[a-z][\xe9\xe0]\xff{,2}.	 9c \x0a\x0ac \xe0
+7	0	|(a|b)*.[a-]]	\x80b9b\xff\xe0x\x80
+5	0	[[:upper:]] [a-z]^[[=a=]]]	
+1	0	\xe9[abc][a-]\x5c1|	\x80 x
+5	0	[abc]|9x[abc]\xff	B
+5	0	\x5c)	
+7	0	[[:digit:]]\xff	0* 9  Bc\xff 
+5	0	.][[=a=]][abc]	 Ax AB\x0a9
+9	0	ab|cd	Ab\xe0
+5	0	  	\xffA.c0\x0axx\xe0
+3	0	{2}	*xA\xe999b*a
+1	0	xx*[^a]^	
+5	0	[{[[:upper:]]{2}ac	bxbA**0x0\x80
+7	0	(a|b)*\xe9.*	b.*x\xe9b
+9	0	ab|cd	*\xe0.bAc
+7	0	x[[:digit:]] [abc]	9\xe9
+0	0	b*	  a*
+3	0	\x5c(	A\xe9\xe90
+7	0	ab|cd	Bc\xffb\xe0xx 
+9	0	[^a].*]	 B\xff*abb90* 
+0	0	[]a]9*	A\x80bx\x80
+0	0	[[:digit:]]ab|cd{	\xffbc\x0ax0.\x0aA.
+9	0	[]a]^\x80b0[]a]	\xff9b
+0	0	[a-]	A
+5	0	[[:digit:]]\x5c((9	c\xe9b *aA99\xe0
+9	0	[[:alpha:]]][[.a.]][^a])+	\xe9\xe0\xffBa\xe0\xe9
+5	0	[[:space:]]	\xffA\xe0\xff
+5	0	\x5c*[[[=a=]]	*c
+1	0	\x5c(\xff)\xe9[abc]	aa* \x80\xff909a
+0	0	{\x5c.	9.\xffa\x0a\xe0.\xe0
+1	0	[[:space:]]c\x5c(\x5c1	a
+5	0	{1,3}[{.*	9B\x80Ba 
+5	0	[a-]+[{,2}\xe9	\x0a\xe9bb\xe9axB9\xe0
+7	0	9].*\xffx$	\x80\xffcc9\xe0 .
+5	0	c[]a]\x5c{bA	*\xe0c\xff\x80\xff\xe9c
+5	0	{[[.a.]][abc]	 0aB0a
+9	0	\x5c.[[:alpha:]]\x80{2}{1,3}	
+5	0	|a[{,2}\x5c[	\x80x
+5	0	[[=a=]]\xe9\xff+	A0c9
+5	0	+	 0\xe9
+0	0	b\x5c1(	\xe9\x80x\x0aA\xe00x9 
+0	0	*[\xe9\xe0][a-]\x5c[	\x80\xff\xe0A\xe9
+1	0	a]\xff{,2}[[:alpha:]]	\xffA\xe0
+3	0	\x5c.{2}A[[:digit:]].	A\x0ax. *cx 9c
+5	0	[[:upper:]].[[=a=]]0$	A* 0x\xff\xe0.\x0a\xffa
+0	0	\x5c(	B9 9\xe9B*BB\x80\x80
+7	0	[]a]).	a
+9	0	\x5c\x5c{	 a\x80\xff\xff*\xff 
+1	0	B[a-z]\x5c1{1,3}ab|cd[[:upper:]]	\xe0
+5	0	a[\xe9\xe0]^	0x\x0a\xff
+5	0	\xe9[abc]{B*	ABA.B\xff\xe9
+5	0	([[:upper:]][[:upper:]][	\xe0 A\xe0*\x80 *Bcx
+5	0	c[[[:upper:]]x	9\xe0xa\x0aa9\xe9
+0	0	*	
+9	0	^\xe9[[:digit:]]	9Bc.9B *.
+5	0	[[:space:]]?x	\xe9\xe00\x80
+7	0	{,2}{,2}{1,3}9	*a\x0a09bx\xff\x0a
+5	0	c[a-z][^a]{(	c*
+9	0	^(a|b)*+ab|cdA	\xffb\x80a\x0a\xe9a*0\xe9
+9	0	[[:alpha:]][a-]a\xff+	\x80A .\xe0
+5	0	?[[:digit:]])|[^a]	
+9	0	.|{1,3}\xff	
+7	0	[	B*b.x .
+5	0	[[.a.]]\x5c(	\xff9\xe99*A
+1	0	^\x80B	\xe0A9
+1	0	09[[:upper:]][[.a.]][abc]\xe9	9x
+9	0	\x5c{	
+0	0	.	A0x\xffx\xe0 0
+5	0	9\xff	\xe9\xe9ccB\xff
+7	0	[[[:alpha:]]	bx0Ab\xff\x0a\x80*\xe0
+0	0	{2}\x5c.[	
+1	0	[a-z]\x5c.[a-]	\xffa\x0a\xe9\xe99a\xff0 \x0a
+5	0	[[:alpha:]]{1,3}[[:upper:]]{1,3}[[:digit:]]	\xe9\xe9ccxc b*
+5	0	) c[[:digit:]]\x5c(	AcxA90c
+5	0	]	 
+5	0	[[:space:]]\xe9[a-z]\x5c(a|b)*a	c
+7	0	[[.a.]]	\xe90\x80\x0a\xe0a
+7	0	\xff0^[abc]ab|cd{2}	 0\xe0B
+7	0	ab|cd[^a]\x5c)$	 .c\x0aB
+3	0	B	x
+0	0	{1,3}	a\x80\xe0.\x0a.\x80\x80\xff
+5	0	[\xe9\xe0]{1,3}a[abc]	a\xe9\x80
+9	0	Ax	9a*xxBx9b\xff
+3	0	|\xff*\x5c.	..
+0	0	ab|cd.*\x5c1[\xe9\xe0] 	bB
+5	0	[[:upper:]].B\x5c.\x5c.]	c9.A\xe9
+7	0	\x809{,2}a	a\xe0c\x80 \x0a\x80\x80A
+9	0	)\x5c^	bb a
+5	0	9[a-]\x5c([^a]	.\x80a0a\xe0c9\xe0\x80
+1	0	A{1,3}ab|cd?x	9* \x0a\xe9x9B\xff\x0a
+5	0	|[\xe9\xe0][[:digit:]][a-z]	\xffcb9.\x0a *
+5	0	[a-z][^a]A[^a]	B
+0	0	\xe9$	\xff\xe9\xe09c \x0a\xff
+7	0	)	\xffx\xe9\xffb\x0ac\x80\x809B
+5	0	\x5c({,2}	aa.B\xe09B\x0ac0\x80
+5	0	[[abc]	9\xff\x80.90 \x0a0.a
+3	0	\x5c{+\x5c*	\x0aABb\xff
+9	0	.*\x5c)	x AxA.
+7	0	x\x5c1[^a]$(	x\xe0x*\xe0
+1	0	[]a]9\xffBb.	b\x80a
+9	0	a$+\xff[[:digit:]]	x b
+5	0	(a|b)*[abc]A[[:space:]]	\xe9*.0 bb.
+5	0	[^a]	
+7	0	[[.a.]].[[:alpha:]]+a0	
+7	0	{2}\x5c).*.*\xff	cAbc.\x0aBB 
+5	0	\x80(a|b)*	\xe0\x0a0*\x0a b
+5	0	{2}\x5c))A[a-]	\x80A9\xff\xe9b00..
+3	0	\xe9	* bcb
+0	0	[[:space:]][a-z]\x80[abc]\x5c((a|b)*	00\x80Ax9\x0a\x0a9
+7	0	\x5c.[]a]9+[[=a=]]\x5c	A
+3	0	\x80[[=a=]]	9*
+1	0	{2}	0
+5	0	)	\x80ab 0
+7	0	[abc]	.a0b\xe9 \xe000B
+3	0	^	 \xe0
+9	0	]	 \xff\xe0c0Ba
+3	0	{c	\x0a*\x809
+5	0	(	\xe9\xff0x0\x80\x80.B
+7	0	9BB[[:alpha:]]	x*c.9\x80A\x80
+7	0	[\xe9\xe0]	\x809.
+3	0	.*A	\x80\x80\x0aB
+5	0	\x5c1{,2}{2}\x5c.	a\xe9x.\xe9\xff\xe9* 
+1	0	[abc][a-z]$\x5c	\x0a
+0	0	b[]a]c	A
+3	0	\x5c(x\xe9ab|cd[\xe9\xe0] 	Bx
+5	0	a[[[:digit:]]	b\xe9
+5	0	[[:digit:]]	
+5	0	0[[.a.]]\x5c{\x5c1	\x80
+7	0	{[\xe9\xe0].x\x5c\x5c)	0xa\x80\x0a0
+0	0	\xe9{[[=a=]]\x5c(	 b A\xe0Bx 0\xff0
+9	0	{,2}{1,3}$.[[=a=]]{	 \xff\xe99bA\xe9
+7	0	\x80+[^a]	Ab9
+5	0	?{,2}.*09	\xe09\xe00axBc
+0	0	^	Ax** 
+5	0	[[:space:]]ab|cd\xff[abc]	\x80c\xff9B
+9	0	9	c99c9AxcA
+9	0	.b\x5c(	c
+5	0	0x|[[:upper:]][^a]	
+5	0	\xe9{[\x5c{2}[[.a.]]	\xff\xe0B\xe0 b.
+5	0	[[:space:]]\x80 9	B\x80Bb
+3	0	)]\x5c*\x5c.	bac\xff\x0aB
+5	0	b)[[:digit:]]	.\xe9\xe0*\x0a\xe9c\xe0
+9	0	\xe9c[[:alpha:]]]	0Bb0\x0ac.
+5	0	\x5c*	A AA
+5	0	[[:alpha:]]\xff 	\xe0..*\x80cAa\xe9
+5	0	].{\x5c*[\xe9\xe0]	\xff\x0a9*A\xff0\x0a
+5	0	(a|b)*+|^\x5c*	\x0aax
+0	0	[[:upper:]]	\xe9\xe09bc\xe00\x0a\x80
+0	0	B[]a][[:alpha:]]*x	a
+1	0	?	\x800A099.*ca
+5	0	{2}0	\xffB
+5	0	{[[:digit:]][[:upper:]]\xff$[]a]	\x0a0
+0	0	^[]a]\x5c\x5c1\x5c*9	\x0a\xff B\x0abA
+5	0	\xe9\x5c*0	bcAca\xe0b\xe0\x0a c
+5	0	.*	\x80\x0a
+1	0	*	xc.\x80
+5	0	+	\x0ab\x80AB\xe0
+3	0	[[.a.]][[:upper:]] 	\xe0
+7	0	[	\xe9\xe0A0
+3	0	[[:space:]][[=a=]][^a]+	A\x0aa\x0a\xe9*\xe9a
+5	0	$B$	A\x0a\xff*\xff\x800 
+5	0	[^a]{,2}[[=a=]](a|b)*	x.
+9	0	.(a|b)*\xe9\x5c(	0.\x80a 
+9	0	A	\xff\xff9 \xe9Bbx
+0	0	\x5c1	9
+3	0	x	 \x80Ac
+9	0	[a-][\xe9\xe0]	\xe9b9 \xe0 \xe9
+5	0	[[:digit:]]	axx\xe0x
+3	0	[[:alpha:]][[=a=]]ab|cd[a-]0[abc]	\xe9\xe9\x0a\xff
+7	0	\x5c1(a|b)*+	9 
+5	0	[]a]\xffaB{	\x800x
+1	0	A[]a]	\x0a\x0aa
+3	0	^	
+1	0	(a|b)*\x5c*	 a\x80*cacxa
+5	0	[[.a.]]	
+5	0	{,2}\xff(	c*\x80B*
+7	0	\x5c)	
+3	0	{1,3}\x5c)\x5c1	A\x0a
+9	0	[[:digit:]]ab|cd?\x5c*	0xbb\x0a\xffa*\x0aBc
+1	0	[[:digit:]]	B9x
+5	0	B^.[a-z]	
+9	0	\x5c((()\x5c*	b9*
+0	0	[[=a=]]^	\xe9b\x80 .
+3	0	[\xe9\xe0]	cx\xe0c\x80
+3	0	[[:alpha:]]\x5c1{1,3}{	.*xA\xff\xe9
+1	0	[a-]ab|cd	\xe9a.
+5	0	[[.a.]]	\xff*.*\xe9\xff  a
+3	0	[[:space:]]aA]){2}	a\x80\xe0\xff\x80 
+1	0	B\xe9^{	\xe0abA\xe0.9x\x0a
+3	0	.*?	\x80\xff\xff0\x0aBc
+5	0	.*[\xe9\xe0]	\x80
+0	0	[abc])b$B	*a* \xe00ba
+1	0	[^a][[.a.]]	
+1	0	) ($	\xe9.*c0\xff0A
+7	0	.*\x5c)]{,2})	\x80ba
+5	0	a)	x\x80x
+3	0	[[:alpha:]]\x5c{\x5c)B	\x0a0\x0axB.
+5	0	?\xff\x5c.\x5c.([[.a.]]	9c.9\x80A*B\xff
+0	0	\x5c.[[:alpha:]][a-z]	b\x0a\x0ac\xe0\x80\xff\x0a\xe9a
+5	0	(a|b)*[abc]	.
+1	0	a[[=a=]][]a]a[^a]	\xe9\xff\xe99\xff\x0a
+3	0	0	a*
+0	0	[\xe9\xe0]\x5c1[[=a=]][[:upper:]]*	*Axb*A.*0x
+9	0	[[:space:]][[:upper:]]\x5c)	\xffb\xe0\xe0x9*\xe9 
+5	0	Ax[\xe9\xe0]	xB.A
+1	0	[a-]	b\xe9
+5	0	[[:upper:]]\x5c{	ba \x0a\xffb
+9	0	\x5c{\x5c1[[:upper:]]	*0\xe0\xff9
+5	0	[[:digit:]]{1,3}x+ab|cd[]a]	9\x80
+5	0	[[=a=]][abc]	b B\xe0.A
+1	0	A[a-]A \x5c*[]a]	b\xe9*b*Ba
+7	0	[[=a=]]ab|cd	0a\xff.A
+5	0	A	Bxa\xffb
+1	0	[[.a.]]\x80	 \x0axA
+5	0	0\xe9	
+0	0	?][a-z]	B\xff*9
+3	0	\x80B\x5c1\x5c(\x5c*	\x0ab\xe9ac\x0aAA\x80
+7	0	[[:digit:]]\x5c1{,2}[[=a=]]	\xffB*
+1	0	[\xe9\xe0]ab|cd.ab|cdc\x5c)	AA9Ab \xff\x0a\x0a.x
+7	0	$ [abc][\xe9\xe0].*	9B990\x0aB\xe0*x\x80
+3	0	x{$ [[=a=]]\x5c*	a
+7	0	[[:alpha:]][a-]B\xe9	\x80bB\xe0\x0a c\xe9\x80a
+3	0	[[:alpha:]]	x*\x80A\xff
+1	0	B{1,3}\x5c.	\xff\x0a.b*
+5	0	\x5c(c	\xe0A\xffxBc*\x0a0\xff0
+0	0	\xff[[.a.]]	cx\xe0*9a\xff
+3	0	A[abc]	x0BBa\xe00A 
+0	0	{2}\x5c{	\xe9.
+1	0	^(a|b)*\xe9{	c.a
+9	0	[[:alpha:]]\xff(9	bx*\x0aa\xe0xx.
+5	0	\x5c((a|b)*	b \x0a xxBxcxa
+7	0	c[a-z][[:upper:]]+\xff\x80	9\xff\x80AB\x0aB\x0a
+1	0	\x5c)x.	 \xe099
+7	0	[a-z]{,2}(	.c\x80B\x0a\xe0
+3	0	a|A [[:alpha:]][[:space:]]	\x80\x80B
+5	0	]	c\x0a.b 
+7	0	[\xe9\xe0]*[]a]\x5c)	bc.\xe9A
+1	0	A\x5c)\x5c{[[:alpha:]]	\xe9.\xff.0\x80b
+7	0	[\x5c*	ca9B
+0	0	{+	\x0aaB
+5	0	.*\x80[a-z]\x5c*A*	9\xe9A9x9*aBA 
+5	0	9\x5c^bx\xff	b .*\xe0
+3	0	{2}	a\xe9c.9\xe9\xff\xe90 
+5	0	\x5c1{	\x80\x80x\xff.
+1	0	\x5c(\x5c.(	\xff9\x80cc\xe9\xff9\x80\x0a
+9	0	+\x5c*ac	Ba
+0	0	[[=a=]][[:alpha:]]**	B\xe9
+3	0	\xe9[[:digit:]]c[a-z]9	\xffB\x0a.*Ab\xe9
+0	0	{1,3}\x5c	b0\x0a00
+5	0	0({,2}[[:alpha:]]]	0c
+1	0	\x5c((a|b)*	AB\x80
+5	0	[[:digit:]][[:alpha:]][[.a.]]	a
+5	0	[\xe9\xe0]\x5c)	
+0	0	[\xe9\xe0][[.a.]]ab|cd	.*
+0	0	*	x\xe90\xe0AB9
+9	0	\x5c*+[[:alpha:]]{,2}	BAB\xff\xe9*\xffAB\x0a
+5	0	[\xe9\xe0](a|b)*[[:upper:]]	
+0	0	(a|b)*	 \xff \xe9a
+5	0	[[.a.]][\xe9\xe0](a|b)*{	 \x0a9.c*a 0ab
+0	0	]c	9
+5	0	(a|b)*\x5c{[a-]	\xe0a*xb0
+1	0	\x80|][^a]	*
+5	0	[[:digit:]](a|b)*cc\x5c)	
+3	0	(a|b)*([^a]	B\xe9 b\x0a
+0	0	* 9[[:alpha:]][\xe9\xe0]\xe9	\x0aBcx
+1	0	a|{,2}[\xe9\xe0]	\xe9x9\x0a
+1	0	\x5c)\x5c1 \x5c*[[:alpha:]]\xe9	\xe0\x80\xe9
+5	0	{,2}	\xe0x\xe00
+7	0	0\x80{,2}\x5c1	 
+1	0	(a|b)*	\xe0 aAbA*bxa
+7	0	{,2}^ (a|b)*[\xe9\xe0]\xff	\xff.\x0a \x0ac*B\x80 .
+5	0	(a|b)*\x5c(A\x5c[[.a.]]	A\x80\xff 
+0	0	\xe9[abc]	\xff*\x80\x80aBB.
+1	0	\xe990	\xff0\x80\xffBa*\xff
+5	0	[[:digit:]].{2}[]a]\xff	9\xff09a9a
+5	0	0$9{1,3}[a-z]\x5c	0**\xe90.bc*
+7	0	+\x5c1	
+5	0	\xff	c\xff9\xe0cb. 9
+3	0	\x5c(.\x5c)+.*	BAA
+7	0	?	\x80
+7	0	9	\xe9b\x0a\xe9\x80
+7	0	\x5c1[[:alpha:]][\xe9\xe0](a|b)*0{	c
+7	0	\x5c([abc]	\xe99bcBb\x0a*Aa\x80
+5	0	\x5c[\xe9\xe0][[:upper:]]{1,3}\xe9?	x9\x80*B.\x0a\x80
+0	0	{2}{1,3})	\xe90. 
+5	0	[^a]\x5c*\xffA(a|b)*\x5c)	9B\x80x
+9	0	$B[^a]b|	b\xe90A\xffxA
+0	0	]c\xe9[]a] 	a
+7	0	\x5c)\xe9[[:alpha:]]$[abc]	 \x80A\xffxcB0\xe90
+5	0	^9[[:digit:]]	\xe9\xffb.
+9	0	[	\xe0\xe0
+0	0	{1,3}*	abb\x0a9\xff
+5	0	(a|b)*\x80[abc]\x5c)	\xe0\xe9\x0a b\x0a
+3	0	(a|b)*	\x0a.x\x80x\x80\x0aa A\xe9
+9	0	\xe9c)[]a]	.
+5	0	[[.a.]]a[[:upper:]][]a]{1,3}\x5c.	*b9\xff9\x80*b 9
+9	0	.[a-z][[:alpha:]]	\xff c\xff0bb
+5	0	(a|b)**x](a|b)*	a*x.\xff\xffaAx
+9	0	[[=a=]][[:upper:]].\x5c1[[=a=]][]a]	*\x0a\x809A\x80.A
+9	0	\x5c*{1,3}a[[:space:]]*	*
+1	0	[[=a=]]*x0\x80[	BcxAxb\xe0\x0a\xe99
+5	0	A+\x5c(\x5c)	.aB\x0a
+7	0	\x5c(b[\xe9\xe0]	\xff\xff
+9	0	9.\x5c.[^a][abc]\x5c*	
+5	0	\x5c)[[:space:]]x^\x5c	  \xe0x9\xe0
+5	0	[[:space:]]B[[=a=]]x(a|b)*\x5c{	\x80B9 
+9	0	[[:space:]][[:alpha:]]\x5c.	
+0	0	{2}[a-z]\x5c1[a-z]]	\xff0
+9	0	(\x5c){,2}[[:digit:]]\x5c*[[:digit:]]	\x0aBB0*x\x0a 
+5	0	$+	\xff\x809cB9bb
+7	0	)]	.\xe9AAb0 B
+3	0	[[=a=]]\x5c{?ab|cd	\xe0\xe00\xff9ca.\xff9
+9	0	[abc]	\xff.b\xe0*\x0aa.B
+3	0	[(	\x0aa\xe9\xff\x0a \x0a\xe0
+9	0	x[[:digit:]]|	*c\xffcBax.x\xe0x
+0	0	$[[:digit:]]\x5c1[	\xffxa\xe0\x80\xe9 0
+7	0	a\x80x{1,3}\x5c1	a
+1	0	\x80[[=a=]]\x5c{\x5c)[a-z]	\x80\x80\xe0*
+5	0	[abc][[.a.]]?\x5c	0\xe0B.\x0a\x0a\xe0a\x80x
+5	0	[[:upper:]]c	0 .bx0c\x0a
+9	0	[[:upper:]](a|b)*A (a|b)*	
+0	0	a\xe9[^a]{1,3}[[:digit:]]	0A\xe9\xffbaa.
+5	0	0^.{1,3}	B\xff09B
+0	0	[a-]c.{,2}	\xffBb\xe9\x80\x80A\x0a
+9	0	?0c|	
+7	0	\xe9	c.*B\x0a0 
+7	0	.*\xff0[9	\xff0\xe0*9A
+5	0	b	*\xe9\x0a00\x0a 
+7	0	[[:digit:]][[:alpha:]]	\x80A\xff\xe0a0
+9	0	[[:alpha:]]	b
+5	0	\xff.*x]	
+5	0	\x5cx\x5c1	 *
+9	0	\xff\x80\x5c)B	\xe9\xe9\xe90
+0	0	|+\x5c.	\xff\x0a*bB
+5	0	(a|b)*\x5c)^[^a]	\xff0*\xe0\xffAb
+9	0	$+\x5c.(a|b)*	.
+5	0	[[=a=]]{2}ab|cd	abb\x80ba\xe900\xe0b
+5	0	x{,2}x+	a
+0	0	[[=a=]]	x
+0	0	{2}\x5c)][]a][]	aA*\x0a
+3	0	[[a-][[:space:]]\x5c{	
+7	0	\x5c1[[:space:]] [[:space:]][[:digit:]][[:space:]]	a\xe00\x80\xe9\x80b
+7	0	\x80	.\x0a0*0c\xe9c
+3	0	\x80[abc].{,2}	\xffc\xff\xe0.a0*c
+7	0	{,2}	*a\xe9
+1	0	A\x5c1B[]a]	00 *0
+1	0	?({2}	9\xe9.\xe0.
+0	0	\xe9 Bab|cd+[a-z]	\xe0BBBA A
+3	0	[[:digit:]]{2}[[:digit:]])	a.\xe9xb9
+5	0	\x5c\x5c*^	0.9B\x0a
+1	0	{1,3}	\xff\x0a\x0a\x80bx.\x800\x0aB
+3	0	[]a]x^	\xe9B\xffB\xe9\x0a\x80\xe0\x0a00
+5	0	[a-z]	BcA\x8009 
+5	0	[[=a=]]].*a.	B0*0
+5	0	\xff^\x5c.{,2}c	bBb \xe0
+7	0	a9\x5c1	\xe9\xe0\x80*
+9	0	(	a.axxA9
+1	0	|{1,3}	b0
+3	0	[abc]	ABxc\xe00
+9	0	[^a]{A\x5c*)A	A\xff9 c\xff9ba*
+5	0	\x5c*[a-]c[[:alpha:]][[.a.]]*	ax\xe0
+1	0	[a-]	\x0a..a*x\x0a9A9
+5	0	.	0\x0a \xe090*9Bb
+5	0	\x5c($	Bcc\x80\xe9
+5	0	[abc]\x5c(a.\x5c.	BB*.\x800\x0ab.cA
+1	0	ab|cd	9a \xe9xx \xe0. 
+0	0	[[:upper:]].*[[=a=]]?	c 9\x80
+7	0	\x5c([[.a.]]\x5c.a9	9\xe0Bax\x80xa\x0a*
+0	0	[[=a=]]]){[^a][^a]	a\xe9x\xe9BB\x80
+1	0	(.*([^a]\x5c{\x5c(	\xffaBB\xe00\x80*c.
+5	0	[[:alpha:]]0[a-z][[[=a=]][[:digit:]]	
+3	0	*	a\xe9c
+3	0	[a-]c[a-z]{,2}B	Bbcc .
+5	0	[]a]	0\x0ab\xffa
+7	0	[[=a=]]).*[[:upper:]][abc]?	\x0a\xe0
+0	0	)	*c9x
+9	0	{1,3}*[]a][[:upper:]]	*\xe9\x80\xe9 ccB*
+5	0	[]a]B$\x5c)x	b0ca\x0ax\xff
+7	0	]?]	B\x0a\xff.a9a9
+0	0	.*0 \x5c1B*	\x0a
+0	0	.	\xff\x0a\x80x 
+5	0	[[:space:]][[:digit:]]	c.B\x0a\xe00\xe9 \x80*
+7	0	)[\xe9\xe0].*[\xe9\xe0]a[[=a=]]	\x0ac\x0a\xff\xe0.\x80c\x0a.a
+7	0	bc	c a
+5	0	*\x5c*b [[:upper:]]{2}	A\xe0\x800\xe09c\xe0\x0a*
+7	0	\xff	0\xe9xA\x80Ac\xe9\x0a
+9	0	ab|cd.[[.a.]]x	\xe00
+5	0	[	
+5	0	)[]a]({,2}\x5c*[[:space:]]	 9\x0aB\x80\x0a
+3	0	[abc][\xe9\xe0]\x5c.\x5c(|\xe9	9\xe9a.
+7	0	a	x\x0a\xe9
+5	0	*|.[[:space:]]{2}	
+3	0	[^a]	\xff\xe0c
+5	0	][]a](a|b)*[\x5c1x	9*
+0	0	\x5c{	.\x0aBBcB\xff\x80.A
+1	0	\x5c.[[.a.]]c\x5c*)B	\xe0B\x80
+5	0	B{,2}	a*B\xff\xe0\xe0.a
+0	0	+()	b 9\x80\xe9 0
+5	0	[^a]|	Bb\xe0B\xe90A
+1	0	[[:alpha:]][a-]\x80a	xx\xe9A
+5	0	{,2}[[=a=]]{2}	xb
+0	0	\x5c{[[=a=]][[:upper:]][abc]	*Bba\xe0Ax
+0	0	{2}	 0*x.
+0	0	[[:digit:]][[:alpha:]][[:space:]]^{	.b\xe9\x0a0b\xffA
+5	0	[[:digit:]].*\x5c([[.a.]]	
+1	0	[[:space:]]\x5c1[[:space:]].* \xff	a \x0ab.\x0a\xe00a.
+5	0	A(a|b)*[\xe9\xe0][^a][[:space:]]	0\x0a99x\x80.\xff.  
+9	0	\x5c{[^a][\xe9\xe0]	.
+9	0	[[:upper:]]	*x.\xe0
+7	0	{2}{2}a\xff\x5c({2}	acb\xe9\xffa0
+0	0	[]a]9bab|cd\x5c)	xb\x80**\x0a9\xe0\x80b*
+3	0	\x5c{	.bAB
+9	0	\x5c*[[:digit:]][[=a=]]x	  \x800A\xe9
+7	0	[[:digit:]]\x5c*	\xff.\xe90\xe9cB
+5	0	[[:upper:]][\xe9\xe0]\x5c*b	\x80\xff\xff0\x0a
+7	0	|x	0
+5	0	][^a]\x5c{[[.a.]]\x5c.[	\xe0
+3	0	0	 cbb
+5	0	[]a]\xe9\x5c1	\x80\xe0 cx\xe0.\xff9
+7	0	 b	0 a.\xe9.\x80\xe09x\x0a
+9	0	ab|cd	A\x80
+3	0	[^a]0[a-].\x5c(\x5c1	B0\xe0
+5	0	x.	\xe0a\xe000x
+1	0	[^a]	9xAA*B
+0	0	$][a-z].* $	\xffxx\xe9x\xff\x0a 0x
+5	0	c0.\x5c1\x5c1[a-]	\x80.\xffB\xe0\x0a\x0a9
+5	0	a	\xe9\xe9x*99c*A
+1	0	|	Aa \x0a
+1	0	\x5c1	c0
+7	0	x(	bB\x80\x0a\xe0
+9	0	^	Bx
+5	0	]{1,3}c [[=a=]]]	a9BcA*0.0
+7	0	[[.a.]]){,2}9	\x0a\x80\x80.\x80
+5	0	[a-][[:alpha:]]?	\xe0\x0a9\xe0A99
+5	0	c[[.a.]][[:space:]]\x5c1	\x80a\xff9.\x0a\x0aA\xff 
+7	0	\x5c*\x5c([a-z]\x5c0\x5c)	9\x0abA\xe0\x80c.\x80 
+0	0	)*.*\x5c1[[:upper:]]A	
+0	0	.^(^][[:upper:]]	\x0a0*9xc0
+9	0	B	
+5	0	^\x5c.?[^a]	a\x0a 
+5	0	*B9	99\x80A\xe9
+3	0	$	Bac*\x80a\xff0 \x80c
+9	0	[a-]{1,3}	\x0aAa9\xe9b
+5	0	|	B*\xe00*
+0	0	[[:space:]]	\xe9\x0a
+5	0	{1,3}\x5c(\x80xB	\xe0*Bc.B\xe9a
+3	0	{1,3}.*ab|cd\x5c([[:alpha:]]{,2}	\xe9*aB
+5	0	(a|b)*|(a[a-]	\xe0
+1	0	{,2}[[:digit:]][[:space:]]	\xe9\x0a9x\xe0\xe09
+3	0	\x5c*? (a|b)*[abc]	c.c
+9	0	\x5c(	x\x80x9
+5	0	?	\xff\xe0\xe0
+5	0	\xe9	xabb9A\x0ax
+0	0	\x5c)	A \xe9\xe0
+7	0	c[[:alpha:]][a-z][a-z]*\x5c*	\xe0\xe9x\x80
+3	0	^[a-z]B{,2}	\xff
+9	0	.*	\xe90.BAx\xe9 Ba
+5	0	.\x5c{+ \xff	*a9 a
+7	0	[a-z]x(ab|cd{1,3}{	0 x0A\xe0.B*\x0a\xe9
+5	0	||\x5c{ 	\x0a\x80
+9	0	(a|b)*0[a-z]\x5c*B	a\xffB\x0a\x80
+3	0	.*	0bc\x0aA*. 
+0	0	{,2}*[\xe9\xe0][[:space:]]	\x80
+3	0	\xff[\xe9\xe0]a[abc][[=a=]]\xe9	x99x0b\x0aA
+3	0	 ?[[=a=]]\xe9^\x80	bB90\xe0.
+5	0	|90c[[.a.]][[=a=]]	 bx*\x0aa.*b0
+5	0	.*[abc]	0a\x0a\xff\xe0\x0a
+3	0	\x5c([[:upper:]][[:upper:]]	b9
+9	0	[\xe9*	*b0bB
+5	0	(a|b)* 0$	A0\xff\xff
+0	0	{2}[\xe9\xe0]0c$[[:space:]]	 c*Ba\xe9\xe0xbxc
+1	0	[[:alpha:]](*{1,3}	.9\x80x\xe0x\xe0
+0	0	[abc]\x5c(a$^B	\xe9.\x0a
+9	0	[^a]	x\xe0a*B*B\xe09c
+7	0	[[.a.]]|[a-].{2}	 
+3	0	\xff{2}\x5c1[^a]9	\x80cx\x0a\x0a9
+7	0	(a|b)*[$\x5c1[[:digit:]]x	\xe909xA9a*
+5	0	a[abc]	\xe9*0\xff\xe09
+7	0	\x5c1	\xe0B\xe0 \xe9\x0ac
+1	0	{1,3}{\x5c[a-]\x80|	\x80\xe0\x80x
+5	0	\x5c).{2}\x80{,2}\x5c*	a\x0a*
+5	0	{[[=a=]]	b*c9\x0a\x80c\xff\x0ax
+5	0	][a-](a|b)*c[abc][[=a=]]	x\x0a\xff*x
+5	0	\x5c$[abc]\x5c)	caax9AA.\xe0
+9	0	]B	0
+1	0	$\x5c(.9	
+5	0	\x5c(^()	A
+1	0	*A	 B
+5	0	[\xe9\xe0]x[[:upper:]]ab|cd[a-z]	
+3	0	a\x5c1[a-].*[\xe9\xe0]	
+0	0	[^a]	a0cA \xe09
+0	0	[a-z]{,2}[[:digit:]][a	\x80a \xff*.\xe09\xff
+7	0	(a|b)*]B	Bc\xe09B.\xff\x0a*
+0	0	[{1,3}\x5c*a[]a]	B9\xe9
+5	0	(a|b)*B[[=a=]][[.a.]]	0.\xe0.\x80*\x0a\x80cc
+9	0	[[:alpha:]]{,2}\x5c1c[\x5c	\x80\x0a
+5	0	(a|b)*[[:alpha:]]\xff	\xffa 
+5	0	[[=a=]]|	a\xff\x0a.9c0xa
+7	0	0	 .\xe9\xffa
+0	0	\x5c1\x5c{\x5c*0	\xe0\xff009\xff\xe9\xe9A\xff\x0a
+1	0	\x80{,2}	B0*\xe00x\xff \xe0*x
+5	0	 	B*bac \xe0c
+5	0	[[:upper:]] (x	0bA0
+5	0	|[[=a=]]\x5c{\x5c(\xe9	 
+1	0	(A)	Bbxc\xe0A\xe9\xe9B\x0a
+3	0	\x5c*x[[:alpha:]]\x5c{[[:digit:]]	Bb\xe09\x80\xe09.
+5	0	c|\x5c()[^a]?	0\x0a\xe9A0b
+3	0	?a\x5c*\x5c{[[:space:]]	9\xff0a.c\x80 b
+5	0	][a-z][[.a.]]b{(a|b)*	9\x80\xe9
+5	0	\x5c1[a-z](a|b)*{1,3}x(	\xff\xe9\xe0.\xe0
+9	0	\x5c*B[a-z]{,2}[a-z]\xff	\xe0x9aa0\xe0
+0	0	{1,3}	\xffa9A
+9	0	[^a]\x5c{[[:space:]]\x5c1+	\xffa
+3	0	[[=a=]][[=a=]]$	\x80 .xcA.A*9
+3	0	b[[:space:]]+ab|cd|.*	\xe9\xe0\x80\x0a\x80bxaB\xe9
+3	0	\x5c(cx	00\xe9x B
+5	0	[abc]{1,3}[\xe9\xe0]\x5c	*\xe0\xe9\x0aB\xe0.9
+0	0	^[\xe9\xe0][abc]	ax
+7	0	\x80	 9\xff\xe00.\xe9A*
+9	0	]\xe9.**	cc
+5	0	(a|b)*	
+5	0	\x5c1{1,3}A[[:upper:]]	0\xe9\x80\xe9
+0	0	.*\x80\x5c([a-]	
+5	0	\xff[\xe9\xe0]\x5c(	\xff\xff.\x80
+5	0	9\x5c{2}	*
+5	0	.[\xe9\xe0]B	\x80B\x0aBA\xff \xff\xe9b
+3	0	a\x5c*	c\xff*.\xffa..
+9	0	[\xe9\xe0])\x5c.[[:space:]]	.\x0a**\xe9\x0aAx
+0	0	*\x5c)\x5c1	\x800\xe999AB\xe0b
+5	0	{2} {\x5c1	
+1	0	]\x5c.{	  c.B
+7	0	[[=a=]]. (a|b)*B[[:upper:]]	9aac
+5	0	[]a][[=a=]][abc]*	xA0\x80.\xe9x
+3	0	([a-]	b\xe9 \xff**x
+5	0	A[^a]\x5cc[]a]	0.
+3	0	?$	B\xff.AaA\xe9AA\xffc
+7	0	\x5c1b[[:digit:]]	\xe9.**b\xe0 c
+5	0	\x5c.\x5c9.*[{,2}	\xe9c9.\xff*\xffb
+5	0	\x5c)x{,2}	\x80*
+3	0	\x5c{ 	.\xe9\xe9\xffA\xe0\xe9b09B
+7	0	$	
+5	0	b()\x5c)[[:space:]]a	\xff\x0a9\x80BB\x0a
+3	0	{,2}{,2}0{*	.\x0a*cxB*x\x80a
+3	0	\x5c.	A*ac
+5	0	{[[:space:]][a-z]\x80	0B\x0aB\xe9BxBc 
+0	0	[[:alpha:]]$[[:space:]]	
+9	0	\x5c1[^a](a|b)*	B*b*AAx
+9	0	[[.a.]][[:upper:]]9\x5c|[a-z]	\xff  a.\x80
+3	0	[^a][[:upper:]].*.*[]a]	B9.
+9	0	^[[:alpha:]]	\x80\xe0ac
+1	0	[[:upper:]]\xe9?$	c\xe9B
+5	0	\x5c1\x5c)	0
+5	0	[a-z][[:digit:]]	0\xe0a
+5	0	)\x5c{[[:upper:]]\x5c.	\x0a\xe0 b.xaABB\xe0
+7	0	\x5c(	   a9\x80
+9	0	[\xe9\xe0]	00c\xff\xff\x809
+1	0	*[[=a=]][\xe9\xe0]	0\xe0.*bxBb 
+5	0	\xff	\x80\x80A
+5	0	0[[:digit:]]. \x5c1	9x\x80c\x80 \x0aA 
+1	0	\xe9B	\xe9c9
+1	0	A\x5c{[[:space:]]*	\xe9*b
+5	0	\x5c1	*xbAbx09aB
+5	0	B[a-]	a
+5	0	|ab|cd\x5c	9\x0a\x0a\x0a\x0ax\xe9B\xe9\xe0b
+7	0	]|A$[abc]	
+7	0	[abc]	x
+5	0	\xe9 |[[.a.]]\x5c)A	9A\x80
+3	0	(+(a|b)*{,2}	\x0aA\xe0
+5	0	[[:alpha:]]b[[:digit:]]\x5c\x5c1	\x0a\xff00B
+9	0	\x5c[a-z]{Ac	ba\xe9\xff\xff\x0aa ac
+5	0	?$B\x5c1(a|b)*$	cB9B\xe0*A \x80 
+0	0	$.	a
+3	0	[a-z][]a]\x5c10[abc]	 \x0a
+5	0	 	x\xff00cab.
+7	0	 )^[\xe9\xe0]+	c\xe9.
+5	0	*{,2}[[=a=]]\xe9	\x0a\xe9
+0	0	|]+[[:upper:]]	b.0c9\xff\x80\x80
+5	0	[[:space:]]	ba0
+3	0	[[:alpha:]][[=a=]]	
+0	0	\x5c]\x5c()\x5c*\x5c(	\x80x\x0a
+1	0	.*A.*	A\x80ac\x80\xe0b
+5	0	+[[:alpha:]]\xff	Ba\xe9
+0	0	[[:space:]][[:space:]]	cx9\xff\x0a\x0a\xe0a.B\x0a
+5	0	[a-z][[:alpha:]]Bb(a|b)*\x5c(	cb\xe0\xe0ba9aB.
+1	0	[[.a.]][[.a.]]B[\xe9\xe0]{2}]	\xe9aB\xe0B\x80\xe9\x80\xe0\x80B
+0	0	$.ab|cd\x5c.	b09\x0a\x0a\x80
+3	0	|.*.*[\xe9\xe0]\xff	\xe09b\xe0
+9	0	[[=a=]]^[a-z].*c)	.*xx
+0	0	 [^a][[:upper:]]ab|cd).*	*\x0a0a\xe9Bcc
+5	0	[[:digit:]]\x5c{	
+5	0	.* {2}.	0
+5	0	)\x5c1${,2}\xe9\x5c*	9\xe09.
+9	0	9\x5c)c	c*\x80
+1	0	[[=a=]]	0\xffb\xe0\xff0\xff
+3	0	[a-z]\x5c*[a-]x\x5c.\x5c*	\x0a0*
+5	0	){,2}a\x5c{.	 \x800a. 0
+3	0	\x5c*\x5c*[[=a=]][a-z]B\x5c	
+5	0	+({1,3}c|	9
+5	0	A	\x0a\xff\xe9\x80b.\xff
+0	0	c[[:alpha:]]x\xff[[:digit:]]a	00**b0
+1	0	^	0
+5	0	[abc][\xe9\xe0](	*b*0.\xffB\xe0x
+5	0	{|	\x0a0b\x80B\xe9bc
+7	0	[]a][abc]B.*$\x80	A
+0	0	\x5c(^b\x5c{[a-z]^	*\x80bBb xB
+7	0	[\xe9\xe0][[:space:]]$	x BB.Aa\xe9*
+1	0	[a-z][^a][[:alpha:]]\x5c.	\xe0\x80xa
+9	0	^	B B. x\xe9c
+9	0	a)a[[:upper:]]	\x80
+1	0	 .*	\xe9 xx0BBba
+9	0	[[=a=]]\x80	*AAbA
+5	0	\xffab|cd\xe9.[]a]	\x0a\xe9b\x80A**
+7	0	A[(a|b)*\x5cb	.\x80
+3	0	\x5c([[:upper:]]0[[:alpha:]]	xx\x80c.
+7	0	{1,3}()^[\xe9\xe0]	\xff\xffb9b\x0a
+9	0	b{1,3}\xe9	\x0a
+7	0	\x5c{\x5c.ab|cdab|cd[[:space:]]b	\x0a\xe0
+5	0	^b\x5c1	\xe0  \xe9\xe0\xe9\xff
+5	0	[]a][[:alpha:]]	A\xe9Ax
+5	0	\x5c	B\x0a\xe9  .9\xe0\xe0.
+5	0	 [[.a.]]{ab|cdB	c
+5	0	{2}\x80(\x80	b\x0a
+5	0	x^\x5c*(	9.\x0a\xffa\xe99.c\xe9
+9	0	[[:space:]]	 B
+0	0	(a|b)*	Ba\xffBB\xe9\xe0bB
+5	0	[abc]\x5c1xx[\xe9\xe0]\x80	A\x800*c
+7	0	[[:alpha:]]\x5c*\x5c.[a-z]	9 .A\xffAa 
+0	0	[[=a=]]\x80(a|b)*\xff\x5c)	
+5	0	[[:alpha:]]\x5c{\x5c.[\x5c{(	
+7	0	9\x5c*\x5c)\x5c1	A\xe0c*\xffc\x80\x0a
+9	0	\x5c({,2}\x5c.{1,3}$	Bab\xe0 .BA\xff
+3	0	{A	Ac.c9\xe0c*9
+9	0	(a|b)*A\x5c)\xff[[:digit:]]+	bA9990
+5	0	{,2}]a+[[:space:]]	c
+3	0	*	b\x80\xe9
+7	0	|.*.*	aacc
+3	0	[abc]\x80\x80a	\xff\xe0\xff00ba\xff\xff0c
+5	0	\xffab|cd[B[a-]	bb \x0aB
+1	0	[[=a=]]b[^	B\x80\x0a
+5	0	[[:digit:]]0[[:digit:]][[:alpha:]]	..bA\xe9\xe0\xe9\x0aa0
+1	0	 a[[	a *B 
+7	0	[[:digit:]]\x5c1[a-]?$]	\xe9B
+9	0	\x5c1.\xe9	\xe9\x0a\xe9\xff\xffx.a*
+9	0	\xe9*[a-]\x5c\x5c{\x5c	A\xe0.a
+5	0	\x5c*.\x5c.0	*\x809
+0	0	\x5c(\x5c{cx	\xe9.xbAAa\xff0 
+5	0	x[[:digit:]]\x80]{2}\x5c1	
+9	0	[[:upper:]]{1,3}[[=a=]][[:alpha:]][[:alpha:]]	*9B.9
+7	0	{[[:digit:]]\xe9\xff|	BcaB99
+0	0	[abc](a|b)*b(a|b)*	0
+5	0	\x5c)[[:space:]]$	00b*x
+9	0	\x5c*	\x0a A \x80\xe0 ..
+5	0	\x5c(\xe9x[[:space:]](a|b)*	.\x0axxx0\xffcc
+0	0	a{,2}\xe9)[[=a=]]{2}	9a
+0	0	)\x5c1B	BA9.ba
+7	0	(a|b)*{1,3}\x5c(	0a\x0ab0\x0aaa\x80
+5	0	a][\xe9\xe0]	\xe9
+5	0	^aa\x5c{	909\xe9
+5	0	ab|cd{2}bc	\x0a0\x80
+9	0	\x5c)9\x5c1[^a]{1,3}[]a]	*\xff\xff
+5	0	ab|cd[[=a=]][a-z]?[.	\xff\xff* \x0ab0\x0a\xe0B\xe0
+7	0	\x5c(*^{1,3}	.09* .*Bax
+7	0	|*	
+5	0	0B$	
+5	0	*Ac	\xe0a .a9\x80.a0
+1	0	[a-]?\x5c1	b x..
+7	0	[[:upper:]]c.*\x5c.\x5c*	\x80B9c9 aBb\x80
+5	0	[^a]	 xb
+5	0	{{2}((	A\x80Ax*aAA\xe9\xe9
+5	0	\x5c{1,3}$	c9 
+9	0	[]a]	c*\xe0\xe0c
+7	0	\x5c({1,3}[abc]\x5c1	\xff0\x80* 9
+1	0	\x5c)	\x80*ca0\x0a\xe0A\xe0*x
+3	0	[c	00\x0ab0 \x80c
+3	0	\x5c*?[a-]	\x80\xe0.B\x800a 
+9	0	x[[:alpha:]]|?[]a]	b
+9	0	^[	A\x80x\x0aaA
+1	0	? 	 \x0a\x80\x80Ac
+7	0	[[.a.]]$|[\xe9\xe0]?[[:upper:]]	a9x\xff9c\x80*\x80
+9	0	^x[]a].\x5c1	\xffA\x80aBB.0 
+1	0	[]a]\x5c1	a
+9	0	\x80\x5c[a-z]a	.A0a0\xe9
+5	0	B[abc]A.	c 0*0\xe9
+3	0	\xe9\x5c{*	
+9	0	|[[:space:]]	x\xff\xe0\xe0
+7	0	[]a]ab|cdB	AbBA* \x0aBaAB
+5	0	\x5c*	
+9	0	a*\x5c(^\x5c)\x5c(	a\x0a0\xe0a0A\xffx\x80
+1	0	\x5c1\x5c*	\xff\x0axc
+5	0	[^a]0ab|cd{2}ab|cd	
+0	0	[A[[:digit:]]{2}.	
+5	0	 |*ab|cd{,2}	0\xe9B\x0a.c
+7	0	(a|b)*\x5c1(x[[:digit:]]{,2}	A\xe0. a\xe9**\xe0
+7	0	(?\x80	09.b *0\x0a.
+9	0	\x5c.].a	\x809\xe0 A\x0a\x80A
+7	0	\x5c.([[.a.]]0	c
+5	0	.*	a
+0	0	[abc]	A\xe0c9*x\xe0\xe9\xffxc
+7	0	(a|b)*.*\x5c*	\x0a
+0	0	{1,3}|	\x0aB\xe0Ax\xe0*.\xe9\xff\xe9
+9	0	\x5c)0\x5c.\x5c.	acA9\xe0 9.Bb
+0	0	{2}\x5c1 .{	
+9	0	|	
+7	0	)	0cA\xe9
+3	0	{1,3}	\x0ac\x80
+0	0	^0[\xe9\xe0]{	*c\x0ab B\x80Ax.
+0	0	[a-z] [abc](a|b)*	9a
+9	0	9{,2}{*][[:space:]]	cax9\xe0*\x80
+9	0	\x5c([[:space:]][[:upper:]][[.a.]]	bxb\xe9ba
+5	0	\xe9(][]a]	0
+9	0	{\x5c([[=a=]]	c\xe0.\x0a
+7	0	[]a]A{	x.x\x0a9a0c\xff\x0aa
+9	0	$c)	B0\xe9
+3	0	(a|b)*B(9	\xe9x\x0a0*.Bb
+5	0	[abc]*[\xe9\xe0]\x80|	9. c\xe9A\xe9
+5	0	9\x5c1+x[abc]	 c*c9b*
+5	0	[(9\xff\xe9	\x80**9c*
+5	0	[\xe9\xe0]+[[:alpha:]]\x5c{	xa
+0	0	Ac[[:alpha:]]	\x80\x80a\xe0B\x0a\x0aa*
+1	0	^\x5c(\x80	 \x80\xffx\x80\x80*.
+0	0	{,2}?	\xffx\xffx\xe0AxB.\x0a
+5	0	[[:upper:]][[=a=]]{a	0c\xe0A0BBb\x80Ba
+5	0	[[=a=]]\x5c(+[^a]	B9\xe9\x80c\xe9
+3	0	[[:space:]]\x5c([[=a=]]	b \x0a A.aB\x0a\xff
+3	0	[a-z][[.a.]]B 	0\x80xc\x80\xe0\xe0.9
+1	0	[]a][[.a.]][a-z] 9	.
+5	0	^	c
+5	0	\xe9b	
+3	0	[[:alpha:]][a-z][[:digit:]] 	\xe0\xe0\x0aaAxc
+9	0	\xe99 )[[.a.]]	\xe9b \xe9
+5	0	)\x5c*	9
+5	0	A.*?{]	.cA\xff* 
+9	0	[[:digit:]][^a]{,2}B[[a-z]	\xe9\x0a0xA\xff**\xff
+7	0	|[^a]]	ABx
+7	0	[[:digit:]]	..
+5	0	aa	9*A\xe9
+9	0	[abc]	cab
+5	0	\x5c1[a-][a-z]( {	\xff
+5	0	$	\x80*\xff
+7	0	\xff\x5c*|[	a  \xe9.\xe00bx\x80
+9	0	B[{2}	\x80
+7	0	[[:upper:]]|^{2}[a-]	
+3	0	c)[[.a.]] 	A\x80\x80
+1	0	[a-z]	\xffcxA
+5	0	[[:upper:]]	x.\xff
+7	0	b\x5c){+	*.\x80\xe9
+5	0	[[:digit:]][[:upper:]][[:upper:]][c\x5c(	\xe0.*99B*b\xffx
+9	0	[^a]{2}^{	
+7	0	\x5c(|	.*\x80a\xe9
+5	0	[[=a=]]]][[.a.]]x	
+5	0	b[[=a=]][[:space:]][abc]0b	
+3	0	\x5c*\x5c*x.*]	.0x
+5	0	 $b)	9*.
+0	0	\x5c([[=a=]]\x5c1	\x80c 
+1	0	[\xe9\xe0]?[\xe9\xe0]	.\xe9\x0a.a b\xff
+5	0	\xe9A(a|b)*.a9	x\xe9.Ba*
+3	0	{,2}	*
+5	0	[[:space:]][[=a=]]	\x0a
+5	0	+ab|cd\x80[^a](	\xffab\x80B\xff
+5	0	[[=a=]][]a]	\xffA\xe0.
+3	0	[\xe9\xe0]0$|?[a-z]	9\x800 A.9\x80
+5	0	c{\x5c*Bx	..\xe0
+0	0	{1,3}A[a-]	bb\x0aa\x80b\x0a\xe0\xe0a
+5	0	9^\x5c$[[.a.]]c	*cx.\xe9
+0	0	^\x5c*9\x80|	a0B\xff.bB
+5	0	aB9.*ab|cdab|cd	.aa
+5	0	[[:alpha:]]	Aa\xe9
+0	0	\x5c1$	\xff\xe0\xff\x0a\xe0x\xe0c\xe9
+3	0	.* 	Ax\xff\xe0*
+0	0	abBB	\xe0c\x80x\xe00\xe0\x80
+5	0	[[:digit:]](a|b)*(a|b)*	c  x9a\xffbx.A
+3	0	[\xe9\xe0]c[[:alpha:]][a-]	 \xff\x80
+3	0	|	0\x0aa\x0a
+5	0	].*[[[:alpha:]]{2}	b\xe9x9\x0aa9\x0ac
+0	0	\x5c([[:alpha:]][[:space:]][\xe9\xe0]9{,2}	b\xe0cA
+3	0	b{1,3}B\xff(\x5c)	9
+9	0	99[[:digit:]]+[a-z]	 \x0a\x0ac\xe90.0
+5	0	b\x5c.[abc][a-z]	x*9*\xff9cbx \xe0
+5	0	[[.a.]]\x5c{\xffBa\xe9	\xe9.\x0a\x809
+1	0	]9\xe99	\x0a \xe0\xe0a
+5	0	{1,3}[a-][\xe9\xe0]A9	*
+5	0	ab|cd9	
+5	0	\x5c1*0[^a][[:upper:]]\xe9	
+5	0	??\x5c{{+[[=a=]]	*\x80
+5	0	c$[a-z][abc]{,2}[\xe9\xe0]	Axcx
+5	0	]]{2}\x5c1	. \x0aaAxa
+0	0	\x5c.	Ac*xB
+5	0	[B	 .\xe9\x0a\x0a
+5	0	[[=a=]][[:space:]]+	A
+5	0	{,2}[abc]	Bc
+1	0	x	*\xff\x80
+1	0	\x5c*[[.a.]]{1,3}b {,2}	 
+0	0	[a-]\x5c.\x5c)A[abc]{	\xffaaB
+3	0	.	.\x0aa\xe9
+5	0	ab|cd*[a-].	AAa\xe0\x0a\xe9
+3	0	(a|b)*	.B\x0abb0A90
+0	0	\xffb	x.\x80\x80*\x80a9\xe0
+3	0	\x5c1{,2}	bA\xe0\x0a\x80\xe9ca9a.
+0	0	^${2}[[:space:]]{1,3}	bA\xe9
+5	0	\x5c1x[abc]A?+	xaxb0 
+5	0	.*?[[:digit:]]\x5c[\xe9\xe0][abc]	c
+5	0	x+	a*ab\x0aAA
+9	0	\x5c)^?	*\xff
+9	0	[\xe9\xe0]	c.x
+1	0	({1,3}[abc]	
+1	0	{1,3}[a-z]\x5c*\xff9	0
+5	0	[[.a.]][]a]$	.\x80
+9	0	?\x5c	
+5	0	\xe9b.[	\xe9
+5	0	[[=a=]] \x5c(	b9b9
+5	0	[[:space:]]c{,2}.*	0b\x80\xe0xx
+5	0	|[a-]$[]a]\x5c( 	ac \xff
+5	0	[\xe9\xe0](a|b)*\x5c1[[:upper:]]	\xffB.0\xffA
+0	0	\x5c1x^.*c	\x0ax0*\xe09**
+5	0	A{*[]a]c 	\x80\x80a\x0a\x0a\xe9\xff 9bb
+1	0	{[a-z](a|b)*?]	
+0	0	\xff	cBc \xe0 \xe0\xff
+7	0	]Ba\x5c([]a]	\x80
+7	0	\x5c)b\x80	bBa.\x80B9c\xffB
+1	0	(a|b)*	
+9	0	?{x$	A
+9	0	[[=a=]]]	x.9\xe0\x0ax\x80 c0b
+5	0	9\x5c.\xe9[[:space:]]	cx \x0a0B\x0a\xe0A*\xe9
+0	0	^[	\x0a
+7	0	x\x5c([^a][[:space:]]*\x5c	\xe0AB90c \xe9\xe9
+9	0	{2}\xe9((b	\xff
+5	0	A[abc]^9{1,3}\x5c)	9
+3	0	$c[abc]	\x80A\xff.0\xe9c\x0a.
+9	0	\x80{1,3}^a	9A 0B \xe9
+5	0	0[^a]\x5c].*ab|cd	.0\xff*cb\xe9A
+5	0	\x5c)\x5c\x80$	\x80
+3	0	\x5c.{2}[|	b\xe0b
+3	0	\x5c*	
+5	0	[[=a=]]	A
+5	0	{1,3}	B. 9Ab\xe9
+5	0	*+	Bc\x0aA
+7	0	)	
+5	0	 [[:alpha:]][[=a=]]\x5c((a|b)*ab|cd	\xe9\x0a
+5	0	A\x5c*	 *
+0	0	[[:alpha:]][[:upper:]]	x..\xe0.A\x80\xe0c\xff\x0a
+5	0	[^a]9[[:space:]]	\xe0A\xffB\xe0c9.\xe9b
+0	0	[[:digit:]]a{2}	BBA9b*cA 
+5	0	[[:digit:]]	09B
+3	0	ab|cd[[:space:]][^a]x[^a].	\x80 \xe0*.\x0a
+3	0	\x5c.[[:upper:]]\xe9cc\x5c*	*c\xe9cax
+1	0	[a-z][[=a=]][abc]	. 
+5	0	*\x5c.	b9ca9\x0ac.
+3	0	[abc]{	a\x80B\x80\x0a\x0aa
+0	0	*ab|cd	b\xff\xe9\x80aa\xff*
+5	0	*[abc]	9aAAc\x0a
+7	0	\x80?[a-]{1,3}[[.a.]]+	
+1	0	*bb	9.Ax.* .* 
+5	0	[abc][(a|b)*9(	\x0a\xe0\xe0 b \xe0x\x80
+7	0	\x5caA\x5c*	x9
+3	0	\x5c{9.	xc
+7	0	ab|cd.*+]	A\xe0
+0	0	{?[a-z]	0b\xffbbc
+9	0	B{,2}*	*A0A\x80xbaB0
+5	0	[\xe9	x\x80
+5	0	[^a]\x5c({2}	\xe09\xe0\x80bc\xe0\xe9\xff
+5	0	ab|cd\x5c).*	\x80a9\x80\x80a0
+3	0	.*\x5c1	A\xe0
+5	0	+[	b9\xe0\x80B\x0a9\x800A.
+7	0	[\xe9\xe0]^$)$	\xff a\xe9\x0a
+1	0	0\x5c)\x5c(	\xe0xxx\xe09x0\xe9A
+9	0	$c[abc]$[[:upper:]][[:space:]]	\xe0 \xffx\x0aA0\xff\xe0.c
+7	0	9{1,3}	
+5	0	[[.a.]]A[a-z]\xff	
+0	0	\x5c**[[:digit:]][[:digit:]]	**9\xe99\xffB\xff
+1	0	[a-]	\x0a\xe0x
+5	0	([[:alpha:]][abc]	
+7	0	)[]a]	b\xe9A\xe9*\x80*0\xffa
+9	0	]\x5c)(a|b)*)^?	x B
+5	0	\x80\x5cc	*B0xx
+7	0	x9?	B
+5	0	[[:alpha:]]$	 x\x80b Bx\xe9b0
+3	0	[abc]\x5c*\x80\x5c{(\x5c1	00\x0a
+1	0	{1,3}	
+5	0	\x5c	*A9\xe9b\xe0B
+5	0	.. \x5c1ab|cd	\x0a.\x0ab \xff 0Ba
+5	0	[[:upper:]]ab|cd]9	\x0a*0\xe9
+5	0	[^a][a-z]\x5c0b	9\xe0a.\x0a\x800x\xffB
+7	0	\x5c{a	cx 
+5	0	?\x5c{[	A
+3	0	Bb	A.\x0a*a\x80
+7	0	[]a]).*{,2}	
+5	0	.[[:alpha:]]	.
+5	0	[a-]	9 A\x0a0
+0	0	c.?*9\x80	\xe0 B9A\x80*
+5	0	(\x5c{\x5c([[=a=]]	\x0a\x80\xe0
+0	0	[]a]{2}(|?	\x80\x0a\xe9
+5	0	{,2}\x5c1[abc]\x80	c*9
+7	0	\x5c*[]a](|a	c\x0axAc9*A
+3	0	[[:digit:]][[=a=]]\xff	\x80 \xe90\x0a
+5	0	0[\xe9\xe0]b	\x0a*\x80\xff0
+7	0	[a-z]{,2}	\xff9
+9	0	A.\x5c) 	99\xff \xe9\xffB\xe0
+3	0	a.	A 
+5	0	*	xB09x0Ax90
+0	0	\x5c*\x5c*\x5c{	
+7	0	a[[:space:]][[:upper:]]\xff[a-z]|	\xe00.*c a.
+3	0	[[=a=]][[:upper:]]{\x5c*0	x
+7	0	[^a]|	 \x0acBBb
+3	0	[]a](a|b)*\x5c([a-z]\x5c)	*.A
+5	0	\x5c{[[:space:]]\x80	9B\xff\xe0\xff\x80 \x0abxB
+1	0	\x5c(+|	\xffc*..b*\xe90
+7	0	[a-]	Ax
+9	0	[a-]	
+9	0	A\xff(	\x0a\xff\x80\xff\xe9
+0	0	[a-z]c\xe9*\x5c1)	\x80\xffABxc0*c
+7	0	$	aab0\x0a
+5	0	.)[	
+3	0	\x5c[[:upper:]]\x5c([]a]$.*	 aa\xe9.A\x0a9b
+3	0	[]a]|\x80\xe9{1,3}[	9x\x80*\x0aa\x0ax\xff*
+5	0	?\x5c(\xe9[[:space:]]\xe9	a\xff\x0a\x0ab\x80B
+5	0	[[:upper:]]].?\x5c{\x5c)	b
+5	0	\x5c)([[.a.]]c	*0 bBx*B
+5	0	a(a|b)*(a|b)*[^a]$[a-]	\x0a9a\xe9\x80
+1	0	9[a-z][^a][({2}	9\xffc 
+1	0	{b9[^a]\x5c[\xe9\xe0]	bc.a\x80 9\xe9
+5	0	\xe9{,2}	 *
+9	0	)\x5cb\x5c.\x5c)	b.x .0\xff\xffcc
+3	0	\xe9|[[:alpha:]][abc]	b\xe0\xffx\x0a9
+0	0	(a|b)*b	.9.x\xff\x80\xff.
+1	0	 {+a{1,3}\x5c{	 0A*axa
+5	0	{ab|cd	x\xe0\xe9
+5	0	AbA	b\xff.**
+1	0	.*	a\x0a\x80B*A.b..
+1	0	9[\xe9\xe0]\x5c{	\xe9A
+0	0	ab|cd|\x5c)	
+3	0	{,2}[]a]	\xe9**.
+0	0	[a-]\x5c	
+3	0	[[:digit:]][a-]\xff\x5c{(a|b)**	\xe9c\xff*bb
+5	0	.*B(.*a	\xe0
+5	0	[abc]{2}^	c\xe9
+5	0	\xe9[[:space:]]	a *c0\x0a\x0axa 0
+5	0	9$	\xe0
+5	0	\xff	b\x80ca\x80
+9	0	x](a|b)*	 
+1	0	*[[.a.]]x[[:alpha:]]	B
+5	0	ab[]a][[:space:]]	\xff0Axx*Ba\x80x.
+9	0	[[:space:]][a-z]c{2}A	\x0a\xff\x80.\xff
+5	0	*{2} 	. 0 \x0ax.*A
+3	0	[a-z].*\xe9|?	\xe0.\x0ab9c9
+5	0	 ||[abc]0\x5c	
+7	0	[^a].*b{2}	
+1	0	b	\x80cc\x0a\xe0A
+5	0	?{\x5c0\x5c{	\x0a\x0a.a\x0a.c*\xff*
+5	0	[[:upper:]]]\x5c(\x5c*	B\xe9A\xff 0ca
+3	0	9\x5c|bab|cdx	9b\xff
+7	0	[[:alpha:]] \x5c)\xe9	\xe0B\x80\xe9
+0	0	A	abx\xff\xe0\x80
+5	0	?	\x80abx0B\xe9..c\x80
+5	0	x.[[:digit:]]\x5c)	\x80\x0a0B\x0a.9x\xe9
+9	0	[^a][a-z])*)	\xff aB\xffA\xff
+3	0	[\xe9\xe0].*\x5c{*\x5c.\x5c*	ac
+5	0	|\x5c1A9[[:alpha:]]	 c\x0a\xe99\x80*xx \xe9
+7	0	 [[:alpha:]]ba9)	\xe0a\xe0*
+5	0	B[abc]ab|cd[[.a.]]\x5c1[[:space:]]	xcA\xe0B
+5	0	\x5c1^	\xffx9A9x\xff
+1	0	09[a-z]9	.A\xffB\xe9\x0a\x0aa
+5	0	([[:alpha:]]	0A\xff\xff\xff\x80a*
+5	0	\x5c([[:upper:]][[=a=]][\xe9\xe0]	. \x0ac\xffc
+5	0	ab|cd\x80B^{	\xe0 .ca Ab.
+9	0	B	b\xe0\x80\x0ax0cB\xff
+9	0	B^	B0a
+3	0	[[.a.]]$[a-z]	x* *
+9	0	|.*x	\x0a\xe0.\xe9a\xe0\x8099B9
+5	0	$+?\x5c{c[[:upper:]]	9*0\xff.
+5	0	b [a-z]a0\x5c)	 \x80axb9\xe9\xe9 
+9	0	{1,3}	c\xffx\x0a\xff\x80\x0acA9
+5	0	\x80\x5c(\x5c[[:upper:]][abc]	
+3	0	\xffa	.*A\x80 
+1	0	\x5c) [a-]+.*	*Bb.\xffc\xe0\xe9
+1	0	[[:space:]]][[:space:]]$	\xe9\xe9x\xe9
+5	0	\x5c(.c	\xe0c\x80\xe9a0.0\xe0c
+5	0	ab|cd	x9B\xe0
+5	0	c[[=a=]][[:space:]]	
+5	0	[[:upper:]]{1,3}[\xe9\xe0]b	B. 00
+1	0	\x5c({1,3}^\x5c)a{	\x0ax.\xe0\x0ac 
+5	0	\xe9	09\x80
+5	0	[^a][\x5c*a\x5c	9\x0abc
+0	0	 	\xe9 \xe0 \x80B
+1	0	\xe9	
+3	0	| 	\xe9\x80abx*\xff
+5	0	\x5c([[:digit:]][]a]	B\x80
+1	0	B$?B|	\xe0\xe0909A\xe9.
+7	0	{1,3}	\xe0a\xe0..\x80
+3	0	B$+B+[[=a=]]	\xe9b*a\xff9xA 
+7	0	[\xe9\xe0]((a[a-z]\xff	\xe0*A\x80*90*
+5	0	blessed	a blessed +1 long sword
+5	0	blessed	an uncursed ring
+5	0	blessed	You see here a lichen corpse.
+5	0	blessed	a loadstone
+5	0	blessed	You hear the footsteps of a guard on patrol.
+5	0	blessed	a wand of wishing (0:3)
+5	0	blessed	Elbereth
+5	0	blessed	a dagger (weapon in hand)
+5	0	blessed	
+5	0	cursed	a blessed +1 long sword
+5	0	cursed	an uncursed ring
+5	0	cursed	You see here a lichen corpse.
+5	0	cursed	a loadstone
+5	0	cursed	You hear the footsteps of a guard on patrol.
+5	0	cursed	a wand of wishing (0:3)
+5	0	cursed	Elbereth
+5	0	cursed	a dagger (weapon in hand)
+5	0	cursed	
+5	0	uncursed	a blessed +1 long sword
+5	0	uncursed	an uncursed ring
+5	0	uncursed	You see here a lichen corpse.
+5	0	uncursed	a loadstone
+5	0	uncursed	You hear the footsteps of a guard on patrol.
+5	0	uncursed	a wand of wishing (0:3)
+5	0	uncursed	Elbereth
+5	0	uncursed	a dagger (weapon in hand)
+5	0	uncursed	
+5	0	\x5c(being worn\x5c)	a blessed +1 long sword
+5	0	\x5c(being worn\x5c)	an uncursed ring
+5	0	\x5c(being worn\x5c)	You see here a lichen corpse.
+5	0	\x5c(being worn\x5c)	a loadstone
+5	0	\x5c(being worn\x5c)	You hear the footsteps of a guard on patrol.
+5	0	\x5c(being worn\x5c)	a wand of wishing (0:3)
+5	0	\x5c(being worn\x5c)	Elbereth
+5	0	\x5c(being worn\x5c)	a dagger (weapon in hand)
+5	0	\x5c(being worn\x5c)	
+5	0	^You see here	a blessed +1 long sword
+5	0	^You see here	an uncursed ring
+5	0	^You see here	You see here a lichen corpse.
+5	0	^You see here	a loadstone
+5	0	^You see here	You hear the footsteps of a guard on patrol.
+5	0	^You see here	a wand of wishing (0:3)
+5	0	^You see here	Elbereth
+5	0	^You see here	a dagger (weapon in hand)
+5	0	^You see here	
+5	0	You hear the footsteps of a guard on patrol\x5c.	a blessed +1 long sword
+5	0	You hear the footsteps of a guard on patrol\x5c.	an uncursed ring
+5	0	You hear the footsteps of a guard on patrol\x5c.	You see here a lichen corpse.
+5	0	You hear the footsteps of a guard on patrol\x5c.	a loadstone
+5	0	You hear the footsteps of a guard on patrol\x5c.	You hear the footsteps of a guard on patrol.
+5	0	You hear the footsteps of a guard on patrol\x5c.	a wand of wishing (0:3)
+5	0	You hear the footsteps of a guard on patrol\x5c.	Elbereth
+5	0	You hear the footsteps of a guard on patrol\x5c.	a dagger (weapon in hand)
+5	0	You hear the footsteps of a guard on patrol\x5c.	
+5	0	.* corpse	a blessed +1 long sword
+5	0	.* corpse	an uncursed ring
+5	0	.* corpse	You see here a lichen corpse.
+5	0	.* corpse	a loadstone
+5	0	.* corpse	You hear the footsteps of a guard on patrol.
+5	0	.* corpse	a wand of wishing (0:3)
+5	0	.* corpse	Elbereth
+5	0	.* corpse	a dagger (weapon in hand)
+5	0	.* corpse	
+5	0	"*.wand"	a blessed +1 long sword
+5	0	"*.wand"	an uncursed ring
+5	0	"*.wand"	You see here a lichen corpse.
+5	0	"*.wand"	a loadstone
+5	0	"*.wand"	You hear the footsteps of a guard on patrol.
+5	0	"*.wand"	a wand of wishing (0:3)
+5	0	"*.wand"	Elbereth
+5	0	"*.wand"	a dagger (weapon in hand)
+5	0	"*.wand"	
+5	0	<.*>	a blessed +1 long sword
+5	0	<.*>	an uncursed ring
+5	0	<.*>	You see here a lichen corpse.
+5	0	<.*>	a loadstone
+5	0	<.*>	You hear the footsteps of a guard on patrol.
+5	0	<.*>	a wand of wishing (0:3)
+5	0	<.*>	Elbereth
+5	0	<.*>	a dagger (weapon in hand)
+5	0	<.*>	
+5	0	^[a-z] - 	a blessed +1 long sword
+5	0	^[a-z] - 	an uncursed ring
+5	0	^[a-z] - 	You see here a lichen corpse.
+5	0	^[a-z] - 	a loadstone
+5	0	^[a-z] - 	You hear the footsteps of a guard on patrol.
+5	0	^[a-z] - 	a wand of wishing (0:3)
+5	0	^[a-z] - 	Elbereth
+5	0	^[a-z] - 	a dagger (weapon in hand)
+5	0	^[a-z] - 	
+5	0	loadstone|luckstone	a blessed +1 long sword
+5	0	loadstone|luckstone	an uncursed ring
+5	0	loadstone|luckstone	You see here a lichen corpse.
+5	0	loadstone|luckstone	a loadstone
+5	0	loadstone|luckstone	You hear the footsteps of a guard on patrol.
+5	0	loadstone|luckstone	a wand of wishing (0:3)
+5	0	loadstone|luckstone	Elbereth
+5	0	loadstone|luckstone	a dagger (weapon in hand)
+5	0	loadstone|luckstone	
+5	0	You displace .*\x5c.	a blessed +1 long sword
+5	0	You displace .*\x5c.	an uncursed ring
+5	0	You displace .*\x5c.	You see here a lichen corpse.
+5	0	You displace .*\x5c.	a loadstone
+5	0	You displace .*\x5c.	You hear the footsteps of a guard on patrol.
+5	0	You displace .*\x5c.	a wand of wishing (0:3)
+5	0	You displace .*\x5c.	Elbereth
+5	0	You displace .*\x5c.	a dagger (weapon in hand)
+5	0	You displace .*\x5c.	
+5	0	^Elbereth$	a blessed +1 long sword
+5	0	^Elbereth$	an uncursed ring
+5	0	^Elbereth$	You see here a lichen corpse.
+5	0	^Elbereth$	a loadstone
+5	0	^Elbereth$	You hear the footsteps of a guard on patrol.
+5	0	^Elbereth$	a wand of wishing (0:3)
+5	0	^Elbereth$	Elbereth
+5	0	^Elbereth$	a dagger (weapon in hand)
+5	0	^Elbereth$	
+5	0	\x5c((weapon|wielded)( in hand)?\x5c)	a blessed +1 long sword
+5	0	\x5c((weapon|wielded)( in hand)?\x5c)	an uncursed ring
+5	0	\x5c((weapon|wielded)( in hand)?\x5c)	You see here a lichen corpse.
+5	0	\x5c((weapon|wielded)( in hand)?\x5c)	a loadstone
+5	0	\x5c((weapon|wielded)( in hand)?\x5c)	You hear the footsteps of a guard on patrol.
+5	0	\x5c((weapon|wielded)( in hand)?\x5c)	a wand of wishing (0:3)
+5	0	\x5c((weapon|wielded)( in hand)?\x5c)	Elbereth
+5	0	\x5c((weapon|wielded)( in hand)?\x5c)	a dagger (weapon in hand)
+5	0	\x5c((weapon|wielded)( in hand)?\x5c)	

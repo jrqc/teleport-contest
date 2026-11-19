@@ -10,8 +10,8 @@ the BSD notices in the files (`regex/FreeBSD/COPYRIGHT`).
 |---|---|
 | `regex/TRE/lib/*.c`, `*.h`, `regex/TRE/config.h`, `tre-config.h` | Libc's `regcomp`/`regexec`/`regfree` (TRE 0.8.0 as Apple ships it) |
 | `regex/FreeBSD/regerror.c`, `utils.h`, `cname.h` | Libc's `regerror` |
+| `string/FreeBSD/{wcslen,wcsncmp,wcsncpy,wmemcmp}.c` | The wide-string functions TRE calls |
 | `locale/FreeBSD/{runetype,tolower,toupper,table,none,mbrtowc,wctype,wcsrtombs}.c`, `mblocal.h` | The C locale's rune table (`table.c`: `_DefaultRuneLocale`, `_DefaultRuneXLocale`) and the multibyte/ctype entry points TRE calls |
-| `include/_regex.h` | Libc-1752's error codes (`REG_BADMAX` = 18), which the installed system returns |
 
 **Why 1752 and not 1669.** The reference machine runs macOS 15.8.1 (24H32), whose Libc
 tag would be 1669.x; but its `regcomp` returns error 18 ("maximum repetition exceeds 255")
@@ -23,7 +23,10 @@ that pass `REG_DUMP` or `REG_LARGE`; NetHack passes `REG_EXTENDED | REG_NOSUB`).
 **Build flags** (Libc's own for TRE: `-DHAVE_CONFIG_H -I regex/TRE -I regex/FreeBSD`), plus
 `-D__LIBC__` (Libc builds define it; without it TRE calls `duplocale`) and
 `-D_DONT_USE_CTYPE_INLINE_` (every ctype/wctype call becomes a call to the shim's definition
-instead of the SDK's `gnu_inline` wrappers, which at -O0 resolve to the system library).
+instead of the SDK's `gnu_inline` wrappers, which at -O0 resolve to the system library), and
+`-DREG_BADMAX=18`: Libc-1752's `include/_regex.h` defines it, this SDK's does not, and
+without it `tre.h` falls back to `REG_BADPAT`. The SDK's `<regex.h>` is used otherwise, so
+`regex_t` is the same type in NetHack's `posixregex.c` and in TRE (the bridge copies it).
 
 ## `darwin-c-locale/`: the C-locale shim (written for this project)
 

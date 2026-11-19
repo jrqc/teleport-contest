@@ -239,6 +239,22 @@ export class Program {
         const code = em.run();   // imports are collected while emitting
         return { path: `${tu.module}.js`, code, errors: em.errors.map((e) => `${tu.file}: ${e}`) };
     }
+    /** objKeys plus the records embedded in them (struct nhregex { regex_t re; }): every record object-world code holds. */
+    objRecordKeys() {
+        const keys = new Set(this.objKeys);
+        const todo = [...keys];
+        while (todo.length) {
+            const key = todo.pop();
+            const scope = this.classScope.get(key);
+            if (!scope) continue;
+            for (const f of scope.recordLayout(key).fields) {
+                let t = scope.resolve(f.type);
+                while (t.k === 'arr') t = scope.resolve(t.of);
+                if (t.k === 'rec' && !keys.has(t.key)) { keys.add(t.key); todo.push(t.key); }
+            }
+        }
+        return keys;
+    }
     /** The shared modules, after every TU was emitted: Map(path -> text). */
     finish() {
         // the bridge first: it names the classes of the records it copies

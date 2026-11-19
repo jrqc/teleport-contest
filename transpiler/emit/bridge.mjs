@@ -34,6 +34,7 @@ function paramTexts(ctype) {
 
 export function bridgeModule(prog) {
     const records = new Map();   // key -> { scope }
+    const objKeys = prog.objRecordKeys();
     const S0 = (d) => d.scope;
     function kind(S, t, isConst = false) {
         t = S.resolve(t);
@@ -48,7 +49,7 @@ export function bridgeModule(prog) {
             if (to.k === 'void') return 'v';
             if (to.k === 'fn') return { f: [kind(S, to.ret), ...(to.params || []).map((p) => kind(S, p))] };
             if (to.k === 'rec') {
-                if (!prog.objKeys.has(to.key)) return 'o';
+                if (!objKeys.has(to.key)) return 'o';
                 records.set(to.key, S);
                 return { r: to.key, ro: isConst };
             }
@@ -66,7 +67,8 @@ export function bridgeModule(prog) {
         const S = S0(d);
         const ft = S.resolve(S.type(d.ctype));
         const consts = paramTexts(d.ctype).map((p) => /^const\b/.test(p));
-        const desc = [kind(S, ft.ret), ...(ft.params || []).map((p, i) => kind(S, p, consts[i]))];
+        // a non-const char * parameter may be written (regerror's errbuf): 'sb', copied back
+        const desc = [kind(S, ft.ret), ...(ft.params || []).map((p, i) => { const k = kind(S, p, consts[i]); return k === 's' && !consts[i] ? 'sb' : k; })];
         if (!imports.has(d.module)) imports.set(d.module, []);
         imports.get(d.module).push(name);
         const fresh = FRESH[name] !== undefined ? `, ${FRESH[name]}` : '';

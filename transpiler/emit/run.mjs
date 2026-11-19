@@ -34,8 +34,15 @@ const cells = Object.entries(punVerdicts).filter(([k, v]) => {
 }).map(([k]) => k.replace(/^union /, ''));
 const handModules = Object.fromEntries(Object.entries(ann.functions || {}).filter(([, f]) => f.handwritten && f.handwritten.startsWith('js/hand/'))
     .map(([k, f]) => [k.replace(/^.*::/, ''), '../' + f.handwritten.replace(/^js\//, '').replace(/\.js$/, '')]));
-const prog = new Program({ crtNames, heapCrtNames, handwritten, handModules, tails, cells, asyncCut: (ann.edges && ann.edges.cut || []).map((c) => c.to) });
-const luaDb = JSON.parse(readFileSync(path.join(ROOT, 'transpiler/out/compile_commands.json'), 'utf8')).filter((e) => e.group === 'lua');
+// heap-world groups (annotations groups[].repr "heap"): Lua, and the vendored Darwin regex
+const heapGroups = Object.values(ann0.groups || {}).filter((g) => g.repr === 'heap');
+const isHeapFile = (file) => heapGroups.some((g) => file.includes(g.files));
+const prog = new Program({ crtNames, heapCrtNames, handwritten, handModules, tails, cells, isHeapFile, asyncCut: (ann.edges && ann.edges.cut || []).map((c) => c.to) });
+const luaDb = [
+    ...JSON.parse(readFileSync(path.join(ROOT, 'transpiler/out/compile_commands.json'), 'utf8')).filter((e) => e.group === 'lua'),
+    // transpiler/third_party/README.md (postmortem F2)
+    ...JSON.parse(readFileSync(path.join(ROOT, 'transpiler/third_party/compile_commands.json'), 'utf8')),
+];
 prog.missingFn = new Set();
 
 // group defines (annotations groups[].defines) apply to the group's files

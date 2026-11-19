@@ -18,7 +18,7 @@
 // Calls into the object-world runtime ($c) pass byte pointers as Ptr over the
 // heap ($h.P) and scalar pointers as Ptr over a typed view ($h.PV); handles
 // carry runtime objects (FILE *) through heap memory.
-import { TUEmitter, EmitError, E, PREC, par, neg, kids, pkind, jsStr, decodeCString } from './tu.mjs';
+import { TUEmitter, EmitError, E, PREC, par, neg, kids, pkind, jsStr, decodeCString, decodeWideString } from './tu.mjs';
 import { jsName } from './names.mjs';
 
 const isPtr = (t) => t.k === 'ptr';
@@ -123,6 +123,12 @@ export class HeapEmitter extends TUEmitter {
         n = this.skipParens(n);
         t = this.S.resolve(t);
         if (n.kind === 'ImplicitValueInitExpr') return;
+        if (t.k === 'arr' && n.kind === 'StringLiteral' && n.value[0] === 'L') {
+            const w = decodeWideString(n.value);
+            const m = Math.min(w.length, t.n === null ? w.length + 1 : t.n);
+            if (m) out.push(`${ind}$h.i32.set([${w.slice(0, m).join(', ')}], (${a}) >>> 2);   // L${jsStr(String.fromCodePoint(...w.slice(0, 40)).replace(/[^\x20-\x7e]/g, '?'))}`);
+            return;
+        }
         if (t.k === 'arr' && n.kind === 'StringLiteral') {
             const s = decodeCString(n.value);
             const m = Math.min(s.length, t.n === null ? s.length + 1 : t.n);
@@ -371,6 +377,7 @@ export class HeapEmitter extends TUEmitter {
 
     // ---------- expressions ----------
     ex(n, ctx) {
+        if (n.kind === 'StringLiteral' && n.value[0] === 'L') return E(`$h.wlit([${decodeWideString(n.value).join(', ')}])`, PREC.call);
         if (n.kind === 'StringLiteral') return E(`$h.lit(${jsStr(decodeCString(n.value))})`, PREC.call);
         if (n.kind === 'MemberExpr' || n.kind === 'ArraySubscriptExpr') return this.lvalue(n).get();
         if (n.kind === 'CompoundLiteralExpr') return this.lvalue(n).get();
