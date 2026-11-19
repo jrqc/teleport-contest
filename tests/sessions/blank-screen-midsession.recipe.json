@@ -1,0 +1,12 @@
+{
+ "version": 5,
+ "source": "hand-written (tools/fuzz saves-128 shape): a game ends through the disclose prompts with ESC at the conduct prompt, which leaves a blank (\"\") screen the judge skips; a second game follows",
+ "segments": [
+  { "seed": 4242, "datetime": "20260310120000",
+    "nethackrc": "OPTIONS=name:Ada,role:Valkyrie,race:human,gender:female,align:lawful\nOPTIONS=!tutorial,!legacy\nOPTIONS=suppress_alert:3.4.3\n",
+    "moves": "\u001bss#quit\ryyn\u001b\u001b\u001b\u001b  " },
+  { "seed": 4243, "datetime": "20260311120000",
+    "nethackrc": "OPTIONS=name:Bram,role:Samurai,race:human,gender:male,align:lawful\nOPTIONS=!tutorial,!legacy\nOPTIONS=suppress_alert:3.4.3\n",
+    "moves": "\u001bsshjkl" }
+ ]
+}

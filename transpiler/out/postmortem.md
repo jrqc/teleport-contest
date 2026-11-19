@@ -58,6 +58,7 @@ held-out session, untested; **L** = possible, but needs an unusual input.
 | F17 | Sandbox differences (judge runs under `node --permission`) | L | Startup failure |
 | F18 | Memory model: row crossing, the out-of-bounds Proxy, union punning, struct copies | L | Trap (loud) |
 | F19 | Regex source version: Libc-1752.120.2 vendored; the recording machine's macOS version is unknown | L | Different regex error code/text, or match result on an unusual pattern |
+| F20 | Blank ("") screens: the judge skips them on the C side only | **fixed** | Every later screen of the session one step off |
 
 ### F1. Capture buffer overflow (old patch 006) — H
 
@@ -301,6 +302,21 @@ held-out session, untested; **L** = possible, but needs an unusual input.
 
 All the traps above are loud: a trap ends the segment with an error on stderr. The judge's
 output is not visible to us, but the same trap in our own runs names the C construct.
+
+### F20. Blank screens shift the judge's alignment — fixed 2026-11-19
+
+- **Found by** T2 (`tools/fuzz/run.mjs`, case saves-128): a recording that the port reproduces
+  exactly (per segment, every screen and RNG call equal) scored 412/463 screens.
+- **Cause.** `frozen/ps_test_runner.mjs` builds the C screen list with `if (step.screen)`: a
+  step whose screen is the empty string (a completely blank terminal; here after "Do you want
+  to see your conduct?" answered with ESC at the end of a game) is not compared. Our
+  `getScreens()` returned that step's `""` too, so from there to the end of the session every
+  JS screen was compared with the next C screen. A judged session with a blank screen in an
+  early segment loses nearly all later screens while its RNG still matches.
+- **Fix.** `js/jsmain.js` `getScreens()`/`getCursors()` leave out `""` screens by the same rule
+  (per-step arrays stay available to tools as `getStepScreens()`/`getStepCursors()`).
+- **Test.** `tests/sessions/blank-screen-midsession` (own recording; 16/22 before, 22/22 after),
+  run by `tests/nh/own-sessions.test.mjs` and the sandbox run.
 
 ### F19. Regex Libc version — L (known risk, accepted 2026-11-19)
 
