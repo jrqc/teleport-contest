@@ -55,7 +55,7 @@ export class FieldRef {
  * outside the array (one past the end, or before the start while iterating) is
  * an ElemPtr, which can be compared and moved but not dereferenced.
  */
-const ELEM_OK = new Set(['__arr', '__idx', 'then', 'constructor', 'toJSON', '$const']);
+const ELEM_OK = new Set(['__arr', '__idx', 'then', 'constructor', 'toJSON', '$const', '$stale']);
 const ELEM_TRAP = {
     get(t, k) {
         if (typeof k === 'symbol' || ELEM_OK.has(k)) return t[k];
@@ -108,15 +108,27 @@ export function recTail(p) {
     if (!p.__tail) throw new CTrap('(char *) (p + 1): the record has no trailing area');
     return new Ptr(p.__tail, 0);
 }
+// A record that is not an array element behaves as an array of one (C11 6.5.6p7): p + 1
+// is its one-past-the-end pointer, which compares (unequal to every object) but cannot
+// be dereferenced (mhitu.c hitmsg: mattk == gh.hitmsg_prev + 1, where getmattk() may
+// return a pointer to one local struct attack).
+const SOLO = new WeakMap();
+function soloOf(p) { let s = SOLO.get(p); if (s === undefined) { s = [p]; SOLO.set(p, s); } return s; }
 /** p + n for a record pointer. */
 export function radd(p, n) {
     if (n === 0) return p;
     const a = p.__arr;
-    if (a === undefined) throw new CTrap('arithmetic on a pointer to a record that is not an array element');
+    if (a === undefined) {
+        if (Number(n) !== 1) throw new CTrap('arithmetic on a pointer to a record that is not an array element');
+        return new ElemPtr(soloOf(p), 1);
+    }
     return relem(a, p.__idx + Number(n));
 }
 /** p - q for record pointers into the same array (element count). */
 export function rdiff(p, q) {
+    // a lone record against its one-past pointer (soloOf)
+    if (p.__arr === undefined && q.__arr !== undefined && SOLO.get(p) === q.__arr) return -q.__idx;
+    if (q.__arr === undefined && p.__arr !== undefined && SOLO.get(q) === p.__arr) return p.__idx;
     if (p.__arr === undefined || q.__arr === undefined || p.__arr !== q.__arr) {
         if (p === q) return 0;
         if (p.__arr !== undefined && q.__arr !== undefined) {
@@ -140,6 +152,10 @@ export function pdiff(p, q) {
 export function peq(a, b) {
     if (a === b) return true;
     if (a === null || b === null) return false;
+    // a pointer read back from a save file (serial.js STALE) holds an address of the
+    // process that saved: unequal to every live object (save.c savemonchn compares
+    // each monster with the restored u.ustuck before the restore resolves it by m_id)
+    if (a.$stale === true || b.$stale === true) return false;
     if (a instanceof Ptr) return b instanceof Ptr && a.buf === b.buf && a.off === b.off;
     if (a instanceof FieldRef) return b instanceof FieldRef && a.obj === b.obj && a.key === b.key;
     if (a.__arr !== undefined) return a.__arr === b.__arr && a.__idx === b.__idx;

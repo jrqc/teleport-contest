@@ -1,0 +1,9 @@
+{
+ "about": "Fuzz cases (kind, seed) that found port bugs; node tools/fuzz/run.mjs --regress replays them (records with the reference recorder; all must pass). Keep in sync with results/LOG.md.",
+ "cases": [
+  { "kind": "saves", "seed": 128, "bug": "F20: blank end-of-game screen shifted later screens (js/jsmain.js getScreens)" },
+  { "kind": "bones", "seed": 1054, "bug": "mhitu.c hitmsg: hitmsg_prev + 1 on a lone struct attack (mem.js radd one-past)" },
+  { "kind": "deep", "seed": 1191, "bug": "same as bones-1054 (fire attack)" },
+  { "kind": "saves", "seed": 1056, "bug": "save.c savemonchn: mtmp == u.ustuck with u.ustuck read from the save file (mem.js peq STALE)" }
+ ]
+}

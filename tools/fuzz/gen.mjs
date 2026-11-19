@@ -12,6 +12,10 @@
 //   bones  segment 1 dies on a level (wizard mode, "Save bones?" y); segment 2,
 //          a new game, goes to that level and loads them ("Get bones?" y) (F3)
 //   saves  play, save (S y), restore in the next segment, play on, save again (F13)
+//   long   one long normal game, 2000-4000 keys, descending often (F15, T6)
+//   special wizard mode: ^V ? (the special-level menu) and a random entry: Sokoban,
+//          Minetown, Oracle, quest, big room, ...; play, save there, restore, play,
+//          save again (F13 on special levels, T6)
 // Everything is a function of the case seed: gen(kind, seed) is deterministic.
 
 export function rng(seed) {
@@ -188,7 +192,7 @@ function play(r, n, o = { meta: 2 }) {
 const intro = '   ';   // the legacy/intro --More-- screens (dismissed with spaces)
 
 // ---------- kinds ----------
-export const KINDS = ['opts', 'play', 'deep', 'bones', 'saves'];
+export const KINDS = ['opts', 'play', 'deep', 'bones', 'saves', 'long', 'special'];
 
 export function gen(kind, seed) {
     const r = rng(seed * 2654435761 + KINDS.indexOf(kind));
@@ -246,6 +250,29 @@ export function gen(kind, seed) {
         segments = [];
         for (let i = 0; i < n; i++) {
             let m = (i === 0 ? intro : '  ') + play(r, 80 + r.int(300), { meta: 1 });
+            if (i < n - 1) m += '\x1b\x1b\x1bSy';
+            segments.push(seg(m, opts, i === 0 ? seed : 99999));
+        }
+        break;
+    }
+    case 'long': {
+        let m = intro;
+        while (m.length < 2000 + r.int(2000)) m += r.chance(0.04) ? '>' + '  ' : command(r, { meta: 1 });
+        segments = [seg(m, [...base, 'OPTIONS=!tutorial', ...(r.chance(0.5) ? ['OPTIONS=!autopickup'] : [])])];
+        break;
+    }
+    case 'special': {
+        const opts = [...base, 'OPTIONS=playmode:debug,!tutorial,!autopickup'];
+        // ^V takes a level number, a special level's name (dat/dungeon.lua), or "?" for a
+        // menu of them (picked by letter)
+        const LEVELS = ['oracle', 'bigrm', 'rogue', 'medusa', 'castle', 'valley', 'juiblex', 'baalz', 'asmodeus', 'orcus',
+            'wizard1', 'fakewiz1', 'minetn', 'minend', 'soko1', 'soko2', 'soko3', 'soko4', 'x-strt', 'x-loca', 'x-goal', 'knox', 'tower1'];
+        const go = () => '\x1b\x1b\x16' + (r.chance(0.75) ? r.pick(LEVELS) + '\r' : '?\r' + r.pick('abcdefghijklmnopqrstuvwxyz'.split(''))) + '    ';
+        const n = 2 + r.int(3);
+        segments = [];
+        for (let i = 0; i < n; i++) {
+            let m = (i === 0 ? intro + go() : '  ') + play(r, 40 + r.int(160), { meta: 1 });
+            if (i > 0 && r.chance(0.4)) m += go() + play(r, 20 + r.int(80), { meta: 1 });
             if (i < n - 1) m += '\x1b\x1b\x1bSy';
             segments.push(seg(m, opts, i === 0 ? seed : 99999));
         }

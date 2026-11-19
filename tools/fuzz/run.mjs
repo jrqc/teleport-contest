@@ -6,6 +6,7 @@
 //
 // Usage: node tools/fuzz/run.mjs [--kinds opts,play,deep,bones,saves] [--n 40]
 //                                [--seed 1] [--jobs 6] [--out DIR] [--keep]
+//        node tools/fuzz/run.mjs --regress   (the cases in regress.json: found bugs)
 // Output: DIR (default results/fuzz/<timestamp>/): summary.json, summary.md, and
 // fail/<kind>-<seed>.session.json (the recording) + .triage.json for each failure.
 // Groups failures by the C caller of the first differing RNG call (or by error), so
@@ -40,7 +41,8 @@ function sh(cmd, args, env = {}, timeout = 300_000) {
 }
 
 const cases = [];
-for (let i = 0; i < n; i++) for (const k of kinds) cases.push({ kind: k, seed: seed0 + i });
+if (process.argv.includes('--regress')) cases.push(...JSON.parse(readFileSync(new URL('./regress.json', import.meta.url), 'utf8')).cases);
+else for (let i = 0; i < n; i++) for (const k of kinds) cases.push({ kind: k, seed: seed0 + i });
 const results = [];
 async function worker(w) {
     // a private copy of the game directory: bones, saves and the record file are per recording
