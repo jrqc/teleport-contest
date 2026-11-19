@@ -16,6 +16,10 @@
 //   special wizard mode: ^V ? (the special-level menu) and a random entry: Sokoban,
 //          Minetown, Oracle, quest, big room, ...; play, save there, restore, play,
 //          save again (F13 on special levels, T6)
+//   meta   altmeta on: every meta command as ESC + key and as an 8-bit byte, with its
+//          prompts answered, ESC before digits, counts and directions, BIND=M-x,
+//          number_pad variants (F4)
+//   longopts one long game (1500-3000 keys) under random options (T3 + T6)
 // Everything is a function of the case seed: gen(kind, seed) is deterministic.
 
 export function rng(seed) {
@@ -192,7 +196,24 @@ function play(r, n, o = { meta: 2 }) {
 const intro = '   ';   // the legacy/intro --More-- screens (dismissed with spaces)
 
 // ---------- kinds ----------
-export const KINDS = ['opts', 'play', 'deep', 'bones', 'saves', 'long', 'special'];
+export const KINDS = ['opts', 'play', 'deep', 'bones', 'saves', 'long', 'special', 'meta', 'longopts'];
+
+// meta commands (cmd.c: M('x') bindings and extended commands with meta shortcuts), with
+// what usually follows them
+const META = [
+    ['a', (r) => letter(r) + r.pick(['b', 'c', '\x1b'])], ['c', (r) => r.pick([...DIRS, '.'])], ['d', (r) => letter(r) + 'n' + answer(r)],
+    ['e', () => '\x1b'], ['f', () => 'n'], ['i', (r) => letter(r)], ['j', (r) => '\x1b'], ['l', (r) => answer(r)],
+    ['m', (r) => answer(r)], ['n', (r) => r.pick(['m', 'i', 'o', 'f', 'd', '\x1b']) + '\x1b'], ['o', (r) => answer(r)],
+    ['p', () => 'n'], ['q', () => 'n'], ['r', (r) => letter(r)], ['s', () => ''], ['t', () => ''], ['u', (r) => r.pick([...DIRS, '.'])],
+    ['v', () => ''], ['w', () => ''], ['?', () => '\x1b'], ['C', () => ' \x1b'], ['O', () => ' \x1b'], ['T', (r) => letter(r)],
+    ['R', () => ''], ['A', () => '\x1b'], ['X', () => ''], ['2', () => ''], ['N', () => '\x1b'],
+];
+function metaCommand(r) {
+    const [k, then] = r.pick(META);
+    const how = r.int(3);
+    const key = how === 0 ? '\x1b' + k : how === 1 ? String.fromCharCode(k.charCodeAt(0) | 0x80) : '\x1b' + k.toUpperCase();
+    return key + then(r) + r.pick(['', ' ', '\x1b']);
+}
 
 export function gen(kind, seed) {
     const r = rng(seed * 2654435761 + KINDS.indexOf(kind));
@@ -253,6 +274,33 @@ export function gen(kind, seed) {
             if (i < n - 1) m += '\x1b\x1b\x1bSy';
             segments.push(seg(m, opts, i === 0 ? seed : 99999));
         }
+        break;
+    }
+    case 'meta': {
+        let m = intro;
+        const n = 300 + r.int(500);
+        while (m.length < n) {
+            m += r.wpick([
+                [6, () => metaCommand(r)],
+                [1, () => '\x1b' + String(1 + r.int(9)) + r.pick([...DIRS, 's'])],   // ESC then a count
+                [1, () => '\x1b' + r.pick(DIRS)],                                    // ESC then a direction (meta-h ...)
+                [1, () => '\x1b\x1b' + r.pick(DIRS)],
+                [1, () => 'n' + String(2 + r.int(9)) + r.pick(DIRS)],                 // number_pad count prefix
+                [5, () => command(r, { meta: 3 })],
+            ])();
+        }
+        const opts = [...base, 'OPTIONS=!tutorial', 'OPTIONS=altmeta'];
+        if (r.chance(0.4)) opts.push('OPTIONS=number_pad:' + r.pick(['0', '1', '2', '3', '4', '-1']));
+        if (r.chance(0.4)) opts.push('BIND=' + r.pick(['M-p:pray', 'M-x:search', 'M-z:inventory', 'M-v:version', '\\:discoveries']));
+        if (r.chance(0.2)) opts.push('OPTIONS=playmode:debug');
+        segments = [seg(m, opts)];
+        break;
+    }
+    case 'longopts': {
+        let m = intro;
+        const n = 1500 + r.int(1500);
+        while (m.length < n) m += r.chance(0.04) ? '>' + '  ' : command(r, { meta: 2 });
+        segments = [seg(m, [...base, ...randomOptions(r)])];
         break;
     }
     case 'long': {

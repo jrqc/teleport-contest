@@ -26,6 +26,7 @@ const isInt = (t) => t.k === 'int';
 const is64 = (t) => t.k === 'int' && t.size === 8;
 
 export class HeapEmitter extends TUEmitter {
+    get heapWorld() { return true; }
     constructor(tu, prog) { super(tu, prog); this.heap = true; }
 
     run() {

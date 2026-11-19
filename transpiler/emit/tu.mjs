@@ -355,7 +355,11 @@ export class TUEmitter {
         if (this.fn.usesGoto) decls.push('$goto = null');
         for (const tn of this.fn.tempNames) decls.push(tn);
         if (decls.length) lines.push(`    let ${decls.join(', ')};`);
-        lines.push(...stmts);
+        if (this.fn.setjmp) {   // objectSetjmp
+            const { jb, handler } = this.fn.setjmp;
+            lines.push('    try {', ...stmts.map((l) => (l ? '    ' + l : l)), '    } catch ($e) {',
+                `        if (!$c.isLongJmpTo($e, ${jb})) throw $e;`, ...handler, '    }');
+        } else lines.push(...stmts);
         lines.push('}');
         this.fn = null;
         return lines.join('\n');
@@ -411,6 +415,39 @@ export class TUEmitter {
         const l = n.loc && (n.loc.expansionLoc || n.loc);
         return l ? `${path.basename(l._f || '')}:${l._l}` : '';
     }
+    /**
+     * setjmp in the object world (nhlua.c nhl_pcall): `if (setjmp(buf)) S`, where S does
+     * not fall through (it ends in a noreturn call or a return). setjmp arms the buffer
+     * and returns 0; S becomes the handler of a try around the whole function body
+     * (emitFunction), entered by a longjmp to that buffer from any depth while this
+     * frame is live. Since S never falls through, where C would resume after the if
+     * does not matter. Locals are hoisted, so S sees them. Other shapes are errors.
+     */
+    objectSetjmp(n, ind, tag) {
+        const [c, th] = kids(n);
+        let cc = c;
+        while (cc && (cc.kind === 'ImplicitCastExpr' || cc.kind === 'ParenExpr' || cc.kind === 'CStyleCastExpr')) cc = kids(cc)[0];
+        if (!cc || cc.kind !== 'CallExpr') return null;
+        let f = kids(cc)[0];
+        while (f && (f.kind === 'ImplicitCastExpr' || f.kind === 'ParenExpr')) f = kids(f)[0];
+        if (!(f && f.kind === 'DeclRefExpr' && /^_?setjmp$/.test(f.referencedDecl.name))) return null;
+        if (this.heapWorld) return null;   // heap.mjs LUAI_TRY handles its own pattern
+        if (n.hasElse) this.err(n, 'setjmp: an if with an else is not translated');
+        if (this.fn.setjmp) this.err(n, 'setjmp: more than one in a function');
+        const last = th.kind === 'CompoundStmt' ? kids(th).at(-1) : th;
+        const noReturn = (x) => {
+            if (!x) return false;
+            if (x.kind === 'ReturnStmt') return true;
+            if (x.kind !== 'CallExpr') return false;
+            let g = kids(x)[0];
+            while (g && (g.kind === 'ImplicitCastExpr' || g.kind === 'ParenExpr')) g = kids(g)[0];
+            return !!(g && g.kind === 'DeclRefExpr' && /noreturn/.test(g.referencedDecl.type?.qualType || ''));
+        };
+        if (!noReturn(last)) this.err(n, 'setjmp: the handler falls through');
+        const jb = this.temp();
+        this.fn.setjmp = { jb, handler: this.block(th, '        ') };
+        return [`${ind}${jb} = ${this.rv(kids(cc)[1]).c}, $c.setjmp(${jb});   // setjmp: armed; a longjmp here runs the handler at the end of the function${tag}`];
+    }
     temp() {
         const n = `$t${++this.fn.temps}`;
         this.fn.tempNames.push(n);
@@ -460,6 +497,8 @@ export class TUEmitter {
             return out;
         }
         case 'IfStmt': {
+            const sj = this.objectSetjmp(n, ind, tag);
+            if (sj) return sj;
             const [c, th, el] = kids(n);
             const out = [`${ind}if (${this.inwardIf(n, th, el, this.cond(c))}) {${tag}`, ...this.block(th, ind + '    ')];
             if (n.hasElse) {

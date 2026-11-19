@@ -26,14 +26,15 @@ static void M(int sec, int min, int hour, int mday, int mon, int year, int isdst
 int main(void) {
     int i, y, h;
     const long long T0 = -473277600LL /* 1955-01-02 */, T1 = 4133980800LL /* 2101-01-01 */;
+    const long long E0 = -5364662400LL /* 1800-01-01 */;
     for (i = 0; i < 20000; i++) L((time_t) (T0 + r(T1 - T0)));
-    /* early hours of days in transition months, plus random days, 1955..2100 */
-    for (y = 1955; y <= 2100; y++) {
+    for (i = 0; i < 10000; i++) L((time_t) (E0 + r(T0 - E0)));   /* before 1955: tz database table */
+    /* early hours of days in transition months, plus random days, 1880..2100 */
+    for (y = 1880; y <= 2100; y++) {
         int mon, d;
         for (mon = 0; mon < 12; mon++) for (d = 1; d <= 28; d += 1) {
-            if (!(mon == 0 || mon == 1 || mon == 2 || mon == 3 || mon == 9 || mon == 10)) continue;
-            if (r(6) && !(y == 1974 || y == 1975)) continue;
-            if (y == 1955 && mon == 0 && d == 1) continue;   /* 1954 is outside the modeled range */
+            if (y >= 1955 && !(mon == 0 || mon == 1 || mon == 2 || mon == 3 || mon == 9 || mon == 10)) continue;
+            if (r(6) && !(y == 1974 || y == 1975 || y == 1883 || (y >= 1942 && y <= 1945))) continue;
             for (h = 0; h < 5; h++) {
                 struct tm t = { 0 };
                 t.tm_year = y - 1900; t.tm_mon = mon; t.tm_mday = d; t.tm_hour = h; t.tm_min = 30; t.tm_isdst = -1;
@@ -48,7 +49,7 @@ int main(void) {
     /* random and denormalized fields */
     for (i = 0; i < 20000; i++) {
         int isd = (int) r(3) - 1;
-        if (r(2)) M((int) r(60), (int) r(60), (int) r(24), 1 + (int) r(28), (int) r(12), 56 + (int) r(144), isd);
+        if (r(2)) M((int) r(60), (int) r(60), (int) r(24), 1 + (int) r(28), (int) r(12), (int) r(4) ? 56 + (int) r(144) : -30 + (int) r(90), isd);
         else M((int) r(200) - 100, (int) r(200) - 100, (int) r(60) - 30, (int) r(80) - 20, (int) r(40) - 14, 70 + (int) r(120), isd);
     }
     /* the session datetimes, as patch 001 builds them (fields from the string, isdst 1 and 0) */

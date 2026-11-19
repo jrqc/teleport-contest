@@ -14,7 +14,7 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const fields = (t) => [t.tm_sec, t.tm_min, t.tm_hour, t.tm_mday, t.tm_mon, t.tm_year, t.tm_wday, t.tm_yday,
     t.tm_isdst, t.tm_gmtoff, t.tm_zone ? cstrToJs(t.tm_zone) : '(null)'].join(' ');
 
-test('localtime and mktime match Darwin in America/New_York, 1955-2100', () => {
+test('localtime and mktime match Darwin in America/New_York, 1800-2100', () => {
     const dir = mkdtempSync(path.join(tmpdir(), 'time-'));
     const exe = path.join(dir, 'time-ref');
     execFileSync('clang', ['-arch', 'arm64', '-O0', '-o', exe, path.join(HERE, '../c-diff/time/time-ref.c')]);

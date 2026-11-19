@@ -73,6 +73,9 @@ async function worker(w) {
             cpSync(rec, path.join(OUT, 'fail', `${name}.session.json`));
             writeFileSync(path.join(OUT, 'fail', `${name}.triage.json`), JSON.stringify(row.triage, null, 1));
         }
+        // the levels it visited (the port's game state: dungeon, level, special level)
+        const lv = await sh('node', ['tools/fuzz/levels.mjs', rec], {}, 900_000);
+        try { row.levels = JSON.parse(lv.out); } catch { row.levels = null; }
         if (keep) { mkdirSync(path.join(OUT, 'all'), { recursive: true }); cpSync(rec, path.join(OUT, 'all', `${name}.session.json`)); }
         results.push(row);
         log(row);
@@ -102,13 +105,22 @@ for (const r of fails) {
     if (!groups.has(key)) groups.set(key, []);
     groups.get(key).push(r.name);
 }
-const summary = { ts, commit: (await sh('git', ['rev-parse', '--short', 'HEAD'])).out.trim(), cases: results.length,
+// levels reached in this run: label -> cases that visited it (special levels by name)
+const levelCount = new Map();
+for (const r of results) for (const l of r.levels || []) levelCount.set(l, (levelCount.get(l) || 0) + 1);
+const levelKey = (l) => { const m = l.match(/^(.*):(\d+)( .*)?$/); return m ? [m[1], Number(m[2])] : [l, 0]; };
+const levelsReached = [...levelCount].sort((a, b) => { const [da, la] = levelKey(a[0]), [db, lb] = levelKey(b[0]); return da < db ? -1 : da > db ? 1 : la - lb; });
+const summary = { ts, commit: (await sh('git', ['rev-parse', '--short', 'HEAD'])).out.trim(), cases: results.length, levelsReached: Object.fromEntries(levelsReached),
     passed: results.filter((r) => r.passed).length, failed: fails.length, recordErrors: results.filter((r) => r.recordError).length,
     groups: Object.fromEntries([...groups].sort((a, b) => b[1].length - a[1].length)), results };
 writeFileSync(path.join(OUT, 'summary.json'), JSON.stringify(summary, null, 1));
 const md = [`# Fuzz ${ts} (commit ${summary.commit})`, '', `${summary.cases} cases: ${summary.passed} pass, ${summary.failed} fail, ${summary.recordErrors} not recorded`, '',
     '| Cases | First divergence (C caller of the first differing RNG call, or error) | Examples |', '|---|---|---|',
-    ...[...groups].sort((a, b) => b[1].length - a[1].length).map(([k, v]) => `| ${v.length} | ${k.replace(/\|/g, '/')} | ${v.slice(0, 4).join(', ')} |`)];
+    ...[...groups].sort((a, b) => b[1].length - a[1].length).map(([k, v]) => `| ${v.length} | ${k.replace(/\|/g, '/')} | ${v.slice(0, 4).join(', ')} |`),
+    '', `## Levels reached (${levelsReached.length} distinct; cases that visited each)`, '',
+    ...[...new Set(levelsReached.map(([l]) => levelKey(l)[0]))].map((d) => `- **${d}**: ` + levelsReached.filter(([l]) => levelKey(l)[0] === d)
+        .map(([l, c]) => `${l.slice(d.length + 1)} (${c})`).join(', ')),
+    '', `Special levels: ${levelsReached.filter(([l]) => / /.test(l.replace(/^.*?:\d+/, ''))).map(([l]) => l.replace(/^.*?:\d+ /, '')).join(', ') || 'none'}`];
 writeFileSync(path.join(OUT, 'summary.md'), md.join('\n') + '\n');
 console.log(md.join('\n'));
 process.exit(fails.length ? 1 : 0);
