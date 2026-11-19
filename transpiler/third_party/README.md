@@ -4,7 +4,12 @@
 
 Unmodified files from Apple's Libc, tag **Libc-1752.120.2**
 (<https://github.com/apple-oss-distributions/Libc>), license `APPLE_LICENSE` (APSL 2.0) and
-the BSD notices in the files (`regex/FreeBSD/COPYRIGHT`).
+the notices in the files themselves. Every vendored `.c`/`.h` file is byte-identical to that
+tag and keeps its original header; the exceptions with no notice are `regex/TRE/config.h` and
+`tre-config.h`, autoconf output that carries none in Apple's tree either. Other license files:
+`regex/FreeBSD/COPYRIGHT` (Henry Spencer / UC Berkeley) and `regex/TRE/LICENSE` (TRE, BSD
+2-clause: the TRE files say "See the file LICENSE", which Apple's tree does not ship, so it
+is TRE's notice copied verbatim from Libc's `include/_regex.h`).
 
 | Path | Why |
 |---|---|

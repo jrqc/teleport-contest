@@ -57,6 +57,7 @@ held-out session, untested; **L** = possible, but needs an unusual input.
 | F16 | Darwin libc corners (`printf`, `strtod`, `qsort`) | L | Screen text |
 | F17 | Sandbox differences (judge runs under `node --permission`) | L | Startup failure |
 | F18 | Memory model: row crossing, the out-of-bounds Proxy, union punning, struct copies | L | Trap (loud) |
+| F19 | Regex source version: Libc-1752.120.2 vendored; the recording machine's macOS version is unknown | L | Different regex error code/text, or match result on an unusual pattern |
 
 ### F1. Capture buffer overflow (old patch 006) — H
 
@@ -292,6 +293,28 @@ held-out session, untested; **L** = possible, but needs an unusual input.
 
 All the traps above are loud: a trap ends the segment with an error on stderr. The judge's
 output is not visible to us, but the same trap in our own runs names the C construct.
+
+### F19. Regex Libc version — L (known risk, accepted 2026-11-19)
+
+- **What we chose.** The F2 fix transpiles TRE from Apple **Libc-1752.120.2**, because it
+  matches the regex of *our* machine (macOS 15.8.1, 24H32) on all 80,418 differential cases.
+  Libc-1669.60.4 (the tag macOS 15 nominally ships) differs on 12 of 30,292: `{256}` and
+  other counts above `RE_DUP_MAX` give error 10 "invalid repetition count(s)" there and error
+  18 "maximum repetition exceeds 255" on our system, so Apple has backported the 1752 code.
+- **What we don't know.** The macOS version of the machine that recorded the official
+  sessions (davidbau's) is not documented (`docs/recording-environment.md` names `HOME`,
+  `TERM`, `TZ` and Darwin libc, but no OS build). An older or newer macOS could have a TRE
+  between or beyond these two tags.
+- **Why it is low.** NetHack calls regex only with `REG_EXTENDED | REG_NOSUB`, for
+  match/no-match of user patterns from the nethackrc (`MENUCOLOR`, `MSGTYPE`,
+  autopickup exceptions). The two tags agree on every such case that compiles; they
+  differ only in which error a malformed pattern reports, and NetHack shows that text
+  only in an option-error message (`config_error_add`), for an invalid pattern. A held-out
+  session would need a pattern with a repetition count above 255, or another construct
+  the versions treat differently, to see it.
+- **How to settle it.** Any held-out failure in a session whose nethackrc has a regex
+  option; or a recording with a malformed pattern made on the recorder machine (needs the
+  contest author). Switching tags is a re-vendor plus regenerate, no transpiler change.
 
 ## 1A. Readability and Phase 2 (owner request, 2026-11-19)
 
