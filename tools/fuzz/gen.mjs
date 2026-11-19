@@ -311,11 +311,20 @@ export function gen(kind, seed) {
     }
     case 'special': {
         const opts = [...base, 'OPTIONS=playmode:debug,!tutorial,!autopickup'];
-        // ^V takes a level number, a special level's name (dat/dungeon.lua), or "?" for a
-        // menu of them (picked by letter)
-        const LEVELS = ['oracle', 'bigrm', 'rogue', 'medusa', 'castle', 'valley', 'juiblex', 'baalz', 'asmodeus', 'orcus',
-            'wizard1', 'fakewiz1', 'minetn', 'minend', 'soko1', 'soko2', 'soko3', 'soko4', 'x-strt', 'x-loca', 'x-goal', 'knox', 'tower1'];
-        const go = () => '\x1b\x1b\x16' + (r.chance(0.75) ? r.pick(LEVELS) + '\r' : '?\r' + r.pick('abcdefghijklmnopqrstuvwxyz'.split(''))) + '    ';
+        // ^V takes a level number, a special level's name, or "?" for a menu. A name only
+        // reaches levels in the current branch (dungeon.c lev_by_name: the Dungeons and
+        // Gehennom from the Dungeons); the menu (print_dungeon) reaches every dungeon. The
+        // tty menu has 3 pages and takes letters of the page shown: page 1 a-s (the
+        // Dungeons, Gehennom), page 2 t-J (fakewiz, sanctum, the Mines w x, the Quest y z A,
+        // Sokoban B-E, Vlad's Tower G-I, astral J), page 3 K... (the other planes).
+        const LEVELS = ['oracle', 'bigrm', 'rogue', 'medusa', 'castle', 'valley', 'juiblex', 'baalz', 'asmodeus', 'orcus', 'wizard1', 'fakewiz1'];
+        const menu = () => r.wpick([
+            [3, () => r.pick('bcdefghijklmnopqrs'.split(''))],
+            [8, () => '>' + r.pick('wxyzABCDEGHI'.split(''))],      // the branches
+            [1, () => '>' + r.pick('tuvJ'.split(''))],
+            [1, () => '>>' + r.pick('KLMN'.split(''))],
+        ])();
+        const go = () => '\x1b\x1b\x16' + (r.chance(0.35) ? r.pick(LEVELS) + '\r' : '?\r' + menu()) + '    ';
         const n = 2 + r.int(3);
         segments = [];
         for (let i = 0; i < n; i++) {

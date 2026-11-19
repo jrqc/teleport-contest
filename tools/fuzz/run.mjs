@@ -120,7 +120,7 @@ const md = [`# Fuzz ${ts} (commit ${summary.commit})`, '', `${summary.cases} cas
     '', `## Levels reached (${levelsReached.length} distinct; cases that visited each)`, '',
     ...[...new Set(levelsReached.map(([l]) => levelKey(l)[0]))].map((d) => `- **${d}**: ` + levelsReached.filter(([l]) => levelKey(l)[0] === d)
         .map(([l, c]) => `${l.slice(d.length + 1)} (${c})`).join(', ')),
-    '', `Special levels: ${levelsReached.filter(([l]) => / /.test(l.replace(/^.*?:\d+/, ''))).map(([l]) => l.replace(/^.*?:\d+ /, '')).join(', ') || 'none'}`];
+    '', `Special levels: ${[...new Set(levelsReached.filter(([l]) => / /.test(l.replace(/^.*?:\d+/, ''))).map(([l]) => l.replace(/^.*?:\d+ /, '')))].join(', ') || 'none'}`];
 writeFileSync(path.join(OUT, 'summary.md'), md.join('\n') + '\n');
 console.log(md.join('\n'));
 process.exit(fails.length ? 1 : 0);
