@@ -452,3 +452,4 @@ scored commit changed. Do this until the Phase 1 freeze (2026-11-29 00:00 UTC).
 | Scored (UTC) | Commit | Public | Held-out | Unmatched (pub + held) | Screen % (pub / held) | PRNG % (pub / held) | Rank (transpiled) | Note |
 |---|---|---|---|---|---|---|---|---|
 | 2026-11-19 00:50 | `9e66cf2` | 44/44 | 52/56 | 0 + 1,117 | 100 / 91.49 | 100 / 93.37 | 4 of 7 | First judged transpiled build (previous scored commit was the template skeleton: 15 points); analysis in `transpiler/out/postmortem.md` |
+| 2026-11-19 06:40 | `5a185bd` | 44/44 | 55/56 | 0 + 700 | 100 / 94.67 | 100 / 96.39 | 4 of 6 | F1 capture buffer + F2 regex: held-out +417 points, 3 more sessions pass; one held-out session still loses ~700 steps. Playability 6.88 ms/move on the judge |
