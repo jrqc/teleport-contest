@@ -428,3 +428,18 @@ frozen/, sessions/, nethack-c/, docs/   ← contest-provided; do not modify
   root causes. No claims of "fixed" without a score run.
 - Ask the owner before: changing the overall approach, adding hand-written overrides beyond a
   few, deleting large parts of the transpiler, or pushing to `main`.
+
+## 7. Judge results
+
+The official judge's scores for this fork, from the leaderboard data
+(`https://mazesofmenace.ai/leaderboard/data.json`, our entry `name == "jrqc"`). Until the
+Phase 1 freeze (2026-11-29 00:00 UTC), check it after every judge run (about every 2 hours)
+and add a row **only when the score or the scored commit changed**. The judge does not
+publish the commit it scored: the commit column is the latest commit on `origin/main` pushed
+before `lastScored`. Unmatched = maximum points − points (public + held-out). Screen % and
+PRNG % are given as public / held-out, as the leaderboard reports them. Rank is by total
+points (public + held-out) within the `transpiled` category.
+
+| Scored (UTC) | Commit | Public | Held-out | Unmatched (pub + held) | Screen % (pub / held) | PRNG % (pub / held) | Rank (transpiled) | Note |
+|---|---|---|---|---|---|---|---|---|
+| 2026-11-19 00:50 | `9e66cf2` | 44/44 | 52/56 | 0 + 1,117 | 100 / 91.49 | 100 / 93.37 | 4 of 7 | First judged transpiled build (previous scored commit was the template skeleton: 15 points); analysis in `transpiler/out/postmortem.md` |
