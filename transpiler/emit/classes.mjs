@@ -1,4 +1,4 @@
-// classes.mjs: record types -> JS classes (transpiler-design.md 3.2).
+// classes.mjs: record types -> JS classes (method/design.md 3.2).
 // Each struct becomes a class whose constructor zero-initializes every field
 // (C static zero-init and calloc/memset 0 both map to `new T()`), with
 // $copyFrom (C struct assignment: deep for embedded records and arrays,

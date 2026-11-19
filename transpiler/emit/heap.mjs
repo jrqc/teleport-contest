@@ -1,4 +1,4 @@
-// heap.mjs: heap-world code generation (transpiler-design.md 3.5, 7; decision D2).
+// heap.mjs: heap-world code generation (method/design.md 3.5, 7; decision D2).
 //
 // A HeapEmitter emits a TU whose data lives in the byte heap of
 // js/crt/heap.js ($h) with the C layout: the Lua 5.4.8 TUs, which treat memory

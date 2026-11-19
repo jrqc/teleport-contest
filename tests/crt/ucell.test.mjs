@@ -1,4 +1,4 @@
-// Unit test: js/crt/ucell.js union cells (transpiler-design.md 3.4.2) and the
+// Unit test: js/crt/ucell.js union cells (method/design.md 3.4.2) and the
 // pointer handles behind them (js/crt/mem.js ptrToInt). Layouts mirror the
 // generated classes of union customization_content and union any (arm64).
 import { test } from 'node:test';

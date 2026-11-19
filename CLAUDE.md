@@ -299,13 +299,13 @@ implementation (riskier: subtle semantic and RNG-order differences).
 
 | Stage | Who triggers | Output | Done when |
 |---|---|---|---|
-| **1. Investigate and design** | Owner asks | `transpiler-design.md` | Design reviewed and approved by the owner |
+| **1. Investigate and design** | Owner asks | `method/design.md` | Design reviewed and approved by the owner |
 | **2. Implement the transpiler** | Owner asks after approval | `transpiler/` + runtime + tooling | Transpiler unit/differential tests green; full NetHack transpiles without errors |
 | **3. Run and iterate** | Owner asks | Generated `js/`, scores | Automated loop running; score climbing; no regressions |
 
 Do not start a later stage without the owner's go-ahead.
 
-### Stage 1: investigate the code, then write `transpiler-design.md`
+### Stage 1: investigate the code, then write `method/design.md`
 
 Investigate with tools, not by reading 443k lines end to end:
 
@@ -324,7 +324,7 @@ Investigate with tools, not by reading 443k lines end to end:
    - Every PRNG call site per stream (core, display), plus Lua-script call sites.
 3. **Hotspots:** group the unsafe sites by file and type. Read only those closely and propose a
    decision for each (auto-object, heap-backed, hand rewrite).
-4. **Write `transpiler-design.md`** containing at least:
+4. **Write `method/design.md`** containing at least:
    - Inventory summary tables and the hotspot list, with the propagated heap-backed type set and
      its size (the key feasibility number).
    - Implementation language and front end (e.g. libclang/`clang -Xclang -ast-dump=json` from
@@ -398,7 +398,11 @@ to `results/<timestamp>/` and a short human summary.
 
 ```
 CLAUDE.md                 ← this file
-transpiler-design.md      ← Stage 1 output
+METHODS.md                ← how the port was made (summary for readers)
+method/                   ← method documents (NOT judged)
+  design.md               ← Stage 1 output, with implementation updates (section 14)
+  decisions.md            ← every lasting decision, with date and reason
+  postmortem.md, trap-audit.md, readability-plan.md
 transpiler/               ← transpiler source, annotations, analyzer (NOT judged)
   annotations.yaml
   out/                    ← inventory, unsafe report, call graphs
@@ -451,5 +455,6 @@ scored commit changed. Do this until the Phase 1 freeze (2026-11-29 00:00 UTC).
 
 | Scored (UTC) | Commit | Public | Held-out | Unmatched (pub + held) | Screen % (pub / held) | PRNG % (pub / held) | Rank (transpiled) | Note |
 |---|---|---|---|---|---|---|---|---|
-| 2026-11-19 00:50 | `9e66cf2` | 44/44 | 52/56 | 0 + 1,117 | 100 / 91.49 | 100 / 93.37 | 4 of 7 | First judged transpiled build (previous scored commit was the template skeleton: 15 points); analysis in `transpiler/out/postmortem.md` |
+| 2026-11-19 00:50 | `9e66cf2` | 44/44 | 52/56 | 0 + 1,117 | 100 / 91.49 | 100 / 93.37 | 4 of 7 | First judged transpiled build (previous scored commit was the template skeleton: 15 points); analysis in `method/postmortem.md` |
 | 2026-11-19 06:40 | `5a185bd` | 44/44 | 55/56 | 0 + 700 | 100 / 94.67 | 100 / 96.39 | 4 of 6 | F1 capture buffer + F2 regex: held-out +417 points, 3 more sessions pass; one held-out session still loses ~700 steps. Playability 6.88 ms/move on the judge |
+| 2026-11-19 18:34 | `f63c072` | 44/44 | 56/56 | 0 + 0 | 100 / 100 | 100 / 100 | 1 (tied with 2 others) of 6 | F20 blank screens, traps A/B (one-past pointer on a lone record, stale save-file pointer), trap audit, fuzzing: every session passes, 24,531/24,531 points. Playability 6.57 ms/move on the judge |

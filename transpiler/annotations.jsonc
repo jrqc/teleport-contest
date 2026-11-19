@@ -1,5 +1,5 @@
 // transpiler/annotations.jsonc: representation and call-graph decisions that
-// override the analyzer's defaults (transpiler-design.md section 9).
+// override the analyzer's defaults (method/design.md section 9).
 // Keys are C names: "struct x" / "union u" for records, function names (or
 // "file::name" for static functions). Every entry says why. Checked by
 // transpiler/annotations/check.mjs on every transpile.

@@ -1,4 +1,4 @@
-// ctypes.mjs: C types for the IR (transpiler-design.md 2, 3.1, 3.2).
+// ctypes.mjs: C types for the IR (method/design.md 2, 3.1, 3.2).
 //
 // Clang's JSON AST gives expression types only as C declarator strings, and
 // only desugars a typedef at the top level ("coordxy *" stays sugared). This

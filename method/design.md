@@ -679,7 +679,7 @@ is unaffected (one key at a time).
 | D3 | Annotation format | **Approved**: `transpiler/annotations.jsonc`; reasoning corrected (9.1): only `js/**` counts in the Phase 2 diff, and transpiler dependencies go in `transpiler/package.json` |
 | D4 | `struct engr` | **Approved**: object with a trailing byte area, matching C's truncation and length behavior (3.5) |
 | D5 | Template skeleton in `js/` | Delete it in **one separate commit**, once the first generated build runs end to end through `runSegment` |
-| D6 | Upstream report | Issue texts drafted in `transpiler/out/upstream-issue-drafts.md`; **the owner posts them** |
+| D6 | Upstream report | Issue texts drafted by the agent; **the owner posts them** |
 | D7 | Push | **After M3** |
 
 ### 12.3 Milestones

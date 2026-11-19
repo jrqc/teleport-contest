@@ -1,5 +1,5 @@
 // union-census-tu.mjs: per-TU facts for the union punning check
-// (transpiler-design.md 3.4, decision D1).
+// (method/design.md 3.4, decision D1).
 //
 // For every member access on a union value: the union, the member's canonical
 // type, the access kind and the storage class it touches. For every whole-union

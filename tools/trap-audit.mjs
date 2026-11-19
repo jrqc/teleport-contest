@@ -2,7 +2,7 @@
 // tools/trap-audit.mjs: every CTrap the hand-written runtime (js/crt/) can throw, with its
 // class. A trap ends the segment (the C program would go on), so each one must be either
 // behavior C does not define or a port invariant, never legal C the runtime does not
-// support (those were fixed: transpiler/out/trap-audit.md). Exit 1 on a trap that matches
+// support (those were fixed: method/trap-audit.md). Exit 1 on a trap that matches
 // no rule, so a new trap needs a decision.
 // Classes:
 //   UB        undefined behavior in C, or the C program aborts the same way (Darwin's

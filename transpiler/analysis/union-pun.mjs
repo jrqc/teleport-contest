@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// union-pun.mjs: the per-union punning check (transpiler-design.md 3.4, D1).
+// union-pun.mjs: the per-union punning check (method/design.md 3.4, D1).
 //
 // Input: the `unionCensus` facts in transpiler/out/inventory/tu/*.json
 // (union-census-tu.mjs). Written member types propagate along value flows to a

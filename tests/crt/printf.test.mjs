@@ -13,7 +13,7 @@ import { CTrap, norm } from '../../js/crt/int.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 
-// specs found in the NetHack + Lua sources (transpiler-design.md 5), plus a grid
+// specs found in the NetHack + Lua sources (method/design.md 5), plus a grid
 const SOURCE_SPECS = ['%s', '%d', '%ld', '%c', '%u', '%i', '%lu', '%08lx', '%p', '%02d', '%.60s', '%lx', '%.20s',
     '%.*s', '%2d', '%06ld', '%-1d', '%2.2s', '%03x', '%4d', '%08ld', '%02x', '%.3s', '%12s', '%*s', '%x', '%f',
     '%8ld', '%3d', '%06lx', '%8s', '%4s', '%4ld', '%1c', '%-7s', '%zu', '%*c', '%.40s', '%-20s', '%-12.12s', '%o',

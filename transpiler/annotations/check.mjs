@@ -1,4 +1,4 @@
-// check.mjs: annotation checker (tool 4.8, transpiler-design.md 9.3).
+// check.mjs: annotation checker (tool 4.8, method/design.md 9.3).
 //
 //   node transpiler/annotations/check.mjs      check transpiler/annotations.jsonc
 //

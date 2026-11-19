@@ -1,3 +1,23 @@
+# This fork: NetHack 5.0 → JavaScript by transpiling
+
+**Method.** This fork (category *transpiled*) ports NetHack 5.0 with its own C-to-JavaScript
+transpiler instead of a hand port: it reads clang's AST of the same patched source the recorder
+is built from and emits one readable JavaScript module per C file, with plain objects for
+NetHack's data and a C-exact byte heap only where the C treats memory as raw bytes (the Lua 5.4.8
+interpreter and Apple's regex library, transpiled by the same tool). A small hand-written C
+runtime supplies exact integer, `printf`, `qsort` and time semantics. Verification is differential
+testing against the reference C recorder: the public sessions, plus thousands of random recorded
+games.
+
+**Result.** The judge scored commit `f63c072` on 2026-11-19 at **100/100 sessions** (44/44 public,
+56/56 held-out), **0 unmatched** of 24,531 points, screens and PRNG 100%.
+
+How it was built, tested and decided: **[METHODS.md](METHODS.md)** (details in [`method/`](method/)).
+
+The contest's original README follows unchanged.
+
+---
+
 # The Teleport Coding Challenge
 
 *A guide to porting the Mazes of Menace from C to JavaScript, for

@@ -1,4 +1,4 @@
-// Legal C the object model used to trap on (trap audit, transpiler/out/trap-audit.md, 2026-11-19).
+// Legal C the object model used to trap on (trap audit, method/trap-audit.md, 2026-11-19).
 // Each test is a C construct with defined behavior; the comment gives the C.
 import test from 'node:test';
 import assert from 'node:assert/strict';

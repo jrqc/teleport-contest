@@ -26,6 +26,6 @@ Recording environment otherwise as the contest scripts set it: `TZ=America/New_Y
 On an Apple Silicon Mac the reference recorder builds as an **arm64** binary, even when the
 calling shell runs x86_64 under Rosetta (check with `file build/nethack-c/recorder/install/games/lib/nethackdir/nethack`).
 The 44/44 result was obtained with that arm64 binary, so arm64 is the reference ABI
-(transpiler-design.md 3.1). An x86_64 build differs only where C is undefined (it traps on
+(method/design.md 3.1). An x86_64 build differs only where C is undefined (it traps on
 integer division by zero, for example).
 

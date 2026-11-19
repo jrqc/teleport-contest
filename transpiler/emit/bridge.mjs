@@ -1,5 +1,5 @@
 // bridge.mjs: generates nh/luabridge.js, the object-world entry points of the
-// heap-world (Lua) functions NetHack calls (transpiler-design.md 7.3).
+// heap-world (Lua) functions NetHack calls (method/design.md 7.3).
 //
 // Each entry wraps the heap function with conversion descriptors derived from
 // its C type (js/crt/bridge.js documents the kinds). Records the object world

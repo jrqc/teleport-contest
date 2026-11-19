@@ -1,7 +1,7 @@
 {
   "name": "teleport-transpiler",
   "private": true,
-  "description": "NetHack 5.0 C to JavaScript transpiler (not judged; see ../transpiler-design.md)",
+  "description": "NetHack 5.0 C to JavaScript transpiler (not judged; see ../method/design.md)",
   "type": "module",
   "engines": { "node": ">=22.0.0" },
   "scripts": {

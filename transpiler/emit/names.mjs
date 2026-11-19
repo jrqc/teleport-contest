@@ -1,4 +1,4 @@
-// names.mjs: C identifiers -> JS identifiers (transpiler-design.md 4.5).
+// names.mjs: C identifiers -> JS identifiers (method/design.md 4.5).
 // C names are kept; names JS reserves or that would shadow globals the
 // generated code relies on get a fixed "_" suffix, from a fixed list (never a
 // counter or hash, so a change elsewhere cannot rename anything).

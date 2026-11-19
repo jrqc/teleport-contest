@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// data.mjs: embed the recorder's data directory as JS modules (transpiler-design.md 8.1).
+// data.mjs: embed the recorder's data directory as JS modules (method/design.md 8.1).
 // Usage: node transpiler/emit/data.mjs [--out DIR]   (default transpiler/build/data)
 // One module per file (a latin1 string literal, ASCII-escaped), plus index.js:
 //   export const files = [[name, () => Uint8Array], ...]; export const dirs = [...]

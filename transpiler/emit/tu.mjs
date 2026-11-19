@@ -1,4 +1,4 @@
-// tu.mjs: one translation unit -> one JS module (transpiler-design.md 3-4).
+// tu.mjs: one translation unit -> one JS module (method/design.md 3-4).
 //
 // Input: the resolved clang AST of a TU, its ctypes Scope, and a Program
 // object that answers whole-program questions (which module defines a
