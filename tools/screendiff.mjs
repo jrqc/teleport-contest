@@ -29,7 +29,7 @@ for (const seg of segs) {
     const n = seg.steps.length;
     for (let i = 0; i < n; i++) {
         C.push({ screen: seg.steps[i].screen, cursor: seg.steps[i].cursor });
-        J.push({ screen: g.getScreens()[i], cursor: g.getCursors()[i] });
+        J.push({ screen: g.getStepScreens()[i], cursor: g.getStepCursors()[i] });
         keys.push(seg.steps[i].key);
     }
     if (g.error) console.log(`[segment error] ${g.error.stack.split('\n').slice(0, process.env.STACK ? 14 : 4).join(' | ')}`);

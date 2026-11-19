@@ -14,6 +14,7 @@
 //   strict  --allow-fs-read=js/,frozen/,<the session file>: any other file read by
 //           our code fails, which a run with the whole fork readable would hide
 // Usage: node tools/sandbox-score.mjs [--policy judge|strict|both] [session ...]
+//   (default: sessions/ and tests/sessions/)
 // Exit 1 if any session fails, differs from the unsandboxed run, or logs an
 // access denial.
 import { spawnSync } from 'node:child_process';
@@ -28,7 +29,7 @@ const pi = args.indexOf('--policy');
 const policyArg = pi >= 0 ? args.splice(pi, 2)[1] : 'both';
 const policies = policyArg === 'both' ? ['judge', 'strict'] : [policyArg];
 let files = args.length ? args.map((a) => path.resolve(a))
-    : readdirSync(path.join(ROOT, 'sessions')).filter((f) => f.endsWith('.session.json')).sort().map((f) => path.join(ROOT, 'sessions', f));
+    : ['sessions', 'tests/sessions'].flatMap((d) => readdirSync(path.join(ROOT, d)).filter((f) => f.endsWith('.session.json')).sort().map((f) => path.join(ROOT, d, f)));   // public + our own (tests/sessions)
 
 // the judge overlays the frozen files; a run with different copies would not be its run
 for (const f of ['isaac64.js', 'terminal.js', 'storage.js']) {

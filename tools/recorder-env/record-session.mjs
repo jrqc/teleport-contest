@@ -20,6 +20,7 @@
 //                      (defaults to nethack-c/recorder/install/...)
 //   NETHACK_INSTALL    install dir (HACKDIR / NETHACKDIR)
 //   RERECORD_TZ        timezone for the C process (default America/New_York)
+//   RERECORD_CANON_HOME=1  run with the recording machine's HOME/USER ([teleport])
 //
 // The recorder binary must be built from the patched submodule.
 // See nethack-c/build-recorder.sh.
@@ -35,6 +36,7 @@ const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 const TEMPLATE_ROOT = path.resolve(SCRIPT_DIR, '..', '..');
 // [teleport] Defaults point at the reference recorder (build-reference.sh).
 const DEFAULT_BINARY = path.join(SCRIPT_DIR, 'nethack-ref.sh');
+const CANON_HOME = '/Users/davidbau/git/mazesofmenace/teleport/maud/test/comparison/c-harness/results';
 const DEFAULT_INSTALL = path.join(
     SCRIPT_DIR, 'build', 'nethack-c', 'recorder', 'install',
     'games', 'lib', 'nethackdir');
@@ -406,6 +408,13 @@ async function recordSegment({
         NETHACKDIR: installDir,
         HACKDIR: installDir,
         HOME: homeDir,
+        // [teleport] RERECORD_CANON_HOME=1: the recording machine's HOME, USER and
+        // LOGNAME (docs/recording-environment.md), with homemap.dylib (nethack-ref.sh)
+        // redirecting file calls under that HOME to homeDir
+        ...(process.env.RERECORD_CANON_HOME === '1' ? {
+            HOME: CANON_HOME, USER: 'davidbau', LOGNAME: 'davidbau',
+            TELEPORT_HOMEMAP_FROM: CANON_HOME, TELEPORT_HOMEMAP_REAL: homeDir,
+        } : {}),
         TERM: 'xterm-256color',
         TZ: tz,
         NETHACK_NO_DELAY: '1',

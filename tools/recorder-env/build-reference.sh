@@ -53,6 +53,7 @@ sed -e 's/^WIZARDS=.*/WIZARDS=*/' -e '/^GDBPATH=/d' -e '/^GREPPATH=/d' \
 chmod 0600 "$INST/sysconf"
 
 clang -dynamiclib -O2 -o "$B/realnow.dylib" "$HERE/realnow.c"
+clang -dynamiclib -O2 -o "$B/homemap.dylib" "$HERE/homemap.c"
 
 # nh_getenv() ignores values longer than BUFSZ/2 = 128 chars (options.c).
 if [ "${#INST}" -gt 128 ]; then
