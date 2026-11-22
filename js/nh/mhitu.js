@@ -41,7 +41,7 @@ import { You, You_cant, You_feel, You_hear, Your, impossible, pline, pline_The, 
 import { body_part, poly_gender, polymon, rehumanize, ugolemeffects } from './polyself.js';
 import { incr_itimeout, make_blinded, make_confused, make_hallucinated, make_sick, make_stunned, split_mon } from './potion.js';
 import { is_quest_artifact } from './questpgr.js';
-import { d, rn2, rnd, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { d, rn2, rnd } from './rnd.js';
 import { genders } from './role.js';
 import { money2mon } from './shk.js';
 import { growl_sound } from './sounds.js';
@@ -124,7 +124,7 @@ export function mswings_verb(mwep, bash) {   // mhitu.c:105
     let verb = null, otyp = 0, lash = 0, thrust = 0;
     otyp = mwep.otyp;
     lash = objects[otyp].oc_subtyp === 26 /* P_WHIP */ || mwep.otyp === 234 /* TOWEL */ && mwep.spe > 0 ? 1 : 0;
-    thrust = ((objects[otyp].oc_dir | 0) & 1) !== 0 && (((objects[otyp].oc_dir | 0) & -2) === 0 || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 116, $c.lit("mswings_verb")), rn2(2)) : rn2(2))) ? 1 : 0;
+    thrust = ((objects[otyp].oc_dir | 0) & 1) !== 0 && (((objects[otyp].oc_dir | 0) & -2) === 0 || !rn2(2)) ? 1 : 0;
     verb = bash ? $c.lit("bashes with") : lash ? $c.lit("lashes") : thrust ? $c.lit("thrusts") : $c.lit("swings");
     return verb;
 }
@@ -174,7 +174,7 @@ async function wildmiss(mtmp, mattk) {   // mhitu.c:176
         if (compat) {
             await pline($c.lit("%s tries to touch you and misses!"), Monst_name);
         } else {
-            switch (rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 218, $c.lit("wildmiss")), rn2(3)) : rn2(3)) {
+            switch (rn2(3)) {
                 case 0:
                     await pline($c.lit("%s %s wildly and misses!"), Monst_name, swings);
                     break;
@@ -365,7 +365,7 @@ export async function mattacku(mtmp) {   // mhitu.c:491
         if ($c.peq(mtmp, u.usteed)) {
             return 0;
         }
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 534, $c.lit("mattacku")), rn2($c.andu64(mtmp.data.mflags2, 128) !== 0 ? 2 : 4)) : rn2($c.andu64(mtmp.data.mflags2, 128) !== 0 ? 2 : 4)) && dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 2) {
+        if (!rn2($c.andu64(mtmp.data.mflags2, 128) !== 0 ? 2 : 4) && dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 2) {
             i = await mattackm(mtmp, u.usteed);
             if ((i & 4) !== 0) {
                 return 1;
@@ -410,9 +410,9 @@ export async function mattacku(mtmp) {   // mhitu.c:491
             if (hard_helmet(obj)) {
                 await Your($c.lit("blow glances off %s %s."), s_suffix(await mon_nam(mtmp)), helm_simple_name(obj));
             } else {
-                if ((3 + find_mac(mtmp) | 0) <= (rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 604, $c.lit("mattacku")), rnd(20)) : rnd(20))) {
+                if ((3 + find_mac(mtmp) | 0) <= rnd(20)) {
                     await pline($c.lit("%s is hit by a falling piercer (you)!"), await Monnam(mtmp));
-                    if (($t1 = rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 607, $c.lit("mattacku")), d(3, 6)) : d(3, 6), mtmp.mhp = mtmp.mhp - $t1 | 0) < 1) {
+                    if (($t1 = d(3, 6), mtmp.mhp = mtmp.mhp - $t1 | 0) < 1) {
                         await killed(mtmp);
                     }
                 } else {
@@ -481,7 +481,7 @@ export async function mattacku(mtmp) {   // mhitu.c:491
         }
         return 0;
     }
-    tmp = (u.uac >= 0 ? u.uac : -(rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 709, $c.lit("mattacku")), rnd(-u.uac | 0)) : rnd(-u.uac | 0)) | 0) + 10 | 0;
+    tmp = (u.uac >= 0 ? u.uac : -rnd(-u.uac | 0) | 0) + 10 | 0;
     tmp = tmp + mtmp.m_lev | 0;
     if (gm.multi < 0) {
         tmp = tmp + 4 | 0;
@@ -559,7 +559,7 @@ export async function mattacku(mtmp) {   // mhitu.c:491
                 }
                 if (!range2[0] && (!mtmp.mw || mtmp.mconf | 0 || (u.uprops[44 /* CONFLICT */].intrinsic || u.uprops[44 /* CONFLICT */].extrinsic) || !($c.peq(gy.youmonst.data, $c.relem(mons, 10 /* PM_COCKATRICE */)) || $c.peq(gy.youmonst.data, $c.relem(mons, 9 /* PM_CHICKATRICE */))))) {
                     if (foundyou[0]) {
-                        if (tmp > (j = rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 806, $c.lit("mattacku")), rnd(20 + i | 0)) : rnd(20 + i | 0))) {
+                        if (tmp > (j = rnd(20 + i | 0))) {
                             if ($c.andu64(gy.youmonst.data.mflags1, 1048576) !== 0 && await failed_grab(mtmp, gy.youmonst, mattk)) {
                                 continue L1;
                             }
@@ -595,7 +595,7 @@ export async function mattacku(mtmp) {   // mhitu.c:491
             case 11:
                 if (!range2[0]) {
                     if (foundyou[0]) {
-                        if (u.uswallow | 0 || !mtmp.mspec_used && tmp > (j = rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 848, $c.lit("mattacku")), rnd(20 + i | 0)) : rnd(20 + i | 0))) {
+                        if (u.uswallow | 0 || !mtmp.mspec_used && tmp > (j = rnd(20 + i | 0))) {
                             await flush_screen(1);
                             $t6 = await gulpmu(mtmp, mattk), sum[i] = $t6;
                         } else {
@@ -645,7 +645,7 @@ export async function mattacku(mtmp) {   // mhitu.c:491
                             tmp = tmp + hittmp | 0;
                             await mswings(mtmp, mon_currwep, bash);
                         }
-                        if (tmp > (j = ($t9 = rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 912, $c.lit("mattacku")), rnd(20 + i | 0)) : rnd(20 + i | 0), gm.mhitu_dieroll = $t9))) {
+                        if (tmp > (j = ($t9 = rnd(20 + i | 0), gm.mhitu_dieroll = $t9))) {
                             $t10 = await hitmu(mtmp, mattk), sum[i] = $t10;
                         } else {
                             await missmu(mtmp, $c.i8(tmp === j ? 1 : 0), mattk);
@@ -673,7 +673,7 @@ export async function mattacku(mtmp) {   // mhitu.c:491
             await bot();
         }
         if (sum[i] === 1) {
-            if (u.usleep && u.usleep < svm.moves && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 940, $c.lit("mattacku")), rn2(10)) : rn2(10))) {
+            if (u.usleep && u.usleep < svm.moves && !rn2(10)) {
                 gm.multi = -1;
                 gn.nomovemsg = $c.lit("The combat suddenly awakens you.");
             }
@@ -692,7 +692,7 @@ async function summonmu(mtmp, youseeit) {   // mhitu.c:956
     mdat = mtmp.data;
     if ($c.andu64(mdat.mflags2, 256) !== 0) {
         if (!$c.peq(mdat, $c.relem(mons, 302 /* PM_BALROG */)) && !$c.peq(mdat, $c.relem(mons, 290 /* PM_AMOROUS_DEMON */))) {
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 968, $c.lit("summonmu")), rn2(In_hell(u.uz) ? 10 : 16)) : rn2(In_hell(u.uz) ? 10 : 16))) {
+            if (!rn2(In_hell(u.uz) ? 10 : 16)) {
                 await msummon(mtmp);
             }
         }
@@ -700,16 +700,16 @@ async function summonmu(mtmp, youseeit) {   // mhitu.c:956
     }
     if ($c.andu64(mdat.mflags2, 4) !== 0) {
         if ($c.andu64(mdat.mflags2, 8) !== 0) {
-            if (!(u.uprops[60 /* PROT_FROM_SHAPE_CHANGERS */].intrinsic || u.uprops[60 /* PROT_FROM_SHAPE_CHANGERS */].extrinsic) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 979, $c.lit("summonmu")), rn2(5 - Math.imul(night(), 2) | 0)) : rn2(5 - Math.imul(night(), 2) | 0))) {
+            if (!(u.uprops[60 /* PROT_FROM_SHAPE_CHANGERS */].intrinsic || u.uprops[60 /* PROT_FROM_SHAPE_CHANGERS */].extrinsic) && !rn2(5 - Math.imul(night(), 2) | 0)) {
                 await new_were(mtmp);
             }
         } else {
-            if (u.uprops[60 /* PROT_FROM_SHAPE_CHANGERS */].intrinsic || u.uprops[60 /* PROT_FROM_SHAPE_CHANGERS */].extrinsic || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 982, $c.lit("summonmu")), rn2(30)) : rn2(30))) {
+            if (u.uprops[60 /* PROT_FROM_SHAPE_CHANGERS */].intrinsic || u.uprops[60 /* PROT_FROM_SHAPE_CHANGERS */].extrinsic || !rn2(30)) {
                 await new_were(mtmp);
             }
         }
         mdat = mtmp.data;
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 989, $c.lit("summonmu")), rn2(10)) : rn2(10))) {
+        if (!rn2(10)) {
             $c.__builtin___strcpy_chk(new $c.Ptr(genericwere, 0), $c.lit("creature"), 256);
             if (youseeit) {
                 await pline_mon(mtmp, $c.lit("%s summons help!"), await Monnam(mtmp));
@@ -752,7 +752,7 @@ export async function diseasemu(mdat) {   // mhitu.c:1033
         await You_feel($c.lit("a slight illness."));
         return 0;
     } else {
-        await make_sick(u.uprops[17 /* SICK */].intrinsic ? $c.add64($c.div64(u.uprops[17 /* SICK */].intrinsic, 3), 1) : (rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 1039, $c.lit("diseasemu")), rn2(acurr(4 /* A_CON */))) : rn2(acurr(4 /* A_CON */))) + 20 | 0, mdat.pmnames[2 /* NEUTRAL */], 1, 2);
+        await make_sick(u.uprops[17 /* SICK */].intrinsic ? $c.add64($c.div64(u.uprops[17 /* SICK */].intrinsic, 3), 1) : rn2(acurr(4 /* A_CON */)) + 20 | 0, mdat.pmnames[2 /* NEUTRAL */], 1, 2);
         return 1;
     }
 }
@@ -768,9 +768,9 @@ export async function u_slip_free(mtmp, mattk) {   // mhitu.c:1047
     if (mattk.adtyp === 32) {
         obj = $G.uarmh;
     }
-    if (obj && (obj.greased | 0 || obj.otyp === 142 /* OILSKIN_CLOAK */) && (!obj.cursed || (rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 1066, $c.lit("u_slip_free")), rn2(3)) : rn2(3)))) {
+    if (obj && (obj.greased | 0 || obj.otyp === 142 /* OILSKIN_CLOAK */) && (!obj.cursed || rn2(3))) {
         await pline_mon(mtmp, $c.lit("%s %s your %s %s!"), await Monnam(mtmp), mattk.adtyp === 28 ? $c.lit("slips off of") : $c.lit("grabs you, but cannot hold onto"), obj.greased | 0 ? $c.lit("greased") : $c.lit("slippery"), obj.greased | 0 || objects[obj.otyp].oc_name_known | 0 ? await xname(obj) : cloak_simple_name(obj));
-        if (obj.greased | 0 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 1077, $c.lit("u_slip_free")), rn2(2)) : rn2(2))) {
+        if (obj.greased | 0 && !rn2(2)) {
             await pline_The($c.lit("grease wears off."));
             obj.greased = (0) & 1;
             await update_inventory();
@@ -848,9 +848,9 @@ async function hitmu(mtmp, mattk) {   // mhitu.c:1144
             await newsym(mtmp.mx, mtmp.my);
         }
     }
-    $t1 = rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 1187, $c.lit("hitmu")), d(mattk.damn, mattk.damd)) : d(mattk.damn, mattk.damd), mhm.damage = $t1;
+    $t1 = d(mattk.damn, mattk.damd), mhm.damage = $t1;
     if (($c.andu64(mdat.mflags2, 2) !== 0 || (mtmp.cham === 226 /* PM_VAMPIRE */ || mtmp.cham === 227 /* PM_VAMPIRE_LEADER */ || mtmp.cham === 228 /* PM_VLAD_THE_IMPALER */)) && midnight()) {
-        $t2 = rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 1189, $c.lit("hitmu")), d(mattk.damn, mattk.damd)) : d(mattk.damn, mattk.damd), mhm.damage = mhm.damage + $t2 | 0;
+        $t2 = d(mattk.damn, mattk.damd), mhm.damage = mhm.damage + $t2 | 0;
     }
     await mhitm_adtyping(mtmp, mattk, gy.youmonst, mhm);
     await mhitm_knockback(mtmp, gy.youmonst, mattk, new $c.FieldRef(mhm, "hitflags", "i32"), $c.i8(mtmp.mw !== null ? 1 : 0));
@@ -862,7 +862,7 @@ async function hitmu(mtmp, mattk) {   // mhitu.c:1144
         mhm.damage = 0;
     }
     if (mhm.damage && u.uac < 0) {
-        $t3 = rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 1209, $c.lit("hitmu")), rnd(-u.uac | 0)) : rnd(-u.uac | 0), mhm.damage = mhm.damage - $t3 | 0;
+        $t3 = rnd(-u.uac | 0), mhm.damage = mhm.damage - $t3 | 0;
         if (mhm.damage < 1) {
             mhm.damage = 1;
         }
@@ -872,7 +872,7 @@ async function hitmu(mtmp, mattk) {   // mhitu.c:1144
             mhm.damage = $c.div32(mhm.damage + 1 | 0, 2);
         }
         if (mhm.permdmg) {
-            $t4 = $c.i8(rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 1233, $c.lit("hitmu")), rn2($c.div32(mhm.damage, 2) + 1 | 0)) : rn2($c.div32(mhm.damage, 2) + 1 | 0)), mhm.permdmg = $t4;
+            $t4 = $c.i8(rn2($c.div32(mhm.damage, 2) + 1 | 0)), mhm.permdmg = $t4;
             if (u.umonnum !== u.umonster || u.uhpmax > Math.imul(25, u.ulevel)) {
                 mhm.permdmg = $c.i8(mhm.damage);
             } else if (u.uhpmax > Math.imul(10, u.ulevel)) {
@@ -916,7 +916,7 @@ export async function gulp_blnd_check() {   // mhitu.c:1273
 async function gulpmu(mtmp, mattk) {   // mhitu.c:1289
     let t = null, tmp = 0, tim_tmp = 0, otmp2 = null, nextobj = null, i = 0, physical_damage = 0, omx = 0, omy = 0, buf = new Int8Array(256), s = null, was_blinded = 0;
     t = t_at(u.ux, u.uy);
-    tmp = rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 1292, $c.lit("gulpmu")), d(mattk.damn, mattk.damd)) : d(mattk.damn, mattk.damd);
+    tmp = d(mattk.damn, mattk.damd);
     physical_damage = 0;
     if (!u.uswallow) {
         omx = mtmp.mx;
@@ -971,14 +971,14 @@ async function gulpmu(mtmp, mattk) {   // mhitu.c:1289
         await vision_recalc(2);
         u.uswallow = (1) & 1;
         if (mattk.adtyp === 26) {
-            tim_tmp = ((acurr(4 /* A_CON */) + 10 | 0) - u.uac | 0) + (rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 1385, $c.lit("gulpmu")), rn2(20)) : rn2(20)) | 0;
+            tim_tmp = ((acurr(4 /* A_CON */) + 10 | 0) - u.uac | 0) + rn2(20) | 0;
             if (tim_tmp < 0) {
                 tim_tmp = 0;
             }
             tim_tmp = $c.div32(tim_tmp, mtmp.m_lev);
             tim_tmp = tim_tmp + 3 | 0;
         } else {
-            tim_tmp = rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 1392, $c.lit("gulpmu")), rnd(mtmp.m_lev + 5 | 0)) : rnd(mtmp.m_lev + 5 | 0);
+            tim_tmp = rnd(mtmp.m_lev + 5 | 0);
         }
         u.uswldtim = (tim_tmp < 2 ? 2 : tim_tmp) >>> 0;
         await swallowed(1);
@@ -1065,7 +1065,7 @@ async function gulpmu(mtmp, mattk) {   // mhitu.c:1289
             tmp = 0;
             break;
         case 6:
-            if (!mtmp.mcan && (rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 1488, $c.lit("gulpmu")), rn2(2)) : rn2(2))) {
+            if (!mtmp.mcan && rn2(2)) {
                 await pline_The($c.lit("air around you crackles with electricity."));
                 if (u.uprops[5 /* SHOCK_RES */].intrinsic || u.uprops[5 /* SHOCK_RES */].extrinsic) {
                     await shieldeff(u.ux, u.uy);
@@ -1081,7 +1081,7 @@ async function gulpmu(mtmp, mattk) {   // mhitu.c:1289
             }
             break;
         case 3:
-            if (!mtmp.mcan && (rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 1503, $c.lit("gulpmu")), rn2(2)) : rn2(2))) {
+            if (!mtmp.mcan && rn2(2)) {
                 if (u.uprops[2 /* COLD_RES */].intrinsic || u.uprops[2 /* COLD_RES */].extrinsic) {
                     await shieldeff(u.ux, u.uy);
                     await You_feel($c.lit("mildly chilly."));
@@ -1097,7 +1097,7 @@ async function gulpmu(mtmp, mattk) {   // mhitu.c:1289
             }
             break;
         case 2:
-            if (!mtmp.mcan && (rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 1518, $c.lit("gulpmu")), rn2(2)) : rn2(2))) {
+            if (!mtmp.mcan && rn2(2)) {
                 if (u.uprops[1 /* FIRE_RES */].intrinsic || u.uprops[1 /* FIRE_RES */].extrinsic) {
                     await shieldeff(u.ux, u.uy);
                     await You_feel($c.lit("mildly hot."));
@@ -1119,7 +1119,7 @@ async function gulpmu(mtmp, mattk) {   // mhitu.c:1289
             }
             break;
         case 16:
-            if (!mtmp.mcan && (rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 1539, $c.lit("gulpmu")), rn2(4)) : rn2(4))) {
+            if (!mtmp.mcan && rn2(4)) {
                 await drain_en(tmp, 0);
             }
             tmp = 0;
@@ -1131,7 +1131,7 @@ async function gulpmu(mtmp, mattk) {   // mhitu.c:1289
     }
     if (physical_damage) {
         if (u.uac < 0) {
-            tmp = tmp - (rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 1552, $c.lit("gulpmu")), rnd(-u.uac | 0)) : rnd(-u.uac | 0)) | 0;
+            tmp = tmp - rnd(-u.uac | 0) | 0;
         }
         if (tmp < 0) {
             tmp = 1;
@@ -1163,7 +1163,7 @@ async function explmu(mtmp, mattk, ufound) {   // mhitu.c:1591
     if (mtmp.mcan) {
         return 0;
     }
-    tmp = rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 1603, $c.lit("explmu")), d(mattk.damn, mattk.damd)) : d(mattk.damn, mattk.damd);
+    tmp = d(mattk.damn, mattk.damd);
     not_affected = await defended(mtmp, mattk.adtyp);
     if (!ufound) {
         await pline($c.lit("%s explodes at a spot in %s!"), canseemon(mtmp) ? await Monnam(mtmp) : $c.lit("It"), is_waterwall(mtmp.mux, mtmp.muy) ? $c.lit("empty water") : $c.lit("thin air"));
@@ -1182,7 +1182,7 @@ async function explmu(mtmp, mattk, ufound) {   // mhitu.c:1591
         case 11:
             not_affected = await resists_blnd(gy.youmonst);
             if (ufound && !not_affected) {
-                if (mon_visible(mtmp) || (rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 1627, $c.lit("explmu")), rnd(tmp = $c.div32(tmp, 2))) : rnd(tmp = $c.div32(tmp, 2))) > u.ulevel) {
+                if (mon_visible(mtmp) || rnd(tmp = $c.div32(tmp, 2)) > u.ulevel) {
                     await You($c.lit("are blinded by a blast of light!"));
                     await make_blinded(tmp, 0);
                     if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
@@ -1230,7 +1230,7 @@ export async function gazemu(mtmp, mattk) {   // mhitu.c:1668
     }
     is_medusa = $c.i8($c.peq(mtmp.data, $c.relem(mons, 284 /* PM_MEDUSA */)) ? 1 : 0);
     reflectable = $c.i8((u.uprops[65 /* REFLECTING */].intrinsic || u.uprops[65 /* REFLECTING */].extrinsic) && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & 1) !== 0 && is_medusa ? 1 : 0);
-    if (u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 1698, $c.lit("gazemu")), rn2(4)) : rn2(4)) || gm.multi < 0 && (unconscious() || is_fainted()) && !reflectable) {
+    if (u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic) && rn2(4) || gm.multi < 0 && (unconscious() || is_fainted()) && !reflectable) {
         cancelled = 1;
     }
     switch (mattk.adtyp) {
@@ -1243,7 +1243,7 @@ export async function gazemu(mtmp, mattk) {   // mhitu.c:1668
                     react = is_medusa ? 4 : 2;
                     break;
                 }
-                if (is_medusa && (u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic)) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 1712, $c.lit("gazemu")), rn2(3)) : rn2(3))) {
+                if (is_medusa && (u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic)) && !rn2(3)) {
                     await pline($c.lit("Someone seems overdue for a serpent cut."));
                 } else {
                     await pline_mon(mtmp, $c.lit("%s %s."), await Monnam(mtmp), is_medusa && mtmp.mcan | 0 && !react ? $c.lit("doesn't look all that ugly") : $c.lit("gazes ineffectually"));
@@ -1287,13 +1287,13 @@ export async function gazemu(mtmp, mattk) {   // mhitu.c:1668
             }
             break;
         case 25:
-            if (mcanseeu && !mtmp.mspec_used && (rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 1760, $c.lit("gazemu")), rn2(5)) : rn2(5))) {
+            if (mcanseeu && !mtmp.mspec_used && rn2(5)) {
                 if (cancelled) {
                     react = 0;
                     already = $c.i8((mtmp.mconf | 0) !== 0 ? 1 : 0);
                 } else {
-                    conf = rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 1765, $c.lit("gazemu")), d(3, 4)) : d(3, 4);
-                    $t1 = mtmp.mspec_used + (conf + (rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 1767, $c.lit("gazemu")), rn2(6)) : rn2(6)) | 0) | 0, mtmp.mspec_used = $t1;
+                    conf = d(3, 4);
+                    $t1 = mtmp.mspec_used + (conf + rn2(6) | 0) | 0, mtmp.mspec_used = $t1;
                     if (!u.uprops[14 /* CONFUSION */].intrinsic) {
                         await pline_mon(mtmp, $c.lit("%s gaze confuses you!"), s_suffix(await Monnam(mtmp)));
                     } else {
@@ -1305,13 +1305,13 @@ export async function gazemu(mtmp, mattk) {   // mhitu.c:1668
             }
             break;
         case 12:
-            if (mcanseeu && !mtmp.mspec_used && (rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 1779, $c.lit("gazemu")), rn2(5)) : rn2(5))) {
+            if (mcanseeu && !mtmp.mspec_used && rn2(5)) {
                 if (cancelled) {
                     react = 1;
                     already = $c.i8((mtmp.mstun | 0) !== 0 ? 1 : 0);
                 } else {
-                    stun = rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 1784, $c.lit("gazemu")), d(2, 6)) : d(2, 6);
-                    $t2 = mtmp.mspec_used + (stun + (rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 1786, $c.lit("gazemu")), rn2(6)) : rn2(6)) | 0) | 0, mtmp.mspec_used = $t2;
+                    stun = d(2, 6);
+                    $t2 = mtmp.mspec_used + (stun + rn2(6) | 0) | 0, mtmp.mspec_used = $t2;
                     await pline_mon(mtmp, $c.lit("%s stares piercingly at you!"), await Monnam(mtmp));
                     await make_stunned($c.add64($c.and64(u.uprops[13 /* STUNNED */].intrinsic, 16777215), stun), 1);
                     await stop_occupation();
@@ -1321,13 +1321,13 @@ export async function gazemu(mtmp, mattk) {   // mhitu.c:1668
         case 11:
             if (canseemon(mtmp) && !await resists_blnd(gy.youmonst) && dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 64) {
                 if (cancelled) {
-                    react = (rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 1797, $c.lit("gazemu")), rn2(2)) : rn2(2)) + 2 | 0;
+                    react = rn2(2) + 2 | 0;
                     already = $c.i8((mtmp.mcansee | 0) === 0 ? 1 : 0);
-                    if (mtmp.mcan | 0 && $c.peq(mtmp.data, $c.relem(mons, 125 /* PM_ARCHON */)) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 1801, $c.lit("gazemu")), rn2(5)) : rn2(5))) {
+                    if (mtmp.mcan | 0 && $c.peq(mtmp.data, $c.relem(mons, 125 /* PM_ARCHON */)) && rn2(5)) {
                         react = -1;
                     }
                 } else {
-                    blnd = rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 1804, $c.lit("gazemu")), d(mattk.damn, mattk.damd)) : d(mattk.damn, mattk.damd);
+                    blnd = d(mattk.damn, mattk.damd);
                     await You($c.lit("are blinded by %s radiance!"), s_suffix(await mon_nam(mtmp)));
                     await make_blinded(blnd, 0);
                     await stop_occupation();
@@ -1335,18 +1335,18 @@ export async function gazemu(mtmp, mattk) {   // mhitu.c:1668
                         await Your($c.lit("%s"), c_common_strings.c_vision_clears);
                     } else {
                         oldstun = $c.and64(u.uprops[13 /* STUNNED */].intrinsic, 16777215);
-                        newstun = rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 1815, $c.lit("gazemu")), rnd(3)) : rnd(3);
+                        newstun = rnd(3);
                         await make_stunned(oldstun > newstun ? oldstun : newstun, 1);
                     }
                 }
             }
             break;
         case 2:
-            if (mcanseeu && !mtmp.mspec_used && (rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 1825, $c.lit("gazemu")), rn2(5)) : rn2(5))) {
+            if (mcanseeu && !mtmp.mspec_used && rn2(5)) {
                 if (cancelled) {
-                    react = (rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 1827, $c.lit("gazemu")), rn2(2)) : rn2(2)) + 4 | 0;
+                    react = rn2(2) + 4 | 0;
                 } else {
-                    dmg = rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 1829, $c.lit("gazemu")), d(2, 6)) : d(2, 6);
+                    dmg = d(2, 6);
                     orig_dmg = dmg;
                     lev = mtmp.m_lev;
                     await pline_mon(mtmp, $c.lit("%s attacks you with a fiery gaze!"), await Monnam(mtmp));
@@ -1355,16 +1355,16 @@ export async function gazemu(mtmp, mattk) {   // mhitu.c:1668
                         await shieldeff(u.ux, u.uy);
                         await pline_The($c.lit("fire doesn't feel hot!"));
                         monstseesu(2);
-                        await ugolemeffects(2, rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 1838, $c.lit("gazemu")), d(12, 6)) : d(12, 6));
+                        await ugolemeffects(2, d(12, 6));
                         dmg = 0;
                     } else {
                         monstunseesu(2);
                     }
                     await burn_away_slime();
-                    if (lev > (rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 1844, $c.lit("gazemu")), rn2(20)) : rn2(20))) {
+                    if (lev > rn2(20)) {
                         await burnarmor(gy.youmonst);
                     }
-                    if (lev > (rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 1846, $c.lit("gazemu")), rn2(20)) : rn2(20))) {
+                    if (lev > rn2(20)) {
                         await destroy_items(gy.youmonst, 2, orig_dmg);
                         await ignite_items(gi.invent);
                     }
@@ -1379,10 +1379,10 @@ export async function gazemu(mtmp, mattk) {   // mhitu.c:1668
             break;
     }
     if (react >= 0) {
-        if (u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 1888, $c.lit("gazemu")), rn2(3)) : rn2(3))) {
-            react = rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 1889, $c.lit("gazemu")), rn2(8)) : rn2(8);
+        if (u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic) && rn2(3)) {
+            react = rn2(8);
         }
-        await pline_mon(mtmp, $c.lit("%s looks %s%s."), await Monnam(mtmp), !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 1893, $c.lit("gazemu")), rn2(3)) : rn2(3)) ? $c.lit("") : already ? $c.lit("quite ") : !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 1894, $c.lit("gazemu")), rn2(2)) : rn2(2)) ? $c.lit("a bit ") : $c.lit("somewhat "), gazemu$reactions[react]);
+        await pline_mon(mtmp, $c.lit("%s looks %s%s."), await Monnam(mtmp), !rn2(3) ? $c.lit("") : already ? $c.lit("quite ") : !rn2(2) ? $c.lit("a bit ") : $c.lit("somewhat "), gazemu$reactions[react]);
     }
     return 0;
 }
@@ -1482,7 +1482,7 @@ export async function doseduce(mon) {   // mhitu.c:1985
                     continue;
                 }
             }
-            if (!(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 2032, $c.lit("doseduce")), rn2(20)) : rn2(20)) < acurr(5 /* A_CHA */)) {
+            if (!(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf) && rn2(20) < acurr(5 /* A_CHA */)) {
                 await safe_qbuf(new $c.Ptr(qbuf, 0), $c.lit("\"That "), $c.lit(" looks pretty.  May I have it?\""), ring, xname, simpleonames, $c.lit("ring"));
                 await discover_object(173, 1, 1, 1);
                 if (await yn_function(new $c.Ptr(qbuf, 0), new $c.Ptr(ynchars, 0), 110, 1) === 110) {
@@ -1512,7 +1512,7 @@ export async function doseduce(mon) {   // mhitu.c:1985
                     break;
                 }
             }
-            if (!(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 2063, $c.lit("doseduce")), rn2(20)) : rn2(20)) < acurr(5 /* A_CHA */)) {
+            if (!(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf) && rn2(20) < acurr(5 /* A_CHA */)) {
                 await safe_qbuf(new $c.Ptr(qbuf, 0), $c.lit("\"That "), $c.lit(" looks pretty.  Would you wear it for me?\""), ring, xname, simpleonames, $c.lit("ring"));
                 await discover_object(173, 1, 1, 1);
                 if (await yn_function(new $c.Ptr(qbuf, 0), new $c.Ptr(ynchars, 0), 110, 1) === 110) {
@@ -1592,13 +1592,13 @@ export async function doseduce(mon) {   // mhitu.c:1985
     }
     await urgent_pline($c.lit("Time stands still while you and %s lie in each other's arms..."), await noit_mon_nam(mon));
     attr_tot = acurr(5 /* A_CHA */) + acurr(1 /* A_INT */) | 0;
-    if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 2178, $c.lit("doseduce")), rn2(35)) : rn2(35)) > (attr_tot < 32 ? attr_tot : 32)) {
+    if (rn2(35) > (attr_tot < 32 ? attr_tot : 32)) {
         await pline($c.lit("%s seems to have enjoyed it more than you..."), await noit_Monnam(mon));
-        switch (rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 2182, $c.lit("doseduce")), rn2(5)) : rn2(5)) {
+        switch (rn2(5)) {
             case 0:
                 await You_feel($c.lit("drained of energy."));
                 u.uen = 0;
-                $t3 = rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 2186, $c.lit("doseduce")), rnd(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? 5 : 10)) : rnd(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? 5 : 10), u.uenmax = u.uenmax - $t3 | 0;
+                $t3 = rnd(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? 5 : 10), u.uenmax = u.uenmax - $t3 | 0;
                 await exercise(4 /* A_CON */, 0);
                 if (u.uenmax < 0) {
                     u.uenmax = 0;
@@ -1631,19 +1631,19 @@ export async function doseduce(mon) {   // mhitu.c:1985
                 {
                     await You_feel($c.lit("exhausted."));
                     await exercise(0 /* A_STR */, 0);
-                    tmp = (rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 2219, $c.lit("doseduce")), rn2(10)) : rn2(10)) + 6 | 0;
+                    tmp = rn2(10) + 6 | 0;
                     await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(tmp + 1 | 0, 2) : tmp, $c.lit("exhaustion"), 1);
                     break;
                 }
         }
     } else {
-        $t4 = rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 2225, $c.lit("doseduce")), rnd(100)) : rnd(100), mon.mspec_used = $t4;
+        $t4 = rnd(100), mon.mspec_used = $t4;
         await You($c.lit("seem to have enjoyed it more than %s..."), await noit_mon_nam(mon));
-        switch (rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 2227, $c.lit("doseduce")), rn2(5)) : rn2(5)) {
+        switch (rn2(5)) {
             case 0:
                 await You_feel($c.lit("raised to your full potential."));
                 await exercise(4 /* A_CON */, 1);
-                $t6 = ($t5 = rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 2231, $c.lit("doseduce")), rnd(5)) : rnd(5), u.uenmax = u.uenmax + $t5 | 0), u.uen = $t6;
+                $t6 = ($t5 = rnd(5), u.uenmax = u.uenmax + $t5 | 0), u.uen = $t6;
                 if (u.uenmax > u.uenpeak) {
                     u.uenpeak = u.uenmax;
                 }
@@ -1677,16 +1677,16 @@ export async function doseduce(mon) {   // mhitu.c:1985
         }
     }
     if (mon.mtame) {
-    } else if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 2265, $c.lit("doseduce")), rn2(20)) : rn2(20)) < acurr(5 /* A_CHA */)) {
+    } else if (rn2(20) < acurr(5 /* A_CHA */)) {
         await pline($c.lit("%s demands that you pay %s, but you refuse..."), await noit_Monnam(mon), genders[pronoun_gender(mon, 3)].him);
     } else if (u.umonnum === 63 /* PM_LEPRECHAUN */) {
         await pline_mon(mon, $c.lit("%s tries to take your gold, but fails..."), await noit_Monnam(mon));
     } else {
         umoney = money_cnt(gi.invent);
         if (umoney > 32757) {
-            cost = $c.add64(rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 2276, $c.lit("doseduce")), rnd(32767)) : rnd(32767), 500);
+            cost = $c.add64(rnd(32767), 500);
         } else {
-            cost = $c.add64(rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 2278, $c.lit("doseduce")), rnd($c.i32(umoney) + 10 | 0)) : rnd($c.i32(umoney) + 10 | 0), 500);
+            cost = $c.add64(rnd($c.i32(umoney) + 10 | 0), 500);
         }
         if (mon.mpeaceful) {
             cost = $c.div64(cost, 5);
@@ -1709,7 +1709,7 @@ export async function doseduce(mon) {   // mhitu.c:1985
             disp.botl = 1;
         }
     }
-    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 2300, $c.lit("doseduce")), rn2(25)) : rn2(25))) {
+    if (!rn2(25)) {
         mon.mcan = (1) & 1;
     }
     if (!await tele_restrict(mon)) {
@@ -1727,8 +1727,8 @@ async function mayberem(mon, seducer, obj, str) {   // mhitu.c:2309
     }
     if (u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf) {
         await pline($c.lit("%s takes off your %s."), seducer, str);
-    } else if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 2325, $c.lit("mayberem")), rn2(20)) : rn2(20)) < acurr(5 /* A_CHA */)) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("\"Shall I remove your %s, %s?\""), str, !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 2328, $c.lit("mayberem")), rn2(2)) : rn2(2)) ? $c.lit("lover") : !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 2328, $c.lit("mayberem")), rn2(2)) : rn2(2)) ? $c.lit("dear") : $c.lit("sweetheart"));
+    } else if (rn2(20) < acurr(5 /* A_CHA */)) {
+        $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("\"Shall I remove your %s, %s?\""), str, !rn2(2) ? $c.lit("lover") : !rn2(2) ? $c.lit("dear") : $c.lit("sweetheart"));
         if (await yn_function(new $c.Ptr(qbuf, 0), new $c.Ptr(ynchars, 0), 110, 1) === 110) {
             return;
         }
@@ -1781,15 +1781,15 @@ async function passiveum(olduasmon, mtmp, mattk) {   // mhitu.c:2435
         }
     }
     if (oldu_mattk.damn) {
-        tmp = rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 2456, $c.lit("passiveum")), d(oldu_mattk.damn, oldu_mattk.damd)) : d(oldu_mattk.damn, oldu_mattk.damd);
+        tmp = d(oldu_mattk.damn, oldu_mattk.damd);
     } else if (oldu_mattk.damd) {
-        tmp = rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 2458, $c.lit("passiveum")), d(olduasmon.mlevel + 1 | 0, oldu_mattk.damd)) : d(olduasmon.mlevel + 1 | 0, oldu_mattk.damd);
+        tmp = d(olduasmon.mlevel + 1 | 0, oldu_mattk.damd);
     } else {
         tmp = 0;
     }
     switch (oldu_mattk.adtyp) {
         case 8:
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 2465, $c.lit("passiveum")), rn2(2)) : rn2(2))) {
+            if (!rn2(2)) {
                 await pline_mon(mtmp, $c.lit("%s is splashed by %s%s!"), await Monnam(mtmp), !(u.umonnum !== u.umonster) ? $c.lit("") : $c.lit("your "), hliquid($c.lit("acid")));
                 if (await Resists_Elem(mtmp, 7 /* ACID_RES */)) {
                     await pline_mon(mtmp, $c.lit("%s is not affected."), await Monnam(mtmp));
@@ -1798,10 +1798,10 @@ async function passiveum(olduasmon, mtmp, mattk) {   // mhitu.c:2435
             } else {
                 tmp = 0;
             }
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 2477, $c.lit("passiveum")), rn2(30)) : rn2(30))) {
+            if (!rn2(30)) {
                 await erode_armor(mtmp, 3);
             }
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 2479, $c.lit("passiveum")), rn2(6)) : rn2(6))) {
+            if (!rn2(6)) {
                 await acid_damage(mtmp.mw);
             }
             return await assess_dmg(mtmp, tmp);
@@ -1838,7 +1838,7 @@ async function passiveum(olduasmon, mtmp, mattk) {   // mhitu.c:2435
     if (!(u.umonnum !== u.umonster)) {
         return 1;
     }
-    if (rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 2523, $c.lit("passiveum")), rn2(3)) : rn2(3)) {
+    if (rn2(3)) {
         switch (oldu_mattk.adtyp) {
             case 0:
                 if (oldu_mattk.aatyp === 14) {
@@ -1852,10 +1852,10 @@ async function passiveum(olduasmon, mtmp, mattk) {   // mhitu.c:2435
                     tmp = 127;
                 }
                 if (u.umonnum === 28 /* PM_FLOATING_EYE */) {
-                    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 2537, $c.lit("passiveum")), rn2(4)) : rn2(4))) {
+                    if (!rn2(4)) {
                         tmp = 127;
                     }
-                    if (mtmp.mcansee | 0 && $c.andu64(mtmp.data.mflags1, 4096) === 0 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 2539, $c.lit("passiveum")), rn2(3)) : rn2(3)) && ($c.andu64(mtmp.data.mflags1, 16777216) !== 0 || !((u.uprops[40 /* INVIS */].intrinsic || u.uprops[40 /* INVIS */].extrinsic) && !u.uprops[40 /* INVIS */].blocked))) {
+                    if (mtmp.mcansee | 0 && $c.andu64(mtmp.data.mflags1, 4096) === 0 && rn2(3) && ($c.andu64(mtmp.data.mflags1, 16777216) !== 0 || !((u.uprops[40 /* INVIS */].intrinsic || u.uprops[40 /* INVIS */].extrinsic) && !u.uprops[40 /* INVIS */].blocked))) {
                         if ((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked) {
                             await pline($c.lit("As a blind %s, you cannot defend yourself."), pmname(gy.youmonst.data, flags.female ? 1 /* FEMALE */ : 0 /* MALE */));
                         } else {
@@ -1882,7 +1882,7 @@ async function passiveum(olduasmon, mtmp, mattk) {   // mhitu.c:2435
                     break;
                 }
                 await pline_mon(mtmp, $c.lit("%s is suddenly very cold!"), await Monnam(mtmp));
-                $t1 = $c.div32(tmp + (rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitu.c"), 2570, $c.lit("passiveum")), rn2(2)) : rn2(2)) | 0, 2), u.mh = u.mh + $t1 | 0;
+                $t1 = $c.div32(tmp + rn2(2) | 0, 2), u.mh = u.mh + $t1 | 0;
                 if (u.mhmax < u.mh) {
                     u.mhmax = u.mh;
                 }

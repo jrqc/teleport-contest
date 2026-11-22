@@ -56,7 +56,7 @@ import { dopray, dosacrifice, doturn } from './pray.js';
 import { deliver_splev_message } from './questpgr.js';
 import { doread } from './read.js';
 import { dobugreport } from './report.js';
-import { rn2, rnd, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { rn2, rnd } from './rnd.js';
 import { dosave, dosave0, savelev } from './save.js';
 import { selection_floodfill, selection_free, selection_getbounds, selection_getpoint, selection_new, selection_size_description, set_selection_floodfillchk } from './selvar.js';
 import { dopay } from './shk.js';
@@ -2085,10 +2085,10 @@ function accept_menu_prefix(ec) {   // cmd.c:3509
 }
 export async function randomkey() {   // cmd.c:3517
     let c = 0, d = 0, m = 0, $t1;
-    if ((randomkey$last_c === 1 || randomkey$last_c === 16) && program_state.input_state === 1 /* commandInp */ && (rng_log_enabled() ? (rng_log_set_caller($c.lit("cmd.c"), 3525, $c.lit("randomkey")), rn2(5)) : rn2(5))) {
+    if ((randomkey$last_c === 1 || randomkey$last_c === 16) && program_state.input_state === 1 /* commandInp */ && rn2(5)) {
         return randomkey$last_c;
     }
-    switch (rng_log_enabled() ? (rng_log_set_caller($c.lit("cmd.c"), 3528, $c.lit("randomkey")), rn2(16)) : rn2(16)) {
+    switch (rn2(16)) {
         default:
             c = 27;
             break;
@@ -2099,16 +2099,16 @@ export async function randomkey() {   // cmd.c:3517
         case 2:
         case 3:
         case 4:
-            c = $c.i8((rng_log_enabled() ? (rng_log_set_caller($c.lit("cmd.c"), 3539, $c.lit("randomkey")), rn2(95)) : rn2(95)) + 32 | 0);
+            c = $c.i8(rn2(95) + 32 | 0);
             break;
         case 5:
-            c = $c.i8((rng_log_enabled() ? (rng_log_set_caller($c.lit("cmd.c"), 3542, $c.lit("randomkey")), rn2(2)) : rn2(2)) ? 9 : 32);
+            c = $c.i8(rn2(2) ? 9 : 32);
             break;
         case 6:
-            c = $c.i8((rng_log_enabled() ? (rng_log_set_caller($c.lit("cmd.c"), 3545, $c.lit("randomkey")), rn2(26)) : rn2(26)) + 97 | 0);
+            c = $c.i8(rn2(26) + 97 | 0);
             break;
         case 7:
-            c = $c.i8((rng_log_enabled() ? (rng_log_set_caller($c.lit("cmd.c"), 3548, $c.lit("randomkey")), rn2(26)) : rn2(26)) + 65 | 0);
+            c = $c.i8(rn2(26) + 65 | 0);
             break;
         case 8:
             c = $c.i8(extcmdlist[$c.remu32(($t1 = randomkey$i, randomkey$i = $t1 + 1 >>> 0, $t1), 171)].key);
@@ -2120,16 +2120,16 @@ export async function randomkey() {   // cmd.c:3517
         case 11:
         case 12:
             {
-                d = rng_log_enabled() ? (rng_log_set_caller($c.lit("cmd.c"), 3560, $c.lit("randomkey")), rn2(8)) : rn2(8);
-                m = (rng_log_enabled() ? (rng_log_set_caller($c.lit("cmd.c"), 3561, $c.lit("randomkey")), rn2(7)) : rn2(7)) ? 0 /* MV_WALK */ : !(rng_log_enabled() ? (rng_log_set_caller($c.lit("cmd.c"), 3561, $c.lit("randomkey")), rn2(3)) : rn2(3)) ? 2 /* MV_RUSH */ : 1 /* MV_RUN */;
+                d = rn2(8);
+                m = rn2(7) ? 0 /* MV_WALK */ : !rn2(3) ? 2 /* MV_RUSH */ : 1 /* MV_RUN */;
                 c = await cmd_from_dir(d, m);
             }
             break;
         case 13:
-            c = $c.i8((rng_log_enabled() ? (rng_log_set_caller($c.lit("cmd.c"), 3567, $c.lit("randomkey")), rn2(10)) : rn2(10)) + 48 | 0);
+            c = $c.i8(rn2(10) + 48 | 0);
             break;
         case 14:
-            c = $c.i8(rng_log_enabled() ? (rng_log_set_caller($c.lit("cmd.c"), 3571, $c.lit("randomkey")), rnd(iflags.wc_eight_bit_input ? 255 : 127)) : rnd(iflags.wc_eight_bit_input ? 255 : 127));
+            c = $c.i8(rnd(iflags.wc_eight_bit_input ? 255 : 127));
             break;
     }
     if (program_state.input_state === 1 /* commandInp */) {
@@ -2156,7 +2156,7 @@ export async function random_response(buf, sz) {   // cmd.c:3581
     buf.set(count, 0);
 }
 export function rnd_extcmd_idx() {   // cmd.c:3601
-    return (rng_log_enabled() ? (rng_log_set_caller($c.lit("cmd.c"), 3603, $c.lit("rnd_extcmd_idx")), rn2(extcmdlist_length + 1 | 0)) : rn2(extcmdlist_length + 1 | 0)) - 1 | 0;
+    return rn2(extcmdlist_length + 1 | 0) - 1 | 0;
 }
 function reset_cmd_vars(reset_cmdq) {   // cmd.c:3607
     let $t1, $t2, $t3;
@@ -2447,16 +2447,16 @@ export async function getdir(s) {   // cmd.c:3958
                 dirsym = await readchar();
             } else {
                 dirsym = await yn_function(s && s.get(0) !== 94 ? s : $c.lit("In what direction?"), null, 0, 0);
-                if (iflags.debug_fuzzer && (rng_log_enabled() ? (rng_log_set_caller($c.lit("cmd.c"), 3996, $c.lit("getdir")), rn2(20)) : rn2(20))) {
-                    switch (rng_log_enabled() ? (rng_log_set_caller($c.lit("cmd.c"), 3997, $c.lit("getdir")), rn2(20)) : rn2(20)) {
+                if (iflags.debug_fuzzer && rn2(20)) {
+                    switch (rn2(20)) {
                         case 0:
-                            dirsym = gc.Cmd.spkeys[(rng_log_enabled() ? (rng_log_set_caller($c.lit("cmd.c"), 3999, $c.lit("getdir")), rn2(2)) : rn2(2)) ? 1 /* NHKF_GETDIR_SELF */ : 0 /* NHKF_ESC */];
+                            dirsym = gc.Cmd.spkeys[rn2(2) ? 1 /* NHKF_GETDIR_SELF */ : 0 /* NHKF_ESC */];
                             break;
                         case 1:
-                            dirsym = gc.Cmd.dirchars.get((rng_log_enabled() ? (rng_log_set_caller($c.lit("cmd.c"), 4002, $c.lit("getdir")), rn2(2)) : rn2(2)) ? 8 /* DIR_DOWN */ : 9 /* DIR_UP */);
+                            dirsym = gc.Cmd.dirchars.get(rn2(2) ? 8 /* DIR_DOWN */ : 9 /* DIR_UP */);
                             break;
                         default:
-                            dirsym = gc.Cmd.dirchars.get(rng_log_enabled() ? (rng_log_set_caller($c.lit("cmd.c"), 4005, $c.lit("getdir")), rn2(8)) : rn2(8));
+                            dirsym = gc.Cmd.dirchars.get(rn2(8));
                             break;
                     }
                 }
@@ -2618,7 +2618,7 @@ export function confdir(force_impairment) {   // cmd.c:4300
     let kmax = 0, k = 0;
     if (force_impairment || u_maybe_impaired()) {
         kmax = u.umonnum === 116 /* PM_GRID_BUG */ ? 4 : 8;
-        k = dirs_ord[rng_log_enabled() ? (rng_log_set_caller($c.lit("cmd.c"), 4304, $c.lit("confdir")), rn2(kmax)) : rn2(kmax)];
+        k = dirs_ord[rn2(kmax)];
         u.dx = xdir[k];
         u.dy = ydir[k];
     }
@@ -3438,13 +3438,13 @@ export async function yn_function(query, resp, def, addcmdq) {   // cmd.c:5471
             cmdq_clear(0 /* CQ_CANNED */);
         }
         addcmdq = 0;
-    } else if (iflags.debug_fuzzer && resp && resp.get(0) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("cmd.c"), 5513, $c.lit("yn_function")), rn2(20)) : rn2(20))) {
+    } else if (iflags.debug_fuzzer && resp && resp.get(0) && rn2(20)) {
         ln = $c.i32($c.strlen(resp));
-        ridx = rng_log_enabled() ? (rng_log_set_caller($c.lit("cmd.c"), 5514, $c.lit("yn_function")), rn2(ln)) : rn2(ln);
+        ridx = rn2(ln);
         res[0] = resp.get(ridx);
         if (res[0] === 27) {
             if (ln > 1) {
-                ridx = ridx === 0 ? 1 + (rng_log_enabled() ? (rng_log_set_caller($c.lit("cmd.c"), 5523, $c.lit("yn_function")), rn2(ln - 1 | 0)) : rn2(ln - 1 | 0)) | 0 : rng_log_enabled() ? (rng_log_set_caller($c.lit("cmd.c"), 5523, $c.lit("yn_function")), rn2(ridx)) : rn2(ridx);
+                ridx = ridx === 0 ? 1 + rn2(ln - 1 | 0) | 0 : rn2(ridx);
                 res[0] = resp.get(ridx);
             } else {
                 res[0] = def;

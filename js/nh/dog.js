@@ -32,7 +32,7 @@ import { Tobjnam, an, the, xname } from './objnam.js';
 import { There, You, impossible, livelog_printf, pline, pline_The, pline_mon } from './pline.js';
 import { body_part } from './polyself.js';
 import { is_quest_artifact } from './questpgr.js';
-import { rn2, rnd, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { rn2, rnd } from './rnd.js';
 import { genders } from './role.js';
 import { make_happy_shk, make_happy_shoppers, obfree, picked_container, set_residency } from './shk.js';
 import { growl, yelp } from './sounds.js';
@@ -110,7 +110,7 @@ function pet_type() {   // dog.c:91
     } else if (gp.preferred_pet === 100) {
         return 16 /* PM_LITTLE_DOG */;
     } else {
-        return (rng_log_enabled() ? (rng_log_set_caller($c.lit("dog.c"), 100, $c.lit("pet_type")), rn2(2)) : rn2(2)) ? 32 /* PM_KITTEN */ : 16 /* PM_LITTLE_DOG */;
+        return rn2(2) ? 32 /* PM_KITTEN */ : 16 /* PM_LITTLE_DOG */;
     }
 }
 async function pick_familiar_pm(otmp, quietly) {   // dog.c:104
@@ -126,7 +126,7 @@ async function pick_familiar_pm(otmp, quietly) {   // dog.c:104
             }
             return null;
         }
-    } else if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("dog.c"), 124, $c.lit("pick_familiar_pm")), rn2(3)) : rn2(3))) {
+    } else if (!rn2(3)) {
         pm = $c.relem(mons, pet_type());
     } else {
         skill = spell_skilltype(401 /* SPE_CREATE_FAMILIAR */);
@@ -170,7 +170,7 @@ export async function make_familiar(otmp, x, y, quietly) {   // dog.c:138
         return null;
     }
     if (otmp) {
-        chance = rng_log_enabled() ? (rng_log_set_caller($c.lit("dog.c"), 186, $c.lit("make_familiar")), rn2(10)) : rn2(10);
+        chance = rn2(10);
         if (chance > 2) {
             chance = otmp.blessed | 0 ? 0 : !otmp.cursed ? 1 : 2;
         }
@@ -342,7 +342,7 @@ export async function mon_arrive(mtmp, when) {   // dog.c:420
         return;
     }
     if (when === 1 /* With_you */) {
-        if (!(svl.level.monsters[u.ux][u.uy] !== null) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dog.c"), 475, $c.lit("mon_arrive")), rn2(mtmp.mtame ? 10 : mtmp.mpeaceful | 0 ? 5 : 2)) : rn2(mtmp.mtame ? 10 : mtmp.mpeaceful | 0 ? 5 : 2))) {
+        if (!(svl.level.monsters[u.ux][u.uy] !== null) && !rn2(mtmp.mtame ? 10 : mtmp.mpeaceful | 0 ? 5 : 2)) {
             await rloc_to(mtmp, u.ux, u.uy);
         } else {
             await mnexto(mtmp, 4);
@@ -400,8 +400,8 @@ export async function mon_arrive(mtmp, when) {   // dog.c:420
             break;
         case 8:
             if (u.uz.dnum === svd.dungeon_topology.d_astral_level.dnum) {
-                xlocale = $c.i16((rng_log_enabled() ? (rng_log_set_caller($c.lit("dog.c"), 548, $c.lit("mon_arrive")), rn2((svu.updest.hx - svu.updest.lx | 0) + 1 | 0)) : rn2((svu.updest.hx - svu.updest.lx | 0) + 1 | 0)) + svu.updest.lx | 0);
-                ylocale = $c.i16((rng_log_enabled() ? (rng_log_set_caller($c.lit("dog.c"), 549, $c.lit("mon_arrive")), rn2((svu.updest.hy - svu.updest.ly | 0) + 1 | 0)) : rn2((svu.updest.hy - svu.updest.ly | 0) + 1 | 0)) + svu.updest.ly | 0);
+                xlocale = $c.i16(rn2((svu.updest.hx - svu.updest.lx | 0) + 1 | 0) + svu.updest.lx | 0);
+                ylocale = $c.i16(rn2((svu.updest.hy - svu.updest.ly | 0) + 1 | 0) + svu.updest.ly | 0);
                 break;
             }
             for (t = gf.ftrap; t; t = t.ntrap) {
@@ -439,10 +439,10 @@ export async function mon_arrive(mtmp, when) {   // dog.c:420
         } else {
             i = 1 > (xlocale - wander | 0) ? 1 : xlocale - wander | 0;
             j = 79 < (xlocale + wander | 0) ? 79 : xlocale + wander | 0;
-            xlocale = $c.i16((rng_log_enabled() ? (rng_log_set_caller($c.lit("dog.c"), 600, $c.lit("mon_arrive")), rn2(j - i | 0)) : rn2(j - i | 0)) + i | 0);
+            xlocale = $c.i16(rn2(j - i | 0) + i | 0);
             i = 0 > (ylocale - wander | 0) ? 0 : ylocale - wander | 0;
             j = 20 < (ylocale + wander | 0) ? 20 : ylocale + wander | 0;
-            ylocale = $c.i16((rng_log_enabled() ? (rng_log_set_caller($c.lit("dog.c"), 603, $c.lit("mon_arrive")), rn2(j - i | 0)) : rn2(j - i | 0)) + i | 0);
+            ylocale = $c.i16(rn2(j - i | 0) + i | 0);
         }
     }
     mtmp.mx = 0;
@@ -495,13 +495,13 @@ export async function mon_catchup_elapsed_time(mtmp, nmv) {   // dog.c:627
             mtmp.mfleetim = (((mtmp.mfleetim | 0) - imv | 0) >>> 0) & 127;
         }
     }
-    if (mtmp.mtrapped | 0 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("dog.c"), 670, $c.lit("mon_catchup_elapsed_time")), rn2(imv + 1 | 0)) : rn2(imv + 1 | 0)) > 20) {
+    if (mtmp.mtrapped | 0 && rn2(imv + 1 | 0) > 20) {
         mtmp.mtrapped = (0) & 1;
     }
-    if (mtmp.mconf | 0 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("dog.c"), 672, $c.lit("mon_catchup_elapsed_time")), rn2(imv + 1 | 0)) : rn2(imv + 1 | 0)) > 25) {
+    if (mtmp.mconf | 0 && rn2(imv + 1 | 0) > 25) {
         mtmp.mconf = (0) & 1;
     }
-    if (mtmp.mstun | 0 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("dog.c"), 674, $c.lit("mon_catchup_elapsed_time")), rn2(imv + 1 | 0)) : rn2(imv + 1 | 0)) > 5) {
+    if (mtmp.mstun | 0 && rn2(imv + 1 | 0) > 5) {
         mtmp.mstun = (0) & 1;
     }
     if (mtmp.meating) {
@@ -520,7 +520,7 @@ export async function mon_catchup_elapsed_time(mtmp, nmv) {   // dog.c:627
         wilder = $c.div32(imv + 75 | 0, 150);
         if (mtmp.mtame > wilder) {
             mtmp.mtame = $c.i8(mtmp.mtame - wilder | 0);
-        } else if (mtmp.mtame > (rng_log_enabled() ? (rng_log_set_caller($c.lit("dog.c"), 694, $c.lit("mon_catchup_elapsed_time")), rn2(wilder)) : rn2(wilder))) {
+        } else if (mtmp.mtame > rn2(wilder)) {
             mtmp.mtame = 0;
         } else {
             $t1 = $c.i8(mtmp.mpeaceful = (0) & 1), mtmp.mtame = $t1;
@@ -822,7 +822,7 @@ export async function tamedog(mtmp, obj, givemsg) {   // dog.c:1143
     }
     mtmp.mpeaceful = (1) & 1;
     set_malign(mtmp);
-    if (flags.moonphase === 4 && night() && (rng_log_enabled() ? (rng_log_set_caller($c.lit("dog.c"), 1176, $c.lit("tamedog")), rn2(6)) : rn2(6)) && obj && mtmp.data.mlet === 4 /* S_DOG */) {
+    if (flags.moonphase === 4 && night() && rn2(6) && obj && mtmp.data.mlet === 4 /* S_DOG */) {
         return 0;
     }
     mtmp.mflee = (0) & 1;
@@ -850,7 +850,7 @@ export async function tamedog(mtmp, obj, givemsg) {   // dog.c:1143
         }
     }
     if (mtmp.mtame && mtmp.mtame < 10) {
-        if (mtmp.mtame < (rng_log_enabled() ? (rng_log_set_caller($c.lit("dog.c"), 1225, $c.lit("tamedog")), rnd(10)) : rnd(10))) {
+        if (mtmp.mtame < rnd(10)) {
             mtmp.mtame = $c.i8(mtmp.mtame + 1);
         }
         if (blessed_scroll) {
@@ -912,7 +912,7 @@ export async function wary_dog(mtmp, was_dead) {   // dog.c:1292
     if (edog && ((edog.killed_by_u | 0) === 1 || edog.abuse > 2)) {
         $t1 = (mtmp.mtame = 0) >>> 0, mtmp.mpeaceful = ($t1) & 1;
         if (edog.abuse >= 0 && edog.abuse < 10) {
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("dog.c"), 1313, $c.lit("wary_dog")), rn2(edog.abuse + 1 | 0)) : rn2(edog.abuse + 1 | 0))) {
+            if (!rn2(edog.abuse + 1 | 0)) {
                 mtmp.mpeaceful = (1) & 1;
             }
         }
@@ -926,9 +926,9 @@ export async function wary_dog(mtmp, was_dead) {   // dog.c:1292
             }
         }
     } else {
-        $t2 = $c.i8(rng_log_enabled() ? (rng_log_set_caller($c.lit("dog.c"), 1328, $c.lit("wary_dog")), rn2(mtmp.mtame + 1 | 0)) : rn2(mtmp.mtame + 1 | 0)), mtmp.mtame = $t2;
+        $t2 = $c.i8(rn2(mtmp.mtame + 1 | 0)), mtmp.mtame = $t2;
         if (!mtmp.mtame) {
-            $t3 = (rng_log_enabled() ? (rng_log_set_caller($c.lit("dog.c"), 1330, $c.lit("wary_dog")), rn2(2)) : rn2(2)) >>> 0, mtmp.mpeaceful = ($t3) & 1;
+            $t3 = rn2(2) >>> 0, mtmp.mpeaceful = ($t3) & 1;
         }
     }
     if (!mtmp.mtame) {
@@ -974,7 +974,7 @@ export async function abuse_dog(mtmp) {   // dog.c:1362
         await m_unleash(mtmp, 1);
     }
     if (mtmp.mx !== 0) {
-        if (mtmp.mtame && (rng_log_enabled() ? (rng_log_set_caller($c.lit("dog.c"), 1381, $c.lit("abuse_dog")), rn2(mtmp.mtame)) : rn2(mtmp.mtame))) {
+        if (mtmp.mtame && rn2(mtmp.mtame)) {
             await yelp(mtmp);
         } else {
             await growl(mtmp);

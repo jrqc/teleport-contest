@@ -23,7 +23,7 @@ import { encumber_msg } from './pickup.js';
 import { You, You_cant, Your, pline } from './pline.js';
 import { body_part } from './polyself.js';
 import { strange_feeling } from './potion.js';
-import { rn2, rnd, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { rn2, rnd } from './rnd.js';
 import { Shk_Your, alter_cost, inside_shop, shop_keeper } from './shk.js';
 import { shkname } from './shknam.js';
 import { begin_burn, end_burn } from './timeout.js';
@@ -553,7 +553,7 @@ export async function dotwoweapon() {   // wield.c:845
         await You($c.lit("begin two-weapon combat."));
         set_twoweap(1);
         await update_inventory();
-        return (rng_log_enabled() ? (rng_log_set_caller($c.lit("wield.c"), 861, $c.lit("dotwoweapon")), rnd(20)) : rnd(20)) > acurr(3 /* A_DEX */) ? 1 : 0;
+        return rnd(20) > acurr(3 /* A_DEX */) ? 1 : 0;
     }
     return 0;
 }
@@ -664,7 +664,7 @@ export async function chwepon(otmp, amount) {   // wield.c:918
         }
         return 1;
     }
-    if (($G.uwep.spe > 5 && amount >= 0 || $G.uwep.spe < -5 && amount < 0) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("wield.c"), 1000, $c.lit("chwepon")), rn2(3)) : rn2(3))) {
+    if (($G.uwep.spe > 5 && amount >= 0 || $G.uwep.spe < -5 && amount < 0) && rn2(3)) {
         if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
             await pline($c.lit("%s %s for a while and then %s."), await Yobjnam2($G.uwep, $c.lit("violently glow")), color, await otense($G.uwep, $c.lit("evaporate")));
         } else {
@@ -695,7 +695,7 @@ export async function chwepon(otmp, amount) {   // wield.c:918
     if (is_art($G.uwep, 8 /* ART_MAGICBANE */) && $G.uwep.spe >= 0) {
         await Your($c.lit("right %s %sches!"), await body_part(6 /* HAND */), amount > 1 && $G.uwep.spe > 1 ? $c.lit("flin") : $c.lit("it"));
     }
-    if ($G.uwep.spe > 5 && ($G.uwep.otyp === 19 /* ELVEN_ARROW */ || $G.uwep.otyp === 28 /* ELVEN_SPEAR */ || $G.uwep.otyp === 35 /* ELVEN_DAGGER */ || $G.uwep.otyp === 47 /* ELVEN_SHORT_SWORD */ || $G.uwep.otyp === 53 /* ELVEN_BROADSWORD */ || $G.uwep.otyp === 84 /* ELVEN_BOW */ || $G.uwep.oartifact || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("wield.c"), 1044, $c.lit("chwepon")), rn2(7)) : rn2(7)))) {
+    if ($G.uwep.spe > 5 && ($G.uwep.otyp === 19 /* ELVEN_ARROW */ || $G.uwep.otyp === 28 /* ELVEN_SPEAR */ || $G.uwep.otyp === 35 /* ELVEN_DAGGER */ || $G.uwep.otyp === 47 /* ELVEN_SHORT_SWORD */ || $G.uwep.otyp === 53 /* ELVEN_BROADSWORD */ || $G.uwep.otyp === 84 /* ELVEN_BOW */ || $G.uwep.oartifact || !rn2(7))) {
         await pline($c.lit("%s unexpectedly."), await Yobjnam2($G.uwep, $c.lit("suddenly vibrate")));
     }
     return 1;

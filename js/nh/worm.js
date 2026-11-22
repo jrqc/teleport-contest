@@ -13,7 +13,7 @@ import { mattacku } from './mhitu.js';
 import { mcalcmove } from './mon.js';
 import { mons } from './monst.js';
 import { You, impossible, pline } from './pline.js';
-import { d, rn2, rn2_on_display_rng, rnd, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { d, rn2, rn2_on_display_rng, rnd } from './rnd.js';
 import { sfi_int, sfi_int16, sfi_long, sfo_int, sfo_int16, sfo_long } from './sfbase.js';
 import { rnd_nextto_goodpos } from './trap.js';
 
@@ -88,10 +88,10 @@ export async function worm_move(worm) {   // worm.c:196
     if (wgrowtime[wnum] <= svm.moves) {
         wsegs = count_wsegs(worm);
         if (!wgrowtime[wnum]) {
-            $t1 = $c.add64(svm.moves, rng_log_enabled() ? (rng_log_set_caller($c.lit("worm.c"), 224, $c.lit("worm_move")), rnd(5)) : rnd(5)), wgrowtime[wnum] = $t1;
+            $t1 = $c.add64(svm.moves, rnd(5)), wgrowtime[wnum] = $t1;
         } else {
             mmove = mcalcmove(worm, 0);
-            incr = (rng_log_enabled() ? (rng_log_set_caller($c.lit("worm.c"), 233, $c.lit("worm_move")), rn2(10)) : rn2(10)) + 2 | 0;
+            incr = rn2(10) + 2 | 0;
             incr = $c.div32(Math.imul(incr, 12), mmove > 1 ? mmove : 1);
             wgrowtime[wnum] = $c.add64(svm.moves, incr);
         }
@@ -110,7 +110,7 @@ export async function worm_move(worm) {   // worm.c:196
             whplimit = 500;
         }
         prev_mhp = worm.mhp;
-        $t2 = rng_log_enabled() ? (rng_log_set_caller($c.lit("worm.c"), 257, $c.lit("worm_move")), d(2, 2)) : d(2, 2), worm.mhp = worm.mhp + $t2 | 0;
+        $t2 = d(2, 2), worm.mhp = worm.mhp + $t2 | 0;
         whpcap = whplimit > worm.mhpmax ? whplimit : worm.mhpmax;
         if (worm.mhp < whpcap) {
             if (worm.mhp > whplimit) {
@@ -132,7 +132,7 @@ export async function worm_nomove(worm) {   // worm.c:288
     let $t1;
     await shrink_worm(worm.wormno | 0);
     if (worm.mhp > count_wsegs(worm)) {
-        $t1 = rng_log_enabled() ? (rng_log_set_caller($c.lit("worm.c"), 293, $c.lit("worm_nomove")), d(2, 2)) : d(2, 2), worm.mhp = worm.mhp - $t1 | 0;
+        $t1 = d(2, 2), worm.mhp = worm.mhp - $t1 | 0;
         if (worm.mhp < 1) {
             worm.mhp = 1;
         }
@@ -173,7 +173,7 @@ export async function cutworm(worm, x, y, cuttier) {   // worm.c:373
     if (x === worm.mx && y === worm.my) {
         return;
     }
-    cut_chance = rng_log_enabled() ? (rng_log_set_caller($c.lit("worm.c"), 388, $c.lit("cutworm")), rnd(20)) : rnd(20);
+    cut_chance = rnd(20);
     if (cuttier) {
         cut_chance = cut_chance + 10 | 0;
     }
@@ -196,7 +196,7 @@ export async function cutworm(worm, x, y, cuttier) {   // worm.c:373
     wtails[wnum] = curr.nseg;
     curr.nseg = null;
     new_worm = null;
-    new_wnum = worm.m_lev >= 3 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("worm.c"), 427, $c.lit("cutworm")), rn2(3)) : rn2(3)) ? get_wormno() : 0;
+    new_wnum = worm.m_lev >= 3 && !rn2(3) ? get_wormno() : 0;
     if (new_wnum) {
         svl.level.monsters[x][y] = null;
         new_worm = await clone_mon(worm, x, y);
@@ -220,8 +220,8 @@ export async function cutworm(worm, x, y, cuttier) {   // worm.c:373
     new_worm.mcloned = (0) & 1;
     worm.m_lev = $c.u8(worm.m_lev - 2 >>> 0 > 3 ? worm.m_lev - 2 >>> 0 : 3);
     new_worm.m_lev = worm.m_lev;
-    $t2 = ($t1 = rng_log_enabled() ? (rng_log_set_caller($c.lit("worm.c"), 461, $c.lit("cutworm")), d(new_worm.m_lev, 8)) : d(new_worm.m_lev, 8), new_worm.mhp = $t1), new_worm.mhpmax = $t2;
-    $t3 = rng_log_enabled() ? (rng_log_set_caller($c.lit("worm.c"), 462, $c.lit("cutworm")), d(worm.m_lev, 8)) : d(worm.m_lev, 8), worm.mhpmax = $t3;
+    $t2 = ($t1 = d(new_worm.m_lev, 8), new_worm.mhp = $t1), new_worm.mhpmax = $t2;
+    $t3 = d(worm.m_lev, 8), worm.mhpmax = $t3;
     if (worm.mhpmax < worm.mhp) {
         worm.mhp = worm.mhpmax;
     }

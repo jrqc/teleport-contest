@@ -40,7 +40,7 @@ import { The, Tobjnam, Yname2, Yobjnam2, an, aobjnam, cxname, doname, fruitname,
 import { waterbody_name } from './pager.js';
 import { You, You_feel, Your, impossible, livelog_printf, pline, pline_The, verbalize } from './pline.js';
 import { body_part, float_vs_flight, polyself } from './polyself.js';
-import { d, rn2, rnd, rng_log_enabled, rng_log_set_caller, rnl } from './rnd.js';
+import { d, rn2, rnd, rnl } from './rnd.js';
 import { genders } from './role.js';
 import { alter_cost, check_unpaid, obfree, shop_keeper, stolen_value, subfrombill } from './shk.js';
 import { stairway_at } from './stairs.js';
@@ -443,11 +443,11 @@ export async function dodrink() {   // potion.c:526
         }
     }
     otmp.in_use = (1) & 1;
-    if (await objdescr_is(otmp, $c.lit("milky")) && !(svm.mvitals[287 /* PM_GHOST */].mvflags & 3) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 603, $c.lit("dodrink")), rn2(13 + Math.imul(2, svm.mvitals[287 /* PM_GHOST */].born) | 0)) : rn2(13 + Math.imul(2, svm.mvitals[287 /* PM_GHOST */].born) | 0))) {
+    if (await objdescr_is(otmp, $c.lit("milky")) && !(svm.mvitals[287 /* PM_GHOST */].mvflags & 3) && !rn2(13 + Math.imul(2, svm.mvitals[287 /* PM_GHOST */].born) | 0)) {
         await ghost_from_bottle();
         await useup(otmp);
         return 1;
-    } else if (await objdescr_is(otmp, $c.lit("smoky")) && !(svm.mvitals[315 /* PM_DJINNI */].mvflags & 3) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 609, $c.lit("dodrink")), rn2(13 + Math.imul(2, svm.mvitals[315 /* PM_DJINNI */].born) | 0)) : rn2(13 + Math.imul(2, svm.mvitals[315 /* PM_DJINNI */].born) | 0))) {
+    } else if (await objdescr_is(otmp, $c.lit("smoky")) && !(svm.mvitals[315 /* PM_DJINNI */].mvflags & 3) && !rn2(13 + Math.imul(2, svm.mvitals[315 /* PM_DJINNI */].born) | 0)) {
         await djinni_from_bottle(otmp);
         await useup(otmp);
         return 1;
@@ -484,7 +484,7 @@ async function peffect_restore_ability(otmp) {   // potion.c:646
         return;
     } else {
         await pline($c.lit("Wow!  This makes you feel %s!"), !otmp.blessed ? $c.lit("good") : unfixable_trouble_count(0) ? $c.lit("better") : $c.lit("great"));
-        i = rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 662, $c.lit("peffect_restore_ability")), rn2(6 /* A_MAX */)) : rn2(6 /* A_MAX */);
+        i = rn2(6 /* A_MAX */);
         for (ii = 0; ii < 6 /* A_MAX */; ii = ii + 1 | 0) {
             lim = u.amax.a[i];
             if (u.acurr.a[i] < lim) {
@@ -513,8 +513,8 @@ async function peffect_hallucination(otmp) {   // potion.c:696
     } else if (u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic)) {
         gp.potion_nothing = gp.potion_nothing + 1 | 0;
     }
-    await make_hallucinated(itimeout_incr(u.uprops[23 /* HALLUC */].intrinsic, (rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 705, $c.lit("peffect_hallucination")), rn2(200)) : rn2(200)) + (600 - Math.imul(300, bcsign(otmp)) | 0) | 0), 1, 0);
-    if (otmp.blessed | 0 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 707, $c.lit("peffect_hallucination")), rn2(3)) : rn2(3)) || !otmp.cursed && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 707, $c.lit("peffect_hallucination")), rn2(6)) : rn2(6))) {
+    await make_hallucinated(itimeout_incr(u.uprops[23 /* HALLUC */].intrinsic, rn2(200) + (600 - Math.imul(300, bcsign(otmp)) | 0) | 0), 1, 0);
+    if (otmp.blessed | 0 && !rn2(3) || !otmp.cursed && !rn2(6)) {
         await You($c.lit("perceive yourself..."));
         await windowprocs.win_display_nhwindow($G.WIN_MESSAGE, 0);
         await enlightenment(2, 0);
@@ -526,7 +526,7 @@ async function peffect_water(otmp) {   // potion.c:717
     let $t1;
     if (!otmp.blessed && !otmp.cursed) {
         await pline($c.lit("This tastes like %s."), hliquid($c.lit("water")));
-        $t1 = rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 721, $c.lit("peffect_water")), rnd(10)) : rnd(10), u.uhunger = u.uhunger + $t1 | 0;
+        $t1 = rnd(10), u.uhunger = u.uhunger + $t1 | 0;
         await newuhs(0);
         return;
     }
@@ -542,10 +542,10 @@ async function peffect_water(otmp) {   // potion.c:717
                 }
                 await set_ulycn(-1 /* NON_PM */);
             }
-            await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32((rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 738, $c.lit("peffect_water")), d(2, 6)) : d(2, 6)) + 1 | 0, 2) : rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 738, $c.lit("peffect_water")), d(2, 6)) : d(2, 6), $c.lit("potion of holy water"), 0);
+            await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(d(2, 6) + 1 | 0, 2) : d(2, 6), $c.lit("potion of holy water"), 0);
         } else if (otmp.cursed) {
             await You_feel($c.lit("quite proud of yourself."));
-            await healup(rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 742, $c.lit("peffect_water")), d(2, 6)) : d(2, 6), 0, 0, 0);
+            await healup(d(2, 6), 0, 0, 0);
             if (u.ulycn >= 0 /* LOW_PM */ && u.ulycn < 383 /* NUMMONS */ && !(u.umonnum !== u.umonster)) {
                 await you_were();
             }
@@ -563,7 +563,7 @@ async function peffect_water(otmp) {   // potion.c:717
         } else {
             if (u.ualign.type === 1) {
                 await pline($c.lit("This burns like %s!"), hliquid($c.lit("acid")));
-                await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32((rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 759, $c.lit("peffect_water")), d(2, 6)) : d(2, 6)) + 1 | 0, 2) : rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 759, $c.lit("peffect_water")), d(2, 6)) : d(2, 6), $c.lit("potion of unholy water"), 0);
+                await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(d(2, 6) + 1 | 0, 2) : d(2, 6), $c.lit("potion of unholy water"), 0);
             } else {
                 await You_feel($c.lit("full of dread."));
             }
@@ -579,7 +579,7 @@ async function peffect_booze(otmp) {   // potion.c:771
     gp.potion_unkn = gp.potion_unkn + 1 | 0;
     await pline($c.lit("Ooph!  This tastes like %s%s!"), otmp.oeroded | 0 ? $c.lit("watered down ") : $c.lit(""), u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic) ? $c.lit("dandelion wine") : $c.lit("liquid fire"));
     if (!otmp.blessed) {
-        await make_confused(itimeout_incr(u.uprops[14 /* CONFUSION */].intrinsic, rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 779, $c.lit("peffect_booze")), d(2 + u.uhs >>> 0 | 0, 8)) : d(2 + u.uhs >>> 0 | 0, 8)), 0);
+        await make_confused(itimeout_incr(u.uprops[14 /* CONFUSION */].intrinsic, d(2 + u.uhs >>> 0 | 0, 8)), 0);
     }
     if (!otmp.oeroded) {
         await healup(1, 0, 0, 0);
@@ -589,7 +589,7 @@ async function peffect_booze(otmp) {   // potion.c:771
     await exercise(2 /* A_WIS */, 0);
     if (otmp.cursed) {
         await You($c.lit("pass out."));
-        $t2 = -(rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 789, $c.lit("peffect_booze")), rnd(15)) : rnd(15)) | 0, gm.multi = $t2;
+        $t2 = -rnd(15) | 0, gm.multi = $t2;
         gn.nomovemsg = $c.lit("You awake with a headache.");
     }
 }
@@ -618,10 +618,10 @@ async function peffect_invisibility(otmp) {   // potion.c:811
     } else {
         await self_invis_message();
     }
-    if (otmp.blessed | 0 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 825, $c.lit("peffect_invisibility")), rn2(u.uprops[40 /* INVIS */].intrinsic ? 15 : 30)) : rn2(u.uprops[40 /* INVIS */].intrinsic ? 15 : 30))) {
+    if (otmp.blessed | 0 && !rn2(u.uprops[40 /* INVIS */].intrinsic ? 15 : 30)) {
         u.uprops[40 /* INVIS */].intrinsic = $c.or64(u.uprops[40 /* INVIS */].intrinsic, 67108864);
     } else {
-        incr_itimeout(new $c.FieldRef(u.uprops[40 /* INVIS */], "intrinsic", "i64"), (rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 828, $c.lit("peffect_invisibility")), d(6 - Math.imul(3, bcsign(otmp)) | 0, 100)) : d(6 - Math.imul(3, bcsign(otmp)) | 0, 100)) + 100 | 0);
+        incr_itimeout(new $c.FieldRef(u.uprops[40 /* INVIS */], "intrinsic", "i64"), d(6 - Math.imul(3, bcsign(otmp)) | 0, 100) + 100 | 0);
     }
     await newsym(u.ux, u.uy);
     if (otmp.cursed) {
@@ -648,10 +648,10 @@ async function peffect_see_invisible(otmp) {   // potion.c:841
     if (!otmp.cursed) {
         await make_blinded(0, 1);
     }
-    if (otmp.blessed | 0 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 867, $c.lit("peffect_see_invisible")), rn2(permchance)) : rn2(permchance))) {
+    if (otmp.blessed | 0 && !rn2(permchance)) {
         u.uprops[29 /* SEE_INVIS */].intrinsic = $c.or64(u.uprops[29 /* SEE_INVIS */].intrinsic, 67108864);
     } else {
-        incr_itimeout(new $c.FieldRef(u.uprops[29 /* SEE_INVIS */], "intrinsic", "i64"), (rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 870, $c.lit("peffect_see_invisible")), rn2(100)) : rn2(100)) + 750 | 0);
+        incr_itimeout(new $c.FieldRef(u.uprops[29 /* SEE_INVIS */], "intrinsic", "i64"), rn2(100) + 750 | 0);
     }
     await set_mimic_blocking();
     await see_monsters();
@@ -672,7 +672,7 @@ async function peffect_paralysis(otmp) {   // potion.c:881
         } else {
             await Your($c.lit("%s are frozen to the %s!"), await makeplural(await body_part(5 /* FOOT */)), surface(u.ux, u.uy));
         }
-        nomul(-((rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 893, $c.lit("peffect_paralysis")), rn2(10)) : rn2(10)) + (25 - Math.imul(12, bcsign(otmp)) | 0) | 0) | 0);
+        nomul(-(rn2(10) + (25 - Math.imul(12, bcsign(otmp)) | 0) | 0) | 0);
         gm.multi_reason = $c.lit("frozen by a potion");
         gn.nomovemsg = c_common_strings.c_You_can_move_again;
         await exercise(3 /* A_DEX */, 0);
@@ -685,7 +685,7 @@ async function peffect_sleeping(otmp) {   // potion.c:901
     } else {
         await You($c.lit("suddenly fall asleep!"));
         monstunseesu(8);
-        await fall_asleep(-((rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 909, $c.lit("peffect_sleeping")), rn2(10)) : rn2(10)) + (25 - Math.imul(12, bcsign(otmp)) | 0) | 0) | 0, 1);
+        await fall_asleep(-(rn2(10) + (25 - Math.imul(12, bcsign(otmp)) | 0) | 0) | 0, 1);
     }
 }
 async function peffect_monster_detection(otmp) {   // potion.c:914
@@ -698,9 +698,9 @@ async function peffect_monster_detection(otmp) {   // potion.c:914
         if ($c.and64(u.uprops[37 /* DETECT_MONSTERS */].intrinsic, 16777215) >= 300) {
             i = 1;
         } else if (otmp.oclass === 10 /* SPBOOK_CLASS */) {
-            i = (rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 926, $c.lit("peffect_monster_detection")), rn2(40)) : rn2(40)) + 21 | 0;
+            i = rn2(40) + 21 | 0;
         } else {
-            i = (rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 928, $c.lit("peffect_monster_detection")), rn2(100)) : rn2(100)) + 100 | 0;
+            i = rn2(100) + 100 | 0;
         }
         incr_itimeout(new $c.FieldRef(u.uprops[37 /* DETECT_MONSTERS */], "intrinsic", "i64"), i);
         for (x = 1; x < 80; x = x + 1 | 0) {
@@ -750,20 +750,20 @@ async function peffect_sickness(otmp) {   // potion.c:964
         if (gu.urole.mnum === 334) {
             await pline($c.lit("Fortunately, you have been immunized."));
         } else {
-            typ = rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 981, $c.lit("peffect_sickness")), rn2(6 /* A_MAX */)) : rn2(6 /* A_MAX */);
+            typ = rn2(6 /* A_MAX */);
             $c.__builtin___sprintf_chk(new $c.Ptr(contaminant, 0), 0, 256, $c.lit("%s%s"), u.uprops[6 /* POISON_RES */].intrinsic || u.uprops[6 /* POISON_RES */].extrinsic ? $c.lit("mildly ") : $c.lit(""), otmp.corpsenm ? $c.lit("contaminated tap water") : $c.lit("contaminated potion"));
             if (!u.uprops[67 /* FIXED_ABIL */].extrinsic) {
                 await poisontell(typ, 0);
-                await adjattrib(typ, u.uprops[6 /* POISON_RES */].intrinsic || u.uprops[6 /* POISON_RES */].extrinsic ? -1 : -((rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 989, $c.lit("peffect_sickness")), rn2(4)) : rn2(4)) + 3 | 0) | 0, 1);
+                await adjattrib(typ, u.uprops[6 /* POISON_RES */].intrinsic || u.uprops[6 /* POISON_RES */].extrinsic ? -1 : -(rn2(4) + 3 | 0) | 0, 1);
             }
             if (!(u.uprops[6 /* POISON_RES */].intrinsic || u.uprops[6 /* POISON_RES */].extrinsic)) {
                 if (otmp.corpsenm) {
-                    await losehp((rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 994, $c.lit("peffect_sickness")), rnd(10)) : rnd(10)) + Math.imul(5, !!otmp.cursed ? 1 : 0) | 0, new $c.Ptr(contaminant, 0), 1);
+                    await losehp(rnd(10) + Math.imul(5, !!otmp.cursed ? 1 : 0) | 0, new $c.Ptr(contaminant, 0), 1);
                 } else {
-                    await losehp((rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 997, $c.lit("peffect_sickness")), rnd(10)) : rnd(10)) + Math.imul(5, !!otmp.cursed ? 1 : 0) | 0, new $c.Ptr(contaminant, 0), 0);
+                    await losehp(rnd(10) + Math.imul(5, !!otmp.cursed ? 1 : 0) | 0, new $c.Ptr(contaminant, 0), 0);
                 }
             } else {
-                await losehp(1 + (rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 1001, $c.lit("peffect_sickness")), rn2(2)) : rn2(2)) | 0, new $c.Ptr(contaminant, 0), $c.i8(otmp.corpsenm ? 1 : 0));
+                await losehp(1 + rn2(2) | 0, new $c.Ptr(contaminant, 0), $c.i8(otmp.corpsenm ? 1 : 0));
             }
             await exercise(4 /* A_CON */, 0);
         }
@@ -784,7 +784,7 @@ async function peffect_confusion(otmp) {   // potion.c:1014
     } else {
         gp.potion_nothing = gp.potion_nothing + 1 | 0;
     }
-    await make_confused(itimeout_incr(u.uprops[14 /* CONFUSION */].intrinsic, (rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 1025, $c.lit("peffect_confusion")), rn2(7)) : rn2(7)) + (16 - Math.imul(8, bcsign(otmp)) | 0) | 0), 0);
+    await make_confused(itimeout_incr(u.uprops[14 /* CONFUSION */].intrinsic, rn2(7) + (16 - Math.imul(8, bcsign(otmp)) | 0) | 0), 0);
 }
 async function peffect_gain_ability(otmp) {   // potion.c:1030
     let itmp = 0, ii = 0, i = 0;
@@ -796,7 +796,7 @@ async function peffect_gain_ability(otmp) {   // potion.c:1030
     } else {
         i = -1;
         for (ii = 6 /* A_MAX */; ii > 0; ii = ii - 1 | 0) {
-            i = otmp.blessed | 0 ? i + 1 | 0 : rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 1041, $c.lit("peffect_gain_ability")), rn2(6 /* A_MAX */)) : rn2(6 /* A_MAX */);
+            i = otmp.blessed | 0 ? i + 1 | 0 : rn2(6 /* A_MAX */);
             itmp = otmp.blessed | 0 || ii === 1 ? 0 : -1;
             if (await adjattrib(i, 1, itmp) && !otmp.blessed) {
                 break;
@@ -812,7 +812,7 @@ async function peffect_speed(otmp) {   // potion.c:1052
         gp.potion_unkn = gp.potion_unkn + 1 | 0;
         return;
     }
-    await speed_up((rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 1063, $c.lit("peffect_speed")), rn2(10)) : rn2(10)) + (100 + Math.imul(60, bcsign(otmp)) | 0) | 0);
+    await speed_up(rn2(10) + (100 + Math.imul(60, bcsign(otmp)) | 0) | 0);
     if (is_speed && !otmp.cursed && !$c.and64(u.uprops[64 /* FAST */].intrinsic, 117440512)) {
         await Your($c.lit("quickness feels very natural."));
         u.uprops[64 /* FAST */].intrinsic = $c.or64(u.uprops[64 /* FAST */].intrinsic, 67108864);
@@ -822,7 +822,7 @@ async function peffect_blindness(otmp) {   // potion.c:1073
     if ((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked || (u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && u.uprops[15 /* BLINDED */].blocked) {
         gp.potion_nothing = gp.potion_nothing + 1 | 0;
     }
-    await make_blinded(itimeout_incr($c.and64(u.uprops[15 /* BLINDED */].intrinsic, 16777215), (rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 1078, $c.lit("peffect_blindness")), rn2(200)) : rn2(200)) + (250 - Math.imul(125, bcsign(otmp)) | 0) | 0), $c.i8(!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked) ? 1 : 0));
+    await make_blinded(itimeout_incr($c.and64(u.uprops[15 /* BLINDED */].intrinsic, 16777215), rn2(200) + (250 - Math.imul(125, bcsign(otmp)) | 0) | 0), $c.i8(!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked) ? 1 : 0));
 }
 async function peffect_gain_level(otmp) {   // potion.c:1083
     let on_lvl_1 = 0, newlev = 0, newlevel = new $T.d_level(), $t1;
@@ -854,12 +854,12 @@ async function peffect_gain_level(otmp) {   // potion.c:1083
 }
 async function peffect_healing(otmp) {   // potion.c:1119
     await You_feel($c.lit("better."));
-    await healup(8 + (rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 1122, $c.lit("peffect_healing")), d(4 + Math.imul(2, bcsign(otmp)) | 0, 4)) : d(4 + Math.imul(2, bcsign(otmp)) | 0, 4)) | 0, !otmp.cursed ? 1 : 0, $c.i8(!!otmp.blessed ? 1 : 0), $c.i8(!otmp.cursed ? 1 : 0));
+    await healup(8 + d(4 + Math.imul(2, bcsign(otmp)) | 0, 4) | 0, !otmp.cursed ? 1 : 0, $c.i8(!!otmp.blessed ? 1 : 0), $c.i8(!otmp.cursed ? 1 : 0));
     await exercise(4 /* A_CON */, 1);
 }
 async function peffect_extra_healing(otmp) {   // potion.c:1128
     await You_feel($c.lit("much better."));
-    await healup(16 + (rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 1131, $c.lit("peffect_extra_healing")), d(4 + Math.imul(2, bcsign(otmp)) | 0, 8)) : d(4 + Math.imul(2, bcsign(otmp)) | 0, 8)) | 0, otmp.blessed | 0 ? 5 : !otmp.cursed ? 2 : 0, $c.i8(!otmp.cursed ? 1 : 0), 1);
+    await healup(16 + d(4 + Math.imul(2, bcsign(otmp)) | 0, 8) | 0, otmp.blessed | 0 ? 5 : !otmp.cursed ? 2 : 0, $c.i8(!otmp.cursed ? 1 : 0), 1);
     await make_hallucinated(0, 1, 0);
     await exercise(4 /* A_CON */, 1);
     await exercise(0 /* A_STR */, 1);
@@ -896,16 +896,16 @@ async function peffect_levitation(otmp) {   // potion.c:1165
             await doup();
             gp.potion_nothing = 0;
         } else if (has_ceiling(u.uz)) {
-            dmg = rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 1200, $c.lit("peffect_levitation")), rnd(!$G.uarmh ? 10 : !hard_helmet($G.uarmh) ? 6 : 3)) : rnd(!$G.uarmh ? 10 : !hard_helmet($G.uarmh) ? 6 : 3);
+            dmg = rnd(!$G.uarmh ? 10 : !hard_helmet($G.uarmh) ? 6 : 3);
             await You($c.lit("hit your %s on the %s."), await body_part(8 /* HEAD */), ceiling(u.ux, u.uy));
             await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(dmg + 1 | 0, 2) : dmg, $c.lit("colliding with the ceiling"), 1);
             gp.potion_nothing = 0;
         }
     } else if (otmp.blessed) {
-        incr_itimeout(new $c.FieldRef(u.uprops[48 /* LEVITATION */], "intrinsic", "i64"), (rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 1210, $c.lit("peffect_levitation")), rn2(50)) : rn2(50)) + 250 | 0);
+        incr_itimeout(new $c.FieldRef(u.uprops[48 /* LEVITATION */], "intrinsic", "i64"), rn2(50) + 250 | 0);
         u.uprops[48 /* LEVITATION */].intrinsic = $c.or64(u.uprops[48 /* LEVITATION */].intrinsic, 536870912);
     } else {
-        incr_itimeout(new $c.FieldRef(u.uprops[48 /* LEVITATION */], "intrinsic", "i64"), (rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 1215, $c.lit("peffect_levitation")), rn2(140)) : rn2(140)) + 10 | 0);
+        incr_itimeout(new $c.FieldRef(u.uprops[48 /* LEVITATION */], "intrinsic", "i64"), rn2(140) + 10 | 0);
     }
     if ((u.uprops[48 /* LEVITATION */].intrinsic || u.uprops[48 /* LEVITATION */].extrinsic) && !u.uprops[48 /* LEVITATION */].blocked && svl.level.locations[u.ux][u.uy].typ === 30 /* SINK */) {
         await spoteffects(0);
@@ -919,7 +919,7 @@ async function peffect_gain_energy(otmp) {   // potion.c:1224
     } else {
         await pline($c.lit("Magical energies course through your body."));
     }
-    num = rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 1242, $c.lit("peffect_gain_energy")), d(otmp.blessed | 0 ? 3 : !otmp.cursed ? 2 : 1, 6)) : d(otmp.blessed | 0 ? 3 : !otmp.cursed ? 2 : 1, 6);
+    num = d(otmp.blessed | 0 ? 3 : !otmp.cursed ? 2 : 1, 6);
     if (otmp.cursed) {
         num = -num | 0;
     }
@@ -948,7 +948,7 @@ async function peffect_oil(otmp) {   // potion.c:1260
         } else {
             await You($c.lit("burn your %s."), await body_part(2 /* FACE */));
             vulnerable = $c.i8(!(u.uprops[1 /* FIRE_RES */].intrinsic || u.uprops[1 /* FIRE_RES */].extrinsic) || (u.uprops[2 /* COLD_RES */].intrinsic || u.uprops[2 /* COLD_RES */].extrinsic) ? 1 : 0);
-            await losehp(rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 1277, $c.lit("peffect_oil")), d(vulnerable ? 4 : 2, 4)) : d(vulnerable ? 4 : 2, 4), $c.lit("quaffing a burning potion of oil"), 1);
+            await losehp(d(vulnerable ? 4 : 2, 4), $c.lit("quaffing a burning potion of oil"), 1);
         }
         await burn_away_slime();
     } else if (otmp.cursed) {
@@ -964,7 +964,7 @@ async function peffect_acid(otmp) {   // potion.c:1297
         await pline($c.lit("This tastes %s."), u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic) ? $c.lit("tangy") : $c.lit("sour"));
     } else {
         await pline($c.lit("This burns%s!"), otmp.blessed | 0 ? $c.lit(" a little") : otmp.cursed | 0 ? $c.lit(" a lot") : $c.lit(" like acid"));
-        dmg = rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 1308, $c.lit("peffect_acid")), d(otmp.cursed | 0 ? 2 : 1, otmp.blessed | 0 ? 4 : 8)) : d(otmp.cursed | 0 ? 2 : 1, otmp.blessed | 0 ? 4 : 8);
+        dmg = d(otmp.cursed | 0 ? 2 : 1, otmp.blessed | 0 ? 4 : 8);
         await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(dmg + 1 | 0, 2) : dmg, $c.lit("potion of acid"), 0);
         await exercise(4 /* A_CON */, 0);
     }
@@ -982,7 +982,7 @@ async function peffect_polymorph(otmp) {   // potion.c:1318
         } else {
             await polyself(9);
             if (u.mtimedone && u.umonnum !== u.umonster) {
-                $t1 = u.mtimedone < ((rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 1327, $c.lit("peffect_polymorph")), rn2(15)) : rn2(15)) + 10 | 0) ? u.mtimedone : (rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 1327, $c.lit("peffect_polymorph")), rn2(15)) : rn2(15)) + 10 | 0, u.mtimedone = $t1;
+                $t1 = u.mtimedone < (rn2(15) + 10 | 0) ? u.mtimedone : rn2(15) + 10 | 0, u.mtimedone = $t1;
             }
         }
     }
@@ -1127,9 +1127,9 @@ export async function strange_feeling(obj, txt) {   // potion.c:1461
 }
 export function bottlename() {   // potion.c:1488
     if (u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic)) {
-        return hbottlenames[rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 1491, $c.lit("bottlename")), rn2(24)) : rn2(24)];
+        return hbottlenames[rn2(24)];
     } else {
-        return bottlenames[rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 1493, $c.lit("bottlename")), rn2(7)) : rn2(7)];
+        return bottlenames[rn2(7)];
     }
 }
 async function H2Opotion_dip(potion, targobj, useeit, objphrase) {   // potion.c:1498
@@ -1229,10 +1229,10 @@ export async function potionhit(mon, obj, how) {   // potion.c:1625
         tx = u.ux, ty = u.uy;
         distance = 0;
         await pline_The($c.lit("%s crashes on your %s and breaks into shards."), botlnam, await body_part(8 /* HEAD */));
-        await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32((rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 1638, $c.lit("potionhit")), rnd(2)) : rnd(2)) + 1 | 0, 2) : rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 1638, $c.lit("potionhit")), rnd(2)) : rnd(2), how === 3 ? $c.lit("propelled potion") : $c.lit("thrown potion"), 0);
+        await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(rnd(2) + 1 | 0, 2) : rnd(2), how === 3 ? $c.lit("propelled potion") : $c.lit("thrown potion"), 0);
     } else {
         tx = mon.mx, ty = mon.my;
-        if ($c.and64(mon.misc_worn_check, 1048576) && (saddle = await which_armor(mon, 1048576)) && (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 1647, $c.lit("potionhit")), rn2(10)) : rn2(10)) || obj.otyp === 322 /* POT_WATER */ && ((rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 1649, $c.lit("potionhit")), rnl(10)) : rnl(10)) > 7 && obj.cursed | 0 || (rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 1650, $c.lit("potionhit")), rnl(10)) : rnl(10)) < 4 && obj.blessed | 0 || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 1650, $c.lit("potionhit")), rn2(3)) : rn2(3))))) {
+        if ($c.and64(mon.misc_worn_check, 1048576) && (saddle = await which_armor(mon, 1048576)) && (!rn2(10) || obj.otyp === 322 /* POT_WATER */ && (rnl(10) > 7 && obj.cursed | 0 || rnl(10) < 4 && obj.blessed | 0 || !rn2(3)))) {
             hit_saddle = 1;
         }
         distance = dist2($c.i16(tx), $c.i16(ty), u.ux, u.uy);
@@ -1249,7 +1249,7 @@ export async function potionhit(mon, obj, how) {   // potion.c:1625
             }
             await pline_The($c.lit("%s crashes on %s and breaks into shards."), botlnam, new $c.Ptr(buf, 0));
         }
-        if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 1675, $c.lit("potionhit")), rn2(5)) : rn2(5)) && mon.mhp > 1 && !hit_saddle) {
+        if (rn2(5) && mon.mhp > 1 && !hit_saddle) {
             mon.mhp = mon.mhp - 1 | 0;
         }
     }
@@ -1272,7 +1272,7 @@ export async function potionhit(mon, obj, how) {   // potion.c:1625
             case 320 /* POT_ACID */:
                 if (!(u.uprops[7 /* ACID_RES */].intrinsic || u.uprops[7 /* ACID_RES */].extrinsic)) {
                     await pline($c.lit("This burns%s!"), obj.blessed | 0 ? $c.lit(" a little") : obj.cursed | 0 ? $c.lit(" a lot") : $c.lit(""));
-                    dmg = rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 1701, $c.lit("potionhit")), d(obj.cursed | 0 ? 2 : 1, obj.blessed | 0 ? 4 : 8)) : d(obj.cursed | 0 ? 2 : 1, obj.blessed | 0 ? 4 : 8);
+                    dmg = d(obj.cursed | 0 ? 2 : 1, obj.blessed | 0 ? 4 : 8);
                     await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(dmg + 1 | 0, 2) : dmg, $c.lit("potion of acid"), 0);
                 }
                 break;
@@ -1369,14 +1369,14 @@ export async function potionhit(mon, obj, how) {   // potion.c:1625
                         break;
                     }
                 case 314 /* POT_SLEEPING */:
-                    if (await sleep_monst(mon, rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 1804, $c.lit("potionhit")), rnd(12)) : rnd(12), 8 /* POTION_CLASS */)) {
+                    if (await sleep_monst(mon, rnd(12), 8 /* POTION_CLASS */)) {
                         await pline($c.lit("%s falls asleep."), await Monnam(mon));
                         await slept_monst(mon);
                     }
                     break;
                 case 301 /* POT_PARALYSIS */:
                     if (mon.mcanmove) {
-                        paralyze_monst(mon, rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 1814, $c.lit("potionhit")), rnd(25)) : rnd(25));
+                        paralyze_monst(mon, rnd(25));
                     }
                     break;
                 case 302 /* POT_SPEED */:
@@ -1385,7 +1385,7 @@ export async function potionhit(mon, obj, how) {   // potion.c:1625
                     break;
                 case 300 /* POT_BLINDNESS */:
                     if ($c.andu64(mon.data.mflags1, 4096) === 0 && !(!mon.mcansee && !mon.mblinded)) {
-                        btmp = (64 + (rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 1823, $c.lit("potionhit")), rn2(32)) : rn2(32)) | 0) + Math.imul(rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 1824, $c.lit("potionhit")), rn2(32)) : rn2(32), !await resist(mon, 8, 0, 0) ? 1 : 0) | 0;
+                        btmp = (64 + rn2(32) | 0) + Math.imul(rn2(32), !await resist(mon, 8, 0, 0) ? 1 : 0) | 0;
                         btmp = btmp + (mon.mblinded | 0) | 0;
                         mon.mblinded = ((btmp < 127 ? btmp : 127) >>> 0) & 127;
                         mon.mcansee = (0) & 1;
@@ -1398,7 +1398,7 @@ export async function potionhit(mon, obj, how) {   // potion.c:1625
                             if (!(mon.data.msound === 0 /* MS_SILENT */)) {
                                 await wake_nearto($c.i16(tx), $c.i16(ty), Math.imul(mon.data.mlevel, 10));
                             }
-                            $t1 = rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 1839, $c.lit("potionhit")), d(2, 6)) : d(2, 6), mon.mhp = mon.mhp - $t1 | 0;
+                            $t1 = d(2, 6), mon.mhp = mon.mhp - $t1 | 0;
                             if (mon.mhp < 1) {
                                 await killed(mon);
                             } else if ($c.andu64(mon.data.mflags2, 4) !== 0 && !($c.andu64(mon.data.mflags2, 8) !== 0)) {
@@ -1409,7 +1409,7 @@ export async function potionhit(mon, obj, how) {   // potion.c:1625
                             if (canseemon(mon)) {
                                 await pline($c.lit("%s looks healthier."), await Monnam(mon));
                             }
-                            await healmon(mon, rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 1849, $c.lit("potionhit")), d(2, 6)) : d(2, 6), 0);
+                            await healmon(mon, d(2, 6), 0);
                             if ($c.andu64(mon.data.mflags2, 4) !== 0 && $c.andu64(mon.data.mflags2, 8) !== 0 && !(u.uprops[60 /* PROT_FROM_SHAPE_CHANGERS */].intrinsic || u.uprops[60 /* PROT_FROM_SHAPE_CHANGERS */].extrinsic)) {
                                 await new_were(mon);
                             }
@@ -1421,7 +1421,7 @@ export async function potionhit(mon, obj, how) {   // potion.c:1625
                         if (canseemon(mon)) {
                             await pline($c.lit("%s rusts."), await Monnam(mon));
                         }
-                        $t2 = rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 1860, $c.lit("potionhit")), d(1, 6)) : d(1, 6), mon.mhp = mon.mhp - $t2 | 0;
+                        $t2 = d(1, 6), mon.mhp = mon.mhp - $t2 | 0;
                         if (mon.mhp < 1) {
                             await killed(mon);
                         }
@@ -1438,7 +1438,7 @@ export async function potionhit(mon, obj, how) {   // potion.c:1625
                         if (!(mon.data.msound === 0 /* MS_SILENT */)) {
                             await wake_nearto($c.i16(tx), $c.i16(ty), Math.imul(mon.data.mlevel, 10));
                         }
-                        $t3 = rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 1876, $c.lit("potionhit")), d(obj.cursed | 0 ? 2 : 1, obj.blessed | 0 ? 4 : 8)) : d(obj.cursed | 0 ? 2 : 1, obj.blessed | 0 ? 4 : 8), mon.mhp = mon.mhp - $t3 | 0;
+                        $t3 = d(obj.cursed | 0 ? 2 : 1, obj.blessed | 0 ? 4 : 8), mon.mhp = mon.mhp - $t3 | 0;
                         if (mon.mhp < 1) {
                             if (your_fault) {
                                 await killed(mon);
@@ -1462,7 +1462,7 @@ export async function potionhit(mon, obj, how) {   // potion.c:1625
             }
         }
     }
-    if ((distance === 0 || distance < 3 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 1907, $c.lit("potionhit")), rn2($c.div32(1 + acurr(3 /* A_DEX */) | 0, 2))) : rn2($c.div32(1 + acurr(3 /* A_DEX */) | 0, 2)))) && (!($c.andu64(gy.youmonst.data.mflags1, 1024) !== 0) || $c.andu64(gy.youmonst.data.mflags1, 4096) === 0)) {
+    if ((distance === 0 || distance < 3 && !rn2($c.div32(1 + acurr(3 /* A_DEX */) | 0, 2))) && (!($c.andu64(gy.youmonst.data.mflags1, 1024) !== 0) || $c.andu64(gy.youmonst.data.mflags1, 4096) === 0)) {
         await potionbreathe(obj);
     } else if (obj.dknown | 0 && (gv.viz_array.get(ty).get(tx) & 2) !== 0) {
         await trycall(obj);
@@ -1503,7 +1503,7 @@ export async function potionbreathe(obj) {   // potion.c:1932
                 }
                 break;
             } else {
-                i = rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 1964, $c.lit("potionbreathe")), rn2(6 /* A_MAX */)) : rn2(6 /* A_MAX */);
+                i = rn2(6 /* A_MAX */);
                 for (isdone = ii = 0; !isdone && ii < 6 /* A_MAX */; ii = ii + 1 | 0) {
                     if (u.acurr.a[i] < u.amax.a[i]) {
                         u.acurr.a[i] = $c.i8(u.acurr.a[i] + 1);
@@ -1577,7 +1577,7 @@ export async function potionbreathe(obj) {   // potion.c:1932
             if (!u.uprops[14 /* CONFUSION */].intrinsic) {
                 await You_feel($c.lit("somewhat dizzy."));
             }
-            await make_confused(itimeout_incr(u.uprops[14 /* CONFUSION */].intrinsic, rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 2031, $c.lit("potionbreathe")), rnd(5)) : rnd(5)), 0);
+            await make_confused(itimeout_incr(u.uprops[14 /* CONFUSION */].intrinsic, rnd(5)), 0);
             break;
         case 305 /* POT_INVISIBILITY */:
             if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked) && !((u.uprops[40 /* INVIS */].intrinsic || u.uprops[40 /* INVIS */].extrinsic) && !u.uprops[40 /* INVIS */].blocked)) {
@@ -1589,7 +1589,7 @@ export async function potionbreathe(obj) {   // potion.c:1932
             kn = kn + 1 | 0;
             if (!u.uprops[66 /* FREE_ACTION */].extrinsic) {
                 await pline($c.lit("%s seems to be holding you."), c_common_strings.c_Something);
-                nomul(-(rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 2045, $c.lit("potionbreathe")), rnd(5)) : rnd(5)) | 0);
+                nomul(-rnd(5) | 0);
                 gm.multi_reason = $c.lit("frozen by a potion");
                 gn.nomovemsg = c_common_strings.c_You_can_move_again;
                 await exercise(3 /* A_DEX */, 0);
@@ -1601,7 +1601,7 @@ export async function potionbreathe(obj) {   // potion.c:1932
             kn = kn + 1 | 0;
             if (!u.uprops[66 /* FREE_ACTION */].extrinsic && !(u.uprops[3 /* SLEEP_RES */].intrinsic || u.uprops[3 /* SLEEP_RES */].extrinsic)) {
                 await You_feel($c.lit("rather tired."));
-                nomul(-(rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 2056, $c.lit("potionbreathe")), rnd(5)) : rnd(5)) | 0);
+                nomul(-rnd(5) | 0);
                 gm.multi_reason = $c.lit("sleeping off a magical draught");
                 gn.nomovemsg = c_common_strings.c_You_can_move_again;
                 await exercise(3 /* A_DEX */, 0);
@@ -1614,7 +1614,7 @@ export async function potionbreathe(obj) {   // potion.c:1932
             if (!(u.uprops[64 /* FAST */].intrinsic || u.uprops[64 /* FAST */].extrinsic)) {
                 await Your($c.lit("knees seem more flexible now."));
             }
-            incr_itimeout(new $c.FieldRef(u.uprops[64 /* FAST */], "intrinsic", "i64"), rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 2068, $c.lit("potionbreathe")), rnd(5)) : rnd(5));
+            incr_itimeout(new $c.FieldRef(u.uprops[64 /* FAST */], "intrinsic", "i64"), rnd(5));
             await exercise(3 /* A_DEX */, 1);
             break;
         case 300 /* POT_BLINDNESS */:
@@ -1622,7 +1622,7 @@ export async function potionbreathe(obj) {   // potion.c:1932
                 kn = kn + 1 | 0;
                 await pline($c.lit("It suddenly gets dark."));
             }
-            await make_blinded(itimeout_incr($c.and64(u.uprops[15 /* BLINDED */].intrinsic, 16777215), rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 2076, $c.lit("potionbreathe")), rnd(5)) : rnd(5)), 0);
+            await make_blinded(itimeout_incr($c.and64(u.uprops[15 /* BLINDED */].intrinsic, 16777215), rnd(5)), 0);
             if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked) && !(gm.multi < 0 && (unconscious() || is_fainted()))) {
                 await Your($c.lit("%s"), c_common_strings.c_vision_clears);
             }
@@ -1692,7 +1692,7 @@ function mixtype(o1, o2) {   // potion.c:2122
         case 313 /* POT_GAIN_ENERGY */:
             switch (o2typ) {
                 case 299 /* POT_CONFUSION */:
-                    return $c.i16((rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 2169, $c.lit("mixtype")), rn2(3)) : rn2(3)) ? 317 /* POT_BOOZE */ : 310 /* POT_ENLIGHTENMENT */);
+                    return $c.i16(rn2(3) ? 317 /* POT_BOOZE */ : 310 /* POT_ENLIGHTENMENT */);
                 case 307 /* POT_HEALING */:
                     return 308;
                 case 308 /* POT_EXTRA_HEALING */:
@@ -1720,7 +1720,7 @@ function mixtype(o1, o2) {   // potion.c:2122
         case 310 /* POT_ENLIGHTENMENT */:
             switch (o2typ) {
                 case 303 /* POT_LEVITATION */:
-                    if (rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 2197, $c.lit("mixtype")), rn2(3)) : rn2(3)) {
+                    if (rn2(3)) {
                         return 309;
                     }
                     break;
@@ -1871,7 +1871,7 @@ async function poof(potion) {   // potion.c:2408
     await useup(potion);
 }
 async function dip_potion_explosion(obj, dmg) {   // potion.c:2417
-    if (obj.cursed | 0 || obj.otyp === 320 /* POT_ACID */ || obj.otyp === 321 /* POT_OIL */ && obj.lamplit | 0 || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 2421, $c.lit("dip_potion_explosion")), rn2($G.uarmc && $G.uarmc.otyp === 144 /* ALCHEMY_SMOCK */ ? 30 : 10)) : rn2($G.uarmc && $G.uarmc.otyp === 144 /* ALCHEMY_SMOCK */ ? 30 : 10))) {
+    if (obj.cursed | 0 || obj.otyp === 320 /* POT_ACID */ || obj.otyp === 321 /* POT_OIL */ && obj.lamplit | 0 || !rn2($G.uarmc && $G.uarmc.otyp === 144 /* ALCHEMY_SMOCK */ ? 30 : 10)) {
         obj.in_use = (1) & 1;
         await pline($c.lit("%sThey explode!"), !(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf) ? $c.lit("BOOM!  ") : $c.lit(""));
         await wake_nearto(u.ux, u.uy, 81);
@@ -1938,9 +1938,9 @@ async function potion_dip(obj, potion) {   // potion.c:2442
             if (obj.oeroded) {
                 amt = 2;
             } else if (magic) {
-                amt = (rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 2524, $c.lit("potion_dip")), rnd((amt < 8 ? amt : 8) - 2 | 0)) : rnd((amt < 8 ? amt : 8) - 2 | 0)) + 2 | 0;
+                amt = rnd((amt < 8 ? amt : 8) - 2 | 0) + 2 | 0;
             } else {
-                amt = (rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 2526, $c.lit("potion_dip")), rnd(amt - 6 | 0)) : rnd(amt - 6 | 0)) + 6 | 0;
+                amt = rnd(amt - 6 | 0) + 6 | 0;
             }
             if (amt < obj.quan) {
                 obj = await splitobj(obj, amt);
@@ -1949,7 +1949,7 @@ async function potion_dip(obj, potion) {   // potion.c:2442
         }
         await pline($c.lit("%s %s %s with %s%s..."), new $c.Ptr(qbuf, 0), await simpleonames(obj), await otense(obj, $c.lit("mix")), potion.quan > 1 ? $c.lit("one of ") : $c.lit(""), await thesimpleoname(potion));
         await useup(potion);
-        if (await dip_potion_explosion(obj, amt + (rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 2541, $c.lit("potion_dip")), rnd(9)) : rnd(9)) | 0)) {
+        if (await dip_potion_explosion(obj, amt + rnd(9) | 0)) {
             return 1;
         }
         $t3 = ($t2 = obj.bknown = (0) & 1, obj.cursed = ($t2) & 1), obj.blessed = ($t3) & 1;
@@ -1959,7 +1959,7 @@ async function potion_dip(obj, potion) {   // potion.c:2442
         if (mixture !== 0 /* STRANGE_OBJECT */) {
             obj.otyp = mixture;
         } else {
-            switch (obj.oeroded | 0 ? 1 : rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 2553, $c.lit("potion_dip")), rnd(8)) : rnd(8)) {
+            switch (obj.oeroded | 0 ? 1 : rnd(8)) {
                 case 1:
                     obj.otyp = 322;
                     break;
@@ -2035,7 +2035,7 @@ async function potion_dip(obj, potion) {   // potion.c:2442
                 await fire_damage(obj, 1, u.ux, u.uy);
             } else if (potion.cursed) {
                 await pline_The($c.lit("potion spills and covers your %s with oil."), await fingers_or_gloves(1));
-                await make_glib($c.i32($c.and64(u.uprops[21 /* GLIB */].intrinsic, 16777215)) + (rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 2653, $c.lit("potion_dip")), d(2, 10)) : d(2, 10)) | 0);
+                await make_glib($c.i32($c.and64(u.uprops[21 /* GLIB */].intrinsic, 16777215)) + d(2, 10) | 0);
             } else if (obj.oclass !== 2 /* WEAPON_CLASS */ && !(obj.oclass === 6 /* TOOL_CLASS */ && objects[obj.otyp].oc_subtyp !== 0 /* P_NONE */)) {
                 break more_dips$;
             } else if (!((objects[obj.otyp].oc_material | 0) === 11 /* IRON */) && !((objects[obj.otyp].oc_material | 0) === 13 /* COPPER */ || (objects[obj.otyp].oc_material | 0) === 11 /* IRON */) || (obj.oclass === 2 /* WEAPON_CLASS */ || obj.oclass === 13 /* GEM_CLASS */) && objects[obj.otyp].oc_subtyp >= -22 && objects[obj.otyp].oc_subtyp <= -20 || !obj.oeroded && !obj.oeroded2) {
@@ -2065,7 +2065,7 @@ async function potion_dip(obj, potion) {   // potion.c:2442
     if ((obj.otyp === 227 /* OIL_LAMP */ || obj.otyp === 228 /* MAGIC_LAMP */) && potion.otyp === 321 /* POT_OIL */) {
         if (obj.lamplit | 0 || potion.lamplit | 0) {
             await useup(potion);
-            await explode(u.ux, u.uy, 11, rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 2695, $c.lit("potion_dip")), d(6, 6)) : d(6, 6), 0, 5 /* EXPL_FIERY */);
+            await explode(u.ux, u.uy, 11, d(6, 6), 0, 5 /* EXPL_FIERY */);
             await exercise(2 /* A_WIS */, 0);
             return 1;
         }
@@ -2173,11 +2173,11 @@ export async function djinni_from_bottle(obj) {   // potion.c:2815
         await You($c.lit("smell acrid fumes."));
         await pline($c.lit("%s speaks."), c_common_strings.c_Something);
     }
-    chance = rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 2833, $c.lit("djinni_from_bottle")), rn2(5)) : rn2(5);
+    chance = rn2(5);
     if (obj.blessed) {
-        chance = chance === 4 ? rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 2835, $c.lit("djinni_from_bottle")), rnd(4)) : rnd(4) : 0;
+        chance = chance === 4 ? rnd(4) : 0;
     } else if (obj.cursed) {
-        chance = chance === 0 ? rng_log_enabled() ? (rng_log_set_caller($c.lit("potion.c"), 2837, $c.lit("djinni_from_bottle")), rn2(4)) : rn2(4) : 4;
+        chance = chance === 0 ? rn2(4) : 4;
     }
     switch (chance) {
         case 0:

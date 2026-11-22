@@ -59,7 +59,7 @@ import { ok_to_quest } from './quest.js';
 import { is_quest_artifact } from './questpgr.js';
 import { cant_revive, litroom, recharge, unpunish } from './read.js';
 import { create_gas_cloud } from './region.js';
-import { d, rn2, rn2_on_display_rng, rnd, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { d, rn2, rn2_on_display_rng, rnd } from './rnd.js';
 import { genders } from './role.js';
 import { Shk_Your, add_damage, addtobill, billable, check_unpaid, contained_cost, costly_spot, delete_contents, hot_pursuit, inhishop, inside_shop, make_angry_shk, obfree, pay_for_damage, shk_your, shkcatch, shop_keeper, stolen_value } from './shk.js';
 import { Shknam, neweshk, shkname } from './shknam.js';
@@ -143,11 +143,11 @@ export async function bhitm(mtmp, otmp) {   // zap.c:160
                 }
                 await shieldeff(mtmp.mx, mtmp.my);
                 await pline($c.lit("Boing!"));
-            } else if (u.uswallow | 0 || (rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 202, $c.lit("bhitm")), rnd(20)) : rnd(20)) < (10 + find_mac(mtmp) | 0)) {
+            } else if (u.uswallow | 0 || rnd(20) < (10 + find_mac(mtmp) | 0)) {
                 if (disguised_mimic) {
                     await seemimic(mtmp);
                 }
-                dmg = rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 205, $c.lit("bhitm")), d(2, 12)) : d(2, 12);
+                dmg = d(2, 12);
                 if (dbldam) {
                     dmg = Math.imul(dmg, 2);
                 }
@@ -197,7 +197,7 @@ export async function bhitm(mtmp, otmp) {   // zap.c:160
             if ($c.andu64(mtmp.data.mflags2, 2) !== 0 || (mtmp.cham === 226 /* PM_VAMPIRE */ || mtmp.cham === 227 /* PM_VAMPIRE_LEADER */ || mtmp.cham === 228 /* PM_VLAD_THE_IMPALER */)) {
                 reveal_invis = 1;
                 wake = 1;
-                dmg = rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 251, $c.lit("bhitm")), rnd(8)) : rnd(8);
+                dmg = rnd(8);
                 if (dbldam) {
                     dmg = Math.imul(dmg, 2);
                 }
@@ -226,7 +226,7 @@ export async function bhitm(mtmp, otmp) {   // zap.c:160
                         bypass_obj(obj);
                     }
                 }
-                if (mtmp.cham === -1 /* NON_PM */ && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 290, $c.lit("bhitm")), rn2(25)) : rn2(25))) {
+                if (mtmp.cham === -1 /* NON_PM */ && !rn2(25)) {
                     if (canseemon(mtmp)) {
                         await pline($c.lit("%s shudders!"), await Monnam(mtmp));
                         learn_it[0] = 1;
@@ -321,7 +321,7 @@ export async function bhitm(mtmp, otmp) {   // zap.c:160
                     if (canseemon(mtmp)) {
                         await pline($c.lit("%s is knocked back!"), await Monnam(mtmp));
                     }
-                    await mhurtle(mtmp, mtmp.mx - u.ux | 0, mtmp.my - u.uy | 0, rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 408, $c.lit("bhitm")), rnd(2)) : rnd(2));
+                    await mhurtle(mtmp, mtmp.mx - u.ux | 0, mtmp.my - u.uy | 0, rnd(2));
                 } else {
                     if (canseemon(mtmp)) {
                         await pline($c.lit("%s doesn't budge."), await Monnam(mtmp));
@@ -347,7 +347,7 @@ export async function bhitm(mtmp, otmp) {   // zap.c:160
         case 374 /* SPE_HEALING */:
         case 391 /* SPE_EXTRA_HEALING */:
             {
-                healamt = rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 435, $c.lit("bhitm")), d(6, otyp === 391 /* SPE_EXTRA_HEALING */ ? 8 : 4)) : d(6, otyp === 391 /* SPE_EXTRA_HEALING */ ? 8 : 4);
+                healamt = d(6, otyp === 391 /* SPE_EXTRA_HEALING */ ? 8 : 4);
                 reveal_invis = 1;
                 if (!$c.peq(mtmp.data, $c.relem(mons, 312 /* PM_PESTILENCE */))) {
                     delta = mtmp.mhpmax - mtmp.mhp | 0;
@@ -388,7 +388,7 @@ export async function bhitm(mtmp, otmp) {   // zap.c:160
             break;
         case 432 /* WAN_SLEEP */:
             reveal_invis = 1;
-            if (await sleep_monst(mtmp, rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 485, $c.lit("bhitm")), d(1 + otmp.spe | 0, 12)) : d(1 + otmp.spe | 0, 12), 11 /* WAND_CLASS */)) {
+            if (await sleep_monst(mtmp, d(1 + otmp.spe | 0, 12), 11 /* WAND_CLASS */)) {
                 await slept_monst(mtmp);
             }
             if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
@@ -582,7 +582,7 @@ export async function montraits(obj, cc, adjacentok) {   // zap.c:713
             return null;
         }
         if (mtmp.m_lev < mtmp.data.mlevel) {
-            ltmp = rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 750, $c.lit("montraits")), rnd(mtmp.data.mlevel + 1 | 0)) : rnd(mtmp.data.mlevel + 1 | 0);
+            ltmp = rnd(mtmp.data.mlevel + 1 | 0);
             if (ltmp > mtmp.m_lev) {
                 while (mtmp.m_lev < ltmp) {
                     mtmp.m_lev = $c.u8(mtmp.m_lev + 1);
@@ -715,7 +715,7 @@ export async function revive(corpse, by_hero) {   // zap.c:884
     if (x[0]) {
         corpse.ox = x[0], corpse.oy = y[0];
     }
-    if (!x[0] || container && (container.olocked | 0 || container_nesting[0] > 2 || container.otyp === 476 /* STATUE */ || container.otyp === 219 /* BAG_OF_HOLDING */ && (rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 952, $c.lit("revive")), rn2(40)) : rn2(40))) || is_zomb && corpse.where === 6 && !zombie_can_dig(x[0], y[0])) {
+    if (!x[0] || container && (container.olocked | 0 || container_nesting[0] > 2 || container.otyp === 476 /* STATUE */ || container.otyp === 219 /* BAG_OF_HOLDING */ && rn2(40)) || is_zomb && corpse.where === 6 && !zombie_can_dig(x[0], y[0])) {
         return null;
     }
     mptr = $c.relem(mons, montype[0]);
@@ -917,7 +917,7 @@ export async function unturn_you() {   // zap.c:1225
     await unturn_dead(gy.youmonst);
     if ($c.andu64(gy.youmonst.data.mflags2, 2) !== 0) {
         await You_feel($c.lit("frightened and %sstunned."), u.uprops[13 /* STUNNED */].intrinsic ? $c.lit("even more ") : $c.lit(""));
-        await make_stunned($c.add64($c.and64(u.uprops[13 /* STUNNED */].intrinsic, 16777215), rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 1231, $c.lit("unturn_you")), rnd(30)) : rnd(30)), 0);
+        await make_stunned($c.add64($c.and64(u.uprops[13 /* STUNNED */].intrinsic, 16777215), rnd(30)), 0);
     } else {
         await You($c.lit("shudder in dread."));
     }
@@ -1106,7 +1106,7 @@ export function obj_resists(obj, ochance, achance) {   // zap.c:1458
     if (obj.otyp === 213 /* AMULET_OF_YENDOR */ || obj.otyp === 409 /* SPE_BOOK_OF_THE_DEAD */ || obj.otyp === 262 /* CANDELABRUM_OF_INVOCATION */ || obj.otyp === 263 /* BELL_OF_OPENING */ || obj.otyp === 265 /* CORPSE */ && ($c.peq($c.relem(mons, obj.corpsenm), $c.relem(mons, 311 /* PM_DEATH */)) || $c.peq($c.relem(mons, obj.corpsenm), $c.relem(mons, 313 /* PM_FAMINE */)) || $c.peq($c.relem(mons, obj.corpsenm), $c.relem(mons, 312 /* PM_PESTILENCE */)))) {
         return 1;
     } else {
-        chance = rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 1469, $c.lit("obj_resists")), rn2(100)) : rn2(100);
+        chance = rn2(100);
         return $c.i8(chance < (obj.oartifact ? achance : ochance) ? 1 : 0);
     }
 }
@@ -1127,7 +1127,7 @@ export function obj_shudders(obj) {   // zap.c:1476
     if (obj.quan > 4) {
         zap_odds = $c.div32(zap_odds, 2);
     }
-    return $c.i8(!(rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 1496, $c.lit("obj_shudders")), rn2(zap_odds)) : rn2(zap_odds)) ? 1 : 0);
+    return $c.i8(!rn2(zap_odds) ? 1 : 0);
 }
 async function polyuse(objhdr, mat, minwt) {   // zap.c:1505
     let otmp = null, otmp2 = null;
@@ -1145,7 +1145,7 @@ async function polyuse(objhdr, mat, minwt) {   // zap.c:1505
         if (otmp.otyp === 364 /* SCR_MAIL */) {
             continue;
         }
-        if (((objects[otmp.otyp].oc_material | 0) === mat ? 1 : 0) === ((rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 1523, $c.lit("polyuse")), rn2(minwt + 1 | 0)) : rn2(minwt + 1 | 0)) !== 0 ? 1 : 0)) {
+        if (((objects[otmp.otyp].oc_material | 0) === mat ? 1 : 0) === (rn2(minwt + 1 | 0) !== 0 ? 1 : 0)) {
             if (await costly_spot(otmp.ox, otmp.oy)) {
                 if (new $c.Ptr(u.ushops, 0).get(0)) {
                     await addtobill(otmp, 0, 0, 0);
@@ -1185,7 +1185,7 @@ async function create_polymon(obj, okind) {   // zap.c:1546
         case 16 /* PLATINUM */:
         case 20 /* GEMSTONE */:
         case 21 /* MINERAL */:
-            pm_index = (rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 1579, $c.lit("create_polymon")), rn2(2)) : rn2(2)) ? 257 /* PM_STONE_GOLEM */ : 256 /* PM_CLAY_GOLEM */;
+            pm_index = rn2(2) ? 257 /* PM_STONE_GOLEM */ : 256 /* PM_CLAY_GOLEM */;
             material = $c.lit("lithic ");
             break;
         case 0:
@@ -1243,7 +1243,7 @@ export async function do_osshock(obj) {   // zap.c:1637
     go.obj_zapped = 1;
     if (gp.poly_zapped < 0) {
         for (i = obj.quan; i; i = $c.sub64(i, 1)) {
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 1650, $c.lit("do_osshock")), rn2((u.uluck + u.moreluck | 0) + 45 | 0)) : rn2((u.uluck + u.moreluck | 0) + 45 | 0))) {
+            if (!rn2((u.uluck + u.moreluck | 0) + 45 | 0)) {
                 gp.poly_zapped = objects[obj.otyp].oc_material | 0;
                 break;
             }
@@ -1251,9 +1251,9 @@ export async function do_osshock(obj) {   // zap.c:1637
     }
     if (obj.quan > 1) {
         if (obj.quan > 32767) {
-            obj = await splitobj(obj, rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 1659, $c.lit("do_osshock")), rnd(30000)) : rnd(30000));
+            obj = await splitobj(obj, rnd(30000));
         } else {
-            obj = await splitobj(obj, rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 1661, $c.lit("do_osshock")), rnd($c.i32(obj.quan) - 1 | 0)) : rnd($c.i32(obj.quan) - 1 | 0));
+            obj = await splitobj(obj, rnd($c.i32(obj.quan) - 1 | 0));
         }
     }
     if (await costly_spot(obj.ox, obj.oy)) {
@@ -1370,7 +1370,7 @@ export async function poly_obj(obj, id) {   // zap.c:1702
     if (otmp.cobj !== null) {
         await delete_contents(otmp);
     }
-    if (otmp.quan > 1 && (!objects[otmp.otyp].oc_merge || can_merge && otmp.quan > (rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 1833, $c.lit("poly_obj")), rn2(1000)) : rn2(1000)))) {
+    if (otmp.quan > 1 && (!objects[otmp.otyp].oc_merge || can_merge && otmp.quan > rn2(1000))) {
         otmp.quan = 1;
     }
     switch (otmp.oclass) {
@@ -1386,7 +1386,7 @@ export async function poly_obj(obj, id) {   // zap.c:1702
             while (otmp.otyp === 414 /* WAN_WISHING */ || otmp.otyp === 422 /* WAN_POLYMORPH */) {
                 $t3 = $c.i16(rnd_class(410 /* WAN_LIGHT */, 434 /* WAN_LIGHTNING */)), otmp.otyp = $t3;
             }
-            if ((otmp.recharged | 0) < (rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 1852, $c.lit("poly_obj")), rn2(7)) : rn2(7))) {
+            if ((otmp.recharged | 0) < rn2(7)) {
                 otmp.recharged = (otmp.recharged + 1 >>> 0) & 7;
             }
             break;
@@ -1406,12 +1406,12 @@ export async function poly_obj(obj, id) {   // zap.c:1702
                 otmp.usecount = obj.usecount + 1 | 0;
                 if (otmp.usecount > 3) {
                     otmp.otyp = 407;
-                    $t6 = rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 1878, $c.lit("poly_obj")), rn2(otmp.usecount)) : rn2(otmp.usecount), otmp.usecount = $t6;
+                    $t6 = rn2(otmp.usecount), otmp.usecount = $t6;
                 }
             }
             break;
         case 13 /* GEM_CLASS */:
-            if (otmp.quan > (rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 1884, $c.lit("poly_obj")), rnd(4)) : rnd(4)) && (objects[obj.otyp].oc_material | 0) === 21 /* MINERAL */ && (objects[otmp.otyp].oc_material | 0) !== 21 /* MINERAL */) {
+            if (otmp.quan > rnd(4) && (objects[obj.otyp].oc_material | 0) === 21 /* MINERAL */ && (objects[otmp.otyp].oc_material | 0) !== 21 /* MINERAL */) {
                 otmp.otyp = 474;
                 otmp.quan = $c.div64(otmp.quan, 2);
             }
@@ -1878,7 +1878,7 @@ export async function bhitpile(obj, fhito, tx, ty, zz) {   // zap.c:2428
     return hitanything;
 }
 export async function zappable(wand) {   // zap.c:2514
-    if (wand.spe < 0 || wand.spe === 0 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 2516, $c.lit("zappable")), rn2(121)) : rn2(121))) {
+    if (wand.spe < 0 || wand.spe === 0 && rn2(121)) {
         return 0;
     }
     if (wand.spe === 0) {
@@ -1911,19 +1911,19 @@ export async function zapnodir(obj) {   // zap.c:2539
             break;
         case 415 /* WAN_STASIS */:
             {
-                tmp_until = $c.add64(svm.moves, (rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 2560, $c.lit("zapnodir")), rn2(21)) : rn2(21)) + 10 | 0);
+                tmp_until = $c.add64(svm.moves, rn2(21) + 10 | 0);
                 if (tmp_until > svl.level.flags.stasis_until) {
                     svl.level.flags.stasis_until = tmp_until;
                 }
                 break;
             }
         case 413 /* WAN_CREATE_MONSTER */:
-            if (await create_critters((rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 2571, $c.lit("zapnodir")), rn2(23)) : rn2(23)) ? 1 : (rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 2571, $c.lit("zapnodir")), rn2(7)) : rn2(7)) + 2 | 0, null, 0)) {
+            if (await create_critters(rn2(23) ? 1 : rn2(7) + 2 | 0, null, 0)) {
                 known = $c.i8(!!obj.dknown ? 1 : 0);
             }
             break;
         case 414 /* WAN_WISHING */:
-            if (((u.uluck + u.moreluck | 0) + (rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 2576, $c.lit("zapnodir")), rn2(5)) : rn2(5)) | 0) < 0) {
+            if (((u.uluck + u.moreluck | 0) + rn2(5) | 0) < 0) {
                 await pline($c.lit("Unfortunately, nothing happens."));
                 known = 0;
             } else {
@@ -1949,7 +1949,7 @@ async function backfire(otmp) {   // zap.c:2605
     let dmg = 0;
     otmp.in_use = (1) & 1;
     await pline($c.lit("%s suddenly explodes!"), await The(await xname(otmp)));
-    dmg = rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 2611, $c.lit("backfire")), d(otmp.spe + 2 | 0, 6)) : d(otmp.spe + 2 | 0, 6);
+    dmg = d(otmp.spe + 2 | 0, 6);
     await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(dmg + 1 | 0, 2) : dmg, $c.lit("exploding wand"), 0);
     await useupall(otmp);
 }
@@ -1976,7 +1976,7 @@ export async function dozap() {   // zap.c:2627
     need_dir = (objects[obj.otyp].oc_dir | 0) !== 1 ? 1 : 0;
     if (!await zappable(obj)) {
         await pline($c.lit("%s"), c_common_strings.c_nothing_happens);
-    } else if (obj.cursed | 0 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 2647, $c.lit("dozap")), rn2(100)) : rn2(100))) {
+    } else if (obj.cursed | 0 && !rn2(100)) {
         await backfire(obj);
         await exercise(0 /* A_STR */, 0);
         return 1;
@@ -2033,9 +2033,9 @@ export async function zapyourself(obj, ordinary) {   // zap.c:2705
             } else {
                 if (ordinary) {
                     await You($c.lit("bash yourself!"));
-                    damage = rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 2722, $c.lit("zapyourself")), d(2, 12)) : d(2, 12);
+                    damage = d(2, 12);
                 } else {
-                    damage = rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 2724, $c.lit("zapyourself")), d(1 + obj.spe | 0, 6)) : d(1 + obj.spe | 0, 6);
+                    damage = d(1 + obj.spe | 0, 6);
                 }
                 await exercise(0 /* A_STR */, 0);
                 monstunseesu(1);
@@ -2043,7 +2043,7 @@ export async function zapyourself(obj, ordinary) {   // zap.c:2705
             break;
         case 434 /* WAN_LIGHTNING */:
             learn_it[0] = 1;
-            orig_dmg = rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 2732, $c.lit("zapyourself")), d(12, 6)) : d(12, 6);
+            orig_dmg = d(12, 6);
             if (!(u.uprops[5 /* SHOCK_RES */].intrinsic || u.uprops[5 /* SHOCK_RES */].extrinsic)) {
                 await You($c.lit("shock yourself!"));
                 damage = orig_dmg;
@@ -2056,16 +2056,16 @@ export async function zapyourself(obj, ordinary) {   // zap.c:2705
                 await ugolemeffects(6, orig_dmg);
             }
             await destroy_items(gy.youmonst, 6, orig_dmg);
-            await flashburn(rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 2745, $c.lit("zapyourself")), rnd(100)) : rnd(100), 1);
+            await flashburn(rnd(100), 1);
             break;
         case 368 /* SPE_FIREBALL */:
             await You($c.lit("explode a fireball on top of yourself!"));
-            await explode(u.ux, u.uy, 11, rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 2750, $c.lit("zapyourself")), d(6, 6)) : d(6, 6), 11, 5 /* EXPL_FIERY */);
+            await explode(u.ux, u.uy, 11, d(6, 6), 11, 5 /* EXPL_FIERY */);
             break;
         case 430 /* WAN_FIRE */:
         case 251 /* FIRE_HORN */:
             learn_it[0] = 1;
-            orig_dmg = rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 2755, $c.lit("zapyourself")), d(12, 6)) : d(12, 6);
+            orig_dmg = d(12, 6);
             if (u.uprops[1 /* FIRE_RES */].intrinsic || u.uprops[1 /* FIRE_RES */].extrinsic) {
                 await shieldeff(u.ux, u.uy);
                 await You_feel($c.lit("rather warm."));
@@ -2085,7 +2085,7 @@ export async function zapyourself(obj, ordinary) {   // zap.c:2705
         case 369 /* SPE_CONE_OF_COLD */:
         case 250 /* FROST_HORN */:
             learn_it[0] = 1;
-            orig_dmg = rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 2776, $c.lit("zapyourself")), d(12, 6)) : d(12, 6);
+            orig_dmg = d(12, 6);
             if (u.uprops[2 /* COLD_RES */].intrinsic || u.uprops[2 /* COLD_RES */].extrinsic) {
                 await shieldeff(u.ux, u.uy);
                 await You_feel($c.lit("a little chill."));
@@ -2106,7 +2106,7 @@ export async function zapyourself(obj, ordinary) {   // zap.c:2705
                 await pline_The($c.lit("missiles bounce!"));
                 monstseesu(1);
             } else {
-                damage = rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 2798, $c.lit("zapyourself")), d(4, 6)) : d(4, 6);
+                damage = d(4, 6);
                 await pline($c.lit("Idiot!  You've shot yourself!"));
                 monstunseesu(1);
             }
@@ -2136,7 +2136,7 @@ export async function zapyourself(obj, ordinary) {   // zap.c:2705
                     await You_feel($c.lit("rather itchy under %s."), await yname($G.uarmc));
                     break;
                 }
-                incr_itimeout(new $c.FieldRef(u.uprops[40 /* INVIS */], "intrinsic", "i64"), (rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 2836, $c.lit("zapyourself")), rn2(15)) : rn2(15)) + 31 | 0);
+                incr_itimeout(new $c.FieldRef(u.uprops[40 /* INVIS */], "intrinsic", "i64"), rn2(15) + 31 | 0);
                 if (msg) {
                     learn_it[0] = 1;
                     await newsym(u.ux, u.uy);
@@ -2145,7 +2145,7 @@ export async function zapyourself(obj, ordinary) {   // zap.c:2705
                 break;
             }
         case 420 /* WAN_SPEED_MONSTER */:
-            await speed_up((rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 2847, $c.lit("zapyourself")), rn2(25)) : rn2(25)) + 50 | 0);
+            await speed_up(rn2(25) + 50 | 0);
             learn_it[0] = 1;
             break;
         case 432 /* WAN_SLEEP */:
@@ -2162,7 +2162,7 @@ export async function zapyourself(obj, ordinary) {   // zap.c:2705
                     await You($c.lit("fall asleep!"));
                 }
                 monstunseesu(8);
-                await fall_asleep(-(rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 2864, $c.lit("zapyourself")), rnd(50)) : rnd(50)) | 0, 1);
+                await fall_asleep(-rnd(50) | 0, 1);
             }
             break;
         case 419 /* WAN_SLOW_MONSTER */:
@@ -2200,17 +2200,17 @@ export async function zapyourself(obj, ordinary) {   // zap.c:2705
         case 374 /* SPE_HEALING */:
         case 391 /* SPE_EXTRA_HEALING */:
             learn_it[0] = 1;
-            await healup(rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 2911, $c.lit("zapyourself")), d(6, obj.otyp === 391 /* SPE_EXTRA_HEALING */ ? 8 : 4)) : d(6, obj.otyp === 391 /* SPE_EXTRA_HEALING */ ? 8 : 4), 0, 0, $c.i8(obj.blessed | 0 || obj.otyp === 391 /* SPE_EXTRA_HEALING */ ? 1 : 0));
+            await healup(d(6, obj.otyp === 391 /* SPE_EXTRA_HEALING */ ? 8 : 4), 0, 0, $c.i8(obj.blessed | 0 || obj.otyp === 391 /* SPE_EXTRA_HEALING */ ? 1 : 0));
             await You_feel($c.lit("%sbetter."), obj.otyp === 391 /* SPE_EXTRA_HEALING */ ? $c.lit("much ") : $c.lit(""));
             break;
         case 410 /* WAN_LIGHT */:
-            damage = rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 2917, $c.lit("zapyourself")), d(obj.spe, 25)) : d(obj.spe, 25);
+            damage = d(obj.spe, 25);
         case 229 /* EXPENSIVE_CAMERA */:
             if (!damage) {
                 damage = 5;
             }
             damage = await lightdamage(obj, ordinary, damage);
-            damage = damage + (rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 2924, $c.lit("zapyourself")), rnd(25)) : rnd(25)) | 0;
+            damage = damage + rnd(25) | 0;
             if (await flashburn(damage, 0)) {
                 learn_it[0] = 1;
             }
@@ -2298,9 +2298,9 @@ export async function lightdamage(obj, ordinary, amt) {   // zap.c:3026
     let buf = new Int8Array(256), how = null, dmg = 0;
     dmg = amt;
     if (dmg && $c.peq(gy.youmonst.data, $c.relem(mons, 40 /* PM_GREMLIN */))) {
-        dmg = rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 3037, $c.lit("lightdamage")), rnd(dmg)) : rnd(dmg);
+        dmg = rnd(dmg);
         if (dmg > 10) {
-            dmg = 10 + (rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 3039, $c.lit("lightdamage")), rnd(dmg - 10 | 0)) : rnd(dmg - 10 | 0)) | 0;
+            dmg = 10 + rnd(dmg - 10 | 0) | 0;
         }
         if (dmg > 20) {
             dmg = 20;
@@ -2490,9 +2490,9 @@ async function zap_updown(obj) {   // zap.c:3219
                     await destroy_drawbridge(xx[0], yy[0]);
                 }
                 disclose[0] = 1;
-            } else if (striking && u.dz < 0 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 3307, $c.lit("zap_updown")), rn2(3)) : rn2(3)) && !((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level)) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) && !u.uinwater && !((svd.dungeon_topology.d_qstart_level.dlevel || svd.dungeon_topology.d_qstart_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_qstart_level))) {
+            } else if (striking && u.dz < 0 && rn2(3) && !((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level)) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) && !u.uinwater && !((svd.dungeon_topology.d_qstart_level.dlevel || svd.dungeon_topology.d_qstart_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_qstart_level))) {
                 await pline($c.lit("A rock is dislodged from the %s and falls on your %s."), ceiling(x, y), await body_part(8 /* HEAD */));
-                dmg = rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 3314, $c.lit("zap_updown")), rnd(hard_helmet($G.uarmh) ? 2 : 6)) : rnd(hard_helmet($G.uarmh) ? 2 : 6);
+                dmg = rnd(hard_helmet($G.uarmh) ? 2 : 6);
                 await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(dmg + 1 | 0, 2) : dmg, $c.lit("falling rock"), 0);
                 if ((otmp = await mksobj_at(474 /* ROCK */, x, y, 0, 0)) !== null) {
                     await xname(otmp);
@@ -2591,7 +2591,7 @@ export async function weffects(obj$in) {   // zap.c:3431
         } else if (u.dz) {
             disclose = await zap_updown(obj[0]);
         } else {
-            await bhit(u.dx, u.dy, (rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 3448, $c.lit("weffects")), rn2(8)) : rn2(8)) + 6 | 0, 0, bhitm, bhito, new $c.Ptr(obj, 0));
+            await bhit(u.dx, u.dy, rn2(8) + 6 | 0, 0, bhitm, bhito, new $c.Ptr(obj, 0));
         }
         await zapwrapup();
     } else if ((objects[otyp].oc_dir | 0) === 1) {
@@ -2679,9 +2679,9 @@ export async function miss(str, mtmp) {   // zap.c:3571
 function skiprange(range, skipstart, skipend) {   // zap.c:3579
     let tr = 0, tmp = 0, $t1;
     tr = $c.div32(range, 4);
-    tmp = range - (tr > 0 ? rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 3582, $c.lit("skiprange")), rnd(tr)) : rnd(tr) : 0) | 0;
+    tmp = range - (tr > 0 ? rnd(tr) : 0) | 0;
     skipstart.set(0, tmp);
-    $t1 = tmp - Math.imul($c.div32(tmp, 4), rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 3585, $c.lit("skiprange")), rnd(3)) : rnd(3)) | 0, skipend.set(0, $t1);
+    $t1 = tmp - Math.imul($c.div32(tmp, 4), rnd(3)) | 0, skipend.set(0, $t1);
     if (skipend.get(0) >= tmp) {
         skipend.set(0, tmp - 1 | 0);
     }
@@ -2703,7 +2703,7 @@ async function maybe_explode_trap(ttmp, otmp, learn_it) {   // zap.c:3594
             }
         } else if ((ttmp.ttyp | 0) === 15 /* TELEP_TRAP */ || (ttmp.ttyp | 0) === 16 /* LEVEL_TELEP */ || (ttmp.ttyp | 0) === 20 /* MAGIC_TRAP */ || (ttmp.ttyp | 0) === 21 /* ANTI_MAGIC */ || (ttmp.ttyp | 0) === 22 /* POLY_TRAP */) {
             seeit = (gv.viz_array.get(y).get(x) & 2) !== 0 ? 1 : 0;
-            await explode(x, y, -423, 20 + (rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 3616, $c.lit("maybe_explode_trap")), d(3, 6)) : d(3, 6)) | 0, 21, 4 /* EXPL_MAGICAL */);
+            await explode(x, y, -423, 20 + d(3, 6) | 0, 21, 4 /* EXPL_MAGICAL */);
             await deltrap(ttmp);
             await newsym(x, y);
             if (seeit) {
@@ -2742,12 +2742,12 @@ async function zap_map(x, y, obj) {   // zap.c:3628
                 case 405 /* SPE_STONE_TO_FLESH */:
                     if (e.engr_type === 2) {
                         await pline_The(u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic) ? $c.lit("floor runs like butter!") : $c.lit("edges on the floor get smoother."));
-                        await wipe_engr_at(x, y, $c.i16(rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 3673, $c.lit("zap_map")), d(2, 4)) : d(2, 4)), 1);
+                        await wipe_engr_at(x, y, $c.i16(d(2, 4)), 1);
                     }
                     break;
                 case 417 /* WAN_STRIKING */:
                 case 376 /* SPE_FORCE_BOLT */:
-                    await wipe_engr_at(x, y, $c.i16(rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 3678, $c.lit("zap_map")), d(2, 4)) : d(2, 4)), 1);
+                    await wipe_engr_at(x, y, $c.i16(d(2, 4)), 1);
                     break;
                 default:
                     break;
@@ -2820,7 +2820,7 @@ async function zap_map(x, y, obj) {   // zap.c:3628
             await newsym(x, y);
             if (!t_already_seen || hallu) {
                 ttmpname = trapname(ttmp.ttyp | 0, 0);
-                use_the = $c.i8(!hallu ? (ttmp.ttyp | 0) === 23 /* VIBRATING_SQUARE */ && Invocation_lev(u.uz) ? 1 : 0 : !(rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 3789, $c.lit("zap_map")), rn2(4)) : rn2(4)) ? 1 : 0);
+                use_the = $c.i8(!hallu ? (ttmp.ttyp | 0) === 23 /* VIBRATING_SQUARE */ && Invocation_lev(u.uz) ? 1 : 0 : !rn2(4) ? 1 : 0);
                 await You($c.lit("find %s%c"), use_the ? await the(ttmpname) : await an(ttmpname), use_the ? 33 : 46);
                 learn_it[0] = $c.i8(!hallu ? 1 : 0);
             }
@@ -2854,7 +2854,7 @@ export async function bhit(ddx, ddy, range, weapon, fhitm, fhito, pobj) {   // z
     }
     if (weapon === 1 && obj && obj.otyp === 474 /* ROCK */) {
         skiprange(range, new $c.Ptr(skiprange_start, 0), new $c.Ptr(skiprange_end, 0));
-        allow_skip = $c.i8(!(rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 3858, $c.lit("bhit")), rn2(3)) : rn2(3)) ? 1 : 0);
+        allow_skip = $c.i8(!rn2(3) ? 1 : 0);
     }
     if (weapon === 4) {
         await tmp_at(-1, 4084);
@@ -2891,7 +2891,7 @@ export async function bhit(ddx, ddy, range, weapon, fhitm, fhito, pobj) {   // z
                 if (obj.lamplit | 0 && !((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
                     await show_transient_light(obj, x, y);
                 }
-                if (typ === 22 /* IRONBARS */ && await hits_bars(pobj, $c.i16(x - ddx | 0), $c.i16(y - ddy | 0), x, y, point_blank ? 0 : !(rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 3906, $c.lit("bhit")), rn2(5)) : rn2(5)) ? 1 : 0, 1)) {
+                if (typ === 22 /* IRONBARS */ && await hits_bars(pobj, $c.i16(x - ddx | 0), $c.i16(y - ddy | 0), x, y, point_blank ? 0 : !rn2(5) ? 1 : 0, 1)) {
                     obj = pobj.get(0);
                     obj;
                     gb.bhitpos.x = $c.i16(gb.bhitpos.x - ddx | 0);
@@ -2909,7 +2909,7 @@ export async function bhit(ddx, ddy, range, weapon, fhitm, fhito, pobj) {   // z
             }
             mtmp = svl.level.monsters[x][y];
             ttmp = t_at(x, y);
-            if (!mtmp && ttmp && (ttmp.ttyp | 0) === 18 /* WEB */ && (weapon === 1 || weapon === 3) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 3930, $c.lit("bhit")), rn2(3)) : rn2(3))) {
+            if (!mtmp && ttmp && (ttmp.ttyp | 0) === 18 /* WEB */ && (weapon === 1 || weapon === 3) && !rn2(3)) {
                 if ((gv.viz_array.get(y).get(x) & 2) !== 0) {
                     await pline($c.lit("%s gets stuck in a web!"), await Yname2(obj));
                     ttmp.tseen = (1) & 1;
@@ -3106,7 +3106,7 @@ export async function boomhit(obj$in, dx, dy) {   // zap.c:4148
             break;
         }
         if (gb.bhitpos.x === u.ux && gb.bhitpos.y === u.uy) {
-            if (u.uprops[25 /* FUMBLING */].intrinsic || u.uprops[25 /* FUMBLING */].extrinsic || (rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 4203, $c.lit("boomhit")), rn2(20)) : rn2(20)) >= acurr(3 /* A_DEX */)) {
+            if (u.uprops[25 /* FUMBLING */].intrinsic || u.uprops[25 /* FUMBLING */].extrinsic || rn2(20) >= acurr(3 /* A_DEX */)) {
                 dam = await dmgval(obj[0], gy.youmonst);
                 await thitu(10 + obj[0].spe | 0, u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(dam + 1 | 0, 2) : dam, new $c.Ptr(obj, 0), $c.lit("boomerang"));
                 await endmultishot(1);
@@ -3147,7 +3147,7 @@ export async function zhitm(mon, type, nd, ootmp) {   // zap.c:4238
                 sho_shieldeff = 1;
                 break;
             }
-            tmp = rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 4256, $c.lit("zhitm")), d(nd, 6)) : d(nd, 6);
+            tmp = d(nd, 6);
             if (spellcaster) {
                 tmp = spell_damage_bonus(tmp);
             }
@@ -3157,7 +3157,7 @@ export async function zhitm(mon, type, nd, ootmp) {   // zap.c:4238
                 sho_shieldeff = 1;
                 break;
             }
-            tmp = rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 4265, $c.lit("zhitm")), d(nd, 6)) : d(nd, 6);
+            tmp = d(nd, 6);
             if (spellcaster) {
                 tmp = spell_damage_bonus(tmp);
             }
@@ -3166,7 +3166,7 @@ export async function zhitm(mon, type, nd, ootmp) {   // zap.c:4238
                 tmp = tmp + 7 | 0;
             }
             if (await burnarmor(mon)) {
-                if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 4272, $c.lit("zhitm")), rn2(3)) : rn2(3))) {
+                if (!rn2(3)) {
                     tmp = tmp + await destroy_items(mon, 2, orig_dmg) | 0;
                     await ignite_items(mon.minvent);
                 }
@@ -3177,21 +3177,21 @@ export async function zhitm(mon, type, nd, ootmp) {   // zap.c:4238
                 sho_shieldeff = 1;
                 break;
             }
-            tmp = rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 4283, $c.lit("zhitm")), d(nd, 6)) : d(nd, 6);
+            tmp = d(nd, 6);
             if (spellcaster) {
                 tmp = spell_damage_bonus(tmp);
             }
             orig_dmg = tmp;
             if (await Resists_Elem(mon, 1 /* FIRE_RES */)) {
-                tmp = tmp + (rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 4288, $c.lit("zhitm")), d(nd, 3)) : d(nd, 3)) | 0;
+                tmp = tmp + d(nd, 3) | 0;
             }
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 4289, $c.lit("zhitm")), rn2(3)) : rn2(3))) {
+            if (!rn2(3)) {
                 tmp = tmp + await destroy_items(mon, 3, orig_dmg) | 0;
             }
             break;
         case 3:
             tmp = 0;
-            await sleep_monst(mon, rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 4296, $c.lit("zhitm")), d(nd, 25)) : d(nd, 25), type === 3 ? 11 /* WAND_CLASS */ : 0);
+            await sleep_monst(mon, d(nd, 25), type === 3 ? 11 /* WAND_CLASS */ : 0);
             break;
         case 4:
             if ($c.abs(type) !== 24) {
@@ -3233,7 +3233,7 @@ export async function zhitm(mon, type, nd, ootmp) {   // zap.c:4238
             tmp = mon.mhp + 1 | 0;
             break;
         case 5:
-            tmp = rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 4343, $c.lit("zhitm")), d(nd, 6)) : d(nd, 6);
+            tmp = d(nd, 6);
             if (spellcaster) {
                 tmp = spell_damage_bonus(tmp);
             }
@@ -3243,7 +3243,7 @@ export async function zhitm(mon, type, nd, ootmp) {   // zap.c:4238
                 tmp = 0;
             }
             if (!await resists_blnd(mon) && !(type > 0 && (u.uswallow | 0 && $c.peq(u.ustuck, mon))) && nd > 2) {
-                rnd_tmp = (rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 4356, $c.lit("zhitm")), rnd(50)) : rnd(50)) >>> 0;
+                rnd_tmp = rnd(50) >>> 0;
                 mon.mcansee = (0) & 1;
                 if (mon.mblinded + rnd_tmp >>> 0 > 127) {
                     mon.mblinded = (127) & 127;
@@ -3251,7 +3251,7 @@ export async function zhitm(mon, type, nd, ootmp) {   // zap.c:4238
                     mon.mblinded = (mon.mblinded + rnd_tmp >>> 0) & 127;
                 }
             }
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 4363, $c.lit("zhitm")), rn2(3)) : rn2(3))) {
+            if (!rn2(3)) {
                 tmp = tmp + await destroy_items(mon, 6, orig_dmg) | 0;
             }
             break;
@@ -3260,18 +3260,18 @@ export async function zhitm(mon, type, nd, ootmp) {   // zap.c:4238
                 sho_shieldeff = 1;
                 break;
             }
-            tmp = rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 4371, $c.lit("zhitm")), d(nd, 6)) : d(nd, 6);
+            tmp = d(nd, 6);
             break;
         case 7:
             if (await Resists_Elem(mon, 7 /* ACID_RES */) || await defended(mon, 8)) {
                 sho_shieldeff = 1;
                 break;
             }
-            tmp = rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 4378, $c.lit("zhitm")), d(nd, 6)) : d(nd, 6);
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 4379, $c.lit("zhitm")), rn2(6)) : rn2(6))) {
+            tmp = d(nd, 6);
+            if (!rn2(6)) {
                 await acid_damage(mon.mw);
             }
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 4381, $c.lit("zhitm")), rn2(6)) : rn2(6))) {
+            if (!rn2(6)) {
                 await erode_armor(mon, 3);
             }
             break;
@@ -3310,13 +3310,13 @@ async function zhitu(type, nd, fltxt, sx, sy) {   // zap.c:4401
                 await pline_The($c.lit("missiles bounce off!"));
                 monstseesu(1);
             } else {
-                dam = rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 4416, $c.lit("zhitu")), d(nd, 6)) : d(nd, 6);
+                dam = d(nd, 6);
                 await exercise(0 /* A_STR */, 0);
                 monstunseesu(1);
             }
             break;
         case 1:
-            orig_dam = rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 4422, $c.lit("zhitu")), d(nd, 6)) : d(nd, 6);
+            orig_dam = d(nd, 6);
             if (u.uprops[1 /* FIRE_RES */].intrinsic || u.uprops[1 /* FIRE_RES */].extrinsic) {
                 await shieldeff(sx, sy);
                 await You($c.lit("don't feel hot!"));
@@ -3328,16 +3328,16 @@ async function zhitu(type, nd, fltxt, sx, sy) {   // zap.c:4401
             }
             await burn_away_slime();
             if (await burnarmor(gy.youmonst)) {
-                if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 4434, $c.lit("zhitu")), rn2(3)) : rn2(3))) {
+                if (!rn2(3)) {
                     await destroy_items(gy.youmonst, 2, orig_dam);
                 }
-                if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 4436, $c.lit("zhitu")), rn2(3)) : rn2(3))) {
+                if (!rn2(3)) {
                     await ignite_items(gi.invent);
                 }
             }
             break;
         case 2:
-            orig_dam = rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 4441, $c.lit("zhitu")), d(nd, 6)) : d(nd, 6);
+            orig_dam = d(nd, 6);
             if (u.uprops[2 /* COLD_RES */].intrinsic || u.uprops[2 /* COLD_RES */].extrinsic) {
                 await shieldeff(sx, sy);
                 await You($c.lit("don't feel cold."));
@@ -3347,7 +3347,7 @@ async function zhitu(type, nd, fltxt, sx, sy) {   // zap.c:4401
                 dam = orig_dam;
                 monstunseesu(4);
             }
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 4451, $c.lit("zhitu")), rn2(3)) : rn2(3))) {
+            if (!rn2(3)) {
                 await destroy_items(gy.youmonst, 3, orig_dam);
             }
             break;
@@ -3358,7 +3358,7 @@ async function zhitu(type, nd, fltxt, sx, sy) {   // zap.c:4401
                 monstseesu(8);
             } else {
                 monstunseesu(8);
-                await fall_asleep(-(rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 4461, $c.lit("zhitu")), d(nd, 25)) : d(nd, 25)) | 0, 1);
+                await fall_asleep(-d(nd, 25) | 0, 1);
             }
             break;
         case 4:
@@ -3405,7 +3405,7 @@ async function zhitu(type, nd, fltxt, sx, sy) {   // zap.c:4401
             await done(0 /* DIED */);
             return;
         case 5:
-            orig_dam = rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 4511, $c.lit("zhitu")), d(nd, 6)) : d(nd, 6);
+            orig_dam = d(nd, 6);
             if (u.uprops[5 /* SHOCK_RES */].intrinsic || u.uprops[5 /* SHOCK_RES */].extrinsic) {
                 await shieldeff(sx, sy);
                 await You($c.lit("aren't affected."));
@@ -3416,7 +3416,7 @@ async function zhitu(type, nd, fltxt, sx, sy) {   // zap.c:4401
                 await exercise(4 /* A_CON */, 0);
                 monstunseesu(32);
             }
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 4522, $c.lit("zhitu")), rn2(3)) : rn2(3))) {
+            if (!rn2(3)) {
                 await destroy_items(gy.youmonst, 6, orig_dam);
             }
             break;
@@ -3430,17 +3430,17 @@ async function zhitu(type, nd, fltxt, sx, sy) {   // zap.c:4401
                 dam = 0;
             } else {
                 await pline_The($c.lit("%s burns!"), hliquid($c.lit("acid")));
-                dam = rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 4535, $c.lit("zhitu")), d(nd, 6)) : d(nd, 6);
+                dam = d(nd, 6);
                 await exercise(0 /* A_STR */, 0);
                 monstunseesu(128);
             }
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 4540, $c.lit("zhitu")), rn2(u.twoweap ? 3 : 6)) : rn2(u.twoweap ? 3 : 6))) {
+            if (!rn2(u.twoweap ? 3 : 6)) {
                 await acid_damage($G.uwep);
             }
-            if (u.twoweap && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 4542, $c.lit("zhitu")), rn2(3)) : rn2(3))) {
+            if (u.twoweap && !rn2(3)) {
                 await acid_damage($G.uswapwep);
             }
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 4544, $c.lit("zhitu")), rn2(6)) : rn2(6))) {
+            if (!rn2(6)) {
                 await erode_armor(gy.youmonst, 3);
             }
             break;
@@ -3475,7 +3475,7 @@ export async function burn_floor_objects(x, y, give_feedback, u_caused) {   // z
             scrquan = obj.quan;
             delquan = 0;
             for (i = scrquan; i > 0; i = $c.sub64(i, 1)) {
-                if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 4619, $c.lit("burn_floor_objects")), rn2(3)) : rn2(3))) {
+                if (!rn2(3)) {
                     delquan = $c.add64(delquan, 1);
                 }
             }
@@ -3511,7 +3511,7 @@ export async function burn_floor_objects(x, y, give_feedback, u_caused) {   // z
 }
 function bounce_dir(sx, sy, ddx, ddy, bounceback) {   // zap.c:4664
     let rmn = 0, bounce = 0, lsy = 0, lsx = 0;
-    if (!ddx.get(0) || !ddy.get(0) || bounceback > 0 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 4668, $c.lit("bounce_dir")), rn2(bounceback)) : rn2(bounceback))) {
+    if (!ddx.get(0) || !ddy.get(0) || bounceback > 0 && !rn2(bounceback)) {
         ddx.set(0, -ddx.get(0) | 0);
         ddy.set(0, -ddy.get(0) | 0);
     } else {
@@ -3522,7 +3522,7 @@ function bounce_dir(sx, sy, ddx, ddy, bounceback) {   // zap.c:4664
             bounce = 1;
         }
         if (isok(lsx, sy) && (rmn = $c.u8(svl.level.locations[lsx][sy].typ)) >= 16 /* POOL */ && !closed_door(lsx, sy) && (rmn >= 25 /* ROOM */ || isok(lsx, $c.i16(sy + ddy.get(0) | 0)) && svl.level.locations[lsx][sy + ddy.get(0) | 0].typ >= 16 /* POOL */)) {
-            if (!bounce || (rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 4686, $c.lit("bounce_dir")), rn2(2)) : rn2(2))) {
+            if (!bounce || rn2(2)) {
                 bounce = 2;
             }
         }
@@ -3540,12 +3540,12 @@ function bounce_dir(sx, sy, ddx, ddy, bounceback) {   // zap.c:4664
 }
 function zap_hit(ac, type) {   // zap.c:4705
     let chance = 0, spell_bonus = 0;
-    chance = rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 4709, $c.lit("zap_hit")), rn2(20)) : rn2(20);
+    chance = rn2(20);
     spell_bonus = type ? spell_hit_bonus(type) : 0;
     if (!chance) {
-        return (rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 4714, $c.lit("zap_hit")), rnd(10)) : rnd(10)) < (ac + spell_bonus | 0) ? 1 : 0;
+        return rnd(10) < (ac + spell_bonus | 0) ? 1 : 0;
     }
-    ac = ac >= 0 ? ac : -(rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 4717, $c.lit("zap_hit")), rnd(-ac | 0)) : rnd(-ac | 0)) | 0;
+    ac = ac >= 0 ? ac : -rnd(-ac | 0) | 0;
     return (3 - chance | 0) < (ac + spell_bonus | 0) ? 1 : 0;
 }
 async function disintegrate_mon(mon, type, fltxt) {   // zap.c:4723
@@ -3586,7 +3586,7 @@ export async function dobuzz(type, nd, sx, sy, dx$in, dy$in, sayhit, saymiss, fo
     shopdamage[0] = 0;
     fireball = $c.i8(type === 11 ? 1 : 0);
     gas_hit = 0;
-    hdmgtype = u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic) ? rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 4797, $c.lit("dobuzz")), rn2(6)) : rn2(6) : damgtype;
+    hdmgtype = u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic) ? rn2(6) : damgtype;
     spell_type = type >= 10 && type < 20 ? 367 /* SPE_MAGIC_MISSILE */ + damgtype | 0 : 0;
     if (u.uswallow) {
         if (type < 0) {
@@ -3609,7 +3609,7 @@ export async function dobuzz(type, nd, sx, sy, dx$in, dy$in, sayhit, saymiss, fo
     if (type < 0) {
         await newsym(u.ux, u.uy);
     }
-    range = (rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 4823, $c.lit("dobuzz")), rn2(7)) : rn2(7)) + 7 | 0;
+    range = rn2(7) + 7 | 0;
     if (dx[0] === 0 && dy[0] === 0) {
         range = 1;
     }
@@ -3731,7 +3731,7 @@ export async function dobuzz(type, nd, sx, sy, dx$in, dy$in, sayhit, saymiss, fo
                     }
                 } else if (sx === u.ux && sy === u.uy && range >= 0) {
                     nomul(0);
-                    if (u.usteed && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 4959, $c.lit("dobuzz")), rn2(3)) : rn2(3)) && !await mon_reflects(u.usteed, null)) {
+                    if (u.usteed && !rn2(3) && !await mon_reflects(u.usteed, null)) {
                         mon = u.usteed;
                         $goto = "buzzmonst"; continue D1;
                     } else if (!forcemiss && zap_hit(u.uac, 0)) {
@@ -3758,7 +3758,7 @@ export async function dobuzz(type, nd, sx, sy, dx$in, dy$in, sayhit, saymiss, fo
                         await Your($c.lit("%s tingles."), await body_part(0 /* ARM */));
                     }
                     if (damgtype === 5) {
-                        await flashburn(rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 4989, $c.lit("dobuzz")), d(nd, 50)) : d(nd, 50), 1);
+                        await flashburn(d(nd, 50), 1);
                     }
                     await stop_occupation();
                     nomul(0);
@@ -3801,7 +3801,7 @@ export async function dobuzz(type, nd, sx, sy, dx$in, dy$in, sayhit, saymiss, fo
     }
     await tmp_at(-7, 0);
     if (fireball) {
-        await explode(sx, sy, type, rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 5027, $c.lit("dobuzz")), d(12, 6)) : d(12, 6), 0, 5 /* EXPL_FIERY */);
+        await explode(sx, sy, type, d(12, 6), 0, 5 /* EXPL_FIERY */);
     }
     if (shopdamage[0]) {
         await pay_for_damage(damgtype === 1 ? $c.lit("burn away") : damgtype === 2 ? $c.lit("shatter") : damgtype === 7 ? $c.lit("damage") : damgtype === 4 ? $c.lit("disintegrate") : $c.lit("destroy"), 0);
@@ -3858,7 +3858,7 @@ export async function start_melt_ice_timeout(x, y, min_time) {   // zap.c:5088
         when = 49;
     }
     while ((when = when + 1 | 0) <= 2000) {
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 5101, $c.lit("start_melt_ice_timeout")), rn2((2000 - when | 0) + 50 | 0)) : rn2((2000 - when | 0) + 50 | 0))) {
+        if (!rn2((2000 - when | 0) + 50 | 0)) {
             break;
         }
     }
@@ -3906,7 +3906,7 @@ export async function zap_over_floor(x, y, type, shopdamage, ignoremon, explodin
                 msggiven = 0;
                 msgtxt = !(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf) ? $c.lit("You hear hissing gas.") : type >= 0 ? $c.lit("That seemed remarkably uneventful.") : null;
                 if (!on_water_level) {
-                    await create_gas_cloud(x, y, rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 5186, $c.lit("zap_over_floor")), rnd(5)) : rnd(5), 0);
+                    await create_gas_cloud(x, y, rnd(5), 0);
                     if (iflags.last_msg === 4 /* PLNMSG_ENVELOPED_IN_GAS */) {
                         msggiven = 1;
                     }
@@ -3945,7 +3945,7 @@ export async function zap_over_floor(x, y, type, shopdamage, ignoremon, explodin
                     }
                 }
             } else if (lev.typ === 28 /* FOUNTAIN */) {
-                await create_gas_cloud(x, y, rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 5230, $c.lit("zap_over_floor")), rnd(3)) : rnd(3), 0);
+                await create_gas_cloud(x, y, rnd(3), 0);
                 if (see_it) {
                     await pline($c.lit("Steam billows from the fountain."));
                 }
@@ -3958,7 +3958,7 @@ export async function zap_over_floor(x, y, type, shopdamage, ignoremon, explodin
                 lava = $c.i8(is_lava(x, y) || lavawall ? 1 : 0);
                 moat = is_moat(x, y);
                 chance = 2 > (5 + Math.imul(svl.level.flags.temperature, 10) | 0) ? 2 : 5 + Math.imul(svl.level.flags.temperature, 10) | 0;
-                if (lev.typ === 18 /* WATER */ || lavawall && (rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 5244, $c.lit("zap_over_floor")), rn2(chance)) : rn2(chance))) {
+                if (lev.typ === 18 /* WATER */ || lavawall && rn2(chance)) {
                     if (see_it) {
                         await pline_The($c.lit("%s freezes for a moment."), hliquid(lavawall ? $c.lit("lava") : $c.lit("water")));
                     } else {
@@ -4010,7 +4010,7 @@ export async function zap_over_floor(x, y, type, shopdamage, ignoremon, explodin
                                 await You($c.lit("pass through the now-solid rock."));
                                 await reset_utrap(1);
                             } else {
-                                set_utrap(((rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 5305, $c.lit("zap_over_floor")), rn2(50)) : rn2(50)) + 20 | 0) >>> 0, 5);
+                                set_utrap((rn2(50) + 20 | 0) >>> 0, 5);
                                 await You($c.lit("are firmly stuck in the cooling rock."));
                             }
                         }
@@ -4040,7 +4040,7 @@ export async function zap_over_floor(x, y, type, shopdamage, ignoremon, explodin
         case 5:
         case 7:
             if (lev.typ === 22 /* IRONBARS */) {
-                if (damgtype === 5 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 5349, $c.lit("zap_over_floor")), rn2(10)) : rn2(10))) {
+                if (damgtype === 5 && rn2(10)) {
                     break;
                 }
                 if (((lev.flags | 0) & 8) !== 0) {
@@ -4184,7 +4184,7 @@ export async function mon_spell_hits_spot(caster, adtyp, x, y) {   // zap.c:5501
         ep = engr_at(x, y);
         etext = ep ? ep.engr_txt[0 /* actual_text */] : null;
         if (etext) {
-            await wipe_engr_at(x, y, $c.i16($c.i32($c.strlen(etext)) + (rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 5514, $c.lit("mon_spell_hits_spot")), d(6, 6)) : d(6, 6)) | 0), 1);
+            await wipe_engr_at(x, y, $c.i16($c.i32($c.strlen(etext)) + d(6, 6) | 0), 1);
         }
     }
     if (adtyp >= 1 && adtyp <= 8) {
@@ -4212,7 +4212,7 @@ export async function fracture_rock(obj) {   // zap.c:5537
     }
     obj.otyp = 474;
     obj.oclass = 13;
-    $t1 = (rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 5560, $c.lit("fracture_rock")), rn2(60)) : rn2(60)) + 7 | 0, obj.quan = $t1;
+    $t1 = rn2(60) + 7 | 0, obj.quan = $t1;
     $t2 = await weight(obj) >>> 0, obj.owt = $t2;
     $t4 = ($t3 = obj.rknown = (0) & 1, obj.bknown = ($t3) & 1), obj.dknown = ($t4) & 1;
     obj.known = ((objects[obj.otyp].oc_uses_known | 0 ? 0 : 1) >>> 0) & 1;
@@ -4313,7 +4313,7 @@ export function inventory_resistance_check(dmgtyp) {   // zap.c:5710
     if (!prob) {
         return 0;
     }
-    return $c.i8((rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 5717, $c.lit("inventory_resistance_check")), rn2(100)) : rn2(100)) < prob ? 1 : 0);
+    return $c.i8(rn2(100) < prob ? 1 : 0);
 }
 export async function item_what(dmgtyp) {   // zap.c:5722
     let what = null, prop = 0, xtrinsic = 0;
@@ -4369,7 +4369,7 @@ async function maybe_destroy_item(carrier, obj, dmgtyp) {   // zap.c:5798
         case 3:
             quan = obj.quan;
             dindx = 0;
-            dmg = rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 5823, $c.lit("maybe_destroy_item")), rnd(4)) : rnd(4);
+            dmg = rnd(4);
             break;
         case 2:
             xresist = obj.oclass !== 8 /* POTION_CLASS */ && obj.otyp !== 273 /* GLOB_OF_GREEN_SLIME */ && (u_carry ? u.uprops[1 /* FIRE_RES */].intrinsic || u.uprops[1 /* FIRE_RES */].extrinsic : await Resists_Elem(carrier, 1 /* FIRE_RES */)) ? 1 : 0;
@@ -4384,7 +4384,7 @@ async function maybe_destroy_item(carrier, obj, dmgtyp) {   // zap.c:5798
             switch (obj.oclass) {
                 case 8 /* POTION_CLASS */:
                     dindx = obj.otyp !== 321 /* POT_OIL */ ? 1 : 2;
-                    dmg = rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 5842, $c.lit("maybe_destroy_item")), rnd(6)) : rnd(6);
+                    dmg = rnd(6);
                     break;
                 case 9 /* SCROLL_CLASS */:
                     dindx = 3;
@@ -4408,7 +4408,7 @@ async function maybe_destroy_item(carrier, obj, dmgtyp) {   // zap.c:5798
                     if ($c.and64(obj.owornmask, 393216) && $G.uarmg && !((objects[$G.uarmg.otyp].oc_material | 0) >= 11 /* IRON */ && (objects[$G.uarmg.otyp].oc_material | 0) <= 17 /* MITHRIL */) || obj.otyp === 191 /* RIN_SHOCK_RESISTANCE */) {
                         skip = skip + 1 | 0;
                         break;
-                    } else if (objects[obj.otyp].oc_charged | 0 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 5868, $c.lit("maybe_destroy_item")), rn2(3)) : rn2(3))) {
+                    } else if (objects[obj.otyp].oc_charged | 0 && rn2(3)) {
                         chargeit = 1;
                         break;
                     }
@@ -4417,7 +4417,7 @@ async function maybe_destroy_item(carrier, obj, dmgtyp) {   // zap.c:5798
                     break;
                 case 11 /* WAND_CLASS */:
                     dindx = 6;
-                    dmg = rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 5877, $c.lit("maybe_destroy_item")), rnd(10)) : rnd(10);
+                    dmg = rnd(10);
                     break;
             }
             break;
@@ -4436,7 +4436,7 @@ async function maybe_destroy_item(carrier, obj, dmgtyp) {   // zap.c:5798
             quan = $c.sub64(quan, 1);
         }
         for (i = cnt = 0; i < quan; i = $c.add64(i, 1)) {
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 5897, $c.lit("maybe_destroy_item")), rn2(3)) : rn2(3))) {
+            if (!rn2(3)) {
                 cnt = $c.add64(cnt, 1);
             }
         }
@@ -4501,7 +4501,7 @@ export async function destroy_items(mon, dmgtyp, dmg_in) {   // zap.c:5965
         items_to_destroy[i].deferred = 0;
     }
     limit = $c.div32(dmg_in, 5);
-    if ($c.rem32(dmg_in, 5) > (rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 5998, $c.lit("destroy_items")), rn2(5)) : rn2(5))) {
+    if ($c.rem32(dmg_in, 5) > rn2(5)) {
         limit = limit + 1 | 0;
     }
     if (limit > 20) {
@@ -4515,7 +4515,7 @@ export async function destroy_items(mon, dmgtyp, dmg_in) {   // zap.c:5965
         if (!destroyable(obj, dmgtyp)) {
             continue;
         }
-        i = elig_stacks < limit ? elig_stacks : rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 6045, $c.lit("destroy_items")), rn2(elig_stacks)) : rn2(elig_stacks);
+        i = elig_stacks < limit ? elig_stacks : rn2(elig_stacks);
         elig_stacks = elig_stacks + 1 | 0;
         if (i < 0 || i >= limit) {
             continue;
@@ -4582,7 +4582,7 @@ export async function resist(mtmp, oclass, damage, tell) {   // zap.c:6100
     } else if (dlev < 1) {
         dlev = $c.pcmp(mtmp.data, $c.relem(mons, 331 /* PM_ARCHEOLOGIST */)) >= 0 && $c.pcmp(mtmp.data, $c.relem(mons, 343 /* PM_WIZARD */)) <= 0 ? u.ulevel : 1;
     }
-    resisted = (rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 6141, $c.lit("resist")), rn2((100 + alev | 0) - dlev | 0)) : rn2((100 + alev | 0) - dlev | 0)) < mtmp.data.mr ? 1 : 0;
+    resisted = rn2((100 + alev | 0) - dlev | 0) < mtmp.data.mr ? 1 : 0;
     if (resisted) {
         if (tell) {
             await shieldeff_mon(mtmp);
@@ -4760,7 +4760,7 @@ export async function makewish() {   // zap.c:6314
     verb = (svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || u.uinwater | 0 ? $c.lit("slip") : otmp.otyp === 265 /* CORPSE */ && otmp.usecount ? $c.lit("materialize") : $c.lit("drop");
     oops_msg = u.uswallow | 0 ? $c.lit("Oops!  %s out of your reach!") : (svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) || svl.level.locations[u.ux][u.uy].typ < 22 /* IRONBARS */ || svl.level.locations[u.ux][u.uy].typ >= 33 /* ICE */ ? $c.lit("Oops!  %s away from you!") : !(otmp.otyp === 265 /* CORPSE */ && otmp.usecount) ? $c.lit("Oops!  %s to the floor!") : $c.lit("Careful! %s on the floor!");
     await hold_another_object(otmp, oops_msg, await The(await aobjnam(otmp, verb)), null);
-    $t2 = (rng_log_enabled() ? (rng_log_set_caller($c.lit("zap.c"), 6421, $c.lit("makewish")), rn2(100)) : rn2(100)) + 50 | 0, u.ublesscnt = u.ublesscnt + $t2 | 0;
+    $t2 = rn2(100) + 50 | 0, u.ublesscnt = u.ublesscnt + $t2 | 0;
 }
 export function flash_str(typ, nohallu) {   // zap.c:6429
     typ = zaptype(typ);

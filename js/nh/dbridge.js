@@ -23,7 +23,7 @@ import { mons } from './monst.js';
 import { vtense } from './objnam.js';
 import { You, You_hear, You_see, impossible, pline, pline_The } from './pline.js';
 import { update_monster_region } from './region.js';
-import { rn2, rnd, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { rn2, rnd } from './rnd.js';
 import { genders } from './role.js';
 import { place_monster } from './steed.js';
 import { enexto, teleds } from './teleport.js';
@@ -377,7 +377,7 @@ async function e_missed(etmp, chunks) {   // dbridge.c:496
             iflags.last_msg = save_plnmsg$2;
         }
     } while (0);
-    return $c.i8(misses >= (rng_log_enabled() ? (rng_log_set_caller($c.lit("dbridge.c"), 524, $c.lit("e_missed")), rnd(8)) : rnd(8)) ? 1 : 0);
+    return $c.i8(misses >= rnd(8) ? 1 : 0);
 }
 async function e_jumps(etmp) {   // dbridge.c:531
     let tmp = 0, save_plnmsg = 0;
@@ -401,7 +401,7 @@ async function e_jumps(etmp) {   // dbridge.c:531
             iflags.last_msg = save_plnmsg;
         }
     } while (0);
-    return $c.i8(tmp >= (rng_log_enabled() ? (rng_log_set_caller($c.lit("dbridge.c"), 550, $c.lit("e_jumps")), rnd(10)) : rnd(10)) ? 1 : 0);
+    return $c.i8(tmp >= rnd(10) ? 1 : 0);
 }
 async function do_entity(etmp) {   // dbridge.c:554
     let newx = Int16Array.of(0), newy = Int16Array.of(0), oldx = 0, oldy = 0, at_portcullis = 0, must_jump = 0, relocates = 0, e_inview = 0, crm = null, save_plnmsg = 0, save_plnmsg$2 = 0, save_plnmsg$3 = 0, save_plnmsg$4 = 0, save_plnmsg$5 = 0, save_plnmsg$6 = 0, other = null, save_plnmsg$7 = 0, save_plnmsg$8 = 0, save_plnmsg$9 = 0, save_plnmsg$10 = 0, save_plnmsg$11 = 0, save_plnmsg$12 = 0, save_plnmsg$13 = 0, save_plnmsg$14 = 0, save_plnmsg$15 = 0, save_plnmsg$16 = 0, save_plnmsg$17 = 0, lava = 0;
@@ -818,8 +818,8 @@ export async function destroy_drawbridge(x, y) {   // dbridge.c:888
     }
     await del_engr_at(x, y);
     await del_engr_at(x2[0], y2[0]);
-    for (i = rng_log_enabled() ? (rng_log_set_caller($c.lit("dbridge.c"), 949, $c.lit("destroy_drawbridge")), rn2(6)) : rn2(6); i > 0; i = i - 1 | 0) {
-        otmp = await mksobj_at(478 /* IRON_CHAIN */, $c.i16((rng_log_enabled() ? (rng_log_set_caller($c.lit("dbridge.c"), 953, $c.lit("destroy_drawbridge")), rn2(2)) : rn2(2)) ? x : x2[0]), $c.i16((rng_log_enabled() ? (rng_log_set_caller($c.lit("dbridge.c"), 953, $c.lit("destroy_drawbridge")), rn2(2)) : rn2(2)) ? y : y2[0]), 1, 0);
+    for (i = rn2(6); i > 0; i = i - 1 | 0) {
+        otmp = await mksobj_at(478 /* IRON_CHAIN */, $c.i16(rn2(2) ? x : x2[0]), $c.i16(rn2(2) ? y : y2[0]), 1, 0);
         await scatter(otmp.ox, otmp.oy, 1, 6, otmp);
     }
     await newsym(x, y);

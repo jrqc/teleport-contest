@@ -12,7 +12,7 @@ import { objects } from './objects.js';
 import { an } from './objnam.js';
 import { impossible, pline } from './pline.js';
 import { align_gtitle } from './pray.js';
-import { rn2, rn2_on_display_rng, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { rn2, rn2_on_display_rng } from './rnd.js';
 import { Strlen_ } from './strutil.js';
 import { sysopt } from './sys.js';
 import { add_menu, add_menu_str, select_menu, windowprocs } from './windows.js';
@@ -36,7 +36,7 @@ export function randrole(for_display) {   // role.c:719
     if (for_display) {
         res = rn2_on_display_rng(res);
     } else {
-        res = rng_log_enabled() ? (rng_log_set_caller($c.lit("role.c"), 726, $c.lit("randrole")), rn2(res)) : rn2(res);
+        res = rn2(res);
     }
     return res;
 }
@@ -48,7 +48,7 @@ function randrole_filtered() {   // role.c:731
             set[($t1 = n, n = $t1 + 1 | 0, $t1)] = i;
         }
     }
-    return n ? set[rng_log_enabled() ? (rng_log_set_caller($c.lit("role.c"), 743, $c.lit("randrole_filtered")), rn2(n)) : rn2(n)] : randrole(0);
+    return n ? set[rn2(n)] : randrole(0);
 }
 export async function str2role(str) {   // role.c:747
     let i = 0, len = 0;
@@ -84,7 +84,7 @@ export function randrace(rolenum) {   // role.c:787
         }
     }
     if (n) {
-        n = $c.div32(rng_log_enabled() ? (rng_log_set_caller($c.lit("role.c"), 799, $c.lit("randrace")), rn2(Math.imul(n, 100))) : rn2(Math.imul(n, 100)), 100);
+        n = $c.div32(rn2(Math.imul(n, 100)), 100);
     }
     for (i = 0; races[i].noun; i = i + 1 | 0) {
         if (roles[rolenum].allow & races[i].allow & 4088) {
@@ -95,7 +95,7 @@ export function randrace(rolenum) {   // role.c:787
             }
         }
     }
-    return rng_log_enabled() ? (rng_log_set_caller($c.lit("role.c"), 809, $c.lit("randrace")), rn2(5)) : rn2(5);
+    return rn2(5);
 }
 export async function str2race(str) {   // role.c:813
     let i = 0, len = 0;
@@ -131,7 +131,7 @@ export function randgend(rolenum, racenum) {   // role.c:853
         }
     }
     if (n) {
-        n = rng_log_enabled() ? (rng_log_set_caller($c.lit("role.c"), 865, $c.lit("randgend")), rn2(n)) : rn2(n);
+        n = rn2(n);
     }
     for (i = 0; i < 2; i = i + 1 | 0) {
         if (roles[rolenum].allow & races[racenum].allow & genders[i].allow & 61440) {
@@ -142,7 +142,7 @@ export function randgend(rolenum, racenum) {   // role.c:853
             }
         }
     }
-    return rng_log_enabled() ? (rng_log_set_caller($c.lit("role.c"), 876, $c.lit("randgend")), rn2(2)) : rn2(2);
+    return rn2(2);
 }
 export async function str2gend(str) {   // role.c:880
     let i = 0, len = 0;
@@ -175,7 +175,7 @@ export function randalign(rolenum, racenum) {   // role.c:916
         }
     }
     if (n) {
-        n = rng_log_enabled() ? (rng_log_set_caller($c.lit("role.c"), 928, $c.lit("randalign")), rn2(n)) : rn2(n);
+        n = rn2(n);
     }
     for (i = 0; i < 3; i = i + 1 | 0) {
         if (roles[rolenum].allow & races[racenum].allow & aligns[i].allow & 7) {
@@ -186,7 +186,7 @@ export function randalign(rolenum, racenum) {   // role.c:916
             }
         }
     }
-    return rng_log_enabled() ? (rng_log_set_caller($c.lit("role.c"), 939, $c.lit("randalign")), rn2(3)) : rn2(3);
+    return rn2(3);
 }
 export async function str2align(str) {   // role.c:943
     let i = 0, len = 0;
@@ -255,7 +255,7 @@ export function pick_role(racenum, gendnum, alignnum, pickhow) {   // role.c:101
     if (roles_ok === 0 || roles_ok > 1 && pickhow === 1) {
         return -1;
     }
-    return set[rng_log_enabled() ? (rng_log_set_caller($c.lit("role.c"), 1032, $c.lit("pick_role")), rn2(roles_ok)) : rn2(roles_ok)];
+    return set[rn2(roles_ok)];
 }
 export function ok_race(rolenum, racenum, gendnum, alignnum) {   // role.c:1037
     let i = 0, allow = 0;
@@ -305,7 +305,7 @@ export function pick_race(rolenum, gendnum, alignnum, pickhow) {   // role.c:108
     if (races_ok === 0 || races_ok > 1 && pickhow === 1) {
         return -1;
     }
-    races_ok = rng_log_enabled() ? (rng_log_set_caller($c.lit("role.c"), 1092, $c.lit("pick_race")), rn2(races_ok)) : rn2(races_ok);
+    races_ok = rn2(races_ok);
     for (i = 0; i < 5; i = i + 1 | 0) {
         if (ok_race(rolenum, i, gendnum, alignnum)) {
             if (races_ok === 0) {
@@ -359,7 +359,7 @@ export function pick_gend(rolenum, racenum, alignnum, pickhow) {   // role.c:114
     if (gends_ok === 0 || gends_ok > 1 && pickhow === 1) {
         return -1;
     }
-    gends_ok = rng_log_enabled() ? (rng_log_set_caller($c.lit("role.c"), 1157, $c.lit("pick_gend")), rn2(gends_ok)) : rn2(gends_ok);
+    gends_ok = rn2(gends_ok);
     for (i = 0; i < 2; i = i + 1 | 0) {
         if (ok_gend(rolenum, racenum, i, alignnum)) {
             if (gends_ok === 0) {
@@ -413,7 +413,7 @@ export function pick_align(rolenum, racenum, gendnum, pickhow) {   // role.c:121
     if (aligns_ok === 0 || aligns_ok > 1 && pickhow === 1) {
         return -1;
     }
-    aligns_ok = rng_log_enabled() ? (rng_log_set_caller($c.lit("role.c"), 1222, $c.lit("pick_align")), rn2(aligns_ok)) : rn2(aligns_ok);
+    aligns_ok = rn2(aligns_ok);
     for (i = 0; i < 3; i = i + 1 | 0) {
         if (ok_align(rolenum, racenum, gendnum, i)) {
             if (aligns_ok === 0) {
@@ -1023,7 +1023,7 @@ export async function role_init() {   // role.c:1980
         pm.mflags2 = $c.oru64(pm.mflags2, 2097152);
         pm.mflags3 = $c.u16(pm.mflags3 | 128);
         pm.maligntyp = $c.i8(Math.imul(alignmnt, 3));
-        $t5 = ($c.andu64(pm.mflags2, 262144) !== 0 ? 2 : $c.andu64(pm.mflags2, 131072) !== 0 ? 1 : $c.andu64(pm.mflags2, 65536) !== 0 ? 0 : (rng_log_enabled() ? (rng_log_set_caller($c.lit("role.c"), 2039, $c.lit("role_init")), rn2(100)) : rn2(100)) < 50 ? 1 : 0) >>> 0, svq.quest_status.ldrgend = ($t5) & 3;
+        $t5 = ($c.andu64(pm.mflags2, 262144) !== 0 ? 2 : $c.andu64(pm.mflags2, 131072) !== 0 ? 1 : $c.andu64(pm.mflags2, 65536) !== 0 ? 0 : rn2(100) < 50 ? 1 : 0) >>> 0, svq.quest_status.ldrgend = ($t5) & 3;
     }
     if (gu.urole.guardnum !== -1 /* NON_PM */) {
         pm = $c.relem(mons, gu.urole.guardnum);
@@ -1037,7 +1037,7 @@ export async function role_init() {   // role.c:1980
         pm.mflags2 = $c.oru64(pm.mflags2, 51380224);
         pm.mflags3 = $c.u16(pm.mflags3 & -129);
         pm.mflags3 = $c.u16(pm.mflags3 | 80);
-        $t6 = ($c.andu64(pm.mflags2, 262144) !== 0 ? 2 : $c.andu64(pm.mflags2, 131072) !== 0 ? 1 : $c.andu64(pm.mflags2, 65536) !== 0 ? 0 : (rng_log_enabled() ? (rng_log_set_caller($c.lit("role.c"), 2060, $c.lit("role_init")), rn2(100)) : rn2(100)) < 50 ? 1 : 0) >>> 0, svq.quest_status.nemgend = ($t6) & 3;
+        $t6 = ($c.andu64(pm.mflags2, 262144) !== 0 ? 2 : $c.andu64(pm.mflags2, 131072) !== 0 ? 1 : $c.andu64(pm.mflags2, 65536) !== 0 ? 0 : rn2(100) < 50 ? 1 : 0) >>> 0, svq.quest_status.nemgend = ($t6) & 3;
     }
     if (flags.pantheon === -1) {
         trycnt = 0;

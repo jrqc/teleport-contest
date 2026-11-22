@@ -27,7 +27,7 @@ import { container_at, doloot } from './pickup.js';
 import { There, You, You_cant, You_hear, impossible, pline, pline_The, set_msg_xy, verbalize } from './pline.js';
 import { bottlename, potionbreathe } from './potion.js';
 import { is_quest_artifact } from './questpgr.js';
-import { rn2, rng_log_enabled, rng_log_set_caller, rnl } from './rnd.js';
+import { rn2, rnl } from './rnd.js';
 import { add_damage, costly_spot, obfree, shop_keeper, stolen_value } from './shk.js';
 import { maybe_absorb_item } from './steal.js';
 import { b_trapped, chest_trap, could_untrap, t_at, unconscious, untrap } from './trap.js';
@@ -95,7 +95,7 @@ async function picklock() {   // lock.c:68
         await exercise(3 /* A_DEX */, 1);
         return gx.xlock.usedtime = 0;
     }
-    if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("lock.c"), 98, $c.lit("picklock")), rn2(100)) : rn2(100)) >= gx.xlock.chance) {
+    if (rn2(100) >= gx.xlock.chance) {
         return 1;
     }
     if ((!gx.xlock.door ? gx.xlock.box.otrapped | 0 : ((gx.xlock.door.flags | 0) & 16) !== 0) && gx.xlock.magic_key) {
@@ -168,7 +168,7 @@ export async function breakchestlock(box, destroyit) {   // lock.c:162
         await pline($c.lit("In fact, you've totally destroyed %s."), await the(await xname(box)));
         while ((otmp = box.cobj) !== null) {
             await obj_extract_self(otmp);
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("lock.c"), 186, $c.lit("breakchestlock")), rn2(3)) : rn2(3)) || otmp.oclass === 8 /* POTION_CLASS */) {
+            if (!rn2(3) || otmp.oclass === 8 /* POTION_CLASS */) {
                 await chest_shatter_msg(otmp);
                 if (costly) {
                     loss = $c.add64(loss, await stolen_value(otmp, u.ux, u.uy, peaceful_shk, 1));
@@ -208,7 +208,7 @@ async function forcelock() {   // lock.c:216
         return gx.xlock.usedtime = 0;
     }
     if (gx.xlock.picktyp) {
-        if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("lock.c"), 229, $c.lit("forcelock")), rn2(1000 - $G.uwep.spe | 0)) : rn2(1000 - $G.uwep.spe | 0)) > (992 - Math.imul(($G.uwep.oeroded | 0) > ($G.uwep.oeroded2 | 0) ? $G.uwep.oeroded | 0 : $G.uwep.oeroded2 | 0, 10) | 0) && !$G.uwep.cursed && !obj_resists($G.uwep, 0, 99)) {
+        if (rn2(1000 - $G.uwep.spe | 0) > (992 - Math.imul(($G.uwep.oeroded | 0) > ($G.uwep.oeroded2 | 0) ? $G.uwep.oeroded | 0 : $G.uwep.oeroded2 | 0, 10) | 0) && !$G.uwep.cursed && !obj_resists($G.uwep, 0, 99)) {
             await pline($c.lit("%sour %s broke!"), $G.uwep.quan > 1 ? $c.lit("One of y") : $c.lit("Y"), await xname($G.uwep));
             await useup($G.uwep);
             await You($c.lit("give up your attempt to force the lock."));
@@ -218,12 +218,12 @@ async function forcelock() {   // lock.c:216
     } else {
         await wake_nearby(0);
     }
-    if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("lock.c"), 244, $c.lit("forcelock")), rn2(100)) : rn2(100)) >= gx.xlock.chance) {
+    if (rn2(100) >= gx.xlock.chance) {
         return 1;
     }
     await You($c.lit("succeed in forcing the lock."));
     await exercise(gx.xlock.picktyp ? 3 /* A_DEX */ : 0 /* A_STR */, 1);
-    await breakchestlock(gx.xlock.box, $c.i8(!gx.xlock.picktyp && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("lock.c"), 252, $c.lit("forcelock")), rn2(3)) : rn2(3)) ? 1 : 0));
+    await breakchestlock(gx.xlock.box, $c.i8(!gx.xlock.picktyp && !rn2(3) ? 1 : 0));
     reset_pick();
     return 0;
 }
@@ -695,7 +695,7 @@ export async function doopen_indir(x, y) {   // lock.c:780
         await pline($c.lit("You're too small to pull the door open."));
         return res;
     }
-    if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("lock.c"), 904, $c.lit("doopen_indir")), rnl(20)) : rnl(20)) < $c.div32((acurrstr() + acurr(3 /* A_DEX */) | 0) + acurr(4 /* A_CON */) | 0, 3)) {
+    if (rnl(20) < $c.div32((acurrstr() + acurr(3 /* A_DEX */) | 0) + acurr(4 /* A_CON */) | 0, 3)) {
         set_msg_xy(cc.x, cc.y);
         await pline_The($c.lit("door opens."));
         if ((door.flags | 0) & 16) {
@@ -822,7 +822,7 @@ export async function doclose() {   // lock.c:957
                     await pline($c.lit("You're too small to push the door closed."));
                     return res;
                 }
-                if (u.usteed || (rng_log_enabled() ? (rng_log_set_caller($c.lit("lock.c"), 1039, $c.lit("doclose")), rn2(25)) : rn2(25)) < $c.div32((acurrstr() + acurr(3 /* A_DEX */) | 0) + acurr(4 /* A_CON */) | 0, 3)) {
+                if (u.usteed || rn2(25) < $c.div32((acurrstr() + acurr(3 /* A_DEX */) | 0) + acurr(4 /* A_CON */) | 0, 3)) {
                     await pline_The($c.lit("door closes."));
                     door.flags = (4) & 31;
                     await feel_newsym(x, y);

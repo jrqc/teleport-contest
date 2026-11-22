@@ -25,7 +25,7 @@ import { You, You_feel, You_hear, Your, pline, pline_mon } from './pline.js';
 import { polyself } from './polyself.js';
 import { split_mon } from './potion.js';
 import { update_monster_region } from './region.js';
-import { d, rn2, rnd, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { d, rn2, rnd } from './rnd.js';
 import { genders } from './role.js';
 import { place_monster } from './steed.js';
 import { goodpos, rloc, tele, tele_restrict } from './teleport.js';
@@ -105,7 +105,7 @@ export async function fightm(mtmp) {   // mhitm.c:106
         if (!$c.peq(mon, mtmp) && !(mon.mhp < 1)) {
             if (monnear(mtmp, mon.mx, mon.my)) {
                 if (!u.uswallow && $c.peq(mtmp, u.ustuck)) {
-                    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitm.c"), 133, $c.lit("fightm")), rn2(4)) : rn2(4))) {
+                    if (!rn2(4)) {
                         await set_ustuck(null);
                         await pline($c.lit("%s releases you!"), await Monnam(mtmp));
                     } else {
@@ -121,7 +121,7 @@ export async function fightm(mtmp) {   // mhitm.c:106
                 if (has_u_swallowed) {
                     return 0;
                 }
-                if ((result & 3) === 1 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitm.c"), 157, $c.lit("fightm")), rn2(4)) : rn2(4)) && mon.movement > (rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitm.c"), 157, $c.lit("fightm")), rn2(12)) : rn2(12))) {
+                if ((result & 3) === 1 && rn2(4) && mon.movement > rn2(12)) {
                     if (mon.movement > 12) {
                         mon.movement = $c.i16(mon.movement - 12 | 0);
                     } else {
@@ -148,7 +148,7 @@ export async function mdisplacem(magr, mdef, quietly) {   // mhitm.c:179
     if (!$c.peq(svl.level.monsters[fx][fy], magr) || !$c.peq(svl.level.monsters[tx][ty], mdef)) {
         return 0;
     }
-    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitm.c"), 199, $c.lit("mdisplacem")), rn2(7)) : rn2(7))) {
+    if (!rn2(7)) {
         return 0;
     }
     if ($c.peq(pa, $c.relem(mons, 116 /* PM_GRID_BUG */)) && magr.mx !== mdef.mx && magr.my !== mdef.my) {
@@ -311,7 +311,7 @@ export async function mattackm(magr, mdef) {   // mhitm.c:293
                     strike = 0;
                     break;
                 }
-                dieroll = rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitm.c"), 441, $c.lit("mattackm")), rnd(20 + i | 0)) : rnd(20 + i | 0);
+                dieroll = rnd(20 + i | 0);
                 strike = tmp > dieroll ? 1 : 0;
                 if (mwep) {
                     tmp = tmp - await hitval(mwep, mdef) | 0;
@@ -380,7 +380,7 @@ export async function mattackm(magr, mdef) {   // mhitm.c:293
                 }
                 if (u.uswallow | 0 && $c.peq(u.ustuck, magr)) {
                     strike = 0;
-                } else if ((strike = tmp > (rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitm.c"), 528, $c.lit("mattackm")), rnd(20 + i | 0)) : rnd(20 + i | 0)) ? 1 : 0) !== 0) {
+                } else if ((strike = tmp > rnd(20 + i | 0) ? 1 : 0) !== 0) {
                     if (await failed_grab(magr, mdef, mattk)) {
                         strike = 0;
                     } else {
@@ -566,7 +566,7 @@ async function gazemm(magr, mdef, mattk) {   // mhitm.c:736
         }
     } else if (archon) {
         await mhitm_ad_blnd(magr, mattk, mdef, null);
-        if (rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitm.c"), 798, $c.lit("gazemm")), rn2(2)) : rn2(2)) {
+        if (rn2(2)) {
             mdef.mstun = (1) & 1;
         }
     }
@@ -697,7 +697,7 @@ async function mdamagem(magr, mdef, mattk, mwep, dieroll) {   // mhitm.c:1016
     let pa = null, pd = null, mhm = new $T.mhitm_data(), protector = 0, wornitems = 0, $t1, $t2;
     pa = magr.data;
     pd = mdef.data;
-    $t1 = rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitm.c"), 1025, $c.lit("mdamagem")), d(mattk.damn, mattk.damd)) : d(mattk.damn, mattk.damd), mhm.damage = $t1;
+    $t1 = d(mattk.damn, mattk.damd), mhm.damage = $t1;
     mhm.hitflags = 0;
     mhm.permdmg = 0;
     mhm.specialdmg = 0;
@@ -800,7 +800,7 @@ export async function mon_poly(magr, mdef, dmg) {   // mhitm.c:1122
                 await shieldeff_mon(mdef);
             }
         } else if (await resist(mdef, 11, 0, 1)) {
-        } else if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitm.c"), 1157, $c.lit("mon_poly")), rn2(25)) : rn2(25)) && mdef.cham === -1 /* NON_PM */ && (mdef.mcan | 0 || pm_to_cham(mdef.data.pmidx) !== -1 /* NON_PM */)) {
+        } else if (!rn2(25) && mdef.cham === -1 /* NON_PM */ && (mdef.mcan | 0 || pm_to_cham(mdef.data.pmidx) !== -1 /* NON_PM */)) {
             if (gv.vis) {
                 await pline($c.lit("%s shudders!"), new $c.Ptr(Before, 0));
             }
@@ -839,7 +839,7 @@ export async function mon_poly(magr, mdef, dmg) {   // mhitm.c:1122
         }
     }
     if (!$c.peq(mdef.data, oldform) && !$c.peq(magr, gy.youmonst)) {
-        $t1 = rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitm.c"), 1204, $c.lit("mon_poly")), rnd(2)) : rnd(2), magr.mspec_used = magr.mspec_used + $t1 | 0;
+        $t1 = rnd(2), magr.mspec_used = magr.mspec_used + $t1 | 0;
     }
     return dmg;
 }
@@ -892,7 +892,7 @@ export async function rustm(mdef, obj) {   // mhitm.c:1260
         dmgtyp = 0;
         chance = 6;
     }
-    if (dmgtyp !== -1 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitm.c"), 1278, $c.lit("rustm")), rn2(chance)) : rn2(chance))) {
+    if (dmgtyp !== -1 && !rn2(chance)) {
         await erode_obj(obj, null, dmgtyp, 5);
     }
 }
@@ -917,16 +917,16 @@ async function passivemm(magr, mdef, mhitb, mdead, mwep) {   // mhitm.c:1304
         }
     }
     if (mddat.mattk[i].damn) {
-        tmp = rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitm.c"), 1324, $c.lit("passivemm")), d(mddat.mattk[i].damn, mddat.mattk[i].damd)) : d(mddat.mattk[i].damn, mddat.mattk[i].damd);
+        tmp = d(mddat.mattk[i].damn, mddat.mattk[i].damd);
     } else if (mddat.mattk[i].damd) {
-        tmp = rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitm.c"), 1326, $c.lit("passivemm")), d(mddat.mlevel + 1 | 0, mddat.mattk[i].damd)) : d(mddat.mlevel + 1 | 0, mddat.mattk[i].damd);
+        tmp = d(mddat.mlevel + 1 | 0, mddat.mattk[i].damd);
     } else {
         tmp = 0;
     }
     assess_dmg$: {
         switch (mddat.mattk[i].adtyp) {
             case 8:
-                if (mhitb && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitm.c"), 1333, $c.lit("passivemm")), rn2(2)) : rn2(2))) {
+                if (mhitb && !rn2(2)) {
                     $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), await Monnam(magr), 256);
                     if (canseemon(magr)) {
                         await pline($c.lit("%s is splashed by %s %s!"), new $c.Ptr(buf, 0), s_suffix(await mon_nam(mdef)), hliquid($c.lit("acid")));
@@ -940,10 +940,10 @@ async function passivemm(magr, mdef, mhitb, mdead, mwep) {   // mhitm.c:1304
                 } else {
                     tmp = 0;
                 }
-                if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitm.c"), 1345, $c.lit("passivemm")), rn2(30)) : rn2(30))) {
+                if (!rn2(30)) {
                     await erode_armor(magr, 3);
                 }
-                if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitm.c"), 1347, $c.lit("passivemm")), rn2(6)) : rn2(6))) {
+                if (!rn2(6)) {
                     await acid_damage(magr.mw);
                 }
                 break assess_dmg$;
@@ -958,14 +958,14 @@ async function passivemm(magr, mdef, mhitb, mdead, mwep) {   // mhitm.c:1304
         if (mdead || mdef.mcan | 0) {
             return mdead | mhit;
         }
-        if (rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitm.c"), 1363, $c.lit("passivemm")), rn2(3)) : rn2(3)) {
+        if (rn2(3)) {
             switch (mddat.mattk[i].adtyp) {
                 case 14:
                     if (tmp > 127) {
                         tmp = 127;
                     }
                     if ($c.peq(mddat, $c.relem(mons, 28 /* PM_FLOATING_EYE */))) {
-                        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitm.c"), 1369, $c.lit("passivemm")), rn2(4)) : rn2(4))) {
+                        if (!rn2(4)) {
                             tmp = 127;
                         }
                         if (magr.mcansee | 0 && $c.andu64(madat.mflags1, 4096) === 0 && mdef.mcansee | 0 && ($c.andu64(madat.mflags1, 16777216) !== 0 || !mdef.minvis)) {
@@ -1060,7 +1060,7 @@ async function passivemm(magr, mdef, mhitb, mdead, mwep) {   // mhitm.c:1304
 export async function xdrainenergym(mon, givemsg) {   // mhitm.c:1461
     let $t1;
     if (mon.mspec_used < 20 && (attacktype(mon.data, 255) || attacktype(mon.data, 12))) {
-        $t1 = rng_log_enabled() ? (rng_log_set_caller($c.lit("mhitm.c"), 1466, $c.lit("xdrainenergym")), d(2, 2)) : d(2, 2), mon.mspec_used = mon.mspec_used + $t1 | 0;
+        $t1 = d(2, 2), mon.mspec_used = mon.mspec_used + $t1 | 0;
         if (givemsg) {
             await pline_mon(mon, $c.lit("%s seems lethargic."), await Monnam(mon));
         }

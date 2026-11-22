@@ -38,7 +38,7 @@ import { mbodypart } from './polyself.js';
 import { in_your_sanctuary, inhistemple, mon_aligntyp, pri_move } from './priest.js';
 import { quest_stat_check, quest_talk } from './quest.js';
 import { create_gas_cloud, m_in_out_region, visible_region_at } from './region.js';
-import { d, rn2, rnd, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { d, rn2, rnd } from './rnd.js';
 import { genders } from './role.js';
 import { add_damage, after_shk_move, costly_spot, inhishop, shk_move } from './shk.js';
 import { stairway_at, stairway_find_dir } from './stairs.js';
@@ -81,7 +81,7 @@ export async function mb_trapped(mtmp, canseeit) {   // monmove.c:54
     }
     await wake_nearto(mtmp.mx, mtmp.my, 49);
     mtmp.mstun = (1) & 1;
-    $t1 = rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 65, $c.lit("mb_trapped")), rnd(15)) : rnd(15), mtmp.mhp = mtmp.mhp - $t1 | 0;
+    $t1 = rnd(15), mtmp.mhp = mtmp.mhp - $t1 | 0;
     if (mtmp.mhp < 1) {
         await mondied(mtmp);
         if (mtmp.mhp < 1) {
@@ -135,7 +135,7 @@ export async function m_break_boulder(mtmp, x, y) {   // monmove.c:143
                 }
                 await pline($c.lit("%s mutters %s."), await Monnam(mtmp), mtmp.ispriest | 0 ? $c.lit("a prayer") : $c.lit("an incantation"));
             }
-            $t1 = (rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 156, $c.lit("m_break_boulder")), rn2(20)) : rn2(20)) + 10 | 0, mtmp.mspec_used = mtmp.mspec_used + $t1 | 0;
+            $t1 = rn2(20) + 10 | 0, mtmp.mspec_used = mtmp.mspec_used + $t1 | 0;
         }
         if ((gv.viz_array.get(y).get(x) & 2) !== 0) {
             set_msg_xy(x, y);
@@ -149,7 +149,7 @@ export async function m_break_boulder(mtmp, x, y) {   // monmove.c:143
 }
 async function watch_on_duty(mtmp) {   // monmove.c:176
     let x = Int16Array.of(0), y = Int16Array.of(0);
-    if (mtmp.mpeaceful | 0 && in_town($c.i16(u.ux + u.dx | 0), $c.i16(u.uy + u.dy | 0)) && mtmp.mcansee | 0 && ((!((u.uprops[40 /* INVIS */].intrinsic || u.uprops[40 /* INVIS */].extrinsic) && !u.uprops[40 /* INVIS */].blocked) || $c.andu64(mtmp.data.mflags1, 16777216) !== 0) && !u.uinwater && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & 1) !== 0) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 181, $c.lit("watch_on_duty")), rn2(3)) : rn2(3))) {
+    if (mtmp.mpeaceful | 0 && in_town($c.i16(u.ux + u.dx | 0), $c.i16(u.uy + u.dy | 0)) && mtmp.mcansee | 0 && ((!((u.uprops[40 /* INVIS */].intrinsic || u.uprops[40 /* INVIS */].extrinsic) && !u.uprops[40 /* INVIS */].blocked) || $c.andu64(mtmp.data.mflags1, 16777216) !== 0) && !u.uinwater && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & 1) !== 0) && !rn2(3)) {
         if (picking_lock(new $c.Ptr(x, 0), new $c.Ptr(y, 0)) && svl.level.locations[x[0]][y[0]].typ === 23 /* DOOR */ && (svl.level.locations[x[0]][y[0]].flags | 0) & 8) {
             if ((gv.viz_array.get(mtmp.my).get(mtmp.mx) & 1) !== 0) {
                 if ((svl.level.locations[x[0]][y[0]].flags | 0) & 16) {
@@ -218,7 +218,7 @@ export async function mon_regen(mon, digest_meal) {   // monmove.c:307
     }
 }
 async function disturb(mtmp) {   // monmove.c:327
-    if ((gv.viz_array.get(mtmp.my).get(mtmp.mx) & 1) !== 0 && dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 100 && (!((u.uprops[42 /* STEALTH */].intrinsic || u.uprops[42 /* STEALTH */].extrinsic) && !u.uprops[42 /* STEALTH */].blocked) || $c.peq(mtmp.data, $c.relem(mons, 174 /* PM_ETTIN */)) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 342, $c.lit("disturb")), rn2(10)) : rn2(10))) && (!(mtmp.data.mlet === 14 /* S_NYMPH */ || $c.peq(mtmp.data, $c.relem(mons, 178 /* PM_JABBERWOCK */)) || mtmp.data.mlet === 12 /* S_LEPRECHAUN */) || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 348, $c.lit("disturb")), rn2(50)) : rn2(50))) && (u.uprops[43 /* AGGRAVATE_MONSTER */].intrinsic || u.uprops[43 /* AGGRAVATE_MONSTER */].extrinsic || (mtmp.data.mlet === 4 /* S_DOG */ || mtmp.data.mlet === 53 /* S_HUMAN */) || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 351, $c.lit("disturb")), rn2(7)) : rn2(7)) && (mtmp.m_ap_type & 7) !== 1 /* M_AP_FURNITURE */ && (mtmp.m_ap_type & 7) !== 2 /* M_AP_OBJECT */)) {
+    if ((gv.viz_array.get(mtmp.my).get(mtmp.mx) & 1) !== 0 && dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 100 && (!((u.uprops[42 /* STEALTH */].intrinsic || u.uprops[42 /* STEALTH */].extrinsic) && !u.uprops[42 /* STEALTH */].blocked) || $c.peq(mtmp.data, $c.relem(mons, 174 /* PM_ETTIN */)) && rn2(10)) && (!(mtmp.data.mlet === 14 /* S_NYMPH */ || $c.peq(mtmp.data, $c.relem(mons, 178 /* PM_JABBERWOCK */)) || mtmp.data.mlet === 12 /* S_LEPRECHAUN */) || !rn2(50)) && (u.uprops[43 /* AGGRAVATE_MONSTER */].intrinsic || u.uprops[43 /* AGGRAVATE_MONSTER */].extrinsic || (mtmp.data.mlet === 4 /* S_DOG */ || mtmp.data.mlet === 53 /* S_HUMAN */) || !rn2(7) && (mtmp.m_ap_type & 7) !== 1 /* M_AP_FURNITURE */ && (mtmp.m_ap_type & 7) !== 2 /* M_AP_OBJECT */)) {
         await wake_msg(mtmp, $c.i8(!mtmp.mpeaceful ? 1 : 0));
         mtmp.msleeping = (0) & 1;
         return 1;
@@ -318,7 +318,7 @@ export async function monflee(mtmp, fleetime, first, fleemsg) {   // monmove.c:4
             } else if ($c.peq(mtmp.data, $c.relem(mons, 40 /* PM_GREMLIN */)) && ($G.uwep && $G.uwep.lamplit | 0 && artifact_light($G.uwep) || $G.uarm && $G.uarm.lamplit | 0 && artifact_light($G.uarm)) && mtmp.mcansee | 0 && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & 1) !== 0) {
                 if (gm.multi < 0 && (unconscious() || is_fainted())) {
                     await pline_mon(mtmp, $c.lit("%s is frightened."), await Monnam(mtmp));
-                } else if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 499, $c.lit("monflee")), rn2(10)) : rn2(10)) || (u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf)) {
+                } else if (rn2(10) || (u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf)) {
                     lsrc = $G.uwep && artifact_light($G.uwep) ? await bare_artifactname($G.uwep) : $G.uarm && artifact_light($G.uarm) ? await yname($G.uarm) : $c.lit("[its imagination?]");
                     await pline_mon(mtmp, $c.lit("%s flees from the painful light of %s."), await Monnam(mtmp), lsrc);
                 } else {
@@ -329,7 +329,7 @@ export async function monflee(mtmp, fleetime, first, fleemsg) {   // monmove.c:4
             }
         }
         if ($c.peq(mtmp.data, $c.relem(mons, 295 /* PM_VROCK */)) && !mtmp.mspec_used) {
-            $t1 = 75 + (rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 522, $c.lit("monflee")), rn2(25)) : rn2(25)) | 0, mtmp.mspec_used = $t1;
+            $t1 = 75 + rn2(25) | 0, mtmp.mspec_used = $t1;
             await create_gas_cloud(mtmp.mx, mtmp.my, 5, 8);
         }
         mtmp.mflee = (1) & 1;
@@ -339,7 +339,7 @@ export async function monflee(mtmp, fleetime, first, fleemsg) {   // monmove.c:4
 async function distfleeck(mtmp, inrange, nearby, scared) {   // monmove.c:533
     let seescaryx = 0, seescaryy = 0, sawscary = 0, bravegremlin = 0, $t1, $t2;
     sawscary = 0;
-    bravegremlin = $c.i8((rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 538, $c.lit("distfleeck")), rn2(5)) : rn2(5)) === 0 ? 1 : 0);
+    bravegremlin = $c.i8(rn2(5) === 0 ? 1 : 0);
     $t1 = dist2(mtmp.mx, mtmp.my, mtmp.mux, mtmp.muy) <= 64 ? 1 : 0, inrange.set(0, $t1);
     $t2 = inrange.get(0) && monnear(mtmp, mtmp.mux, mtmp.muy) ? 1 : 0, nearby.set(0, $t2);
     if (!mtmp.mcansee || (u.uprops[40 /* INVIS */].intrinsic || u.uprops[40 /* INVIS */].extrinsic) && !u.uprops[40 /* INVIS */].blocked && !($c.andu64(mtmp.data.mflags1, 16777216) !== 0)) {
@@ -352,7 +352,7 @@ async function distfleeck(mtmp, inrange, nearby, scared) {   // monmove.c:533
     sawscary = onscary($c.i16(seescaryx), $c.i16(seescaryy), mtmp);
     if (nearby.get(0) && (sawscary || $c.peq(mtmp.data, $c.relem(mons, 40 /* PM_GREMLIN */)) && ($G.uwep && $G.uwep.lamplit | 0 && artifact_light($G.uwep) || $G.uarm && $G.uarm.lamplit | 0 && artifact_light($G.uarm)) && mtmp.mcansee | 0 && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & 1) !== 0 && !bravegremlin || !mtmp.mpeaceful && in_your_sanctuary(mtmp, 0, 0))) {
         scared.set(0, 1);
-        await monflee(mtmp, rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 564, $c.lit("distfleeck")), rnd((rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 564, $c.lit("distfleeck")), rn2(7)) : rn2(7)) ? 10 : 100)) : rnd((rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 564, $c.lit("distfleeck")), rn2(7)) : rn2(7)) ? 10 : 100), 1, 1);
+        await monflee(mtmp, rnd(rn2(7) ? 10 : 100), 1, 1);
     } else {
         scared.set(0, 0);
     }
@@ -376,7 +376,7 @@ async function mind_blast(mtmp) {   // monmove.c:583
         await pline($c.lit("It feels quite soothing."));
     } else if (!u.uinvulnerable) {
         m_sen = $c.i8(sensemon(mtmp));
-        if (m_sen || (u.uprops[30 /* TELEPAT */].intrinsic || u.uprops[30 /* TELEPAT */].extrinsic) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 601, $c.lit("mind_blast")), rn2(2)) : rn2(2)) || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 601, $c.lit("mind_blast")), rn2(10)) : rn2(10))) {
+        if (m_sen || (u.uprops[30 /* TELEPAT */].intrinsic || u.uprops[30 /* TELEPAT */].extrinsic) && rn2(2) || !rn2(10)) {
             if (u.uundetected) {
                 u.uundetected = (0) & 1;
                 await newsym(u.ux, u.uy);
@@ -386,7 +386,7 @@ async function mind_blast(mtmp) {   // monmove.c:583
                 await newsym(u.ux, u.uy);
             }
             await pline($c.lit("It locks on to your %s!"), m_sen ? $c.lit("telepathy") : u.uprops[30 /* TELEPAT */].intrinsic || u.uprops[30 /* TELEPAT */].extrinsic ? $c.lit("latent telepathy") : $c.lit("mind"));
-            dmg = rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 619, $c.lit("mind_blast")), rnd(15)) : rnd(15);
+            dmg = rnd(15);
             if (u.uprops[55 /* HALF_SPDAM */].intrinsic || u.uprops[55 /* HALF_SPDAM */].extrinsic) {
                 dmg = $c.div32(dmg + 1 | 0, 2);
             }
@@ -407,12 +407,12 @@ async function mind_blast(mtmp) {   // monmove.c:583
         if ($c.peq(m2, mtmp)) {
             continue;
         }
-        if (($c.peq(m2.data, $c.relem(mons, 28 /* PM_FLOATING_EYE */)) || $c.peq(m2.data, $c.relem(mons, 48 /* PM_MIND_FLAYER */)) || $c.peq(m2.data, $c.relem(mons, 49 /* PM_MASTER_MIND_FLAYER */))) && ((rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 635, $c.lit("mind_blast")), rn2(2)) : rn2(2)) || m2.mblinded | 0) || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 635, $c.lit("mind_blast")), rn2(10)) : rn2(10))) {
+        if (($c.peq(m2.data, $c.relem(mons, 28 /* PM_FLOATING_EYE */)) || $c.peq(m2.data, $c.relem(mons, 48 /* PM_MIND_FLAYER */)) || $c.peq(m2.data, $c.relem(mons, 49 /* PM_MASTER_MIND_FLAYER */))) && (rn2(2) || m2.mblinded | 0) || !rn2(10)) {
             await wakeup(m2, 0);
             if ((gv.viz_array.get(m2.my).get(m2.mx) & 2) !== 0) {
                 await pline($c.lit("It locks on to %s."), await mon_nam(m2));
             }
-            $t1 = rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 640, $c.lit("mind_blast")), rnd(15)) : rnd(15), m2.mhp = m2.mhp - $t1 | 0;
+            $t1 = rnd(15), m2.mhp = m2.mhp - $t1 | 0;
             if (m2.mhp < 1) {
                 await monkilled(m2, $c.lit(""), 32);
             }
@@ -472,13 +472,13 @@ export async function dochug(mtmp) {   // monmove.c:690
         return 0;
     }
     await wipe_engr_at(mtmp.mx, mtmp.my, 1, 0);
-    if (mtmp.mconf | 0 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 737, $c.lit("dochug")), rn2(50)) : rn2(50))) {
+    if (mtmp.mconf | 0 && !rn2(50)) {
         mtmp.mconf = (0) & 1;
     }
-    if (mtmp.mstun | 0 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 741, $c.lit("dochug")), rn2(10)) : rn2(10))) {
+    if (mtmp.mstun | 0 && !rn2(10)) {
         mtmp.mstun = (0) & 1;
     }
-    if (mtmp.mflee | 0 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 745, $c.lit("dochug")), rn2(40)) : rn2(40)) && $c.andu64(mdat.mflags1, 33554432) !== 0 && !mtmp.iswiz && !await noteleport_level(mtmp)) {
+    if (mtmp.mflee | 0 && !rn2(40) && $c.andu64(mdat.mflags1, 33554432) !== 0 && !mtmp.iswiz && !await noteleport_level(mtmp)) {
         if (await rloc(mtmp, 2)) {
             await leppie_stash(mtmp);
         }
@@ -488,7 +488,7 @@ export async function dochug(mtmp) {   // monmove.c:690
     if (mtmp.mhp < 1) {
         return 1;
     }
-    if (mtmp.mflee | 0 && !mtmp.mfleetim && mtmp.mhp === mtmp.mhpmax && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 759, $c.lit("dochug")), rn2(25)) : rn2(25))) {
+    if (mtmp.mflee | 0 && !mtmp.mfleetim && mtmp.mhp === mtmp.mhpmax && !rn2(25)) {
         mtmp.mflee = (0) & 1;
     }
     if ($c.peq(mtmp, u.ustuck) && mtmp.mpeaceful | 0 && !mtmp.mconf && !(u.uprops[44 /* CONFLICT */].intrinsic || u.uprops[44 /* CONFLICT */].extrinsic)) {
@@ -535,7 +535,7 @@ export async function dochug(mtmp) {   // monmove.c:690
     }
     if ($c.peq(mdat, $c.relem(mons, 282 /* PM_WATCHMAN */)) || $c.peq(mdat, $c.relem(mons, 283 /* PM_WATCH_CAPTAIN */))) {
         await watch_on_duty(mtmp);
-    } else if (($c.peq(mdat, $c.relem(mons, 48 /* PM_MIND_FLAYER */)) || $c.peq(mdat, $c.relem(mons, 49 /* PM_MASTER_MIND_FLAYER */))) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 831, $c.lit("dochug")), rn2(20)) : rn2(20))) {
+    } else if (($c.peq(mdat, $c.relem(mons, 48 /* PM_MIND_FLAYER */)) || $c.peq(mdat, $c.relem(mons, 49 /* PM_MASTER_MIND_FLAYER */))) && !rn2(20)) {
         await mind_blast(mtmp);
         set_apparxy(mtmp);
         await distfleeck(mtmp, new $c.Ptr(inrange, 0), new $c.Ptr(nearby, 0), new $c.Ptr(scared, 0));
@@ -555,7 +555,7 @@ export async function dochug(mtmp) {   // monmove.c:690
     if ($c.peq(mdat, $c.relem(mons, 8 /* PM_GELATINOUS_CUBE */)) && (res = await gelcube_digests(mtmp)) >= 0) {
         return res;
     }
-    if (!nearby[0] || mtmp.mflee | 0 || scared[0] || mtmp.mconf | 0 || mtmp.mstun | 0 || mtmp.minvis | 0 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 883, $c.lit("dochug")), rn2(3)) : rn2(3)) || mdat.mlet === 12 /* S_LEPRECHAUN */ && !findgold(gi.invent) && (findgold(mtmp.minvent) || (rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 885, $c.lit("dochug")), rn2(2)) : rn2(2))) || $c.andu64(mdat.mflags2, 8388608) !== 0 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 886, $c.lit("dochug")), rn2(4)) : rn2(4)) || (u.uprops[44 /* CONFLICT */].intrinsic || u.uprops[44 /* CONFLICT */].extrinsic) && !mtmp.iswiz || !mtmp.mcansee && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 887, $c.lit("dochug")), rn2(4)) : rn2(4)) || mtmp.mpeaceful | 0) {
+    if (!nearby[0] || mtmp.mflee | 0 || scared[0] || mtmp.mconf | 0 || mtmp.mstun | 0 || mtmp.minvis | 0 && !rn2(3) || mdat.mlet === 12 /* S_LEPRECHAUN */ && !findgold(gi.invent) && (findgold(mtmp.minvent) || rn2(2)) || $c.andu64(mdat.mflags2, 8388608) !== 0 && !rn2(4) || (u.uprops[44 /* CONFLICT */].intrinsic || u.uprops[44 /* CONFLICT */].extrinsic) && !mtmp.iswiz || !mtmp.mcansee && !rn2(4) || mtmp.mpeaceful | 0) {
         if (!mtmp.mspec_used && dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 49) {
             for (a = $c.relem(mdat.mattk, 0); $c.pcmp(a, $c.relem(mdat.mattk, 6)) < 0; a = $c.radd(a, 1)) {
                 if (a.aatyp === 255 && (a.adtyp === 241 || a.adtyp === 240)) {
@@ -625,7 +625,7 @@ export async function dochug(mtmp) {   // monmove.c:690
     if (!(mtmp.msleeping | 0 || !mtmp.mcanmove) && nearby[0]) {
         await quest_talk(mtmp);
     }
-    if (inrange[0] && mtmp.data.msound === 34 /* MS_CUSS */ && !mtmp.mpeaceful && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & 1) !== 0 && !mtmp.minvis && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 984, $c.lit("dochug")), rn2(5)) : rn2(5))) {
+    if (inrange[0] && mtmp.data.msound === 34 /* MS_CUSS */ && !mtmp.mpeaceful && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & 1) !== 0 && !mtmp.minvis && !rn2(5)) {
         await cuss(mtmp);
     }
     return status === 2 ? 1 : 0;
@@ -743,7 +743,7 @@ function leppie_avoidance(mtmp) {   // monmove.c:1139
 }
 async function leppie_stash(mtmp) {   // monmove.c:1154
     let gold = null;
-    if ($c.peq(mtmp.data, $c.relem(mons, 63 /* PM_LEPRECHAUN */)) && !(mtmp.mhp < 1) && !((!((u.uprops[40 /* INVIS */].intrinsic || u.uprops[40 /* INVIS */].extrinsic) && !u.uprops[40 /* INVIS */].blocked) || $c.andu64(mtmp.data.mflags1, 16777216) !== 0) && !u.uinwater && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & 1) !== 0) && !in_rooms(mtmp.mx, mtmp.my, 14 /* SHOPBASE */).get(0) && svl.level.locations[mtmp.mx][mtmp.my].typ === 25 /* ROOM */ && !t_at(mtmp.mx, mtmp.my) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 1164, $c.lit("leppie_stash")), rn2(4)) : rn2(4)) && (gold = findgold(mtmp.minvent)) !== null) {
+    if ($c.peq(mtmp.data, $c.relem(mons, 63 /* PM_LEPRECHAUN */)) && !(mtmp.mhp < 1) && !((!((u.uprops[40 /* INVIS */].intrinsic || u.uprops[40 /* INVIS */].extrinsic) && !u.uprops[40 /* INVIS */].blocked) || $c.andu64(mtmp.data.mflags1, 16777216) !== 0) && !u.uinwater && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & 1) !== 0) && !in_rooms(mtmp.mx, mtmp.my, 14 /* SHOPBASE */).get(0) && svl.level.locations[mtmp.mx][mtmp.my].typ === 25 /* ROOM */ && !t_at(mtmp.mx, mtmp.my) && rn2(4) && (gold = findgold(mtmp.minvent)) !== null) {
         await mdrop_obj(mtmp, gold, 0);
         gold = g_at(mtmp.mx, mtmp.my);
         if (gold) {
@@ -813,8 +813,8 @@ async function maybe_spin_web(mtmp) {   // monmove.c:1269
     let trap = null, prob = 0, mbuf = new Int8Array(256), $t1;
     if (($c.peq(mtmp.data, $c.relem(mons, 94 /* PM_CAVE_SPIDER */)) || $c.peq(mtmp.data, $c.relem(mons, 96 /* PM_GIANT_SPIDER */))) && !(mtmp.msleeping | 0 || !mtmp.mcanmove) && !mtmp.mspec_used && !t_at(mtmp.mx, mtmp.my) && soko_allow_web(mtmp)) {
         prob = Math.imul($c.peq(mtmp.data, $c.relem(mons, 96 /* PM_GIANT_SPIDER */)) ? 15 : 5, count_webbing_walls(mtmp.mx, mtmp.my) + 1 | 0) - Math.imul(3, count_traps(18 /* WEB */)) | 0;
-        if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 1279, $c.lit("maybe_spin_web")), rn2(1000)) : rn2(1000)) < prob && (trap = await maketrap(mtmp.mx, mtmp.my, 18 /* WEB */)) !== null) {
-            $t1 = rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 1281, $c.lit("maybe_spin_web")), d(4, 4)) : d(4, 4), mtmp.mspec_used = $t1;
+        if (rn2(1000) < prob && (trap = await maketrap(mtmp.mx, mtmp.my, 18 /* WEB */)) !== null) {
+            $t1 = d(4, 4), mtmp.mspec_used = $t1;
             if ((gv.viz_array.get(mtmp.my).get(mtmp.mx) & 2) !== 0) {
                 $c.__builtin___strcpy_chk(new $c.Ptr(mbuf, 0), canseemon(mtmp) || sensemon(mtmp) ? await y_monnam(mtmp) : c_common_strings.c_something, 256);
                 await pline_mon(mtmp, $c.lit("%s spins a web."), upstart(new $c.Ptr(mbuf, 0)));
@@ -851,7 +851,7 @@ async function m_search_items(mtmp, ggx, ggy, mmoved, appr) {   // monmove.c:133
         minr = 1;
     }
     finish_search$: {
-        if (in_rooms(omx, omy, 14 /* SHOPBASE */).get(0) && ((rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 1355, $c.lit("m_search_items")), rn2(25)) : rn2(25)) || mtmp.isshk | 0)) {
+        if (in_rooms(omx, omy, 14 /* SHOPBASE */).get(0) && (rn2(25) || mtmp.isshk | 0)) {
             break finish_search$;
         }
         hmx = $c.i16(79 < (omx + minr | 0) ? 79 : omx + minr | 0);
@@ -1015,7 +1015,7 @@ async function postmov(mtmp, ptr, omx, omy, mmoved, seenflgs, can_tunnel, can_un
                     }
                 }
             } else if (((here.flags | 0) & 12) !== 0) {
-                mask = (btrapped || ((here.flags | 0) & 8) !== 0 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 1598, $c.lit("postmov")), rn2(2)) : rn2(2)) ? 0 : 1) >>> 0;
+                mask = (btrapped || ((here.flags | 0) & 8) !== 0 && !rn2(2) ? 0 : 1) >>> 0;
                 do {
                     here.flags = (mask) & 31;
                     await newsym(mtmp.mx, mtmp.my);
@@ -1094,7 +1094,7 @@ async function postmov(mtmp, ptr, omx, omy, mmoved, seenflgs, can_tunnel, can_un
         }
         await maybe_spin_web(mtmp);
         if ($c.andu64(ptr.mflags1, 128) !== 0 || ptr.mlet === 57 /* S_EEL */) {
-            if (mtmp.mundetected | 0 || !(mtmp.msleeping | 0 || !mtmp.mcanmove) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 1696, $c.lit("postmov")), rn2(5)) : rn2(5))) {
+            if (mtmp.mundetected | 0 || !(mtmp.msleeping | 0 || !mtmp.mcanmove) && rn2(5)) {
                 await hideunder(mtmp);
             }
             await newsym(mtmp.mx, mtmp.my);
@@ -1136,7 +1136,7 @@ export async function m_move(mtmp, after) {   // monmove.c:1715
         }
         return 3;
     }
-    if ($c.andu64(ptr.mflags1, 128) !== 0 && svl.level.objects[mtmp.mx][mtmp.my] !== null && can_hide_under_obj(svl.level.objects[mtmp.mx][mtmp.my]) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 1753, $c.lit("m_move")), rn2(10)) : rn2(10))) {
+    if ($c.andu64(ptr.mflags1, 128) !== 0 && svl.level.objects[mtmp.mx][mtmp.my] !== null && can_hide_under_obj(svl.level.objects[mtmp.mx][mtmp.my]) && rn2(10)) {
         return 0;
     }
     seenflgs = ((canseemon(mtmp) ? 1 : 0) | (canseemon(mtmp) || sensemon(mtmp) ? 2 : 0)) >>> 0;
@@ -1190,8 +1190,8 @@ export async function m_move(mtmp, after) {   // monmove.c:1715
             await mongone(mtmp);
             return 2;
         }
-        if ($c.peq(ptr, $c.relem(mons, 55 /* PM_TENGU */)) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 1841, $c.lit("m_move")), rn2(5)) : rn2(5)) && !mtmp.mcan && !await tele_restrict(mtmp)) {
-            if (mtmp.mhp < 7 || mtmp.mpeaceful | 0 || (rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 1843, $c.lit("m_move")), rn2(2)) : rn2(2))) {
+        if ($c.peq(ptr, $c.relem(mons, 55 /* PM_TENGU */)) && !rn2(5) && !mtmp.mcan && !await tele_restrict(mtmp)) {
+            if (mtmp.mhp < 7 || mtmp.mpeaceful | 0 || rn2(2)) {
                 await rloc(mtmp, 2);
             } else {
                 await mnexto(mtmp, 2);
@@ -1211,7 +1211,7 @@ export async function m_move(mtmp, after) {   // monmove.c:1715
         appr[0] = 0;
     } else {
         should_see = $c.i8((gv.viz_array.get(omy).get(omx) & 1) !== 0 && (svl.level.locations[ggx[0]][ggy[0]].lit | 0 || !svl.level.locations[omx][omy].lit) && dist2(omx, omy, ggx[0], ggy[0]) <= 36 ? 1 : 0);
-        if (!mtmp.mcansee || should_see && ((u.uprops[40 /* INVIS */].intrinsic || u.uprops[40 /* INVIS */].extrinsic) && !u.uprops[40 /* INVIS */].blocked) && !($c.andu64(ptr.mflags1, 16777216) !== 0) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 1866, $c.lit("m_move")), rn2(11)) : rn2(11)) || (gy.youmonst.m_ap_type & 7) === 2 /* M_AP_OBJECT */ && gy.youmonst.mappearance === 0 || u.uundetected | 0 || (gy.youmonst.m_ap_type & 7) === 2 /* M_AP_OBJECT */ && gy.youmonst.mappearance === 438 && !($c.andu64(ptr.mflags2, 268435456) !== 0) || mtmp.mpeaceful | 0 && !mtmp.isshk || (ptr.pmidx === 153 /* PM_STALKER */ || ptr.mlet === 28 /* S_BAT */ || ptr.mlet === 25 /* S_LIGHT */) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 1871, $c.lit("m_move")), rn2(3)) : rn2(3))) {
+        if (!mtmp.mcansee || should_see && ((u.uprops[40 /* INVIS */].intrinsic || u.uprops[40 /* INVIS */].extrinsic) && !u.uprops[40 /* INVIS */].blocked) && !($c.andu64(ptr.mflags1, 16777216) !== 0) && rn2(11) || (gy.youmonst.m_ap_type & 7) === 2 /* M_AP_OBJECT */ && gy.youmonst.mappearance === 0 || u.uundetected | 0 || (gy.youmonst.m_ap_type & 7) === 2 /* M_AP_OBJECT */ && gy.youmonst.mappearance === 438 && !($c.andu64(ptr.mflags2, 268435456) !== 0) || mtmp.mpeaceful | 0 && !mtmp.isshk || (ptr.pmidx === 153 /* PM_STALKER */ || ptr.mlet === 28 /* S_BAT */ || ptr.mlet === 25 /* S_LIGHT */) && !rn2(3)) {
             appr[0] = 0;
         }
         if (appr[0] === 1 && leppie_avoidance(mtmp)) {
@@ -1226,7 +1226,7 @@ export async function m_move(mtmp, after) {   // monmove.c:1715
             }
         }
     }
-    if ((!mtmp.mpeaceful || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 1891, $c.lit("m_move")), rn2(10)) : rn2(10))) && !((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level))) {
+    if ((!mtmp.mpeaceful || !rn2(10)) && !((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level))) {
         in_line = $c.i8(lined_up(mtmp) && distmin(mtmp.mx, mtmp.my, mtmp.mux, mtmp.muy) <= ($c.andu64(gy.youmonst.data.mflags2, 134217728) !== 0 ? 20 : $c.div32(acurrstr(), 2) + 1 | 0) ? 1 : 0);
         if (appr[0] !== 1 || !in_line) {
             getitems = 1;
@@ -1281,14 +1281,14 @@ export async function m_move(mtmp, after) {   // monmove.c:1715
                     mtrk = $c.relem(mtmp.mtrack, 0);
                     for (j = 0; j < jcnt; mtrk = $c.radd(mtrk, 1), j = j + 1 | 0) {
                         if (nx === mtrk.x && ny === mtrk.y) {
-                            if (rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 1963, $c.lit("m_move")), rn2(Math.imul(4, cnt - j | 0))) : rn2(Math.imul(4, cnt - j | 0))) {
+                            if (rn2(Math.imul(4, cnt - j | 0))) {
                                 break nxti$;
                             }
                         }
                     }
                 }
                 nearer = (ndist = dist2($c.i16(nx), $c.i16(ny), ggx[0], ggy[0])) < nidist ? 1 : 0;
-                if (appr[0] === 1 && nearer || appr[0] === -1 && !nearer || !appr[0] && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 1970, $c.lit("m_move")), rn2(chcnt = $c.i16(chcnt + 1))) : rn2(chcnt = $c.i16(chcnt + 1))) || appr[0] === -2 && (ndist <= preferredrange_min[0] && !nearer || ndist >= preferredrange_max[0] && nearer) || mmoved[0] === 0) {
+                if (appr[0] === 1 && nearer || appr[0] === -1 && !nearer || !appr[0] && !rn2(chcnt = $c.i16(chcnt + 1)) || appr[0] === -2 && (ndist <= preferredrange_min[0] && !nearer || ndist >= preferredrange_max[0] && nearer) || mmoved[0] === 0) {
                     nix = $c.i16(nx);
                     niy = $c.i16(ny);
                     nidist = ndist;
@@ -1346,7 +1346,7 @@ export async function m_move(mtmp, after) {   // monmove.c:1715
         await maybe_unhide_at(mtmp.mx, mtmp.my);
         mon_track_add(mtmp, omx, omy);
     } else {
-        if (ptr.mlet === 21 /* S_UNICORN */ && $c.andu64(ptr.mflags2, 536870912) !== 0 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 2064, $c.lit("m_move")), rn2(2)) : rn2(2)) && !await tele_restrict(mtmp)) {
+        if (ptr.mlet === 21 /* S_UNICORN */ && $c.andu64(ptr.mflags2, 536870912) !== 0 && rn2(2) && !await tele_restrict(mtmp)) {
             await rloc(mtmp, 2);
             return 1;
         }
@@ -1368,7 +1368,7 @@ export async function m_move_aggress(mtmp, x, y) {   // monmove.c:2088
     if (mstatus & 4 || mtmp.mhp < 1) {
         return 2;
     }
-    if ((mstatus & 3) === 1 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 2104, $c.lit("m_move_aggress")), rn2(4)) : rn2(4)) && mtmp2.movement > (rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 2104, $c.lit("m_move_aggress")), rn2(12)) : rn2(12))) {
+    if ((mstatus & 3) === 1 && rn2(4) && mtmp2.movement > rn2(12)) {
         if (mtmp2.movement > 12) {
             mtmp2.movement = $c.i16(mtmp2.movement - 12 | 0);
         } else {
@@ -1448,7 +1448,7 @@ export function set_apparxy(mtmp) {   // monmove.c:2198
         mtmp.muy = u.uy;
         return;
     }
-    gotu = $c.i8(notseen ? !(rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 2239, $c.lit("set_apparxy")), rn2(3)) : rn2(3)) ? 1 : 0 : notthere ? !(rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 2239, $c.lit("set_apparxy")), rn2(4)) : rn2(4)) ? 1 : 0 : 0);
+    gotu = $c.i8(notseen ? !rn2(3) ? 1 : 0 : notthere ? !rn2(4) ? 1 : 0 : 0);
     if (!gotu) {
         try_cnt = 0;
         do {
@@ -1457,8 +1457,8 @@ export function set_apparxy(mtmp) {   // monmove.c:2198
                 my = u.uy;
                 break;
             }
-            mx = $c.i16((u.ux - displ | 0) + (rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 2250, $c.lit("set_apparxy")), rn2(Math.imul(2, displ) + 1 | 0)) : rn2(Math.imul(2, displ) + 1 | 0)) | 0);
-            my = $c.i16((u.uy - displ | 0) + (rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 2251, $c.lit("set_apparxy")), rn2(Math.imul(2, displ) + 1 | 0)) : rn2(Math.imul(2, displ) + 1 | 0)) | 0);
+            mx = $c.i16((u.ux - displ | 0) + rn2(Math.imul(2, displ) + 1 | 0) | 0);
+            my = $c.i16((u.uy - displ | 0) + rn2(Math.imul(2, displ) + 1 | 0) | 0);
         } while (!isok(mx, my) || displ !== 2 && mx === mtmp.mx && my === mtmp.my || (mx !== u.ux || my !== u.uy) && !($c.andu64(mtmp.data.mflags1, 8) !== 0) && !(accessible(mx, my) || closed_door(mx, my) && (can_ooze(mtmp) || can_fog(mtmp))) || !((gv.viz_array.get(my).get(mx) & 1) !== 0));
     } else {
         mx = u.ux;
@@ -1472,13 +1472,13 @@ export function undesirable_disp(mtmp, x, y) {   // monmove.c:2277
     is_pet = $c.i8(mtmp.mtame && !mtmp.isminion ? 1 : 0);
     trap = t_at(x, y);
     if (is_pet) {
-        if (trap && trap.tseen | 0 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 2287, $c.lit("undesirable_disp")), rn2(40)) : rn2(40))) {
+        if (trap && trap.tseen | 0 && rn2(40)) {
             return 1;
         }
         if (cursed_object_at(x, y)) {
             return 1;
         }
-    } else if (trap && (rng_log_enabled() ? (rng_log_set_caller($c.lit("monmove.c"), 2294, $c.lit("undesirable_disp")), rn2(40)) : rn2(40)) && mon_knows_traps(mtmp, trap.ttyp | 0)) {
+    } else if (trap && rn2(40) && mon_knows_traps(mtmp, trap.ttyp | 0)) {
         return 1;
     }
     if (!accessible(x, y) && !(is_pool(x, y) && is_pool(mtmp.mx, mtmp.my))) {

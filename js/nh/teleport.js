@@ -37,7 +37,7 @@ import { make_blinded, make_confused, make_stunned } from './potion.js';
 import { inhistemple } from './priest.js';
 import { learnscroll } from './read.js';
 import { in_out_region, update_monster_region, update_player_regions } from './region.js';
-import { rn2, rnd, rng_log_enabled, rng_log_set_caller, rnl } from './rnd.js';
+import { rn2, rnd, rnl } from './rnd.js';
 import { genders } from './role.js';
 import { addtobill, costly_adjacent, costly_spot, find_objowner, inhishop, make_angry_shk, onshopbill, stolen_value, subfrombill, u_left_shop } from './shk.js';
 import { yelp } from './sounds.js';
@@ -123,7 +123,7 @@ export function goodpos(x, y, mtmp, gpflags) {   // teleport.c:86
             } else {
                 return $c.i8($c.andu64(mdat.mflags1, 2) !== 0 || !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) && !is_waterwall(x, y) && m_in_air(mtmp) ? 1 : 0);
             }
-        } else if (mdat.mlet === 57 /* S_EEL */ && (rng_log_enabled() ? (rng_log_set_caller($c.lit("teleport.c"), 148, $c.lit("goodpos")), rn2(13)) : rn2(13)) && !ignorewater) {
+        } else if (mdat.mlet === 57 /* S_EEL */ && rn2(13) && !ignorewater) {
             return 0;
         } else if (is_lava(x, y) && !ignorelava) {
             if ($c.peq(mdat, $c.relem(mons, 28 /* PM_FLOATING_EYE */))) {
@@ -393,7 +393,7 @@ export async function collect_coords(ccc, cx, cy, maxradius, cc_flags, filter) {
         }
         if (scramble && passend) {
             while (n > 1) {
-                k = rng_log_enabled() ? (rng_log_set_caller($c.lit("teleport.c"), 700, $c.lit("collect_coords")), rn2(n)) : rn2(n);
+                k = rn2(n);
                 if (k) {
                     cc.$copyFrom($c.radd(passcc, 0));
                     $c.radd(passcc, 0).$copyFrom($c.radd(passcc, k));
@@ -416,8 +416,8 @@ export async function collect_coords(ccc, cx, cy, maxradius, cc_flags, filter) {
 export async function safe_teleds(teleds_flags) {   // teleport.c:717
     let nux = 0, nuy = 0, cc_flags = 0, candy = $c.recArray($T.nhcoord, 1659), backupspot = new $T.nhcoord(), tcnt = 0, candycount = 0, $t1;
     for (tcnt = 0; tcnt < 40; tcnt = tcnt + 1 | 0) {
-        nux = $c.i16(rng_log_enabled() ? (rng_log_set_caller($c.lit("teleport.c"), 737, $c.lit("safe_teleds")), rnd(79)) : rnd(79));
-        nuy = $c.i16(rng_log_enabled() ? (rng_log_set_caller($c.lit("teleport.c"), 738, $c.lit("safe_teleds")), rn2(21)) : rn2(21));
+        nux = $c.i16(rnd(79));
+        nuy = $c.i16(rn2(21));
         if (await teleok(nux, nuy, 0)) {
             await teleds(nux, nuy, teleds_flags);
             return 1;
@@ -502,14 +502,14 @@ export async function tele_to_rnd_pet() {   // teleport.c:814
     for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
         if (!(mtmp.mhp < 1) && mtmp.mtame && !(mtmp.mstate !== 0)) {
             cnt = cnt + 1 | 0;
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("teleport.c"), 828, $c.lit("tele_to_rnd_pet")), rn2(cnt)) : rn2(cnt))) {
+            if (!rn2(cnt)) {
                 pet = mtmp;
             }
         }
     }
     if (pet && !(dist2(pet.mx, pet.my, u.ux, u.uy) <= 2)) {
-        tx = $c.i16((pet.mx + (rng_log_enabled() ? (rng_log_set_caller($c.lit("teleport.c"), 832, $c.lit("tele_to_rnd_pet")), rn2(3)) : rn2(3)) | 0) - 1 | 0);
-        ty = $c.i16((pet.my + (rng_log_enabled() ? (rng_log_set_caller($c.lit("teleport.c"), 833, $c.lit("tele_to_rnd_pet")), rn2(3)) : rn2(3)) | 0) - 1 | 0);
+        tx = $c.i16((pet.mx + rn2(3) | 0) - 1 | 0);
+        ty = $c.i16((pet.my + rn2(3) | 0) - 1 | 0);
         if (isok(tx, ty) && await teleok(tx, ty, 0)) {
             await teleds(tx, ty, 2);
         }
@@ -530,7 +530,7 @@ export async function scrolltele(scroll) {   // teleport.c:849
     if (!(u.uprops[15 /* BLINDED */].intrinsic && !u.uprops[15 /* BLINDED */].blocked)) {
         await make_blinded(0, 0);
     }
-    if ((u.uhave.amulet | 0 || On_W_tower_level(u.uz)) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("teleport.c"), 865, $c.lit("scrolltele")), rn2(3)) : rn2(3))) {
+    if ((u.uhave.amulet | 0 || On_W_tower_level(u.uz)) && !rn2(3)) {
         await You_feel($c.lit("disoriented for a moment."));
         if (!flags.debug || await yn_function($c.lit("Override?"), new $c.Ptr(ynchars, 0), 110, 1) !== 121) {
             return;
@@ -730,9 +730,9 @@ export async function level_tele() {   // teleport.c:1165
             force_dest = 0;
             if (iflags.debug_fuzzer) {
                 do {
-                    $t1 = $c.i16(rng_log_enabled() ? (rng_log_set_caller($c.lit("teleport.c"), 1176, $c.lit("level_tele")), rn2(svn.n_dgns)) : rn2(svn.n_dgns)), newlevel.dnum = $t1;
+                    $t1 = $c.i16(rn2(svn.n_dgns)), newlevel.dnum = $t1;
                 } while (newlevel.dnum === svd.dungeon_topology.d_astral_level.dnum || svd.dungeons[newlevel.dnum].flags.unconnected | 0 || !svd.dungeons[newlevel.dnum].num_dunlevs);
-                $t2 = $c.i16(1 + (rng_log_enabled() ? (rng_log_set_caller($c.lit("teleport.c"), 1180, $c.lit("level_tele")), rn2(dunlevs_in_dungeon(newlevel))) : rn2(dunlevs_in_dungeon(newlevel))) | 0), newlevel.dlevel = $t2;
+                $t2 = $c.i16(1 + rn2(dunlevs_in_dungeon(newlevel)) | 0), newlevel.dlevel = $t2;
                 assign_level(u.ucamefrom, u.uz);
                 await schedule_goto(newlevel, 0 /* UTOTYPE_NONE */, null, null);
                 return;
@@ -766,7 +766,7 @@ export async function level_tele() {   // teleport.c:1165
                             await getlin(new $c.Ptr(qbuf, 0), new $c.Ptr(buf, 0));
                             if (!$c.strcmp(new $c.Ptr(buf, 0), $c.lit("*"))) {
                                 $goto = "random_levtport"; continue D1;
-                            } else if (u.uprops[14 /* CONFUSION */].intrinsic && (rng_log_enabled() ? (rng_log_set_caller($c.lit("teleport.c"), 1215, $c.lit("level_tele")), rnl(5)) : rnl(5))) {
+                            } else if (u.uprops[14 /* CONFUSION */].intrinsic && rnl(5)) {
                                 await pline($c.lit("Oops..."));
                                 $goto = "random_levtport"; continue D1;
                             } else if (!$c.strcmp(new $c.Ptr(buf, 0), $c.lit("\x1b"))) {
@@ -1183,8 +1183,8 @@ export async function rloc(mtmp, rlocflags) {   // teleport.c:1799
             }
         }
         for (trycount = 0; trycount < 50; trycount = trycount + 1 | 0) {
-            x = $c.i16(rng_log_enabled() ? (rng_log_set_caller($c.lit("teleport.c"), 1850, $c.lit("rloc")), rnd(79)) : rnd(79));
-            y = $c.i16(rng_log_enabled() ? (rng_log_set_caller($c.lit("teleport.c"), 1851, $c.lit("rloc")), rn2(21)) : rn2(21));
+            x = $c.i16(rnd(79));
+            y = $c.i16(rn2(21));
             if (rloc_pos_ok(x, y, mtmp)) {
                 break found_xy$;
             }
@@ -1196,7 +1196,7 @@ export async function rloc(mtmp, rlocflags) {   // teleport.c:1799
         candycount = await collect_coords($c.relem(candy, 0), 40, 10, 0, cc_flags, null);
         $t1 = backupcc.y = 0, backupcc.x = $t1;
         for (i = 0; i < candycount; i = i + 1 | 0) {
-            if ((j = rng_log_enabled() ? (rng_log_set_caller($c.lit("teleport.c"), 1868, $c.lit("rloc")), rn2(candycount - i | 0)) : rn2(candycount - i | 0)) > 0) {
+            if ((j = rn2(candycount - i | 0)) > 0) {
                 cc.$copyFrom(candy[i]);
                 candy[i].$copyFrom(candy[i + j | 0]);
                 candy[i + j | 0].$copyFrom(cc);
@@ -1312,7 +1312,7 @@ export async function mlevel_tele_trap(mtmp, trap, force_it, in_sight) {   // te
                 clamp_hole_destination(tolevel);
             }
         } else if (tt === 17 /* MAGIC_PORTAL */) {
-            if (u.uz.dnum === svd.dungeon_topology.d_astral_level.dnum && (mon_has_amulet(mtmp) || is_home_elemental(mtmp.data) || (rng_log_enabled() ? (rng_log_set_caller($c.lit("teleport.c"), 2036, $c.lit("mlevel_tele_trap")), rn2(7)) : rn2(7)))) {
+            if (u.uz.dnum === svd.dungeon_topology.d_astral_level.dnum && (mon_has_amulet(mtmp) || is_home_elemental(mtmp.data) || rn2(7))) {
                 if (in_sight && mtmp.data.mlet !== 31 /* S_ELEMENTAL */) {
                     await pline_mon(mtmp, $c.lit("%s seems to shimmer for a moment."), await Monnam(mtmp));
                     await seetrap(trap);
@@ -1372,8 +1372,8 @@ export async function rloco(obj) {   // teleport.c:2102
     oty = obj.oy;
     restricted_fall = $c.i8(otx === 0 && svd.dndest.lx ? 1 : 0);
     do {
-        tx = $c.i16((rng_log_enabled() ? (rng_log_set_caller($c.lit("teleport.c"), 2118, $c.lit("rloco")), rn2(77)) : rn2(77)) + 2 | 0);
-        ty = $c.i16(rng_log_enabled() ? (rng_log_set_caller($c.lit("teleport.c"), 2119, $c.lit("rloco")), rn2(21)) : rn2(21));
+        tx = $c.i16(rn2(77) + 2 | 0);
+        ty = $c.i16(rn2(21));
         if (!(try_limit = try_limit - 1 | 0)) {
             break;
         }
@@ -1413,7 +1413,7 @@ export async function rloco(obj) {   // teleport.c:2102
 export function random_teleport_level() {   // teleport.c:2191
     let nlev = 0, max_depth = 0, min_depth = 0, cur_depth = 0, bottom = 0, qlocate_depth = 0;
     cur_depth = depth(u.uz);
-    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("teleport.c"), 2196, $c.lit("random_teleport_level")), rn2(5)) : rn2(5)) || single_level_branch(u.uz) || u.uz.dnum === svd.dungeon_topology.d_astral_level.dnum) {
+    if (!rn2(5) || single_level_branch(u.uz) || u.uz.dnum === svd.dungeon_topology.d_astral_level.dnum) {
         return cur_depth;
     }
     if (In_quest(u.uz)) {
@@ -1431,20 +1431,20 @@ export function random_teleport_level() {   // teleport.c:2191
             max_depth = max_depth - 1 | 0;
         }
     }
-    nlev = (rng_log_enabled() ? (rng_log_set_caller($c.lit("teleport.c"), 2239, $c.lit("random_teleport_level")), rn2((cur_depth + 3 | 0) - min_depth | 0)) : rn2((cur_depth + 3 | 0) - min_depth | 0)) + min_depth | 0;
+    nlev = rn2((cur_depth + 3 | 0) - min_depth | 0) + min_depth | 0;
     if (nlev >= cur_depth) {
         nlev = nlev + 1 | 0;
     }
     if (nlev > max_depth) {
         nlev = max_depth;
         if (Is_botlevel(u.uz)) {
-            nlev = nlev - (rng_log_enabled() ? (rng_log_set_caller($c.lit("teleport.c"), 2247, $c.lit("random_teleport_level")), rnd(3)) : rnd(3)) | 0;
+            nlev = nlev - rnd(3) | 0;
         }
     }
     if (nlev < min_depth) {
         nlev = min_depth;
         if (nlev === cur_depth) {
-            nlev = nlev + (rng_log_enabled() ? (rng_log_set_caller($c.lit("teleport.c"), 2252, $c.lit("random_teleport_level")), rnd(3)) : rnd(3)) | 0;
+            nlev = nlev + rnd(3) | 0;
             if (nlev > max_depth) {
                 nlev = max_depth;
             }
@@ -1472,7 +1472,7 @@ export async function u_teleport_mon(mtmp, give_feedback) {   // teleport.c:2263
         if (!await rloc(mtmp, 2)) {
             await m_into_limbo(mtmp);
         }
-    } else if (($c.peq(mtmp.data, $c.relem(mons, 311 /* PM_DEATH */)) || $c.peq(mtmp.data, $c.relem(mons, 313 /* PM_FAMINE */)) || $c.peq(mtmp.data, $c.relem(mons, 312 /* PM_PESTILENCE */)) || $c.andu64(mtmp.data.mflags1, 67108864) !== 0) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("teleport.c"), 2285, $c.lit("u_teleport_mon")), rn2(13)) : rn2(13)) && await enexto(cc, u.ux, u.uy, mtmp.data)) {
+    } else if (($c.peq(mtmp.data, $c.relem(mons, 311 /* PM_DEATH */)) || $c.peq(mtmp.data, $c.relem(mons, 313 /* PM_FAMINE */)) || $c.peq(mtmp.data, $c.relem(mons, 312 /* PM_PESTILENCE */)) || $c.andu64(mtmp.data.mflags1, 67108864) !== 0) && rn2(13) && await enexto(cc, u.ux, u.uy, mtmp.data)) {
         await rloc_to(mtmp, cc.x, cc.y);
     } else {
         if (!await rloc(mtmp, 2)) {

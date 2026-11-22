@@ -56,7 +56,7 @@ import { leaddead, nemdead, nemesis_stinks } from './quest.js';
 import { quest_info, stinky_nemesis } from './questpgr.js';
 import { unpunish } from './read.js';
 import { create_gas_cloud, visible_region_at } from './region.js';
-import { d, rn2, rn2_on_display_rng, rnd, rng_log_enabled, rng_log_set_caller, rnl } from './rnd.js';
+import { d, rn2, rn2_on_display_rng, rnd, rnl } from './rnd.js';
 import { genders } from './role.js';
 import { hot_pursuit, inhishop, replshk, shkgone } from './shk.js';
 import { neweshk, shtypes } from './shknam.js';
@@ -449,7 +449,7 @@ async function make_corpse(mtmp, corpseflags) {   // mon.c:564
             case 150 /* PM_BLUE_DRAGON */:
             case 151 /* PM_GREEN_DRAGON */:
             case 152 /* PM_YELLOW_DRAGON */:
-                if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 597, $c.lit("make_corpse")), rn2(mtmp.mrevived | 0 ? 20 : 3)) : rn2(mtmp.mrevived | 0 ? 20 : 3))) {
+                if (!rn2(mtmp.mrevived | 0 ? 20 : 3)) {
                     num = (111 /* GRAY_DRAGON_SCALES */ + mdat.pmidx | 0) - 143 /* PM_GRAY_DRAGON */ | 0;
                     obj[0] = await mksobj_at(num, x, y, 0, 0);
                     obj[0].spe = 0;
@@ -459,7 +459,7 @@ async function make_corpse(mtmp, corpseflags) {   // mon.c:564
             case 101 /* PM_WHITE_UNICORN */:
             case 102 /* PM_GRAY_UNICORN */:
             case 103 /* PM_BLACK_UNICORN */:
-                if (mtmp.mrevived | 0 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 607, $c.lit("make_corpse")), rn2(2)) : rn2(2))) {
+                if (mtmp.mrevived | 0 && rn2(2)) {
                     if (canseemon(mtmp)) {
                         await pline_mon(mtmp, $c.lit("%s recently regrown horn crumbles to dust."), s_suffix(await Monnam(mtmp)));
                     }
@@ -502,22 +502,22 @@ async function make_corpse(mtmp, corpseflags) {   // mon.c:564
                 obj[0].age = $c.sub64(obj[0].age, 51);
                 break;
             case 259 /* PM_IRON_GOLEM */:
-                num = rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 651, $c.lit("make_corpse")), d(2, 6)) : d(2, 6);
+                num = d(2, 6);
                 while ($t2 = num, num = $t2 - 1 | 0, $t2) {
                     obj[0] = await mksobj_at(478 /* IRON_CHAIN */, x, y, 1, 0);
                 }
                 free_mgivenname(mtmp);
                 break;
             case 258 /* PM_GLASS_GOLEM */:
-                num = rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 657, $c.lit("make_corpse")), d(2, 4)) : d(2, 4);
+                num = d(2, 4);
                 while ($t3 = num, num = $t3 - 1 | 0, $t3) {
-                    obj[0] = await mksobj_at(461 /* FIRST_GLASS_GEM */ + (rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 659, $c.lit("make_corpse")), rn2(9 /* NUM_GLASS_GEMS */)) : rn2(9 /* NUM_GLASS_GEMS */)) | 0, x, y, 1, 0);
+                    obj[0] = await mksobj_at(461 /* FIRST_GLASS_GEM */ + rn2(9 /* NUM_GLASS_GEMS */) | 0, x, y, 1, 0);
                 }
                 free_mgivenname(mtmp);
                 break;
             case 256 /* PM_CLAY_GOLEM */:
                 obj[0] = await mksobj_at(474 /* ROCK */, x, y, 0, 0);
-                $t4 = (rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 665, $c.lit("make_corpse")), rn2(20)) : rn2(20)) + 50 | 0, obj[0].quan = $t4;
+                $t4 = rn2(20) + 50 | 0, obj[0].quan = $t4;
                 $t5 = await weight(obj[0]) >>> 0, obj[0].owt = $t5;
                 free_mgivenname(mtmp);
                 break;
@@ -526,32 +526,32 @@ async function make_corpse(mtmp, corpseflags) {   // mon.c:564
                 obj[0] = await mkcorpstat(476 /* STATUE */, null, mdat, x, y, corpstatflags);
                 break;
             case 254 /* PM_WOOD_GOLEM */:
-                num = rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 675, $c.lit("make_corpse")), d(2, 4)) : d(2, 4);
+                num = d(2, 4);
                 while ($t6 = num, num = $t6 - 1 | 0, $t6) {
-                    obj[0] = await mksobj_at((rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 678, $c.lit("make_corpse")), rn2(2)) : rn2(2)) ? 79 /* QUARTERSTAFF */ : (rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 679, $c.lit("make_corpse")), rn2(3)) : rn2(3)) ? 150 /* SMALL_SHIELD */ : (rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 680, $c.lit("make_corpse")), rn2(3)) : rn2(3)) ? 77 /* CLUB */ : (rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 681, $c.lit("make_corpse")), rn2(3)) : rn2(3)) ? 28 /* ELVEN_SPEAR */ : 26 /* BOOMERANG */, x, y, 1, 0);
+                    obj[0] = await mksobj_at(rn2(2) ? 79 /* QUARTERSTAFF */ : rn2(3) ? 150 /* SMALL_SHIELD */ : rn2(3) ? 77 /* CLUB */ : rn2(3) ? 28 /* ELVEN_SPEAR */ : 26 /* BOOMERANG */, x, y, 1, 0);
                 }
                 free_mgivenname(mtmp);
                 break;
             case 251 /* PM_ROPE_GOLEM */:
-                num = rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 687, $c.lit("make_corpse")), rn2(3)) : rn2(3);
+                num = rn2(3);
                 while (($t7 = num, num = $t7 - 1 | 0, $t7) > 0) {
-                    obj[0] = await mksobj_at((rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 689, $c.lit("make_corpse")), rn2(2)) : rn2(2)) ? 236 /* LEASH */ : (rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 690, $c.lit("make_corpse")), rn2(3)) : rn2(3)) ? 82 /* BULLWHIP */ : 260 /* GRAPPLING_HOOK */, x, y, 1, 0);
+                    obj[0] = await mksobj_at(rn2(2) ? 236 /* LEASH */ : rn2(3) ? 82 /* BULLWHIP */ : 260 /* GRAPPLING_HOOK */, x, y, 1, 0);
                 }
                 free_mgivenname(mtmp);
                 break;
             case 253 /* PM_LEATHER_GOLEM */:
-                num = rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 696, $c.lit("make_corpse")), d(2, 4)) : d(2, 4);
+                num = d(2, 4);
                 while ($t8 = num, num = $t8 - 1 | 0, $t8) {
-                    obj[0] = await mksobj_at((rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 698, $c.lit("make_corpse")), rn2(4)) : rn2(4)) ? 134 /* LEATHER_ARMOR */ : (rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 699, $c.lit("make_corpse")), rn2(3)) : rn2(3)) ? 145 /* LEATHER_CLOAK */ : 235 /* SADDLE */, x, y, 1, 0);
+                    obj[0] = await mksobj_at(rn2(4) ? 134 /* LEATHER_ARMOR */ : rn2(3) ? 145 /* LEATHER_CLOAK */ : 235 /* SADDLE */, x, y, 1, 0);
                 }
                 free_mgivenname(mtmp);
                 break;
             case 252 /* PM_GOLD_GOLEM */:
-                obj[0] = await mkgold(200 - (rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 705, $c.lit("make_corpse")), rnl(101)) : rnl(101)) | 0, x, y);
+                obj[0] = await mkgold(200 - rnl(101) | 0, x, y);
                 free_mgivenname(mtmp);
                 break;
             case 250 /* PM_PAPER_GOLEM */:
-                num = rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 709, $c.lit("make_corpse")), rnd(4)) : rnd(4);
+                num = rnd(4);
                 while ($t9 = num, num = $t9 - 1 | 0, $t9) {
                     obj[0] = await mksobj_at(365 /* SCR_BLANK_PAPER */, x, y, 1, 0);
                 }
@@ -626,7 +626,7 @@ async function minliquid_core(mtmp) {   // mon.c:961
     if ($c.peq(mtmp, u.usteed) && ((u.uprops[49 /* FLYING */].intrinsic || u.uprops[49 /* FLYING */].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, 1) !== 0) && !u.uprops[49 /* FLYING */].blocked || (u.uprops[48 /* LEVITATION */].intrinsic || u.uprops[48 /* LEVITATION */].extrinsic) && !u.uprops[48 /* LEVITATION */].blocked) && !waterwall) {
         return 0;
     }
-    if ($c.peq(mtmp.data, $c.relem(mons, 40 /* PM_GREMLIN */)) && (inpool || infountain) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 987, $c.lit("minliquid_core")), rn2(3)) : rn2(3))) {
+    if ($c.peq(mtmp.data, $c.relem(mons, 40 /* PM_GREMLIN */)) && (inpool || infountain) && rn2(3)) {
         if (await split_mon(mtmp, null)) {
             await dryup(mtmp.mx, mtmp.my, 0);
         }
@@ -634,8 +634,8 @@ async function minliquid_core(mtmp) {   // mon.c:961
             await water_damage_chain(mtmp.minvent, 0);
         }
         return 0;
-    } else if ($c.peq(mtmp.data, $c.relem(mons, 259 /* PM_IRON_GOLEM */)) && inpool && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 993, $c.lit("minliquid_core")), rn2(5)) : rn2(5))) {
-        dam = rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 994, $c.lit("minliquid_core")), d(2, 6)) : d(2, 6);
+    } else if ($c.peq(mtmp.data, $c.relem(mons, 259 /* PM_IRON_GOLEM */)) && inpool && !rn2(5)) {
+        dam = d(2, 6);
         if ((gv.viz_array.get(mtmp.my).get(mtmp.mx) & 2) !== 0) {
             await pline_mon(mtmp, $c.lit("%s rusts."), await Monnam(mtmp));
         }
@@ -730,7 +730,7 @@ async function minliquid_core(mtmp) {   // mon.c:961
         }
     } else {
         if (mtmp.data.mlet === 57 /* S_EEL */ && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) && !($c.andu64(mtmp.data.mflags1, 1024) !== 0)) {
-            if (mtmp.mhp > 1 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 1116, $c.lit("minliquid_core")), rn2(mtmp.mhp)) : rn2(mtmp.mhp)) > (rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 1116, $c.lit("minliquid_core")), rn2(8)) : rn2(8))) {
+            if (mtmp.mhp > 1 && rn2(mtmp.mhp) > rn2(8)) {
                 mtmp.mhp = mtmp.mhp - 1 | 0;
             }
             await monflee(mtmp, 2, 0, 0);
@@ -751,12 +751,12 @@ export function mcalcmove(mon, m_moving) {   // mon.c:1126
         mmove = $c.div32(Math.imul(4, mmove) + 2 | 0, 3);
     }
     if ($c.peq(mon, u.usteed) && u.ugallop && svc.context.mv) {
-        mmove = $c.div32(Math.imul((rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 1152, $c.lit("mcalcmove")), rn2(2)) : rn2(2)) ? 4 : 5, mmove), 3);
+        mmove = $c.div32(Math.imul(rn2(2) ? 4 : 5, mmove), 3);
     }
     if (m_moving) {
         mmove_adj = $c.rem32(mmove, 12);
         mmove = mmove - mmove_adj | 0;
-        if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 1164, $c.lit("mcalcmove")), rn2(12)) : rn2(12)) < mmove_adj) {
+        if (rn2(12) < mmove_adj) {
             mmove = mmove + 12 | 0;
         }
     }
@@ -846,7 +846,7 @@ export async function movemon_singlemon(mtmp) {   // mon.c:1214
         if (mtmp.mundetected) {
             return 0;
         }
-    } else if (mtmp.data.mlet === 57 /* S_EEL */ && !mtmp.mundetected && (mtmp.mflee | 0 || !(dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 2)) && !canseemon(mtmp) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 1297, $c.lit("movemon_singlemon")), rn2(4)) : rn2(4))) {
+    } else if (mtmp.data.mlet === 57 /* S_EEL */ && !mtmp.mundetected && (mtmp.mflee | 0 || !(dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 2)) && !canseemon(mtmp) && !rn2(4)) {
         if (await hideunder(mtmp)) {
             return 0;
         }
@@ -955,7 +955,7 @@ export async function m_consume_obj(mtmp, otmp) {   // mon.c:1392
             await quickmimic(mtmp);
         }
         if (otmp.otyp === 266 /* EGG */ && corpsenm === 11 /* PM_PYROLISK */) {
-            await explode(mtmp.mx, mtmp.my, -11, rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 1449, $c.lit("m_consume_obj")), d(3, 6)) : d(3, 6), 0, 5 /* EXPL_FIERY */);
+            await explode(mtmp.mx, mtmp.my, -11, d(3, 6), 0, 5 /* EXPL_FIERY */);
         }
         if (corpsenm !== -1 /* NON_PM */) {
             await mon_givit(mtmp, $c.relem(mons, corpsenm));
@@ -1004,7 +1004,7 @@ export async function meatmetal(mtmp) {   // mon.c:1463
                 if (mtmp.mhp < 1) {
                     return 2;
                 }
-                if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 1521, $c.lit("meatmetal")), rnd(25)) : rnd(25)) < 3) {
+                if (rnd(25) < 3) {
                     await mksobj_at(474 /* ROCK */, mtmp.mx, mtmp.my, 1, 0);
                 }
                 await newsym(mtmp.mx, mtmp.my);
@@ -1213,7 +1213,7 @@ export async function mpickstuff(mtmp) {   // mon.c:1847
     if (mtmp.isshk | 0 && inhishop(mtmp)) {
         return 0;
     }
-    if (!mtmp.mtame && in_rooms(mtmp.mx, mtmp.my, 14 /* SHOPBASE */).get(0) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 1857, $c.lit("mpickstuff")), rn2(25)) : rn2(25))) {
+    if (!mtmp.mtame && in_rooms(mtmp.mx, mtmp.my, 14 /* SHOPBASE */).get(0) && rn2(25)) {
         return 0;
     }
     if (!could_reach_item(mtmp, mtmp.mx, mtmp.my)) {
@@ -1311,7 +1311,7 @@ export async function can_carry(mtmp, otmp) {   // mon.c:1990
     if (!await can_touch_safely(mtmp, otmp)) {
         return 0;
     }
-    iquan = otmp.quan > 32767 ? 20000 + (rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 2005, $c.lit("can_carry")), rn2(12768)) : rn2(12768)) | 0 : $c.i32(otmp.quan);
+    iquan = otmp.quan > 32767 ? 20000 + rn2(12768) | 0 : $c.i32(otmp.quan);
     if (iquan > 1) {
         glomper = 0;
         if (mtmp.data.mlet === 30 /* S_DRAGON */ && (otmp.oclass === 12 /* COIN_CLASS */ || otmp.oclass === 13 /* GEM_CLASS */)) {
@@ -2064,7 +2064,7 @@ export async function mondead(mtmp) {   // mon.c:3081
         await You($c.lit("have a sad feeling for a moment, then it passes."));
     }
     if ($c.peq(mtmp.data, $c.relem(mons, 110 /* PM_STEAM_VORTEX */))) {
-        await create_gas_cloud(mtmp.mx, mtmp.my, (rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 3104, $c.lit("mondead")), rn2(10)) : rn2(10)) + 5 | 0, 0);
+        await create_gas_cloud(mtmp.mx, mtmp.my, rn2(10) + 5 | 0, 0);
     }
     if (mtmp.isgd | 0 && !await grddead(mtmp)) {
         return;
@@ -2092,7 +2092,7 @@ export async function mondead(mtmp) {   // mon.c:3081
     }
     if (mtmp.data.mlet === 37 /* S_KOP */) {
         stway = stairway_find_type_dir(0, 0);
-        switch (rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 3151, $c.lit("mondead")), rnd(5)) : rnd(5)) {
+        switch (rnd(5)) {
             case 1:
                 if (stway) {
                     await makemon(mtmp.data, stway.sx, stway.sy, 0);
@@ -2127,9 +2127,9 @@ export async function corpse_chance(mon, magr, was_swallowed) {   // mon.c:3181
     for (i = 0; i < 6; i = i + 1 | 0) {
         if (mdat.mattk[i].aatyp === 14) {
             if (mdat.mattk[i].damn) {
-                tmp = rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 3203, $c.lit("corpse_chance")), d(mdat.mattk[i].damn, mdat.mattk[i].damd)) : d(mdat.mattk[i].damn, mdat.mattk[i].damd);
+                tmp = d(mdat.mattk[i].damn, mdat.mattk[i].damd);
             } else if (mdat.mattk[i].damd) {
-                tmp = rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 3205, $c.lit("corpse_chance")), d(mdat.mlevel + 1 | 0, mdat.mattk[i].damd)) : d(mdat.mlevel + 1 | 0, mdat.mattk[i].damd);
+                tmp = d(mdat.mlevel + 1 | 0, mdat.mattk[i].damd);
             } else {
                 tmp = 0;
             }
@@ -2158,14 +2158,14 @@ export async function corpse_chance(mon, magr, was_swallowed) {   // mon.c:3181
             return 0;
         }
     }
-    if ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) || !svl.level.flags.deathdrops || svl.level.flags.graveyard | 0 && $c.andu64(mdat.mflags2, 2) !== 0 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 3241, $c.lit("corpse_chance")), rn2(3)) : rn2(3))) {
+    if ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) || !svl.level.flags.deathdrops || svl.level.flags.graveyard | 0 && $c.andu64(mdat.mflags2, 2) !== 0 && rn2(3)) {
         return 0;
     }
     if ((mdat.msize >= 3 || $c.peq(mdat, $c.relem(mons, 326 /* PM_LIZARD */))) && !mon.mcloned || mdat.mlet === 55 /* S_GOLEM */ || $c.pcmp(mdat, $c.relem(mons, 331 /* PM_ARCHEOLOGIST */)) >= 0 && $c.pcmp(mdat, $c.relem(mons, 343 /* PM_WIZARD */)) <= 0 || ($c.peq(mdat, $c.relem(mons, 311 /* PM_DEATH */)) || $c.peq(mdat, $c.relem(mons, 313 /* PM_FAMINE */)) || $c.peq(mdat, $c.relem(mons, 312 /* PM_PESTILENCE */))) || mon.isshk | 0) {
         return 1;
     }
     tmp = (2 + ((mdat.geno & 7) < 2 ? 1 : 0) | 0) + (mdat.msize < 1 ? 1 : 0) | 0;
-    return $c.i8(!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 3248, $c.lit("corpse_chance")), rn2(tmp)) : rn2(tmp)) ? 1 : 0);
+    return $c.i8(!rn2(tmp) ? 1 : 0);
 }
 export async function mondied(mdef) {   // mon.c:3253
     await mondead(mdef);
@@ -2200,7 +2200,7 @@ export async function monstone(mdef) {   // mon.c:3287
         return;
     }
     mdef.mtrapped = (0) & 1;
-    if (mdef.data.msize > 0 || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 3310, $c.lit("monstone")), rn2(2 + ((mdef.data.geno & 7) > 2 ? 1 : 0) | 0)) : rn2(2 + ((mdef.data.geno & 7) > 2 ? 1 : 0) | 0))) {
+    if (mdef.data.msize > 0 || !rn2(2 + ((mdef.data.geno & 7) > 2 ? 1 : 0) | 0)) {
         corpstatflags = 0;
         oldminvent = null;
         while ((obj = mdef.minvent) !== null) {
@@ -2312,7 +2312,7 @@ export async function unstuck(mtmp) {   // mon.c:3438
             await docrt();
         }
         if (!mtmp.mspec_used && (dmgtype(ptr, 19) || attacktype(ptr, 11) || attacktype(ptr, 7))) {
-            $t1 = rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 3465, $c.lit("unstuck")), rnd(2)) : rnd(2), mtmp.mspec_used = $t1;
+            $t1 = rnd(2), mtmp.mspec_used = $t1;
         }
     }
 }
@@ -2381,14 +2381,14 @@ export async function xkilled(mtmp, xkill_flags) {   // mon.c:3477
             gs.stoned = 0;
             break cleanup$;
         }
-        if (nocorpse || ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) || !svl.level.flags.deathdrops || svl.level.flags.graveyard | 0 && $c.andu64(mdat.mflags2, 2) !== 0 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 3574, $c.lit("xkilled")), rn2(3)) : rn2(3)))) {
+        if (nocorpse || ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) || !svl.level.flags.deathdrops || svl.level.flags.graveyard | 0 && $c.andu64(mdat.mflags2, 2) !== 0 && rn2(3))) {
             break cleanup$;
         }
         if ($c.peq(mdat, $c.relem(mons, 314 /* PM_MAIL_DAEMON */))) {
             await stackobj(await mksobj_at(364 /* SCR_MAIL */, x, y, 0, 0));
         }
         if (accessible(x, y) || is_pool(x, y)) {
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 3587, $c.lit("xkilled")), rn2(6)) : rn2(6)) && !(svm.mvitals[mndx].mvflags & 16) && (x !== u.ux || y !== u.uy) && mdat.mlet !== 37 /* S_KOP */ && !mtmp.mcloned) {
+            if (!rn2(6) && !(svm.mvitals[mndx].mvflags & 16) && (x !== u.ux || y !== u.uy) && mdat.mlet !== 37 /* S_KOP */ && !mtmp.mcloned) {
                 otmp = await mkobj(0 /* RANDOM_CLASS */, 1);
                 otyp = otmp.otyp;
                 if (otmp.oclass === 7 /* FOOD_CLASS */ && !$c.andu64(mdat.mflags2, 1073741824) && !otmp.oartifact) {
@@ -2430,7 +2430,7 @@ export async function xkilled(mtmp, xkill_flags) {   // mon.c:3477
             await see_monsters();
         }
     }
-    if (mtmp.mpeaceful | 0 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 3664, $c.lit("xkilled")), rn2(2)) : rn2(2)) || mtmp.mtame) {
+    if (mtmp.mpeaceful | 0 && !rn2(2) || mtmp.mtame) {
         change_luck(-1);
     }
     if (mdat.mlet === 21 /* S_UNICORN */ && $c.andu64(mdat.mflags2, 536870912) !== 0 && sgn(u.ualign.type) === sgn(mdat.maligntyp)) {
@@ -2577,7 +2577,7 @@ export async function elemental_clog(mon) {   // mon.c:3878
     if (u.uz.dnum === svd.dungeon_topology.d_astral_level.dnum) {
         m1 = m2 = m3 = m4 = m5 = zm = null;
         if (!elemental_clog$msgmv || $c.sub64(svm.moves, elemental_clog$msgmv) > 200) {
-            if (!elemental_clog$msgmv || (rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 3887, $c.lit("elemental_clog")), rn2(2)) : rn2(2))) {
+            if (!elemental_clog$msgmv || rn2(2)) {
                 await You_feel($c.lit("besieged."));
             }
             elemental_clog$msgmv = svm.moves;
@@ -2729,8 +2729,8 @@ async function m_respond_shrieker(mtmp) {   // mon.c:4089
         await pline($c.lit("%s shrieks."), await Monnam(mtmp));
         await stop_occupation();
     }
-    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 4095, $c.lit("m_respond_shrieker")), rn2(10)) : rn2(10))) {
-        await makemon((rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 4098, $c.lit("m_respond_shrieker")), rn2(13)) : rn2(13)) ? null : $c.relem(mons, mons[115 /* PM_PURPLE_WORM */].difficulty > $c.div32(await level_difficulty() + u.ulevel | 0, 2) ? 113 /* PM_BABY_PURPLE_WORM */ : 115 /* PM_PURPLE_WORM */), 0, 0, 0);
+    if (!rn2(10)) {
+        await makemon(rn2(13) ? null : $c.relem(mons, mons[115 /* PM_PURPLE_WORM */].difficulty > $c.div32(await level_difficulty() + u.ulevel | 0, 2) ? 113 /* PM_BABY_PURPLE_WORM */ : 115 /* PM_PURPLE_WORM */), 0, 0, 0);
     }
     await aggravate();
 }
@@ -2796,7 +2796,7 @@ async function peacefuls_respond(mtmp) {   // mon.c:4163
                     await verbalize($c.lit("Halt!  You're under arrest!"));
                     await angry_guards($c.i8(!!(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf) ? 1 : 0));
                 } else {
-                    if (!(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 4187, $c.lit("peacefuls_respond")), rn2(5)) : rn2(5))) {
+                    if (!(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf) && !rn2(5)) {
                         gasp = maybe_gasp(mon);
                         if (gasp) {
                             if (!strncmpi(gasp, $c.lit("gasp"), 4)) {
@@ -2814,9 +2814,9 @@ async function peacefuls_respond(mtmp) {   // mon.c:4163
                         }
                         continue;
                     }
-                    if (mon.data.mlevel < (rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 4213, $c.lit("peacefuls_respond")), rn2(10)) : rn2(10)) && !$c.peq(mon.data, $c.relem(mons, gu.urole.guardnum))) {
+                    if (mon.data.mlevel < rn2(10) && !$c.peq(mon.data, $c.relem(mons, gu.urole.guardnum))) {
                         alreadyfleeing = $c.i8(mon.mflee | 0 || mon.mfleetim | 0 ? 1 : 0);
-                        await monflee(mon, (rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 4217, $c.lit("peacefuls_respond")), rn2(50)) : rn2(50)) + 25 | 0, 1, $c.i8(!exclaimed ? 1 : 0));
+                        await monflee(mon, rn2(50) + 25 | 0, 1, $c.i8(!exclaimed ? 1 : 0));
                         if (exclaimed) {
                             if (flags.verbose && !alreadyfleeing) {
                                 $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit(" and then turns to flee."), 256);
@@ -2839,14 +2839,14 @@ async function peacefuls_respond(mtmp) {   // mon.c:4163
                         }
                     }
                 }
-            } else if (mon.data.mlet === mtmp.data.mlet && big_little_match(mndx, mon.data.pmidx) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 4241, $c.lit("peacefuls_respond")), rn2(3)) : rn2(3))) {
-                if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 4242, $c.lit("peacefuls_respond")), rn2(4)) : rn2(4))) {
+            } else if (mon.data.mlet === mtmp.data.mlet && big_little_match(mndx, mon.data.pmidx) && !rn2(3)) {
+                if (!rn2(4)) {
                     await growl(mon);
                     exclaimed = $c.i8(iflags.last_msg === 9 /* PLNMSG_GROWL */ ? 1 : 0);
                 }
-                if (rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 4246, $c.lit("peacefuls_respond")), rn2(6)) : rn2(6)) {
+                if (rn2(6)) {
                     alreadyfleeing = $c.i8(mon.mflee | 0 || mon.mfleetim | 0 ? 1 : 0);
-                    await monflee(mon, (rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 4248, $c.lit("peacefuls_respond")), rn2(25)) : rn2(25)) + 15 | 0, 1, $c.i8(!exclaimed ? 1 : 0));
+                    await monflee(mon, rn2(25) + 15 | 0, 1, $c.i8(!exclaimed ? 1 : 0));
                     if (exclaimed && !alreadyfleeing) {
                         await pline($c.lit("And then starts to flee."));
                     }
@@ -2858,7 +2858,7 @@ async function peacefuls_respond(mtmp) {   // mon.c:4163
 export async function setmangry(mtmp, via_attack) {   // mon.c:4265
     if (via_attack && sengr_at($c.lit("Elbereth"), u.ux, u.uy, 1) && (onscary(u.ux, u.uy, mtmp) || mtmp.mpeaceful | 0)) {
         await You_feel($c.lit("like a hypocrite."));
-        adjalign(u.ualign.record > 5 ? -5 : -(rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 4280, $c.lit("setmangry")), rnd(5)) : rnd(5)) | 0);
+        adjalign(u.ualign.record > 5 ? -5 : -rnd(5) | 0);
         if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
             await pline($c.lit("The engraving beneath you fades."));
         }
@@ -3114,7 +3114,7 @@ export async function restore_cham(mon) {   // mon.c:4649
 }
 async function restrap(mtmp) {   // mon.c:4662
     let t = null;
-    if (mtmp.mcan | 0 || mtmp.m_ap_type & 7 || (gv.viz_array.get(mtmp.my).get(mtmp.mx) & 2) !== 0 || (rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 4667, $c.lit("restrap")), rn2(3)) : rn2(3)) || $c.peq(mtmp, u.ustuck) || mtmp.mtrapped | 0 && (t = t_at(mtmp.mx, mtmp.my)) !== null && !((t.ttyp | 0) === 11 /* PIT */ || (t.ttyp | 0) === 12 /* SPIKED_PIT */) || $c.andu64(mtmp.data.mflags1, 256) !== 0 && ($c.andu64(mtmp.data.mflags1, 16) !== 0 && mtmp.data.mlet !== 13 /* S_MIMIC */ || $c.andu64(mtmp.data.mflags1, 1) !== 0) && !has_ceiling(u.uz) || sensemon(mtmp) && dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 2) {
+    if (mtmp.mcan | 0 || mtmp.m_ap_type & 7 || (gv.viz_array.get(mtmp.my).get(mtmp.mx) & 2) !== 0 || rn2(3) || $c.peq(mtmp, u.ustuck) || mtmp.mtrapped | 0 && (t = t_at(mtmp.mx, mtmp.my)) !== null && !((t.ttyp | 0) === 11 /* PIT */ || (t.ttyp | 0) === 12 /* SPIKED_PIT */) || $c.andu64(mtmp.data.mflags1, 256) !== 0 && ($c.andu64(mtmp.data.mflags1, 16) !== 0 && mtmp.data.mlet !== 13 /* S_MIMIC */ || $c.andu64(mtmp.data.mflags1, 1) !== 0) && !has_ceiling(u.uz) || sensemon(mtmp) && dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 2) {
         return 0;
     }
     if (mtmp.data.mlet === 13 /* S_MIMIC */) {
@@ -3246,9 +3246,9 @@ async function pick_animal() {   // mon.c:4855
         await mon_animal_list(1);
     }
     (!(ga.animal_list !== null) ? 1 : 0) ? $c.__assert_rtn($c.lit("pick_animal"), $c.lit("mon.c"), 4861, $c.lit("ga.animal_list != 0")) : 0;
-    res = ga.animal_list.get(rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 4862, $c.lit("pick_animal")), rn2(ga.animal_list_count)) : rn2(ga.animal_list_count));
+    res = ga.animal_list.get(rn2(ga.animal_list_count));
     if ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) && !$c.isupper(def_monsyms[$c.relem(mons, res).mlet].sym)) {
-        res = ga.animal_list.get(rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 4867, $c.lit("pick_animal")), rn2(ga.animal_list_count)) : rn2(ga.animal_list_count));
+        res = ga.animal_list.get(rn2(ga.animal_list_count));
     }
     return res;
 }
@@ -3258,16 +3258,16 @@ export async function decide_to_shapeshift(mon) {   // mon.c:4872
     was_female = mon.female;
     dochng = 0;
     if (!(mon.cham === 226 /* PM_VAMPIRE */ || mon.cham === 227 /* PM_VAMPIRE_LEADER */ || mon.cham === 228 /* PM_VLAD_THE_IMPALER */)) {
-        if (!mon.mspec_used && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 4881, $c.lit("decide_to_shapeshift")), rn2(6)) : rn2(6))) {
+        if (!mon.mspec_used && !rn2(6)) {
             dochng = 1;
-            $t1 = 3 + (rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 4883, $c.lit("decide_to_shapeshift")), rn2(10)) : rn2(10)) | 0, mon.mspec_used = $t1;
+            $t1 = 3 + rn2(10) | 0, mon.mspec_used = $t1;
         }
     } else if (!$c.andu64(mon.mstrategy, 536870912)) {
         if (mon.data.mlet !== 48 /* S_VAMPIRE */) {
-            if (mon.mhp <= $c.div32(mon.mhpmax + 5 | 0, 6) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 4894, $c.lit("decide_to_shapeshift")), rn2(4)) : rn2(4)) && (mon.cham >= 0 /* LOW_PM */ && mon.cham < 383 /* NUMMONS */)) {
+            if (mon.mhp <= $c.div32(mon.mhpmax + 5 | 0, 6) && rn2(4) && (mon.cham >= 0 /* LOW_PM */ && mon.cham < 383 /* NUMMONS */)) {
                 ptr = $c.relem(mons, mon.cham);
                 dochng = 1;
-            } else if ($c.peq(mon.data, $c.relem(mons, 106 /* PM_FOG_CLOUD */)) && mon.mhp === mon.mhpmax && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 4899, $c.lit("decide_to_shapeshift")), rn2(4)) : rn2(4)) && (!canseemon(mon) || dist2(mon.mx, mon.my, u.ux, u.uy) > 64)) {
+            } else if ($c.peq(mon.data, $c.relem(mons, 106 /* PM_FOG_CLOUD */)) && mon.mhp === mon.mhpmax && !rn2(4) && (!canseemon(mon) || dist2(mon.mx, mon.my, u.ux, u.uy) > 64)) {
                 mndx = pickvampshape(mon);
                 if (mndx >= 0 /* LOW_PM */ && mndx < 383 /* NUMMONS */) {
                     ptr = $c.relem(mons, mndx);
@@ -3280,7 +3280,7 @@ export async function decide_to_shapeshift(mon) {   // mon.c:4872
                 }
             }
         } else {
-            if (mon.mhp >= $c.div32(Math.imul(9, mon.mhpmax), 10) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 4921, $c.lit("decide_to_shapeshift")), rn2(6)) : rn2(6)) && (!canseemon(mon) || dist2(mon.mx, mon.my, u.ux, u.uy) > 64)) {
+            if (mon.mhp >= $c.div32(Math.imul(9, mon.mhpmax), 10) && !rn2(6) && (!canseemon(mon) || dist2(mon.mx, mon.my, u.ux, u.uy) > 64)) {
                 dochng = 1;
             }
         }
@@ -3308,15 +3308,15 @@ function pickvampshape(mon) {   // mon.c:4941
             }
             wolfchance = 3;
         case 227 /* PM_VAMPIRE_LEADER */:
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 4957, $c.lit("pickvampshape")), rn2(wolfchance)) : rn2(wolfchance)) && !uppercase_only && !is_pool_or_lava(mon.mx, mon.my)) {
+            if (!rn2(wolfchance) && !uppercase_only && !is_pool_or_lava(mon.mx, mon.my)) {
                 mndx = 20 /* PM_WOLF */;
                 break;
             }
         case 226 /* PM_VAMPIRE */:
-            mndx = !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 4967, $c.lit("pickvampshape")), rn2(4)) : rn2(4)) && !uppercase_only ? 106 /* PM_FOG_CLOUD */ : 129 /* PM_VAMPIRE_BAT */;
+            mndx = !rn2(4) && !uppercase_only ? 106 /* PM_FOG_CLOUD */ : 129 /* PM_VAMPIRE_BAT */;
             break;
     }
-    if ((svm.mvitals[mndx].mvflags & 2) !== 0 || !$c.peq(mon.data, $c.relem(mons, mon.cham)) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 4975, $c.lit("pickvampshape")), rn2(4)) : rn2(4))) {
+    if ((svm.mvitals[mndx].mvflags & 2) !== 0 || !$c.peq(mon.data, $c.relem(mons, mon.cham)) && !rn2(4)) {
         return mon.cham;
     }
     return mndx;
@@ -3443,24 +3443,24 @@ export async function select_newcham_form(mon) {   // mon.c:5157
     mndx = -1 /* NON_PM */;
     switch (mon.cham) {
         case 301 /* PM_SANDESTIN */:
-            if (rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 5163, $c.lit("select_newcham_form")), rn2(7)) : rn2(7)) {
+            if (rn2(7)) {
                 mndx = pick_nasty(mons[125 /* PM_ARCHON */].difficulty - 1 | 0);
             }
             break;
         case 270 /* PM_DOPPELGANGER */:
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 5167, $c.lit("select_newcham_form")), rn2(7)) : rn2(7))) {
+            if (!rn2(7)) {
                 mndx = pick_nasty(mons[178 /* PM_JABBERWOCK */].difficulty - 1 | 0);
-            } else if (rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 5169, $c.lit("select_newcham_form")), rn2(3)) : rn2(3)) {
+            } else if (rn2(3)) {
                 mndx = await tt_doppel(mon);
-            } else if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 5171, $c.lit("select_newcham_form")), rn2(3)) : rn2(3))) {
-                mndx = (rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 5172, $c.lit("select_newcham_form")), rn2(14)) : rn2(14)) + 369 | 0;
+            } else if (!rn2(3)) {
+                mndx = rn2(14) + 369 | 0;
                 if (mndx === gu.urole.guardnum) {
                     mndx = -1 /* NON_PM */;
                 }
             } else {
                 tryct = 5;
                 do {
-                    mndx = (rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 5179, $c.lit("select_newcham_form")), rn2(330)) : rn2(330)) + 0 | 0;
+                    mndx = rn2(330) + 0 | 0;
                     if ($c.andu64($c.relem(mons, mndx).mflags1, 131072) !== 0 && $c.andu64($c.relem(mons, mndx).mflags2, 1) === 0) {
                         break;
                     }
@@ -3471,7 +3471,7 @@ export async function select_newcham_form(mon) {   // mon.c:5157
             }
             break;
         case 327 /* PM_CHAMELEON */:
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 5189, $c.lit("select_newcham_form")), rn2(3)) : rn2(3))) {
+            if (!rn2(3)) {
                 mndx = await pick_animal();
             }
             break;
@@ -3497,7 +3497,7 @@ export async function select_newcham_form(mon) {   // mon.c:5157
     if (mndx === -1 /* NON_PM */) {
         tryct = 50;
         do {
-            mndx = (rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 5217, $c.lit("select_newcham_form")), rn2(330)) : rn2(330)) + 0 | 0;
+            mndx = rn2(330) + 0 | 0;
         } while ((tryct = tryct - 1 | 0) > 0 && !validspecmon(mon, mndx) && (tryct > 40 && ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level)) && !$c.isupper(def_monsyms[$c.relem(mons, mndx).mlet].sym)));
     }
     return mndx;
@@ -3528,7 +3528,7 @@ export function mgender_from_permonst(mtmp, mdat) {   // mon.c:5256
     } else if ($c.andu64(mdat.mflags2, 131072) !== 0) {
         mtmp.female = (1) & 1;
     } else if (!($c.andu64(mdat.mflags2, 262144) !== 0)) {
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 5269, $c.lit("mgender_from_permonst")), rn2(10)) : rn2(10)) && !(mdat.mlet === 48 /* S_VAMPIRE */ || (mtmp.cham === 226 /* PM_VAMPIRE */ || mtmp.cham === 227 /* PM_VAMPIRE_LEADER */ || mtmp.cham === 228 /* PM_VLAD_THE_IMPALER */))) {
+        if (!rn2(10) && !(mdat.mlet === 48 /* S_VAMPIRE */ || (mtmp.cham === 226 /* PM_VAMPIRE */ || mtmp.cham === 227 /* PM_VAMPIRE_LEADER */ || mtmp.cham === 228 /* PM_VLAD_THE_IMPALER */))) {
             mtmp.female = ((!mtmp.female ? 1 : 0) >>> 0) & 1;
         }
     }
@@ -3649,7 +3649,7 @@ export async function newcham(mtmp, mdat, ncflags) {   // mon.c:5278
         }
     }
     if ($c.peq(mdat, $c.relem(mons, 114 /* PM_LONG_WORM */)) && (($t3 = get_wormno() >>> 0, mtmp.wormno = ($t3) & 31) | 0) !== 0) {
-        await initworm(mtmp, rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 5452, $c.lit("newcham")), rn2(5)) : rn2(5));
+        await initworm(mtmp, rn2(5));
         await place_worm_tail_randomly(mtmp, mtmp.mx, mtmp.my);
     }
     mtmp.meverseen = (0) & 1;
@@ -3699,7 +3699,7 @@ export async function newcham(mtmp, mdat, ncflags) {   // mon.c:5278
             set_apparxy(mtmp);
         }
         if (!mtmp.mpeaceful && onscary(mtmp.mux, mtmp.muy, mtmp) && monnear(mtmp, mtmp.mux, mtmp.muy)) {
-            await monflee(mtmp, (rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 5531, $c.lit("newcham")), rn2(9)) : rn2(9)) + 2 | 0, 1, 1);
+            await monflee(mtmp, rn2(9) + 2 | 0, 1, 1);
         }
     }
     return 1;
@@ -3709,13 +3709,13 @@ export function can_be_hatched(mnum) {   // mon.c:5546
         mnum = 97 /* PM_SCORPION */;
     }
     mnum = little_to_big(mnum);
-    if (mnum === 1 /* PM_KILLER_BEE */ || mnum === 41 /* PM_GARGOYLE */ || $c.andu64($c.relem(mons, mnum).mflags1, 4194304) !== 0 && (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 5561, $c.lit("can_be_hatched")), rn2(77)) : rn2(77)) || mnum !== 5 /* PM_QUEEN_BEE */ && mnum !== 42 /* PM_WINGED_GARGOYLE */)) {
+    if (mnum === 1 /* PM_KILLER_BEE */ || mnum === 41 /* PM_GARGOYLE */ || $c.andu64($c.relem(mons, mnum).mflags1, 4194304) !== 0 && (!rn2(77) || mnum !== 5 /* PM_QUEEN_BEE */ && mnum !== 42 /* PM_WINGED_GARGOYLE */)) {
         return mnum;
     }
     return -1 /* NON_PM */;
 }
 export function egg_type_from_parent(mnum, force_ordinary) {   // mon.c:5569
-    if (force_ordinary || !!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mon.c"), 5573, $c.lit("egg_type_from_parent")), rn2(77)) : rn2(77))) {
+    if (force_ordinary || !!rn2(77)) {
         if (mnum === 5 /* PM_QUEEN_BEE */) {
             mnum = 1 /* PM_KILLER_BEE */;
         } else if (mnum === 42 /* PM_WINGED_GARGOYLE */) {

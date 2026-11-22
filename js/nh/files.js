@@ -21,7 +21,7 @@ import { readobjnam } from './objnam.js';
 import { nh_getenv } from './options.js';
 import { You_feel, impossible, pline, raw_printf } from './pline.js';
 import { get_plname_from_file } from './restore.js';
-import { rn2, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { rn2 } from './rnd.js';
 import { aligns, genders } from './role.js';
 import { freedynamicdata } from './save.js';
 import { sfo_char } from './sfbase.js';
@@ -1114,14 +1114,14 @@ function choose_passage(passagecnt, oid) {   // files.c:3431
         } else {
             svc.context.novel.count = 30;
             for (idx = i = 0; i < passagecnt; i = i + 1 | 0, range = range - 1 | 0) {
-                if (range > 0 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("files.c"), 3456, $c.lit("choose_passage")), rn2(range)) : rn2(range)) < limit) {
+                if (range > 0 && rn2(range) < limit) {
                     svc.context.novel.pasg[($t1 = idx, idx = $t1 + 1 | 0, $t1)] = $c.i8($c.i16(i + 1 | 0));
                     limit = limit - 1 | 0;
                 }
             }
         }
     }
-    idx = rng_log_enabled() ? (rng_log_set_caller($c.lit("files.c"), 3463, $c.lit("choose_passage")), rn2(svc.context.novel.count)) : rn2(svc.context.novel.count);
+    idx = rn2(svc.context.novel.count);
     res = svc.context.novel.pasg[idx];
     $t2 = svc.context.novel.pasg[svc.context.novel.count = svc.context.novel.count - 1 | 0], svc.context.novel.pasg[idx] = $t2;
     return res;

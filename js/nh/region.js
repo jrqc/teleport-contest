@@ -20,7 +20,7 @@ import { body_part } from './polyself.js';
 import { make_blinded, set_itimeout } from './potion.js';
 import { valid_cloud_pos } from './read.js';
 import { lookup_id_mapping } from './restore.js';
-import { d, rn2, rnd, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { d, rn2, rnd } from './rnd.js';
 import { selection_getbounds, selection_getpoint } from './selvar.js';
 import { sfi_any, sfi_boolean, sfi_char, sfi_int, sfi_long, sfi_nhrect, sfi_short, sfi_unsigned, sfo_any, sfo_boolean, sfo_char, sfo_int, sfo_long, sfo_nhrect, sfo_short, sfo_unsigned } from './sfbase.js';
 import { safe_teleds } from './teleport.js';
@@ -692,7 +692,7 @@ export async function inside_gas_cloud(p1, p2) {   // region.c:1091
             await pline($c.lit("%s is burning your %s!"), c_common_strings.c_Something, await makeplural(await body_part(16 /* LUNG */)));
             await You($c.lit("cough and spit blood!"));
             await wake_nearto(u.ux, u.uy, 2);
-            dam = u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(((rng_log_enabled() ? (rng_log_set_caller($c.lit("region.c"), 1122, $c.lit("inside_gas_cloud")), rnd(dam)) : rnd(dam)) + 5 | 0) + 1 | 0, 2) : (rng_log_enabled() ? (rng_log_set_caller($c.lit("region.c"), 1122, $c.lit("inside_gas_cloud")), rnd(dam)) : rnd(dam)) + 5 | 0;
+            dam = u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32((rnd(dam) + 5 | 0) + 1 | 0, 2) : rnd(dam) + 5 | 0;
             if ($G.ublindf && $G.ublindf.otyp === 234 /* TOWEL */ && $G.ublindf.spe > 0) {
                 dam = $c.div32(dam + 1 | 0, 2);
             }
@@ -724,7 +724,7 @@ export async function inside_gas_cloud(p1, p2) {   // region.c:1091
             if (await Resists_Elem(mtmp, 6 /* POISON_RES */)) {
                 return 0;
             }
-            $t1 = (rng_log_enabled() ? (rng_log_set_caller($c.lit("region.c"), 1152, $c.lit("inside_gas_cloud")), rnd(dam)) : rnd(dam)) + 5 | 0, mtmp.mhp = mtmp.mhp - $t1 | 0;
+            $t1 = rnd(dam) + 5 | 0, mtmp.mhp = mtmp.mhp - $t1 | 0;
             if (mtmp.mhp < 1) {
                 if (!((reg.player_flags & 2) >>> 0)) {
                     await killed(mtmp);
@@ -796,7 +796,7 @@ export async function create_gas_cloud(x, y, cloudsize, damage) {   // region.c:
         dirs[3].x = 1;
         dirs[3].y = 0;
         for (i = 4; i > 0; i = i - 1 | 0) {
-            swapidx = $c.i16(rng_log_enabled() ? (rng_log_set_caller($c.lit("region.c"), 1255, $c.lit("create_gas_cloud")), rn2(i)) : rn2(i));
+            swapidx = $c.i16(rn2(i));
             tmp.$copyFrom(dirs[swapidx]);
             dirs[swapidx].$copyFrom(dirs[i - 1 | 0]);
             dirs[i - 1 | 0].$copyFrom(tmp);
@@ -814,7 +814,7 @@ export async function create_gas_cloud(x, y, cloudsize, damage) {   // region.c:
                         break;
                     }
                 }
-                if (nvalid === 4 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("region.c"), 1279, $c.lit("create_gas_cloud")), rn2(2)) : rn2(2))) {
+                if (nvalid === 4 && !rn2(2)) {
                     continue;
                 }
                 if (isunpicked) {
@@ -834,7 +834,7 @@ export async function create_gas_cloud(x, y, cloudsize, damage) {   // region.c:
         $t2 = tmprect.hy = ycoords[i], tmprect.ly = $t2;
         await add_rect_to_reg(cloud, tmprect);
     }
-    $t3 = (rng_log_enabled() ? (rng_log_set_caller($c.lit("region.c"), 1303, $c.lit("create_gas_cloud")), rn2(3)) : rn2(3)) + 4 | 0, cloud.ttl = $t3;
+    $t3 = rn2(3) + 4 | 0, cloud.ttl = $t3;
     cloud.ttl = $c.div64($c.mul64(cloud.ttl, cloudsize), newidx);
     await make_gas_cloud(cloud, damage, inside_cloud);
     return cloud;
@@ -895,7 +895,7 @@ export async function region_safety() {   // region.c:1368
     if (n > 1 || n === 1 && !r) {
         await safe_teleds(0);
         if (region_danger()) {
-            set_itimeout(new $c.FieldRef(u.uprops[52 /* MAGICAL_BREATHING */], "intrinsic", "i64"), (rng_log_enabled() ? (rng_log_set_caller($c.lit("region.c"), 1391, $c.lit("region_safety")), d(4, 4)) : d(4, 4)) + 4 | 0);
+            set_itimeout(new $c.FieldRef(u.uprops[52 /* MAGICAL_BREATHING */], "intrinsic", "i64"), d(4, 4) + 4 | 0);
             await You_feel($c.lit("able to breathe."));
         }
     } else if (r) {

@@ -31,7 +31,7 @@ import { body_part, poly_gender } from './polyself.js';
 import { make_blinded, make_confused, make_hallucinated, strange_feeling } from './potion.js';
 import { is_quest_artifact } from './questpgr.js';
 import { visible_region_at } from './region.js';
-import { rn2, rn2_on_display_rng, rnd, rng_log_enabled, rng_log_set_caller, rnl } from './rnd.js';
+import { rn2, rn2_on_display_rng, rnd, rnl } from './rnd.js';
 import { findgold } from './steal.js';
 import { activate_statue_trap, b_trapped, openfallingtrap, openholdingtrap, t_at, trapname } from './trap.js';
 import { hidden_gold } from './vault.js';
@@ -88,7 +88,7 @@ export function trapped_chest_at(ttyp, x, y) {   // detect.c:139
     if (!(glyph_at(x, y) >= 4026 && glyph_at(x, y) < 4051)) {
         return 0;
     }
-    if (ttyp !== 25 /* TRAPPED_CHEST */ || u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("detect.c"), 146, $c.lit("trapped_chest_at")), rn2(20)) : rn2(20))) {
+    if (ttyp !== 25 /* TRAPPED_CHEST */ || u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic) && rn2(20)) {
         return 0;
     }
     if (sobj_at(215 /* CHEST */, x, y) || sobj_at(214 /* LARGE_BOX */, x, y)) {
@@ -122,7 +122,7 @@ export function trapped_door_at(ttyp, x, y) {   // detect.c:182
     if (!(glyph_at(x, y) >= 4026 && glyph_at(x, y) < 4051)) {
         return 0;
     }
-    if (ttyp !== 24 /* TRAPPED_DOOR */ || u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("detect.c"), 188, $c.lit("trapped_door_at")), rn2(20)) : rn2(20))) {
+    if (ttyp !== 24 /* TRAPPED_DOOR */ || u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic) && rn2(20)) {
         return 0;
     }
     lev = $c.relem(svl.level.locations[x], y);
@@ -321,7 +321,7 @@ export async function gold_detect(sobj) {   // detect.c:335
         if (findgold(mtmp.minvent) || mtmp.data.pmidx === 252 /* PM_GOLD_GOLEM */) {
             gold.$copyFrom(cg.zeroobj);
             gold.otyp = 438;
-            $t2 = rng_log_enabled() ? (rng_log_set_caller($c.lit("detect.c"), 442, $c.lit("gold_detect")), rnd(10)) : rnd(10), gold.quan = $t2;
+            $t2 = rnd(10), gold.quan = $t2;
             gold.ox = mtmp.mx;
             gold.oy = mtmp.my;
             await map_object(gold, 1);
@@ -613,7 +613,7 @@ export async function object_detect(detector, class_) {   // detect.c:603
         } else if (findgold(mtmp.minvent) && (!class_ || class_ === 12 /* COIN_CLASS */)) {
             gold.$copyFrom(cg.zeroobj);
             gold.otyp = 438;
-            $t1 = rng_log_enabled() ? (rng_log_set_caller($c.lit("detect.c"), 770, $c.lit("object_detect")), rnd(10)) : rnd(10), gold.quan = $t1;
+            $t1 = rnd(10), gold.quan = $t1;
             gold.ox = mtmp.mx;
             gold.oy = mtmp.my;
             await map_object(gold, 1);
@@ -695,7 +695,7 @@ async function sense_trap(trap, x, y, src_cursed) {   // detect.c:865
             obj.oy = y;
         }
         $t1 = $c.i16(!(u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic)) ? 438 /* GOLD_PIECE */ : await rn2(463) + 18 /* FIRST_OBJECT */ | 0), obj.otyp = $t1;
-        $t2 = obj.otyp === 438 /* GOLD_PIECE */ ? rng_log_enabled() ? (rng_log_set_caller($c.lit("detect.c"), 879, $c.lit("sense_trap")), rnd(10)) : rnd(10) : objects[obj.otyp].oc_merge | 0 ? rng_log_enabled() ? (rng_log_set_caller($c.lit("detect.c"), 880, $c.lit("sense_trap")), rnd(2)) : rnd(2) : 1, obj.quan = $t2;
+        $t2 = obj.otyp === 438 /* GOLD_PIECE */ ? rnd(10) : objects[obj.otyp].oc_merge | 0 ? rnd(2) : 1, obj.quan = $t2;
         $t3 = await rn2(383 /* NUMMONS */), obj.corpsenm = $t3;
         await map_object(obj, 1);
     } else if (trap) {
@@ -888,7 +888,7 @@ export function level_distance(where) {   // detect.c:1142
     indun = $c.i8(u.uz.dnum === where.dnum ? 1 : 0);
     res = $c.lit("");
     if (ll < 0) {
-        if (ll < (-8 - (rng_log_enabled() ? (rng_log_set_caller($c.lit("detect.c"), 1149, $c.lit("level_distance")), rn2(3)) : rn2(3)) | 0)) {
+        if (ll < (-8 - rn2(3) | 0)) {
             if (!indun) {
                 res = $c.lit("far away");
             } else {
@@ -906,7 +906,7 @@ export function level_distance(where) {   // detect.c:1142
             res = $c.lit("just below");
         }
     } else if (ll > 0) {
-        if (ll > (8 + (rng_log_enabled() ? (rng_log_set_caller($c.lit("detect.c"), 1164, $c.lit("level_distance")), rn2(3)) : rn2(3)) | 0)) {
+        if (ll > (8 + rn2(3) | 0)) {
             if (!indun) {
                 res = $c.lit("far away");
             } else {
@@ -944,9 +944,9 @@ export async function use_crystal_ball(optr) {   // detect.c:1206
                 return;
             }
             oops = is_quest_artifact(obj) ? 8 : obj.blessed | 0 ? 16 : 20;
-            if (charged && (obj.cursed | 0 || (rng_log_enabled() ? (rng_log_set_caller($c.lit("detect.c"), 1218, $c.lit("use_crystal_ball")), rnd(oops)) : rnd(oops)) > acurr(1 /* A_INT */))) {
-                impair = rng_log_enabled() ? (rng_log_set_caller($c.lit("detect.c"), 1219, $c.lit("use_crystal_ball")), rnd(100 - Math.imul(3, acurr(1 /* A_INT */)) | 0)) : rnd(100 - Math.imul(3, acurr(1 /* A_INT */)) | 0);
-                switch (rng_log_enabled() ? (rng_log_set_caller($c.lit("detect.c"), 1221, $c.lit("use_crystal_ball")), rnd(obj.oartifact || obj.blessed | 0 ? 4 : 5)) : rnd(obj.oartifact || obj.blessed | 0 ? 4 : 5)) {
+            if (charged && (obj.cursed | 0 || rnd(oops) > acurr(1 /* A_INT */))) {
+                impair = rnd(100 - Math.imul(3, acurr(1 /* A_INT */)) | 0);
+                switch (rnd(obj.oartifact || obj.blessed | 0 ? 4 : 5)) {
                     case 1:
                         await pline($c.lit("%s too much to comprehend!"), await Tobjnam(obj, $c.lit("are")));
                         break;
@@ -974,7 +974,7 @@ export async function use_crystal_ball(optr) {   // detect.c:1206
                         await pline($c.lit("%s!"), await Tobjnam(obj, $c.lit("explode")));
                         await useup(obj);
                         $t1 = obj = null, optr.set(0, $t1);
-                        await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32((rng_log_enabled() ? (rng_log_set_caller($c.lit("detect.c"), 1250, $c.lit("use_crystal_ball")), rnd(30)) : rnd(30)) + 1 | 0, 2) : rng_log_enabled() ? (rng_log_set_caller($c.lit("detect.c"), 1250, $c.lit("use_crystal_ball")), rnd(30)) : rnd(30), $c.lit("exploding crystal ball"), 0);
+                        await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(rnd(30) + 1 | 0, 2) : rnd(30), $c.lit("exploding crystal ball"), 0);
                         break;
                 }
                 if (obj) {
@@ -983,7 +983,7 @@ export async function use_crystal_ball(optr) {   // detect.c:1206
                 return;
             }
             if (u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic)) {
-                nomul(-(rng_log_enabled() ? (rng_log_set_caller($c.lit("detect.c"), 1260, $c.lit("use_crystal_ball")), rnd(charged ? 4 : 2)) : rnd(charged ? 4 : 2)) | 0);
+                nomul(-rnd(charged ? 4 : 2) | 0);
                 gm.multi_reason = $c.lit("gazing into a Magic 8-Ball (tm)");
                 gn.nomovemsg = $c.lit("");
                 if (!charged) {
@@ -992,7 +992,7 @@ export async function use_crystal_ball(optr) {   // detect.c:1206
                         $goto = "implode"; continue D1;
                     }
                 } else {
-                    switch (rng_log_enabled() ? (rng_log_set_caller($c.lit("detect.c"), 1269, $c.lit("use_crystal_ball")), rnd(6)) : rnd(6)) {
+                    switch (rnd(6)) {
                         case 1:
                             await You($c.lit("grok some groovy globs of incandescent lava."));
                             break;
@@ -1027,7 +1027,7 @@ export async function use_crystal_ball(optr) {   // detect.c:1206
                 return;
             }
             await You($c.lit("peer into %s..."), await the(await xname(obj)));
-            nomul(-(rng_log_enabled() ? (rng_log_set_caller($c.lit("detect.c"), 1313, $c.lit("use_crystal_ball")), rnd(charged ? 10 : 2)) : rnd(charged ? 10 : 2)) | 0);
+            nomul(-rnd(charged ? 10 : 2) | 0);
             gm.multi_reason = $c.lit("gazing into a crystal ball");
             gn.nomovemsg = $c.lit("");
         case "implode":
@@ -1065,12 +1065,12 @@ export async function use_crystal_ball(optr) {   // detect.c:1206
                 } else if (ch === 94) {
                     ret = await trap_detect(null);
                 } else {
-                    i = rng_log_enabled() ? (rng_log_set_caller($c.lit("detect.c"), 1354, $c.lit("use_crystal_ball")), rn2(4)) : rn2(4);
+                    i = rn2(4);
                     await You_see($c.lit("%s, %s."), level_detects[i].what, level_distance(level_detects[i].where));
                     ret = 0;
                 }
                 if (ret) {
-                    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("detect.c"), 1361, $c.lit("use_crystal_ball")), rn2(100)) : rn2(100))) {
+                    if (!rn2(100)) {
                         await You_see($c.lit("the Wizard of Yendor gazing out at you."));
                     } else {
                         await pline_The($c.lit("vision is unclear."));
@@ -1084,7 +1084,7 @@ export async function use_crystal_ball(optr) {   // detect.c:1206
 }
 export async function show_map_spot(x, y, cnf) {   // detect.c:1372
     let lev = null, t = null, ep = null, oldglyph = 0;
-    if (cnf && (rng_log_enabled() ? (rng_log_set_caller($c.lit("detect.c"), 1379, $c.lit("show_map_spot")), rn2(7)) : rn2(7))) {
+    if (cnf && rn2(7)) {
         return;
     }
     lev = $c.relem(svl.level.locations[x], y);
@@ -1548,7 +1548,7 @@ export async function dosearch0(aflag) {   // detect.c:2016
                     await feel_location(x, y);
                 }
                 if (svl.level.locations[x][y].typ === 14 /* SDOOR */) {
-                    if (rng_log_enabled() ? (rng_log_set_caller($c.lit("detect.c"), 2043, $c.lit("dosearch0")), rnl(7 - fund | 0)) : rnl(7 - fund | 0)) {
+                    if (rnl(7 - fund | 0)) {
                         continue;
                     }
                     cvt_sdoor_to_door($c.relem(svl.level.locations[x], y));
@@ -1559,7 +1559,7 @@ export async function dosearch0(aflag) {   // detect.c:2016
                     set_msg_xy(x, y);
                     await You($c.lit("find a hidden door."));
                 } else if (svl.level.locations[x][y].typ === 15 /* SCORR */) {
-                    if (rng_log_enabled() ? (rng_log_set_caller($c.lit("detect.c"), 2053, $c.lit("dosearch0")), rnl(7 - fund | 0)) : rnl(7 - fund | 0)) {
+                    if (rnl(7 - fund | 0)) {
                         continue;
                     }
                     svl.level.locations[x][y].typ = 24;
@@ -1581,7 +1581,7 @@ export async function dosearch0(aflag) {   // detect.c:2016
                     if (!aflag && !mtmp && !((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
                         await unmap_invisible(x, y);
                     }
-                    if ((trap = t_at(x, y)) && !trap.tseen && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("detect.c"), 2079, $c.lit("dosearch0")), rnl(8)) : rnl(8))) {
+                    if ((trap = t_at(x, y)) && !trap.tseen && !rnl(8)) {
                         nomul(0);
                         if ((trap.ttyp | 0) === 19 /* STATUE_TRAP */) {
                             if (await activate_statue_trap(trap, x, y, 0)) {

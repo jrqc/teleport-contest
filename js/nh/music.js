@@ -30,7 +30,7 @@ import { Tobjnam, Yname2, an, the, thesimpleoname, xname, yname } from './objnam
 import { Norep, You, You_cant, You_feel, You_hear, Your, impossible, pline, pline_The } from './pline.js';
 import { incr_itimeout } from './potion.js';
 import { altarmask_at, desecrate_altar } from './pray.js';
-import { d, rn2, rnd, rng_log_enabled, rng_log_set_caller, rnl } from './rnd.js';
+import { d, rn2, rnd, rnl } from './rnd.js';
 import { genders } from './role.js';
 import { add_damage } from './shk.js';
 import { maketrap, mselftouch, reset_utrap, selftouch, set_utrap, t_at } from './trap.js';
@@ -70,7 +70,7 @@ async function put_monsters_to_sleep(distance) {   // music.c:85
         if (mtmp.mhp < 1) {
             continue;
         }
-        if (dist2(mtmp.mx, mtmp.my, u.ux, u.uy) < distance && await sleep_monst(mtmp, rng_log_enabled() ? (rng_log_set_caller($c.lit("music.c"), 93, $c.lit("put_monsters_to_sleep")), d(10, 10)) : d(10, 10), 6 /* TOOL_CLASS */)) {
+        if (dist2(mtmp.mx, mtmp.my, u.ux, u.uy) < distance && await sleep_monst(mtmp, d(10, 10), 6 /* TOOL_CLASS */)) {
             mtmp.msleeping = (1) & 1;
             await slept_monst(mtmp);
         }
@@ -198,7 +198,7 @@ async function do_pit(x, y, tu_pit) {   // music.c:221
             }
             await mselftouch(mtmp, $c.lit("Falling, "), 1);
             if (!(mtmp.mhp < 1)) {
-                $t1 = rng_log_enabled() ? (rng_log_set_caller($c.lit("music.c"), 276, $c.lit("do_pit")), rnd(m_already_trapped ? 4 : 6)) : rnd(m_already_trapped ? 4 : 6), mtmp.mhp = mtmp.mhp - $t1 | 0;
+                $t1 = rnd(m_already_trapped ? 4 : 6), mtmp.mhp = mtmp.mhp - $t1 | 0;
                 if (mtmp.mhp < 1) {
                     if (!((gv.viz_array.get(y).get(x) & 2) !== 0)) {
                         await pline($c.lit("It is destroyed!"));
@@ -221,14 +221,14 @@ async function do_pit(x, y, tu_pit) {   // music.c:221
             }
         } else if (!tu_pit || !u.utrap || u.utraptype !== 2) {
             await You($c.lit("fall into a chasm!"));
-            set_utrap(((rng_log_enabled() ? (rng_log_set_caller($c.lit("music.c"), 313, $c.lit("do_pit")), rn2(6)) : rn2(6)) + 2 | 0) >>> 0, 2);
-            await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32((rng_log_enabled() ? (rng_log_set_caller($c.lit("music.c"), 314, $c.lit("do_pit")), rnd(6)) : rnd(6)) + 1 | 0, 2) : rng_log_enabled() ? (rng_log_set_caller($c.lit("music.c"), 314, $c.lit("do_pit")), rnd(6)) : rnd(6), $c.lit("fell into a chasm"), 2);
+            set_utrap((rn2(6) + 2 | 0) >>> 0, 2);
+            await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(rnd(6) + 1 | 0, 2) : rnd(6), $c.lit("fell into a chasm"), 2);
             await selftouch($c.lit("Falling, you"));
         } else if (u.utrap && u.utraptype === 2) {
-            keepfooting = $c.i8(!((u.uprops[25 /* FUMBLING */].intrinsic || u.uprops[25 /* FUMBLING */].extrinsic) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("music.c"), 319, $c.lit("do_pit")), rn2(5)) : rn2(5))) && (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("music.c"), 320, $c.lit("do_pit")), rnl(gu.urole.mnum === 331 ? 3 : 9)) : rnl(gu.urole.mnum === 331 ? 3 : 9)) || acurr(3 /* A_DEX */) > 7 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("music.c"), 321, $c.lit("do_pit")), rn2(5)) : rn2(5))) ? 1 : 0);
+            keepfooting = $c.i8(!((u.uprops[25 /* FUMBLING */].intrinsic || u.uprops[25 /* FUMBLING */].extrinsic) && rn2(5)) && (!rnl(gu.urole.mnum === 331 ? 3 : 9) || acurr(3 /* A_DEX */) > 7 && rn2(5)) ? 1 : 0);
             await You($c.lit("are jostled around violently!"));
-            set_utrap(((rng_log_enabled() ? (rng_log_set_caller($c.lit("music.c"), 324, $c.lit("do_pit")), rn2(6)) : rn2(6)) + 2 | 0) >>> 0, 2);
-            await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32((rng_log_enabled() ? (rng_log_set_caller($c.lit("music.c"), 325, $c.lit("do_pit")), rnd(keepfooting ? 2 : 4)) : rnd(keepfooting ? 2 : 4)) + 1 | 0, 2) : rng_log_enabled() ? (rng_log_set_caller($c.lit("music.c"), 325, $c.lit("do_pit")), rnd(keepfooting ? 2 : 4)) : rnd(keepfooting ? 2 : 4), $c.lit("hurt in a chasm"), 2);
+            set_utrap((rn2(6) + 2 | 0) >>> 0, 2);
+            await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(rnd(keepfooting ? 2 : 4) + 1 | 0, 2) : rnd(keepfooting ? 2 : 4), $c.lit("hurt in a chasm"), 2);
             if (keepfooting) {
                 await exercise(3 /* A_DEX */, 1);
             } else {
@@ -276,7 +276,7 @@ async function do_earthquake(force) {   // music.c:344
                     await seemimic(mtmp);
                 }
             }
-            if (rng_log_enabled() ? (rng_log_set_caller($c.lit("music.c"), 387, $c.lit("do_earthquake")), rn2(14 - force | 0)) : rn2(14 - force | 0)) {
+            if (rn2(14 - force | 0)) {
                 continue;
             }
             switch (svl.level.locations[x][y].typ) {
@@ -388,9 +388,9 @@ async function do_improvisation(instr) {   // music.c:503
     if (u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic)) {
         mode = mode | 4;
     }
-    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("music.c"), 535, $c.lit("do_improvisation")), rn2(2)) : rn2(2))) {
+    if (!rn2(2)) {
         if (mode === 3) {
-            mode = !(rng_log_enabled() ? (rng_log_set_caller($c.lit("music.c"), 542, $c.lit("do_improvisation")), rn2(2)) : rn2(2)) ? 1 : 2;
+            mode = !rn2(2) ? 1 : 2;
         }
         if (mode & 4) {
             mode = 4;
@@ -434,7 +434,7 @@ async function do_improvisation(instr) {   // music.c:503
             await exercise(3 /* A_DEX */, 1);
             break;
         case 247 /* WOODEN_FLUTE */:
-            do_spec = do_spec & (((rng_log_enabled() ? (rng_log_set_caller($c.lit("music.c"), 600, $c.lit("do_improvisation")), rn2(acurr(3 /* A_DEX */))) : rn2(acurr(3 /* A_DEX */))) + u.ulevel | 0) > 25 ? 1 : 0);
+            do_spec = do_spec & ((rn2(acurr(3 /* A_DEX */)) + u.ulevel | 0) > 25 ? 1 : 0);
             if (!(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf)) {
                 await pline($c.lit("%s%s."), await Tobjnam(instr, do_spec ? $c.lit("trill") : $c.lit("toot")), same_old_song[0] ? $c.lit(" a familiar tune") : $c.lit(""));
             } else {
@@ -462,7 +462,7 @@ async function do_improvisation(instr) {   // music.c:503
                     await pline($c.lit("A %s blasts out of the horn!"), flash_str(type, 0));
                 }
                 gc.current_wand = instr;
-                await ubuzz(0 + type | 0, (rng_log_enabled() ? (rng_log_set_caller($c.lit("music.c"), 634, $c.lit("do_improvisation")), rn2(6)) : rn2(6)) + 6 | 0);
+                await ubuzz(0 + type | 0, rn2(6) + 6 | 0);
                 gc.current_wand = null;
             }
             await discover_object(instr.otyp, 1, 1, 1);
@@ -496,7 +496,7 @@ async function do_improvisation(instr) {   // music.c:503
             await exercise(3 /* A_DEX */, 1);
             break;
         case 253 /* WOODEN_HARP */:
-            do_spec = do_spec & (((rng_log_enabled() ? (rng_log_set_caller($c.lit("music.c"), 673, $c.lit("do_improvisation")), rn2(acurr(3 /* A_DEX */))) : rn2(acurr(3 /* A_DEX */))) + u.ulevel | 0) > 25 ? 1 : 0);
+            do_spec = do_spec & ((rn2(acurr(3 /* A_DEX */)) + u.ulevel | 0) > 25 ? 1 : 0);
             if (!(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf)) {
                 await pline($c.lit("%s %s."), await Yname2(instr), do_spec && same_old_song[0] ? $c.lit("produces a familiar, lilting melody") : do_spec ? $c.lit("produces a lilting melody") : same_old_song[0] ? $c.lit("twangs a familiar tune") : $c.lit("twangs"));
             } else {
@@ -519,13 +519,13 @@ async function do_improvisation(instr) {   // music.c:503
             if (!mundane) {
                 if (!(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf)) {
                     await You($c.lit("beat a %sdeafening row!"), same_old_song[0] ? $c.lit("familiar ") : $c.lit(""));
-                    incr_itimeout(new $c.FieldRef(u.uprops[16 /* DEAF */], "intrinsic", "i64"), (rng_log_enabled() ? (rng_log_set_caller($c.lit("music.c"), 709, $c.lit("do_improvisation")), rn2(20)) : rn2(20)) + 30 | 0);
+                    incr_itimeout(new $c.FieldRef(u.uprops[16 /* DEAF */], "intrinsic", "i64"), rn2(20) + 30 | 0);
                 } else {
                     await You($c.lit("pound on the drum."));
                 }
                 await exercise(2 /* A_WIS */, 0);
             } else {
-                await You($c.lit("%s %s."), (rng_log_enabled() ? (rng_log_set_caller($c.lit("music.c"), 717, $c.lit("do_improvisation")), rn2(2)) : rn2(2)) ? $c.lit("butcher") : (rng_log_enabled() ? (rng_log_set_caller($c.lit("music.c"), 717, $c.lit("do_improvisation")), rn2(2)) : rn2(2)) ? $c.lit("manage") : $c.lit("pull off"), await an(beats[rng_log_enabled() ? (rng_log_set_caller($c.lit("music.c"), 718, $c.lit("do_improvisation")), rn2(8)) : rn2(8)]));
+                await You($c.lit("%s %s."), rn2(2) ? $c.lit("butcher") : rn2(2) ? $c.lit("manage") : $c.lit("pull off"), await an(beats[rn2(8)]));
             }
             await awaken_monsters(Math.imul(u.ulevel, mundane ? 5 : 40));
             disp.botl = 1;
@@ -540,9 +540,9 @@ async function do_improvisation(instr) {   // music.c:503
 function improvised_notes(same_as_last_time) {   // music.c:733
     let i = 0, notecount = 0, $t1;
     if (!((u.uprops[63 /* UNCHANGING */].intrinsic || u.uprops[63 /* UNCHANGING */].extrinsic) && svc.context.jingle[0] !== 0)) {
-        notecount = rng_log_enabled() ? (rng_log_set_caller($c.lit("music.c"), 742, $c.lit("improvised_notes")), rnd(5)) : rnd(5);
+        notecount = rnd(5);
         for (i = 0; i < notecount; i = i + 1 | 0) {
-            $t1 = improvised_notes$notes[rng_log_enabled() ? (rng_log_set_caller($c.lit("music.c"), 745, $c.lit("improvised_notes")), rn2(7)) : rn2(7)], svc.context.jingle[i] = $t1;
+            $t1 = improvised_notes$notes[rn2(7)], svc.context.jingle[i] = $t1;
         }
         svc.context.jingle[notecount] = 0;
         same_as_last_time.set(0, 0);

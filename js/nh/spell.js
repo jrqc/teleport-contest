@@ -41,7 +41,7 @@ import { You, You_feel, You_hear, Your, impossible, livelog_printf, pline, pline
 import { body_part } from './polyself.js';
 import { healup, make_blinded, make_confused, make_slimed, make_stunned, peffects } from './potion.js';
 import { seffects } from './read.js';
-import { d, rn2, rn2_on_display_rng, rnd, rng_log_enabled, rng_log_set_caller, rnl } from './rnd.js';
+import { d, rn2, rn2_on_display_rng, rnd, rnl } from './rnd.js';
 import { genders } from './role.js';
 import { check_unpaid, obfree } from './shk.js';
 import { rndcurse, take_gold } from './sit.js';
@@ -73,7 +73,7 @@ async function cursed_book(bp) {   // spell.c:130
     let was_in_use = 0, lev = 0, dmg = 0;
     lev = objects[bp.otyp].oc_oc2;
     dmg = 0;
-    switch (rng_log_enabled() ? (rng_log_set_caller($c.lit("spell.c"), 136, $c.lit("cursed_book")), rn2(lev)) : rn2(lev)) {
+    switch (rn2(lev)) {
         case 0:
             await You_feel($c.lit("a wrenching sensation."));
             await tele();
@@ -83,14 +83,14 @@ async function cursed_book(bp) {   // spell.c:130
             await aggravate();
             break;
         case 2:
-            await make_blinded($c.add64($c.and64(u.uprops[15 /* BLINDED */].intrinsic, 16777215), (rng_log_enabled() ? (rng_log_set_caller($c.lit("spell.c"), 146, $c.lit("cursed_book")), rn2(100)) : rn2(100)) + 250 | 0), 1);
+            await make_blinded($c.add64($c.and64(u.uprops[15 /* BLINDED */].intrinsic, 16777215), rn2(100) + 250 | 0), 1);
             break;
         case 3:
             await take_gold();
             break;
         case 4:
             await pline($c.lit("These runes were just too much to comprehend."));
-            await make_confused($c.add64(u.uprops[14 /* CONFUSION */].intrinsic, (rng_log_enabled() ? (rng_log_set_caller($c.lit("spell.c"), 153, $c.lit("cursed_book")), rn2(7)) : rn2(7)) + 16 | 0), 0);
+            await make_confused($c.add64(u.uprops[14 /* CONFUSION */].intrinsic, rn2(7) + 16 | 0), 0);
             break;
         case 5:
             await pline_The($c.lit("book was coated with contact poison!"));
@@ -100,7 +100,7 @@ async function cursed_book(bp) {   // spell.c:130
             }
             was_in_use = $c.i8(bp.in_use);
             bp.in_use = (0) & 1;
-            await poison_strdmg(u.uprops[6 /* POISON_RES */].intrinsic || u.uprops[6 /* POISON_RES */].extrinsic ? (rng_log_enabled() ? (rng_log_set_caller($c.lit("spell.c"), 164, $c.lit("cursed_book")), rn2(2)) : rn2(2)) + 1 | 0 : (rng_log_enabled() ? (rng_log_set_caller($c.lit("spell.c"), 164, $c.lit("cursed_book")), rn2(4)) : rn2(4)) + 3 | 0, rng_log_enabled() ? (rng_log_set_caller($c.lit("spell.c"), 165, $c.lit("cursed_book")), rnd(u.uprops[6 /* POISON_RES */].intrinsic || u.uprops[6 /* POISON_RES */].extrinsic ? 6 : 10)) : rnd(u.uprops[6 /* POISON_RES */].intrinsic || u.uprops[6 /* POISON_RES */].extrinsic ? 6 : 10), $c.lit("contact-poisoned spellbook"), 0);
+            await poison_strdmg(u.uprops[6 /* POISON_RES */].intrinsic || u.uprops[6 /* POISON_RES */].extrinsic ? rn2(2) + 1 | 0 : rn2(4) + 3 | 0, rnd(u.uprops[6 /* POISON_RES */].intrinsic || u.uprops[6 /* POISON_RES */].extrinsic ? 6 : 10), $c.lit("contact-poisoned spellbook"), 0);
             bp.in_use = (was_in_use >>> 0) & 1;
             break;
         case 6:
@@ -109,7 +109,7 @@ async function cursed_book(bp) {   // spell.c:130
                 await pline_The($c.lit("book %s, but you are unharmed!"), new $c.Ptr(explodes, 0));
             } else {
                 await pline($c.lit("As you read the book, it %s in your %s!"), new $c.Ptr(explodes, 0), await body_part(2 /* FACE */));
-                dmg = Math.imul(2, rng_log_enabled() ? (rng_log_set_caller($c.lit("spell.c"), 176, $c.lit("cursed_book")), rnd(10)) : rnd(10)) + 5 | 0;
+                dmg = Math.imul(2, rnd(10)) + 5 | 0;
                 await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(dmg + 1 | 0, 2) : dmg, $c.lit("exploding rune"), 0);
             }
             return 1;
@@ -122,7 +122,7 @@ async function cursed_book(bp) {   // spell.c:130
 async function confused_book(spellbook) {   // spell.c:189
     let gone = 0;
     gone = 0;
-    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("spell.c"), 193, $c.lit("confused_book")), rn2(3)) : rn2(3)) && spellbook.otyp !== 409 /* SPE_BOOK_OF_THE_DEAD */) {
+    if (!rn2(3) && spellbook.otyp !== 409 /* SPE_BOOK_OF_THE_DEAD */) {
         spellbook.in_use = (1) & 1;
         await pline($c.lit("Being confused you have difficulties in controlling your actions."));
         await windowprocs.win_display_nhwindow($G.WIN_MESSAGE, 0);
@@ -198,7 +198,7 @@ async function deadbook(book2) {   // spell.c:231
                     await pline_The($c.lit("invocation fails!"));
                     await pline($c.lit("At least one of your relics is cursed..."));
                 } else if (arti1_primed && arti2_primed) {
-                    soon = (rng_log_enabled() ? (rng_log_set_caller($c.lit("spell.c"), 287, $c.lit("deadbook")), d(2, 6)) : d(2, 6)) >>> 0;
+                    soon = d(2, 6) >>> 0;
                     await mkinvokearea();
                     u.uevent.invoked = (1) & 1;
                     await record_achievement(5);
@@ -216,7 +216,7 @@ async function deadbook(book2) {   // spell.c:231
             if ($goto === "raise_dead" || book2.cursed) {
                 $goto = null;   // raise_dead:
                 await You($c.lit("raised the dead!"));
-                if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("spell.c"), 311, $c.lit("deadbook")), rn2(3)) : rn2(3)) && ((mtmp = await makemon($c.relem(mons, 185 /* PM_MASTER_LICH */), u.ux, u.uy, 1)) !== null || (mtmp = await makemon($c.relem(mons, 299 /* PM_NALFESHNEE */), u.ux, u.uy, 1)) !== null)) {
+                if (!rn2(3) && ((mtmp = await makemon($c.relem(mons, 185 /* PM_MASTER_LICH */), u.ux, u.uy, 1)) !== null || (mtmp = await makemon($c.relem(mons, 299 /* PM_NALFESHNEE */), u.ux, u.uy, 1)) !== null)) {
                     mtmp.mpeaceful = (0) & 1;
                     set_malign(mtmp);
                 }
@@ -227,7 +227,7 @@ async function deadbook(book2) {   // spell.c:231
             } else if (book2.blessed) {
                 await iter_mons(deadbook_pacify_undead);
             } else {
-                switch (rng_log_enabled() ? (rng_log_set_caller($c.lit("spell.c"), 327, $c.lit("deadbook")), rn2(3)) : rn2(3)) {
+                switch (rn2(3)) {
                     case 0:
                         await Your($c.lit("ancestors are annoyed with you!"));
                         break;
@@ -255,7 +255,7 @@ async function learn() {   // spell.c:356
     costly = 1;
     faded_to_blank = 0;
     book = svc.context.spbook.book;
-    if (svc.context.spbook.delay && $G.ublindf && $G.ublindf.otyp === 232 /* LENSES */ && (rng_log_enabled() ? (rng_log_set_caller($c.lit("spell.c"), 366, $c.lit("learn")), rn2(2)) : rn2(2))) {
+    if (svc.context.spbook.delay && $G.ublindf && $G.ublindf.otyp === 232 /* LENSES */ && rn2(2)) {
         svc.context.spbook.delay = $c.i8(svc.context.spbook.delay + 1);
     }
     if (u.uprops[14 /* CONFUSION */].intrinsic) {
@@ -291,7 +291,7 @@ async function learn() {   // spell.c:356
             await pline($c.lit("This spellbook is too faint to be read any more."));
             $t1 = booktype = 407, book.otyp = $t1;
             faded_to_blank = 1;
-            $t2 = rng_log_enabled() ? (rng_log_set_caller($c.lit("spell.c"), 406, $c.lit("learn")), rn2(book.usecount)) : rn2(book.usecount), book.usecount = $t2;
+            $t2 = rn2(book.usecount), book.usecount = $t2;
         } else {
             await Your($c.lit("knowledge of %s is %s."), new $c.Ptr(splname, 0), svs.spl_book[i].sp_know ? $c.lit("keener") : $c.lit("restored"));
             svs.spl_book[i].sp_know = 20001;
@@ -303,7 +303,7 @@ async function learn() {   // spell.c:356
             await pline($c.lit("This spellbook is too faint to read even once."));
             $t3 = booktype = 407, book.otyp = $t3;
             faded_to_blank = 1;
-            $t4 = rng_log_enabled() ? (rng_log_set_caller($c.lit("spell.c"), 424, $c.lit("learn")), rn2(book.usecount)) : rn2(book.usecount), book.usecount = $t4;
+            $t4 = rn2(book.usecount), book.usecount = $t4;
         } else {
             svs.spl_book[i].sp_id = booktype;
             svs.spl_book[i].sp_lev = $c.i16(objects[booktype].oc_oc2);
@@ -343,9 +343,9 @@ export async function study_book(spellbook) {   // spell.c:468
     confused = $c.i8(u.uprops[14 /* CONFUSION */].intrinsic !== 0 ? 1 : 0);
     too_hard = 0;
     if (!confused && !(u.uprops[3 /* SLEEP_RES */].intrinsic || u.uprops[3 /* SLEEP_RES */].extrinsic) && await objdescr_is(spellbook, $c.lit("dull"))) {
-        dullbook = (rng_log_enabled() ? (rng_log_set_caller($c.lit("spell.c"), 478, $c.lit("study_book")), rnd(25)) : rnd(25)) - acurr(2 /* A_WIS */) | 0;
+        dullbook = rnd(25) - acurr(2 /* A_WIS */) | 0;
         if (svc.context.spbook.delay && $c.peq(spellbook, svc.context.spbook.book)) {
-            dullbook = dullbook - (rng_log_enabled() ? (rng_log_set_caller($c.lit("spell.c"), 482, $c.lit("study_book")), rnd(objects[booktype].oc_oc2)) : rnd(objects[booktype].oc_oc2)) | 0;
+            dullbook = dullbook - rnd(objects[booktype].oc_oc2) | 0;
         }
         if (dullbook > 0) {
             eyes = await body_part(1 /* EYE */);
@@ -353,7 +353,7 @@ export async function study_book(spellbook) {   // spell.c:468
                 eyes = await makeplural(eyes);
             }
             await pline($c.lit("This book is so dull that you can't keep your %s open."), eyes);
-            dullbook = dullbook + (rng_log_enabled() ? (rng_log_set_caller($c.lit("spell.c"), 490, $c.lit("study_book")), rnd(Math.imul(2, objects[booktype].oc_oc2))) : rnd(Math.imul(2, objects[booktype].oc_oc2))) | 0;
+            dullbook = dullbook + rnd(Math.imul(2, objects[booktype].oc_oc2)) | 0;
             await fall_asleep(-dullbook | 0, 1);
             return 1;
         }
@@ -428,7 +428,7 @@ export async function study_book(spellbook) {   // spell.c:468
                         return 1;
                     }
                 }
-                if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("spell.c"), 599, $c.lit("study_book")), rnd(20)) : rnd(20)) > read_ability) {
+                if (rnd(20) > read_ability) {
                     too_hard = 1;
                 }
             }
@@ -439,7 +439,7 @@ export async function study_book(spellbook) {   // spell.c:468
             gm.multi_reason = $c.lit("reading a book");
             gn.nomovemsg = null;
             svc.context.spbook.delay = 0;
-            if (gone || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("spell.c"), 612, $c.lit("study_book")), rn2(3)) : rn2(3))) {
+            if (gone || !rn2(3)) {
                 if (!gone) {
                     await pline_The($c.lit("spellbook crumbles to dust!"));
                 }
@@ -790,7 +790,7 @@ async function spell_backfire(spell) {   // spell.c:1181
     duration = Math.imul(svs.spl_book[spell].sp_lev + 1 | 0, 3);
     old_stun = $c.and64(u.uprops[13 /* STUNNED */].intrinsic, 16777215);
     old_conf = $c.and64(u.uprops[14 /* CONFUSION */].intrinsic, 16777215);
-    switch (rng_log_enabled() ? (rng_log_set_caller($c.lit("spell.c"), 1194, $c.lit("spell_backfire")), rn2(10)) : rn2(10)) {
+    switch (rn2(10)) {
         case 0:
         case 1:
         case 2:
@@ -827,7 +827,7 @@ async function spelleffects_check(spell, res, energy) {   // spell.c:1220
         await Your($c.lit("knowledge of this spell is twisted."));
         await pline($c.lit("It invokes nightmarish images in your mind..."));
         await spell_backfire(spell);
-        $t1 = rng_log_enabled() ? (rng_log_set_caller($c.lit("spell.c"), 1255, $c.lit("spelleffects_check")), rnd(energy.get(0))) : rnd(energy.get(0)), u.uen = u.uen - $t1 | 0;
+        $t1 = rnd(energy.get(0)), u.uen = u.uen - $t1 | 0;
         if (u.uen < 0) {
             u.uen = 0;
         }
@@ -857,7 +857,7 @@ async function spelleffects_check(spell, res, energy) {   // spell.c:1220
     }
     if (u.uhave.amulet | 0 && u.uen >= energy.get(0)) {
         await You_feel($c.lit("the amulet draining your energy away."));
-        $t2 = rng_log_enabled() ? (rng_log_set_caller($c.lit("spell.c"), 1298, $c.lit("spelleffects_check")), rnd(Math.imul(2, energy.get(0)))) : rnd(Math.imul(2, energy.get(0))), u.uen = u.uen - $t2 | 0;
+        $t2 = rnd(Math.imul(2, energy.get(0))), u.uen = u.uen - $t2 | 0;
         if (u.uen < 0) {
             u.uen = 0;
         }
@@ -900,7 +900,7 @@ async function spelleffects_check(spell, res, energy) {   // spell.c:1220
         }
     }
     chance = await percent_success(spell);
-    if (confused || (rng_log_enabled() ? (rng_log_set_caller($c.lit("spell.c"), 1372, $c.lit("spelleffects_check")), rnd(100)) : rnd(100)) > chance) {
+    if (confused || rnd(100) > chance) {
         await You($c.lit("fail to cast the spell correctly."));
         u.uen = u.uen - $c.div32(energy.get(0), 2) | 0;
         disp.botl = 1;
@@ -934,7 +934,7 @@ export async function spelleffects(spell_otyp, atme, force) {   // spell.c:1385
                 if (await throwspell()) {
                     cc.x = $c.i16(u.dx);
                     cc.y = $c.i16(u.dy);
-                    n = (rng_log_enabled() ? (rng_log_set_caller($c.lit("spell.c"), 1425, $c.lit("spelleffects")), rnd(8)) : rnd(8)) + 1 | 0;
+                    n = rnd(8) + 1 | 0;
                     while ($t2 = n, n = $t2 - 1 | 0, $t2) {
                         if (!u.dx && !u.dy && !u.dz) {
                             if ((damage = await zapyourself(pseudo, 1)) !== 0) {
@@ -944,8 +944,8 @@ export async function spelleffects(spell_otyp, atme, force) {   // spell.c:1385
                         } else {
                             await explode($c.i16(u.dx), $c.i16(u.dy), (otyp - 367 /* SPE_MAGIC_MISSILE */ | 0) + 10 | 0, spell_damage_bonus($c.div32(u.ulevel, 2) + 1 | 0), 0, otyp === 369 /* SPE_CONE_OF_COLD */ ? 6 /* EXPL_FROSTY */ : 5 /* EXPL_FIERY */);
                         }
-                        $t3 = (cc.x + (rng_log_enabled() ? (rng_log_set_caller($c.lit("spell.c"), 1442, $c.lit("spelleffects")), rnd(3)) : rnd(3)) | 0) - 2 | 0, u.dx = $t3;
-                        $t4 = (cc.y + (rng_log_enabled() ? (rng_log_set_caller($c.lit("spell.c"), 1443, $c.lit("spelleffects")), rnd(3)) : rnd(3)) | 0) - 2 | 0, u.dy = $t4;
+                        $t3 = (cc.x + rnd(3) | 0) - 2 | 0, u.dx = $t3;
+                        $t4 = (cc.y + rnd(3) | 0) - 2 | 0, u.dy = $t4;
                         if (!isok($c.i16(u.dx), $c.i16(u.dy)) || !((gv.viz_array.get(u.dy).get(u.dx) & 2) !== 0) || svl.level.locations[u.dx][u.dy].typ <= 12 /* DBWALL */ || u.uswallow | 0) {
                             u.dx = cc.x;
                             u.dy = cc.y;
@@ -1195,18 +1195,18 @@ export async function losespells() {   // spell.c:1763
             break;
         }
     }
-    nzap = rng_log_enabled() ? (rng_log_set_caller($c.lit("spell.c"), 1777, $c.lit("losespells")), rn2(n + 1 | 0)) : rn2(n + 1 | 0);
+    nzap = rn2(n + 1 | 0);
     if (u.uprops[14 /* CONFUSION */].intrinsic) {
-        i = rng_log_enabled() ? (rng_log_set_caller($c.lit("spell.c"), 1779, $c.lit("losespells")), rn2(n + 1 | 0)) : rn2(n + 1 | 0);
+        i = rn2(n + 1 | 0);
         if (i > nzap) {
             nzap = i;
         }
     }
-    if (nzap > 1 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("spell.c"), 1784, $c.lit("losespells")), rnl(7)) : rnl(7))) {
-        nzap = rng_log_enabled() ? (rng_log_set_caller($c.lit("spell.c"), 1785, $c.lit("losespells")), rnd(nzap)) : rnd(nzap);
+    if (nzap > 1 && !rnl(7)) {
+        nzap = rnd(nzap);
     }
     for (i = 0; nzap > 0; i = i + 1 | 0) {
-        if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("spell.c"), 1814, $c.lit("losespells")), rn2(n - i | 0)) : rn2(n - i | 0)) < nzap) {
+        if (rn2(n - i | 0) < nzap) {
             svs.spl_book[i].sp_know = 0;
             await exercise(2 /* A_WIS */, 0);
             nzap = nzap - 1 | 0;

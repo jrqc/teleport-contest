@@ -40,7 +40,7 @@ import { body_part, mbodypart } from './polyself.js';
 import { altar_wrath, altarmask_at, desecrate_altar } from './pray.js';
 import { angry_priest } from './priest.js';
 import { punish, unpunish } from './read.js';
-import { d, rn2, rnd, rng_log_enabled, rng_log_set_caller, rnl } from './rnd.js';
+import { d, rn2, rnd, rnl } from './rnd.js';
 import { genders } from './role.js';
 import { add_damage, costly_spot, make_angry_shk, obfree, pay_for_damage, shop_keeper, shopdig, stolen_value } from './shk.js';
 import { shkname } from './shknam.js';
@@ -293,8 +293,8 @@ async function dig() {   // dig.c:300
             return 0;
         }
     }
-    if ((u.uprops[25 /* FUMBLING */].intrinsic || u.uprops[25 /* FUMBLING */].extrinsic) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dig.c"), 336, $c.lit("dig")), rn2(3)) : rn2(3))) {
-        switch (rng_log_enabled() ? (rng_log_set_caller($c.lit("dig.c"), 337, $c.lit("dig")), rn2(3)) : rn2(3)) {
+    if ((u.uprops[25 /* FUMBLING */].intrinsic || u.uprops[25 /* FUMBLING */].extrinsic) && !rn2(3)) {
+        switch (rn2(3)) {
             case 0:
                 if (!await welded($G.uwep)) {
                     await You($c.lit("fumble and drop %s."), await yname($G.uwep));
@@ -305,7 +305,7 @@ async function dig() {   // dig.c:300
                     } else {
                         await pline($c.lit("Ouch!  %s and %s you!"), await Yobjnam2($G.uwep, $c.lit("bounce")), await otense($G.uwep, $c.lit("hit")));
                     }
-                    await set_wounded_legs(262144, 5 + (rng_log_enabled() ? (rng_log_set_caller($c.lit("dig.c"), 349, $c.lit("dig")), rnd(5)) : rnd(5)) | 0);
+                    await set_wounded_legs(262144, 5 + rnd(5) | 0);
                 }
                 break;
             case 1:
@@ -318,7 +318,7 @@ async function dig() {   // dig.c:300
         }
         return 0;
     }
-    $t1 = ((((10 + (rng_log_enabled() ? (rng_log_set_caller($c.lit("dig.c"), 366, $c.lit("dig")), rn2(5)) : rn2(5)) | 0) + await abon() | 0) + $G.uwep.spe | 0) - (($G.uwep.oeroded | 0) > ($G.uwep.oeroded2 | 0) ? $G.uwep.oeroded | 0 : $G.uwep.oeroded2 | 0) | 0) + u.udaminc | 0, svc.context.digging.effort = svc.context.digging.effort + $t1 | 0;
+    $t1 = ((((10 + rn2(5) | 0) + await abon() | 0) + $G.uwep.spe | 0) - (($G.uwep.oeroded | 0) > ($G.uwep.oeroded2 | 0) ? $G.uwep.oeroded | 0 : $G.uwep.oeroded2 | 0) | 0) + u.udaminc | 0, svc.context.digging.effort = svc.context.digging.effort + $t1 | 0;
     if (gu.urace.mnum === 44) {
         svc.context.digging.effort = Math.imul(svc.context.digging.effort, 2);
     }
@@ -336,7 +336,7 @@ async function dig() {   // dig.c:300
             $c.__builtin___memset_chk(svc.context.digging, 0, 32, 608);
             return 0;
         } else if (ttmp && (ttmp.ttyp | 0) === 5 /* BEAR_TRAP */ && u.utrap) {
-            if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("dig.c"), 393, $c.lit("dig")), rnl(7)) : rnl(7)) > (u.uprops[25 /* FUMBLING */].intrinsic || u.uprops[25 /* FUMBLING */].extrinsic ? 1 : 4)) {
+            if (rnl(7) > (u.uprops[25 /* FUMBLING */].intrinsic || u.uprops[25 /* FUMBLING */].extrinsic ? 1 : 4)) {
                 dmg = await dmgval($G.uwep, gy.youmonst) + dbon() | 0;
                 if (dmg < 1) {
                     dmg = 1;
@@ -392,10 +392,10 @@ async function dig() {   // dig.c:300
                 digtxt = $c.lit("The boulder falls apart.");
             } else if (lev.typ === 0 /* STONE */ || lev.typ === 15 /* SCORR */ || (lev.typ === 13 /* TREE */ || svl.level.flags.arboreal | 0 && lev.typ === 0 /* STONE */)) {
                 if ((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_earth_level)) {
-                    if ($G.uwep.blessed | 0 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dig.c"), 468, $c.lit("dig")), rn2(3)) : rn2(3))) {
+                    if ($G.uwep.blessed | 0 && !rn2(3)) {
                         await mkcavearea(0);
                         break cleanup$;
-                    } else if ($G.uwep.cursed | 0 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dig.c"), 471, $c.lit("dig")), rn2(4)) : rn2(4)) || !$G.uwep.blessed && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dig.c"), 472, $c.lit("dig")), rn2(6)) : rn2(6))) {
+                    } else if ($G.uwep.cursed | 0 && !rn2(4) || !$G.uwep.blessed && !rn2(6)) {
                         await mkcavearea(1);
                         break cleanup$;
                     }
@@ -403,7 +403,7 @@ async function dig() {   // dig.c:300
                 if (digtyp === 5 /* DIGTYP_TREE */) {
                     digtxt = $c.lit("You cut down the tree.");
                     lev.typ = 25, lev.flags = (0) & 31;
-                    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("dig.c"), 480, $c.lit("dig")), rn2(5)) : rn2(5))) {
+                    if (!rn2(5)) {
                         await rnd_treefruit_at(dpx, dpy);
                     }
                     if (gu.urace.mnum === 264 || gu.urole.mnum === 338) {
@@ -455,8 +455,8 @@ async function dig() {   // dig.c:300
             if (dmgtxt) {
                 await pay_for_damage(dmgtxt, 0);
             }
-            if ((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_earth_level) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dig.c"), 528, $c.lit("dig")), rn2(3)) : rn2(3))) {
-                mndx = (rng_log_enabled() ? (rng_log_set_caller($c.lit("dig.c"), 529, $c.lit("dig")), rn2(2)) : rn2(2)) ? 156 /* PM_EARTH_ELEMENTAL */ : 232 /* PM_XORN */;
+            if ((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_earth_level) && !rn2(3)) {
+                mndx = rn2(2) ? 156 /* PM_EARTH_ELEMENTAL */ : 232 /* PM_XORN */;
                 if (await makemon($c.relem(mons, mndx), dpx, dpy, 131072)) {
                     await pline_The($c.lit("debris from your digging comes to life!"));
                 }
@@ -539,11 +539,11 @@ export function fillholetyp(x, y, fill_if_any) {   // dig.c:606
     if (!fill_if_any) {
         pool_cnt = $c.div32(pool_cnt, 3);
     }
-    if (lava_cnt > (moat_cnt + pool_cnt | 0) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("dig.c"), 628, $c.lit("fillholetyp")), rn2(lava_cnt + 1 | 0)) : rn2(lava_cnt + 1 | 0)) || lava_cnt && fill_if_any) {
+    if (lava_cnt > (moat_cnt + pool_cnt | 0) && rn2(lava_cnt + 1 | 0) || lava_cnt && fill_if_any) {
         return 20;
-    } else if (moat_cnt > 0 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("dig.c"), 631, $c.lit("fillholetyp")), rn2(moat_cnt + 1 | 0)) : rn2(moat_cnt + 1 | 0)) || moat_cnt && fill_if_any) {
+    } else if (moat_cnt > 0 && rn2(moat_cnt + 1 | 0) || moat_cnt && fill_if_any) {
         return 17;
-    } else if (pool_cnt > 0 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("dig.c"), 633, $c.lit("fillholetyp")), rn2(pool_cnt + 1 | 0)) : rn2(pool_cnt + 1 | 0)) || pool_cnt && fill_if_any) {
+    } else if (pool_cnt > 0 && rn2(pool_cnt + 1 | 0) || pool_cnt && fill_if_any) {
         return 16;
     } else {
         return 25;
@@ -638,7 +638,7 @@ export async function digactualhole(x, y, madeby, ttyp) {   // dig.c:640
         }
         if (at_u) {
             if (!wont_fall) {
-                set_utrap(((rng_log_enabled() ? (rng_log_set_caller($c.lit("dig.c"), 739, $c.lit("digactualhole")), rn2(4)) : rn2(4)) + 2 | 0) >>> 0, 2);
+                set_utrap((rn2(4) + 2 | 0) >>> 0, 2);
                 gv.vision_full_recalc = 1;
             } else {
                 await reset_utrap(1);
@@ -772,7 +772,7 @@ export async function dighole(pit_only, by_magic, cc) {   // dig.c:885
     if (ttmp && ((ttmp.ttyp | 0) === 17 /* MAGIC_PORTAL */ || (ttmp.ttyp | 0) === 23 /* VIBRATING_SQUARE */ || nohole) || old_typ < 16 /* POOL */ && old_typ !== 14 /* SDOOR */ && ((lev.flags | 0) & 8) !== 0) {
         await pline_The($c.lit("%s %shere is too hard to dig in."), surface(dig_x, dig_y), dig_x !== u.ux || dig_y !== u.uy ? $c.lit("t") : $c.lit(""));
     } else if (ttmp && ((ttmp.ttyp | 0) === 15 /* TELEP_TRAP */ || (ttmp.ttyp | 0) === 16 /* LEVEL_TELEP */ || (ttmp.ttyp | 0) === 20 /* MAGIC_TRAP */ || (ttmp.ttyp | 0) === 21 /* ANTI_MAGIC */ || (ttmp.ttyp | 0) === 22 /* POLY_TRAP */)) {
-        await explode(dig_x, dig_y, 0, 20 + (rng_log_enabled() ? (rng_log_set_caller($c.lit("dig.c"), 919, $c.lit("dighole")), d(3, 6)) : d(3, 6)) | 0, 21, 4 /* EXPL_MAGICAL */);
+        await explode(dig_x, dig_y, 0, 20 + d(3, 6) | 0, 21, 4 /* EXPL_MAGICAL */);
         await deltrap(ttmp);
         await newsym(dig_x, dig_y);
     } else if (is_pool_or_lava(dig_x, dig_y)) {
@@ -789,7 +789,7 @@ export async function dighole(pit_only, by_magic, cc) {   // dig.c:885
             retval = 1;
         }
     } else if ((boulder_here = sobj_at(475 /* BOULDER */, dig_x, dig_y)) !== null) {
-        if (ttmp && ((ttmp.ttyp | 0) === 11 /* PIT */ || (ttmp.ttyp | 0) === 12 /* SPIKED_PIT */) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("dig.c"), 944, $c.lit("dighole")), rn2(2)) : rn2(2))) {
+        if (ttmp && ((ttmp.ttyp | 0) === 11 /* PIT */ || (ttmp.ttyp | 0) === 12 /* SPIKED_PIT */) && rn2(2)) {
             await pline_The($c.lit("boulder settles into the %spit."), dig_x !== u.ux || dig_y !== u.uy ? $c.lit("adjacent ") : $c.lit(""));
             ttmp.ttyp = (11) & 31;
         } else {
@@ -866,7 +866,7 @@ async function dig_up_grave(cc) {   // dig.c:1027
         }
         await You($c.lit("have violated the sanctity of this grave!"));
     }
-    what_happens = svl.level.locations[dig_x][dig_y].flags | 0 ? -1 : rng_log_enabled() ? (rng_log_set_caller($c.lit("dig.c"), 1058, $c.lit("dig_up_grave")), rn2(5)) : rn2(5);
+    what_happens = svl.level.locations[dig_x][dig_y].flags | 0 ? -1 : rn2(5);
     switch (what_happens) {
         case 0:
         case 1:
@@ -957,7 +957,7 @@ export async function use_pick_axe2(obj) {   // dig.c:1162
             await You_cant($c.lit("reach the %s."), ceiling(u.ux, u.uy));
         }
     } else if (!u.dx && !u.dy && !u.dz) {
-        dam = ((rng_log_enabled() ? (rng_log_set_caller($c.lit("dig.c"), 1184, $c.lit("use_pick_axe2")), rnd(2)) : rnd(2)) + dbon() | 0) + obj.spe | 0;
+        dam = (rnd(2) + dbon() | 0) + obj.spe | 0;
         if (dam <= 0) {
             dam = 1;
         }
@@ -987,7 +987,7 @@ export async function use_pick_axe2(obj) {   // dig.c:1162
                     await There($c.lit("is a spider web there!"));
                 }
                 await pline($c.lit("%s entangled in the web."), await Yobjnam2(obj, $c.lit("become")));
-                nomul(-(rng_log_enabled() ? (rng_log_set_caller($c.lit("dig.c"), 1218, $c.lit("use_pick_axe2")), d(2, 2)) : d(2, 2)) | 0);
+                nomul(-d(2, 2) | 0);
                 gm.multi_reason = $c.lit("stuck in a spider web");
                 gn.nomovemsg = $c.lit("You pull free.");
             } else if (lev.typ === 22 /* IRONBARS */) {
@@ -1005,7 +1005,7 @@ export async function use_pick_axe2(obj) {   // dig.c:1162
             } else if ((boulder = sobj_at(475 /* BOULDER */, rx, ry)) !== null || sobj_at(476 /* STATUE */, rx, ry)) {
                 what = boulder ? $c.lit("boulder") : $c.lit("statue");
                 if (!ispick) {
-                    vibrate = $c.i8(!(rng_log_enabled() ? (rng_log_set_caller($c.lit("dig.c"), 1240, $c.lit("use_pick_axe2")), rn2(3)) : rn2(3)) ? 1 : 0);
+                    vibrate = $c.i8(!rn2(3) ? 1 : 0);
                     await pline($c.lit("Sparks fly as you whack the %s.%s"), what, vibrate ? $c.lit("  The axe-handle vibrates violently!") : $c.lit(""));
                     if (vibrate) {
                         await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? 1 : 2, $c.lit("axing a hard object"), 1);
@@ -1124,7 +1124,7 @@ export async function watch_dig(mtmp, x, y, zap) {   // dig.c:1377
 }
 export async function mdig_tunnel(mtmp) {   // dig.c:1414
     let here = null, sawit = 0, seeit = 0, trapped = 0, pile = 0;
-    pile = rng_log_enabled() ? (rng_log_set_caller($c.lit("dig.c"), 1418, $c.lit("mdig_tunnel")), rnd(12)) : rnd(12);
+    pile = rnd(12);
     here = $c.relem(svl.level.locations[mtmp.mx], mtmp.my);
     if (here.typ === 14 /* SDOOR */) {
         cvt_sdoor_to_door(here);
@@ -1146,7 +1146,7 @@ export async function mdig_tunnel(mtmp) {   // dig.c:1414
             }
         } else {
             if (flags.verbose) {
-                if (!(gm.multi < 0 && (unconscious() || is_fainted())) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dig.c"), 1442, $c.lit("mdig_tunnel")), rn2(3)) : rn2(3))) {
+                if (!(gm.multi < 0 && (unconscious() || is_fainted())) && !rn2(3)) {
                     await draft_message(1);
                 }
             }
@@ -1166,7 +1166,7 @@ export async function mdig_tunnel(mtmp) {   // dig.c:1414
         return 0;
     }
     if (here.typ && here.typ <= 12 /* DBWALL */) {
-        if (flags.verbose && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dig.c"), 1468, $c.lit("mdig_tunnel")), rn2(5)) : rn2(5))) {
+        if (flags.verbose && !rn2(5)) {
             await You_hear($c.lit("crashing rock."));
         }
         if (in_rooms(mtmp.mx, mtmp.my, 14 /* SHOPBASE */).get(0)) {
@@ -1208,9 +1208,9 @@ export async function draft_message(unexpected) {   // dig.c:1504
         if (!(u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic))) {
             await You_feel($c.lit("a draft."));
         } else {
-            dridx = (rng_log_enabled() ? (rng_log_set_caller($c.lit("dig.c"), 1537, $c.lit("draft_message")), rn2(2)) : rn2(2)) + (1 - sgn(u.ualign.type) | 0) | 0;
+            dridx = rn2(2) + (1 - sgn(u.ualign.type) | 0) | 0;
             if (u.ualign.record < 4) {
-                dridx = dridx + ((rng_log_enabled() ? (rng_log_set_caller($c.lit("dig.c"), 1540, $c.lit("draft_message")), rn2(3)) : rn2(3)) + (sgn(u.ualign.type) - 1 | 0) | 0) | 0;
+                dridx = dridx + (rn2(3) + (sgn(u.ualign.type) - 1 | 0) | 0) | 0;
             }
             await You_feel($c.lit("like %s."), draft_message$draft_reaction[dridx]);
         }
@@ -1248,7 +1248,7 @@ export async function zap_dig() {   // dig.c:1548
                 }
                 await You($c.lit("loosen a rock from the %s."), ceiling(u.ux, u.uy));
                 await pline($c.lit("It falls on your %s!"), await body_part(8 /* HEAD */));
-                dmg = rng_log_enabled() ? (rng_log_set_caller($c.lit("dig.c"), 1596, $c.lit("zap_dig")), rnd(hard_helmet($G.uarmh) ? 2 : 6)) : rnd(hard_helmet($G.uarmh) ? 2 : 6);
+                dmg = rnd(hard_helmet($G.uarmh) ? 2 : 6);
                 await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(dmg + 1 | 0, 2) : dmg, $c.lit("falling rock"), 0);
                 otmp = await mksobj_at(474 /* ROCK */, u.ux, u.uy, 0, 0);
                 if (otmp) {
@@ -1271,7 +1271,7 @@ export async function zap_dig() {   // dig.c:1548
         pitdig = 1;
         diridx = xytodir(u.dx, u.dy);
     }
-    digdepth = (rng_log_enabled() ? (rng_log_set_caller($c.lit("dig.c"), 1622, $c.lit("zap_dig")), rn2(18)) : rn2(18)) + 8 | 0;
+    digdepth = rn2(18) + 8 | 0;
     await tmp_at(-1, 4083);
     while ((digdepth = digdepth - 1 | 0) >= 0) {
         if (!isok(zx, zy)) {
@@ -1541,7 +1541,7 @@ export async function bury_an_obj(otmp, dealloced) {   // dig.c:1984
     }
     if ($c.peq(otmp, $G.uball)) {
         await unpunish();
-        set_utrap(((rng_log_enabled() ? (rng_log_set_caller($c.lit("dig.c"), 1994, $c.lit("bury_an_obj")), rn2(50)) : rn2(50)) + 20 | 0) >>> 0, 6);
+        set_utrap((rn2(50) + 20 | 0) >>> 0, 6);
         await pline_The($c.lit("iron ball gets buried!"));
     }
     otmp2 = otmp.v.v_nexthere;
@@ -1565,7 +1565,7 @@ export async function bury_an_obj(otmp, dealloced) {   // dig.c:1984
     }
     if (otmp.otyp === 265 /* CORPSE */) {
     } else if ((under_ice ? otmp.oclass === 8 /* POTION_CLASS */ : (objects[otmp.otyp].oc_material | 0) <= 8 /* WOOD */) && !obj_resists(otmp, 5, 95)) {
-        await start_timer($c.add64(under_ice ? 0 : 250, rng_log_enabled() ? (rng_log_set_caller($c.lit("dig.c"), 2034, $c.lit("bury_an_obj")), rnd(250)) : rnd(250)), 3, 0, obj_to_any(otmp));
+        await start_timer($c.add64(under_ice ? 0 : 250, rnd(250)), 3, 0, obj_to_any(otmp));
     }
     await add_to_buried(otmp);
     return otmp2;

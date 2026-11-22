@@ -32,7 +32,7 @@ import { There, You, You_cant, You_feel, Your, impossible, pline, pline_The, urg
 import { body_part, change_sex, float_vs_flight, livelog_newform, poly_gender } from './polyself.js';
 import { incr_itimeout, make_glib, make_hallucinated, make_slimed, self_invis_message, toggle_blindness } from './potion.js';
 import { region_danger } from './region.js';
-import { rn2, rnd, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { rn2, rnd } from './rnd.js';
 import { shk_your } from './shk.js';
 import { remove_worn_item } from './steal.js';
 import { begin_burn, end_burn } from './timeout.js';
@@ -152,7 +152,7 @@ export async function Boots_on() {   // do_wear.c:187
             break;
         case 171 /* FUMBLE_BOOTS */:
             if (!oldprop && !$c.and64(u.uprops[25 /* FUMBLING */].intrinsic, -16777216)) {
-                incr_itimeout(new $c.FieldRef(u.uprops[25 /* FUMBLING */], "intrinsic", "i64"), rng_log_enabled() ? (rng_log_set_caller($c.lit("do_wear.c"), 233, $c.lit("Boots_on")), rnd(20)) : rnd(20));
+                incr_itimeout(new $c.FieldRef(u.uprops[25 /* FUMBLING */], "intrinsic", "i64"), rnd(20));
             }
             break;
         case 172 /* LEVITATION_BOOTS */:
@@ -436,7 +436,7 @@ async function Gloves_on() {   // do_wear.c:576
             break;
         case 160 /* GAUNTLETS_OF_FUMBLING */:
             if (!oldprop && !$c.and64(u.uprops[25 /* FUMBLING */].intrinsic, -16777216)) {
-                incr_itimeout(new $c.FieldRef(u.uprops[25 /* FUMBLING */], "intrinsic", "i64"), rng_log_enabled() ? (rng_log_set_caller($c.lit("do_wear.c"), 586, $c.lit("Gloves_on")), rnd(20)) : rnd(20));
+                incr_itimeout(new $c.FieldRef(u.uprops[25 /* FUMBLING */], "intrinsic", "i64"), rnd(20));
             }
             break;
         case 161 /* GAUNTLETS_OF_POWER */:
@@ -784,7 +784,7 @@ async function Amulet_on(amul) {   // do_wear.c:963
             break;
         case 204 /* AMULET_OF_RESTFUL_SLEEP */:
             {
-                newnap = $c.add64(rng_log_enabled() ? (rng_log_set_caller($c.lit("do_wear.c"), 1048, $c.lit("Amulet_on")), rnd(98)) : rnd(98), 2);
+                newnap = $c.add64(rnd(98), 2);
                 oldnap = $c.and64(u.uprops[27 /* SLEEPY */].intrinsic, 16777215);
                 if (newnap < oldnap || oldnap === 0) {
                     u.uprops[27 /* SLEEPY */].intrinsic = $c.or64($c.and64(u.uprops[27 /* SLEEPY */].intrinsic, -16777216), newnap);
@@ -2077,19 +2077,19 @@ export async function some_armor(victim) {   // do_wear.c:2630
         otmph = $c.peq(victim, gy.youmonst) ? $G.uarmu : await which_armor(victim, 64);
     }
     otmp = $c.peq(victim, gy.youmonst) ? $G.uarmh : await which_armor(victim, 4);
-    if (otmp && (!otmph || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("do_wear.c"), 2641, $c.lit("some_armor")), rn2(4)) : rn2(4)))) {
+    if (otmp && (!otmph || !rn2(4))) {
         otmph = otmp;
     }
     otmp = $c.peq(victim, gy.youmonst) ? $G.uarmg : await which_armor(victim, 16);
-    if (otmp && (!otmph || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("do_wear.c"), 2644, $c.lit("some_armor")), rn2(4)) : rn2(4)))) {
+    if (otmp && (!otmph || !rn2(4))) {
         otmph = otmp;
     }
     otmp = $c.peq(victim, gy.youmonst) ? $G.uarmf : await which_armor(victim, 32);
-    if (otmp && (!otmph || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("do_wear.c"), 2647, $c.lit("some_armor")), rn2(4)) : rn2(4)))) {
+    if (otmp && (!otmph || !rn2(4))) {
         otmph = otmp;
     }
     otmp = $c.peq(victim, gy.youmonst) ? $G.uarms : await which_armor(victim, 8);
-    if (otmp && (!otmph || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("do_wear.c"), 2650, $c.lit("some_armor")), rn2(4)) : rn2(4)))) {
+    if (otmp && (!otmph || !rn2(4))) {
         otmph = otmp;
     }
     return otmph;
@@ -2572,7 +2572,7 @@ export async function destroy_arm() {   // do_wear.c:3278
     armors.fill(null);
     armors[0] = null;
     idx = 0;
-    hits = (rng_log_enabled() ? (rng_log_set_caller($c.lit("do_wear.c"), 3282, $c.lit("destroy_arm")), rn2(4)) : rn2(4)) + 1 | 0;
+    hits = rn2(4) + 1 | 0;
     ret = 0;
     if ($G.uarm) {
         armors[($t1 = idx, idx = $t1 + 1 | 0, $t1)] = $G.uarm;
@@ -2599,7 +2599,7 @@ export async function destroy_arm() {   // do_wear.c:3278
         return 0;
     }
     for (i = 0; i < hits; i = i + 1 | 0) {
-        otmp = armors[rng_log_enabled() ? (rng_log_set_caller($c.lit("do_wear.c"), 3297, $c.lit("destroy_arm")), rn2(idx)) : rn2(idx)];
+        otmp = armors[rn2(idx)];
         if (erosion_matters(otmp) && ((objects[otmp.otyp].oc_material | 0) === 11 /* IRON */ || is_flammable(otmp) || is_rottable(otmp) || ((objects[otmp.otyp].oc_material | 0) === 13 /* COPPER */ || (objects[otmp.otyp].oc_material | 0) === 11 /* IRON */) || (objects[otmp.otyp].oc_material | 0) === 19 /* GLASS */ && otmp.oclass === 3 /* ARMOR_CLASS */) && !otmp.oerodeproof) {
             erosion = obj_erode_type(otmp);
             if (erosion !== -1) {

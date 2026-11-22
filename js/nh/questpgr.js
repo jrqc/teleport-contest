@@ -16,7 +16,7 @@ import { get_table_option, get_table_str_opt, nhl_done, nhl_init, nhl_loadlua } 
 import { An, an, makeplural, makesingular, the } from './objnam.js';
 import { impossible, pline } from './pline.js';
 import { align_gname, align_gtitle } from './pray.js';
-import { rn2, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { rn2 } from './rnd.js';
 import { genders } from './role.js';
 import { windowprocs } from './windows.js';
 
@@ -416,7 +416,7 @@ async function com_pager_core(section, msgid, showerror, rawtext) {   // questpg
                 }
                 break compagerdone$;
             }
-            nelems = (rng_log_enabled() ? (rng_log_set_caller($c.lit("questpgr.c"), 566, $c.lit("com_pager_core")), rn2(nelems)) : rn2(nelems)) + 1 | 0;
+            nelems = rn2(nelems) + 1 | 0;
             lua_pushinteger(L, nelems);
             await lua_gettable(L, -2);
             text = await dupstr(await luaL_checklstring(L, -1, null));
@@ -463,15 +463,15 @@ export async function qt_pager(msgid) {   // questpgr.c:630
 }
 export async function qt_montype() {   // questpgr.c:637
     let qpm = 0;
-    if (rng_log_enabled() ? (rng_log_set_caller($c.lit("questpgr.c"), 641, $c.lit("qt_montype")), rn2(5)) : rn2(5)) {
+    if (rn2(5)) {
         qpm = gu.urole.enemy1num;
-        if (qpm !== -1 /* NON_PM */ && (rng_log_enabled() ? (rng_log_set_caller($c.lit("questpgr.c"), 643, $c.lit("qt_montype")), rn2(5)) : rn2(5)) && !(svm.mvitals[qpm].mvflags & 2)) {
+        if (qpm !== -1 /* NON_PM */ && rn2(5) && !(svm.mvitals[qpm].mvflags & 2)) {
             return $c.relem(mons, qpm);
         }
         return await mkclass(gu.urole.enemy1sym, 0);
     }
     qpm = gu.urole.enemy2num;
-    if (qpm !== -1 /* NON_PM */ && (rng_log_enabled() ? (rng_log_set_caller($c.lit("questpgr.c"), 648, $c.lit("qt_montype")), rn2(5)) : rn2(5)) && !(svm.mvitals[qpm].mvflags & 2)) {
+    if (qpm !== -1 /* NON_PM */ && rn2(5) && !(svm.mvitals[qpm].mvflags & 2)) {
         return $c.relem(mons, qpm);
     }
     return await mkclass(gu.urole.enemy2sym, 0);

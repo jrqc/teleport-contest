@@ -27,7 +27,7 @@ import { shiny_obj } from './objnam.js';
 import { fruitadd } from './options.js';
 import { Norep, impossible, pline } from './pline.js';
 import { create_gas_cloud } from './region.js';
-import { rn2, rnd, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { rn2, rnd } from './rnd.js';
 import { sfi_bubble, sfi_int, sfo_bubble, sfo_int } from './sfbase.js';
 import { load_special } from './sp_lev.js';
 import { stairway_find_dir } from './stairs.js';
@@ -103,7 +103,7 @@ export async function set_levltyp_lit(x, y, typ, lit) {   // mkmaze.c:125
             if (typ === 20 /* LAVAPOOL */ || typ === 21 /* LAVAWALL */) {
                 lit = 1;
             } else if (lit === -1) {
-                lit = $c.i8(rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 139, $c.lit("set_levltyp_lit")), rn2(2)) : rn2(2));
+                lit = $c.i8(rn2(2));
             }
             svl.level.locations[x][y].lit = (lit >>> 0) & 1;
         }
@@ -229,8 +229,8 @@ async function okay(x, y, dir) {   // mkmaze.c:297
 }
 function maze0xy(cc) {   // mkmaze.c:309
     let $t1, $t2;
-    $t1 = $c.i16(3 + Math.imul(2, rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 311, $c.lit("maze0xy")), rn2((gx.x_maze_max >> 1) - 1 | 0)) : rn2((gx.x_maze_max >> 1) - 1 | 0)) | 0), cc.x = $t1;
-    $t2 = $c.i16(3 + Math.imul(2, rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 312, $c.lit("maze0xy")), rn2((gy.y_maze_max >> 1) - 1 | 0)) : rn2((gy.y_maze_max >> 1) - 1 | 0)) | 0), cc.y = $t2;
+    $t1 = $c.i16(3 + Math.imul(2, rn2((gx.x_maze_max >> 1) - 1 | 0)) | 0), cc.x = $t1;
+    $t2 = $c.i16(3 + Math.imul(2, rn2((gy.y_maze_max >> 1) - 1 | 0)) | 0), cc.y = $t2;
     return;
 }
 export function is_exclusion_zone(type, x, y) {   // mkmaze.c:317
@@ -273,8 +273,8 @@ export async function place_lregion(lx, ly, hx, hy, nlx, nly, nhx, nhy, rtype, l
     }
     oneshot = $c.i8(lx === hx && ly === hy ? 1 : 0);
     for (trycnt = 0; trycnt < 200; trycnt = trycnt + 1 | 0) {
-        x = $c.i16((rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 396, $c.lit("place_lregion")), rn2((hx - lx | 0) + 1 | 0)) : rn2((hx - lx | 0) + 1 | 0)) + lx | 0);
-        y = $c.i16((rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 397, $c.lit("place_lregion")), rn2((hy - ly | 0) + 1 | 0)) : rn2((hy - ly | 0) + 1 | 0)) + ly | 0);
+        x = $c.i16(rn2((hx - lx | 0) + 1 | 0) + lx | 0);
+        y = $c.i16(rn2((hy - ly | 0) + 1 | 0) + ly | 0);
         if (await put_lregion_here(x, y, nlx, nly, nhx, nhy, rtype, oneshot, lev)) {
             return;
         }
@@ -466,7 +466,7 @@ export async function fixup_special() {   // mkmaze.c:570
     }
     if ((svd.dungeon_topology.d_medusa_level.dlevel || svd.dungeon_topology.d_medusa_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_medusa_level)) {
         croom = $c.relem(svr.rooms, 0);
-        for (tryct = rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 654, $c.lit("fixup_special")), rnd(4)) : rnd(4); tryct; tryct = tryct - 1 | 0) {
+        for (tryct = rnd(4); tryct; tryct = tryct - 1 | 0) {
             x = somex(croom);
             y = somey(croom);
             if (goodpos($c.i16(x), $c.i16(y), null, 0)) {
@@ -477,7 +477,7 @@ export async function fixup_special() {   // mkmaze.c:570
                 }
             }
         }
-        if (rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 671, $c.lit("fixup_special")), rn2(2)) : rn2(2)) {
+        if (rn2(2)) {
             otmp = await mk_tt_object(476 /* STATUE */, $c.i16(somex(croom)), $c.i16(somey(croom)));
         } else {
             otmp = await mkcorpstat(476 /* STATUE */, null, null, $c.i16(somex(croom)), $c.i16(somey(croom)), 0);
@@ -515,12 +515,12 @@ async function migrate_orc(mtmp, mflags) {   // mkmaze.c:717
     max_depth = dunlevs_in_dungeon(u.uz) + (svd.dungeons[u.uz.dnum].depth_start - 1 | 0) | 0;
     if (mflags === 1) {
         nlev = max_depth;
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 732, $c.lit("migrate_orc")), rn2(40)) : rn2(40))) {
+        if (!rn2(40)) {
             nlev = nlev - 1 | 0;
         }
         mtmp.migflags = $c.or64(mtmp.migflags, 8192);
     } else {
-        nlev = (rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 736, $c.lit("migrate_orc")), rn2((max_depth - cur_depth | 0) + 1 | 0)) : rn2((max_depth - cur_depth | 0) + 1 | 0)) + cur_depth | 0;
+        nlev = rn2((max_depth - cur_depth | 0) + 1 | 0) + cur_depth | 0;
         if (nlev === cur_depth) {
             nlev = nlev + 1 | 0;
         }
@@ -537,14 +537,14 @@ async function shiny_orc_stuff(mtmp) {   // mkmaze.c:748
     is_captain = $c.i8($c.peq(mtmp.data, $c.relem(mons, 77 /* PM_ORC_CAPTAIN */)) ? 1 : 0);
     goldprob = is_captain ? 600 : 300;
     gemprob = $c.div32(goldprob, 4);
-    if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 757, $c.lit("shiny_orc_stuff")), rn2(1000)) : rn2(1000)) < goldprob) {
+    if (rn2(1000) < goldprob) {
         if ((otmp = await mksobj(438 /* GOLD_PIECE */, 1, 0)) !== null) {
-            $t1 = $c.add64(1, rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 759, $c.lit("shiny_orc_stuff")), rnd(goldprob)) : rnd(goldprob)), otmp.quan = $t1;
+            $t1 = $c.add64(1, rnd(goldprob)), otmp.quan = $t1;
             $t2 = await weight(otmp) >>> 0, otmp.owt = $t2;
             await add_to_minv(mtmp, otmp);
         }
     }
-    if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 764, $c.lit("shiny_orc_stuff")), rn2(1000)) : rn2(1000)) < gemprob) {
+    if (rn2(1000) < gemprob) {
         if ((otmp = await mkobj(13 /* GEM_CLASS */, 0)) !== null) {
             if (otmp.otyp === 474 /* ROCK */) {
                 await dealloc_obj(otmp);
@@ -553,7 +553,7 @@ async function shiny_orc_stuff(mtmp) {   // mkmaze.c:748
             }
         }
     }
-    if (is_captain || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 772, $c.lit("shiny_orc_stuff")), rn2(8)) : rn2(8))) {
+    if (is_captain || !rn2(8)) {
         otyp = await shiny_obj(4);
         if (otyp !== 0 /* STRANGE_OBJECT */ && (otmp = await mksobj(otyp, 1, 0)) !== null) {
             await add_to_minv(mtmp, otmp);
@@ -568,9 +568,9 @@ async function migr_booty_item(otyp, gang) {   // mkmaze.c:780
         $c.__builtin___strcpy_chk(otmp.oextra.oname, gang, -1);
         if (objects[otyp].oc_class === 7 /* FOOD_CLASS */) {
             if (otyp === 285 /* SLIME_MOLD */) {
-                $t1 = $c.i8(await fruitadd(orcfruit[rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 790, $c.lit("migr_booty_item")), rn2(2)) : rn2(2)], null)), otmp.spe = $t1;
+                $t1 = $c.i8(await fruitadd(orcfruit[rn2(2)], null)), otmp.spe = $t1;
             }
-            $t2 = rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 792, $c.lit("migr_booty_item")), rn2(3)) : rn2(3), otmp.quan = $c.add64(otmp.quan, $t2);
+            $t2 = rn2(3), otmp.quan = $c.add64(otmp.quan, $t2);
             $t3 = await weight(otmp) >>> 0, otmp.owt = $t3;
         }
     }
@@ -578,24 +578,24 @@ async function migr_booty_item(otyp, gang) {   // mkmaze.c:780
 async function stolen_booty() {   // mkmaze.c:799
     let gang = null, gang_name = new Int8Array(256), mtmp = null, cnt = 0, i = 0, otyp = 0, mtyp = 0;
     gang = rndorcname(new $c.Ptr(gang_name, 0));
-    cnt = rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 820, $c.lit("stolen_booty")), rnd(4)) : rnd(4);
+    cnt = rnd(4);
     for (i = 0; i < cnt; i = i + 1 | 0) {
-        await migr_booty_item((rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 822, $c.lit("stolen_booty")), rn2(4)) : rn2(4)) ? 224 /* TALLOW_CANDLE */ : 225 /* WAX_CANDLE */, gang);
+        await migr_booty_item(rn2(4) ? 224 /* TALLOW_CANDLE */ : 225 /* WAX_CANDLE */, gang);
     }
-    cnt = rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 823, $c.lit("stolen_booty")), rnd(3)) : rnd(3);
+    cnt = rnd(3);
     for (i = 0; i < cnt; i = i + 1 | 0) {
         await migr_booty_item(221 /* SKELETON_KEY */, gang);
     }
-    otyp = (rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 826, $c.lit("stolen_booty")), rn2(4)) : rn2(4)) + 159 | 0;
+    otyp = rn2(4) + 159 | 0;
     await migr_booty_item(otyp, gang);
-    cnt = rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 828, $c.lit("stolen_booty")), rnd(10)) : rnd(10);
+    cnt = rnd(10);
     for (i = 0; i < cnt; i = i + 1 | 0) {
-        otyp = (rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 831, $c.lit("stolen_booty")), rn2(33)) : rn2(33)) + 264 | 0;
+        otyp = rn2(33) + 264 | 0;
         if (otyp !== 291 /* LEMBAS_WAFER */ && (objects[otyp].oc_prob !== 0 || otyp === 295 /* C_RATION */ || otyp === 294 /* K_RATION */) && otyp !== 265 /* CORPSE */ && otyp !== 266 /* EGG */ && otyp !== 296 /* TIN */) {
             await migr_booty_item(otyp, gang);
         }
     }
-    await migr_booty_item((rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 843, $c.lit("stolen_booty")), rn2(2)) : rn2(2)) ? 54 /* LONG_SWORD */ : 51 /* SILVER_SABER */, gang);
+    await migr_booty_item(rn2(2) ? 54 /* LONG_SWORD */ : 51 /* SILVER_SABER */, gang);
     mtmp = await makemon($c.relem(mons, 77 /* PM_ORC_CAPTAIN */), 0, 0, 64);
     if (mtmp) {
         mtmp = await christen_monst(mtmp, upstart(gang));
@@ -608,15 +608,15 @@ async function stolen_booty() {   // mkmaze.c:799
         if (mtmp.mhp < 1) {
             continue;
         }
-        if ($c.andu64(mtmp.data.mflags2, 128) !== 0 && !(mtmp.mextra && mtmp.mextra.mgivenname) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 858, $c.lit("stolen_booty")), rn2(10)) : rn2(10))) {
+        if ($c.andu64(mtmp.data.mflags2, 128) !== 0 && !(mtmp.mextra && mtmp.mextra.mgivenname) && rn2(10)) {
             if (!$c.peq(mtmp.data, $c.relem(mons, 77 /* PM_ORC_CAPTAIN */))) {
                 mtmp = await christen_orc(mtmp, upstart(gang), $c.lit(""));
             }
         }
     }
-    cnt = (rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 877, $c.lit("stolen_booty")), rn2(10)) : rn2(10)) + 5 | 0;
+    cnt = rn2(10) + 5 | 0;
     for (i = 0; i < cnt; i = i + 1 | 0) {
-        mtyp = (rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 881, $c.lit("stolen_booty")), rn2(5)) : rn2(5)) + 72 /* PM_ORC */ | 0;
+        mtyp = rn2(5) + 72 /* PM_ORC */ | 0;
         mtmp = await makemon($c.relem(mons, mtyp), 0, 0, 64);
         if (mtmp) {
             await shiny_orc_stuff(mtmp);
@@ -708,7 +708,7 @@ async function maze_remove_deadends(typ) {   // mkmaze.c:904
                 if (idx2 >= 3 && idx > 0) {
                     dx = x;
                     dy = y;
-                    dir = $c.i16(dirok[rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 939, $c.lit("maze_remove_deadends")), rn2(idx)) : rn2(idx)]);
+                    dir = $c.i16(dirok[rn2(idx)]);
                     do {
                         switch (dir) {
                             case 0:
@@ -740,10 +740,10 @@ export async function create_maze(corrwid, wallthick, rmdeadends) {   // mkmaze.
     rdx = 0;
     rdy = 0;
     if (corrwid === -1) {
-        corrwid = rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 961, $c.lit("create_maze")), rnd(4)) : rnd(4);
+        corrwid = rnd(4);
     }
     if (wallthick === -1) {
-        wallthick = (rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 964, $c.lit("create_maze")), rnd(4)) : rnd(4)) - corrwid | 0;
+        wallthick = rnd(4) - corrwid | 0;
     }
     if (wallthick < 1) {
         wallthick = 1;
@@ -826,8 +826,8 @@ export async function pick_vibrasquare_location() {   // mkmaze.c:1042
     }
     $t1 = svi.inv_pos.y = 0, svi.inv_pos.x = $t1;
     do {
-        x = $c.i16((rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 1075, $c.lit("pick_vibrasquare_location")), rn2(x_range)) : rn2(x_range)) + 7 | 0);
-        y = $c.i16((rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 1076, $c.lit("pick_vibrasquare_location")), rn2(y_range)) : rn2(y_range)) + 6 | 0);
+        x = $c.i16(rn2(x_range) + 7 | 0);
+        y = $c.i16(rn2(y_range) + 6 | 0);
         if ((trycnt = trycnt + 1 | 0) > 1000) {
             break;
         }
@@ -837,27 +837,27 @@ export async function pick_vibrasquare_location() {   // mkmaze.c:1042
 }
 async function populate_maze() {   // mkmaze.c:1097
     let i = 0, mm = new $T.nhcoord();
-    for (i = (rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 1102, $c.lit("populate_maze")), rn2(8)) : rn2(8)) + 11 | 0; i; i = i - 1 | 0) {
+    for (i = rn2(8) + 11 | 0; i; i = i - 1 | 0) {
         await mazexy(mm);
-        await mkobj_at($c.i8((rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 1104, $c.lit("populate_maze")), rn2(2)) : rn2(2)) ? 13 /* GEM_CLASS */ : 0 /* RANDOM_CLASS */), mm.x, mm.y, 1);
+        await mkobj_at($c.i8(rn2(2) ? 13 /* GEM_CLASS */ : 0 /* RANDOM_CLASS */), mm.x, mm.y, 1);
     }
-    for (i = (rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 1106, $c.lit("populate_maze")), rn2(10)) : rn2(10)) + 2 | 0; i; i = i - 1 | 0) {
+    for (i = rn2(10) + 2 | 0; i; i = i - 1 | 0) {
         await mazexy(mm);
         await mksobj_at(475 /* BOULDER */, mm.x, mm.y, 1, 0);
     }
-    for (i = rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 1110, $c.lit("populate_maze")), rn2(3)) : rn2(3); i; i = i - 1 | 0) {
+    for (i = rn2(3); i; i = i - 1 | 0) {
         await mazexy(mm);
         await makemon($c.relem(mons, 177 /* PM_MINOTAUR */), mm.x, mm.y, 0);
     }
-    for (i = (rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 1114, $c.lit("populate_maze")), rn2(5)) : rn2(5)) + 7 | 0; i; i = i - 1 | 0) {
+    for (i = rn2(5) + 7 | 0; i; i = i - 1 | 0) {
         await mazexy(mm);
         await makemon(null, mm.x, mm.y, 0);
     }
-    for (i = (rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 1118, $c.lit("populate_maze")), rn2(6)) : rn2(6)) + 7 | 0; i; i = i - 1 | 0) {
+    for (i = rn2(6) + 7 | 0; i; i = i - 1 | 0) {
         await mazexy(mm);
         await mkgold(0, mm.x, mm.y);
     }
-    for (i = (rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 1122, $c.lit("populate_maze")), rn2(6)) : rn2(6)) + 7 | 0; i; i = i - 1 | 0) {
+    for (i = rn2(6) + 7 | 0; i; i = i - 1 | 0) {
         await mktrap(0, 2, null, null);
     }
 }
@@ -866,19 +866,19 @@ export async function makemaz(s) {   // mkmaze.c:1127
     sp = Is_special(u.uz);
     if (s.get(0)) {
         if (sp && sp.rndlevs) {
-            nh_snprintf($c.lit("makemaz"), 1136, new $c.Ptr(protofile, 0), 20, $c.lit("%s-%d"), s, rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 1136, $c.lit("makemaz")), rnd(sp.rndlevs)) : rnd(sp.rndlevs));
+            nh_snprintf($c.lit("makemaz"), 1136, new $c.Ptr(protofile, 0), 20, $c.lit("%s-%d"), s, rnd(sp.rndlevs));
         } else {
             $c.__builtin___strcpy_chk(new $c.Ptr(protofile, 0), s, 20);
         }
     } else if (new $c.Ptr(svd.dungeons[u.uz.dnum].proto, 0).get(0)) {
         if (dunlevs_in_dungeon(u.uz) > 1) {
             if (sp && sp.rndlevs) {
-                nh_snprintf($c.lit("makemaz"), 1144, new $c.Ptr(protofile, 0), 20, $c.lit("%s%d-%d"), new $c.Ptr(svd.dungeons[u.uz.dnum].proto, 0), dunlev(u.uz), rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 1144, $c.lit("makemaz")), rnd(sp.rndlevs)) : rnd(sp.rndlevs));
+                nh_snprintf($c.lit("makemaz"), 1144, new $c.Ptr(protofile, 0), 20, $c.lit("%s%d-%d"), new $c.Ptr(svd.dungeons[u.uz.dnum].proto, 0), dunlev(u.uz), rnd(sp.rndlevs));
             } else {
                 nh_snprintf($c.lit("makemaz"), 1148, new $c.Ptr(protofile, 0), 20, $c.lit("%s%d"), new $c.Ptr(svd.dungeons[u.uz.dnum].proto, 0), dunlev(u.uz));
             }
         } else if (sp && sp.rndlevs) {
-            nh_snprintf($c.lit("makemaz"), 1152, new $c.Ptr(protofile, 0), 20, $c.lit("%s-%d"), new $c.Ptr(svd.dungeons[u.uz.dnum].proto, 0), rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 1152, $c.lit("makemaz")), rnd(sp.rndlevs)) : rnd(sp.rndlevs));
+            nh_snprintf($c.lit("makemaz"), 1152, new $c.Ptr(protofile, 0), 20, $c.lit("%s-%d"), new $c.Ptr(svd.dungeons[u.uz.dnum].proto, 0), rnd(sp.rndlevs));
         } else {
             $c.__builtin___strcpy_chk(new $c.Ptr(protofile, 0), new $c.Ptr(svd.dungeons[u.uz.dnum].proto, 0), 20);
         }
@@ -916,9 +916,9 @@ export async function makemaz(s) {   // mkmaze.c:1127
         await impossible($c.lit("Couldn't load \"%s\" - making a maze."), new $c.Ptr(protofile, 0));
     }
     svl.level.flags.is_maze_lev = (1) & 1;
-    $t1 = (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 1198, $c.lit("makemaz")), rn2(3)) : rn2(3)) ? 1 : 0) >>> 0, svl.level.flags.corrmaze = ($t1) & 1;
-    if (!Invocation_lev(u.uz) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 1200, $c.lit("makemaz")), rn2(2)) : rn2(2))) {
-        await create_maze(-1, -1, $c.i8(!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 1201, $c.lit("makemaz")), rn2(5)) : rn2(5)) ? 1 : 0));
+    $t1 = (!rn2(3) ? 1 : 0) >>> 0, svl.level.flags.corrmaze = ($t1) & 1;
+    if (!Invocation_lev(u.uz) && rn2(2)) {
+        await create_maze(-1, -1, $c.i8(!rn2(5) ? 1 : 0));
     } else {
         await create_maze(1, 1, 0);
     }
@@ -960,7 +960,7 @@ export async function walkfrom(x, y, typ) {   // mkmaze.c:1279
         if (!q) {
             return;
         }
-        dir = dirs[rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 1304, $c.lit("walkfrom")), rn2(q)) : rn2(q)];
+        dir = dirs[rn2(q)];
         do {
             switch (dir) {
                 case 0:
@@ -1006,8 +1006,8 @@ export async function mazexy(cc) {   // mkmaze.c:1316
     allowedtyp = svl.level.flags.corrmaze | 0 ? 24 /* CORR */ : 25 /* ROOM */;
     cpt = 0;
     do {
-        x = $c.i16(rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 1330, $c.lit("mazexy")), rnd(gx.x_maze_max)) : rnd(gx.x_maze_max));
-        y = $c.i16(rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 1331, $c.lit("mazexy")), rnd(gy.y_maze_max)) : rnd(gy.y_maze_max));
+        x = $c.i16(rnd(gx.x_maze_max));
+        y = $c.i16(rnd(gy.y_maze_max));
         if (svl.level.locations[x][y].typ === allowedtyp) {
             cc.x = x;
             cc.y = y;
@@ -1134,7 +1134,7 @@ export async function mkportal(x, y, todnum, todlevel) {   // mkmaze.c:1464
 }
 export async function fumaroles() {   // mkmaze.c:1484
     let n = 0, nmax = 0, sizemin = 0, snd = 0, loud = 0, x = 0, y = 0, r = null;
-    nmax = $c.i16(rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 1486, $c.lit("fumaroles")), rn2(3)) : rn2(3));
+    nmax = $c.i16(rn2(3));
     sizemin = 5;
     snd = 0;
     loud = 0;
@@ -1147,10 +1147,10 @@ export async function fumaroles() {   // mkmaze.c:1484
         sizemin = sizemin + 5 | 0;
     }
     for (n = nmax; n; n = $c.i16(n - 1)) {
-        x = $c.i16((rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 1500, $c.lit("fumaroles")), rn2(76)) : rn2(76)) + 3 | 0);
-        y = $c.i16((rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 1501, $c.lit("fumaroles")), rn2(17)) : rn2(17)) + 3 | 0);
+        x = $c.i16(rn2(76) + 3 | 0);
+        y = $c.i16(rn2(17) + 3 | 0);
         if (svl.level.locations[x][y].typ === 20 /* LAVAPOOL */) {
-            r = await create_gas_cloud(x, y, (rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 1504, $c.lit("fumaroles")), rn2(10)) : rn2(10)) + sizemin | 0, (rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 1504, $c.lit("fumaroles")), rn2(10)) : rn2(10)) + 5 | 0);
+            r = await create_gas_cloud(x, y, rn2(10) + sizemin | 0, rn2(10) + 5 | 0);
             r.player_flags = (r.player_flags | 2) >>> 0;
             snd = 1;
             if (dist2(x, y, u.ux, u.uy) < 15) {
@@ -1252,7 +1252,7 @@ export async function movebubbles() {   // mkmaze.c:1539
                 xedge = $c.i8(x < (svx.xmin + 1 | 0) || x > (svx.xmax - 1 | 0) ? 1 : 0);
                 yedge = $c.i8(y < (svy.ymin + 1 | 0) || y > (svy.ymax - 1 | 0) ? 1 : 0);
                 if (xedge || yedge) {
-                    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 1660, $c.lit("movebubbles")), rn2(xedge ? 3 : 5)) : rn2(xedge ? 3 : 5))) {
+                    if (!rn2(xedge ? 3 : 5)) {
                         svl.level.locations[x][y].typ = 36;
                         block_point(x, y);
                     }
@@ -1262,8 +1262,8 @@ export async function movebubbles() {   // mkmaze.c:1539
     }
     movebubbles$up = $c.i8(!movebubbles$up ? 1 : 0);
     for (b = movebubbles$up ? svb.bbubbles : ge.ebubbles; b; b = movebubbles$up ? b.next : b.prev) {
-        rx = rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 1675, $c.lit("movebubbles")), rn2(3)) : rn2(3);
-        ry = rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 1675, $c.lit("movebubbles")), rn2(3)) : rn2(3);
+        rx = rn2(3);
+        ry = rn2(3);
         await mv_bubble(b, $c.i16((b.dx + 1 | 0) - (!b.dx ? rx : rx ? 1 : 0) | 0), $c.i16((b.dy + 1 | 0) - (!b.dy ? ry : ry ? 1 : 0) | 0), 0);
     }
     if ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) && $G.uball !== null) {
@@ -1274,22 +1274,22 @@ export async function movebubbles() {   // mkmaze.c:1539
 export async function water_friction() {   // mkmaze.c:1689
     let x = 0, y = 0, dx = 0, dy = 0, eff = 0;
     eff = 0;
-    if ((u.uprops[51 /* SWIMMING */].intrinsic || u.uprops[51 /* SWIMMING */].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, 2) !== 0) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 1694, $c.lit("water_friction")), rn2(4)) : rn2(4))) {
+    if ((u.uprops[51 /* SWIMMING */].intrinsic || u.uprops[51 /* SWIMMING */].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, 2) !== 0) && rn2(4)) {
         return;
     }
-    if (u.dx && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 1697, $c.lit("water_friction")), rn2(!u.dy ? 3 : 6)) : rn2(!u.dy ? 3 : 6))) {
+    if (u.dx && !rn2(!u.dy ? 3 : 6)) {
         x = u.ux;
         do {
-            dy = $c.i16((rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 1701, $c.lit("water_friction")), rn2(3)) : rn2(3)) - 1 | 0);
+            dy = $c.i16(rn2(3) - 1 | 0);
             y = $c.i16(u.uy + dy | 0);
         } while (dy && (!isok(x, y) || !is_pool(x, y)));
         u.dx = 0;
         u.dy = dy;
         eff = 1;
-    } else if (u.dy && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 1707, $c.lit("water_friction")), rn2(!u.dx ? 3 : 5)) : rn2(!u.dx ? 3 : 5))) {
+    } else if (u.dy && !rn2(!u.dx ? 3 : 5)) {
         y = u.uy;
         do {
-            dx = $c.i16((rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 1711, $c.lit("water_friction")), rn2(3)) : rn2(3)) - 1 | 0);
+            dx = $c.i16(rn2(3) - 1 | 0);
             x = $c.i16(u.ux + dx | 0);
         } while (dx && (!isok(x, y) || !is_pool(x, y)));
         u.dy = 0;
@@ -1384,15 +1384,15 @@ async function setup_waterlevel() {   // mkmaze.c:1812
         }
     }
     if ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) {
-        xskip = $c.i16(10 + (rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 1847, $c.lit("setup_waterlevel")), rn2(10)) : rn2(10)) | 0);
-        yskip = $c.i16(4 + (rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 1848, $c.lit("setup_waterlevel")), rn2(4)) : rn2(4)) | 0);
+        xskip = $c.i16(10 + rn2(10) | 0);
+        yskip = $c.i16(4 + rn2(4) | 0);
     } else {
-        xskip = $c.i16(6 + (rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 1850, $c.lit("setup_waterlevel")), rn2(4)) : rn2(4)) | 0);
-        yskip = $c.i16(3 + (rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 1851, $c.lit("setup_waterlevel")), rn2(3)) : rn2(3)) | 0);
+        xskip = $c.i16(6 + rn2(4) | 0);
+        yskip = $c.i16(3 + rn2(3) | 0);
     }
     for (x = $c.i16(svx.xmin + 1 | 0); x <= (svx.xmax - 1 | 0); x = $c.i16(x + xskip | 0)) {
         for (y = $c.i16(svy.ymin + 1 | 0); y <= (svy.ymax - 1 | 0); y = $c.i16(y + yskip | 0)) {
-            await mk_bubble(x, y, rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 1856, $c.lit("setup_waterlevel")), rn2(7)) : rn2(7));
+            await mk_bubble(x, y, rn2(7));
         }
     }
 }
@@ -1425,8 +1425,8 @@ async function mk_bubble(x, y, n) {   // mkmaze.c:1873
     }
     b.x = x;
     b.y = y;
-    $t1 = $c.i8(1 - (rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 1909, $c.lit("mk_bubble")), rn2(3)) : rn2(3)) | 0), b.dx = $t1;
-    $t2 = $c.i8(1 - (rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 1910, $c.lit("mk_bubble")), rn2(3)) : rn2(3)) | 0), b.dy = $t2;
+    $t1 = $c.i8(1 - rn2(3) | 0), b.dx = $t1;
+    $t2 = $c.i8(1 - rn2(3) | 0), b.dy = $t2;
     $c.__builtin___memcpy_chk(new $c.Ptr(b.bm, 0), mk_bubble$bmask[n], $c.mulu64($c.u64(mk_bubble$bmask[n].get(1) + 2 | 0), 1), -1);
     b.cons = null;
     if (!svb.bbubbles) {
@@ -1449,7 +1449,7 @@ export function maybe_adjust_hero_bubble() {   // mkmaze.c:1929
     if (!u.dx && !u.dy) {
         return;
     }
-    if (hero_bubble && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 1937, $c.lit("maybe_adjust_hero_bubble")), rn2(2)) : rn2(2))) {
+    if (hero_bubble && !rn2(2)) {
         hero_bubble.dx = $c.i8(u.dx);
         hero_bubble.dy = $c.i8(u.dy);
     }
@@ -1457,7 +1457,7 @@ export function maybe_adjust_hero_bubble() {   // mkmaze.c:1929
 async function mv_bubble(b, dx, dy, ini) {   // mkmaze.c:1952
     let i = 0, j = 0, colli = 0, x = 0, y = 0, cons = null, ctemp = null, olist = null, otmp = null, mon = null, mtmp = null, ux0 = 0, uy0 = 0, btrap = null, $t1, $t2;
     colli = 0;
-    if (!((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level)) || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 1959, $c.lit("mv_bubble")), rn2(6)) : rn2(6))) {
+    if (!((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level)) || !rn2(6)) {
         if (dx < -1 || dx > 1 || dy < -1 || dy > 1) {
             dx = $c.i16(sgn(dx));
             dy = $c.i16(sgn(dy));
@@ -1580,9 +1580,9 @@ async function mv_bubble(b, dx, dy, ini) {   // mkmaze.c:1952
             b.dx = $c.i8(-b.dx | 0);
             break;
         default:
-            if (!ini && (b.dx || b.dy ? !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 2102, $c.lit("mv_bubble")), rn2(20)) : rn2(20)) : !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 2102, $c.lit("mv_bubble")), rn2(5)) : rn2(5)))) {
-                $t1 = $c.i8(1 - (rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 2103, $c.lit("mv_bubble")), rn2(3)) : rn2(3)) | 0), b.dx = $t1;
-                $t2 = $c.i8(1 - (rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmaze.c"), 2104, $c.lit("mv_bubble")), rn2(3)) : rn2(3)) | 0), b.dy = $t2;
+            if (!ini && (b.dx || b.dy ? !rn2(20) : !rn2(5))) {
+                $t1 = $c.i8(1 - rn2(3) | 0), b.dx = $t1;
+                $t2 = $c.i8(1 - rn2(3) | 0), b.dy = $t2;
             }
     }
 }

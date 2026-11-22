@@ -29,7 +29,7 @@ import { You, pline } from './pline.js';
 import { is_quest_artifact } from './questpgr.js';
 import { cant_revive, unpunish } from './read.js';
 import { getlev, trickery } from './restore.js';
-import { rn2, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { rn2 } from './rnd.js';
 import { aligns, genders, races, roles } from './role.js';
 import { savefruitchn, savelev } from './save.js';
 import { sfi_char, sfo_char } from './sfbase.js';
@@ -184,7 +184,7 @@ async function give_to_nearby_mon(otmp, x, y) {   // bones.c:226
                 continue;
             }
             nmon = nmon + 1 | 0;
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("bones.c"), 247, $c.lit("give_to_nearby_mon")), rn2(nmon)) : rn2(nmon))) {
+            if (!rn2(nmon)) {
                 selected = mtmp;
             }
         }
@@ -210,14 +210,14 @@ export async function drop_upon_death(mtmp, cont, x, y) {   // bones.c:259
         if (otmp.otyp === 285 /* SLIME_MOLD */) {
             goodfruit(otmp.spe);
         }
-        if (rng_log_enabled() ? (rng_log_set_caller($c.lit("bones.c"), 290, $c.lit("drop_upon_death")), rn2(5)) : rn2(5)) {
+        if (rn2(5)) {
             await curse(otmp);
         }
         if (mtmp) {
             await add_to_minv(mtmp, otmp);
         } else if (cont) {
             await add_to_container(cont, otmp);
-        } else if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("bones.c"), 296, $c.lit("drop_upon_death")), rn2(8)) : rn2(8))) {
+        } else if (!rn2(8)) {
             await give_to_nearby_mon(otmp, x, y);
         } else {
             await place_object(otmp, x, y);
@@ -276,7 +276,7 @@ export function can_make_bones() {   // bones.c:356
             }
         }
     }
-    if (depth(u.uz) <= 0 || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("bones.c"), 377, $c.lit("can_make_bones")), rn2(1 + (depth(u.uz) >> 2) | 0)) : rn2(1 + (depth(u.uz) >> 2) | 0)) && !flags.debug) {
+    if (depth(u.uz) <= 0 || !rn2(1 + (depth(u.uz) >> 2) | 0) && !flags.debug) {
         return 0;
     }
     if (flags.explore) {
@@ -464,7 +464,7 @@ export async function getbones() {   // bones.c:630
     if (!flags.bones) {
         return 0;
     }
-    if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("bones.c"), 645, $c.lit("getbones")), rn2(3)) : rn2(3)) && !flags.debug) {
+    if (rn2(3) && !flags.debug) {
         return 0;
     }
     if (no_bones_level(u.uz)) {

@@ -35,7 +35,7 @@ import { You, gamelog_add, impossible, pline } from './pline.js';
 import { set_uasmon } from './polyself.js';
 import { newepri, restpriest } from './priest.js';
 import { rest_regions } from './region.js';
-import { rnd, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { rnd } from './rnd.js';
 import { role_init } from './role.js';
 import { restore_oracles } from './rumors.js';
 import { savelev, savestateinlock } from './save.js';
@@ -776,7 +776,7 @@ export async function getlev(nhfp, pid, lev) {   // restore.c:1046
             await mon_catchup_elapsed_time(mtmp, elapsed);
         }
         await restore_cham(mtmp);
-        if (ghostly || elapsed > 0 && elapsed > (rng_log_enabled() ? (rng_log_set_caller($c.lit("restore.c"), 1219, $c.lit("getlev")), rnd(10)) : rnd(10))) {
+        if (ghostly || elapsed > 0 && elapsed > rnd(10)) {
             await hide_monst(mtmp);
         }
     }

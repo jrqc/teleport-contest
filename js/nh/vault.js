@@ -28,7 +28,7 @@ import { m_carrying } from './mthrowu.js';
 import { objects } from './objects.js';
 import { an, makeplural, mimic_obj_name, simpleonames } from './objnam.js';
 import { You, You_hear, You_see, Your, impossible, pline, pline_The, verbalize } from './pline.js';
-import { rn2, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { rn2 } from './rnd.js';
 import { genders } from './role.js';
 import { contained_gold, obfree } from './shk.js';
 import { yelp } from './sounds.js';
@@ -275,7 +275,7 @@ export async function invault() {   // vault.c:317
         return;
     }
     vgdeathcount = svm.mvitals[272 /* PM_GUARD */].died;
-    if (vgdeathcount < 2 || vgdeathcount < 50 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("vault.c"), 334, $c.lit("invault")), rn2(Math.imul(vgdeathcount, vgdeathcount))) : rn2(Math.imul(vgdeathcount, vgdeathcount)))) {
+    if (vgdeathcount < 2 || vgdeathcount < 50 && !rn2(Math.imul(vgdeathcount, vgdeathcount))) {
         u.uinvault = u.uinvault + 1 | 0;
     }
     if (u.uinvault < 30 || $c.rem32(u.uinvault, 15) !== 0) {
@@ -512,8 +512,8 @@ async function move_gold(gold, vroom) {   // vault.c:632
     let nx = 0, ny = 0;
     await remove_object(gold);
     await newsym(gold.ox, gold.oy);
-    nx = $c.i16(svr.rooms[vroom].lx + (rng_log_enabled() ? (rng_log_set_caller($c.lit("vault.c"), 638, $c.lit("move_gold")), rn2(2)) : rn2(2)) | 0);
-    ny = $c.i16(svr.rooms[vroom].ly + (rng_log_enabled() ? (rng_log_set_caller($c.lit("vault.c"), 639, $c.lit("move_gold")), rn2(2)) : rn2(2)) | 0);
+    nx = $c.i16(svr.rooms[vroom].lx + rn2(2) | 0);
+    ny = $c.i16(svr.rooms[vroom].ly + rn2(2) | 0);
     await place_object(gold, nx, ny);
     await stackobj(gold);
     await newsym(nx, ny);
@@ -857,7 +857,7 @@ export async function gd_move(grd) {   // vault.c:888
                 return 0;
             }
             if (um_dist(grd.mx, grd.my, 1) || egrd.gddone | 0) {
-                if (!egrd.gddone && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("vault.c"), 1067, $c.lit("gd_move")), rn2(10)) : rn2(10)) && !(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf) && !u.uswallow && !(u.ustuck && !sticks(gy.youmonst.data))) {
+                if (!egrd.gddone && !rn2(10) && !(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf) && !u.uswallow && !(u.ustuck && !sticks(gy.youmonst.data))) {
                     await verbalize($c.lit("Move along!"));
                 }
                 await restfakecorr(grd);
@@ -1011,8 +1011,8 @@ export async function paygd(silently) {   // vault.c:1205
             if (!silently) {
                 await pline($c.lit("%s remits your gold to the vault."), await Monnam(grd));
             }
-            gdx = svr.rooms[grd.mextra.egd.vroom].lx + (rng_log_enabled() ? (rng_log_set_caller($c.lit("vault.c"), 1229, $c.lit("paygd")), rn2(2)) : rn2(2)) | 0;
-            gdy = svr.rooms[grd.mextra.egd.vroom].ly + (rng_log_enabled() ? (rng_log_set_caller($c.lit("vault.c"), 1230, $c.lit("paygd")), rn2(2)) : rn2(2)) | 0;
+            gdx = svr.rooms[grd.mextra.egd.vroom].lx + rn2(2) | 0;
+            gdy = svr.rooms[grd.mextra.egd.vroom].ly + rn2(2) | 0;
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("To Croesus: here's the gold recovered from %s the %s."), new $c.Ptr(svp.plname, 0), pmname($c.relem(mons, u.umonster), flags.female ? 1 /* FEMALE */ : 0 /* MALE */));
             await make_grave($c.i16(gdx), $c.i16(gdy), new $c.Ptr(buf, 0));
         }

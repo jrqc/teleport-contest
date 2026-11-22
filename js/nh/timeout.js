@@ -37,7 +37,7 @@ import { incr_itimeout, make_blinded, make_confused, make_deaf, make_glib, make_
 import { stuck_in_wall } from './pray.js';
 import { any_visible_region, region_danger, visible_region_summary } from './region.js';
 import { lookup_id_mapping } from './restore.js';
-import { d, rn2, rnd, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { d, rn2, rnd } from './rnd.js';
 import { genders } from './role.js';
 import { sfi_fe, sfi_int, sfi_ulong, sfo_fe, sfo_int, sfo_ulong } from './sfbase.js';
 import { Shk_Your, find_oid, obfree } from './shk.js';
@@ -135,12 +135,12 @@ async function vomiting_dialogue() {   // timeout.c:197
             }
             break;
         case 6:
-            await make_stunned($c.add64($c.and64(u.uprops[13 /* STUNNED */].intrinsic, 16777215), rng_log_enabled() ? (rng_log_set_caller($c.lit("timeout.c"), 215, $c.lit("vomiting_dialogue")), d(2, 4)) : d(2, 4)), 0);
+            await make_stunned($c.add64($c.and64(u.uprops[13 /* STUNNED */].intrinsic, 16777215), d(2, 4)), 0);
             if (!Popeye(20 /* VOMITING */)) {
                 await stop_occupation();
             }
         case 9:
-            await make_confused($c.add64($c.and64(u.uprops[14 /* CONFUSION */].intrinsic, 16777215), rng_log_enabled() ? (rng_log_set_caller($c.lit("timeout.c"), 221, $c.lit("vomiting_dialogue")), d(2, 4)) : d(2, 4)), 0);
+            await make_confused($c.add64($c.and64(u.uprops[14 /* CONFUSION */].intrinsic, 16777215), d(2, 4)), 0);
             if (gm.multi > 0) {
                 nomul(0);
             }
@@ -191,7 +191,7 @@ async function choke_dialogue() {   // timeout.c:295
     let i = 0, str = null;
     i = $c.and64(u.uprops[19 /* STRANGLED */].intrinsic, 16777215);
     if (i > 0 && i <= 5) {
-        if (u.uprops[52 /* MAGICAL_BREATHING */].intrinsic || u.uprops[52 /* MAGICAL_BREATHING */].extrinsic || $c.andu64(gy.youmonst.data.mflags1, 1024) !== 0 || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("timeout.c"), 300, $c.lit("choke_dialogue")), rn2(50)) : rn2(50))) {
+        if (u.uprops[52 /* MAGICAL_BREATHING */].intrinsic || u.uprops[52 /* MAGICAL_BREATHING */].extrinsic || $c.andu64(gy.youmonst.data.mflags1, 1024) !== 0 || !rn2(50)) {
             await urgent_pline(choke_texts2[$c.idx($c.sub64(5, i))], await body_part(11 /* NECK */));
         } else {
             str = choke_texts[$c.idx($c.sub64(5, i))];
@@ -417,7 +417,7 @@ export async function nh_timeout() {   // timeout.c:588
     }
     if (u.mtimedone && !(u.mtimedone = u.mtimedone - 1 | 0)) {
         if (u.uprops[63 /* UNCHANGING */].intrinsic || u.uprops[63 /* UNCHANGING */].extrinsic) {
-            $t1 = rng_log_enabled() ? (rng_log_set_caller($c.lit("timeout.c"), 643, $c.lit("nh_timeout")), rnd(Math.imul(100, gy.youmonst.data.mlevel) + 1 | 0)) : rnd(Math.imul(100, gy.youmonst.data.mlevel) + 1 | 0), u.mtimedone = $t1;
+            $t1 = rnd(Math.imul(100, gy.youmonst.data.mlevel) + 1 | 0), u.mtimedone = $t1;
         } else if ($c.andu64(gy.youmonst.data.mflags2, 4) !== 0) {
             await you_unwere(0);
         } else {
@@ -465,7 +465,7 @@ export async function nh_timeout() {   // timeout.c:588
                     await make_vomiting(0, 1);
                     break;
                 case 17:
-                    if (((u.usick_type | 0) & 2) === 0 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("timeout.c"), 696, $c.lit("nh_timeout")), rn2(100)) : rn2(100)) < acurr(4 /* A_CON */)) {
+                    if (((u.usick_type | 0) & 2) === 0 && rn2(100) < acurr(4 /* A_CON */)) {
                         await You($c.lit("have recovered from your illness."));
                         await make_sick(0, null, 0, 3);
                         await exercise(4 /* A_CON */, 0);
@@ -555,12 +555,12 @@ export async function nh_timeout() {   // timeout.c:588
                     break;
                 case 27:
                     if (unconscious() || (u.uprops[3 /* SLEEP_RES */].intrinsic || u.uprops[3 /* SLEEP_RES */].extrinsic)) {
-                        incr_itimeout(new $c.FieldRef(u.uprops[27 /* SLEEPY */], "intrinsic", "i64"), rng_log_enabled() ? (rng_log_set_caller($c.lit("timeout.c"), 786, $c.lit("nh_timeout")), rnd(100)) : rnd(100));
+                        incr_itimeout(new $c.FieldRef(u.uprops[27 /* SLEEPY */], "intrinsic", "i64"), rnd(100));
                     } else if (u.uprops[27 /* SLEEPY */].intrinsic || u.uprops[27 /* SLEEPY */].extrinsic) {
                         await You($c.lit("fall asleep."));
-                        sleeptime = rng_log_enabled() ? (rng_log_set_caller($c.lit("timeout.c"), 789, $c.lit("nh_timeout")), rnd(20)) : rnd(20);
+                        sleeptime = rnd(20);
                         await fall_asleep(-sleeptime | 0, 1);
-                        incr_itimeout(new $c.FieldRef(u.uprops[27 /* SLEEPY */], "intrinsic", "i64"), sleeptime + (rng_log_enabled() ? (rng_log_set_caller($c.lit("timeout.c"), 791, $c.lit("nh_timeout")), rnd(100)) : rnd(100)) | 0);
+                        incr_itimeout(new $c.FieldRef(u.uprops[27 /* SLEEPY */], "intrinsic", "i64"), sleeptime + rnd(100) | 0);
                     }
                     break;
                 case 48:
@@ -665,7 +665,7 @@ export async function nh_timeout() {   // timeout.c:588
                     }
                     u.uprops[25 /* FUMBLING */].intrinsic = $c.and64(u.uprops[25 /* FUMBLING */].intrinsic, -67108865);
                     if (u.uprops[25 /* FUMBLING */].intrinsic || u.uprops[25 /* FUMBLING */].extrinsic) {
-                        incr_itimeout(new $c.FieldRef(u.uprops[25 /* FUMBLING */], "intrinsic", "i64"), rng_log_enabled() ? (rng_log_set_caller($c.lit("timeout.c"), 924, $c.lit("nh_timeout")), rnd(20)) : rnd(20));
+                        incr_itimeout(new $c.FieldRef(u.uprops[25 /* FUMBLING */], "intrinsic", "i64"), rnd(20));
                     }
                     if (iflags.defer_decor) {
                         await deferred_decor(0);
@@ -699,7 +699,7 @@ export async function attach_egg_hatch_timeout(egg, when) {   // timeout.c:981
     await stop_timer(5, obj_to_any(egg));
     if (!when) {
         for (i = 151; i <= 200; i = i + 1 | 0) {
-            if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("timeout.c"), 996, $c.lit("attach_egg_hatch_timeout")), rnd(i)) : rnd(i)) > 150) {
+            if (rnd(i) > 150) {
                 when = i;
                 break;
             }
@@ -723,10 +723,10 @@ export async function hatch_egg(arg, timeout) {   // timeout.c:1017
     }
     mon = mon2 = null;
     mnum = big_to_little(egg.corpsenm);
-    yours = $c.i8(egg.spe || !flags.female && egg.where === 3 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("timeout.c"), 1035, $c.lit("hatch_egg")), rn2(2)) : rn2(2)) ? 1 : 0);
+    yours = $c.i8(egg.spe || !flags.female && egg.where === 3 && !rn2(2) ? 1 : 0);
     silent = $c.i8(timeout !== svm.moves ? 1 : 0);
     if (get_obj_location(egg, new $c.Ptr(x, 0), new $c.Ptr(y, 0), 0)) {
-        hatchcount = rng_log_enabled() ? (rng_log_set_caller($c.lit("timeout.c"), 1042, $c.lit("hatch_egg")), rnd($c.i32(egg.quan))) : rnd($c.i32(egg.quan));
+        hatchcount = rnd($c.i32(egg.quan));
         cansee_hatchspot = $c.i8((gv.viz_array.get(y[0]).get(x[0]) & 2) !== 0 && !silent ? 1 : 0);
         if (!(mons[mnum].geno & 4096) && !(svm.mvitals[mnum].mvflags & 3)) {
             for (i = hatchcount; i > 0; i = i - 1 | 0) {
@@ -801,7 +801,7 @@ export async function hatch_egg(arg, timeout) {   // timeout.c:1017
             await learn_egg_type(mnum);
         }
         if (egg.quan > 0) {
-            await attach_egg_hatch_timeout(egg, rng_log_enabled() ? (rng_log_set_caller($c.lit("timeout.c"), 1172, $c.lit("hatch_egg")), rnd(12)) : rnd(12));
+            await attach_egg_hatch_timeout(egg, rnd(12));
             await container_weight(egg);
         } else if (egg.where === 3) {
             await useup(egg);
@@ -825,7 +825,7 @@ export async function learn_egg_type(mnum) {   // timeout.c:1193
 export async function attach_fig_transform_timeout(figurine) {   // timeout.c:1204
     let i = 0;
     await stop_timer(6, obj_to_any(figurine));
-    i = (rng_log_enabled() ? (rng_log_set_caller($c.lit("timeout.c"), 1214, $c.lit("attach_fig_transform_timeout")), rnd(9000)) : rnd(9000)) + 200 | 0;
+    i = rnd(9000) + 200 | 0;
     await start_timer(i, 3, 6, obj_to_any(figurine));
 }
 async function slip_or_trip() {   // timeout.c:1222
@@ -848,13 +848,13 @@ async function slip_or_trip() {   // timeout.c:1222
             $c.__builtin___sprintf_chk(new $c.Ptr(svk.killer.name, 0), 0, 256, $c.lit("tripping over %s corpse"), await an(mons[otmp.corpsenm].pmnames[2 /* NEUTRAL */]));
             await instapetrify(new $c.Ptr(svk.killer.name, 0));
         }
-    } else if ($c.and64(u.uprops[25 /* FUMBLING */].intrinsic, 67108864) || is_ice(u.ux, u.uy) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("timeout.c"), 1262, $c.lit("slip_or_trip")), rn2(3)) : rn2(3))) {
+    } else if ($c.and64(u.uprops[25 /* FUMBLING */].intrinsic, 67108864) || is_ice(u.ux, u.uy) && !rn2(3)) {
         ice_only = $c.i8(!(u.uprops[25 /* FUMBLING */].extrinsic || $c.and64(u.uprops[25 /* FUMBLING */].intrinsic, -67108865)) ? 1 : 0);
-        await pline($c.lit("%s %s %s the ice."), u.usteed ? upstart(await x_monnam(u.usteed, 1, null, 8, 0)) : $c.lit("You"), await vtense(u.usteed ? $c.lit("steed") : $c.lit("you"), (rng_log_enabled() ? (rng_log_set_caller($c.lit("timeout.c"), 1273, $c.lit("slip_or_trip")), rn2(2)) : rn2(2)) ? $c.lit("slip") : $c.lit("slide")), is_ice(u.ux, u.uy) ? $c.lit("on") : $c.lit("off"));
-        if (!on_foot && ((saddle = await which_armor(u.usteed, 1048576)) === null || !saddle.cursed) && (!ice_only || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("timeout.c"), 1284, $c.lit("slip_or_trip")), rn2(3)) : rn2(3)))) {
+        await pline($c.lit("%s %s %s the ice."), u.usteed ? upstart(await x_monnam(u.usteed, 1, null, 8, 0)) : $c.lit("You"), await vtense(u.usteed ? $c.lit("steed") : $c.lit("you"), rn2(2) ? $c.lit("slip") : $c.lit("slide")), is_ice(u.ux, u.uy) ? $c.lit("on") : $c.lit("off"));
+        if (!on_foot && ((saddle = await which_armor(u.usteed, 1048576)) === null || !saddle.cursed) && (!ice_only || !rn2(3))) {
             await You($c.lit("lose your balance."));
             await dismount_steed(1 /* DISMOUNT_FELL */);
-        } else if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("timeout.c"), 1287, $c.lit("slip_or_trip")), rn2(10 + acurr(3 /* A_DEX */) | 0)) : rn2(10 + acurr(3 /* A_DEX */) | 0))) {
+        } else if (!rn2(10 + acurr(3 /* A_DEX */) | 0)) {
             if (!(u.umonnum === 116 /* PM_GRID_BUG */)) {
                 confdir(1);
             }
@@ -864,7 +864,7 @@ async function slip_or_trip() {   // timeout.c:1222
         }
     } else {
         if (on_foot) {
-            switch (rng_log_enabled() ? (rng_log_set_caller($c.lit("timeout.c"), 1302, $c.lit("slip_or_trip")), rn2(4)) : rn2(4)) {
+            switch (rn2(4)) {
                 case 1:
                     await You($c.lit("trip over your own %s."), u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic) ? $c.lit("elbow") : await makeplural(await body_part(5 /* FOOT */)));
                     break;
@@ -879,7 +879,7 @@ async function slip_or_trip() {   // timeout.c:1222
                     break;
             }
         } else if ((saddle = await which_armor(u.usteed, 1048576)) === null || !saddle.cursed) {
-            switch (rng_log_enabled() ? (rng_log_set_caller($c.lit("timeout.c"), 1323, $c.lit("slip_or_trip")), rn2(4)) : rn2(4)) {
+            switch (rn2(4)) {
                 case 1:
                     await Your($c.lit("%s slip out of the stirrups."), await makeplural(await body_part(5 /* FOOT */)));
                     break;
@@ -1264,18 +1264,18 @@ async function cleanup_burn(arg, expire_time) {   // timeout.c:1828
 }
 export async function do_storms() {   // timeout.c:1847
     let nstrike = 0, x = 0, y = 0, dirx = 0, diry = 0, count = 0;
-    if (!svl.level.flags.stormy || (rng_log_enabled() ? (rng_log_set_caller($c.lit("timeout.c"), 1855, $c.lit("do_storms")), rn2(8)) : rn2(8))) {
+    if (!svl.level.flags.stormy || rn2(8)) {
         return;
     }
-    for (nstrike = rng_log_enabled() ? (rng_log_set_caller($c.lit("timeout.c"), 1859, $c.lit("do_storms")), rnd(64)) : rnd(64); nstrike <= 64; nstrike = Math.imul(nstrike, 2)) {
+    for (nstrike = rnd(64); nstrike <= 64; nstrike = Math.imul(nstrike, 2)) {
         count = 0;
         do {
-            x = rng_log_enabled() ? (rng_log_set_caller($c.lit("timeout.c"), 1862, $c.lit("do_storms")), rnd(79)) : rnd(79);
-            y = rng_log_enabled() ? (rng_log_set_caller($c.lit("timeout.c"), 1863, $c.lit("do_storms")), rn2(21)) : rn2(21);
+            x = rnd(79);
+            y = rn2(21);
         } while ((count = count + 1 | 0) < 100 && svl.level.locations[x][y].typ !== 36 /* CLOUD */);
         if (count < 100) {
-            dirx = (rng_log_enabled() ? (rng_log_set_caller($c.lit("timeout.c"), 1867, $c.lit("do_storms")), rn2(3)) : rn2(3)) - 1 | 0;
-            diry = (rng_log_enabled() ? (rng_log_set_caller($c.lit("timeout.c"), 1868, $c.lit("do_storms")), rn2(3)) : rn2(3)) - 1 | 0;
+            dirx = rn2(3) - 1 | 0;
+            diry = rn2(3) - 1 | 0;
             if (dirx !== 0 || diry !== 0) {
                 gb.buzzer = null;
                 await buzz(-10 - $c.rem32($c.abs(5), 10) | 0, 8, $c.i16(x), $c.i16(y), dirx, diry);
@@ -1284,7 +1284,7 @@ export async function do_storms() {   // timeout.c:1847
     }
     if (svl.level.locations[u.ux][u.uy].typ === 36 /* CLOUD */) {
         await pline($c.lit("Kaboom!!!  Boom!!  Boom!!"));
-        incr_itimeout(new $c.FieldRef(u.uprops[16 /* DEAF */], "intrinsic", "i64"), (rng_log_enabled() ? (rng_log_set_caller($c.lit("timeout.c"), 1882, $c.lit("do_storms")), rn2(20)) : rn2(20)) + 30 | 0);
+        incr_itimeout(new $c.FieldRef(u.uprops[16 /* DEAF */], "intrinsic", "i64"), rn2(20) + 30 | 0);
         disp.botl = 1;
         if (!u.uinvulnerable) {
             await stop_occupation();

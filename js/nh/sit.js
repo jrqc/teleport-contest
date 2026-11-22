@@ -34,7 +34,7 @@ import { body_part, polyself } from './polyself.js';
 import { make_blinded, make_confused, make_glib, make_sick, split_mon } from './potion.js';
 import { altar_wrath } from './pray.js';
 import { do_genocide, seffects } from './read.js';
-import { d, rn2, rnd, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { d, rn2, rnd } from './rnd.js';
 import { genders } from './role.js';
 import { remove_worn_item } from './steal.js';
 import { tele } from './teleport.js';
@@ -70,8 +70,8 @@ async function throne_sit_effect() {   // sit.c:39
     tx = u.ux;
     ty = u.uy;
     special_throne = $c.i8(!!In_V_tower(u.uz) ? 1 : 0);
-    if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("sit.c"), 45, $c.lit("throne_sit_effect")), rnd(6)) : rnd(6)) > 4) {
-        effect = rng_log_enabled() ? (rng_log_set_caller($c.lit("sit.c"), 46, $c.lit("throne_sit_effect")), rnd(13)) : rnd(13);
+    if (rnd(6) > 4) {
+        effect = rnd(13);
         if (flags.debug && !iflags.debug_fuzzer) {
             buf[0] = 0;
             await getlin($c.lit("Throne sit effect (1..13) [0=random]"), new $c.Ptr(buf, 0));
@@ -90,15 +90,15 @@ async function throne_sit_effect() {   // sit.c:39
         }
         switch (effect) {
             case 1:
-                await adjattrib(rng_log_enabled() ? (rng_log_set_caller($c.lit("sit.c"), 70, $c.lit("throne_sit_effect")), rn2(6 /* A_MAX */)) : rn2(6 /* A_MAX */), -((rng_log_enabled() ? (rng_log_set_caller($c.lit("sit.c"), 70, $c.lit("throne_sit_effect")), rn2(4)) : rn2(4)) + 3 | 0) | 0, 0);
-                await losehp(rng_log_enabled() ? (rng_log_set_caller($c.lit("sit.c"), 71, $c.lit("throne_sit_effect")), rnd(10)) : rnd(10), $c.lit("cursed throne"), 0);
+                await adjattrib(rn2(6 /* A_MAX */), -(rn2(4) + 3 | 0) | 0, 0);
+                await losehp(rnd(10), $c.lit("cursed throne"), 0);
                 break;
             case 2:
-                await adjattrib(rng_log_enabled() ? (rng_log_set_caller($c.lit("sit.c"), 74, $c.lit("throne_sit_effect")), rn2(6 /* A_MAX */)) : rn2(6 /* A_MAX */), 1, 0);
+                await adjattrib(rn2(6 /* A_MAX */), 1, 0);
                 break;
             case 3:
                 await pline($c.lit("A%s electric shock shoots through your body!"), u.uprops[5 /* SHOCK_RES */].intrinsic || u.uprops[5 /* SHOCK_RES */].extrinsic ? $c.lit("n") : $c.lit(" massive"));
-                await losehp(u.uprops[5 /* SHOCK_RES */].intrinsic || u.uprops[5 /* SHOCK_RES */].extrinsic ? rng_log_enabled() ? (rng_log_set_caller($c.lit("sit.c"), 79, $c.lit("throne_sit_effect")), rnd(6)) : rnd(6) : rng_log_enabled() ? (rng_log_set_caller($c.lit("sit.c"), 79, $c.lit("throne_sit_effect")), rnd(30)) : rnd(30), $c.lit("electric chair"), 0);
+                await losehp(u.uprops[5 /* SHOCK_RES */].intrinsic || u.uprops[5 /* SHOCK_RES */].extrinsic ? rnd(6) : rnd(30), $c.lit("electric chair"), 0);
                 await exercise(4 /* A_CON */, 0);
                 break;
             case 4:
@@ -126,7 +126,7 @@ async function throne_sit_effect() {   // sit.c:39
                 await take_gold();
                 break;
             case 6:
-                if ((u.uluck + (rng_log_enabled() ? (rng_log_set_caller($c.lit("sit.c"), 106, $c.lit("throne_sit_effect")), rn2(5)) : rn2(5)) | 0) < 0) {
+                if ((u.uluck + rn2(5) | 0) < 0) {
                     await You_feel($c.lit("your luck is changing."));
                     change_luck(1);
                 } else {
@@ -135,7 +135,7 @@ async function throne_sit_effect() {   // sit.c:39
                 break;
             case 7:
                 {
-                    cnt = rng_log_enabled() ? (rng_log_set_caller($c.lit("sit.c"), 114, $c.lit("throne_sit_effect")), rnd(10)) : rnd(10);
+                    cnt = rnd(10);
                     await pline($c.lit("A voice echoes:"));
                     await verbalize($c.lit("Thine audience hath been summoned, %s!"), flags.female ? $c.lit("Dame") : $c.lit("Sire"));
                     while ($t1 = cnt, cnt = $t1 - 1 | 0, $t1) {
@@ -152,8 +152,8 @@ async function throne_sit_effect() {   // sit.c:39
                 await pline($c.lit("A voice echoes:"));
                 await verbalize($c.lit("A curse upon thee for sitting upon this most holy throne!"));
                 if ((u.uluck + u.moreluck | 0) > 0) {
-                    await make_blinded($c.add64($c.and64(u.uprops[15 /* BLINDED */].intrinsic, 16777215), (rng_log_enabled() ? (rng_log_set_caller($c.lit("sit.c"), 140, $c.lit("throne_sit_effect")), rn2(100)) : rn2(100)) + 250 | 0), 1);
-                    change_luck($c.i8((u.uluck + u.moreluck | 0) > 1 ? -(rng_log_enabled() ? (rng_log_set_caller($c.lit("sit.c"), 141, $c.lit("throne_sit_effect")), rnd(2)) : rnd(2)) | 0 : -1));
+                    await make_blinded($c.add64($c.and64(u.uprops[15 /* BLINDED */].intrinsic, 16777215), rn2(100) + 250 | 0), 1);
+                    change_luck($c.i8((u.uluck + u.moreluck | 0) > 1 ? -rnd(2) | 0 : -1));
                 } else {
                     await rndcurse();
                 }
@@ -162,7 +162,7 @@ async function throne_sit_effect() {   // sit.c:39
                 if ((u.uluck + u.moreluck | 0) < 0 || $c.and64(u.uprops[29 /* SEE_INVIS */].intrinsic, 117440512)) {
                     if (svl.level.flags.nommap) {
                         await pline($c.lit("A terrible drone fills your head!"));
-                        await make_confused($c.add64($c.and64(u.uprops[14 /* CONFUSION */].intrinsic, 16777215), rng_log_enabled() ? (rng_log_set_caller($c.lit("sit.c"), 149, $c.lit("throne_sit_effect")), rnd(30)) : rnd(30)), 0);
+                        await make_confused($c.add64($c.and64(u.uprops[14 /* CONFUSION */].intrinsic, 16777215), rnd(30)), 0);
                     } else {
                         await pline($c.lit("An image forms in your mind."));
                         await do_mapping();
@@ -201,12 +201,12 @@ async function throne_sit_effect() {   // sit.c:39
             case 12:
                 await You($c.lit("are granted an insight!"));
                 if (gi.invent) {
-                    await identify_pack(rng_log_enabled() ? (rng_log_set_caller($c.lit("sit.c"), 198, $c.lit("throne_sit_effect")), rn2(5)) : rn2(5), 0);
+                    await identify_pack(rn2(5), 0);
                 }
                 break;
             case 13:
                 await Your($c.lit("mind turns into a pretzel!"));
-                await make_confused($c.add64($c.and64(u.uprops[14 /* CONFUSION */].intrinsic, 16777215), (rng_log_enabled() ? (rng_log_set_caller($c.lit("sit.c"), 203, $c.lit("throne_sit_effect")), rn2(7)) : rn2(7)) + 16 | 0), 0);
+                await make_confused($c.add64($c.and64(u.uprops[14 /* CONFUSION */].intrinsic, 16777215), rn2(7) + 16 | 0), 0);
                 break;
             default:
                 await impossible($c.lit("throne effect"));
@@ -219,7 +219,7 @@ async function throne_sit_effect() {   // sit.c:39
             await You_feel($c.lit("somehow out of place..."));
         }
     }
-    if (!special_throne && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("sit.c"), 225, $c.lit("throne_sit_effect")), rn2(3)) : rn2(3)) && (!flags.debug || await yn_function($c.lit("Analyze throne?"), new $c.Ptr(ynchars, 0), 110, 1) === 121)) {
+    if (!special_throne && !rn2(3) && (!flags.debug || await yn_function($c.lit("Analyze throne?"), new $c.Ptr(ynchars, 0), 110, 1) === 121)) {
         svl.level.locations[tx][ty].typ = 25, svl.level.locations[tx][ty].flags = (0) & 31;
         await map_background(tx, ty, 0);
         await newsym_force(tx, ty);
@@ -258,7 +258,7 @@ async function special_throne_effect(effect) {   // sit.c:238
                         otmp.greased = (1) & 1;
                     }
                 }
-                await make_glib((rng_log_enabled() ? (rng_log_set_caller($c.lit("sit.c"), 277, $c.lit("special_throne_effect")), rn2(101)) : rn2(101)) + 100 | 0);
+                await make_glib(rn2(101) + 100 | 0);
                 await update_inventory();
                 break;
             }
@@ -308,14 +308,14 @@ async function special_throne_effect(effect) {   // sit.c:238
             break;
         case 12:
             await pline($c.lit("The throne is covered in acid!"));
-            await losehp(u.uprops[7 /* ACID_RES */].intrinsic || u.uprops[7 /* ACID_RES */].extrinsic ? rng_log_enabled() ? (rng_log_set_caller($c.lit("sit.c"), 339, $c.lit("special_throne_effect")), rnd(16)) : rnd(16) : rng_log_enabled() ? (rng_log_set_caller($c.lit("sit.c"), 339, $c.lit("special_throne_effect")), rnd(80)) : rnd(80), $c.lit("acidic chair"), 0);
+            await losehp(u.uprops[7 /* ACID_RES */].intrinsic || u.uprops[7 /* ACID_RES */].extrinsic ? rnd(16) : rnd(80), $c.lit("acidic chair"), 0);
             await exercise(4 /* A_CON */, 0);
             break;
         case 13:
             {
                 await pline($c.lit("As you sit on the throne, your body and mind start to warp."));
                 for (ability = 0; ability < 6 /* A_MAX */; ability = ability + 1 | 0) {
-                    await adjattrib(ability, (rng_log_enabled() ? (rng_log_set_caller($c.lit("sit.c"), 349, $c.lit("special_throne_effect")), rn2(5)) : rn2(5)) - 2 | 0, -1);
+                    await adjattrib(ability, rn2(5) - 2 | 0, -1);
                 }
                 break;
             }
@@ -420,22 +420,22 @@ export async function dosit() {   // sit.c:400
                     } else if (u.utraptype === 2) {
                         if (trap && (trap.ttyp | 0) === 12 /* SPIKED_PIT */) {
                             await You($c.lit("sit down on a spike.  Ouch!"));
-                            await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? rng_log_enabled() ? (rng_log_set_caller($c.lit("sit.c"), 476, $c.lit("dosit")), rn2(2)) : rn2(2) : 1, $c.lit("sitting on an iron spike"), 1);
+                            await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? rn2(2) : 1, $c.lit("sitting on an iron spike"), 1);
                             await exercise(0 /* A_STR */, 0);
                         } else {
                             await You($c.lit("sit down in the pit."));
                         }
-                        $t1 = (rng_log_enabled() ? (rng_log_set_caller($c.lit("sit.c"), 481, $c.lit("dosit")), rn2(5)) : rn2(5)) >>> 0, u.utrap = u.utrap + $t1 >>> 0;
+                        $t1 = rn2(5) >>> 0, u.utrap = u.utrap + $t1 >>> 0;
                     } else if (u.utraptype === 3) {
                         await You($c.lit("sit in the spider web and get entangled further!"));
-                        $t2 = ((rng_log_enabled() ? (rng_log_set_caller($c.lit("sit.c"), 484, $c.lit("dosit")), rn2(10)) : rn2(10)) + 5 | 0) >>> 0, u.utrap = u.utrap + $t2 >>> 0;
+                        $t2 = (rn2(10) + 5 | 0) >>> 0, u.utrap = u.utrap + $t2 >>> 0;
                     } else if (u.utraptype === 4) {
                         await You($c.lit("sit in the %s!"), hliquid($c.lit("lava")));
                         if (u.uprops[22 /* SLIMED */].intrinsic) {
                             await burn_away_slime();
                         }
-                        $t3 = (rng_log_enabled() ? (rng_log_set_caller($c.lit("sit.c"), 490, $c.lit("dosit")), rnd(4)) : rnd(4)) >>> 0, u.utrap = u.utrap + $t3 >>> 0;
-                        await losehp(rng_log_enabled() ? (rng_log_set_caller($c.lit("sit.c"), 491, $c.lit("dosit")), d(2, 10)) : d(2, 10), $c.lit("sitting in lava"), 1);
+                        $t3 = rnd(4) >>> 0, u.utrap = u.utrap + $t3 >>> 0;
+                        await losehp(d(2, 10), $c.lit("sitting in lava"), 1);
                     } else if (u.utraptype === 5 || u.utraptype === 6) {
                         await You_cant($c.lit("maneuver to sit!"));
                         u.utrap = u.utrap + 1 >>> 0;
@@ -460,10 +460,10 @@ export async function dosit() {   // sit.c:400
                         }
                     }
                 } else {
-                    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("sit.c"), 521, $c.lit("dosit")), rn2(10)) : rn2(10)) && $G.uarm) {
+                    if (!rn2(10) && $G.uarm) {
                         await water_damage($G.uarm, $c.lit("armor"), 1);
                     }
-                    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("sit.c"), 523, $c.lit("dosit")), rn2(10)) : rn2(10)) && $G.uarmf && $G.uarmf.otyp !== 167 /* WATER_WALKING_BOOTS */) {
+                    if (!rn2(10) && $G.uarmf && $G.uarmf.otyp !== 167 /* WATER_WALKING_BOOTS */) {
                         await water_damage($G.uarm, $c.lit("armor"), 1);
                     }
                 }
@@ -487,7 +487,7 @@ export async function dosit() {   // sit.c:400
                     return 1;
                 }
                 await pline_The($c.lit("%s burns you!"), hliquid($c.lit("lava")));
-                await losehp(rng_log_enabled() ? (rng_log_set_caller($c.lit("sit.c"), 548, $c.lit("dosit")), d(u.uprops[1 /* FIRE_RES */].intrinsic || u.uprops[1 /* FIRE_RES */].extrinsic ? 2 : 10, 10)) : d(u.uprops[1 /* FIRE_RES */].intrinsic || u.uprops[1 /* FIRE_RES */].extrinsic ? 2 : 10, 10), $c.lit("sitting on lava"), 1);
+                await losehp(d(u.uprops[1 /* FIRE_RES */].intrinsic || u.uprops[1 /* FIRE_RES */].extrinsic ? 2 : 10, 10), $c.lit("sitting on lava"), 1);
             } else if (is_ice(u.ux, u.uy)) {
                 await You(new $c.Ptr(dosit$sit_message, 0), defsyms[39 /* S_ice */].explanation);
                 if (!(u.uprops[2 /* COLD_RES */].intrinsic || u.uprops[2 /* COLD_RES */].extrinsic)) {
@@ -511,7 +511,7 @@ export async function dosit() {   // sit.c:400
 export async function rndcurse() {   // sit.c:569
     let nobj = 0, cnt = 0, onum = 0, otmp = null;
     nobj = 0;
-    if (is_art($G.uwep, 8 /* ART_MAGICBANE */) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("sit.c"), 576, $c.lit("rndcurse")), rn2(20)) : rn2(20))) {
+    if (is_art($G.uwep, 8 /* ART_MAGICBANE */) && rn2(20)) {
         await You(new $c.Ptr(rndcurse$mal_aura, 0), $c.lit("the magic-absorbing blade"));
         return;
     }
@@ -525,10 +525,10 @@ export async function rndcurse() {   // sit.c:569
         }
         nobj = nobj + 1 | 0;
     }
-    cnt = rng_log_enabled() ? (rng_log_set_caller($c.lit("sit.c"), 593, $c.lit("rndcurse")), rnd($c.div32(6, ((!!(u.uprops[12 /* ANTIMAGIC */].intrinsic || u.uprops[12 /* ANTIMAGIC */].extrinsic) ? 1 : 0) + (!!(u.uprops[55 /* HALF_SPDAM */].intrinsic || u.uprops[55 /* HALF_SPDAM */].extrinsic) ? 1 : 0) | 0) + 1 | 0))) : rnd($c.div32(6, ((!!(u.uprops[12 /* ANTIMAGIC */].intrinsic || u.uprops[12 /* ANTIMAGIC */].extrinsic) ? 1 : 0) + (!!(u.uprops[55 /* HALF_SPDAM */].intrinsic || u.uprops[55 /* HALF_SPDAM */].extrinsic) ? 1 : 0) | 0) + 1 | 0));
+    cnt = rnd($c.div32(6, ((!!(u.uprops[12 /* ANTIMAGIC */].intrinsic || u.uprops[12 /* ANTIMAGIC */].extrinsic) ? 1 : 0) + (!!(u.uprops[55 /* HALF_SPDAM */].intrinsic || u.uprops[55 /* HALF_SPDAM */].extrinsic) ? 1 : 0) | 0) + 1 | 0));
     if (nobj) {
         for (; cnt > 0; cnt = cnt - 1 | 0) {
-            onum = rng_log_enabled() ? (rng_log_set_caller($c.lit("sit.c"), 596, $c.lit("rndcurse")), rnd(nobj)) : rnd(nobj);
+            onum = rnd(nobj);
             for (otmp = gi.invent; otmp; otmp = otmp.nobj) {
                 if (otmp.oclass === 12 /* COIN_CLASS */) {
                     continue;
@@ -540,7 +540,7 @@ export async function rndcurse() {   // sit.c:569
             if (!otmp || otmp.cursed | 0) {
                 continue;
             }
-            if (otmp.oartifact && spec_ability(otmp, 4) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("sit.c"), 610, $c.lit("rndcurse")), rn2(10)) : rn2(10)) < 8) {
+            if (otmp.oartifact && spec_ability(otmp, 4) && rn2(10) < 8) {
                 await pline($c.lit("%s!"), await Tobjnam(otmp, $c.lit("resist")));
                 continue;
             }
@@ -552,7 +552,7 @@ export async function rndcurse() {   // sit.c:569
         }
         await update_inventory();
     }
-    if (u.usteed && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("sit.c"), 624, $c.lit("rndcurse")), rn2(4)) : rn2(4)) && (otmp = await which_armor(u.usteed, 1048576)) !== null && !otmp.cursed) {
+    if (u.usteed && !rn2(4) && (otmp = await which_armor(u.usteed, 1048576)) !== null && !otmp.cursed) {
         if (otmp.blessed) {
             await unbless(otmp);
         } else {
@@ -569,7 +569,7 @@ export async function rndcurse() {   // sit.c:569
 export async function attrcurse() {   // sit.c:644
     let ret = 0;
     ret = 0;
-    switch (rng_log_enabled() ? (rng_log_set_caller($c.lit("sit.c"), 648, $c.lit("attrcurse")), rnd(11)) : rnd(11)) {
+    switch (rnd(11)) {
         case 1:
             if ($c.and64(u.uprops[1 /* FIRE_RES */].intrinsic, 117440512)) {
                 u.uprops[1 /* FIRE_RES */].intrinsic = $c.and64(u.uprops[1 /* FIRE_RES */].intrinsic, -117440513);

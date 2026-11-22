@@ -38,7 +38,7 @@ import { body_part, change_sex, polymon, polyself, rehumanize, uasmon_maxStr } f
 import { dopotion, incr_itimeout, make_blinded, make_confused, make_deaf, make_glib, make_hallucinated, make_sick, make_slimed, make_stoned, make_stunned, make_vomiting, self_invis_message, set_itimeout } from './potion.js';
 import { altar_wrath } from './pray.js';
 import { unpunish } from './read.js';
-import { d, rn2, rnd, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { d, rn2, rnd } from './rnd.js';
 import { outrumor } from './rumors.js';
 import { costly_spot, sellobj_state } from './shk.js';
 import { attrcurse } from './sit.js';
@@ -154,7 +154,7 @@ async function choke(food) {   // eat.c:245
         await You_feel($c.lit("like a glutton!"));
     }
     await exercise(4 /* A_CON */, 0);
-    if (u.uprops[52 /* MAGICAL_BREATHING */].intrinsic || u.uprops[52 /* MAGICAL_BREATHING */].extrinsic || $c.andu64(gy.youmonst.data.mflags1, 1024) !== 0 || (u.uprops[28 /* HUNGER */].intrinsic || u.uprops[28 /* HUNGER */].extrinsic) || !u.uprops[19 /* STRANGLED */].intrinsic && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 258, $c.lit("choke")), rn2(20)) : rn2(20))) {
+    if (u.uprops[52 /* MAGICAL_BREATHING */].intrinsic || u.uprops[52 /* MAGICAL_BREATHING */].extrinsic || $c.andu64(gy.youmonst.data.mflags1, 1024) !== 0 || (u.uprops[28 /* HUNGER */].intrinsic || u.uprops[28 /* HUNGER */].extrinsic) || !u.uprops[19 /* STRANGLED */].intrinsic && !rn2(20)) {
         if (food && food.otyp === 203 /* AMULET_OF_STRANGULATION */) {
             await You($c.lit("choke, but recover your composure."));
             return;
@@ -418,7 +418,7 @@ export async function eat_brains(magr, mdef, visflag, dmg_p) {   // eat.c:603
     pd = mdef.data;
     give_nutrit = 0;
     result = 1;
-    xtra_dmg = rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 611, $c.lit("eat_brains")), rnd(10)) : rnd(10);
+    xtra_dmg = rnd(10);
     if (!$c.peq(magr, gy.youmonst) && magr.mhp < 1) {
         return 4;
     }
@@ -469,9 +469,9 @@ export async function eat_brains(magr, mdef, visflag, dmg_p) {   // eat.c:603
             await exercise(2 /* A_WIS */, 0);
             dmg_p.set(0, dmg_p.get(0) + xtra_dmg | 0);
         } else {
-            await morehungry(-(rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 678, $c.lit("eat_brains")), rnd(30)) : rnd(30)) | 0);
+            await morehungry(-rnd(30) | 0);
             if (u.acurr.a[1 /* A_INT */] < u.amax.a[1 /* A_INT */]) {
-                $t1 = rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 681, $c.lit("eat_brains")), rnd(4)) : rnd(4), u.acurr.a[1 /* A_INT */] = $c.i8(u.acurr.a[1 /* A_INT */] + $t1 | 0);
+                $t1 = rnd(4), u.acurr.a[1 /* A_INT */] = $c.i8(u.acurr.a[1 /* A_INT */] + $t1 | 0);
                 if (u.acurr.a[1 /* A_INT */] > u.amax.a[1 /* A_INT */]) {
                     u.acurr.a[1 /* A_INT */] = u.amax.a[1 /* A_INT */];
                 }
@@ -521,7 +521,7 @@ export async function eat_brains(magr, mdef, visflag, dmg_p) {   // eat.c:603
         }
     }
     if (give_nutrit && magr.mtame && !magr.isminion) {
-        $t3 = rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 749, $c.lit("eat_brains")), rnd(60)) : rnd(60), magr.mextra.edog.hungrytime = $c.add64(magr.mextra.edog.hungrytime, $t3);
+        $t3 = rnd(60), magr.mextra.edog.hungrytime = $c.add64(magr.mextra.edog.hungrytime, $t3);
         magr.mconf = (0) & 1;
     }
     return result;
@@ -541,7 +541,7 @@ async function maybe_cannibal(pm, allowmsg) {   // eat.c:758
             await You($c.lit("cannibal!  You will regret this!"));
         }
         u.uprops[43 /* AGGRAVATE_MONSTER */].intrinsic = $c.or64(u.uprops[43 /* AGGRAVATE_MONSTER */].intrinsic, 67108864);
-        change_luck($c.i8(-((rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 784, $c.lit("maybe_cannibal")), rn2(4)) : rn2(4)) + 2 | 0) | 0));
+        change_luck($c.i8(-(rn2(4) + 2 | 0) | 0));
         return 1;
     }
     return 0;
@@ -783,7 +783,7 @@ export function should_givit(type, ptr) {   // eat.c:961
     let chance = 0;
     switch (type) {
         case 6 /* POISON_RES */:
-            if (($c.peq(ptr, $c.relem(mons, 1 /* PM_KILLER_BEE */)) || $c.peq(ptr, $c.relem(mons, 97 /* PM_SCORPION */))) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 969, $c.lit("should_givit")), rn2(4)) : rn2(4))) {
+            if (($c.peq(ptr, $c.relem(mons, 1 /* PM_KILLER_BEE */)) || $c.peq(ptr, $c.relem(mons, 97 /* PM_SCORPION */))) && !rn2(4)) {
                 chance = 1;
             } else {
                 chance = 15;
@@ -802,12 +802,12 @@ export function should_givit(type, ptr) {   // eat.c:961
             chance = 15;
             break;
     }
-    return $c.i8(ptr.mlevel > (rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 988, $c.lit("should_givit")), rn2(chance)) : rn2(chance)) ? 1 : 0);
+    return $c.i8(ptr.mlevel > rn2(chance) ? 1 : 0);
 }
 function temp_givit(type, ptr) {   // eat.c:992
     let chance = 0;
     chance = type === 8 /* STONE_RES */ ? 6 : type === 7 /* ACID_RES */ ? 3 : 0;
-    return $c.i8(chance ? ptr.mlevel > (rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 996, $c.lit("temp_givit")), rn2(chance)) : rn2(chance)) ? 1 : 0 : 0);
+    return $c.i8(chance ? ptr.mlevel > rn2(chance) ? 1 : 0 : 0);
 }
 async function givit(type, ptr) {   // eat.c:1003
     let save_plnmsg = 0, save_plnmsg$2 = 0, save_plnmsg$3 = 0, save_plnmsg$4 = 0, save_plnmsg$5 = 0, save_plnmsg$6 = 0, save_plnmsg$7 = 0, save_plnmsg$8 = 0, save_plnmsg$9 = 0, save_plnmsg$10 = 0, save_plnmsg$11 = 0, save_plnmsg$12 = 0, save_plnmsg$13 = 0;
@@ -957,7 +957,7 @@ async function givit(type, ptr) {   // eat.c:1003
             if (!(u.uprops[7 /* ACID_RES */].intrinsic || u.uprops[7 /* ACID_RES */].extrinsic)) {
                 await You_feel($c.lit("%s."), u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic) ? $c.lit("secure from flashbacks") : $c.lit("less concerned about being harmed by acid"));
             }
-            incr_itimeout(new $c.FieldRef(u.uprops[7 /* ACID_RES */], "intrinsic", "i64"), rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 1087, $c.lit("givit")), d(3, 6)) : d(3, 6));
+            incr_itimeout(new $c.FieldRef(u.uprops[7 /* ACID_RES */], "intrinsic", "i64"), d(3, 6));
             break;
         case 8 /* STONE_RES */:
             do {
@@ -970,7 +970,7 @@ async function givit(type, ptr) {   // eat.c:1003
             if (!(u.uprops[8 /* STONE_RES */].intrinsic || u.uprops[8 /* STONE_RES */].extrinsic)) {
                 await You_feel($c.lit("%s."), u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic) ? $c.lit("unusually limber") : $c.lit("less concerned about becoming petrified"));
             }
-            incr_itimeout(new $c.FieldRef(u.uprops[8 /* STONE_RES */], "intrinsic", "i64"), rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 1094, $c.lit("givit")), d(3, 6)) : d(3, 6));
+            incr_itimeout(new $c.FieldRef(u.uprops[8 /* STONE_RES */], "intrinsic", "i64"), d(3, 6));
             break;
         default:
             do {
@@ -985,11 +985,11 @@ async function givit(type, ptr) {   // eat.c:1003
 }
 async function eye_of_newt_buzz() {   // eat.c:1103
     let old_uen = 0, $t1;
-    if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 1106, $c.lit("eye_of_newt_buzz")), rn2(3)) : rn2(3)) || Math.imul(3, u.uen) <= Math.imul(2, u.uenmax)) {
+    if (rn2(3) || Math.imul(3, u.uen) <= Math.imul(2, u.uenmax)) {
         old_uen = u.uen;
-        $t1 = rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 1109, $c.lit("eye_of_newt_buzz")), rnd(3)) : rnd(3), u.uen = u.uen + $t1 | 0;
+        $t1 = rnd(3), u.uen = u.uen + $t1 | 0;
         if (u.uen > u.uenmax) {
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 1111, $c.lit("eye_of_newt_buzz")), rn2(3)) : rn2(3))) {
+            if (!rn2(3)) {
                 u.uenmax = u.uenmax + 1 | 0;
                 if (u.uenmax > u.uenpeak) {
                     u.uenpeak = u.uenmax;
@@ -1036,7 +1036,7 @@ async function cpostfx(pm) {   // eat.c:1129
             break;
         case 153 /* PM_STALKER */:
             if (!((u.uprops[40 /* INVIS */].intrinsic || u.uprops[40 /* INVIS */].extrinsic) && !u.uprops[40 /* INVIS */].blocked)) {
-                set_itimeout(new $c.FieldRef(u.uprops[40 /* INVIS */], "intrinsic", "i64"), (rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 1164, $c.lit("cpostfx")), rn2(100)) : rn2(100)) + 50 | 0);
+                set_itimeout(new $c.FieldRef(u.uprops[40 /* INVIS */], "intrinsic", "i64"), rn2(100) + 50 | 0);
                 if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked) && !u.uprops[40 /* INVIS */].blocked) {
                     await self_invis_message();
                 }
@@ -1120,7 +1120,7 @@ async function cpostfx(pm) {   // eat.c:1129
             if (!(u.uprops[41 /* DISPLACED */].intrinsic || u.uprops[41 /* DISPLACED */].extrinsic)) {
                 await toggle_displacement(null, 0, 1);
             }
-            incr_itimeout(new $c.FieldRef(u.uprops[41 /* DISPLACED */], "intrinsic", "i64"), rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 1268, $c.lit("cpostfx")), d(6, 6)) : d(6, 6));
+            incr_itimeout(new $c.FieldRef(u.uprops[41 /* DISPLACED */], "intrinsic", "i64"), d(6, 6));
             break;
         case 213 /* PM_DISENCHANTER */:
             do {
@@ -1139,7 +1139,7 @@ async function cpostfx(pm) {   // eat.c:1129
         case 48 /* PM_MIND_FLAYER */:
         case 49 /* PM_MASTER_MIND_FLAYER */:
             if (u.acurr.a[1 /* A_INT */] < (0 ? uasmon_maxStr() : gu.urace.attrmax[1 /* A_INT */])) {
-                if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 1284, $c.lit("cpostfx")), rn2(2)) : rn2(2))) {
+                if (!rn2(2)) {
                     await pline($c.lit("Yum!  That was real brain food!"));
                     await adjattrib(1 /* A_INT */, 1, 0);
                     break;
@@ -1194,7 +1194,7 @@ export async function corpse_intrinsic(ptr) {   // eat.c:1339
             continue;
         }
         count = count + 1 | 0;
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 1363, $c.lit("corpse_intrinsic")), rn2(count)) : rn2(count))) {
+        if (!rn2(count)) {
             do {
                 if (debugcore($c.lit("eat.c"), 1)) {
                     save_plnmsg$2 = iflags.last_msg;
@@ -1205,7 +1205,7 @@ export async function corpse_intrinsic(ptr) {   // eat.c:1339
             prop = i;
         }
     }
-    if (conveys_STR && count === 1 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 1369, $c.lit("corpse_intrinsic")), rn2(2)) : rn2(2))) {
+    if (conveys_STR && count === 1 && !rn2(2)) {
         prop = 0;
     }
     return prop;
@@ -1285,12 +1285,12 @@ export function set_tin_variety(obj, forcetype) {   // eat.c:1461
             r = 0;
         }
         while (r === 0 && !obj.cursed || !tintxts[r].fodder) {
-            r = rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 1477, $c.lit("set_tin_variety")), rn2(15)) : rn2(15);
+            r = rn2(15);
         }
     } else if (forcetype >= 0 && forcetype < 15) {
         r = forcetype;
     } else {
-        r = rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 1481, $c.lit("set_tin_variety")), rn2(15)) : rn2(15);
+        r = rn2(15);
         if (r === 0 && (mnum >= 0 /* LOW_PM */ && mnum < 383 /* NUMMONS */ && (mnum === 326 /* PM_LIZARD */ || mnum === 158 /* PM_LICHEN */ || ($c.peq($c.relem(mons, mnum), $c.relem(mons, 311 /* PM_DEATH */)) || $c.peq($c.relem(mons, mnum), $c.relem(mons, 313 /* PM_FAMINE */)) || $c.peq($c.relem(mons, mnum), $c.relem(mons, 312 /* PM_PESTILENCE */))) || mnum === 6 /* PM_ACID_BLOB */))) {
             r = 1;
         }
@@ -1308,9 +1308,9 @@ function tin_variety(obj, displ) {   // eat.c:1489
         r = -obj.spe | 0;
         r = r - 1 | 0;
     } else {
-        r = rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 1503, $c.lit("tin_variety")), rn2(15)) : rn2(15);
+        r = rn2(15);
     }
-    if (!displ && r === 1 && !obj.blessed && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 1506, $c.lit("tin_variety")), rn2(7)) : rn2(7))) {
+    if (!displ && r === 1 && !obj.blessed && !rn2(7)) {
         r = 0;
     }
     if (r === 0 && (mnum >= 0 /* LOW_PM */ && mnum < 383 /* NUMMONS */ && (mnum === 326 /* PM_LIZARD */ || mnum === 158 /* PM_LICHEN */ || ($c.peq($c.relem(mons, mnum), $c.relem(mons, 311 /* PM_DEATH */)) || $c.peq($c.relem(mons, mnum), $c.relem(mons, 313 /* PM_FAMINE */)) || $c.peq($c.relem(mons, mnum), $c.relem(mons, 312 /* PM_PESTILENCE */))) || mnum === 6 /* PM_ACID_BLOB */))) {
@@ -1332,7 +1332,7 @@ async function consume_tin(mesg) {   // eat.c:1528
     always_eat = $c.i8($c.andu64(gy.youmonst.data.mflags1, 2147483648) !== 0 ? 1 : 0);
     tin = svc.context.tin.tin;
     r = tin_variety(tin, 0);
-    if (tin.otrapped | 0 || tin.cursed | 0 && r !== 1 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 1537, $c.lit("consume_tin")), rn2(8)) : rn2(8))) {
+    if (tin.otrapped | 0 || tin.cursed | 0 && r !== 1 && !rn2(8)) {
         await b_trapped($c.lit("tin"), -1 /* NO_PART */);
         tin = await costly_tin(11 /* COST_DSTROY */);
         await use_up_tin(tin);
@@ -1343,7 +1343,7 @@ async function consume_tin(mesg) {   // eat.c:1528
         mnum = tin.corpsenm;
         if (mnum === -1 /* NON_PM */) {
             if (u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic)) {
-                await pline($c.lit("It's full of %s."), (rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 1551, $c.lit("consume_tin")), rn2(2)) : rn2(2)) ? $c.lit("air elemental souffle") : $c.lit("dehydrated water"));
+                await pline($c.lit("It's full of %s."), rn2(2) ? $c.lit("air elemental souffle") : $c.lit("dehydrated water"));
             } else {
                 await pline($c.lit("It turns out to be empty."));
             }
@@ -1404,7 +1404,7 @@ async function consume_tin(mesg) {   // eat.c:1528
             return;
         }
         if (tintxts[r].nut < 0) {
-            await make_vomiting((rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 1618, $c.lit("consume_tin")), rn2(15)) : rn2(15)) + 10 | 0, 0);
+            await make_vomiting(rn2(15) + 10 | 0, 0);
         } else {
             nutamt = tintxts[r].nut;
             if (r === 1 && nutamt > mons[mnum].cnutrit) {
@@ -1418,7 +1418,7 @@ async function consume_tin(mesg) {   // eat.c:1528
         }
         if (tintxts[r].greasy) {
             alreadyglib = $c.i32($c.and64(u.uprops[21 /* GLIB */].intrinsic, 16777215));
-            await make_glib(alreadyglib + ((rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 1641, $c.lit("consume_tin")), rn2(11)) : rn2(11)) + 5 | 0) | 0);
+            await make_glib(alreadyglib + (rn2(11) + 5 | 0) | 0);
             await pline($c.lit("Eating %s food made your %s %s slippery."), tintxts[r].txt, await fingers_or_gloves(1), alreadyglib ? $c.lit("even more") : $c.lit("very"));
         }
     } else {
@@ -1445,7 +1445,7 @@ async function consume_tin(mesg) {   // eat.c:1528
         }
         await gainstr(tin, 0, 0);
         tin = ($t3 = await costly_tin(14 /* COST_OPEN */), svc.context.tin.tin = $t3);
-        nutamt = tin.blessed | 0 ? 600 : !tin.cursed ? 400 + (rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 1688, $c.lit("consume_tin")), rnd(200)) : rnd(200)) | 0 : 200 + (rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 1689, $c.lit("consume_tin")), rnd(400)) : rnd(400)) | 0;
+        nutamt = tin.blessed | 0 ? 600 : !tin.cursed ? 400 + rnd(200) | 0 : 200 + rnd(400) | 0;
         if (always_eat) {
             nutamt = nutamt + 5 | 0;
         }
@@ -1486,7 +1486,7 @@ async function start_tin(otmp) {   // eat.c:1723
                 await You($c.lit("cannot handle the tin properly to open it."));
                 return;
             } else if ($goto !== "no_opener" && otmp.blessed) {
-                tmp = $G.uwep && $G.uwep.blessed | 0 && $G.uwep.otyp === 239 /* TIN_OPENER */ ? 0 : rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 1741, $c.lit("start_tin")), rn2(2)) : rn2(2);
+                tmp = $G.uwep && $G.uwep.blessed | 0 && $G.uwep.otyp === 239 /* TIN_OPENER */ ? 0 : rn2(2);
                 if (!tmp) {
                     mesg = $c.lit("The tin opens like magic!");
                 } else {
@@ -1496,7 +1496,7 @@ async function start_tin(otmp) {   // eat.c:1723
                 switch ($G.uwep.otyp) {
                     case 239 /* TIN_OPENER */:
                         mesg = $c.lit("You easily open the tin.");
-                        tmp = rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 1750, $c.lit("start_tin")), rn2($G.uwep.cursed | 0 ? 3 : !$G.uwep.blessed ? 2 : 1)) : rn2($G.uwep.cursed | 0 ? 3 : !$G.uwep.blessed ? 2 : 1);
+                        tmp = rn2($G.uwep.cursed | 0 ? 3 : !$G.uwep.blessed ? 2 : 1);
                         break;
                     case 34 /* DAGGER */:
                     case 37 /* SILVER_DAGGER */:
@@ -1531,7 +1531,7 @@ async function start_tin(otmp) {   // eat.c:1723
                     }
                     return;
                 }
-                tmp = (rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 1784, $c.lit("start_tin")), rn2(1 + $c.div32(500, acurr(3 /* A_DEX */) + acurrstr() | 0) | 0)) : rn2(1 + $c.div32(500, acurr(3 /* A_DEX */) + acurrstr() | 0) | 0)) + 10 | 0;
+                tmp = rn2(1 + $c.div32(500, acurr(3 /* A_DEX */) + acurrstr() | 0) | 0) + 10 | 0;
             }
             svc.context.tin.tin = otmp;
             svc.context.tin.o_id = otmp.o_id;
@@ -1548,7 +1548,7 @@ async function start_tin(otmp) {   // eat.c:1723
     }
 }
 export async function Hear_again() {   // eat.c:1801
-    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 1804, $c.lit("Hear_again")), rn2(2)) : rn2(2))) {
+    if (!rn2(2)) {
         await make_deaf(0, 0);
         disp.botl = 1;
     }
@@ -1557,21 +1557,21 @@ export async function Hear_again() {   // eat.c:1801
 async function rottenfood(obj) {   // eat.c:1813
     let what = null, where = null, duration = 0;
     await pline($c.lit("Blecch!  %s %s!"), is_rottable(obj) ? $c.lit("Rotten") : $c.lit("Awful"), await foodword(obj));
-    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 1817, $c.lit("rottenfood")), rn2(4)) : rn2(4))) {
+    if (!rn2(4)) {
         if (u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic)) {
             await You_feel($c.lit("rather trippy."));
         } else {
             await You_feel($c.lit("rather %s."), await body_part(10 /* LIGHT_HEADED */));
         }
-        await make_confused($c.add64(u.uprops[14 /* CONFUSION */].intrinsic, rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 1822, $c.lit("rottenfood")), d(2, 4)) : d(2, 4)), 0);
-    } else if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 1823, $c.lit("rottenfood")), rn2(4)) : rn2(4)) && !((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
+        await make_confused($c.add64(u.uprops[14 /* CONFUSION */].intrinsic, d(2, 4)), 0);
+    } else if (!rn2(4) && !((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
         await pline($c.lit("Everything suddenly goes dark."));
-        await make_blinded($c.add64($c.and64(u.uprops[15 /* BLINDED */].intrinsic, 16777215), rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 1827, $c.lit("rottenfood")), d(2, 10)) : d(2, 10)), 0);
+        await make_blinded($c.add64($c.and64(u.uprops[15 /* BLINDED */].intrinsic, 16777215), d(2, 10)), 0);
         if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
             await Your($c.lit("%s"), c_common_strings.c_vision_clears);
         }
-    } else if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 1830, $c.lit("rottenfood")), rn2(3)) : rn2(3))) {
-        duration = rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 1832, $c.lit("rottenfood")), rnd(10)) : rnd(10);
+    } else if (!rn2(3)) {
+        duration = rnd(10);
         if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
             what = $c.lit("goes"), where = $c.lit("dark");
         } else if ((u.uprops[48 /* LEVITATION */].intrinsic || u.uprops[48 /* LEVITATION */].extrinsic) && !u.uprops[48 /* LEVITATION */].blocked || (svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) {
@@ -1615,7 +1615,7 @@ async function eatcorpse(otmp) {   // eat.c:1855
     }
     if (!(mnum === 326 /* PM_LIZARD */ || mnum === 158 /* PM_LICHEN */ || ($c.peq($c.relem(mons, mnum), $c.relem(mons, 311 /* PM_DEATH */)) || $c.peq($c.relem(mons, mnum), $c.relem(mons, 313 /* PM_FAMINE */)) || $c.peq($c.relem(mons, mnum), $c.relem(mons, 312 /* PM_PESTILENCE */))) || mnum === 6 /* PM_ACID_BLOB */)) {
         age = await peek_at_iced_corpse_age(otmp);
-        rotted = $c.div64($c.sub64(svm.moves, age), $c.add64(10, rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 1887, $c.lit("eatcorpse")), rn2(20)) : rn2(20)));
+        rotted = $c.div64($c.sub64(svm.moves, age), $c.add64(10, rn2(20)));
         if (otmp.cursed) {
             rotted = $c.add64(rotted, 2);
         } else if (otmp.blessed) {
@@ -1628,7 +1628,7 @@ async function eatcorpse(otmp) {   // eat.c:1855
         if (u.uprops[10 /* SICK_RES */].intrinsic || u.uprops[10 /* SICK_RES */].extrinsic || await defended(gy.youmonst, 33)) {
             await pline($c.lit("It doesn't seem at all sickening, though..."));
         } else {
-            sick_time = (rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 1909, $c.lit("eatcorpse")), rn2(10)) : rn2(10)) + 10 | 0;
+            sick_time = rn2(10) + 10 | 0;
             if (u.uprops[17 /* SICK */].intrinsic && sick_time > u.uprops[17 /* SICK */].intrinsic) {
                 sick_time = u.uprops[17 /* SICK */].intrinsic > 1 ? $c.sub64(u.uprops[17 /* SICK */].intrinsic, 1) : 1;
             }
@@ -1644,22 +1644,22 @@ async function eatcorpse(otmp) {   // eat.c:1855
     } else if ($c.andu64($c.relem(mons, mnum).mflags1, 134217728) !== 0 && !(u.uprops[7 /* ACID_RES */].intrinsic || u.uprops[7 /* ACID_RES */].extrinsic)) {
         tp = tp + 1 | 0;
         await You($c.lit("have a very bad case of stomach acid."));
-        await losehp(rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 1926, $c.lit("eatcorpse")), rnd(15)) : rnd(15), !glob ? $c.lit("acidic corpse") : $c.lit("acidic glob"), 0);
-    } else if ($c.andu64($c.relem(mons, mnum).mflags1, 268435456) !== 0 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 1928, $c.lit("eatcorpse")), rn2(5)) : rn2(5))) {
+        await losehp(rnd(15), !glob ? $c.lit("acidic corpse") : $c.lit("acidic glob"), 0);
+    } else if ($c.andu64($c.relem(mons, mnum).mflags1, 268435456) !== 0 && rn2(5)) {
         tp = tp + 1 | 0;
         await pline($c.lit("Ecch - that must have been poisonous!"));
         if (!(u.uprops[6 /* POISON_RES */].intrinsic || u.uprops[6 /* POISON_RES */].extrinsic)) {
-            await poison_strdmg(rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 1932, $c.lit("eatcorpse")), rnd(4)) : rnd(4), rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 1932, $c.lit("eatcorpse")), rnd(15)) : rnd(15), !glob ? $c.lit("poisonous corpse") : $c.lit("poisonous glob"), 0);
+            await poison_strdmg(rnd(4), rnd(15), !glob ? $c.lit("poisonous corpse") : $c.lit("poisonous glob"), 0);
         } else {
             await You($c.lit("seem unaffected by the poison."));
         }
-    } else if ((rotted > 5 || rotted > 3 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 1939, $c.lit("eatcorpse")), rn2(5)) : rn2(5))) && !(u.uprops[10 /* SICK_RES */].intrinsic || u.uprops[10 /* SICK_RES */].extrinsic || await defended(gy.youmonst, 33))) {
+    } else if ((rotted > 5 || rotted > 3 && rn2(5)) && !(u.uprops[10 /* SICK_RES */].intrinsic || u.uprops[10 /* SICK_RES */].extrinsic || await defended(gy.youmonst, 33))) {
         tp = tp + 1 | 0;
         await You_feel($c.lit("%ssick."), u.uprops[17 /* SICK */].intrinsic ? $c.lit("very ") : $c.lit(""));
-        await losehp(rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 1942, $c.lit("eatcorpse")), rnd(8)) : rnd(8), !glob ? $c.lit("cadaver") : $c.lit("rotted glob"), 0);
+        await losehp(rnd(8), !glob ? $c.lit("cadaver") : $c.lit("rotted glob"), 0);
     }
     svc.context.victual.reqtime = 3 + ((!glob ? mons[mnum].cwt : otmp.owt) >>> 6) >>> 0 | 0;
-    if (!tp && !(mnum === 326 /* PM_LIZARD */ || mnum === 158 /* PM_LICHEN */ || ($c.peq($c.relem(mons, mnum), $c.relem(mons, 311 /* PM_DEATH */)) || $c.peq($c.relem(mons, mnum), $c.relem(mons, 313 /* PM_FAMINE */)) || $c.peq($c.relem(mons, mnum), $c.relem(mons, 312 /* PM_PESTILENCE */))) || mnum === 6 /* PM_ACID_BLOB */) && (otmp.oeroded | 0 || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 1949, $c.lit("eatcorpse")), rn2(7)) : rn2(7)))) {
+    if (!tp && !(mnum === 326 /* PM_LIZARD */ || mnum === 158 /* PM_LICHEN */ || ($c.peq($c.relem(mons, mnum), $c.relem(mons, 311 /* PM_DEATH */)) || $c.peq($c.relem(mons, mnum), $c.relem(mons, 313 /* PM_FAMINE */)) || $c.peq($c.relem(mons, mnum), $c.relem(mons, 312 /* PM_PESTILENCE */))) || mnum === 6 /* PM_ACID_BLOB */) && (otmp.oeroded | 0 || !rn2(7))) {
         if (await rottenfood(otmp)) {
             otmp.oeroded = (1) & 3;
             otmp = await touchfood(otmp);
@@ -1689,9 +1689,9 @@ async function eatcorpse(otmp) {   // eat.c:1855
     } else if (tp) {
     } else {
         yummy = $c.i8($c.relem(mons, mnum).mlet === 2 /* S_BLOB */ || $c.relem(mons, mnum).mlet === 10 /* S_JELLY */ || $c.relem(mons, mnum).mlet === 32 /* S_FUNGUS */ || $c.relem(mons, mnum).mlet === 22 /* S_VORTEX */ || $c.relem(mons, mnum).mlet === 25 /* S_LIGHT */ || $c.relem(mons, mnum).mlet === 31 /* S_ELEMENTAL */ && !$c.peq($c.relem(mons, mnum), $c.relem(mons, 153 /* PM_STALKER */)) || $c.relem(mons, mnum).mlet === 55 /* S_GOLEM */ && !$c.peq($c.relem(mons, mnum), $c.relem(mons, 255 /* PM_FLESH_GOLEM */)) && !$c.peq($c.relem(mons, mnum), $c.relem(mons, 253 /* PM_LEATHER_GOLEM */)) || $c.relem(mons, mnum).mlet === 54 /* S_GHOST */ ? !($c.andu64(gy.youmonst.data.mflags1, 536870912) !== 0) && $c.andu64(gy.youmonst.data.mflags1, 1073741824) !== 0 ? 1 : 0 : $c.andu64(gy.youmonst.data.mflags1, 536870912) !== 0 && !($c.andu64(gy.youmonst.data.mflags1, 1073741824) !== 0) ? 1 : 0);
-        palatable = $c.i8(($c.relem(mons, mnum).mlet === 2 /* S_BLOB */ || $c.relem(mons, mnum).mlet === 10 /* S_JELLY */ || $c.relem(mons, mnum).mlet === 32 /* S_FUNGUS */ || $c.relem(mons, mnum).mlet === 22 /* S_VORTEX */ || $c.relem(mons, mnum).mlet === 25 /* S_LIGHT */ || $c.relem(mons, mnum).mlet === 31 /* S_ELEMENTAL */ && !$c.peq($c.relem(mons, mnum), $c.relem(mons, 153 /* PM_STALKER */)) || $c.relem(mons, mnum).mlet === 55 /* S_GOLEM */ && !$c.peq($c.relem(mons, mnum), $c.relem(mons, 255 /* PM_FLESH_GOLEM */)) && !$c.peq($c.relem(mons, mnum), $c.relem(mons, 253 /* PM_LEATHER_GOLEM */)) || $c.relem(mons, mnum).mlet === 54 /* S_GHOST */ || $c.relem(mons, mnum).mlet === 42 /* S_PUDDING */ && !$c.peq($c.relem(mons, mnum), $c.relem(mons, 209 /* PM_BLACK_PUDDING */)) ? $c.andu64(gy.youmonst.data.mflags1, 1073741824) !== 0 : $c.andu64(gy.youmonst.data.mflags1, 536870912) !== 0) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 1988, $c.lit("eatcorpse")), rn2(10)) : rn2(10)) && (rotted < 1 || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 1989, $c.lit("eatcorpse")), rn2($c.i32(rotted) + 1 | 0)) : rn2($c.i32(rotted) + 1 | 0))) ? 1 : 0);
+        palatable = $c.i8(($c.relem(mons, mnum).mlet === 2 /* S_BLOB */ || $c.relem(mons, mnum).mlet === 10 /* S_JELLY */ || $c.relem(mons, mnum).mlet === 32 /* S_FUNGUS */ || $c.relem(mons, mnum).mlet === 22 /* S_VORTEX */ || $c.relem(mons, mnum).mlet === 25 /* S_LIGHT */ || $c.relem(mons, mnum).mlet === 31 /* S_ELEMENTAL */ && !$c.peq($c.relem(mons, mnum), $c.relem(mons, 153 /* PM_STALKER */)) || $c.relem(mons, mnum).mlet === 55 /* S_GOLEM */ && !$c.peq($c.relem(mons, mnum), $c.relem(mons, 255 /* PM_FLESH_GOLEM */)) && !$c.peq($c.relem(mons, mnum), $c.relem(mons, 253 /* PM_LEATHER_GOLEM */)) || $c.relem(mons, mnum).mlet === 54 /* S_GHOST */ || $c.relem(mons, mnum).mlet === 42 /* S_PUDDING */ && !$c.peq($c.relem(mons, mnum), $c.relem(mons, 209 /* PM_BLACK_PUDDING */)) ? $c.andu64(gy.youmonst.data.mflags1, 1073741824) !== 0 : $c.andu64(gy.youmonst.data.mflags1, 536870912) !== 0) && rn2(10) && (rotted < 1 || !rn2($c.i32(rotted) + 1 | 0)) ? 1 : 0);
         pmxnam = await food_xname(otmp, 0);
-        idx = $c.relem(mons, mnum).mlet === 2 /* S_BLOB */ || $c.relem(mons, mnum).mlet === 10 /* S_JELLY */ || $c.relem(mons, mnum).mlet === 32 /* S_FUNGUS */ || $c.relem(mons, mnum).mlet === 22 /* S_VORTEX */ || $c.relem(mons, mnum).mlet === 25 /* S_LIGHT */ || $c.relem(mons, mnum).mlet === 31 /* S_ELEMENTAL */ && !$c.peq($c.relem(mons, mnum), $c.relem(mons, 153 /* PM_STALKER */)) || $c.relem(mons, mnum).mlet === 55 /* S_GOLEM */ && !$c.peq($c.relem(mons, mnum), $c.relem(mons, 255 /* PM_FLESH_GOLEM */)) && !$c.peq($c.relem(mons, mnum), $c.relem(mons, 253 /* PM_LEATHER_GOLEM */)) || $c.relem(mons, mnum).mlet === 54 /* S_GHOST */ || $c.relem(mons, mnum).mlet === 42 /* S_PUDDING */ && !$c.peq($c.relem(mons, mnum), $c.relem(mons, 209 /* PM_BLACK_PUDDING */)) ? 0 : rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 1996, $c.lit("eatcorpse")), rn2(5)) : rn2(5);
+        idx = $c.relem(mons, mnum).mlet === 2 /* S_BLOB */ || $c.relem(mons, mnum).mlet === 10 /* S_JELLY */ || $c.relem(mons, mnum).mlet === 32 /* S_FUNGUS */ || $c.relem(mons, mnum).mlet === 22 /* S_VORTEX */ || $c.relem(mons, mnum).mlet === 25 /* S_LIGHT */ || $c.relem(mons, mnum).mlet === 31 /* S_ELEMENTAL */ && !$c.peq($c.relem(mons, mnum), $c.relem(mons, 153 /* PM_STALKER */)) || $c.relem(mons, mnum).mlet === 55 /* S_GOLEM */ && !$c.peq($c.relem(mons, mnum), $c.relem(mons, 255 /* PM_FLESH_GOLEM */)) && !$c.peq($c.relem(mons, mnum), $c.relem(mons, 253 /* PM_LEATHER_GOLEM */)) || $c.relem(mons, mnum).mlet === 54 /* S_GHOST */ || $c.relem(mons, mnum).mlet === 42 /* S_PUDDING */ && !$c.peq($c.relem(mons, mnum), $c.relem(mons, 209 /* PM_BLACK_PUDDING */)) ? 0 : rn2(5);
         palat_msg = eatcorpse$palatable_msgs[idx];
         use_is = $c.i8(u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic) || palatable && palat_msg.get(0) === 73 ? 1 : 0);
         if (!strncmpi(pmxnam, $c.lit("the "), 4)) {
@@ -1786,11 +1786,11 @@ async function fprefx(otmp) {   // eat.c:2099
                     } else {
                         await useupf(otmp, 1);
                     }
-                    await explode(u.ux, u.uy, -11, rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 2108, $c.lit("fprefx")), d(3, 6)) : d(3, 6), 0, 5 /* EXPL_FIERY */);
+                    await explode(u.ux, u.uy, -11, d(3, 6), 0, 5 /* EXPL_FIERY */);
                     return 0;
                 } else if ($c.sub64(svm.moves, otmp.age) > 400) {
                     await pline($c.lit("Ugh.  Rotten egg."));
-                    await make_vomiting($c.add64($c.and64(u.uprops[20 /* VOMITING */].intrinsic, 16777215), rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 2115, $c.lit("fprefx")), d(10, 4)) : d(10, 4)), 1);
+                    await make_vomiting($c.add64($c.and64(u.uprops[20 /* VOMITING */].intrinsic, 16777215), d(10, 4)), 1);
                 } else {
                     $goto = "give_feedback"; continue S1;
                 }
@@ -1811,8 +1811,8 @@ async function fprefx(otmp) {   // eat.c:2099
                     await pline($c.lit("Yak - dog food!"));
                     await more_experienced(1, 0);
                     await newexplevel();
-                    if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 2143, $c.lit("fprefx")), rn2(2)) : rn2(2)) && !(gu.urole.mnum === 333 || gu.urace.mnum === 72)) {
-                        await make_vomiting((rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 2144, $c.lit("fprefx")), rn2(svc.context.victual.reqtime)) : rn2(svc.context.victual.reqtime)) + 14 | 0, 0);
+                    if (rn2(2) && !(gu.urole.mnum === 333 || gu.urace.mnum === 72)) {
+                        await make_vomiting(rn2(svc.context.victual.reqtime) + 14 | 0, 0);
                     }
                 }
                 break;
@@ -1832,7 +1832,7 @@ async function fprefx(otmp) {   // eat.c:2099
                 $goto = "give_feedback"; continue S1;
             case 284 /* CLOVE_OF_GARLIC */:
                 if ($c.andu64(gy.youmonst.data.mflags2, 2) !== 0) {
-                    await make_vomiting((rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 2164, $c.lit("fprefx")), rn2(svc.context.victual.reqtime)) : rn2(svc.context.victual.reqtime)) + 5 | 0, 0);
+                    await make_vomiting(rn2(svc.context.victual.reqtime) + 5 | 0, 0);
                     break;
                 }
                 await iter_mons(garlic_breath);
@@ -1847,7 +1847,7 @@ async function fprefx(otmp) {   // eat.c:2099
                     if (!(u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic))) {
                         await pline($c.lit("Core dumped."));
                     } else {
-                        x = rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 2193, $c.lit("fprefx")), rnd(100)) : rnd(100);
+                        x = rnd(100);
                         await pline($c.lit("%s -- core dumped."), x <= 75 ? $c.lit("Segmentation fault") : x <= 99 ? $c.lit("Bus error") : $c.lit("Yo' mama"));
                     }
                 } else {
@@ -1872,15 +1872,15 @@ function bounded_increase(old, inc, typ) {   // eat.c:2221
     sgnold = sgn(old), sgninc = sgn(inc);
     if (absinc === 0 || sgnold !== sgninc || (absold + absinc | 0) < 10) {
     } else if ((absold + absinc | 0) < 20) {
-        absinc = rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 2237, $c.lit("bounded_increase")), rnd(absinc)) : rnd(absinc);
+        absinc = rnd(absinc);
         if ((absold + absinc | 0) < 10) {
             absinc = 10 - absold | 0;
         }
         inc = Math.imul(sgninc, absinc);
     } else if ((absold + absinc | 0) < 40) {
-        absinc = (rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 2242, $c.lit("bounded_increase")), rn2(absinc)) : rn2(absinc)) ? 1 : 0;
+        absinc = rn2(absinc) ? 1 : 0;
         if ((absold + absinc | 0) < 20) {
-            absinc = rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 2244, $c.lit("bounded_increase")), rnd(20 - absold | 0)) : rnd(20 - absold | 0);
+            absinc = rnd(20 - absold | 0);
         }
         inc = Math.imul(sgninc, absinc);
     } else {
@@ -1909,7 +1909,7 @@ async function eataccessory(otmp) {   // eat.c:2265
     }
     await observe_object(otmp);
     otmp.known = (1) & 1;
-    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 2280, $c.lit("eataccessory")), rn2(otmp.oclass === 4 /* RING_CLASS */ ? 3 : 5)) : rn2(otmp.oclass === 4 /* RING_CLASS */ ? 3 : 5))) {
+    if (!rn2(otmp.oclass === 4 /* RING_CLASS */ ? 3 : 5)) {
         switch (otmp.otyp) {
             default:
                 if (!objects[typ].oc_oprop) {
@@ -1943,7 +1943,7 @@ async function eataccessory(otmp) {   // eat.c:2265
                         u.uprops[48 /* LEVITATION */].intrinsic = oldprop;
                         if (!((u.uprops[48 /* LEVITATION */].intrinsic || u.uprops[48 /* LEVITATION */].extrinsic) && !u.uprops[48 /* LEVITATION */].blocked)) {
                             await float_up();
-                            incr_itimeout(new $c.FieldRef(u.uprops[48 /* LEVITATION */], "intrinsic", "i64"), rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 2319, $c.lit("eataccessory")), d(10, 20)) : d(10, 20));
+                            incr_itimeout(new $c.FieldRef(u.uprops[48 /* LEVITATION */], "intrinsic", "i64"), d(10, 20));
                             await discover_object(typ, 1, 1, 1);
                         }
                         break;
@@ -2010,7 +2010,7 @@ async function eataccessory(otmp) {   // eat.c:2265
                 break;
             case 204 /* AMULET_OF_RESTFUL_SLEEP */:
                 {
-                    newnap = rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 2390, $c.lit("eataccessory")), rnd(100)) : rnd(100);
+                    newnap = rnd(100);
                     oldnap = $c.and64(u.uprops[27 /* SLEEPY */].intrinsic, 16777215);
                     if (!$c.and64(u.uprops[27 /* SLEEPY */].intrinsic, 67108864)) {
                         await accessory_has_effect(otmp);
@@ -2128,9 +2128,9 @@ async function fpostfx(otmp) {   // eat.c:2510
             }
             await gainstr(otmp, 1, 1);
             if (u.umonnum !== u.umonster) {
-                $t2 = otmp.cursed | 0 ? -(rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 2537, $c.lit("fpostfx")), rnd(20)) : rnd(20)) | 0 : rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 2537, $c.lit("fpostfx")), rnd(20)) : rnd(20), u.mh = u.mh + $t2 | 0, disp.botl = 1;
+                $t2 = otmp.cursed | 0 ? -rnd(20) | 0 : rnd(20), u.mh = u.mh + $t2 | 0, disp.botl = 1;
                 if (u.mh > u.mhmax) {
-                    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 2539, $c.lit("fpostfx")), rn2(17)) : rn2(17))) {
+                    if (!rn2(17)) {
                         setuhpmax(u.mhmax + 1 | 0, 0);
                     }
                     u.mh = u.mhmax;
@@ -2138,9 +2138,9 @@ async function fpostfx(otmp) {   // eat.c:2510
                     await rehumanize();
                 }
             } else {
-                $t3 = otmp.cursed | 0 ? -(rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 2546, $c.lit("fpostfx")), rnd(20)) : rnd(20)) | 0 : rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 2546, $c.lit("fpostfx")), rnd(20)) : rnd(20), u.uhp = u.uhp + $t3 | 0, disp.botl = 1;
+                $t3 = otmp.cursed | 0 ? -rnd(20) | 0 : rnd(20), u.uhp = u.uhp + $t3 | 0, disp.botl = 1;
                 if (u.uhp > u.uhpmax) {
-                    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 2548, $c.lit("fpostfx")), rn2(17)) : rn2(17))) {
+                    if (!rn2(17)) {
                         setuhpmax(u.uhpmax + 1 | 0, 0);
                     }
                     u.uhp = u.uhpmax;
@@ -2181,7 +2181,7 @@ async function fpostfx(otmp) {   // eat.c:2510
                 } else {
                     await You_hear($c.lit("sinister laughter as you fall asleep..."));
                 }
-                await fall_asleep(-((rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 2595, $c.lit("fpostfx")), rn2(11)) : rn2(11)) + 20 | 0) | 0, 1);
+                await fall_asleep(-(rn2(11) + 20 | 0) | 0, 1);
             }
             break;
     }
@@ -2289,7 +2289,7 @@ async function doeat_nonfood(otmp) {   // eat.c:2734
     if (otmp.oclass === 2 /* WEAPON_CLASS */ && otmp.otrapped | 0) {
         await pline($c.lit("Ecch - that must have been poisonous!"));
         if (!(u.uprops[6 /* POISON_RES */].intrinsic || u.uprops[6 /* POISON_RES */].extrinsic)) {
-            await poison_strdmg(rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 2798, $c.lit("doeat_nonfood")), rnd(4)) : rnd(4), rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 2798, $c.lit("doeat_nonfood")), rnd(15)) : rnd(15), await xname(otmp), 0);
+            await poison_strdmg(rnd(4), rnd(15), await xname(otmp), 0);
         } else {
             await You($c.lit("seem unaffected by the poison."));
         }
@@ -2349,7 +2349,7 @@ export async function doeat() {   // eat.c:2817
         }
         await pline($c.lit("Ulch - that %s was rustproofed!"), await xname(otmp[0]));
         otmp[0].oerodeproof = (0) & 1;
-        await make_stunned($c.add64($c.and64(u.uprops[13 /* STUNNED */].intrinsic, 16777215), rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 2888, $c.lit("doeat")), rn2(10)) : rn2(10)), 1);
+        await make_stunned($c.add64($c.and64(u.uprops[13 /* STUNNED */].intrinsic, 16777215), rn2(10)), 1);
         if (await welded(otmp[0]) || otmp[0].cursed | 0 && $c.and64(otmp[0].owornmask, 393216)) {
             await set_bknown(otmp[0], 1);
             await You($c.lit("spit out %s."), await the(await xname(otmp[0])));
@@ -2445,7 +2445,7 @@ export async function doeat() {   // eat.c:2817
                 break;
         }
         svc.context.victual.reqtime = objects[otmp[0].otyp].oc_delay;
-        if (otmp[0].otyp !== 289 /* FORTUNE_COOKIE */ && (otmp[0].cursed | 0 || !(otmp[0].otyp === 291 /* LEMBAS_WAFER */ || otmp[0].otyp === 292 /* CRAM_RATION */) && $c.sub64(svm.moves, otmp[0].age) > (otmp[0].blessed | 0 ? 50 : 30) && (otmp[0].oeroded | 0 || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 3031, $c.lit("doeat")), rn2(7)) : rn2(7))))) {
+        if (otmp[0].otyp !== 289 /* FORTUNE_COOKIE */ && (otmp[0].cursed | 0 || !(otmp[0].otyp === 291 /* LEMBAS_WAFER */ || otmp[0].otyp === 292 /* CRAM_RATION */) && $c.sub64(svm.moves, otmp[0].age) > (otmp[0].blessed | 0 ? 50 : 30) && (otmp[0].oeroded | 0 || !rn2(7)))) {
             if (await rottenfood(otmp[0])) {
                 otmp[0].oeroded = (1) & 3;
                 dont_start = 1;
@@ -2549,10 +2549,10 @@ export async function gethungry() {   // eat.c:3163
     if (u.uinvulnerable | 0 || iflags.debug_hunger) {
         return;
     }
-    if ((!(gm.multi < 0 && (unconscious() || is_fainted())) || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 3174, $c.lit("gethungry")), rn2(10)) : rn2(10))) && ($c.andu64(gy.youmonst.data.mflags1, 536870912) !== 0 || $c.andu64(gy.youmonst.data.mflags1, 1073741824) !== 0 || $c.andu64(gy.youmonst.data.mflags1, 2147483648) !== 0) && !(u.uprops[54 /* SLOW_DIGESTION */].intrinsic || u.uprops[54 /* SLOW_DIGESTION */].extrinsic)) {
+    if ((!(gm.multi < 0 && (unconscious() || is_fainted())) || !rn2(10)) && ($c.andu64(gy.youmonst.data.mflags1, 536870912) !== 0 || $c.andu64(gy.youmonst.data.mflags1, 1073741824) !== 0 || $c.andu64(gy.youmonst.data.mflags1, 2147483648) !== 0) && !(u.uprops[54 /* SLOW_DIGESTION */].intrinsic || u.uprops[54 /* SLOW_DIGESTION */].extrinsic)) {
         u.uhunger = u.uhunger - 1 | 0;
     }
-    accessorytime = rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 3191, $c.lit("gethungry")), rn2(20)) : rn2(20);
+    accessorytime = rn2(20);
     if ($c.rem32(accessorytime, 2)) {
         if ($c.and64(u.uprops[57 /* REGENERATION */].intrinsic, -268435457) || $c.and64(u.uprops[57 /* REGENERATION */].extrinsic, -8449)) {
             u.uhunger = u.uhunger - 1 | 0;
@@ -2681,7 +2681,7 @@ export async function newuhs(incr) {   // eat.c:3362
         if (is_fainted()) {
             newhs = 5;
         }
-        if (u.uhs <= 3 || (rng_log_enabled() ? (rng_log_set_caller($c.lit("eat.c"), 3416, $c.lit("newuhs")), rn2(20 - uhunger_div_by_10 | 0)) : rn2(20 - uhunger_div_by_10 | 0)) >= 19) {
+        if (u.uhs <= 3 || rn2(20 - uhunger_div_by_10 | 0) >= 19) {
             if (!is_fainted() && gm.multi >= 0) {
                 duration = 10 - uhunger_div_by_10 | 0;
                 await stop_occupation();

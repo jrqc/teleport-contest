@@ -33,7 +33,7 @@ import { Norep, impossible, pline, pline_mon, raw_printf, set_msg_xy } from './p
 import { mon_aligntyp, newepri } from './priest.js';
 import { qt_montype, quest_info } from './questpgr.js';
 import { create_particular } from './read.js';
-import { d, rn2, rnd, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { d, rn2, rnd } from './rnd.js';
 import { genders } from './role.js';
 import { freedynamicdata } from './save.js';
 import { obfree } from './shk.js';
@@ -95,7 +95,7 @@ function wrong_elem_type(ptr) {   // makemon.c:56
 }
 async function m_initgrp(mtmp, x, y, n, mmflags) {   // makemon.c:79
     let mm = new $T.nhcoord(), cnt = 0, mon = null, $t1;
-    cnt = rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 85, $c.lit("m_initgrp")), rnd(n)) : rnd(n);
+    cnt = rnd(n);
     cnt = $c.div32(cnt, u.ulevel < 3 ? 4 : u.ulevel < 5 ? 2 : 1);
     if (!cnt) {
         cnt = cnt + 1 | 0;
@@ -119,7 +119,7 @@ async function m_initgrp(mtmp, x, y, n, mmflags) {   // makemon.c:79
 async function m_initthrow(mtmp, otyp, oquan) {   // makemon.c:148
     let otmp = null, $t1, $t2;
     otmp = await mksobj(otyp, 1, 0);
-    $t1 = (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 153, $c.lit("m_initthrow")), rn2(oquan)) : rn2(oquan)) + 3 | 0, otmp.quan = $t1;
+    $t1 = rn2(oquan) + 3 | 0, otmp.quan = $t1;
     $t2 = await weight(otmp) >>> 0, otmp.owt = $t2;
     if (otyp === 20 /* ORCISH_ARROW */) {
         otmp.otrapped = (1) & 1;
@@ -135,11 +135,11 @@ async function m_initweap(mtmp) {   // makemon.c:161
     }
     switch (ptr.mlet) {
         case 34 /* S_GIANT */:
-            if (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 181, $c.lit("m_initweap")), rn2(2)) : rn2(2)) {
+            if (rn2(2)) {
                 await mongets(mtmp, mm !== 174 /* PM_ETTIN */ ? 475 /* BOULDER */ : 77 /* CLUB */);
             }
-            if (mm !== 174 /* PM_ETTIN */ && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 183, $c.lit("m_initweap")), rn2(5)) : rn2(5))) {
-                await mongets(mtmp, (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 184, $c.lit("m_initweap")), rn2(2)) : rn2(2)) ? 55 /* TWO_HANDED_SWORD */ : 45 /* BATTLE_AXE */);
+            if (mm !== 174 /* PM_ETTIN */ && !rn2(5)) {
+                await mongets(mtmp, rn2(2) ? 55 /* TWO_HANDED_SWORD */ : 45 /* BATTLE_AXE */);
             }
             break;
         case 53 /* S_HUMAN */:
@@ -148,30 +148,30 @@ async function m_initweap(mtmp) {   // makemon.c:161
                 switch (mm) {
                     case 282 /* PM_WATCHMAN */:
                     case 277 /* PM_SOLDIER */:
-                        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 192, $c.lit("m_initweap")), rn2(3)) : rn2(3))) {
+                        if (!rn2(3)) {
                             do {
-                                w1 = (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 197, $c.lit("m_initweap")), rn2(12)) : rn2(12)) + 59 | 0;
+                                w1 = rn2(12) + 59 | 0;
                             } while (objects[w1].oc_subtyp !== 16 /* P_POLEARMS */);
-                            w2 = (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 199, $c.lit("m_initweap")), rn2(2)) : rn2(2)) ? 34 /* DAGGER */ : 40 /* KNIFE */;
+                            w2 = rn2(2) ? 34 /* DAGGER */ : 40 /* KNIFE */;
                         } else {
-                            w1 = (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 201, $c.lit("m_initweap")), rn2(2)) : rn2(2)) ? 27 /* SPEAR */ : 46 /* SHORT_SWORD */;
+                            w1 = rn2(2) ? 27 /* SPEAR */ : 46 /* SHORT_SWORD */;
                         }
                         break;
                     case 278 /* PM_SERGEANT */:
-                        w1 = (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 204, $c.lit("m_initweap")), rn2(2)) : rn2(2)) ? 81 /* FLAIL */ : 73 /* MACE */;
+                        w1 = rn2(2) ? 81 /* FLAIL */ : 73 /* MACE */;
                         break;
                     case 280 /* PM_LIEUTENANT */:
-                        w1 = (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 207, $c.lit("m_initweap")), rn2(2)) : rn2(2)) ? 52 /* BROADSWORD */ : 54 /* LONG_SWORD */;
+                        w1 = rn2(2) ? 52 /* BROADSWORD */ : 54 /* LONG_SWORD */;
                         break;
                     case 281 /* PM_CAPTAIN */:
                     case 283 /* PM_WATCH_CAPTAIN */:
-                        w1 = (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 211, $c.lit("m_initweap")), rn2(2)) : rn2(2)) ? 54 /* LONG_SWORD */ : 51 /* SILVER_SABER */;
+                        w1 = rn2(2) ? 54 /* LONG_SWORD */ : 51 /* SILVER_SABER */;
                         break;
                     default:
-                        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 214, $c.lit("m_initweap")), rn2(4)) : rn2(4))) {
+                        if (!rn2(4)) {
                             w1 = 34 /* DAGGER */;
                         }
-                        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 216, $c.lit("m_initweap")), rn2(7)) : rn2(7))) {
+                        if (!rn2(7)) {
                             w2 = 27 /* SPEAR */;
                         }
                         break;
@@ -179,30 +179,30 @@ async function m_initweap(mtmp) {   // makemon.c:161
                 if (w1) {
                     await mongets(mtmp, w1);
                 }
-                if (!w2 && w1 !== 34 /* DAGGER */ && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 222, $c.lit("m_initweap")), rn2(4)) : rn2(4))) {
+                if (!w2 && w1 !== 34 /* DAGGER */ && !rn2(4)) {
                     w2 = 40 /* KNIFE */;
                 }
                 if (w2) {
                     await mongets(mtmp, w2);
                 }
             } else if ($c.andu64(ptr.mflags2, 16) !== 0) {
-                if (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 227, $c.lit("m_initweap")), rn2(2)) : rn2(2)) {
-                    await mongets(mtmp, (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 229, $c.lit("m_initweap")), rn2(2)) : rn2(2)) ? 127 /* ELVEN_MITHRIL_COAT */ : 139 /* ELVEN_CLOAK */);
+                if (rn2(2)) {
+                    await mongets(mtmp, rn2(2) ? 127 /* ELVEN_MITHRIL_COAT */ : 139 /* ELVEN_CLOAK */);
                 }
-                if (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 230, $c.lit("m_initweap")), rn2(2)) : rn2(2)) {
+                if (rn2(2)) {
                     await mongets(mtmp, 89 /* ELVEN_LEATHER_HELM */);
-                } else if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 232, $c.lit("m_initweap")), rn2(4)) : rn2(4))) {
+                } else if (!rn2(4)) {
                     await mongets(mtmp, 169 /* ELVEN_BOOTS */);
                 }
-                if (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 234, $c.lit("m_initweap")), rn2(2)) : rn2(2)) {
+                if (rn2(2)) {
                     await mongets(mtmp, 35 /* ELVEN_DAGGER */);
                 }
-                switch (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 236, $c.lit("m_initweap")), rn2(3)) : rn2(3)) {
+                switch (rn2(3)) {
                     case 0:
-                        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 238, $c.lit("m_initweap")), rn2(4)) : rn2(4))) {
+                        if (!rn2(4)) {
                             await mongets(mtmp, 153 /* ELVEN_SHIELD */);
                         }
-                        if (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 240, $c.lit("m_initweap")), rn2(3)) : rn2(3)) {
+                        if (rn2(3)) {
                             await mongets(mtmp, 47 /* ELVEN_SHORT_SWORD */);
                         }
                         await mongets(mtmp, 84 /* ELVEN_BOW */);
@@ -210,35 +210,35 @@ async function m_initweap(mtmp) {   // makemon.c:161
                         break;
                     case 1:
                         await mongets(mtmp, 53 /* ELVEN_BROADSWORD */);
-                        if (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 247, $c.lit("m_initweap")), rn2(2)) : rn2(2)) {
+                        if (rn2(2)) {
                             await mongets(mtmp, 153 /* ELVEN_SHIELD */);
                         }
                         break;
                     case 2:
-                        if (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 251, $c.lit("m_initweap")), rn2(2)) : rn2(2)) {
+                        if (rn2(2)) {
                             await mongets(mtmp, 28 /* ELVEN_SPEAR */);
                             await mongets(mtmp, 153 /* ELVEN_SHIELD */);
                         }
                         break;
                 }
                 if (mm === 269 /* PM_ELVEN_MONARCH */) {
-                    if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 258, $c.lit("m_initweap")), rn2(3)) : rn2(3)) || gi.in_mklev && ((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_earth_level))) {
+                    if (rn2(3) || gi.in_mklev && ((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_earth_level))) {
                         await mongets(mtmp, 259 /* PICK_AXE */);
                     }
-                    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 260, $c.lit("m_initweap")), rn2(50)) : rn2(50))) {
+                    if (!rn2(50)) {
                         await mongets(mtmp, 231 /* CRYSTAL_BALL */);
                     }
                 }
             } else if (ptr.msound === 41 /* MS_PRIEST */ || ptr.mlet === 53 /* S_HUMAN */ && gu.urole.mnum === 337 && (ptr.msound === 36 /* MS_LEADER */ || ptr.msound === 37 /* MS_NEMESIS */)) {
                 otmp = await mksobj(73 /* MACE */, 0, 0);
-                $t1 = $c.i8(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 266, $c.lit("m_initweap")), rnd(3)) : rnd(3)), otmp.spe = $t1;
-                if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 267, $c.lit("m_initweap")), rn2(2)) : rn2(2))) {
+                $t1 = $c.i8(rnd(3)), otmp.spe = $t1;
+                if (!rn2(2)) {
                     await curse(otmp);
                 }
                 await mpickobj(mtmp, otmp);
             } else if (mm === 378 /* PM_NINJA */) {
-                await mongets(mtmp, (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 271, $c.lit("m_initweap")), rn2(4)) : rn2(4)) ? 25 /* SHURIKEN */ : 24 /* DART */);
-                await mongets(mtmp, (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 272, $c.lit("m_initweap")), rn2(4)) : rn2(4)) ? 46 /* SHORT_SWORD */ : 44 /* AXE */);
+                await mongets(mtmp, rn2(4) ? 25 /* SHURIKEN */ : 24 /* DART */);
+                await mongets(mtmp, rn2(4) ? 46 /* SHORT_SWORD */ : 44 /* AXE */);
             } else if (ptr.msound === 38 /* MS_GUARDIAN */) {
                 switch (mm) {
                     case 369 /* PM_STUDENT */:
@@ -247,16 +247,16 @@ async function m_initweap(mtmp) {   // makemon.c:161
                     case 375 /* PM_ACOLYTE */:
                     case 380 /* PM_GUIDE */:
                     case 382 /* PM_APPRENTICE */:
-                        if (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 282, $c.lit("m_initweap")), rn2(2)) : rn2(2)) {
-                            await mongets(mtmp, (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 283, $c.lit("m_initweap")), rn2(3)) : rn2(3)) ? 34 /* DAGGER */ : 40 /* KNIFE */);
+                        if (rn2(2)) {
+                            await mongets(mtmp, rn2(3) ? 34 /* DAGGER */ : 40 /* KNIFE */);
                         }
-                        if (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 284, $c.lit("m_initweap")), rn2(5)) : rn2(5)) {
-                            await mongets(mtmp, (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 285, $c.lit("m_initweap")), rn2(3)) : rn2(3)) ? 135 /* LEATHER_JACKET */ : 145 /* LEATHER_CLOAK */);
+                        if (rn2(5)) {
+                            await mongets(mtmp, rn2(3) ? 135 /* LEATHER_JACKET */ : 145 /* LEATHER_CLOAK */);
                         }
-                        if (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 287, $c.lit("m_initweap")), rn2(3)) : rn2(3)) {
-                            await mongets(mtmp, (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 288, $c.lit("m_initweap")), rn2(3)) : rn2(3)) ? 163 /* LOW_BOOTS */ : 165 /* HIGH_BOOTS */);
+                        if (rn2(3)) {
+                            await mongets(mtmp, rn2(3) ? 163 /* LOW_BOOTS */ : 165 /* HIGH_BOOTS */);
                         }
-                        if (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 289, $c.lit("m_initweap")), rn2(3)) : rn2(3)) {
+                        if (rn2(3)) {
                             await mongets(mtmp, 307 /* POT_HEALING */);
                         }
                         break;
@@ -264,34 +264,34 @@ async function m_initweap(mtmp) {   // makemon.c:161
                     case 373 /* PM_PAGE */:
                     case 379 /* PM_ROSHI */:
                     case 381 /* PM_WARRIOR */:
-                        await mongets(mtmp, (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 296, $c.lit("m_initweap")), rn2(3)) : rn2(3)) ? 54 /* LONG_SWORD */ : 46 /* SHORT_SWORD */);
-                        await mongets(mtmp, (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 297, $c.lit("m_initweap")), rn2(3)) : rn2(3)) ? 128 /* CHAIN_MAIL */ : 134 /* LEATHER_ARMOR */);
-                        if (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 298, $c.lit("m_initweap")), rn2(2)) : rn2(2)) {
-                            await mongets(mtmp, (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 299, $c.lit("m_initweap")), rn2(2)) : rn2(2)) ? 163 /* LOW_BOOTS */ : 165 /* HIGH_BOOTS */);
+                        await mongets(mtmp, rn2(3) ? 54 /* LONG_SWORD */ : 46 /* SHORT_SWORD */);
+                        await mongets(mtmp, rn2(3) ? 128 /* CHAIN_MAIL */ : 134 /* LEATHER_ARMOR */);
+                        if (rn2(2)) {
+                            await mongets(mtmp, rn2(2) ? 163 /* LOW_BOOTS */ : 165 /* HIGH_BOOTS */);
                         }
-                        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 300, $c.lit("m_initweap")), rn2(3)) : rn2(3))) {
+                        if (!rn2(3)) {
                             await mongets(mtmp, 145 /* LEATHER_CLOAK */);
                         }
-                        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 302, $c.lit("m_initweap")), rn2(3)) : rn2(3))) {
+                        if (!rn2(3)) {
                             await mongets(mtmp, 83 /* BOW */);
                             await m_initthrow(mtmp, 18 /* ARROW */, 12);
                         }
                         break;
                     case 376 /* PM_HUNTER */:
-                        await mongets(mtmp, (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 308, $c.lit("m_initweap")), rn2(3)) : rn2(3)) ? 46 /* SHORT_SWORD */ : 34 /* DAGGER */);
-                        if (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 309, $c.lit("m_initweap")), rn2(2)) : rn2(2)) {
-                            await mongets(mtmp, (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 310, $c.lit("m_initweap")), rn2(2)) : rn2(2)) ? 135 /* LEATHER_JACKET */ : 134 /* LEATHER_ARMOR */);
+                        await mongets(mtmp, rn2(3) ? 46 /* SHORT_SWORD */ : 34 /* DAGGER */);
+                        if (rn2(2)) {
+                            await mongets(mtmp, rn2(2) ? 135 /* LEATHER_JACKET */ : 134 /* LEATHER_ARMOR */);
                         }
                         await mongets(mtmp, 83 /* BOW */);
                         await m_initthrow(mtmp, 18 /* ARROW */, 12);
                         break;
                     case 377 /* PM_THUG */:
                         await mongets(mtmp, 77 /* CLUB */);
-                        await mongets(mtmp, (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 317, $c.lit("m_initweap")), rn2(3)) : rn2(3)) ? 34 /* DAGGER */ : 40 /* KNIFE */);
-                        if (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 318, $c.lit("m_initweap")), rn2(2)) : rn2(2)) {
+                        await mongets(mtmp, rn2(3) ? 34 /* DAGGER */ : 40 /* KNIFE */);
+                        if (rn2(2)) {
                             await mongets(mtmp, 159 /* LEATHER_GLOVES */);
                         }
-                        await mongets(mtmp, (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 320, $c.lit("m_initweap")), rn2(2)) : rn2(2)) ? 135 /* LEATHER_JACKET */ : 134 /* LEATHER_ARMOR */);
+                        await mongets(mtmp, rn2(2) ? 135 /* LEATHER_JACKET */ : 134 /* LEATHER_ARMOR */);
                         break;
                     case 371 /* PM_NEANDERTHAL */:
                         await mongets(mtmp, 77 /* CLUB */);
@@ -302,20 +302,20 @@ async function m_initweap(mtmp) {   // makemon.c:161
             break;
         case 27 /* S_ANGEL */:
             if ($c.andu64(ptr.mflags1, 131072) !== 0) {
-                typ = (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 333, $c.lit("m_initweap")), rn2(3)) : rn2(3)) ? 54 /* LONG_SWORD */ : 74 /* SILVER_MACE */;
+                typ = rn2(3) ? 54 /* LONG_SWORD */ : 74 /* SILVER_MACE */;
                 nam = typ === 54 /* LONG_SWORD */ ? $c.lit("Sunsword") : $c.lit("Demonbane");
                 otmp = await mksobj(typ, 0, 0);
-                if ((!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 338, $c.lit("m_initweap")), rn2(20)) : rn2(20)) || $c.andu64(ptr.mflags2, 1024) !== 0) && sgn(mtmp.isminion | 0 ? mtmp.mextra.emin.min_align : ptr.maligntyp) === 1) {
+                if ((!rn2(20) || $c.andu64(ptr.mflags2, 1024) !== 0) && sgn(mtmp.isminion | 0 ? mtmp.mextra.emin.min_align : ptr.maligntyp) === 1) {
                     otmp = await oname(otmp, nam, 128);
                 }
                 await bless(otmp);
                 otmp.oerodeproof = (1) & 1;
-                $t2 = $c.i8(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 347, $c.lit("m_initweap")), rn2(4)) : rn2(4)), otmp.spe = $t2;
+                $t2 = $c.i8(rn2(4)), otmp.spe = $t2;
                 if (typ === 74 /* SILVER_MACE */) {
                     otmp.spe = $c.i8(otmp.spe + 3 | 0);
                 }
                 await mpickobj(mtmp, otmp);
-                otmp = await mksobj(!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 352, $c.lit("m_initweap")), rn2(4)) : rn2(4)) || $c.andu64(ptr.mflags2, 1024) !== 0 ? 158 /* SHIELD_OF_REFLECTION */ : 156 /* LARGE_SHIELD */, 0, 0);
+                otmp = await mksobj(!rn2(4) || $c.andu64(ptr.mflags2, 1024) !== 0 ? 158 /* SHIELD_OF_REFLECTION */ : 156 /* LARGE_SHIELD */, 0, 0);
                 otmp.oerodeproof = (1) & 1;
                 otmp.spe = 0;
                 await mpickobj(mtmp, otmp);
@@ -323,7 +323,7 @@ async function m_initweap(mtmp) {   // makemon.c:161
             break;
         case 8 /* S_HUMANOID */:
             if (mm === 43 /* PM_HOBBIT */) {
-                switch (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 364, $c.lit("m_initweap")), rn2(3)) : rn2(3)) {
+                switch (rn2(3)) {
                     case 0:
                         await mongets(mtmp, 34 /* DAGGER */);
                         break;
@@ -332,100 +332,100 @@ async function m_initweap(mtmp) {   // makemon.c:161
                         break;
                     case 2:
                         await mongets(mtmp, 87 /* SLING */);
-                        await m_initthrow(mtmp, !(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 373, $c.lit("m_initweap")), rn2(4)) : rn2(4)) ? 473 /* FLINT */ : 474 /* ROCK */, 6);
+                        await m_initthrow(mtmp, !rn2(4) ? 473 /* FLINT */ : 474 /* ROCK */, 6);
                         break;
                 }
-                if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 376, $c.lit("m_initweap")), rn2(10)) : rn2(10))) {
+                if (!rn2(10)) {
                     await mongets(mtmp, 127 /* ELVEN_MITHRIL_COAT */);
                 }
-                if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 378, $c.lit("m_initweap")), rn2(10)) : rn2(10))) {
+                if (!rn2(10)) {
                     await mongets(mtmp, 141 /* DWARVISH_CLOAK */);
                 }
             } else if ($c.andu64(ptr.mflags2, 32) !== 0) {
-                if (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 381, $c.lit("m_initweap")), rn2(7)) : rn2(7)) {
+                if (rn2(7)) {
                     await mongets(mtmp, 141 /* DWARVISH_CLOAK */);
                 }
-                if (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 383, $c.lit("m_initweap")), rn2(7)) : rn2(7)) {
+                if (rn2(7)) {
                     await mongets(mtmp, 164 /* IRON_SHOES */);
                 }
-                if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 385, $c.lit("m_initweap")), rn2(4)) : rn2(4))) {
+                if (!rn2(4)) {
                     await mongets(mtmp, 49 /* DWARVISH_SHORT_SWORD */);
-                    if (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 388, $c.lit("m_initweap")), rn2(2)) : rn2(2)) {
+                    if (rn2(2)) {
                         await mongets(mtmp, 71 /* DWARVISH_MATTOCK */);
                     } else {
-                        await mongets(mtmp, (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 391, $c.lit("m_initweap")), rn2(2)) : rn2(2)) ? 44 /* AXE */ : 30 /* DWARVISH_SPEAR */);
+                        await mongets(mtmp, rn2(2) ? 44 /* AXE */ : 30 /* DWARVISH_SPEAR */);
                         await mongets(mtmp, 157 /* DWARVISH_ROUNDSHIELD */);
                     }
                     await mongets(mtmp, 91 /* DWARVISH_IRON_HELM */);
-                    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 395, $c.lit("m_initweap")), rn2(3)) : rn2(3))) {
+                    if (!rn2(3)) {
                         await mongets(mtmp, 126 /* DWARVISH_MITHRIL_COAT */);
                     }
                 } else {
-                    await mongets(mtmp, !(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 398, $c.lit("m_initweap")), rn2(3)) : rn2(3)) ? 259 /* PICK_AXE */ : 34 /* DAGGER */);
+                    await mongets(mtmp, !rn2(3) ? 259 /* PICK_AXE */ : 34 /* DAGGER */);
                 }
             }
             break;
         case 37 /* S_KOP */:
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 405, $c.lit("m_initweap")), rn2(4)) : rn2(4))) {
+            if (!rn2(4)) {
                 await m_initthrow(mtmp, 287 /* CREAM_PIE */, 2);
             }
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 407, $c.lit("m_initweap")), rn2(3)) : rn2(3))) {
-                await mongets(mtmp, (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 408, $c.lit("m_initweap")), rn2(2)) : rn2(2)) ? 77 /* CLUB */ : 78 /* RUBBER_HOSE */);
+            if (!rn2(3)) {
+                await mongets(mtmp, rn2(2) ? 77 /* CLUB */ : 78 /* RUBBER_HOSE */);
             }
             break;
         case 15 /* S_ORC */:
-            if (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 411, $c.lit("m_initweap")), rn2(2)) : rn2(2)) {
+            if (rn2(2)) {
                 await mongets(mtmp, 90 /* ORCISH_HELM */);
             }
-            switch (mm !== 77 /* PM_ORC_CAPTAIN */ ? mm : (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 414, $c.lit("m_initweap")), rn2(2)) : rn2(2)) ? 74 /* PM_MORDOR_ORC */ : 75 /* PM_URUK_HAI */) {
+            switch (mm !== 77 /* PM_ORC_CAPTAIN */ ? mm : rn2(2) ? 74 /* PM_MORDOR_ORC */ : 75 /* PM_URUK_HAI */) {
                 case 74 /* PM_MORDOR_ORC */:
-                    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 416, $c.lit("m_initweap")), rn2(3)) : rn2(3))) {
+                    if (!rn2(3)) {
                         await mongets(mtmp, 50 /* SCIMITAR */);
                     }
-                    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 418, $c.lit("m_initweap")), rn2(3)) : rn2(3))) {
+                    if (!rn2(3)) {
                         await mongets(mtmp, 155 /* ORCISH_SHIELD */);
                     }
-                    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 420, $c.lit("m_initweap")), rn2(3)) : rn2(3))) {
+                    if (!rn2(3)) {
                         await mongets(mtmp, 40 /* KNIFE */);
                     }
-                    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 422, $c.lit("m_initweap")), rn2(3)) : rn2(3))) {
+                    if (!rn2(3)) {
                         await mongets(mtmp, 129 /* ORCISH_CHAIN_MAIL */);
                     }
                     break;
                 case 75 /* PM_URUK_HAI */:
-                    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 426, $c.lit("m_initweap")), rn2(3)) : rn2(3))) {
+                    if (!rn2(3)) {
                         await mongets(mtmp, 140 /* ORCISH_CLOAK */);
                     }
-                    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 428, $c.lit("m_initweap")), rn2(3)) : rn2(3))) {
+                    if (!rn2(3)) {
                         await mongets(mtmp, 48 /* ORCISH_SHORT_SWORD */);
                     }
-                    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 430, $c.lit("m_initweap")), rn2(3)) : rn2(3))) {
+                    if (!rn2(3)) {
                         await mongets(mtmp, 164 /* IRON_SHOES */);
                     }
-                    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 432, $c.lit("m_initweap")), rn2(3)) : rn2(3))) {
+                    if (!rn2(3)) {
                         await mongets(mtmp, 85 /* ORCISH_BOW */);
                         await m_initthrow(mtmp, 20 /* ORCISH_ARROW */, 12);
                     }
-                    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 436, $c.lit("m_initweap")), rn2(3)) : rn2(3))) {
+                    if (!rn2(3)) {
                         await mongets(mtmp, 154 /* URUK_HAI_SHIELD */);
                     }
                     break;
                 default:
-                    if (mm !== 76 /* PM_ORC_SHAMAN */ && (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 440, $c.lit("m_initweap")), rn2(2)) : rn2(2))) {
-                        await mongets(mtmp, mm === 70 /* PM_GOBLIN */ || (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 441, $c.lit("m_initweap")), rn2(2)) : rn2(2)) === 0 ? 36 /* ORCISH_DAGGER */ : 50 /* SCIMITAR */);
+                    if (mm !== 76 /* PM_ORC_SHAMAN */ && rn2(2)) {
+                        await mongets(mtmp, mm === 70 /* PM_GOBLIN */ || rn2(2) === 0 ? 36 /* ORCISH_DAGGER */ : 50 /* SCIMITAR */);
                     }
             }
             break;
         case 41 /* S_OGRE */:
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 447, $c.lit("m_initweap")), rn2(mm === 205 /* PM_OGRE_TYRANT */ ? 3 : mm === 204 /* PM_OGRE_LEADER */ ? 6 : 12)) : rn2(mm === 205 /* PM_OGRE_TYRANT */ ? 3 : mm === 204 /* PM_OGRE_LEADER */ ? 6 : 12))) {
+            if (!rn2(mm === 205 /* PM_OGRE_TYRANT */ ? 3 : mm === 204 /* PM_OGRE_LEADER */ ? 6 : 12)) {
                 await mongets(mtmp, 45 /* BATTLE_AXE */);
             } else {
                 await mongets(mtmp, 77 /* CLUB */);
             }
             break;
         case 46 /* S_TROLL */:
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 453, $c.lit("m_initweap")), rn2(2)) : rn2(2))) {
-                switch (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 454, $c.lit("m_initweap")), rn2(4)) : rn2(4)) {
+            if (!rn2(2)) {
+                switch (rn2(4)) {
                     case 0:
                         await mongets(mtmp, 60 /* RANSEUR */);
                         break;
@@ -442,12 +442,12 @@ async function m_initweap(mtmp) {   // makemon.c:161
             }
             break;
         case 11 /* S_KOBOLD */:
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 470, $c.lit("m_initweap")), rn2(4)) : rn2(4))) {
+            if (!rn2(4)) {
                 await m_initthrow(mtmp, 24 /* DART */, 12);
             }
             break;
         case 29 /* S_CENTAUR */:
-            if (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 475, $c.lit("m_initweap")), rn2(2)) : rn2(2)) {
+            if (rn2(2)) {
                 if ($c.peq(ptr, $c.relem(mons, 131 /* PM_FOREST_CENTAUR */))) {
                     await mongets(mtmp, 83 /* BOW */);
                     await m_initthrow(mtmp, 18 /* ARROW */, 12);
@@ -462,16 +462,16 @@ async function m_initweap(mtmp) {   // makemon.c:161
             await mongets(mtmp, 54 /* LONG_SWORD */);
             break;
         case 52 /* S_ZOMBIE */:
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 490, $c.lit("m_initweap")), rn2(4)) : rn2(4))) {
+            if (!rn2(4)) {
                 await mongets(mtmp, 134 /* LEATHER_ARMOR */);
             }
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 492, $c.lit("m_initweap")), rn2(4)) : rn2(4))) {
-                await mongets(mtmp, (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 493, $c.lit("m_initweap")), rn2(3)) : rn2(3)) ? 40 /* KNIFE */ : 46 /* SHORT_SWORD */);
+            if (!rn2(4)) {
+                await mongets(mtmp, rn2(3) ? 40 /* KNIFE */ : 46 /* SHORT_SWORD */);
             }
             break;
         case 58 /* S_LIZARD */:
             if (mm === 329 /* PM_SALAMANDER */) {
-                await mongets(mtmp, (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 498, $c.lit("m_initweap")), rn2(7)) : rn2(7)) ? 27 /* SPEAR */ : (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 498, $c.lit("m_initweap")), rn2(3)) : rn2(3)) ? 33 /* TRIDENT */ : 41 /* STILETTO */);
+                await mongets(mtmp, rn2(7) ? 27 /* SPEAR */ : rn2(3) ? 33 /* TRIDENT */ : 41 /* STILETTO */);
             }
             break;
         case 56 /* S_DEMON */:
@@ -484,7 +484,7 @@ async function m_initweap(mtmp) {   // makemon.c:161
                     await mongets(mtmp, 433 /* WAN_DEATH */);
                     break;
                 case 291 /* PM_HORNED_DEVIL */:
-                    await mongets(mtmp, (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 510, $c.lit("m_initweap")), rn2(4)) : rn2(4)) ? 33 /* TRIDENT */ : 82 /* BULLWHIP */);
+                    await mongets(mtmp, rn2(4) ? 33 /* TRIDENT */ : 82 /* BULLWHIP */);
                     break;
                 case 307 /* PM_DISPATER */:
                     await mongets(mtmp, 417 /* WAN_STRIKING */);
@@ -498,7 +498,7 @@ async function m_initweap(mtmp) {   // makemon.c:161
             }
         default:
             bias = (($c.andu64(ptr.mflags2, 1024) !== 0 ? 1 : 0) + Math.imul($c.andu64(ptr.mflags2, 2048) !== 0 ? 1 : 0, 2) | 0) + ($c.andu64(ptr.mflags2, 33554432) !== 0 ? 1 : 0) | 0;
-            switch (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 533, $c.lit("m_initweap")), rnd(14 - Math.imul(2, bias) | 0)) : rnd(14 - Math.imul(2, bias) | 0)) {
+            switch (rnd(14 - Math.imul(2, bias) | 0)) {
                 case 1:
                     if ($c.andu64(ptr.mflags2, 67108864) !== 0) {
                         await mongets(mtmp, 45 /* BATTLE_AXE */);
@@ -537,7 +537,7 @@ async function m_initweap(mtmp) {   // makemon.c:161
             }
             break;
     }
-    if (mtmp.m_lev > (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 570, $c.lit("m_initweap")), rn2(75)) : rn2(75))) {
+    if (mtmp.m_lev > rn2(75)) {
         await mongets(mtmp, await rnd_offensive_item(mtmp));
     }
 }
@@ -586,12 +586,12 @@ async function m_initinv(mtmp) {   // makemon.c:589
                         mac = 0;
                         break;
                 }
-                if (mac < -1 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 639, $c.lit("m_initinv")), rn2(5)) : rn2(5))) {
-                    otmp = await mongets(mtmp, (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 640, $c.lit("m_initinv")), rn2(5)) : rn2(5)) ? 121 /* PLATE_MAIL */ : 122 /* CRYSTAL_PLATE_MAIL */);
-                } else if (mac < 3 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 642, $c.lit("m_initinv")), rn2(5)) : rn2(5))) {
-                    otmp = await mongets(mtmp, (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 643, $c.lit("m_initinv")), rn2(3)) : rn2(3)) ? 124 /* SPLINT_MAIL */ : 125 /* BANDED_MAIL */);
-                } else if (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 644, $c.lit("m_initinv")), rn2(5)) : rn2(5)) {
-                    otmp = await mongets(mtmp, (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 645, $c.lit("m_initinv")), rn2(3)) : rn2(3)) ? 132 /* RING_MAIL */ : 131 /* STUDDED_LEATHER_ARMOR */);
+                if (mac < -1 && rn2(5)) {
+                    otmp = await mongets(mtmp, rn2(5) ? 121 /* PLATE_MAIL */ : 122 /* CRYSTAL_PLATE_MAIL */);
+                } else if (mac < 3 && rn2(5)) {
+                    otmp = await mongets(mtmp, rn2(3) ? 124 /* SPLINT_MAIL */ : 125 /* BANDED_MAIL */);
+                } else if (rn2(5)) {
+                    otmp = await mongets(mtmp, rn2(3) ? 132 /* RING_MAIL */ : 131 /* STUDDED_LEATHER_ARMOR */);
                 } else {
                     otmp = await mongets(mtmp, 134 /* LEATHER_ARMOR */);
                 }
@@ -599,36 +599,36 @@ async function m_initinv(mtmp) {   // makemon.c:589
                     mac = mac + ((objects[otmp.otyp].oc_oc1 + otmp.spe | 0) - (((otmp.oeroded | 0) > (otmp.oeroded2 | 0) ? otmp.oeroded | 0 : otmp.oeroded2 | 0) < objects[otmp.otyp].oc_oc1 ? (otmp.oeroded | 0) > (otmp.oeroded2 | 0) ? otmp.oeroded | 0 : otmp.oeroded2 | 0 : objects[otmp.otyp].oc_oc1) | 0) | 0;
                 }
                 otmp = null;
-                if (mac < 10 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 652, $c.lit("m_initinv")), rn2(3)) : rn2(3))) {
+                if (mac < 10 && rn2(3)) {
                     otmp = await mongets(mtmp, 97 /* HELMET */);
-                } else if (mac < 10 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 654, $c.lit("m_initinv")), rn2(2)) : rn2(2))) {
+                } else if (mac < 10 && rn2(2)) {
                     otmp = await mongets(mtmp, 95 /* DENTED_POT */);
                 }
                 if (otmp) {
                     mac = mac + ((objects[otmp.otyp].oc_oc1 + otmp.spe | 0) - (((otmp.oeroded | 0) > (otmp.oeroded2 | 0) ? otmp.oeroded | 0 : otmp.oeroded2 | 0) < objects[otmp.otyp].oc_oc1 ? (otmp.oeroded | 0) > (otmp.oeroded2 | 0) ? otmp.oeroded | 0 : otmp.oeroded2 | 0 : objects[otmp.otyp].oc_oc1) | 0) | 0;
                 }
                 otmp = null;
-                if (mac < 10 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 659, $c.lit("m_initinv")), rn2(3)) : rn2(3))) {
+                if (mac < 10 && rn2(3)) {
                     otmp = await mongets(mtmp, 150 /* SMALL_SHIELD */);
-                } else if (mac < 10 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 661, $c.lit("m_initinv")), rn2(2)) : rn2(2))) {
+                } else if (mac < 10 && rn2(2)) {
                     otmp = await mongets(mtmp, 156 /* LARGE_SHIELD */);
                 }
                 if (otmp) {
                     mac = mac + ((objects[otmp.otyp].oc_oc1 + otmp.spe | 0) - (((otmp.oeroded | 0) > (otmp.oeroded2 | 0) ? otmp.oeroded | 0 : otmp.oeroded2 | 0) < objects[otmp.otyp].oc_oc1 ? (otmp.oeroded | 0) > (otmp.oeroded2 | 0) ? otmp.oeroded | 0 : otmp.oeroded2 | 0 : objects[otmp.otyp].oc_oc1) | 0) | 0;
                 }
                 otmp = null;
-                if (mac < 10 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 666, $c.lit("m_initinv")), rn2(3)) : rn2(3))) {
+                if (mac < 10 && rn2(3)) {
                     otmp = await mongets(mtmp, 163 /* LOW_BOOTS */);
-                } else if (mac < 10 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 668, $c.lit("m_initinv")), rn2(2)) : rn2(2))) {
+                } else if (mac < 10 && rn2(2)) {
                     otmp = await mongets(mtmp, 165 /* HIGH_BOOTS */);
                 }
                 if (otmp) {
                     mac = mac + ((objects[otmp.otyp].oc_oc1 + otmp.spe | 0) - (((otmp.oeroded | 0) > (otmp.oeroded2 | 0) ? otmp.oeroded | 0 : otmp.oeroded2 | 0) < objects[otmp.otyp].oc_oc1 ? (otmp.oeroded | 0) > (otmp.oeroded2 | 0) ? otmp.oeroded | 0 : otmp.oeroded2 | 0 : objects[otmp.otyp].oc_oc1) | 0) | 0;
                 }
                 otmp = null;
-                if (mac < 10 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 673, $c.lit("m_initinv")), rn2(3)) : rn2(3))) {
+                if (mac < 10 && rn2(3)) {
                     otmp = await mongets(mtmp, 159 /* LEATHER_GLOVES */);
-                } else if (mac < 10 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 675, $c.lit("m_initinv")), rn2(2)) : rn2(2))) {
+                } else if (mac < 10 && rn2(2)) {
                     otmp = await mongets(mtmp, 145 /* LEATHER_CLOAK */);
                 }
                 if (otmp) {
@@ -638,7 +638,7 @@ async function m_initinv(mtmp) {   // makemon.c:589
                 mac;
                 if ($c.peq(ptr, $c.relem(mons, 283 /* PM_WATCH_CAPTAIN */))) {
                 } else if ($c.peq(ptr, $c.relem(mons, 282 /* PM_WATCHMAN */))) {
-                    if (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 685, $c.lit("m_initinv")), rn2(3)) : rn2(3)) {
+                    if (rn2(3)) {
                         await mongets(mtmp, 245 /* TIN_WHISTLE */);
                     }
                 } else if ($c.peq(ptr, $c.relem(mons, 272 /* PM_GUARD */))) {
@@ -646,19 +646,19 @@ async function m_initinv(mtmp) {   // makemon.c:589
                     await curse(otmp);
                     await mpickobj(mtmp, otmp);
                 } else {
-                    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 695, $c.lit("m_initinv")), rn2(3)) : rn2(3))) {
+                    if (!rn2(3)) {
                         await mongets(mtmp, 294 /* K_RATION */);
                     }
-                    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 697, $c.lit("m_initinv")), rn2(2)) : rn2(2))) {
+                    if (!rn2(2)) {
                         await mongets(mtmp, 295 /* C_RATION */);
                     }
-                    if (!$c.peq(ptr, $c.relem(mons, 277 /* PM_SOLDIER */)) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 699, $c.lit("m_initinv")), rn2(3)) : rn2(3))) {
+                    if (!$c.peq(ptr, $c.relem(mons, 277 /* PM_SOLDIER */)) && !rn2(3)) {
                         await mongets(mtmp, 256 /* BUGLE */);
                     }
                 }
             } else if ($c.peq(ptr, $c.relem(mons, 271 /* PM_SHOPKEEPER */))) {
                 await mongets(mtmp, 221 /* SKELETON_KEY */);
-                switch (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 704, $c.lit("m_initinv")), rn2(4)) : rn2(4)) {
+                switch (rn2(4)) {
                     case 0:
                         await mongets(mtmp, 429 /* WAN_MAGIC_MISSILE */);
                     case 1:
@@ -669,30 +669,30 @@ async function m_initinv(mtmp) {   // makemon.c:589
                         await mongets(mtmp, 417 /* WAN_STRIKING */);
                 }
             } else if (ptr.msound === 41 /* MS_PRIEST */ || ptr.mlet === 53 /* S_HUMAN */ && gu.urole.mnum === 337 && (ptr.msound === 36 /* MS_LEADER */ || ptr.msound === 37 /* MS_NEMESIS */)) {
-                await mongets(mtmp, (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 723, $c.lit("m_initinv")), rn2(7)) : rn2(7)) ? 143 /* ROBE */ : (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 724, $c.lit("m_initinv")), rn2(3)) : rn2(3)) ? 146 /* CLOAK_OF_PROTECTION */ : 148 /* CLOAK_OF_MAGIC_RESISTANCE */);
+                await mongets(mtmp, rn2(7) ? 143 /* ROBE */ : rn2(3) ? 146 /* CLOAK_OF_PROTECTION */ : 148 /* CLOAK_OF_MAGIC_RESISTANCE */);
                 await mongets(mtmp, 150 /* SMALL_SHIELD */);
-                await mkmonmoney(mtmp, (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 727, $c.lit("m_initinv")), rn2(10)) : rn2(10)) + 20 | 0);
+                await mkmonmoney(mtmp, rn2(10) + 20 | 0);
             } else if (ptr.mlet === 53 /* S_HUMAN */ && gu.urole.mnum === 336 && (ptr.msound === 36 /* MS_LEADER */ || ptr.msound === 37 /* MS_NEMESIS */)) {
-                await mongets(mtmp, (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 729, $c.lit("m_initinv")), rn2(11)) : rn2(11)) ? 143 /* ROBE */ : 148 /* CLOAK_OF_MAGIC_RESISTANCE */);
+                await mongets(mtmp, rn2(11) ? 143 /* ROBE */ : 148 /* CLOAK_OF_MAGIC_RESISTANCE */);
             }
             break;
         case 14 /* S_NYMPH */:
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 733, $c.lit("m_initinv")), rn2(2)) : rn2(2))) {
+            if (!rn2(2)) {
                 await mongets(mtmp, 230 /* MIRROR */);
             }
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 735, $c.lit("m_initinv")), rn2(2)) : rn2(2))) {
+            if (!rn2(2)) {
                 await mongets(mtmp, 312 /* POT_OBJECT_DETECTION */);
             }
             break;
         case 34 /* S_GIANT */:
             if ($c.peq(ptr, $c.relem(mons, 177 /* PM_MINOTAUR */))) {
-                if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 740, $c.lit("m_initinv")), rn2(8)) : rn2(8)) || gi.in_mklev && ((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_earth_level))) {
+                if (!rn2(8) || gi.in_mklev && ((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_earth_level))) {
                     await mongets(mtmp, 428 /* WAN_DIGGING */);
                 }
             } else if ($c.andu64(ptr.mflags2, 8192) !== 0) {
-                for (cnt = rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 743, $c.lit("m_initinv")), rn2($c.div32(mtmp.m_lev, 2))) : rn2($c.div32(mtmp.m_lev, 2)); cnt; cnt = cnt - 1 | 0) {
+                for (cnt = rn2($c.div32(mtmp.m_lev, 2)); cnt; cnt = cnt - 1 | 0) {
                     otmp = await mksobj(rnd_class(439 /* DILITHIUM_CRYSTAL */, 469), 0, 0);
-                    $t1 = (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 746, $c.lit("m_initinv")), rn2(2)) : rn2(2)) + 3 | 0, otmp.quan = $t1;
+                    $t1 = rn2(2) + 3 | 0, otmp.quan = $t1;
                     $t2 = await weight(otmp) >>> 0, otmp.owt = $t2;
                     await mpickobj(mtmp, otmp);
                 }
@@ -706,26 +706,26 @@ async function m_initinv(mtmp) {   // makemon.c:589
             }
             break;
         case 38 /* S_LICH */:
-            if ($c.peq(ptr, $c.relem(mons, 185 /* PM_MASTER_LICH */)) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 760, $c.lit("m_initinv")), rn2(13)) : rn2(13))) {
-                await mongets(mtmp, (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 761, $c.lit("m_initinv")), rn2(7)) : rn2(7)) ? 38 /* ATHAME */ : 416 /* WAN_NOTHING */);
-            } else if ($c.peq(ptr, $c.relem(mons, 186 /* PM_ARCH_LICH */)) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 762, $c.lit("m_initinv")), rn2(3)) : rn2(3))) {
-                otmp = await mksobj((rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 763, $c.lit("m_initinv")), rn2(3)) : rn2(3)) ? 38 /* ATHAME */ : 79 /* QUARTERSTAFF */, 1, $c.i8((rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 764, $c.lit("m_initinv")), rn2(13)) : rn2(13)) ? 0 : 1));
+            if ($c.peq(ptr, $c.relem(mons, 185 /* PM_MASTER_LICH */)) && !rn2(13)) {
+                await mongets(mtmp, rn2(7) ? 38 /* ATHAME */ : 416 /* WAN_NOTHING */);
+            } else if ($c.peq(ptr, $c.relem(mons, 186 /* PM_ARCH_LICH */)) && !rn2(3)) {
+                otmp = await mksobj(rn2(3) ? 38 /* ATHAME */ : 79 /* QUARTERSTAFF */, 1, $c.i8(rn2(13) ? 0 : 1));
                 if (otmp.spe < 2) {
-                    $t3 = $c.i8(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 766, $c.lit("m_initinv")), rnd(3)) : rnd(3)), otmp.spe = $t3;
+                    $t3 = $c.i8(rnd(3)), otmp.spe = $t3;
                 }
-                if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 767, $c.lit("m_initinv")), rn2(4)) : rn2(4))) {
+                if (!rn2(4)) {
                     otmp.oerodeproof = (1) & 1;
                 }
                 await mpickobj(mtmp, otmp);
             }
             break;
         case 39 /* S_MUMMY */:
-            if (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 773, $c.lit("m_initinv")), rn2(7)) : rn2(7)) {
+            if (rn2(7)) {
                 await mongets(mtmp, 138 /* MUMMY_WRAPPING */);
             }
             break;
         case 43 /* S_QUANTMECH */:
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 777, $c.lit("m_initinv")), rn2(20)) : rn2(20)) && $c.peq(ptr, $c.relem(mons, 210 /* PM_QUANTUM_MECHANIC */))) {
+            if (!rn2(20) && $c.peq(ptr, $c.relem(mons, 210 /* PM_QUANTUM_MECHANIC */))) {
                 otmp = await mksobj(214 /* LARGE_BOX */, 0, 0);
                 if ((catcorpse = await mksobj(265 /* CORPSE */, 1, 0)) !== null) {
                     otmp.spe = 1;
@@ -738,10 +738,10 @@ async function m_initinv(mtmp) {   // makemon.c:589
             }
             break;
         case 12 /* S_LEPRECHAUN */:
-            await mkmonmoney(mtmp, rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 797, $c.lit("m_initinv")), d(await level_difficulty(), 30)) : d(await level_difficulty(), 30));
+            await mkmonmoney(mtmp, d(await level_difficulty(), 30));
             break;
         case 56 /* S_DEMON */:
-            if ($c.peq(ptr, $c.relem(mons, 298 /* PM_ICE_DEVIL */)) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 802, $c.lit("m_initinv")), rn2(4)) : rn2(4))) {
+            if ($c.peq(ptr, $c.relem(mons, 298 /* PM_ICE_DEVIL */)) && !rn2(4)) {
                 await mongets(mtmp, 27 /* SPEAR */);
             } else if ($c.peq(ptr, $c.relem(mons, 309 /* PM_ASMODEUS */))) {
                 await mongets(mtmp, 431 /* WAN_COLD */);
@@ -749,8 +749,8 @@ async function m_initinv(mtmp) {   // makemon.c:589
             }
             break;
         case 33 /* S_GNOME */:
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 810, $c.lit("m_initinv")), rn2(In_mines(u.uz) && gi.in_mklev ? 20 : 60)) : rn2(In_mines(u.uz) && gi.in_mklev ? 20 : 60))) {
-                otmp = await mksobj((rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 811, $c.lit("m_initinv")), rn2(4)) : rn2(4)) ? 224 /* TALLOW_CANDLE */ : 225 /* WAX_CANDLE */, 1, 0);
+            if (!rn2(In_mines(u.uz) && gi.in_mklev ? 20 : 60)) {
+                otmp = await mksobj(rn2(4) ? 224 /* TALLOW_CANDLE */ : 225 /* WAX_CANDLE */, 1, 0);
                 otmp.quan = 1;
                 $t5 = await weight(otmp) >>> 0, otmp.owt = $t5;
                 if (!await mpickobj(mtmp, otmp) && !svl.level.locations[mtmp.mx][mtmp.my].lit) {
@@ -761,17 +761,17 @@ async function m_initinv(mtmp) {   // makemon.c:589
         default:
             break;
     }
-    if ($c.peq(ptr, $c.relem(mons, 277 /* PM_SOLDIER */)) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 823, $c.lit("m_initinv")), rn2(13)) : rn2(13))) {
+    if ($c.peq(ptr, $c.relem(mons, 277 /* PM_SOLDIER */)) && rn2(13)) {
         return;
     }
-    if (mtmp.m_lev > (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 826, $c.lit("m_initinv")), rn2(50)) : rn2(50))) {
+    if (mtmp.m_lev > rn2(50)) {
         await mongets(mtmp, await rnd_defensive_item(mtmp));
     }
-    if (mtmp.m_lev > (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 828, $c.lit("m_initinv")), rn2(100)) : rn2(100))) {
+    if (mtmp.m_lev > rn2(100)) {
         await mongets(mtmp, rnd_misc_item(mtmp));
     }
-    if ($c.andu64(ptr.mflags2, 268435456) !== 0 && !findgold(mtmp.minvent) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 830, $c.lit("m_initinv")), rn2(5)) : rn2(5))) {
-        await mkmonmoney(mtmp, rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 832, $c.lit("m_initinv")), d(await level_difficulty(), mtmp.minvent ? 5 : 10)) : d(await level_difficulty(), mtmp.minvent ? 5 : 10));
+    if ($c.andu64(ptr.mflags2, 268435456) !== 0 && !findgold(mtmp.minvent) && !rn2(5)) {
+        await mkmonmoney(mtmp, d(await level_difficulty(), mtmp.minvent ? 5 : 10));
     }
 }
 export async function clone_mon(mon, x, y) {   // makemon.c:837
@@ -826,9 +826,9 @@ export async function clone_mon(mon, x, y) {   // makemon.c:837
     }
     if (!svc.context.mon_moving && mon.mpeaceful | 0) {
         if (mon.mtame) {
-            $t2 = $c.i8((rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 912, $c.lit("clone_mon")), rn2((2 + u.uluck | 0) > 2 ? 2 + u.uluck | 0 : 2)) : rn2((2 + u.uluck | 0) > 2 ? 2 + u.uluck | 0 : 2)) ? mon.mtame : 0), m2.mtame = $t2;
+            $t2 = $c.i8(rn2((2 + u.uluck | 0) > 2 ? 2 + u.uluck | 0 : 2) ? mon.mtame : 0), m2.mtame = $t2;
         } else if (mon.mpeaceful) {
-            $t3 = ((rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 914, $c.lit("clone_mon")), rn2((2 + u.uluck | 0) > 2 ? 2 + u.uluck | 0 : 2)) : rn2((2 + u.uluck | 0) > 2 ? 2 + u.uluck | 0 : 2)) ? 1 : 0) >>> 0, m2.mpeaceful = ($t3) & 1;
+            $t3 = (rn2((2 + u.uluck | 0) > 2 ? 2 + u.uluck | 0 : 2) ? 1 : 0) >>> 0, m2.mpeaceful = ($t3) & 1;
         }
     }
     if (m2.isminion) {
@@ -876,15 +876,15 @@ export async function propagate(mndx, tally, ghostly) {   // makemon.c:958
 export function monhp_per_lvl(mon) {   // makemon.c:986
     let ptr = null, hp = 0;
     ptr = mon.data;
-    hp = rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 989, $c.lit("monhp_per_lvl")), rnd(8)) : rnd(8);
+    hp = rnd(8);
     if (ptr.mlet === 55 /* S_GOLEM */) {
         hp = $c.div32(golemhp(ptr.pmidx), ptr.mlevel);
     } else if (ptr.mlevel > 49) {
-        hp = 4 + (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 997, $c.lit("monhp_per_lvl")), rnd(4)) : rnd(4)) | 0;
+        hp = 4 + rnd(4) | 0;
     } else if (ptr.mlet === 30 /* S_DRAGON */ && ptr.pmidx >= 143 /* PM_GRAY_DRAGON */) {
-        hp = 4 + (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 1001, $c.lit("monhp_per_lvl")), rn2(5)) : rn2(5)) | 0;
+        hp = 4 + rn2(5) | 0;
     } else if (!mon.m_lev) {
-        hp = rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 1004, $c.lit("monhp_per_lvl")), rnd(4)) : rnd(4);
+        hp = rnd(4);
     }
     return hp;
 }
@@ -897,19 +897,19 @@ export async function newmonhp(mon, mndx) {   // makemon.c:1012
         $t3 = ($t2 = golemhp(mndx), mon.mhp = $t2), mon.mhpmax = $t3;
     } else if ($c.peq(ptr, $c.relem(mons, 311 /* PM_DEATH */)) || $c.peq(ptr, $c.relem(mons, 313 /* PM_FAMINE */)) || $c.peq(ptr, $c.relem(mons, 312 /* PM_PESTILENCE */))) {
         basehp = 10;
-        $t5 = ($t4 = rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 1024, $c.lit("newmonhp")), d(basehp, 8)) : d(basehp, 8), mon.mhp = $t4), mon.mhpmax = $t5;
+        $t5 = ($t4 = d(basehp, 8), mon.mhp = $t4), mon.mhpmax = $t5;
     } else if (ptr.mlevel > 49) {
         $t6 = mon.mhp = Math.imul(2, ptr.mlevel - 6 | 0), mon.mhpmax = $t6;
         mon.m_lev = $c.u8($c.div32(mon.mhp, 4));
     } else if (ptr.mlet === 30 /* S_DRAGON */ && mndx >= 143 /* PM_GRAY_DRAGON */) {
         basehp = mon.m_lev;
-        $t8 = ($t7 = u.uz.dnum === svd.dungeon_topology.d_astral_level.dnum ? Math.imul(8, basehp) : Math.imul(4, basehp) + (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 1036, $c.lit("newmonhp")), d(basehp, 4)) : d(basehp, 4)) | 0, mon.mhp = $t7), mon.mhpmax = $t8;
+        $t8 = ($t7 = u.uz.dnum === svd.dungeon_topology.d_astral_level.dnum ? Math.imul(8, basehp) : Math.imul(4, basehp) + d(basehp, 4) | 0, mon.mhp = $t7), mon.mhpmax = $t8;
     } else if (!mon.m_lev) {
         basehp = 1;
-        $t10 = ($t9 = rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 1039, $c.lit("newmonhp")), rnd(4)) : rnd(4), mon.mhp = $t9), mon.mhpmax = $t10;
+        $t10 = ($t9 = rnd(4), mon.mhp = $t9), mon.mhpmax = $t10;
     } else {
         basehp = mon.m_lev;
-        $t12 = ($t11 = rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 1042, $c.lit("newmonhp")), d(basehp, 8)) : d(basehp, 8), mon.mhp = $t11), mon.mhpmax = $t12;
+        $t12 = ($t11 = d(basehp, 8), mon.mhp = $t11), mon.mhpmax = $t12;
         if (is_home_elemental(ptr)) {
             $t13 = mon.mhp = Math.imul(mon.mhp, 3), mon.mhpmax = $t13;
         }
@@ -937,8 +937,8 @@ function makemon_rnd_goodpos(mon, gpflags, cc) {   // makemon.c:1076
             tryct = 0;
             gpflags = $c.u32($c.or64(gpflags, 16777216));
             do {
-                nx = $c.i16((rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 1087, $c.lit("makemon_rnd_goodpos")), rn2(77)) : rn2(77)) + 2 | 0);
-                ny = $c.i16(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 1088, $c.lit("makemon_rnd_goodpos")), rn2(21)) : rn2(21));
+                nx = $c.i16(rn2(77) + 2 | 0);
+                ny = $c.i16(rn2(21));
                 good = $c.i8(!gi.in_mklev && (gv.viz_array.get(ny).get(nx) & 2) !== 0 ? 0 : goodpos(nx, ny, mon, gpflags));
             } while ((tryct = tryct + 1 | 0) < 50 && !good);
         case "gotgood":
@@ -965,7 +965,7 @@ function makemon_rnd_goodpos(mon, gpflags, cc) {   // makemon.c:1076
                     if (bl === 0 && (!mon || mon.data.mmove)) {
                         stway = gs.stairs;
                         while (stway) {
-                            if (stway.tolev.dnum === u.uz.dnum && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 1119, $c.lit("makemon_rnd_goodpos")), rn2(2)) : rn2(2))) {
+                            if (stway.tolev.dnum === u.uz.dnum && !rn2(2)) {
                                 nx = stway.sx;
                                 ny = stway.sy;
                                 break;
@@ -1098,7 +1098,7 @@ export async function makemon(ptr, x, y, mmflags) {   // makemon.c:1147
     } else if (ptr.msound === 37 /* MS_NEMESIS */ && await quest_info(37 /* MS_NEMESIS */) === mndx) {
         mtmp.female = (svq.quest_status.nemgend) & 1;
     } else {
-        $t3 = (femaleok ? rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 1279, $c.lit("makemon")), rn2(2)) : rn2(2) : 0) >>> 0, mtmp.female = ($t3) & 1;
+        $t3 = (femaleok ? rn2(2) : 0) >>> 0, mtmp.female = ($t3) & 1;
     }
     if (u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum && !($c.andu64(ptr.mflags1, 65536) !== 0)) {
         mon_learns_traps(mtmp, 11 /* PIT */);
@@ -1151,7 +1151,7 @@ export async function makemon(ptr, x, y, mmflags) {   // makemon.c:1147
             break;
         case 36 /* S_JABBERWOCK */:
         case 14 /* S_NYMPH */:
-            if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 1332, $c.lit("makemon")), rn2(5)) : rn2(5)) && !u.uhave.amulet) {
+            if (rn2(5) && !u.uhave.amulet) {
                 mtmp.msleeping = (1) & 1;
             }
             break;
@@ -1203,7 +1203,7 @@ export async function makemon(ptr, x, y, mmflags) {   // makemon.c:1147
         await mongets(mtmp, mitem);
     }
     if (gi.in_mklev) {
-        if (($c.andu64(ptr.mflags2, 256) !== 0 && $c.andu64(ptr.mflags2, 3072) === 0 || mndx === 84 /* PM_WUMPUS */ || mndx === 114 /* PM_LONG_WORM */ || mndx === 319 /* PM_GIANT_EEL */) && !u.uhave.amulet && (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 1389, $c.lit("makemon")), rn2(5)) : rn2(5))) {
+        if (($c.andu64(ptr.mflags2, 256) !== 0 && $c.andu64(ptr.mflags2, 3072) === 0 || mndx === 84 /* PM_WUMPUS */ || mndx === 114 /* PM_LONG_WORM */ || mndx === 319 /* PM_GIANT_EEL */) && !u.uhave.amulet && rn2(5)) {
             mtmp.msleeping = (1) & 1;
         }
     } else {
@@ -1223,25 +1223,25 @@ export async function makemon(ptr, x, y, mmflags) {   // makemon.c:1147
         mtmp.mpeaceful = (1) & 1;
     }
     if (mndx === 114 /* PM_LONG_WORM */ && (($t9 = get_wormno() >>> 0, mtmp.wormno = ($t9) & 31) | 0) !== 0) {
-        await initworm(mtmp, allowtail ? rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 1406, $c.lit("makemon")), rn2(5)) : rn2(5) : 0);
+        await initworm(mtmp, allowtail ? rn2(5) : 0);
         if (count_wsegs(mtmp)) {
             await place_worm_tail_randomly(mtmp, x, y);
         }
     }
-    if (mndx === 275 /* PM_ALIGNED_CLERIC */ || mndx === 276 /* PM_HIGH_CLERIC */ ? !$c.and64(mmflags, 1280) : mndx === 123 /* PM_ANGEL */ && !$c.and64(mmflags, 1024) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 1416, $c.lit("makemon")), rn2(3)) : rn2(3))) {
+    if (mndx === 275 /* PM_ALIGNED_CLERIC */ || mndx === 276 /* PM_HIGH_CLERIC */ ? !$c.and64(mmflags, 1280) : mndx === 123 /* PM_ANGEL */ && !$c.and64(mmflags, 1024) && !rn2(3)) {
         await newemin(mtmp);
         eminp = mtmp.mextra.emin;
         mtmp.isminion = (1) & 1;
-        $t10 = $c.i8((rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 1423, $c.lit("makemon")), rn2(3)) : rn2(3)) - 1 | 0), eminp.min_align = $t10;
-        $t11 = $c.i8($c.and64(mmflags, 32) ? 1 : !(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 1424, $c.lit("makemon")), rn2(3)) : rn2(3)) ? 1 : 0), eminp.renegade = $t11;
+        $t10 = $c.i8(rn2(3) - 1 | 0), eminp.min_align = $t10;
+        $t11 = $c.i8($c.and64(mmflags, 32) ? 1 : !rn2(3) ? 1 : 0), eminp.renegade = $t11;
         mtmp.mpeaceful = ((eminp.min_align === u.ualign.type ? !eminp.renegade ? 1 : 0 : eminp.renegade) >>> 0) & 1;
     }
     set_malign(mtmp);
     if (anymon && !$c.and64(mmflags, 8192)) {
-        if (ptr.geno & 128 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 1431, $c.lit("makemon")), rn2(2)) : rn2(2))) {
+        if (ptr.geno & 128 && rn2(2)) {
             await m_initgrp(mtmp, mtmp.mx, mtmp.my, 3, mmflags);
         } else if (ptr.geno & 64) {
-            if (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 1434, $c.lit("makemon")), rn2(3)) : rn2(3)) {
+            if (rn2(3)) {
                 await m_initgrp(mtmp, mtmp.mx, mtmp.my, 10, mmflags);
             } else {
                 await m_initgrp(mtmp, mtmp.mx, mtmp.my, 3, mmflags);
@@ -1254,7 +1254,7 @@ export async function makemon(ptr, x, y, mmflags) {   // makemon.c:1147
         }
         await m_initinv(mtmp);
         await m_dowear(mtmp, 1);
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 1447, $c.lit("makemon")), rn2(100)) : rn2(100)) && $c.andu64(ptr.mflags2, 4194304) !== 0 && can_saddle(mtmp) && !await which_armor(mtmp, 1048576)) {
+        if (!rn2(100) && $c.andu64(ptr.mflags2, 4194304) !== 0 && can_saddle(mtmp) && !await which_armor(mtmp, 1048576)) {
             await put_saddle_on_mon(null, mtmp);
         }
     } else {
@@ -1393,7 +1393,7 @@ export async function rndmonst() {   // makemon.c:1652
 }
 export async function rndmonst_adj(minadj, maxadj) {   // makemon.c:1659
     let ptr = null, mndx = 0, weight = 0, totalweight = 0, selected_mndx = 0, zlevel = 0, minmlev = 0, maxmlev = 0, elemlevel = 0, upper = 0, save_plnmsg = 0;
-    if (u.uz.dnum === svd.dungeon_topology.d_quest_dnum && (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 1666, $c.lit("rndmonst_adj")), rn2(7)) : rn2(7)) && (ptr = await qt_montype()) !== null) {
+    if (u.uz.dnum === svd.dungeon_topology.d_quest_dnum && rn2(7) && (ptr = await qt_montype()) !== null) {
         return ptr;
     }
     zlevel = await level_difficulty();
@@ -1428,7 +1428,7 @@ export async function rndmonst_adj(minadj, maxadj) {   // makemon.c:1659
         }
         if (weight > 0) {
             totalweight = totalweight + weight | 0;
-            if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 1716, $c.lit("rndmonst_adj")), rn2(totalweight)) : rn2(totalweight)) < weight) {
+            if (rn2(totalweight) < weight) {
                 selected_mndx = mndx;
             }
         }
@@ -1544,12 +1544,12 @@ export async function mkclass_aligned(class_, spc, atyp) {   // makemon.c:1880
             continue;
         }
         gn_mask = 4608;
-        if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 1934, $c.lit("mkclass_aligned")), rn2(9)) : rn2(9)) || class_ === 38 /* S_LICH */) {
+        if (rn2(9) || class_ === 38 /* S_LICH */) {
             gn_mask = (gn_mask | (gehennom ? 2048 : 1024) >>> 0) >>> 0;
         }
         gn_mask = (gn_mask & ~spc >>> 0) >>> 0;
         if (mk_gen_ok(mongen_order[last], mv_mask, gn_mask)) {
-            if (num && mons[mongen_order[last]].difficulty > maxmlev && mons[mongen_order[last]].difficulty > mons[mongen_order[last - 1 | 0]].difficulty && (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 1946, $c.lit("mkclass_aligned")), rn2(2)) : rn2(2))) {
+            if (num && mons[mongen_order[last]].difficulty > maxmlev && mons[mongen_order[last]].difficulty > mons[mongen_order[last - 1 | 0]].difficulty && rn2(2)) {
                 break;
             }
             if ((k = mons[mongen_order[last]].geno & 7) > 0 || (k = zero_freq_for_entire_class ? 1 : 0) > 0) {
@@ -1561,7 +1561,7 @@ export async function mkclass_aligned(class_, spc, atyp) {   // makemon.c:1880
     if (!num) {
         return null;
     }
-    for (num = rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 1969, $c.lit("mkclass_aligned")), rnd(num)) : rnd(num); first < last; first = first + 1 | 0) {
+    for (num = rnd(num); first < last; first = first + 1 | 0) {
         if ((num = num - nums[mongen_order[first]] | 0) <= 0) {
             break;
         }
@@ -1580,7 +1580,7 @@ export function mkclass_poly(class_) {   // makemon.c:1983
         return -1 /* NON_PM */;
     }
     gmask = 4608;
-    if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 1997, $c.lit("mkclass_poly")), rn2(9)) : rn2(9)) || class_ === 38 /* S_LICH */) {
+    if (rn2(9) || class_ === 38 /* S_LICH */) {
         gmask = (gmask | (In_hell(u.uz) ? 2048 : 1024) >>> 0) >>> 0;
     }
     for (last = first; last < 330 /* SPECIAL_PM */ && mons[last].mlet === class_; last = last + 1 | 0) {
@@ -1591,7 +1591,7 @@ export function mkclass_poly(class_) {   // makemon.c:1983
     if (!num) {
         return -1 /* NON_PM */;
     }
-    for (num = rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 2006, $c.lit("mkclass_poly")), rnd(num)) : rnd(num); num > 0; first = first + 1 | 0) {
+    for (num = rnd(num); num > 0; first = first + 1 | 0) {
         if (mk_gen_ok(first, 2, gmask)) {
             num = num - (mons[first].geno & 7) | 0;
         }
@@ -1648,13 +1648,13 @@ export async function grow_up(mtmp, victim) {   // makemon.c:2051
         if (oldtype !== newtype && mons[newtype].mlevel > lev_limit) {
             lev_limit = mons[newtype].mlevel;
         }
-        max_increase = rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 2095, $c.lit("grow_up")), rnd(victim.m_lev + 1 | 0)) : rnd(victim.m_lev + 1 | 0);
+        max_increase = rnd(victim.m_lev + 1 | 0);
         if ((mtmp.mhpmax + max_increase | 0) > (hp_threshold + 1 | 0)) {
             max_increase = ((hp_threshold + 1 | 0) - mtmp.mhpmax | 0) > 0 ? (hp_threshold + 1 | 0) - mtmp.mhpmax | 0 : 0;
         }
-        cur_increase = max_increase > 1 ? rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 2098, $c.lit("grow_up")), rn2(max_increase)) : rn2(max_increase) : 0;
+        cur_increase = max_increase > 1 ? rn2(max_increase) : 0;
     } else {
-        max_increase = cur_increase = rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 2103, $c.lit("grow_up")), rnd(8)) : rnd(8);
+        max_increase = cur_increase = rnd(8);
         hp_threshold = 0;
         lev_limit = 50;
     }
@@ -1728,7 +1728,7 @@ export async function mongets(mtmp, otyp) {   // makemon.c:2181
             otmp.oerodeproof = (1) & 1;
             $t1 = otmp.oeroded2 = (0) & 3, otmp.oeroded = ($t1) & 3;
         } else if ($c.pcmp(mtmp.data, $c.relem(mons, 331 /* PM_ARCHEOLOGIST */)) >= 0 && $c.pcmp(mtmp.data, $c.relem(mons, 343 /* PM_WIZARD */)) <= 0 && (otmp.oclass === 2 /* WEAPON_CLASS */ && objects[otmp.otyp].oc_subtyp >= 5 /* P_SHORT_SWORD */ && objects[otmp.otyp].oc_subtyp <= 9 /* P_SABER */)) {
-            $t2 = $c.i8(3 + (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 2201, $c.lit("mongets")), rn2(4)) : rn2(4)) | 0), otmp.spe = $t2;
+            $t2 = $c.i8(3 + rn2(4) | 0), otmp.spe = $t2;
         }
         if (otmp.otyp === 262 /* CANDELABRUM_OF_INVOCATION */) {
             otmp.spe = 0;
@@ -1816,7 +1816,7 @@ export function peace_minded(ptr) {   // makemon.c:2268
     if ($c.andu64(ptr.mflags2, 4096) !== 0) {
         return $c.i8(u.ualign.record >= 0 ? 1 : 0);
     }
-    return $c.i8(!!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 2306, $c.lit("peace_minded")), rn2(16 + (u.ualign.record < -15 ? -15 : u.ualign.record) | 0)) : rn2(16 + (u.ualign.record < -15 ? -15 : u.ualign.record) | 0)) && !!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 2307, $c.lit("peace_minded")), rn2(2 + $c.abs(mal) | 0)) : rn2(2 + $c.abs(mal) | 0)) ? 1 : 0);
+    return $c.i8(!!rn2(16 + (u.ualign.record < -15 ? -15 : u.ualign.record) | 0) && !!rn2(2 + $c.abs(mal) | 0) ? 1 : 0);
 }
 export function set_malign(mtmp) {   // makemon.c:2321
     let mal = 0, coaligned = 0, absmal = 0, absmal$2 = 0, absmal$3 = 0, $t1;
@@ -1905,7 +1905,7 @@ export async function set_mimic_sym(mtmp) {   // makemon.c:2393
                 } else {
                     appear = ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? 1 /* S_vwall */ : 15 /* S_vcdoor */) >>> 0;
                 }
-            } else if ($goto !== "assign_sym" && (svl.level.flags.is_maze_lev | 0 && !(In_mines(u.uz) && in_town(u.ux, u.uy)) && !(u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 2441, $c.lit("set_mimic_sym")), rn2(2)) : rn2(2)))) {
+            } else if ($goto !== "assign_sym" && (svl.level.flags.is_maze_lev | 0 && !(In_mines(u.uz) && in_town(u.ux, u.uy)) && !(u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum) && rn2(2))) {
                 ap_type = 2;
                 appear = 476;
             } else if ($goto !== "assign_sym" && (roomno < 0 && !t_at($c.i16(mx), $c.i16(my)))) {
@@ -1915,7 +1915,7 @@ export async function set_mimic_sym(mtmp) {   // makemon.c:2393
                 ap_type = 2;
                 appear = 438;
             } else if ($goto !== "assign_sym" && rt === 9 /* DELPHI */) {
-                if (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 2451, $c.lit("set_mimic_sym")), rn2(2)) : rn2(2)) {
+                if (rn2(2)) {
                     ap_type = 2;
                     appear = 476;
                 } else {
@@ -1926,7 +1926,7 @@ export async function set_mimic_sym(mtmp) {   // makemon.c:2393
                 ap_type = 1;
                 appear = 33;
             } else if ($goto !== "assign_sym" && rt >= 14 /* SHOPBASE */) {
-                if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 2468, $c.lit("set_mimic_sym")), rn2(10)) : rn2(10)) >= depth(u.uz)) {
+                if (rn2(10) >= depth(u.uz)) {
                     s_sym = 60 /* S_MIMIC_DEF */;
                     $goto = "assign_sym"; continue D1;
                 }
@@ -1936,10 +1936,10 @@ export async function set_mimic_sym(mtmp) {   // makemon.c:2393
                     appear = (-s_sym | 0) >>> 0;
                 } else if (rt === 24 /* FODDERSHOP */ && s_sym > 18 /* MAXOCLASSES */) {
                     ap_type = 2;
-                    appear = ((rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 2481, $c.lit("set_mimic_sym")), rn2(2)) : rn2(2)) ? 286 /* LUMP_OF_ROYAL_JELLY */ : 285 /* SLIME_MOLD */) >>> 0;
+                    appear = (rn2(2) ? 286 /* LUMP_OF_ROYAL_JELLY */ : 285 /* SLIME_MOLD */) >>> 0;
                 } else {
                     if (s_sym === 0 /* RANDOM_CLASS */ || s_sym >= 18 /* MAXOCLASSES */) {
-                        s_sym = syms[(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 2484, $c.lit("set_mimic_sym")), rn2(15)) : rn2(15)) + 2 | 0];
+                        s_sym = syms[rn2(15) + 2 | 0];
                     }
                     $goto = "assign_sym"; continue D1;
                 }
@@ -1947,12 +1947,12 @@ export async function set_mimic_sym(mtmp) {   // makemon.c:2393
                 D2: for (;;) {
                     switch ($goto) {
                     case null:
-                        s_sym = syms[rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 2488, $c.lit("set_mimic_sym")), rn2(17)) : rn2(17)];
+                        s_sym = syms[rn2(17)];
                     case "assign_sym":
                         $goto = null;   // assign_sym:
                         if (s_sym === 18 /* MAXOCLASSES */) {
                             ap_type = 1;
-                            appear = set_mimic_sym$furnsyms[rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 2497, $c.lit("set_mimic_sym")), rn2(8)) : rn2(8)] >>> 0;
+                            appear = set_mimic_sym$furnsyms[rn2(8)] >>> 0;
                         } else {
                             ap_type = 2;
                             if (s_sym === 60 /* S_MIMIC_DEF */) {
@@ -1975,7 +1975,7 @@ export async function set_mimic_sym(mtmp) {   // makemon.c:2393
                 mndx = await rndmonnum();
                 nocorpse_ndx = (svm.mvitals[mndx].mvflags & 16) !== 0 ? 1 : 0;
                 if (appear === 265 && nocorpse_ndx) {
-                    mndx = (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 2522, $c.lit("set_mimic_sym")), rn2(13)) : rn2(13)) + 331 | 0;
+                    mndx = rn2(13) + 331 | 0;
                 } else if (appear === 266 && !can_be_hatched(mndx) || appear === 296 && nocorpse_ndx) {
                     mndx = -1 /* NON_PM */;
                 }
@@ -1986,9 +1986,9 @@ export async function set_mimic_sym(mtmp) {   // makemon.c:2393
                 mtmp.mextra.mcorpsenm = svc.context.current_fruit;
                 flags.made_fruit = 1;
             } else if (ap_type === 1 && appear === 33) {
-                algn = (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 2539, $c.lit("set_mimic_sym")), rn2(3)) : rn2(3)) - 1 | 0;
+                algn = rn2(3) - 1 | 0;
                 await newmcorpsenm(mtmp);
-                $t1 = (In_hell(u.uz) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 2542, $c.lit("set_mimic_sym")), rn2(3)) : rn2(3)) ? 0 : (algn === -128 ? 0 : algn === 1 ? 4 : algn + 2 | 0) >>> 0) | 0, mtmp.mextra.mcorpsenm = $t1;
+                $t1 = (In_hell(u.uz) && rn2(3) ? 0 : (algn === -128 ? 0 : algn === 1 ? 4 : algn + 2 | 0) >>> 0) | 0, mtmp.mextra.mcorpsenm = $t1;
             } else if (mtmp.mextra && mtmp.mextra.mcorpsenm !== -1 /* NON_PM */) {
                 mtmp.mextra.mcorpsenm = -1 /* NON_PM */;
             }
@@ -2014,8 +2014,8 @@ export async function bagotricks(bag, tipping, seencount) {   // makemon.c:2554
         creatcnt = 1;
         seecount = 0;
         await consume_obj_charge(bag, $c.i8(!tipping ? 1 : 0));
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 2577, $c.lit("bagotricks")), rn2(23)) : rn2(23))) {
-            creatcnt = creatcnt + (rng_log_enabled() ? (rng_log_set_caller($c.lit("makemon.c"), 2578, $c.lit("bagotricks")), rnd(7)) : rnd(7)) | 0;
+        if (!rn2(23)) {
+            creatcnt = creatcnt + rnd(7) | 0;
         }
         do {
             mtmp = await makemon(null, u.ux, u.uy, 0);

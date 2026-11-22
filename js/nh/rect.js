@@ -5,7 +5,7 @@ import { $G } from './globals.js';
 import { alloc } from './alloc.js';
 import { panic } from './end.js';
 import { impossible } from './pline.js';
-import { rn2, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { rn2 } from './rnd.js';
 
 let rect = null;
 let n_rects = 0;
@@ -58,7 +58,7 @@ export function get_rect(r) {   // rect.c:82
     return null;
 }
 export function rnd_rect() {   // rect.c:104
-    return rect_cnt > 0 ? $c.radd(rect, rng_log_enabled() ? (rng_log_set_caller($c.lit("rect.c"), 106, $c.lit("rnd_rect")), rn2(rect_cnt)) : rn2(rect_cnt)) : null;
+    return rect_cnt > 0 ? $c.radd(rect, rn2(rect_cnt)) : null;
 }
 function intersect(r1, r2, r3) {   // rect.c:116
     if (r2.lx > r1.hx || r2.ly > r1.hy || r2.hx < r1.lx || r2.hy < r1.ly) {

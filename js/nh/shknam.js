@@ -21,7 +21,7 @@ import { mon_learns_traps } from './mondata.js';
 import { mons } from './monst.js';
 import { obj_descr, objects } from './objects.js';
 import { impossible, pline } from './pline.js';
-import { rn2, rnd, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { rn2, rnd } from './rnd.js';
 import { inside_shop, shop_keeper } from './shk.js';
 import { rloc } from './teleport.js';
 import { windowprocs } from './windows.js';
@@ -78,7 +78,7 @@ async function shkveg() {   // shknam.c:408
     if (maxprob < 1) {
         await panic($c.lit("shkveg no veggy objects"));
     }
-    prob = rng_log_enabled() ? (rng_log_set_caller($c.lit("shknam.c"), 427, $c.lit("shkveg")), rnd(maxprob)) : rnd(maxprob);
+    prob = rnd(maxprob);
     j = 0;
     i = ok[0];
     while ((prob = prob - objects[i].oc_prob | 0) > 0) {
@@ -107,7 +107,7 @@ async function mkshobj_at(shp, sx, sy, mkspecl) {   // shknam.c:454
         }
         return;
     }
-    if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("shknam.c"), 470, $c.lit("mkshobj_at")), rn2(100)) : rn2(100)) < depth(u.uz) && !(svl.level.monsters[sx][sy] !== null) && (ptr = await mkclass(13, 0)) !== null && (mtmp = await makemon(ptr, $c.i16(sx), $c.i16(sy), 0)) !== null) {
+    if (rn2(100) < depth(u.uz) && !(svl.level.monsters[sx][sy] !== null) && (ptr = await mkclass(13, 0)) !== null && (mtmp = await makemon(ptr, $c.i16(sx), $c.i16(sy), 0)) !== null) {
     } else {
         atype = get_shop_item($c.i32($c.rdiff(shp, $c.relem(shtypes, 0))));
         if (atype === 19) {
@@ -140,11 +140,11 @@ function nameshk(shk, nlp) {   // shknam.c:487
         name_wanted = $c.rem32(name_wanted, names_avail);
         for (trycnt = 0; trycnt < 50; trycnt = trycnt + 1 | 0) {
             if ($c.peq(nlp, new $c.Ptr(shktools, 0))) {
-                shname = shktools[rng_log_enabled() ? (rng_log_set_caller($c.lit("shknam.c"), 519, $c.lit("nameshk")), rn2(names_avail)) : rn2(names_avail)];
+                shname = shktools[rn2(names_avail)];
                 shk.female = (0) & 1;
             } else if (name_wanted < names_avail) {
                 shname = nlp.get(name_wanted);
-            } else if ((i = rng_log_enabled() ? (rng_log_set_caller($c.lit("shknam.c"), 523, $c.lit("nameshk")), rn2(names_avail)) : rn2(names_avail)) !== 0) {
+            } else if ((i = rn2(names_avail)) !== 0) {
                 shname = nlp.get(i - 1 | 0);
             } else if (!$c.peq(nlp, new $c.Ptr(shkgeneral, 0))) {
                 nlp = new $c.Ptr(shkgeneral, 0);
@@ -272,11 +272,11 @@ async function shkinit(shp, sroom) {   // shknam.c:628
     $t8 = eshkp.visitct = 0, eshkp.billct = $t8;
     eshkp.bill_p = null;
     eshkp.customer[0] = 0;
-    await mkmonmoney(shk, $c.add64(1000, $c.mul64(30, rng_log_enabled() ? (rng_log_set_caller($c.lit("shknam.c"), 682, $c.lit("shkinit")), rnd(100)) : rnd(100))));
+    await mkmonmoney(shk, $c.add64(1000, $c.mul64(30, rnd(100))));
     if ($c.peq(shp.shknms, new $c.Ptr(shkrings, 0))) {
         await mongets(shk, 472 /* TOUCHSTONE */);
     }
-    if ($c.peq(shp.shknms, new $c.Ptr(shktools, 0)) || $c.peq(shp.shknms, new $c.Ptr(shkwands, 0)) || $c.peq(shp.shknms, new $c.Ptr(shkrings, 0)) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("shknam.c"), 686, $c.lit("shkinit")), rn2(2)) : rn2(2)) || $c.peq(shp.shknms, new $c.Ptr(shkgeneral, 0)) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("shknam.c"), 687, $c.lit("shkinit")), rn2(5)) : rn2(5))) {
+    if ($c.peq(shp.shknms, new $c.Ptr(shktools, 0)) || $c.peq(shp.shknms, new $c.Ptr(shkwands, 0)) || $c.peq(shp.shknms, new $c.Ptr(shkrings, 0)) && rn2(2) || $c.peq(shp.shknms, new $c.Ptr(shkgeneral, 0)) && rn2(5)) {
         await mongets(shk, 342 /* SCR_CHARGING */);
     }
     nameshk(shk, shp.shknms);
@@ -344,7 +344,7 @@ export async function stock_room(shp_indx, sroom) {   // shknam.c:718
                 }
             }
         }
-        specialspot = rng_log_enabled() ? (rng_log_set_caller($c.lit("shknam.c"), 777, $c.lit("stock_room")), rnd(stockcount)) : rnd(stockcount);
+        specialspot = rnd(stockcount);
         stockcount = 0;
     }
     for (sx = sroom.lx; sx <= sroom.hx; sx = sx + 1 | 0) {
@@ -382,7 +382,7 @@ export function saleable(shkp, obj) {   // shknam.c:805
 export function get_shop_item(type) {   // shknam.c:829
     let shp = null, i = 0, j = 0;
     shp = $c.radd($c.relem(shtypes, 0), type);
-    for (j = rng_log_enabled() ? (rng_log_set_caller($c.lit("shknam.c"), 835, $c.lit("get_shop_item")), rnd(100)) : rnd(100), i = 0; (j = j - shp.iprobs[i].iprob | 0) > 0; i = i + 1 | 0) {
+    for (j = rnd(100), i = 0; (j = j - shp.iprobs[i].iprob | 0) > 0; i = i + 1 | 0) {
         continue;
     }
     return shp.iprobs[i].itype;
@@ -412,12 +412,12 @@ export async function shkname(mtmp) {   // shknam.c:856
                 }
             }
             if (num > 0) {
-                nlp = shtypes[rng_log_enabled() ? (rng_log_set_caller($c.lit("shknam.c"), 884, $c.lit("shkname")), rn2(num)) : rn2(num)].shknms;
+                nlp = shtypes[rn2(num)].shknms;
                 for (num = 0; nlp.get(num); num = num + 1 | 0) {
                     continue;
                 }
                 if (num > 0) {
-                    shknm = nlp.get(rng_log_enabled() ? (rng_log_set_caller($c.lit("shknam.c"), 888, $c.lit("shkname")), rn2(num)) : rn2(num));
+                    shknm = nlp.get(rn2(num));
                 }
             }
         }

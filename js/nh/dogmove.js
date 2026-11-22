@@ -29,7 +29,7 @@ import { obj_descr, objects } from './objects.js';
 import { an, distant_name, doname, vtense, xname } from './objnam.js';
 import { You, You_feel, Your, impossible, pline, pline_mon, pline_xy } from './pline.js';
 import { m_in_out_region } from './region.js';
-import { rn2, rnd, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { rn2, rnd } from './rnd.js';
 import { genders } from './role.js';
 import { unpaid_cost } from './shk.js';
 import { beg, domonnoise, whimper } from './sounds.js';
@@ -329,8 +329,8 @@ async function dog_invent(mtmp, edog, udist) {   // dogmove.c:400
     omy = mtmp.my;
     if (await droppables(mtmp)) {
         (!(edog.apport > 0) ? 1 : 0) ? $c.__assert_rtn($c.lit("dog_invent"), $c.lit("dogmove.c"), 417, $c.lit("edog->apport > 0")) : 0;
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("dogmove.c"), 418, $c.lit("dog_invent")), rn2(udist + 1 | 0)) : rn2(udist + 1 | 0)) || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dogmove.c"), 418, $c.lit("dog_invent")), rn2(edog.apport)) : rn2(edog.apport))) {
-            if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("dogmove.c"), 419, $c.lit("dog_invent")), rn2(10)) : rn2(10)) < edog.apport) {
+        if (!rn2(udist + 1 | 0) || !rn2(edog.apport)) {
+            if (rn2(10) < edog.apport) {
                 await relobj(mtmp, mtmp.minvis | 0, 1);
                 if (edog.apport > 1) {
                     edog.apport = edog.apport - 1 | 0;
@@ -347,8 +347,8 @@ async function dog_invent(mtmp, edog, udist) {   // dogmove.c:400
             }
             carryamt = await can_carry(mtmp, obj);
             if (carryamt > 0 && !obj.cursed && could_reach_item(mtmp, obj.ox, obj.oy)) {
-                if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("dogmove.c"), 446, $c.lit("dog_invent")), rn2(20)) : rn2(20)) < (edog.apport + 3 | 0)) {
-                    if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("dogmove.c"), 447, $c.lit("dog_invent")), rn2(udist)) : rn2(udist)) || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dogmove.c"), 447, $c.lit("dog_invent")), rn2(edog.apport)) : rn2(edog.apport))) {
+                if (rn2(20) < (edog.apport + 3 | 0)) {
+                    if (rn2(udist) || !rn2(edog.apport)) {
                         otmp = obj;
                         if (carryamt !== obj.quan) {
                             otmp = await splitobj(obj, carryamt);
@@ -422,7 +422,7 @@ async function dog_goal(mtmp, edog, after, udist, whappr) {   // dogmove.c:483
                         gg.gy = ny;
                         gg.gtyp = otyp;
                     }
-                } else if (gg.gtyp === 6 /* UNDEF */ && in_masters_sight && !dog_has_minvent && (!svl.level.locations[omx][omy].lit || svl.level.locations[u.ux][u.uy].lit | 0) && (otyp === 3 /* MANFOOD */ || clear_path(mtmp.mx, mtmp.my, nx, ny)) && edog.apport > (rng_log_enabled() ? (rng_log_set_caller($c.lit("dogmove.c"), 554, $c.lit("dog_goal")), rn2(8)) : rn2(8)) && await can_carry(mtmp, obj) > 0) {
+                } else if (gg.gtyp === 6 /* UNDEF */ && in_masters_sight && !dog_has_minvent && (!svl.level.locations[omx][omy].lit || svl.level.locations[u.ux][u.uy].lit | 0) && (otyp === 3 /* MANFOOD */ || clear_path(mtmp.mx, mtmp.my, nx, ny)) && edog.apport > rn2(8) && await can_carry(mtmp, obj) > 0) {
                     gg.gx = nx;
                     gg.gy = ny;
                     gg.gtyp = 4;
@@ -438,7 +438,7 @@ async function dog_goal(mtmp, edog, after, udist, whappr) {   // dogmove.c:483
         }
         appr = udist >= 9 ? 1 : mtmp.mflee | 0 ? -1 : 0;
         if (udist > 1) {
-            if (!(svl.level.locations[u.ux][u.uy].typ >= 25 /* ROOM */) || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dogmove.c"), 575, $c.lit("dog_goal")), rn2(4)) : rn2(4)) || whappr || dog_has_minvent && (rng_log_enabled() ? (rng_log_set_caller($c.lit("dogmove.c"), 576, $c.lit("dog_goal")), rn2(edog.apport)) : rn2(edog.apport))) {
+            if (!(svl.level.locations[u.ux][u.uy].typ >= 25 /* ROOM */) || !rn2(4) || whappr || dog_has_minvent && rn2(edog.apport)) {
                 appr = 1;
             }
         }
@@ -565,7 +565,7 @@ function find_friends(mtmp, mtarg, maxdist) {   // dogmove.c:694
 function score_targ(mtmp, mtarg) {   // dogmove.c:738
     let score = 0, mtmp_lev = 0, align1 = 0, align2 = 0, faith1 = 0, faith2 = 0;
     score = 0;
-    if (!mtmp.mconf || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dogmove.c"), 748, $c.lit("score_targ")), rn2(3)) : rn2(3)) || (svd.dungeon_topology.d_qstart_level.dlevel || svd.dungeon_topology.d_qstart_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_qstart_level)) {
+    if (!mtmp.mconf || !rn2(3) || (svd.dungeon_topology.d_qstart_level.dlevel || svd.dungeon_topology.d_qstart_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_qstart_level)) {
         align1 = -128;
         align2 = -128;
         faith1 = 1;
@@ -615,7 +615,7 @@ function score_targ(mtmp, mtarg) {   // dogmove.c:738
         mtmp_lev = mtmp.m_lev;
         if ((mtmp.cham === 226 /* PM_VAMPIRE */ || mtmp.cham === 227 /* PM_VAMPIRE_LEADER */ || mtmp.cham === 228 /* PM_VLAD_THE_IMPALER */) && mtmp.data.mlet !== 48 /* S_VAMPIRE */) {
             mtmp_lev = mons[mtmp.cham].mlevel;
-            mtmp_lev = mtmp_lev + (rng_log_enabled() ? (rng_log_set_caller($c.lit("dogmove.c"), 813, $c.lit("score_targ")), rn2($c.div32(mtmp_lev, 2) + 1 | 0)) : rn2($c.div32(mtmp_lev, 2) + 1 | 0)) | 0;
+            mtmp_lev = mtmp_lev + rn2($c.div32(mtmp_lev, 2) + 1 | 0) | 0;
             if (mtmp.m_lev > mtmp_lev) {
                 mtmp_lev = mtmp.m_lev;
             }
@@ -625,8 +625,8 @@ function score_targ(mtmp, mtarg) {   // dogmove.c:738
         }
         score = $c.add64(score, Math.imul(mtarg.m_lev, 2) + $c.div32(mtarg.mhp, 3) | 0);
     }
-    score = $c.add64(score, rng_log_enabled() ? (rng_log_set_caller($c.lit("dogmove.c"), 830, $c.lit("score_targ")), rnd(5)) : rnd(5));
-    if (mtmp.mconf | 0 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dogmove.c"), 832, $c.lit("score_targ")), rn2(3)) : rn2(3))) {
+    score = $c.add64(score, rnd(5));
+    if (mtmp.mconf | 0 && !rn2(3)) {
         score = $c.sub64(score, 1000);
     }
     return score;
@@ -671,7 +671,7 @@ export async function pet_ranged_attk(mtmp, forced) {   // dogmove.c:889
         hungry = svm.moves > $c.add64(dog.hungrytime, 300) ? 1 : 0;
     }
     mtarg = best_target(mtmp, forced);
-    if (mtarg && (!hungry || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dogmove.c"), 907, $c.lit("pet_ranged_attk")), rn2(5)) : rn2(5)))) {
+    if (mtarg && (!hungry || !rn2(5))) {
         mstatus = 0;
         if ($c.peq(mtarg, gy.youmonst)) {
             if (await mattacku(mtmp)) {
@@ -685,7 +685,7 @@ export async function pet_ranged_attk(mtmp, forced) {   // dogmove.c:889
             if (mstatus & 4) {
                 return 2;
             }
-            if (mstatus & 1 && !(mstatus & 2) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("dogmove.c"), 934, $c.lit("pet_ranged_attk")), rn2(4)) : rn2(4)) && !$c.peq(mtarg, gy.youmonst)) {
+            if (mstatus & 1 && !(mstatus & 2) && rn2(4) && !$c.peq(mtarg, gy.youmonst)) {
                 if (mtarg.mcansee | 0 && $c.andu64(mtarg.data.mflags1, 4096) === 0) {
                     gb.bhitpos.x = mtmp.mx, gb.bhitpos.y = mtmp.my;
                     gn.notonhead = 0;
@@ -790,7 +790,7 @@ export async function dog_move(mtmp, after) {   // dogmove.c:977
                 if (mtmp2.m_lev >= balk || mtmp2.mtame && mtmp.mtame && !(u.uprops[44 /* CONFLICT */].intrinsic || u.uprops[44 /* CONFLICT */].extrinsic) || await max_passive_dmg(mtmp2, mtmp) >= mtmp.mhp || (Math.imul(mtmp.mhp, 4) < mtmp.mhpmax || mtmp2.data.msound === 38 /* MS_GUARDIAN */ || mtmp2.data.msound === 36 /* MS_LEADER */) && mtmp2.mpeaceful | 0 && !(u.uprops[44 /* CONFLICT */].intrinsic || u.uprops[44 /* CONFLICT */].extrinsic)) {
                     continue;
                 }
-                if ($c.peq(mtmp2.data, $c.relem(mons, 28 /* PM_FLOATING_EYE */)) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("dogmove.c"), 1130, $c.lit("dog_move")), rn2(10)) : rn2(10)) && mtmp.mcansee | 0 && $c.andu64(mtmp.data.mflags1, 4096) === 0 && mtmp2.mcansee | 0 && (!mtmp2.minvis || $c.andu64(mtmp.data.mflags1, 16777216) !== 0) && !await mon_reflects(mtmp, $c.asArr(null, Int8Array)) || $c.peq(mtmp2.data, $c.relem(mons, 8 /* PM_GELATINOUS_CUBE */)) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("dogmove.c"), 1134, $c.lit("dog_move")), rn2(10)) : rn2(10)) || ($c.peq(mtmp2.data, $c.relem(mons, 10 /* PM_COCKATRICE */)) || $c.peq(mtmp2.data, $c.relem(mons, 9 /* PM_CHICKATRICE */))) && !await Resists_Elem(mtmp, 8 /* STONE_RES */)) {
+                if ($c.peq(mtmp2.data, $c.relem(mons, 28 /* PM_FLOATING_EYE */)) && rn2(10) && mtmp.mcansee | 0 && $c.andu64(mtmp.data.mflags1, 4096) === 0 && mtmp2.mcansee | 0 && (!mtmp2.minvis || $c.andu64(mtmp.data.mflags1, 16777216) !== 0) && !await mon_reflects(mtmp, $c.asArr(null, Int8Array)) || $c.peq(mtmp2.data, $c.relem(mons, 8 /* PM_GELATINOUS_CUBE */)) && rn2(10) || ($c.peq(mtmp2.data, $c.relem(mons, 10 /* PM_COCKATRICE */)) || $c.peq(mtmp2.data, $c.relem(mons, 9 /* PM_CHICKATRICE */))) && !await Resists_Elem(mtmp, 8 /* STONE_RES */)) {
                     if (dist2(mtmp.mx, mtmp.my, mtmp2.mx, mtmp2.my) <= 2 || !$c.peq(best_target(mtmp, 0), mtmp2)) {
                         continue;
                     }
@@ -808,7 +808,7 @@ export async function dog_move(mtmp, after) {   // dogmove.c:977
                 if (mstatus & 4) {
                     return 2;
                 }
-                if ((mstatus & 3) === 1 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("dogmove.c"), 1158, $c.lit("dog_move")), rn2(4)) : rn2(4)) && mtmp2.mlstmv !== svm.moves && !onscary(mtmp.mx, mtmp.my, mtmp2) && monnear(mtmp2, mtmp.mx, mtmp.my)) {
+                if ((mstatus & 3) === 1 && rn2(4) && mtmp2.mlstmv !== svm.moves && !onscary(mtmp.mx, mtmp.my, mtmp2) && monnear(mtmp2, mtmp.mx, mtmp.my)) {
                     gb.bhitpos.x = mtmp.mx, gb.bhitpos.y = mtmp.my;
                     gn.notonhead = 0;
                     mstatus = await mattackm(mtmp2, mtmp);
@@ -839,7 +839,7 @@ export async function dog_move(mtmp, after) {   // dogmove.c:977
                             await whimper(mtmp);
                         }
                     } else {
-                        if (trap.tseen | 0 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("dogmove.c"), 1206, $c.lit("dog_move")), rn2(40)) : rn2(40))) {
+                        if (trap.tseen | 0 && rn2(40)) {
                             continue;
                         }
                     }
@@ -860,7 +860,7 @@ export async function dog_move(mtmp, after) {   // dogmove.c:977
                     }
                 }
             }
-            if (cursemsg[i] && !mtmp.mleashed && uncursedcnt > 0 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("dogmove.c"), 1238, $c.lit("dog_move")), rn2(Math.imul(13, uncursedcnt))) : rn2(Math.imul(13, uncursedcnt)))) {
+            if (cursemsg[i] && !mtmp.mleashed && uncursedcnt > 0 && rn2(Math.imul(13, uncursedcnt))) {
                 continue;
             }
             nxti$: {
@@ -868,14 +868,14 @@ export async function dog_move(mtmp, after) {   // dogmove.c:977
                     k = edog ? uncursedcnt : cnt;
                     for (j = 0; j < 4 && j < (k - 1 | 0); j = j + 1 | 0) {
                         if (nx === mtmp.mtrack[j].x && ny === mtmp.mtrack[j].y) {
-                            if (rng_log_enabled() ? (rng_log_set_caller($c.lit("dogmove.c"), 1250, $c.lit("dog_move")), rn2(Math.imul(4, k - j | 0))) : rn2(Math.imul(4, k - j | 0))) {
+                            if (rn2(Math.imul(4, k - j | 0))) {
                                 break nxti$;
                             }
                         }
                     }
                 }
                 j = Math.imul((ndist = dist2(nx, ny, gg.gx, gg.gy)) - nidist | 0, appr);
-                if (j === 0 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dogmove.c"), 1255, $c.lit("dog_move")), rn2(chcnt = $c.i16(chcnt + 1))) : rn2(chcnt = $c.i16(chcnt + 1))) || j < 0 || j > 0 && !whappr && (omx === nix && omy === niy && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dogmove.c"), 1257, $c.lit("dog_move")), rn2(3)) : rn2(3)) || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dogmove.c"), 1257, $c.lit("dog_move")), rn2(12)) : rn2(12)))) {
+                if (j === 0 && !rn2(chcnt = $c.i16(chcnt + 1)) || j < 0 || j > 0 && !whappr && (omx === nix && omy === niy && !rn2(3) || !rn2(12))) {
                     nix = nx;
                     niy = ny;
                     nidist = ndist;
@@ -1025,7 +1025,7 @@ export async function quickmimic(mtmp) {   // dogmove.c:1472
         await dismount_steed(4 /* DISMOUNT_POLY */);
     }
     do {
-        idx = rng_log_enabled() ? (rng_log_set_caller($c.lit("dogmove.c"), 1491, $c.lit("quickmimic")), rn2(9)) : rn2(9);
+        idx = rn2(9);
         if (qm[idx].mndx !== 0 && mtmp.data.pmidx === qm[idx].mndx) {
             break;
         }

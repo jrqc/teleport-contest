@@ -14,7 +14,7 @@ import { discover_object, observe_object } from './o_init.js';
 import { obj_descr, objects } from './objects.js';
 import { The, Tobjnam, an, aobjnam, ysimple_name } from './objnam.js';
 import { There, You, You_cant, Your, impossible, livelog_printf, pline, pline_The } from './pline.js';
-import { rn2, rng_log_enabled, rng_log_set_caller, rnl } from './rnd.js';
+import { rn2, rnl } from './rnd.js';
 import { check_unpaid, obfree } from './shk.js';
 import { known_spell } from './spell.js';
 import { getlin } from './windows.js';
@@ -146,7 +146,7 @@ export async function dowrite(pen) {   // write.c:74
             }
         }
         for (i = first; i <= last; i = i + 1 | 0) {
-            if (objects[i].oc_uname && !strncmpi(objects[i].oc_uname, nm, -1) && !(real && objects[i].oc_name_known | 0) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("write.c"), 193, $c.lit("dowrite")), rn2(deferralchance = deferralchance + 1 | 0)) : rn2(deferralchance = deferralchance + 1 | 0))) {
+            if (objects[i].oc_uname && !strncmpi(objects[i].oc_uname, nm, -1) && !(real && objects[i].oc_name_known | 0) && !rn2(deferralchance = deferralchance + 1 | 0)) {
                 deferred = i;
                 by_descr = 1;
             }
@@ -163,8 +163,8 @@ export async function dowrite(pen) {   // write.c:74
         await pline($c.lit("It's obscene!"));
         return 1;
     } else if (i === 408 /* SPE_NOVEL */) {
-        fanfic = $c.i8(!(rng_log_enabled() ? (rng_log_set_caller($c.lit("write.c"), 216, $c.lit("dowrite")), rn2(3)) : rn2(3)) ? 1 : 0);
-        tearup = $c.i8(!(rng_log_enabled() ? (rng_log_set_caller($c.lit("write.c"), 216, $c.lit("dowrite")), rn2(3)) : rn2(3)) ? 1 : 0);
+        fanfic = $c.i8(!rn2(3) ? 1 : 0);
+        tearup = $c.i8(!rn2(3) ? 1 : 0);
         if (!fanfic) {
             await You($c.lit("%s to write the Great Yendorian Novel, but %s inspiration."), !tearup ? $c.lit("prepare") : $c.lit("try"), !(u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic)) ? $c.lit("lack") : $c.lit("have too much"));
         } else {
@@ -196,7 +196,7 @@ export async function dowrite(pen) {   // write.c:74
         await obfree(new_obj, null);
         return 1;
     }
-    actualcost = (rng_log_enabled() ? (rng_log_set_caller($c.lit("write.c"), 265, $c.lit("dowrite")), rn2($c.div32(basecost, 2))) : rn2($c.div32(basecost, 2))) + $c.div32(basecost, 2) | 0;
+    actualcost = rn2($c.div32(basecost, 2)) + $c.div32(basecost, 2) | 0;
     curseval = bcsign(pen) + bcsign(paper) | 0;
     await exercise(2 /* A_WIS */, 1);
     if (pen.spe < actualcost) {
@@ -218,7 +218,7 @@ export async function dowrite(pen) {   // write.c:74
     } else {
         spell_knowledge = 0 /* spe_Unknown */;
     }
-    if (!objects[new_obj.otyp].oc_name_known && !(by_descr && objects[new_obj.otyp].oc_encountered | 0) && spell_knowledge !== 1 /* spe_Fresh */ && (rng_log_enabled() ? (rng_log_set_caller($c.lit("write.c"), 321, $c.lit("dowrite")), rnl(gu.urole.mnum === 343 && paper.oclass !== 10 /* SPBOOK_CLASS */ || spell_knowledge === 2 /* spe_GoingStale */ ? 5 : 15)) : rnl(gu.urole.mnum === 343 && paper.oclass !== 10 /* SPBOOK_CLASS */ || spell_knowledge === 2 /* spe_GoingStale */ ? 5 : 15))) {
+    if (!objects[new_obj.otyp].oc_name_known && !(by_descr && objects[new_obj.otyp].oc_encountered | 0) && spell_knowledge !== 1 /* spe_Fresh */ && rnl(gu.urole.mnum === 343 && paper.oclass !== 10 /* SPBOOK_CLASS */ || spell_knowledge === 2 /* spe_GoingStale */ ? 5 : 15)) {
         await You($c.lit("%s to write that."), by_descr ? $c.lit("fail") : $c.lit("don't know how"));
         if (paper.oclass === 10 /* SPBOOK_CLASS */) {
             await You($c.lit("write in your best handwriting:  \"My Diary\", but it quickly fades."));
@@ -236,7 +236,7 @@ export async function dowrite(pen) {   // write.c:74
         await obfree(new_obj, null);
         return 1;
     }
-    if ((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked && (rng_log_enabled() ? (rng_log_set_caller($c.lit("write.c"), 342, $c.lit("dowrite")), rnl(3)) : rnl(3))) {
+    if ((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked && rnl(3)) {
         await You($c.lit("fail to write the scroll correctly and it disappears."));
         await useup(paper);
         await obfree(new_obj, null);

@@ -40,7 +40,7 @@ import { make_blinded, make_confused, make_deaf, make_glib, make_hallucinated, m
 import { angry_priest, findpriest, p_coaligned, temple_occupied } from './priest.js';
 import { punish, unpunish } from './read.js';
 import { region_danger, region_safety } from './region.js';
-import { d, rn2, rn2_on_display_rng, rnd, rng_log_enabled, rng_log_set_caller, rnl, rnz } from './rnd.js';
+import { d, rn2, rn2_on_display_rng, rnd, rnl, rnz } from './rnd.js';
 import { genders, randrole, roles } from './role.js';
 import { obfree } from './shk.js';
 import { attrcurse, rndcurse } from './sit.js';
@@ -322,13 +322,13 @@ async function fix_worst_trouble(trouble) {   // pray.c:373
         case 7:
             await You_feel($c.lit("much better."));
             if (u.umonnum !== u.umonster) {
-                maxhp = u.mhmax + (rng_log_enabled() ? (rng_log_set_caller($c.lit("pray.c"), 427, $c.lit("fix_worst_trouble")), rnd(5)) : rnd(5)) | 0;
+                maxhp = u.mhmax + rnd(5) | 0;
                 setuhpmax(maxhp > 6 ? maxhp : 6, 0);
                 u.mh = u.mhmax;
             }
             maxhp = u.uhpmax;
             if (maxhp < (Math.imul(u.ulevel, 5) + 11 | 0)) {
-                maxhp = maxhp + (rng_log_enabled() ? (rng_log_set_caller($c.lit("pray.c"), 433, $c.lit("fix_worst_trouble")), rnd(5)) : rnd(5)) | 0;
+                maxhp = maxhp + rnd(5) | 0;
             }
             setuhpmax(maxhp > 6 ? maxhp : 6, 1);
             u.uhp = u.uhpmax;
@@ -358,7 +358,7 @@ async function fix_worst_trouble(trouble) {   // pray.c:373
             if (await safe_teleds(0)) {
                 await Your($c.lit("surroundings change."));
             } else {
-                set_itimeout(new $c.FieldRef(u.uprops[53 /* PASSES_WALLS */], "intrinsic", "i64"), (rng_log_enabled() ? (rng_log_set_caller($c.lit("pray.c"), 473, $c.lit("fix_worst_trouble")), d(4, 4)) : d(4, 4)) + 4 | 0);
+                set_itimeout(new $c.FieldRef(u.uprops[53 /* PASSES_WALLS */], "intrinsic", "i64"), d(4, 4) + 4 | 0);
                 await You_feel($c.lit("much slimmer."));
             }
             break;
@@ -580,7 +580,7 @@ async function angrygods(resp_god) {   // pray.c:704
     } else if (maxanger > 15) {
         maxanger = 15;
     }
-    switch (rng_log_enabled() ? (rng_log_set_caller($c.lit("pray.c"), 725, $c.lit("angrygods")), rn2(maxanger)) : rn2(maxanger)) {
+    switch (rn2(maxanger)) {
         case 0:
         case 1:
             await You_feel($c.lit("that %s is %s."), await align_gname(resp_god), u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic) ? $c.lit("bummed") : $c.lit("displeased"));
@@ -605,7 +605,7 @@ async function angrygods(resp_god) {   // pray.c:704
             if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked) && !(u.uprops[12 /* ANTIMAGIC */].intrinsic || u.uprops[12 /* ANTIMAGIC */].extrinsic)) {
                 await pline($c.lit("%s glow surrounds you."), await An(hcolor(c_color_names.c_black)));
             }
-            if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("pray.c"), 757, $c.lit("angrygods")), rn2(2)) : rn2(2)) || !await attrcurse()) {
+            if (rn2(2) || !await attrcurse()) {
                 await rndcurse();
             }
             break;
@@ -621,7 +621,7 @@ async function angrygods(resp_god) {   // pray.c:704
             await god_zaps_you(resp_god);
             break;
     }
-    new_ublesscnt = rng_log_enabled() ? (rng_log_set_caller($c.lit("pray.c"), 780, $c.lit("angrygods")), rnz(300)) : rnz(300);
+    new_ublesscnt = rnz(300);
     if (new_ublesscnt > u.ublesscnt) {
         u.ublesscnt = new_ublesscnt;
     }
@@ -786,7 +786,7 @@ async function give_spell() {   // pray.c:999
         }
         $t1 = $c.i16(rnd_class(svb.bases[10 /* SPBOOK_CLASS */], 407 /* SPE_BLANK_PAPER */)), otmp.otyp = $t1;
     }
-    if (otmp.otyp !== 407 /* SPE_BLANK_PAPER */ && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("pray.c"), 1030, $c.lit("give_spell")), rn2(4)) : rn2(4)) && (spe_knowledge = known_spell(otmp.otyp)) !== 1 /* spe_Fresh */) {
+    if (otmp.otyp !== 407 /* SPE_BLANK_PAPER */ && !rn2(4) && (spe_knowledge = known_spell(otmp.otyp)) !== 1 /* spe_Fresh */) {
         if ((spe_let = await force_learn_spell(otmp.otyp)) !== 0) {
             spe_name = obj_descr[objects[otmp.otyp].oc_name_idx].oc_name;
             if (spe_knowledge === 0 /* spe_Unknown */) {
@@ -798,7 +798,7 @@ async function give_spell() {   // pray.c:999
         await obfree(otmp, null);
     } else {
         await observe_object(otmp);
-        if (otmp.otyp === 407 /* SPE_BLANK_PAPER */ || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("pray.c"), 1060, $c.lit("give_spell")), rn2(100)) : rn2(100))) {
+        if (otmp.otyp === 407 /* SPE_BLANK_PAPER */ || !rn2(100)) {
             await discover_object(otmp.otyp, 1, 1, 1);
         }
         await bless(otmp);
@@ -826,12 +826,12 @@ async function pleased(g_align) {   // pray.c:1071
     } else {
         tryct = 0;
         prayer_luck = (u.uluck + u.moreluck | 0) > -1 ? u.uluck + u.moreluck | 0 : -1;
-        action = (rng_log_enabled() ? (rng_log_set_caller($c.lit("pray.c"), 1126, $c.lit("pleased")), rn2(prayer_luck + (svl.level.locations[u.ux][u.uy].typ === 32 /* ALTAR */ ? 3 + (((svl.level.locations[u.ux][u.uy].flags | 0) & 8) !== 0 ? 1 : 0) | 0 : 2) | 0)) : rn2(prayer_luck + (svl.level.locations[u.ux][u.uy].typ === 32 /* ALTAR */ ? 3 + (((svl.level.locations[u.ux][u.uy].flags | 0) & 8) !== 0 ? 1 : 0) | 0 : 2) | 0)) + 1 | 0;
+        action = rn2(prayer_luck + (svl.level.locations[u.ux][u.uy].typ === 32 /* ALTAR */ ? 3 + (((svl.level.locations[u.ux][u.uy].flags | 0) & 8) !== 0 ? 1 : 0) | 0 : 2) | 0) + 1 | 0;
         if (!(svl.level.locations[u.ux][u.uy].typ === 32 /* ALTAR */)) {
             action = action < 3 ? action : 3;
         }
         if (u.ualign.record < 4) {
-            action = u.ualign.record > 0 || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("pray.c"), 1130, $c.lit("pleased")), rnl(2)) : rnl(2)) ? 1 : 0;
+            action = u.ualign.record > 0 || !rnl(2) ? 1 : 0;
         }
         switch (action < 5 ? action : 5) {
             case 5:
@@ -858,7 +858,7 @@ async function pleased(g_align) {   // pray.c:1071
         }
     }
     if (pat_on_head) {
-        switch (rng_log_enabled() ? (rng_log_set_caller($c.lit("pray.c"), 1167, $c.lit("pleased")), rn2(((u.uluck + u.moreluck | 0) + 6 | 0) >> 1)) : rn2(((u.uluck + u.moreluck | 0) + 6 | 0) >> 1)) {
+        switch (rn2(((u.uluck + u.moreluck | 0) + 6 | 0) >> 1)) {
             case 0:
                 break;
             case 1:
@@ -992,7 +992,7 @@ async function pleased(g_align) {   // pray.c:1071
                         if (!$c.and64(u.uprops[59 /* PROTECTION */].intrinsic, 117440512)) {
                             u.uprops[59 /* PROTECTION */].intrinsic = $c.or64(u.uprops[59 /* PROTECTION */].intrinsic, 67108864);
                             if (!u.ublessed) {
-                                $t2 = (rng_log_enabled() ? (rng_log_set_caller($c.lit("pray.c"), 1331, $c.lit("pleased")), rn2(3)) : rn2(3)) + 2 | 0, u.ublessed = $t2;
+                                $t2 = rn2(3) + 2 | 0, u.ublessed = $t2;
                             }
                         } else {
                             u.ublessed = u.ublessed + 1 | 0;
@@ -1016,13 +1016,13 @@ async function pleased(g_align) {   // pray.c:1071
                 break;
         }
     }
-    $t3 = rng_log_enabled() ? (rng_log_set_caller($c.lit("pray.c"), 1356, $c.lit("pleased")), rnz(350)) : rnz(350), u.ublesscnt = $t3;
+    $t3 = rnz(350), u.ublesscnt = $t3;
     kick_on_butt = u.uevent.udemigod | 0 ? 1 : 0;
     if (u.uevent.uhand_of_elbereth) {
         kick_on_butt = kick_on_butt + 1 | 0;
     }
     if (kick_on_butt) {
-        $t4 = Math.imul(kick_on_butt, rng_log_enabled() ? (rng_log_set_caller($c.lit("pray.c"), 1361, $c.lit("pleased")), rnz(1000)) : rnz(1000)), u.ublesscnt = u.ublesscnt + $t4 | 0;
+        $t4 = Math.imul(kick_on_butt, rnz(1000)), u.ublesscnt = u.ublesscnt + $t4 | 0;
     }
     if (svm.moves > 100000) {
         incr = $c.div64($c.sub64(svm.moves, 100000), 100);
@@ -1062,7 +1062,7 @@ async function godvoice(g_align, words) {   // pray.c:1415
     } else {
         words = $c.lit("");
     }
-    await pline_The($c.lit("voice of %s %s: %s%s%s"), await align_gname(g_align), godvoices[rng_log_enabled() ? (rng_log_set_caller($c.lit("pray.c"), 1425, $c.lit("godvoice")), rn2(4)) : rn2(4)], quot, words, quot);
+    await pline_The($c.lit("voice of %s %s: %s%s%s"), await align_gname(g_align), godvoices[rn2(4)], quot, words, quot);
 }
 async function gods_angry(g_align) {   // pray.c:1429
     await godvoice(g_align, $c.lit("Thou hast angered me."));
@@ -1077,7 +1077,7 @@ async function gods_upset(g_align) {   // pray.c:1436
 }
 async function consume_offering(otmp) {   // pray.c:1446
     if (u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic)) {
-        switch (rng_log_enabled() ? (rng_log_set_caller($c.lit("pray.c"), 1449, $c.lit("consume_offering")), rn2(3)) : rn2(3)) {
+        switch (rn2(3)) {
             case 0:
                 await Your($c.lit("sacrifice sprouts wings and a propeller and roars away!"));
                 break;
@@ -1212,7 +1212,7 @@ async function offer_different_alignment_altar(otmp, altaralign) {   // pray.c:1
     } else {
         await consume_offering(otmp);
         await You($c.lit("sense a conflict between %s and %s."), await u_gname(), await a_gname());
-        if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("pray.c"), 1661, $c.lit("offer_different_alignment_altar")), rn2(8 + u.ulevel | 0)) : rn2(8 + u.ulevel | 0)) > 5) {
+        if (rn2(8 + u.ulevel | 0) > 5) {
             await You_feel($c.lit("the power of %s increase."), await u_gname());
             await exercise(2 /* A_WIS */, 1);
             change_luck(1);
@@ -1225,7 +1225,7 @@ async function offer_different_alignment_altar(otmp, altaralign) {   // pray.c:1
             if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
                 await pline_The($c.lit("altar glows %s."), hcolor(u.ualign.type === 1 ? c_color_names.c_white : u.ualign.type ? c_color_names.c_black : $c.lit("gray")));
             }
-            if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("pray.c"), 1679, $c.lit("offer_different_alignment_altar")), rnl(u.ulevel)) : rnl(u.ulevel)) > 6 && u.ualign.record > 0 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("pray.c"), 1680, $c.lit("offer_different_alignment_altar")), rnd(u.ualign.record)) : rnd(u.ualign.record)) > $c.div64($c.mul64(3, $c.add64(10, $c.div64(svm.moves, 200))), 4)) {
+            if (rnl(u.ulevel) > 6 && u.ualign.record > 0 && rnd(u.ualign.record) > $c.div64($c.mul64(3, $c.add64(10, $c.div64(svm.moves, 200))), 4)) {
                 await summon_minion(altaralign, 1);
             }
             if ((pri = findpriest(temple_occupied(new $c.Ptr(u.urooms, 0)))) && !p_coaligned(pri)) {
@@ -1235,7 +1235,7 @@ async function offer_different_alignment_altar(otmp, altaralign) {   // pray.c:1
             await pline($c.lit("Unluckily, you feel the power of %s decrease."), await u_gname());
             change_luck(-1);
             await exercise(2 /* A_WIS */, 0);
-            if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("pray.c"), 1690, $c.lit("offer_different_alignment_altar")), rnl(u.ulevel)) : rnl(u.ulevel)) > 6 && u.ualign.record > 0 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("pray.c"), 1691, $c.lit("offer_different_alignment_altar")), rnd(u.ualign.record)) : rnd(u.ualign.record)) > $c.div64($c.mul64(7, $c.add64(10, $c.div64(svm.moves, 200))), 8)) {
+            if (rnl(u.ulevel) > 6 && u.ualign.record > 0 && rnd(u.ualign.record) > $c.div64($c.mul64(7, $c.add64(10, $c.div64(svm.moves, 200))), 8)) {
                 await summon_minion(altaralign, 1);
             }
         }
@@ -1315,7 +1315,7 @@ async function bestow_artifact(max_giftvalue) {   // pray.c:1781
         if (flags.debug) {
             do_bestow = $c.i8(await yn_function($c.lit("Gift an artifact?"), new $c.Ptr(ynchars, 0), 110, 1) === 121 ? 1 : 0);
         } else {
-            do_bestow = $c.i8(!(rng_log_enabled() ? (rng_log_set_caller($c.lit("pray.c"), 1792, $c.lit("bestow_artifact")), rn2(6 + Math.imul(Math.imul(2, u.ugifts), nartifacts) | 0)) : rn2(6 + Math.imul(Math.imul(2, u.ugifts), nartifacts) | 0)) ? 1 : 0);
+            do_bestow = $c.i8(!rn2(6 + Math.imul(Math.imul(2, u.ugifts), nartifacts) | 0) ? 1 : 0);
         }
     }
     if (do_bestow) {
@@ -1337,7 +1337,7 @@ async function bestow_artifact(max_giftvalue) {   // pray.c:1781
             await dropy(otmp);
             await godvoice(u.ualign.type, $c.lit("Use my gift wisely!"));
             u.ugifts = u.ugifts + 1 | 0;
-            $t1 = rng_log_enabled() ? (rng_log_set_caller($c.lit("pray.c"), 1819, $c.lit("bestow_artifact")), rnz(300 + Math.imul(50, nartifacts) | 0)) : rnz(300 + Math.imul(50, nartifacts) | 0), u.ublesscnt = $t1;
+            $t1 = rnz(300 + Math.imul(50, nartifacts) | 0), u.ublesscnt = $t1;
             await exercise(2 /* A_WIS */, 1);
             await livelog_printf(72, $c.lit("was bestowed with %s by %s"), artiname(otmp.oartifact), await align_gname(u.ualign.type));
             unrestrict_weapon_skill(weapon_type(otmp));
@@ -1587,7 +1587,7 @@ export async function can_pray(praying) {   // pray.c:2124
             gp.p_type = 3;
         }
     }
-    if ($c.andu64(gy.youmonst.data.mflags2, 2) !== 0 && !In_hell(u.uz) && (gp.p_aligntyp === 1 || gp.p_aligntyp === 0 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("pray.c"), 2166, $c.lit("can_pray")), rn2(10)) : rn2(10)))) {
+    if ($c.andu64(gy.youmonst.data.mflags2, 2) !== 0 && !In_hell(u.uz) && (gp.p_aligntyp === 1 || gp.p_aligntyp === 0 && !rn2(10))) {
         gp.p_type = -1;
     }
     return $c.i8(!praying ? $c.i8(gp.p_type === 3 && !In_hell(u.uz) ? 1 : 0) : 1);
@@ -1674,13 +1674,13 @@ async function prayer_done() {   // pray.c:2276
         await godvoice(alignment, alignment === 1 ? $c.lit("Vile creature, thou durst call upon me?") : $c.lit("Walk no more, perversion of nature!"));
         await You_feel($c.lit("like you are falling apart."));
         await rehumanize();
-        await losehp(rng_log_enabled() ? (rng_log_set_caller($c.lit("pray.c"), 2303, $c.lit("prayer_done")), rnd(20)) : rnd(20), $c.lit("residual undead turning effect"), 0);
+        await losehp(rnd(20), $c.lit("residual undead turning effect"), 0);
         await exercise(4 /* A_CON */, 0);
         return 1;
     }
     if (In_hell(u.uz)) {
         await pline($c.lit("Since you are in Gehennom, %s can't help you."), await align_gname(alignment));
-        if (u.ualign.record <= 0 || (rng_log_enabled() ? (rng_log_set_caller($c.lit("pray.c"), 2311, $c.lit("prayer_done")), rnl(u.ualign.record)) : rnl(u.ualign.record))) {
+        if (u.ualign.record <= 0 || rnl(u.ualign.record)) {
             await angrygods(u.ualign.type);
         }
         return 0;
@@ -1689,7 +1689,7 @@ async function prayer_done() {   // pray.c:2276
         if (svl.level.locations[u.ux][u.uy].typ === 32 /* ALTAR */ && u.ualign.type !== alignment) {
             await water_prayer(0);
         }
-        $t1 = rng_log_enabled() ? (rng_log_set_caller($c.lit("pray.c"), 2319, $c.lit("prayer_done")), rnz(250)) : rnz(250), u.ublesscnt = u.ublesscnt + $t1 | 0;
+        $t1 = rnz(250), u.ublesscnt = u.ublesscnt + $t1 | 0;
         change_luck(-3);
         await gods_upset(u.ualign.type);
     } else if (gp.p_type === 1) {
@@ -1699,7 +1699,7 @@ async function prayer_done() {   // pray.c:2276
         await angrygods(u.ualign.type);
     } else if (gp.p_type === 2) {
         if (await water_prayer(0)) {
-            $t2 = rng_log_enabled() ? (rng_log_set_caller($c.lit("pray.c"), 2329, $c.lit("prayer_done")), rnz(250)) : rnz(250), u.ublesscnt = u.ublesscnt + $t2 | 0;
+            $t2 = rnz(250), u.ublesscnt = u.ublesscnt + $t2 | 0;
             change_luck(-3);
             await gods_upset(u.ualign.type);
         } else {
@@ -1913,15 +1913,15 @@ export function align_gtitle(alignment) {   // pray.c:2628
 export async function altar_wrath(x, y) {   // pray.c:2652
     let altaralign = 0;
     altaralign = $c.i8(((svl.level.locations[x][y].flags | 0) & 7 & 7) === 0 ? -128 : ((svl.level.locations[x][y].flags | 0) & 7 & 7) === 4 ? 1 : ((svl.level.locations[x][y].flags | 0) & 7 & 7) - 2 | 0);
-    if (u.ualign.type === altaralign && u.ualign.record > (-(rng_log_enabled() ? (rng_log_set_caller($c.lit("pray.c"), 2656, $c.lit("altar_wrath")), rn2(4)) : rn2(4)) | 0)) {
+    if (u.ualign.type === altaralign && u.ualign.record > (-rn2(4) | 0)) {
         await godvoice(altaralign, $c.lit("How darest thou desecrate my altar!"));
         await adjattrib(2 /* A_WIS */, -1, 0);
         u.ualign.record = u.ualign.record - 1 | 0;
     } else {
         await pline($c.lit("%s %s%s:"), !(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf) ? $c.lit("A voice (could it be") : $c.lit("Despite your deafness, you seem to hear"), await align_gname(altaralign), !(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf) ? $c.lit("?) whispers") : $c.lit(" say"));
         await verbalize($c.lit("Thou shalt pay, infidel!"));
-        if ((u.uluck + u.moreluck | 0) > -5 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("pray.c"), 2670, $c.lit("altar_wrath")), rn2((u.uluck + u.moreluck | 0) + 6 | 0)) : rn2((u.uluck + u.moreluck | 0) + 6 | 0))) {
-            change_luck($c.i8((rng_log_enabled() ? (rng_log_set_caller($c.lit("pray.c"), 2671, $c.lit("altar_wrath")), rn2(20)) : rn2(20)) ? -1 : -2));
+        if ((u.uluck + u.moreluck | 0) > -5 && rn2((u.uluck + u.moreluck | 0) + 6 | 0)) {
+            change_luck($c.i8(rn2(20) ? -1 : -2));
         }
     }
 }

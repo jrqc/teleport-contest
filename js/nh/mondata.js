@@ -15,7 +15,7 @@ import { objdescr_is } from './o_init.js';
 import { objects } from './objects.js';
 import { makesingular } from './objnam.js';
 import { impossible } from './pline.js';
-import { rn2, rnd, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { rn2, rnd } from './rnd.js';
 import { is_fshk } from './shk.js';
 import { unconscious } from './trap.js';
 import { clear_path } from './vision.js';
@@ -775,7 +775,7 @@ export function pronoun_gender(mtmp, pg_flags) {   // mondata.c:1191
     override_vis = $c.i8((pg_flags & 1) >>> 0 ? 1 : 0);
     hallu_rand = $c.i8((pg_flags & 2) >>> 0 ? 1 : 0);
     if (hallu_rand && (u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic))) {
-        return rng_log_enabled() ? (rng_log_set_caller($c.lit("mondata.c"), 1200, $c.lit("pronoun_gender")), rn2(4)) : rn2(4);
+        return rn2(4);
     }
     if (!override_vis && !(canseemon(mtmp) || sensemon(mtmp))) {
         return 2;
@@ -1013,7 +1013,7 @@ export function give_u_to_m_resistances(mtmp) {   // mondata.c:1586
 export function resist_conflict(mtmp) {   // mondata.c:1607
     let resist_chance = 0;
     resist_chance = 19 < ((acurr(5 /* A_CHA */) - mtmp.m_lev | 0) + u.ulevel | 0) ? 19 : (acurr(5 /* A_CHA */) - mtmp.m_lev | 0) + u.ulevel | 0;
-    return $c.i8((rng_log_enabled() ? (rng_log_set_caller($c.lit("mondata.c"), 1612, $c.lit("resist_conflict")), rnd(20)) : rnd(20)) > resist_chance ? 1 : 0);
+    return $c.i8(rnd(20) > resist_chance ? 1 : 0);
 }
 export function mon_knows_traps(mtmp, ttyp) {   // mondata.c:1617
     if (ttyp === -1 /* ALL_TRAPS */) {
@@ -1053,7 +1053,7 @@ export function mons_see_trap(ttmp) {   // mondata.c:1641
 }
 export function get_atkdam_type(adtyp) {   // mondata.c:1660
     if (adtyp === 242) {
-        return get_atkdam_type$rnd_breath_typ[rng_log_enabled() ? (rng_log_set_caller($c.lit("mondata.c"), 1666, $c.lit("get_atkdam_type")), rn2(8)) : rn2(8)];
+        return get_atkdam_type$rnd_breath_typ[rn2(8)];
     }
     return adtyp;
 }

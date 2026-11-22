@@ -27,7 +27,7 @@ import { Tobjnam } from './objnam.js';
 import { You, You_hear, impossible, pline, pline_The } from './pline.js';
 import { rehumanize, ugolemeffects } from './polyself.js';
 import { unpunish } from './read.js';
-import { d, rn2, rnd, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { d, rn2, rnd } from './rnd.js';
 import { genders } from './role.js';
 import { addtobill, costly_spot, credit_report, pay_for_damage, shop_keeper } from './shk.js';
 import { burn_away_slime, end_burn } from './timeout.js';
@@ -595,14 +595,14 @@ export async function scatter(sx, sy, blastforce, scflags, obj) {   // explode.c
             if (qtmp > 32767) {
                 qtmp = 32767;
             }
-            qtmp = rng_log_enabled() ? (rng_log_set_caller($c.lit("explode.c"), 764, $c.lit("scatter")), rnd($c.i32(qtmp))) : rnd($c.i32(qtmp));
+            qtmp = rnd($c.i32(qtmp));
             otmp = await splitobj(otmp, qtmp);
         } else {
             obj = null;
         }
         await obj_extract_self(otmp);
         used_up = 0;
-        if ((scflags & 16) >>> 0 !== 0 && (otmp.otyp === 475 /* BOULDER */ || otmp.otyp === 476 /* STATUE */) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("explode.c"), 775, $c.lit("scatter")), rn2(10)) : rn2(10))) {
+        if ((scflags & 16) >>> 0 !== 0 && (otmp.otyp === 475 /* BOULDER */ || otmp.otyp === 476 /* STATUE */) && rn2(10)) {
             if (otmp.otyp === 475 /* BOULDER */) {
                 if ((gv.viz_array.get(sy).get(sx) & 2) !== 0) {
                     await pline($c.lit("%s apart."), await Tobjnam(otmp, $c.lit("break")));
@@ -629,7 +629,7 @@ export async function scatter(sx, sy, blastforce, scflags, obj) {   // explode.c
             }
             await newsym(sx, sy);
             used_up = 1;
-        } else if ((scflags & 8) >>> 0 !== 0 && (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("explode.c"), 809, $c.lit("scatter")), rn2(10)) : rn2(10)) || ((objects[otmp.otyp].oc_material | 0) === 19 /* GLASS */ || otmp.otyp === 266 /* EGG */))) {
+        } else if ((scflags & 8) >>> 0 !== 0 && (!rn2(10) || ((objects[otmp.otyp].oc_material | 0) === 19 /* GLASS */ || otmp.otyp === 266 /* EGG */))) {
             if (await breaks(otmp, sx, sy)) {
                 used_up = 1;
             }
@@ -640,14 +640,14 @@ export async function scatter(sx, sy, blastforce, scflags, obj) {   // explode.c
             stmp.obj = otmp;
             stmp.ox = sx;
             stmp.oy = sy;
-            tmp = rng_log_enabled() ? (rng_log_set_caller($c.lit("explode.c"), 821, $c.lit("scatter")), rn2(8)) : rn2(8);
+            tmp = rn2(8);
             stmp.dx = xdir[tmp];
             stmp.dy = ydir[tmp];
             tmp = (blastforce >>> 0) - $c.divu32(otmp.owt, 40) >>> 0 | 0;
             if (tmp < 1) {
                 tmp = 1;
             }
-            $t1 = rng_log_enabled() ? (rng_log_set_caller($c.lit("explode.c"), 827, $c.lit("scatter")), rnd(tmp)) : rnd(tmp), stmp.range = $t1;
+            $t1 = rnd(tmp), stmp.range = $t1;
             if (farthest < stmp.range) {
                 farthest = stmp.range;
             }
@@ -758,7 +758,7 @@ export async function scatter(sx, sy, blastforce, scflags, obj) {   // explode.c
 }
 export async function splatter_burning_oil(x, y, diluted_oil) {   // explode.c:962
     let dmg = 0;
-    dmg = rng_log_enabled() ? (rng_log_set_caller($c.lit("explode.c"), 964, $c.lit("splatter_burning_oil")), d(diluted_oil ? 3 : 4, 4)) : d(diluted_oil ? 3 : 4, 4);
+    dmg = d(diluted_oil ? 3 : 4, 4);
     await explode(x, y, 11, dmg, 19, 5 /* EXPL_FIERY */);
 }
 export async function explode_oil(obj, x, y) {   // explode.c:974
@@ -797,9 +797,9 @@ export async function adtyp_to_expltype(adtyp) {   // explode.c:987
 export async function mon_explodes(mon, mattk) {   // explode.c:1019
     let dmg = 0, type = 0;
     if (mattk.damn) {
-        dmg = rng_log_enabled() ? (rng_log_set_caller($c.lit("explode.c"), 1026, $c.lit("mon_explodes")), d(mattk.damn, mattk.damd)) : d(mattk.damn, mattk.damd);
+        dmg = d(mattk.damn, mattk.damd);
     } else if (mattk.damd) {
-        dmg = rng_log_enabled() ? (rng_log_set_caller($c.lit("explode.c"), 1029, $c.lit("mon_explodes")), d(mon.data.mlevel + 1 | 0, mattk.damd)) : d(mon.data.mlevel + 1 | 0, mattk.damd);
+        dmg = d(mon.data.mlevel + 1 | 0, mattk.damd);
     } else {
         dmg = 0;
     }

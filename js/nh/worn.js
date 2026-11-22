@@ -22,7 +22,7 @@ import { discover_object } from './o_init.js';
 import { objects } from './objects.js';
 import { Yname2, an, cloak_simple_name, distant_name, doname, otense, simpleonames } from './objnam.js';
 import { You, You_hear, impossible, pline, pline_mon } from './pline.js';
-import { rng_log_enabled, rng_log_set_caller, rnl } from './rnd.js';
+import { rnl } from './rnd.js';
 import { genders } from './role.js';
 import { can_ride, can_saddle, dismount_steed } from './steed.js';
 import { begin_burn, end_burn } from './timeout.js';
@@ -970,7 +970,7 @@ export async function mon_break_armor(mon, polyspot) {   // worn.c:1177
     }
     if (noride || $c.peq(mon, u.usteed) && !can_ride(mon)) {
         await You($c.lit("can no longer ride %s."), await mon_nam(mon));
-        if (($c.peq(u.usteed.data, $c.relem(mons, 10 /* PM_COCKATRICE */)) || $c.peq(u.usteed.data, $c.relem(mons, 9 /* PM_CHICKATRICE */))) && !(u.uprops[8 /* STONE_RES */].intrinsic || u.uprops[8 /* STONE_RES */].extrinsic) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("worn.c"), 1324, $c.lit("mon_break_armor")), rnl(3)) : rnl(3))) {
+        if (($c.peq(u.usteed.data, $c.relem(mons, 10 /* PM_COCKATRICE */)) || $c.peq(u.usteed.data, $c.relem(mons, 9 /* PM_CHICKATRICE */))) && !(u.uprops[8 /* STONE_RES */].intrinsic || u.uprops[8 /* STONE_RES */].extrinsic) && rnl(3)) {
             await You($c.lit("touch %s."), await mon_nam(u.usteed));
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("falling off %s"), await an(pmname(u.usteed.data, Mgender(u.usteed))));
             await instapetrify(new $c.Ptr(buf, 0));

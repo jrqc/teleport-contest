@@ -40,7 +40,7 @@ import { self_lookat, waterbody_name } from './pager.js';
 import { Norep, There, You, You_cant, Your, impossible, livelog_printf, pline, pline_The, urgent_pline, verbalize } from './pline.js';
 import { body_part, polymon } from './polyself.js';
 import { regex_match } from './posixregex.js';
-import { d, rn2, rn2_on_display_rng, rnd, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { d, rn2, rn2_on_display_rng, rnd } from './rnd.js';
 import { genders } from './role.js';
 import { Shk_Your, addtobill, check_unpaid_usage, costly_spot, obfree, pick_pick, remote_burglary, sellobj, sellobj_state, shop_keeper, stolen_value, subfrombill } from './shk.js';
 import { tiphat } from './sounds.js';
@@ -1456,7 +1456,7 @@ async function do_loot_cont(cobjp, cindex, ccount) {   // pickup.c:2088
     if (cobj.otyp === 220 /* BAG_OF_TRICKS */) {
         await You($c.lit("carefully open %s..."), await the(await xname(cobj)));
         await pline($c.lit("It develops a huge set of teeth and bites you!"));
-        tmp = rng_log_enabled() ? (rng_log_set_caller($c.lit("pickup.c"), 2155, $c.lit("do_loot_cont")), rnd(10)) : rnd(10);
+        tmp = rnd(10);
         await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(tmp + 1 | 0, 2) : tmp, $c.lit("carnivorous bag"), 0);
         await discover_object(220, 1, 1, 1);
         ga.abort_looting = 1;
@@ -1493,10 +1493,10 @@ async function doloot_core() {   // pickup.c:2178
                 return 0;
             }
             if (u.uprops[14 /* CONFUSION */].intrinsic) {
-                if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("pickup.c"), 2203, $c.lit("doloot_core")), rn2(6)) : rn2(6)) && await reverse_loot()) {
+                if (rn2(6) && await reverse_loot()) {
                     return 1;
                 }
-                if (rng_log_enabled() ? (rng_log_set_caller($c.lit("pickup.c"), 2205, $c.lit("doloot_core")), rn2(2)) : rn2(2)) {
+                if (rn2(2)) {
                     await pline($c.lit("Being confused, you find nothing to loot."));
                     return 1;
                 }
@@ -1618,9 +1618,9 @@ async function reverse_loot() {   // pickup.c:2350
     goldob = null;
     x = u.ux;
     y = u.uy;
-    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("pickup.c"), 2357, $c.lit("reverse_loot")), rn2(3)) : rn2(3))) {
+    if (!rn2(3)) {
         for (n = inv_cnt(1), otmp = gi.invent; otmp; n = n - 1 | 0, otmp = otmp.nobj) {
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("pickup.c"), 2361, $c.lit("reverse_loot")), rn2(n + 1 | 0)) : rn2(n + 1 | 0))) {
+            if (!rn2(n + 1 | 0)) {
                 await prinv($c.lit("You find old loot:"), otmp, 0);
                 return 1;
             }
@@ -1629,7 +1629,7 @@ async function reverse_loot() {   // pickup.c:2350
     }
     for (goldob = gi.invent; goldob; goldob = goldob.nobj) {
         if (goldob.oclass === 12 /* COIN_CLASS */) {
-            contribution = $c.div64($c.add64($c.mul64(rng_log_enabled() ? (rng_log_set_caller($c.lit("pickup.c"), 2371, $c.lit("reverse_loot")), rnd(5)) : rnd(5), goldob.quan), 4), 5);
+            contribution = $c.div64($c.add64($c.mul64(rnd(5), goldob.quan), 4), 5);
             if (contribution < goldob.quan) {
                 goldob = await splitobj(goldob, contribution);
             }
@@ -1674,7 +1674,7 @@ async function reverse_loot() {   // pickup.c:2350
             await freeinv(goldob);
             await add_to_minv(mon, goldob);
             await pline($c.lit("The exchequer accepts your contribution."));
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("pickup.c"), 2418, $c.lit("reverse_loot")), rn2(10)) : rn2(10))) {
+            if (!rn2(10)) {
                 svl.level.locations[x][y].flags = (1) & 31;
             }
         } else {
@@ -1708,7 +1708,7 @@ export async function loot_mon(mtmp, passed_info, prev_loot) {   // pickup.c:243
             }
             otmp = await hold_another_object(otmp, $c.lit("You drop %s!"), await doname(otmp), null);
             otmp;
-            timepassed = rng_log_enabled() ? (rng_log_set_caller($c.lit("pickup.c"), 2467, $c.lit("loot_mon")), rnd(3)) : rnd(3);
+            timepassed = rnd(3);
             if (prev_loot) {
                 prev_loot.set(0, 1);
             }
@@ -1727,7 +1727,7 @@ function mbag_explodes(obj, depthin) {   // pickup.c:2488
     if ((obj.otyp === 423 /* WAN_CANCELLATION */ || obj.otyp === 220 /* BAG_OF_TRICKS */) && obj.spe <= 0) {
         return 0;
     }
-    if ((obj.otyp === 219 /* BAG_OF_HOLDING */ || obj.otyp === 220 /* BAG_OF_TRICKS */ || obj.otyp === 423 /* WAN_CANCELLATION */) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("pickup.c"), 2497, $c.lit("mbag_explodes")), rn2(1 << Number(depthin > 7 ? 7 : depthin))) : rn2(1 << Number(depthin > 7 ? 7 : depthin))) <= depthin) {
+    if ((obj.otyp === 219 /* BAG_OF_HOLDING */ || obj.otyp === 220 /* BAG_OF_TRICKS */ || obj.otyp === 423 /* WAN_CANCELLATION */) && rn2(1 << Number(depthin > 7 ? 7 : depthin)) <= depthin) {
         return 1;
     } else if (obj.cobj !== null) {
         for (otmp = obj.cobj; otmp; otmp = otmp.nobj) {
@@ -1739,7 +1739,7 @@ function mbag_explodes(obj, depthin) {   // pickup.c:2488
     return 0;
 }
 function is_boh_item_gone() {   // pickup.c:2510
-    return $c.i8(!(rng_log_enabled() ? (rng_log_set_caller($c.lit("pickup.c"), 2512, $c.lit("is_boh_item_gone")), rn2(13)) : rn2(13)) ? 1 : 0);
+    return $c.i8(!rn2(13) ? 1 : 0);
 }
 async function do_boh_explosion(boh, on_floor) {   // pickup.c:2518
     let otmp = null, nobj = null;
@@ -1868,7 +1868,7 @@ async function in_container(obj) {   // pickup.c:2558
         } else {
             await panic($c.lit("in_container:  bag not found."));
         }
-        await losehp(rng_log_enabled() ? (rng_log_set_caller($c.lit("pickup.c"), 2692, $c.lit("in_container")), d(6, 6)) : d(6, 6), $c.lit("magical explosion"), 0);
+        await losehp(d(6, 6), $c.lit("magical explosion"), 0);
         gc.current_container = null;
     }
     if (gc.current_container) {
@@ -1963,7 +1963,7 @@ async function mbag_item_gone(held, item, silent) {   // pickup.c:2803
 export async function observe_quantum_cat(box, makecat, givemsg) {   // pickup.c:2826
     let deadcat = null, livecat = null, ox = Int16Array.of(0), oy = Int16Array.of(0), itsalive = 0, $t1;
     livecat = null;
-    itsalive = $c.i8(!(rng_log_enabled() ? (rng_log_set_caller($c.lit("pickup.c"), 2832, $c.lit("observe_quantum_cat")), rn2(2)) : rn2(2)) ? 1 : 0);
+    itsalive = $c.i8(!rn2(2) ? 1 : 0);
     if (get_obj_location(box, new $c.Ptr(ox, 0), new $c.Ptr(oy, 0), 0)) {
         box.ox = ox[0], box.oy = oy[0];
     }
@@ -2607,7 +2607,7 @@ async function tipcontainer(box) {   // pickup.c:3688
                     }
                     targetbox = null;
                     nobj = null;
-                    await losehp(rng_log_enabled() ? (rng_log_set_caller($c.lit("pickup.c"), 3803, $c.lit("tipcontainer")), d(6, 6)) : d(6, 6), $c.lit("magical explosion"), 0);
+                    await losehp(d(6, 6), $c.lit("magical explosion"), 0);
                 } else {
                     await add_to_container(targetbox, otmp);
                 }

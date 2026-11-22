@@ -36,7 +36,7 @@ import { body_part, poly_gender, polymon } from './polyself.js';
 import { altar_wrath } from './pray.js';
 import { ok_to_quest } from './quest.js';
 import { m_in_out_region } from './region.js';
-import { rn2, rnd, rng_log_enabled, rng_log_set_caller, rnl } from './rnd.js';
+import { rn2, rnd, rnl } from './rnd.js';
 import { genders } from './role.js';
 import { add_damage, addtobill, contained_gold, costly_adjacent, costly_gold, costly_spot, donate_gold, find_objowner, hot_pursuit, inside_shop, is_unpaid, make_angry_shk, make_happy_shk, obfree, pay_for_damage, picked_container, shop_keeper, stolen_value, subfrombill } from './shk.js';
 import { Shknam, shkname } from './shknam.js';
@@ -83,18 +83,18 @@ async function kickdmg(mon, clumsy) {   // dokick.c:34
     if (mon.mtame) {
         await abuse_dog(mon);
         if (mon.mtame) {
-            await monflee(mon, dmg ? rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 74, $c.lit("kickdmg")), rnd(dmg)) : rnd(dmg) : 1, 0, 0);
+            await monflee(mon, dmg ? rnd(dmg) : 1, 0, 0);
         } else {
             mon.mflee = (0) & 1;
         }
     }
     if (dmg > 0) {
-        dmg = rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 81, $c.lit("kickdmg")), rnd(dmg)) : rnd(dmg);
+        dmg = rnd(dmg);
         if (gu.urole.mnum === 340 || gu.urole.mnum === 336 || $c.peq(gy.youmonst.data, $c.relem(mons, 238 /* PM_SASQUATCH */)) || $G.uarmf && $G.uarmf.otyp === 170 /* KICKING_BOOTS */) {
             if (dmg > 1) {
                 kick_skill = 35 /* P_BARE_HANDED_COMBAT */;
             }
-            dmg = dmg + (rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 85, $c.lit("kickdmg")), rn2($c.div32(acurr(3 /* A_DEX */), 2) + 1 | 0)) : rn2($c.div32(acurr(3 /* A_DEX */), 2) + 1 | 0)) | 0;
+            dmg = dmg + rn2($c.div32(acurr(3 /* A_DEX */), 2) + 1 | 0) | 0;
         }
         await exercise(3 /* A_DEX */, 1);
     }
@@ -106,7 +106,7 @@ async function kickdmg(mon, clumsy) {   // dokick.c:34
     if (dmg > 0) {
         mon.mhp = mon.mhp - dmg | 0;
     }
-    if (!(mon.mhp < 1) && (gu.urole.mnum === 340 || gu.urole.mnum === 336 || $c.peq(gy.youmonst.data, $c.relem(mons, 238 /* PM_SASQUATCH */)) || $G.uarmf && $G.uarmf.otyp === 170 /* KICKING_BOOTS */) && !(mon.data.msize >= 3) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 96, $c.lit("kickdmg")), rn2(3)) : rn2(3)) && mon.mcanmove | 0 && !$c.peq(mon, u.ustuck) && !mon.mtrapped) {
+    if (!(mon.mhp < 1) && (gu.urole.mnum === 340 || gu.urole.mnum === 336 || $c.peq(gy.youmonst.data, $c.relem(mons, 238 /* PM_SASQUATCH */)) || $G.uarmf && $G.uarmf.otyp === 170 /* KICKING_BOOTS */) && !(mon.data.msize >= 3) && !rn2(3) && mon.mcanmove | 0 && !$c.peq(mon, u.ustuck) && !mon.mtrapped) {
         mdx = mon.mx + u.dx | 0;
         mdy = mon.my + u.dy | 0;
         if (goodpos($c.i16(mdx), $c.i16(mdy), mon, 0)) {
@@ -151,7 +151,7 @@ async function kick_monster(mon, x, y) {   // dokick.c:146
     let clumsy = 0, i = 0, j = 0, uattk = null, sum = 0, kickdieroll = 0, armorpenalty = Int32Array.of(0), specialdmg = 0, attknum = Int32Array.of(0), tmp = 0;
     clumsy = 0;
     await setmangry(mon, 1);
-    if ((u.uprops[48 /* LEVITATION */].intrinsic || u.uprops[48 /* LEVITATION */].extrinsic) && !u.uprops[48 /* LEVITATION */].blocked && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 154, $c.lit("kick_monster")), rn2(3)) : rn2(3)) && mon.data.msize < 1 && !($c.andu64(mon.data.mflags1, 1) !== 0)) {
+    if ((u.uprops[48 /* LEVITATION */].intrinsic || u.uprops[48 /* LEVITATION */].extrinsic) && !u.uprops[48 /* LEVITATION */].blocked && !rn2(3) && mon.data.msize < 1 && !($c.andu64(mon.data.mflags1, 1) !== 0)) {
         await pline($c.lit("Floating in the air, you miss wildly!"));
         await exercise(3 /* A_DEX */, 0);
         await passive(mon, $G.uarmf, 0, 1, 3, 0);
@@ -181,7 +181,7 @@ async function kick_monster(mon, x, y) {   // dokick.c:146
             if (uattk.aatyp !== 3) {
                 continue;
             }
-            kickdieroll = rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 202, $c.lit("kick_monster")), rnd(20)) : rnd(20);
+            kickdieroll = rnd(20);
             specialdmg = await special_dmgval(gy.youmonst, mon, 32, null);
             if ($c.peq(mon.data, $c.relem(mons, 288 /* PM_SHADE */)) && !specialdmg) {
                 await Your($c.lit("%s %s."), new $c.Ptr(kick_passes_thru, 0), await mon_nam(mon));
@@ -204,7 +204,7 @@ async function kick_monster(mon, x, y) {   // dokick.c:146
     j = weight_cap();
     doit$: {
         if (i < $c.div32(Math.imul(j, 3), 10)) {
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 237, $c.lit("kick_monster")), rn2(i < $c.div32(j, 10) ? 2 : i < $c.div32(j, 5) ? 3 : 4)) : rn2(i < $c.div32(j, 10) ? 2 : i < $c.div32(j, 5) ? 3 : 4))) {
+            if (!rn2(i < $c.div32(j, 10) ? 2 : i < $c.div32(j, 5) ? 3 : 4)) {
                 if (gu.urole.mnum === 340 || gu.urole.mnum === 336 || $c.peq(gy.youmonst.data, $c.relem(mons, 238 /* PM_SASQUATCH */)) || $G.uarmf && $G.uarmf.otyp === 170 /* KICKING_BOOTS */) {
                     break doit$;
                 }
@@ -214,19 +214,19 @@ async function kick_monster(mon, x, y) {   // dokick.c:146
             }
             if (i < $c.div32(j, 10)) {
                 clumsy = 1;
-            } else if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 246, $c.lit("kick_monster")), rn2(i < $c.div32(j, 5) ? 2 : 3)) : rn2(i < $c.div32(j, 5) ? 2 : 3))) {
+            } else if (!rn2(i < $c.div32(j, 5) ? 2 : 3)) {
                 clumsy = 1;
             }
         }
         if (u.uprops[25 /* FUMBLING */].intrinsic || u.uprops[25 /* FUMBLING */].extrinsic) {
             clumsy = 1;
-        } else if ($G.uarm && objects[$G.uarm.otyp].oc_big | 0 && acurr(3 /* A_DEX */) < (rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 253, $c.lit("kick_monster")), rnd(25)) : rnd(25))) {
+        } else if ($G.uarm && objects[$G.uarm.otyp].oc_big | 0 && acurr(3 /* A_DEX */) < rnd(25)) {
             clumsy = 1;
         }
     }
     await You($c.lit("kick %s."), await mon_nam(mon));
-    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 257, $c.lit("kick_monster")), rn2(clumsy ? 3 : 4)) : rn2(clumsy ? 3 : 4)) && (clumsy || !(mon.data.msize >= 3)) && mon.mcansee | 0 && !mon.mtrapped && !($c.andu64(mon.data.mflags1, 2097152) !== 0) && mon.data.mlet !== 57 /* S_EEL */ && $c.andu64(mon.data.mflags1, 4096) === 0 && mon.mcanmove | 0 && !mon.mstun && !mon.mconf && !mon.msleeping && mon.data.mmove >= 12) {
-        if (!($c.andu64(mon.data.mflags1, 8192) !== 0) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 262, $c.lit("kick_monster")), rn2(gu.urole.mnum === 340 || gu.urole.mnum === 336 || $c.peq(gy.youmonst.data, $c.relem(mons, 238 /* PM_SASQUATCH */)) || $G.uarmf && $G.uarmf.otyp === 170 /* KICKING_BOOTS */ ? 5 : 3)) : rn2(gu.urole.mnum === 340 || gu.urole.mnum === 336 || $c.peq(gy.youmonst.data, $c.relem(mons, 238 /* PM_SASQUATCH */)) || $G.uarmf && $G.uarmf.otyp === 170 /* KICKING_BOOTS */ ? 5 : 3))) {
+    if (!rn2(clumsy ? 3 : 4) && (clumsy || !(mon.data.msize >= 3)) && mon.mcansee | 0 && !mon.mtrapped && !($c.andu64(mon.data.mflags1, 2097152) !== 0) && mon.data.mlet !== 57 /* S_EEL */ && $c.andu64(mon.data.mflags1, 4096) === 0 && mon.mcanmove | 0 && !mon.mstun && !mon.mconf && !mon.msleeping && mon.data.mmove >= 12) {
+        if (!($c.andu64(mon.data.mflags1, 8192) !== 0) && !rn2(gu.urole.mnum === 340 || gu.urole.mnum === 336 || $c.peq(gy.youmonst.data, $c.relem(mons, 238 /* PM_SASQUATCH */)) || $G.uarmf && $G.uarmf.otyp === 170 /* KICKING_BOOTS */ ? 5 : 3)) {
             await pline($c.lit("%s blocks your %skick."), await Monnam(mon), clumsy ? $c.lit("clumsy ") : $c.lit(""));
             await passive(mon, $G.uarmf, 0, 1, 3, 0);
             return;
@@ -257,7 +257,7 @@ export async function ghitm(mtmp, gold) {   // dokick.c:295
         value = $c.mul64(gold.quan, objects[gold.otyp].oc_cost);
         mtmp.msleeping = (0) & 1;
         await finish_meating(mtmp);
-        if (!mtmp.isgd && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 317, $c.lit("ghitm")), rn2(4)) : rn2(4))) {
+        if (!mtmp.isgd && !rn2(4)) {
             await setmangry(mtmp, 1);
         }
         if ((gv.viz_array.get(mtmp.my).get(mtmp.mx) & 2) !== 0) {
@@ -306,9 +306,9 @@ export async function ghitm(mtmp, gold) {   // dokick.c:295
             } else if ($c.peq(mtmp.data, $c.relem(mons, 281 /* PM_CAPTAIN */))) {
                 goldreqd = 750;
             }
-            if (goldreqd && (rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 379, $c.lit("ghitm")), rn2(3)) : rn2(3))) {
+            if (goldreqd && rn2(3)) {
                 umoney = money_cnt(gi.invent);
-                goldreqd = $c.add64(goldreqd, $c.div64($c.add64(umoney, Math.imul(u.ulevel, rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 381, $c.lit("ghitm")), rn2(5)) : rn2(5))), acurr(5 /* A_CHA */)));
+                goldreqd = $c.add64(goldreqd, $c.div64($c.add64(umoney, Math.imul(u.ulevel, rn2(5))), acurr(5 /* A_CHA */)));
                 if (value > goldreqd) {
                     mtmp.mpeaceful = (1) & 1;
                 }
@@ -347,7 +347,7 @@ export async function container_impact_dmg(obj, x, y) {   // dokick.c:412
         otmp2 = otmp.nobj;
         if ((objects[otmp.otyp].oc_material | 0) === 19 /* GLASS */ && otmp.oclass !== 13 /* GEM_CLASS */ && !obj_resists(otmp, 33, 100)) {
             result = $c.lit("shatter");
-        } else if (otmp.otyp === 266 /* EGG */ && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 440, $c.lit("container_impact_dmg")), rn2(3)) : rn2(3))) {
+        } else if (otmp.otyp === 266 /* EGG */ && !rn2(3)) {
             result = $c.lit("cracking");
         }
         if (result) {
@@ -421,7 +421,7 @@ async function really_kick_object(x, y) {   // dokick.c:508
             return 1;
         }
     }
-    if ((u.uprops[25 /* FUMBLING */].intrinsic || u.uprops[25 /* FUMBLING */].extrinsic) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 537, $c.lit("really_kick_object")), rn2(3)) : rn2(3))) {
+    if ((u.uprops[25 /* FUMBLING */].intrinsic || u.uprops[25 /* FUMBLING */].extrinsic) && !rn2(3)) {
         await Your($c.lit("clumsy kick missed."));
         return 1;
     }
@@ -445,18 +445,18 @@ async function really_kick_object(x, y) {   // dokick.c:508
         range = $c.div32(acurrstr(), 2) - $c.div32(k_owt, 40) | 0;
     }
     if (gu.urole.mnum === 340 || gu.urole.mnum === 336 || $c.peq(gy.youmonst.data, $c.relem(mons, 238 /* PM_SASQUATCH */)) || $G.uarmf && $G.uarmf.otyp === 170 /* KICKING_BOOTS */) {
-        range = range + (rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 579, $c.lit("really_kick_object")), rnd(3)) : rnd(3)) | 0;
+        range = range + rnd(3) | 0;
     }
     if (is_pool(x, y)) {
         range = $c.div32(range, 3) + 1 | 0;
     } else if ((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) {
-        range = range + (rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 586, $c.lit("really_kick_object")), rnd(3)) : rnd(3)) | 0;
+        range = range + rnd(3) | 0;
     } else {
         if (is_ice(x, y)) {
-            range = range + (rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 589, $c.lit("really_kick_object")), rnd(3)) : rnd(3)) | 0, slide = 1;
+            range = range + rnd(3) | 0, slide = 1;
         }
         if (gk.kickedobj.greased) {
-            range = range + (rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 591, $c.lit("really_kick_object")), rnd(3)) : rnd(3)) | 0, slide = 1;
+            range = range + rnd(3) | 0, slide = 1;
         }
     }
     if (is_art(gk.kickedobj, 3 /* ART_MJOLLNIR */)) {
@@ -469,13 +469,13 @@ async function really_kick_object(x, y) {   // dokick.c:508
     costly = $c.i8(shkp && (await costly_spot(x, y) || costly_adjacent(shkp, x, y) && gk.kickedobj.unpaid | 0) ? 1 : 0);
     await Norep($c.lit("You kick %s."), !isgold ? await singular(gk.kickedobj, doname) : await doname(gk.kickedobj));
     if (svl.level.locations[x][y].typ < 16 /* POOL */ || closed_door(x, y)) {
-        if (!(gu.urole.mnum === 340 || gu.urole.mnum === 336 || $c.peq(gy.youmonst.data, $c.relem(mons, 238 /* PM_SASQUATCH */)) || $G.uarmf && $G.uarmf.otyp === 170 /* KICKING_BOOTS */) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 616, $c.lit("really_kick_object")), rn2(20)) : rn2(20)) > acurr(3 /* A_DEX */) || svl.level.locations[u.ux][u.uy].typ < 16 /* POOL */ || closed_door(u.ux, u.uy)) {
+        if (!(gu.urole.mnum === 340 || gu.urole.mnum === 336 || $c.peq(gy.youmonst.data, $c.relem(mons, 238 /* PM_SASQUATCH */)) || $G.uarmf && $G.uarmf.otyp === 170 /* KICKING_BOOTS */) && rn2(20) > acurr(3 /* A_DEX */) || svl.level.locations[u.ux][u.uy].typ < 16 /* POOL */ || closed_door(u.ux, u.uy)) {
             if ((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked) {
                 await pline($c.lit("It doesn't come loose."));
             } else {
                 await pline($c.lit("%s %sn't come loose."), await The(await distant_name(gk.kickedobj, xname)), await otense(gk.kickedobj, $c.lit("do")));
             }
-            return !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 624, $c.lit("really_kick_object")), rn2(3)) : rn2(3)) || (gu.urole.mnum === 340 || gu.urole.mnum === 336 || $c.peq(gy.youmonst.data, $c.relem(mons, 238 /* PM_SASQUATCH */)) || $G.uarmf && $G.uarmf.otyp === 170 /* KICKING_BOOTS */) ? 1 : 0;
+            return !rn2(3) || (gu.urole.mnum === 340 || gu.urole.mnum === 336 || $c.peq(gy.youmonst.data, $c.relem(mons, 238 /* PM_SASQUATCH */)) || $G.uarmf && $G.uarmf.otyp === 170 /* KICKING_BOOTS */) ? 1 : 0;
         }
         if ((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked) {
             await pline($c.lit("It comes loose."));
@@ -506,7 +506,7 @@ async function really_kick_object(x, y) {   // dokick.c:508
         }
         await container_impact_dmg(gk.kickedobj, x, y);
         if (gk.kickedobj.olocked) {
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 657, $c.lit("really_kick_object")), rn2(5)) : rn2(5)) || (gu.urole.mnum === 340 || gu.urole.mnum === 336 || $c.peq(gy.youmonst.data, $c.relem(mons, 238 /* PM_SASQUATCH */)) || $G.uarmf && $G.uarmf.otyp === 170 /* KICKING_BOOTS */) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 657, $c.lit("really_kick_object")), rn2(2)) : rn2(2))) {
+            if (!rn2(5) || (gu.urole.mnum === 340 || gu.urole.mnum === 336 || $c.peq(gy.youmonst.data, $c.relem(mons, 238 /* PM_SASQUATCH */)) || $G.uarmf && $G.uarmf.otyp === 170 /* KICKING_BOOTS */) && !rn2(2)) {
                 await You($c.lit("break open the lock!"));
                 await breakchestlock(gk.kickedobj, 0);
                 if (otrp) {
@@ -515,7 +515,7 @@ async function really_kick_object(x, y) {   // dokick.c:508
                 return 1;
             }
         } else {
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 665, $c.lit("really_kick_object")), rn2(3)) : rn2(3)) || (gu.urole.mnum === 340 || gu.urole.mnum === 336 || $c.peq(gy.youmonst.data, $c.relem(mons, 238 /* PM_SASQUATCH */)) || $G.uarmf && $G.uarmf.otyp === 170 /* KICKING_BOOTS */) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 665, $c.lit("really_kick_object")), rn2(2)) : rn2(2))) {
+            if (!rn2(3) || (gu.urole.mnum === 340 || gu.urole.mnum === 336 || $c.peq(gy.youmonst.data, $c.relem(mons, 238 /* PM_SASQUATCH */)) || $G.uarmf && $G.uarmf.otyp === 170 /* KICKING_BOOTS */) && !rn2(2)) {
                 await pline_The($c.lit("lid slams open, then falls shut."));
                 gk.kickedobj.lknown = (1) & 1;
                 if (otrp) {
@@ -535,24 +535,24 @@ async function really_kick_object(x, y) {   // dokick.c:508
         if (!(gk.kickedobj.otyp === 214 /* LARGE_BOX */ || gk.kickedobj.otyp === 215 /* CHEST */)) {
             await pline($c.lit("Thump!"));
         }
-        return !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 689, $c.lit("really_kick_object")), rn2(3)) : rn2(3)) || (gu.urole.mnum === 340 || gu.urole.mnum === 336 || $c.peq(gy.youmonst.data, $c.relem(mons, 238 /* PM_SASQUATCH */)) || $G.uarmf && $G.uarmf.otyp === 170 /* KICKING_BOOTS */) ? 1 : 0;
+        return !rn2(3) || (gu.urole.mnum === 340 || gu.urole.mnum === 336 || $c.peq(gy.youmonst.data, $c.relem(mons, 238 /* PM_SASQUATCH */)) || $G.uarmf && $G.uarmf.otyp === 170 /* KICKING_BOOTS */) ? 1 : 0;
     }
     if (gk.kickedobj.quan > 1) {
         if (!isgold) {
             $t1 = await splitobj(gk.kickedobj, 1), gk.kickedobj = $t1;
         } else {
-            if (rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 696, $c.lit("really_kick_object")), rn2(20)) : rn2(20)) {
+            if (rn2(20)) {
                 if (!(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf)) {
                     await pline($c.lit("%s"), $c.lit("Thwwpingg!"));
                 }
-                await You($c.lit("%s!"), really_kick_object$flyingcoinmsg[rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 704, $c.lit("really_kick_object")), rn2(3)) : rn2(3)]);
-                await scatter(x, y, rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 705, $c.lit("really_kick_object")), rnd(3)) : rnd(3), 7, gk.kickedobj);
+                await You($c.lit("%s!"), really_kick_object$flyingcoinmsg[rn2(3)]);
+                await scatter(x, y, rnd(3), 7, gk.kickedobj);
                 await newsym(x, y);
                 return 1;
             }
             if (gk.kickedobj.quan > 300) {
                 await pline($c.lit("Thump!"));
-                return !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 712, $c.lit("really_kick_object")), rn2(3)) : rn2(3)) || (gu.urole.mnum === 340 || gu.urole.mnum === 336 || $c.peq(gy.youmonst.data, $c.relem(mons, 238 /* PM_SASQUATCH */)) || $G.uarmf && $G.uarmf.otyp === 170 /* KICKING_BOOTS */) ? 1 : 0;
+                return !rn2(3) || (gu.urole.mnum === 340 || gu.urole.mnum === 336 || $c.peq(gy.youmonst.data, $c.relem(mons, 238 /* PM_SASQUATCH */)) || $G.uarmf && $G.uarmf.otyp === 170 /* KICKING_BOOTS */) ? 1 : 0;
             }
         }
     }
@@ -665,7 +665,7 @@ async function watchman_door_damage(mtmp, x, y) {   // dokick.c:846
 }
 async function kick_dumb(x, y) {   // dokick.c:864
     await exercise(3 /* A_DEX */, 0);
-    if (gu.urole.mnum === 340 || gu.urole.mnum === 336 || $c.peq(gy.youmonst.data, $c.relem(mons, 238 /* PM_SASQUATCH */)) || $G.uarmf && $G.uarmf.otyp === 170 /* KICKING_BOOTS */ || acurr(3 /* A_DEX */) >= 16 || (rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 867, $c.lit("kick_dumb")), rn2(3)) : rn2(3))) {
+    if (gu.urole.mnum === 340 || gu.urole.mnum === 336 || $c.peq(gy.youmonst.data, $c.relem(mons, 238 /* PM_SASQUATCH */)) || $G.uarmf && $G.uarmf.otyp === 170 /* KICKING_BOOTS */ || acurr(3 /* A_DEX */) >= 16 || rn2(3)) {
         await You($c.lit("kick at empty space."));
         if ((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked) {
             await feel_location(x, y);
@@ -673,9 +673,9 @@ async function kick_dumb(x, y) {   // dokick.c:864
     } else {
         await pline($c.lit("Dumb move!  You strain a muscle."));
         await exercise(0 /* A_STR */, 0);
-        await set_wounded_legs(262144, 5 + (rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 874, $c.lit("kick_dumb")), rnd(5)) : rnd(5)) | 0);
+        await set_wounded_legs(262144, 5 + rnd(5) | 0);
     }
-    if (((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || (u.uprops[48 /* LEVITATION */].intrinsic || u.uprops[48 /* LEVITATION */].extrinsic) && !u.uprops[48 /* LEVITATION */].blocked) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 876, $c.lit("kick_dumb")), rn2(2)) : rn2(2))) {
+    if (((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || (u.uprops[48 /* LEVITATION */].intrinsic || u.uprops[48 /* LEVITATION */].extrinsic) && !u.uprops[48 /* LEVITATION */].blocked) && rn2(2)) {
         await hurtle(-u.dx | 0, -u.dy | 0, 1, 1);
     }
 }
@@ -697,13 +697,13 @@ async function kick_ouch(x$in, y$in, kickobjnam) {   // dokick.c:881
         }
         await wake_nearto(x[0], y[0], 25);
     }
-    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 900, $c.lit("kick_ouch")), rn2(3)) : rn2(3))) {
-        await set_wounded_legs(262144, 5 + (rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 901, $c.lit("kick_ouch")), rnd(5)) : rnd(5)) | 0);
+    if (!rn2(3)) {
+        await set_wounded_legs(262144, 5 + rnd(5) | 0);
     }
-    dmg = rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 902, $c.lit("kick_ouch")), rnd(acurr(4 /* A_CON */) > 15 ? 3 : 5)) : rnd(acurr(4 /* A_CON */) > 15 ? 3 : 5);
+    dmg = rnd(acurr(4 /* A_CON */) > 15 ? 3 : 5);
     await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(dmg + 1 | 0, 2) : dmg, kickstr(new $c.Ptr(buf, 0), kickobjnam), 1);
     if ((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || (u.uprops[48 /* LEVITATION */].intrinsic || u.uprops[48 /* LEVITATION */].extrinsic) && !u.uprops[48 /* LEVITATION */].blocked) {
-        await hurtle(-u.dx | 0, -u.dy | 0, (rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 905, $c.lit("kick_ouch")), rn2(2)) : rn2(2)) + 4 | 0, 1);
+        await hurtle(-u.dx | 0, -u.dy | 0, rn2(2) + 4 | 0, 1);
     }
 }
 async function kick_door(x, y, avrg_attrib) {   // dokick.c:910
@@ -718,7 +718,7 @@ async function kick_door(x, y, avrg_attrib) {   // dokick.c:910
     }
     await exercise(3 /* A_DEX */, 1);
     doorbuster = $c.i8(u.umonnum !== u.umonster && $c.andu64(gy.youmonst.data.mflags2, 8192) !== 0 ? 1 : 0);
-    if (doorbuster || (rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 930, $c.lit("kick_door")), rnl(35)) : rnl(35)) < (avrg_attrib + (!(gu.urole.mnum === 340 || gu.urole.mnum === 336 || $c.peq(gy.youmonst.data, $c.relem(mons, 238 /* PM_SASQUATCH */)) || $G.uarmf && $G.uarmf.otyp === 170 /* KICKING_BOOTS */) ? 0 : acurr(3 /* A_DEX */)) | 0)) {
+    if (doorbuster || rnl(35) < (avrg_attrib + (!(gu.urole.mnum === 340 || gu.urole.mnum === 336 || $c.peq(gy.youmonst.data, $c.relem(mons, 238 /* PM_SASQUATCH */)) || $G.uarmf && $G.uarmf.otyp === 170 /* KICKING_BOOTS */) ? 0 : acurr(3 /* A_DEX */)) | 0)) {
         shopdoor = $c.i8(in_rooms(x, y, 14 /* SHOPBASE */).get(0) ? 1 : 0);
         if ((gm.maploc.flags | 0) & 16) {
             if (flags.verbose) {
@@ -727,7 +727,7 @@ async function kick_door(x, y, avrg_attrib) {   // dokick.c:910
             await exercise(0 /* A_STR */, 0);
             gm.maploc.flags = (0) & 31;
             await b_trapped($c.lit("door"), 5 /* FOOT */);
-        } else if (acurr(0 /* A_STR */) > 18 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 940, $c.lit("kick_door")), rn2(5)) : rn2(5)) && !shopdoor) {
+        } else if (acurr(0 /* A_STR */) > 18 && !rn2(5) && !shopdoor) {
             await pline($c.lit("As you kick the door, it shatters to pieces!"));
             await exercise(0 /* A_STR */, 1);
             gm.maploc.flags = (0) & 31;
@@ -750,7 +750,7 @@ async function kick_door(x, y, avrg_attrib) {   // dokick.c:910
             await feel_location(x, y);
         }
         await exercise(0 /* A_STR */, 1);
-        await pline($c.lit("%s!!"), u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 966, $c.lit("kick_door")), rn2(3)) : rn2(3)) ? $c.lit("Thwack") : $c.lit("Whammm"));
+        await pline($c.lit("%s!!"), u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf || !rn2(3) ? $c.lit("Thwack") : $c.lit("Whammm"));
         if (in_town(x, y)) {
             await get_iter_mons_xy(watchman_door_damage, x, y);
         }
@@ -759,7 +759,7 @@ async function kick_door(x, y, avrg_attrib) {   // dokick.c:910
 async function kick_nondoor(x, y, avrg_attrib) {   // dokick.c:974
     let i = 0, treefruit = null, nfruit = 0, nfall = 0, frtype = 0, cnt = 0, made = 0, mm = new $T.nhcoord(), gend = 0, $t1, $t2, $t3;
     if (gm.maploc.typ === 14 /* SDOOR */) {
-        if (!((u.uprops[48 /* LEVITATION */].intrinsic || u.uprops[48 /* LEVITATION */].extrinsic) && !u.uprops[48 /* LEVITATION */].blocked) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 977, $c.lit("kick_nondoor")), rn2(30)) : rn2(30)) < avrg_attrib) {
+        if (!((u.uprops[48 /* LEVITATION */].intrinsic || u.uprops[48 /* LEVITATION */].extrinsic) && !u.uprops[48 /* LEVITATION */].blocked) && rn2(30) < avrg_attrib) {
             cvt_sdoor_to_door(gm.maploc);
             await pline($c.lit("Crash!  %s a secret door!"), ((gm.maploc.flags | 0) & 24) === 8 ? $c.lit("Your kick uncovers") : $c.lit("You kick open"));
             await exercise(3 /* A_DEX */, 1);
@@ -780,7 +780,7 @@ async function kick_nondoor(x, y, avrg_attrib) {   // dokick.c:974
         }
     }
     if (gm.maploc.typ === 15 /* SCORR */) {
-        if (!((u.uprops[48 /* LEVITATION */].intrinsic || u.uprops[48 /* LEVITATION */].extrinsic) && !u.uprops[48 /* LEVITATION */].blocked) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 1003, $c.lit("kick_nondoor")), rn2(30)) : rn2(30)) < avrg_attrib) {
+        if (!((u.uprops[48 /* LEVITATION */].intrinsic || u.uprops[48 /* LEVITATION */].extrinsic) && !u.uprops[48 /* LEVITATION */].blocked) && rn2(30) < avrg_attrib) {
             await pline($c.lit("Crash!  You kick open a secret passage!"));
             await exercise(3 /* A_DEX */, 1);
             gm.maploc.typ = 24;
@@ -797,10 +797,10 @@ async function kick_nondoor(x, y, avrg_attrib) {   // dokick.c:974
             await kick_dumb(x, y);
             return 1;
         }
-        if (((u.uluck + u.moreluck | 0) < 0 || gm.maploc.flags | 0) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 1022, $c.lit("kick_nondoor")), rn2(3)) : rn2(3))) {
+        if (((u.uluck + u.moreluck | 0) < 0 || gm.maploc.flags | 0) && !rn2(3)) {
             gm.maploc.flags = (0) & 31;
             gm.maploc.typ = 25;
-            await mkgold(rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 1025, $c.lit("kick_nondoor")), rnd(200)) : rnd(200), x, y);
+            await mkgold(rnd(200), x, y);
             if ((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked) {
                 await pline($c.lit("CRASH!  You destroy it."));
             } else {
@@ -809,8 +809,8 @@ async function kick_nondoor(x, y, avrg_attrib) {   // dokick.c:974
             }
             await exercise(3 /* A_DEX */, 1);
             return 1;
-        } else if ((u.uluck + u.moreluck | 0) > 0 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 1035, $c.lit("kick_nondoor")), rn2(3)) : rn2(3)) && !gm.maploc.flags) {
-            await mkgold((rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 1036, $c.lit("kick_nondoor")), rn2(201)) : rn2(201)) + 300 | 0, x, y);
+        } else if ((u.uluck + u.moreluck | 0) > 0 && !rn2(3) && !gm.maploc.flags) {
+            await mkgold(rn2(201) + 300 | 0, x, y);
             i = (u.uluck + u.moreluck | 0) + 1 | 0;
             if (i > 6) {
                 i = 6;
@@ -826,7 +826,7 @@ async function kick_nondoor(x, y, avrg_attrib) {   // dokick.c:974
             }
             gm.maploc.flags = (1) & 31;
             return 1;
-        } else if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 1053, $c.lit("kick_nondoor")), rn2(4)) : rn2(4))) {
+        } else if (!rn2(4)) {
             if (dunlev(u.uz) < dunlevs_in_dungeon(u.uz)) {
                 await fall_through(0, 0);
                 return 1;
@@ -845,7 +845,7 @@ async function kick_nondoor(x, y, avrg_attrib) {   // dokick.c:974
         }
         await You($c.lit("kick %s."), (u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked ? c_common_strings.c_something : $c.lit("the altar"));
         await altar_wrath(x, y);
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 1072, $c.lit("kick_nondoor")), rn2(3)) : rn2(3))) {
+        if (!rn2(3)) {
             await kick_ouch(x, y, $c.lit(""));
             return 1;
         }
@@ -858,11 +858,11 @@ async function kick_nondoor(x, y, avrg_attrib) {   // dokick.c:974
             return 1;
         }
         await You($c.lit("kick %s."), (u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked ? c_common_strings.c_something : $c.lit("the fountain"));
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 1085, $c.lit("kick_nondoor")), rn2(3)) : rn2(3))) {
+        if (!rn2(3)) {
             await kick_ouch(x, y, $c.lit(""));
             return 1;
         }
-        if ($G.uarmf && (rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 1090, $c.lit("kick_nondoor")), rn2(3)) : rn2(3))) {
+        if ($G.uarmf && rn2(3)) {
             if (await water_damage($G.uarmf, $c.lit("metal boots"), 1) === 0) {
                 await Your($c.lit("boots get wet."));
             }
@@ -873,9 +873,9 @@ async function kick_nondoor(x, y, avrg_attrib) {   // dokick.c:974
     if (gm.maploc.typ === 31 /* GRAVE */) {
         if ((u.uprops[48 /* LEVITATION */].intrinsic || u.uprops[48 /* LEVITATION */].extrinsic) && !u.uprops[48 /* LEVITATION */].blocked) {
             await kick_dumb(x, y);
-        } else if (rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 1101, $c.lit("kick_nondoor")), rn2(4)) : rn2(4)) {
+        } else if (rn2(4)) {
             await kick_ouch(x, y, $c.lit(""));
-        } else if (!gm.maploc.horizontal && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 1104, $c.lit("kick_nondoor")), rn2(2)) : rn2(2))) {
+        } else if (!gm.maploc.horizontal && !rn2(2)) {
             await disturb_grave(x, y);
         } else {
             await exercise(2 /* A_WIS */, 0);
@@ -901,15 +901,15 @@ async function kick_nondoor(x, y, avrg_attrib) {   // dokick.c:974
         return 1;
     }
     if (gm.maploc.typ === 13 /* TREE */ || svl.level.flags.arboreal | 0 && gm.maploc.typ === 0 /* STONE */) {
-        if (rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 1139, $c.lit("kick_nondoor")), rn2(3)) : rn2(3)) {
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 1140, $c.lit("kick_nondoor")), rn2(6)) : rn2(6)) && !(svm.mvitals[1 /* PM_KILLER_BEE */].mvflags & 3)) {
+        if (rn2(3)) {
+            if (!rn2(6) && !(svm.mvitals[1 /* PM_KILLER_BEE */].mvflags & 3)) {
                 await You_hear($c.lit("a low buzzing."));
             }
             await kick_ouch(x, y, $c.lit(""));
             return 1;
         }
-        if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 1145, $c.lit("kick_nondoor")), rn2(15)) : rn2(15)) && !((gm.maploc.flags | 0) & 1) && (treefruit = await rnd_treefruit_at(x, y))) {
-            nfruit = $c.sub64(8, rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 1147, $c.lit("kick_nondoor")), rnl(7)) : rnl(7));
+        if (rn2(15) && !((gm.maploc.flags | 0) & 1) && (treefruit = await rnd_treefruit_at(x, y))) {
+            nfruit = $c.sub64(8, rnl(7));
             frtype = treefruit.otyp;
             treefruit.quan = nfruit;
             $t2 = await weight(treefruit) >>> 0, treefruit.owt = $t2;
@@ -931,7 +931,7 @@ async function kick_nondoor(x, y, avrg_attrib) {   // dokick.c:974
             gm.maploc.flags = ((gm.maploc.flags | 0 | 1) >>> 0) & 31;
             return 1;
         } else if (!((gm.maploc.flags | 0) & 2)) {
-            cnt = (rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 1172, $c.lit("kick_nondoor")), rnl(4)) : rnl(4)) + 2 | 0;
+            cnt = rnl(4) + 2 | 0;
             made = 0;
             mm.x = x;
             mm.y = y;
@@ -957,7 +957,7 @@ async function kick_nondoor(x, y, avrg_attrib) {   // dokick.c:974
             await kick_dumb(x, y);
             return 1;
         }
-        if (rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 1201, $c.lit("kick_nondoor")), rn2(5)) : rn2(5)) {
+        if (rn2(5)) {
             if (!(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf)) {
                 await pline($c.lit("Klunk!  The pipes vibrate noisily."));
             } else {
@@ -965,7 +965,7 @@ async function kick_nondoor(x, y, avrg_attrib) {   // dokick.c:974
             }
             await exercise(3 /* A_DEX */, 1);
             return 1;
-        } else if (!((gm.maploc.flags | 0) & 1) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 1209, $c.lit("kick_nondoor")), rn2(3)) : rn2(3)) && !(svm.mvitals[209 /* PM_BLACK_PUDDING */].mvflags & 3)) {
+        } else if (!((gm.maploc.flags | 0) & 1) && !rn2(3) && !(svm.mvitals[209 /* PM_BLACK_PUDDING */].mvflags & 3)) {
             if ((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked) {
                 if (!(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf)) {
                     await You_hear($c.lit("a gushing sound."));
@@ -978,15 +978,15 @@ async function kick_nondoor(x, y, avrg_attrib) {   // dokick.c:974
             await newsym(x, y);
             gm.maploc.flags = ((gm.maploc.flags | 0 | 1) >>> 0) & 31;
             return 1;
-        } else if (!((gm.maploc.flags | 0) & 2) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 1224, $c.lit("kick_nondoor")), rn2(3)) : rn2(3)) && !(svm.mvitals[290 /* PM_AMOROUS_DEMON */].mvflags & 3)) {
+        } else if (!((gm.maploc.flags | 0) & 2) && !rn2(3) && !(svm.mvitals[290 /* PM_AMOROUS_DEMON */].mvflags & 3)) {
             await pline($c.lit("%s returns!"), (u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked ? c_common_strings.c_Something : $c.lit("The dish washer"));
-            if (await makemon($c.relem(mons, 290 /* PM_AMOROUS_DEMON */), x, y, $c.u32($c.or64(131072, gend === 1 || gend === 2 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 1229, $c.lit("kick_nondoor")), rn2(2)) : rn2(2)) ? 32768 : 65536)))) {
+            if (await makemon($c.relem(mons, 290 /* PM_AMOROUS_DEMON */), x, y, $c.u32($c.or64(131072, gend === 1 || gend === 2 && rn2(2) ? 32768 : 65536)))) {
                 await newsym(x, y);
             }
             gm.maploc.flags = ((gm.maploc.flags | 0 | 2) >>> 0) & 31;
             await exercise(3 /* A_DEX */, 1);
             return 1;
-        } else if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 1235, $c.lit("kick_nondoor")), rn2(3)) : rn2(3))) {
+        } else if (!rn2(3)) {
             await sink_backs_up(x, y);
             return 1;
         }
@@ -1031,7 +1031,7 @@ export async function dokick() {   // dokick.c:1257
     } else if (gy.youmonst.data.mlet === 58 /* S_LIZARD */) {
         await Your($c.lit("legs cannot kick effectively."));
         no_kick = 1;
-    } else if (u.uinwater | 0 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 1288, $c.lit("dokick")), rn2(2)) : rn2(2))) {
+    } else if (u.uinwater | 0 && !rn2(2)) {
         await Your($c.lit("slow motion kick doesn't hit anything."));
         no_kick = 1;
     } else if (u.utrap) {
@@ -1074,7 +1074,7 @@ export async function dokick() {   // dokick.c:1257
         avrg_attrib = $c.div32((acurrstr() + acurr(3 /* A_DEX */) | 0) + acurr(4 /* A_CON */) | 0, 3);
     }
     if (u.uswallow) {
-        switch (rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 1334, $c.lit("dokick")), rn2(3)) : rn2(3)) {
+        switch (rn2(3)) {
             case 0:
                 await You_cant($c.lit("move your %s!"), await body_part(9 /* LEG */));
                 break;
@@ -1227,7 +1227,7 @@ export async function impact_drop(missile, x, y, dlev) {   // dokick.c:1511
         if ($c.peq(obj, $G.uball) || $c.peq(obj, $G.uchain)) {
             continue;
         }
-        if (isrock && obj.otyp === 475 /* BOULDER */ || (rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 1569, $c.lit("impact_drop")), rn2(obj.otyp === 475 /* BOULDER */ ? 30 : 3)) : rn2(obj.otyp === 475 /* BOULDER */ ? 30 : 3))) {
+        if (isrock && obj.otyp === 475 /* BOULDER */ || rn2(obj.otyp === 475 /* BOULDER */ ? 30 : 3)) {
             continue;
         }
         await obj_extract_self(obj);
@@ -1296,7 +1296,7 @@ export async function ship_object(otmp, x, y, shop_floor_obj) {   // dokick.c:16
     if (!cc.y) {
         return 0;
     }
-    nodrop = $c.i8($c.peq(otmp, $G.uball) || $c.peq(otmp, $G.uchain) || toloc !== 5 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 1660, $c.lit("ship_object")), rn2(3)) : rn2(3)) ? 1 : 0);
+    nodrop = $c.i8($c.peq(otmp, $G.uball) || $c.peq(otmp, $G.uchain) || toloc !== 5 && rn2(3) ? 1 : 0);
     container = $c.i8(otmp.cobj !== null ? 1 : 0);
     unpaid = is_unpaid(otmp);
     if (svl.level.objects[x][y] !== null) {
@@ -1436,7 +1436,7 @@ export async function obj_delivery(near_hero) {   // dokick.c:1769
             }
             await stackobj(otmp);
             if (!noscatter) {
-                await scatter($c.i16(nx), $c.i16(ny), rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 1838, $c.lit("obj_delivery")), rnd(2)) : rnd(2), 0, otmp);
+                await scatter($c.i16(nx), $c.i16(ny), rnd(2), 0, otmp);
             } else {
                 await newsym($c.i16(nx), $c.i16(ny));
             }
@@ -1453,7 +1453,7 @@ export async function deliver_obj_to_mon(mtmp, cnt, deliverflags) {   // dokick.
     maxobj = 1;
     at_crime_scene = In_mines(u.uz);
     if ($c.andu64(deliverflags, 1) && cnt > 1) {
-        maxobj = rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 1861, $c.lit("deliver_obj_to_mon")), rnd(cnt)) : rnd(cnt);
+        maxobj = rnd(cnt);
     } else if ($c.andu64(deliverflags, 4)) {
         maxobj = 0;
     } else {
@@ -1472,7 +1472,7 @@ export async function deliver_obj_to_mon(mtmp, cnt, deliverflags) {   // dokick.
             $t1 = otmp.oy = 0, otmp.ox = $t1;
             if ($c.and64(otmp.corpsenm, 128) !== 0 && (otmp.oextra && otmp.oextra.oname)) {
                 if (!(mtmp.mextra && mtmp.mextra.mgivenname)) {
-                    if (at_crime_scene || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dokick.c"), 1887, $c.lit("deliver_obj_to_mon")), rn2(2)) : rn2(2))) {
+                    if (at_crime_scene || !rn2(2)) {
                         mtmp = await christen_orc(mtmp, at_crime_scene ? otmp.oextra.oname : null, $c.lit(" the Fence"));
                     }
                 }

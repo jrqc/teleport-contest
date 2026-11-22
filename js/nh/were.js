@@ -18,7 +18,7 @@ import { mons } from './monst.js';
 import { an } from './objnam.js';
 import { You_feel, You_hear, impossible, pline } from './pline.js';
 import { polymon, rehumanize, set_uasmon } from './polyself.js';
-import { rn2, rnd, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { rn2, rnd } from './rnd.js';
 import { unconscious } from './trap.js';
 import { possibly_unwield } from './weapon.js';
 import { mon_break_armor } from './worn.js';
@@ -29,7 +29,7 @@ export async function were_change(mon) {   // were.c:9
         return;
     }
     if ($c.andu64(mon.data.mflags2, 8) !== 0) {
-        if (!(u.uprops[60 /* PROT_FROM_SHAPE_CHANGERS */].intrinsic || u.uprops[60 /* PROT_FROM_SHAPE_CHANGERS */].extrinsic) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("were.c"), 17, $c.lit("were_change")), rn2(night() ? flags.moonphase === 4 ? 3 : 30 : flags.moonphase === 4 ? 10 : 50)) : rn2(night() ? flags.moonphase === 4 ? 3 : 30 : flags.moonphase === 4 ? 10 : 50))) {
+        if (!(u.uprops[60 /* PROT_FROM_SHAPE_CHANGERS */].intrinsic || u.uprops[60 /* PROT_FROM_SHAPE_CHANGERS */].extrinsic) && !rn2(night() ? flags.moonphase === 4 ? 3 : 30 : flags.moonphase === 4 ? 10 : 50)) {
             await new_were(mon);
             gw.were_changes = $c.add64(gw.were_changes, 1);
             if (!(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf) && !canseemon(mon)) {
@@ -50,7 +50,7 @@ export async function were_change(mon) {   // were.c:9
                 }
             }
         }
-    } else if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("were.c"), 41, $c.lit("were_change")), rn2(30)) : rn2(30)) || (u.uprops[60 /* PROT_FROM_SHAPE_CHANGERS */].intrinsic || u.uprops[60 /* PROT_FROM_SHAPE_CHANGERS */].extrinsic)) {
+    } else if (!rn2(30) || (u.uprops[60 /* PROT_FROM_SHAPE_CHANGERS */].intrinsic || u.uprops[60 /* PROT_FROM_SHAPE_CHANGERS */].extrinsic)) {
         await new_were(mon);
         gw.were_changes = $c.add64(gw.were_changes, 1);
     }
@@ -120,7 +120,7 @@ export async function new_were(mon) {   // were.c:96
     await mon_break_armor(mon, 0);
     await possibly_unwield(mon, 0);
     if (svc.context.mon_moving && !mon.mpeaceful && onscary(mon.mux, mon.muy, mon) && monnear(mon, mon.mux, mon.muy)) {
-        await monflee(mon, (rng_log_enabled() ? (rng_log_set_caller($c.lit("were.c"), 137, $c.lit("new_were")), rn2(9)) : rn2(9)) + 2 | 0, 1, 1);
+        await monflee(mon, rn2(9) + 2 | 0, 1, 1);
     }
 }
 export async function were_summon(ptr, yours, visible, genbuf) {   // were.c:142
@@ -131,25 +131,25 @@ export async function were_summon(ptr, yours, visible, genbuf) {   // were.c:142
     if ((u.uprops[60 /* PROT_FROM_SHAPE_CHANGERS */].intrinsic || u.uprops[60 /* PROT_FROM_SHAPE_CHANGERS */].extrinsic) && !yours) {
         return 0;
     }
-    L1: for (i = rng_log_enabled() ? (rng_log_set_caller($c.lit("were.c"), 155, $c.lit("were_summon")), rnd(5)) : rnd(5); i > 0; i = i - 1 | 0) {
+    L1: for (i = rnd(5); i > 0; i = i - 1 | 0) {
         switch (pm) {
             case 91 /* PM_WERERAT */:
             case 261 /* PM_HUMAN_WERERAT */:
-                typ = (rng_log_enabled() ? (rng_log_set_caller($c.lit("were.c"), 159, $c.lit("were_summon")), rn2(3)) : rn2(3)) ? 88 /* PM_SEWER_RAT */ : (rng_log_enabled() ? (rng_log_set_caller($c.lit("were.c"), 160, $c.lit("were_summon")), rn2(3)) : rn2(3)) ? 89 /* PM_GIANT_RAT */ : 90 /* PM_RABID_RAT */;
+                typ = rn2(3) ? 88 /* PM_SEWER_RAT */ : rn2(3) ? 89 /* PM_GIANT_RAT */ : 90 /* PM_RABID_RAT */;
                 if (genbuf) {
                     $c.__builtin___strcpy_chk(genbuf, $c.lit("rat"), -1);
                 }
                 break;
             case 15 /* PM_WEREJACKAL */:
             case 262 /* PM_HUMAN_WEREJACKAL */:
-                typ = (rng_log_enabled() ? (rng_log_set_caller($c.lit("were.c"), 166, $c.lit("were_summon")), rn2(7)) : rn2(7)) ? 12 /* PM_JACKAL */ : (rng_log_enabled() ? (rng_log_set_caller($c.lit("were.c"), 166, $c.lit("were_summon")), rn2(3)) : rn2(3)) ? 14 /* PM_COYOTE */ : 13 /* PM_FOX */;
+                typ = rn2(7) ? 12 /* PM_JACKAL */ : rn2(3) ? 14 /* PM_COYOTE */ : 13 /* PM_FOX */;
                 if (genbuf) {
                     $c.__builtin___strcpy_chk(genbuf, $c.lit("jackal"), -1);
                 }
                 break;
             case 21 /* PM_WEREWOLF */:
             case 263 /* PM_HUMAN_WEREWOLF */:
-                typ = (rng_log_enabled() ? (rng_log_set_caller($c.lit("were.c"), 172, $c.lit("were_summon")), rn2(5)) : rn2(5)) ? 20 /* PM_WOLF */ : (rng_log_enabled() ? (rng_log_set_caller($c.lit("were.c"), 172, $c.lit("were_summon")), rn2(2)) : rn2(2)) ? 23 /* PM_WARG */ : 24 /* PM_WINTER_WOLF */;
+                typ = rn2(5) ? 20 /* PM_WOLF */ : rn2(2) ? 23 /* PM_WARG */ : 24 /* PM_WINTER_WOLF */;
                 if (genbuf) {
                     $c.__builtin___strcpy_chk(genbuf, $c.lit("wolf"), -1);
                 }
@@ -197,7 +197,7 @@ export async function you_unwere(purify) {   // were.c:213
     if (!(u.uprops[63 /* UNCHANGING */].intrinsic || u.uprops[63 /* UNCHANGING */].extrinsic) && $c.andu64(gy.youmonst.data.mflags2, 4) !== 0 && !monster_nearby() && (!controllable_poly || !await paranoid_query($c.i8((flags.paranoia_bits & 256) >>> 0 !== 0 ? 1 : 0), $c.lit("Remain in beast form?")))) {
         await rehumanize();
     } else if ($c.andu64(gy.youmonst.data.mflags2, 4) !== 0 && !u.mtimedone) {
-        $t1 = (rng_log_enabled() ? (rng_log_set_caller($c.lit("were.c"), 227, $c.lit("you_unwere")), rn2(200)) : rn2(200)) + 200 | 0, u.mtimedone = $t1;
+        $t1 = rn2(200) + 200 | 0, u.mtimedone = $t1;
     }
 }
 export async function set_ulycn(which) {   // were.c:232

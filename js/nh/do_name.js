@@ -26,7 +26,7 @@ import { object_from_map } from './pager.js';
 import { There, You, impossible, livelog_printf, pline, verbalize } from './pline.js';
 import { body_part } from './polyself.js';
 import { priestname } from './priest.js';
-import { rn2, rn2_on_display_rng, rnd_on_display_rng, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { rn2, rn2_on_display_rng, rnd_on_display_rng } from './rnd.js';
 import { genders } from './role.js';
 import { get_rnd_text } from './rumors.js';
 import { alter_cost } from './shk.js';
@@ -502,7 +502,7 @@ async function namefloorobj() {   // do_name.c:679
     }
 }
 export function rndghostname() {   // do_name.c:772
-    return (rng_log_enabled() ? (rng_log_set_caller($c.lit("do_name.c"), 774, $c.lit("rndghostname")), rn2(7)) : rn2(7)) ? ghostnames[rng_log_enabled() ? (rng_log_set_caller($c.lit("do_name.c"), 774, $c.lit("rndghostname")), rn2(34)) : rn2(34)] : new $c.Ptr(svp.plname, 0);
+    return rn2(7) ? ghostnames[rn2(34)] : new $c.Ptr(svp.plname, 0);
 }
 export async function x_monnam(mtmp, article, adjective, suppress, called) {   // do_name.c:827
     let buf = null, mdat = null, pm_name = null, do_hallu = 0, do_invis = 0, do_it = 0, do_saddle = 0, do_mappear = 0, do_exact = 0, do_name = 0, augment_it = 0, name_at_start = 0, has_adjectives = 0, insertbuf2 = 0, mappear_as_mon = 0, bp = null, buf2 = new Int8Array(256), s_one = 0, name = null, save_prop = 0, save_invis = 0, rnamecode = Int8Array.of(0), rname = null, name$2 = null, pbuf = new Int8Array(256), pbuf$2 = new Int8Array(256);
@@ -533,7 +533,7 @@ export async function x_monnam(mtmp, article, adjective, suppress, called) {   /
     buf.set(0, 0);
     if (do_it) {
         s_one = $c.i8($c.andu64(mdat.mflags1, 131072) !== 0 && !($c.andu64(mdat.mflags1, 262144) !== 0) && !($c.andu64(mdat.mflags1, 65536) !== 0) ? 1 : 0);
-        $c.__builtin___strcpy_chk(buf, !augment_it ? $c.lit("it") : (!do_hallu ? s_one : !(rng_log_enabled() ? (rng_log_set_caller($c.lit("do_name.c"), 881, $c.lit("x_monnam")), rn2(2)) : rn2(2))) ? $c.lit("someone") : $c.lit("something"), -1);
+        $c.__builtin___strcpy_chk(buf, !augment_it ? $c.lit("it") : (!do_hallu ? s_one : !rn2(2)) ? $c.lit("someone") : $c.lit("something"), -1);
         return buf;
     }
     if ((mtmp.ispriest | 0 || mtmp.isminion | 0) && !do_mappear) {
@@ -874,14 +874,14 @@ export function roguename() {   // do_name.c:1424
             }
         }
     }
-    return (rng_log_enabled() ? (rng_log_set_caller($c.lit("do_name.c"), 1437, $c.lit("roguename")), rn2(3)) : rn2(3)) ? (rng_log_enabled() ? (rng_log_set_caller($c.lit("do_name.c"), 1437, $c.lit("roguename")), rn2(2)) : rn2(2)) ? $c.lit("Michael Toy") : $c.lit("Kenneth Arnold") : $c.lit("Glenn Wichman");
+    return rn2(3) ? rn2(2) ? $c.lit("Michael Toy") : $c.lit("Kenneth Arnold") : $c.lit("Glenn Wichman");
 }
 export function hcolor(colorpref) {   // do_name.c:1461
     return u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic) || !colorpref ? hcolors[rn2_on_display_rng(74)] : colorpref;
 }
 export function rndcolor() {   // do_name.c:1470
     let k = 0;
-    k = rng_log_enabled() ? (rng_log_set_caller($c.lit("do_name.c"), 1472, $c.lit("rndcolor")), rn2(16)) : rn2(16);
+    k = rn2(16);
     return u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic) ? hcolor(null) : k === 8 ? $c.lit("colorless") : c_obj_colors[k];
 }
 export function hliquid(liquidpref) {   // do_name.c:1493
@@ -907,13 +907,13 @@ export async function coyotename(mtmp, buf) {   // do_name.c:1526
 }
 export function rndorcname(s) {   // do_name.c:1538
     let i = 0, iend = 0, vstart = 0;
-    iend = (rng_log_enabled() ? (rng_log_set_caller($c.lit("do_name.c"), 1543, $c.lit("rndorcname")), rn2(2)) : rn2(2)) + 3 | 0;
-    vstart = rng_log_enabled() ? (rng_log_set_caller($c.lit("do_name.c"), 1543, $c.lit("rndorcname")), rn2(2)) : rn2(2);
+    iend = rn2(2) + 3 | 0;
+    vstart = rn2(2);
     if (s) {
         s.set(0, 0);
         for (i = 0; i < iend; i = i + 1 | 0) {
             vstart = 1 - vstart | 0;
-            $c.__builtin___sprintf_chk(eos(s), 0, -1, $c.lit("%s%s"), i > 0 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("do_name.c"), 1549, $c.lit("rndorcname")), rn2(30)) : rn2(30)) ? $c.lit("-") : $c.lit(""), vstart ? rndorcname$v[rng_log_enabled() ? (rng_log_set_caller($c.lit("do_name.c"), 1550, $c.lit("rndorcname")), rn2(4)) : rn2(4)] : rndorcname$snd[rng_log_enabled() ? (rng_log_set_caller($c.lit("do_name.c"), 1550, $c.lit("rndorcname")), rn2(11)) : rn2(11)]);
+            $c.__builtin___sprintf_chk(eos(s), 0, -1, $c.lit("%s%s"), i > 0 && !rn2(30) ? $c.lit("-") : $c.lit(""), vstart ? rndorcname$v[rn2(4)] : rndorcname$snd[rn2(11)]);
         }
     }
     return s;
@@ -946,7 +946,7 @@ export async function christen_orc(mtmp, gang, other) {   // do_name.c:1557
 export function noveltitle(novidx) {   // do_name.c:1611
     let j = 0, k = 0;
     k = 41;
-    j = rng_log_enabled() ? (rng_log_set_caller($c.lit("do_name.c"), 1615, $c.lit("noveltitle")), rn2(k)) : rn2(k);
+    j = rn2(k);
     if (novidx) {
         if (novidx.get(0) === -1) {
             novidx.set(0, j);

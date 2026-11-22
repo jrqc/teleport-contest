@@ -17,7 +17,7 @@ import { let_to_name, loot_classify, update_inventory } from './invent.js';
 import { obj_descr, objects } from './objects.js';
 import { Japanese_item_name, obj_typename } from './objnam.js';
 import { You, impossible, pline, raw_printf } from './pline.js';
-import { rn2, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { rn2 } from './rnd.js';
 import { sfi_char, sfi_int, sfi_objclass, sfi_short, sfi_unsigned, sfo_char, sfo_int, sfo_objclass, sfo_short, sfo_unsigned } from './sfbase.js';
 import { append_price_quote, gem_learned } from './shk.js';
 import { Strlen_ } from './strutil.js';
@@ -58,13 +58,13 @@ async function setgemprobs(dlev) {   // o_init.c:54
     go.oclass_prob_totals[13 /* GEM_CLASS */] = $c.i16(sum);
 }
 function randomize_gem_colors() {   // o_init.c:85
-    if (rng_log_enabled() ? (rng_log_set_caller($c.lit("o_init.c"), 89, $c.lit("randomize_gem_colors")), rn2(2)) : rn2(2)) {
+    if (rn2(2)) {
         objects[446 /* TURQUOISE */].oc_descr_idx = objects[443 /* SAPPHIRE */].oc_descr_idx, objects[446 /* TURQUOISE */].oc_color = objects[443 /* SAPPHIRE */].oc_color;
     }
-    if (rng_log_enabled() ? (rng_log_set_caller($c.lit("o_init.c"), 92, $c.lit("randomize_gem_colors")), rn2(2)) : rn2(2)) {
+    if (rn2(2)) {
         objects[448 /* AQUAMARINE */].oc_descr_idx = objects[443 /* SAPPHIRE */].oc_descr_idx, objects[448 /* AQUAMARINE */].oc_color = objects[443 /* SAPPHIRE */].oc_color;
     }
-    switch (rng_log_enabled() ? (rng_log_set_caller($c.lit("o_init.c"), 95, $c.lit("randomize_gem_colors")), rn2(4)) : rn2(4)) {
+    switch (rn2(4)) {
         case 0:
             break;
         case 1:
@@ -93,7 +93,7 @@ function shuffle(o_low, o_high, domaterial) {   // o_init.c:113
             continue;
         }
         do {
-            i = j + (rng_log_enabled() ? (rng_log_set_caller($c.lit("o_init.c"), 129, $c.lit("shuffle")), rn2((o_high - j | 0) + 1 | 0)) : rn2((o_high - j | 0) + 1 | 0)) | 0;
+            i = j + rn2((o_high - j | 0) + 1 | 0) | 0;
         } while (objects[i].oc_name_known);
         sw = objects[j].oc_descr_idx;
         objects[j].oc_descr_idx = objects[i].oc_descr_idx;
@@ -158,7 +158,7 @@ export async function init_objects() {   // o_init.c:151
     }
     await init_oclass_probs();
     shuffle_all();
-    $t3 = ((rng_log_enabled() ? (rng_log_set_caller($c.lit("o_init.c"), 234, $c.lit("init_objects")), rn2(2)) : rn2(2)) ? 1 : 2) >>> 0, objects[416 /* WAN_NOTHING */].oc_dir = ($t3) & 7;
+    $t3 = (rn2(2) ? 1 : 2) >>> 0, objects[416 /* WAN_NOTHING */].oc_dir = ($t3) & 7;
 }
 export async function init_oclass_probs() {   // o_init.c:240
     let i = 0, sum = 0, oclass = 0;

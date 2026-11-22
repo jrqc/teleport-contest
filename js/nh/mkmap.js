@@ -9,7 +9,7 @@ import { depth } from './dungeon.js';
 import { add_room } from './mklev.js';
 import { somexy } from './mkroom.js';
 import { impossible } from './pline.js';
-import { rn2, rnd, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { rn2, rnd } from './rnd.js';
 import { dig_corridor, wallify_map } from './sp_lev.js';
 
 const dirs = new Int32Array(16);
@@ -28,8 +28,8 @@ function init_fill(bg_typ, fg_typ) {   // mkmap.c:37
     limit = 624;
     count = 0;
     while (count < limit) {
-        x = $c.i16((rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmap.c"), 45, $c.lit("init_fill")), rn2(77)) : rn2(77)) + 2 | 0);
-        y = $c.i16(rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmap.c"), 46, $c.lit("init_fill")), rnd(19)) : rnd(19));
+        x = $c.i16(rn2(77) + 2 | 0);
+        y = $c.i16(rnd(19));
         if (svl.level.locations[x][y].typ === bg_typ) {
             svl.level.locations[x][y].typ = fg_typ;
             count = $c.add64(count, 1);
@@ -245,7 +245,7 @@ async function join_map(bg_typ, fg_typ) {   // mkmap.c:258
             em.y = $c.i16(croom2.ly + $c.div32(croom2.hy - croom2.ly | 0, 2) | 0);
         }
         await dig_corridor(sm, em, null, 0, fg_typ, bg_typ);
-        if (croom2.lx > croom.hx || (croom2.ly > croom.hy || croom2.hy < croom.ly) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmap.c"), 322, $c.lit("join_map")), rn2(3)) : rn2(3))) {
+        if (croom2.lx > croom.hx || (croom2.ly > croom.hy || croom2.hy < croom.ly) && rn2(3)) {
             croom = croom2;
         }
         croom2 = $c.radd(croom2, 1);
@@ -315,7 +315,7 @@ function remove_room(roomno) {   // mkmap.c:412
 }
 export function litstate_rnd(litstate) {   // mkmap.c:443
     if (litstate < 0) {
-        return $c.i8((rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmap.c"), 446, $c.lit("litstate_rnd")), rnd(1 + $c.abs(depth(u.uz)) | 0)) : rnd(1 + $c.abs(depth(u.uz)) | 0)) < 11 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("mkmap.c"), 446, $c.lit("litstate_rnd")), rn2(77)) : rn2(77)) ? 1 : 0);
+        return $c.i8(rnd(1 + $c.abs(depth(u.uz)) | 0) < 11 && rn2(77) ? 1 : 0);
     }
     return $c.i8(litstate);
 }

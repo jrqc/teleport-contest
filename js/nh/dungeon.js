@@ -26,7 +26,7 @@ import { align_gname, altarmask_at } from './pray.js';
 import { findpriest, inhistemple } from './priest.js';
 import { ldrname } from './questpgr.js';
 import { restcemetery } from './restore.js';
-import { rn2, rnd, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { rn2, rnd } from './rnd.js';
 import { savecemetery } from './save.js';
 import { sfi_branch, sfi_char, sfi_d_level, sfi_dgn_topology, sfi_dungeon, sfi_int, sfi_int16, sfi_linfo, sfi_mapseen_feat, sfi_mapseen_flags, sfi_mapseen_rooms, sfi_nhcoord, sfi_unsigned, sfi_xint16, sfo_branch, sfo_char, sfo_d_level, sfo_dgn_topology, sfo_dungeon, sfo_int, sfo_int16, sfo_linfo, sfo_mapseen_feat, sfo_mapseen_flags, sfo_mapseen_rooms, sfo_nhcoord, sfo_unsigned, sfo_xint16 } from './sfbase.js';
 import { inhishop, shop_keeper } from './shk.js';
@@ -247,7 +247,7 @@ async function parent_dlevel(s, pd) {   // dungeon.c:415
     dnum = await parent_dnum(s, pd);
     i = await find_branch(s, pd);
     num = await level_range($c.i16(dnum), pd.tmpbranch[i].lev.base, pd.tmpbranch[i].lev.rand, pd.tmpbranch[i].chain, pd, new $c.Ptr(base, 0));
-    i = j = rng_log_enabled() ? (rng_log_set_caller($c.lit("dungeon.c"), 426, $c.lit("parent_dlevel")), rn2(num)) : rn2(num);
+    i = j = rn2(num);
     do {
         if ((i = i + 1 | 0) >= num) {
             i = 0;
@@ -346,7 +346,7 @@ async function init_level(dgn, proto_index, pd) {   // dungeon.c:566
     let new_level = null, tlevel = null, $t1;
     tlevel = $c.relem(pd.tmplevel, proto_index);
     pd.final_lev[proto_index] = null;
-    if (!flags.debug && tlevel.chance <= (rng_log_enabled() ? (rng_log_set_caller($c.lit("dungeon.c"), 572, $c.lit("init_level")), rn2(100)) : rn2(100))) {
+    if (!flags.debug && tlevel.chance <= rn2(100)) {
         return;
     }
     $t1 = new_level = $c.asRec(await alloc(40), $T.s_level, 40), pd.final_lev[proto_index] = $t1;
@@ -405,7 +405,7 @@ async function place_level(proto_index, pd) {   // dungeon.c:666
     }
     npossible = await possible_places(proto_index, new $c.Ptr(map, 0), pd);
     for (; npossible; npossible = npossible - 1 | 0) {
-        $t1 = await pick_level(new $c.Ptr(map, 0), rng_log_enabled() ? (rng_log_set_caller($c.lit("dungeon.c"), 687, $c.lit("place_level")), rn2(npossible)) : rn2(npossible)), lev.dlevel.dlevel = $t1;
+        $t1 = await pick_level(new $c.Ptr(map, 0), rn2(npossible)), lev.dlevel.dlevel = $t1;
         if (await place_level(proto_index + 1 | 0, pd)) {
             return 1;
         }
@@ -624,7 +624,7 @@ async function init_dungeon_dungeons(L, pd, dngidx) {   // dungeon.c:997
             iflags.last_msg = save_plnmsg;
         }
     } while (0);
-    if (!flags.debug && dgn_chance && dgn_chance <= (rng_log_enabled() ? (rng_log_set_caller($c.lit("dungeon.c"), 1022, $c.lit("init_dungeon_dungeons")), rn2(100)) : rn2(100))) {
+    if (!flags.debug && dgn_chance && dgn_chance <= rn2(100)) {
         do {
             if (debugcore($c.lit("dungeon.c"), 1)) {
                 save_plnmsg$2 = iflags.last_msg;
@@ -672,7 +672,7 @@ async function init_dungeon_dungeons(L, pd, dngidx) {   // dungeon.c:997
     $c.free(dgn_bonetag);
     $c.free(dgn_themerms);
     if (dgn_range) {
-        $t1 = $c.i16((rng_log_enabled() ? (rng_log_set_caller($c.lit("dungeon.c"), 1074, $c.lit("init_dungeon_dungeons")), rn2(dgn_range)) : rn2(dgn_range)) + dgn_base | 0), svd.dungeons[dngidx].num_dunlevs = $t1;
+        $t1 = $c.i16(rn2(dgn_range) + dgn_base | 0), svd.dungeons[dngidx].num_dunlevs = $t1;
     } else {
         svd.dungeons[dngidx].num_dunlevs = $c.i16(dgn_base);
     }
@@ -703,7 +703,7 @@ async function init_dungeon_dungeons(L, pd, dngidx) {   // dungeon.c:997
 function init_castle_tune() {   // dungeon.c:1111
     let i = 0, $t1;
     for (i = 0; i < 5; i = i + 1 | 0) {
-        $t1 = $c.i8(65 + (rng_log_enabled() ? (rng_log_set_caller($c.lit("dungeon.c"), 1116, $c.lit("init_castle_tune")), rn2(7)) : rn2(7)) | 0), svt.tune[i] = $t1;
+        $t1 = $c.i8(65 + rn2(7) | 0), svt.tune[i] = $t1;
     }
     svt.tune[5] = 0;
 }
@@ -1179,7 +1179,7 @@ export function assign_level(dest, src) {   // dungeon.c:1978
 export function assign_rnd_level(dest, src, range) {   // dungeon.c:1986
     let $t1, $t2;
     dest.dnum = src.dnum;
-    $t1 = $c.i16(src.dlevel + (range > 0 ? rng_log_enabled() ? (rng_log_set_caller($c.lit("dungeon.c"), 1989, $c.lit("assign_rnd_level")), rnd(range)) : rnd(range) : -(rng_log_enabled() ? (rng_log_set_caller($c.lit("dungeon.c"), 1989, $c.lit("assign_rnd_level")), rnd(-range | 0)) : rnd(-range | 0)) | 0) | 0), dest.dlevel = $t1;
+    $t1 = $c.i16(src.dlevel + (range > 0 ? rnd(range) : -rnd(-range | 0) | 0) | 0), dest.dlevel = $t1;
     if (dest.dlevel > dunlevs_in_dungeon(dest)) {
         $t2 = dunlevs_in_dungeon(dest), dest.dlevel = $t2;
     } else if (dest.dlevel < 1) {
@@ -1190,16 +1190,16 @@ export function induced_align(pct) {   // dungeon.c:1999
     let lev = null, al = 0;
     lev = Is_special(u.uz);
     if (lev && lev.flags.align | 0) {
-        if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("dungeon.c"), 2005, $c.lit("induced_align")), rn2(100)) : rn2(100)) < pct) {
+        if (rn2(100) < pct) {
             return lev.flags.align;
         }
     }
     if (svd.dungeons[u.uz.dnum].flags.align) {
-        if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("dungeon.c"), 2009, $c.lit("induced_align")), rn2(100)) : rn2(100)) < pct) {
+        if (rn2(100) < pct) {
             return svd.dungeons[u.uz.dnum].flags.align;
         }
     }
-    al = $c.i8((rng_log_enabled() ? (rng_log_set_caller($c.lit("dungeon.c"), 2012, $c.lit("induced_align")), rn2(3)) : rn2(3)) - 1 | 0);
+    al = $c.i8(rn2(3) - 1 | 0);
     return (al === -128 ? 0 : al === 1 ? 4 : al + 2 | 0) >>> 0;
 }
 export function Invocation_lev(lev) {   // dungeon.c:2017

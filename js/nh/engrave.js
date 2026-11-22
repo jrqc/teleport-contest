@@ -29,7 +29,7 @@ import { body_part } from './polyself.js';
 import { make_blinded } from './potion.js';
 import { altar_wrath } from './pray.js';
 import { wand_explode } from './read.js';
-import { rn2, rnd, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { rn2, rnd } from './rnd.js';
 import { get_rnd_text, getrumor } from './rumors.js';
 import { sfi_char, sfi_engr, sfi_unsigned, sfo_char, sfo_engr, sfo_unsigned } from './sfbase.js';
 import { check_unpaid } from './shk.js';
@@ -45,7 +45,7 @@ const rubouts = $c.recArray($T.anon_engrave_66, 48);
 const blind_writing = $c.matrix(Int8Array, [9, 21]);
 export async function random_engraving(outbuf, pristine_copy) {   // engrave.c:51
     let rumor = null;
-    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("engrave.c"), 57, $c.lit("random_engraving")), rn2(4)) : rn2(4)) || !(rumor = await getrumor(0, pristine_copy, 1)) || !rumor.get(0)) {
+    if (!rn2(4) || !(rumor = await getrumor(0, pristine_copy, 1)) || !rumor.get(0)) {
         await get_rnd_text($c.lit("engrave"), pristine_copy, rn2, 60);
     }
     $c.__builtin___strcpy_chk(outbuf, pristine_copy, -1);
@@ -58,8 +58,8 @@ export function wipeout_text(engr, cnt, seed) {   // engrave.c:120
     if (lth && cnt > 0) {
         while ($t1 = cnt, cnt = $t1 - 1 | 0, $t1) {
             if (!seed) {
-                nxt = rng_log_enabled() ? (rng_log_set_caller($c.lit("engrave.c"), 134, $c.lit("wipeout_text")), rn2(lth | 0)) : rn2(lth | 0);
-                use_rubout = rng_log_enabled() ? (rng_log_set_caller($c.lit("engrave.c"), 135, $c.lit("wipeout_text")), rn2(4)) : rn2(4);
+                nxt = rn2(lth | 0);
+                use_rubout = rn2(4);
             } else {
                 nxt = $c.remu32(seed, lth) | 0;
                 seed = Math.imul(seed, 31) >>> 0, seed = $c.remu32(seed, 255);
@@ -80,7 +80,7 @@ export function wipeout_text(engr, cnt, seed) {   // engrave.c:120
                     if (s.get(0) === rubouts[i].wipefrom) {
                         ln = $c.u32($c.strlen(rubouts[i].wipeto));
                         if (!seed) {
-                            j = rng_log_enabled() ? (rng_log_set_caller($c.lit("engrave.c"), 164, $c.lit("wipeout_text")), rn2(ln | 0)) : rn2(ln | 0);
+                            j = rn2(ln | 0);
                         } else {
                             seed = Math.imul(seed, 31) >>> 0, seed = $c.remu32(seed, 255);
                             j = $c.remu32(seed, ln) | 0;
@@ -158,9 +158,9 @@ export async function wipe_engr_at(x, y, cnt, magical) {   // engrave.c:271
                 iflags.last_msg = save_plnmsg;
             }
         } while (0);
-        if (ep.engr_type !== 3 || is_ice(x, y) || magical && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("engrave.c"), 278, $c.lit("wipe_engr_at")), rn2(2)) : rn2(2))) {
+        if (ep.engr_type !== 3 || is_ice(x, y) || magical && !rn2(2)) {
             if (ep.engr_type !== 1 && ep.engr_type !== 5) {
-                cnt = $c.i16((rng_log_enabled() ? (rng_log_set_caller($c.lit("engrave.c"), 280, $c.lit("wipe_engr_at")), rn2(1 + $c.div32(50, cnt + 1 | 0) | 0)) : rn2(1 + $c.div32(50, cnt + 1 | 0) | 0)) ? 0 : 1);
+                cnt = $c.i16(rn2(1 + $c.div32(50, cnt + 1 | 0) | 0) ? 0 : 1);
                 do {
                     if (debugcore($c.lit("engrave.c"), 1)) {
                         save_plnmsg$2 = iflags.last_msg;
@@ -302,7 +302,7 @@ export async function make_engr_at(x, y, s, pristine_s, e_time, e_type) {   // e
         }
     }
     ep.engr_time = e_time;
-    $t1 = $c.i8(e_type > 0 ? e_type : rng_log_enabled() ? (rng_log_set_caller($c.lit("engrave.c"), 452, $c.lit("make_engr_at")), rnd(5)) : rnd(5)), ep.engr_type = $t1;
+    $t1 = $c.i8(e_type > 0 ? e_type : rnd(5)), ep.engr_type = $t1;
     ep.engr_szeach = smem;
     ep.engr_alloc = Math.imul(smem, 3) >>> 0;
 }
@@ -549,7 +549,7 @@ async function doengrave_sfx_item(de) {   // engrave.c:742
         case 11 /* WAND_CLASS */:
             if (await zappable(de.otmp)) {
                 await check_unpaid(de.otmp);
-                if (de.otmp.cursed | 0 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("engrave.c"), 794, $c.lit("doengrave_sfx_item")), rn2(100)) : rn2(100))) {
+                if (de.otmp.cursed | 0 && !rn2(100)) {
                     await wand_explode(de.otmp, 0);
                     de.ret = 1;
                     return 0;
@@ -847,8 +847,8 @@ export async function doengrave() {   // engrave.c:956
             if (sp.get(0) === 32) {
                 continue;
             }
-            if ((de.type === 1 || de.type === 5) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("engrave.c"), 1223, $c.lit("doengrave")), rn2(25)) : rn2(25)) || (u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("engrave.c"), 1224, $c.lit("doengrave")), rn2(11)) : rn2(11)) || u.uprops[14 /* CONFUSION */].intrinsic && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("engrave.c"), 1224, $c.lit("doengrave")), rn2(7)) : rn2(7)) || u.uprops[13 /* STUNNED */].intrinsic && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("engrave.c"), 1225, $c.lit("doengrave")), rn2(4)) : rn2(4)) || u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("engrave.c"), 1225, $c.lit("doengrave")), rn2(2)) : rn2(2))) {
-                $t6 = $c.i8(32 + (rng_log_enabled() ? (rng_log_set_caller($c.lit("engrave.c"), 1226, $c.lit("doengrave")), rnd(94)) : rnd(94)) | 0), sp.set(0, $t6);
+            if ((de.type === 1 || de.type === 5) && !rn2(25) || (u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked && !rn2(11) || u.uprops[14 /* CONFUSION */].intrinsic && !rn2(7) || u.uprops[13 /* STUNNED */].intrinsic && !rn2(4) || u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic) && !rn2(2)) {
+                $t6 = $c.i8(32 + rnd(94) | 0), sp.set(0, $t6);
             }
         }
         if (de.eow) {
@@ -869,7 +869,7 @@ export async function doengrave() {   // engrave.c:956
         }
         if (de.doblind && !await resists_blnd(gy.youmonst)) {
             await You($c.lit("are blinded by the flash!"));
-            await make_blinded(rng_log_enabled() ? (rng_log_set_caller($c.lit("engrave.c"), 1250, $c.lit("doengrave")), rnd(50)) : rnd(50), 0);
+            await make_blinded(rnd(50), 0);
             if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
                 await Your($c.lit("%s"), c_common_strings.c_vision_clears);
             }
@@ -1161,8 +1161,8 @@ export async function rloc_engr(ep) {   // engrave.c:1667
         if ((tryct = tryct - 1 | 0) < 0) {
             return;
         }
-        tx = (rng_log_enabled() ? (rng_log_set_caller($c.lit("engrave.c"), 1674, $c.lit("rloc_engr")), rn2(77)) : rn2(77)) + 2 | 0;
-        ty = rng_log_enabled() ? (rng_log_set_caller($c.lit("engrave.c"), 1675, $c.lit("rloc_engr")), rn2(21)) : rn2(21);
+        tx = rn2(77) + 2 | 0;
+        ty = rn2(21);
     } while (engr_at($c.i16(tx), $c.i16(ty)) || !goodpos($c.i16(tx), $c.i16(ty), null, 0));
     ep.engr_x = $c.i16(tx);
     ep.engr_y = $c.i16(ty);
@@ -1209,7 +1209,7 @@ export async function feel_engraving(ep) {   // engrave.c:1732
     }
 }
 function blengr() {   // engrave.c:1765
-    return new $c.Ptr(blind_writing[rng_log_enabled() ? (rng_log_set_caller($c.lit("engrave.c"), 1767, $c.lit("blengr")), rn2(9)) : rn2(9)], 0);
+    return new $c.Ptr(blind_writing[rn2(9)], 0);
 }
 
 export function $init() {

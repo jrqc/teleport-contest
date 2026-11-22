@@ -19,7 +19,7 @@ import { the, xname } from './objnam.js';
 import { You, impossible, livelog_printf, pline, verbalize } from './pline.js';
 import { com_pager, find_quest_artifact, is_quest_artifact, qt_pager } from './questpgr.js';
 import { create_gas_cloud } from './region.js';
-import { rn2, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { rn2 } from './rnd.js';
 import { deltrap } from './trap.js';
 
 async function on_start() {   // quest.c:26
@@ -276,14 +276,14 @@ export async function nemesis_speaks() {   // quest.c:403
             await qt_pager($c.lit("nemesis_next"));
         } else if ((svq.quest_status.made_goal | 0) < 7) {
             await qt_pager($c.lit("nemesis_other"));
-        } else if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("quest.c"), 414, $c.lit("nemesis_speaks")), rn2(5)) : rn2(5))) {
+        } else if (!rn2(5)) {
             await qt_pager($c.lit("discourage"));
         }
         if ((svq.quest_status.made_goal | 0) < 7) {
             svq.quest_status.made_goal = (svq.quest_status.made_goal + 1 >>> 0) & 7;
         }
         svq.quest_status.met_nemesis = (1) & 1;
-    } else if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("quest.c"), 420, $c.lit("nemesis_speaks")), rn2(5)) : rn2(5))) {
+    } else if (!rn2(5)) {
         await qt_pager($c.lit("discourage"));
     }
 }

@@ -33,7 +33,7 @@ import { impossible, pline } from './pline.js';
 import { body_part } from './polyself.js';
 import { is_quest_artifact } from './questpgr.js';
 import { apron_text, candy_wrapper_text, hawaiian_motif, tshirt_text } from './read.js';
-import { rn2, rnd, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { rn2, rnd } from './rnd.js';
 import { genders } from './role.js';
 import { CapitalMon } from './rumors.js';
 import { append_price_quote, delete_contents, get_cost_of_shop_item, is_unpaid, obfree, record_price_quote, shk_your, unpaid_cost } from './shk.js';
@@ -2174,7 +2174,7 @@ function rnd_otyp_by_wpnskill(skill) {   // objnam.c:3432
         }
     }
     if (n > 0) {
-        n = rng_log_enabled() ? (rng_log_set_caller($c.lit("objnam.c"), 3444, $c.lit("rnd_otyp_by_wpnskill")), rn2(n)) : rn2(n);
+        n = rn2(n);
         for (i = svb.bases[2 /* WEAPON_CLASS */]; i < 481 /* NUM_OBJECTS */ && objects[i].oc_class === 2 /* WEAPON_CLASS */; i = i + 1 | 0) {
             if (objects[i].oc_subtyp === skill) {
                 if ((n = n - 1 | 0) < 0) {
@@ -2213,7 +2213,7 @@ async function rnd_otyp_by_namedesc(name, oclass, xtra_prob) {   // objnam.c:345
         }
     }
     if (n > 0 && maxprob) {
-        prob = rng_log_enabled() ? (rng_log_set_caller($c.lit("objnam.c"), 3522, $c.lit("rnd_otyp_by_namedesc")), rn2(maxprob)) : rn2(maxprob);
+        prob = rn2(maxprob);
         for (i = 0; i < (n - 1 | 0); i = i + 1 | 0) {
             if ((prob = prob - (objects[validobjs[i]].oc_prob + xtra_prob | 0) | 0) < 0) {
                 break;
@@ -2359,7 +2359,7 @@ async function wizterrainwish(d) {   // objnam.c:3554
         } else if (!strncmpi(bp, $c.lit("unaligned "), 10)) {
             al = -128;
         } else {
-            al = $c.i8(!(rng_log_enabled() ? (rng_log_set_caller($c.lit("objnam.c"), 3702, $c.lit("wizterrainwish")), rn2(6)) : rn2(6)) ? -128 : (rng_log_enabled() ? (rng_log_set_caller($c.lit("objnam.c"), 3702, $c.lit("wizterrainwish")), rn2(3)) : rn2(3)) - 1 | 0);
+            al = $c.i8(!rn2(6) ? -128 : rn2(3) - 1 | 0);
         }
         lev.flags = ((al === -128 ? 0 : al === 1 ? 4 : al + 2 | 0) >>> 0) & 31;
         await pline($c.lit("%s altar."), await An(align_str(al)));
@@ -2585,9 +2585,9 @@ function readobjnam_preparse(d) {   // objnam.c:3966
             d.islit = 0;
         } else if (!strncmpi(d.bp, $c.lit("moist "), l = 6) || !strncmpi(d.bp, $c.lit("wet "), l = 4)) {
             if (!strncmpi(d.bp, $c.lit("wet "), 4)) {
-                $t8 = 3 + (rng_log_enabled() ? (rng_log_set_caller($c.lit("objnam.c"), 4025, $c.lit("readobjnam_preparse")), rn2(3)) : rn2(3)) | 0, d.wetness = $t8;
+                $t8 = 3 + rn2(3) | 0, d.wetness = $t8;
             } else {
-                $t9 = rng_log_enabled() ? (rng_log_set_caller($c.lit("objnam.c"), 4027, $c.lit("readobjnam_preparse")), rnd(2)) : rnd(2), d.wetness = $t9;
+                $t9 = rnd(2), d.wetness = $t9;
             }
         } else if (!strncmpi(d.bp, $c.lit("unlabeled "), l = 10) || !strncmpi(d.bp, $c.lit("unlabelled "), l = 11) || !strncmpi(d.bp, $c.lit("blank "), l = 6)) {
             d.unlabeled = 1;
@@ -2795,7 +2795,7 @@ async function readobjnam_postparse1(d) {   // objnam.c:4240
     if (!strncmpi(d.bp, $c.lit("glob"), -1) || !($c.pcmp(d.bp.add(i).add(-5), d.bp) < 0 || strncmpi(d.bp.add(i).add(-5), $c.lit(" glob"), -1)) || !strncmpi(d.bp, $c.lit("globs"), -1) || !($c.pcmp(d.bp.add(i).add(-6), d.bp) < 0 || strncmpi(d.bp.add(i).add(-6), $c.lit(" globs"), -1)) || ($t7 = strstri(d.bp, $c.lit("glob of ")), d.p = $t7) !== null || ($t8 = strstri(d.bp, $c.lit("globs of ")), d.p = $t8) !== null) {
         $t9 = await name_to_mon(!d.p ? d.bp : strstri(d.p, $c.lit(" of ")).add(4), null), d.mntmp = $t9;
         if (d.mntmp === -1 /* NON_PM */) {
-            $t10 = (rng_log_enabled() ? (rng_log_set_caller($c.lit("objnam.c"), 4354, $c.lit("readobjnam_postparse1")), rn2(3)) : rn2(3)) + 206 | 0, d.mntmp = $t10;
+            $t10 = rn2(3) + 206 | 0, d.mntmp = $t10;
         }
         if (d.cnt < 2 && strstri(d.bp, $c.lit("globs"))) {
             d.cnt = 2;
@@ -3017,7 +3017,7 @@ function readobjnam_postparse2(d) {   // objnam.c:4666
             s = s.add(9);
         }
         if (!strncmpi(s, $c.lit("glass"), -1)) {
-            $t3 = 461 /* FIRST_GLASS_GEM */ + (rng_log_enabled() ? (rng_log_set_caller($c.lit("objnam.c"), 4705, $c.lit("readobjnam_postparse2")), rn2(9 /* NUM_GLASS_GEMS */)) : rn2(9 /* NUM_GLASS_GEMS */)) | 0, d.typ = $t3;
+            $t3 = 461 /* FIRST_GLASS_GEM */ + rn2(9 /* NUM_GLASS_GEMS */) | 0, d.typ = $t3;
             if (objects[d.typ].oc_class === 13 /* GEM_CLASS */) {
                 return 2;
             } else {
@@ -3243,7 +3243,7 @@ export async function readobjnam(bp, no_wish) {   // objnam.c:4910
         case "any":
             $goto = null;   // any:
             if (!d.oclass) {
-                $t4 = wrpsym[rng_log_enabled() ? (rng_log_set_caller($c.lit("objnam.c"), 4996, $c.lit("readobjnam")), rn2(13)) : rn2(13)], d.oclass = $t4;
+                $t4 = wrpsym[rn2(13)], d.oclass = $t4;
             }
         case "typfnd":
             $goto = null;   // typfnd:
@@ -3287,7 +3287,7 @@ export async function readobjnam(bp, no_wish) {   // objnam.c:4910
                     d.otmp.owt = d.otmp.owt + (Math.imul((5 + Math.imul(d.gsize - 2 | 0, 10) | 0) >>> 0, d.otmp.owt) >>> 0) >>> 0;
                 }
                 if (d.cnt > 1) {
-                    rn1cnt = (rng_log_enabled() ? (rng_log_set_caller($c.lit("objnam.c"), 5059, $c.lit("readobjnam")), rn2(5)) : rn2(5)) + 2 | 0;
+                    rn1cnt = rn2(5) + 2 | 0;
                     if (rn1cnt > (6 - d.gsize | 0)) {
                         rn1cnt = 6 - d.gsize | 0;
                     }
@@ -3298,7 +3298,7 @@ export async function readobjnam(bp, no_wish) {   // objnam.c:4910
                 }
                 d.cnt = 0;
             } else if (d.cnt > 0) {
-                if (objects[d.typ].oc_merge | 0 && (flags.debug || d.cnt < (rng_log_enabled() ? (rng_log_set_caller($c.lit("objnam.c"), 5077, $c.lit("readobjnam")), rnd(6)) : rnd(6)) || d.cnt <= 7 && (d.otmp.otyp === 224 /* TALLOW_CANDLE */ || d.otmp.otyp === 225 /* WAX_CANDLE */) || d.cnt <= 20 && (d.typ === 474 /* ROCK */ || d.typ === 473 /* FLINT */ || (d.otmp.oclass === 2 /* WEAPON_CLASS */ || d.otmp.oclass === 6 /* TOOL_CLASS */) && objects[d.otmp.otyp].oc_subtyp >= -25 && objects[d.otmp.otyp].oc_subtyp <= -23 || d.oclass === 2 /* WEAPON_CLASS */ && ((d.otmp.oclass === 2 /* WEAPON_CLASS */ || d.otmp.oclass === 13 /* GEM_CLASS */) && objects[d.otmp.otyp].oc_subtyp >= -22 && objects[d.otmp.otyp].oc_subtyp <= -20)))) {
+                if (objects[d.typ].oc_merge | 0 && (flags.debug || d.cnt < rnd(6) || d.cnt <= 7 && (d.otmp.otyp === 224 /* TALLOW_CANDLE */ || d.otmp.otyp === 225 /* WAX_CANDLE */) || d.cnt <= 20 && (d.typ === 474 /* ROCK */ || d.typ === 473 /* FLINT */ || (d.otmp.oclass === 2 /* WEAPON_CLASS */ || d.otmp.oclass === 6 /* TOOL_CLASS */) && objects[d.otmp.otyp].oc_subtyp >= -25 && objects[d.otmp.otyp].oc_subtyp <= -23 || d.oclass === 2 /* WEAPON_CLASS */ && ((d.otmp.oclass === 2 /* WEAPON_CLASS */ || d.otmp.oclass === 13 /* GEM_CLASS */) && objects[d.otmp.otyp].oc_subtyp >= -22 && objects[d.otmp.otyp].oc_subtyp <= -20)))) {
                     d.otmp.quan = d.cnt;
                 }
             }
@@ -3311,7 +3311,7 @@ export async function readobjnam(bp, no_wish) {   // objnam.c:4910
                 d.spe = d.otmp.spe;
             } else if (flags.debug) {
             } else if (d.oclass === 3 /* ARMOR_CLASS */ || d.oclass === 2 /* WEAPON_CLASS */ || d.otmp.oclass === 6 /* TOOL_CLASS */ && objects[d.otmp.otyp].oc_subtyp !== 0 /* P_NONE */ || d.oclass === 4 /* RING_CLASS */ && objects[d.typ].oc_charged | 0) {
-                if (d.spe > (rng_log_enabled() ? (rng_log_set_caller($c.lit("objnam.c"), 5102, $c.lit("readobjnam")), rnd(5)) : rnd(5)) && d.spe > d.otmp.spe) {
+                if (d.spe > rnd(5) && d.spe > d.otmp.spe) {
                     d.spe = 0;
                 }
                 if (d.spe > 2 && (u.uluck + u.moreluck | 0) < 0) {
@@ -3364,7 +3364,7 @@ export async function readobjnam(bp, no_wish) {   // objnam.c:4910
                         P = d.mntmp >= 0 /* LOW_PM */ && d.mntmp < 383 /* NUMMONS */ ? $c.relem(mons, d.mntmp) : null;
                         d.otmp.spe = $c.i8(!P ? 0 : $c.andu64(P.mflags2, 262144) !== 0 ? 3 : d.mgend === 1 /* FEMALE */ && !($c.andu64(P.mflags2, 65536) !== 0) ? 1 : d.mgend === 0 /* MALE */ && !($c.andu64(P.mflags2, 131072) !== 0) ? 2 : 0);
                         if (P && d.otmp.spe === 0) {
-                            $t8 = $c.i8($c.andu64(P.mflags2, 65536) !== 0 ? 2 : $c.andu64(P.mflags2, 131072) !== 0 ? 1 : (rng_log_enabled() ? (rng_log_set_caller($c.lit("objnam.c"), 5163, $c.lit("readobjnam")), rn2(2)) : rn2(2)) ? 2 : 1), d.otmp.spe = $t8;
+                            $t8 = $c.i8($c.andu64(P.mflags2, 65536) !== 0 ? 2 : $c.andu64(P.mflags2, 131072) !== 0 ? 1 : rn2(2) ? 2 : 1), d.otmp.spe = $t8;
                         }
                         if (d.ishistoric && d.typ === 476 /* STATUE */) {
                             d.otmp.spe = $c.i8(d.otmp.spe | 4);
@@ -3380,7 +3380,7 @@ export async function readobjnam(bp, no_wish) {   // objnam.c:4910
                     break;
                 case 414 /* WAN_WISHING */:
                     if (!flags.debug) {
-                        $t9 = $c.i8((rng_log_enabled() ? (rng_log_set_caller($c.lit("objnam.c"), 5182, $c.lit("readobjnam")), rn2(10)) : rn2(10)) ? -1 : 0), d.otmp.spe = $t9;
+                        $t9 = $c.i8(rn2(10) ? -1 : 0), d.otmp.spe = $t9;
                         break;
                     }
                 default:
@@ -3409,7 +3409,7 @@ export async function readobjnam(bp, no_wish) {   // objnam.c:4910
                             await set_corpsenm(d.otmp, d.mntmp);
                         }
                         if (d.zombify && zombie_form($c.relem(mons, d.mntmp))) {
-                            await start_timer((rng_log_enabled() ? (rng_log_set_caller($c.lit("objnam.c"), 5223, $c.lit("readobjnam")), rn2(5)) : rn2(5)) + 10 | 0, 3, 3, obj_to_any(d.otmp));
+                            await start_timer(rn2(5) + 10 | 0, 3, 3, obj_to_any(d.otmp));
                         }
                         break;
                     case 266 /* EGG */:
@@ -3503,7 +3503,7 @@ export async function readobjnam(bp, no_wish) {   // objnam.c:4910
             if (d.isdiluted && d.otmp.oclass === 8 /* POTION_CLASS */) {
                 d.otmp.oeroded = ((d.otmp.otyp !== 322 /* POT_WATER */ ? 1 : 0) >>> 0) & 3;
             }
-            if (d.otmp.otyp === 296 /* TIN */ && d.tvariety >= 0 && ((rng_log_enabled() ? (rng_log_set_caller($c.lit("objnam.c"), 5343, $c.lit("readobjnam")), rn2(4)) : rn2(4)) || flags.debug)) {
+            if (d.otmp.otyp === 296 /* TIN */ && d.tvariety >= 0 && (rn2(4) || flags.debug)) {
                 set_tin_variety(d.otmp, d.tvariety);
             }
             if (d.name) {
@@ -3523,7 +3523,7 @@ export async function readobjnam(bp, no_wish) {   // objnam.c:4910
             if (permapoisoned(d.otmp)) {
                 d.otmp.otrapped = (1) & 1;
             }
-            if ((is_quest_artifact(d.otmp) || d.otmp.oartifact && (rng_log_enabled() ? (rng_log_set_caller($c.lit("objnam.c"), 5374, $c.lit("readobjnam")), rn2(nartifact_exist())) : rn2(nartifact_exist())) > 1) && !flags.debug) {
+            if ((is_quest_artifact(d.otmp) || d.otmp.oartifact && rn2(nartifact_exist()) > 1) && !flags.debug) {
                 await artifact_exists(d.otmp, safe_oname(d.otmp), 0, 0);
                 await obfree(d.otmp, null);
                 d.otmp = hands_obj;
@@ -3554,9 +3554,9 @@ export function rnd_class(first, last) {   // objnam.c:5403
             sum = sum + objects[i].oc_prob | 0;
         }
         if (!sum) {
-            return (rng_log_enabled() ? (rng_log_set_caller($c.lit("objnam.c"), 5411, $c.lit("rnd_class")), rn2((last - first | 0) + 1 | 0)) : rn2((last - first | 0) + 1 | 0)) + first | 0;
+            return rn2((last - first | 0) + 1 | 0) + first | 0;
         }
-        x = rng_log_enabled() ? (rng_log_set_caller($c.lit("objnam.c"), 5413, $c.lit("rnd_class")), rnd(sum)) : rnd(sum);
+        x = rnd(sum);
         for (i = first; i <= last; i = i + 1 | 0) {
             if ((x = x - objects[i].oc_prob | 0) <= 0) {
                 return i;

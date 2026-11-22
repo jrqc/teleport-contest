@@ -25,7 +25,7 @@ import { an, makeplural, makesingular, the_unique_pm, vtense } from './objnam.js
 import { Norep, You, You_feel, You_hear, Your, impossible, pline, pline_The, pline_mon, set_msg_xy, verbalize } from './pline.js';
 import { body_part, rehumanize } from './polyself.js';
 import { make_blinded, make_confused, make_stunned } from './potion.js';
-import { d, rn2, rnd, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { d, rn2, rnd } from './rnd.js';
 import { genders } from './role.js';
 import { rndcurse } from './sit.js';
 import { enexto } from './teleport.js';
@@ -51,7 +51,7 @@ async function cursetxt(mtmp, undirected) {   // mcastu.c:63
             point_msg = $c.lit("at you, then curses");
         }
         await pline_mon(mtmp, $c.lit("%s points %s."), await Monnam(mtmp), point_msg);
-    } else if (!$c.rem64(svm.moves, 4) || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mcastu.c"), 81, $c.lit("cursetxt")), rn2(4)) : rn2(4))) {
+    } else if (!$c.rem64(svm.moves, 4) || !rn2(4)) {
         if (!(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf)) {
             await Norep($c.lit("You hear a mumbled curse."));
         }
@@ -72,9 +72,9 @@ async function choose_monster_spell(mtmp, adtyp) {   // mcastu.c:89
         return 0 /* MCAST_PSI_BOLT */;
     }
     maxlev = mcast_data[list.get(len - 1 | 0)].level;
-    spellval = rng_log_enabled() ? (rng_log_set_caller($c.lit("mcastu.c"), 111, $c.lit("choose_monster_spell")), rn2(mtmp.m_lev)) : rn2(mtmp.m_lev);
-    if (spellval > maxlev && (rng_log_enabled() ? (rng_log_set_caller($c.lit("mcastu.c"), 112, $c.lit("choose_monster_spell")), rn2(maxlev)) : rn2(maxlev))) {
-        spellval = rng_log_enabled() ? (rng_log_set_caller($c.lit("mcastu.c"), 113, $c.lit("choose_monster_spell")), rn2(maxlev)) : rn2(maxlev);
+    spellval = rn2(mtmp.m_lev);
+    if (spellval > maxlev && rn2(maxlev)) {
+        spellval = rn2(maxlev);
     }
     for (i = len - 1 | 0; i >= 0; i = i - 1 | 0) {
         if (mcast_data[list.get(i)].level <= spellval && !await spell_would_be_useless(mtmp, list.get(i))) {
@@ -124,7 +124,7 @@ export async function castmu(mtmp, mattk, thinks_it_foundyou, foundyou) {   // m
         return 0;
     }
     nomul(0);
-    if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("mcastu.c"), 208, $c.lit("castmu")), rn2(Math.imul(ml, 10))) : rn2(Math.imul(ml, 10))) < (mtmp.mconf | 0 ? 100 : 20)) {
+    if (rn2(Math.imul(ml, 10)) < (mtmp.mconf | 0 ? 100 : 20)) {
         if (canseemon(mtmp) && !(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf)) {
             set_msg_xy(mtmp.mx, mtmp.my);
             await pline_The($c.lit("air crackles around %s."), await mon_nam(mtmp));
@@ -141,9 +141,9 @@ export async function castmu(mtmp, mattk, thinks_it_foundyou, foundyou) {   // m
             return 0;
         }
     } else if (mattk.damd) {
-        dmg = rng_log_enabled() ? (rng_log_set_caller($c.lit("mcastu.c"), 241, $c.lit("castmu")), d($c.div32(ml, 2) + mattk.damn | 0, mattk.damd)) : d($c.div32(ml, 2) + mattk.damn | 0, mattk.damd);
+        dmg = d($c.div32(ml, 2) + mattk.damn | 0, mattk.damd);
     } else {
-        dmg = rng_log_enabled() ? (rng_log_set_caller($c.lit("mcastu.c"), 243, $c.lit("castmu")), d($c.div32(ml, 2) + 1 | 0, 6)) : d($c.div32(ml, 2) + 1 | 0, 6);
+        dmg = d($c.div32(ml, 2) + 1 | 0, 6);
     }
     if (u.uprops[55 /* HALF_SPDAM */].intrinsic || u.uprops[55 /* HALF_SPDAM */].extrinsic) {
         dmg = $c.div32(dmg + 1 | 0, 2);
@@ -183,7 +183,7 @@ export async function castmu(mtmp, mattk, thinks_it_foundyou, foundyou) {   // m
                 monstseesu(1);
                 dmg = 0;
             } else {
-                dmg = rng_log_enabled() ? (rng_log_set_caller($c.lit("mcastu.c"), 290, $c.lit("castmu")), d($c.div32(mtmp.m_lev, 2) + 1 | 0, 6)) : d($c.div32(mtmp.m_lev, 2) + 1 | 0, 6);
+                dmg = d($c.div32(mtmp.m_lev, 2) + 1 | 0, 6);
                 monstunseesu(1);
             }
             await mon_spell_hits_spot(mtmp, 1, u.ux, u.uy);
@@ -204,14 +204,14 @@ async function m_cure_self(mtmp, dmg) {   // mcastu.c:308
         if (canseemon(mtmp)) {
             await pline_mon(mtmp, $c.lit("%s looks better."), await Monnam(mtmp));
         }
-        await healmon(mtmp, rng_log_enabled() ? (rng_log_set_caller($c.lit("mcastu.c"), 314, $c.lit("m_cure_self")), d(3, 6)) : d(3, 6), 0);
+        await healmon(mtmp, d(3, 6), 0);
         dmg = 0;
     }
     return dmg;
 }
 export async function touch_of_death(mtmp) {   // mcastu.c:323
     let kbuf = new Int8Array(256), dmg = 0, drain = 0, olduhp = 0, uhpmin = 0, newuhpmax = 0;
-    dmg = 50 + (rng_log_enabled() ? (rng_log_set_caller($c.lit("mcastu.c"), 326, $c.lit("touch_of_death")), d(8, 6)) : d(8, 6)) | 0;
+    dmg = 50 + d(8, 6) | 0;
     drain = $c.div32(dmg, 2);
     await You_feel($c.lit("drained..."));
     await death_inflicted_by(new $c.Ptr(kbuf, 0), $c.lit("the touch of death"), mtmp);
@@ -254,7 +254,7 @@ async function mcast_death_touch(mtmp) {   // mcastu.c:389
     await pline($c.lit("Oh no, %s's using the touch of death!"), genders[pronoun_gender(mtmp, 2)].he);
     if ($c.andu64(gy.youmonst.data.mflags2, 2) !== 0 || $c.peq(gy.youmonst.data, $c.relem(mons, 50 /* PM_MANES */)) || (gy.youmonst.data.mlet === 55 /* S_GOLEM */ || gy.youmonst.data.mlet === 22 /* S_VORTEX */) || $c.andu64(gy.youmonst.data.mflags2, 256) !== 0) {
         await You($c.lit("seem no deader than before."));
-    } else if (!(u.uprops[12 /* ANTIMAGIC */].intrinsic || u.uprops[12 /* ANTIMAGIC */].extrinsic) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("mcastu.c"), 394, $c.lit("mcast_death_touch")), rn2(mtmp.m_lev)) : rn2(mtmp.m_lev)) > 12) {
+    } else if (!(u.uprops[12 /* ANTIMAGIC */].intrinsic || u.uprops[12 /* ANTIMAGIC */].extrinsic) && rn2(mtmp.m_lev) > 12) {
         if (u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic)) {
             await You($c.lit("have an out of body experience."));
         } else {
@@ -321,7 +321,7 @@ async function mcast_weaken_you(mtmp, dmg) {   // mcastu.c:466
         if (u.uprops[55 /* HALF_SPDAM */].intrinsic || u.uprops[55 /* HALF_SPDAM */].extrinsic) {
             dmg = $c.div32(dmg + 1 | 0, 2);
         }
-        await losestr(rng_log_enabled() ? (rng_log_set_caller($c.lit("mcastu.c"), 481, $c.lit("mcast_weaken_you")), rnd(dmg)) : rnd(dmg), await death_inflicted_by(new $c.Ptr(kbuf, 0), $c.lit("strength loss"), mtmp), 1);
+        await losestr(rnd(dmg), await death_inflicted_by(new $c.Ptr(kbuf, 0), $c.lit("strength loss"), mtmp), 1);
         svk.killer.name[0] = 0;
         monstunseesu(1);
     }
@@ -349,7 +349,7 @@ async function mcast_stun_you(dmg) {   // mcastu.c:504
         await make_stunned(1, 0);
     } else {
         await You(u.uprops[13 /* STUNNED */].intrinsic ? $c.lit("struggle to keep your balance.") : $c.lit("reel..."));
-        dmg = rng_log_enabled() ? (rng_log_set_caller($c.lit("mcastu.c"), 514, $c.lit("mcast_stun_you")), d(acurr(3 /* A_DEX */) < 12 ? 6 : 4, 4)) : d(acurr(3 /* A_DEX */) < 12 ? 6 : 4, 4);
+        dmg = d(acurr(3 /* A_DEX */) < 12 ? 6 : 4, 4);
         if (u.uprops[55 /* HALF_SPDAM */].intrinsic || u.uprops[55 /* HALF_SPDAM */].extrinsic) {
             dmg = $c.div32(dmg + 1 | 0, 2);
         }
@@ -359,7 +359,7 @@ async function mcast_stun_you(dmg) {   // mcastu.c:504
 }
 async function mcast_geyser(dmg) {   // mcastu.c:523
     await pline($c.lit("A sudden geyser slams into you from nowhere!"));
-    dmg = rng_log_enabled() ? (rng_log_set_caller($c.lit("mcastu.c"), 529, $c.lit("mcast_geyser")), d(8, 6)) : d(8, 6);
+    dmg = d(8, 6);
     if (u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic) {
         dmg = $c.div32(dmg + 1 | 0, 2);
     }
@@ -368,7 +368,7 @@ async function mcast_geyser(dmg) {   // mcastu.c:523
 async function mcast_fire_pillar(mtmp, dmg) {   // mcastu.c:540
     let orig_dmg = 0;
     await pline($c.lit("A pillar of fire strikes all around you!"));
-    orig_dmg = dmg = rng_log_enabled() ? (rng_log_set_caller($c.lit("mcastu.c"), 545, $c.lit("mcast_fire_pillar")), d(8, 6)) : d(8, 6);
+    orig_dmg = dmg = d(8, 6);
     if (u.uprops[1 /* FIRE_RES */].intrinsic || u.uprops[1 /* FIRE_RES */].extrinsic) {
         await shieldeff(u.ux, u.uy);
         monstseesu(2);
@@ -390,7 +390,7 @@ async function mcast_lightning(mtmp, dmg) {   // mcastu.c:566
     let orig_dmg = 0, reflects = 0;
     await pline($c.lit("A bolt of lightning strikes down at you from above!"));
     reflects = await ureflects($c.lit("It bounces off your %s%s."), $c.lit(""));
-    orig_dmg = dmg = rng_log_enabled() ? (rng_log_set_caller($c.lit("mcastu.c"), 574, $c.lit("mcast_lightning")), d(8, 6)) : d(8, 6);
+    orig_dmg = dmg = d(8, 6);
     if (reflects || (u.uprops[5 /* SHOCK_RES */].intrinsic || u.uprops[5 /* SHOCK_RES */].extrinsic)) {
         await shieldeff(u.ux, u.uy);
         dmg = 0;
@@ -408,7 +408,7 @@ async function mcast_lightning(mtmp, dmg) {   // mcastu.c:566
     }
     await destroy_items(gy.youmonst, 6, orig_dmg);
     await mon_spell_hits_spot(mtmp, 6, u.ux, u.uy);
-    await flashburn(rng_log_enabled() ? (rng_log_set_caller($c.lit("mcastu.c"), 596, $c.lit("mcast_lightning")), rnd(100)) : rnd(100), 1);
+    await flashburn(rnd(100), 1);
     return dmg;
 }
 async function mcast_psi_bolt(dmg) {   // mcastu.c:601
@@ -456,7 +456,7 @@ async function mcast_insects(mtmp) {   // mcastu.c:645
     let_ = $c.i8(pm ? 1 /* S_ANT */ : 45 /* S_SNAKE */);
     success = 0;
     oldseen = monster_census(1);
-    quan = mtmp.m_lev < 2 ? 1 : rng_log_enabled() ? (rng_log_set_caller($c.lit("mcastu.c"), 658, $c.lit("mcast_insects")), rnd($c.div32(mtmp.m_lev, 2))) : rnd($c.div32(mtmp.m_lev, 2));
+    quan = mtmp.m_lev < 2 ? 1 : rnd($c.div32(mtmp.m_lev, 2));
     if (quan < 3) {
         quan = 3;
     }
@@ -681,12 +681,12 @@ async function spell_would_be_useless(mtmp, spellnum) {   // mcastu.c:909
     }
     switch (spellnum) {
         case 19 /* MCAST_DEATH_TOUCH */:
-            if ((u.uprops[12 /* ANTIMAGIC */].intrinsic || u.uprops[12 /* ANTIMAGIC */].extrinsic || u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic)) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mcastu.c"), 934, $c.lit("spell_would_be_useless")), rn2(2)) : rn2(2))) {
+            if ((u.uprops[12 /* ANTIMAGIC */].intrinsic || u.uprops[12 /* ANTIMAGIC */].extrinsic || u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic)) && !rn2(2)) {
                 return 1;
             }
             break;
         case 15 /* MCAST_GEYSER */:
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mcastu.c"), 938, $c.lit("spell_would_be_useless")), rn2(5)) : rn2(5))) {
+            if (!rn2(5)) {
                 return 1;
             }
             break;
@@ -697,7 +697,7 @@ async function spell_would_be_useless(mtmp, spellnum) {   // mcastu.c:909
             break;
         case 16 /* MCAST_AGGRAVATION */:
             if (!await has_aggravatables(mtmp)) {
-                return $c.i8((rng_log_enabled() ? (rng_log_set_caller($c.lit("mcastu.c"), 953, $c.lit("spell_would_be_useless")), rn2(100)) : rn2(100)) ? 1 : 0);
+                return $c.i8(rn2(100) ? 1 : 0);
             }
             break;
         case 3 /* MCAST_HASTE_SELF */:
@@ -736,7 +736,7 @@ export async function buzzmu(mtmp, mattk) {   // mcastu.c:989
         await cursetxt(mtmp, 0);
         return 0;
     }
-    if (lined_up(mtmp) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("mcastu.c"), 1000, $c.lit("buzzmu")), rn2(3)) : rn2(3))) {
+    if (lined_up(mtmp) && rn2(3)) {
         nomul(0);
         if (canseemon(mtmp)) {
             await pline_mon(mtmp, $c.lit("%s zaps you with a %s!"), await Monnam(mtmp), flash_str($c.rem32($c.abs(mattk.adtyp - 1 | 0), 10), 0));

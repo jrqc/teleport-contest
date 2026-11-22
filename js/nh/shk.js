@@ -42,7 +42,7 @@ import { Doname2, The, ansimpleoname, doname, makeplural, obj_typename, paydonam
 import { Norep, There, You, You_cant, You_feel, You_hear, Your, impossible, livelog_printf, pline, pline_The, verbalize } from './pline.js';
 import { body_part, mbodypart, poly_gender } from './polyself.js';
 import { move_special } from './priest.js';
-import { rn2, rnd, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { rn2, rnd } from './rnd.js';
 import { Hello, genders } from './role.js';
 import { Shknam, is_izchak, saleable, shkname, shtypes } from './shknam.js';
 import { growl, set_voice, yelp } from './sounds.js';
@@ -535,7 +535,7 @@ export async function u_entered_shop(enterstring) {   // shk.c:751
         if (!(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf) && !(shkp.msleeping | 0 || !shkp.mcanmove || shkp.data.msound <= 17 /* MS_ANIMAL */)) {
             await verbalize($c.lit("So, %s, you dare return to %s %s?!"), new $c.Ptr(svp.plname, 0), s_suffix(await shkname(shkp)), shtypes[rt - 14 /* SHOPBASE */ | 0].name);
         } else {
-            await pline($c.lit("%s seems %s over your return to %s %s!"), await Shknam(shkp), angrytexts[rng_log_enabled() ? (rng_log_set_caller($c.lit("shk.c"), 820, $c.lit("u_entered_shop")), rn2(3)) : rn2(3)], genders[pronoun_gender(shkp, 3)].his, shtypes[rt - 14 /* SHOPBASE */ | 0].name);
+            await pline($c.lit("%s seems %s over your return to %s %s!"), await Shknam(shkp), angrytexts[rn2(3)], genders[pronoun_gender(shkp, 3)].his, shtypes[rt - 14 /* SHOPBASE */ | 0].name);
         }
     } else if (eshkp.surcharge) {
         if (!(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf) && !(shkp.msleeping | 0 || !shkp.mcanmove || shkp.data.msound <= 17 /* MS_ANIMAL */)) {
@@ -1250,7 +1250,7 @@ export async function dopay() {   // shk.c:1743
         await rouse_shk(shkp, 1);
     }
     if (shkp.msleeping | 0 || !shkp.mcanmove) {
-        await pline($c.lit("%s %s."), await Shknam(shkp), (rng_log_enabled() ? (rng_log_set_caller($c.lit("shk.c"), 1865, $c.lit("dopay")), rn2(2)) : rn2(2)) ? $c.lit("seems to be napping") : $c.lit("doesn't respond"));
+        await pline($c.lit("%s %s."), await Shknam(shkp), rn2(2) ? $c.lit("seems to be napping") : $c.lit("doesn't respond"));
         return 0;
     }
     if (!$c.peq(shkp, resident) && shkp.mpeaceful | 0) {
@@ -1314,7 +1314,7 @@ export async function dopay() {   // shk.c:1743
             }
             await You($c.lit("try to appease %s by giving %s 1000 gold pieces."), canseemon(shkp) || sensemon(shkp) ? await x_monnam(shkp, 1, $c.lit("angry"), 0, 0) : await shkname(shkp), genders[pronoun_gender(shkp, 3)].him);
             await pay(1000, shkp);
-            if ($c.strncmp(new $c.Ptr(eshkp.customer, 0), new $c.Ptr(svp.plname, 0), 32) || (rng_log_enabled() ? (rng_log_set_caller($c.lit("shk.c"), 1938, $c.lit("dopay")), rn2(3)) : rn2(3))) {
+            if ($c.strncmp(new $c.Ptr(eshkp.customer, 0), new $c.Ptr(svp.plname, 0), 32) || rn2(3)) {
                 await make_happy_shk(shkp, 0);
             } else {
                 await pline($c.lit("But %s is as angry as ever."), await shkname(shkp));
@@ -1722,7 +1722,7 @@ async function inherits(shkp, numsk, croaked, silently) {   // shk.c:2577
             if (numsk > 1) {
                 if ((gv.viz_array.get(shkp.my).get(shkp.mx) & 2) !== 0 && croaked && !silently) {
                     takes[0] = 0;
-                    if ($c.andu64(shkp.data.mflags1, 32768) === 0 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("shk.c"), 2600, $c.lit("inherits")), rn2(2)) : rn2(2))) {
+                    if ($c.andu64(shkp.data.mflags1, 32768) === 0 && !rn2(2)) {
                         $c.__builtin___sprintf_chk(new $c.Ptr(takes, 0), 0, 256, $c.lit(", shakes %s %s,"), genders[pronoun_gender(shkp, 3)].his, await mbodypart(shkp, 8 /* HEAD */));
                     }
                     await pline($c.lit("%s %slooks at your corpse%s and %s."), await Shknam(shkp), shkp.msleeping | 0 || !shkp.mcanmove ? $c.lit("wakes up, ") : $c.lit(""), new $c.Ptr(takes, 0), !inhishop(shkp) ? $c.lit("disappears") : $c.lit("sighs"));
@@ -2399,7 +2399,7 @@ export async function addtobill(obj, ininv, dummy, silent) {   // shk.c:3490
     }
 }
 function append_honorific(buf) {   // shk.c:3602
-    $c.__builtin___strcat_chk(buf, append_honorific$honored[(rng_log_enabled() ? (rng_log_set_caller($c.lit("shk.c"), 3611, $c.lit("append_honorific")), rn2(4)) : rn2(4)) + (u.uevent.udemigod | 0) | 0], -1);
+    $c.__builtin___strcat_chk(buf, append_honorific$honored[rn2(4) + (u.uevent.udemigod | 0) | 0], -1);
     if (gy.youmonst.data.mlet === 48 /* S_VAMPIRE */) {
         $c.__builtin___strcat_chk(buf, flags.female ? $c.lit(" dark lady") : $c.lit(" dark lord"), -1);
     } else if (u.umonnum !== u.umonster ? $c.andu64(gy.youmonst.data.mflags2, 16) !== 0 : gu.urace.mnum === 264) {
@@ -3169,7 +3169,7 @@ async function litter_scatter(litter, x, y, shkp) {   // shk.c:4622
                 await obfree(otmp, null);
             } else {
                 trylimit = 10;
-                i = rng_log_enabled() ? (rng_log_set_caller($c.lit("shk.c"), 4661, $c.lit("litter_scatter")), rn2(9)) : rn2(9);
+                i = rn2(9);
                 do {
                     i = $c.rem32(i + 1 | 0, 9);
                 } while ((trylimit = trylimit - 1 | 0) && !((litter.get(i) & 4) >>> 0));
@@ -3289,7 +3289,7 @@ async function repair_damage(shkp, tmp_dam, catchup) {   // shk.c:4732
     } else if (tmp_dam.typ && tmp_dam.typ <= 12 /* DBWALL */) {
         if (inside_shop(u.ux, u.uy) === shkp.mextra.eshk.shoproom) {
             await You_feel($c.lit("more claustrophobic than before."));
-        } else if (!(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("shk.c"), 4833, $c.lit("repair_damage")), rn2(10)) : rn2(10))) {
+        } else if (!(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf) && !rn2(10)) {
             await Norep($c.lit("The dungeon acoustics noticeably change."));
         }
     }
@@ -3352,7 +3352,7 @@ export async function shk_move(shkp) {   // shk.c:4880
                     await pline($c.lit("%s holds out %s upturned %s."), await Shknam(shkp), genders[pronoun_gender(shkp, 3)].his, await mbodypart(shkp, 6 /* HAND */));
                 }
                 gf.followmsg = svm.moves;
-                if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("shk.c"), 4924, $c.lit("shk_move")), rn2(9)) : rn2(9))) {
+                if (!rn2(9)) {
                     await pline($c.lit("%s doesn't like customers who don't pay."), await Shknam(shkp));
                     rile_shk(shkp);
                 }
@@ -3494,7 +3494,7 @@ export async function shopdig(fall) {   // shk.c:5019
 }
 async function makekops(mm) {   // shk.c:5113
     let k_cnt = new Int32Array(4), cnt = 0, mndx = 0, k = 0, $t1, $t2;
-    $t1 = cnt = $c.abs(depth(u.uz)) + (rng_log_enabled() ? (rng_log_set_caller($c.lit("shk.c"), 5119, $c.lit("makekops")), rnd(5)) : rnd(5)) | 0, k_cnt[0] = $t1;
+    $t1 = cnt = $c.abs(depth(u.uz)) + rnd(5) | 0, k_cnt[0] = $t1;
     k_cnt[1] = $c.div32(cnt, 3) + 1 | 0;
     k_cnt[2] = $c.div32(cnt, 6);
     k_cnt[3] = $c.div32(cnt, 9);
@@ -3524,14 +3524,14 @@ async function getcad(shkp, dmgstr, x, y, uinshp, animal, pursue) {   // shk.c:5
         if (!(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf)) {
             await verbalize($c.lit("How dare you %s my %s?"), dmgstr, dugwall ? $c.lit("shop") : $c.lit("door"));
         } else {
-            await pline($c.lit("%s is %s that you decided to %s %s %s!"), await Shknam(shkp), angrytexts[rng_log_enabled() ? (rng_log_set_caller($c.lit("shk.c"), 5155, $c.lit("getcad")), rn2(3)) : rn2(3)], dmgstr, genders[pronoun_gender(shkp, 3)].his, dugwall ? $c.lit("shop") : $c.lit("door"));
+            await pline($c.lit("%s is %s that you decided to %s %s %s!"), await Shknam(shkp), angrytexts[rn2(3)], dmgstr, genders[pronoun_gender(shkp, 3)].his, dugwall ? $c.lit("shop") : $c.lit("door"));
         }
     } else {
         if (!(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf)) {
             await pline($c.lit("%s shouts:"), await Shknam(shkp));
             await verbalize($c.lit("Who dared %s my %s?"), dmgstr, dugwall ? $c.lit("shop") : $c.lit("door"));
         } else {
-            await pline($c.lit("%s is %s that someone decided to %s %s %s!"), await Shknam(shkp), angrytexts[rng_log_enabled() ? (rng_log_set_caller($c.lit("shk.c"), 5166, $c.lit("getcad")), rn2(3)) : rn2(3)], dmgstr, genders[pronoun_gender(shkp, 3)].his, dugwall ? $c.lit("shop") : $c.lit("door"));
+            await pline($c.lit("%s is %s that someone decided to %s %s %s!"), await Shknam(shkp), angrytexts[rn2(3)], dmgstr, genders[pronoun_gender(shkp, 3)].his, dugwall ? $c.lit("shop") : $c.lit("door"));
         }
     }
     hot_pursuit(shkp);
@@ -3571,7 +3571,7 @@ export async function pay_for_damage(dmgstr, cant_mollify) {   // shk.c:5174
                 continue;
             }
             if (shk_distance === nearest_shk && picks) {
-                if (rng_log_enabled() ? (rng_log_set_caller($c.lit("shk.c"), 5218, $c.lit("pay_for_damage")), rn2(picks = picks + 1 | 0)) : rn2(picks = picks + 1 | 0)) {
+                if (rn2(picks = picks + 1 | 0)) {
                     continue;
                 }
             } else {
@@ -3628,7 +3628,7 @@ export async function pay_for_damage(dmgstr, cant_mollify) {   // shk.c:5174
         }
         await mnearto(shkp, x, y, 1, 2);
     }
-    if (um_dist(x, y, 1) && !uinshp || cant_mollify || $c.add64(money_cnt(gi.invent), shkp.mextra.eshk.credit) < cost_of_damage || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("shk.c"), 5297, $c.lit("pay_for_damage")), rn2(50)) : rn2(50))) {
+    if (um_dist(x, y, 1) && !uinshp || cant_mollify || $c.add64(money_cnt(gi.invent), shkp.mextra.eshk.credit) < cost_of_damage || !rn2(50)) {
         await getcad(shkp, dmgstr, x, y, uinshp, animal, pursue);
         return;
     }
@@ -3750,8 +3750,8 @@ export async function price_quote(first_obj) {   // shk.c:5406
 }
 function shk_embellish(itm, cost) {   // shk.c:5468
     let o = 0, choice = 0;
-    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("shk.c"), 5470, $c.lit("shk_embellish")), rn2(3)) : rn2(3))) {
-        choice = rng_log_enabled() ? (rng_log_set_caller($c.lit("shk.c"), 5471, $c.lit("shk_embellish")), rn2(5)) : rn2(5);
+    if (!rn2(3)) {
+        choice = rn2(5);
         if (choice === 0) {
             choice = cost < 100 ? 1 : cost < 500 ? 2 : 3;
         }
@@ -3822,7 +3822,7 @@ export async function shk_chat(shkp) {   // shk.c:5521
         await pline($c.lit("%s %s that business is good."), await Shknam(shkp), !(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf) && !(shkp.msleeping | 0 || !shkp.mcanmove || shkp.data.msound <= 17 /* MS_ANIMAL */) ? $c.lit("says") : $c.lit("indicates"));
     } else if (is_izchak(shkp, 0)) {
         if (!(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf) && !(shkp.msleeping | 0 || !shkp.mcanmove || shkp.data.msound <= 17 /* MS_ANIMAL */)) {
-            await pline(Izchak_speaks[rng_log_enabled() ? (rng_log_set_caller($c.lit("shk.c"), 5596, $c.lit("shk_chat")), rn2(9)) : rn2(9)], await shkname(shkp));
+            await pline(Izchak_speaks[rn2(9)], await shkname(shkp));
         }
     } else {
         if (!(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf) && !(shkp.msleeping | 0 || !shkp.mcanmove || shkp.data.msound <= 17 /* MS_ANIMAL */)) {
@@ -3897,24 +3897,24 @@ export async function check_unpaid_usage(otmp, altusage) {   // shk.c:5688
     if (otmp.oclass === 10 /* SPBOOK_CLASS */) {
         fmt = $c.lit("%sYou owe%s %ld %s.");
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("This is no free library, %s!  "), await cad(0));
-        arg1 = (rng_log_enabled() ? (rng_log_set_caller($c.lit("shk.c"), 5708, $c.lit("check_unpaid_usage")), rn2(2)) : rn2(2)) ? new $c.Ptr(buf, 0) : $c.lit("");
+        arg1 = rn2(2) ? new $c.Ptr(buf, 0) : $c.lit("");
         arg2 = shkp.mextra.eshk.debit > 0 ? $c.lit(" an additional") : $c.lit("");
     } else if (otmp.otyp === 321 /* POT_OIL */) {
         fmt = $c.lit("%s%sThat will cost you %ld %s (Yendorian Fuel Tax).");
     } else if (altusage && (otmp.otyp === 220 /* BAG_OF_TRICKS */ || otmp.otyp === 252 /* HORN_OF_PLENTY */)) {
         fmt = $c.lit("%s%sEmptying that will cost you %ld %s.");
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("shk.c"), 5715, $c.lit("check_unpaid_usage")), rn2(3)) : rn2(3))) {
+        if (!rn2(3)) {
             arg1 = $c.lit("Whoa!  ");
         }
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("shk.c"), 5717, $c.lit("check_unpaid_usage")), rn2(3)) : rn2(3))) {
+        if (!rn2(3)) {
             arg1 = $c.lit("Watch it!  ");
         }
     } else {
         fmt = $c.lit("%s%sUsage fee, %ld %s.");
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("shk.c"), 5721, $c.lit("check_unpaid_usage")), rn2(3)) : rn2(3))) {
+        if (!rn2(3)) {
             arg1 = $c.lit("Hey!  ");
         }
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("shk.c"), 5723, $c.lit("check_unpaid_usage")), rn2(3)) : rn2(3))) {
+        if (!rn2(3)) {
             arg2 = $c.lit("Ahem.  ");
         }
     }

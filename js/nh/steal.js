@@ -29,7 +29,7 @@ import { You, Your, impossible, pline, pline_mon, urgent_pline } from './pline.j
 import { body_part, mbodypart, skinback } from './polyself.js';
 import { is_quest_artifact } from './questpgr.js';
 import { unpunish } from './read.js';
-import { rn2, rnd, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { rn2, rnd } from './rnd.js';
 import { costly_spot, find_objowner, obfree, shop_keeper, subfrombill } from './shk.js';
 import { rloc, rloco, tele_restrict } from './teleport.js';
 import { minstapetrify, openholdingtrap, unconscious } from './trap.js';
@@ -43,17 +43,17 @@ export function somegold(lmoney) {   // steal.c:14
     igold = lmoney >= 32767 ? 32767 : $c.i32(lmoney);
     if (igold < 50) {
     } else if (igold < 100) {
-        igold = (rng_log_enabled() ? (rng_log_set_caller($c.lit("steal.c"), 21, $c.lit("somegold")), rn2((igold - 25 | 0) + 1 | 0)) : rn2((igold - 25 | 0) + 1 | 0)) + 25 | 0;
+        igold = rn2((igold - 25 | 0) + 1 | 0) + 25 | 0;
     } else if (igold < 500) {
-        igold = (rng_log_enabled() ? (rng_log_set_caller($c.lit("steal.c"), 23, $c.lit("somegold")), rn2((igold - 50 | 0) + 1 | 0)) : rn2((igold - 50 | 0) + 1 | 0)) + 50 | 0;
+        igold = rn2((igold - 50 | 0) + 1 | 0) + 50 | 0;
     } else if (igold < 1000) {
-        igold = (rng_log_enabled() ? (rng_log_set_caller($c.lit("steal.c"), 25, $c.lit("somegold")), rn2((igold - 100 | 0) + 1 | 0)) : rn2((igold - 100 | 0) + 1 | 0)) + 100 | 0;
+        igold = rn2((igold - 100 | 0) + 1 | 0) + 100 | 0;
     } else if (igold < 5000) {
-        igold = (rng_log_enabled() ? (rng_log_set_caller($c.lit("steal.c"), 27, $c.lit("somegold")), rn2((igold - 500 | 0) + 1 | 0)) : rn2((igold - 500 | 0) + 1 | 0)) + 500 | 0;
+        igold = rn2((igold - 500 | 0) + 1 | 0) + 500 | 0;
     } else if (igold < 10000) {
-        igold = (rng_log_enabled() ? (rng_log_set_caller($c.lit("steal.c"), 29, $c.lit("somegold")), rn2((igold - 1000 | 0) + 1 | 0)) : rn2((igold - 1000 | 0) + 1 | 0)) + 1000 | 0;
+        igold = rn2((igold - 1000 | 0) + 1 | 0) + 1000 | 0;
     } else {
-        igold = (rng_log_enabled() ? (rng_log_set_caller($c.lit("steal.c"), 31, $c.lit("somegold")), rn2((igold - 5000 | 0) + 1 | 0)) : rn2((igold - 5000 | 0) + 1 | 0)) + 5000 | 0;
+        igold = rn2((igold - 5000 | 0) + 1 | 0) + 5000 | 0;
     }
     return igold;
 }
@@ -72,7 +72,7 @@ export async function stealgold(mtmp) {   // steal.c:58
         fgold = fgold.v.v_nexthere;
     }
     ygold = findgold(gi.invent);
-    if (fgold && (!ygold || fgold.quan > ygold.quan || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("steal.c"), 73, $c.lit("stealgold")), rn2(5)) : rn2(5)))) {
+    if (fgold && (!ygold || fgold.quan > ygold.quan || !rn2(5))) {
         await obj_extract_self(fgold);
         await add_to_minv(mtmp, fgold);
         await newsym(u.ux, u.uy);
@@ -92,7 +92,7 @@ export async function stealgold(mtmp) {   // steal.c:58
             what = what.add(5);
         }
         await pline($c.lit("%s quickly snatches some gold from %s %s %s!"), await Monnam(mtmp), (u.uprops[48 /* LEVITATION */].intrinsic || u.uprops[48 /* LEVITATION */].extrinsic) && !u.uprops[48 /* LEVITATION */].blocked || (u.uprops[49 /* FLYING */].intrinsic || u.uprops[49 /* FLYING */].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, 1) !== 0) && !u.uprops[49 /* FLYING */].blocked ? $c.lit("beneath") : $c.lit("between"), whose, what);
-        if (!ygold || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("steal.c"), 94, $c.lit("stealgold")), rn2(5)) : rn2(5))) {
+        if (!ygold || !rn2(5)) {
             if (!await tele_restrict(mtmp)) {
                 await rloc(mtmp, 2);
             }
@@ -290,10 +290,10 @@ export async function steal(mtmp, objnambuf) {   // steal.c:343
         case "nothing_to_steal":
             if ($goto === "nothing_to_steal" || (!icnt || icnt === 1 && $G.uskin)) {
                 $goto = null;   // nothing_to_steal:
-                if ($G.uball !== null && !monkey_business && (rng_log_enabled() ? (rng_log_set_caller($c.lit("steal.c"), 379, $c.lit("steal")), rn2(4)) : rn2(4))) {
+                if ($G.uball !== null && !monkey_business && rn2(4)) {
                     (!(!$c.peq($G.uball, $c.asRec(null, $T.obj, 112)) && $G.uball.where === 1) ? 1 : 0) ? $c.__assert_rtn($c.lit("steal"), $c.lit("steal.c"), 381, $c.lit("uball != NULL && uball->where == OBJ_FLOOR")) : 0;
                     await worn_item_removal(mtmp, $G.uchain);
-                } else if (u.utrap && u.utraptype === 6 && !monkey_business && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("steal.c"), 384, $c.lit("steal")), rn2(4)) : rn2(4))) {
+                } else if (u.utrap && u.utraptype === 6 && !monkey_business && !rn2(4)) {
                     await pline($c.lit("%s takes off your unseen chain."), new $c.Ptr(Monnambuf, 0));
                     await openholdingtrap(gy.youmonst, new $c.Ptr(dummy, 0));
                 } else if ((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked) {
@@ -324,7 +324,7 @@ export async function steal(mtmp, objnambuf) {   // steal.c:343
             if (!tmp) {
                 $goto = "nothing_to_steal"; continue D1;
             }
-            tmp = rng_log_enabled() ? (rng_log_set_caller($c.lit("steal.c"), 421, $c.lit("steal")), rn2(tmp)) : rn2(tmp);
+            tmp = rn2(tmp);
             for (otmp = gi.invent; otmp; otmp = otmp.nobj) {
                 if ((!$G.uarm || !$c.peq(otmp, $G.uarmc)) && !$c.peq(otmp, $G.uskin) && otmp.oclass !== 12 /* COIN_CLASS */) {
                     tmp = tmp - ($c.and64(otmp.owornmask, 983167) ? 5 : 1) | 0;
@@ -379,8 +379,8 @@ export async function steal(mtmp, objnambuf) {   // steal.c:343
                                 case null:
                                 case "cant_take":
                                     $goto = null;   // cant_take:
-                                    await pline($c.lit("%s tries to %s %s%s but gives up."), new $c.Ptr(Monnambuf, 0), steal$how[rng_log_enabled() ? (rng_log_set_caller($c.lit("steal.c"), 481, $c.lit("steal")), rn2(4)) : rn2(4)], $c.and64(otmp.owornmask, 127) ? $c.lit("your ") : $c.lit(""), $c.and64(otmp.owornmask, 127) ? await armor_simple_name(otmp) : await yname(otmp));
-                                    return !(rng_log_enabled() ? (rng_log_set_caller($c.lit("steal.c"), 488, $c.lit("steal")), rn2($c.div32(inv_cnt(0), 5) + 2 | 0)) : rn2($c.div32(inv_cnt(0), 5) + 2 | 0)) ? 1 : 0;
+                                    await pline($c.lit("%s tries to %s %s%s but gives up."), new $c.Ptr(Monnambuf, 0), steal$how[rn2(4)], $c.and64(otmp.owornmask, 127) ? $c.lit("your ") : $c.lit(""), $c.and64(otmp.owornmask, 127) ? await armor_simple_name(otmp) : await yname(otmp));
+                                    return !rn2($c.div32(inv_cnt(0), 5) + 2 | 0) ? 1 : 0;
                                 }
                                 break;
                             }
@@ -412,7 +412,7 @@ export async function steal(mtmp, objnambuf) {   // steal.c:343
                             armordelay = olddelay;
                         }
                         if (monkey_business || unresponsive()) {
-                            if (armordelay >= 1 && !olddelay && (rng_log_enabled() ? (rng_log_set_caller($c.lit("steal.c"), 521, $c.lit("steal")), rn2(10)) : rn2(10))) {
+                            if (armordelay >= 1 && !olddelay && rn2(10)) {
                                 $goto = "cant_take"; continue D1;
                             }
                             await worn_item_removal(mtmp, otmp);
@@ -537,7 +537,7 @@ export async function stealamulet(mtmp) {   // steal.c:689
         }
     }
     if (n > 1) {
-        n = rng_log_enabled() ? (rng_log_set_caller($c.lit("steal.c"), 702, $c.lit("stealamulet")), rnd(n)) : rnd(n);
+        n = rnd(n);
         for (otmp = gi.invent; otmp; otmp = otmp.nobj) {
             if (otmp.oartifact >= 21 /* ART_ORB_OF_DETECTION */ && !(n = n - 1 | 0)) {
                 break;
@@ -564,7 +564,7 @@ export async function stealamulet(mtmp) {   // steal.c:689
             }
         }
         if (n > 1) {
-            n = rng_log_enabled() ? (rng_log_set_caller($c.lit("steal.c"), 728, $c.lit("stealamulet")), rnd(n)) : rnd(n);
+            n = rnd(n);
             for (otmp = gi.invent; otmp; otmp = otmp.nobj) {
                 if ((otmp.otyp === real || otmp.otyp === fake && !mtmp.iswiz) && !(n = n - 1 | 0)) {
                     break;

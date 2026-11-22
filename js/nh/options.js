@@ -27,7 +27,7 @@ import { obj_descr, objects } from './objects.js';
 import { fruit_from_name, makeplural, makesingular } from './objnam.js';
 import { You_cant, impossible, pline, raw_printf } from './pline.js';
 import { regex_compile, regex_error_desc, regex_free, regex_init, regex_match } from './posixregex.js';
-import { init_random, rn2, rn2_on_display_rng, rnd, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { init_random, rn2, rn2_on_display_rng, rnd } from './rnd.js';
 import { aligns, clearrolefilter, genders, races, rolefilterstring, roles, setrolefilter, str2align, str2gend, str2race, str2role } from './role.js';
 import { sf_init } from './sfbase.js';
 import { assign_soundlib, get_soundlib_name, soundlib_id_from_opt } from './sounds.js';
@@ -5002,7 +5002,7 @@ export async function fruitadd(str, replace_fruit) {   // options.c:8170
             break nonew$;
         }
         if (highest_fruit_id[0] >= 127) {
-            return rng_log_enabled() ? (rng_log_set_caller($c.lit("options.c"), 8273, $c.lit("fruitadd")), rnd(127)) : rnd(127);
+            return rnd(127);
         }
         f = $c.asRec(await alloc(48), $T.fruit, 48);
         $c.__builtin___memset_chk(f, 0, 48, -1);

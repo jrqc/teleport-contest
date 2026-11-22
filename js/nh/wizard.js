@@ -21,7 +21,7 @@ import { Tobjnam, distant_name, doname } from './objnam.js';
 import { You, You_feel, pline, verbalize } from './pline.js';
 import { inhistemple, mon_aligntyp } from './priest.js';
 import { com_pager } from './questpgr.js';
-import { rn2, rnd, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { rn2, rnd } from './rnd.js';
 import { inhishop } from './shk.js';
 import { rndcurse } from './sit.js';
 import { stairway_find_type_dir } from './stairs.js';
@@ -34,7 +34,7 @@ const random_insult = $c.nulls(28);
 const random_malediction = $c.nulls(11);
 export async function amulet() {   // wizard.c:61
     let mtmp = null, ttmp = null, amu = null, du = 0;
-    if (((amu = $G.uamul) !== null && amu.otyp === 213 /* AMULET_OF_YENDOR */ || (amu = $G.uwep) !== null && amu.otyp === 213 /* AMULET_OF_YENDOR */) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("wizard.c"), 73, $c.lit("amulet")), rn2(15)) : rn2(15))) {
+    if (((amu = $G.uamul) !== null && amu.otyp === 213 /* AMULET_OF_YENDOR */ || (amu = $G.uwep) !== null && amu.otyp === 213 /* AMULET_OF_YENDOR */) && !rn2(15)) {
         for (ttmp = gf.ftrap; ttmp; ttmp = ttmp.ntrap) {
             if ((ttmp.ttyp | 0) === 17 /* MAGIC_PORTAL */) {
                 du = dist2(ttmp.tx, ttmp.ty, u.ux, u.uy);
@@ -56,7 +56,7 @@ export async function amulet() {   // wizard.c:61
         if (mtmp.mhp < 1) {
             continue;
         }
-        if (mtmp.iswiz | 0 && mtmp.msleeping | 0 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("wizard.c"), 95, $c.lit("amulet")), rn2(40)) : rn2(40))) {
+        if (mtmp.iswiz | 0 && mtmp.msleeping | 0 && !rn2(40)) {
             mtmp.msleeping = (0) & 1;
             if (!(dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 2)) {
                 await You($c.lit("get the creepy feeling that somebody noticed your taking the Amulet."));
@@ -269,7 +269,7 @@ export async function tactics(mtmp) {   // wizard.c:369
             await choose_stairs(new $c.Ptr(sx, 0), new $c.Ptr(sy, 0), $c.i8($c.remu32(mtmp.m_id, 2)));
             mtmp.mavenge = (1) & 1;
             if (await In_W_tower(mx, my, u.uz) || mtmp.iswiz | 0 && !sx[0] && !mon_has_amulet(mtmp)) {
-                if (!await noteleport_level(mtmp) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("wizard.c"), 390, $c.lit("tactics")), rn2(3 + $c.div32(mtmp.mhp, 10) | 0)) : rn2(3 + $c.div32(mtmp.mhp, 10) | 0))) {
+                if (!await noteleport_level(mtmp) && !rn2(3 + $c.div32(mtmp.mhp, 10) | 0)) {
                     await rloc(mtmp, 2);
                 }
             } else if (sx[0] && (mx !== sx[0] || my !== sy[0])) {
@@ -281,12 +281,12 @@ export async function tactics(mtmp) {   // wizard.c:369
             }
             if (dist2(mx, my, u.ux, u.uy) > 64) {
                 if (mtmp.mhp <= (mtmp.mhpmax - 8 | 0)) {
-                    await healmon(mtmp, rng_log_enabled() ? (rng_log_set_caller($c.lit("wizard.c"), 406, $c.lit("tactics")), rnd(8)) : rnd(8), 0);
+                    await healmon(mtmp, rnd(8), 0);
                     return 1;
                 }
             }
         case 0:
-            if (!await noteleport_level(mtmp) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("wizard.c"), 413, $c.lit("tactics")), rn2(!mtmp.mflee ? 5 : 33)) : rn2(!mtmp.mflee ? 5 : 33))) {
+            if (!await noteleport_level(mtmp) && !rn2(!mtmp.mflee ? 5 : 33)) {
                 await mnexto(mtmp, 2);
             }
             return 0;
@@ -323,7 +323,7 @@ export async function tactics(mtmp) {   // wizard.c:369
                             return 0;
                         }
                     } else {
-                        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("wizard.c"), 453, $c.lit("tactics")), rn2(5)) : rn2(5)) && !await noteleport_level(mtmp)) {
+                        if (!rn2(5) && !await noteleport_level(mtmp)) {
                             await mnexto(mtmp, 2);
                         }
                         return 0;
@@ -370,7 +370,7 @@ export async function aggravate() {   // wizard.c:494
         }
         mtmp.mstrategy = $c.andu64(mtmp.mstrategy, 18446744071025197055n);
         mtmp.msleeping = (0) & 1;
-        if (!mtmp.mcanmove && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("wizard.c"), 506, $c.lit("aggravate")), rn2(5)) : rn2(5))) {
+        if (!mtmp.mcanmove && !rn2(5)) {
             mtmp.mfrozen = (0) & 127;
             mtmp.mcanmove = (1) & 1;
         }
@@ -380,21 +380,21 @@ export async function clonewiz() {   // wizard.c:517
     let mtmp2 = null, $t1, $t2, $t3;
     if ((mtmp2 = await makemon($c.relem(mons, 285 /* PM_WIZARD_OF_YENDOR */), u.ux, u.uy, 2)) !== null) {
         $t2 = ($t1 = $c.i8(mtmp2.mpeaceful = (0) & 1), mtmp2.mtame = $t1) >>> 0, mtmp2.msleeping = ($t2) & 1;
-        if (!u.uhave.amulet && (rng_log_enabled() ? (rng_log_set_caller($c.lit("wizard.c"), 524, $c.lit("clonewiz")), rn2(2)) : rn2(2))) {
+        if (!u.uhave.amulet && rn2(2)) {
             await add_to_minv(mtmp2, await mksobj(212 /* FAKE_AMULET_OF_YENDOR */, 1, 0));
         }
         if (!(u.uprops[60 /* PROT_FROM_SHAPE_CHANGERS */].intrinsic || u.uprops[60 /* PROT_FROM_SHAPE_CHANGERS */].extrinsic)) {
             mtmp2.m_ap_type = 3;
-            $t3 = wizapp[rng_log_enabled() ? (rng_log_set_caller($c.lit("wizard.c"), 530, $c.lit("clonewiz")), rn2(12)) : rn2(12)], mtmp2.mappearance = $t3;
+            $t3 = wizapp[rn2(12)], mtmp2.mappearance = $t3;
         }
         await newsym(mtmp2.mx, mtmp2.my);
     }
 }
 export function pick_nasty(difcap) {   // wizard.c:538
     let alt = 0, res = 0, mnam = null, lastspace = null;
-    res = nasties[rng_log_enabled() ? (rng_log_set_caller($c.lit("wizard.c"), 541, $c.lit("pick_nasty")), rn2(44)) : rn2(44)];
+    res = nasties[rn2(44)];
     if ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) && !(65 <= def_monsyms[$c.relem(mons, res).mlet].sym && def_monsyms[$c.relem(mons, res).mlet].sym <= 90)) {
-        res = nasties[rng_log_enabled() ? (rng_log_set_caller($c.lit("wizard.c"), 551, $c.lit("pick_nasty")), rn2(44)) : rn2(44)];
+        res = nasties[rn2(44)];
     }
     alt = res;
     if ((svm.mvitals[res].mvflags & 2) !== 0 || difcap > 0 && mons[res].difficulty >= difcap || (mons[res].geno & (In_hell(u.uz) ? 2048 : 1024)) !== 0) {
@@ -413,7 +413,7 @@ export async function nasty(summoner) {   // wizard.c:591
     let mtmp = null, bypos = new $T.nhcoord(), i = 0, j = 0, count = 0, census = 0, tmp = 0, makeindex = 0, s_cls = 0, m_cls = 0, difcap = 0, trylimit = 0, castalign = 0, mmflags = 0, $t1, $t2, $t3;
     mmflags = $c.u32(summoner ? 131072 : 0);
     census = monster_census(0);
-    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("wizard.c"), 607, $c.lit("nasty")), rn2(10)) : rn2(10)) && In_hell(u.uz)) {
+    if (!rn2(10) && In_hell(u.uz)) {
         count = await msummon(null);
     } else {
         count = 0;
@@ -423,7 +423,7 @@ export async function nasty(summoner) {   // wizard.c:591
         tmp = u.ulevel > 3 ? $c.div32(u.ulevel, 3) : 1;
         bypos.x = u.ux;
         bypos.y = u.uy;
-        for (i = rng_log_enabled() ? (rng_log_set_caller($c.lit("wizard.c"), 620, $c.lit("nasty")), rnd(tmp)) : rnd(tmp); i > 0 && count < 10; i = i - 1 | 0) {
+        for (i = rnd(tmp); i > 0 && count < 10; i = i - 1 | 0) {
             for (j = 0; j < 20; j = j + 1 | 0) {
                 trylimit = 11;
                 nextj$: {
@@ -443,7 +443,7 @@ export async function nasty(summoner) {   // wizard.c:591
                     } else {
                         if ((mtmp = await makemon(null, bypos.x, bypos.y, mmflags)) !== null) {
                             m_cls = mtmp.data.mlet;
-                            if (difcap > 0 && mtmp.data.difficulty >= difcap && (rng_log_enabled() ? (rng_log_set_caller($c.lit("wizard.c"), 673, $c.lit("nasty")), rn2(u.uz.dnum === svd.dungeon_topology.d_astral_level.dnum ? 3 : 7)) : rn2(u.uz.dnum === svd.dungeon_topology.d_astral_level.dnum ? 3 : 7)) && attacktype(mtmp.data, 255) || s_cls === 56 /* S_DEMON */ && m_cls === 27 /* S_ANGEL */ || s_cls === 27 /* S_ANGEL */ && m_cls === 56 /* S_DEMON */) {
+                            if (difcap > 0 && mtmp.data.difficulty >= difcap && rn2(u.uz.dnum === svd.dungeon_topology.d_astral_level.dnum ? 3 : 7) && attacktype(mtmp.data, 255) || s_cls === 56 /* S_DEMON */ && m_cls === 27 /* S_ANGEL */ || s_cls === 27 /* S_ANGEL */ && m_cls === 56 /* S_DEMON */) {
                                 mtmp = await unmakemon(mtmp, 0);
                             }
                         }
@@ -455,7 +455,7 @@ export async function nasty(summoner) {   // wizard.c:591
                                 difcap = tmp;
                             }
                         }
-                        $t3 = rng_log_enabled() ? (rng_log_set_caller($c.lit("wizard.c"), 695, $c.lit("nasty")), rnd(4)) : rnd(4), mtmp.mspec_used = $t3;
+                        $t3 = rnd(4), mtmp.mspec_used = $t3;
                         if ((count = count + 1 | 0) >= 10 || mtmp.data.maligntyp === 0 || sgn(mtmp.data.maligntyp) === castalign) {
                             break;
                         }
@@ -487,7 +487,7 @@ export async function resurrect() {   // wizard.c:715
                     elapsed = 32766;
                 }
                 elapsed = $c.div64(elapsed, 50);
-                if (mtmp.msleeping | 0 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("wizard.c"), 742, $c.lit("resurrect")), rn2($c.i32(elapsed) + 1 | 0)) : rn2($c.i32(elapsed) + 1 | 0))) {
+                if (mtmp.msleeping | 0 && rn2($c.i32(elapsed) + 1 | 0)) {
                     mtmp.msleeping = (0) & 1;
                 }
                 if ((mtmp.mfrozen | 0) === 1) {
@@ -517,7 +517,7 @@ export async function resurrect() {   // wizard.c:715
 }
 export async function intervene() {   // wizard.c:785
     let which = 0;
-    which = (svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level) ? rng_log_enabled() ? (rng_log_set_caller($c.lit("wizard.c"), 787, $c.lit("intervene")), rnd(4)) : rnd(4) : rng_log_enabled() ? (rng_log_set_caller($c.lit("wizard.c"), 787, $c.lit("intervene")), rn2(6)) : rn2(6);
+    which = (svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level) ? rnd(4) : rn2(6);
     switch (which) {
         case 0:
         case 1:
@@ -545,7 +545,7 @@ export function wizdeadorgone() {   // wizard.c:815
     svc.context.no_of_wizards = svc.context.no_of_wizards - 1 >>> 0;
     if (!u.uevent.udemigod) {
         u.uevent.udemigod = (1) & 1;
-        $t1 = ((rng_log_enabled() ? (rng_log_set_caller($c.lit("wizard.c"), 820, $c.lit("wizdeadorgone")), rn2(250)) : rn2(250)) + 50 | 0) >>> 0, u.udg_cnt = $t1;
+        $t1 = (rn2(250) + 50 | 0) >>> 0, u.udg_cnt = $t1;
     }
 }
 export async function cuss(mtmp) {   // wizard.c:846
@@ -553,21 +553,21 @@ export async function cuss(mtmp) {   // wizard.c:846
         return;
     }
     if (mtmp.iswiz) {
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("wizard.c"), 851, $c.lit("cuss")), rn2(5)) : rn2(5))) {
+        if (!rn2(5)) {
             await pline($c.lit("%s laughs fiendishly."), await Monnam(mtmp));
-        } else if (u.uhave.amulet | 0 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("wizard.c"), 853, $c.lit("cuss")), rn2(28)) : rn2(28))) {
-            await verbalize($c.lit("Relinquish the amulet, %s!"), random_insult[rng_log_enabled() ? (rng_log_set_caller($c.lit("wizard.c"), 856, $c.lit("cuss")), rn2(28)) : rn2(28)]);
-        } else if (u.uhp < 5 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("wizard.c"), 857, $c.lit("cuss")), rn2(2)) : rn2(2))) {
-            await verbalize((rng_log_enabled() ? (rng_log_set_caller($c.lit("wizard.c"), 859, $c.lit("cuss")), rn2(2)) : rn2(2)) ? $c.lit("Even now thy life force ebbs, %s!") : $c.lit("Savor thy breath, %s, it be thy last!"), random_insult[rng_log_enabled() ? (rng_log_set_caller($c.lit("wizard.c"), 861, $c.lit("cuss")), rn2(28)) : rn2(28)]);
-        } else if (mtmp.mhp < 5 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("wizard.c"), 862, $c.lit("cuss")), rn2(2)) : rn2(2))) {
-            await verbalize((rng_log_enabled() ? (rng_log_set_caller($c.lit("wizard.c"), 864, $c.lit("cuss")), rn2(2)) : rn2(2)) ? $c.lit("I shall return.") : $c.lit("I'll be back."));
+        } else if (u.uhave.amulet | 0 && !rn2(28)) {
+            await verbalize($c.lit("Relinquish the amulet, %s!"), random_insult[rn2(28)]);
+        } else if (u.uhp < 5 && !rn2(2)) {
+            await verbalize(rn2(2) ? $c.lit("Even now thy life force ebbs, %s!") : $c.lit("Savor thy breath, %s, it be thy last!"), random_insult[rn2(28)]);
+        } else if (mtmp.mhp < 5 && !rn2(2)) {
+            await verbalize(rn2(2) ? $c.lit("I shall return.") : $c.lit("I'll be back."));
         } else {
-            await verbalize($c.lit("%s %s!"), random_malediction[rng_log_enabled() ? (rng_log_set_caller($c.lit("wizard.c"), 868, $c.lit("cuss")), rn2(11)) : rn2(11)], random_insult[rng_log_enabled() ? (rng_log_set_caller($c.lit("wizard.c"), 869, $c.lit("cuss")), rn2(28)) : rn2(28)]);
+            await verbalize($c.lit("%s %s!"), random_malediction[rn2(11)], random_insult[rn2(28)]);
         }
     } else if ($c.andu64(mtmp.data.mflags2, 4096) !== 0 && mon_aligntyp(mtmp) === 1 && !(mtmp.isminion | 0 && mtmp.mextra.emin.renegade)) {
         await com_pager($c.lit("angel_cuss"));
     } else {
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("wizard.c"), 877, $c.lit("cuss")), rn2($c.andu64(mtmp.data.mflags2, 4096) !== 0 ? 100 : 5)) : rn2($c.andu64(mtmp.data.mflags2, 4096) !== 0 ? 100 : 5))) {
+        if (!rn2($c.andu64(mtmp.data.mflags2, 4096) !== 0 ? 100 : 5)) {
             await pline($c.lit("%s casts aspersions on your ancestry."), await Monnam(mtmp));
         } else {
             await com_pager($c.lit("demon_cuss"));

@@ -20,7 +20,7 @@ import { obj_descr, objects } from './objects.js';
 import { Japanese_item_name } from './objnam.js';
 import { pline } from './pline.js';
 import { set_uasmon } from './polyself.js';
-import { rn2, rnd, rne, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { rn2, rnd, rne } from './rnd.js';
 import { aligns } from './role.js';
 import { initialspell, num_spells, spell_skilltype } from './spell.js';
 import { hidden_gold } from './vault.js';
@@ -111,23 +111,23 @@ async function u_init_role() {   // u_init.c:637
     switch (gu.urole.mnum) {
         case 331 /* PM_ARCHEOLOGIST */:
             await ini_inv($c.relem(Archeologist, 0));
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("u_init.c"), 654, $c.lit("u_init_role")), rn2(10)) : rn2(10))) {
+            if (!rn2(10)) {
                 await ini_inv($c.relem(Tinopener, 0));
-            } else if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("u_init.c"), 656, $c.lit("u_init_role")), rn2(4)) : rn2(4))) {
+            } else if (!rn2(4)) {
                 await ini_inv($c.relem(Lamp, 0));
-            } else if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("u_init.c"), 658, $c.lit("u_init_role")), rn2(5)) : rn2(5))) {
+            } else if (!rn2(5)) {
                 await ini_inv($c.relem(Magicmarker, 0));
             }
             await knows_object(217 /* SACK */, 0);
             await knows_object(472 /* TOUCHSTONE */, 0);
             break;
         case 332 /* PM_BARBARIAN */:
-            if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("u_init.c"), 666, $c.lit("u_init_role")), rn2(100)) : rn2(100)) >= 50) {
+            if (rn2(100) >= 50) {
                 await ini_inv($c.relem(Barbarian_0, 0));
             } else {
                 await ini_inv($c.relem(Barbarian_1, 0));
             }
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("u_init.c"), 671, $c.lit("u_init_role")), rn2(6)) : rn2(6))) {
+            if (!rn2(6)) {
                 await ini_inv($c.relem(Lamp, 0));
             }
             await knows_class(2);
@@ -137,9 +137,9 @@ async function u_init_role() {   // u_init.c:637
             await ini_inv($c.relem(Cave_man, 0));
             break;
         case 334 /* PM_HEALER */:
-            $t1 = (rng_log_enabled() ? (rng_log_set_caller($c.lit("u_init.c"), 680, $c.lit("u_init_role")), rn2(1000)) : rn2(1000)) + 1001 | 0, u.umoney0 = $t1;
+            $t1 = rn2(1000) + 1001 | 0, u.umoney0 = $t1;
             await ini_inv($c.relem(Healer, 0));
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("u_init.c"), 682, $c.lit("u_init_role")), rn2(25)) : rn2(25))) {
+            if (!rn2(25)) {
                 await ini_inv($c.relem(Lamp, 0));
             }
             await knows_object(315 /* POT_FULL_HEALING */, 0);
@@ -153,10 +153,10 @@ async function u_init_role() {   // u_init.c:637
         case 336 /* PM_MONK */:
             {
                 await ini_inv($c.relem(Monk, 0));
-                await ini_inv(u_init_role$M_spell[$c.div32(rng_log_enabled() ? (rng_log_set_caller($c.lit("u_init.c"), 699, $c.lit("u_init_role")), rn2(90)) : rn2(90), 30)]);
-                if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("u_init.c"), 700, $c.lit("u_init_role")), rn2(4)) : rn2(4))) {
+                await ini_inv(u_init_role$M_spell[$c.div32(rn2(90), 30)]);
+                if (!rn2(4)) {
                     await ini_inv($c.relem(Magicmarker, 0));
-                } else if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("u_init.c"), 702, $c.lit("u_init_role")), rn2(10)) : rn2(10))) {
+                } else if (!rn2(10)) {
                     await ini_inv($c.relem(Lamp, 0));
                 }
                 await knows_class(3);
@@ -165,9 +165,9 @@ async function u_init_role() {   // u_init.c:637
             }
         case 337 /* PM_CLERIC */:
             await ini_inv($c.relem(Priest, 0));
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("u_init.c"), 711, $c.lit("u_init_role")), rn2(5)) : rn2(5))) {
+            if (!rn2(5)) {
                 await ini_inv($c.relem(Magicmarker, 0));
-            } else if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("u_init.c"), 713, $c.lit("u_init_role")), rn2(10)) : rn2(10))) {
+            } else if (!rn2(10)) {
                 await ini_inv($c.relem(Lamp, 0));
             }
             await knows_object(322 /* POT_WATER */, 1);
@@ -179,7 +179,7 @@ async function u_init_role() {   // u_init.c:637
         case 339 /* PM_ROGUE */:
             u.umoney0 = 0;
             await ini_inv($c.relem(Rogue, 0));
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("u_init.c"), 731, $c.lit("u_init_role")), rn2(5)) : rn2(5))) {
+            if (!rn2(5)) {
                 await ini_inv($c.relem(Blindfold, 0));
             }
             await knows_object(217 /* SACK */, 0);
@@ -187,7 +187,7 @@ async function u_init_role() {   // u_init.c:637
             break;
         case 340 /* PM_SAMURAI */:
             await ini_inv($c.relem(Samurai, 0));
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("u_init.c"), 740, $c.lit("u_init_role")), rn2(5)) : rn2(5))) {
+            if (!rn2(5)) {
                 await ini_inv($c.relem(Blindfold, 0));
             }
             await knows_class(2);
@@ -202,21 +202,21 @@ async function u_init_role() {   // u_init.c:637
             }
             break;
         case 341 /* PM_TOURIST */:
-            $t2 = rng_log_enabled() ? (rng_log_set_caller($c.lit("u_init.c"), 756, $c.lit("u_init_role")), rnd(1000)) : rnd(1000), u.umoney0 = $t2;
+            $t2 = rnd(1000), u.umoney0 = $t2;
             await ini_inv($c.relem(Tourist, 0));
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("u_init.c"), 758, $c.lit("u_init_role")), rn2(25)) : rn2(25))) {
+            if (!rn2(25)) {
                 await ini_inv($c.relem(Tinopener, 0));
-            } else if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("u_init.c"), 760, $c.lit("u_init_role")), rn2(25)) : rn2(25))) {
+            } else if (!rn2(25)) {
                 await ini_inv($c.relem(Leash, 0));
-            } else if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("u_init.c"), 762, $c.lit("u_init_role")), rn2(25)) : rn2(25))) {
+            } else if (!rn2(25)) {
                 await ini_inv($c.relem(Towel, 0));
-            } else if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("u_init.c"), 764, $c.lit("u_init_role")), rn2(20)) : rn2(20))) {
+            } else if (!rn2(20)) {
                 await ini_inv($c.relem(Magicmarker, 0));
             }
             break;
         case 342 /* PM_VALKYRIE */:
             await ini_inv($c.relem(Valkyrie, 0));
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("u_init.c"), 769, $c.lit("u_init_role")), rn2(6)) : rn2(6))) {
+            if (!rn2(6)) {
                 await ini_inv($c.relem(Lamp, 0));
             }
             await knows_class(2);
@@ -224,7 +224,7 @@ async function u_init_role() {   // u_init.c:637
             break;
         case 343 /* PM_WIZARD */:
             await ini_inv($c.relem(Wizard, 0));
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("u_init.c"), 776, $c.lit("u_init_role")), rn2(5)) : rn2(5))) {
+            if (!rn2(5)) {
                 await ini_inv($c.relem(Blindfold, 0));
             }
             break;
@@ -246,7 +246,7 @@ async function u_init_race() {   // u_init.c:792
                 for (let $i16 = 0; $i16 < 2; $i16++) {
                     Instrument[$i16].$copyFrom(new $T.trobj());
                 }
-                Instrument[0].trotyp = $c.i16(u_init_race$trotyp[rng_log_enabled() ? (rng_log_set_caller($c.lit("u_init.c"), 810, $c.lit("u_init_race")), rn2(6)) : rn2(6)]);
+                Instrument[0].trotyp = $c.i16(u_init_race$trotyp[rn2(6)]);
                 Instrument[0].trspe = 0;
                 Instrument[0].trclass = 6;
                 Instrument[0].trquan_min = 1;
@@ -400,7 +400,7 @@ export async function u_init_misc() {   // u_init.c:944
     if (u.uroleplay.blind) {
         u.uprops[15 /* BLINDED */].intrinsic = $c.or64(u.uprops[15 /* BLINDED */].intrinsic, 67108864);
     }
-    $t11 = ((rng_log_enabled() ? (rng_log_set_caller($c.lit("u_init.c"), 1028, $c.lit("u_init_misc")), rn2(10)) : rn2(10)) ? 0 : 1) >>> 0, u.uhandedness = ($t11) & 1;
+    $t11 = (rn2(10) ? 0 : 1) >>> 0, u.uhandedness = ($t11) & 1;
     max_rank_sz();
     return;
 }
@@ -468,7 +468,7 @@ function trquan(trop) {   // u_init.c:1106
     if (!trop.trquan_min) {
         return 1;
     }
-    return trop.trquan_min + (rng_log_enabled() ? (rng_log_set_caller($c.lit("u_init.c"), 1110, $c.lit("trquan")), rn2((trop.trquan_max - trop.trquan_min | 0) + 1 | 0)) : rn2((trop.trquan_max - trop.trquan_min | 0) + 1 | 0)) | 0;
+    return trop.trquan_min + rn2((trop.trquan_max - trop.trquan_min | 0) + 1 | 0) | 0;
 }
 async function ini_inv_mkobj_filter(oclass, got_level1_spellbook) {   // u_init.c:1115
     let obj = null, otyp = 0, trycnt = 0;
@@ -532,11 +532,11 @@ async function ini_inv_adjust_obj(trop, obj) {   // u_init.c:1205
         if (trop.trspe !== 127) {
             obj.spe = trop.trspe;
             if (trop.trotyp === 242 /* MAGIC_MARKER */ && obj.spe < 96) {
-                $t5 = rng_log_enabled() ? (rng_log_set_caller($c.lit("u_init.c"), 1233, $c.lit("ini_inv_adjust_obj")), rn2(4)) : rn2(4), obj.spe = $c.i8(obj.spe + $t5 | 0);
+                $t5 = rn2(4), obj.spe = $c.i8(obj.spe + $t5 | 0);
             }
         } else {
             if (objects[obj.otyp].oc_class === 4 /* RING_CLASS */ && objects[obj.otyp].oc_charged | 0 && obj.spe <= 0) {
-                $t6 = $c.i8(rng_log_enabled() ? (rng_log_set_caller($c.lit("u_init.c"), 1238, $c.lit("ini_inv_adjust_obj")), rne(3)) : rne(3)), obj.spe = $t6;
+                $t6 = $c.i8(rne(3)), obj.spe = $t6;
             }
         }
         if (trop.trbless !== 2) {

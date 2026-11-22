@@ -44,7 +44,7 @@ import { impossible, pline } from './pline.js';
 import { mk_roamer, priestini } from './priest.js';
 import { get_rect, rnd_rect, split_rects } from './rect.js';
 import { create_gas_cloud, create_gas_cloud_selection } from './region.js';
-import { rn2, rnd, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { rn2, rnd } from './rnd.js';
 import { selection_clear, selection_clone, selection_do_grow, selection_floodfill, selection_free, selection_getbounds, selection_getpoint, selection_iterate, selection_new, selection_rndcoord, selection_setpoint, set_selection_floodfillchk } from './selvar.js';
 import { delete_contents, obfree } from './shk.js';
 import { stock_room } from './shknam.js';
@@ -275,7 +275,7 @@ async function lvlfill_swamp(fg, bg, lit) {   // sp_lev.c:391
                 c = c + 1 | 0;
             }
             if (c === 3) {
-                switch (rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 410, $c.lit("lvlfill_swamp")), rn2(3)) : rn2(3)) {
+                switch (rn2(3)) {
                     case 0:
                         await set_levltyp_lit($c.i16(x + 1 | 0), $c.i16(y), fg, lit);
                         break;
@@ -820,10 +820,10 @@ function flip_vault_guard(flp, grd, minx, miny, maxx, maxy) {   // sp_lev.c:926
 export async function flip_level_rnd(flp, extras) {   // sp_lev.c:967
     let c = 0;
     c = 0;
-    if (flp & 1 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 975, $c.lit("flip_level_rnd")), rn2(2)) : rn2(2))) {
+    if (flp & 1 && rn2(2)) {
         c = c | 1;
     }
-    if (flp & 2 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 977, $c.lit("flip_level_rnd")), rn2(2)) : rn2(2))) {
+    if (flp & 2 && rn2(2)) {
         c = c | 2;
     }
     if (c) {
@@ -930,12 +930,12 @@ async function link_doors_rooms() {   // sp_lev.c:1122
     }
 }
 function rnddoor() {   // sp_lev.c:1148
-    return rnddoor$state[rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 1152, $c.lit("rnddoor")), rn2(5)) : rn2(5)];
+    return rnddoor$state[rn2(5)];
 }
 function rndtrap() {   // sp_lev.c:1159
     let rtrap = 0;
     do {
-        rtrap = rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 1164, $c.lit("rndtrap")), rnd(25)) : rnd(25);
+        rtrap = rnd(25);
         switch (rtrap) {
             case 13 /* HOLE */:
             case 23 /* VIBRATING_SQUARE */:
@@ -988,8 +988,8 @@ async function get_location(x, y, humidity, croom) {   // sp_lev.c:1202
                     x.set(0, tmpc.x);
                     y.set(0, tmpc.y);
                 } else {
-                    $t1 = $c.i16(mx + (rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 1233, $c.lit("get_location")), rn2(sx)) : rn2(sx)) | 0), x.set(0, $t1);
-                    $t2 = $c.i16(my + (rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 1234, $c.lit("get_location")), rn2(sy)) : rn2(sy)) | 0), y.set(0, $t2);
+                    $t1 = $c.i16(mx + rn2(sx) | 0), x.set(0, $t1);
+                    $t2 = $c.i16(my + rn2(sy) | 0), y.set(0, $t2);
                 }
                 if (await is_ok_location(x.get(0), y.get(0), humidity)) {
                     break;
@@ -1095,10 +1095,10 @@ async function get_room_loc(x, y, croom) {   // sp_lev.c:1360
         }
     } else {
         if (x.get(0) < 0) {
-            $t1 = $c.i16(rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 1372, $c.lit("get_room_loc")), rn2((croom.hx - croom.lx | 0) + 1 | 0)) : rn2((croom.hx - croom.lx | 0) + 1 | 0)), x.set(0, $t1);
+            $t1 = $c.i16(rn2((croom.hx - croom.lx | 0) + 1 | 0)), x.set(0, $t1);
         }
         if (y.get(0) < 0) {
-            $t2 = $c.i16(rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 1374, $c.lit("get_room_loc")), rn2((croom.hy - croom.ly | 0) + 1 | 0)) : rn2((croom.hy - croom.ly | 0) + 1 | 0)), y.set(0, $t2);
+            $t2 = $c.i16(rn2((croom.hy - croom.ly | 0) + 1 | 0)), y.set(0, $t2);
         }
         x.set(0, $c.i16(x.get(0) + croom.lx | 0));
         y.set(0, $c.i16(y.get(0) + croom.ly | 0));
@@ -1172,7 +1172,7 @@ export async function check_room(lowx, ddx, lowy, ddy, vault) {   // sp_lev.c:14
                             }
                         } while (0);
                     }
-                    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 1455, $c.lit("check_room")), rn2(3)) : rn2(3))) {
+                    if (!rn2(3)) {
                         return 0;
                     }
                     if (gi.in_mk_themerooms) {
@@ -1245,8 +1245,8 @@ export async function create_room(x, y, w, h, xal, yal, rtype, rlit) {   // sp_l
             if (vault) {
                 dx[0] = dy[0] = 1;
             } else {
-                dx[0] = $c.i16(2 + (rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 1548, $c.lit("create_room")), rn2((hx - lx | 0) > 28 ? 12 : 8)) : rn2((hx - lx | 0) > 28 ? 12 : 8)) | 0);
-                dy[0] = $c.i16(2 + (rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 1549, $c.lit("create_room")), rn2(4)) : rn2(4)) | 0);
+                dx[0] = $c.i16(2 + rn2((hx - lx | 0) > 28 ? 12 : 8) | 0);
+                dy[0] = $c.i16(2 + rn2(4) | 0);
                 if (Math.imul(dx[0], dy[0]) > 50) {
                     dy[0] = $c.i16($c.div32(50, dx[0]));
                 }
@@ -1257,10 +1257,10 @@ export async function create_room(x, y, w, h, xal, yal, rtype, rlit) {   // sp_l
                 r1 = null;
                 continue;
             }
-            xabs[0] = $c.i16((lx + (lx > 0 ? xlim : 3) | 0) + (rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 1560, $c.lit("create_room")), rn2((((hx - (lx > 0 ? lx : 3) | 0) - dx[0] | 0) - xborder | 0) + 1 | 0)) : rn2((((hx - (lx > 0 ? lx : 3) | 0) - dx[0] | 0) - xborder | 0) + 1 | 0)) | 0);
-            yabs[0] = $c.i16((ly + (ly > 0 ? ylim : 2) | 0) + (rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 1562, $c.lit("create_room")), rn2((((hy - (ly > 0 ? ly : 2) | 0) - dy[0] | 0) - yborder | 0) + 1 | 0)) : rn2((((hy - (ly > 0 ? ly : 2) | 0) - dy[0] | 0) - yborder | 0) + 1 | 0)) | 0);
-            if (ly === 0 && hy >= 20 && (!svn.nroom || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 1564, $c.lit("create_room")), rn2(svn.nroom)) : rn2(svn.nroom))) && (yabs[0] + dy[0] | 0) > 10) {
-                yabs[0] = $c.i16((rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 1566, $c.lit("create_room")), rn2(3)) : rn2(3)) + 2 | 0);
+            xabs[0] = $c.i16((lx + (lx > 0 ? xlim : 3) | 0) + rn2((((hx - (lx > 0 ? lx : 3) | 0) - dx[0] | 0) - xborder | 0) + 1 | 0) | 0);
+            yabs[0] = $c.i16((ly + (ly > 0 ? ylim : 2) | 0) + rn2((((hy - (ly > 0 ? ly : 2) | 0) - dy[0] | 0) - yborder | 0) + 1 | 0) | 0);
+            if (ly === 0 && hy >= 20 && (!svn.nroom || !rn2(svn.nroom)) && (yabs[0] + dy[0] | 0) > 10) {
+                yabs[0] = $c.i16(rn2(3) + 2 | 0);
                 if (svn.nroom < 4 && dy[0] > 1) {
                     dy[0] = $c.i16(dy[0] - 1);
                 }
@@ -1278,19 +1278,19 @@ export async function create_room(x, y, w, h, xal, yal, rtype, rlit) {   // sp_l
         } else {
             rndpos = 0;
             if (xtmp < 0 && ytmp < 0) {
-                xtmp = rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 1585, $c.lit("create_room")), rnd(5)) : rnd(5);
-                ytmp = rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 1586, $c.lit("create_room")), rnd(5)) : rnd(5);
+                xtmp = rnd(5);
+                ytmp = rnd(5);
                 rndpos = 1;
             }
             if (wtmp < 0 || htmp < 0) {
-                wtmp = (rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 1590, $c.lit("create_room")), rn2(15)) : rn2(15)) + 3 | 0;
-                htmp = (rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 1591, $c.lit("create_room")), rn2(8)) : rn2(8)) + 2 | 0;
+                wtmp = rn2(15) + 3 | 0;
+                htmp = rn2(8) + 2 | 0;
             }
             if (xaltmp === -1) {
-                xaltmp = rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 1594, $c.lit("create_room")), rnd(3)) : rnd(3);
+                xaltmp = rnd(3);
             }
             if (yaltmp === -1) {
-                yaltmp = rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 1596, $c.lit("create_room")), rnd(3)) : rnd(3);
+                yaltmp = rnd(3);
             }
             xabs[0] = $c.i16($c.div32(Math.imul(xtmp - 1 | 0, 80), 5) + 1 | 0);
             yabs[0] = $c.i16($c.div32(Math.imul(ytmp - 1 | 0, 21), 5) + 1 | 0);
@@ -1359,16 +1359,16 @@ async function create_subroom(proom, x, y, w, h, rtype, rlit) {   // sp_lev.c:16
         return 0;
     }
     if (w === -1) {
-        w = $c.i16(rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 1686, $c.lit("create_subroom")), rnd(width - 3 | 0)) : rnd(width - 3 | 0));
+        w = $c.i16(rnd(width - 3 | 0));
     }
     if (h === -1) {
-        h = $c.i16(rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 1688, $c.lit("create_subroom")), rnd(height - 3 | 0)) : rnd(height - 3 | 0));
+        h = $c.i16(rnd(height - 3 | 0));
     }
     if (x === -1) {
-        x = $c.i16(rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 1690, $c.lit("create_subroom")), rnd(width - w | 0)) : rnd(width - w | 0));
+        x = $c.i16(rnd(width - w | 0));
     }
     if (y === -1) {
-        y = $c.i16(rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 1692, $c.lit("create_subroom")), rnd(height - h | 0)) : rnd(height - h | 0));
+        y = $c.i16(rnd(height - h | 0));
     }
     if (x === 1) {
         x = 0;
@@ -1394,34 +1394,34 @@ async function create_door(dd, broom) {   // sp_lev.c:1714
     x = 0;
     y = 0;
     if (dd.secret === -1) {
-        $t1 = $c.i16(rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 1720, $c.lit("create_door")), rn2(2)) : rn2(2)), dd.secret = $t1;
+        $t1 = $c.i16(rn2(2)), dd.secret = $t1;
     }
     if (dd.wall === -1) {
         dd.wall = 15;
     }
     if (dd.mask === -1) {
         if (!dd.secret) {
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 1728, $c.lit("create_door")), rn2(3)) : rn2(3))) {
-                if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 1729, $c.lit("create_door")), rn2(5)) : rn2(5))) {
+            if (!rn2(3)) {
+                if (!rn2(5)) {
                     dd.mask = 2;
-                } else if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 1731, $c.lit("create_door")), rn2(6)) : rn2(6))) {
+                } else if (!rn2(6)) {
                     dd.mask = 8;
                 } else {
                     dd.mask = 4;
                 }
-                if (dd.mask !== 2 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 1735, $c.lit("create_door")), rn2(25)) : rn2(25))) {
+                if (dd.mask !== 2 && !rn2(25)) {
                     dd.mask = $c.i16(dd.mask | 16);
                 }
             } else {
                 dd.mask = 0;
             }
         } else {
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 1740, $c.lit("create_door")), rn2(5)) : rn2(5))) {
+            if (!rn2(5)) {
                 dd.mask = 8;
             } else {
                 dd.mask = 4;
             }
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 1745, $c.lit("create_door")), rn2(20)) : rn2(20))) {
+            if (!rn2(20)) {
                 dd.mask = $c.i16(dd.mask | 16);
             }
         }
@@ -1429,13 +1429,13 @@ async function create_door(dd, broom) {   // sp_lev.c:1714
     L1: for (trycnt = 0; trycnt < 100; trycnt = trycnt + 1 | 0) {
         dwall = dd.wall;
         dpos = dd.pos;
-        switch (rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 1754, $c.lit("create_door")), rn2(4)) : rn2(4)) {
+        switch (rn2(4)) {
             case 0:
                 if (!(dwall & 1)) {
                     continue L1;
                 }
                 y = broom.ly - 1 | 0;
-                x = broom.lx + (dpos === -1 ? rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 1759, $c.lit("create_door")), rn2((1 + broom.hx | 0) - broom.lx | 0)) : rn2((1 + broom.hx | 0) - broom.lx | 0) : dpos) | 0;
+                x = broom.lx + (dpos === -1 ? rn2((1 + broom.hx | 0) - broom.lx | 0) : dpos) | 0;
                 if (!isok($c.i16(x), $c.i16(y - 1 | 0)) || svl.level.locations[x][y - 1 | 0].typ < 16 /* POOL */) {
                     continue L1;
                 }
@@ -1445,7 +1445,7 @@ async function create_door(dd, broom) {   // sp_lev.c:1714
                     continue L1;
                 }
                 y = broom.hy + 1 | 0;
-                x = broom.lx + (dpos === -1 ? rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 1768, $c.lit("create_door")), rn2((1 + broom.hx | 0) - broom.lx | 0)) : rn2((1 + broom.hx | 0) - broom.lx | 0) : dpos) | 0;
+                x = broom.lx + (dpos === -1 ? rn2((1 + broom.hx | 0) - broom.lx | 0) : dpos) | 0;
                 if (!isok($c.i16(x), $c.i16(y + 1 | 0)) || svl.level.locations[x][y + 1 | 0].typ < 16 /* POOL */) {
                     continue L1;
                 }
@@ -1455,7 +1455,7 @@ async function create_door(dd, broom) {   // sp_lev.c:1714
                     continue L1;
                 }
                 x = broom.lx - 1 | 0;
-                y = broom.ly + (dpos === -1 ? rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 1777, $c.lit("create_door")), rn2((1 + broom.hy | 0) - broom.ly | 0)) : rn2((1 + broom.hy | 0) - broom.ly | 0) : dpos) | 0;
+                y = broom.ly + (dpos === -1 ? rn2((1 + broom.hy | 0) - broom.ly | 0) : dpos) | 0;
                 if (!isok($c.i16(x - 1 | 0), $c.i16(y)) || svl.level.locations[x - 1 | 0][y].typ < 16 /* POOL */) {
                     continue L1;
                 }
@@ -1465,7 +1465,7 @@ async function create_door(dd, broom) {   // sp_lev.c:1714
                     continue L1;
                 }
                 x = broom.hx + 1 | 0;
-                y = broom.ly + (dpos === -1 ? rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 1786, $c.lit("create_door")), rn2((1 + broom.hy | 0) - broom.ly | 0)) : rn2((1 + broom.hy | 0) - broom.ly | 0) : dpos) | 0;
+                y = broom.ly + (dpos === -1 ? rn2((1 + broom.hy | 0) - broom.ly | 0) : dpos) | 0;
                 if (!isok($c.i16(x + 1 | 0), $c.i16(y)) || svl.level.locations[x + 1 | 0][y].typ < 16 /* POOL */) {
                     continue L1;
                 }
@@ -1521,7 +1521,7 @@ async function create_trap(t, croom) {   // sp_lev.c:1812
 }
 function noncoalignment(alignment) {   // sp_lev.c:1852
     let k = 0;
-    k = rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 1856, $c.lit("noncoalignment")), rn2(2)) : rn2(2);
+    k = rn2(2);
     if (!alignment) {
         return k ? -1 : 1;
     }
@@ -1599,7 +1599,7 @@ async function create_monster(m, croom) {   // sp_lev.c:1925
     } else {
         pm = await mkclass(class_, 512);
     }
-    if (In_mines(u.uz) && pm && $c.andu64(pm.mflags2, $c.u64(gu.urace.selfmask)) !== 0 && (gu.urace.mnum === 44 || gu.urace.mnum === 165) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 1960, $c.lit("create_monster")), rn2(3)) : rn2(3))) {
+    if (In_mines(u.uz) && pm && $c.andu64(pm.mflags2, $c.u64(gu.urace.selfmask)) !== 0 && (gu.urace.mnum === 44 || gu.urace.mnum === 165) && rn2(3)) {
         pm = null;
     }
     if (pm) {
@@ -2008,7 +2008,7 @@ async function create_altar(a, croom) {   // sp_lev.c:2446
     amask = sp_amask_to_amask(a.sp_amask);
     svl.level.locations[x[0]][y[0]].flags = (amask) & 31;
     if (a.shrine < 0) {
-        $t1 = $c.i16(rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 2474, $c.lit("create_altar")), rn2(2)) : rn2(2)), a.shrine = $t1;
+        $t1 = $c.i16(rn2(2)), a.shrine = $t1;
     }
     if (!croom_is_temple || !a.shrine) {
         return;
@@ -2099,7 +2099,7 @@ export async function dig_corridor(org, dest, npoints, nxcor, ftyp, btyp) {   //
     yy = yy - dy | 0;
     cct = 0;
     while (xx !== tx || yy !== ty) {
-        if (($t1 = cct, cct = $t1 + 1 | 0, $t1) > 500 || nxcor && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 2585, $c.lit("dig_corridor")), rn2(35)) : rn2(35))) {
+        if (($t1 = cct, cct = $t1 + 1 | 0, $t1) > 500 || nxcor && !rn2(35)) {
             return 0;
         }
         xx = xx + dx | 0;
@@ -2119,7 +2119,7 @@ export async function dig_corridor(org, dest, npoints, nxcor, ftyp, btyp) {   //
                     npoints.set(0, npoints.get(0) + 1 | 0);
                 }
                 crm.typ = ftyp;
-                if (nxcor && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 2604, $c.lit("dig_corridor")), rn2(50)) : rn2(50))) {
+                if (nxcor && !rn2(50)) {
                     await mksobj_at(475 /* BOULDER */, $c.i16(xx), $c.i16(yy), 1, 0);
                 }
             }
@@ -2128,9 +2128,9 @@ export async function dig_corridor(org, dest, npoints, nxcor, ftyp, btyp) {   //
         }
         dix = $c.abs(xx - tx | 0);
         diy = $c.abs(yy - ty | 0);
-        if (dix > diy && diy && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 2616, $c.lit("dig_corridor")), rn2((dix - diy | 0) + 1 | 0)) : rn2((dix - diy | 0) + 1 | 0))) {
+        if (dix > diy && diy && !rn2((dix - diy | 0) + 1 | 0)) {
             dix = 0;
-        } else if (diy > dix && dix && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 2618, $c.lit("dig_corridor")), rn2((diy - dix | 0) + 1 | 0)) : rn2((diy - dix | 0) + 1 | 0))) {
+        } else if (diy > dix && dix && !rn2((diy - dix | 0) + 1 | 0)) {
             diy = 0;
         }
         if (dy && dix > diy) {
@@ -2239,7 +2239,7 @@ export async function fill_special_room(croom) {   // sp_lev.c:2731
             case 4 /* VAULT */:
                 for (x = croom.lx; x <= croom.hx; x = x + 1 | 0) {
                     for (y = croom.ly; y <= croom.hy; y = y + 1 | 0) {
-                        await mkgold((rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 2763, $c.lit("fill_special_room")), rn2(Math.imul($c.abs(depth(u.uz)), 100))) : rn2(Math.imul($c.abs(depth(u.uz)), 100))) + 51 | 0, $c.i16(x), $c.i16(y));
+                        await mkgold(rn2(Math.imul($c.abs(depth(u.uz)), 100)) + 51 | 0, $c.i16(x), $c.i16(y));
                     }
                 }
                 break;
@@ -2284,7 +2284,7 @@ export async function fill_special_room(croom) {   // sp_lev.c:2731
 }
 async function build_room(r, mkr) {   // sp_lev.c:2807
     let okroom = 0, aroom = null, rtype = 0;
-    rtype = $c.i16(!r.chance || (rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 2811, $c.lit("build_room")), rn2(100)) : rn2(100)) < r.chance ? r.rtype : 0 /* OROOM */);
+    rtype = $c.i16(!r.chance || rn2(100) < r.chance ? r.rtype : 0 /* OROOM */);
     if (mkr) {
         aroom = $c.radd(gs.subrooms, gn.nsubroom);
         okroom = await create_subroom(mkr, r.x, r.y, r.w, r.h, rtype, r.rlit);
@@ -2352,8 +2352,8 @@ async function maze1xy(m, humidity) {   // sp_lev.c:2900
     let x = 0, y = 0, tryct = 0;
     tryct = 2000;
     do {
-        x = (rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 2908, $c.lit("maze1xy")), rn2(gx.x_maze_max - 3 | 0)) : rn2(gx.x_maze_max - 3 | 0)) + 3 | 0;
-        y = (rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 2909, $c.lit("maze1xy")), rn2(gy.y_maze_max - 3 | 0)) : rn2(gy.y_maze_max - 3 | 0)) + 3 | 0;
+        x = rn2(gx.x_maze_max - 3 | 0) + 3 | 0;
+        y = rn2(gy.y_maze_max - 3 | 0) + 3 | 0;
         if ((tryct = tryct - 1 | 0) < 0) {
             break;
         }
@@ -2373,30 +2373,30 @@ async function fill_empty_maze() {   // sp_lev.c:2926
     }
     if (mapcount > $c.div32(mapcountmax, 10)) {
         mapfact = $c.i32($c.div64($c.mul64(mapcount, 100), mapcountmax));
-        for (x = $c.i16(rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 2942, $c.lit("fill_empty_maze")), rnd($c.div32(Math.imul(20, mapfact), 100))) : rnd($c.div32(Math.imul(20, mapfact), 100))); x; x = $c.i16(x - 1)) {
+        for (x = $c.i16(rnd($c.div32(Math.imul(20, mapfact), 100))); x; x = $c.i16(x - 1)) {
             await maze1xy(mm, 1);
-            await mkobj_at($c.i8((rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 2944, $c.lit("fill_empty_maze")), rn2(2)) : rn2(2)) ? 13 /* GEM_CLASS */ : 0 /* RANDOM_CLASS */), mm.x, mm.y, 1);
+            await mkobj_at($c.i8(rn2(2) ? 13 /* GEM_CLASS */ : 0 /* RANDOM_CLASS */), mm.x, mm.y, 1);
         }
-        for (x = $c.i16(rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 2947, $c.lit("fill_empty_maze")), rnd($c.div32(Math.imul(12, mapfact), 100))) : rnd($c.div32(Math.imul(12, mapfact), 100))); x; x = $c.i16(x - 1)) {
+        for (x = $c.i16(rnd($c.div32(Math.imul(12, mapfact), 100))); x; x = $c.i16(x - 1)) {
             await maze1xy(mm, 1);
             if ((ttmp = t_at(mm.x, mm.y)) !== null && ((ttmp.ttyp | 0) === 11 /* PIT */ || (ttmp.ttyp | 0) === 12 /* SPIKED_PIT */ || ((ttmp.ttyp | 0) === 13 /* HOLE */ || (ttmp.ttyp | 0) === 14 /* TRAPDOOR */))) {
                 continue;
             }
             await mksobj_at(475 /* BOULDER */, mm.x, mm.y, 1, 0);
         }
-        for (x = $c.i16(rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 2956, $c.lit("fill_empty_maze")), rn2(2)) : rn2(2)); x; x = $c.i16(x - 1)) {
+        for (x = $c.i16(rn2(2)); x; x = $c.i16(x - 1)) {
             await maze1xy(mm, 1);
             await makemon($c.relem(mons, 177 /* PM_MINOTAUR */), mm.x, mm.y, 0);
         }
-        for (x = $c.i16(rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 2960, $c.lit("fill_empty_maze")), rnd($c.div32(Math.imul(12, mapfact), 100))) : rnd($c.div32(Math.imul(12, mapfact), 100))); x; x = $c.i16(x - 1)) {
+        for (x = $c.i16(rnd($c.div32(Math.imul(12, mapfact), 100))); x; x = $c.i16(x - 1)) {
             await maze1xy(mm, 1);
             await makemon(null, mm.x, mm.y, 0);
         }
-        for (x = $c.i16(rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 2964, $c.lit("fill_empty_maze")), rn2($c.div32(Math.imul(15, mapfact), 100))) : rn2($c.div32(Math.imul(15, mapfact), 100))); x; x = $c.i16(x - 1)) {
+        for (x = $c.i16(rn2($c.div32(Math.imul(15, mapfact), 100))); x; x = $c.i16(x - 1)) {
             await maze1xy(mm, 1);
             await mkgold(0, mm.x, mm.y);
         }
-        for (x = $c.i16(rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 2968, $c.lit("fill_empty_maze")), rn2($c.div32(Math.imul(15, mapfact), 100))) : rn2($c.div32(Math.imul(15, mapfact), 100))); x; x = $c.i16(x - 1)) {
+        for (x = $c.i16(rn2($c.div32(Math.imul(15, mapfact), 100))); x; x = $c.i16(x - 1)) {
             await maze1xy(mm, 1);
             trytrap = rndtrap();
             if (sobj_at(475 /* BOULDER */, mm.x, mm.y)) {
@@ -2418,7 +2418,7 @@ async function splev_initlev(linit) {   // sp_lev.c:2982
             break;
         case 1 /* LVLINIT_SOLIDFILL */:
             if (linit.lit === -1) {
-                $t1 = $c.i16(rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 2992, $c.lit("splev_initlev")), rn2(2)) : rn2(2)), linit.lit = $t1;
+                $t1 = $c.i16(rn2(2)), linit.lit = $t1;
             }
             await lvlfill_solid(linit.filling, $c.i8(linit.lit));
             break;
@@ -2433,7 +2433,7 @@ async function splev_initlev(linit) {   // sp_lev.c:2982
             break;
         case 4 /* LVLINIT_MINES */:
             if (linit.lit === -1) {
-                $t2 = $c.i16(rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 3006, $c.lit("splev_initlev")), rn2(2)) : rn2(2)), linit.lit = $t2;
+                $t2 = $c.i16(rn2(2)), linit.lit = $t2;
             }
             if (linit.filling > -1) {
                 await lvlfill_solid(linit.filling, 0);
@@ -2443,7 +2443,7 @@ async function splev_initlev(linit) {   // sp_lev.c:2982
             break;
         case 6 /* LVLINIT_SWAMP */:
             if (linit.lit === -1) {
-                $t3 = $c.i16(rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 3014, $c.lit("splev_initlev")), rn2(2)) : rn2(2)), linit.lit = $t3;
+                $t3 = $c.i16(rn2(2)), linit.lit = $t3;
             }
             await lvlfill_swamp(linit.fg, linit.bg, $c.i8(linit.lit));
             break;
@@ -2531,7 +2531,7 @@ async function find_montype(L, s, mgender) {   // sp_lev.c:3143
         if ($c.andu64($c.relem(mons, i).mflags2, 65536) !== 0 || $c.andu64($c.relem(mons, i).mflags2, 131072) !== 0) {
             mgend[0] = $c.andu64($c.relem(mons, i).mflags2, 131072) !== 0 ? 1 /* FEMALE */ : 0 /* MALE */;
         } else {
-            mgend[0] = mgend[0] === 1 /* FEMALE */ ? 1 /* FEMALE */ : mgend[0] === 0 /* MALE */ ? 0 /* MALE */ : rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 3156, $c.lit("find_montype")), rn2(2)) : rn2(2);
+            mgend[0] = mgend[0] === 1 /* FEMALE */ ? 1 /* FEMALE */ : mgend[0] === 0 /* MALE */ ? 0 /* MALE */ : rn2(2);
         }
         if (mgender) {
             mgender.set(0, mgend[0]);
@@ -2609,7 +2609,7 @@ export async function lspo_monster(L) {   // sp_lev.c:3214
         } else {
             tmpmons.class = -1;
             $t1 = $c.i16(await find_montype(L, paramstr, new $c.Ptr(mgend, 0))), tmpmons.id = $t1;
-            $t2 = $c.i16(mgend[0] === 1 /* FEMALE */ ? 1 /* FEMALE */ : mgend[0] === 0 /* MALE */ ? 0 /* MALE */ : rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 3256, $c.lit("lspo_monster")), rn2(2)) : rn2(2)), tmpmons.female = $t2;
+            $t2 = $c.i16(mgend[0] === 1 /* FEMALE */ ? 1 /* FEMALE */ : mgend[0] === 0 /* MALE */ ? 0 /* MALE */ : rn2(2)), tmpmons.female = $t2;
         }
     } else if (argc === 2 && lua_type(L, 1) === 4 && lua_type(L, 2) === 5) {
         paramstr$2 = await luaL_checklstring(L, 1, null);
@@ -2620,7 +2620,7 @@ export async function lspo_monster(L) {   // sp_lev.c:3214
         } else {
             tmpmons.class = -1;
             $t3 = $c.i16(await find_montype(L, paramstr$2, new $c.Ptr(mgend, 0))), tmpmons.id = $t3;
-            $t4 = $c.i16(mgend[0] === 1 /* FEMALE */ ? 1 /* FEMALE */ : mgend[0] === 0 /* MALE */ ? 0 /* MALE */ : rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 3271, $c.lit("lspo_monster")), rn2(2)) : rn2(2)), tmpmons.female = $t4;
+            $t4 = $c.i16(mgend[0] === 1 /* FEMALE */ ? 1 /* FEMALE */ : mgend[0] === 0 /* MALE */ ? 0 /* MALE */ : rn2(2)), tmpmons.female = $t4;
         }
     } else if (argc === 3) {
         paramstr$3 = await luaL_checklstring(L, 1, null);
@@ -2632,7 +2632,7 @@ export async function lspo_monster(L) {   // sp_lev.c:3214
         } else {
             tmpmons.class = -1;
             $t5 = $c.i16(await find_montype(L, paramstr$3, new $c.Ptr(mgend, 0))), tmpmons.id = $t5;
-            $t6 = $c.i16(mgend[0] === 1 /* FEMALE */ ? 1 /* FEMALE */ : mgend[0] === 0 /* MALE */ ? 0 /* MALE */ : rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 3287, $c.lit("lspo_monster")), rn2(2)) : rn2(2)), tmpmons.female = $t6;
+            $t6 = $c.i16(mgend[0] === 1 /* FEMALE */ ? 1 /* FEMALE */ : mgend[0] === 0 /* MALE */ ? 0 /* MALE */ : rn2(2)), tmpmons.female = $t6;
         }
     } else {
         keep_default_invent = -1;
@@ -3485,7 +3485,7 @@ export async function lspo_gold(L) {   // sp_lev.c:4480
     }
     await get_location_coord(new $c.Ptr(x, 0), new $c.Ptr(y, 0), 1, gc.coder.croom, gcoord);
     if (amount < 0) {
-        amount = rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 4518, $c.lit("lspo_gold")), rnd(200)) : rnd(200);
+        amount = rnd(200);
     }
     await mkgold(amount, x[0], y[0]);
     return 0;
@@ -3516,7 +3516,7 @@ export async function lspo_random_corridors(L) {   // sp_lev.c:4558
     return 0;
 }
 export function random_wdir() {   // sp_lev.c:4578
-    return random_wdir$wdirs[rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 4581, $c.lit("random_wdir")), rn2(4)) : rn2(4)];
+    return random_wdir$wdirs[rn2(4)];
 }
 function floodfillchk_match_under(x, y) {   // sp_lev.c:4587
     return floodfillchk_match_under_typ === svl.level.locations[x][y].typ ? 1 : 0;
@@ -3612,7 +3612,7 @@ async function l_table_getset_feature_flag(L, x, y, name, flag) {   // sp_lev.c:
     val = await get_table_boolean_opt(L, name, -2);
     if (val !== -2) {
         if (val === -1) {
-            val = rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 4749, $c.lit("l_table_getset_feature_flag")), rn2(2)) : rn2(2);
+            val = rn2(2);
         }
         if (val) {
             svl.level.locations[x][y].flags = ((svl.level.locations[x][y].flags | 0 | flag) >>> 0) & 31;
@@ -3868,11 +3868,11 @@ export async function lspo_replace_terrain(L) {   // sp_lev.c:5051
         for (y = rect.ly; y <= rect.hy; y = $c.i16(y + 1)) {
             if (selection_getpoint(x, y, sel)) {
                 if (mf[0]) {
-                    if (await mapfrag_match(mf[0], x, y) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 5127, $c.lit("lspo_replace_terrain")), rn2(100)) : rn2(100)) < chance) {
+                    if (await mapfrag_match(mf[0], x, y) && rn2(100) < chance) {
                         await set_levltyp_lit(x, y, $c.i8(totyp), $c.i8(tolit));
                     }
                 } else {
-                    if ((fromtyp === 38 /* MATCH_WALL */ && svl.level.locations[x][y].typ <= 12 /* DBWALL */ || svl.level.locations[x][y].typ === fromtyp) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 5132, $c.lit("lspo_replace_terrain")), rn2(100)) : rn2(100)) < chance) {
+                    if ((fromtyp === 38 /* MATCH_WALL */ && svl.level.locations[x][y].typ <= 12 /* DBWALL */ || svl.level.locations[x][y].typ === fromtyp) && rn2(100) < chance) {
                         await set_levltyp_lit(x, y, $c.i8(totyp), $c.i8(tolit));
                     }
                 }
@@ -3914,13 +3914,13 @@ async function generate_way_out_method(nx, ny, ov) {   // sp_lev.c:5146
             selection_free(ov3, 1);
             ov3 = await selection_clone(ov2);
             while (selection_rndcoord(ov3, new $c.Ptr(x, 0), new $c.Ptr(y, 0), 1)) {
-                if (await maketrap(x[0], y[0], (rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 5198, $c.lit("generate_way_out_method")), rn2(2)) : rn2(2)) ? 13 /* HOLE */ : 14 /* TRAPDOOR */)) {
+                if (await maketrap(x[0], y[0], rn2(2) ? 13 /* HOLE */ : 14 /* TRAPDOOR */)) {
                     break gotitdone$;
                 }
             }
         }
         if (selection_rndcoord(ov2, new $c.Ptr(x, 0), new $c.Ptr(y, 0), 0)) {
-            await mksobj_at(generate_way_out_method$escapeitems[rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 5205, $c.lit("generate_way_out_method")), rn2(6)) : rn2(6)], x[0], y[0], 1, 0);
+            await mksobj_at(generate_way_out_method$escapeitems[rn2(6)], x[0], y[0], 1, 0);
             break gotitdone$;
         }
         res = 0;
@@ -4268,7 +4268,7 @@ export async function lspo_drawbridge(L) {   // sp_lev.c:5720
         return 0;
     }
     if (db_open === -1) {
-        db_open = !(rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 5757, $c.lit("lspo_drawbridge")), rn2(2)) : rn2(2)) ? 1 : 0;
+        db_open = !rn2(2) ? 1 : 0;
     }
     if (!await create_drawbridge(x[0], y[0], dir, $c.i8(db_open ? 1 : 0))) {
         await impossible($c.lit("Cannot create drawbridge."));
@@ -4530,7 +4530,7 @@ export async function lspo_map(L) {   // sp_lev.c:6075
                             x[0] = 1;
                         }
                     } else {
-                        x[0] = 1 + (rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 6154, $c.lit("lspo_map")), rn2(79 - mf[0].wid | 0)) : rn2(79 - mf[0].wid | 0)) | 0;
+                        x[0] = 1 + rn2(79 - mf[0].wid | 0) | 0;
                     }
                 }
                 if (oy === -1) {
@@ -4540,7 +4540,7 @@ export async function lspo_map(L) {   // sp_lev.c:6075
                             y[0] = 1;
                         }
                     } else {
-                        y[0] = rng_log_enabled() ? (rng_log_set_caller($c.lit("sp_lev.c"), 6164, $c.lit("lspo_map")), rn2(21 - mf[0].hei | 0)) : rn2(21 - mf[0].hei | 0);
+                        y[0] = rn2(21 - mf[0].hei | 0);
                     }
                 }
             }

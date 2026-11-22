@@ -47,7 +47,7 @@ import { You, You_feel, You_hear, Your, impossible, livelog_printf, pline, pline
 import { body_part, mbodypart, polymon, rehumanize, ugolemeffects, uunstick } from './polyself.js';
 import { make_blinded, make_confused, make_sick, make_slimed, make_stoned, make_stunned, potionhit, split_mon } from './potion.js';
 import { ghod_hitsu } from './priest.js';
-import { d, rn2, rn2_on_display_rng, rnd, rng_log_enabled, rng_log_set_caller, rnl } from './rnd.js';
+import { d, rn2, rn2_on_display_rng, rnd, rnl } from './rnd.js';
 import { genders } from './role.js';
 import { dopay, obfree, tended_shop } from './shk.js';
 import { attrcurse } from './sit.js';
@@ -78,7 +78,7 @@ async function mhitm_mgc_atk_negated(magr, mdef, verbosely) {   // uhitm.c:75
         return 1;
     }
     armpro = magic_negation(mdef);
-    negated = $c.i8(!((rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 87, $c.lit("mhitm_mgc_atk_negated")), rn2(10)) : rn2(10)) >= Math.imul(3, armpro)) ? 1 : 0);
+    negated = $c.i8(!(rn2(10) >= Math.imul(3, armpro)) ? 1 : 0);
     if (negated) {
         if (verbosely) {
             if ($c.peq(mdef, gy.youmonst)) {
@@ -103,7 +103,7 @@ export async function dynamic_multi_reason(mon, verb, by_gaze) {   // uhitm.c:10
 export async function erode_armor(mdef, hurt) {   // uhitm.c:126
     let target = null;
     L1: while (1) {
-        switch (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 137, $c.lit("erode_armor")), rn2(5)) : rn2(5)) {
+        switch (rn2(5)) {
             case 0:
                 target = await which_armor(mdef, 4);
                 if (!target || await erode_obj(target, await xname(target), hurt, 1) === 0) {
@@ -226,7 +226,7 @@ export async function check_caitiff(mtmp) {   // uhitm.c:331
 }
 export function mon_maybe_unparalyze(mtmp) {   // uhitm.c:351
     if (!mtmp.mcanmove) {
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 354, $c.lit("mon_maybe_unparalyze")), rn2(10)) : rn2(10))) {
+        if (!rn2(10)) {
             mtmp.mcanmove = (1) & 1;
             mtmp.mfrozen = (0) & 127;
         }
@@ -292,7 +292,7 @@ export async function do_attack(mtmp) {   // uhitm.c:448
     mdat = mtmp.data;
     if (is_safemon(mtmp) && !svc.context.forcefight) {
         if (!is_art($G.uwep, 2 /* ART_STORMBRINGER */)) {
-            foo = $c.i8($G.uball !== null || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 474, $c.lit("do_attack")), rn2(7)) : rn2(7)) || ($c.peq(mtmp.data, $c.relem(mons, 112 /* PM_BABY_LONG_WORM */)) || $c.peq(mtmp.data, $c.relem(mons, 114 /* PM_LONG_WORM */)) || $c.peq(mtmp.data, $c.relem(mons, 330 /* PM_LONG_WORM_TAIL */))) && mtmp.wormno | 0 || svl.level.locations[u.ux][u.uy].typ < 16 /* POOL */ && !($c.andu64(mtmp.data.mflags1, 8) !== 0) ? 1 : 0);
+            foo = $c.i8($G.uball !== null || !rn2(7) || ($c.peq(mtmp.data, $c.relem(mons, 112 /* PM_BABY_LONG_WORM */)) || $c.peq(mtmp.data, $c.relem(mons, 114 /* PM_LONG_WORM */)) || $c.peq(mtmp.data, $c.relem(mons, 330 /* PM_LONG_WORM_TAIL */))) && mtmp.wormno | 0 || svl.level.locations[u.ux][u.uy].typ < 16 /* POOL */ && !($c.andu64(mtmp.data.mflags1, 8) !== 0) ? 1 : 0);
             inshop = 0;
             if (!foo) {
                 for (p = in_rooms(mtmp.mx, mtmp.my, 14 /* SHOPBASE */); p.get(0); p = p.add(1)) {
@@ -309,14 +309,14 @@ export async function do_attack(mtmp) {   // uhitm.c:448
                     }
                 }
                 if (mtmp.mtame) {
-                    await monflee(mtmp, rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 497, $c.lit("do_attack")), rnd(6)) : rnd(6), 0, 0);
+                    await monflee(mtmp, rnd(6), 0, 0);
                 }
                 $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), await y_monnam(mtmp), 256);
                 $t1 = highc(buf[0]), buf[0] = $t1;
                 await You($c.lit("stop.  %s is in the way!"), new $c.Ptr(buf, 0));
                 end_running(1);
                 return 1;
-            } else if (mtmp.mfrozen | 0 || (mtmp.msleeping | 0 || !mtmp.mcanmove) || mtmp.data.mmove === 0 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 504, $c.lit("do_attack")), rn2(6)) : rn2(6))) {
+            } else if (mtmp.mfrozen | 0 || (mtmp.msleeping | 0 || !mtmp.mcanmove) || mtmp.data.mmove === 0 && rn2(6)) {
                 await pline($c.lit("%s doesn't seem to move!"), await Monnam(mtmp));
                 end_running(1);
                 return 1;
@@ -356,7 +356,7 @@ export async function do_attack(mtmp) {   // uhitm.c:448
         }
         await exercise(0 /* A_STR */, 1);
         await u_wipe_engr(3);
-        if (mdat.mlet === 12 /* S_LEPRECHAUN */ && !mtmp.mfrozen && !(mtmp.msleeping | 0 || !mtmp.mcanmove) && !mtmp.mconf && mtmp.mcansee | 0 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 557, $c.lit("do_attack")), rn2(7)) : rn2(7)) && (await m_move(mtmp, 0) === 2 || mtmp.mx !== (u.ux + u.dx | 0) || mtmp.my !== (u.uy + u.dy | 0))) {
+        if (mdat.mlet === 12 /* S_LEPRECHAUN */ && !mtmp.mfrozen && !(mtmp.msleeping | 0 || !mtmp.mcanmove) && !mtmp.mconf && mtmp.mcansee | 0 && !rn2(7) && (await m_move(mtmp, 0) === 2 || mtmp.mx !== (u.ux + u.dx | 0) || mtmp.my !== (u.uy + u.dy | 0))) {
             await You($c.lit("miss wildly and stumble forwards."));
             return 0;
         }
@@ -392,8 +392,8 @@ async function known_hitum(mon, weapon, mhit, rollneeded, armorpenalty, uattk, d
         gn.notonhead = $c.i8(mon.mx !== gb.bhitpos.x || mon.my !== gb.bhitpos.y ? 1 : 0);
         malive = await hmon(mon, weapon, 0 /* HMON_MELEE */, dieroll);
         if (malive) {
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 625, $c.lit("known_hitum")), rn2(25)) : rn2(25)) && mon.mhp < $c.div32(mon.mhpmax, 2) && !(u.uswallow | 0 && $c.peq(u.ustuck, mon))) {
-                await monflee(mon, !(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 628, $c.lit("known_hitum")), rn2(3)) : rn2(3)) ? rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 628, $c.lit("known_hitum")), rnd(100)) : rnd(100) : 0, 0, 1);
+            if (!rn2(25) && mon.mhp < $c.div32(mon.mhpmax, 2) && !(u.uswallow | 0 && $c.peq(u.ustuck, mon))) {
+                await monflee(mon, !rn2(3) ? rnd(100) : 0, 0, 1);
                 if ($c.peq(u.ustuck, mon) && !u.uswallow && !sticks(gy.youmonst.data)) {
                     await set_ustuck(null);
                 }
@@ -438,7 +438,7 @@ async function hitum_cleave(target, uattk) {   // uhitm.c:651
         }
         tmp = await find_roll_to_hit(mtmp, uattk.aatyp, $G.uwep, new $c.Ptr(attknum, 0), new $c.Ptr(armorpenalty, 0));
         mon_maybe_unparalyze(mtmp);
-        dieroll = rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 709, $c.lit("hitum_cleave")), rnd(20)) : rnd(20);
+        dieroll = rnd(20);
         mhit[0] = tmp > dieroll ? 1 : 0;
         gb.bhitpos.x = $c.i16(tx), gb.bhitpos.y = $c.i16(ty);
         gn.notonhead = $c.i8(mtmp.mx !== tx || mtmp.my !== ty ? 1 : 0);
@@ -457,7 +457,7 @@ function double_punch() {   // uhitm.c:736
     let skl_lvl = 0;
     skl_lvl = u.weapon_skills[35 /* P_BARE_HANDED_COMBAT */].skill;
     if (!$G.uwep && !$G.uarms && skl_lvl > 2 /* P_BASIC */) {
-        return $c.i8((skl_lvl - 2 /* P_BASIC */ | 0) > (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 752, $c.lit("double_punch")), rn2(5)) : rn2(5)) ? 1 : 0);
+        return $c.i8((skl_lvl - 2 /* P_BASIC */ | 0) > rn2(5) ? 1 : 0);
     }
     return 0;
 }
@@ -476,7 +476,7 @@ async function hitum(mon, uattk) {   // uhitm.c:758
     $t1 = ($G.uwep ? u.twoweap : double_punch()) ? 1 : 0, gt.twohits = $t1;
     tmp = await find_roll_to_hit(mon, uattk.aatyp, $G.uwep, new $c.Ptr(attknum, 0), new $c.Ptr(armorpenalty, 0));
     mon_maybe_unparalyze(mon);
-    dieroll = rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 780, $c.lit("hitum")), rnd(20)) : rnd(20);
+    dieroll = rnd(20);
     mhit[0] = tmp > dieroll || u.uswallow | 0 ? 1 : 0;
     if (tmp > dieroll) {
         await exercise(3 /* A_DEX */, 1);
@@ -490,7 +490,7 @@ async function hitum(mon, uattk) {   // uhitm.c:758
         gt.twohits = 2;
         tmp = await find_roll_to_hit(mon, uattk.aatyp, $G.uswapwep, new $c.Ptr(attknum, 0), new $c.Ptr(armorpenalty, 0));
         mon_maybe_unparalyze(mon);
-        dieroll = rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 804, $c.lit("hitum")), rnd(20)) : rnd(20);
+        dieroll = rnd(20);
         mhit[0] = tmp > dieroll || u.uswallow | 0 ? 1 : 0;
         malive = await known_hitum(mon, secondwep, new $c.Ptr(mhit, 0), tmp, armorpenalty[0], uattk, dieroll);
         if (mhit[0]) {
@@ -504,7 +504,7 @@ export async function hmon(mon, obj, thrown, dieroll) {   // uhitm.c:819
     let result = 0, anger_guards = 0;
     anger_guards = $c.i8(mon.mpeaceful | 0 && (mon.ispriest | 0 || mon.isshk | 0 || ($c.peq(mon.data, $c.relem(mons, 282 /* PM_WATCHMAN */)) || $c.peq(mon.data, $c.relem(mons, 283 /* PM_WATCH_CAPTAIN */)))) ? 1 : 0);
     result = await hmon_hitmon(mon, obj, thrown, dieroll);
-    if (mon.ispriest | 0 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 829, $c.lit("hmon")), rn2(2)) : rn2(2))) {
+    if (mon.ispriest | 0 && !rn2(2)) {
         await ghod_hitsu(mon);
     }
     if (anger_guards) {
@@ -518,7 +518,7 @@ async function hmon_hitmon_barehands(hmd, mon) {   // uhitm.c:838
     if ($c.peq(hmd.mdat, $c.relem(mons, 288 /* PM_SHADE */))) {
         hmd.dmg = 0;
     } else {
-        $t1 = rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 847, $c.lit("hmon_hitmon_barehands")), rnd(!(gu.urole.mnum === 340 || gu.urole.mnum === 336) ? 2 : 4)) : rnd(!(gu.urole.mnum === 340 || gu.urole.mnum === 336) ? 2 : 4), hmd.dmg = $t1;
+        $t1 = rnd(!(gu.urole.mnum === 340 || gu.urole.mnum === 336) ? 2 : 4), hmd.dmg = $t1;
         hmd.use_weapon_skill = 1;
         hmd.train_weapon_skill = $c.i8(hmd.dmg > 1 ? 1 : 0);
     }
@@ -547,13 +547,13 @@ async function hmon_hitmon_weapon_ranged(hmd, mon, obj) {   // uhitm.c:885
     if ($c.peq(hmd.mdat, $c.relem(mons, 288 /* PM_SHADE */)) && !shade_glare(obj)) {
         hmd.dmg = 0;
     } else {
-        $t1 = rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 895, $c.lit("hmon_hitmon_weapon_ranged")), rnd(2)) : rnd(2), hmd.dmg = $t1;
+        $t1 = rnd(2), hmd.dmg = $t1;
     }
     if (hmd.material === 14 /* SILVER */ && mon_hates_silver(mon)) {
         $t2 = hmd.silverobj = 1, hmd.silvermsg = $t2;
-        $t3 = rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 899, $c.lit("hmon_hitmon_weapon_ranged")), rnd(hmd.dmg ? 20 : 10)) : rnd(hmd.dmg ? 20 : 10), hmd.dmg = hmd.dmg + $t3 | 0;
+        $t3 = rnd(hmd.dmg ? 20 : 10), hmd.dmg = hmd.dmg + $t3 | 0;
     }
-    if (!hmd.thrown && $c.peq(obj, $G.uwep) && obj.otyp === 26 /* BOOMERANG */ && (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 902, $c.lit("hmon_hitmon_weapon_ranged")), rnl(4)) : rnl(4)) === 3) {
+    if (!hmd.thrown && $c.peq(obj, $G.uwep) && obj.otyp === 26 /* BOOMERANG */ && rnl(4) === 3) {
         more_than_1 = $c.i8(obj.quan > 1 ? 1 : 0);
         await pline($c.lit("As you hit %s, %s%s breaks into splinters."), await mon_nam(mon), more_than_1 ? $c.lit("one of ") : $c.lit(""), await yname(obj));
         if (!more_than_1) {
@@ -583,7 +583,7 @@ async function hmon_hitmon_weapon_melee(hmd, mon, obj) {   // uhitm.c:934
     if (!hmd.train_weapon_skill || $c.peq(mon, u.ustuck) || u.twoweap || hmd.hand_to_hand && is_art(obj, 4 /* ART_CLEAVER */)) {
     } else if (gu.urole.mnum === 339 && backstabbable(mon) && !(u.umonnum !== u.umonster) && hmd.hand_to_hand) {
         await You($c.lit("strike %s from behind!"), await mon_nam(mon));
-        $t2 = rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 964, $c.lit("hmon_hitmon_weapon_melee")), rnd(u.ulevel)) : rnd(u.ulevel), hmd.dmg = hmd.dmg + $t2 | 0;
+        $t2 = rnd(u.ulevel), hmd.dmg = hmd.dmg + $t2 | 0;
         hmd.hittxt = 1;
     } else if (hmd.dieroll === 2 && $c.peq(obj, $G.uwep) && obj.oclass === 2 /* WEAPON_CLASS */ && ((obj.oclass === 2 /* WEAPON_CLASS */ || obj.oclass === 6 /* TOOL_CLASS */) && objects[obj.otyp].oc_big | 0 || gu.urole.mnum === 340 && obj.otyp === 56 /* KATANA */ && !$G.uarms) && ((wtype = uwep_skill_type()) !== 0 /* P_NONE */ && u.weapon_skills[wtype].skill >= 3 /* P_SKILLED */) && ((monwep = mon.mw) !== null && !((objects[monwep.otyp].oc_material | 0) <= 7 /* LEATHER */ || monwep.otyp === 78 /* RUBBER_HOSE */) && !obj_resists(monwep, 50 + Math.imul(15, ((obj.oeroded | 0) > (obj.oeroded2 | 0) ? obj.oeroded | 0 : obj.oeroded2 | 0) - ((monwep.oeroded | 0) > (monwep.oeroded2 | 0) ? monwep.oeroded | 0 : monwep.oeroded2 | 0) | 0) | 0, 100))) {
         await setmnotwielded(mon, monwep);
@@ -596,8 +596,8 @@ async function hmon_hitmon_weapon_melee(hmd, mon, obj) {   // uhitm.c:934
         buf[$c.idx(226)] = 0;
         await pline($c.lit("%s%s"), new $c.Ptr(buf, 0), new $c.Ptr(hmon_hitmon_weapon_melee$from_your_blow, 0));
         await m_useupall(mon, monwep);
-        if (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 1009, $c.lit("hmon_hitmon_weapon_melee")), rn2(4)) : rn2(4)) {
-            await monflee(mon, rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 1010, $c.lit("hmon_hitmon_weapon_melee")), d(2, 3)) : d(2, 3), 1, 1);
+        if (rn2(4)) {
+            await monflee(mon, d(2, 3), 1, 1);
         }
         hmd.hittxt = 1;
     }
@@ -778,7 +778,7 @@ async function hmon_hitmon_misc_obj(hmd, mon, obj) {   // uhitm.c:1119
                             }
                             obj = null;
                         } while (0);
-                        await explode(mon.mx, mon.my, -11, rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 1246, $c.lit("hmon_hitmon_misc_obj")), d(3, 6)) : d(3, 6), 0, 5 /* EXPL_FIERY */);
+                        await explode(mon.mx, mon.my, -11, d(3, 6), 0, 5 /* EXPL_FIERY */);
                         hmd.doreturn = 1;
                         hmd.retval = $c.i8(!(mon.mhp < 1) ? 1 : 0);
                         return;
@@ -799,7 +799,7 @@ async function hmon_hitmon_misc_obj(hmd, mon, obj) {   // uhitm.c:1119
             }
         case 284 /* CLOVE_OF_GARLIC */:
             if ($c.andu64(hmd.mdat.mflags2, 2) !== 0 || (mon.cham === 226 /* PM_VAMPIRE */ || mon.cham === 227 /* PM_VAMPIRE_LEADER */ || mon.cham === 228 /* PM_VLAD_THE_IMPALER */)) {
-                await monflee(mon, rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 1261, $c.lit("hmon_hitmon_misc_obj")), d(2, 4)) : d(2, 4), 0, 1);
+                await monflee(mon, d(2, 4), 0, 1);
             }
             hmd.dmg = 1;
             break;
@@ -824,7 +824,7 @@ async function hmon_hitmon_misc_obj(hmd, mon, obj) {   // uhitm.c:1119
                 }
                 await setmangry(mon, 1);
                 mon.mcansee = (0) & 1;
-                $t5 = (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 1295, $c.lit("hmon_hitmon_misc_obj")), rn2(25)) : rn2(25)) + 21 | 0, hmd.dmg = $t5;
+                $t5 = rn2(25) + 21 | 0, hmd.dmg = $t5;
                 if (((mon.mblinded | 0) + hmd.dmg | 0) > 127) {
                     mon.mblinded = (127) & 127;
                 } else {
@@ -878,22 +878,22 @@ async function hmon_hitmon_misc_obj(hmd, mon, obj) {   // uhitm.c:1119
                 break;
             }
             hmd.dmg = $c.divu32(obj.owt + 99 >>> 0, 100) | 0;
-            $t7 = hmd.dmg <= 1 ? 1 : rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 1355, $c.lit("hmon_hitmon_misc_obj")), rnd(hmd.dmg)) : rnd(hmd.dmg), hmd.dmg = $t7;
+            $t7 = hmd.dmg <= 1 ? 1 : rnd(hmd.dmg), hmd.dmg = $t7;
             if (hmd.dmg > 6) {
                 hmd.dmg = 6;
             }
             if (obj.otyp === 234 /* TOWEL */ && obj.spe > 0) {
                 doubld = $c.i8($c.peq(mon.data, $c.relem(mons, 259 /* PM_IRON_GOLEM */)) ? 1 : 0);
                 hmd.dmg = hmd.dmg + Math.imul(obj.spe, doubld ? 2 : 1) | 0;
-                $t8 = rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 1369, $c.lit("hmon_hitmon_misc_obj")), rnd(hmd.dmg)) : rnd(hmd.dmg), hmd.dmg = $t8;
-                $t9 = $c.i8((rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 1372, $c.lit("hmon_hitmon_misc_obj")), rn2(obj.spe + 1 | 0)) : rn2(obj.spe + 1 | 0)) > 0 ? 1 : 0), hmd.dryit = $t9;
+                $t8 = rnd(hmd.dmg), hmd.dmg = $t8;
+                $t9 = $c.i8(rn2(obj.spe + 1 | 0) > 0 ? 1 : 0), hmd.dryit = $t9;
             }
             if (hmd.material === 14 /* SILVER */ && mon_hates_silver(mon)) {
-                $t10 = rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 1377, $c.lit("hmon_hitmon_misc_obj")), rnd(20)) : rnd(20), hmd.dmg = hmd.dmg + $t10 | 0;
+                $t10 = rnd(20), hmd.dmg = hmd.dmg + $t10 | 0;
                 $t11 = hmd.silverobj = 1, hmd.silvermsg = $t11;
             }
             if (obj.blessed | 0 && mon_hates_blessings(mon)) {
-                $t12 = rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 1381, $c.lit("hmon_hitmon_misc_obj")), rnd(4)) : rnd(4), hmd.dmg = hmd.dmg + $t12 | 0;
+                $t12 = rnd(4), hmd.dmg = hmd.dmg + $t12 | 0;
             }
     }
 }
@@ -977,21 +977,21 @@ async function hmon_hitmon_poison(hmd, mon, obj) {   // uhitm.c:1510
         await You_feel($c.lit("like an evil coward for using a poisoned weapon."));
         adjalign(-1);
     }
-    if (!permapoisoned(obj) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 1526, $c.lit("hmon_hitmon_poison")), rn2(nopoison)) : rn2(nopoison))) {
+    if (!permapoisoned(obj) && !rn2(nopoison)) {
         obj.otrapped = (0) & 1;
         hmd.unpoisonmsg = 1;
     }
     if (await Resists_Elem(mon, 6 /* POISON_RES */)) {
         hmd.needpoismsg = 1;
-    } else if (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 1534, $c.lit("hmon_hitmon_poison")), rn2(10)) : rn2(10)) {
-        $t1 = rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 1535, $c.lit("hmon_hitmon_poison")), rnd(6)) : rnd(6), hmd.dmg = hmd.dmg + $t1 | 0;
+    } else if (rn2(10)) {
+        $t1 = rnd(6), hmd.dmg = hmd.dmg + $t1 | 0;
     } else {
         hmd.poiskilled = 1;
     }
 }
 async function hmon_hitmon_jousting(hmd, mon, obj) {   // uhitm.c:1541
     let $t1;
-    $t1 = rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 1546, $c.lit("hmon_hitmon_jousting")), d(2, $c.peq(obj, $G.uwep) ? 10 : 2)) : d(2, $c.peq(obj, $G.uwep) ? 10 : 2), hmd.dmg = hmd.dmg + $t1 | 0;
+    $t1 = d(2, $c.peq(obj, $G.uwep) ? 10 : 2), hmd.dmg = hmd.dmg + $t1 | 0;
     await You($c.lit("joust %s%s"), await mon_nam(mon), canseemon(mon) ? exclam(hmd.dmg) : $c.lit("."));
     if (u.uconduct.weaphit <= 1) {
         await first_weapon_hit(obj);
@@ -1011,7 +1011,7 @@ async function hmon_hitmon_jousting(hmd, mon, obj) {   // uhitm.c:1541
     hmd.hittxt = 1;
 }
 async function hmon_hitmon_stagger(hmd, mon, obj) {   // uhitm.c:1570
-    if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 1576, $c.lit("hmon_hitmon_stagger")), rnd(100)) : rnd(100)) < u.weapon_skills[35 /* P_BARE_HANDED_COMBAT */].skill && !(hmd.mdat.msize >= 3) && !($c.andu64(hmd.mdat.mflags1, 2097152) !== 0)) {
+    if (rnd(100) < u.weapon_skills[35 /* P_BARE_HANDED_COMBAT */].skill && !(hmd.mdat.msize >= 3) && !($c.andu64(hmd.mdat.mflags1, 2097152) !== 0)) {
         if (canseemon(mon) || sensemon(mon)) {
             await pline($c.lit("%s %s from your powerful strike!"), await Monnam(mon), await makeplural(stagger(mon.data, $c.lit("stagger"))));
         }
@@ -1025,7 +1025,7 @@ async function hmon_hitmon_pet(hmd, mon, obj) {   // uhitm.c:1588
     if (mon.mtame && hmd.dmg > 0) {
         await abuse_dog(mon);
         if (mon.mtame && !hmd.destroyed) {
-            await monflee(mon, Math.imul(10, rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 1599, $c.lit("hmon_hitmon_pet")), rnd(hmd.dmg)) : rnd(hmd.dmg)), 0, 0);
+            await monflee(mon, Math.imul(10, rnd(hmd.dmg)), 0, 0);
         }
     }
 }
@@ -1299,9 +1299,9 @@ async function m_slips_free(mdef, mattk) {   // uhitm.c:2056
             obj = await which_armor(mdef, 64);
         }
     }
-    if (obj && (obj.greased | 0 || obj.otyp === 142 /* OILSKIN_CLOAK */) && (!obj.cursed || (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 2075, $c.lit("m_slips_free")), rn2(3)) : rn2(3)))) {
+    if (obj && (obj.greased | 0 || obj.otyp === 142 /* OILSKIN_CLOAK */) && (!obj.cursed || rn2(3))) {
         await You($c.lit("%s %s %s %s!"), mattk.adtyp === 28 ? $c.lit("slip off of") : $c.lit("grab, but cannot hold onto"), s_suffix(await mon_nam(mdef)), obj.greased | 0 ? $c.lit("greased") : $c.lit("slippery"), obj.greased | 0 || objects[obj.otyp].oc_name_known | 0 ? await xname(obj) : cloak_simple_name(obj));
-        if (obj.greased | 0 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 2086, $c.lit("m_slips_free")), rn2(2)) : rn2(2))) {
+        if (obj.greased | 0 && !rn2(2)) {
             await pline_The($c.lit("grease wears off."));
             obj.greased = (0) & 1;
         }
@@ -1327,8 +1327,8 @@ function joust(mon, obj) {   // uhitm.c:2098
     if (skill_rating === 0 /* P_ISRESTRICTED */) {
         skill_rating = 1 /* P_UNSKILLED */;
     }
-    if ((joust_dieroll = rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 2122, $c.lit("joust")), rn2(5)) : rn2(5)) < skill_rating) {
-        if (joust_dieroll === 0 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 2123, $c.lit("joust")), rnl(50)) : rnl(50)) === 49 && !($c.andu64(mon.data.mflags1, 1048576) !== 0) && !obj_resists(obj, 0, 100)) {
+    if ((joust_dieroll = rn2(5)) < skill_rating) {
+        if (joust_dieroll === 0 && rnl(50) === 49 && !($c.andu64(mon.data.mflags1, 1048576) !== 0) && !obj_resists(obj, 0, 100)) {
             return -1;
         }
         return 1;
@@ -1338,7 +1338,7 @@ function joust(mon, obj) {   // uhitm.c:2098
 async function demonpet() {   // uhitm.c:2133
     let i = 0, pm = null, dtmp = null;
     await pline($c.lit("Some hell-p has arrived!"));
-    i = !(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 2140, $c.lit("demonpet")), rn2(6)) : rn2(6)) ? await ndemon(u.ualign.type) : -1 /* NON_PM */;
+    i = !rn2(6) ? await ndemon(u.ualign.type) : -1 /* NON_PM */;
     pm = i !== -1 /* NON_PM */ ? $c.relem(mons, i) : gy.youmonst.data;
     if ((dtmp = await makemon(pm, u.ux, u.uy, 0)) !== null) {
         await tamedog(dtmp, null, 0);
@@ -1540,18 +1540,18 @@ export async function mhitm_ad_dren(magr, mattk, mdef, mhm) {   // uhitm.c:2418
     let negated = 0;
     negated = await mhitm_mgc_atk_negated(magr, mdef, 0);
     if ($c.peq(magr, gy.youmonst)) {
-        if (!negated && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 2426, $c.lit("mhitm_ad_dren")), rn2(4)) : rn2(4))) {
+        if (!negated && !rn2(4)) {
             await xdrainenergym(mdef, 1);
         }
         mhm.damage = 0;
     } else if ($c.peq(mdef, gy.youmonst)) {
         await hitmsg(magr, mattk);
-        if (!negated && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 2432, $c.lit("mhitm_ad_dren")), rn2(4)) : rn2(4))) {
+        if (!negated && !rn2(4)) {
             await drain_en(mhm.damage, 0);
         }
         mhm.damage = 0;
     } else {
-        if (!negated && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 2437, $c.lit("mhitm_ad_dren")), rn2(4)) : rn2(4))) {
+        if (!negated && !rn2(4)) {
             await xdrainenergym(mdef, $c.i8(gv.vis && (canseemon(mdef) || sensemon(mdef)) && mattk.aatyp !== 11 ? 1 : 0));
         }
         mhm.damage = 0;
@@ -1560,8 +1560,8 @@ export async function mhitm_ad_dren(magr, mattk, mdef, mhm) {   // uhitm.c:2418
 export async function mhitm_ad_drli(magr, mattk, mdef, mhm) {   // uhitm.c:2445
     let is_death = 0, $t1, $t2;
     if ($c.peq(magr, gy.youmonst)) {
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 2451, $c.lit("mhitm_ad_drli")), rn2(3)) : rn2(3)) && !(await resists_drli(mdef) || await defended(mdef, 15)) && !await mhitm_mgc_atk_negated(magr, mdef, 1)) {
-            $t1 = rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 2453, $c.lit("mhitm_ad_drli")), d(2, 6)) : d(2, 6), mhm.damage = $t1;
+        if (!rn2(3) && !(await resists_drli(mdef) || await defended(mdef, 15)) && !await mhitm_mgc_atk_negated(magr, mdef, 1)) {
+            $t1 = d(2, 6), mhm.damage = $t1;
             await pline($c.lit("%s becomes weaker!"), await Monnam(mdef));
             if ((mdef.mhpmax - mhm.damage | 0) > mdef.m_lev) {
                 mdef.mhpmax = mdef.mhpmax - mhm.damage | 0;
@@ -1581,14 +1581,14 @@ export async function mhitm_ad_drli(magr, mattk, mdef, mhm) {   // uhitm.c:2445
         }
     } else if ($c.peq(mdef, gy.youmonst)) {
         await hitmsg(magr, mattk);
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 2482, $c.lit("mhitm_ad_drli")), rn2(3)) : rn2(3)) && !(u.uprops[9 /* DRAIN_RES */].intrinsic || u.uprops[9 /* DRAIN_RES */].extrinsic) && !await mhitm_mgc_atk_negated(magr, mdef, 1)) {
+        if (!rn2(3) && !(u.uprops[9 /* DRAIN_RES */].intrinsic || u.uprops[9 /* DRAIN_RES */].extrinsic) && !await mhitm_mgc_atk_negated(magr, mdef, 1)) {
             await losexp($c.lit("life drainage"));
         }
     } else {
         is_death = $c.i8(mattk.adtyp === 37 ? 1 : 0);
-        if (is_death || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 2495, $c.lit("mhitm_ad_drli")), rn2(3)) : rn2(3)) && !(await resists_drli(mdef) || await defended(mdef, 15)) && !await mhitm_mgc_atk_negated(magr, mdef, 1)) {
+        if (is_death || !rn2(3) && !(await resists_drli(mdef) || await defended(mdef, 15)) && !await mhitm_mgc_atk_negated(magr, mdef, 1)) {
             if (!is_death) {
-                $t2 = rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 2498, $c.lit("mhitm_ad_drli")), d(2, 6)) : d(2, 6), mhm.damage = $t2;
+                $t2 = d(2, 6), mhm.damage = $t2;
             }
             if (gv.vis && (canseemon(mdef) || sensemon(mdef))) {
                 await pline_mon(mdef, $c.lit("%s becomes weaker!"), await Monnam(mdef));
@@ -1656,7 +1656,7 @@ export async function mhitm_ad_fire(magr, mattk, mdef, mhm) {   // uhitm.c:2521
             } else {
                 monstunseesu(2);
             }
-            if (magr.m_lev > (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 2579, $c.lit("mhitm_ad_fire")), rn2(20)) : rn2(20))) {
+            if (magr.m_lev > rn2(20)) {
                 await destroy_items(gy.youmonst, 2, orig_dmg);
                 await ignite_items(gi.invent);
             }
@@ -1729,7 +1729,7 @@ export async function mhitm_ad_cold(magr, mattk, mdef, mhm) {   // uhitm.c:2626
             } else {
                 monstunseesu(4);
             }
-            if (magr.m_lev > (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 2660, $c.lit("mhitm_ad_cold")), rn2(20)) : rn2(20))) {
+            if (magr.m_lev > rn2(20)) {
                 await destroy_items(gy.youmonst, 3, orig_dmg);
             }
         } else {
@@ -1785,7 +1785,7 @@ export async function mhitm_ad_elec(magr, mattk, mdef, mhm) {   // uhitm.c:2684
             } else {
                 monstunseesu(32);
             }
-            if (magr.m_lev > (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 2718, $c.lit("mhitm_ad_elec")), rn2(20)) : rn2(20))) {
+            if (magr.m_lev > rn2(20)) {
                 await destroy_items(gy.youmonst, 6, orig_dmg);
             }
         } else {
@@ -1817,7 +1817,7 @@ export async function mhitm_ad_acid(magr, mattk, mdef, mhm) {   // uhitm.c:2742
         }
     } else if ($c.peq(mdef, gy.youmonst)) {
         await hitmsg(magr, mattk);
-        if (!magr.mcan && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 2753, $c.lit("mhitm_ad_acid")), rn2(3)) : rn2(3))) {
+        if (!magr.mcan && !rn2(3)) {
             if (u.uprops[7 /* ACID_RES */].intrinsic || u.uprops[7 /* ACID_RES */].extrinsic) {
                 await pline($c.lit("You're covered in %s, but it seems harmless."), hliquid($c.lit("acid")));
                 monstseesu(128);
@@ -1844,10 +1844,10 @@ export async function mhitm_ad_acid(magr, mattk, mdef, mhm) {   // uhitm.c:2742
             await pline_mon(mdef, $c.lit("%s is covered in %s!"), await Monnam(mdef), hliquid($c.lit("acid")));
             await pline($c.lit("It burns %s!"), await mon_nam(mdef));
         }
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 2781, $c.lit("mhitm_ad_acid")), rn2(30)) : rn2(30))) {
+        if (!rn2(30)) {
             await erode_armor(mdef, 3);
         }
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 2783, $c.lit("mhitm_ad_acid")), rn2(6)) : rn2(6))) {
+        if (!rn2(6)) {
             await acid_damage(mdef.mw);
         }
     }
@@ -2011,7 +2011,7 @@ export async function mhitm_ad_blnd(magr, mattk, mdef, mhm) {   // uhitm.c:2958
                 }
                 await pline($c.lit("%s."), new $c.Ptr(buf, 0));
             }
-            rnd_tmp = (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 3002, $c.lit("mhitm_ad_blnd")), d(mattk.damn, mattk.damd)) : d(mattk.damn, mattk.damd)) >>> 0;
+            rnd_tmp = d(mattk.damn, mattk.damd) >>> 0;
             if ((rnd_tmp = rnd_tmp + mdef.mblinded >>> 0) > 127) {
                 rnd_tmp = 127;
             }
@@ -2029,7 +2029,7 @@ export async function mhitm_ad_curs(magr, mattk, mdef, mhm) {   // uhitm.c:3015
     pa = magr.data;
     pd = mdef.data;
     if ($c.peq(magr, gy.youmonst)) {
-        if (night() && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 3024, $c.lit("mhitm_ad_curs")), rn2(10)) : rn2(10)) && !mdef.mcan) {
+        if (night() && !rn2(10) && !mdef.mcan) {
             if ($c.peq(pd, $c.relem(mons, 256 /* PM_CLAY_GOLEM */))) {
                 if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
                     await pline($c.lit("Some writing vanishes from %s head!"), s_suffix(await mon_nam(mdef)));
@@ -2046,7 +2046,7 @@ export async function mhitm_ad_curs(magr, mattk, mdef, mhm) {   // uhitm.c:3015
         if (!night() && $c.peq(pa, $c.relem(mons, 40 /* PM_GREMLIN */))) {
             return;
         }
-        if (!magr.mcan && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 3042, $c.lit("mhitm_ad_curs")), rn2(10)) : rn2(10))) {
+        if (!magr.mcan && !rn2(10)) {
             if (!(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf)) {
                 if ((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked) {
                     await You_hear($c.lit("laughter."));
@@ -2065,7 +2065,7 @@ export async function mhitm_ad_curs(magr, mattk, mdef, mhm) {   // uhitm.c:3015
         if (!night() && $c.peq(pa, $c.relem(mons, 40 /* PM_GREMLIN */))) {
             return;
         }
-        if (!magr.mcan && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 3063, $c.lit("mhitm_ad_curs")), rn2(10)) : rn2(10))) {
+        if (!magr.mcan && !rn2(10)) {
             mdef.mcan = (1) & 1;
             mdef.mstrategy = $c.andu64(mdef.mstrategy, 18446744073172680703n);
             if ($c.andu64(pd.mflags2, 4) !== 0 && pd.mlet !== 53 /* S_HUMAN */) {
@@ -2108,7 +2108,7 @@ async function mhitm_really_poison(magr, mattk, mdef, mhm) {   // uhitm.c:3104
             await pline_The($c.lit("poison doesn't seem to affect %s."), await mon_nam(mdef));
         }
     } else {
-        $t1 = (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 3115, $c.lit("mhitm_really_poison")), rn2(10)) : rn2(10)) + 6 | 0, mhm.damage = mhm.damage + $t1 | 0;
+        $t1 = rn2(10) + 6 | 0, mhm.damage = mhm.damage + $t1 | 0;
         if (mhm.damage >= mdef.mhp && gv.vis && (canseemon(mdef) || sensemon(mdef))) {
             await pline_The($c.lit("poison was deadly..."));
         }
@@ -2119,16 +2119,16 @@ export async function mhitm_ad_drst(magr, mattk, mdef, mhm) {   // uhitm.c:3122
     negated = await mhitm_mgc_atk_negated(magr, mdef, 0);
     pa = magr.data;
     if ($c.peq(magr, gy.youmonst)) {
-        if (!negated && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 3131, $c.lit("mhitm_ad_drst")), rn2(8)) : rn2(8))) {
+        if (!negated && !rn2(8)) {
             await Your($c.lit("%s was poisoned!"), mpoisons_subj(magr, mattk));
             if (await Resists_Elem(mdef, 6 /* POISON_RES */)) {
                 await pline_The($c.lit("poison doesn't seem to affect %s."), await mon_nam(mdef));
             } else {
-                if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 3136, $c.lit("mhitm_ad_drst")), rn2(10)) : rn2(10))) {
+                if (!rn2(10)) {
                     await Your($c.lit("poison was deadly..."));
                     mhm.damage = mdef.mhp;
                 } else {
-                    $t1 = (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 3140, $c.lit("mhitm_ad_drst")), rn2(10)) : rn2(10)) + 6 | 0, mhm.damage = mhm.damage + $t1 | 0;
+                    $t1 = rn2(10) + 6 | 0, mhm.damage = mhm.damage + $t1 | 0;
                 }
             }
         }
@@ -2146,12 +2146,12 @@ export async function mhitm_ad_drst(magr, mattk, mdef, mhm) {   // uhitm.c:3122
                 break;
         }
         await hitmsg(magr, mattk);
-        if (!negated && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 3154, $c.lit("mhitm_ad_drst")), rn2(8)) : rn2(8))) {
+        if (!negated && !rn2(8)) {
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s %s"), s_suffix(await Monnam(magr)), mpoisons_subj(magr, mattk));
             await poisoned(new $c.Ptr(buf, 0), ptmp, pmname(pa, Mgender(magr)), 30, 0);
         }
     } else {
-        if (!negated && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 3161, $c.lit("mhitm_ad_drst")), rn2(8)) : rn2(8))) {
+        if (!negated && !rn2(8)) {
             await mhitm_really_poison(magr, mattk, mdef, mhm);
         }
     }
@@ -2175,7 +2175,7 @@ export async function mhitm_ad_drin(magr, mattk, mdef, mhm) {   // uhitm.c:3168
         if (await m_slips_free(mdef, mattk)) {
             return;
         }
-        if ((helmet = await which_armor(mdef, 4)) !== null && (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 3207, $c.lit("mhitm_ad_drin")), rn2(8)) : rn2(8))) {
+        if ((helmet = await which_armor(mdef, 4)) !== null && rn2(8)) {
             await pline($c.lit("%s %s blocks your attack to %s head."), s_suffix(await Monnam(mdef)), helm_simple_name(helmet), genders[pronoun_gender(mdef, 2)].his);
             return;
         }
@@ -2195,7 +2195,7 @@ export async function mhitm_ad_drin(magr, mattk, mdef, mhm) {   // uhitm.c:3168
         if (await u_slip_free(magr, mattk)) {
             return;
         }
-        if ($G.uarmh && (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 3235, $c.lit("mhitm_ad_drin")), rn2(8)) : rn2(8))) {
+        if ($G.uarmh && rn2(8)) {
             await Your($c.lit("%s blocks the attack to your head."), helm_simple_name($G.uarmh));
             return;
         }
@@ -2214,13 +2214,13 @@ export async function mhitm_ad_drin(magr, mattk, mdef, mhm) {   // uhitm.c:3168
                 return;
             }
         }
-        await adjattrib(1 /* A_INT */, -(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 3263, $c.lit("mhitm_ad_drin")), rnd(2)) : rnd(2)) | 0, 0);
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 3264, $c.lit("mhitm_ad_drin")), rn2(5)) : rn2(5))) {
+        await adjattrib(1 /* A_INT */, -rnd(2) | 0, 0);
+        if (!rn2(5)) {
             await losespells();
             gs.skipdrin = 1;
         }
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 3268, $c.lit("mhitm_ad_drin")), rn2(5)) : rn2(5))) {
-            await drain_weapon_skill(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 3269, $c.lit("mhitm_ad_drin")), rnd(2)) : rnd(2));
+        if (!rn2(5)) {
+            await drain_weapon_skill(rnd(2));
             gs.skipdrin = 1;
         }
     } else {
@@ -2232,7 +2232,7 @@ export async function mhitm_ad_drin(magr, mattk, mdef, mhm) {   // uhitm.c:3168
             gs.skipdrin = 1;
             return;
         }
-        if ($c.and64(mdef.misc_worn_check, 4) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 3286, $c.lit("mhitm_ad_drin")), rn2(8)) : rn2(8))) {
+        if ($c.and64(mdef.misc_worn_check, 4) && rn2(8)) {
             if (gv.vis && (canseemon(magr) || sensemon(magr)) && canseemon(mdef)) {
                 $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), s_suffix(await Monnam(mdef)), 256);
                 await pline($c.lit("%s helmet blocks %s attack to %s head."), new $c.Ptr(buf, 0), s_suffix(await mon_nam(magr)), genders[pronoun_gender(mdef, 2)].his);
@@ -2281,7 +2281,7 @@ export async function mhitm_ad_wrap(magr, mattk, mdef, mhm) {   // uhitm.c:3337
     if ($c.peq(magr, gy.youmonst)) {
         if (!sticks(pd)) {
             tailmiss = $c.i8(!gn.notonhead ? 1 : 0);
-            if (!u.ustuck && !tailmiss && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 3349, $c.lit("mhitm_ad_wrap")), rn2(10)) : rn2(10))) {
+            if (!u.ustuck && !tailmiss && !rn2(10)) {
                 if (await m_slips_free(mdef, mattk)) {
                     mhm.damage = 0;
                 } else {
@@ -2310,7 +2310,7 @@ export async function mhitm_ad_wrap(magr, mattk, mdef, mhm) {   // uhitm.c:3337
         }
     } else if ($c.peq(mdef, gy.youmonst)) {
         if ((!magr.mcan || $c.peq(u.ustuck, magr)) && !sticks(pd)) {
-            if (!u.ustuck && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 3379, $c.lit("mhitm_ad_wrap")), rn2(10)) : rn2(10))) {
+            if (!u.ustuck && !rn2(10)) {
                 if (await u_slip_free(magr, mattk)) {
                     mhm.damage = 0;
                 } else {
@@ -2352,15 +2352,15 @@ export async function mhitm_ad_wrap(magr, mattk, mdef, mhm) {   // uhitm.c:3337
 export async function mhitm_ad_plys(magr, mattk, mdef, mhm) {   // uhitm.c:3431
     let buf = new Int8Array(256);
     if ($c.peq(magr, gy.youmonst)) {
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 3437, $c.lit("mhitm_ad_plys")), rn2(3)) : rn2(3)) && mhm.damage < mdef.mhp && !await mhitm_mgc_atk_negated(magr, mdef, 1)) {
+        if (!rn2(3) && mhm.damage < mdef.mhp && !await mhitm_mgc_atk_negated(magr, mdef, 1)) {
             if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
                 await pline($c.lit("%s is frozen by you!"), await Monnam(mdef));
             }
-            paralyze_monst(mdef, rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 3441, $c.lit("mhitm_ad_plys")), rnd(10)) : rnd(10));
+            paralyze_monst(mdef, rnd(10));
         }
     } else if ($c.peq(mdef, gy.youmonst)) {
         await hitmsg(magr, mattk);
-        if (gm.multi >= 0 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 3446, $c.lit("mhitm_ad_plys")), rn2(3)) : rn2(3)) && !await mhitm_mgc_atk_negated(magr, mdef, 1)) {
+        if (gm.multi >= 0 && !rn2(3) && !await mhitm_mgc_atk_negated(magr, mdef, 1)) {
             if (u.uprops[66 /* FREE_ACTION */].extrinsic) {
                 await You($c.lit("momentarily stiffen."));
             } else {
@@ -2370,25 +2370,25 @@ export async function mhitm_ad_plys(magr, mattk, mdef, mhm) {   // uhitm.c:3431
                     await You($c.lit("are frozen by %s!"), await mon_nam(magr));
                 }
                 gn.nomovemsg = c_common_strings.c_You_can_move_again;
-                nomul(-(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 3456, $c.lit("mhitm_ad_plys")), rnd(10)) : rnd(10)) | 0);
+                nomul(-rnd(10) | 0);
                 await dynamic_multi_reason(magr, $c.lit("paralyzed"), 0);
                 await exercise(3 /* A_DEX */, 0);
             }
         }
     } else {
-        if (mdef.mcanmove | 0 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 3465, $c.lit("mhitm_ad_plys")), rn2(3)) : rn2(3)) && !await mhitm_mgc_atk_negated(magr, mdef, 1)) {
+        if (mdef.mcanmove | 0 && !rn2(3) && !await mhitm_mgc_atk_negated(magr, mdef, 1)) {
             if (gv.vis && (canseemon(mdef) || sensemon(mdef))) {
                 $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), await Monnam(mdef), 256);
                 await pline($c.lit("%s is frozen by %s."), new $c.Ptr(buf, 0), await mon_nam(magr));
             }
-            paralyze_monst(mdef, rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 3473, $c.lit("mhitm_ad_plys")), rnd(10)) : rnd(10));
+            paralyze_monst(mdef, rnd(10));
         }
     }
 }
 export async function mhitm_ad_slee(magr, mattk, mdef, mhm) {   // uhitm.c:3479
     let buf = new Int8Array(256);
     if ($c.peq(magr, gy.youmonst)) {
-        if (!mdef.msleeping && !await mhitm_mgc_atk_negated(magr, mdef, 0) && await sleep_monst(mdef, rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 3487, $c.lit("mhitm_ad_slee")), rnd(10)) : rnd(10), -1)) {
+        if (!mdef.msleeping && !await mhitm_mgc_atk_negated(magr, mdef, 0) && await sleep_monst(mdef, rnd(10), -1)) {
             if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
                 await pline($c.lit("%s is put to sleep by you!"), await Monnam(mdef));
             }
@@ -2396,13 +2396,13 @@ export async function mhitm_ad_slee(magr, mattk, mdef, mhm) {   // uhitm.c:3479
         }
     } else if ($c.peq(mdef, gy.youmonst)) {
         await hitmsg(magr, mattk);
-        if (gm.multi >= 0 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 3495, $c.lit("mhitm_ad_slee")), rn2(5)) : rn2(5)) && !await mhitm_mgc_atk_negated(magr, mdef, 1)) {
+        if (gm.multi >= 0 && !rn2(5) && !await mhitm_mgc_atk_negated(magr, mdef, 1)) {
             if (u.uprops[3 /* SLEEP_RES */].intrinsic || u.uprops[3 /* SLEEP_RES */].extrinsic) {
                 monstseesu(8);
                 return;
             }
             monstunseesu(8);
-            await fall_asleep(-(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 3502, $c.lit("mhitm_ad_slee")), rnd(10)) : rnd(10)) | 0, 1);
+            await fall_asleep(-rnd(10) | 0, 1);
             if ((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked) {
                 await You($c.lit("are put to sleep!"));
             } else {
@@ -2410,7 +2410,7 @@ export async function mhitm_ad_slee(magr, mattk, mdef, mhm) {   // uhitm.c:3479
             }
         }
     } else {
-        if (!mdef.msleeping && await sleep_monst(mdef, rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 3510, $c.lit("mhitm_ad_slee")), rnd(10)) : rnd(10), -1) && await sleep_monst(mdef, rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 3511, $c.lit("mhitm_ad_slee")), rnd(10)) : rnd(10), -1)) {
+        if (!mdef.msleeping && await sleep_monst(mdef, rnd(10), -1) && await sleep_monst(mdef, rnd(10), -1)) {
             if (gv.vis && (canseemon(mdef) || sensemon(mdef))) {
                 $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), await Monnam(mdef), 256);
                 await pline($c.lit("%s is put to sleep by %s."), new $c.Ptr(buf, 0), await mon_nam(magr));
@@ -2428,7 +2428,7 @@ export async function mhitm_ad_slim(magr, mattk, mdef, mhm) {   // uhitm.c:3526
         if (negated) {
             return;
         }
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 3537, $c.lit("mhitm_ad_slim")), rn2(4)) : rn2(4)) && !($c.peq(pd, $c.relem(mons, 208 /* PM_GREEN_SLIME */)) || ($c.peq(pd, $c.relem(mons, 111 /* PM_FIRE_VORTEX */)) || $c.peq(pd, $c.relem(mons, 30 /* PM_FLAMING_SPHERE */)) || $c.peq(pd, $c.relem(mons, 155 /* PM_FIRE_ELEMENTAL */)) || $c.peq(pd, $c.relem(mons, 329 /* PM_SALAMANDER */))) || pd.mlet === 54 /* S_GHOST */)) {
+        if (!rn2(4) && !($c.peq(pd, $c.relem(mons, 208 /* PM_GREEN_SLIME */)) || ($c.peq(pd, $c.relem(mons, 111 /* PM_FIRE_VORTEX */)) || $c.peq(pd, $c.relem(mons, 30 /* PM_FLAMING_SPHERE */)) || $c.peq(pd, $c.relem(mons, 155 /* PM_FIRE_ELEMENTAL */)) || $c.peq(pd, $c.relem(mons, 329 /* PM_SALAMANDER */))) || pd.mlet === 54 /* S_GHOST */)) {
             if (!await munslime(mdef, 1) && !(mdef.mhp < 1)) {
                 await You($c.lit("turn %s into slime."), await mon_nam(mdef));
                 if (await newcham(mdef, $c.relem(mons, 208 /* PM_GREEN_SLIME */), 0)) {
@@ -2467,7 +2467,7 @@ export async function mhitm_ad_slim(magr, mattk, mdef, mhm) {   // uhitm.c:3526
         if (negated) {
             return;
         }
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 3579, $c.lit("mhitm_ad_slim")), rn2(4)) : rn2(4)) && !($c.peq(pd, $c.relem(mons, 208 /* PM_GREEN_SLIME */)) || ($c.peq(pd, $c.relem(mons, 111 /* PM_FIRE_VORTEX */)) || $c.peq(pd, $c.relem(mons, 30 /* PM_FLAMING_SPHERE */)) || $c.peq(pd, $c.relem(mons, 155 /* PM_FIRE_ELEMENTAL */)) || $c.peq(pd, $c.relem(mons, 329 /* PM_SALAMANDER */))) || pd.mlet === 54 /* S_GHOST */)) {
+        if (!rn2(4) && !($c.peq(pd, $c.relem(mons, 208 /* PM_GREEN_SLIME */)) || ($c.peq(pd, $c.relem(mons, 111 /* PM_FIRE_VORTEX */)) || $c.peq(pd, $c.relem(mons, 30 /* PM_FLAMING_SPHERE */)) || $c.peq(pd, $c.relem(mons, 155 /* PM_FIRE_ELEMENTAL */)) || $c.peq(pd, $c.relem(mons, 329 /* PM_SALAMANDER */))) || pd.mlet === 54 /* S_GHOST */)) {
             if (!await munslime(mdef, 0) && !(mdef.mhp < 1)) {
                 ncflags = 0;
                 if (gv.vis && canseemon(mdef)) {
@@ -2499,7 +2499,7 @@ export async function mhitm_ad_ench(magr, mattk, mdef, mhm) {   // uhitm.c:3603
         if (!negated) {
             obj = await some_armor(mdef);
             if (!obj) {
-                switch (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 3624, $c.lit("mhitm_ad_ench")), rn2(5)) : rn2(5)) {
+                switch (rn2(5)) {
                     case 0:
                         break;
                     case 1:
@@ -2539,7 +2539,7 @@ export async function mhitm_ad_slow(magr, mattk, mdef, mhm) {   // uhitm.c:3652
         }
     } else if ($c.peq(mdef, gy.youmonst)) {
         await hitmsg(magr, mattk);
-        if (!negated && u.uprops[64 /* FAST */].intrinsic && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 3674, $c.lit("mhitm_ad_slow")), rn2(4)) : rn2(4))) {
+        if (!negated && u.uprops[64 /* FAST */].intrinsic && !rn2(4)) {
             await u_slow_down();
         }
     } else {
@@ -2564,8 +2564,8 @@ export async function mhitm_ad_conf(magr, mattk, mdef, mhm) {   // uhitm.c:3690
         }
     } else if ($c.peq(mdef, gy.youmonst)) {
         await hitmsg(magr, mattk);
-        if (!magr.mcan && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 3704, $c.lit("mhitm_ad_conf")), rn2(4)) : rn2(4)) && !magr.mspec_used) {
-            $t1 = magr.mspec_used + (mhm.damage + (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 3705, $c.lit("mhitm_ad_conf")), rn2(6)) : rn2(6)) | 0) | 0, magr.mspec_used = $t1;
+        if (!magr.mcan && !rn2(4) && !magr.mspec_used) {
+            $t1 = magr.mspec_used + (mhm.damage + rn2(6) | 0) | 0, magr.mspec_used = $t1;
             if (u.uprops[14 /* CONFUSION */].intrinsic) {
                 await You($c.lit("are getting even more confused."));
             } else {
@@ -2637,7 +2637,7 @@ export async function mhitm_ad_famn(magr, mattk, mdef, mhm) {   // uhitm.c:3777
                 await pline_mon(magr, $c.lit("%s reaches out, and your body shrivels."), await Monnam(magr));
                 await exercise(4 /* A_CON */, 0);
                 if (!is_fainted()) {
-                    await morehungry((rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 3795, $c.lit("mhitm_ad_famn")), rn2(40)) : rn2(40)) + 40 | 0);
+                    await morehungry(rn2(40) + 40 | 0);
                 }
             } else {
                 $goto = null;   // mhitm_famn:
@@ -2687,7 +2687,7 @@ export async function mhitm_ad_deth(magr, mattk, mdef, mhm) {   // uhitm.c:3837
                     await pline($c.lit("Was that the touch of death?"));
                     return;
                 }
-                switch (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 3858, $c.lit("mhitm_ad_deth")), rn2(20)) : rn2(20)) {
+                switch (rn2(20)) {
                     case 19:
                     case 18:
                     case 17:
@@ -2715,7 +2715,7 @@ export async function mhitm_ad_deth(magr, mattk, mdef, mhm) {   // uhitm.c:3837
             } else {
                 $goto = null;   // mhitm_deth:
                 if ($c.andu64(pd.mflags2, 2) !== 0 && mhm.damage > 1) {
-                    $t1 = rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 3890, $c.lit("mhitm_ad_deth")), rnd($c.div32(mhm.damage, 2))) : rnd($c.div32(mhm.damage, 2)), mhm.damage = $t1;
+                    $t1 = rnd($c.div32(mhm.damage, 2)), mhm.damage = $t1;
                 }
                 await mhitm_ad_drli(magr, mattk, mdef, mhm);
             }
@@ -2830,7 +2830,7 @@ export async function mhitm_ad_phys(magr, mattk, mdef, mhm) {   // uhitm.c:3981
         }
     } else if ($c.peq(mdef, gy.youmonst)) {
         if (mattk.aatyp === 7 && !sticks(pd)) {
-            if (!u.ustuck && (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 4024, $c.lit("mhitm_ad_phys")), rn2(2)) : rn2(2))) {
+            if (!u.ustuck && rn2(2)) {
                 if (await u_slip_free(magr, mattk)) {
                     mhm.damage = 0;
                     mhm.hitflags = mhm.hitflags | 0;
@@ -2860,7 +2860,7 @@ export async function mhitm_ad_phys(magr, mattk, mdef, mhm) {   // uhitm.c:3981
                 }
                 $t1 = await dmgval(otmp, mdef), mhm.damage = mhm.damage + $t1 | 0;
                 if ((marmg = await which_armor(magr, 16)) !== null && marmg.otyp === 161 /* GAUNTLETS_OF_POWER */) {
-                    $t2 = (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 4064, $c.lit("mhitm_ad_phys")), rn2(4)) : rn2(4)) + 3 | 0, mhm.damage = mhm.damage + $t2 | 0;
+                    $t2 = rn2(4) + 3 | 0, mhm.damage = mhm.damage + $t2 | 0;
                 }
                 if (mhm.damage <= 0) {
                     mhm.damage = 1;
@@ -2878,7 +2878,7 @@ export async function mhitm_ad_phys(magr, mattk, mdef, mhm) {   // uhitm.c:3981
                 }
                 tmp = mhm.damage;
                 if (u.uac < 0) {
-                    tmp = tmp - (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 4085, $c.lit("mhitm_ad_phys")), rnd(-u.uac | 0)) : rnd(-u.uac | 0)) | 0;
+                    tmp = tmp - rnd(-u.uac | 0) | 0;
                 }
                 if (tmp < 1) {
                     tmp = 1;
@@ -2926,7 +2926,7 @@ export async function mhitm_ad_phys(magr, mattk, mdef, mhm) {   // uhitm.c:3981
             }
             $t3 = await dmgval(mwep, mdef), mhm.damage = mhm.damage + $t3 | 0;
             if ((marmg$2 = await which_armor(magr, 16)) !== null && marmg$2.otyp === 161 /* GAUNTLETS_OF_POWER */) {
-                $t4 = (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 4155, $c.lit("mhitm_ad_phys")), rn2(4)) : rn2(4)) + 3 | 0, mhm.damage = mhm.damage + $t4 | 0;
+                $t4 = rn2(4) + 3 | 0, mhm.damage = mhm.damage + $t4 | 0;
             }
             if (mhm.damage < 1) {
                 mhm.damage = 1;
@@ -2947,7 +2947,7 @@ export async function mhitm_ad_phys(magr, mattk, mdef, mhm) {   // uhitm.c:3981
             if (mhm.damage) {
                 await rustm(mdef, mwep);
             }
-            if ((mwep.otrapped | 0 || permapoisoned(mwep)) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 4184, $c.lit("mhitm_ad_phys")), rn2(4)) : rn2(4))) {
+            if ((mwep.otrapped | 0 || permapoisoned(mwep)) && !rn2(4)) {
                 await mhitm_really_poison(magr, mattk, mdef, mhm);
             }
         } else if ($c.peq(pa, $c.relem(mons, 115 /* PM_PURPLE_WORM */)) && $c.peq(pd, $c.relem(mons, 163 /* PM_SHRIEKER */))) {
@@ -2965,7 +2965,7 @@ export async function mhitm_ad_ston(magr, mattk, mdef, mhm) {   // uhitm.c:4203
         mhm.damage = 0;
     } else if ($c.peq(mdef, gy.youmonst)) {
         await hitmsg(magr, mattk);
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 4215, $c.lit("mhitm_ad_ston")), rn2(3)) : rn2(3))) {
+        if (!rn2(3)) {
             if (magr.mcan) {
                 if (!(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf)) {
                     await You_hear($c.lit("a cough from %s!"), await mon_nam(magr));
@@ -2979,7 +2979,7 @@ export async function mhitm_ad_ston(magr, mattk, mdef, mhm) {   // uhitm.c:4203
                 } else if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
                     await pline($c.lit("%s seems to grimace."), await Monnam(magr));
                 }
-                if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 4245, $c.lit("mhitm_ad_ston")), rn2(10)) : rn2(10)) || flags.moonphase === 0) {
+                if (!rn2(10) || flags.moonphase === 0) {
                     if (await do_stone_u(magr)) {
                         mhm.hitflags = 1;
                         mhm.done = 1;
@@ -3008,7 +3008,7 @@ export async function mhitm_ad_were(magr, mattk, mdef, mhm) {   // uhitm.c:4265
         }
     } else if ($c.peq(mdef, gy.youmonst)) {
         await hitmsg(magr, mattk);
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 4279, $c.lit("mhitm_ad_were")), rn2(4)) : rn2(4)) && u.ulycn === -1 /* NON_PM */ && !(u.uprops[60 /* PROT_FROM_SHAPE_CHANGERS */].intrinsic || u.uprops[60 /* PROT_FROM_SHAPE_CHANGERS */].extrinsic) && !defends(29, $G.uwep) && !await mhitm_mgc_atk_negated(magr, mdef, 1)) {
+        if (!rn2(4) && u.ulycn === -1 /* NON_PM */ && !(u.uprops[60 /* PROT_FROM_SHAPE_CHANGERS */].intrinsic || u.uprops[60 /* PROT_FROM_SHAPE_CHANGERS */].extrinsic) && !defends(29, $G.uwep) && !await mhitm_mgc_atk_negated(magr, mdef, 1)) {
             await urgent_pline($c.lit("You feel feverish."));
             await exercise(4 /* A_CON */, 0);
             await set_ulycn(pa.pmidx);
@@ -3038,10 +3038,10 @@ export async function mhitm_ad_heal(magr, mattk, mdef, mhm) {   // uhitm.c:4296
             goaway = 0;
             await pline_mon(magr, $c.lit("%s hits!  (I hope you don't mind.)"), await Monnam(magr));
             if (u.umonnum !== u.umonster) {
-                $t1 = rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 4324, $c.lit("mhitm_ad_heal")), rnd(7)) : rnd(7), u.mh = u.mh + $t1 | 0;
-                if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 4325, $c.lit("mhitm_ad_heal")), rn2(7)) : rn2(7))) {
+                $t1 = rnd(7), u.mh = u.mh + $t1 | 0;
+                if (!rn2(7)) {
                     u.mhmax = u.mhmax + 1 | 0;
-                    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 4328, $c.lit("mhitm_ad_heal")), rn2(13)) : rn2(13))) {
+                    if (!rn2(13)) {
                         goaway = 1;
                     }
                 }
@@ -3049,15 +3049,15 @@ export async function mhitm_ad_heal(magr, mattk, mdef, mhm) {   // uhitm.c:4296
                     u.mh = u.mhmax;
                 }
             } else {
-                $t2 = rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 4334, $c.lit("mhitm_ad_heal")), rnd(7)) : rnd(7), u.uhp = u.uhp + $t2 | 0;
-                if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 4335, $c.lit("mhitm_ad_heal")), rn2(7)) : rn2(7))) {
-                    if (u.uhpmax < (Math.imul(5, u.ulevel) + (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 4337, $c.lit("mhitm_ad_heal")), d(Math.imul(2, u.ulevel), 10)) : d(Math.imul(2, u.ulevel), 10)) | 0)) {
+                $t2 = rnd(7), u.uhp = u.uhp + $t2 | 0;
+                if (!rn2(7)) {
+                    if (u.uhpmax < (Math.imul(5, u.ulevel) + d(Math.imul(2, u.ulevel), 10) | 0)) {
                         u.uhpmax = u.uhpmax + 1 | 0;
                         if (u.uhpmax > u.uhppeak) {
                             u.uhppeak = u.uhpmax;
                         }
                     }
-                    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 4342, $c.lit("mhitm_ad_heal")), rn2(13)) : rn2(13))) {
+                    if (!rn2(13)) {
                         goaway = 1;
                     }
                 }
@@ -3065,10 +3065,10 @@ export async function mhitm_ad_heal(magr, mattk, mdef, mhm) {   // uhitm.c:4296
                     u.uhp = u.uhpmax;
                 }
             }
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 4348, $c.lit("mhitm_ad_heal")), rn2(3)) : rn2(3))) {
+            if (!rn2(3)) {
                 await exercise(0 /* A_STR */, 1);
             }
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 4350, $c.lit("mhitm_ad_heal")), rn2(3)) : rn2(3))) {
+            if (!rn2(3)) {
                 await exercise(4 /* A_CON */, 1);
             }
             if (u.uprops[17 /* SICK */].intrinsic) {
@@ -3080,11 +3080,11 @@ export async function mhitm_ad_heal(magr, mattk, mdef, mhm) {   // uhitm.c:4296
                 mhm.done = 1;
                 mhm.hitflags = 2;
                 return;
-            } else if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 4360, $c.lit("mhitm_ad_heal")), rn2(33)) : rn2(33))) {
+            } else if (!rn2(33)) {
                 if (!await tele_restrict(magr)) {
                     await rloc(magr, 2);
                 }
-                await monflee(magr, rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 4363, $c.lit("mhitm_ad_heal")), d(3, 6)) : d(3, 6), 1, 0);
+                await monflee(magr, d(3, 6), 1, 0);
                 mhm.done = 1;
                 mhm.hitflags = 3;
                 return;
@@ -3121,7 +3121,7 @@ export async function mhitm_ad_stun(magr, mattk, mdef, mhm) {   // uhitm.c:4388
         }
     } else if ($c.peq(mdef, gy.youmonst)) {
         await hitmsg(magr, mattk);
-        if (!magr.mcan && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 4406, $c.lit("mhitm_ad_stun")), rn2(4)) : rn2(4))) {
+        if (!magr.mcan && !rn2(4)) {
             await make_stunned($c.add64($c.and64(u.uprops[13 /* STUNNED */].intrinsic, 16777215), mhm.damage), 1);
             mhm.damage = $c.div32(mhm.damage, 2);
         }
@@ -3147,7 +3147,7 @@ export async function mhitm_ad_legs(magr, mattk, mdef, mhm) {   // uhitm.c:4425
             return;
         }
     } else if ($c.peq(mdef, gy.youmonst)) {
-        side = (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 4442, $c.lit("mhitm_ad_legs")), rn2(2)) : rn2(2)) ? 262144 : 131072;
+        side = rn2(2) ? 262144 : 131072;
         sidestr = side === 262144 ? $c.lit("right") : $c.lit("left");
         Monst_name = await Monnam(magr);
         leg = await body_part(9 /* LEG */);
@@ -3159,9 +3159,9 @@ export async function mhitm_ad_legs(magr, mattk, mdef, mhm) {   // uhitm.c:4425
             mhm.damage = 0;
         } else {
             if ($G.uarmf) {
-                if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 4459, $c.lit("mhitm_ad_legs")), rn2(2)) : rn2(2)) && ($G.uarmf.otyp === 163 /* LOW_BOOTS */ || $G.uarmf.otyp === 164 /* IRON_SHOES */)) {
+                if (rn2(2) && ($G.uarmf.otyp === 163 /* LOW_BOOTS */ || $G.uarmf.otyp === 164 /* IRON_SHOES */)) {
                     await pline($c.lit("%s pricks the exposed part of your %s %s!"), Monst_name, sidestr, leg);
-                } else if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 4463, $c.lit("mhitm_ad_legs")), rn2(5)) : rn2(5))) {
+                } else if (!rn2(5)) {
                     await pline($c.lit("%s pricks through your %s boot!"), Monst_name, sidestr);
                 } else {
                     await pline($c.lit("%s scratches your %s boot!"), Monst_name, sidestr);
@@ -3171,7 +3171,7 @@ export async function mhitm_ad_legs(magr, mattk, mdef, mhm) {   // uhitm.c:4425
             } else {
                 await pline($c.lit("%s pricks your %s %s!"), Monst_name, sidestr, leg);
             }
-            await set_wounded_legs(side, rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 4475, $c.lit("mhitm_ad_legs")), rnd(60 - acurr(3 /* A_DEX */) | 0)) : rnd(60 - acurr(3 /* A_DEX */) | 0));
+            await set_wounded_legs(side, rnd(60 - acurr(3 /* A_DEX */) | 0));
             await exercise(0 /* A_STR */, 0);
             await exercise(3 /* A_DEX */, 0);
         }
@@ -3242,7 +3242,7 @@ export async function mhitm_ad_samu(magr, mattk, mdef, mhm) {   // uhitm.c:4570
         mhm.damage = 0;
     } else if ($c.peq(mdef, gy.youmonst)) {
         await hitmsg(magr, mattk);
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 4583, $c.lit("mhitm_ad_samu")), rn2(20)) : rn2(20))) {
+        if (!rn2(20)) {
             await stealamulet(magr);
         }
     } else {
@@ -3298,7 +3298,7 @@ export async function mhitm_ad_sedu(magr, mattk, mdef, mhm) {   // uhitm.c:4623
             if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
                 await pline($c.lit("%s tries to %s you, but you seem %s."), await Adjmonnam(magr, $c.lit("plain")), flags.female ? $c.lit("charm") : $c.lit("seduce"), flags.female ? $c.lit("unaffected") : $c.lit("uninterested"));
             }
-            if (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 4663, $c.lit("mhitm_ad_sedu")), rn2(3)) : rn2(3)) {
+            if (rn2(3)) {
                 if (!await tele_restrict(magr)) {
                     await rloc(magr, 2);
                 }
@@ -3529,12 +3529,12 @@ export async function mhitm_adtyping(magr, mattk, mdef, mhm) {   // uhitm.c:4782
 }
 export async function damageum(mdef, mattk, specialdmg) {   // uhitm.c:4835
     let mhm = new $T.mhitm_data(), $t1;
-    $t1 = rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 4842, $c.lit("damageum")), d(mattk.damn, mattk.damd)) : d(mattk.damn, mattk.damd), mhm.damage = $t1;
+    $t1 = d(mattk.damn, mattk.damd), mhm.damage = $t1;
     mhm.hitflags = 0;
     mhm.permdmg = 0;
     mhm.specialdmg = specialdmg;
     mhm.done = 0;
-    if ($c.andu64(gy.youmonst.data.mflags2, 256) !== 0 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 4848, $c.lit("damageum")), rn2(13)) : rn2(13)) && !$G.uwep && u.umonnum !== 290 /* PM_AMOROUS_DEMON */ && u.umonnum !== 302 /* PM_BALROG */) {
+    if ($c.andu64(gy.youmonst.data.mflags2, 256) !== 0 && !rn2(13) && !$G.uwep && u.umonnum !== 290 /* PM_AMOROUS_DEMON */ && u.umonnum !== 302 /* PM_BALROG */) {
         await demonpet();
         return 0;
     }
@@ -3568,7 +3568,7 @@ export async function damageum(mdef, mattk, specialdmg) {   // uhitm.c:4835
 }
 export async function explum(mdef, mattk) {   // uhitm.c:4891
     let tmp = 0;
-    tmp = rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 4893, $c.lit("explum")), d(mattk.damn, mattk.damd)) : d(mattk.damn, mattk.damd);
+    tmp = d(mattk.damn, mattk.damd);
     switch (mattk.adtyp) {
         case 11:
             if (mdef && !await resists_blnd(mdef)) {
@@ -3618,7 +3618,7 @@ async function end_engulf() {   // uhitm.c:4949
 }
 async function gulpum(mdef, mattk) {   // uhitm.c:4958
     let tmp = 0, dam = 0, fatal_gulp = 0, u_digest = 0, u_enfold = 0, otmp = null, pd = null, expel_verb = null, kbuf = new Int8Array(256), mnam = null;
-    dam = rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 4962, $c.lit("gulpum")), d(mattk.damn, mattk.damd)) : d(mattk.damn, mattk.damd);
+    dam = d(mattk.damn, mattk.damd);
     u_digest = $c.i8(dmgtype_fromattack(gy.youmonst.data, 26, 11) !== null ? 1 : 0);
     u_enfold = $c.i8(dmgtype_fromattack(gy.youmonst.data, 28, 11) !== null ? 1 : 0);
     pd = mdef.data;
@@ -3743,7 +3743,7 @@ async function gulpum(mdef, mattk) {   // uhitm.c:4958
                     dam = 0;
                     break;
                 case 6:
-                    if (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 5141, $c.lit("gulpum")), rn2(2)) : rn2(2)) {
+                    if (rn2(2)) {
                         await pline_The($c.lit("air around %s crackles with electricity."), await mon_nam(mdef));
                         if (await Resists_Elem(mdef, 5 /* SHOCK_RES */)) {
                             await pline($c.lit("%s seems unhurt."), await Monnam(mdef));
@@ -3755,7 +3755,7 @@ async function gulpum(mdef, mattk) {   // uhitm.c:4958
                     }
                     break;
                 case 3:
-                    if (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 5153, $c.lit("gulpum")), rn2(2)) : rn2(2)) {
+                    if (rn2(2)) {
                         if (await Resists_Elem(mdef, 2 /* COLD_RES */)) {
                             await pline($c.lit("%s seems mildly chilly."), await Monnam(mdef));
                             dam = 0;
@@ -3768,7 +3768,7 @@ async function gulpum(mdef, mattk) {   // uhitm.c:4958
                     }
                     break;
                 case 2:
-                    if (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 5164, $c.lit("gulpum")), rn2(2)) : rn2(2)) {
+                    if (rn2(2)) {
                         if (await Resists_Elem(mdef, 1 /* FIRE_RES */)) {
                             await pline($c.lit("%s seems mildly hot."), await Monnam(mdef));
                             dam = 0;
@@ -3781,7 +3781,7 @@ async function gulpum(mdef, mattk) {   // uhitm.c:4958
                     }
                     break;
                 case 16:
-                    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 5175, $c.lit("gulpum")), rn2(4)) : rn2(4))) {
+                    if (!rn2(4)) {
                         await xdrainenergym(mdef, 1);
                     }
                     dam = 0;
@@ -3838,7 +3838,7 @@ export function m_is_steadfast(mtmp) {   // uhitm.c:5218
 }
 export async function mhitm_knockback(magr, mdef, mattk, hitflags, weapon_used) {   // uhitm.c:5247
     let magrbuf = new Int8Array(256), mdefbuf = new Int8Array(256), otmp = null, knockedhow = null, dx = 0, dy = 0, defx = 0, defy = 0, knockdistance = 0, chance = 0, u_agr = 0, u_def = 0, was_u = 0, dismount = 0, wep = null;
-    knockdistance = (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 5258, $c.lit("mhitm_knockback")), rn2(3)) : rn2(3)) ? 1 : 2;
+    knockdistance = rn2(3) ? 1 : 2;
     chance = 6;
     u_agr = $c.i8($c.peq(magr, gy.youmonst) ? 1 : 0);
     u_def = $c.i8($c.peq(mdef, gy.youmonst) ? 1 : 0);
@@ -3848,7 +3848,7 @@ export async function mhitm_knockback(magr, mdef, mattk, hitflags, weapon_used) 
     if (wep && is_art(wep, 16 /* ART_OGRESMASHER */)) {
         chance = 2;
     }
-    if (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 5269, $c.lit("mhitm_knockback")), rn2(chance)) : rn2(chance)) {
+    if (rn2(chance)) {
         return 0;
     }
     if (!(mattk.adtyp === 0 && (mattk.aatyp === 1 || mattk.aatyp === 3 || mattk.aatyp === 4 || mattk.aatyp === 254))) {
@@ -3916,7 +3916,7 @@ export async function mhitm_knockback(magr, mdef, mattk, hitflags, weapon_used) 
         if (was_u) {
             nh_snprintf($c.lit("mhitm_knockback"), 5366, eos(new $c.Ptr(mdefbuf, 0)), $c.subu64(256, $c.strlen(new $c.Ptr(mdefbuf, 0))), $c.lit(" and %s"), await y_monnam(u.usteed));
         }
-        await pline($c.lit("%s %s %s %s with a %s %s!"), new $c.Ptr(magrbuf, 0), await vtense(new $c.Ptr(magrbuf, 0), $c.lit("knock")), new $c.Ptr(mdefbuf, 0), knockedhow, (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 5374, $c.lit("mhitm_knockback")), rn2(2)) : rn2(2)) ? $c.lit("forceful") : $c.lit("powerful"), (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 5374, $c.lit("mhitm_knockback")), rn2(2)) : rn2(2)) ? $c.lit("blow") : $c.lit("strike"));
+        await pline($c.lit("%s %s %s %s with a %s %s!"), new $c.Ptr(magrbuf, 0), await vtense(new $c.Ptr(magrbuf, 0), $c.lit("knock")), new $c.Ptr(mdefbuf, 0), knockedhow, rn2(2) ? $c.lit("forceful") : $c.lit("powerful"), rn2(2) ? $c.lit("blow") : $c.lit("strike"));
     } else if (u_agr) {
         await You_feel($c.lit("%s be knocked %s!"), await some_mon_nam(mdef), knockedhow);
     }
@@ -3933,7 +3933,7 @@ export async function mhitm_knockback(magr, mdef, mattk, hitflags, weapon_used) 
             hitflags.set(0, hitflags.get(0) | 1);
         }
         set_apparxy(magr);
-        if (!u.uprops[13 /* STUNNED */].intrinsic && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 5397, $c.lit("mhitm_knockback")), rn2(4)) : rn2(4))) {
+        if (!u.uprops[13 /* STUNNED */].intrinsic && !rn2(4)) {
             await make_stunned(knockdistance + 1 | 0, 1);
         }
     } else {
@@ -3945,7 +3945,7 @@ export async function mhitm_knockback(magr, mdef, mattk, hitflags, weapon_used) 
             if (!was_u) {
                 hitflags.set(0, hitflags.get(0) | 2);
             }
-        } else if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 5406, $c.lit("mhitm_knockback")), rn2(4)) : rn2(4))) {
+        } else if (!rn2(4)) {
             mdef.mstun = (1) & 1;
             if ($c.peq(mdef, u.usteed)) {
                 set_apparxy(magr);
@@ -4012,7 +4012,7 @@ async function hmonas(mon) {   // uhitm.c:5424
                         }
                         tmp = await find_roll_to_hit(mon, 254, weapon, new $c.Ptr(attknum, 0), new $c.Ptr(armorpenalty, 0));
                         mon_maybe_unparalyze(mon);
-                        dieroll = rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 5521, $c.lit("hmonas")), rnd(20)) : rnd(20);
+                        dieroll = rnd(20);
                         dhit[0] = tmp > dieroll || u.uswallow | 0 ? 1 : 0;
                         if (multi_weap > 1) {
                             gt.twohits = gt.twohits + 1 | 0;
@@ -4051,7 +4051,7 @@ async function hmonas(mon) {   // uhitm.c:5424
                     case 16:
                         tmp = await find_roll_to_hit(mon, mattk.aatyp, null, new $c.Ptr(attknum, 0), new $c.Ptr(armorpenalty, 0));
                         mon_maybe_unparalyze(mon);
-                        dieroll = rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 5571, $c.lit("hmonas")), rnd(20)) : rnd(20);
+                        dieroll = rnd(20);
                         dhit[0] = tmp > dieroll || u.uswallow | 0 ? 1 : 0;
                         if (dhit[0]) {
                             silverhit[0] = 0;
@@ -4185,16 +4185,16 @@ async function hmonas(mon) {   // uhitm.c:5424
                     case 11:
                         tmp = await find_roll_to_hit(mon, mattk.aatyp, null, new $c.Ptr(attknum, 0), new $c.Ptr(armorpenalty, 0));
                         mon_maybe_unparalyze(mon);
-                        if (dhit[0] = tmp > (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 5773, $c.lit("hmonas")), rnd(20 + i | 0)) : rnd(20 + i | 0)) ? 1 : 0) {
+                        if (dhit[0] = tmp > rnd(20 + i | 0) ? 1 : 0) {
                             await wakeup(mon, 1);
                             if ($c.peq(mon.data, $c.relem(mons, 288 /* PM_SHADE */))) {
                                 await Your($c.lit("attempt to surround %s is harmless."), await mon_nam(mon));
                             } else if (await failed_grab(gy.youmonst, mon, mattk)) {
                             } else {
                                 $t10 = await gulpum(mon, mattk), sum[i] = $t10;
-                                if (sum[i] === 2 && (mon.data.mlet === 52 /* S_ZOMBIE */ || mon.data.mlet === 39 /* S_MUMMY */) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 5786, $c.lit("hmonas")), rn2(5)) : rn2(5)) && !(u.uprops[10 /* SICK_RES */].intrinsic || u.uprops[10 /* SICK_RES */].extrinsic || await defended(gy.youmonst, 33))) {
+                                if (sum[i] === 2 && (mon.data.mlet === 52 /* S_ZOMBIE */ || mon.data.mlet === 39 /* S_MUMMY */) && rn2(5) && !(u.uprops[10 /* SICK_RES */].intrinsic || u.uprops[10 /* SICK_RES */].extrinsic || await defended(gy.youmonst, 33))) {
                                     await You_feel($c.lit("%ssick."), u.uprops[17 /* SICK */].intrinsic ? $c.lit("very ") : $c.lit(""));
-                                    await mdamageu(mon, rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 5788, $c.lit("hmonas")), rnd(8)) : rnd(8));
+                                    await mdamageu(mon, rnd(8));
                                 }
                             }
                         } else {
@@ -4263,9 +4263,9 @@ export async function passive(mon, weapon, mhitb, maliveb, aatyp, wep_was_destro
         }
     }
     if (ptr.mattk[i].damn) {
-        tmp = rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 5886, $c.lit("passive")), d(ptr.mattk[i].damn, ptr.mattk[i].damd)) : d(ptr.mattk[i].damn, ptr.mattk[i].damd);
+        tmp = d(ptr.mattk[i].damn, ptr.mattk[i].damd);
     } else if (ptr.mattk[i].damd) {
-        tmp = rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 5888, $c.lit("passive")), d(mon.m_lev + 1 | 0, ptr.mattk[i].damd)) : d(mon.m_lev + 1 | 0, ptr.mattk[i].damd);
+        tmp = d(mon.m_lev + 1 | 0, ptr.mattk[i].damd);
     } else {
         tmp = 0;
     }
@@ -4273,7 +4273,7 @@ export async function passive(mon, weapon, mhitb, maliveb, aatyp, wep_was_destro
         case 2:
             if (mhitb && !mon.mcan && weapon) {
                 if (aatyp === 3) {
-                    if ($G.uarmf && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 5898, $c.lit("passive")), rn2(6)) : rn2(6))) {
+                    if ($G.uarmf && !rn2(6)) {
                         await erode_obj($G.uarmf, await xname($G.uarmf), 0, 5);
                     }
                 } else if (aatyp === 254 || aatyp === 1 || aatyp === 255 || aatyp === 5) {
@@ -4282,7 +4282,7 @@ export async function passive(mon, weapon, mhitb, maliveb, aatyp, wep_was_destro
             }
             break;
         case 8:
-            if (mhitb && (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 5907, $c.lit("passive")), rn2(2)) : rn2(2))) {
+            if (mhitb && rn2(2)) {
                 if ((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked || !flags.verbose) {
                     await You($c.lit("are splashed!"));
                 } else {
@@ -4294,13 +4294,13 @@ export async function passive(mon, weapon, mhitb, maliveb, aatyp, wep_was_destro
                 } else {
                     monstseesu(128);
                 }
-                if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 5920, $c.lit("passive")), rn2(30)) : rn2(30))) {
+                if (!rn2(30)) {
                     await erode_armor(gy.youmonst, 3);
                 }
             }
             if (mhitb && weapon) {
                 if (aatyp === 3) {
-                    if ($G.uarmf && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 5925, $c.lit("passive")), rn2(6)) : rn2(6))) {
+                    if ($G.uarmf && !rn2(6)) {
                         await erode_obj($G.uarmf, await xname($G.uarmf), 3, 5);
                     }
                 } else if (aatyp === 254 || aatyp === 1 || aatyp === 255 || aatyp === 5) {
@@ -4372,7 +4372,7 @@ export async function passive(mon, weapon, mhitb, maliveb, aatyp, wep_was_destro
         default:
             break;
     }
-    if (malive && !mon.mcan && (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 6019, $c.lit("passive")), rn2(3)) : rn2(3))) {
+    if (malive && !mon.mcan && rn2(3)) {
         switch (ptr.mattk[i].adtyp) {
             case 14:
                 if ($c.peq(ptr, $c.relem(mons, 28 /* PM_FLOATING_EYE */))) {
@@ -4381,19 +4381,19 @@ export async function passive(mon, weapon, mhitb, maliveb, aatyp, wep_was_destro
                     }
                     if (mon.mcansee) {
                         if (await ureflects($c.lit("%s gaze is reflected by your %s."), s_suffix(await Monnam(mon)))) {
-                        } else if (u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 6030, $c.lit("passive")), rn2(4)) : rn2(4))) {
-                            await pline($c.lit("%s looks %s%s."), await Monnam(mon), !(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 6035, $c.lit("passive")), rn2(2)) : rn2(2)) ? $c.lit("") : $c.lit("rather "), !(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 6036, $c.lit("passive")), rn2(2)) : rn2(2)) ? $c.lit("numb") : $c.lit("stupefied"));
+                        } else if (u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic) && rn2(4)) {
+                            await pline($c.lit("%s looks %s%s."), await Monnam(mon), !rn2(2) ? $c.lit("") : $c.lit("rather "), !rn2(2) ? $c.lit("numb") : $c.lit("stupefied"));
                         } else if (u.uprops[66 /* FREE_ACTION */].extrinsic) {
                             await You($c.lit("momentarily stiffen under %s gaze!"), s_suffix(await mon_nam(mon)));
                         } else {
                             await You($c.lit("are frozen by %s gaze!"), s_suffix(await mon_nam(mon)));
-                            nomul(acurr(2 /* A_WIS */) > 12 || (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 6042, $c.lit("passive")), rn2(4)) : rn2(4)) ? -tmp | 0 : -127);
+                            nomul(acurr(2 /* A_WIS */) > 12 || rn2(4) ? -tmp | 0 : -127);
                             await dynamic_multi_reason(mon, $c.lit("frozen"), 1);
                             gn.nomovemsg = null;
                         }
                     } else {
                         await pline($c.lit("%s cannot defend itself."), await Adjmonnam(mon, $c.lit("blind")));
-                        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 6051, $c.lit("passive")), rn2(500)) : rn2(500))) {
+                        if (!rn2(500)) {
                             change_luck(-1);
                         }
                     }
@@ -4419,7 +4419,7 @@ export async function passive(mon, weapon, mhitb, maliveb, aatyp, wep_was_destro
                     monstunseesu(4);
                     await You($c.lit("are suddenly very cold!"));
                     await mdamageu(mon, tmp);
-                    await healmon(mon, $c.div32(tmp + (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 6079, $c.lit("passive")), rn2(2)) : rn2(2)) | 0, 2), $c.div32(tmp + 1 | 0, 2));
+                    await healmon(mon, $c.div32(tmp + rn2(2) | 0, 2), $c.div32(tmp + 1 | 0, 2));
                     if (mon.mhpmax > Math.imul(mon.m_lev + 1 | 0, 8)) {
                         await split_mon(mon, gy.youmonst);
                     }
@@ -4466,7 +4466,7 @@ export async function passive_obj(mon, obj, mattk) {   // uhitm.c:6127
     let ptr = null, i = 0;
     ptr = mon.data;
     if (!obj) {
-        obj = u.twoweap && $G.uswapwep && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 6138, $c.lit("passive_obj")), rn2(2)) : rn2(2)) ? $G.uswapwep : $G.uwep;
+        obj = u.twoweap && $G.uswapwep && !rn2(2) ? $G.uswapwep : $G.uwep;
         if (!obj && mattk.adtyp === 41) {
             obj = $G.uarmg;
         }
@@ -4487,12 +4487,12 @@ export async function passive_obj(mon, obj, mattk) {   // uhitm.c:6127
     }
     switch (mattk.adtyp) {
         case 2:
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 6158, $c.lit("passive_obj")), rn2(6)) : rn2(6)) && !mon.mcan && !$c.peq(mon.data, $c.relem(mons, 110 /* PM_STEAM_VORTEX */))) {
+            if (!rn2(6) && !mon.mcan && !$c.peq(mon.data, $c.relem(mons, 110 /* PM_STEAM_VORTEX */))) {
                 await erode_obj(obj, null, 0, 0);
             }
             break;
         case 8:
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 6165, $c.lit("passive_obj")), rn2(6)) : rn2(6))) {
+            if (!rn2(6)) {
                 await erode_obj(obj, null, 3, 1);
             }
             break;
@@ -4645,18 +4645,18 @@ export async function flash_hits_mon(mtmp, otmp) {   // uhitm.c:6341
                 res = 1;
             }
             if ($c.peq(mtmp.data, $c.relem(mons, 40 /* PM_GREMLIN */))) {
-                amt = otmp.otyp === 410 /* WAN_LIGHT */ ? rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 6392, $c.lit("flash_hits_mon")), d(1 + otmp.spe | 0, 4)) : d(1 + otmp.spe | 0, 4) : rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 6393, $c.lit("flash_hits_mon")), rnd(mtmp.mhp < 4 ? mtmp.mhp : 4)) : rnd(mtmp.mhp < 4 ? mtmp.mhp : 4);
+                amt = otmp.otyp === 410 /* WAN_LIGHT */ ? d(1 + otmp.spe | 0, 4) : rnd(mtmp.mhp < 4 ? mtmp.mhp : 4);
                 await light_hits_gremlin(mtmp, amt);
             }
             if (!(mtmp.mhp < 1)) {
                 if (!svc.context.mon_moving) {
                     await setmangry(mtmp, 1);
                 }
-                if (tmp < 9 && !mtmp.isshk && (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 6399, $c.lit("flash_hits_mon")), rn2(4)) : rn2(4))) {
-                    await monflee(mtmp, (rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 6400, $c.lit("flash_hits_mon")), rn2(4)) : rn2(4)) ? rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 6400, $c.lit("flash_hits_mon")), rnd(100)) : rnd(100) : 0, 0, 1);
+                if (tmp < 9 && !mtmp.isshk && rn2(4)) {
+                    await monflee(mtmp, rn2(4) ? rnd(100) : 0, 0, 1);
                 }
                 mtmp.mcansee = (0) & 1;
-                $t1 = (tmp < 3 ? 0 : rng_log_enabled() ? (rng_log_set_caller($c.lit("uhitm.c"), 6402, $c.lit("flash_hits_mon")), rnd(1 + $c.div32(50, tmp) | 0)) : rnd(1 + $c.div32(50, tmp) | 0)) >>> 0, mtmp.mblinded = ($t1) & 127;
+                $t1 = (tmp < 3 ? 0 : rnd(1 + $c.div32(50, tmp) | 0)) >>> 0, mtmp.mblinded = ($t1) & 127;
             }
         } else if (useeit) {
             if (resists_blnd_by_arti(mtmp)) {

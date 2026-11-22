@@ -34,7 +34,7 @@ import { nh_getenv } from './options.js';
 import { You, impossible, pline, pline_The } from './pline.js';
 import { init_rect, rnd_rect } from './rect.js';
 import { clear_regions } from './region.js';
-import { reseed_random, rn2, rn2_on_display_rng, rnd, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { reseed_random, rn2, rn2_on_display_rng, rnd } from './rnd.js';
 import { obfree } from './shk.js';
 import { check_room, create_des_coder, create_room, dig_corridor, fill_special_room, reset_xystart_size } from './sp_lev.js';
 import { stairway_add, stairway_free_all } from './stairs.js';
@@ -145,8 +145,8 @@ async function finddpos(cc, dir, aroom) {   // mklev.c:147
     }
     gotit$: {
         do {
-            x[0] = $c.i16(x2 - x1 | 0 ? (rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 185, $c.lit("finddpos")), rn2((x2 - x1 | 0) + 1 | 0)) : rn2((x2 - x1 | 0) + 1 | 0)) + x1 | 0 : x1);
-            y[0] = $c.i16(y2 - y1 | 0 ? (rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 186, $c.lit("finddpos")), rn2((y2 - y1 | 0) + 1 | 0)) : rn2((y2 - y1 | 0) + 1 | 0)) + y1 | 0 : y1);
+            x[0] = $c.i16(x2 - x1 | 0 ? rn2((x2 - x1 | 0) + 1 | 0) + x1 | 0 : x1);
+            y[0] = $c.i16(y2 - y1 | 0 ? rn2((y2 - y1 | 0) + 1 | 0) + y1 | 0 : y1);
             if (finddpos_shift(new $c.Ptr(x, 0), new $c.Ptr(y, 0), dir, aroom)) {
                 break gotit$;
             }
@@ -321,7 +321,7 @@ async function makerooms() {   // mklev.c:367
         $t2 = gi.in_mk_themerooms = 0, iflags.in_lua = $t2;
     }
     while (svn.nroom < 39 && rnd_rect()) {
-        if (svn.nroom >= 6 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 404, $c.lit("makerooms")), rn2(2)) : rn2(2)) && !tried_vault) {
+        if (svn.nroom >= 6 && rn2(2) && !tried_vault) {
             tried_vault = 1;
             if (await create_room(-1, -1, 2, 2, -1, -1, 4, 1)) {
                 gv.vault_x = svr.rooms[svn.nroom].lx;
@@ -433,7 +433,7 @@ export async function makecorridors() {   // mklev.c:522
     any = 1;
     for (a = 0; a < (svn.nroom - 1 | 0); a = a + 1 | 0) {
         await join(a, a + 1 | 0, 0);
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 529, $c.lit("makecorridors")), rn2(50)) : rn2(50))) {
+        if (!rn2(50)) {
             break;
         }
     }
@@ -452,9 +452,9 @@ export async function makecorridors() {   // mklev.c:522
         }
     }
     if (svn.nroom > 2) {
-        for (i = (rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 545, $c.lit("makecorridors")), rn2(svn.nroom)) : rn2(svn.nroom)) + 4 | 0; i; i = i - 1 | 0) {
-            a = rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 546, $c.lit("makecorridors")), rn2(svn.nroom)) : rn2(svn.nroom);
-            b = rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 547, $c.lit("makecorridors")), rn2(svn.nroom - 2 | 0)) : rn2(svn.nroom - 2 | 0);
+        for (i = rn2(svn.nroom) + 4 | 0; i; i = i - 1 | 0) {
+            a = rn2(svn.nroom);
+            b = rn2(svn.nroom - 2 | 0);
             if (b >= a) {
                 b = b + 2 | 0;
             }
@@ -518,15 +518,15 @@ async function dosdoor(x, y, aroom, type) {   // mklev.c:615
     }
     svl.level.locations[x][y].typ = $c.i8(type);
     if (type === 23 /* DOOR */) {
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 623, $c.lit("dosdoor")), rn2(3)) : rn2(3))) {
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 624, $c.lit("dosdoor")), rn2(5)) : rn2(5))) {
+        if (!rn2(3)) {
+            if (!rn2(5)) {
                 svl.level.locations[x][y].flags = (2) & 31;
-            } else if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 626, $c.lit("dosdoor")), rn2(6)) : rn2(6))) {
+            } else if (!rn2(6)) {
                 svl.level.locations[x][y].flags = (8) & 31;
             } else {
                 svl.level.locations[x][y].flags = (4) & 31;
             }
-            if ((svl.level.locations[x][y].flags | 0) !== 2 && !shdoor && await level_difficulty() >= 5 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 632, $c.lit("dosdoor")), rn2(25)) : rn2(25))) {
+            if ((svl.level.locations[x][y].flags | 0) !== 2 && !shdoor && await level_difficulty() >= 5 && !rn2(25)) {
                 svl.level.locations[x][y].flags = ((svl.level.locations[x][y].flags | 0 | 16) >>> 0) & 31;
             }
         } else {
@@ -536,7 +536,7 @@ async function dosdoor(x, y, aroom, type) {   // mklev.c:615
             svl.level.locations[x][y].flags = (0) & 31;
         }
         if ((svl.level.locations[x][y].flags | 0) & 16) {
-            if (await level_difficulty() >= 9 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 653, $c.lit("dosdoor")), rn2(5)) : rn2(5)) && !(svm.mvitals[64 /* PM_SMALL_MIMIC */].mvflags & 3 && svm.mvitals[65 /* PM_LARGE_MIMIC */].mvflags & 3 && svm.mvitals[66 /* PM_GIANT_MIMIC */].mvflags & 3)) {
+            if (await level_difficulty() >= 9 && !rn2(5) && !(svm.mvitals[64 /* PM_SMALL_MIMIC */].mvflags & 3 && svm.mvitals[65 /* PM_LARGE_MIMIC */].mvflags & 3 && svm.mvitals[66 /* PM_GIANT_MIMIC */].mvflags & 3)) {
                 svl.level.locations[x][y].flags = (0) & 31;
                 mtmp = await makemon(await mkclass(13, 0), x, y, 0);
                 if (mtmp) {
@@ -545,12 +545,12 @@ async function dosdoor(x, y, aroom, type) {   // mklev.c:615
             }
         }
     } else {
-        if (shdoor || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 666, $c.lit("dosdoor")), rn2(5)) : rn2(5))) {
+        if (shdoor || !rn2(5)) {
             svl.level.locations[x][y].flags = (8) & 31;
         } else {
             svl.level.locations[x][y].flags = (4) & 31;
         }
-        if (!shdoor && await level_difficulty() >= 4 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 671, $c.lit("dosdoor")), rn2(20)) : rn2(20))) {
+        if (!shdoor && await level_difficulty() >= 4 && !rn2(20)) {
             svl.level.locations[x][y].flags = ((svl.level.locations[x][y].flags | 0 | 16) >>> 0) & 31;
         }
     }
@@ -575,7 +575,7 @@ function cardinal_nextto_room(aroom, x, y) {   // mklev.c:681
 }
 async function place_niche(aroom, dy, xx, yy) {   // mklev.c:701
     let dd = new $T.nhcoord();
-    if (rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 708, $c.lit("place_niche")), rn2(2)) : rn2(2)) {
+    if (rn2(2)) {
         dy.set(0, 1);
         if (!await finddpos(dd, 6 /* DIR_S */, aroom)) {
             return 0;
@@ -594,18 +594,18 @@ async function makeniche(trap_type) {   // mklev.c:740
     let aroom = null, rm = null, dy = Int32Array.of(0), vct = 0, xx = Int16Array.of(0), yy = Int16Array.of(0), ttmp = null, $t1;
     vct = 8;
     while ($t1 = vct, vct = $t1 - 1 | 0, $t1) {
-        aroom = $c.relem(svr.rooms, rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 749, $c.lit("makeniche")), rn2(svn.nroom)) : rn2(svn.nroom));
+        aroom = $c.relem(svr.rooms, rn2(svn.nroom));
         if (aroom.rtype !== 0 /* OROOM */) {
             continue;
         }
-        if (aroom.doorct === 1 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 752, $c.lit("makeniche")), rn2(5)) : rn2(5))) {
+        if (aroom.doorct === 1 && rn2(5)) {
             continue;
         }
         if (!await place_niche(aroom, new $c.Ptr(dy, 0), new $c.Ptr(xx, 0), new $c.Ptr(yy, 0))) {
             continue;
         }
         rm = $c.relem(svl.level.locations[xx[0]], yy[0] + dy[0] | 0);
-        if (trap_type || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 758, $c.lit("makeniche")), rn2(4)) : rn2(4))) {
+        if (trap_type || !rn2(4)) {
             rm.typ = 15;
             if (trap_type) {
                 if ((trap_type === 13 /* HOLE */ || trap_type === 14 /* TRAPDOOR */) && !Can_fall_thru(u.uz)) {
@@ -625,19 +625,19 @@ async function makeniche(trap_type) {   // mklev.c:740
             await dosdoor(xx[0], yy[0], aroom, 14 /* SDOOR */);
         } else {
             rm.typ = 24;
-            if (rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 779, $c.lit("makeniche")), rn2(7)) : rn2(7)) {
-                await dosdoor(xx[0], yy[0], aroom, (rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 780, $c.lit("makeniche")), rn2(5)) : rn2(5)) ? 14 /* SDOOR */ : 23 /* DOOR */);
+            if (rn2(7)) {
+                await dosdoor(xx[0], yy[0], aroom, rn2(5) ? 14 /* SDOOR */ : 23 /* DOOR */);
             } else {
-                if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 783, $c.lit("makeniche")), rn2(5)) : rn2(5)) && (svl.level.locations[xx[0]][yy[0]].typ && svl.level.locations[xx[0]][yy[0]].typ <= 12 /* DBWALL */)) {
+                if (!rn2(5) && (svl.level.locations[xx[0]][yy[0]].typ && svl.level.locations[xx[0]][yy[0]].typ <= 12 /* DBWALL */)) {
                     await set_levltyp(xx[0], yy[0], 22);
-                    if (rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 785, $c.lit("makeniche")), rn2(3)) : rn2(3)) {
+                    if (rn2(3)) {
                         await mkcorpstat(265 /* CORPSE */, null, await mkclass(53, 0), xx[0], $c.i16(yy[0] + dy[0] | 0), 1);
                     }
                 }
                 if (!svl.level.flags.noteleport) {
                     await mksobj_at(333 /* SCR_TELEPORTATION */, xx[0], $c.i16(yy[0] + dy[0] | 0), 1, 0);
                 }
-                if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 793, $c.lit("makeniche")), rn2(3)) : rn2(3))) {
+                if (!rn2(3)) {
                     await mkobj_at(0, xx[0], $c.i16(yy[0] + dy[0] | 0), 1);
                 }
             }
@@ -647,15 +647,15 @@ async function makeniche(trap_type) {   // mklev.c:740
 }
 async function make_niches() {   // mklev.c:802
     let ct = 0, dep = 0, ltptr = 0, vamp = 0, $t1;
-    ct = rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 804, $c.lit("make_niches")), rnd((svn.nroom >> 1) + 1 | 0)) : rnd((svn.nroom >> 1) + 1 | 0);
+    ct = rnd((svn.nroom >> 1) + 1 | 0);
     dep = depth(u.uz);
     ltptr = $c.i8(!svl.level.flags.noteleport && dep > 15 ? 1 : 0);
     vamp = $c.i8(dep > 5 && dep < 25 ? 1 : 0);
     while ($t1 = ct, ct = $t1 - 1 | 0, $t1) {
-        if (ltptr && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 809, $c.lit("make_niches")), rn2(6)) : rn2(6))) {
+        if (ltptr && !rn2(6)) {
             ltptr = 0;
             await makeniche(16 /* LEVEL_TELEP */);
-        } else if (vamp && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 812, $c.lit("make_niches")), rn2(6)) : rn2(6))) {
+        } else if (vamp && !rn2(6)) {
             vamp = 0;
             await makeniche(14 /* TRAPDOOR */);
         } else {
@@ -765,7 +765,7 @@ async function fill_ordinary_room(croom, bonus_items) {   // mklev.c:939
     if (croom.needfill !== 1) {
         return;
     }
-    if ((u.uhave.amulet | 0 || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 974, $c.lit("fill_ordinary_room")), rn2(3)) : rn2(3))) && somexyspace(croom, pos)) {
+    if ((u.uhave.amulet | 0 || !rn2(3)) && somexyspace(croom, pos)) {
         tmonst = await makemon(null, pos.x, pos.y, 8192);
         if (tmonst && $c.peq(tmonst.data, $c.relem(mons, 96 /* PM_GIANT_SPIDER */)) && !occupied(pos.x, pos.y)) {
             await maketrap(pos.x, pos.y, 18 /* WEB */);
@@ -775,47 +775,47 @@ async function fill_ordinary_room(croom, bonus_items) {   // mklev.c:939
     if (x <= 1) {
         x = 2;
     }
-    while (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 984, $c.lit("fill_ordinary_room")), rn2(x)) : rn2(x)) && (trycnt = trycnt + 1 | 0) < 1000) {
+    while (!rn2(x) && (trycnt = trycnt + 1 | 0) < 1000) {
         await mktrap(0, 0, croom, null);
     }
-    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 986, $c.lit("fill_ordinary_room")), rn2(3)) : rn2(3)) && somexyspace(croom, pos)) {
+    if (!rn2(3) && somexyspace(croom, pos)) {
         await mkgold(0, pos.x, pos.y);
     }
     skip_nonrogue$: {
         if ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level)) {
             break skip_nonrogue$;
         }
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 990, $c.lit("fill_ordinary_room")), rn2(10)) : rn2(10))) {
+        if (!rn2(10)) {
             await mkfount(croom);
         }
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 992, $c.lit("fill_ordinary_room")), rn2(60)) : rn2(60))) {
+        if (!rn2(60)) {
             await mksink(croom);
         }
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 994, $c.lit("fill_ordinary_room")), rn2(60)) : rn2(60))) {
+        if (!rn2(60)) {
             await mkaltar(croom);
         }
         x = $c.i16(80 - Math.imul(depth(u.uz), 2) | 0);
         if (x < 2) {
             x = 2;
         }
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 999, $c.lit("fill_ordinary_room")), rn2(x)) : rn2(x))) {
+        if (!rn2(x)) {
             await mkgrave(croom);
         }
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1003, $c.lit("fill_ordinary_room")), rn2(20)) : rn2(20)) && somexyspace(croom, pos)) {
+        if (!rn2(20) && somexyspace(croom, pos)) {
             await mkcorpstat(476 /* STATUE */, null, null, pos.x, pos.y, 8);
         }
         if (bonus_items && somexyspace(croom, pos)) {
             uz_branch = Is_branchlev(u.uz);
             if (uz_branch && u.uz.dnum !== svd.dungeon_topology.d_mines_dnum && (uz_branch.end1.dnum === svd.dungeon_topology.d_mines_dnum || uz_branch.end2.dnum === svd.dungeon_topology.d_mines_dnum)) {
-                await mksobj_at((rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1032, $c.lit("fill_ordinary_room")), rn2(5)) : rn2(5)) < 3 ? 293 /* FOOD_RATION */ : (rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1033, $c.lit("fill_ordinary_room")), rn2(2)) : rn2(2)) ? 292 /* CRAM_RATION */ : 291 /* LEMBAS_WAFER */, pos.x, pos.y, 1, 0);
-            } else if (u.uz.dnum === svd.dungeon_topology.d_oracle_level.dnum && u.uz.dlevel < svd.dungeon_topology.d_oracle_level.dlevel && (rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1037, $c.lit("fill_ordinary_room")), rn2(3)) : rn2(3))) {
+                await mksobj_at(rn2(5) < 3 ? 293 /* FOOD_RATION */ : rn2(2) ? 292 /* CRAM_RATION */ : 291 /* LEMBAS_WAFER */, pos.x, pos.y, 1, 0);
+            } else if (u.uz.dnum === svd.dungeon_topology.d_oracle_level.dnum && u.uz.dlevel < svd.dungeon_topology.d_oracle_level.dlevel && rn2(3)) {
                 tryct = 0;
-                supply_chest = await mksobj_at((rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1044, $c.lit("fill_ordinary_room")), rn2(3)) : rn2(3)) ? 215 /* CHEST */ : 214 /* LARGE_BOX */, pos.x, pos.y, 0, 0);
-                $t1 = (!!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1047, $c.lit("fill_ordinary_room")), rn2(6)) : rn2(6)) ? 1 : 0) >>> 0, supply_chest.olocked = ($t1) & 1;
+                supply_chest = await mksobj_at(rn2(3) ? 215 /* CHEST */ : 214 /* LARGE_BOX */, pos.x, pos.y, 0, 0);
+                $t1 = (!!rn2(6) ? 1 : 0) >>> 0, supply_chest.olocked = ($t1) & 1;
                 do {
-                    otyp = (rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1063, $c.lit("fill_ordinary_room")), rn2(2)) : rn2(2)) ? 307 /* POT_HEALING */ : fill_ordinary_room$supply_items[rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1063, $c.lit("fill_ordinary_room")), rn2(9)) : rn2(9)];
+                    otyp = rn2(2) ? 307 /* POT_HEALING */ : fill_ordinary_room$supply_items[rn2(9)];
                     otmp = await mksobj(otyp, 1, 0);
-                    if (otyp === 307 /* POT_HEALING */ && (rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1065, $c.lit("fill_ordinary_room")), rn2(2)) : rn2(2))) {
+                    if (otyp === 307 /* POT_HEALING */ && rn2(2)) {
                         otmp.quan = 2;
                         $t2 = await weight(otmp) >>> 0, otmp.owt = $t2;
                     }
@@ -826,9 +826,9 @@ async function fill_ordinary_room(croom, bonus_items) {   // mklev.c:939
                         await impossible($c.lit("couldn't generate supply chest item"));
                         break;
                     }
-                } while (cursed || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1081, $c.lit("fill_ordinary_room")), rn2(5)) : rn2(5)));
-                if (rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1086, $c.lit("fill_ordinary_room")), rn2(3)) : rn2(3)) {
-                    oclass = fill_ordinary_room$extra_classes[rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1099, $c.lit("fill_ordinary_room")), rn2(10)) : rn2(10)];
+                } while (cursed || !rn2(5));
+                if (rn2(3)) {
+                    oclass = fill_ordinary_room$extra_classes[rn2(10)];
                     otmp = await mkobj(oclass, 0);
                     if (oclass === -10) {
                         maxpass = depth(u.uz) > 2 ? 2 : 3;
@@ -848,27 +848,27 @@ async function fill_ordinary_room(croom, bonus_items) {   // mklev.c:939
                 skip_chests = 1;
             }
         }
-        if (!skip_chests && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1137, $c.lit("fill_ordinary_room")), rn2($c.div32(Math.imul(svn.nroom, 5), 2))) : rn2($c.div32(Math.imul(svn.nroom, 5), 2))) && somexyspace(croom, pos)) {
-            await mksobj_at((rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1138, $c.lit("fill_ordinary_room")), rn2(3)) : rn2(3)) ? 214 /* LARGE_BOX */ : 215 /* CHEST */, pos.x, pos.y, 1, 0);
+        if (!skip_chests && !rn2($c.div32(Math.imul(svn.nroom, 5), 2)) && somexyspace(croom, pos)) {
+            await mksobj_at(rn2(3) ? 214 /* LARGE_BOX */ : 215 /* CHEST */, pos.x, pos.y, 1, 0);
         }
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1142, $c.lit("fill_ordinary_room")), rn2(27 + Math.imul(3, $c.abs(depth(u.uz))) | 0)) : rn2(27 + Math.imul(3, $c.abs(depth(u.uz))) | 0))) {
+        if (!rn2(27 + Math.imul(3, $c.abs(depth(u.uz))) | 0)) {
             mesg = await random_engraving(new $c.Ptr(buf, 0), new $c.Ptr(pristinebuf, 0));
             if (mesg) {
                 do {
                     somexyspace(croom, pos);
                     x = pos.x;
                     y = pos.y;
-                } while (svl.level.locations[x][y].typ !== 25 /* ROOM */ && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1151, $c.lit("fill_ordinary_room")), rn2(40)) : rn2(40)));
+                } while (svl.level.locations[x][y].typ !== 25 /* ROOM */ && !rn2(40));
                 if (svl.level.locations[x][y].typ === 25 /* ROOM */) {
                     await make_engr_at(x, y, mesg, new $c.Ptr(pristinebuf, 0), 0, 4);
                 }
             }
         }
     }
-    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1158, $c.lit("fill_ordinary_room")), rn2(3)) : rn2(3)) && somexyspace(croom, pos)) {
+    if (!rn2(3) && somexyspace(croom, pos)) {
         await mkobj_at(0, pos.x, pos.y, 1);
         trycnt = 0;
-        while (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1161, $c.lit("fill_ordinary_room")), rn2(5)) : rn2(5))) {
+        while (!rn2(5)) {
             if ((trycnt = trycnt + 1 | 0) > 100) {
                 await impossible($c.lit("trycnt overflow4"));
                 break;
@@ -964,7 +964,7 @@ async function makelevel() {   // mklev.c:1251
         $c.__builtin___sprintf_chk(new $c.Ptr(fillname, 0), 0, 9, $c.lit("%s-fil"), gu.urole.filecode);
         $c.__builtin___strcat_chk(new $c.Ptr(fillname, 0), u.uz.dlevel < loc_lev.dlevel.dlevel ? $c.lit("a") : $c.lit("b"), 9);
         await makemaz(new $c.Ptr(fillname, 0));
-    } else if (In_hell(u.uz) || (rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1287, $c.lit("makelevel")), rn2(5)) : rn2(5)) && u.uz.dnum === svd.dungeon_topology.d_medusa_level.dnum && depth(u.uz) > depth(svd.dungeon_topology.d_medusa_level)) {
+    } else if (In_hell(u.uz) || rn2(5) && u.uz.dnum === svd.dungeon_topology.d_medusa_level.dnum && depth(u.uz) > depth(svd.dungeon_topology.d_medusa_level)) {
         await makemaz($c.lit(""));
     } else {
         u_depth = depth(u.uz);
@@ -1008,7 +1008,7 @@ async function makelevel() {   // mklev.c:1251
                             svr.rooms[svn.nroom - 1 | 0].needfill = 1;
                             await fill_special_room($c.relem(svr.rooms, svn.nroom - 1 | 0));
                             await mk_knox_portal($c.i16(gv.vault_x + w[0] | 0), $c.i16(gv.vault_y + h[0] | 0));
-                            if (!svl.level.flags.noteleport && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1332, $c.lit("makelevel")), rn2(3)) : rn2(3))) {
+                            if (!svl.level.flags.noteleport && !rn2(3)) {
                                 await makevtele();
                             }
                         } else if (rnd_rect() && await create_room(-1, -1, 2, 2, -1, -1, 4, 1)) {
@@ -1026,27 +1026,27 @@ async function makelevel() {   // mklev.c:1251
             }
             if (flags.debug && nh_getenv($c.lit("SHOPTYPE"))) {
                 await do_mkroom(14 /* SHOPBASE */);
-            } else if (u_depth > 1 && u_depth < depth(svd.dungeon_topology.d_medusa_level) && svn.nroom >= room_threshold && (rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1350, $c.lit("makelevel")), rn2(u_depth)) : rn2(u_depth)) < 3) {
+            } else if (u_depth > 1 && u_depth < depth(svd.dungeon_topology.d_medusa_level) && svn.nroom >= room_threshold && rn2(u_depth) < 3) {
                 await do_mkroom(14 /* SHOPBASE */);
-            } else if (u_depth > 4 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1352, $c.lit("makelevel")), rn2(6)) : rn2(6))) {
+            } else if (u_depth > 4 && !rn2(6)) {
                 await do_mkroom(2 /* COURT */);
-            } else if (u_depth > 5 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1354, $c.lit("makelevel")), rn2(8)) : rn2(8)) && !(svm.mvitals[63 /* PM_LEPRECHAUN */].mvflags & 3)) {
+            } else if (u_depth > 5 && !rn2(8) && !(svm.mvitals[63 /* PM_LEPRECHAUN */].mvflags & 3)) {
                 await do_mkroom(11 /* LEPREHALL */);
-            } else if (u_depth > 6 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1357, $c.lit("makelevel")), rn2(7)) : rn2(7))) {
+            } else if (u_depth > 6 && !rn2(7)) {
                 await do_mkroom(8 /* ZOO */);
-            } else if (u_depth > 8 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1359, $c.lit("makelevel")), rn2(5)) : rn2(5))) {
+            } else if (u_depth > 8 && !rn2(5)) {
                 await do_mkroom(10 /* TEMPLE */);
-            } else if (u_depth > 9 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1361, $c.lit("makelevel")), rn2(5)) : rn2(5)) && !(svm.mvitals[1 /* PM_KILLER_BEE */].mvflags & 3)) {
+            } else if (u_depth > 9 && !rn2(5) && !(svm.mvitals[1 /* PM_KILLER_BEE */].mvflags & 3)) {
                 await do_mkroom(5 /* BEEHIVE */);
-            } else if (u_depth > 11 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1364, $c.lit("makelevel")), rn2(6)) : rn2(6))) {
+            } else if (u_depth > 11 && !rn2(6)) {
                 await do_mkroom(6 /* MORGUE */);
-            } else if (u_depth > 12 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1366, $c.lit("makelevel")), rn2(8)) : rn2(8)) && await antholemon()) {
+            } else if (u_depth > 12 && !rn2(8) && await antholemon()) {
                 await do_mkroom(13 /* ANTHOLE */);
-            } else if (u_depth > 14 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1368, $c.lit("makelevel")), rn2(4)) : rn2(4)) && !(svm.mvitals[277 /* PM_SOLDIER */].mvflags & 3)) {
+            } else if (u_depth > 14 && !rn2(4) && !(svm.mvitals[277 /* PM_SOLDIER */].mvflags & 3)) {
                 await do_mkroom(7 /* BARRACKS */);
-            } else if (u_depth > 15 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1371, $c.lit("makelevel")), rn2(6)) : rn2(6))) {
+            } else if (u_depth > 15 && !rn2(6)) {
                 await do_mkroom(3 /* SWAMP */);
-            } else if (u_depth > 16 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1373, $c.lit("makelevel")), rn2(8)) : rn2(8)) && !(svm.mvitals[10 /* PM_COCKATRICE */].mvflags & 3)) {
+            } else if (u_depth > 16 && !rn2(8) && !(svm.mvitals[10 /* PM_COCKATRICE */].mvflags & 3)) {
                 await do_mkroom(12 /* COCKNEST */);
             }
         }
@@ -1061,7 +1061,7 @@ async function makelevel() {   // mklev.c:1251
                 fillable_room_count = fillable_room_count + 1 | 0;
             }
         }
-        bonus_item_room_countdown = fillable_room_count ? rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1402, $c.lit("makelevel")), rn2(fillable_room_count)) : rn2(fillable_room_count) : -1;
+        bonus_item_room_countdown = fillable_room_count ? rn2(fillable_room_count) : -1;
         for (croom = $c.relem(svr.rooms, 0); croom.hx > 0; croom = $c.radd(croom, 1)) {
             fillable = $c.i8((croom.rtype === 0 /* OROOM */ || croom.rtype === 1 /* THEMEROOM */) && croom.needfill === 1 ? 1 : 0);
             await fill_ordinary_room(croom, $c.i8(fillable && bonus_item_room_countdown === 0 ? 1 : 0));
@@ -1082,7 +1082,7 @@ async function makelevel() {   // mklev.c:1251
     }
 }
 function water_has_kelp(x, y, kelp_pool, kelp_moat) {   // mklev.c:1432
-    if (kelp_pool && (svl.level.locations[x][y].typ === 16 /* POOL */ || svl.level.locations[x][y].typ === 18 /* WATER */ && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1436, $c.lit("water_has_kelp")), rn2(kelp_pool)) : rn2(kelp_pool)) || kelp_moat && svl.level.locations[x][y].typ === 17 /* MOAT */ && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1437, $c.lit("water_has_kelp")), rn2(kelp_moat)) : rn2(kelp_moat))) {
+    if (kelp_pool && (svl.level.locations[x][y].typ === 16 /* POOL */ || svl.level.locations[x][y].typ === 18 /* WATER */ && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) && !rn2(kelp_pool) || kelp_moat && svl.level.locations[x][y].typ === 17 /* MOAT */ && !rn2(kelp_moat)) {
         return 1;
     }
     return 0;
@@ -1130,26 +1130,26 @@ export async function mineralize(kelp_pool, kelp_moat, goldprob, gemprob, skip_l
             } else if (svl.level.locations[x][y].typ !== 0 /* STONE */) {
                 y = $c.i16(y + 1 | 0);
             } else if (!((svl.level.locations[x][y].flags | 0) & 8) && svl.level.locations[x][y - 1 | 0].typ === 0 /* STONE */ && svl.level.locations[x + 1 | 0][y - 1 | 0].typ === 0 /* STONE */ && svl.level.locations[x - 1 | 0][y - 1 | 0].typ === 0 /* STONE */ && svl.level.locations[x + 1 | 0][y].typ === 0 /* STONE */ && svl.level.locations[x - 1 | 0][y].typ === 0 /* STONE */ && svl.level.locations[x + 1 | 0][y + 1 | 0].typ === 0 /* STONE */ && svl.level.locations[x - 1 | 0][y + 1 | 0].typ === 0 /* STONE */) {
-                if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1515, $c.lit("mineralize")), rn2(1000)) : rn2(1000)) < goldprob) {
+                if (rn2(1000) < goldprob) {
                     if ((otmp = await mksobj(438 /* GOLD_PIECE */, 0, 0)) !== null) {
                         otmp.ox = x, otmp.oy = y;
-                        $t1 = $c.add64(1, rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1518, $c.lit("mineralize")), rnd(Math.imul(goldprob, 3))) : rnd(Math.imul(goldprob, 3))), otmp.quan = $t1;
+                        $t1 = $c.add64(1, rnd(Math.imul(goldprob, 3))), otmp.quan = $t1;
                         $t2 = await weight(otmp) >>> 0, otmp.owt = $t2;
-                        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1520, $c.lit("mineralize")), rn2(3)) : rn2(3))) {
+                        if (!rn2(3)) {
                             await add_to_buried(otmp);
                         } else {
                             await place_object(otmp, x, y);
                         }
                     }
                 }
-                if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1526, $c.lit("mineralize")), rn2(1000)) : rn2(1000)) < gemprob) {
-                    for (cnt = rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1527, $c.lit("mineralize")), rnd(2 + $c.div32(dunlev(u.uz), 3) | 0)) : rnd(2 + $c.div32(dunlev(u.uz), 3) | 0); cnt > 0; cnt = cnt - 1 | 0) {
+                if (rn2(1000) < gemprob) {
+                    for (cnt = rnd(2 + $c.div32(dunlev(u.uz), 3) | 0); cnt > 0; cnt = cnt - 1 | 0) {
                         if ((otmp = await mkobj(13 /* GEM_CLASS */, 0)) !== null) {
                             if (otmp.otyp === 474 /* ROCK */) {
                                 await dealloc_obj(otmp);
                             } else {
                                 otmp.ox = x, otmp.oy = y;
-                                if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1533, $c.lit("mineralize")), rn2(3)) : rn2(3))) {
+                                if (!rn2(3)) {
                                     await add_to_buried(otmp);
                                 } else {
                                     await place_object(otmp, x, y);
@@ -1328,7 +1328,7 @@ export function okdoor(x, y) {   // mklev.c:1779
     return (svl.level.locations[x][y].typ === 2 /* HWALL */ || svl.level.locations[x][y].typ === 1 /* VWALL */) && (isok($c.i16(x - 1 | 0), y) && !(svl.level.locations[x - 1 | 0][y].typ < 16 /* POOL */) || isok($c.i16(x + 1 | 0), y) && !(svl.level.locations[x + 1 | 0][y].typ < 16 /* POOL */) || isok(x, $c.i16(y - 1 | 0)) && !(svl.level.locations[x][y - 1 | 0].typ < 16 /* POOL */) || isok(x, $c.i16(y + 1 | 0)) && !(svl.level.locations[x][y + 1 | 0].typ < 16 /* POOL */)) && !near_door ? 1 : 0;
 }
 export function maybe_sdoor(chance) {   // mklev.c:1793
-    return $c.i8(depth(u.uz) > 2 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1795, $c.lit("maybe_sdoor")), rn2(2 > chance ? 2 : chance)) : rn2(2 > chance ? 2 : chance)) ? 1 : 0);
+    return $c.i8(depth(u.uz) > 2 && !rn2(2 > chance ? 2 : chance) ? 1 : 0);
 }
 export async function dodoor(x, y, aroom) {   // mklev.c:1800
     await dosdoor(x, y, aroom, maybe_sdoor(8) ? 14 /* SDOOR */ : 23 /* DOOR */);
@@ -1363,7 +1363,7 @@ async function mktrap_victim(ttmp) {   // mklev.c:1815
     }
     do {
         poss_class = 0 /* RANDOM_CLASS */;
-        switch (rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1857, $c.lit("mktrap_victim")), rn2(4)) : rn2(4)) {
+        switch (rn2(4)) {
             case 0:
                 poss_class = 2 /* WEAPON_CLASS */;
                 break;
@@ -1384,11 +1384,11 @@ async function mktrap_victim(ttmp) {   // mklev.c:1815
         } else {
             await place_object(otmp, x, y);
         }
-    } while (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1888, $c.lit("mktrap_victim")), rn2(5)) : rn2(5)));
-    switch (rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1891, $c.lit("mktrap_victim")), rn2(15)) : rn2(15)) {
+    } while (!rn2(5));
+    switch (rn2(15)) {
         case 0:
             victim_mnum = 264 /* PM_ELF */;
-            if (kind === 8 /* SLP_GAS_TRAP */ && !(lvl <= 2 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1899, $c.lit("mktrap_victim")), rn2(2)) : rn2(2)))) {
+            if (kind === 8 /* SLP_GAS_TRAP */ && !(lvl <= 2 && rn2(2))) {
                 victim_mnum = 260 /* PM_HUMAN */;
             }
             break;
@@ -1406,8 +1406,8 @@ async function mktrap_victim(ttmp) {   // mklev.c:1815
         case 8:
         case 9:
             victim_mnum = 165 /* PM_GNOME */;
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1912, $c.lit("mktrap_victim")), rn2(10)) : rn2(10))) {
-                otmp = await mksobj((rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1913, $c.lit("mktrap_victim")), rn2(4)) : rn2(4)) ? 224 /* TALLOW_CANDLE */ : 225 /* WAX_CANDLE */, 1, 0);
+            if (!rn2(10)) {
+                otmp = await mksobj(rn2(4) ? 224 /* TALLOW_CANDLE */ : 225 /* WAX_CANDLE */, 1, 0);
                 otmp.quan = 1;
                 $t1 = await weight(otmp) >>> 0, otmp.owt = $t1;
                 await curse(otmp);
@@ -1421,8 +1421,8 @@ async function mktrap_victim(ttmp) {   // mklev.c:1815
             victim_mnum = 260 /* PM_HUMAN */;
             break;
     }
-    if (victim_mnum === 260 /* PM_HUMAN */ && (rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1930, $c.lit("mktrap_victim")), rn2(25)) : rn2(25))) {
-        victim_mnum = (rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1931, $c.lit("mktrap_victim")), rn2(12)) : rn2(12)) + 331 | 0;
+    if (victim_mnum === 260 /* PM_HUMAN */ && rn2(25)) {
+        victim_mnum = rn2(12) + 331 | 0;
     }
     otmp = await mkcorpstat(265 /* CORPSE */, null, $c.relem(mons, victim_mnum), x, y, 8);
     otmp.age = $c.sub64(otmp.age, 51);
@@ -1430,7 +1430,7 @@ async function mktrap_victim(ttmp) {   // mklev.c:1815
 async function traptype_rnd(mktrapflags) {   // mklev.c:1938
     let lvl = 0, kind = 0;
     lvl = await level_difficulty() >>> 0;
-    kind = rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1941, $c.lit("traptype_rnd")), rnd(25)) : rnd(25);
+    kind = rnd(25);
     switch (kind) {
         case 24 /* TRAPPED_DOOR */:
         case 25 /* TRAPPED_CHEST */:
@@ -1483,7 +1483,7 @@ async function traptype_rnd(mktrapflags) {   // mklev.c:1938
             }
             break;
         case 13 /* HOLE */:
-            if (rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 1993, $c.lit("traptype_rnd")), rn2(7)) : rn2(7)) {
+            if (rn2(7)) {
                 kind = 0 /* NO_TRAP */;
             }
             break;
@@ -1492,7 +1492,7 @@ async function traptype_rnd(mktrapflags) {   // mklev.c:1938
 }
 function traptype_roguelvl() {   // mklev.c:2002
     let kind = 0;
-    switch (rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 2006, $c.lit("traptype_roguelvl")), rn2(7)) : rn2(7)) {
+    switch (rn2(7)) {
         default:
             kind = 5 /* BEAR_TRAP */;
             break;
@@ -1535,7 +1535,7 @@ export async function mktrap(num, mktrapflags, croom, tm) {   // mklev.c:2036
         kind = num;
     } else if ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level)) {
         kind = traptype_roguelvl();
-    } else if (In_hell(u.uz) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 2070, $c.lit("mktrap")), rn2(5)) : rn2(5))) {
+    } else if (In_hell(u.uz) && !rn2(5)) {
         kind = 10 /* FIRE_TRAP */;
     } else {
         do {
@@ -1572,7 +1572,7 @@ export async function mktrap(num, mktrapflags, croom, tm) {   // mklev.c:2036
     if (kind === 17 /* MAGIC_PORTAL */ && (u.ucamefrom.dnum || u.ucamefrom.dlevel)) {
         assign_level(t.dst, u.ucamefrom);
     }
-    if (gi.in_mklev && kind !== 0 /* NO_TRAP */ && !((mktrapflags & 8) >>> 0) && lvl <= (rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 2137, $c.lit("mktrap")), rnd(4)) : rnd(4)) >>> 0 && kind !== 4 /* SQKY_BOARD */ && kind !== 9 /* RUST_TRAP */ && !(kind === 7 /* ROLLING_BOULDER_TRAP */ && t.launch.x === t.tx && t.launch.y === t.ty) && !(kind === 11 /* PIT */ || kind === 12 /* SPIKED_PIT */) && (kind < 13 /* HOLE */ || kind === 20 /* MAGIC_TRAP */)) {
+    if (gi.in_mklev && kind !== 0 /* NO_TRAP */ && !((mktrapflags & 8) >>> 0) && lvl <= rnd(4) >>> 0 && kind !== 4 /* SQKY_BOARD */ && kind !== 9 /* RUST_TRAP */ && !(kind === 7 /* ROLLING_BOULDER_TRAP */ && t.launch.x === t.tx && t.launch.y === t.ty) && !(kind === 11 /* PIT */ || kind === 12 /* SPIKED_PIT */) && (kind < 13 /* HOLE */ || kind === 20 /* MAGIC_TRAP */)) {
         if (kind === 6 /* LANDMINE */) {
             t.ttyp = (11) & 31;
             t.tseen = (1) & 1;
@@ -1622,13 +1622,13 @@ async function generate_stairs_find_room() {   // mklev.c:2219
             }
         }
         if (ai > 0) {
-            i = rmarr.get(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 2236, $c.lit("generate_stairs_find_room")), rn2(ai)) : rn2(ai));
+            i = rmarr.get(rn2(ai));
             $c.free(rmarr);
             return $c.relem(svr.rooms, i);
         }
     }
     $c.free(rmarr);
-    croom = $c.relem(svr.rooms, rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 2243, $c.lit("generate_stairs_find_room")), rn2(svn.nroom)) : rn2(svn.nroom));
+    croom = $c.relem(svr.rooms, rn2(svn.nroom));
     return croom;
 }
 async function generate_stairs() {   // mklev.c:2250
@@ -1662,7 +1662,7 @@ async function mkfount(croom) {   // mklev.c:2285
     if (!await set_levltyp(m.x, m.y, 28)) {
         return;
     }
-    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 2296, $c.lit("mkfount")), rn2(7)) : rn2(7))) {
+    if (!rn2(7)) {
         svl.level.locations[m.x][m.y].horizontal = (1) & 1;
     }
     svl.level.flags.nfountains = $c.u8(svl.level.flags.nfountains + 1);
@@ -1701,13 +1701,13 @@ async function mkaltar(croom) {   // mklev.c:2332
     if (!await set_levltyp(m.x, m.y, 32)) {
         return;
     }
-    al = $c.i8((rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 2348, $c.lit("mkaltar")), rn2(3)) : rn2(3)) - 1 | 0);
+    al = $c.i8(rn2(3) - 1 | 0);
     svl.level.locations[m.x][m.y].flags = ((al === -128 ? 0 : al === 1 ? 4 : al + 2 | 0) >>> 0) & 31;
 }
 async function mkgrave(croom) {   // mklev.c:2353
     let m = new $T.nhcoord(), tryct = 0, otmp = null, dobell = 0, gold = null, $t1, $t2;
     tryct = 0;
-    dobell = $c.i8(!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 2358, $c.lit("mkgrave")), rn2(10)) : rn2(10)) ? 1 : 0);
+    dobell = $c.i8(!rn2(10) ? 1 : 0);
     if (croom.rtype !== 0 /* OROOM */) {
         return;
     }
@@ -1715,14 +1715,14 @@ async function mkgrave(croom) {   // mklev.c:2353
         return;
     }
     await make_grave(m.x, m.y, dobell ? $c.lit("Saved by the bell!") : null);
-    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 2370, $c.lit("mkgrave")), rn2(3)) : rn2(3))) {
+    if (!rn2(3)) {
         gold = await mksobj(438 /* GOLD_PIECE */, 1, 0);
-        $t1 = (rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 2378, $c.lit("mkgrave")), rnd(20)) : rnd(20)) + Math.imul(await level_difficulty(), rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 2378, $c.lit("mkgrave")), rnd(5)) : rnd(5)) | 0, gold.quan = $t1;
+        $t1 = rnd(20) + Math.imul(await level_difficulty(), rnd(5)) | 0, gold.quan = $t1;
         $t2 = await weight(gold) >>> 0, gold.owt = $t2;
         gold.ox = m.x, gold.oy = m.y;
         await add_to_buried(gold);
     }
-    for (tryct = rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 2383, $c.lit("mkgrave")), rn2(5)) : rn2(5); tryct; tryct = tryct - 1 | 0) {
+    for (tryct = rn2(5); tryct; tryct = tryct - 1 | 0) {
         otmp = await mkobj(0 /* RANDOM_CLASS */, 1);
         if (!otmp) {
             return;
@@ -1898,7 +1898,7 @@ async function mk_knox_portal(x, y) {   // mklev.c:2624
         }
         source = br.end1;
     }
-    if (source.dnum < svn.n_dgns || (rng_log_enabled() ? (rng_log_set_caller($c.lit("mklev.c"), 2644, $c.lit("mk_knox_portal")), rn2(3)) : rn2(3)) && !flags.debug) {
+    if (source.dnum < svn.n_dgns || rn2(3) && !flags.debug) {
         return;
     }
     if (!(u.uz.dnum === svd.dungeon_topology.d_oracle_level.dnum && !await at_dgn_entrance($c.lit("The Quest")) && (u_depth = depth(u.uz)) > 10 && u_depth < depth(svd.dungeon_topology.d_medusa_level))) {

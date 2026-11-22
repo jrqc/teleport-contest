@@ -40,7 +40,7 @@ import { align_gname } from './pray.js';
 import { finish_quest } from './quest.js';
 import { is_quest_artifact } from './questpgr.js';
 import { in_out_region, m_in_out_region } from './region.js';
-import { d, rn2, rn2_on_display_rng, rnd, rng_log_enabled, rng_log_set_caller, rnl } from './rnd.js';
+import { d, rn2, rn2_on_display_rng, rnd, rnl } from './rnd.js';
 import { genders } from './role.js';
 import { contained_gold, costly_spot, donate_gold, hot_pursuit, inside_shop, is_unpaid, make_angry_shk, obfree, sellobj, shop_keeper, stolen_value, subfrombill } from './shk.js';
 import { mpickobj, remove_worn_item } from './steal.js';
@@ -188,9 +188,9 @@ async function throw_obj(obj, shotlimit) {   // dothrow.c:87
                 }
             }
             if (multishot > 1 && skill === -22 && ((obj.oclass === 2 /* WEAPON_CLASS */ || obj.oclass === 13 /* GEM_CLASS */) && objects[obj.otyp].oc_subtyp >= -22 && objects[obj.otyp].oc_subtyp <= -20 && ($G.uwep && objects[obj.otyp].oc_subtyp === (-objects[$G.uwep.otyp].oc_subtyp | 0))) && acurrstr() < (gu.urace.mnum === 165 ? 16 : 18)) {
-                multishot = rng_log_enabled() ? (rng_log_set_caller($c.lit("dothrow.c"), 231, $c.lit("throw_obj")), rnd(multishot)) : rnd(multishot);
+                multishot = rnd(multishot);
             }
-            multishot = rng_log_enabled() ? (rng_log_set_caller($c.lit("dothrow.c"), 233, $c.lit("throw_obj")), rnd(multishot)) : rnd(multishot);
+            multishot = rnd(multishot);
             if (multishot > obj.quan) {
                 multishot = $c.i32(obj.quan);
             }
@@ -577,7 +577,7 @@ export async function hurtle_step(arg, x, y) {   // dothrow.c:773
             }
         }
         if (why) {
-            dmg = rng_log_enabled() ? (rng_log_set_caller($c.lit("dothrow.c"), 835, $c.lit("hurtle_step")), rnd(2 + range.get(0) | 0)) : rnd(2 + range.get(0) | 0);
+            dmg = rnd(2 + range.get(0) | 0);
             await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(dmg + 1 | 0, 2) : dmg, why, 1);
             await wake_nearto(x, y, 10);
             return 0;
@@ -893,7 +893,7 @@ async function toss_up(obj, hitsroof) {   // dothrow.c:1256
             if ($goto !== "petrify" && obj.oclass === 8 /* POTION_CLASS */) {
                 await potionhit(gy.youmonst, obj, 1);
             } else if ($goto !== "petrify" && breaktest(obj)) {
-                blindinc = (otyp === 287 /* CREAM_PIE */ || otyp === 479 /* BLINDING_VENOM */) && await can_blnd(gy.youmonst, gy.youmonst, 254, obj) ? rng_log_enabled() ? (rng_log_set_caller($c.lit("dothrow.c"), 1298, $c.lit("toss_up")), rnd(25)) : rnd(25) : 0;
+                blindinc = (otyp === 287 /* CREAM_PIE */ || otyp === 479 /* BLINDING_VENOM */) && await can_blnd(gy.youmonst, gy.youmonst, 254, obj) ? rnd(25) : 0;
                 await breakmsg(obj, $c.i8(!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked) ? 1 : 0));
                 if (await breakobj(obj, u.ux, u.uy, 1, 1)) {
                     obj = null;
@@ -943,11 +943,11 @@ async function toss_up(obj, hitsroof) {   // dothrow.c:1256
                         artimsg = 0;
                         dmg[0] = await dmgval(obj, gy.youmonst);
                         if (obj.oartifact && !harmless) {
-                            artimsg = await artifact_hit(null, gy.youmonst, obj, new $c.Ptr(dmg, 0), (rng_log_enabled() ? (rng_log_set_caller($c.lit("dothrow.c"), 1354, $c.lit("toss_up")), rn2(18)) : rn2(18)) + 2 | 0);
+                            artimsg = await artifact_hit(null, gy.youmonst, obj, new $c.Ptr(dmg, 0), rn2(18) + 2 | 0);
                         }
                         if (!dmg[0]) {
                             dmg[0] = $c.div32((obj.owt | 0) + 99 | 0, 100 /* WT_TO_DMG */);
-                            dmg[0] = dmg[0] <= 1 ? 1 : rng_log_enabled() ? (rng_log_set_caller($c.lit("dothrow.c"), 1358, $c.lit("toss_up")), rnd(dmg[0])) : rnd(dmg[0]);
+                            dmg[0] = dmg[0] <= 1 ? 1 : rnd(dmg[0]);
                             if (dmg[0] > 6) {
                                 dmg[0] = 6;
                             }
@@ -955,10 +955,10 @@ async function toss_up(obj, hitsroof) {   // dothrow.c:1256
                                 dmg[0] = 0;
                             }
                             if (obj.blessed | 0 && mon_hates_blessings(gy.youmonst)) {
-                                dmg[0] = dmg[0] + (rng_log_enabled() ? (rng_log_set_caller($c.lit("dothrow.c"), 1370, $c.lit("toss_up")), rnd(4)) : rnd(4)) | 0;
+                                dmg[0] = dmg[0] + rnd(4) | 0;
                             }
                             if (is_silver && (u.ulycn >= 0 /* LOW_PM */ || hates_silver(gy.youmonst.data))) {
-                                dmg[0] = dmg[0] + (rng_log_enabled() ? (rng_log_set_caller($c.lit("dothrow.c"), 1372, $c.lit("toss_up")), rnd(20)) : rnd(20)) | 0;
+                                dmg[0] = dmg[0] + rnd(20) | 0;
                             }
                         }
                         if (dmg[0] > 1 && less_damage) {
@@ -1077,7 +1077,7 @@ export async function throwit(obj$in, wep_mask, twoweap, oldslot) {   // dothrow
     impaired = $c.i8(u.uprops[14 /* CONFUSION */].intrinsic || u.uprops[13 /* STUNNED */].intrinsic || (u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked || u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic) || (u.uprops[25 /* FUMBLING */].intrinsic || u.uprops[25 /* FUMBLING */].extrinsic) ? 1 : 0);
     tethered_weapon = $c.i8(arw && arw.tethered | 0 && $c.and64(wep_mask, 256) !== 0 ? 1 : 0);
     gn.notonhead = 0;
-    if ((obj[0].cursed | 0 || obj[0].greased | 0) && (u.dx || u.dy) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dothrow.c"), 1526, $c.lit("throwit")), rn2(7)) : rn2(7))) {
+    if ((obj[0].cursed | 0 || obj[0].greased | 0) && (u.dx || u.dy) && !rn2(7)) {
         slipok = 1;
         if ((obj[0].oclass === 2 /* WEAPON_CLASS */ || obj[0].oclass === 13 /* GEM_CLASS */) && objects[obj[0].otyp].oc_subtyp >= -22 && objects[obj[0].otyp].oc_subtyp <= -20 && ($G.uwep && objects[obj[0].otyp].oc_subtyp === (-objects[$G.uwep.otyp].oc_subtyp | 0))) {
             await pline($c.lit("%s!"), await Tobjnam(obj[0], $c.lit("misfire")));
@@ -1089,8 +1089,8 @@ export async function throwit(obj$in, wep_mask, twoweap, oldslot) {   // dothrow
             }
         }
         if (slipok) {
-            $t1 = (rng_log_enabled() ? (rng_log_set_caller($c.lit("dothrow.c"), 1541, $c.lit("throwit")), rn2(3)) : rn2(3)) - 1 | 0, u.dx = $t1;
-            $t2 = (rng_log_enabled() ? (rng_log_set_caller($c.lit("dothrow.c"), 1542, $c.lit("throwit")), rn2(3)) : rn2(3)) - 1 | 0, u.dy = $t2;
+            $t1 = rn2(3) - 1 | 0, u.dx = $t1;
+            $t2 = rn2(3) - 1 | 0, u.dy = $t2;
             if (!u.dx && !u.dy) {
                 u.dz = 1;
             }
@@ -1122,8 +1122,8 @@ export async function throwit(obj$in, wep_mask, twoweap, oldslot) {   // dothrow
             await pline($c.lit("%s the %s and returns to your hand!"), await Tobjnam(obj[0], $c.lit("hit")), ceiling(u.ux, u.uy));
             obj[0] = await return_throw_to_inv(obj[0], wep_mask, twoweap, oldslot);
         } else if (u.dz < 0) {
-            await toss_up(obj[0], $c.i8((rng_log_enabled() ? (rng_log_set_caller($c.lit("dothrow.c"), 1589, $c.lit("throwit")), rn2(5)) : rn2(5)) && !u.uinwater ? 1 : 0));
-        } else if (u.dz > 0 && u.usteed && obj[0].oclass === 8 /* POTION_CLASS */ && (rng_log_enabled() ? (rng_log_set_caller($c.lit("dothrow.c"), 1591, $c.lit("throwit")), rn2(6)) : rn2(6))) {
+            await toss_up(obj[0], $c.i8(rn2(5) && !u.uinwater ? 1 : 0));
+        } else if (u.dz > 0 && u.usteed && obj[0].oclass === 8 /* POTION_CLASS */ && rn2(6)) {
             await potionhit(u.usteed, obj[0], 1);
         } else {
             await hitfloor(obj[0], 1);
@@ -1220,13 +1220,13 @@ export async function throwit(obj$in, wep_mask, twoweap, oldslot) {   // dothrow
         return;
     } else {
         if (iflags.returning_missile) {
-            if (rng_log_enabled() ? (rng_log_set_caller($c.lit("dothrow.c"), 1711, $c.lit("throwit")), rn2(100)) : rn2(100)) {
+            if (rn2(100)) {
                 if (tethered_weapon) {
                     await tmp_at(-7, -1);
                 } else {
                     await sho_obj_return_to_u(obj[0]);
                 }
-                if (!impaired && (rng_log_enabled() ? (rng_log_set_caller($c.lit("dothrow.c"), 1717, $c.lit("throwit")), rn2(100)) : rn2(100))) {
+                if (!impaired && rn2(100)) {
                     await pline($c.lit("%s to your hand!"), await Tobjnam(obj[0], $c.lit("return")));
                     obj[0] = await addinv_before(obj[0], oldslot);
                     await encumber_msg();
@@ -1239,11 +1239,11 @@ export async function throwit(obj$in, wep_mask, twoweap, oldslot) {   // dothrow
                         await newsym(gb.bhitpos.x, gb.bhitpos.y);
                     }
                 } else {
-                    dmg[0] = rng_log_enabled() ? (rng_log_set_caller($c.lit("dothrow.c"), 1730, $c.lit("throwit")), rn2(2)) : rn2(2);
+                    dmg[0] = rn2(2);
                     if (!dmg[0]) {
                         await pline((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked ? $c.lit("%s lands %s your %s.") : $c.lit("%s back to you, landing %s your %s."), (u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked ? c_common_strings.c_Something : await Tobjnam(obj[0], $c.lit("return")), (u.uprops[48 /* LEVITATION */].intrinsic || u.uprops[48 /* LEVITATION */].extrinsic) && !u.uprops[48 /* LEVITATION */].blocked ? $c.lit("beneath") : $c.lit("at"), await makeplural(await body_part(5 /* FOOT */)));
                     } else {
-                        dmg[0] = dmg[0] + (rng_log_enabled() ? (rng_log_set_caller($c.lit("dothrow.c"), 1739, $c.lit("throwit")), rnd(3)) : rnd(3)) | 0;
+                        dmg[0] = dmg[0] + rnd(3) | 0;
                         await pline((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked ? $c.lit("%s your %s!") : $c.lit("%s back toward you, hitting your %s!"), await Tobjnam(obj[0], (u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked ? $c.lit("hit") : $c.lit("fly")), await body_part(0 /* ARM */));
                         if (obj[0].oartifact) {
                             await artifact_hit(null, gy.youmonst, obj[0], new $c.Ptr(dmg, 0), 0);
@@ -1377,7 +1377,7 @@ export async function omon_adj(mon, obj, mon_notices) {   // dothrow.c:1913
     }
     if (!mon.mcanmove || !mon.data.mmove) {
         tmp = tmp + 4 | 0;
-        if (mon_notices && mon.data.mmove && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dothrow.c"), 1926, $c.lit("omon_adj")), rn2(10)) : rn2(10))) {
+        if (mon_notices && mon.data.mmove && !rn2(10)) {
             mon.mcanmove = (1) & 1;
             mon.mfrozen = (0) & 127;
         }
@@ -1407,7 +1407,7 @@ async function tmiss(obj, mon, maybe_wakeup) {   // dothrow.c:1951
     } else {
         await miss(missile, mon);
     }
-    if (maybe_wakeup && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dothrow.c"), 1964, $c.lit("tmiss")), rn2(3)) : rn2(3))) {
+    if (maybe_wakeup && !rn2(3)) {
         await wakeup(mon, 1);
     }
     return;
@@ -1418,11 +1418,11 @@ export function should_mulch_missile(obj) {   // dothrow.c:1976
         return 0;
     }
     chance = (3 + ((obj.oeroded | 0) > (obj.oeroded2 | 0) ? obj.oeroded | 0 : obj.oeroded2 | 0) | 0) - obj.spe | 0;
-    broken = $c.i8(chance > 1 ? rng_log_enabled() ? (rng_log_set_caller($c.lit("dothrow.c"), 1991, $c.lit("should_mulch_missile")), rn2(chance)) : rn2(chance) : !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dothrow.c"), 1991, $c.lit("should_mulch_missile")), rn2(4)) : rn2(4)) ? 1 : 0);
-    if (obj.blessed | 0 && (svc.context.mon_moving ? !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dothrow.c"), 1992, $c.lit("should_mulch_missile")), rn2(3)) : rn2(3)) : !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dothrow.c"), 1992, $c.lit("should_mulch_missile")), rnl(4)) : rnl(4)))) {
+    broken = $c.i8(chance > 1 ? rn2(chance) : !rn2(4) ? 1 : 0);
+    if (obj.blessed | 0 && (svc.context.mon_moving ? !rn2(3) : !rnl(4))) {
         broken = 0;
     }
-    if ((obj.oclass === 13 /* GEM_CLASS */ && objects[obj.otyp].oc_tough | 0 || obj.otyp === 473 /* FLINT */) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("dothrow.c"), 1998, $c.lit("should_mulch_missile")), rn2(2)) : rn2(2))) {
+    if ((obj.oclass === 13 /* GEM_CLASS */ && objects[obj.otyp].oc_tough | 0 || obj.otyp === 473 /* FLINT */) && !rn2(2)) {
         broken = 0;
     }
     return broken;
@@ -1512,7 +1512,7 @@ export async function thitmonst(mon, obj) {   // dothrow.c:2011
         }
         return 0;
     }
-    dieroll = rng_log_enabled() ? (rng_log_set_caller($c.lit("dothrow.c"), 2152, $c.lit("thitmonst")), rnd(20)) : rnd(20);
+    dieroll = rnd(20);
     if (obj.oclass === 2 /* WEAPON_CLASS */ || obj.oclass === 6 /* TOOL_CLASS */ && objects[obj.otyp].oc_subtyp !== 0 /* P_NONE */ || obj.oclass === 13 /* GEM_CLASS */) {
         if (hmode === 2 /* HMON_KICKED */) {
             tmp = tmp - ((obj.oclass === 2 /* WEAPON_CLASS */ || obj.oclass === 13 /* GEM_CLASS */) && objects[obj.otyp].oc_subtyp >= -22 && objects[obj.otyp].oc_subtyp <= -20 ? 5 : 3) | 0;
@@ -1592,10 +1592,10 @@ export async function thitmonst(mon, obj) {   // dothrow.c:2011
         } else {
             await tmiss(obj, mon, 1);
         }
-    } else if ((otyp === 266 /* EGG */ || otyp === 287 /* CREAM_PIE */ || otyp === 479 /* BLINDING_VENOM */ || otyp === 480 /* ACID_VENOM */) && (guaranteed_hit || acurr(3 /* A_DEX */) > (rng_log_enabled() ? (rng_log_set_caller($c.lit("dothrow.c"), 2258, $c.lit("thitmonst")), rnd(25)) : rnd(25)))) {
+    } else if ((otyp === 266 /* EGG */ || otyp === 287 /* CREAM_PIE */ || otyp === 479 /* BLINDING_VENOM */ || otyp === 480 /* ACID_VENOM */) && (guaranteed_hit || acurr(3 /* A_DEX */) > rnd(25))) {
         await hmon(mon, obj, hmode, dieroll);
         return 1;
-    } else if (obj.oclass === 8 /* POTION_CLASS */ && (guaranteed_hit || acurr(3 /* A_DEX */) > (rng_log_enabled() ? (rng_log_set_caller($c.lit("dothrow.c"), 2263, $c.lit("thitmonst")), rnd(25)) : rnd(25)))) {
+    } else if (obj.oclass === 8 /* POTION_CLASS */ && (guaranteed_hit || acurr(3 /* A_DEX */) > rnd(25))) {
         await potionhit(mon, obj, 1);
         return 1;
     } else if (($c.peq(mon.data, $c.relem(mons, 233 /* PM_MONKEY */)) || $c.peq(mon.data, $c.relem(mons, 234 /* PM_APE */)) ? obj.otyp === 281 /* BANANA */ : $c.andu64(mon.data.mflags2, 4194304) !== 0 && obj.oclass === 7 /* FOOD_CLASS */ && (mon.data.mlet !== 21 /* S_UNICORN */ || (objects[obj.otyp].oc_material | 0) === 3 /* VEGGY */ || obj.otyp === 265 /* CORPSE */ && obj.corpsenm === 158 /* PM_LICHEN */)) || mon.mtame && await dogfood(mon, obj) <= 2 /* ACCFOOD */) {
@@ -1645,7 +1645,7 @@ async function gem_accept(mon, obj) {   // dothrow.c:2309
                     change_luck(5);
                 } else {
                     $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), new $c.Ptr(gem_accept$maybeluck, 0), 256);
-                    change_luck($c.i8((rng_log_enabled() ? (rng_log_set_caller($c.lit("dothrow.c"), 2334, $c.lit("gem_accept")), rn2(7)) : rn2(7)) - 3 | 0));
+                    change_luck($c.i8(rn2(7) - 3 | 0));
                 }
             } else {
                 $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), new $c.Ptr(gem_accept$nogood, 0), 256);
@@ -1658,7 +1658,7 @@ async function gem_accept(mon, obj) {   // dothrow.c:2309
                     change_luck(2);
                 } else {
                     $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), new $c.Ptr(gem_accept$maybeluck, 0), 256);
-                    change_luck($c.i8((rng_log_enabled() ? (rng_log_set_caller($c.lit("dothrow.c"), 2349, $c.lit("gem_accept")), rn2(3)) : rn2(3)) - 1 | 0));
+                    change_luck($c.i8(rn2(3) - 1 | 0));
                 }
             } else {
                 $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), new $c.Ptr(gem_accept$nogood, 0), 256);
@@ -1671,7 +1671,7 @@ async function gem_accept(mon, obj) {   // dothrow.c:2309
                     change_luck(1);
                 } else {
                     $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), new $c.Ptr(gem_accept$maybeluck, 0), 256);
-                    change_luck($c.i8((rng_log_enabled() ? (rng_log_set_caller($c.lit("dothrow.c"), 2364, $c.lit("gem_accept")), rn2(3)) : rn2(3)) - 1 | 0));
+                    change_luck($c.i8(rn2(3) - 1 | 0));
                 }
             } else {
                 $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), new $c.Ptr(gem_accept$noluck, 0), 256);
@@ -1717,7 +1717,7 @@ export async function breaks(obj, x, y) {   // dothrow.c:2444
 }
 export async function release_camera_demon(obj, x, y) {   // dothrow.c:2457
     let mtmp = null;
-    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("dothrow.c"), 2460, $c.lit("release_camera_demon")), rn2(3)) : rn2(3)) && (mtmp = await makemon($c.relem(mons, (rng_log_enabled() ? (rng_log_set_caller($c.lit("dothrow.c"), 2461, $c.lit("release_camera_demon")), rn2(3)) : rn2(3)) ? 51 /* PM_HOMUNCULUS */ : 52 /* PM_IMP */), x, y, 131072)) !== null) {
+    if (!rn2(3) && (mtmp = await makemon($c.relem(mons, rn2(3) ? 51 /* PM_HOMUNCULUS */ : 52 /* PM_IMP */), x, y, 131072)) !== null) {
         if (canseemon(mtmp) || sensemon(mtmp)) {
             await pline($c.lit("%s is released!"), u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic) ? await An(await rndmonnam(null)) : $c.lit("The picture-painting demon"));
         }
@@ -1801,7 +1801,7 @@ export async function breakobj(obj, x, y, hero_caused, from_invent) {   // dothr
         await delobj(obj);
     }
     if (explosion) {
-        await explode(x, y, -11, rng_log_enabled() ? (rng_log_set_caller($c.lit("dothrow.c"), 2572, $c.lit("breakobj")), d(3, 6)) : d(3, 6), 0, 5 /* EXPL_FIERY */);
+        await explode(x, y, -11, d(3, 6), 0, 5 /* EXPL_FIERY */);
     }
     return 1;
 }

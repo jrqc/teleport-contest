@@ -14,7 +14,7 @@ import { lua_createtable, lua_pushinteger, lua_settable } from './luabridge.js';
 import { nhl_add_table_entry_int, nhl_add_table_entry_str } from './nhlua.js';
 import { add_autopickup_exception, all_options_strbuf, allopt_array_init, assign_warnings, disregard_all_options, disregard_this_option, heed_all_options, heed_this_option, match_optname, msgtype_parse_add, nh_getenv, parsebindings, parseoptions, reset_duplicate_opt_detection } from './options.js';
 import { pline, raw_printf } from './pline.js';
-import { rn2, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { rn2 } from './rnd.js';
 import { str2role } from './role.js';
 import { strbuf_empty, strbuf_init } from './strutil.js';
 import { parsesymbols, switch_symbols } from './symbols.js';
@@ -201,7 +201,7 @@ function choose_random_part(str, sep) {   // cfgfiles.c:464
         }
         str = str.add(1);
     }
-    csep = rng_log_enabled() ? (rng_log_set_caller($c.lit("cfgfiles.c"), 480, $c.lit("choose_random_part")), rn2(nsep)) : rn2(nsep);
+    csep = rn2(nsep);
     str = begin;
     while (csep > 0 && str.get(0)) {
         str = str.add(1);

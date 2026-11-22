@@ -51,7 +51,7 @@ import { incr_itimeout, make_blinded, make_hallucinated, make_stunned, self_invi
 import { is_quest_artifact, quest_info } from './questpgr.js';
 import { cant_revive, seffects, unpunish } from './read.js';
 import { create_gas_cloud } from './region.js';
-import { d, rn2, rn2_on_display_rng, rnd, rng_log_enabled, rng_log_set_caller, rnl } from './rnd.js';
+import { d, rn2, rn2_on_display_rng, rnd, rnl } from './rnd.js';
 import { add_damage, costly_spot, delete_contents, inside_shop, make_angry_shk, obfree, sellobj, shk_your, shop_keeper, shopdig, stolen_value } from './shk.js';
 import { mpickobj, remove_worn_item } from './steal.js';
 import { dismount_steed, rider_cant_reach } from './steed.js';
@@ -96,7 +96,7 @@ export async function burnarmor(victim) {   // trap.c:88
     while (item) {
         if (item.otyp === 234 /* TOWEL */ && item.spe > 0) {
             oldspe = item.spe;
-            await dry_a_towel(item, rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 104, $c.lit("burnarmor")), rn2(oldspe + 1 | 0)) : rn2(oldspe + 1 | 0), 1);
+            await dry_a_towel(item, rn2(oldspe + 1 | 0), 1);
             if (item.spe !== oldspe) {
                 break;
             }
@@ -104,7 +104,7 @@ export async function burnarmor(victim) {   // trap.c:88
         item = item.nobj;
     }
     L1: while (1) {
-        switch (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 113, $c.lit("burnarmor")), rn2(5)) : rn2(5)) {
+        switch (rn2(5)) {
             case 0:
                 item = hitting_u ? $G.uarmh : await which_armor(victim, 4);
                 if (item) {
@@ -222,7 +222,7 @@ export async function erode_obj(otmp, ostr, type, ef_flags) {   // trap.c:171
             await pline($c.lit("%s %s %s not affected by %s."), uvictim ? $c.lit("Your") : s_suffix(await Monnam(victim)), ostr, await vtense(ostr, $c.lit("are")), erode_obj$bythe[type]);
         }
         return 0;
-    } else if (otmp.oerodeproof | 0 || otmp.blessed | 0 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 257, $c.lit("erode_obj")), rnl(4)) : rnl(4))) {
+    } else if (otmp.oerodeproof | 0 || otmp.blessed | 0 && !rnl(4)) {
         if (flags.verbose && (print || otmp.oerodeproof | 0) && (uvictim || vismon || visobj)) {
             await pline($c.lit("Somehow, %s %s %s not affected by the %s."), uvictim ? $c.lit("your") : !vismon ? $c.lit("the") : s_suffix(await mon_nam(victim)), ostr, await vtense(ostr, $c.lit("are")), erode_obj$bythe[type]);
         }
@@ -298,7 +298,7 @@ export async function grease_protect(otmp, ostr, victim) {   // trap.c:360
     } else if ($c.peq(victim, gy.youmonst) || vismon) {
         await pline($c.lit("%s %s"), await Yobjnam2(otmp, $c.lit("are")), new $c.Ptr(grease_protect$txt, 0));
     }
-    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 377, $c.lit("grease_protect")), rn2(2)) : rn2(2))) {
+    if (!rn2(2)) {
         otmp.greased = (0) & 1;
         if (otmp.where === 3) {
             await pline_The($c.lit("grease dissolves."));
@@ -350,7 +350,7 @@ function hole_destination(dst) {   // trap.c:442
     $t1 = dunlev(u.uz), dst.dlevel = $t1;
     while (dst.dlevel < bottom) {
         dst.dlevel = $c.i16(dst.dlevel + 1);
-        if (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 450, $c.lit("hole_destination")), rn2(4)) : rn2(4)) {
+        if (rn2(4)) {
             break;
         }
     }
@@ -852,7 +852,7 @@ export async function m_harmless_trap(mtmp, ttmp) {   // trap.c:1106
 async function trapeffect_arrow_trap(mtmp, trap, trflags) {   // trap.c:1190
     let otmp = [null], dam = 0, in_sight = 0, see_it = 0, trapkilled = 0;
     if ($c.peq(mtmp, gy.youmonst)) {
-        if (trap.once | 0 && trap.tseen | 0 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 1199, $c.lit("trapeffect_arrow_trap")), rn2(15)) : rn2(15))) {
+        if (trap.once | 0 && trap.tseen | 0 && !rn2(15)) {
             await You_hear($c.lit("a loud click!"));
             await deltrap(trap);
             await newsym(u.ux, u.uy);
@@ -863,7 +863,7 @@ async function trapeffect_arrow_trap(mtmp, trap, trflags) {   // trap.c:1190
         await pline($c.lit("An arrow shoots out at you!"));
         otmp[0] = await t_missile(18 /* ARROW */, trap);
         dam = await dmgval(otmp[0], gy.youmonst);
-        if (u.usteed && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 1211, $c.lit("trapeffect_arrow_trap")), rn2(2)) : rn2(2)) && await steedintrap(trap, otmp[0])) {
+        if (u.usteed && !rn2(2) && await steedintrap(trap, otmp[0])) {
         } else if (await thitu(8, u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(dam + 1 | 0, 2) : dam, new $c.Ptr(otmp, 0), $c.lit("arrow"))) {
             if (otmp[0]) {
                 await obfree(otmp[0], null);
@@ -880,7 +880,7 @@ async function trapeffect_arrow_trap(mtmp, trap, trflags) {   // trap.c:1190
         in_sight = $c.i8(canseemon(mtmp) || $c.peq(mtmp, u.usteed) ? 1 : 0);
         see_it = $c.i8((gv.viz_array.get(mtmp.my).get(mtmp.mx) & 2) !== 0 ? 1 : 0);
         trapkilled = 0;
-        if (trap.once | 0 && trap.tseen | 0 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 1228, $c.lit("trapeffect_arrow_trap")), rn2(15)) : rn2(15))) {
+        if (trap.once | 0 && trap.tseen | 0 && !rn2(15)) {
             if (in_sight && see_it) {
                 await pline_mon(mtmp, $c.lit("%s triggers a trap but nothing happens."), await Monnam(mtmp));
             }
@@ -904,7 +904,7 @@ async function trapeffect_dart_trap(mtmp, trap, trflags) {   // trap.c:1251
     let otmp = [null], dam = 0, oldumort = 0, in_sight = 0, see_it = 0, trapkilled = 0;
     if ($c.peq(mtmp, gy.youmonst)) {
         oldumort = u.umortality;
-        if (trap.once | 0 && trap.tseen | 0 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 1262, $c.lit("trapeffect_dart_trap")), rn2(15)) : rn2(15))) {
+        if (trap.once | 0 && trap.tseen | 0 && !rn2(15)) {
             await You_hear($c.lit("a soft click."));
             await deltrap(trap);
             await newsym(u.ux, u.uy);
@@ -914,11 +914,11 @@ async function trapeffect_dart_trap(mtmp, trap, trflags) {   // trap.c:1251
         await seetrap(trap);
         await pline($c.lit("A little dart shoots out at you!"));
         otmp[0] = await t_missile(24 /* DART */, trap);
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 1273, $c.lit("trapeffect_dart_trap")), rn2(6)) : rn2(6))) {
+        if (!rn2(6)) {
             otmp[0].otrapped = (1) & 1;
         }
         dam = await dmgval(otmp[0], gy.youmonst);
-        if (u.usteed && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 1276, $c.lit("trapeffect_dart_trap")), rn2(2)) : rn2(2)) && await steedintrap(trap, otmp[0])) {
+        if (u.usteed && !rn2(2) && await steedintrap(trap, otmp[0])) {
         } else if (await thitu(7, u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(dam + 1 | 0, 2) : dam, new $c.Ptr(otmp, 0), $c.lit("little dart"))) {
             if (otmp[0]) {
                 if (otmp[0].otrapped) {
@@ -938,7 +938,7 @@ async function trapeffect_dart_trap(mtmp, trap, trflags) {   // trap.c:1251
         in_sight = $c.i8(canseemon(mtmp) || $c.peq(mtmp, u.usteed) ? 1 : 0);
         see_it = $c.i8((gv.viz_array.get(mtmp.my).get(mtmp.mx) & 2) !== 0 ? 1 : 0);
         trapkilled = 0;
-        if (trap.once | 0 && trap.tseen | 0 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 1299, $c.lit("trapeffect_dart_trap")), rn2(15)) : rn2(15))) {
+        if (trap.once | 0 && trap.tseen | 0 && !rn2(15)) {
             if (in_sight && see_it) {
                 await pline_mon(mtmp, $c.lit("%s triggers a trap but nothing happens."), await Monnam(mtmp));
             }
@@ -948,7 +948,7 @@ async function trapeffect_dart_trap(mtmp, trap, trflags) {   // trap.c:1251
         }
         trap.once = (1) & 1;
         otmp[0] = await t_missile(24 /* DART */, trap);
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 1310, $c.lit("trapeffect_dart_trap")), rn2(6)) : rn2(6))) {
+        if (!rn2(6)) {
             otmp[0].otrapped = (1) & 1;
         }
         if (in_sight) {
@@ -965,12 +965,12 @@ async function trapeffect_rocktrap(mtmp, trap, trflags) {   // trap.c:1324
     let otmp = null, harmless = 0, dmg = 0, in_sight = 0, see_it = 0, trapkilled = 0;
     harmless = 0;
     if ($c.peq(mtmp, gy.youmonst)) {
-        if (trap.once | 0 && trap.tseen | 0 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 1333, $c.lit("trapeffect_rocktrap")), rn2(15)) : rn2(15))) {
+        if (trap.once | 0 && trap.tseen | 0 && !rn2(15)) {
             await pline($c.lit("A trap door in %s opens, but nothing falls out!"), await the(ceiling(u.ux, u.uy)));
             await deltrap(trap);
             await newsym(u.ux, u.uy);
         } else {
-            dmg = rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 1339, $c.lit("trapeffect_rocktrap")), d(2, 6)) : d(2, 6);
+            dmg = d(2, 6);
             trap.once = (1) & 1;
             await feeltrap(trap);
             otmp = await t_missile(474 /* ROCK */, trap);
@@ -1004,7 +1004,7 @@ async function trapeffect_rocktrap(mtmp, trap, trflags) {   // trap.c:1324
         in_sight = $c.i8(canseemon(mtmp) || $c.peq(mtmp, u.usteed) ? 1 : 0);
         see_it = $c.i8((gv.viz_array.get(mtmp.my).get(mtmp.mx) & 2) !== 0 ? 1 : 0);
         trapkilled = 0;
-        if (trap.once | 0 && trap.tseen | 0 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 1380, $c.lit("trapeffect_rocktrap")), rn2(15)) : rn2(15))) {
+        if (trap.once | 0 && trap.tseen | 0 && !rn2(15)) {
             if (in_sight && see_it) {
                 await pline_mon(mtmp, $c.lit("A trap door above %s opens, but nothing falls out!"), await mon_nam(mtmp));
             }
@@ -1017,7 +1017,7 @@ async function trapeffect_rocktrap(mtmp, trap, trflags) {   // trap.c:1324
         if (in_sight) {
             await seetrap(trap);
         }
-        if (await thitm(0, mtmp, otmp, rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 1393, $c.lit("trapeffect_rocktrap")), d(2, 6)) : d(2, 6), 0)) {
+        if (await thitm(0, mtmp, otmp, d(2, 6), 0)) {
             trapkilled = 1;
         }
         return trapkilled ? 2 /* Trap_Killed_Mon */ : mtmp.mtrapped | 0 ? 1 /* Trap_Caught_Mon */ : 0 /* Trap_Effect_Finished */;
@@ -1086,7 +1086,7 @@ async function trapeffect_bear_trap(mtmp, trap, trflags) {   // trap.c:1479
     is_you = $c.i8($c.peq(mtmp, gy.youmonst) ? 1 : 0);
     forcetrap = $c.i8((trflags & 1) >>> 0 !== 0 || (trflags & 64) >>> 0 !== 0 || is_you && (trflags & 32) >>> 0 !== 0 ? 1 : 0);
     if (is_you) {
-        dmg = rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 1490, $c.lit("trapeffect_bear_trap")), d(2, 4)) : d(2, 4);
+        dmg = d(2, 4);
         if (((u.uprops[48 /* LEVITATION */].intrinsic || u.uprops[48 /* LEVITATION */].extrinsic) && !u.uprops[48 /* LEVITATION */].blocked || (u.uprops[49 /* FLYING */].intrinsic || u.uprops[49 /* FLYING */].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, 1) !== 0) && !u.uprops[49 /* FLYING */].blocked) && !forcetrap) {
             return 0 /* Trap_Effect_Finished */;
         }
@@ -1099,7 +1099,7 @@ async function trapeffect_bear_trap(mtmp, trap, trflags) {   // trap.c:1479
             await pline($c.lit("%s bear trap closes harmlessly over you."), A_Your[trap.madeby_u]);
             return 0 /* Trap_Effect_Finished */;
         }
-        set_utrap(((rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 1506, $c.lit("trapeffect_bear_trap")), rn2(4)) : rn2(4)) + 4 | 0) >>> 0, 1);
+        set_utrap((rn2(4) + 4 | 0) >>> 0, 1);
         if (u.usteed) {
             await pline($c.lit("%s bear trap closes on %s %s!"), A_Your[trap.madeby_u], s_suffix(await mon_nam(u.usteed)), await mbodypart(u.usteed, 5 /* FOOT */));
             if (await thitm(0, u.usteed, null, dmg, 0)) {
@@ -1113,7 +1113,7 @@ async function trapeffect_bear_trap(mtmp, trap, trflags) {   // trap.c:1479
             if (await wearing_iron_shoes(mtmp)) {
                 await pline($c.lit("%s protects your leg."), await Yname2($G.uarmf));
             } else {
-                await set_wounded_legs((rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 1520, $c.lit("trapeffect_bear_trap")), rn2(2)) : rn2(2)) ? 262144 : 131072, (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 1520, $c.lit("trapeffect_bear_trap")), rn2(10)) : rn2(10)) + 10 | 0);
+                await set_wounded_legs(rn2(2) ? 262144 : 131072, rn2(10) + 10 | 0);
                 await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(dmg + 1 | 0, 2) : dmg, $c.lit("bear trap"), 0);
             }
         }
@@ -1139,7 +1139,7 @@ async function trapeffect_bear_trap(mtmp, trap, trflags) {   // trap.c:1479
             }
         }
         if (mtmp.mtrapped | 0 && !await wearing_iron_shoes(mtmp)) {
-            trapkilled = await thitm(0, mtmp, null, rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 1554, $c.lit("trapeffect_bear_trap")), d(2, 4)) : d(2, 4), 0);
+            trapkilled = await thitm(0, mtmp, null, d(2, 4), 0);
         }
         return trapkilled ? 2 /* Trap_Killed_Mon */ : mtmp.mtrapped | 0 ? 1 /* Trap_Caught_Mon */ : 0 /* Trap_Effect_Finished */;
     }
@@ -1154,14 +1154,14 @@ async function trapeffect_slp_gas_trap(mtmp, trap, trflags) {   // trap.c:1563
             monstseesu(8);
         } else {
             await pline($c.lit("A cloud of gas puts you to sleep!"));
-            await fall_asleep(-(rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 1575, $c.lit("trapeffect_slp_gas_trap")), rnd(25)) : rnd(25)) | 0, 1);
+            await fall_asleep(-rnd(25) | 0, 1);
             monstunseesu(8);
         }
         await steedintrap(trap, null);
     } else {
         in_sight = $c.i8(canseemon(mtmp) || $c.peq(mtmp, u.usteed) ? 1 : 0);
         if (!await Resists_Elem(mtmp, 3 /* SLEEP_RES */) && !($c.andu64(mtmp.data.mflags1, 1024) !== 0) && !(mtmp.msleeping | 0 || !mtmp.mcanmove)) {
-            if (await sleep_monst(mtmp, rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 1584, $c.lit("trapeffect_slp_gas_trap")), rnd(25)) : rnd(25), -1) && in_sight) {
+            if (await sleep_monst(mtmp, rnd(25), -1) && in_sight) {
                 await pline_mon(mtmp, $c.lit("%s suddenly falls asleep!"), await Monnam(mtmp));
                 await seetrap(trap);
             }
@@ -1174,7 +1174,7 @@ async function trapeffect_rust_trap(mtmp, trap, trflags) {   // trap.c:1595
     if ($c.peq(mtmp, gy.youmonst)) {
         await seetrap(trap);
         S1: for (;;) {
-            switch ($goto !== null ? $goto : (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 1610, $c.lit("trapeffect_rust_trap")), rn2(5)) : rn2(5))) {
+            switch ($goto !== null ? $goto : rn2(5)) {
                 case 0:
                     await pline($c.lit("%s you on the %s!"), A_gush_of_water_hits, await body_part(8 /* HEAD */));
                     await water_damage($G.uarmh, helm_simple_name($G.uarmh), 1);
@@ -1218,7 +1218,7 @@ async function trapeffect_rust_trap(mtmp, trap, trflags) {   // trap.c:1595
             dam = u.mhmax;
             await You($c.lit("are covered with rust!"));
             await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(dam + 1 | 0, 2) : dam, $c.lit("rusting away"), 1);
-        } else if (u.umonnum === 40 /* PM_GREMLIN */ && (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 1652, $c.lit("trapeffect_rust_trap")), rn2(3)) : rn2(3))) {
+        } else if (u.umonnum === 40 /* PM_GREMLIN */ && rn2(3)) {
             await split_mon(gy.youmonst, null);
         }
     } else {
@@ -1229,7 +1229,7 @@ async function trapeffect_rust_trap(mtmp, trap, trflags) {   // trap.c:1595
             await seetrap(trap);
         }
         S2: for (;;) {
-            switch ($goto !== null ? $goto : (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 1663, $c.lit("trapeffect_rust_trap")), rn2(5)) : rn2(5))) {
+            switch ($goto !== null ? $goto : rn2(5)) {
                 case 0:
                     if (in_sight) {
                         await pline_mon(mtmp, $c.lit("%s %s on the %s!"), A_gush_of_water_hits, await mon_nam(mtmp), await mbodypart(mtmp, 8 /* HEAD */));
@@ -1287,7 +1287,7 @@ async function trapeffect_rust_trap(mtmp, trap, trflags) {   // trap.c:1595
             if (mtmp.mhp < 1) {
                 trapkilled = 1;
             }
-        } else if ($c.peq(mptr, $c.relem(mons, 40 /* PM_GREMLIN */)) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 1719, $c.lit("trapeffect_rust_trap")), rn2(3)) : rn2(3))) {
+        } else if ($c.peq(mptr, $c.relem(mons, 40 /* PM_GREMLIN */)) && rn2(3)) {
             await split_mon(mtmp, null);
         }
         return trapkilled ? 2 /* Trap_Killed_Mon */ : mtmp.mtrapped | 0 ? 1 /* Trap_Caught_Mon */ : 0 /* Trap_Effect_Finished */;
@@ -1306,7 +1306,7 @@ async function trapeffect_fire_trap(mtmp, trap, trflags) {   // trap.c:1730
         see_it = $c.i8((gv.viz_array.get(ty).get(tx) & 2) !== 0 ? 1 : 0);
         trapkilled = 0;
         mptr = mtmp.data;
-        orig_dmg = rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 1744, $c.lit("trapeffect_fire_trap")), d(2, 4)) : d(2, 4);
+        orig_dmg = d(2, 4);
         if (in_sight) {
             await pline_mon(mtmp, $c.lit("A %s erupts from the %s under %s!"), new $c.Ptr(tower_of_flame, 0), surface(mtmp.mx, mtmp.my), await mon_nam(mtmp));
         } else if (see_it) {
@@ -1345,13 +1345,13 @@ async function trapeffect_fire_trap(mtmp, trap, trflags) {   // trap.c:1730
             if (await thitm(0, mtmp, null, num, immolate)) {
                 trapkilled = 1;
             } else {
-                $t1 = rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 1792, $c.lit("trapeffect_fire_trap")), rn2(num + 1 | 0)) : rn2(num + 1 | 0), mtmp.mhpmax = mtmp.mhpmax - $t1 | 0;
+                $t1 = rn2(num + 1 | 0), mtmp.mhpmax = mtmp.mhpmax - $t1 | 0;
                 if (mtmp.mhp > mtmp.mhpmax) {
                     mtmp.mhp = mtmp.mhpmax;
                 }
             }
         }
-        if (await burnarmor(mtmp) || (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 1797, $c.lit("trapeffect_fire_trap")), rn2(3)) : rn2(3))) {
+        if (await burnarmor(mtmp) || rn2(3)) {
             xtradmg = await destroy_items(mtmp, 2, orig_dmg);
             await ignite_items(mtmp.minvent);
             if (!(mtmp.mhp < 1)) {
@@ -1420,7 +1420,7 @@ async function trapeffect_pit(mtmp, trap, trflags) {   // trap.c:1825
             } else if (conj_pit) {
                 await You($c.lit("move into an adjacent pit."));
             } else if (adj_pit) {
-                await You($c.lit("stumble over debris%s."), !(rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 1885, $c.lit("trapeffect_pit")), rn2(5)) : rn2(5)) ? $c.lit(" between the pits") : $c.lit(""));
+                await You($c.lit("stumble over debris%s."), !rn2(5) ? $c.lit(" between the pits") : $c.lit(""));
             } else {
                 $c.__builtin___strcpy_chk(new $c.Ptr(verbbuf, 0), !plunged ? $c.lit("fall") : (u.uprops[49 /* FLYING */].intrinsic || u.uprops[49 /* FLYING */].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, 1) !== 0) && !u.uprops[49 /* FLYING */].blocked ? $c.lit("dive") : $c.lit("plunge"), 256);
             }
@@ -1445,17 +1445,17 @@ async function trapeffect_pit(mtmp, trap, trflags) {   // trap.c:1825
                 await You($c.lit("%s %s!"), conj_pit ? $c.lit("step") : $c.lit("land"), predicament);
             }
         }
-        set_utrap(((rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 1920, $c.lit("trapeffect_pit")), rn2(6)) : rn2(6)) + 2 | 0) >>> 0, 2);
+        set_utrap((rn2(6) + 2 | 0) >>> 0, 2);
         if (!await steedintrap(trap, null)) {
             if (relevant_spikes) {
                 oldumort = u.umortality;
-                await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32((rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 1925, $c.lit("trapeffect_pit")), rnd(conj_pit ? 4 : adj_pit ? 6 : 10)) : rnd(conj_pit ? 4 : adj_pit ? 6 : 10)) + 1 | 0, 2) : rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 1925, $c.lit("trapeffect_pit")), rnd(conj_pit ? 4 : adj_pit ? 6 : 10)) : rnd(conj_pit ? 4 : adj_pit ? 6 : 10), plunged ? $c.lit("deliberately plunged into a pit of iron spikes") : conj_pit || deliberate ? $c.lit("stepped into a pit of iron spikes") : adj_pit ? $c.lit("stumbled into a pit of iron spikes") : $c.lit("fell into a pit of iron spikes"), 2);
-                if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 1938, $c.lit("trapeffect_pit")), rn2(6)) : rn2(6))) {
+                await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(rnd(conj_pit ? 4 : adj_pit ? 6 : 10) + 1 | 0, 2) : rnd(conj_pit ? 4 : adj_pit ? 6 : 10), plunged ? $c.lit("deliberately plunged into a pit of iron spikes") : conj_pit || deliberate ? $c.lit("stepped into a pit of iron spikes") : adj_pit ? $c.lit("stumbled into a pit of iron spikes") : $c.lit("fell into a pit of iron spikes"), 2);
+                if (!rn2(6)) {
                     await poisoned($c.lit("spikes"), 0 /* A_STR */, conj_pit || adj_pit || deliberate ? $c.lit("stepping on poison spikes") : $c.lit("fall onto poison spikes"), u.umortality > oldumort ? 0 : 8, 0);
                 }
             } else {
                 if (!conj_pit && !deliberate && !(plunged && ((u.uprops[49 /* FLYING */].intrinsic || u.uprops[49 /* FLYING */].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, 1) !== 0) && !u.uprops[49 /* FLYING */].blocked || $c.andu64(gy.youmonst.data.mflags1, 16) !== 0))) {
-                    await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32((rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 1950, $c.lit("trapeffect_pit")), rnd(adj_pit ? 3 : 6)) : rnd(adj_pit ? 3 : 6)) + 1 | 0, 2) : rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 1950, $c.lit("trapeffect_pit")), rnd(adj_pit ? 3 : 6)) : rnd(adj_pit ? 3 : 6), plunged ? $c.lit("deliberately plunged into a pit") : $c.lit("fell into a pit"), 2);
+                    await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(rnd(adj_pit ? 3 : 6) + 1 | 0, 2) : rnd(adj_pit ? 3 : 6), plunged ? $c.lit("deliberately plunged into a pit") : $c.lit("fell into a pit"), 2);
                 }
             }
             if ($G.uball !== null && !($G.uball.where === 3)) {
@@ -1504,7 +1504,7 @@ async function trapeffect_pit(mtmp, trap, trflags) {   // trap.c:1825
         if (await wearing_iron_shoes(mtmp)) {
             relevant_spikes = 0;
         }
-        if (mtmp.mhp < 1 || await thitm(0, mtmp, null, rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 2003, $c.lit("trapeffect_pit")), rnd(relevant_spikes ? 10 : 6)) : rnd(relevant_spikes ? 10 : 6), 0)) {
+        if (mtmp.mhp < 1 || await thitm(0, mtmp, null, rnd(relevant_spikes ? 10 : 6), 0)) {
             trapkilled = 1;
         }
         return trapkilled ? 2 /* Trap_Killed_Mon */ : mtmp.mtrapped | 0 ? 1 /* Trap_Caught_Mon */ : 0 /* Trap_Effect_Finished */;
@@ -1627,17 +1627,17 @@ async function trapeffect_web(mtmp, trap, trflags) {   // trap.c:2106
                 webmsgok = 0;
             }
             if (str <= 3) {
-                tim = (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 2182, $c.lit("trapeffect_web")), rn2(6)) : rn2(6)) + 6 | 0;
+                tim = rn2(6) + 6 | 0;
             } else if (str < 6) {
-                tim = (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 2184, $c.lit("trapeffect_web")), rn2(6)) : rn2(6)) + 4 | 0;
+                tim = rn2(6) + 4 | 0;
             } else if (str < 9) {
-                tim = (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 2186, $c.lit("trapeffect_web")), rn2(4)) : rn2(4)) + 4 | 0;
+                tim = rn2(4) + 4 | 0;
             } else if (str < 12) {
-                tim = (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 2188, $c.lit("trapeffect_web")), rn2(4)) : rn2(4)) + 2 | 0;
+                tim = rn2(4) + 2 | 0;
             } else if (str < 15) {
-                tim = (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 2190, $c.lit("trapeffect_web")), rn2(2)) : rn2(2)) + 2 | 0;
+                tim = rn2(2) + 2 | 0;
             } else if (str < 18) {
-                tim = rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 2192, $c.lit("trapeffect_web")), rnd(2)) : rnd(2);
+                tim = rnd(2);
             } else if (str < 69) {
                 tim = 1;
             } else {
@@ -1720,11 +1720,11 @@ async function trapeffect_magic_trap(mtmp, trap, trflags) {   // trap.c:2293
     let $t1;
     if ($c.peq(mtmp, gy.youmonst)) {
         await seetrap(trap);
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 2300, $c.lit("trapeffect_magic_trap")), rn2(30)) : rn2(30))) {
+        if (!rn2(30)) {
             await deltrap(trap);
             await newsym(u.ux, u.uy);
             await You($c.lit("are caught in a magical explosion!"));
-            await losehp(rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 2304, $c.lit("trapeffect_magic_trap")), rnd(10)) : rnd(10), $c.lit("magical explosion"), 0);
+            await losehp(rnd(10), $c.lit("magical explosion"), 0);
             await Your($c.lit("body absorbs some of the magical energy!"));
             $t1 = u.uenmax = u.uenmax + 2 | 0, u.uen = $t1;
             if (u.uenmax > u.uenpeak) {
@@ -1736,7 +1736,7 @@ async function trapeffect_magic_trap(mtmp, trap, trflags) {   // trap.c:2293
         }
         await steedintrap(trap, null);
     } else {
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 2316, $c.lit("trapeffect_magic_trap")), rn2(21)) : rn2(21))) {
+        if (!rn2(21)) {
             return await trapeffect_fire_trap(mtmp, trap, trflags);
         }
     }
@@ -1761,13 +1761,13 @@ async function trapeffect_anti_magic(mtmp, trap, trflags) {   // trap.c:2323
         exclaim_it = 0;
         await seetrap(trap);
         if (u.uprops[12 /* ANTIMAGIC */].intrinsic || u.uprops[12 /* ANTIMAGIC */].extrinsic) {
-            dmgval2 = rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 2353, $c.lit("trapeffect_anti_magic")), rnd(4)) : rnd(4);
+            dmgval2 = rnd(4);
             hp = u.umonnum !== u.umonster ? u.mh : u.uhp;
             if (u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic || (u.uprops[55 /* HALF_SPDAM */].intrinsic || u.uprops[55 /* HALF_SPDAM */].extrinsic)) {
-                dmgval2 = dmgval2 + (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 2358, $c.lit("trapeffect_anti_magic")), rnd(4)) : rnd(4)) | 0;
+                dmgval2 = dmgval2 + rnd(4) | 0;
             }
             if (is_art($G.uwep, 8 /* ART_MAGICBANE */)) {
-                dmgval2 = dmgval2 + (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 2361, $c.lit("trapeffect_anti_magic")), rnd(4)) : rnd(4)) | 0;
+                dmgval2 = dmgval2 + rnd(4) | 0;
             }
             for (otmp = gi.invent; otmp; otmp = otmp.nobj) {
                 if (otmp.oartifact && !is_quest_artifact(otmp) && defends_when_carried(1, otmp)) {
@@ -1775,7 +1775,7 @@ async function trapeffect_anti_magic(mtmp, trap, trflags) {   // trap.c:2323
                 }
             }
             if (otmp) {
-                dmgval2 = dmgval2 + (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 2370, $c.lit("trapeffect_anti_magic")), rnd(4)) : rnd(4)) | 0;
+                dmgval2 = dmgval2 + rnd(4) | 0;
             }
             if (u.uprops[53 /* PASSES_WALLS */].intrinsic || u.uprops[53 /* PASSES_WALLS */].extrinsic) {
                 dmgval2 = $c.div32(dmgval2 + 3 | 0, 4);
@@ -1783,8 +1783,8 @@ async function trapeffect_anti_magic(mtmp, trap, trflags) {   // trap.c:2323
             await You_feel(dmgval2 >= hp ? $c.lit("unbearably torpid!") : dmgval2 >= $c.div32(hp, 4) ? $c.lit("very lethargic.") : $c.lit("sluggish."));
             await losehp(dmgval2, $c.lit("anti-magic implosion"), 0);
         }
-        drain = rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 2386, $c.lit("trapeffect_anti_magic")), d(2, 6)) : d(2, 6);
-        halfd = rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 2387, $c.lit("trapeffect_anti_magic")), rnd($c.div32(drain, 2))) : rnd($c.div32(drain, 2));
+        drain = d(2, 6);
+        halfd = rnd($c.div32(drain, 2));
         if (u.uenmax > drain) {
             u.uenmax = u.uenmax - halfd | 0;
             drain = drain - halfd | 0;
@@ -1798,16 +1798,16 @@ async function trapeffect_anti_magic(mtmp, trap, trflags) {   // trap.c:2323
         mptr = mtmp.data;
         if (!resists_magm(mtmp)) {
             if (!mtmp.mcan && (attacktype(mptr, 255) || attacktype(mptr, 12))) {
-                $t1 = rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 2409, $c.lit("trapeffect_anti_magic")), d(2, 6)) : d(2, 6), mtmp.mspec_used = mtmp.mspec_used + $t1 | 0;
+                $t1 = d(2, 6), mtmp.mspec_used = mtmp.mspec_used + $t1 | 0;
                 if (in_sight) {
                     await seetrap(trap);
                     await pline_mon(mtmp, $c.lit("%s seems lethargic."), await Monnam(mtmp));
                 }
             }
         } else {
-            dmgval2$2 = rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 2418, $c.lit("trapeffect_anti_magic")), rnd(4)) : rnd(4);
+            dmgval2$2 = rnd(4);
             if ((otmp$2 = mtmp.mw) !== null && is_art(otmp$2, 8 /* ART_MAGICBANE */)) {
-                dmgval2$2 = dmgval2$2 + (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 2422, $c.lit("trapeffect_anti_magic")), rnd(4)) : rnd(4)) | 0;
+                dmgval2$2 = dmgval2$2 + rnd(4) | 0;
             }
             for (otmp$2 = mtmp.minvent; otmp$2; otmp$2 = otmp$2.nobj) {
                 if (otmp$2.oartifact && defends_when_carried(1, otmp$2)) {
@@ -1815,7 +1815,7 @@ async function trapeffect_anti_magic(mtmp, trap, trflags) {   // trap.c:2323
                 }
             }
             if (otmp$2) {
-                dmgval2$2 = dmgval2$2 + (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 2428, $c.lit("trapeffect_anti_magic")), rnd(4)) : rnd(4)) | 0;
+                dmgval2$2 = dmgval2$2 + rnd(4) | 0;
             }
             if ($c.andu64(mptr.mflags1, 8) !== 0) {
                 dmgval2$2 = $c.div32(dmgval2$2 + 3 | 0, 4);
@@ -1901,7 +1901,7 @@ async function trapeffect_poly_trap(mtmp, trap, trflags) {   // trap.c:2453
 }
 async function trapeffect_landmine(mtmp, trap, trflags) {   // trap.c:2528
     let damage = 0, already_seen = 0, forcetrap = 0, forcebungle = 0, steed_mid = 0, saddle = null, trapkilled = 0, in_sight = 0, tx = 0, ty = 0, already_seen$2 = 0;
-    damage = rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 2533, $c.lit("trapeffect_landmine")), rnd(16)) : rnd(16);
+    damage = rnd(16);
     if (await wearing_iron_shoes(mtmp)) {
         damage = $c.div32(damage + 3 | 0, 4);
     }
@@ -1912,12 +1912,12 @@ async function trapeffect_landmine(mtmp, trap, trflags) {   // trap.c:2528
         steed_mid = 0;
         saddle = null;
         if (((u.uprops[48 /* LEVITATION */].intrinsic || u.uprops[48 /* LEVITATION */].extrinsic) && !u.uprops[48 /* LEVITATION */].blocked || (u.uprops[49 /* FLYING */].intrinsic || u.uprops[49 /* FLYING */].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, 1) !== 0) && !u.uprops[49 /* FLYING */].blocked) && !forcetrap) {
-            if (!already_seen && (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 2549, $c.lit("trapeffect_landmine")), rn2(3)) : rn2(3))) {
+            if (!already_seen && rn2(3)) {
                 return 0 /* Trap_Effect_Finished */;
             }
             await feeltrap(trap);
             await pline($c.lit("%s %s in a pile of soil below you."), already_seen ? $c.lit("There is") : $c.lit("You discover"), trap.madeby_u | 0 ? $c.lit("the trigger of your mine") : $c.lit("a trigger"));
-            if (already_seen && (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 2555, $c.lit("trapeffect_landmine")), rn2(3)) : rn2(3))) {
+            if (already_seen && rn2(3)) {
                 return 0 /* Trap_Effect_Finished */;
             }
             await pline($c.lit("KAABLAMM!!!  %s %s%s off!"), forcebungle ? $c.lit("Your inept attempt sets") : $c.lit("The air currents set"), already_seen ? a_your[trap.madeby_u] : $c.lit(""), already_seen ? $c.lit(" land mine") : $c.lit("it"));
@@ -1934,8 +1934,8 @@ async function trapeffect_landmine(mtmp, trap, trflags) {   // trap.c:2528
             await steedintrap(trap, null);
             trapeffect_landmine$recursive_mine = 0;
             saddle = sobj_at(235 /* SADDLE */, u.ux, u.uy);
-            await set_wounded_legs(131072, (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 2581, $c.lit("trapeffect_landmine")), rn2(35)) : rn2(35)) + 41 | 0);
-            await set_wounded_legs(262144, (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 2582, $c.lit("trapeffect_landmine")), rn2(35)) : rn2(35)) + 41 | 0);
+            await set_wounded_legs(131072, rn2(35) + 41 | 0);
+            await set_wounded_legs(262144, rn2(35) + 41 | 0);
             await exercise(3 /* A_DEX */, 0);
         }
         trap.ttyp = (11) & 31;
@@ -1955,7 +1955,7 @@ async function trapeffect_landmine(mtmp, trap, trflags) {   // trap.c:2528
         in_sight = $c.i8(canseemon(mtmp) || $c.peq(mtmp, u.usteed) ? 1 : 0);
         tx = trap.tx;
         ty = trap.ty;
-        if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 2606, $c.lit("trapeffect_landmine")), rn2(mtmp.data.cwt + 1 >>> 0 | 0)) : rn2(mtmp.data.cwt + 1 >>> 0 | 0)) < 400) {
+        if (rn2(mtmp.data.cwt + 1 >>> 0 | 0) < 400) {
             return 0 /* Trap_Effect_Finished */;
         }
         if (m_in_air(mtmp)) {
@@ -1964,7 +1964,7 @@ async function trapeffect_landmine(mtmp, trap, trflags) {   // trap.c:2528
                 await pline_mon(mtmp, $c.lit("A trigger appears in a pile of soil below %s."), await mon_nam(mtmp));
                 await seetrap(trap);
             }
-            if (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 2617, $c.lit("trapeffect_landmine")), rn2(3)) : rn2(3)) {
+            if (rn2(3)) {
                 return 0 /* Trap_Effect_Finished */;
             }
             if (in_sight) {
@@ -2263,7 +2263,7 @@ export async function dotrap(trap, trflags) {   // trap.c:2996
             }
             return;
         }
-        if (already_seen && !(u.uprops[25 /* FUMBLING */].intrinsic || u.uprops[25 /* FUMBLING */].extrinsic) && !(ttype === 17 /* MAGIC_PORTAL */ || ttype === 23 /* VIBRATING_SQUARE */) && ttype !== 21 /* ANTI_MAGIC */ && !forcebungle && !plunged && !conj_pit && !adj_pit && (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 3038, $c.lit("dotrap")), rn2(5)) : rn2(5)) || (ttype === 11 /* PIT */ || ttype === 12 /* SPIKED_PIT */) && $c.andu64(gy.youmonst.data.mflags1, 16) !== 0)) {
+        if (already_seen && !(u.uprops[25 /* FUMBLING */].intrinsic || u.uprops[25 /* FUMBLING */].extrinsic) && !(ttype === 17 /* MAGIC_PORTAL */ || ttype === 23 /* VIBRATING_SQUARE */) && ttype !== 21 /* ANTI_MAGIC */ && !forcebungle && !plunged && !conj_pit && !adj_pit && (!rn2(5) || (ttype === 11 /* PIT */ || ttype === 12 /* SPIKED_PIT */) && $c.andu64(gy.youmonst.data.mflags1, 16) !== 0)) {
             await You($c.lit("escape %s %s."), ttype === 1 /* ARROW_TRAP */ && !trap.madeby_u ? $c.lit("an") : a_your[trap.madeby_u], trapname(ttype, 0));
             return;
         }
@@ -2299,7 +2299,7 @@ function choose_trapnote(ttmp) {   // trap.c:3083
             tpick[($t2 = tcnt, tcnt = $t2 + 1 | 0, $t2)] = k;
         }
     }
-    return tcnt > 0 ? tpick[rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 3098, $c.lit("choose_trapnote")), rn2(tcnt)) : rn2(tcnt)] : rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 3098, $c.lit("choose_trapnote")), rn2(12)) : rn2(12);
+    return tcnt > 0 ? tpick[rn2(tcnt)] : rn2(12);
 }
 async function steedintrap(trap, otmp) {   // trap.c:3102
     let steed = null, tt = 0, trapkilled = 0, steedhit = 0;
@@ -2330,19 +2330,19 @@ async function steedintrap(trap, otmp) {   // trap.c:3102
             break;
         case 8 /* SLP_GAS_TRAP */:
             if (!await Resists_Elem(steed, 3 /* SLEEP_RES */) && !($c.andu64(steed.data.mflags1, 1024) !== 0) && !(steed.msleeping | 0 || !steed.mcanmove)) {
-                if (await sleep_monst(steed, rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 3135, $c.lit("steedintrap")), rnd(25)) : rnd(25), -1)) {
+                if (await sleep_monst(steed, rnd(25), -1)) {
                     await pline($c.lit("%s suddenly falls asleep!"), await Monnam(steed));
                 }
             }
             steedhit = 1;
             break;
         case 6 /* LANDMINE */:
-            trapkilled = await thitm(0, steed, null, rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 3142, $c.lit("steedintrap")), rnd(16)) : rnd(16), 0);
+            trapkilled = await thitm(0, steed, null, rnd(16), 0);
             steedhit = 1;
             break;
         case 11 /* PIT */:
         case 12 /* SPIKED_PIT */:
-            trapkilled = $c.i8(steed.mhp < 1 || await thitm(0, steed, null, rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 3149, $c.lit("steedintrap")), rnd(tt === 11 /* PIT */ ? 6 : 10)) : rnd(tt === 11 /* PIT */ ? 6 : 10), 0) ? 1 : 0);
+            trapkilled = $c.i8(steed.mhp < 1 || await thitm(0, steed, null, rnd(tt === 11 /* PIT */ ? 6 : 10), 0) ? 1 : 0);
             steedhit = 1;
             break;
         case 22 /* POLY_TRAP */:
@@ -2511,7 +2511,7 @@ export async function launch_obj(otyp, x1, y1, x2, y2, style) {   // trap.c:3260
         y = gb.bhitpos.y = $c.i16(gb.bhitpos.y + dy | 0);
         if ((mtmp = svl.level.monsters[x][y]) !== null) {
             if (otyp === 475 /* BOULDER */ && $c.andu64(mtmp.data.mflags2, 134217728) !== 0) {
-                if (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 3397, $c.lit("launch_obj")), rn2(3)) : rn2(3)) {
+                if (rn2(3)) {
                     if ((gv.viz_array.get(y).get(x) & 2) !== 0) {
                         await pline_mon(mtmp, $c.lit("%s snatches the boulder."), await Monnam(mtmp));
                     }
@@ -2548,7 +2548,7 @@ export async function launch_obj(otyp, x1, y1, x2, y2, style) {   // trap.c:3260
                 newlev = 0;
                 switch (t.ttyp | 0) {
                     case 6 /* LANDMINE */:
-                        if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 3438, $c.lit("launch_obj")), rn2(10)) : rn2(10)) > 2) {
+                        if (rn2(10) > 2) {
                             if ((gv.viz_array.get(y).get(x) & 2) !== 0) {
                                 set_msg_xy(x, y);
                             }
@@ -2647,7 +2647,7 @@ export async function launch_obj(otyp, x1, y1, x2, y2, style) {   // trap.c:3260
             typ = $c.u8(svl.level.locations[fx$2][fy$2].typ);
             if (typ === 22 /* IRONBARS */) {
                 x2 = x, y2 = y;
-                if (await hits_bars(new $c.Ptr(singleobj, 0), x2, y2, fx$2, fy$2, !(rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 3550, $c.lit("launch_obj")), rn2(20)) : rn2(20)) ? 1 : 0, 0)) {
+                if (await hits_bars(new $c.Ptr(singleobj, 0), x2, y2, fx$2, fy$2, !rn2(20) ? 1 : 0, 0)) {
                     if (!singleobj[0]) {
                         used_up = 1;
                         launch_drop_spot(null, 0, 0);
@@ -2707,8 +2707,8 @@ function find_random_launch_coord(ttmp, cc) {   // trap.c:3599
     if ((ttmp.ttyp | 0) === 7 /* ROLLING_BOULDER_TRAP */) {
         mindist = 2;
     }
-    distance = (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 3626, $c.lit("find_random_launch_coord")), rn2(5)) : rn2(5)) + 4 | 0;
-    tmp = rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 3627, $c.lit("find_random_launch_coord")), rn2(8)) : rn2(8);
+    distance = rn2(5) + 4 | 0;
+    tmp = rn2(8);
     while (distance >= mindist) {
         dx = $c.i16(xdir[tmp]);
         dy = $c.i16(ydir[tmp]);
@@ -2802,9 +2802,9 @@ export async function mintrap(mtmp, mintrapflags) {   // trap.c:3733
         if (!trap.tseen && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & 2) !== 0 && canseemon(mtmp) && ((trap.ttyp | 0) === 11 /* PIT */ || (trap.ttyp | 0) === 12 /* SPIKED_PIT */ || (trap.ttyp | 0) === 5 /* BEAR_TRAP */ || (trap.ttyp | 0) === 13 /* HOLE */ || (trap.ttyp | 0) === 18 /* WEB */)) {
             await seetrap(trap);
         }
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 3751, $c.lit("mintrap")), rn2(40)) : rn2(40)) || ((trap.ttyp | 0) === 11 /* PIT */ || (trap.ttyp | 0) === 12 /* SPIKED_PIT */) && m_easy_escape_pit(mtmp)) {
+        if (!rn2(40) || ((trap.ttyp | 0) === 11 /* PIT */ || (trap.ttyp | 0) === 12 /* SPIKED_PIT */) && m_easy_escape_pit(mtmp)) {
             if (sobj_at(475 /* BOULDER */, mtmp.mx, mtmp.my) && ((trap.ttyp | 0) === 11 /* PIT */ || (trap.ttyp | 0) === 12 /* SPIKED_PIT */)) {
-                if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 3754, $c.lit("mintrap")), rn2(2)) : rn2(2))) {
+                if (!rn2(2)) {
                     mtmp.mtrapped = (0) & 1;
                     if (canseemon(mtmp)) {
                         await pline_mon(mtmp, $c.lit("%s pulls free..."), await Monnam(mtmp));
@@ -2854,13 +2854,13 @@ export async function mintrap(mtmp, mintrapflags) {   // trap.c:3733
             if (floor_trigger(tt) && check_in_air(mtmp, mintrapflags)) {
                 return 0 /* Trap_Effect_Finished */;
             }
-            if (already_seen && (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 3812, $c.lit("mintrap")), rn2(4)) : rn2(4)) && !forcebungle) {
+            if (already_seen && rn2(4) && !forcebungle) {
                 return 0 /* Trap_Effect_Finished */;
             }
         }
         mon_learns_traps(mtmp, tt);
         mons_see_trap(trap);
-        if (trap.madeby_u | 0 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 3822, $c.lit("mintrap")), rnl(5)) : rnl(5))) {
+        if (trap.madeby_u | 0 && rnl(5)) {
             await setmangry(mtmp, 0);
         }
         trap_result = await trapeffect_selector(mtmp, trap, mintrapflags);
@@ -3074,7 +3074,7 @@ export async function float_down(hmask, emask) {   // trap.c:4024
                     } else {
                         await You($c.lit("fall over."));
                     }
-                    await losehp(rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 4131, $c.lit("float_down")), rnd(2)) : rnd(2), $c.lit("dangerous winds"), 1);
+                    await losehp(rnd(2), $c.lit("dangerous winds"), 1);
                     if (u.usteed) {
                         await dismount_steed(1 /* DISMOUNT_FELL */);
                     }
@@ -3122,7 +3122,7 @@ export async function climb_pit() {   // trap.c:4183
         await reset_utrap(0);
         await fill_pit(u.ux, u.uy);
         gv.vision_full_recalc = 1;
-    } else if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 4197, $c.lit("climb_pit")), rn2(2)) : rn2(2)) && sobj_at(475 /* BOULDER */, u.ux, u.uy)) {
+    } else if (!rn2(2) && sobj_at(475 /* BOULDER */, u.ux, u.uy)) {
         await Your($c.lit("%s gets stuck in a crevice."), await body_part(9 /* LEG */));
         await windowprocs.win_display_nhwindow($G.WIN_MESSAGE, 0);
         await windowprocs.win_clear_nhwindow($G.WIN_MESSAGE);
@@ -3141,20 +3141,20 @@ export async function climb_pit() {   // trap.c:4183
         if (u.usteed) {
             await Norep($c.lit("%s is still in a pit."), await YMonnam(u.usteed));
         } else {
-            await Norep(u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 4226, $c.lit("climb_pit")), rn2(5)) : rn2(5)) ? $c.lit("You've fallen, and you can't get up.") : $c.lit("You are still in a pit."));
+            await Norep(u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic) && !rn2(5) ? $c.lit("You've fallen, and you can't get up.") : $c.lit("You are still in a pit."));
         }
     }
 }
 async function dofiretrap(box) {   // trap.c:4233
     let see_it = 0, orig_dmg = 0, num = 0, alt = 0, uhpmin = 0, olduhpmax = 0, $t1, $t2;
     see_it = $c.i8(!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked) ? 1 : 0);
-    orig_dmg = num = rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 4238, $c.lit("dofiretrap")), d(2, 4)) : d(2, 4);
+    orig_dmg = num = d(2, 4);
     if (box && !(box.where === 3) ? is_pool(box.ox, box.oy) : u.uinwater | 0) {
         await pline($c.lit("A cascade of steamy bubbles erupts from %s!"), await the(box ? await xname(box) : surface(u.ux, u.uy)));
         if (u.uprops[1 /* FIRE_RES */].intrinsic || u.uprops[1 /* FIRE_RES */].extrinsic) {
             await You($c.lit("are uninjured."));
         } else {
-            await losehp(rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 4250, $c.lit("dofiretrap")), rnd(3)) : rnd(3), $c.lit("boiling water"), 1);
+            await losehp(rnd(3), $c.lit("boiling water"), 1);
         }
         return;
     }
@@ -3162,7 +3162,7 @@ async function dofiretrap(box) {   // trap.c:4233
     if (u.uprops[1 /* FIRE_RES */].intrinsic || u.uprops[1 /* FIRE_RES */].extrinsic) {
         await shieldeff(u.ux, u.uy);
         monstseesu(2);
-        num = rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 4258, $c.lit("dofiretrap")), rn2(2)) : rn2(2);
+        num = rn2(2);
     } else if (u.umonnum !== u.umonster) {
         switch (u.umonnum) {
             case 250 /* PM_PAPER_GOLEM */:
@@ -3185,7 +3185,7 @@ async function dofiretrap(box) {   // trap.c:4233
             num = alt;
         }
         if (u.mhmax > mons[u.umonnum].mlevel) {
-            $t1 = rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 4280, $c.lit("dofiretrap")), rn2(u.mhmax < (num + 1 | 0) ? u.mhmax : num + 1 | 0)) : rn2(u.mhmax < (num + 1 | 0) ? u.mhmax : num + 1 | 0), u.mhmax = u.mhmax - $t1 | 0, disp.botl = 1;
+            $t1 = rn2(u.mhmax < (num + 1 | 0) ? u.mhmax : num + 1 | 0), u.mhmax = u.mhmax - $t1 | 0, disp.botl = 1;
         }
         if (u.mh > u.mhmax) {
             u.mh = u.mhmax, disp.botl = 1;
@@ -3194,9 +3194,9 @@ async function dofiretrap(box) {   // trap.c:4233
     } else {
         uhpmin = minuhpmax(1);
         olduhpmax = u.uhpmax;
-        num = rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 4287, $c.lit("dofiretrap")), d(2, 4)) : d(2, 4);
+        num = d(2, 4);
         if (u.uhpmax > uhpmin) {
-            $t2 = rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 4289, $c.lit("dofiretrap")), rn2(u.uhpmax < (num + 1 | 0) ? u.uhpmax : num + 1 | 0)) : rn2(u.uhpmax < (num + 1 | 0) ? u.uhpmax : num + 1 | 0), u.uhpmax = u.uhpmax - $t2 | 0, disp.botl = 1;
+            $t2 = rn2(u.uhpmax < (num + 1 | 0) ? u.uhpmax : num + 1 | 0), u.uhpmax = u.uhpmax - $t2 | 0, disp.botl = 1;
         }
         if (u.uhpmax < uhpmin) {
             setuhpmax(olduhpmax < uhpmin ? olduhpmax : uhpmin, 0);
@@ -3215,7 +3215,7 @@ async function dofiretrap(box) {   // trap.c:4233
         await losehp(num, new $c.Ptr(tower_of_flame, 0), 0);
     }
     await burn_away_slime();
-    if (await burnarmor(gy.youmonst) || (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 4306, $c.lit("dofiretrap")), rn2(3)) : rn2(3))) {
+    if (await burnarmor(gy.youmonst) || rn2(3)) {
         await destroy_items(gy.youmonst, 2, orig_dmg);
         await ignite_items(gi.invent);
     }
@@ -3228,12 +3228,12 @@ async function dofiretrap(box) {   // trap.c:4233
 }
 async function domagictrap() {   // trap.c:4317
     let fate = 0, cnt = 0, i = 0, j = 0, mtmp = null, pseudo = new $T.obj(), save_conf = 0, $t1;
-    fate = rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 4319, $c.lit("domagictrap")), rnd(20)) : rnd(20);
+    fate = rnd(20);
     if (fate < 10) {
-        cnt = rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 4325, $c.lit("domagictrap")), rnd(4)) : rnd(4);
+        cnt = rnd(4);
         if (!await resists_blnd(gy.youmonst)) {
             await You($c.lit("are momentarily blinded by a flash of light!"));
-            await make_blinded((rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 4330, $c.lit("domagictrap")), rn2(5)) : rn2(5)) + 10 | 0, 0);
+            await make_blinded(rn2(5) + 10 | 0, 0);
             if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
                 await Your($c.lit("%s"), c_common_strings.c_vision_clears);
             }
@@ -3242,11 +3242,11 @@ async function domagictrap() {   // trap.c:4317
         }
         if (!(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf)) {
             await You_hear($c.lit("a deafening roar!"));
-            incr_itimeout(new $c.FieldRef(u.uprops[16 /* DEAF */], "intrinsic", "i64"), (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 4341, $c.lit("domagictrap")), rn2(20)) : rn2(20)) + 30 | 0);
+            incr_itimeout(new $c.FieldRef(u.uprops[16 /* DEAF */], "intrinsic", "i64"), rn2(20) + 30 | 0);
             disp.botl = 1;
         } else {
             await You_feel($c.lit("rankled."));
-            incr_itimeout(new $c.FieldRef(u.uprops[16 /* DEAF */], "intrinsic", "i64"), (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 4346, $c.lit("domagictrap")), rn2(5)) : rn2(5)) + 15 | 0);
+            incr_itimeout(new $c.FieldRef(u.uprops[16 /* DEAF */], "intrinsic", "i64"), rn2(5) + 15 | 0);
             disp.botl = 1;
         }
         while ($t1 = cnt, cnt = $t1 - 1 | 0, $t1) {
@@ -3355,7 +3355,7 @@ export async function fire_damage(obj, force, x, y) {   // trap.c:4455
                 chance = 20;
                 break;
         }
-        if (!force && ((u.uluck + u.moreluck | 0) + 5 | 0) > (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 4484, $c.lit("fire_damage")), rn2(chance)) : rn2(chance))) {
+        if (!force && ((u.uluck + u.moreluck | 0) + 5 | 0) > rn2(chance)) {
             return 0;
         }
         if (in_sight) {
@@ -3376,7 +3376,7 @@ export async function fire_damage(obj, force, x, y) {   // trap.c:4455
         await setnotworn(obj);
         await delobj(obj);
         return 1;
-    } else if (!force && ((u.uluck + u.moreluck | 0) + 5 | 0) > (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 4507, $c.lit("fire_damage")), rn2(20)) : rn2(20))) {
+    } else if (!force && ((u.uluck + u.moreluck | 0) + 5 | 0) > rn2(20)) {
         return 0;
     } else if (obj.oclass === 9 /* SCROLL_CLASS */ || obj.oclass === 10 /* SPBOOK_CLASS */) {
         if (obj.otyp === 339 /* SCR_FIRE */ || obj.otyp === 368 /* SPE_FIREBALL */) {
@@ -3522,10 +3522,10 @@ export async function water_damage(obj, ostr, force) {   // trap.c:4712
     if (obj.otyp === 240 /* CAN_OF_GREASE */ && obj.spe > 0) {
         return 0;
     } else if (obj.otyp === 234 /* TOWEL */ && obj.spe < 7) {
-        await wet_a_towel(obj, -(rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 4734, $c.lit("water_damage")), rnd(7 - obj.spe | 0)) : rnd(7 - obj.spe | 0)) | 0, 1);
+        await wet_a_towel(obj, -rnd(7 - obj.spe | 0) | 0, 1);
         return 0;
     } else if (obj.greased) {
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 4737, $c.lit("water_damage")), rn2(2)) : rn2(2))) {
+        if (!rn2(2)) {
             obj.greased = (0) & 1;
             if (in_invent) {
                 await pline_The($c.lit("grease on %s washes off."), await yname(obj));
@@ -3538,7 +3538,7 @@ export async function water_damage(obj, ostr, force) {   // trap.c:4712
             }
         }
         return 1;
-    } else if (obj.otyp >= 214 /* LARGE_BOX */ && obj.otyp <= 220 /* BAG_OF_TRICKS */ && (!(obj.otyp === 218 /* OILSKIN_SACK */ || obj.otyp === 216 /* ICE_BOX */ || (obj.otyp === 214 /* LARGE_BOX */ || obj.otyp === 215 /* CHEST */)) || obj.cursed | 0 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 4752, $c.lit("water_damage")), rn2(3)) : rn2(3)))) {
+    } else if (obj.otyp >= 214 /* LARGE_BOX */ && obj.otyp <= 220 /* BAG_OF_TRICKS */ && (!(obj.otyp === 218 /* OILSKIN_SACK */ || obj.otyp === 216 /* ICE_BOX */ || (obj.otyp === 214 /* LARGE_BOX */ || obj.otyp === 215 /* CHEST */)) || obj.cursed | 0 && !rn2(3))) {
         if (in_invent) {
             await pline($c.lit("Some %s gets into your %s!"), hliquid($c.lit("water")), ostr);
             gm.mentioned_water = $c.i8(!(u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic)) ? 1 : 0);
@@ -3552,7 +3552,7 @@ export async function water_damage(obj, ostr, force) {   // trap.c:4712
             await discover_object(obj.otyp, 1, 1, 1);
         }
         return 2;
-    } else if (!force && ((u.uluck + u.moreluck | 0) + 5 | 0) > (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 4771, $c.lit("water_damage")), rn2(20)) : rn2(20))) {
+    } else if (!force && ((u.uluck + u.moreluck | 0) + 5 | 0) > rn2(20)) {
         return 0;
     } else if (obj.oclass === 9 /* SCROLL_CLASS */) {
         if (obj.otyp === 365 /* SCR_BLANK_PAPER */ || obj.otyp === 364 /* SCR_MAIL */) {
@@ -3588,7 +3588,7 @@ export async function water_damage(obj, ostr, force) {   // trap.c:4712
         }
         obj.otyp = 407;
         if (obj.usecount) {
-            $t1 = rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 4816, $c.lit("water_damage")), rn2(obj.usecount)) : rn2(obj.usecount), obj.usecount = $t1;
+            $t1 = rn2(obj.usecount), obj.usecount = $t1;
         }
         obj.dknown = (0) & 1;
         if (otyp === 408 /* SPE_NOVEL */) {
@@ -3654,7 +3654,7 @@ async function emergency_disrobe(lostsome) {   // trap.c:4897
     while (near_capacity() > ($G.uball !== null ? 0 /* UNENCUMBERED */ : 1 /* SLT_ENCUMBER */)) {
         otmp = null;
         if (invc > 0) {
-            i = rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 4907, $c.lit("emergency_disrobe")), rn2(invc)) : rn2(invc);
+            i = rn2(invc);
             for (obj = gi.invent; obj; obj = nextobj) {
                 nextobj = obj.nobj;
                 if (!(obj.otyp === 471 /* LOADSTONE */ && obj.cursed | 0 || $c.peq(obj, $G.uamul) || $c.peq(obj, $G.uleft) || $c.peq(obj, $G.uright) || $c.peq(obj, $G.ublindf) || $c.peq(obj, $G.uarm) || $c.peq(obj, $G.uarmc) || $c.peq(obj, $G.uarmg) || $c.peq(obj, $G.uarmf) || $c.peq(obj, $G.uarmu) || obj.cursed | 0 && ($c.peq(obj, $G.uarmh) || $c.peq(obj, $G.uarms)) || await welded(obj) || obj.o_id === gs.stealoid || obj.in_use | 0)) {
@@ -3684,7 +3684,7 @@ export async function rnd_nextto_goodpos(x, y, mtmp) {   // trap.c:4947
         dirs[i] = $c.i16(i);
     }
     for (i = 8; i > 0; i = i - 1 | 0) {
-        j = rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 4956, $c.lit("rnd_nextto_goodpos")), rn2(i)) : rn2(i);
+        j = rn2(i);
         k = dirs[j];
         dirs[j] = dirs[i - 1 | 0];
         dirs[i - 1 | 0] = k;
@@ -3764,7 +3764,7 @@ export async function drown() {   // trap.c:5059
     is_solid = is_waterwall(u.ux, u.uy);
     await feel_newsym(u.ux, u.uy);
     if (u.uinwater | 0 && is_pool($c.i16(u.ux - u.dx | 0), $c.i16(u.uy - u.dy | 0)) && (u.uprops[51 /* SWIMMING */].intrinsic || u.uprops[51 /* SWIMMING */].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, 2) !== 0 || (u.uprops[52 /* MAGICAL_BREATHING */].intrinsic || u.uprops[52 /* MAGICAL_BREATHING */].extrinsic || $c.andu64(gy.youmonst.data.mflags1, 512) !== 0) || (u.uprops[52 /* MAGICAL_BREATHING */].intrinsic || u.uprops[52 /* MAGICAL_BREATHING */].extrinsic || $c.andu64(gy.youmonst.data.mflags1, 1024) !== 0))) {
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 5072, $c.lit("drown")), rn2(5)) : rn2(5))) {
+        if (!rn2(5)) {
             inpool_ok = 1;
         } else {
             return 0;
@@ -3777,11 +3777,11 @@ export async function drown() {   // trap.c:5059
         }
     }
     await water_damage_chain(gi.invent, 0);
-    if (u.umonnum === 40 /* PM_GREMLIN */ && (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 5088, $c.lit("drown")), rn2(3)) : rn2(3))) {
+    if (u.umonnum === 40 /* PM_GREMLIN */ && rn2(3)) {
         await split_mon(gy.youmonst, null);
     } else if (u.umonnum === 259 /* PM_IRON_GOLEM */) {
         await You($c.lit("rust!"));
-        i = u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32((rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 5092, $c.lit("drown")), d(2, 6)) : d(2, 6)) + 1 | 0, 2) : rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 5092, $c.lit("drown")), d(2, 6)) : d(2, 6);
+        i = u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(d(2, 6) + 1 | 0, 2) : d(2, 6);
         if (u.mhmax > i) {
             u.mhmax = u.mhmax - i | 0;
         }
@@ -3817,7 +3817,7 @@ export async function drown() {   // trap.c:5059
         gv.vision_full_recalc = 1;
         return 0;
     }
-    if ((u.uprops[46 /* TELEPORT */].intrinsic || u.uprops[46 /* TELEPORT */].extrinsic || $c.andu64(gy.youmonst.data.mflags1, 33554432) !== 0) && !(gm.multi < 0 && (unconscious() || is_fainted())) && (u.uprops[47 /* TELEPORT_CONTROL */].intrinsic || u.uprops[47 /* TELEPORT_CONTROL */].extrinsic || (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 5128, $c.lit("drown")), rn2(3)) : rn2(3)) < ((u.uluck + u.moreluck | 0) + 2 | 0))) {
+    if ((u.uprops[46 /* TELEPORT */].intrinsic || u.uprops[46 /* TELEPORT */].extrinsic || $c.andu64(gy.youmonst.data.mflags1, 33554432) !== 0) && !(gm.multi < 0 && (unconscious() || is_fainted())) && (u.uprops[47 /* TELEPORT_CONTROL */].intrinsic || u.uprops[47 /* TELEPORT_CONTROL */].extrinsic || rn2(3) < ((u.uluck + u.moreluck | 0) + 2 | 0))) {
         await You($c.lit("attempt a teleport spell."));
         if (!await noteleport_level(gy.youmonst)) {
             await dotele(0);
@@ -3889,7 +3889,7 @@ export async function drain_en(n, max_already_drained) {   // trap.c:5202
         mesg = $c.lit("momentarily lethargic");
     } else {
         if (n > $c.div32(u.uen + u.uenmax | 0, 3)) {
-            n = rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 5222, $c.lit("drain_en")), rnd(n)) : rnd(n);
+            n = rnd(n);
         }
         mesg = $c.lit("your magical energy drain away");
         if (n > u.uen) {
@@ -3897,7 +3897,7 @@ export async function drain_en(n, max_already_drained) {   // trap.c:5202
         }
         u.uen = u.uen - n | 0;
         if (u.uen < 0) {
-            $t2 = rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 5230, $c.lit("drain_en")), rnd(-u.uen | 0)) : rnd(-u.uen | 0), u.uenmax = u.uenmax - $t2 | 0;
+            $t2 = rnd(-u.uen | 0), u.uenmax = u.uenmax - $t2 | 0;
             if (u.uenmax < 0) {
                 u.uenmax = 0;
             }
@@ -3969,7 +3969,7 @@ function untrap_prob(ttmp) {   // trap.c:5289
         return 0;
     }
     if (gu.urole.mnum === 339) {
-        if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 5328, $c.lit("untrap_prob")), rn2(60)) : rn2(60)) < u.ulevel) {
+        if (rn2(60) < u.ulevel) {
             chance = chance - 1 | 0;
         }
         if (u.uhave.questart | 0 && chance > 1) {
@@ -3981,7 +3981,7 @@ function untrap_prob(ttmp) {   // trap.c:5289
     if (chance < 1) {
         chance = 1;
     }
-    return rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 5336, $c.lit("untrap_prob")), rn2(chance)) : rn2(chance);
+    return rn2(chance);
 }
 export async function cnv_trap_obj(otyp, cnt, ttmp, bury_it) {   // trap.c:5341
     let otmp = null, mtmp = null, $t1;
@@ -4080,20 +4080,20 @@ async function try_disarm(ttmp, force_failure) {   // trap.c:5441
         return 0;
     }
     if (force_failure || untrap_prob(ttmp)) {
-        if (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 5481, $c.lit("try_disarm")), rnl(5)) : rnl(5)) {
+        if (rnl(5)) {
             await pline($c.lit("Whoops..."));
             if (mtmp) {
                 if (ttype === 5 /* BEAR_TRAP */) {
                     if (mtmp.mtame) {
                         await abuse_dog(mtmp);
                     }
-                    $t1 = rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 5487, $c.lit("try_disarm")), rnd(4)) : rnd(4), mtmp.mhp = mtmp.mhp - $t1 | 0;
+                    $t1 = rnd(4), mtmp.mhp = mtmp.mhp - $t1 | 0;
                     if (mtmp.mhp < 1) {
                         await killed(mtmp);
                     }
                 } else if (ttype === 18 /* WEB */) {
                     ttmp2 = t_at(u.ux, u.uy);
-                    if (!($c.peq(gy.youmonst.data, $c.relem(mons, 94 /* PM_CAVE_SPIDER */)) || $c.peq(gy.youmonst.data, $c.relem(mons, 96 /* PM_GIANT_SPIDER */))) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 5495, $c.lit("try_disarm")), rn2(3)) : rn2(3)) && (ttmp2 ? (ttmp2.ttyp | 0) === 18 /* WEB */ : (ttmp2 = await maketrap(u.ux, u.uy, 18 /* WEB */)) !== null)) {
+                    if (!($c.peq(gy.youmonst.data, $c.relem(mons, 94 /* PM_CAVE_SPIDER */)) || $c.peq(gy.youmonst.data, $c.relem(mons, 96 /* PM_GIANT_SPIDER */))) && !rn2(3) && (ttmp2 ? (ttmp2.ttyp | 0) === 18 /* WEB */ : (ttmp2 = await maketrap(u.ux, u.uy, 18 /* WEB */)) !== null)) {
                         await pline_The($c.lit("web sticks to you.  You're caught too!"));
                         await dotrap(ttmp2, 2);
                         if (u.usteed && u.utrap) {
@@ -4118,12 +4118,12 @@ async function try_disarm(ttmp, force_failure) {   // trap.c:5441
 }
 async function reward_untrap(ttmp, mtmp) {   // trap.c:5530
     if (!ttmp.madeby_u) {
-        if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 5533, $c.lit("reward_untrap")), rnl(10)) : rnl(10)) < 8 && !mtmp.mpeaceful && !(mtmp.msleeping | 0 || !mtmp.mcanmove) && !mtmp.mfrozen && !($c.andu64(mtmp.data.mflags1, 65536) !== 0) && !((mtmp.data.geno & 4096) !== 0) && mtmp.data.mlet !== 53 /* S_HUMAN */) {
+        if (rnl(10) < 8 && !mtmp.mpeaceful && !(mtmp.msleeping | 0 || !mtmp.mcanmove) && !mtmp.mfrozen && !($c.andu64(mtmp.data.mflags1, 65536) !== 0) && !((mtmp.data.geno & 4096) !== 0) && mtmp.data.mlet !== 53 /* S_HUMAN */) {
             mtmp.mpeaceful = (1) & 1;
             set_malign(mtmp);
             await pline($c.lit("%s is grateful."), await Monnam(mtmp));
         }
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 5543, $c.lit("reward_untrap")), rn2(3)) : rn2(3)) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 5543, $c.lit("reward_untrap")), rnl(8)) : rnl(8)) && u.ualign.type === 1) {
+        if (!rn2(3) && !rnl(8) && u.ualign.type === 1) {
             adjalign(1);
             await You_feel($c.lit("that you did the right thing."));
         }
@@ -4213,13 +4213,13 @@ async function disarm_shooting_trap(ttmp, otyp) {   // trap.c:5664
         return fails;
     }
     await You($c.lit("disarm %s trap."), c_common_strings.c_the_your[ttmp.madeby_u]);
-    await cnv_trap_obj(otyp, 50 - (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 5671, $c.lit("disarm_shooting_trap")), rnl(50)) : rnl(50)) | 0, ttmp, 0);
+    await cnv_trap_obj(otyp, 50 - rnl(50) | 0, ttmp, 0);
     return 1;
 }
 async function try_lift(mtmp, ttmp, xtra_wt, stuff) {   // trap.c:5677
     if (calc_capacity(xtra_wt) >= 3 /* HVY_ENCUMBER */) {
         await pline($c.lit("%s is %s for you to lift."), await Monnam(mtmp), stuff ? $c.lit("carrying too much") : $c.lit("too heavy"));
-        if (!ttmp.madeby_u && !mtmp.mpeaceful && mtmp.mcanmove | 0 && !($c.andu64(mtmp.data.mflags1, 65536) !== 0) && mtmp.data.mlet !== 53 /* S_HUMAN */ && (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 5688, $c.lit("try_lift")), rnl(10)) : rnl(10)) < 3) {
+        if (!ttmp.madeby_u && !mtmp.mpeaceful && mtmp.mcanmove | 0 && !($c.andu64(mtmp.data.mflags1, 65536) !== 0) && mtmp.data.mlet !== 53 /* S_HUMAN */ && rnl(10) < 3) {
             mtmp.mpeaceful = (1) & 1;
             set_malign(mtmp);
             await pline($c.lit("%s thinks it was nice of you to try."), await Monnam(mtmp));
@@ -4264,7 +4264,7 @@ async function help_monster_out(mtmp, ttmp) {   // trap.c:5700
     if (mtmp.msleeping) {
         mtmp.msleeping = (0) & 1;
         await pline($c.lit("%s awakens."), await Monnam(mtmp));
-    } else if (mtmp.mfrozen | 0 && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 5765, $c.lit("help_monster_out")), rn2(mtmp.mfrozen | 0)) : rn2(mtmp.mfrozen | 0))) {
+    } else if (mtmp.mfrozen | 0 && !rn2(mtmp.mfrozen | 0)) {
         mtmp.mcanmove = (1) & 1;
         mtmp.mfrozen = (0) & 127;
         await pline($c.lit("%s stirs."), await Monnam(mtmp));
@@ -4294,7 +4294,7 @@ async function disarm_box(box, force, confused) {   // trap.c:5794
         if (gu.urole.mnum === 339) {
             ch = Math.imul(ch, 2);
         }
-        if (!force && (confused || (u.uprops[25 /* FUMBLING */].intrinsic || u.uprops[25 /* FUMBLING */].extrinsic) || (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 5802, $c.lit("disarm_box")), rnd(75 + $c.div32(await level_difficulty(), 2) | 0)) : rnd(75 + $c.div32(await level_difficulty(), 2) | 0)) > ch)) {
+        if (!force && (confused || (u.uprops[25 /* FUMBLING */].intrinsic || u.uprops[25 /* FUMBLING */].extrinsic) || rnd(75 + $c.div32(await level_difficulty(), 2) | 0) > ch)) {
             await chest_trap(box, 3 /* FINGER */, 1);
         } else {
             await You($c.lit("disarm it!"));
@@ -4310,7 +4310,7 @@ async function disarm_box(box, force, confused) {   // trap.c:5794
     }
 }
 async function untrap_box(box, force, confused) {   // trap.c:5821
-    if (box.otrapped | 0 && (force || !confused && (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 5827, $c.lit("untrap_box")), rn2(31 - u.ulevel | 0)) : rn2(31 - u.ulevel | 0)) < 10) || box.tknown | 0 || !force && confused && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 5829, $c.lit("untrap_box")), rn2(3)) : rn2(3))) {
+    if (box.otrapped | 0 && (force || !confused && rn2(31 - u.ulevel | 0) < 10) || box.tknown | 0 || !force && confused && !rn2(3)) {
         if (!(box.tknown | 0 && box.dknown | 0)) {
             await You($c.lit("find a trap on %s!"), await the(await xname(box)));
         } else {
@@ -4491,7 +4491,7 @@ export async function untrap(force, rx, ry, container) {   // trap.c:5848
             await pline($c.lit("This door is broken."));
             return 0;
     }
-    if (((svl.level.locations[x][y].flags | 0) & 16) !== 0 && (force || !confused && (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 6064, $c.lit("untrap")), rn2((30 - u.ulevel | 0) + 11 | 0)) : rn2((30 - u.ulevel | 0) + 11 | 0)) < 10) || !force && confused && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 6065, $c.lit("untrap")), rn2(3)) : rn2(3))) {
+    if (((svl.level.locations[x][y].flags | 0) & 16) !== 0 && (force || !confused && rn2((30 - u.ulevel | 0) + 11 | 0) < 10) || !force && confused && !rn2(3)) {
         await You($c.lit("find a trap on the door!"));
         await exercise(2 /* A_WIS */, 1);
         if (await yn_function($c.lit("Disarm it?"), new $c.Ptr(ynqchars, 0), 113, 1) !== 121) {
@@ -4500,7 +4500,7 @@ export async function untrap(force, rx, ry, container) {   // trap.c:5848
         if ((svl.level.locations[x][y].flags | 0) & 16) {
             ch = 15 + (gu.urole.mnum === 339 ? Math.imul(u.ulevel, 3) : u.ulevel) | 0;
             await exercise(3 /* A_DEX */, 1);
-            if (!force && (confused || (u.uprops[25 /* FUMBLING */].intrinsic || u.uprops[25 /* FUMBLING */].extrinsic) || (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 6074, $c.lit("untrap")), rnd(75 + $c.div32(await level_difficulty(), 2) | 0)) : rnd(75 + $c.div32(await level_difficulty(), 2) | 0)) > ch)) {
+            if (!force && (confused || (u.uprops[25 /* FUMBLING */].intrinsic || u.uprops[25 /* FUMBLING */].extrinsic) || rnd(75 + $c.div32(await level_difficulty(), 2) | 0) > ch)) {
                 await You($c.lit("set it off!"));
                 await b_trapped($c.lit("door"), 3 /* FINGER */);
                 svl.level.locations[x][y].flags = (0) & 31;
@@ -4610,7 +4610,7 @@ export async function openholdingtrap(mon, noticed) {   // trap.c:6101
                 await pline($c.lit("%s%s opens."), upstart($c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), which, 256)), trapdescr);
             }
         }
-        if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 6201, $c.lit("openholdingtrap")), rn2(2)) : rn2(2)) && dist2(mon.mx, mon.my, u.ux, u.uy) <= 2) {
+        if (rn2(2) && dist2(mon.mx, mon.my, u.ux, u.uy) <= 2) {
             await reward_untrap(t, mon);
         }
     }
@@ -4689,8 +4689,8 @@ export async function chest_trap(obj, bodypart, disarm) {   // trap.c:6294
     otmp.otrapped = (0) & 1;
     await You(disarm ? $c.lit("set it off!") : $c.lit("trigger a trap!"));
     await windowprocs.win_display_nhwindow($G.WIN_MESSAGE, 0);
-    if ((u.uluck + u.moreluck | 0) > -13 && (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 6312, $c.lit("chest_trap")), rn2(13 + (u.uluck + u.moreluck | 0) | 0)) : rn2(13 + (u.uluck + u.moreluck | 0) | 0)) > 7) {
-        switch (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 6314, $c.lit("chest_trap")), rn2(13)) : rn2(13)) {
+    if ((u.uluck + u.moreluck | 0) > -13 && rn2(13 + (u.uluck + u.moreluck | 0) | 0) > 7) {
+        switch (rn2(13)) {
             case 12:
             case 11:
                 msg = $c.lit("explosive charge is a dud");
@@ -4723,7 +4723,7 @@ export async function chest_trap(obj, bodypart, disarm) {   // trap.c:6294
             await pline($c.lit("But luckily the %s!"), msg);
         }
     } else {
-        switch ((rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 6346, $c.lit("chest_trap")), rn2(20)) : rn2(20)) ? (u.uluck + u.moreluck | 0) >= 13 ? 0 : rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 6346, $c.lit("chest_trap")), rn2(13 - (u.uluck + u.moreluck | 0) | 0)) : rn2(13 - (u.uluck + u.moreluck | 0) | 0) : rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 6346, $c.lit("chest_trap")), rn2(26)) : rn2(26)) {
+        switch (rn2(20) ? (u.uluck + u.moreluck | 0) >= 13 ? 0 : rn2(13 - (u.uluck + u.moreluck | 0) | 0) : rn2(26)) {
             case 25:
             case 24:
             case 23:
@@ -4757,7 +4757,7 @@ export async function chest_trap(obj, bodypart, disarm) {   // trap.c:6294
                         await delobj(otmp);
                     }
                     await wake_nearby(0);
-                    await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32((rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 6398, $c.lit("chest_trap")), d(6, 6)) : d(6, 6)) + 1 | 0, 2) : rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 6398, $c.lit("chest_trap")), d(6, 6)) : d(6, 6), new $c.Ptr(buf, 0), 0);
+                    await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(d(6, 6) + 1 | 0, 2) : d(6, 6), new $c.Ptr(buf, 0), 0);
                     await exercise(0 /* A_STR */, 0);
                     if (costly && loss) {
                         if (insider) {
@@ -4777,7 +4777,7 @@ export async function chest_trap(obj, bodypart, disarm) {   // trap.c:6294
             case 18:
             case 17:
                 await pline($c.lit("A cloud of noxious gas billows from %s."), await the(await xname(obj)));
-                if (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 6419, $c.lit("chest_trap")), rn2(3)) : rn2(3)) {
+                if (rn2(3)) {
                     await poisoned($c.lit("gas cloud"), 0 /* A_STR */, $c.lit("cloud of poison gas"), 15, 0);
                 } else {
                     await create_gas_cloud(obj.ox, obj.oy, 1, 8);
@@ -4802,7 +4802,7 @@ export async function chest_trap(obj, bodypart, disarm) {   // trap.c:6294
             case 7:
             case 6:
                 {
-                    dmg = rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 6443, $c.lit("chest_trap")), d(4, 4)) : d(4, 4);
+                    dmg = d(4, 4);
                     orig_dmg = dmg;
                     await You($c.lit("are jolted by a surge of electricity!"));
                     if (u.uprops[5 /* SHOCK_RES */].intrinsic || u.uprops[5 /* SHOCK_RES */].extrinsic) {
@@ -4824,7 +4824,7 @@ export async function chest_trap(obj, bodypart, disarm) {   // trap.c:6294
             case 3:
                 if (!u.uprops[66 /* FREE_ACTION */].extrinsic) {
                     await pline($c.lit("Suddenly you are frozen in place!"));
-                    nomul(-(rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 6464, $c.lit("chest_trap")), d(5, 6)) : d(5, 6)) | 0);
+                    nomul(-d(5, 6) | 0);
                     gm.multi_reason = $c.lit("frozen by a trap");
                     await exercise(3 /* A_DEX */, 0);
                     gn.nomovemsg = c_common_strings.c_You_can_move_again;
@@ -4835,7 +4835,7 @@ export async function chest_trap(obj, bodypart, disarm) {   // trap.c:6294
             case 2:
             case 1:
             case 0:
-                await pline($c.lit("A cloud of %s gas billows from %s."), (u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked ? blindgas[rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 6475, $c.lit("chest_trap")), rn2(6)) : rn2(6)] : rndcolor(), await the(await xname(obj)));
+                await pline($c.lit("A cloud of %s gas billows from %s."), (u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked ? blindgas[rn2(6)] : rndcolor(), await the(await xname(obj)));
                 if (!u.uprops[13 /* STUNNED */].intrinsic) {
                     if (u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic)) {
                         await pline($c.lit("What a groovy feeling!"));
@@ -4843,8 +4843,8 @@ export async function chest_trap(obj, bodypart, disarm) {   // trap.c:6294
                         await You($c.lit("%s%s..."), stagger(gy.youmonst.data, $c.lit("stagger")), u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic ? $c.lit("") : (u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked ? $c.lit(" and get dizzy") : $c.lit(" and your vision blurs"));
                     }
                 }
-                await make_stunned($c.add64($c.and64(u.uprops[13 /* STUNNED */].intrinsic, 16777215), (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 6486, $c.lit("chest_trap")), rn2(7)) : rn2(7)) + 16 | 0), 0);
-                await make_hallucinated($c.add64($c.and64(u.uprops[23 /* HALLUC */].intrinsic, 16777215), (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 6488, $c.lit("chest_trap")), rn2(5)) : rn2(5)) + 16 | 0), 0, 0);
+                await make_stunned($c.add64($c.and64(u.uprops[13 /* STUNNED */].intrinsic, 16777215), rn2(7) + 16 | 0), 0);
+                await make_hallucinated($c.add64($c.and64(u.uprops[23 /* HALLUC */].intrinsic, 16777215), rn2(5) + 16 | 0), 0, 0);
                 break;
             default:
                 await impossible($c.lit("bad chest trap"));
@@ -4968,7 +4968,7 @@ export async function delfloortrap(ttmp) {   // trap.c:6668
 export async function b_trapped(item, bodypart) {   // trap.c:6694
     let lvl = 0, dmg = 0;
     lvl = await level_difficulty();
-    dmg = rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 6697, $c.lit("b_trapped")), rnd(5 + (lvl < 5 ? lvl : 2 + $c.div32(lvl, 2) | 0) | 0)) : rnd(5 + (lvl < 5 ? lvl : 2 + $c.div32(lvl, 2) | 0) | 0);
+    dmg = rnd(5 + (lvl < 5 ? lvl : 2 + $c.div32(lvl, 2) | 0) | 0);
     await pline($c.lit("KABOOM!!  %s was booby-trapped!"), await The(item));
     await wake_nearby(0);
     await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(dmg + 1 | 0, 2) : dmg, $c.lit("explosion"), 0);
@@ -4984,9 +4984,9 @@ async function thitm(tlev, mon, obj, d_override, nocorpse) {   // trap.c:6711
     if (d_override) {
         strike = 1;
     } else if (obj) {
-        strike = ((find_mac(mon) + tlev | 0) + obj.spe | 0) <= (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 6724, $c.lit("thitm")), rnd(20)) : rnd(20)) ? 1 : 0;
+        strike = ((find_mac(mon) + tlev | 0) + obj.spe | 0) <= rnd(20) ? 1 : 0;
     } else {
-        strike = (find_mac(mon) + tlev | 0) <= (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 6726, $c.lit("thitm")), rnd(20)) : rnd(20)) ? 1 : 0;
+        strike = (find_mac(mon) + tlev | 0) <= rnd(20) ? 1 : 0;
     }
     if (!strike) {
         if (obj && (gv.viz_array.get(mon.my).get(mon.mx) & 2) !== 0) {
@@ -5040,7 +5040,7 @@ export async function lava_effects() {   // trap.c:6794
     protect_oid = 0;
     burncount = 0;
     burnmesgcount = 0;
-    dmg = rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 6800, $c.lit("lava_effects")), d(6, 6)) : d(6, 6);
+    dmg = d(6, 6);
     if (iflags.in_lava_effects) {
         do {
             if (debugcore($c.lit("trap.c"), 1)) {
@@ -5152,7 +5152,7 @@ export async function lava_effects() {   // trap.c:6794
             return 1;
         } else if (!((u.uprops[50 /* WWALKING */].intrinsic || u.uprops[50 /* WWALKING */].extrinsic) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) && (!u.utrap || u.utraptype !== 4)) {
             boil_away = $c.i8(!(u.uprops[1 /* FIRE_RES */].intrinsic || u.uprops[1 /* FIRE_RES */].extrinsic) ? 1 : 0);
-            set_utrap((((rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 6968, $c.lit("lava_effects")), rn2(4)) : rn2(4)) + 4 | 0) + ((boil_away ? 2 : (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 6969, $c.lit("lava_effects")), rn2(4)) : rn2(4)) + 12 | 0) << 8) | 0) >>> 0, 4);
+            set_utrap(((rn2(4) + 4 | 0) + ((boil_away ? 2 : rn2(4) + 12 | 0) << 8) | 0) >>> 0, 4);
             await You($c.lit("sink into the %s%s!"), waterbody_name(u.ux, u.uy), !boil_away ? $c.lit(", but it only burns slightly") : $c.lit(" and are about to be immolated"));
             if (u.uprops[1 /* FIRE_RES */].intrinsic || u.uprops[1 /* FIRE_RES */].extrinsic) {
                 monstseesu(2);
@@ -5189,13 +5189,13 @@ export async function sink_into_lava() {   // trap.c:6991
                 await safe_teleds(3);
             }
         } else if (!u.umoved) {
-            if (u.uprops[22 /* SLIMED */].intrinsic && (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 7025, $c.lit("sink_into_lava")), rnd(9)) : rnd(9)) >= $c.i32($c.and64(u.uprops[22 /* SLIMED */].intrinsic, 16777215))) {
+            if (u.uprops[22 /* SLIMED */].intrinsic && rnd(9) >= $c.i32($c.and64(u.uprops[22 /* SLIMED */].intrinsic, 16777215))) {
                 await pline(new $c.Ptr(sink_into_lava$sink_deeper, 0));
                 await burn_away_slime();
             } else {
                 await Norep(new $c.Ptr(sink_into_lava$sink_deeper, 0));
             }
-            $t1 = (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 7031, $c.lit("sink_into_lava")), rnd(4)) : rnd(4)) >>> 0, u.utrap = u.utrap + $t1 >>> 0;
+            $t1 = rnd(4) >>> 0, u.utrap = u.utrap + $t1 >>> 0;
         }
     }
 }
@@ -5230,7 +5230,7 @@ export function trapname(ttyp, override) {   // trap.c:7100
         nameidx = rn2_on_display_rng(total_names + 1 | 0);
         if (nameidx === total_names) {
             fem = $c.i8(u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female);
-            copynchars(new $c.Ptr(trapname$roletrap, 0), (rng_log_enabled() ? (rng_log_set_caller($c.lit("trap.c"), 7141, $c.lit("trapname")), rn2(3)) : rn2(3)) ? fem && gu.urole.name.f ? gu.urole.name.f : gu.urole.name.m : rank_of(u.ulevel, gu.urole.mnum, fem), 27);
+            copynchars(new $c.Ptr(trapname$roletrap, 0), rn2(3) ? fem && gu.urole.name.f ? gu.urole.name.f : gu.urole.name.m : rank_of(u.ulevel, gu.urole.mnum, fem), 27);
             $c.__builtin___strcat_chk(new $c.Ptr(trapname$roletrap, 0), $c.lit(" trap"), 33);
             return lcase(new $c.Ptr(trapname$roletrap, 0));
         } else if (nameidx >= 26 /* TRAPNUM */) {

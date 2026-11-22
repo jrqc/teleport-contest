@@ -40,7 +40,7 @@ import { artitouch } from './quest.js';
 import { is_quest_artifact } from './questpgr.js';
 import { unpunish } from './read.js';
 import { reg_damg, visible_region_at } from './region.js';
-import { rn2, rn2_on_display_rng, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { rn2, rn2_on_display_rng } from './rnd.js';
 import { addtobill, check_unpaid, costly_spot, doinvbill, inhishop, inside_shop, obfree, picked_container, same_price, shop_keeper, shopper_financial_report, stolen_value, unpaid_cost } from './shk.js';
 import { stairs_description, stairway_at } from './stairs.js';
 import { Strlen_ } from './strutil.js';
@@ -1028,7 +1028,7 @@ export function carrying_stoning_corpse() {   // invent.c:1508
 }
 export async function currency(amount) {   // invent.c:1546
     let res = null;
-    res = u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic) ? currencies[rng_log_enabled() ? (rng_log_set_caller($c.lit("invent.c"), 1550, $c.lit("currency")), rn2(21)) : rn2(21)] : $c.lit("zorkmid");
+    res = u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic) ? currencies[rn2(21)] : $c.lit("zorkmid");
     if (amount !== 1) {
         res = await makeplural(res);
     }
@@ -1142,7 +1142,7 @@ async function mime_action(word) {   // invent.c:1678
     }
     if ((bp = $c.strstr(new $c.Ptr(buf, 0), $c.lit(" or "))) !== null) {
         bp.set(0, 0);
-        bp = (rng_log_enabled() ? (rng_log_set_caller($c.lit("invent.c"), 1700, $c.lit("mime_action")), rn2(2)) : rn2(2)) ? new $c.Ptr(buf, 0) : bp.add(4);
+        bp = rn2(2) ? new $c.Ptr(buf, 0) : bp.add(4);
     } else {
         bp = new $c.Ptr(buf, 0);
     }

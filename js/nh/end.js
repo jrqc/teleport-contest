@@ -43,7 +43,7 @@ import { make_sick, peffects, set_itimeout } from './potion.js';
 import { clearpriests } from './priest.js';
 import { NH_panictrace_gdb, NH_panictrace_libc, panictrace_setsignals, submit_web_report } from './report.js';
 import { inven_inuse } from './restore.js';
-import { d, rn2, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { d, rn2 } from './rnd.js';
 import { Goodbye } from './role.js';
 import { dosave0, freedynamicdata } from './save.js';
 import { sfi_kinfo, sfo_kinfo } from './sfbase.js';
@@ -525,31 +525,31 @@ async function fuzzer_savelife(how) {   // end.c:946
     let potion = null, propidx = 0, proptim = 0, remedies = 0, $t1;
     if (!program_state.panicking && how !== 11 /* PANICKED */ && how !== 12 /* TRICKED */) {
         await savelife(how);
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("end.c"), 959, $c.lit("fuzzer_savelife")), rn2(gd.done_seq > $c.add64(gh.hero_seq, 2) ? 2 : 10)) : rn2(gd.done_seq > $c.add64(gh.hero_seq, 2) ? 2 : 10))) {
+        if (!rn2(gd.done_seq > $c.add64(gh.hero_seq, 2) ? 2 : 10)) {
             remedies = 0;
-            if (u.ulycn >= 0 /* LOW_PM */ && u.ulycn < 383 /* NUMMONS */ && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("end.c"), 965, $c.lit("fuzzer_savelife")), rn2(3)) : rn2(3))) {
+            if (u.ulycn >= 0 /* LOW_PM */ && u.ulycn < 383 /* NUMMONS */ && !rn2(3)) {
                 potion = await mksobj(322 /* POT_WATER */, 1, 0);
                 await bless(potion);
                 await peffects(potion);
                 await obfree(potion, null);
                 remedies = remedies + 1 | 0;
             }
-            if (!remedies || (rng_log_enabled() ? (rng_log_set_caller($c.lit("end.c"), 972, $c.lit("fuzzer_savelife")), rn2(3)) : rn2(3))) {
+            if (!remedies || rn2(3)) {
                 potion = await mksobj(298 /* POT_RESTORE_ABILITY */, 1, 0);
                 await bless(potion);
                 await peffects(potion);
                 await obfree(potion, null);
                 remedies = remedies + 1 | 0;
             }
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("end.c"), 979, $c.lit("fuzzer_savelife")), rn2(3 + Math.imul(3, remedies) | 0)) : rn2(3 + Math.imul(3, remedies) | 0))) {
+            if (!rn2(3 + Math.imul(3, remedies) | 0)) {
                 for (propidx = 1; propidx <= 8; propidx = propidx + 1 | 0) {
-                    if (!u.uprops[propidx].intrinsic && !u.uprops[propidx].extrinsic && (proptim = rng_log_enabled() ? (rng_log_set_caller($c.lit("end.c"), 985, $c.lit("fuzzer_savelife")), rn2(3)) : rn2(3)) > 0) {
+                    if (!u.uprops[propidx].intrinsic && !u.uprops[propidx].extrinsic && (proptim = rn2(3)) > 0) {
                         set_itimeout(new $c.FieldRef(u.uprops[propidx], "intrinsic", "i64"), Math.imul(2, proptim) + 1 | 0);
                     }
                 }
                 remedies = remedies + 1 | 0;
             }
-            if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("end.c"), 991, $c.lit("fuzzer_savelife")), rn2(5 + Math.imul(5, remedies) | 0)) : rn2(5 + Math.imul(5, remedies) | 0))) {
+            if (!rn2(5 + Math.imul(5, remedies) | 0)) {
             }
         }
         svk.killer.name[0] = 0;
@@ -860,7 +860,7 @@ async function really_done(how) {   // end.c:1132
             }
             if (Schroedingers_cat) {
                 m_lev = await adj_lev($c.relem(mons, 33 /* PM_HOUSECAT */));
-                mhp = rng_log_enabled() ? (rng_log_set_caller($c.lit("end.c"), 1468, $c.lit("really_done")), d(m_lev, 8)) : d(m_lev, 8);
+                mhp = d(m_lev, 8);
                 u.urexp = u.urexp <= $c.sub64(9223372036854775807n, mhp) ? $c.add64(u.urexp, mhp) : 9223372036854775807n;
                 $c.__builtin___strcat_chk(eos(new $c.Ptr(pbuf, 0)), $c.lit(" and Schroedinger's cat"), -1);
             }

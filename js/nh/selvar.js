@@ -9,7 +9,7 @@ import { newsym_force } from './display.js';
 import { panic } from './end.js';
 import { dist2 } from './hacklib.js';
 import { impossible } from './pline.js';
-import { rn2, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { rn2 } from './rnd.js';
 import { match_maptyps, random_wdir } from './sp_lev.js';
 
 const selection_floodfill$floodfill_stack_overrun = new Int8Array(24);   // static in selection_floodfill()
@@ -193,7 +193,7 @@ export async function selection_filter_percent(ov, percent) {   // selvar.c:224
     selection_getbounds(ov, rect);
     for (x = rect.lx; x <= rect.hx; x = x + 1 | 0) {
         for (y = rect.ly; y <= rect.hy; y = y + 1 | 0) {
-            if (selection_getpoint($c.i16(x), $c.i16(y), ov) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("selvar.c"), 241, $c.lit("selection_filter_percent")), rn2(100)) : rn2(100)) < percent) {
+            if (selection_getpoint($c.i16(x), $c.i16(y), ov) && rn2(100) < percent) {
                 selection_setpoint($c.i16(x), $c.i16(y), ret, 1);
             }
         }
@@ -217,7 +217,7 @@ export async function selection_filter_mapchar(ov, typ, lit) {   // selvar.c:248
                         selection_setpoint($c.i16(x), $c.i16(y), ret, 1);
                         break;
                     case -1:
-                        selection_setpoint($c.i16(x), $c.i16(y), ret, rng_log_enabled() ? (rng_log_set_caller($c.lit("selvar.c"), 271, $c.lit("selection_filter_mapchar")), rn2(2)) : rn2(2));
+                        selection_setpoint($c.i16(x), $c.i16(y), ret, rn2(2));
                         break;
                     case 0:
                     case 1:
@@ -244,7 +244,7 @@ export function selection_rndcoord(ov, x, y, removeit) {   // selvar.c:284
         }
     }
     if (idx) {
-        c = rng_log_enabled() ? (rng_log_set_caller($c.lit("selvar.c"), 302, $c.lit("selection_rndcoord")), rn2(idx)) : rn2(idx);
+        c = rn2(idx);
         for (dx = rect.lx; dx <= rect.hx; dx = dx + 1 | 0) {
             for (dy = rect.ly; dy <= rect.hy; dy = dy + 1 | 0) {
                 if (selection_getpoint($c.i16(dx), $c.i16(dy), ov)) {
@@ -568,7 +568,7 @@ export async function selection_do_gradient(ov, x, y, x2, y2, gtyp, mind, maxd) 
                 for (dx = 0; dx < 80; dx = $c.add64(dx, 1)) {
                     for (dy = 0; dy < 21; dy = $c.add64(dy, 1)) {
                         d0 = line_dist_coord(x, y, x2, y2, dx, dy);
-                        if (d0 <= $c.mul64(mind, mind) || d0 <= $c.mul64(maxd, maxd) && $c.sub64(d0, $c.mul64(mind, mind)) < (rng_log_enabled() ? (rng_log_set_caller($c.lit("selvar.c"), 600, $c.lit("selection_do_gradient")), rn2($c.i32(dofs))) : rn2($c.i32(dofs)))) {
+                        if (d0 <= $c.mul64(mind, mind) || d0 <= $c.mul64(maxd, maxd) && $c.sub64(d0, $c.mul64(mind, mind)) < rn2($c.i32(dofs))) {
                             selection_setpoint($c.i16(dx), $c.i16(dy), ov, 1);
                         }
                     }
@@ -585,7 +585,7 @@ export async function selection_do_gradient(ov, x, y, x2, y2, gtyp, mind, maxd) 
                         d4 = line_dist_coord(x, y, x2, y2, dx, y2);
                         d5 = line_dist_coord(x, y, x2, y2, dx, dy);
                         d0$2 = d5 < ((d1 > d2 ? d1 : d2) < (d3 > d4 ? d3 : d4) ? d1 > d2 ? d1 : d2 : d3 > d4 ? d3 : d4) ? d5 : (d1 > d2 ? d1 : d2) < (d3 > d4 ? d3 : d4) ? d1 > d2 ? d1 : d2 : d3 > d4 ? d3 : d4;
-                        if (d0$2 <= $c.mul64(mind, mind) || d0$2 <= $c.mul64(maxd, maxd) && $c.sub64(d0$2, $c.mul64(mind, mind)) < (rng_log_enabled() ? (rng_log_set_caller($c.lit("selvar.c"), 616, $c.lit("selection_do_gradient")), rn2($c.i32(dofs))) : rn2($c.i32(dofs)))) {
+                        if (d0$2 <= $c.mul64(mind, mind) || d0$2 <= $c.mul64(maxd, maxd) && $c.sub64(d0$2, $c.mul64(mind, mind)) < rn2($c.i32(dofs))) {
                             selection_setpoint($c.i16(dx), $c.i16(dy), ov, 1);
                         }
                     }
@@ -655,8 +655,8 @@ export function selection_do_randline(x1, y1, x2, y2, rough, rec, ov) {   // sel
         my = $c.div32(y1 + y2 | 0, 2);
     } else {
         do {
-            dx = (rng_log_enabled() ? (rng_log_set_caller($c.lit("selvar.c"), 704, $c.lit("selection_do_randline")), rn2(rough)) : rn2(rough)) - $c.div32(rough, 2) | 0;
-            dy = (rng_log_enabled() ? (rng_log_set_caller($c.lit("selvar.c"), 705, $c.lit("selection_do_randline")), rn2(rough)) : rn2(rough)) - $c.div32(rough, 2) | 0;
+            dx = rn2(rough) - $c.div32(rough, 2) | 0;
+            dy = rn2(rough) - $c.div32(rough, 2) | 0;
             mx = $c.div32(x1 + x2 | 0, 2) + dx | 0;
             my = $c.div32(y1 + y2 | 0, 2) + dy | 0;
         } while (mx > 79 || mx < 0 || my < 0 || my > 20);

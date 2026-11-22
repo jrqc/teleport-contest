@@ -56,7 +56,7 @@ import { ok_to_quest, onquest } from './quest.js';
 import { com_pager, deliver_splev_message } from './questpgr.js';
 import { in_out_region } from './region.js';
 import { getlev } from './restore.js';
-import { d, reseed_random, rn2, rn2_on_display_rng, rnd, rng_log_enabled, rng_log_set_caller, rnz } from './rnd.js';
+import { d, reseed_random, rn2, rn2_on_display_rng, rnd, rnz } from './rnd.js';
 import { savelev, savestateinlock, tricked_fileremoved } from './save.js';
 import { bufon } from './sfstruct.js';
 import { fix_shop_damage, is_unpaid, obfree, sellobj, sellobj_state, stolen_value } from './shk.js';
@@ -102,7 +102,7 @@ export async function boulder_hits_pool(otmp, rx, ry, pushing) {   // do.c:50
         lava = is_lava(rx, ry);
         what = waterbody_name(rx, ry);
         ltyp = svl.level.locations[rx][ry].typ;
-        chance = rng_log_enabled() ? (rng_log_set_caller($c.lit("do.c"), 61, $c.lit("boulder_hits_pool")), rn2(10)) : rn2(10);
+        chance = rn2(10);
         fills_up = $c.i8((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? 0 : ltyp === 18 /* WATER */ ? chance < 5 ? 1 : 0 : lava ? chance === 0 ? 1 : 0 : chance !== 0 ? 1 : 0);
         if (fills_up) {
             ttmp = t_at(rx, ry);
@@ -152,7 +152,7 @@ export async function boulder_hits_pool(otmp, rx, ry, pushing) {   // do.c:50
             } else if (lava && dist2(rx, ry, u.ux, u.uy) <= 2) {
                 await You($c.lit("are hit by molten %s%c"), hliquid($c.lit("lava")), u.uprops[1 /* FIRE_RES */].intrinsic || u.uprops[1 /* FIRE_RES */].extrinsic ? 46 : 33);
                 await burn_away_slime();
-                dmg = rng_log_enabled() ? (rng_log_set_caller($c.lit("do.c"), 138, $c.lit("boulder_hits_pool")), d(u.uprops[1 /* FIRE_RES */].intrinsic || u.uprops[1 /* FIRE_RES */].extrinsic ? 1 : 3, 6)) : d(u.uprops[1 /* FIRE_RES */].intrinsic || u.uprops[1 /* FIRE_RES */].extrinsic ? 1 : 3, 6);
+                dmg = d(u.uprops[1 /* FIRE_RES */].intrinsic || u.uprops[1 /* FIRE_RES */].extrinsic ? 1 : 3, 6);
                 await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(dmg + 1 | 0, 2) : dmg, $c.lit("molten lava"), 1);
             } else if (!fills_up && flags.verbose && (pushing ? !((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked) : (gv.viz_array.get(ry).get(rx) & 2) !== 0)) {
                 await pline($c.lit("It sinks without a trace!"));
@@ -210,7 +210,7 @@ export async function flooreffects(obj, x, y, verb) {   // do.c:162
                     mtmp.mtrapped = (0) & 1;
                 } else {
                     if (!(u.uprops[53 /* PASSES_WALLS */].intrinsic || u.uprops[53 /* PASSES_WALLS */].extrinsic) && !($c.andu64(gy.youmonst.data.mflags2, 134217728) !== 0)) {
-                        await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32((rng_log_enabled() ? (rng_log_set_caller($c.lit("do.c"), 232, $c.lit("flooreffects")), rnd(15)) : rnd(15)) + 1 | 0, 2) : rng_log_enabled() ? (rng_log_set_caller($c.lit("do.c"), 232, $c.lit("flooreffects")), rnd(15)) : rnd(15), $c.lit("squished under a boulder"), 2);
+                        await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(rnd(15) + 1 | 0, 2) : rnd(15), $c.lit("squished under a boulder"), 2);
                         break deletedwithboulder$;
                     } else {
                         await reset_utrap(1);
@@ -332,7 +332,7 @@ export async function polymorph_sink() {   // do.c:404
     }
     sinklooted = $c.i8((svl.level.locations[u.ux][u.uy].flags | 0) !== 0 ? 1 : 0);
     svl.level.locations[u.ux][u.uy].flags = (0) & 31;
-    switch (rng_log_enabled() ? (rng_log_set_caller($c.lit("do.c"), 416, $c.lit("polymorph_sink")), rn2(4)) : rn2(4)) {
+    switch (rn2(4)) {
         default:
         case 0:
             sym = 37;
@@ -352,8 +352,8 @@ export async function polymorph_sink() {   // do.c:404
         case 2:
             sym = 33;
             await set_levltyp(u.ux, u.uy, 32);
-            algn = (rng_log_enabled() ? (rng_log_set_caller($c.lit("do.c"), 436, $c.lit("polymorph_sink")), rn2(3)) : rn2(3)) - 1 | 0;
-            $t1 = In_hell(u.uz) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("do.c"), 437, $c.lit("polymorph_sink")), rn2(3)) : rn2(3)) ? 0 : (algn === -128 ? 0 : algn === 1 ? 4 : algn + 2 | 0) >>> 0, svl.level.locations[u.ux][u.uy].flags = ($t1) & 31;
+            algn = rn2(3) - 1 | 0;
+            $t1 = In_hell(u.uz) && rn2(3) ? 0 : (algn === -128 ? 0 : algn === 1 ? 4 : algn + 2 | 0) >>> 0, svl.level.locations[u.ux][u.uy].flags = ($t1) & 31;
             break;
         case 3:
             sym = 19;
@@ -375,8 +375,8 @@ async function teleport_sink() {   // do.c:460
     let cx = 0, cy = 0, alreadylooted = 0, trycnt = 0;
     trycnt = 0;
     do {
-        cx = $c.i16(1 + (rng_log_enabled() ? (rng_log_set_caller($c.lit("do.c"), 472, $c.lit("teleport_sink")), rnd(77)) : rnd(77)) | 0);
-        cy = $c.i16(1 + (rng_log_enabled() ? (rng_log_set_caller($c.lit("do.c"), 473, $c.lit("teleport_sink")), rn2(19)) : rn2(19)) | 0);
+        cx = $c.i16(1 + rnd(77) | 0);
+        cy = $c.i16(1 + rn2(19) | 0);
         if (svl.level.locations[cx][cy].typ === 25 /* ROOM */ && !t_at(cx, cy) && !engr_at(cx, cy) && (!((gv.viz_array.get(cy).get(cx) & 2) !== 0) || dist2(cx, cy, u.ux, u.uy) > 9)) {
             alreadylooted = svl.level.locations[u.ux][u.uy].flags;
             await set_levltyp(u.ux, u.uy, 25);
@@ -522,11 +522,11 @@ async function dosinkring(obj) {   // do.c:498
     } else if (!nosink) {
         await You_hear($c.lit("the ring bouncing down the drainpipe."));
     }
-    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("do.c"), 649, $c.lit("dosinkring")), rn2(20)) : rn2(20)) && !nosink) {
+    if (!rn2(20) && !nosink) {
         await pline_The($c.lit("sink backs up, leaving %s."), await doname(obj));
         obj.in_use = (0) & 1;
         await dropx(obj);
-    } else if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("do.c"), 653, $c.lit("dosinkring")), rn2(5)) : rn2(5))) {
+    } else if (!rn2(5)) {
         await freeinv(obj);
         obj.in_use = (0) & 1;
         obj.ox = u.ux;
@@ -740,7 +740,7 @@ export async function obj_no_longer_held(obj) {   // do.c:893
     }
     switch (obj.otyp) {
         case 43 /* CRYSKNIFE */:
-            if (!obj.oerodeproof || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("do.c"), 911, $c.lit("obj_no_longer_held")), rn2(10)) : rn2(10))) {
+            if (!obj.oerodeproof || !rn2(10)) {
                 if (!svc.context.mon_moving && !program_state.gameover) {
                     await costly_alteration(obj, 6 /* COST_DEGRD */);
                 }
@@ -909,7 +909,7 @@ export async function dodown() {   // do.c:1131
                         if (obj.age < svm.moves) {
                             obj.age = svm.moves;
                         }
-                        $t1 = rng_log_enabled() ? (rng_log_set_caller($c.lit("do.c"), 1165, $c.lit("dodown")), rnz(100)) : rnz(100), obj.age = $c.add64(obj.age, $t1);
+                        $t1 = rnz(100), obj.age = $c.add64(obj.age, $t1);
                     }
                 }
             }
@@ -992,9 +992,9 @@ export async function dodown() {   // do.c:1131
             await You($c.lit("don't fit %s easily."), down_or_thru);
             $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("Try to squeeze %s?"), down_or_thru);
             if (await yn_function(new $c.Ptr(qbuf, 0), new $c.Ptr(ynchars, 0), 110, 1) === 121) {
-                if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("do.c"), 1266, $c.lit("dodown")), rn2(3)) : rn2(3))) {
+                if (!rn2(3)) {
                     actn = $c.lit("manage to squeeze");
-                    await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32((rng_log_enabled() ? (rng_log_set_caller($c.lit("do.c"), 1268, $c.lit("dodown")), rnd(4)) : rnd(4)) + 1 | 0, 2) : rng_log_enabled() ? (rng_log_set_caller($c.lit("do.c"), 1268, $c.lit("dodown")), rnd(4)) : rnd(4), $c.lit("contusion from a small passage"), 1);
+                    await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(rnd(4) + 1 | 0, 2) : rnd(4), $c.lit("contusion from a small passage"), 1);
                 } else {
                     await You($c.lit("were unable to fit %s."), down_or_thru);
                     return 0;
@@ -1094,7 +1094,7 @@ export async function u_collide_m(mtmp) {   // do.c:1412
         await impossible($c.lit("level arrival collision: %s?"), !mtmp ? $c.lit("no monster") : $c.peq(mtmp, u.usteed) ? $c.lit("steed is on map") : $c.lit("monster not co-located"));
         return;
     }
-    if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("do.c"), 1429, $c.lit("u_collide_m")), rn2(2)) : rn2(2)) && await enexto(cc, u.ux, u.uy, gy.youmonst.data) && dist2(cc.x, cc.y, u.ux, u.uy) <= 2) {
+    if (!rn2(2) && await enexto(cc, u.ux, u.uy, gy.youmonst.data) && dist2(cc.x, cc.y, u.ux, u.uy) <= 2) {
         await u_on_newpos(cc.x, cc.y);
     } else {
         await mnexto(mtmp, 4);
@@ -1110,7 +1110,7 @@ export async function u_collide_m(mtmp) {   // do.c:1412
 }
 async function familiar_level_msg() {   // do.c:1448
     let mesg = null, buf = new Int8Array(256), which = 0;
-    which = rng_log_enabled() ? (rng_log_set_caller($c.lit("do.c"), 1462, $c.lit("familiar_level_msg")), rn2(4)) : rn2(4);
+    which = rn2(4);
     if (u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic)) {
         mesg = familiar_level_msg$halu_fam_msgs[which];
     } else {
@@ -1159,9 +1159,9 @@ export async function goto_level(newlevel, at_stairs, falling, portal) {   // do
         await done(14 /* ESCAPED */);
     }
     if (In_hell(u.uz) && up && u.uhave.amulet | 0 && !newdungeon && !portal && dunlev(u.uz) < (dunlevs_in_dungeon(u.uz) - 3 | 0)) {
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("do.c"), 1543, $c.lit("goto_level")), rn2(4 + svc.context.mysteryforce | 0)) : rn2(4 + svc.context.mysteryforce | 0))) {
+        if (!rn2(4 + svc.context.mysteryforce | 0)) {
             odds = 3 + u.ualign.type | 0;
-            diff = odds <= 1 ? 0 : rng_log_enabled() ? (rng_log_set_caller($c.lit("do.c"), 1545, $c.lit("goto_level")), rn2(odds)) : rn2(odds);
+            diff = odds <= 1 ? 0 : rn2(odds);
             if (diff !== 0) {
                 assign_rnd_level(newlevel, u.uz, diff);
                 diff = newlevel.dlevel - u.uz.dlevel | 0;
@@ -1173,7 +1173,7 @@ export async function goto_level(newlevel, at_stairs, falling, portal) {   // do
                 assign_level(newlevel, u.uz);
             }
             await pline($c.lit("A mysterious force momentarily surrounds you..."));
-            $t2 = rng_log_enabled() ? (rng_log_set_caller($c.lit("do.c"), 1563, $c.lit("goto_level")), rn2(diff + 2 | 0)) : rn2(diff + 2 | 0), svc.context.mysteryforce = svc.context.mysteryforce + $t2 | 0;
+            $t2 = rn2(diff + 2 | 0), svc.context.mysteryforce = svc.context.mysteryforce + $t2 | 0;
             if (on_level(newlevel, u.uz)) {
                 await safe_teleds(0);
                 await next_to_u();
@@ -1358,7 +1358,7 @@ export async function goto_level(newlevel, at_stairs, falling, portal) {   // do
                 if (u.usteed) {
                     await dismount_steed(1 /* DISMOUNT_FELL */);
                 } else {
-                    await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32((rng_log_enabled() ? (rng_log_set_caller($c.lit("do.c"), 1792, $c.lit("goto_level")), rnd(3)) : rnd(3)) + 1 | 0, 2) : rng_log_enabled() ? (rng_log_set_caller($c.lit("do.c"), 1792, $c.lit("goto_level")), rnd(3)) : rnd(3), ga.at_ladder ? $c.lit("falling off a ladder") : $c.lit("tumbling down a flight of stairs"), 1);
+                    await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(rnd(3) + 1 | 0, 2) : rnd(3), ga.at_ladder ? $c.lit("falling off a ladder") : $c.lit("tumbling down a flight of stairs"), 1);
                 }
                 await selftouch($c.lit("Falling, you"));
             } else {
@@ -1490,7 +1490,7 @@ export async function goto_level(newlevel, at_stairs, falling, portal) {   // do
         await fix_shop_damage();
     }
     if (do_fall_dmg) {
-        dmg = rng_log_enabled() ? (rng_log_set_caller($c.lit("do.c"), 1990, $c.lit("goto_level")), d(dist > 1 ? dist : 1, 6)) : d(dist > 1 ? dist : 1, 6);
+        dmg = d(dist > 1 ? dist : 1, 6);
         dmg = u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(dmg + 1 | 0, 2) : dmg;
         await losehp(dmg, $c.lit("falling down a mine shaft"), 1);
     }
@@ -1524,7 +1524,7 @@ export async function maybe_lvltport_feedback() {   // do.c:2032
 }
 async function final_level() {   // do.c:2043
     await iter_mons(reset_hostility);
-    await create_mplayers((rng_log_enabled() ? (rng_log_set_caller($c.lit("do.c"), 2049, $c.lit("final_level")), rn2(4)) : rn2(4)) + 3 | 0, 1);
+    await create_mplayers(rn2(4) + 3 | 0, 1);
     await gain_guardian_angel();
 }
 export async function schedule_goto(tolev, utotype_flags, pre_msg, post_msg) {   // do.c:2057
@@ -1680,7 +1680,7 @@ export async function revive_mon(arg, timeout) {   // do.c:2251
         }
     }
     if (!await revive_corpse(body)) {
-        if (($c.peq(mptr, $c.relem(mons, 311 /* PM_DEATH */)) || $c.peq(mptr, $c.relem(mons, 313 /* PM_FAMINE */)) || $c.peq(mptr, $c.relem(mons, 312 /* PM_PESTILENCE */))) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("do.c"), 2281, $c.lit("revive_mon")), rn2(99)) : rn2(99))) {
+        if (($c.peq(mptr, $c.relem(mons, 311 /* PM_DEATH */)) || $c.peq(mptr, $c.relem(mons, 313 /* PM_FAMINE */)) || $c.peq(mptr, $c.relem(mons, 312 /* PM_PESTILENCE */))) && rn2(99)) {
             action = 2 /* REVIVE_MON */;
             when = rider_revival_time(body, 1);
         } else {
@@ -1688,7 +1688,7 @@ export async function revive_mon(arg, timeout) {   // do.c:2251
                 await You_feel($c.lit("%sless hassled."), $c.peq(mptr, $c.relem(mons, 311 /* PM_DEATH */)) || $c.peq(mptr, $c.relem(mons, 313 /* PM_FAMINE */)) || $c.peq(mptr, $c.relem(mons, 312 /* PM_PESTILENCE */)) ? $c.lit("much ") : $c.lit(""));
             }
             action = 1 /* ROT_CORPSE */;
-            when = $c.sub64(rng_log_enabled() ? (rng_log_set_caller($c.lit("do.c"), 2288, $c.lit("revive_mon")), d(5, 50)) : d(5, 50), $c.sub64(svm.moves, body.age));
+            when = $c.sub64(d(5, 50), $c.sub64(svm.moves, body.age));
             if (when < 1) {
                 when = 1;
             }

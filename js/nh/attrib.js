@@ -21,7 +21,7 @@ import { encumber_msg } from './pickup.js';
 import { You, You_feel, Your, impossible, livelog_printf, pline, pline_The } from './pline.js';
 import { body_part, uasmon_maxStr } from './polyself.js';
 import { make_confused } from './potion.js';
-import { d, rn2, rnd, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { d, rn2, rnd } from './rnd.js';
 import { aligns } from './role.js';
 import { add_weapon_skill, lose_weapon_skill } from './weapon.js';
 
@@ -76,7 +76,7 @@ export async function adjattrib(ndx, incr, msgflg) {   // attrib.c:117
         abonflg = $c.i8(u.abon.a[ndx] < 0 ? 1 : 0);
     } else {
         if (u.acurr.a[ndx] < gu.urace.attrmin[ndx]) {
-            decr = rng_log_enabled() ? (rng_log_set_caller($c.lit("attrib.c"), 166, $c.lit("adjattrib")), rn2((gu.urace.attrmin[ndx] - u.acurr.a[ndx] | 0) + 1 | 0)) : rn2((gu.urace.attrmin[ndx] - u.acurr.a[ndx] | 0) + 1 | 0);
+            decr = rn2((gu.urace.attrmin[ndx] - u.acurr.a[ndx] | 0) + 1 | 0);
             u.acurr.a[ndx] = $c.i8(gu.urace.attrmin[ndx]);
             u.amax.a[ndx] = $c.i8(u.amax.a[ndx] - decr | 0);
             if (u.amax.a[ndx] < gu.urace.attrmin[ndx]) {
@@ -111,9 +111,9 @@ export async function gainstr(otmp, incr, givemsg) {   // attrib.c:203
     num = incr;
     if (!num) {
         if (u.acurr.a[0 /* A_STR */] < 18) {
-            num = (rng_log_enabled() ? (rng_log_set_caller($c.lit("attrib.c"), 209, $c.lit("gainstr")), rn2(4)) : rn2(4)) ? 1 : rng_log_enabled() ? (rng_log_set_caller($c.lit("attrib.c"), 209, $c.lit("gainstr")), rnd(6)) : rnd(6);
+            num = rn2(4) ? 1 : rnd(6);
         } else if (u.acurr.a[0 /* A_STR */] < 103) {
-            num = rng_log_enabled() ? (rng_log_set_caller($c.lit("attrib.c"), 211, $c.lit("gainstr")), rnd(10)) : rnd(10);
+            num = rnd(10);
         } else {
             num = 1;
         }
@@ -134,7 +134,7 @@ export async function losestr(num, knam, k_format) {   // attrib.c:221
     while (ustr < gu.urace.attrmin[0 /* A_STR */]) {
         ustr = ustr + 1 | 0;
         num = num - 1 | 0;
-        amt = (rng_log_enabled() ? (rng_log_set_caller($c.lit("attrib.c"), 235, $c.lit("losestr")), rn2(4)) : rn2(4)) + 3 | 0;
+        amt = rn2(4) + 3 | 0;
         dmg = dmg + amt | 0;
     }
     if (dmg) {
@@ -196,9 +196,9 @@ export async function poisoned(reason, typ, pkiller, fatal, thrown_weapon) {   /
     } else if (!strncmpi(pkiller, $c.lit("the "), 4) || !strncmpi(pkiller, $c.lit("an "), 3) || !strncmpi(pkiller, $c.lit("a "), 2)) {
         kprefix = 1;
     }
-    i = !fatal ? 1 : rng_log_enabled() ? (rng_log_set_caller($c.lit("attrib.c"), 362, $c.lit("poisoned")), rn2(fatal + (thrown_weapon ? 20 : 0) | 0)) : rn2(fatal + (thrown_weapon ? 20 : 0) | 0);
+    i = !fatal ? 1 : rn2(fatal + (thrown_weapon ? 20 : 0) | 0);
     if (i === 0 && typ !== 5 /* A_CHA */) {
-        loss = 6 + (rng_log_enabled() ? (rng_log_set_caller($c.lit("attrib.c"), 365, $c.lit("poisoned")), d(4, 6)) : d(4, 6)) | 0;
+        loss = 6 + d(4, 6) | 0;
         if (u.uhp <= loss) {
             u.uhp = -1;
             disp.botl = 1;
@@ -218,13 +218,13 @@ export async function poisoned(reason, typ, pkiller, fatal, thrown_weapon) {   /
         }
     } else if (i > 5) {
         cloud = $c.i8(!$c.strcmp(reason, $c.lit("gas cloud")) ? 1 : 0);
-        loss = thrown_weapon ? rng_log_enabled() ? (rng_log_set_caller($c.lit("attrib.c"), 388, $c.lit("poisoned")), rnd(6)) : rnd(6) : (rng_log_enabled() ? (rng_log_set_caller($c.lit("attrib.c"), 388, $c.lit("poisoned")), rn2(10)) : rn2(10)) + 6 | 0;
+        loss = thrown_weapon ? rnd(6) : rn2(10) + 6 | 0;
         if ((blast || cloud) && ($G.ublindf && $G.ublindf.otyp === 234 /* TOWEL */ && $G.ublindf.spe > 0)) {
             loss = $c.div32(loss + 1 | 0, 2);
         }
         await losehp(loss, pkiller, $c.i8(kprefix));
     } else {
-        loss = thrown_weapon || !fatal ? 1 : rng_log_enabled() ? (rng_log_set_caller($c.lit("attrib.c"), 395, $c.lit("poisoned")), d(2, 2)) : d(2, 2);
+        loss = thrown_weapon || !fatal ? 1 : d(2, 2);
         if (await adjattrib(typ, -loss | 0, 1)) {
             await poisontell(typ, 1);
         }
@@ -304,7 +304,7 @@ export async function exercise(i, inc_or_dec) {   // attrib.c:489
         return;
     }
     if ($c.abs(u.aexe.a[i]) < 50) {
-        $t1 = inc_or_dec ? (rng_log_enabled() ? (rng_log_set_caller($c.lit("attrib.c"), 509, $c.lit("exercise")), rn2(19)) : rn2(19)) > acurr(i) ? 1 : 0 : -(rng_log_enabled() ? (rng_log_set_caller($c.lit("attrib.c"), 509, $c.lit("exercise")), rn2(2)) : rn2(2)) | 0, u.aexe.a[i] = $c.i8(u.aexe.a[i] + $t1 | 0);
+        $t1 = inc_or_dec ? rn2(19) > acurr(i) ? 1 : 0 : -rn2(2) | 0, u.aexe.a[i] = $c.i8(u.aexe.a[i] + $t1 | 0);
         do {
             if (debugcore($c.lit("attrib.c"), 1)) {
                 save_plnmsg$2 = iflags.last_msg;
@@ -440,7 +440,7 @@ export async function exerchk() {   // attrib.c:598
                         iflags.last_msg = save_plnmsg$3;
                     }
                 } while (0);
-                if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("attrib.c"), 655, $c.lit("exerchk")), rn2(50)) : rn2(50)) > (i !== 2 /* A_WIS */ ? $c.div32(Math.imul($c.abs(ax), 2), 3) : $c.abs(ax))) {
+                if (rn2(50) > (i !== 2 /* A_WIS */ ? $c.div32(Math.imul($c.abs(ax), 2), 3) : $c.abs(ax))) {
                     break nextattrib$;
                 }
                 do {
@@ -464,7 +464,7 @@ export async function exerchk() {   // attrib.c:598
             }
             $t2 = $c.i8(Math.imul($c.div32($c.abs(ax), 2), mod_val)), u.aexe.a[i] = $t2;
         }
-        $t3 = (rng_log_enabled() ? (rng_log_set_caller($c.lit("attrib.c"), 673, $c.lit("exerchk")), rn2(200)) : rn2(200)) + 800 | 0, svc.context.next_attrib_check = $c.add64(svc.context.next_attrib_check, $t3);
+        $t3 = rn2(200) + 800 | 0, svc.context.next_attrib_check = $c.add64(svc.context.next_attrib_check, $t3);
         do {
             if (debugcore($c.lit("attrib.c"), 1)) {
                 save_plnmsg$6 = iflags.last_msg;
@@ -476,7 +476,7 @@ export async function exerchk() {   // attrib.c:598
 }
 function rnd_attr() {   // attrib.c:682
     let i = 0, x = 0;
-    x = rng_log_enabled() ? (rng_log_set_caller($c.lit("attrib.c"), 684, $c.lit("rnd_attr")), rn2(100)) : rn2(100);
+    x = rn2(100);
     for (i = 0; i < 6 /* A_MAX */; i = i + 1 | 0) {
         if ((x = x - gu.urole.attrdist[i] | 0) < 0) {
             break;
@@ -518,7 +518,7 @@ export function redist_attr() {   // attrib.c:740
             continue;
         }
         tmp = u.amax.a[i];
-        $t1 = (rng_log_enabled() ? (rng_log_set_caller($c.lit("attrib.c"), 749, $c.lit("redist_attr")), rn2(5)) : rn2(5)) - 2 | 0, u.amax.a[i] = $c.i8(u.amax.a[i] + $t1 | 0);
+        $t1 = rn2(5) - 2 | 0, u.amax.a[i] = $c.i8(u.amax.a[i] + $t1 | 0);
         if (u.amax.a[i] > (i === 0 /* A_STR */ && u.umonnum !== u.umonster ? uasmon_maxStr() : gu.urace.attrmax[i])) {
             $t2 = $c.i8(i === 0 /* A_STR */ && u.umonnum !== u.umonster ? uasmon_maxStr() : gu.urace.attrmax[i]), u.amax.a[i] = $t2;
         }
@@ -534,8 +534,8 @@ export function redist_attr() {   // attrib.c:740
 export async function vary_init_attr() {   // attrib.c:764
     let i = 0, xd = 0;
     for (i = 0; i < 6 /* A_MAX */; i = i + 1 | 0) {
-        if (!(rng_log_enabled() ? (rng_log_set_caller($c.lit("attrib.c"), 769, $c.lit("vary_init_attr")), rn2(20)) : rn2(20))) {
-            xd = (rng_log_enabled() ? (rng_log_set_caller($c.lit("attrib.c"), 770, $c.lit("vary_init_attr")), rn2(7)) : rn2(7)) - 2 | 0;
+        if (!rn2(20)) {
+            xd = rn2(7) - 2 | 0;
             await adjattrib(i, xd, 1);
             if (u.acurr.a[i] < u.amax.a[i]) {
                 u.amax.a[i] = u.acurr.a[i];
@@ -780,10 +780,10 @@ export function newhp() {   // attrib.c:1080
     if (u.ulevel === 0) {
         hp = gu.urole.hpadv.infix + gu.urace.hpadv.infix | 0;
         if (gu.urole.hpadv.inrnd > 0) {
-            hp = hp + (rng_log_enabled() ? (rng_log_set_caller($c.lit("attrib.c"), 1088, $c.lit("newhp")), rnd(gu.urole.hpadv.inrnd)) : rnd(gu.urole.hpadv.inrnd)) | 0;
+            hp = hp + rnd(gu.urole.hpadv.inrnd) | 0;
         }
         if (gu.urace.hpadv.inrnd > 0) {
-            hp = hp + (rng_log_enabled() ? (rng_log_set_caller($c.lit("attrib.c"), 1090, $c.lit("newhp")), rnd(gu.urace.hpadv.inrnd)) : rnd(gu.urace.hpadv.inrnd)) | 0;
+            hp = hp + rnd(gu.urace.hpadv.inrnd) | 0;
         }
         if (svm.moves === 0) {
             u.ualign.type = aligns[flags.initalign].value;
@@ -793,18 +793,18 @@ export function newhp() {   // attrib.c:1080
         if (u.ulevel < gu.urole.xlev) {
             hp = gu.urole.hpadv.lofix + gu.urace.hpadv.lofix | 0;
             if (gu.urole.hpadv.lornd > 0) {
-                hp = hp + (rng_log_enabled() ? (rng_log_set_caller($c.lit("attrib.c"), 1101, $c.lit("newhp")), rnd(gu.urole.hpadv.lornd)) : rnd(gu.urole.hpadv.lornd)) | 0;
+                hp = hp + rnd(gu.urole.hpadv.lornd) | 0;
             }
             if (gu.urace.hpadv.lornd > 0) {
-                hp = hp + (rng_log_enabled() ? (rng_log_set_caller($c.lit("attrib.c"), 1103, $c.lit("newhp")), rnd(gu.urace.hpadv.lornd)) : rnd(gu.urace.hpadv.lornd)) | 0;
+                hp = hp + rnd(gu.urace.hpadv.lornd) | 0;
             }
         } else {
             hp = gu.urole.hpadv.hifix + gu.urace.hpadv.hifix | 0;
             if (gu.urole.hpadv.hirnd > 0) {
-                hp = hp + (rng_log_enabled() ? (rng_log_set_caller($c.lit("attrib.c"), 1107, $c.lit("newhp")), rnd(gu.urole.hpadv.hirnd)) : rnd(gu.urole.hpadv.hirnd)) | 0;
+                hp = hp + rnd(gu.urole.hpadv.hirnd) | 0;
             }
             if (gu.urace.hpadv.hirnd > 0) {
-                hp = hp + (rng_log_enabled() ? (rng_log_set_caller($c.lit("attrib.c"), 1109, $c.lit("newhp")), rnd(gu.urace.hpadv.hirnd)) : rnd(gu.urace.hpadv.hirnd)) | 0;
+                hp = hp + rnd(gu.urace.hpadv.hirnd) | 0;
             }
         }
         if (acurr(4 /* A_CON */) <= 3) {
@@ -978,8 +978,8 @@ export async function uchangealign(newalign, reason) {   // attrib.c:1320
         if (reason === 1 /* A_CG_HELM_ON */) {
             adjalign(-7);
             await Your($c.lit("mind oscillates %s."), u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic) ? $c.lit("wildly") : $c.lit("briefly"));
-            await make_confused((rng_log_enabled() ? (rng_log_set_caller($c.lit("attrib.c"), 1346, $c.lit("uchangealign")), rn2(2)) : rn2(2)) + 3 | 0, 0);
-            if ((svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level) || (rng_log_enabled() ? (rng_log_set_caller($c.lit("attrib.c"), 1347, $c.lit("uchangealign")), rn2(50)) : rn2(50)) >>> 0 < u.ualign.abuse) {
+            await make_confused(rn2(2) + 3 | 0, 0);
+            if ((svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level) || rn2(50) >>> 0 < u.ualign.abuse) {
                 await summon_furies((svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level) ? 0 : 1);
             }
             await livelog_printf(512, $c.lit("used a helm to turn %s"), aligns[1 - newalign | 0].adj);

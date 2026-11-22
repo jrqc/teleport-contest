@@ -17,7 +17,7 @@ import { num_genocides, sokoban_in_play } from './insight.js';
 import { set_corpsenm } from './mkobj.js';
 import { an } from './objnam.js';
 import { impossible, raw_printf } from './pline.js';
-import { rn2, rnd, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { rn2, rnd } from './rnd.js';
 import { aligns, genders, roles, str2race, str2role } from './role.js';
 import { free_dungeons } from './save.js';
 import { Strlen_ } from './strutil.js';
@@ -927,7 +927,7 @@ export async function get_rnd_toptenentry() {   // topten.c:1381
         return null;
     }
     tt = get_rnd_toptenentry$tt_buf;
-    rank = rng_log_enabled() ? (rng_log_set_caller($c.lit("topten.c"), 1395, $c.lit("get_rnd_toptenentry")), rnd(sysopt.tt_oname_maxrank)) : rnd(sysopt.tt_oname_maxrank);
+    rank = rnd(sysopt.tt_oname_maxrank);
     pickentry$: for (;;) {
         for (i = rank; i; i = i - 1 | 0) {
             await readentry(rfile, tt);
@@ -968,9 +968,9 @@ export async function tt_oname(otmp) {   // topten.c:1422
 }
 export async function tt_doppel(mon) {   // topten.c:1445
     let tt = null, ret = 0;
-    tt = (rng_log_enabled() ? (rng_log_set_caller($c.lit("topten.c"), 1446, $c.lit("tt_doppel")), rn2(13)) : rn2(13)) ? await get_rnd_toptenentry() : null;
+    tt = rn2(13) ? await get_rnd_toptenentry() : null;
     if (!tt) {
-        ret = (rng_log_enabled() ? (rng_log_set_caller($c.lit("topten.c"), 1450, $c.lit("tt_doppel")), rn2(13)) : rn2(13)) + 331 | 0;
+        ret = rn2(13) + 331 | 0;
     } else {
         if (tt.plgend[0] === 70) {
             mon.female = (1) & 1;

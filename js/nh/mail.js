@@ -18,7 +18,7 @@ import { accessible } from './monmove.js';
 import { mons } from './monst.js';
 import { nh_getenv } from './options.js';
 import { pline, verbalize } from './pline.js';
-import { rn2, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { rn2 } from './rnd.js';
 import { Hello } from './role.js';
 import { place_monster } from './steed.js';
 import { enexto } from './teleport.js';
@@ -125,7 +125,7 @@ async function md_stop(stopp, startp) {   // mail.c:248
             }
             if (accessible(x, y) && !(svl.level.monsters[x][y] !== null)) {
                 distance = $c.i16(dist2(x, y, startp.x, startp.y));
-                if (min_distance < 0 || distance < min_distance || distance === min_distance && (rng_log_enabled() ? (rng_log_set_caller($c.lit("mail.c"), 261, $c.lit("md_stop")), rn2(2)) : rn2(2))) {
+                if (min_distance < 0 || distance < min_distance || distance === min_distance && rn2(2)) {
                     stopp.x = x;
                     stopp.y = y;
                     min_distance = distance;
@@ -173,7 +173,7 @@ async function md_rush(md, tx, ty) {   // mail.c:288
         mon = svl.level.monsters[fx][fy];
         if (!(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf)) {
             if (mon) {
-                await verbalize($c.lit("%s"), mail_text[rng_log_enabled() ? (rng_log_set_caller($c.lit("mail.c"), 340, $c.lit("md_rush")), rn2(3)) : rn2(3)]);
+                await verbalize($c.lit("%s"), mail_text[rn2(3)]);
             } else if (fx === u.ux && fy === u.uy) {
                 await verbalize($c.lit("Excuse me."));
             }

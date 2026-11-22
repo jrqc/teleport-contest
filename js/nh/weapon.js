@@ -26,7 +26,7 @@ import { obj_descr, objects } from './objects.js';
 import { The, Tobjnam, Yname2, Yobjnam2, distant_name, doname, makeplural, makesingular, otense, the, vtense, xname } from './objnam.js';
 import { You, You_feel, Your, impossible, pline, pline_mon } from './pline.js';
 import { mbodypart } from './polyself.js';
-import { d, rn2, rnd, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { d, rn2, rnd } from './rnd.js';
 import { genders } from './role.js';
 import { skill_based_spellbook_id, spell_skilltype } from './spell.js';
 import { Strlen_ } from './strutil.js';
@@ -128,7 +128,7 @@ export async function dmgval(otmp, mon) {   // weapon.c:216
     }
     if (ptr.msize >= 3) {
         if (objects[otyp].oc_wldam) {
-            tmp = rng_log_enabled() ? (rng_log_set_caller($c.lit("weapon.c"), 227, $c.lit("dmgval")), rnd(objects[otyp].oc_wldam)) : rnd(objects[otyp].oc_wldam);
+            tmp = rnd(objects[otyp].oc_wldam);
         }
         switch (otyp) {
             case 478 /* IRON_CHAIN */:
@@ -143,27 +143,27 @@ export async function dmgval(otmp, mon) {   // weapon.c:216
             case 81 /* FLAIL */:
             case 60 /* RANSEUR */:
             case 65 /* VOULGE */:
-                tmp = tmp + (rng_log_enabled() ? (rng_log_set_caller($c.lit("weapon.c"), 242, $c.lit("dmgval")), rnd(4)) : rnd(4)) | 0;
+                tmp = tmp + rnd(4) | 0;
                 break;
             case 480 /* ACID_VENOM */:
             case 63 /* HALBERD */:
             case 61 /* SPETUM */:
-                tmp = tmp + (rng_log_enabled() ? (rng_log_set_caller($c.lit("weapon.c"), 248, $c.lit("dmgval")), rnd(6)) : rnd(6)) | 0;
+                tmp = tmp + rnd(6) | 0;
                 break;
             case 45 /* BATTLE_AXE */:
             case 64 /* BARDICHE */:
             case 33 /* TRIDENT */:
-                tmp = tmp + (rng_log_enabled() ? (rng_log_set_caller($c.lit("weapon.c"), 254, $c.lit("dmgval")), d(2, 4)) : d(2, 4)) | 0;
+                tmp = tmp + d(2, 4) | 0;
                 break;
             case 57 /* TSURUGI */:
             case 71 /* DWARVISH_MATTOCK */:
             case 55 /* TWO_HANDED_SWORD */:
-                tmp = tmp + (rng_log_enabled() ? (rng_log_set_caller($c.lit("weapon.c"), 260, $c.lit("dmgval")), d(2, 6)) : d(2, 6)) | 0;
+                tmp = tmp + d(2, 6) | 0;
                 break;
         }
     } else {
         if (objects[otyp].oc_wsdam) {
-            tmp = rng_log_enabled() ? (rng_log_set_caller($c.lit("weapon.c"), 265, $c.lit("dmgval")), rnd(objects[otyp].oc_wsdam)) : rnd(objects[otyp].oc_wsdam);
+            tmp = rnd(objects[otyp].oc_wsdam);
         }
         switch (otyp) {
             case 478 /* IRON_CHAIN */:
@@ -187,10 +187,10 @@ export async function dmgval(otmp, mon) {   // weapon.c:216
             case 53 /* ELVEN_BROADSWORD */:
             case 58 /* RUNESWORD */:
             case 65 /* VOULGE */:
-                tmp = tmp + (rng_log_enabled() ? (rng_log_set_caller($c.lit("weapon.c"), 289, $c.lit("dmgval")), rnd(4)) : rnd(4)) | 0;
+                tmp = tmp + rnd(4) | 0;
                 break;
             case 480 /* ACID_VENOM */:
-                tmp = tmp + (rng_log_enabled() ? (rng_log_set_caller($c.lit("weapon.c"), 293, $c.lit("dmgval")), rnd(6)) : rnd(6)) | 0;
+                tmp = tmp + rnd(6) | 0;
                 break;
         }
     }
@@ -210,7 +210,7 @@ export async function dmgval(otmp, mon) {   // weapon.c:216
         wt = objects[477 /* HEAVY_IRON_BALL */].oc_weight | 0;
         if ((otmp.owt | 0) > wt) {
             wt = $c.div32((otmp.owt | 0) - wt | 0, 160 /* WT_IRON_BALL_INCR */);
-            tmp = tmp + (rng_log_enabled() ? (rng_log_set_caller($c.lit("weapon.c"), 316, $c.lit("dmgval")), rnd(Math.imul(4, wt))) : rnd(Math.imul(4, wt))) | 0;
+            tmp = tmp + rnd(Math.imul(4, wt)) | 0;
             if (tmp > 25) {
                 tmp = 25;
             }
@@ -219,16 +219,16 @@ export async function dmgval(otmp, mon) {   // weapon.c:216
     if (Is_weapon || otmp.oclass === 13 /* GEM_CLASS */ || otmp.oclass === 15 /* BALL_CLASS */ || otmp.oclass === 16 /* CHAIN_CLASS */) {
         bonus = 0;
         if (otmp.blessed | 0 && mon_hates_blessings(mon)) {
-            bonus = bonus + (rng_log_enabled() ? (rng_log_set_caller($c.lit("weapon.c"), 328, $c.lit("dmgval")), rnd(4)) : rnd(4)) | 0;
+            bonus = bonus + rnd(4) | 0;
         }
         if ((otmp.oclass === 2 /* WEAPON_CLASS */ || otmp.oclass === 6 /* TOOL_CLASS */) && objects[otmp.otyp].oc_subtyp === 3 /* P_AXE */ && $c.peq(ptr, $c.relem(mons, 254 /* PM_WOOD_GOLEM */))) {
-            bonus = bonus + (rng_log_enabled() ? (rng_log_set_caller($c.lit("weapon.c"), 330, $c.lit("dmgval")), rnd(4)) : rnd(4)) | 0;
+            bonus = bonus + rnd(4) | 0;
         }
         if ((objects[otyp].oc_material | 0) === 14 /* SILVER */ && mon_hates_silver(mon)) {
-            bonus = bonus + (rng_log_enabled() ? (rng_log_set_caller($c.lit("weapon.c"), 332, $c.lit("dmgval")), rnd(20)) : rnd(20)) | 0;
+            bonus = bonus + rnd(20) | 0;
         }
         if (artifact_light(otmp) && otmp.lamplit | 0 && $c.peq(ptr, $c.relem(mons, 40 /* PM_GREMLIN */))) {
-            bonus = bonus + (rng_log_enabled() ? (rng_log_set_caller($c.lit("weapon.c"), 334, $c.lit("dmgval")), rnd(8)) : rnd(8)) | 0;
+            bonus = bonus + rnd(8) | 0;
         }
         if (bonus > 1 && otmp.oartifact && await spec_dbon(otmp, mon, 25) >= 25) {
             bonus = $c.div32(bonus + 1 | 0, 2);
@@ -267,23 +267,23 @@ export async function special_dmgval(magr, mdef, armask, silverhit_p) {   // wea
     }
     if (obj) {
         if (obj.blessed | 0 && mon_hates_blessings(mdef)) {
-            bonus = bonus + (rng_log_enabled() ? (rng_log_set_caller($c.lit("weapon.c"), 396, $c.lit("special_dmgval")), rnd(4)) : rnd(4)) | 0;
+            bonus = bonus + rnd(4) | 0;
         }
         if ((objects[obj.otyp].oc_material | 0) === 14 /* SILVER */ && mon_hates_silver(mdef)) {
-            bonus = bonus + (rng_log_enabled() ? (rng_log_set_caller($c.lit("weapon.c"), 403, $c.lit("special_dmgval")), rnd(20)) : rnd(20)) | 0;
+            bonus = bonus + rnd(20) | 0;
             silverhit = $c.or64(silverhit, armask);
         }
     } else if ((left_ring || right_ring) && $c.peq(magr, gy.youmonst)) {
         if (left_ring && $G.uleft) {
             if ((objects[$G.uleft.otyp].oc_material | 0) === 14 /* SILVER */ && mon_hates_silver(mdef)) {
-                bonus = bonus + (rng_log_enabled() ? (rng_log_set_caller($c.lit("weapon.c"), 412, $c.lit("special_dmgval")), rnd(20)) : rnd(20)) | 0;
+                bonus = bonus + rnd(20) | 0;
                 silverhit = $c.or64(silverhit, 131072);
             }
         }
         if (right_ring && $G.uright) {
             if ((objects[$G.uright.otyp].oc_material | 0) === 14 /* SILVER */ && mon_hates_silver(mdef)) {
                 if (!$c.and64(silverhit, 131072)) {
-                    bonus = bonus + (rng_log_enabled() ? (rng_log_set_caller($c.lit("weapon.c"), 422, $c.lit("special_dmgval")), rnd(20)) : rnd(20)) | 0;
+                    bonus = bonus + rnd(20) | 0;
                 }
                 silverhit = $c.or64(silverhit, 262144);
             }
@@ -971,7 +971,7 @@ export async function drain_weapon_skill(n) {   // weapon.c:1476
     $c.__builtin___memset_chk(new $c.Ptr(tmpskills, 0), 0, 152, 152);
     while ((n = n - 1 | 0) >= 0) {
         if (u.skills_advanced) {
-            i = rng_log_enabled() ? (rng_log_set_caller($c.lit("weapon.c"), 1489, $c.lit("drain_weapon_skill")), rn2(u.skills_advanced)) : rn2(u.skills_advanced);
+            i = rn2(u.skills_advanced);
             skill = u.skill_record[i];
             tmpskills[skill] = 1;
             for (; i < (u.skills_advanced - 1 | 0); i = i + 1 | 0) {
@@ -986,7 +986,7 @@ export async function drain_weapon_skill(n) {   // weapon.c:1476
             curradv = Math.imul(Math.imul(u.weapon_skills[skill].skill, u.weapon_skills[skill].skill), 20);
             prevadv = Math.imul(Math.imul(u.weapon_skills[skill].skill - 1 | 0, u.weapon_skills[skill].skill - 1 | 0), 20);
             if (u.weapon_skills[skill].advance >= curradv) {
-                $t2 = $c.u16(prevadv + (rng_log_enabled() ? (rng_log_set_caller($c.lit("weapon.c"), 1505, $c.lit("drain_weapon_skill")), rn2(curradv - prevadv | 0)) : rn2(curradv - prevadv | 0)) | 0), u.weapon_skills[skill].advance = $t2;
+                $t2 = $c.u16(prevadv + rn2(curradv - prevadv | 0) | 0), u.weapon_skills[skill].advance = $t2;
             }
         }
     }

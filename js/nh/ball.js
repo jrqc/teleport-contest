@@ -20,7 +20,7 @@ import { Yname2, otense, safe_typename, xname, yname } from './objnam.js';
 import { encumber_msg } from './pickup.js';
 import { You, You_feel, Your, impossible, pline, pline_The } from './pline.js';
 import { body_part } from './polyself.js';
-import { rn2, rnd, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { rn2, rnd } from './rnd.js';
 import { deltrap, fill_pit, reset_utrap, t_at } from './trap.js';
 import { hmon } from './uhitm.js';
 import { setuqwep, setuswapwep, setuwep, welded } from './wield.js';
@@ -52,10 +52,10 @@ export async function ballfall() {   // ball.c:43
     if (!$G.uball || $G.uball && $G.uball.where === 3 && await welded($G.uball)) {
         return;
     }
-    gets_hit = $c.i8(($G.uball.ox !== u.ux || $G.uball.oy !== u.uy) && ($c.peq($G.uwep, $G.uball) ? 0 : $c.i8(rng_log_enabled() ? (rng_log_set_caller($c.lit("ball.c"), 51, $c.lit("ballfall")), rn2(5)) : rn2(5))) ? 1 : 0);
+    gets_hit = $c.i8(($G.uball.ox !== u.ux || $G.uball.oy !== u.uy) && ($c.peq($G.uwep, $G.uball) ? 0 : $c.i8(rn2(5))) ? 1 : 0);
     await ballrelease(1);
     if (gets_hit) {
-        dmg = (rng_log_enabled() ? (rng_log_set_caller($c.lit("ball.c"), 54, $c.lit("ballfall")), rn2(7)) : rn2(7)) + 25 | 0;
+        dmg = rn2(7) + 25 | 0;
         await pline_The($c.lit("iron ball falls on your %s."), await body_part(8 /* HEAD */));
         if ($G.uarmh) {
             if (hard_helmet($G.uarmh)) {
@@ -146,7 +146,7 @@ export async function unplacebc_and_covet_placebc() {   // ball.c:222
     if (bcrestriction) {
         await impossible($c.lit("unplacebc_and_covet_placebc denied, already restricted"));
     } else {
-        restriction = bcrestriction = rng_log_enabled() ? (rng_log_set_caller($c.lit("ball.c"), 229, $c.lit("unplacebc_and_covet_placebc")), rnd(400)) : rnd(400);
+        restriction = bcrestriction = rnd(400);
         await unplacebc_core();
     }
     return restriction;
@@ -399,7 +399,7 @@ export async function drag_ball(x, y, bc_control, ballx, bally, chainx, chainy, 
                                 await move_bc(0, bc_control.get(0), ballx.get(0), bally.get(0), chainx.get(0), chainy.get(0));
                                 break drag$;
                             } while (0);
-                        } else if (dist2(tempx, tempy, $G.uchain.ox, $G.uchain.oy) < dist2(tempx2, tempy2, $G.uchain.ox, $G.uchain.oy) || dist2(tempx, tempy, $G.uchain.ox, $G.uchain.oy) === dist2(tempx2, tempy2, $G.uchain.ox, $G.uchain.oy) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("ball.c"), 706, $c.lit("drag_ball")), rn2(2)) : rn2(2))) {
+                        } else if (dist2(tempx, tempy, $G.uchain.ox, $G.uchain.oy) < dist2(tempx2, tempy2, $G.uchain.ox, $G.uchain.oy) || dist2(tempx, tempy, $G.uchain.ox, $G.uchain.oy) === dist2(tempx2, tempy2, $G.uchain.ox, $G.uchain.oy) && rn2(2)) {
                             chainx.set(0, tempx);
                             chainy.set(0, tempy);
                         } else {
@@ -474,7 +474,7 @@ export async function drag_ball(x, y, bc_control, ballx, bally, chainx, chainy, 
         } else {
             await You($c.lit("are jerked back by the iron ball!"));
             if ((victim = svl.level.monsters[$G.uchain.ox][$G.uchain.oy]) !== null) {
-                dieroll = rng_log_enabled() ? (rng_log_set_caller($c.lit("ball.c"), 800, $c.lit("drag_ball")), rnd(20)) : rnd(20);
+                dieroll = rnd(20);
                 tmp = (-2 + (u.uluck + u.moreluck | 0) | 0) + find_mac(victim) | 0;
                 tmp = tmp + await omon_adj(victim, $G.uball, 1) | 0;
                 if (tmp >= dieroll) {
@@ -543,9 +543,9 @@ export async function drop_ball(x, y) {   // ball.c:882
                     await pline($c.lit("%s%s!"), new $c.Ptr(drop_ball$pullmsg, 0), hliquid($c.lit("lava")));
                     break;
                 case 1:
-                    side = (rng_log_enabled() ? (rng_log_set_caller($c.lit("ball.c"), 912, $c.lit("drop_ball")), rn2(3)) : rn2(3)) ? 131072 : 262144;
+                    side = rn2(3) ? 131072 : 262144;
                     await pline($c.lit("%s%s!"), new $c.Ptr(drop_ball$pullmsg, 0), $c.lit("bear trap"));
-                    await set_wounded_legs(side, (rng_log_enabled() ? (rng_log_set_caller($c.lit("ball.c"), 914, $c.lit("drop_ball")), rn2(1000)) : rn2(1000)) + 500 | 0);
+                    await set_wounded_legs(side, rn2(1000) + 500 | 0);
                     if (!u.usteed) {
                         await Your($c.lit("%s %s is severely damaged."), side === 131072 ? $c.lit("left") : $c.lit("right"), await body_part(9 /* LEG */));
                         await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? 1 : 2, $c.lit("leg damage from being pulled out of a bear trap"), 1);
@@ -588,7 +588,7 @@ async function litter() {   // ball.c:965
     capacity = weight_cap();
     for (otmp = gi.invent; otmp; otmp = nextobj) {
         nextobj = otmp.nobj;
-        if (!$c.peq(otmp, $G.uball) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("ball.c"), 972, $c.lit("litter")), rnd(capacity)) : rnd(capacity)) <= (otmp.owt | 0)) {
+        if (!$c.peq(otmp, $G.uball) && rnd(capacity) <= (otmp.owt | 0)) {
             if (await canletgo(otmp, $c.lit(""))) {
                 await You($c.lit("drop %s and %s %s down the stairs with you."), await yname(otmp), otmp.quan === 1 ? $c.lit("it") : $c.lit("they"), await otense(otmp, $c.lit("fall")));
                 await setnotworn(otmp);
@@ -601,27 +601,27 @@ async function litter() {   // ball.c:965
 export async function drag_down() {   // ball.c:986
     let forward = 0, dragchance = 0;
     dragchance = 3;
-    forward = $c.i8($G.uball.where === 3 && ($c.peq($G.uwep, $G.uball) || !$G.uwep || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("ball.c"), 999, $c.lit("drag_down")), rn2(3)) : rn2(3))) ? 1 : 0);
+    forward = $c.i8($G.uball.where === 3 && ($c.peq($G.uwep, $G.uball) || !$G.uwep || !rn2(3)) ? 1 : 0);
     if ($G.uball.where === 3 && !await welded($G.uball)) {
         await You($c.lit("lose your grip on the iron ball."));
     }
     await cls();
     if (forward) {
-        if (rng_log_enabled() ? (rng_log_set_caller($c.lit("ball.c"), 1008, $c.lit("drag_down")), rn2(6)) : rn2(6)) {
+        if (rn2(6)) {
             await pline_The($c.lit("iron ball drags you downstairs!"));
-            await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32((rng_log_enabled() ? (rng_log_set_caller($c.lit("ball.c"), 1010, $c.lit("drag_down")), rnd(6)) : rnd(6)) + 1 | 0, 2) : rng_log_enabled() ? (rng_log_set_caller($c.lit("ball.c"), 1010, $c.lit("drag_down")), rnd(6)) : rnd(6), $c.lit("dragged downstairs by an iron ball"), 2);
+            await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(rnd(6) + 1 | 0, 2) : rnd(6), $c.lit("dragged downstairs by an iron ball"), 2);
             await litter();
         }
     } else {
-        if (rng_log_enabled() ? (rng_log_set_caller($c.lit("ball.c"), 1015, $c.lit("drag_down")), rn2(2)) : rn2(2)) {
+        if (rn2(2)) {
             await pline_The($c.lit("iron ball smacks into you!"));
-            await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32((rng_log_enabled() ? (rng_log_set_caller($c.lit("ball.c"), 1018, $c.lit("drag_down")), rnd(20)) : rnd(20)) + 1 | 0, 2) : rng_log_enabled() ? (rng_log_set_caller($c.lit("ball.c"), 1018, $c.lit("drag_down")), rnd(20)) : rnd(20), $c.lit("iron ball collision"), 0);
+            await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(rnd(20) + 1 | 0, 2) : rnd(20), $c.lit("iron ball collision"), 0);
             await exercise(0 /* A_STR */, 0);
             dragchance = $c.u8(dragchance - 2 | 0);
         }
-        if (dragchance >= (rng_log_enabled() ? (rng_log_set_caller($c.lit("ball.c"), 1023, $c.lit("drag_down")), rnd(6)) : rnd(6))) {
+        if (dragchance >= rnd(6)) {
             await pline_The($c.lit("iron ball drags you downstairs!"));
-            await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32((rng_log_enabled() ? (rng_log_set_caller($c.lit("ball.c"), 1025, $c.lit("drag_down")), rnd(3)) : rnd(3)) + 1 | 0, 2) : rng_log_enabled() ? (rng_log_set_caller($c.lit("ball.c"), 1025, $c.lit("drag_down")), rnd(3)) : rnd(3), $c.lit("dragged downstairs by an iron ball"), 2);
+            await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(rnd(3) + 1 | 0, 2) : rnd(3), $c.lit("dragged downstairs by an iron ball"), 2);
             await exercise(0 /* A_STR */, 0);
             await litter();
         }

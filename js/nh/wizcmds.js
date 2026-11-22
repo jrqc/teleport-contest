@@ -36,7 +36,7 @@ import { body_part, float_vs_flight, polyself } from './polyself.js';
 import { incr_itimeout, make_blinded, make_deaf, make_glib, make_hallucinated, make_sick, make_slimed, make_stoned, make_stunned, make_vomiting } from './potion.js';
 import { create_particular } from './read.js';
 import { region_stats } from './region.js';
-import { rn2, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { rn2 } from './rnd.js';
 import { genders } from './role.js';
 import { rumor_check } from './rumors.js';
 import { setpaid } from './shk.js';
@@ -810,7 +810,7 @@ export async function wiz_intrinsic() {   // wizcmds.c:949
                         await make_hallucinated(newtimeout, 1, 0);
                         break;
                     case 17 /* SICK */:
-                        typ = !(rng_log_enabled() ? (rng_log_set_caller($c.lit("wizcmds.c"), 1036, $c.lit("wiz_intrinsic")), rn2(2)) : rn2(2)) ? 1 : 2;
+                        typ = !rn2(2) ? 1 : 2;
                         await make_sick(newtimeout, new $c.Ptr(wiz_intrinsic$wizintrinsic, 0), 1, typ);
                         break;
                     case 22 /* SLIMED */:

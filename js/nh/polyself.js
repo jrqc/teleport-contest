@@ -36,7 +36,7 @@ import { encumber_msg } from './pickup.js';
 import { There, You, You_cant, You_feel, Your, impossible, livelog_printf, pline, pline_The, urgent_pline } from './pline.js';
 import { make_blinded, make_glib, make_sick, make_slimed, make_stoned, set_itimeout } from './potion.js';
 import { unpunish } from './read.js';
-import { d, rn2, rnd, rng_log_enabled, rng_log_set_caller, rnl } from './rnd.js';
+import { d, rn2, rnd, rnl } from './rnd.js';
 import { character_race, genders } from './role.js';
 import { add_damage } from './shk.js';
 import { On_stairs } from './stairs.js';
@@ -373,7 +373,7 @@ async function polyman(fmt, arg) {   // polyself.c:200
         await untwoweapon();
     }
     if (u.utrap && u.utraptype === 2) {
-        set_utrap(((rng_log_enabled() ? (rng_log_set_caller($c.lit("polyself.c"), 256, $c.lit("polyman")), rn2(6)) : rn2(6)) + 2 | 0) >>> 0, 2);
+        set_utrap((rn2(6) + 2 | 0) >>> 0, 2);
     }
     if (was_blind && !((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
         set_itimeout(new $c.FieldRef(u.uprops[15 /* BLINDED */], "intrinsic", "i64"), 1);
@@ -424,7 +424,7 @@ async function newman() {   // polyself.c:336
         switch ($goto) {
         case null:
             oldlvl = u.ulevel;
-            newlvl = oldlvl + ((rng_log_enabled() ? (rng_log_set_caller($c.lit("polyself.c"), 342, $c.lit("newman")), rn2(5)) : rn2(5)) + -2 | 0) | 0;
+            newlvl = oldlvl + (rn2(5) + -2 | 0) | 0;
             if (newlvl > 127 || newlvl < 1) {
                 $goto = "dead"; continue D1;
             }
@@ -439,7 +439,7 @@ async function newman() {   // polyself.c:336
             }
             u.ulevel = newlvl;
             oldgend = poly_gender();
-            if (gs.sex_change_ok && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("polyself.c"), 361, $c.lit("newman")), rn2(10)) : rn2(10))) {
+            if (gs.sex_change_ok && !rn2(10)) {
                 await change_sex();
             }
             await adjabil(oldlvl, u.ulevel);
@@ -449,7 +449,7 @@ async function newman() {   // polyself.c:336
             for (i = 0; i < oldlvl; i = i + 1 | 0) {
                 hpmax = hpmax - u.uhpinc[i] | 0;
             }
-            hpmax = await rounddiv($c.mul64(hpmax, (rng_log_enabled() ? (rng_log_set_caller($c.lit("polyself.c"), 390, $c.lit("newman")), rn2(4)) : rn2(4)) + 8 | 0), 10);
+            hpmax = await rounddiv($c.mul64(hpmax, rn2(4) + 8 | 0), 10);
             for (i = 0; (u.ulevel = i) < newlvl; i = i + 1 | 0) {
                 hpmax = hpmax + newhp() | 0;
             }
@@ -462,7 +462,7 @@ async function newman() {   // polyself.c:336
             for (i = 0; i < oldlvl; i = i + 1 | 0) {
                 enmax = enmax - u.ueninc[i] | 0;
             }
-            enmax = await rounddiv($c.mul64(enmax, (rng_log_enabled() ? (rng_log_set_caller($c.lit("polyself.c"), 404, $c.lit("newman")), rn2(4)) : rn2(4)) + 8 | 0), 10);
+            enmax = await rounddiv($c.mul64(enmax, rn2(4) + 8 | 0), 10);
             for (i = 0; (u.ulevel = i) < newlvl; i = i + 1 | 0) {
                 enmax = enmax + newpw() | 0;
             }
@@ -471,7 +471,7 @@ async function newman() {   // polyself.c:336
             }
             $t3 = await rounddiv($c.mul64(u.uen, enmax), u.uenmax < 1 ? 1 : u.uenmax), u.uen = $t3;
             u.uenmax = enmax;
-            $t4 = (rng_log_enabled() ? (rng_log_set_caller($c.lit("polyself.c"), 414, $c.lit("newman")), rn2(500)) : rn2(500)) + 500 | 0, u.uhunger = $t4;
+            $t4 = rn2(500) + 500 | 0, u.uhunger = $t4;
             if (u.uprops[17 /* SICK */].intrinsic) {
                 await make_sick(0, null, 0, 3);
             }
@@ -538,9 +538,9 @@ export async function polyself(psflags) {   // polyself.c:469
                 return;
             }
             if (!(u.uprops[62 /* POLYMORPH_CONTROL */].intrinsic || u.uprops[62 /* POLYMORPH_CONTROL */].extrinsic) && !forcecontrol && !draconian && !iswere && !isvamp) {
-                if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("polyself.c"), 490, $c.lit("polyself")), rn2(20)) : rn2(20)) > acurr(4 /* A_CON */)) {
+                if (rn2(20) > acurr(4 /* A_CON */)) {
                     await You($c.lit("%s"), c_common_strings.c_shudder_for_moment);
-                    await losehp(rng_log_enabled() ? (rng_log_set_caller($c.lit("polyself.c"), 492, $c.lit("polyself")), rnd(30)) : rnd(30), $c.lit("system shock"), 0);
+                    await losehp(rnd(30), $c.lit("system shock"), 0);
                     await exercise(4 /* A_CON */, 0);
                     return;
                 }
@@ -591,11 +591,11 @@ export async function polyself(psflags) {   // polyself.c:469
                                 }
                             } else if (($c.peq($c.relem(mons, mntmp[0]), $c.relem(mons, 72 /* PM_ORC */)) || $c.peq($c.relem(mons, mntmp[0]), $c.relem(mons, 169 /* PM_GIANT */)) || $c.peq($c.relem(mons, mntmp[0]), $c.relem(mons, 264 /* PM_ELF */)) || $c.peq($c.relem(mons, mntmp[0]), $c.relem(mons, 260 /* PM_HUMAN */))) && !($c.andu64($c.relem(mons, mntmp[0]).mflags2, $c.u64(gu.urace.selfmask)) !== 0) && mntmp[0] !== 260 /* PM_HUMAN */) {
                                 if (mntmp[0] === 72 /* PM_ORC */) {
-                                    mntmp[0] = (rng_log_enabled() ? (rng_log_set_caller($c.lit("polyself.c"), 554, $c.lit("polyself")), rn2(3)) : rn2(3)) ? 73 /* PM_HILL_ORC */ : 74 /* PM_MORDOR_ORC */;
+                                    mntmp[0] = rn2(3) ? 73 /* PM_HILL_ORC */ : 74 /* PM_MORDOR_ORC */;
                                 } else if (mntmp[0] === 264 /* PM_ELF */) {
-                                    mntmp[0] = (rng_log_enabled() ? (rng_log_set_caller($c.lit("polyself.c"), 556, $c.lit("polyself")), rn2(3)) : rn2(3)) ? 266 /* PM_GREEN_ELF */ : 267 /* PM_GREY_ELF */;
+                                    mntmp[0] = rn2(3) ? 266 /* PM_GREEN_ELF */ : 267 /* PM_GREY_ELF */;
                                 } else if (mntmp[0] === 169 /* PM_GIANT */) {
-                                    mntmp[0] = (rng_log_enabled() ? (rng_log_set_caller($c.lit("polyself.c"), 558, $c.lit("polyself")), rn2(3)) : rn2(3)) ? 170 /* PM_STONE_GIANT */ : 171 /* PM_HILL_GIANT */;
+                                    mntmp[0] = rn2(3) ? 170 /* PM_STONE_GIANT */ : 171 /* PM_HILL_GIANT */;
                                 }
                             }
                             if (mntmp[0] < 0 /* LOW_PM */) {
@@ -612,7 +612,7 @@ export async function polyself(psflags) {   // polyself.c:469
                                 $goto = "do_shift"; continue D1;
                             } else if (!($c.andu64($c.relem(mons, mntmp[0]).mflags2, 1) === 0) && !(mntmp[0] === 260 /* PM_HUMAN */ || $c.andu64($c.relem(mons, mntmp[0]).mflags2, $c.u64(gu.urace.selfmask)) !== 0 && (mons[mntmp[0]].geno & 4096) === 0 || mntmp[0] === gu.urole.mnum)) {
                                 if (class_) {
-                                    if ((rng_log_enabled() ? (rng_log_set_caller($c.lit("polyself.c"), 601, $c.lit("polyself")), rn2(3)) : rn2(3)) || (tryct = tryct - 1 | 0) > 0) {
+                                    if (rn2(3) || (tryct = tryct - 1 | 0) > 0) {
                                         $goto = "by_class"; continue D2;
                                     }
                                     tryct = tryct + 1 | 0;
@@ -675,8 +675,8 @@ export async function polyself(psflags) {   // polyself.c:469
                 } else if ($goto === "do_vampyr" || isvamp) {
                     $goto = null;   // do_vampyr:
                     if (mntmp[0] < 0 /* LOW_PM */ || mons[mntmp[0]].geno & 4096) {
-                        mntmp[0] = $c.peq(gy.youmonst.data, $c.relem(mons, 227 /* PM_VAMPIRE_LEADER */)) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("polyself.c"), 674, $c.lit("polyself")), rn2(10)) : rn2(10)) ? 20 /* PM_WOLF */ : !(rng_log_enabled() ? (rng_log_set_caller($c.lit("polyself.c"), 675, $c.lit("polyself")), rn2(4)) : rn2(4)) ? 106 /* PM_FOG_CLOUD */ : 129 /* PM_VAMPIRE_BAT */;
-                        if (gy.youmonst.cham >= 0 /* LOW_PM */ && gy.youmonst.cham < 383 /* NUMMONS */ && !(gy.youmonst.data.mlet === 48 /* S_VAMPIRE */) && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("polyself.c"), 678, $c.lit("polyself")), rn2(2)) : rn2(2))) {
+                        mntmp[0] = $c.peq(gy.youmonst.data, $c.relem(mons, 227 /* PM_VAMPIRE_LEADER */)) && !rn2(10) ? 20 /* PM_WOLF */ : !rn2(4) ? 106 /* PM_FOG_CLOUD */ : 129 /* PM_VAMPIRE_BAT */;
+                        if (gy.youmonst.cham >= 0 /* LOW_PM */ && gy.youmonst.cham < 383 /* NUMMONS */ && !(gy.youmonst.data.mlet === 48 /* S_VAMPIRE */) && !rn2(2)) {
                             mntmp[0] = gy.youmonst.cham;
                         }
                     }
@@ -697,14 +697,14 @@ export async function polyself(psflags) {   // polyself.c:469
             if (mntmp[0] < 0 /* LOW_PM */) {
                 tryct = 200;
                 do {
-                    mntmp[0] = (rng_log_enabled() ? (rng_log_set_caller($c.lit("polyself.c"), 702, $c.lit("polyself")), rn2(330)) : rn2(330)) + 0 | 0;
+                    mntmp[0] = rn2(330) + 0 | 0;
                     if ($c.andu64($c.relem(mons, mntmp[0]).mflags2, 1) === 0 && !($c.peq($c.relem(mons, mntmp[0]), $c.relem(mons, 72 /* PM_ORC */)) || $c.peq($c.relem(mons, mntmp[0]), $c.relem(mons, 169 /* PM_GIANT */)) || $c.peq($c.relem(mons, mntmp[0]), $c.relem(mons, 264 /* PM_ELF */)) || $c.peq($c.relem(mons, mntmp[0]), $c.relem(mons, 260 /* PM_HUMAN */)))) {
                         break;
                     }
                 } while ((tryct = tryct - 1 | 0) > 0);
             }
             gs.sex_change_ok = gs.sex_change_ok + 1 | 0;
-            if (!($c.andu64($c.relem(mons, mntmp[0]).mflags2, 1) === 0) || !forcecontrol && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("polyself.c"), 712, $c.lit("polyself")), rn2(5)) : rn2(5)) || $c.andu64($c.relem(mons, mntmp[0]).mflags2, $c.u64(gu.urace.selfmask)) !== 0) {
+            if (!($c.andu64($c.relem(mons, mntmp[0]).mflags2, 1) === 0) || !forcecontrol && !rn2(5) || $c.andu64($c.relem(mons, mntmp[0]).mflags2, $c.u64(gu.urace.selfmask)) !== 0) {
                 await newman();
             } else {
                 await polymon(mntmp[0]);
@@ -770,7 +770,7 @@ export async function polymon(mntmp) {   // polyself.c:735
             dochange = 1;
         }
     } else if (!($c.andu64($c.relem(mons, mntmp).mflags2, 262144) !== 0) && mntmp !== u.ulycn) {
-        if (gs.sex_change_ok && !(rng_log_enabled() ? (rng_log_set_caller($c.lit("polyself.c"), 792, $c.lit("polymon")), rn2(10)) : rn2(10))) {
+        if (gs.sex_change_ok && !rn2(10)) {
             dochange = 1;
         }
     }
@@ -786,7 +786,7 @@ export async function polymon(mntmp) {   // polyself.c:735
         mntmp = 257 /* PM_STONE_GOLEM */;
         await make_stoned(0, $c.lit("You turn to stone!"), 0, null);
     }
-    $t2 = (rng_log_enabled() ? (rng_log_set_caller($c.lit("polyself.c"), 813, $c.lit("polymon")), rn2(500)) : rn2(500)) + 500 | 0, u.mtimedone = $t2;
+    $t2 = rn2(500) + 500 | 0, u.mtimedone = $t2;
     u.umonnum = mntmp;
     await set_uasmon();
     newMaxStr = uasmon_maxStr();
@@ -818,14 +818,14 @@ export async function polymon(mntmp) {   // polyself.c:735
     }
     mlvl = mons[mntmp].mlevel;
     if (gy.youmonst.data.mlet === 30 /* S_DRAGON */ && mntmp >= 143 /* PM_GRAY_DRAGON */) {
-        $t4 = u.uz.dnum === svd.dungeon_topology.d_astral_level.dnum ? Math.imul(8, mlvl) : Math.imul(4, mlvl) + (rng_log_enabled() ? (rng_log_set_caller($c.lit("polyself.c"), 861, $c.lit("polymon")), d(mlvl, 4)) : d(mlvl, 4)) | 0, u.mhmax = $t4;
+        $t4 = u.uz.dnum === svd.dungeon_topology.d_astral_level.dnum ? Math.imul(8, mlvl) : Math.imul(4, mlvl) + d(mlvl, 4) | 0, u.mhmax = $t4;
     } else if (gy.youmonst.data.mlet === 55 /* S_GOLEM */) {
         $t5 = golemhp(mntmp), u.mhmax = $t5;
     } else {
         if (!mlvl) {
-            $t6 = rng_log_enabled() ? (rng_log_set_caller($c.lit("polyself.c"), 866, $c.lit("polymon")), rnd(4)) : rnd(4), u.mhmax = $t6;
+            $t6 = rnd(4), u.mhmax = $t6;
         } else {
-            $t7 = rng_log_enabled() ? (rng_log_set_caller($c.lit("polyself.c"), 868, $c.lit("polymon")), d(mlvl, 8)) : d(mlvl, 8), u.mhmax = $t7;
+            $t7 = d(mlvl, 8), u.mhmax = $t7;
         }
         if (is_home_elemental($c.relem(mons, mntmp))) {
             u.mhmax = Math.imul(u.mhmax, 3);
@@ -845,7 +845,7 @@ export async function polymon(mntmp) {   // polyself.c:735
         await hideunder(gy.youmonst);
     }
     if (u.utrap && u.utraptype === 2) {
-        set_utrap(((rng_log_enabled() ? (rng_log_set_caller($c.lit("polyself.c"), 897, $c.lit("polymon")), rn2(6)) : rn2(6)) + 2 | 0) >>> 0, 2);
+        set_utrap((rn2(6) + 2 | 0) >>> 0, 2);
     }
     if (was_blind && !((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
         set_itimeout(new $c.FieldRef(u.uprops[15 /* BLINDED */], "intrinsic", "i64"), 1);
@@ -879,7 +879,7 @@ export async function polymon(mntmp) {   // polyself.c:735
         await uunstick();
     }
     if (u.usteed) {
-        if (($c.peq(u.usteed.data, $c.relem(mons, 10 /* PM_COCKATRICE */)) || $c.peq(u.usteed.data, $c.relem(mons, 9 /* PM_CHICKATRICE */))) && !(u.uprops[8 /* STONE_RES */].intrinsic || u.uprops[8 /* STONE_RES */].extrinsic) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("polyself.c"), 956, $c.lit("polymon")), rnl(3)) : rnl(3))) {
+        if (($c.peq(u.usteed.data, $c.relem(mons, 10 /* PM_COCKATRICE */)) || $c.peq(u.usteed.data, $c.relem(mons, 9 /* PM_CHICKATRICE */))) && !(u.uprops[8 /* STONE_RES */].intrinsic || u.uprops[8 /* STONE_RES */].extrinsic) && rnl(3)) {
             await pline($c.lit("%s touch %s."), new $c.Ptr(no_longer_petrify_resistant, 0), await mon_nam(u.usteed));
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("riding %s"), await an(pmname(u.usteed.data, Mgender(u.usteed))));
             await instapetrify(new $c.Ptr(buf, 0));
@@ -1473,7 +1473,7 @@ export async function dogaze() {   // polyself.c:1642
                     }
                     mtmp.mconf = (1) & 1;
                 } else if (adtyp === 2) {
-                    dmg = rng_log_enabled() ? (rng_log_set_caller($c.lit("polyself.c"), 1715, $c.lit("dogaze")), d(2, 6)) : d(2, 6);
+                    dmg = d(2, 6);
                     orig_dmg = dmg;
                     lev = u.ulevel;
                     await You($c.lit("attack %s with a fiery gaze!"), await mon_nam(mtmp));
@@ -1481,7 +1481,7 @@ export async function dogaze() {   // polyself.c:1642
                         await pline_The($c.lit("fire doesn't burn %s!"), await mon_nam(mtmp));
                         dmg = 0;
                     }
-                    if (lev > (rng_log_enabled() ? (rng_log_set_caller($c.lit("polyself.c"), 1722, $c.lit("dogaze")), rn2(20)) : rn2(20))) {
+                    if (lev > rn2(20)) {
                         dmg = dmg + await destroy_items(mtmp, 2, orig_dmg) | 0;
                         await ignite_items(mtmp.minvent);
                     }
@@ -1498,7 +1498,7 @@ export async function dogaze() {   // polyself.c:1642
                 if ($c.peq(mtmp.data, $c.relem(mons, 28 /* PM_FLOATING_EYE */)) && !mtmp.mcan) {
                     if (!u.uprops[66 /* FREE_ACTION */].extrinsic) {
                         await You($c.lit("are frozen by %s gaze!"), s_suffix(await mon_nam(mtmp)));
-                        nomul(u.ulevel > 6 || (rng_log_enabled() ? (rng_log_set_caller($c.lit("polyself.c"), 1741, $c.lit("dogaze")), rn2(4)) : rn2(4)) ? -(rng_log_enabled() ? (rng_log_set_caller($c.lit("polyself.c"), 1743, $c.lit("dogaze")), d(mtmp.m_lev + 1 | 0, mtmp.data.mattk[0].damd)) : d(mtmp.m_lev + 1 | 0, mtmp.data.mattk[0].damd)) | 0 : -200);
+                        nomul(u.ulevel > 6 || rn2(4) ? -d(mtmp.m_lev + 1 | 0, mtmp.data.mattk[0].damd) | 0 : -200);
                         gm.multi_reason = $c.lit("frozen by a monster's gaze");
                         gn.nomovemsg = null;
                         return 1;
@@ -1627,8 +1627,8 @@ export async function domindblast() {   // polyself.c:1894
             continue;
         }
         u_sen = ($c.peq(mtmp.data, $c.relem(mons, 28 /* PM_FLOATING_EYE */)) || $c.peq(mtmp.data, $c.relem(mons, 48 /* PM_MIND_FLAYER */)) || $c.peq(mtmp.data, $c.relem(mons, 49 /* PM_MASTER_MIND_FLAYER */))) && !mtmp.mcansee ? 1 : 0;
-        if (u_sen || ($c.peq(mtmp.data, $c.relem(mons, 28 /* PM_FLOATING_EYE */)) || $c.peq(mtmp.data, $c.relem(mons, 48 /* PM_MIND_FLAYER */)) || $c.peq(mtmp.data, $c.relem(mons, 49 /* PM_MASTER_MIND_FLAYER */))) && (rng_log_enabled() ? (rng_log_set_caller($c.lit("polyself.c"), 1921, $c.lit("domindblast")), rn2(2)) : rn2(2)) || !(rng_log_enabled() ? (rng_log_set_caller($c.lit("polyself.c"), 1921, $c.lit("domindblast")), rn2(10)) : rn2(10))) {
-            dmg = rng_log_enabled() ? (rng_log_set_caller($c.lit("polyself.c"), 1922, $c.lit("domindblast")), rnd(15)) : rnd(15);
+        if (u_sen || ($c.peq(mtmp.data, $c.relem(mons, 28 /* PM_FLOATING_EYE */)) || $c.peq(mtmp.data, $c.relem(mons, 48 /* PM_MIND_FLAYER */)) || $c.peq(mtmp.data, $c.relem(mons, 49 /* PM_MASTER_MIND_FLAYER */))) && rn2(2) || !rn2(10)) {
+            dmg = rnd(15);
             await wakeup(mtmp, $c.i8(dmg > mtmp.mhp ? 1 : 0));
             await You($c.lit("lock in on %s %s."), s_suffix(await mon_nam(mtmp)), u_sen ? $c.lit("telepathy") : $c.peq(mtmp.data, $c.relem(mons, 28 /* PM_FLOATING_EYE */)) || $c.peq(mtmp.data, $c.relem(mons, 48 /* PM_MIND_FLAYER */)) || $c.peq(mtmp.data, $c.relem(mons, 49 /* PM_MASTER_MIND_FLAYER */)) ? $c.lit("latent telepathy") : $c.lit("mind"));
             mtmp.mhp = mtmp.mhp - dmg | 0;

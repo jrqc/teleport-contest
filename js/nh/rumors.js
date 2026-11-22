@@ -17,7 +17,7 @@ import { currency } from './invent.js';
 import { mons } from './monst.js';
 import { the_unique_pm } from './objnam.js';
 import { There, You, impossible, nhassert_failed, pline, verbalize } from './pline.js';
-import { rn2, rnd, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { rn2, rnd } from './rnd.js';
 import { sfi_ulong, sfi_unsigned, sfo_ulong, sfo_unsigned } from './sfbase.js';
 import { money2mon } from './shk.js';
 import { windowprocs } from './windows.js';
@@ -72,7 +72,7 @@ export async function getrumor(truth, rumor_buf, exclude_cookie) {   // rumors.c
                     return rumor_buf;
                 }
             }
-            switch (adjtruth = truth + (rng_log_enabled() ? (rng_log_set_caller($c.lit("rumors.c"), 151, $c.lit("getrumor")), rn2(2)) : rn2(2)) | 0) {
+            switch (adjtruth = truth + rn2(2) | 0) {
                 case 2:
                 case 1:
                     beginning = $c.i64(gt.true_rumor_start);
@@ -334,7 +334,7 @@ export async function outrumor(truth, mechanism) {   // rumors.c:529
     }
     switch (mechanism) {
         case 0:
-            await pline($c.lit("True to her word, the Oracle %ssays: "), !(rng_log_enabled() ? (rng_log_set_caller($c.lit("rumors.c"), 558, $c.lit("outrumor")), rn2(4)) : rn2(4)) ? $c.lit("offhandedly ") : !(rng_log_enabled() ? (rng_log_set_caller($c.lit("rumors.c"), 559, $c.lit("outrumor")), rn2(3)) : rn2(3)) ? $c.lit("casually ") : (rng_log_enabled() ? (rng_log_set_caller($c.lit("rumors.c"), 560, $c.lit("outrumor")), rn2(2)) : rn2(2)) ? $c.lit("nonchalantly ") : $c.lit(""));
+            await pline($c.lit("True to her word, the Oracle %ssays: "), !rn2(4) ? $c.lit("offhandedly ") : !rn2(3) ? $c.lit("casually ") : rn2(2) ? $c.lit("nonchalantly ") : $c.lit(""));
             await verbalize($c.lit("%s"), line);
             return;
         case 1:
@@ -409,7 +409,7 @@ export async function outoracle(special, delphi) {   // rumors.c:640
             if (svo.oracle_cnt <= 1 && !special) {
                 break close_oracles$;
             }
-            oracle_idx = special ? 0 : rng_log_enabled() ? (rng_log_set_caller($c.lit("rumors.c"), 665, $c.lit("outoracle")), rnd((svo.oracle_cnt | 0) - 1 | 0)) : rnd((svo.oracle_cnt | 0) - 1 | 0);
+            oracle_idx = special ? 0 : rnd((svo.oracle_cnt | 0) - 1 | 0);
             $c.fseek(oracles, $c.i64(svo.oracle_loc.get(oracle_idx)), 0);
             if (!special) {
                 $t1 = svo.oracle_loc.get(svo.oracle_cnt = svo.oracle_cnt - 1 >>> 0), svo.oracle_loc.set(oracle_idx, $t1);

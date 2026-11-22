@@ -12,7 +12,7 @@ import { resists_drli } from './mondata.js';
 import { mons } from './monst.js';
 import { You_feel, livelog_printf, pline } from './pline.js';
 import { rehumanize } from './polyself.js';
-import { rn2, rnd, rng_log_enabled, rng_log_set_caller } from './rnd.js';
+import { rn2, rnd } from './rnd.js';
 import { Goodbye } from './role.js';
 import { find_mac } from './worn.js';
 
@@ -49,10 +49,10 @@ export function newpw() {   // exper.c:45
     if (u.ulevel === 0) {
         en = gu.urole.enadv.infix + gu.urace.enadv.infix | 0;
         if (gu.urole.enadv.inrnd > 0) {
-            en = en + (rng_log_enabled() ? (rng_log_set_caller($c.lit("exper.c"), 52, $c.lit("newpw")), rnd(gu.urole.enadv.inrnd)) : rnd(gu.urole.enadv.inrnd)) | 0;
+            en = en + rnd(gu.urole.enadv.inrnd) | 0;
         }
         if (gu.urace.enadv.inrnd > 0) {
-            en = en + (rng_log_enabled() ? (rng_log_set_caller($c.lit("exper.c"), 54, $c.lit("newpw")), rnd(gu.urace.enadv.inrnd)) : rnd(gu.urace.enadv.inrnd)) | 0;
+            en = en + rnd(gu.urace.enadv.inrnd) | 0;
         }
     } else {
         enrnd = $c.div32(acurr(2 /* A_WIS */), 2);
@@ -63,7 +63,7 @@ export function newpw() {   // exper.c:45
             enrnd = enrnd + (gu.urole.enadv.hirnd + gu.urace.enadv.hirnd | 0) | 0;
             enfix = gu.urole.enadv.hifix + gu.urace.enadv.hifix | 0;
         }
-        en = enermod((rng_log_enabled() ? (rng_log_set_caller($c.lit("exper.c"), 64, $c.lit("newpw")), rn2(enrnd)) : rn2(enrnd)) + enfix | 0);
+        en = enermod(rn2(enrnd) + enfix | 0);
     }
     if (en <= 0) {
         en = 1;
@@ -297,7 +297,7 @@ export function rndexp(gaining) {   // exper.c:378
     while (diff >= 32767) {
         diff = $c.div64(diff, 2), factor = $c.mul64(factor, 2);
     }
-    result = $c.add64(minexp, $c.mul64(factor, rng_log_enabled() ? (rng_log_set_caller($c.lit("exper.c"), 388, $c.lit("rndexp")), rn2($c.i32(diff))) : rn2($c.i32(diff))));
+    result = $c.add64(minexp, $c.mul64(factor, rn2($c.i32(diff))));
     if (u.ulevel === 30 && gaining) {
         result = $c.add64(result, $c.sub64(u.uexp, minexp));
         if (result < u.uexp) {
