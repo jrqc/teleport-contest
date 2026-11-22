@@ -118,6 +118,9 @@ export function intLit(v, t) {
     return E(`${v}`);
 }
 
+/** The functions patch 003 wraps in an RNG caller tag (rngTagMacro). */
+const RNG_TAGGED = new Set(['rn2', 'rnd', 'rnl', 'd', 'rne', 'rnz']);
+
 export class TUEmitter {
     /**
      * @param tu { root, scope, file (repo-relative .c), dir (TU directory), src (absolute .c path) }
@@ -1066,6 +1069,8 @@ export class TUEmitter {
         case 'CompoundAssignOperator': return this.compoundAssign(n, ctx);
         case 'UnaryOperator': return this.unary(n, ctx);
         case 'ConditionalOperator': {
+            const tagged = this.rngTagMacro(n);
+            if (tagged) return this.ex(tagged, ctx);
             const [c, a, b] = kids(n);
             const t = this.T(n);
             const sub = (x) => (t.k === 'void' ? this.ex(x, 'd') : this.ex(x, ctx === 'c' && isInt(t) ? 'c' : 'v'));
@@ -1089,6 +1094,33 @@ export class TUEmitter {
         default: this.err(n, `unsupported expression ${n.kind}`);
         }
         return null;
+    }
+
+    /**
+     * Readability plan P1 (method/readability-plan.md): patch 003 (hack.h) defines
+     * `rn2(x)` (and rnd, rnl, d, rne, rnz) as
+     *     rng_log_enabled() ? (rng_log_set_caller(__FILE__, __LINE__, __func__), rn2(x)) : rn2(x)
+     * The tag only labels the RNG log line with the C caller, and getRngLog() strips it
+     * (the judge compares calls and values only). The expansion is emitted as its else
+     * branch, the plain call: the same RNG calls in the same order. Returns that branch,
+     * or null when n is not this expansion. Patch 004's explicit tags for Lua calls
+     * (nhl_rnglog_set_lua_caller) are ordinary C code and stay.
+     */
+    rngTagMacro(n) {
+        const callee = (x) => {
+            x = this.stripCasts(x);
+            if (!x || x.kind !== 'CallExpr') return null;
+            const f = this.stripCasts(kids(x)[0]);
+            return f && f.kind === 'DeclRefExpr' && f.referencedDecl && f.referencedDecl.kind === 'FunctionDecl' ? f.referencedDecl.name : null;
+        };
+        const [c, a, b] = kids(n);
+        if (callee(c) !== 'rng_log_enabled' || kids(this.stripCasts(c)).length !== 1) return null;
+        const a0 = this.skipParens(a);
+        if (!a0 || a0.kind !== 'BinaryOperator' || a0.opcode !== ',') return null;
+        const [tag, call] = kids(a0);
+        const fn = callee(call);
+        if (callee(tag) !== 'rng_log_set_caller' || !RNG_TAGGED.has(fn) || callee(b) !== fn) return null;
+        return b;
     }
 
     declRef(n, ctx) {
