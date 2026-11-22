@@ -1,0 +1,154 @@
+{
+ "ts": "20261122T231855",
+ "label": "p1",
+ "commit": "8a9d975",
+ "variants": {
+  "monster": {
+   "lines": 17690,
+   "files": 99,
+   "top": [
+    {
+     "file": "monst.js",
+     "added": 5780,
+     "deleted": 5734
+    },
+    {
+     "file": "earlyarg.js",
+     "added": 397,
+     "deleted": 395
+    },
+    {
+     "file": "mondata.js",
+     "added": 259,
+     "deleted": 259
+    },
+    {
+     "file": "mon.js",
+     "added": 255,
+     "deleted": 255
+    },
+    {
+     "file": "display.js",
+     "added": 178,
+     "deleted": 178
+    },
+    {
+     "file": "makemon.js",
+     "added": 123,
+     "deleted": 123
+    },
+    {
+     "file": "role.js",
+     "added": 107,
+     "deleted": 107
+    },
+    {
+     "file": "uhitm.js",
+     "added": 105,
+     "deleted": 105
+    }
+   ]
+  },
+  "field": {
+   "lines": 70,
+   "files": 18,
+   "top": [
+    {
+     "file": "types.js",
+     "added": 8,
+     "deleted": 6
+    },
+    {
+     "file": "shk.js",
+     "added": 4,
+     "deleted": 4
+    },
+    {
+     "file": "mkobj.js",
+     "added": 3,
+     "deleted": 3
+    },
+    {
+     "file": "makemon.js",
+     "added": 2,
+     "deleted": 2
+    },
+    {
+     "file": "pray.js",
+     "added": 2,
+     "deleted": 2
+    },
+    {
+     "file": "region.js",
+     "added": 2,
+     "deleted": 2
+    },
+    {
+     "file": "sfbase.js",
+     "added": 2,
+     "deleted": 2
+    },
+    {
+     "file": "sfstruct.js",
+     "added": 2,
+     "deleted": 2
+    }
+   ]
+  },
+  "yn": {
+   "lines": 79,
+   "files": 13,
+   "top": [
+    {
+     "file": "teleport.js",
+     "added": 17,
+     "deleted": 14
+    },
+    {
+     "file": "makemon.js",
+     "added": 6,
+     "deleted": 6
+    },
+    {
+     "file": "hack.js",
+     "added": 4,
+     "deleted": 4
+    },
+    {
+     "file": "dogmove.js",
+     "added": 3,
+     "deleted": 3
+    },
+    {
+     "file": "dothrow.js",
+     "added": 3,
+     "deleted": 3
+    },
+    {
+     "file": "dokick.js",
+     "added": 1,
+     "deleted": 1
+    },
+    {
+     "file": "engrave.js",
+     "added": 1,
+     "deleted": 1
+    },
+    {
+     "file": "mhitm.js",
+     "added": 1,
+     "deleted": 1
+    }
+   ],
+   "withoutAsync": 3,
+   "asyncRipple": 76,
+   "newlyAsync": 4
+  }
+ },
+ "determinism": {
+  "identical": true,
+  "differ": [],
+  "extra": []
+ },
+ "codeLines": 275754
+}

@@ -99,3 +99,4 @@ to one patch version (F1, F5) and keeps recorder code in `js/`. Plan:
 | Step | Date | Commit | Churn: monster / field / yn (async ripple) | Checks | Notes |
 |---|---|---|---|---|---|
 | Baseline | 2026-11-22 | `8a5bfb6` | 17,690 / 70 / 123 (ripple 76; 4 functions became async) | determinism byte-identical | 275,754 normalized lines; monster churn is mostly `monst.js` (11,514: the `mons[]` initializers are indexed by position) |
+| P1 RNG caller tags | 2026-11-22 | see git log | 17,690 / 70 / 79 (ripple 76; 3 without it, was 47) | 44/44, tests 60/60, fuzz-regress 4/4, batch 990/990 (seeds 10220-10329), sandbox 45/45, playability 2.14 ms/move, determinism byte-identical | 2,545 tagged sites now plain calls (2,634 lines changed once); `onscary()` unchanged (no RNG calls). Triage keeps naming C callers from the recordings (it never read the JS tags), so no source map was needed |
