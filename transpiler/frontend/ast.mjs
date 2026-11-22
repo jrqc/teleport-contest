@@ -32,6 +32,9 @@ function baseArgs(entry) {
     }
     // annotation-driven defines (annotations.jsonc "defines"), e.g. the Lua VM's dispatch
     args.push(...(entry.extraArgs || []));
+    // extra clang arguments for experiments, never for the build: the churn benchmark
+    // (tools/churn/bench.mjs) passes a VFS overlay that substitutes edited C files
+    if (process.env.NH_CLANG_EXTRA_ARGS) args.push(...JSON.parse(process.env.NH_CLANG_EXTRA_ARGS));
     return { dir, file, args };
 }
 // __DATE__/__TIME__ must not depend on when we transpile (output determinism, design 2.6):

@@ -1,8 +1,8 @@
 # Readability and Phase 2 plan
 
 Owner request, 2026-11-19. Moved out of the postmortem (`method/postmortem.md`, formerly
-section 1A) on 2026-11-19; unchanged in substance. Status: **planned, not built**: P1-P4 are
-the transpiler changes to make before the Phase 1 freeze (2026-11-29).
+section 1A) on 2026-11-19. **Approved by the owner on 2026-11-22** with the additions marked
+"(owner, 2026-11-22)" below. Status: in progress; results per step in "Progress" at the end.
 
 Phase 2 scores `parity / (1 + lines_changed_in_js / N)`, with comment-only and whitespace-only
 changes normalized out. Every line of generated code that encodes something incidental to the
@@ -30,8 +30,8 @@ Fix plan (in the transpiler only; no hand edits):
    unchanged (score) and tool 4.2 still names C callers.
 2. **P2, named constants.** Emit each enum constant and object-like `#define` that the code uses
    as a named export of a generated constants module per header (`js/nh/consts/<hdr>.js`:
-   `export const PM_GIANT_ANT = 0;`) and reference it by name (`PM.PM_GIANT_ANT` or an
-   imported binding). A renumbering then changes one line per constant in one file. Exceptions,
+   `export const PM_GIANT_ANT = 0;`) and reference it by an **imported binding**, so the code
+   reads like the C: `mons[PM_ANGEL]`, not `PM.PM_GIANT_ANT` (owner, 2026-11-22). A renumbering then changes one line per constant in one file. Exceptions,
    emitted as values: constants inside `case` labels where the switch must stay a JS `switch`
    (named constants work there too, so probably none), array sizes in typed-array constructors
    (keep the value; the name in a comment). Check: generated code byte-identical in behavior
@@ -42,16 +42,40 @@ Fix plan (in the transpiler only; no hand edits):
    when the call is semantically identical to the expansion**: each argument at the call site
    is free of side effects and of `await` (otherwise evaluating it once instead of N times or
    in a different order would change behavior), the macro does not take addresses of or assign
-   to its arguments, and it does not depend on the caller's local names. Other sites keep the
-   expansion. Property macros (`Blind`, `Levitation`, …) and predicates (`IS_POOL`, `rn1`)
+   to its arguments, and it does not depend on the caller's local names. **A macro whose body
+   can reach a blocking function becomes an `async` JS function, and its calls are awaited**
+   (owner, 2026-11-22): it joins the async set like any function, so the equivalence covers the
+   `await` as well. Other sites keep the expansion. Property macros (`Blind`, `Levitation`, …) and predicates (`IS_POOL`, `rn1`)
    qualify. Check: score, and the count of expansion sites converted.
 4. **P4, comments.** Carry C comments from the source text (clang's AST omits most of them):
    attach each comment to the next emitted statement by source location. Free in Phase 2.
+   **License headers** (owner, 2026-11-22): every generated file starts with the license notice
+   of the C file it comes from (NetHack General Public License for NetHack, the MIT notice for
+   Lua, Apple's/TRE's notices for the regex sources), as a comment.
+5. **P5 (optional, after P1-P4; owner, 2026-11-22), wrapper reduction.** Emit plain JS where a
+   runtime wrapper is provably a no-op at that site (for example `$c.i8(...)` around a value
+   already known to be 0 or 1, `$c.peq(a, b)` where both sides are records or null, so `===`
+   is exact, `$c.relem(mons, PM_ANGEL)` where a record reference does the same). Every
+   rewrite needs the same kind of exactness proof as P3.
 
-Order: P1 (largest churn per unit of work), P2, P3, P4. Each step is a separate transpiler
-commit plus a generated commit, with a score run and the churn report (T13).
+Order (owner, 2026-11-22): baseline churn numbers first, then P1, P2, P3, P4, then P5 if time
+allows. Each step is a separate transpiler commit plus a generated commit.
 
-**Rendering without the capture layer (owner request, longer term).** Today screens come from
+**Checks after each step** (owner, 2026-11-22): 44/44 public sessions, `npm test`,
+`npm run fuzz-regress`, one fuzz batch, the sandbox run, playability, byte-identical
+determinism (two transpiles), the churn benchmark, and the generated `onscary()` before and
+after. Then commit and push.
+
+**Churn benchmark** (`tools/churn/bench.mjs`; owner, 2026-11-22). Three edits to the C, applied
+through a clang VFS overlay (the recorder tree is not touched), each transpiled and compared with
+an unmodified transpile, counting changed `js/` lines the way the Phase 2 judge does (added +
+deleted, comment-only and whitespace-only changes normalized out):
+- **monster**: a new monster inserted early in `monsters.h` (renumbers every later `PM_*`);
+- **field**: a new field in the middle of `struct monst`;
+- **yn**: a `yn()` call inside a deep non-async function; the **async ripple** (lines that
+  change only because functions became `async` or calls `await`) is reported separately.
+
+**Rendering without the capture layer (owner request, longer term; deferred by the owner until after the Phase 1 freeze, 2026-11-22).** Today screens come from
 the recorder's patch 006, transpiled: a shadow screen in `termcap.c`, captured into a marker on
 stdout at every input boundary, parsed and re-encoded by `js/nhprocess.js`. That ties the port
 to one patch version (F1, F5) and keeps recorder code in `js/`. Plan:
@@ -69,3 +93,9 @@ to one patch version (F1, F5) and keeps recorder code in `js/`. Plan:
   decides whether the scored screens can come from the emulator.
 - Effect on Phase 2: patch 006 changes would no longer reach `js/`; 5.1 changes to tty output
   would reach it only through the transpiled wintty/termcap code, as they should.
+
+## Progress
+
+| Step | Date | Commit | Churn: monster / field / yn (async ripple) | Checks | Notes |
+|---|---|---|---|---|---|
+| Baseline | 2026-11-22 | `8a5bfb6` | 17,690 / 70 / 123 (ripple 76; 4 functions became async) | determinism byte-identical | 275,754 normalized lines; monster churn is mostly `monst.js` (11,514: the `mons[]` initializers are indexed by position) |
