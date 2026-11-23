@@ -25,6 +25,8 @@ import { show } from '../ir/ctypes.mjs';
 import { preprocess } from '../frontend/ast.mjs';
 import { jsName, field } from './names.mjs';
 import { zeroOf, typedArrayOf, arrayInit } from './classes.mjs';
+import { constExpr, exact, headerModule, macroConstText } from './consts.mjs';
+import { defines } from './macros.mjs';
 
 export const PREC = { comma: 1, assign: 2, cond: 2, or: 3, and: 4, bor: 5, bxor: 6, band: 7, eq: 8, rel: 9, shift: 10, add: 11, mul: 12, unary: 14, postfix: 15, call: 17, prim: 18 };
 export const E = (c, p = PREC.prim) => ({ c, p });
@@ -183,8 +185,13 @@ export class TUEmitter {
         head.push("import * as $c from '../crt/index.js';");
         head.push("import * as $T from './types.js';");
         head.push("import { $G } from './globals.js';");
+        // readability plan P2: the .c file's own enum constants (header constants are imported)
+        const local = this.heap ? { lines: [] } : this.prog.consts.definitions(this.tu.file, jsName, true);
+        if (local.imports) for (const [mod, names] of local.imports) for (const nm of names) this.prog.noteImport(this, mod, nm);
         for (const line of this.prog.importsFor(this)) head.push(line);
         const lines = [...head, ''];
+        const localDefs = [...(local.entries || []), ...this.prog.localMacroConsts(this)].sort((a, b) => a.offset - b.offset);
+        if (localDefs.length) lines.push(...localDefs.map((x) => x.line), '');
         for (const s of statics) lines.push(s.decl);
         lines.push(...body);
         lines.push('');
@@ -683,6 +690,8 @@ export class TUEmitter {
     caseValue(ce) {
         if (ce.kind === 'ConstantExpr' && ce.value !== undefined) {
             const t = this.T(ce);
+            const named = this.namedConst(ce, BigInt(ce.value));
+            if (named) return named.c;
             return intLit(BigInt(ce.value), t).c + this.enumComment(ce);
         }
         return this.rv(ce).c;
@@ -1040,6 +1049,8 @@ export class TUEmitter {
         if (n.kind !== 'IntegerLiteral' && n.kind !== 'CharacterLiteral' && n.kind !== 'DeclRefExpr' && n.kind !== 'ConstantExpr' && n.type) {
             const v = this.fold(n);
             if (v !== null) {
+                const named = this.namedConst(n, v);
+                if (named) return named;
                 const e = intLit(v, this.T(n));
                 if (ctx === 'c' && (n.kind === 'BinaryOperator' || n.kind === 'UnaryOperator')) return e;
                 return e;
@@ -1050,10 +1061,19 @@ export class TUEmitter {
         case 'ConstantExpr':
             if (n.value !== undefined) {
                 const t = this.T(n);
-                if (isInt(t)) return E(intLit(BigInt(n.value), t).c + this.enumComment(n), intLit(BigInt(n.value), t).p);
+                if (isInt(t)) {
+                    const named = this.namedConst(n, BigInt(n.value));
+                    if (named) return named;
+                    return E(intLit(BigInt(n.value), t).c + this.enumComment(n), intLit(BigInt(n.value), t).p);
+                }
             }
             return this.ex(kids(n)[0], ctx);
-        case 'IntegerLiteral': return intLit(BigInt(n.value), this.T(n));
+        case 'IntegerLiteral': {
+            const v = this.fold(n);
+            const named = v !== null && this.namedConst(n, v);
+            if (named) return named;
+            return intLit(BigInt(n.value), this.T(n));
+        }
         case 'CharacterLiteral': return E(String(n.value), n.value < 0 ? PREC.unary : PREC.prim);
         case 'FloatingLiteral': {
             const v = Number(n.value);
@@ -1123,11 +1143,68 @@ export class TUEmitter {
         return b;
     }
 
+    /**
+     * Readability plan P2: constant expression n (clang's value v, a BigInt) by name, when
+     * it uses enum constants and the printed text has exactly that value (consts.mjs);
+     * else null (the number is emitted). Heap-world code keeps numbers.
+     */
+    namedConst(n, v) {
+        if (this.heap) return null;
+        const ref = (name, id) => this.constRef(name, id);
+        ref.macro = (x) => this.macroConst(x);
+        const r = constExpr(n, ref);
+        if (!r || !exact(r, v)) return null;
+        for (const [js, b] of r.names) {
+            if (b.macro) this.prog.useMacroConst(this, b);
+            if (b.file !== this.tu.file) this.prog.noteImport(this, headerModule(b.file), js);
+        }
+        return E(r.c, r.p);
+    }
+    /**
+     * Readability plan P2, #define constants: node n as the whole expansion of an
+     * object-like macro whose body is only numbers and operators (macroConstText), the
+     * file's only #define of that name: { js, file, v, header, macro: { name, text, offset } }.
+     */
+    macroConst(n) {
+        const r = n.range;
+        const bx = r && r.begin && r.begin.expansionLoc, ex1 = r && r.end && r.end.expansionLoc;
+        const bs = r && r.begin && r.begin.spellingLoc, es = r && r.end && r.end.spellingLoc;
+        if (!bx || !ex1 || !bs || !es || bx.isMacroArgExpansion || ex1.isMacroArgExpansion) return null;
+        if (bx.offset !== ex1.offset || !bs._f || bs._f !== es._f || path.isAbsolute(bs._f)) return null;
+        const all = defines(bs._f);
+        const d = all.find((x) => !x.fnlike && x.bodyStart === bs.offset && x.lastTok === es.offset);
+        if (!d || all.filter((x) => x.name === d.name).length !== 1) return null;
+        if (this.prog.macroNameTaken(this, d.name)) return null;
+        const c = macroConstText(d.body);
+        if (!c) return null;
+        const header = /\.h$/.test(bs._f);
+        if (!header && bs._f !== this.tu.file) return null;
+        return { js: jsName(d.name), file: bs._f, v: c.v, header, macro: { name: d.name, text: c.text, offset: d.bodyStart } };
+    }
+    /** The binding of enum constant `name` (declaration id `id` in this TU), or null. */
+    constRef(name, id) {
+        if (!this._enumFile) {
+            this._enumFile = new Map();
+            const walk = (x) => {
+                if (!x || typeof x !== 'object') return;
+                if (x.kind === 'EnumConstantDecl') { const l = x.loc && (x.loc.expansionLoc || x.loc); this._enumFile.set(x.id, l && l._f); }
+                for (const c of kids(x)) walk(c);
+            };
+            walk(this.tu.root);
+        }
+        const file = this._enumFile.get(id);
+        const b = this.prog.consts.binding(name, file, jsName);
+        if (!b || (!b.header && b.file !== this.tu.file)) return null;
+        return b;
+    }
+
     declRef(n, ctx) {
         const d = n.referencedDecl;
         if (d.kind === 'EnumConstantDecl') {
             const v = this.S.enumConsts.get(d.name);
             if (v === undefined) this.err(n, `unknown enum constant ${d.name}`);
+            const named = this.namedConst(n, v);
+            if (named) return named;
             const e = intLit(v, this.T(n));
             return E(`${e.c} /* ${d.name} */`, e.p);
         }
