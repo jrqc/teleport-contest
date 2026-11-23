@@ -16,7 +16,7 @@ import { init_uhunger } from './eat.js';
 import { panic } from './end.js';
 import { debugcore, paniclog } from './files.js';
 import { wizard } from './flag.macros.js';
-import { COLNO, FALSE, LL_DEBUG, NHL_SB_ALL, NHL_SB_BASEMASK, NHL_SB_BASE_BASE, NHL_SB_COROUTINE, NHL_SB_DBMASK, NHL_SB_DB_SAFE, NHL_SB_DEBUGGING, NHL_SB_MATH, NHL_SB_OSMASK, NHL_SB_SAFE, NHL_SB_STEPSIZE, NHL_SB_STRING, NHL_SB_TABLE, NHL_SB_UTF8, NHL_SB_VERSION, NHLpa_impossible, NHLpa_panic, ROWNO, TRUE } from './global.h.js';
+import { COLNO, FALSE, LL_DEBUG, NHL_SB_ALL, NHL_SB_BASEMASK, NHL_SB_BASE_BASE, NHL_SB_BASE_ERROR, NHL_SB_BASE_GC, NHL_SB_BASE_META, NHL_SB_BASE_UNSAFE, NHL_SB_COROUTINE, NHL_SB_DBMASK, NHL_SB_DB_DB, NHL_SB_DB_SAFE, NHL_SB_DEBUGGING, NHL_SB_MATH, NHL_SB_OSMASK, NHL_SB_OS_FILES, NHL_SB_OS_TIME, NHL_SB_SAFE, NHL_SB_STEPSIZE, NHL_SB_STRING, NHL_SB_TABLE, NHL_SB_UTF8, NHL_SB_VERSION, NHLpa_impossible, NHLpa_panic, ROWNO, TRUE } from './global.h.js';
 import { long_to_any } from './hack.js';
 import { CQ_CANNED, NHCORE_ENTER_TUTORIAL, NHCORE_LEAVE_TUTORIAL, NUM_NHCB, NUM_NHCORE_CALLS } from './hack.h.js';
 import { eos, ing_suffix, nh_snprintf, s_suffix, strncmpi } from './hacklib.js';
@@ -1467,7 +1467,7 @@ export async function nhl_loadlua(L, fname) {   // nhlua.c:2338
         bufin = bufout = buf;
         ct = 0;
         while (buflen > 0 || ct) {
-            if ((cnt = $c.i64($c.fread(bufin, 1, $c.u64($c.i32(buflen) < 8192 ? $c.i32(buflen) : 8192), fh))) < 0) {
+            if ((cnt = $c.i64($c.fread(bufin, 1, $c.u64($c.i32(buflen) < LOADCHUNKSIZE ? $c.i32(buflen) : LOADCHUNKSIZE), fh))) < 0) {
                 break;
             }
             buflen = $c.sub64(buflen, cnt);
@@ -1677,11 +1677,11 @@ async function nhlL_openlibs(L, lflags) {   // nhlua.c:3000
     if ((lflags & NHL_SB_BASEMASK) >>> 0) {
         await luaL_requiref(L, $c.lit("_G"), luaopen_base, 1);
         baselib = lua_gettop(L);
-        await nhl_clearfromtable(L, !!((lflags & 128) >>> 0) ? 1 : 0, baselib, $c.relem(ct_base_base, 0));
-        await nhl_clearfromtable(L, !!((lflags & 256) >>> 0) ? 1 : 0, baselib, $c.relem(ct_base_error, 0));
-        await nhl_clearfromtable(L, !!((lflags & 512) >>> 0) ? 1 : 0, baselib, $c.relem(ct_base_meta, 0));
-        await nhl_clearfromtable(L, !!((lflags & 1024) >>> 0) ? 1 : 0, baselib, $c.relem(ct_base_iffy, 0));
-        await nhl_clearfromtable(L, !!((lflags & 2048) >>> 0) ? 1 : 0, baselib, $c.relem(ct_base_unsafe, 0));
+        await nhl_clearfromtable(L, !!((lflags & NHL_SB_BASE_BASE) >>> 0) ? 1 : 0, baselib, $c.relem(ct_base_base, 0));
+        await nhl_clearfromtable(L, !!((lflags & NHL_SB_BASE_ERROR) >>> 0) ? 1 : 0, baselib, $c.relem(ct_base_error, 0));
+        await nhl_clearfromtable(L, !!((lflags & NHL_SB_BASE_META) >>> 0) ? 1 : 0, baselib, $c.relem(ct_base_meta, 0));
+        await nhl_clearfromtable(L, !!((lflags & NHL_SB_BASE_GC) >>> 0) ? 1 : 0, baselib, $c.relem(ct_base_iffy, 0));
+        await nhl_clearfromtable(L, !!((lflags & NHL_SB_BASE_UNSAFE) >>> 0) ? 1 : 0, baselib, $c.relem(ct_base_unsafe, 0));
         await lua_settop(L, -2);
     }
     if ((lflags & NHL_SB_COROUTINE) >>> 0) {
@@ -1695,8 +1695,8 @@ async function nhlL_openlibs(L, lflags) {   // nhlua.c:3000
     if ((lflags & NHL_SB_OSMASK) >>> 0) {
         await luaL_requiref(L, $c.lit("os"), luaopen_os, 1);
         oslib = lua_gettop(L);
-        await nhl_clearfromtable(L, !!((lflags & 16384) >>> 0) ? 1 : 0, oslib, $c.relem(ct_os_time, 0));
-        await nhl_clearfromtable(L, !!((lflags & 32768) >>> 0) ? 1 : 0, oslib, $c.relem(ct_os_files, 0));
+        await nhl_clearfromtable(L, !!((lflags & NHL_SB_OS_TIME) >>> 0) ? 1 : 0, oslib, $c.relem(ct_os_time, 0));
+        await nhl_clearfromtable(L, !!((lflags & NHL_SB_OS_FILES) >>> 0) ? 1 : 0, oslib, $c.relem(ct_os_files, 0));
         await lua_settop(L, -2);
     }
     if ((lflags & NHL_SB_STRING) >>> 0) {
@@ -1723,8 +1723,8 @@ async function nhlL_openlibs(L, lflags) {   // nhlua.c:3000
     if ((lflags & NHL_SB_DBMASK) >>> 0) {
         await luaL_requiref(L, $c.lit("debug"), luaopen_debug, 1);
         dblib = lua_gettop(L);
-        await nhl_clearfromtable(L, !!((lflags & 4096) >>> 0) ? 1 : 0, dblib, $c.relem(ct_debug_debug, 0));
-        await nhl_clearfromtable(L, !!((lflags & 8192) >>> 0) ? 1 : 0, dblib, $c.relem(ct_debug_safe, 0));
+        await nhl_clearfromtable(L, !!((lflags & NHL_SB_DB_DB) >>> 0) ? 1 : 0, dblib, $c.relem(ct_debug_debug, 0));
+        await nhl_clearfromtable(L, !!((lflags & NHL_SB_DB_SAFE) >>> 0) ? 1 : 0, dblib, $c.relem(ct_debug_safe, 0));
         await lua_settop(L, -2);
     }
 }
@@ -1807,365 +1807,249 @@ async function nhlL_newstate(sbi, name) {   // nhlua.c:3207
 
 export function $init() {
     nhcore_call_names.fill(null);
-    nhcore_call_names[0] = $c.lit("start_new_game");
-    nhcore_call_names[1] = $c.lit("restore_old_game");
-    nhcore_call_names[2] = $c.lit("moveloop_turn");
-    nhcore_call_names[3] = $c.lit("game_exit");
-    nhcore_call_names[4] = $c.lit("getpos_tip");
-    nhcore_call_names[5] = $c.lit("enter_tutorial");
-    nhcore_call_names[6] = $c.lit("leave_tutorial");
+    $c.init(nhcore_call_names, [
+        $c.lit("start_new_game"),
+        $c.lit("restore_old_game"),
+        $c.lit("moveloop_turn"),
+        $c.lit("game_exit"),
+        $c.lit("getpos_tip"),
+        $c.lit("enter_tutorial"),
+        $c.lit("leave_tutorial")
+    ]);
     nhcore_call_available.fill(0);
     luapat = null;
     for (let $i0 = 0; $i0 < 35; $i0++) {
         char2typ[$i0].$copyFrom(new $T.anon_nhlua_342());
     }
-    char2typ[0].ch = 32;
-    char2typ[0].typ = STONE;
-    char2typ[1].ch = 35;
-    char2typ[1].typ = CORR;
-    char2typ[2].ch = 46;
-    char2typ[2].typ = ROOM;
-    char2typ[3].ch = 45;
-    char2typ[3].typ = HWALL;
-    char2typ[4].ch = 45;
-    char2typ[4].typ = TLCORNER;
-    char2typ[5].ch = 45;
-    char2typ[5].typ = TRCORNER;
-    char2typ[6].ch = 45;
-    char2typ[6].typ = BLCORNER;
-    char2typ[7].ch = 45;
-    char2typ[7].typ = BRCORNER;
-    char2typ[8].ch = 45;
-    char2typ[8].typ = CROSSWALL;
-    char2typ[9].ch = 45;
-    char2typ[9].typ = TUWALL;
-    char2typ[10].ch = 45;
-    char2typ[10].typ = TDWALL;
-    char2typ[11].ch = 45;
-    char2typ[11].typ = TLWALL;
-    char2typ[12].ch = 45;
-    char2typ[12].typ = TRWALL;
-    char2typ[13].ch = 45;
-    char2typ[13].typ = DBWALL;
-    char2typ[14].ch = 124;
-    char2typ[14].typ = VWALL;
-    char2typ[15].ch = 43;
-    char2typ[15].typ = DOOR;
-    char2typ[16].ch = 65;
-    char2typ[16].typ = AIR;
-    char2typ[17].ch = 67;
-    char2typ[17].typ = CLOUD;
-    char2typ[18].ch = 83;
-    char2typ[18].typ = SDOOR;
-    char2typ[19].ch = 72;
-    char2typ[19].typ = SCORR;
-    char2typ[20].ch = 123;
-    char2typ[20].typ = FOUNTAIN;
-    char2typ[21].ch = 92;
-    char2typ[21].typ = THRONE;
-    char2typ[22].ch = 75;
-    char2typ[22].typ = SINK;
-    char2typ[23].ch = 125;
-    char2typ[23].typ = MOAT;
-    char2typ[24].ch = 80;
-    char2typ[24].typ = POOL;
-    char2typ[25].ch = 76;
-    char2typ[25].typ = LAVAPOOL;
-    char2typ[26].ch = 90;
-    char2typ[26].typ = LAVAWALL;
-    char2typ[27].ch = 73;
-    char2typ[27].typ = ICE;
-    char2typ[28].ch = 87;
-    char2typ[28].typ = WATER;
-    char2typ[29].ch = 84;
-    char2typ[29].typ = TREE;
-    char2typ[30].ch = 70;
-    char2typ[30].typ = IRONBARS;
-    char2typ[31].ch = 120;
-    char2typ[31].typ = MAX_TYPE;
-    char2typ[32].ch = 66;
-    char2typ[32].typ = CROSSWALL;
-    char2typ[33].ch = 119;
-    char2typ[33].typ = MATCH_WALL;
-    char2typ[34].ch = 0;
-    char2typ[34].typ = STONE;
+    $c.init(char2typ, [
+        { ch: 32, typ: STONE },
+        { ch: 35, typ: CORR },
+        { ch: 46, typ: ROOM },
+        { ch: 45, typ: HWALL },
+        { ch: 45, typ: TLCORNER },
+        { ch: 45, typ: TRCORNER },
+        { ch: 45, typ: BLCORNER },
+        { ch: 45, typ: BRCORNER },
+        { ch: 45, typ: CROSSWALL },
+        { ch: 45, typ: TUWALL },
+        { ch: 45, typ: TDWALL },
+        { ch: 45, typ: TLWALL },
+        { ch: 45, typ: TRWALL },
+        { ch: 45, typ: DBWALL },
+        { ch: 124, typ: VWALL },
+        { ch: 43, typ: DOOR },
+        { ch: 65, typ: AIR },
+        { ch: 67, typ: CLOUD },
+        { ch: 83, typ: SDOOR },
+        { ch: 72, typ: SCORR },
+        { ch: 123, typ: FOUNTAIN },
+        { ch: 92, typ: THRONE },
+        { ch: 75, typ: SINK },
+        { ch: 125, typ: MOAT },
+        { ch: 80, typ: POOL },
+        { ch: 76, typ: LAVAPOOL },
+        { ch: 90, typ: LAVAWALL },
+        { ch: 73, typ: ICE },
+        { ch: 87, typ: WATER },
+        { ch: 84, typ: TREE },
+        { ch: 70, typ: IRONBARS },
+        { ch: 120, typ: MAX_TYPE },
+        { ch: 66, typ: CROSSWALL },
+        { ch: 119, typ: MATCH_WALL },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 41; $i0++) {
         nhl_functions[$i0].$copyFrom(new $T.luaL_Reg());
     }
-    nhl_functions[0].name = $c.lit("test");
-    nhl_functions[0].func = nhl_test;
-    nhl_functions[1].name = $c.lit("getmap");
-    nhl_functions[1].func = nhl_getmap;
-    nhl_functions[2].name = $c.lit("gettrap");
-    nhl_functions[2].func = nhl_gettrap;
-    nhl_functions[3].name = $c.lit("deltrap");
-    nhl_functions[3].func = nhl_deltrap;
-    nhl_functions[4].name = $c.lit("has_timer_at");
-    nhl_functions[4].func = nhl_timer_has_at;
-    nhl_functions[5].name = $c.lit("peek_timer_at");
-    nhl_functions[5].func = nhl_timer_peek_at;
-    nhl_functions[6].name = $c.lit("stop_timer_at");
-    nhl_functions[6].func = nhl_timer_stop_at;
-    nhl_functions[7].name = $c.lit("start_timer_at");
-    nhl_functions[7].func = nhl_timer_start_at;
-    nhl_functions[8].name = $c.lit("abscoord");
-    nhl_functions[8].func = nhl_abs_coord;
-    nhl_functions[9].name = $c.lit("impossible");
-    nhl_functions[9].func = nhl_impossible;
-    nhl_functions[10].name = $c.lit("pline");
-    nhl_functions[10].func = nhl_pline;
-    nhl_functions[11].name = $c.lit("verbalize");
-    nhl_functions[11].func = nhl_verbalize;
-    nhl_functions[12].name = $c.lit("menu");
-    nhl_functions[12].func = nhl_menu;
-    nhl_functions[13].name = $c.lit("text");
-    nhl_functions[13].func = nhl_text;
-    nhl_functions[14].name = $c.lit("getlin");
-    nhl_functions[14].func = nhl_getlin;
-    nhl_functions[15].name = $c.lit("eckey");
-    nhl_functions[15].func = nhl_get_cmd_key;
-    nhl_functions[16].name = $c.lit("callback");
-    nhl_functions[16].func = nhl_callback;
-    nhl_functions[17].name = $c.lit("gamestate");
-    nhl_functions[17].func = nhl_gamestate;
-    nhl_functions[18].name = $c.lit("makeplural");
-    nhl_functions[18].func = nhl_makeplural;
-    nhl_functions[19].name = $c.lit("makesingular");
-    nhl_functions[19].func = nhl_makesingular;
-    nhl_functions[20].name = $c.lit("s_suffix");
-    nhl_functions[20].func = nhl_s_suffix;
-    nhl_functions[21].name = $c.lit("ing_suffix");
-    nhl_functions[21].func = nhl_ing_suffix;
-    nhl_functions[22].name = $c.lit("an");
-    nhl_functions[22].func = nhl_an;
-    nhl_functions[23].name = $c.lit("rn2");
-    nhl_functions[23].func = nhl_rn2;
-    nhl_functions[24].name = $c.lit("random");
-    nhl_functions[24].func = nhl_random;
-    nhl_functions[25].name = $c.lit("level_difficulty");
-    nhl_functions[25].func = nhl_level_difficulty;
-    nhl_functions[26].name = $c.lit("is_genocided");
-    nhl_functions[26].func = nhl_is_genocided;
-    nhl_functions[27].name = $c.lit("debug_themerm");
-    nhl_functions[27].func = nhl_get_debug_themerm_name;
-    nhl_functions[28].name = $c.lit("parse_config");
-    nhl_functions[28].func = nhl_parse_config;
-    nhl_functions[29].name = $c.lit("get_config");
-    nhl_functions[29].func = nhl_get_config;
-    nhl_functions[30].name = $c.lit("get_config_errors");
-    nhl_functions[30].func = l_get_config_errors;
-    nhl_functions[31].name = $c.lit("dnum_name");
-    nhl_functions[31].func = nhl_dnum_name;
-    nhl_functions[32].name = $c.lit("int_to_pmname");
-    nhl_functions[32].func = nhl_int_to_pm_name;
-    nhl_functions[33].name = $c.lit("int_to_objname");
-    nhl_functions[33].func = nhl_int_to_obj_name;
-    nhl_functions[34].name = $c.lit("variable");
-    nhl_functions[34].func = nhl_variable;
-    nhl_functions[35].name = $c.lit("stairways");
-    nhl_functions[35].func = nhl_stairways;
-    nhl_functions[36].name = $c.lit("pushkey");
-    nhl_functions[36].func = nhl_pushkey;
-    nhl_functions[37].name = $c.lit("doturn");
-    nhl_functions[37].func = nhl_doturn;
-    nhl_functions[38].name = $c.lit("debug_flags");
-    nhl_functions[38].func = nhl_debug_flags;
-    nhl_functions[39].name = $c.lit("flip_level");
-    nhl_functions[39].func = nhl_flip_level;
-    nhl_functions[40].name = null;
-    nhl_functions[40].func = null;
+    $c.init(nhl_functions, [
+        { name: $c.lit("test"), func: nhl_test },
+        { name: $c.lit("getmap"), func: nhl_getmap },
+        { name: $c.lit("gettrap"), func: nhl_gettrap },
+        { name: $c.lit("deltrap"), func: nhl_deltrap },
+        { name: $c.lit("has_timer_at"), func: nhl_timer_has_at },
+        { name: $c.lit("peek_timer_at"), func: nhl_timer_peek_at },
+        { name: $c.lit("stop_timer_at"), func: nhl_timer_stop_at },
+        { name: $c.lit("start_timer_at"), func: nhl_timer_start_at },
+        { name: $c.lit("abscoord"), func: nhl_abs_coord },
+        { name: $c.lit("impossible"), func: nhl_impossible },
+        { name: $c.lit("pline"), func: nhl_pline },
+        { name: $c.lit("verbalize"), func: nhl_verbalize },
+        { name: $c.lit("menu"), func: nhl_menu },
+        { name: $c.lit("text"), func: nhl_text },
+        { name: $c.lit("getlin"), func: nhl_getlin },
+        { name: $c.lit("eckey"), func: nhl_get_cmd_key },
+        { name: $c.lit("callback"), func: nhl_callback },
+        { name: $c.lit("gamestate"), func: nhl_gamestate },
+        { name: $c.lit("makeplural"), func: nhl_makeplural },
+        { name: $c.lit("makesingular"), func: nhl_makesingular },
+        { name: $c.lit("s_suffix"), func: nhl_s_suffix },
+        { name: $c.lit("ing_suffix"), func: nhl_ing_suffix },
+        { name: $c.lit("an"), func: nhl_an },
+        { name: $c.lit("rn2"), func: nhl_rn2 },
+        { name: $c.lit("random"), func: nhl_random },
+        { name: $c.lit("level_difficulty"), func: nhl_level_difficulty },
+        { name: $c.lit("is_genocided"), func: nhl_is_genocided },
+        { name: $c.lit("debug_themerm"), func: nhl_get_debug_themerm_name },
+        { name: $c.lit("parse_config"), func: nhl_parse_config },
+        { name: $c.lit("get_config"), func: nhl_get_config },
+        { name: $c.lit("get_config_errors"), func: l_get_config_errors },
+        { name: $c.lit("dnum_name"), func: nhl_dnum_name },
+        { name: $c.lit("int_to_pmname"), func: nhl_int_to_pm_name },
+        { name: $c.lit("int_to_objname"), func: nhl_int_to_obj_name },
+        { name: $c.lit("variable"), func: nhl_variable },
+        { name: $c.lit("stairways"), func: nhl_stairways },
+        { name: $c.lit("pushkey"), func: nhl_pushkey },
+        { name: $c.lit("doturn"), func: nhl_doturn },
+        { name: $c.lit("debug_flags"), func: nhl_debug_flags },
+        { name: $c.lit("flip_level"), func: nhl_flip_level },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 9; $i0++) {
         nhl_consts[$i0].$copyFrom(new $T.anon_nhlua_2057());
     }
-    nhl_consts[0].name = $c.lit("COLNO");
-    nhl_consts[0].value = COLNO;
-    nhl_consts[1].name = $c.lit("ROWNO");
-    nhl_consts[1].value = ROWNO;
-    nhl_consts[2].name = $c.lit("NUMMONS");
-    nhl_consts[2].value = NUMMONS;
-    nhl_consts[3].name = $c.lit("LOW_PM");
-    nhl_consts[3].value = LOW_PM;
-    nhl_consts[4].name = $c.lit("HIGH_PM");
-    nhl_consts[4].value = HIGH_PM;
-    nhl_consts[5].name = $c.lit("FIRST_OBJECT");
-    nhl_consts[5].value = FIRST_OBJECT;
-    nhl_consts[6].name = $c.lit("LAST_OBJECT");
-    nhl_consts[6].value = NUM_OBJECTS - 1;
-    nhl_consts[7].name = $c.lit("DLB");
-    nhl_consts[7].value = 0;
-    nhl_consts[8].name = null;
-    nhl_consts[8].value = 0;
+    $c.init(nhl_consts, [
+        { name: $c.lit("COLNO"), value: COLNO },
+        { name: $c.lit("ROWNO"), value: ROWNO },
+        { name: $c.lit("NUMMONS"), value: NUMMONS },
+        { name: $c.lit("LOW_PM"), value: LOW_PM },
+        { name: $c.lit("HIGH_PM"), value: HIGH_PM },
+        { name: $c.lit("FIRST_OBJECT"), value: FIRST_OBJECT },
+        { name: $c.lit("LAST_OBJECT"), value: NUM_OBJECTS - 1 },
+        { name: $c.lit("DLB"), value: 0 },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 3; $i0++) {
         nhl_u_functions[$i0].$copyFrom(new $T.luaL_Reg());
     }
-    nhl_u_functions[0].name = $c.lit("clear_inventory");
-    nhl_u_functions[0].func = nhl_u_clear_inventory;
-    nhl_u_functions[1].name = $c.lit("giveobj");
-    nhl_u_functions[1].func = nhl_u_giveobj;
-    nhl_u_functions[2].name = null;
-    nhl_u_functions[2].func = null;
+    $c.init(nhl_u_functions, [
+        { name: $c.lit("clear_inventory"), func: nhl_u_clear_inventory },
+        { name: $c.lit("giveobj"), func: nhl_u_giveobj },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 10; $i0++) {
         ct_base_base[$i0].$copyFrom(new $T.e());
     }
-    ct_base_base[0].when = IFFLAG;
-    ct_base_base[0].fnname = $c.lit("ipairs");
-    ct_base_base[1].when = IFFLAG;
-    ct_base_base[1].fnname = $c.lit("next");
-    ct_base_base[2].when = IFFLAG;
-    ct_base_base[2].fnname = $c.lit("pairs");
-    ct_base_base[3].when = IFFLAG;
-    ct_base_base[3].fnname = $c.lit("pcall");
-    ct_base_base[4].when = IFFLAG;
-    ct_base_base[4].fnname = $c.lit("select");
-    ct_base_base[5].when = IFFLAG;
-    ct_base_base[5].fnname = $c.lit("tonumber");
-    ct_base_base[6].when = IFFLAG;
-    ct_base_base[6].fnname = $c.lit("tostring");
-    ct_base_base[7].when = IFFLAG;
-    ct_base_base[7].fnname = $c.lit("type");
-    ct_base_base[8].when = IFFLAG;
-    ct_base_base[8].fnname = $c.lit("xpcall");
-    ct_base_base[9].when = EOT;
-    ct_base_base[9].fnname = null;
+    $c.init(ct_base_base, [
+        { when: IFFLAG, fnname: $c.lit("ipairs") },
+        { when: IFFLAG, fnname: $c.lit("next") },
+        { when: IFFLAG, fnname: $c.lit("pairs") },
+        { when: IFFLAG, fnname: $c.lit("pcall") },
+        { when: IFFLAG, fnname: $c.lit("select") },
+        { when: IFFLAG, fnname: $c.lit("tonumber") },
+        { when: IFFLAG, fnname: $c.lit("tostring") },
+        { when: IFFLAG, fnname: $c.lit("type") },
+        { when: IFFLAG, fnname: $c.lit("xpcall") },
+        { when: EOT, fnname: null }
+    ]);
     for (let $i0 = 0; $i0 < 5; $i0++) {
         ct_base_error[$i0].$copyFrom(new $T.e());
     }
-    ct_base_error[0].when = IFFLAG;
-    ct_base_error[0].fnname = $c.lit("assert");
-    ct_base_error[1].when = IFFLAG;
-    ct_base_error[1].fnname = $c.lit("error");
-    ct_base_error[2].when = NEVER;
-    ct_base_error[2].fnname = $c.lit("print");
-    ct_base_error[3].when = NEVER;
-    ct_base_error[3].fnname = $c.lit("warn");
-    ct_base_error[4].when = EOT;
-    ct_base_error[4].fnname = null;
+    $c.init(ct_base_error, [
+        { when: IFFLAG, fnname: $c.lit("assert") },
+        { when: IFFLAG, fnname: $c.lit("error") },
+        { when: NEVER, fnname: $c.lit("print") },
+        { when: NEVER, fnname: $c.lit("warn") },
+        { when: EOT, fnname: null }
+    ]);
     for (let $i0 = 0; $i0 < 7; $i0++) {
         ct_base_meta[$i0].$copyFrom(new $T.e());
     }
-    ct_base_meta[0].when = IFFLAG;
-    ct_base_meta[0].fnname = $c.lit("getmetatable");
-    ct_base_meta[1].when = IFFLAG;
-    ct_base_meta[1].fnname = $c.lit("rawequal");
-    ct_base_meta[2].when = IFFLAG;
-    ct_base_meta[2].fnname = $c.lit("rawget");
-    ct_base_meta[3].when = IFFLAG;
-    ct_base_meta[3].fnname = $c.lit("rawlen");
-    ct_base_meta[4].when = IFFLAG;
-    ct_base_meta[4].fnname = $c.lit("rawset");
-    ct_base_meta[5].when = IFFLAG;
-    ct_base_meta[5].fnname = $c.lit("setmetatable");
-    ct_base_meta[6].when = EOT;
-    ct_base_meta[6].fnname = null;
+    $c.init(ct_base_meta, [
+        { when: IFFLAG, fnname: $c.lit("getmetatable") },
+        { when: IFFLAG, fnname: $c.lit("rawequal") },
+        { when: IFFLAG, fnname: $c.lit("rawget") },
+        { when: IFFLAG, fnname: $c.lit("rawlen") },
+        { when: IFFLAG, fnname: $c.lit("rawset") },
+        { when: IFFLAG, fnname: $c.lit("setmetatable") },
+        { when: EOT, fnname: null }
+    ]);
     for (let $i0 = 0; $i0 < 2; $i0++) {
         ct_base_iffy[$i0].$copyFrom(new $T.e());
     }
-    ct_base_iffy[0].when = IFFLAG;
-    ct_base_iffy[0].fnname = $c.lit("collectgarbage");
-    ct_base_iffy[1].when = EOT;
-    ct_base_iffy[1].fnname = null;
+    $c.init(ct_base_iffy, [
+        { when: IFFLAG, fnname: $c.lit("collectgarbage") },
+        { when: EOT, fnname: null }
+    ]);
     for (let $i0 = 0; $i0 < 4; $i0++) {
         ct_base_unsafe[$i0].$copyFrom(new $T.e());
     }
-    ct_base_unsafe[0].when = IFFLAG;
-    ct_base_unsafe[0].fnname = $c.lit("dofile");
-    ct_base_unsafe[1].when = IFFLAG;
-    ct_base_unsafe[1].fnname = $c.lit("loadfile");
-    ct_base_unsafe[2].when = IFFLAG;
-    ct_base_unsafe[2].fnname = $c.lit("load");
-    ct_base_unsafe[3].when = EOT;
-    ct_base_unsafe[3].fnname = null;
+    $c.init(ct_base_unsafe, [
+        { when: IFFLAG, fnname: $c.lit("dofile") },
+        { when: IFFLAG, fnname: $c.lit("loadfile") },
+        { when: IFFLAG, fnname: $c.lit("load") },
+        { when: EOT, fnname: null }
+    ]);
     for (let $i0 = 0; $i0 < 17; $i0++) {
         ct_debug_debug[$i0].$copyFrom(new $T.e());
     }
-    ct_debug_debug[0].when = NEVER;
-    ct_debug_debug[0].fnname = $c.lit("debug");
-    ct_debug_debug[1].when = IFFLAG;
-    ct_debug_debug[1].fnname = $c.lit("getuservalue");
-    ct_debug_debug[2].when = NEVER;
-    ct_debug_debug[2].fnname = $c.lit("gethook");
-    ct_debug_debug[3].when = IFFLAG;
-    ct_debug_debug[3].fnname = $c.lit("getinfo");
-    ct_debug_debug[4].when = IFFLAG;
-    ct_debug_debug[4].fnname = $c.lit("getlocal");
-    ct_debug_debug[5].when = IFFLAG;
-    ct_debug_debug[5].fnname = $c.lit("getregistry");
-    ct_debug_debug[6].when = IFFLAG;
-    ct_debug_debug[6].fnname = $c.lit("getmetatable");
-    ct_debug_debug[7].when = IFFLAG;
-    ct_debug_debug[7].fnname = $c.lit("getupvalue");
-    ct_debug_debug[8].when = IFFLAG;
-    ct_debug_debug[8].fnname = $c.lit("upvaluejoin");
-    ct_debug_debug[9].when = IFFLAG;
-    ct_debug_debug[9].fnname = $c.lit("upvalueid");
-    ct_debug_debug[10].when = IFFLAG;
-    ct_debug_debug[10].fnname = $c.lit("setuservalue");
-    ct_debug_debug[11].when = NEVER;
-    ct_debug_debug[11].fnname = $c.lit("sethook");
-    ct_debug_debug[12].when = IFFLAG;
-    ct_debug_debug[12].fnname = $c.lit("setlocal");
-    ct_debug_debug[13].when = IFFLAG;
-    ct_debug_debug[13].fnname = $c.lit("setmetatable");
-    ct_debug_debug[14].when = IFFLAG;
-    ct_debug_debug[14].fnname = $c.lit("setupvalue");
-    ct_debug_debug[15].when = IFFLAG;
-    ct_debug_debug[15].fnname = $c.lit("setcstacklimit");
-    ct_debug_debug[16].when = EOT;
-    ct_debug_debug[16].fnname = null;
+    $c.init(ct_debug_debug, [
+        { when: NEVER, fnname: $c.lit("debug") },
+        { when: IFFLAG, fnname: $c.lit("getuservalue") },
+        { when: NEVER, fnname: $c.lit("gethook") },
+        { when: IFFLAG, fnname: $c.lit("getinfo") },
+        { when: IFFLAG, fnname: $c.lit("getlocal") },
+        { when: IFFLAG, fnname: $c.lit("getregistry") },
+        { when: IFFLAG, fnname: $c.lit("getmetatable") },
+        { when: IFFLAG, fnname: $c.lit("getupvalue") },
+        { when: IFFLAG, fnname: $c.lit("upvaluejoin") },
+        { when: IFFLAG, fnname: $c.lit("upvalueid") },
+        { when: IFFLAG, fnname: $c.lit("setuservalue") },
+        { when: NEVER, fnname: $c.lit("sethook") },
+        { when: IFFLAG, fnname: $c.lit("setlocal") },
+        { when: IFFLAG, fnname: $c.lit("setmetatable") },
+        { when: IFFLAG, fnname: $c.lit("setupvalue") },
+        { when: IFFLAG, fnname: $c.lit("setcstacklimit") },
+        { when: EOT, fnname: null }
+    ]);
     for (let $i0 = 0; $i0 < 2; $i0++) {
         ct_debug_safe[$i0].$copyFrom(new $T.e());
     }
-    ct_debug_safe[0].when = IFFLAG;
-    ct_debug_safe[0].fnname = $c.lit("traceback");
-    ct_debug_safe[1].when = EOT;
-    ct_debug_safe[1].fnname = null;
+    $c.init(ct_debug_safe, [
+        { when: IFFLAG, fnname: $c.lit("traceback") },
+        { when: EOT, fnname: null }
+    ]);
     for (let $i0 = 0; $i0 < 5; $i0++) {
         ct_os_time[$i0].$copyFrom(new $T.e());
     }
-    ct_os_time[0].when = IFFLAG;
-    ct_os_time[0].fnname = $c.lit("clock");
-    ct_os_time[1].when = IFFLAG;
-    ct_os_time[1].fnname = $c.lit("date");
-    ct_os_time[2].when = IFFLAG;
-    ct_os_time[2].fnname = $c.lit("difftime");
-    ct_os_time[3].when = IFFLAG;
-    ct_os_time[3].fnname = $c.lit("time");
-    ct_os_time[4].when = EOT;
-    ct_os_time[4].fnname = null;
+    $c.init(ct_os_time, [
+        { when: IFFLAG, fnname: $c.lit("clock") },
+        { when: IFFLAG, fnname: $c.lit("date") },
+        { when: IFFLAG, fnname: $c.lit("difftime") },
+        { when: IFFLAG, fnname: $c.lit("time") },
+        { when: EOT, fnname: null }
+    ]);
     for (let $i0 = 0; $i0 < 8; $i0++) {
         ct_os_files[$i0].$copyFrom(new $T.e());
     }
-    ct_os_files[0].when = NEVER;
-    ct_os_files[0].fnname = $c.lit("execute");
-    ct_os_files[1].when = NEVER;
-    ct_os_files[1].fnname = $c.lit("exit");
-    ct_os_files[2].when = NEVER;
-    ct_os_files[2].fnname = $c.lit("getenv");
-    ct_os_files[3].when = IFFLAG;
-    ct_os_files[3].fnname = $c.lit("remove");
-    ct_os_files[4].when = IFFLAG;
-    ct_os_files[4].fnname = $c.lit("rename");
-    ct_os_files[5].when = NEVER;
-    ct_os_files[5].fnname = $c.lit("setlocale");
-    ct_os_files[6].when = NEVER;
-    ct_os_files[6].fnname = $c.lit("tmpname");
-    ct_os_files[7].when = EOT;
-    ct_os_files[7].fnname = null;
+    $c.init(ct_os_files, [
+        { when: NEVER, fnname: $c.lit("execute") },
+        { when: NEVER, fnname: $c.lit("exit") },
+        { when: NEVER, fnname: $c.lit("getenv") },
+        { when: IFFLAG, fnname: $c.lit("remove") },
+        { when: IFFLAG, fnname: $c.lit("rename") },
+        { when: NEVER, fnname: $c.lit("setlocale") },
+        { when: NEVER, fnname: $c.lit("tmpname") },
+        { when: EOT, fnname: null }
+    ]);
     nhl_get_timertype$timerstr.fill(null);
-    nhl_get_timertype$timerstr[0] = $c.lit("rot-organic");
-    nhl_get_timertype$timerstr[1] = $c.lit("rot-corpse");
-    nhl_get_timertype$timerstr[2] = $c.lit("revive-mon");
-    nhl_get_timertype$timerstr[3] = $c.lit("zombify-mon");
-    nhl_get_timertype$timerstr[4] = $c.lit("burn-obj");
-    nhl_get_timertype$timerstr[5] = $c.lit("hatch-egg");
-    nhl_get_timertype$timerstr[6] = $c.lit("fig-transform");
-    nhl_get_timertype$timerstr[7] = $c.lit("shrink-glob");
-    nhl_get_timertype$timerstr[8] = $c.lit("melt-ice");
-    nhl_get_timertype$timerstr[9] = null;
+    $c.init(nhl_get_timertype$timerstr, [
+        $c.lit("rot-organic"),
+        $c.lit("rot-corpse"),
+        $c.lit("revive-mon"),
+        $c.lit("zombify-mon"),
+        $c.lit("burn-obj"),
+        $c.lit("hatch-egg"),
+        $c.lit("fig-transform"),
+        $c.lit("shrink-glob"),
+        $c.lit("melt-ice"),
+        null
+    ]);
     nhl_menu$pickX.fill(null);
-    nhl_menu$pickX[0] = $c.lit("none");
-    nhl_menu$pickX[1] = $c.lit("one");
-    nhl_menu$pickX[2] = $c.lit("any");
+    $c.init(nhl_menu$pickX, [
+        $c.lit("none"),
+        $c.lit("one"),
+        $c.lit("any")
+    ]);
     nhl_lua_rnglog_ctx_enabled$enabled = -1;
     nhl_rnglog_set_lua_caller$rnglog_srcbuf.fill(0);
     nhl_rnglog_set_lua_caller$rnglog_namebuf.fill(0);
@@ -2174,84 +2058,40 @@ export function $init() {
     nhl_rnglog_set_lua_caller$rnglog_src2buf.fill(0);
     nhl_rnglog_set_lua_caller$rnglog_parentbuf.fill(0);
     get_table_boolean$boolstr.fill(null);
-    get_table_boolean$boolstr[0] = $c.lit("true");
-    get_table_boolean$boolstr[1] = $c.lit("false");
-    get_table_boolean$boolstr[2] = $c.lit("yes");
-    get_table_boolean$boolstr[3] = $c.lit("no");
-    get_table_boolean$boolstr[4] = null;
+    $c.init(get_table_boolean$boolstr, [
+        $c.lit("true"),
+        $c.lit("false"),
+        $c.lit("yes"),
+        $c.lit("no"),
+        null
+    ]);
     for (let $i0 = 0; $i0 < 24; $i0++) {
         nhl_meta_u_index$ustruct[$i0].$copyFrom(new $T.anon_nhlua_2120());
     }
-    nhl_meta_u_index$ustruct[0].name = $c.lit("ux");
-    nhl_meta_u_index$ustruct[0].ptr = new $c.FieldRef(u, "ux", "i16");
-    nhl_meta_u_index$ustruct[0].type = ANY_UCHAR;
-    nhl_meta_u_index$ustruct[1].name = $c.lit("uy");
-    nhl_meta_u_index$ustruct[1].ptr = new $c.FieldRef(u, "uy", "i16");
-    nhl_meta_u_index$ustruct[1].type = ANY_UCHAR;
-    nhl_meta_u_index$ustruct[2].name = $c.lit("dx");
-    nhl_meta_u_index$ustruct[2].ptr = new $c.FieldRef(u, "dx", "i32");
-    nhl_meta_u_index$ustruct[2].type = ANY_SCHAR;
-    nhl_meta_u_index$ustruct[3].name = $c.lit("dy");
-    nhl_meta_u_index$ustruct[3].ptr = new $c.FieldRef(u, "dy", "i32");
-    nhl_meta_u_index$ustruct[3].type = ANY_SCHAR;
-    nhl_meta_u_index$ustruct[4].name = $c.lit("dz");
-    nhl_meta_u_index$ustruct[4].ptr = new $c.FieldRef(u, "dz", "i32");
-    nhl_meta_u_index$ustruct[4].type = ANY_SCHAR;
-    nhl_meta_u_index$ustruct[5].name = $c.lit("tx");
-    nhl_meta_u_index$ustruct[5].ptr = new $c.FieldRef(u, "tx", "i16");
-    nhl_meta_u_index$ustruct[5].type = ANY_UCHAR;
-    nhl_meta_u_index$ustruct[6].name = $c.lit("ty");
-    nhl_meta_u_index$ustruct[6].ptr = new $c.FieldRef(u, "ty", "i16");
-    nhl_meta_u_index$ustruct[6].type = ANY_UCHAR;
-    nhl_meta_u_index$ustruct[7].name = $c.lit("ulevel");
-    nhl_meta_u_index$ustruct[7].ptr = new $c.FieldRef(u, "ulevel", "i32");
-    nhl_meta_u_index$ustruct[7].type = ANY_INT;
-    nhl_meta_u_index$ustruct[8].name = $c.lit("ulevelmax");
-    nhl_meta_u_index$ustruct[8].ptr = new $c.FieldRef(u, "ulevelmax", "i32");
-    nhl_meta_u_index$ustruct[8].type = ANY_INT;
-    nhl_meta_u_index$ustruct[9].name = $c.lit("uhunger");
-    nhl_meta_u_index$ustruct[9].ptr = new $c.FieldRef(u, "uhunger", "i32");
-    nhl_meta_u_index$ustruct[9].type = ANY_INT;
-    nhl_meta_u_index$ustruct[10].name = $c.lit("nv_range");
-    nhl_meta_u_index$ustruct[10].ptr = new $c.FieldRef(u, "nv_range", "i32");
-    nhl_meta_u_index$ustruct[10].type = ANY_INT;
-    nhl_meta_u_index$ustruct[11].name = $c.lit("xray_range");
-    nhl_meta_u_index$ustruct[11].ptr = new $c.FieldRef(u, "xray_range", "i32");
-    nhl_meta_u_index$ustruct[11].type = ANY_INT;
-    nhl_meta_u_index$ustruct[12].name = $c.lit("umonster");
-    nhl_meta_u_index$ustruct[12].ptr = new $c.FieldRef(u, "umonster", "i32");
-    nhl_meta_u_index$ustruct[12].type = ANY_INT;
-    nhl_meta_u_index$ustruct[13].name = $c.lit("umonnum");
-    nhl_meta_u_index$ustruct[13].ptr = new $c.FieldRef(u, "umonnum", "i32");
-    nhl_meta_u_index$ustruct[13].type = ANY_INT;
-    nhl_meta_u_index$ustruct[14].name = $c.lit("mh");
-    nhl_meta_u_index$ustruct[14].ptr = new $c.FieldRef(u, "mh", "i32");
-    nhl_meta_u_index$ustruct[14].type = ANY_INT;
-    nhl_meta_u_index$ustruct[15].name = $c.lit("mhmax");
-    nhl_meta_u_index$ustruct[15].ptr = new $c.FieldRef(u, "mhmax", "i32");
-    nhl_meta_u_index$ustruct[15].type = ANY_INT;
-    nhl_meta_u_index$ustruct[16].name = $c.lit("mtimedone");
-    nhl_meta_u_index$ustruct[16].ptr = new $c.FieldRef(u, "mtimedone", "i32");
-    nhl_meta_u_index$ustruct[16].type = ANY_INT;
-    nhl_meta_u_index$ustruct[17].name = $c.lit("dlevel");
-    nhl_meta_u_index$ustruct[17].ptr = new $c.FieldRef(u.uz, "dlevel", "i16");
-    nhl_meta_u_index$ustruct[17].type = ANY_SCHAR;
-    nhl_meta_u_index$ustruct[18].name = $c.lit("dnum");
-    nhl_meta_u_index$ustruct[18].ptr = new $c.FieldRef(u.uz, "dnum", "i16");
-    nhl_meta_u_index$ustruct[18].type = ANY_SCHAR;
-    nhl_meta_u_index$ustruct[19].name = $c.lit("uluck");
-    nhl_meta_u_index$ustruct[19].ptr = new $c.FieldRef(u, "uluck", "i8");
-    nhl_meta_u_index$ustruct[19].type = ANY_SCHAR;
-    nhl_meta_u_index$ustruct[20].name = $c.lit("uhp");
-    nhl_meta_u_index$ustruct[20].ptr = new $c.FieldRef(u, "uhp", "i32");
-    nhl_meta_u_index$ustruct[20].type = ANY_INT;
-    nhl_meta_u_index$ustruct[21].name = $c.lit("uhpmax");
-    nhl_meta_u_index$ustruct[21].ptr = new $c.FieldRef(u, "uhpmax", "i32");
-    nhl_meta_u_index$ustruct[21].type = ANY_INT;
-    nhl_meta_u_index$ustruct[22].name = $c.lit("uen");
-    nhl_meta_u_index$ustruct[22].ptr = new $c.FieldRef(u, "uen", "i32");
-    nhl_meta_u_index$ustruct[22].type = ANY_INT;
-    nhl_meta_u_index$ustruct[23].name = $c.lit("uenmax");
-    nhl_meta_u_index$ustruct[23].ptr = new $c.FieldRef(u, "uenmax", "i32");
-    nhl_meta_u_index$ustruct[23].type = ANY_INT;
+    $c.init(nhl_meta_u_index$ustruct, [
+        { name: $c.lit("ux"), ptr: new $c.FieldRef(u, "ux", "i16"), type: ANY_UCHAR },
+        { name: $c.lit("uy"), ptr: new $c.FieldRef(u, "uy", "i16"), type: ANY_UCHAR },
+        { name: $c.lit("dx"), ptr: new $c.FieldRef(u, "dx", "i32"), type: ANY_SCHAR },
+        { name: $c.lit("dy"), ptr: new $c.FieldRef(u, "dy", "i32"), type: ANY_SCHAR },
+        { name: $c.lit("dz"), ptr: new $c.FieldRef(u, "dz", "i32"), type: ANY_SCHAR },
+        { name: $c.lit("tx"), ptr: new $c.FieldRef(u, "tx", "i16"), type: ANY_UCHAR },
+        { name: $c.lit("ty"), ptr: new $c.FieldRef(u, "ty", "i16"), type: ANY_UCHAR },
+        { name: $c.lit("ulevel"), ptr: new $c.FieldRef(u, "ulevel", "i32"), type: ANY_INT },
+        { name: $c.lit("ulevelmax"), ptr: new $c.FieldRef(u, "ulevelmax", "i32"), type: ANY_INT },
+        { name: $c.lit("uhunger"), ptr: new $c.FieldRef(u, "uhunger", "i32"), type: ANY_INT },
+        { name: $c.lit("nv_range"), ptr: new $c.FieldRef(u, "nv_range", "i32"), type: ANY_INT },
+        { name: $c.lit("xray_range"), ptr: new $c.FieldRef(u, "xray_range", "i32"), type: ANY_INT },
+        { name: $c.lit("umonster"), ptr: new $c.FieldRef(u, "umonster", "i32"), type: ANY_INT },
+        { name: $c.lit("umonnum"), ptr: new $c.FieldRef(u, "umonnum", "i32"), type: ANY_INT },
+        { name: $c.lit("mh"), ptr: new $c.FieldRef(u, "mh", "i32"), type: ANY_INT },
+        { name: $c.lit("mhmax"), ptr: new $c.FieldRef(u, "mhmax", "i32"), type: ANY_INT },
+        { name: $c.lit("mtimedone"), ptr: new $c.FieldRef(u, "mtimedone", "i32"), type: ANY_INT },
+        { name: $c.lit("dlevel"), ptr: new $c.FieldRef(u.uz, "dlevel", "i16"), type: ANY_SCHAR },
+        { name: $c.lit("dnum"), ptr: new $c.FieldRef(u.uz, "dnum", "i16"), type: ANY_SCHAR },
+        { name: $c.lit("uluck"), ptr: new $c.FieldRef(u, "uluck", "i8"), type: ANY_SCHAR },
+        { name: $c.lit("uhp"), ptr: new $c.FieldRef(u, "uhp", "i32"), type: ANY_INT },
+        { name: $c.lit("uhpmax"), ptr: new $c.FieldRef(u, "uhpmax", "i32"), type: ANY_INT },
+        { name: $c.lit("uen"), ptr: new $c.FieldRef(u, "uen", "i32"), type: ANY_INT },
+        { name: $c.lit("uenmax"), ptr: new $c.FieldRef(u, "uenmax", "i32"), type: ANY_INT }
+    ]);
 }

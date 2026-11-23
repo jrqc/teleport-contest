@@ -22,7 +22,7 @@ import { down_gate, ship_object } from './dokick.js';
 import { breaks, harmless_missile, hero_breaks, multishot_class_bonus, omon_adj, should_mulch_missile } from './dothrow.js';
 import { panic } from './end.js';
 import { freehand } from './engrave.js';
-import { FALSE, TRUE } from './global.h.js';
+import { BUFSZ, FALSE, TRUE } from './global.h.js';
 import { calc_capacity, losehp, nomul, rounddiv } from './hack.js';
 import { ARM, BOLT_LIM, BRK_BY_HERO, BRK_MELEE, CORPSTAT_FEMALE, CORPSTAT_GENDER, EYE, FACE, FOOT, HAND, KILLED_BY, KILLED_BY_AN, MON_POLE_DIST, PET_MISSILE_RANGE2, SLT_ENCUMBER, XKILL_NOMSG } from './hack.h.js';
 import { BZ_OFS_AD, BZ_VALID_ADTYP, Maybe_Half_Phys } from './hack.macros.js';
@@ -33,7 +33,7 @@ import { nhUse } from './lint.macros.js';
 import { mswings_verb } from './mhitu.js';
 import { add_to_minv, clear_dknown, is_flammable, mksobj, obj_extract_self, place_object, splitobj, weight } from './mkobj.js';
 import { mondied, monkilled, seemimic, setmangry, wake_nearto, xkilled } from './mon.js';
-import { AD_ACID, AD_BLND, AD_DRST, AD_PHYS, AD_SLEE, AT_SPIT, AT_WEAP, M_ATTK_HIT, M_ATTK_MISS } from './monattk.h.js';
+import { AD_ACID, AD_BLND, AD_DRST, AD_MAGM, AD_PHYS, AD_SLEE, AT_SPIT, AT_WEAP, M_ATTK_HIT, M_ATTK_MISS } from './monattk.h.js';
 import { can_blnd, cvt_adtyp_to_mseenres, get_atkdam_type, mon_hates_silver, monstseesu, monstunseesu, poly_when_stoned, pronoun_gender } from './mondata.js';
 import { amorphous, bigmonst, eyecount, is_elf, is_gnome, is_lord, is_mplayer, is_orc, is_prince, is_unicorn, nohands, noncorporeal, nonliving, passes_rocks, throws_rocks, touch_petrifies } from './mondata.macros.js';
 import { MZ_TINY, NEUTRAL } from './monflag.h.js';
@@ -309,7 +309,7 @@ export async function ohitmon(mtmp, otmp, range, verbose) {   // mthrowu.c:321
                 if (!harmless) {
                     $c.__builtin___strcpy_chk(new $c.Ptr(how, 0), exclam(damage), 256);
                 } else {
-                    $c.__builtin___sprintf_chk(new $c.Ptr(how, 0), 0, 256, $c.lit(" but passes harmlessly through %.9s."), genders[pronoun_gender(mtmp, 2)].him);
+                    $c.__builtin___sprintf_chk(new $c.Ptr(how, 0), 0, 256, $c.lit(" but passes harmlessly through %.9s."), genders[pronoun_gender(mtmp, PRONOUN_HALLU)].him);
                 }
                 await hit(await distant_name(otmp, mshot_xname), mtmp, new $c.Ptr(how, 0));
             }
@@ -423,7 +423,7 @@ async function u_catch_thrown_obj(otmp) {   // mthrowu.c:533
     let catch_chance = 0, buf = new Int8Array(256);
     catch_chance = (100 - ACURR(A_DEX) | 0) - (gu.urole.mnum === PM_MONK || gu.urole.mnum === PM_ROGUE ? 20 : 0) | 0;
     if (!Blind() && !u.uprops[CONFUSION].intrinsic && !u.uprops[STUNNED].intrinsic && !Fumbling() && otmp.oclass !== VENOM_CLASS && !nohands(gy.youmonst.data) && await freehand() && calc_capacity(otmp.owt | 0) <= SLT_ENCUMBER && !rn2(catch_chance)) {
-        nh_snprintf($c.lit("u_catch_thrown_obj"), 544, new $c.Ptr(buf, 0), 256, $c.lit("You catch the %s!"), await simpleonames(otmp));
+        nh_snprintf($c.lit("u_catch_thrown_obj"), 544, new $c.Ptr(buf, 0), BUFSZ, $c.lit("You catch the %s!"), await simpleonames(otmp));
         await hold_another_object(otmp, $c.lit("You catch, but drop, the %s."), await simpleonames(otmp), new $c.Ptr(buf, 0));
         return TRUE;
     }
@@ -592,7 +592,7 @@ export async function m_throw(mon, x, y, dx, dy, range, obj) {   // mthrowu.c:57
             }
         }
         forcehit = $c.i8(!rn2(5) ? 1 : 0);
-        if (!range || (!isok($c.i16(gb.bhitpos.x + dx | 0), $c.i16(gb.bhitpos.y + dy | 0)) || svl.level.locations[gb.bhitpos.x + dx | 0][gb.bhitpos.y + dy | 0].typ < POOL || closed_door($c.i16(gb.bhitpos.x + dx | 0), $c.i16(gb.bhitpos.y + dy | 0)) || svl.level.locations[gb.bhitpos.x + dx | 0][gb.bhitpos.y + dy | 0].typ === IRONBARS && await hits_bars(new $c.Ptr(singleobj, 0), gb.bhitpos.x, gb.bhitpos.y, $c.i16(gb.bhitpos.x + dx | 0), $c.i16(gb.bhitpos.y + dy | 0), 0 ? 0 : forcehit, 0) || 1 && svl.level.locations[gb.bhitpos.x][gb.bhitpos.y].typ === SINK)) {
+        if (!range || (!isok($c.i16(gb.bhitpos.x + dx | 0), $c.i16(gb.bhitpos.y + dy | 0)) || svl.level.locations[gb.bhitpos.x + dx | 0][gb.bhitpos.y + dy | 0].typ < POOL || closed_door($c.i16(gb.bhitpos.x + dx | 0), $c.i16(gb.bhitpos.y + dy | 0)) || svl.level.locations[gb.bhitpos.x + dx | 0][gb.bhitpos.y + dy | 0].typ === IRONBARS && await hits_bars(new $c.Ptr(singleobj, 0), gb.bhitpos.x, gb.bhitpos.y, $c.i16(gb.bhitpos.x + dx | 0), $c.i16(gb.bhitpos.y + dy | 0), FALSE ? 0 : forcehit, 0) || 1 && svl.level.locations[gb.bhitpos.x][gb.bhitpos.y].typ === SINK)) {
             if (singleobj[0]) {
                 if (range && cansee(gb.bhitpos.x, gb.bhitpos.y) && svl.level.locations[gb.bhitpos.x][gb.bhitpos.y].typ === SINK) {
                     await pline($c.lit("%s %s onto the sink."), await The(await mshot_xname(singleobj[0])), await otense(singleobj[0], Hallucination() ? $c.lit("plop") : $c.lit("drop")));
@@ -751,7 +751,7 @@ export async function thrwmm(mtmp, mtarg) {   // mthrowu.c:969
     y = mtmp.my;
     mwep = mtmp.mw;
     if (!ispole && m_lined_up(mtarg, mtmp)) {
-        chance = (8 - distmin(x, y, mtarg.mx, mtarg.my) | 0) > 1 ? 8 - distmin(x, y, mtarg.mx, mtarg.my) | 0 : 1;
+        chance = (BOLT_LIM - distmin(x, y, mtarg.mx, mtarg.my) | 0) > 1 ? BOLT_LIM - distmin(x, y, mtarg.mx, mtarg.my) | 0 : 1;
         if (!mtarg.mflee || !rn2(chance)) {
             if (ammo_and_launcher(otmp, mwep) && dist2(mtmp.mx, mtmp.my, mtarg.mx, mtarg.my) > PET_MISSILE_RANGE2) {
                 return M_ATTK_MISS;
@@ -793,7 +793,7 @@ export async function spitmm(mtmp, mattk, mtarg) {   // mthrowu.c:1016
                 otmp = await mksobj(ACID_VENOM, TRUE, FALSE);
                 break;
         }
-        if (!rn2(8 - distmin(mtmp.mx, mtmp.my, tx, ty) | 0)) {
+        if (!rn2(BOLT_LIM - distmin(mtmp.mx, mtmp.my, tx, ty) | 0)) {
             if (canseemon(mtmp)) {
                 await pline($c.lit("%s spits venom!"), await Monnam(mtmp));
             }
@@ -847,7 +847,7 @@ export async function breamm(mtmp, mattk, mtarg) {   // mthrowu.c:1093
                     await pline($c.lit("%s breathes %s!"), await Monnam(mtmp), breathwep_name(typ));
                 }
                 gb.buzzer = mtmp;
-                await dobuzz(-20 - $c.rem32($c.abs(typ - 1 | 0), 10) | 0, mattk.damn, mtmp.mx, mtmp.my, sgn(gt.tbx), sgn(gt.tby), utarget, utarget, FALSE);
+                await dobuzz(-20 - $c.rem32($c.abs(typ - AD_MAGM | 0), 10) | 0, mattk.damn, mtmp.mx, mtmp.my, sgn(gt.tbx), sgn(gt.tby), utarget, utarget, FALSE);
                 gb.buzzer = null;
                 nomul(0);
                 if (!utarget || !rn2(3)) {
@@ -933,7 +933,7 @@ export async function thrwmu(mtmp) {   // mthrowu.c:1174
     }
     x = mtmp.mx;
     y = mtmp.my;
-    if (!lined_up(mtmp) || URETREATING(x, y) && (!always_toss && rn2(8 - distmin(x, y, mtmp.mux, mtmp.muy) | 0))) {
+    if (!lined_up(mtmp) || URETREATING(x, y) && (!always_toss && rn2(BOLT_LIM - distmin(x, y, mtmp.mux, mtmp.muy) | 0))) {
         return;
     }
     mwep = mtmp.mw;
@@ -1122,126 +1122,134 @@ function URETREATING(x, y) {
 
 export function $init() {
     breathwep.fill(null);
-    breathwep[0] = $c.lit("fragments");
-    breathwep[1] = $c.lit("fire");
-    breathwep[2] = $c.lit("frost");
-    breathwep[3] = $c.lit("sleep gas");
-    breathwep[4] = $c.lit("a disintegration blast");
-    breathwep[5] = $c.lit("lightning");
-    breathwep[6] = $c.lit("poison gas");
-    breathwep[7] = $c.lit("acid");
-    breathwep[8] = $c.lit("strange breath #8");
-    breathwep[9] = $c.lit("strange breath #9");
+    $c.init(breathwep, [
+        $c.lit("fragments"),
+        $c.lit("fire"),
+        $c.lit("frost"),
+        $c.lit("sleep gas"),
+        $c.lit("a disintegration blast"),
+        $c.lit("lightning"),
+        $c.lit("poison gas"),
+        $c.lit("acid"),
+        $c.lit("strange breath #8"),
+        $c.lit("strange breath #9")
+    ]);
     hallublasts.fill(null);
-    hallublasts[0] = $c.lit("asteroids");
-    hallublasts[1] = $c.lit("beads");
-    hallublasts[2] = $c.lit("bubbles");
-    hallublasts[3] = $c.lit("butterflies");
-    hallublasts[4] = $c.lit("champagne");
-    hallublasts[5] = $c.lit("chaos");
-    hallublasts[6] = $c.lit("coins");
-    hallublasts[7] = $c.lit("cotton candy");
-    hallublasts[8] = $c.lit("crumbs");
-    hallublasts[9] = $c.lit("dark matter");
-    hallublasts[10] = $c.lit("darkness");
-    hallublasts[11] = $c.lit("data");
-    hallublasts[12] = $c.lit("dust specks");
-    hallublasts[13] = $c.lit("emoticons");
-    hallublasts[14] = $c.lit("emotions");
-    hallublasts[15] = $c.lit("entropy");
-    hallublasts[16] = $c.lit("flowers");
-    hallublasts[17] = $c.lit("foam");
-    hallublasts[18] = $c.lit("fog");
-    hallublasts[19] = $c.lit("gamma rays");
-    hallublasts[20] = $c.lit("gelatin");
-    hallublasts[21] = $c.lit("gemstones");
-    hallublasts[22] = $c.lit("ghosts");
-    hallublasts[23] = $c.lit("glass shards");
-    hallublasts[24] = $c.lit("glitter");
-    hallublasts[25] = $c.lit("good vibes");
-    hallublasts[26] = $c.lit("gravel");
-    hallublasts[27] = $c.lit("gravity");
-    hallublasts[28] = $c.lit("gravy");
-    hallublasts[29] = $c.lit("grawlixes");
-    hallublasts[30] = $c.lit("holy light");
-    hallublasts[31] = $c.lit("hornets");
-    hallublasts[32] = $c.lit("hot air");
-    hallublasts[33] = $c.lit("hyphens");
-    hallublasts[34] = $c.lit("hypnosis");
-    hallublasts[35] = $c.lit("infrared");
-    hallublasts[36] = $c.lit("insects");
-    hallublasts[37] = $c.lit("jargon");
-    hallublasts[38] = $c.lit("laser beams");
-    hallublasts[39] = $c.lit("leaves");
-    hallublasts[40] = $c.lit("lightening");
-    hallublasts[41] = $c.lit("logic gates");
-    hallublasts[42] = $c.lit("magma");
-    hallublasts[43] = $c.lit("marbles");
-    hallublasts[44] = $c.lit("mathematics");
-    hallublasts[45] = $c.lit("megabytes");
-    hallublasts[46] = $c.lit("metal shavings");
-    hallublasts[47] = $c.lit("metapatterns");
-    hallublasts[48] = $c.lit("meteors");
-    hallublasts[49] = $c.lit("mist");
-    hallublasts[50] = $c.lit("mud");
-    hallublasts[51] = $c.lit("music");
-    hallublasts[52] = $c.lit("nanites");
-    hallublasts[53] = $c.lit("needles");
-    hallublasts[54] = $c.lit("noise");
-    hallublasts[55] = $c.lit("nostalgia");
-    hallublasts[56] = $c.lit("oil");
-    hallublasts[57] = $c.lit("paint");
-    hallublasts[58] = $c.lit("photons");
-    hallublasts[59] = $c.lit("pixels");
-    hallublasts[60] = $c.lit("plasma");
-    hallublasts[61] = $c.lit("polarity");
-    hallublasts[62] = $c.lit("powder");
-    hallublasts[63] = $c.lit("powerups");
-    hallublasts[64] = $c.lit("prismatic light");
-    hallublasts[65] = $c.lit("pure logic");
-    hallublasts[66] = $c.lit("purple");
-    hallublasts[67] = $c.lit("radio waves");
-    hallublasts[68] = $c.lit("rainbows");
-    hallublasts[69] = $c.lit("rock music");
-    hallublasts[70] = $c.lit("rocket fuel");
-    hallublasts[71] = $c.lit("rope");
-    hallublasts[72] = $c.lit("sadness");
-    hallublasts[73] = $c.lit("salt");
-    hallublasts[74] = $c.lit("sand");
-    hallublasts[75] = $c.lit("scrolls");
-    hallublasts[76] = $c.lit("sludge");
-    hallublasts[77] = $c.lit("smileys");
-    hallublasts[78] = $c.lit("snowflakes");
-    hallublasts[79] = $c.lit("sparkles");
-    hallublasts[80] = $c.lit("specularity");
-    hallublasts[81] = $c.lit("spores");
-    hallublasts[82] = $c.lit("stars");
-    hallublasts[83] = $c.lit("steam");
-    hallublasts[84] = $c.lit("tetrahedrons");
-    hallublasts[85] = $c.lit("text");
-    hallublasts[86] = $c.lit("the past");
-    hallublasts[87] = $c.lit("tornadoes");
-    hallublasts[88] = $c.lit("toxic waste");
-    hallublasts[89] = $c.lit("ultraviolet light");
-    hallublasts[90] = $c.lit("viruses");
-    hallublasts[91] = $c.lit("water");
-    hallublasts[92] = $c.lit("waveforms");
-    hallublasts[93] = $c.lit("wind");
-    hallublasts[94] = $c.lit("X-rays");
-    hallublasts[95] = $c.lit("zorkmids");
+    $c.init(hallublasts, [
+        $c.lit("asteroids"),
+        $c.lit("beads"),
+        $c.lit("bubbles"),
+        $c.lit("butterflies"),
+        $c.lit("champagne"),
+        $c.lit("chaos"),
+        $c.lit("coins"),
+        $c.lit("cotton candy"),
+        $c.lit("crumbs"),
+        $c.lit("dark matter"),
+        $c.lit("darkness"),
+        $c.lit("data"),
+        $c.lit("dust specks"),
+        $c.lit("emoticons"),
+        $c.lit("emotions"),
+        $c.lit("entropy"),
+        $c.lit("flowers"),
+        $c.lit("foam"),
+        $c.lit("fog"),
+        $c.lit("gamma rays"),
+        $c.lit("gelatin"),
+        $c.lit("gemstones"),
+        $c.lit("ghosts"),
+        $c.lit("glass shards"),
+        $c.lit("glitter"),
+        $c.lit("good vibes"),
+        $c.lit("gravel"),
+        $c.lit("gravity"),
+        $c.lit("gravy"),
+        $c.lit("grawlixes"),
+        $c.lit("holy light"),
+        $c.lit("hornets"),
+        $c.lit("hot air"),
+        $c.lit("hyphens"),
+        $c.lit("hypnosis"),
+        $c.lit("infrared"),
+        $c.lit("insects"),
+        $c.lit("jargon"),
+        $c.lit("laser beams"),
+        $c.lit("leaves"),
+        $c.lit("lightening"),
+        $c.lit("logic gates"),
+        $c.lit("magma"),
+        $c.lit("marbles"),
+        $c.lit("mathematics"),
+        $c.lit("megabytes"),
+        $c.lit("metal shavings"),
+        $c.lit("metapatterns"),
+        $c.lit("meteors"),
+        $c.lit("mist"),
+        $c.lit("mud"),
+        $c.lit("music"),
+        $c.lit("nanites"),
+        $c.lit("needles"),
+        $c.lit("noise"),
+        $c.lit("nostalgia"),
+        $c.lit("oil"),
+        $c.lit("paint"),
+        $c.lit("photons"),
+        $c.lit("pixels"),
+        $c.lit("plasma"),
+        $c.lit("polarity"),
+        $c.lit("powder"),
+        $c.lit("powerups"),
+        $c.lit("prismatic light"),
+        $c.lit("pure logic"),
+        $c.lit("purple"),
+        $c.lit("radio waves"),
+        $c.lit("rainbows"),
+        $c.lit("rock music"),
+        $c.lit("rocket fuel"),
+        $c.lit("rope"),
+        $c.lit("sadness"),
+        $c.lit("salt"),
+        $c.lit("sand"),
+        $c.lit("scrolls"),
+        $c.lit("sludge"),
+        $c.lit("smileys"),
+        $c.lit("snowflakes"),
+        $c.lit("sparkles"),
+        $c.lit("specularity"),
+        $c.lit("spores"),
+        $c.lit("stars"),
+        $c.lit("steam"),
+        $c.lit("tetrahedrons"),
+        $c.lit("text"),
+        $c.lit("the past"),
+        $c.lit("tornadoes"),
+        $c.lit("toxic waste"),
+        $c.lit("ultraviolet light"),
+        $c.lit("viruses"),
+        $c.lit("water"),
+        $c.lit("waveforms"),
+        $c.lit("wind"),
+        $c.lit("X-rays"),
+        $c.lit("zorkmids")
+    ]);
     return_from_mtoss$do_not_annoy = 0;
     hit_bars$se.fill(0);
-    hit_bars$se[0] = se_zero_invalid;
-    hit_bars$se[1] = se_bars_whang;
-    hit_bars$se[2] = se_bars_whap;
-    hit_bars$se[3] = se_bars_flapp;
-    hit_bars$se[4] = se_bars_clink;
-    hit_bars$se[5] = se_bars_clonk;
+    $c.init(hit_bars$se, [
+        se_zero_invalid,
+        se_bars_whang,
+        se_bars_whap,
+        se_bars_flapp,
+        se_bars_clink,
+        se_bars_clonk
+    ]);
     hit_bars$barsounds.fill(null);
-    hit_bars$barsounds[0] = $c.lit("");
-    hit_bars$barsounds[1] = $c.lit("Whang");
-    hit_bars$barsounds[2] = $c.lit("Whap");
-    hit_bars$barsounds[3] = $c.lit("Flapp");
-    hit_bars$barsounds[4] = $c.lit("Clink");
-    hit_bars$barsounds[5] = $c.lit("Clonk");
+    $c.init(hit_bars$barsounds, [
+        $c.lit(""),
+        $c.lit("Whang"),
+        $c.lit("Whap"),
+        $c.lit("Flapp"),
+        $c.lit("Clink"),
+        $c.lit("Clonk")
+    ]);
 }

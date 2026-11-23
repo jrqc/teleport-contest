@@ -31,7 +31,7 @@ export async function genl_outrip(tmpwin, how, when) {   // rip.c:86
         $t2 = await dupstr(rip_txt[x]), dp.set(x, $t2);
     }
     dp.set(x, null);
-    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%.*s"), 16, new $c.Ptr(svp.plname, 0));
+    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%.*s"), STONE_LINE_LEN, new $c.Ptr(svp.plname, 0));
     center(NAME_LINE, new $c.Ptr(buf, 0));
     cash = gd.done_money > 0 ? gd.done_money : 0;
     if (cash > 999999999) {
@@ -80,20 +80,22 @@ export async function genl_outrip(tmpwin, how, when) {   // rip.c:86
 
 export function $init() {
     rip_txt.fill(null);
-    rip_txt[0] = $c.lit("                       ----------");
-    rip_txt[1] = $c.lit("                      /          \\");
-    rip_txt[2] = $c.lit("                     /    REST    \\");
-    rip_txt[3] = $c.lit("                    /      IN      \\");
-    rip_txt[4] = $c.lit("                   /     PEACE      \\");
-    rip_txt[5] = $c.lit("                  /                  \\");
-    rip_txt[6] = $c.lit("                  |                  |");
-    rip_txt[7] = $c.lit("                  |                  |");
-    rip_txt[8] = $c.lit("                  |                  |");
-    rip_txt[9] = $c.lit("                  |                  |");
-    rip_txt[10] = $c.lit("                  |                  |");
-    rip_txt[11] = $c.lit("                  |                  |");
-    rip_txt[12] = $c.lit("                  |       1001       |");
-    rip_txt[13] = $c.lit("                 *|     *  *  *      | *");
-    rip_txt[14] = $c.lit("        _________)/\\\\_//(\\/(/\\)/\\//\\/|_)_______");
-    rip_txt[15] = null;
+    $c.init(rip_txt, [
+        $c.lit("                       ----------"),
+        $c.lit("                      /          \\"),
+        $c.lit("                     /    REST    \\"),
+        $c.lit("                    /      IN      \\"),
+        $c.lit("                   /     PEACE      \\"),
+        $c.lit("                  /                  \\"),
+        $c.lit("                  |                  |"),
+        $c.lit("                  |                  |"),
+        $c.lit("                  |                  |"),
+        $c.lit("                  |                  |"),
+        $c.lit("                  |                  |"),
+        $c.lit("                  |                  |"),
+        $c.lit("                  |       1001       |"),
+        $c.lit("                 *|     *  *  *      | *"),
+        $c.lit("        _________)/\\\\_//(\\/(/\\)/\\//\\/|_)_______"),
+        null
+    ]);
 }

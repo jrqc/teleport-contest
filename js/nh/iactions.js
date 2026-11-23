@@ -34,7 +34,7 @@ import { impossible } from './pline.js';
 import { body_part } from './polyself.js';
 import { dip_into, dodrink } from './potion.js';
 import { dosacrifice } from './pray.js';
-import { W_ACCESSORY, W_ARMOR } from './prop.h.js';
+import { W_ACCESSORY, W_AMUL, W_ARMOR, W_RING, W_TOOL } from './prop.h.js';
 import { doread } from './read.js';
 import { ALTAR } from './rm.h.js';
 import { dopay, inhishop, shop_keeper } from './shk.js';
@@ -425,7 +425,7 @@ export async function itemactions(otmp) {   // iactions.c:278
         await ia_addmenu(win, IA_READ_OBJ, 114, new $c.Ptr(buf, 0));
     }
     if ($c.and64(otmp.owornmask, W_ACCESSORY)) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Remove this %s"), $c.and64(otmp.owornmask, 65536) ? $c.lit("amulet") : $c.and64(otmp.owornmask, 393216) ? $c.lit("ring") : $c.and64(otmp.owornmask, 524288) ? $c.lit("eyewear") : $c.lit("accessory"));
+        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Remove this %s"), $c.and64(otmp.owornmask, W_AMUL) ? $c.lit("amulet") : $c.and64(otmp.owornmask, W_RING) ? $c.lit("ring") : $c.and64(otmp.owornmask, W_TOOL) ? $c.lit("eyewear") : $c.lit("accessory"));
         await ia_addmenu(win, IA_TAKEOFF_OBJ, 82, new $c.Ptr(buf, 0));
     }
     if (otmp.otyp === OIL_LAMP || otmp.otyp === MAGIC_LAMP || otmp.otyp === BRASS_LANTERN) {

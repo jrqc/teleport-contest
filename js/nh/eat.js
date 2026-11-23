@@ -41,7 +41,7 @@ import { iter_mons, mondied, monstone, rescham } from './mon.js';
 import { AD_ACID, AD_BLND, AD_HALU, AD_STUN, AT_BREA, AT_ENGL, AT_MAGC, M_ATTK_AGR_DIED, M_ATTK_HIT, M_ATTK_MISS } from './monattk.h.js';
 import { attacktype, attacktype_fordmg, cantvomit, dmgtype, olfaction, poly_when_stoned, same_race } from './mondata.js';
 import { acidic, can_teleport, cantwield, carnivorous, control_teleport, flesh_petrifies, herbivorous, humanoid, is_clinger, is_giant, is_rider, is_undead, is_were, metallivorous, mindless, noncorporeal, perceives, poisonous, slimeproof, telepathic, type_is_pname, vegan, vegetarian, your_race } from './mondata.macros.js';
-import { M1_BREATHLESS, M1_FLY, MR_ACID, MR_COLD, MR_DISINT, MR_ELEC, MR_FIRE, MR_POISON, MR_SLEEP, MR_STONE, NEUTRAL } from './monflag.h.js';
+import { M1_BREATHLESS, M1_FLY, M2_DWARF, M2_ELF, M2_ORC, MR_ACID, MR_COLD, MR_DISINT, MR_ELEC, MR_FIRE, MR_POISON, MR_SLEEP, MR_STONE, NEUTRAL } from './monflag.h.js';
 import { monflee } from './monmove.js';
 import { mons } from './monst.js';
 import { M_AP_NOTHING, M_AP_OBJECT, M_AP_TYPMASK } from './monst.h.js';
@@ -265,13 +265,13 @@ function adj_victual_nutrition() {   // eat.c:338
     nut = -svc.context.victual.nmod | 0;
     (!(nut > 0) ? 1 : 0) ? $c.__assert_rtn($c.lit("adj_victual_nutrition"), $c.lit("eat.c"), 344, $c.lit("nut > 0")) : 0;
     if (otyp === LEMBAS_WAFER) {
-        if (u.umonnum !== u.umonster ? $c.andu64(gy.youmonst.data.mflags2, 16) !== 0 : gu.urace.mnum === PM_ELF) {
+        if (u.umonnum !== u.umonster ? $c.andu64(gy.youmonst.data.mflags2, M2_ELF) !== 0 : gu.urace.mnum === PM_ELF) {
             nut = nut + $c.div32(nut + 2 | 0, 4) | 0;
-        } else if (u.umonnum !== u.umonster ? $c.andu64(gy.youmonst.data.mflags2, 128) !== 0 : gu.urace.mnum === PM_ORC) {
+        } else if (u.umonnum !== u.umonster ? $c.andu64(gy.youmonst.data.mflags2, M2_ORC) !== 0 : gu.urace.mnum === PM_ORC) {
             nut = nut - $c.div32(nut + 2 | 0, 4) | 0;
         }
     } else if (otyp === CRAM_RATION) {
-        if (u.umonnum !== u.umonster ? $c.andu64(gy.youmonst.data.mflags2, 32) !== 0 : gu.urace.mnum === PM_DWARF) {
+        if (u.umonnum !== u.umonster ? $c.andu64(gy.youmonst.data.mflags2, M2_DWARF) !== 0 : gu.urace.mnum === PM_DWARF) {
             nut = nut + $c.div32(nut + 3 | 0, 6) | 0;
         }
     }
@@ -1794,7 +1794,7 @@ async function start_eating(otmp, already_partly_eaten) {   // eat.c:2022
         await done_eating($c.i8(svc.context.victual.reqtime > 1 || already_partly_eaten ? TRUE : FALSE));
         return;
     }
-    $c.__builtin___sprintf_chk(new $c.Ptr(start_eating$msgbuf, 0), 0, 256, $c.lit("eating %s"), await food_xname(otmp, 1));
+    $c.__builtin___sprintf_chk(new $c.Ptr(start_eating$msgbuf, 0), 0, 256, $c.lit("eating %s"), await food_xname(otmp, TRUE));
     set_occupation(eatfood, new $c.Ptr(start_eating$msgbuf, 0), 0);
 }
 export function eating_glob(glob) {   // eat.c:2078
@@ -1835,7 +1835,7 @@ async function fprefx(otmp) {   // eat.c:2099
             case TRIPE_RATION:
                 if (carnivorous(gy.youmonst.data) && !humanoid(gy.youmonst.data)) {
                     await pline($c.lit("This tripe ration is surprisingly good!"));
-                } else if (u.umonnum !== u.umonster ? $c.andu64(gy.youmonst.data.mflags2, 128) !== 0 : gu.urace.mnum === PM_ORC) {
+                } else if (u.umonnum !== u.umonster ? $c.andu64(gy.youmonst.data.mflags2, M2_ORC) !== 0 : gu.urace.mnum === PM_ORC) {
                     await pline(Hallucination() ? $c.lit("Tastes great!  Less filling!") : $c.lit("Mmm, tripe... not bad!"));
                 } else {
                     await pline($c.lit("Yak - dog food!"));
@@ -1847,10 +1847,10 @@ async function fprefx(otmp) {   // eat.c:2099
                 }
                 break;
             case LEMBAS_WAFER:
-                if (u.umonnum !== u.umonster ? $c.andu64(gy.youmonst.data.mflags2, 128) !== 0 : gu.urace.mnum === PM_ORC) {
+                if (u.umonnum !== u.umonster ? $c.andu64(gy.youmonst.data.mflags2, M2_ORC) !== 0 : gu.urace.mnum === PM_ORC) {
                     await pline($c.lit("%s"), $c.lit("!#?&* elf kibble!"));
                     break;
-                } else if (u.umonnum !== u.umonster ? $c.andu64(gy.youmonst.data.mflags2, 16) !== 0 : gu.urace.mnum === PM_ELF) {
+                } else if (u.umonnum !== u.umonster ? $c.andu64(gy.youmonst.data.mflags2, M2_ELF) !== 0 : gu.urace.mnum === PM_ELF) {
                     await pline($c.lit("A little goes a long way."));
                     break;
                 }
@@ -3061,115 +3061,75 @@ function nonrotting_food(otyp) {
 
 export function $init() {
     hu_stat.fill(null);
-    hu_stat[0] = $c.lit("Satiated");
-    hu_stat[1] = $c.lit("        ");
-    hu_stat[2] = $c.lit("Hungry  ");
-    hu_stat[3] = $c.lit("Weak    ");
-    hu_stat[4] = $c.lit("Fainting");
-    hu_stat[5] = $c.lit("Fainted ");
-    hu_stat[6] = $c.lit("Starved ");
+    $c.init(hu_stat, [
+        $c.lit("Satiated"),
+        $c.lit("        "),
+        $c.lit("Hungry  "),
+        $c.lit("Weak    "),
+        $c.lit("Fainting"),
+        $c.lit("Fainted "),
+        $c.lit("Starved ")
+    ]);
     zero_victual.$copyFrom(new $T.victual_info());
     zero_victual.piece = null;
     getobj_else = 0;
     for (let $i0 = 0; $i0 < 16; $i0++) {
         tintxts[$i0].$copyFrom(new $T.anon_eat_138());
     }
-    tintxts[0].txt = $c.lit("rotten");
-    tintxts[0].nut = -50;
-    tintxts[0].fodder = (0) & 1;
-    tintxts[0].greasy = (0) & 1;
-    tintxts[1].txt = $c.lit("homemade");
-    tintxts[1].nut = 50;
-    tintxts[1].fodder = (1) & 1;
-    tintxts[1].greasy = (0) & 1;
-    tintxts[2].txt = $c.lit("soup made from");
-    tintxts[2].nut = 20;
-    tintxts[2].fodder = (1) & 1;
-    tintxts[2].greasy = (0) & 1;
-    tintxts[3].txt = $c.lit("french fried");
-    tintxts[3].nut = 40;
-    tintxts[3].fodder = (0) & 1;
-    tintxts[3].greasy = (1) & 1;
-    tintxts[4].txt = $c.lit("pickled");
-    tintxts[4].nut = 40;
-    tintxts[4].fodder = (1) & 1;
-    tintxts[4].greasy = (0) & 1;
-    tintxts[5].txt = $c.lit("boiled");
-    tintxts[5].nut = 50;
-    tintxts[5].fodder = (1) & 1;
-    tintxts[5].greasy = (0) & 1;
-    tintxts[6].txt = $c.lit("smoked");
-    tintxts[6].nut = 50;
-    tintxts[6].fodder = (1) & 1;
-    tintxts[6].greasy = (0) & 1;
-    tintxts[7].txt = $c.lit("dried");
-    tintxts[7].nut = 55;
-    tintxts[7].fodder = (1) & 1;
-    tintxts[7].greasy = (0) & 1;
-    tintxts[8].txt = $c.lit("deep fried");
-    tintxts[8].nut = 60;
-    tintxts[8].fodder = (0) & 1;
-    tintxts[8].greasy = (1) & 1;
-    tintxts[9].txt = $c.lit("szechuan");
-    tintxts[9].nut = 70;
-    tintxts[9].fodder = (1) & 1;
-    tintxts[9].greasy = (0) & 1;
-    tintxts[10].txt = $c.lit("broiled");
-    tintxts[10].nut = 80;
-    tintxts[10].fodder = (0) & 1;
-    tintxts[10].greasy = (0) & 1;
-    tintxts[11].txt = $c.lit("stir fried");
-    tintxts[11].nut = 80;
-    tintxts[11].fodder = (0) & 1;
-    tintxts[11].greasy = (1) & 1;
-    tintxts[12].txt = $c.lit("sauteed");
-    tintxts[12].nut = 95;
-    tintxts[12].fodder = (0) & 1;
-    tintxts[12].greasy = (0) & 1;
-    tintxts[13].txt = $c.lit("candied");
-    tintxts[13].nut = 100;
-    tintxts[13].fodder = (1) & 1;
-    tintxts[13].greasy = (0) & 1;
-    tintxts[14].txt = $c.lit("pureed");
-    tintxts[14].nut = 500;
-    tintxts[14].fodder = (1) & 1;
-    tintxts[14].greasy = (0) & 1;
-    tintxts[15].txt = $c.lit("");
-    tintxts[15].nut = 0;
-    tintxts[15].fodder = (0) & 1;
-    tintxts[15].greasy = (0) & 1;
+    $c.init(tintxts, [
+        { txt: $c.lit("rotten"), nut: -50, fodder: 0, greasy: 0 },
+        { txt: $c.lit("homemade"), nut: 50, fodder: 1, greasy: 0 },
+        { txt: $c.lit("soup made from"), nut: 20, fodder: 1, greasy: 0 },
+        { txt: $c.lit("french fried"), nut: 40, fodder: 0, greasy: 1 },
+        { txt: $c.lit("pickled"), nut: 40, fodder: 1, greasy: 0 },
+        { txt: $c.lit("boiled"), nut: 50, fodder: 1, greasy: 0 },
+        { txt: $c.lit("smoked"), nut: 50, fodder: 1, greasy: 0 },
+        { txt: $c.lit("dried"), nut: 55, fodder: 1, greasy: 0 },
+        { txt: $c.lit("deep fried"), nut: 60, fodder: 0, greasy: 1 },
+        { txt: $c.lit("szechuan"), nut: 70, fodder: 1, greasy: 0 },
+        { txt: $c.lit("broiled"), nut: 80, fodder: 0, greasy: 0 },
+        { txt: $c.lit("stir fried"), nut: 80, fodder: 0, greasy: 1 },
+        { txt: $c.lit("sauteed"), nut: 95, fodder: 0, greasy: 0 },
+        { txt: $c.lit("candied"), nut: 100, fodder: 1, greasy: 0 },
+        { txt: $c.lit("pureed"), nut: 500, fodder: 1, greasy: 0 },
+        { txt: $c.lit(""), nut: 0, fodder: 0, greasy: 0 }
+    ]);
     foodwords.fill(null);
-    foodwords[0] = $c.lit("meal");
-    foodwords[1] = $c.lit("liquid");
-    foodwords[2] = $c.lit("wax");
-    foodwords[3] = $c.lit("food");
-    foodwords[4] = $c.lit("meat");
-    foodwords[5] = $c.lit("paper");
-    foodwords[6] = $c.lit("cloth");
-    foodwords[7] = $c.lit("leather");
-    foodwords[8] = $c.lit("wood");
-    foodwords[9] = $c.lit("bone");
-    foodwords[10] = $c.lit("scale");
-    foodwords[11] = $c.lit("metal");
-    foodwords[12] = $c.lit("metal");
-    foodwords[13] = $c.lit("metal");
-    foodwords[14] = $c.lit("silver");
-    foodwords[15] = $c.lit("gold");
-    foodwords[16] = $c.lit("platinum");
-    foodwords[17] = $c.lit("mithril");
-    foodwords[18] = $c.lit("plastic");
-    foodwords[19] = $c.lit("glass");
-    foodwords[20] = $c.lit("rich food");
-    foodwords[21] = $c.lit("stone");
+    $c.init(foodwords, [
+        $c.lit("meal"),
+        $c.lit("liquid"),
+        $c.lit("wax"),
+        $c.lit("food"),
+        $c.lit("meat"),
+        $c.lit("paper"),
+        $c.lit("cloth"),
+        $c.lit("leather"),
+        $c.lit("wood"),
+        $c.lit("bone"),
+        $c.lit("scale"),
+        $c.lit("metal"),
+        $c.lit("metal"),
+        $c.lit("metal"),
+        $c.lit("silver"),
+        $c.lit("gold"),
+        $c.lit("platinum"),
+        $c.lit("mithril"),
+        $c.lit("plastic"),
+        $c.lit("glass"),
+        $c.lit("rich food"),
+        $c.lit("stone")
+    ]);
     eat_brains$brainlessness.fill(0);
     eat_brains$brainlessness.set([98, 114, 97, 105, 110, 108, 101, 115, 115, 110, 101, 115, 115]);   // "brainlessness"
     maybe_cannibal$ate_brains = 0;
     eatcorpse$palatable_msgs.fill(null);
-    eatcorpse$palatable_msgs[0] = $c.lit("Tokay");
-    eatcorpse$palatable_msgs[1] = $c.lit("Istringy");
-    eatcorpse$palatable_msgs[2] = $c.lit("Igamey");
-    eatcorpse$palatable_msgs[3] = $c.lit("Ifatty");
-    eatcorpse$palatable_msgs[4] = $c.lit("Itough");
+    $c.init(eatcorpse$palatable_msgs, [
+        $c.lit("Tokay"),
+        $c.lit("Istringy"),
+        $c.lit("Igamey"),
+        $c.lit("Ifatty"),
+        $c.lit("Itough")
+    ]);
     start_eating$msgbuf.fill(0);
     newuhs$save_hs = 0;
     newuhs$saved_hs = FALSE;

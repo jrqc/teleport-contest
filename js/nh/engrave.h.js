@@ -10,3 +10,4 @@ export const BURN = 3;
 export const MARK = 4;
 export const ENGR_BLOOD = 5;
 export const HEADSTONE = 6;
+export const N_ENGRAVE = 6;

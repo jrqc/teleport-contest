@@ -26,7 +26,7 @@ import { can_reach_floor, cant_reach_floor, del_engr_at, u_wipe_engr } from './e
 import { explode } from './explode.js';
 import { debugcore } from './files.js';
 import { breaksink, dogushforth, dryup } from './fountain.js';
-import { COLNO, FALSE, TRUE } from './global.h.js';
+import { COLNO, FALSE, ROWNO, TRUE } from './global.h.js';
 import { in_rooms, in_town, losehp, may_dig, nomul, obj_to_any, pooleffects, spot_checks, spoteffects, switch_terrain } from './hack.js';
 import { CQ_CANNED, CXN_NO_PFX, DIGCHECK_FAILED, DIGCHECK_FAIL_AIRLEVEL, DIGCHECK_FAIL_ALTAR, DIGCHECK_FAIL_BOULDER, DIGCHECK_FAIL_CANTDIG, DIGCHECK_FAIL_OBJ_POOL_OR_TRAP, DIGCHECK_FAIL_ONLADDER, DIGCHECK_FAIL_ONSTAIRS, DIGCHECK_FAIL_THRONE, DIGCHECK_FAIL_TOOHARD, DIGCHECK_FAIL_UNDESTROYABLETRAP, DIGCHECK_FAIL_WATERLEVEL, DIGCHECK_PASSED, DIGCHECK_PASSED_DESTROY_TRAP, DIGCHECK_PASSED_PITONLY, DIR_ERR, ECMD_CANCEL, ECMD_OK, ECMD_TIME, FOOT, FORCEBUNGLE, FORCETRAP, HEAD, KILLED_BY, KILLED_BY_AN, MM_NOMSG, MV_WALK, NO_PART, NO_TRAP_FLAGS, N_DIRS, N_DIRS_Z, RLOC_NOMSG, SHOP_DOOR_COST, SHOP_PIT_COST, SHOP_WALL_COST, STOMACH, TAINT_AGE } from './hack.h.js';
 import { DIR_180, Maybe_Half_Phys, SHOP_WALL_DMG, pline1, plur } from './hack.macros.js';
@@ -557,9 +557,9 @@ export function holetime() {   // dig.c:597
 export function fillholetyp(x, y, fill_if_any) {   // dig.c:606
     let x1 = 0, y1 = 0, lo_x = 0, hi_x = 0, lo_y = 0, hi_y = 0, pool_cnt = 0, moat_cnt = 0, lava_cnt = 0;
     lo_x = $c.i16(1 > (x - 1 | 0) ? 1 : x - 1 | 0);
-    hi_x = $c.i16((x + 1 | 0) < 79 ? x + 1 | 0 : 79);
+    hi_x = $c.i16((x + 1 | 0) < COLNO - 1 ? x + 1 | 0 : COLNO - 1);
     lo_y = $c.i16(0 > (y - 1 | 0) ? 0 : y - 1 | 0);
-    hi_y = $c.i16((y + 1 | 0) < 20 ? y + 1 | 0 : 20);
+    hi_y = $c.i16((y + 1 | 0) < ROWNO - 1 ? y + 1 | 0 : ROWNO - 1);
     pool_cnt = 0;
     moat_cnt = 0;
     lava_cnt = 0;
@@ -616,7 +616,7 @@ export async function digactualhole(x, y, madeby, ttyp) {   // dig.c:640
     if (IS_FURNITURE(lev.typ)) {
         surface_type = IS_ROOM(lev.typ) && !((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_earth_level)) ? $c.lit("floor") : $c.lit("ground");
         if (IS_ALTAR(lev.typ)) {
-            old_aligntyp = $c.i8(((svl.level.locations[x][y].flags | 0) & 7 & AM_MASK) === 0 ? A_NONE : ((svl.level.locations[x][y].flags | 0) & 7 & AM_MASK) === AM_LAWFUL ? A_LAWFUL : ((svl.level.locations[x][y].flags | 0) & 7 & AM_MASK) - 2 | 0);
+            old_aligntyp = $c.i8(((svl.level.locations[x][y].flags | 0) & AM_MASK & AM_MASK) === 0 ? A_NONE : ((svl.level.locations[x][y].flags | 0) & AM_MASK & AM_MASK) === AM_LAWFUL ? A_LAWFUL : ((svl.level.locations[x][y].flags | 0) & AM_MASK & AM_MASK) - 2 | 0);
             $c.__builtin___strcpy_chk(new $c.Ptr(furniture, 0), align_str($c.i8(old_aligntyp)), 256);
             $c.__builtin___strcat_chk(new $c.Ptr(furniture, 0), $c.lit(" "), 256);
         }
@@ -1750,22 +1750,28 @@ function BY_YOU() {
 
 export function $init() {
     dig$d_target.fill(null);
-    dig$d_target[0] = $c.lit("");
-    dig$d_target[1] = $c.lit("rock");
-    dig$d_target[2] = $c.lit("statue");
-    dig$d_target[3] = $c.lit("boulder");
-    dig$d_target[4] = $c.lit("door");
-    dig$d_target[5] = $c.lit("tree");
+    $c.init(dig$d_target, [
+        $c.lit(""),
+        $c.lit("rock"),
+        $c.lit("statue"),
+        $c.lit("boulder"),
+        $c.lit("door"),
+        $c.lit("tree")
+    ]);
     use_pick_axe2$d_action.fill(null);
-    use_pick_axe2$d_action[0] = $c.lit("swinging");
-    use_pick_axe2$d_action[1] = $c.lit("digging");
-    use_pick_axe2$d_action[2] = $c.lit("chipping the statue");
-    use_pick_axe2$d_action[3] = $c.lit("hitting the boulder");
-    use_pick_axe2$d_action[4] = $c.lit("chopping at the door");
-    use_pick_axe2$d_action[5] = $c.lit("cutting the tree");
+    $c.init(use_pick_axe2$d_action, [
+        $c.lit("swinging"),
+        $c.lit("digging"),
+        $c.lit("chipping the statue"),
+        $c.lit("hitting the boulder"),
+        $c.lit("chopping at the door"),
+        $c.lit("cutting the tree")
+    ]);
     draft_message$draft_reaction.fill(null);
-    draft_message$draft_reaction[0] = $c.lit("enlisting");
-    draft_message$draft_reaction[1] = $c.lit("marching");
-    draft_message$draft_reaction[2] = $c.lit("protesting");
-    draft_message$draft_reaction[3] = $c.lit("fleeing");
+    $c.init(draft_message$draft_reaction, [
+        $c.lit("enlisting"),
+        $c.lit("marching"),
+        $c.lit("protesting"),
+        $c.lit("fleeing")
+    ]);
 }

@@ -852,48 +852,60 @@ export function $init() {
     to_custom_symset_entry_callback$glyphnag = 0;
     to_custom_symset_entry_callback$colornag = 0;
     shuffle_customizations$offsets.fill(0);
-    shuffle_customizations$offsets[0] = GLYPH_OBJ_OFF;
-    shuffle_customizations$offsets[1] = GLYPH_OBJ_PILETOP_OFF;
+    $c.init(shuffle_customizations$offsets, [
+        GLYPH_OBJ_OFF,
+        GLYPH_OBJ_PILETOP_OFF
+    ]);
     parse_id$altar_text.fill(null);
-    parse_id$altar_text[0] = $c.lit("unaligned");
-    parse_id$altar_text[1] = $c.lit("chaotic");
-    parse_id$altar_text[2] = $c.lit("neutral");
-    parse_id$altar_text[3] = $c.lit("lawful");
-    parse_id$altar_text[4] = $c.lit("other");
+    $c.init(parse_id$altar_text, [
+        $c.lit("unaligned"),
+        $c.lit("chaotic"),
+        $c.lit("neutral"),
+        $c.lit("lawful"),
+        $c.lit("other")
+    ]);
     parse_id$zap_texts.fill(null);
-    parse_id$zap_texts[0] = $c.lit("missile");
-    parse_id$zap_texts[1] = $c.lit("fire");
-    parse_id$zap_texts[2] = $c.lit("frost");
-    parse_id$zap_texts[3] = $c.lit("sleep");
-    parse_id$zap_texts[4] = $c.lit("death");
-    parse_id$zap_texts[5] = $c.lit("lightning");
-    parse_id$zap_texts[6] = $c.lit("poison gas");
-    parse_id$zap_texts[7] = $c.lit("acid");
+    $c.init(parse_id$zap_texts, [
+        $c.lit("missile"),
+        $c.lit("fire"),
+        $c.lit("frost"),
+        $c.lit("sleep"),
+        $c.lit("death"),
+        $c.lit("lightning"),
+        $c.lit("poison gas"),
+        $c.lit("acid")
+    ]);
     parse_id$swallow_texts.fill(null);
-    parse_id$swallow_texts[0] = $c.lit("top left");
-    parse_id$swallow_texts[1] = $c.lit("top center");
-    parse_id$swallow_texts[2] = $c.lit("top right");
-    parse_id$swallow_texts[3] = $c.lit("middle left");
-    parse_id$swallow_texts[4] = $c.lit("middle right");
-    parse_id$swallow_texts[5] = $c.lit("bottom left");
-    parse_id$swallow_texts[6] = $c.lit("bottom center");
-    parse_id$swallow_texts[7] = $c.lit("bottom right");
+    $c.init(parse_id$swallow_texts, [
+        $c.lit("top left"),
+        $c.lit("top center"),
+        $c.lit("top right"),
+        $c.lit("middle left"),
+        $c.lit("middle right"),
+        $c.lit("bottom left"),
+        $c.lit("bottom center"),
+        $c.lit("bottom right")
+    ]);
     parse_id$expl_type_texts.fill(null);
-    parse_id$expl_type_texts[0] = $c.lit("dark");
-    parse_id$expl_type_texts[1] = $c.lit("noxious");
-    parse_id$expl_type_texts[2] = $c.lit("muddy");
-    parse_id$expl_type_texts[3] = $c.lit("wet");
-    parse_id$expl_type_texts[4] = $c.lit("magical");
-    parse_id$expl_type_texts[5] = $c.lit("fiery");
-    parse_id$expl_type_texts[6] = $c.lit("frosty");
+    $c.init(parse_id$expl_type_texts, [
+        $c.lit("dark"),
+        $c.lit("noxious"),
+        $c.lit("muddy"),
+        $c.lit("wet"),
+        $c.lit("magical"),
+        $c.lit("fiery"),
+        $c.lit("frosty")
+    ]);
     parse_id$expl_texts.fill(null);
-    parse_id$expl_texts[0] = $c.lit("tl");
-    parse_id$expl_texts[1] = $c.lit("tc");
-    parse_id$expl_texts[2] = $c.lit("tr");
-    parse_id$expl_texts[3] = $c.lit("ml");
-    parse_id$expl_texts[4] = $c.lit("mc");
-    parse_id$expl_texts[5] = $c.lit("mr");
-    parse_id$expl_texts[6] = $c.lit("bl");
-    parse_id$expl_texts[7] = $c.lit("bc");
-    parse_id$expl_texts[8] = $c.lit("br");
+    $c.init(parse_id$expl_texts, [
+        $c.lit("tl"),
+        $c.lit("tc"),
+        $c.lit("tr"),
+        $c.lit("ml"),
+        $c.lit("mc"),
+        $c.lit("mr"),
+        $c.lit("bl"),
+        $c.lit("bc"),
+        $c.lit("br")
+    ]);
 }

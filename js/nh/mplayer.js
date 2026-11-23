@@ -10,7 +10,7 @@ import { cg, gu, svl, u } from './decl.js';
 import { WEAPON_CLASS } from './defsym.h.js';
 import { christen_monst } from './do_name.js';
 import { In_endgame } from './dungeon.macros.js';
-import { FALSE, TRUE } from './global.h.js';
+import { COLNO, FALSE, ROWNO, TRUE } from './global.h.js';
 import { MM_NOMSG, NO_MM_FLAGS, RLOC_ERR, RLOC_NOMSG } from './hack.h.js';
 import { makemon, mkmonmoney, mongets, set_malign } from './makemon.js';
 import { bless, curse, mkobj, mksobj, weight } from './mkobj.js';
@@ -310,8 +310,8 @@ export async function create_mplayers(num, special) {   // mplayer.c:327
         pm = rn2(PM_WIZARD - PM_ARCHEOLOGIST + 1) + PM_ARCHEOLOGIST | 0;
         set_mon_data(fakemon, $c.relem(mons, pm));
         do {
-            x = rn2(76) + 2 | 0;
-            y = rnd(19);
+            x = rn2(COLNO - 4) + 2 | 0;
+            y = rnd(ROWNO - 2);
         } while (!goodpos($c.i16(x), $c.i16(y), fakemon, 0) && ($t1 = tryct, tryct = $t1 + 1 | 0, $t1) <= 50);
         if (tryct > 50) {
             return;
@@ -329,70 +329,76 @@ export async function mplayer_talk(mtmp) {   // mplayer.c:356
 
 export function $init() {
     developers.fill(null);
-    developers[0] = $c.lit("Alex");
-    developers[1] = $c.lit("Dave");
-    developers[2] = $c.lit("Dean");
-    developers[3] = $c.lit("Derek");
-    developers[4] = $c.lit("Eric");
-    developers[5] = $c.lit("Izchak");
-    developers[6] = $c.lit("Janet");
-    developers[7] = $c.lit("Jessie");
-    developers[8] = $c.lit("Ken");
-    developers[9] = $c.lit("Kevin");
-    developers[10] = $c.lit("Michael");
-    developers[11] = $c.lit("Mike");
-    developers[12] = $c.lit("Pasi");
-    developers[13] = $c.lit("Pat");
-    developers[14] = $c.lit("Patric");
-    developers[15] = $c.lit("Paul");
-    developers[16] = $c.lit("Sean");
-    developers[17] = $c.lit("Steve");
-    developers[18] = $c.lit("Timo");
-    developers[19] = $c.lit("Warwick");
-    developers[20] = $c.lit("Bill");
-    developers[21] = $c.lit("Eric");
-    developers[22] = $c.lit("Keizo");
-    developers[23] = $c.lit("Ken");
-    developers[24] = $c.lit("Kevin");
-    developers[25] = $c.lit("Michael");
-    developers[26] = $c.lit("Mike");
-    developers[27] = $c.lit("Paul");
-    developers[28] = $c.lit("Stephen");
-    developers[29] = $c.lit("Steve");
-    developers[30] = $c.lit("Timo");
-    developers[31] = $c.lit("Yitzhak");
-    developers[32] = $c.lit("Andy");
-    developers[33] = $c.lit("Gregg");
-    developers[34] = $c.lit("Janne");
-    developers[35] = $c.lit("Keni");
-    developers[36] = $c.lit("Mike");
-    developers[37] = $c.lit("Olaf");
-    developers[38] = $c.lit("Richard");
-    developers[39] = $c.lit("Andy");
-    developers[40] = $c.lit("Chris");
-    developers[41] = $c.lit("Dean");
-    developers[42] = $c.lit("Jon");
-    developers[43] = $c.lit("Jonathan");
-    developers[44] = $c.lit("Kevin");
-    developers[45] = $c.lit("Wang");
-    developers[46] = $c.lit("Eric");
-    developers[47] = $c.lit("Marvin");
-    developers[48] = $c.lit("Warwick");
-    developers[49] = $c.lit("Alex");
-    developers[50] = $c.lit("Dion");
-    developers[51] = $c.lit("Michael");
-    developers[52] = $c.lit("Helge");
-    developers[53] = $c.lit("Ron");
-    developers[54] = $c.lit("Timo");
-    developers[55] = $c.lit("Joshua");
-    developers[56] = $c.lit("Pat");
-    developers[57] = $c.lit("");
+    $c.init(developers, [
+        $c.lit("Alex"),
+        $c.lit("Dave"),
+        $c.lit("Dean"),
+        $c.lit("Derek"),
+        $c.lit("Eric"),
+        $c.lit("Izchak"),
+        $c.lit("Janet"),
+        $c.lit("Jessie"),
+        $c.lit("Ken"),
+        $c.lit("Kevin"),
+        $c.lit("Michael"),
+        $c.lit("Mike"),
+        $c.lit("Pasi"),
+        $c.lit("Pat"),
+        $c.lit("Patric"),
+        $c.lit("Paul"),
+        $c.lit("Sean"),
+        $c.lit("Steve"),
+        $c.lit("Timo"),
+        $c.lit("Warwick"),
+        $c.lit("Bill"),
+        $c.lit("Eric"),
+        $c.lit("Keizo"),
+        $c.lit("Ken"),
+        $c.lit("Kevin"),
+        $c.lit("Michael"),
+        $c.lit("Mike"),
+        $c.lit("Paul"),
+        $c.lit("Stephen"),
+        $c.lit("Steve"),
+        $c.lit("Timo"),
+        $c.lit("Yitzhak"),
+        $c.lit("Andy"),
+        $c.lit("Gregg"),
+        $c.lit("Janne"),
+        $c.lit("Keni"),
+        $c.lit("Mike"),
+        $c.lit("Olaf"),
+        $c.lit("Richard"),
+        $c.lit("Andy"),
+        $c.lit("Chris"),
+        $c.lit("Dean"),
+        $c.lit("Jon"),
+        $c.lit("Jonathan"),
+        $c.lit("Kevin"),
+        $c.lit("Wang"),
+        $c.lit("Eric"),
+        $c.lit("Marvin"),
+        $c.lit("Warwick"),
+        $c.lit("Alex"),
+        $c.lit("Dion"),
+        $c.lit("Michael"),
+        $c.lit("Helge"),
+        $c.lit("Ron"),
+        $c.lit("Timo"),
+        $c.lit("Joshua"),
+        $c.lit("Pat"),
+        $c.lit("")
+    ]);
     mplayer_talk$same_class_msg.fill(null);
-    mplayer_talk$same_class_msg[0] = $c.lit("I can't win, and neither will you!");
-    mplayer_talk$same_class_msg[1] = $c.lit("You don't deserve to win!");
-    mplayer_talk$same_class_msg[2] = $c.lit("Mine should be the honor, not yours!");
+    $c.init(mplayer_talk$same_class_msg, [
+        $c.lit("I can't win, and neither will you!"),
+        $c.lit("You don't deserve to win!"),
+        $c.lit("Mine should be the honor, not yours!")
+    ]);
     mplayer_talk$other_class_msg.fill(null);
-    mplayer_talk$other_class_msg[0] = $c.lit("The low-life wants to talk, eh?");
-    mplayer_talk$other_class_msg[1] = $c.lit("Fight, scum!");
-    mplayer_talk$other_class_msg[2] = $c.lit("Here is what I have to say!");
+    $c.init(mplayer_talk$other_class_msg, [
+        $c.lit("The low-life wants to talk, eh?"),
+        $c.lit("Fight, scum!"),
+        $c.lit("Here is what I have to say!")
+    ]);
 }

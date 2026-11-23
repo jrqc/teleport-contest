@@ -49,7 +49,7 @@ import { ANY_SHOP, CANDLESHOP, NO_ROOM, ROOMOFFSET, SHOPBASE } from './mkroom.h.
 import { angry_guards, mnearto, mnexto, mongone, pacify_guards, wake_nearto } from './mon.js';
 import { locomotion, pronoun_gender, resist_conflict } from './mondata.js';
 import { has_head, haseyes, is_demon, is_silent, is_vampire, nolimbs, passes_walls, type_is_pname, unique_corpstat } from './mondata.macros.js';
-import { G_GONE, M1_SEE_INVIS, MS_ANIMAL, MS_HUMANOID } from './monflag.h.js';
+import { G_GONE, M1_SEE_INVIS, M2_ELF, M2_HUMAN, MS_ANIMAL, MS_HUMANOID } from './monflag.h.js';
 import { closed_door, dochug } from './monmove.js';
 import { mons } from './monst.js';
 import { M_AP_MONSTER, M_AP_NOTHING } from './monst.h.js';
@@ -253,7 +253,7 @@ function clear_no_charge_obj(shkp, otmp) {   // shk.c:329
         clear_no_charge(shkp, otmp.cobj);
     }
     if (otmp.no_charge) {
-        if (!shkp || otmp.where !== OBJ_FLOOR && otmp.where !== OBJ_CONTAINED && otmp.where !== OBJ_BURIED || !get_obj_location(otmp, new $c.Ptr(x, 0), new $c.Ptr(y, 0), OBJ_CONTAINED | OBJ_BURIED) || !isok(x[0], y[0]) || (rno = svl.level.locations[x[0]][y[0]].roomno | 0) < ROOMOFFSET || !(svr.rooms[rno - 3 | 0].rtype >= SHOPBASE) || (rm_shkp = svr.rooms[rno - ROOMOFFSET | 0].resident) === null || $c.peq(rm_shkp, shkp)) {
+        if (!shkp || otmp.where !== OBJ_FLOOR && otmp.where !== OBJ_CONTAINED && otmp.where !== OBJ_BURIED || !get_obj_location(otmp, new $c.Ptr(x, 0), new $c.Ptr(y, 0), OBJ_CONTAINED | OBJ_BURIED) || !isok(x[0], y[0]) || (rno = svl.level.locations[x[0]][y[0]].roomno | 0) < ROOMOFFSET || !(svr.rooms[rno - ROOMOFFSET | 0].rtype >= SHOPBASE) || (rm_shkp = svr.rooms[rno - ROOMOFFSET | 0].resident) === null || $c.peq(rm_shkp, shkp)) {
             otmp.no_charge = (0) & 1;
         }
     }
@@ -413,7 +413,7 @@ async function call_kops(shkp, nearshop) {   // shk.c:510
 export function inside_shop(x, y) {   // shk.c:568
     let rno = 0;
     rno = $c.i8(svl.level.locations[x][y].roomno);
-    if (rno < ROOMOFFSET || svl.level.locations[x][y].edge | 0 || !(svr.rooms[rno - 3 | 0].rtype >= SHOPBASE)) {
+    if (rno < ROOMOFFSET || svl.level.locations[x][y].edge | 0 || !(svr.rooms[rno - ROOMOFFSET | 0].rtype >= SHOPBASE)) {
         rno = NO_ROOM;
     }
     return rno;
@@ -564,7 +564,7 @@ export async function u_entered_shop(enterstring) {   // shk.c:751
     if ((!eshkp.visitct || new $c.Ptr(eshkp.customer, 0).get(0)) && strncmpi(new $c.Ptr(eshkp.customer, 0), new $c.Ptr(svp.plname, 0), PL_NSIZ)) {
         eshkp.visitct = 0;
         eshkp.following = 0;
-        $c.__builtin___strncpy_chk(new $c.Ptr(eshkp.customer, 0), new $c.Ptr(svp.plname, 0), 32, 32);
+        $c.__builtin___strncpy_chk(new $c.Ptr(eshkp.customer, 0), new $c.Ptr(svp.plname, 0), PL_NSIZ, 32);
         pacify_shk(shkp, TRUE);
     }
     if (muteshk(shkp) || eshkp.following) {
@@ -1025,7 +1025,7 @@ export function hot_pursuit(shkp) {   // shk.c:1449
         return;
     }
     rile_shk(shkp);
-    $c.__builtin___strncpy_chk(new $c.Ptr(shkp.mextra.eshk.customer, 0), new $c.Ptr(svp.plname, 0), 32, 32);
+    $c.__builtin___strncpy_chk(new $c.Ptr(shkp.mextra.eshk.customer, 0), new $c.Ptr(svp.plname, 0), PL_NSIZ, 32);
     shkp.mextra.eshk.following = 1;
     clear_no_charge($c.asRec(null, $T.monst, 192), svl.level.objlist);
     clear_no_charge_pets(shkp);
@@ -1772,7 +1772,7 @@ async function inherits(shkp, numsk, croaked, silently) {   // shk.c:2577
                 if (cansee(shkp.mx, shkp.my) && croaked && !silently) {
                     takes[0] = 0;
                     if (has_head(shkp.data) && !rn2(2)) {
-                        $c.__builtin___sprintf_chk(new $c.Ptr(takes, 0), 0, 256, $c.lit(", shakes %s %s,"), genders[pronoun_gender(shkp, 3)].his, await mbodypart(shkp, HEAD));
+                        $c.__builtin___sprintf_chk(new $c.Ptr(takes, 0), 0, 256, $c.lit(", shakes %s %s,"), genders[pronoun_gender(shkp, PRONOUN_NO_IT | PRONOUN_HALLU)].his, await mbodypart(shkp, HEAD));
                     }
                     await pline($c.lit("%s %slooks at your corpse%s and %s."), await Shknam(shkp), helpless(shkp) ? $c.lit("wakes up, ") : $c.lit(""), new $c.Ptr(takes, 0), !inhishop(shkp) ? $c.lit("disappears") : $c.lit("sighs"));
                 }
@@ -2451,10 +2451,10 @@ function append_honorific(buf) {   // shk.c:3602
     $c.__builtin___strcat_chk(buf, append_honorific$honored[rn2(4) + (u.uevent.udemigod | 0) | 0], -1);
     if (is_vampire(gy.youmonst.data)) {
         $c.__builtin___strcat_chk(buf, flags.female ? $c.lit(" dark lady") : $c.lit(" dark lord"), -1);
-    } else if (u.umonnum !== u.umonster ? $c.andu64(gy.youmonst.data.mflags2, 16) !== 0 : gu.urace.mnum === PM_ELF) {
+    } else if (u.umonnum !== u.umonster ? $c.andu64(gy.youmonst.data.mflags2, M2_ELF) !== 0 : gu.urace.mnum === PM_ELF) {
         $c.__builtin___strcat_chk(buf, flags.female ? $c.lit(" hiril") : $c.lit(" hir"), -1);
     } else {
-        $c.__builtin___strcat_chk(buf, !($c.andu64(gy.youmonst.data.mflags2, 8) !== 0) ? $c.lit(" creature") : flags.female ? $c.lit(" lady") : $c.lit(" sir"), -1);
+        $c.__builtin___strcat_chk(buf, !($c.andu64(gy.youmonst.data.mflags2, M2_HUMAN) !== 0) ? $c.lit(" creature") : flags.female ? $c.lit(" lady") : $c.lit(" sir"), -1);
     }
 }
 export async function splitbill(obj, otmp) {   // shk.c:3623
@@ -3639,7 +3639,7 @@ export async function pay_for_damage(dmgstr, cant_mollify) {   // shk.c:5174
     pursue = FALSE;
     x = appear_here.place.x;
     y = appear_here.place.y;
-    $c.__builtin___strncpy_chk(new $c.Ptr(shkp.mextra.eshk.customer, 0), new $c.Ptr(svp.plname, 0), 32, 32);
+    $c.__builtin___strncpy_chk(new $c.Ptr(shkp.mextra.eshk.customer, 0), new $c.Ptr(svp.plname, 0), PL_NSIZ, 32);
     if (ANGRY(shkp) || shkp.mextra.eshk.following) {
         hot_pursuit(shkp);
         return;
@@ -3684,7 +3684,7 @@ export async function pay_for_damage(dmgstr, cant_mollify) {   // shk.c:5174
     if (Invis()) {
         await Your($c.lit("invisibility does not fool %s!"), await shkname(shkp));
     }
-    $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 80, $c.lit("%sYou did %ld %s worth of damage!%s  Pay?"), !animal ? await cad(1) : $c.lit(""), cost_of_damage, await currency(cost_of_damage), !animal ? $c.lit("\"") : $c.lit(""));
+    $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 80, $c.lit("%sYou did %ld %s worth of damage!%s  Pay?"), !animal ? await cad(TRUE) : $c.lit(""), cost_of_damage, await currency(cost_of_damage), !animal ? $c.lit("\"") : $c.lit(""));
     if (await y_n(new $c.Ptr(qbuf, 0)) !== 110) {
         was_seen = $c.i8(canseemon(shkp));
         was_outside = $c.i8(!inhishop(shkp) ? 1 : 0);
@@ -3945,7 +3945,7 @@ export async function check_unpaid_usage(otmp, altusage) {   // shk.c:5688
     arg1 = arg2 = $c.lit("");
     if (otmp.oclass === SPBOOK_CLASS) {
         fmt = $c.lit("%sYou owe%s %ld %s.");
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("This is no free library, %s!  "), await cad(0));
+        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("This is no free library, %s!  "), await cad(FALSE));
         arg1 = rn2(2) ? new $c.Ptr(buf, 0) : $c.lit("");
         arg2 = shkp.mextra.eshk.debit > 0 ? $c.lit(" an additional") : $c.lit("");
     } else if (otmp.otyp === POT_OIL) {
@@ -4067,7 +4067,7 @@ export async function shk_your(buf, obj) {   // shk.c:5862
     } else if (chk_pm && the_unique_pm($c.relem(mons, obj.corpsenm))) {
         $c.__builtin___strcpy_chk(buf, $c.lit("the"), -1);
     } else if (!await shk_owns(buf, obj) && !await mon_owns(buf, obj)) {
-        $c.__builtin___strcpy_chk(buf, c_common_strings.c_the_your[obj.where === 3 ? 1 : 0], -1);
+        $c.__builtin___strcpy_chk(buf, c_common_strings.c_the_your[obj.where === OBJ_INVENT ? 1 : 0], -1);
     }
     return $c.__builtin___strcat_chk(buf, $c.lit(" "), -1);
 }
@@ -4243,44 +4243,50 @@ export function $init() {
     the_contents_of.fill(0);
     the_contents_of.set([116, 104, 101, 32, 99, 111, 110, 116, 101, 110, 116, 115, 32, 111, 102, 32]);   // "the contents of "
     angrytexts.fill(null);
-    angrytexts[0] = $c.lit("quite upset");
-    angrytexts[1] = $c.lit("ticked off");
-    angrytexts[2] = $c.lit("furious");
+    $c.init(angrytexts, [
+        $c.lit("quite upset"),
+        $c.lit("ticked off"),
+        $c.lit("furious")
+    ]);
     no_money.fill(0);
     no_money.set([77, 111, 114, 101, 111, 118, 101, 114, 44, 32, 121, 111, 117, 37, 115, 32, 104, 97, 118, 101, 32, 110, 111, 32, 103, 111, 108, 100, 46]);   // "Moreover, you%s have no gold."
     not_enough_money.fill(0);
     not_enough_money.set([66, 101, 115, 105, 100, 101, 115, 44, 32, 121, 111, 117, 32, 100, 111, 110, 39, 116, 32, 104, 97, 118, 101, 32, 101, 110, 111, 117, 103, 104, 32, 116, 111, 32, 105, 110, 116, 101, 114, 101, 115, 116, 32, 37, 115, 46]);   // "Besides, you don't have enough to interest %s."
     Izchak_speaks.fill(null);
-    Izchak_speaks[0] = $c.lit("%s says: 'These shopping malls give me a headache.'");
-    Izchak_speaks[1] = $c.lit("%s says: 'Slow down.  Think clearly.'");
-    Izchak_speaks[2] = $c.lit("%s says: 'You need to take things one at a time.'");
-    Izchak_speaks[3] = $c.lit("%s says: 'I don't like poofy coffee... give me Colombian Supremo.'");
-    Izchak_speaks[4] = $c.lit("%s says that getting the devteam's agreement on anything is difficult.");
-    Izchak_speaks[5] = $c.lit("%s says that he has noticed those who serve their deity will prosper.");
-    Izchak_speaks[6] = $c.lit("%s says: 'Don't try to steal from me - I have friends in high places!'");
-    Izchak_speaks[7] = $c.lit("%s says: 'You may well need something from this shop in the future.'");
-    Izchak_speaks[8] = $c.lit("%s comments about the Valley of the Dead as being a gateway.");
+    $c.init(Izchak_speaks, [
+        $c.lit("%s says: 'These shopping malls give me a headache.'"),
+        $c.lit("%s says: 'Slow down.  Think clearly.'"),
+        $c.lit("%s says: 'You need to take things one at a time.'"),
+        $c.lit("%s says: 'I don't like poofy coffee... give me Colombian Supremo.'"),
+        $c.lit("%s says that getting the devteam's agreement on anything is difficult."),
+        $c.lit("%s says that he has noticed those who serve their deity will prosper."),
+        $c.lit("%s says: 'Don't try to steal from me - I have friends in high places!'"),
+        $c.lit("%s says: 'You may well need something from this shop in the future.'"),
+        $c.lit("%s comments about the Valley of the Dead as being a gateway.")
+    ]);
     for (let $i0 = 0; $i0 < 2; $i0++) {
         credit_report$credit_snap[$i0].fill(0);
     }
-    credit_report$credit_snap[0][0] = 0;
-    credit_report$credit_snap[0][1] = 0;
-    credit_report$credit_snap[0][2] = 0;
-    credit_report$credit_snap[1][0] = 0;
-    credit_report$credit_snap[1][1] = 0;
-    credit_report$credit_snap[1][2] = 0;
+    $c.init(credit_report$credit_snap, [
+        [],
+        []
+    ]);
     u_entered_shop$empty_shops.fill(0);
     pick_pick$pickmovetime = 0;
     make_itemized_bill$zerosbi.$copyFrom(new $T.sortbill_item());
     append_honorific$honored.fill(null);
-    append_honorific$honored[0] = $c.lit("good");
-    append_honorific$honored[1] = $c.lit("honored");
-    append_honorific$honored[2] = $c.lit("most gracious");
-    append_honorific$honored[3] = $c.lit("esteemed");
-    append_honorific$honored[4] = $c.lit("most renowned and sacred");
+    $c.init(append_honorific$honored, [
+        $c.lit("good"),
+        $c.lit("honored"),
+        $c.lit("most gracious"),
+        $c.lit("esteemed"),
+        $c.lit("most renowned and sacred")
+    ]);
     makekops$k_mndx.fill(0);
-    makekops$k_mndx[0] = PM_KEYSTONE_KOP;
-    makekops$k_mndx[1] = PM_KOP_SERGEANT;
-    makekops$k_mndx[2] = PM_KOP_LIEUTENANT;
-    makekops$k_mndx[3] = PM_KOP_KAPTAIN;
+    $c.init(makekops$k_mndx, [
+        PM_KEYSTONE_KOP,
+        PM_KOP_SERGEANT,
+        PM_KOP_LIEUTENANT,
+        PM_KOP_KAPTAIN
+    ]);
 }

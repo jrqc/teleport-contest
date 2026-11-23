@@ -183,9 +183,9 @@ async function rogue_vision(next, rmin, rmax) {   // vision.c:314
     }
     in_door = svl.level.locations[u.ux][u.uy].typ === DOOR ? 1 : 0;
     ylo = (u.uy - 1 | 0) > 0 ? u.uy - 1 | 0 : 0;
-    yhi = (u.uy + 1 | 0) < 20 ? u.uy + 1 | 0 : 20;
+    yhi = (u.uy + 1 | 0) < ROWNO - 1 ? u.uy + 1 | 0 : ROWNO - 1;
     xlo = (u.ux - 1 | 0) > 1 ? u.ux - 1 | 0 : 1;
-    xhi = (u.ux + 1 | 0) < 79 ? u.ux + 1 | 0 : 79;
+    xhi = (u.ux + 1 | 0) < COLNO - 1 ? u.ux + 1 | 0 : COLNO - 1;
     for (zy = ylo; zy <= yhi; zy = zy + 1 | 0) {
         if (xlo < rmin.get(zy)) {
             rmin.set(zy, $c.i16(xlo));
@@ -252,7 +252,7 @@ export async function vision_recalc(control) {   // vision.c:512
                         break;
                     }
                     next_rmin[0].set(row, $c.i16(1 > (u.ux - 1 | 0) ? 1 : u.ux - 1 | 0));
-                    next_rmax[0].set(row, $c.i16(79 < (u.ux + 1 | 0) ? 79 : u.ux + 1 | 0));
+                    next_rmax[0].set(row, $c.i16(COLNO - 1 < (u.ux + 1 | 0) ? COLNO - 1 : u.ux + 1 | 0));
                     next_row = next_array[0].get(row);
                     for (col = next_rmin[0].get(row); col <= next_rmax[0].get(row); col = col + 1 | 0) {
                         next_row.set(col, IN_SIGHT | COULD_SEE);
@@ -274,7 +274,7 @@ export async function vision_recalc(control) {   // vision.c:512
                         dy = v_abs(u.uy - row | 0);
                         next_row = next_array[0].get(row);
                         start = 1 > (u.ux - ranges.get(dy) | 0) ? 1 : u.ux - ranges.get(dy) | 0;
-                        stop = 79 < (u.ux + ranges.get(dy) | 0) ? 79 : u.ux + ranges.get(dy) | 0;
+                        stop = COLNO - 1 < (u.ux + ranges.get(dy) | 0) ? COLNO - 1 : u.ux + ranges.get(dy) | 0;
                         for (col = start; col <= stop; col = col + 1 | 0) {
                             old_row_val = $c.i8(next_row.get(col));
                             next_row.set(col, $c.u8(next_row.get(col) | IN_SIGHT));
@@ -312,7 +312,7 @@ export async function vision_recalc(control) {   // vision.c:512
                         dy = v_abs(u.uy - row | 0);
                         next_row = next_array[0].get(row);
                         start = 1 > (u.ux - ranges.get(dy) | 0) ? 1 : u.ux - ranges.get(dy) | 0;
-                        stop = 79 < (u.ux + ranges.get(dy) | 0) ? 79 : u.ux + ranges.get(dy) | 0;
+                        stop = COLNO - 1 < (u.ux + ranges.get(dy) | 0) ? COLNO - 1 : u.ux + ranges.get(dy) | 0;
                         for (col = start; col <= stop; col = col + 1 | 0) {
                             if (next_row.get(col)) {
                                 next_row.set(col, $c.u8(next_row.get(col) | IN_SIGHT));
@@ -1461,160 +1461,164 @@ function good_row(z) {
 
 export function $init() {
     circle_data.fill(0);
-    circle_data[0] = 0;
-    circle_data[1] = 1;
-    circle_data[2] = 1;
-    circle_data[3] = 2;
-    circle_data[4] = 2;
-    circle_data[5] = 1;
-    circle_data[6] = 3;
-    circle_data[7] = 3;
-    circle_data[8] = 2;
-    circle_data[9] = 1;
-    circle_data[10] = 4;
-    circle_data[11] = 4;
-    circle_data[12] = 4;
-    circle_data[13] = 3;
-    circle_data[14] = 2;
-    circle_data[15] = 5;
-    circle_data[16] = 5;
-    circle_data[17] = 5;
-    circle_data[18] = 4;
-    circle_data[19] = 3;
-    circle_data[20] = 2;
-    circle_data[21] = 6;
-    circle_data[22] = 6;
-    circle_data[23] = 6;
-    circle_data[24] = 5;
-    circle_data[25] = 5;
-    circle_data[26] = 4;
-    circle_data[27] = 2;
-    circle_data[28] = 7;
-    circle_data[29] = 7;
-    circle_data[30] = 7;
-    circle_data[31] = 6;
-    circle_data[32] = 6;
-    circle_data[33] = 5;
-    circle_data[34] = 4;
-    circle_data[35] = 2;
-    circle_data[36] = 8;
-    circle_data[37] = 8;
-    circle_data[38] = 8;
-    circle_data[39] = 7;
-    circle_data[40] = 7;
-    circle_data[41] = 6;
-    circle_data[42] = 6;
-    circle_data[43] = 4;
-    circle_data[44] = 2;
-    circle_data[45] = 9;
-    circle_data[46] = 9;
-    circle_data[47] = 9;
-    circle_data[48] = 9;
-    circle_data[49] = 8;
-    circle_data[50] = 8;
-    circle_data[51] = 7;
-    circle_data[52] = 6;
-    circle_data[53] = 5;
-    circle_data[54] = 3;
-    circle_data[55] = 10;
-    circle_data[56] = 10;
-    circle_data[57] = 10;
-    circle_data[58] = 10;
-    circle_data[59] = 9;
-    circle_data[60] = 9;
-    circle_data[61] = 8;
-    circle_data[62] = 7;
-    circle_data[63] = 6;
-    circle_data[64] = 5;
-    circle_data[65] = 3;
-    circle_data[66] = 11;
-    circle_data[67] = 11;
-    circle_data[68] = 11;
-    circle_data[69] = 11;
-    circle_data[70] = 10;
-    circle_data[71] = 10;
-    circle_data[72] = 9;
-    circle_data[73] = 9;
-    circle_data[74] = 8;
-    circle_data[75] = 7;
-    circle_data[76] = 5;
-    circle_data[77] = 3;
-    circle_data[78] = 12;
-    circle_data[79] = 12;
-    circle_data[80] = 12;
-    circle_data[81] = 12;
-    circle_data[82] = 11;
-    circle_data[83] = 11;
-    circle_data[84] = 10;
-    circle_data[85] = 10;
-    circle_data[86] = 9;
-    circle_data[87] = 8;
-    circle_data[88] = 7;
-    circle_data[89] = 5;
-    circle_data[90] = 3;
-    circle_data[91] = 13;
-    circle_data[92] = 13;
-    circle_data[93] = 13;
-    circle_data[94] = 13;
-    circle_data[95] = 12;
-    circle_data[96] = 12;
-    circle_data[97] = 12;
-    circle_data[98] = 11;
-    circle_data[99] = 10;
-    circle_data[100] = 10;
-    circle_data[101] = 9;
-    circle_data[102] = 7;
-    circle_data[103] = 6;
-    circle_data[104] = 3;
-    circle_data[105] = 14;
-    circle_data[106] = 14;
-    circle_data[107] = 14;
-    circle_data[108] = 14;
-    circle_data[109] = 13;
-    circle_data[110] = 13;
-    circle_data[111] = 13;
-    circle_data[112] = 12;
-    circle_data[113] = 12;
-    circle_data[114] = 11;
-    circle_data[115] = 10;
-    circle_data[116] = 9;
-    circle_data[117] = 8;
-    circle_data[118] = 6;
-    circle_data[119] = 3;
-    circle_data[120] = 15;
-    circle_data[121] = 15;
-    circle_data[122] = 15;
-    circle_data[123] = 15;
-    circle_data[124] = 14;
-    circle_data[125] = 14;
-    circle_data[126] = 14;
-    circle_data[127] = 13;
-    circle_data[128] = 13;
-    circle_data[129] = 12;
-    circle_data[130] = 11;
-    circle_data[131] = 10;
-    circle_data[132] = 9;
-    circle_data[133] = 8;
-    circle_data[134] = 6;
-    circle_data[135] = 3;
-    circle_data[136] = 16;
+    $c.init(circle_data, [
+        0,
+        1,
+        1,
+        2,
+        2,
+        1,
+        3,
+        3,
+        2,
+        1,
+        4,
+        4,
+        4,
+        3,
+        2,
+        5,
+        5,
+        5,
+        4,
+        3,
+        2,
+        6,
+        6,
+        6,
+        5,
+        5,
+        4,
+        2,
+        7,
+        7,
+        7,
+        6,
+        6,
+        5,
+        4,
+        2,
+        8,
+        8,
+        8,
+        7,
+        7,
+        6,
+        6,
+        4,
+        2,
+        9,
+        9,
+        9,
+        9,
+        8,
+        8,
+        7,
+        6,
+        5,
+        3,
+        10,
+        10,
+        10,
+        10,
+        9,
+        9,
+        8,
+        7,
+        6,
+        5,
+        3,
+        11,
+        11,
+        11,
+        11,
+        10,
+        10,
+        9,
+        9,
+        8,
+        7,
+        5,
+        3,
+        12,
+        12,
+        12,
+        12,
+        11,
+        11,
+        10,
+        10,
+        9,
+        8,
+        7,
+        5,
+        3,
+        13,
+        13,
+        13,
+        13,
+        12,
+        12,
+        12,
+        11,
+        10,
+        10,
+        9,
+        7,
+        6,
+        3,
+        14,
+        14,
+        14,
+        14,
+        13,
+        13,
+        13,
+        12,
+        12,
+        11,
+        10,
+        9,
+        8,
+        6,
+        3,
+        15,
+        15,
+        15,
+        15,
+        14,
+        14,
+        14,
+        13,
+        13,
+        12,
+        11,
+        10,
+        9,
+        8,
+        6,
+        3,
+        16
+    ]);
     circle_start.fill(0);
-    circle_start[0] = 0;
-    circle_start[1] = 1;
-    circle_start[2] = 3;
-    circle_start[3] = 6;
-    circle_start[4] = 10;
-    circle_start[5] = 15;
-    circle_start[6] = 21;
-    circle_start[7] = 28;
-    circle_start[8] = 36;
-    circle_start[9] = 45;
-    circle_start[10] = 55;
-    circle_start[11] = 66;
-    circle_start[12] = 78;
-    circle_start[13] = 91;
-    circle_start[14] = 105;
-    circle_start[15] = 120;
+    $c.init(circle_start, [
+        0,
+        1,
+        3,
+        6,
+        10,
+        15,
+        21,
+        28,
+        36,
+        45,
+        55,
+        66,
+        78,
+        91,
+        105,
+        120
+    ]);
     for (let $i0 = 0; $i0 < 2; $i0++) {
         for (let $i4 = 0; $i4 < 21; $i4++) {
             could_see[$i0][$i4].fill(0);

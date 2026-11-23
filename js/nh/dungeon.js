@@ -2312,107 +2312,98 @@ export function $init() {
     for (let $i0 = 0; $i0 < 27; $i0++) {
         level_map[$i0].$copyFrom(new $T.level_map());
     }
-    level_map[0].lev_name = $c.lit("air");
-    level_map[0].lev_spec = svd.dungeon_topology.d_air_level;
-    level_map[1].lev_name = $c.lit("asmodeus");
-    level_map[1].lev_spec = svd.dungeon_topology.d_asmodeus_level;
-    level_map[2].lev_name = $c.lit("astral");
-    level_map[2].lev_spec = svd.dungeon_topology.d_astral_level;
-    level_map[3].lev_name = $c.lit("baalz");
-    level_map[3].lev_spec = svd.dungeon_topology.d_baalzebub_level;
-    level_map[4].lev_name = $c.lit("bigrm");
-    level_map[4].lev_spec = svd.dungeon_topology.d_bigroom_level;
-    level_map[5].lev_name = $c.lit("castle");
-    level_map[5].lev_spec = svd.dungeon_topology.d_stronghold_level;
-    level_map[6].lev_name = $c.lit("earth");
-    level_map[6].lev_spec = svd.dungeon_topology.d_earth_level;
-    level_map[7].lev_name = $c.lit("fakewiz1");
-    level_map[7].lev_spec = svd.dungeon_topology.d_portal_level;
-    level_map[8].lev_name = $c.lit("fire");
-    level_map[8].lev_spec = svd.dungeon_topology.d_fire_level;
-    level_map[9].lev_name = $c.lit("juiblex");
-    level_map[9].lev_spec = svd.dungeon_topology.d_juiblex_level;
-    level_map[10].lev_name = $c.lit("knox");
-    level_map[10].lev_spec = svd.dungeon_topology.d_knox_level;
-    level_map[11].lev_name = $c.lit("medusa");
-    level_map[11].lev_spec = svd.dungeon_topology.d_medusa_level;
-    level_map[12].lev_name = $c.lit("oracle");
-    level_map[12].lev_spec = svd.dungeon_topology.d_oracle_level;
-    level_map[13].lev_name = $c.lit("orcus");
-    level_map[13].lev_spec = svd.dungeon_topology.d_orcus_level;
-    level_map[14].lev_name = $c.lit("rogue");
-    level_map[14].lev_spec = svd.dungeon_topology.d_rogue_level;
-    level_map[15].lev_name = $c.lit("sanctum");
-    level_map[15].lev_spec = svd.dungeon_topology.d_sanctum_level;
-    level_map[16].lev_name = $c.lit("valley");
-    level_map[16].lev_spec = svd.dungeon_topology.d_valley_level;
-    level_map[17].lev_name = $c.lit("water");
-    level_map[17].lev_spec = svd.dungeon_topology.d_water_level;
-    level_map[18].lev_name = $c.lit("wizard1");
-    level_map[18].lev_spec = svd.dungeon_topology.d_wiz1_level;
-    level_map[19].lev_name = $c.lit("wizard2");
-    level_map[19].lev_spec = svd.dungeon_topology.d_wiz2_level;
-    level_map[20].lev_name = $c.lit("wizard3");
-    level_map[20].lev_spec = svd.dungeon_topology.d_wiz3_level;
-    level_map[21].lev_name = $c.lit("minend");
-    level_map[21].lev_spec = svd.dungeon_topology.d_mineend_level;
-    level_map[22].lev_name = $c.lit("soko1");
-    level_map[22].lev_spec = svd.dungeon_topology.d_sokoend_level;
-    level_map[23].lev_name = $c.lit("x-strt");
-    level_map[23].lev_spec = svd.dungeon_topology.d_qstart_level;
-    level_map[24].lev_name = $c.lit("x-loca");
-    level_map[24].lev_spec = svd.dungeon_topology.d_qlocate_level;
-    level_map[25].lev_name = $c.lit("x-goal");
-    level_map[25].lev_spec = svd.dungeon_topology.d_nemesis_level;
-    level_map[26].lev_name = $c.lit("");
-    level_map[26].lev_spec = null;
+    $c.init(level_map, [
+        { lev_name: $c.lit("air"), lev_spec: svd.dungeon_topology.d_air_level },
+        { lev_name: $c.lit("asmodeus"), lev_spec: svd.dungeon_topology.d_asmodeus_level },
+        { lev_name: $c.lit("astral"), lev_spec: svd.dungeon_topology.d_astral_level },
+        { lev_name: $c.lit("baalz"), lev_spec: svd.dungeon_topology.d_baalzebub_level },
+        { lev_name: $c.lit("bigrm"), lev_spec: svd.dungeon_topology.d_bigroom_level },
+        { lev_name: $c.lit("castle"), lev_spec: svd.dungeon_topology.d_stronghold_level },
+        { lev_name: $c.lit("earth"), lev_spec: svd.dungeon_topology.d_earth_level },
+        { lev_name: $c.lit("fakewiz1"), lev_spec: svd.dungeon_topology.d_portal_level },
+        { lev_name: $c.lit("fire"), lev_spec: svd.dungeon_topology.d_fire_level },
+        { lev_name: $c.lit("juiblex"), lev_spec: svd.dungeon_topology.d_juiblex_level },
+        { lev_name: $c.lit("knox"), lev_spec: svd.dungeon_topology.d_knox_level },
+        { lev_name: $c.lit("medusa"), lev_spec: svd.dungeon_topology.d_medusa_level },
+        { lev_name: $c.lit("oracle"), lev_spec: svd.dungeon_topology.d_oracle_level },
+        { lev_name: $c.lit("orcus"), lev_spec: svd.dungeon_topology.d_orcus_level },
+        { lev_name: $c.lit("rogue"), lev_spec: svd.dungeon_topology.d_rogue_level },
+        { lev_name: $c.lit("sanctum"), lev_spec: svd.dungeon_topology.d_sanctum_level },
+        { lev_name: $c.lit("valley"), lev_spec: svd.dungeon_topology.d_valley_level },
+        { lev_name: $c.lit("water"), lev_spec: svd.dungeon_topology.d_water_level },
+        { lev_name: $c.lit("wizard1"), lev_spec: svd.dungeon_topology.d_wiz1_level },
+        { lev_name: $c.lit("wizard2"), lev_spec: svd.dungeon_topology.d_wiz2_level },
+        { lev_name: $c.lit("wizard3"), lev_spec: svd.dungeon_topology.d_wiz3_level },
+        { lev_name: $c.lit("minend"), lev_spec: svd.dungeon_topology.d_mineend_level },
+        { lev_name: $c.lit("soko1"), lev_spec: svd.dungeon_topology.d_sokoend_level },
+        { lev_name: $c.lit("x-strt"), lev_spec: svd.dungeon_topology.d_qstart_level },
+        { lev_name: $c.lit("x-loca"), lev_spec: svd.dungeon_topology.d_qlocate_level },
+        { lev_name: $c.lit("x-goal"), lev_spec: svd.dungeon_topology.d_nemesis_level },
+        { lev_name: $c.lit(""), lev_spec: null }
+    ]);
     add_branch$branch_id = 0;
     get_dgn_flags$flagstrs.fill(null);
-    get_dgn_flags$flagstrs[0] = $c.lit("town");
-    get_dgn_flags$flagstrs[1] = $c.lit("hellish");
-    get_dgn_flags$flagstrs[2] = $c.lit("mazelike");
-    get_dgn_flags$flagstrs[3] = $c.lit("roguelike");
-    get_dgn_flags$flagstrs[4] = $c.lit("unconnected");
-    get_dgn_flags$flagstrs[5] = null;
+    $c.init(get_dgn_flags$flagstrs, [
+        $c.lit("town"),
+        $c.lit("hellish"),
+        $c.lit("mazelike"),
+        $c.lit("roguelike"),
+        $c.lit("unconnected"),
+        null
+    ]);
     get_dgn_flags$flagstrs2i.fill(0);
-    get_dgn_flags$flagstrs2i[0] = TOWN;
-    get_dgn_flags$flagstrs2i[1] = HELLISH;
-    get_dgn_flags$flagstrs2i[2] = MAZELIKE;
-    get_dgn_flags$flagstrs2i[3] = ROGUELIKE;
-    get_dgn_flags$flagstrs2i[4] = UNCONNECTED;
-    get_dgn_flags$flagstrs2i[5] = 0;
+    $c.init(get_dgn_flags$flagstrs2i, [
+        TOWN,
+        HELLISH,
+        MAZELIKE,
+        ROGUELIKE,
+        UNCONNECTED,
+        0
+    ]);
     get_dgn_align$dgnaligns.fill(null);
-    get_dgn_align$dgnaligns[0] = $c.lit("unaligned");
-    get_dgn_align$dgnaligns[1] = $c.lit("noalign");
-    get_dgn_align$dgnaligns[2] = $c.lit("lawful");
-    get_dgn_align$dgnaligns[3] = $c.lit("neutral");
-    get_dgn_align$dgnaligns[4] = $c.lit("chaotic");
-    get_dgn_align$dgnaligns[5] = null;
+    $c.init(get_dgn_align$dgnaligns, [
+        $c.lit("unaligned"),
+        $c.lit("noalign"),
+        $c.lit("lawful"),
+        $c.lit("neutral"),
+        $c.lit("chaotic"),
+        null
+    ]);
     get_dgn_align$dgnaligns2i.fill(0);
-    get_dgn_align$dgnaligns2i[0] = D_ALIGN_NONE;
-    get_dgn_align$dgnaligns2i[1] = D_ALIGN_NONE;
-    get_dgn_align$dgnaligns2i[2] = AM_LAWFUL << 4;
-    get_dgn_align$dgnaligns2i[3] = AM_NEUTRAL << 4;
-    get_dgn_align$dgnaligns2i[4] = AM_CHAOTIC << 4;
-    get_dgn_align$dgnaligns2i[5] = D_ALIGN_NONE;
+    $c.init(get_dgn_align$dgnaligns2i, [
+        D_ALIGN_NONE,
+        D_ALIGN_NONE,
+        AM_LAWFUL << 4,
+        AM_NEUTRAL << 4,
+        AM_CHAOTIC << 4,
+        D_ALIGN_NONE
+    ]);
     init_dungeon_branches$brdirstr.fill(null);
-    init_dungeon_branches$brdirstr[0] = $c.lit("up");
-    init_dungeon_branches$brdirstr[1] = $c.lit("down");
-    init_dungeon_branches$brdirstr[2] = null;
+    $c.init(init_dungeon_branches$brdirstr, [
+        $c.lit("up"),
+        $c.lit("down"),
+        null
+    ]);
     init_dungeon_branches$brdirstr2i.fill(0);
-    init_dungeon_branches$brdirstr2i[0] = TRUE;
-    init_dungeon_branches$brdirstr2i[1] = FALSE;
-    init_dungeon_branches$brdirstr2i[2] = FALSE;
+    $c.init(init_dungeon_branches$brdirstr2i, [
+        TRUE,
+        FALSE,
+        FALSE
+    ]);
     init_dungeon_branches$brtypes.fill(null);
-    init_dungeon_branches$brtypes[0] = $c.lit("stair");
-    init_dungeon_branches$brtypes[1] = $c.lit("portal");
-    init_dungeon_branches$brtypes[2] = $c.lit("no_down");
-    init_dungeon_branches$brtypes[3] = $c.lit("no_up");
-    init_dungeon_branches$brtypes[4] = null;
+    $c.init(init_dungeon_branches$brtypes, [
+        $c.lit("stair"),
+        $c.lit("portal"),
+        $c.lit("no_down"),
+        $c.lit("no_up"),
+        null
+    ]);
     init_dungeon_branches$brtypes2i.fill(0);
-    init_dungeon_branches$brtypes2i[0] = TBR_STAIR;
-    init_dungeon_branches$brtypes2i[1] = TBR_PORTAL;
-    init_dungeon_branches$brtypes2i[2] = TBR_NO_DOWN;
-    init_dungeon_branches$brtypes2i[3] = TBR_NO_UP;
-    init_dungeon_branches$brtypes2i[4] = TBR_STAIR;
+    $c.init(init_dungeon_branches$brtypes2i, [
+        TBR_STAIR,
+        TBR_PORTAL,
+        TBR_NO_DOWN,
+        TBR_NO_UP,
+        TBR_STAIR
+    ]);
 }

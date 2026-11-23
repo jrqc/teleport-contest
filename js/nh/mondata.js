@@ -1082,383 +1082,215 @@ export function $init() {
     for (let $i0 = 0; $i0 < 68; $i0++) {
         grownups[$i0].fill(0);
     }
-    grownups[0][0] = PM_CHICKATRICE;
-    grownups[0][1] = PM_COCKATRICE;
-    grownups[1][0] = PM_LITTLE_DOG;
-    grownups[1][1] = PM_DOG;
-    grownups[2][0] = PM_DOG;
-    grownups[2][1] = PM_LARGE_DOG;
-    grownups[3][0] = PM_HELL_HOUND_PUP;
-    grownups[3][1] = PM_HELL_HOUND;
-    grownups[4][0] = PM_WINTER_WOLF_CUB;
-    grownups[4][1] = PM_WINTER_WOLF;
-    grownups[5][0] = PM_KITTEN;
-    grownups[5][1] = PM_HOUSECAT;
-    grownups[6][0] = PM_HOUSECAT;
-    grownups[6][1] = PM_LARGE_CAT;
-    grownups[7][0] = PM_PONY;
-    grownups[7][1] = PM_HORSE;
-    grownups[8][0] = PM_HORSE;
-    grownups[8][1] = PM_WARHORSE;
-    grownups[9][0] = PM_KOBOLD;
-    grownups[9][1] = PM_LARGE_KOBOLD;
-    grownups[10][0] = PM_LARGE_KOBOLD;
-    grownups[10][1] = PM_KOBOLD_LEADER;
-    grownups[11][0] = PM_GNOME;
-    grownups[11][1] = PM_GNOME_LEADER;
-    grownups[12][0] = PM_GNOME_LEADER;
-    grownups[12][1] = PM_GNOME_RULER;
-    grownups[13][0] = PM_DWARF;
-    grownups[13][1] = PM_DWARF_LEADER;
-    grownups[14][0] = PM_DWARF_LEADER;
-    grownups[14][1] = PM_DWARF_RULER;
-    grownups[15][0] = PM_MIND_FLAYER;
-    grownups[15][1] = PM_MASTER_MIND_FLAYER;
-    grownups[16][0] = PM_ORC;
-    grownups[16][1] = PM_ORC_CAPTAIN;
-    grownups[17][0] = PM_HILL_ORC;
-    grownups[17][1] = PM_ORC_CAPTAIN;
-    grownups[18][0] = PM_MORDOR_ORC;
-    grownups[18][1] = PM_ORC_CAPTAIN;
-    grownups[19][0] = PM_URUK_HAI;
-    grownups[19][1] = PM_ORC_CAPTAIN;
-    grownups[20][0] = PM_SEWER_RAT;
-    grownups[20][1] = PM_GIANT_RAT;
-    grownups[21][0] = PM_CAVE_SPIDER;
-    grownups[21][1] = PM_GIANT_SPIDER;
-    grownups[22][0] = PM_OGRE;
-    grownups[22][1] = PM_OGRE_LEADER;
-    grownups[23][0] = PM_OGRE_LEADER;
-    grownups[23][1] = PM_OGRE_TYRANT;
-    grownups[24][0] = PM_ELF;
-    grownups[24][1] = PM_ELF_NOBLE;
-    grownups[25][0] = PM_WOODLAND_ELF;
-    grownups[25][1] = PM_ELF_NOBLE;
-    grownups[26][0] = PM_GREEN_ELF;
-    grownups[26][1] = PM_ELF_NOBLE;
-    grownups[27][0] = PM_GREY_ELF;
-    grownups[27][1] = PM_ELF_NOBLE;
-    grownups[28][0] = PM_ELF_NOBLE;
-    grownups[28][1] = PM_ELVEN_MONARCH;
-    grownups[29][0] = PM_LICH;
-    grownups[29][1] = PM_DEMILICH;
-    grownups[30][0] = PM_DEMILICH;
-    grownups[30][1] = PM_MASTER_LICH;
-    grownups[31][0] = PM_MASTER_LICH;
-    grownups[31][1] = PM_ARCH_LICH;
-    grownups[32][0] = PM_VAMPIRE;
-    grownups[32][1] = PM_VAMPIRE_LEADER;
-    grownups[33][0] = PM_BAT;
-    grownups[33][1] = PM_GIANT_BAT;
-    grownups[34][0] = PM_BABY_GRAY_DRAGON;
-    grownups[34][1] = PM_GRAY_DRAGON;
-    grownups[35][0] = PM_BABY_GOLD_DRAGON;
-    grownups[35][1] = PM_GOLD_DRAGON;
-    grownups[36][0] = PM_BABY_SILVER_DRAGON;
-    grownups[36][1] = PM_SILVER_DRAGON;
-    grownups[37][0] = PM_BABY_RED_DRAGON;
-    grownups[37][1] = PM_RED_DRAGON;
-    grownups[38][0] = PM_BABY_WHITE_DRAGON;
-    grownups[38][1] = PM_WHITE_DRAGON;
-    grownups[39][0] = PM_BABY_ORANGE_DRAGON;
-    grownups[39][1] = PM_ORANGE_DRAGON;
-    grownups[40][0] = PM_BABY_BLACK_DRAGON;
-    grownups[40][1] = PM_BLACK_DRAGON;
-    grownups[41][0] = PM_BABY_BLUE_DRAGON;
-    grownups[41][1] = PM_BLUE_DRAGON;
-    grownups[42][0] = PM_BABY_GREEN_DRAGON;
-    grownups[42][1] = PM_GREEN_DRAGON;
-    grownups[43][0] = PM_BABY_YELLOW_DRAGON;
-    grownups[43][1] = PM_YELLOW_DRAGON;
-    grownups[44][0] = PM_RED_NAGA_HATCHLING;
-    grownups[44][1] = PM_RED_NAGA;
-    grownups[45][0] = PM_BLACK_NAGA_HATCHLING;
-    grownups[45][1] = PM_BLACK_NAGA;
-    grownups[46][0] = PM_GOLDEN_NAGA_HATCHLING;
-    grownups[46][1] = PM_GOLDEN_NAGA;
-    grownups[47][0] = PM_GUARDIAN_NAGA_HATCHLING;
-    grownups[47][1] = PM_GUARDIAN_NAGA;
-    grownups[48][0] = PM_SMALL_MIMIC;
-    grownups[48][1] = PM_LARGE_MIMIC;
-    grownups[49][0] = PM_LARGE_MIMIC;
-    grownups[49][1] = PM_GIANT_MIMIC;
-    grownups[50][0] = PM_BABY_LONG_WORM;
-    grownups[50][1] = PM_LONG_WORM;
-    grownups[51][0] = PM_BABY_PURPLE_WORM;
-    grownups[51][1] = PM_PURPLE_WORM;
-    grownups[52][0] = PM_BABY_CROCODILE;
-    grownups[52][1] = PM_CROCODILE;
-    grownups[53][0] = PM_SOLDIER;
-    grownups[53][1] = PM_SERGEANT;
-    grownups[54][0] = PM_SERGEANT;
-    grownups[54][1] = PM_LIEUTENANT;
-    grownups[55][0] = PM_LIEUTENANT;
-    grownups[55][1] = PM_CAPTAIN;
-    grownups[56][0] = PM_WATCHMAN;
-    grownups[56][1] = PM_WATCH_CAPTAIN;
-    grownups[57][0] = PM_ALIGNED_CLERIC;
-    grownups[57][1] = PM_HIGH_CLERIC;
-    grownups[58][0] = PM_STUDENT;
-    grownups[58][1] = PM_ARCHEOLOGIST;
-    grownups[59][0] = PM_ATTENDANT;
-    grownups[59][1] = PM_HEALER;
-    grownups[60][0] = PM_PAGE;
-    grownups[60][1] = PM_KNIGHT;
-    grownups[61][0] = PM_ACOLYTE;
-    grownups[61][1] = PM_CLERIC;
-    grownups[62][0] = PM_APPRENTICE;
-    grownups[62][1] = PM_WIZARD;
-    grownups[63][0] = PM_MANES;
-    grownups[63][1] = PM_LEMURE;
-    grownups[64][0] = PM_KEYSTONE_KOP;
-    grownups[64][1] = PM_KOP_SERGEANT;
-    grownups[65][0] = PM_KOP_SERGEANT;
-    grownups[65][1] = PM_KOP_LIEUTENANT;
-    grownups[66][0] = PM_KOP_LIEUTENANT;
-    grownups[66][1] = PM_KOP_KAPTAIN;
-    grownups[67][0] = NON_PM;
-    grownups[67][1] = NON_PM;
+    $c.init(grownups, [
+        [PM_CHICKATRICE, PM_COCKATRICE],
+        [PM_LITTLE_DOG, PM_DOG],
+        [PM_DOG, PM_LARGE_DOG],
+        [PM_HELL_HOUND_PUP, PM_HELL_HOUND],
+        [PM_WINTER_WOLF_CUB, PM_WINTER_WOLF],
+        [PM_KITTEN, PM_HOUSECAT],
+        [PM_HOUSECAT, PM_LARGE_CAT],
+        [PM_PONY, PM_HORSE],
+        [PM_HORSE, PM_WARHORSE],
+        [PM_KOBOLD, PM_LARGE_KOBOLD],
+        [PM_LARGE_KOBOLD, PM_KOBOLD_LEADER],
+        [PM_GNOME, PM_GNOME_LEADER],
+        [PM_GNOME_LEADER, PM_GNOME_RULER],
+        [PM_DWARF, PM_DWARF_LEADER],
+        [PM_DWARF_LEADER, PM_DWARF_RULER],
+        [PM_MIND_FLAYER, PM_MASTER_MIND_FLAYER],
+        [PM_ORC, PM_ORC_CAPTAIN],
+        [PM_HILL_ORC, PM_ORC_CAPTAIN],
+        [PM_MORDOR_ORC, PM_ORC_CAPTAIN],
+        [PM_URUK_HAI, PM_ORC_CAPTAIN],
+        [PM_SEWER_RAT, PM_GIANT_RAT],
+        [PM_CAVE_SPIDER, PM_GIANT_SPIDER],
+        [PM_OGRE, PM_OGRE_LEADER],
+        [PM_OGRE_LEADER, PM_OGRE_TYRANT],
+        [PM_ELF, PM_ELF_NOBLE],
+        [PM_WOODLAND_ELF, PM_ELF_NOBLE],
+        [PM_GREEN_ELF, PM_ELF_NOBLE],
+        [PM_GREY_ELF, PM_ELF_NOBLE],
+        [PM_ELF_NOBLE, PM_ELVEN_MONARCH],
+        [PM_LICH, PM_DEMILICH],
+        [PM_DEMILICH, PM_MASTER_LICH],
+        [PM_MASTER_LICH, PM_ARCH_LICH],
+        [PM_VAMPIRE, PM_VAMPIRE_LEADER],
+        [PM_BAT, PM_GIANT_BAT],
+        [PM_BABY_GRAY_DRAGON, PM_GRAY_DRAGON],
+        [PM_BABY_GOLD_DRAGON, PM_GOLD_DRAGON],
+        [PM_BABY_SILVER_DRAGON, PM_SILVER_DRAGON],
+        [PM_BABY_RED_DRAGON, PM_RED_DRAGON],
+        [PM_BABY_WHITE_DRAGON, PM_WHITE_DRAGON],
+        [PM_BABY_ORANGE_DRAGON, PM_ORANGE_DRAGON],
+        [PM_BABY_BLACK_DRAGON, PM_BLACK_DRAGON],
+        [PM_BABY_BLUE_DRAGON, PM_BLUE_DRAGON],
+        [PM_BABY_GREEN_DRAGON, PM_GREEN_DRAGON],
+        [PM_BABY_YELLOW_DRAGON, PM_YELLOW_DRAGON],
+        [PM_RED_NAGA_HATCHLING, PM_RED_NAGA],
+        [PM_BLACK_NAGA_HATCHLING, PM_BLACK_NAGA],
+        [PM_GOLDEN_NAGA_HATCHLING, PM_GOLDEN_NAGA],
+        [PM_GUARDIAN_NAGA_HATCHLING, PM_GUARDIAN_NAGA],
+        [PM_SMALL_MIMIC, PM_LARGE_MIMIC],
+        [PM_LARGE_MIMIC, PM_GIANT_MIMIC],
+        [PM_BABY_LONG_WORM, PM_LONG_WORM],
+        [PM_BABY_PURPLE_WORM, PM_PURPLE_WORM],
+        [PM_BABY_CROCODILE, PM_CROCODILE],
+        [PM_SOLDIER, PM_SERGEANT],
+        [PM_SERGEANT, PM_LIEUTENANT],
+        [PM_LIEUTENANT, PM_CAPTAIN],
+        [PM_WATCHMAN, PM_WATCH_CAPTAIN],
+        [PM_ALIGNED_CLERIC, PM_HIGH_CLERIC],
+        [PM_STUDENT, PM_ARCHEOLOGIST],
+        [PM_ATTENDANT, PM_HEALER],
+        [PM_PAGE, PM_KNIGHT],
+        [PM_ACOLYTE, PM_CLERIC],
+        [PM_APPRENTICE, PM_WIZARD],
+        [PM_MANES, PM_LEMURE],
+        [PM_KEYSTONE_KOP, PM_KOP_SERGEANT],
+        [PM_KOP_SERGEANT, PM_KOP_LIEUTENANT],
+        [PM_KOP_LIEUTENANT, PM_KOP_KAPTAIN],
+        [NON_PM, NON_PM]
+    ]);
     levitate.fill(null);
-    levitate[0] = $c.lit("float");
-    levitate[1] = $c.lit("Float");
-    levitate[2] = $c.lit("wobble");
-    levitate[3] = $c.lit("Wobble");
+    $c.init(levitate, [
+        $c.lit("float"),
+        $c.lit("Float"),
+        $c.lit("wobble"),
+        $c.lit("Wobble")
+    ]);
     flys.fill(null);
-    flys[0] = $c.lit("fly");
-    flys[1] = $c.lit("Fly");
-    flys[2] = $c.lit("flutter");
-    flys[3] = $c.lit("Flutter");
+    $c.init(flys, [
+        $c.lit("fly"),
+        $c.lit("Fly"),
+        $c.lit("flutter"),
+        $c.lit("Flutter")
+    ]);
     flyl.fill(null);
-    flyl[0] = $c.lit("fly");
-    flyl[1] = $c.lit("Fly");
-    flyl[2] = $c.lit("stagger");
-    flyl[3] = $c.lit("Stagger");
+    $c.init(flyl, [
+        $c.lit("fly"),
+        $c.lit("Fly"),
+        $c.lit("stagger"),
+        $c.lit("Stagger")
+    ]);
     slither.fill(null);
-    slither[0] = $c.lit("slither");
-    slither[1] = $c.lit("Slither");
-    slither[2] = $c.lit("falter");
-    slither[3] = $c.lit("Falter");
+    $c.init(slither, [
+        $c.lit("slither"),
+        $c.lit("Slither"),
+        $c.lit("falter"),
+        $c.lit("Falter")
+    ]);
     ooze.fill(null);
-    ooze[0] = $c.lit("ooze");
-    ooze[1] = $c.lit("Ooze");
-    ooze[2] = $c.lit("tremble");
-    ooze[3] = $c.lit("Tremble");
+    $c.init(ooze, [
+        $c.lit("ooze"),
+        $c.lit("Ooze"),
+        $c.lit("tremble"),
+        $c.lit("Tremble")
+    ]);
     immobile.fill(null);
-    immobile[0] = $c.lit("wiggle");
-    immobile[1] = $c.lit("Wiggle");
-    immobile[2] = $c.lit("pulsate");
-    immobile[3] = $c.lit("Pulsate");
+    $c.init(immobile, [
+        $c.lit("wiggle"),
+        $c.lit("Wiggle"),
+        $c.lit("pulsate"),
+        $c.lit("Pulsate")
+    ]);
     crawl.fill(null);
-    crawl[0] = $c.lit("crawl");
-    crawl[1] = $c.lit("Crawl");
-    crawl[2] = $c.lit("falter");
-    crawl[3] = $c.lit("Falter");
+    $c.init(crawl, [
+        $c.lit("crawl"),
+        $c.lit("Crawl"),
+        $c.lit("falter"),
+        $c.lit("Falter")
+    ]);
     for (let $i0 = 0; $i0 < 56; $i0++) {
         name_to_monplus$names[$i0].$copyFrom(new $T.alt_spl());
     }
-    name_to_monplus$names[0].name = $c.lit("grey dragon");
-    name_to_monplus$names[0].pm_val = PM_GRAY_DRAGON;
-    name_to_monplus$names[0].genderhint = NEUTRAL;
-    name_to_monplus$names[1].name = $c.lit("baby grey dragon");
-    name_to_monplus$names[1].pm_val = PM_BABY_GRAY_DRAGON;
-    name_to_monplus$names[1].genderhint = NEUTRAL;
-    name_to_monplus$names[2].name = $c.lit("grey unicorn");
-    name_to_monplus$names[2].pm_val = PM_GRAY_UNICORN;
-    name_to_monplus$names[2].genderhint = NEUTRAL;
-    name_to_monplus$names[3].name = $c.lit("grey ooze");
-    name_to_monplus$names[3].pm_val = PM_GRAY_OOZE;
-    name_to_monplus$names[3].genderhint = NEUTRAL;
-    name_to_monplus$names[4].name = $c.lit("gray-elf");
-    name_to_monplus$names[4].pm_val = PM_GREY_ELF;
-    name_to_monplus$names[4].genderhint = NEUTRAL;
-    name_to_monplus$names[5].name = $c.lit("mindflayer");
-    name_to_monplus$names[5].pm_val = PM_MIND_FLAYER;
-    name_to_monplus$names[5].genderhint = NEUTRAL;
-    name_to_monplus$names[6].name = $c.lit("master mindflayer");
-    name_to_monplus$names[6].pm_val = PM_MASTER_MIND_FLAYER;
-    name_to_monplus$names[6].genderhint = NEUTRAL;
-    name_to_monplus$names[7].name = $c.lit("aligned priest");
-    name_to_monplus$names[7].pm_val = PM_ALIGNED_CLERIC;
-    name_to_monplus$names[7].genderhint = MALE;
-    name_to_monplus$names[8].name = $c.lit("aligned priestess");
-    name_to_monplus$names[8].pm_val = PM_ALIGNED_CLERIC;
-    name_to_monplus$names[8].genderhint = FEMALE;
-    name_to_monplus$names[9].name = $c.lit("high priest");
-    name_to_monplus$names[9].pm_val = PM_HIGH_CLERIC;
-    name_to_monplus$names[9].genderhint = MALE;
-    name_to_monplus$names[10].name = $c.lit("high priestess");
-    name_to_monplus$names[10].pm_val = PM_HIGH_CLERIC;
-    name_to_monplus$names[10].genderhint = FEMALE;
-    name_to_monplus$names[11].name = $c.lit("master of thief");
-    name_to_monplus$names[11].pm_val = PM_MASTER_OF_THIEVES;
-    name_to_monplus$names[11].genderhint = NEUTRAL;
-    name_to_monplus$names[12].name = $c.lit("master thief");
-    name_to_monplus$names[12].pm_val = PM_MASTER_OF_THIEVES;
-    name_to_monplus$names[12].genderhint = NEUTRAL;
-    name_to_monplus$names[13].name = $c.lit("master of assassin");
-    name_to_monplus$names[13].pm_val = PM_MASTER_ASSASSIN;
-    name_to_monplus$names[13].genderhint = NEUTRAL;
-    name_to_monplus$names[14].name = $c.lit("master-lich");
-    name_to_monplus$names[14].pm_val = PM_MASTER_LICH;
-    name_to_monplus$names[14].genderhint = NEUTRAL;
-    name_to_monplus$names[15].name = $c.lit("masterlich");
-    name_to_monplus$names[15].pm_val = PM_MASTER_LICH;
-    name_to_monplus$names[15].genderhint = NEUTRAL;
-    name_to_monplus$names[16].name = $c.lit("invisible stalker");
-    name_to_monplus$names[16].pm_val = PM_STALKER;
-    name_to_monplus$names[16].genderhint = NEUTRAL;
-    name_to_monplus$names[17].name = $c.lit("high-elf");
-    name_to_monplus$names[17].pm_val = PM_ELVEN_MONARCH;
-    name_to_monplus$names[17].genderhint = NEUTRAL;
-    name_to_monplus$names[18].name = $c.lit("wood-elf");
-    name_to_monplus$names[18].pm_val = PM_WOODLAND_ELF;
-    name_to_monplus$names[18].genderhint = NEUTRAL;
-    name_to_monplus$names[19].name = $c.lit("wood elf");
-    name_to_monplus$names[19].pm_val = PM_WOODLAND_ELF;
-    name_to_monplus$names[19].genderhint = NEUTRAL;
-    name_to_monplus$names[20].name = $c.lit("woodland nymph");
-    name_to_monplus$names[20].pm_val = PM_WOOD_NYMPH;
-    name_to_monplus$names[20].genderhint = NEUTRAL;
-    name_to_monplus$names[21].name = $c.lit("halfling");
-    name_to_monplus$names[21].pm_val = PM_HOBBIT;
-    name_to_monplus$names[21].genderhint = NEUTRAL;
-    name_to_monplus$names[22].name = $c.lit("genie");
-    name_to_monplus$names[22].pm_val = PM_DJINNI;
-    name_to_monplus$names[22].genderhint = NEUTRAL;
-    name_to_monplus$names[23].name = $c.lit("human wererat");
-    name_to_monplus$names[23].pm_val = PM_HUMAN_WERERAT;
-    name_to_monplus$names[23].genderhint = NEUTRAL;
-    name_to_monplus$names[24].name = $c.lit("human werejackal");
-    name_to_monplus$names[24].pm_val = PM_HUMAN_WEREJACKAL;
-    name_to_monplus$names[24].genderhint = NEUTRAL;
-    name_to_monplus$names[25].name = $c.lit("human werewolf");
-    name_to_monplus$names[25].pm_val = PM_HUMAN_WEREWOLF;
-    name_to_monplus$names[25].genderhint = NEUTRAL;
-    name_to_monplus$names[26].name = $c.lit("rat wererat");
-    name_to_monplus$names[26].pm_val = PM_WERERAT;
-    name_to_monplus$names[26].genderhint = NEUTRAL;
-    name_to_monplus$names[27].name = $c.lit("jackal werejackal");
-    name_to_monplus$names[27].pm_val = PM_WEREJACKAL;
-    name_to_monplus$names[27].genderhint = NEUTRAL;
-    name_to_monplus$names[28].name = $c.lit("wolf werewolf");
-    name_to_monplus$names[28].pm_val = PM_WEREWOLF;
-    name_to_monplus$names[28].genderhint = NEUTRAL;
-    name_to_monplus$names[29].name = $c.lit("ki rin");
-    name_to_monplus$names[29].pm_val = PM_KI_RIN;
-    name_to_monplus$names[29].genderhint = NEUTRAL;
-    name_to_monplus$names[30].name = $c.lit("kirin");
-    name_to_monplus$names[30].pm_val = PM_KI_RIN;
-    name_to_monplus$names[30].genderhint = NEUTRAL;
-    name_to_monplus$names[31].name = $c.lit("uruk hai");
-    name_to_monplus$names[31].pm_val = PM_URUK_HAI;
-    name_to_monplus$names[31].genderhint = NEUTRAL;
-    name_to_monplus$names[32].name = $c.lit("orc captain");
-    name_to_monplus$names[32].pm_val = PM_ORC_CAPTAIN;
-    name_to_monplus$names[32].genderhint = NEUTRAL;
-    name_to_monplus$names[33].name = $c.lit("woodland elf");
-    name_to_monplus$names[33].pm_val = PM_WOODLAND_ELF;
-    name_to_monplus$names[33].genderhint = NEUTRAL;
-    name_to_monplus$names[34].name = $c.lit("green elf");
-    name_to_monplus$names[34].pm_val = PM_GREEN_ELF;
-    name_to_monplus$names[34].genderhint = NEUTRAL;
-    name_to_monplus$names[35].name = $c.lit("grey elf");
-    name_to_monplus$names[35].pm_val = PM_GREY_ELF;
-    name_to_monplus$names[35].genderhint = NEUTRAL;
-    name_to_monplus$names[36].name = $c.lit("gray elf");
-    name_to_monplus$names[36].pm_val = PM_GREY_ELF;
-    name_to_monplus$names[36].genderhint = NEUTRAL;
-    name_to_monplus$names[37].name = $c.lit("elf lady");
-    name_to_monplus$names[37].pm_val = PM_ELF_NOBLE;
-    name_to_monplus$names[37].genderhint = FEMALE;
-    name_to_monplus$names[38].name = $c.lit("elf lord");
-    name_to_monplus$names[38].pm_val = PM_ELF_NOBLE;
-    name_to_monplus$names[38].genderhint = MALE;
-    name_to_monplus$names[39].name = $c.lit("elf noble");
-    name_to_monplus$names[39].pm_val = PM_ELF_NOBLE;
-    name_to_monplus$names[39].genderhint = NEUTRAL;
-    name_to_monplus$names[40].name = $c.lit("olog hai");
-    name_to_monplus$names[40].pm_val = PM_OLOG_HAI;
-    name_to_monplus$names[40].genderhint = NEUTRAL;
-    name_to_monplus$names[41].name = $c.lit("arch lich");
-    name_to_monplus$names[41].pm_val = PM_ARCH_LICH;
-    name_to_monplus$names[41].genderhint = NEUTRAL;
-    name_to_monplus$names[42].name = $c.lit("archlich");
-    name_to_monplus$names[42].pm_val = PM_ARCH_LICH;
-    name_to_monplus$names[42].genderhint = NEUTRAL;
-    name_to_monplus$names[43].name = $c.lit("incubi");
-    name_to_monplus$names[43].pm_val = PM_AMOROUS_DEMON;
-    name_to_monplus$names[43].genderhint = MALE;
-    name_to_monplus$names[44].name = $c.lit("succubi");
-    name_to_monplus$names[44].pm_val = PM_AMOROUS_DEMON;
-    name_to_monplus$names[44].genderhint = FEMALE;
-    name_to_monplus$names[45].name = $c.lit("violet fungi");
-    name_to_monplus$names[45].pm_val = PM_VIOLET_FUNGUS;
-    name_to_monplus$names[45].genderhint = NEUTRAL;
-    name_to_monplus$names[46].name = $c.lit("homunculi");
-    name_to_monplus$names[46].pm_val = PM_HOMUNCULUS;
-    name_to_monplus$names[46].genderhint = NEUTRAL;
-    name_to_monplus$names[47].name = $c.lit("baluchitheria");
-    name_to_monplus$names[47].pm_val = PM_BALUCHITHERIUM;
-    name_to_monplus$names[47].genderhint = NEUTRAL;
-    name_to_monplus$names[48].name = $c.lit("lurkers above");
-    name_to_monplus$names[48].pm_val = PM_LURKER_ABOVE;
-    name_to_monplus$names[48].genderhint = NEUTRAL;
-    name_to_monplus$names[49].name = $c.lit("cavemen");
-    name_to_monplus$names[49].pm_val = PM_CAVE_DWELLER;
-    name_to_monplus$names[49].genderhint = MALE;
-    name_to_monplus$names[50].name = $c.lit("cavewomen");
-    name_to_monplus$names[50].pm_val = PM_CAVE_DWELLER;
-    name_to_monplus$names[50].genderhint = FEMALE;
-    name_to_monplus$names[51].name = $c.lit("watchmen");
-    name_to_monplus$names[51].pm_val = PM_WATCHMAN;
-    name_to_monplus$names[51].genderhint = NEUTRAL;
-    name_to_monplus$names[52].name = $c.lit("djinn");
-    name_to_monplus$names[52].pm_val = PM_DJINNI;
-    name_to_monplus$names[52].genderhint = NEUTRAL;
-    name_to_monplus$names[53].name = $c.lit("mumakil");
-    name_to_monplus$names[53].pm_val = PM_MUMAK;
-    name_to_monplus$names[53].genderhint = NEUTRAL;
-    name_to_monplus$names[54].name = $c.lit("erinyes");
-    name_to_monplus$names[54].pm_val = PM_ERINYS;
-    name_to_monplus$names[54].genderhint = NEUTRAL;
-    name_to_monplus$names[55].name = null;
-    name_to_monplus$names[55].pm_val = NON_PM;
-    name_to_monplus$names[55].genderhint = NEUTRAL;
+    $c.init(name_to_monplus$names, [
+        { name: $c.lit("grey dragon"), pm_val: PM_GRAY_DRAGON, genderhint: NEUTRAL },
+        { name: $c.lit("baby grey dragon"), pm_val: PM_BABY_GRAY_DRAGON, genderhint: NEUTRAL },
+        { name: $c.lit("grey unicorn"), pm_val: PM_GRAY_UNICORN, genderhint: NEUTRAL },
+        { name: $c.lit("grey ooze"), pm_val: PM_GRAY_OOZE, genderhint: NEUTRAL },
+        { name: $c.lit("gray-elf"), pm_val: PM_GREY_ELF, genderhint: NEUTRAL },
+        { name: $c.lit("mindflayer"), pm_val: PM_MIND_FLAYER, genderhint: NEUTRAL },
+        { name: $c.lit("master mindflayer"), pm_val: PM_MASTER_MIND_FLAYER, genderhint: NEUTRAL },
+        { name: $c.lit("aligned priest"), pm_val: PM_ALIGNED_CLERIC, genderhint: MALE },
+        { name: $c.lit("aligned priestess"), pm_val: PM_ALIGNED_CLERIC, genderhint: FEMALE },
+        { name: $c.lit("high priest"), pm_val: PM_HIGH_CLERIC, genderhint: MALE },
+        { name: $c.lit("high priestess"), pm_val: PM_HIGH_CLERIC, genderhint: FEMALE },
+        { name: $c.lit("master of thief"), pm_val: PM_MASTER_OF_THIEVES, genderhint: NEUTRAL },
+        { name: $c.lit("master thief"), pm_val: PM_MASTER_OF_THIEVES, genderhint: NEUTRAL },
+        { name: $c.lit("master of assassin"), pm_val: PM_MASTER_ASSASSIN, genderhint: NEUTRAL },
+        { name: $c.lit("master-lich"), pm_val: PM_MASTER_LICH, genderhint: NEUTRAL },
+        { name: $c.lit("masterlich"), pm_val: PM_MASTER_LICH, genderhint: NEUTRAL },
+        { name: $c.lit("invisible stalker"), pm_val: PM_STALKER, genderhint: NEUTRAL },
+        { name: $c.lit("high-elf"), pm_val: PM_ELVEN_MONARCH, genderhint: NEUTRAL },
+        { name: $c.lit("wood-elf"), pm_val: PM_WOODLAND_ELF, genderhint: NEUTRAL },
+        { name: $c.lit("wood elf"), pm_val: PM_WOODLAND_ELF, genderhint: NEUTRAL },
+        { name: $c.lit("woodland nymph"), pm_val: PM_WOOD_NYMPH, genderhint: NEUTRAL },
+        { name: $c.lit("halfling"), pm_val: PM_HOBBIT, genderhint: NEUTRAL },
+        { name: $c.lit("genie"), pm_val: PM_DJINNI, genderhint: NEUTRAL },
+        { name: $c.lit("human wererat"), pm_val: PM_HUMAN_WERERAT, genderhint: NEUTRAL },
+        { name: $c.lit("human werejackal"), pm_val: PM_HUMAN_WEREJACKAL, genderhint: NEUTRAL },
+        { name: $c.lit("human werewolf"), pm_val: PM_HUMAN_WEREWOLF, genderhint: NEUTRAL },
+        { name: $c.lit("rat wererat"), pm_val: PM_WERERAT, genderhint: NEUTRAL },
+        { name: $c.lit("jackal werejackal"), pm_val: PM_WEREJACKAL, genderhint: NEUTRAL },
+        { name: $c.lit("wolf werewolf"), pm_val: PM_WEREWOLF, genderhint: NEUTRAL },
+        { name: $c.lit("ki rin"), pm_val: PM_KI_RIN, genderhint: NEUTRAL },
+        { name: $c.lit("kirin"), pm_val: PM_KI_RIN, genderhint: NEUTRAL },
+        { name: $c.lit("uruk hai"), pm_val: PM_URUK_HAI, genderhint: NEUTRAL },
+        { name: $c.lit("orc captain"), pm_val: PM_ORC_CAPTAIN, genderhint: NEUTRAL },
+        { name: $c.lit("woodland elf"), pm_val: PM_WOODLAND_ELF, genderhint: NEUTRAL },
+        { name: $c.lit("green elf"), pm_val: PM_GREEN_ELF, genderhint: NEUTRAL },
+        { name: $c.lit("grey elf"), pm_val: PM_GREY_ELF, genderhint: NEUTRAL },
+        { name: $c.lit("gray elf"), pm_val: PM_GREY_ELF, genderhint: NEUTRAL },
+        { name: $c.lit("elf lady"), pm_val: PM_ELF_NOBLE, genderhint: FEMALE },
+        { name: $c.lit("elf lord"), pm_val: PM_ELF_NOBLE, genderhint: MALE },
+        { name: $c.lit("elf noble"), pm_val: PM_ELF_NOBLE, genderhint: NEUTRAL },
+        { name: $c.lit("olog hai"), pm_val: PM_OLOG_HAI, genderhint: NEUTRAL },
+        { name: $c.lit("arch lich"), pm_val: PM_ARCH_LICH, genderhint: NEUTRAL },
+        { name: $c.lit("archlich"), pm_val: PM_ARCH_LICH, genderhint: NEUTRAL },
+        { name: $c.lit("incubi"), pm_val: PM_AMOROUS_DEMON, genderhint: MALE },
+        { name: $c.lit("succubi"), pm_val: PM_AMOROUS_DEMON, genderhint: FEMALE },
+        { name: $c.lit("violet fungi"), pm_val: PM_VIOLET_FUNGUS, genderhint: NEUTRAL },
+        { name: $c.lit("homunculi"), pm_val: PM_HOMUNCULUS, genderhint: NEUTRAL },
+        { name: $c.lit("baluchitheria"), pm_val: PM_BALUCHITHERIUM, genderhint: NEUTRAL },
+        { name: $c.lit("lurkers above"), pm_val: PM_LURKER_ABOVE, genderhint: NEUTRAL },
+        { name: $c.lit("cavemen"), pm_val: PM_CAVE_DWELLER, genderhint: MALE },
+        { name: $c.lit("cavewomen"), pm_val: PM_CAVE_DWELLER, genderhint: FEMALE },
+        { name: $c.lit("watchmen"), pm_val: PM_WATCHMAN, genderhint: NEUTRAL },
+        { name: $c.lit("djinn"), pm_val: PM_DJINNI, genderhint: NEUTRAL },
+        { name: $c.lit("mumakil"), pm_val: PM_MUMAK, genderhint: NEUTRAL },
+        { name: $c.lit("erinyes"), pm_val: PM_ERINYS, genderhint: NEUTRAL },
+        { name: null, pm_val: NON_PM, genderhint: NEUTRAL }
+    ]);
     name_to_monclass$falsematch.fill(null);
-    name_to_monclass$falsematch[0] = $c.lit("an");
-    name_to_monclass$falsematch[1] = $c.lit("the");
-    name_to_monclass$falsematch[2] = $c.lit("or");
-    name_to_monclass$falsematch[3] = $c.lit("other");
-    name_to_monclass$falsematch[4] = $c.lit("or other");
-    name_to_monclass$falsematch[5] = null;
+    $c.init(name_to_monclass$falsematch, [
+        $c.lit("an"),
+        $c.lit("the"),
+        $c.lit("or"),
+        $c.lit("other"),
+        $c.lit("or other"),
+        null
+    ]);
     for (let $i0 = 0; $i0 < 6; $i0++) {
         name_to_monclass$truematch[$i0].$copyFrom(new $T.alt_spl());
     }
-    name_to_monclass$truematch[0].name = $c.lit("long worm");
-    name_to_monclass$truematch[0].pm_val = PM_LONG_WORM;
-    name_to_monclass$truematch[0].genderhint = NEUTRAL;
-    name_to_monclass$truematch[1].name = $c.lit("demon");
-    name_to_monclass$truematch[1].pm_val = -S_DEMON;
-    name_to_monclass$truematch[1].genderhint = NEUTRAL;
-    name_to_monclass$truematch[2].name = $c.lit("devil");
-    name_to_monclass$truematch[2].pm_val = -S_DEMON;
-    name_to_monclass$truematch[2].genderhint = NEUTRAL;
-    name_to_monclass$truematch[3].name = $c.lit("bug");
-    name_to_monclass$truematch[3].pm_val = -S_XAN;
-    name_to_monclass$truematch[3].genderhint = NEUTRAL;
-    name_to_monclass$truematch[4].name = $c.lit("fish");
-    name_to_monclass$truematch[4].pm_val = -S_EEL;
-    name_to_monclass$truematch[4].genderhint = NEUTRAL;
-    name_to_monclass$truematch[5].name = null;
-    name_to_monclass$truematch[5].pm_val = NON_PM;
-    name_to_monclass$truematch[5].genderhint = NEUTRAL;
+    $c.init(name_to_monclass$truematch, [
+        { name: $c.lit("long worm"), pm_val: PM_LONG_WORM, genderhint: NEUTRAL },
+        { name: $c.lit("demon"), pm_val: -S_DEMON, genderhint: NEUTRAL },
+        { name: $c.lit("devil"), pm_val: -S_DEMON, genderhint: NEUTRAL },
+        { name: $c.lit("bug"), pm_val: -S_XAN, genderhint: NEUTRAL },
+        { name: $c.lit("fish"), pm_val: -S_EEL, genderhint: NEUTRAL },
+        { name: null, pm_val: NON_PM, genderhint: NEUTRAL }
+    ]);
     get_atkdam_type$rnd_breath_typ.fill(0);
-    get_atkdam_type$rnd_breath_typ[0] = AD_MAGM;
-    get_atkdam_type$rnd_breath_typ[1] = AD_FIRE;
-    get_atkdam_type$rnd_breath_typ[2] = AD_COLD;
-    get_atkdam_type$rnd_breath_typ[3] = AD_SLEE;
-    get_atkdam_type$rnd_breath_typ[4] = AD_DISN;
-    get_atkdam_type$rnd_breath_typ[5] = AD_ELEC;
-    get_atkdam_type$rnd_breath_typ[6] = AD_DRST;
-    get_atkdam_type$rnd_breath_typ[7] = AD_ACID;
+    $c.init(get_atkdam_type$rnd_breath_typ, [
+        AD_MAGM,
+        AD_FIRE,
+        AD_COLD,
+        AD_SLEE,
+        AD_DISN,
+        AD_ELEC,
+        AD_DRST,
+        AD_ACID
+    ]);
 }

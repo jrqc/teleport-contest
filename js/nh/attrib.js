@@ -38,7 +38,7 @@ import { encumber_msg } from './pickup.js';
 import { You, You_feel, Your, impossible, livelog_printf, pline, pline_The } from './pline.js';
 import { body_part } from './polyself.js';
 import { make_confused } from './potion.js';
-import { BLINDED, BLND_RES, CLAIRVOYANT, COLD_RES, CONFUSION, DEAF, DRAIN_RES, FAST, FIRE_RES, FROMEXPER, FROMFORM, FROMOUTSIDE, FROMRACE, INFRAVISION, INTRINSIC, INVIS, JUMPING, POISON_RES, SEARCHING, SEE_INVIS, SHOCK_RES, SLEEP_RES, STEALTH, STRANGLED, TELEPORT_CONTROL, TIMEOUT, WARNING, W_ARMC, W_ARMH } from './prop.h.js';
+import { BLINDED, BLND_RES, CLAIRVOYANT, COLD_RES, CONFUSION, DEAF, DRAIN_RES, FAST, FIRE_RES, FROMEXPER, FROMFORM, FROMOUTSIDE, FROMRACE, INFRAVISION, INTRINSIC, INVIS, JUMPING, POISON_RES, SEARCHING, SEE_INVIS, SHOCK_RES, SLEEP_RES, STEALTH, STRANGLED, TELEPORT_CONTROL, TIMEOUT, WARNING, W_ARMC, W_ARMF, W_ARMH } from './prop.h.js';
 import { d, rn2, rnd } from './rnd.js';
 import { aligns } from './role.js';
 import { add_weapon_skill, lose_weapon_skill } from './weapon.js';
@@ -470,7 +470,7 @@ export async function exerchk() {   // attrib.c:598
                         iflags.last_msg = save_plnmsg$3;
                     }
                 } while (0);
-                if (rn2(50) > (i !== A_WIS ? $c.div32(Math.imul($c.abs(ax), 2), 3) : $c.abs(ax))) {
+                if (rn2(AVAL) > (i !== A_WIS ? $c.div32(Math.imul($c.abs(ax), 2), 3) : $c.abs(ax))) {
                     break nextattrib$;
                 }
                 do {
@@ -708,7 +708,7 @@ export async function from_what(propidx) {   // attrib.c:905
             } else if (innateness === FROM_FORM) {
                 $c.__builtin___strcpy_chk(new $c.Ptr(from_what$buf, 0), $c.lit(" from your creature form"), 256);
             } else if (propidx === FAST && Very_fast()) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(from_what$buf, 0), 0, 256, new $c.Ptr(from_what$because_of, 0), $c.and64(u.uprops[FAST].intrinsic, 16777215) !== 0 ? $c.lit("a potion or spell") : $c.and64(u.uprops[FAST].extrinsic, 32) !== 0 && $G.uarmf.dknown | 0 && objects[$G.uarmf.otyp].oc_name_known | 0 ? await ysimple_name($G.uarmf) : u.uprops[FAST].extrinsic ? $c.lit("worn equipment") : c_common_strings.c_something);
+                $c.__builtin___sprintf_chk(new $c.Ptr(from_what$buf, 0), 0, 256, new $c.Ptr(from_what$because_of, 0), $c.and64(u.uprops[FAST].intrinsic, TIMEOUT) !== 0 ? $c.lit("a potion or spell") : $c.and64(u.uprops[FAST].extrinsic, W_ARMF) !== 0 && $G.uarmf.dknown | 0 && objects[$G.uarmf.otyp].oc_name_known | 0 ? await ysimple_name($G.uarmf) : u.uprops[FAST].extrinsic ? $c.lit("worn equipment") : c_common_strings.c_something);
             } else if (wizard() && (obj = what_gives(new $c.FieldRef(u.uprops[propidx], "extrinsic", "i64"))) !== null) {
                 $c.__builtin___sprintf_chk(new $c.Ptr(from_what$buf, 0), 0, 256, new $c.Ptr(from_what$because_of, 0), obj.oartifact ? await bare_artifactname(obj) : await ysimple_name(obj));
             } else if (propidx === BLINDED && Blindfolded_only()) {
@@ -1025,358 +1025,206 @@ export async function uchangealign(newalign, reason) {   // attrib.c:1320
 
 export function $init() {
     plusattr.fill(null);
-    plusattr[0] = $c.lit("strong");
-    plusattr[1] = $c.lit("smart");
-    plusattr[2] = $c.lit("wise");
-    plusattr[3] = $c.lit("agile");
-    plusattr[4] = $c.lit("tough");
-    plusattr[5] = $c.lit("charismatic");
+    $c.init(plusattr, [
+        $c.lit("strong"),
+        $c.lit("smart"),
+        $c.lit("wise"),
+        $c.lit("agile"),
+        $c.lit("tough"),
+        $c.lit("charismatic")
+    ]);
     minusattr.fill(null);
-    minusattr[0] = $c.lit("weak");
-    minusattr[1] = $c.lit("stupid");
-    minusattr[2] = $c.lit("foolish");
-    minusattr[3] = $c.lit("clumsy");
-    minusattr[4] = $c.lit("fragile");
-    minusattr[5] = $c.lit("repulsive");
+    $c.init(minusattr, [
+        $c.lit("weak"),
+        $c.lit("stupid"),
+        $c.lit("foolish"),
+        $c.lit("clumsy"),
+        $c.lit("fragile"),
+        $c.lit("repulsive")
+    ]);
     attrname.fill(null);
-    attrname[0] = $c.lit("strength");
-    attrname[1] = $c.lit("intelligence");
-    attrname[2] = $c.lit("wisdom");
-    attrname[3] = $c.lit("dexterity");
-    attrname[4] = $c.lit("constitution");
-    attrname[5] = $c.lit("charisma");
+    $c.init(attrname, [
+        $c.lit("strength"),
+        $c.lit("intelligence"),
+        $c.lit("wisdom"),
+        $c.lit("dexterity"),
+        $c.lit("constitution"),
+        $c.lit("charisma")
+    ]);
     for (let $i0 = 0; $i0 < 4; $i0++) {
         arc_abil[$i0].$copyFrom(new $T.innate());
     }
-    arc_abil[0].ulevel = 1;
-    arc_abil[0].ability = new $c.FieldRef(u.uprops[SEARCHING], "intrinsic", "i64");
-    arc_abil[0].gainstr = $c.lit("");
-    arc_abil[0].losestr = $c.lit("");
-    arc_abil[1].ulevel = 5;
-    arc_abil[1].ability = new $c.FieldRef(u.uprops[STEALTH], "intrinsic", "i64");
-    arc_abil[1].gainstr = $c.lit("stealthy");
-    arc_abil[1].losestr = $c.lit("");
-    arc_abil[2].ulevel = 10;
-    arc_abil[2].ability = new $c.FieldRef(u.uprops[FAST], "intrinsic", "i64");
-    arc_abil[2].gainstr = $c.lit("quick");
-    arc_abil[2].losestr = $c.lit("slow");
-    arc_abil[3].ulevel = 0;
-    arc_abil[3].ability = null;
-    arc_abil[3].gainstr = null;
-    arc_abil[3].losestr = null;
+    $c.init(arc_abil, [
+        { ulevel: 1, ability: new $c.FieldRef(u.uprops[SEARCHING], "intrinsic", "i64"), gainstr: $c.lit(""), losestr: $c.lit("") },
+        { ulevel: 5, ability: new $c.FieldRef(u.uprops[STEALTH], "intrinsic", "i64"), gainstr: $c.lit("stealthy"), losestr: $c.lit("") },
+        { ulevel: 10, ability: new $c.FieldRef(u.uprops[FAST], "intrinsic", "i64"), gainstr: $c.lit("quick"), losestr: $c.lit("slow") },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 4; $i0++) {
         bar_abil[$i0].$copyFrom(new $T.innate());
     }
-    bar_abil[0].ulevel = 1;
-    bar_abil[0].ability = new $c.FieldRef(u.uprops[POISON_RES], "intrinsic", "i64");
-    bar_abil[0].gainstr = $c.lit("");
-    bar_abil[0].losestr = $c.lit("");
-    bar_abil[1].ulevel = 7;
-    bar_abil[1].ability = new $c.FieldRef(u.uprops[FAST], "intrinsic", "i64");
-    bar_abil[1].gainstr = $c.lit("quick");
-    bar_abil[1].losestr = $c.lit("slow");
-    bar_abil[2].ulevel = 15;
-    bar_abil[2].ability = new $c.FieldRef(u.uprops[STEALTH], "intrinsic", "i64");
-    bar_abil[2].gainstr = $c.lit("stealthy");
-    bar_abil[2].losestr = $c.lit("");
-    bar_abil[3].ulevel = 0;
-    bar_abil[3].ability = null;
-    bar_abil[3].gainstr = null;
-    bar_abil[3].losestr = null;
+    $c.init(bar_abil, [
+        { ulevel: 1, ability: new $c.FieldRef(u.uprops[POISON_RES], "intrinsic", "i64"), gainstr: $c.lit(""), losestr: $c.lit("") },
+        { ulevel: 7, ability: new $c.FieldRef(u.uprops[FAST], "intrinsic", "i64"), gainstr: $c.lit("quick"), losestr: $c.lit("slow") },
+        { ulevel: 15, ability: new $c.FieldRef(u.uprops[STEALTH], "intrinsic", "i64"), gainstr: $c.lit("stealthy"), losestr: $c.lit("") },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 3; $i0++) {
         cav_abil[$i0].$copyFrom(new $T.innate());
     }
-    cav_abil[0].ulevel = 7;
-    cav_abil[0].ability = new $c.FieldRef(u.uprops[FAST], "intrinsic", "i64");
-    cav_abil[0].gainstr = $c.lit("quick");
-    cav_abil[0].losestr = $c.lit("slow");
-    cav_abil[1].ulevel = 15;
-    cav_abil[1].ability = new $c.FieldRef(u.uprops[WARNING], "intrinsic", "i64");
-    cav_abil[1].gainstr = $c.lit("sensitive");
-    cav_abil[1].losestr = $c.lit("");
-    cav_abil[2].ulevel = 0;
-    cav_abil[2].ability = null;
-    cav_abil[2].gainstr = null;
-    cav_abil[2].losestr = null;
+    $c.init(cav_abil, [
+        { ulevel: 7, ability: new $c.FieldRef(u.uprops[FAST], "intrinsic", "i64"), gainstr: $c.lit("quick"), losestr: $c.lit("slow") },
+        { ulevel: 15, ability: new $c.FieldRef(u.uprops[WARNING], "intrinsic", "i64"), gainstr: $c.lit("sensitive"), losestr: $c.lit("") },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 3; $i0++) {
         hea_abil[$i0].$copyFrom(new $T.innate());
     }
-    hea_abil[0].ulevel = 1;
-    hea_abil[0].ability = new $c.FieldRef(u.uprops[POISON_RES], "intrinsic", "i64");
-    hea_abil[0].gainstr = $c.lit("");
-    hea_abil[0].losestr = $c.lit("");
-    hea_abil[1].ulevel = 15;
-    hea_abil[1].ability = new $c.FieldRef(u.uprops[WARNING], "intrinsic", "i64");
-    hea_abil[1].gainstr = $c.lit("sensitive");
-    hea_abil[1].losestr = $c.lit("");
-    hea_abil[2].ulevel = 0;
-    hea_abil[2].ability = null;
-    hea_abil[2].gainstr = null;
-    hea_abil[2].losestr = null;
+    $c.init(hea_abil, [
+        { ulevel: 1, ability: new $c.FieldRef(u.uprops[POISON_RES], "intrinsic", "i64"), gainstr: $c.lit(""), losestr: $c.lit("") },
+        { ulevel: 15, ability: new $c.FieldRef(u.uprops[WARNING], "intrinsic", "i64"), gainstr: $c.lit("sensitive"), losestr: $c.lit("") },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 2; $i0++) {
         kni_abil[$i0].$copyFrom(new $T.innate());
     }
-    kni_abil[0].ulevel = 7;
-    kni_abil[0].ability = new $c.FieldRef(u.uprops[FAST], "intrinsic", "i64");
-    kni_abil[0].gainstr = $c.lit("quick");
-    kni_abil[0].losestr = $c.lit("slow");
-    kni_abil[1].ulevel = 0;
-    kni_abil[1].ability = null;
-    kni_abil[1].gainstr = null;
-    kni_abil[1].losestr = null;
+    $c.init(kni_abil, [
+        { ulevel: 7, ability: new $c.FieldRef(u.uprops[FAST], "intrinsic", "i64"), gainstr: $c.lit("quick"), losestr: $c.lit("slow") },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 12; $i0++) {
         mon_abil[$i0].$copyFrom(new $T.innate());
     }
-    mon_abil[0].ulevel = 1;
-    mon_abil[0].ability = new $c.FieldRef(u.uprops[FAST], "intrinsic", "i64");
-    mon_abil[0].gainstr = $c.lit("");
-    mon_abil[0].losestr = $c.lit("");
-    mon_abil[1].ulevel = 1;
-    mon_abil[1].ability = new $c.FieldRef(u.uprops[SLEEP_RES], "intrinsic", "i64");
-    mon_abil[1].gainstr = $c.lit("");
-    mon_abil[1].losestr = $c.lit("");
-    mon_abil[2].ulevel = 1;
-    mon_abil[2].ability = new $c.FieldRef(u.uprops[SEE_INVIS], "intrinsic", "i64");
-    mon_abil[2].gainstr = $c.lit("");
-    mon_abil[2].losestr = $c.lit("");
-    mon_abil[3].ulevel = 3;
-    mon_abil[3].ability = new $c.FieldRef(u.uprops[POISON_RES], "intrinsic", "i64");
-    mon_abil[3].gainstr = $c.lit("healthy");
-    mon_abil[3].losestr = $c.lit("");
-    mon_abil[4].ulevel = 5;
-    mon_abil[4].ability = new $c.FieldRef(u.uprops[STEALTH], "intrinsic", "i64");
-    mon_abil[4].gainstr = $c.lit("stealthy");
-    mon_abil[4].losestr = $c.lit("");
-    mon_abil[5].ulevel = 7;
-    mon_abil[5].ability = new $c.FieldRef(u.uprops[WARNING], "intrinsic", "i64");
-    mon_abil[5].gainstr = $c.lit("sensitive");
-    mon_abil[5].losestr = $c.lit("");
-    mon_abil[6].ulevel = 9;
-    mon_abil[6].ability = new $c.FieldRef(u.uprops[SEARCHING], "intrinsic", "i64");
-    mon_abil[6].gainstr = $c.lit("perceptive");
-    mon_abil[6].losestr = $c.lit("unaware");
-    mon_abil[7].ulevel = 11;
-    mon_abil[7].ability = new $c.FieldRef(u.uprops[FIRE_RES], "intrinsic", "i64");
-    mon_abil[7].gainstr = $c.lit("cool");
-    mon_abil[7].losestr = $c.lit("warmer");
-    mon_abil[8].ulevel = 13;
-    mon_abil[8].ability = new $c.FieldRef(u.uprops[COLD_RES], "intrinsic", "i64");
-    mon_abil[8].gainstr = $c.lit("warm");
-    mon_abil[8].losestr = $c.lit("cooler");
-    mon_abil[9].ulevel = 15;
-    mon_abil[9].ability = new $c.FieldRef(u.uprops[SHOCK_RES], "intrinsic", "i64");
-    mon_abil[9].gainstr = $c.lit("insulated");
-    mon_abil[9].losestr = $c.lit("conductive");
-    mon_abil[10].ulevel = 17;
-    mon_abil[10].ability = new $c.FieldRef(u.uprops[TELEPORT_CONTROL], "intrinsic", "i64");
-    mon_abil[10].gainstr = $c.lit("controlled");
-    mon_abil[10].losestr = $c.lit("uncontrolled");
-    mon_abil[11].ulevel = 0;
-    mon_abil[11].ability = null;
-    mon_abil[11].gainstr = null;
-    mon_abil[11].losestr = null;
+    $c.init(mon_abil, [
+        { ulevel: 1, ability: new $c.FieldRef(u.uprops[FAST], "intrinsic", "i64"), gainstr: $c.lit(""), losestr: $c.lit("") },
+        { ulevel: 1, ability: new $c.FieldRef(u.uprops[SLEEP_RES], "intrinsic", "i64"), gainstr: $c.lit(""), losestr: $c.lit("") },
+        { ulevel: 1, ability: new $c.FieldRef(u.uprops[SEE_INVIS], "intrinsic", "i64"), gainstr: $c.lit(""), losestr: $c.lit("") },
+        { ulevel: 3, ability: new $c.FieldRef(u.uprops[POISON_RES], "intrinsic", "i64"), gainstr: $c.lit("healthy"), losestr: $c.lit("") },
+        { ulevel: 5, ability: new $c.FieldRef(u.uprops[STEALTH], "intrinsic", "i64"), gainstr: $c.lit("stealthy"), losestr: $c.lit("") },
+        { ulevel: 7, ability: new $c.FieldRef(u.uprops[WARNING], "intrinsic", "i64"), gainstr: $c.lit("sensitive"), losestr: $c.lit("") },
+        { ulevel: 9, ability: new $c.FieldRef(u.uprops[SEARCHING], "intrinsic", "i64"), gainstr: $c.lit("perceptive"), losestr: $c.lit("unaware") },
+        { ulevel: 11, ability: new $c.FieldRef(u.uprops[FIRE_RES], "intrinsic", "i64"), gainstr: $c.lit("cool"), losestr: $c.lit("warmer") },
+        { ulevel: 13, ability: new $c.FieldRef(u.uprops[COLD_RES], "intrinsic", "i64"), gainstr: $c.lit("warm"), losestr: $c.lit("cooler") },
+        { ulevel: 15, ability: new $c.FieldRef(u.uprops[SHOCK_RES], "intrinsic", "i64"), gainstr: $c.lit("insulated"), losestr: $c.lit("conductive") },
+        { ulevel: 17, ability: new $c.FieldRef(u.uprops[TELEPORT_CONTROL], "intrinsic", "i64"), gainstr: $c.lit("controlled"), losestr: $c.lit("uncontrolled") },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 3; $i0++) {
         pri_abil[$i0].$copyFrom(new $T.innate());
     }
-    pri_abil[0].ulevel = 15;
-    pri_abil[0].ability = new $c.FieldRef(u.uprops[WARNING], "intrinsic", "i64");
-    pri_abil[0].gainstr = $c.lit("sensitive");
-    pri_abil[0].losestr = $c.lit("");
-    pri_abil[1].ulevel = 20;
-    pri_abil[1].ability = new $c.FieldRef(u.uprops[FIRE_RES], "intrinsic", "i64");
-    pri_abil[1].gainstr = $c.lit("cool");
-    pri_abil[1].losestr = $c.lit("warmer");
-    pri_abil[2].ulevel = 0;
-    pri_abil[2].ability = null;
-    pri_abil[2].gainstr = null;
-    pri_abil[2].losestr = null;
+    $c.init(pri_abil, [
+        { ulevel: 15, ability: new $c.FieldRef(u.uprops[WARNING], "intrinsic", "i64"), gainstr: $c.lit("sensitive"), losestr: $c.lit("") },
+        { ulevel: 20, ability: new $c.FieldRef(u.uprops[FIRE_RES], "intrinsic", "i64"), gainstr: $c.lit("cool"), losestr: $c.lit("warmer") },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 4; $i0++) {
         ran_abil[$i0].$copyFrom(new $T.innate());
     }
-    ran_abil[0].ulevel = 1;
-    ran_abil[0].ability = new $c.FieldRef(u.uprops[SEARCHING], "intrinsic", "i64");
-    ran_abil[0].gainstr = $c.lit("");
-    ran_abil[0].losestr = $c.lit("");
-    ran_abil[1].ulevel = 7;
-    ran_abil[1].ability = new $c.FieldRef(u.uprops[STEALTH], "intrinsic", "i64");
-    ran_abil[1].gainstr = $c.lit("stealthy");
-    ran_abil[1].losestr = $c.lit("");
-    ran_abil[2].ulevel = 15;
-    ran_abil[2].ability = new $c.FieldRef(u.uprops[SEE_INVIS], "intrinsic", "i64");
-    ran_abil[2].gainstr = $c.lit("");
-    ran_abil[2].losestr = $c.lit("");
-    ran_abil[3].ulevel = 0;
-    ran_abil[3].ability = null;
-    ran_abil[3].gainstr = null;
-    ran_abil[3].losestr = null;
+    $c.init(ran_abil, [
+        { ulevel: 1, ability: new $c.FieldRef(u.uprops[SEARCHING], "intrinsic", "i64"), gainstr: $c.lit(""), losestr: $c.lit("") },
+        { ulevel: 7, ability: new $c.FieldRef(u.uprops[STEALTH], "intrinsic", "i64"), gainstr: $c.lit("stealthy"), losestr: $c.lit("") },
+        { ulevel: 15, ability: new $c.FieldRef(u.uprops[SEE_INVIS], "intrinsic", "i64"), gainstr: $c.lit(""), losestr: $c.lit("") },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 3; $i0++) {
         rog_abil[$i0].$copyFrom(new $T.innate());
     }
-    rog_abil[0].ulevel = 1;
-    rog_abil[0].ability = new $c.FieldRef(u.uprops[STEALTH], "intrinsic", "i64");
-    rog_abil[0].gainstr = $c.lit("");
-    rog_abil[0].losestr = $c.lit("");
-    rog_abil[1].ulevel = 10;
-    rog_abil[1].ability = new $c.FieldRef(u.uprops[SEARCHING], "intrinsic", "i64");
-    rog_abil[1].gainstr = $c.lit("perceptive");
-    rog_abil[1].losestr = $c.lit("");
-    rog_abil[2].ulevel = 0;
-    rog_abil[2].ability = null;
-    rog_abil[2].gainstr = null;
-    rog_abil[2].losestr = null;
+    $c.init(rog_abil, [
+        { ulevel: 1, ability: new $c.FieldRef(u.uprops[STEALTH], "intrinsic", "i64"), gainstr: $c.lit(""), losestr: $c.lit("") },
+        { ulevel: 10, ability: new $c.FieldRef(u.uprops[SEARCHING], "intrinsic", "i64"), gainstr: $c.lit("perceptive"), losestr: $c.lit("") },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 3; $i0++) {
         sam_abil[$i0].$copyFrom(new $T.innate());
     }
-    sam_abil[0].ulevel = 1;
-    sam_abil[0].ability = new $c.FieldRef(u.uprops[FAST], "intrinsic", "i64");
-    sam_abil[0].gainstr = $c.lit("");
-    sam_abil[0].losestr = $c.lit("");
-    sam_abil[1].ulevel = 15;
-    sam_abil[1].ability = new $c.FieldRef(u.uprops[STEALTH], "intrinsic", "i64");
-    sam_abil[1].gainstr = $c.lit("stealthy");
-    sam_abil[1].losestr = $c.lit("");
-    sam_abil[2].ulevel = 0;
-    sam_abil[2].ability = null;
-    sam_abil[2].gainstr = null;
-    sam_abil[2].losestr = null;
+    $c.init(sam_abil, [
+        { ulevel: 1, ability: new $c.FieldRef(u.uprops[FAST], "intrinsic", "i64"), gainstr: $c.lit(""), losestr: $c.lit("") },
+        { ulevel: 15, ability: new $c.FieldRef(u.uprops[STEALTH], "intrinsic", "i64"), gainstr: $c.lit("stealthy"), losestr: $c.lit("") },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 3; $i0++) {
         tou_abil[$i0].$copyFrom(new $T.innate());
     }
-    tou_abil[0].ulevel = 10;
-    tou_abil[0].ability = new $c.FieldRef(u.uprops[SEARCHING], "intrinsic", "i64");
-    tou_abil[0].gainstr = $c.lit("perceptive");
-    tou_abil[0].losestr = $c.lit("");
-    tou_abil[1].ulevel = 20;
-    tou_abil[1].ability = new $c.FieldRef(u.uprops[POISON_RES], "intrinsic", "i64");
-    tou_abil[1].gainstr = $c.lit("hardy");
-    tou_abil[1].losestr = $c.lit("");
-    tou_abil[2].ulevel = 0;
-    tou_abil[2].ability = null;
-    tou_abil[2].gainstr = null;
-    tou_abil[2].losestr = null;
+    $c.init(tou_abil, [
+        { ulevel: 10, ability: new $c.FieldRef(u.uprops[SEARCHING], "intrinsic", "i64"), gainstr: $c.lit("perceptive"), losestr: $c.lit("") },
+        { ulevel: 20, ability: new $c.FieldRef(u.uprops[POISON_RES], "intrinsic", "i64"), gainstr: $c.lit("hardy"), losestr: $c.lit("") },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 4; $i0++) {
         val_abil[$i0].$copyFrom(new $T.innate());
     }
-    val_abil[0].ulevel = 1;
-    val_abil[0].ability = new $c.FieldRef(u.uprops[COLD_RES], "intrinsic", "i64");
-    val_abil[0].gainstr = $c.lit("");
-    val_abil[0].losestr = $c.lit("");
-    val_abil[1].ulevel = 3;
-    val_abil[1].ability = new $c.FieldRef(u.uprops[STEALTH], "intrinsic", "i64");
-    val_abil[1].gainstr = $c.lit("stealthy");
-    val_abil[1].losestr = $c.lit("");
-    val_abil[2].ulevel = 7;
-    val_abil[2].ability = new $c.FieldRef(u.uprops[FAST], "intrinsic", "i64");
-    val_abil[2].gainstr = $c.lit("quick");
-    val_abil[2].losestr = $c.lit("slow");
-    val_abil[3].ulevel = 0;
-    val_abil[3].ability = null;
-    val_abil[3].gainstr = null;
-    val_abil[3].losestr = null;
+    $c.init(val_abil, [
+        { ulevel: 1, ability: new $c.FieldRef(u.uprops[COLD_RES], "intrinsic", "i64"), gainstr: $c.lit(""), losestr: $c.lit("") },
+        { ulevel: 3, ability: new $c.FieldRef(u.uprops[STEALTH], "intrinsic", "i64"), gainstr: $c.lit("stealthy"), losestr: $c.lit("") },
+        { ulevel: 7, ability: new $c.FieldRef(u.uprops[FAST], "intrinsic", "i64"), gainstr: $c.lit("quick"), losestr: $c.lit("slow") },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 3; $i0++) {
         wiz_abil[$i0].$copyFrom(new $T.innate());
     }
-    wiz_abil[0].ulevel = 15;
-    wiz_abil[0].ability = new $c.FieldRef(u.uprops[WARNING], "intrinsic", "i64");
-    wiz_abil[0].gainstr = $c.lit("sensitive");
-    wiz_abil[0].losestr = $c.lit("");
-    wiz_abil[1].ulevel = 17;
-    wiz_abil[1].ability = new $c.FieldRef(u.uprops[TELEPORT_CONTROL], "intrinsic", "i64");
-    wiz_abil[1].gainstr = $c.lit("controlled");
-    wiz_abil[1].losestr = $c.lit("uncontrolled");
-    wiz_abil[2].ulevel = 0;
-    wiz_abil[2].ability = null;
-    wiz_abil[2].gainstr = null;
-    wiz_abil[2].losestr = null;
+    $c.init(wiz_abil, [
+        { ulevel: 15, ability: new $c.FieldRef(u.uprops[WARNING], "intrinsic", "i64"), gainstr: $c.lit("sensitive"), losestr: $c.lit("") },
+        { ulevel: 17, ability: new $c.FieldRef(u.uprops[TELEPORT_CONTROL], "intrinsic", "i64"), gainstr: $c.lit("controlled"), losestr: $c.lit("uncontrolled") },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 2; $i0++) {
         dwa_abil[$i0].$copyFrom(new $T.innate());
     }
-    dwa_abil[0].ulevel = 1;
-    dwa_abil[0].ability = new $c.FieldRef(u.uprops[INFRAVISION], "intrinsic", "i64");
-    dwa_abil[0].gainstr = $c.lit("");
-    dwa_abil[0].losestr = $c.lit("");
-    dwa_abil[1].ulevel = 0;
-    dwa_abil[1].ability = null;
-    dwa_abil[1].gainstr = null;
-    dwa_abil[1].losestr = null;
+    $c.init(dwa_abil, [
+        { ulevel: 1, ability: new $c.FieldRef(u.uprops[INFRAVISION], "intrinsic", "i64"), gainstr: $c.lit(""), losestr: $c.lit("") },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 3; $i0++) {
         elf_abil[$i0].$copyFrom(new $T.innate());
     }
-    elf_abil[0].ulevel = 1;
-    elf_abil[0].ability = new $c.FieldRef(u.uprops[INFRAVISION], "intrinsic", "i64");
-    elf_abil[0].gainstr = $c.lit("");
-    elf_abil[0].losestr = $c.lit("");
-    elf_abil[1].ulevel = 4;
-    elf_abil[1].ability = new $c.FieldRef(u.uprops[SLEEP_RES], "intrinsic", "i64");
-    elf_abil[1].gainstr = $c.lit("awake");
-    elf_abil[1].losestr = $c.lit("tired");
-    elf_abil[2].ulevel = 0;
-    elf_abil[2].ability = null;
-    elf_abil[2].gainstr = null;
-    elf_abil[2].losestr = null;
+    $c.init(elf_abil, [
+        { ulevel: 1, ability: new $c.FieldRef(u.uprops[INFRAVISION], "intrinsic", "i64"), gainstr: $c.lit(""), losestr: $c.lit("") },
+        { ulevel: 4, ability: new $c.FieldRef(u.uprops[SLEEP_RES], "intrinsic", "i64"), gainstr: $c.lit("awake"), losestr: $c.lit("tired") },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 2; $i0++) {
         gno_abil[$i0].$copyFrom(new $T.innate());
     }
-    gno_abil[0].ulevel = 1;
-    gno_abil[0].ability = new $c.FieldRef(u.uprops[INFRAVISION], "intrinsic", "i64");
-    gno_abil[0].gainstr = $c.lit("");
-    gno_abil[0].losestr = $c.lit("");
-    gno_abil[1].ulevel = 0;
-    gno_abil[1].ability = null;
-    gno_abil[1].gainstr = null;
-    gno_abil[1].losestr = null;
+    $c.init(gno_abil, [
+        { ulevel: 1, ability: new $c.FieldRef(u.uprops[INFRAVISION], "intrinsic", "i64"), gainstr: $c.lit(""), losestr: $c.lit("") },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 3; $i0++) {
         orc_abil[$i0].$copyFrom(new $T.innate());
     }
-    orc_abil[0].ulevel = 1;
-    orc_abil[0].ability = new $c.FieldRef(u.uprops[INFRAVISION], "intrinsic", "i64");
-    orc_abil[0].gainstr = $c.lit("");
-    orc_abil[0].losestr = $c.lit("");
-    orc_abil[1].ulevel = 1;
-    orc_abil[1].ability = new $c.FieldRef(u.uprops[POISON_RES], "intrinsic", "i64");
-    orc_abil[1].gainstr = $c.lit("");
-    orc_abil[1].losestr = $c.lit("");
-    orc_abil[2].ulevel = 0;
-    orc_abil[2].ability = null;
-    orc_abil[2].gainstr = null;
-    orc_abil[2].losestr = null;
+    $c.init(orc_abil, [
+        { ulevel: 1, ability: new $c.FieldRef(u.uprops[INFRAVISION], "intrinsic", "i64"), gainstr: $c.lit(""), losestr: $c.lit("") },
+        { ulevel: 1, ability: new $c.FieldRef(u.uprops[POISON_RES], "intrinsic", "i64"), gainstr: $c.lit(""), losestr: $c.lit("") },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 1; $i0++) {
         hum_abil[$i0].$copyFrom(new $T.innate());
     }
-    hum_abil[0].ulevel = 0;
-    hum_abil[0].ability = null;
-    hum_abil[0].gainstr = null;
-    hum_abil[0].losestr = null;
+    $c.init(hum_abil, [
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 6; $i0++) {
         poiseff[$i0].$copyFrom(new $T.poison_effect_message());
     }
-    poiseff[0].delivery_func = You_feel;
-    poiseff[0].effect_msg = $c.lit("weaker");
-    poiseff[1].delivery_func = Your;
-    poiseff[1].effect_msg = $c.lit("brain is on fire");
-    poiseff[2].delivery_func = Your;
-    poiseff[2].effect_msg = $c.lit("judgement is impaired");
-    poiseff[3].delivery_func = Your;
-    poiseff[3].effect_msg = $c.lit("muscles won't obey you");
-    poiseff[4].delivery_func = You_feel;
-    poiseff[4].effect_msg = $c.lit("very sick");
-    poiseff[5].delivery_func = You;
-    poiseff[5].effect_msg = $c.lit("break out in hives");
+    $c.init(poiseff, [
+        { delivery_func: You_feel, effect_msg: $c.lit("weaker") },
+        { delivery_func: Your, effect_msg: $c.lit("brain is on fire") },
+        { delivery_func: Your, effect_msg: $c.lit("judgement is impaired") },
+        { delivery_func: Your, effect_msg: $c.lit("muscles won't obey you") },
+        { delivery_func: You_feel, effect_msg: $c.lit("very sick") },
+        { delivery_func: You, effect_msg: $c.lit("break out in hives") }
+    ]);
     for (let $i0 = 0; $i0 < 6; $i0++) {
         exertext[$i0].fill(null);
     }
-    exertext[0][0] = $c.lit("exercising diligently");
-    exertext[0][1] = $c.lit("exercising properly");
-    exertext[1][0] = null;
-    exertext[1][1] = null;
-    exertext[2][0] = $c.lit("very observant");
-    exertext[2][1] = $c.lit("paying attention");
-    exertext[3][0] = $c.lit("working on your reflexes");
-    exertext[3][1] = $c.lit("working on reflexes lately");
-    exertext[4][0] = $c.lit("leading a healthy life-style");
-    exertext[4][1] = $c.lit("watching your health");
-    exertext[5][0] = null;
-    exertext[5][1] = null;
+    $c.init(exertext, [
+        [$c.lit("exercising diligently"), $c.lit("exercising properly")],
+        [],
+        [$c.lit("very observant"), $c.lit("paying attention")],
+        [$c.lit("working on your reflexes"), $c.lit("working on reflexes lately")],
+        [$c.lit("leading a healthy life-style"), $c.lit("watching your health")],
+        []
+    ]);
     from_what$buf.fill(0);
     from_what$because_of.fill(0);
     from_what$because_of.set([32, 98, 101, 99, 97, 117, 115, 101, 32, 111, 102, 32, 37, 115]);   // " because of %s"

@@ -319,9 +319,11 @@ export function $init() {
     mailbox = null;
     laststattime = 0;
     mail_text.fill(null);
-    mail_text[0] = $c.lit("Gangway!");
-    mail_text[1] = $c.lit("Look out!");
-    mail_text[2] = $c.lit("Pardon me!");
+    $c.init(mail_text, [
+        $c.lit("Gangway!"),
+        $c.lit("Look out!"),
+        $c.lit("Pardon me!")
+    ]);
     ckmailstatus$deliver.$copyFrom(new $T.mail_info());
     ckmailstatus$deliver.message_typ = MSG_MAIL;
     ckmailstatus$deliver.display_txt = $c.lit("I have some mail for you");

@@ -1301,41 +1301,43 @@ export function sound_speak(text) {   // sounds.c:2185
 
 export function $init() {
     h_sounds.fill(null);
-    h_sounds[0] = $c.lit("beep");
-    h_sounds[1] = $c.lit("boing");
-    h_sounds[2] = $c.lit("sing");
-    h_sounds[3] = $c.lit("belche");
-    h_sounds[4] = $c.lit("creak");
-    h_sounds[5] = $c.lit("cough");
-    h_sounds[6] = $c.lit("rattle");
-    h_sounds[7] = $c.lit("ululate");
-    h_sounds[8] = $c.lit("pop");
-    h_sounds[9] = $c.lit("jingle");
-    h_sounds[10] = $c.lit("sniffle");
-    h_sounds[11] = $c.lit("tinkle");
-    h_sounds[12] = $c.lit("eep");
-    h_sounds[13] = $c.lit("clatter");
-    h_sounds[14] = $c.lit("hum");
-    h_sounds[15] = $c.lit("sizzle");
-    h_sounds[16] = $c.lit("twitter");
-    h_sounds[17] = $c.lit("wheeze");
-    h_sounds[18] = $c.lit("rustle");
-    h_sounds[19] = $c.lit("honk");
-    h_sounds[20] = $c.lit("lisp");
-    h_sounds[21] = $c.lit("yodel");
-    h_sounds[22] = $c.lit("coo");
-    h_sounds[23] = $c.lit("burp");
-    h_sounds[24] = $c.lit("moo");
-    h_sounds[25] = $c.lit("boom");
-    h_sounds[26] = $c.lit("murmur");
-    h_sounds[27] = $c.lit("oink");
-    h_sounds[28] = $c.lit("quack");
-    h_sounds[29] = $c.lit("rumble");
-    h_sounds[30] = $c.lit("twang");
-    h_sounds[31] = $c.lit("toot");
-    h_sounds[32] = $c.lit("gargle");
-    h_sounds[33] = $c.lit("hoot");
-    h_sounds[34] = $c.lit("warble");
+    $c.init(h_sounds, [
+        $c.lit("beep"),
+        $c.lit("boing"),
+        $c.lit("sing"),
+        $c.lit("belche"),
+        $c.lit("creak"),
+        $c.lit("cough"),
+        $c.lit("rattle"),
+        $c.lit("ululate"),
+        $c.lit("pop"),
+        $c.lit("jingle"),
+        $c.lit("sniffle"),
+        $c.lit("tinkle"),
+        $c.lit("eep"),
+        $c.lit("clatter"),
+        $c.lit("hum"),
+        $c.lit("sizzle"),
+        $c.lit("twitter"),
+        $c.lit("wheeze"),
+        $c.lit("rustle"),
+        $c.lit("honk"),
+        $c.lit("lisp"),
+        $c.lit("yodel"),
+        $c.lit("coo"),
+        $c.lit("burp"),
+        $c.lit("moo"),
+        $c.lit("boom"),
+        $c.lit("murmur"),
+        $c.lit("oink"),
+        $c.lit("quack"),
+        $c.lit("rumble"),
+        $c.lit("twang"),
+        $c.lit("toot"),
+        $c.lit("gargle"),
+        $c.lit("hoot"),
+        $c.lit("warble")
+    ]);
     soundprocs.$copyFrom(new $T.sound_procs());
     nosound_procs.$copyFrom(new $T.sound_procs());
     nosound_procs.soundname = $c.lit("nosound");
@@ -1352,88 +1354,124 @@ export function $init() {
     for (let $i0 = 0; $i0 < 1; $i0++) {
         soundlib_choices[$i0].$copyFrom(new $T.sound_choices());
     }
-    soundlib_choices[0].sndprocs = nosound_procs;
+    $c.init(soundlib_choices, [
+        { sndprocs: nosound_procs }
+    ]);
     throne_mon_sound$throne_msg.fill(null);
-    throne_mon_sound$throne_msg[0] = $c.lit("the tones of courtly conversation.");
-    throne_mon_sound$throne_msg[1] = $c.lit("a sceptre pounded in judgment.");
-    throne_mon_sound$throne_msg[2] = $c.lit("Someone shouts \"Off with %s head!\"");
-    throne_mon_sound$throne_msg[3] = $c.lit("Queen Beruthiel's cats!");
+    $c.init(throne_mon_sound$throne_msg, [
+        $c.lit("the tones of courtly conversation."),
+        $c.lit("a sceptre pounded in judgment."),
+        $c.lit("Someone shouts \"Off with %s head!\""),
+        $c.lit("Queen Beruthiel's cats!")
+    ]);
     zoo_mon_sound$zoo_msg.fill(null);
-    zoo_mon_sound$zoo_msg[0] = $c.lit("a sound reminiscent of an elephant stepping on a peanut.");
-    zoo_mon_sound$zoo_msg[1] = $c.lit("a sound reminiscent of a seal barking.");
-    zoo_mon_sound$zoo_msg[2] = $c.lit("Doctor Dolittle!");
+    $c.init(zoo_mon_sound$zoo_msg, [
+        $c.lit("a sound reminiscent of an elephant stepping on a peanut."),
+        $c.lit("a sound reminiscent of a seal barking."),
+        $c.lit("Doctor Dolittle!")
+    ]);
     temple_priest_sound$temple_msg.fill(null);
-    temple_priest_sound$temple_msg[0] = $c.lit("*someone praising %s.");
-    temple_priest_sound$temple_msg[1] = $c.lit("*someone beseeching %s.");
-    temple_priest_sound$temple_msg[2] = $c.lit("#an animal carcass being offered in sacrifice.");
-    temple_priest_sound$temple_msg[3] = $c.lit("*a strident plea for donations.");
+    $c.init(temple_priest_sound$temple_msg, [
+        $c.lit("*someone praising %s."),
+        $c.lit("*someone beseeching %s."),
+        $c.lit("#an animal carcass being offered in sacrifice."),
+        $c.lit("*a strident plea for donations.")
+    ]);
     oracle_sound$ora_msg.fill(null);
-    oracle_sound$ora_msg[0] = $c.lit("a strange wind.");
-    oracle_sound$ora_msg[1] = $c.lit("convulsive ravings.");
-    oracle_sound$ora_msg[2] = $c.lit("snoring snakes.");
-    oracle_sound$ora_msg[3] = $c.lit("someone say \"No more woodchucks!\"");
-    oracle_sound$ora_msg[4] = $c.lit("a loud ZOT!");
+    $c.init(oracle_sound$ora_msg, [
+        $c.lit("a strange wind."),
+        $c.lit("convulsive ravings."),
+        $c.lit("snoring snakes."),
+        $c.lit("someone say \"No more woodchucks!\""),
+        $c.lit("a loud ZOT!")
+    ]);
     dosounds$fountain_msg.fill(null);
-    dosounds$fountain_msg[0] = $c.lit("bubbling water.");
-    dosounds$fountain_msg[1] = $c.lit("water falling on coins.");
-    dosounds$fountain_msg[2] = $c.lit("the splashing of a naiad.");
-    dosounds$fountain_msg[3] = $c.lit("a soda fountain!");
+    $c.init(dosounds$fountain_msg, [
+        $c.lit("bubbling water."),
+        $c.lit("water falling on coins."),
+        $c.lit("the splashing of a naiad."),
+        $c.lit("a soda fountain!")
+    ]);
     dosounds$sink_msg.fill(null);
-    dosounds$sink_msg[0] = $c.lit("a slow drip.");
-    dosounds$sink_msg[1] = $c.lit("a gurgling noise.");
-    dosounds$sink_msg[2] = $c.lit("dishes being washed!");
+    $c.init(dosounds$sink_msg, [
+        $c.lit("a slow drip."),
+        $c.lit("a gurgling noise."),
+        $c.lit("dishes being washed!")
+    ]);
     dosounds$swamp_msg.fill(null);
-    dosounds$swamp_msg[0] = $c.lit("hear mosquitoes!");
-    dosounds$swamp_msg[1] = $c.lit("smell marsh gas!");
-    dosounds$swamp_msg[2] = $c.lit("hear Donald Duck!");
+    $c.init(dosounds$swamp_msg, [
+        $c.lit("hear mosquitoes!"),
+        $c.lit("smell marsh gas!"),
+        $c.lit("hear Donald Duck!")
+    ]);
     dosounds$barracks_msg.fill(null);
-    dosounds$barracks_msg[0] = $c.lit("blades being honed.");
-    dosounds$barracks_msg[1] = $c.lit("loud snoring.");
-    dosounds$barracks_msg[2] = $c.lit("dice being thrown.");
-    dosounds$barracks_msg[3] = $c.lit("General MacArthur!");
+    $c.init(dosounds$barracks_msg, [
+        $c.lit("blades being honed."),
+        $c.lit("loud snoring."),
+        $c.lit("dice being thrown."),
+        $c.lit("General MacArthur!")
+    ]);
     dosounds$shop_msg.fill(null);
-    dosounds$shop_msg[0] = $c.lit("someone cursing shoplifters.");
-    dosounds$shop_msg[1] = $c.lit("the chime of a cash register.");
-    dosounds$shop_msg[2] = $c.lit("Neiman and Marcus arguing!");
+    $c.init(dosounds$shop_msg, [
+        $c.lit("someone cursing shoplifters."),
+        $c.lit("the chime of a cash register."),
+        $c.lit("Neiman and Marcus arguing!")
+    ]);
     maybe_gasp$Exclam.fill(null);
-    maybe_gasp$Exclam[0] = $c.lit("Gasp!");
-    maybe_gasp$Exclam[1] = $c.lit("Uh-oh.");
-    maybe_gasp$Exclam[2] = $c.lit("Oh my!");
-    maybe_gasp$Exclam[3] = $c.lit("What?");
-    maybe_gasp$Exclam[4] = $c.lit("Why?");
+    $c.init(maybe_gasp$Exclam, [
+        $c.lit("Gasp!"),
+        $c.lit("Uh-oh."),
+        $c.lit("Oh my!"),
+        $c.lit("What?"),
+        $c.lit("Why?")
+    ]);
     domonnoise$vampmsg.fill(null);
-    domonnoise$vampmsg[0] = $c.lit("I vant to suck your %s!");
-    domonnoise$vampmsg[1] = $c.lit("I vill come after %s without regret!");
+    $c.init(domonnoise$vampmsg, [
+        $c.lit("I vant to suck your %s!"),
+        $c.lit("I vill come after %s without regret!")
+    ]);
     domonnoise$laugh_msg.fill(null);
-    domonnoise$laugh_msg[0] = $c.lit("giggles.");
-    domonnoise$laugh_msg[1] = $c.lit("chuckles.");
-    domonnoise$laugh_msg[2] = $c.lit("snickers.");
-    domonnoise$laugh_msg[3] = $c.lit("laughs.");
+    $c.init(domonnoise$laugh_msg, [
+        $c.lit("giggles."),
+        $c.lit("chuckles."),
+        $c.lit("snickers."),
+        $c.lit("laughs.")
+    ]);
     domonnoise$arrest_msg.fill(null);
-    domonnoise$arrest_msg[0] = $c.lit("Anything you say can be used against you.");
-    domonnoise$arrest_msg[1] = $c.lit("You're under arrest!");
-    domonnoise$arrest_msg[2] = $c.lit("Stop in the name of the Law!");
+    $c.init(domonnoise$arrest_msg, [
+        $c.lit("Anything you say can be used against you."),
+        $c.lit("You're under arrest!"),
+        $c.lit("Stop in the name of the Law!")
+    ]);
     domonnoise$soldier_foe_msg.fill(null);
-    domonnoise$soldier_foe_msg[0] = $c.lit("Resistance is useless!");
-    domonnoise$soldier_foe_msg[1] = $c.lit("You're dog meat!");
-    domonnoise$soldier_foe_msg[2] = $c.lit("Surrender!");
+    $c.init(domonnoise$soldier_foe_msg, [
+        $c.lit("Resistance is useless!"),
+        $c.lit("You're dog meat!"),
+        $c.lit("Surrender!")
+    ]);
     domonnoise$soldier_pax_msg.fill(null);
-    domonnoise$soldier_pax_msg[0] = $c.lit("What lousy pay we're getting here!");
-    domonnoise$soldier_pax_msg[1] = $c.lit("The food's not fit for Orcs!");
-    domonnoise$soldier_pax_msg[2] = $c.lit("My feet hurt, I've been on them all day!");
+    $c.init(domonnoise$soldier_pax_msg, [
+        $c.lit("What lousy pay we're getting here!"),
+        $c.lit("The food's not fit for Orcs!"),
+        $c.lit("My feet hurt, I've been on them all day!")
+    ]);
     dochat$walltalk.fill(null);
-    dochat$walltalk[0] = $c.lit("gripes about its job.");
-    dochat$walltalk[1] = $c.lit("tells you a funny joke!");
-    dochat$walltalk[2] = $c.lit("insults your heritage!");
-    dochat$walltalk[3] = $c.lit("chuckles.");
-    dochat$walltalk[4] = $c.lit("guffaws merrily!");
-    dochat$walltalk[5] = $c.lit("deprecates your exploration efforts.");
-    dochat$walltalk[6] = $c.lit("suggests a stint of rehab...");
-    dochat$walltalk[7] = $c.lit("doesn't seem to be interested.");
+    $c.init(dochat$walltalk, [
+        $c.lit("gripes about its job."),
+        $c.lit("tells you a funny joke!"),
+        $c.lit("insults your heritage!"),
+        $c.lit("chuckles."),
+        $c.lit("guffaws merrily!"),
+        $c.lit("deprecates your exploration efforts."),
+        $c.lit("suggests a stint of rehab..."),
+        $c.lit("doesn't seem to be interested.")
+    ]);
     tiphat$reaction.fill(null);
-    tiphat$reaction[0] = $c.lit("curses");
-    tiphat$reaction[1] = $c.lit("gestures rudely");
-    tiphat$reaction[2] = $c.lit("gestures offensively");
+    $c.init(tiphat$reaction, [
+        $c.lit("curses"),
+        $c.lit("gestures rudely"),
+        $c.lit("gestures offensively")
+    ]);
     base_soundname_to_filename$suffix.fill(0);
     base_soundname_to_filename$suffix.set([46, 119, 97, 118]);   // ".wav"
 }

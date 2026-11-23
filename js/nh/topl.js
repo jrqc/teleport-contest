@@ -256,7 +256,7 @@ export async function update_topl(bp) {   // topl.c:251
         }
     }
     await remember_topl();
-    $c.__builtin___strncpy_chk(new $c.Ptr(gt.toplines, 0), bp, 300, 300);
+    $c.__builtin___strncpy_chk(new $c.Ptr(gt.toplines, 0), bp, TBUFSZ, 300);
     gt.toplines[TBUFSZ - 1] = 0;
     for (tl = new $c.Ptr(gt.toplines, 0); n0 >= gt.tc_gbl_data.tc_CO; ) {
         otl = tl;
@@ -358,7 +358,7 @@ export async function tty_yn_function(query, resp, def) {   // topl.c:373
             if ((rb = $c.strchr(new $c.Ptr(respbuf, 0), 27)) !== null) {
                 rb.set(0, 0);
             }
-            $c.__builtin___strncpy_chk(new $c.Ptr(prompt, 0), query, 127, 256);
+            $c.__builtin___strncpy_chk(new $c.Ptr(prompt, 0), query, QBUFSZ - 1, 256);
             prompt[QBUFSZ - 1] = 0;
             $c.__builtin___sprintf_chk(eos(new $c.Ptr(prompt, 0)), 0, -1, $c.lit(" [%s]"), new $c.Ptr(respbuf, 0));
             if (def) {
@@ -567,7 +567,7 @@ export async function tty_putmsghistory(msg, restoring_msghist) {   // topl.c:68
         $c.__builtin___strcpy_chk(new $c.Ptr(gt.toplines, 0), msg, 300);
         await dumplogmsg(new $c.Ptr(gt.toplines, 0));
     } else if (snapshot_mesgs) {
-        !!($c.peq($G.ttyDisplay, $c.asRec(null, $T.DisplayDesc, 60)) || $G.ttyDisplay.toplin !== 1) || (await nhassert_failed($c.lit("ttyDisplay == NULL || ttyDisplay->toplin != TOPLINE_NEED_MORE"), $c.lit("../win/tty/topl.c"), 720), 0);
+        !!($c.peq($G.ttyDisplay, $c.asRec(null, $T.DisplayDesc, 60)) || $G.ttyDisplay.toplin !== TOPLINE_NEED_MORE) || (await nhassert_failed($c.lit("ttyDisplay == NULL || ttyDisplay->toplin != TOPLINE_NEED_MORE"), $c.lit("../win/tty/topl.c"), 720), 0);
         for (idx = 0; snapshot_mesgs.get(idx); idx = idx + 1 | 0) {
             await remember_topl();
             $c.__builtin___strcpy_chk(new $c.Ptr(gt.toplines, 0), snapshot_mesgs.get(idx), 300);

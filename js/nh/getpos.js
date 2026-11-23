@@ -789,76 +789,68 @@ export function $init() {
     for (let $i0 = 0; $i0 < 6; $i0++) {
         gloc_descr[$i0].fill(null);
     }
-    gloc_descr[0][0] = $c.lit("any monsters");
-    gloc_descr[0][1] = $c.lit("monster");
-    gloc_descr[0][2] = $c.lit("next/previous monster");
-    gloc_descr[0][3] = $c.lit("monsters");
-    gloc_descr[1][0] = $c.lit("any items");
-    gloc_descr[1][1] = $c.lit("item");
-    gloc_descr[1][2] = $c.lit("next/previous object");
-    gloc_descr[1][3] = $c.lit("objects");
-    gloc_descr[2][0] = $c.lit("any doors");
-    gloc_descr[2][1] = $c.lit("door");
-    gloc_descr[2][2] = $c.lit("next/previous door or doorway");
-    gloc_descr[2][3] = $c.lit("doors or doorways");
-    gloc_descr[3][0] = $c.lit("any unexplored areas");
-    gloc_descr[3][1] = $c.lit("unexplored area");
-    gloc_descr[3][2] = $c.lit("unexplored location");
-    gloc_descr[3][3] = $c.lit("locations next to unexplored locations");
-    gloc_descr[4][0] = $c.lit("anything interesting");
-    gloc_descr[4][1] = $c.lit("interesting thing");
-    gloc_descr[4][2] = $c.lit("anything interesting");
-    gloc_descr[4][3] = $c.lit("anything interesting");
-    gloc_descr[5][0] = $c.lit("any valid locations");
-    gloc_descr[5][1] = $c.lit("valid location");
-    gloc_descr[5][2] = $c.lit("valid location");
-    gloc_descr[5][3] = $c.lit("valid locations");
+    $c.init(gloc_descr, [
+        [$c.lit("any monsters"), $c.lit("monster"), $c.lit("next/previous monster"), $c.lit("monsters")],
+        [$c.lit("any items"), $c.lit("item"), $c.lit("next/previous object"), $c.lit("objects")],
+        [$c.lit("any doors"), $c.lit("door"), $c.lit("next/previous door or doorway"),
+          $c.lit("doors or doorways")],
+        [$c.lit("any unexplored areas"), $c.lit("unexplored area"), $c.lit("unexplored location"),
+          $c.lit("locations next to unexplored locations")],
+        [$c.lit("anything interesting"), $c.lit("interesting thing"), $c.lit("anything interesting"),
+          $c.lit("anything interesting")],
+        [$c.lit("any valid locations"), $c.lit("valid location"), $c.lit("valid location"),
+          $c.lit("valid locations")]
+    ]);
     gloc_filtertxt.fill(null);
-    gloc_filtertxt[0] = $c.lit("");
-    gloc_filtertxt[1] = $c.lit(" in view");
-    gloc_filtertxt[2] = $c.lit(" in this area");
+    $c.init(gloc_filtertxt, [
+        $c.lit(""),
+        $c.lit(" in view"),
+        $c.lit(" in this area")
+    ]);
     getpos_help$fastmovemode.fill(null);
-    getpos_help$fastmovemode[0] = $c.lit("8 units at a time");
-    getpos_help$fastmovemode[1] = $c.lit("skipping same glyphs");
+    $c.init(getpos_help$fastmovemode, [
+        $c.lit("8 units at a time"),
+        $c.lit("skipping same glyphs")
+    ]);
     dxdy_to_dist_descr$buf.fill(0);
     for (let $i0 = 0; $i0 < 4; $i0++) {
         dxdy_to_dist_descr$dirnames[$i0].fill(null);
     }
-    dxdy_to_dist_descr$dirnames[0][0] = $c.lit("n");
-    dxdy_to_dist_descr$dirnames[0][1] = $c.lit("north");
-    dxdy_to_dist_descr$dirnames[1][0] = $c.lit("s");
-    dxdy_to_dist_descr$dirnames[1][1] = $c.lit("south");
-    dxdy_to_dist_descr$dirnames[2][0] = $c.lit("w");
-    dxdy_to_dist_descr$dirnames[2][1] = $c.lit("west");
-    dxdy_to_dist_descr$dirnames[3][0] = $c.lit("e");
-    dxdy_to_dist_descr$dirnames[3][1] = $c.lit("east");
+    $c.init(dxdy_to_dist_descr$dirnames, [
+        [$c.lit("n"), $c.lit("north")],
+        [$c.lit("s"), $c.lit("south")],
+        [$c.lit("w"), $c.lit("west")],
+        [$c.lit("e"), $c.lit("east")]
+    ]);
     coord_desc$screen_fmt.fill(0);
     for (let $i0 = 0; $i0 < 4; $i0++) {
         getpos$pick_chars_def[$i0].$copyFrom(new $T.anon_getpos_773());
     }
-    getpos$pick_chars_def[0].nhkf = NHKF_GETPOS_PICK;
-    getpos$pick_chars_def[0].ret = LOOK_TRADITIONAL;
-    getpos$pick_chars_def[1].nhkf = NHKF_GETPOS_PICK_Q;
-    getpos$pick_chars_def[1].ret = LOOK_QUICK;
-    getpos$pick_chars_def[2].nhkf = NHKF_GETPOS_PICK_O;
-    getpos$pick_chars_def[2].ret = LOOK_ONCE;
-    getpos$pick_chars_def[3].nhkf = NHKF_GETPOS_PICK_V;
-    getpos$pick_chars_def[3].ret = LOOK_VERBOSE;
+    $c.init(getpos$pick_chars_def, [
+        { nhkf: NHKF_GETPOS_PICK, ret: LOOK_TRADITIONAL },
+        { nhkf: NHKF_GETPOS_PICK_Q, ret: LOOK_QUICK },
+        { nhkf: NHKF_GETPOS_PICK_O, ret: LOOK_ONCE },
+        { nhkf: NHKF_GETPOS_PICK_V, ret: LOOK_VERBOSE }
+    ]);
     getpos$mMoOdDxX_def.fill(0);
-    getpos$mMoOdDxX_def[0] = NHKF_GETPOS_MON_NEXT;
-    getpos$mMoOdDxX_def[1] = NHKF_GETPOS_MON_PREV;
-    getpos$mMoOdDxX_def[2] = NHKF_GETPOS_OBJ_NEXT;
-    getpos$mMoOdDxX_def[3] = NHKF_GETPOS_OBJ_PREV;
-    getpos$mMoOdDxX_def[4] = NHKF_GETPOS_DOOR_NEXT;
-    getpos$mMoOdDxX_def[5] = NHKF_GETPOS_DOOR_PREV;
-    getpos$mMoOdDxX_def[6] = NHKF_GETPOS_UNEX_NEXT;
-    getpos$mMoOdDxX_def[7] = NHKF_GETPOS_UNEX_PREV;
-    getpos$mMoOdDxX_def[8] = NHKF_GETPOS_INTERESTING_NEXT;
-    getpos$mMoOdDxX_def[9] = NHKF_GETPOS_INTERESTING_PREV;
-    getpos$mMoOdDxX_def[10] = NHKF_GETPOS_VALID_NEXT;
-    getpos$mMoOdDxX_def[11] = NHKF_GETPOS_VALID_PREV;
+    $c.init(getpos$mMoOdDxX_def, [
+        NHKF_GETPOS_MON_NEXT,
+        NHKF_GETPOS_MON_PREV,
+        NHKF_GETPOS_OBJ_NEXT,
+        NHKF_GETPOS_OBJ_PREV,
+        NHKF_GETPOS_DOOR_NEXT,
+        NHKF_GETPOS_DOOR_PREV,
+        NHKF_GETPOS_UNEX_NEXT,
+        NHKF_GETPOS_UNEX_PREV,
+        NHKF_GETPOS_INTERESTING_NEXT,
+        NHKF_GETPOS_INTERESTING_PREV,
+        NHKF_GETPOS_VALID_NEXT,
+        NHKF_GETPOS_VALID_PREV
+    ]);
     getpos$view_filters.fill(null);
-    getpos$view_filters[0] = $c.lit("Not limiting targets");
-    getpos$view_filters[1] = $c.lit("Limiting targets to those in sight");
-    getpos$view_filters[2] = $c.lit("Limiting targets to those in same area");
+    $c.init(getpos$view_filters, [
+        $c.lit("Not limiting targets"),
+        $c.lit("Limiting targets to those in sight"),
+        $c.lit("Limiting targets to those in same area")
+    ]);
 }

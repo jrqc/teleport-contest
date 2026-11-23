@@ -8,7 +8,7 @@ import { artifact_exists, artifact_name, exist_artifact, restrict_name, set_arti
 import { ART_EYES_OF_THE_OVERWORLD } from './artilist.h.js';
 import { rank_of } from './botl.js';
 import { cmdq_clear, cmdq_pop, isok } from './cmd.js';
-import { NO_COLOR } from './color.h.js';
+import { CLR_MAX, NO_COLOR } from './color.h.js';
 import { c_obj_colors, cg, flags, gi, gu, gy, program_state, svd, svl, svp, u } from './decl.js';
 import { AMULET_CLASS, ARMOR_CLASS, COIN_CLASS, FOOD_CLASS, GEM_CLASS, POTION_CLASS, RING_CLASS, SCROLL_CLASS, SPBOOK_CLASS, TOOL_CLASS, VENOM_CLASS, WAND_CLASS, WEAPON_CLASS } from './defsym.h.js';
 import { canseemon, flush_screen, glyph_at, nul_glyphinfo, see_with_infrared, sensemon } from './display.js';
@@ -27,7 +27,7 @@ import { has_ebones, has_mgivenname } from './mextra.macros.js';
 import { dealloc_obj, newoextra } from './mkobj.js';
 import { pronoun_gender } from './mondata.js';
 import { humanoid, is_animal, is_mplayer, is_rider, mindless, type_is_pname } from './mondata.macros.js';
-import { FEMALE, G_NOGEN, G_UNIQ, MALE, MS_ANIMAL, NEUTRAL, NUM_MGENDERS } from './monflag.h.js';
+import { FEMALE, G_NOGEN, G_UNIQ, M1_CONCEAL, MALE, MS_ANIMAL, NEUTRAL, NUM_MGENDERS } from './monflag.h.js';
 import { mons } from './monst.js';
 import { M_AP_FURNITURE, M_AP_MONSTER, M_AP_OBJECT } from './monst.h.js';
 import { M_AP_TYPE, engulfing_u, helpless, ismnum } from './monst.macros.js';
@@ -148,7 +148,7 @@ export async function christen_monst(mtmp, name) {   // do_name.c:133
     lth = name && name.get(0) ? $c.i32($c.strlen(name)) + 1 | 0 : 0;
     if (lth > PL_PSIZ) {
         lth = PL_PSIZ;
-        name = $c.__builtin___strncpy_chk(new $c.Ptr(buf, 0), name, 62, 63);
+        name = $c.__builtin___strncpy_chk(new $c.Ptr(buf, 0), name, PL_PSIZ - 1, 63);
         buf[PL_PSIZ - 1] = 0;
     }
     await new_mgivenname(mtmp, lth);
@@ -170,7 +170,7 @@ async function alreadynamed(mtmp, monnambuf, usrbuf) {   // do_name.c:158
         if (is_rider(mtmp.data)) {
             await pline($c.lit("%s is already called that."), upstart(monnambuf));
         } else {
-            await pline($c.lit("%s is already called %s."), upstart($c.__builtin___strcpy_chk(new $c.Ptr(pronounbuf, 0), genders[pronoun_gender(mtmp, 2)].he, 10)), monnambuf);
+            await pline($c.lit("%s is already called %s."), upstart($c.__builtin___strcpy_chk(new $c.Ptr(pronounbuf, 0), genders[pronoun_gender(mtmp, PRONOUN_HALLU)].he, 10)), monnambuf);
         }
         return TRUE;
     } else if ($c.peq(mtmp.data, $c.relem(mons, PM_JUIBLEX)) && strstri(monnambuf, $c.lit("Juiblex")) && !strncmpi(usrbuf, $c.lit("Jubilex"), -1)) {
@@ -214,7 +214,7 @@ async function do_mgivenname() {   // do_name.c:199
         await pline($c.lit("I see no monster there."));
         return;
     }
-    $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("What do you want to call %s?"), await distant_monnam(mtmp, 1, new $c.Ptr(monnambuf, 0)));
+    $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("What do you want to call %s?"), await distant_monnam(mtmp, ARTICLE_THE, new $c.Ptr(monnambuf, 0)));
     if (!await name_from_player(new $c.Ptr(buf, 0), new $c.Ptr(qbuf, 0), has_mgivenname(mtmp) ? mtmp.mextra.mgivenname : null)) {
         return;
     }
@@ -275,7 +275,7 @@ export async function oname(obj, name, oflgs) {   // do_name.c:372
     lth = name.get(0) ? $c.i32($c.addu64($c.strlen(name), 1)) : 0;
     if (lth > PL_PSIZ) {
         lth = PL_PSIZ;
-        name = $c.__builtin___strncpy_chk(new $c.Ptr(buf, 0), name, 62, 63);
+        name = $c.__builtin___strncpy_chk(new $c.Ptr(buf, 0), name, PL_PSIZ - 1, 63);
         buf[PL_PSIZ - 1] = 0;
     }
     if (obj.oartifact || lth && exist_artifact(obj.otyp, name)) {
@@ -496,7 +496,7 @@ async function namefloorobj() {   // do_name.c:679
     obj[0] = null;
     fakeobj = FALSE;
     cc.x = u.ux, cc.y = u.uy;
-    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("object on map (or '.' for one %s you)"), u.uundetected | 0 && $c.andu64(gy.youmonst.data.mflags1, 128) !== 0 ? $c.lit("over") : $c.lit("under"));
+    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("object on map (or '.' for one %s you)"), u.uundetected | 0 && $c.andu64(gy.youmonst.data.mflags1, M1_CONCEAL) !== 0 ? $c.lit("over") : $c.lit("under"));
     if (await getpos(cc, FALSE, new $c.Ptr(buf, 0)) < 0 || cc.x <= 0) {
         return;
     }
@@ -749,10 +749,10 @@ export async function Amonnam(mtmp) {   // do_name.c:1159
 }
 export async function distant_monnam(mon, article, outbuf) {   // do_name.c:1170
     if ($c.peq(mon.data, $c.relem(mons, PM_HIGH_CLERIC)) && !Hallucination() && ((svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level)) && !(dist2(mon.mx, mon.my, u.ux, u.uy) <= 2)) {
-        $c.__builtin___strcpy_chk(outbuf, article === 1 ? $c.lit("the ") : $c.lit(""), -1);
+        $c.__builtin___strcpy_chk(outbuf, article === ARTICLE_THE ? $c.lit("the ") : $c.lit(""), -1);
         $c.__builtin___strcat_chk(outbuf, mon.female | 0 ? $c.lit("high priestess") : $c.lit("high priest"), -1);
     } else {
-        $c.__builtin___strcpy_chk(outbuf, await x_monnam(mon, article, null, 0, 1), -1);
+        $c.__builtin___strcpy_chk(outbuf, await x_monnam(mon, article, null, 0, TRUE), -1);
     }
     return outbuf;
 }
@@ -914,7 +914,7 @@ export function hcolor(colorpref) {   // do_name.c:1461
 }
 export function rndcolor() {   // do_name.c:1470
     let k = 0;
-    k = rn2(16);
+    k = rn2(CLR_MAX);
     return Hallucination() ? hcolor(null) : k === NO_COLOR ? $c.lit("colorless") : c_obj_colors[k];
 }
 export function hliquid(liquidpref) {   // do_name.c:1493
@@ -934,7 +934,7 @@ export function hliquid(liquidpref) {   // do_name.c:1493
 }
 export async function coyotename(mtmp, buf) {   // do_name.c:1526
     if (mtmp && buf) {
-        $c.__builtin___sprintf_chk(buf, 0, -1, $c.lit("%s - %s"), await x_monnam(mtmp, 0, null, 0, 1), mtmp.mcan | 0 ? coynames[21] : coynames[$c.remu32(mtmp.m_id, 21)]);
+        $c.__builtin___sprintf_chk(buf, 0, -1, $c.lit("%s - %s"), await x_monnam(mtmp, ARTICLE_NONE, null, 0, TRUE), mtmp.mcan | 0 ? coynames[21] : coynames[$c.remu32(mtmp.m_id, 21)]);
     }
     return buf;
 }
@@ -1018,243 +1018,257 @@ export async function lookup_novel(lookname, idx) {   // do_name.c:1627
 
 export function $init() {
     ghostnames.fill(null);
-    ghostnames[0] = $c.lit("Adri");
-    ghostnames[1] = $c.lit("Andries");
-    ghostnames[2] = $c.lit("Andreas");
-    ghostnames[3] = $c.lit("Bert");
-    ghostnames[4] = $c.lit("David");
-    ghostnames[5] = $c.lit("Dirk");
-    ghostnames[6] = $c.lit("Emile");
-    ghostnames[7] = $c.lit("Frans");
-    ghostnames[8] = $c.lit("Fred");
-    ghostnames[9] = $c.lit("Greg");
-    ghostnames[10] = $c.lit("Hether");
-    ghostnames[11] = $c.lit("Jay");
-    ghostnames[12] = $c.lit("John");
-    ghostnames[13] = $c.lit("Jon");
-    ghostnames[14] = $c.lit("Karnov");
-    ghostnames[15] = $c.lit("Kay");
-    ghostnames[16] = $c.lit("Kenny");
-    ghostnames[17] = $c.lit("Kevin");
-    ghostnames[18] = $c.lit("Maud");
-    ghostnames[19] = $c.lit("Michiel");
-    ghostnames[20] = $c.lit("Mike");
-    ghostnames[21] = $c.lit("Peter");
-    ghostnames[22] = $c.lit("Robert");
-    ghostnames[23] = $c.lit("Ron");
-    ghostnames[24] = $c.lit("Tom");
-    ghostnames[25] = $c.lit("Wilmar");
-    ghostnames[26] = $c.lit("Nick Danger");
-    ghostnames[27] = $c.lit("Phoenix");
-    ghostnames[28] = $c.lit("Jiro");
-    ghostnames[29] = $c.lit("Mizue");
-    ghostnames[30] = $c.lit("Stephan");
-    ghostnames[31] = $c.lit("Lance Braccus");
-    ghostnames[32] = $c.lit("Shadowhawk");
-    ghostnames[33] = $c.lit("Murphy");
+    $c.init(ghostnames, [
+        $c.lit("Adri"),
+        $c.lit("Andries"),
+        $c.lit("Andreas"),
+        $c.lit("Bert"),
+        $c.lit("David"),
+        $c.lit("Dirk"),
+        $c.lit("Emile"),
+        $c.lit("Frans"),
+        $c.lit("Fred"),
+        $c.lit("Greg"),
+        $c.lit("Hether"),
+        $c.lit("Jay"),
+        $c.lit("John"),
+        $c.lit("Jon"),
+        $c.lit("Karnov"),
+        $c.lit("Kay"),
+        $c.lit("Kenny"),
+        $c.lit("Kevin"),
+        $c.lit("Maud"),
+        $c.lit("Michiel"),
+        $c.lit("Mike"),
+        $c.lit("Peter"),
+        $c.lit("Robert"),
+        $c.lit("Ron"),
+        $c.lit("Tom"),
+        $c.lit("Wilmar"),
+        $c.lit("Nick Danger"),
+        $c.lit("Phoenix"),
+        $c.lit("Jiro"),
+        $c.lit("Mizue"),
+        $c.lit("Stephan"),
+        $c.lit("Lance Braccus"),
+        $c.lit("Shadowhawk"),
+        $c.lit("Murphy")
+    ]);
     bogon_codes.fill(0);
     bogon_codes.set([45, 95, 43, 124, 61]);   // "-_+|="
     hcolors.fill(null);
-    hcolors[0] = $c.lit("ultraviolet");
-    hcolors[1] = $c.lit("infrared");
-    hcolors[2] = $c.lit("bluish-orange");
-    hcolors[3] = $c.lit("reddish-green");
-    hcolors[4] = $c.lit("dark white");
-    hcolors[5] = $c.lit("light black");
-    hcolors[6] = $c.lit("sky blue-pink");
-    hcolors[7] = $c.lit("pinkish-cyan");
-    hcolors[8] = $c.lit("indigo-chartreuse");
-    hcolors[9] = $c.lit("salty");
-    hcolors[10] = $c.lit("sweet");
-    hcolors[11] = $c.lit("sour");
-    hcolors[12] = $c.lit("bitter");
-    hcolors[13] = $c.lit("umami");
-    hcolors[14] = $c.lit("striped");
-    hcolors[15] = $c.lit("spiral");
-    hcolors[16] = $c.lit("swirly");
-    hcolors[17] = $c.lit("plaid");
-    hcolors[18] = $c.lit("checkered");
-    hcolors[19] = $c.lit("argyle");
-    hcolors[20] = $c.lit("paisley");
-    hcolors[21] = $c.lit("blotchy");
-    hcolors[22] = $c.lit("guernsey-spotted");
-    hcolors[23] = $c.lit("polka-dotted");
-    hcolors[24] = $c.lit("square");
-    hcolors[25] = $c.lit("round");
-    hcolors[26] = $c.lit("triangular");
-    hcolors[27] = $c.lit("cabernet");
-    hcolors[28] = $c.lit("sangria");
-    hcolors[29] = $c.lit("fuchsia");
-    hcolors[30] = $c.lit("wisteria");
-    hcolors[31] = $c.lit("lemon-lime");
-    hcolors[32] = $c.lit("strawberry-banana");
-    hcolors[33] = $c.lit("peppermint");
-    hcolors[34] = $c.lit("romantic");
-    hcolors[35] = $c.lit("incandescent");
-    hcolors[36] = $c.lit("octarine");
-    hcolors[37] = $c.lit("excitingly dull");
-    hcolors[38] = $c.lit("mauve");
-    hcolors[39] = $c.lit("electric");
-    hcolors[40] = $c.lit("neon");
-    hcolors[41] = $c.lit("fluorescent");
-    hcolors[42] = $c.lit("phosphorescent");
-    hcolors[43] = $c.lit("translucent");
-    hcolors[44] = $c.lit("opaque");
-    hcolors[45] = $c.lit("psychedelic");
-    hcolors[46] = $c.lit("iridescent");
-    hcolors[47] = $c.lit("rainbow-colored");
-    hcolors[48] = $c.lit("polychromatic");
-    hcolors[49] = $c.lit("colorless");
-    hcolors[50] = $c.lit("colorless green");
-    hcolors[51] = $c.lit("dancing");
-    hcolors[52] = $c.lit("singing");
-    hcolors[53] = $c.lit("loving");
-    hcolors[54] = $c.lit("loudy");
-    hcolors[55] = $c.lit("noisy");
-    hcolors[56] = $c.lit("clattery");
-    hcolors[57] = $c.lit("silent");
-    hcolors[58] = $c.lit("apocyan");
-    hcolors[59] = $c.lit("infra-pink");
-    hcolors[60] = $c.lit("opalescent");
-    hcolors[61] = $c.lit("violant");
-    hcolors[62] = $c.lit("tuneless");
-    hcolors[63] = $c.lit("viridian");
-    hcolors[64] = $c.lit("aureolin");
-    hcolors[65] = $c.lit("cinnabar");
-    hcolors[66] = $c.lit("purpurin");
-    hcolors[67] = $c.lit("gamboge");
-    hcolors[68] = $c.lit("madder");
-    hcolors[69] = $c.lit("bistre");
-    hcolors[70] = $c.lit("ecru");
-    hcolors[71] = $c.lit("fulvous");
-    hcolors[72] = $c.lit("tekhelet");
-    hcolors[73] = $c.lit("selective yellow");
+    $c.init(hcolors, [
+        $c.lit("ultraviolet"),
+        $c.lit("infrared"),
+        $c.lit("bluish-orange"),
+        $c.lit("reddish-green"),
+        $c.lit("dark white"),
+        $c.lit("light black"),
+        $c.lit("sky blue-pink"),
+        $c.lit("pinkish-cyan"),
+        $c.lit("indigo-chartreuse"),
+        $c.lit("salty"),
+        $c.lit("sweet"),
+        $c.lit("sour"),
+        $c.lit("bitter"),
+        $c.lit("umami"),
+        $c.lit("striped"),
+        $c.lit("spiral"),
+        $c.lit("swirly"),
+        $c.lit("plaid"),
+        $c.lit("checkered"),
+        $c.lit("argyle"),
+        $c.lit("paisley"),
+        $c.lit("blotchy"),
+        $c.lit("guernsey-spotted"),
+        $c.lit("polka-dotted"),
+        $c.lit("square"),
+        $c.lit("round"),
+        $c.lit("triangular"),
+        $c.lit("cabernet"),
+        $c.lit("sangria"),
+        $c.lit("fuchsia"),
+        $c.lit("wisteria"),
+        $c.lit("lemon-lime"),
+        $c.lit("strawberry-banana"),
+        $c.lit("peppermint"),
+        $c.lit("romantic"),
+        $c.lit("incandescent"),
+        $c.lit("octarine"),
+        $c.lit("excitingly dull"),
+        $c.lit("mauve"),
+        $c.lit("electric"),
+        $c.lit("neon"),
+        $c.lit("fluorescent"),
+        $c.lit("phosphorescent"),
+        $c.lit("translucent"),
+        $c.lit("opaque"),
+        $c.lit("psychedelic"),
+        $c.lit("iridescent"),
+        $c.lit("rainbow-colored"),
+        $c.lit("polychromatic"),
+        $c.lit("colorless"),
+        $c.lit("colorless green"),
+        $c.lit("dancing"),
+        $c.lit("singing"),
+        $c.lit("loving"),
+        $c.lit("loudy"),
+        $c.lit("noisy"),
+        $c.lit("clattery"),
+        $c.lit("silent"),
+        $c.lit("apocyan"),
+        $c.lit("infra-pink"),
+        $c.lit("opalescent"),
+        $c.lit("violant"),
+        $c.lit("tuneless"),
+        $c.lit("viridian"),
+        $c.lit("aureolin"),
+        $c.lit("cinnabar"),
+        $c.lit("purpurin"),
+        $c.lit("gamboge"),
+        $c.lit("madder"),
+        $c.lit("bistre"),
+        $c.lit("ecru"),
+        $c.lit("fulvous"),
+        $c.lit("tekhelet"),
+        $c.lit("selective yellow")
+    ]);
     hliquids.fill(null);
-    hliquids[0] = $c.lit("yoghurt");
-    hliquids[1] = $c.lit("oobleck");
-    hliquids[2] = $c.lit("clotted blood");
-    hliquids[3] = $c.lit("diluted water");
-    hliquids[4] = $c.lit("purified water");
-    hliquids[5] = $c.lit("instant coffee");
-    hliquids[6] = $c.lit("tea");
-    hliquids[7] = $c.lit("herbal infusion");
-    hliquids[8] = $c.lit("liquid rainbow");
-    hliquids[9] = $c.lit("creamy foam");
-    hliquids[10] = $c.lit("mulled wine");
-    hliquids[11] = $c.lit("bouillon");
-    hliquids[12] = $c.lit("nectar");
-    hliquids[13] = $c.lit("grog");
-    hliquids[14] = $c.lit("flubber");
-    hliquids[15] = $c.lit("ketchup");
-    hliquids[16] = $c.lit("slow light");
-    hliquids[17] = $c.lit("oil");
-    hliquids[18] = $c.lit("vinaigrette");
-    hliquids[19] = $c.lit("liquid crystal");
-    hliquids[20] = $c.lit("honey");
-    hliquids[21] = $c.lit("caramel sauce");
-    hliquids[22] = $c.lit("ink");
-    hliquids[23] = $c.lit("aqueous humour");
-    hliquids[24] = $c.lit("milk substitute");
-    hliquids[25] = $c.lit("fruit juice");
-    hliquids[26] = $c.lit("glowing lava");
-    hliquids[27] = $c.lit("gastric acid");
-    hliquids[28] = $c.lit("mineral water");
-    hliquids[29] = $c.lit("cough syrup");
-    hliquids[30] = $c.lit("quicksilver");
-    hliquids[31] = $c.lit("sweet vitriol");
-    hliquids[32] = $c.lit("grey goo");
-    hliquids[33] = $c.lit("pink slime");
-    hliquids[34] = $c.lit("cosmic latte");
-    hliquids[35] = $c.lit("bone oil");
-    hliquids[36] = $c.lit("custard");
-    hliquids[37] = $c.lit("lard");
-    hliquids[38] = $c.lit("vinegar");
-    hliquids[39] = $c.lit("creosote");
+    $c.init(hliquids, [
+        $c.lit("yoghurt"),
+        $c.lit("oobleck"),
+        $c.lit("clotted blood"),
+        $c.lit("diluted water"),
+        $c.lit("purified water"),
+        $c.lit("instant coffee"),
+        $c.lit("tea"),
+        $c.lit("herbal infusion"),
+        $c.lit("liquid rainbow"),
+        $c.lit("creamy foam"),
+        $c.lit("mulled wine"),
+        $c.lit("bouillon"),
+        $c.lit("nectar"),
+        $c.lit("grog"),
+        $c.lit("flubber"),
+        $c.lit("ketchup"),
+        $c.lit("slow light"),
+        $c.lit("oil"),
+        $c.lit("vinaigrette"),
+        $c.lit("liquid crystal"),
+        $c.lit("honey"),
+        $c.lit("caramel sauce"),
+        $c.lit("ink"),
+        $c.lit("aqueous humour"),
+        $c.lit("milk substitute"),
+        $c.lit("fruit juice"),
+        $c.lit("glowing lava"),
+        $c.lit("gastric acid"),
+        $c.lit("mineral water"),
+        $c.lit("cough syrup"),
+        $c.lit("quicksilver"),
+        $c.lit("sweet vitriol"),
+        $c.lit("grey goo"),
+        $c.lit("pink slime"),
+        $c.lit("cosmic latte"),
+        $c.lit("bone oil"),
+        $c.lit("custard"),
+        $c.lit("lard"),
+        $c.lit("vinegar"),
+        $c.lit("creosote")
+    ]);
     coynames.fill(null);
-    coynames[0] = $c.lit("Carnivorous Vulgaris");
-    coynames[1] = $c.lit("Road-Runnerus Digestus");
-    coynames[2] = $c.lit("Eatibus Anythingus");
-    coynames[3] = $c.lit("Famishus-Famishus");
-    coynames[4] = $c.lit("Eatibus Almost Anythingus");
-    coynames[5] = $c.lit("Eatius Birdius");
-    coynames[6] = $c.lit("Famishius Fantasticus");
-    coynames[7] = $c.lit("Eternalii Famishiis");
-    coynames[8] = $c.lit("Famishus Vulgarus");
-    coynames[9] = $c.lit("Famishius Vulgaris Ingeniusi");
-    coynames[10] = $c.lit("Eatius-Slobbius");
-    coynames[11] = $c.lit("Hardheadipus Oedipus");
-    coynames[12] = $c.lit("Carnivorous Slobbius");
-    coynames[13] = $c.lit("Hard-Headipus Ravenus");
-    coynames[14] = $c.lit("Evereadii Eatibus");
-    coynames[15] = $c.lit("Apetitius Giganticus");
-    coynames[16] = $c.lit("Hungrii Flea-Bagius");
-    coynames[17] = $c.lit("Overconfidentii Vulgaris");
-    coynames[18] = $c.lit("Caninus Nervous Rex");
-    coynames[19] = $c.lit("Grotesques Appetitus");
-    coynames[20] = $c.lit("Nemesis Ridiculii");
-    coynames[21] = $c.lit("Canis latrans");
+    $c.init(coynames, [
+        $c.lit("Carnivorous Vulgaris"),
+        $c.lit("Road-Runnerus Digestus"),
+        $c.lit("Eatibus Anythingus"),
+        $c.lit("Famishus-Famishus"),
+        $c.lit("Eatibus Almost Anythingus"),
+        $c.lit("Eatius Birdius"),
+        $c.lit("Famishius Fantasticus"),
+        $c.lit("Eternalii Famishiis"),
+        $c.lit("Famishus Vulgarus"),
+        $c.lit("Famishius Vulgaris Ingeniusi"),
+        $c.lit("Eatius-Slobbius"),
+        $c.lit("Hardheadipus Oedipus"),
+        $c.lit("Carnivorous Slobbius"),
+        $c.lit("Hard-Headipus Ravenus"),
+        $c.lit("Evereadii Eatibus"),
+        $c.lit("Apetitius Giganticus"),
+        $c.lit("Hungrii Flea-Bagius"),
+        $c.lit("Overconfidentii Vulgaris"),
+        $c.lit("Caninus Nervous Rex"),
+        $c.lit("Grotesques Appetitus"),
+        $c.lit("Nemesis Ridiculii"),
+        $c.lit("Canis latrans")
+    ]);
     sir_Terry_novels.fill(null);
-    sir_Terry_novels[0] = $c.lit("The Colour of Magic");
-    sir_Terry_novels[1] = $c.lit("The Light Fantastic");
-    sir_Terry_novels[2] = $c.lit("Equal Rites");
-    sir_Terry_novels[3] = $c.lit("Mort");
-    sir_Terry_novels[4] = $c.lit("Sourcery");
-    sir_Terry_novels[5] = $c.lit("Wyrd Sisters");
-    sir_Terry_novels[6] = $c.lit("Pyramids");
-    sir_Terry_novels[7] = $c.lit("Guards! Guards!");
-    sir_Terry_novels[8] = $c.lit("Eric");
-    sir_Terry_novels[9] = $c.lit("Moving Pictures");
-    sir_Terry_novels[10] = $c.lit("Reaper Man");
-    sir_Terry_novels[11] = $c.lit("Witches Abroad");
-    sir_Terry_novels[12] = $c.lit("Small Gods");
-    sir_Terry_novels[13] = $c.lit("Lords and Ladies");
-    sir_Terry_novels[14] = $c.lit("Men at Arms");
-    sir_Terry_novels[15] = $c.lit("Soul Music");
-    sir_Terry_novels[16] = $c.lit("Interesting Times");
-    sir_Terry_novels[17] = $c.lit("Maskerade");
-    sir_Terry_novels[18] = $c.lit("Feet of Clay");
-    sir_Terry_novels[19] = $c.lit("Hogfather");
-    sir_Terry_novels[20] = $c.lit("Jingo");
-    sir_Terry_novels[21] = $c.lit("The Last Continent");
-    sir_Terry_novels[22] = $c.lit("Carpe Jugulum");
-    sir_Terry_novels[23] = $c.lit("The Fifth Elephant");
-    sir_Terry_novels[24] = $c.lit("The Truth");
-    sir_Terry_novels[25] = $c.lit("Thief of Time");
-    sir_Terry_novels[26] = $c.lit("The Last Hero");
-    sir_Terry_novels[27] = $c.lit("The Amazing Maurice and His Educated Rodents");
-    sir_Terry_novels[28] = $c.lit("Night Watch");
-    sir_Terry_novels[29] = $c.lit("The Wee Free Men");
-    sir_Terry_novels[30] = $c.lit("Monstrous Regiment");
-    sir_Terry_novels[31] = $c.lit("A Hat Full of Sky");
-    sir_Terry_novels[32] = $c.lit("Going Postal");
-    sir_Terry_novels[33] = $c.lit("Thud!");
-    sir_Terry_novels[34] = $c.lit("Wintersmith");
-    sir_Terry_novels[35] = $c.lit("Making Money");
-    sir_Terry_novels[36] = $c.lit("Unseen Academicals");
-    sir_Terry_novels[37] = $c.lit("I Shall Wear Midnight");
-    sir_Terry_novels[38] = $c.lit("Snuff");
-    sir_Terry_novels[39] = $c.lit("Raising Steam");
-    sir_Terry_novels[40] = $c.lit("The Shepherd's Crown");
+    $c.init(sir_Terry_novels, [
+        $c.lit("The Colour of Magic"),
+        $c.lit("The Light Fantastic"),
+        $c.lit("Equal Rites"),
+        $c.lit("Mort"),
+        $c.lit("Sourcery"),
+        $c.lit("Wyrd Sisters"),
+        $c.lit("Pyramids"),
+        $c.lit("Guards! Guards!"),
+        $c.lit("Eric"),
+        $c.lit("Moving Pictures"),
+        $c.lit("Reaper Man"),
+        $c.lit("Witches Abroad"),
+        $c.lit("Small Gods"),
+        $c.lit("Lords and Ladies"),
+        $c.lit("Men at Arms"),
+        $c.lit("Soul Music"),
+        $c.lit("Interesting Times"),
+        $c.lit("Maskerade"),
+        $c.lit("Feet of Clay"),
+        $c.lit("Hogfather"),
+        $c.lit("Jingo"),
+        $c.lit("The Last Continent"),
+        $c.lit("Carpe Jugulum"),
+        $c.lit("The Fifth Elephant"),
+        $c.lit("The Truth"),
+        $c.lit("Thief of Time"),
+        $c.lit("The Last Hero"),
+        $c.lit("The Amazing Maurice and His Educated Rodents"),
+        $c.lit("Night Watch"),
+        $c.lit("The Wee Free Men"),
+        $c.lit("Monstrous Regiment"),
+        $c.lit("A Hat Full of Sky"),
+        $c.lit("Going Postal"),
+        $c.lit("Thud!"),
+        $c.lit("Wintersmith"),
+        $c.lit("Making Money"),
+        $c.lit("Unseen Academicals"),
+        $c.lit("I Shall Wear Midnight"),
+        $c.lit("Snuff"),
+        $c.lit("Raising Steam"),
+        $c.lit("The Shepherd's Crown")
+    ]);
     for (let $i0 = 0; $i0 < 5; $i0++) {
         nextmbuf$bufs[$i0].fill(0);
     }
     nextmbuf$bufidx = 0;
     rndmonnam$buf.fill(0);
     rndorcname$v.fill(null);
-    rndorcname$v[0] = $c.lit("a");
-    rndorcname$v[1] = $c.lit("ai");
-    rndorcname$v[2] = $c.lit("og");
-    rndorcname$v[3] = $c.lit("u");
+    $c.init(rndorcname$v, [
+        $c.lit("a"),
+        $c.lit("ai"),
+        $c.lit("og"),
+        $c.lit("u")
+    ]);
     rndorcname$snd.fill(null);
-    rndorcname$snd[0] = $c.lit("gor");
-    rndorcname$snd[1] = $c.lit("gris");
-    rndorcname$snd[2] = $c.lit("un");
-    rndorcname$snd[3] = $c.lit("bane");
-    rndorcname$snd[4] = $c.lit("ruk");
-    rndorcname$snd[5] = $c.lit("oth");
-    rndorcname$snd[6] = $c.lit("ul");
-    rndorcname$snd[7] = $c.lit("z");
-    rndorcname$snd[8] = $c.lit("thos");
-    rndorcname$snd[9] = $c.lit("akh");
-    rndorcname$snd[10] = $c.lit("hai");
+    $c.init(rndorcname$snd, [
+        $c.lit("gor"),
+        $c.lit("gris"),
+        $c.lit("un"),
+        $c.lit("bane"),
+        $c.lit("ruk"),
+        $c.lit("oth"),
+        $c.lit("ul"),
+        $c.lit("z"),
+        $c.lit("thos"),
+        $c.lit("akh"),
+        $c.lit("hai")
+    ]);
 }

@@ -283,8 +283,10 @@ function new_book_description(booktype, outbuf) {   // write.c:395
 
 export function $init() {
     new_book_description$compositions.fill(null);
-    new_book_description$compositions[0] = $c.lit("parchment");
-    new_book_description$compositions[1] = $c.lit("vellum");
-    new_book_description$compositions[2] = $c.lit("cloth");
-    new_book_description$compositions[3] = null;
+    $c.init(new_book_description$compositions, [
+        $c.lit("parchment"),
+        $c.lit("vellum"),
+        $c.lit("cloth"),
+        null
+    ]);
 }

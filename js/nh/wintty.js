@@ -400,7 +400,7 @@ export async function tty_create_nhwindow(type) {   // wintty.c:874
             }
             newwin.offx = 0;
             rowoffset = $G.ttyDisplay.rows - iflags.wc2_statuslines | 0;
-            newwin.offy = $c.i16(rowoffset < 22 ? rowoffset : 22);
+            newwin.offy = $c.i16(rowoffset < ROWNO + 1 ? rowoffset : ROWNO + 1);
             $t10 = newwin.maxrow = iflags.wc2_statuslines, newwin.rows = $t10;
             $t11 = newwin.maxcol = $G.ttyDisplay.cols, newwin.cols = $t11;
             break;
@@ -1177,7 +1177,7 @@ export async function tty_display_nhwindow(window, blocking) {   // wintty.c:190
                 await more();
                 $G.ttyDisplay.toplin = TOPLINE_NEED_MORE;
                 await tty_clear_nhwindow(window);
-                !!($G.ttyDisplay.toplin === 0) || (await nhassert_failed($c.lit("ttyDisplay->toplin == TOPLINE_EMPTY"), $c.lit("../win/tty/wintty.c"), 1926), 0);
+                !!($G.ttyDisplay.toplin === TOPLINE_EMPTY) || (await nhassert_failed($c.lit("ttyDisplay->toplin == TOPLINE_EMPTY"), $c.lit("../win/tty/wintty.c"), 1926), 0);
             } else {
                 $G.ttyDisplay.toplin = TOPLINE_EMPTY;
             }
@@ -1253,7 +1253,7 @@ export async function tty_dismiss_nhwindow(window) {   // wintty.c:2001
             if ($G.ttyDisplay.toplin !== TOPLINE_EMPTY) {
                 await tty_display_nhwindow($G.WIN_MESSAGE, 1);
             }
-            !!($G.ttyDisplay.toplin === 0) || (await nhassert_failed($c.lit("ttyDisplay->toplin == TOPLINE_EMPTY"), $c.lit("../win/tty/wintty.c"), 2015), 0);
+            !!($G.ttyDisplay.toplin === TOPLINE_EMPTY) || (await nhassert_failed($c.lit("ttyDisplay->toplin == TOPLINE_EMPTY"), $c.lit("../win/tty/wintty.c"), 2015), 0);
         case NHW_STATUS:
         case NHW_BASE:
         case NHW_MAP:
@@ -1793,7 +1793,7 @@ export async function tty_message_menu(let_, how, mesg) {   // wintty.c:2876
         await more();
         $G.ttyDisplay.toplin = TOPLINE_NEED_MORE;
         await tty_clear_nhwindow($G.WIN_MESSAGE);
-        !!($G.ttyDisplay.toplin === 0) || (await nhassert_failed($c.lit("ttyDisplay->toplin == TOPLINE_EMPTY"), $c.lit("../win/tty/wintty.c"), 2895), 0);
+        !!($G.ttyDisplay.toplin === TOPLINE_EMPTY) || (await nhassert_failed($c.lit("ttyDisplay->toplin == TOPLINE_EMPTY"), $c.lit("../win/tty/wintty.c"), 2895), 0);
     }
     wins[$G.WIN_MESSAGE].flags = wins[$G.WIN_MESSAGE].flags & ~WIN_CANCELLED;
     $G.ttyDisplay.dismiss_more = 0;
@@ -1966,14 +1966,14 @@ export async function tty_cliparound(x, y) {   // wintty.c:3879
         clipx = 0 > (x - 20 | 0) ? 0 : x - 20 | 0;
         clipxmax = clipx + gt.tc_gbl_data.tc_CO | 0;
     } else if (x > (clipxmax - 5 | 0)) {
-        clipxmax = 80 < (clipxmax + 20 | 0) ? 80 : clipxmax + 20 | 0;
+        clipxmax = COLNO < (clipxmax + 20 | 0) ? COLNO : clipxmax + 20 | 0;
         clipx = clipxmax - gt.tc_gbl_data.tc_CO | 0;
     }
     if (y < (clipy + 2 | 0)) {
         clipy = 0 > (y - $c.div32(clipymax - clipy | 0, 2) | 0) ? 0 : y - $c.div32(clipymax - clipy | 0, 2) | 0;
         clipymax = clipy + ((gt.tc_gbl_data.tc_LI - 1 | 0) - iflags.wc2_statuslines | 0) | 0;
     } else if (y > (clipymax - 2 | 0)) {
-        clipymax = 21 < (clipymax + $c.div32(clipymax - clipy | 0, 2) | 0) ? 21 : clipymax + $c.div32(clipymax - clipy | 0, 2) | 0;
+        clipymax = ROWNO < (clipymax + $c.div32(clipymax - clipy | 0, 2) | 0) ? ROWNO : clipymax + $c.div32(clipymax - clipy | 0, 2) | 0;
         clipy = clipymax - ((gt.tc_gbl_data.tc_LI - 1 | 0) - iflags.wc2_statuslines | 0) | 0;
     }
     if (clipx !== oldx || clipy !== oldy) {
@@ -2926,18 +2926,20 @@ export function $init() {
     $G.GFlag = 0;
     calling_from_update_inventory = 0;
     default_menu_cmds.fill(0);
-    default_menu_cmds[0] = MENU_FIRST_PAGE;
-    default_menu_cmds[1] = MENU_LAST_PAGE;
-    default_menu_cmds[2] = MENU_NEXT_PAGE;
-    default_menu_cmds[3] = MENU_PREVIOUS_PAGE;
-    default_menu_cmds[4] = MENU_SELECT_ALL;
-    default_menu_cmds[5] = MENU_UNSELECT_ALL;
-    default_menu_cmds[6] = MENU_INVERT_ALL;
-    default_menu_cmds[7] = MENU_SELECT_PAGE;
-    default_menu_cmds[8] = MENU_UNSELECT_PAGE;
-    default_menu_cmds[9] = MENU_INVERT_PAGE;
-    default_menu_cmds[10] = MENU_SEARCH;
-    default_menu_cmds[11] = 0;
+    $c.init(default_menu_cmds, [
+        MENU_FIRST_PAGE,
+        MENU_LAST_PAGE,
+        MENU_NEXT_PAGE,
+        MENU_PREVIOUS_PAGE,
+        MENU_SELECT_ALL,
+        MENU_UNSELECT_ALL,
+        MENU_INVERT_ALL,
+        MENU_SELECT_PAGE,
+        MENU_UNSELECT_PAGE,
+        MENU_INVERT_PAGE,
+        MENU_SEARCH,
+        0
+    ]);
     resize_mesg = 0;
     tty_menu_promptstyle.$copyFrom(new $T.color_and_attr());
     tty_menu_promptstyle.color = NO_COLOR;
@@ -2954,141 +2956,37 @@ export function $init() {
     for (let $i0 = 0; $i0 < 3; $i0++) {
         encvals[$i0].fill(null);
     }
-    encvals[0][0] = $c.lit("");
-    encvals[0][1] = $c.lit("Burdened");
-    encvals[0][2] = $c.lit("Stressed");
-    encvals[0][3] = $c.lit("Strained");
-    encvals[0][4] = $c.lit("Overtaxed");
-    encvals[0][5] = $c.lit("Overloaded");
-    encvals[1][0] = $c.lit("");
-    encvals[1][1] = $c.lit("Burden");
-    encvals[1][2] = $c.lit("Stress");
-    encvals[1][3] = $c.lit("Strain");
-    encvals[1][4] = $c.lit("Overtax");
-    encvals[1][5] = $c.lit("Overload");
-    encvals[2][0] = $c.lit("");
-    encvals[2][1] = $c.lit("Brd");
-    encvals[2][2] = $c.lit("Strs");
-    encvals[2][3] = $c.lit("Strn");
-    encvals[2][4] = $c.lit("Ovtx");
-    encvals[2][5] = $c.lit("Ovld");
+    $c.init(encvals, [
+        [$c.lit(""), $c.lit("Burdened"), $c.lit("Stressed"), $c.lit("Strained"), $c.lit("Overtaxed"), $c.lit("Overloaded")],
+        [$c.lit(""), $c.lit("Burden"), $c.lit("Stress"), $c.lit("Strain"), $c.lit("Overtax"), $c.lit("Overload")],
+        [$c.lit(""), $c.lit("Brd"), $c.lit("Strs"), $c.lit("Strn"), $c.lit("Ovtx"), $c.lit("Ovld")]
+    ]);
     for (let $i0 = 0; $i0 < 3; $i0++) {
         twolineorder[$i0].fill(0);
     }
-    twolineorder[0][0] = BL_TITLE;
-    twolineorder[0][1] = BL_STR;
-    twolineorder[0][2] = BL_DX;
-    twolineorder[0][3] = BL_CO;
-    twolineorder[0][4] = BL_IN;
-    twolineorder[0][5] = BL_WI;
-    twolineorder[0][6] = BL_CH;
-    twolineorder[0][7] = BL_ALIGN;
-    twolineorder[0][8] = BL_SCORE;
-    twolineorder[0][9] = BL_FLUSH;
-    twolineorder[0][10] = blPAD;
-    twolineorder[0][11] = blPAD;
-    twolineorder[0][12] = blPAD;
-    twolineorder[0][13] = blPAD;
-    twolineorder[0][14] = blPAD;
-    twolineorder[0][15] = blPAD;
-    twolineorder[0][16] = blPAD;
-    twolineorder[0][17] = blPAD;
-    twolineorder[0][18] = blPAD;
-    twolineorder[1][0] = BL_LEVELDESC;
-    twolineorder[1][1] = BL_GOLD;
-    twolineorder[1][2] = BL_HP;
-    twolineorder[1][3] = BL_HPMAX;
-    twolineorder[1][4] = BL_ENE;
-    twolineorder[1][5] = BL_ENEMAX;
-    twolineorder[1][6] = BL_AC;
-    twolineorder[1][7] = BL_XP;
-    twolineorder[1][8] = BL_EXP;
-    twolineorder[1][9] = BL_HD;
-    twolineorder[1][10] = BL_TIME;
-    twolineorder[1][11] = BL_HUNGER;
-    twolineorder[1][12] = BL_CAP;
-    twolineorder[1][13] = BL_CONDITION;
-    twolineorder[1][14] = BL_WEAPON;
-    twolineorder[1][15] = BL_ARMOR;
-    twolineorder[1][16] = BL_TERRAIN;
-    twolineorder[1][17] = BL_VERS;
-    twolineorder[1][18] = BL_FLUSH;
-    twolineorder[2][0] = BL_FLUSH;
-    twolineorder[2][1] = blPAD;
-    twolineorder[2][2] = blPAD;
-    twolineorder[2][3] = blPAD;
-    twolineorder[2][4] = blPAD;
-    twolineorder[2][5] = blPAD;
-    twolineorder[2][6] = blPAD;
-    twolineorder[2][7] = blPAD;
-    twolineorder[2][8] = blPAD;
-    twolineorder[2][9] = blPAD;
-    twolineorder[2][10] = blPAD;
-    twolineorder[2][11] = blPAD;
-    twolineorder[2][12] = blPAD;
-    twolineorder[2][13] = blPAD;
-    twolineorder[2][14] = blPAD;
-    twolineorder[2][15] = blPAD;
+    $c.init(twolineorder, [
+        [BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_ALIGN,
+          BL_SCORE, BL_FLUSH,
+          blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD],
+        [BL_LEVELDESC, BL_GOLD, BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX,
+          BL_AC, BL_XP, BL_EXP, BL_HD, BL_TIME, BL_HUNGER, BL_CAP,
+          BL_CONDITION, BL_WEAPON, BL_ARMOR, BL_TERRAIN, BL_VERS, BL_FLUSH],
+        [BL_FLUSH, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD,
+          blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD]
+    ]);
     for (let $i0 = 0; $i0 < 3; $i0++) {
         threelineorder[$i0].fill(0);
     }
-    threelineorder[0][0] = BL_TITLE;
-    threelineorder[0][1] = BL_STR;
-    threelineorder[0][2] = BL_DX;
-    threelineorder[0][3] = BL_CO;
-    threelineorder[0][4] = BL_IN;
-    threelineorder[0][5] = BL_WI;
-    threelineorder[0][6] = BL_CH;
-    threelineorder[0][7] = BL_SCORE;
-    threelineorder[0][8] = BL_FLUSH;
-    threelineorder[0][9] = blPAD;
-    threelineorder[0][10] = blPAD;
-    threelineorder[0][11] = blPAD;
-    threelineorder[0][12] = blPAD;
-    threelineorder[0][13] = blPAD;
-    threelineorder[0][14] = blPAD;
-    threelineorder[0][15] = blPAD;
-    threelineorder[0][16] = blPAD;
-    threelineorder[0][17] = blPAD;
-    threelineorder[0][18] = blPAD;
-    threelineorder[1][0] = BL_ALIGN;
-    threelineorder[1][1] = BL_GOLD;
-    threelineorder[1][2] = BL_HP;
-    threelineorder[1][3] = BL_HPMAX;
-    threelineorder[1][4] = BL_ENE;
-    threelineorder[1][5] = BL_ENEMAX;
-    threelineorder[1][6] = BL_AC;
-    threelineorder[1][7] = BL_XP;
-    threelineorder[1][8] = BL_EXP;
-    threelineorder[1][9] = BL_HD;
-    threelineorder[1][10] = BL_HUNGER;
-    threelineorder[1][11] = BL_CAP;
-    threelineorder[1][12] = BL_FLUSH;
-    threelineorder[1][13] = blPAD;
-    threelineorder[1][14] = blPAD;
-    threelineorder[1][15] = blPAD;
-    threelineorder[1][16] = blPAD;
-    threelineorder[1][17] = blPAD;
-    threelineorder[1][18] = blPAD;
-    threelineorder[2][0] = BL_LEVELDESC;
-    threelineorder[2][1] = BL_TIME;
-    threelineorder[2][2] = BL_CONDITION;
-    threelineorder[2][3] = BL_WEAPON;
-    threelineorder[2][4] = BL_ARMOR;
-    threelineorder[2][5] = BL_TERRAIN;
-    threelineorder[2][6] = BL_VERS;
-    threelineorder[2][7] = BL_FLUSH;
-    threelineorder[2][8] = blPAD;
-    threelineorder[2][9] = blPAD;
-    threelineorder[2][10] = blPAD;
-    threelineorder[2][11] = blPAD;
-    threelineorder[2][12] = blPAD;
-    threelineorder[2][13] = blPAD;
-    threelineorder[2][14] = blPAD;
-    threelineorder[2][15] = blPAD;
-    threelineorder[2][16] = blPAD;
-    threelineorder[2][17] = blPAD;
-    threelineorder[2][18] = blPAD;
+    $c.init(threelineorder, [
+        [BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_SCORE, BL_FLUSH,
+          blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD],
+        [BL_ALIGN, BL_GOLD, BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX,
+          BL_AC, BL_XP, BL_EXP, BL_HD, BL_HUNGER, BL_CAP,
+          BL_FLUSH, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD],
+        [BL_LEVELDESC, BL_TIME, BL_CONDITION, BL_WEAPON, BL_ARMOR, BL_TERRAIN,
+          BL_VERS, BL_FLUSH, blPAD,
+          blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD]
+    ]);
     fieldorder = null;
     for (let $i0 = 0; $i0 < 3; $i0++) {
         finalx[$i0].fill(0);

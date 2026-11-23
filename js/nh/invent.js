@@ -2,6 +2,7 @@
 import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
+import { AM_LAWFUL, AM_MASK, AM_SANCTUM, AM_SHRINE, A_LAWFUL, A_NONE } from './align.h.js';
 import { alloc, dupstr } from './alloc.js';
 import { confers_luck, discover_artifact, set_artifact_intrinsic, touch_artifact } from './artifact.js';
 import { ART_MJOLLNIR } from './artilist.h.js';
@@ -28,7 +29,7 @@ import { wizard } from './flag.macros.js';
 import { BUFSZ, FALSE, LARGEST_INT, LL_CONDUCT, QBUFSZ, TRUE, set_gameview } from './global.h.js';
 import { strcmpi } from './global.macros.js';
 import { in_rooms, inv_cnt, money_cnt, near_capacity, obj_to_any } from './hack.js';
-import { ALL_FINISHED, BILLED_TYPES, BUC_BLESSED, BUC_CURSED, BUC_UNCURSED, BUC_UNKNOWN, BY_NEXTHERE, CMDQ_INT, CMDQ_KEY, CMDQ_USER_INPUT, CONTAINED_SYM, CORPSTAT_FEMALE, CORPSTAT_GENDER, COST_NOCONTENTS, CQ_CANNED, CQ_REPEAT, CXN_ARTICLE, ECMD_CANCEL, ECMD_FAIL, ECMD_OK, ECMD_TIME, FINGERTIP, GC_CONDHIST, GC_ECHOFIRST, GC_SAVEHIST, GETOBJ_ALLOWCNT, GETOBJ_DOWNPLAY, GETOBJ_EXCLUDE, GETOBJ_EXCLUDE_INACCESS, GETOBJ_EXCLUDE_NONINVENT, GETOBJ_EXCLUDE_SELECTABLE, GETOBJ_NOFLAGS, GETOBJ_PROMPT, GETOBJ_SUGGEST, HAND, HANDS_SYM, INCLUDE_HERO, INCLUDE_VENOM, INVORDER_SORT, JUSTPICKED, LOOKHERE_NOFLAGS, LOOKHERE_PICKED_SOME, LOOKHERE_SKIP_DFEATURE, MENU_FULL, MENU_PARTIAL, MENU_TRADITIONAL, MSGTYP_MASK_REP_SHOW, NOINVSYM, ONAME_SKIP_INVUPD, SIGNAL_ESCAPE, SIGNAL_NOMENU, SORTLOOT_INUSE, SORTLOOT_INVLET, SORTLOOT_LOOT, SORTLOOT_PACK, SORTLOOT_PETRIFY, STOMACH, UNPAID_TYPES, USE_INVLET, invlet_basic, st_all } from './hack.h.js';
+import { ALL_FINISHED, BILLED_TYPES, BUC_BLESSED, BUC_CURSED, BUC_UNCURSED, BUC_UNKNOWN, BY_NEXTHERE, CMDQ_INT, CMDQ_KEY, CMDQ_USER_INPUT, CONTAINED_SYM, CORPSTAT_FEMALE, CORPSTAT_GENDER, COST_NOCONTENTS, CQ_CANNED, CQ_REPEAT, CXN_ARTICLE, CXN_PFX_THE, ECMD_CANCEL, ECMD_FAIL, ECMD_OK, ECMD_TIME, FINGERTIP, GC_CONDHIST, GC_ECHOFIRST, GC_SAVEHIST, GETOBJ_ALLOWCNT, GETOBJ_DOWNPLAY, GETOBJ_EXCLUDE, GETOBJ_EXCLUDE_INACCESS, GETOBJ_EXCLUDE_NONINVENT, GETOBJ_EXCLUDE_SELECTABLE, GETOBJ_NOFLAGS, GETOBJ_PROMPT, GETOBJ_SUGGEST, HAND, HANDS_SYM, INCLUDE_HERO, INCLUDE_VENOM, INVORDER_SORT, JUSTPICKED, LOOKHERE_NOFLAGS, LOOKHERE_PICKED_SOME, LOOKHERE_SKIP_DFEATURE, MENU_FULL, MENU_PARTIAL, MENU_TRADITIONAL, MSGTYP_MASK_REP_SHOW, NOINVSYM, ONAME_SKIP_INVUPD, SIGNAL_ESCAPE, SIGNAL_NOMENU, SORTLOOT_INUSE, SORTLOOT_INVLET, SORTLOOT_LOOT, SORTLOOT_PACK, SORTLOOT_PETRIFY, STOMACH, UNPAID_TYPES, USE_INVLET, invlet_basic, st_all } from './hack.h.js';
 import { pline1 } from './hack.macros.js';
 import { digit, eos, highc, ing_suffix, letter, mungspaces, nh_snprintf, s_suffix, strkitten, strncmpi, strstri, strsubst, visctrl } from './hacklib.js';
 import { itemactions } from './iactions.js';
@@ -57,7 +58,7 @@ import { add_valid_menu_class, allow_all, allow_category, collect_obj_classes, c
 import { There, You, Your, impossible, livelog_printf, pline, pline_The } from './pline.js';
 import { body_part, mbodypart } from './polyself.js';
 import { a_gname } from './pray.js';
-import { BLINDED, HALLUC, HALLUC_RES, W_ACCESSORY, W_ARMOR, W_ART, W_QUIVER, W_SADDLE, W_SWAPWEP, W_TOOL, W_WEAPONS, W_WEP } from './prop.h.js';
+import { BLINDED, HALLUC, HALLUC_RES, W_ACCESSORY, W_AMUL, W_ARM, W_ARMC, W_ARMF, W_ARMG, W_ARMH, W_ARMOR, W_ARMS, W_ARMU, W_ART, W_QUIVER, W_RINGL, W_RINGR, W_SADDLE, W_SWAPWEP, W_TOOL, W_WEAPONS, W_WEP } from './prop.h.js';
 import { artitouch } from './quest.js';
 import { is_quest_artifact } from './questpgr.js';
 import { unpunish } from './read.js';
@@ -80,7 +81,7 @@ import { WC_PERM_INVENT, wp_tty } from './winprocs.h.js';
 import { clear_nhwindow, create_nhwindow, ctrl_nhwindow, destroy_nhwindow, display_nhwindow, end_menu, message_menu, putmsghistory, putstr, start_menu, wait_synch } from './winprocs.macros.js';
 import { ATR_NONE, InvInUse, InvOptNone, InvOptOn, InvShowGold, MENU_BEHAVE_PERMINV, MENU_BEHAVE_STANDARD, MENU_ITEMFLAGS_NONE, MENU_ITEMFLAGS_SKIPINVERT, NHW_MENU, PICK_ANY, PICK_NONE, PICK_ONE, WIN_ERR, prohibited, request_settings, set_mode, toggling_not, toggling_off, toggling_on, too_early, too_small } from './wintype.h.js';
 import { bypass_objlist, clear_bypasses, nxt_unbypassed_loot, setnotworn, setworn } from './worn.js';
-import { ACH_AMUL, ACH_BELL, ACH_BOOK, ACH_CNDL, ACH_MINE_PRIZE, ACH_SOKO_PRIZE } from './you.h.js';
+import { ACH_AMUL, ACH_BELL, ACH_BOOK, ACH_CNDL, ACH_MINE_PRIZE, ACH_SOKO_PRIZE, LEFT_HANDED, RIGHT_HANDED } from './you.h.js';
 import { Upolyd } from './you.macros.js';
 import { Blind, Fumbling, Hallucination, Stone_resistance, Underwater } from './youprop.macros.js';
 import { get_obj_location, obj_resists } from './zap.js';
@@ -134,87 +135,87 @@ function inuse_classify(sort_item, obj) {   // invent.c:70
         altclass = altclass + 1 | 0;
         do {
             rating = rating + 1 | 0;
-            if ($c.and64(w_mask, 64) !== 0) {
+            if ($c.and64(w_mask, W_ARMU) !== 0) {
                 break assign_rating$;
             }
         } while (0);
         do {
             rating = rating + 1 | 0;
-            if ($c.and64(w_mask, 32) !== 0) {
+            if ($c.and64(w_mask, W_ARMF) !== 0) {
                 break assign_rating$;
             }
         } while (0);
         do {
             rating = rating + 1 | 0;
-            if ($c.and64(w_mask, 16) !== 0) {
+            if ($c.and64(w_mask, W_ARMG) !== 0) {
                 break assign_rating$;
             }
         } while (0);
         do {
             rating = rating + 1 | 0;
-            if ($c.and64(w_mask, 4) !== 0) {
+            if ($c.and64(w_mask, W_ARMH) !== 0) {
                 break assign_rating$;
             }
         } while (0);
         do {
             rating = rating + 1 | 0;
-            if ($c.and64(w_mask, 8) !== 0) {
+            if ($c.and64(w_mask, W_ARMS) !== 0) {
                 break assign_rating$;
             }
         } while (0);
         do {
             rating = rating + 1 | 0;
-            if ($c.and64(w_mask, 2) !== 0) {
+            if ($c.and64(w_mask, W_ARMC) !== 0) {
                 break assign_rating$;
             }
         } while (0);
         do {
             rating = rating + 1 | 0;
-            if ($c.and64(w_mask, 1) !== 0) {
-                break assign_rating$;
-            }
-        } while (0);
-        altclass = altclass + 1 | 0;
-        do {
-            rating = rating + 1 | 0;
-            if ($c.and64(w_mask, 512) !== 0) {
-                break assign_rating$;
-            }
-        } while (0);
-        do {
-            rating = rating + 1 | 0;
-            if ($c.and64(w_mask, 1024) !== 0) {
-                break assign_rating$;
-            }
-        } while (0);
-        do {
-            rating = rating + 1 | 0;
-            if ($c.and64(w_mask, 256) !== 0) {
+            if ($c.and64(w_mask, W_ARM) !== 0) {
                 break assign_rating$;
             }
         } while (0);
         altclass = altclass + 1 | 0;
         do {
             rating = rating + 1 | 0;
-            if ($c.and64(w_mask, 524288) !== 0) {
+            if ($c.and64(w_mask, W_QUIVER) !== 0) {
                 break assign_rating$;
             }
         } while (0);
         do {
             rating = rating + 1 | 0;
-            if ($c.and64(w_mask, (u.uhandedness | 0) === 1 ? 262144 : 131072) !== 0) {
+            if ($c.and64(w_mask, W_SWAPWEP) !== 0) {
                 break assign_rating$;
             }
         } while (0);
         do {
             rating = rating + 1 | 0;
-            if ($c.and64(w_mask, (u.uhandedness | 0) === 0 ? 262144 : 131072) !== 0) {
+            if ($c.and64(w_mask, W_WEP) !== 0) {
+                break assign_rating$;
+            }
+        } while (0);
+        altclass = altclass + 1 | 0;
+        do {
+            rating = rating + 1 | 0;
+            if ($c.and64(w_mask, W_TOOL) !== 0) {
                 break assign_rating$;
             }
         } while (0);
         do {
             rating = rating + 1 | 0;
-            if ($c.and64(w_mask, 65536) !== 0) {
+            if ($c.and64(w_mask, (u.uhandedness | 0) === LEFT_HANDED ? W_RINGR : W_RINGL) !== 0) {
+                break assign_rating$;
+            }
+        } while (0);
+        do {
+            rating = rating + 1 | 0;
+            if ($c.and64(w_mask, (u.uhandedness | 0) === RIGHT_HANDED ? W_RINGR : W_RINGL) !== 0) {
+                break assign_rating$;
+            }
+        } while (0);
+        do {
+            rating = rating + 1 | 0;
+            if ($c.and64(w_mask, W_AMUL) !== 0) {
                 break assign_rating$;
             }
         } while (0);
@@ -1193,7 +1194,7 @@ export function any_obj_ok(obj) {   // invent.c:1710
 }
 async function getobj_hands_txt(action, qbuf) {   // invent.c:1719
     if (!$c.strcmp(action, $c.lit("grease"))) {
-        $c.__builtin___sprintf_chk(qbuf, 0, -1, $c.lit("your %s"), await fingers_or_gloves(0));
+        $c.__builtin___sprintf_chk(qbuf, 0, -1, $c.lit("your %s"), await fingers_or_gloves(FALSE));
     } else if (!$c.strcmp(action, $c.lit("write with"))) {
         $c.__builtin___sprintf_chk(qbuf, 0, -1, $c.lit("your %s"), await body_part(FINGERTIP));
     } else if (!$c.strcmp(action, $c.lit("wield"))) {
@@ -2501,7 +2502,7 @@ async function dounpaid(count, floorcount, buriedcount) {   // invent.c:3654
     if (otmp && !contnr) {
         cost = await unpaid_cost(otmp, COST_NOCONTENTS);
         iflags.suppress_price = iflags.suppress_price + 1 | 0;
-        await pline($c.lit("%s"), await xprname(otmp, await distant_name(otmp, doname), $c.i8(otmp.where === 3 ? otmp.invlet : 62), 1, cost, 0));
+        await pline($c.lit("%s"), await xprname(otmp, await distant_name(otmp, doname), $c.i8(otmp.where === OBJ_INVENT ? otmp.invlet : 62), TRUE, cost, 0));
         iflags.suppress_price = iflags.suppress_price - 1 | 0;
         return;
     }
@@ -2832,7 +2833,7 @@ export async function dfeature_at(x, y, buf) {   // invent.c:4037
     } else if (IS_SINK(ltyp)) {
         cmap = S_sink;
     } else if (IS_ALTAR(ltyp)) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(dfeature_at$altbuf, 0), 0, 256, $c.lit("%saltar to %s (%s)"), (lev.flags | 0) & 16 ? $c.lit("high ") : $c.lit(""), await a_gname(), align_str($c.i8(((lev.flags | 0) & -9 & 7) === 0 ? -128 : ((lev.flags | 0) & -9 & 7) === 4 ? 1 : ((lev.flags | 0) & -9 & 7) - 2 | 0)));
+        $c.__builtin___sprintf_chk(new $c.Ptr(dfeature_at$altbuf, 0), 0, 256, $c.lit("%saltar to %s (%s)"), (lev.flags | 0) & AM_SANCTUM ? $c.lit("high ") : $c.lit(""), await a_gname(), align_str($c.i8(((lev.flags | 0) & ~AM_SHRINE & AM_MASK) === 0 ? A_NONE : ((lev.flags | 0) & ~AM_SHRINE & AM_MASK) === AM_LAWFUL ? A_LAWFUL : ((lev.flags | 0) & ~AM_SHRINE & AM_MASK) - 2 | 0)));
         dfeature = new $c.Ptr(dfeature_at$altbuf, 0);
     } else if (stway) {
         dfeature = stairs_description(stway, new $c.Ptr(dfeature_at$altbuf, 0), TRUE);
@@ -3017,7 +3018,7 @@ export function will_feel_cockatrice(otmp, force_touch) {   // invent.c:4334
 export async function feel_cockatrice(otmp, force_touch) {   // invent.c:4343
     let kbuf = new Int8Array(256);
     if (will_feel_cockatrice(otmp, force_touch)) {
-        $c.__builtin___strcpy_chk(new $c.Ptr(kbuf, 0), await corpse_xname(otmp, null, 4), 256);
+        $c.__builtin___strcpy_chk(new $c.Ptr(kbuf, 0), await corpse_xname(otmp, null, CXN_PFX_THE), 256);
         if (poly_when_stoned(gy.youmonst.data)) {
             await You($c.lit("touched %s with your bare %s."), new $c.Ptr(kbuf, 0), await makeplural(await body_part(HAND)));
         } else {
@@ -3863,85 +3864,101 @@ export function $init() {
     perminv_flags = InvOptNone;
     in_perm_invent_toggled = 0;
     venom_inv.fill(0);
-    venom_inv[0] = VENOM_CLASS;
-    venom_inv[1] = 0;
+    $c.init(venom_inv, [
+        VENOM_CLASS,
+        0
+    ]);
     inuse_headers.fill(null);
-    inuse_headers[0] = $c.lit("");
-    inuse_headers[1] = $c.lit("Miscellaneous");
-    inuse_headers[2] = $c.lit("Worn Armor");
-    inuse_headers[3] = $c.lit("Wielded/Readied Weapons");
-    inuse_headers[4] = $c.lit("Accessories");
+    $c.init(inuse_headers, [
+        $c.lit(""),
+        $c.lit("Miscellaneous"),
+        $c.lit("Worn Armor"),
+        $c.lit("Wielded/Readied Weapons"),
+        $c.lit("Accessories")
+    ]);
     currencies.fill(null);
-    currencies[0] = $c.lit("Altarian Dollar");
-    currencies[1] = $c.lit("Ankh-Morpork Dollar");
-    currencies[2] = $c.lit("auric");
-    currencies[3] = $c.lit("buckazoid");
-    currencies[4] = $c.lit("cirbozoid");
-    currencies[5] = $c.lit("credit chit");
-    currencies[6] = $c.lit("cubit");
-    currencies[7] = $c.lit("Flanian Pobble Bead");
-    currencies[8] = $c.lit("fretzer");
-    currencies[9] = $c.lit("imperial credit");
-    currencies[10] = $c.lit("Hong Kong Luna Dollar");
-    currencies[11] = $c.lit("kongbuck");
-    currencies[12] = $c.lit("nanite");
-    currencies[13] = $c.lit("quatloo");
-    currencies[14] = $c.lit("simoleon");
-    currencies[15] = $c.lit("solari");
-    currencies[16] = $c.lit("spacebuck");
-    currencies[17] = $c.lit("sporebuck");
-    currencies[18] = $c.lit("Triganic Pu");
-    currencies[19] = $c.lit("woolong");
-    currencies[20] = $c.lit("zorkmid");
+    $c.init(currencies, [
+        $c.lit("Altarian Dollar"),
+        $c.lit("Ankh-Morpork Dollar"),
+        $c.lit("auric"),
+        $c.lit("buckazoid"),
+        $c.lit("cirbozoid"),
+        $c.lit("credit chit"),
+        $c.lit("cubit"),
+        $c.lit("Flanian Pobble Bead"),
+        $c.lit("fretzer"),
+        $c.lit("imperial credit"),
+        $c.lit("Hong Kong Luna Dollar"),
+        $c.lit("kongbuck"),
+        $c.lit("nanite"),
+        $c.lit("quatloo"),
+        $c.lit("simoleon"),
+        $c.lit("solari"),
+        $c.lit("spacebuck"),
+        $c.lit("sporebuck"),
+        $c.lit("Triganic Pu"),
+        $c.lit("woolong"),
+        $c.lit("zorkmid")
+    ]);
     safeq_xprn_ctx.$copyFrom(new $T.xprnctx());
     removeables.fill(0);
-    removeables[0] = ARMOR_CLASS;
-    removeables[1] = WEAPON_CLASS;
-    removeables[2] = RING_CLASS;
-    removeables[3] = AMULET_CLASS;
-    removeables[4] = TOOL_CLASS;
-    removeables[5] = 0;
+    $c.init(removeables, [
+        ARMOR_CLASS,
+        WEAPON_CLASS,
+        RING_CLASS,
+        AMULET_CLASS,
+        TOOL_CLASS,
+        0
+    ]);
     names.fill(null);
-    names[0] = null;
-    names[1] = $c.lit("Illegal objects");
-    names[2] = $c.lit("Weapons");
-    names[3] = $c.lit("Armor");
-    names[4] = $c.lit("Rings");
-    names[5] = $c.lit("Amulets");
-    names[6] = $c.lit("Tools");
-    names[7] = $c.lit("Comestibles");
-    names[8] = $c.lit("Potions");
-    names[9] = $c.lit("Scrolls");
-    names[10] = $c.lit("Spellbooks");
-    names[11] = $c.lit("Wands");
-    names[12] = $c.lit("Coins");
-    names[13] = $c.lit("Gems/Stones");
-    names[14] = $c.lit("Boulders/Statues");
-    names[15] = $c.lit("Iron balls");
-    names[16] = $c.lit("Chains");
-    names[17] = $c.lit("Venoms");
+    $c.init(names, [
+        null,
+        $c.lit("Illegal objects"),
+        $c.lit("Weapons"),
+        $c.lit("Armor"),
+        $c.lit("Rings"),
+        $c.lit("Amulets"),
+        $c.lit("Tools"),
+        $c.lit("Comestibles"),
+        $c.lit("Potions"),
+        $c.lit("Scrolls"),
+        $c.lit("Spellbooks"),
+        $c.lit("Wands"),
+        $c.lit("Coins"),
+        $c.lit("Gems/Stones"),
+        $c.lit("Boulders/Statues"),
+        $c.lit("Iron balls"),
+        $c.lit("Chains"),
+        $c.lit("Venoms")
+    ]);
     oth_symbols.fill(0);
-    oth_symbols[0] = CONTAINED_SYM;
-    oth_symbols[1] = 0;
+    $c.init(oth_symbols, [
+        CONTAINED_SYM,
+        0
+    ]);
     oth_names.fill(null);
-    oth_names[0] = $c.lit("Bagged/Boxed items");
+    $c.init(oth_names, [
+        $c.lit("Bagged/Boxed items")
+    ]);
     loot_classify$def_srt_order.fill(0);
-    loot_classify$def_srt_order[0] = COIN_CLASS;
-    loot_classify$def_srt_order[1] = AMULET_CLASS;
-    loot_classify$def_srt_order[2] = RING_CLASS;
-    loot_classify$def_srt_order[3] = WAND_CLASS;
-    loot_classify$def_srt_order[4] = POTION_CLASS;
-    loot_classify$def_srt_order[5] = SCROLL_CLASS;
-    loot_classify$def_srt_order[6] = SPBOOK_CLASS;
-    loot_classify$def_srt_order[7] = GEM_CLASS;
-    loot_classify$def_srt_order[8] = FOOD_CLASS;
-    loot_classify$def_srt_order[9] = TOOL_CLASS;
-    loot_classify$def_srt_order[10] = WEAPON_CLASS;
-    loot_classify$def_srt_order[11] = ARMOR_CLASS;
-    loot_classify$def_srt_order[12] = ROCK_CLASS;
-    loot_classify$def_srt_order[13] = BALL_CLASS;
-    loot_classify$def_srt_order[14] = CHAIN_CLASS;
-    loot_classify$def_srt_order[15] = 0;
+    $c.init(loot_classify$def_srt_order, [
+        COIN_CLASS,
+        AMULET_CLASS,
+        RING_CLASS,
+        WAND_CLASS,
+        POTION_CLASS,
+        SCROLL_CLASS,
+        SPBOOK_CLASS,
+        GEM_CLASS,
+        FOOD_CLASS,
+        TOOL_CLASS,
+        WEAPON_CLASS,
+        ARMOR_CLASS,
+        ROCK_CLASS,
+        BALL_CLASS,
+        CHAIN_CLASS,
+        0
+    ]);
     loot_classify$armcat.fill(0);
     sortloot$zerosli.$copyFrom(new $T.sortloot_item());
     getobj$only_one.fill(0);

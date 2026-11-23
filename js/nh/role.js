@@ -159,7 +159,7 @@ export function randgend(rolenum, racenum) {   // role.c:853
             }
         }
     }
-    return rn2(2);
+    return rn2(ROLE_GENDERS);
 }
 export async function str2gend(str) {   // role.c:880
     let i = 0, len = 0;
@@ -203,7 +203,7 @@ export function randalign(rolenum, racenum) {   // role.c:916
             }
         }
     }
-    return rn2(3);
+    return rn2(ROLE_ALIGNS);
 }
 export async function str2align(str) {   // role.c:943
     let i = 0, len = 0;
@@ -666,7 +666,7 @@ export function root_plselection_prompt(suppliedbuf, buflen, rolenum, racenum, g
             if (donefirst) {
                 $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit(" "), 256);
             }
-            $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), rolenum === -1 ? races[racenum].noun : races[racenum].adj, 256);
+            $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), rolenum === ROLE_NONE ? races[racenum].noun : races[racenum].adj, 256);
             donefirst = TRUE;
         } else if (!validrole(rolenum)) {
             if (donefirst) {
@@ -857,11 +857,11 @@ export async function role_selection_prolog(which, where) {   // role.c:1726
         }
     }
     $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%12s "), $c.lit("name:"));
-    $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), which === 0 ? new $c.Ptr(role_selection_prolog$choosing, 0) : !new $c.Ptr(svp.plname, 0).get(0) ? new $c.Ptr(role_selection_prolog$not_yet, 0) : new $c.Ptr(svp.plname, 0), 256);
+    $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), which === RS_NAME ? new $c.Ptr(role_selection_prolog$choosing, 0) : !new $c.Ptr(svp.plname, 0).get(0) ? new $c.Ptr(role_selection_prolog$not_yet, 0) : new $c.Ptr(svp.plname, 0), 256);
     await putstr()(where, 0, new $c.Ptr(buf, 0));
     $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%12s "), $c.lit("role:"));
-    (!(which === 1 || r === -1 || r === -2 || r >= 0 && r < 13) ? 1 : 0) ? $c.__assert_rtn($c.lit("role_selection_prolog"), $c.lit("role.c"), 1777, $c.lit("which == RS_ROLE || r == ROLE_NONE || r == ROLE_RANDOM || IndexOkT(r, roles)")) : 0;
-    $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), which === 1 ? new $c.Ptr(role_selection_prolog$choosing, 0) : r === -1 ? new $c.Ptr(role_selection_prolog$not_yet, 0) : r === -2 ? new $c.Ptr(role_selection_prolog$rand_choice, 0) : roles[r].name.m, 256);
+    (!(which === RS_ROLE || r === ROLE_NONE || r === ROLE_RANDOM || r >= 0 && r < 13) ? 1 : 0) ? $c.__assert_rtn($c.lit("role_selection_prolog"), $c.lit("role.c"), 1777, $c.lit("which == RS_ROLE || r == ROLE_NONE || r == ROLE_RANDOM || IndexOkT(r, roles)")) : 0;
+    $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), which === RS_ROLE ? new $c.Ptr(role_selection_prolog$choosing, 0) : r === ROLE_NONE ? new $c.Ptr(role_selection_prolog$not_yet, 0) : r === ROLE_RANDOM ? new $c.Ptr(role_selection_prolog$rand_choice, 0) : roles[r].name.m, 256);
     if (r >= 0 && roles[r].name.f) {
         if (gend === 1) {
             $c.__builtin___sprintf_chk($c.strchr(new $c.Ptr(buf, 0), 58), 0, -1, $c.lit(": %s"), roles[r].name.f);
@@ -871,14 +871,14 @@ export async function role_selection_prolog(which, where) {   // role.c:1726
     }
     await putstr()(where, 0, new $c.Ptr(buf, 0));
     $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%12s "), $c.lit("race:"));
-    (!(which === 2 || c === -1 || c === -2 || c >= 0 && c < 5) ? 1 : 0) ? $c.__assert_rtn($c.lit("role_selection_prolog"), $c.lit("role.c"), 1794, $c.lit("which == RS_RACE || c == ROLE_NONE || c == ROLE_RANDOM || IndexOkT(c, races)")) : 0;
-    $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), which === 2 ? new $c.Ptr(role_selection_prolog$choosing, 0) : c === -1 ? new $c.Ptr(role_selection_prolog$not_yet, 0) : c === -2 ? new $c.Ptr(role_selection_prolog$rand_choice, 0) : races[c].noun, 256);
+    (!(which === RS_RACE || c === ROLE_NONE || c === ROLE_RANDOM || c >= 0 && c < 5) ? 1 : 0) ? $c.__assert_rtn($c.lit("role_selection_prolog"), $c.lit("role.c"), 1794, $c.lit("which == RS_RACE || c == ROLE_NONE || c == ROLE_RANDOM || IndexOkT(c, races)")) : 0;
+    $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), which === RS_RACE ? new $c.Ptr(role_selection_prolog$choosing, 0) : c === ROLE_NONE ? new $c.Ptr(role_selection_prolog$not_yet, 0) : c === ROLE_RANDOM ? new $c.Ptr(role_selection_prolog$rand_choice, 0) : races[c].noun, 256);
     await putstr()(where, 0, new $c.Ptr(buf, 0));
     $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%12s "), $c.lit("gender:"));
-    $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), which === 3 ? new $c.Ptr(role_selection_prolog$choosing, 0) : gend === -1 ? new $c.Ptr(role_selection_prolog$not_yet, 0) : gend === -2 ? new $c.Ptr(role_selection_prolog$rand_choice, 0) : genders[gend].adj, 256);
+    $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), which === RS_GENDER ? new $c.Ptr(role_selection_prolog$choosing, 0) : gend === ROLE_NONE ? new $c.Ptr(role_selection_prolog$not_yet, 0) : gend === ROLE_RANDOM ? new $c.Ptr(role_selection_prolog$rand_choice, 0) : genders[gend].adj, 256);
     await putstr()(where, 0, new $c.Ptr(buf, 0));
     $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%12s "), $c.lit("alignment:"));
-    $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), which === 4 ? new $c.Ptr(role_selection_prolog$choosing, 0) : a === -1 ? new $c.Ptr(role_selection_prolog$not_yet, 0) : a === -2 ? new $c.Ptr(role_selection_prolog$rand_choice, 0) : aligns[a].adj, 256);
+    $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), which === RS_ALGNMNT ? new $c.Ptr(role_selection_prolog$choosing, 0) : a === ROLE_NONE ? new $c.Ptr(role_selection_prolog$not_yet, 0) : a === ROLE_RANDOM ? new $c.Ptr(role_selection_prolog$rand_choice, 0) : aligns[a].adj, 256);
     await putstr()(where, 0, new $c.Ptr(buf, 0));
 }
 export async function role_menu_extra(which, where, preselect) {   // role.c:1816
@@ -994,7 +994,7 @@ export async function role_menu_extra(which, where, preselect) {   // role.c:181
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Pick%s %s first"), f >= 0 ? $c.lit(" another") : $c.lit(""), what);
         await add_menu(where, nul_glyphinfo, any, role_menu_extra$RS_menu_let[which], 0, ATR_NONE, clr, new $c.Ptr(buf, 0), MENU_ITEMFLAGS_NONE);
     } else if (which === RS_filter) {
-        any.a_int = ROLE_RANDOM - (5 + 1);
+        any.a_int = ROLE_RANDOM - (RS_filter + 1);
         $c.__builtin___sprintf_chk(new $c.Ptr(setfiltering, 0), 0, 40, $c.lit("%s role/race/&c filtering"), gotrolefilter() ? $c.lit("Reset") : $c.lit("Set"));
         await add_menu(where, nul_glyphinfo, any, 126, 0, ATR_NONE, clr, new $c.Ptr(setfiltering, 0), MENU_ITEMFLAGS_NONE);
     } else if (which === ROLE_RANDOM) {
@@ -1209,16 +1209,16 @@ export async function genl_player_setup(screenheight) {   // role.c:2206
                             await destroy_nhwindow()(win), win = WIN_ERR;
                             if (choice === ROLE_NONE) {
                                 break setup_done$;
-                            } else if (choice === ROLE_RANDOM - (4 + 1)) {
+                            } else if (choice === ROLE_RANDOM - (RS_ALGNMNT + 1)) {
                                 $t1 = k = ROLE_NONE, flags.initalign = $t1;
                                 nextpick = RS_ALGNMNT;
-                            } else if (choice === ROLE_RANDOM - (3 + 1)) {
+                            } else if (choice === ROLE_RANDOM - (RS_GENDER + 1)) {
                                 $t2 = k = ROLE_NONE, flags.initgend = $t2;
                                 nextpick = RS_GENDER;
-                            } else if (choice === ROLE_RANDOM - (2 + 1)) {
+                            } else if (choice === ROLE_RANDOM - (RS_RACE + 1)) {
                                 $t3 = k = ROLE_NONE, flags.initrace = $t3;
                                 nextpick = RS_RACE;
-                            } else if (choice === ROLE_RANDOM - (5 + 1)) {
+                            } else if (choice === ROLE_RANDOM - (RS_filter + 1)) {
                                 $t4 = k = ROLE_NONE, flags.initrole = $t4;
                                 await reset_role_filtering();
                                 nextpick = RS_ROLE;
@@ -1289,16 +1289,16 @@ export async function genl_player_setup(screenheight) {   // role.c:2206
                                 await destroy_nhwindow()(win), win = WIN_ERR;
                                 if (choice === ROLE_NONE) {
                                     break setup_done$;
-                                } else if (choice === ROLE_RANDOM - (4 + 1)) {
+                                } else if (choice === ROLE_RANDOM - (RS_ALGNMNT + 1)) {
                                     $t5 = k = ROLE_NONE, flags.initalign = $t5;
                                     nextpick = RS_ALGNMNT;
-                                } else if (choice === ROLE_RANDOM - (3 + 1)) {
+                                } else if (choice === ROLE_RANDOM - (RS_GENDER + 1)) {
                                     $t6 = k = ROLE_NONE, flags.initgend = $t6;
                                     nextpick = RS_GENDER;
-                                } else if (choice === ROLE_RANDOM - (1 + 1)) {
+                                } else if (choice === ROLE_RANDOM - (RS_ROLE + 1)) {
                                     $t7 = k = ROLE_NONE, flags.initrole = $t7;
                                     nextpick = RS_ROLE;
-                                } else if (choice === ROLE_RANDOM - (5 + 1)) {
+                                } else if (choice === ROLE_RANDOM - (RS_filter + 1)) {
                                     $t8 = k = ROLE_NONE, flags.initrace = $t8;
                                     if (await reset_role_filtering()) {
                                         nextpick = RS_ROLE;
@@ -1373,16 +1373,16 @@ export async function genl_player_setup(screenheight) {   // role.c:2206
                                 await destroy_nhwindow()(win), win = WIN_ERR;
                                 if (choice === ROLE_NONE) {
                                     break setup_done$;
-                                } else if (choice === ROLE_RANDOM - (4 + 1)) {
+                                } else if (choice === ROLE_RANDOM - (RS_ALGNMNT + 1)) {
                                     $t9 = k = ROLE_NONE, flags.initalign = $t9;
                                     nextpick = RS_ALGNMNT;
-                                } else if (choice === ROLE_RANDOM - (2 + 1)) {
+                                } else if (choice === ROLE_RANDOM - (RS_RACE + 1)) {
                                     $t10 = k = ROLE_NONE, flags.initrace = $t10;
                                     nextpick = RS_RACE;
-                                } else if (choice === ROLE_RANDOM - (1 + 1)) {
+                                } else if (choice === ROLE_RANDOM - (RS_ROLE + 1)) {
                                     $t11 = k = ROLE_NONE, flags.initrole = $t11;
                                     nextpick = RS_ROLE;
-                                } else if (choice === ROLE_RANDOM - (5 + 1)) {
+                                } else if (choice === ROLE_RANDOM - (RS_filter + 1)) {
                                     $t12 = k = ROLE_NONE, flags.initgend = $t12;
                                     if (await reset_role_filtering()) {
                                         nextpick = RS_ROLE;
@@ -1457,16 +1457,16 @@ export async function genl_player_setup(screenheight) {   // role.c:2206
                                 await destroy_nhwindow()(win), win = WIN_ERR;
                                 if (choice === ROLE_NONE) {
                                     break setup_done$;
-                                } else if (choice === ROLE_RANDOM - (3 + 1)) {
+                                } else if (choice === ROLE_RANDOM - (RS_GENDER + 1)) {
                                     $t13 = k = ROLE_NONE, flags.initgend = $t13;
                                     nextpick = RS_GENDER;
-                                } else if (choice === ROLE_RANDOM - (2 + 1)) {
+                                } else if (choice === ROLE_RANDOM - (RS_RACE + 1)) {
                                     $t14 = k = ROLE_NONE, flags.initrace = $t14;
                                     nextpick = RS_RACE;
-                                } else if (choice === ROLE_RANDOM - (1 + 1)) {
+                                } else if (choice === ROLE_RANDOM - (RS_ROLE + 1)) {
                                     $t15 = k = ROLE_NONE, flags.initrole = $t15;
                                     nextpick = RS_ROLE;
-                                } else if (choice === ROLE_RANDOM - (5 + 1)) {
+                                } else if (choice === ROLE_RANDOM - (RS_filter + 1)) {
                                     $t16 = k = ROLE_NONE, flags.initalign = $t16;
                                     if (await reset_role_filtering()) {
                                         nextpick = RS_ROLE;
@@ -1702,1205 +1702,582 @@ export function $init() {
     for (let $i0 = 0; $i0 < 14; $i0++) {
         roles[$i0].$copyFrom(new $T.Role());
     }
-    roles[0].name.m = $c.lit("Archeologist");
-    roles[0].name.f = null;
-    roles[0].rank[0].m = $c.lit("Digger");
-    roles[0].rank[0].f = null;
-    roles[0].rank[1].m = $c.lit("Field Worker");
-    roles[0].rank[1].f = null;
-    roles[0].rank[2].m = $c.lit("Investigator");
-    roles[0].rank[2].f = null;
-    roles[0].rank[3].m = $c.lit("Exhumer");
-    roles[0].rank[3].f = null;
-    roles[0].rank[4].m = $c.lit("Excavator");
-    roles[0].rank[4].f = null;
-    roles[0].rank[5].m = $c.lit("Spelunker");
-    roles[0].rank[5].f = null;
-    roles[0].rank[6].m = $c.lit("Speleologist");
-    roles[0].rank[6].f = null;
-    roles[0].rank[7].m = $c.lit("Collector");
-    roles[0].rank[7].f = null;
-    roles[0].rank[8].m = $c.lit("Curator");
-    roles[0].rank[8].f = null;
-    roles[0].lgod = $c.lit("Quetzalcoatl");
-    roles[0].ngod = $c.lit("Camaxtli");
-    roles[0].cgod = $c.lit("Huhetotl");
-    roles[0].filecode = $c.lit("Arc");
-    roles[0].homebase = $c.lit("the College of Archeology");
-    roles[0].intermed = $c.lit("the Tomb of the Toltec Kings");
-    roles[0].mnum = PM_ARCHEOLOGIST;
-    roles[0].petnum = NON_PM;
-    roles[0].ldrnum = PM_LORD_CARNARVON;
-    roles[0].guardnum = PM_STUDENT;
-    roles[0].neminum = PM_MINION_OF_HUHETOTL;
-    roles[0].enemy1num = NON_PM;
-    roles[0].enemy2num = PM_HUMAN_MUMMY;
-    roles[0].enemy1sym = S_SNAKE;
-    roles[0].enemy2sym = S_MUMMY;
-    roles[0].questarti = ART_ORB_OF_DETECTION;
-    roles[0].allow = M2_HUMAN | M2_DWARF | M2_GNOME | ROLE_MALE | ROLE_FEMALE | AM_LAWFUL | AM_NEUTRAL;
-    roles[0].attrbase[0] = 7;
-    roles[0].attrbase[1] = 10;
-    roles[0].attrbase[2] = 10;
-    roles[0].attrbase[3] = 7;
-    roles[0].attrbase[4] = 7;
-    roles[0].attrbase[5] = 7;
-    roles[0].attrdist[0] = 20;
-    roles[0].attrdist[1] = 20;
-    roles[0].attrdist[2] = 20;
-    roles[0].attrdist[3] = 10;
-    roles[0].attrdist[4] = 20;
-    roles[0].attrdist[5] = 10;
-    roles[0].hpadv.infix = 11;
-    roles[0].hpadv.inrnd = 0;
-    roles[0].hpadv.lofix = 0;
-    roles[0].hpadv.lornd = 8;
-    roles[0].hpadv.hifix = 1;
-    roles[0].hpadv.hirnd = 0;
-    roles[0].enadv.infix = 1;
-    roles[0].enadv.inrnd = 0;
-    roles[0].enadv.lofix = 0;
-    roles[0].enadv.lornd = 1;
-    roles[0].enadv.hifix = 0;
-    roles[0].enadv.hirnd = 1;
-    roles[0].xlev = 14;
-    roles[0].initrecord = 10;
-    roles[0].spelbase = 5;
-    roles[0].spelheal = 0;
-    roles[0].spelshld = 2;
-    roles[0].spelarmr = 10;
-    roles[0].spelstat = A_INT;
-    roles[0].spelspec = SPE_MAGIC_MAPPING;
-    roles[0].spelsbon = -4;
-    roles[1].name.m = $c.lit("Barbarian");
-    roles[1].name.f = null;
-    roles[1].rank[0].m = $c.lit("Plunderer");
-    roles[1].rank[0].f = $c.lit("Plunderess");
-    roles[1].rank[1].m = $c.lit("Pillager");
-    roles[1].rank[1].f = null;
-    roles[1].rank[2].m = $c.lit("Bandit");
-    roles[1].rank[2].f = null;
-    roles[1].rank[3].m = $c.lit("Brigand");
-    roles[1].rank[3].f = null;
-    roles[1].rank[4].m = $c.lit("Raider");
-    roles[1].rank[4].f = null;
-    roles[1].rank[5].m = $c.lit("Reaver");
-    roles[1].rank[5].f = null;
-    roles[1].rank[6].m = $c.lit("Slayer");
-    roles[1].rank[6].f = null;
-    roles[1].rank[7].m = $c.lit("Chieftain");
-    roles[1].rank[7].f = $c.lit("Chieftainess");
-    roles[1].rank[8].m = $c.lit("Conqueror");
-    roles[1].rank[8].f = $c.lit("Conqueress");
-    roles[1].lgod = $c.lit("Mitra");
-    roles[1].ngod = $c.lit("Crom");
-    roles[1].cgod = $c.lit("Set");
-    roles[1].filecode = $c.lit("Bar");
-    roles[1].homebase = $c.lit("the Camp of the Duali Tribe");
-    roles[1].intermed = $c.lit("the Duali Oasis");
-    roles[1].mnum = PM_BARBARIAN;
-    roles[1].petnum = NON_PM;
-    roles[1].ldrnum = PM_PELIAS;
-    roles[1].guardnum = PM_CHIEFTAIN;
-    roles[1].neminum = PM_THOTH_AMON;
-    roles[1].enemy1num = PM_OGRE;
-    roles[1].enemy2num = PM_TROLL;
-    roles[1].enemy1sym = S_OGRE;
-    roles[1].enemy2sym = S_TROLL;
-    roles[1].questarti = ART_HEART_OF_AHRIMAN;
-    roles[1].allow = M2_HUMAN | M2_ORC | ROLE_MALE | ROLE_FEMALE | AM_NEUTRAL | AM_CHAOTIC;
-    roles[1].attrbase[0] = 16;
-    roles[1].attrbase[1] = 7;
-    roles[1].attrbase[2] = 7;
-    roles[1].attrbase[3] = 15;
-    roles[1].attrbase[4] = 16;
-    roles[1].attrbase[5] = 6;
-    roles[1].attrdist[0] = 30;
-    roles[1].attrdist[1] = 6;
-    roles[1].attrdist[2] = 7;
-    roles[1].attrdist[3] = 20;
-    roles[1].attrdist[4] = 30;
-    roles[1].attrdist[5] = 7;
-    roles[1].hpadv.infix = 14;
-    roles[1].hpadv.inrnd = 0;
-    roles[1].hpadv.lofix = 0;
-    roles[1].hpadv.lornd = 10;
-    roles[1].hpadv.hifix = 2;
-    roles[1].hpadv.hirnd = 0;
-    roles[1].enadv.infix = 1;
-    roles[1].enadv.inrnd = 0;
-    roles[1].enadv.lofix = 0;
-    roles[1].enadv.lornd = 1;
-    roles[1].enadv.hifix = 0;
-    roles[1].enadv.hirnd = 1;
-    roles[1].xlev = 10;
-    roles[1].initrecord = 10;
-    roles[1].spelbase = 14;
-    roles[1].spelheal = 0;
-    roles[1].spelshld = 0;
-    roles[1].spelarmr = 8;
-    roles[1].spelstat = A_INT;
-    roles[1].spelspec = SPE_HASTE_SELF;
-    roles[1].spelsbon = -4;
-    roles[2].name.m = $c.lit("Caveman");
-    roles[2].name.f = $c.lit("Cavewoman");
-    roles[2].rank[0].m = $c.lit("Troglodyte");
-    roles[2].rank[0].f = null;
-    roles[2].rank[1].m = $c.lit("Aborigine");
-    roles[2].rank[1].f = null;
-    roles[2].rank[2].m = $c.lit("Wanderer");
-    roles[2].rank[2].f = null;
-    roles[2].rank[3].m = $c.lit("Vagrant");
-    roles[2].rank[3].f = null;
-    roles[2].rank[4].m = $c.lit("Wayfarer");
-    roles[2].rank[4].f = null;
-    roles[2].rank[5].m = $c.lit("Roamer");
-    roles[2].rank[5].f = null;
-    roles[2].rank[6].m = $c.lit("Nomad");
-    roles[2].rank[6].f = null;
-    roles[2].rank[7].m = $c.lit("Rover");
-    roles[2].rank[7].f = null;
-    roles[2].rank[8].m = $c.lit("Pioneer");
-    roles[2].rank[8].f = null;
-    roles[2].lgod = $c.lit("Anu");
-    roles[2].ngod = $c.lit("_Ishtar");
-    roles[2].cgod = $c.lit("Anshar");
-    roles[2].filecode = $c.lit("Cav");
-    roles[2].homebase = $c.lit("the Caves of the Ancestors");
-    roles[2].intermed = $c.lit("the Dragon's Lair");
-    roles[2].mnum = PM_CAVE_DWELLER;
-    roles[2].petnum = PM_LITTLE_DOG;
-    roles[2].ldrnum = PM_SHAMAN_KARNOV;
-    roles[2].guardnum = PM_NEANDERTHAL;
-    roles[2].neminum = PM_CHROMATIC_DRAGON;
-    roles[2].enemy1num = PM_BUGBEAR;
-    roles[2].enemy2num = PM_HILL_GIANT;
-    roles[2].enemy1sym = S_HUMANOID;
-    roles[2].enemy2sym = S_GIANT;
-    roles[2].questarti = ART_SCEPTRE_OF_MIGHT;
-    roles[2].allow = M2_HUMAN | M2_DWARF | M2_GNOME | ROLE_MALE | ROLE_FEMALE | AM_LAWFUL | AM_NEUTRAL;
-    roles[2].attrbase[0] = 10;
-    roles[2].attrbase[1] = 7;
-    roles[2].attrbase[2] = 7;
-    roles[2].attrbase[3] = 7;
-    roles[2].attrbase[4] = 8;
-    roles[2].attrbase[5] = 6;
-    roles[2].attrdist[0] = 30;
-    roles[2].attrdist[1] = 6;
-    roles[2].attrdist[2] = 7;
-    roles[2].attrdist[3] = 20;
-    roles[2].attrdist[4] = 30;
-    roles[2].attrdist[5] = 7;
-    roles[2].hpadv.infix = 14;
-    roles[2].hpadv.inrnd = 0;
-    roles[2].hpadv.lofix = 0;
-    roles[2].hpadv.lornd = 8;
-    roles[2].hpadv.hifix = 2;
-    roles[2].hpadv.hirnd = 0;
-    roles[2].enadv.infix = 1;
-    roles[2].enadv.inrnd = 0;
-    roles[2].enadv.lofix = 0;
-    roles[2].enadv.lornd = 1;
-    roles[2].enadv.hifix = 0;
-    roles[2].enadv.hirnd = 1;
-    roles[2].xlev = 10;
-    roles[2].initrecord = 0;
-    roles[2].spelbase = 12;
-    roles[2].spelheal = 0;
-    roles[2].spelshld = 1;
-    roles[2].spelarmr = 8;
-    roles[2].spelstat = A_INT;
-    roles[2].spelspec = SPE_DIG;
-    roles[2].spelsbon = -4;
-    roles[3].name.m = $c.lit("Healer");
-    roles[3].name.f = null;
-    roles[3].rank[0].m = $c.lit("Rhizotomist");
-    roles[3].rank[0].f = null;
-    roles[3].rank[1].m = $c.lit("Empiric");
-    roles[3].rank[1].f = null;
-    roles[3].rank[2].m = $c.lit("Embalmer");
-    roles[3].rank[2].f = null;
-    roles[3].rank[3].m = $c.lit("Dresser");
-    roles[3].rank[3].f = null;
-    roles[3].rank[4].m = $c.lit("Medicus ossium");
-    roles[3].rank[4].f = $c.lit("Medica ossium");
-    roles[3].rank[5].m = $c.lit("Herbalist");
-    roles[3].rank[5].f = null;
-    roles[3].rank[6].m = $c.lit("Magister");
-    roles[3].rank[6].f = $c.lit("Magistra");
-    roles[3].rank[7].m = $c.lit("Physician");
-    roles[3].rank[7].f = null;
-    roles[3].rank[8].m = $c.lit("Chirurgeon");
-    roles[3].rank[8].f = null;
-    roles[3].lgod = $c.lit("_Athena");
-    roles[3].ngod = $c.lit("Hermes");
-    roles[3].cgod = $c.lit("Poseidon");
-    roles[3].filecode = $c.lit("Hea");
-    roles[3].homebase = $c.lit("the Temple of Epidaurus");
-    roles[3].intermed = $c.lit("the Temple of Coeus");
-    roles[3].mnum = PM_HEALER;
-    roles[3].petnum = NON_PM;
-    roles[3].ldrnum = PM_HIPPOCRATES;
-    roles[3].guardnum = PM_ATTENDANT;
-    roles[3].neminum = PM_CYCLOPS;
-    roles[3].enemy1num = PM_GIANT_RAT;
-    roles[3].enemy2num = PM_SNAKE;
-    roles[3].enemy1sym = S_RODENT;
-    roles[3].enemy2sym = S_YETI;
-    roles[3].questarti = ART_STAFF_OF_AESCULAPIUS;
-    roles[3].allow = M2_HUMAN | M2_GNOME | ROLE_MALE | ROLE_FEMALE | AM_NEUTRAL;
-    roles[3].attrbase[0] = 7;
-    roles[3].attrbase[1] = 7;
-    roles[3].attrbase[2] = 13;
-    roles[3].attrbase[3] = 7;
-    roles[3].attrbase[4] = 11;
-    roles[3].attrbase[5] = 16;
-    roles[3].attrdist[0] = 15;
-    roles[3].attrdist[1] = 20;
-    roles[3].attrdist[2] = 20;
-    roles[3].attrdist[3] = 15;
-    roles[3].attrdist[4] = 25;
-    roles[3].attrdist[5] = 5;
-    roles[3].hpadv.infix = 11;
-    roles[3].hpadv.inrnd = 0;
-    roles[3].hpadv.lofix = 0;
-    roles[3].hpadv.lornd = 8;
-    roles[3].hpadv.hifix = 1;
-    roles[3].hpadv.hirnd = 0;
-    roles[3].enadv.infix = 1;
-    roles[3].enadv.inrnd = 4;
-    roles[3].enadv.lofix = 0;
-    roles[3].enadv.lornd = 1;
-    roles[3].enadv.hifix = 0;
-    roles[3].enadv.hirnd = 2;
-    roles[3].xlev = 20;
-    roles[3].initrecord = 10;
-    roles[3].spelbase = 3;
-    roles[3].spelheal = -3;
-    roles[3].spelshld = 2;
-    roles[3].spelarmr = 10;
-    roles[3].spelstat = A_WIS;
-    roles[3].spelspec = SPE_CURE_SICKNESS;
-    roles[3].spelsbon = -4;
-    roles[4].name.m = $c.lit("Knight");
-    roles[4].name.f = null;
-    roles[4].rank[0].m = $c.lit("Gallant");
-    roles[4].rank[0].f = null;
-    roles[4].rank[1].m = $c.lit("Esquire");
-    roles[4].rank[1].f = null;
-    roles[4].rank[2].m = $c.lit("Bachelor");
-    roles[4].rank[2].f = null;
-    roles[4].rank[3].m = $c.lit("Sergeant");
-    roles[4].rank[3].f = null;
-    roles[4].rank[4].m = $c.lit("Knight");
-    roles[4].rank[4].f = null;
-    roles[4].rank[5].m = $c.lit("Banneret");
-    roles[4].rank[5].f = null;
-    roles[4].rank[6].m = $c.lit("Chevalier");
-    roles[4].rank[6].f = $c.lit("Chevaliere");
-    roles[4].rank[7].m = $c.lit("Seignieur");
-    roles[4].rank[7].f = $c.lit("Dame");
-    roles[4].rank[8].m = $c.lit("Paladin");
-    roles[4].rank[8].f = null;
-    roles[4].lgod = $c.lit("Lugh");
-    roles[4].ngod = $c.lit("_Brigit");
-    roles[4].cgod = $c.lit("Manannan Mac Lir");
-    roles[4].filecode = $c.lit("Kni");
-    roles[4].homebase = $c.lit("Camelot Castle");
-    roles[4].intermed = $c.lit("the Isle of Glass");
-    roles[4].mnum = PM_KNIGHT;
-    roles[4].petnum = PM_PONY;
-    roles[4].ldrnum = PM_KING_ARTHUR;
-    roles[4].guardnum = PM_PAGE;
-    roles[4].neminum = PM_IXOTH;
-    roles[4].enemy1num = PM_QUASIT;
-    roles[4].enemy2num = PM_OCHRE_JELLY;
-    roles[4].enemy1sym = S_IMP;
-    roles[4].enemy2sym = S_JELLY;
-    roles[4].questarti = ART_MAGIC_MIRROR_OF_MERLIN;
-    roles[4].allow = M2_HUMAN | ROLE_MALE | ROLE_FEMALE | AM_LAWFUL;
-    roles[4].attrbase[0] = 13;
-    roles[4].attrbase[1] = 7;
-    roles[4].attrbase[2] = 14;
-    roles[4].attrbase[3] = 8;
-    roles[4].attrbase[4] = 10;
-    roles[4].attrbase[5] = 17;
-    roles[4].attrdist[0] = 30;
-    roles[4].attrdist[1] = 15;
-    roles[4].attrdist[2] = 15;
-    roles[4].attrdist[3] = 10;
-    roles[4].attrdist[4] = 20;
-    roles[4].attrdist[5] = 10;
-    roles[4].hpadv.infix = 14;
-    roles[4].hpadv.inrnd = 0;
-    roles[4].hpadv.lofix = 0;
-    roles[4].hpadv.lornd = 8;
-    roles[4].hpadv.hifix = 2;
-    roles[4].hpadv.hirnd = 0;
-    roles[4].enadv.infix = 1;
-    roles[4].enadv.inrnd = 4;
-    roles[4].enadv.lofix = 0;
-    roles[4].enadv.lornd = 1;
-    roles[4].enadv.hifix = 0;
-    roles[4].enadv.hirnd = 2;
-    roles[4].xlev = 10;
-    roles[4].initrecord = 10;
-    roles[4].spelbase = 8;
-    roles[4].spelheal = -2;
-    roles[4].spelshld = 0;
-    roles[4].spelarmr = 9;
-    roles[4].spelstat = A_WIS;
-    roles[4].spelspec = SPE_TURN_UNDEAD;
-    roles[4].spelsbon = -4;
-    roles[5].name.m = $c.lit("Monk");
-    roles[5].name.f = null;
-    roles[5].rank[0].m = $c.lit("Candidate");
-    roles[5].rank[0].f = null;
-    roles[5].rank[1].m = $c.lit("Novice");
-    roles[5].rank[1].f = null;
-    roles[5].rank[2].m = $c.lit("Initiate");
-    roles[5].rank[2].f = null;
-    roles[5].rank[3].m = $c.lit("Student of Stones");
-    roles[5].rank[3].f = null;
-    roles[5].rank[4].m = $c.lit("Student of Waters");
-    roles[5].rank[4].f = null;
-    roles[5].rank[5].m = $c.lit("Student of Metals");
-    roles[5].rank[5].f = null;
-    roles[5].rank[6].m = $c.lit("Student of Winds");
-    roles[5].rank[6].f = null;
-    roles[5].rank[7].m = $c.lit("Student of Fire");
-    roles[5].rank[7].f = null;
-    roles[5].rank[8].m = $c.lit("Master");
-    roles[5].rank[8].f = null;
-    roles[5].lgod = $c.lit("Shan Lai Ching");
-    roles[5].ngod = $c.lit("Chih Sung-tzu");
-    roles[5].cgod = $c.lit("Huan Ti");
-    roles[5].filecode = $c.lit("Mon");
-    roles[5].homebase = $c.lit("the Monastery of Chan-Sune");
-    roles[5].intermed = $c.lit("the Monastery of the Earth-Lord");
-    roles[5].mnum = PM_MONK;
-    roles[5].petnum = NON_PM;
-    roles[5].ldrnum = PM_GRAND_MASTER;
-    roles[5].guardnum = PM_ABBOT;
-    roles[5].neminum = PM_MASTER_KAEN;
-    roles[5].enemy1num = PM_EARTH_ELEMENTAL;
-    roles[5].enemy2num = PM_XORN;
-    roles[5].enemy1sym = S_ELEMENTAL;
-    roles[5].enemy2sym = S_XORN;
-    roles[5].questarti = ART_EYES_OF_THE_OVERWORLD;
-    roles[5].allow = M2_HUMAN | ROLE_MALE | ROLE_FEMALE | AM_LAWFUL | AM_NEUTRAL | AM_CHAOTIC;
-    roles[5].attrbase[0] = 10;
-    roles[5].attrbase[1] = 7;
-    roles[5].attrbase[2] = 8;
-    roles[5].attrbase[3] = 8;
-    roles[5].attrbase[4] = 7;
-    roles[5].attrbase[5] = 7;
-    roles[5].attrdist[0] = 25;
-    roles[5].attrdist[1] = 10;
-    roles[5].attrdist[2] = 20;
-    roles[5].attrdist[3] = 20;
-    roles[5].attrdist[4] = 15;
-    roles[5].attrdist[5] = 10;
-    roles[5].hpadv.infix = 12;
-    roles[5].hpadv.inrnd = 0;
-    roles[5].hpadv.lofix = 0;
-    roles[5].hpadv.lornd = 8;
-    roles[5].hpadv.hifix = 1;
-    roles[5].hpadv.hirnd = 0;
-    roles[5].enadv.infix = 2;
-    roles[5].enadv.inrnd = 2;
-    roles[5].enadv.lofix = 0;
-    roles[5].enadv.lornd = 2;
-    roles[5].enadv.hifix = 0;
-    roles[5].enadv.hirnd = 2;
-    roles[5].xlev = 10;
-    roles[5].initrecord = 10;
-    roles[5].spelbase = 8;
-    roles[5].spelheal = -2;
-    roles[5].spelshld = 2;
-    roles[5].spelarmr = 20;
-    roles[5].spelstat = A_WIS;
-    roles[5].spelspec = SPE_RESTORE_ABILITY;
-    roles[5].spelsbon = -4;
-    roles[6].name.m = $c.lit("Priest");
-    roles[6].name.f = $c.lit("Priestess");
-    roles[6].rank[0].m = $c.lit("Aspirant");
-    roles[6].rank[0].f = null;
-    roles[6].rank[1].m = $c.lit("Acolyte");
-    roles[6].rank[1].f = null;
-    roles[6].rank[2].m = $c.lit("Adept");
-    roles[6].rank[2].f = null;
-    roles[6].rank[3].m = $c.lit("Priest");
-    roles[6].rank[3].f = $c.lit("Priestess");
-    roles[6].rank[4].m = $c.lit("Curate");
-    roles[6].rank[4].f = null;
-    roles[6].rank[5].m = $c.lit("Canon");
-    roles[6].rank[5].f = $c.lit("Canoness");
-    roles[6].rank[6].m = $c.lit("Lama");
-    roles[6].rank[6].f = null;
-    roles[6].rank[7].m = $c.lit("Patriarch");
-    roles[6].rank[7].f = $c.lit("Matriarch");
-    roles[6].rank[8].m = $c.lit("High Priest");
-    roles[6].rank[8].f = $c.lit("High Priestess");
-    roles[6].lgod = null;
-    roles[6].ngod = null;
-    roles[6].cgod = null;
-    roles[6].filecode = $c.lit("Pri");
-    roles[6].homebase = $c.lit("the Great Temple");
-    roles[6].intermed = $c.lit("the Temple of Nalzok");
-    roles[6].mnum = PM_CLERIC;
-    roles[6].petnum = NON_PM;
-    roles[6].ldrnum = PM_ARCH_PRIEST;
-    roles[6].guardnum = PM_ACOLYTE;
-    roles[6].neminum = PM_NALZOK;
-    roles[6].enemy1num = PM_HUMAN_ZOMBIE;
-    roles[6].enemy2num = PM_WRAITH;
-    roles[6].enemy1sym = S_ZOMBIE;
-    roles[6].enemy2sym = S_WRAITH;
-    roles[6].questarti = ART_MITRE_OF_HOLINESS;
-    roles[6].allow = M2_HUMAN | M2_ELF | ROLE_MALE | ROLE_FEMALE | AM_LAWFUL | AM_NEUTRAL | AM_CHAOTIC;
-    roles[6].attrbase[0] = 7;
-    roles[6].attrbase[1] = 7;
-    roles[6].attrbase[2] = 10;
-    roles[6].attrbase[3] = 7;
-    roles[6].attrbase[4] = 7;
-    roles[6].attrbase[5] = 7;
-    roles[6].attrdist[0] = 15;
-    roles[6].attrdist[1] = 10;
-    roles[6].attrdist[2] = 30;
-    roles[6].attrdist[3] = 15;
-    roles[6].attrdist[4] = 20;
-    roles[6].attrdist[5] = 10;
-    roles[6].hpadv.infix = 12;
-    roles[6].hpadv.inrnd = 0;
-    roles[6].hpadv.lofix = 0;
-    roles[6].hpadv.lornd = 8;
-    roles[6].hpadv.hifix = 1;
-    roles[6].hpadv.hirnd = 0;
-    roles[6].enadv.infix = 4;
-    roles[6].enadv.inrnd = 3;
-    roles[6].enadv.lofix = 0;
-    roles[6].enadv.lornd = 2;
-    roles[6].enadv.hifix = 0;
-    roles[6].enadv.hirnd = 2;
-    roles[6].xlev = 10;
-    roles[6].initrecord = 0;
-    roles[6].spelbase = 3;
-    roles[6].spelheal = -2;
-    roles[6].spelshld = 2;
-    roles[6].spelarmr = 10;
-    roles[6].spelstat = A_WIS;
-    roles[6].spelspec = SPE_REMOVE_CURSE;
-    roles[6].spelsbon = -4;
-    roles[7].name.m = $c.lit("Rogue");
-    roles[7].name.f = null;
-    roles[7].rank[0].m = $c.lit("Footpad");
-    roles[7].rank[0].f = null;
-    roles[7].rank[1].m = $c.lit("Cutpurse");
-    roles[7].rank[1].f = null;
-    roles[7].rank[2].m = $c.lit("Rogue");
-    roles[7].rank[2].f = null;
-    roles[7].rank[3].m = $c.lit("Pilferer");
-    roles[7].rank[3].f = null;
-    roles[7].rank[4].m = $c.lit("Robber");
-    roles[7].rank[4].f = null;
-    roles[7].rank[5].m = $c.lit("Burglar");
-    roles[7].rank[5].f = null;
-    roles[7].rank[6].m = $c.lit("Filcher");
-    roles[7].rank[6].f = null;
-    roles[7].rank[7].m = $c.lit("Magsman");
-    roles[7].rank[7].f = $c.lit("Magswoman");
-    roles[7].rank[8].m = $c.lit("Thief");
-    roles[7].rank[8].f = null;
-    roles[7].lgod = $c.lit("Issek");
-    roles[7].ngod = $c.lit("Mog");
-    roles[7].cgod = $c.lit("Kos");
-    roles[7].filecode = $c.lit("Rog");
-    roles[7].homebase = $c.lit("the Thieves' Guild Hall");
-    roles[7].intermed = $c.lit("the Assassins' Guild Hall");
-    roles[7].mnum = PM_ROGUE;
-    roles[7].petnum = NON_PM;
-    roles[7].ldrnum = PM_MASTER_OF_THIEVES;
-    roles[7].guardnum = PM_THUG;
-    roles[7].neminum = PM_MASTER_ASSASSIN;
-    roles[7].enemy1num = PM_LEPRECHAUN;
-    roles[7].enemy2num = PM_GUARDIAN_NAGA;
-    roles[7].enemy1sym = S_NYMPH;
-    roles[7].enemy2sym = S_NAGA;
-    roles[7].questarti = ART_MASTER_KEY_OF_THIEVERY;
-    roles[7].allow = M2_HUMAN | M2_ORC | ROLE_MALE | ROLE_FEMALE | AM_CHAOTIC;
-    roles[7].attrbase[0] = 7;
-    roles[7].attrbase[1] = 7;
-    roles[7].attrbase[2] = 7;
-    roles[7].attrbase[3] = 10;
-    roles[7].attrbase[4] = 7;
-    roles[7].attrbase[5] = 6;
-    roles[7].attrdist[0] = 20;
-    roles[7].attrdist[1] = 10;
-    roles[7].attrdist[2] = 10;
-    roles[7].attrdist[3] = 30;
-    roles[7].attrdist[4] = 20;
-    roles[7].attrdist[5] = 10;
-    roles[7].hpadv.infix = 10;
-    roles[7].hpadv.inrnd = 0;
-    roles[7].hpadv.lofix = 0;
-    roles[7].hpadv.lornd = 8;
-    roles[7].hpadv.hifix = 1;
-    roles[7].hpadv.hirnd = 0;
-    roles[7].enadv.infix = 1;
-    roles[7].enadv.inrnd = 0;
-    roles[7].enadv.lofix = 0;
-    roles[7].enadv.lornd = 1;
-    roles[7].enadv.hifix = 0;
-    roles[7].enadv.hirnd = 1;
-    roles[7].xlev = 11;
-    roles[7].initrecord = 10;
-    roles[7].spelbase = 8;
-    roles[7].spelheal = 0;
-    roles[7].spelshld = 1;
-    roles[7].spelarmr = 9;
-    roles[7].spelstat = A_INT;
-    roles[7].spelspec = SPE_DETECT_TREASURE;
-    roles[7].spelsbon = -4;
-    roles[8].name.m = $c.lit("Ranger");
-    roles[8].name.f = null;
-    roles[8].rank[0].m = $c.lit("Tenderfoot");
-    roles[8].rank[0].f = null;
-    roles[8].rank[1].m = $c.lit("Lookout");
-    roles[8].rank[1].f = null;
-    roles[8].rank[2].m = $c.lit("Trailblazer");
-    roles[8].rank[2].f = null;
-    roles[8].rank[3].m = $c.lit("Reconnoiterer");
-    roles[8].rank[3].f = $c.lit("Reconnoiteress");
-    roles[8].rank[4].m = $c.lit("Scout");
-    roles[8].rank[4].f = null;
-    roles[8].rank[5].m = $c.lit("Arbalester");
-    roles[8].rank[5].f = null;
-    roles[8].rank[6].m = $c.lit("Archer");
-    roles[8].rank[6].f = null;
-    roles[8].rank[7].m = $c.lit("Sharpshooter");
-    roles[8].rank[7].f = null;
-    roles[8].rank[8].m = $c.lit("Marksman");
-    roles[8].rank[8].f = $c.lit("Markswoman");
-    roles[8].lgod = $c.lit("Mercury");
-    roles[8].ngod = $c.lit("_Venus");
-    roles[8].cgod = $c.lit("Mars");
-    roles[8].filecode = $c.lit("Ran");
-    roles[8].homebase = $c.lit("Orion's camp");
-    roles[8].intermed = $c.lit("the cave of the wumpus");
-    roles[8].mnum = PM_RANGER;
-    roles[8].petnum = PM_LITTLE_DOG;
-    roles[8].ldrnum = PM_ORION;
-    roles[8].guardnum = PM_HUNTER;
-    roles[8].neminum = PM_SCORPIUS;
-    roles[8].enemy1num = PM_FOREST_CENTAUR;
-    roles[8].enemy2num = PM_SCORPION;
-    roles[8].enemy1sym = S_CENTAUR;
-    roles[8].enemy2sym = S_SPIDER;
-    roles[8].questarti = ART_LONGBOW_OF_DIANA;
-    roles[8].allow = M2_HUMAN | M2_ELF | M2_GNOME | M2_ORC | ROLE_MALE | ROLE_FEMALE | AM_NEUTRAL | AM_CHAOTIC;
-    roles[8].attrbase[0] = 13;
-    roles[8].attrbase[1] = 13;
-    roles[8].attrbase[2] = 13;
-    roles[8].attrbase[3] = 9;
-    roles[8].attrbase[4] = 13;
-    roles[8].attrbase[5] = 7;
-    roles[8].attrdist[0] = 30;
-    roles[8].attrdist[1] = 10;
-    roles[8].attrdist[2] = 10;
-    roles[8].attrdist[3] = 20;
-    roles[8].attrdist[4] = 20;
-    roles[8].attrdist[5] = 10;
-    roles[8].hpadv.infix = 13;
-    roles[8].hpadv.inrnd = 0;
-    roles[8].hpadv.lofix = 0;
-    roles[8].hpadv.lornd = 6;
-    roles[8].hpadv.hifix = 1;
-    roles[8].hpadv.hirnd = 0;
-    roles[8].enadv.infix = 1;
-    roles[8].enadv.inrnd = 0;
-    roles[8].enadv.lofix = 0;
-    roles[8].enadv.lornd = 1;
-    roles[8].enadv.hifix = 0;
-    roles[8].enadv.hirnd = 1;
-    roles[8].xlev = 12;
-    roles[8].initrecord = 10;
-    roles[8].spelbase = 9;
-    roles[8].spelheal = 2;
-    roles[8].spelshld = 1;
-    roles[8].spelarmr = 10;
-    roles[8].spelstat = A_INT;
-    roles[8].spelspec = SPE_INVISIBILITY;
-    roles[8].spelsbon = -4;
-    roles[9].name.m = $c.lit("Samurai");
-    roles[9].name.f = null;
-    roles[9].rank[0].m = $c.lit("Hatamoto");
-    roles[9].rank[0].f = null;
-    roles[9].rank[1].m = $c.lit("Ronin");
-    roles[9].rank[1].f = null;
-    roles[9].rank[2].m = $c.lit("Ninja");
-    roles[9].rank[2].f = $c.lit("Kunoichi");
-    roles[9].rank[3].m = $c.lit("Joshu");
-    roles[9].rank[3].f = null;
-    roles[9].rank[4].m = $c.lit("Ryoshu");
-    roles[9].rank[4].f = null;
-    roles[9].rank[5].m = $c.lit("Kokushu");
-    roles[9].rank[5].f = null;
-    roles[9].rank[6].m = $c.lit("Daimyo");
-    roles[9].rank[6].f = null;
-    roles[9].rank[7].m = $c.lit("Kuge");
-    roles[9].rank[7].f = null;
-    roles[9].rank[8].m = $c.lit("Shogun");
-    roles[9].rank[8].f = null;
-    roles[9].lgod = $c.lit("_Amaterasu Omikami");
-    roles[9].ngod = $c.lit("Raijin");
-    roles[9].cgod = $c.lit("Susanowo");
-    roles[9].filecode = $c.lit("Sam");
-    roles[9].homebase = $c.lit("the Castle of the Taro Clan");
-    roles[9].intermed = $c.lit("the Shogun's Castle");
-    roles[9].mnum = PM_SAMURAI;
-    roles[9].petnum = PM_LITTLE_DOG;
-    roles[9].ldrnum = PM_LORD_SATO;
-    roles[9].guardnum = PM_ROSHI;
-    roles[9].neminum = PM_ASHIKAGA_TAKAUJI;
-    roles[9].enemy1num = PM_WOLF;
-    roles[9].enemy2num = PM_STALKER;
-    roles[9].enemy1sym = S_DOG;
-    roles[9].enemy2sym = S_ELEMENTAL;
-    roles[9].questarti = ART_TSURUGI_OF_MURAMASA;
-    roles[9].allow = M2_HUMAN | ROLE_MALE | ROLE_FEMALE | AM_LAWFUL;
-    roles[9].attrbase[0] = 10;
-    roles[9].attrbase[1] = 8;
-    roles[9].attrbase[2] = 7;
-    roles[9].attrbase[3] = 10;
-    roles[9].attrbase[4] = 17;
-    roles[9].attrbase[5] = 6;
-    roles[9].attrdist[0] = 30;
-    roles[9].attrdist[1] = 10;
-    roles[9].attrdist[2] = 8;
-    roles[9].attrdist[3] = 30;
-    roles[9].attrdist[4] = 14;
-    roles[9].attrdist[5] = 8;
-    roles[9].hpadv.infix = 13;
-    roles[9].hpadv.inrnd = 0;
-    roles[9].hpadv.lofix = 0;
-    roles[9].hpadv.lornd = 8;
-    roles[9].hpadv.hifix = 1;
-    roles[9].hpadv.hirnd = 0;
-    roles[9].enadv.infix = 1;
-    roles[9].enadv.inrnd = 0;
-    roles[9].enadv.lofix = 0;
-    roles[9].enadv.lornd = 1;
-    roles[9].enadv.hifix = 0;
-    roles[9].enadv.hirnd = 1;
-    roles[9].xlev = 11;
-    roles[9].initrecord = 10;
-    roles[9].spelbase = 10;
-    roles[9].spelheal = 0;
-    roles[9].spelshld = 0;
-    roles[9].spelarmr = 8;
-    roles[9].spelstat = A_INT;
-    roles[9].spelspec = SPE_CLAIRVOYANCE;
-    roles[9].spelsbon = -4;
-    roles[10].name.m = $c.lit("Tourist");
-    roles[10].name.f = null;
-    roles[10].rank[0].m = $c.lit("Rambler");
-    roles[10].rank[0].f = null;
-    roles[10].rank[1].m = $c.lit("Sightseer");
-    roles[10].rank[1].f = null;
-    roles[10].rank[2].m = $c.lit("Excursionist");
-    roles[10].rank[2].f = null;
-    roles[10].rank[3].m = $c.lit("Peregrinator");
-    roles[10].rank[3].f = $c.lit("Peregrinatrix");
-    roles[10].rank[4].m = $c.lit("Traveler");
-    roles[10].rank[4].f = null;
-    roles[10].rank[5].m = $c.lit("Journeyer");
-    roles[10].rank[5].f = null;
-    roles[10].rank[6].m = $c.lit("Voyager");
-    roles[10].rank[6].f = null;
-    roles[10].rank[7].m = $c.lit("Explorer");
-    roles[10].rank[7].f = null;
-    roles[10].rank[8].m = $c.lit("Adventurer");
-    roles[10].rank[8].f = null;
-    roles[10].lgod = $c.lit("Blind Io");
-    roles[10].ngod = $c.lit("_The Lady");
-    roles[10].cgod = $c.lit("Offler");
-    roles[10].filecode = $c.lit("Tou");
-    roles[10].homebase = $c.lit("Ankh-Morpork");
-    roles[10].intermed = $c.lit("the Thieves' Guild Hall");
-    roles[10].mnum = PM_TOURIST;
-    roles[10].petnum = NON_PM;
-    roles[10].ldrnum = PM_TWOFLOWER;
-    roles[10].guardnum = PM_GUIDE;
-    roles[10].neminum = PM_MASTER_OF_THIEVES;
-    roles[10].enemy1num = PM_GIANT_SPIDER;
-    roles[10].enemy2num = PM_FOREST_CENTAUR;
-    roles[10].enemy1sym = S_SPIDER;
-    roles[10].enemy2sym = S_CENTAUR;
-    roles[10].questarti = ART_YENDORIAN_EXPRESS_CARD;
-    roles[10].allow = M2_HUMAN | ROLE_MALE | ROLE_FEMALE | AM_NEUTRAL;
-    roles[10].attrbase[0] = 7;
-    roles[10].attrbase[1] = 10;
-    roles[10].attrbase[2] = 6;
-    roles[10].attrbase[3] = 7;
-    roles[10].attrbase[4] = 7;
-    roles[10].attrbase[5] = 10;
-    roles[10].attrdist[0] = 15;
-    roles[10].attrdist[1] = 10;
-    roles[10].attrdist[2] = 10;
-    roles[10].attrdist[3] = 15;
-    roles[10].attrdist[4] = 30;
-    roles[10].attrdist[5] = 20;
-    roles[10].hpadv.infix = 8;
-    roles[10].hpadv.inrnd = 0;
-    roles[10].hpadv.lofix = 0;
-    roles[10].hpadv.lornd = 8;
-    roles[10].hpadv.hifix = 0;
-    roles[10].hpadv.hirnd = 0;
-    roles[10].enadv.infix = 1;
-    roles[10].enadv.inrnd = 0;
-    roles[10].enadv.lofix = 0;
-    roles[10].enadv.lornd = 1;
-    roles[10].enadv.hifix = 0;
-    roles[10].enadv.hirnd = 1;
-    roles[10].xlev = 14;
-    roles[10].initrecord = 0;
-    roles[10].spelbase = 5;
-    roles[10].spelheal = 1;
-    roles[10].spelshld = 2;
-    roles[10].spelarmr = 10;
-    roles[10].spelstat = A_INT;
-    roles[10].spelspec = SPE_CHARM_MONSTER;
-    roles[10].spelsbon = -4;
-    roles[11].name.m = $c.lit("Valkyrie");
-    roles[11].name.f = null;
-    roles[11].rank[0].m = $c.lit("Stripling");
-    roles[11].rank[0].f = null;
-    roles[11].rank[1].m = $c.lit("Skirmisher");
-    roles[11].rank[1].f = null;
-    roles[11].rank[2].m = $c.lit("Fighter");
-    roles[11].rank[2].f = null;
-    roles[11].rank[3].m = $c.lit("Man-at-arms");
-    roles[11].rank[3].f = $c.lit("Woman-at-arms");
-    roles[11].rank[4].m = $c.lit("Warrior");
-    roles[11].rank[4].f = null;
-    roles[11].rank[5].m = $c.lit("Swashbuckler");
-    roles[11].rank[5].f = null;
-    roles[11].rank[6].m = $c.lit("Hero");
-    roles[11].rank[6].f = $c.lit("Heroine");
-    roles[11].rank[7].m = $c.lit("Champion");
-    roles[11].rank[7].f = null;
-    roles[11].rank[8].m = $c.lit("Lord");
-    roles[11].rank[8].f = $c.lit("Lady");
-    roles[11].lgod = $c.lit("Tyr");
-    roles[11].ngod = $c.lit("Odin");
-    roles[11].cgod = $c.lit("Loki");
-    roles[11].filecode = $c.lit("Val");
-    roles[11].homebase = $c.lit("the Shrine of Destiny");
-    roles[11].intermed = $c.lit("the cave of Surtur");
-    roles[11].mnum = PM_VALKYRIE;
-    roles[11].petnum = NON_PM;
-    roles[11].ldrnum = PM_NORN;
-    roles[11].guardnum = PM_WARRIOR;
-    roles[11].neminum = PM_LORD_SURTUR;
-    roles[11].enemy1num = PM_FIRE_ANT;
-    roles[11].enemy2num = PM_FIRE_GIANT;
-    roles[11].enemy1sym = S_ANT;
-    roles[11].enemy2sym = S_GIANT;
-    roles[11].questarti = ART_ORB_OF_FATE;
-    roles[11].allow = M2_HUMAN | M2_DWARF | ROLE_FEMALE | AM_LAWFUL | AM_NEUTRAL;
-    roles[11].attrbase[0] = 10;
-    roles[11].attrbase[1] = 7;
-    roles[11].attrbase[2] = 7;
-    roles[11].attrbase[3] = 7;
-    roles[11].attrbase[4] = 10;
-    roles[11].attrbase[5] = 7;
-    roles[11].attrdist[0] = 30;
-    roles[11].attrdist[1] = 6;
-    roles[11].attrdist[2] = 7;
-    roles[11].attrdist[3] = 20;
-    roles[11].attrdist[4] = 30;
-    roles[11].attrdist[5] = 7;
-    roles[11].hpadv.infix = 14;
-    roles[11].hpadv.inrnd = 0;
-    roles[11].hpadv.lofix = 0;
-    roles[11].hpadv.lornd = 8;
-    roles[11].hpadv.hifix = 2;
-    roles[11].hpadv.hirnd = 0;
-    roles[11].enadv.infix = 1;
-    roles[11].enadv.inrnd = 0;
-    roles[11].enadv.lofix = 0;
-    roles[11].enadv.lornd = 1;
-    roles[11].enadv.hifix = 0;
-    roles[11].enadv.hirnd = 1;
-    roles[11].xlev = 10;
-    roles[11].initrecord = 0;
-    roles[11].spelbase = 10;
-    roles[11].spelheal = -2;
-    roles[11].spelshld = 0;
-    roles[11].spelarmr = 9;
-    roles[11].spelstat = A_WIS;
-    roles[11].spelspec = SPE_CONE_OF_COLD;
-    roles[11].spelsbon = -4;
-    roles[12].name.m = $c.lit("Wizard");
-    roles[12].name.f = null;
-    roles[12].rank[0].m = $c.lit("Evoker");
-    roles[12].rank[0].f = null;
-    roles[12].rank[1].m = $c.lit("Conjurer");
-    roles[12].rank[1].f = null;
-    roles[12].rank[2].m = $c.lit("Thaumaturge");
-    roles[12].rank[2].f = null;
-    roles[12].rank[3].m = $c.lit("Magician");
-    roles[12].rank[3].f = null;
-    roles[12].rank[4].m = $c.lit("Enchanter");
-    roles[12].rank[4].f = $c.lit("Enchantress");
-    roles[12].rank[5].m = $c.lit("Sorcerer");
-    roles[12].rank[5].f = $c.lit("Sorceress");
-    roles[12].rank[6].m = $c.lit("Necromancer");
-    roles[12].rank[6].f = null;
-    roles[12].rank[7].m = $c.lit("Wizard");
-    roles[12].rank[7].f = null;
-    roles[12].rank[8].m = $c.lit("Mage");
-    roles[12].rank[8].f = null;
-    roles[12].lgod = $c.lit("Ptah");
-    roles[12].ngod = $c.lit("Thoth");
-    roles[12].cgod = $c.lit("Anhur");
-    roles[12].filecode = $c.lit("Wiz");
-    roles[12].homebase = $c.lit("the Lonely Tower");
-    roles[12].intermed = $c.lit("the Tower of Darkness");
-    roles[12].mnum = PM_WIZARD;
-    roles[12].petnum = PM_KITTEN;
-    roles[12].ldrnum = PM_NEFERET_THE_GREEN;
-    roles[12].guardnum = PM_APPRENTICE;
-    roles[12].neminum = PM_DARK_ONE;
-    roles[12].enemy1num = PM_VAMPIRE_BAT;
-    roles[12].enemy2num = PM_XORN;
-    roles[12].enemy1sym = S_BAT;
-    roles[12].enemy2sym = S_WRAITH;
-    roles[12].questarti = ART_EYE_OF_THE_AETHIOPICA;
-    roles[12].allow = M2_HUMAN | M2_ELF | M2_GNOME | M2_ORC | ROLE_MALE | ROLE_FEMALE | AM_NEUTRAL | AM_CHAOTIC;
-    roles[12].attrbase[0] = 7;
-    roles[12].attrbase[1] = 10;
-    roles[12].attrbase[2] = 7;
-    roles[12].attrbase[3] = 7;
-    roles[12].attrbase[4] = 7;
-    roles[12].attrbase[5] = 7;
-    roles[12].attrdist[0] = 10;
-    roles[12].attrdist[1] = 30;
-    roles[12].attrdist[2] = 10;
-    roles[12].attrdist[3] = 20;
-    roles[12].attrdist[4] = 20;
-    roles[12].attrdist[5] = 10;
-    roles[12].hpadv.infix = 10;
-    roles[12].hpadv.inrnd = 0;
-    roles[12].hpadv.lofix = 0;
-    roles[12].hpadv.lornd = 8;
-    roles[12].hpadv.hifix = 1;
-    roles[12].hpadv.hirnd = 0;
-    roles[12].enadv.infix = 4;
-    roles[12].enadv.inrnd = 3;
-    roles[12].enadv.lofix = 0;
-    roles[12].enadv.lornd = 2;
-    roles[12].enadv.hifix = 0;
-    roles[12].enadv.hirnd = 3;
-    roles[12].xlev = 12;
-    roles[12].initrecord = 0;
-    roles[12].spelbase = 1;
-    roles[12].spelheal = 0;
-    roles[12].spelshld = 3;
-    roles[12].spelarmr = 10;
-    roles[12].spelstat = A_INT;
-    roles[12].spelspec = SPE_MAGIC_MISSILE;
-    roles[12].spelsbon = -4;
-    roles[13].name.m = null;
-    roles[13].name.f = null;
-    roles[13].rank[0].m = null;
-    roles[13].rank[0].f = null;
-    roles[13].lgod = null;
-    roles[13].ngod = null;
-    roles[13].cgod = null;
-    roles[13].filecode = null;
-    roles[13].homebase = null;
-    roles[13].intermed = null;
-    roles[13].mnum = NON_PM;
-    roles[13].petnum = NON_PM;
-    roles[13].ldrnum = NON_PM;
-    roles[13].guardnum = NON_PM;
-    roles[13].neminum = NON_PM;
-    roles[13].enemy1num = NON_PM;
-    roles[13].enemy2num = NON_PM;
-    roles[13].enemy1sym = 0;
-    roles[13].enemy2sym = 0;
-    roles[13].questarti = STRANGE_OBJECT;
-    roles[13].allow = 0;
-    roles[13].attrbase[0] = 0;
-    roles[13].attrdist[0] = 0;
-    roles[13].hpadv.infix = 0;
-    roles[13].enadv.infix = 0;
-    roles[13].xlev = 0;
-    roles[13].initrecord = 0;
-    roles[13].spelbase = 0;
-    roles[13].spelheal = 0;
-    roles[13].spelshld = 0;
-    roles[13].spelarmr = 0;
-    roles[13].spelstat = 0;
-    roles[13].spelspec = 0;
-    roles[13].spelsbon = 0;
+    $c.init(roles, [
+        { name: { m: $c.lit("Archeologist"), f: null },
+          rank: [{ m: $c.lit("Digger"), f: null },
+          { m: $c.lit("Field Worker"), f: null },
+          { m: $c.lit("Investigator"), f: null },
+          { m: $c.lit("Exhumer"), f: null },
+          { m: $c.lit("Excavator"), f: null },
+          { m: $c.lit("Spelunker"), f: null },
+          { m: $c.lit("Speleologist"), f: null },
+          { m: $c.lit("Collector"), f: null },
+          { m: $c.lit("Curator"), f: null }],
+          lgod: $c.lit("Quetzalcoatl"), ngod: $c.lit("Camaxtli"), cgod: $c.lit("Huhetotl"),
+          filecode: $c.lit("Arc"),
+          homebase: $c.lit("the College of Archeology"),
+          intermed: $c.lit("the Tomb of the Toltec Kings"),
+          mnum: PM_ARCHEOLOGIST,
+          petnum: NON_PM,
+          ldrnum: PM_LORD_CARNARVON,
+          guardnum: PM_STUDENT,
+          neminum: PM_MINION_OF_HUHETOTL,
+          enemy1num: NON_PM,
+          enemy2num: PM_HUMAN_MUMMY,
+          enemy1sym: S_SNAKE,
+          enemy2sym: S_MUMMY,
+          questarti: ART_ORB_OF_DETECTION, allow: M2_HUMAN | M2_DWARF | M2_GNOME | ROLE_MALE | ROLE_FEMALE | AM_LAWFUL | AM_NEUTRAL,
+          attrbase: [7, 10, 10, 7, 7, 7],
+          attrdist: [20, 20, 20, 10, 20, 10],
+          hpadv: { infix: 11, inrnd: 0, lofix: 0, lornd: 8, hifix: 1, hirnd: 0 },
+          enadv: { infix: 1, inrnd: 0, lofix: 0, lornd: 1, hifix: 0, hirnd: 1 },
+          xlev: 14,
+          initrecord: 10,
+          spelbase: 5,
+          spelheal: 0,
+          spelshld: 2,
+          spelarmr: 10,
+          spelstat: A_INT,
+          spelspec: SPE_MAGIC_MAPPING,
+          spelsbon: -4 },
+        { name: { m: $c.lit("Barbarian"), f: null },
+          rank: [{ m: $c.lit("Plunderer"), f: $c.lit("Plunderess") },
+          { m: $c.lit("Pillager"), f: null },
+          { m: $c.lit("Bandit"), f: null },
+          { m: $c.lit("Brigand"), f: null },
+          { m: $c.lit("Raider"), f: null },
+          { m: $c.lit("Reaver"), f: null },
+          { m: $c.lit("Slayer"), f: null },
+          { m: $c.lit("Chieftain"), f: $c.lit("Chieftainess") },
+          { m: $c.lit("Conqueror"), f: $c.lit("Conqueress") }],
+          lgod: $c.lit("Mitra"), ngod: $c.lit("Crom"), cgod: $c.lit("Set"),
+          filecode: $c.lit("Bar"),
+          homebase: $c.lit("the Camp of the Duali Tribe"),
+          intermed: $c.lit("the Duali Oasis"),
+          mnum: PM_BARBARIAN,
+          petnum: NON_PM,
+          ldrnum: PM_PELIAS,
+          guardnum: PM_CHIEFTAIN,
+          neminum: PM_THOTH_AMON,
+          enemy1num: PM_OGRE,
+          enemy2num: PM_TROLL,
+          enemy1sym: S_OGRE,
+          enemy2sym: S_TROLL,
+          questarti: ART_HEART_OF_AHRIMAN, allow: M2_HUMAN | M2_ORC | ROLE_MALE | ROLE_FEMALE | AM_NEUTRAL | AM_CHAOTIC,
+          attrbase: [16, 7, 7, 15, 16, 6],
+          attrdist: [30, 6, 7, 20, 30, 7],
+          hpadv: { infix: 14, inrnd: 0, lofix: 0, lornd: 10, hifix: 2, hirnd: 0 },
+          enadv: { infix: 1, inrnd: 0, lofix: 0, lornd: 1, hifix: 0, hirnd: 1 },
+          xlev: 10,
+          initrecord: 10,
+          spelbase: 14,
+          spelheal: 0,
+          spelshld: 0,
+          spelarmr: 8,
+          spelstat: A_INT,
+          spelspec: SPE_HASTE_SELF,
+          spelsbon: -4 },
+        { name: { m: $c.lit("Caveman"), f: $c.lit("Cavewoman") },
+          rank: [{ m: $c.lit("Troglodyte"), f: null },
+          { m: $c.lit("Aborigine"), f: null },
+          { m: $c.lit("Wanderer"), f: null },
+          { m: $c.lit("Vagrant"), f: null },
+          { m: $c.lit("Wayfarer"), f: null },
+          { m: $c.lit("Roamer"), f: null },
+          { m: $c.lit("Nomad"), f: null },
+          { m: $c.lit("Rover"), f: null },
+          { m: $c.lit("Pioneer"), f: null }],
+          lgod: $c.lit("Anu"), ngod: $c.lit("_Ishtar"), cgod: $c.lit("Anshar"),
+          filecode: $c.lit("Cav"),
+          homebase: $c.lit("the Caves of the Ancestors"),
+          intermed: $c.lit("the Dragon's Lair"),
+          mnum: PM_CAVE_DWELLER,
+          petnum: PM_LITTLE_DOG,
+          ldrnum: PM_SHAMAN_KARNOV,
+          guardnum: PM_NEANDERTHAL,
+          neminum: PM_CHROMATIC_DRAGON,
+          enemy1num: PM_BUGBEAR,
+          enemy2num: PM_HILL_GIANT,
+          enemy1sym: S_HUMANOID,
+          enemy2sym: S_GIANT,
+          questarti: ART_SCEPTRE_OF_MIGHT, allow: M2_HUMAN | M2_DWARF | M2_GNOME | ROLE_MALE | ROLE_FEMALE | AM_LAWFUL | AM_NEUTRAL,
+          attrbase: [10, 7, 7, 7, 8, 6],
+          attrdist: [30, 6, 7, 20, 30, 7],
+          hpadv: { infix: 14, inrnd: 0, lofix: 0, lornd: 8, hifix: 2, hirnd: 0 },
+          enadv: { infix: 1, inrnd: 0, lofix: 0, lornd: 1, hifix: 0, hirnd: 1 },
+          xlev: 10,
+          initrecord: 0,
+          spelbase: 12,
+          spelheal: 0,
+          spelshld: 1,
+          spelarmr: 8,
+          spelstat: A_INT,
+          spelspec: SPE_DIG,
+          spelsbon: -4 },
+        { name: { m: $c.lit("Healer"), f: null },
+          rank: [{ m: $c.lit("Rhizotomist"), f: null },
+          { m: $c.lit("Empiric"), f: null },
+          { m: $c.lit("Embalmer"), f: null },
+          { m: $c.lit("Dresser"), f: null },
+          { m: $c.lit("Medicus ossium"), f: $c.lit("Medica ossium") },
+          { m: $c.lit("Herbalist"), f: null },
+          { m: $c.lit("Magister"), f: $c.lit("Magistra") },
+          { m: $c.lit("Physician"), f: null },
+          { m: $c.lit("Chirurgeon"), f: null }],
+          lgod: $c.lit("_Athena"), ngod: $c.lit("Hermes"), cgod: $c.lit("Poseidon"),
+          filecode: $c.lit("Hea"),
+          homebase: $c.lit("the Temple of Epidaurus"),
+          intermed: $c.lit("the Temple of Coeus"),
+          mnum: PM_HEALER,
+          petnum: NON_PM,
+          ldrnum: PM_HIPPOCRATES,
+          guardnum: PM_ATTENDANT,
+          neminum: PM_CYCLOPS,
+          enemy1num: PM_GIANT_RAT,
+          enemy2num: PM_SNAKE,
+          enemy1sym: S_RODENT,
+          enemy2sym: S_YETI,
+          questarti: ART_STAFF_OF_AESCULAPIUS, allow: M2_HUMAN | M2_GNOME | ROLE_MALE | ROLE_FEMALE | AM_NEUTRAL,
+          attrbase: [7, 7, 13, 7, 11, 16],
+          attrdist: [15, 20, 20, 15, 25, 5],
+          hpadv: { infix: 11, inrnd: 0, lofix: 0, lornd: 8, hifix: 1, hirnd: 0 },
+          enadv: { infix: 1, inrnd: 4, lofix: 0, lornd: 1, hifix: 0, hirnd: 2 },
+          xlev: 20,
+          initrecord: 10,
+          spelbase: 3,
+          spelheal: -3,
+          spelshld: 2,
+          spelarmr: 10,
+          spelstat: A_WIS,
+          spelspec: SPE_CURE_SICKNESS,
+          spelsbon: -4 },
+        { name: { m: $c.lit("Knight"), f: null },
+          rank: [{ m: $c.lit("Gallant"), f: null },
+          { m: $c.lit("Esquire"), f: null },
+          { m: $c.lit("Bachelor"), f: null },
+          { m: $c.lit("Sergeant"), f: null },
+          { m: $c.lit("Knight"), f: null },
+          { m: $c.lit("Banneret"), f: null },
+          { m: $c.lit("Chevalier"), f: $c.lit("Chevaliere") },
+          { m: $c.lit("Seignieur"), f: $c.lit("Dame") },
+          { m: $c.lit("Paladin"), f: null }],
+          lgod: $c.lit("Lugh"), ngod: $c.lit("_Brigit"), cgod: $c.lit("Manannan Mac Lir"),
+          filecode: $c.lit("Kni"),
+          homebase: $c.lit("Camelot Castle"),
+          intermed: $c.lit("the Isle of Glass"),
+          mnum: PM_KNIGHT,
+          petnum: PM_PONY,
+          ldrnum: PM_KING_ARTHUR,
+          guardnum: PM_PAGE,
+          neminum: PM_IXOTH,
+          enemy1num: PM_QUASIT,
+          enemy2num: PM_OCHRE_JELLY,
+          enemy1sym: S_IMP,
+          enemy2sym: S_JELLY,
+          questarti: ART_MAGIC_MIRROR_OF_MERLIN, allow: M2_HUMAN | ROLE_MALE | ROLE_FEMALE | AM_LAWFUL,
+          attrbase: [13, 7, 14, 8, 10, 17],
+          attrdist: [30, 15, 15, 10, 20, 10],
+          hpadv: { infix: 14, inrnd: 0, lofix: 0, lornd: 8, hifix: 2, hirnd: 0 },
+          enadv: { infix: 1, inrnd: 4, lofix: 0, lornd: 1, hifix: 0, hirnd: 2 },
+          xlev: 10,
+          initrecord: 10,
+          spelbase: 8,
+          spelheal: -2,
+          spelshld: 0,
+          spelarmr: 9,
+          spelstat: A_WIS,
+          spelspec: SPE_TURN_UNDEAD,
+          spelsbon: -4 },
+        { name: { m: $c.lit("Monk"), f: null },
+          rank: [{ m: $c.lit("Candidate"), f: null },
+          { m: $c.lit("Novice"), f: null },
+          { m: $c.lit("Initiate"), f: null },
+          { m: $c.lit("Student of Stones"), f: null },
+          { m: $c.lit("Student of Waters"), f: null },
+          { m: $c.lit("Student of Metals"), f: null },
+          { m: $c.lit("Student of Winds"), f: null },
+          { m: $c.lit("Student of Fire"), f: null },
+          { m: $c.lit("Master"), f: null }],
+          lgod: $c.lit("Shan Lai Ching"), ngod: $c.lit("Chih Sung-tzu"), cgod: $c.lit("Huan Ti"),
+          filecode: $c.lit("Mon"),
+          homebase: $c.lit("the Monastery of Chan-Sune"),
+          intermed: $c.lit("the Monastery of the Earth-Lord"),
+          mnum: PM_MONK,
+          petnum: NON_PM,
+          ldrnum: PM_GRAND_MASTER,
+          guardnum: PM_ABBOT,
+          neminum: PM_MASTER_KAEN,
+          enemy1num: PM_EARTH_ELEMENTAL,
+          enemy2num: PM_XORN,
+          enemy1sym: S_ELEMENTAL,
+          enemy2sym: S_XORN,
+          questarti: ART_EYES_OF_THE_OVERWORLD, allow: M2_HUMAN | ROLE_MALE | ROLE_FEMALE | AM_LAWFUL | AM_NEUTRAL | AM_CHAOTIC,
+          attrbase: [10, 7, 8, 8, 7, 7],
+          attrdist: [25, 10, 20, 20, 15, 10],
+          hpadv: { infix: 12, inrnd: 0, lofix: 0, lornd: 8, hifix: 1, hirnd: 0 },
+          enadv: { infix: 2, inrnd: 2, lofix: 0, lornd: 2, hifix: 0, hirnd: 2 },
+          xlev: 10,
+          initrecord: 10,
+          spelbase: 8,
+          spelheal: -2,
+          spelshld: 2,
+          spelarmr: 20,
+          spelstat: A_WIS,
+          spelspec: SPE_RESTORE_ABILITY,
+          spelsbon: -4 },
+        { name: { m: $c.lit("Priest"), f: $c.lit("Priestess") },
+          rank: [{ m: $c.lit("Aspirant"), f: null },
+          { m: $c.lit("Acolyte"), f: null },
+          { m: $c.lit("Adept"), f: null },
+          { m: $c.lit("Priest"), f: $c.lit("Priestess") },
+          { m: $c.lit("Curate"), f: null },
+          { m: $c.lit("Canon"), f: $c.lit("Canoness") },
+          { m: $c.lit("Lama"), f: null },
+          { m: $c.lit("Patriarch"), f: $c.lit("Matriarch") },
+          { m: $c.lit("High Priest"), f: $c.lit("High Priestess") }],
+          lgod: null, ngod: null, cgod: null,
+          filecode: $c.lit("Pri"),
+          homebase: $c.lit("the Great Temple"),
+          intermed: $c.lit("the Temple of Nalzok"),
+          mnum: PM_CLERIC,
+          petnum: NON_PM,
+          ldrnum: PM_ARCH_PRIEST,
+          guardnum: PM_ACOLYTE,
+          neminum: PM_NALZOK,
+          enemy1num: PM_HUMAN_ZOMBIE,
+          enemy2num: PM_WRAITH,
+          enemy1sym: S_ZOMBIE,
+          enemy2sym: S_WRAITH,
+          questarti: ART_MITRE_OF_HOLINESS, allow: M2_HUMAN | M2_ELF | ROLE_MALE | ROLE_FEMALE | AM_LAWFUL | AM_NEUTRAL | AM_CHAOTIC,
+          attrbase: [7, 7, 10, 7, 7, 7],
+          attrdist: [15, 10, 30, 15, 20, 10],
+          hpadv: { infix: 12, inrnd: 0, lofix: 0, lornd: 8, hifix: 1, hirnd: 0 },
+          enadv: { infix: 4, inrnd: 3, lofix: 0, lornd: 2, hifix: 0, hirnd: 2 },
+          xlev: 10,
+          initrecord: 0,
+          spelbase: 3,
+          spelheal: -2,
+          spelshld: 2,
+          spelarmr: 10,
+          spelstat: A_WIS,
+          spelspec: SPE_REMOVE_CURSE,
+          spelsbon: -4 },
+        { name: { m: $c.lit("Rogue"), f: null },
+          rank: [{ m: $c.lit("Footpad"), f: null },
+          { m: $c.lit("Cutpurse"), f: null },
+          { m: $c.lit("Rogue"), f: null },
+          { m: $c.lit("Pilferer"), f: null },
+          { m: $c.lit("Robber"), f: null },
+          { m: $c.lit("Burglar"), f: null },
+          { m: $c.lit("Filcher"), f: null },
+          { m: $c.lit("Magsman"), f: $c.lit("Magswoman") },
+          { m: $c.lit("Thief"), f: null }],
+          lgod: $c.lit("Issek"), ngod: $c.lit("Mog"), cgod: $c.lit("Kos"),
+          filecode: $c.lit("Rog"),
+          homebase: $c.lit("the Thieves' Guild Hall"),
+          intermed: $c.lit("the Assassins' Guild Hall"),
+          mnum: PM_ROGUE,
+          petnum: NON_PM,
+          ldrnum: PM_MASTER_OF_THIEVES,
+          guardnum: PM_THUG,
+          neminum: PM_MASTER_ASSASSIN,
+          enemy1num: PM_LEPRECHAUN,
+          enemy2num: PM_GUARDIAN_NAGA,
+          enemy1sym: S_NYMPH,
+          enemy2sym: S_NAGA,
+          questarti: ART_MASTER_KEY_OF_THIEVERY, allow: M2_HUMAN | M2_ORC | ROLE_MALE | ROLE_FEMALE | AM_CHAOTIC,
+          attrbase: [7, 7, 7, 10, 7, 6],
+          attrdist: [20, 10, 10, 30, 20, 10],
+          hpadv: { infix: 10, inrnd: 0, lofix: 0, lornd: 8, hifix: 1, hirnd: 0 },
+          enadv: { infix: 1, inrnd: 0, lofix: 0, lornd: 1, hifix: 0, hirnd: 1 },
+          xlev: 11,
+          initrecord: 10,
+          spelbase: 8,
+          spelheal: 0,
+          spelshld: 1,
+          spelarmr: 9,
+          spelstat: A_INT,
+          spelspec: SPE_DETECT_TREASURE,
+          spelsbon: -4 },
+        { name: { m: $c.lit("Ranger"), f: null },
+          rank: [{ m: $c.lit("Tenderfoot"), f: null },
+          { m: $c.lit("Lookout"), f: null },
+          { m: $c.lit("Trailblazer"), f: null },
+          { m: $c.lit("Reconnoiterer"), f: $c.lit("Reconnoiteress") },
+          { m: $c.lit("Scout"), f: null },
+          { m: $c.lit("Arbalester"), f: null },
+          { m: $c.lit("Archer"), f: null },
+          { m: $c.lit("Sharpshooter"), f: null },
+          { m: $c.lit("Marksman"), f: $c.lit("Markswoman") }],
+          lgod: $c.lit("Mercury"), ngod: $c.lit("_Venus"), cgod: $c.lit("Mars"),
+          filecode: $c.lit("Ran"),
+          homebase: $c.lit("Orion's camp"),
+          intermed: $c.lit("the cave of the wumpus"),
+          mnum: PM_RANGER,
+          petnum: PM_LITTLE_DOG,
+          ldrnum: PM_ORION,
+          guardnum: PM_HUNTER,
+          neminum: PM_SCORPIUS,
+          enemy1num: PM_FOREST_CENTAUR,
+          enemy2num: PM_SCORPION,
+          enemy1sym: S_CENTAUR,
+          enemy2sym: S_SPIDER,
+          questarti: ART_LONGBOW_OF_DIANA, allow: M2_HUMAN | M2_ELF | M2_GNOME | M2_ORC | ROLE_MALE | ROLE_FEMALE | AM_NEUTRAL | AM_CHAOTIC,
+          attrbase: [13, 13, 13, 9, 13, 7],
+          attrdist: [30, 10, 10, 20, 20, 10],
+          hpadv: { infix: 13, inrnd: 0, lofix: 0, lornd: 6, hifix: 1, hirnd: 0 },
+          enadv: { infix: 1, inrnd: 0, lofix: 0, lornd: 1, hifix: 0, hirnd: 1 },
+          xlev: 12,
+          initrecord: 10,
+          spelbase: 9,
+          spelheal: 2,
+          spelshld: 1,
+          spelarmr: 10,
+          spelstat: A_INT,
+          spelspec: SPE_INVISIBILITY,
+          spelsbon: -4 },
+        { name: { m: $c.lit("Samurai"), f: null },
+          rank: [{ m: $c.lit("Hatamoto"), f: null },
+          { m: $c.lit("Ronin"), f: null },
+          { m: $c.lit("Ninja"), f: $c.lit("Kunoichi") },
+          { m: $c.lit("Joshu"), f: null },
+          { m: $c.lit("Ryoshu"), f: null },
+          { m: $c.lit("Kokushu"), f: null },
+          { m: $c.lit("Daimyo"), f: null },
+          { m: $c.lit("Kuge"), f: null },
+          { m: $c.lit("Shogun"), f: null }],
+          lgod: $c.lit("_Amaterasu Omikami"), ngod: $c.lit("Raijin"), cgod: $c.lit("Susanowo"),
+          filecode: $c.lit("Sam"),
+          homebase: $c.lit("the Castle of the Taro Clan"),
+          intermed: $c.lit("the Shogun's Castle"),
+          mnum: PM_SAMURAI,
+          petnum: PM_LITTLE_DOG,
+          ldrnum: PM_LORD_SATO,
+          guardnum: PM_ROSHI,
+          neminum: PM_ASHIKAGA_TAKAUJI,
+          enemy1num: PM_WOLF,
+          enemy2num: PM_STALKER,
+          enemy1sym: S_DOG,
+          enemy2sym: S_ELEMENTAL,
+          questarti: ART_TSURUGI_OF_MURAMASA, allow: M2_HUMAN | ROLE_MALE | ROLE_FEMALE | AM_LAWFUL,
+          attrbase: [10, 8, 7, 10, 17, 6],
+          attrdist: [30, 10, 8, 30, 14, 8],
+          hpadv: { infix: 13, inrnd: 0, lofix: 0, lornd: 8, hifix: 1, hirnd: 0 },
+          enadv: { infix: 1, inrnd: 0, lofix: 0, lornd: 1, hifix: 0, hirnd: 1 },
+          xlev: 11,
+          initrecord: 10,
+          spelbase: 10,
+          spelheal: 0,
+          spelshld: 0,
+          spelarmr: 8,
+          spelstat: A_INT,
+          spelspec: SPE_CLAIRVOYANCE,
+          spelsbon: -4 },
+        { name: { m: $c.lit("Tourist"), f: null },
+          rank: [{ m: $c.lit("Rambler"), f: null },
+          { m: $c.lit("Sightseer"), f: null },
+          { m: $c.lit("Excursionist"), f: null },
+          { m: $c.lit("Peregrinator"), f: $c.lit("Peregrinatrix") },
+          { m: $c.lit("Traveler"), f: null },
+          { m: $c.lit("Journeyer"), f: null },
+          { m: $c.lit("Voyager"), f: null },
+          { m: $c.lit("Explorer"), f: null },
+          { m: $c.lit("Adventurer"), f: null }],
+          lgod: $c.lit("Blind Io"), ngod: $c.lit("_The Lady"), cgod: $c.lit("Offler"),
+          filecode: $c.lit("Tou"),
+          homebase: $c.lit("Ankh-Morpork"),
+          intermed: $c.lit("the Thieves' Guild Hall"),
+          mnum: PM_TOURIST,
+          petnum: NON_PM,
+          ldrnum: PM_TWOFLOWER,
+          guardnum: PM_GUIDE,
+          neminum: PM_MASTER_OF_THIEVES,
+          enemy1num: PM_GIANT_SPIDER,
+          enemy2num: PM_FOREST_CENTAUR,
+          enemy1sym: S_SPIDER,
+          enemy2sym: S_CENTAUR,
+          questarti: ART_YENDORIAN_EXPRESS_CARD, allow: M2_HUMAN | ROLE_MALE | ROLE_FEMALE | AM_NEUTRAL,
+          attrbase: [7, 10, 6, 7, 7, 10],
+          attrdist: [15, 10, 10, 15, 30, 20],
+          hpadv: { infix: 8, inrnd: 0, lofix: 0, lornd: 8, hifix: 0, hirnd: 0 },
+          enadv: { infix: 1, inrnd: 0, lofix: 0, lornd: 1, hifix: 0, hirnd: 1 },
+          xlev: 14,
+          initrecord: 0,
+          spelbase: 5,
+          spelheal: 1,
+          spelshld: 2,
+          spelarmr: 10,
+          spelstat: A_INT,
+          spelspec: SPE_CHARM_MONSTER,
+          spelsbon: -4 },
+        { name: { m: $c.lit("Valkyrie"), f: null },
+          rank: [{ m: $c.lit("Stripling"), f: null },
+          { m: $c.lit("Skirmisher"), f: null },
+          { m: $c.lit("Fighter"), f: null },
+          { m: $c.lit("Man-at-arms"), f: $c.lit("Woman-at-arms") },
+          { m: $c.lit("Warrior"), f: null },
+          { m: $c.lit("Swashbuckler"), f: null },
+          { m: $c.lit("Hero"), f: $c.lit("Heroine") },
+          { m: $c.lit("Champion"), f: null },
+          { m: $c.lit("Lord"), f: $c.lit("Lady") }],
+          lgod: $c.lit("Tyr"), ngod: $c.lit("Odin"), cgod: $c.lit("Loki"),
+          filecode: $c.lit("Val"),
+          homebase: $c.lit("the Shrine of Destiny"),
+          intermed: $c.lit("the cave of Surtur"),
+          mnum: PM_VALKYRIE,
+          petnum: NON_PM,
+          ldrnum: PM_NORN,
+          guardnum: PM_WARRIOR,
+          neminum: PM_LORD_SURTUR,
+          enemy1num: PM_FIRE_ANT,
+          enemy2num: PM_FIRE_GIANT,
+          enemy1sym: S_ANT,
+          enemy2sym: S_GIANT,
+          questarti: ART_ORB_OF_FATE, allow: M2_HUMAN | M2_DWARF | ROLE_FEMALE | AM_LAWFUL | AM_NEUTRAL,
+          attrbase: [10, 7, 7, 7, 10, 7],
+          attrdist: [30, 6, 7, 20, 30, 7],
+          hpadv: { infix: 14, inrnd: 0, lofix: 0, lornd: 8, hifix: 2, hirnd: 0 },
+          enadv: { infix: 1, inrnd: 0, lofix: 0, lornd: 1, hifix: 0, hirnd: 1 },
+          xlev: 10,
+          initrecord: 0,
+          spelbase: 10,
+          spelheal: -2,
+          spelshld: 0,
+          spelarmr: 9,
+          spelstat: A_WIS,
+          spelspec: SPE_CONE_OF_COLD,
+          spelsbon: -4 },
+        { name: { m: $c.lit("Wizard"), f: null },
+          rank: [{ m: $c.lit("Evoker"), f: null },
+          { m: $c.lit("Conjurer"), f: null },
+          { m: $c.lit("Thaumaturge"), f: null },
+          { m: $c.lit("Magician"), f: null },
+          { m: $c.lit("Enchanter"), f: $c.lit("Enchantress") },
+          { m: $c.lit("Sorcerer"), f: $c.lit("Sorceress") },
+          { m: $c.lit("Necromancer"), f: null },
+          { m: $c.lit("Wizard"), f: null },
+          { m: $c.lit("Mage"), f: null }],
+          lgod: $c.lit("Ptah"), ngod: $c.lit("Thoth"), cgod: $c.lit("Anhur"),
+          filecode: $c.lit("Wiz"),
+          homebase: $c.lit("the Lonely Tower"),
+          intermed: $c.lit("the Tower of Darkness"),
+          mnum: PM_WIZARD,
+          petnum: PM_KITTEN,
+          ldrnum: PM_NEFERET_THE_GREEN,
+          guardnum: PM_APPRENTICE,
+          neminum: PM_DARK_ONE,
+          enemy1num: PM_VAMPIRE_BAT,
+          enemy2num: PM_XORN,
+          enemy1sym: S_BAT,
+          enemy2sym: S_WRAITH,
+          questarti: ART_EYE_OF_THE_AETHIOPICA, allow: M2_HUMAN | M2_ELF | M2_GNOME | M2_ORC | ROLE_MALE | ROLE_FEMALE | AM_NEUTRAL | AM_CHAOTIC,
+          attrbase: [7, 10, 7, 7, 7, 7],
+          attrdist: [10, 30, 10, 20, 20, 10],
+          hpadv: { infix: 10, inrnd: 0, lofix: 0, lornd: 8, hifix: 1, hirnd: 0 },
+          enadv: { infix: 4, inrnd: 3, lofix: 0, lornd: 2, hifix: 0, hirnd: 3 },
+          xlev: 12,
+          initrecord: 0,
+          spelbase: 1,
+          spelheal: 0,
+          spelshld: 3,
+          spelarmr: 10,
+          spelstat: A_INT,
+          spelspec: SPE_MAGIC_MISSILE,
+          spelsbon: -4 },
+        { name: {}, rank: [], lgod: null, ngod: null, cgod: null, filecode: null, homebase: null, intermed: null, mnum: NON_PM, petnum: NON_PM, ldrnum: NON_PM,
+          guardnum: NON_PM, neminum: NON_PM, enemy1num: NON_PM, enemy2num: NON_PM, enemy1sym: 0, enemy2sym: 0, questarti: STRANGE_OBJECT, allow: 0, attrbase:
+          [], attrdist: [], hpadv: {}, enadv: {}, xlev: 0, initrecord: 0, spelbase: 0, spelheal: 0, spelshld: 0, spelarmr: 0, spelstat: 0, spelspec: 0,
+          spelsbon: 0 }
+    ]);
     for (let $i0 = 0; $i0 < 6; $i0++) {
         races[$i0].$copyFrom(new $T.Race());
     }
-    races[0].noun = $c.lit("human");
-    races[0].adj = $c.lit("human");
-    races[0].coll = $c.lit("humanity");
-    races[0].filecode = $c.lit("Hum");
-    races[0].individual.m = $c.lit("man");
-    races[0].individual.f = $c.lit("woman");
-    races[0].mnum = PM_HUMAN;
-    races[0].mummynum = PM_HUMAN_MUMMY;
-    races[0].zombienum = PM_HUMAN_ZOMBIE;
-    races[0].allow = M2_HUMAN | ROLE_MALE | ROLE_FEMALE | AM_LAWFUL | AM_NEUTRAL | AM_CHAOTIC;
-    races[0].selfmask = M2_HUMAN;
-    races[0].lovemask = 0;
-    races[0].hatemask = M2_GNOME | M2_ORC;
-    races[0].attrmin[0] = 3;
-    races[0].attrmin[1] = 3;
-    races[0].attrmin[2] = 3;
-    races[0].attrmin[3] = 3;
-    races[0].attrmin[4] = 3;
-    races[0].attrmin[5] = 3;
-    races[0].attrmax[0] = 118;
-    races[0].attrmax[1] = 18;
-    races[0].attrmax[2] = 18;
-    races[0].attrmax[3] = 18;
-    races[0].attrmax[4] = 18;
-    races[0].attrmax[5] = 18;
-    races[0].hpadv.infix = 2;
-    races[0].hpadv.inrnd = 0;
-    races[0].hpadv.lofix = 0;
-    races[0].hpadv.lornd = 2;
-    races[0].hpadv.hifix = 1;
-    races[0].hpadv.hirnd = 0;
-    races[0].enadv.infix = 1;
-    races[0].enadv.inrnd = 0;
-    races[0].enadv.lofix = 2;
-    races[0].enadv.lornd = 0;
-    races[0].enadv.hifix = 2;
-    races[0].enadv.hirnd = 0;
-    races[1].noun = $c.lit("elf");
-    races[1].adj = $c.lit("elven");
-    races[1].coll = $c.lit("elvenkind");
-    races[1].filecode = $c.lit("Elf");
-    races[1].individual.m = null;
-    races[1].individual.f = null;
-    races[1].mnum = PM_ELF;
-    races[1].mummynum = PM_ELF_MUMMY;
-    races[1].zombienum = PM_ELF_ZOMBIE;
-    races[1].allow = M2_ELF | ROLE_MALE | ROLE_FEMALE | AM_CHAOTIC;
-    races[1].selfmask = M2_ELF;
-    races[1].lovemask = M2_ELF;
-    races[1].hatemask = M2_ORC;
-    races[1].attrmin[0] = 3;
-    races[1].attrmin[1] = 3;
-    races[1].attrmin[2] = 3;
-    races[1].attrmin[3] = 3;
-    races[1].attrmin[4] = 3;
-    races[1].attrmin[5] = 3;
-    races[1].attrmax[0] = 18;
-    races[1].attrmax[1] = 20;
-    races[1].attrmax[2] = 20;
-    races[1].attrmax[3] = 18;
-    races[1].attrmax[4] = 16;
-    races[1].attrmax[5] = 18;
-    races[1].hpadv.infix = 1;
-    races[1].hpadv.inrnd = 0;
-    races[1].hpadv.lofix = 0;
-    races[1].hpadv.lornd = 1;
-    races[1].hpadv.hifix = 1;
-    races[1].hpadv.hirnd = 0;
-    races[1].enadv.infix = 2;
-    races[1].enadv.inrnd = 0;
-    races[1].enadv.lofix = 3;
-    races[1].enadv.lornd = 0;
-    races[1].enadv.hifix = 3;
-    races[1].enadv.hirnd = 0;
-    races[2].noun = $c.lit("dwarf");
-    races[2].adj = $c.lit("dwarven");
-    races[2].coll = $c.lit("dwarvenkind");
-    races[2].filecode = $c.lit("Dwa");
-    races[2].individual.m = null;
-    races[2].individual.f = null;
-    races[2].mnum = PM_DWARF;
-    races[2].mummynum = PM_DWARF_MUMMY;
-    races[2].zombienum = PM_DWARF_ZOMBIE;
-    races[2].allow = M2_DWARF | ROLE_MALE | ROLE_FEMALE | AM_LAWFUL;
-    races[2].selfmask = M2_DWARF;
-    races[2].lovemask = M2_DWARF | M2_GNOME;
-    races[2].hatemask = M2_ORC;
-    races[2].attrmin[0] = 3;
-    races[2].attrmin[1] = 3;
-    races[2].attrmin[2] = 3;
-    races[2].attrmin[3] = 3;
-    races[2].attrmin[4] = 3;
-    races[2].attrmin[5] = 3;
-    races[2].attrmax[0] = 118;
-    races[2].attrmax[1] = 16;
-    races[2].attrmax[2] = 16;
-    races[2].attrmax[3] = 20;
-    races[2].attrmax[4] = 20;
-    races[2].attrmax[5] = 16;
-    races[2].hpadv.infix = 4;
-    races[2].hpadv.inrnd = 0;
-    races[2].hpadv.lofix = 0;
-    races[2].hpadv.lornd = 3;
-    races[2].hpadv.hifix = 2;
-    races[2].hpadv.hirnd = 0;
-    races[2].enadv.infix = 0;
-    races[2].enadv.inrnd = 0;
-    races[2].enadv.lofix = 0;
-    races[2].enadv.lornd = 0;
-    races[2].enadv.hifix = 0;
-    races[2].enadv.hirnd = 0;
-    races[3].noun = $c.lit("gnome");
-    races[3].adj = $c.lit("gnomish");
-    races[3].coll = $c.lit("gnomehood");
-    races[3].filecode = $c.lit("Gno");
-    races[3].individual.m = null;
-    races[3].individual.f = null;
-    races[3].mnum = PM_GNOME;
-    races[3].mummynum = PM_GNOME_MUMMY;
-    races[3].zombienum = PM_GNOME_ZOMBIE;
-    races[3].allow = M2_GNOME | ROLE_MALE | ROLE_FEMALE | AM_NEUTRAL;
-    races[3].selfmask = M2_GNOME;
-    races[3].lovemask = M2_DWARF | M2_GNOME;
-    races[3].hatemask = M2_HUMAN;
-    races[3].attrmin[0] = 3;
-    races[3].attrmin[1] = 3;
-    races[3].attrmin[2] = 3;
-    races[3].attrmin[3] = 3;
-    races[3].attrmin[4] = 3;
-    races[3].attrmin[5] = 3;
-    races[3].attrmax[0] = 68;
-    races[3].attrmax[1] = 19;
-    races[3].attrmax[2] = 18;
-    races[3].attrmax[3] = 18;
-    races[3].attrmax[4] = 18;
-    races[3].attrmax[5] = 18;
-    races[3].hpadv.infix = 1;
-    races[3].hpadv.inrnd = 0;
-    races[3].hpadv.lofix = 0;
-    races[3].hpadv.lornd = 1;
-    races[3].hpadv.hifix = 0;
-    races[3].hpadv.hirnd = 0;
-    races[3].enadv.infix = 2;
-    races[3].enadv.inrnd = 0;
-    races[3].enadv.lofix = 2;
-    races[3].enadv.lornd = 0;
-    races[3].enadv.hifix = 2;
-    races[3].enadv.hirnd = 0;
-    races[4].noun = $c.lit("orc");
-    races[4].adj = $c.lit("orcish");
-    races[4].coll = $c.lit("orcdom");
-    races[4].filecode = $c.lit("Orc");
-    races[4].individual.m = null;
-    races[4].individual.f = null;
-    races[4].mnum = PM_ORC;
-    races[4].mummynum = PM_ORC_MUMMY;
-    races[4].zombienum = PM_ORC_ZOMBIE;
-    races[4].allow = M2_ORC | ROLE_MALE | ROLE_FEMALE | AM_CHAOTIC;
-    races[4].selfmask = M2_ORC;
-    races[4].lovemask = 0;
-    races[4].hatemask = M2_HUMAN | M2_ELF | M2_DWARF;
-    races[4].attrmin[0] = 3;
-    races[4].attrmin[1] = 3;
-    races[4].attrmin[2] = 3;
-    races[4].attrmin[3] = 3;
-    races[4].attrmin[4] = 3;
-    races[4].attrmin[5] = 3;
-    races[4].attrmax[0] = 68;
-    races[4].attrmax[1] = 16;
-    races[4].attrmax[2] = 16;
-    races[4].attrmax[3] = 18;
-    races[4].attrmax[4] = 18;
-    races[4].attrmax[5] = 16;
-    races[4].hpadv.infix = 1;
-    races[4].hpadv.inrnd = 0;
-    races[4].hpadv.lofix = 0;
-    races[4].hpadv.lornd = 1;
-    races[4].hpadv.hifix = 0;
-    races[4].hpadv.hirnd = 0;
-    races[4].enadv.infix = 1;
-    races[4].enadv.inrnd = 0;
-    races[4].enadv.lofix = 1;
-    races[4].enadv.lornd = 0;
-    races[4].enadv.hifix = 1;
-    races[4].enadv.hirnd = 0;
-    races[5].noun = null;
-    races[5].adj = null;
-    races[5].coll = null;
-    races[5].filecode = null;
-    races[5].individual.m = null;
-    races[5].individual.f = null;
-    races[5].mnum = NON_PM;
-    races[5].mummynum = NON_PM;
-    races[5].zombienum = NON_PM;
-    races[5].allow = 0;
-    races[5].selfmask = 0;
-    races[5].lovemask = 0;
-    races[5].hatemask = 0;
-    races[5].attrmin[0] = 0;
-    races[5].attrmax[0] = 0;
-    races[5].hpadv.infix = 0;
-    races[5].enadv.infix = 0;
+    $c.init(races, [
+        { noun: $c.lit("human"),
+          adj: $c.lit("human"),
+          coll: $c.lit("humanity"),
+          filecode: $c.lit("Hum"),
+          individual: { m: $c.lit("man"), f: $c.lit("woman") },
+          mnum: PM_HUMAN,
+          mummynum: PM_HUMAN_MUMMY,
+          zombienum: PM_HUMAN_ZOMBIE, allow: M2_HUMAN | ROLE_MALE | ROLE_FEMALE | AM_LAWFUL | AM_NEUTRAL | AM_CHAOTIC, selfmask: M2_HUMAN,
+          lovemask: 0, hatemask: M2_GNOME | M2_ORC,
+          attrmin: [3, 3, 3, 3, 3, 3],
+          attrmax: [118, 18, 18, 18, 18, 18],
+          hpadv: { infix: 2, inrnd: 0, lofix: 0, lornd: 2, hifix: 1, hirnd: 0 },
+          enadv: { infix: 1, inrnd: 0, lofix: 2, lornd: 0, hifix: 2, hirnd: 0 } },
+        { noun: $c.lit("elf"),
+          adj: $c.lit("elven"),
+          coll: $c.lit("elvenkind"),
+          filecode: $c.lit("Elf"),
+          individual: {},
+          mnum: PM_ELF,
+          mummynum: PM_ELF_MUMMY,
+          zombienum: PM_ELF_ZOMBIE, allow: M2_ELF | ROLE_MALE | ROLE_FEMALE | AM_CHAOTIC, selfmask: M2_ELF, lovemask: M2_ELF, hatemask: M2_ORC,
+          attrmin: [3, 3, 3, 3, 3, 3],
+          attrmax: [18, 20, 20, 18, 16, 18],
+          hpadv: { infix: 1, inrnd: 0, lofix: 0, lornd: 1, hifix: 1, hirnd: 0 },
+          enadv: { infix: 2, inrnd: 0, lofix: 3, lornd: 0, hifix: 3, hirnd: 0 } },
+        { noun: $c.lit("dwarf"),
+          adj: $c.lit("dwarven"),
+          coll: $c.lit("dwarvenkind"),
+          filecode: $c.lit("Dwa"),
+          individual: {},
+          mnum: PM_DWARF,
+          mummynum: PM_DWARF_MUMMY,
+          zombienum: PM_DWARF_ZOMBIE, allow: M2_DWARF | ROLE_MALE | ROLE_FEMALE | AM_LAWFUL, selfmask: M2_DWARF, lovemask: M2_DWARF | M2_GNOME,
+          hatemask: M2_ORC,
+          attrmin: [3, 3, 3, 3, 3, 3],
+          attrmax: [118, 16, 16, 20, 20, 16],
+          hpadv: { infix: 4, inrnd: 0, lofix: 0, lornd: 3, hifix: 2, hirnd: 0 },
+          enadv: {} },
+        { noun: $c.lit("gnome"),
+          adj: $c.lit("gnomish"),
+          coll: $c.lit("gnomehood"),
+          filecode: $c.lit("Gno"),
+          individual: {},
+          mnum: PM_GNOME,
+          mummynum: PM_GNOME_MUMMY,
+          zombienum: PM_GNOME_ZOMBIE, allow: M2_GNOME | ROLE_MALE | ROLE_FEMALE | AM_NEUTRAL, selfmask: M2_GNOME, lovemask: M2_DWARF | M2_GNOME,
+          hatemask: M2_HUMAN,
+          attrmin: [3, 3, 3, 3, 3, 3],
+          attrmax: [68, 19, 18, 18, 18, 18],
+          hpadv: { infix: 1, inrnd: 0, lofix: 0, lornd: 1, hifix: 0, hirnd: 0 },
+          enadv: { infix: 2, inrnd: 0, lofix: 2, lornd: 0, hifix: 2, hirnd: 0 } },
+        { noun: $c.lit("orc"),
+          adj: $c.lit("orcish"),
+          coll: $c.lit("orcdom"),
+          filecode: $c.lit("Orc"),
+          individual: {},
+          mnum: PM_ORC,
+          mummynum: PM_ORC_MUMMY,
+          zombienum: PM_ORC_ZOMBIE, allow: M2_ORC | ROLE_MALE | ROLE_FEMALE | AM_CHAOTIC, selfmask: M2_ORC,
+          lovemask: 0, hatemask: M2_HUMAN | M2_ELF | M2_DWARF,
+          attrmin: [3, 3, 3, 3, 3, 3],
+          attrmax: [68, 16, 16, 18, 18, 16],
+          hpadv: { infix: 1, inrnd: 0, lofix: 0, lornd: 1, hifix: 0, hirnd: 0 },
+          enadv: { infix: 1, inrnd: 0, lofix: 1, lornd: 0, hifix: 1, hirnd: 0 } },
+        { noun: null, adj: null, coll: null, filecode: null, individual: {}, mnum: NON_PM, mummynum: NON_PM, zombienum: NON_PM, allow: 0, selfmask: 0,
+          lovemask: 0, hatemask: 0, attrmin: [], attrmax: [], hpadv: {}, enadv: {} }
+    ]);
     for (let $i0 = 0; $i0 < 4; $i0++) {
         genders[$i0].$copyFrom(new $T.Gender());
     }
-    genders[0].adj = $c.lit("male");
-    genders[0].he = $c.lit("he");
-    genders[0].him = $c.lit("him");
-    genders[0].his = $c.lit("his");
-    genders[0].filecode = $c.lit("Mal");
-    genders[0].allow = ROLE_MALE;
-    genders[1].adj = $c.lit("female");
-    genders[1].he = $c.lit("she");
-    genders[1].him = $c.lit("her");
-    genders[1].his = $c.lit("her");
-    genders[1].filecode = $c.lit("Fem");
-    genders[1].allow = ROLE_FEMALE;
-    genders[2].adj = $c.lit("neuter");
-    genders[2].he = $c.lit("it");
-    genders[2].him = $c.lit("it");
-    genders[2].his = $c.lit("its");
-    genders[2].filecode = $c.lit("Ntr");
-    genders[2].allow = ROLE_NEUTER;
-    genders[3].adj = $c.lit("group");
-    genders[3].he = $c.lit("they");
-    genders[3].him = $c.lit("them");
-    genders[3].his = $c.lit("their");
-    genders[3].filecode = $c.lit("Grp");
-    genders[3].allow = 0;
+    $c.init(genders, [
+        { adj: $c.lit("male"), he: $c.lit("he"), him: $c.lit("him"), his: $c.lit("his"), filecode: $c.lit("Mal"), allow: ROLE_MALE },
+        { adj: $c.lit("female"), he: $c.lit("she"), him: $c.lit("her"), his: $c.lit("her"), filecode: $c.lit("Fem"), allow: ROLE_FEMALE },
+        { adj: $c.lit("neuter"), he: $c.lit("it"), him: $c.lit("it"), his: $c.lit("its"), filecode: $c.lit("Ntr"), allow: ROLE_NEUTER },
+        { adj: $c.lit("group"), he: $c.lit("they"), him: $c.lit("them"), his: $c.lit("their"), filecode: $c.lit("Grp"), allow: 0 }
+    ]);
     for (let $i0 = 0; $i0 < 4; $i0++) {
         aligns[$i0].$copyFrom(new $T.Align());
     }
-    aligns[0].noun = $c.lit("law");
-    aligns[0].adj = $c.lit("lawful");
-    aligns[0].filecode = $c.lit("Law");
-    aligns[0].allow = AM_LAWFUL;
-    aligns[0].value = A_LAWFUL;
-    aligns[1].noun = $c.lit("balance");
-    aligns[1].adj = $c.lit("neutral");
-    aligns[1].filecode = $c.lit("Neu");
-    aligns[1].allow = AM_NEUTRAL;
-    aligns[1].value = A_NEUTRAL;
-    aligns[2].noun = $c.lit("chaos");
-    aligns[2].adj = $c.lit("chaotic");
-    aligns[2].filecode = $c.lit("Cha");
-    aligns[2].allow = AM_CHAOTIC;
-    aligns[2].value = A_CHAOTIC;
-    aligns[3].noun = $c.lit("evil");
-    aligns[3].adj = $c.lit("unaligned");
-    aligns[3].filecode = $c.lit("Una");
-    aligns[3].allow = 0;
-    aligns[3].value = A_NONE;
+    $c.init(aligns, [
+        { noun: $c.lit("law"), adj: $c.lit("lawful"), filecode: $c.lit("Law"), allow: AM_LAWFUL, value: A_LAWFUL },
+        { noun: $c.lit("balance"), adj: $c.lit("neutral"), filecode: $c.lit("Neu"), allow: AM_NEUTRAL, value: A_NEUTRAL },
+        { noun: $c.lit("chaos"), adj: $c.lit("chaotic"), filecode: $c.lit("Cha"), allow: AM_CHAOTIC, value: A_CHAOTIC },
+        { noun: $c.lit("evil"), adj: $c.lit("unaligned"), filecode: $c.lit("Una"), allow: 0, value: A_NONE }
+    ]);
     randomstr.fill(0);
     randomstr.set([114, 97, 110, 100, 111, 109]);   // "random"
     root_plselection_prompt$err_ret.fill(0);
@@ -2912,9 +2289,11 @@ export function $init() {
     role_selection_prolog$rand_choice.fill(0);
     role_selection_prolog$rand_choice.set([32, 114, 97, 110, 100, 111, 109]);   // " random"
     role_menu_extra$RS_menu_let.fill(0);
-    role_menu_extra$RS_menu_let[0] = 61;
-    role_menu_extra$RS_menu_let[1] = 63;
-    role_menu_extra$RS_menu_let[2] = 47;
-    role_menu_extra$RS_menu_let[3] = 34;
-    role_menu_extra$RS_menu_let[4] = 91;
+    $c.init(role_menu_extra$RS_menu_let, [
+        61,
+        63,
+        47,
+        34,
+        91
+    ]);
 }

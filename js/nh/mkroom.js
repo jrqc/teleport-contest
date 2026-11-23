@@ -862,13 +862,11 @@ export function $init() {
     for (let $i0 = 0; $i0 < 4; $i0++) {
         squadprob[$i0].$copyFrom(new $T.anon_mkroom_807());
     }
-    squadprob[0].pm = PM_SOLDIER;
-    squadprob[0].prob = 80;
-    squadprob[1].pm = PM_SERGEANT;
-    squadprob[1].prob = 15;
-    squadprob[2].pm = PM_LIEUTENANT;
-    squadprob[2].prob = 4;
-    squadprob[3].pm = PM_CAPTAIN;
-    squadprob[3].prob = 1;
+    $c.init(squadprob, [
+        { pm: PM_SOLDIER, prob: 80 },
+        { pm: PM_SERGEANT, prob: 15 },
+        { pm: PM_LIEUTENANT, prob: 4 },
+        { pm: PM_CAPTAIN, prob: 1 }
+    ]);
     shrine_pos$buf.$copyFrom(new $T.nhcoord());
 }

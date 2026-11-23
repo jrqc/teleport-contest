@@ -20,7 +20,7 @@ import { done } from './end.js';
 import { PLNMSG_CAUGHT_IN_EXPLOSION, PLNMSG_TOWER_OF_FLAME } from './flag.h.js';
 import { FALSE, LARGEST_INT, TRUE } from './global.h.js';
 import { in_rooms, nomul } from './hack.js';
-import { BURNING, DIED, KILLED_BY, KILLED_BY_AN, MAY_DESTROY, MAY_FRACTURE, MAY_HITMON, MAY_HITYOU, NO_KILLER_PREFIX, N_DIRS_Z, PHYS_EXPL_TYPE, VIS_EFFECTS, XKILL_GIVEMSG, XKILL_NOCONDUCT, XKILL_NOCORPSE, XKILL_NOMSG } from './hack.h.js';
+import { BURNING, DIED, KILLED_BY, KILLED_BY_AN, MAY_DESTROY, MAY_FRACTURE, MAY_HITMON, MAY_HITYOU, NO_KILLER_PREFIX, N_DIRS, PHYS_EXPL_TYPE, VIS_EFFECTS, XKILL_GIVEMSG, XKILL_NOCONDUCT, XKILL_NOCORPSE, XKILL_NOMSG } from './hack.h.js';
 import { Maybe_Half_Phys } from './hack.macros.js';
 import { dist2, lowc, nh_snprintf, s_suffix, strncmpi, strstri } from './hacklib.js';
 import { sobj_at, stackobj } from './invent.js';
@@ -668,7 +668,7 @@ export async function scatter(sx, sy, blastforce, scflags, obj) {   // explode.c
             stmp.obj = otmp;
             stmp.ox = sx;
             stmp.oy = sy;
-            tmp = rn2(N_DIRS_Z - 2);
+            tmp = rn2(N_DIRS);
             stmp.dx = xdir[tmp];
             stmp.dy = ydir[tmp];
             tmp = (blastforce >>> 0) - $c.divu32(otmp.owt, 40) >>> 0 | 0;
@@ -852,13 +852,9 @@ export function $init() {
     for (let $i0 = 0; $i0 < 3; $i0++) {
         explosion[$i0].fill(0);
     }
-    explosion[0][0] = S_expl_tl;
-    explosion[0][1] = S_expl_ml;
-    explosion[0][2] = S_expl_bl;
-    explosion[1][0] = S_expl_tc;
-    explosion[1][1] = S_expl_mc;
-    explosion[1][2] = S_expl_bc;
-    explosion[2][0] = S_expl_tr;
-    explosion[2][1] = S_expl_mr;
-    explosion[2][2] = S_expl_br;
+    $c.init(explosion, [
+        [S_expl_tl, S_expl_ml, S_expl_bl],
+        [S_expl_tc, S_expl_mc, S_expl_bc],
+        [S_expl_tr, S_expl_mr, S_expl_br]
+    ]);
 }

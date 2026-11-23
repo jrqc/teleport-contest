@@ -20,7 +20,7 @@ import { panic } from './end.js';
 import { del_engr_at, make_grave } from './engrave.js';
 import { paniclog } from './files.js';
 import { wizard } from './flag.macros.js';
-import { BUFSZ, FALSE, QBUFSZ, TRUE } from './global.h.js';
+import { BUFSZ, COLNO, FALSE, QBUFSZ, ROWNO, TRUE } from './global.h.js';
 import { obj_to_any, pooleffects, set_uinwater, switch_terrain } from './hack.js';
 import { CORPSTAT_FEMALE, CORPSTAT_GENDER, CORPSTAT_HISTORIC, CORPSTAT_MALE, CORPSTAT_NEUTER, CORPSTAT_RANDOM, COST_CONTENTS, CXN_ARTICLE, CXN_NOCORPSE, CXN_NORMAL, CXN_NO_PFX, CXN_PFX_THE, CXN_SINGULAR, FM_FMON, HAND, ONAME_NO_FLAGS, ONAME_WISH, RANDOM_TIN } from './hack.h.js';
 import { copynchars, digit, dist2, eos, fuzzymatch, highc, letter, lowc, mungspaces, nh_snprintf, ordin, s_suffix, str_start_is, strcasecpy, strncmpi, strstri, strsubst, upstart } from './hacklib.js';
@@ -34,7 +34,7 @@ import { curse, is_flammable, is_rottable, mkobj, mksobj, obj_extract_self, plac
 import { can_be_hatched, dead_species, genus, zombie_form } from './mon.js';
 import { name_to_mon, name_to_monplus } from './mondata.js';
 import { is_female, is_human, is_male, is_neuter, is_were, type_is_pname, verysmall } from './mondata.macros.js';
-import { FEMALE, G_NOCORPSE, G_UNIQ, M1_FLY, MALE, MS_GUARDIAN, MV_KNOWS_EGG, NEUTRAL } from './monflag.h.js';
+import { FEMALE, G_NOCORPSE, G_UNIQ, M1_FLY, M2_PNAME, MALE, MS_GUARDIAN, MV_KNOWS_EGG, NEUTRAL } from './monflag.h.js';
 import { mons } from './monst.js';
 import { M_AP_OBJECT } from './monst.h.js';
 import { DEADMONSTER, M_AP_TYPE, ismnum } from './monst.macros.js';
@@ -69,7 +69,7 @@ import { recalc_block_point } from './vision.js';
 import { cansee } from './vision.macros.js';
 import { WT_IRON_BALL_INCR } from './weight.h.js';
 import { counter_were } from './were.js';
-import { TT_LAVA } from './you.h.js';
+import { RIGHT_HANDED, TT_LAVA } from './you.h.js';
 import { Luck } from './you.macros.js';
 import { Blind, Glib, Levitation } from './youprop.macros.js';
 import { get_obj_location, start_melt_ice_timeout } from './zap.js';
@@ -574,7 +574,7 @@ async function xname_flags(obj, cxn_flags) {   // objnam.c:581
                 case ROCK_CLASS:
                     if (typ === STATUE && omndx !== NON_PM) {
                         statue_pmname = await obj_pmname(obj);
-                        nh_snprintf($c.lit("xname_flags"), 813, buf, bufspaceleft, $c.lit("%s%s of %s%s"), gu.urole.mnum === PM_ARCHEOLOGIST && (obj.spe & 4) !== 0 ? $c.lit("historic ") : $c.lit(""), actualn, $c.andu64($c.relem(mons, omndx).mflags2, 524288) !== 0 ? $c.lit("") : the_unique_pm($c.relem(mons, omndx)) ? $c.lit("the ") : just_an(new $c.Ptr(anbuf$2, 0), statue_pmname), statue_pmname);
+                        nh_snprintf($c.lit("xname_flags"), 813, buf, bufspaceleft, $c.lit("%s%s of %s%s"), gu.urole.mnum === PM_ARCHEOLOGIST && (obj.spe & CORPSTAT_HISTORIC) !== 0 ? $c.lit("historic ") : $c.lit(""), actualn, $c.andu64($c.relem(mons, omndx).mflags2, M2_PNAME) !== 0 ? $c.lit("") : the_unique_pm($c.relem(mons, omndx)) ? $c.lit("the ") : just_an(new $c.Ptr(anbuf$2, 0), statue_pmname), statue_pmname);
                     } else if (typ === BOULDER && obj.corpsenm === 1) {
                         $c.__builtin___strcat_chk($c.__builtin___strcpy_chk(buf, $c.lit("next "), -1), actualn, -1);
                         obj.corpsenm = 0;
@@ -1142,7 +1142,7 @@ async function doname_base(obj, doname_flags) {   // objnam.c:1223
                 add_erosion_words(obj, new $c.Ptr(prefix, 0));
                 if ($c.and64(obj.owornmask, W_BALL | W_CHAIN)) {
                     do {
-                        nh_snprintf($c.lit("doname_base"), 1545, bp_eos[0].add(-0), $c.addu64(bpspaceleft, 0), $c.lit(" (%s to you)"), $c.and64(obj.owornmask, 2097152) ? $c.lit("chained") : $c.lit("attached"));
+                        nh_snprintf($c.lit("doname_base"), 1545, bp_eos[0].add(-0), $c.addu64(bpspaceleft, 0), $c.lit(" (%s to you)"), $c.and64(obj.owornmask, W_BALL) ? $c.lit("chained") : $c.lit("attached"));
                         bp_eos[0] = eos(bp), bpspaceleft = $c.u64($c.pdiff(bp_end, bp_eos[0]));
                     } while (0);
                 }
@@ -1154,7 +1154,7 @@ async function doname_base(obj, doname_flags) {   // objnam.c:1223
         cgend = obj.spe & CORPSTAT_GENDER;
         mgend = cgend === CORPSTAT_MALE ? MALE : cgend === CORPSTAT_FEMALE ? FEMALE : NEUTRAL;
         do {
-            nh_snprintf($c.lit("doname_base"), 1558, bp_eos[0].add(-0), $c.addu64(bpspaceleft, 0), $c.lit(" (%s)"), cgend !== 0 ? genders[mgend].adj : $c.lit("unspecified gender"));
+            nh_snprintf($c.lit("doname_base"), 1558, bp_eos[0].add(-0), $c.addu64(bpspaceleft, 0), $c.lit(" (%s)"), cgend !== CORPSTAT_RANDOM ? genders[mgend].adj : $c.lit("unspecified gender"));
             bp_eos[0] = eos(bp), bpspaceleft = $c.u64($c.pdiff(bp_end, bp_eos[0]));
         } while (0);
     }
@@ -1172,7 +1172,7 @@ async function doname_base(obj, doname_flags) {   // objnam.c:1223
                 hand_s = $c.__builtin___strcpy_chk(new $c.Ptr(handsbuf, 0), obufp = await makeplural(hand_s), 40);
                 releaseobuf(obufp);
             } else {
-                $c.__builtin___sprintf_chk(new $c.Ptr(handsbuf, 0), 0, 40, $c.lit("%s %s"), (u.uhandedness | 0) === 0 ? $c.lit("right") : $c.lit("left"), hand_s);
+                $c.__builtin___sprintf_chk(new $c.Ptr(handsbuf, 0), 0, 40, $c.lit("%s %s"), (u.uhandedness | 0) === RIGHT_HANDED ? $c.lit("right") : $c.lit("left"), hand_s);
                 hand_s = new $c.Ptr(handsbuf, 0);
             }
             do {
@@ -1182,7 +1182,7 @@ async function doname_base(obj, doname_flags) {   // objnam.c:1223
             if (!Blind() && bpspaceleft && bp_eos[0].get(-1) === 41) {
                 if (gw.warn_obj_cnt && $c.peq(obj, $G.uwep) && $c.and64(u.uprops[WARN_OF_MON].extrinsic, W_WEP) !== 0) {
                     do {
-                        nh_snprintf($c.lit("doname_base"), 1605, bp_eos[0].add(-1), $c.addu64(bpspaceleft, 1), $c.lit(", %s %s)"), glow_verb(gw.warn_obj_cnt, 1), glow_color(obj.oartifact));
+                        nh_snprintf($c.lit("doname_base"), 1605, bp_eos[0].add(-1), $c.addu64(bpspaceleft, 1), $c.lit(", %s %s)"), glow_verb(gw.warn_obj_cnt, TRUE), glow_color(obj.oartifact));
                         bp_eos[0] = eos(bp), bpspaceleft = $c.u64($c.pdiff(bp_end, bp_eos[0]));
                     } while (0);
                 } else if (obj.lamplit | 0 && artifact_light(obj)) {
@@ -1197,7 +1197,7 @@ async function doname_base(obj, doname_flags) {   // objnam.c:1223
     if ($c.and64(obj.owornmask, W_SWAPWEP)) {
         if (u.twoweap) {
             do {
-                nh_snprintf($c.lit("doname_base"), 1616, bp_eos[0].add(-0), $c.addu64(bpspaceleft, 0), $c.lit(" (wielded in %s %s)"), (u.uhandedness | 0) === 0 ? $c.lit("left") : $c.lit("right"), await body_part(HAND));
+                nh_snprintf($c.lit("doname_base"), 1616, bp_eos[0].add(-0), $c.addu64(bpspaceleft, 0), $c.lit(" (wielded in %s %s)"), (u.uhandedness | 0) === RIGHT_HANDED ? $c.lit("left") : $c.lit("right"), await body_part(HAND));
                 bp_eos[0] = eos(bp), bpspaceleft = $c.u64($c.pdiff(bp_end, bp_eos[0]));
             } while (0);
         } else {
@@ -1539,7 +1539,7 @@ export async function an(str) {   // objnam.c:2145
         return $c.__builtin___strcpy_chk(buf, $c.lit("an []"), -1);
     }
     just_an(buf, str);
-    return $c.__builtin___strncat_chk(buf, str, 255 - await Strlen_(buf, $c.lit("an"), 2154) >>> 0, -1);
+    return $c.__builtin___strncat_chk(buf, str, BUFSZ - 1 - await Strlen_(buf, $c.lit("an"), 2154) >>> 0, -1);
 }
 export async function An(str) {   // objnam.c:2158
     let tmp = null, $t1;
@@ -1583,7 +1583,7 @@ export async function the(str) {   // objnam.c:2171
     } else {
         buf.set(0, 0);
     }
-    return $c.__builtin___strncat_chk(buf, str, 255 - await Strlen_(buf, $c.lit("the"), 2230) >>> 0, -1);
+    return $c.__builtin___strncat_chk(buf, str, BUFSZ - 1 - await Strlen_(buf, $c.lit("the"), 2230) >>> 0, -1);
 }
 export async function The(str) {   // objnam.c:2234
     let tmp = null, $t1;
@@ -2398,7 +2398,7 @@ async function wizterrainwish(d) {   // objnam.c:3554
         } else if (!strncmpi(bp, $c.lit("unaligned "), 10)) {
             al = A_NONE;
         } else {
-            al = $c.i8(!rn2(6) ? A_NONE : rn2(3) - 1 | 0);
+            al = $c.i8(!rn2(6) ? A_NONE : rn2(A_LAWFUL + 2) - 1 | 0);
         }
         lev.flags = (Align2amask(al)) & 31;
         await pline($c.lit("%s altar."), await An(align_str(al)));
@@ -2493,7 +2493,7 @@ async function wizterrainwish(d) {   // objnam.c:3554
         lev.typ = wall;
         lev.flags = (0) & 31;
         set_wallprop_from_str(bp);
-        await fix_wall_spines($c.i16(0 > (u.ux - 1 | 0) ? 0 : u.ux - 1 | 0), $c.i16(0 > (u.uy - 1 | 0) ? 0 : u.uy - 1 | 0), $c.i16(80 < (u.ux + 1 | 0) ? 80 : u.ux + 1 | 0), $c.i16(21 < (u.uy + 1 | 0) ? 21 : u.uy + 1 | 0));
+        await fix_wall_spines($c.i16(0 > (u.ux - 1 | 0) ? 0 : u.ux - 1 | 0), $c.i16(0 > (u.uy - 1 | 0) ? 0 : u.uy - 1 | 0), $c.i16(COLNO < (u.ux + 1 | 0) ? COLNO : u.ux + 1 | 0), $c.i16(ROWNO < (u.uy + 1 | 0) ? ROWNO : u.uy + 1 | 0));
         await pline($c.lit("A wall."));
     } else if (!($c.pcmp(p.add(-15), bp) < 0 || strncmpi(p.add(-15), $c.lit("secret corridor"), -1))) {
         if (lev.typ === CORR) {
@@ -3017,7 +3017,7 @@ async function readobjnam_postparse1(d) {   // objnam.c:4240
                 d.typ = beartrap ? BEARTRAP : LAND_MINE;
                 return 2;
             } else if (d.trapped === 1 || zp.get(0) !== 0) {
-                $c.__builtin___strcpy_chk(d.bp, trapname(beartrap ? BEAR_TRAP : LANDMINE, 1), -1);
+                $c.__builtin___strcpy_chk(d.bp, trapname(beartrap ? BEAR_TRAP : LANDMINE, TRUE), -1);
                 return 5;
             }
         }
@@ -3789,458 +3789,346 @@ export function $init() {
     for (let $i0 = 0; $i0 < 14; $i0++) {
         Japanese_items[$i0].$copyFrom(new $T.Jitem());
     }
-    Japanese_items[0].item = SHORT_SWORD;
-    Japanese_items[0].name = $c.lit("wakizashi");
-    Japanese_items[1].item = BROADSWORD;
-    Japanese_items[1].name = $c.lit("ninja-to");
-    Japanese_items[2].item = FLAIL;
-    Japanese_items[2].name = $c.lit("nunchaku");
-    Japanese_items[3].item = GLAIVE;
-    Japanese_items[3].name = $c.lit("naginata");
-    Japanese_items[4].item = LOCK_PICK;
-    Japanese_items[4].name = $c.lit("osaku");
-    Japanese_items[5].item = WOODEN_HARP;
-    Japanese_items[5].name = $c.lit("koto");
-    Japanese_items[6].item = MAGIC_HARP;
-    Japanese_items[6].name = $c.lit("magic koto");
-    Japanese_items[7].item = KNIFE;
-    Japanese_items[7].name = $c.lit("shito");
-    Japanese_items[8].item = PLATE_MAIL;
-    Japanese_items[8].name = $c.lit("tanko");
-    Japanese_items[9].item = HELMET;
-    Japanese_items[9].name = $c.lit("kabuto");
-    Japanese_items[10].item = LEATHER_GLOVES;
-    Japanese_items[10].name = $c.lit("yugake");
-    Japanese_items[11].item = FOOD_RATION;
-    Japanese_items[11].name = $c.lit("gunyoki");
-    Japanese_items[12].item = POT_BOOZE;
-    Japanese_items[12].name = $c.lit("sake");
-    Japanese_items[13].item = 0;
-    Japanese_items[13].name = $c.lit("");
+    $c.init(Japanese_items, [
+        { item: SHORT_SWORD, name: $c.lit("wakizashi") },
+        { item: BROADSWORD, name: $c.lit("ninja-to") },
+        { item: FLAIL, name: $c.lit("nunchaku") },
+        { item: GLAIVE, name: $c.lit("naginata") },
+        { item: LOCK_PICK, name: $c.lit("osaku") },
+        { item: WOODEN_HARP, name: $c.lit("koto") },
+        { item: MAGIC_HARP, name: $c.lit("magic koto") },
+        { item: KNIFE, name: $c.lit("shito") },
+        { item: PLATE_MAIL, name: $c.lit("tanko") },
+        { item: HELMET, name: $c.lit("kabuto") },
+        { item: LEATHER_GLOVES, name: $c.lit("yugake") },
+        { item: FOOD_RATION, name: $c.lit("gunyoki") },
+        { item: POT_BOOZE, name: $c.lit("sake") },
+        { item: 0, name: $c.lit("") }
+    ]);
     for (let $i0 = 0; $i0 < 12; $i0++) {
         obufs[$i0].fill(0);
     }
     obufidx = 0;
     wrp.fill(null);
-    wrp[0] = $c.lit("wand");
-    wrp[1] = $c.lit("ring");
-    wrp[2] = $c.lit("potion");
-    wrp[3] = $c.lit("scroll");
-    wrp[4] = $c.lit("gem");
-    wrp[5] = $c.lit("amulet");
-    wrp[6] = $c.lit("spellbook");
-    wrp[7] = $c.lit("spell book");
-    wrp[8] = $c.lit("weapon");
-    wrp[9] = $c.lit("armor");
-    wrp[10] = $c.lit("tool");
-    wrp[11] = $c.lit("food");
-    wrp[12] = $c.lit("comestible");
+    $c.init(wrp, [
+        $c.lit("wand"),
+        $c.lit("ring"),
+        $c.lit("potion"),
+        $c.lit("scroll"),
+        $c.lit("gem"),
+        $c.lit("amulet"),
+        $c.lit("spellbook"),
+        $c.lit("spell book"),
+        $c.lit("weapon"),
+        $c.lit("armor"),
+        $c.lit("tool"),
+        $c.lit("food"),
+        $c.lit("comestible")
+    ]);
     wrpsym.fill(0);
-    wrpsym[0] = WAND_CLASS;
-    wrpsym[1] = RING_CLASS;
-    wrpsym[2] = POTION_CLASS;
-    wrpsym[3] = SCROLL_CLASS;
-    wrpsym[4] = GEM_CLASS;
-    wrpsym[5] = AMULET_CLASS;
-    wrpsym[6] = SPBOOK_CLASS;
-    wrpsym[7] = SPBOOK_CLASS;
-    wrpsym[8] = WEAPON_CLASS;
-    wrpsym[9] = ARMOR_CLASS;
-    wrpsym[10] = TOOL_CLASS;
-    wrpsym[11] = FOOD_CLASS;
-    wrpsym[12] = FOOD_CLASS;
+    $c.init(wrpsym, [
+        WAND_CLASS,
+        RING_CLASS,
+        POTION_CLASS,
+        SCROLL_CLASS,
+        GEM_CLASS,
+        AMULET_CLASS,
+        SPBOOK_CLASS,
+        SPBOOK_CLASS,
+        WEAPON_CLASS,
+        ARMOR_CLASS,
+        TOOL_CLASS,
+        FOOD_CLASS,
+        FOOD_CLASS
+    ]);
     special_subjs.fill(null);
-    special_subjs[0] = $c.lit("erinys");
-    special_subjs[1] = $c.lit("manes");
-    special_subjs[2] = $c.lit("Cyclops");
-    special_subjs[3] = $c.lit("Hippocrates");
-    special_subjs[4] = $c.lit("Pelias");
-    special_subjs[5] = $c.lit("aklys");
-    special_subjs[6] = $c.lit("amnesia");
-    special_subjs[7] = $c.lit("detect monsters");
-    special_subjs[8] = $c.lit("paralysis");
-    special_subjs[9] = $c.lit("shape changers");
-    special_subjs[10] = $c.lit("nemesis");
-    special_subjs[11] = null;
+    $c.init(special_subjs, [
+        $c.lit("erinys"),
+        $c.lit("manes"),
+        $c.lit("Cyclops"),
+        $c.lit("Hippocrates"),
+        $c.lit("Pelias"),
+        $c.lit("aklys"),
+        $c.lit("amnesia"),
+        $c.lit("detect monsters"),
+        $c.lit("paralysis"),
+        $c.lit("shape changers"),
+        $c.lit("nemesis"),
+        null
+    ]);
     for (let $i0 = 0; $i0 < 23; $i0++) {
         one_off[$i0].$copyFrom(new $T.sing_plur());
     }
-    one_off[0].sing = $c.lit("child");
-    one_off[0].plur = $c.lit("children");
-    one_off[1].sing = $c.lit("cubus");
-    one_off[1].plur = $c.lit("cubi");
-    one_off[2].sing = $c.lit("culus");
-    one_off[2].plur = $c.lit("culi");
-    one_off[3].sing = $c.lit("Cyclops");
-    one_off[3].plur = $c.lit("Cyclopes");
-    one_off[4].sing = $c.lit("djinni");
-    one_off[4].plur = $c.lit("djinn");
-    one_off[5].sing = $c.lit("erinys");
-    one_off[5].plur = $c.lit("erinyes");
-    one_off[6].sing = $c.lit("foot");
-    one_off[6].plur = $c.lit("feet");
-    one_off[7].sing = $c.lit("fungus");
-    one_off[7].plur = $c.lit("fungi");
-    one_off[8].sing = $c.lit("goose");
-    one_off[8].plur = $c.lit("geese");
-    one_off[9].sing = $c.lit("knife");
-    one_off[9].plur = $c.lit("knives");
-    one_off[10].sing = $c.lit("labrum");
-    one_off[10].plur = $c.lit("labra");
-    one_off[11].sing = $c.lit("louse");
-    one_off[11].plur = $c.lit("lice");
-    one_off[12].sing = $c.lit("mouse");
-    one_off[12].plur = $c.lit("mice");
-    one_off[13].sing = $c.lit("mumak");
-    one_off[13].plur = $c.lit("mumakil");
-    one_off[14].sing = $c.lit("nemesis");
-    one_off[14].plur = $c.lit("nemeses");
-    one_off[15].sing = $c.lit("ovum");
-    one_off[15].plur = $c.lit("ova");
-    one_off[16].sing = $c.lit("ox");
-    one_off[16].plur = $c.lit("oxen");
-    one_off[17].sing = $c.lit("passerby");
-    one_off[17].plur = $c.lit("passersby");
-    one_off[18].sing = $c.lit("rtex");
-    one_off[18].plur = $c.lit("rtices");
-    one_off[19].sing = $c.lit("serum");
-    one_off[19].plur = $c.lit("sera");
-    one_off[20].sing = $c.lit("staff");
-    one_off[20].plur = $c.lit("staves");
-    one_off[21].sing = $c.lit("tooth");
-    one_off[21].plur = $c.lit("teeth");
-    one_off[22].sing = null;
-    one_off[22].plur = null;
+    $c.init(one_off, [
+        { sing: $c.lit("child"),
+          plur: $c.lit("children") },
+        { sing: $c.lit("cubus"), plur: $c.lit("cubi") },
+        { sing: $c.lit("culus"), plur: $c.lit("culi") },
+        { sing: $c.lit("Cyclops"), plur: $c.lit("Cyclopes") },
+        { sing: $c.lit("djinni"), plur: $c.lit("djinn") },
+        { sing: $c.lit("erinys"), plur: $c.lit("erinyes") },
+        { sing: $c.lit("foot"), plur: $c.lit("feet") },
+        { sing: $c.lit("fungus"), plur: $c.lit("fungi") },
+        { sing: $c.lit("goose"), plur: $c.lit("geese") },
+        { sing: $c.lit("knife"), plur: $c.lit("knives") },
+        { sing: $c.lit("labrum"), plur: $c.lit("labra") },
+        { sing: $c.lit("louse"), plur: $c.lit("lice") },
+        { sing: $c.lit("mouse"), plur: $c.lit("mice") },
+        { sing: $c.lit("mumak"), plur: $c.lit("mumakil") },
+        { sing: $c.lit("nemesis"), plur: $c.lit("nemeses") },
+        { sing: $c.lit("ovum"), plur: $c.lit("ova") },
+        { sing: $c.lit("ox"), plur: $c.lit("oxen") },
+        { sing: $c.lit("passerby"), plur: $c.lit("passersby") },
+        { sing: $c.lit("rtex"), plur: $c.lit("rtices") },
+        { sing: $c.lit("serum"), plur: $c.lit("sera") },
+        { sing: $c.lit("staff"), plur: $c.lit("staves") },
+        { sing: $c.lit("tooth"), plur: $c.lit("teeth") },
+        {}
+    ]);
     as_is.fill(null);
-    as_is[0] = $c.lit("boots");
-    as_is[1] = $c.lit("shoes");
-    as_is[2] = $c.lit("gloves");
-    as_is[3] = $c.lit("lenses");
-    as_is[4] = $c.lit("scales");
-    as_is[5] = $c.lit("eyes");
-    as_is[6] = $c.lit("gauntlets");
-    as_is[7] = $c.lit("iron bars");
-    as_is[8] = $c.lit("bison");
-    as_is[9] = $c.lit("deer");
-    as_is[10] = $c.lit("elk");
-    as_is[11] = $c.lit("fish");
-    as_is[12] = $c.lit("fowl");
-    as_is[13] = $c.lit("tuna");
-    as_is[14] = $c.lit("yaki");
-    as_is[15] = $c.lit("-hai");
-    as_is[16] = $c.lit("krill");
-    as_is[17] = $c.lit("manes");
-    as_is[18] = $c.lit("moose");
-    as_is[19] = $c.lit("ninja");
-    as_is[20] = $c.lit("sheep");
-    as_is[21] = $c.lit("ronin");
-    as_is[22] = $c.lit("roshi");
-    as_is[23] = $c.lit("shito");
-    as_is[24] = $c.lit("tengu");
-    as_is[25] = $c.lit("ki-rin");
-    as_is[26] = $c.lit("Nazgul");
-    as_is[27] = $c.lit("gunyoki");
-    as_is[28] = $c.lit("piranha");
-    as_is[29] = $c.lit("samurai");
-    as_is[30] = $c.lit("shuriken");
-    as_is[31] = $c.lit("haggis");
-    as_is[32] = $c.lit("Bordeaux");
-    as_is[33] = null;
+    $c.init(as_is, [
+        $c.lit("boots"),
+        $c.lit("shoes"),
+        $c.lit("gloves"),
+        $c.lit("lenses"),
+        $c.lit("scales"),
+        $c.lit("eyes"),
+        $c.lit("gauntlets"),
+        $c.lit("iron bars"),
+        $c.lit("bison"),
+        $c.lit("deer"),
+        $c.lit("elk"),
+        $c.lit("fish"),
+        $c.lit("fowl"),
+        $c.lit("tuna"),
+        $c.lit("yaki"),
+        $c.lit("-hai"),
+        $c.lit("krill"),
+        $c.lit("manes"),
+        $c.lit("moose"),
+        $c.lit("ninja"),
+        $c.lit("sheep"),
+        $c.lit("ronin"),
+        $c.lit("roshi"),
+        $c.lit("shito"),
+        $c.lit("tengu"),
+        $c.lit("ki-rin"),
+        $c.lit("Nazgul"),
+        $c.lit("gunyoki"),
+        $c.lit("piranha"),
+        $c.lit("samurai"),
+        $c.lit("shuriken"),
+        $c.lit("haggis"),
+        $c.lit("Bordeaux"),
+        null
+    ]);
     for (let $i0 = 0; $i0 < 19; $i0++) {
         o_ranges[$i0].$copyFrom(new $T.o_range());
     }
-    o_ranges[0].name = $c.lit("bag");
-    o_ranges[0].oclass = TOOL_CLASS;
-    o_ranges[0].f_o_range = SACK;
-    o_ranges[0].l_o_range = BAG_OF_TRICKS;
-    o_ranges[1].name = $c.lit("lamp");
-    o_ranges[1].oclass = TOOL_CLASS;
-    o_ranges[1].f_o_range = OIL_LAMP;
-    o_ranges[1].l_o_range = MAGIC_LAMP;
-    o_ranges[2].name = $c.lit("candle");
-    o_ranges[2].oclass = TOOL_CLASS;
-    o_ranges[2].f_o_range = TALLOW_CANDLE;
-    o_ranges[2].l_o_range = WAX_CANDLE;
-    o_ranges[3].name = $c.lit("horn");
-    o_ranges[3].oclass = TOOL_CLASS;
-    o_ranges[3].f_o_range = TOOLED_HORN;
-    o_ranges[3].l_o_range = HORN_OF_PLENTY;
-    o_ranges[4].name = $c.lit("shield");
-    o_ranges[4].oclass = ARMOR_CLASS;
-    o_ranges[4].f_o_range = SMALL_SHIELD;
-    o_ranges[4].l_o_range = SHIELD_OF_REFLECTION;
-    o_ranges[5].name = $c.lit("hat");
-    o_ranges[5].oclass = ARMOR_CLASS;
-    o_ranges[5].f_o_range = FEDORA;
-    o_ranges[5].l_o_range = DUNCE_CAP;
-    o_ranges[6].name = $c.lit("helm");
-    o_ranges[6].oclass = ARMOR_CLASS;
-    o_ranges[6].f_o_range = ELVEN_LEATHER_HELM;
-    o_ranges[6].l_o_range = HELM_OF_TELEPATHY;
-    o_ranges[7].name = $c.lit("gloves");
-    o_ranges[7].oclass = ARMOR_CLASS;
-    o_ranges[7].f_o_range = LEATHER_GLOVES;
-    o_ranges[7].l_o_range = GAUNTLETS_OF_DEXTERITY;
-    o_ranges[8].name = $c.lit("gauntlets");
-    o_ranges[8].oclass = ARMOR_CLASS;
-    o_ranges[8].f_o_range = LEATHER_GLOVES;
-    o_ranges[8].l_o_range = GAUNTLETS_OF_DEXTERITY;
-    o_ranges[9].name = $c.lit("boots");
-    o_ranges[9].oclass = ARMOR_CLASS;
-    o_ranges[9].f_o_range = LOW_BOOTS;
-    o_ranges[9].l_o_range = LEVITATION_BOOTS;
-    o_ranges[10].name = $c.lit("shoes");
-    o_ranges[10].oclass = ARMOR_CLASS;
-    o_ranges[10].f_o_range = LOW_BOOTS;
-    o_ranges[10].l_o_range = IRON_SHOES;
-    o_ranges[11].name = $c.lit("cloak");
-    o_ranges[11].oclass = ARMOR_CLASS;
-    o_ranges[11].f_o_range = MUMMY_WRAPPING;
-    o_ranges[11].l_o_range = CLOAK_OF_DISPLACEMENT;
-    o_ranges[12].name = $c.lit("shirt");
-    o_ranges[12].oclass = ARMOR_CLASS;
-    o_ranges[12].f_o_range = HAWAIIAN_SHIRT;
-    o_ranges[12].l_o_range = T_SHIRT;
-    o_ranges[13].name = $c.lit("dragon scales");
-    o_ranges[13].oclass = ARMOR_CLASS;
-    o_ranges[13].f_o_range = GRAY_DRAGON_SCALES;
-    o_ranges[13].l_o_range = YELLOW_DRAGON_SCALES;
-    o_ranges[14].name = $c.lit("dragon scale mail");
-    o_ranges[14].oclass = ARMOR_CLASS;
-    o_ranges[14].f_o_range = GRAY_DRAGON_SCALE_MAIL;
-    o_ranges[14].l_o_range = YELLOW_DRAGON_SCALE_MAIL;
-    o_ranges[15].name = $c.lit("sword");
-    o_ranges[15].oclass = WEAPON_CLASS;
-    o_ranges[15].f_o_range = SHORT_SWORD;
-    o_ranges[15].l_o_range = KATANA;
-    o_ranges[16].name = $c.lit("venom");
-    o_ranges[16].oclass = VENOM_CLASS;
-    o_ranges[16].f_o_range = BLINDING_VENOM;
-    o_ranges[16].l_o_range = ACID_VENOM;
-    o_ranges[17].name = $c.lit("gray stone");
-    o_ranges[17].oclass = GEM_CLASS;
-    o_ranges[17].f_o_range = LUCKSTONE;
-    o_ranges[17].l_o_range = FLINT;
-    o_ranges[18].name = $c.lit("grey stone");
-    o_ranges[18].oclass = GEM_CLASS;
-    o_ranges[18].f_o_range = LUCKSTONE;
-    o_ranges[18].l_o_range = FLINT;
+    $c.init(o_ranges, [
+        { name: $c.lit("bag"), oclass: TOOL_CLASS, f_o_range: SACK, l_o_range: BAG_OF_TRICKS },
+        { name: $c.lit("lamp"), oclass: TOOL_CLASS, f_o_range: OIL_LAMP, l_o_range: MAGIC_LAMP },
+        { name: $c.lit("candle"), oclass: TOOL_CLASS, f_o_range: TALLOW_CANDLE, l_o_range: WAX_CANDLE },
+        { name: $c.lit("horn"), oclass: TOOL_CLASS, f_o_range: TOOLED_HORN, l_o_range: HORN_OF_PLENTY },
+        { name: $c.lit("shield"), oclass: ARMOR_CLASS, f_o_range: SMALL_SHIELD, l_o_range: SHIELD_OF_REFLECTION },
+        { name: $c.lit("hat"), oclass: ARMOR_CLASS, f_o_range: FEDORA, l_o_range: DUNCE_CAP },
+        { name: $c.lit("helm"), oclass: ARMOR_CLASS, f_o_range: ELVEN_LEATHER_HELM, l_o_range: HELM_OF_TELEPATHY },
+        { name: $c.lit("gloves"), oclass: ARMOR_CLASS, f_o_range: LEATHER_GLOVES, l_o_range: GAUNTLETS_OF_DEXTERITY },
+        { name: $c.lit("gauntlets"), oclass: ARMOR_CLASS, f_o_range: LEATHER_GLOVES, l_o_range: GAUNTLETS_OF_DEXTERITY },
+        { name: $c.lit("boots"), oclass: ARMOR_CLASS, f_o_range: LOW_BOOTS, l_o_range: LEVITATION_BOOTS },
+        { name: $c.lit("shoes"), oclass: ARMOR_CLASS, f_o_range: LOW_BOOTS, l_o_range: IRON_SHOES },
+        { name: $c.lit("cloak"), oclass: ARMOR_CLASS, f_o_range: MUMMY_WRAPPING, l_o_range: CLOAK_OF_DISPLACEMENT },
+        { name: $c.lit("shirt"), oclass: ARMOR_CLASS, f_o_range: HAWAIIAN_SHIRT, l_o_range: T_SHIRT },
+        { name: $c.lit("dragon scales"), oclass: ARMOR_CLASS, f_o_range: GRAY_DRAGON_SCALES,
+          l_o_range: YELLOW_DRAGON_SCALES },
+        { name: $c.lit("dragon scale mail"), oclass: ARMOR_CLASS, f_o_range: GRAY_DRAGON_SCALE_MAIL,
+          l_o_range: YELLOW_DRAGON_SCALE_MAIL },
+        { name: $c.lit("sword"), oclass: WEAPON_CLASS, f_o_range: SHORT_SWORD, l_o_range: KATANA },
+        { name: $c.lit("venom"), oclass: VENOM_CLASS, f_o_range: BLINDING_VENOM, l_o_range: ACID_VENOM },
+        { name: $c.lit("gray stone"), oclass: GEM_CLASS, f_o_range: LUCKSTONE, l_o_range: FLINT },
+        { name: $c.lit("grey stone"), oclass: GEM_CLASS, f_o_range: LUCKSTONE, l_o_range: FLINT }
+    ]);
     for (let $i0 = 0; $i0 < 47; $i0++) {
         spellings[$i0].$copyFrom(new $T.alt_spellings());
     }
-    spellings[0].sp = $c.lit("pickax");
-    spellings[0].ob = PICK_AXE;
-    spellings[1].sp = $c.lit("whip");
-    spellings[1].ob = BULLWHIP;
-    spellings[2].sp = $c.lit("saber");
-    spellings[2].ob = SILVER_SABER;
-    spellings[3].sp = $c.lit("silver sabre");
-    spellings[3].ob = SILVER_SABER;
-    spellings[4].sp = $c.lit("smooth shield");
-    spellings[4].ob = SHIELD_OF_REFLECTION;
-    spellings[5].sp = $c.lit("grey dragon scale mail");
-    spellings[5].ob = GRAY_DRAGON_SCALE_MAIL;
-    spellings[6].sp = $c.lit("grey dragon scales");
-    spellings[6].ob = GRAY_DRAGON_SCALES;
-    spellings[7].sp = $c.lit("iron ball");
-    spellings[7].ob = HEAVY_IRON_BALL;
-    spellings[8].sp = $c.lit("lantern");
-    spellings[8].ob = BRASS_LANTERN;
-    spellings[9].sp = $c.lit("mattock");
-    spellings[9].ob = DWARVISH_MATTOCK;
-    spellings[10].sp = $c.lit("amulet of poison resistance");
-    spellings[10].ob = AMULET_VERSUS_POISON;
-    spellings[11].sp = $c.lit("amulet of protection");
-    spellings[11].ob = AMULET_OF_GUARDING;
-    spellings[12].sp = $c.lit("amulet of telepathy");
-    spellings[12].ob = AMULET_OF_ESP;
-    spellings[13].sp = $c.lit("helm of esp");
-    spellings[13].ob = HELM_OF_TELEPATHY;
-    spellings[14].sp = $c.lit("gauntlets of ogre power");
-    spellings[14].ob = GAUNTLETS_OF_POWER;
-    spellings[15].sp = $c.lit("gauntlets of giant strength");
-    spellings[15].ob = GAUNTLETS_OF_POWER;
-    spellings[16].sp = $c.lit("elven chain mail");
-    spellings[16].ob = ELVEN_MITHRIL_COAT;
-    spellings[17].sp = $c.lit("silver shield");
-    spellings[17].ob = SHIELD_OF_REFLECTION;
-    spellings[18].sp = $c.lit("potion of sleep");
-    spellings[18].ob = POT_SLEEPING;
-    spellings[19].sp = $c.lit("scroll of recharging");
-    spellings[19].ob = SCR_CHARGING;
-    spellings[20].sp = $c.lit("recharging");
-    spellings[20].ob = SCR_CHARGING;
-    spellings[21].sp = $c.lit("stone");
-    spellings[21].ob = ROCK;
-    spellings[22].sp = $c.lit("camera");
-    spellings[22].ob = EXPENSIVE_CAMERA;
-    spellings[23].sp = $c.lit("tee shirt");
-    spellings[23].ob = T_SHIRT;
-    spellings[24].sp = $c.lit("can");
-    spellings[24].ob = TIN;
-    spellings[25].sp = $c.lit("can opener");
-    spellings[25].ob = TIN_OPENER;
-    spellings[26].sp = $c.lit("kelp");
-    spellings[26].ob = KELP_FROND;
-    spellings[27].sp = $c.lit("eucalyptus");
-    spellings[27].ob = EUCALYPTUS_LEAF;
-    spellings[28].sp = $c.lit("lembas");
-    spellings[28].ob = LEMBAS_WAFER;
-    spellings[29].sp = $c.lit("tripe");
-    spellings[29].ob = TRIPE_RATION;
-    spellings[30].sp = $c.lit("cookie");
-    spellings[30].ob = FORTUNE_COOKIE;
-    spellings[31].sp = $c.lit("pie");
-    spellings[31].ob = CREAM_PIE;
-    spellings[32].sp = $c.lit("huge meatball");
-    spellings[32].ob = ENORMOUS_MEATBALL;
-    spellings[33].sp = $c.lit("huge chunk of meat");
-    spellings[33].ob = ENORMOUS_MEATBALL;
-    spellings[34].sp = $c.lit("marker");
-    spellings[34].ob = MAGIC_MARKER;
-    spellings[35].sp = $c.lit("hook");
-    spellings[35].ob = GRAPPLING_HOOK;
-    spellings[36].sp = $c.lit("grappling iron");
-    spellings[36].ob = GRAPPLING_HOOK;
-    spellings[37].sp = $c.lit("grapnel");
-    spellings[37].ob = GRAPPLING_HOOK;
-    spellings[38].sp = $c.lit("grapple");
-    spellings[38].ob = GRAPPLING_HOOK;
-    spellings[39].sp = $c.lit("protection from shape shifters");
-    spellings[39].ob = RIN_PROTECTION_FROM_SHAPE_CHAN;
-    spellings[40].sp = $c.lit("accuracy");
-    spellings[40].ob = RIN_INCREASE_ACCURACY;
-    spellings[41].sp = $c.lit("box");
-    spellings[41].ob = LARGE_BOX;
-    spellings[42].sp = $c.lit("luck stone");
-    spellings[42].ob = LUCKSTONE;
-    spellings[43].sp = $c.lit("load stone");
-    spellings[43].ob = LOADSTONE;
-    spellings[44].sp = $c.lit("touch stone");
-    spellings[44].ob = TOUCHSTONE;
-    spellings[45].sp = $c.lit("flintstone");
-    spellings[45].ob = FLINT;
-    spellings[46].sp = null;
-    spellings[46].ob = 0;
+    $c.init(spellings, [
+        { sp: $c.lit("pickax"), ob: PICK_AXE },
+        { sp: $c.lit("whip"), ob: BULLWHIP },
+        { sp: $c.lit("saber"), ob: SILVER_SABER },
+        { sp: $c.lit("silver sabre"), ob: SILVER_SABER },
+        { sp: $c.lit("smooth shield"), ob: SHIELD_OF_REFLECTION },
+        { sp: $c.lit("grey dragon scale mail"), ob: GRAY_DRAGON_SCALE_MAIL },
+        { sp: $c.lit("grey dragon scales"), ob: GRAY_DRAGON_SCALES },
+        { sp: $c.lit("iron ball"), ob: HEAVY_IRON_BALL },
+        { sp: $c.lit("lantern"), ob: BRASS_LANTERN },
+        { sp: $c.lit("mattock"), ob: DWARVISH_MATTOCK },
+        { sp: $c.lit("amulet of poison resistance"), ob: AMULET_VERSUS_POISON },
+        { sp: $c.lit("amulet of protection"), ob: AMULET_OF_GUARDING },
+        { sp: $c.lit("amulet of telepathy"), ob: AMULET_OF_ESP },
+        { sp: $c.lit("helm of esp"), ob: HELM_OF_TELEPATHY },
+        { sp: $c.lit("gauntlets of ogre power"), ob: GAUNTLETS_OF_POWER },
+        { sp: $c.lit("gauntlets of giant strength"), ob: GAUNTLETS_OF_POWER },
+        { sp: $c.lit("elven chain mail"), ob: ELVEN_MITHRIL_COAT },
+        { sp: $c.lit("silver shield"), ob: SHIELD_OF_REFLECTION },
+        { sp: $c.lit("potion of sleep"), ob: POT_SLEEPING },
+        { sp: $c.lit("scroll of recharging"), ob: SCR_CHARGING },
+        { sp: $c.lit("recharging"), ob: SCR_CHARGING },
+        { sp: $c.lit("stone"), ob: ROCK },
+        { sp: $c.lit("camera"), ob: EXPENSIVE_CAMERA },
+        { sp: $c.lit("tee shirt"), ob: T_SHIRT },
+        { sp: $c.lit("can"), ob: TIN },
+        { sp: $c.lit("can opener"), ob: TIN_OPENER },
+        { sp: $c.lit("kelp"), ob: KELP_FROND },
+        { sp: $c.lit("eucalyptus"), ob: EUCALYPTUS_LEAF },
+        { sp: $c.lit("lembas"), ob: LEMBAS_WAFER },
+        { sp: $c.lit("tripe"), ob: TRIPE_RATION },
+        { sp: $c.lit("cookie"), ob: FORTUNE_COOKIE },
+        { sp: $c.lit("pie"), ob: CREAM_PIE },
+        { sp: $c.lit("huge meatball"), ob: ENORMOUS_MEATBALL },
+        { sp: $c.lit("huge chunk of meat"), ob: ENORMOUS_MEATBALL },
+        { sp: $c.lit("marker"), ob: MAGIC_MARKER },
+        { sp: $c.lit("hook"), ob: GRAPPLING_HOOK },
+        { sp: $c.lit("grappling iron"), ob: GRAPPLING_HOOK },
+        { sp: $c.lit("grapnel"), ob: GRAPPLING_HOOK },
+        { sp: $c.lit("grapple"), ob: GRAPPLING_HOOK },
+        { sp: $c.lit("protection from shape shifters"), ob: RIN_PROTECTION_FROM_SHAPE_CHAN },
+        { sp: $c.lit("accuracy"), ob: RIN_INCREASE_ACCURACY },
+        { sp: $c.lit("box"), ob: LARGE_BOX },
+        { sp: $c.lit("luck stone"), ob: LUCKSTONE },
+        { sp: $c.lit("load stone"), ob: LOADSTONE },
+        { sp: $c.lit("touch stone"), ob: TOUCHSTONE },
+        { sp: $c.lit("flintstone"), ob: FLINT },
+        {}
+    ]);
     xname_flags$xname_full = 0;
     doname_base$doname_full = 0;
     paydoname$and_contents.fill(0);
     paydoname$and_contents.set([32, 97, 110, 100, 32, 105, 116, 115, 32, 99, 111, 110, 116, 101, 110, 116, 115]);   // " and its contents"
     singplur_compound$compounds.fill(null);
-    singplur_compound$compounds[0] = $c.lit(" of ");
-    singplur_compound$compounds[1] = $c.lit(" labeled ");
-    singplur_compound$compounds[2] = $c.lit(" called ");
-    singplur_compound$compounds[3] = $c.lit(" named ");
-    singplur_compound$compounds[4] = $c.lit(" above");
-    singplur_compound$compounds[5] = $c.lit(" versus ");
-    singplur_compound$compounds[6] = $c.lit(" from ");
-    singplur_compound$compounds[7] = $c.lit(" in ");
-    singplur_compound$compounds[8] = $c.lit(" on ");
-    singplur_compound$compounds[9] = $c.lit(" a la ");
-    singplur_compound$compounds[10] = $c.lit(" with");
-    singplur_compound$compounds[11] = $c.lit(" de ");
-    singplur_compound$compounds[12] = $c.lit(" d'");
-    singplur_compound$compounds[13] = $c.lit(" du ");
-    singplur_compound$compounds[14] = $c.lit(" au ");
-    singplur_compound$compounds[15] = $c.lit("-in-");
-    singplur_compound$compounds[16] = $c.lit("-at-");
-    singplur_compound$compounds[17] = null;
+    $c.init(singplur_compound$compounds, [
+        $c.lit(" of "),
+        $c.lit(" labeled "),
+        $c.lit(" called "),
+        $c.lit(" named "),
+        $c.lit(" above"),
+        $c.lit(" versus "),
+        $c.lit(" from "),
+        $c.lit(" in "),
+        $c.lit(" on "),
+        $c.lit(" a la "),
+        $c.lit(" with"),
+        $c.lit(" de "),
+        $c.lit(" d'"),
+        $c.lit(" du "),
+        $c.lit(" au "),
+        $c.lit("-in-"),
+        $c.lit("-at-"),
+        null
+    ]);
     singplur_compound$compound_start.fill(0);
     singplur_compound$compound_start.set([32, 45]);   // " -"
     makeplural$already_plural.fill(null);
-    makeplural$already_plural[0] = $c.lit("ae");
-    makeplural$already_plural[1] = $c.lit("eaux");
-    makeplural$already_plural[2] = $c.lit("matzot");
-    makeplural$already_plural[3] = null;
+    $c.init(makeplural$already_plural, [
+        $c.lit("ae"),
+        $c.lit("eaux"),
+        $c.lit("matzot"),
+        null
+    ]);
     ch_ksound$ch_k.fill(null);
-    ch_ksound$ch_k[0] = $c.lit("monarch");
-    ch_ksound$ch_k[1] = $c.lit("poch");
-    ch_ksound$ch_k[2] = $c.lit("tech");
-    ch_ksound$ch_k[3] = $c.lit("mech");
-    ch_ksound$ch_k[4] = $c.lit("stomach");
-    ch_ksound$ch_k[5] = $c.lit("psych");
-    ch_ksound$ch_k[6] = $c.lit("amphibrach");
-    ch_ksound$ch_k[7] = $c.lit("anarch");
-    ch_ksound$ch_k[8] = $c.lit("atriarch");
-    ch_ksound$ch_k[9] = $c.lit("azedarach");
-    ch_ksound$ch_k[10] = $c.lit("broch");
-    ch_ksound$ch_k[11] = $c.lit("gastrotrich");
-    ch_ksound$ch_k[12] = $c.lit("isopach");
-    ch_ksound$ch_k[13] = $c.lit("loch");
-    ch_ksound$ch_k[14] = $c.lit("oligarch");
-    ch_ksound$ch_k[15] = $c.lit("peritrich");
-    ch_ksound$ch_k[16] = $c.lit("sandarach");
-    ch_ksound$ch_k[17] = $c.lit("sumach");
-    ch_ksound$ch_k[18] = $c.lit("symposiarch");
+    $c.init(ch_ksound$ch_k, [
+        $c.lit("monarch"),
+        $c.lit("poch"),
+        $c.lit("tech"),
+        $c.lit("mech"),
+        $c.lit("stomach"),
+        $c.lit("psych"),
+        $c.lit("amphibrach"),
+        $c.lit("anarch"),
+        $c.lit("atriarch"),
+        $c.lit("azedarach"),
+        $c.lit("broch"),
+        $c.lit("gastrotrich"),
+        $c.lit("isopach"),
+        $c.lit("loch"),
+        $c.lit("oligarch"),
+        $c.lit("peritrich"),
+        $c.lit("sandarach"),
+        $c.lit("sumach"),
+        $c.lit("symposiarch")
+    ]);
     badman$no_men.fill(null);
-    badman$no_men[0] = $c.lit("albu");
-    badman$no_men[1] = $c.lit("antihu");
-    badman$no_men[2] = $c.lit("anti");
-    badman$no_men[3] = $c.lit("ata");
-    badman$no_men[4] = $c.lit("auto");
-    badman$no_men[5] = $c.lit("bildungsro");
-    badman$no_men[6] = $c.lit("cai");
-    badman$no_men[7] = $c.lit("cay");
-    badman$no_men[8] = $c.lit("ceru");
-    badman$no_men[9] = $c.lit("corner");
-    badman$no_men[10] = $c.lit("decu");
-    badman$no_men[11] = $c.lit("des");
-    badman$no_men[12] = $c.lit("dura");
-    badman$no_men[13] = $c.lit("fir");
-    badman$no_men[14] = $c.lit("hanu");
-    badman$no_men[15] = $c.lit("het");
-    badman$no_men[16] = $c.lit("infrahu");
-    badman$no_men[17] = $c.lit("inhu");
-    badman$no_men[18] = $c.lit("nonhu");
-    badman$no_men[19] = $c.lit("otto");
-    badman$no_men[20] = $c.lit("out");
-    badman$no_men[21] = $c.lit("prehu");
-    badman$no_men[22] = $c.lit("protohu");
-    badman$no_men[23] = $c.lit("subhu");
-    badman$no_men[24] = $c.lit("superhu");
-    badman$no_men[25] = $c.lit("talis");
-    badman$no_men[26] = $c.lit("unhu");
-    badman$no_men[27] = $c.lit("sha");
-    badman$no_men[28] = $c.lit("hu");
-    badman$no_men[29] = $c.lit("un");
-    badman$no_men[30] = $c.lit("le");
-    badman$no_men[31] = $c.lit("re");
-    badman$no_men[32] = $c.lit("so");
-    badman$no_men[33] = $c.lit("to");
-    badman$no_men[34] = $c.lit("at");
-    badman$no_men[35] = $c.lit("a");
+    $c.init(badman$no_men, [
+        $c.lit("albu"),
+        $c.lit("antihu"),
+        $c.lit("anti"),
+        $c.lit("ata"),
+        $c.lit("auto"),
+        $c.lit("bildungsro"),
+        $c.lit("cai"),
+        $c.lit("cay"),
+        $c.lit("ceru"),
+        $c.lit("corner"),
+        $c.lit("decu"),
+        $c.lit("des"),
+        $c.lit("dura"),
+        $c.lit("fir"),
+        $c.lit("hanu"),
+        $c.lit("het"),
+        $c.lit("infrahu"),
+        $c.lit("inhu"),
+        $c.lit("nonhu"),
+        $c.lit("otto"),
+        $c.lit("out"),
+        $c.lit("prehu"),
+        $c.lit("protohu"),
+        $c.lit("subhu"),
+        $c.lit("superhu"),
+        $c.lit("talis"),
+        $c.lit("unhu"),
+        $c.lit("sha"),
+        $c.lit("hu"),
+        $c.lit("un"),
+        $c.lit("le"),
+        $c.lit("re"),
+        $c.lit("so"),
+        $c.lit("to"),
+        $c.lit("at"),
+        $c.lit("a")
+    ]);
     badman$no_man.fill(null);
-    badman$no_man[0] = $c.lit("abdo");
-    badman$no_man[1] = $c.lit("acu");
-    badman$no_man[2] = $c.lit("agno");
-    badman$no_man[3] = $c.lit("ceru");
-    badman$no_man[4] = $c.lit("cogno");
-    badman$no_man[5] = $c.lit("cycla");
-    badman$no_man[6] = $c.lit("fleh");
-    badman$no_man[7] = $c.lit("grava");
-    badman$no_man[8] = $c.lit("hegu");
-    badman$no_man[9] = $c.lit("preno");
-    badman$no_man[10] = $c.lit("sonar");
-    badman$no_man[11] = $c.lit("speci");
-    badman$no_man[12] = $c.lit("dai");
-    badman$no_man[13] = $c.lit("exa");
-    badman$no_man[14] = $c.lit("fla");
-    badman$no_man[15] = $c.lit("sta");
-    badman$no_man[16] = $c.lit("teg");
-    badman$no_man[17] = $c.lit("tegu");
-    badman$no_man[18] = $c.lit("vela");
-    badman$no_man[19] = $c.lit("da");
-    badman$no_man[20] = $c.lit("hy");
-    badman$no_man[21] = $c.lit("lu");
-    badman$no_man[22] = $c.lit("no");
-    badman$no_man[23] = $c.lit("nu");
-    badman$no_man[24] = $c.lit("ra");
-    badman$no_man[25] = $c.lit("ru");
-    badman$no_man[26] = $c.lit("se");
-    badman$no_man[27] = $c.lit("vi");
-    badman$no_man[28] = $c.lit("ya");
-    badman$no_man[29] = $c.lit("o");
-    badman$no_man[30] = $c.lit("a");
+    $c.init(badman$no_man, [
+        $c.lit("abdo"),
+        $c.lit("acu"),
+        $c.lit("agno"),
+        $c.lit("ceru"),
+        $c.lit("cogno"),
+        $c.lit("cycla"),
+        $c.lit("fleh"),
+        $c.lit("grava"),
+        $c.lit("hegu"),
+        $c.lit("preno"),
+        $c.lit("sonar"),
+        $c.lit("speci"),
+        $c.lit("dai"),
+        $c.lit("exa"),
+        $c.lit("fla"),
+        $c.lit("sta"),
+        $c.lit("teg"),
+        $c.lit("tegu"),
+        $c.lit("vela"),
+        $c.lit("da"),
+        $c.lit("hy"),
+        $c.lit("lu"),
+        $c.lit("no"),
+        $c.lit("nu"),
+        $c.lit("ra"),
+        $c.lit("ru"),
+        $c.lit("se"),
+        $c.lit("vi"),
+        $c.lit("ya"),
+        $c.lit("o"),
+        $c.lit("a")
+    ]);
     wishymatch$detect_SP.fill(0);
     wishymatch$detect_SP.set([100, 101, 116, 101, 99, 116, 32]);   // "detect "
     wishymatch$SP_detection.fill(0);

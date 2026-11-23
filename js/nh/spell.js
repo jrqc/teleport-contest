@@ -767,7 +767,7 @@ async function cast_chain_lightning() {   // spell.c:1003
             if (mon) {
                 unused[0] = null;
                 gn.notonhead = $c.i8(mon.mx !== gb.bhitpos.x || mon.my !== gb.bhitpos.y ? 1 : 0);
-                dmg = await zhitm(mon, 15, 2, new $c.Ptr(unused, 0));
+                dmg = await zhitm(mon, 10 + (AD_ELEC - 1), 2, new $c.Ptr(unused, 0));
                 if (dmg) {
                     if (DEADMONSTER(mon)) {
                         await xkilled(mon, XKILL_GIVEMSG);
@@ -1419,7 +1419,7 @@ export async function show_spells() {   // spell.c:2059
         await pline($c.lit("%s"), $c.lit(""));
     } else {
         await pline($c.lit("Spells:"));
-        await dospellmenu($c.lit(""), -3, new $c.Ptr(unused, 0));
+        await dospellmenu($c.lit(""), SPELLMENU_DUMP, new $c.Ptr(unused, 0));
     }
 }
 async function dospellmenu(prompt, splaction, spell_no) {   // spell.c:2075
@@ -1429,7 +1429,7 @@ async function dospellmenu(prompt, splaction, spell_no) {   // spell.c:2075
     await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     if (!iflags.menu_tab_sep) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s%-20s Level %-12s Fail Retention"), splaction === -3 ? $c.lit("") : $c.lit("    "), $c.lit("Name"), $c.lit("Category"));
+        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s%-20s Level %-12s Fail Retention"), splaction === SPELLMENU_DUMP ? $c.lit("") : $c.lit("    "), $c.lit("Name"), $c.lit("Category"));
         fmt = $c.lit("%-20s  %2d   %-12s %3d%% %9s");
         sep = 32;
     } else {
@@ -1640,14 +1640,16 @@ export function $init() {
     explodes.fill(0);
     explodes.set([114, 97, 100, 105, 97, 116, 101, 115, 32, 101, 120, 112, 108, 111, 115, 105, 118, 101, 32, 101, 110, 101, 114, 103, 121]);   // "radiates explosive energy"
     spl_sortchoices.fill(null);
-    spl_sortchoices[0] = $c.lit("by casting letter");
-    spl_sortchoices[1] = $c.lit("alphabetically");
-    spl_sortchoices[2] = $c.lit("by level, low to high");
-    spl_sortchoices[3] = $c.lit("by level, high to low");
-    spl_sortchoices[4] = $c.lit("by skill group, alphabetized within each group");
-    spl_sortchoices[5] = $c.lit("by skill group, low to high level within group");
-    spl_sortchoices[6] = $c.lit("by skill group, high to low level within group");
-    spl_sortchoices[7] = $c.lit("maintain current ordering");
-    spl_sortchoices[8] = $c.lit("reassign casting letters to retain current order");
+    $c.init(spl_sortchoices, [
+        $c.lit("by casting letter"),
+        $c.lit("alphabetically"),
+        $c.lit("by level, low to high"),
+        $c.lit("by level, high to low"),
+        $c.lit("by skill group, alphabetized within each group"),
+        $c.lit("by skill group, low to high level within group"),
+        $c.lit("by skill group, high to low level within group"),
+        $c.lit("maintain current ordering"),
+        $c.lit("reassign casting letters to retain current order")
+    ]);
     tport_spell$save_tport.$copyFrom(new $T.tport_hideaway());
 }

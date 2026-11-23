@@ -15,7 +15,7 @@ import { add_menu_coloring_parsed, attr2attrname, check_enhanced_colors, clr2col
 import { nomakedefs } from './date.js';
 import { a11y, cg, disclosure_options, disp, flags, ga, gc, gd, gf, gh, gm, gn, go, gp, gs, gt, gv, gw, hexdd, iflags, program_state, svb, svc, svd, svp, u } from './decl.js';
 import { AE, AS } from './decl.macros.js';
-import { AMULET_CLASS, ARMOR_CLASS, BALL_CLASS, CHAIN_CLASS, COIN_CLASS, FOOD_CLASS, GEM_CLASS, GOLD_SYM, POTION_CLASS, RING_CLASS, ROCK_CLASS, SCROLL_CLASS, SPBOOK_CLASS, S_expl_br, S_stone, S_vbeam, S_water, TOOL_CLASS, VENOM_SYM, WAND_CLASS, WEAPON_CLASS } from './defsym.h.js';
+import { AMULET_CLASS, ARMOR_CLASS, BALL_CLASS, CHAIN_CLASS, COIN_CLASS, FOOD_CLASS, GEM_CLASS, GOLD_SYM, POTION_CLASS, RING_CLASS, ROCK_CLASS, SCROLL_CLASS, SPBOOK_CLASS, TOOL_CLASS, VENOM_SYM, WAND_CLASS, WEAPON_CLASS } from './defsym.h.js';
 import { docrt, flush_screen, nul_glyphinfo, reglyph_darkroom, reset_glyphmap } from './display.js';
 import { gm_optionchange } from './display.h.js';
 import { def_char_to_monclass, def_char_to_objclass, def_oc_syms, def_warnsyms } from './drawing.js';
@@ -24,11 +24,11 @@ import { nh_terminate, panic } from './end.js';
 import { do_deferred_showpaths, nh_basename, read_sym_file } from './files.js';
 import { AUTOUNLOCK_APPLY_KEY, AUTOUNLOCK_FORCE, AUTOUNLOCK_KICK, AUTOUNLOCK_UNTRAP, DISCLOSE_NO_WITHOUT_PROMPT, DISCLOSE_PROMPT_DEFAULT_NO, DISCLOSE_PROMPT_DEFAULT_SPECIAL, DISCLOSE_PROMPT_DEFAULT_YES, DISCLOSE_SPECIAL_WITHOUT_PROMPT, DISCLOSE_YES_WITHOUT_PROMPT, GFILTER_AREA, GFILTER_NONE, GFILTER_VIEW, GPCOORDS_COMFULL, GPCOORDS_COMPASS, GPCOORDS_MAP, GPCOORDS_NONE, GPCOORDS_SCREEN, NUM_DISCLOSURE_OPTIONS, PARANOID_AUTOALL, PARANOID_BONES, PARANOID_BREAKWAND, PARANOID_CONFIRM, PARANOID_DIE, PARANOID_EATING, PARANOID_HIT, PARANOID_PRAY, PARANOID_QUIT, PARANOID_REMOVE, PARANOID_SWIM, PARANOID_TRAP, PARANOID_WERECHANGE, RUN_CRAWL, RUN_LEAP, RUN_STEP, RUN_TPORT, VI_BRANCH, VI_NAME, VI_NUMBER, WC_COUNT, wcolor_menu, wcolor_message, wcolor_status, wcolor_text } from './flag.h.js';
 import { discover, wizard } from './flag.macros.js';
-import { BUFSZ, COLNO, FALSE, LARGEST_INT, OPTCOUNT, PL_FSIZ, PL_NSIZ, PL_PSIZ, TRUE, builtin_opt, cmdline_opt, environ_opt, num_opt_phases, opt_in, opt_out, play_opt, set_gameview, set_hidden, set_in_config, set_in_game, set_in_sysconf, set_wiznofuz, set_wizonly, syscf_opt } from './global.h.js';
+import { BUFSZ, COLNO, FALSE, LARGEST_INT, OPTCOUNT, PL_CSIZ, PL_FSIZ, PL_NSIZ, PL_PSIZ, ROWNO, TRUE, builtin_opt, cmdline_opt, environ_opt, num_opt_phases, opt_in, opt_out, play_opt, set_gameview, set_hidden, set_in_config, set_in_game, set_in_sysconf, set_wiznofuz, set_wizonly, syscf_opt } from './global.h.js';
 import { C, M, SET__IS_VALUE_VALID } from './global.macros.js';
 import { apply_customizations, fill_glyphid_cache, free_glyphid_cache, glyphid_cache_status, glyphrep_to_custom_map_entries, reset_customcolors } from './glyphs.js';
 import { classify_terrain } from './hack.js';
-import { ECMD_FAIL, ECMD_OK, EXT_ENCUMBER, HVY_ENCUMBER, MAX_MENU_MAPPED_CMDS, MENU_COMBINATION, MENU_FULL, MENU_PARTIAL, MENU_TRADITIONAL, MOD_ENCUMBER, MSGTYP_NOREP, MSGTYP_NORMAL, MSGTYP_NOSHOW, MSGTYP_STOP, OVERLOADED, SLT_ENCUMBER, SYM_OFF_X, UNENCUMBERED, VANQ_MLVL_MNDX, WINTYPELEN } from './hack.h.js';
+import { ECMD_FAIL, ECMD_OK, EXT_ENCUMBER, HVY_ENCUMBER, MAX_MENU_MAPPED_CMDS, MENUTYPELEN, MENU_COMBINATION, MENU_FULL, MENU_PARTIAL, MENU_TRADITIONAL, MOD_ENCUMBER, MSGTYP_NOREP, MSGTYP_NORMAL, MSGTYP_NOSHOW, MSGTYP_STOP, OVERLOADED, SLT_ENCUMBER, SYM_OFF_O, SYM_OFF_X, UNENCUMBERED, VANQ_MLVL_MNDX, WINTYPELEN } from './hack.h.js';
 import { copynchars, digit, eos, fuzzymatch, highc, letter, lowc, mungspaces, nh_snprintf, strNsubst, str_end_is, str_start_is, strkitten, strncmpi, strstri, strsubst, trimspaces, visctrl } from './hacklib.js';
 import { set_vanq_order, vanqorders } from './insight.js';
 import { reassign, update_inventory } from './invent.js';
@@ -50,9 +50,8 @@ import { aligns, clearrolefilter, genders, races, rolefilterstring, roles, setro
 import { sf_init } from './sfbase.js';
 import { assign_soundlib, get_soundlib_name, soundlib_id_from_opt } from './sounds.js';
 import { Strlen_, strbuf_append, strbuf_init } from './strutil.js';
-import { MAXMCLASSES, MAXPCHARS, NUM_GRAPHICS, PRIMARYSET, ROGUESET, SYM_BOULDER, WARNCOUNT, do_custom_colors, do_custom_symbols } from './sym.h.js';
+import { MAXDCHARS, MAXECHARS, MAXMCLASSES, MAXTCHARS, NUM_GRAPHICS, PRIMARYSET, ROGUESET, SYM_BOULDER, WARNCOUNT, do_custom_colors, do_custom_symbols } from './sym.h.js';
 import { assign_graphics, clear_symsetentry, do_symset, get_othersym, init_ov_primary_symbols, init_ov_rogue_symbols, init_rogue_symbols, init_symbols, known_handling, load_symset, parsesymbols, savedsym_strbuf, switch_symbols } from './symbols.js';
-import { TRAPNUM } from './trap.h.js';
 import { authorize_explore_mode, authorize_wizard_mode } from './unixmain.js';
 import { reset_customsymbols } from './utf8map.js';
 import { get_current_feature_ver, get_feature_notice_ver, status_version } from './version.js';
@@ -418,7 +417,7 @@ async function optfn_alignment(optidx, req, negated, opts, op$in) {   // options
         return optn_ok;
     }
     if (req === get_val) {
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), flags.initalign >= 0 ? aligns[flags.initalign].adj : flags.initalign === -2 ? new $c.Ptr(randomrole, 0) : new $c.Ptr(none, 0));
+        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), flags.initalign >= 0 ? aligns[flags.initalign].adj : flags.initalign === ROLE_RANDOM ? new $c.Ptr(randomrole, 0) : new $c.Ptr(none, 0));
         return optn_ok;
     }
     if (req === get_cnf_val) {
@@ -456,7 +455,7 @@ async function optfn_align_message(optidx, req, negated, opts, op) {   // option
     }
     if (req === get_val || req === get_cnf_val) {
         which = iflags.wc_align_message;
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), which === 3 ? $c.lit("top") : which === 1 ? $c.lit("left") : which === 4 ? $c.lit("bottom") : which === 2 ? $c.lit("right") : new $c.Ptr(defopt, 0));
+        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), which === ALIGN_TOP ? $c.lit("top") : which === ALIGN_LEFT ? $c.lit("left") : which === ALIGN_BOTTOM ? $c.lit("bottom") : which === ALIGN_RIGHT ? $c.lit("right") : new $c.Ptr(defopt, 0));
         return optn_ok;
     }
     if (req === do_handler) {
@@ -492,7 +491,7 @@ async function optfn_align_status(optidx, req, negated, opts, op) {   // options
     }
     if (req === get_val || req === get_cnf_val) {
         which = iflags.wc_align_status;
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), which === 3 ? $c.lit("top") : which === 1 ? $c.lit("left") : which === 4 ? $c.lit("bottom") : which === 2 ? $c.lit("right") : new $c.Ptr(defopt, 0));
+        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), which === ALIGN_TOP ? $c.lit("top") : which === ALIGN_LEFT ? $c.lit("left") : which === ALIGN_BOTTOM ? $c.lit("bottom") : which === ALIGN_RIGHT ? $c.lit("right") : new $c.Ptr(defopt, 0));
         return optn_ok;
     }
     if (req === do_handler) {
@@ -635,7 +634,7 @@ async function optfn_boulder(optidx, req, negated, opts, op) {   // options.c:11
     }
     if (req === get_val || req === get_cnf_val) {
         opts.set(0, 0);
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%c"), go.ov_primary_syms[SYM_BOULDER + (0 + MAXPCHARS + MAXOCLASSES + MAXMCLASSES + 6)] ? go.ov_primary_syms[SYM_BOULDER + (0 + MAXPCHARS + MAXOCLASSES + MAXMCLASSES + 6)] : gs.showsyms[objects[BOULDER].oc_class + (0 + MAXPCHARS) | 0]);
+        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%c"), go.ov_primary_syms[SYM_BOULDER + SYM_OFF_X] ? go.ov_primary_syms[SYM_BOULDER + SYM_OFF_X] : gs.showsyms[objects[BOULDER].oc_class + SYM_OFF_O | 0]);
         return optn_ok;
     }
     return optn_ok;
@@ -974,7 +973,7 @@ async function optfn_gender(optidx, req, negated, opts, op$in) {   // options.c:
         return optn_ok;
     }
     if (req === get_val) {
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), flags.initgend >= 0 ? genders[flags.initgend].adj : flags.initgend === -2 ? new $c.Ptr(randomrole, 0) : new $c.Ptr(none, 0));
+        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), flags.initgend >= 0 ? genders[flags.initgend].adj : flags.initgend === ROLE_RANDOM ? new $c.Ptr(randomrole, 0) : new $c.Ptr(none, 0));
         return optn_ok;
     }
     if (req === get_cnf_val) {
@@ -1139,7 +1138,7 @@ async function optfn_map_mode(optidx, req, negated, opts, op) {   // options.c:1
     }
     if (req === get_val || req === get_cnf_val) {
         i = iflags.wc_map_mode;
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), i === 0 ? $c.lit("tiles") : i === 1 ? $c.lit("ascii4x6") : i === 2 ? $c.lit("ascii6x8") : i === 3 ? $c.lit("ascii8x8") : i === 4 ? $c.lit("ascii16x8") : i === 5 ? $c.lit("ascii7x12") : i === 6 ? $c.lit("ascii8x12") : i === 7 ? $c.lit("ascii16x12") : i === 8 ? $c.lit("ascii12x16") : i === 9 ? $c.lit("ascii10x18") : i === 10 ? $c.lit("fit_to_screen") : new $c.Ptr(defopt, 0));
+        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), i === MAP_MODE_TILES ? $c.lit("tiles") : i === MAP_MODE_ASCII4x6 ? $c.lit("ascii4x6") : i === MAP_MODE_ASCII6x8 ? $c.lit("ascii6x8") : i === MAP_MODE_ASCII8x8 ? $c.lit("ascii8x8") : i === MAP_MODE_ASCII16x8 ? $c.lit("ascii16x8") : i === MAP_MODE_ASCII7x12 ? $c.lit("ascii7x12") : i === MAP_MODE_ASCII8x12 ? $c.lit("ascii8x12") : i === MAP_MODE_ASCII16x12 ? $c.lit("ascii16x12") : i === MAP_MODE_ASCII12x16 ? $c.lit("ascii12x16") : i === MAP_MODE_ASCII10x18 ? $c.lit("ascii10x18") : i === MAP_MODE_ASCII_FIT_TO_SCREEN ? $c.lit("fit_to_screen") : new $c.Ptr(defopt, 0));
         return optn_ok;
     }
     return optn_ok;
@@ -1659,7 +1658,7 @@ async function optfn_paranoid_confirmation(optidx, req, opt_negated, opts, op) {
             }
         }
         opts.set(0, 0);
-        $c.__builtin___strncat_chk(opts, tmpbuf[0] ? new $c.Ptr(tmpbuf, 1) : $c.lit("none"), 255, -1);
+        $c.__builtin___strncat_chk(opts, tmpbuf[0] ? new $c.Ptr(tmpbuf, 1) : $c.lit("none"), BUFSZ - 1, -1);
         return optn_ok;
     }
     if (req === do_handler) {
@@ -2044,7 +2043,7 @@ async function optfn_race(optidx, req, negated, opts, op$in) {   // options.c:35
         return optn_ok;
     }
     if (req === get_val) {
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), flags.initrace >= 0 ? races[flags.initrace].noun : flags.initrace === -2 ? new $c.Ptr(randomrole, 0) : new $c.Ptr(none, 0));
+        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), flags.initrace >= 0 ? races[flags.initrace].noun : flags.initrace === ROLE_RANDOM ? new $c.Ptr(randomrole, 0) : new $c.Ptr(none, 0));
         return optn_ok;
     }
     if (req === get_cnf_val) {
@@ -2114,7 +2113,7 @@ async function optfn_role(optidx, req, negated, opts, op$in) {   // options.c:35
         return optn_ok;
     }
     if (req === get_val) {
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), flags.initrole >= 0 ? roles[flags.initrole].name.m : flags.initrole === -2 ? new $c.Ptr(randomrole, 0) : new $c.Ptr(none, 0));
+        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), flags.initrole >= 0 ? roles[flags.initrole].name.m : flags.initrole === ROLE_RANDOM ? new $c.Ptr(randomrole, 0) : new $c.Ptr(none, 0));
         return optn_ok;
     }
     if (req === get_cnf_val) {
@@ -2804,7 +2803,7 @@ async function optfn_versinfo(optidx, req, negated, opts, op) {   // options.c:4
         g = $c.i8((vi & VI_NAME) >>> 0 !== 0 ? 1 : 0);
         b = $c.i8((vi & VI_BRANCH) >>> 0 !== 0 ? 1 : 0);
         n = $c.i8((vi & VI_NUMBER) >>> 0 !== 0 ? 1 : 0);
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%u: %s%s%s%s%s (%.99s)"), flags.versinfo, g ? $c.lit("name") : $c.lit(""), b && g ? $c.lit("+") : $c.lit(""), b ? $c.lit("branch") : $c.lit(""), n && (b || g) ? $c.lit("+") : $c.lit(""), n ? $c.lit("number") : $c.lit(""), status_version(new $c.Ptr(vbuf, 0), 128, 0));
+        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%u: %s%s%s%s%s (%.99s)"), flags.versinfo, g ? $c.lit("name") : $c.lit(""), b && g ? $c.lit("+") : $c.lit(""), b ? $c.lit("branch") : $c.lit(""), n && (b || g) ? $c.lit("+") : $c.lit(""), n ? $c.lit("number") : $c.lit(""), status_version(new $c.Ptr(vbuf, 0), 128, FALSE));
     } else if (req === get_cnf_val) {
         $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%u"), flags.versinfo);
     }
@@ -3862,12 +3861,12 @@ async function handler_whatis_coord() {   // options.c:6206
     any.a_char = GPCOORDS_NONE;
     await add_menu(tmpwin, nul_glyphinfo, any, GPCOORDS_NONE, 0, ATR_NONE, clr, $c.lit("none (no coordinates displayed)"), gpc === 110 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     await add_menu_str(tmpwin, $c.lit(""));
-    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("map: upper-left: <%d,%d>, lower-right: <%d,%d>%s"), 1, 0, 79, 20, flags.verbose ? $c.lit("; column 0 unused, off left edge") : $c.lit(""));
+    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("map: upper-left: <%d,%d>, lower-right: <%d,%d>%s"), 1, 0, COLNO - 1, ROWNO - 1, flags.verbose ? $c.lit("; column 0 unused, off left edge") : $c.lit(""));
     await add_menu_str(tmpwin, new $c.Ptr(buf, 0));
     if ($c.strcmp(windowprocs.name, $c.lit("tty"))) {
         await add_menu_str(tmpwin, $c.lit("screen: row is offset to accommodate tty interface's use of top line"));
     }
-    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("screen: upper-left: [%02d,%02d], lower-right: [%d,%d]%s"), 2, 1, 22, 79, flags.verbose ? $c.lit("; column 80 is not used") : $c.lit(""));
+    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("screen: upper-left: [%02d,%02d], lower-right: [%d,%d]%s"), 2, 1, ROWNO - 1 + 2, COLNO - 1, flags.verbose ? $c.lit("; column 80 is not used") : $c.lit(""));
     await add_menu_str(tmpwin, new $c.Ptr(buf, 0));
     await add_menu_str(tmpwin, $c.lit(""));
     await end_menu()(tmpwin, $c.lit("Select coordinate display when auto-describing a map position:"));
@@ -4010,7 +4009,7 @@ async function handler_menu_colors() {   // options.c:6407
                     sclr = $c.__builtin___strcpy_chk(new $c.Ptr(clrbuf, 0), clr2colorname(tmp.color), 128);
                     strNsubst(new $c.Ptr(clrbuf, 0), $c.lit(" "), $c.lit("-"), 0);
                     $t1 = mc_idx = mc_idx + 1 | 0, any.a_int = $t1;
-                    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("\"\"=%s%s%s"), sclr, tmp.attr !== 0 ? $c.lit("&") : $c.lit(""), tmp.attr !== 0 ? sattr : $c.lit(""));
+                    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("\"\"=%s%s%s"), sclr, tmp.attr !== ATR_NONE ? $c.lit("&") : $c.lit(""), tmp.attr !== ATR_NONE ? sattr : $c.lit(""));
                     ln = $c.u32($c.subu64($c.subu64(256, await Strlen_(new $c.Ptr(buf, 0), $c.lit("handler_menu_colors"), 6470)), 1));
                     $c.__builtin___strcpy_chk(new $c.Ptr(mcbuf, 0), $c.lit("\""), 256);
                     if ($c.strlen(tmp.origstr) > ln) {
@@ -5618,29 +5617,29 @@ export async function show_menu_controls(win, dolist) {   // options.c:9070
         await putstr()(win, 0, new $c.Ptr(buf, 0));
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_altfmt, 0), $c.lit(""), $c.lit(" Menu"), $c.lit(" Page"));
         await putstr()(win, 0, new $c.Ptr(buf, 0));
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit("Select"), visctrl(get_menu_cmd_key(46)), visctrl(get_menu_cmd_key(44)));
+        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit("Select"), visctrl(get_menu_cmd_key(MENU_SELECT_ALL)), visctrl(get_menu_cmd_key(MENU_SELECT_PAGE)));
         await putstr()(win, 0, new $c.Ptr(buf, 0));
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit("Invert"), visctrl(get_menu_cmd_key(64)), visctrl(get_menu_cmd_key(126)));
+        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit("Invert"), visctrl(get_menu_cmd_key(MENU_INVERT_ALL)), visctrl(get_menu_cmd_key(MENU_INVERT_PAGE)));
         await putstr()(win, 0, new $c.Ptr(buf, 0));
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit("Deselect"), visctrl(get_menu_cmd_key(45)), visctrl(get_menu_cmd_key(92)));
+        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit("Deselect"), visctrl(get_menu_cmd_key(MENU_UNSELECT_ALL)), visctrl(get_menu_cmd_key(MENU_UNSELECT_PAGE)));
         await putstr()(win, 0, new $c.Ptr(buf, 0));
         await putstr()(win, 0, $c.lit(""));
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit("Go to"), visctrl(get_menu_cmd_key(62)), $c.lit("Next page"));
+        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit("Go to"), visctrl(get_menu_cmd_key(MENU_NEXT_PAGE)), $c.lit("Next page"));
         await putstr()(win, 0, new $c.Ptr(buf, 0));
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit(""), visctrl(get_menu_cmd_key(60)), $c.lit("Previous page"));
+        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit(""), visctrl(get_menu_cmd_key(MENU_PREVIOUS_PAGE)), $c.lit("Previous page"));
         await putstr()(win, 0, new $c.Ptr(buf, 0));
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit(""), visctrl(get_menu_cmd_key(94)), $c.lit("First page"));
+        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit(""), visctrl(get_menu_cmd_key(MENU_FIRST_PAGE)), $c.lit("First page"));
         await putstr()(win, 0, new $c.Ptr(buf, 0));
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit(""), visctrl(get_menu_cmd_key(124)), $c.lit("Last page"));
+        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit(""), visctrl(get_menu_cmd_key(MENU_LAST_PAGE)), $c.lit("Last page"));
         await putstr()(win, 0, new $c.Ptr(buf, 0));
         if (has_menu_shift) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit("Pan view"), visctrl(get_menu_cmd_key(125)), $c.lit("Right (perm_invent only)"));
+            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit("Pan view"), visctrl(get_menu_cmd_key(MENU_SHIFT_RIGHT)), $c.lit("Right (perm_invent only)"));
             await putstr()(win, 0, new $c.Ptr(buf, 0));
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit(""), visctrl(get_menu_cmd_key(123)), $c.lit("Left"));
+            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit(""), visctrl(get_menu_cmd_key(MENU_SHIFT_LEFT)), $c.lit("Left"));
             await putstr()(win, 0, new $c.Ptr(buf, 0));
         }
         await putstr()(win, 0, $c.lit(""));
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit("Search"), visctrl(get_menu_cmd_key(58)), $c.lit("Exter a target string and invert all matching entries"));
+        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit("Search"), visctrl(get_menu_cmd_key(MENU_SEARCH)), $c.lit("Exter a target string and invert all matching entries"));
         await putstr()(win, 0, new $c.Ptr(buf, 0));
         await putstr()(win, 0, $c.lit(""));
         fmt = $c.lit("%9s  %-8s %s");
@@ -5908,7 +5907,7 @@ async function all_options_menucolors(sbuf) {   // options.c:9595
         tmp = arr.get(i - 1 | 0);
         sattr = attr2attrname(tmp.attr);
         sclr = clr2colorname(tmp.color);
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 512, $c.lit("MENUCOLOR=\"%s\"=%s%s%s\n"), tmp.origstr, sclr, tmp.attr !== 0 ? $c.lit("&") : $c.lit(""), tmp.attr !== 0 ? sattr : $c.lit(""));
+        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 512, $c.lit("MENUCOLOR=\"%s\"=%s%s%s\n"), tmp.origstr, sclr, tmp.attr !== ATR_NONE ? $c.lit("&") : $c.lit(""), tmp.attr !== ATR_NONE ? sattr : $c.lit(""));
         await strbuf_append(sbuf, new $c.Ptr(buf, 0));
     }
     $c.free(arr);
@@ -6266,4807 +6265,756 @@ export function $init() {
     for (let $i0 = 0; $i0 < 218; $i0++) {
         allopt_init[$i0].$copyFrom(new $T.allopt_t());
     }
-    allopt_init[0].name = $c.lit("windowtype");
-    allopt_init[0].section = OptS_Advanced;
-    allopt_init[0].minmatch = 0;
-    allopt_init[0].expectedbuf = 16;
-    allopt_init[0].idx = opt_windowtype;
-    allopt_init[0].setwhere = set_gameview;
-    allopt_init[0].opttyp = CompOpt;
-    allopt_init[0].negateok = No;
-    allopt_init[0].valok = Yes;
-    allopt_init[0].dupeok = No;
-    allopt_init[0].pfx = No;
-    allopt_init[0].termpref = 0;
-    allopt_init[0].opt_in_out = opt_in;
-    allopt_init[0].addr = null;
-    allopt_init[0].optfn = optfn_windowtype;
-    allopt_init[0].alias = null;
-    allopt_init[0].descr = $c.lit("windowing system to use (should be specified first)");
-    allopt_init[0].prefixgw = null;
-    allopt_init[0].initval = Off;
-    allopt_init[0].has_handler = No;
-    allopt_init[0].dupdetected = 0;
-    allopt_init[0].disregarded = 0;
-    allopt_init[1].name = $c.lit("playmode");
-    allopt_init[1].section = OptS_Advanced;
-    allopt_init[1].minmatch = 0;
-    allopt_init[1].expectedbuf = 8;
-    allopt_init[1].idx = opt_playmode;
-    allopt_init[1].setwhere = set_gameview;
-    allopt_init[1].opttyp = CompOpt;
-    allopt_init[1].negateok = No;
-    allopt_init[1].valok = Yes;
-    allopt_init[1].dupeok = No;
-    allopt_init[1].pfx = No;
-    allopt_init[1].termpref = 0;
-    allopt_init[1].opt_in_out = opt_in;
-    allopt_init[1].addr = null;
-    allopt_init[1].optfn = optfn_playmode;
-    allopt_init[1].alias = null;
-    allopt_init[1].descr = $c.lit("normal play, non-scoring explore mode, or debug mode");
-    allopt_init[1].prefixgw = null;
-    allopt_init[1].initval = Off;
-    allopt_init[1].has_handler = No;
-    allopt_init[1].dupdetected = 0;
-    allopt_init[1].disregarded = 0;
-    allopt_init[2].name = $c.lit("name");
-    allopt_init[2].section = OptS_Advanced;
-    allopt_init[2].minmatch = 0;
-    allopt_init[2].expectedbuf = 32;
-    allopt_init[2].idx = opt_name;
-    allopt_init[2].setwhere = set_gameview;
-    allopt_init[2].opttyp = CompOpt;
-    allopt_init[2].negateok = No;
-    allopt_init[2].valok = Yes;
-    allopt_init[2].dupeok = No;
-    allopt_init[2].pfx = No;
-    allopt_init[2].termpref = 0;
-    allopt_init[2].opt_in_out = opt_in;
-    allopt_init[2].addr = null;
-    allopt_init[2].optfn = optfn_name;
-    allopt_init[2].alias = null;
-    allopt_init[2].descr = $c.lit("your character's name (e.g., name:Merlin-W)");
-    allopt_init[2].prefixgw = null;
-    allopt_init[2].initval = Off;
-    allopt_init[2].has_handler = No;
-    allopt_init[2].dupdetected = 0;
-    allopt_init[2].disregarded = 0;
-    allopt_init[3].name = $c.lit("role");
-    allopt_init[3].section = OptS_Advanced;
-    allopt_init[3].minmatch = 0;
-    allopt_init[3].expectedbuf = 32;
-    allopt_init[3].idx = opt_role;
-    allopt_init[3].setwhere = set_gameview;
-    allopt_init[3].opttyp = CompOpt;
-    allopt_init[3].negateok = Yes;
-    allopt_init[3].valok = Yes;
-    allopt_init[3].dupeok = Yes;
-    allopt_init[3].pfx = No;
-    allopt_init[3].termpref = 0;
-    allopt_init[3].opt_in_out = opt_in;
-    allopt_init[3].addr = null;
-    allopt_init[3].optfn = optfn_role;
-    allopt_init[3].alias = $c.lit("character");
-    allopt_init[3].descr = $c.lit("your starting role (e.g., Barbarian, Valkyrie)");
-    allopt_init[3].prefixgw = null;
-    allopt_init[3].initval = Off;
-    allopt_init[3].has_handler = No;
-    allopt_init[3].dupdetected = 0;
-    allopt_init[3].disregarded = 0;
-    allopt_init[4].name = $c.lit("race");
-    allopt_init[4].section = OptS_Advanced;
-    allopt_init[4].minmatch = 0;
-    allopt_init[4].expectedbuf = 32;
-    allopt_init[4].idx = opt_race;
-    allopt_init[4].setwhere = set_gameview;
-    allopt_init[4].opttyp = CompOpt;
-    allopt_init[4].negateok = Yes;
-    allopt_init[4].valok = Yes;
-    allopt_init[4].dupeok = Yes;
-    allopt_init[4].pfx = No;
-    allopt_init[4].termpref = 0;
-    allopt_init[4].opt_in_out = opt_in;
-    allopt_init[4].addr = null;
-    allopt_init[4].optfn = optfn_race;
-    allopt_init[4].alias = null;
-    allopt_init[4].descr = $c.lit("your starting race (e.g., Human, Elf)");
-    allopt_init[4].prefixgw = null;
-    allopt_init[4].initval = Off;
-    allopt_init[4].has_handler = No;
-    allopt_init[4].dupdetected = 0;
-    allopt_init[4].disregarded = 0;
-    allopt_init[5].name = $c.lit("gender");
-    allopt_init[5].section = OptS_Advanced;
-    allopt_init[5].minmatch = 0;
-    allopt_init[5].expectedbuf = 8;
-    allopt_init[5].idx = opt_gender;
-    allopt_init[5].setwhere = set_gameview;
-    allopt_init[5].opttyp = CompOpt;
-    allopt_init[5].negateok = Yes;
-    allopt_init[5].valok = Yes;
-    allopt_init[5].dupeok = Yes;
-    allopt_init[5].pfx = No;
-    allopt_init[5].termpref = 0;
-    allopt_init[5].opt_in_out = opt_in;
-    allopt_init[5].addr = null;
-    allopt_init[5].optfn = optfn_gender;
-    allopt_init[5].alias = null;
-    allopt_init[5].descr = $c.lit("your starting gender (male or female)");
-    allopt_init[5].prefixgw = null;
-    allopt_init[5].initval = Off;
-    allopt_init[5].has_handler = No;
-    allopt_init[5].dupdetected = 0;
-    allopt_init[5].disregarded = 0;
-    allopt_init[6].name = $c.lit("alignment");
-    allopt_init[6].section = OptS_Advanced;
-    allopt_init[6].minmatch = 0;
-    allopt_init[6].expectedbuf = 8;
-    allopt_init[6].idx = opt_alignment;
-    allopt_init[6].setwhere = set_gameview;
-    allopt_init[6].opttyp = CompOpt;
-    allopt_init[6].negateok = Yes;
-    allopt_init[6].valok = Yes;
-    allopt_init[6].dupeok = Yes;
-    allopt_init[6].pfx = No;
-    allopt_init[6].termpref = 0;
-    allopt_init[6].opt_in_out = opt_in;
-    allopt_init[6].addr = null;
-    allopt_init[6].optfn = optfn_alignment;
-    allopt_init[6].alias = $c.lit("align");
-    allopt_init[6].descr = $c.lit("your starting alignment (lawful, neutral, or chaotic)");
-    allopt_init[6].prefixgw = null;
-    allopt_init[6].initval = Off;
-    allopt_init[6].has_handler = No;
-    allopt_init[6].dupdetected = 0;
-    allopt_init[6].disregarded = 0;
-    allopt_init[7].name = $c.lit("accessiblemsg");
-    allopt_init[7].section = OptS_Advanced;
-    allopt_init[7].minmatch = 0;
-    allopt_init[7].expectedbuf = 0;
-    allopt_init[7].idx = opt_accessiblemsg;
-    allopt_init[7].setwhere = set_in_game;
-    allopt_init[7].opttyp = BoolOpt;
-    allopt_init[7].negateok = Yes;
-    allopt_init[7].valok = No;
-    allopt_init[7].dupeok = No;
-    allopt_init[7].pfx = No;
-    allopt_init[7].termpref = Term_False;
-    allopt_init[7].opt_in_out = opt_out;
-    allopt_init[7].addr = new $c.FieldRef(a11y, "accessiblemsg", "i8");
-    allopt_init[7].optfn = optfn_boolean;
-    allopt_init[7].alias = null;
-    allopt_init[7].descr = $c.lit("add location information to messages");
-    allopt_init[7].prefixgw = null;
-    allopt_init[7].initval = Off;
-    allopt_init[7].has_handler = 0;
-    allopt_init[7].dupdetected = 0;
-    allopt_init[7].disregarded = 0;
-    allopt_init[8].name = $c.lit("acoustics");
-    allopt_init[8].section = OptS_Advanced;
-    allopt_init[8].minmatch = 0;
-    allopt_init[8].expectedbuf = 0;
-    allopt_init[8].idx = opt_acoustics;
-    allopt_init[8].setwhere = set_in_game;
-    allopt_init[8].opttyp = BoolOpt;
-    allopt_init[8].negateok = Yes;
-    allopt_init[8].valok = No;
-    allopt_init[8].dupeok = No;
-    allopt_init[8].pfx = No;
-    allopt_init[8].termpref = Term_False;
-    allopt_init[8].opt_in_out = opt_out;
-    allopt_init[8].addr = new $c.FieldRef(flags, "acoustics", "i8");
-    allopt_init[8].optfn = optfn_boolean;
-    allopt_init[8].alias = null;
-    allopt_init[8].descr = $c.lit("can your character hear anything");
-    allopt_init[8].prefixgw = null;
-    allopt_init[8].initval = On;
-    allopt_init[8].has_handler = 0;
-    allopt_init[8].dupdetected = 0;
-    allopt_init[8].disregarded = 0;
-    allopt_init[9].name = $c.lit("align_message");
-    allopt_init[9].section = OptS_Advanced;
-    allopt_init[9].minmatch = 0;
-    allopt_init[9].expectedbuf = 20;
-    allopt_init[9].idx = opt_align_message;
-    allopt_init[9].setwhere = set_gameview;
-    allopt_init[9].opttyp = CompOpt;
-    allopt_init[9].negateok = Yes;
-    allopt_init[9].valok = Yes;
-    allopt_init[9].dupeok = No;
-    allopt_init[9].pfx = No;
-    allopt_init[9].termpref = 0;
-    allopt_init[9].opt_in_out = opt_in;
-    allopt_init[9].addr = null;
-    allopt_init[9].optfn = optfn_align_message;
-    allopt_init[9].alias = null;
-    allopt_init[9].descr = $c.lit("message window alignment");
-    allopt_init[9].prefixgw = null;
-    allopt_init[9].initval = Off;
-    allopt_init[9].has_handler = Yes;
-    allopt_init[9].dupdetected = 0;
-    allopt_init[9].disregarded = 0;
-    allopt_init[10].name = $c.lit("align_status");
-    allopt_init[10].section = OptS_Advanced;
-    allopt_init[10].minmatch = 0;
-    allopt_init[10].expectedbuf = 20;
-    allopt_init[10].idx = opt_align_status;
-    allopt_init[10].setwhere = set_gameview;
-    allopt_init[10].opttyp = CompOpt;
-    allopt_init[10].negateok = No;
-    allopt_init[10].valok = Yes;
-    allopt_init[10].dupeok = No;
-    allopt_init[10].pfx = No;
-    allopt_init[10].termpref = 0;
-    allopt_init[10].opt_in_out = opt_in;
-    allopt_init[10].addr = null;
-    allopt_init[10].optfn = optfn_align_status;
-    allopt_init[10].alias = null;
-    allopt_init[10].descr = $c.lit("status window alignment");
-    allopt_init[10].prefixgw = null;
-    allopt_init[10].initval = Off;
-    allopt_init[10].has_handler = Yes;
-    allopt_init[10].dupdetected = 0;
-    allopt_init[10].disregarded = 0;
-    allopt_init[11].name = $c.lit("altkeyhandling");
-    allopt_init[11].section = OptS_Advanced;
-    allopt_init[11].minmatch = 0;
-    allopt_init[11].expectedbuf = 20;
-    allopt_init[11].idx = opt_altkeyhandling;
-    allopt_init[11].setwhere = set_in_config;
-    allopt_init[11].opttyp = CompOpt;
-    allopt_init[11].negateok = No;
-    allopt_init[11].valok = Yes;
-    allopt_init[11].dupeok = No;
-    allopt_init[11].pfx = No;
-    allopt_init[11].termpref = 0;
-    allopt_init[11].opt_in_out = opt_in;
-    allopt_init[11].addr = null;
-    allopt_init[11].optfn = optfn_altkeyhandling;
-    allopt_init[11].alias = $c.lit("altkeyhandler");
-    allopt_init[11].descr = $c.lit("(not applicable)");
-    allopt_init[11].prefixgw = null;
-    allopt_init[11].initval = Off;
-    allopt_init[11].has_handler = Yes;
-    allopt_init[11].dupdetected = 0;
-    allopt_init[11].disregarded = 0;
-    allopt_init[12].name = $c.lit("altmeta");
-    allopt_init[12].section = OptS_Advanced;
-    allopt_init[12].minmatch = 0;
-    allopt_init[12].expectedbuf = 0;
-    allopt_init[12].idx = opt_altmeta;
-    allopt_init[12].setwhere = set_in_game;
-    allopt_init[12].opttyp = BoolOpt;
-    allopt_init[12].negateok = Yes;
-    allopt_init[12].valok = No;
-    allopt_init[12].dupeok = No;
-    allopt_init[12].pfx = No;
-    allopt_init[12].termpref = Term_False;
-    allopt_init[12].opt_in_out = opt_out;
-    allopt_init[12].addr = new $c.FieldRef(iflags, "altmeta", "i8");
-    allopt_init[12].optfn = optfn_boolean;
-    allopt_init[12].alias = null;
-    allopt_init[12].descr = $c.lit("treat \"ESC c\" as M-c (Meta+c, 8th bit set)");
-    allopt_init[12].prefixgw = null;
-    allopt_init[12].initval = Off;
-    allopt_init[12].has_handler = 0;
-    allopt_init[12].dupdetected = 0;
-    allopt_init[12].disregarded = 0;
-    allopt_init[13].name = $c.lit("armorstatus");
-    allopt_init[13].section = OptS_Advanced;
-    allopt_init[13].minmatch = 0;
-    allopt_init[13].expectedbuf = 0;
-    allopt_init[13].idx = opt_armorstatus;
-    allopt_init[13].setwhere = set_in_game;
-    allopt_init[13].opttyp = BoolOpt;
-    allopt_init[13].negateok = Yes;
-    allopt_init[13].valok = No;
-    allopt_init[13].dupeok = No;
-    allopt_init[13].pfx = No;
-    allopt_init[13].termpref = Term_False;
-    allopt_init[13].opt_in_out = opt_in;
-    allopt_init[13].addr = new $c.FieldRef(flags, "armorstatus", "i8");
-    allopt_init[13].optfn = optfn_boolean;
-    allopt_init[13].alias = null;
-    allopt_init[13].descr = $c.lit("summarize currently worn armor in a status field");
-    allopt_init[13].prefixgw = null;
-    allopt_init[13].initval = Off;
-    allopt_init[13].has_handler = 0;
-    allopt_init[13].dupdetected = 0;
-    allopt_init[13].disregarded = 0;
-    allopt_init[14].name = $c.lit("ascii_map");
-    allopt_init[14].section = OptS_Advanced;
-    allopt_init[14].minmatch = 0;
-    allopt_init[14].expectedbuf = 0;
-    allopt_init[14].idx = opt_ascii_map;
-    allopt_init[14].setwhere = set_in_game;
-    allopt_init[14].opttyp = BoolOpt;
-    allopt_init[14].negateok = Yes;
-    allopt_init[14].valok = No;
-    allopt_init[14].dupeok = No;
-    allopt_init[14].pfx = No;
-    allopt_init[14].termpref = Term_False;
-    allopt_init[14].opt_in_out = opt_in;
-    allopt_init[14].addr = new $c.FieldRef(iflags, "wc_ascii_map", "i8");
-    allopt_init[14].optfn = optfn_boolean;
-    allopt_init[14].alias = null;
-    allopt_init[14].descr = $c.lit("show map as text");
-    allopt_init[14].prefixgw = null;
-    allopt_init[14].initval = On;
-    allopt_init[14].has_handler = 0;
-    allopt_init[14].dupdetected = 0;
-    allopt_init[14].disregarded = 0;
-    allopt_init[15].name = $c.lit("autocompletions");
-    allopt_init[15].section = OptS_Advanced;
-    allopt_init[15].minmatch = 0;
-    allopt_init[15].expectedbuf = 256;
-    allopt_init[15].idx = opt_o_autocomplete;
-    allopt_init[15].setwhere = set_in_game;
-    allopt_init[15].opttyp = OthrOpt;
-    allopt_init[15].negateok = No;
-    allopt_init[15].valok = Yes;
-    allopt_init[15].dupeok = No;
-    allopt_init[15].pfx = No;
-    allopt_init[15].termpref = 0;
-    allopt_init[15].opt_in_out = opt_in;
-    allopt_init[15].addr = null;
-    allopt_init[15].optfn = optfn_o_autocomplete;
-    allopt_init[15].alias = null;
-    allopt_init[15].descr = $c.lit("edit autocompletions");
-    allopt_init[15].prefixgw = null;
-    allopt_init[15].initval = On;
-    allopt_init[15].has_handler = On;
-    allopt_init[15].dupdetected = 0;
-    allopt_init[15].disregarded = 0;
-    allopt_init[16].name = $c.lit("autodescribe");
-    allopt_init[16].section = OptS_Advanced;
-    allopt_init[16].minmatch = 0;
-    allopt_init[16].expectedbuf = 0;
-    allopt_init[16].idx = opt_autodescribe;
-    allopt_init[16].setwhere = set_in_game;
-    allopt_init[16].opttyp = BoolOpt;
-    allopt_init[16].negateok = Yes;
-    allopt_init[16].valok = No;
-    allopt_init[16].dupeok = No;
-    allopt_init[16].pfx = No;
-    allopt_init[16].termpref = Term_False;
-    allopt_init[16].opt_in_out = opt_out;
-    allopt_init[16].addr = new $c.FieldRef(iflags, "autodescribe", "i8");
-    allopt_init[16].optfn = optfn_boolean;
-    allopt_init[16].alias = null;
-    allopt_init[16].descr = $c.lit("describe terrain under cursor");
-    allopt_init[16].prefixgw = null;
-    allopt_init[16].initval = On;
-    allopt_init[16].has_handler = 0;
-    allopt_init[16].dupdetected = 0;
-    allopt_init[16].disregarded = 0;
-    allopt_init[17].name = $c.lit("autodig");
-    allopt_init[17].section = OptS_Behavior;
-    allopt_init[17].minmatch = 0;
-    allopt_init[17].expectedbuf = 0;
-    allopt_init[17].idx = opt_autodig;
-    allopt_init[17].setwhere = set_in_game;
-    allopt_init[17].opttyp = BoolOpt;
-    allopt_init[17].negateok = Yes;
-    allopt_init[17].valok = No;
-    allopt_init[17].dupeok = No;
-    allopt_init[17].pfx = No;
-    allopt_init[17].termpref = Term_False;
-    allopt_init[17].opt_in_out = opt_in;
-    allopt_init[17].addr = new $c.FieldRef(flags, "autodig", "i8");
-    allopt_init[17].optfn = optfn_boolean;
-    allopt_init[17].alias = null;
-    allopt_init[17].descr = $c.lit("dig if moving and wielding a digging tool");
-    allopt_init[17].prefixgw = null;
-    allopt_init[17].initval = Off;
-    allopt_init[17].has_handler = 0;
-    allopt_init[17].dupdetected = 0;
-    allopt_init[17].disregarded = 0;
-    allopt_init[18].name = $c.lit("autoopen");
-    allopt_init[18].section = OptS_Behavior;
-    allopt_init[18].minmatch = 0;
-    allopt_init[18].expectedbuf = 0;
-    allopt_init[18].idx = opt_autoopen;
-    allopt_init[18].setwhere = set_in_game;
-    allopt_init[18].opttyp = BoolOpt;
-    allopt_init[18].negateok = Yes;
-    allopt_init[18].valok = No;
-    allopt_init[18].dupeok = No;
-    allopt_init[18].pfx = No;
-    allopt_init[18].termpref = Term_False;
-    allopt_init[18].opt_in_out = opt_out;
-    allopt_init[18].addr = new $c.FieldRef(flags, "autoopen", "i8");
-    allopt_init[18].optfn = optfn_boolean;
-    allopt_init[18].alias = null;
-    allopt_init[18].descr = $c.lit("walking into a door attempts to open it");
-    allopt_init[18].prefixgw = null;
-    allopt_init[18].initval = On;
-    allopt_init[18].has_handler = 0;
-    allopt_init[18].dupdetected = 0;
-    allopt_init[18].disregarded = 0;
-    allopt_init[19].name = $c.lit("autopickup");
-    allopt_init[19].section = OptS_Behavior;
-    allopt_init[19].minmatch = 0;
-    allopt_init[19].expectedbuf = 0;
-    allopt_init[19].idx = opt_autopickup;
-    allopt_init[19].setwhere = set_in_game;
-    allopt_init[19].opttyp = BoolOpt;
-    allopt_init[19].negateok = Yes;
-    allopt_init[19].valok = No;
-    allopt_init[19].dupeok = No;
-    allopt_init[19].pfx = No;
-    allopt_init[19].termpref = Term_False;
-    allopt_init[19].opt_in_out = opt_out;
-    allopt_init[19].addr = new $c.FieldRef(flags, "pickup", "i8");
-    allopt_init[19].optfn = optfn_boolean;
-    allopt_init[19].alias = null;
-    allopt_init[19].descr = $c.lit("automatically pick up objects");
-    allopt_init[19].prefixgw = null;
-    allopt_init[19].initval = Off;
-    allopt_init[19].has_handler = 0;
-    allopt_init[19].dupdetected = 0;
-    allopt_init[19].disregarded = 0;
-    allopt_init[20].name = $c.lit("autopickup exceptions");
-    allopt_init[20].section = OptS_Behavior;
-    allopt_init[20].minmatch = 0;
-    allopt_init[20].expectedbuf = 256;
-    allopt_init[20].idx = opt_o_autopickup_exceptions;
-    allopt_init[20].setwhere = set_in_game;
-    allopt_init[20].opttyp = OthrOpt;
-    allopt_init[20].negateok = No;
-    allopt_init[20].valok = Yes;
-    allopt_init[20].dupeok = No;
-    allopt_init[20].pfx = No;
-    allopt_init[20].termpref = 0;
-    allopt_init[20].opt_in_out = opt_in;
-    allopt_init[20].addr = null;
-    allopt_init[20].optfn = optfn_o_autopickup_exceptions;
-    allopt_init[20].alias = null;
-    allopt_init[20].descr = $c.lit("edit autopickup exceptions");
-    allopt_init[20].prefixgw = null;
-    allopt_init[20].initval = On;
-    allopt_init[20].has_handler = On;
-    allopt_init[20].dupdetected = 0;
-    allopt_init[20].disregarded = 0;
-    allopt_init[21].name = $c.lit("autoquiver");
-    allopt_init[21].section = OptS_Behavior;
-    allopt_init[21].minmatch = 0;
-    allopt_init[21].expectedbuf = 0;
-    allopt_init[21].idx = opt_autoquiver;
-    allopt_init[21].setwhere = set_in_game;
-    allopt_init[21].opttyp = BoolOpt;
-    allopt_init[21].negateok = Yes;
-    allopt_init[21].valok = No;
-    allopt_init[21].dupeok = No;
-    allopt_init[21].pfx = No;
-    allopt_init[21].termpref = Term_False;
-    allopt_init[21].opt_in_out = opt_in;
-    allopt_init[21].addr = new $c.FieldRef(flags, "autoquiver", "i8");
-    allopt_init[21].optfn = optfn_boolean;
-    allopt_init[21].alias = null;
-    allopt_init[21].descr = $c.lit("fill empty quiver automatically when firing");
-    allopt_init[21].prefixgw = null;
-    allopt_init[21].initval = Off;
-    allopt_init[21].has_handler = 0;
-    allopt_init[21].dupdetected = 0;
-    allopt_init[21].disregarded = 0;
-    allopt_init[22].name = $c.lit("autounlock");
-    allopt_init[22].section = OptS_Behavior;
-    allopt_init[22].minmatch = 0;
-    allopt_init[22].expectedbuf = 80;
-    allopt_init[22].idx = opt_autounlock;
-    allopt_init[22].setwhere = set_in_game;
-    allopt_init[22].opttyp = CompOpt;
-    allopt_init[22].negateok = Yes;
-    allopt_init[22].valok = Yes;
-    allopt_init[22].dupeok = No;
-    allopt_init[22].pfx = No;
-    allopt_init[22].termpref = 0;
-    allopt_init[22].opt_in_out = opt_out;
-    allopt_init[22].addr = null;
-    allopt_init[22].optfn = optfn_autounlock;
-    allopt_init[22].alias = null;
-    allopt_init[22].descr = $c.lit("action to take when encountering locked door or chest");
-    allopt_init[22].prefixgw = null;
-    allopt_init[22].initval = Off;
-    allopt_init[22].has_handler = Yes;
-    allopt_init[22].dupdetected = 0;
-    allopt_init[22].disregarded = 0;
-    allopt_init[23].name = $c.lit("bgcolors");
-    allopt_init[23].section = OptS_Map;
-    allopt_init[23].minmatch = 0;
-    allopt_init[23].expectedbuf = 0;
-    allopt_init[23].idx = opt_bgcolors;
-    allopt_init[23].setwhere = set_in_game;
-    allopt_init[23].opttyp = BoolOpt;
-    allopt_init[23].negateok = Yes;
-    allopt_init[23].valok = No;
-    allopt_init[23].dupeok = No;
-    allopt_init[23].pfx = No;
-    allopt_init[23].termpref = Term_Off;
-    allopt_init[23].opt_in_out = opt_out;
-    allopt_init[23].addr = new $c.FieldRef(iflags, "bgcolors", "i8");
-    allopt_init[23].optfn = optfn_boolean;
-    allopt_init[23].alias = null;
-    allopt_init[23].descr = $c.lit("use background color for some map hilighting");
-    allopt_init[23].prefixgw = null;
-    allopt_init[23].initval = On;
-    allopt_init[23].has_handler = 0;
-    allopt_init[23].dupdetected = 0;
-    allopt_init[23].disregarded = 0;
-    allopt_init[24].name = $c.lit("bind keys");
-    allopt_init[24].section = OptS_Advanced;
-    allopt_init[24].minmatch = 0;
-    allopt_init[24].expectedbuf = 256;
-    allopt_init[24].idx = opt_o_bind_keys;
-    allopt_init[24].setwhere = set_in_game;
-    allopt_init[24].opttyp = OthrOpt;
-    allopt_init[24].negateok = No;
-    allopt_init[24].valok = Yes;
-    allopt_init[24].dupeok = No;
-    allopt_init[24].pfx = No;
-    allopt_init[24].termpref = 0;
-    allopt_init[24].opt_in_out = opt_in;
-    allopt_init[24].addr = null;
-    allopt_init[24].optfn = optfn_o_bind_keys;
-    allopt_init[24].alias = null;
-    allopt_init[24].descr = $c.lit("edit key binds");
-    allopt_init[24].prefixgw = null;
-    allopt_init[24].initval = On;
-    allopt_init[24].has_handler = On;
-    allopt_init[24].dupdetected = 0;
-    allopt_init[24].disregarded = 0;
-    allopt_init[25].name = $c.lit("BIOS");
-    allopt_init[25].section = OptS_Advanced;
-    allopt_init[25].minmatch = 0;
-    allopt_init[25].expectedbuf = 0;
-    allopt_init[25].idx = opt_BIOS;
-    allopt_init[25].setwhere = set_in_config;
-    allopt_init[25].opttyp = BoolOpt;
-    allopt_init[25].negateok = No;
-    allopt_init[25].valok = No;
-    allopt_init[25].dupeok = No;
-    allopt_init[25].pfx = No;
-    allopt_init[25].termpref = Term_False;
-    allopt_init[25].opt_in_out = opt_in;
-    allopt_init[25].addr = null;
-    allopt_init[25].optfn = optfn_boolean;
-    allopt_init[25].alias = null;
-    allopt_init[25].descr = null;
-    allopt_init[25].prefixgw = null;
-    allopt_init[25].initval = Off;
-    allopt_init[25].has_handler = 0;
-    allopt_init[25].dupdetected = 0;
-    allopt_init[25].disregarded = 0;
-    allopt_init[26].name = $c.lit("blind");
-    allopt_init[26].section = OptS_Advanced;
-    allopt_init[26].minmatch = 0;
-    allopt_init[26].expectedbuf = 0;
-    allopt_init[26].idx = opt_blind;
-    allopt_init[26].setwhere = set_in_config;
-    allopt_init[26].opttyp = BoolOpt;
-    allopt_init[26].negateok = Yes;
-    allopt_init[26].valok = No;
-    allopt_init[26].dupeok = No;
-    allopt_init[26].pfx = No;
-    allopt_init[26].termpref = Term_False;
-    allopt_init[26].opt_in_out = opt_in;
-    allopt_init[26].addr = new $c.FieldRef(u.uroleplay, "blind", "i8");
-    allopt_init[26].optfn = optfn_boolean;
-    allopt_init[26].alias = $c.lit("permablind");
-    allopt_init[26].descr = $c.lit("your character is permanently blind");
-    allopt_init[26].prefixgw = null;
-    allopt_init[26].initval = Off;
-    allopt_init[26].has_handler = 0;
-    allopt_init[26].dupdetected = 0;
-    allopt_init[26].disregarded = 0;
-    allopt_init[27].name = $c.lit("bones");
-    allopt_init[27].section = OptS_Advanced;
-    allopt_init[27].minmatch = 0;
-    allopt_init[27].expectedbuf = 0;
-    allopt_init[27].idx = opt_bones;
-    allopt_init[27].setwhere = set_in_config;
-    allopt_init[27].opttyp = BoolOpt;
-    allopt_init[27].negateok = Yes;
-    allopt_init[27].valok = No;
-    allopt_init[27].dupeok = No;
-    allopt_init[27].pfx = No;
-    allopt_init[27].termpref = Term_False;
-    allopt_init[27].opt_in_out = opt_out;
-    allopt_init[27].addr = new $c.FieldRef(flags, "bones", "i8");
-    allopt_init[27].optfn = optfn_boolean;
-    allopt_init[27].alias = null;
-    allopt_init[27].descr = $c.lit("allow loading bones files");
-    allopt_init[27].prefixgw = null;
-    allopt_init[27].initval = On;
-    allopt_init[27].has_handler = 0;
-    allopt_init[27].dupdetected = 0;
-    allopt_init[27].disregarded = 0;
-    allopt_init[28].name = $c.lit("boulder");
-    allopt_init[28].section = OptS_Advanced;
-    allopt_init[28].minmatch = 0;
-    allopt_init[28].expectedbuf = 1;
-    allopt_init[28].idx = opt_boulder;
-    allopt_init[28].setwhere = set_in_game;
-    allopt_init[28].opttyp = CompOpt;
-    allopt_init[28].negateok = No;
-    allopt_init[28].valok = Yes;
-    allopt_init[28].dupeok = No;
-    allopt_init[28].pfx = No;
-    allopt_init[28].termpref = 0;
-    allopt_init[28].opt_in_out = opt_in;
-    allopt_init[28].addr = null;
-    allopt_init[28].optfn = optfn_boulder;
-    allopt_init[28].alias = null;
-    allopt_init[28].descr = $c.lit("deprecated (use S_boulder in sym file instead)");
-    allopt_init[28].prefixgw = null;
-    allopt_init[28].initval = Off;
-    allopt_init[28].has_handler = No;
-    allopt_init[28].dupdetected = 0;
-    allopt_init[28].disregarded = 0;
-    allopt_init[29].name = $c.lit("catname");
-    allopt_init[29].section = OptS_Advanced;
-    allopt_init[29].minmatch = 0;
-    allopt_init[29].expectedbuf = 63;
-    allopt_init[29].idx = opt_catname;
-    allopt_init[29].setwhere = set_gameview;
-    allopt_init[29].opttyp = CompOpt;
-    allopt_init[29].negateok = No;
-    allopt_init[29].valok = Yes;
-    allopt_init[29].dupeok = No;
-    allopt_init[29].pfx = No;
-    allopt_init[29].termpref = 0;
-    allopt_init[29].opt_in_out = opt_in;
-    allopt_init[29].addr = null;
-    allopt_init[29].optfn = optfn_catname;
-    allopt_init[29].alias = null;
-    allopt_init[29].descr = $c.lit("name of your starting pet if it is a kitten");
-    allopt_init[29].prefixgw = null;
-    allopt_init[29].initval = Off;
-    allopt_init[29].has_handler = No;
-    allopt_init[29].dupdetected = 0;
-    allopt_init[29].disregarded = 0;
-    allopt_init[30].name = $c.lit("checkpoint");
-    allopt_init[30].section = OptS_Advanced;
-    allopt_init[30].minmatch = 0;
-    allopt_init[30].expectedbuf = 0;
-    allopt_init[30].idx = opt_checkpoint;
-    allopt_init[30].setwhere = set_in_game;
-    allopt_init[30].opttyp = BoolOpt;
-    allopt_init[30].negateok = Yes;
-    allopt_init[30].valok = No;
-    allopt_init[30].dupeok = No;
-    allopt_init[30].pfx = No;
-    allopt_init[30].termpref = Term_False;
-    allopt_init[30].opt_in_out = opt_out;
-    allopt_init[30].addr = new $c.FieldRef(flags, "ins_chkpt", "i8");
-    allopt_init[30].optfn = optfn_boolean;
-    allopt_init[30].alias = null;
-    allopt_init[30].descr = $c.lit("save game state after each level change");
-    allopt_init[30].prefixgw = null;
-    allopt_init[30].initval = On;
-    allopt_init[30].has_handler = 0;
-    allopt_init[30].dupdetected = 0;
-    allopt_init[30].disregarded = 0;
-    allopt_init[31].name = $c.lit("cmdassist");
-    allopt_init[31].section = OptS_Behavior;
-    allopt_init[31].minmatch = 0;
-    allopt_init[31].expectedbuf = 0;
-    allopt_init[31].idx = opt_cmdassist;
-    allopt_init[31].setwhere = set_in_game;
-    allopt_init[31].opttyp = BoolOpt;
-    allopt_init[31].negateok = Yes;
-    allopt_init[31].valok = No;
-    allopt_init[31].dupeok = No;
-    allopt_init[31].pfx = No;
-    allopt_init[31].termpref = Term_False;
-    allopt_init[31].opt_in_out = opt_out;
-    allopt_init[31].addr = new $c.FieldRef(iflags, "cmdassist", "i8");
-    allopt_init[31].optfn = optfn_boolean;
-    allopt_init[31].alias = null;
-    allopt_init[31].descr = $c.lit("give help for errors on direction input");
-    allopt_init[31].prefixgw = null;
-    allopt_init[31].initval = On;
-    allopt_init[31].has_handler = 0;
-    allopt_init[31].dupdetected = 0;
-    allopt_init[31].disregarded = 0;
-    allopt_init[32].name = $c.lit("color");
-    allopt_init[32].section = OptS_Map;
-    allopt_init[32].minmatch = 0;
-    allopt_init[32].expectedbuf = 0;
-    allopt_init[32].idx = opt_color;
-    allopt_init[32].setwhere = set_in_game;
-    allopt_init[32].opttyp = BoolOpt;
-    allopt_init[32].negateok = Yes;
-    allopt_init[32].valok = No;
-    allopt_init[32].dupeok = No;
-    allopt_init[32].pfx = No;
-    allopt_init[32].termpref = Term_False;
-    allopt_init[32].opt_in_out = opt_in;
-    allopt_init[32].addr = new $c.FieldRef(iflags, "wc_color", "i8");
-    allopt_init[32].optfn = optfn_boolean;
-    allopt_init[32].alias = $c.lit("colour");
-    allopt_init[32].descr = $c.lit("use color in map");
-    allopt_init[32].prefixgw = null;
-    allopt_init[32].initval = On;
-    allopt_init[32].has_handler = 0;
-    allopt_init[32].dupdetected = 0;
-    allopt_init[32].disregarded = 0;
-    allopt_init[33].name = $c.lit("confirm");
-    allopt_init[33].section = OptS_Advanced;
-    allopt_init[33].minmatch = 0;
-    allopt_init[33].expectedbuf = 0;
-    allopt_init[33].idx = opt_confirm;
-    allopt_init[33].setwhere = set_in_game;
-    allopt_init[33].opttyp = BoolOpt;
-    allopt_init[33].negateok = Yes;
-    allopt_init[33].valok = No;
-    allopt_init[33].dupeok = No;
-    allopt_init[33].pfx = No;
-    allopt_init[33].termpref = Term_False;
-    allopt_init[33].opt_in_out = opt_out;
-    allopt_init[33].addr = new $c.FieldRef(flags, "confirm", "i8");
-    allopt_init[33].optfn = optfn_boolean;
-    allopt_init[33].alias = null;
-    allopt_init[33].descr = $c.lit("ask before hitting tame or peaceful monsters");
-    allopt_init[33].prefixgw = null;
-    allopt_init[33].initval = On;
-    allopt_init[33].has_handler = 0;
-    allopt_init[33].dupdetected = 0;
-    allopt_init[33].disregarded = 0;
-    allopt_init[34].name = $c.lit("crash_email");
-    allopt_init[34].section = OptS_Advanced;
-    allopt_init[34].minmatch = 0;
-    allopt_init[34].expectedbuf = 32;
-    allopt_init[34].idx = opt_crash_email;
-    allopt_init[34].setwhere = set_in_game;
-    allopt_init[34].opttyp = CompOpt;
-    allopt_init[34].negateok = No;
-    allopt_init[34].valok = Yes;
-    allopt_init[34].dupeok = No;
-    allopt_init[34].pfx = No;
-    allopt_init[34].termpref = 0;
-    allopt_init[34].opt_in_out = opt_in;
-    allopt_init[34].addr = null;
-    allopt_init[34].optfn = optfn_crash_email;
-    allopt_init[34].alias = null;
-    allopt_init[34].descr = $c.lit("email address for reporting");
-    allopt_init[34].prefixgw = null;
-    allopt_init[34].initval = Off;
-    allopt_init[34].has_handler = No;
-    allopt_init[34].dupdetected = 0;
-    allopt_init[34].disregarded = 0;
-    allopt_init[35].name = $c.lit("crash_name");
-    allopt_init[35].section = OptS_Advanced;
-    allopt_init[35].minmatch = 0;
-    allopt_init[35].expectedbuf = 32;
-    allopt_init[35].idx = opt_crash_name;
-    allopt_init[35].setwhere = set_in_game;
-    allopt_init[35].opttyp = CompOpt;
-    allopt_init[35].negateok = No;
-    allopt_init[35].valok = Yes;
-    allopt_init[35].dupeok = No;
-    allopt_init[35].pfx = No;
-    allopt_init[35].termpref = 0;
-    allopt_init[35].opt_in_out = opt_in;
-    allopt_init[35].addr = null;
-    allopt_init[35].optfn = optfn_crash_name;
-    allopt_init[35].alias = null;
-    allopt_init[35].descr = $c.lit("your name for reporting");
-    allopt_init[35].prefixgw = null;
-    allopt_init[35].initval = Off;
-    allopt_init[35].has_handler = No;
-    allopt_init[35].dupdetected = 0;
-    allopt_init[35].disregarded = 0;
-    allopt_init[36].name = $c.lit("crash_urlmax");
-    allopt_init[36].section = OptS_Advanced;
-    allopt_init[36].minmatch = 0;
-    allopt_init[36].expectedbuf = 32;
-    allopt_init[36].idx = opt_crash_urlmax;
-    allopt_init[36].setwhere = set_in_game;
-    allopt_init[36].opttyp = CompOpt;
-    allopt_init[36].negateok = No;
-    allopt_init[36].valok = Yes;
-    allopt_init[36].dupeok = No;
-    allopt_init[36].pfx = No;
-    allopt_init[36].termpref = 0;
-    allopt_init[36].opt_in_out = opt_in;
-    allopt_init[36].addr = null;
-    allopt_init[36].optfn = optfn_crash_urlmax;
-    allopt_init[36].alias = null;
-    allopt_init[36].descr = $c.lit("length of longest url we can generate");
-    allopt_init[36].prefixgw = null;
-    allopt_init[36].initval = Off;
-    allopt_init[36].has_handler = No;
-    allopt_init[36].dupdetected = 0;
-    allopt_init[36].disregarded = 0;
-    allopt_init[37].name = $c.lit("customcolors");
-    allopt_init[37].section = OptS_Map;
-    allopt_init[37].minmatch = 0;
-    allopt_init[37].expectedbuf = 0;
-    allopt_init[37].idx = opt_customcolors;
-    allopt_init[37].setwhere = set_in_game;
-    allopt_init[37].opttyp = BoolOpt;
-    allopt_init[37].negateok = Yes;
-    allopt_init[37].valok = No;
-    allopt_init[37].dupeok = No;
-    allopt_init[37].pfx = No;
-    allopt_init[37].termpref = Term_False;
-    allopt_init[37].opt_in_out = opt_out;
-    allopt_init[37].addr = new $c.FieldRef(iflags, "customcolors", "i8");
-    allopt_init[37].optfn = optfn_boolean;
-    allopt_init[37].alias = $c.lit("customcolours");
-    allopt_init[37].descr = $c.lit("use custom colors in map");
-    allopt_init[37].prefixgw = null;
-    allopt_init[37].initval = On;
-    allopt_init[37].has_handler = 0;
-    allopt_init[37].dupdetected = 0;
-    allopt_init[37].disregarded = 0;
-    allopt_init[38].name = $c.lit("customsymbols");
-    allopt_init[38].section = OptS_Map;
-    allopt_init[38].minmatch = 0;
-    allopt_init[38].expectedbuf = 0;
-    allopt_init[38].idx = opt_customsymbols;
-    allopt_init[38].setwhere = set_in_game;
-    allopt_init[38].opttyp = BoolOpt;
-    allopt_init[38].negateok = Yes;
-    allopt_init[38].valok = No;
-    allopt_init[38].dupeok = No;
-    allopt_init[38].pfx = No;
-    allopt_init[38].termpref = Term_False;
-    allopt_init[38].opt_in_out = opt_out;
-    allopt_init[38].addr = new $c.FieldRef(iflags, "customsymbols", "i8");
-    allopt_init[38].optfn = optfn_boolean;
-    allopt_init[38].alias = $c.lit("customsymbols");
-    allopt_init[38].descr = $c.lit("use custom utf8 symbols in map");
-    allopt_init[38].prefixgw = null;
-    allopt_init[38].initval = On;
-    allopt_init[38].has_handler = 0;
-    allopt_init[38].dupdetected = 0;
-    allopt_init[38].disregarded = 0;
-    allopt_init[39].name = $c.lit("dark_room");
-    allopt_init[39].section = OptS_Advanced;
-    allopt_init[39].minmatch = 0;
-    allopt_init[39].expectedbuf = 0;
-    allopt_init[39].idx = opt_dark_room;
-    allopt_init[39].setwhere = set_in_game;
-    allopt_init[39].opttyp = BoolOpt;
-    allopt_init[39].negateok = Yes;
-    allopt_init[39].valok = No;
-    allopt_init[39].dupeok = No;
-    allopt_init[39].pfx = No;
-    allopt_init[39].termpref = Term_False;
-    allopt_init[39].opt_in_out = opt_out;
-    allopt_init[39].addr = new $c.FieldRef(flags, "dark_room", "i8");
-    allopt_init[39].optfn = optfn_boolean;
-    allopt_init[39].alias = null;
-    allopt_init[39].descr = $c.lit("show floor outside line of sight differently");
-    allopt_init[39].prefixgw = null;
-    allopt_init[39].initval = On;
-    allopt_init[39].has_handler = 0;
-    allopt_init[39].dupdetected = 0;
-    allopt_init[39].disregarded = 0;
-    allopt_init[40].name = $c.lit("deaf");
-    allopt_init[40].section = OptS_Advanced;
-    allopt_init[40].minmatch = 0;
-    allopt_init[40].expectedbuf = 0;
-    allopt_init[40].idx = opt_deaf;
-    allopt_init[40].setwhere = set_in_config;
-    allopt_init[40].opttyp = BoolOpt;
-    allopt_init[40].negateok = Yes;
-    allopt_init[40].valok = No;
-    allopt_init[40].dupeok = No;
-    allopt_init[40].pfx = No;
-    allopt_init[40].termpref = Term_False;
-    allopt_init[40].opt_in_out = opt_in;
-    allopt_init[40].addr = new $c.FieldRef(u.uroleplay, "deaf", "i8");
-    allopt_init[40].optfn = optfn_boolean;
-    allopt_init[40].alias = $c.lit("permadeaf");
-    allopt_init[40].descr = $c.lit("your character is permanently deaf");
-    allopt_init[40].prefixgw = null;
-    allopt_init[40].initval = Off;
-    allopt_init[40].has_handler = 0;
-    allopt_init[40].dupdetected = 0;
-    allopt_init[40].disregarded = 0;
-    allopt_init[41].name = $c.lit("DECgraphics");
-    allopt_init[41].section = OptS_Advanced;
-    allopt_init[41].minmatch = 0;
-    allopt_init[41].expectedbuf = 70;
-    allopt_init[41].idx = opt_DECgraphics;
-    allopt_init[41].setwhere = set_in_config;
-    allopt_init[41].opttyp = CompOpt;
-    allopt_init[41].negateok = Yes;
-    allopt_init[41].valok = Yes;
-    allopt_init[41].dupeok = No;
-    allopt_init[41].pfx = No;
-    allopt_init[41].termpref = 0;
-    allopt_init[41].opt_in_out = opt_in;
-    allopt_init[41].addr = null;
-    allopt_init[41].optfn = optfn_DECgraphics;
-    allopt_init[41].alias = null;
-    allopt_init[41].descr = $c.lit("load DECGraphics display symbols into symset");
-    allopt_init[41].prefixgw = null;
-    allopt_init[41].initval = Off;
-    allopt_init[41].has_handler = No;
-    allopt_init[41].dupdetected = 0;
-    allopt_init[41].disregarded = 0;
-    allopt_init[42].name = $c.lit("debug_hunger");
-    allopt_init[42].section = OptS_Advanced;
-    allopt_init[42].minmatch = 0;
-    allopt_init[42].expectedbuf = 0;
-    allopt_init[42].idx = opt_debug_hunger;
-    allopt_init[42].setwhere = set_wiznofuz;
-    allopt_init[42].opttyp = BoolOpt;
-    allopt_init[42].negateok = Yes;
-    allopt_init[42].valok = No;
-    allopt_init[42].dupeok = No;
-    allopt_init[42].pfx = No;
-    allopt_init[42].termpref = Term_False;
-    allopt_init[42].opt_in_out = opt_in;
-    allopt_init[42].addr = new $c.FieldRef(iflags, "debug_hunger", "i8");
-    allopt_init[42].optfn = optfn_boolean;
-    allopt_init[42].alias = null;
-    allopt_init[42].descr = $c.lit("no hunger");
-    allopt_init[42].prefixgw = null;
-    allopt_init[42].initval = Off;
-    allopt_init[42].has_handler = 0;
-    allopt_init[42].dupdetected = 0;
-    allopt_init[42].disregarded = 0;
-    allopt_init[43].name = $c.lit("debug_mongen");
-    allopt_init[43].section = OptS_Advanced;
-    allopt_init[43].minmatch = 0;
-    allopt_init[43].expectedbuf = 0;
-    allopt_init[43].idx = opt_debug_mongen;
-    allopt_init[43].setwhere = set_wiznofuz;
-    allopt_init[43].opttyp = BoolOpt;
-    allopt_init[43].negateok = Yes;
-    allopt_init[43].valok = No;
-    allopt_init[43].dupeok = No;
-    allopt_init[43].pfx = No;
-    allopt_init[43].termpref = Term_False;
-    allopt_init[43].opt_in_out = opt_in;
-    allopt_init[43].addr = new $c.FieldRef(iflags, "debug_mongen", "i8");
-    allopt_init[43].optfn = optfn_boolean;
-    allopt_init[43].alias = null;
-    allopt_init[43].descr = $c.lit("no random monster generation");
-    allopt_init[43].prefixgw = null;
-    allopt_init[43].initval = Off;
-    allopt_init[43].has_handler = 0;
-    allopt_init[43].dupdetected = 0;
-    allopt_init[43].disregarded = 0;
-    allopt_init[44].name = $c.lit("debug_overwrite_stairs");
-    allopt_init[44].section = OptS_Advanced;
-    allopt_init[44].minmatch = 0;
-    allopt_init[44].expectedbuf = 0;
-    allopt_init[44].idx = opt_debug_overwrite_stairs;
-    allopt_init[44].setwhere = set_wiznofuz;
-    allopt_init[44].opttyp = BoolOpt;
-    allopt_init[44].negateok = Yes;
-    allopt_init[44].valok = No;
-    allopt_init[44].dupeok = No;
-    allopt_init[44].pfx = No;
-    allopt_init[44].termpref = Term_False;
-    allopt_init[44].opt_in_out = opt_in;
-    allopt_init[44].addr = new $c.FieldRef(iflags, "debug_overwrite_stairs", "i8");
-    allopt_init[44].optfn = optfn_boolean;
-    allopt_init[44].alias = null;
-    allopt_init[44].descr = $c.lit("level generation can overwrite stairs");
-    allopt_init[44].prefixgw = null;
-    allopt_init[44].initval = Off;
-    allopt_init[44].has_handler = 0;
-    allopt_init[44].dupdetected = 0;
-    allopt_init[44].disregarded = 0;
-    allopt_init[45].name = $c.lit("disclose");
-    allopt_init[45].section = OptS_Advanced;
-    allopt_init[45].minmatch = 0;
-    allopt_init[45].expectedbuf = 14;
-    allopt_init[45].idx = opt_disclose;
-    allopt_init[45].setwhere = set_in_game;
-    allopt_init[45].opttyp = CompOpt;
-    allopt_init[45].negateok = Yes;
-    allopt_init[45].valok = Yes;
-    allopt_init[45].dupeok = No;
-    allopt_init[45].pfx = No;
-    allopt_init[45].termpref = 0;
-    allopt_init[45].opt_in_out = opt_in;
-    allopt_init[45].addr = null;
-    allopt_init[45].optfn = optfn_disclose;
-    allopt_init[45].alias = null;
-    allopt_init[45].descr = $c.lit("the kinds of information to disclose at end of game");
-    allopt_init[45].prefixgw = null;
-    allopt_init[45].initval = Off;
-    allopt_init[45].has_handler = Yes;
-    allopt_init[45].dupdetected = 0;
-    allopt_init[45].disregarded = 0;
-    allopt_init[46].name = $c.lit("dogname");
-    allopt_init[46].section = OptS_Advanced;
-    allopt_init[46].minmatch = 0;
-    allopt_init[46].expectedbuf = 63;
-    allopt_init[46].idx = opt_dogname;
-    allopt_init[46].setwhere = set_gameview;
-    allopt_init[46].opttyp = CompOpt;
-    allopt_init[46].negateok = No;
-    allopt_init[46].valok = Yes;
-    allopt_init[46].dupeok = No;
-    allopt_init[46].pfx = No;
-    allopt_init[46].termpref = 0;
-    allopt_init[46].opt_in_out = opt_in;
-    allopt_init[46].addr = null;
-    allopt_init[46].optfn = optfn_dogname;
-    allopt_init[46].alias = null;
-    allopt_init[46].descr = $c.lit("name of your starting pet if it is a little dog");
-    allopt_init[46].prefixgw = null;
-    allopt_init[46].initval = Off;
-    allopt_init[46].has_handler = No;
-    allopt_init[46].dupdetected = 0;
-    allopt_init[46].disregarded = 0;
-    allopt_init[47].name = $c.lit("dropped_nopick");
-    allopt_init[47].section = OptS_Behavior;
-    allopt_init[47].minmatch = 0;
-    allopt_init[47].expectedbuf = 0;
-    allopt_init[47].idx = opt_dropped_nopick;
-    allopt_init[47].setwhere = set_in_game;
-    allopt_init[47].opttyp = BoolOpt;
-    allopt_init[47].negateok = Yes;
-    allopt_init[47].valok = No;
-    allopt_init[47].dupeok = No;
-    allopt_init[47].pfx = No;
-    allopt_init[47].termpref = Term_False;
-    allopt_init[47].opt_in_out = opt_out;
-    allopt_init[47].addr = new $c.FieldRef(flags, "nopick_dropped", "i8");
-    allopt_init[47].optfn = optfn_boolean;
-    allopt_init[47].alias = null;
-    allopt_init[47].descr = $c.lit("don't autopickup dropped items");
-    allopt_init[47].prefixgw = null;
-    allopt_init[47].initval = On;
-    allopt_init[47].has_handler = 0;
-    allopt_init[47].dupdetected = 0;
-    allopt_init[47].disregarded = 0;
-    allopt_init[48].name = $c.lit("dungeon");
-    allopt_init[48].section = OptS_Advanced;
-    allopt_init[48].minmatch = 0;
-    allopt_init[48].expectedbuf = S_water - S_stone + 1 + 1;
-    allopt_init[48].idx = opt_dungeon;
-    allopt_init[48].setwhere = set_in_config;
-    allopt_init[48].opttyp = CompOpt;
-    allopt_init[48].negateok = No;
-    allopt_init[48].valok = Yes;
-    allopt_init[48].dupeok = No;
-    allopt_init[48].pfx = No;
-    allopt_init[48].termpref = 0;
-    allopt_init[48].opt_in_out = opt_in;
-    allopt_init[48].addr = null;
-    allopt_init[48].optfn = optfn_dungeon;
-    allopt_init[48].alias = null;
-    allopt_init[48].descr = $c.lit("list of symbols to use in drawing the dungeon map");
-    allopt_init[48].prefixgw = null;
-    allopt_init[48].initval = Off;
-    allopt_init[48].has_handler = No;
-    allopt_init[48].dupdetected = 0;
-    allopt_init[48].disregarded = 0;
-    allopt_init[49].name = $c.lit("effects");
-    allopt_init[49].section = OptS_Advanced;
-    allopt_init[49].minmatch = 0;
-    allopt_init[49].expectedbuf = S_expl_br - S_vbeam + 1 + 1;
-    allopt_init[49].idx = opt_effects;
-    allopt_init[49].setwhere = set_in_config;
-    allopt_init[49].opttyp = CompOpt;
-    allopt_init[49].negateok = No;
-    allopt_init[49].valok = Yes;
-    allopt_init[49].dupeok = No;
-    allopt_init[49].pfx = No;
-    allopt_init[49].termpref = 0;
-    allopt_init[49].opt_in_out = opt_in;
-    allopt_init[49].addr = null;
-    allopt_init[49].optfn = optfn_effects;
-    allopt_init[49].alias = null;
-    allopt_init[49].descr = $c.lit("list of symbols to use in drawing special effects");
-    allopt_init[49].prefixgw = null;
-    allopt_init[49].initval = Off;
-    allopt_init[49].has_handler = No;
-    allopt_init[49].dupdetected = 0;
-    allopt_init[49].disregarded = 0;
-    allopt_init[50].name = $c.lit("eight_bit_tty");
-    allopt_init[50].section = OptS_Advanced;
-    allopt_init[50].minmatch = 0;
-    allopt_init[50].expectedbuf = 0;
-    allopt_init[50].idx = opt_eight_bit_tty;
-    allopt_init[50].setwhere = set_in_game;
-    allopt_init[50].opttyp = BoolOpt;
-    allopt_init[50].negateok = Yes;
-    allopt_init[50].valok = No;
-    allopt_init[50].dupeok = No;
-    allopt_init[50].pfx = No;
-    allopt_init[50].termpref = Term_False;
-    allopt_init[50].opt_in_out = opt_in;
-    allopt_init[50].addr = new $c.FieldRef(iflags, "wc_eight_bit_input", "i8");
-    allopt_init[50].optfn = optfn_boolean;
-    allopt_init[50].alias = null;
-    allopt_init[50].descr = $c.lit("send 8-bit characters directly to terminal");
-    allopt_init[50].prefixgw = null;
-    allopt_init[50].initval = Off;
-    allopt_init[50].has_handler = 0;
-    allopt_init[50].dupdetected = 0;
-    allopt_init[50].disregarded = 0;
-    allopt_init[51].name = $c.lit("extmenu");
-    allopt_init[51].section = OptS_Advanced;
-    allopt_init[51].minmatch = 0;
-    allopt_init[51].expectedbuf = 0;
-    allopt_init[51].idx = opt_extmenu;
-    allopt_init[51].setwhere = set_in_game;
-    allopt_init[51].opttyp = BoolOpt;
-    allopt_init[51].negateok = Yes;
-    allopt_init[51].valok = No;
-    allopt_init[51].dupeok = No;
-    allopt_init[51].pfx = No;
-    allopt_init[51].termpref = Term_False;
-    allopt_init[51].opt_in_out = opt_in;
-    allopt_init[51].addr = new $c.FieldRef(iflags, "extmenu", "i8");
-    allopt_init[51].optfn = optfn_boolean;
-    allopt_init[51].alias = null;
-    allopt_init[51].descr = $c.lit("use menu for getting extended commands");
-    allopt_init[51].prefixgw = null;
-    allopt_init[51].initval = Off;
-    allopt_init[51].has_handler = 0;
-    allopt_init[51].dupdetected = 0;
-    allopt_init[51].disregarded = 0;
-    allopt_init[52].name = $c.lit("female");
-    allopt_init[52].section = OptS_Advanced;
-    allopt_init[52].minmatch = 0;
-    allopt_init[52].expectedbuf = 0;
-    allopt_init[52].idx = opt_female;
-    allopt_init[52].setwhere = set_in_config;
-    allopt_init[52].opttyp = BoolOpt;
-    allopt_init[52].negateok = Yes;
-    allopt_init[52].valok = No;
-    allopt_init[52].dupeok = No;
-    allopt_init[52].pfx = No;
-    allopt_init[52].termpref = Term_False;
-    allopt_init[52].opt_in_out = opt_in;
-    allopt_init[52].addr = new $c.FieldRef(flags, "female", "i8");
-    allopt_init[52].optfn = optfn_boolean;
-    allopt_init[52].alias = $c.lit("male");
-    allopt_init[52].descr = $c.lit("deprecated; use gender:female");
-    allopt_init[52].prefixgw = null;
-    allopt_init[52].initval = Off;
-    allopt_init[52].has_handler = 0;
-    allopt_init[52].dupdetected = 0;
-    allopt_init[52].disregarded = 0;
-    allopt_init[53].name = $c.lit("fireassist");
-    allopt_init[53].section = OptS_Behavior;
-    allopt_init[53].minmatch = 0;
-    allopt_init[53].expectedbuf = 0;
-    allopt_init[53].idx = opt_fireassist;
-    allopt_init[53].setwhere = set_in_game;
-    allopt_init[53].opttyp = BoolOpt;
-    allopt_init[53].negateok = Yes;
-    allopt_init[53].valok = No;
-    allopt_init[53].dupeok = No;
-    allopt_init[53].pfx = No;
-    allopt_init[53].termpref = Term_False;
-    allopt_init[53].opt_in_out = opt_out;
-    allopt_init[53].addr = new $c.FieldRef(iflags, "fireassist", "i8");
-    allopt_init[53].optfn = optfn_boolean;
-    allopt_init[53].alias = null;
-    allopt_init[53].descr = $c.lit("fire-command tries to be helpful");
-    allopt_init[53].prefixgw = null;
-    allopt_init[53].initval = On;
-    allopt_init[53].has_handler = 0;
-    allopt_init[53].dupdetected = 0;
-    allopt_init[53].disregarded = 0;
-    allopt_init[54].name = $c.lit("fixinv");
-    allopt_init[54].section = OptS_Advanced;
-    allopt_init[54].minmatch = 0;
-    allopt_init[54].expectedbuf = 0;
-    allopt_init[54].idx = opt_fixinv;
-    allopt_init[54].setwhere = set_in_game;
-    allopt_init[54].opttyp = BoolOpt;
-    allopt_init[54].negateok = Yes;
-    allopt_init[54].valok = No;
-    allopt_init[54].dupeok = No;
-    allopt_init[54].pfx = No;
-    allopt_init[54].termpref = Term_False;
-    allopt_init[54].opt_in_out = opt_out;
-    allopt_init[54].addr = new $c.FieldRef(flags, "invlet_constant", "i8");
-    allopt_init[54].optfn = optfn_boolean;
-    allopt_init[54].alias = null;
-    allopt_init[54].descr = $c.lit("inventory items keep their letters");
-    allopt_init[54].prefixgw = null;
-    allopt_init[54].initval = On;
-    allopt_init[54].has_handler = 0;
-    allopt_init[54].dupdetected = 0;
-    allopt_init[54].disregarded = 0;
-    allopt_init[55].name = $c.lit("font_map");
-    allopt_init[55].section = OptS_Advanced;
-    allopt_init[55].minmatch = 0;
-    allopt_init[55].expectedbuf = 40;
-    allopt_init[55].idx = opt_font_map;
-    allopt_init[55].setwhere = set_gameview;
-    allopt_init[55].opttyp = CompOpt;
-    allopt_init[55].negateok = Yes;
-    allopt_init[55].valok = Yes;
-    allopt_init[55].dupeok = Yes;
-    allopt_init[55].pfx = No;
-    allopt_init[55].termpref = 0;
-    allopt_init[55].opt_in_out = opt_in;
-    allopt_init[55].addr = null;
-    allopt_init[55].optfn = optfn_font_map;
-    allopt_init[55].alias = null;
-    allopt_init[55].descr = $c.lit("font to use in the map window");
-    allopt_init[55].prefixgw = null;
-    allopt_init[55].initval = Off;
-    allopt_init[55].has_handler = No;
-    allopt_init[55].dupdetected = 0;
-    allopt_init[55].disregarded = 0;
-    allopt_init[56].name = $c.lit("font_menu");
-    allopt_init[56].section = OptS_Advanced;
-    allopt_init[56].minmatch = 0;
-    allopt_init[56].expectedbuf = 40;
-    allopt_init[56].idx = opt_font_menu;
-    allopt_init[56].setwhere = set_gameview;
-    allopt_init[56].opttyp = CompOpt;
-    allopt_init[56].negateok = Yes;
-    allopt_init[56].valok = Yes;
-    allopt_init[56].dupeok = Yes;
-    allopt_init[56].pfx = No;
-    allopt_init[56].termpref = 0;
-    allopt_init[56].opt_in_out = opt_in;
-    allopt_init[56].addr = null;
-    allopt_init[56].optfn = optfn_font_menu;
-    allopt_init[56].alias = null;
-    allopt_init[56].descr = $c.lit("font to use in menus");
-    allopt_init[56].prefixgw = null;
-    allopt_init[56].initval = Off;
-    allopt_init[56].has_handler = No;
-    allopt_init[56].dupdetected = 0;
-    allopt_init[56].disregarded = 0;
-    allopt_init[57].name = $c.lit("font_message");
-    allopt_init[57].section = OptS_Advanced;
-    allopt_init[57].minmatch = 0;
-    allopt_init[57].expectedbuf = 40;
-    allopt_init[57].idx = opt_font_message;
-    allopt_init[57].setwhere = set_gameview;
-    allopt_init[57].opttyp = CompOpt;
-    allopt_init[57].negateok = Yes;
-    allopt_init[57].valok = Yes;
-    allopt_init[57].dupeok = Yes;
-    allopt_init[57].pfx = No;
-    allopt_init[57].termpref = 0;
-    allopt_init[57].opt_in_out = opt_in;
-    allopt_init[57].addr = null;
-    allopt_init[57].optfn = optfn_font_message;
-    allopt_init[57].alias = null;
-    allopt_init[57].descr = $c.lit("font to use in the message window");
-    allopt_init[57].prefixgw = null;
-    allopt_init[57].initval = Off;
-    allopt_init[57].has_handler = No;
-    allopt_init[57].dupdetected = 0;
-    allopt_init[57].disregarded = 0;
-    allopt_init[58].name = $c.lit("font_size_map");
-    allopt_init[58].section = OptS_Advanced;
-    allopt_init[58].minmatch = 0;
-    allopt_init[58].expectedbuf = 20;
-    allopt_init[58].idx = opt_font_size_map;
-    allopt_init[58].setwhere = set_gameview;
-    allopt_init[58].opttyp = CompOpt;
-    allopt_init[58].negateok = Yes;
-    allopt_init[58].valok = Yes;
-    allopt_init[58].dupeok = Yes;
-    allopt_init[58].pfx = No;
-    allopt_init[58].termpref = 0;
-    allopt_init[58].opt_in_out = opt_in;
-    allopt_init[58].addr = null;
-    allopt_init[58].optfn = optfn_font_size_map;
-    allopt_init[58].alias = null;
-    allopt_init[58].descr = $c.lit("size of the map font");
-    allopt_init[58].prefixgw = null;
-    allopt_init[58].initval = Off;
-    allopt_init[58].has_handler = No;
-    allopt_init[58].dupdetected = 0;
-    allopt_init[58].disregarded = 0;
-    allopt_init[59].name = $c.lit("font_size_menu");
-    allopt_init[59].section = OptS_Advanced;
-    allopt_init[59].minmatch = 0;
-    allopt_init[59].expectedbuf = 20;
-    allopt_init[59].idx = opt_font_size_menu;
-    allopt_init[59].setwhere = set_gameview;
-    allopt_init[59].opttyp = CompOpt;
-    allopt_init[59].negateok = Yes;
-    allopt_init[59].valok = Yes;
-    allopt_init[59].dupeok = Yes;
-    allopt_init[59].pfx = No;
-    allopt_init[59].termpref = 0;
-    allopt_init[59].opt_in_out = opt_in;
-    allopt_init[59].addr = null;
-    allopt_init[59].optfn = optfn_font_size_menu;
-    allopt_init[59].alias = null;
-    allopt_init[59].descr = $c.lit("size of the menu font");
-    allopt_init[59].prefixgw = null;
-    allopt_init[59].initval = Off;
-    allopt_init[59].has_handler = No;
-    allopt_init[59].dupdetected = 0;
-    allopt_init[59].disregarded = 0;
-    allopt_init[60].name = $c.lit("font_size_message");
-    allopt_init[60].section = OptS_Advanced;
-    allopt_init[60].minmatch = 0;
-    allopt_init[60].expectedbuf = 20;
-    allopt_init[60].idx = opt_font_size_message;
-    allopt_init[60].setwhere = set_gameview;
-    allopt_init[60].opttyp = CompOpt;
-    allopt_init[60].negateok = Yes;
-    allopt_init[60].valok = Yes;
-    allopt_init[60].dupeok = Yes;
-    allopt_init[60].pfx = No;
-    allopt_init[60].termpref = 0;
-    allopt_init[60].opt_in_out = opt_in;
-    allopt_init[60].addr = null;
-    allopt_init[60].optfn = optfn_font_size_message;
-    allopt_init[60].alias = null;
-    allopt_init[60].descr = $c.lit("size of the message font");
-    allopt_init[60].prefixgw = null;
-    allopt_init[60].initval = Off;
-    allopt_init[60].has_handler = No;
-    allopt_init[60].dupdetected = 0;
-    allopt_init[60].disregarded = 0;
-    allopt_init[61].name = $c.lit("font_size_status");
-    allopt_init[61].section = OptS_Advanced;
-    allopt_init[61].minmatch = 0;
-    allopt_init[61].expectedbuf = 20;
-    allopt_init[61].idx = opt_font_size_status;
-    allopt_init[61].setwhere = set_gameview;
-    allopt_init[61].opttyp = CompOpt;
-    allopt_init[61].negateok = Yes;
-    allopt_init[61].valok = Yes;
-    allopt_init[61].dupeok = Yes;
-    allopt_init[61].pfx = No;
-    allopt_init[61].termpref = 0;
-    allopt_init[61].opt_in_out = opt_in;
-    allopt_init[61].addr = null;
-    allopt_init[61].optfn = optfn_font_size_status;
-    allopt_init[61].alias = null;
-    allopt_init[61].descr = $c.lit("size of the status font");
-    allopt_init[61].prefixgw = null;
-    allopt_init[61].initval = Off;
-    allopt_init[61].has_handler = No;
-    allopt_init[61].dupdetected = 0;
-    allopt_init[61].disregarded = 0;
-    allopt_init[62].name = $c.lit("font_size_text");
-    allopt_init[62].section = OptS_Advanced;
-    allopt_init[62].minmatch = 0;
-    allopt_init[62].expectedbuf = 20;
-    allopt_init[62].idx = opt_font_size_text;
-    allopt_init[62].setwhere = set_gameview;
-    allopt_init[62].opttyp = CompOpt;
-    allopt_init[62].negateok = Yes;
-    allopt_init[62].valok = Yes;
-    allopt_init[62].dupeok = Yes;
-    allopt_init[62].pfx = No;
-    allopt_init[62].termpref = 0;
-    allopt_init[62].opt_in_out = opt_in;
-    allopt_init[62].addr = null;
-    allopt_init[62].optfn = optfn_font_size_text;
-    allopt_init[62].alias = null;
-    allopt_init[62].descr = $c.lit("size of the text font");
-    allopt_init[62].prefixgw = null;
-    allopt_init[62].initval = Off;
-    allopt_init[62].has_handler = No;
-    allopt_init[62].dupdetected = 0;
-    allopt_init[62].disregarded = 0;
-    allopt_init[63].name = $c.lit("font_status");
-    allopt_init[63].section = OptS_Advanced;
-    allopt_init[63].minmatch = 0;
-    allopt_init[63].expectedbuf = 40;
-    allopt_init[63].idx = opt_font_status;
-    allopt_init[63].setwhere = set_gameview;
-    allopt_init[63].opttyp = CompOpt;
-    allopt_init[63].negateok = Yes;
-    allopt_init[63].valok = Yes;
-    allopt_init[63].dupeok = Yes;
-    allopt_init[63].pfx = No;
-    allopt_init[63].termpref = 0;
-    allopt_init[63].opt_in_out = opt_in;
-    allopt_init[63].addr = null;
-    allopt_init[63].optfn = optfn_font_status;
-    allopt_init[63].alias = null;
-    allopt_init[63].descr = $c.lit("font to use in status window");
-    allopt_init[63].prefixgw = null;
-    allopt_init[63].initval = Off;
-    allopt_init[63].has_handler = No;
-    allopt_init[63].dupdetected = 0;
-    allopt_init[63].disregarded = 0;
-    allopt_init[64].name = $c.lit("font_text");
-    allopt_init[64].section = OptS_Advanced;
-    allopt_init[64].minmatch = 0;
-    allopt_init[64].expectedbuf = 40;
-    allopt_init[64].idx = opt_font_text;
-    allopt_init[64].setwhere = set_gameview;
-    allopt_init[64].opttyp = CompOpt;
-    allopt_init[64].negateok = Yes;
-    allopt_init[64].valok = Yes;
-    allopt_init[64].dupeok = Yes;
-    allopt_init[64].pfx = No;
-    allopt_init[64].termpref = 0;
-    allopt_init[64].opt_in_out = opt_in;
-    allopt_init[64].addr = null;
-    allopt_init[64].optfn = optfn_font_text;
-    allopt_init[64].alias = null;
-    allopt_init[64].descr = $c.lit("font to use in text windows");
-    allopt_init[64].prefixgw = null;
-    allopt_init[64].initval = Off;
-    allopt_init[64].has_handler = No;
-    allopt_init[64].dupdetected = 0;
-    allopt_init[64].disregarded = 0;
-    allopt_init[65].name = $c.lit("force_invmenu");
-    allopt_init[65].section = OptS_Advanced;
-    allopt_init[65].minmatch = 0;
-    allopt_init[65].expectedbuf = 0;
-    allopt_init[65].idx = opt_force_invmenu;
-    allopt_init[65].setwhere = set_in_game;
-    allopt_init[65].opttyp = BoolOpt;
-    allopt_init[65].negateok = Yes;
-    allopt_init[65].valok = No;
-    allopt_init[65].dupeok = No;
-    allopt_init[65].pfx = No;
-    allopt_init[65].termpref = Term_False;
-    allopt_init[65].opt_in_out = opt_in;
-    allopt_init[65].addr = new $c.FieldRef(iflags, "force_invmenu", "i8");
-    allopt_init[65].optfn = optfn_boolean;
-    allopt_init[65].alias = null;
-    allopt_init[65].descr = $c.lit("commands asking for inventory item show a menu");
-    allopt_init[65].prefixgw = null;
-    allopt_init[65].initval = Off;
-    allopt_init[65].has_handler = 0;
-    allopt_init[65].dupdetected = 0;
-    allopt_init[65].disregarded = 0;
-    allopt_init[66].name = $c.lit("fruit");
-    allopt_init[66].section = OptS_General;
-    allopt_init[66].minmatch = 0;
-    allopt_init[66].expectedbuf = 32;
-    allopt_init[66].idx = opt_fruit;
-    allopt_init[66].setwhere = set_in_game;
-    allopt_init[66].opttyp = CompOpt;
-    allopt_init[66].negateok = No;
-    allopt_init[66].valok = Yes;
-    allopt_init[66].dupeok = No;
-    allopt_init[66].pfx = No;
-    allopt_init[66].termpref = 0;
-    allopt_init[66].opt_in_out = opt_in;
-    allopt_init[66].addr = null;
-    allopt_init[66].optfn = optfn_fruit;
-    allopt_init[66].alias = null;
-    allopt_init[66].descr = $c.lit("name of a fruit you enjoy eating");
-    allopt_init[66].prefixgw = null;
-    allopt_init[66].initval = Off;
-    allopt_init[66].has_handler = No;
-    allopt_init[66].dupdetected = 0;
-    allopt_init[66].disregarded = 0;
-    allopt_init[67].name = $c.lit("fullscreen");
-    allopt_init[67].section = OptS_Advanced;
-    allopt_init[67].minmatch = 0;
-    allopt_init[67].expectedbuf = 0;
-    allopt_init[67].idx = opt_fullscreen;
-    allopt_init[67].setwhere = set_in_config;
-    allopt_init[67].opttyp = BoolOpt;
-    allopt_init[67].negateok = Yes;
-    allopt_init[67].valok = No;
-    allopt_init[67].dupeok = No;
-    allopt_init[67].pfx = No;
-    allopt_init[67].termpref = Term_False;
-    allopt_init[67].opt_in_out = opt_in;
-    allopt_init[67].addr = new $c.FieldRef(iflags, "wc2_fullscreen", "i8");
-    allopt_init[67].optfn = optfn_boolean;
-    allopt_init[67].alias = null;
-    allopt_init[67].descr = $c.lit("toggle fullscreen");
-    allopt_init[67].prefixgw = null;
-    allopt_init[67].initval = Off;
-    allopt_init[67].has_handler = 0;
-    allopt_init[67].dupdetected = 0;
-    allopt_init[67].disregarded = 0;
-    allopt_init[68].name = $c.lit("glyph");
-    allopt_init[68].section = OptS_Advanced;
-    allopt_init[68].minmatch = 0;
-    allopt_init[68].expectedbuf = 40;
-    allopt_init[68].idx = opt_glyph;
-    allopt_init[68].setwhere = set_in_game;
-    allopt_init[68].opttyp = CompOpt;
-    allopt_init[68].negateok = No;
-    allopt_init[68].valok = Yes;
-    allopt_init[68].dupeok = Yes;
-    allopt_init[68].pfx = No;
-    allopt_init[68].termpref = 0;
-    allopt_init[68].opt_in_out = opt_in;
-    allopt_init[68].addr = null;
-    allopt_init[68].optfn = optfn_glyph;
-    allopt_init[68].alias = null;
-    allopt_init[68].descr = $c.lit("set representation of a glyph to a unicode value and color");
-    allopt_init[68].prefixgw = null;
-    allopt_init[68].initval = Off;
-    allopt_init[68].has_handler = No;
-    allopt_init[68].dupdetected = 0;
-    allopt_init[68].disregarded = 0;
-    allopt_init[69].name = $c.lit("goldX");
-    allopt_init[69].section = OptS_Advanced;
-    allopt_init[69].minmatch = 0;
-    allopt_init[69].expectedbuf = 0;
-    allopt_init[69].idx = opt_goldX;
-    allopt_init[69].setwhere = set_in_game;
-    allopt_init[69].opttyp = BoolOpt;
-    allopt_init[69].negateok = Yes;
-    allopt_init[69].valok = No;
-    allopt_init[69].dupeok = No;
-    allopt_init[69].pfx = No;
-    allopt_init[69].termpref = Term_False;
-    allopt_init[69].opt_in_out = opt_in;
-    allopt_init[69].addr = new $c.FieldRef(flags, "goldX", "i8");
-    allopt_init[69].optfn = optfn_boolean;
-    allopt_init[69].alias = null;
-    allopt_init[69].descr = $c.lit("classify gold as unknown or uncursed");
-    allopt_init[69].prefixgw = null;
-    allopt_init[69].initval = Off;
-    allopt_init[69].has_handler = 0;
-    allopt_init[69].dupdetected = 0;
-    allopt_init[69].disregarded = 0;
-    allopt_init[70].name = $c.lit("guicolor");
-    allopt_init[70].section = OptS_Advanced;
-    allopt_init[70].minmatch = 0;
-    allopt_init[70].expectedbuf = 0;
-    allopt_init[70].idx = opt_guicolor;
-    allopt_init[70].setwhere = set_in_game;
-    allopt_init[70].opttyp = BoolOpt;
-    allopt_init[70].negateok = Yes;
-    allopt_init[70].valok = No;
-    allopt_init[70].dupeok = No;
-    allopt_init[70].pfx = No;
-    allopt_init[70].termpref = Term_False;
-    allopt_init[70].opt_in_out = opt_out;
-    allopt_init[70].addr = new $c.FieldRef(iflags, "wc2_guicolor", "i8");
-    allopt_init[70].optfn = optfn_boolean;
-    allopt_init[70].alias = null;
-    allopt_init[70].descr = $c.lit("use color for UI");
-    allopt_init[70].prefixgw = null;
-    allopt_init[70].initval = On;
-    allopt_init[70].has_handler = 0;
-    allopt_init[70].dupdetected = 0;
-    allopt_init[70].disregarded = 0;
-    allopt_init[71].name = $c.lit("help");
-    allopt_init[71].section = OptS_Advanced;
-    allopt_init[71].minmatch = 0;
-    allopt_init[71].expectedbuf = 0;
-    allopt_init[71].idx = opt_help;
-    allopt_init[71].setwhere = set_in_game;
-    allopt_init[71].opttyp = BoolOpt;
-    allopt_init[71].negateok = Yes;
-    allopt_init[71].valok = No;
-    allopt_init[71].dupeok = No;
-    allopt_init[71].pfx = No;
-    allopt_init[71].termpref = Term_False;
-    allopt_init[71].opt_in_out = opt_out;
-    allopt_init[71].addr = new $c.FieldRef(flags, "help", "i8");
-    allopt_init[71].optfn = optfn_boolean;
-    allopt_init[71].alias = null;
-    allopt_init[71].descr = $c.lit("show all available info when using whatis-command");
-    allopt_init[71].prefixgw = null;
-    allopt_init[71].initval = On;
-    allopt_init[71].has_handler = 0;
-    allopt_init[71].dupdetected = 0;
-    allopt_init[71].disregarded = 0;
-    allopt_init[72].name = $c.lit("herecmd_menu");
-    allopt_init[72].section = OptS_Advanced;
-    allopt_init[72].minmatch = 0;
-    allopt_init[72].expectedbuf = 0;
-    allopt_init[72].idx = opt_herecmd_menu;
-    allopt_init[72].setwhere = set_in_game;
-    allopt_init[72].opttyp = BoolOpt;
-    allopt_init[72].negateok = Yes;
-    allopt_init[72].valok = No;
-    allopt_init[72].dupeok = No;
-    allopt_init[72].pfx = No;
-    allopt_init[72].termpref = Term_False;
-    allopt_init[72].opt_in_out = opt_in;
-    allopt_init[72].addr = new $c.FieldRef(iflags, "herecmd_menu", "i8");
-    allopt_init[72].optfn = optfn_boolean;
-    allopt_init[72].alias = null;
-    allopt_init[72].descr = $c.lit("show commands available in this location");
-    allopt_init[72].prefixgw = null;
-    allopt_init[72].initval = Off;
-    allopt_init[72].has_handler = 0;
-    allopt_init[72].dupdetected = 0;
-    allopt_init[72].disregarded = 0;
-    allopt_init[73].name = $c.lit("hilite_pet");
-    allopt_init[73].section = OptS_Map;
-    allopt_init[73].minmatch = 0;
-    allopt_init[73].expectedbuf = 0;
-    allopt_init[73].idx = opt_hilite_pet;
-    allopt_init[73].setwhere = set_in_game;
-    allopt_init[73].opttyp = BoolOpt;
-    allopt_init[73].negateok = Yes;
-    allopt_init[73].valok = No;
-    allopt_init[73].dupeok = No;
-    allopt_init[73].pfx = No;
-    allopt_init[73].termpref = Term_False;
-    allopt_init[73].opt_in_out = opt_in;
-    allopt_init[73].addr = new $c.FieldRef(iflags, "wc_hilite_pet", "i8");
-    allopt_init[73].optfn = optfn_boolean;
-    allopt_init[73].alias = null;
-    allopt_init[73].descr = $c.lit("use highlight for pets");
-    allopt_init[73].prefixgw = null;
-    allopt_init[73].initval = Off;
-    allopt_init[73].has_handler = 0;
-    allopt_init[73].dupdetected = 0;
-    allopt_init[73].disregarded = 0;
-    allopt_init[74].name = $c.lit("hilite_pile");
-    allopt_init[74].section = OptS_Map;
-    allopt_init[74].minmatch = 0;
-    allopt_init[74].expectedbuf = 0;
-    allopt_init[74].idx = opt_hilite_pile;
-    allopt_init[74].setwhere = set_in_game;
-    allopt_init[74].opttyp = BoolOpt;
-    allopt_init[74].negateok = Yes;
-    allopt_init[74].valok = No;
-    allopt_init[74].dupeok = No;
-    allopt_init[74].pfx = No;
-    allopt_init[74].termpref = Term_False;
-    allopt_init[74].opt_in_out = opt_in;
-    allopt_init[74].addr = new $c.FieldRef(iflags, "hilite_pile", "i8");
-    allopt_init[74].optfn = optfn_boolean;
-    allopt_init[74].alias = null;
-    allopt_init[74].descr = $c.lit("highlight piles of items");
-    allopt_init[74].prefixgw = null;
-    allopt_init[74].initval = Off;
-    allopt_init[74].has_handler = 0;
-    allopt_init[74].dupdetected = 0;
-    allopt_init[74].disregarded = 0;
-    allopt_init[75].name = $c.lit("hilite_status");
-    allopt_init[75].section = OptS_Advanced;
-    allopt_init[75].minmatch = 0;
-    allopt_init[75].expectedbuf = 13;
-    allopt_init[75].idx = opt_hilite_status;
-    allopt_init[75].setwhere = set_in_game;
-    allopt_init[75].opttyp = CompOpt;
-    allopt_init[75].negateok = Yes;
-    allopt_init[75].valok = Yes;
-    allopt_init[75].dupeok = Yes;
-    allopt_init[75].pfx = No;
-    allopt_init[75].termpref = 0;
-    allopt_init[75].opt_in_out = opt_out;
-    allopt_init[75].addr = null;
-    allopt_init[75].optfn = optfn_hilite_status;
-    allopt_init[75].alias = null;
-    allopt_init[75].descr = $c.lit("a status highlighting rule (can occur multiple times)");
-    allopt_init[75].prefixgw = null;
-    allopt_init[75].initval = Off;
-    allopt_init[75].has_handler = No;
-    allopt_init[75].dupdetected = 0;
-    allopt_init[75].disregarded = 0;
-    allopt_init[76].name = $c.lit("hitpointbar");
-    allopt_init[76].section = OptS_Status;
-    allopt_init[76].minmatch = 0;
-    allopt_init[76].expectedbuf = 0;
-    allopt_init[76].idx = opt_hitpointbar;
-    allopt_init[76].setwhere = set_in_game;
-    allopt_init[76].opttyp = BoolOpt;
-    allopt_init[76].negateok = Yes;
-    allopt_init[76].valok = No;
-    allopt_init[76].dupeok = No;
-    allopt_init[76].pfx = No;
-    allopt_init[76].termpref = Term_False;
-    allopt_init[76].opt_in_out = opt_in;
-    allopt_init[76].addr = new $c.FieldRef(iflags, "wc2_hitpointbar", "i8");
-    allopt_init[76].optfn = optfn_boolean;
-    allopt_init[76].alias = null;
-    allopt_init[76].descr = $c.lit("show colored bar for hit points");
-    allopt_init[76].prefixgw = null;
-    allopt_init[76].initval = Off;
-    allopt_init[76].has_handler = 0;
-    allopt_init[76].dupdetected = 0;
-    allopt_init[76].disregarded = 0;
-    allopt_init[77].name = $c.lit("horsename");
-    allopt_init[77].section = OptS_Advanced;
-    allopt_init[77].minmatch = 0;
-    allopt_init[77].expectedbuf = 63;
-    allopt_init[77].idx = opt_horsename;
-    allopt_init[77].setwhere = set_gameview;
-    allopt_init[77].opttyp = CompOpt;
-    allopt_init[77].negateok = No;
-    allopt_init[77].valok = Yes;
-    allopt_init[77].dupeok = No;
-    allopt_init[77].pfx = No;
-    allopt_init[77].termpref = 0;
-    allopt_init[77].opt_in_out = opt_in;
-    allopt_init[77].addr = null;
-    allopt_init[77].optfn = optfn_horsename;
-    allopt_init[77].alias = null;
-    allopt_init[77].descr = $c.lit("name of your starting pet if it is a pony");
-    allopt_init[77].prefixgw = null;
-    allopt_init[77].initval = Off;
-    allopt_init[77].has_handler = No;
-    allopt_init[77].dupdetected = 0;
-    allopt_init[77].disregarded = 0;
-    allopt_init[78].name = $c.lit("IBMgraphics");
-    allopt_init[78].section = OptS_Advanced;
-    allopt_init[78].minmatch = 0;
-    allopt_init[78].expectedbuf = 70;
-    allopt_init[78].idx = opt_IBMgraphics;
-    allopt_init[78].setwhere = set_in_config;
-    allopt_init[78].opttyp = CompOpt;
-    allopt_init[78].negateok = Yes;
-    allopt_init[78].valok = Yes;
-    allopt_init[78].dupeok = No;
-    allopt_init[78].pfx = No;
-    allopt_init[78].termpref = 0;
-    allopt_init[78].opt_in_out = opt_in;
-    allopt_init[78].addr = null;
-    allopt_init[78].optfn = optfn_IBMgraphics;
-    allopt_init[78].alias = null;
-    allopt_init[78].descr = $c.lit("load IBMGraphics display symbols into symset");
-    allopt_init[78].prefixgw = null;
-    allopt_init[78].initval = Off;
-    allopt_init[78].has_handler = No;
-    allopt_init[78].dupdetected = 0;
-    allopt_init[78].disregarded = 0;
-    allopt_init[79].name = $c.lit("idlecheckpoint");
-    allopt_init[79].section = OptS_Advanced;
-    allopt_init[79].minmatch = 0;
-    allopt_init[79].expectedbuf = 0;
-    allopt_init[79].idx = opt_idlecheckpoint;
-    allopt_init[79].setwhere = set_in_game;
-    allopt_init[79].opttyp = BoolOpt;
-    allopt_init[79].negateok = Yes;
-    allopt_init[79].valok = No;
-    allopt_init[79].dupeok = No;
-    allopt_init[79].pfx = No;
-    allopt_init[79].termpref = Term_Off;
-    allopt_init[79].opt_in_out = opt_in;
-    allopt_init[79].addr = new $c.FieldRef(iflags, "idlecheckpoint", "i8");
-    allopt_init[79].optfn = optfn_boolean;
-    allopt_init[79].alias = null;
-    allopt_init[79].descr = $c.lit("update checkpoint file if input is idle for 10 seconds");
-    allopt_init[79].prefixgw = null;
-    allopt_init[79].initval = Off;
-    allopt_init[79].has_handler = 0;
-    allopt_init[79].dupdetected = 0;
-    allopt_init[79].disregarded = 0;
-    allopt_init[80].name = $c.lit("ignintr");
-    allopt_init[80].section = OptS_Advanced;
-    allopt_init[80].minmatch = 0;
-    allopt_init[80].expectedbuf = 0;
-    allopt_init[80].idx = opt_ignintr;
-    allopt_init[80].setwhere = set_in_game;
-    allopt_init[80].opttyp = BoolOpt;
-    allopt_init[80].negateok = Yes;
-    allopt_init[80].valok = No;
-    allopt_init[80].dupeok = No;
-    allopt_init[80].pfx = No;
-    allopt_init[80].termpref = Term_False;
-    allopt_init[80].opt_in_out = opt_in;
-    allopt_init[80].addr = new $c.FieldRef(flags, "ignintr", "i8");
-    allopt_init[80].optfn = optfn_boolean;
-    allopt_init[80].alias = null;
-    allopt_init[80].descr = $c.lit("ignore interrupt signals");
-    allopt_init[80].prefixgw = null;
-    allopt_init[80].initval = Off;
-    allopt_init[80].has_handler = 0;
-    allopt_init[80].dupdetected = 0;
-    allopt_init[80].disregarded = 0;
-    allopt_init[81].name = $c.lit("implicit_uncursed");
-    allopt_init[81].section = OptS_Advanced;
-    allopt_init[81].minmatch = 0;
-    allopt_init[81].expectedbuf = 0;
-    allopt_init[81].idx = opt_implicit_uncursed;
-    allopt_init[81].setwhere = set_in_game;
-    allopt_init[81].opttyp = BoolOpt;
-    allopt_init[81].negateok = Yes;
-    allopt_init[81].valok = No;
-    allopt_init[81].dupeok = No;
-    allopt_init[81].pfx = No;
-    allopt_init[81].termpref = Term_False;
-    allopt_init[81].opt_in_out = opt_out;
-    allopt_init[81].addr = new $c.FieldRef(flags, "implicit_uncursed", "i8");
-    allopt_init[81].optfn = optfn_boolean;
-    allopt_init[81].alias = null;
-    allopt_init[81].descr = $c.lit("omit \"uncursed\" from inventory");
-    allopt_init[81].prefixgw = null;
-    allopt_init[81].initval = On;
-    allopt_init[81].has_handler = 0;
-    allopt_init[81].dupdetected = 0;
-    allopt_init[81].disregarded = 0;
-    allopt_init[82].name = $c.lit("legacy");
-    allopt_init[82].section = OptS_Advanced;
-    allopt_init[82].minmatch = 0;
-    allopt_init[82].expectedbuf = 0;
-    allopt_init[82].idx = opt_legacy;
-    allopt_init[82].setwhere = set_in_config;
-    allopt_init[82].opttyp = BoolOpt;
-    allopt_init[82].negateok = Yes;
-    allopt_init[82].valok = No;
-    allopt_init[82].dupeok = No;
-    allopt_init[82].pfx = No;
-    allopt_init[82].termpref = Term_False;
-    allopt_init[82].opt_in_out = opt_out;
-    allopt_init[82].addr = new $c.FieldRef(flags, "legacy", "i8");
-    allopt_init[82].optfn = optfn_boolean;
-    allopt_init[82].alias = null;
-    allopt_init[82].descr = $c.lit("show introductory message");
-    allopt_init[82].prefixgw = null;
-    allopt_init[82].initval = On;
-    allopt_init[82].has_handler = 0;
-    allopt_init[82].dupdetected = 0;
-    allopt_init[82].disregarded = 0;
-    allopt_init[83].name = $c.lit("lit_corridor");
-    allopt_init[83].section = OptS_Advanced;
-    allopt_init[83].minmatch = 0;
-    allopt_init[83].expectedbuf = 0;
-    allopt_init[83].idx = opt_lit_corridor;
-    allopt_init[83].setwhere = set_in_game;
-    allopt_init[83].opttyp = BoolOpt;
-    allopt_init[83].negateok = Yes;
-    allopt_init[83].valok = No;
-    allopt_init[83].dupeok = No;
-    allopt_init[83].pfx = No;
-    allopt_init[83].termpref = Term_False;
-    allopt_init[83].opt_in_out = opt_in;
-    allopt_init[83].addr = new $c.FieldRef(flags, "lit_corridor", "i8");
-    allopt_init[83].optfn = optfn_boolean;
-    allopt_init[83].alias = null;
-    allopt_init[83].descr = $c.lit("show dark corridors as lit if in sight");
-    allopt_init[83].prefixgw = null;
-    allopt_init[83].initval = Off;
-    allopt_init[83].has_handler = 0;
-    allopt_init[83].dupdetected = 0;
-    allopt_init[83].disregarded = 0;
-    allopt_init[84].name = $c.lit("lootabc");
-    allopt_init[84].section = OptS_Advanced;
-    allopt_init[84].minmatch = 0;
-    allopt_init[84].expectedbuf = 0;
-    allopt_init[84].idx = opt_lootabc;
-    allopt_init[84].setwhere = set_in_game;
-    allopt_init[84].opttyp = BoolOpt;
-    allopt_init[84].negateok = Yes;
-    allopt_init[84].valok = No;
-    allopt_init[84].dupeok = No;
-    allopt_init[84].pfx = No;
-    allopt_init[84].termpref = Term_False;
-    allopt_init[84].opt_in_out = opt_in;
-    allopt_init[84].addr = new $c.FieldRef(flags, "lootabc", "i8");
-    allopt_init[84].optfn = optfn_boolean;
-    allopt_init[84].alias = null;
-    allopt_init[84].descr = $c.lit("use a/b/c rather than o/i/c when looting");
-    allopt_init[84].prefixgw = null;
-    allopt_init[84].initval = Off;
-    allopt_init[84].has_handler = 0;
-    allopt_init[84].dupdetected = 0;
-    allopt_init[84].disregarded = 0;
-    allopt_init[85].name = $c.lit("mail");
-    allopt_init[85].section = OptS_Advanced;
-    allopt_init[85].minmatch = 0;
-    allopt_init[85].expectedbuf = 0;
-    allopt_init[85].idx = opt_mail;
-    allopt_init[85].setwhere = set_in_game;
-    allopt_init[85].opttyp = BoolOpt;
-    allopt_init[85].negateok = Yes;
-    allopt_init[85].valok = No;
-    allopt_init[85].dupeok = No;
-    allopt_init[85].pfx = No;
-    allopt_init[85].termpref = Term_False;
-    allopt_init[85].opt_in_out = opt_out;
-    allopt_init[85].addr = new $c.FieldRef(flags, "biff", "i8");
-    allopt_init[85].optfn = optfn_boolean;
-    allopt_init[85].alias = null;
-    allopt_init[85].descr = $c.lit("enable the mail daemon");
-    allopt_init[85].prefixgw = null;
-    allopt_init[85].initval = On;
-    allopt_init[85].has_handler = 0;
-    allopt_init[85].dupdetected = 0;
-    allopt_init[85].disregarded = 0;
-    allopt_init[86].name = $c.lit("map_mode");
-    allopt_init[86].section = OptS_Advanced;
-    allopt_init[86].minmatch = 0;
-    allopt_init[86].expectedbuf = 20;
-    allopt_init[86].idx = opt_map_mode;
-    allopt_init[86].setwhere = set_gameview;
-    allopt_init[86].opttyp = CompOpt;
-    allopt_init[86].negateok = Yes;
-    allopt_init[86].valok = Yes;
-    allopt_init[86].dupeok = No;
-    allopt_init[86].pfx = No;
-    allopt_init[86].termpref = 0;
-    allopt_init[86].opt_in_out = opt_in;
-    allopt_init[86].addr = null;
-    allopt_init[86].optfn = optfn_map_mode;
-    allopt_init[86].alias = null;
-    allopt_init[86].descr = $c.lit("map display mode under Windows");
-    allopt_init[86].prefixgw = null;
-    allopt_init[86].initval = Off;
-    allopt_init[86].has_handler = No;
-    allopt_init[86].dupdetected = 0;
-    allopt_init[86].disregarded = 0;
-    allopt_init[87].name = $c.lit("mention_decor");
-    allopt_init[87].section = OptS_Advanced;
-    allopt_init[87].minmatch = 0;
-    allopt_init[87].expectedbuf = 0;
-    allopt_init[87].idx = opt_mention_decor;
-    allopt_init[87].setwhere = set_in_game;
-    allopt_init[87].opttyp = BoolOpt;
-    allopt_init[87].negateok = Yes;
-    allopt_init[87].valok = No;
-    allopt_init[87].dupeok = No;
-    allopt_init[87].pfx = No;
-    allopt_init[87].termpref = Term_False;
-    allopt_init[87].opt_in_out = opt_in;
-    allopt_init[87].addr = new $c.FieldRef(flags, "mention_decor", "i8");
-    allopt_init[87].optfn = optfn_boolean;
-    allopt_init[87].alias = null;
-    allopt_init[87].descr = $c.lit("give feedback when walking over interesting features");
-    allopt_init[87].prefixgw = null;
-    allopt_init[87].initval = Off;
-    allopt_init[87].has_handler = 0;
-    allopt_init[87].dupdetected = 0;
-    allopt_init[87].disregarded = 0;
-    allopt_init[88].name = $c.lit("mention_map");
-    allopt_init[88].section = OptS_Advanced;
-    allopt_init[88].minmatch = 0;
-    allopt_init[88].expectedbuf = 0;
-    allopt_init[88].idx = opt_mention_map;
-    allopt_init[88].setwhere = set_in_game;
-    allopt_init[88].opttyp = BoolOpt;
-    allopt_init[88].negateok = Yes;
-    allopt_init[88].valok = No;
-    allopt_init[88].dupeok = No;
-    allopt_init[88].pfx = No;
-    allopt_init[88].termpref = Term_False;
-    allopt_init[88].opt_in_out = opt_in;
-    allopt_init[88].addr = new $c.FieldRef(a11y, "glyph_updates", "i8");
-    allopt_init[88].optfn = optfn_boolean;
-    allopt_init[88].alias = null;
-    allopt_init[88].descr = $c.lit("give feedback when interesting map locations change");
-    allopt_init[88].prefixgw = null;
-    allopt_init[88].initval = Off;
-    allopt_init[88].has_handler = 0;
-    allopt_init[88].dupdetected = 0;
-    allopt_init[88].disregarded = 0;
-    allopt_init[89].name = $c.lit("mention_walls");
-    allopt_init[89].section = OptS_Advanced;
-    allopt_init[89].minmatch = 0;
-    allopt_init[89].expectedbuf = 0;
-    allopt_init[89].idx = opt_mention_walls;
-    allopt_init[89].setwhere = set_in_game;
-    allopt_init[89].opttyp = BoolOpt;
-    allopt_init[89].negateok = Yes;
-    allopt_init[89].valok = No;
-    allopt_init[89].dupeok = No;
-    allopt_init[89].pfx = No;
-    allopt_init[89].termpref = Term_False;
-    allopt_init[89].opt_in_out = opt_in;
-    allopt_init[89].addr = new $c.FieldRef(flags, "mention_walls", "i8");
-    allopt_init[89].optfn = optfn_boolean;
-    allopt_init[89].alias = null;
-    allopt_init[89].descr = $c.lit("give feedback when walking into walls");
-    allopt_init[89].prefixgw = null;
-    allopt_init[89].initval = Off;
-    allopt_init[89].has_handler = 0;
-    allopt_init[89].dupdetected = 0;
-    allopt_init[89].disregarded = 0;
-    allopt_init[90].name = $c.lit("menu_deselect_all");
-    allopt_init[90].section = OptS_Advanced;
-    allopt_init[90].minmatch = 0;
-    allopt_init[90].expectedbuf = 4;
-    allopt_init[90].idx = opt_menu_deselect_all;
-    allopt_init[90].setwhere = set_in_config;
-    allopt_init[90].opttyp = CompOpt;
-    allopt_init[90].negateok = No;
-    allopt_init[90].valok = Yes;
-    allopt_init[90].dupeok = No;
-    allopt_init[90].pfx = No;
-    allopt_init[90].termpref = 0;
-    allopt_init[90].opt_in_out = opt_in;
-    allopt_init[90].addr = null;
-    allopt_init[90].optfn = optfn_menu_deselect_all;
-    allopt_init[90].alias = null;
-    allopt_init[90].descr = $c.lit("deselect all items in a menu");
-    allopt_init[90].prefixgw = null;
-    allopt_init[90].initval = Off;
-    allopt_init[90].has_handler = No;
-    allopt_init[90].dupdetected = 0;
-    allopt_init[90].disregarded = 0;
-    allopt_init[91].name = $c.lit("menu_deselect_page");
-    allopt_init[91].section = OptS_Advanced;
-    allopt_init[91].minmatch = 0;
-    allopt_init[91].expectedbuf = 4;
-    allopt_init[91].idx = opt_menu_deselect_page;
-    allopt_init[91].setwhere = set_in_config;
-    allopt_init[91].opttyp = CompOpt;
-    allopt_init[91].negateok = No;
-    allopt_init[91].valok = Yes;
-    allopt_init[91].dupeok = No;
-    allopt_init[91].pfx = No;
-    allopt_init[91].termpref = 0;
-    allopt_init[91].opt_in_out = opt_in;
-    allopt_init[91].addr = null;
-    allopt_init[91].optfn = optfn_menu_deselect_page;
-    allopt_init[91].alias = null;
-    allopt_init[91].descr = $c.lit("deselect all items on this page of a menu");
-    allopt_init[91].prefixgw = null;
-    allopt_init[91].initval = Off;
-    allopt_init[91].has_handler = No;
-    allopt_init[91].dupdetected = 0;
-    allopt_init[91].disregarded = 0;
-    allopt_init[92].name = $c.lit("menu_first_page");
-    allopt_init[92].section = OptS_Advanced;
-    allopt_init[92].minmatch = 0;
-    allopt_init[92].expectedbuf = 4;
-    allopt_init[92].idx = opt_menu_first_page;
-    allopt_init[92].setwhere = set_in_config;
-    allopt_init[92].opttyp = CompOpt;
-    allopt_init[92].negateok = No;
-    allopt_init[92].valok = Yes;
-    allopt_init[92].dupeok = No;
-    allopt_init[92].pfx = No;
-    allopt_init[92].termpref = 0;
-    allopt_init[92].opt_in_out = opt_in;
-    allopt_init[92].addr = null;
-    allopt_init[92].optfn = optfn_menu_first_page;
-    allopt_init[92].alias = null;
-    allopt_init[92].descr = $c.lit("jump to the first page in a menu");
-    allopt_init[92].prefixgw = null;
-    allopt_init[92].initval = Off;
-    allopt_init[92].has_handler = No;
-    allopt_init[92].dupdetected = 0;
-    allopt_init[92].disregarded = 0;
-    allopt_init[93].name = $c.lit("menu_headings");
-    allopt_init[93].section = OptS_Advanced;
-    allopt_init[93].minmatch = 0;
-    allopt_init[93].expectedbuf = 4;
-    allopt_init[93].idx = opt_menu_headings;
-    allopt_init[93].setwhere = set_in_game;
-    allopt_init[93].opttyp = CompOpt;
-    allopt_init[93].negateok = Yes;
-    allopt_init[93].valok = Yes;
-    allopt_init[93].dupeok = No;
-    allopt_init[93].pfx = No;
-    allopt_init[93].termpref = 0;
-    allopt_init[93].opt_in_out = opt_in;
-    allopt_init[93].addr = null;
-    allopt_init[93].optfn = optfn_menu_headings;
-    allopt_init[93].alias = null;
-    allopt_init[93].descr = $c.lit("display style for menu headings");
-    allopt_init[93].prefixgw = null;
-    allopt_init[93].initval = Off;
-    allopt_init[93].has_handler = Yes;
-    allopt_init[93].dupdetected = 0;
-    allopt_init[93].disregarded = 0;
-    allopt_init[94].name = $c.lit("menu_invert_all");
-    allopt_init[94].section = OptS_Advanced;
-    allopt_init[94].minmatch = 0;
-    allopt_init[94].expectedbuf = 4;
-    allopt_init[94].idx = opt_menu_invert_all;
-    allopt_init[94].setwhere = set_in_config;
-    allopt_init[94].opttyp = CompOpt;
-    allopt_init[94].negateok = No;
-    allopt_init[94].valok = Yes;
-    allopt_init[94].dupeok = No;
-    allopt_init[94].pfx = No;
-    allopt_init[94].termpref = 0;
-    allopt_init[94].opt_in_out = opt_in;
-    allopt_init[94].addr = null;
-    allopt_init[94].optfn = optfn_menu_invert_all;
-    allopt_init[94].alias = null;
-    allopt_init[94].descr = $c.lit("invert all items in a menu");
-    allopt_init[94].prefixgw = null;
-    allopt_init[94].initval = Off;
-    allopt_init[94].has_handler = No;
-    allopt_init[94].dupdetected = 0;
-    allopt_init[94].disregarded = 0;
-    allopt_init[95].name = $c.lit("menu_invert_page");
-    allopt_init[95].section = OptS_Advanced;
-    allopt_init[95].minmatch = 0;
-    allopt_init[95].expectedbuf = 4;
-    allopt_init[95].idx = opt_menu_invert_page;
-    allopt_init[95].setwhere = set_in_config;
-    allopt_init[95].opttyp = CompOpt;
-    allopt_init[95].negateok = No;
-    allopt_init[95].valok = Yes;
-    allopt_init[95].dupeok = No;
-    allopt_init[95].pfx = No;
-    allopt_init[95].termpref = 0;
-    allopt_init[95].opt_in_out = opt_in;
-    allopt_init[95].addr = null;
-    allopt_init[95].optfn = optfn_menu_invert_page;
-    allopt_init[95].alias = null;
-    allopt_init[95].descr = $c.lit("invert all items on this page of a menu");
-    allopt_init[95].prefixgw = null;
-    allopt_init[95].initval = Off;
-    allopt_init[95].has_handler = No;
-    allopt_init[95].dupdetected = 0;
-    allopt_init[95].disregarded = 0;
-    allopt_init[96].name = $c.lit("menu_last_page");
-    allopt_init[96].section = OptS_Advanced;
-    allopt_init[96].minmatch = 0;
-    allopt_init[96].expectedbuf = 4;
-    allopt_init[96].idx = opt_menu_last_page;
-    allopt_init[96].setwhere = set_in_config;
-    allopt_init[96].opttyp = CompOpt;
-    allopt_init[96].negateok = No;
-    allopt_init[96].valok = Yes;
-    allopt_init[96].dupeok = No;
-    allopt_init[96].pfx = No;
-    allopt_init[96].termpref = 0;
-    allopt_init[96].opt_in_out = opt_in;
-    allopt_init[96].addr = null;
-    allopt_init[96].optfn = optfn_menu_last_page;
-    allopt_init[96].alias = null;
-    allopt_init[96].descr = $c.lit("jump to the last page in a menu");
-    allopt_init[96].prefixgw = null;
-    allopt_init[96].initval = Off;
-    allopt_init[96].has_handler = No;
-    allopt_init[96].dupdetected = 0;
-    allopt_init[96].disregarded = 0;
-    allopt_init[97].name = $c.lit("menu_next_page");
-    allopt_init[97].section = OptS_Advanced;
-    allopt_init[97].minmatch = 0;
-    allopt_init[97].expectedbuf = 4;
-    allopt_init[97].idx = opt_menu_next_page;
-    allopt_init[97].setwhere = set_in_config;
-    allopt_init[97].opttyp = CompOpt;
-    allopt_init[97].negateok = No;
-    allopt_init[97].valok = Yes;
-    allopt_init[97].dupeok = No;
-    allopt_init[97].pfx = No;
-    allopt_init[97].termpref = 0;
-    allopt_init[97].opt_in_out = opt_in;
-    allopt_init[97].addr = null;
-    allopt_init[97].optfn = optfn_menu_next_page;
-    allopt_init[97].alias = null;
-    allopt_init[97].descr = $c.lit("go to the next menu page");
-    allopt_init[97].prefixgw = null;
-    allopt_init[97].initval = Off;
-    allopt_init[97].has_handler = No;
-    allopt_init[97].dupdetected = 0;
-    allopt_init[97].disregarded = 0;
-    allopt_init[98].name = $c.lit("menu_objsyms");
-    allopt_init[98].section = OptS_Advanced;
-    allopt_init[98].minmatch = 0;
-    allopt_init[98].expectedbuf = 12;
-    allopt_init[98].idx = opt_menu_objsyms;
-    allopt_init[98].setwhere = set_in_game;
-    allopt_init[98].opttyp = CompOpt;
-    allopt_init[98].negateok = Yes;
-    allopt_init[98].valok = Yes;
-    allopt_init[98].dupeok = No;
-    allopt_init[98].pfx = No;
-    allopt_init[98].termpref = 0;
-    allopt_init[98].opt_in_out = opt_in;
-    allopt_init[98].addr = null;
-    allopt_init[98].optfn = optfn_menu_objsyms;
-    allopt_init[98].alias = $c.lit("use_menu_glyphs");
-    allopt_init[98].descr = $c.lit("show object symbols in menus");
-    allopt_init[98].prefixgw = null;
-    allopt_init[98].initval = Off;
-    allopt_init[98].has_handler = Yes;
-    allopt_init[98].dupdetected = 0;
-    allopt_init[98].disregarded = 0;
-    allopt_init[99].name = $c.lit("menu_overlay");
-    allopt_init[99].section = OptS_Advanced;
-    allopt_init[99].minmatch = 0;
-    allopt_init[99].expectedbuf = 0;
-    allopt_init[99].idx = opt_menu_overlay;
-    allopt_init[99].setwhere = set_in_game;
-    allopt_init[99].opttyp = BoolOpt;
-    allopt_init[99].negateok = Yes;
-    allopt_init[99].valok = No;
-    allopt_init[99].dupeok = No;
-    allopt_init[99].pfx = No;
-    allopt_init[99].termpref = Term_False;
-    allopt_init[99].opt_in_out = opt_in;
-    allopt_init[99].addr = new $c.FieldRef(iflags, "menu_overlay", "i8");
-    allopt_init[99].optfn = optfn_boolean;
-    allopt_init[99].alias = null;
-    allopt_init[99].descr = $c.lit("menus overlay and align to right");
-    allopt_init[99].prefixgw = null;
-    allopt_init[99].initval = On;
-    allopt_init[99].has_handler = 0;
-    allopt_init[99].dupdetected = 0;
-    allopt_init[99].disregarded = 0;
-    allopt_init[100].name = $c.lit("menu_previous_page");
-    allopt_init[100].section = OptS_Advanced;
-    allopt_init[100].minmatch = 0;
-    allopt_init[100].expectedbuf = 4;
-    allopt_init[100].idx = opt_menu_previous_page;
-    allopt_init[100].setwhere = set_in_config;
-    allopt_init[100].opttyp = CompOpt;
-    allopt_init[100].negateok = No;
-    allopt_init[100].valok = Yes;
-    allopt_init[100].dupeok = No;
-    allopt_init[100].pfx = No;
-    allopt_init[100].termpref = 0;
-    allopt_init[100].opt_in_out = opt_in;
-    allopt_init[100].addr = null;
-    allopt_init[100].optfn = optfn_menu_previous_page;
-    allopt_init[100].alias = null;
-    allopt_init[100].descr = $c.lit("go to the previous menu page");
-    allopt_init[100].prefixgw = null;
-    allopt_init[100].initval = Off;
-    allopt_init[100].has_handler = No;
-    allopt_init[100].dupdetected = 0;
-    allopt_init[100].disregarded = 0;
-    allopt_init[101].name = $c.lit("menu_search");
-    allopt_init[101].section = OptS_Advanced;
-    allopt_init[101].minmatch = 0;
-    allopt_init[101].expectedbuf = 4;
-    allopt_init[101].idx = opt_menu_search;
-    allopt_init[101].setwhere = set_in_config;
-    allopt_init[101].opttyp = CompOpt;
-    allopt_init[101].negateok = No;
-    allopt_init[101].valok = Yes;
-    allopt_init[101].dupeok = No;
-    allopt_init[101].pfx = No;
-    allopt_init[101].termpref = 0;
-    allopt_init[101].opt_in_out = opt_in;
-    allopt_init[101].addr = null;
-    allopt_init[101].optfn = optfn_menu_search;
-    allopt_init[101].alias = null;
-    allopt_init[101].descr = $c.lit("search for a menu item");
-    allopt_init[101].prefixgw = null;
-    allopt_init[101].initval = Off;
-    allopt_init[101].has_handler = No;
-    allopt_init[101].dupdetected = 0;
-    allopt_init[101].disregarded = 0;
-    allopt_init[102].name = $c.lit("menu_select_all");
-    allopt_init[102].section = OptS_Advanced;
-    allopt_init[102].minmatch = 0;
-    allopt_init[102].expectedbuf = 4;
-    allopt_init[102].idx = opt_menu_select_all;
-    allopt_init[102].setwhere = set_in_config;
-    allopt_init[102].opttyp = CompOpt;
-    allopt_init[102].negateok = No;
-    allopt_init[102].valok = Yes;
-    allopt_init[102].dupeok = No;
-    allopt_init[102].pfx = No;
-    allopt_init[102].termpref = 0;
-    allopt_init[102].opt_in_out = opt_in;
-    allopt_init[102].addr = null;
-    allopt_init[102].optfn = optfn_menu_select_all;
-    allopt_init[102].alias = null;
-    allopt_init[102].descr = $c.lit("select all items in a menu");
-    allopt_init[102].prefixgw = null;
-    allopt_init[102].initval = Off;
-    allopt_init[102].has_handler = No;
-    allopt_init[102].dupdetected = 0;
-    allopt_init[102].disregarded = 0;
-    allopt_init[103].name = $c.lit("menu_select_page");
-    allopt_init[103].section = OptS_Advanced;
-    allopt_init[103].minmatch = 0;
-    allopt_init[103].expectedbuf = 4;
-    allopt_init[103].idx = opt_menu_select_page;
-    allopt_init[103].setwhere = set_in_config;
-    allopt_init[103].opttyp = CompOpt;
-    allopt_init[103].negateok = No;
-    allopt_init[103].valok = Yes;
-    allopt_init[103].dupeok = No;
-    allopt_init[103].pfx = No;
-    allopt_init[103].termpref = 0;
-    allopt_init[103].opt_in_out = opt_in;
-    allopt_init[103].addr = null;
-    allopt_init[103].optfn = optfn_menu_select_page;
-    allopt_init[103].alias = null;
-    allopt_init[103].descr = $c.lit("select all items on this page of a menu");
-    allopt_init[103].prefixgw = null;
-    allopt_init[103].initval = Off;
-    allopt_init[103].has_handler = No;
-    allopt_init[103].dupdetected = 0;
-    allopt_init[103].disregarded = 0;
-    allopt_init[104].name = $c.lit("menu_shift_left");
-    allopt_init[104].section = OptS_Advanced;
-    allopt_init[104].minmatch = 0;
-    allopt_init[104].expectedbuf = 4;
-    allopt_init[104].idx = opt_menu_shift_left;
-    allopt_init[104].setwhere = set_in_config;
-    allopt_init[104].opttyp = CompOpt;
-    allopt_init[104].negateok = No;
-    allopt_init[104].valok = Yes;
-    allopt_init[104].dupeok = No;
-    allopt_init[104].pfx = No;
-    allopt_init[104].termpref = 0;
-    allopt_init[104].opt_in_out = opt_in;
-    allopt_init[104].addr = null;
-    allopt_init[104].optfn = optfn_menu_shift_left;
-    allopt_init[104].alias = null;
-    allopt_init[104].descr = $c.lit("pan current menu page left");
-    allopt_init[104].prefixgw = null;
-    allopt_init[104].initval = Off;
-    allopt_init[104].has_handler = No;
-    allopt_init[104].dupdetected = 0;
-    allopt_init[104].disregarded = 0;
-    allopt_init[105].name = $c.lit("menu_shift_right");
-    allopt_init[105].section = OptS_Advanced;
-    allopt_init[105].minmatch = 0;
-    allopt_init[105].expectedbuf = 4;
-    allopt_init[105].idx = opt_menu_shift_right;
-    allopt_init[105].setwhere = set_in_config;
-    allopt_init[105].opttyp = CompOpt;
-    allopt_init[105].negateok = No;
-    allopt_init[105].valok = Yes;
-    allopt_init[105].dupeok = No;
-    allopt_init[105].pfx = No;
-    allopt_init[105].termpref = 0;
-    allopt_init[105].opt_in_out = opt_in;
-    allopt_init[105].addr = null;
-    allopt_init[105].optfn = optfn_menu_shift_right;
-    allopt_init[105].alias = null;
-    allopt_init[105].descr = $c.lit("pan current menu page right");
-    allopt_init[105].prefixgw = null;
-    allopt_init[105].initval = Off;
-    allopt_init[105].has_handler = No;
-    allopt_init[105].dupdetected = 0;
-    allopt_init[105].disregarded = 0;
-    allopt_init[106].name = $c.lit("menu_tab_sep");
-    allopt_init[106].section = OptS_Advanced;
-    allopt_init[106].minmatch = 0;
-    allopt_init[106].expectedbuf = 0;
-    allopt_init[106].idx = opt_menu_tab_sep;
-    allopt_init[106].setwhere = set_wizonly;
-    allopt_init[106].opttyp = BoolOpt;
-    allopt_init[106].negateok = Yes;
-    allopt_init[106].valok = No;
-    allopt_init[106].dupeok = No;
-    allopt_init[106].pfx = No;
-    allopt_init[106].termpref = Term_False;
-    allopt_init[106].opt_in_out = opt_in;
-    allopt_init[106].addr = new $c.FieldRef(iflags, "menu_tab_sep", "i8");
-    allopt_init[106].optfn = optfn_boolean;
-    allopt_init[106].alias = null;
-    allopt_init[106].descr = $c.lit("menu formatting");
-    allopt_init[106].prefixgw = null;
-    allopt_init[106].initval = Off;
-    allopt_init[106].has_handler = 0;
-    allopt_init[106].dupdetected = 0;
-    allopt_init[106].disregarded = 0;
-    allopt_init[107].name = $c.lit("menucolors");
-    allopt_init[107].section = OptS_Advanced;
-    allopt_init[107].minmatch = 0;
-    allopt_init[107].expectedbuf = 0;
-    allopt_init[107].idx = opt_menucolors;
-    allopt_init[107].setwhere = set_in_game;
-    allopt_init[107].opttyp = BoolOpt;
-    allopt_init[107].negateok = Yes;
-    allopt_init[107].valok = Yes;
-    allopt_init[107].dupeok = No;
-    allopt_init[107].pfx = No;
-    allopt_init[107].termpref = Term_False;
-    allopt_init[107].opt_in_out = opt_in;
-    allopt_init[107].addr = new $c.FieldRef(iflags, "use_menu_color", "i8");
-    allopt_init[107].optfn = optfn_boolean;
-    allopt_init[107].alias = null;
-    allopt_init[107].descr = $c.lit("use colors in menus");
-    allopt_init[107].prefixgw = null;
-    allopt_init[107].initval = Off;
-    allopt_init[107].has_handler = 0;
-    allopt_init[107].dupdetected = 0;
-    allopt_init[107].disregarded = 0;
-    allopt_init[108].name = $c.lit("menu colors");
-    allopt_init[108].section = OptS_Status;
-    allopt_init[108].minmatch = 0;
-    allopt_init[108].expectedbuf = 256;
-    allopt_init[108].idx = opt_o_menu_colors;
-    allopt_init[108].setwhere = set_in_game;
-    allopt_init[108].opttyp = OthrOpt;
-    allopt_init[108].negateok = No;
-    allopt_init[108].valok = Yes;
-    allopt_init[108].dupeok = No;
-    allopt_init[108].pfx = No;
-    allopt_init[108].termpref = 0;
-    allopt_init[108].opt_in_out = opt_in;
-    allopt_init[108].addr = null;
-    allopt_init[108].optfn = optfn_o_menu_colors;
-    allopt_init[108].alias = null;
-    allopt_init[108].descr = $c.lit("change colors used in menus");
-    allopt_init[108].prefixgw = null;
-    allopt_init[108].initval = On;
-    allopt_init[108].has_handler = On;
-    allopt_init[108].dupdetected = 0;
-    allopt_init[108].disregarded = 0;
-    allopt_init[109].name = $c.lit("menuinvertmode");
-    allopt_init[109].section = OptS_Advanced;
-    allopt_init[109].minmatch = 0;
-    allopt_init[109].expectedbuf = 5;
-    allopt_init[109].idx = opt_menuinvertmode;
-    allopt_init[109].setwhere = set_in_game;
-    allopt_init[109].opttyp = CompOpt;
-    allopt_init[109].negateok = No;
-    allopt_init[109].valok = Yes;
-    allopt_init[109].dupeok = No;
-    allopt_init[109].pfx = No;
-    allopt_init[109].termpref = 0;
-    allopt_init[109].opt_in_out = opt_in;
-    allopt_init[109].addr = null;
-    allopt_init[109].optfn = optfn_menuinvertmode;
-    allopt_init[109].alias = null;
-    allopt_init[109].descr = $c.lit("experimental behavior of menu inverts");
-    allopt_init[109].prefixgw = null;
-    allopt_init[109].initval = Off;
-    allopt_init[109].has_handler = No;
-    allopt_init[109].dupdetected = 0;
-    allopt_init[109].disregarded = 0;
-    allopt_init[110].name = $c.lit("menustyle");
-    allopt_init[110].section = OptS_Advanced;
-    allopt_init[110].minmatch = 0;
-    allopt_init[110].expectedbuf = 13;
-    allopt_init[110].idx = opt_menustyle;
-    allopt_init[110].setwhere = set_in_game;
-    allopt_init[110].opttyp = CompOpt;
-    allopt_init[110].negateok = Yes;
-    allopt_init[110].valok = Yes;
-    allopt_init[110].dupeok = No;
-    allopt_init[110].pfx = No;
-    allopt_init[110].termpref = 0;
-    allopt_init[110].opt_in_out = opt_in;
-    allopt_init[110].addr = null;
-    allopt_init[110].optfn = optfn_menustyle;
-    allopt_init[110].alias = null;
-    allopt_init[110].descr = $c.lit("user interface for object selection");
-    allopt_init[110].prefixgw = null;
-    allopt_init[110].initval = Off;
-    allopt_init[110].has_handler = Yes;
-    allopt_init[110].dupdetected = 0;
-    allopt_init[110].disregarded = 0;
-    allopt_init[111].name = $c.lit("message types");
-    allopt_init[111].section = OptS_Advanced;
-    allopt_init[111].minmatch = 0;
-    allopt_init[111].expectedbuf = 256;
-    allopt_init[111].idx = opt_o_message_types;
-    allopt_init[111].setwhere = set_in_game;
-    allopt_init[111].opttyp = OthrOpt;
-    allopt_init[111].negateok = No;
-    allopt_init[111].valok = Yes;
-    allopt_init[111].dupeok = No;
-    allopt_init[111].pfx = No;
-    allopt_init[111].termpref = 0;
-    allopt_init[111].opt_in_out = opt_in;
-    allopt_init[111].addr = null;
-    allopt_init[111].optfn = optfn_o_message_types;
-    allopt_init[111].alias = null;
-    allopt_init[111].descr = $c.lit("edit message types");
-    allopt_init[111].prefixgw = null;
-    allopt_init[111].initval = On;
-    allopt_init[111].has_handler = On;
-    allopt_init[111].dupdetected = 0;
-    allopt_init[111].disregarded = 0;
-    allopt_init[112].name = $c.lit("mon_movement");
-    allopt_init[112].section = OptS_Advanced;
-    allopt_init[112].minmatch = 0;
-    allopt_init[112].expectedbuf = 0;
-    allopt_init[112].idx = opt_mon_movement;
-    allopt_init[112].setwhere = set_in_game;
-    allopt_init[112].opttyp = BoolOpt;
-    allopt_init[112].negateok = Yes;
-    allopt_init[112].valok = No;
-    allopt_init[112].dupeok = No;
-    allopt_init[112].pfx = No;
-    allopt_init[112].termpref = Term_False;
-    allopt_init[112].opt_in_out = opt_in;
-    allopt_init[112].addr = new $c.FieldRef(a11y, "mon_movement", "i8");
-    allopt_init[112].optfn = optfn_boolean;
-    allopt_init[112].alias = null;
-    allopt_init[112].descr = $c.lit("message when hero sees monster movement");
-    allopt_init[112].prefixgw = null;
-    allopt_init[112].initval = Off;
-    allopt_init[112].has_handler = 0;
-    allopt_init[112].dupdetected = 0;
-    allopt_init[112].disregarded = 0;
-    allopt_init[113].name = $c.lit("monpolycontrol");
-    allopt_init[113].section = OptS_Advanced;
-    allopt_init[113].minmatch = 0;
-    allopt_init[113].expectedbuf = 0;
-    allopt_init[113].idx = opt_monpolycontrol;
-    allopt_init[113].setwhere = set_wizonly;
-    allopt_init[113].opttyp = BoolOpt;
-    allopt_init[113].negateok = Yes;
-    allopt_init[113].valok = No;
-    allopt_init[113].dupeok = No;
-    allopt_init[113].pfx = No;
-    allopt_init[113].termpref = Term_False;
-    allopt_init[113].opt_in_out = opt_in;
-    allopt_init[113].addr = new $c.FieldRef(iflags, "mon_polycontrol", "i8");
-    allopt_init[113].optfn = optfn_boolean;
-    allopt_init[113].alias = null;
-    allopt_init[113].descr = $c.lit("control monster polymorphs");
-    allopt_init[113].prefixgw = null;
-    allopt_init[113].initval = Off;
-    allopt_init[113].has_handler = 0;
-    allopt_init[113].dupdetected = 0;
-    allopt_init[113].disregarded = 0;
-    allopt_init[114].name = $c.lit("montelecontrol");
-    allopt_init[114].section = OptS_Advanced;
-    allopt_init[114].minmatch = 0;
-    allopt_init[114].expectedbuf = 0;
-    allopt_init[114].idx = opt_montelecontrol;
-    allopt_init[114].setwhere = set_wizonly;
-    allopt_init[114].opttyp = BoolOpt;
-    allopt_init[114].negateok = Yes;
-    allopt_init[114].valok = No;
-    allopt_init[114].dupeok = No;
-    allopt_init[114].pfx = No;
-    allopt_init[114].termpref = Term_False;
-    allopt_init[114].opt_in_out = opt_in;
-    allopt_init[114].addr = new $c.FieldRef(iflags, "mon_telecontrol", "i8");
-    allopt_init[114].optfn = optfn_boolean;
-    allopt_init[114].alias = null;
-    allopt_init[114].descr = $c.lit("control monster teleport destinations");
-    allopt_init[114].prefixgw = null;
-    allopt_init[114].initval = Off;
-    allopt_init[114].has_handler = 0;
-    allopt_init[114].dupdetected = 0;
-    allopt_init[114].disregarded = 0;
-    allopt_init[115].name = $c.lit("monsters");
-    allopt_init[115].section = OptS_Advanced;
-    allopt_init[115].minmatch = 0;
-    allopt_init[115].expectedbuf = MAXMCLASSES;
-    allopt_init[115].idx = opt_monsters;
-    allopt_init[115].setwhere = set_in_config;
-    allopt_init[115].opttyp = CompOpt;
-    allopt_init[115].negateok = No;
-    allopt_init[115].valok = Yes;
-    allopt_init[115].dupeok = No;
-    allopt_init[115].pfx = No;
-    allopt_init[115].termpref = 0;
-    allopt_init[115].opt_in_out = opt_in;
-    allopt_init[115].addr = null;
-    allopt_init[115].optfn = optfn_monsters;
-    allopt_init[115].alias = null;
-    allopt_init[115].descr = $c.lit("list of symbols to use for monsters");
-    allopt_init[115].prefixgw = null;
-    allopt_init[115].initval = Off;
-    allopt_init[115].has_handler = No;
-    allopt_init[115].dupdetected = 0;
-    allopt_init[115].disregarded = 0;
-    allopt_init[116].name = $c.lit("mouse_support");
-    allopt_init[116].section = OptS_Advanced;
-    allopt_init[116].minmatch = 0;
-    allopt_init[116].expectedbuf = 0;
-    allopt_init[116].idx = opt_mouse_support;
-    allopt_init[116].setwhere = set_in_game;
-    allopt_init[116].opttyp = CompOpt;
-    allopt_init[116].negateok = No;
-    allopt_init[116].valok = Yes;
-    allopt_init[116].dupeok = No;
-    allopt_init[116].pfx = No;
-    allopt_init[116].termpref = 0;
-    allopt_init[116].opt_in_out = opt_in;
-    allopt_init[116].addr = null;
-    allopt_init[116].optfn = optfn_mouse_support;
-    allopt_init[116].alias = null;
-    allopt_init[116].descr = $c.lit("game receives click info from mouse");
-    allopt_init[116].prefixgw = null;
-    allopt_init[116].initval = Off;
-    allopt_init[116].has_handler = No;
-    allopt_init[116].dupdetected = 0;
-    allopt_init[116].disregarded = 0;
-    allopt_init[117].name = $c.lit("msg_window");
-    allopt_init[117].section = OptS_Advanced;
-    allopt_init[117].minmatch = 0;
-    allopt_init[117].expectedbuf = 1;
-    allopt_init[117].idx = opt_msg_window;
-    allopt_init[117].setwhere = set_in_game;
-    allopt_init[117].opttyp = CompOpt;
-    allopt_init[117].negateok = Yes;
-    allopt_init[117].valok = Yes;
-    allopt_init[117].dupeok = No;
-    allopt_init[117].pfx = No;
-    allopt_init[117].termpref = 0;
-    allopt_init[117].opt_in_out = opt_in;
-    allopt_init[117].addr = null;
-    allopt_init[117].optfn = optfn_msg_window;
-    allopt_init[117].alias = null;
-    allopt_init[117].descr = $c.lit("control of \"view previous message(s)\" (^P) behavior");
-    allopt_init[117].prefixgw = null;
-    allopt_init[117].initval = Off;
-    allopt_init[117].has_handler = Yes;
-    allopt_init[117].dupdetected = 0;
-    allopt_init[117].disregarded = 0;
-    allopt_init[118].name = $c.lit("msghistory");
-    allopt_init[118].section = OptS_Advanced;
-    allopt_init[118].minmatch = 0;
-    allopt_init[118].expectedbuf = 5;
-    allopt_init[118].idx = opt_msghistory;
-    allopt_init[118].setwhere = set_gameview;
-    allopt_init[118].opttyp = CompOpt;
-    allopt_init[118].negateok = Yes;
-    allopt_init[118].valok = Yes;
-    allopt_init[118].dupeok = No;
-    allopt_init[118].pfx = No;
-    allopt_init[118].termpref = 0;
-    allopt_init[118].opt_in_out = opt_in;
-    allopt_init[118].addr = null;
-    allopt_init[118].optfn = optfn_msghistory;
-    allopt_init[118].alias = null;
-    allopt_init[118].descr = $c.lit("number of top line messages to save");
-    allopt_init[118].prefixgw = null;
-    allopt_init[118].initval = Off;
-    allopt_init[118].has_handler = No;
-    allopt_init[118].dupdetected = 0;
-    allopt_init[118].disregarded = 0;
-    allopt_init[119].name = $c.lit("news");
-    allopt_init[119].section = OptS_Advanced;
-    allopt_init[119].minmatch = 0;
-    allopt_init[119].expectedbuf = 0;
-    allopt_init[119].idx = opt_news;
-    allopt_init[119].setwhere = set_in_config;
-    allopt_init[119].opttyp = BoolOpt;
-    allopt_init[119].negateok = Yes;
-    allopt_init[119].valok = No;
-    allopt_init[119].dupeok = No;
-    allopt_init[119].pfx = No;
-    allopt_init[119].termpref = Term_False;
-    allopt_init[119].opt_in_out = opt_in;
-    allopt_init[119].addr = new $c.FieldRef(iflags, "news", "i8");
-    allopt_init[119].optfn = optfn_boolean;
-    allopt_init[119].alias = null;
-    allopt_init[119].descr = $c.lit("show any news at game start");
-    allopt_init[119].prefixgw = null;
-    allopt_init[119].initval = Off;
-    allopt_init[119].has_handler = 0;
-    allopt_init[119].dupdetected = 0;
-    allopt_init[119].disregarded = 0;
-    allopt_init[120].name = $c.lit("nudist");
-    allopt_init[120].section = OptS_Advanced;
-    allopt_init[120].minmatch = 0;
-    allopt_init[120].expectedbuf = 0;
-    allopt_init[120].idx = opt_nudist;
-    allopt_init[120].setwhere = set_in_config;
-    allopt_init[120].opttyp = BoolOpt;
-    allopt_init[120].negateok = Yes;
-    allopt_init[120].valok = No;
-    allopt_init[120].dupeok = No;
-    allopt_init[120].pfx = No;
-    allopt_init[120].termpref = Term_False;
-    allopt_init[120].opt_in_out = opt_in;
-    allopt_init[120].addr = new $c.FieldRef(u.uroleplay, "nudist", "i8");
-    allopt_init[120].optfn = optfn_boolean;
-    allopt_init[120].alias = null;
-    allopt_init[120].descr = $c.lit("start your character without armor");
-    allopt_init[120].prefixgw = null;
-    allopt_init[120].initval = Off;
-    allopt_init[120].has_handler = 0;
-    allopt_init[120].dupdetected = 0;
-    allopt_init[120].disregarded = 0;
-    allopt_init[121].name = $c.lit("null");
-    allopt_init[121].section = OptS_Advanced;
-    allopt_init[121].minmatch = 0;
-    allopt_init[121].expectedbuf = 0;
-    allopt_init[121].idx = opt_null;
-    allopt_init[121].setwhere = set_in_game;
-    allopt_init[121].opttyp = BoolOpt;
-    allopt_init[121].negateok = Yes;
-    allopt_init[121].valok = No;
-    allopt_init[121].dupeok = No;
-    allopt_init[121].pfx = No;
-    allopt_init[121].termpref = Term_False;
-    allopt_init[121].opt_in_out = opt_out;
-    allopt_init[121].addr = new $c.FieldRef(flags, "null", "i8");
-    allopt_init[121].optfn = optfn_boolean;
-    allopt_init[121].alias = null;
-    allopt_init[121].descr = $c.lit("allow nulls to be sent to terminal");
-    allopt_init[121].prefixgw = null;
-    allopt_init[121].initval = On;
-    allopt_init[121].has_handler = 0;
-    allopt_init[121].dupdetected = 0;
-    allopt_init[121].disregarded = 0;
-    allopt_init[122].name = $c.lit("number_pad");
-    allopt_init[122].section = OptS_General;
-    allopt_init[122].minmatch = 0;
-    allopt_init[122].expectedbuf = 1;
-    allopt_init[122].idx = opt_number_pad;
-    allopt_init[122].setwhere = set_in_game;
-    allopt_init[122].opttyp = CompOpt;
-    allopt_init[122].negateok = No;
-    allopt_init[122].valok = Yes;
-    allopt_init[122].dupeok = No;
-    allopt_init[122].pfx = No;
-    allopt_init[122].termpref = 0;
-    allopt_init[122].opt_in_out = opt_in;
-    allopt_init[122].addr = null;
-    allopt_init[122].optfn = optfn_number_pad;
-    allopt_init[122].alias = null;
-    allopt_init[122].descr = $c.lit("use the number pad for movement");
-    allopt_init[122].prefixgw = null;
-    allopt_init[122].initval = Off;
-    allopt_init[122].has_handler = Yes;
-    allopt_init[122].dupdetected = 0;
-    allopt_init[122].disregarded = 0;
-    allopt_init[123].name = $c.lit("objects");
-    allopt_init[123].section = OptS_Advanced;
-    allopt_init[123].minmatch = 0;
-    allopt_init[123].expectedbuf = MAXOCLASSES;
-    allopt_init[123].idx = opt_objects;
-    allopt_init[123].setwhere = set_in_config;
-    allopt_init[123].opttyp = CompOpt;
-    allopt_init[123].negateok = No;
-    allopt_init[123].valok = Yes;
-    allopt_init[123].dupeok = No;
-    allopt_init[123].pfx = No;
-    allopt_init[123].termpref = 0;
-    allopt_init[123].opt_in_out = opt_in;
-    allopt_init[123].addr = null;
-    allopt_init[123].optfn = optfn_objects;
-    allopt_init[123].alias = null;
-    allopt_init[123].descr = $c.lit("list of symbols to use for objects");
-    allopt_init[123].prefixgw = null;
-    allopt_init[123].initval = Off;
-    allopt_init[123].has_handler = No;
-    allopt_init[123].dupdetected = 0;
-    allopt_init[123].disregarded = 0;
-    allopt_init[124].name = $c.lit("packorder");
-    allopt_init[124].section = OptS_Advanced;
-    allopt_init[124].minmatch = 0;
-    allopt_init[124].expectedbuf = MAXOCLASSES;
-    allopt_init[124].idx = opt_packorder;
-    allopt_init[124].setwhere = set_in_game;
-    allopt_init[124].opttyp = CompOpt;
-    allopt_init[124].negateok = No;
-    allopt_init[124].valok = Yes;
-    allopt_init[124].dupeok = No;
-    allopt_init[124].pfx = No;
-    allopt_init[124].termpref = 0;
-    allopt_init[124].opt_in_out = opt_in;
-    allopt_init[124].addr = null;
-    allopt_init[124].optfn = optfn_packorder;
-    allopt_init[124].alias = null;
-    allopt_init[124].descr = $c.lit("the inventory order of the items in your pack");
-    allopt_init[124].prefixgw = null;
-    allopt_init[124].initval = Off;
-    allopt_init[124].has_handler = No;
-    allopt_init[124].dupdetected = 0;
-    allopt_init[124].disregarded = 0;
-    allopt_init[125].name = $c.lit("paranoid_confirmation");
-    allopt_init[125].section = OptS_Advanced;
-    allopt_init[125].minmatch = 0;
-    allopt_init[125].expectedbuf = 28;
-    allopt_init[125].idx = opt_paranoid_confirmation;
-    allopt_init[125].setwhere = set_in_game;
-    allopt_init[125].opttyp = CompOpt;
-    allopt_init[125].negateok = Yes;
-    allopt_init[125].valok = Yes;
-    allopt_init[125].dupeok = Yes;
-    allopt_init[125].pfx = No;
-    allopt_init[125].termpref = 0;
-    allopt_init[125].opt_in_out = opt_in;
-    allopt_init[125].addr = null;
-    allopt_init[125].optfn = optfn_paranoid_confirmation;
-    allopt_init[125].alias = $c.lit("prayconfirm");
-    allopt_init[125].descr = $c.lit("extra prompting in certain situations");
-    allopt_init[125].prefixgw = null;
-    allopt_init[125].initval = Off;
-    allopt_init[125].has_handler = Yes;
-    allopt_init[125].dupdetected = 0;
-    allopt_init[125].disregarded = 0;
-    allopt_init[126].name = $c.lit("pauper");
-    allopt_init[126].section = OptS_Advanced;
-    allopt_init[126].minmatch = 0;
-    allopt_init[126].expectedbuf = 0;
-    allopt_init[126].idx = opt_pauper;
-    allopt_init[126].setwhere = set_in_config;
-    allopt_init[126].opttyp = BoolOpt;
-    allopt_init[126].negateok = Yes;
-    allopt_init[126].valok = No;
-    allopt_init[126].dupeok = No;
-    allopt_init[126].pfx = No;
-    allopt_init[126].termpref = Term_False;
-    allopt_init[126].opt_in_out = opt_in;
-    allopt_init[126].addr = new $c.FieldRef(u.uroleplay, "pauper", "i8");
-    allopt_init[126].optfn = optfn_boolean;
-    allopt_init[126].alias = null;
-    allopt_init[126].descr = $c.lit("start your character without any items");
-    allopt_init[126].prefixgw = null;
-    allopt_init[126].initval = Off;
-    allopt_init[126].has_handler = 0;
-    allopt_init[126].dupdetected = 0;
-    allopt_init[126].disregarded = 0;
-    allopt_init[127].name = $c.lit("perm_invent");
-    allopt_init[127].section = OptS_Advanced;
-    allopt_init[127].minmatch = 0;
-    allopt_init[127].expectedbuf = 0;
-    allopt_init[127].idx = opt_perm_invent;
-    allopt_init[127].setwhere = set_in_game;
-    allopt_init[127].opttyp = BoolOpt;
-    allopt_init[127].negateok = Yes;
-    allopt_init[127].valok = No;
-    allopt_init[127].dupeok = No;
-    allopt_init[127].pfx = No;
-    allopt_init[127].termpref = Term_Off;
-    allopt_init[127].opt_in_out = opt_in;
-    allopt_init[127].addr = new $c.FieldRef(iflags, "perm_invent", "i8");
-    allopt_init[127].optfn = optfn_boolean;
-    allopt_init[127].alias = null;
-    allopt_init[127].descr = $c.lit("show persistent inventory window");
-    allopt_init[127].prefixgw = null;
-    allopt_init[127].initval = Off;
-    allopt_init[127].has_handler = 0;
-    allopt_init[127].dupdetected = 0;
-    allopt_init[127].disregarded = 0;
-    allopt_init[128].name = $c.lit("perminv_mode");
-    allopt_init[128].section = OptS_Advanced;
-    allopt_init[128].minmatch = 0;
-    allopt_init[128].expectedbuf = 20;
-    allopt_init[128].idx = opt_perminv_mode;
-    allopt_init[128].setwhere = set_in_game;
-    allopt_init[128].opttyp = CompOpt;
-    allopt_init[128].negateok = Yes;
-    allopt_init[128].valok = Yes;
-    allopt_init[128].dupeok = No;
-    allopt_init[128].pfx = No;
-    allopt_init[128].termpref = 0;
-    allopt_init[128].opt_in_out = opt_in;
-    allopt_init[128].addr = null;
-    allopt_init[128].optfn = optfn_perminv_mode;
-    allopt_init[128].alias = null;
-    allopt_init[128].descr = $c.lit("what to show in persistent inventory window");
-    allopt_init[128].prefixgw = null;
-    allopt_init[128].initval = Off;
-    allopt_init[128].has_handler = Yes;
-    allopt_init[128].dupdetected = 0;
-    allopt_init[128].disregarded = 0;
-    allopt_init[129].name = $c.lit("petattr");
-    allopt_init[129].section = OptS_Advanced;
-    allopt_init[129].minmatch = 0;
-    allopt_init[129].expectedbuf = 88;
-    allopt_init[129].idx = opt_petattr;
-    allopt_init[129].setwhere = set_in_game;
-    allopt_init[129].opttyp = CompOpt;
-    allopt_init[129].negateok = No;
-    allopt_init[129].valok = Yes;
-    allopt_init[129].dupeok = No;
-    allopt_init[129].pfx = No;
-    allopt_init[129].termpref = 0;
-    allopt_init[129].opt_in_out = opt_in;
-    allopt_init[129].addr = null;
-    allopt_init[129].optfn = optfn_petattr;
-    allopt_init[129].alias = null;
-    allopt_init[129].descr = $c.lit("attributes for highlighting pets");
-    allopt_init[129].prefixgw = null;
-    allopt_init[129].initval = Off;
-    allopt_init[129].has_handler = Yes;
-    allopt_init[129].dupdetected = 0;
-    allopt_init[129].disregarded = 0;
-    allopt_init[130].name = $c.lit("pettype");
-    allopt_init[130].section = OptS_Advanced;
-    allopt_init[130].minmatch = 0;
-    allopt_init[130].expectedbuf = 4;
-    allopt_init[130].idx = opt_pettype;
-    allopt_init[130].setwhere = set_gameview;
-    allopt_init[130].opttyp = CompOpt;
-    allopt_init[130].negateok = Yes;
-    allopt_init[130].valok = Yes;
-    allopt_init[130].dupeok = No;
-    allopt_init[130].pfx = No;
-    allopt_init[130].termpref = 0;
-    allopt_init[130].opt_in_out = opt_in;
-    allopt_init[130].addr = null;
-    allopt_init[130].optfn = optfn_pettype;
-    allopt_init[130].alias = $c.lit("pet");
-    allopt_init[130].descr = $c.lit("your preferred initial pet type");
-    allopt_init[130].prefixgw = null;
-    allopt_init[130].initval = Off;
-    allopt_init[130].has_handler = No;
-    allopt_init[130].dupdetected = 0;
-    allopt_init[130].disregarded = 0;
-    allopt_init[131].name = $c.lit("pickup_burden");
-    allopt_init[131].section = OptS_Advanced;
-    allopt_init[131].minmatch = 0;
-    allopt_init[131].expectedbuf = 20;
-    allopt_init[131].idx = opt_pickup_burden;
-    allopt_init[131].setwhere = set_in_game;
-    allopt_init[131].opttyp = CompOpt;
-    allopt_init[131].negateok = No;
-    allopt_init[131].valok = Yes;
-    allopt_init[131].dupeok = No;
-    allopt_init[131].pfx = No;
-    allopt_init[131].termpref = 0;
-    allopt_init[131].opt_in_out = opt_in;
-    allopt_init[131].addr = null;
-    allopt_init[131].optfn = optfn_pickup_burden;
-    allopt_init[131].alias = null;
-    allopt_init[131].descr = $c.lit("maximum burden picked up before prompt");
-    allopt_init[131].prefixgw = null;
-    allopt_init[131].initval = Off;
-    allopt_init[131].has_handler = Yes;
-    allopt_init[131].dupdetected = 0;
-    allopt_init[131].disregarded = 0;
-    allopt_init[132].name = $c.lit("pickup_stolen");
-    allopt_init[132].section = OptS_Behavior;
-    allopt_init[132].minmatch = 0;
-    allopt_init[132].expectedbuf = 0;
-    allopt_init[132].idx = opt_pickup_stolen;
-    allopt_init[132].setwhere = set_in_game;
-    allopt_init[132].opttyp = BoolOpt;
-    allopt_init[132].negateok = Yes;
-    allopt_init[132].valok = No;
-    allopt_init[132].dupeok = No;
-    allopt_init[132].pfx = No;
-    allopt_init[132].termpref = Term_False;
-    allopt_init[132].opt_in_out = opt_out;
-    allopt_init[132].addr = new $c.FieldRef(flags, "pickup_stolen", "i8");
-    allopt_init[132].optfn = optfn_boolean;
-    allopt_init[132].alias = null;
-    allopt_init[132].descr = $c.lit("autopickup stolen items");
-    allopt_init[132].prefixgw = null;
-    allopt_init[132].initval = On;
-    allopt_init[132].has_handler = 0;
-    allopt_init[132].dupdetected = 0;
-    allopt_init[132].disregarded = 0;
-    allopt_init[133].name = $c.lit("pickup_thrown");
-    allopt_init[133].section = OptS_Behavior;
-    allopt_init[133].minmatch = 0;
-    allopt_init[133].expectedbuf = 0;
-    allopt_init[133].idx = opt_pickup_thrown;
-    allopt_init[133].setwhere = set_in_game;
-    allopt_init[133].opttyp = BoolOpt;
-    allopt_init[133].negateok = Yes;
-    allopt_init[133].valok = No;
-    allopt_init[133].dupeok = No;
-    allopt_init[133].pfx = No;
-    allopt_init[133].termpref = Term_False;
-    allopt_init[133].opt_in_out = opt_out;
-    allopt_init[133].addr = new $c.FieldRef(flags, "pickup_thrown", "i8");
-    allopt_init[133].optfn = optfn_boolean;
-    allopt_init[133].alias = null;
-    allopt_init[133].descr = $c.lit("autopickup thrown items");
-    allopt_init[133].prefixgw = null;
-    allopt_init[133].initval = On;
-    allopt_init[133].has_handler = 0;
-    allopt_init[133].dupdetected = 0;
-    allopt_init[133].disregarded = 0;
-    allopt_init[134].name = $c.lit("pickup_types");
-    allopt_init[134].section = OptS_Behavior;
-    allopt_init[134].minmatch = 0;
-    allopt_init[134].expectedbuf = MAXOCLASSES;
-    allopt_init[134].idx = opt_pickup_types;
-    allopt_init[134].setwhere = set_in_game;
-    allopt_init[134].opttyp = CompOpt;
-    allopt_init[134].negateok = No;
-    allopt_init[134].valok = Yes;
-    allopt_init[134].dupeok = No;
-    allopt_init[134].pfx = No;
-    allopt_init[134].termpref = 0;
-    allopt_init[134].opt_in_out = opt_in;
-    allopt_init[134].addr = null;
-    allopt_init[134].optfn = optfn_pickup_types;
-    allopt_init[134].alias = null;
-    allopt_init[134].descr = $c.lit("types of objects to pick up automatically");
-    allopt_init[134].prefixgw = null;
-    allopt_init[134].initval = Off;
-    allopt_init[134].has_handler = Yes;
-    allopt_init[134].dupdetected = 0;
-    allopt_init[134].disregarded = 0;
-    allopt_init[135].name = $c.lit("pile_limit");
-    allopt_init[135].section = OptS_Advanced;
-    allopt_init[135].minmatch = 0;
-    allopt_init[135].expectedbuf = 24;
-    allopt_init[135].idx = opt_pile_limit;
-    allopt_init[135].setwhere = set_in_game;
-    allopt_init[135].opttyp = CompOpt;
-    allopt_init[135].negateok = Yes;
-    allopt_init[135].valok = Yes;
-    allopt_init[135].dupeok = No;
-    allopt_init[135].pfx = No;
-    allopt_init[135].termpref = 0;
-    allopt_init[135].opt_in_out = opt_in;
-    allopt_init[135].addr = null;
-    allopt_init[135].optfn = optfn_pile_limit;
-    allopt_init[135].alias = null;
-    allopt_init[135].descr = $c.lit("threshold for \"there are many objects here\"");
-    allopt_init[135].prefixgw = null;
-    allopt_init[135].initval = Off;
-    allopt_init[135].has_handler = No;
-    allopt_init[135].dupdetected = 0;
-    allopt_init[135].disregarded = 0;
-    allopt_init[136].name = $c.lit("player_selection");
-    allopt_init[136].section = OptS_Advanced;
-    allopt_init[136].minmatch = 0;
-    allopt_init[136].expectedbuf = 12;
-    allopt_init[136].idx = opt_player_selection;
-    allopt_init[136].setwhere = set_gameview;
-    allopt_init[136].opttyp = CompOpt;
-    allopt_init[136].negateok = No;
-    allopt_init[136].valok = Yes;
-    allopt_init[136].dupeok = No;
-    allopt_init[136].pfx = No;
-    allopt_init[136].termpref = 0;
-    allopt_init[136].opt_in_out = opt_in;
-    allopt_init[136].addr = null;
-    allopt_init[136].optfn = optfn_player_selection;
-    allopt_init[136].alias = null;
-    allopt_init[136].descr = $c.lit("choose character via dialog or prompts");
-    allopt_init[136].prefixgw = null;
-    allopt_init[136].initval = Off;
-    allopt_init[136].has_handler = No;
-    allopt_init[136].dupdetected = 0;
-    allopt_init[136].disregarded = 0;
-    allopt_init[137].name = $c.lit("popup_dialog");
-    allopt_init[137].section = OptS_Advanced;
-    allopt_init[137].minmatch = 0;
-    allopt_init[137].expectedbuf = 0;
-    allopt_init[137].idx = opt_popup_dialog;
-    allopt_init[137].setwhere = set_in_game;
-    allopt_init[137].opttyp = BoolOpt;
-    allopt_init[137].negateok = Yes;
-    allopt_init[137].valok = No;
-    allopt_init[137].dupeok = No;
-    allopt_init[137].pfx = No;
-    allopt_init[137].termpref = Term_False;
-    allopt_init[137].opt_in_out = opt_in;
-    allopt_init[137].addr = new $c.FieldRef(iflags, "wc_popup_dialog", "i8");
-    allopt_init[137].optfn = optfn_boolean;
-    allopt_init[137].alias = null;
-    allopt_init[137].descr = null;
-    allopt_init[137].prefixgw = null;
-    allopt_init[137].initval = Off;
-    allopt_init[137].has_handler = 0;
-    allopt_init[137].dupdetected = 0;
-    allopt_init[137].disregarded = 0;
-    allopt_init[138].name = $c.lit("preload_tiles");
-    allopt_init[138].section = OptS_Advanced;
-    allopt_init[138].minmatch = 0;
-    allopt_init[138].expectedbuf = 0;
-    allopt_init[138].idx = opt_preload_tiles;
-    allopt_init[138].setwhere = set_in_config;
-    allopt_init[138].opttyp = BoolOpt;
-    allopt_init[138].negateok = Yes;
-    allopt_init[138].valok = No;
-    allopt_init[138].dupeok = No;
-    allopt_init[138].pfx = No;
-    allopt_init[138].termpref = Term_False;
-    allopt_init[138].opt_in_out = opt_out;
-    allopt_init[138].addr = new $c.FieldRef(iflags, "wc_preload_tiles", "i8");
-    allopt_init[138].optfn = optfn_boolean;
-    allopt_init[138].alias = null;
-    allopt_init[138].descr = null;
-    allopt_init[138].prefixgw = null;
-    allopt_init[138].initval = On;
-    allopt_init[138].has_handler = 0;
-    allopt_init[138].dupdetected = 0;
-    allopt_init[138].disregarded = 0;
-    allopt_init[139].name = $c.lit("price_quotes");
-    allopt_init[139].section = OptS_General;
-    allopt_init[139].minmatch = 0;
-    allopt_init[139].expectedbuf = 0;
-    allopt_init[139].idx = opt_price_quotes;
-    allopt_init[139].setwhere = set_in_game;
-    allopt_init[139].opttyp = BoolOpt;
-    allopt_init[139].negateok = Yes;
-    allopt_init[139].valok = No;
-    allopt_init[139].dupeok = No;
-    allopt_init[139].pfx = No;
-    allopt_init[139].termpref = Term_False;
-    allopt_init[139].opt_in_out = opt_in;
-    allopt_init[139].addr = new $c.FieldRef(iflags, "pricequotes", "i8");
-    allopt_init[139].optfn = optfn_boolean;
-    allopt_init[139].alias = null;
-    allopt_init[139].descr = $c.lit("display prices you have seen for unidentified objects");
-    allopt_init[139].prefixgw = null;
-    allopt_init[139].initval = Off;
-    allopt_init[139].has_handler = 0;
-    allopt_init[139].dupdetected = 0;
-    allopt_init[139].disregarded = 0;
-    allopt_init[140].name = $c.lit("pushweapon");
-    allopt_init[140].section = OptS_Behavior;
-    allopt_init[140].minmatch = 0;
-    allopt_init[140].expectedbuf = 0;
-    allopt_init[140].idx = opt_pushweapon;
-    allopt_init[140].setwhere = set_in_game;
-    allopt_init[140].opttyp = BoolOpt;
-    allopt_init[140].negateok = Yes;
-    allopt_init[140].valok = No;
-    allopt_init[140].dupeok = No;
-    allopt_init[140].pfx = No;
-    allopt_init[140].termpref = Term_False;
-    allopt_init[140].opt_in_out = opt_in;
-    allopt_init[140].addr = new $c.FieldRef(flags, "pushweapon", "i8");
-    allopt_init[140].optfn = optfn_boolean;
-    allopt_init[140].alias = null;
-    allopt_init[140].descr = $c.lit("previous weapon goes to secondary slot");
-    allopt_init[140].prefixgw = null;
-    allopt_init[140].initval = Off;
-    allopt_init[140].has_handler = 0;
-    allopt_init[140].dupdetected = 0;
-    allopt_init[140].disregarded = 0;
-    allopt_init[141].name = $c.lit("query_menu");
-    allopt_init[141].section = OptS_Advanced;
-    allopt_init[141].minmatch = 0;
-    allopt_init[141].expectedbuf = 0;
-    allopt_init[141].idx = opt_query_menu;
-    allopt_init[141].setwhere = set_in_game;
-    allopt_init[141].opttyp = BoolOpt;
-    allopt_init[141].negateok = Yes;
-    allopt_init[141].valok = No;
-    allopt_init[141].dupeok = No;
-    allopt_init[141].pfx = No;
-    allopt_init[141].termpref = Term_False;
-    allopt_init[141].opt_in_out = opt_in;
-    allopt_init[141].addr = new $c.FieldRef(iflags, "query_menu", "i8");
-    allopt_init[141].optfn = optfn_boolean;
-    allopt_init[141].alias = null;
-    allopt_init[141].descr = $c.lit("use a menu for yes/no queries");
-    allopt_init[141].prefixgw = null;
-    allopt_init[141].initval = Off;
-    allopt_init[141].has_handler = 0;
-    allopt_init[141].dupdetected = 0;
-    allopt_init[141].disregarded = 0;
-    allopt_init[142].name = $c.lit("quick_farsight");
-    allopt_init[142].section = OptS_Advanced;
-    allopt_init[142].minmatch = 0;
-    allopt_init[142].expectedbuf = 0;
-    allopt_init[142].idx = opt_quick_farsight;
-    allopt_init[142].setwhere = set_in_game;
-    allopt_init[142].opttyp = BoolOpt;
-    allopt_init[142].negateok = Yes;
-    allopt_init[142].valok = No;
-    allopt_init[142].dupeok = No;
-    allopt_init[142].pfx = No;
-    allopt_init[142].termpref = Term_False;
-    allopt_init[142].opt_in_out = opt_in;
-    allopt_init[142].addr = new $c.FieldRef(flags, "quick_farsight", "i8");
-    allopt_init[142].optfn = optfn_boolean;
-    allopt_init[142].alias = null;
-    allopt_init[142].descr = $c.lit("skip map browse when forced to looked at map");
-    allopt_init[142].prefixgw = null;
-    allopt_init[142].initval = Off;
-    allopt_init[142].has_handler = 0;
-    allopt_init[142].dupdetected = 0;
-    allopt_init[142].disregarded = 0;
-    allopt_init[143].name = $c.lit("rawio");
-    allopt_init[143].section = OptS_Advanced;
-    allopt_init[143].minmatch = 0;
-    allopt_init[143].expectedbuf = 0;
-    allopt_init[143].idx = opt_rawio;
-    allopt_init[143].setwhere = set_in_config;
-    allopt_init[143].opttyp = BoolOpt;
-    allopt_init[143].negateok = No;
-    allopt_init[143].valok = No;
-    allopt_init[143].dupeok = No;
-    allopt_init[143].pfx = No;
-    allopt_init[143].termpref = Term_False;
-    allopt_init[143].opt_in_out = opt_in;
-    allopt_init[143].addr = null;
-    allopt_init[143].optfn = optfn_boolean;
-    allopt_init[143].alias = null;
-    allopt_init[143].descr = null;
-    allopt_init[143].prefixgw = null;
-    allopt_init[143].initval = Off;
-    allopt_init[143].has_handler = 0;
-    allopt_init[143].dupdetected = 0;
-    allopt_init[143].disregarded = 0;
-    allopt_init[144].name = $c.lit("reroll");
-    allopt_init[144].section = OptS_Advanced;
-    allopt_init[144].minmatch = 0;
-    allopt_init[144].expectedbuf = 0;
-    allopt_init[144].idx = opt_reroll;
-    allopt_init[144].setwhere = set_in_config;
-    allopt_init[144].opttyp = BoolOpt;
-    allopt_init[144].negateok = Yes;
-    allopt_init[144].valok = No;
-    allopt_init[144].dupeok = No;
-    allopt_init[144].pfx = No;
-    allopt_init[144].termpref = Term_False;
-    allopt_init[144].opt_in_out = opt_in;
-    allopt_init[144].addr = new $c.FieldRef(u.uroleplay, "reroll", "i8");
-    allopt_init[144].optfn = optfn_boolean;
-    allopt_init[144].alias = null;
-    allopt_init[144].descr = $c.lit("allow rerolling of starting inventory and items");
-    allopt_init[144].prefixgw = null;
-    allopt_init[144].initval = Off;
-    allopt_init[144].has_handler = 0;
-    allopt_init[144].dupdetected = 0;
-    allopt_init[144].disregarded = 0;
-    allopt_init[145].name = $c.lit("rest_on_space");
-    allopt_init[145].section = OptS_Advanced;
-    allopt_init[145].minmatch = 0;
-    allopt_init[145].expectedbuf = 0;
-    allopt_init[145].idx = opt_rest_on_space;
-    allopt_init[145].setwhere = set_in_game;
-    allopt_init[145].opttyp = BoolOpt;
-    allopt_init[145].negateok = Yes;
-    allopt_init[145].valok = No;
-    allopt_init[145].dupeok = No;
-    allopt_init[145].pfx = No;
-    allopt_init[145].termpref = Term_False;
-    allopt_init[145].opt_in_out = opt_in;
-    allopt_init[145].addr = new $c.FieldRef(flags, "rest_on_space", "i8");
-    allopt_init[145].optfn = optfn_boolean;
-    allopt_init[145].alias = null;
-    allopt_init[145].descr = $c.lit("space bar is bound to the rest-command");
-    allopt_init[145].prefixgw = null;
-    allopt_init[145].initval = Off;
-    allopt_init[145].has_handler = 0;
-    allopt_init[145].dupdetected = 0;
-    allopt_init[145].disregarded = 0;
-    allopt_init[146].name = $c.lit("roguesymset");
-    allopt_init[146].section = OptS_Advanced;
-    allopt_init[146].minmatch = 0;
-    allopt_init[146].expectedbuf = 70;
-    allopt_init[146].idx = opt_roguesymset;
-    allopt_init[146].setwhere = set_in_game;
-    allopt_init[146].opttyp = CompOpt;
-    allopt_init[146].negateok = No;
-    allopt_init[146].valok = Yes;
-    allopt_init[146].dupeok = No;
-    allopt_init[146].pfx = No;
-    allopt_init[146].termpref = 0;
-    allopt_init[146].opt_in_out = opt_in;
-    allopt_init[146].addr = null;
-    allopt_init[146].optfn = optfn_roguesymset;
-    allopt_init[146].alias = null;
-    allopt_init[146].descr = $c.lit("load a set of rogue display symbols from symbols file");
-    allopt_init[146].prefixgw = null;
-    allopt_init[146].initval = Off;
-    allopt_init[146].has_handler = Yes;
-    allopt_init[146].dupdetected = 0;
-    allopt_init[146].disregarded = 0;
-    allopt_init[147].name = $c.lit("runmode");
-    allopt_init[147].section = OptS_Advanced;
-    allopt_init[147].minmatch = 0;
-    allopt_init[147].expectedbuf = 9;
-    allopt_init[147].idx = opt_runmode;
-    allopt_init[147].setwhere = set_in_game;
-    allopt_init[147].opttyp = CompOpt;
-    allopt_init[147].negateok = Yes;
-    allopt_init[147].valok = Yes;
-    allopt_init[147].dupeok = No;
-    allopt_init[147].pfx = No;
-    allopt_init[147].termpref = 0;
-    allopt_init[147].opt_in_out = opt_in;
-    allopt_init[147].addr = null;
-    allopt_init[147].optfn = optfn_runmode;
-    allopt_init[147].alias = null;
-    allopt_init[147].descr = $c.lit("display frequency when `running' or `travelling'");
-    allopt_init[147].prefixgw = null;
-    allopt_init[147].initval = Off;
-    allopt_init[147].has_handler = Yes;
-    allopt_init[147].dupdetected = 0;
-    allopt_init[147].disregarded = 0;
-    allopt_init[148].name = $c.lit("safe_pet");
-    allopt_init[148].section = OptS_Advanced;
-    allopt_init[148].minmatch = 0;
-    allopt_init[148].expectedbuf = 0;
-    allopt_init[148].idx = opt_safe_pet;
-    allopt_init[148].setwhere = set_in_game;
-    allopt_init[148].opttyp = BoolOpt;
-    allopt_init[148].negateok = Yes;
-    allopt_init[148].valok = No;
-    allopt_init[148].dupeok = No;
-    allopt_init[148].pfx = No;
-    allopt_init[148].termpref = Term_False;
-    allopt_init[148].opt_in_out = opt_out;
-    allopt_init[148].addr = new $c.FieldRef(flags, "safe_dog", "i8");
-    allopt_init[148].optfn = optfn_boolean;
-    allopt_init[148].alias = null;
-    allopt_init[148].descr = $c.lit("prevent you from hitting pets");
-    allopt_init[148].prefixgw = null;
-    allopt_init[148].initval = On;
-    allopt_init[148].has_handler = 0;
-    allopt_init[148].dupdetected = 0;
-    allopt_init[148].disregarded = 0;
-    allopt_init[149].name = $c.lit("safe_wait");
-    allopt_init[149].section = OptS_Advanced;
-    allopt_init[149].minmatch = 0;
-    allopt_init[149].expectedbuf = 0;
-    allopt_init[149].idx = opt_safe_wait;
-    allopt_init[149].setwhere = set_in_game;
-    allopt_init[149].opttyp = BoolOpt;
-    allopt_init[149].negateok = Yes;
-    allopt_init[149].valok = No;
-    allopt_init[149].dupeok = No;
-    allopt_init[149].pfx = No;
-    allopt_init[149].termpref = Term_False;
-    allopt_init[149].opt_in_out = opt_out;
-    allopt_init[149].addr = new $c.FieldRef(flags, "safe_wait", "i8");
-    allopt_init[149].optfn = optfn_boolean;
-    allopt_init[149].alias = null;
-    allopt_init[149].descr = $c.lit("prevent waiting next to hostiles");
-    allopt_init[149].prefixgw = null;
-    allopt_init[149].initval = On;
-    allopt_init[149].has_handler = 0;
-    allopt_init[149].dupdetected = 0;
-    allopt_init[149].disregarded = 0;
-    allopt_init[150].name = $c.lit("sanity_check");
-    allopt_init[150].section = OptS_Advanced;
-    allopt_init[150].minmatch = 0;
-    allopt_init[150].expectedbuf = 0;
-    allopt_init[150].idx = opt_sanity_check;
-    allopt_init[150].setwhere = set_wizonly;
-    allopt_init[150].opttyp = BoolOpt;
-    allopt_init[150].negateok = Yes;
-    allopt_init[150].valok = No;
-    allopt_init[150].dupeok = No;
-    allopt_init[150].pfx = No;
-    allopt_init[150].termpref = Term_False;
-    allopt_init[150].opt_in_out = opt_in;
-    allopt_init[150].addr = new $c.FieldRef(iflags, "sanity_check", "i8");
-    allopt_init[150].optfn = optfn_boolean;
-    allopt_init[150].alias = null;
-    allopt_init[150].descr = $c.lit("perform data sanity checks");
-    allopt_init[150].prefixgw = null;
-    allopt_init[150].initval = Off;
-    allopt_init[150].has_handler = 0;
-    allopt_init[150].dupdetected = 0;
-    allopt_init[150].disregarded = 0;
-    allopt_init[151].name = $c.lit("scores");
-    allopt_init[151].section = OptS_Advanced;
-    allopt_init[151].minmatch = 0;
-    allopt_init[151].expectedbuf = 32;
-    allopt_init[151].idx = opt_scores;
-    allopt_init[151].setwhere = set_in_game;
-    allopt_init[151].opttyp = CompOpt;
-    allopt_init[151].negateok = No;
-    allopt_init[151].valok = Yes;
-    allopt_init[151].dupeok = No;
-    allopt_init[151].pfx = No;
-    allopt_init[151].termpref = 0;
-    allopt_init[151].opt_in_out = opt_in;
-    allopt_init[151].addr = null;
-    allopt_init[151].optfn = optfn_scores;
-    allopt_init[151].alias = null;
-    allopt_init[151].descr = $c.lit("the parts of the score list you wish to see");
-    allopt_init[151].prefixgw = null;
-    allopt_init[151].initval = Off;
-    allopt_init[151].has_handler = No;
-    allopt_init[151].dupdetected = 0;
-    allopt_init[151].disregarded = 0;
-    allopt_init[152].name = $c.lit("scroll_amount");
-    allopt_init[152].section = OptS_Advanced;
-    allopt_init[152].minmatch = 0;
-    allopt_init[152].expectedbuf = 20;
-    allopt_init[152].idx = opt_scroll_amount;
-    allopt_init[152].setwhere = set_gameview;
-    allopt_init[152].opttyp = CompOpt;
-    allopt_init[152].negateok = Yes;
-    allopt_init[152].valok = Yes;
-    allopt_init[152].dupeok = No;
-    allopt_init[152].pfx = No;
-    allopt_init[152].termpref = 0;
-    allopt_init[152].opt_in_out = opt_in;
-    allopt_init[152].addr = null;
-    allopt_init[152].optfn = optfn_scroll_amount;
-    allopt_init[152].alias = null;
-    allopt_init[152].descr = $c.lit("amount to scroll map when scroll_margin is reached");
-    allopt_init[152].prefixgw = null;
-    allopt_init[152].initval = Off;
-    allopt_init[152].has_handler = No;
-    allopt_init[152].dupdetected = 0;
-    allopt_init[152].disregarded = 0;
-    allopt_init[153].name = $c.lit("scroll_margin");
-    allopt_init[153].section = OptS_Advanced;
-    allopt_init[153].minmatch = 0;
-    allopt_init[153].expectedbuf = 20;
-    allopt_init[153].idx = opt_scroll_margin;
-    allopt_init[153].setwhere = set_gameview;
-    allopt_init[153].opttyp = CompOpt;
-    allopt_init[153].negateok = Yes;
-    allopt_init[153].valok = Yes;
-    allopt_init[153].dupeok = No;
-    allopt_init[153].pfx = No;
-    allopt_init[153].termpref = 0;
-    allopt_init[153].opt_in_out = opt_in;
-    allopt_init[153].addr = null;
-    allopt_init[153].optfn = optfn_scroll_margin;
-    allopt_init[153].alias = null;
-    allopt_init[153].descr = $c.lit("scroll map when this far from the edge");
-    allopt_init[153].prefixgw = null;
-    allopt_init[153].initval = Off;
-    allopt_init[153].has_handler = No;
-    allopt_init[153].dupdetected = 0;
-    allopt_init[153].disregarded = 0;
-    allopt_init[154].name = $c.lit("selectsaved");
-    allopt_init[154].section = OptS_Advanced;
-    allopt_init[154].minmatch = 0;
-    allopt_init[154].expectedbuf = 0;
-    allopt_init[154].idx = opt_selectsaved;
-    allopt_init[154].setwhere = set_in_config;
-    allopt_init[154].opttyp = BoolOpt;
-    allopt_init[154].negateok = Yes;
-    allopt_init[154].valok = No;
-    allopt_init[154].dupeok = No;
-    allopt_init[154].pfx = No;
-    allopt_init[154].termpref = Term_False;
-    allopt_init[154].opt_in_out = opt_out;
-    allopt_init[154].addr = new $c.FieldRef(iflags, "wc2_selectsaved", "i8");
-    allopt_init[154].optfn = optfn_boolean;
-    allopt_init[154].alias = null;
-    allopt_init[154].descr = null;
-    allopt_init[154].prefixgw = null;
-    allopt_init[154].initval = On;
-    allopt_init[154].has_handler = 0;
-    allopt_init[154].dupdetected = 0;
-    allopt_init[154].disregarded = 0;
-    allopt_init[155].name = $c.lit("showdamage");
-    allopt_init[155].section = OptS_Advanced;
-    allopt_init[155].minmatch = 0;
-    allopt_init[155].expectedbuf = 0;
-    allopt_init[155].idx = opt_showdamage;
-    allopt_init[155].setwhere = set_in_game;
-    allopt_init[155].opttyp = BoolOpt;
-    allopt_init[155].negateok = Yes;
-    allopt_init[155].valok = No;
-    allopt_init[155].dupeok = No;
-    allopt_init[155].pfx = No;
-    allopt_init[155].termpref = Term_False;
-    allopt_init[155].opt_in_out = opt_in;
-    allopt_init[155].addr = new $c.FieldRef(iflags, "showdamage", "i8");
-    allopt_init[155].optfn = optfn_boolean;
-    allopt_init[155].alias = null;
-    allopt_init[155].descr = $c.lit("show damage hero takes in message line");
-    allopt_init[155].prefixgw = null;
-    allopt_init[155].initval = Off;
-    allopt_init[155].has_handler = 0;
-    allopt_init[155].dupdetected = 0;
-    allopt_init[155].disregarded = 0;
-    allopt_init[156].name = $c.lit("showexp");
-    allopt_init[156].section = OptS_Status;
-    allopt_init[156].minmatch = 0;
-    allopt_init[156].expectedbuf = 0;
-    allopt_init[156].idx = opt_showexp;
-    allopt_init[156].setwhere = set_in_game;
-    allopt_init[156].opttyp = BoolOpt;
-    allopt_init[156].negateok = Yes;
-    allopt_init[156].valok = No;
-    allopt_init[156].dupeok = No;
-    allopt_init[156].pfx = No;
-    allopt_init[156].termpref = Term_False;
-    allopt_init[156].opt_in_out = opt_in;
-    allopt_init[156].addr = new $c.FieldRef(flags, "showexp", "i8");
-    allopt_init[156].optfn = optfn_boolean;
-    allopt_init[156].alias = null;
-    allopt_init[156].descr = $c.lit("show experience points in status line");
-    allopt_init[156].prefixgw = null;
-    allopt_init[156].initval = Off;
-    allopt_init[156].has_handler = 0;
-    allopt_init[156].dupdetected = 0;
-    allopt_init[156].disregarded = 0;
-    allopt_init[157].name = $c.lit("showrace");
-    allopt_init[157].section = OptS_Map;
-    allopt_init[157].minmatch = 0;
-    allopt_init[157].expectedbuf = 0;
-    allopt_init[157].idx = opt_showrace;
-    allopt_init[157].setwhere = set_in_game;
-    allopt_init[157].opttyp = BoolOpt;
-    allopt_init[157].negateok = Yes;
-    allopt_init[157].valok = No;
-    allopt_init[157].dupeok = No;
-    allopt_init[157].pfx = No;
-    allopt_init[157].termpref = Term_False;
-    allopt_init[157].opt_in_out = opt_in;
-    allopt_init[157].addr = new $c.FieldRef(flags, "showrace", "i8");
-    allopt_init[157].optfn = optfn_boolean;
-    allopt_init[157].alias = null;
-    allopt_init[157].descr = $c.lit("show your character by race rather than role");
-    allopt_init[157].prefixgw = null;
-    allopt_init[157].initval = Off;
-    allopt_init[157].has_handler = 0;
-    allopt_init[157].dupdetected = 0;
-    allopt_init[157].disregarded = 0;
-    allopt_init[158].name = $c.lit("showscore");
-    allopt_init[158].section = OptS_Status;
-    allopt_init[158].minmatch = 0;
-    allopt_init[158].expectedbuf = 0;
-    allopt_init[158].idx = opt_showscore;
-    allopt_init[158].setwhere = set_in_config;
-    allopt_init[158].opttyp = BoolOpt;
-    allopt_init[158].negateok = Yes;
-    allopt_init[158].valok = No;
-    allopt_init[158].dupeok = No;
-    allopt_init[158].pfx = No;
-    allopt_init[158].termpref = Term_False;
-    allopt_init[158].opt_in_out = opt_in;
-    allopt_init[158].addr = null;
-    allopt_init[158].optfn = optfn_boolean;
-    allopt_init[158].alias = null;
-    allopt_init[158].descr = null;
-    allopt_init[158].prefixgw = null;
-    allopt_init[158].initval = Off;
-    allopt_init[158].has_handler = 0;
-    allopt_init[158].dupdetected = 0;
-    allopt_init[158].disregarded = 0;
-    allopt_init[159].name = $c.lit("showvers");
-    allopt_init[159].section = OptS_Advanced;
-    allopt_init[159].minmatch = 0;
-    allopt_init[159].expectedbuf = 0;
-    allopt_init[159].idx = opt_showvers;
-    allopt_init[159].setwhere = set_in_game;
-    allopt_init[159].opttyp = BoolOpt;
-    allopt_init[159].negateok = Yes;
-    allopt_init[159].valok = No;
-    allopt_init[159].dupeok = No;
-    allopt_init[159].pfx = No;
-    allopt_init[159].termpref = Term_False;
-    allopt_init[159].opt_in_out = opt_in;
-    allopt_init[159].addr = new $c.FieldRef(flags, "showvers", "i8");
-    allopt_init[159].optfn = optfn_boolean;
-    allopt_init[159].alias = null;
-    allopt_init[159].descr = $c.lit("show version info on status line");
-    allopt_init[159].prefixgw = null;
-    allopt_init[159].initval = Off;
-    allopt_init[159].has_handler = 0;
-    allopt_init[159].dupdetected = 0;
-    allopt_init[159].disregarded = 0;
-    allopt_init[160].name = $c.lit("silent");
-    allopt_init[160].section = OptS_Advanced;
-    allopt_init[160].minmatch = 0;
-    allopt_init[160].expectedbuf = 0;
-    allopt_init[160].idx = opt_silent;
-    allopt_init[160].setwhere = set_in_game;
-    allopt_init[160].opttyp = BoolOpt;
-    allopt_init[160].negateok = Yes;
-    allopt_init[160].valok = No;
-    allopt_init[160].dupeok = No;
-    allopt_init[160].pfx = No;
-    allopt_init[160].termpref = Term_False;
-    allopt_init[160].opt_in_out = opt_out;
-    allopt_init[160].addr = new $c.FieldRef(flags, "silent", "i8");
-    allopt_init[160].optfn = optfn_boolean;
-    allopt_init[160].alias = null;
-    allopt_init[160].descr = $c.lit("don't use terminal bell");
-    allopt_init[160].prefixgw = null;
-    allopt_init[160].initval = On;
-    allopt_init[160].has_handler = 0;
-    allopt_init[160].dupdetected = 0;
-    allopt_init[160].disregarded = 0;
-    allopt_init[161].name = $c.lit("softkeyboard");
-    allopt_init[161].section = OptS_Advanced;
-    allopt_init[161].minmatch = 0;
-    allopt_init[161].expectedbuf = 0;
-    allopt_init[161].idx = opt_softkeyboard;
-    allopt_init[161].setwhere = set_in_config;
-    allopt_init[161].opttyp = BoolOpt;
-    allopt_init[161].negateok = Yes;
-    allopt_init[161].valok = No;
-    allopt_init[161].dupeok = No;
-    allopt_init[161].pfx = No;
-    allopt_init[161].termpref = Term_False;
-    allopt_init[161].opt_in_out = opt_in;
-    allopt_init[161].addr = new $c.FieldRef(iflags, "wc2_softkeyboard", "i8");
-    allopt_init[161].optfn = optfn_boolean;
-    allopt_init[161].alias = null;
-    allopt_init[161].descr = null;
-    allopt_init[161].prefixgw = null;
-    allopt_init[161].initval = Off;
-    allopt_init[161].has_handler = 0;
-    allopt_init[161].dupdetected = 0;
-    allopt_init[161].disregarded = 0;
-    allopt_init[162].name = $c.lit("sortdiscoveries");
-    allopt_init[162].section = OptS_Advanced;
-    allopt_init[162].minmatch = 0;
-    allopt_init[162].expectedbuf = 0;
-    allopt_init[162].idx = opt_sortdiscoveries;
-    allopt_init[162].setwhere = set_in_game;
-    allopt_init[162].opttyp = CompOpt;
-    allopt_init[162].negateok = Yes;
-    allopt_init[162].valok = Yes;
-    allopt_init[162].dupeok = No;
-    allopt_init[162].pfx = No;
-    allopt_init[162].termpref = 0;
-    allopt_init[162].opt_in_out = opt_in;
-    allopt_init[162].addr = null;
-    allopt_init[162].optfn = optfn_sortdiscoveries;
-    allopt_init[162].alias = null;
-    allopt_init[162].descr = $c.lit("preferred order when displaying discovered objects");
-    allopt_init[162].prefixgw = null;
-    allopt_init[162].initval = Off;
-    allopt_init[162].has_handler = Yes;
-    allopt_init[162].dupdetected = 0;
-    allopt_init[162].disregarded = 0;
-    allopt_init[163].name = $c.lit("sortloot");
-    allopt_init[163].section = OptS_Advanced;
-    allopt_init[163].minmatch = 0;
-    allopt_init[163].expectedbuf = 4;
-    allopt_init[163].idx = opt_sortloot;
-    allopt_init[163].setwhere = set_in_game;
-    allopt_init[163].opttyp = CompOpt;
-    allopt_init[163].negateok = No;
-    allopt_init[163].valok = Yes;
-    allopt_init[163].dupeok = No;
-    allopt_init[163].pfx = No;
-    allopt_init[163].termpref = 0;
-    allopt_init[163].opt_in_out = opt_in;
-    allopt_init[163].addr = null;
-    allopt_init[163].optfn = optfn_sortloot;
-    allopt_init[163].alias = null;
-    allopt_init[163].descr = $c.lit("sort object selection lists by description");
-    allopt_init[163].prefixgw = null;
-    allopt_init[163].initval = Off;
-    allopt_init[163].has_handler = Yes;
-    allopt_init[163].dupdetected = 0;
-    allopt_init[163].disregarded = 0;
-    allopt_init[164].name = $c.lit("sortpack");
-    allopt_init[164].section = OptS_Advanced;
-    allopt_init[164].minmatch = 0;
-    allopt_init[164].expectedbuf = 0;
-    allopt_init[164].idx = opt_sortpack;
-    allopt_init[164].setwhere = set_in_game;
-    allopt_init[164].opttyp = BoolOpt;
-    allopt_init[164].negateok = Yes;
-    allopt_init[164].valok = No;
-    allopt_init[164].dupeok = No;
-    allopt_init[164].pfx = No;
-    allopt_init[164].termpref = Term_False;
-    allopt_init[164].opt_in_out = opt_out;
-    allopt_init[164].addr = new $c.FieldRef(flags, "sortpack", "i8");
-    allopt_init[164].optfn = optfn_boolean;
-    allopt_init[164].alias = null;
-    allopt_init[164].descr = $c.lit("group inventory items by type");
-    allopt_init[164].prefixgw = null;
-    allopt_init[164].initval = On;
-    allopt_init[164].has_handler = 0;
-    allopt_init[164].dupdetected = 0;
-    allopt_init[164].disregarded = 0;
-    allopt_init[165].name = $c.lit("sortvanquished");
-    allopt_init[165].section = OptS_Advanced;
-    allopt_init[165].minmatch = 0;
-    allopt_init[165].expectedbuf = 0;
-    allopt_init[165].idx = opt_sortvanquished;
-    allopt_init[165].setwhere = set_in_game;
-    allopt_init[165].opttyp = CompOpt;
-    allopt_init[165].negateok = Yes;
-    allopt_init[165].valok = Yes;
-    allopt_init[165].dupeok = No;
-    allopt_init[165].pfx = No;
-    allopt_init[165].termpref = 0;
-    allopt_init[165].opt_in_out = opt_in;
-    allopt_init[165].addr = null;
-    allopt_init[165].optfn = optfn_sortvanquished;
-    allopt_init[165].alias = null;
-    allopt_init[165].descr = $c.lit("preferred order when displaying vanquished monsters");
-    allopt_init[165].prefixgw = null;
-    allopt_init[165].initval = Off;
-    allopt_init[165].has_handler = Yes;
-    allopt_init[165].dupdetected = 0;
-    allopt_init[165].disregarded = 0;
-    allopt_init[166].name = $c.lit("soundlib");
-    allopt_init[166].section = OptS_Advanced;
-    allopt_init[166].minmatch = 0;
-    allopt_init[166].expectedbuf = 16;
-    allopt_init[166].idx = opt_soundlib;
-    allopt_init[166].setwhere = set_gameview;
-    allopt_init[166].opttyp = CompOpt;
-    allopt_init[166].negateok = No;
-    allopt_init[166].valok = Yes;
-    allopt_init[166].dupeok = No;
-    allopt_init[166].pfx = No;
-    allopt_init[166].termpref = 0;
-    allopt_init[166].opt_in_out = opt_in;
-    allopt_init[166].addr = null;
-    allopt_init[166].optfn = optfn_soundlib;
-    allopt_init[166].alias = null;
-    allopt_init[166].descr = $c.lit("soundlib interface to use (if any)");
-    allopt_init[166].prefixgw = null;
-    allopt_init[166].initval = Off;
-    allopt_init[166].has_handler = No;
-    allopt_init[166].dupdetected = 0;
-    allopt_init[166].disregarded = 0;
-    allopt_init[167].name = $c.lit("sounds");
-    allopt_init[167].section = OptS_Advanced;
-    allopt_init[167].minmatch = 0;
-    allopt_init[167].expectedbuf = 0;
-    allopt_init[167].idx = opt_sounds;
-    allopt_init[167].setwhere = set_in_game;
-    allopt_init[167].opttyp = BoolOpt;
-    allopt_init[167].negateok = Yes;
-    allopt_init[167].valok = No;
-    allopt_init[167].dupeok = No;
-    allopt_init[167].pfx = No;
-    allopt_init[167].termpref = Term_Off;
-    allopt_init[167].opt_in_out = opt_in;
-    allopt_init[167].addr = new $c.FieldRef(iflags, "sounds", "i8");
-    allopt_init[167].optfn = optfn_boolean;
-    allopt_init[167].alias = null;
-    allopt_init[167].descr = $c.lit("use sounds");
-    allopt_init[167].prefixgw = null;
-    allopt_init[167].initval = Off;
-    allopt_init[167].has_handler = 0;
-    allopt_init[167].dupdetected = 0;
-    allopt_init[167].disregarded = 0;
-    allopt_init[168].name = $c.lit("sparkle");
-    allopt_init[168].section = OptS_Map;
-    allopt_init[168].minmatch = 0;
-    allopt_init[168].expectedbuf = 0;
-    allopt_init[168].idx = opt_sparkle;
-    allopt_init[168].setwhere = set_in_game;
-    allopt_init[168].opttyp = BoolOpt;
-    allopt_init[168].negateok = Yes;
-    allopt_init[168].valok = No;
-    allopt_init[168].dupeok = No;
-    allopt_init[168].pfx = No;
-    allopt_init[168].termpref = Term_False;
-    allopt_init[168].opt_in_out = opt_out;
-    allopt_init[168].addr = new $c.FieldRef(flags, "sparkle", "i8");
-    allopt_init[168].optfn = optfn_boolean;
-    allopt_init[168].alias = null;
-    allopt_init[168].descr = $c.lit("display sparkly effect when resisting magic");
-    allopt_init[168].prefixgw = null;
-    allopt_init[168].initval = On;
-    allopt_init[168].has_handler = 0;
-    allopt_init[168].dupdetected = 0;
-    allopt_init[168].disregarded = 0;
-    allopt_init[169].name = $c.lit("spot_monsters");
-    allopt_init[169].section = OptS_Advanced;
-    allopt_init[169].minmatch = 0;
-    allopt_init[169].expectedbuf = 0;
-    allopt_init[169].idx = opt_spot_monsters;
-    allopt_init[169].setwhere = set_in_game;
-    allopt_init[169].opttyp = BoolOpt;
-    allopt_init[169].negateok = Yes;
-    allopt_init[169].valok = No;
-    allopt_init[169].dupeok = No;
-    allopt_init[169].pfx = No;
-    allopt_init[169].termpref = Term_False;
-    allopt_init[169].opt_in_out = opt_in;
-    allopt_init[169].addr = new $c.FieldRef(a11y, "mon_notices", "i8");
-    allopt_init[169].optfn = optfn_boolean;
-    allopt_init[169].alias = null;
-    allopt_init[169].descr = $c.lit("message when hero spots a monster");
-    allopt_init[169].prefixgw = null;
-    allopt_init[169].initval = Off;
-    allopt_init[169].has_handler = 0;
-    allopt_init[169].dupdetected = 0;
-    allopt_init[169].disregarded = 0;
-    allopt_init[170].name = $c.lit("splash_screen");
-    allopt_init[170].section = OptS_Advanced;
-    allopt_init[170].minmatch = 0;
-    allopt_init[170].expectedbuf = 0;
-    allopt_init[170].idx = opt_splash_screen;
-    allopt_init[170].setwhere = set_in_config;
-    allopt_init[170].opttyp = BoolOpt;
-    allopt_init[170].negateok = Yes;
-    allopt_init[170].valok = No;
-    allopt_init[170].dupeok = No;
-    allopt_init[170].pfx = No;
-    allopt_init[170].termpref = Term_False;
-    allopt_init[170].opt_in_out = opt_out;
-    allopt_init[170].addr = new $c.FieldRef(iflags, "wc_splash_screen", "i8");
-    allopt_init[170].optfn = optfn_boolean;
-    allopt_init[170].alias = null;
-    allopt_init[170].descr = null;
-    allopt_init[170].prefixgw = null;
-    allopt_init[170].initval = On;
-    allopt_init[170].has_handler = 0;
-    allopt_init[170].dupdetected = 0;
-    allopt_init[170].disregarded = 0;
-    allopt_init[171].name = $c.lit("standout");
-    allopt_init[171].section = OptS_Advanced;
-    allopt_init[171].minmatch = 0;
-    allopt_init[171].expectedbuf = 0;
-    allopt_init[171].idx = opt_standout;
-    allopt_init[171].setwhere = set_in_game;
-    allopt_init[171].opttyp = BoolOpt;
-    allopt_init[171].negateok = Yes;
-    allopt_init[171].valok = No;
-    allopt_init[171].dupeok = No;
-    allopt_init[171].pfx = No;
-    allopt_init[171].termpref = Term_False;
-    allopt_init[171].opt_in_out = opt_in;
-    allopt_init[171].addr = new $c.FieldRef(flags, "standout", "i8");
-    allopt_init[171].optfn = optfn_boolean;
-    allopt_init[171].alias = null;
-    allopt_init[171].descr = $c.lit("use standout for --more--");
-    allopt_init[171].prefixgw = null;
-    allopt_init[171].initval = Off;
-    allopt_init[171].has_handler = 0;
-    allopt_init[171].dupdetected = 0;
-    allopt_init[171].disregarded = 0;
-    allopt_init[172].name = $c.lit("status_updates");
-    allopt_init[172].section = OptS_Advanced;
-    allopt_init[172].minmatch = 0;
-    allopt_init[172].expectedbuf = 0;
-    allopt_init[172].idx = opt_status_updates;
-    allopt_init[172].setwhere = set_in_config;
-    allopt_init[172].opttyp = BoolOpt;
-    allopt_init[172].negateok = Yes;
-    allopt_init[172].valok = No;
-    allopt_init[172].dupeok = No;
-    allopt_init[172].pfx = No;
-    allopt_init[172].termpref = Term_False;
-    allopt_init[172].opt_in_out = opt_out;
-    allopt_init[172].addr = new $c.FieldRef(iflags, "status_updates", "i8");
-    allopt_init[172].optfn = optfn_boolean;
-    allopt_init[172].alias = null;
-    allopt_init[172].descr = $c.lit("allow the status lines to update");
-    allopt_init[172].prefixgw = null;
-    allopt_init[172].initval = On;
-    allopt_init[172].has_handler = 0;
-    allopt_init[172].dupdetected = 0;
-    allopt_init[172].disregarded = 0;
-    allopt_init[173].name = $c.lit("status condition fields");
-    allopt_init[173].section = OptS_Status;
-    allopt_init[173].minmatch = 0;
-    allopt_init[173].expectedbuf = 256;
-    allopt_init[173].idx = opt_o_status_cond;
-    allopt_init[173].setwhere = set_in_game;
-    allopt_init[173].opttyp = OthrOpt;
-    allopt_init[173].negateok = No;
-    allopt_init[173].valok = Yes;
-    allopt_init[173].dupeok = No;
-    allopt_init[173].pfx = No;
-    allopt_init[173].termpref = 0;
-    allopt_init[173].opt_in_out = opt_in;
-    allopt_init[173].addr = null;
-    allopt_init[173].optfn = optfn_o_status_cond;
-    allopt_init[173].alias = null;
-    allopt_init[173].descr = $c.lit("change status condition highlighting");
-    allopt_init[173].prefixgw = null;
-    allopt_init[173].initval = On;
-    allopt_init[173].has_handler = On;
-    allopt_init[173].dupdetected = 0;
-    allopt_init[173].disregarded = 0;
-    allopt_init[174].name = $c.lit("statushilites");
-    allopt_init[174].section = OptS_Advanced;
-    allopt_init[174].minmatch = 0;
-    allopt_init[174].expectedbuf = 20;
-    allopt_init[174].idx = opt_statushilites;
-    allopt_init[174].setwhere = set_in_game;
-    allopt_init[174].opttyp = CompOpt;
-    allopt_init[174].negateok = Yes;
-    allopt_init[174].valok = Yes;
-    allopt_init[174].dupeok = Yes;
-    allopt_init[174].pfx = No;
-    allopt_init[174].termpref = 0;
-    allopt_init[174].opt_in_out = opt_in;
-    allopt_init[174].addr = null;
-    allopt_init[174].optfn = optfn_statushilites;
-    allopt_init[174].alias = null;
-    allopt_init[174].descr = $c.lit("0=no status highlighting, N=show highlights for N turns");
-    allopt_init[174].prefixgw = null;
-    allopt_init[174].initval = Off;
-    allopt_init[174].has_handler = No;
-    allopt_init[174].dupdetected = 0;
-    allopt_init[174].disregarded = 0;
-    allopt_init[175].name = $c.lit("status highlight rules");
-    allopt_init[175].section = OptS_Status;
-    allopt_init[175].minmatch = 0;
-    allopt_init[175].expectedbuf = 256;
-    allopt_init[175].idx = opt_o_status_hilites;
-    allopt_init[175].setwhere = set_in_game;
-    allopt_init[175].opttyp = OthrOpt;
-    allopt_init[175].negateok = No;
-    allopt_init[175].valok = Yes;
-    allopt_init[175].dupeok = No;
-    allopt_init[175].pfx = No;
-    allopt_init[175].termpref = 0;
-    allopt_init[175].opt_in_out = opt_in;
-    allopt_init[175].addr = null;
-    allopt_init[175].optfn = optfn_o_status_hilites;
-    allopt_init[175].alias = null;
-    allopt_init[175].descr = $c.lit("change status line highlighting");
-    allopt_init[175].prefixgw = null;
-    allopt_init[175].initval = On;
-    allopt_init[175].has_handler = On;
-    allopt_init[175].dupdetected = 0;
-    allopt_init[175].disregarded = 0;
-    allopt_init[176].name = $c.lit("statuslines");
-    allopt_init[176].section = OptS_Status;
-    allopt_init[176].minmatch = 0;
-    allopt_init[176].expectedbuf = 20;
-    allopt_init[176].idx = opt_statuslines;
-    allopt_init[176].setwhere = set_in_game;
-    allopt_init[176].opttyp = CompOpt;
-    allopt_init[176].negateok = No;
-    allopt_init[176].valok = Yes;
-    allopt_init[176].dupeok = No;
-    allopt_init[176].pfx = No;
-    allopt_init[176].termpref = 0;
-    allopt_init[176].opt_in_out = opt_in;
-    allopt_init[176].addr = null;
-    allopt_init[176].optfn = optfn_statuslines;
-    allopt_init[176].alias = null;
-    allopt_init[176].descr = $c.lit("2 or 3 lines for status display");
-    allopt_init[176].prefixgw = null;
-    allopt_init[176].initval = Off;
-    allopt_init[176].has_handler = No;
-    allopt_init[176].dupdetected = 0;
-    allopt_init[176].disregarded = 0;
-    allopt_init[177].name = $c.lit("suppress_alert");
-    allopt_init[177].section = OptS_Advanced;
-    allopt_init[177].minmatch = 0;
-    allopt_init[177].expectedbuf = 8;
-    allopt_init[177].idx = opt_suppress_alert;
-    allopt_init[177].setwhere = set_in_game;
-    allopt_init[177].opttyp = CompOpt;
-    allopt_init[177].negateok = No;
-    allopt_init[177].valok = Yes;
-    allopt_init[177].dupeok = Yes;
-    allopt_init[177].pfx = No;
-    allopt_init[177].termpref = 0;
-    allopt_init[177].opt_in_out = opt_in;
-    allopt_init[177].addr = null;
-    allopt_init[177].optfn = optfn_suppress_alert;
-    allopt_init[177].alias = null;
-    allopt_init[177].descr = $c.lit("suppress alerts about version-specific features");
-    allopt_init[177].prefixgw = null;
-    allopt_init[177].initval = Off;
-    allopt_init[177].has_handler = No;
-    allopt_init[177].dupdetected = 0;
-    allopt_init[177].disregarded = 0;
-    allopt_init[178].name = $c.lit("symset");
-    allopt_init[178].section = OptS_Map;
-    allopt_init[178].minmatch = 0;
-    allopt_init[178].expectedbuf = 70;
-    allopt_init[178].idx = opt_symset;
-    allopt_init[178].setwhere = set_in_game;
-    allopt_init[178].opttyp = CompOpt;
-    allopt_init[178].negateok = No;
-    allopt_init[178].valok = Yes;
-    allopt_init[178].dupeok = No;
-    allopt_init[178].pfx = No;
-    allopt_init[178].termpref = 0;
-    allopt_init[178].opt_in_out = opt_in;
-    allopt_init[178].addr = null;
-    allopt_init[178].optfn = optfn_symset;
-    allopt_init[178].alias = null;
-    allopt_init[178].descr = $c.lit("load a set of display symbols from symbols file");
-    allopt_init[178].prefixgw = null;
-    allopt_init[178].initval = Off;
-    allopt_init[178].has_handler = Yes;
-    allopt_init[178].dupdetected = 0;
-    allopt_init[178].disregarded = 0;
-    allopt_init[179].name = $c.lit("term_cols");
-    allopt_init[179].section = OptS_Advanced;
-    allopt_init[179].minmatch = 0;
-    allopt_init[179].expectedbuf = 6;
-    allopt_init[179].idx = opt_term_cols;
-    allopt_init[179].setwhere = set_in_config;
-    allopt_init[179].opttyp = CompOpt;
-    allopt_init[179].negateok = No;
-    allopt_init[179].valok = Yes;
-    allopt_init[179].dupeok = No;
-    allopt_init[179].pfx = No;
-    allopt_init[179].termpref = 0;
-    allopt_init[179].opt_in_out = opt_in;
-    allopt_init[179].addr = null;
-    allopt_init[179].optfn = optfn_term_cols;
-    allopt_init[179].alias = $c.lit("termcolumns");
-    allopt_init[179].descr = $c.lit("number of columns");
-    allopt_init[179].prefixgw = null;
-    allopt_init[179].initval = Off;
-    allopt_init[179].has_handler = No;
-    allopt_init[179].dupdetected = 0;
-    allopt_init[179].disregarded = 0;
-    allopt_init[180].name = $c.lit("term_rows");
-    allopt_init[180].section = OptS_Advanced;
-    allopt_init[180].minmatch = 0;
-    allopt_init[180].expectedbuf = 6;
-    allopt_init[180].idx = opt_term_rows;
-    allopt_init[180].setwhere = set_in_config;
-    allopt_init[180].opttyp = CompOpt;
-    allopt_init[180].negateok = No;
-    allopt_init[180].valok = Yes;
-    allopt_init[180].dupeok = No;
-    allopt_init[180].pfx = No;
-    allopt_init[180].termpref = 0;
-    allopt_init[180].opt_in_out = opt_in;
-    allopt_init[180].addr = null;
-    allopt_init[180].optfn = optfn_term_rows;
-    allopt_init[180].alias = null;
-    allopt_init[180].descr = $c.lit("number of rows");
-    allopt_init[180].prefixgw = null;
-    allopt_init[180].initval = Off;
-    allopt_init[180].has_handler = No;
-    allopt_init[180].dupdetected = 0;
-    allopt_init[180].disregarded = 0;
-    allopt_init[181].name = $c.lit("terrainstatus");
-    allopt_init[181].section = OptS_Advanced;
-    allopt_init[181].minmatch = 0;
-    allopt_init[181].expectedbuf = 0;
-    allopt_init[181].idx = opt_terrainstatus;
-    allopt_init[181].setwhere = set_in_game;
-    allopt_init[181].opttyp = BoolOpt;
-    allopt_init[181].negateok = Yes;
-    allopt_init[181].valok = No;
-    allopt_init[181].dupeok = No;
-    allopt_init[181].pfx = No;
-    allopt_init[181].termpref = Term_False;
-    allopt_init[181].opt_in_out = opt_in;
-    allopt_init[181].addr = new $c.FieldRef(flags, "terrainstatus", "i8");
-    allopt_init[181].optfn = optfn_boolean;
-    allopt_init[181].alias = null;
-    allopt_init[181].descr = $c.lit("show hero's location as a status field");
-    allopt_init[181].prefixgw = null;
-    allopt_init[181].initval = Off;
-    allopt_init[181].has_handler = 0;
-    allopt_init[181].dupdetected = 0;
-    allopt_init[181].disregarded = 0;
-    allopt_init[182].name = $c.lit("tile_file");
-    allopt_init[182].section = OptS_Advanced;
-    allopt_init[182].minmatch = 0;
-    allopt_init[182].expectedbuf = 70;
-    allopt_init[182].idx = opt_tile_file;
-    allopt_init[182].setwhere = set_gameview;
-    allopt_init[182].opttyp = CompOpt;
-    allopt_init[182].negateok = No;
-    allopt_init[182].valok = Yes;
-    allopt_init[182].dupeok = No;
-    allopt_init[182].pfx = No;
-    allopt_init[182].termpref = 0;
-    allopt_init[182].opt_in_out = opt_in;
-    allopt_init[182].addr = null;
-    allopt_init[182].optfn = optfn_tile_file;
-    allopt_init[182].alias = null;
-    allopt_init[182].descr = $c.lit("name of tile file");
-    allopt_init[182].prefixgw = null;
-    allopt_init[182].initval = Off;
-    allopt_init[182].has_handler = No;
-    allopt_init[182].dupdetected = 0;
-    allopt_init[182].disregarded = 0;
-    allopt_init[183].name = $c.lit("tile_height");
-    allopt_init[183].section = OptS_Advanced;
-    allopt_init[183].minmatch = 0;
-    allopt_init[183].expectedbuf = 20;
-    allopt_init[183].idx = opt_tile_height;
-    allopt_init[183].setwhere = set_gameview;
-    allopt_init[183].opttyp = CompOpt;
-    allopt_init[183].negateok = Yes;
-    allopt_init[183].valok = Yes;
-    allopt_init[183].dupeok = No;
-    allopt_init[183].pfx = No;
-    allopt_init[183].termpref = 0;
-    allopt_init[183].opt_in_out = opt_in;
-    allopt_init[183].addr = null;
-    allopt_init[183].optfn = optfn_tile_height;
-    allopt_init[183].alias = null;
-    allopt_init[183].descr = $c.lit("height of tiles");
-    allopt_init[183].prefixgw = null;
-    allopt_init[183].initval = Off;
-    allopt_init[183].has_handler = No;
-    allopt_init[183].dupdetected = 0;
-    allopt_init[183].disregarded = 0;
-    allopt_init[184].name = $c.lit("tile_width");
-    allopt_init[184].section = OptS_Advanced;
-    allopt_init[184].minmatch = 0;
-    allopt_init[184].expectedbuf = 20;
-    allopt_init[184].idx = opt_tile_width;
-    allopt_init[184].setwhere = set_gameview;
-    allopt_init[184].opttyp = CompOpt;
-    allopt_init[184].negateok = Yes;
-    allopt_init[184].valok = Yes;
-    allopt_init[184].dupeok = No;
-    allopt_init[184].pfx = No;
-    allopt_init[184].termpref = 0;
-    allopt_init[184].opt_in_out = opt_in;
-    allopt_init[184].addr = null;
-    allopt_init[184].optfn = optfn_tile_width;
-    allopt_init[184].alias = null;
-    allopt_init[184].descr = $c.lit("width of tiles");
-    allopt_init[184].prefixgw = null;
-    allopt_init[184].initval = Off;
-    allopt_init[184].has_handler = No;
-    allopt_init[184].dupdetected = 0;
-    allopt_init[184].disregarded = 0;
-    allopt_init[185].name = $c.lit("tiled_map");
-    allopt_init[185].section = OptS_Advanced;
-    allopt_init[185].minmatch = 0;
-    allopt_init[185].expectedbuf = 0;
-    allopt_init[185].idx = opt_tiled_map;
-    allopt_init[185].setwhere = set_in_game;
-    allopt_init[185].opttyp = BoolOpt;
-    allopt_init[185].negateok = Yes;
-    allopt_init[185].valok = No;
-    allopt_init[185].dupeok = No;
-    allopt_init[185].pfx = No;
-    allopt_init[185].termpref = Term_False;
-    allopt_init[185].opt_in_out = opt_in;
-    allopt_init[185].addr = new $c.FieldRef(iflags, "wc_tiled_map", "i8");
-    allopt_init[185].optfn = optfn_boolean;
-    allopt_init[185].alias = null;
-    allopt_init[185].descr = null;
-    allopt_init[185].prefixgw = null;
-    allopt_init[185].initval = Off;
-    allopt_init[185].has_handler = 0;
-    allopt_init[185].dupdetected = 0;
-    allopt_init[185].disregarded = 0;
-    allopt_init[186].name = $c.lit("time");
-    allopt_init[186].section = OptS_Status;
-    allopt_init[186].minmatch = 0;
-    allopt_init[186].expectedbuf = 0;
-    allopt_init[186].idx = opt_time;
-    allopt_init[186].setwhere = set_in_game;
-    allopt_init[186].opttyp = BoolOpt;
-    allopt_init[186].negateok = Yes;
-    allopt_init[186].valok = No;
-    allopt_init[186].dupeok = No;
-    allopt_init[186].pfx = No;
-    allopt_init[186].termpref = Term_False;
-    allopt_init[186].opt_in_out = opt_in;
-    allopt_init[186].addr = new $c.FieldRef(flags, "time", "i8");
-    allopt_init[186].optfn = optfn_boolean;
-    allopt_init[186].alias = null;
-    allopt_init[186].descr = $c.lit("display game turns in status line");
-    allopt_init[186].prefixgw = null;
-    allopt_init[186].initval = Off;
-    allopt_init[186].has_handler = 0;
-    allopt_init[186].dupdetected = 0;
-    allopt_init[186].disregarded = 0;
-    allopt_init[187].name = $c.lit("timed_delay");
-    allopt_init[187].section = OptS_Map;
-    allopt_init[187].minmatch = 0;
-    allopt_init[187].expectedbuf = 0;
-    allopt_init[187].idx = opt_timed_delay;
-    allopt_init[187].setwhere = set_in_config;
-    allopt_init[187].opttyp = BoolOpt;
-    allopt_init[187].negateok = No;
-    allopt_init[187].valok = No;
-    allopt_init[187].dupeok = No;
-    allopt_init[187].pfx = No;
-    allopt_init[187].termpref = Term_False;
-    allopt_init[187].opt_in_out = opt_in;
-    allopt_init[187].addr = null;
-    allopt_init[187].optfn = optfn_boolean;
-    allopt_init[187].alias = null;
-    allopt_init[187].descr = null;
-    allopt_init[187].prefixgw = null;
-    allopt_init[187].initval = Off;
-    allopt_init[187].has_handler = 0;
-    allopt_init[187].dupdetected = 0;
-    allopt_init[187].disregarded = 0;
-    allopt_init[188].name = $c.lit("tips");
-    allopt_init[188].section = OptS_Advanced;
-    allopt_init[188].minmatch = 0;
-    allopt_init[188].expectedbuf = 0;
-    allopt_init[188].idx = opt_tips;
-    allopt_init[188].setwhere = set_in_game;
-    allopt_init[188].opttyp = BoolOpt;
-    allopt_init[188].negateok = Yes;
-    allopt_init[188].valok = No;
-    allopt_init[188].dupeok = No;
-    allopt_init[188].pfx = No;
-    allopt_init[188].termpref = Term_False;
-    allopt_init[188].opt_in_out = opt_out;
-    allopt_init[188].addr = new $c.FieldRef(flags, "tips", "i8");
-    allopt_init[188].optfn = optfn_boolean;
-    allopt_init[188].alias = null;
-    allopt_init[188].descr = $c.lit("show some helpful tips during gameplay");
-    allopt_init[188].prefixgw = null;
-    allopt_init[188].initval = On;
-    allopt_init[188].has_handler = 0;
-    allopt_init[188].dupdetected = 0;
-    allopt_init[188].disregarded = 0;
-    allopt_init[189].name = $c.lit("tombstone");
-    allopt_init[189].section = OptS_Advanced;
-    allopt_init[189].minmatch = 0;
-    allopt_init[189].expectedbuf = 0;
-    allopt_init[189].idx = opt_tombstone;
-    allopt_init[189].setwhere = set_in_game;
-    allopt_init[189].opttyp = BoolOpt;
-    allopt_init[189].negateok = Yes;
-    allopt_init[189].valok = No;
-    allopt_init[189].dupeok = No;
-    allopt_init[189].pfx = No;
-    allopt_init[189].termpref = Term_False;
-    allopt_init[189].opt_in_out = opt_out;
-    allopt_init[189].addr = new $c.FieldRef(flags, "tombstone", "i8");
-    allopt_init[189].optfn = optfn_boolean;
-    allopt_init[189].alias = null;
-    allopt_init[189].descr = $c.lit("show tombstone when your character dies");
-    allopt_init[189].prefixgw = null;
-    allopt_init[189].initval = On;
-    allopt_init[189].has_handler = 0;
-    allopt_init[189].dupdetected = 0;
-    allopt_init[189].disregarded = 0;
-    allopt_init[190].name = $c.lit("toptenwin");
-    allopt_init[190].section = OptS_Advanced;
-    allopt_init[190].minmatch = 0;
-    allopt_init[190].expectedbuf = 0;
-    allopt_init[190].idx = opt_toptenwin;
-    allopt_init[190].setwhere = set_in_game;
-    allopt_init[190].opttyp = BoolOpt;
-    allopt_init[190].negateok = Yes;
-    allopt_init[190].valok = No;
-    allopt_init[190].dupeok = No;
-    allopt_init[190].pfx = No;
-    allopt_init[190].termpref = Term_False;
-    allopt_init[190].opt_in_out = opt_in;
-    allopt_init[190].addr = new $c.FieldRef(iflags, "toptenwin", "i8");
-    allopt_init[190].optfn = optfn_boolean;
-    allopt_init[190].alias = null;
-    allopt_init[190].descr = $c.lit("show top scores in window");
-    allopt_init[190].prefixgw = null;
-    allopt_init[190].initval = Off;
-    allopt_init[190].has_handler = 0;
-    allopt_init[190].dupdetected = 0;
-    allopt_init[190].disregarded = 0;
-    allopt_init[191].name = $c.lit("traps");
-    allopt_init[191].section = OptS_Advanced;
-    allopt_init[191].minmatch = 0;
-    allopt_init[191].expectedbuf = TRAPNUM - 1 + 1;
-    allopt_init[191].idx = opt_traps;
-    allopt_init[191].setwhere = set_in_config;
-    allopt_init[191].opttyp = CompOpt;
-    allopt_init[191].negateok = No;
-    allopt_init[191].valok = Yes;
-    allopt_init[191].dupeok = No;
-    allopt_init[191].pfx = No;
-    allopt_init[191].termpref = 0;
-    allopt_init[191].opt_in_out = opt_in;
-    allopt_init[191].addr = null;
-    allopt_init[191].optfn = optfn_traps;
-    allopt_init[191].alias = null;
-    allopt_init[191].descr = $c.lit("list of symbols to use in drawing traps");
-    allopt_init[191].prefixgw = null;
-    allopt_init[191].initval = Off;
-    allopt_init[191].has_handler = No;
-    allopt_init[191].dupdetected = 0;
-    allopt_init[191].disregarded = 0;
-    allopt_init[192].name = $c.lit("travel");
-    allopt_init[192].section = OptS_Advanced;
-    allopt_init[192].minmatch = 0;
-    allopt_init[192].expectedbuf = 0;
-    allopt_init[192].idx = opt_travel;
-    allopt_init[192].setwhere = set_in_game;
-    allopt_init[192].opttyp = BoolOpt;
-    allopt_init[192].negateok = Yes;
-    allopt_init[192].valok = No;
-    allopt_init[192].dupeok = No;
-    allopt_init[192].pfx = No;
-    allopt_init[192].termpref = Term_False;
-    allopt_init[192].opt_in_out = opt_out;
-    allopt_init[192].addr = new $c.FieldRef(flags, "travelcmd", "i8");
-    allopt_init[192].optfn = optfn_boolean;
-    allopt_init[192].alias = null;
-    allopt_init[192].descr = $c.lit("enable traveling via mouse click");
-    allopt_init[192].prefixgw = null;
-    allopt_init[192].initval = On;
-    allopt_init[192].has_handler = 0;
-    allopt_init[192].dupdetected = 0;
-    allopt_init[192].disregarded = 0;
-    allopt_init[193].name = $c.lit("travel_debug");
-    allopt_init[193].section = OptS_Advanced;
-    allopt_init[193].minmatch = 0;
-    allopt_init[193].expectedbuf = 0;
-    allopt_init[193].idx = opt_travel_debug;
-    allopt_init[193].setwhere = set_wizonly;
-    allopt_init[193].opttyp = BoolOpt;
-    allopt_init[193].negateok = Yes;
-    allopt_init[193].valok = No;
-    allopt_init[193].dupeok = No;
-    allopt_init[193].pfx = No;
-    allopt_init[193].termpref = Term_False;
-    allopt_init[193].opt_in_out = opt_out;
-    allopt_init[193].addr = new $c.FieldRef(iflags, "trav_debug", "i8");
-    allopt_init[193].optfn = optfn_boolean;
-    allopt_init[193].alias = null;
-    allopt_init[193].descr = null;
-    allopt_init[193].prefixgw = null;
-    allopt_init[193].initval = Off;
-    allopt_init[193].has_handler = 0;
-    allopt_init[193].dupdetected = 0;
-    allopt_init[193].disregarded = 0;
-    allopt_init[194].name = $c.lit("tutorial");
-    allopt_init[194].section = OptS_Advanced;
-    allopt_init[194].minmatch = 0;
-    allopt_init[194].expectedbuf = 0;
-    allopt_init[194].idx = opt_tutorial;
-    allopt_init[194].setwhere = set_in_config;
-    allopt_init[194].opttyp = BoolOpt;
-    allopt_init[194].negateok = Yes;
-    allopt_init[194].valok = No;
-    allopt_init[194].dupeok = No;
-    allopt_init[194].pfx = No;
-    allopt_init[194].termpref = Term_False;
-    allopt_init[194].opt_in_out = opt_out;
-    allopt_init[194].addr = new $c.FieldRef(flags, "tutorial", "i8");
-    allopt_init[194].optfn = optfn_boolean;
-    allopt_init[194].alias = null;
-    allopt_init[194].descr = $c.lit("ask if you want the tutorial");
-    allopt_init[194].prefixgw = null;
-    allopt_init[194].initval = On;
-    allopt_init[194].has_handler = 0;
-    allopt_init[194].dupdetected = 0;
-    allopt_init[194].disregarded = 0;
-    allopt_init[195].name = $c.lit("use_darkgray");
-    allopt_init[195].section = OptS_Advanced;
-    allopt_init[195].minmatch = 0;
-    allopt_init[195].expectedbuf = 0;
-    allopt_init[195].idx = opt_use_darkgray;
-    allopt_init[195].setwhere = set_in_config;
-    allopt_init[195].opttyp = BoolOpt;
-    allopt_init[195].negateok = Yes;
-    allopt_init[195].valok = No;
-    allopt_init[195].dupeok = No;
-    allopt_init[195].pfx = No;
-    allopt_init[195].termpref = Term_False;
-    allopt_init[195].opt_in_out = opt_out;
-    allopt_init[195].addr = new $c.FieldRef(iflags, "wc2_darkgray", "i8");
-    allopt_init[195].optfn = optfn_boolean;
-    allopt_init[195].alias = null;
-    allopt_init[195].descr = $c.lit("use bold black color instead of blue");
-    allopt_init[195].prefixgw = null;
-    allopt_init[195].initval = On;
-    allopt_init[195].has_handler = 0;
-    allopt_init[195].dupdetected = 0;
-    allopt_init[195].disregarded = 0;
-    allopt_init[196].name = $c.lit("use_inverse");
-    allopt_init[196].section = OptS_Advanced;
-    allopt_init[196].minmatch = 0;
-    allopt_init[196].expectedbuf = 0;
-    allopt_init[196].idx = opt_use_inverse;
-    allopt_init[196].setwhere = set_in_game;
-    allopt_init[196].opttyp = BoolOpt;
-    allopt_init[196].negateok = Yes;
-    allopt_init[196].valok = No;
-    allopt_init[196].dupeok = No;
-    allopt_init[196].pfx = No;
-    allopt_init[196].termpref = Term_False;
-    allopt_init[196].opt_in_out = opt_out;
-    allopt_init[196].addr = new $c.FieldRef(iflags, "wc_inverse", "i8");
-    allopt_init[196].optfn = optfn_boolean;
-    allopt_init[196].alias = null;
-    allopt_init[196].descr = $c.lit("display detected monsters in inverse");
-    allopt_init[196].prefixgw = null;
-    allopt_init[196].initval = On;
-    allopt_init[196].has_handler = 0;
-    allopt_init[196].dupdetected = 0;
-    allopt_init[196].disregarded = 0;
-    allopt_init[197].name = $c.lit("use_truecolor");
-    allopt_init[197].section = OptS_Advanced;
-    allopt_init[197].minmatch = 0;
-    allopt_init[197].expectedbuf = 0;
-    allopt_init[197].idx = opt_use_truecolor;
-    allopt_init[197].setwhere = set_in_config;
-    allopt_init[197].opttyp = BoolOpt;
-    allopt_init[197].negateok = Yes;
-    allopt_init[197].valok = No;
-    allopt_init[197].dupeok = No;
-    allopt_init[197].pfx = No;
-    allopt_init[197].termpref = Term_False;
-    allopt_init[197].opt_in_out = opt_in;
-    allopt_init[197].addr = new $c.FieldRef(iflags, "use_truecolor", "i8");
-    allopt_init[197].optfn = optfn_boolean;
-    allopt_init[197].alias = $c.lit("use_truecolour");
-    allopt_init[197].descr = null;
-    allopt_init[197].prefixgw = null;
-    allopt_init[197].initval = Off;
-    allopt_init[197].has_handler = 0;
-    allopt_init[197].dupdetected = 0;
-    allopt_init[197].disregarded = 0;
-    allopt_init[198].name = $c.lit("vary_msgcount");
-    allopt_init[198].section = OptS_Advanced;
-    allopt_init[198].minmatch = 0;
-    allopt_init[198].expectedbuf = 20;
-    allopt_init[198].idx = opt_vary_msgcount;
-    allopt_init[198].setwhere = set_gameview;
-    allopt_init[198].opttyp = CompOpt;
-    allopt_init[198].negateok = No;
-    allopt_init[198].valok = Yes;
-    allopt_init[198].dupeok = No;
-    allopt_init[198].pfx = No;
-    allopt_init[198].termpref = 0;
-    allopt_init[198].opt_in_out = opt_in;
-    allopt_init[198].addr = null;
-    allopt_init[198].optfn = optfn_vary_msgcount;
-    allopt_init[198].alias = null;
-    allopt_init[198].descr = $c.lit("show more old messages at a time");
-    allopt_init[198].prefixgw = null;
-    allopt_init[198].initval = Off;
-    allopt_init[198].has_handler = No;
-    allopt_init[198].dupdetected = 0;
-    allopt_init[198].disregarded = 0;
-    allopt_init[199].name = $c.lit("verbose");
-    allopt_init[199].section = OptS_Advanced;
-    allopt_init[199].minmatch = 0;
-    allopt_init[199].expectedbuf = 0;
-    allopt_init[199].idx = opt_verbose;
-    allopt_init[199].setwhere = set_in_game;
-    allopt_init[199].opttyp = BoolOpt;
-    allopt_init[199].negateok = Yes;
-    allopt_init[199].valok = No;
-    allopt_init[199].dupeok = No;
-    allopt_init[199].pfx = No;
-    allopt_init[199].termpref = Term_False;
-    allopt_init[199].opt_in_out = opt_out;
-    allopt_init[199].addr = new $c.FieldRef(flags, "verbose", "i8");
-    allopt_init[199].optfn = optfn_boolean;
-    allopt_init[199].alias = null;
-    allopt_init[199].descr = null;
-    allopt_init[199].prefixgw = null;
-    allopt_init[199].initval = On;
-    allopt_init[199].has_handler = 0;
-    allopt_init[199].dupdetected = 0;
-    allopt_init[199].disregarded = 0;
-    allopt_init[200].name = $c.lit("versinfo");
-    allopt_init[200].section = OptS_Advanced;
-    allopt_init[200].minmatch = 0;
-    allopt_init[200].expectedbuf = 80;
-    allopt_init[200].idx = opt_versinfo;
-    allopt_init[200].setwhere = set_in_game;
-    allopt_init[200].opttyp = CompOpt;
-    allopt_init[200].negateok = No;
-    allopt_init[200].valok = Yes;
-    allopt_init[200].dupeok = No;
-    allopt_init[200].pfx = No;
-    allopt_init[200].termpref = 0;
-    allopt_init[200].opt_in_out = opt_out;
-    allopt_init[200].addr = null;
-    allopt_init[200].optfn = optfn_versinfo;
-    allopt_init[200].alias = null;
-    allopt_init[200].descr = $c.lit("extra information for 'showvers'");
-    allopt_init[200].prefixgw = null;
-    allopt_init[200].initval = Off;
-    allopt_init[200].has_handler = Yes;
-    allopt_init[200].dupdetected = 0;
-    allopt_init[200].disregarded = 0;
-    allopt_init[201].name = $c.lit("voices");
-    allopt_init[201].section = OptS_Advanced;
-    allopt_init[201].minmatch = 0;
-    allopt_init[201].expectedbuf = 0;
-    allopt_init[201].idx = opt_voices;
-    allopt_init[201].setwhere = set_gameview;
-    allopt_init[201].opttyp = BoolOpt;
-    allopt_init[201].negateok = Yes;
-    allopt_init[201].valok = No;
-    allopt_init[201].dupeok = No;
-    allopt_init[201].pfx = No;
-    allopt_init[201].termpref = Term_Excluded;
-    allopt_init[201].opt_in_out = opt_in;
-    allopt_init[201].addr = new $c.FieldRef(iflags, "voices", "i8");
-    allopt_init[201].optfn = optfn_boolean;
-    allopt_init[201].alias = null;
-    allopt_init[201].descr = null;
-    allopt_init[201].prefixgw = null;
-    allopt_init[201].initval = Off;
-    allopt_init[201].has_handler = 0;
-    allopt_init[201].dupdetected = 0;
-    allopt_init[201].disregarded = 0;
-    allopt_init[202].name = $c.lit("vt_tiledata");
-    allopt_init[202].section = OptS_Advanced;
-    allopt_init[202].minmatch = 0;
-    allopt_init[202].expectedbuf = 0;
-    allopt_init[202].idx = opt_vt_tiledata;
-    allopt_init[202].setwhere = set_in_config;
-    allopt_init[202].opttyp = BoolOpt;
-    allopt_init[202].negateok = Yes;
-    allopt_init[202].valok = No;
-    allopt_init[202].dupeok = No;
-    allopt_init[202].pfx = No;
-    allopt_init[202].termpref = Term_False;
-    allopt_init[202].opt_in_out = opt_in;
-    allopt_init[202].addr = null;
-    allopt_init[202].optfn = optfn_boolean;
-    allopt_init[202].alias = null;
-    allopt_init[202].descr = null;
-    allopt_init[202].prefixgw = null;
-    allopt_init[202].initval = Off;
-    allopt_init[202].has_handler = 0;
-    allopt_init[202].dupdetected = 0;
-    allopt_init[202].disregarded = 0;
-    allopt_init[203].name = $c.lit("vt_sounddata");
-    allopt_init[203].section = OptS_Advanced;
-    allopt_init[203].minmatch = 0;
-    allopt_init[203].expectedbuf = 0;
-    allopt_init[203].idx = opt_vt_sounddata;
-    allopt_init[203].setwhere = set_in_config;
-    allopt_init[203].opttyp = BoolOpt;
-    allopt_init[203].negateok = Yes;
-    allopt_init[203].valok = No;
-    allopt_init[203].dupeok = No;
-    allopt_init[203].pfx = No;
-    allopt_init[203].termpref = Term_False;
-    allopt_init[203].opt_in_out = opt_in;
-    allopt_init[203].addr = null;
-    allopt_init[203].optfn = optfn_boolean;
-    allopt_init[203].alias = null;
-    allopt_init[203].descr = null;
-    allopt_init[203].prefixgw = null;
-    allopt_init[203].initval = Off;
-    allopt_init[203].has_handler = 0;
-    allopt_init[203].dupdetected = 0;
-    allopt_init[203].disregarded = 0;
-    allopt_init[204].name = $c.lit("warnings");
-    allopt_init[204].section = OptS_Advanced;
-    allopt_init[204].minmatch = 0;
-    allopt_init[204].expectedbuf = 10;
-    allopt_init[204].idx = opt_warnings;
-    allopt_init[204].setwhere = set_in_config;
-    allopt_init[204].opttyp = CompOpt;
-    allopt_init[204].negateok = No;
-    allopt_init[204].valok = Yes;
-    allopt_init[204].dupeok = No;
-    allopt_init[204].pfx = No;
-    allopt_init[204].termpref = 0;
-    allopt_init[204].opt_in_out = opt_in;
-    allopt_init[204].addr = null;
-    allopt_init[204].optfn = optfn_warnings;
-    allopt_init[204].alias = null;
-    allopt_init[204].descr = $c.lit("display characters for warnings");
-    allopt_init[204].prefixgw = null;
-    allopt_init[204].initval = Off;
-    allopt_init[204].has_handler = No;
-    allopt_init[204].dupdetected = 0;
-    allopt_init[204].disregarded = 0;
-    allopt_init[205].name = $c.lit("weaponstatus");
-    allopt_init[205].section = OptS_Advanced;
-    allopt_init[205].minmatch = 0;
-    allopt_init[205].expectedbuf = 0;
-    allopt_init[205].idx = opt_weaponstatus;
-    allopt_init[205].setwhere = set_in_game;
-    allopt_init[205].opttyp = BoolOpt;
-    allopt_init[205].negateok = Yes;
-    allopt_init[205].valok = No;
-    allopt_init[205].dupeok = No;
-    allopt_init[205].pfx = No;
-    allopt_init[205].termpref = Term_False;
-    allopt_init[205].opt_in_out = opt_in;
-    allopt_init[205].addr = new $c.FieldRef(flags, "weaponstatus", "i8");
-    allopt_init[205].optfn = optfn_boolean;
-    allopt_init[205].alias = null;
-    allopt_init[205].descr = $c.lit("show currently wielded weapon in a status field");
-    allopt_init[205].prefixgw = null;
-    allopt_init[205].initval = Off;
-    allopt_init[205].has_handler = 0;
-    allopt_init[205].dupdetected = 0;
-    allopt_init[205].disregarded = 0;
-    allopt_init[206].name = $c.lit("whatis_coord");
-    allopt_init[206].section = OptS_Advanced;
-    allopt_init[206].minmatch = 0;
-    allopt_init[206].expectedbuf = 1;
-    allopt_init[206].idx = opt_whatis_coord;
-    allopt_init[206].setwhere = set_in_game;
-    allopt_init[206].opttyp = CompOpt;
-    allopt_init[206].negateok = Yes;
-    allopt_init[206].valok = Yes;
-    allopt_init[206].dupeok = No;
-    allopt_init[206].pfx = No;
-    allopt_init[206].termpref = 0;
-    allopt_init[206].opt_in_out = opt_in;
-    allopt_init[206].addr = null;
-    allopt_init[206].optfn = optfn_whatis_coord;
-    allopt_init[206].alias = null;
-    allopt_init[206].descr = $c.lit("show coordinates when auto-describing cursor position");
-    allopt_init[206].prefixgw = null;
-    allopt_init[206].initval = Off;
-    allopt_init[206].has_handler = Yes;
-    allopt_init[206].dupdetected = 0;
-    allopt_init[206].disregarded = 0;
-    allopt_init[207].name = $c.lit("whatis_filter");
-    allopt_init[207].section = OptS_Advanced;
-    allopt_init[207].minmatch = 0;
-    allopt_init[207].expectedbuf = 1;
-    allopt_init[207].idx = opt_whatis_filter;
-    allopt_init[207].setwhere = set_in_game;
-    allopt_init[207].opttyp = CompOpt;
-    allopt_init[207].negateok = Yes;
-    allopt_init[207].valok = Yes;
-    allopt_init[207].dupeok = No;
-    allopt_init[207].pfx = No;
-    allopt_init[207].termpref = 0;
-    allopt_init[207].opt_in_out = opt_in;
-    allopt_init[207].addr = null;
-    allopt_init[207].optfn = optfn_whatis_filter;
-    allopt_init[207].alias = null;
-    allopt_init[207].descr = $c.lit("filter coordinate locations when targeting next or previous");
-    allopt_init[207].prefixgw = null;
-    allopt_init[207].initval = Off;
-    allopt_init[207].has_handler = Yes;
-    allopt_init[207].dupdetected = 0;
-    allopt_init[207].disregarded = 0;
-    allopt_init[208].name = $c.lit("whatis_menu");
-    allopt_init[208].section = OptS_Advanced;
-    allopt_init[208].minmatch = 0;
-    allopt_init[208].expectedbuf = 0;
-    allopt_init[208].idx = opt_whatis_menu;
-    allopt_init[208].setwhere = set_in_game;
-    allopt_init[208].opttyp = BoolOpt;
-    allopt_init[208].negateok = Yes;
-    allopt_init[208].valok = No;
-    allopt_init[208].dupeok = No;
-    allopt_init[208].pfx = No;
-    allopt_init[208].termpref = Term_False;
-    allopt_init[208].opt_in_out = opt_in;
-    allopt_init[208].addr = new $c.FieldRef(iflags, "getloc_usemenu", "i8");
-    allopt_init[208].optfn = optfn_boolean;
-    allopt_init[208].alias = null;
-    allopt_init[208].descr = $c.lit("show menu when getting a map location");
-    allopt_init[208].prefixgw = null;
-    allopt_init[208].initval = Off;
-    allopt_init[208].has_handler = 0;
-    allopt_init[208].dupdetected = 0;
-    allopt_init[208].disregarded = 0;
-    allopt_init[209].name = $c.lit("whatis_moveskip");
-    allopt_init[209].section = OptS_Advanced;
-    allopt_init[209].minmatch = 0;
-    allopt_init[209].expectedbuf = 0;
-    allopt_init[209].idx = opt_whatis_moveskip;
-    allopt_init[209].setwhere = set_in_game;
-    allopt_init[209].opttyp = BoolOpt;
-    allopt_init[209].negateok = Yes;
-    allopt_init[209].valok = No;
-    allopt_init[209].dupeok = No;
-    allopt_init[209].pfx = No;
-    allopt_init[209].termpref = Term_False;
-    allopt_init[209].opt_in_out = opt_in;
-    allopt_init[209].addr = new $c.FieldRef(iflags, "getloc_moveskip", "i8");
-    allopt_init[209].optfn = optfn_boolean;
-    allopt_init[209].alias = null;
-    allopt_init[209].descr = $c.lit("skip same glyph when getting map location");
-    allopt_init[209].prefixgw = null;
-    allopt_init[209].initval = Off;
-    allopt_init[209].has_handler = 0;
-    allopt_init[209].dupdetected = 0;
-    allopt_init[209].disregarded = 0;
-    allopt_init[210].name = $c.lit("windowborders");
-    allopt_init[210].section = OptS_Advanced;
-    allopt_init[210].minmatch = 0;
-    allopt_init[210].expectedbuf = 9;
-    allopt_init[210].idx = opt_windowborders;
-    allopt_init[210].setwhere = set_in_game;
-    allopt_init[210].opttyp = CompOpt;
-    allopt_init[210].negateok = Yes;
-    allopt_init[210].valok = Yes;
-    allopt_init[210].dupeok = No;
-    allopt_init[210].pfx = No;
-    allopt_init[210].termpref = 0;
-    allopt_init[210].opt_in_out = opt_in;
-    allopt_init[210].addr = null;
-    allopt_init[210].optfn = optfn_windowborders;
-    allopt_init[210].alias = null;
-    allopt_init[210].descr = $c.lit("0 (off), 1 (on), 2 (auto)");
-    allopt_init[210].prefixgw = null;
-    allopt_init[210].initval = Off;
-    allopt_init[210].has_handler = Yes;
-    allopt_init[210].dupdetected = 0;
-    allopt_init[210].disregarded = 0;
-    allopt_init[211].name = $c.lit("windowcolors");
-    allopt_init[211].section = OptS_Advanced;
-    allopt_init[211].minmatch = 0;
-    allopt_init[211].expectedbuf = 80;
-    allopt_init[211].idx = opt_windowcolors;
-    allopt_init[211].setwhere = set_gameview;
-    allopt_init[211].opttyp = CompOpt;
-    allopt_init[211].negateok = No;
-    allopt_init[211].valok = Yes;
-    allopt_init[211].dupeok = Yes;
-    allopt_init[211].pfx = No;
-    allopt_init[211].termpref = 0;
-    allopt_init[211].opt_in_out = opt_in;
-    allopt_init[211].addr = null;
-    allopt_init[211].optfn = optfn_windowcolors;
-    allopt_init[211].alias = null;
-    allopt_init[211].descr = $c.lit("the foreground/background colors of windows");
-    allopt_init[211].prefixgw = null;
-    allopt_init[211].initval = Off;
-    allopt_init[211].has_handler = No;
-    allopt_init[211].dupdetected = 0;
-    allopt_init[211].disregarded = 0;
-    allopt_init[212].name = $c.lit("wizmgender");
-    allopt_init[212].section = OptS_Advanced;
-    allopt_init[212].minmatch = 0;
-    allopt_init[212].expectedbuf = 0;
-    allopt_init[212].idx = opt_wizmgender;
-    allopt_init[212].setwhere = set_wizonly;
-    allopt_init[212].opttyp = BoolOpt;
-    allopt_init[212].negateok = Yes;
-    allopt_init[212].valok = No;
-    allopt_init[212].dupeok = No;
-    allopt_init[212].pfx = No;
-    allopt_init[212].termpref = Term_False;
-    allopt_init[212].opt_in_out = opt_in;
-    allopt_init[212].addr = new $c.FieldRef(iflags, "wizmgender", "i8");
-    allopt_init[212].optfn = optfn_boolean;
-    allopt_init[212].alias = null;
-    allopt_init[212].descr = null;
-    allopt_init[212].prefixgw = null;
-    allopt_init[212].initval = Off;
-    allopt_init[212].has_handler = 0;
-    allopt_init[212].dupdetected = 0;
-    allopt_init[212].disregarded = 0;
-    allopt_init[213].name = $c.lit("wizweight");
-    allopt_init[213].section = OptS_Advanced;
-    allopt_init[213].minmatch = 0;
-    allopt_init[213].expectedbuf = 0;
-    allopt_init[213].idx = opt_wizweight;
-    allopt_init[213].setwhere = set_wizonly;
-    allopt_init[213].opttyp = BoolOpt;
-    allopt_init[213].negateok = Yes;
-    allopt_init[213].valok = No;
-    allopt_init[213].dupeok = No;
-    allopt_init[213].pfx = No;
-    allopt_init[213].termpref = Term_False;
-    allopt_init[213].opt_in_out = opt_in;
-    allopt_init[213].addr = new $c.FieldRef(iflags, "wizweight", "i8");
-    allopt_init[213].optfn = optfn_boolean;
-    allopt_init[213].alias = null;
-    allopt_init[213].descr = null;
-    allopt_init[213].prefixgw = null;
-    allopt_init[213].initval = Off;
-    allopt_init[213].has_handler = 0;
-    allopt_init[213].dupdetected = 0;
-    allopt_init[213].disregarded = 0;
-    allopt_init[214].name = $c.lit("wraptext");
-    allopt_init[214].section = OptS_Advanced;
-    allopt_init[214].minmatch = 0;
-    allopt_init[214].expectedbuf = 0;
-    allopt_init[214].idx = opt_wraptext;
-    allopt_init[214].setwhere = set_in_game;
-    allopt_init[214].opttyp = BoolOpt;
-    allopt_init[214].negateok = Yes;
-    allopt_init[214].valok = No;
-    allopt_init[214].dupeok = No;
-    allopt_init[214].pfx = No;
-    allopt_init[214].termpref = Term_False;
-    allopt_init[214].opt_in_out = opt_in;
-    allopt_init[214].addr = new $c.FieldRef(iflags, "wc2_wraptext", "i8");
-    allopt_init[214].optfn = optfn_boolean;
-    allopt_init[214].alias = null;
-    allopt_init[214].descr = null;
-    allopt_init[214].prefixgw = null;
-    allopt_init[214].initval = Off;
-    allopt_init[214].has_handler = 0;
-    allopt_init[214].dupdetected = 0;
-    allopt_init[214].disregarded = 0;
-    allopt_init[215].name = $c.lit("cond_");
-    allopt_init[215].section = OptS_Advanced;
-    allopt_init[215].minmatch = 0;
-    allopt_init[215].expectedbuf = 0;
-    allopt_init[215].idx = pfx_cond_;
-    allopt_init[215].setwhere = set_hidden;
-    allopt_init[215].opttyp = CompOpt;
-    allopt_init[215].negateok = Yes;
-    allopt_init[215].valok = No;
-    allopt_init[215].dupeok = Yes;
-    allopt_init[215].pfx = Yes;
-    allopt_init[215].termpref = 0;
-    allopt_init[215].opt_in_out = opt_in;
-    allopt_init[215].addr = null;
-    allopt_init[215].optfn = pfxfn_cond_;
-    allopt_init[215].alias = null;
-    allopt_init[215].descr = $c.lit("prefix for cond_ options");
-    allopt_init[215].prefixgw = $c.lit("cond_");
-    allopt_init[215].initval = Off;
-    allopt_init[215].has_handler = Yes;
-    allopt_init[215].dupdetected = 0;
-    allopt_init[215].disregarded = 0;
-    allopt_init[216].name = $c.lit("font");
-    allopt_init[216].section = OptS_Advanced;
-    allopt_init[216].minmatch = 0;
-    allopt_init[216].expectedbuf = 0;
-    allopt_init[216].idx = pfx_font;
-    allopt_init[216].setwhere = set_hidden;
-    allopt_init[216].opttyp = CompOpt;
-    allopt_init[216].negateok = Yes;
-    allopt_init[216].valok = Yes;
-    allopt_init[216].dupeok = Yes;
-    allopt_init[216].pfx = Yes;
-    allopt_init[216].termpref = 0;
-    allopt_init[216].opt_in_out = opt_in;
-    allopt_init[216].addr = null;
-    allopt_init[216].optfn = pfxfn_font;
-    allopt_init[216].alias = null;
-    allopt_init[216].descr = $c.lit("prefix for font options");
-    allopt_init[216].prefixgw = $c.lit("font");
-    allopt_init[216].initval = Off;
-    allopt_init[216].has_handler = No;
-    allopt_init[216].dupdetected = 0;
-    allopt_init[216].disregarded = 0;
-    allopt_init[217].name = null;
-    allopt_init[217].section = OptS_Advanced;
-    allopt_init[217].minmatch = 0;
-    allopt_init[217].expectedbuf = 0;
-    allopt_init[217].idx = 0;
-    allopt_init[217].setwhere = set_in_sysconf;
-    allopt_init[217].opttyp = BoolOpt;
-    allopt_init[217].negateok = No;
-    allopt_init[217].valok = No;
-    allopt_init[217].dupeok = No;
-    allopt_init[217].pfx = No;
-    allopt_init[217].termpref = Term_False;
-    allopt_init[217].opt_in_out = 0;
-    allopt_init[217].addr = null;
-    allopt_init[217].optfn = null;
-    allopt_init[217].alias = null;
-    allopt_init[217].descr = null;
-    allopt_init[217].prefixgw = null;
-    allopt_init[217].initval = 0;
-    allopt_init[217].has_handler = 0;
-    allopt_init[217].dupdetected = 0;
-    allopt_init[217].disregarded = 1;
+    $c.init(allopt_init, [
+        { name: $c.lit("windowtype"), section: OptS_Advanced, minmatch: 0, expectedbuf: WINTYPELEN, idx: opt_windowtype, setwhere: set_gameview,
+          opttyp: CompOpt, negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_windowtype, alias: null,
+          descr: $c.lit("windowing system to use (should be specified first)"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("playmode"), section: OptS_Advanced, minmatch: 0, expectedbuf: 8, idx: opt_playmode, setwhere: set_gameview, opttyp: CompOpt,
+          negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_playmode, alias: null,
+          descr: $c.lit("normal play, non-scoring explore mode, or debug mode"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("name"), section: OptS_Advanced, minmatch: 0, expectedbuf: PL_NSIZ, idx: opt_name, setwhere: set_gameview, opttyp: CompOpt, negateok: No,
+          valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_name, alias: null,
+          descr: $c.lit("your character's name (e.g., name:Merlin-W)"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("role"), section: OptS_Advanced, minmatch: 0, expectedbuf: PL_CSIZ, idx: opt_role, setwhere: set_gameview, opttyp: CompOpt,
+          negateok: Yes, valok: Yes, dupeok: Yes, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_role, alias: $c.lit("character"),
+          descr: $c.lit("your starting role (e.g., Barbarian, Valkyrie)"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("race"), section: OptS_Advanced, minmatch: 0, expectedbuf: PL_CSIZ, idx: opt_race, setwhere: set_gameview, opttyp: CompOpt,
+          negateok: Yes, valok: Yes, dupeok: Yes, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_race, alias: null,
+          descr: $c.lit("your starting race (e.g., Human, Elf)"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("gender"), section: OptS_Advanced, minmatch: 0, expectedbuf: 8, idx: opt_gender, setwhere: set_gameview, opttyp: CompOpt, negateok: Yes,
+          valok: Yes, dupeok: Yes, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_gender, alias: null,
+          descr: $c.lit("your starting gender (male or female)"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("alignment"), section: OptS_Advanced, minmatch: 0, expectedbuf: 8, idx: opt_alignment, setwhere: set_gameview, opttyp: CompOpt,
+          negateok: Yes, valok: Yes, dupeok: Yes, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_alignment, alias: $c.lit("align"),
+          descr: $c.lit("your starting alignment (lawful, neutral, or chaotic)"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("accessiblemsg"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_accessiblemsg, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(a11y, "accessiblemsg", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("add location information to messages"), prefixgw: null, initval: Off, has_handler: 0,
+          dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("acoustics"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_acoustics, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "acoustics", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("can your character hear anything"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("align_message"), section: OptS_Advanced, minmatch: 0, expectedbuf: 20, idx: opt_align_message, setwhere: set_gameview, opttyp: CompOpt,
+          negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_align_message, alias: null,
+          descr: $c.lit("message window alignment"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("align_status"), section: OptS_Advanced, minmatch: 0, expectedbuf: 20, idx: opt_align_status, setwhere: set_gameview, opttyp: CompOpt,
+          negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_align_status, alias: null,
+          descr: $c.lit("status window alignment"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("altkeyhandling"), section: OptS_Advanced, minmatch: 0, expectedbuf: 20, idx: opt_altkeyhandling, setwhere: set_in_config,
+          opttyp: CompOpt, negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_altkeyhandling,
+          alias: $c.lit("altkeyhandler"), descr: $c.lit("(not applicable)"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("altmeta"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_altmeta, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(iflags, "altmeta", "i8"), optfn: optfn_boolean,
+          alias: null, descr: $c.lit("treat \"ESC c\" as M-c (Meta+c, 8th bit set)"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("armorstatus"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_armorstatus, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "armorstatus", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("summarize currently worn armor in a status field"), prefixgw: null, initval: Off, has_handler: 0,
+          dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("ascii_map"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_ascii_map, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "wc_ascii_map", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("show map as text"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("autocompletions"), section: OptS_Advanced, minmatch: 0, expectedbuf: BUFSZ, idx: opt_o_autocomplete, opt_in_out: opt_in, addr: null,
+          optfn: optfn_o_autocomplete,
+          setwhere: set_in_game, opttyp: OthrOpt, negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, alias: null,
+          descr: $c.lit("edit autocompletions"), prefixgw: null, initval: On, has_handler: On, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("autodescribe"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_autodescribe, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(iflags, "autodescribe", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("describe terrain under cursor"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("autodig"), section: OptS_Behavior, minmatch: 0, expectedbuf: 0, idx: opt_autodig, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "autodig", "i8"), optfn: optfn_boolean,
+          alias: null, descr: $c.lit("dig if moving and wielding a digging tool"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("autoopen"), section: OptS_Behavior, minmatch: 0, expectedbuf: 0, idx: opt_autoopen, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "autoopen", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("walking into a door attempts to open it"), prefixgw: null, initval: On, has_handler: 0,
+          dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("autopickup"), section: OptS_Behavior, minmatch: 0, expectedbuf: 0, idx: opt_autopickup, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "pickup", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("automatically pick up objects"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("autopickup exceptions"), section: OptS_Behavior, minmatch: 0, expectedbuf: BUFSZ, idx: opt_o_autopickup_exceptions,
+          opt_in_out: opt_in, addr: null, optfn: optfn_o_autopickup_exceptions, setwhere: set_in_game, opttyp: OthrOpt,
+          negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, alias: null, descr: $c.lit("edit autopickup exceptions"), prefixgw: null, initval: On,
+          has_handler: On, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("autoquiver"), section: OptS_Behavior, minmatch: 0, expectedbuf: 0, idx: opt_autoquiver, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "autoquiver", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("fill empty quiver automatically when firing"), prefixgw: null, initval: Off, has_handler: 0,
+          dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("autounlock"), section: OptS_Behavior, minmatch: 0, expectedbuf: 80, idx: opt_autounlock, setwhere: set_in_game, opttyp: CompOpt,
+          negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_out, addr: null, optfn: optfn_autounlock, alias: null,
+          descr: $c.lit("action to take when encountering locked door or chest"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("bgcolors"), section: OptS_Map, minmatch: 0, expectedbuf: 0, idx: opt_bgcolors, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term_Off, opt_in_out: opt_out, addr: new $c.FieldRef(iflags, "bgcolors", "i8"), optfn: optfn_boolean,
+          alias: null, descr: $c.lit("use background color for some map hilighting"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("bind keys"), section: OptS_Advanced, minmatch: 0, expectedbuf: BUFSZ, idx: opt_o_bind_keys, opt_in_out: opt_in, addr: null,
+          optfn: optfn_o_bind_keys, setwhere: set_in_game, opttyp: OthrOpt,
+          negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, alias: null, descr: $c.lit("edit key binds"), prefixgw: null, initval: On,
+          has_handler: On, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("BIOS"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_BIOS, setwhere: set_in_config, opttyp: BoolOpt, negateok: No,
+          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: null, optfn: optfn_boolean, alias: null, descr: null, prefixgw: null,
+          initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("blind"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_blind, setwhere: set_in_config, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(u.uroleplay, "blind", "i8"), optfn: optfn_boolean,
+          alias: $c.lit("permablind"), descr: $c.lit("your character is permanently blind"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("bones"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_bones, setwhere: set_in_config, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "bones", "i8"), optfn: optfn_boolean,
+          alias: null, descr: $c.lit("allow loading bones files"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("boulder"), section: OptS_Advanced, minmatch: 0, expectedbuf: 1, idx: opt_boulder, setwhere: set_in_game, opttyp: CompOpt, negateok: No,
+          valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_boulder, alias: null,
+          descr: $c.lit("deprecated (use S_boulder in sym file instead)"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("catname"), section: OptS_Advanced, minmatch: 0, expectedbuf: PL_PSIZ, idx: opt_catname, setwhere: set_gameview, opttyp: CompOpt,
+          negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_catname, alias: null,
+          descr: $c.lit("name of your starting pet if it is a kitten"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("checkpoint"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_checkpoint, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "ins_chkpt", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("save game state after each level change"), prefixgw: null, initval: On, has_handler: 0,
+          dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("cmdassist"), section: OptS_Behavior, minmatch: 0, expectedbuf: 0, idx: opt_cmdassist, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(iflags, "cmdassist", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("give help for errors on direction input"), prefixgw: null, initval: On, has_handler: 0,
+          dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("color"), section: OptS_Map, minmatch: 0, expectedbuf: 0, idx: opt_color, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "wc_color", "i8"), optfn: optfn_boolean,
+          alias: $c.lit("colour"), descr: $c.lit("use color in map"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("confirm"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_confirm, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "confirm", "i8"), optfn: optfn_boolean,
+          alias: null, descr: $c.lit("ask before hitting tame or peaceful monsters"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("crash_email"), section: OptS_Advanced, minmatch: 0, expectedbuf: PL_NSIZ, idx: opt_crash_email, setwhere: set_in_game, opttyp: CompOpt,
+          negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_crash_email, alias: null,
+          descr: $c.lit("email address for reporting"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("crash_name"), section: OptS_Advanced, minmatch: 0, expectedbuf: PL_NSIZ, idx: opt_crash_name, setwhere: set_in_game, opttyp: CompOpt,
+          negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_crash_name, alias: null,
+          descr: $c.lit("your name for reporting"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("crash_urlmax"), section: OptS_Advanced, minmatch: 0, expectedbuf: PL_NSIZ, idx: opt_crash_urlmax, setwhere: set_in_game,
+          opttyp: CompOpt, negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_crash_urlmax, alias: null,
+          descr: $c.lit("length of longest url we can generate"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("customcolors"), section: OptS_Map, minmatch: 0, expectedbuf: 0, idx: opt_customcolors, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(iflags, "customcolors", "i8"),
+          optfn: optfn_boolean, alias: $c.lit("customcolours"), descr: $c.lit("use custom colors in map"), prefixgw: null, initval: On, has_handler: 0,
+          dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("customsymbols"), section: OptS_Map, minmatch: 0, expectedbuf: 0, idx: opt_customsymbols, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(iflags, "customsymbols", "i8"),
+          optfn: optfn_boolean, alias: $c.lit("customsymbols"), descr: $c.lit("use custom utf8 symbols in map"), prefixgw: null, initval: On, has_handler: 0,
+          dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("dark_room"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_dark_room, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "dark_room", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("show floor outside line of sight differently"), prefixgw: null, initval: On, has_handler: 0,
+          dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("deaf"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_deaf, setwhere: set_in_config, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(u.uroleplay, "deaf", "i8"), optfn: optfn_boolean,
+          alias: $c.lit("permadeaf"), descr: $c.lit("your character is permanently deaf"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("DECgraphics"), section: OptS_Advanced, minmatch: 0, expectedbuf: 70, idx: opt_DECgraphics, setwhere: set_in_config, opttyp: CompOpt,
+          negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_DECgraphics, alias: null,
+          descr: $c.lit("load DECGraphics display symbols into symset"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("debug_hunger"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_debug_hunger, setwhere: set_wiznofuz, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "debug_hunger", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("no hunger"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("debug_mongen"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_debug_mongen, setwhere: set_wiznofuz, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "debug_mongen", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("no random monster generation"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("debug_overwrite_stairs"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_debug_overwrite_stairs, setwhere: set_wiznofuz,
+          opttyp: BoolOpt, negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in,
+          addr: new $c.FieldRef(iflags, "debug_overwrite_stairs", "i8"), optfn: optfn_boolean, alias: null,
+          descr: $c.lit("level generation can overwrite stairs"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("disclose"), section: OptS_Advanced, minmatch: 0, expectedbuf: 14, idx: opt_disclose, setwhere: set_in_game, opttyp: CompOpt,
+          negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_disclose, alias: null,
+          descr: $c.lit("the kinds of information to disclose at end of game"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("dogname"), section: OptS_Advanced, minmatch: 0, expectedbuf: PL_PSIZ, idx: opt_dogname, setwhere: set_gameview, opttyp: CompOpt,
+          negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_dogname, alias: null,
+          descr: $c.lit("name of your starting pet if it is a little dog"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("dropped_nopick"), section: OptS_Behavior, minmatch: 0, expectedbuf: 0, idx: opt_dropped_nopick, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "nopick_dropped", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("don't autopickup dropped items"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("dungeon"), section: OptS_Advanced, minmatch: 0, expectedbuf: MAXDCHARS + 1, idx: opt_dungeon, setwhere: set_in_config, opttyp: CompOpt,
+          negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_dungeon, alias: null,
+          descr: $c.lit("list of symbols to use in drawing the dungeon map"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("effects"), section: OptS_Advanced, minmatch: 0, expectedbuf: MAXECHARS + 1, idx: opt_effects, setwhere: set_in_config, opttyp: CompOpt,
+          negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_effects, alias: null,
+          descr: $c.lit("list of symbols to use in drawing special effects"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("eight_bit_tty"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_eight_bit_tty, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "wc_eight_bit_input", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("send 8-bit characters directly to terminal"), prefixgw: null, initval: Off, has_handler: 0,
+          dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("extmenu"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_extmenu, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "extmenu", "i8"), optfn: optfn_boolean,
+          alias: null, descr: $c.lit("use menu for getting extended commands"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("female"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_female, setwhere: set_in_config, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "female", "i8"), optfn: optfn_boolean,
+          alias: $c.lit("male"), descr: $c.lit("deprecated; use gender:female"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("fireassist"), section: OptS_Behavior, minmatch: 0, expectedbuf: 0, idx: opt_fireassist, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(iflags, "fireassist", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("fire-command tries to be helpful"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("fixinv"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_fixinv, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "invlet_constant", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("inventory items keep their letters"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("font_map"), section: OptS_Advanced, minmatch: 0, expectedbuf: 40, idx: opt_font_map, setwhere: set_gameview, opttyp: CompOpt,
+          negateok: Yes, valok: Yes, dupeok: Yes, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_font_map, alias: null,
+          descr: $c.lit("font to use in the map window"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("font_menu"), section: OptS_Advanced, minmatch: 0, expectedbuf: 40, idx: opt_font_menu, setwhere: set_gameview, opttyp: CompOpt,
+          negateok: Yes, valok: Yes, dupeok: Yes, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_font_menu, alias: null,
+          descr: $c.lit("font to use in menus"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("font_message"), section: OptS_Advanced, minmatch: 0, expectedbuf: 40, idx: opt_font_message, setwhere: set_gameview, opttyp: CompOpt,
+          negateok: Yes, valok: Yes, dupeok: Yes, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_font_message, alias: null,
+          descr: $c.lit("font to use in the message window"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("font_size_map"), section: OptS_Advanced, minmatch: 0, expectedbuf: 20, idx: opt_font_size_map, setwhere: set_gameview, opttyp: CompOpt,
+          negateok: Yes, valok: Yes, dupeok: Yes, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_font_size_map, alias: null,
+          descr: $c.lit("size of the map font"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("font_size_menu"), section: OptS_Advanced, minmatch: 0, expectedbuf: 20, idx: opt_font_size_menu, setwhere: set_gameview,
+          opttyp: CompOpt, negateok: Yes, valok: Yes, dupeok: Yes, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_font_size_menu,
+          alias: null, descr: $c.lit("size of the menu font"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("font_size_message"), section: OptS_Advanced, minmatch: 0, expectedbuf: 20, idx: opt_font_size_message, setwhere: set_gameview,
+          opttyp: CompOpt, negateok: Yes, valok: Yes, dupeok: Yes, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_font_size_message,
+          alias: null, descr: $c.lit("size of the message font"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("font_size_status"), section: OptS_Advanced, minmatch: 0, expectedbuf: 20, idx: opt_font_size_status, setwhere: set_gameview,
+          opttyp: CompOpt, negateok: Yes, valok: Yes, dupeok: Yes, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_font_size_status,
+          alias: null, descr: $c.lit("size of the status font"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("font_size_text"), section: OptS_Advanced, minmatch: 0, expectedbuf: 20, idx: opt_font_size_text, setwhere: set_gameview,
+          opttyp: CompOpt, negateok: Yes, valok: Yes, dupeok: Yes, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_font_size_text,
+          alias: null, descr: $c.lit("size of the text font"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("font_status"), section: OptS_Advanced, minmatch: 0, expectedbuf: 40, idx: opt_font_status, setwhere: set_gameview, opttyp: CompOpt,
+          negateok: Yes, valok: Yes, dupeok: Yes, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_font_status, alias: null,
+          descr: $c.lit("font to use in status window"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("font_text"), section: OptS_Advanced, minmatch: 0, expectedbuf: 40, idx: opt_font_text, setwhere: set_gameview, opttyp: CompOpt,
+          negateok: Yes, valok: Yes, dupeok: Yes, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_font_text, alias: null,
+          descr: $c.lit("font to use in text windows"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("force_invmenu"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_force_invmenu, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "force_invmenu", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("commands asking for inventory item show a menu"), prefixgw: null, initval: Off, has_handler: 0,
+          dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("fruit"), section: OptS_General, minmatch: 0, expectedbuf: PL_FSIZ, idx: opt_fruit, setwhere: set_in_game, opttyp: CompOpt, negateok: No,
+          valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_fruit, alias: null,
+          descr: $c.lit("name of a fruit you enjoy eating"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("fullscreen"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_fullscreen, setwhere: set_in_config, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "wc2_fullscreen", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("toggle fullscreen"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("glyph"), section: OptS_Advanced, minmatch: 0, expectedbuf: 40, idx: opt_glyph, setwhere: set_in_game, opttyp: CompOpt, negateok: No,
+          valok: Yes, dupeok: Yes, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_glyph, alias: null,
+          descr: $c.lit("set representation of a glyph to a unicode value and color"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("goldX"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_goldX, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "goldX", "i8"), optfn: optfn_boolean,
+          alias: null, descr: $c.lit("classify gold as unknown or uncursed"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("guicolor"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_guicolor, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(iflags, "wc2_guicolor", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("use color for UI"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("help"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_help, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "help", "i8"), optfn: optfn_boolean,
+          alias: null, descr: $c.lit("show all available info when using whatis-command"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("herecmd_menu"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_herecmd_menu, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "herecmd_menu", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("show commands available in this location"), prefixgw: null, initval: Off, has_handler: 0,
+          dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("hilite_pet"), section: OptS_Map, minmatch: 0, expectedbuf: 0, idx: opt_hilite_pet, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "wc_hilite_pet", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("use highlight for pets"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("hilite_pile"), section: OptS_Map, minmatch: 0, expectedbuf: 0, idx: opt_hilite_pile, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "hilite_pile", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("highlight piles of items"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("hilite_status"), section: OptS_Advanced, minmatch: 0, expectedbuf: 13, idx: opt_hilite_status, setwhere: set_in_game, opttyp: CompOpt,
+          negateok: Yes, valok: Yes, dupeok: Yes, pfx: No, termpref: 0, opt_in_out: opt_out, addr: null, optfn: optfn_hilite_status, alias: null,
+          descr: $c.lit("a status highlighting rule (can occur multiple times)"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("hitpointbar"), section: OptS_Status, minmatch: 0, expectedbuf: 0, idx: opt_hitpointbar, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "wc2_hitpointbar", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("show colored bar for hit points"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("horsename"), section: OptS_Advanced, minmatch: 0, expectedbuf: PL_PSIZ, idx: opt_horsename, setwhere: set_gameview, opttyp: CompOpt,
+          negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_horsename, alias: null,
+          descr: $c.lit("name of your starting pet if it is a pony"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("IBMgraphics"), section: OptS_Advanced, minmatch: 0, expectedbuf: 70, idx: opt_IBMgraphics, setwhere: set_in_config, opttyp: CompOpt,
+          negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_IBMgraphics, alias: null,
+          descr: $c.lit("load IBMGraphics display symbols into symset"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("idlecheckpoint"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_idlecheckpoint, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_Off, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "idlecheckpoint", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("update checkpoint file if input is idle for 10 seconds"), prefixgw: null, initval: Off,
+          has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("ignintr"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_ignintr, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "ignintr", "i8"), optfn: optfn_boolean,
+          alias: null, descr: $c.lit("ignore interrupt signals"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("implicit_uncursed"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_implicit_uncursed, setwhere: set_in_game,
+          opttyp: BoolOpt, negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out,
+          addr: new $c.FieldRef(flags, "implicit_uncursed", "i8"), optfn: optfn_boolean, alias: null, descr: $c.lit("omit \"uncursed\" from inventory"),
+          prefixgw: null, initval: On, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("legacy"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_legacy, setwhere: set_in_config, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "legacy", "i8"), optfn: optfn_boolean,
+          alias: null, descr: $c.lit("show introductory message"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("lit_corridor"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_lit_corridor, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "lit_corridor", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("show dark corridors as lit if in sight"), prefixgw: null, initval: Off, has_handler: 0,
+          dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("lootabc"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_lootabc, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "lootabc", "i8"), optfn: optfn_boolean,
+          alias: null, descr: $c.lit("use a/b/c rather than o/i/c when looting"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("mail"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_mail, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "biff", "i8"), optfn: optfn_boolean,
+          alias: null, descr: $c.lit("enable the mail daemon"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("map_mode"), section: OptS_Advanced, minmatch: 0, expectedbuf: 20, idx: opt_map_mode, setwhere: set_gameview, opttyp: CompOpt,
+          negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_map_mode, alias: null,
+          descr: $c.lit("map display mode under Windows"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("mention_decor"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_mention_decor, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "mention_decor", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("give feedback when walking over interesting features"), prefixgw: null, initval: Off,
+          has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("mention_map"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_mention_map, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(a11y, "glyph_updates", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("give feedback when interesting map locations change"), prefixgw: null, initval: Off, has_handler: 0,
+          dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("mention_walls"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_mention_walls, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "mention_walls", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("give feedback when walking into walls"), prefixgw: null, initval: Off, has_handler: 0,
+          dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("menu_deselect_all"), section: OptS_Advanced, minmatch: 0, expectedbuf: 4, idx: opt_menu_deselect_all, setwhere: set_in_config,
+          opttyp: CompOpt, negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_menu_deselect_all,
+          alias: null, descr: $c.lit("deselect all items in a menu"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("menu_deselect_page"), section: OptS_Advanced, minmatch: 0, expectedbuf: 4, idx: opt_menu_deselect_page, setwhere: set_in_config,
+          opttyp: CompOpt, negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_menu_deselect_page,
+          alias: null, descr: $c.lit("deselect all items on this page of a menu"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("menu_first_page"), section: OptS_Advanced, minmatch: 0, expectedbuf: 4, idx: opt_menu_first_page, setwhere: set_in_config,
+          opttyp: CompOpt, negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_menu_first_page,
+          alias: null, descr: $c.lit("jump to the first page in a menu"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("menu_headings"), section: OptS_Advanced, minmatch: 0, expectedbuf: 4, idx: opt_menu_headings, setwhere: set_in_game, opttyp: CompOpt,
+          negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_menu_headings, alias: null,
+          descr: $c.lit("display style for menu headings"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("menu_invert_all"), section: OptS_Advanced, minmatch: 0, expectedbuf: 4, idx: opt_menu_invert_all, setwhere: set_in_config,
+          opttyp: CompOpt, negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_menu_invert_all,
+          alias: null, descr: $c.lit("invert all items in a menu"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("menu_invert_page"), section: OptS_Advanced, minmatch: 0, expectedbuf: 4, idx: opt_menu_invert_page, setwhere: set_in_config,
+          opttyp: CompOpt, negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_menu_invert_page,
+          alias: null, descr: $c.lit("invert all items on this page of a menu"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("menu_last_page"), section: OptS_Advanced, minmatch: 0, expectedbuf: 4, idx: opt_menu_last_page, setwhere: set_in_config,
+          opttyp: CompOpt, negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_menu_last_page, alias: null,
+          descr: $c.lit("jump to the last page in a menu"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("menu_next_page"), section: OptS_Advanced, minmatch: 0, expectedbuf: 4, idx: opt_menu_next_page, setwhere: set_in_config,
+          opttyp: CompOpt, negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_menu_next_page, alias: null,
+          descr: $c.lit("go to the next menu page"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("menu_objsyms"), section: OptS_Advanced, minmatch: 0, expectedbuf: 12, idx: opt_menu_objsyms, setwhere: set_in_game, opttyp: CompOpt,
+          negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_menu_objsyms,
+          alias: $c.lit("use_menu_glyphs"), descr: $c.lit("show object symbols in menus"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("menu_overlay"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_menu_overlay, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "menu_overlay", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("menus overlay and align to right"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("menu_previous_page"), section: OptS_Advanced, minmatch: 0, expectedbuf: 4, idx: opt_menu_previous_page, setwhere: set_in_config,
+          opttyp: CompOpt, negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_menu_previous_page,
+          alias: null, descr: $c.lit("go to the previous menu page"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("menu_search"), section: OptS_Advanced, minmatch: 0, expectedbuf: 4, idx: opt_menu_search, setwhere: set_in_config, opttyp: CompOpt,
+          negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_menu_search, alias: null,
+          descr: $c.lit("search for a menu item"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("menu_select_all"), section: OptS_Advanced, minmatch: 0, expectedbuf: 4, idx: opt_menu_select_all, setwhere: set_in_config,
+          opttyp: CompOpt, negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_menu_select_all,
+          alias: null, descr: $c.lit("select all items in a menu"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("menu_select_page"), section: OptS_Advanced, minmatch: 0, expectedbuf: 4, idx: opt_menu_select_page, setwhere: set_in_config,
+          opttyp: CompOpt, negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_menu_select_page,
+          alias: null, descr: $c.lit("select all items on this page of a menu"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("menu_shift_left"), section: OptS_Advanced, minmatch: 0, expectedbuf: 4, idx: opt_menu_shift_left, setwhere: set_in_config,
+          opttyp: CompOpt, negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_menu_shift_left,
+          alias: null, descr: $c.lit("pan current menu page left"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("menu_shift_right"), section: OptS_Advanced, minmatch: 0, expectedbuf: 4, idx: opt_menu_shift_right, setwhere: set_in_config,
+          opttyp: CompOpt, negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_menu_shift_right,
+          alias: null, descr: $c.lit("pan current menu page right"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("menu_tab_sep"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_menu_tab_sep, setwhere: set_wizonly, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "menu_tab_sep", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("menu formatting"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("menucolors"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_menucolors, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "use_menu_color", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("use colors in menus"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("menu colors"), section: OptS_Status, minmatch: 0, expectedbuf: BUFSZ, idx: opt_o_menu_colors, opt_in_out: opt_in, addr: null,
+          optfn: optfn_o_menu_colors, setwhere: set_in_game, opttyp: OthrOpt,
+          negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, alias: null, descr: $c.lit("change colors used in menus"), prefixgw: null, initval: On,
+          has_handler: On, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("menuinvertmode"), section: OptS_Advanced, minmatch: 0, expectedbuf: 5, idx: opt_menuinvertmode, setwhere: set_in_game, opttyp: CompOpt,
+          negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_menuinvertmode, alias: null,
+          descr: $c.lit("experimental behavior of menu inverts"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("menustyle"), section: OptS_Advanced, minmatch: 0, expectedbuf: MENUTYPELEN, idx: opt_menustyle, setwhere: set_in_game, opttyp: CompOpt,
+          negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_menustyle, alias: null,
+          descr: $c.lit("user interface for object selection"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("message types"), section: OptS_Advanced, minmatch: 0, expectedbuf: BUFSZ, idx: opt_o_message_types,
+          opt_in_out: opt_in, addr: null, optfn: optfn_o_message_types, setwhere: set_in_game, opttyp: OthrOpt,
+          negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, alias: null, descr: $c.lit("edit message types"), prefixgw: null, initval: On,
+          has_handler: On, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("mon_movement"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_mon_movement, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(a11y, "mon_movement", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("message when hero sees monster movement"), prefixgw: null, initval: Off, has_handler: 0,
+          dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("monpolycontrol"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_monpolycontrol, setwhere: set_wizonly, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "mon_polycontrol", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("control monster polymorphs"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("montelecontrol"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_montelecontrol, setwhere: set_wizonly, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "mon_telecontrol", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("control monster teleport destinations"), prefixgw: null, initval: Off, has_handler: 0,
+          dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("monsters"), section: OptS_Advanced, minmatch: 0, expectedbuf: MAXMCLASSES, idx: opt_monsters, setwhere: set_in_config, opttyp: CompOpt,
+          negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_monsters, alias: null,
+          descr: $c.lit("list of symbols to use for monsters"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("mouse_support"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_mouse_support, setwhere: set_in_game, opttyp: CompOpt,
+          negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_mouse_support, alias: null,
+          descr: $c.lit("game receives click info from mouse"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("msg_window"), section: OptS_Advanced, minmatch: 0, expectedbuf: 1, idx: opt_msg_window, setwhere: set_in_game, opttyp: CompOpt,
+          negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_msg_window, alias: null,
+          descr: $c.lit("control of \"view previous message(s)\" (^P) behavior"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("msghistory"), section: OptS_Advanced, minmatch: 0, expectedbuf: 5, idx: opt_msghistory, setwhere: set_gameview, opttyp: CompOpt,
+          negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_msghistory, alias: null,
+          descr: $c.lit("number of top line messages to save"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("news"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_news, setwhere: set_in_config, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "news", "i8"), optfn: optfn_boolean,
+          alias: null, descr: $c.lit("show any news at game start"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("nudist"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_nudist, setwhere: set_in_config, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(u.uroleplay, "nudist", "i8"), optfn: optfn_boolean,
+          alias: null, descr: $c.lit("start your character without armor"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("null"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_null, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "null", "i8"), optfn: optfn_boolean,
+          alias: null, descr: $c.lit("allow nulls to be sent to terminal"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("number_pad"), section: OptS_General, minmatch: 0, expectedbuf: 1, idx: opt_number_pad, setwhere: set_in_game, opttyp: CompOpt,
+          negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_number_pad, alias: null,
+          descr: $c.lit("use the number pad for movement"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("objects"), section: OptS_Advanced, minmatch: 0, expectedbuf: MAXOCLASSES, idx: opt_objects, setwhere: set_in_config, opttyp: CompOpt,
+          negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_objects, alias: null,
+          descr: $c.lit("list of symbols to use for objects"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("packorder"), section: OptS_Advanced, minmatch: 0, expectedbuf: MAXOCLASSES, idx: opt_packorder, setwhere: set_in_game, opttyp: CompOpt,
+          negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_packorder, alias: null,
+          descr: $c.lit("the inventory order of the items in your pack"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("paranoid_confirmation"), section: OptS_Advanced, minmatch: 0, expectedbuf: 28, idx: opt_paranoid_confirmation, setwhere: set_in_game,
+          opttyp: CompOpt, negateok: Yes, valok: Yes, dupeok: Yes, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_paranoid_confirmation,
+          alias: $c.lit("prayconfirm"), descr: $c.lit("extra prompting in certain situations"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("pauper"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_pauper, setwhere: set_in_config, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(u.uroleplay, "pauper", "i8"), optfn: optfn_boolean,
+          alias: null, descr: $c.lit("start your character without any items"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("perm_invent"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_perm_invent, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_Off, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "perm_invent", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("show persistent inventory window"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("perminv_mode"), section: OptS_Advanced, minmatch: 0, expectedbuf: 20, idx: opt_perminv_mode, setwhere: set_in_game, opttyp: CompOpt,
+          negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_perminv_mode, alias: null,
+          descr: $c.lit("what to show in persistent inventory window"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("petattr"), section: OptS_Advanced, minmatch: 0, expectedbuf: 88, idx: opt_petattr, setwhere: set_in_game, opttyp: CompOpt, negateok: No,
+          valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_petattr, alias: null,
+          descr: $c.lit("attributes for highlighting pets"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("pettype"), section: OptS_Advanced, minmatch: 0, expectedbuf: 4, idx: opt_pettype, setwhere: set_gameview, opttyp: CompOpt,
+          negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_pettype, alias: $c.lit("pet"),
+          descr: $c.lit("your preferred initial pet type"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("pickup_burden"), section: OptS_Advanced, minmatch: 0, expectedbuf: 20, idx: opt_pickup_burden, setwhere: set_in_game, opttyp: CompOpt,
+          negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_pickup_burden, alias: null,
+          descr: $c.lit("maximum burden picked up before prompt"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("pickup_stolen"), section: OptS_Behavior, minmatch: 0, expectedbuf: 0, idx: opt_pickup_stolen, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "pickup_stolen", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("autopickup stolen items"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("pickup_thrown"), section: OptS_Behavior, minmatch: 0, expectedbuf: 0, idx: opt_pickup_thrown, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "pickup_thrown", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("autopickup thrown items"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("pickup_types"), section: OptS_Behavior, minmatch: 0, expectedbuf: MAXOCLASSES, idx: opt_pickup_types, setwhere: set_in_game,
+          opttyp: CompOpt, negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_pickup_types, alias: null,
+          descr: $c.lit("types of objects to pick up automatically"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("pile_limit"), section: OptS_Advanced, minmatch: 0, expectedbuf: 24, idx: opt_pile_limit, setwhere: set_in_game, opttyp: CompOpt,
+          negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_pile_limit, alias: null,
+          descr: $c.lit("threshold for \"there are many objects here\""), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("player_selection"), section: OptS_Advanced, minmatch: 0, expectedbuf: 12, idx: opt_player_selection, setwhere: set_gameview,
+          opttyp: CompOpt, negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_player_selection,
+          alias: null, descr: $c.lit("choose character via dialog or prompts"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("popup_dialog"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_popup_dialog, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "wc_popup_dialog", "i8"),
+          optfn: optfn_boolean, alias: null, descr: null, prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("preload_tiles"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_preload_tiles, setwhere: set_in_config, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(iflags, "wc_preload_tiles", "i8"),
+          optfn: optfn_boolean, alias: null, descr: null, prefixgw: null, initval: On, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("price_quotes"), section: OptS_General, minmatch: 0, expectedbuf: 0, idx: opt_price_quotes, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "pricequotes", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("display prices you have seen for unidentified objects"), prefixgw: null, initval: Off,
+          has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("pushweapon"), section: OptS_Behavior, minmatch: 0, expectedbuf: 0, idx: opt_pushweapon, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "pushweapon", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("previous weapon goes to secondary slot"), prefixgw: null, initval: Off, has_handler: 0,
+          dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("query_menu"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_query_menu, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "query_menu", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("use a menu for yes/no queries"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("quick_farsight"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_quick_farsight, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "quick_farsight", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("skip map browse when forced to looked at map"), prefixgw: null, initval: Off, has_handler: 0,
+          dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("rawio"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_rawio, setwhere: set_in_config, opttyp: BoolOpt, negateok: No,
+          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: null, optfn: optfn_boolean, alias: null, descr: null, prefixgw: null,
+          initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("reroll"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_reroll, setwhere: set_in_config, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(u.uroleplay, "reroll", "i8"), optfn: optfn_boolean,
+          alias: null, descr: $c.lit("allow rerolling of starting inventory and items"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("rest_on_space"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_rest_on_space, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "rest_on_space", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("space bar is bound to the rest-command"), prefixgw: null, initval: Off, has_handler: 0,
+          dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("roguesymset"), section: OptS_Advanced, minmatch: 0, expectedbuf: 70, idx: opt_roguesymset, setwhere: set_in_game, opttyp: CompOpt,
+          negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_roguesymset, alias: null,
+          descr: $c.lit("load a set of rogue display symbols from symbols file"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("runmode"), section: OptS_Advanced, minmatch: 0, expectedbuf: 9, idx: opt_runmode, setwhere: set_in_game, opttyp: CompOpt, negateok: Yes,
+          valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_runmode, alias: null,
+          descr: $c.lit("display frequency when `running' or `travelling'"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("safe_pet"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_safe_pet, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "safe_dog", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("prevent you from hitting pets"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("safe_wait"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_safe_wait, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "safe_wait", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("prevent waiting next to hostiles"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("sanity_check"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_sanity_check, setwhere: set_wizonly, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "sanity_check", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("perform data sanity checks"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("scores"), section: OptS_Advanced, minmatch: 0, expectedbuf: 32, idx: opt_scores, setwhere: set_in_game, opttyp: CompOpt, negateok: No,
+          valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_scores, alias: null,
+          descr: $c.lit("the parts of the score list you wish to see"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("scroll_amount"), section: OptS_Advanced, minmatch: 0, expectedbuf: 20, idx: opt_scroll_amount, setwhere: set_gameview, opttyp: CompOpt,
+          negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_scroll_amount, alias: null,
+          descr: $c.lit("amount to scroll map when scroll_margin is reached"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("scroll_margin"), section: OptS_Advanced, minmatch: 0, expectedbuf: 20, idx: opt_scroll_margin, setwhere: set_gameview, opttyp: CompOpt,
+          negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_scroll_margin, alias: null,
+          descr: $c.lit("scroll map when this far from the edge"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("selectsaved"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_selectsaved, setwhere: set_in_config, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(iflags, "wc2_selectsaved", "i8"),
+          optfn: optfn_boolean, alias: null, descr: null, prefixgw: null, initval: On, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("showdamage"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_showdamage, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "showdamage", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("show damage hero takes in message line"), prefixgw: null, initval: Off, has_handler: 0,
+          dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("showexp"), section: OptS_Status, minmatch: 0, expectedbuf: 0, idx: opt_showexp, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "showexp", "i8"), optfn: optfn_boolean,
+          alias: null, descr: $c.lit("show experience points in status line"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("showrace"), section: OptS_Map, minmatch: 0, expectedbuf: 0, idx: opt_showrace, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "showrace", "i8"), optfn: optfn_boolean,
+          alias: null, descr: $c.lit("show your character by race rather than role"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("showscore"), section: OptS_Status, minmatch: 0, expectedbuf: 0, idx: opt_showscore, setwhere: set_in_config, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: null, optfn: optfn_boolean, alias: null, descr: null,
+          prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("showvers"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_showvers, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "showvers", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("show version info on status line"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("silent"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_silent, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "silent", "i8"), optfn: optfn_boolean,
+          alias: null, descr: $c.lit("don't use terminal bell"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("softkeyboard"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_softkeyboard, setwhere: set_in_config, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "wc2_softkeyboard", "i8"),
+          optfn: optfn_boolean, alias: null, descr: null, prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("sortdiscoveries"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_sortdiscoveries, setwhere: set_in_game,
+          opttyp: CompOpt, negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_sortdiscoveries,
+          alias: null, descr: $c.lit("preferred order when displaying discovered objects"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("sortloot"), section: OptS_Advanced, minmatch: 0, expectedbuf: 4, idx: opt_sortloot, setwhere: set_in_game, opttyp: CompOpt,
+          negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_sortloot, alias: null,
+          descr: $c.lit("sort object selection lists by description"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("sortpack"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_sortpack, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "sortpack", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("group inventory items by type"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("sortvanquished"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_sortvanquished, setwhere: set_in_game, opttyp: CompOpt,
+          negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_sortvanquished, alias: null,
+          descr: $c.lit("preferred order when displaying vanquished monsters"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("soundlib"), section: OptS_Advanced, minmatch: 0, expectedbuf: WINTYPELEN, idx: opt_soundlib, setwhere: set_gameview, opttyp: CompOpt,
+          negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_soundlib, alias: null,
+          descr: $c.lit("soundlib interface to use (if any)"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("sounds"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_sounds, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term_Off, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "sounds", "i8"), optfn: optfn_boolean,
+          alias: null, descr: $c.lit("use sounds"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("sparkle"), section: OptS_Map, minmatch: 0, expectedbuf: 0, idx: opt_sparkle, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "sparkle", "i8"), optfn: optfn_boolean,
+          alias: null, descr: $c.lit("display sparkly effect when resisting magic"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("spot_monsters"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_spot_monsters, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(a11y, "mon_notices", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("message when hero spots a monster"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("splash_screen"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_splash_screen, setwhere: set_in_config, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(iflags, "wc_splash_screen", "i8"),
+          optfn: optfn_boolean, alias: null, descr: null, prefixgw: null, initval: On, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("standout"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_standout, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "standout", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("use standout for --more--"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("status_updates"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_status_updates, setwhere: set_in_config,
+          opttyp: BoolOpt, negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out,
+          addr: new $c.FieldRef(iflags, "status_updates", "i8"), optfn: optfn_boolean, alias: null, descr: $c.lit("allow the status lines to update"),
+          prefixgw: null, initval: On, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("status condition fields"), section: OptS_Status, minmatch: 0, expectedbuf: BUFSZ, idx: opt_o_status_cond,
+          opt_in_out: opt_in, addr: null, optfn: optfn_o_status_cond, setwhere: set_in_game, opttyp: OthrOpt,
+          negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, alias: null, descr: $c.lit("change status condition highlighting"), prefixgw: null,
+          initval: On, has_handler: On, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("statushilites"), section: OptS_Advanced, minmatch: 0, expectedbuf: 20, idx: opt_statushilites, setwhere: set_in_game, opttyp: CompOpt,
+          negateok: Yes, valok: Yes, dupeok: Yes, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_statushilites, alias: null,
+          descr: $c.lit("0=no status highlighting, N=show highlights for N turns"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("status highlight rules"), section: OptS_Status, minmatch: 0, expectedbuf: BUFSZ, idx: opt_o_status_hilites,
+          opt_in_out: opt_in, addr: null, optfn: optfn_o_status_hilites, setwhere: set_in_game, opttyp: OthrOpt,
+          negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, alias: null, descr: $c.lit("change status line highlighting"), prefixgw: null,
+          initval: On, has_handler: On, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("statuslines"), section: OptS_Status, minmatch: 0, expectedbuf: 20, idx: opt_statuslines, setwhere: set_in_game, opttyp: CompOpt,
+          negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_statuslines, alias: null,
+          descr: $c.lit("2 or 3 lines for status display"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("suppress_alert"), section: OptS_Advanced, minmatch: 0, expectedbuf: 8, idx: opt_suppress_alert, setwhere: set_in_game, opttyp: CompOpt,
+          negateok: No, valok: Yes, dupeok: Yes, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_suppress_alert, alias: null,
+          descr: $c.lit("suppress alerts about version-specific features"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("symset"), section: OptS_Map, minmatch: 0, expectedbuf: 70, idx: opt_symset, setwhere: set_in_game, opttyp: CompOpt, negateok: No,
+          valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_symset, alias: null,
+          descr: $c.lit("load a set of display symbols from symbols file"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("term_cols"), section: OptS_Advanced, minmatch: 0, expectedbuf: 6, idx: opt_term_cols, setwhere: set_in_config, opttyp: CompOpt,
+          negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_term_cols, alias: $c.lit("termcolumns"),
+          descr: $c.lit("number of columns"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("term_rows"), section: OptS_Advanced, minmatch: 0, expectedbuf: 6, idx: opt_term_rows, setwhere: set_in_config, opttyp: CompOpt,
+          negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_term_rows, alias: null,
+          descr: $c.lit("number of rows"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("terrainstatus"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_terrainstatus, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "terrainstatus", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("show hero's location as a status field"), prefixgw: null, initval: Off, has_handler: 0,
+          dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("tile_file"), section: OptS_Advanced, minmatch: 0, expectedbuf: 70, idx: opt_tile_file, setwhere: set_gameview, opttyp: CompOpt,
+          negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_tile_file, alias: null,
+          descr: $c.lit("name of tile file"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("tile_height"), section: OptS_Advanced, minmatch: 0, expectedbuf: 20, idx: opt_tile_height, setwhere: set_gameview, opttyp: CompOpt,
+          negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_tile_height, alias: null,
+          descr: $c.lit("height of tiles"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("tile_width"), section: OptS_Advanced, minmatch: 0, expectedbuf: 20, idx: opt_tile_width, setwhere: set_gameview, opttyp: CompOpt,
+          negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_tile_width, alias: null,
+          descr: $c.lit("width of tiles"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("tiled_map"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_tiled_map, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "wc_tiled_map", "i8"),
+          optfn: optfn_boolean, alias: null, descr: null, prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("time"), section: OptS_Status, minmatch: 0, expectedbuf: 0, idx: opt_time, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "time", "i8"), optfn: optfn_boolean,
+          alias: null, descr: $c.lit("display game turns in status line"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("timed_delay"), section: OptS_Map, minmatch: 0, expectedbuf: 0, idx: opt_timed_delay, setwhere: set_in_config, opttyp: BoolOpt,
+          negateok: No, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: null, optfn: optfn_boolean, alias: null, descr: null,
+          prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("tips"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_tips, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "tips", "i8"), optfn: optfn_boolean,
+          alias: null, descr: $c.lit("show some helpful tips during gameplay"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("tombstone"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_tombstone, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "tombstone", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("show tombstone when your character dies"), prefixgw: null, initval: On, has_handler: 0,
+          dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("toptenwin"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_toptenwin, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "toptenwin", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("show top scores in window"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("traps"), section: OptS_Advanced, minmatch: 0, expectedbuf: MAXTCHARS + 1, idx: opt_traps, setwhere: set_in_config, opttyp: CompOpt,
+          negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_traps, alias: null,
+          descr: $c.lit("list of symbols to use in drawing traps"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("travel"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_travel, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "travelcmd", "i8"), optfn: optfn_boolean,
+          alias: null, descr: $c.lit("enable traveling via mouse click"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("travel_debug"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_travel_debug, setwhere: set_wizonly, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(iflags, "trav_debug", "i8"),
+          optfn: optfn_boolean, alias: null, descr: null, prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("tutorial"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_tutorial, setwhere: set_in_config, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "tutorial", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("ask if you want the tutorial"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("use_darkgray"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_use_darkgray, setwhere: set_in_config, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(iflags, "wc2_darkgray", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("use bold black color instead of blue"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("use_inverse"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_use_inverse, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(iflags, "wc_inverse", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("display detected monsters in inverse"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("use_truecolor"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_use_truecolor, setwhere: set_in_config, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "use_truecolor", "i8"),
+          optfn: optfn_boolean, alias: $c.lit("use_truecolour"), descr: null, prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("vary_msgcount"), section: OptS_Advanced, minmatch: 0, expectedbuf: 20, idx: opt_vary_msgcount, setwhere: set_gameview, opttyp: CompOpt,
+          negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_vary_msgcount, alias: null,
+          descr: $c.lit("show more old messages at a time"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("verbose"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_verbose, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "verbose", "i8"), optfn: optfn_boolean,
+          alias: null, descr: null, prefixgw: null, initval: On, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("versinfo"), section: OptS_Advanced, minmatch: 0, expectedbuf: 80, idx: opt_versinfo, setwhere: set_in_game, opttyp: CompOpt,
+          negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_out, addr: null, optfn: optfn_versinfo, alias: null,
+          descr: $c.lit("extra information for 'showvers'"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("voices"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_voices, setwhere: set_gameview, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term_Excluded, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "voices", "i8"), optfn: optfn_boolean,
+          alias: null, descr: null, prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("vt_tiledata"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_vt_tiledata, setwhere: set_in_config, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: null, optfn: optfn_boolean, alias: null, descr: null,
+          prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("vt_sounddata"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_vt_sounddata, setwhere: set_in_config, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: null, optfn: optfn_boolean, alias: null, descr: null,
+          prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("warnings"), section: OptS_Advanced, minmatch: 0, expectedbuf: 10, idx: opt_warnings, setwhere: set_in_config, opttyp: CompOpt,
+          negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_warnings, alias: null,
+          descr: $c.lit("display characters for warnings"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("weaponstatus"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_weaponstatus, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "weaponstatus", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("show currently wielded weapon in a status field"), prefixgw: null, initval: Off, has_handler: 0,
+          dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("whatis_coord"), section: OptS_Advanced, minmatch: 0, expectedbuf: 1, idx: opt_whatis_coord, setwhere: set_in_game, opttyp: CompOpt,
+          negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_whatis_coord, alias: null,
+          descr: $c.lit("show coordinates when auto-describing cursor position"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("whatis_filter"), section: OptS_Advanced, minmatch: 0, expectedbuf: 1, idx: opt_whatis_filter, setwhere: set_in_game, opttyp: CompOpt,
+          negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_whatis_filter, alias: null,
+          descr: $c.lit("filter coordinate locations when targeting next or previous"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0,
+          disregarded: 0 },
+        { name: $c.lit("whatis_menu"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_whatis_menu, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "getloc_usemenu", "i8"),
+          optfn: optfn_boolean, alias: null, descr: $c.lit("show menu when getting a map location"), prefixgw: null, initval: Off, has_handler: 0,
+          dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("whatis_moveskip"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_whatis_moveskip, setwhere: set_in_game,
+          opttyp: BoolOpt, negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in,
+          addr: new $c.FieldRef(iflags, "getloc_moveskip", "i8"), optfn: optfn_boolean, alias: null, descr: $c.lit("skip same glyph when getting map location"),
+          prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("windowborders"), section: OptS_Advanced, minmatch: 0, expectedbuf: 9, idx: opt_windowborders, setwhere: set_in_game, opttyp: CompOpt,
+          negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_windowborders, alias: null,
+          descr: $c.lit("0 (off), 1 (on), 2 (auto)"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("windowcolors"), section: OptS_Advanced, minmatch: 0, expectedbuf: 80, idx: opt_windowcolors, setwhere: set_gameview, opttyp: CompOpt,
+          negateok: No, valok: Yes, dupeok: Yes, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_windowcolors, alias: null,
+          descr: $c.lit("the foreground/background colors of windows"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("wizmgender"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_wizmgender, setwhere: set_wizonly, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "wizmgender", "i8"),
+          optfn: optfn_boolean, alias: null, descr: null, prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("wizweight"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_wizweight, setwhere: set_wizonly, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "wizweight", "i8"),
+          optfn: optfn_boolean, alias: null, descr: null, prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("wraptext"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_wraptext, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "wc2_wraptext", "i8"),
+          optfn: optfn_boolean, alias: null, descr: null, prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("cond_"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: pfx_cond_, setwhere: set_hidden, opttyp: CompOpt, negateok: Yes,
+          valok: No, dupeok: Yes, pfx: Yes, termpref: 0, opt_in_out: opt_in, addr: null, optfn: pfxfn_cond_, alias: null,
+          descr: $c.lit("prefix for cond_ options"), prefixgw: $c.lit("cond_"), initval: Off, has_handler: Yes, dupdetected: 0, disregarded: 0 },
+        { name: $c.lit("font"), prefixgw: $c.lit("font"), initval: Off, has_handler: No, dupdetected: 0, disregarded: 0, section: OptS_Advanced, minmatch: 0,
+          expectedbuf: 0, idx: pfx_font, setwhere: set_hidden, opttyp: CompOpt, negateok: Yes, valok: Yes, dupeok: Yes, pfx: Yes, termpref: 0,
+          opt_in_out: opt_in, addr: null, optfn: pfxfn_font, alias: null, descr: $c.lit("prefix for font options") },
+        { name: null, section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: 0, setwhere: set_in_sysconf, opttyp: BoolOpt,
+          negateok: No, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: 0, addr: null,
+          optfn: null,
+          alias: null, descr: null, prefixgw: null, initval: 0, has_handler: 0, dupdetected: 0, disregarded: 1 }
+    ]);
     for (let $i0 = 0; $i0 < 218; $i0++) {
         allopt[$i0].$copyFrom(new $T.allopt_t());
     }
     empty_optstr.fill(0);
-    empty_optstr[0] = 0;
+    $c.init(empty_optstr, [
+        0
+    ]);
     duplicate = 0;
     using_alias = 0;
     give_opt_msg = TRUE;
@@ -11075,28 +7023,32 @@ export function $init() {
         roleoptvals[$i0].fill(null);
     }
     OptS_type.fill(null);
-    OptS_type[0] = $c.lit("General");
-    OptS_type[1] = $c.lit("Behavior");
-    OptS_type[2] = $c.lit("Map");
-    OptS_type[3] = $c.lit("Status");
-    OptS_type[4] = $c.lit("Advanced");
+    $c.init(OptS_type, [
+        $c.lit("General"),
+        $c.lit("Behavior"),
+        $c.lit("Map"),
+        $c.lit("Status"),
+        $c.lit("Advanced")
+    ]);
     def_inv_order.fill(0);
-    def_inv_order[0] = COIN_CLASS;
-    def_inv_order[1] = AMULET_CLASS;
-    def_inv_order[2] = WEAPON_CLASS;
-    def_inv_order[3] = ARMOR_CLASS;
-    def_inv_order[4] = FOOD_CLASS;
-    def_inv_order[5] = SCROLL_CLASS;
-    def_inv_order[6] = SPBOOK_CLASS;
-    def_inv_order[7] = POTION_CLASS;
-    def_inv_order[8] = RING_CLASS;
-    def_inv_order[9] = WAND_CLASS;
-    def_inv_order[10] = TOOL_CLASS;
-    def_inv_order[11] = GEM_CLASS;
-    def_inv_order[12] = ROCK_CLASS;
-    def_inv_order[13] = BALL_CLASS;
-    def_inv_order[14] = CHAIN_CLASS;
-    def_inv_order[15] = 0;
+    $c.init(def_inv_order, [
+        COIN_CLASS,
+        AMULET_CLASS,
+        WEAPON_CLASS,
+        ARMOR_CLASS,
+        FOOD_CLASS,
+        SCROLL_CLASS,
+        SPBOOK_CLASS,
+        POTION_CLASS,
+        RING_CLASS,
+        WAND_CLASS,
+        TOOL_CLASS,
+        GEM_CLASS,
+        ROCK_CLASS,
+        BALL_CLASS,
+        CHAIN_CLASS,
+        0
+    ]);
     none.fill(0);
     none.set([40, 110, 111, 110, 101, 41]);   // "(none)"
     randomrole.fill(0);
@@ -11110,498 +7062,363 @@ export function $init() {
     for (let $i0 = 0; $i0 < 15; $i0++) {
         paranoia[$i0].$copyFrom(new $T.paranoia_opts());
     }
-    paranoia[0].flagmask = PARANOID_CONFIRM;
-    paranoia[0].argname = $c.lit("Confirm");
-    paranoia[0].argMinLen = 1;
-    paranoia[0].synonym = $c.lit("Paranoia");
-    paranoia[0].synMinLen = 2;
-    paranoia[0].explain = $c.lit("for \"yes\" confirmations, require \"no\" to reject");
-    paranoia[1].flagmask = PARANOID_QUIT;
-    paranoia[1].argname = $c.lit("quit");
-    paranoia[1].argMinLen = 1;
-    paranoia[1].synonym = $c.lit("explore");
-    paranoia[1].synMinLen = 2;
-    paranoia[1].explain = $c.lit("yes vs y to quit or to enter explore mode");
-    paranoia[2].flagmask = PARANOID_DIE;
-    paranoia[2].argname = $c.lit("die");
-    paranoia[2].argMinLen = 1;
-    paranoia[2].synonym = $c.lit("death");
-    paranoia[2].synMinLen = 2;
-    paranoia[2].explain = $c.lit("yes vs y to die (explore mode or debug mode)");
-    paranoia[3].flagmask = PARANOID_BONES;
-    paranoia[3].argname = $c.lit("bones");
-    paranoia[3].argMinLen = 1;
-    paranoia[3].synonym = null;
-    paranoia[3].synMinLen = 0;
-    paranoia[3].explain = $c.lit("yes vs y to save bones data when dying in debug mode");
-    paranoia[4].flagmask = PARANOID_HIT;
-    paranoia[4].argname = $c.lit("attack");
-    paranoia[4].argMinLen = 1;
-    paranoia[4].synonym = $c.lit("hit");
-    paranoia[4].synMinLen = 1;
-    paranoia[4].explain = $c.lit("yes vs y to attack a peaceful monster");
-    paranoia[5].flagmask = PARANOID_BREAKWAND;
-    paranoia[5].argname = $c.lit("wand-break");
-    paranoia[5].argMinLen = 2;
-    paranoia[5].synonym = $c.lit("break-wand");
-    paranoia[5].synMinLen = 2;
-    paranoia[5].explain = $c.lit("yes vs y to break a wand via (a)pply");
-    paranoia[6].flagmask = PARANOID_EATING;
-    paranoia[6].argname = $c.lit("eat");
-    paranoia[6].argMinLen = 1;
-    paranoia[6].synonym = $c.lit("continue");
-    paranoia[6].synMinLen = 4;
-    paranoia[6].explain = $c.lit("yes vs y to continue eating after first bite when satiated");
-    paranoia[7].flagmask = PARANOID_WERECHANGE;
-    paranoia[7].argname = $c.lit("Were-change");
-    paranoia[7].argMinLen = 2;
-    paranoia[7].synonym = null;
-    paranoia[7].synMinLen = 0;
-    paranoia[7].explain = $c.lit("yes vs y to change form when lycanthropy is controllable");
-    paranoia[8].flagmask = PARANOID_PRAY;
-    paranoia[8].argname = $c.lit("pray");
-    paranoia[8].argMinLen = 1;
-    paranoia[8].synonym = null;
-    paranoia[8].synMinLen = 0;
-    paranoia[8].explain = $c.lit("y required to pray (supersedes old \"prayconfirm\" option)");
-    paranoia[9].flagmask = PARANOID_TRAP;
-    paranoia[9].argname = $c.lit("trap");
-    paranoia[9].argMinLen = 1;
-    paranoia[9].synonym = $c.lit("move-trap");
-    paranoia[9].synMinLen = 1;
-    paranoia[9].explain = $c.lit("y required to enter known trap unless considered harmless");
-    paranoia[10].flagmask = PARANOID_AUTOALL;
-    paranoia[10].argname = $c.lit("Autoall");
-    paranoia[10].argMinLen = 2;
-    paranoia[10].synonym = $c.lit("autoselect-all");
-    paranoia[10].synMinLen = 2;
-    paranoia[10].explain = $c.lit("y required to pick filter choice 'A' for menustyle:Full");
-    paranoia[11].flagmask = PARANOID_SWIM;
-    paranoia[11].argname = $c.lit("swim");
-    paranoia[11].argMinLen = 1;
-    paranoia[11].synonym = null;
-    paranoia[11].synMinLen = 0;
-    paranoia[11].explain = $c.lit("'m' prefix necessary to deliberately walk into lava or water");
-    paranoia[12].flagmask = PARANOID_REMOVE;
-    paranoia[12].argname = $c.lit("Remove");
-    paranoia[12].argMinLen = 1;
-    paranoia[12].synonym = $c.lit("Takeoff");
-    paranoia[12].synMinLen = 1;
-    paranoia[12].explain = $c.lit("always pick from inventory for Remove and Takeoff");
-    paranoia[13].flagmask = 0;
-    paranoia[13].argname = $c.lit("none");
-    paranoia[13].argMinLen = 4;
-    paranoia[13].synonym = null;
-    paranoia[13].synMinLen = 0;
-    paranoia[13].explain = null;
-    paranoia[14].flagmask = -1;
-    paranoia[14].argname = $c.lit("all");
-    paranoia[14].argMinLen = 3;
-    paranoia[14].synonym = null;
-    paranoia[14].synMinLen = 0;
-    paranoia[14].explain = null;
+    $c.init(paranoia, [
+        { flagmask: PARANOID_CONFIRM, argname: $c.lit("Confirm"), argMinLen: 1, synonym: $c.lit("Paranoia"), synMinLen: 2,
+          explain: $c.lit("for \"yes\" confirmations, require \"no\" to reject") },
+        { flagmask: PARANOID_QUIT, argname: $c.lit("quit"), argMinLen: 1, synonym: $c.lit("explore"), synMinLen: 2,
+          explain: $c.lit("yes vs y to quit or to enter explore mode") },
+        { flagmask: PARANOID_DIE, argname: $c.lit("die"), argMinLen: 1, synonym: $c.lit("death"), synMinLen: 2,
+          explain: $c.lit("yes vs y to die (explore mode or debug mode)") },
+        { flagmask: PARANOID_BONES, argname: $c.lit("bones"), argMinLen: 1, synonym: null, synMinLen: 0,
+          explain: $c.lit("yes vs y to save bones data when dying in debug mode") },
+        { flagmask: PARANOID_HIT, argname: $c.lit("attack"), argMinLen: 1, synonym: $c.lit("hit"), synMinLen: 1,
+          explain: $c.lit("yes vs y to attack a peaceful monster") },
+        { flagmask: PARANOID_BREAKWAND, argname: $c.lit("wand-break"), argMinLen: 2, synonym: $c.lit("break-wand"), synMinLen: 2,
+          explain: $c.lit("yes vs y to break a wand via (a)pply") },
+        { flagmask: PARANOID_EATING, argname: $c.lit("eat"), argMinLen: 1, synonym: $c.lit("continue"), synMinLen: 4,
+          explain: $c.lit("yes vs y to continue eating after first bite when satiated") },
+        { flagmask: PARANOID_WERECHANGE, argname: $c.lit("Were-change"), argMinLen: 2, synonym: null, synMinLen: 0,
+          explain: $c.lit("yes vs y to change form when lycanthropy is controllable") },
+        { flagmask: PARANOID_PRAY, argname: $c.lit("pray"), argMinLen: 1, synonym: null, synMinLen: 0,
+          explain: $c.lit("y required to pray (supersedes old \"prayconfirm\" option)") },
+        { flagmask: PARANOID_TRAP, argname: $c.lit("trap"), argMinLen: 1, synonym: $c.lit("move-trap"), synMinLen: 1,
+          explain: $c.lit("y required to enter known trap unless considered harmless") },
+        { flagmask: PARANOID_AUTOALL, argname: $c.lit("Autoall"), argMinLen: 2, synonym: $c.lit("autoselect-all"), synMinLen: 2,
+          explain: $c.lit("y required to pick filter choice 'A' for menustyle:Full") },
+        { flagmask: PARANOID_SWIM, argname: $c.lit("swim"), argMinLen: 1, synonym: null, synMinLen: 0,
+          explain: $c.lit("'m' prefix necessary to deliberately walk into lava or water") },
+        { flagmask: PARANOID_REMOVE, argname: $c.lit("Remove"), argMinLen: 1, synonym: $c.lit("Takeoff"), synMinLen: 1,
+          explain: $c.lit("always pick from inventory for Remove and Takeoff") },
+        { flagmask: 0, argname: $c.lit("none"), argMinLen: 4, synonym: null, synMinLen: 0, explain: null },
+        { flagmask: -1, argname: $c.lit("all"), argMinLen: 3, synonym: null, synMinLen: 0, explain: null }
+    ]);
     for (let $i0 = 0; $i0 < 4; $i0++) {
         menutype[$i0].fill(null);
     }
-    menutype[0][0] = $c.lit("traditional");
-    menutype[0][1] = $c.lit("[prompt for object class(es), then");
-    menutype[0][2] = $c.lit(" ask y/n for each item in those classes]");
-    menutype[1][0] = $c.lit("combination");
-    menutype[1][1] = $c.lit("[prompt for object class(es), then");
-    menutype[1][2] = $c.lit(" use menu for items in those classes]");
-    menutype[2][0] = $c.lit("full");
-    menutype[2][1] = $c.lit("[use menu to choose class(es), then");
-    menutype[2][2] = $c.lit(" use another menu for items in those]");
-    menutype[3][0] = $c.lit("partial");
-    menutype[3][1] = $c.lit("[skip class filtering; always");
-    menutype[3][2] = $c.lit(" use menu of all available items]");
+    $c.init(menutype, [
+        [$c.lit("traditional"), $c.lit("[prompt for object class(es), then"),
+          $c.lit(" ask y/n for each item in those classes]")],
+        [$c.lit("combination"), $c.lit("[prompt for object class(es), then"),
+          $c.lit(" use menu for items in those classes]")],
+        [$c.lit("full"), $c.lit("[use menu to choose class(es), then"),
+          $c.lit(" use another menu for items in those]")],
+        [$c.lit("partial"), $c.lit("[skip class filtering; always"),
+          $c.lit(" use menu of all available items]")]
+    ]);
     for (let $i0 = 0; $i0 < 4; $i0++) {
         msgwind[$i0].fill(null);
     }
-    msgwind[0][0] = $c.lit("single");
-    msgwind[0][1] = $c.lit("[show one old message at a time,");
-    msgwind[0][2] = $c.lit(" most recent first]");
-    msgwind[1][0] = $c.lit("combination");
-    msgwind[1][1] = $c.lit("[for consecutive ^P requests, use");
-    msgwind[1][2] = $c.lit(" 'single' for first two, then 'full']");
-    msgwind[2][0] = $c.lit("full");
-    msgwind[2][1] = $c.lit("[show all available messages,");
-    msgwind[2][2] = $c.lit(" oldest first and most recent last]");
-    msgwind[3][0] = $c.lit("reversed");
-    msgwind[3][1] = $c.lit("[show all available messages,");
-    msgwind[3][2] = $c.lit(" most recent first]");
+    $c.init(msgwind, [
+        [$c.lit("single"), $c.lit("[show one old message at a time,"),
+          $c.lit(" most recent first]")],
+        [$c.lit("combination"), $c.lit("[for consecutive ^P requests, use"),
+          $c.lit(" 'single' for first two, then 'full']")],
+        [$c.lit("full"), $c.lit("[show all available messages,"),
+          $c.lit(" oldest first and most recent last]")],
+        [$c.lit("reversed"), $c.lit("[show all available messages,"),
+          $c.lit(" most recent first]")]
+    ]);
     for (let $i0 = 0; $i0 < 4; $i0++) {
         unlocktypes[$i0].fill(null);
     }
-    unlocktypes[0][0] = $c.lit("untrap");
-    unlocktypes[0][1] = $c.lit("(might fail)");
-    unlocktypes[1][0] = $c.lit("apply-key");
-    unlocktypes[1][1] = $c.lit("");
-    unlocktypes[2][0] = $c.lit("kick");
-    unlocktypes[2][1] = $c.lit("(doors only)");
-    unlocktypes[3][0] = $c.lit("force");
-    unlocktypes[3][1] = $c.lit("(chests/boxes only)");
+    $c.init(unlocktypes, [
+        [$c.lit("untrap"), $c.lit("(might fail)")],
+        [$c.lit("apply-key"), $c.lit("")],
+        [$c.lit("kick"), $c.lit("(doors only)")],
+        [$c.lit("force"), $c.lit("(chests/boxes only)")]
+    ]);
     burdentype.fill(null);
-    burdentype[0] = $c.lit("unencumbered");
-    burdentype[1] = $c.lit("burdened");
-    burdentype[2] = $c.lit("stressed");
-    burdentype[3] = $c.lit("strained");
-    burdentype[4] = $c.lit("overtaxed");
-    burdentype[5] = $c.lit("overloaded");
+    $c.init(burdentype, [
+        $c.lit("unencumbered"),
+        $c.lit("burdened"),
+        $c.lit("stressed"),
+        $c.lit("strained"),
+        $c.lit("overtaxed"),
+        $c.lit("overloaded")
+    ]);
     runmodes.fill(null);
-    runmodes[0] = $c.lit("teleport");
-    runmodes[1] = $c.lit("run");
-    runmodes[2] = $c.lit("walk");
-    runmodes[3] = $c.lit("crawl");
+    $c.init(runmodes, [
+        $c.lit("teleport"),
+        $c.lit("run"),
+        $c.lit("walk"),
+        $c.lit("crawl")
+    ]);
     sortltype.fill(null);
-    sortltype[0] = $c.lit("none");
-    sortltype[1] = $c.lit("loot");
-    sortltype[2] = $c.lit("full");
+    $c.init(sortltype, [
+        $c.lit("none"),
+        $c.lit("loot"),
+        $c.lit("full")
+    ]);
     for (let $i0 = 0; $i0 < 9; $i0++) {
         perminv_modes[$i0].fill(null);
     }
-    perminv_modes[0][0] = $c.lit("none");
-    perminv_modes[0][1] = $c.lit("off");
-    perminv_modes[0][2] = $c.lit("no permanent inventory window");
-    perminv_modes[1][0] = $c.lit("all");
-    perminv_modes[1][1] = $c.lit("on");
-    perminv_modes[1][2] = $c.lit("all inventory except for gold");
-    perminv_modes[2][0] = $c.lit("full");
-    perminv_modes[2][1] = $c.lit("gold");
-    perminv_modes[2][2] = $c.lit("full inventory including gold");
-    perminv_modes[3][0] = null;
-    perminv_modes[3][1] = null;
-    perminv_modes[3][2] = null;
-    perminv_modes[4][0] = null;
-    perminv_modes[4][1] = null;
-    perminv_modes[4][2] = null;
-    perminv_modes[5][0] = null;
-    perminv_modes[5][1] = null;
-    perminv_modes[5][2] = null;
-    perminv_modes[6][0] = null;
-    perminv_modes[6][1] = null;
-    perminv_modes[6][2] = null;
-    perminv_modes[7][0] = null;
-    perminv_modes[7][1] = null;
-    perminv_modes[7][2] = null;
-    perminv_modes[8][0] = $c.lit("in-use");
-    perminv_modes[8][1] = $c.lit("inuse-only");
-    perminv_modes[8][2] = $c.lit("subset: items currently in use");
+    $c.init(perminv_modes, [
+        [$c.lit("none"), $c.lit("off"), $c.lit("no permanent inventory window")],
+        [$c.lit("all"), $c.lit("on"), $c.lit("all inventory except for gold")],
+        [$c.lit("full"), $c.lit("gold"), $c.lit("full inventory including gold")],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [$c.lit("in-use"), $c.lit("inuse-only"), $c.lit("subset: items currently in use")]
+    ]);
     for (let $i0 = 0; $i0 < 6; $i0++) {
         objsymvals[$i0].$copyFrom(new $T.objsymopt());
     }
-    objsymvals[0].num = 0;
-    objsymvals[0].nam = $c.lit("none");
-    objsymvals[0].descr = $c.lit("don't show object symbols in menus");
-    objsymvals[1].num = 1;
-    objsymvals[1].nam = $c.lit("headers");
-    objsymvals[1].descr = $c.lit("show object symbols in menu header lines");
-    objsymvals[2].num = 2;
-    objsymvals[2].nam = $c.lit("entries");
-    objsymvals[2].descr = $c.lit("show object symbols in individual menu entries");
-    objsymvals[3].num = 3;
-    objsymvals[3].nam = $c.lit("both");
-    objsymvals[3].descr = $c.lit("show object symbols in headers and menu entries");
-    objsymvals[4].num = 4;
-    objsymvals[4].nam = $c.lit("conditional");
-    objsymvals[4].descr = $c.lit("show objsyms in entries if no headers are shown");
-    objsymvals[5].num = 5;
-    objsymvals[5].nam = $c.lit("one-or-other");
-    objsymvals[5].descr = $c.lit("show objsyms in header, in entries if no header");
+    $c.init(objsymvals, [
+        { num: 0, nam: $c.lit("none"), descr: $c.lit("don't show object symbols in menus") },
+        { num: 1, nam: $c.lit("headers"), descr: $c.lit("show object symbols in menu header lines") },
+        { num: 2, nam: $c.lit("entries"), descr: $c.lit("show object symbols in individual menu entries") },
+        { num: 3, nam: $c.lit("both"), descr: $c.lit("show object symbols in headers and menu entries") },
+        { num: 4, nam: $c.lit("conditional"), descr: $c.lit("show objsyms in entries if no headers are shown") },
+        { num: 5, nam: $c.lit("one-or-other"), descr: $c.lit("show objsyms in header, in entries if no header") }
+    ]);
     for (let $i0 = 0; $i0 < 14; $i0++) {
         default_menu_cmd_info[$i0].$copyFrom(new $T.menu_cmd_t());
     }
-    default_menu_cmd_info[0].name = $c.lit("menu_next_page");
-    default_menu_cmd_info[0].cmd = MENU_NEXT_PAGE;
-    default_menu_cmd_info[0].desc = $c.lit("Go to next page");
-    default_menu_cmd_info[1].name = $c.lit("menu_previous_page");
-    default_menu_cmd_info[1].cmd = MENU_PREVIOUS_PAGE;
-    default_menu_cmd_info[1].desc = $c.lit("Go to previous page");
-    default_menu_cmd_info[2].name = $c.lit("menu_first_page");
-    default_menu_cmd_info[2].cmd = MENU_FIRST_PAGE;
-    default_menu_cmd_info[2].desc = $c.lit("Go to first page");
-    default_menu_cmd_info[3].name = $c.lit("menu_last_page");
-    default_menu_cmd_info[3].cmd = MENU_LAST_PAGE;
-    default_menu_cmd_info[3].desc = $c.lit("Go to last page");
-    default_menu_cmd_info[4].name = $c.lit("menu_select_all");
-    default_menu_cmd_info[4].cmd = MENU_SELECT_ALL;
-    default_menu_cmd_info[4].desc = $c.lit("Select all items in entire menu");
-    default_menu_cmd_info[5].name = $c.lit("menu_invert_all");
-    default_menu_cmd_info[5].cmd = MENU_INVERT_ALL;
-    default_menu_cmd_info[5].desc = $c.lit("Invert selection for all items");
-    default_menu_cmd_info[6].name = $c.lit("menu_deselect_all");
-    default_menu_cmd_info[6].cmd = MENU_UNSELECT_ALL;
-    default_menu_cmd_info[6].desc = $c.lit("Unselect all items in entire menu");
-    default_menu_cmd_info[7].name = $c.lit("menu_select_page");
-    default_menu_cmd_info[7].cmd = MENU_SELECT_PAGE;
-    default_menu_cmd_info[7].desc = $c.lit("Select all items on current page");
-    default_menu_cmd_info[8].name = $c.lit("menu_invert_page");
-    default_menu_cmd_info[8].cmd = MENU_INVERT_PAGE;
-    default_menu_cmd_info[8].desc = $c.lit("Invert current page's selections");
-    default_menu_cmd_info[9].name = $c.lit("menu_deselect_page");
-    default_menu_cmd_info[9].cmd = MENU_UNSELECT_PAGE;
-    default_menu_cmd_info[9].desc = $c.lit("Unselect all items on current page");
-    default_menu_cmd_info[10].name = $c.lit("menu_search");
-    default_menu_cmd_info[10].cmd = MENU_SEARCH;
-    default_menu_cmd_info[10].desc = $c.lit("Search and invert matching items");
-    default_menu_cmd_info[11].name = $c.lit("menu_shift_right");
-    default_menu_cmd_info[11].cmd = MENU_SHIFT_RIGHT;
-    default_menu_cmd_info[11].desc = $c.lit("Pan current page to right (perm_invent only)");
-    default_menu_cmd_info[12].name = $c.lit("menu_shift_left");
-    default_menu_cmd_info[12].cmd = MENU_SHIFT_LEFT;
-    default_menu_cmd_info[12].desc = $c.lit("Pan current page to left (perm_invent only)");
-    default_menu_cmd_info[13].name = null;
-    default_menu_cmd_info[13].cmd = 0;
-    default_menu_cmd_info[13].desc = null;
+    $c.init(default_menu_cmd_info, [
+        { name: $c.lit("menu_next_page"), cmd: MENU_NEXT_PAGE, desc: $c.lit("Go to next page") },
+        { name: $c.lit("menu_previous_page"), cmd: MENU_PREVIOUS_PAGE, desc: $c.lit("Go to previous page") },
+        { name: $c.lit("menu_first_page"), cmd: MENU_FIRST_PAGE, desc: $c.lit("Go to first page") },
+        { name: $c.lit("menu_last_page"), cmd: MENU_LAST_PAGE, desc: $c.lit("Go to last page") },
+        { name: $c.lit("menu_select_all"), cmd: MENU_SELECT_ALL,
+          desc: $c.lit("Select all items in entire menu") },
+        { name: $c.lit("menu_invert_all"), cmd: MENU_INVERT_ALL,
+          desc: $c.lit("Invert selection for all items") },
+        { name: $c.lit("menu_deselect_all"), cmd: MENU_UNSELECT_ALL,
+          desc: $c.lit("Unselect all items in entire menu") },
+        { name: $c.lit("menu_select_page"), cmd: MENU_SELECT_PAGE,
+          desc: $c.lit("Select all items on current page") },
+        { name: $c.lit("menu_invert_page"), cmd: MENU_INVERT_PAGE,
+          desc: $c.lit("Invert current page's selections") },
+        { name: $c.lit("menu_deselect_page"), cmd: MENU_UNSELECT_PAGE,
+          desc: $c.lit("Unselect all items on current page") },
+        { name: $c.lit("menu_search"), cmd: MENU_SEARCH,
+          desc: $c.lit("Search and invert matching items") },
+        { name: $c.lit("menu_shift_right"), cmd: MENU_SHIFT_RIGHT,
+          desc: $c.lit("Pan current page to right (perm_invent only)") },
+        { name: $c.lit("menu_shift_left"), cmd: MENU_SHIFT_LEFT,
+          desc: $c.lit("Pan current page to left (perm_invent only)") },
+        {}
+    ]);
     n_currently_set.fill(0);
     n_currently_set.set([40, 37, 100, 32, 99, 117, 114, 114, 101, 110, 116, 108, 121, 32, 115, 101, 116, 41]);   // "(%d currently set)"
     roleopt2opt.fill(0);
-    roleopt2opt[0] = opt_role;
-    roleopt2opt[1] = opt_race;
-    roleopt2opt[2] = opt_gender;
-    roleopt2opt[3] = opt_alignment;
+    $c.init(roleopt2opt, [
+        opt_role,
+        opt_race,
+        opt_gender,
+        opt_alignment
+    ]);
     wcnames.fill(null);
-    wcnames[0] = $c.lit("menu");
-    wcnames[1] = $c.lit("message");
-    wcnames[2] = $c.lit("status");
-    wcnames[3] = $c.lit("text");
+    $c.init(wcnames, [
+        $c.lit("menu"),
+        $c.lit("message"),
+        $c.lit("status"),
+        $c.lit("text")
+    ]);
     wcshortnames.fill(null);
-    wcshortnames[0] = $c.lit("mnu");
-    wcshortnames[1] = $c.lit("msg");
-    wcshortnames[2] = $c.lit("sts");
-    wcshortnames[3] = $c.lit("txt");
+    $c.init(wcshortnames, [
+        $c.lit("mnu"),
+        $c.lit("msg"),
+        $c.lit("sts"),
+        $c.lit("txt")
+    ]);
     wcolors_opt.fill(0);
     for (let $i0 = 0; $i0 < 6; $i0++) {
         msgtype_names[$i0].$copyFrom(new $T.anon_options_7676());
     }
-    msgtype_names[0].name = $c.lit("show");
-    msgtype_names[0].msgtyp = MSGTYP_NORMAL;
-    msgtype_names[0].descr = $c.lit("Show message normally");
-    msgtype_names[1].name = $c.lit("hide");
-    msgtype_names[1].msgtyp = MSGTYP_NOSHOW;
-    msgtype_names[1].descr = $c.lit("Hide message");
-    msgtype_names[2].name = $c.lit("noshow");
-    msgtype_names[2].msgtyp = MSGTYP_NOSHOW;
-    msgtype_names[2].descr = null;
-    msgtype_names[3].name = $c.lit("stop");
-    msgtype_names[3].msgtyp = MSGTYP_STOP;
-    msgtype_names[3].descr = $c.lit("Prompt for more after the message");
-    msgtype_names[4].name = $c.lit("more");
-    msgtype_names[4].msgtyp = MSGTYP_STOP;
-    msgtype_names[4].descr = null;
-    msgtype_names[5].name = $c.lit("norep");
-    msgtype_names[5].msgtyp = MSGTYP_NOREP;
-    msgtype_names[5].descr = $c.lit("Do not repeat the message");
+    $c.init(msgtype_names, [
+        { name: $c.lit("show"), msgtyp: MSGTYP_NORMAL, descr: $c.lit("Show message normally") },
+        { name: $c.lit("hide"), msgtyp: MSGTYP_NOSHOW, descr: $c.lit("Hide message") },
+        { name: $c.lit("noshow"), msgtyp: MSGTYP_NOSHOW, descr: null },
+        { name: $c.lit("stop"), msgtyp: MSGTYP_STOP, descr: $c.lit("Prompt for more after the message") },
+        { name: $c.lit("more"), msgtyp: MSGTYP_STOP, descr: null },
+        { name: $c.lit("norep"), msgtyp: MSGTYP_NOREP, descr: $c.lit("Do not repeat the message") }
+    ]);
     opt_intro.fill(null);
-    opt_intro[0] = $c.lit("");
-    opt_intro[1] = $c.lit("                 NetHack Options Help:");
-    opt_intro[2] = $c.lit("");
-    opt_intro[3] = null;
-    opt_intro[4] = $c.lit("or use `NETHACKOPTIONS=\"<options>\"' in your environment");
-    opt_intro[5] = $c.lit("(<options> is a list of options separated by commas)");
-    opt_intro[6] = $c.lit("or press \"O\" while playing and use the menu.");
-    opt_intro[7] = $c.lit("");
-    opt_intro[8] = $c.lit("Boolean options (which can be negated by prefixing them with '!' or \"no\"):");
-    opt_intro[9] = null;
+    $c.init(opt_intro, [
+        $c.lit(""),
+        $c.lit("                 NetHack Options Help:"),
+        $c.lit(""),
+        null,
+        $c.lit("or use `NETHACKOPTIONS=\"<options>\"' in your environment"),
+        $c.lit("(<options> is a list of options separated by commas)"),
+        $c.lit("or press \"O\" while playing and use the menu."),
+        $c.lit(""),
+        $c.lit("Boolean options (which can be negated by prefixing them with '!' or \"no\"):"),
+        null
+    ]);
     opt_epilog.fill(null);
-    opt_epilog[0] = $c.lit("");
-    opt_epilog[1] = $c.lit("Some of the options can only be set before the game is started;");
-    opt_epilog[2] = $c.lit("those items will not be selectable in the 'O' command's menu.");
-    opt_epilog[3] = $c.lit("Some options are stored in a game's save file, and will keep saved");
-    opt_epilog[4] = $c.lit("values when restoring that game even if you have updated your config-");
-    opt_epilog[5] = $c.lit("uration file to change them.  Such changes will matter for new games.");
-    opt_epilog[6] = $c.lit("The \"other settings\" can be set with 'O', but when set within the");
-    opt_epilog[7] = $c.lit("configuration file they use their own directives rather than OPTIONS.");
-    opt_epilog[8] = $c.lit("See NetHack's \"Guidebook\" for details.");
-    opt_epilog[9] = null;
+    $c.init(opt_epilog, [
+        $c.lit(""),
+        $c.lit("Some of the options can only be set before the game is started;"),
+        $c.lit("those items will not be selectable in the 'O' command's menu."),
+        $c.lit("Some options are stored in a game's save file, and will keep saved"),
+        $c.lit("values when restoring that game even if you have updated your config-"),
+        $c.lit("uration file to change them.  Such changes will matter for new games."),
+        $c.lit("The \"other settings\" can be set with 'O', but when set within the"),
+        $c.lit("configuration file they use their own directives rather than OPTIONS."),
+        $c.lit("See NetHack's \"Guidebook\" for details."),
+        null
+    ]);
     for (let $i0 = 0; $i0 < 34; $i0++) {
         wc_options[$i0].$copyFrom(new $T.wc_Opt());
     }
-    wc_options[0].wc_name = $c.lit("ascii_map");
-    wc_options[0].wc_bit = WC_ASCII_MAP;
-    wc_options[1].wc_name = $c.lit("color");
-    wc_options[1].wc_bit = WC_COLOR;
-    wc_options[2].wc_name = $c.lit("eight_bit_tty");
-    wc_options[2].wc_bit = WC_EIGHT_BIT_IN;
-    wc_options[3].wc_name = $c.lit("hilite_pet");
-    wc_options[3].wc_bit = WC_HILITE_PET;
-    wc_options[4].wc_name = $c.lit("perm_invent");
-    wc_options[4].wc_bit = WC_PERM_INVENT;
-    wc_options[5].wc_name = $c.lit("perminv_mode");
-    wc_options[5].wc_bit = WC_PERM_INVENT;
-    wc_options[6].wc_name = $c.lit("popup_dialog");
-    wc_options[6].wc_bit = WC_POPUP_DIALOG;
-    wc_options[7].wc_name = $c.lit("player_selection");
-    wc_options[7].wc_bit = WC_PLAYER_SELECTION;
-    wc_options[8].wc_name = $c.lit("preload_tiles");
-    wc_options[8].wc_bit = WC_PRELOAD_TILES;
-    wc_options[9].wc_name = $c.lit("tiled_map");
-    wc_options[9].wc_bit = WC_TILED_MAP;
-    wc_options[10].wc_name = $c.lit("tile_file");
-    wc_options[10].wc_bit = WC_TILE_FILE;
-    wc_options[11].wc_name = $c.lit("tile_width");
-    wc_options[11].wc_bit = WC_TILE_WIDTH;
-    wc_options[12].wc_name = $c.lit("tile_height");
-    wc_options[12].wc_bit = WC_TILE_HEIGHT;
-    wc_options[13].wc_name = $c.lit("align_message");
-    wc_options[13].wc_bit = WC_ALIGN_MESSAGE;
-    wc_options[14].wc_name = $c.lit("align_status");
-    wc_options[14].wc_bit = WC_ALIGN_STATUS;
-    wc_options[15].wc_name = $c.lit("font_map");
-    wc_options[15].wc_bit = WC_FONT_MAP;
-    wc_options[16].wc_name = $c.lit("font_menu");
-    wc_options[16].wc_bit = WC_FONT_MENU;
-    wc_options[17].wc_name = $c.lit("font_message");
-    wc_options[17].wc_bit = WC_FONT_MESSAGE;
-    wc_options[18].wc_name = $c.lit("font_size_map");
-    wc_options[18].wc_bit = WC_FONTSIZ_MAP;
-    wc_options[19].wc_name = $c.lit("font_size_menu");
-    wc_options[19].wc_bit = WC_FONTSIZ_MENU;
-    wc_options[20].wc_name = $c.lit("font_size_message");
-    wc_options[20].wc_bit = WC_FONTSIZ_MESSAGE;
-    wc_options[21].wc_name = $c.lit("font_size_status");
-    wc_options[21].wc_bit = WC_FONTSIZ_STATUS;
-    wc_options[22].wc_name = $c.lit("font_size_text");
-    wc_options[22].wc_bit = WC_FONTSIZ_TEXT;
-    wc_options[23].wc_name = $c.lit("font_status");
-    wc_options[23].wc_bit = WC_FONT_STATUS;
-    wc_options[24].wc_name = $c.lit("font_text");
-    wc_options[24].wc_bit = WC_FONT_TEXT;
-    wc_options[25].wc_name = $c.lit("map_mode");
-    wc_options[25].wc_bit = WC_MAP_MODE;
-    wc_options[26].wc_name = $c.lit("scroll_amount");
-    wc_options[26].wc_bit = WC_SCROLL_AMOUNT;
-    wc_options[27].wc_name = $c.lit("scroll_margin");
-    wc_options[27].wc_bit = WC_SCROLL_MARGIN;
-    wc_options[28].wc_name = $c.lit("splash_screen");
-    wc_options[28].wc_bit = WC_SPLASH_SCREEN;
-    wc_options[29].wc_name = $c.lit("use_inverse");
-    wc_options[29].wc_bit = WC_INVERSE;
-    wc_options[30].wc_name = $c.lit("vary_msgcount");
-    wc_options[30].wc_bit = WC_VARY_MSGCOUNT;
-    wc_options[31].wc_name = $c.lit("windowcolors");
-    wc_options[31].wc_bit = WC_WINDOWCOLORS;
-    wc_options[32].wc_name = $c.lit("mouse_support");
-    wc_options[32].wc_bit = 2147483648;
-    wc_options[33].wc_name = null;
-    wc_options[33].wc_bit = 0;
+    $c.init(wc_options, [
+        { wc_name: $c.lit("ascii_map"), wc_bit: WC_ASCII_MAP },
+        { wc_name: $c.lit("color"), wc_bit: WC_COLOR },
+        { wc_name: $c.lit("eight_bit_tty"), wc_bit: WC_EIGHT_BIT_IN },
+        { wc_name: $c.lit("hilite_pet"), wc_bit: WC_HILITE_PET },
+        { wc_name: $c.lit("perm_invent"), wc_bit: WC_PERM_INVENT },
+        { wc_name: $c.lit("perminv_mode"), wc_bit: WC_PERM_INVENT },
+        { wc_name: $c.lit("popup_dialog"), wc_bit: WC_POPUP_DIALOG },
+        { wc_name: $c.lit("player_selection"), wc_bit: WC_PLAYER_SELECTION },
+        { wc_name: $c.lit("preload_tiles"), wc_bit: WC_PRELOAD_TILES },
+        { wc_name: $c.lit("tiled_map"), wc_bit: WC_TILED_MAP },
+        { wc_name: $c.lit("tile_file"), wc_bit: WC_TILE_FILE },
+        { wc_name: $c.lit("tile_width"), wc_bit: WC_TILE_WIDTH },
+        { wc_name: $c.lit("tile_height"), wc_bit: WC_TILE_HEIGHT },
+        { wc_name: $c.lit("align_message"), wc_bit: WC_ALIGN_MESSAGE },
+        { wc_name: $c.lit("align_status"), wc_bit: WC_ALIGN_STATUS },
+        { wc_name: $c.lit("font_map"), wc_bit: WC_FONT_MAP },
+        { wc_name: $c.lit("font_menu"), wc_bit: WC_FONT_MENU },
+        { wc_name: $c.lit("font_message"), wc_bit: WC_FONT_MESSAGE },
+        { wc_name: $c.lit("font_size_map"), wc_bit: WC_FONTSIZ_MAP },
+        { wc_name: $c.lit("font_size_menu"), wc_bit: WC_FONTSIZ_MENU },
+        { wc_name: $c.lit("font_size_message"), wc_bit: WC_FONTSIZ_MESSAGE },
+        { wc_name: $c.lit("font_size_status"), wc_bit: WC_FONTSIZ_STATUS },
+        { wc_name: $c.lit("font_size_text"), wc_bit: WC_FONTSIZ_TEXT },
+        { wc_name: $c.lit("font_status"), wc_bit: WC_FONT_STATUS },
+        { wc_name: $c.lit("font_text"), wc_bit: WC_FONT_TEXT },
+        { wc_name: $c.lit("map_mode"), wc_bit: WC_MAP_MODE },
+        { wc_name: $c.lit("scroll_amount"), wc_bit: WC_SCROLL_AMOUNT },
+        { wc_name: $c.lit("scroll_margin"), wc_bit: WC_SCROLL_MARGIN },
+        { wc_name: $c.lit("splash_screen"), wc_bit: WC_SPLASH_SCREEN },
+        { wc_name: $c.lit("use_inverse"), wc_bit: WC_INVERSE },
+        { wc_name: $c.lit("vary_msgcount"), wc_bit: WC_VARY_MSGCOUNT },
+        { wc_name: $c.lit("windowcolors"), wc_bit: WC_WINDOWCOLORS },
+        { wc_name: $c.lit("mouse_support"), wc_bit: 2147483648 },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 19; $i0++) {
         wc2_options[$i0].$copyFrom(new $T.wc_Opt());
     }
-    wc2_options[0].wc_name = $c.lit("armorstatus");
-    wc2_options[0].wc_bit = WC2_EXTRASTATUS;
-    wc2_options[1].wc_name = $c.lit("fullscreen");
-    wc2_options[1].wc_bit = WC2_FULLSCREEN;
-    wc2_options[2].wc_name = $c.lit("guicolor");
-    wc2_options[2].wc_bit = WC2_GUICOLOR;
-    wc2_options[3].wc_name = $c.lit("hilite_status");
-    wc2_options[3].wc_bit = WC2_HILITE_STATUS;
-    wc2_options[4].wc_name = $c.lit("hitpointbar");
-    wc2_options[4].wc_bit = WC2_HITPOINTBAR;
-    wc2_options[5].wc_name = $c.lit("menu_shift");
-    wc2_options[5].wc_bit = WC2_MENU_SHIFT;
-    wc2_options[6].wc_name = $c.lit("petattr");
-    wc2_options[6].wc_bit = WC2_PETATTR;
-    wc2_options[7].wc_name = $c.lit("softkeyboard");
-    wc2_options[7].wc_bit = WC2_SOFTKEYBOARD;
-    wc2_options[8].wc_name = $c.lit("status hilite rules");
-    wc2_options[8].wc_bit = WC2_HILITE_STATUS;
-    wc2_options[9].wc_name = $c.lit("statushilites");
-    wc2_options[9].wc_bit = WC2_HILITE_STATUS;
-    wc2_options[10].wc_name = $c.lit("statuslines");
-    wc2_options[10].wc_bit = WC2_STATUSLINES;
-    wc2_options[11].wc_name = $c.lit("term_cols");
-    wc2_options[11].wc_bit = WC2_TERM_SIZE;
-    wc2_options[12].wc_name = $c.lit("term_rows");
-    wc2_options[12].wc_bit = WC2_TERM_SIZE;
-    wc2_options[13].wc_name = $c.lit("terrainstatus");
-    wc2_options[13].wc_bit = WC2_EXTRASTATUS;
-    wc2_options[14].wc_name = $c.lit("use_darkgray");
-    wc2_options[14].wc_bit = WC2_DARKGRAY;
-    wc2_options[15].wc_name = $c.lit("weaponstatus");
-    wc2_options[15].wc_bit = WC2_EXTRASTATUS;
-    wc2_options[16].wc_name = $c.lit("windowborders");
-    wc2_options[16].wc_bit = WC2_WINDOWBORDERS;
-    wc2_options[17].wc_name = $c.lit("wraptext");
-    wc2_options[17].wc_bit = WC2_WRAPTEXT;
-    wc2_options[18].wc_name = null;
-    wc2_options[18].wc_bit = 0;
+    $c.init(wc2_options, [
+        { wc_name: $c.lit("armorstatus"), wc_bit: WC2_EXTRASTATUS },
+        { wc_name: $c.lit("fullscreen"), wc_bit: WC2_FULLSCREEN },
+        { wc_name: $c.lit("guicolor"), wc_bit: WC2_GUICOLOR },
+        { wc_name: $c.lit("hilite_status"), wc_bit: WC2_HILITE_STATUS },
+        { wc_name: $c.lit("hitpointbar"), wc_bit: WC2_HITPOINTBAR },
+        { wc_name: $c.lit("menu_shift"), wc_bit: WC2_MENU_SHIFT },
+        { wc_name: $c.lit("petattr"), wc_bit: WC2_PETATTR },
+        { wc_name: $c.lit("softkeyboard"), wc_bit: WC2_SOFTKEYBOARD },
+        { wc_name: $c.lit("status hilite rules"), wc_bit: WC2_HILITE_STATUS },
+        { wc_name: $c.lit("statushilites"), wc_bit: WC2_HILITE_STATUS },
+        { wc_name: $c.lit("statuslines"), wc_bit: WC2_STATUSLINES },
+        { wc_name: $c.lit("term_cols"), wc_bit: WC2_TERM_SIZE },
+        { wc_name: $c.lit("term_rows"), wc_bit: WC2_TERM_SIZE },
+        { wc_name: $c.lit("terrainstatus"), wc_bit: WC2_EXTRASTATUS },
+        { wc_name: $c.lit("use_darkgray"), wc_bit: WC2_DARKGRAY },
+        { wc_name: $c.lit("weaponstatus"), wc_bit: WC2_EXTRASTATUS },
+        { wc_name: $c.lit("windowborders"), wc_bit: WC2_WINDOWBORDERS },
+        { wc_name: $c.lit("wraptext"), wc_bit: WC2_WRAPTEXT },
+        {}
+    ]);
     fgp.fill(null);
-    fgp[0] = new $c.FieldRef(iflags.wcolors[wcolor_menu], "fg", "ptr");
-    fgp[1] = new $c.FieldRef(iflags.wcolors[wcolor_message], "fg", "ptr");
-    fgp[2] = new $c.FieldRef(iflags.wcolors[wcolor_status], "fg", "ptr");
-    fgp[3] = new $c.FieldRef(iflags.wcolors[wcolor_text], "fg", "ptr");
+    $c.init(fgp, [
+        new $c.FieldRef(iflags.wcolors[wcolor_menu], "fg", "ptr"),
+        new $c.FieldRef(iflags.wcolors[wcolor_message], "fg", "ptr"),
+        new $c.FieldRef(iflags.wcolors[wcolor_status], "fg", "ptr"),
+        new $c.FieldRef(iflags.wcolors[wcolor_text], "fg", "ptr")
+    ]);
     bgp.fill(null);
-    bgp[0] = new $c.FieldRef(iflags.wcolors[wcolor_menu], "bg", "ptr");
-    bgp[1] = new $c.FieldRef(iflags.wcolors[wcolor_message], "bg", "ptr");
-    bgp[2] = new $c.FieldRef(iflags.wcolors[wcolor_status], "bg", "ptr");
-    bgp[3] = new $c.FieldRef(iflags.wcolors[wcolor_text], "bg", "ptr");
+    $c.init(bgp, [
+        new $c.FieldRef(iflags.wcolors[wcolor_menu], "bg", "ptr"),
+        new $c.FieldRef(iflags.wcolors[wcolor_message], "bg", "ptr"),
+        new $c.FieldRef(iflags.wcolors[wcolor_status], "bg", "ptr"),
+        new $c.FieldRef(iflags.wcolors[wcolor_text], "bg", "ptr")
+    ]);
     $G.options_set_window_colors_flag = 0;
     optfn_autounlock$plus.fill(0);
     optfn_autounlock$plus.set([32, 43, 32]);   // " + "
     optfn_disclose$valid_settings.fill(0);
-    optfn_disclose$valid_settings[0] = DISCLOSE_PROMPT_DEFAULT_YES;
-    optfn_disclose$valid_settings[1] = DISCLOSE_PROMPT_DEFAULT_NO;
-    optfn_disclose$valid_settings[2] = DISCLOSE_PROMPT_DEFAULT_SPECIAL;
-    optfn_disclose$valid_settings[3] = DISCLOSE_YES_WITHOUT_PROMPT;
-    optfn_disclose$valid_settings[4] = DISCLOSE_NO_WITHOUT_PROMPT;
-    optfn_disclose$valid_settings[5] = DISCLOSE_SPECIAL_WITHOUT_PROMPT;
-    optfn_disclose$valid_settings[6] = 0;
+    $c.init(optfn_disclose$valid_settings, [
+        DISCLOSE_PROMPT_DEFAULT_YES,
+        DISCLOSE_PROMPT_DEFAULT_NO,
+        DISCLOSE_PROMPT_DEFAULT_SPECIAL,
+        DISCLOSE_YES_WITHOUT_PROMPT,
+        DISCLOSE_NO_WITHOUT_PROMPT,
+        DISCLOSE_SPECIAL_WITHOUT_PROMPT,
+        0
+    ]);
     optfn_menu_objsyms$alt5.fill(0);
     optfn_menu_objsyms$alt5.set([111, 110, 101, 45, 111, 114, 45, 116, 104, 101, 45, 111, 116, 104, 101, 114]);   // "one-or-the-other"
     for (let $i0 = 0; $i0 < 3; $i0++) {
         optfn_mouse_support$mousemodes[$i0].fill(null);
     }
-    optfn_mouse_support$mousemodes[0][0] = $c.lit("0=off");
-    optfn_mouse_support$mousemodes[0][1] = $c.lit("");
-    optfn_mouse_support$mousemodes[1][0] = $c.lit("1=on");
-    optfn_mouse_support$mousemodes[1][1] = $c.lit(", O/S adjusted");
-    optfn_mouse_support$mousemodes[2][0] = $c.lit("2=on");
-    optfn_mouse_support$mousemodes[2][1] = $c.lit(", O/S unchanged");
+    $c.init(optfn_mouse_support$mousemodes, [
+        [$c.lit("0=off"), $c.lit("")],
+        [$c.lit("1=on"), $c.lit(", O/S adjusted")],
+        [$c.lit("2=on"), $c.lit(", O/S unchanged")]
+    ]);
     optfn_number_pad$numpadmodes.fill(null);
-    optfn_number_pad$numpadmodes[0] = $c.lit("0=off");
-    optfn_number_pad$numpadmodes[1] = $c.lit("1=on");
-    optfn_number_pad$numpadmodes[2] = $c.lit("2=on, MSDOS compatible");
-    optfn_number_pad$numpadmodes[3] = $c.lit("3=on, phone-style layout");
-    optfn_number_pad$numpadmodes[4] = $c.lit("4=on, phone layout, MSDOS compatible");
-    optfn_number_pad$numpadmodes[5] = $c.lit("-1=off, y & z swapped");
+    $c.init(optfn_number_pad$numpadmodes, [
+        $c.lit("0=off"),
+        $c.lit("1=on"),
+        $c.lit("2=on, MSDOS compatible"),
+        $c.lit("3=on, phone-style layout"),
+        $c.lit("4=on, phone layout, MSDOS compatible"),
+        $c.lit("-1=off, y & z swapped")
+    ]);
     optfn_sortvanquished$vanqmodes.fill(0);
     optfn_sortvanquished$vanqmodes.set([116, 100, 97, 65, 67, 99, 110, 122]);   // "tdaACcnz"
     optfn_whatis_coord$gpcoords.fill(0);
-    optfn_whatis_coord$gpcoords[0] = GPCOORDS_NONE;
-    optfn_whatis_coord$gpcoords[1] = GPCOORDS_COMPASS;
-    optfn_whatis_coord$gpcoords[2] = GPCOORDS_COMFULL;
-    optfn_whatis_coord$gpcoords[3] = GPCOORDS_MAP;
-    optfn_whatis_coord$gpcoords[4] = GPCOORDS_SCREEN;
-    optfn_whatis_coord$gpcoords[5] = 0;
+    $c.init(optfn_whatis_coord$gpcoords, [
+        GPCOORDS_NONE,
+        GPCOORDS_COMPASS,
+        GPCOORDS_COMFULL,
+        GPCOORDS_MAP,
+        GPCOORDS_SCREEN,
+        0
+    ]);
     handler_disclose$disclosure_names.fill(null);
-    handler_disclose$disclosure_names[0] = $c.lit("inventory");
-    handler_disclose$disclosure_names[1] = $c.lit("attributes");
-    handler_disclose$disclosure_names[2] = $c.lit("vanquished");
-    handler_disclose$disclosure_names[3] = $c.lit("genocides");
-    handler_disclose$disclosure_names[4] = $c.lit("conduct");
-    handler_disclose$disclosure_names[5] = $c.lit("overview");
+    $c.init(handler_disclose$disclosure_names, [
+        $c.lit("inventory"),
+        $c.lit("attributes"),
+        $c.lit("vanquished"),
+        $c.lit("genocides"),
+        $c.lit("conduct"),
+        $c.lit("overview")
+    ]);
     handler_number_pad$npchoices.fill(null);
-    handler_number_pad$npchoices[0] = $c.lit(" 0 (off)");
-    handler_number_pad$npchoices[1] = $c.lit(" 1 (on)");
-    handler_number_pad$npchoices[2] = $c.lit(" 2 (on, MSDOS compatible)");
-    handler_number_pad$npchoices[3] = $c.lit(" 3 (on, phone-style digit layout)");
-    handler_number_pad$npchoices[4] = $c.lit(" 4 (on, phone-style layout, MSDOS compatible)");
-    handler_number_pad$npchoices[5] = $c.lit("-1 (off, 'z' to move upper-left, 'y' to zap wands)");
+    $c.init(handler_number_pad$npchoices, [
+        $c.lit(" 0 (off)"),
+        $c.lit(" 1 (on)"),
+        $c.lit(" 2 (on, MSDOS compatible)"),
+        $c.lit(" 3 (on, phone-style digit layout)"),
+        $c.lit(" 4 (on, phone-style layout, MSDOS compatible)"),
+        $c.lit("-1 (off, 'z' to move upper-left, 'y' to zap wands)")
+    ]);
     handler_windowborders$windowborders_text.fill(null);
-    handler_windowborders$windowborders_text[0] = $c.lit("Off, never show borders");
-    handler_windowborders$windowborders_text[1] = $c.lit("On, always show borders");
-    handler_windowborders$windowborders_text[2] = $c.lit("Auto, on if display is at least (24+2)x(80+2)");
-    handler_windowborders$windowborders_text[3] = $c.lit("On, except forced off for perm_invent");
-    handler_windowborders$windowborders_text[4] = $c.lit("Auto, except forced off for perm_invent");
+    $c.init(handler_windowborders$windowborders_text, [
+        $c.lit("Off, never show borders"),
+        $c.lit("On, always show borders"),
+        $c.lit("Auto, on if display is at least (24+2)x(80+2)"),
+        $c.lit("On, except forced off for perm_invent"),
+        $c.lit("Auto, except forced off for perm_invent")
+    ]);
     escapes$oct.fill(0);
     escapes$oct.set([48, 49, 50, 51, 52, 53, 54, 55]);   // "01234567"
     escapes$dec.fill(0);
     escapes$dec.set([48, 49, 50, 51, 52, 53, 54, 55, 56, 57]);   // "0123456789"
     allopt_array_init$options_array_inited_already = FALSE;
     parsebindings$mousebtn_names.fill(null);
-    parsebindings$mousebtn_names[0] = $c.lit("mouse1");
-    parsebindings$mousebtn_names[1] = $c.lit("mouse2");
+    $c.init(parsebindings$mousebtn_names, [
+        $c.lit("mouse1"),
+        $c.lit("mouse2")
+    ]);
     msgtype_add$re_error = $c.lit("MSGTYPE regex error");
     test_regex_pattern$def_errmsg.fill(0);
     test_regex_pattern$def_errmsg.set([78, 72, 114, 101, 103, 101, 120, 32, 101, 114, 114, 111, 114]);   // "NHregex error"
@@ -11610,55 +7427,45 @@ export function $init() {
     for (let $i0 = 0; $i0 < 6; $i0++) {
         collect_menu_keys$scroll_keys[$i0].$copyFrom(new $T.menuscrollinfo());
     }
-    collect_menu_keys$scroll_keys[0].cmdkey = MENU_FIRST_PAGE;
-    collect_menu_keys$scroll_keys[0].maskindx = 1;
-    collect_menu_keys$scroll_keys[1].cmdkey = MENU_PREVIOUS_PAGE;
-    collect_menu_keys$scroll_keys[1].maskindx = 1;
-    collect_menu_keys$scroll_keys[2].cmdkey = MENU_NEXT_PAGE;
-    collect_menu_keys$scroll_keys[2].maskindx = 2;
-    collect_menu_keys$scroll_keys[3].cmdkey = MENU_LAST_PAGE;
-    collect_menu_keys$scroll_keys[3].maskindx = 2;
-    collect_menu_keys$scroll_keys[4].cmdkey = MENU_SHIFT_LEFT;
-    collect_menu_keys$scroll_keys[4].maskindx = 4;
-    collect_menu_keys$scroll_keys[5].cmdkey = MENU_SHIFT_RIGHT;
-    collect_menu_keys$scroll_keys[5].maskindx = 8;
+    $c.init(collect_menu_keys$scroll_keys, [
+        { cmdkey: MENU_FIRST_PAGE, maskindx: 1 },
+        { cmdkey: MENU_PREVIOUS_PAGE, maskindx: 1 },
+        { cmdkey: MENU_NEXT_PAGE, maskindx: 2 },
+        { cmdkey: MENU_LAST_PAGE, maskindx: 2 },
+        { cmdkey: MENU_SHIFT_LEFT, maskindx: 4 },
+        { cmdkey: MENU_SHIFT_RIGHT, maskindx: 8 }
+    ]);
     get_option_value$retbuf.fill(0);
     doset_simple_menu$fmtstr_tab_doset_simple.fill(0);
     doset_simple_menu$fmtstr_tab_doset_simple.set([37, 115, 9, 91, 37, 115, 93]);   // "%s\t[%s]"
     for (let $i0 = 0; $i0 < 2; $i0++) {
         term_for_boolean$booleanterms[$i0].fill(null);
     }
-    term_for_boolean$booleanterms[0][0] = $c.lit("false");
-    term_for_boolean$booleanterms[0][1] = $c.lit("off");
-    term_for_boolean$booleanterms[0][2] = $c.lit("disabled");
-    term_for_boolean$booleanterms[0][3] = $c.lit("excluded from build");
-    term_for_boolean$booleanterms[1][0] = $c.lit("true");
-    term_for_boolean$booleanterms[1][1] = $c.lit("on");
-    term_for_boolean$booleanterms[1][2] = $c.lit("enabled");
-    term_for_boolean$booleanterms[1][3] = $c.lit("included");
+    $c.init(term_for_boolean$booleanterms, [
+        [$c.lit("false"), $c.lit("off"), $c.lit("disabled"), $c.lit("excluded from build")],
+        [$c.lit("true"), $c.lit("on"), $c.lit("enabled"), $c.lit("included")]
+    ]);
     doset$fmtstr_tab_doset.fill(0);
     doset$fmtstr_tab_doset.set([37, 115, 37, 115, 9, 91, 37, 115, 93]);   // "%s%s\t[%s]"
     doset$helptext.fill(null);
-    doset$helptext[0] = $c.lit("For a brief explanation of how this works, type '?' to select");
-    doset$helptext[1] = $c.lit("the next menu choice, then press <enter> or <return>.");
-    doset$helptext[2] = null;
-    doset$helptext[3] = $c.lit("[To suppress this menu help, toggle off the 'cmdassist' option.]");
-    doset$helptext[4] = $c.lit("");
+    $c.init(doset$helptext, [
+        $c.lit("For a brief explanation of how this works, type '?' to select"),
+        $c.lit("the next menu choice, then press <enter> or <return>."),
+        null,
+        $c.lit("[To suppress this menu help, toggle off the 'cmdassist' option.]"),
+        $c.lit("")
+    ]);
     for (let $i0 = 0; $i0 < 6; $i0++) {
         show_menu_controls$hardcoded[$i0].$copyFrom(new $T.xtra_cntrls());
     }
-    show_menu_controls$hardcoded[0].key = $c.lit("Return");
-    show_menu_controls$hardcoded[0].desc = $c.lit("Accept current choice(s) and dismiss menu");
-    show_menu_controls$hardcoded[1].key = $c.lit("Enter");
-    show_menu_controls$hardcoded[1].desc = $c.lit("Same as Return");
-    show_menu_controls$hardcoded[2].key = $c.lit("Space");
-    show_menu_controls$hardcoded[2].desc = $c.lit("If not on last page, advance one page;");
-    show_menu_controls$hardcoded[3].key = $c.lit("     ");
-    show_menu_controls$hardcoded[3].desc = $c.lit("when on last page, treat like Return");
-    show_menu_controls$hardcoded[4].key = $c.lit("Escape");
-    show_menu_controls$hardcoded[4].desc = $c.lit("Cancel menu without making any choice(s)");
-    show_menu_controls$hardcoded[5].key = null;
-    show_menu_controls$hardcoded[5].desc = null;
+    $c.init(show_menu_controls$hardcoded, [
+        { key: $c.lit("Return"), desc: $c.lit("Accept current choice(s) and dismiss menu") },
+        { key: $c.lit("Enter"), desc: $c.lit("Same as Return") },
+        { key: $c.lit("Space"), desc: $c.lit("If not on last page, advance one page;") },
+        { key: $c.lit("     "), desc: $c.lit("when on last page, treat like Return") },
+        { key: $c.lit("Escape"), desc: $c.lit("Cancel menu without making any choice(s)") },
+        {}
+    ]);
     show_menu_controls$mc_fmt.fill(0);
     show_menu_controls$mc_fmt.set([37, 56, 115, 32, 32, 32, 32, 32, 37, 45, 54, 115, 32, 37, 115]);   // "%8s     %-6s %s"
     show_menu_controls$mc_altfmt.fill(0);
@@ -11666,14 +7473,12 @@ export function $init() {
     for (let $i0 = 0; $i0 < 4; $i0++) {
         handle_add_list_remove$action_titles[$i0].$copyFrom(new $T.action());
     }
-    handle_add_list_remove$action_titles[0].letr = 97;
-    handle_add_list_remove$action_titles[0].desc = $c.lit("add new %s");
-    handle_add_list_remove$action_titles[1].letr = 108;
-    handle_add_list_remove$action_titles[1].desc = $c.lit("list %s");
-    handle_add_list_remove$action_titles[2].letr = 114;
-    handle_add_list_remove$action_titles[2].desc = $c.lit("remove existing %s");
-    handle_add_list_remove$action_titles[3].letr = 120;
-    handle_add_list_remove$action_titles[3].desc = $c.lit("exit this menu");
+    $c.init(handle_add_list_remove$action_titles, [
+        { letr: 97, desc: $c.lit("add new %s") },
+        { letr: 108, desc: $c.lit("list %s") },
+        { letr: 114, desc: $c.lit("remove existing %s") },
+        { letr: 120, desc: $c.lit("exit this menu") }
+    ]);
     add_autopickup_exception$APE_regex_error.fill(0);
     add_autopickup_exception$APE_regex_error.set([114, 101, 103, 101, 120, 32, 101, 114, 114, 111, 114, 32, 105, 110, 32, 65, 85, 84, 79, 80, 73, 67, 75, 85, 80, 95, 69, 88, 67, 69, 80, 84, 73, 79, 78]);   // "regex error in AUTOPICKUP_EXCEPTION"
     add_autopickup_exception$APE_syntax_error.fill(0);

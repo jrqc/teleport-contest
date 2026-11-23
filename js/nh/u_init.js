@@ -512,7 +512,7 @@ async function ini_inv_obj_substitution(trop, obj) {   // u_init.c:1179
                 do {
                     if (debugcore($c.lit("u_init.c"), TRUE)) {
                         save_plnmsg = iflags.last_msg;
-                        await pline($c.lit("ini_inv: substituting %s for %s%s"), obj_descr[objects[inv_subs[i].subs_otyp].oc_name_idx].oc_name, trop.trotyp === 0 ? $c.lit("random ") : $c.lit(""), obj_descr[objects[obj.otyp].oc_name_idx].oc_name);
+                        await pline($c.lit("ini_inv: substituting %s for %s%s"), obj_descr[objects[inv_subs[i].subs_otyp].oc_name_idx].oc_name, trop.trotyp === UNDEF_TYP ? $c.lit("random ") : $c.lit(""), obj_descr[objects[obj.otyp].oc_name_idx].oc_name);
                         iflags.last_msg = save_plnmsg;
                     }
                 } while (0);
@@ -693,1564 +693,661 @@ export function $init() {
     for (let $i0 = 0; $i0 < 9; $i0++) {
         Archeologist[$i0].$copyFrom(new $T.trobj());
     }
-    Archeologist[0].trotyp = BULLWHIP;
-    Archeologist[0].trspe = 2;
-    Archeologist[0].trclass = WEAPON_CLASS;
-    Archeologist[0].trquan_min = 1;
-    Archeologist[0].trquan_max = 1;
-    Archeologist[0].trbless = UNDEF_BLESS;
-    Archeologist[1].trotyp = LEATHER_JACKET;
-    Archeologist[1].trspe = 0;
-    Archeologist[1].trclass = ARMOR_CLASS;
-    Archeologist[1].trquan_min = 1;
-    Archeologist[1].trquan_max = 1;
-    Archeologist[1].trbless = UNDEF_BLESS;
-    Archeologist[2].trotyp = FEDORA;
-    Archeologist[2].trspe = 0;
-    Archeologist[2].trclass = ARMOR_CLASS;
-    Archeologist[2].trquan_min = 1;
-    Archeologist[2].trquan_max = 1;
-    Archeologist[2].trbless = UNDEF_BLESS;
-    Archeologist[3].trotyp = FOOD_RATION;
-    Archeologist[3].trspe = 0;
-    Archeologist[3].trclass = FOOD_CLASS;
-    Archeologist[3].trquan_min = 3;
-    Archeologist[3].trquan_max = 3;
-    Archeologist[3].trbless = 0;
-    Archeologist[4].trotyp = PICK_AXE;
-    Archeologist[4].trspe = UNDEF_SPE;
-    Archeologist[4].trclass = TOOL_CLASS;
-    Archeologist[4].trquan_min = 1;
-    Archeologist[4].trquan_max = 1;
-    Archeologist[4].trbless = UNDEF_BLESS;
-    Archeologist[5].trotyp = TINNING_KIT;
-    Archeologist[5].trspe = UNDEF_SPE;
-    Archeologist[5].trclass = TOOL_CLASS;
-    Archeologist[5].trquan_min = 1;
-    Archeologist[5].trquan_max = 1;
-    Archeologist[5].trbless = UNDEF_BLESS;
-    Archeologist[6].trotyp = TOUCHSTONE;
-    Archeologist[6].trspe = 0;
-    Archeologist[6].trclass = GEM_CLASS;
-    Archeologist[6].trquan_min = 1;
-    Archeologist[6].trquan_max = 1;
-    Archeologist[6].trbless = 0;
-    Archeologist[7].trotyp = SACK;
-    Archeologist[7].trspe = 0;
-    Archeologist[7].trclass = TOOL_CLASS;
-    Archeologist[7].trquan_min = 1;
-    Archeologist[7].trquan_max = 1;
-    Archeologist[7].trbless = 0;
-    Archeologist[8].trotyp = 0;
-    Archeologist[8].trspe = 0;
-    Archeologist[8].trclass = 0;
-    Archeologist[8].trquan_min = 0;
-    Archeologist[8].trquan_max = 0;
-    Archeologist[8].trbless = 0;
+    $c.init(Archeologist, [
+        { trotyp: BULLWHIP, trspe: 2, trclass: WEAPON_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        { trotyp: LEATHER_JACKET, trspe: 0, trclass: ARMOR_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        { trotyp: FEDORA, trspe: 0, trclass: ARMOR_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        { trotyp: FOOD_RATION, trspe: 0, trclass: FOOD_CLASS, trquan_min: 3, trquan_max: 3, trbless: 0 },
+        { trotyp: PICK_AXE, trspe: UNDEF_SPE, trclass: TOOL_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        { trotyp: TINNING_KIT, trspe: UNDEF_SPE, trclass: TOOL_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        { trotyp: TOUCHSTONE, trspe: 0, trclass: GEM_CLASS, trquan_min: 1, trquan_max: 1, trbless: 0 },
+        { trotyp: SACK, trspe: 0, trclass: TOOL_CLASS, trquan_min: 1, trquan_max: 1, trbless: 0 },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 5; $i0++) {
         Barbarian_0[$i0].$copyFrom(new $T.trobj());
     }
-    Barbarian_0[0].trotyp = TWO_HANDED_SWORD;
-    Barbarian_0[0].trspe = 0;
-    Barbarian_0[0].trclass = WEAPON_CLASS;
-    Barbarian_0[0].trquan_min = 1;
-    Barbarian_0[0].trquan_max = 1;
-    Barbarian_0[0].trbless = UNDEF_BLESS;
-    Barbarian_0[1].trotyp = AXE;
-    Barbarian_0[1].trspe = 0;
-    Barbarian_0[1].trclass = WEAPON_CLASS;
-    Barbarian_0[1].trquan_min = 1;
-    Barbarian_0[1].trquan_max = 1;
-    Barbarian_0[1].trbless = UNDEF_BLESS;
-    Barbarian_0[2].trotyp = RING_MAIL;
-    Barbarian_0[2].trspe = 0;
-    Barbarian_0[2].trclass = ARMOR_CLASS;
-    Barbarian_0[2].trquan_min = 1;
-    Barbarian_0[2].trquan_max = 1;
-    Barbarian_0[2].trbless = UNDEF_BLESS;
-    Barbarian_0[3].trotyp = FOOD_RATION;
-    Barbarian_0[3].trspe = 0;
-    Barbarian_0[3].trclass = FOOD_CLASS;
-    Barbarian_0[3].trquan_min = 1;
-    Barbarian_0[3].trquan_max = 1;
-    Barbarian_0[3].trbless = 0;
-    Barbarian_0[4].trotyp = 0;
-    Barbarian_0[4].trspe = 0;
-    Barbarian_0[4].trclass = 0;
-    Barbarian_0[4].trquan_min = 0;
-    Barbarian_0[4].trquan_max = 0;
-    Barbarian_0[4].trbless = 0;
+    $c.init(Barbarian_0, [
+        { trotyp: TWO_HANDED_SWORD, trspe: 0, trclass: WEAPON_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        { trotyp: AXE, trspe: 0, trclass: WEAPON_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        { trotyp: RING_MAIL, trspe: 0, trclass: ARMOR_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        { trotyp: FOOD_RATION, trspe: 0, trclass: FOOD_CLASS, trquan_min: 1, trquan_max: 1, trbless: 0 },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 5; $i0++) {
         Barbarian_1[$i0].$copyFrom(new $T.trobj());
     }
-    Barbarian_1[0].trotyp = BATTLE_AXE;
-    Barbarian_1[0].trspe = 0;
-    Barbarian_1[0].trclass = WEAPON_CLASS;
-    Barbarian_1[0].trquan_min = 1;
-    Barbarian_1[0].trquan_max = 1;
-    Barbarian_1[0].trbless = UNDEF_BLESS;
-    Barbarian_1[1].trotyp = SHORT_SWORD;
-    Barbarian_1[1].trspe = 0;
-    Barbarian_1[1].trclass = WEAPON_CLASS;
-    Barbarian_1[1].trquan_min = 1;
-    Barbarian_1[1].trquan_max = 1;
-    Barbarian_1[1].trbless = UNDEF_BLESS;
-    Barbarian_1[2].trotyp = RING_MAIL;
-    Barbarian_1[2].trspe = 0;
-    Barbarian_1[2].trclass = ARMOR_CLASS;
-    Barbarian_1[2].trquan_min = 1;
-    Barbarian_1[2].trquan_max = 1;
-    Barbarian_1[2].trbless = UNDEF_BLESS;
-    Barbarian_1[3].trotyp = FOOD_RATION;
-    Barbarian_1[3].trspe = 0;
-    Barbarian_1[3].trclass = FOOD_CLASS;
-    Barbarian_1[3].trquan_min = 1;
-    Barbarian_1[3].trquan_max = 1;
-    Barbarian_1[3].trbless = 0;
-    Barbarian_1[4].trotyp = 0;
-    Barbarian_1[4].trspe = 0;
-    Barbarian_1[4].trclass = 0;
-    Barbarian_1[4].trquan_min = 0;
-    Barbarian_1[4].trquan_max = 0;
-    Barbarian_1[4].trbless = 0;
+    $c.init(Barbarian_1, [
+        { trotyp: BATTLE_AXE, trspe: 0, trclass: WEAPON_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        { trotyp: SHORT_SWORD, trspe: 0, trclass: WEAPON_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        { trotyp: RING_MAIL, trspe: 0, trclass: ARMOR_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        { trotyp: FOOD_RATION, trspe: 0, trclass: FOOD_CLASS, trquan_min: 1, trquan_max: 1, trbless: 0 },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 6; $i0++) {
         Cave_man[$i0].$copyFrom(new $T.trobj());
     }
-    Cave_man[0].trotyp = CLUB;
-    Cave_man[0].trspe = 1;
-    Cave_man[0].trclass = WEAPON_CLASS;
-    Cave_man[0].trquan_min = 1;
-    Cave_man[0].trquan_max = 1;
-    Cave_man[0].trbless = UNDEF_BLESS;
-    Cave_man[1].trotyp = SLING;
-    Cave_man[1].trspe = 2;
-    Cave_man[1].trclass = WEAPON_CLASS;
-    Cave_man[1].trquan_min = 1;
-    Cave_man[1].trquan_max = 1;
-    Cave_man[1].trbless = UNDEF_BLESS;
-    Cave_man[2].trotyp = FLINT;
-    Cave_man[2].trspe = 0;
-    Cave_man[2].trclass = GEM_CLASS;
-    Cave_man[2].trquan_min = 10;
-    Cave_man[2].trquan_max = 20;
-    Cave_man[2].trbless = UNDEF_BLESS;
-    Cave_man[3].trotyp = ROCK;
-    Cave_man[3].trspe = 0;
-    Cave_man[3].trclass = GEM_CLASS;
-    Cave_man[3].trquan_min = 3;
-    Cave_man[3].trquan_max = 3;
-    Cave_man[3].trbless = 0;
-    Cave_man[4].trotyp = LEATHER_ARMOR;
-    Cave_man[4].trspe = 0;
-    Cave_man[4].trclass = ARMOR_CLASS;
-    Cave_man[4].trquan_min = 1;
-    Cave_man[4].trquan_max = 1;
-    Cave_man[4].trbless = UNDEF_BLESS;
-    Cave_man[5].trotyp = 0;
-    Cave_man[5].trspe = 0;
-    Cave_man[5].trclass = 0;
-    Cave_man[5].trquan_min = 0;
-    Cave_man[5].trquan_max = 0;
-    Cave_man[5].trbless = 0;
+    $c.init(Cave_man, [
+        { trotyp: CLUB, trspe: 1, trclass: WEAPON_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        { trotyp: SLING, trspe: 2, trclass: WEAPON_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        { trotyp: FLINT, trspe: 0, trclass: GEM_CLASS, trquan_min: 10, trquan_max: 20, trbless: UNDEF_BLESS },
+        { trotyp: ROCK, trspe: 0, trclass: GEM_CLASS, trquan_min: 3, trquan_max: 3, trbless: 0 },
+        { trotyp: LEATHER_ARMOR, trspe: 0, trclass: ARMOR_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 11; $i0++) {
         Healer[$i0].$copyFrom(new $T.trobj());
     }
-    Healer[0].trotyp = SCALPEL;
-    Healer[0].trspe = 0;
-    Healer[0].trclass = WEAPON_CLASS;
-    Healer[0].trquan_min = 1;
-    Healer[0].trquan_max = 1;
-    Healer[0].trbless = UNDEF_BLESS;
-    Healer[1].trotyp = LEATHER_GLOVES;
-    Healer[1].trspe = 1;
-    Healer[1].trclass = ARMOR_CLASS;
-    Healer[1].trquan_min = 1;
-    Healer[1].trquan_max = 1;
-    Healer[1].trbless = UNDEF_BLESS;
-    Healer[2].trotyp = STETHOSCOPE;
-    Healer[2].trspe = 0;
-    Healer[2].trclass = TOOL_CLASS;
-    Healer[2].trquan_min = 1;
-    Healer[2].trquan_max = 1;
-    Healer[2].trbless = 0;
-    Healer[3].trotyp = POT_HEALING;
-    Healer[3].trspe = 0;
-    Healer[3].trclass = POTION_CLASS;
-    Healer[3].trquan_min = 4;
-    Healer[3].trquan_max = 4;
-    Healer[3].trbless = UNDEF_BLESS;
-    Healer[4].trotyp = POT_EXTRA_HEALING;
-    Healer[4].trspe = 0;
-    Healer[4].trclass = POTION_CLASS;
-    Healer[4].trquan_min = 4;
-    Healer[4].trquan_max = 4;
-    Healer[4].trbless = UNDEF_BLESS;
-    Healer[5].trotyp = WAN_SLEEP;
-    Healer[5].trspe = UNDEF_SPE;
-    Healer[5].trclass = WAND_CLASS;
-    Healer[5].trquan_min = 1;
-    Healer[5].trquan_max = 1;
-    Healer[5].trbless = UNDEF_BLESS;
-    Healer[6].trotyp = SPE_HEALING;
-    Healer[6].trspe = 0;
-    Healer[6].trclass = SPBOOK_CLASS;
-    Healer[6].trquan_min = 1;
-    Healer[6].trquan_max = 1;
-    Healer[6].trbless = 1;
-    Healer[7].trotyp = SPE_EXTRA_HEALING;
-    Healer[7].trspe = 0;
-    Healer[7].trclass = SPBOOK_CLASS;
-    Healer[7].trquan_min = 1;
-    Healer[7].trquan_max = 1;
-    Healer[7].trbless = 1;
-    Healer[8].trotyp = SPE_STONE_TO_FLESH;
-    Healer[8].trspe = 0;
-    Healer[8].trclass = SPBOOK_CLASS;
-    Healer[8].trquan_min = 1;
-    Healer[8].trquan_max = 1;
-    Healer[8].trbless = 1;
-    Healer[9].trotyp = APPLE;
-    Healer[9].trspe = 0;
-    Healer[9].trclass = FOOD_CLASS;
-    Healer[9].trquan_min = 5;
-    Healer[9].trquan_max = 5;
-    Healer[9].trbless = 0;
-    Healer[10].trotyp = 0;
-    Healer[10].trspe = 0;
-    Healer[10].trclass = 0;
-    Healer[10].trquan_min = 0;
-    Healer[10].trquan_max = 0;
-    Healer[10].trbless = 0;
+    $c.init(Healer, [
+        { trotyp: SCALPEL, trspe: 0, trclass: WEAPON_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        { trotyp: LEATHER_GLOVES, trspe: 1, trclass: ARMOR_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        { trotyp: STETHOSCOPE, trspe: 0, trclass: TOOL_CLASS, trquan_min: 1, trquan_max: 1, trbless: 0 },
+        { trotyp: POT_HEALING, trspe: 0, trclass: POTION_CLASS, trquan_min: 4, trquan_max: 4, trbless: UNDEF_BLESS },
+        { trotyp: POT_EXTRA_HEALING, trspe: 0, trclass: POTION_CLASS, trquan_min: 4, trquan_max: 4, trbless: UNDEF_BLESS },
+        { trotyp: WAN_SLEEP, trspe: UNDEF_SPE, trclass: WAND_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        { trotyp: SPE_HEALING, trspe: 0, trclass: SPBOOK_CLASS, trquan_min: 1, trquan_max: 1, trbless: 1 },
+        { trotyp: SPE_EXTRA_HEALING, trspe: 0, trclass: SPBOOK_CLASS, trquan_min: 1, trquan_max: 1, trbless: 1 },
+        { trotyp: SPE_STONE_TO_FLESH, trspe: 0, trclass: SPBOOK_CLASS, trquan_min: 1, trquan_max: 1, trbless: 1 },
+        { trotyp: APPLE, trspe: 0, trclass: FOOD_CLASS, trquan_min: 5, trquan_max: 5, trbless: 0 },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 9; $i0++) {
         Knight[$i0].$copyFrom(new $T.trobj());
     }
-    Knight[0].trotyp = LONG_SWORD;
-    Knight[0].trspe = 1;
-    Knight[0].trclass = WEAPON_CLASS;
-    Knight[0].trquan_min = 1;
-    Knight[0].trquan_max = 1;
-    Knight[0].trbless = UNDEF_BLESS;
-    Knight[1].trotyp = LANCE;
-    Knight[1].trspe = 1;
-    Knight[1].trclass = WEAPON_CLASS;
-    Knight[1].trquan_min = 1;
-    Knight[1].trquan_max = 1;
-    Knight[1].trbless = UNDEF_BLESS;
-    Knight[2].trotyp = RING_MAIL;
-    Knight[2].trspe = 1;
-    Knight[2].trclass = ARMOR_CLASS;
-    Knight[2].trquan_min = 1;
-    Knight[2].trquan_max = 1;
-    Knight[2].trbless = UNDEF_BLESS;
-    Knight[3].trotyp = HELMET;
-    Knight[3].trspe = 0;
-    Knight[3].trclass = ARMOR_CLASS;
-    Knight[3].trquan_min = 1;
-    Knight[3].trquan_max = 1;
-    Knight[3].trbless = UNDEF_BLESS;
-    Knight[4].trotyp = SMALL_SHIELD;
-    Knight[4].trspe = 0;
-    Knight[4].trclass = ARMOR_CLASS;
-    Knight[4].trquan_min = 1;
-    Knight[4].trquan_max = 1;
-    Knight[4].trbless = UNDEF_BLESS;
-    Knight[5].trotyp = LEATHER_GLOVES;
-    Knight[5].trspe = 0;
-    Knight[5].trclass = ARMOR_CLASS;
-    Knight[5].trquan_min = 1;
-    Knight[5].trquan_max = 1;
-    Knight[5].trbless = UNDEF_BLESS;
-    Knight[6].trotyp = APPLE;
-    Knight[6].trspe = 0;
-    Knight[6].trclass = FOOD_CLASS;
-    Knight[6].trquan_min = 10;
-    Knight[6].trquan_max = 10;
-    Knight[6].trbless = 0;
-    Knight[7].trotyp = CARROT;
-    Knight[7].trspe = 0;
-    Knight[7].trclass = FOOD_CLASS;
-    Knight[7].trquan_min = 10;
-    Knight[7].trquan_max = 10;
-    Knight[7].trbless = 0;
-    Knight[8].trotyp = 0;
-    Knight[8].trspe = 0;
-    Knight[8].trclass = 0;
-    Knight[8].trquan_min = 0;
-    Knight[8].trquan_max = 0;
-    Knight[8].trbless = 0;
+    $c.init(Knight, [
+        { trotyp: LONG_SWORD, trspe: 1, trclass: WEAPON_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        { trotyp: LANCE, trspe: 1, trclass: WEAPON_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        { trotyp: RING_MAIL, trspe: 1, trclass: ARMOR_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        { trotyp: HELMET, trspe: 0, trclass: ARMOR_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        { trotyp: SMALL_SHIELD, trspe: 0, trclass: ARMOR_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        { trotyp: LEATHER_GLOVES, trspe: 0, trclass: ARMOR_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        { trotyp: APPLE, trspe: 0, trclass: FOOD_CLASS, trquan_min: 10, trquan_max: 10, trbless: 0 },
+        { trotyp: CARROT, trspe: 0, trclass: FOOD_CLASS, trquan_min: 10, trquan_max: 10, trbless: 0 },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 9; $i0++) {
         Monk[$i0].$copyFrom(new $T.trobj());
     }
-    Monk[0].trotyp = LEATHER_GLOVES;
-    Monk[0].trspe = 2;
-    Monk[0].trclass = ARMOR_CLASS;
-    Monk[0].trquan_min = 1;
-    Monk[0].trquan_max = 1;
-    Monk[0].trbless = UNDEF_BLESS;
-    Monk[1].trotyp = ROBE;
-    Monk[1].trspe = 1;
-    Monk[1].trclass = ARMOR_CLASS;
-    Monk[1].trquan_min = 1;
-    Monk[1].trquan_max = 1;
-    Monk[1].trbless = UNDEF_BLESS;
-    Monk[2].trotyp = UNDEF_TYP;
-    Monk[2].trspe = UNDEF_SPE;
-    Monk[2].trclass = SCROLL_CLASS;
-    Monk[2].trquan_min = 1;
-    Monk[2].trquan_max = 1;
-    Monk[2].trbless = UNDEF_BLESS;
-    Monk[3].trotyp = POT_HEALING;
-    Monk[3].trspe = 0;
-    Monk[3].trclass = POTION_CLASS;
-    Monk[3].trquan_min = 3;
-    Monk[3].trquan_max = 3;
-    Monk[3].trbless = UNDEF_BLESS;
-    Monk[4].trotyp = FOOD_RATION;
-    Monk[4].trspe = 0;
-    Monk[4].trclass = FOOD_CLASS;
-    Monk[4].trquan_min = 3;
-    Monk[4].trquan_max = 3;
-    Monk[4].trbless = 0;
-    Monk[5].trotyp = APPLE;
-    Monk[5].trspe = 0;
-    Monk[5].trclass = FOOD_CLASS;
-    Monk[5].trquan_min = 5;
-    Monk[5].trquan_max = 5;
-    Monk[5].trbless = UNDEF_BLESS;
-    Monk[6].trotyp = ORANGE;
-    Monk[6].trspe = 0;
-    Monk[6].trclass = FOOD_CLASS;
-    Monk[6].trquan_min = 5;
-    Monk[6].trquan_max = 5;
-    Monk[6].trbless = UNDEF_BLESS;
-    Monk[7].trotyp = FORTUNE_COOKIE;
-    Monk[7].trspe = 0;
-    Monk[7].trclass = FOOD_CLASS;
-    Monk[7].trquan_min = 3;
-    Monk[7].trquan_max = 3;
-    Monk[7].trbless = UNDEF_BLESS;
-    Monk[8].trotyp = 0;
-    Monk[8].trspe = 0;
-    Monk[8].trclass = 0;
-    Monk[8].trquan_min = 0;
-    Monk[8].trquan_max = 0;
-    Monk[8].trbless = 0;
+    $c.init(Monk, [
+        { trotyp: LEATHER_GLOVES, trspe: 2, trclass: ARMOR_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        { trotyp: ROBE, trspe: 1, trclass: ARMOR_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        { trotyp: UNDEF_TYP, trspe: UNDEF_SPE, trclass: SCROLL_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        { trotyp: POT_HEALING, trspe: 0, trclass: POTION_CLASS, trquan_min: 3, trquan_max: 3, trbless: UNDEF_BLESS },
+        { trotyp: FOOD_RATION, trspe: 0, trclass: FOOD_CLASS, trquan_min: 3, trquan_max: 3, trbless: 0 },
+        { trotyp: APPLE, trspe: 0, trclass: FOOD_CLASS, trquan_min: 5, trquan_max: 5, trbless: UNDEF_BLESS },
+        { trotyp: ORANGE, trspe: 0, trclass: FOOD_CLASS, trquan_min: 5, trquan_max: 5, trbless: UNDEF_BLESS },
+        { trotyp: FORTUNE_COOKIE, trspe: 0, trclass: FOOD_CLASS, trquan_min: 3, trquan_max: 3, trbless: UNDEF_BLESS },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 8; $i0++) {
         Priest[$i0].$copyFrom(new $T.trobj());
     }
-    Priest[0].trotyp = MACE;
-    Priest[0].trspe = 1;
-    Priest[0].trclass = WEAPON_CLASS;
-    Priest[0].trquan_min = 1;
-    Priest[0].trquan_max = 1;
-    Priest[0].trbless = 1;
-    Priest[1].trotyp = ROBE;
-    Priest[1].trspe = 0;
-    Priest[1].trclass = ARMOR_CLASS;
-    Priest[1].trquan_min = 1;
-    Priest[1].trquan_max = 1;
-    Priest[1].trbless = UNDEF_BLESS;
-    Priest[2].trotyp = SMALL_SHIELD;
-    Priest[2].trspe = 0;
-    Priest[2].trclass = ARMOR_CLASS;
-    Priest[2].trquan_min = 1;
-    Priest[2].trquan_max = 1;
-    Priest[2].trbless = UNDEF_BLESS;
-    Priest[3].trotyp = POT_WATER;
-    Priest[3].trspe = 0;
-    Priest[3].trclass = POTION_CLASS;
-    Priest[3].trquan_min = 4;
-    Priest[3].trquan_max = 4;
-    Priest[3].trbless = 1;
-    Priest[4].trotyp = CLOVE_OF_GARLIC;
-    Priest[4].trspe = 0;
-    Priest[4].trclass = FOOD_CLASS;
-    Priest[4].trquan_min = 1;
-    Priest[4].trquan_max = 1;
-    Priest[4].trbless = 0;
-    Priest[5].trotyp = SPRIG_OF_WOLFSBANE;
-    Priest[5].trspe = 0;
-    Priest[5].trclass = FOOD_CLASS;
-    Priest[5].trquan_min = 1;
-    Priest[5].trquan_max = 1;
-    Priest[5].trbless = 0;
-    Priest[6].trotyp = UNDEF_TYP;
-    Priest[6].trspe = UNDEF_SPE;
-    Priest[6].trclass = SPBOOK_CLASS;
-    Priest[6].trquan_min = 2;
-    Priest[6].trquan_max = 2;
-    Priest[6].trbless = UNDEF_BLESS;
-    Priest[7].trotyp = 0;
-    Priest[7].trspe = 0;
-    Priest[7].trclass = 0;
-    Priest[7].trquan_min = 0;
-    Priest[7].trquan_max = 0;
-    Priest[7].trbless = 0;
+    $c.init(Priest, [
+        { trotyp: MACE, trspe: 1, trclass: WEAPON_CLASS, trquan_min: 1, trquan_max: 1, trbless: 1 },
+        { trotyp: ROBE, trspe: 0, trclass: ARMOR_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        { trotyp: SMALL_SHIELD, trspe: 0, trclass: ARMOR_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        { trotyp: POT_WATER, trspe: 0, trclass: POTION_CLASS, trquan_min: 4, trquan_max: 4, trbless: 1 },
+        { trotyp: CLOVE_OF_GARLIC, trspe: 0, trclass: FOOD_CLASS, trquan_min: 1, trquan_max: 1, trbless: 0 },
+        { trotyp: SPRIG_OF_WOLFSBANE, trspe: 0, trclass: FOOD_CLASS, trquan_min: 1, trquan_max: 1, trbless: 0 },
+        { trotyp: UNDEF_TYP, trspe: UNDEF_SPE, trclass: SPBOOK_CLASS, trquan_min: 2, trquan_max: 2, trbless: UNDEF_BLESS },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 7; $i0++) {
         Ranger[$i0].$copyFrom(new $T.trobj());
     }
-    Ranger[0].trotyp = DAGGER;
-    Ranger[0].trspe = 1;
-    Ranger[0].trclass = WEAPON_CLASS;
-    Ranger[0].trquan_min = 1;
-    Ranger[0].trquan_max = 1;
-    Ranger[0].trbless = UNDEF_BLESS;
-    Ranger[1].trotyp = BOW;
-    Ranger[1].trspe = 1;
-    Ranger[1].trclass = WEAPON_CLASS;
-    Ranger[1].trquan_min = 1;
-    Ranger[1].trquan_max = 1;
-    Ranger[1].trbless = UNDEF_BLESS;
-    Ranger[2].trotyp = ARROW;
-    Ranger[2].trspe = 2;
-    Ranger[2].trclass = WEAPON_CLASS;
-    Ranger[2].trquan_min = 50;
-    Ranger[2].trquan_max = 59;
-    Ranger[2].trbless = UNDEF_BLESS;
-    Ranger[3].trotyp = ARROW;
-    Ranger[3].trspe = 0;
-    Ranger[3].trclass = WEAPON_CLASS;
-    Ranger[3].trquan_min = 30;
-    Ranger[3].trquan_max = 39;
-    Ranger[3].trbless = UNDEF_BLESS;
-    Ranger[4].trotyp = CLOAK_OF_DISPLACEMENT;
-    Ranger[4].trspe = 2;
-    Ranger[4].trclass = ARMOR_CLASS;
-    Ranger[4].trquan_min = 1;
-    Ranger[4].trquan_max = 1;
-    Ranger[4].trbless = UNDEF_BLESS;
-    Ranger[5].trotyp = CRAM_RATION;
-    Ranger[5].trspe = 0;
-    Ranger[5].trclass = FOOD_CLASS;
-    Ranger[5].trquan_min = 4;
-    Ranger[5].trquan_max = 4;
-    Ranger[5].trbless = 0;
-    Ranger[6].trotyp = 0;
-    Ranger[6].trspe = 0;
-    Ranger[6].trclass = 0;
-    Ranger[6].trquan_min = 0;
-    Ranger[6].trquan_max = 0;
-    Ranger[6].trbless = 0;
+    $c.init(Ranger, [
+        { trotyp: DAGGER, trspe: 1, trclass: WEAPON_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        { trotyp: BOW, trspe: 1, trclass: WEAPON_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        { trotyp: ARROW, trspe: 2, trclass: WEAPON_CLASS, trquan_min: 50, trquan_max: 59, trbless: UNDEF_BLESS },
+        { trotyp: ARROW, trspe: 0, trclass: WEAPON_CLASS, trquan_min: 30, trquan_max: 39, trbless: UNDEF_BLESS },
+        { trotyp: CLOAK_OF_DISPLACEMENT, trspe: 2, trclass: ARMOR_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        { trotyp: CRAM_RATION, trspe: 0, trclass: FOOD_CLASS, trquan_min: 4, trquan_max: 4, trbless: 0 },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 7; $i0++) {
         Rogue[$i0].$copyFrom(new $T.trobj());
     }
-    Rogue[0].trotyp = SHORT_SWORD;
-    Rogue[0].trspe = 0;
-    Rogue[0].trclass = WEAPON_CLASS;
-    Rogue[0].trquan_min = 1;
-    Rogue[0].trquan_max = 1;
-    Rogue[0].trbless = UNDEF_BLESS;
-    Rogue[1].trotyp = DAGGER;
-    Rogue[1].trspe = 0;
-    Rogue[1].trclass = WEAPON_CLASS;
-    Rogue[1].trquan_min = 6;
-    Rogue[1].trquan_max = 15;
-    Rogue[1].trbless = 0;
-    Rogue[2].trotyp = LEATHER_ARMOR;
-    Rogue[2].trspe = 1;
-    Rogue[2].trclass = ARMOR_CLASS;
-    Rogue[2].trquan_min = 1;
-    Rogue[2].trquan_max = 1;
-    Rogue[2].trbless = UNDEF_BLESS;
-    Rogue[3].trotyp = POT_SICKNESS;
-    Rogue[3].trspe = 0;
-    Rogue[3].trclass = POTION_CLASS;
-    Rogue[3].trquan_min = 1;
-    Rogue[3].trquan_max = 1;
-    Rogue[3].trbless = 0;
-    Rogue[4].trotyp = LOCK_PICK;
-    Rogue[4].trspe = 0;
-    Rogue[4].trclass = TOOL_CLASS;
-    Rogue[4].trquan_min = 1;
-    Rogue[4].trquan_max = 1;
-    Rogue[4].trbless = 0;
-    Rogue[5].trotyp = SACK;
-    Rogue[5].trspe = 0;
-    Rogue[5].trclass = TOOL_CLASS;
-    Rogue[5].trquan_min = 1;
-    Rogue[5].trquan_max = 1;
-    Rogue[5].trbless = 0;
-    Rogue[6].trotyp = 0;
-    Rogue[6].trspe = 0;
-    Rogue[6].trclass = 0;
-    Rogue[6].trquan_min = 0;
-    Rogue[6].trquan_max = 0;
-    Rogue[6].trbless = 0;
+    $c.init(Rogue, [
+        { trotyp: SHORT_SWORD, trspe: 0, trclass: WEAPON_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        { trotyp: DAGGER, trspe: 0, trclass: WEAPON_CLASS, trquan_min: 6, trquan_max: 15, trbless: 0 },
+        { trotyp: LEATHER_ARMOR, trspe: 1, trclass: ARMOR_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        { trotyp: POT_SICKNESS, trspe: 0, trclass: POTION_CLASS, trquan_min: 1, trquan_max: 1, trbless: 0 },
+        { trotyp: LOCK_PICK, trspe: 0, trclass: TOOL_CLASS, trquan_min: 1, trquan_max: 1, trbless: 0 },
+        { trotyp: SACK, trspe: 0, trclass: TOOL_CLASS, trquan_min: 1, trquan_max: 1, trbless: 0 },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 6; $i0++) {
         Samurai[$i0].$copyFrom(new $T.trobj());
     }
-    Samurai[0].trotyp = KATANA;
-    Samurai[0].trspe = 0;
-    Samurai[0].trclass = WEAPON_CLASS;
-    Samurai[0].trquan_min = 1;
-    Samurai[0].trquan_max = 1;
-    Samurai[0].trbless = UNDEF_BLESS;
-    Samurai[1].trotyp = SHORT_SWORD;
-    Samurai[1].trspe = 0;
-    Samurai[1].trclass = WEAPON_CLASS;
-    Samurai[1].trquan_min = 1;
-    Samurai[1].trquan_max = 1;
-    Samurai[1].trbless = UNDEF_BLESS;
-    Samurai[2].trotyp = YUMI;
-    Samurai[2].trspe = 0;
-    Samurai[2].trclass = WEAPON_CLASS;
-    Samurai[2].trquan_min = 1;
-    Samurai[2].trquan_max = 1;
-    Samurai[2].trbless = UNDEF_BLESS;
-    Samurai[3].trotyp = YA;
-    Samurai[3].trspe = 0;
-    Samurai[3].trclass = WEAPON_CLASS;
-    Samurai[3].trquan_min = 26;
-    Samurai[3].trquan_max = 45;
-    Samurai[3].trbless = UNDEF_BLESS;
-    Samurai[4].trotyp = SPLINT_MAIL;
-    Samurai[4].trspe = 0;
-    Samurai[4].trclass = ARMOR_CLASS;
-    Samurai[4].trquan_min = 1;
-    Samurai[4].trquan_max = 1;
-    Samurai[4].trbless = UNDEF_BLESS;
-    Samurai[5].trotyp = 0;
-    Samurai[5].trspe = 0;
-    Samurai[5].trclass = 0;
-    Samurai[5].trquan_min = 0;
-    Samurai[5].trquan_max = 0;
-    Samurai[5].trbless = 0;
+    $c.init(Samurai, [
+        { trotyp: KATANA, trspe: 0, trclass: WEAPON_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        { trotyp: SHORT_SWORD, trspe: 0, trclass: WEAPON_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        { trotyp: YUMI, trspe: 0, trclass: WEAPON_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        { trotyp: YA, trspe: 0, trclass: WEAPON_CLASS, trquan_min: 26, trquan_max: 45, trbless: UNDEF_BLESS },
+        { trotyp: SPLINT_MAIL, trspe: 0, trclass: ARMOR_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 8; $i0++) {
         Tourist[$i0].$copyFrom(new $T.trobj());
     }
-    Tourist[0].trotyp = DART;
-    Tourist[0].trspe = 2;
-    Tourist[0].trclass = WEAPON_CLASS;
-    Tourist[0].trquan_min = 21;
-    Tourist[0].trquan_max = 40;
-    Tourist[0].trbless = UNDEF_BLESS;
-    Tourist[1].trotyp = UNDEF_TYP;
-    Tourist[1].trspe = UNDEF_SPE;
-    Tourist[1].trclass = FOOD_CLASS;
-    Tourist[1].trquan_min = 10;
-    Tourist[1].trquan_max = 10;
-    Tourist[1].trbless = 0;
-    Tourist[2].trotyp = POT_EXTRA_HEALING;
-    Tourist[2].trspe = 0;
-    Tourist[2].trclass = POTION_CLASS;
-    Tourist[2].trquan_min = 2;
-    Tourist[2].trquan_max = 2;
-    Tourist[2].trbless = UNDEF_BLESS;
-    Tourist[3].trotyp = SCR_MAGIC_MAPPING;
-    Tourist[3].trspe = 0;
-    Tourist[3].trclass = SCROLL_CLASS;
-    Tourist[3].trquan_min = 4;
-    Tourist[3].trquan_max = 4;
-    Tourist[3].trbless = UNDEF_BLESS;
-    Tourist[4].trotyp = HAWAIIAN_SHIRT;
-    Tourist[4].trspe = 0;
-    Tourist[4].trclass = ARMOR_CLASS;
-    Tourist[4].trquan_min = 1;
-    Tourist[4].trquan_max = 1;
-    Tourist[4].trbless = UNDEF_BLESS;
-    Tourist[5].trotyp = EXPENSIVE_CAMERA;
-    Tourist[5].trspe = UNDEF_SPE;
-    Tourist[5].trclass = TOOL_CLASS;
-    Tourist[5].trquan_min = 1;
-    Tourist[5].trquan_max = 1;
-    Tourist[5].trbless = 0;
-    Tourist[6].trotyp = CREDIT_CARD;
-    Tourist[6].trspe = 0;
-    Tourist[6].trclass = TOOL_CLASS;
-    Tourist[6].trquan_min = 1;
-    Tourist[6].trquan_max = 1;
-    Tourist[6].trbless = 0;
-    Tourist[7].trotyp = 0;
-    Tourist[7].trspe = 0;
-    Tourist[7].trclass = 0;
-    Tourist[7].trquan_min = 0;
-    Tourist[7].trquan_max = 0;
-    Tourist[7].trbless = 0;
+    $c.init(Tourist, [
+        { trotyp: DART, trspe: 2, trclass: WEAPON_CLASS, trquan_min: 21, trquan_max: 40, trbless: UNDEF_BLESS },
+        { trotyp: UNDEF_TYP, trspe: UNDEF_SPE, trclass: FOOD_CLASS, trquan_min: 10, trquan_max: 10, trbless: 0 },
+        { trotyp: POT_EXTRA_HEALING, trspe: 0, trclass: POTION_CLASS, trquan_min: 2, trquan_max: 2, trbless: UNDEF_BLESS },
+        { trotyp: SCR_MAGIC_MAPPING, trspe: 0, trclass: SCROLL_CLASS, trquan_min: 4, trquan_max: 4, trbless: UNDEF_BLESS },
+        { trotyp: HAWAIIAN_SHIRT, trspe: 0, trclass: ARMOR_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        { trotyp: EXPENSIVE_CAMERA, trspe: UNDEF_SPE, trclass: TOOL_CLASS, trquan_min: 1, trquan_max: 1, trbless: 0 },
+        { trotyp: CREDIT_CARD, trspe: 0, trclass: TOOL_CLASS, trquan_min: 1, trquan_max: 1, trbless: 0 },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 5; $i0++) {
         Valkyrie[$i0].$copyFrom(new $T.trobj());
     }
-    Valkyrie[0].trotyp = SPEAR;
-    Valkyrie[0].trspe = 1;
-    Valkyrie[0].trclass = WEAPON_CLASS;
-    Valkyrie[0].trquan_min = 1;
-    Valkyrie[0].trquan_max = 1;
-    Valkyrie[0].trbless = UNDEF_BLESS;
-    Valkyrie[1].trotyp = DAGGER;
-    Valkyrie[1].trspe = 0;
-    Valkyrie[1].trclass = WEAPON_CLASS;
-    Valkyrie[1].trquan_min = 1;
-    Valkyrie[1].trquan_max = 1;
-    Valkyrie[1].trbless = UNDEF_BLESS;
-    Valkyrie[2].trotyp = SMALL_SHIELD;
-    Valkyrie[2].trspe = 3;
-    Valkyrie[2].trclass = ARMOR_CLASS;
-    Valkyrie[2].trquan_min = 1;
-    Valkyrie[2].trquan_max = 1;
-    Valkyrie[2].trbless = UNDEF_BLESS;
-    Valkyrie[3].trotyp = FOOD_RATION;
-    Valkyrie[3].trspe = 0;
-    Valkyrie[3].trclass = FOOD_CLASS;
-    Valkyrie[3].trquan_min = 1;
-    Valkyrie[3].trquan_max = 1;
-    Valkyrie[3].trbless = 0;
-    Valkyrie[4].trotyp = 0;
-    Valkyrie[4].trspe = 0;
-    Valkyrie[4].trclass = 0;
-    Valkyrie[4].trquan_min = 0;
-    Valkyrie[4].trquan_max = 0;
-    Valkyrie[4].trbless = 0;
+    $c.init(Valkyrie, [
+        { trotyp: SPEAR, trspe: 1, trclass: WEAPON_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        { trotyp: DAGGER, trspe: 0, trclass: WEAPON_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        { trotyp: SMALL_SHIELD, trspe: 3, trclass: ARMOR_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        { trotyp: FOOD_RATION, trspe: 0, trclass: FOOD_CLASS, trquan_min: 1, trquan_max: 1, trbless: 0 },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 10; $i0++) {
         Wizard[$i0].$copyFrom(new $T.trobj());
     }
-    Wizard[0].trotyp = QUARTERSTAFF;
-    Wizard[0].trspe = 1;
-    Wizard[0].trclass = WEAPON_CLASS;
-    Wizard[0].trquan_min = 1;
-    Wizard[0].trquan_max = 1;
-    Wizard[0].trbless = 1;
-    Wizard[1].trotyp = CLOAK_OF_MAGIC_RESISTANCE;
-    Wizard[1].trspe = 0;
-    Wizard[1].trclass = ARMOR_CLASS;
-    Wizard[1].trquan_min = 1;
-    Wizard[1].trquan_max = 1;
-    Wizard[1].trbless = UNDEF_BLESS;
-    Wizard[2].trotyp = UNDEF_TYP;
-    Wizard[2].trspe = UNDEF_SPE;
-    Wizard[2].trclass = WAND_CLASS;
-    Wizard[2].trquan_min = 1;
-    Wizard[2].trquan_max = 1;
-    Wizard[2].trbless = UNDEF_BLESS;
-    Wizard[3].trotyp = UNDEF_TYP;
-    Wizard[3].trspe = UNDEF_SPE;
-    Wizard[3].trclass = RING_CLASS;
-    Wizard[3].trquan_min = 2;
-    Wizard[3].trquan_max = 2;
-    Wizard[3].trbless = UNDEF_BLESS;
-    Wizard[4].trotyp = UNDEF_TYP;
-    Wizard[4].trspe = UNDEF_SPE;
-    Wizard[4].trclass = POTION_CLASS;
-    Wizard[4].trquan_min = 3;
-    Wizard[4].trquan_max = 3;
-    Wizard[4].trbless = UNDEF_BLESS;
-    Wizard[5].trotyp = UNDEF_TYP;
-    Wizard[5].trspe = UNDEF_SPE;
-    Wizard[5].trclass = SCROLL_CLASS;
-    Wizard[5].trquan_min = 3;
-    Wizard[5].trquan_max = 3;
-    Wizard[5].trbless = UNDEF_BLESS;
-    Wizard[6].trotyp = SPE_FORCE_BOLT;
-    Wizard[6].trspe = 0;
-    Wizard[6].trclass = SPBOOK_CLASS;
-    Wizard[6].trquan_min = 1;
-    Wizard[6].trquan_max = 1;
-    Wizard[6].trbless = 1;
-    Wizard[7].trotyp = UNDEF_TYP;
-    Wizard[7].trspe = UNDEF_SPE;
-    Wizard[7].trclass = SPBOOK_CLASS;
-    Wizard[7].trquan_min = 1;
-    Wizard[7].trquan_max = 1;
-    Wizard[7].trbless = UNDEF_BLESS;
-    Wizard[8].trotyp = MAGIC_MARKER;
-    Wizard[8].trspe = 19;
-    Wizard[8].trclass = TOOL_CLASS;
-    Wizard[8].trquan_min = 1;
-    Wizard[8].trquan_max = 1;
-    Wizard[8].trbless = 0;
-    Wizard[9].trotyp = 0;
-    Wizard[9].trspe = 0;
-    Wizard[9].trclass = 0;
-    Wizard[9].trquan_min = 0;
-    Wizard[9].trquan_max = 0;
-    Wizard[9].trbless = 0;
+    $c.init(Wizard, [
+        { trotyp: QUARTERSTAFF, trspe: 1, trclass: WEAPON_CLASS, trquan_min: 1, trquan_max: 1, trbless: 1 },
+        { trotyp: CLOAK_OF_MAGIC_RESISTANCE, trspe: 0, trclass: ARMOR_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        { trotyp: UNDEF_TYP, trspe: UNDEF_SPE, trclass: WAND_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        { trotyp: UNDEF_TYP, trspe: UNDEF_SPE, trclass: RING_CLASS, trquan_min: 2, trquan_max: 2, trbless: UNDEF_BLESS },
+        { trotyp: UNDEF_TYP, trspe: UNDEF_SPE, trclass: POTION_CLASS, trquan_min: 3, trquan_max: 3, trbless: UNDEF_BLESS },
+        { trotyp: UNDEF_TYP, trspe: UNDEF_SPE, trclass: SCROLL_CLASS, trquan_min: 3, trquan_max: 3, trbless: UNDEF_BLESS },
+        { trotyp: SPE_FORCE_BOLT, trspe: 0, trclass: SPBOOK_CLASS, trquan_min: 1, trquan_max: 1, trbless: 1 },
+        { trotyp: UNDEF_TYP, trspe: UNDEF_SPE, trclass: SPBOOK_CLASS, trquan_min: 1, trquan_max: 1, trbless: UNDEF_BLESS },
+        { trotyp: MAGIC_MARKER, trspe: 19, trclass: TOOL_CLASS, trquan_min: 1, trquan_max: 1, trbless: 0 },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 2; $i0++) {
         Healing_book[$i0].$copyFrom(new $T.trobj());
     }
-    Healing_book[0].trotyp = SPE_HEALING;
-    Healing_book[0].trspe = UNDEF_SPE;
-    Healing_book[0].trclass = SPBOOK_CLASS;
-    Healing_book[0].trquan_min = 1;
-    Healing_book[0].trquan_max = 1;
-    Healing_book[0].trbless = 1;
-    Healing_book[1].trotyp = 0;
-    Healing_book[1].trspe = 0;
-    Healing_book[1].trclass = 0;
-    Healing_book[1].trquan_min = 0;
-    Healing_book[1].trquan_max = 0;
-    Healing_book[1].trbless = 0;
+    $c.init(Healing_book, [
+        { trotyp: SPE_HEALING, trspe: UNDEF_SPE, trclass: SPBOOK_CLASS, trquan_min: 1, trquan_max: 1, trbless: 1 },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 2; $i0++) {
         Protection_book[$i0].$copyFrom(new $T.trobj());
     }
-    Protection_book[0].trotyp = SPE_PROTECTION;
-    Protection_book[0].trspe = UNDEF_SPE;
-    Protection_book[0].trclass = SPBOOK_CLASS;
-    Protection_book[0].trquan_min = 1;
-    Protection_book[0].trquan_max = 1;
-    Protection_book[0].trbless = 1;
-    Protection_book[1].trotyp = 0;
-    Protection_book[1].trspe = 0;
-    Protection_book[1].trclass = 0;
-    Protection_book[1].trquan_min = 0;
-    Protection_book[1].trquan_max = 0;
-    Protection_book[1].trbless = 0;
+    $c.init(Protection_book, [
+        { trotyp: SPE_PROTECTION, trspe: UNDEF_SPE, trclass: SPBOOK_CLASS, trquan_min: 1, trquan_max: 1, trbless: 1 },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 2; $i0++) {
         Confuse_monster_book[$i0].$copyFrom(new $T.trobj());
     }
-    Confuse_monster_book[0].trotyp = SPE_CONFUSE_MONSTER;
-    Confuse_monster_book[0].trspe = UNDEF_SPE;
-    Confuse_monster_book[0].trclass = SPBOOK_CLASS;
-    Confuse_monster_book[0].trquan_min = 1;
-    Confuse_monster_book[0].trquan_max = 1;
-    Confuse_monster_book[0].trbless = 1;
-    Confuse_monster_book[1].trotyp = 0;
-    Confuse_monster_book[1].trspe = 0;
-    Confuse_monster_book[1].trclass = 0;
-    Confuse_monster_book[1].trquan_min = 0;
-    Confuse_monster_book[1].trquan_max = 0;
-    Confuse_monster_book[1].trbless = 0;
+    $c.init(Confuse_monster_book, [
+        { trotyp: SPE_CONFUSE_MONSTER, trspe: UNDEF_SPE, trclass: SPBOOK_CLASS, trquan_min: 1, trquan_max: 1, trbless: 1 },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 2; $i0++) {
         Tinopener[$i0].$copyFrom(new $T.trobj());
     }
-    Tinopener[0].trotyp = TIN_OPENER;
-    Tinopener[0].trspe = 0;
-    Tinopener[0].trclass = TOOL_CLASS;
-    Tinopener[0].trquan_min = 1;
-    Tinopener[0].trquan_max = 1;
-    Tinopener[0].trbless = 0;
-    Tinopener[1].trotyp = 0;
-    Tinopener[1].trspe = 0;
-    Tinopener[1].trclass = 0;
-    Tinopener[1].trquan_min = 0;
-    Tinopener[1].trquan_max = 0;
-    Tinopener[1].trbless = 0;
+    $c.init(Tinopener, [
+        { trotyp: TIN_OPENER, trspe: 0, trclass: TOOL_CLASS, trquan_min: 1, trquan_max: 1, trbless: 0 },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 2; $i0++) {
         Magicmarker[$i0].$copyFrom(new $T.trobj());
     }
-    Magicmarker[0].trotyp = MAGIC_MARKER;
-    Magicmarker[0].trspe = 19;
-    Magicmarker[0].trclass = TOOL_CLASS;
-    Magicmarker[0].trquan_min = 1;
-    Magicmarker[0].trquan_max = 1;
-    Magicmarker[0].trbless = 0;
-    Magicmarker[1].trotyp = 0;
-    Magicmarker[1].trspe = 0;
-    Magicmarker[1].trclass = 0;
-    Magicmarker[1].trquan_min = 0;
-    Magicmarker[1].trquan_max = 0;
-    Magicmarker[1].trbless = 0;
+    $c.init(Magicmarker, [
+        { trotyp: MAGIC_MARKER, trspe: 19, trclass: TOOL_CLASS, trquan_min: 1, trquan_max: 1, trbless: 0 },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 2; $i0++) {
         Lamp[$i0].$copyFrom(new $T.trobj());
     }
-    Lamp[0].trotyp = OIL_LAMP;
-    Lamp[0].trspe = 1;
-    Lamp[0].trclass = TOOL_CLASS;
-    Lamp[0].trquan_min = 1;
-    Lamp[0].trquan_max = 1;
-    Lamp[0].trbless = 0;
-    Lamp[1].trotyp = 0;
-    Lamp[1].trspe = 0;
-    Lamp[1].trclass = 0;
-    Lamp[1].trquan_min = 0;
-    Lamp[1].trquan_max = 0;
-    Lamp[1].trbless = 0;
+    $c.init(Lamp, [
+        { trotyp: OIL_LAMP, trspe: 1, trclass: TOOL_CLASS, trquan_min: 1, trquan_max: 1, trbless: 0 },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 2; $i0++) {
         Blindfold[$i0].$copyFrom(new $T.trobj());
     }
-    Blindfold[0].trotyp = BLINDFOLD;
-    Blindfold[0].trspe = 0;
-    Blindfold[0].trclass = TOOL_CLASS;
-    Blindfold[0].trquan_min = 1;
-    Blindfold[0].trquan_max = 1;
-    Blindfold[0].trbless = 0;
-    Blindfold[1].trotyp = 0;
-    Blindfold[1].trspe = 0;
-    Blindfold[1].trclass = 0;
-    Blindfold[1].trquan_min = 0;
-    Blindfold[1].trquan_max = 0;
-    Blindfold[1].trbless = 0;
+    $c.init(Blindfold, [
+        { trotyp: BLINDFOLD, trspe: 0, trclass: TOOL_CLASS, trquan_min: 1, trquan_max: 1, trbless: 0 },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 2; $i0++) {
         Xtra_food[$i0].$copyFrom(new $T.trobj());
     }
-    Xtra_food[0].trotyp = UNDEF_TYP;
-    Xtra_food[0].trspe = UNDEF_SPE;
-    Xtra_food[0].trclass = FOOD_CLASS;
-    Xtra_food[0].trquan_min = 2;
-    Xtra_food[0].trquan_max = 2;
-    Xtra_food[0].trbless = 0;
-    Xtra_food[1].trotyp = 0;
-    Xtra_food[1].trspe = 0;
-    Xtra_food[1].trclass = 0;
-    Xtra_food[1].trquan_min = 0;
-    Xtra_food[1].trquan_max = 0;
-    Xtra_food[1].trbless = 0;
+    $c.init(Xtra_food, [
+        { trotyp: UNDEF_TYP, trspe: UNDEF_SPE, trclass: FOOD_CLASS, trquan_min: 2, trquan_max: 2, trbless: 0 },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 2; $i0++) {
         Leash[$i0].$copyFrom(new $T.trobj());
     }
-    Leash[0].trotyp = LEASH;
-    Leash[0].trspe = 0;
-    Leash[0].trclass = TOOL_CLASS;
-    Leash[0].trquan_min = 1;
-    Leash[0].trquan_max = 1;
-    Leash[0].trbless = 0;
-    Leash[1].trotyp = 0;
-    Leash[1].trspe = 0;
-    Leash[1].trclass = 0;
-    Leash[1].trquan_min = 0;
-    Leash[1].trquan_max = 0;
-    Leash[1].trbless = 0;
+    $c.init(Leash, [
+        { trotyp: LEASH, trspe: 0, trclass: TOOL_CLASS, trquan_min: 1, trquan_max: 1, trbless: 0 },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 2; $i0++) {
         Towel[$i0].$copyFrom(new $T.trobj());
     }
-    Towel[0].trotyp = TOWEL;
-    Towel[0].trspe = 0;
-    Towel[0].trclass = TOOL_CLASS;
-    Towel[0].trquan_min = 1;
-    Towel[0].trquan_max = 1;
-    Towel[0].trbless = 0;
-    Towel[1].trotyp = 0;
-    Towel[1].trspe = 0;
-    Towel[1].trclass = 0;
-    Towel[1].trquan_min = 0;
-    Towel[1].trquan_max = 0;
-    Towel[1].trbless = 0;
+    $c.init(Towel, [
+        { trotyp: TOWEL, trspe: 0, trclass: TOOL_CLASS, trquan_min: 1, trquan_max: 1, trbless: 0 },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 2; $i0++) {
         Wishing[$i0].$copyFrom(new $T.trobj());
     }
-    Wishing[0].trotyp = WAN_WISHING;
-    Wishing[0].trspe = 3;
-    Wishing[0].trclass = WAND_CLASS;
-    Wishing[0].trquan_min = 1;
-    Wishing[0].trquan_max = 1;
-    Wishing[0].trbless = 0;
-    Wishing[1].trotyp = 0;
-    Wishing[1].trspe = 0;
-    Wishing[1].trclass = 0;
-    Wishing[1].trquan_min = 0;
-    Wishing[1].trquan_max = 0;
-    Wishing[1].trbless = 0;
+    $c.init(Wishing, [
+        { trotyp: WAN_WISHING, trspe: 3, trclass: WAND_CLASS, trquan_min: 1, trquan_max: 1, trbless: 0 },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 2; $i0++) {
         Money[$i0].$copyFrom(new $T.trobj());
     }
-    Money[0].trotyp = GOLD_PIECE;
-    Money[0].trspe = 0;
-    Money[0].trclass = COIN_CLASS;
-    Money[0].trquan_min = 1;
-    Money[0].trquan_max = 1;
-    Money[0].trbless = 0;
-    Money[1].trotyp = 0;
-    Money[1].trspe = 0;
-    Money[1].trclass = 0;
-    Money[1].trquan_min = 0;
-    Money[1].trquan_max = 0;
-    Money[1].trbless = 0;
+    $c.init(Money, [
+        { trotyp: GOLD_PIECE, trspe: 0, trclass: COIN_CLASS, trquan_min: 1, trquan_max: 1, trbless: 0 },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 26; $i0++) {
         inv_subs[$i0].$copyFrom(new $T.inv_sub());
     }
-    inv_subs[0].race_pm = PM_ELF;
-    inv_subs[0].item_otyp = DAGGER;
-    inv_subs[0].subs_otyp = ELVEN_DAGGER;
-    inv_subs[1].race_pm = PM_ELF;
-    inv_subs[1].item_otyp = SPEAR;
-    inv_subs[1].subs_otyp = ELVEN_SPEAR;
-    inv_subs[2].race_pm = PM_ELF;
-    inv_subs[2].item_otyp = SHORT_SWORD;
-    inv_subs[2].subs_otyp = ELVEN_SHORT_SWORD;
-    inv_subs[3].race_pm = PM_ELF;
-    inv_subs[3].item_otyp = BOW;
-    inv_subs[3].subs_otyp = ELVEN_BOW;
-    inv_subs[4].race_pm = PM_ELF;
-    inv_subs[4].item_otyp = ARROW;
-    inv_subs[4].subs_otyp = ELVEN_ARROW;
-    inv_subs[5].race_pm = PM_ELF;
-    inv_subs[5].item_otyp = HELMET;
-    inv_subs[5].subs_otyp = ELVEN_LEATHER_HELM;
-    inv_subs[6].race_pm = PM_ELF;
-    inv_subs[6].item_otyp = CLOAK_OF_DISPLACEMENT;
-    inv_subs[6].subs_otyp = ELVEN_CLOAK;
-    inv_subs[7].race_pm = PM_ELF;
-    inv_subs[7].item_otyp = CRAM_RATION;
-    inv_subs[7].subs_otyp = LEMBAS_WAFER;
-    inv_subs[8].race_pm = PM_ORC;
-    inv_subs[8].item_otyp = DAGGER;
-    inv_subs[8].subs_otyp = ORCISH_DAGGER;
-    inv_subs[9].race_pm = PM_ORC;
-    inv_subs[9].item_otyp = SPEAR;
-    inv_subs[9].subs_otyp = ORCISH_SPEAR;
-    inv_subs[10].race_pm = PM_ORC;
-    inv_subs[10].item_otyp = SHORT_SWORD;
-    inv_subs[10].subs_otyp = ORCISH_SHORT_SWORD;
-    inv_subs[11].race_pm = PM_ORC;
-    inv_subs[11].item_otyp = BOW;
-    inv_subs[11].subs_otyp = ORCISH_BOW;
-    inv_subs[12].race_pm = PM_ORC;
-    inv_subs[12].item_otyp = ARROW;
-    inv_subs[12].subs_otyp = ORCISH_ARROW;
-    inv_subs[13].race_pm = PM_ORC;
-    inv_subs[13].item_otyp = HELMET;
-    inv_subs[13].subs_otyp = ORCISH_HELM;
-    inv_subs[14].race_pm = PM_ORC;
-    inv_subs[14].item_otyp = SMALL_SHIELD;
-    inv_subs[14].subs_otyp = ORCISH_SHIELD;
-    inv_subs[15].race_pm = PM_ORC;
-    inv_subs[15].item_otyp = RING_MAIL;
-    inv_subs[15].subs_otyp = ORCISH_RING_MAIL;
-    inv_subs[16].race_pm = PM_ORC;
-    inv_subs[16].item_otyp = CHAIN_MAIL;
-    inv_subs[16].subs_otyp = ORCISH_CHAIN_MAIL;
-    inv_subs[17].race_pm = PM_ORC;
-    inv_subs[17].item_otyp = CRAM_RATION;
-    inv_subs[17].subs_otyp = TRIPE_RATION;
-    inv_subs[18].race_pm = PM_ORC;
-    inv_subs[18].item_otyp = LEMBAS_WAFER;
-    inv_subs[18].subs_otyp = TRIPE_RATION;
-    inv_subs[19].race_pm = PM_DWARF;
-    inv_subs[19].item_otyp = SPEAR;
-    inv_subs[19].subs_otyp = DWARVISH_SPEAR;
-    inv_subs[20].race_pm = PM_DWARF;
-    inv_subs[20].item_otyp = SHORT_SWORD;
-    inv_subs[20].subs_otyp = DWARVISH_SHORT_SWORD;
-    inv_subs[21].race_pm = PM_DWARF;
-    inv_subs[21].item_otyp = HELMET;
-    inv_subs[21].subs_otyp = DWARVISH_IRON_HELM;
-    inv_subs[22].race_pm = PM_DWARF;
-    inv_subs[22].item_otyp = LEMBAS_WAFER;
-    inv_subs[22].subs_otyp = CRAM_RATION;
-    inv_subs[23].race_pm = PM_GNOME;
-    inv_subs[23].item_otyp = BOW;
-    inv_subs[23].subs_otyp = CROSSBOW;
-    inv_subs[24].race_pm = PM_GNOME;
-    inv_subs[24].item_otyp = ARROW;
-    inv_subs[24].subs_otyp = CROSSBOW_BOLT;
-    inv_subs[25].race_pm = NON_PM;
-    inv_subs[25].item_otyp = STRANGE_OBJECT;
-    inv_subs[25].subs_otyp = STRANGE_OBJECT;
+    $c.init(inv_subs, [
+        { race_pm: PM_ELF, item_otyp: DAGGER, subs_otyp: ELVEN_DAGGER },
+        { race_pm: PM_ELF, item_otyp: SPEAR, subs_otyp: ELVEN_SPEAR },
+        { race_pm: PM_ELF, item_otyp: SHORT_SWORD, subs_otyp: ELVEN_SHORT_SWORD },
+        { race_pm: PM_ELF, item_otyp: BOW, subs_otyp: ELVEN_BOW },
+        { race_pm: PM_ELF, item_otyp: ARROW, subs_otyp: ELVEN_ARROW },
+        { race_pm: PM_ELF, item_otyp: HELMET, subs_otyp: ELVEN_LEATHER_HELM },
+        { race_pm: PM_ELF, item_otyp: CLOAK_OF_DISPLACEMENT, subs_otyp: ELVEN_CLOAK },
+        { race_pm: PM_ELF, item_otyp: CRAM_RATION, subs_otyp: LEMBAS_WAFER },
+        { race_pm: PM_ORC, item_otyp: DAGGER, subs_otyp: ORCISH_DAGGER },
+        { race_pm: PM_ORC, item_otyp: SPEAR, subs_otyp: ORCISH_SPEAR },
+        { race_pm: PM_ORC, item_otyp: SHORT_SWORD, subs_otyp: ORCISH_SHORT_SWORD },
+        { race_pm: PM_ORC, item_otyp: BOW, subs_otyp: ORCISH_BOW },
+        { race_pm: PM_ORC, item_otyp: ARROW, subs_otyp: ORCISH_ARROW },
+        { race_pm: PM_ORC, item_otyp: HELMET, subs_otyp: ORCISH_HELM },
+        { race_pm: PM_ORC, item_otyp: SMALL_SHIELD, subs_otyp: ORCISH_SHIELD },
+        { race_pm: PM_ORC, item_otyp: RING_MAIL, subs_otyp: ORCISH_RING_MAIL },
+        { race_pm: PM_ORC, item_otyp: CHAIN_MAIL, subs_otyp: ORCISH_CHAIN_MAIL },
+        { race_pm: PM_ORC, item_otyp: CRAM_RATION, subs_otyp: TRIPE_RATION },
+        { race_pm: PM_ORC, item_otyp: LEMBAS_WAFER, subs_otyp: TRIPE_RATION },
+        { race_pm: PM_DWARF, item_otyp: SPEAR, subs_otyp: DWARVISH_SPEAR },
+        { race_pm: PM_DWARF, item_otyp: SHORT_SWORD, subs_otyp: DWARVISH_SHORT_SWORD },
+        { race_pm: PM_DWARF, item_otyp: HELMET, subs_otyp: DWARVISH_IRON_HELM },
+        { race_pm: PM_DWARF, item_otyp: LEMBAS_WAFER, subs_otyp: CRAM_RATION },
+        { race_pm: PM_GNOME, item_otyp: BOW, subs_otyp: CROSSBOW },
+        { race_pm: PM_GNOME, item_otyp: ARROW, subs_otyp: CROSSBOW_BOLT },
+        { race_pm: NON_PM, item_otyp: STRANGE_OBJECT, subs_otyp: STRANGE_OBJECT }
+    ]);
     for (let $i0 = 0; $i0 < 20; $i0++) {
         Skill_A[$i0].$copyFrom(new $T.def_skill());
     }
-    Skill_A[0].skill = P_DAGGER;
-    Skill_A[0].skmax = P_BASIC;
-    Skill_A[1].skill = P_KNIFE;
-    Skill_A[1].skmax = P_BASIC;
-    Skill_A[2].skill = P_PICK_AXE;
-    Skill_A[2].skmax = P_EXPERT;
-    Skill_A[3].skill = P_SHORT_SWORD;
-    Skill_A[3].skmax = P_BASIC;
-    Skill_A[4].skill = P_SABER;
-    Skill_A[4].skmax = P_EXPERT;
-    Skill_A[5].skill = P_CLUB;
-    Skill_A[5].skmax = P_SKILLED;
-    Skill_A[6].skill = P_QUARTERSTAFF;
-    Skill_A[6].skmax = P_SKILLED;
-    Skill_A[7].skill = P_SLING;
-    Skill_A[7].skmax = P_SKILLED;
-    Skill_A[8].skill = P_DART;
-    Skill_A[8].skmax = P_BASIC;
-    Skill_A[9].skill = P_BOOMERANG;
-    Skill_A[9].skmax = P_EXPERT;
-    Skill_A[10].skill = P_WHIP;
-    Skill_A[10].skmax = P_EXPERT;
-    Skill_A[11].skill = P_UNICORN_HORN;
-    Skill_A[11].skmax = P_SKILLED;
-    Skill_A[12].skill = P_ATTACK_SPELL;
-    Skill_A[12].skmax = P_BASIC;
-    Skill_A[13].skill = P_HEALING_SPELL;
-    Skill_A[13].skmax = P_BASIC;
-    Skill_A[14].skill = P_DIVINATION_SPELL;
-    Skill_A[14].skmax = P_EXPERT;
-    Skill_A[15].skill = P_MATTER_SPELL;
-    Skill_A[15].skmax = P_BASIC;
-    Skill_A[16].skill = P_RIDING;
-    Skill_A[16].skmax = P_BASIC;
-    Skill_A[17].skill = P_TWO_WEAPON_COMBAT;
-    Skill_A[17].skmax = P_BASIC;
-    Skill_A[18].skill = P_BARE_HANDED_COMBAT;
-    Skill_A[18].skmax = P_EXPERT;
-    Skill_A[19].skill = P_NONE;
-    Skill_A[19].skmax = 0;
+    $c.init(Skill_A, [
+        { skill: P_DAGGER, skmax: P_BASIC },
+        { skill: P_KNIFE, skmax: P_BASIC },
+        { skill: P_PICK_AXE, skmax: P_EXPERT },
+        { skill: P_SHORT_SWORD, skmax: P_BASIC },
+        { skill: P_SABER, skmax: P_EXPERT },
+        { skill: P_CLUB, skmax: P_SKILLED },
+        { skill: P_QUARTERSTAFF, skmax: P_SKILLED },
+        { skill: P_SLING, skmax: P_SKILLED },
+        { skill: P_DART, skmax: P_BASIC },
+        { skill: P_BOOMERANG, skmax: P_EXPERT },
+        { skill: P_WHIP, skmax: P_EXPERT },
+        { skill: P_UNICORN_HORN, skmax: P_SKILLED },
+        { skill: P_ATTACK_SPELL, skmax: P_BASIC },
+        { skill: P_HEALING_SPELL, skmax: P_BASIC },
+        { skill: P_DIVINATION_SPELL, skmax: P_EXPERT },
+        { skill: P_MATTER_SPELL, skmax: P_BASIC },
+        { skill: P_RIDING, skmax: P_BASIC },
+        { skill: P_TWO_WEAPON_COMBAT, skmax: P_BASIC },
+        { skill: P_BARE_HANDED_COMBAT, skmax: P_EXPERT },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 23; $i0++) {
         Skill_B[$i0].$copyFrom(new $T.def_skill());
     }
-    Skill_B[0].skill = P_DAGGER;
-    Skill_B[0].skmax = P_BASIC;
-    Skill_B[1].skill = P_AXE;
-    Skill_B[1].skmax = P_EXPERT;
-    Skill_B[2].skill = P_PICK_AXE;
-    Skill_B[2].skmax = P_SKILLED;
-    Skill_B[3].skill = P_SHORT_SWORD;
-    Skill_B[3].skmax = P_EXPERT;
-    Skill_B[4].skill = P_BROAD_SWORD;
-    Skill_B[4].skmax = P_SKILLED;
-    Skill_B[5].skill = P_LONG_SWORD;
-    Skill_B[5].skmax = P_SKILLED;
-    Skill_B[6].skill = P_TWO_HANDED_SWORD;
-    Skill_B[6].skmax = P_EXPERT;
-    Skill_B[7].skill = P_SABER;
-    Skill_B[7].skmax = P_SKILLED;
-    Skill_B[8].skill = P_CLUB;
-    Skill_B[8].skmax = P_SKILLED;
-    Skill_B[9].skill = P_MACE;
-    Skill_B[9].skmax = P_SKILLED;
-    Skill_B[10].skill = P_MORNING_STAR;
-    Skill_B[10].skmax = P_SKILLED;
-    Skill_B[11].skill = P_FLAIL;
-    Skill_B[11].skmax = P_BASIC;
-    Skill_B[12].skill = P_HAMMER;
-    Skill_B[12].skmax = P_EXPERT;
-    Skill_B[13].skill = P_QUARTERSTAFF;
-    Skill_B[13].skmax = P_BASIC;
-    Skill_B[14].skill = P_SPEAR;
-    Skill_B[14].skmax = P_SKILLED;
-    Skill_B[15].skill = P_TRIDENT;
-    Skill_B[15].skmax = P_SKILLED;
-    Skill_B[16].skill = P_BOW;
-    Skill_B[16].skmax = P_BASIC;
-    Skill_B[17].skill = P_ATTACK_SPELL;
-    Skill_B[17].skmax = P_BASIC;
-    Skill_B[18].skill = P_ESCAPE_SPELL;
-    Skill_B[18].skmax = P_BASIC;
-    Skill_B[19].skill = P_RIDING;
-    Skill_B[19].skmax = P_BASIC;
-    Skill_B[20].skill = P_TWO_WEAPON_COMBAT;
-    Skill_B[20].skmax = P_BASIC;
-    Skill_B[21].skill = P_BARE_HANDED_COMBAT;
-    Skill_B[21].skmax = P_MASTER;
-    Skill_B[22].skill = P_NONE;
-    Skill_B[22].skmax = 0;
+    $c.init(Skill_B, [
+        { skill: P_DAGGER, skmax: P_BASIC },
+        { skill: P_AXE, skmax: P_EXPERT },
+        { skill: P_PICK_AXE, skmax: P_SKILLED },
+        { skill: P_SHORT_SWORD, skmax: P_EXPERT },
+        { skill: P_BROAD_SWORD, skmax: P_SKILLED },
+        { skill: P_LONG_SWORD, skmax: P_SKILLED },
+        { skill: P_TWO_HANDED_SWORD, skmax: P_EXPERT },
+        { skill: P_SABER, skmax: P_SKILLED },
+        { skill: P_CLUB, skmax: P_SKILLED },
+        { skill: P_MACE, skmax: P_SKILLED },
+        { skill: P_MORNING_STAR, skmax: P_SKILLED },
+        { skill: P_FLAIL, skmax: P_BASIC },
+        { skill: P_HAMMER, skmax: P_EXPERT },
+        { skill: P_QUARTERSTAFF, skmax: P_BASIC },
+        { skill: P_SPEAR, skmax: P_SKILLED },
+        { skill: P_TRIDENT, skmax: P_SKILLED },
+        { skill: P_BOW, skmax: P_BASIC },
+        { skill: P_ATTACK_SPELL, skmax: P_BASIC },
+        { skill: P_ESCAPE_SPELL, skmax: P_BASIC },
+        { skill: P_RIDING, skmax: P_BASIC },
+        { skill: P_TWO_WEAPON_COMBAT, skmax: P_BASIC },
+        { skill: P_BARE_HANDED_COMBAT, skmax: P_MASTER },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 21; $i0++) {
         Skill_C[$i0].$copyFrom(new $T.def_skill());
     }
-    Skill_C[0].skill = P_DAGGER;
-    Skill_C[0].skmax = P_BASIC;
-    Skill_C[1].skill = P_KNIFE;
-    Skill_C[1].skmax = P_SKILLED;
-    Skill_C[2].skill = P_AXE;
-    Skill_C[2].skmax = P_SKILLED;
-    Skill_C[3].skill = P_PICK_AXE;
-    Skill_C[3].skmax = P_BASIC;
-    Skill_C[4].skill = P_CLUB;
-    Skill_C[4].skmax = P_EXPERT;
-    Skill_C[5].skill = P_MACE;
-    Skill_C[5].skmax = P_EXPERT;
-    Skill_C[6].skill = P_MORNING_STAR;
-    Skill_C[6].skmax = P_BASIC;
-    Skill_C[7].skill = P_FLAIL;
-    Skill_C[7].skmax = P_SKILLED;
-    Skill_C[8].skill = P_HAMMER;
-    Skill_C[8].skmax = P_SKILLED;
-    Skill_C[9].skill = P_QUARTERSTAFF;
-    Skill_C[9].skmax = P_EXPERT;
-    Skill_C[10].skill = P_POLEARMS;
-    Skill_C[10].skmax = P_SKILLED;
-    Skill_C[11].skill = P_SPEAR;
-    Skill_C[11].skmax = P_EXPERT;
-    Skill_C[12].skill = P_TRIDENT;
-    Skill_C[12].skmax = P_SKILLED;
-    Skill_C[13].skill = P_BOW;
-    Skill_C[13].skmax = P_SKILLED;
-    Skill_C[14].skill = P_SLING;
-    Skill_C[14].skmax = P_EXPERT;
-    Skill_C[15].skill = P_ATTACK_SPELL;
-    Skill_C[15].skmax = P_BASIC;
-    Skill_C[16].skill = P_MATTER_SPELL;
-    Skill_C[16].skmax = P_SKILLED;
-    Skill_C[17].skill = P_BOOMERANG;
-    Skill_C[17].skmax = P_EXPERT;
-    Skill_C[18].skill = P_UNICORN_HORN;
-    Skill_C[18].skmax = P_BASIC;
-    Skill_C[19].skill = P_BARE_HANDED_COMBAT;
-    Skill_C[19].skmax = P_MASTER;
-    Skill_C[20].skill = P_NONE;
-    Skill_C[20].skmax = 0;
+    $c.init(Skill_C, [
+        { skill: P_DAGGER, skmax: P_BASIC },
+        { skill: P_KNIFE, skmax: P_SKILLED },
+        { skill: P_AXE, skmax: P_SKILLED },
+        { skill: P_PICK_AXE, skmax: P_BASIC },
+        { skill: P_CLUB, skmax: P_EXPERT },
+        { skill: P_MACE, skmax: P_EXPERT },
+        { skill: P_MORNING_STAR, skmax: P_BASIC },
+        { skill: P_FLAIL, skmax: P_SKILLED },
+        { skill: P_HAMMER, skmax: P_SKILLED },
+        { skill: P_QUARTERSTAFF, skmax: P_EXPERT },
+        { skill: P_POLEARMS, skmax: P_SKILLED },
+        { skill: P_SPEAR, skmax: P_EXPERT },
+        { skill: P_TRIDENT, skmax: P_SKILLED },
+        { skill: P_BOW, skmax: P_SKILLED },
+        { skill: P_SLING, skmax: P_EXPERT },
+        { skill: P_ATTACK_SPELL, skmax: P_BASIC },
+        { skill: P_MATTER_SPELL, skmax: P_SKILLED },
+        { skill: P_BOOMERANG, skmax: P_EXPERT },
+        { skill: P_UNICORN_HORN, skmax: P_BASIC },
+        { skill: P_BARE_HANDED_COMBAT, skmax: P_MASTER },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 17; $i0++) {
         Skill_H[$i0].$copyFrom(new $T.def_skill());
     }
-    Skill_H[0].skill = P_DAGGER;
-    Skill_H[0].skmax = P_SKILLED;
-    Skill_H[1].skill = P_KNIFE;
-    Skill_H[1].skmax = P_EXPERT;
-    Skill_H[2].skill = P_SHORT_SWORD;
-    Skill_H[2].skmax = P_SKILLED;
-    Skill_H[3].skill = P_SABER;
-    Skill_H[3].skmax = P_BASIC;
-    Skill_H[4].skill = P_CLUB;
-    Skill_H[4].skmax = P_SKILLED;
-    Skill_H[5].skill = P_MACE;
-    Skill_H[5].skmax = P_BASIC;
-    Skill_H[6].skill = P_QUARTERSTAFF;
-    Skill_H[6].skmax = P_EXPERT;
-    Skill_H[7].skill = P_POLEARMS;
-    Skill_H[7].skmax = P_BASIC;
-    Skill_H[8].skill = P_SPEAR;
-    Skill_H[8].skmax = P_BASIC;
-    Skill_H[9].skill = P_TRIDENT;
-    Skill_H[9].skmax = P_BASIC;
-    Skill_H[10].skill = P_SLING;
-    Skill_H[10].skmax = P_SKILLED;
-    Skill_H[11].skill = P_DART;
-    Skill_H[11].skmax = P_EXPERT;
-    Skill_H[12].skill = P_SHURIKEN;
-    Skill_H[12].skmax = P_SKILLED;
-    Skill_H[13].skill = P_UNICORN_HORN;
-    Skill_H[13].skmax = P_EXPERT;
-    Skill_H[14].skill = P_HEALING_SPELL;
-    Skill_H[14].skmax = P_EXPERT;
-    Skill_H[15].skill = P_BARE_HANDED_COMBAT;
-    Skill_H[15].skmax = P_BASIC;
-    Skill_H[16].skill = P_NONE;
-    Skill_H[16].skmax = 0;
+    $c.init(Skill_H, [
+        { skill: P_DAGGER, skmax: P_SKILLED },
+        { skill: P_KNIFE, skmax: P_EXPERT },
+        { skill: P_SHORT_SWORD, skmax: P_SKILLED },
+        { skill: P_SABER, skmax: P_BASIC },
+        { skill: P_CLUB, skmax: P_SKILLED },
+        { skill: P_MACE, skmax: P_BASIC },
+        { skill: P_QUARTERSTAFF, skmax: P_EXPERT },
+        { skill: P_POLEARMS, skmax: P_BASIC },
+        { skill: P_SPEAR, skmax: P_BASIC },
+        { skill: P_TRIDENT, skmax: P_BASIC },
+        { skill: P_SLING, skmax: P_SKILLED },
+        { skill: P_DART, skmax: P_EXPERT },
+        { skill: P_SHURIKEN, skmax: P_SKILLED },
+        { skill: P_UNICORN_HORN, skmax: P_EXPERT },
+        { skill: P_HEALING_SPELL, skmax: P_EXPERT },
+        { skill: P_BARE_HANDED_COMBAT, skmax: P_BASIC },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 27; $i0++) {
         Skill_K[$i0].$copyFrom(new $T.def_skill());
     }
-    Skill_K[0].skill = P_DAGGER;
-    Skill_K[0].skmax = P_BASIC;
-    Skill_K[1].skill = P_KNIFE;
-    Skill_K[1].skmax = P_BASIC;
-    Skill_K[2].skill = P_AXE;
-    Skill_K[2].skmax = P_SKILLED;
-    Skill_K[3].skill = P_PICK_AXE;
-    Skill_K[3].skmax = P_BASIC;
-    Skill_K[4].skill = P_SHORT_SWORD;
-    Skill_K[4].skmax = P_SKILLED;
-    Skill_K[5].skill = P_BROAD_SWORD;
-    Skill_K[5].skmax = P_SKILLED;
-    Skill_K[6].skill = P_LONG_SWORD;
-    Skill_K[6].skmax = P_EXPERT;
-    Skill_K[7].skill = P_TWO_HANDED_SWORD;
-    Skill_K[7].skmax = P_SKILLED;
-    Skill_K[8].skill = P_SABER;
-    Skill_K[8].skmax = P_SKILLED;
-    Skill_K[9].skill = P_CLUB;
-    Skill_K[9].skmax = P_BASIC;
-    Skill_K[10].skill = P_MACE;
-    Skill_K[10].skmax = P_SKILLED;
-    Skill_K[11].skill = P_MORNING_STAR;
-    Skill_K[11].skmax = P_SKILLED;
-    Skill_K[12].skill = P_FLAIL;
-    Skill_K[12].skmax = P_BASIC;
-    Skill_K[13].skill = P_HAMMER;
-    Skill_K[13].skmax = P_BASIC;
-    Skill_K[14].skill = P_POLEARMS;
-    Skill_K[14].skmax = P_SKILLED;
-    Skill_K[15].skill = P_SPEAR;
-    Skill_K[15].skmax = P_SKILLED;
-    Skill_K[16].skill = P_TRIDENT;
-    Skill_K[16].skmax = P_BASIC;
-    Skill_K[17].skill = P_LANCE;
-    Skill_K[17].skmax = P_EXPERT;
-    Skill_K[18].skill = P_BOW;
-    Skill_K[18].skmax = P_BASIC;
-    Skill_K[19].skill = P_CROSSBOW;
-    Skill_K[19].skmax = P_SKILLED;
-    Skill_K[20].skill = P_ATTACK_SPELL;
-    Skill_K[20].skmax = P_SKILLED;
-    Skill_K[21].skill = P_HEALING_SPELL;
-    Skill_K[21].skmax = P_SKILLED;
-    Skill_K[22].skill = P_CLERIC_SPELL;
-    Skill_K[22].skmax = P_SKILLED;
-    Skill_K[23].skill = P_RIDING;
-    Skill_K[23].skmax = P_EXPERT;
-    Skill_K[24].skill = P_TWO_WEAPON_COMBAT;
-    Skill_K[24].skmax = P_SKILLED;
-    Skill_K[25].skill = P_BARE_HANDED_COMBAT;
-    Skill_K[25].skmax = P_EXPERT;
-    Skill_K[26].skill = P_NONE;
-    Skill_K[26].skmax = 0;
+    $c.init(Skill_K, [
+        { skill: P_DAGGER, skmax: P_BASIC },
+        { skill: P_KNIFE, skmax: P_BASIC },
+        { skill: P_AXE, skmax: P_SKILLED },
+        { skill: P_PICK_AXE, skmax: P_BASIC },
+        { skill: P_SHORT_SWORD, skmax: P_SKILLED },
+        { skill: P_BROAD_SWORD, skmax: P_SKILLED },
+        { skill: P_LONG_SWORD, skmax: P_EXPERT },
+        { skill: P_TWO_HANDED_SWORD, skmax: P_SKILLED },
+        { skill: P_SABER, skmax: P_SKILLED },
+        { skill: P_CLUB, skmax: P_BASIC },
+        { skill: P_MACE, skmax: P_SKILLED },
+        { skill: P_MORNING_STAR, skmax: P_SKILLED },
+        { skill: P_FLAIL, skmax: P_BASIC },
+        { skill: P_HAMMER, skmax: P_BASIC },
+        { skill: P_POLEARMS, skmax: P_SKILLED },
+        { skill: P_SPEAR, skmax: P_SKILLED },
+        { skill: P_TRIDENT, skmax: P_BASIC },
+        { skill: P_LANCE, skmax: P_EXPERT },
+        { skill: P_BOW, skmax: P_BASIC },
+        { skill: P_CROSSBOW, skmax: P_SKILLED },
+        { skill: P_ATTACK_SPELL, skmax: P_SKILLED },
+        { skill: P_HEALING_SPELL, skmax: P_SKILLED },
+        { skill: P_CLERIC_SPELL, skmax: P_SKILLED },
+        { skill: P_RIDING, skmax: P_EXPERT },
+        { skill: P_TWO_WEAPON_COMBAT, skmax: P_SKILLED },
+        { skill: P_BARE_HANDED_COMBAT, skmax: P_EXPERT },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 13; $i0++) {
         Skill_Mon[$i0].$copyFrom(new $T.def_skill());
     }
-    Skill_Mon[0].skill = P_QUARTERSTAFF;
-    Skill_Mon[0].skmax = P_BASIC;
-    Skill_Mon[1].skill = P_SPEAR;
-    Skill_Mon[1].skmax = P_BASIC;
-    Skill_Mon[2].skill = P_CROSSBOW;
-    Skill_Mon[2].skmax = P_BASIC;
-    Skill_Mon[3].skill = P_SHURIKEN;
-    Skill_Mon[3].skmax = P_BASIC;
-    Skill_Mon[4].skill = P_ATTACK_SPELL;
-    Skill_Mon[4].skmax = P_BASIC;
-    Skill_Mon[5].skill = P_HEALING_SPELL;
-    Skill_Mon[5].skmax = P_EXPERT;
-    Skill_Mon[6].skill = P_DIVINATION_SPELL;
-    Skill_Mon[6].skmax = P_BASIC;
-    Skill_Mon[7].skill = P_ENCHANTMENT_SPELL;
-    Skill_Mon[7].skmax = P_BASIC;
-    Skill_Mon[8].skill = P_CLERIC_SPELL;
-    Skill_Mon[8].skmax = P_SKILLED;
-    Skill_Mon[9].skill = P_ESCAPE_SPELL;
-    Skill_Mon[9].skmax = P_SKILLED;
-    Skill_Mon[10].skill = P_MATTER_SPELL;
-    Skill_Mon[10].skmax = P_BASIC;
-    Skill_Mon[11].skill = P_MARTIAL_ARTS;
-    Skill_Mon[11].skmax = P_GRAND_MASTER;
-    Skill_Mon[12].skill = P_NONE;
-    Skill_Mon[12].skmax = 0;
+    $c.init(Skill_Mon, [
+        { skill: P_QUARTERSTAFF, skmax: P_BASIC },
+        { skill: P_SPEAR, skmax: P_BASIC },
+        { skill: P_CROSSBOW, skmax: P_BASIC },
+        { skill: P_SHURIKEN, skmax: P_BASIC },
+        { skill: P_ATTACK_SPELL, skmax: P_BASIC },
+        { skill: P_HEALING_SPELL, skmax: P_EXPERT },
+        { skill: P_DIVINATION_SPELL, skmax: P_BASIC },
+        { skill: P_ENCHANTMENT_SPELL, skmax: P_BASIC },
+        { skill: P_CLERIC_SPELL, skmax: P_SKILLED },
+        { skill: P_ESCAPE_SPELL, skmax: P_SKILLED },
+        { skill: P_MATTER_SPELL, skmax: P_BASIC },
+        { skill: P_MARTIAL_ARTS, skmax: P_GRAND_MASTER },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 22; $i0++) {
         Skill_P[$i0].$copyFrom(new $T.def_skill());
     }
-    Skill_P[0].skill = P_CLUB;
-    Skill_P[0].skmax = P_EXPERT;
-    Skill_P[1].skill = P_MACE;
-    Skill_P[1].skmax = P_EXPERT;
-    Skill_P[2].skill = P_MORNING_STAR;
-    Skill_P[2].skmax = P_EXPERT;
-    Skill_P[3].skill = P_FLAIL;
-    Skill_P[3].skmax = P_EXPERT;
-    Skill_P[4].skill = P_HAMMER;
-    Skill_P[4].skmax = P_EXPERT;
-    Skill_P[5].skill = P_QUARTERSTAFF;
-    Skill_P[5].skmax = P_EXPERT;
-    Skill_P[6].skill = P_POLEARMS;
-    Skill_P[6].skmax = P_SKILLED;
-    Skill_P[7].skill = P_SPEAR;
-    Skill_P[7].skmax = P_SKILLED;
-    Skill_P[8].skill = P_TRIDENT;
-    Skill_P[8].skmax = P_SKILLED;
-    Skill_P[9].skill = P_LANCE;
-    Skill_P[9].skmax = P_BASIC;
-    Skill_P[10].skill = P_BOW;
-    Skill_P[10].skmax = P_BASIC;
-    Skill_P[11].skill = P_SLING;
-    Skill_P[11].skmax = P_BASIC;
-    Skill_P[12].skill = P_CROSSBOW;
-    Skill_P[12].skmax = P_BASIC;
-    Skill_P[13].skill = P_DART;
-    Skill_P[13].skmax = P_BASIC;
-    Skill_P[14].skill = P_SHURIKEN;
-    Skill_P[14].skmax = P_BASIC;
-    Skill_P[15].skill = P_BOOMERANG;
-    Skill_P[15].skmax = P_BASIC;
-    Skill_P[16].skill = P_UNICORN_HORN;
-    Skill_P[16].skmax = P_SKILLED;
-    Skill_P[17].skill = P_HEALING_SPELL;
-    Skill_P[17].skmax = P_EXPERT;
-    Skill_P[18].skill = P_DIVINATION_SPELL;
-    Skill_P[18].skmax = P_EXPERT;
-    Skill_P[19].skill = P_CLERIC_SPELL;
-    Skill_P[19].skmax = P_EXPERT;
-    Skill_P[20].skill = P_BARE_HANDED_COMBAT;
-    Skill_P[20].skmax = P_BASIC;
-    Skill_P[21].skill = P_NONE;
-    Skill_P[21].skmax = 0;
+    $c.init(Skill_P, [
+        { skill: P_CLUB, skmax: P_EXPERT },
+        { skill: P_MACE, skmax: P_EXPERT },
+        { skill: P_MORNING_STAR, skmax: P_EXPERT },
+        { skill: P_FLAIL, skmax: P_EXPERT },
+        { skill: P_HAMMER, skmax: P_EXPERT },
+        { skill: P_QUARTERSTAFF, skmax: P_EXPERT },
+        { skill: P_POLEARMS, skmax: P_SKILLED },
+        { skill: P_SPEAR, skmax: P_SKILLED },
+        { skill: P_TRIDENT, skmax: P_SKILLED },
+        { skill: P_LANCE, skmax: P_BASIC },
+        { skill: P_BOW, skmax: P_BASIC },
+        { skill: P_SLING, skmax: P_BASIC },
+        { skill: P_CROSSBOW, skmax: P_BASIC },
+        { skill: P_DART, skmax: P_BASIC },
+        { skill: P_SHURIKEN, skmax: P_BASIC },
+        { skill: P_BOOMERANG, skmax: P_BASIC },
+        { skill: P_UNICORN_HORN, skmax: P_SKILLED },
+        { skill: P_HEALING_SPELL, skmax: P_EXPERT },
+        { skill: P_DIVINATION_SPELL, skmax: P_EXPERT },
+        { skill: P_CLERIC_SPELL, skmax: P_EXPERT },
+        { skill: P_BARE_HANDED_COMBAT, skmax: P_BASIC },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 24; $i0++) {
         Skill_R[$i0].$copyFrom(new $T.def_skill());
     }
-    Skill_R[0].skill = P_DAGGER;
-    Skill_R[0].skmax = P_EXPERT;
-    Skill_R[1].skill = P_KNIFE;
-    Skill_R[1].skmax = P_EXPERT;
-    Skill_R[2].skill = P_SHORT_SWORD;
-    Skill_R[2].skmax = P_EXPERT;
-    Skill_R[3].skill = P_BROAD_SWORD;
-    Skill_R[3].skmax = P_SKILLED;
-    Skill_R[4].skill = P_LONG_SWORD;
-    Skill_R[4].skmax = P_SKILLED;
-    Skill_R[5].skill = P_TWO_HANDED_SWORD;
-    Skill_R[5].skmax = P_BASIC;
-    Skill_R[6].skill = P_SABER;
-    Skill_R[6].skmax = P_SKILLED;
-    Skill_R[7].skill = P_CLUB;
-    Skill_R[7].skmax = P_SKILLED;
-    Skill_R[8].skill = P_MACE;
-    Skill_R[8].skmax = P_SKILLED;
-    Skill_R[9].skill = P_MORNING_STAR;
-    Skill_R[9].skmax = P_BASIC;
-    Skill_R[10].skill = P_FLAIL;
-    Skill_R[10].skmax = P_BASIC;
-    Skill_R[11].skill = P_HAMMER;
-    Skill_R[11].skmax = P_BASIC;
-    Skill_R[12].skill = P_POLEARMS;
-    Skill_R[12].skmax = P_BASIC;
-    Skill_R[13].skill = P_SPEAR;
-    Skill_R[13].skmax = P_BASIC;
-    Skill_R[14].skill = P_CROSSBOW;
-    Skill_R[14].skmax = P_EXPERT;
-    Skill_R[15].skill = P_DART;
-    Skill_R[15].skmax = P_EXPERT;
-    Skill_R[16].skill = P_SHURIKEN;
-    Skill_R[16].skmax = P_SKILLED;
-    Skill_R[17].skill = P_DIVINATION_SPELL;
-    Skill_R[17].skmax = P_SKILLED;
-    Skill_R[18].skill = P_ESCAPE_SPELL;
-    Skill_R[18].skmax = P_SKILLED;
-    Skill_R[19].skill = P_MATTER_SPELL;
-    Skill_R[19].skmax = P_SKILLED;
-    Skill_R[20].skill = P_RIDING;
-    Skill_R[20].skmax = P_BASIC;
-    Skill_R[21].skill = P_TWO_WEAPON_COMBAT;
-    Skill_R[21].skmax = P_EXPERT;
-    Skill_R[22].skill = P_BARE_HANDED_COMBAT;
-    Skill_R[22].skmax = P_EXPERT;
-    Skill_R[23].skill = P_NONE;
-    Skill_R[23].skmax = 0;
+    $c.init(Skill_R, [
+        { skill: P_DAGGER, skmax: P_EXPERT },
+        { skill: P_KNIFE, skmax: P_EXPERT },
+        { skill: P_SHORT_SWORD, skmax: P_EXPERT },
+        { skill: P_BROAD_SWORD, skmax: P_SKILLED },
+        { skill: P_LONG_SWORD, skmax: P_SKILLED },
+        { skill: P_TWO_HANDED_SWORD, skmax: P_BASIC },
+        { skill: P_SABER, skmax: P_SKILLED },
+        { skill: P_CLUB, skmax: P_SKILLED },
+        { skill: P_MACE, skmax: P_SKILLED },
+        { skill: P_MORNING_STAR, skmax: P_BASIC },
+        { skill: P_FLAIL, skmax: P_BASIC },
+        { skill: P_HAMMER, skmax: P_BASIC },
+        { skill: P_POLEARMS, skmax: P_BASIC },
+        { skill: P_SPEAR, skmax: P_BASIC },
+        { skill: P_CROSSBOW, skmax: P_EXPERT },
+        { skill: P_DART, skmax: P_EXPERT },
+        { skill: P_SHURIKEN, skmax: P_SKILLED },
+        { skill: P_DIVINATION_SPELL, skmax: P_SKILLED },
+        { skill: P_ESCAPE_SPELL, skmax: P_SKILLED },
+        { skill: P_MATTER_SPELL, skmax: P_SKILLED },
+        { skill: P_RIDING, skmax: P_BASIC },
+        { skill: P_TWO_WEAPON_COMBAT, skmax: P_EXPERT },
+        { skill: P_BARE_HANDED_COMBAT, skmax: P_EXPERT },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 25; $i0++) {
         Skill_Ran[$i0].$copyFrom(new $T.def_skill());
     }
-    Skill_Ran[0].skill = P_DAGGER;
-    Skill_Ran[0].skmax = P_EXPERT;
-    Skill_Ran[1].skill = P_KNIFE;
-    Skill_Ran[1].skmax = P_SKILLED;
-    Skill_Ran[2].skill = P_AXE;
-    Skill_Ran[2].skmax = P_SKILLED;
-    Skill_Ran[3].skill = P_PICK_AXE;
-    Skill_Ran[3].skmax = P_BASIC;
-    Skill_Ran[4].skill = P_SHORT_SWORD;
-    Skill_Ran[4].skmax = P_BASIC;
-    Skill_Ran[5].skill = P_MORNING_STAR;
-    Skill_Ran[5].skmax = P_BASIC;
-    Skill_Ran[6].skill = P_FLAIL;
-    Skill_Ran[6].skmax = P_SKILLED;
-    Skill_Ran[7].skill = P_HAMMER;
-    Skill_Ran[7].skmax = P_BASIC;
-    Skill_Ran[8].skill = P_QUARTERSTAFF;
-    Skill_Ran[8].skmax = P_BASIC;
-    Skill_Ran[9].skill = P_POLEARMS;
-    Skill_Ran[9].skmax = P_SKILLED;
-    Skill_Ran[10].skill = P_SPEAR;
-    Skill_Ran[10].skmax = P_EXPERT;
-    Skill_Ran[11].skill = P_TRIDENT;
-    Skill_Ran[11].skmax = P_BASIC;
-    Skill_Ran[12].skill = P_BOW;
-    Skill_Ran[12].skmax = P_EXPERT;
-    Skill_Ran[13].skill = P_SLING;
-    Skill_Ran[13].skmax = P_EXPERT;
-    Skill_Ran[14].skill = P_CROSSBOW;
-    Skill_Ran[14].skmax = P_EXPERT;
-    Skill_Ran[15].skill = P_DART;
-    Skill_Ran[15].skmax = P_EXPERT;
-    Skill_Ran[16].skill = P_SHURIKEN;
-    Skill_Ran[16].skmax = P_SKILLED;
-    Skill_Ran[17].skill = P_BOOMERANG;
-    Skill_Ran[17].skmax = P_EXPERT;
-    Skill_Ran[18].skill = P_WHIP;
-    Skill_Ran[18].skmax = P_BASIC;
-    Skill_Ran[19].skill = P_HEALING_SPELL;
-    Skill_Ran[19].skmax = P_BASIC;
-    Skill_Ran[20].skill = P_DIVINATION_SPELL;
-    Skill_Ran[20].skmax = P_EXPERT;
-    Skill_Ran[21].skill = P_ESCAPE_SPELL;
-    Skill_Ran[21].skmax = P_BASIC;
-    Skill_Ran[22].skill = P_RIDING;
-    Skill_Ran[22].skmax = P_BASIC;
-    Skill_Ran[23].skill = P_BARE_HANDED_COMBAT;
-    Skill_Ran[23].skmax = P_BASIC;
-    Skill_Ran[24].skill = P_NONE;
-    Skill_Ran[24].skmax = 0;
+    $c.init(Skill_Ran, [
+        { skill: P_DAGGER, skmax: P_EXPERT },
+        { skill: P_KNIFE, skmax: P_SKILLED },
+        { skill: P_AXE, skmax: P_SKILLED },
+        { skill: P_PICK_AXE, skmax: P_BASIC },
+        { skill: P_SHORT_SWORD, skmax: P_BASIC },
+        { skill: P_MORNING_STAR, skmax: P_BASIC },
+        { skill: P_FLAIL, skmax: P_SKILLED },
+        { skill: P_HAMMER, skmax: P_BASIC },
+        { skill: P_QUARTERSTAFF, skmax: P_BASIC },
+        { skill: P_POLEARMS, skmax: P_SKILLED },
+        { skill: P_SPEAR, skmax: P_EXPERT },
+        { skill: P_TRIDENT, skmax: P_BASIC },
+        { skill: P_BOW, skmax: P_EXPERT },
+        { skill: P_SLING, skmax: P_EXPERT },
+        { skill: P_CROSSBOW, skmax: P_EXPERT },
+        { skill: P_DART, skmax: P_EXPERT },
+        { skill: P_SHURIKEN, skmax: P_SKILLED },
+        { skill: P_BOOMERANG, skmax: P_EXPERT },
+        { skill: P_WHIP, skmax: P_BASIC },
+        { skill: P_HEALING_SPELL, skmax: P_BASIC },
+        { skill: P_DIVINATION_SPELL, skmax: P_EXPERT },
+        { skill: P_ESCAPE_SPELL, skmax: P_BASIC },
+        { skill: P_RIDING, skmax: P_BASIC },
+        { skill: P_BARE_HANDED_COMBAT, skmax: P_BASIC },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 21; $i0++) {
         Skill_S[$i0].$copyFrom(new $T.def_skill());
     }
-    Skill_S[0].skill = P_DAGGER;
-    Skill_S[0].skmax = P_BASIC;
-    Skill_S[1].skill = P_KNIFE;
-    Skill_S[1].skmax = P_SKILLED;
-    Skill_S[2].skill = P_SHORT_SWORD;
-    Skill_S[2].skmax = P_EXPERT;
-    Skill_S[3].skill = P_BROAD_SWORD;
-    Skill_S[3].skmax = P_SKILLED;
-    Skill_S[4].skill = P_LONG_SWORD;
-    Skill_S[4].skmax = P_EXPERT;
-    Skill_S[5].skill = P_TWO_HANDED_SWORD;
-    Skill_S[5].skmax = P_EXPERT;
-    Skill_S[6].skill = P_SABER;
-    Skill_S[6].skmax = P_BASIC;
-    Skill_S[7].skill = P_FLAIL;
-    Skill_S[7].skmax = P_SKILLED;
-    Skill_S[8].skill = P_QUARTERSTAFF;
-    Skill_S[8].skmax = P_BASIC;
-    Skill_S[9].skill = P_POLEARMS;
-    Skill_S[9].skmax = P_SKILLED;
-    Skill_S[10].skill = P_SPEAR;
-    Skill_S[10].skmax = P_SKILLED;
-    Skill_S[11].skill = P_LANCE;
-    Skill_S[11].skmax = P_SKILLED;
-    Skill_S[12].skill = P_BOW;
-    Skill_S[12].skmax = P_EXPERT;
-    Skill_S[13].skill = P_SHURIKEN;
-    Skill_S[13].skmax = P_EXPERT;
-    Skill_S[14].skill = P_ATTACK_SPELL;
-    Skill_S[14].skmax = P_BASIC;
-    Skill_S[15].skill = P_DIVINATION_SPELL;
-    Skill_S[15].skmax = P_BASIC;
-    Skill_S[16].skill = P_CLERIC_SPELL;
-    Skill_S[16].skmax = P_SKILLED;
-    Skill_S[17].skill = P_RIDING;
-    Skill_S[17].skmax = P_SKILLED;
-    Skill_S[18].skill = P_TWO_WEAPON_COMBAT;
-    Skill_S[18].skmax = P_EXPERT;
-    Skill_S[19].skill = P_MARTIAL_ARTS;
-    Skill_S[19].skmax = P_MASTER;
-    Skill_S[20].skill = P_NONE;
-    Skill_S[20].skmax = 0;
+    $c.init(Skill_S, [
+        { skill: P_DAGGER, skmax: P_BASIC },
+        { skill: P_KNIFE, skmax: P_SKILLED },
+        { skill: P_SHORT_SWORD, skmax: P_EXPERT },
+        { skill: P_BROAD_SWORD, skmax: P_SKILLED },
+        { skill: P_LONG_SWORD, skmax: P_EXPERT },
+        { skill: P_TWO_HANDED_SWORD, skmax: P_EXPERT },
+        { skill: P_SABER, skmax: P_BASIC },
+        { skill: P_FLAIL, skmax: P_SKILLED },
+        { skill: P_QUARTERSTAFF, skmax: P_BASIC },
+        { skill: P_POLEARMS, skmax: P_SKILLED },
+        { skill: P_SPEAR, skmax: P_SKILLED },
+        { skill: P_LANCE, skmax: P_SKILLED },
+        { skill: P_BOW, skmax: P_EXPERT },
+        { skill: P_SHURIKEN, skmax: P_EXPERT },
+        { skill: P_ATTACK_SPELL, skmax: P_BASIC },
+        { skill: P_DIVINATION_SPELL, skmax: P_BASIC },
+        { skill: P_CLERIC_SPELL, skmax: P_SKILLED },
+        { skill: P_RIDING, skmax: P_SKILLED },
+        { skill: P_TWO_WEAPON_COMBAT, skmax: P_EXPERT },
+        { skill: P_MARTIAL_ARTS, skmax: P_MASTER },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 33; $i0++) {
         Skill_T[$i0].$copyFrom(new $T.def_skill());
     }
-    Skill_T[0].skill = P_DAGGER;
-    Skill_T[0].skmax = P_EXPERT;
-    Skill_T[1].skill = P_KNIFE;
-    Skill_T[1].skmax = P_SKILLED;
-    Skill_T[2].skill = P_AXE;
-    Skill_T[2].skmax = P_BASIC;
-    Skill_T[3].skill = P_PICK_AXE;
-    Skill_T[3].skmax = P_BASIC;
-    Skill_T[4].skill = P_SHORT_SWORD;
-    Skill_T[4].skmax = P_EXPERT;
-    Skill_T[5].skill = P_BROAD_SWORD;
-    Skill_T[5].skmax = P_BASIC;
-    Skill_T[6].skill = P_LONG_SWORD;
-    Skill_T[6].skmax = P_BASIC;
-    Skill_T[7].skill = P_TWO_HANDED_SWORD;
-    Skill_T[7].skmax = P_BASIC;
-    Skill_T[8].skill = P_SABER;
-    Skill_T[8].skmax = P_SKILLED;
-    Skill_T[9].skill = P_MACE;
-    Skill_T[9].skmax = P_BASIC;
-    Skill_T[10].skill = P_MORNING_STAR;
-    Skill_T[10].skmax = P_BASIC;
-    Skill_T[11].skill = P_FLAIL;
-    Skill_T[11].skmax = P_BASIC;
-    Skill_T[12].skill = P_HAMMER;
-    Skill_T[12].skmax = P_BASIC;
-    Skill_T[13].skill = P_QUARTERSTAFF;
-    Skill_T[13].skmax = P_BASIC;
-    Skill_T[14].skill = P_POLEARMS;
-    Skill_T[14].skmax = P_BASIC;
-    Skill_T[15].skill = P_SPEAR;
-    Skill_T[15].skmax = P_BASIC;
-    Skill_T[16].skill = P_TRIDENT;
-    Skill_T[16].skmax = P_BASIC;
-    Skill_T[17].skill = P_LANCE;
-    Skill_T[17].skmax = P_BASIC;
-    Skill_T[18].skill = P_BOW;
-    Skill_T[18].skmax = P_BASIC;
-    Skill_T[19].skill = P_SLING;
-    Skill_T[19].skmax = P_BASIC;
-    Skill_T[20].skill = P_CROSSBOW;
-    Skill_T[20].skmax = P_BASIC;
-    Skill_T[21].skill = P_DART;
-    Skill_T[21].skmax = P_EXPERT;
-    Skill_T[22].skill = P_SHURIKEN;
-    Skill_T[22].skmax = P_BASIC;
-    Skill_T[23].skill = P_BOOMERANG;
-    Skill_T[23].skmax = P_BASIC;
-    Skill_T[24].skill = P_WHIP;
-    Skill_T[24].skmax = P_BASIC;
-    Skill_T[25].skill = P_UNICORN_HORN;
-    Skill_T[25].skmax = P_SKILLED;
-    Skill_T[26].skill = P_DIVINATION_SPELL;
-    Skill_T[26].skmax = P_BASIC;
-    Skill_T[27].skill = P_ENCHANTMENT_SPELL;
-    Skill_T[27].skmax = P_BASIC;
-    Skill_T[28].skill = P_ESCAPE_SPELL;
-    Skill_T[28].skmax = P_SKILLED;
-    Skill_T[29].skill = P_RIDING;
-    Skill_T[29].skmax = P_BASIC;
-    Skill_T[30].skill = P_TWO_WEAPON_COMBAT;
-    Skill_T[30].skmax = P_SKILLED;
-    Skill_T[31].skill = P_BARE_HANDED_COMBAT;
-    Skill_T[31].skmax = P_SKILLED;
-    Skill_T[32].skill = P_NONE;
-    Skill_T[32].skmax = 0;
+    $c.init(Skill_T, [
+        { skill: P_DAGGER, skmax: P_EXPERT },
+        { skill: P_KNIFE, skmax: P_SKILLED },
+        { skill: P_AXE, skmax: P_BASIC },
+        { skill: P_PICK_AXE, skmax: P_BASIC },
+        { skill: P_SHORT_SWORD, skmax: P_EXPERT },
+        { skill: P_BROAD_SWORD, skmax: P_BASIC },
+        { skill: P_LONG_SWORD, skmax: P_BASIC },
+        { skill: P_TWO_HANDED_SWORD, skmax: P_BASIC },
+        { skill: P_SABER, skmax: P_SKILLED },
+        { skill: P_MACE, skmax: P_BASIC },
+        { skill: P_MORNING_STAR, skmax: P_BASIC },
+        { skill: P_FLAIL, skmax: P_BASIC },
+        { skill: P_HAMMER, skmax: P_BASIC },
+        { skill: P_QUARTERSTAFF, skmax: P_BASIC },
+        { skill: P_POLEARMS, skmax: P_BASIC },
+        { skill: P_SPEAR, skmax: P_BASIC },
+        { skill: P_TRIDENT, skmax: P_BASIC },
+        { skill: P_LANCE, skmax: P_BASIC },
+        { skill: P_BOW, skmax: P_BASIC },
+        { skill: P_SLING, skmax: P_BASIC },
+        { skill: P_CROSSBOW, skmax: P_BASIC },
+        { skill: P_DART, skmax: P_EXPERT },
+        { skill: P_SHURIKEN, skmax: P_BASIC },
+        { skill: P_BOOMERANG, skmax: P_BASIC },
+        { skill: P_WHIP, skmax: P_BASIC },
+        { skill: P_UNICORN_HORN, skmax: P_SKILLED },
+        { skill: P_DIVINATION_SPELL, skmax: P_BASIC },
+        { skill: P_ENCHANTMENT_SPELL, skmax: P_BASIC },
+        { skill: P_ESCAPE_SPELL, skmax: P_SKILLED },
+        { skill: P_RIDING, skmax: P_BASIC },
+        { skill: P_TWO_WEAPON_COMBAT, skmax: P_SKILLED },
+        { skill: P_BARE_HANDED_COMBAT, skmax: P_SKILLED },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 21; $i0++) {
         Skill_V[$i0].$copyFrom(new $T.def_skill());
     }
-    Skill_V[0].skill = P_DAGGER;
-    Skill_V[0].skmax = P_EXPERT;
-    Skill_V[1].skill = P_AXE;
-    Skill_V[1].skmax = P_EXPERT;
-    Skill_V[2].skill = P_PICK_AXE;
-    Skill_V[2].skmax = P_SKILLED;
-    Skill_V[3].skill = P_SHORT_SWORD;
-    Skill_V[3].skmax = P_SKILLED;
-    Skill_V[4].skill = P_BROAD_SWORD;
-    Skill_V[4].skmax = P_SKILLED;
-    Skill_V[5].skill = P_LONG_SWORD;
-    Skill_V[5].skmax = P_EXPERT;
-    Skill_V[6].skill = P_TWO_HANDED_SWORD;
-    Skill_V[6].skmax = P_EXPERT;
-    Skill_V[7].skill = P_SABER;
-    Skill_V[7].skmax = P_BASIC;
-    Skill_V[8].skill = P_HAMMER;
-    Skill_V[8].skmax = P_EXPERT;
-    Skill_V[9].skill = P_QUARTERSTAFF;
-    Skill_V[9].skmax = P_BASIC;
-    Skill_V[10].skill = P_POLEARMS;
-    Skill_V[10].skmax = P_SKILLED;
-    Skill_V[11].skill = P_SPEAR;
-    Skill_V[11].skmax = P_EXPERT;
-    Skill_V[12].skill = P_TRIDENT;
-    Skill_V[12].skmax = P_BASIC;
-    Skill_V[13].skill = P_LANCE;
-    Skill_V[13].skmax = P_SKILLED;
-    Skill_V[14].skill = P_SLING;
-    Skill_V[14].skmax = P_BASIC;
-    Skill_V[15].skill = P_ATTACK_SPELL;
-    Skill_V[15].skmax = P_BASIC;
-    Skill_V[16].skill = P_ESCAPE_SPELL;
-    Skill_V[16].skmax = P_BASIC;
-    Skill_V[17].skill = P_RIDING;
-    Skill_V[17].skmax = P_SKILLED;
-    Skill_V[18].skill = P_TWO_WEAPON_COMBAT;
-    Skill_V[18].skmax = P_SKILLED;
-    Skill_V[19].skill = P_BARE_HANDED_COMBAT;
-    Skill_V[19].skmax = P_EXPERT;
-    Skill_V[20].skill = P_NONE;
-    Skill_V[20].skmax = 0;
+    $c.init(Skill_V, [
+        { skill: P_DAGGER, skmax: P_EXPERT },
+        { skill: P_AXE, skmax: P_EXPERT },
+        { skill: P_PICK_AXE, skmax: P_SKILLED },
+        { skill: P_SHORT_SWORD, skmax: P_SKILLED },
+        { skill: P_BROAD_SWORD, skmax: P_SKILLED },
+        { skill: P_LONG_SWORD, skmax: P_EXPERT },
+        { skill: P_TWO_HANDED_SWORD, skmax: P_EXPERT },
+        { skill: P_SABER, skmax: P_BASIC },
+        { skill: P_HAMMER, skmax: P_EXPERT },
+        { skill: P_QUARTERSTAFF, skmax: P_BASIC },
+        { skill: P_POLEARMS, skmax: P_SKILLED },
+        { skill: P_SPEAR, skmax: P_EXPERT },
+        { skill: P_TRIDENT, skmax: P_BASIC },
+        { skill: P_LANCE, skmax: P_SKILLED },
+        { skill: P_SLING, skmax: P_BASIC },
+        { skill: P_ATTACK_SPELL, skmax: P_BASIC },
+        { skill: P_ESCAPE_SPELL, skmax: P_BASIC },
+        { skill: P_RIDING, skmax: P_SKILLED },
+        { skill: P_TWO_WEAPON_COMBAT, skmax: P_SKILLED },
+        { skill: P_BARE_HANDED_COMBAT, skmax: P_EXPERT },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 23; $i0++) {
         Skill_W[$i0].$copyFrom(new $T.def_skill());
     }
-    Skill_W[0].skill = P_DAGGER;
-    Skill_W[0].skmax = P_EXPERT;
-    Skill_W[1].skill = P_KNIFE;
-    Skill_W[1].skmax = P_SKILLED;
-    Skill_W[2].skill = P_AXE;
-    Skill_W[2].skmax = P_SKILLED;
-    Skill_W[3].skill = P_SHORT_SWORD;
-    Skill_W[3].skmax = P_BASIC;
-    Skill_W[4].skill = P_CLUB;
-    Skill_W[4].skmax = P_SKILLED;
-    Skill_W[5].skill = P_MACE;
-    Skill_W[5].skmax = P_BASIC;
-    Skill_W[6].skill = P_QUARTERSTAFF;
-    Skill_W[6].skmax = P_EXPERT;
-    Skill_W[7].skill = P_POLEARMS;
-    Skill_W[7].skmax = P_SKILLED;
-    Skill_W[8].skill = P_SPEAR;
-    Skill_W[8].skmax = P_BASIC;
-    Skill_W[9].skill = P_TRIDENT;
-    Skill_W[9].skmax = P_BASIC;
-    Skill_W[10].skill = P_SLING;
-    Skill_W[10].skmax = P_SKILLED;
-    Skill_W[11].skill = P_DART;
-    Skill_W[11].skmax = P_EXPERT;
-    Skill_W[12].skill = P_SHURIKEN;
-    Skill_W[12].skmax = P_BASIC;
-    Skill_W[13].skill = P_ATTACK_SPELL;
-    Skill_W[13].skmax = P_EXPERT;
-    Skill_W[14].skill = P_HEALING_SPELL;
-    Skill_W[14].skmax = P_SKILLED;
-    Skill_W[15].skill = P_DIVINATION_SPELL;
-    Skill_W[15].skmax = P_EXPERT;
-    Skill_W[16].skill = P_ENCHANTMENT_SPELL;
-    Skill_W[16].skmax = P_SKILLED;
-    Skill_W[17].skill = P_CLERIC_SPELL;
-    Skill_W[17].skmax = P_SKILLED;
-    Skill_W[18].skill = P_ESCAPE_SPELL;
-    Skill_W[18].skmax = P_EXPERT;
-    Skill_W[19].skill = P_MATTER_SPELL;
-    Skill_W[19].skmax = P_EXPERT;
-    Skill_W[20].skill = P_RIDING;
-    Skill_W[20].skmax = P_BASIC;
-    Skill_W[21].skill = P_BARE_HANDED_COMBAT;
-    Skill_W[21].skmax = P_BASIC;
-    Skill_W[22].skill = P_NONE;
-    Skill_W[22].skmax = 0;
+    $c.init(Skill_W, [
+        { skill: P_DAGGER, skmax: P_EXPERT },
+        { skill: P_KNIFE, skmax: P_SKILLED },
+        { skill: P_AXE, skmax: P_SKILLED },
+        { skill: P_SHORT_SWORD, skmax: P_BASIC },
+        { skill: P_CLUB, skmax: P_SKILLED },
+        { skill: P_MACE, skmax: P_BASIC },
+        { skill: P_QUARTERSTAFF, skmax: P_EXPERT },
+        { skill: P_POLEARMS, skmax: P_SKILLED },
+        { skill: P_SPEAR, skmax: P_BASIC },
+        { skill: P_TRIDENT, skmax: P_BASIC },
+        { skill: P_SLING, skmax: P_SKILLED },
+        { skill: P_DART, skmax: P_EXPERT },
+        { skill: P_SHURIKEN, skmax: P_BASIC },
+        { skill: P_ATTACK_SPELL, skmax: P_EXPERT },
+        { skill: P_HEALING_SPELL, skmax: P_SKILLED },
+        { skill: P_DIVINATION_SPELL, skmax: P_EXPERT },
+        { skill: P_ENCHANTMENT_SPELL, skmax: P_SKILLED },
+        { skill: P_CLERIC_SPELL, skmax: P_SKILLED },
+        { skill: P_ESCAPE_SPELL, skmax: P_EXPERT },
+        { skill: P_MATTER_SPELL, skmax: P_EXPERT },
+        { skill: P_RIDING, skmax: P_BASIC },
+        { skill: P_BARE_HANDED_COMBAT, skmax: P_BASIC },
+        {}
+    ]);
     u_init_role$M_spell.fill(null);
-    u_init_role$M_spell[0] = $c.relem(Healing_book, 0);
-    u_init_role$M_spell[1] = $c.relem(Protection_book, 0);
-    u_init_role$M_spell[2] = $c.relem(Confuse_monster_book, 0);
+    $c.init(u_init_role$M_spell, [
+        $c.relem(Healing_book, 0),
+        $c.relem(Protection_book, 0),
+        $c.relem(Confuse_monster_book, 0)
+    ]);
     u_init_race$trotyp.fill(0);
-    u_init_race$trotyp[0] = WOODEN_FLUTE;
-    u_init_race$trotyp[1] = TOOLED_HORN;
-    u_init_race$trotyp[2] = WOODEN_HARP;
-    u_init_race$trotyp[3] = BELL;
-    u_init_race$trotyp[4] = BUGLE;
-    u_init_race$trotyp[5] = LEATHER_DRUM;
+    $c.init(u_init_race$trotyp, [
+        WOODEN_FLUTE,
+        TOOLED_HORN,
+        WOODEN_HARP,
+        BELL,
+        BUGLE,
+        LEATHER_DRUM
+    ]);
 }

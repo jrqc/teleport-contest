@@ -24,7 +24,7 @@ import { debugcore } from './files.js';
 import { wizard } from './flag.macros.js';
 import { FALSE, TRUE } from './global.h.js';
 import { losehp, near_capacity, test_move, u_locomotion } from './hack.js';
-import { DIR_ERR, DISMOUNT_BONES, DISMOUNT_BYCHOICE, DISMOUNT_ENGULFED, DISMOUNT_FELL, DISMOUNT_GENERIC, DISMOUNT_KNOCKED, DISMOUNT_POLY, DISMOUNT_THROWN, ECMD_CANCEL, ECMD_OK, ECMD_TIME, KILLED_BY_AN, LEG, NO_KILLER_PREFIX, NO_TRAP_FLAGS, N_DIRS, RLOC_ERR, RLOC_NOMSG, SLT_ENCUMBER, TELEDS_ALLOW_DRAG, TEST_MOVE } from './hack.h.js';
+import { ARTICLE_A, ARTICLE_YOUR, DIR_ERR, DISMOUNT_BONES, DISMOUNT_BYCHOICE, DISMOUNT_ENGULFED, DISMOUNT_FELL, DISMOUNT_GENERIC, DISMOUNT_KNOCKED, DISMOUNT_POLY, DISMOUNT_THROWN, ECMD_CANCEL, ECMD_OK, ECMD_TIME, KILLED_BY_AN, LEG, NO_KILLER_PREFIX, NO_TRAP_FLAGS, N_DIRS, RLOC_ERR, RLOC_NOMSG, SLT_ENCUMBER, SUPPRESS_HALLUCINATION, SUPPRESS_INVISIBLE, SUPPRESS_IT, SUPPRESS_SADDLE, TELEDS_ALLOW_DRAG, TEST_MOVE } from './hack.h.js';
 import { DIR_LEFT, DIR_RIGHT, NODIAG, distu, y_n } from './hack.macros.js';
 import { highc, strsubst } from './hacklib.js';
 import { freeinv, fully_identify_obj, sobj_at } from './invent.js';
@@ -213,7 +213,7 @@ export async function mount_steed(mtmp, force) {   // steed.c:197
     }
     if (Wounded_legs()) {
         await legs_in_no_shape($c.lit("riding"), FALSE);
-        $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("Heal your leg%s?"), $c.and64(u.uprops[WOUNDED_LEGS].intrinsic, 393216) === 393216 ? $c.lit("s") : $c.lit(""));
+        $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("Heal your leg%s?"), $c.and64(u.uprops[WOUNDED_LEGS].intrinsic, BOTH_SIDES) === BOTH_SIDES ? $c.lit("s") : $c.lit(""));
         if (force && wizard() && await y_n(new $c.Ptr(qbuf, 0)) === 121) {
             await heal_legs(0);
         } else {
@@ -294,7 +294,7 @@ export async function mount_steed(mtmp, force) {   // steed.c:197
             return FALSE;
         }
         await You($c.lit("slip while trying to get on %s."), await mon_nam(mtmp));
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("slipped while mounting %s"), await x_monnam(mtmp, 2, null, 7, 1));
+        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("slipped while mounting %s"), await x_monnam(mtmp, ARTICLE_A, null, SUPPRESS_IT | SUPPRESS_INVISIBLE | SUPPRESS_HALLUCINATION, TRUE));
         await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32((rn2(5) + 10 | 0) + 1 | 0, 2) : rn2(5) + 10 | 0, new $c.Ptr(buf, 0), NO_KILLER_PREFIX);
         return FALSE;
     }
@@ -340,7 +340,7 @@ export async function kick_steed() {   // steed.c:402
         return;
     }
     if (helpless(u.usteed)) {
-        $c.__builtin___strcpy_chk(new $c.Ptr(He, 0), genders[pronoun_gender(u.usteed, 2)].he, 256);
+        $c.__builtin___strcpy_chk(new $c.Ptr(He, 0), genders[pronoun_gender(u.usteed, PRONOUN_HALLU)].he, 256);
         $t1 = highc(new $c.Ptr(He, 0).get(0)), new $c.Ptr(He, 0).set(0, $t1);
         if ((u.usteed.mcanmove | 0 || u.usteed.mfrozen | 0) && !rn2(2)) {
             if (u.usteed.mcanmove) {
@@ -622,7 +622,7 @@ export async function poly_steed(steed, oldshape) {   // steed.c:852
     if (!can_saddle(steed) || !can_ride(steed)) {
         await dismount_steed(DISMOUNT_FELL);
     } else {
-        $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), await x_monnam(steed, 3, null, 8, 0), 256);
+        $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), await x_monnam(steed, ARTICLE_YOUR, null, SUPPRESS_SADDLE, FALSE), 256);
         if (!$c.peq(oldshape, steed.data)) {
             strsubst(new $c.Ptr(buf, 0), $c.lit("your "), $c.lit("your new "));
         }
@@ -671,11 +671,13 @@ export async function place_monster(mon, x, y) {   // steed.c:898
 
 export function $init() {
     steeds.fill(0);
-    steeds[0] = S_QUADRUPED;
-    steeds[1] = S_UNICORN;
-    steeds[2] = S_ANGEL;
-    steeds[3] = S_CENTAUR;
-    steeds[4] = S_DRAGON;
-    steeds[5] = S_JABBERWOCK;
-    steeds[6] = 0;
+    $c.init(steeds, [
+        S_QUADRUPED,
+        S_UNICORN,
+        S_ANGEL,
+        S_CENTAUR,
+        S_DRAGON,
+        S_JABBERWOCK,
+        0
+    ]);
 }

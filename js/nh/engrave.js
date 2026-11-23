@@ -15,13 +15,13 @@ import { AMULET_CLASS, ARMOR_CLASS, BALL_CLASS, CHAIN_CLASS, COIN_CLASS, FOOD_CL
 import { map_engraving, newsym } from './display.js';
 import { mon_nam } from './do_name.js';
 import { ceiling, on_level, surface } from './dungeon.js';
-import { BURN, DUST, ENGRAVE, ENGR_BLOOD, HEADSTONE, MARK, actual_text, pristine_text, remembered_text, text_states } from './engrave.h.js';
+import { BURN, DUST, ENGRAVE, ENGR_BLOOD, HEADSTONE, MARK, N_ENGRAVE, actual_text, pristine_text, remembered_text, text_states } from './engrave.h.js';
 import { dealloc_engr } from './engrave.macros.js';
 import { more_experienced } from './exper.js';
 import { debugcore } from './files.js';
-import { BUFSZ, FALSE, LL_CONDUCT, MD_PAD_RUMORS, TRUE } from './global.h.js';
+import { BUFSZ, COLNO, FALSE, LL_CONDUCT, MD_PAD_RUMORS, ROWNO, TRUE } from './global.h.js';
 import { check_capacity, nomul } from './hack.js';
-import { ECMD_CANCEL, ECMD_FAIL, ECMD_OK, ECMD_TIME, FINGERTIP, GETOBJ_DOWNPLAY, GETOBJ_PROMPT, GETOBJ_SUGGEST, HAND, NO_MM_FLAGS } from './hack.h.js';
+import { ECMD_CANCEL, ECMD_FAIL, ECMD_OK, ECMD_TIME, FINGERTIP, GETOBJ_DOWNPLAY, GETOBJ_PROMPT, GETOBJ_SUGGEST, HAND, NO_MM_FLAGS, WAND_BACKFIRE_CHANCE } from './hack.h.js';
 import { min, release_data, update_file } from './hack.macros.js';
 import { mungspaces, strncmpi, strstri, xcrypt } from './hacklib.js';
 import { getobj, hold_another_object, prinv, update_inventory, useup } from './invent.js';
@@ -323,7 +323,7 @@ export async function make_engr_at(x, y, s, pristine_s, e_time, e_type) {   // e
         }
     }
     ep.engr_time = e_time;
-    $t1 = $c.i8(e_type > 0 ? e_type : rnd(5)), ep.engr_type = $t1;
+    $t1 = $c.i8(e_type > 0 ? e_type : rnd(N_ENGRAVE - 1)), ep.engr_type = $t1;
     ep.engr_szeach = smem;
     ep.engr_alloc = Math.imul(smem, 3) >>> 0;
 }
@@ -570,7 +570,7 @@ async function doengrave_sfx_item(de) {   // engrave.c:742
         case WAND_CLASS:
             if (await zappable(de.otmp)) {
                 await check_unpaid(de.otmp);
-                if (de.otmp.cursed | 0 && !rn2(100)) {
+                if (de.otmp.cursed | 0 && !rn2(WAND_BACKFIRE_CHANCE)) {
                     await wand_explode(de.otmp, 0);
                     de.ret = ECMD_TIME;
                     return FALSE;
@@ -1182,8 +1182,8 @@ export async function rloc_engr(ep) {   // engrave.c:1667
         if ((tryct = tryct - 1 | 0) < 0) {
             return;
         }
-        tx = rn2(77) + 2 | 0;
-        ty = rn2(21);
+        tx = rn2(COLNO - 3) + 2 | 0;
+        ty = rn2(ROWNO);
     } while (engr_at($c.i16(tx), $c.i16(ty)) || !goodpos($c.i16(tx), $c.i16(ty), null, 0));
     ep.engr_x = $c.i16(tx);
     ep.engr_y = $c.i16(ty);
@@ -1237,292 +1237,77 @@ export function $init() {
     for (let $i0 = 0; $i0 < 48; $i0++) {
         rubouts[$i0].$copyFrom(new $T.anon_engrave_66());
     }
-    rubouts[0].wipefrom = 65;
-    rubouts[0].wipeto = $c.lit("^");
-    rubouts[1].wipefrom = 66;
-    rubouts[1].wipeto = $c.lit("Pb[");
-    rubouts[2].wipefrom = 67;
-    rubouts[2].wipeto = $c.lit("(");
-    rubouts[3].wipefrom = 68;
-    rubouts[3].wipeto = $c.lit("|)[");
-    rubouts[4].wipefrom = 69;
-    rubouts[4].wipeto = $c.lit("|FL[_");
-    rubouts[5].wipefrom = 70;
-    rubouts[5].wipeto = $c.lit("|-");
-    rubouts[6].wipefrom = 71;
-    rubouts[6].wipeto = $c.lit("C(");
-    rubouts[7].wipefrom = 72;
-    rubouts[7].wipeto = $c.lit("|-");
-    rubouts[8].wipefrom = 73;
-    rubouts[8].wipeto = $c.lit("|");
-    rubouts[9].wipefrom = 75;
-    rubouts[9].wipeto = $c.lit("|<");
-    rubouts[10].wipefrom = 76;
-    rubouts[10].wipeto = $c.lit("|_");
-    rubouts[11].wipefrom = 77;
-    rubouts[11].wipeto = $c.lit("|");
-    rubouts[12].wipefrom = 78;
-    rubouts[12].wipeto = $c.lit("|\\");
-    rubouts[13].wipefrom = 79;
-    rubouts[13].wipeto = $c.lit("C(");
-    rubouts[14].wipefrom = 80;
-    rubouts[14].wipeto = $c.lit("F");
-    rubouts[15].wipefrom = 81;
-    rubouts[15].wipeto = $c.lit("C(");
-    rubouts[16].wipefrom = 82;
-    rubouts[16].wipeto = $c.lit("PF");
-    rubouts[17].wipefrom = 84;
-    rubouts[17].wipeto = $c.lit("|");
-    rubouts[18].wipefrom = 85;
-    rubouts[18].wipeto = $c.lit("J");
-    rubouts[19].wipefrom = 86;
-    rubouts[19].wipeto = $c.lit("/\\");
-    rubouts[20].wipefrom = 87;
-    rubouts[20].wipeto = $c.lit("V/\\");
-    rubouts[21].wipefrom = 90;
-    rubouts[21].wipeto = $c.lit("/");
-    rubouts[22].wipefrom = 98;
-    rubouts[22].wipeto = $c.lit("|");
-    rubouts[23].wipefrom = 100;
-    rubouts[23].wipeto = $c.lit("c|");
-    rubouts[24].wipefrom = 101;
-    rubouts[24].wipeto = $c.lit("c");
-    rubouts[25].wipefrom = 103;
-    rubouts[25].wipeto = $c.lit("c");
-    rubouts[26].wipefrom = 104;
-    rubouts[26].wipeto = $c.lit("n");
-    rubouts[27].wipefrom = 106;
-    rubouts[27].wipeto = $c.lit("i");
-    rubouts[28].wipefrom = 107;
-    rubouts[28].wipeto = $c.lit("|");
-    rubouts[29].wipefrom = 108;
-    rubouts[29].wipeto = $c.lit("|");
-    rubouts[30].wipefrom = 109;
-    rubouts[30].wipeto = $c.lit("nr");
-    rubouts[31].wipefrom = 110;
-    rubouts[31].wipeto = $c.lit("r");
-    rubouts[32].wipefrom = 111;
-    rubouts[32].wipeto = $c.lit("c");
-    rubouts[33].wipefrom = 113;
-    rubouts[33].wipeto = $c.lit("c");
-    rubouts[34].wipefrom = 119;
-    rubouts[34].wipeto = $c.lit("v");
-    rubouts[35].wipefrom = 121;
-    rubouts[35].wipeto = $c.lit("v");
-    rubouts[36].wipefrom = 58;
-    rubouts[36].wipeto = $c.lit(".");
-    rubouts[37].wipefrom = 59;
-    rubouts[37].wipeto = $c.lit(",:");
-    rubouts[38].wipefrom = 44;
-    rubouts[38].wipeto = $c.lit(".");
-    rubouts[39].wipefrom = 61;
-    rubouts[39].wipeto = $c.lit("-");
-    rubouts[40].wipefrom = 43;
-    rubouts[40].wipeto = $c.lit("-|");
-    rubouts[41].wipefrom = 42;
-    rubouts[41].wipeto = $c.lit("+");
-    rubouts[42].wipefrom = 64;
-    rubouts[42].wipeto = $c.lit("0");
-    rubouts[43].wipefrom = 48;
-    rubouts[43].wipeto = $c.lit("C(");
-    rubouts[44].wipefrom = 49;
-    rubouts[44].wipeto = $c.lit("|");
-    rubouts[45].wipefrom = 54;
-    rubouts[45].wipeto = $c.lit("o");
-    rubouts[46].wipefrom = 55;
-    rubouts[46].wipeto = $c.lit("/");
-    rubouts[47].wipefrom = 56;
-    rubouts[47].wipeto = $c.lit("3o");
+    $c.init(rubouts, [
+        { wipefrom: 65, wipeto: $c.lit("^") },
+        { wipefrom: 66, wipeto: $c.lit("Pb[") },
+        { wipefrom: 67, wipeto: $c.lit("(") },
+        { wipefrom: 68, wipeto: $c.lit("|)[") },
+        { wipefrom: 69, wipeto: $c.lit("|FL[_") },
+        { wipefrom: 70, wipeto: $c.lit("|-") },
+        { wipefrom: 71, wipeto: $c.lit("C(") },
+        { wipefrom: 72, wipeto: $c.lit("|-") },
+        { wipefrom: 73, wipeto: $c.lit("|") },
+        { wipefrom: 75, wipeto: $c.lit("|<") },
+        { wipefrom: 76, wipeto: $c.lit("|_") },
+        { wipefrom: 77, wipeto: $c.lit("|") },
+        { wipefrom: 78, wipeto: $c.lit("|\\") },
+        { wipefrom: 79, wipeto: $c.lit("C(") },
+        { wipefrom: 80, wipeto: $c.lit("F") },
+        { wipefrom: 81, wipeto: $c.lit("C(") },
+        { wipefrom: 82, wipeto: $c.lit("PF") },
+        { wipefrom: 84, wipeto: $c.lit("|") },
+        { wipefrom: 85, wipeto: $c.lit("J") },
+        { wipefrom: 86, wipeto: $c.lit("/\\") },
+        { wipefrom: 87, wipeto: $c.lit("V/\\") },
+        { wipefrom: 90, wipeto: $c.lit("/") },
+        { wipefrom: 98, wipeto: $c.lit("|") },
+        { wipefrom: 100, wipeto: $c.lit("c|") },
+        { wipefrom: 101, wipeto: $c.lit("c") },
+        { wipefrom: 103, wipeto: $c.lit("c") },
+        { wipefrom: 104, wipeto: $c.lit("n") },
+        { wipefrom: 106, wipeto: $c.lit("i") },
+        { wipefrom: 107, wipeto: $c.lit("|") },
+        { wipefrom: 108, wipeto: $c.lit("|") },
+        { wipefrom: 109, wipeto: $c.lit("nr") },
+        { wipefrom: 110, wipeto: $c.lit("r") },
+        { wipefrom: 111, wipeto: $c.lit("c") },
+        { wipefrom: 113, wipeto: $c.lit("c") },
+        { wipefrom: 119, wipeto: $c.lit("v") },
+        { wipefrom: 121, wipeto: $c.lit("v") },
+        { wipefrom: 58, wipeto: $c.lit(".") },
+        { wipefrom: 59, wipeto: $c.lit(",:") },
+        { wipefrom: 44, wipeto: $c.lit(".") },
+        { wipefrom: 61, wipeto: $c.lit("-") },
+        { wipefrom: 43, wipeto: $c.lit("-|") },
+        { wipefrom: 42, wipeto: $c.lit("+") },
+        { wipefrom: 64, wipeto: $c.lit("0") },
+        { wipefrom: 48, wipeto: $c.lit("C(") },
+        { wipefrom: 49, wipeto: $c.lit("|") },
+        { wipefrom: 54, wipeto: $c.lit("o") },
+        { wipefrom: 55, wipeto: $c.lit("/") },
+        { wipefrom: 56, wipeto: $c.lit("3o") }
+    ]);
     for (let $i0 = 0; $i0 < 9; $i0++) {
         blind_writing[$i0].fill(0);
     }
-    blind_writing[0][0] = 68;
-    blind_writing[0][1] = 102;
-    blind_writing[0][2] = 109;
-    blind_writing[0][3] = 105;
-    blind_writing[0][4] = 98;
-    blind_writing[0][5] = 101;
-    blind_writing[0][6] = 34;
-    blind_writing[0][7] = 69;
-    blind_writing[0][8] = 123;
-    blind_writing[0][9] = 113;
-    blind_writing[0][10] = 101;
-    blind_writing[0][11] = 109;
-    blind_writing[0][12] = 114;
-    blind_writing[0][13] = 0;
-    blind_writing[0][14] = 0;
-    blind_writing[0][15] = 0;
-    blind_writing[0][16] = 0;
-    blind_writing[0][17] = 0;
-    blind_writing[0][18] = 0;
-    blind_writing[0][19] = 0;
-    blind_writing[0][20] = 0;
-    blind_writing[1][0] = 81;
-    blind_writing[1][1] = 103;
-    blind_writing[1][2] = 96;
-    blind_writing[1][3] = 122;
-    blind_writing[1][4] = 127;
-    blind_writing[1][5] = 33;
-    blind_writing[1][6] = 64;
-    blind_writing[1][7] = 113;
-    blind_writing[1][8] = 107;
-    blind_writing[1][9] = 113;
-    blind_writing[1][10] = 111;
-    blind_writing[1][11] = 103;
-    blind_writing[1][12] = 99;
-    blind_writing[1][13] = 0;
-    blind_writing[1][14] = 0;
-    blind_writing[1][15] = 0;
-    blind_writing[1][16] = 0;
-    blind_writing[1][17] = 0;
-    blind_writing[1][18] = 0;
-    blind_writing[1][19] = 0;
-    blind_writing[1][20] = 0;
-    blind_writing[2][0] = 73;
-    blind_writing[2][1] = 109;
-    blind_writing[2][2] = 115;
-    blind_writing[2][3] = 105;
-    blind_writing[2][4] = 98;
-    blind_writing[2][5] = 101;
-    blind_writing[2][6] = 34;
-    blind_writing[2][7] = 76;
-    blind_writing[2][8] = 97;
-    blind_writing[2][9] = 124;
-    blind_writing[2][10] = 109;
-    blind_writing[2][11] = 103;
-    blind_writing[2][12] = 36;
-    blind_writing[2][13] = 66;
-    blind_writing[2][14] = 127;
-    blind_writing[2][15] = 105;
-    blind_writing[2][16] = 108;
-    blind_writing[2][17] = 119;
-    blind_writing[2][18] = 103;
-    blind_writing[2][19] = 126;
-    blind_writing[2][20] = 0;
-    blind_writing[3][0] = 75;
-    blind_writing[3][1] = 109;
-    blind_writing[3][2] = 108;
-    blind_writing[3][3] = 102;
-    blind_writing[3][4] = 48;
-    blind_writing[3][5] = 76;
-    blind_writing[3][6] = 107;
-    blind_writing[3][7] = 104;
-    blind_writing[3][8] = 124;
-    blind_writing[3][9] = 127;
-    blind_writing[3][10] = 111;
-    blind_writing[3][11] = 0;
-    blind_writing[3][12] = 0;
-    blind_writing[3][13] = 0;
-    blind_writing[3][14] = 0;
-    blind_writing[3][15] = 0;
-    blind_writing[3][16] = 0;
-    blind_writing[3][17] = 0;
-    blind_writing[3][18] = 0;
-    blind_writing[3][19] = 0;
-    blind_writing[3][20] = 0;
-    blind_writing[4][0] = 81;
-    blind_writing[4][1] = 103;
-    blind_writing[4][2] = 112;
-    blind_writing[4][3] = 122;
-    blind_writing[4][4] = 127;
-    blind_writing[4][5] = 111;
-    blind_writing[4][6] = 103;
-    blind_writing[4][7] = 104;
-    blind_writing[4][8] = 100;
-    blind_writing[4][9] = 113;
-    blind_writing[4][10] = 33;
-    blind_writing[4][11] = 79;
-    blind_writing[4][12] = 107;
-    blind_writing[4][13] = 109;
-    blind_writing[4][14] = 126;
-    blind_writing[4][15] = 114;
-    blind_writing[4][16] = 0;
-    blind_writing[4][17] = 0;
-    blind_writing[4][18] = 0;
-    blind_writing[4][19] = 0;
-    blind_writing[4][20] = 0;
-    blind_writing[5][0] = 76;
-    blind_writing[5][1] = 99;
-    blind_writing[5][2] = 118;
-    blind_writing[5][3] = 97;
-    blind_writing[5][4] = 113;
-    blind_writing[5][5] = 33;
-    blind_writing[5][6] = 72;
-    blind_writing[5][7] = 107;
-    blind_writing[5][8] = 123;
-    blind_writing[5][9] = 117;
-    blind_writing[5][10] = 103;
-    blind_writing[5][11] = 99;
-    blind_writing[5][12] = 36;
-    blind_writing[5][13] = 69;
-    blind_writing[5][14] = 101;
-    blind_writing[5][15] = 107;
-    blind_writing[5][16] = 107;
-    blind_writing[5][17] = 101;
-    blind_writing[5][18] = 0;
-    blind_writing[5][19] = 0;
-    blind_writing[5][20] = 0;
-    blind_writing[6][0] = 76;
-    blind_writing[6][1] = 103;
-    blind_writing[6][2] = 104;
-    blind_writing[6][3] = 107;
-    blind_writing[6][4] = 120;
-    blind_writing[6][5] = 104;
-    blind_writing[6][6] = 109;
-    blind_writing[6][7] = 118;
-    blind_writing[6][8] = 122;
-    blind_writing[6][9] = 117;
-    blind_writing[6][10] = 33;
-    blind_writing[6][11] = 79;
-    blind_writing[6][12] = 113;
-    blind_writing[6][13] = 122;
-    blind_writing[6][14] = 117;
-    blind_writing[6][15] = 111;
-    blind_writing[6][16] = 119;
-    blind_writing[6][17] = 0;
-    blind_writing[6][18] = 0;
-    blind_writing[6][19] = 0;
-    blind_writing[6][20] = 0;
-    blind_writing[7][0] = 68;
-    blind_writing[7][1] = 102;
-    blind_writing[7][2] = 109;
-    blind_writing[7][3] = 124;
-    blind_writing[7][4] = 120;
-    blind_writing[7][5] = 33;
-    blind_writing[7][6] = 80;
-    blind_writing[7][7] = 101;
-    blind_writing[7][8] = 102;
-    blind_writing[7][9] = 101;
-    blind_writing[7][10] = 108;
-    blind_writing[7][11] = 0;
-    blind_writing[7][12] = 0;
-    blind_writing[7][13] = 0;
-    blind_writing[7][14] = 0;
-    blind_writing[7][15] = 0;
-    blind_writing[7][16] = 0;
-    blind_writing[7][17] = 0;
-    blind_writing[7][18] = 0;
-    blind_writing[7][19] = 0;
-    blind_writing[7][20] = 0;
-    blind_writing[8][0] = 68;
-    blind_writing[8][1] = 102;
-    blind_writing[8][2] = 115;
-    blind_writing[8][3] = 105;
-    blind_writing[8][4] = 98;
-    blind_writing[8][5] = 101;
-    blind_writing[8][6] = 34;
-    blind_writing[8][7] = 86;
-    blind_writing[8][8] = 125;
-    blind_writing[8][9] = 99;
-    blind_writing[8][10] = 105;
-    blind_writing[8][11] = 118;
-    blind_writing[8][12] = 107;
-    blind_writing[8][13] = 102;
-    blind_writing[8][14] = 0;
-    blind_writing[8][15] = 0;
-    blind_writing[8][16] = 0;
-    blind_writing[8][17] = 0;
-    blind_writing[8][18] = 0;
-    blind_writing[8][19] = 0;
-    blind_writing[8][20] = 0;
+    $c.init(blind_writing, [
+        [68, 102, 109, 105, 98, 101, 34, 69, 123, 113,
+          101, 109, 114, 0, 0, 0, 0, 0, 0, 0, 0],
+        [81, 103, 96, 122, 127, 33, 64, 113, 107, 113,
+          111, 103, 99, 0, 0, 0, 0, 0, 0, 0, 0],
+        [73, 109, 115, 105, 98, 101, 34, 76, 97, 124,
+          109, 103, 36, 66, 127, 105, 108, 119, 103, 126, 0],
+        [75, 109, 108, 102, 48, 76, 107, 104, 124, 127,
+          111, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [81, 103, 112, 122, 127, 111, 103, 104, 100, 113,
+          33, 79, 107, 109, 126, 114, 0, 0, 0, 0, 0],
+        [76, 99, 118, 97, 113, 33, 72, 107, 123, 117,
+          103, 99, 36, 69, 101, 107, 107, 101, 0, 0, 0],
+        [76, 103, 104, 107, 120, 104, 109, 118, 122, 117,
+          33, 79, 113, 122, 117, 111, 119, 0, 0, 0, 0],
+        [68, 102, 109, 124, 120, 33, 80, 101, 102, 101,
+          108, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [68, 102, 115, 105, 98, 101, 34, 86, 125, 99,
+          105, 118, 107, 102, 0, 0, 0, 0, 0, 0, 0]
+    ]);
 }

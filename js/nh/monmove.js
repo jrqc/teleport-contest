@@ -21,7 +21,7 @@ import { Is_special, on_level, u_on_newpos } from './dungeon.js';
 import { In_endgame, Inhell } from './dungeon.macros.js';
 import { eaten_stat } from './eat.js';
 import { sengr_at, wipe_engr_at } from './engrave.js';
-import { FALSE, TRUE } from './global.h.js';
+import { COLNO, FALSE, ROWNO, TRUE } from './global.h.js';
 import { disturb_buried_zombies, in_rooms, in_town, losehp, may_dig, money_cnt, notice_mon, switch_terrain } from './hack.js';
 import { ARM, BOLT_LIM, HEAD, KILLED_BY_AN, MMOVE_DIED, MMOVE_DONE, MMOVE_MOVED, MMOVE_NOMOVES, MMOVE_NOTHING, MON_POLE_DIST, NC_SHOW_MSG, NO_NC_FLAGS, NO_TRAP_FLAGS, RLOC_MSG } from './hack.h.js';
 import { distu, verbalize1 } from './hack.macros.js';
@@ -64,7 +64,7 @@ import { in_your_sanctuary, inhistemple, mon_aligntyp, pri_move } from './priest
 import { INVIS } from './prop.h.js';
 import { quest_stat_check, quest_talk } from './quest.js';
 import { create_gas_cloud, m_in_out_region, visible_region_at } from './region.js';
-import { ALTAR, CORR, DBWALL, DOOR, D_BROKEN, D_CLOSED, D_LOCKED, D_NODOOR, D_TRAPPED, D_WARNED, IRONBARS, LADDER, POOL, ROOM, STAIRS, STONE, TREE, W_NONDIGGABLE } from './rm.h.js';
+import { ALTAR, CORR, DBWALL, DOOR, D_BROKEN, D_CLOSED, D_ISOPEN, D_LOCKED, D_NODOOR, D_TRAPPED, D_WARNED, IRONBARS, LADDER, POOL, ROOM, STAIRS, STONE, TREE, W_NONDIGGABLE } from './rm.h.js';
 import { ACCESSIBLE, MON_AT, OBJ_AT, SURFACE_AT, Sokoban, remove_monster } from './rm.macros.js';
 import { d, rn2, rnd } from './rnd.js';
 import { genders } from './role.js';
@@ -892,8 +892,8 @@ async function m_search_items(mtmp, ggx, ggy, mmoved, appr) {   // monmove.c:133
         if (in_rooms(omx, omy, SHOPBASE).get(0) && (rn2(25) || mtmp.isshk | 0)) {
             break finish_search$;
         }
-        hmx = $c.i16(79 < (omx + minr | 0) ? 79 : omx + minr | 0);
-        hmy = $c.i16(20 < (omy + minr | 0) ? 20 : omy + minr | 0);
+        hmx = $c.i16(COLNO - 1 < (omx + minr | 0) ? COLNO - 1 : omx + minr | 0);
+        hmy = $c.i16(ROWNO - 1 < (omy + minr | 0) ? ROWNO - 1 : omy + minr | 0);
         lmx = $c.i16(1 > (omx - minr | 0) ? 1 : omx - minr | 0);
         lmy = $c.i16(0 > (omy - minr | 0) ? 0 : omy - minr | 0);
         for (xx = lmx; xx <= hmx; xx = $c.i16(xx + 1)) {
@@ -1008,7 +1008,7 @@ async function postmov(mtmp, ptr, omx, omy, mmoved, seenflgs, can_tunnel, can_un
                 }
             } else if (((here.flags | 0) & D_LOCKED) !== 0 && can_unlock) {
                 do {
-                    here.flags = ((!btrapped ? 2 : 0) >>> 0) & 31;
+                    here.flags = ((!btrapped ? D_ISOPEN : D_NODOOR) >>> 0) & 31;
                     await newsym(mtmp.mx, mtmp.my);
                     recalc_block_point(mtmp.mx, mtmp.my);
                     await vision_recalc(0);
@@ -1031,7 +1031,7 @@ async function postmov(mtmp, ptr, omx, omy, mmoved, seenflgs, can_tunnel, can_un
                 }
             } else if ((here.flags | 0) === D_CLOSED && can_open) {
                 do {
-                    here.flags = ((!btrapped ? 2 : 0) >>> 0) & 31;
+                    here.flags = ((!btrapped ? D_ISOPEN : D_NODOOR) >>> 0) & 31;
                     await newsym(mtmp.mx, mtmp.my);
                     recalc_block_point(mtmp.mx, mtmp.my);
                     await vision_recalc(0);
@@ -1288,7 +1288,7 @@ export async function m_move(mtmp, after) {   // monmove.c:1715
             return MMOVE_NOMOVES;
         }
         chcnt = 0;
-        jcnt = 4 < (cnt - 1 | 0) ? 4 : cnt - 1 | 0;
+        jcnt = MTSZ < (cnt - 1 | 0) ? MTSZ : cnt - 1 | 0;
         chi = -1;
         nidist = dist2(nix, niy, ggx[0], ggy[0]);
         if (!mtmp.mpeaceful && svl.level.flags.shortsighted | 0 && nidist > (couldsee(nix, niy) ? 144 : 36) && appr[0] === 1) {
@@ -1406,7 +1406,7 @@ export async function m_move_aggress(mtmp, x, y) {   // monmove.c:2088
     if (mstatus & M_ATTK_AGR_DIED || DEADMONSTER(mtmp)) {
         return MMOVE_DIED;
     }
-    if ((mstatus & (M_ATTK_HIT | M_ATTK_DEF_DIED)) === M_ATTK_HIT && rn2(4) && mtmp2.movement > rn2(12)) {
+    if ((mstatus & (M_ATTK_HIT | M_ATTK_DEF_DIED)) === M_ATTK_HIT && rn2(4) && mtmp2.movement > rn2(NORMAL_SPEED)) {
         if (mtmp2.movement > NORMAL_SPEED) {
             mtmp2.movement = $c.i16(mtmp2.movement - NORMAL_SPEED | 0);
         } else {
@@ -1571,17 +1571,21 @@ async function vamp_shift(mon, ptr, domsg) {   // monmove.c:2377
 
 export function $init() {
     practical.fill(0);
-    practical[0] = WEAPON_CLASS;
-    practical[1] = ARMOR_CLASS;
-    practical[2] = GEM_CLASS;
-    practical[3] = FOOD_CLASS;
-    practical[4] = 0;
+    $c.init(practical, [
+        WEAPON_CLASS,
+        ARMOR_CLASS,
+        GEM_CLASS,
+        FOOD_CLASS,
+        0
+    ]);
     magical.fill(0);
-    magical[0] = AMULET_CLASS;
-    magical[1] = POTION_CLASS;
-    magical[2] = SCROLL_CLASS;
-    magical[3] = WAND_CLASS;
-    magical[4] = RING_CLASS;
-    magical[5] = SPBOOK_CLASS;
-    magical[6] = 0;
+    $c.init(magical, [
+        AMULET_CLASS,
+        POTION_CLASS,
+        SCROLL_CLASS,
+        WAND_CLASS,
+        RING_CLASS,
+        SPBOOK_CLASS,
+        0
+    ]);
 }

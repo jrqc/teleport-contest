@@ -40,7 +40,7 @@ import { dryup } from './fountain.js';
 import { coord_desc } from './getpos.js';
 import { COLNO, FALSE, LARGEST_INT, LL_ACHIEVE, LL_CONDUCT, LL_KILLEDPET, LL_UMONST, MAXMONNO, QBUFSZ, ROWNO, TRUE } from './global.h.js';
 import { bad_rock, cant_squeeze_thru, disturb_buried_zombies, in_rooms, losehp, may_dig, may_passwall, monst_to_any, spoteffects, u_locomotion } from './hack.js';
-import { ARTICLE_A, ARTICLE_NONE, ARTICLE_THE, ARTICLE_YOUR, BOLT_LIM, CORPSTAT_BURIED, CORPSTAT_FEMALE, CORPSTAT_HISTORIC, CORPSTAT_INIT, CORPSTAT_MALE, CORPSTAT_NONE, DISMOUNT_GENERIC, EXACT_NAME, KILLED_BY_AN, M_POISONGAS_BAD, M_POISONGAS_MINOR, M_POISONGAS_OK, NC_SHOW_MSG, NC_VIA_WAND_OR_SPELL, NO_MM_FLAGS, NO_NC_FLAGS, ONAME_NO_FLAGS, RLOC_MSG, RLOC_NOMSG, STOMACH, SUPPRESS_INVISIBLE, SUPPRESS_IT, SUPPRESS_NAME, SUPPRESS_SADDLE, TAINT_AGE, XKILL_GIVEMSG, XKILL_NOCONDUCT, XKILL_NOCORPSE, XKILL_NOMSG } from './hack.h.js';
+import { ARTICLE_A, ARTICLE_NONE, ARTICLE_THE, ARTICLE_YOUR, AUGMENT_IT, BOLT_LIM, CORPSTAT_BURIED, CORPSTAT_FEMALE, CORPSTAT_HISTORIC, CORPSTAT_INIT, CORPSTAT_MALE, CORPSTAT_NONE, DISMOUNT_GENERIC, EXACT_NAME, KILLED_BY_AN, M_POISONGAS_BAD, M_POISONGAS_MINOR, M_POISONGAS_OK, NC_SHOW_MSG, NC_VIA_WAND_OR_SPELL, NO_MM_FLAGS, NO_NC_FLAGS, ONAME_NO_FLAGS, RLOC_MSG, RLOC_NOMSG, STOMACH, SUPPRESS_HALLUCINATION, SUPPRESS_INVISIBLE, SUPPRESS_IT, SUPPRESS_NAME, SUPPRESS_SADDLE, TAINT_AGE, XKILL_GIVEMSG, XKILL_NOCONDUCT, XKILL_NOCORPSE, XKILL_NOMSG } from './hack.h.js';
 import { Maybe_Half_Phys, NODIAG, pline1, plur } from './hack.macros.js';
 import { dist2, eos, highc, mungspaces, nh_snprintf, online2, ordin, s_suffix, sgn, strncmpi, upstart } from './hacklib.js';
 import { record_achievement } from './insight.js';
@@ -57,7 +57,7 @@ import { SHOPBASE, TEMPLE } from './mkroom.h.js';
 import { AD_COLD, AD_CORR, AD_DCAY, AD_DGST, AD_DRST, AD_ELEC, AD_FIRE, AD_RBRE, AD_RUST, AD_SEDU, AD_SPEL, AD_SSEX, AD_STCK, AT_BOOM, AT_BREA, AT_ENGL, AT_EXPL, AT_GAZE, AT_HUGS, AT_MAGC, AT_WEAP } from './monattk.h.js';
 import { attacktype, attacktype_fordmg, big_little_match, big_to_little, dmgtype, dmgtype_fromattack, little_to_big, locomotion, mon_hates_silver, mon_knows_traps, name_to_mon, name_to_monclass, olfaction, on_fire, passes_bars, poly_when_stoned, resist_conflict, set_mon_data, sticks } from './mondata.js';
 import { acidic, always_hostile, amorphous, bigmonst, breathless, can_teleport, cant_drown, ceiling_hider, completelyburns, completelyrots, completelyrusts, digests, emits_light, flesh_petrifies, has_head, hides_under, humanoid, immune_poisongas, is_animal, is_clinger, is_covetous, is_displacer, is_dwarf, is_elf, is_female, is_floater, is_flyer, is_giant, is_gnome, is_golem, is_hider, is_human, is_male, is_minion, is_mplayer, is_neuter, is_orc, is_placeholder, is_rider, is_shapeshifter, is_swimmer, is_undead, is_unicorn, is_vampire, is_watch, is_were, is_whirly, lays_eggs, likes_lava, mindless, needspick, nohands, noncorporeal, nonliving, notake, passes_walls, perceives, pm_invisible, polyok, slimeproof, strongmonst, throws_rocks, touch_petrifies, tunnels, unique_corpstat, unsolid, vegan, verysmall } from './mondata.macros.js';
-import { G_FREQ, G_GENOD, G_NOCORPSE, G_UNIQ, M1_AMPHIBIOUS, M1_BREATHLESS, M1_FLY, M1_NOHANDS, M1_REGEN, M1_SEE_INVIS, M1_TPORT, M1_TPORT_CNTRL, M2_COLLECT, M2_UNDEAD, MR_STONE, MS_GUARDIAN, MS_LEADER, MS_NEMESIS, MS_SHRIEK, MZ_MEDIUM, MZ_TINY, NEUTRAL } from './monflag.h.js';
+import { G_FREQ, G_GENOD, G_NOCORPSE, G_UNIQ, M1_AMORPHOUS, M1_AMPHIBIOUS, M1_BREATHLESS, M1_FLY, M1_NOHANDS, M1_REGEN, M1_SEE_INVIS, M1_TPORT, M1_TPORT_CNTRL, M2_COLLECT, M2_ORC, M2_UNDEAD, MR_STONE, MS_GUARDIAN, MS_LEADER, MS_NEMESIS, MS_SHRIEK, MZ_MEDIUM, MZ_TINY, NEUTRAL } from './monflag.h.js';
 import { accessible, can_fog, can_hide_under_obj, closed_door, dochugw, m_can_break_boulder, m_everyturn_effect, mb_trapped, mon_regen, mon_track_clear, mon_would_take_item, monflee, monhaskey, onscary, set_apparxy } from './monmove.js';
 import { mons } from './monst.js';
 import { MFAST, MON_DETACH, MON_ENDGAME_FREE, MON_ENDGAME_MIGR, MON_LIMBO, MON_MIGRATING, MON_OBLITERATE, MON_OFFMAP, MSLOW, M_AP_FURNITURE, M_AP_MONSTER, M_AP_NOTHING, M_AP_OBJECT, M_AP_TYPMASK, NO_WEAPON_WANTED, STRAT_WAITFORU } from './monst.h.js';
@@ -798,7 +798,7 @@ export function mcalcmove(mon, m_moving) {   // mon.c:1126
     if (m_moving) {
         mmove_adj = $c.rem32(mmove, NORMAL_SPEED);
         mmove = mmove - mmove_adj | 0;
-        if (rn2(12) < mmove_adj) {
+        if (rn2(NORMAL_SPEED) < mmove_adj) {
             mmove = mmove + NORMAL_SPEED | 0;
         }
     }
@@ -1353,7 +1353,7 @@ export async function can_carry(mtmp, otmp) {   // mon.c:1990
     if (!await can_touch_safely(mtmp, otmp)) {
         return 0;
     }
-    iquan = otmp.quan > LARGEST_INT ? 20000 + rn2(12768) | 0 : $c.i32(otmp.quan);
+    iquan = otmp.quan > LARGEST_INT ? 20000 + rn2(LARGEST_INT - 20000 + 1) | 0 : $c.i32(otmp.quan);
     if (iquan > 1) {
         glomper = FALSE;
         if (mtmp.data.mlet === S_DRAGON && (otmp.oclass === COIN_CLASS || otmp.oclass === GEM_CLASS)) {
@@ -1500,8 +1500,8 @@ export async function mfndpos(mon, data, flag) {   // mon.c:2140
         if (!mon.mcansee) {
             flag = $c.or64(flag, ALLOW_SSM);
         }
-        maxx = (x + 1 | 0) < 79 ? x + 1 | 0 : 79;
-        maxy = (y + 1 | 0) < 20 ? y + 1 | 0 : 20;
+        maxx = (x + 1 | 0) < COLNO - 1 ? x + 1 | 0 : COLNO - 1;
+        maxy = (y + 1 | 0) < ROWNO - 1 ? y + 1 | 0 : ROWNO - 1;
         for (nx = $c.i16(1 > (x - 1 | 0) ? 1 : x - 1 | 0); nx <= maxx; nx = $c.i16(nx + 1)) {
             for (ny = $c.i16(0 > (y - 1 | 0) ? 0 : y - 1 | 0); ny <= maxy; ny = $c.i16(ny + 1)) {
                 if (nx === x && ny === y) {
@@ -2003,7 +2003,7 @@ async function vamprises(mtmp) {   // mon.c:2890
         spec_death = $c.i8(gd.disintegested || noncorporeal(mtmp.data) || amorphous(mtmp.data) ? 1 : 0);
         x = mtmp.mx;
         y = mtmp.my;
-        nh_snprintf($c.lit("vamprises"), 2919, new $c.Ptr(action, 0), 256, $c.lit("%s%s %s%s and rises as"), gm.multi < 0 && (unconscious() || is_fainted()) ? $c.lit("you dream that ") : $c.lit(""), await x_monnam(mtmp, 1, spec_mon ? null : $c.lit("seemingly dead"), 66, 0), gm.multi < 0 && (unconscious() || is_fainted()) ? $c.lit("") : $c.lit("suddenly "), spec_death ? $c.lit("reconstitutes") : $c.lit("transforms"));
+        nh_snprintf($c.lit("vamprises"), 2919, new $c.Ptr(action, 0), 256, $c.lit("%s%s %s%s and rises as"), gm.multi < 0 && (unconscious() || is_fainted()) ? $c.lit("you dream that ") : $c.lit(""), await x_monnam(mtmp, ARTICLE_THE, spec_mon ? null : $c.lit("seemingly dead"), SUPPRESS_INVISIBLE | AUGMENT_IT, FALSE), gm.multi < 0 && (unconscious() || is_fainted()) ? $c.lit("") : $c.lit("suddenly "), spec_death ? $c.lit("reconstitutes") : $c.lit("transforms"));
         mtmp.mcanmove = (1) & 1;
         mtmp.mfrozen = (0) & 127;
         set_mon_min_mhpmax(mtmp, 10);
@@ -2242,7 +2242,7 @@ export async function monstone(mdef) {   // mon.c:3287
         return;
     }
     mdef.mtrapped = (0) & 1;
-    if (mdef.data.msize > MZ_TINY || !rn2(2 + ((mdef.data.geno & 7) > 2 ? 1 : 0) | 0)) {
+    if (mdef.data.msize > MZ_TINY || !rn2(2 + ((mdef.data.geno & G_FREQ) > 2 ? 1 : 0) | 0)) {
         corpstatflags = CORPSTAT_NONE;
         oldminvent = null;
         while ((obj = mdef.minvent) !== null) {
@@ -2553,7 +2553,7 @@ export async function vamp_stone(mtmp) {   // mon.c:3766
         x = mtmp.mx;
         y = mtmp.my;
         if (mndx >= LOW_PM && mndx !== mtmp.data.pmidx && !(svm.mvitals[mndx].mvflags & G_GENOD)) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("The lapidifying %s %s %s"), await x_monnam(mtmp, 0, null, 15, 0), $c.andu64(mtmp.data.mflags1, 4) !== 0 ? $c.lit("coalesces on the") : $c.andu64(mtmp.data.mflags1, 1) !== 0 ? $c.lit("drops to the") : $c.lit("writhes on the"), surface(x, y));
+            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("The lapidifying %s %s %s"), await x_monnam(mtmp, ARTICLE_NONE, null, SUPPRESS_SADDLE | SUPPRESS_HALLUCINATION | SUPPRESS_INVISIBLE | SUPPRESS_IT, FALSE), $c.andu64(mtmp.data.mflags1, M1_AMORPHOUS) !== 0 ? $c.lit("coalesces on the") : $c.andu64(mtmp.data.mflags1, M1_FLY) !== 0 ? $c.lit("drops to the") : $c.lit("writhes on the"), surface(x, y));
             mtmp.mcanmove = (1) & 1;
             mtmp.mfrozen = (0) & 127;
             set_mon_min_mhpmax(mtmp, 10);
@@ -3596,10 +3596,10 @@ export async function newcham(mtmp, mdat, ncflags) {   // mon.c:5278
         }
     }
     if (msg) {
-        $c.__builtin___strcpy_chk(new $c.Ptr(oldname, 0), await x_monnam(mtmp, mtmp.mtame ? 3 : 1, null, 8, 0), 256);
+        $c.__builtin___strcpy_chk(new $c.Ptr(oldname, 0), await x_monnam(mtmp, mtmp.mtame ? ARTICLE_YOUR : ARTICLE_THE, null, SUPPRESS_SADDLE, FALSE), 256);
         $t2 = highc(oldname[0]), oldname[0] = $t2;
     }
-    $c.__builtin___strcpy_chk(new $c.Ptr(l_oldname, 0), await x_monnam(mtmp, 1, null, mtmp.mextra && mtmp.mextra.mgivenname ? 8 : 0, 0), 256);
+    $c.__builtin___strcpy_chk(new $c.Ptr(l_oldname, 0), await x_monnam(mtmp, ARTICLE_THE, null, mtmp.mextra && mtmp.mextra.mgivenname ? SUPPRESS_SADDLE : 0, FALSE), 256);
     if (mdat === null) {
         tryct = 20;
         do {
@@ -3672,7 +3672,7 @@ export async function newcham(mtmp, mdat, ncflags) {   // mon.c:5278
             if (!attacktype(mdat, AT_ENGL)) {
                 if (!noncorporeal(mdat) && !is_whirly(mdat) && !(amorphous(mdat) || mdat.mlet === S_LIGHT)) {
                     if (is_vampshifter(mtmp)) {
-                        $c.__builtin___sprintf_chk(new $c.Ptr(msgtrail, 0), 0, 256, $c.lit(" which was a shapeshifted %s"), await noname_monnam(mtmp, 0));
+                        $c.__builtin___sprintf_chk(new $c.Ptr(msgtrail, 0), 0, 256, $c.lit(" which was a shapeshifted %s"), await noname_monnam(mtmp, ARTICLE_NONE));
                     } else if (digests(mdat)) {
                         $c.__builtin___strcpy_chk(new $c.Ptr(msgtrail, 0), $c.lit("'s stomach"), 256);
                     } else {
@@ -4000,7 +4000,7 @@ export async function usmellmon(mdat) {   // mon.c:5796
                     msg_given = TRUE;
                     break;
                 case S_ORC:
-                    if (u.umonnum !== u.umonster ? $c.andu64(gy.youmonst.data.mflags2, 128) !== 0 : gu.urace.mnum === PM_ORC) {
+                    if (u.umonnum !== u.umonster ? $c.andu64(gy.youmonst.data.mflags2, M2_ORC) !== 0 : gu.urace.mnum === PM_ORC) {
                         await You($c.lit("notice an attractive smell."));
                     } else {
                         await pline($c.lit("A foul stench makes you feel a little nauseated."));

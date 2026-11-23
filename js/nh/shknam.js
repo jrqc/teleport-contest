@@ -195,7 +195,7 @@ function nameshk(shk, nlp) {   // shknam.c:487
             }
         }
     }
-    $c.__builtin___strncpy_chk(new $c.Ptr(shk.mextra.eshk.shknam, 0), shname, 32, -1);
+    $c.__builtin___strncpy_chk(new $c.Ptr(shk.mextra.eshk.shknam, 0), shname, PL_NSIZ, -1);
     shk.mextra.eshk.shknam[PL_NSIZ - 1] = 0;
 }
 export async function neweshk(mtmp) {   // shknam.c:557
@@ -472,609 +472,531 @@ export function is_izchak(shkp, override_hallucination) {   // shknam.c:908
 
 export function $init() {
     shkliquors.fill(null);
-    shkliquors[0] = $c.lit("Njezjin");
-    shkliquors[1] = $c.lit("Tsjernigof");
-    shkliquors[2] = $c.lit("Ossipewsk");
-    shkliquors[3] = $c.lit("Gorlowka");
-    shkliquors[4] = $c.lit("Gomel");
-    shkliquors[5] = $c.lit("Konosja");
-    shkliquors[6] = $c.lit("Weliki Oestjoeg");
-    shkliquors[7] = $c.lit("Syktywkar");
-    shkliquors[8] = $c.lit("Sablja");
-    shkliquors[9] = $c.lit("Narodnaja");
-    shkliquors[10] = $c.lit("Kyzyl");
-    shkliquors[11] = $c.lit("Walbrzych");
-    shkliquors[12] = $c.lit("Swidnica");
-    shkliquors[13] = $c.lit("Klodzko");
-    shkliquors[14] = $c.lit("Raciborz");
-    shkliquors[15] = $c.lit("Gliwice");
-    shkliquors[16] = $c.lit("Brzeg");
-    shkliquors[17] = $c.lit("Krnov");
-    shkliquors[18] = $c.lit("Hradec Kralove");
-    shkliquors[19] = $c.lit("Leuk");
-    shkliquors[20] = $c.lit("Brig");
-    shkliquors[21] = $c.lit("Brienz");
-    shkliquors[22] = $c.lit("Thun");
-    shkliquors[23] = $c.lit("Sarnen");
-    shkliquors[24] = $c.lit("Burglen");
-    shkliquors[25] = $c.lit("Elm");
-    shkliquors[26] = $c.lit("Flims");
-    shkliquors[27] = $c.lit("Vals");
-    shkliquors[28] = $c.lit("Schuls");
-    shkliquors[29] = $c.lit("Zum Loch");
-    shkliquors[30] = null;
+    $c.init(shkliquors, [
+        $c.lit("Njezjin"),
+        $c.lit("Tsjernigof"),
+        $c.lit("Ossipewsk"),
+        $c.lit("Gorlowka"),
+        $c.lit("Gomel"),
+        $c.lit("Konosja"),
+        $c.lit("Weliki Oestjoeg"),
+        $c.lit("Syktywkar"),
+        $c.lit("Sablja"),
+        $c.lit("Narodnaja"),
+        $c.lit("Kyzyl"),
+        $c.lit("Walbrzych"),
+        $c.lit("Swidnica"),
+        $c.lit("Klodzko"),
+        $c.lit("Raciborz"),
+        $c.lit("Gliwice"),
+        $c.lit("Brzeg"),
+        $c.lit("Krnov"),
+        $c.lit("Hradec Kralove"),
+        $c.lit("Leuk"),
+        $c.lit("Brig"),
+        $c.lit("Brienz"),
+        $c.lit("Thun"),
+        $c.lit("Sarnen"),
+        $c.lit("Burglen"),
+        $c.lit("Elm"),
+        $c.lit("Flims"),
+        $c.lit("Vals"),
+        $c.lit("Schuls"),
+        $c.lit("Zum Loch"),
+        null
+    ]);
     shkbooks.fill(null);
-    shkbooks[0] = $c.lit("Skibbereen");
-    shkbooks[1] = $c.lit("Kanturk");
-    shkbooks[2] = $c.lit("Rath Luirc");
-    shkbooks[3] = $c.lit("Ennistymon");
-    shkbooks[4] = $c.lit("Lahinch");
-    shkbooks[5] = $c.lit("Kinnegad");
-    shkbooks[6] = $c.lit("Lugnaquillia");
-    shkbooks[7] = $c.lit("Enniscorthy");
-    shkbooks[8] = $c.lit("Gweebarra");
-    shkbooks[9] = $c.lit("Kittamagh");
-    shkbooks[10] = $c.lit("Nenagh");
-    shkbooks[11] = $c.lit("Sneem");
-    shkbooks[12] = $c.lit("Ballingeary");
-    shkbooks[13] = $c.lit("Kilgarvan");
-    shkbooks[14] = $c.lit("Cahersiveen");
-    shkbooks[15] = $c.lit("Glenbeigh");
-    shkbooks[16] = $c.lit("Kilmihil");
-    shkbooks[17] = $c.lit("Kiltamagh");
-    shkbooks[18] = $c.lit("Droichead Atha");
-    shkbooks[19] = $c.lit("Inniscrone");
-    shkbooks[20] = $c.lit("Clonegal");
-    shkbooks[21] = $c.lit("Lisnaskea");
-    shkbooks[22] = $c.lit("Culdaff");
-    shkbooks[23] = $c.lit("Dunfanaghy");
-    shkbooks[24] = $c.lit("Inishbofin");
-    shkbooks[25] = $c.lit("Kesh");
-    shkbooks[26] = null;
+    $c.init(shkbooks, [
+        $c.lit("Skibbereen"),
+        $c.lit("Kanturk"),
+        $c.lit("Rath Luirc"),
+        $c.lit("Ennistymon"),
+        $c.lit("Lahinch"),
+        $c.lit("Kinnegad"),
+        $c.lit("Lugnaquillia"),
+        $c.lit("Enniscorthy"),
+        $c.lit("Gweebarra"),
+        $c.lit("Kittamagh"),
+        $c.lit("Nenagh"),
+        $c.lit("Sneem"),
+        $c.lit("Ballingeary"),
+        $c.lit("Kilgarvan"),
+        $c.lit("Cahersiveen"),
+        $c.lit("Glenbeigh"),
+        $c.lit("Kilmihil"),
+        $c.lit("Kiltamagh"),
+        $c.lit("Droichead Atha"),
+        $c.lit("Inniscrone"),
+        $c.lit("Clonegal"),
+        $c.lit("Lisnaskea"),
+        $c.lit("Culdaff"),
+        $c.lit("Dunfanaghy"),
+        $c.lit("Inishbofin"),
+        $c.lit("Kesh"),
+        null
+    ]);
     shkarmors.fill(null);
-    shkarmors[0] = $c.lit("Demirci");
-    shkarmors[1] = $c.lit("Kalecik");
-    shkarmors[2] = $c.lit("Boyabai");
-    shkarmors[3] = $c.lit("Yildizeli");
-    shkarmors[4] = $c.lit("Gaziantep");
-    shkarmors[5] = $c.lit("Siirt");
-    shkarmors[6] = $c.lit("Akhalataki");
-    shkarmors[7] = $c.lit("Tirebolu");
-    shkarmors[8] = $c.lit("Aksaray");
-    shkarmors[9] = $c.lit("Ermenak");
-    shkarmors[10] = $c.lit("Iskenderun");
-    shkarmors[11] = $c.lit("Kadirli");
-    shkarmors[12] = $c.lit("Siverek");
-    shkarmors[13] = $c.lit("Pervari");
-    shkarmors[14] = $c.lit("Malasgirt");
-    shkarmors[15] = $c.lit("Bayburt");
-    shkarmors[16] = $c.lit("Ayancik");
-    shkarmors[17] = $c.lit("Zonguldak");
-    shkarmors[18] = $c.lit("Balya");
-    shkarmors[19] = $c.lit("Tefenni");
-    shkarmors[20] = $c.lit("Artvin");
-    shkarmors[21] = $c.lit("Kars");
-    shkarmors[22] = $c.lit("Makharadze");
-    shkarmors[23] = $c.lit("Malazgirt");
-    shkarmors[24] = $c.lit("Midyat");
-    shkarmors[25] = $c.lit("Birecik");
-    shkarmors[26] = $c.lit("Kirikkale");
-    shkarmors[27] = $c.lit("Alaca");
-    shkarmors[28] = $c.lit("Polatli");
-    shkarmors[29] = $c.lit("Nallihan");
-    shkarmors[30] = null;
+    $c.init(shkarmors, [
+        $c.lit("Demirci"),
+        $c.lit("Kalecik"),
+        $c.lit("Boyabai"),
+        $c.lit("Yildizeli"),
+        $c.lit("Gaziantep"),
+        $c.lit("Siirt"),
+        $c.lit("Akhalataki"),
+        $c.lit("Tirebolu"),
+        $c.lit("Aksaray"),
+        $c.lit("Ermenak"),
+        $c.lit("Iskenderun"),
+        $c.lit("Kadirli"),
+        $c.lit("Siverek"),
+        $c.lit("Pervari"),
+        $c.lit("Malasgirt"),
+        $c.lit("Bayburt"),
+        $c.lit("Ayancik"),
+        $c.lit("Zonguldak"),
+        $c.lit("Balya"),
+        $c.lit("Tefenni"),
+        $c.lit("Artvin"),
+        $c.lit("Kars"),
+        $c.lit("Makharadze"),
+        $c.lit("Malazgirt"),
+        $c.lit("Midyat"),
+        $c.lit("Birecik"),
+        $c.lit("Kirikkale"),
+        $c.lit("Alaca"),
+        $c.lit("Polatli"),
+        $c.lit("Nallihan"),
+        null
+    ]);
     shkwands.fill(null);
-    shkwands[0] = $c.lit("Yr Wyddgrug");
-    shkwands[1] = $c.lit("Trallwng");
-    shkwands[2] = $c.lit("Mallwyd");
-    shkwands[3] = $c.lit("Pontarfynach");
-    shkwands[4] = $c.lit("Rhaeader");
-    shkwands[5] = $c.lit("Llandrindod");
-    shkwands[6] = $c.lit("Llanfair-ym-muallt");
-    shkwands[7] = $c.lit("Y-Fenni");
-    shkwands[8] = $c.lit("Maesteg");
-    shkwands[9] = $c.lit("Rhydaman");
-    shkwands[10] = $c.lit("Beddgelert");
-    shkwands[11] = $c.lit("Curig");
-    shkwands[12] = $c.lit("Llanrwst");
-    shkwands[13] = $c.lit("Llanerchymedd");
-    shkwands[14] = $c.lit("Caergybi");
-    shkwands[15] = $c.lit("Nairn");
-    shkwands[16] = $c.lit("Turriff");
-    shkwands[17] = $c.lit("Inverurie");
-    shkwands[18] = $c.lit("Braemar");
-    shkwands[19] = $c.lit("Lochnagar");
-    shkwands[20] = $c.lit("Kerloch");
-    shkwands[21] = $c.lit("Beinn a Ghlo");
-    shkwands[22] = $c.lit("Drumnadrochit");
-    shkwands[23] = $c.lit("Morven");
-    shkwands[24] = $c.lit("Uist");
-    shkwands[25] = $c.lit("Storr");
-    shkwands[26] = $c.lit("Sgurr na Ciche");
-    shkwands[27] = $c.lit("Cannich");
-    shkwands[28] = $c.lit("Gairloch");
-    shkwands[29] = $c.lit("Kyleakin");
-    shkwands[30] = $c.lit("Dunvegan");
-    shkwands[31] = null;
+    $c.init(shkwands, [
+        $c.lit("Yr Wyddgrug"),
+        $c.lit("Trallwng"),
+        $c.lit("Mallwyd"),
+        $c.lit("Pontarfynach"),
+        $c.lit("Rhaeader"),
+        $c.lit("Llandrindod"),
+        $c.lit("Llanfair-ym-muallt"),
+        $c.lit("Y-Fenni"),
+        $c.lit("Maesteg"),
+        $c.lit("Rhydaman"),
+        $c.lit("Beddgelert"),
+        $c.lit("Curig"),
+        $c.lit("Llanrwst"),
+        $c.lit("Llanerchymedd"),
+        $c.lit("Caergybi"),
+        $c.lit("Nairn"),
+        $c.lit("Turriff"),
+        $c.lit("Inverurie"),
+        $c.lit("Braemar"),
+        $c.lit("Lochnagar"),
+        $c.lit("Kerloch"),
+        $c.lit("Beinn a Ghlo"),
+        $c.lit("Drumnadrochit"),
+        $c.lit("Morven"),
+        $c.lit("Uist"),
+        $c.lit("Storr"),
+        $c.lit("Sgurr na Ciche"),
+        $c.lit("Cannich"),
+        $c.lit("Gairloch"),
+        $c.lit("Kyleakin"),
+        $c.lit("Dunvegan"),
+        null
+    ]);
     shkrings.fill(null);
-    shkrings[0] = $c.lit("Feyfer");
-    shkrings[1] = $c.lit("Flugi");
-    shkrings[2] = $c.lit("Gheel");
-    shkrings[3] = $c.lit("Havic");
-    shkrings[4] = $c.lit("Haynin");
-    shkrings[5] = $c.lit("Hoboken");
-    shkrings[6] = $c.lit("Imbyze");
-    shkrings[7] = $c.lit("Juyn");
-    shkrings[8] = $c.lit("Kinsky");
-    shkrings[9] = $c.lit("Massis");
-    shkrings[10] = $c.lit("Matray");
-    shkrings[11] = $c.lit("Moy");
-    shkrings[12] = $c.lit("Olycan");
-    shkrings[13] = $c.lit("Sadelin");
-    shkrings[14] = $c.lit("Svaving");
-    shkrings[15] = $c.lit("Tapper");
-    shkrings[16] = $c.lit("Terwen");
-    shkrings[17] = $c.lit("Wirix");
-    shkrings[18] = $c.lit("Ypey");
-    shkrings[19] = $c.lit("Rastegaisa");
-    shkrings[20] = $c.lit("Varjag Njarga");
-    shkrings[21] = $c.lit("Kautekeino");
-    shkrings[22] = $c.lit("Abisko");
-    shkrings[23] = $c.lit("Enontekis");
-    shkrings[24] = $c.lit("Rovaniemi");
-    shkrings[25] = $c.lit("Avasaksa");
-    shkrings[26] = $c.lit("Haparanda");
-    shkrings[27] = $c.lit("Lulea");
-    shkrings[28] = $c.lit("Gellivare");
-    shkrings[29] = $c.lit("Oeloe");
-    shkrings[30] = $c.lit("Kajaani");
-    shkrings[31] = $c.lit("Fauske");
-    shkrings[32] = null;
+    $c.init(shkrings, [
+        $c.lit("Feyfer"),
+        $c.lit("Flugi"),
+        $c.lit("Gheel"),
+        $c.lit("Havic"),
+        $c.lit("Haynin"),
+        $c.lit("Hoboken"),
+        $c.lit("Imbyze"),
+        $c.lit("Juyn"),
+        $c.lit("Kinsky"),
+        $c.lit("Massis"),
+        $c.lit("Matray"),
+        $c.lit("Moy"),
+        $c.lit("Olycan"),
+        $c.lit("Sadelin"),
+        $c.lit("Svaving"),
+        $c.lit("Tapper"),
+        $c.lit("Terwen"),
+        $c.lit("Wirix"),
+        $c.lit("Ypey"),
+        $c.lit("Rastegaisa"),
+        $c.lit("Varjag Njarga"),
+        $c.lit("Kautekeino"),
+        $c.lit("Abisko"),
+        $c.lit("Enontekis"),
+        $c.lit("Rovaniemi"),
+        $c.lit("Avasaksa"),
+        $c.lit("Haparanda"),
+        $c.lit("Lulea"),
+        $c.lit("Gellivare"),
+        $c.lit("Oeloe"),
+        $c.lit("Kajaani"),
+        $c.lit("Fauske"),
+        null
+    ]);
     shkfoods.fill(null);
-    shkfoods[0] = $c.lit("Djasinga");
-    shkfoods[1] = $c.lit("Tjibarusa");
-    shkfoods[2] = $c.lit("Tjiwidej");
-    shkfoods[3] = $c.lit("Pengalengan");
-    shkfoods[4] = $c.lit("Bandjar");
-    shkfoods[5] = $c.lit("Parbalingga");
-    shkfoods[6] = $c.lit("Bojolali");
-    shkfoods[7] = $c.lit("Sarangan");
-    shkfoods[8] = $c.lit("Ngebel");
-    shkfoods[9] = $c.lit("Djombang");
-    shkfoods[10] = $c.lit("Ardjawinangun");
-    shkfoods[11] = $c.lit("Berbek");
-    shkfoods[12] = $c.lit("Papar");
-    shkfoods[13] = $c.lit("Baliga");
-    shkfoods[14] = $c.lit("Tjisolok");
-    shkfoods[15] = $c.lit("Siboga");
-    shkfoods[16] = $c.lit("Banjoewangi");
-    shkfoods[17] = $c.lit("Trenggalek");
-    shkfoods[18] = $c.lit("Karangkobar");
-    shkfoods[19] = $c.lit("Njalindoeng");
-    shkfoods[20] = $c.lit("Pasawahan");
-    shkfoods[21] = $c.lit("Pameunpeuk");
-    shkfoods[22] = $c.lit("Patjitan");
-    shkfoods[23] = $c.lit("Kediri");
-    shkfoods[24] = $c.lit("Pemboeang");
-    shkfoods[25] = $c.lit("Tringanoe");
-    shkfoods[26] = $c.lit("Makin");
-    shkfoods[27] = $c.lit("Tipor");
-    shkfoods[28] = $c.lit("Semai");
-    shkfoods[29] = $c.lit("Berhala");
-    shkfoods[30] = $c.lit("Tegal");
-    shkfoods[31] = $c.lit("Samoe");
-    shkfoods[32] = null;
+    $c.init(shkfoods, [
+        $c.lit("Djasinga"),
+        $c.lit("Tjibarusa"),
+        $c.lit("Tjiwidej"),
+        $c.lit("Pengalengan"),
+        $c.lit("Bandjar"),
+        $c.lit("Parbalingga"),
+        $c.lit("Bojolali"),
+        $c.lit("Sarangan"),
+        $c.lit("Ngebel"),
+        $c.lit("Djombang"),
+        $c.lit("Ardjawinangun"),
+        $c.lit("Berbek"),
+        $c.lit("Papar"),
+        $c.lit("Baliga"),
+        $c.lit("Tjisolok"),
+        $c.lit("Siboga"),
+        $c.lit("Banjoewangi"),
+        $c.lit("Trenggalek"),
+        $c.lit("Karangkobar"),
+        $c.lit("Njalindoeng"),
+        $c.lit("Pasawahan"),
+        $c.lit("Pameunpeuk"),
+        $c.lit("Patjitan"),
+        $c.lit("Kediri"),
+        $c.lit("Pemboeang"),
+        $c.lit("Tringanoe"),
+        $c.lit("Makin"),
+        $c.lit("Tipor"),
+        $c.lit("Semai"),
+        $c.lit("Berhala"),
+        $c.lit("Tegal"),
+        $c.lit("Samoe"),
+        null
+    ]);
     shkweapons.fill(null);
-    shkweapons[0] = $c.lit("Voulgezac");
-    shkweapons[1] = $c.lit("Rouffiac");
-    shkweapons[2] = $c.lit("Lerignac");
-    shkweapons[3] = $c.lit("Touverac");
-    shkweapons[4] = $c.lit("Guizengeard");
-    shkweapons[5] = $c.lit("Melac");
-    shkweapons[6] = $c.lit("Neuvicq");
-    shkweapons[7] = $c.lit("Vanzac");
-    shkweapons[8] = $c.lit("Picq");
-    shkweapons[9] = $c.lit("Urignac");
-    shkweapons[10] = $c.lit("Corignac");
-    shkweapons[11] = $c.lit("Fleac");
-    shkweapons[12] = $c.lit("Lonzac");
-    shkweapons[13] = $c.lit("Vergt");
-    shkweapons[14] = $c.lit("Queyssac");
-    shkweapons[15] = $c.lit("Liorac");
-    shkweapons[16] = $c.lit("Echourgnac");
-    shkweapons[17] = $c.lit("Cazelon");
-    shkweapons[18] = $c.lit("Eypau");
-    shkweapons[19] = $c.lit("Carignan");
-    shkweapons[20] = $c.lit("Monbazillac");
-    shkweapons[21] = $c.lit("Jonzac");
-    shkweapons[22] = $c.lit("Pons");
-    shkweapons[23] = $c.lit("Jumilhac");
-    shkweapons[24] = $c.lit("Fenouilledes");
-    shkweapons[25] = $c.lit("Laguiolet");
-    shkweapons[26] = $c.lit("Saujon");
-    shkweapons[27] = $c.lit("Eymoutiers");
-    shkweapons[28] = $c.lit("Eygurande");
-    shkweapons[29] = $c.lit("Eauze");
-    shkweapons[30] = $c.lit("Labouheyre");
-    shkweapons[31] = null;
+    $c.init(shkweapons, [
+        $c.lit("Voulgezac"),
+        $c.lit("Rouffiac"),
+        $c.lit("Lerignac"),
+        $c.lit("Touverac"),
+        $c.lit("Guizengeard"),
+        $c.lit("Melac"),
+        $c.lit("Neuvicq"),
+        $c.lit("Vanzac"),
+        $c.lit("Picq"),
+        $c.lit("Urignac"),
+        $c.lit("Corignac"),
+        $c.lit("Fleac"),
+        $c.lit("Lonzac"),
+        $c.lit("Vergt"),
+        $c.lit("Queyssac"),
+        $c.lit("Liorac"),
+        $c.lit("Echourgnac"),
+        $c.lit("Cazelon"),
+        $c.lit("Eypau"),
+        $c.lit("Carignan"),
+        $c.lit("Monbazillac"),
+        $c.lit("Jonzac"),
+        $c.lit("Pons"),
+        $c.lit("Jumilhac"),
+        $c.lit("Fenouilledes"),
+        $c.lit("Laguiolet"),
+        $c.lit("Saujon"),
+        $c.lit("Eymoutiers"),
+        $c.lit("Eygurande"),
+        $c.lit("Eauze"),
+        $c.lit("Labouheyre"),
+        null
+    ]);
     shktools.fill(null);
-    shktools[0] = $c.lit("Ymla");
-    shktools[1] = $c.lit("Eed-morra");
-    shktools[2] = $c.lit("Elan Lapinski");
-    shktools[3] = $c.lit("Cubask");
-    shktools[4] = $c.lit("Nieb");
-    shktools[5] = $c.lit("Bnowr Falr");
-    shktools[6] = $c.lit("Sperc");
-    shktools[7] = $c.lit("Noskcirdneh");
-    shktools[8] = $c.lit("Yawolloh");
-    shktools[9] = $c.lit("Hyeghu");
-    shktools[10] = $c.lit("Niskal");
-    shktools[11] = $c.lit("Trahnil");
-    shktools[12] = $c.lit("Htargcm");
-    shktools[13] = $c.lit("Enrobwem");
-    shktools[14] = $c.lit("Kachzi Rellim");
-    shktools[15] = $c.lit("Regien");
-    shktools[16] = $c.lit("Donmyar");
-    shktools[17] = $c.lit("Yelpur");
-    shktools[18] = $c.lit("Nosnehpets");
-    shktools[19] = $c.lit("Stewe");
-    shktools[20] = $c.lit("Renrut");
-    shktools[21] = $c.lit("Senna Hut");
-    shktools[22] = $c.lit("-Zlaw");
-    shktools[23] = $c.lit("Nosalnef");
-    shktools[24] = $c.lit("Rewuorb");
-    shktools[25] = $c.lit("Rellenk");
-    shktools[26] = $c.lit("Yad");
-    shktools[27] = $c.lit("Cire Htims");
-    shktools[28] = $c.lit("Y-crad");
-    shktools[29] = $c.lit("Nenilukah");
-    shktools[30] = $c.lit("Corsh");
-    shktools[31] = $c.lit("Aned");
-    shktools[32] = $c.lit("Dark Eery");
-    shktools[33] = $c.lit("Niknar");
-    shktools[34] = $c.lit("Lapu");
-    shktools[35] = $c.lit("Lechaim");
-    shktools[36] = $c.lit("Rebrol-nek");
-    shktools[37] = $c.lit("AlliWar Wickson");
-    shktools[38] = $c.lit("Oguhmk");
-    shktools[39] = $c.lit("Telloc Cyaj");
-    shktools[40] = null;
+    $c.init(shktools, [
+        $c.lit("Ymla"),
+        $c.lit("Eed-morra"),
+        $c.lit("Elan Lapinski"),
+        $c.lit("Cubask"),
+        $c.lit("Nieb"),
+        $c.lit("Bnowr Falr"),
+        $c.lit("Sperc"),
+        $c.lit("Noskcirdneh"),
+        $c.lit("Yawolloh"),
+        $c.lit("Hyeghu"),
+        $c.lit("Niskal"),
+        $c.lit("Trahnil"),
+        $c.lit("Htargcm"),
+        $c.lit("Enrobwem"),
+        $c.lit("Kachzi Rellim"),
+        $c.lit("Regien"),
+        $c.lit("Donmyar"),
+        $c.lit("Yelpur"),
+        $c.lit("Nosnehpets"),
+        $c.lit("Stewe"),
+        $c.lit("Renrut"),
+        $c.lit("Senna Hut"),
+        $c.lit("-Zlaw"),
+        $c.lit("Nosalnef"),
+        $c.lit("Rewuorb"),
+        $c.lit("Rellenk"),
+        $c.lit("Yad"),
+        $c.lit("Cire Htims"),
+        $c.lit("Y-crad"),
+        $c.lit("Nenilukah"),
+        $c.lit("Corsh"),
+        $c.lit("Aned"),
+        $c.lit("Dark Eery"),
+        $c.lit("Niknar"),
+        $c.lit("Lapu"),
+        $c.lit("Lechaim"),
+        $c.lit("Rebrol-nek"),
+        $c.lit("AlliWar Wickson"),
+        $c.lit("Oguhmk"),
+        $c.lit("Telloc Cyaj"),
+        null
+    ]);
     shklight.fill(null);
-    shklight[0] = $c.lit("Zarnesti");
-    shklight[1] = $c.lit("Slanic");
-    shklight[2] = $c.lit("Nehoiasu");
-    shklight[3] = $c.lit("Ludus");
-    shklight[4] = $c.lit("Sighisoara");
-    shklight[5] = $c.lit("Nisipitu");
-    shklight[6] = $c.lit("Razboieni");
-    shklight[7] = $c.lit("Bicaz");
-    shklight[8] = $c.lit("Dorohoi");
-    shklight[9] = $c.lit("Vaslui");
-    shklight[10] = $c.lit("Fetesti");
-    shklight[11] = $c.lit("Tirgu Neamt");
-    shklight[12] = $c.lit("Babadag");
-    shklight[13] = $c.lit("Zimnicea");
-    shklight[14] = $c.lit("Zlatna");
-    shklight[15] = $c.lit("Jiu");
-    shklight[16] = $c.lit("Eforie");
-    shklight[17] = $c.lit("Mamaia");
-    shklight[18] = $c.lit("Silistra");
-    shklight[19] = $c.lit("Tulovo");
-    shklight[20] = $c.lit("Panagyuritshte");
-    shklight[21] = $c.lit("Smolyan");
-    shklight[22] = $c.lit("Kirklareli");
-    shklight[23] = $c.lit("Pernik");
-    shklight[24] = $c.lit("Lom");
-    shklight[25] = $c.lit("Haskovo");
-    shklight[26] = $c.lit("Dobrinishte");
-    shklight[27] = $c.lit("Varvara");
-    shklight[28] = $c.lit("Oryahovo");
-    shklight[29] = $c.lit("Troyan");
-    shklight[30] = $c.lit("Lovech");
-    shklight[31] = $c.lit("Sliven");
-    shklight[32] = null;
+    $c.init(shklight, [
+        $c.lit("Zarnesti"),
+        $c.lit("Slanic"),
+        $c.lit("Nehoiasu"),
+        $c.lit("Ludus"),
+        $c.lit("Sighisoara"),
+        $c.lit("Nisipitu"),
+        $c.lit("Razboieni"),
+        $c.lit("Bicaz"),
+        $c.lit("Dorohoi"),
+        $c.lit("Vaslui"),
+        $c.lit("Fetesti"),
+        $c.lit("Tirgu Neamt"),
+        $c.lit("Babadag"),
+        $c.lit("Zimnicea"),
+        $c.lit("Zlatna"),
+        $c.lit("Jiu"),
+        $c.lit("Eforie"),
+        $c.lit("Mamaia"),
+        $c.lit("Silistra"),
+        $c.lit("Tulovo"),
+        $c.lit("Panagyuritshte"),
+        $c.lit("Smolyan"),
+        $c.lit("Kirklareli"),
+        $c.lit("Pernik"),
+        $c.lit("Lom"),
+        $c.lit("Haskovo"),
+        $c.lit("Dobrinishte"),
+        $c.lit("Varvara"),
+        $c.lit("Oryahovo"),
+        $c.lit("Troyan"),
+        $c.lit("Lovech"),
+        $c.lit("Sliven"),
+        null
+    ]);
     shkgeneral.fill(null);
-    shkgeneral[0] = $c.lit("Hebiwerie");
-    shkgeneral[1] = $c.lit("Possogroenoe");
-    shkgeneral[2] = $c.lit("Asidonhopo");
-    shkgeneral[3] = $c.lit("Manlobbi");
-    shkgeneral[4] = $c.lit("Adjama");
-    shkgeneral[5] = $c.lit("Pakka Pakka");
-    shkgeneral[6] = $c.lit("Kabalebo");
-    shkgeneral[7] = $c.lit("Wonotobo");
-    shkgeneral[8] = $c.lit("Akalapi");
-    shkgeneral[9] = $c.lit("Sipaliwini");
-    shkgeneral[10] = $c.lit("Annootok");
-    shkgeneral[11] = $c.lit("Upernavik");
-    shkgeneral[12] = $c.lit("Angmagssalik");
-    shkgeneral[13] = $c.lit("Aklavik");
-    shkgeneral[14] = $c.lit("Inuvik");
-    shkgeneral[15] = $c.lit("Tuktoyaktuk");
-    shkgeneral[16] = $c.lit("Chicoutimi");
-    shkgeneral[17] = $c.lit("Ouiatchouane");
-    shkgeneral[18] = $c.lit("Chibougamau");
-    shkgeneral[19] = $c.lit("Matagami");
-    shkgeneral[20] = $c.lit("Kipawa");
-    shkgeneral[21] = $c.lit("Kinojevis");
-    shkgeneral[22] = $c.lit("Abitibi");
-    shkgeneral[23] = $c.lit("Maganasipi");
-    shkgeneral[24] = $c.lit("Akureyri");
-    shkgeneral[25] = $c.lit("Kopasker");
-    shkgeneral[26] = $c.lit("Budereyri");
-    shkgeneral[27] = $c.lit("Akranes");
-    shkgeneral[28] = $c.lit("Bordeyri");
-    shkgeneral[29] = $c.lit("Holmavik");
-    shkgeneral[30] = null;
+    $c.init(shkgeneral, [
+        $c.lit("Hebiwerie"),
+        $c.lit("Possogroenoe"),
+        $c.lit("Asidonhopo"),
+        $c.lit("Manlobbi"),
+        $c.lit("Adjama"),
+        $c.lit("Pakka Pakka"),
+        $c.lit("Kabalebo"),
+        $c.lit("Wonotobo"),
+        $c.lit("Akalapi"),
+        $c.lit("Sipaliwini"),
+        $c.lit("Annootok"),
+        $c.lit("Upernavik"),
+        $c.lit("Angmagssalik"),
+        $c.lit("Aklavik"),
+        $c.lit("Inuvik"),
+        $c.lit("Tuktoyaktuk"),
+        $c.lit("Chicoutimi"),
+        $c.lit("Ouiatchouane"),
+        $c.lit("Chibougamau"),
+        $c.lit("Matagami"),
+        $c.lit("Kipawa"),
+        $c.lit("Kinojevis"),
+        $c.lit("Abitibi"),
+        $c.lit("Maganasipi"),
+        $c.lit("Akureyri"),
+        $c.lit("Kopasker"),
+        $c.lit("Budereyri"),
+        $c.lit("Akranes"),
+        $c.lit("Bordeyri"),
+        $c.lit("Holmavik"),
+        null
+    ]);
     shkhealthfoods.fill(null);
-    shkhealthfoods[0] = $c.lit("Ga'er");
-    shkhealthfoods[1] = $c.lit("Zhangmu");
-    shkhealthfoods[2] = $c.lit("Rikaze");
-    shkhealthfoods[3] = $c.lit("Jiangji");
-    shkhealthfoods[4] = $c.lit("Changdu");
-    shkhealthfoods[5] = $c.lit("Linzhi");
-    shkhealthfoods[6] = $c.lit("Shigatse");
-    shkhealthfoods[7] = $c.lit("Gyantse");
-    shkhealthfoods[8] = $c.lit("Ganden");
-    shkhealthfoods[9] = $c.lit("Tsurphu");
-    shkhealthfoods[10] = $c.lit("Lhasa");
-    shkhealthfoods[11] = $c.lit("Tsedong");
-    shkhealthfoods[12] = $c.lit("Drepung");
-    shkhealthfoods[13] = $c.lit("=Azura");
-    shkhealthfoods[14] = $c.lit("=Blaze");
-    shkhealthfoods[15] = $c.lit("=Breanna");
-    shkhealthfoods[16] = $c.lit("=Breezy");
-    shkhealthfoods[17] = $c.lit("=Dharma");
-    shkhealthfoods[18] = $c.lit("=Feather");
-    shkhealthfoods[19] = $c.lit("=Jasmine");
-    shkhealthfoods[20] = $c.lit("=Luna");
-    shkhealthfoods[21] = $c.lit("=Melody");
-    shkhealthfoods[22] = $c.lit("=Moonjava");
-    shkhealthfoods[23] = $c.lit("=Petal");
-    shkhealthfoods[24] = $c.lit("=Rhiannon");
-    shkhealthfoods[25] = $c.lit("=Starla");
-    shkhealthfoods[26] = $c.lit("=Tranquilla");
-    shkhealthfoods[27] = $c.lit("=Windsong");
-    shkhealthfoods[28] = $c.lit("=Zennia");
-    shkhealthfoods[29] = $c.lit("=Zoe");
-    shkhealthfoods[30] = $c.lit("=Zora");
-    shkhealthfoods[31] = null;
+    $c.init(shkhealthfoods, [
+        $c.lit("Ga'er"),
+        $c.lit("Zhangmu"),
+        $c.lit("Rikaze"),
+        $c.lit("Jiangji"),
+        $c.lit("Changdu"),
+        $c.lit("Linzhi"),
+        $c.lit("Shigatse"),
+        $c.lit("Gyantse"),
+        $c.lit("Ganden"),
+        $c.lit("Tsurphu"),
+        $c.lit("Lhasa"),
+        $c.lit("Tsedong"),
+        $c.lit("Drepung"),
+        $c.lit("=Azura"),
+        $c.lit("=Blaze"),
+        $c.lit("=Breanna"),
+        $c.lit("=Breezy"),
+        $c.lit("=Dharma"),
+        $c.lit("=Feather"),
+        $c.lit("=Jasmine"),
+        $c.lit("=Luna"),
+        $c.lit("=Melody"),
+        $c.lit("=Moonjava"),
+        $c.lit("=Petal"),
+        $c.lit("=Rhiannon"),
+        $c.lit("=Starla"),
+        $c.lit("=Tranquilla"),
+        $c.lit("=Windsong"),
+        $c.lit("=Zennia"),
+        $c.lit("=Zoe"),
+        $c.lit("=Zora"),
+        null
+    ]);
     for (let $i0 = 0; $i0 < 13; $i0++) {
         shtypes[$i0].$copyFrom(new $T.shclass());
     }
-    shtypes[0].name = $c.lit("general store");
-    shtypes[0].annotation = null;
-    shtypes[0].symb = RANDOM_CLASS;
-    shtypes[0].prob = 42;
-    shtypes[0].shdist = D_SHOP;
-    shtypes[0].iprobs[0].iprob = 100;
-    shtypes[0].iprobs[0].itype = RANDOM_CLASS;
-    shtypes[0].iprobs[1].iprob = 0;
-    shtypes[0].iprobs[1].itype = 0;
-    shtypes[0].iprobs[2].iprob = 0;
-    shtypes[0].iprobs[2].itype = 0;
-    shtypes[0].iprobs[3].iprob = 0;
-    shtypes[0].iprobs[3].itype = 0;
-    shtypes[0].iprobs[4].iprob = 0;
-    shtypes[0].iprobs[4].itype = 0;
-    shtypes[0].iprobs[5].iprob = 0;
-    shtypes[0].iprobs[5].itype = 0;
-    shtypes[0].shknms = new $c.Ptr(shkgeneral, 0);
-    shtypes[1].name = $c.lit("used armor dealership");
-    shtypes[1].annotation = $c.lit("armor shop");
-    shtypes[1].symb = ARMOR_CLASS;
-    shtypes[1].prob = 14;
-    shtypes[1].shdist = D_SHOP;
-    shtypes[1].iprobs[0].iprob = 90;
-    shtypes[1].iprobs[0].itype = ARMOR_CLASS;
-    shtypes[1].iprobs[1].iprob = 10;
-    shtypes[1].iprobs[1].itype = WEAPON_CLASS;
-    shtypes[1].iprobs[2].iprob = 0;
-    shtypes[1].iprobs[2].itype = 0;
-    shtypes[1].iprobs[3].iprob = 0;
-    shtypes[1].iprobs[3].itype = 0;
-    shtypes[1].iprobs[4].iprob = 0;
-    shtypes[1].iprobs[4].itype = 0;
-    shtypes[1].iprobs[5].iprob = 0;
-    shtypes[1].iprobs[5].itype = 0;
-    shtypes[1].shknms = new $c.Ptr(shkarmors, 0);
-    shtypes[2].name = $c.lit("second-hand bookstore");
-    shtypes[2].annotation = $c.lit("scroll shop");
-    shtypes[2].symb = SCROLL_CLASS;
-    shtypes[2].prob = 10;
-    shtypes[2].shdist = D_SHOP;
-    shtypes[2].iprobs[0].iprob = 90;
-    shtypes[2].iprobs[0].itype = SCROLL_CLASS;
-    shtypes[2].iprobs[1].iprob = 10;
-    shtypes[2].iprobs[1].itype = SPBOOK_CLASS;
-    shtypes[2].iprobs[2].iprob = 0;
-    shtypes[2].iprobs[2].itype = 0;
-    shtypes[2].iprobs[3].iprob = 0;
-    shtypes[2].iprobs[3].itype = 0;
-    shtypes[2].iprobs[4].iprob = 0;
-    shtypes[2].iprobs[4].itype = 0;
-    shtypes[2].iprobs[5].iprob = 0;
-    shtypes[2].iprobs[5].itype = 0;
-    shtypes[2].shknms = new $c.Ptr(shkbooks, 0);
-    shtypes[3].name = $c.lit("liquor emporium");
-    shtypes[3].annotation = $c.lit("potion shop");
-    shtypes[3].symb = POTION_CLASS;
-    shtypes[3].prob = 10;
-    shtypes[3].shdist = D_SHOP;
-    shtypes[3].iprobs[0].iprob = 100;
-    shtypes[3].iprobs[0].itype = POTION_CLASS;
-    shtypes[3].iprobs[1].iprob = 0;
-    shtypes[3].iprobs[1].itype = 0;
-    shtypes[3].iprobs[2].iprob = 0;
-    shtypes[3].iprobs[2].itype = 0;
-    shtypes[3].iprobs[3].iprob = 0;
-    shtypes[3].iprobs[3].itype = 0;
-    shtypes[3].iprobs[4].iprob = 0;
-    shtypes[3].iprobs[4].itype = 0;
-    shtypes[3].iprobs[5].iprob = 0;
-    shtypes[3].iprobs[5].itype = 0;
-    shtypes[3].shknms = new $c.Ptr(shkliquors, 0);
-    shtypes[4].name = $c.lit("antique weapons outlet");
-    shtypes[4].annotation = $c.lit("weapon shop");
-    shtypes[4].symb = WEAPON_CLASS;
-    shtypes[4].prob = 5;
-    shtypes[4].shdist = D_SHOP;
-    shtypes[4].iprobs[0].iprob = 90;
-    shtypes[4].iprobs[0].itype = WEAPON_CLASS;
-    shtypes[4].iprobs[1].iprob = 10;
-    shtypes[4].iprobs[1].itype = ARMOR_CLASS;
-    shtypes[4].iprobs[2].iprob = 0;
-    shtypes[4].iprobs[2].itype = 0;
-    shtypes[4].iprobs[3].iprob = 0;
-    shtypes[4].iprobs[3].itype = 0;
-    shtypes[4].iprobs[4].iprob = 0;
-    shtypes[4].iprobs[4].itype = 0;
-    shtypes[4].iprobs[5].iprob = 0;
-    shtypes[4].iprobs[5].itype = 0;
-    shtypes[4].shknms = new $c.Ptr(shkweapons, 0);
-    shtypes[5].name = $c.lit("delicatessen");
-    shtypes[5].annotation = $c.lit("food shop");
-    shtypes[5].symb = FOOD_CLASS;
-    shtypes[5].prob = 5;
-    shtypes[5].shdist = D_SHOP;
-    shtypes[5].iprobs[0].iprob = 83;
-    shtypes[5].iprobs[0].itype = FOOD_CLASS;
-    shtypes[5].iprobs[1].iprob = 5;
-    shtypes[5].iprobs[1].itype = -POT_FRUIT_JUICE;
-    shtypes[5].iprobs[2].iprob = 4;
-    shtypes[5].iprobs[2].itype = -POT_BOOZE;
-    shtypes[5].iprobs[3].iprob = 5;
-    shtypes[5].iprobs[3].itype = -POT_WATER;
-    shtypes[5].iprobs[4].iprob = 3;
-    shtypes[5].iprobs[4].itype = -ICE_BOX;
-    shtypes[5].iprobs[5].iprob = 0;
-    shtypes[5].iprobs[5].itype = 0;
-    shtypes[5].shknms = new $c.Ptr(shkfoods, 0);
-    shtypes[6].name = $c.lit("jewelers");
-    shtypes[6].annotation = $c.lit("ring shop");
-    shtypes[6].symb = RING_CLASS;
-    shtypes[6].prob = 3;
-    shtypes[6].shdist = D_SHOP;
-    shtypes[6].iprobs[0].iprob = 85;
-    shtypes[6].iprobs[0].itype = RING_CLASS;
-    shtypes[6].iprobs[1].iprob = 10;
-    shtypes[6].iprobs[1].itype = GEM_CLASS;
-    shtypes[6].iprobs[2].iprob = 5;
-    shtypes[6].iprobs[2].itype = AMULET_CLASS;
-    shtypes[6].iprobs[3].iprob = 0;
-    shtypes[6].iprobs[3].itype = 0;
-    shtypes[6].iprobs[4].iprob = 0;
-    shtypes[6].iprobs[4].itype = 0;
-    shtypes[6].iprobs[5].iprob = 0;
-    shtypes[6].iprobs[5].itype = 0;
-    shtypes[6].shknms = new $c.Ptr(shkrings, 0);
-    shtypes[7].name = $c.lit("quality apparel and accessories");
-    shtypes[7].annotation = $c.lit("wand shop");
-    shtypes[7].symb = WAND_CLASS;
-    shtypes[7].prob = 3;
-    shtypes[7].shdist = D_SHOP;
-    shtypes[7].iprobs[0].iprob = 90;
-    shtypes[7].iprobs[0].itype = WAND_CLASS;
-    shtypes[7].iprobs[1].iprob = 5;
-    shtypes[7].iprobs[1].itype = -LEATHER_GLOVES;
-    shtypes[7].iprobs[2].iprob = 5;
-    shtypes[7].iprobs[2].itype = -ELVEN_CLOAK;
-    shtypes[7].iprobs[3].iprob = 0;
-    shtypes[7].iprobs[3].itype = 0;
-    shtypes[7].shknms = new $c.Ptr(shkwands, 0);
-    shtypes[8].name = $c.lit("hardware store");
-    shtypes[8].annotation = $c.lit("tool shop");
-    shtypes[8].symb = TOOL_CLASS;
-    shtypes[8].prob = 3;
-    shtypes[8].shdist = D_SHOP;
-    shtypes[8].iprobs[0].iprob = 100;
-    shtypes[8].iprobs[0].itype = TOOL_CLASS;
-    shtypes[8].iprobs[1].iprob = 0;
-    shtypes[8].iprobs[1].itype = 0;
-    shtypes[8].iprobs[2].iprob = 0;
-    shtypes[8].iprobs[2].itype = 0;
-    shtypes[8].iprobs[3].iprob = 0;
-    shtypes[8].iprobs[3].itype = 0;
-    shtypes[8].iprobs[4].iprob = 0;
-    shtypes[8].iprobs[4].itype = 0;
-    shtypes[8].iprobs[5].iprob = 0;
-    shtypes[8].iprobs[5].itype = 0;
-    shtypes[8].shknms = new $c.Ptr(shktools, 0);
-    shtypes[9].name = $c.lit("rare books");
-    shtypes[9].annotation = $c.lit("bookstore");
-    shtypes[9].symb = SPBOOK_CLASS;
-    shtypes[9].prob = 3;
-    shtypes[9].shdist = D_SHOP;
-    shtypes[9].iprobs[0].iprob = 90;
-    shtypes[9].iprobs[0].itype = SPBOOK_CLASS;
-    shtypes[9].iprobs[1].iprob = 10;
-    shtypes[9].iprobs[1].itype = SCROLL_CLASS;
-    shtypes[9].iprobs[2].iprob = 0;
-    shtypes[9].iprobs[2].itype = 0;
-    shtypes[9].iprobs[3].iprob = 0;
-    shtypes[9].iprobs[3].itype = 0;
-    shtypes[9].iprobs[4].iprob = 0;
-    shtypes[9].iprobs[4].itype = 0;
-    shtypes[9].iprobs[5].iprob = 0;
-    shtypes[9].iprobs[5].itype = 0;
-    shtypes[9].shknms = new $c.Ptr(shkbooks, 0);
-    shtypes[10].name = $c.lit("health food store");
-    shtypes[10].annotation = $c.lit("vegetarian food shop");
-    shtypes[10].symb = FOOD_CLASS;
-    shtypes[10].prob = 2;
-    shtypes[10].shdist = D_SHOP;
-    shtypes[10].iprobs[0].iprob = 70;
-    shtypes[10].iprobs[0].itype = MAXOCLASSES + 1;
-    shtypes[10].iprobs[1].iprob = 20;
-    shtypes[10].iprobs[1].itype = -POT_FRUIT_JUICE;
-    shtypes[10].iprobs[2].iprob = 4;
-    shtypes[10].iprobs[2].itype = -POT_HEALING;
-    shtypes[10].iprobs[3].iprob = 3;
-    shtypes[10].iprobs[3].itype = -POT_FULL_HEALING;
-    shtypes[10].iprobs[4].iprob = 2;
-    shtypes[10].iprobs[4].itype = -SCR_FOOD_DETECTION;
-    shtypes[10].iprobs[5].iprob = 1;
-    shtypes[10].iprobs[5].itype = -LUMP_OF_ROYAL_JELLY;
-    shtypes[10].shknms = new $c.Ptr(shkhealthfoods, 0);
-    shtypes[11].name = $c.lit("lighting store");
-    shtypes[11].annotation = $c.lit("lighting shop");
-    shtypes[11].symb = TOOL_CLASS;
-    shtypes[11].prob = 0;
-    shtypes[11].shdist = D_SHOP;
-    shtypes[11].iprobs[0].iprob = 30;
-    shtypes[11].iprobs[0].itype = -WAX_CANDLE;
-    shtypes[11].iprobs[1].iprob = 44;
-    shtypes[11].iprobs[1].itype = -TALLOW_CANDLE;
-    shtypes[11].iprobs[2].iprob = 5;
-    shtypes[11].iprobs[2].itype = -BRASS_LANTERN;
-    shtypes[11].iprobs[3].iprob = 9;
-    shtypes[11].iprobs[3].itype = -OIL_LAMP;
-    shtypes[11].iprobs[4].iprob = 3;
-    shtypes[11].iprobs[4].itype = -MAGIC_LAMP;
-    shtypes[11].iprobs[5].iprob = 5;
-    shtypes[11].iprobs[5].itype = -POT_OIL;
-    shtypes[11].iprobs[6].iprob = 2;
-    shtypes[11].iprobs[6].itype = -WAN_LIGHT;
-    shtypes[11].iprobs[7].iprob = 1;
-    shtypes[11].iprobs[7].itype = -SCR_LIGHT;
-    shtypes[11].iprobs[8].iprob = 1;
-    shtypes[11].iprobs[8].itype = -SPE_LIGHT;
-    shtypes[11].shknms = new $c.Ptr(shklight, 0);
-    shtypes[12].name = null;
-    shtypes[12].annotation = null;
-    shtypes[12].symb = 0;
-    shtypes[12].prob = 0;
-    shtypes[12].shdist = 0;
-    shtypes[12].iprobs[0].iprob = 0;
-    shtypes[12].iprobs[0].itype = 0;
-    shtypes[12].iprobs[1].iprob = 0;
-    shtypes[12].iprobs[1].itype = 0;
-    shtypes[12].iprobs[2].iprob = 0;
-    shtypes[12].iprobs[2].itype = 0;
-    shtypes[12].iprobs[3].iprob = 0;
-    shtypes[12].iprobs[3].itype = 0;
-    shtypes[12].iprobs[4].iprob = 0;
-    shtypes[12].iprobs[4].itype = 0;
-    shtypes[12].iprobs[5].iprob = 0;
-    shtypes[12].iprobs[5].itype = 0;
-    shtypes[12].shknms = null;
+    $c.init(shtypes, [
+        { name: $c.lit("general store"), annotation: null,
+          symb: RANDOM_CLASS,
+          prob: 42,
+          shdist: D_SHOP,
+          iprobs: [{ iprob: 100, itype: RANDOM_CLASS },
+          {},
+          {},
+          {},
+          {},
+          {}],
+          shknms: new $c.Ptr(shkgeneral, 0) },
+        { name: $c.lit("used armor dealership"), annotation: $c.lit("armor shop"),
+          symb: ARMOR_CLASS,
+          prob: 14,
+          shdist: D_SHOP,
+          iprobs: [{ iprob: 90, itype: ARMOR_CLASS },
+          { iprob: 10, itype: WEAPON_CLASS },
+          {},
+          {},
+          {},
+          {}],
+          shknms: new $c.Ptr(shkarmors, 0) },
+        { name: $c.lit("second-hand bookstore"), annotation: $c.lit("scroll shop"),
+          symb: SCROLL_CLASS,
+          prob: 10,
+          shdist: D_SHOP,
+          iprobs: [{ iprob: 90, itype: SCROLL_CLASS },
+          { iprob: 10, itype: SPBOOK_CLASS },
+          {},
+          {},
+          {},
+          {}],
+          shknms: new $c.Ptr(shkbooks, 0) },
+        { name: $c.lit("liquor emporium"), annotation: $c.lit("potion shop"),
+          symb: POTION_CLASS,
+          prob: 10,
+          shdist: D_SHOP,
+          iprobs: [{ iprob: 100, itype: POTION_CLASS },
+          {},
+          {},
+          {},
+          {},
+          {}],
+          shknms: new $c.Ptr(shkliquors, 0) },
+        { name: $c.lit("antique weapons outlet"), annotation: $c.lit("weapon shop"),
+          symb: WEAPON_CLASS,
+          prob: 5,
+          shdist: D_SHOP,
+          iprobs: [{ iprob: 90, itype: WEAPON_CLASS },
+          { iprob: 10, itype: ARMOR_CLASS },
+          {},
+          {},
+          {},
+          {}],
+          shknms: new $c.Ptr(shkweapons, 0) },
+        { name: $c.lit("delicatessen"), annotation: $c.lit("food shop"),
+          symb: FOOD_CLASS,
+          prob: 5,
+          shdist: D_SHOP,
+          iprobs: [{ iprob: 83, itype: FOOD_CLASS },
+          { iprob: 5, itype: -POT_FRUIT_JUICE },
+          { iprob: 4, itype: -POT_BOOZE },
+          { iprob: 5, itype: -POT_WATER },
+          { iprob: 3, itype: -ICE_BOX },
+          {}],
+          shknms: new $c.Ptr(shkfoods, 0) },
+        { name: $c.lit("jewelers"), annotation: $c.lit("ring shop"),
+          symb: RING_CLASS,
+          prob: 3,
+          shdist: D_SHOP,
+          iprobs: [{ iprob: 85, itype: RING_CLASS },
+          { iprob: 10, itype: GEM_CLASS },
+          { iprob: 5, itype: AMULET_CLASS },
+          {},
+          {},
+          {}],
+          shknms: new $c.Ptr(shkrings, 0) },
+        { name: $c.lit("quality apparel and accessories"), annotation: $c.lit("wand shop"),
+          symb: WAND_CLASS,
+          prob: 3,
+          shdist: D_SHOP,
+          iprobs: [{ iprob: 90, itype: WAND_CLASS },
+          { iprob: 5, itype: -LEATHER_GLOVES },
+          { iprob: 5, itype: -ELVEN_CLOAK },
+          {}],
+          shknms: new $c.Ptr(shkwands, 0) },
+        { name: $c.lit("hardware store"), annotation: $c.lit("tool shop"),
+          symb: TOOL_CLASS,
+          prob: 3,
+          shdist: D_SHOP,
+          iprobs: [{ iprob: 100, itype: TOOL_CLASS },
+          {},
+          {},
+          {},
+          {},
+          {}],
+          shknms: new $c.Ptr(shktools, 0) },
+        { name: $c.lit("rare books"), annotation: $c.lit("bookstore"),
+          symb: SPBOOK_CLASS,
+          prob: 3,
+          shdist: D_SHOP,
+          iprobs: [{ iprob: 90, itype: SPBOOK_CLASS },
+          { iprob: 10, itype: SCROLL_CLASS },
+          {},
+          {},
+          {},
+          {}],
+          shknms: new $c.Ptr(shkbooks, 0) },
+        { name: $c.lit("health food store"), annotation: $c.lit("vegetarian food shop"),
+          symb: FOOD_CLASS,
+          prob: 2,
+          shdist: D_SHOP,
+          iprobs: [{ iprob: 70, itype: MAXOCLASSES + 1 },
+          { iprob: 20, itype: -POT_FRUIT_JUICE },
+          { iprob: 4, itype: -POT_HEALING },
+          { iprob: 3, itype: -POT_FULL_HEALING },
+          { iprob: 2, itype: -SCR_FOOD_DETECTION },
+          { iprob: 1, itype: -LUMP_OF_ROYAL_JELLY }],
+          shknms: new $c.Ptr(shkhealthfoods, 0) },
+        { name: $c.lit("lighting store"), annotation: $c.lit("lighting shop"),
+          symb: TOOL_CLASS,
+          prob: 0,
+          shdist: D_SHOP,
+          iprobs: [{ iprob: 30, itype: -WAX_CANDLE },
+          { iprob: 44, itype: -TALLOW_CANDLE },
+          { iprob: 5, itype: -BRASS_LANTERN },
+          { iprob: 9, itype: -OIL_LAMP },
+          { iprob: 3, itype: -MAGIC_LAMP },
+          { iprob: 5, itype: -POT_OIL },
+          { iprob: 2, itype: -WAN_LIGHT },
+          { iprob: 1, itype: -SCR_LIGHT },
+          { iprob: 1, itype: -SPE_LIGHT }],
+          shknms: new $c.Ptr(shklight, 0) },
+        {}
+    ]);
 }

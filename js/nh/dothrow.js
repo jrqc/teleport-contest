@@ -26,9 +26,9 @@ import { ceiling, has_ceiling, on_level, surface, u_on_newpos } from './dungeon.
 import { done } from './end.js';
 import { u_wipe_engr } from './engrave.js';
 import { explode, explode_oil } from './explode.js';
-import { FALSE, TRUE } from './global.h.js';
+import { FALSE, LARGEST_INT, TRUE } from './global.h.js';
 import { bad_rock, calc_capacity, check_capacity, check_special_room, impact_disturbs_zombies, in_rooms, inv_weight, losehp, may_passwall, nomul, switch_terrain, weight_cap } from './hack.js';
-import { ARM, ARTICLE_A, AUGMENT_IT, BOLT_LIM, BRK_FROM_INV, BRK_KNOWN2BREAK, BRK_KNOWN2NOTBREAK, BRK_KNOWN_OUTCOME, CORPSTAT_FEMALE, CORPSTAT_GENDER, CQ_CANNED, CXN_PFX_THE, ECMD_CANCEL, ECMD_OK, ECMD_TIME, EYE, FACE, FOOT, FORCEBUNGLE, GETOBJ_ALLOWCNT, GETOBJ_DOWNPLAY, GETOBJ_EXCLUDE, GETOBJ_PROMPT, GETOBJ_SUGGEST, HAND, HEAD, HMON_APPLIED, HMON_KICKED, HMON_THROWN, HURTLING, KILLED_BY, KILLED_BY_AN, MM_IGNORELAVA, MM_IGNOREWATER, MM_NOMSG, NO_TRAP_FLAGS, RLOC_MSG, SLT_ENCUMBER, STONING, SUPPRESS_SADDLE, THROWN_TETHERED_WEAPON, THROWN_WEAPON } from './hack.h.js';
+import { ARM, ARTICLE_A, ARTICLE_YOUR, AUGMENT_IT, BOLT_LIM, BRK_FROM_INV, BRK_KNOWN2BREAK, BRK_KNOWN2NOTBREAK, BRK_KNOWN_OUTCOME, CORPSTAT_FEMALE, CORPSTAT_GENDER, CQ_CANNED, CXN_PFX_THE, ECMD_CANCEL, ECMD_OK, ECMD_TIME, EXACT_NAME, EYE, FACE, FOOT, FORCEBUNGLE, GETOBJ_ALLOWCNT, GETOBJ_DOWNPLAY, GETOBJ_EXCLUDE, GETOBJ_PROMPT, GETOBJ_SUGGEST, HAND, HEAD, HMON_APPLIED, HMON_KICKED, HMON_THROWN, HURTLING, KILLED_BY, KILLED_BY_AN, MM_IGNORELAVA, MM_IGNOREWATER, MM_NOMSG, NO_TRAP_FLAGS, RLOC_MSG, SLT_ENCUMBER, STONING, SUPPRESS_NAME, SUPPRESS_SADDLE, THROWN_TETHERED_WEAPON, THROWN_WEAPON } from './hack.h.js';
 import { Maybe_Half_Phys, pline1 } from './hack.macros.js';
 import { dist2, distmin, isqrt, nh_snprintf, ordin, s_suffix, sgn } from './hacklib.js';
 import { addinv, addinv_before, delobj, freeinv, fully_identify_obj, getobj, prinv, sobj_at, stackobj } from './invent.js';
@@ -43,7 +43,7 @@ import { minliquid, monnear, seemimic, setmangry, wake_nearto, wakeup } from './
 import { AD_DGST, AT_ENGL, AT_WEAP } from './monattk.h.js';
 import { can_blnd, dmgtype_fromattack, mon_hates_blessings, poly_when_stoned, pronoun_gender } from './mondata.js';
 import { befriend_with_obj, bigmonst, breathless, eyecount, haseyes, is_animal, is_orc, is_unicorn, nohands, notake, passes_rocks, throws_rocks, touch_petrifies, your_race } from './mondata.macros.js';
-import { M1_FLY, MZ_HUGE, MZ_MEDIUM, NEUTRAL } from './monflag.h.js';
+import { M1_FLY, M2_ELF, MZ_HUGE, MZ_MEDIUM, NEUTRAL } from './monflag.h.js';
 import { closed_door, set_apparxy } from './monmove.js';
 import { mons } from './monst.js';
 import { M_AP_MONSTER } from './monst.h.js';
@@ -270,7 +270,7 @@ async function throw_obj(obj, shotlimit) {   // dothrow.c:87
     return res;
 }
 async function ok_to_throw(shotlimit_p) {   // dothrow.c:297
-    shotlimit_p.set(0, $c.i32(gc.command_count < 0 ? 0 : gc.command_count > 32767 ? 32767 : gc.command_count));
+    shotlimit_p.set(0, $c.i32(gc.command_count < 0 ? 0 : gc.command_count > LARGEST_INT ? LARGEST_INT : gc.command_count));
     gm.multi = 0;
     if (notake(gy.youmonst.data)) {
         await You($c.lit("are physically incapable of throwing or shooting anything."));
@@ -765,7 +765,7 @@ async function mhurtle_step(arg, x, y) {   // dothrow.c:992
             await newsym(mon.mx, mon.my);
         }
         if (touch_petrifies(mon.data) && !($G.uarmu || $G.uarm || $G.uarmc)) {
-            nh_snprintf($c.lit("mhurtle_step"), 1061, new $c.Ptr(svk.killer.name, 0), 256, $c.lit("being hit by %s"), await x_monnam(mon, mon.mtame ? 3 : 2, $c.lit("hurtling"), 63, 0));
+            nh_snprintf($c.lit("mhurtle_step"), 1061, new $c.Ptr(svk.killer.name, 0), 256, $c.lit("being hit by %s"), await x_monnam(mon, mon.mtame ? ARTICLE_YOUR : ARTICLE_A, $c.lit("hurtling"), EXACT_NAME | SUPPRESS_NAME, FALSE));
             await instapetrify(new $c.Ptr(svk.killer.name, 0));
             await newsym(u.ux, u.uy);
         }
@@ -1500,7 +1500,7 @@ export async function thitmonst(mon, obj) {   // dothrow.c:2011
         }
     }
     tmp = tmp + await omon_adj(mon, obj, TRUE) | 0;
-    if (is_orc(mon.data) && (u.umonnum !== u.umonster ? $c.andu64(gy.youmonst.data.mflags2, 16) !== 0 : gu.urace.mnum === PM_ELF)) {
+    if (is_orc(mon.data) && (u.umonnum !== u.umonster ? $c.andu64(gy.youmonst.data.mflags2, M2_ELF) !== 0 : gu.urace.mnum === PM_ELF)) {
         tmp = tmp + 1 | 0;
     }
     if (guaranteed_hit) {
@@ -1654,7 +1654,7 @@ export async function thitmonst(mon, obj) {   // dothrow.c:2011
                 }
             }
         }
-        $c.__builtin___strcpy_chk(new $c.Ptr(trail, 0), dmgtype_fromattack(md, 26, 11) !== null ? $c.lit(" entrails") : md.mlet === S_VORTEX || $c.peq(md, $c.relem(mons, PM_AIR_ELEMENTAL)) ? $c.lit(" currents") : $c.lit(""), 256);
+        $c.__builtin___strcpy_chk(new $c.Ptr(trail, 0), dmgtype_fromattack(md, AD_DGST, AT_ENGL) !== null ? $c.lit(" entrails") : md.mlet === S_VORTEX || $c.peq(md, $c.relem(mons, PM_AIR_ELEMENTAL)) ? $c.lit(" currents") : $c.lit(""), 256);
         monname = await mon_nam(mon);
         if (new $c.Ptr(trail, 0).get(0)) {
             monname = s_suffix(monname);

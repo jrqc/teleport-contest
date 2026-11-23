@@ -32,7 +32,7 @@ import { set_levltyp } from './mkmaze.js';
 import { obj_extract_self } from './mkobj.js';
 import { SHOPBASE } from './mkroom.h.js';
 import { seemimic, wakeup, xkilled } from './mon.js';
-import { AD_MAGM } from './monattk.h.js';
+import { AD_COLD, AD_FIRE, AD_MAGM } from './monattk.h.js';
 import { can_blow } from './mondata.js';
 import { ceiling_hider, humanoid, is_clinger, is_flyer, is_mercenary, mindless, nolimbs, slithy, unique_corpstat } from './mondata.macros.js';
 import { M1_FLY } from './monflag.h.js';
@@ -287,8 +287,8 @@ async function do_earthquake(force) {   // music.c:344
     end_y = u.uy + Math.imul(force, 2) | 0;
     start_x = start_x > 1 ? start_x : 1;
     start_y = start_y > 0 ? start_y : 0;
-    end_x = end_x < 79 ? end_x : 79;
-    end_y = end_y < 20 ? end_y : 20;
+    end_x = end_x < COLNO - 1 ? end_x : COLNO - 1;
+    end_y = end_y < ROWNO - 1 ? end_y : ROWNO - 1;
     for (x = $c.i16(start_x); x <= end_x; x = $c.i16(x + 1)) {
         for (y = $c.i16(start_y); y <= end_y; y = $c.i16(y + 1)) {
             if ((mtmp = svl.level.monsters[x][y]) !== null) {
@@ -329,7 +329,7 @@ async function do_earthquake(force) {   // music.c:344
                     if ((amsk & AM_SANCTUM) !== 0) {
                         break;
                     }
-                    algn = $c.i8((amsk & 7 & AM_MASK) === 0 ? A_NONE : (amsk & 7 & AM_MASK) === AM_LAWFUL ? A_LAWFUL : (amsk & 7 & AM_MASK) - 2 | 0);
+                    algn = $c.i8((amsk & AM_MASK & AM_MASK) === 0 ? A_NONE : (amsk & AM_MASK & AM_MASK) === AM_LAWFUL ? A_LAWFUL : (amsk & AM_MASK & AM_MASK) - 2 | 0);
                     if (cansee(x, y)) {
                         await pline_The($c.lit("%s altar falls%s."), align_str(algn), new $c.Ptr(do_earthquake$into_a_chasm, 0));
                     }
@@ -489,7 +489,7 @@ async function do_improvisation(instr) {   // music.c:503
                     await losehp(damage, new $c.Ptr(buf, 0), KILLED_BY);
                 }
             } else {
-                type = $c.rem32($c.abs((instr.otyp === FROST_HORN ? 3 : 2) - AD_MAGM | 0), 10);
+                type = $c.rem32($c.abs((instr.otyp === FROST_HORN ? AD_COLD : AD_FIRE) - AD_MAGM | 0), 10);
                 if (!Blind()) {
                     await pline($c.lit("A %s blasts out of the horn!"), flash_str(type, FALSE));
                 }
@@ -710,26 +710,32 @@ export function obj_to_instr(obj) {   // music.c:902
 
 export function $init() {
     beats.fill(null);
-    beats[0] = $c.lit("stepper");
-    beats[1] = $c.lit("one drop");
-    beats[2] = $c.lit("slow two");
-    beats[3] = $c.lit("triple stroke roll");
-    beats[4] = $c.lit("double shuffle");
-    beats[5] = $c.lit("half-time shuffle");
-    beats[6] = $c.lit("second line");
-    beats[7] = $c.lit("train");
+    $c.init(beats, [
+        $c.lit("stepper"),
+        $c.lit("one drop"),
+        $c.lit("slow two"),
+        $c.lit("triple stroke roll"),
+        $c.lit("double shuffle"),
+        $c.lit("half-time shuffle"),
+        $c.lit("second line"),
+        $c.lit("train")
+    ]);
     do_earthquake$into_a_chasm.fill(0);
     do_earthquake$into_a_chasm.set([32, 105, 110, 116, 111, 32, 97, 32, 99, 104, 97, 115, 109]);   // " into a chasm"
     do_improvisation$my_goto_song.fill(0);
-    do_improvisation$my_goto_song[0] = 67;
-    do_improvisation$my_goto_song[1] = 0;
+    $c.init(do_improvisation$my_goto_song, [
+        67,
+        0
+    ]);
     do_improvisation$improvisation = new $c.Ptr(do_improvisation$my_goto_song, 0);
     improvised_notes$notes.fill(0);
-    improvised_notes$notes[0] = 65;
-    improvised_notes$notes[1] = 66;
-    improvised_notes$notes[2] = 67;
-    improvised_notes$notes[3] = 68;
-    improvised_notes$notes[4] = 69;
-    improvised_notes$notes[5] = 70;
-    improvised_notes$notes[6] = 71;
+    $c.init(improvised_notes$notes, [
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71
+    ]);
 }

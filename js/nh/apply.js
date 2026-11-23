@@ -31,7 +31,7 @@ import { explode } from './explode.js';
 import { PLNMSG_enum } from './flag.h.js';
 import { ParanoidBreakwand } from './flag.macros.js';
 import { getpos, getpos_sethilite } from './getpos.js';
-import { COLNO, FALSE, TRUE } from './global.h.js';
+import { COLNO, FALSE, MAXULEV, ROWNO, TRUE } from './global.h.js';
 import { glyph_to_cmap } from './glyphs.js';
 import { check_capacity, in_rooms, invocation_pos, losehp, may_passwall, near_capacity, nomul, obj_to_any, overexertion, spoteffects } from './hack.js';
 import { ARTICLE_A, CORPSTAT_FEMALE, CORPSTAT_GENDER, COST_DSTROY, COST_SPLAT, CQ_CANNED, DIGCHECK_FAILED, DIGCHECK_FAIL_BOULDER, ECMD_CANCEL, ECMD_FAIL, ECMD_OK, ECMD_TIME, FACE, FLASHED_LIGHT, FM_FMON, FOOT, FORCEBUNGLE, FORCETRAP, GETOBJ_DOWNPLAY, GETOBJ_EXCLUDE, GETOBJ_EXCLUDE_INACCESS, GETOBJ_EXCLUDE_SELECTABLE, GETOBJ_NOFLAGS, GETOBJ_PROMPT, GETOBJ_SUGGEST, HAND, HEAD, HOMEMADE_TIN, INVIS_BEAM, KILLED_BY, LEG, MM_NOMSG, NOSE, NO_KILLER_PREFIX, NO_MINVENT, NO_MM_FLAGS, NO_TRAP_FLAGS, N_DIRS, RLOC_MSG, RLOC_NOMSG, RLOC_NONE, STOMACH, SUPPRESS_INVISIBLE, SUPPRESS_IT, TELEDS_ALLOW_DRAG, TELEDS_NO_FLAGS, TOOKPLUNGE, UNENCUMBERED, WEAK, XKILL_NOMSG } from './hack.h.js';
@@ -52,7 +52,7 @@ import { get_iter_mons, killed, mnexto, see_monster_closeup, seemimic, set_ustuc
 import { AD_BLND, AD_DGST, AT_ENGL, AT_WEAP } from './monattk.h.js';
 import { attacktype_fordmg, big_to_little, can_blnd, can_blow, dmgtype_fromattack, little_to_big, locomotion, poly_when_stoned, pronoun_gender } from './mondata.js';
 import { bigmonst, breathless, has_head, haseyes, hides_under, humanoid, is_demon, is_female, is_floater, is_flyer, is_male, is_rider, is_unicorn, is_vampire, is_whirly, nohands, nolimbs, passes_walls, perceives, slithy, strongmonst, throws_rocks, touch_petrifies, type_is_pname, unsolid, verysmall } from './mondata.macros.js';
-import { G_GONE, M1_FLY, MS_SILENT, MZ_TINY } from './monflag.h.js';
+import { G_GONE, M1_FLY, M1_HUMANOID, MS_SILENT, MZ_TINY } from './monflag.h.js';
 import { accessible, closed_door, monflee } from './monmove.js';
 import { mons } from './monst.js';
 import { M_AP_FURNITURE, M_AP_MONSTER, M_AP_NOTHING, M_AP_OBJECT } from './monst.h.js';
@@ -82,7 +82,7 @@ import { Shk_Your, add_damage, check_unpaid, check_unpaid_usage, costly_spot, ob
 import { P_BASIC, P_LANCE, P_NONE, P_POLEARMS, P_RIDING, P_SKILLED } from './skills.h.js';
 import { growl, whimper, yelp } from './sounds.js';
 import { known_spell, spelleffects } from './spell.js';
-import { spe_Fresh } from './spell.h.js';
+import { MAX_SPELL_STUDY, spe_Fresh } from './spell.h.js';
 import { On_stairs, stairway_at } from './stairs.js';
 import { mpickobj } from './steal.js';
 import { kick_steed, stucksteed, use_saddle } from './steed.js';
@@ -306,7 +306,7 @@ async function its_dead(rx, ry, resp) {   // apply.c:198
     } else {
         mptr = $c.relem(mons, statue.corpsenm);
         if (Blind()) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s %s"), rx === u.ux && ry === u.uy ? $c.lit("This") : $c.lit("That"), $c.andu64(mptr.mflags1, 131072) !== 0 ? $c.lit("person") : $c.lit("creature"));
+            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s %s"), rx === u.ux && ry === u.uy ? $c.lit("This") : $c.lit("That"), $c.andu64(mptr.mflags1, M1_HUMANOID) !== 0 ? $c.lit("person") : $c.lit("creature"));
             what = new $c.Ptr(buf, 0);
         } else {
             what = await obj_pmname(statue);
@@ -845,7 +845,7 @@ async function use_mirror(obj$in) {   // apply.c:1018
                         await pline($c.lit("Yikes!  You've frozen yourself!"));
                     }
                     if (!Hallucination() || !rn2(4)) {
-                        nomul(-rnd(36 - u.ulevel | 0) | 0);
+                        nomul(-rnd(MAXULEV + 6 - u.ulevel | 0) | 0);
                         gm.multi_reason = $c.lit("gazing into a mirror");
                     }
                     gn.nomovemsg = null;
@@ -943,7 +943,7 @@ async function use_mirror(obj$in) {   // apply.c:1018
     } else if (monable && (mlet === S_NYMPH || $c.peq(mtmp.data, $c.relem(mons, PM_AMOROUS_DEMON)))) {
         if (vis) {
             await pline($c.lit("%s in your %s."), await monverbself(mtmp, await Monnam(mtmp), $c.lit("admire"), null), mirror);
-            await pline($c.lit("%s takes it!"), upstart($c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), genders[pronoun_gender(mtmp, 2)].he, 256)));
+            await pline($c.lit("%s takes it!"), upstart($c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), genders[pronoun_gender(mtmp, PRONOUN_HALLU)].he, 256)));
         } else {
             await pline($c.lit("It steals your %s!"), mirror);
         }
@@ -2238,7 +2238,7 @@ async function use_trap(otmp) {   // apply.c:2821
             chance = $c.i8(rnl(10) > 5 ? 1 : 0);
         }
         await You($c.lit("aren't very skilled at reaching from %s."), await mon_nam(u.usteed));
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Continue your attempt to set %s?"), await the(trapname(ttyp, 0)));
+        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Continue your attempt to set %s?"), await the(trapname(ttyp, FALSE)));
         if (await y_n(new $c.Ptr(buf, 0)) === 121) {
             if (chance) {
                 switch (ttyp) {
@@ -2524,8 +2524,8 @@ function find_poleable_mon(pos) {   // apply.c:3284
     mpos.y = 0;
     impaired = $c.i8(u.uprops[CONFUSION].intrinsic || u.uprops[STUNNED].intrinsic || Hallucination() ? 1 : 0);
     rt = $c.i16(isqrt(gp.polearm_range_max));
-    lo_x = $c.i16((u.ux - rt | 0) > 1 ? u.ux - rt | 0 : 1), hi_x = $c.i16((u.ux + rt | 0) < 79 ? u.ux + rt | 0 : 79);
-    lo_y = $c.i16((u.uy - rt | 0) > 0 ? u.uy - rt | 0 : 0), hi_y = $c.i16((u.uy + rt | 0) < 20 ? u.uy + rt | 0 : 20);
+    lo_x = $c.i16((u.ux - rt | 0) > 1 ? u.ux - rt | 0 : 1), hi_x = $c.i16((u.ux + rt | 0) < COLNO - 1 ? u.ux + rt | 0 : COLNO - 1);
+    lo_y = $c.i16((u.uy - rt | 0) > 0 ? u.uy - rt | 0 : 0), hi_y = $c.i16((u.uy + rt | 0) < ROWNO - 1 ? u.uy + rt | 0 : ROWNO - 1);
     for (x = lo_x; x <= hi_x; x = $c.i16(x + 1)) {
         for (y = lo_y; y <= hi_y; y = $c.i16(y + 1)) {
             if (!get_valid_polearm_position(x, y)) {
@@ -3427,7 +3427,7 @@ async function flip_through_book(obj) {   // apply.c:4473
     } else if (obj.otyp === SPE_NOVEL) {
         await pline($c.lit("This looks like it might be interesting to read."));
     } else {
-        findx = obj.usecount < 3 ? obj.usecount : 3;
+        findx = obj.usecount < MAX_SPELL_STUDY ? obj.usecount : MAX_SPELL_STUDY;
         await pline($c.lit("The%s ink in this spellbook is %s."), objects[obj.otyp].oc_magic | 0 ? $c.lit(" magical") : $c.lit(""), flip_through_book$fadeness[findx]);
     }
     return ECMD_TIME;
@@ -3488,9 +3488,11 @@ export function $init() {
     do_break_wand$nothing_else_happens.fill(0);
     do_break_wand$nothing_else_happens.set([66, 117, 116, 32, 110, 111, 116, 104, 105, 110, 103, 32, 101, 108, 115, 101, 32, 104, 97, 112, 112, 101, 110, 115, 46, 46, 46]);   // "But nothing else happens..."
     flip_through_book$fadeness.fill(null);
-    flip_through_book$fadeness[0] = $c.lit("fresh");
-    flip_through_book$fadeness[1] = $c.lit("slightly faded");
-    flip_through_book$fadeness[2] = $c.lit("very faded");
-    flip_through_book$fadeness[3] = $c.lit("extremely faded");
-    flip_through_book$fadeness[4] = $c.lit("barely visible");
+    $c.init(flip_through_book$fadeness, [
+        $c.lit("fresh"),
+        $c.lit("slightly faded"),
+        $c.lit("very faded"),
+        $c.lit("extremely faded"),
+        $c.lit("barely visible")
+    ]);
 }

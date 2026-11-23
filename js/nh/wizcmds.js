@@ -72,6 +72,7 @@ import { level_tele } from './teleport.js';
 import { property_by_index, timer_sanity_check, timer_stats } from './timeout.js';
 import { trap_sanity_check } from './trap.js';
 import { does_block, get_viz_clear } from './vision.js';
+import { COULD_SEE, IN_SIGHT, TEMP_LIT } from './vision.h.js';
 import { add_menu, add_menu_heading, add_menu_str, getlin, select_menu, windowprocs } from './windows.js';
 import { wp_tty } from './winprocs.h.js';
 import { create_nhwindow, destroy_nhwindow, display_nhwindow, end_menu, putstr, start_menu } from './winprocs.macros.js';
@@ -485,7 +486,7 @@ export async function wiz_show_seenv() {   // wizcmds.c:576
     let win = 0, x = 0, y = 0, startx = 0, stopx = 0, curx = 0, v = 0, row = new Int8Array(81), $t1, $t2;
     win = await create_nhwindow()(NHW_TEXT);
     startx = $c.i16(1 > (u.ux - 20 | 0) ? 1 : u.ux - 20 | 0);
-    stopx = $c.i16((startx + 40 | 0) < 80 ? startx + 40 | 0 : 80);
+    stopx = $c.i16((startx + 40 | 0) < COLNO ? startx + 40 | 0 : COLNO);
     if ((stopx - startx | 0) === 40) {
         startx = $c.i16(startx + 1);
     }
@@ -517,7 +518,7 @@ export async function wiz_show_seenv() {   // wizcmds.c:576
 export async function wiz_show_vision() {   // wizcmds.c:621
     let win = 0, x = 0, y = 0, v = 0, row = new Int8Array(81);
     win = await create_nhwindow()(NHW_TEXT);
-    $c.__builtin___sprintf_chk(new $c.Ptr(row, 0), 0, 81, $c.lit("Flags: 0x%x could see, 0x%x in sight, 0x%x temp lit"), 1, 2, 4);
+    $c.__builtin___sprintf_chk(new $c.Ptr(row, 0), 0, 81, $c.lit("Flags: 0x%x could see, 0x%x in sight, 0x%x temp lit"), COULD_SEE, IN_SIGHT, TEMP_LIT);
     await putstr()(win, 0, new $c.Ptr(row, 0));
     await putstr()(win, 0, $c.lit(""));
     for (y = 0; y < ROWNO; y = $c.i16(y + 1)) {
@@ -792,7 +793,7 @@ export async function wiz_intrinsic() {   // wizcmds.c:949
         win = await create_nhwindow()(NHW_MENU);
         await start_menu()(win, MENU_BEHAVE_STANDARD);
         if (iflags.cmdassist) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("[Precede any selection with a count to increment by other than %d.]"), 30);
+            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("[Precede any selection with a count to increment by other than %d.]"), DEFAULT_TIMEOUT_INCR);
             await add_menu_str(win, new $c.Ptr(buf, 0));
         }
         for (i = 0; (propname = property_by_index(i, new $c.Ptr(p, 0))) !== null; i = i + 1 | 0) {
@@ -1265,7 +1266,7 @@ async function list_migrating_mons(nextlevl) {   // wizcmds.c:1506
                 $c.nh_deterministic_qsort(marray, n, 8, migrsort_cmp);
             }
             for (n = 0; (mtmp = marray.get(n)) !== null; n = n + 1 >>> 0) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("  %s"), minimal_monnam(mtmp, 0));
+                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("  %s"), minimal_monnam(mtmp, FALSE));
                 strsubst(new $c.Ptr(buf, 0), $c.lit(" <0,0>"), $c.lit(""));
                 if (has_mgivenname(mtmp)) {
                     $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" named %s"), mtmp.mextra.mgivenname);

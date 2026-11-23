@@ -1379,7 +1379,7 @@ async function handler_rebind_keys_add(keyfirst) {   // cmd.c:2291
                     $c.__builtin___sprintf_chk(new $c.Ptr(querybuf, 0), 0, 256, $c.lit("Command %s requires a parameter:"), ec.ef_txt);
                     await getlin(new $c.Ptr(querybuf, 0), new $c.Ptr(parambuf, 0));
                     mungspaces(new $c.Ptr(parambuf, 0));
-                    nh_snprintf($c.lit("handler_rebind_keys_add"), 2376, new $c.Ptr(cmdstr, 0), 255, $c.lit("%s(%s)"), ec.ef_txt, new $c.Ptr(parambuf, 0));
+                    nh_snprintf($c.lit("handler_rebind_keys_add"), 2376, new $c.Ptr(cmdstr, 0), BUFSZ - 1, $c.lit("%s(%s)"), ec.ef_txt, new $c.Ptr(parambuf, 0));
                     cmdstr[BUFSZ - 1] = 0;
                 } else {
                     $c.__builtin___strcat_chk(new $c.Ptr(cmdstr, 0), ec.ef_txt, 256);
@@ -1453,7 +1453,7 @@ export async function handler_change_autocompletions() {   // cmd.c:2449
             continue;
         }
         any.a_int = i + 1 | 0;
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%c %s: %s"), (ec.flags & 8192) >>> 0 ? 42 : 32, ec.ef_txt, ec.ef_desc);
+        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%c %s: %s"), (ec.flags & AUTOCOMP_ADJ) >>> 0 ? 42 : 32, ec.ef_txt, ec.ef_desc);
         await add_menu(win, nul_glyphinfo, any, 0, 0, ATR_NONE, clr, new $c.Ptr(buf, 0), (ec.flags & AUTOCOMPLETE) >>> 0 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     }
     await end_menu()(win, $c.lit("Which commands autocomplete?"));
@@ -2018,7 +2018,7 @@ export async function all_options_autocomplete(sbuf) {   // cmd.c:3296
     let efp = null, buf = new Int8Array(256);
     for (efp = $c.relem(extcmdlist, 0); efp.ef_txt; efp = $c.radd(efp, 1)) {
         if ((efp.flags & AUTOCOMP_ADJ) >>> 0 !== 0) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("AUTOCOMPLETE=%s%s\n"), (efp.flags & 2) >>> 0 ? $c.lit("") : $c.lit("!"), efp.ef_txt);
+            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("AUTOCOMPLETE=%s%s\n"), (efp.flags & AUTOCOMPLETE) >>> 0 ? $c.lit("") : $c.lit("!"), efp.ef_txt);
             await strbuf_append(sbuf, new $c.Ptr(buf, 0));
         }
     }
@@ -2193,7 +2193,7 @@ export async function randomkey() {   // cmd.c:3517
         case 11:
         case 12:
             {
-                d = rn2(N_DIRS_Z - 2);
+                d = rn2(N_DIRS);
                 m = rn2(7) ? MV_WALK : !rn2(3) ? MV_RUSH : MV_RUN;
                 c = await cmd_from_dir(d, m);
             }
@@ -2529,7 +2529,7 @@ export async function getdir(s) {   // cmd.c:3958
                             dirsym = gc.Cmd.dirchars.get(rn2(2) ? DIR_DOWN : DIR_UP);
                             break;
                         default:
-                            dirsym = gc.Cmd.dirchars.get(rn2(N_DIRS_Z - 2));
+                            dirsym = gc.Cmd.dirchars.get(rn2(N_DIRS));
                             break;
                     }
                 }
@@ -2776,7 +2776,7 @@ async function there_cmd_menu_self(win, x, y, act) {   // cmd.c:4435
         await mcmd_addmenu(win, MCMD_DOWN, new $c.Ptr(buf, 0)), K = K + 1 | 0;
     }
     if (u.usteed) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Dismount %s"), await x_monnam(u.usteed, 1, null, 8, 0));
+        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Dismount %s"), await x_monnam(u.usteed, ARTICLE_THE, null, SUPPRESS_SADDLE, FALSE));
         await mcmd_addmenu(win, MCMD_DISMOUNT, new $c.Ptr(buf, 0)), K = K + 1 | 0;
     }
     if (OBJ_AT(x, y)) {
@@ -3493,8 +3493,8 @@ export async function yn_function(query, resp, def, addcmdq) {   // cmd.c:5471
     iflags.last_msg = PLNMSG_UNKNOWN;
     if ($c.strlen(query) >= QBUFSZ) {
         paniclog($c.lit("Query truncated: "), query);
-        $c.__builtin___strncpy_chk(new $c.Ptr(qbuf, 0), query, 124, 128);
-        $c.__builtin___strcpy_chk(new $c.Ptr(qbuf, 124), $c.lit("..."), 4);
+        $c.__builtin___strncpy_chk(new $c.Ptr(qbuf, 0), query, QBUFSZ - 1 - 3, 128);
+        $c.__builtin___strcpy_chk(new $c.Ptr(qbuf, QBUFSZ - 1 - 3), $c.lit("..."), 4);
         query = new $c.Ptr(qbuf, 0);
     }
     if (addcmdq && (cmdq = cmdq_pop()) !== null) {
@@ -3562,7 +3562,7 @@ export async function paranoid_ynq(be_paranoid, prompt, accept_q) {   // cmd.c:5
         do {
             k = $c.i32($c.addu64($c.addu64($c.strlen(promptprefix), 1), $c.strlen(responsetype)));
             if (($c.i32($c.strlen(new $c.Ptr(pbuf, 0))) + k | 0) > QBUFSZ - 1) {
-                $c.__builtin___strcpy_chk(new $c.Ptr(pbuf, 0).add(127).add(-k).add(-4), $c.lit("...?"), -1);
+                $c.__builtin___strcpy_chk(new $c.Ptr(pbuf, 0).add(QBUFSZ - 1).add(-k).add(-4), $c.lit("...?"), -1);
             }
             nh_snprintf($c.lit("paranoid_ynq"), 5624, new $c.Ptr(qbuf, 0), 128, $c.lit("%s%s %s"), promptprefix, new $c.Ptr(pbuf, 0), responsetype);
             new $c.Ptr(ans, 0).set(0, 0);
@@ -3625,1222 +3625,474 @@ export function $init() {
     cmdnotavail.fill(0);
     cmdnotavail.set([39, 37, 115, 39, 32, 99, 111, 109, 109, 97, 110, 100, 32, 110, 111, 116, 32, 97, 118, 97, 105, 108, 97, 98, 108, 101, 46]);   // "'%s' command not available."
     levltyp.fill(null);
-    levltyp[0] = $c.lit("stone");
-    levltyp[1] = $c.lit("vertical wall");
-    levltyp[2] = $c.lit("horizontal wall");
-    levltyp[3] = $c.lit("top-left corner wall");
-    levltyp[4] = $c.lit("top-right corner wall");
-    levltyp[5] = $c.lit("bottom-left corner wall");
-    levltyp[6] = $c.lit("bottom-right corner wall");
-    levltyp[7] = $c.lit("cross wall");
-    levltyp[8] = $c.lit("tee-up wall");
-    levltyp[9] = $c.lit("tee-down wall");
-    levltyp[10] = $c.lit("tee-left wall");
-    levltyp[11] = $c.lit("tee-right wall");
-    levltyp[12] = $c.lit("drawbridge wall");
-    levltyp[13] = $c.lit("tree");
-    levltyp[14] = $c.lit("secret door");
-    levltyp[15] = $c.lit("secret corridor");
-    levltyp[16] = $c.lit("pool");
-    levltyp[17] = $c.lit("moat");
-    levltyp[18] = $c.lit("water");
-    levltyp[19] = $c.lit("drawbridge up");
-    levltyp[20] = $c.lit("lava pool");
-    levltyp[21] = $c.lit("lava wall");
-    levltyp[22] = $c.lit("iron bars");
-    levltyp[23] = $c.lit("door");
-    levltyp[24] = $c.lit("corridor");
-    levltyp[25] = $c.lit("room");
-    levltyp[26] = $c.lit("stairs");
-    levltyp[27] = $c.lit("ladder");
-    levltyp[28] = $c.lit("fountain");
-    levltyp[29] = $c.lit("throne");
-    levltyp[30] = $c.lit("sink");
-    levltyp[31] = $c.lit("grave");
-    levltyp[32] = $c.lit("altar");
-    levltyp[33] = $c.lit("ice");
-    levltyp[34] = $c.lit("drawbridge down");
-    levltyp[35] = $c.lit("air");
-    levltyp[36] = $c.lit("cloud");
-    levltyp[37] = $c.lit("unreachable/undiggable");
-    levltyp[38] = $c.lit("");
+    $c.init(levltyp, [
+        $c.lit("stone"),
+        $c.lit("vertical wall"),
+        $c.lit("horizontal wall"),
+        $c.lit("top-left corner wall"),
+        $c.lit("top-right corner wall"),
+        $c.lit("bottom-left corner wall"),
+        $c.lit("bottom-right corner wall"),
+        $c.lit("cross wall"),
+        $c.lit("tee-up wall"),
+        $c.lit("tee-down wall"),
+        $c.lit("tee-left wall"),
+        $c.lit("tee-right wall"),
+        $c.lit("drawbridge wall"),
+        $c.lit("tree"),
+        $c.lit("secret door"),
+        $c.lit("secret corridor"),
+        $c.lit("pool"),
+        $c.lit("moat"),
+        $c.lit("water"),
+        $c.lit("drawbridge up"),
+        $c.lit("lava pool"),
+        $c.lit("lava wall"),
+        $c.lit("iron bars"),
+        $c.lit("door"),
+        $c.lit("corridor"),
+        $c.lit("room"),
+        $c.lit("stairs"),
+        $c.lit("ladder"),
+        $c.lit("fountain"),
+        $c.lit("throne"),
+        $c.lit("sink"),
+        $c.lit("grave"),
+        $c.lit("altar"),
+        $c.lit("ice"),
+        $c.lit("drawbridge down"),
+        $c.lit("air"),
+        $c.lit("cloud"),
+        $c.lit("unreachable/undiggable"),
+        $c.lit("")
+    ]);
     for (let $i0 = 0; $i0 < 171; $i0++) {
         extcmdlist[$i0].$copyFrom(new $T.ext_func_tab());
     }
-    extcmdlist[0].key = 35;
-    extcmdlist[0].ef_txt = $c.lit("#");
-    extcmdlist[0].ef_desc = $c.lit("enter and perform an extended command");
-    extcmdlist[0].ef_funct = doextcmd;
-    extcmdlist[0].flags = IFBURIED | GENERALCMD | CMD_M_PREFIX;
-    extcmdlist[0].f_text = null;
-    extcmdlist[1].key = 191;
-    extcmdlist[1].ef_txt = $c.lit("?");
-    extcmdlist[1].ef_desc = $c.lit("list all extended commands");
-    extcmdlist[1].ef_funct = doextlist;
-    extcmdlist[1].flags = IFBURIED | AUTOCOMPLETE | GENERALCMD | CMD_M_PREFIX;
-    extcmdlist[1].f_text = null;
-    extcmdlist[2].key = 225;
-    extcmdlist[2].ef_txt = $c.lit("adjust");
-    extcmdlist[2].ef_desc = $c.lit("adjust inventory letters");
-    extcmdlist[2].ef_funct = doorganize;
-    extcmdlist[2].flags = IFBURIED | AUTOCOMPLETE | GENERALCMD;
-    extcmdlist[2].f_text = null;
-    extcmdlist[3].key = 193;
-    extcmdlist[3].ef_txt = $c.lit("annotate");
-    extcmdlist[3].ef_desc = $c.lit("name current level");
-    extcmdlist[3].ef_funct = donamelevel;
-    extcmdlist[3].flags = IFBURIED | AUTOCOMPLETE | GENERALCMD | CMD_M_PREFIX;
-    extcmdlist[3].f_text = null;
-    extcmdlist[4].key = 97;
-    extcmdlist[4].ef_txt = $c.lit("apply");
-    extcmdlist[4].ef_desc = $c.lit("apply (use) a tool (pick-axe, key, lamp...)");
-    extcmdlist[4].ef_funct = doapply;
-    extcmdlist[4].flags = CMD_M_PREFIX;
-    extcmdlist[4].f_text = null;
-    extcmdlist[5].key = 24;
-    extcmdlist[5].ef_txt = $c.lit("attributes");
-    extcmdlist[5].ef_desc = $c.lit("show your attributes");
-    extcmdlist[5].ef_funct = doattributes;
-    extcmdlist[5].flags = IFBURIED | GENERALCMD;
-    extcmdlist[5].f_text = null;
-    extcmdlist[6].key = 64;
-    extcmdlist[6].ef_txt = $c.lit("autopickup");
-    extcmdlist[6].ef_desc = $c.lit("toggle the 'autopickup' option on/off");
-    extcmdlist[6].ef_funct = dotogglepickup;
-    extcmdlist[6].flags = IFBURIED | GENERALCMD;
-    extcmdlist[6].f_text = null;
-    extcmdlist[7].key = 0;
-    extcmdlist[7].ef_txt = $c.lit("bugreport");
-    extcmdlist[7].ef_desc = $c.lit("file a bug report");
-    extcmdlist[7].ef_funct = dobugreport;
-    extcmdlist[7].flags = GENERALCMD | NOFUZZERCMD;
-    extcmdlist[7].f_text = null;
-    extcmdlist[8].key = 67;
-    extcmdlist[8].ef_txt = $c.lit("call");
-    extcmdlist[8].ef_desc = $c.lit("name a monster, specific object, or type of object");
-    extcmdlist[8].ef_funct = docallcmd;
-    extcmdlist[8].flags = IFBURIED | GENERALCMD;
-    extcmdlist[8].f_text = null;
-    extcmdlist[9].key = 90;
-    extcmdlist[9].ef_txt = $c.lit("cast");
-    extcmdlist[9].ef_desc = $c.lit("zap (cast) a spell");
-    extcmdlist[9].ef_funct = docast;
-    extcmdlist[9].flags = IFBURIED;
-    extcmdlist[9].f_text = null;
-    extcmdlist[10].key = 227;
-    extcmdlist[10].ef_txt = $c.lit("chat");
-    extcmdlist[10].ef_desc = $c.lit("talk to someone");
-    extcmdlist[10].ef_funct = dotalk;
-    extcmdlist[10].flags = IFBURIED | AUTOCOMPLETE;
-    extcmdlist[10].f_text = null;
-    extcmdlist[11].key = 118;
-    extcmdlist[11].ef_txt = $c.lit("chronicle");
-    extcmdlist[11].ef_desc = $c.lit("show journal of major events");
-    extcmdlist[11].ef_funct = do_gamelog;
-    extcmdlist[11].flags = IFBURIED | AUTOCOMPLETE | GENERALCMD;
-    extcmdlist[11].f_text = null;
-    extcmdlist[12].key = 99;
-    extcmdlist[12].ef_txt = $c.lit("close");
-    extcmdlist[12].ef_desc = $c.lit("close a door");
-    extcmdlist[12].ef_funct = doclose;
-    extcmdlist[12].flags = 0;
-    extcmdlist[12].f_text = null;
-    extcmdlist[13].key = 195;
-    extcmdlist[13].ef_txt = $c.lit("conduct");
-    extcmdlist[13].ef_desc = $c.lit("list voluntary challenges you have maintained");
-    extcmdlist[13].ef_funct = doconduct;
-    extcmdlist[13].flags = IFBURIED | AUTOCOMPLETE | GENERALCMD;
-    extcmdlist[13].f_text = null;
-    extcmdlist[14].key = 0;
-    extcmdlist[14].ef_txt = $c.lit("debugfuzzer");
-    extcmdlist[14].ef_desc = $c.lit("start the fuzz tester");
-    extcmdlist[14].ef_funct = wiz_fuzzer;
-    extcmdlist[14].flags = IFBURIED | WIZMODECMD | NOFUZZERCMD;
-    extcmdlist[14].f_text = null;
-    extcmdlist[15].key = 228;
-    extcmdlist[15].ef_txt = $c.lit("dip");
-    extcmdlist[15].ef_desc = $c.lit("dip an object into something");
-    extcmdlist[15].ef_funct = dodip;
-    extcmdlist[15].flags = AUTOCOMPLETE | CMD_M_PREFIX;
-    extcmdlist[15].f_text = null;
-    extcmdlist[16].key = 62;
-    extcmdlist[16].ef_txt = $c.lit("down");
-    extcmdlist[16].ef_desc = $c.lit("go down a staircase");
-    extcmdlist[16].ef_funct = dodown;
-    extcmdlist[16].flags = CMD_M_PREFIX;
-    extcmdlist[16].f_text = null;
-    extcmdlist[17].key = 100;
-    extcmdlist[17].ef_txt = $c.lit("drop");
-    extcmdlist[17].ef_desc = $c.lit("drop an item");
-    extcmdlist[17].ef_funct = dodrop;
-    extcmdlist[17].flags = 0;
-    extcmdlist[17].f_text = null;
-    extcmdlist[18].key = 68;
-    extcmdlist[18].ef_txt = $c.lit("droptype");
-    extcmdlist[18].ef_desc = $c.lit("drop specific item types");
-    extcmdlist[18].ef_funct = doddrop;
-    extcmdlist[18].flags = 0;
-    extcmdlist[18].f_text = null;
-    extcmdlist[19].key = 101;
-    extcmdlist[19].ef_txt = $c.lit("eat");
-    extcmdlist[19].ef_desc = $c.lit("eat something");
-    extcmdlist[19].ef_funct = doeat;
-    extcmdlist[19].flags = CMD_M_PREFIX;
-    extcmdlist[19].f_text = null;
-    extcmdlist[20].key = 69;
-    extcmdlist[20].ef_txt = $c.lit("engrave");
-    extcmdlist[20].ef_desc = $c.lit("engrave writing on the floor");
-    extcmdlist[20].ef_funct = doengrave;
-    extcmdlist[20].flags = 0;
-    extcmdlist[20].f_text = null;
-    extcmdlist[21].key = 229;
-    extcmdlist[21].ef_txt = $c.lit("enhance");
-    extcmdlist[21].ef_desc = $c.lit("advance or check weapon and spell skills");
-    extcmdlist[21].ef_funct = enhance_weapon_skill;
-    extcmdlist[21].flags = IFBURIED | AUTOCOMPLETE | GENERALCMD;
-    extcmdlist[21].f_text = null;
-    extcmdlist[22].key = 216;
-    extcmdlist[22].ef_txt = $c.lit("exploremode");
-    extcmdlist[22].ef_desc = $c.lit("enter explore (discovery) mode");
-    extcmdlist[22].ef_funct = enter_explore_mode;
-    extcmdlist[22].flags = IFBURIED | GENERALCMD | NOFUZZERCMD;
-    extcmdlist[22].f_text = null;
-    extcmdlist[23].key = 70;
-    extcmdlist[23].ef_txt = $c.lit("fight");
-    extcmdlist[23].ef_desc = $c.lit("prefix: force fight even if you don't see a monster");
-    extcmdlist[23].ef_funct = do_fight;
-    extcmdlist[23].flags = PREFIXCMD;
-    extcmdlist[23].f_text = null;
-    extcmdlist[24].key = 102;
-    extcmdlist[24].ef_txt = $c.lit("fire");
-    extcmdlist[24].ef_desc = $c.lit("fire ammunition from quiver");
-    extcmdlist[24].ef_funct = dofire;
-    extcmdlist[24].flags = 0;
-    extcmdlist[24].f_text = null;
-    extcmdlist[25].key = 230;
-    extcmdlist[25].ef_txt = $c.lit("force");
-    extcmdlist[25].ef_desc = $c.lit("force a lock");
-    extcmdlist[25].ef_funct = doforce;
-    extcmdlist[25].flags = AUTOCOMPLETE;
-    extcmdlist[25].f_text = null;
-    extcmdlist[26].key = 231;
-    extcmdlist[26].ef_txt = $c.lit("genocided");
-    extcmdlist[26].ef_desc = $c.lit("list monsters that have been genocided or become extinct");
-    extcmdlist[26].ef_funct = dogenocided;
-    extcmdlist[26].flags = IFBURIED | AUTOCOMPLETE | GENERALCMD | CMD_M_PREFIX;
-    extcmdlist[26].f_text = null;
-    extcmdlist[27].key = 59;
-    extcmdlist[27].ef_txt = $c.lit("glance");
-    extcmdlist[27].ef_desc = $c.lit("show what type of thing a map symbol corresponds to");
-    extcmdlist[27].ef_funct = doquickwhatis;
-    extcmdlist[27].flags = IFBURIED | GENERALCMD;
-    extcmdlist[27].f_text = null;
-    extcmdlist[28].key = 63;
-    extcmdlist[28].ef_txt = $c.lit("help");
-    extcmdlist[28].ef_desc = $c.lit("give a help message");
-    extcmdlist[28].ef_funct = dohelp;
-    extcmdlist[28].flags = IFBURIED | GENERALCMD;
-    extcmdlist[28].f_text = null;
-    extcmdlist[29].key = 0;
-    extcmdlist[29].ef_txt = $c.lit("herecmdmenu");
-    extcmdlist[29].ef_desc = $c.lit("show menu of commands you can do here");
-    extcmdlist[29].ef_funct = doherecmdmenu;
-    extcmdlist[29].flags = IFBURIED | AUTOCOMPLETE | GENERALCMD;
-    extcmdlist[29].f_text = null;
-    extcmdlist[30].key = 0;
-    extcmdlist[30].ef_txt = $c.lit("history");
-    extcmdlist[30].ef_desc = $c.lit("show a summary of the game's development");
-    extcmdlist[30].ef_funct = dohistory;
-    extcmdlist[30].flags = IFBURIED | AUTOCOMPLETE | GENERALCMD;
-    extcmdlist[30].f_text = null;
-    extcmdlist[31].key = 105;
-    extcmdlist[31].ef_txt = $c.lit("inventory");
-    extcmdlist[31].ef_desc = $c.lit("show your inventory");
-    extcmdlist[31].ef_funct = ddoinv;
-    extcmdlist[31].flags = IFBURIED | GENERALCMD;
-    extcmdlist[31].f_text = null;
-    extcmdlist[32].key = 73;
-    extcmdlist[32].ef_txt = $c.lit("inventtype");
-    extcmdlist[32].ef_desc = $c.lit("show inventory of one specific item class");
-    extcmdlist[32].ef_funct = dotypeinv;
-    extcmdlist[32].flags = IFBURIED | GENERALCMD;
-    extcmdlist[32].f_text = null;
-    extcmdlist[33].key = 233;
-    extcmdlist[33].ef_txt = $c.lit("invoke");
-    extcmdlist[33].ef_desc = $c.lit("invoke an object's special powers");
-    extcmdlist[33].ef_funct = doinvoke;
-    extcmdlist[33].flags = IFBURIED | AUTOCOMPLETE;
-    extcmdlist[33].f_text = null;
-    extcmdlist[34].key = 234;
-    extcmdlist[34].ef_txt = $c.lit("jump");
-    extcmdlist[34].ef_desc = $c.lit("jump to another location");
-    extcmdlist[34].ef_funct = dojump;
-    extcmdlist[34].flags = AUTOCOMPLETE;
-    extcmdlist[34].f_text = null;
-    extcmdlist[35].key = 4;
-    extcmdlist[35].ef_txt = $c.lit("kick");
-    extcmdlist[35].ef_desc = $c.lit("kick something");
-    extcmdlist[35].ef_funct = dokick;
-    extcmdlist[35].flags = 0;
-    extcmdlist[35].f_text = null;
-    extcmdlist[36].key = 92;
-    extcmdlist[36].ef_txt = $c.lit("known");
-    extcmdlist[36].ef_desc = $c.lit("show what object types have been discovered");
-    extcmdlist[36].ef_funct = dodiscovered;
-    extcmdlist[36].flags = IFBURIED | GENERALCMD | CMD_M_PREFIX;
-    extcmdlist[36].f_text = null;
-    extcmdlist[37].key = 96;
-    extcmdlist[37].ef_txt = $c.lit("knownclass");
-    extcmdlist[37].ef_desc = $c.lit("show discovered types for one class of objects");
-    extcmdlist[37].ef_funct = doclassdisco;
-    extcmdlist[37].flags = IFBURIED | GENERALCMD | CMD_M_PREFIX;
-    extcmdlist[37].f_text = null;
-    extcmdlist[38].key = 0;
-    extcmdlist[38].ef_txt = $c.lit("levelchange");
-    extcmdlist[38].ef_desc = $c.lit("change experience level");
-    extcmdlist[38].ef_funct = wiz_level_change;
-    extcmdlist[38].flags = IFBURIED | AUTOCOMPLETE | WIZMODECMD;
-    extcmdlist[38].f_text = null;
-    extcmdlist[39].key = 0;
-    extcmdlist[39].ef_txt = $c.lit("lightsources");
-    extcmdlist[39].ef_desc = $c.lit("show mobile light sources");
-    extcmdlist[39].ef_funct = wiz_light_sources;
-    extcmdlist[39].flags = IFBURIED | AUTOCOMPLETE | WIZMODECMD;
-    extcmdlist[39].f_text = null;
-    extcmdlist[40].key = 58;
-    extcmdlist[40].ef_txt = $c.lit("look");
-    extcmdlist[40].ef_desc = $c.lit("look at what is here");
-    extcmdlist[40].ef_funct = dolook;
-    extcmdlist[40].flags = IFBURIED;
-    extcmdlist[40].f_text = null;
-    extcmdlist[41].key = 0;
-    extcmdlist[41].ef_txt = $c.lit("lookaround");
-    extcmdlist[41].ef_desc = $c.lit("describe what you can see");
-    extcmdlist[41].ef_funct = dolookaround;
-    extcmdlist[41].flags = IFBURIED | GENERALCMD;
-    extcmdlist[41].f_text = null;
-    extcmdlist[42].key = 236;
-    extcmdlist[42].ef_txt = $c.lit("loot");
-    extcmdlist[42].ef_desc = $c.lit("loot a box on the floor");
-    extcmdlist[42].ef_funct = doloot;
-    extcmdlist[42].flags = AUTOCOMPLETE | CMD_M_PREFIX;
-    extcmdlist[42].f_text = null;
-    extcmdlist[43].key = 0;
-    extcmdlist[43].ef_txt = $c.lit("migratemons");
-    extcmdlist[43].ef_desc = $c.lit("show migrating monsters and migrate N random ones");
-    extcmdlist[43].ef_funct = wiz_migrate_mons;
-    extcmdlist[43].flags = IFBURIED | AUTOCOMPLETE | WIZMODECMD;
-    extcmdlist[43].f_text = null;
-    extcmdlist[44].key = 237;
-    extcmdlist[44].ef_txt = $c.lit("monster");
-    extcmdlist[44].ef_desc = $c.lit("use monster's special ability");
-    extcmdlist[44].ef_funct = domonability;
-    extcmdlist[44].flags = IFBURIED | AUTOCOMPLETE;
-    extcmdlist[44].f_text = null;
-    extcmdlist[45].key = 238;
-    extcmdlist[45].ef_txt = $c.lit("name");
-    extcmdlist[45].ef_desc = $c.lit("same as call; name a monster or object or object type");
-    extcmdlist[45].ef_funct = docallcmd;
-    extcmdlist[45].flags = IFBURIED | AUTOCOMPLETE | GENERALCMD;
-    extcmdlist[45].f_text = null;
-    extcmdlist[46].key = 239;
-    extcmdlist[46].ef_txt = $c.lit("offer");
-    extcmdlist[46].ef_desc = $c.lit("offer a sacrifice to the gods");
-    extcmdlist[46].ef_funct = dosacrifice;
-    extcmdlist[46].flags = AUTOCOMPLETE | CMD_M_PREFIX;
-    extcmdlist[46].f_text = null;
-    extcmdlist[47].key = 111;
-    extcmdlist[47].ef_txt = $c.lit("open");
-    extcmdlist[47].ef_desc = $c.lit("open a door");
-    extcmdlist[47].ef_funct = doopen;
-    extcmdlist[47].flags = 0;
-    extcmdlist[47].f_text = null;
-    extcmdlist[48].key = 79;
-    extcmdlist[48].ef_txt = $c.lit("options");
-    extcmdlist[48].ef_desc = $c.lit("show option settings");
-    extcmdlist[48].ef_funct = doset_simple;
-    extcmdlist[48].flags = IFBURIED | GENERALCMD | CMD_M_PREFIX;
-    extcmdlist[48].f_text = null;
-    extcmdlist[49].key = 0;
-    extcmdlist[49].ef_txt = $c.lit("optionsfull");
-    extcmdlist[49].ef_desc = $c.lit("show all option settings, possibly change them");
-    extcmdlist[49].ef_funct = doset;
-    extcmdlist[49].flags = IFBURIED | GENERALCMD | CMD_M_PREFIX;
-    extcmdlist[49].f_text = null;
-    extcmdlist[50].key = 15;
-    extcmdlist[50].ef_txt = $c.lit("overview");
-    extcmdlist[50].ef_desc = $c.lit("show a summary of the explored dungeon");
-    extcmdlist[50].ef_funct = dooverview;
-    extcmdlist[50].flags = IFBURIED | AUTOCOMPLETE | GENERALCMD | CMD_M_PREFIX;
-    extcmdlist[50].f_text = null;
-    extcmdlist[51].key = 0;
-    extcmdlist[51].ef_txt = $c.lit("panic");
-    extcmdlist[51].ef_desc = $c.lit("test panic routine (fatal to game)");
-    extcmdlist[51].ef_funct = wiz_panic;
-    extcmdlist[51].flags = IFBURIED | AUTOCOMPLETE | WIZMODECMD;
-    extcmdlist[51].f_text = null;
-    extcmdlist[52].key = 112;
-    extcmdlist[52].ef_txt = $c.lit("pay");
-    extcmdlist[52].ef_desc = $c.lit("pay your shopping bill");
-    extcmdlist[52].ef_funct = dopay;
-    extcmdlist[52].flags = CMD_M_PREFIX;
-    extcmdlist[52].f_text = null;
-    extcmdlist[53].key = 124;
-    extcmdlist[53].ef_txt = $c.lit("perminv");
-    extcmdlist[53].ef_desc = $c.lit("scroll persistent inventory display");
-    extcmdlist[53].ef_funct = doperminv;
-    extcmdlist[53].flags = IFBURIED | GENERALCMD | NOFUZZERCMD;
-    extcmdlist[53].f_text = null;
-    extcmdlist[54].key = 44;
-    extcmdlist[54].ef_txt = $c.lit("pickup");
-    extcmdlist[54].ef_desc = $c.lit("pick up things at the current location");
-    extcmdlist[54].ef_funct = dopickup;
-    extcmdlist[54].flags = CMD_M_PREFIX;
-    extcmdlist[54].f_text = null;
-    extcmdlist[55].key = 0;
-    extcmdlist[55].ef_txt = $c.lit("polyself");
-    extcmdlist[55].ef_desc = $c.lit("polymorph self");
-    extcmdlist[55].ef_funct = wiz_polyself;
-    extcmdlist[55].flags = IFBURIED | AUTOCOMPLETE | WIZMODECMD;
-    extcmdlist[55].f_text = null;
-    extcmdlist[56].key = 240;
-    extcmdlist[56].ef_txt = $c.lit("pray");
-    extcmdlist[56].ef_desc = $c.lit("pray to the gods for help");
-    extcmdlist[56].ef_funct = dopray;
-    extcmdlist[56].flags = IFBURIED | AUTOCOMPLETE;
-    extcmdlist[56].f_text = null;
-    extcmdlist[57].key = 16;
-    extcmdlist[57].ef_txt = $c.lit("prevmsg");
-    extcmdlist[57].ef_desc = $c.lit("view recent game messages");
-    extcmdlist[57].ef_funct = doprev_message;
-    extcmdlist[57].flags = IFBURIED | GENERALCMD | CMD_INSANE;
-    extcmdlist[57].f_text = null;
-    extcmdlist[58].key = 80;
-    extcmdlist[58].ef_txt = $c.lit("puton");
-    extcmdlist[58].ef_desc = $c.lit("put on an accessory (ring, amulet, etc)");
-    extcmdlist[58].ef_funct = doputon;
-    extcmdlist[58].flags = 0;
-    extcmdlist[58].f_text = null;
-    extcmdlist[59].key = 113;
-    extcmdlist[59].ef_txt = $c.lit("quaff");
-    extcmdlist[59].ef_desc = $c.lit("quaff (drink) something");
-    extcmdlist[59].ef_funct = dodrink;
-    extcmdlist[59].flags = CMD_M_PREFIX;
-    extcmdlist[59].f_text = null;
-    extcmdlist[60].key = 0;
-    extcmdlist[60].ef_txt = $c.lit("quit");
-    extcmdlist[60].ef_desc = $c.lit("exit without saving current game");
-    extcmdlist[60].ef_funct = done2;
-    extcmdlist[60].flags = IFBURIED | AUTOCOMPLETE | GENERALCMD | NOFUZZERCMD;
-    extcmdlist[60].f_text = null;
-    extcmdlist[61].key = 81;
-    extcmdlist[61].ef_txt = $c.lit("quiver");
-    extcmdlist[61].ef_desc = $c.lit("select ammunition for quiver");
-    extcmdlist[61].ef_funct = dowieldquiver;
-    extcmdlist[61].flags = 0;
-    extcmdlist[61].f_text = null;
-    extcmdlist[62].key = 114;
-    extcmdlist[62].ef_txt = $c.lit("read");
-    extcmdlist[62].ef_desc = $c.lit("read a scroll or spellbook");
-    extcmdlist[62].ef_funct = doread;
-    extcmdlist[62].flags = 0;
-    extcmdlist[62].f_text = null;
-    extcmdlist[63].key = 18;
-    extcmdlist[63].ef_txt = $c.lit("redraw");
-    extcmdlist[63].ef_desc = $c.lit("redraw screen");
-    extcmdlist[63].ef_funct = doredraw;
-    extcmdlist[63].flags = IFBURIED | GENERALCMD | CMD_INSANE;
-    extcmdlist[63].f_text = null;
-    extcmdlist[64].key = 82;
-    extcmdlist[64].ef_txt = $c.lit("remove");
-    extcmdlist[64].ef_desc = $c.lit("remove an accessory (ring, amulet, etc)");
-    extcmdlist[64].ef_funct = doremring;
-    extcmdlist[64].flags = 0;
-    extcmdlist[64].f_text = null;
-    extcmdlist[65].key = 1;
-    extcmdlist[65].ef_txt = $c.lit("repeat");
-    extcmdlist[65].ef_desc = $c.lit("repeat a previous command");
-    extcmdlist[65].ef_funct = do_repeat;
-    extcmdlist[65].flags = IFBURIED | GENERALCMD;
-    extcmdlist[65].f_text = null;
-    extcmdlist[66].key = 109;
-    extcmdlist[66].ef_txt = $c.lit("reqmenu");
-    extcmdlist[66].ef_desc = $c.lit("prefix: request menu or modify command");
-    extcmdlist[66].ef_funct = do_reqmenu;
-    extcmdlist[66].flags = PREFIXCMD;
-    extcmdlist[66].f_text = null;
-    extcmdlist[67].key = 31;
-    extcmdlist[67].ef_txt = $c.lit("retravel");
-    extcmdlist[67].ef_desc = $c.lit("travel to previously selected travel location");
-    extcmdlist[67].ef_funct = dotravel_target;
-    extcmdlist[67].flags = 0;
-    extcmdlist[67].f_text = null;
-    extcmdlist[68].key = 210;
-    extcmdlist[68].ef_txt = $c.lit("ride");
-    extcmdlist[68].ef_desc = $c.lit("mount or dismount a saddled steed");
-    extcmdlist[68].ef_funct = doride;
-    extcmdlist[68].flags = AUTOCOMPLETE;
-    extcmdlist[68].f_text = null;
-    extcmdlist[69].key = 242;
-    extcmdlist[69].ef_txt = $c.lit("rub");
-    extcmdlist[69].ef_desc = $c.lit("rub a lamp or a stone");
-    extcmdlist[69].ef_funct = dorub;
-    extcmdlist[69].flags = AUTOCOMPLETE;
-    extcmdlist[69].f_text = null;
-    extcmdlist[70].key = 71;
-    extcmdlist[70].ef_txt = $c.lit("run");
-    extcmdlist[70].ef_desc = $c.lit("prefix: run until something interesting is seen");
-    extcmdlist[70].ef_funct = do_run;
-    extcmdlist[70].flags = PREFIXCMD;
-    extcmdlist[70].f_text = null;
-    extcmdlist[71].key = 103;
-    extcmdlist[71].ef_txt = $c.lit("rush");
-    extcmdlist[71].ef_desc = $c.lit("prefix: rush until something interesting is seen");
-    extcmdlist[71].ef_funct = do_rush;
-    extcmdlist[71].flags = PREFIXCMD;
-    extcmdlist[71].f_text = null;
-    extcmdlist[72].key = 83;
-    extcmdlist[72].ef_txt = $c.lit("save");
-    extcmdlist[72].ef_desc = $c.lit("save the game and exit");
-    extcmdlist[72].ef_funct = dosave;
-    extcmdlist[72].flags = IFBURIED | GENERALCMD | NOFUZZERCMD;
-    extcmdlist[72].f_text = null;
-    extcmdlist[73].key = 0;
-    extcmdlist[73].ef_txt = $c.lit("saveoptions");
-    extcmdlist[73].ef_desc = $c.lit("save the game configuration");
-    extcmdlist[73].ef_funct = do_write_config_file;
-    extcmdlist[73].flags = IFBURIED | GENERALCMD | NOFUZZERCMD;
-    extcmdlist[73].f_text = null;
-    extcmdlist[74].key = 115;
-    extcmdlist[74].ef_txt = $c.lit("search");
-    extcmdlist[74].ef_desc = $c.lit("search for traps and secret doors");
-    extcmdlist[74].ef_funct = dosearch;
-    extcmdlist[74].flags = IFBURIED | CMD_M_PREFIX;
-    extcmdlist[74].f_text = $c.lit("searching");
-    extcmdlist[75].key = 42;
-    extcmdlist[75].ef_txt = $c.lit("seeall");
-    extcmdlist[75].ef_desc = $c.lit("show all equipment in use");
-    extcmdlist[75].ef_funct = doprinuse;
-    extcmdlist[75].flags = IFBURIED | GENERALCMD | CMD_M_PREFIX;
-    extcmdlist[75].f_text = null;
-    extcmdlist[76].key = AMULET_SYM;
-    extcmdlist[76].ef_txt = $c.lit("seeamulet");
-    extcmdlist[76].ef_desc = $c.lit("show the amulet currently worn");
-    extcmdlist[76].ef_funct = dopramulet;
-    extcmdlist[76].flags = IFBURIED | GENERALCMD | CMD_M_PREFIX;
-    extcmdlist[76].f_text = null;
-    extcmdlist[77].key = ARMOR_SYM;
-    extcmdlist[77].ef_txt = $c.lit("seearmor");
-    extcmdlist[77].ef_desc = $c.lit("show the armor currently worn");
-    extcmdlist[77].ef_funct = doprarm;
-    extcmdlist[77].flags = IFBURIED | GENERALCMD | CMD_M_PREFIX;
-    extcmdlist[77].f_text = null;
-    extcmdlist[78].key = RING_SYM;
-    extcmdlist[78].ef_txt = $c.lit("seerings");
-    extcmdlist[78].ef_desc = $c.lit("show the ring(s) currently worn");
-    extcmdlist[78].ef_funct = doprring;
-    extcmdlist[78].flags = IFBURIED | GENERALCMD | CMD_M_PREFIX;
-    extcmdlist[78].f_text = null;
-    extcmdlist[79].key = TOOL_SYM;
-    extcmdlist[79].ef_txt = $c.lit("seetools");
-    extcmdlist[79].ef_desc = $c.lit("show the tools currently in use");
-    extcmdlist[79].ef_funct = doprtool;
-    extcmdlist[79].flags = IFBURIED | GENERALCMD | CMD_M_PREFIX;
-    extcmdlist[79].f_text = null;
-    extcmdlist[80].key = WEAPON_SYM;
-    extcmdlist[80].ef_txt = $c.lit("seeweapon");
-    extcmdlist[80].ef_desc = $c.lit("show the weapon currently wielded");
-    extcmdlist[80].ef_funct = doprwep;
-    extcmdlist[80].flags = IFBURIED | GENERALCMD | CMD_M_PREFIX;
-    extcmdlist[80].f_text = null;
-    extcmdlist[81].key = 33;
-    extcmdlist[81].ef_txt = $c.lit("shell");
-    extcmdlist[81].ef_desc = $c.lit("leave game to enter a sub-shell ('exit' to come back)");
-    extcmdlist[81].ef_funct = dosh_core;
-    extcmdlist[81].flags = IFBURIED | GENERALCMD | NOFUZZERCMD;
-    extcmdlist[81].f_text = null;
-    extcmdlist[82].key = GOLD_SYM;
-    extcmdlist[82].ef_txt = $c.lit("showgold");
-    extcmdlist[82].ef_desc = $c.lit("show gold, possibly shop credit or debt");
-    extcmdlist[82].ef_funct = doprgold;
-    extcmdlist[82].flags = IFBURIED | GENERALCMD | CMD_M_PREFIX;
-    extcmdlist[82].f_text = null;
-    extcmdlist[83].key = SPBOOK_SYM;
-    extcmdlist[83].ef_txt = $c.lit("showspells");
-    extcmdlist[83].ef_desc = $c.lit("list and reorder known spells");
-    extcmdlist[83].ef_funct = dovspell;
-    extcmdlist[83].flags = IFBURIED | GENERALCMD;
-    extcmdlist[83].f_text = null;
-    extcmdlist[84].key = 94;
-    extcmdlist[84].ef_txt = $c.lit("showtrap");
-    extcmdlist[84].ef_desc = $c.lit("describe an adjacent, discovered trap");
-    extcmdlist[84].ef_funct = doidtrap;
-    extcmdlist[84].flags = IFBURIED | GENERALCMD;
-    extcmdlist[84].f_text = null;
-    extcmdlist[85].key = 243;
-    extcmdlist[85].ef_txt = $c.lit("sit");
-    extcmdlist[85].ef_desc = $c.lit("sit down");
-    extcmdlist[85].ef_funct = dosit;
-    extcmdlist[85].flags = AUTOCOMPLETE;
-    extcmdlist[85].f_text = null;
-    extcmdlist[86].key = 0;
-    extcmdlist[86].ef_txt = $c.lit("stats");
-    extcmdlist[86].ef_desc = $c.lit("show memory statistics");
-    extcmdlist[86].ef_funct = wiz_show_stats;
-    extcmdlist[86].flags = IFBURIED | AUTOCOMPLETE | WIZMODECMD;
-    extcmdlist[86].f_text = null;
-    extcmdlist[87].key = 26;
-    extcmdlist[87].ef_txt = $c.lit("suspend");
-    extcmdlist[87].ef_desc = $c.lit("push game to background ('fg' to come back)");
-    extcmdlist[87].ef_funct = dosuspend_core;
-    extcmdlist[87].flags = IFBURIED | GENERALCMD | NOFUZZERCMD;
-    extcmdlist[87].f_text = null;
-    extcmdlist[88].key = 120;
-    extcmdlist[88].ef_txt = $c.lit("swap");
-    extcmdlist[88].ef_desc = $c.lit("swap wielded and secondary weapons");
-    extcmdlist[88].ef_funct = doswapweapon;
-    extcmdlist[88].flags = 0;
-    extcmdlist[88].f_text = null;
-    extcmdlist[89].key = 84;
-    extcmdlist[89].ef_txt = $c.lit("takeoff");
-    extcmdlist[89].ef_desc = $c.lit("take off one piece of armor");
-    extcmdlist[89].ef_funct = dotakeoff;
-    extcmdlist[89].flags = 0;
-    extcmdlist[89].f_text = null;
-    extcmdlist[90].key = 65;
-    extcmdlist[90].ef_txt = $c.lit("takeoffall");
-    extcmdlist[90].ef_desc = $c.lit("remove all armor");
-    extcmdlist[90].ef_funct = doddoremarm;
-    extcmdlist[90].flags = 0;
-    extcmdlist[90].f_text = null;
-    extcmdlist[91].key = 20;
-    extcmdlist[91].ef_txt = $c.lit("teleport");
-    extcmdlist[91].ef_desc = $c.lit("teleport around the level");
-    extcmdlist[91].ef_funct = dotelecmd;
-    extcmdlist[91].flags = IFBURIED | CMD_M_PREFIX;
-    extcmdlist[91].f_text = null;
-    extcmdlist[92].key = 127;
-    extcmdlist[92].ef_txt = $c.lit("terrain");
-    extcmdlist[92].ef_desc = $c.lit("view map without monsters or objects obstructing it");
-    extcmdlist[92].ef_funct = doterrain;
-    extcmdlist[92].flags = IFBURIED | GENERALCMD | AUTOCOMPLETE;
-    extcmdlist[92].f_text = null;
-    extcmdlist[93].key = 0;
-    extcmdlist[93].ef_txt = $c.lit("therecmdmenu");
-    extcmdlist[93].ef_desc = $c.lit("menu of commands you can do from here to adjacent spot");
-    extcmdlist[93].ef_funct = dotherecmdmenu;
-    extcmdlist[93].flags = AUTOCOMPLETE | GENERALCMD | MOUSECMD;
-    extcmdlist[93].f_text = null;
-    extcmdlist[94].key = 116;
-    extcmdlist[94].ef_txt = $c.lit("throw");
-    extcmdlist[94].ef_desc = $c.lit("throw something");
-    extcmdlist[94].ef_funct = dothrow;
-    extcmdlist[94].flags = 0;
-    extcmdlist[94].f_text = null;
-    extcmdlist[95].key = 0;
-    extcmdlist[95].ef_txt = $c.lit("timeout");
-    extcmdlist[95].ef_desc = $c.lit("look at timeout queue and hero's timed intrinsics");
-    extcmdlist[95].ef_funct = wiz_timeout_queue;
-    extcmdlist[95].flags = IFBURIED | AUTOCOMPLETE | WIZMODECMD;
-    extcmdlist[95].f_text = null;
-    extcmdlist[96].key = 212;
-    extcmdlist[96].ef_txt = $c.lit("tip");
-    extcmdlist[96].ef_desc = $c.lit("empty a container");
-    extcmdlist[96].ef_funct = dotip;
-    extcmdlist[96].flags = AUTOCOMPLETE | CMD_M_PREFIX;
-    extcmdlist[96].f_text = null;
-    extcmdlist[97].key = 0;
-    extcmdlist[97].ef_txt = $c.lit("toggle");
-    extcmdlist[97].ef_desc = $c.lit("toggle boolean option");
-    extcmdlist[97].ef_funct = dotoggleoption;
-    extcmdlist[97].flags = IFBURIED | GENERALCMD | CMD_PARAM;
-    extcmdlist[97].f_text = null;
-    extcmdlist[98].key = 95;
-    extcmdlist[98].ef_txt = $c.lit("travel");
-    extcmdlist[98].ef_desc = $c.lit("travel to a specific location on the map");
-    extcmdlist[98].ef_funct = dotravel;
-    extcmdlist[98].flags = CMD_M_PREFIX;
-    extcmdlist[98].f_text = null;
-    extcmdlist[99].key = 244;
-    extcmdlist[99].ef_txt = $c.lit("turn");
-    extcmdlist[99].ef_desc = $c.lit("turn undead away");
-    extcmdlist[99].ef_funct = doturn;
-    extcmdlist[99].flags = IFBURIED | AUTOCOMPLETE;
-    extcmdlist[99].f_text = null;
-    extcmdlist[100].key = 88;
-    extcmdlist[100].ef_txt = $c.lit("twoweapon");
-    extcmdlist[100].ef_desc = $c.lit("toggle two-weapon combat");
-    extcmdlist[100].ef_funct = dotwoweapon;
-    extcmdlist[100].flags = 0;
-    extcmdlist[100].f_text = null;
-    extcmdlist[101].key = 245;
-    extcmdlist[101].ef_txt = $c.lit("untrap");
-    extcmdlist[101].ef_desc = $c.lit("untrap something");
-    extcmdlist[101].ef_funct = dountrap;
-    extcmdlist[101].flags = AUTOCOMPLETE;
-    extcmdlist[101].f_text = null;
-    extcmdlist[102].key = 60;
-    extcmdlist[102].ef_txt = $c.lit("up");
-    extcmdlist[102].ef_desc = $c.lit("go up a staircase");
-    extcmdlist[102].ef_funct = doup;
-    extcmdlist[102].flags = CMD_M_PREFIX;
-    extcmdlist[102].f_text = null;
-    extcmdlist[103].key = 214;
-    extcmdlist[103].ef_txt = $c.lit("vanquished");
-    extcmdlist[103].ef_desc = $c.lit("list vanquished monsters");
-    extcmdlist[103].ef_funct = dovanquished;
-    extcmdlist[103].flags = IFBURIED | AUTOCOMPLETE | GENERALCMD | CMD_M_PREFIX;
-    extcmdlist[103].f_text = null;
-    extcmdlist[104].key = 246;
-    extcmdlist[104].ef_txt = $c.lit("version");
-    extcmdlist[104].ef_desc = $c.lit("list compile time options for this version of NetHack");
-    extcmdlist[104].ef_funct = doextversion;
-    extcmdlist[104].flags = IFBURIED | AUTOCOMPLETE | GENERALCMD;
-    extcmdlist[104].f_text = null;
-    extcmdlist[105].key = 86;
-    extcmdlist[105].ef_txt = $c.lit("versionshort");
-    extcmdlist[105].ef_desc = $c.lit("show version and date+time program was built");
-    extcmdlist[105].ef_funct = doversion;
-    extcmdlist[105].flags = IFBURIED | GENERALCMD | CMD_M_PREFIX;
-    extcmdlist[105].f_text = null;
-    extcmdlist[106].key = 0;
-    extcmdlist[106].ef_txt = $c.lit("vision");
-    extcmdlist[106].ef_desc = $c.lit("show vision array");
-    extcmdlist[106].ef_funct = wiz_show_vision;
-    extcmdlist[106].flags = IFBURIED | AUTOCOMPLETE | WIZMODECMD;
-    extcmdlist[106].f_text = null;
-    extcmdlist[107].key = 46;
-    extcmdlist[107].ef_txt = $c.lit("wait");
-    extcmdlist[107].ef_desc = $c.lit("rest one move while doing nothing");
-    extcmdlist[107].ef_funct = donull;
-    extcmdlist[107].flags = IFBURIED | CMD_M_PREFIX;
-    extcmdlist[107].f_text = $c.lit("waiting");
-    extcmdlist[108].key = 87;
-    extcmdlist[108].ef_txt = $c.lit("wear");
-    extcmdlist[108].ef_desc = $c.lit("wear a piece of armor");
-    extcmdlist[108].ef_funct = dowear;
-    extcmdlist[108].flags = 0;
-    extcmdlist[108].f_text = null;
-    extcmdlist[109].key = 38;
-    extcmdlist[109].ef_txt = $c.lit("whatdoes");
-    extcmdlist[109].ef_desc = $c.lit("tell what a command does");
-    extcmdlist[109].ef_funct = dowhatdoes;
-    extcmdlist[109].flags = IFBURIED | GENERALCMD;
-    extcmdlist[109].f_text = null;
-    extcmdlist[110].key = 47;
-    extcmdlist[110].ef_txt = $c.lit("whatis");
-    extcmdlist[110].ef_desc = $c.lit("show what type of thing a symbol corresponds to");
-    extcmdlist[110].ef_funct = dowhatis;
-    extcmdlist[110].flags = IFBURIED | GENERALCMD;
-    extcmdlist[110].f_text = null;
-    extcmdlist[111].key = 119;
-    extcmdlist[111].ef_txt = $c.lit("wield");
-    extcmdlist[111].ef_desc = $c.lit("wield (put in use) a weapon");
-    extcmdlist[111].ef_funct = dowield;
-    extcmdlist[111].flags = 0;
-    extcmdlist[111].f_text = null;
-    extcmdlist[112].key = 247;
-    extcmdlist[112].ef_txt = $c.lit("wipe");
-    extcmdlist[112].ef_desc = $c.lit("wipe off your face");
-    extcmdlist[112].ef_funct = dowipe;
-    extcmdlist[112].flags = AUTOCOMPLETE;
-    extcmdlist[112].f_text = null;
-    extcmdlist[113].key = 0;
-    extcmdlist[113].ef_txt = $c.lit("wizborn");
-    extcmdlist[113].ef_desc = $c.lit("show stats of monsters created");
-    extcmdlist[113].ef_funct = doborn;
-    extcmdlist[113].flags = IFBURIED | WIZMODECMD;
-    extcmdlist[113].f_text = null;
-    extcmdlist[114].key = 0;
-    extcmdlist[114].ef_txt = $c.lit("wizbury");
-    extcmdlist[114].ef_desc = $c.lit("bury objs under and around you");
-    extcmdlist[114].ef_funct = wiz_debug_cmd_bury;
-    extcmdlist[114].flags = IFBURIED | AUTOCOMPLETE | WIZMODECMD;
-    extcmdlist[114].f_text = null;
-    extcmdlist[115].key = 0;
-    extcmdlist[115].ef_txt = $c.lit("wizcast");
-    extcmdlist[115].ef_desc = $c.lit("cast any spell");
-    extcmdlist[115].ef_funct = dowizcast;
-    extcmdlist[115].flags = IFBURIED | WIZMODECMD;
-    extcmdlist[115].f_text = null;
-    extcmdlist[116].key = 0;
-    extcmdlist[116].ef_txt = $c.lit("wizcustom");
-    extcmdlist[116].ef_desc = $c.lit("show customized glyphs");
-    extcmdlist[116].ef_funct = wiz_custom;
-    extcmdlist[116].flags = IFBURIED | WIZMODECMD | NOFUZZERCMD;
-    extcmdlist[116].f_text = null;
-    extcmdlist[117].key = 5;
-    extcmdlist[117].ef_txt = $c.lit("wizdetect");
-    extcmdlist[117].ef_desc = $c.lit("reveal hidden things within a small radius");
-    extcmdlist[117].ef_funct = wiz_detect;
-    extcmdlist[117].flags = IFBURIED | WIZMODECMD;
-    extcmdlist[117].f_text = null;
-    extcmdlist[118].key = 0;
-    extcmdlist[118].ef_txt = $c.lit("wizdispmacros");
-    extcmdlist[118].ef_desc = $c.lit("validate the display macro ranges");
-    extcmdlist[118].ef_funct = wiz_display_macros;
-    extcmdlist[118].flags = IFBURIED | AUTOCOMPLETE | WIZMODECMD;
-    extcmdlist[118].f_text = null;
-    extcmdlist[119].key = 0;
-    extcmdlist[119].ef_txt = $c.lit("wizfliplevel");
-    extcmdlist[119].ef_desc = $c.lit("flip the level");
-    extcmdlist[119].ef_funct = wiz_flip_level;
-    extcmdlist[119].flags = IFBURIED | WIZMODECMD;
-    extcmdlist[119].f_text = null;
-    extcmdlist[120].key = 7;
-    extcmdlist[120].ef_txt = $c.lit("wizgenesis");
-    extcmdlist[120].ef_desc = $c.lit("create a monster");
-    extcmdlist[120].ef_funct = wiz_genesis;
-    extcmdlist[120].flags = IFBURIED | WIZMODECMD;
-    extcmdlist[120].f_text = null;
-    extcmdlist[121].key = 9;
-    extcmdlist[121].ef_txt = $c.lit("wizidentify");
-    extcmdlist[121].ef_desc = $c.lit("identify all items in inventory");
-    extcmdlist[121].ef_funct = wiz_identify;
-    extcmdlist[121].flags = IFBURIED | WIZMODECMD;
-    extcmdlist[121].f_text = null;
-    extcmdlist[122].key = 0;
-    extcmdlist[122].ef_txt = $c.lit("wizintrinsic");
-    extcmdlist[122].ef_desc = $c.lit("set an intrinsic");
-    extcmdlist[122].ef_funct = wiz_intrinsic;
-    extcmdlist[122].flags = IFBURIED | AUTOCOMPLETE | WIZMODECMD;
-    extcmdlist[122].f_text = null;
-    extcmdlist[123].key = 0;
-    extcmdlist[123].ef_txt = $c.lit("wizkill");
-    extcmdlist[123].ef_desc = $c.lit("slay a monster");
-    extcmdlist[123].ef_funct = wiz_kill;
-    extcmdlist[123].flags = IFBURIED | AUTOCOMPLETE | WIZMODECMD | CMD_M_PREFIX | NOFUZZERCMD;
-    extcmdlist[123].f_text = null;
-    extcmdlist[124].key = 22;
-    extcmdlist[124].ef_txt = $c.lit("wizlevelport");
-    extcmdlist[124].ef_desc = $c.lit("teleport to another level");
-    extcmdlist[124].ef_funct = wiz_level_tele;
-    extcmdlist[124].flags = IFBURIED | WIZMODECMD | CMD_M_PREFIX;
-    extcmdlist[124].f_text = null;
-    extcmdlist[125].key = 0;
-    extcmdlist[125].ef_txt = $c.lit("wizloaddes");
-    extcmdlist[125].ef_desc = $c.lit("load and execute a des-file lua script");
-    extcmdlist[125].ef_funct = wiz_load_splua;
-    extcmdlist[125].flags = IFBURIED | WIZMODECMD | NOFUZZERCMD;
-    extcmdlist[125].f_text = null;
-    extcmdlist[126].key = 0;
-    extcmdlist[126].ef_txt = $c.lit("wizloadlua");
-    extcmdlist[126].ef_desc = $c.lit("load and execute a lua script");
-    extcmdlist[126].ef_funct = wiz_load_lua;
-    extcmdlist[126].flags = IFBURIED | WIZMODECMD | NOFUZZERCMD;
-    extcmdlist[126].f_text = null;
-    extcmdlist[127].key = 0;
-    extcmdlist[127].ef_txt = $c.lit("wizobjprobs");
-    extcmdlist[127].ef_desc = $c.lit("list object generation probabilities");
-    extcmdlist[127].ef_funct = wiz_objprobs;
-    extcmdlist[127].flags = IFBURIED | WIZMODECMD;
-    extcmdlist[127].f_text = null;
-    extcmdlist[128].key = 0;
-    extcmdlist[128].ef_txt = $c.lit("wizmakemap");
-    extcmdlist[128].ef_desc = $c.lit("recreate the current level");
-    extcmdlist[128].ef_funct = wiz_makemap;
-    extcmdlist[128].flags = IFBURIED | WIZMODECMD;
-    extcmdlist[128].f_text = null;
-    extcmdlist[129].key = 6;
-    extcmdlist[129].ef_txt = $c.lit("wizmap");
-    extcmdlist[129].ef_desc = $c.lit("map the level");
-    extcmdlist[129].ef_funct = wiz_map;
-    extcmdlist[129].flags = IFBURIED | WIZMODECMD;
-    extcmdlist[129].f_text = null;
-    extcmdlist[130].key = 0;
-    extcmdlist[130].ef_txt = $c.lit("wizmondiff");
-    extcmdlist[130].ef_desc = $c.lit("validate the difficulty ratings of monsters");
-    extcmdlist[130].ef_funct = wiz_mon_diff;
-    extcmdlist[130].flags = IFBURIED | AUTOCOMPLETE | WIZMODECMD;
-    extcmdlist[130].f_text = null;
-    extcmdlist[131].key = 0;
-    extcmdlist[131].ef_txt = $c.lit("wizrumorcheck");
-    extcmdlist[131].ef_desc = $c.lit("verify rumor boundaries");
-    extcmdlist[131].ef_funct = wiz_rumor_check;
-    extcmdlist[131].flags = IFBURIED | AUTOCOMPLETE | WIZMODECMD;
-    extcmdlist[131].f_text = null;
-    extcmdlist[132].key = 0;
-    extcmdlist[132].ef_txt = $c.lit("wizseenv");
-    extcmdlist[132].ef_desc = $c.lit("show map locations' seen vectors");
-    extcmdlist[132].ef_funct = wiz_show_seenv;
-    extcmdlist[132].flags = IFBURIED | AUTOCOMPLETE | WIZMODECMD;
-    extcmdlist[132].f_text = null;
-    extcmdlist[133].key = 0;
-    extcmdlist[133].ef_txt = $c.lit("wizshownhuuid");
-    extcmdlist[133].ef_desc = $c.lit("show NHUUID for this game");
-    extcmdlist[133].ef_funct = wiz_show_nhuuid;
-    extcmdlist[133].flags = AUTOCOMPLETE | WIZMODECMD;
-    extcmdlist[133].f_text = null;
-    extcmdlist[134].key = 0;
-    extcmdlist[134].ef_txt = $c.lit("wizsmell");
-    extcmdlist[134].ef_desc = $c.lit("smell monster");
-    extcmdlist[134].ef_funct = wiz_smell;
-    extcmdlist[134].flags = IFBURIED | AUTOCOMPLETE | WIZMODECMD;
-    extcmdlist[134].f_text = null;
-    extcmdlist[135].key = 0;
-    extcmdlist[135].ef_txt = $c.lit("wiztelekinesis");
-    extcmdlist[135].ef_desc = $c.lit("telekinesis");
-    extcmdlist[135].ef_funct = wiz_telekinesis;
-    extcmdlist[135].flags = IFBURIED | AUTOCOMPLETE | WIZMODECMD;
-    extcmdlist[135].f_text = null;
-    extcmdlist[136].key = 0;
-    extcmdlist[136].ef_txt = $c.lit("wizwhere");
-    extcmdlist[136].ef_desc = $c.lit("show locations of special levels");
-    extcmdlist[136].ef_funct = wiz_where;
-    extcmdlist[136].flags = IFBURIED | AUTOCOMPLETE | WIZMODECMD;
-    extcmdlist[136].f_text = null;
-    extcmdlist[137].key = 23;
-    extcmdlist[137].ef_txt = $c.lit("wizwish");
-    extcmdlist[137].ef_desc = $c.lit("wish for something");
-    extcmdlist[137].ef_funct = wiz_wish;
-    extcmdlist[137].flags = IFBURIED | CMD_M_PREFIX | WIZMODECMD;
-    extcmdlist[137].f_text = null;
-    extcmdlist[138].key = 0;
-    extcmdlist[138].ef_txt = $c.lit("wmode");
-    extcmdlist[138].ef_desc = $c.lit("show wall modes");
-    extcmdlist[138].ef_funct = wiz_show_wmodes;
-    extcmdlist[138].flags = IFBURIED | AUTOCOMPLETE | WIZMODECMD;
-    extcmdlist[138].f_text = null;
-    extcmdlist[139].key = 122;
-    extcmdlist[139].ef_txt = $c.lit("zap");
-    extcmdlist[139].ef_desc = $c.lit("zap a wand");
-    extcmdlist[139].ef_funct = dozap;
-    extcmdlist[139].flags = 0;
-    extcmdlist[139].f_text = null;
-    extcmdlist[140].key = 0;
-    extcmdlist[140].ef_txt = $c.lit("movewest");
-    extcmdlist[140].ef_desc = $c.lit("move west (screen left)");
-    extcmdlist[140].ef_funct = do_move_west;
-    extcmdlist[140].flags = MOVEMENTCMD | CMD_MOVE_PREFIXES;
-    extcmdlist[140].f_text = null;
-    extcmdlist[141].key = 0;
-    extcmdlist[141].ef_txt = $c.lit("movenorthwest");
-    extcmdlist[141].ef_desc = $c.lit("move northwest (screen upper left)");
-    extcmdlist[141].ef_funct = do_move_northwest;
-    extcmdlist[141].flags = MOVEMENTCMD | CMD_MOVE_PREFIXES;
-    extcmdlist[141].f_text = null;
-    extcmdlist[142].key = 0;
-    extcmdlist[142].ef_txt = $c.lit("movenorth");
-    extcmdlist[142].ef_desc = $c.lit("move north (screen up)");
-    extcmdlist[142].ef_funct = do_move_north;
-    extcmdlist[142].flags = MOVEMENTCMD | CMD_MOVE_PREFIXES;
-    extcmdlist[142].f_text = null;
-    extcmdlist[143].key = 0;
-    extcmdlist[143].ef_txt = $c.lit("movenortheast");
-    extcmdlist[143].ef_desc = $c.lit("move northeast (screen upper right)");
-    extcmdlist[143].ef_funct = do_move_northeast;
-    extcmdlist[143].flags = MOVEMENTCMD | CMD_MOVE_PREFIXES;
-    extcmdlist[143].f_text = null;
-    extcmdlist[144].key = 0;
-    extcmdlist[144].ef_txt = $c.lit("moveeast");
-    extcmdlist[144].ef_desc = $c.lit("move east (screen right)");
-    extcmdlist[144].ef_funct = do_move_east;
-    extcmdlist[144].flags = MOVEMENTCMD | CMD_MOVE_PREFIXES;
-    extcmdlist[144].f_text = null;
-    extcmdlist[145].key = 0;
-    extcmdlist[145].ef_txt = $c.lit("movesoutheast");
-    extcmdlist[145].ef_desc = $c.lit("move southeast (screen lower right)");
-    extcmdlist[145].ef_funct = do_move_southeast;
-    extcmdlist[145].flags = MOVEMENTCMD | CMD_MOVE_PREFIXES;
-    extcmdlist[145].f_text = null;
-    extcmdlist[146].key = 0;
-    extcmdlist[146].ef_txt = $c.lit("movesouth");
-    extcmdlist[146].ef_desc = $c.lit("move south (screen down)");
-    extcmdlist[146].ef_funct = do_move_south;
-    extcmdlist[146].flags = MOVEMENTCMD | CMD_MOVE_PREFIXES;
-    extcmdlist[146].f_text = null;
-    extcmdlist[147].key = 0;
-    extcmdlist[147].ef_txt = $c.lit("movesouthwest");
-    extcmdlist[147].ef_desc = $c.lit("move southwest (screen lower left)");
-    extcmdlist[147].ef_funct = do_move_southwest;
-    extcmdlist[147].flags = MOVEMENTCMD | CMD_MOVE_PREFIXES;
-    extcmdlist[147].f_text = null;
-    extcmdlist[148].key = 0;
-    extcmdlist[148].ef_txt = $c.lit("rushwest");
-    extcmdlist[148].ef_desc = $c.lit("rush west (screen left)");
-    extcmdlist[148].ef_funct = do_rush_west;
-    extcmdlist[148].flags = MOVEMENTCMD | CMD_M_PREFIX;
-    extcmdlist[148].f_text = null;
-    extcmdlist[149].key = 0;
-    extcmdlist[149].ef_txt = $c.lit("rushnorthwest");
-    extcmdlist[149].ef_desc = $c.lit("rush northwest (screen upper left)");
-    extcmdlist[149].ef_funct = do_rush_northwest;
-    extcmdlist[149].flags = MOVEMENTCMD | CMD_M_PREFIX;
-    extcmdlist[149].f_text = null;
-    extcmdlist[150].key = 0;
-    extcmdlist[150].ef_txt = $c.lit("rushnorth");
-    extcmdlist[150].ef_desc = $c.lit("rush north (screen up)");
-    extcmdlist[150].ef_funct = do_rush_north;
-    extcmdlist[150].flags = MOVEMENTCMD | CMD_M_PREFIX;
-    extcmdlist[150].f_text = null;
-    extcmdlist[151].key = 0;
-    extcmdlist[151].ef_txt = $c.lit("rushnortheast");
-    extcmdlist[151].ef_desc = $c.lit("rush northeast (screen upper right)");
-    extcmdlist[151].ef_funct = do_rush_northeast;
-    extcmdlist[151].flags = MOVEMENTCMD | CMD_M_PREFIX;
-    extcmdlist[151].f_text = null;
-    extcmdlist[152].key = 0;
-    extcmdlist[152].ef_txt = $c.lit("rusheast");
-    extcmdlist[152].ef_desc = $c.lit("rush east (screen right)");
-    extcmdlist[152].ef_funct = do_rush_east;
-    extcmdlist[152].flags = MOVEMENTCMD | CMD_M_PREFIX;
-    extcmdlist[152].f_text = null;
-    extcmdlist[153].key = 0;
-    extcmdlist[153].ef_txt = $c.lit("rushsoutheast");
-    extcmdlist[153].ef_desc = $c.lit("rush southeast (screen lower right)");
-    extcmdlist[153].ef_funct = do_rush_southeast;
-    extcmdlist[153].flags = MOVEMENTCMD | CMD_M_PREFIX;
-    extcmdlist[153].f_text = null;
-    extcmdlist[154].key = 0;
-    extcmdlist[154].ef_txt = $c.lit("rushsouth");
-    extcmdlist[154].ef_desc = $c.lit("rush south (screen down)");
-    extcmdlist[154].ef_funct = do_rush_south;
-    extcmdlist[154].flags = MOVEMENTCMD | CMD_M_PREFIX;
-    extcmdlist[154].f_text = null;
-    extcmdlist[155].key = 0;
-    extcmdlist[155].ef_txt = $c.lit("rushsouthwest");
-    extcmdlist[155].ef_desc = $c.lit("rush southwest (screen lower left)");
-    extcmdlist[155].ef_funct = do_rush_southwest;
-    extcmdlist[155].flags = MOVEMENTCMD | CMD_M_PREFIX;
-    extcmdlist[155].f_text = null;
-    extcmdlist[156].key = 0;
-    extcmdlist[156].ef_txt = $c.lit("runwest");
-    extcmdlist[156].ef_desc = $c.lit("run west (screen left)");
-    extcmdlist[156].ef_funct = do_run_west;
-    extcmdlist[156].flags = MOVEMENTCMD | CMD_M_PREFIX;
-    extcmdlist[156].f_text = null;
-    extcmdlist[157].key = 0;
-    extcmdlist[157].ef_txt = $c.lit("runnorthwest");
-    extcmdlist[157].ef_desc = $c.lit("run northwest (screen upper left)");
-    extcmdlist[157].ef_funct = do_run_northwest;
-    extcmdlist[157].flags = MOVEMENTCMD | CMD_M_PREFIX;
-    extcmdlist[157].f_text = null;
-    extcmdlist[158].key = 0;
-    extcmdlist[158].ef_txt = $c.lit("runnorth");
-    extcmdlist[158].ef_desc = $c.lit("run north (screen up)");
-    extcmdlist[158].ef_funct = do_run_north;
-    extcmdlist[158].flags = MOVEMENTCMD | CMD_M_PREFIX;
-    extcmdlist[158].f_text = null;
-    extcmdlist[159].key = 0;
-    extcmdlist[159].ef_txt = $c.lit("runnortheast");
-    extcmdlist[159].ef_desc = $c.lit("run northeast (screen upper right)");
-    extcmdlist[159].ef_funct = do_run_northeast;
-    extcmdlist[159].flags = MOVEMENTCMD | CMD_M_PREFIX;
-    extcmdlist[159].f_text = null;
-    extcmdlist[160].key = 0;
-    extcmdlist[160].ef_txt = $c.lit("runeast");
-    extcmdlist[160].ef_desc = $c.lit("run east (screen right)");
-    extcmdlist[160].ef_funct = do_run_east;
-    extcmdlist[160].flags = MOVEMENTCMD | CMD_M_PREFIX;
-    extcmdlist[160].f_text = null;
-    extcmdlist[161].key = 0;
-    extcmdlist[161].ef_txt = $c.lit("runsoutheast");
-    extcmdlist[161].ef_desc = $c.lit("run southeast (screen lower right)");
-    extcmdlist[161].ef_funct = do_run_southeast;
-    extcmdlist[161].flags = MOVEMENTCMD | CMD_M_PREFIX;
-    extcmdlist[161].f_text = null;
-    extcmdlist[162].key = 0;
-    extcmdlist[162].ef_txt = $c.lit("runsouth");
-    extcmdlist[162].ef_desc = $c.lit("run south (screen down)");
-    extcmdlist[162].ef_funct = do_run_south;
-    extcmdlist[162].flags = MOVEMENTCMD | CMD_M_PREFIX;
-    extcmdlist[162].f_text = null;
-    extcmdlist[163].key = 0;
-    extcmdlist[163].ef_txt = $c.lit("runsouthwest");
-    extcmdlist[163].ef_desc = $c.lit("run southwest (screen lower left)");
-    extcmdlist[163].ef_funct = do_run_southwest;
-    extcmdlist[163].flags = MOVEMENTCMD | CMD_M_PREFIX;
-    extcmdlist[163].f_text = null;
-    extcmdlist[164].key = 0;
-    extcmdlist[164].ef_txt = $c.lit("clicklook");
-    extcmdlist[164].ef_desc = null;
-    extcmdlist[164].ef_funct = doclicklook;
-    extcmdlist[164].flags = INTERNALCMD | MOUSECMD;
-    extcmdlist[164].f_text = null;
-    extcmdlist[165].key = 0;
-    extcmdlist[165].ef_txt = $c.lit("mouseaction");
-    extcmdlist[165].ef_desc = null;
-    extcmdlist[165].ef_funct = domouseaction;
-    extcmdlist[165].flags = INTERNALCMD | MOUSECMD;
-    extcmdlist[165].f_text = null;
-    extcmdlist[166].key = 0;
-    extcmdlist[166].ef_txt = $c.lit("altadjust");
-    extcmdlist[166].ef_desc = null;
-    extcmdlist[166].ef_funct = adjust_split;
-    extcmdlist[166].flags = INTERNALCMD;
-    extcmdlist[166].f_text = null;
-    extcmdlist[167].key = 0;
-    extcmdlist[167].ef_txt = $c.lit("altdip");
-    extcmdlist[167].ef_desc = null;
-    extcmdlist[167].ef_funct = dip_into;
-    extcmdlist[167].flags = INTERNALCMD;
-    extcmdlist[167].f_text = null;
-    extcmdlist[168].key = 0;
-    extcmdlist[168].ef_txt = $c.lit("alttakeoff");
-    extcmdlist[168].ef_desc = null;
-    extcmdlist[168].ef_funct = ia_dotakeoff;
-    extcmdlist[168].flags = INTERNALCMD;
-    extcmdlist[168].f_text = null;
-    extcmdlist[169].key = 0;
-    extcmdlist[169].ef_txt = $c.lit("altunwield");
-    extcmdlist[169].ef_desc = null;
-    extcmdlist[169].ef_funct = remarm_swapwep;
-    extcmdlist[169].flags = INTERNALCMD;
-    extcmdlist[169].f_text = null;
-    extcmdlist[170].key = 0;
-    extcmdlist[170].ef_txt = null;
-    extcmdlist[170].ef_desc = null;
-    extcmdlist[170].ef_funct = donull;
-    extcmdlist[170].flags = 0;
-    extcmdlist[170].f_text = null;
+    $c.init(extcmdlist, [
+        { key: 35, ef_txt: $c.lit("#"), ef_desc: $c.lit("enter and perform an extended command"),
+          ef_funct: doextcmd, flags: IFBURIED | GENERALCMD | CMD_M_PREFIX, f_text: null },
+        { key: 191, ef_txt: $c.lit("?"), ef_desc: $c.lit("list all extended commands"),
+          ef_funct: doextlist, flags: IFBURIED | AUTOCOMPLETE | GENERALCMD | CMD_M_PREFIX, f_text: null },
+        { key: 225, ef_txt: $c.lit("adjust"), ef_desc: $c.lit("adjust inventory letters"),
+          ef_funct: doorganize, flags: IFBURIED | AUTOCOMPLETE | GENERALCMD, f_text: null },
+        { key: 193, ef_txt: $c.lit("annotate"), ef_desc: $c.lit("name current level"),
+          ef_funct: donamelevel, flags: IFBURIED | AUTOCOMPLETE | GENERALCMD | CMD_M_PREFIX, f_text: null },
+        { key: 97, ef_txt: $c.lit("apply"), ef_desc: $c.lit("apply (use) a tool (pick-axe, key, lamp...)"),
+          ef_funct: doapply, flags: CMD_M_PREFIX, f_text: null },
+        { key: 24, ef_txt: $c.lit("attributes"), ef_desc: $c.lit("show your attributes"),
+          ef_funct: doattributes, flags: IFBURIED | GENERALCMD, f_text: null },
+        { key: 64, ef_txt: $c.lit("autopickup"), ef_desc: $c.lit("toggle the 'autopickup' option on/off"),
+          ef_funct: dotogglepickup, flags: IFBURIED | GENERALCMD, f_text: null },
+        { key: 0, ef_txt: $c.lit("bugreport"), ef_desc: $c.lit("file a bug report"),
+          ef_funct: dobugreport, flags: GENERALCMD | NOFUZZERCMD, f_text: null },
+        { key: 67, ef_txt: $c.lit("call"), ef_desc: $c.lit("name a monster, specific object, or type of object"),
+          ef_funct: docallcmd, flags: IFBURIED | GENERALCMD, f_text: null },
+        { key: 90, ef_txt: $c.lit("cast"), ef_desc: $c.lit("zap (cast) a spell"),
+          ef_funct: docast, flags: IFBURIED, f_text: null },
+        { key: 227, ef_txt: $c.lit("chat"), ef_desc: $c.lit("talk to someone"),
+          ef_funct: dotalk, flags: IFBURIED | AUTOCOMPLETE, f_text: null },
+        { key: 118, ef_txt: $c.lit("chronicle"), ef_desc: $c.lit("show journal of major events"),
+          ef_funct: do_gamelog, flags: IFBURIED | AUTOCOMPLETE | GENERALCMD, f_text: null },
+        { key: 99, ef_txt: $c.lit("close"), ef_desc: $c.lit("close a door"),
+          ef_funct: doclose, flags: 0, f_text: null },
+        { key: 195, ef_txt: $c.lit("conduct"), ef_desc: $c.lit("list voluntary challenges you have maintained"),
+          ef_funct: doconduct, flags: IFBURIED | AUTOCOMPLETE | GENERALCMD, f_text: null },
+        { key: 0, ef_txt: $c.lit("debugfuzzer"), ef_desc: $c.lit("start the fuzz tester"),
+          ef_funct: wiz_fuzzer, flags: IFBURIED | WIZMODECMD | NOFUZZERCMD, f_text: null },
+        { key: 228, ef_txt: $c.lit("dip"), ef_desc: $c.lit("dip an object into something"),
+          ef_funct: dodip, flags: AUTOCOMPLETE | CMD_M_PREFIX, f_text: null },
+        { key: 62, ef_txt: $c.lit("down"), ef_desc: $c.lit("go down a staircase"),
+          ef_funct: dodown, flags: CMD_M_PREFIX, f_text: null },
+        { key: 100, ef_txt: $c.lit("drop"), ef_desc: $c.lit("drop an item"),
+          ef_funct: dodrop, flags: 0, f_text: null },
+        { key: 68, ef_txt: $c.lit("droptype"), ef_desc: $c.lit("drop specific item types"),
+          ef_funct: doddrop, flags: 0, f_text: null },
+        { key: 101, ef_txt: $c.lit("eat"), ef_desc: $c.lit("eat something"),
+          ef_funct: doeat, flags: CMD_M_PREFIX, f_text: null },
+        { key: 69, ef_txt: $c.lit("engrave"), ef_desc: $c.lit("engrave writing on the floor"),
+          ef_funct: doengrave, flags: 0, f_text: null },
+        { key: 229, ef_txt: $c.lit("enhance"), ef_desc: $c.lit("advance or check weapon and spell skills"),
+          ef_funct: enhance_weapon_skill, flags: IFBURIED | AUTOCOMPLETE | GENERALCMD, f_text: null },
+        { key: 216, ef_txt: $c.lit("exploremode"), ef_desc: $c.lit("enter explore (discovery) mode"),
+          ef_funct: enter_explore_mode, flags: IFBURIED | GENERALCMD | NOFUZZERCMD, f_text: null },
+        { key: 70, ef_txt: $c.lit("fight"), ef_desc: $c.lit("prefix: force fight even if you don't see a monster"),
+          ef_funct: do_fight, flags: PREFIXCMD, f_text: null },
+        { key: 102, ef_txt: $c.lit("fire"), ef_desc: $c.lit("fire ammunition from quiver"),
+          ef_funct: dofire, flags: 0, f_text: null },
+        { key: 230, ef_txt: $c.lit("force"), ef_desc: $c.lit("force a lock"),
+          ef_funct: doforce, flags: AUTOCOMPLETE, f_text: null },
+        { key: 231, ef_txt: $c.lit("genocided"),
+          ef_desc: $c.lit("list monsters that have been genocided or become extinct"),
+          ef_funct: dogenocided,
+          flags: IFBURIED | AUTOCOMPLETE | GENERALCMD | CMD_M_PREFIX, f_text: null },
+        { key: 59, ef_txt: $c.lit("glance"), ef_desc: $c.lit("show what type of thing a map symbol corresponds to"),
+          ef_funct: doquickwhatis, flags: IFBURIED | GENERALCMD, f_text: null },
+        { key: 63, ef_txt: $c.lit("help"), ef_desc: $c.lit("give a help message"),
+          ef_funct: dohelp, flags: IFBURIED | GENERALCMD, f_text: null },
+        { key: 0, ef_txt: $c.lit("herecmdmenu"), ef_desc: $c.lit("show menu of commands you can do here"),
+          ef_funct: doherecmdmenu, flags: IFBURIED | AUTOCOMPLETE | GENERALCMD, f_text: null },
+        { key: 0, ef_txt: $c.lit("history"), ef_desc: $c.lit("show a summary of the game's development"),
+          ef_funct: dohistory, flags: IFBURIED | AUTOCOMPLETE | GENERALCMD, f_text: null },
+        { key: 105, ef_txt: $c.lit("inventory"), ef_desc: $c.lit("show your inventory"),
+          ef_funct: ddoinv, flags: IFBURIED | GENERALCMD, f_text: null },
+        { key: 73, ef_txt: $c.lit("inventtype"), ef_desc: $c.lit("show inventory of one specific item class"),
+          ef_funct: dotypeinv, flags: IFBURIED | GENERALCMD, f_text: null },
+        { key: 233, ef_txt: $c.lit("invoke"), ef_desc: $c.lit("invoke an object's special powers"),
+          ef_funct: doinvoke, flags: IFBURIED | AUTOCOMPLETE, f_text: null },
+        { key: 234, ef_txt: $c.lit("jump"), ef_desc: $c.lit("jump to another location"),
+          ef_funct: dojump, flags: AUTOCOMPLETE, f_text: null },
+        { key: 4, ef_txt: $c.lit("kick"), ef_desc: $c.lit("kick something"),
+          ef_funct: dokick, flags: 0, f_text: null },
+        { key: 92, ef_txt: $c.lit("known"), ef_desc: $c.lit("show what object types have been discovered"),
+          ef_funct: dodiscovered, flags: IFBURIED | GENERALCMD | CMD_M_PREFIX, f_text: null },
+        { key: 96, ef_txt: $c.lit("knownclass"), ef_desc: $c.lit("show discovered types for one class of objects"),
+          ef_funct: doclassdisco, flags: IFBURIED | GENERALCMD | CMD_M_PREFIX, f_text: null },
+        { key: 0, ef_txt: $c.lit("levelchange"), ef_desc: $c.lit("change experience level"),
+          ef_funct: wiz_level_change, flags: IFBURIED | AUTOCOMPLETE | WIZMODECMD, f_text: null },
+        { key: 0, ef_txt: $c.lit("lightsources"), ef_desc: $c.lit("show mobile light sources"),
+          ef_funct: wiz_light_sources, flags: IFBURIED | AUTOCOMPLETE | WIZMODECMD, f_text: null },
+        { key: 58, ef_txt: $c.lit("look"), ef_desc: $c.lit("look at what is here"),
+          ef_funct: dolook, flags: IFBURIED, f_text: null },
+        { key: 0, ef_txt: $c.lit("lookaround"), ef_desc: $c.lit("describe what you can see"),
+          ef_funct: dolookaround, flags: IFBURIED | GENERALCMD, f_text: null },
+        { key: 236, ef_txt: $c.lit("loot"), ef_desc: $c.lit("loot a box on the floor"),
+          ef_funct: doloot, flags: AUTOCOMPLETE | CMD_M_PREFIX, f_text: null },
+        { key: 0, ef_txt: $c.lit("migratemons"),
+          ef_desc: $c.lit("show migrating monsters and migrate N random ones"),
+          ef_funct: wiz_migrate_mons, flags: IFBURIED | AUTOCOMPLETE | WIZMODECMD, f_text: null },
+        { key: 237, ef_txt: $c.lit("monster"), ef_desc: $c.lit("use monster's special ability"),
+          ef_funct: domonability, flags: IFBURIED | AUTOCOMPLETE, f_text: null },
+        { key: 238, ef_txt: $c.lit("name"), ef_desc: $c.lit("same as call; name a monster or object or object type"),
+          ef_funct: docallcmd, flags: IFBURIED | AUTOCOMPLETE | GENERALCMD, f_text: null },
+        { key: 239, ef_txt: $c.lit("offer"), ef_desc: $c.lit("offer a sacrifice to the gods"),
+          ef_funct: dosacrifice, flags: AUTOCOMPLETE | CMD_M_PREFIX, f_text: null },
+        { key: 111, ef_txt: $c.lit("open"), ef_desc: $c.lit("open a door"),
+          ef_funct: doopen, flags: 0, f_text: null },
+        { key: 79, ef_txt: $c.lit("options"), ef_desc: $c.lit("show option settings"),
+          ef_funct: doset_simple, flags: IFBURIED | GENERALCMD | CMD_M_PREFIX, f_text: null },
+        { key: 0, ef_txt: $c.lit("optionsfull"), ef_desc: $c.lit("show all option settings, possibly change them"),
+          ef_funct: doset, flags: IFBURIED | GENERALCMD | CMD_M_PREFIX, f_text: null },
+        { key: 15, ef_txt: $c.lit("overview"), ef_desc: $c.lit("show a summary of the explored dungeon"),
+          ef_funct: dooverview,
+          flags: IFBURIED | AUTOCOMPLETE | GENERALCMD | CMD_M_PREFIX, f_text: null },
+        { key: 0, ef_txt: $c.lit("panic"), ef_desc: $c.lit("test panic routine (fatal to game)"),
+          ef_funct: wiz_panic, flags: IFBURIED | AUTOCOMPLETE | WIZMODECMD, f_text: null },
+        { key: 112, ef_txt: $c.lit("pay"), ef_desc: $c.lit("pay your shopping bill"),
+          ef_funct: dopay, flags: CMD_M_PREFIX, f_text: null },
+        { key: 124, ef_txt: $c.lit("perminv"), ef_desc: $c.lit("scroll persistent inventory display"),
+          ef_funct: doperminv, flags: IFBURIED | GENERALCMD | NOFUZZERCMD, f_text: null },
+        { key: 44, ef_txt: $c.lit("pickup"), ef_desc: $c.lit("pick up things at the current location"),
+          ef_funct: dopickup, flags: CMD_M_PREFIX, f_text: null },
+        { key: 0, ef_txt: $c.lit("polyself"), ef_desc: $c.lit("polymorph self"),
+          ef_funct: wiz_polyself, flags: IFBURIED | AUTOCOMPLETE | WIZMODECMD, f_text: null },
+        { key: 240, ef_txt: $c.lit("pray"), ef_desc: $c.lit("pray to the gods for help"),
+          ef_funct: dopray, flags: IFBURIED | AUTOCOMPLETE, f_text: null },
+        { key: 16, ef_txt: $c.lit("prevmsg"), ef_desc: $c.lit("view recent game messages"),
+          ef_funct: doprev_message, flags: IFBURIED | GENERALCMD | CMD_INSANE, f_text: null },
+        { key: 80, ef_txt: $c.lit("puton"), ef_desc: $c.lit("put on an accessory (ring, amulet, etc)"),
+          ef_funct: doputon, flags: 0, f_text: null },
+        { key: 113, ef_txt: $c.lit("quaff"), ef_desc: $c.lit("quaff (drink) something"),
+          ef_funct: dodrink, flags: CMD_M_PREFIX, f_text: null },
+        { key: 0, ef_txt: $c.lit("quit"), ef_desc: $c.lit("exit without saving current game"),
+          ef_funct: done2, flags: IFBURIED | AUTOCOMPLETE | GENERALCMD | NOFUZZERCMD, f_text: null },
+        { key: 81, ef_txt: $c.lit("quiver"), ef_desc: $c.lit("select ammunition for quiver"),
+          ef_funct: dowieldquiver, flags: 0, f_text: null },
+        { key: 114, ef_txt: $c.lit("read"), ef_desc: $c.lit("read a scroll or spellbook"),
+          ef_funct: doread, flags: 0, f_text: null },
+        { key: 18, ef_txt: $c.lit("redraw"), ef_desc: $c.lit("redraw screen"),
+          ef_funct: doredraw, flags: IFBURIED | GENERALCMD | CMD_INSANE, f_text: null },
+        { key: 82, ef_txt: $c.lit("remove"), ef_desc: $c.lit("remove an accessory (ring, amulet, etc)"),
+          ef_funct: doremring, flags: 0, f_text: null },
+        { key: 1, ef_txt: $c.lit("repeat"), ef_desc: $c.lit("repeat a previous command"),
+          ef_funct: do_repeat, flags: IFBURIED | GENERALCMD, f_text: null },
+        { key: 109, ef_txt: $c.lit("reqmenu"), ef_desc: $c.lit("prefix: request menu or modify command"),
+          ef_funct: do_reqmenu, flags: PREFIXCMD, f_text: null },
+        { key: 31, ef_txt: $c.lit("retravel"), ef_desc: $c.lit("travel to previously selected travel location"),
+          ef_funct: dotravel_target, flags: 0, f_text: null },
+        { key: 210, ef_txt: $c.lit("ride"), ef_desc: $c.lit("mount or dismount a saddled steed"),
+          ef_funct: doride, flags: AUTOCOMPLETE, f_text: null },
+        { key: 242, ef_txt: $c.lit("rub"), ef_desc: $c.lit("rub a lamp or a stone"),
+          ef_funct: dorub, flags: AUTOCOMPLETE, f_text: null },
+        { key: 71, ef_txt: $c.lit("run"), ef_desc: $c.lit("prefix: run until something interesting is seen"),
+          ef_funct: do_run, flags: PREFIXCMD, f_text: null },
+        { key: 103, ef_txt: $c.lit("rush"), ef_desc: $c.lit("prefix: rush until something interesting is seen"),
+          ef_funct: do_rush, flags: PREFIXCMD, f_text: null },
+        { key: 83, ef_txt: $c.lit("save"), ef_desc: $c.lit("save the game and exit"),
+          ef_funct: dosave, flags: IFBURIED | GENERALCMD | NOFUZZERCMD, f_text: null },
+        { key: 0, ef_txt: $c.lit("saveoptions"), ef_desc: $c.lit("save the game configuration"),
+          ef_funct: do_write_config_file,
+          flags: IFBURIED | GENERALCMD | NOFUZZERCMD, f_text: null },
+        { key: 115, ef_txt: $c.lit("search"), ef_desc: $c.lit("search for traps and secret doors"),
+          ef_funct: dosearch, flags: IFBURIED | CMD_M_PREFIX, f_text: $c.lit("searching") },
+        { key: 42, ef_txt: $c.lit("seeall"), ef_desc: $c.lit("show all equipment in use"),
+          ef_funct: doprinuse, flags: IFBURIED | GENERALCMD | CMD_M_PREFIX, f_text: null },
+        { key: AMULET_SYM, ef_txt: $c.lit("seeamulet"), ef_desc: $c.lit("show the amulet currently worn"),
+          ef_funct: dopramulet, flags: IFBURIED | GENERALCMD | CMD_M_PREFIX, f_text: null },
+        { key: ARMOR_SYM, ef_txt: $c.lit("seearmor"), ef_desc: $c.lit("show the armor currently worn"),
+          ef_funct: doprarm, flags: IFBURIED | GENERALCMD | CMD_M_PREFIX, f_text: null },
+        { key: RING_SYM, ef_txt: $c.lit("seerings"), ef_desc: $c.lit("show the ring(s) currently worn"),
+          ef_funct: doprring, flags: IFBURIED | GENERALCMD | CMD_M_PREFIX, f_text: null },
+        { key: TOOL_SYM, ef_txt: $c.lit("seetools"), ef_desc: $c.lit("show the tools currently in use"),
+          ef_funct: doprtool, flags: IFBURIED | GENERALCMD | CMD_M_PREFIX, f_text: null },
+        { key: WEAPON_SYM, ef_txt: $c.lit("seeweapon"), ef_desc: $c.lit("show the weapon currently wielded"),
+          ef_funct: doprwep, flags: IFBURIED | GENERALCMD | CMD_M_PREFIX, f_text: null },
+        { key: 33, ef_txt: $c.lit("shell"),
+          ef_desc: $c.lit("leave game to enter a sub-shell ('exit' to come back)"),
+          ef_funct: dosh_core, flags: IFBURIED | GENERALCMD | NOFUZZERCMD, f_text: null },
+        { key: GOLD_SYM, ef_txt: $c.lit("showgold"), ef_desc: $c.lit("show gold, possibly shop credit or debt"),
+          ef_funct: doprgold, flags: IFBURIED | GENERALCMD | CMD_M_PREFIX, f_text: null },
+        { key: SPBOOK_SYM, ef_txt: $c.lit("showspells"), ef_desc: $c.lit("list and reorder known spells"),
+          ef_funct: dovspell, flags: IFBURIED | GENERALCMD, f_text: null },
+        { key: 94, ef_txt: $c.lit("showtrap"), ef_desc: $c.lit("describe an adjacent, discovered trap"),
+          ef_funct: doidtrap, flags: IFBURIED | GENERALCMD, f_text: null },
+        { key: 243, ef_txt: $c.lit("sit"), ef_desc: $c.lit("sit down"),
+          ef_funct: dosit, flags: AUTOCOMPLETE, f_text: null },
+        { key: 0, ef_txt: $c.lit("stats"), ef_desc: $c.lit("show memory statistics"),
+          ef_funct: wiz_show_stats, flags: IFBURIED | AUTOCOMPLETE | WIZMODECMD, f_text: null },
+        { key: 26, ef_txt: $c.lit("suspend"), ef_desc: $c.lit("push game to background ('fg' to come back)"),
+          ef_funct: dosuspend_core, flags: IFBURIED | GENERALCMD | NOFUZZERCMD, f_text: null },
+        { key: 120, ef_txt: $c.lit("swap"), ef_desc: $c.lit("swap wielded and secondary weapons"),
+          ef_funct: doswapweapon, flags: 0, f_text: null },
+        { key: 84, ef_txt: $c.lit("takeoff"), ef_desc: $c.lit("take off one piece of armor"),
+          ef_funct: dotakeoff, flags: 0, f_text: null },
+        { key: 65, ef_txt: $c.lit("takeoffall"), ef_desc: $c.lit("remove all armor"),
+          ef_funct: doddoremarm, flags: 0, f_text: null },
+        { key: 20, ef_txt: $c.lit("teleport"), ef_desc: $c.lit("teleport around the level"),
+          ef_funct: dotelecmd, flags: IFBURIED | CMD_M_PREFIX, f_text: null },
+        { key: 127, ef_txt: $c.lit("terrain"),
+          ef_desc: $c.lit("view map without monsters or objects obstructing it"),
+          ef_funct: doterrain, flags: IFBURIED | GENERALCMD | AUTOCOMPLETE, f_text: null },
+        { key: 0, ef_txt: $c.lit("therecmdmenu"),
+          ef_desc: $c.lit("menu of commands you can do from here to adjacent spot"),
+          ef_funct: dotherecmdmenu, flags: AUTOCOMPLETE | GENERALCMD | MOUSECMD, f_text: null },
+        { key: 116, ef_txt: $c.lit("throw"), ef_desc: $c.lit("throw something"),
+          ef_funct: dothrow, flags: 0, f_text: null },
+        { key: 0, ef_txt: $c.lit("timeout"), ef_desc: $c.lit("look at timeout queue and hero's timed intrinsics"),
+          ef_funct: wiz_timeout_queue, flags: IFBURIED | AUTOCOMPLETE | WIZMODECMD, f_text: null },
+        { key: 212, ef_txt: $c.lit("tip"), ef_desc: $c.lit("empty a container"),
+          ef_funct: dotip, flags: AUTOCOMPLETE | CMD_M_PREFIX, f_text: null },
+        { key: 0, ef_txt: $c.lit("toggle"), ef_desc: $c.lit("toggle boolean option"),
+          ef_funct: dotoggleoption, flags: IFBURIED | GENERALCMD | CMD_PARAM, f_text: null },
+        { key: 95, ef_txt: $c.lit("travel"), ef_desc: $c.lit("travel to a specific location on the map"),
+          ef_funct: dotravel, flags: CMD_M_PREFIX, f_text: null },
+        { key: 244, ef_txt: $c.lit("turn"), ef_desc: $c.lit("turn undead away"),
+          ef_funct: doturn, flags: IFBURIED | AUTOCOMPLETE, f_text: null },
+        { key: 88, ef_txt: $c.lit("twoweapon"), ef_desc: $c.lit("toggle two-weapon combat"),
+          ef_funct: dotwoweapon, flags: 0, f_text: null },
+        { key: 245, ef_txt: $c.lit("untrap"), ef_desc: $c.lit("untrap something"),
+          ef_funct: dountrap, flags: AUTOCOMPLETE, f_text: null },
+        { key: 60, ef_txt: $c.lit("up"), ef_desc: $c.lit("go up a staircase"),
+          ef_funct: doup, flags: CMD_M_PREFIX, f_text: null },
+        { key: 214, ef_txt: $c.lit("vanquished"), ef_desc: $c.lit("list vanquished monsters"),
+          ef_funct: dovanquished,
+          flags: IFBURIED | AUTOCOMPLETE | GENERALCMD | CMD_M_PREFIX, f_text: null },
+        { key: 246, ef_txt: $c.lit("version"),
+          ef_desc: $c.lit("list compile time options for this version of NetHack"),
+          ef_funct: doextversion, flags: IFBURIED | AUTOCOMPLETE | GENERALCMD, f_text: null },
+        { key: 86, ef_txt: $c.lit("versionshort"), ef_desc: $c.lit("show version and date+time program was built"),
+          ef_funct: doversion, flags: IFBURIED | GENERALCMD | CMD_M_PREFIX, f_text: null },
+        { key: 0, ef_txt: $c.lit("vision"), ef_desc: $c.lit("show vision array"),
+          ef_funct: wiz_show_vision, flags: IFBURIED | AUTOCOMPLETE | WIZMODECMD, f_text: null },
+        { key: 46, ef_txt: $c.lit("wait"), ef_desc: $c.lit("rest one move while doing nothing"),
+          ef_funct: donull, flags: IFBURIED | CMD_M_PREFIX, f_text: $c.lit("waiting") },
+        { key: 87, ef_txt: $c.lit("wear"), ef_desc: $c.lit("wear a piece of armor"),
+          ef_funct: dowear, flags: 0, f_text: null },
+        { key: 38, ef_txt: $c.lit("whatdoes"), ef_desc: $c.lit("tell what a command does"),
+          ef_funct: dowhatdoes, flags: IFBURIED | GENERALCMD, f_text: null },
+        { key: 47, ef_txt: $c.lit("whatis"), ef_desc: $c.lit("show what type of thing a symbol corresponds to"),
+          ef_funct: dowhatis, flags: IFBURIED | GENERALCMD, f_text: null },
+        { key: 119, ef_txt: $c.lit("wield"), ef_desc: $c.lit("wield (put in use) a weapon"),
+          ef_funct: dowield, flags: 0, f_text: null },
+        { key: 247, ef_txt: $c.lit("wipe"), ef_desc: $c.lit("wipe off your face"),
+          ef_funct: dowipe, flags: AUTOCOMPLETE, f_text: null },
+        { key: 0, ef_txt: $c.lit("wizborn"), ef_desc: $c.lit("show stats of monsters created"),
+          ef_funct: doborn, flags: IFBURIED | WIZMODECMD, f_text: null },
+        { key: 0, ef_txt: $c.lit("wizbury"), ef_desc: $c.lit("bury objs under and around you"),
+          ef_funct: wiz_debug_cmd_bury, flags: IFBURIED | AUTOCOMPLETE | WIZMODECMD, f_text: null },
+        { key: 0, ef_txt: $c.lit("wizcast"), ef_desc: $c.lit("cast any spell"),
+          ef_funct: dowizcast, flags: IFBURIED | WIZMODECMD, f_text: null },
+        { key: 0, ef_txt: $c.lit("wizcustom"), ef_desc: $c.lit("show customized glyphs"),
+          ef_funct: wiz_custom, flags: IFBURIED | WIZMODECMD | NOFUZZERCMD, f_text: null },
+        { key: 5, ef_txt: $c.lit("wizdetect"), ef_desc: $c.lit("reveal hidden things within a small radius"),
+          ef_funct: wiz_detect, flags: IFBURIED | WIZMODECMD, f_text: null },
+        { key: 0, ef_txt: $c.lit("wizdispmacros"), ef_desc: $c.lit("validate the display macro ranges"),
+          ef_funct: wiz_display_macros, flags: IFBURIED | AUTOCOMPLETE | WIZMODECMD, f_text: null },
+        { key: 0, ef_txt: $c.lit("wizfliplevel"), ef_desc: $c.lit("flip the level"),
+          ef_funct: wiz_flip_level, flags: IFBURIED | WIZMODECMD, f_text: null },
+        { key: 7, ef_txt: $c.lit("wizgenesis"), ef_desc: $c.lit("create a monster"),
+          ef_funct: wiz_genesis, flags: IFBURIED | WIZMODECMD, f_text: null },
+        { key: 9, ef_txt: $c.lit("wizidentify"), ef_desc: $c.lit("identify all items in inventory"),
+          ef_funct: wiz_identify, flags: IFBURIED | WIZMODECMD, f_text: null },
+        { key: 0, ef_txt: $c.lit("wizintrinsic"), ef_desc: $c.lit("set an intrinsic"),
+          ef_funct: wiz_intrinsic, flags: IFBURIED | AUTOCOMPLETE | WIZMODECMD, f_text: null },
+        { key: 0, ef_txt: $c.lit("wizkill"), ef_desc: $c.lit("slay a monster"),
+          ef_funct: wiz_kill, flags: IFBURIED | AUTOCOMPLETE | WIZMODECMD | CMD_M_PREFIX | NOFUZZERCMD, f_text: null },
+        { key: 22, ef_txt: $c.lit("wizlevelport"), ef_desc: $c.lit("teleport to another level"),
+          ef_funct: wiz_level_tele, flags: IFBURIED | WIZMODECMD | CMD_M_PREFIX, f_text: null },
+        { key: 0, ef_txt: $c.lit("wizloaddes"), ef_desc: $c.lit("load and execute a des-file lua script"),
+          ef_funct: wiz_load_splua, flags: IFBURIED | WIZMODECMD | NOFUZZERCMD, f_text: null },
+        { key: 0, ef_txt: $c.lit("wizloadlua"), ef_desc: $c.lit("load and execute a lua script"),
+          ef_funct: wiz_load_lua, flags: IFBURIED | WIZMODECMD | NOFUZZERCMD, f_text: null },
+        { key: 0, ef_txt: $c.lit("wizobjprobs"), ef_desc: $c.lit("list object generation probabilities"),
+          ef_funct: wiz_objprobs, flags: IFBURIED | WIZMODECMD, f_text: null },
+        { key: 0, ef_txt: $c.lit("wizmakemap"), ef_desc: $c.lit("recreate the current level"),
+          ef_funct: wiz_makemap, flags: IFBURIED | WIZMODECMD, f_text: null },
+        { key: 6, ef_txt: $c.lit("wizmap"), ef_desc: $c.lit("map the level"),
+          ef_funct: wiz_map, flags: IFBURIED | WIZMODECMD, f_text: null },
+        { key: 0, ef_txt: $c.lit("wizmondiff"), ef_desc: $c.lit("validate the difficulty ratings of monsters"),
+          ef_funct: wiz_mon_diff, flags: IFBURIED | AUTOCOMPLETE | WIZMODECMD, f_text: null },
+        { key: 0, ef_txt: $c.lit("wizrumorcheck"), ef_desc: $c.lit("verify rumor boundaries"),
+          ef_funct: wiz_rumor_check, flags: IFBURIED | AUTOCOMPLETE | WIZMODECMD, f_text: null },
+        { key: 0, ef_txt: $c.lit("wizseenv"), ef_desc: $c.lit("show map locations' seen vectors"),
+          ef_funct: wiz_show_seenv, flags: IFBURIED | AUTOCOMPLETE | WIZMODECMD, f_text: null },
+        { key: 0, ef_txt: $c.lit("wizshownhuuid"), ef_desc: $c.lit("show NHUUID for this game"),
+          ef_funct: wiz_show_nhuuid, flags: AUTOCOMPLETE | WIZMODECMD, f_text: null },
+        { key: 0, ef_txt: $c.lit("wizsmell"), ef_desc: $c.lit("smell monster"),
+          ef_funct: wiz_smell, flags: IFBURIED | AUTOCOMPLETE | WIZMODECMD, f_text: null },
+        { key: 0, ef_txt: $c.lit("wiztelekinesis"), ef_desc: $c.lit("telekinesis"),
+          ef_funct: wiz_telekinesis, flags: IFBURIED | AUTOCOMPLETE | WIZMODECMD, f_text: null },
+        { key: 0, ef_txt: $c.lit("wizwhere"), ef_desc: $c.lit("show locations of special levels"),
+          ef_funct: wiz_where, flags: IFBURIED | AUTOCOMPLETE | WIZMODECMD, f_text: null },
+        { key: 23, ef_txt: $c.lit("wizwish"), ef_desc: $c.lit("wish for something"),
+          ef_funct: wiz_wish, flags: IFBURIED | CMD_M_PREFIX | WIZMODECMD, f_text: null },
+        { key: 0, ef_txt: $c.lit("wmode"), ef_desc: $c.lit("show wall modes"),
+          ef_funct: wiz_show_wmodes, flags: IFBURIED | AUTOCOMPLETE | WIZMODECMD, f_text: null },
+        { key: 122, ef_txt: $c.lit("zap"), ef_desc: $c.lit("zap a wand"),
+          ef_funct: dozap, flags: 0, f_text: null },
+        { key: 0, ef_txt: $c.lit("movewest"), ef_desc: $c.lit("move west (screen left)"),
+          ef_funct: do_move_west, flags: MOVEMENTCMD | CMD_MOVE_PREFIXES, f_text: null },
+        { key: 0, ef_txt: $c.lit("movenorthwest"), ef_desc: $c.lit("move northwest (screen upper left)"),
+          ef_funct: do_move_northwest, flags: MOVEMENTCMD | CMD_MOVE_PREFIXES, f_text: null },
+        { key: 0, ef_txt: $c.lit("movenorth"), ef_desc: $c.lit("move north (screen up)"),
+          ef_funct: do_move_north, flags: MOVEMENTCMD | CMD_MOVE_PREFIXES, f_text: null },
+        { key: 0, ef_txt: $c.lit("movenortheast"), ef_desc: $c.lit("move northeast (screen upper right)"),
+          ef_funct: do_move_northeast, flags: MOVEMENTCMD | CMD_MOVE_PREFIXES, f_text: null },
+        { key: 0, ef_txt: $c.lit("moveeast"), ef_desc: $c.lit("move east (screen right)"),
+          ef_funct: do_move_east, flags: MOVEMENTCMD | CMD_MOVE_PREFIXES, f_text: null },
+        { key: 0, ef_txt: $c.lit("movesoutheast"), ef_desc: $c.lit("move southeast (screen lower right)"),
+          ef_funct: do_move_southeast, flags: MOVEMENTCMD | CMD_MOVE_PREFIXES, f_text: null },
+        { key: 0, ef_txt: $c.lit("movesouth"), ef_desc: $c.lit("move south (screen down)"),
+          ef_funct: do_move_south, flags: MOVEMENTCMD | CMD_MOVE_PREFIXES, f_text: null },
+        { key: 0, ef_txt: $c.lit("movesouthwest"), ef_desc: $c.lit("move southwest (screen lower left)"),
+          ef_funct: do_move_southwest, flags: MOVEMENTCMD | CMD_MOVE_PREFIXES, f_text: null },
+        { key: 0, ef_txt: $c.lit("rushwest"), ef_desc: $c.lit("rush west (screen left)"),
+          ef_funct: do_rush_west, flags: MOVEMENTCMD | CMD_M_PREFIX, f_text: null },
+        { key: 0, ef_txt: $c.lit("rushnorthwest"), ef_desc: $c.lit("rush northwest (screen upper left)"),
+          ef_funct: do_rush_northwest, flags: MOVEMENTCMD | CMD_M_PREFIX, f_text: null },
+        { key: 0, ef_txt: $c.lit("rushnorth"), ef_desc: $c.lit("rush north (screen up)"),
+          ef_funct: do_rush_north, flags: MOVEMENTCMD | CMD_M_PREFIX, f_text: null },
+        { key: 0, ef_txt: $c.lit("rushnortheast"), ef_desc: $c.lit("rush northeast (screen upper right)"),
+          ef_funct: do_rush_northeast, flags: MOVEMENTCMD | CMD_M_PREFIX, f_text: null },
+        { key: 0, ef_txt: $c.lit("rusheast"), ef_desc: $c.lit("rush east (screen right)"),
+          ef_funct: do_rush_east, flags: MOVEMENTCMD | CMD_M_PREFIX, f_text: null },
+        { key: 0, ef_txt: $c.lit("rushsoutheast"), ef_desc: $c.lit("rush southeast (screen lower right)"),
+          ef_funct: do_rush_southeast, flags: MOVEMENTCMD | CMD_M_PREFIX, f_text: null },
+        { key: 0, ef_txt: $c.lit("rushsouth"), ef_desc: $c.lit("rush south (screen down)"),
+          ef_funct: do_rush_south, flags: MOVEMENTCMD | CMD_M_PREFIX, f_text: null },
+        { key: 0, ef_txt: $c.lit("rushsouthwest"), ef_desc: $c.lit("rush southwest (screen lower left)"),
+          ef_funct: do_rush_southwest, flags: MOVEMENTCMD | CMD_M_PREFIX, f_text: null },
+        { key: 0, ef_txt: $c.lit("runwest"), ef_desc: $c.lit("run west (screen left)"),
+          ef_funct: do_run_west, flags: MOVEMENTCMD | CMD_M_PREFIX, f_text: null },
+        { key: 0, ef_txt: $c.lit("runnorthwest"), ef_desc: $c.lit("run northwest (screen upper left)"),
+          ef_funct: do_run_northwest, flags: MOVEMENTCMD | CMD_M_PREFIX, f_text: null },
+        { key: 0, ef_txt: $c.lit("runnorth"), ef_desc: $c.lit("run north (screen up)"),
+          ef_funct: do_run_north, flags: MOVEMENTCMD | CMD_M_PREFIX, f_text: null },
+        { key: 0, ef_txt: $c.lit("runnortheast"), ef_desc: $c.lit("run northeast (screen upper right)"),
+          ef_funct: do_run_northeast, flags: MOVEMENTCMD | CMD_M_PREFIX, f_text: null },
+        { key: 0, ef_txt: $c.lit("runeast"), ef_desc: $c.lit("run east (screen right)"),
+          ef_funct: do_run_east, flags: MOVEMENTCMD | CMD_M_PREFIX, f_text: null },
+        { key: 0, ef_txt: $c.lit("runsoutheast"), ef_desc: $c.lit("run southeast (screen lower right)"),
+          ef_funct: do_run_southeast, flags: MOVEMENTCMD | CMD_M_PREFIX, f_text: null },
+        { key: 0, ef_txt: $c.lit("runsouth"), ef_desc: $c.lit("run south (screen down)"),
+          ef_funct: do_run_south, flags: MOVEMENTCMD | CMD_M_PREFIX, f_text: null },
+        { key: 0, ef_txt: $c.lit("runsouthwest"), ef_desc: $c.lit("run southwest (screen lower left)"),
+          ef_funct: do_run_southwest, flags: MOVEMENTCMD | CMD_M_PREFIX, f_text: null },
+        { key: 0, ef_txt: $c.lit("clicklook"), ef_desc: null, ef_funct: doclicklook, flags: INTERNALCMD | MOUSECMD, f_text: null },
+        { key: 0, ef_txt: $c.lit("mouseaction"), ef_desc: null, ef_funct: domouseaction, flags: INTERNALCMD | MOUSECMD, f_text: null },
+        { key: 0, ef_txt: $c.lit("altadjust"), ef_desc: null, ef_funct: adjust_split, flags: INTERNALCMD, f_text: null },
+        { key: 0, ef_txt: $c.lit("altdip"), ef_desc: null, ef_funct: dip_into, flags: INTERNALCMD, f_text: null },
+        { key: 0, ef_txt: $c.lit("alttakeoff"), ef_desc: null, ef_funct: ia_dotakeoff, flags: INTERNALCMD, f_text: null },
+        { key: 0, ef_txt: $c.lit("altunwield"), ef_desc: null, ef_funct: remarm_swapwep, flags: INTERNALCMD, f_text: null },
+        { key: 0, ef_txt: null, ef_desc: null, ef_funct: donull, flags: 0, f_text: null }
+    ]);
     for (let $i0 = 0; $i0 < 10; $i0++) {
         move_funcs[$i0].fill(null);
     }
-    move_funcs[0][0] = do_move_west;
-    move_funcs[0][1] = do_run_west;
-    move_funcs[0][2] = do_rush_west;
-    move_funcs[1][0] = do_move_northwest;
-    move_funcs[1][1] = do_run_northwest;
-    move_funcs[1][2] = do_rush_northwest;
-    move_funcs[2][0] = do_move_north;
-    move_funcs[2][1] = do_run_north;
-    move_funcs[2][2] = do_rush_north;
-    move_funcs[3][0] = do_move_northeast;
-    move_funcs[3][1] = do_run_northeast;
-    move_funcs[3][2] = do_rush_northeast;
-    move_funcs[4][0] = do_move_east;
-    move_funcs[4][1] = do_run_east;
-    move_funcs[4][2] = do_rush_east;
-    move_funcs[5][0] = do_move_southeast;
-    move_funcs[5][1] = do_run_southeast;
-    move_funcs[5][2] = do_rush_southeast;
-    move_funcs[6][0] = do_move_south;
-    move_funcs[6][1] = do_run_south;
-    move_funcs[6][2] = do_rush_south;
-    move_funcs[7][0] = do_move_southwest;
-    move_funcs[7][1] = do_run_southwest;
-    move_funcs[7][2] = do_rush_southwest;
-    move_funcs[8][0] = dodown;
-    move_funcs[8][1] = dodown;
-    move_funcs[8][2] = dodown;
-    move_funcs[9][0] = doup;
-    move_funcs[9][1] = doup;
-    move_funcs[9][2] = doup;
+    $c.init(move_funcs, [
+        [do_move_west, do_run_west, do_rush_west],
+        [do_move_northwest, do_run_northwest, do_rush_northwest],
+        [do_move_north, do_run_north, do_rush_north],
+        [do_move_northeast, do_run_northeast, do_rush_northeast],
+        [do_move_east, do_run_east, do_rush_east],
+        [do_move_southeast, do_run_southeast, do_rush_southeast],
+        [do_move_south, do_run_south, do_rush_south],
+        [do_move_southwest, do_run_southwest, do_rush_southwest],
+        [dodown, dodown, dodown],
+        [doup, doup, doup]
+    ]);
     for (let $i0 = 0; $i0 < 3; $i0++) {
         misc_keys[$i0].$copyFrom(new $T.anon_cmd_2086());
     }
-    misc_keys[0].nhkf = NHKF_ESC;
-    misc_keys[0].desc = $c.lit("cancel current prompt or pending prefix");
-    misc_keys[0].numpad = 0;
-    misc_keys[1].nhkf = NHKF_COUNT;
-    misc_keys[1].desc = $c.lit("Prefix: for digits when preceding a command with a count");
-    misc_keys[1].numpad = 1;
-    misc_keys[2].nhkf = 0;
-    misc_keys[2].desc = null;
-    misc_keys[2].numpad = 0;
+    $c.init(misc_keys, [
+        { nhkf: NHKF_ESC, desc: $c.lit("cancel current prompt or pending prefix"), numpad: 0 },
+        { nhkf: NHKF_COUNT,
+          desc: $c.lit("Prefix: for digits when preceding a command with a count"), numpad: 1 },
+        {}
+    ]);
     extcmdlist_length = 170;
     for (let $i0 = 0; $i0 < 29; $i0++) {
         spkeys_binds[$i0].$copyFrom(new $T.anon_cmd_3157());
     }
-    spkeys_binds[0].nhkf = NHKF_ESC;
-    spkeys_binds[0].key = 27;
-    spkeys_binds[0].name = null;
-    spkeys_binds[1].nhkf = NHKF_GETDIR_SELF;
-    spkeys_binds[1].key = 46;
-    spkeys_binds[1].name = $c.lit("getdir.self");
-    spkeys_binds[2].nhkf = NHKF_GETDIR_SELF2;
-    spkeys_binds[2].key = 115;
-    spkeys_binds[2].name = $c.lit("getdir.self2");
-    spkeys_binds[3].nhkf = NHKF_GETDIR_HELP;
-    spkeys_binds[3].key = 63;
-    spkeys_binds[3].name = $c.lit("getdir.help");
-    spkeys_binds[4].nhkf = NHKF_GETDIR_MOUSE;
-    spkeys_binds[4].key = 95;
-    spkeys_binds[4].name = $c.lit("getdir.mouse");
-    spkeys_binds[5].nhkf = NHKF_COUNT;
-    spkeys_binds[5].key = 110;
-    spkeys_binds[5].name = $c.lit("count");
-    spkeys_binds[6].nhkf = NHKF_GETPOS_SELF;
-    spkeys_binds[6].key = 64;
-    spkeys_binds[6].name = $c.lit("getpos.self");
-    spkeys_binds[7].nhkf = NHKF_GETPOS_PICK;
-    spkeys_binds[7].key = 46;
-    spkeys_binds[7].name = $c.lit("getpos.pick");
-    spkeys_binds[8].nhkf = NHKF_GETPOS_PICK_Q;
-    spkeys_binds[8].key = 44;
-    spkeys_binds[8].name = $c.lit("getpos.pick.quick");
-    spkeys_binds[9].nhkf = NHKF_GETPOS_PICK_O;
-    spkeys_binds[9].key = 59;
-    spkeys_binds[9].name = $c.lit("getpos.pick.once");
-    spkeys_binds[10].nhkf = NHKF_GETPOS_PICK_V;
-    spkeys_binds[10].key = 58;
-    spkeys_binds[10].name = $c.lit("getpos.pick.verbose");
-    spkeys_binds[11].nhkf = NHKF_GETPOS_SHOWVALID;
-    spkeys_binds[11].key = 36;
-    spkeys_binds[11].name = $c.lit("getpos.valid");
-    spkeys_binds[12].nhkf = NHKF_GETPOS_AUTODESC;
-    spkeys_binds[12].key = 35;
-    spkeys_binds[12].name = $c.lit("getpos.autodescribe");
-    spkeys_binds[13].nhkf = NHKF_GETPOS_MON_NEXT;
-    spkeys_binds[13].key = 109;
-    spkeys_binds[13].name = $c.lit("getpos.mon.next");
-    spkeys_binds[14].nhkf = NHKF_GETPOS_MON_PREV;
-    spkeys_binds[14].key = 77;
-    spkeys_binds[14].name = $c.lit("getpos.mon.prev");
-    spkeys_binds[15].nhkf = NHKF_GETPOS_OBJ_NEXT;
-    spkeys_binds[15].key = 111;
-    spkeys_binds[15].name = $c.lit("getpos.obj.next");
-    spkeys_binds[16].nhkf = NHKF_GETPOS_OBJ_PREV;
-    spkeys_binds[16].key = 79;
-    spkeys_binds[16].name = $c.lit("getpos.obj.prev");
-    spkeys_binds[17].nhkf = NHKF_GETPOS_DOOR_NEXT;
-    spkeys_binds[17].key = 100;
-    spkeys_binds[17].name = $c.lit("getpos.door.next");
-    spkeys_binds[18].nhkf = NHKF_GETPOS_DOOR_PREV;
-    spkeys_binds[18].key = 68;
-    spkeys_binds[18].name = $c.lit("getpos.door.prev");
-    spkeys_binds[19].nhkf = NHKF_GETPOS_UNEX_NEXT;
-    spkeys_binds[19].key = 120;
-    spkeys_binds[19].name = $c.lit("getpos.unexplored.next");
-    spkeys_binds[20].nhkf = NHKF_GETPOS_UNEX_PREV;
-    spkeys_binds[20].key = 88;
-    spkeys_binds[20].name = $c.lit("getpos.unexplored.prev");
-    spkeys_binds[21].nhkf = NHKF_GETPOS_VALID_NEXT;
-    spkeys_binds[21].key = 122;
-    spkeys_binds[21].name = $c.lit("getpos.valid.next");
-    spkeys_binds[22].nhkf = NHKF_GETPOS_VALID_PREV;
-    spkeys_binds[22].key = 90;
-    spkeys_binds[22].name = $c.lit("getpos.valid.prev");
-    spkeys_binds[23].nhkf = NHKF_GETPOS_INTERESTING_NEXT;
-    spkeys_binds[23].key = 97;
-    spkeys_binds[23].name = $c.lit("getpos.all.next");
-    spkeys_binds[24].nhkf = NHKF_GETPOS_INTERESTING_PREV;
-    spkeys_binds[24].key = 65;
-    spkeys_binds[24].name = $c.lit("getpos.all.prev");
-    spkeys_binds[25].nhkf = NHKF_GETPOS_HELP;
-    spkeys_binds[25].key = 63;
-    spkeys_binds[25].name = $c.lit("getpos.help");
-    spkeys_binds[26].nhkf = NHKF_GETPOS_LIMITVIEW;
-    spkeys_binds[26].key = 34;
-    spkeys_binds[26].name = $c.lit("getpos.filter");
-    spkeys_binds[27].nhkf = NHKF_GETPOS_MOVESKIP;
-    spkeys_binds[27].key = 42;
-    spkeys_binds[27].name = $c.lit("getpos.moveskip");
-    spkeys_binds[28].nhkf = NHKF_GETPOS_MENU;
-    spkeys_binds[28].key = 33;
-    spkeys_binds[28].name = $c.lit("getpos.menu");
+    $c.init(spkeys_binds, [
+        { nhkf: NHKF_ESC, key: 27, name: null },
+        { nhkf: NHKF_GETDIR_SELF, key: 46, name: $c.lit("getdir.self") },
+        { nhkf: NHKF_GETDIR_SELF2, key: 115, name: $c.lit("getdir.self2") },
+        { nhkf: NHKF_GETDIR_HELP, key: 63, name: $c.lit("getdir.help") },
+        { nhkf: NHKF_GETDIR_MOUSE, key: 95, name: $c.lit("getdir.mouse") },
+        { nhkf: NHKF_COUNT, key: 110, name: $c.lit("count") },
+        { nhkf: NHKF_GETPOS_SELF, key: 64, name: $c.lit("getpos.self") },
+        { nhkf: NHKF_GETPOS_PICK, key: 46, name: $c.lit("getpos.pick") },
+        { nhkf: NHKF_GETPOS_PICK_Q, key: 44, name: $c.lit("getpos.pick.quick") },
+        { nhkf: NHKF_GETPOS_PICK_O, key: 59, name: $c.lit("getpos.pick.once") },
+        { nhkf: NHKF_GETPOS_PICK_V, key: 58, name: $c.lit("getpos.pick.verbose") },
+        { nhkf: NHKF_GETPOS_SHOWVALID, key: 36, name: $c.lit("getpos.valid") },
+        { nhkf: NHKF_GETPOS_AUTODESC, key: 35, name: $c.lit("getpos.autodescribe") },
+        { nhkf: NHKF_GETPOS_MON_NEXT, key: 109, name: $c.lit("getpos.mon.next") },
+        { nhkf: NHKF_GETPOS_MON_PREV, key: 77, name: $c.lit("getpos.mon.prev") },
+        { nhkf: NHKF_GETPOS_OBJ_NEXT, key: 111, name: $c.lit("getpos.obj.next") },
+        { nhkf: NHKF_GETPOS_OBJ_PREV, key: 79, name: $c.lit("getpos.obj.prev") },
+        { nhkf: NHKF_GETPOS_DOOR_NEXT, key: 100, name: $c.lit("getpos.door.next") },
+        { nhkf: NHKF_GETPOS_DOOR_PREV, key: 68, name: $c.lit("getpos.door.prev") },
+        { nhkf: NHKF_GETPOS_UNEX_NEXT, key: 120, name: $c.lit("getpos.unexplored.next") },
+        { nhkf: NHKF_GETPOS_UNEX_PREV, key: 88, name: $c.lit("getpos.unexplored.prev") },
+        { nhkf: NHKF_GETPOS_VALID_NEXT, key: 122, name: $c.lit("getpos.valid.next") },
+        { nhkf: NHKF_GETPOS_VALID_PREV, key: 90, name: $c.lit("getpos.valid.prev") },
+        { nhkf: NHKF_GETPOS_INTERESTING_NEXT, key: 97, name: $c.lit("getpos.all.next") },
+        { nhkf: NHKF_GETPOS_INTERESTING_PREV, key: 65, name: $c.lit("getpos.all.prev") },
+        { nhkf: NHKF_GETPOS_HELP, key: 63, name: $c.lit("getpos.help") },
+        { nhkf: NHKF_GETPOS_LIMITVIEW, key: 34, name: $c.lit("getpos.filter") },
+        { nhkf: NHKF_GETPOS_MOVESKIP, key: 42, name: $c.lit("getpos.moveskip") },
+        { nhkf: NHKF_GETPOS_MENU, key: 33, name: $c.lit("getpos.menu") }
+    ]);
     doc_extcmd_flagstr$Abuf.fill(0);
     doextlist$headings.fill(null);
-    doextlist$headings[0] = $c.lit("Extended commands");
-    doextlist$headings[1] = $c.lit("Debugging Extended Commands");
+    $c.init(doextlist$headings, [
+        $c.lit("Extended commands"),
+        $c.lit("Debugging Extended Commands")
+    ]);
     makemap_prepost$Unachieve.fill(0);
     makemap_prepost$Unachieve.set([37, 115, 32, 97, 99, 104, 105, 101, 118, 101, 109, 101, 110, 116, 32, 114, 101, 118, 111, 107, 101, 100, 46]);   // "%s achievement revoked."
     extcmds_match$retmatchlist.fill(0);
-    extcmds_match$retmatchlist[0] = 0;
+    $c.init(extcmds_match$retmatchlist, [
+        0
+    ]);
     key2extcmddesc$key2cmdbuf.fill(0);
     cmd_from_ecname$cmdnamebuf.fill(0);
     lock_mouse_buttons$mousebtn.fill(null);
-    lock_mouse_buttons$mousebtn[0] = null;
+    $c.init(lock_mouse_buttons$mousebtn, [
+        null
+    ]);
     reset_commands$sdir.fill(0);
     reset_commands$sdir.set([104, 121, 107, 117, 108, 110, 106, 98, 62, 60]);   // "hykulnjb><"
     reset_commands$sdir_swap_yz.fill(0);
@@ -4850,12 +4102,14 @@ export function $init() {
     reset_commands$ndir_phone_layout.fill(0);
     reset_commands$ndir_phone_layout.set([52, 49, 50, 51, 54, 57, 56, 55, 62, 60]);   // "41236987><"
     reset_commands$ylist.fill(0);
-    reset_commands$ylist[0] = 121;
-    reset_commands$ylist[1] = 89;
-    reset_commands$ylist[2] = 25;
-    reset_commands$ylist[3] = -7;
-    reset_commands$ylist[4] = -39;
-    reset_commands$ylist[5] = -103;
+    $c.init(reset_commands$ylist, [
+        121,
+        89,
+        25,
+        -7,
+        -39,
+        -103
+    ]);
     for (let $i0 = 0; $i0 < 8; $i0++) {
         reset_commands$back_dir_cmd[$i0].fill(null);
     }
@@ -4876,14 +4130,16 @@ export function $init() {
     help_dir$wiz_only_list.fill(0);
     help_dir$wiz_only_list.set([69, 70, 71, 73, 86, 87]);   // "EFGIVW"
     directionname$dirnames.fill(null);
-    directionname$dirnames[0] = $c.lit("west");
-    directionname$dirnames[1] = $c.lit("northwest");
-    directionname$dirnames[2] = $c.lit("north");
-    directionname$dirnames[3] = $c.lit("northeast");
-    directionname$dirnames[4] = $c.lit("east");
-    directionname$dirnames[5] = $c.lit("southeast");
-    directionname$dirnames[6] = $c.lit("south");
-    directionname$dirnames[7] = $c.lit("southwest");
-    directionname$dirnames[8] = $c.lit("down");
-    directionname$dirnames[9] = $c.lit("up");
+    $c.init(directionname$dirnames, [
+        $c.lit("west"),
+        $c.lit("northwest"),
+        $c.lit("north"),
+        $c.lit("northeast"),
+        $c.lit("east"),
+        $c.lit("southeast"),
+        $c.lit("south"),
+        $c.lit("southwest"),
+        $c.lit("down"),
+        $c.lit("up")
+    ]);
 }

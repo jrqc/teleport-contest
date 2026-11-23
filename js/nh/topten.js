@@ -355,7 +355,7 @@ function encode_extended_achievements(buf) {   // topten.c:491
             case ACH_RNK6:
             case ACH_RNK7:
             case ACH_RNK8:
-                $c.__builtin___sprintf_chk(new $c.Ptr(rnkbuf, 0), 0, 40, $c.lit("attained_the_rank_of_%s"), rank_of(rank_to_xlev(absidx - (ACH_RNK1 - 1) | 0), gu.urole.mnum, $c.i8(achidx < 0 ? 1 : 0)));
+                $c.__builtin___sprintf_chk(new $c.Ptr(rnkbuf, 0), 0, 40, $c.lit("attained_the_rank_of_%s"), rank_of(rank_to_xlev(absidx - (ACH_RNK1 - 1) | 0), gu.urole.mnum, $c.i8(achidx < 0 ? TRUE : FALSE)));
                 strNsubst(new $c.Ptr(rnkbuf, 0), $c.lit(" "), $c.lit("_"), 0);
                 achievement = lcase(new $c.Ptr(rnkbuf, 0));
                 break;
@@ -1007,22 +1007,24 @@ export function $init() {
     tt_head = null;
     zerott.$copyFrom(new $T.toptenentry());
     formatkiller$killed_by_prefix.fill(null);
-    formatkiller$killed_by_prefix[0] = $c.lit("killed by ");
-    formatkiller$killed_by_prefix[1] = $c.lit("choked on ");
-    formatkiller$killed_by_prefix[2] = $c.lit("poisoned by ");
-    formatkiller$killed_by_prefix[3] = $c.lit("died of ");
-    formatkiller$killed_by_prefix[4] = $c.lit("drowned in ");
-    formatkiller$killed_by_prefix[5] = $c.lit("burned by ");
-    formatkiller$killed_by_prefix[6] = $c.lit("dissolved in ");
-    formatkiller$killed_by_prefix[7] = $c.lit("crushed to death by ");
-    formatkiller$killed_by_prefix[8] = $c.lit("petrified by ");
-    formatkiller$killed_by_prefix[9] = $c.lit("turned to slime by ");
-    formatkiller$killed_by_prefix[10] = $c.lit("killed by ");
-    formatkiller$killed_by_prefix[11] = $c.lit("");
-    formatkiller$killed_by_prefix[12] = $c.lit("");
-    formatkiller$killed_by_prefix[13] = $c.lit("");
-    formatkiller$killed_by_prefix[14] = $c.lit("");
-    formatkiller$killed_by_prefix[15] = $c.lit("");
+    $c.init(formatkiller$killed_by_prefix, [
+        $c.lit("killed by "),
+        $c.lit("choked on "),
+        $c.lit("poisoned by "),
+        $c.lit("died of "),
+        $c.lit("drowned in "),
+        $c.lit("burned by "),
+        $c.lit("dissolved in "),
+        $c.lit("crushed to death by "),
+        $c.lit("petrified by "),
+        $c.lit("turned to slime by "),
+        $c.lit("killed by "),
+        $c.lit(""),
+        $c.lit(""),
+        $c.lit(""),
+        $c.lit(""),
+        $c.lit("")
+    ]);
     readentry$fmt.fill(0);
     readentry$fmt.set([37, 100, 46, 37, 100, 46, 37, 100, 32, 37, 108, 100, 32, 37, 100, 32, 37, 100, 32, 37, 100, 32, 37, 100, 32, 37, 100, 32, 37, 100, 32, 37, 108, 100, 32, 37, 108, 100, 32, 37, 100, 32]);   // "%d.%d.%d %ld %d %d %d %d %d %d %ld %ld %d "
     readentry$fmt32.fill(0);

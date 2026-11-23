@@ -1275,7 +1275,7 @@ export async function potionhit(mon, obj, how) {   // potion.c:1625
         } else {
             mnam = await mon_nam(mon);
             if (hit_saddle && saddle) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s saddle"), s_suffix(await x_monnam(mon, 1, null, 9, 0)));
+                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s saddle"), s_suffix(await x_monnam(mon, ARTICLE_THE, null, SUPPRESS_IT | SUPPRESS_SADDLE, FALSE)));
             } else if (has_head(mon.data)) {
                 $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s %s"), s_suffix(mnam), gn.notonhead ? $c.lit("body") : $c.lit("head"));
             } else {
@@ -2291,38 +2291,42 @@ export function $init() {
     eyemsg.fill(0);
     eyemsg.set([37, 115, 32, 109, 111, 109, 101, 110, 116, 97, 114, 105, 108, 121, 32, 37, 115, 46]);   // "%s momentarily %s."
     bottlenames.fill(null);
-    bottlenames[0] = $c.lit("bottle");
-    bottlenames[1] = $c.lit("phial");
-    bottlenames[2] = $c.lit("flagon");
-    bottlenames[3] = $c.lit("carafe");
-    bottlenames[4] = $c.lit("flask");
-    bottlenames[5] = $c.lit("jar");
-    bottlenames[6] = $c.lit("vial");
+    $c.init(bottlenames, [
+        $c.lit("bottle"),
+        $c.lit("phial"),
+        $c.lit("flagon"),
+        $c.lit("carafe"),
+        $c.lit("flask"),
+        $c.lit("jar"),
+        $c.lit("vial")
+    ]);
     hbottlenames.fill(null);
-    hbottlenames[0] = $c.lit("jug");
-    hbottlenames[1] = $c.lit("pitcher");
-    hbottlenames[2] = $c.lit("barrel");
-    hbottlenames[3] = $c.lit("tin");
-    hbottlenames[4] = $c.lit("bag");
-    hbottlenames[5] = $c.lit("box");
-    hbottlenames[6] = $c.lit("glass");
-    hbottlenames[7] = $c.lit("beaker");
-    hbottlenames[8] = $c.lit("tumbler");
-    hbottlenames[9] = $c.lit("vase");
-    hbottlenames[10] = $c.lit("flowerpot");
-    hbottlenames[11] = $c.lit("pan");
-    hbottlenames[12] = $c.lit("thingy");
-    hbottlenames[13] = $c.lit("mug");
-    hbottlenames[14] = $c.lit("teacup");
-    hbottlenames[15] = $c.lit("teapot");
-    hbottlenames[16] = $c.lit("keg");
-    hbottlenames[17] = $c.lit("bucket");
-    hbottlenames[18] = $c.lit("thermos");
-    hbottlenames[19] = $c.lit("amphora");
-    hbottlenames[20] = $c.lit("wineskin");
-    hbottlenames[21] = $c.lit("parcel");
-    hbottlenames[22] = $c.lit("bowl");
-    hbottlenames[23] = $c.lit("ampoule");
+    $c.init(hbottlenames, [
+        $c.lit("jug"),
+        $c.lit("pitcher"),
+        $c.lit("barrel"),
+        $c.lit("tin"),
+        $c.lit("bag"),
+        $c.lit("box"),
+        $c.lit("glass"),
+        $c.lit("beaker"),
+        $c.lit("tumbler"),
+        $c.lit("vase"),
+        $c.lit("flowerpot"),
+        $c.lit("pan"),
+        $c.lit("thingy"),
+        $c.lit("mug"),
+        $c.lit("teacup"),
+        $c.lit("teapot"),
+        $c.lit("keg"),
+        $c.lit("bucket"),
+        $c.lit("thermos"),
+        $c.lit("amphora"),
+        $c.lit("wineskin"),
+        $c.lit("parcel"),
+        $c.lit("bowl"),
+        $c.lit("ampoule")
+    ]);
     dodip$Dip_.fill(0);
     dodip$Dip_.set([68, 105, 112, 32]);   // "Dip "
 }

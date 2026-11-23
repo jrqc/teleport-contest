@@ -2,7 +2,7 @@
 import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
-import { AM_LAWFUL, AM_MASK, A_LAWFUL, A_NONE } from './align.h.js';
+import { AM_LAWFUL, AM_MASK, AM_SANCTUM, A_LAWFUL, A_NONE } from './align.h.js';
 import { cmd_from_func, cmdname_from_func, cmdq_clear, cmdq_pop, do_reqmenu, doextlist, dokeylist, getdir, isok, key2extcmddesc, key2txt, yn_function } from './cmd.js';
 import { NO_COLOR } from './color.h.js';
 import { is_drawbridge_wall, is_lava, is_pool } from './dbridge.js';
@@ -23,7 +23,7 @@ import { wizard } from './flag.macros.js';
 import { coord_desc, getpos } from './getpos.js';
 import { BUFSZ, COLNO, FALSE, ROWNO, TRUE } from './global.h.js';
 import { glyph_to_cmap } from './glyphs.js';
-import { ARTICLE_NONE, CMDQ_KEY, CQ_CANNED, ECMD_CANCEL, ECMD_OK, LOOK_ONCE, LOOK_QUICK, LOOK_VERBOSE, MHID_ALTMON, MHID_ARTICLE, MHID_PREFIX, MHID_REGION, SYM_MAX, SYM_OFF_M, SYM_OFF_O, SYM_OFF_X } from './hack.h.js';
+import { ARTICLE_NONE, BOLT_LIM, CMDQ_KEY, CQ_CANNED, ECMD_CANCEL, ECMD_OK, LOOK_ONCE, LOOK_QUICK, LOOK_VERBOSE, MHID_ALTMON, MHID_ARTICLE, MHID_PREFIX, MHID_REGION, SYM_MAX, SYM_OFF_M, SYM_OFF_O, SYM_OFF_X } from './hack.h.js';
 import { distu, y_n } from './hack.macros.js';
 import { copynchars, digit, dist2, eos, lcase, mungspaces, nh_snprintf, strip_newline, strkitten, strncmpi, strstri, strsubst, tabexpand, upstart, visctrl } from './hacklib.js';
 import { align_str, trap_predicament } from './insight.js';
@@ -31,9 +31,10 @@ import { display_inventory, sobj_at } from './invent.js';
 import { nhUse } from './lint.macros.js';
 import { has_mcorpsenm } from './mextra.macros.js';
 import { dealloc_obj, is_treefruit, mkobj, mksobj } from './mkobj.js';
+import { AD_DGST, AT_ENGL } from './monattk.h.js';
 import { dmgtype_fromattack, sticks } from './mondata.js';
 import { hides_under, is_hider, is_orc } from './mondata.macros.js';
-import { M2_DEMON, M2_ELF, M2_HUMAN, M2_ORC, NEUTRAL } from './monflag.h.js';
+import { M1_CLING, M1_FLY, M1_HIDE, M2_DEMON, M2_ELF, M2_HUMAN, M2_ORC, NEUTRAL } from './monflag.h.js';
 import { closed_door } from './monmove.js';
 import { mons } from './monst.js';
 import { M_AP_FURNITURE, M_AP_F_DKNOWN, M_AP_MONSTER, M_AP_OBJECT, STRAT_WAITMASK } from './monst.h.js';
@@ -138,7 +139,7 @@ export async function self_lookat(outbuf) {   // pager.c:108
         $c.__builtin___sprintf_chk(eos(outbuf), 0, -1, $c.lit(", chained to %s"), $G.uball ? await ansimpleoname($G.uball) : $c.lit("nothing?"));
     }
     if (u.utrap) {
-        $c.__builtin___sprintf_chk(eos(outbuf), 0, -1, $c.lit(", %s"), await trap_predicament(new $c.Ptr(trapbuf, 0), 0, 0));
+        $c.__builtin___sprintf_chk(eos(outbuf), 0, -1, $c.lit(", %s"), await trap_predicament(new $c.Ptr(trapbuf, 0), 0, FALSE));
     }
     return outbuf;
 }
@@ -154,7 +155,7 @@ function trap_description(outbuf, tnum, x, y) {   // pager.c:167
     } else if (trapped_door_at(tnum, x, y)) {
         $c.__builtin___strcpy_chk(outbuf, $c.lit("trapped door"), -1);
     } else {
-        $c.__builtin___strcpy_chk(outbuf, trapname(tnum, 0), -1);
+        $c.__builtin___strcpy_chk(outbuf, trapname(tnum, FALSE), -1);
     }
     return;
 }
@@ -226,7 +227,7 @@ export async function mhidden_description(mon, mhid_flags, outbuf) {   // pager.
                     }
                     $c.__builtin___strcat_chk(outbuf, c_common_strings.c_something, -1);
                 } else if (is_hider(mon.data)) {
-                    $c.__builtin___sprintf_chk(eos(outbuf), 0, -1, $c.lit(" on the %s"), $c.andu64(mon.data.mflags1, 256) !== 0 && ($c.andu64(mon.data.mflags1, 16) !== 0 && mon.data.mlet !== S_MIMIC || $c.andu64(mon.data.mflags1, 1) !== 0) ? $c.lit("ceiling") : surface(x, y));
+                    $c.__builtin___sprintf_chk(eos(outbuf), 0, -1, $c.lit(" on the %s"), $c.andu64(mon.data.mflags1, M1_HIDE) !== 0 && ($c.andu64(mon.data.mflags1, M1_CLING) !== 0 && mon.data.mlet !== S_MIMIC || $c.andu64(mon.data.mflags1, M1_FLY) !== 0) ? $c.lit("ceiling") : surface(x, y));
                 } else {
                     if (mon.data.mlet === S_EEL && is_pool(x, y)) {
                         $c.__builtin___strcat_chk(outbuf, $c.lit(" in murky water"), -1);
@@ -238,7 +239,7 @@ export async function mhidden_description(mon, mhid_flags, outbuf) {   // pager.
                 if (distu(x, y) <= Math.imul(r, r + 1 | 0) || force_region) {
                     rglyph = reg.glyph;
                     poison_gas = $c.i8(glyph_is_cmap(rglyph) && glyph_to_cmap(rglyph) === S_poisoncloud ? 1 : 0);
-                    nh_snprintf($c.lit("mhidden_description"), 277, eos(outbuf), $c.subu64(256, buflen), $c.lit(", in a cloud of %s"), poison_gas ? $c.lit("poison gas") : $c.lit("vapor"));
+                    nh_snprintf($c.lit("mhidden_description"), 277, eos(outbuf), $c.subu64(BUFSZ, buflen), $c.lit(", in a cloud of %s"), poison_gas ? $c.lit("poison gas") : $c.lit("vapor"));
                 }
             }
         }
@@ -324,7 +325,7 @@ async function look_at_object(buf, x, y, glyph) {   // pager.c:380
     if (otmp[0] && otmp[0].where === OBJ_BURIED) {
         $c.__builtin___strcat_chk(buf, $c.lit(" (buried)"), -1);
     } else if (svl.level.locations[x][y].typ === TREE || svl.level.flags.arboreal | 0 && svl.level.locations[x][y].typ === STONE) {
-        nh_snprintf($c.lit("look_at_object"), 407, eos(buf), $c.subu64(256, $c.strlen(buf)), $c.lit(" %s in a tree"), otmp[0] && is_treefruit(otmp[0]) ? $c.lit("dangling") : $c.lit("stuck"));
+        nh_snprintf($c.lit("look_at_object"), 407, eos(buf), $c.subu64(BUFSZ, $c.strlen(buf)), $c.lit(" %s in a tree"), otmp[0] && is_treefruit(otmp[0]) ? $c.lit("dangling") : $c.lit("stuck"));
     } else if (svl.level.locations[x][y].typ === STONE || svl.level.locations[x][y].typ === SCORR) {
         $c.__builtin___strcat_chk(buf, $c.lit(" embedded in stone"), -1);
     } else if (svl.level.locations[x][y].typ && svl.level.locations[x][y].typ <= DBWALL || svl.level.locations[x][y].typ === SDOOR) {
@@ -342,10 +343,10 @@ async function look_at_monster(buf, monbuf, mtmp, x, y) {   // pager.c:422
     let name = null, monnambuf = new Int8Array(256), healthbuf = new Int8Array(256), accurate = 0, t = null, tt = 0, how_seen = 0, mW = 0, m2 = 0, whom = null;
     accurate = $c.i8(!Hallucination() ? 1 : 0);
     name = $c.peq(mtmp.data, $c.relem(mons, PM_COYOTE)) && accurate ? await coyotename(mtmp, new $c.Ptr(monnambuf, 0)) : await distant_monnam(mtmp, ARTICLE_NONE, new $c.Ptr(monnambuf, 0));
-    $c.__builtin___sprintf_chk(buf, 0, -1, $c.lit("%s%s%s%s"), mtmp.mx !== x || mtmp.my !== y ? mtmp.isshk | 0 && accurate ? $c.lit("tail of ") : $c.lit("tail of a ") : $c.lit(""), accurate ? monhealthdescr(mtmp, 1, new $c.Ptr(healthbuf, 0)) : $c.lit(""), mtmp.mtame && accurate ? $c.lit("tame ") : mtmp.mpeaceful | 0 && accurate ? $c.lit("peaceful ") : $c.lit(""), name);
+    $c.__builtin___sprintf_chk(buf, 0, -1, $c.lit("%s%s%s%s"), mtmp.mx !== x || mtmp.my !== y ? mtmp.isshk | 0 && accurate ? $c.lit("tail of ") : $c.lit("tail of a ") : $c.lit(""), accurate ? monhealthdescr(mtmp, TRUE, new $c.Ptr(healthbuf, 0)) : $c.lit(""), mtmp.mtame && accurate ? $c.lit("tame ") : mtmp.mpeaceful | 0 && accurate ? $c.lit("peaceful ") : $c.lit(""), name);
     if ($c.peq(u.ustuck, mtmp)) {
         if (u.uswallow | 0 || iflags.save_uswallow | 0) {
-            $c.__builtin___strcat_chk(buf, dmgtype_fromattack(mtmp.data, 26, 11) !== null ? $c.lit(", swallowing you") : $c.lit(", engulfing you"), -1);
+            $c.__builtin___strcat_chk(buf, dmgtype_fromattack(mtmp.data, AD_DGST, AT_ENGL) !== null ? $c.lit(", swallowing you") : $c.lit(", engulfing you"), -1);
         } else {
             $c.__builtin___strcat_chk(buf, u.umonnum !== u.umonster && sticks(gy.youmonst.data) ? $c.lit(", being held") : $c.lit(", holding you"), -1);
         }
@@ -364,7 +365,7 @@ async function look_at_monster(buf, monbuf, mtmp, x, y) {   // pager.c:422
         t = t_at(mtmp.mx, mtmp.my);
         tt = t ? t.ttyp | 0 : NO_TRAP;
         if (tt === BEAR_TRAP || (tt === PIT || tt === SPIKED_PIT) || tt === WEB) {
-            $c.__builtin___sprintf_chk(eos(buf), 0, -1, $c.lit(", trapped in %s"), await an(trapname(tt, 0)));
+            $c.__builtin___sprintf_chk(eos(buf), 0, -1, $c.lit(", trapped in %s"), await an(trapname(tt, FALSE)));
             t.tseen = (1) & 1;
         }
     }
@@ -537,7 +538,7 @@ async function lookat(x, y, buf, monbuf) {   // pager.c:657
     } else if (glyph_is_object(glyph)) {
         await look_at_object(buf, x, y, glyph);
     } else if (glyph_is_trap(glyph)) {
-        tnum = glyph >= GLYPH_TRAP_OFF && glyph < GLYPH_TRAP_OFF + MAXTCHARS ? (((glyph - (GLYPH_CMAP_B_OFF + (S_arrow_trap - S_grave)) | 0) + S_arrow_trap | 0) - S_arrow_trap | 0) + 1 | 0 : NO_GLYPH;
+        tnum = glyph >= GLYPH_TRAP_OFF && glyph < GLYPH_TRAP_OFF + MAXTCHARS ? (((glyph - GLYPH_TRAP_OFF | 0) + S_arrow_trap | 0) - S_arrow_trap | 0) + 1 | 0 : NO_GLYPH;
         trap_description(buf, tnum, x, y);
     } else if (glyph_is_warning(glyph)) {
         warnindx = glyph_to_warning(glyph);
@@ -557,8 +558,8 @@ async function lookat(x, y, buf, monbuf) {   // pager.c:657
         switch (symidx) {
             case S_altar:
                 amsk = altarmask_at(x, y);
-                algn = $c.i8((amsk & 7 & AM_MASK) === 0 ? A_NONE : (amsk & 7 & AM_MASK) === AM_LAWFUL ? A_LAWFUL : (amsk & 7 & AM_MASK) - 2 | 0);
-                $c.__builtin___sprintf_chk(buf, 0, -1, $c.lit("%s %saltar"), (svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level) && !(dist2(x, y, u.ux, u.uy) <= 2) && amsk & 16 ? $c.lit("aligned") : align_str(algn), amsk & 16 ? $c.lit("high ") : $c.lit(""));
+                algn = $c.i8((amsk & AM_MASK & AM_MASK) === 0 ? A_NONE : (amsk & AM_MASK & AM_MASK) === AM_LAWFUL ? A_LAWFUL : (amsk & AM_MASK & AM_MASK) - 2 | 0);
+                $c.__builtin___sprintf_chk(buf, 0, -1, $c.lit("%s %saltar"), (svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level) && !(dist2(x, y, u.ux, u.uy) <= 2) && amsk & AM_SANCTUM ? $c.lit("aligned") : align_str(algn), amsk & AM_SANCTUM ? $c.lit("high ") : $c.lit(""));
                 break;
             case S_ndoor:
                 if (is_drawbridge_wall(x, y) >= 0) {
@@ -896,7 +897,7 @@ async function add_cmap_descr(found, idx, glyph, article, cc$in, x_str, prefix, 
         }
         firstmatch.set(0, x_str);
         found = 1;
-    } else if (!(hit_trap.get(0) && is_cmap_trap(idx)) && !(found >= 3 && is_cmap_drawbridge(idx)) && (idx !== S_vibrating_square || Inhell() || glyph_is_trap(glyph) && (glyph >= GLYPH_TRAP_OFF && glyph < GLYPH_TRAP_OFF + MAXTCHARS ? (((glyph - (GLYPH_CMAP_B_OFF + (S_arrow_trap - S_grave)) | 0) + S_arrow_trap | 0) - S_arrow_trap | 0) + 1 | 0 : NO_GLYPH) === VIBRATING_SQUARE)) {
+    } else if (!(hit_trap.get(0) && is_cmap_trap(idx)) && !(found >= 3 && is_cmap_drawbridge(idx)) && (idx !== S_vibrating_square || Inhell() || glyph_is_trap(glyph) && (glyph >= GLYPH_TRAP_OFF && glyph < GLYPH_TRAP_OFF + MAXTCHARS ? (((glyph - GLYPH_TRAP_OFF | 0) + S_arrow_trap | 0) - S_arrow_trap | 0) + 1 | 0 : NO_GLYPH) === VIBRATING_SQUARE)) {
         found = found + await append_str(out_str, article === 2 ? await the(x_str) : article === 1 ? await an(x_str) : x_str) | 0;
         if (is_cmap_trap(idx) && idx !== S_vibrating_square) {
             hit_trap.set(0, TRUE);
@@ -1125,12 +1126,12 @@ export async function do_screen_description(cc$in, looked, sym, out_str, firstma
                 $c.__builtin___sprintf_chk(new $c.Ptr(temp_buf, 0), 0, 256, $c.lit(" (%s"), firstmatch.get(0));
                 add_quoted_engraving(cc.x, cc.y, new $c.Ptr(temp_buf, 0), FALSE);
                 $c.__builtin___strcat_chk(new $c.Ptr(temp_buf, 0), $c.lit(")"), 256);
-                $c.__builtin___strncat_chk(out_str, new $c.Ptr(temp_buf, 0), $c.subu64($c.subu64(256, $c.strlen(out_str)), 1), -1);
+                $c.__builtin___strncat_chk(out_str, new $c.Ptr(temp_buf, 0), $c.subu64($c.subu64(BUFSZ, $c.strlen(out_str)), 1), -1);
                 found = 1;
             }
             if (monbuf[0]) {
                 nh_snprintf($c.lit("do_screen_description"), 1619, new $c.Ptr(temp_buf, 0), 256, $c.lit(" [seen: %s]"), new $c.Ptr(monbuf, 0));
-                $c.__builtin___strncat_chk(out_str, new $c.Ptr(temp_buf, 0), $c.subu64($c.subu64(256, $c.strlen(out_str)), 1), -1);
+                $c.__builtin___strncat_chk(out_str, new $c.Ptr(temp_buf, 0), $c.subu64($c.subu64(BUFSZ, $c.strlen(out_str)), 1), -1);
             }
         }
     }
@@ -1152,7 +1153,7 @@ function add_quoted_engraving(x, y, buf, force) {   // pager.c:1631
     } else {
         nh_snprintf($c.lit("add_quoted_engraving"), 1663, new $c.Ptr(temp_buf, 0), 256, $c.lit(" %s you haven't read"), headstone ? $c.lit("whose headstone") : $c.lit("that"));
     }
-    $c.__builtin___strncat_chk(buf, new $c.Ptr(temp_buf, 0), $c.subu64($c.subu64(256, $c.strlen(buf)), 1), -1);
+    $c.__builtin___strncat_chk(buf, new $c.Ptr(temp_buf, 0), $c.subu64($c.subu64(BUFSZ, $c.strlen(buf)), 1), -1);
     return TRUE;
 }
 export async function do_look(mode, click_cc) {   // pager.c:1673
@@ -1355,10 +1356,10 @@ export async function do_look(mode, click_cc) {   // pager.c:1673
     }
 }
 function look_region_nearby(lo_x, lo_y, hi_x, hi_y, nearby) {   // pager.c:1966
-    lo_y.set(0, $c.i16(nearby ? (u.uy - 8 | 0) > 0 ? u.uy - 8 | 0 : 0 : 0));
-    lo_x.set(0, $c.i16(nearby ? (u.ux - 8 | 0) > 1 ? u.ux - 8 | 0 : 1 : 1));
-    hi_y.set(0, $c.i16(nearby ? (u.uy + 8 | 0) < 20 ? u.uy + 8 | 0 : 20 : ROWNO - 1));
-    hi_x.set(0, $c.i16(nearby ? (u.ux + 8 | 0) < 79 ? u.ux + 8 | 0 : 79 : COLNO - 1));
+    lo_y.set(0, $c.i16(nearby ? (u.uy - BOLT_LIM | 0) > 0 ? u.uy - BOLT_LIM | 0 : 0 : 0));
+    lo_x.set(0, $c.i16(nearby ? (u.ux - BOLT_LIM | 0) > 1 ? u.ux - BOLT_LIM | 0 : 1 : 1));
+    hi_y.set(0, $c.i16(nearby ? (u.uy + BOLT_LIM | 0) < ROWNO - 1 ? u.uy + BOLT_LIM | 0 : ROWNO - 1 : ROWNO - 1));
+    hi_x.set(0, $c.i16(nearby ? (u.ux + BOLT_LIM | 0) < COLNO - 1 ? u.ux + BOLT_LIM | 0 : COLNO - 1 : COLNO - 1));
 }
 async function look_all(nearby, do_mons) {   // pager.c:1979
     let win = 0, glyph = 0, count = 0, x = 0, y = 0, lo_x = Int16Array.of(0), lo_y = Int16Array.of(0), hi_x = Int16Array.of(0), hi_y = Int16Array.of(0), lookbuf = new Int8Array(256), outbuf = new Int8Array(256), mtmp = null, warnindx = 0, coordbuf = new Int8Array(20), which = new Int8Array(12), cmode = 0;
@@ -1433,11 +1434,11 @@ async function look_traps(nearby) {   // pager.c:2078
             lookbuf[0] = 0;
             glyph = glyph_at(x, y);
             if (glyph_is_trap(glyph)) {
-                tnum = glyph >= GLYPH_TRAP_OFF && glyph < GLYPH_TRAP_OFF + MAXTCHARS ? (((glyph - (GLYPH_CMAP_B_OFF + (S_arrow_trap - S_grave)) | 0) + S_arrow_trap | 0) - S_arrow_trap | 0) + 1 | 0 : NO_GLYPH;
+                tnum = glyph >= GLYPH_TRAP_OFF && glyph < GLYPH_TRAP_OFF + MAXTCHARS ? (((glyph - GLYPH_TRAP_OFF | 0) + S_arrow_trap | 0) - S_arrow_trap | 0) + 1 | 0 : NO_GLYPH;
                 trap_description(new $c.Ptr(lookbuf, 0), tnum, x, y);
                 count = count + 1 | 0;
             } else if ((t = t_at(x, y)) !== null && t.tseen | 0 && (!((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) && !((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level)) || couldsee(x, y))) {
-                $c.__builtin___strcpy_chk(new $c.Ptr(lookbuf, 0), trapname(t.ttyp | 0, 0), 256);
+                $c.__builtin___strcpy_chk(new $c.Ptr(lookbuf, 0), trapname(t.ttyp | 0, FALSE), 256);
                 $c.__builtin___sprintf_chk(eos(new $c.Ptr(lookbuf, 0)), 0, -1, $c.lit(", obscured by %s"), encglyph(glyph));
                 glyph = ((S_arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) === S_stone ? GLYPH_CMAP_STONE_OFF : ((S_arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) <= S_trwall ? (((S_arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) - S_vwall | 0) + (In_mines(u.uz) ? GLYPH_CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH_CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH_CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH_CMAP_SOKO_OFF : GLYPH_CMAP_MAIN_OFF) | 0 : ((S_arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) < S_altar ? (((S_arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) - S_ndoor | 0) + GLYPH_CMAP_A_OFF | 0 : ((S_arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) === S_altar ? 4008 : ((S_arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) < S_arrow_trap + MAXTCHARS ? (((S_arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) - S_grave | 0) + GLYPH_CMAP_B_OFF | 0 : ((S_arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) <= S_goodpos ? (((S_arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) - S_digbeam | 0) + GLYPH_CMAP_C_OFF | 0 : NO_GLYPH;
                 count = count + 1 | 0;
@@ -1582,7 +1583,7 @@ export async function doidtrap() {   // pager.c:2336
     x = $c.i16(u.ux + u.dx | 0);
     y = $c.i16(u.uy + u.dy | 0);
     glyph = glyph_at(x, y);
-    if (glyph_is_trap(glyph) && ((tt = glyph >= GLYPH_TRAP_OFF && glyph < GLYPH_TRAP_OFF + MAXTCHARS ? (((glyph - (GLYPH_CMAP_B_OFF + (S_arrow_trap - S_grave)) | 0) + S_arrow_trap | 0) - S_arrow_trap | 0) + 1 | 0 : NO_GLYPH) === BEAR_TRAP || tt === TRAPPED_DOOR || tt === TRAPPED_CHEST)) {
+    if (glyph_is_trap(glyph) && ((tt = glyph >= GLYPH_TRAP_OFF && glyph < GLYPH_TRAP_OFF + MAXTCHARS ? (((glyph - GLYPH_TRAP_OFF | 0) + S_arrow_trap | 0) - S_arrow_trap | 0) + 1 | 0 : NO_GLYPH) === BEAR_TRAP || tt === TRAPPED_DOOR || tt === TRAPPED_CHEST)) {
         chesttrap = trapped_chest_at(tt, x, y);
         if (chesttrap || trapped_door_at(tt, x, y)) {
             await pline($c.lit("That is a trapped %s."), chesttrap ? $c.lit("chest") : $c.lit("door"));
@@ -1822,70 +1823,61 @@ export function $init() {
     what_is_a_location.fill(0);
     what_is_a_location.set([97, 32, 109, 111, 110, 115, 116, 101, 114, 44, 32, 111, 98, 106, 101, 99, 116, 32, 111, 114, 32, 108, 111, 99, 97, 116, 105, 111, 110]);   // "a monster, object or location"
     suptext1.fill(null);
-    suptext1[0] = $c.lit("%s is a member of a marauding horde of orcs");
-    suptext1[1] = $c.lit("rumored to have brutally attacked and plundered");
-    suptext1[2] = $c.lit("the ordinarily sheltered town that is located ");
-    suptext1[3] = $c.lit("deep within The Gnomish Mines.");
-    suptext1[4] = $c.lit("");
-    suptext1[5] = $c.lit("The members of that vicious horde proudly and ");
-    suptext1[6] = $c.lit("defiantly acclaim their allegiance to their");
-    suptext1[7] = $c.lit("leader %s in their names.");
-    suptext1[8] = null;
+    $c.init(suptext1, [
+        $c.lit("%s is a member of a marauding horde of orcs"),
+        $c.lit("rumored to have brutally attacked and plundered"),
+        $c.lit("the ordinarily sheltered town that is located "),
+        $c.lit("deep within The Gnomish Mines."),
+        $c.lit(""),
+        $c.lit("The members of that vicious horde proudly and "),
+        $c.lit("defiantly acclaim their allegiance to their"),
+        $c.lit("leader %s in their names."),
+        null
+    ]);
     suptext2.fill(null);
-    suptext2[0] = $c.lit("\"%s\" is the common dungeon name of");
-    suptext2[1] = $c.lit("a nefarious orc who is known to acquire property");
-    suptext2[2] = $c.lit("from thieves and sell it off for profit.");
-    suptext2[3] = $c.lit("");
-    suptext2[4] = $c.lit("The perpetrator was last seen hanging around the");
-    suptext2[5] = $c.lit("stairs leading to the Gnomish Mines.");
-    suptext2[6] = null;
+    $c.init(suptext2, [
+        $c.lit("\"%s\" is the common dungeon name of"),
+        $c.lit("a nefarious orc who is known to acquire property"),
+        $c.lit("from thieves and sell it off for profit."),
+        $c.lit(""),
+        $c.lit("The perpetrator was last seen hanging around the"),
+        $c.lit("stairs leading to the Gnomish Mines."),
+        null
+    ]);
     for (let $i0 = 0; $i0 < 17; $i0++) {
         help_menu_items[$i0].$copyFrom(new $T.anon_pager_2830());
     }
-    help_menu_items[0].f = hmenu_doextversion;
-    help_menu_items[0].text = $c.lit("About NetHack (version information).");
-    help_menu_items[1].f = dispfile_help;
-    help_menu_items[1].text = $c.lit("Long description of the game and commands.");
-    help_menu_items[2].f = dispfile_shelp;
-    help_menu_items[2].text = $c.lit("List of game commands.");
-    help_menu_items[3].f = hmenu_dohistory;
-    help_menu_items[3].text = $c.lit("Concise history of NetHack.");
-    help_menu_items[4].f = hmenu_dowhatis;
-    help_menu_items[4].text = $c.lit("Info on a character in the game display.");
-    help_menu_items[5].f = hmenu_dowhatdoes;
-    help_menu_items[5].text = $c.lit("Info on what a given key does.");
-    help_menu_items[6].f = option_help;
-    help_menu_items[6].text = $c.lit("List of game options.");
-    help_menu_items[7].f = dispfile_optionfile;
-    help_menu_items[7].text = $c.lit("Longer explanation of game options.");
-    help_menu_items[8].f = dispfile_optmenu;
-    help_menu_items[8].text = $c.lit("Using the %s command to set options.");
-    help_menu_items[9].f = dokeylist;
-    help_menu_items[9].text = $c.lit("Full list of keyboard commands.");
-    help_menu_items[10].f = hmenu_doextlist;
-    help_menu_items[10].text = $c.lit("List of extended commands.");
-    help_menu_items[11].f = domenucontrols;
-    help_menu_items[11].text = $c.lit("List menu control keys.");
-    help_menu_items[12].f = dispfile_usagehelp;
-    help_menu_items[12].text = $c.lit("Description of NetHack's command line.");
-    help_menu_items[13].f = dispfile_license;
-    help_menu_items[13].text = $c.lit("The NetHack license.");
-    help_menu_items[14].f = docontact;
-    help_menu_items[14].text = $c.lit("Support information.");
-    help_menu_items[15].f = dispfile_debughelp;
-    help_menu_items[15].text = $c.lit("List of wizard-mode commands.");
-    help_menu_items[16].f = null;
-    help_menu_items[16].text = null;
+    $c.init(help_menu_items, [
+        { f: hmenu_doextversion, text: $c.lit("About NetHack (version information).") },
+        { f: dispfile_help, text: $c.lit("Long description of the game and commands.") },
+        { f: dispfile_shelp, text: $c.lit("List of game commands.") },
+        { f: hmenu_dohistory, text: $c.lit("Concise history of NetHack.") },
+        { f: hmenu_dowhatis, text: $c.lit("Info on a character in the game display.") },
+        { f: hmenu_dowhatdoes, text: $c.lit("Info on what a given key does.") },
+        { f: option_help, text: $c.lit("List of game options.") },
+        { f: dispfile_optionfile, text: $c.lit("Longer explanation of game options.") },
+        { f: dispfile_optmenu, text: $c.lit("Using the %s command to set options.") },
+        { f: dokeylist, text: $c.lit("Full list of keyboard commands.") },
+        { f: hmenu_doextlist, text: $c.lit("List of extended commands.") },
+        { f: domenucontrols, text: $c.lit("List menu control keys.") },
+        { f: dispfile_usagehelp, text: $c.lit("Description of NetHack's command line.") },
+        { f: dispfile_license, text: $c.lit("The NetHack license.") },
+        { f: docontact, text: $c.lit("Support information.") },
+        { f: dispfile_debughelp, text: $c.lit("List of wizard-mode commands.") },
+        {}
+    ]);
     append_str$sep.fill(0);
     append_str$sep.set([32, 111, 114, 32]);   // " or "
     waterbody_name$pooltype.fill(0);
     ice_descr$icetyp.fill(null);
-    ice_descr$icetyp[0] = $c.lit("solid");
-    ice_descr$icetyp[1] = $c.lit("sturdy");
-    ice_descr$icetyp[2] = $c.lit("steady");
-    ice_descr$icetyp[3] = $c.lit("unsteady");
-    ice_descr$icetyp[4] = $c.lit("thin");
-    ice_descr$icetyp[5] = $c.lit("slushy");
+    $c.init(ice_descr$icetyp, [
+        $c.lit("solid"),
+        $c.lit("sturdy"),
+        $c.lit("steady"),
+        $c.lit("unsteady"),
+        $c.lit("thin"),
+        $c.lit("slushy")
+    ]);
     do_screen_description$mon_interior.fill(0);
     do_screen_description$mon_interior.set([116, 104, 101, 32, 105, 110, 116, 101, 114, 105, 111, 114, 32, 111, 102, 32, 97, 32, 109, 111, 110, 115, 116, 101, 114]);   // "the interior of a monster"
     do_screen_description$unreconnoitered.fill(0);

@@ -1192,21 +1192,27 @@ export function $init() {
     restoreinfo.name = $c.lit("externalcomp");
     restoreinfo.mread_flags = 0;
     bw_sticky.fill(0);
-    bw_sticky[0] = -1;
-    bw_sticky[1] = -1;
-    bw_sticky[2] = -1;
-    bw_sticky[3] = -1;
-    bw_sticky[4] = -1;
+    $c.init(bw_sticky, [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+    ]);
     bw_buffered.fill(0);
-    bw_buffered[0] = 0;
-    bw_buffered[1] = 0;
-    bw_buffered[2] = 0;
-    bw_buffered[3] = 0;
-    bw_buffered[4] = 0;
+    $c.init(bw_buffered, [
+        0,
+        0,
+        0,
+        0,
+        0
+    ]);
     bw_FILE.fill(null);
-    bw_FILE[0] = null;
-    bw_FILE[1] = null;
-    bw_FILE[2] = null;
-    bw_FILE[3] = null;
-    bw_FILE[4] = null;
+    $c.init(bw_FILE, [
+        null,
+        null,
+        null,
+        null,
+        null
+    ]);
 }

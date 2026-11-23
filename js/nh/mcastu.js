@@ -758,7 +758,7 @@ export async function buzzmu(mtmp, mattk) {   // mcastu.c:989
             await pline_mon(mtmp, $c.lit("%s zaps you with a %s!"), await Monnam(mtmp), flash_str($c.rem32($c.abs(mattk.adtyp - AD_MAGM | 0), 10), FALSE));
         }
         gb.buzzer = mtmp;
-        await buzz(-10 - $c.rem32($c.abs(mattk.adtyp - 1 | 0), 10) | 0, mattk.damn, mtmp.mx, mtmp.my, sgn(gt.tbx), sgn(gt.tby));
+        await buzz(-10 - $c.rem32($c.abs(mattk.adtyp - AD_MAGM | 0), 10) | 0, mattk.damn, mtmp.mx, mtmp.my, sgn(gt.tbx), sgn(gt.tby));
         gb.buzzer = null;
         return M_ATTK_HIT;
     }
@@ -769,68 +769,54 @@ export function $init() {
     for (let $i0 = 0; $i0 < 20; $i0++) {
         mcast_data[$i0].$copyFrom(new $T._mcast_data());
     }
-    mcast_data[0].level = 0;
-    mcast_data[0].flags = 6;
-    mcast_data[1].level = 0;
-    mcast_data[1].flags = 6;
-    mcast_data[2].level = 1;
-    mcast_data[2].flags = 1;
-    mcast_data[3].level = 2;
-    mcast_data[3].flags = 1;
-    mcast_data[4].level = 2;
-    mcast_data[4].flags = 6;
-    mcast_data[5].level = 3;
-    mcast_data[5].flags = 6;
-    mcast_data[6].level = 4;
-    mcast_data[6].flags = 1;
-    mcast_data[7].level = 4;
-    mcast_data[7].flags = 6;
-    mcast_data[8].level = 6;
-    mcast_data[8].flags = 6;
-    mcast_data[9].level = 6;
-    mcast_data[9].flags = 6;
-    mcast_data[10].level = 8;
-    mcast_data[10].flags = 6;
-    mcast_data[11].level = 8;
-    mcast_data[11].flags = 7;
-    mcast_data[12].level = 10;
-    mcast_data[12].flags = 6;
-    mcast_data[13].level = 11;
-    mcast_data[13].flags = 6;
-    mcast_data[14].level = 12;
-    mcast_data[14].flags = 6;
-    mcast_data[15].level = 13;
-    mcast_data[15].flags = 6;
-    mcast_data[16].level = 13;
-    mcast_data[16].flags = 7;
-    mcast_data[17].level = 15;
-    mcast_data[17].flags = 7;
-    mcast_data[18].level = 18;
-    mcast_data[18].flags = 7;
-    mcast_data[19].level = 20;
-    mcast_data[19].flags = 6;
+    $c.init(mcast_data, [
+        { level: 0, flags: MCF_HOSTILE | MCF_SIGHT },
+        { level: 0, flags: MCF_HOSTILE | MCF_SIGHT },
+        { level: 1, flags: MCF_INDIRECT },
+        { level: 2, flags: MCF_INDIRECT },
+        { level: 2, flags: MCF_HOSTILE | MCF_SIGHT },
+        { level: 3, flags: MCF_HOSTILE | MCF_SIGHT },
+        { level: 4, flags: MCF_INDIRECT },
+        { level: 4, flags: MCF_HOSTILE | MCF_SIGHT },
+        { level: 6, flags: MCF_HOSTILE | MCF_SIGHT },
+        { level: 6, flags: MCF_HOSTILE | MCF_SIGHT },
+        { level: 8, flags: MCF_HOSTILE | MCF_SIGHT },
+        { level: 8, flags: MCF_HOSTILE | MCF_INDIRECT | MCF_SIGHT },
+        { level: 10, flags: MCF_HOSTILE | MCF_SIGHT },
+        { level: 11, flags: MCF_HOSTILE | MCF_SIGHT },
+        { level: 12, flags: MCF_HOSTILE | MCF_SIGHT },
+        { level: 13, flags: MCF_HOSTILE | MCF_SIGHT },
+        { level: 13, flags: MCF_INDIRECT | MCF_HOSTILE | MCF_SIGHT },
+        { level: 15, flags: MCF_HOSTILE | MCF_INDIRECT | MCF_SIGHT },
+        { level: 18, flags: MCF_HOSTILE | MCF_INDIRECT | MCF_SIGHT },
+        { level: 20, flags: MCF_HOSTILE | MCF_SIGHT }
+    ]);
     mon_cleric_spells.fill(0);
-    mon_cleric_spells[0] = MCAST_OPEN_WOUNDS;
-    mon_cleric_spells[1] = MCAST_CURE_SELF;
-    mon_cleric_spells[2] = MCAST_CONFUSE_YOU;
-    mon_cleric_spells[3] = MCAST_PARALYZE;
-    mon_cleric_spells[4] = MCAST_BLIND_YOU;
-    mon_cleric_spells[5] = MCAST_INSECTS;
-    mon_cleric_spells[6] = MCAST_CURSE_ITEMS;
-    mon_cleric_spells[7] = MCAST_LIGHTNING;
-    mon_cleric_spells[8] = MCAST_FIRE_PILLAR;
-    mon_cleric_spells[9] = MCAST_GEYSER;
+    $c.init(mon_cleric_spells, [
+        MCAST_OPEN_WOUNDS,
+        MCAST_CURE_SELF,
+        MCAST_CONFUSE_YOU,
+        MCAST_PARALYZE,
+        MCAST_BLIND_YOU,
+        MCAST_INSECTS,
+        MCAST_CURSE_ITEMS,
+        MCAST_LIGHTNING,
+        MCAST_FIRE_PILLAR,
+        MCAST_GEYSER
+    ]);
     mon_wizard_spells.fill(0);
-    mon_wizard_spells[0] = MCAST_PSI_BOLT;
-    mon_wizard_spells[1] = MCAST_CURE_SELF;
-    mon_wizard_spells[2] = MCAST_HASTE_SELF;
-    mon_wizard_spells[3] = MCAST_STUN_YOU;
-    mon_wizard_spells[4] = MCAST_DISAPPEAR;
-    mon_wizard_spells[5] = MCAST_WEAKEN_YOU;
-    mon_wizard_spells[6] = MCAST_DESTRY_ARMR;
-    mon_wizard_spells[7] = MCAST_CURSE_ITEMS;
-    mon_wizard_spells[8] = MCAST_AGGRAVATION;
-    mon_wizard_spells[9] = MCAST_SUMMON_MONS;
-    mon_wizard_spells[10] = MCAST_CLONE_WIZ;
-    mon_wizard_spells[11] = MCAST_DEATH_TOUCH;
+    $c.init(mon_wizard_spells, [
+        MCAST_PSI_BOLT,
+        MCAST_CURE_SELF,
+        MCAST_HASTE_SELF,
+        MCAST_STUN_YOU,
+        MCAST_DISAPPEAR,
+        MCAST_WEAKEN_YOU,
+        MCAST_DESTRY_ARMR,
+        MCAST_CURSE_ITEMS,
+        MCAST_AGGRAVATION,
+        MCAST_SUMMON_MONS,
+        MCAST_CLONE_WIZ,
+        MCAST_DEATH_TOUCH
+    ]);
 }

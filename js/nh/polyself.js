@@ -37,10 +37,10 @@ import { expels } from './mhitu.js';
 import { maybe_adjust_light, mksobj } from './mkobj.js';
 import { SHOPBASE } from './mkroom.h.js';
 import { egg_type_from_parent, hideunder, killed, set_ustuck, setmangry, valid_vampshiftform, wakeup } from './mon.js';
-import { AD_ACID, AD_ANY, AD_BLND, AD_COLD, AD_CONF, AD_DGST, AD_DRST, AD_ELEC, AD_FIRE, AT_BREA, AT_CLAW, AT_ENGL, AT_GAZE, AT_SPIT } from './monattk.h.js';
+import { AD_ACID, AD_ANY, AD_BLND, AD_COLD, AD_CONF, AD_DGST, AD_DRST, AD_ELEC, AD_FIRE, AD_HALU, AD_MAGM, AD_RBRE, AT_BREA, AT_CLAW, AT_ENGL, AT_EXPL, AT_GAZE, AT_SPIT } from './monattk.h.js';
 import { attacktype, attacktype_fordmg, breakarm, can_be_strangled, dmgtype, dmgtype_fromattack, name_to_mon, name_to_monclass, num_horns, poly_when_stoned, resists_drli, set_mon_data, sliparm, sticks } from './mondata.js';
 import { amorphous, can_breathe, cantwield, could_twoweap, eggs_in_water, emits_light, flaming, has_head, has_horns, haseyes, hides_under, humanoid, is_animal, is_bat, is_clinger, is_dwarf, is_elf, is_female, is_giant, is_gnome, is_golem, is_hider, is_male, is_mind_flayer, is_neuter, is_orc, is_placeholder, is_undead, is_unicorn, is_vampire, is_were, is_whirly, lays_eggs, likes_lava, mindless, nohands, nonliving, perceives, polyok, slithy, strongmonst, telepathic, touch_petrifies, type_is_pname, unsolid, verysmall, webmaker, weirdnonliving, your_race } from './mondata.macros.js';
-import { FEMALE, G_GENOD, G_UNIQ, M1_FLY, M1_SWIM, M2_ELF, M2_HUMAN, MALE, MS_SHRIEK, MZ_HUGE, MZ_SMALL, NEUTRAL } from './monflag.h.js';
+import { FEMALE, G_GENOD, G_UNIQ, M1_FLY, M1_NOEYES, M1_REGEN, M1_SEE_INVIS, M1_SWIM, M1_TPORT, M1_TPORT_CNTRL, M1_WALLWALK, M2_ELF, M2_FEMALE, M2_HUMAN, M2_MALE, M3_INFRAVISION, MALE, MR_ACID, MR_COLD, MR_DISINT, MR_ELEC, MR_FIRE, MR_POISON, MR_SLEEP, MR_STONE, MS_SHRIEK, MZ_HUGE, MZ_SMALL, NEUTRAL } from './monflag.h.js';
 import { mons } from './monst.js';
 import { M_AP_FURNITURE, M_AP_NOTHING, M_AP_OBJECT } from './monst.h.js';
 import { DEADMONSTER, M_AP_TYPE, U_AP_TYPE, helpless, is_vampshifter, ismnum, resists_fire } from './monst.macros.js';
@@ -107,56 +107,56 @@ export async function set_uasmon() {   // polyself.c:38
     }
     u.mcham = gy.youmonst.cham;
     do {
-        if ((gy.youmonst.data.mresists & 1) !== 0) {
+        if ((gy.youmonst.data.mresists & MR_FIRE) !== 0) {
             u.uprops[FIRE_RES].intrinsic = $c.or64(u.uprops[FIRE_RES].intrinsic, FROMFORM);
         } else {
             u.uprops[FIRE_RES].intrinsic = $c.and64(u.uprops[FIRE_RES].intrinsic, ~FROMFORM);
         }
     } while (0);
     do {
-        if ((gy.youmonst.data.mresists & 2) !== 0) {
+        if ((gy.youmonst.data.mresists & MR_COLD) !== 0) {
             u.uprops[COLD_RES].intrinsic = $c.or64(u.uprops[COLD_RES].intrinsic, FROMFORM);
         } else {
             u.uprops[COLD_RES].intrinsic = $c.and64(u.uprops[COLD_RES].intrinsic, ~FROMFORM);
         }
     } while (0);
     do {
-        if ((gy.youmonst.data.mresists & 4) !== 0) {
+        if ((gy.youmonst.data.mresists & MR_SLEEP) !== 0) {
             u.uprops[SLEEP_RES].intrinsic = $c.or64(u.uprops[SLEEP_RES].intrinsic, FROMFORM);
         } else {
             u.uprops[SLEEP_RES].intrinsic = $c.and64(u.uprops[SLEEP_RES].intrinsic, ~FROMFORM);
         }
     } while (0);
     do {
-        if ((gy.youmonst.data.mresists & 8) !== 0) {
+        if ((gy.youmonst.data.mresists & MR_DISINT) !== 0) {
             u.uprops[DISINT_RES].intrinsic = $c.or64(u.uprops[DISINT_RES].intrinsic, FROMFORM);
         } else {
             u.uprops[DISINT_RES].intrinsic = $c.and64(u.uprops[DISINT_RES].intrinsic, ~FROMFORM);
         }
     } while (0);
     do {
-        if ((gy.youmonst.data.mresists & 16) !== 0) {
+        if ((gy.youmonst.data.mresists & MR_ELEC) !== 0) {
             u.uprops[SHOCK_RES].intrinsic = $c.or64(u.uprops[SHOCK_RES].intrinsic, FROMFORM);
         } else {
             u.uprops[SHOCK_RES].intrinsic = $c.and64(u.uprops[SHOCK_RES].intrinsic, ~FROMFORM);
         }
     } while (0);
     do {
-        if ((gy.youmonst.data.mresists & 32) !== 0) {
+        if ((gy.youmonst.data.mresists & MR_POISON) !== 0) {
             u.uprops[POISON_RES].intrinsic = $c.or64(u.uprops[POISON_RES].intrinsic, FROMFORM);
         } else {
             u.uprops[POISON_RES].intrinsic = $c.and64(u.uprops[POISON_RES].intrinsic, ~FROMFORM);
         }
     } while (0);
     do {
-        if ((gy.youmonst.data.mresists & 64) !== 0) {
+        if ((gy.youmonst.data.mresists & MR_ACID) !== 0) {
             u.uprops[ACID_RES].intrinsic = $c.or64(u.uprops[ACID_RES].intrinsic, FROMFORM);
         } else {
             u.uprops[ACID_RES].intrinsic = $c.and64(u.uprops[ACID_RES].intrinsic, ~FROMFORM);
         }
     } while (0);
     do {
-        if ((gy.youmonst.data.mresists & 128) !== 0) {
+        if ((gy.youmonst.data.mresists & MR_STONE) !== 0) {
             u.uprops[STONE_RES].intrinsic = $c.or64(u.uprops[STONE_RES].intrinsic, FROMFORM);
         } else {
             u.uprops[STONE_RES].intrinsic = $c.and64(u.uprops[STONE_RES].intrinsic, ~FROMFORM);
@@ -175,7 +175,7 @@ export async function set_uasmon() {   // polyself.c:38
         $G.uwep = save_uwep;
     }
     do {
-        if (dmgtype(mdat, 1) || $c.peq(mdat, $c.relem(mons, PM_BABY_GRAY_DRAGON)) || dmgtype(mdat, 242)) {
+        if (dmgtype(mdat, AD_MAGM) || $c.peq(mdat, $c.relem(mons, PM_BABY_GRAY_DRAGON)) || dmgtype(mdat, AD_RBRE)) {
             u.uprops[ANTIMAGIC].intrinsic = $c.or64(u.uprops[ANTIMAGIC].intrinsic, FROMFORM);
         } else {
             u.uprops[ANTIMAGIC].intrinsic = $c.and64(u.uprops[ANTIMAGIC].intrinsic, ~FROMFORM);
@@ -196,14 +196,14 @@ export async function set_uasmon() {   // polyself.c:38
         }
     } while (0);
     do {
-        if (dmgtype(mdat, 36)) {
+        if (dmgtype(mdat, AD_HALU)) {
             u.uprops[HALLUC_RES].intrinsic = $c.or64(u.uprops[HALLUC_RES].intrinsic, FROMFORM);
         } else {
             u.uprops[HALLUC_RES].intrinsic = $c.and64(u.uprops[HALLUC_RES].intrinsic, ~FROMFORM);
         }
     } while (0);
     do {
-        if ($c.andu64(mdat.mflags1, 16777216) !== 0) {
+        if ($c.andu64(mdat.mflags1, M1_SEE_INVIS) !== 0) {
             u.uprops[SEE_INVIS].intrinsic = $c.or64(u.uprops[SEE_INVIS].intrinsic, FROMFORM);
         } else {
             u.uprops[SEE_INVIS].intrinsic = $c.and64(u.uprops[SEE_INVIS].intrinsic, ~FROMFORM);
@@ -217,7 +217,7 @@ export async function set_uasmon() {   // polyself.c:38
         }
     } while (0);
     do {
-        if ((u.umonnum !== u.umonster ? mdat : $c.relem(mons, gu.urace.mnum)).mflags3 & 256) {
+        if ((u.umonnum !== u.umonster ? mdat : $c.relem(mons, gu.urace.mnum)).mflags3 & M3_INFRAVISION) {
             u.uprops[INFRAVISION].intrinsic = $c.or64(u.uprops[INFRAVISION].intrinsic, FROMFORM);
         } else {
             u.uprops[INFRAVISION].intrinsic = $c.and64(u.uprops[INFRAVISION].intrinsic, ~FROMFORM);
@@ -231,14 +231,14 @@ export async function set_uasmon() {   // polyself.c:38
         }
     } while (0);
     do {
-        if ($c.andu64(mdat.mflags1, 33554432) !== 0) {
+        if ($c.andu64(mdat.mflags1, M1_TPORT) !== 0) {
             u.uprops[TELEPORT].intrinsic = $c.or64(u.uprops[TELEPORT].intrinsic, FROMFORM);
         } else {
             u.uprops[TELEPORT].intrinsic = $c.and64(u.uprops[TELEPORT].intrinsic, ~FROMFORM);
         }
     } while (0);
     do {
-        if ($c.andu64(mdat.mflags1, 67108864) !== 0) {
+        if ($c.andu64(mdat.mflags1, M1_TPORT_CNTRL) !== 0) {
             u.uprops[TELEPORT_CONTROL].intrinsic = $c.or64(u.uprops[TELEPORT_CONTROL].intrinsic, FROMFORM);
         } else {
             u.uprops[TELEPORT_CONTROL].intrinsic = $c.and64(u.uprops[TELEPORT_CONTROL].intrinsic, ~FROMFORM);
@@ -252,28 +252,28 @@ export async function set_uasmon() {   // polyself.c:38
         }
     } while (0);
     do {
-        if ($c.andu64(mdat.mflags1, 1) !== 0 && !(mdat.mlet === S_EYE || mdat.mlet === S_LIGHT)) {
+        if ($c.andu64(mdat.mflags1, M1_FLY) !== 0 && !(mdat.mlet === S_EYE || mdat.mlet === S_LIGHT)) {
             u.uprops[FLYING].intrinsic = $c.or64(u.uprops[FLYING].intrinsic, FROMFORM);
         } else {
             u.uprops[FLYING].intrinsic = $c.and64(u.uprops[FLYING].intrinsic, ~FROMFORM);
         }
     } while (0);
     do {
-        if ($c.andu64(mdat.mflags1, 2) !== 0) {
+        if ($c.andu64(mdat.mflags1, M1_SWIM) !== 0) {
             u.uprops[SWIMMING].intrinsic = $c.or64(u.uprops[SWIMMING].intrinsic, FROMFORM);
         } else {
             u.uprops[SWIMMING].intrinsic = $c.and64(u.uprops[SWIMMING].intrinsic, ~FROMFORM);
         }
     } while (0);
     do {
-        if ($c.andu64(mdat.mflags1, 8) !== 0) {
+        if ($c.andu64(mdat.mflags1, M1_WALLWALK) !== 0) {
             u.uprops[PASSES_WALLS].intrinsic = $c.or64(u.uprops[PASSES_WALLS].intrinsic, FROMFORM);
         } else {
             u.uprops[PASSES_WALLS].intrinsic = $c.and64(u.uprops[PASSES_WALLS].intrinsic, ~FROMFORM);
         }
     } while (0);
     do {
-        if ($c.andu64(mdat.mflags1, 8388608) !== 0) {
+        if ($c.andu64(mdat.mflags1, M1_REGEN) !== 0) {
             u.uprops[REGENERATION].intrinsic = $c.or64(u.uprops[REGENERATION].intrinsic, FROMFORM);
         } else {
             u.uprops[REGENERATION].intrinsic = $c.and64(u.uprops[REGENERATION].intrinsic, ~FROMFORM);
@@ -287,14 +287,14 @@ export async function set_uasmon() {   // polyself.c:38
         }
     } while (0);
     do {
-        if (!($c.andu64(mdat.mflags1, 4096) === 0)) {
+        if (!($c.andu64(mdat.mflags1, M1_NOEYES) === 0)) {
             u.uprops[BLINDED].intrinsic = $c.or64(u.uprops[BLINDED].intrinsic, FROMFORM);
         } else {
             u.uprops[BLINDED].intrinsic = $c.and64(u.uprops[BLINDED].intrinsic, ~FROMFORM);
         }
     } while (0);
     do {
-        if (dmgtype_fromattack(mdat, 11, 13) || dmgtype_fromattack(mdat, 11, 15)) {
+        if (dmgtype_fromattack(mdat, AD_BLND, AT_EXPL) || dmgtype_fromattack(mdat, AD_BLND, AT_GAZE)) {
             u.uprops[BLND_RES].intrinsic = $c.or64(u.uprops[BLND_RES].intrinsic, FROMFORM);
         } else {
             u.uprops[BLND_RES].intrinsic = $c.and64(u.uprops[BLND_RES].intrinsic, ~FROMFORM);
@@ -804,7 +804,7 @@ export async function polymon(mntmp) {   // polyself.c:735
     $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), u.umonnum !== mntmp ? $c.lit("") : $c.lit("new "), 256);
     if (dochange) {
         flags.female = $c.i8(!flags.female ? 1 : 0);
-        $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.andu64($c.relem(mons, mntmp).mflags2, 65536) !== 0 || $c.andu64($c.relem(mons, mntmp).mflags2, 131072) !== 0 ? $c.lit("") : flags.female ? $c.lit("female ") : $c.lit("male "), 256);
+        $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.andu64($c.relem(mons, mntmp).mflags2, M2_MALE) !== 0 || $c.andu64($c.relem(mons, mntmp).mflags2, M2_FEMALE) !== 0 ? $c.lit("") : flags.female ? $c.lit("female ") : $c.lit("male "), 256);
     }
     $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), pmname($c.relem(mons, mntmp), flags.female ? FEMALE : MALE), 256);
     await You($c.lit("%s %s!"), u.umonnum !== mntmp ? $c.lit("turn into") : $c.lit("feel like"), await an(new $c.Ptr(buf, 0)));
@@ -1265,7 +1265,7 @@ export async function dobreathe() {   // polyself.c:1421
     } else if (!u.dx && !u.dy && !u.dz) {
         await ubreatheu(mattk);
     } else {
-        await ubuzz(20 + $c.rem32($c.abs(mattk.adtyp - 1 | 0), 10) | 0, mattk.damn);
+        await ubuzz(20 + $c.rem32($c.abs(mattk.adtyp - AD_MAGM | 0), 10) | 0, mattk.damn);
     }
     return ECMD_TIME;
 }
@@ -1481,7 +1481,7 @@ export async function dogaze() {   // polyself.c:1642
                 await You($c.lit("avoid gazing at %s."), await y_monnam(mtmp));
             } else {
                 if (flags.confirm && mtmp.mpeaceful | 0 && !u.uprops[CONFUSION].intrinsic) {
-                    $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("Really %s %s?"), adtyp === 25 ? $c.lit("confuse") : $c.lit("attack"), await mon_nam(mtmp));
+                    $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("Really %s %s?"), adtyp === AD_CONF ? $c.lit("confuse") : $c.lit("attack"), await mon_nam(mtmp));
                     if (await y_n(new $c.Ptr(qbuf, 0)) !== 121) {
                         continue;
                     }
@@ -1894,255 +1894,281 @@ export function $init() {
     polymon$monsterc.fill(0);
     polymon$monsterc.set([109, 111, 110, 115, 116, 101, 114]);   // "monster"
     mbodypart$humanoid_parts.fill(null);
-    mbodypart$humanoid_parts[0] = $c.lit("arm");
-    mbodypart$humanoid_parts[1] = $c.lit("eye");
-    mbodypart$humanoid_parts[2] = $c.lit("face");
-    mbodypart$humanoid_parts[3] = $c.lit("finger");
-    mbodypart$humanoid_parts[4] = $c.lit("fingertip");
-    mbodypart$humanoid_parts[5] = $c.lit("foot");
-    mbodypart$humanoid_parts[6] = $c.lit("hand");
-    mbodypart$humanoid_parts[7] = $c.lit("handed");
-    mbodypart$humanoid_parts[8] = $c.lit("head");
-    mbodypart$humanoid_parts[9] = $c.lit("leg");
-    mbodypart$humanoid_parts[10] = $c.lit("light headed");
-    mbodypart$humanoid_parts[11] = $c.lit("neck");
-    mbodypart$humanoid_parts[12] = $c.lit("spine");
-    mbodypart$humanoid_parts[13] = $c.lit("toe");
-    mbodypart$humanoid_parts[14] = $c.lit("hair");
-    mbodypart$humanoid_parts[15] = $c.lit("blood");
-    mbodypart$humanoid_parts[16] = $c.lit("lung");
-    mbodypart$humanoid_parts[17] = $c.lit("nose");
-    mbodypart$humanoid_parts[18] = $c.lit("stomach");
+    $c.init(mbodypart$humanoid_parts, [
+        $c.lit("arm"),
+        $c.lit("eye"),
+        $c.lit("face"),
+        $c.lit("finger"),
+        $c.lit("fingertip"),
+        $c.lit("foot"),
+        $c.lit("hand"),
+        $c.lit("handed"),
+        $c.lit("head"),
+        $c.lit("leg"),
+        $c.lit("light headed"),
+        $c.lit("neck"),
+        $c.lit("spine"),
+        $c.lit("toe"),
+        $c.lit("hair"),
+        $c.lit("blood"),
+        $c.lit("lung"),
+        $c.lit("nose"),
+        $c.lit("stomach")
+    ]);
     mbodypart$jelly_parts.fill(null);
-    mbodypart$jelly_parts[0] = $c.lit("pseudopod");
-    mbodypart$jelly_parts[1] = $c.lit("dark spot");
-    mbodypart$jelly_parts[2] = $c.lit("front");
-    mbodypart$jelly_parts[3] = $c.lit("pseudopod extension");
-    mbodypart$jelly_parts[4] = $c.lit("pseudopod extremity");
-    mbodypart$jelly_parts[5] = $c.lit("pseudopod root");
-    mbodypart$jelly_parts[6] = $c.lit("grasp");
-    mbodypart$jelly_parts[7] = $c.lit("grasped");
-    mbodypart$jelly_parts[8] = $c.lit("cerebral area");
-    mbodypart$jelly_parts[9] = $c.lit("lower pseudopod");
-    mbodypart$jelly_parts[10] = $c.lit("viscous");
-    mbodypart$jelly_parts[11] = $c.lit("middle");
-    mbodypart$jelly_parts[12] = $c.lit("surface");
-    mbodypart$jelly_parts[13] = $c.lit("pseudopod extremity");
-    mbodypart$jelly_parts[14] = $c.lit("ripples");
-    mbodypart$jelly_parts[15] = $c.lit("juices");
-    mbodypart$jelly_parts[16] = $c.lit("surface");
-    mbodypart$jelly_parts[17] = $c.lit("sensor");
-    mbodypart$jelly_parts[18] = $c.lit("stomach");
+    $c.init(mbodypart$jelly_parts, [
+        $c.lit("pseudopod"),
+        $c.lit("dark spot"),
+        $c.lit("front"),
+        $c.lit("pseudopod extension"),
+        $c.lit("pseudopod extremity"),
+        $c.lit("pseudopod root"),
+        $c.lit("grasp"),
+        $c.lit("grasped"),
+        $c.lit("cerebral area"),
+        $c.lit("lower pseudopod"),
+        $c.lit("viscous"),
+        $c.lit("middle"),
+        $c.lit("surface"),
+        $c.lit("pseudopod extremity"),
+        $c.lit("ripples"),
+        $c.lit("juices"),
+        $c.lit("surface"),
+        $c.lit("sensor"),
+        $c.lit("stomach")
+    ]);
     mbodypart$animal_parts.fill(null);
-    mbodypart$animal_parts[0] = $c.lit("forelimb");
-    mbodypart$animal_parts[1] = $c.lit("eye");
-    mbodypart$animal_parts[2] = $c.lit("face");
-    mbodypart$animal_parts[3] = $c.lit("foreclaw");
-    mbodypart$animal_parts[4] = $c.lit("claw tip");
-    mbodypart$animal_parts[5] = $c.lit("rear claw");
-    mbodypart$animal_parts[6] = $c.lit("foreclaw");
-    mbodypart$animal_parts[7] = $c.lit("clawed");
-    mbodypart$animal_parts[8] = $c.lit("head");
-    mbodypart$animal_parts[9] = $c.lit("rear limb");
-    mbodypart$animal_parts[10] = $c.lit("light headed");
-    mbodypart$animal_parts[11] = $c.lit("neck");
-    mbodypart$animal_parts[12] = $c.lit("spine");
-    mbodypart$animal_parts[13] = $c.lit("rear claw tip");
-    mbodypart$animal_parts[14] = $c.lit("fur");
-    mbodypart$animal_parts[15] = $c.lit("blood");
-    mbodypart$animal_parts[16] = $c.lit("lung");
-    mbodypart$animal_parts[17] = $c.lit("nose");
-    mbodypart$animal_parts[18] = $c.lit("stomach");
+    $c.init(mbodypart$animal_parts, [
+        $c.lit("forelimb"),
+        $c.lit("eye"),
+        $c.lit("face"),
+        $c.lit("foreclaw"),
+        $c.lit("claw tip"),
+        $c.lit("rear claw"),
+        $c.lit("foreclaw"),
+        $c.lit("clawed"),
+        $c.lit("head"),
+        $c.lit("rear limb"),
+        $c.lit("light headed"),
+        $c.lit("neck"),
+        $c.lit("spine"),
+        $c.lit("rear claw tip"),
+        $c.lit("fur"),
+        $c.lit("blood"),
+        $c.lit("lung"),
+        $c.lit("nose"),
+        $c.lit("stomach")
+    ]);
     mbodypart$bird_parts.fill(null);
-    mbodypart$bird_parts[0] = $c.lit("wing");
-    mbodypart$bird_parts[1] = $c.lit("eye");
-    mbodypart$bird_parts[2] = $c.lit("face");
-    mbodypart$bird_parts[3] = $c.lit("wing");
-    mbodypart$bird_parts[4] = $c.lit("wing tip");
-    mbodypart$bird_parts[5] = $c.lit("foot");
-    mbodypart$bird_parts[6] = $c.lit("wing");
-    mbodypart$bird_parts[7] = $c.lit("winged");
-    mbodypart$bird_parts[8] = $c.lit("head");
-    mbodypart$bird_parts[9] = $c.lit("leg");
-    mbodypart$bird_parts[10] = $c.lit("light headed");
-    mbodypart$bird_parts[11] = $c.lit("neck");
-    mbodypart$bird_parts[12] = $c.lit("spine");
-    mbodypart$bird_parts[13] = $c.lit("toe");
-    mbodypart$bird_parts[14] = $c.lit("feathers");
-    mbodypart$bird_parts[15] = $c.lit("blood");
-    mbodypart$bird_parts[16] = $c.lit("lung");
-    mbodypart$bird_parts[17] = $c.lit("bill");
-    mbodypart$bird_parts[18] = $c.lit("stomach");
+    $c.init(mbodypart$bird_parts, [
+        $c.lit("wing"),
+        $c.lit("eye"),
+        $c.lit("face"),
+        $c.lit("wing"),
+        $c.lit("wing tip"),
+        $c.lit("foot"),
+        $c.lit("wing"),
+        $c.lit("winged"),
+        $c.lit("head"),
+        $c.lit("leg"),
+        $c.lit("light headed"),
+        $c.lit("neck"),
+        $c.lit("spine"),
+        $c.lit("toe"),
+        $c.lit("feathers"),
+        $c.lit("blood"),
+        $c.lit("lung"),
+        $c.lit("bill"),
+        $c.lit("stomach")
+    ]);
     mbodypart$horse_parts.fill(null);
-    mbodypart$horse_parts[0] = $c.lit("foreleg");
-    mbodypart$horse_parts[1] = $c.lit("eye");
-    mbodypart$horse_parts[2] = $c.lit("face");
-    mbodypart$horse_parts[3] = $c.lit("forehoof");
-    mbodypart$horse_parts[4] = $c.lit("hoof tip");
-    mbodypart$horse_parts[5] = $c.lit("rear hoof");
-    mbodypart$horse_parts[6] = $c.lit("forehoof");
-    mbodypart$horse_parts[7] = $c.lit("hooved");
-    mbodypart$horse_parts[8] = $c.lit("head");
-    mbodypart$horse_parts[9] = $c.lit("rear leg");
-    mbodypart$horse_parts[10] = $c.lit("light headed");
-    mbodypart$horse_parts[11] = $c.lit("neck");
-    mbodypart$horse_parts[12] = $c.lit("backbone");
-    mbodypart$horse_parts[13] = $c.lit("rear hoof tip");
-    mbodypart$horse_parts[14] = $c.lit("mane");
-    mbodypart$horse_parts[15] = $c.lit("blood");
-    mbodypart$horse_parts[16] = $c.lit("lung");
-    mbodypart$horse_parts[17] = $c.lit("nose");
-    mbodypart$horse_parts[18] = $c.lit("stomach");
+    $c.init(mbodypart$horse_parts, [
+        $c.lit("foreleg"),
+        $c.lit("eye"),
+        $c.lit("face"),
+        $c.lit("forehoof"),
+        $c.lit("hoof tip"),
+        $c.lit("rear hoof"),
+        $c.lit("forehoof"),
+        $c.lit("hooved"),
+        $c.lit("head"),
+        $c.lit("rear leg"),
+        $c.lit("light headed"),
+        $c.lit("neck"),
+        $c.lit("backbone"),
+        $c.lit("rear hoof tip"),
+        $c.lit("mane"),
+        $c.lit("blood"),
+        $c.lit("lung"),
+        $c.lit("nose"),
+        $c.lit("stomach")
+    ]);
     mbodypart$sphere_parts.fill(null);
-    mbodypart$sphere_parts[0] = $c.lit("appendage");
-    mbodypart$sphere_parts[1] = $c.lit("optic nerve");
-    mbodypart$sphere_parts[2] = $c.lit("body");
-    mbodypart$sphere_parts[3] = $c.lit("tentacle");
-    mbodypart$sphere_parts[4] = $c.lit("tentacle tip");
-    mbodypart$sphere_parts[5] = $c.lit("lower appendage");
-    mbodypart$sphere_parts[6] = $c.lit("tentacle");
-    mbodypart$sphere_parts[7] = $c.lit("tentacled");
-    mbodypart$sphere_parts[8] = $c.lit("body");
-    mbodypart$sphere_parts[9] = $c.lit("lower tentacle");
-    mbodypart$sphere_parts[10] = $c.lit("rotational");
-    mbodypart$sphere_parts[11] = $c.lit("equator");
-    mbodypart$sphere_parts[12] = $c.lit("body");
-    mbodypart$sphere_parts[13] = $c.lit("lower tentacle tip");
-    mbodypart$sphere_parts[14] = $c.lit("cilia");
-    mbodypart$sphere_parts[15] = $c.lit("life force");
-    mbodypart$sphere_parts[16] = $c.lit("retina");
-    mbodypart$sphere_parts[17] = $c.lit("olfactory nerve");
-    mbodypart$sphere_parts[18] = $c.lit("interior");
+    $c.init(mbodypart$sphere_parts, [
+        $c.lit("appendage"),
+        $c.lit("optic nerve"),
+        $c.lit("body"),
+        $c.lit("tentacle"),
+        $c.lit("tentacle tip"),
+        $c.lit("lower appendage"),
+        $c.lit("tentacle"),
+        $c.lit("tentacled"),
+        $c.lit("body"),
+        $c.lit("lower tentacle"),
+        $c.lit("rotational"),
+        $c.lit("equator"),
+        $c.lit("body"),
+        $c.lit("lower tentacle tip"),
+        $c.lit("cilia"),
+        $c.lit("life force"),
+        $c.lit("retina"),
+        $c.lit("olfactory nerve"),
+        $c.lit("interior")
+    ]);
     mbodypart$fungus_parts.fill(null);
-    mbodypart$fungus_parts[0] = $c.lit("mycelium");
-    mbodypart$fungus_parts[1] = $c.lit("visual area");
-    mbodypart$fungus_parts[2] = $c.lit("front");
-    mbodypart$fungus_parts[3] = $c.lit("hypha");
-    mbodypart$fungus_parts[4] = $c.lit("hypha");
-    mbodypart$fungus_parts[5] = $c.lit("root");
-    mbodypart$fungus_parts[6] = $c.lit("strand");
-    mbodypart$fungus_parts[7] = $c.lit("stranded");
-    mbodypart$fungus_parts[8] = $c.lit("cap area");
-    mbodypart$fungus_parts[9] = $c.lit("rhizome");
-    mbodypart$fungus_parts[10] = $c.lit("sporulated");
-    mbodypart$fungus_parts[11] = $c.lit("stalk");
-    mbodypart$fungus_parts[12] = $c.lit("root");
-    mbodypart$fungus_parts[13] = $c.lit("rhizome tip");
-    mbodypart$fungus_parts[14] = $c.lit("spores");
-    mbodypart$fungus_parts[15] = $c.lit("juices");
-    mbodypart$fungus_parts[16] = $c.lit("gill");
-    mbodypart$fungus_parts[17] = $c.lit("gill");
-    mbodypart$fungus_parts[18] = $c.lit("interior");
+    $c.init(mbodypart$fungus_parts, [
+        $c.lit("mycelium"),
+        $c.lit("visual area"),
+        $c.lit("front"),
+        $c.lit("hypha"),
+        $c.lit("hypha"),
+        $c.lit("root"),
+        $c.lit("strand"),
+        $c.lit("stranded"),
+        $c.lit("cap area"),
+        $c.lit("rhizome"),
+        $c.lit("sporulated"),
+        $c.lit("stalk"),
+        $c.lit("root"),
+        $c.lit("rhizome tip"),
+        $c.lit("spores"),
+        $c.lit("juices"),
+        $c.lit("gill"),
+        $c.lit("gill"),
+        $c.lit("interior")
+    ]);
     mbodypart$vortex_parts.fill(null);
-    mbodypart$vortex_parts[0] = $c.lit("region");
-    mbodypart$vortex_parts[1] = $c.lit("eye");
-    mbodypart$vortex_parts[2] = $c.lit("front");
-    mbodypart$vortex_parts[3] = $c.lit("minor current");
-    mbodypart$vortex_parts[4] = $c.lit("minor current");
-    mbodypart$vortex_parts[5] = $c.lit("lower current");
-    mbodypart$vortex_parts[6] = $c.lit("swirl");
-    mbodypart$vortex_parts[7] = $c.lit("swirled");
-    mbodypart$vortex_parts[8] = $c.lit("central core");
-    mbodypart$vortex_parts[9] = $c.lit("lower current");
-    mbodypart$vortex_parts[10] = $c.lit("addled");
-    mbodypart$vortex_parts[11] = $c.lit("center");
-    mbodypart$vortex_parts[12] = $c.lit("currents");
-    mbodypart$vortex_parts[13] = $c.lit("edge");
-    mbodypart$vortex_parts[14] = $c.lit("currents");
-    mbodypart$vortex_parts[15] = $c.lit("life force");
-    mbodypart$vortex_parts[16] = $c.lit("center");
-    mbodypart$vortex_parts[17] = $c.lit("leading edge");
-    mbodypart$vortex_parts[18] = $c.lit("interior");
+    $c.init(mbodypart$vortex_parts, [
+        $c.lit("region"),
+        $c.lit("eye"),
+        $c.lit("front"),
+        $c.lit("minor current"),
+        $c.lit("minor current"),
+        $c.lit("lower current"),
+        $c.lit("swirl"),
+        $c.lit("swirled"),
+        $c.lit("central core"),
+        $c.lit("lower current"),
+        $c.lit("addled"),
+        $c.lit("center"),
+        $c.lit("currents"),
+        $c.lit("edge"),
+        $c.lit("currents"),
+        $c.lit("life force"),
+        $c.lit("center"),
+        $c.lit("leading edge"),
+        $c.lit("interior")
+    ]);
     mbodypart$snake_parts.fill(null);
-    mbodypart$snake_parts[0] = $c.lit("vestigial limb");
-    mbodypart$snake_parts[1] = $c.lit("eye");
-    mbodypart$snake_parts[2] = $c.lit("face");
-    mbodypart$snake_parts[3] = $c.lit("large scale");
-    mbodypart$snake_parts[4] = $c.lit("large scale tip");
-    mbodypart$snake_parts[5] = $c.lit("rear region");
-    mbodypart$snake_parts[6] = $c.lit("scale gap");
-    mbodypart$snake_parts[7] = $c.lit("scale gapped");
-    mbodypart$snake_parts[8] = $c.lit("head");
-    mbodypart$snake_parts[9] = $c.lit("rear region");
-    mbodypart$snake_parts[10] = $c.lit("light headed");
-    mbodypart$snake_parts[11] = $c.lit("neck");
-    mbodypart$snake_parts[12] = $c.lit("length");
-    mbodypart$snake_parts[13] = $c.lit("rear scale");
-    mbodypart$snake_parts[14] = $c.lit("scales");
-    mbodypart$snake_parts[15] = $c.lit("blood");
-    mbodypart$snake_parts[16] = $c.lit("lung");
-    mbodypart$snake_parts[17] = $c.lit("forked tongue");
-    mbodypart$snake_parts[18] = $c.lit("stomach");
+    $c.init(mbodypart$snake_parts, [
+        $c.lit("vestigial limb"),
+        $c.lit("eye"),
+        $c.lit("face"),
+        $c.lit("large scale"),
+        $c.lit("large scale tip"),
+        $c.lit("rear region"),
+        $c.lit("scale gap"),
+        $c.lit("scale gapped"),
+        $c.lit("head"),
+        $c.lit("rear region"),
+        $c.lit("light headed"),
+        $c.lit("neck"),
+        $c.lit("length"),
+        $c.lit("rear scale"),
+        $c.lit("scales"),
+        $c.lit("blood"),
+        $c.lit("lung"),
+        $c.lit("forked tongue"),
+        $c.lit("stomach")
+    ]);
     mbodypart$worm_parts.fill(null);
-    mbodypart$worm_parts[0] = $c.lit("anterior segment");
-    mbodypart$worm_parts[1] = $c.lit("light sensitive cell");
-    mbodypart$worm_parts[2] = $c.lit("clitellum");
-    mbodypart$worm_parts[3] = $c.lit("setae");
-    mbodypart$worm_parts[4] = $c.lit("setae");
-    mbodypart$worm_parts[5] = $c.lit("posterior segment");
-    mbodypart$worm_parts[6] = $c.lit("segment");
-    mbodypart$worm_parts[7] = $c.lit("segmented");
-    mbodypart$worm_parts[8] = $c.lit("anterior segment");
-    mbodypart$worm_parts[9] = $c.lit("posterior");
-    mbodypart$worm_parts[10] = $c.lit("over stretched");
-    mbodypart$worm_parts[11] = $c.lit("clitellum");
-    mbodypart$worm_parts[12] = $c.lit("length");
-    mbodypart$worm_parts[13] = $c.lit("posterior setae");
-    mbodypart$worm_parts[14] = $c.lit("setae");
-    mbodypart$worm_parts[15] = $c.lit("blood");
-    mbodypart$worm_parts[16] = $c.lit("skin");
-    mbodypart$worm_parts[17] = $c.lit("prostomium");
-    mbodypart$worm_parts[18] = $c.lit("stomach");
+    $c.init(mbodypart$worm_parts, [
+        $c.lit("anterior segment"),
+        $c.lit("light sensitive cell"),
+        $c.lit("clitellum"),
+        $c.lit("setae"),
+        $c.lit("setae"),
+        $c.lit("posterior segment"),
+        $c.lit("segment"),
+        $c.lit("segmented"),
+        $c.lit("anterior segment"),
+        $c.lit("posterior"),
+        $c.lit("over stretched"),
+        $c.lit("clitellum"),
+        $c.lit("length"),
+        $c.lit("posterior setae"),
+        $c.lit("setae"),
+        $c.lit("blood"),
+        $c.lit("skin"),
+        $c.lit("prostomium"),
+        $c.lit("stomach")
+    ]);
     mbodypart$spider_parts.fill(null);
-    mbodypart$spider_parts[0] = $c.lit("pedipalp");
-    mbodypart$spider_parts[1] = $c.lit("eye");
-    mbodypart$spider_parts[2] = $c.lit("face");
-    mbodypart$spider_parts[3] = $c.lit("pedipalp");
-    mbodypart$spider_parts[4] = $c.lit("tarsus");
-    mbodypart$spider_parts[5] = $c.lit("claw");
-    mbodypart$spider_parts[6] = $c.lit("pedipalp");
-    mbodypart$spider_parts[7] = $c.lit("palped");
-    mbodypart$spider_parts[8] = $c.lit("cephalothorax");
-    mbodypart$spider_parts[9] = $c.lit("leg");
-    mbodypart$spider_parts[10] = $c.lit("spun out");
-    mbodypart$spider_parts[11] = $c.lit("cephalothorax");
-    mbodypart$spider_parts[12] = $c.lit("abdomen");
-    mbodypart$spider_parts[13] = $c.lit("claw");
-    mbodypart$spider_parts[14] = $c.lit("hair");
-    mbodypart$spider_parts[15] = $c.lit("hemolymph");
-    mbodypart$spider_parts[16] = $c.lit("book lung");
-    mbodypart$spider_parts[17] = $c.lit("labrum");
-    mbodypart$spider_parts[18] = $c.lit("digestive tract");
+    $c.init(mbodypart$spider_parts, [
+        $c.lit("pedipalp"),
+        $c.lit("eye"),
+        $c.lit("face"),
+        $c.lit("pedipalp"),
+        $c.lit("tarsus"),
+        $c.lit("claw"),
+        $c.lit("pedipalp"),
+        $c.lit("palped"),
+        $c.lit("cephalothorax"),
+        $c.lit("leg"),
+        $c.lit("spun out"),
+        $c.lit("cephalothorax"),
+        $c.lit("abdomen"),
+        $c.lit("claw"),
+        $c.lit("hair"),
+        $c.lit("hemolymph"),
+        $c.lit("book lung"),
+        $c.lit("labrum"),
+        $c.lit("digestive tract")
+    ]);
     mbodypart$fish_parts.fill(null);
-    mbodypart$fish_parts[0] = $c.lit("fin");
-    mbodypart$fish_parts[1] = $c.lit("eye");
-    mbodypart$fish_parts[2] = $c.lit("premaxillary");
-    mbodypart$fish_parts[3] = $c.lit("pelvic axillary");
-    mbodypart$fish_parts[4] = $c.lit("pelvic fin");
-    mbodypart$fish_parts[5] = $c.lit("anal fin");
-    mbodypart$fish_parts[6] = $c.lit("pectoral fin");
-    mbodypart$fish_parts[7] = $c.lit("finned");
-    mbodypart$fish_parts[8] = $c.lit("head");
-    mbodypart$fish_parts[9] = $c.lit("peduncle");
-    mbodypart$fish_parts[10] = $c.lit("played out");
-    mbodypart$fish_parts[11] = $c.lit("gills");
-    mbodypart$fish_parts[12] = $c.lit("dorsal fin");
-    mbodypart$fish_parts[13] = $c.lit("caudal fin");
-    mbodypart$fish_parts[14] = $c.lit("scales");
-    mbodypart$fish_parts[15] = $c.lit("blood");
-    mbodypart$fish_parts[16] = $c.lit("gill");
-    mbodypart$fish_parts[17] = $c.lit("nostril");
-    mbodypart$fish_parts[18] = $c.lit("stomach");
+    $c.init(mbodypart$fish_parts, [
+        $c.lit("fin"),
+        $c.lit("eye"),
+        $c.lit("premaxillary"),
+        $c.lit("pelvic axillary"),
+        $c.lit("pelvic fin"),
+        $c.lit("anal fin"),
+        $c.lit("pectoral fin"),
+        $c.lit("finned"),
+        $c.lit("head"),
+        $c.lit("peduncle"),
+        $c.lit("played out"),
+        $c.lit("gills"),
+        $c.lit("dorsal fin"),
+        $c.lit("caudal fin"),
+        $c.lit("scales"),
+        $c.lit("blood"),
+        $c.lit("gill"),
+        $c.lit("nostril"),
+        $c.lit("stomach")
+    ]);
     mbodypart$not_claws.fill(0);
-    mbodypart$not_claws[0] = S_HUMAN;
-    mbodypart$not_claws[1] = S_MUMMY;
-    mbodypart$not_claws[2] = S_ZOMBIE;
-    mbodypart$not_claws[3] = S_ANGEL;
-    mbodypart$not_claws[4] = S_NYMPH;
-    mbodypart$not_claws[5] = S_LEPRECHAUN;
-    mbodypart$not_claws[6] = S_QUANTMECH;
-    mbodypart$not_claws[7] = S_VAMPIRE;
-    mbodypart$not_claws[8] = S_ORC;
-    mbodypart$not_claws[9] = S_GIANT;
-    mbodypart$not_claws[10] = 0;
+    $c.init(mbodypart$not_claws, [
+        S_HUMAN,
+        S_MUMMY,
+        S_ZOMBIE,
+        S_ANGEL,
+        S_NYMPH,
+        S_LEPRECHAUN,
+        S_QUANTMECH,
+        S_VAMPIRE,
+        S_ORC,
+        S_GIANT,
+        0
+    ]);
 }

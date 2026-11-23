@@ -18,7 +18,7 @@ import { Monnam, mon_nam } from './do_name.js';
 import { def_oc_syms } from './drawing.js';
 import { panic } from './end.js';
 import { wizard } from './flag.macros.js';
-import { FALSE, TRUE } from './global.h.js';
+import { FALSE, MAXULEV, TRUE } from './global.h.js';
 import { handle_tip } from './hack.js';
 import { ECMD_OK, HAND } from './hack.h.js';
 import { plur } from './hack.macros.js';
@@ -59,6 +59,7 @@ import { add_menu, add_menu_heading, add_menu_str, select_menu } from './windows
 import { create_nhwindow, destroy_nhwindow, end_menu, start_menu } from './winprocs.macros.js';
 import { ATR_NONE, MENU_BEHAVE_STANDARD, MENU_ITEMFLAGS_NONE, NHW_MENU, PICK_NONE, PICK_ONE } from './wintype.h.js';
 import { bypass_obj, which_armor } from './worn.js';
+import { PRONOUN_HALLU } from './you.h.js';
 import { Upolyd } from './you.macros.js';
 
 const PN_BARE_HANDED = (-1);
@@ -615,7 +616,7 @@ export async function mon_wield_item(mon) {   // weapon.c:801
                 if (bimanual(mw_tmp)) {
                     mon_hand = await makeplural(mon_hand);
                 }
-                $c.__builtin___sprintf_chk(new $c.Ptr(welded_buf, 0), 0, 256, $c.lit("%s welded to %s %s"), await otense(mw_tmp, $c.lit("are")), genders[pronoun_gender(mon, 2)].his, mon_hand);
+                $c.__builtin___sprintf_chk(new $c.Ptr(welded_buf, 0), 0, 256, $c.lit("%s welded to %s %s"), await otense(mw_tmp, $c.lit("are")), genders[pronoun_gender(mon, PRONOUN_HALLU)].his, mon_hand);
                 if (obj.otyp === PICK_AXE) {
                     await pline($c.lit("Since %s weapon%s %s,"), s_suffix(await mon_nam(mon)), plur(mw_tmp.quan), new $c.Ptr(welded_buf, 0));
                     await pline($c.lit("%s cannot wield that %s."), await mon_nam(mon), await xname(obj));
@@ -897,7 +898,7 @@ export async function show_skills() {   // weapon.c:1306
     await start_menu()(win, MENU_BEHAVE_STANDARD);
     await add_skills_to_menu(win, FALSE, FALSE);
     await end_menu()(win, $c.lit(""));
-    await select_menu(win, 0, new $c.Ptr(selected, 0));
+    await select_menu(win, PICK_NONE, new $c.Ptr(selected, 0));
     await destroy_nhwindow()(win);
 }
 export async function enhance_weapon_skill() {   // weapon.c:1329
@@ -925,7 +926,7 @@ export async function enhance_weapon_skill() {   // weapon.c:1329
         await start_menu()(win, MENU_BEHAVE_STANDARD);
         if (eventually_advance > 0 || maxxed_cnt > 0) {
             if (eventually_advance > 0) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("(Skill%s flagged by \"*\" may be enhanced %s.)"), eventually_advance === 1 ? $c.lit("") : $c.lit("s"), u.ulevel < 30 ? $c.lit("when you're more experienced") : $c.lit("if skill slots become available"));
+                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("(Skill%s flagged by \"*\" may be enhanced %s.)"), eventually_advance === 1 ? $c.lit("") : $c.lit("s"), u.ulevel < MAXULEV ? $c.lit("when you're more experienced") : $c.lit("if skill slots become available"));
                 await add_menu_str(win, new $c.Ptr(buf, 0));
             }
             if (maxxed_cnt > 0) {
@@ -1265,173 +1266,183 @@ export async function setmnotwielded(mon, obj) {   // weapon.c:1814
 
 export function $init() {
     skill_names_indices.fill(0);
-    skill_names_indices[0] = 0;
-    skill_names_indices[1] = DAGGER;
-    skill_names_indices[2] = KNIFE;
-    skill_names_indices[3] = AXE;
-    skill_names_indices[4] = PICK_AXE;
-    skill_names_indices[5] = SHORT_SWORD;
-    skill_names_indices[6] = BROADSWORD;
-    skill_names_indices[7] = LONG_SWORD;
-    skill_names_indices[8] = TWO_HANDED_SWORD;
-    skill_names_indices[9] = PN_SABER;
-    skill_names_indices[10] = CLUB;
-    skill_names_indices[11] = MACE;
-    skill_names_indices[12] = MORNING_STAR;
-    skill_names_indices[13] = FLAIL;
-    skill_names_indices[14] = PN_HAMMER;
-    skill_names_indices[15] = QUARTERSTAFF;
-    skill_names_indices[16] = PN_POLEARMS;
-    skill_names_indices[17] = SPEAR;
-    skill_names_indices[18] = TRIDENT;
-    skill_names_indices[19] = LANCE;
-    skill_names_indices[20] = BOW;
-    skill_names_indices[21] = SLING;
-    skill_names_indices[22] = CROSSBOW;
-    skill_names_indices[23] = DART;
-    skill_names_indices[24] = SHURIKEN;
-    skill_names_indices[25] = BOOMERANG;
-    skill_names_indices[26] = PN_WHIP;
-    skill_names_indices[27] = UNICORN_HORN;
-    skill_names_indices[28] = PN_ATTACK_SPELL;
-    skill_names_indices[29] = PN_HEALING_SPELL;
-    skill_names_indices[30] = PN_DIVINATION_SPELL;
-    skill_names_indices[31] = PN_ENCHANTMENT_SPELL;
-    skill_names_indices[32] = PN_CLERIC_SPELL;
-    skill_names_indices[33] = PN_ESCAPE_SPELL;
-    skill_names_indices[34] = PN_MATTER_SPELL;
-    skill_names_indices[35] = PN_BARE_HANDED;
-    skill_names_indices[36] = PN_TWO_WEAPONS;
-    skill_names_indices[37] = PN_RIDING;
+    $c.init(skill_names_indices, [
+        0,
+        DAGGER,
+        KNIFE,
+        AXE,
+        PICK_AXE,
+        SHORT_SWORD,
+        BROADSWORD,
+        LONG_SWORD,
+        TWO_HANDED_SWORD,
+        PN_SABER,
+        CLUB,
+        MACE,
+        MORNING_STAR,
+        FLAIL,
+        PN_HAMMER,
+        QUARTERSTAFF,
+        PN_POLEARMS,
+        SPEAR,
+        TRIDENT,
+        LANCE,
+        BOW,
+        SLING,
+        CROSSBOW,
+        DART,
+        SHURIKEN,
+        BOOMERANG,
+        PN_WHIP,
+        UNICORN_HORN,
+        PN_ATTACK_SPELL,
+        PN_HEALING_SPELL,
+        PN_DIVINATION_SPELL,
+        PN_ENCHANTMENT_SPELL,
+        PN_CLERIC_SPELL,
+        PN_ESCAPE_SPELL,
+        PN_MATTER_SPELL,
+        PN_BARE_HANDED,
+        PN_TWO_WEAPONS,
+        PN_RIDING
+    ]);
     odd_skill_names.fill(null);
-    odd_skill_names[0] = $c.lit("no skill");
-    odd_skill_names[1] = $c.lit("bare hands");
-    odd_skill_names[2] = $c.lit("two weapon combat");
-    odd_skill_names[3] = $c.lit("riding");
-    odd_skill_names[4] = $c.lit("polearms");
-    odd_skill_names[5] = $c.lit("saber");
-    odd_skill_names[6] = $c.lit("hammer");
-    odd_skill_names[7] = $c.lit("whip");
-    odd_skill_names[8] = $c.lit("attack spells");
-    odd_skill_names[9] = $c.lit("healing spells");
-    odd_skill_names[10] = $c.lit("divination spells");
-    odd_skill_names[11] = $c.lit("enchantment spells");
-    odd_skill_names[12] = $c.lit("clerical spells");
-    odd_skill_names[13] = $c.lit("escape spells");
-    odd_skill_names[14] = $c.lit("matter spells");
+    $c.init(odd_skill_names, [
+        $c.lit("no skill"),
+        $c.lit("bare hands"),
+        $c.lit("two weapon combat"),
+        $c.lit("riding"),
+        $c.lit("polearms"),
+        $c.lit("saber"),
+        $c.lit("hammer"),
+        $c.lit("whip"),
+        $c.lit("attack spells"),
+        $c.lit("healing spells"),
+        $c.lit("divination spells"),
+        $c.lit("enchantment spells"),
+        $c.lit("clerical spells"),
+        $c.lit("escape spells"),
+        $c.lit("matter spells")
+    ]);
     barehands_or_martial.fill(null);
-    barehands_or_martial[0] = $c.lit("bare handed combat");
-    barehands_or_martial[1] = $c.lit("martial arts");
+    $c.init(barehands_or_martial, [
+        $c.lit("bare handed combat"),
+        $c.lit("martial arts")
+    ]);
     kebabable.fill(0);
-    kebabable[0] = S_XORN;
-    kebabable[1] = S_DRAGON;
-    kebabable[2] = S_JABBERWOCK;
-    kebabable[3] = S_NAGA;
-    kebabable[4] = S_GIANT;
-    kebabable[5] = 0;
+    $c.init(kebabable, [
+        S_XORN,
+        S_DRAGON,
+        S_JABBERWOCK,
+        S_NAGA,
+        S_GIANT,
+        0
+    ]);
     rwep.fill(0);
-    rwep[0] = DWARVISH_SPEAR;
-    rwep[1] = SILVER_SPEAR;
-    rwep[2] = ELVEN_SPEAR;
-    rwep[3] = SPEAR;
-    rwep[4] = ORCISH_SPEAR;
-    rwep[5] = JAVELIN;
-    rwep[6] = SHURIKEN;
-    rwep[7] = YA;
-    rwep[8] = SILVER_ARROW;
-    rwep[9] = ELVEN_ARROW;
-    rwep[10] = ARROW;
-    rwep[11] = ORCISH_ARROW;
-    rwep[12] = CROSSBOW_BOLT;
-    rwep[13] = SILVER_DAGGER;
-    rwep[14] = ELVEN_DAGGER;
-    rwep[15] = DAGGER;
-    rwep[16] = ORCISH_DAGGER;
-    rwep[17] = KNIFE;
-    rwep[18] = FLINT;
-    rwep[19] = ROCK;
-    rwep[20] = LOADSTONE;
-    rwep[21] = LUCKSTONE;
-    rwep[22] = DART;
-    rwep[23] = CREAM_PIE;
+    $c.init(rwep, [
+        DWARVISH_SPEAR,
+        SILVER_SPEAR,
+        ELVEN_SPEAR,
+        SPEAR,
+        ORCISH_SPEAR,
+        JAVELIN,
+        SHURIKEN,
+        YA,
+        SILVER_ARROW,
+        ELVEN_ARROW,
+        ARROW,
+        ORCISH_ARROW,
+        CROSSBOW_BOLT,
+        SILVER_DAGGER,
+        ELVEN_DAGGER,
+        DAGGER,
+        ORCISH_DAGGER,
+        KNIFE,
+        FLINT,
+        ROCK,
+        LOADSTONE,
+        LUCKSTONE,
+        DART,
+        CREAM_PIE
+    ]);
     pwep.fill(0);
-    pwep[0] = HALBERD;
-    pwep[1] = BARDICHE;
-    pwep[2] = SPETUM;
-    pwep[3] = BILL_GUISARME;
-    pwep[4] = VOULGE;
-    pwep[5] = RANSEUR;
-    pwep[6] = GUISARME;
-    pwep[7] = GLAIVE;
-    pwep[8] = LUCERN_HAMMER;
-    pwep[9] = BEC_DE_CORBIN;
-    pwep[10] = FAUCHARD;
-    pwep[11] = PARTISAN;
-    pwep[12] = LANCE;
+    $c.init(pwep, [
+        HALBERD,
+        BARDICHE,
+        SPETUM,
+        BILL_GUISARME,
+        VOULGE,
+        RANSEUR,
+        GUISARME,
+        GLAIVE,
+        LUCERN_HAMMER,
+        BEC_DE_CORBIN,
+        FAUCHARD,
+        PARTISAN,
+        LANCE
+    ]);
     for (let $i0 = 0; $i0 < 1; $i0++) {
         arwep[$i0].$copyFrom(new $T.throw_and_return_weapon());
     }
-    arwep[0].otyp = AKLYS;
-    arwep[0].range = AKLYS_LIM * AKLYS_LIM;
-    arwep[0].tethered = (1) & 1;
+    $c.init(arwep, [
+        { otyp: AKLYS, range: AKLYS_LIM * AKLYS_LIM, tethered: 1 }
+    ]);
     hwep.fill(0);
-    hwep[0] = CORPSE;
-    hwep[1] = TSURUGI;
-    hwep[2] = RUNESWORD;
-    hwep[3] = DWARVISH_MATTOCK;
-    hwep[4] = TWO_HANDED_SWORD;
-    hwep[5] = BATTLE_AXE;
-    hwep[6] = KATANA;
-    hwep[7] = UNICORN_HORN;
-    hwep[8] = CRYSKNIFE;
-    hwep[9] = TRIDENT;
-    hwep[10] = LONG_SWORD;
-    hwep[11] = ELVEN_BROADSWORD;
-    hwep[12] = BROADSWORD;
-    hwep[13] = SCIMITAR;
-    hwep[14] = SILVER_SABER;
-    hwep[15] = MORNING_STAR;
-    hwep[16] = ELVEN_SHORT_SWORD;
-    hwep[17] = DWARVISH_SHORT_SWORD;
-    hwep[18] = SHORT_SWORD;
-    hwep[19] = ORCISH_SHORT_SWORD;
-    hwep[20] = SILVER_MACE;
-    hwep[21] = MACE;
-    hwep[22] = AXE;
-    hwep[23] = DWARVISH_SPEAR;
-    hwep[24] = SILVER_SPEAR;
-    hwep[25] = ELVEN_SPEAR;
-    hwep[26] = SPEAR;
-    hwep[27] = ORCISH_SPEAR;
-    hwep[28] = FLAIL;
-    hwep[29] = BULLWHIP;
-    hwep[30] = QUARTERSTAFF;
-    hwep[31] = JAVELIN;
-    hwep[32] = AKLYS;
-    hwep[33] = CLUB;
-    hwep[34] = PICK_AXE;
-    hwep[35] = RUBBER_HOSE;
-    hwep[36] = WAR_HAMMER;
-    hwep[37] = SILVER_DAGGER;
-    hwep[38] = ELVEN_DAGGER;
-    hwep[39] = DAGGER;
-    hwep[40] = ORCISH_DAGGER;
-    hwep[41] = ATHAME;
-    hwep[42] = SCALPEL;
-    hwep[43] = KNIFE;
-    hwep[44] = WORM_TOOTH;
+    $c.init(hwep, [
+        CORPSE,
+        TSURUGI,
+        RUNESWORD,
+        DWARVISH_MATTOCK,
+        TWO_HANDED_SWORD,
+        BATTLE_AXE,
+        KATANA,
+        UNICORN_HORN,
+        CRYSKNIFE,
+        TRIDENT,
+        LONG_SWORD,
+        ELVEN_BROADSWORD,
+        BROADSWORD,
+        SCIMITAR,
+        SILVER_SABER,
+        MORNING_STAR,
+        ELVEN_SHORT_SWORD,
+        DWARVISH_SHORT_SWORD,
+        SHORT_SWORD,
+        ORCISH_SHORT_SWORD,
+        SILVER_MACE,
+        MACE,
+        AXE,
+        DWARVISH_SPEAR,
+        SILVER_SPEAR,
+        ELVEN_SPEAR,
+        SPEAR,
+        ORCISH_SPEAR,
+        FLAIL,
+        BULLWHIP,
+        QUARTERSTAFF,
+        JAVELIN,
+        AKLYS,
+        CLUB,
+        PICK_AXE,
+        RUBBER_HOSE,
+        WAR_HAMMER,
+        SILVER_DAGGER,
+        ELVEN_DAGGER,
+        DAGGER,
+        ORCISH_DAGGER,
+        ATHAME,
+        SCALPEL,
+        KNIFE,
+        WORM_TOOTH
+    ]);
     for (let $i0 = 0; $i0 < 3; $i0++) {
         skill_ranges[$i0].$copyFrom(new $T.skill_range());
     }
-    skill_ranges[0].first = P_FIRST_H_TO_H;
-    skill_ranges[0].last = P_LAST_H_TO_H;
-    skill_ranges[0].name = $c.lit("Fighting Skills");
-    skill_ranges[1].first = P_FIRST_WEAPON;
-    skill_ranges[1].last = P_LAST_WEAPON;
-    skill_ranges[1].name = $c.lit("Weapon Skills");
-    skill_ranges[2].first = P_FIRST_SPELL;
-    skill_ranges[2].last = P_LAST_SPELL;
-    skill_ranges[2].name = $c.lit("Spellcasting Skills");
+    $c.init(skill_ranges, [
+        { first: P_FIRST_H_TO_H, last: P_LAST_H_TO_H, name: $c.lit("Fighting Skills") },
+        { first: P_FIRST_WEAPON, last: P_LAST_WEAPON, name: $c.lit("Weapon Skills") },
+        { first: P_FIRST_SPELL, last: P_LAST_SPELL, name: $c.lit("Spellcasting Skills") }
+    ]);
     weapon_hit_bonus$bad_skill.fill(0);
     weapon_hit_bonus$bad_skill.set([119, 101, 97, 112, 111, 110, 95, 104, 105, 116, 95, 98, 111, 110, 117, 115, 58, 32, 98, 97, 100, 32, 115, 107, 105, 108, 108, 32, 37, 100]);   // "weapon_hit_bonus: bad skill %d"
 }

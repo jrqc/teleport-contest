@@ -52,7 +52,7 @@ import { H_IBM, MAXTCHARS, ROGUESET, SYM_BOULDER, SYM_HERO_OVERRIDE, SYM_INVISIB
 import { is_cmap_furniture, is_cmap_room, is_cmap_wall } from './sym.macros.js';
 import { sysopt } from './sys.js';
 import { t_at } from './trap.js';
-import { BEAR_TRAP, NO_TRAP, PIT, SPIKED_PIT, TRAPNUM, WEB } from './trap.h.js';
+import { BEAR_TRAP, NO_TRAP, PIT, SPIKED_PIT, WEB } from './trap.h.js';
 import { block_point, unblock_point, vision_recalc } from './vision.js';
 import { COULD_SEE, IN_SIGHT } from './vision.h.js';
 import { cansee } from './vision.macros.js';
@@ -495,7 +495,7 @@ export async function newsym(x, y) {   // display.c:917
     }
     if (u.uswallow) {
         if (u_at(x, y)) {
-            await show_glyph(u.ux, u.uy, u.usteed && ((!u.usteed.minvis || (u.uprops[SEE_INVIS].intrinsic || u.uprops[SEE_INVIS].extrinsic)) && !u.usteed.mundetected) ? (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) : u.usteed.data.pmidx) + ((u.usteed.female | 0) === 0 ? GLYPH_RIDDEN_MALE_OFF : GLYPH_RIDDEN_FEM_OFF) | 0 : (gy.youmonst.m_ap_type & 7) === M_AP_NOTHING ? (u.umonnum !== u.umonster || !flags.showrace ? u.umonnum : gu.urace.mnum) + (((u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female) ? 1 : 0) === MALE ? GLYPH_MON_MALE_OFF : GLYPH_MON_FEM_OFF) | 0 : (gy.youmonst.m_ap_type & 7) === M_AP_FURNITURE ? (gy.youmonst.mappearance | 0) === S_stone ? GLYPH_CMAP_STONE_OFF : (gy.youmonst.mappearance | 0) <= S_trwall ? ((gy.youmonst.mappearance | 0) - S_vwall | 0) + (In_mines(u.uz) ? GLYPH_CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH_CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH_CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH_CMAP_SOKO_OFF : GLYPH_CMAP_MAIN_OFF) | 0 : (gy.youmonst.mappearance | 0) < S_altar ? ((gy.youmonst.mappearance | 0) - S_ndoor | 0) + GLYPH_CMAP_A_OFF | 0 : (gy.youmonst.mappearance | 0) === S_altar ? 4008 : (gy.youmonst.mappearance | 0) < S_arrow_trap + (TRAPNUM - 1) ? ((gy.youmonst.mappearance | 0) - S_grave | 0) + GLYPH_CMAP_B_OFF | 0 : (gy.youmonst.mappearance | 0) <= S_goodpos ? ((gy.youmonst.mappearance | 0) - S_digbeam | 0) + GLYPH_CMAP_C_OFF | 0 : MAX_GLYPH : (gy.youmonst.m_ap_type & 7) === M_AP_OBJECT ? (gy.youmonst.mappearance | 0) + GLYPH_OBJ_OFF | 0 : (gy.youmonst.mappearance | 0) + (((u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female) ? 1 : 0) === MALE ? GLYPH_MON_MALE_OFF : GLYPH_MON_FEM_OFF) | 0);
+            await show_glyph(u.ux, u.uy, u.usteed && ((!u.usteed.minvis || (u.uprops[SEE_INVIS].intrinsic || u.uprops[SEE_INVIS].extrinsic)) && !u.usteed.mundetected) ? (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) : u.usteed.data.pmidx) + ((u.usteed.female | 0) === 0 ? GLYPH_RIDDEN_MALE_OFF : GLYPH_RIDDEN_FEM_OFF) | 0 : (gy.youmonst.m_ap_type & M_AP_TYPMASK) === M_AP_NOTHING ? (u.umonnum !== u.umonster || !flags.showrace ? u.umonnum : gu.urace.mnum) + (((u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female) ? 1 : 0) === MALE ? GLYPH_MON_MALE_OFF : GLYPH_MON_FEM_OFF) | 0 : (gy.youmonst.m_ap_type & M_AP_TYPMASK) === M_AP_FURNITURE ? (gy.youmonst.mappearance | 0) === S_stone ? GLYPH_CMAP_STONE_OFF : (gy.youmonst.mappearance | 0) <= S_trwall ? ((gy.youmonst.mappearance | 0) - S_vwall | 0) + (In_mines(u.uz) ? GLYPH_CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH_CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH_CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH_CMAP_SOKO_OFF : GLYPH_CMAP_MAIN_OFF) | 0 : (gy.youmonst.mappearance | 0) < S_altar ? ((gy.youmonst.mappearance | 0) - S_ndoor | 0) + GLYPH_CMAP_A_OFF | 0 : (gy.youmonst.mappearance | 0) === S_altar ? 4008 : (gy.youmonst.mappearance | 0) < S_arrow_trap + MAXTCHARS ? ((gy.youmonst.mappearance | 0) - S_grave | 0) + GLYPH_CMAP_B_OFF | 0 : (gy.youmonst.mappearance | 0) <= S_goodpos ? ((gy.youmonst.mappearance | 0) - S_digbeam | 0) + GLYPH_CMAP_C_OFF | 0 : NO_GLYPH : (gy.youmonst.m_ap_type & M_AP_TYPMASK) === M_AP_OBJECT ? (gy.youmonst.mappearance | 0) + GLYPH_OBJ_OFF | 0 : (gy.youmonst.mappearance | 0) + (((u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female) ? 1 : 0) === MALE ? GLYPH_MON_MALE_OFF : GLYPH_MON_FEM_OFF) | 0);
         }
         return;
     }
@@ -537,7 +537,7 @@ export async function newsym(x, y) {   // display.c:917
                 }
             } while (0);
             if (see_self) {
-                await show_glyph(u.ux, u.uy, u.usteed && ((!u.usteed.minvis || (u.uprops[SEE_INVIS].intrinsic || u.uprops[SEE_INVIS].extrinsic)) && !u.usteed.mundetected) ? (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) : u.usteed.data.pmidx) + ((u.usteed.female | 0) === 0 ? GLYPH_RIDDEN_MALE_OFF : GLYPH_RIDDEN_FEM_OFF) | 0 : (gy.youmonst.m_ap_type & 7) === M_AP_NOTHING ? (u.umonnum !== u.umonster || !flags.showrace ? u.umonnum : gu.urace.mnum) + (((u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female) ? 1 : 0) === MALE ? GLYPH_MON_MALE_OFF : GLYPH_MON_FEM_OFF) | 0 : (gy.youmonst.m_ap_type & 7) === M_AP_FURNITURE ? (gy.youmonst.mappearance | 0) === S_stone ? GLYPH_CMAP_STONE_OFF : (gy.youmonst.mappearance | 0) <= S_trwall ? ((gy.youmonst.mappearance | 0) - S_vwall | 0) + (In_mines(u.uz) ? GLYPH_CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH_CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH_CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH_CMAP_SOKO_OFF : GLYPH_CMAP_MAIN_OFF) | 0 : (gy.youmonst.mappearance | 0) < S_altar ? ((gy.youmonst.mappearance | 0) - S_ndoor | 0) + GLYPH_CMAP_A_OFF | 0 : (gy.youmonst.mappearance | 0) === S_altar ? 4008 : (gy.youmonst.mappearance | 0) < S_arrow_trap + (TRAPNUM - 1) ? ((gy.youmonst.mappearance | 0) - S_grave | 0) + GLYPH_CMAP_B_OFF | 0 : (gy.youmonst.mappearance | 0) <= S_goodpos ? ((gy.youmonst.mappearance | 0) - S_digbeam | 0) + GLYPH_CMAP_C_OFF | 0 : MAX_GLYPH : (gy.youmonst.m_ap_type & 7) === M_AP_OBJECT ? (gy.youmonst.mappearance | 0) + GLYPH_OBJ_OFF | 0 : (gy.youmonst.mappearance | 0) + (((u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female) ? 1 : 0) === MALE ? GLYPH_MON_MALE_OFF : GLYPH_MON_FEM_OFF) | 0);
+                await show_glyph(u.ux, u.uy, u.usteed && ((!u.usteed.minvis || (u.uprops[SEE_INVIS].intrinsic || u.uprops[SEE_INVIS].extrinsic)) && !u.usteed.mundetected) ? (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) : u.usteed.data.pmidx) + ((u.usteed.female | 0) === 0 ? GLYPH_RIDDEN_MALE_OFF : GLYPH_RIDDEN_FEM_OFF) | 0 : (gy.youmonst.m_ap_type & M_AP_TYPMASK) === M_AP_NOTHING ? (u.umonnum !== u.umonster || !flags.showrace ? u.umonnum : gu.urace.mnum) + (((u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female) ? 1 : 0) === MALE ? GLYPH_MON_MALE_OFF : GLYPH_MON_FEM_OFF) | 0 : (gy.youmonst.m_ap_type & M_AP_TYPMASK) === M_AP_FURNITURE ? (gy.youmonst.mappearance | 0) === S_stone ? GLYPH_CMAP_STONE_OFF : (gy.youmonst.mappearance | 0) <= S_trwall ? ((gy.youmonst.mappearance | 0) - S_vwall | 0) + (In_mines(u.uz) ? GLYPH_CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH_CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH_CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH_CMAP_SOKO_OFF : GLYPH_CMAP_MAIN_OFF) | 0 : (gy.youmonst.mappearance | 0) < S_altar ? ((gy.youmonst.mappearance | 0) - S_ndoor | 0) + GLYPH_CMAP_A_OFF | 0 : (gy.youmonst.mappearance | 0) === S_altar ? 4008 : (gy.youmonst.mappearance | 0) < S_arrow_trap + MAXTCHARS ? ((gy.youmonst.mappearance | 0) - S_grave | 0) + GLYPH_CMAP_B_OFF | 0 : (gy.youmonst.mappearance | 0) <= S_goodpos ? ((gy.youmonst.mappearance | 0) - S_digbeam | 0) + GLYPH_CMAP_C_OFF | 0 : NO_GLYPH : (gy.youmonst.m_ap_type & M_AP_TYPMASK) === M_AP_OBJECT ? (gy.youmonst.mappearance | 0) + GLYPH_OBJ_OFF | 0 : (gy.youmonst.mappearance | 0) + (((u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female) ? 1 : 0) === MALE ? GLYPH_MON_MALE_OFF : GLYPH_MON_FEM_OFF) | 0);
             }
         } else {
             show = FALSE;
@@ -595,7 +595,7 @@ export async function newsym(x, y) {   // display.c:917
                 if ($goto !== "show_mem" && u_at(x, y)) {
                     await feel_location(u.ux, u.uy);
                     if (canspotself()) {
-                        await show_glyph(u.ux, u.uy, u.usteed && ((!u.usteed.minvis || (u.uprops[SEE_INVIS].intrinsic || u.uprops[SEE_INVIS].extrinsic)) && !u.usteed.mundetected) ? (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) : u.usteed.data.pmidx) + ((u.usteed.female | 0) === 0 ? GLYPH_RIDDEN_MALE_OFF : GLYPH_RIDDEN_FEM_OFF) | 0 : (gy.youmonst.m_ap_type & 7) === M_AP_NOTHING ? (u.umonnum !== u.umonster || !flags.showrace ? u.umonnum : gu.urace.mnum) + (((u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female) ? 1 : 0) === MALE ? GLYPH_MON_MALE_OFF : GLYPH_MON_FEM_OFF) | 0 : (gy.youmonst.m_ap_type & 7) === M_AP_FURNITURE ? (gy.youmonst.mappearance | 0) === S_stone ? GLYPH_CMAP_STONE_OFF : (gy.youmonst.mappearance | 0) <= S_trwall ? ((gy.youmonst.mappearance | 0) - S_vwall | 0) + (In_mines(u.uz) ? GLYPH_CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH_CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH_CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH_CMAP_SOKO_OFF : GLYPH_CMAP_MAIN_OFF) | 0 : (gy.youmonst.mappearance | 0) < S_altar ? ((gy.youmonst.mappearance | 0) - S_ndoor | 0) + GLYPH_CMAP_A_OFF | 0 : (gy.youmonst.mappearance | 0) === S_altar ? 4008 : (gy.youmonst.mappearance | 0) < S_arrow_trap + (TRAPNUM - 1) ? ((gy.youmonst.mappearance | 0) - S_grave | 0) + GLYPH_CMAP_B_OFF | 0 : (gy.youmonst.mappearance | 0) <= S_goodpos ? ((gy.youmonst.mappearance | 0) - S_digbeam | 0) + GLYPH_CMAP_C_OFF | 0 : MAX_GLYPH : (gy.youmonst.m_ap_type & 7) === M_AP_OBJECT ? (gy.youmonst.mappearance | 0) + GLYPH_OBJ_OFF | 0 : (gy.youmonst.mappearance | 0) + (((u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female) ? 1 : 0) === MALE ? GLYPH_MON_MALE_OFF : GLYPH_MON_FEM_OFF) | 0);
+                        await show_glyph(u.ux, u.uy, u.usteed && ((!u.usteed.minvis || (u.uprops[SEE_INVIS].intrinsic || u.uprops[SEE_INVIS].extrinsic)) && !u.usteed.mundetected) ? (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) : u.usteed.data.pmidx) + ((u.usteed.female | 0) === 0 ? GLYPH_RIDDEN_MALE_OFF : GLYPH_RIDDEN_FEM_OFF) | 0 : (gy.youmonst.m_ap_type & M_AP_TYPMASK) === M_AP_NOTHING ? (u.umonnum !== u.umonster || !flags.showrace ? u.umonnum : gu.urace.mnum) + (((u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female) ? 1 : 0) === MALE ? GLYPH_MON_MALE_OFF : GLYPH_MON_FEM_OFF) | 0 : (gy.youmonst.m_ap_type & M_AP_TYPMASK) === M_AP_FURNITURE ? (gy.youmonst.mappearance | 0) === S_stone ? GLYPH_CMAP_STONE_OFF : (gy.youmonst.mappearance | 0) <= S_trwall ? ((gy.youmonst.mappearance | 0) - S_vwall | 0) + (In_mines(u.uz) ? GLYPH_CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH_CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH_CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH_CMAP_SOKO_OFF : GLYPH_CMAP_MAIN_OFF) | 0 : (gy.youmonst.mappearance | 0) < S_altar ? ((gy.youmonst.mappearance | 0) - S_ndoor | 0) + GLYPH_CMAP_A_OFF | 0 : (gy.youmonst.mappearance | 0) === S_altar ? 4008 : (gy.youmonst.mappearance | 0) < S_arrow_trap + MAXTCHARS ? ((gy.youmonst.mappearance | 0) - S_grave | 0) + GLYPH_CMAP_B_OFF | 0 : (gy.youmonst.mappearance | 0) <= S_goodpos ? ((gy.youmonst.mappearance | 0) - S_digbeam | 0) + GLYPH_CMAP_C_OFF | 0 : NO_GLYPH : (gy.youmonst.m_ap_type & M_AP_TYPMASK) === M_AP_OBJECT ? (gy.youmonst.mappearance | 0) + GLYPH_OBJ_OFF | 0 : (gy.youmonst.mappearance | 0) + (((u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female) ? 1 : 0) === MALE ? GLYPH_MON_MALE_OFF : GLYPH_MON_FEM_OFF) | 0);
                     }
                 } else if ($goto !== "show_mem" && ((mon = svl.level.monsters[x][y]) !== null && ((see_it = !($c.andu64(mon.data.mflags1, M1_MINDLESS) !== 0) && ((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked && (u.uprops[TELEPAT].intrinsic || u.uprops[TELEPAT].extrinsic) || u.uprops[TELEPAT].extrinsic && dist2(mon.mx, mon.my, u.ux, u.uy) <= u.unblind_telepat_range) || MATCH_WARN_OF_MON(mon) || !((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked) && (u.uprops[INFRAVISION].intrinsic || u.uprops[INFRAVISION].extrinsic) && mon.data.mflags3 & M3_INFRAVISIBLE && (gv.viz_array.get(mon.my).get(mon.mx) & COULD_SEE) !== 0 && ((!mon.minvis || (u.uprops[SEE_INVIS].intrinsic || u.uprops[SEE_INVIS].extrinsic)) && !mon.mundetected) ? 1 : 0) !== 0 || Detect_monsters() && !(mon && (x !== mon.mx || y !== mon.my))))) {
                     await display_monster(x, y, mon, see_it ? 0 : DETECTED, $c.i8(mon && (x !== mon.mx || y !== mon.my) ? TRUE : FALSE));
@@ -798,7 +798,7 @@ export async function swallowed(first) {   // display.c:1332
     if (left_ok) {
         await show_glyph($c.i16(u.ux - 1 | 0), u.uy, await swallow_to_glyph(swallower, S_sw_ml));
     }
-    await show_glyph(u.ux, u.uy, u.usteed && ((!u.usteed.minvis || (u.uprops[SEE_INVIS].intrinsic || u.uprops[SEE_INVIS].extrinsic)) && !u.usteed.mundetected) ? (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) : u.usteed.data.pmidx) + ((u.usteed.female | 0) === 0 ? GLYPH_RIDDEN_MALE_OFF : GLYPH_RIDDEN_FEM_OFF) | 0 : (gy.youmonst.m_ap_type & 7) === M_AP_NOTHING ? (u.umonnum !== u.umonster || !flags.showrace ? u.umonnum : gu.urace.mnum) + (((u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female) ? 1 : 0) === MALE ? GLYPH_MON_MALE_OFF : GLYPH_MON_FEM_OFF) | 0 : (gy.youmonst.m_ap_type & 7) === M_AP_FURNITURE ? (gy.youmonst.mappearance | 0) === S_stone ? GLYPH_CMAP_STONE_OFF : (gy.youmonst.mappearance | 0) <= S_trwall ? ((gy.youmonst.mappearance | 0) - S_vwall | 0) + (In_mines(u.uz) ? GLYPH_CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH_CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH_CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH_CMAP_SOKO_OFF : GLYPH_CMAP_MAIN_OFF) | 0 : (gy.youmonst.mappearance | 0) < S_altar ? ((gy.youmonst.mappearance | 0) - S_ndoor | 0) + GLYPH_CMAP_A_OFF | 0 : (gy.youmonst.mappearance | 0) === S_altar ? 4008 : (gy.youmonst.mappearance | 0) < S_arrow_trap + (TRAPNUM - 1) ? ((gy.youmonst.mappearance | 0) - S_grave | 0) + GLYPH_CMAP_B_OFF | 0 : (gy.youmonst.mappearance | 0) <= S_goodpos ? ((gy.youmonst.mappearance | 0) - S_digbeam | 0) + GLYPH_CMAP_C_OFF | 0 : MAX_GLYPH : (gy.youmonst.m_ap_type & 7) === M_AP_OBJECT ? (gy.youmonst.mappearance | 0) + GLYPH_OBJ_OFF | 0 : (gy.youmonst.mappearance | 0) + (((u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female) ? 1 : 0) === MALE ? GLYPH_MON_MALE_OFF : GLYPH_MON_FEM_OFF) | 0);
+    await show_glyph(u.ux, u.uy, u.usteed && ((!u.usteed.minvis || (u.uprops[SEE_INVIS].intrinsic || u.uprops[SEE_INVIS].extrinsic)) && !u.usteed.mundetected) ? (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) : u.usteed.data.pmidx) + ((u.usteed.female | 0) === 0 ? GLYPH_RIDDEN_MALE_OFF : GLYPH_RIDDEN_FEM_OFF) | 0 : (gy.youmonst.m_ap_type & M_AP_TYPMASK) === M_AP_NOTHING ? (u.umonnum !== u.umonster || !flags.showrace ? u.umonnum : gu.urace.mnum) + (((u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female) ? 1 : 0) === MALE ? GLYPH_MON_MALE_OFF : GLYPH_MON_FEM_OFF) | 0 : (gy.youmonst.m_ap_type & M_AP_TYPMASK) === M_AP_FURNITURE ? (gy.youmonst.mappearance | 0) === S_stone ? GLYPH_CMAP_STONE_OFF : (gy.youmonst.mappearance | 0) <= S_trwall ? ((gy.youmonst.mappearance | 0) - S_vwall | 0) + (In_mines(u.uz) ? GLYPH_CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH_CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH_CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH_CMAP_SOKO_OFF : GLYPH_CMAP_MAIN_OFF) | 0 : (gy.youmonst.mappearance | 0) < S_altar ? ((gy.youmonst.mappearance | 0) - S_ndoor | 0) + GLYPH_CMAP_A_OFF | 0 : (gy.youmonst.mappearance | 0) === S_altar ? 4008 : (gy.youmonst.mappearance | 0) < S_arrow_trap + MAXTCHARS ? ((gy.youmonst.mappearance | 0) - S_grave | 0) + GLYPH_CMAP_B_OFF | 0 : (gy.youmonst.mappearance | 0) <= S_goodpos ? ((gy.youmonst.mappearance | 0) - S_digbeam | 0) + GLYPH_CMAP_C_OFF | 0 : NO_GLYPH : (gy.youmonst.m_ap_type & M_AP_TYPMASK) === M_AP_OBJECT ? (gy.youmonst.mappearance | 0) + GLYPH_OBJ_OFF | 0 : (gy.youmonst.mappearance | 0) + (((u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female) ? 1 : 0) === MALE ? GLYPH_MON_MALE_OFF : GLYPH_MON_FEM_OFF) | 0);
     if (rght_ok) {
         await show_glyph($c.i16(u.ux + 1 | 0), u.uy, await swallow_to_glyph(swallower, S_sw_mr));
     }
@@ -2104,29 +2104,29 @@ async function wall_angle(lev) {   // display.c:3513
                         } else if ((seenv & SV5) >>> 0 || (seenv & (SV3 | SV4)) >>> 0 && (seenv & (SV6 | SV7)) >>> 0) {
                             col = T_tdwall;
                         } else {
-                            if (!((seenv & 7) >>> 0 && !((seenv & 4294967288) >>> 0))) {
+                            if (!((seenv & (SV0 | SV1 | SV2)) >>> 0 && !((seenv & 4294967288) >>> 0))) {
                                 await t_warn(lev);
                             }
                             col = T_stone;
                         }
                         break;
                     case WM_T_BL:
-                        if ((seenv & 48) >>> 0 && !((seenv & 4294967247) >>> 0)) {
+                        if ((seenv & (SV4 | SV5)) >>> 0 && !((seenv & 4294967247) >>> 0)) {
                             col = T_tlcorn;
                         } else if ((seenv & (SV0 | SV1 | SV2 | SV7)) >>> 0 && !((seenv & (SV3 | SV4 | SV5)) >>> 0)) {
                             col = T_hwall;
-                        } else if ((seenv & 64) >>> 0 && !((seenv & 4294967231) >>> 0)) {
+                        } else if ((seenv & SV6) >>> 0 && !((seenv & 4294967231) >>> 0)) {
                             col = T_stone;
                         } else {
                             col = T_tdwall;
                         }
                         break;
                     case WM_T_BR:
-                        if ((seenv & 96) >>> 0 && !((seenv & 4294967199) >>> 0)) {
+                        if ((seenv & (SV5 | SV6)) >>> 0 && !((seenv & 4294967199) >>> 0)) {
                             col = T_trcorn;
                         } else if ((seenv & (SV0 | SV1 | SV2 | SV3)) >>> 0 && !((seenv & (SV5 | SV6 | SV7)) >>> 0)) {
                             col = T_hwall;
-                        } else if ((seenv & 16) >>> 0 && !((seenv & 4294967279) >>> 0)) {
+                        } else if ((seenv & SV4) >>> 0 && !((seenv & 4294967279) >>> 0)) {
                             col = T_stone;
                         } else {
                             col = T_tdwall;
@@ -2189,7 +2189,7 @@ async function wall_angle(lev) {   // display.c:3513
                         idx = S_tlcorn;
                         break;
                     case WM_C_OUTER:
-                        idx = (seenv & 56) >>> 0 ? S_tlcorn : S_stone;
+                        idx = (seenv & (SV3 | SV4 | SV5)) >>> 0 ? S_tlcorn : S_stone;
                         break;
                     case WM_C_INNER:
                         idx = (seenv & 4294967279) >>> 0 ? S_tlcorn : S_stone;
@@ -2206,7 +2206,7 @@ async function wall_angle(lev) {   // display.c:3513
                         idx = S_trcorn;
                         break;
                     case WM_C_OUTER:
-                        idx = (seenv & 224) >>> 0 ? S_trcorn : S_stone;
+                        idx = (seenv & (SV5 | SV6 | SV7)) >>> 0 ? S_trcorn : S_stone;
                         break;
                     case WM_C_INNER:
                         idx = (seenv & 4294967231) >>> 0 ? S_trcorn : S_stone;
@@ -2223,7 +2223,7 @@ async function wall_angle(lev) {   // display.c:3513
                         idx = S_blcorn;
                         break;
                     case WM_C_OUTER:
-                        idx = (seenv & 14) >>> 0 ? S_blcorn : S_stone;
+                        idx = (seenv & (SV1 | SV2 | SV3)) >>> 0 ? S_blcorn : S_stone;
                         break;
                     case WM_C_INNER:
                         idx = (seenv & 4294967291) >>> 0 ? S_blcorn : S_stone;
@@ -2240,7 +2240,7 @@ async function wall_angle(lev) {   // display.c:3513
                         idx = S_brcorn;
                         break;
                     case WM_C_OUTER:
-                        idx = (seenv & 131) >>> 0 ? S_brcorn : S_stone;
+                        idx = (seenv & (SV7 | SV0 | SV1)) >>> 0 ? S_brcorn : S_stone;
                         break;
                     case WM_C_INNER:
                         idx = (seenv & 4294967294) >>> 0 ? S_brcorn : S_stone;
@@ -2325,22 +2325,22 @@ async function wall_angle(lev) {   // display.c:3513
                             }
                             break;
                         case WM_X_TLBR:
-                            if ((seenv & 14) >>> 0 && !((seenv & 4294967281) >>> 0)) {
+                            if ((seenv & (SV1 | SV2 | SV3)) >>> 0 && !((seenv & 4294967281) >>> 0)) {
                                 idx = S_blcorn;
-                            } else if ((seenv & 224) >>> 0 && !((seenv & 4294967071) >>> 0)) {
+                            } else if ((seenv & (SV5 | SV6 | SV7)) >>> 0 && !((seenv & 4294967071) >>> 0)) {
                                 idx = S_trcorn;
-                            } else if ((seenv & 17) >>> 0 && !((seenv & 4294967278) >>> 0)) {
+                            } else if ((seenv & (SV0 | SV4)) >>> 0 && !((seenv & 4294967278) >>> 0)) {
                                 idx = S_stone;
                             } else {
                                 idx = S_crwall;
                             }
                             break;
                         case WM_X_BLTR:
-                            if ((seenv & 131) >>> 0 && !((seenv & 4294967164) >>> 0)) {
+                            if ((seenv & (SV0 | SV1 | SV7)) >>> 0 && !((seenv & 4294967164) >>> 0)) {
                                 idx = S_brcorn;
-                            } else if ((seenv & 56) >>> 0 && !((seenv & 4294967239) >>> 0)) {
+                            } else if ((seenv & (SV3 | SV4 | SV5)) >>> 0 && !((seenv & 4294967239) >>> 0)) {
                                 idx = S_tlcorn;
-                            } else if ((seenv & 68) >>> 0 && !((seenv & 4294967227) >>> 0)) {
+                            } else if ((seenv & (SV2 | SV6)) >>> 0 && !((seenv & 4294967227) >>> 0)) {
                                 idx = S_stone;
                             } else {
                                 idx = S_crwall;
@@ -2396,13 +2396,12 @@ export function $init() {
     for (let $i0 = 0; $i0 < 9624; $i0++) {
         glyphmap[$i0].$copyFrom(new $T.glyph_map_entry());
     }
-    glyphmap[0].glyphflags = 0;
-    glyphmap[0].sym.color = NO_COLOR;
-    glyphmap[0].sym.symidx = 0;
-    glyphmap[0].customcolor = 0;
-    glyphmap[0].color256idx = 0;
-    glyphmap[0].tileidx = 0;
-    glyphmap[0].u = null;
+    $c.init(glyphmap, [
+        { glyphflags: 0, sym: { color: NO_COLOR, symidx: 0 },
+          customcolor: 0,
+          color256idx: 0, tileidx: 0,
+          u: null }
+    ]);
     nul_gbuf.$copyFrom(new $T.gbuf_entry());
     nul_gbuf.gnew = 0;
     nul_gbuf.glyphinfo.glyph = GLYPH_UNEXPLORED;
@@ -2416,96 +2415,68 @@ export function $init() {
     nul_gbuf.glyphinfo.gm.tileidx = 0;
     nul_gbuf.glyphinfo.gm.u = null;
     zapcolors.fill(0);
-    zapcolors[0] = zap_color_missile;
-    zapcolors[1] = zap_color_fire;
-    zapcolors[2] = zap_color_frost;
-    zapcolors[3] = zap_color_sleep;
-    zapcolors[4] = zap_color_death;
-    zapcolors[5] = zap_color_lightning;
-    zapcolors[6] = zap_color_poison_gas;
-    zapcolors[7] = zap_color_acid;
+    $c.init(zapcolors, [
+        zap_color_missile,
+        zap_color_fire,
+        zap_color_frost,
+        zap_color_sleep,
+        zap_color_death,
+        zap_color_lightning,
+        zap_color_poison_gas,
+        zap_color_acid
+    ]);
     altarcolors.fill(0);
-    altarcolors[0] = altar_color_unaligned;
-    altarcolors[1] = altar_color_chaotic;
-    altarcolors[2] = altar_color_neutral;
-    altarcolors[3] = altar_color_lawful;
-    altarcolors[4] = altar_color_other;
+    $c.init(altarcolors, [
+        altar_color_unaligned,
+        altar_color_chaotic,
+        altar_color_neutral,
+        altar_color_lawful,
+        altar_color_other
+    ]);
     explodecolors.fill(0);
-    explodecolors[0] = explode_color_dark;
-    explodecolors[1] = explode_color_noxious;
-    explodecolors[2] = explode_color_muddy;
-    explodecolors[3] = explode_color_wet;
-    explodecolors[4] = explode_color_magical;
-    explodecolors[5] = explode_color_fiery;
-    explodecolors[6] = explode_color_frosty;
+    $c.init(explodecolors, [
+        explode_color_dark,
+        explode_color_noxious,
+        explode_color_muddy,
+        explode_color_wet,
+        explode_color_magical,
+        explode_color_fiery,
+        explode_color_frosty
+    ]);
     wallcolors.fill(0);
-    wallcolors[0] = CLR_GRAY;
-    wallcolors[1] = CLR_GRAY;
-    wallcolors[2] = CLR_GRAY;
-    wallcolors[3] = CLR_GRAY;
-    wallcolors[4] = CLR_GRAY;
+    $c.init(wallcolors, [
+        CLR_GRAY,
+        CLR_GRAY,
+        CLR_GRAY,
+        CLR_GRAY,
+        CLR_GRAY
+    ]);
     for (let $i0 = 0; $i0 < 3; $i0++) {
         seenv_matrix[$i0].fill(0);
     }
-    seenv_matrix[0][0] = 4;
-    seenv_matrix[0][1] = 2;
-    seenv_matrix[0][2] = 1;
-    seenv_matrix[1][0] = 8;
-    seenv_matrix[1][1] = 255;
-    seenv_matrix[1][2] = 128;
-    seenv_matrix[2][0] = 16;
-    seenv_matrix[2][1] = 32;
-    seenv_matrix[2][2] = 64;
+    $c.init(seenv_matrix, [
+        [4, 2, 1],
+        [8, 255, 128],
+        [16, 32, 64]
+    ]);
     for (let $i0 = 0; $i0 < 4; $i0++) {
         wall_matrix[$i0].fill(0);
     }
-    wall_matrix[0][0] = S_stone;
-    wall_matrix[0][1] = S_tlcorn;
-    wall_matrix[0][2] = S_trcorn;
-    wall_matrix[0][3] = S_hwall;
-    wall_matrix[0][4] = S_tdwall;
-    wall_matrix[1][0] = S_stone;
-    wall_matrix[1][1] = S_trcorn;
-    wall_matrix[1][2] = S_brcorn;
-    wall_matrix[1][3] = S_vwall;
-    wall_matrix[1][4] = S_tlwall;
-    wall_matrix[2][0] = S_stone;
-    wall_matrix[2][1] = S_brcorn;
-    wall_matrix[2][2] = S_blcorn;
-    wall_matrix[2][3] = S_hwall;
-    wall_matrix[2][4] = S_tuwall;
-    wall_matrix[3][0] = S_stone;
-    wall_matrix[3][1] = S_blcorn;
-    wall_matrix[3][2] = S_tlcorn;
-    wall_matrix[3][3] = S_vwall;
-    wall_matrix[3][4] = S_trwall;
+    $c.init(wall_matrix, [
+        [S_stone, S_tlcorn, S_trcorn, S_hwall, S_tdwall],
+        [S_stone, S_trcorn, S_brcorn, S_vwall, S_tlwall],
+        [S_stone, S_brcorn, S_blcorn, S_hwall, S_tuwall],
+        [S_stone, S_blcorn, S_tlcorn, S_vwall, S_trwall]
+    ]);
     for (let $i0 = 0; $i0 < 4; $i0++) {
         cross_matrix[$i0].fill(0);
     }
-    cross_matrix[0][0] = S_brcorn;
-    cross_matrix[0][1] = S_blcorn;
-    cross_matrix[0][2] = S_tlcorn;
-    cross_matrix[0][3] = S_tuwall;
-    cross_matrix[0][4] = S_trwall;
-    cross_matrix[0][5] = S_crwall;
-    cross_matrix[1][0] = S_blcorn;
-    cross_matrix[1][1] = S_tlcorn;
-    cross_matrix[1][2] = S_trcorn;
-    cross_matrix[1][3] = S_trwall;
-    cross_matrix[1][4] = S_tdwall;
-    cross_matrix[1][5] = S_crwall;
-    cross_matrix[2][0] = S_tlcorn;
-    cross_matrix[2][1] = S_trcorn;
-    cross_matrix[2][2] = S_brcorn;
-    cross_matrix[2][3] = S_tdwall;
-    cross_matrix[2][4] = S_tlwall;
-    cross_matrix[2][5] = S_crwall;
-    cross_matrix[3][0] = S_trcorn;
-    cross_matrix[3][1] = S_brcorn;
-    cross_matrix[3][2] = S_blcorn;
-    cross_matrix[3][3] = S_tlwall;
-    cross_matrix[3][4] = S_tuwall;
-    cross_matrix[3][5] = S_crwall;
+    $c.init(cross_matrix, [
+        [S_brcorn, S_blcorn, S_tlcorn, S_tuwall, S_trwall, S_crwall],
+        [S_blcorn, S_tlcorn, S_trcorn, S_trwall, S_tdwall, S_crwall],
+        [S_tlcorn, S_trcorn, S_brcorn, S_tdwall, S_tlwall, S_crwall],
+        [S_trcorn, S_brcorn, S_blcorn, S_tlwall, S_tuwall, S_crwall]
+    ]);
     tmp_at$tglyph = null;
     swallowed$lastx = 0;
     swallowed$lasty = 0;

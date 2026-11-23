@@ -2,12 +2,13 @@
 import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
+import { A_CHAOTIC, A_NEUTRAL } from './align.h.js';
 import { alloc, dupstr, fmt_ptr } from './alloc.js';
 import { ART_MITRE_OF_HOLINESS, ART_TSURUGI_OF_MURAMASA } from './artilist.h.js';
 import { acurr } from './attrib.js';
 import { A_CHA, A_CON, A_DEX, A_INT, A_STR, A_WIS } from './attrib.h.js';
 import { ACURR } from './attrib.macros.js';
-import { BL_AC, BL_ALIGN, BL_ARMOR, BL_CAP, BL_CH, BL_CHARACTERISTICS, BL_CO, BL_CONDITION, BL_DX, BL_ENE, BL_ENEMAX, BL_EXP, BL_FLUSH, BL_GOLD, BL_HD, BL_HP, BL_HPMAX, BL_HUNGER, BL_IN, BL_LEVELDESC, BL_MASK_BAREH, BL_MASK_BLIND, BL_MASK_BUSY, BL_MASK_CONF, BL_MASK_DEAF, BL_MASK_ELF_IRON, BL_MASK_FLY, BL_MASK_FOODPOIS, BL_MASK_GLOWHANDS, BL_MASK_GRAB, BL_MASK_HALLU, BL_MASK_HELD, BL_MASK_HOLDING, BL_MASK_ICY, BL_MASK_INLAVA, BL_MASK_LEV, BL_MASK_PARLYZ, BL_MASK_RIDE, BL_MASK_SLEEPING, BL_MASK_SLIME, BL_MASK_SLIPPERY, BL_MASK_STONE, BL_MASK_STRNGL, BL_MASK_STUN, BL_MASK_SUBMERGED, BL_MASK_TERMILL, BL_MASK_TETHERED, BL_MASK_TRAPPED, BL_MASK_UNCONSC, BL_MASK_WOUNDEDL, BL_RESET, BL_SCORE, BL_STR, BL_TERRAIN, BL_TH_ALWAYS_HILITE, BL_TH_CONDITION, BL_TH_CRITICALHP, BL_TH_NONE, BL_TH_TEXTMATCH, BL_TH_UPDOWN, BL_TH_VAL_ABSOLUTE, BL_TH_VAL_PERCENTAGE, BL_TIME, BL_TITLE, BL_VERS, BL_WEAPON, BL_WI, BL_XP, BOTL_NSIZ, CONDITION_COUNT, EQ_VALUE, GE_VALUE, GT_VALUE, HL_BLINK, HL_BOLD, HL_DIM, HL_INVERSE, HL_ITALIC, HL_NONE, HL_ULINE, HL_UNDEF, LE_VALUE, LT_VALUE, MAXBLSTATS, NO_LTEQGT, TXT_VALUE, bl_bareh, bl_blind, bl_busy, bl_conf, bl_deaf, bl_elf_iron, bl_fly, bl_foodpois, bl_glowhands, bl_grab, bl_hallu, bl_held, bl_holding, bl_icy, bl_inlava, bl_lev, bl_parlyz, bl_ride, bl_sleeping, bl_slime, bl_slippery, bl_stone, bl_strngl, bl_stun, bl_submerged, bl_termill, bl_tethered, bl_trapped, bl_unconsc, bl_woundedl } from './botl.h.js';
+import { BL_AC, BL_ALIGN, BL_ARMOR, BL_CAP, BL_CH, BL_CHARACTERISTICS, BL_CO, BL_CONDITION, BL_DX, BL_ENE, BL_ENEMAX, BL_EXP, BL_FLUSH, BL_GOLD, BL_HD, BL_HP, BL_HPMAX, BL_HUNGER, BL_IN, BL_LEVELDESC, BL_MASK_BAREH, BL_MASK_BLIND, BL_MASK_BUSY, BL_MASK_CONF, BL_MASK_DEAF, BL_MASK_ELF_IRON, BL_MASK_FLY, BL_MASK_FOODPOIS, BL_MASK_GLOWHANDS, BL_MASK_GRAB, BL_MASK_HALLU, BL_MASK_HELD, BL_MASK_HOLDING, BL_MASK_ICY, BL_MASK_INLAVA, BL_MASK_LEV, BL_MASK_PARLYZ, BL_MASK_RIDE, BL_MASK_SLEEPING, BL_MASK_SLIME, BL_MASK_SLIPPERY, BL_MASK_STONE, BL_MASK_STRNGL, BL_MASK_STUN, BL_MASK_SUBMERGED, BL_MASK_TERMILL, BL_MASK_TETHERED, BL_MASK_TRAPPED, BL_MASK_UNCONSC, BL_MASK_WOUNDEDL, BL_RESET, BL_SCORE, BL_STR, BL_TERRAIN, BL_TH_ALWAYS_HILITE, BL_TH_CONDITION, BL_TH_CRITICALHP, BL_TH_NONE, BL_TH_TEXTMATCH, BL_TH_UPDOWN, BL_TH_VAL_ABSOLUTE, BL_TH_VAL_PERCENTAGE, BL_TIME, BL_TITLE, BL_VERS, BL_WEAPON, BL_WI, BL_XP, BOTL_NSIZ, CONDITION_COUNT, EQ_VALUE, GE_VALUE, GT_VALUE, HL_BLINK, HL_BOLD, HL_DIM, HL_INVERSE, HL_ITALIC, HL_NONE, HL_ULINE, HL_UNDEF, LE_VALUE, LT_VALUE, MAXBLSTATS, MAXVALWIDTH, NO_LTEQGT, TXT_VALUE, bl_bareh, bl_blind, bl_busy, bl_conf, bl_deaf, bl_elf_iron, bl_fly, bl_foodpois, bl_glowhands, bl_grab, bl_hallu, bl_held, bl_holding, bl_icy, bl_inlava, bl_lev, bl_parlyz, bl_ride, bl_sleeping, bl_slime, bl_slippery, bl_stone, bl_strngl, bl_stun, bl_submerged, bl_termill, bl_tethered, bl_trapped, bl_unconsc, bl_woundedl } from './botl.h.js';
 import { VIA_WINDOWPORT } from './botl.macros.js';
 import { config_error_add } from './cfgfiles.js';
 import { CLR_MAX, NO_COLOR } from './color.h.js';
@@ -145,7 +146,7 @@ export function do_statusline1() {   // botl.c:48
         $c.__builtin___sprintf_chk(nb = eos(nb), 0, -1, $c.lit("%*s"), i - j | 0, $c.lit(" "));
     }
     $c.__builtin___sprintf_chk(nb = eos(nb), 0, -1, $c.lit("St:%s Dx:%-1d Co:%-1d In:%-1d Wi:%-1d Ch:%-1d"), get_strength_str(), acurr(A_DEX), acurr(A_CON), acurr(A_INT), acurr(A_WIS), acurr(A_CHA));
-    $c.__builtin___sprintf_chk(nb = eos(nb), 0, -1, $c.lit("%s"), u.ualign.type === -1 ? $c.lit("  Chaotic") : u.ualign.type === 0 ? $c.lit("  Neutral") : $c.lit("  Lawful"));
+    $c.__builtin___sprintf_chk(nb = eos(nb), 0, -1, $c.lit("%s"), u.ualign.type === A_CHAOTIC ? $c.lit("  Chaotic") : u.ualign.type === A_NEUTRAL ? $c.lit("  Neutral") : $c.lit("  Lawful"));
     return new $c.Ptr(do_statusline1$newbot1, 0);
 }
 export async function do_statusline2() {   // botl.c:101
@@ -494,7 +495,7 @@ async function bot_via_windowport() {   // botl.c:962
     i = $c.i32($c.subu64($c.addu64($c.addu64($c.strlen(new $c.Ptr(buf, 0)), 6), $c.strlen(titl)), 1));
     if (i > 30) {
         i = 30 - $c.i32($c.subu64($c.addu64(6, $c.strlen(titl)), 1)) | 0;
-        nb.set(i > 16 ? i : 16, 0);
+        nb.set(i > BOTL_NSIZ ? i : BOTL_NSIZ, 0);
     }
     $c.__builtin___strcpy_chk(nb = eos(nb), $c.lit(" the "), -1);
     $c.__builtin___strcpy_chk(nb = eos(nb), titl, -1);
@@ -515,7 +516,7 @@ async function bot_via_windowport() {   // botl.c:962
     $t6 = ACURR(A_INT), gb.blstats[idx][BL_IN].a.a_int = $t6;
     $t7 = ACURR(A_WIS), gb.blstats[idx][BL_WI].a.a_int = $t7;
     $t8 = ACURR(A_CHA), gb.blstats[idx][BL_CH].a.a_int = $t8;
-    $c.__builtin___strcpy_chk(gb.blstats[idx][BL_ALIGN].val, u.ualign.type === -1 ? $c.lit("Chaotic") : u.ualign.type === 0 ? $c.lit("Neutral") : $c.lit("Lawful"), -1);
+    $c.__builtin___strcpy_chk(gb.blstats[idx][BL_ALIGN].val, u.ualign.type === A_CHAOTIC ? $c.lit("Chaotic") : u.ualign.type === A_NEUTRAL ? $c.lit("Neutral") : $c.lit("Lawful"), -1);
     gb.blstats[idx][BL_SCORE].a.a_long = 0;
     i = Upolyd() ? u.mh : u.uhp;
     if (i < 0) {
@@ -1583,7 +1584,7 @@ function splitsubfields(str, sfarr, maxsf) {   // botl.c:2688
     for (sf = 0; sf < MAX_SUBFIELDS; sf = sf + 1 | 0) {
         splitsubfields$subfields[sf] = null;
     }
-    maxsf = maxsf === 0 ? MAX_SUBFIELDS : maxsf < 16 ? maxsf : 16;
+    maxsf = maxsf === 0 ? MAX_SUBFIELDS : maxsf < MAX_SUBFIELDS ? maxsf : MAX_SUBFIELDS;
     if ($c.strchr(str, 43) || $c.strchr(str, 38)) {
         c = str;
         sf = 0;
@@ -2948,910 +2949,256 @@ function Is_Temp_Hilite(rule) {
 
 export function $init() {
     enc_stat.fill(null);
-    enc_stat[0] = $c.lit("");
-    enc_stat[1] = $c.lit("Burdened");
-    enc_stat[2] = $c.lit("Stressed");
-    enc_stat[3] = $c.lit("Strained");
-    enc_stat[4] = $c.lit("Overtaxed");
-    enc_stat[5] = $c.lit("Overloaded");
+    $c.init(enc_stat, [
+        $c.lit(""),
+        $c.lit("Burdened"),
+        $c.lit("Stressed"),
+        $c.lit("Strained"),
+        $c.lit("Overtaxed"),
+        $c.lit("Overloaded")
+    ]);
     for (let $i0 = 0; $i0 < 27; $i0++) {
         initblstats[$i0].$copyFrom(new $T.istat_s());
     }
-    initblstats[0].fldname = $c.lit("title");
-    initblstats[0].fldfmt = $c.lit("%s");
-    initblstats[0].time = 0;
-    initblstats[0].chg = 0;
-    initblstats[0].percent_matters = 0;
-    initblstats[0].percent_value = 0;
-    initblstats[0].anytype = ANY_STR;
-    initblstats[0].a.a_void = null;
-    initblstats[0].rawval.a_void = null;
-    initblstats[0].val = null;
-    initblstats[0].valwidth = 80;
-    initblstats[0].idxmax = -1;
-    initblstats[0].fld = BL_TITLE;
-    initblstats[0].hilite_rule = null;
-    initblstats[0].thresholds = null;
-    initblstats[1].fldname = $c.lit("strength");
-    initblstats[1].fldfmt = $c.lit(" St:%s");
-    initblstats[1].time = 0;
-    initblstats[1].chg = 0;
-    initblstats[1].percent_matters = 0;
-    initblstats[1].percent_value = 0;
-    initblstats[1].anytype = ANY_INT;
-    initblstats[1].a.a_void = null;
-    initblstats[1].rawval.a_void = null;
-    initblstats[1].val = null;
-    initblstats[1].valwidth = 10;
-    initblstats[1].idxmax = -1;
-    initblstats[1].fld = BL_STR;
-    initblstats[1].hilite_rule = null;
-    initblstats[1].thresholds = null;
-    initblstats[2].fldname = $c.lit("dexterity");
-    initblstats[2].fldfmt = $c.lit(" Dx:%s");
-    initblstats[2].time = 0;
-    initblstats[2].chg = 0;
-    initblstats[2].percent_matters = 0;
-    initblstats[2].percent_value = 0;
-    initblstats[2].anytype = ANY_INT;
-    initblstats[2].a.a_void = null;
-    initblstats[2].rawval.a_void = null;
-    initblstats[2].val = null;
-    initblstats[2].valwidth = 10;
-    initblstats[2].idxmax = -1;
-    initblstats[2].fld = BL_DX;
-    initblstats[2].hilite_rule = null;
-    initblstats[2].thresholds = null;
-    initblstats[3].fldname = $c.lit("constitution");
-    initblstats[3].fldfmt = $c.lit(" Co:%s");
-    initblstats[3].time = 0;
-    initblstats[3].chg = 0;
-    initblstats[3].percent_matters = 0;
-    initblstats[3].percent_value = 0;
-    initblstats[3].anytype = ANY_INT;
-    initblstats[3].a.a_void = null;
-    initblstats[3].rawval.a_void = null;
-    initblstats[3].val = null;
-    initblstats[3].valwidth = 10;
-    initblstats[3].idxmax = -1;
-    initblstats[3].fld = BL_CO;
-    initblstats[3].hilite_rule = null;
-    initblstats[3].thresholds = null;
-    initblstats[4].fldname = $c.lit("intelligence");
-    initblstats[4].fldfmt = $c.lit(" In:%s");
-    initblstats[4].time = 0;
-    initblstats[4].chg = 0;
-    initblstats[4].percent_matters = 0;
-    initblstats[4].percent_value = 0;
-    initblstats[4].anytype = ANY_INT;
-    initblstats[4].a.a_void = null;
-    initblstats[4].rawval.a_void = null;
-    initblstats[4].val = null;
-    initblstats[4].valwidth = 10;
-    initblstats[4].idxmax = -1;
-    initblstats[4].fld = BL_IN;
-    initblstats[4].hilite_rule = null;
-    initblstats[4].thresholds = null;
-    initblstats[5].fldname = $c.lit("wisdom");
-    initblstats[5].fldfmt = $c.lit(" Wi:%s");
-    initblstats[5].time = 0;
-    initblstats[5].chg = 0;
-    initblstats[5].percent_matters = 0;
-    initblstats[5].percent_value = 0;
-    initblstats[5].anytype = ANY_INT;
-    initblstats[5].a.a_void = null;
-    initblstats[5].rawval.a_void = null;
-    initblstats[5].val = null;
-    initblstats[5].valwidth = 10;
-    initblstats[5].idxmax = -1;
-    initblstats[5].fld = BL_WI;
-    initblstats[5].hilite_rule = null;
-    initblstats[5].thresholds = null;
-    initblstats[6].fldname = $c.lit("charisma");
-    initblstats[6].fldfmt = $c.lit(" Ch:%s");
-    initblstats[6].time = 0;
-    initblstats[6].chg = 0;
-    initblstats[6].percent_matters = 0;
-    initblstats[6].percent_value = 0;
-    initblstats[6].anytype = ANY_INT;
-    initblstats[6].a.a_void = null;
-    initblstats[6].rawval.a_void = null;
-    initblstats[6].val = null;
-    initblstats[6].valwidth = 10;
-    initblstats[6].idxmax = -1;
-    initblstats[6].fld = BL_CH;
-    initblstats[6].hilite_rule = null;
-    initblstats[6].thresholds = null;
-    initblstats[7].fldname = $c.lit("alignment");
-    initblstats[7].fldfmt = $c.lit(" %s");
-    initblstats[7].time = 0;
-    initblstats[7].chg = 0;
-    initblstats[7].percent_matters = 0;
-    initblstats[7].percent_value = 0;
-    initblstats[7].anytype = ANY_STR;
-    initblstats[7].a.a_void = null;
-    initblstats[7].rawval.a_void = null;
-    initblstats[7].val = null;
-    initblstats[7].valwidth = 20;
-    initblstats[7].idxmax = -1;
-    initblstats[7].fld = BL_ALIGN;
-    initblstats[7].hilite_rule = null;
-    initblstats[7].thresholds = null;
-    initblstats[8].fldname = $c.lit("score");
-    initblstats[8].fldfmt = $c.lit(" S:%s");
-    initblstats[8].time = 0;
-    initblstats[8].chg = 0;
-    initblstats[8].percent_matters = 0;
-    initblstats[8].percent_value = 0;
-    initblstats[8].anytype = ANY_LONG;
-    initblstats[8].a.a_void = null;
-    initblstats[8].rawval.a_void = null;
-    initblstats[8].val = null;
-    initblstats[8].valwidth = 30;
-    initblstats[8].idxmax = -1;
-    initblstats[8].fld = BL_SCORE;
-    initblstats[8].hilite_rule = null;
-    initblstats[8].thresholds = null;
-    initblstats[9].fldname = $c.lit("carrying-capacity");
-    initblstats[9].fldfmt = $c.lit(" %s");
-    initblstats[9].time = 0;
-    initblstats[9].chg = 0;
-    initblstats[9].percent_matters = 0;
-    initblstats[9].percent_value = 0;
-    initblstats[9].anytype = ANY_INT;
-    initblstats[9].a.a_void = null;
-    initblstats[9].rawval.a_void = null;
-    initblstats[9].val = null;
-    initblstats[9].valwidth = 20;
-    initblstats[9].idxmax = -1;
-    initblstats[9].fld = BL_CAP;
-    initblstats[9].hilite_rule = null;
-    initblstats[9].thresholds = null;
-    initblstats[10].fldname = $c.lit("gold");
-    initblstats[10].fldfmt = $c.lit(" %s");
-    initblstats[10].time = 0;
-    initblstats[10].chg = 0;
-    initblstats[10].percent_matters = 0;
-    initblstats[10].percent_value = 0;
-    initblstats[10].anytype = ANY_LONG;
-    initblstats[10].a.a_void = null;
-    initblstats[10].rawval.a_void = null;
-    initblstats[10].val = null;
-    initblstats[10].valwidth = 40;
-    initblstats[10].idxmax = -1;
-    initblstats[10].fld = BL_GOLD;
-    initblstats[10].hilite_rule = null;
-    initblstats[10].thresholds = null;
-    initblstats[11].fldname = $c.lit("power");
-    initblstats[11].fldfmt = $c.lit(" Pw:%s");
-    initblstats[11].time = 0;
-    initblstats[11].chg = 0;
-    initblstats[11].percent_matters = 1;
-    initblstats[11].percent_value = 0;
-    initblstats[11].anytype = ANY_INT;
-    initblstats[11].a.a_void = null;
-    initblstats[11].rawval.a_void = null;
-    initblstats[11].val = null;
-    initblstats[11].valwidth = 10;
-    initblstats[11].idxmax = BL_ENEMAX;
-    initblstats[11].fld = BL_ENE;
-    initblstats[11].hilite_rule = null;
-    initblstats[11].thresholds = null;
-    initblstats[12].fldname = $c.lit("power-max");
-    initblstats[12].fldfmt = $c.lit("(%s)");
-    initblstats[12].time = 0;
-    initblstats[12].chg = 0;
-    initblstats[12].percent_matters = 0;
-    initblstats[12].percent_value = 0;
-    initblstats[12].anytype = ANY_INT;
-    initblstats[12].a.a_void = null;
-    initblstats[12].rawval.a_void = null;
-    initblstats[12].val = null;
-    initblstats[12].valwidth = 10;
-    initblstats[12].idxmax = -1;
-    initblstats[12].fld = BL_ENEMAX;
-    initblstats[12].hilite_rule = null;
-    initblstats[12].thresholds = null;
-    initblstats[13].fldname = $c.lit("experience-level");
-    initblstats[13].fldfmt = $c.lit(" Xp:%s");
-    initblstats[13].time = 0;
-    initblstats[13].chg = 0;
-    initblstats[13].percent_matters = 1;
-    initblstats[13].percent_value = 0;
-    initblstats[13].anytype = ANY_INT;
-    initblstats[13].a.a_void = null;
-    initblstats[13].rawval.a_void = null;
-    initblstats[13].val = null;
-    initblstats[13].valwidth = 10;
-    initblstats[13].idxmax = BL_EXP;
-    initblstats[13].fld = BL_XP;
-    initblstats[13].hilite_rule = null;
-    initblstats[13].thresholds = null;
-    initblstats[14].fldname = $c.lit("armor-class");
-    initblstats[14].fldfmt = $c.lit(" AC:%s");
-    initblstats[14].time = 0;
-    initblstats[14].chg = 0;
-    initblstats[14].percent_matters = 0;
-    initblstats[14].percent_value = 0;
-    initblstats[14].anytype = ANY_INT;
-    initblstats[14].a.a_void = null;
-    initblstats[14].rawval.a_void = null;
-    initblstats[14].val = null;
-    initblstats[14].valwidth = 10;
-    initblstats[14].idxmax = -1;
-    initblstats[14].fld = BL_AC;
-    initblstats[14].hilite_rule = null;
-    initblstats[14].thresholds = null;
-    initblstats[15].fldname = $c.lit("HD");
-    initblstats[15].fldfmt = $c.lit(" HD:%s");
-    initblstats[15].time = 0;
-    initblstats[15].chg = 0;
-    initblstats[15].percent_matters = 0;
-    initblstats[15].percent_value = 0;
-    initblstats[15].anytype = ANY_INT;
-    initblstats[15].a.a_void = null;
-    initblstats[15].rawval.a_void = null;
-    initblstats[15].val = null;
-    initblstats[15].valwidth = 10;
-    initblstats[15].idxmax = -1;
-    initblstats[15].fld = BL_HD;
-    initblstats[15].hilite_rule = null;
-    initblstats[15].thresholds = null;
-    initblstats[16].fldname = $c.lit("time");
-    initblstats[16].fldfmt = $c.lit(" T:%s");
-    initblstats[16].time = 0;
-    initblstats[16].chg = 0;
-    initblstats[16].percent_matters = 0;
-    initblstats[16].percent_value = 0;
-    initblstats[16].anytype = ANY_LONG;
-    initblstats[16].a.a_void = null;
-    initblstats[16].rawval.a_void = null;
-    initblstats[16].val = null;
-    initblstats[16].valwidth = 30;
-    initblstats[16].idxmax = -1;
-    initblstats[16].fld = BL_TIME;
-    initblstats[16].hilite_rule = null;
-    initblstats[16].thresholds = null;
-    initblstats[17].fldname = $c.lit("hunger");
-    initblstats[17].fldfmt = $c.lit(" %s");
-    initblstats[17].time = 0;
-    initblstats[17].chg = 0;
-    initblstats[17].percent_matters = 0;
-    initblstats[17].percent_value = 0;
-    initblstats[17].anytype = ANY_INT;
-    initblstats[17].a.a_void = null;
-    initblstats[17].rawval.a_void = null;
-    initblstats[17].val = null;
-    initblstats[17].valwidth = 20;
-    initblstats[17].idxmax = -1;
-    initblstats[17].fld = BL_HUNGER;
-    initblstats[17].hilite_rule = null;
-    initblstats[17].thresholds = null;
-    initblstats[18].fldname = $c.lit("hitpoints");
-    initblstats[18].fldfmt = $c.lit(" HP:%s");
-    initblstats[18].time = 0;
-    initblstats[18].chg = 0;
-    initblstats[18].percent_matters = 1;
-    initblstats[18].percent_value = 0;
-    initblstats[18].anytype = ANY_INT;
-    initblstats[18].a.a_void = null;
-    initblstats[18].rawval.a_void = null;
-    initblstats[18].val = null;
-    initblstats[18].valwidth = 10;
-    initblstats[18].idxmax = BL_HPMAX;
-    initblstats[18].fld = BL_HP;
-    initblstats[18].hilite_rule = null;
-    initblstats[18].thresholds = null;
-    initblstats[19].fldname = $c.lit("hitpoints-max");
-    initblstats[19].fldfmt = $c.lit("(%s)");
-    initblstats[19].time = 0;
-    initblstats[19].chg = 0;
-    initblstats[19].percent_matters = 0;
-    initblstats[19].percent_value = 0;
-    initblstats[19].anytype = ANY_INT;
-    initblstats[19].a.a_void = null;
-    initblstats[19].rawval.a_void = null;
-    initblstats[19].val = null;
-    initblstats[19].valwidth = 10;
-    initblstats[19].idxmax = -1;
-    initblstats[19].fld = BL_HPMAX;
-    initblstats[19].hilite_rule = null;
-    initblstats[19].thresholds = null;
-    initblstats[20].fldname = $c.lit("dungeon-level");
-    initblstats[20].fldfmt = $c.lit("%s");
-    initblstats[20].time = 0;
-    initblstats[20].chg = 0;
-    initblstats[20].percent_matters = 0;
-    initblstats[20].percent_value = 0;
-    initblstats[20].anytype = ANY_STR;
-    initblstats[20].a.a_void = null;
-    initblstats[20].rawval.a_void = null;
-    initblstats[20].val = null;
-    initblstats[20].valwidth = 80;
-    initblstats[20].idxmax = -1;
-    initblstats[20].fld = BL_LEVELDESC;
-    initblstats[20].hilite_rule = null;
-    initblstats[20].thresholds = null;
-    initblstats[21].fldname = $c.lit("experience");
-    initblstats[21].fldfmt = $c.lit("/%s");
-    initblstats[21].time = 0;
-    initblstats[21].chg = 0;
-    initblstats[21].percent_matters = 1;
-    initblstats[21].percent_value = 0;
-    initblstats[21].anytype = ANY_LONG;
-    initblstats[21].a.a_void = null;
-    initblstats[21].rawval.a_void = null;
-    initblstats[21].val = null;
-    initblstats[21].valwidth = 30;
-    initblstats[21].idxmax = BL_EXP;
-    initblstats[21].fld = BL_EXP;
-    initblstats[21].hilite_rule = null;
-    initblstats[21].thresholds = null;
-    initblstats[22].fldname = $c.lit("condition");
-    initblstats[22].fldfmt = $c.lit("%s");
-    initblstats[22].time = 0;
-    initblstats[22].chg = 0;
-    initblstats[22].percent_matters = 0;
-    initblstats[22].percent_value = 0;
-    initblstats[22].anytype = ANY_MASK32;
-    initblstats[22].a.a_void = null;
-    initblstats[22].rawval.a_void = null;
-    initblstats[22].val = null;
-    initblstats[22].valwidth = 0;
-    initblstats[22].idxmax = -1;
-    initblstats[22].fld = BL_CONDITION;
-    initblstats[22].hilite_rule = null;
-    initblstats[22].thresholds = null;
-    initblstats[23].fldname = $c.lit("version");
-    initblstats[23].fldfmt = $c.lit(" %s");
-    initblstats[23].time = 0;
-    initblstats[23].chg = 0;
-    initblstats[23].percent_matters = 0;
-    initblstats[23].percent_value = 0;
-    initblstats[23].anytype = ANY_STR;
-    initblstats[23].a.a_void = null;
-    initblstats[23].rawval.a_void = null;
-    initblstats[23].val = null;
-    initblstats[23].valwidth = 80;
-    initblstats[23].idxmax = -1;
-    initblstats[23].fld = BL_VERS;
-    initblstats[23].hilite_rule = null;
-    initblstats[23].thresholds = null;
-    initblstats[24].fldname = $c.lit("weapon");
-    initblstats[24].fldfmt = $c.lit(" %s");
-    initblstats[24].time = 0;
-    initblstats[24].chg = 0;
-    initblstats[24].percent_matters = 0;
-    initblstats[24].percent_value = 0;
-    initblstats[24].anytype = ANY_STR;
-    initblstats[24].a.a_void = null;
-    initblstats[24].rawval.a_void = null;
-    initblstats[24].val = null;
-    initblstats[24].valwidth = 20;
-    initblstats[24].idxmax = -1;
-    initblstats[24].fld = BL_WEAPON;
-    initblstats[24].hilite_rule = null;
-    initblstats[24].thresholds = null;
-    initblstats[25].fldname = $c.lit("armor");
-    initblstats[25].fldfmt = $c.lit(" %s");
-    initblstats[25].time = 0;
-    initblstats[25].chg = 0;
-    initblstats[25].percent_matters = 0;
-    initblstats[25].percent_value = 0;
-    initblstats[25].anytype = ANY_STR;
-    initblstats[25].a.a_void = null;
-    initblstats[25].rawval.a_void = null;
-    initblstats[25].val = null;
-    initblstats[25].valwidth = 20;
-    initblstats[25].idxmax = -1;
-    initblstats[25].fld = BL_ARMOR;
-    initblstats[25].hilite_rule = null;
-    initblstats[25].thresholds = null;
-    initblstats[26].fldname = $c.lit("terrain");
-    initblstats[26].fldfmt = $c.lit(" %s");
-    initblstats[26].time = 0;
-    initblstats[26].chg = 0;
-    initblstats[26].percent_matters = 0;
-    initblstats[26].percent_value = 0;
-    initblstats[26].anytype = ANY_STR;
-    initblstats[26].a.a_void = null;
-    initblstats[26].rawval.a_void = null;
-    initblstats[26].val = null;
-    initblstats[26].valwidth = 20;
-    initblstats[26].idxmax = -1;
-    initblstats[26].fld = BL_TERRAIN;
-    initblstats[26].hilite_rule = null;
-    initblstats[26].thresholds = null;
+    $c.init(initblstats, [
+        { fldname: $c.lit("title"), fldfmt: $c.lit("%s"), time: 0, chg: 0, percent_matters: 0, percent_value: 0, anytype: ANY_STR, a: {}, rawval: {}, val: null,
+          valwidth: MAXVALWIDTH, idxmax: -1, fld: BL_TITLE, hilite_rule: null, thresholds: null },
+        { fldname: $c.lit("strength"), fldfmt: $c.lit(" St:%s"), time: 0, chg: 0, percent_matters: 0, percent_value: 0, anytype: ANY_INT, a: {}, rawval: {},
+          val: null, valwidth: 10, idxmax: -1, fld: BL_STR, hilite_rule: null, thresholds: null },
+        { fldname: $c.lit("dexterity"), fldfmt: $c.lit(" Dx:%s"), time: 0, chg: 0, percent_matters: 0, percent_value: 0, anytype: ANY_INT, a: {}, rawval: {},
+          val: null, valwidth: 10, idxmax: -1, fld: BL_DX, hilite_rule: null, thresholds: null },
+        { fldname: $c.lit("constitution"), fldfmt: $c.lit(" Co:%s"), time: 0, chg: 0, percent_matters: 0, percent_value: 0, anytype: ANY_INT, a: {}, rawval: {},
+          val: null, valwidth: 10, idxmax: -1, fld: BL_CO, hilite_rule: null, thresholds: null },
+        { fldname: $c.lit("intelligence"), fldfmt: $c.lit(" In:%s"), time: 0, chg: 0, percent_matters: 0, percent_value: 0, anytype: ANY_INT, a: {}, rawval: {},
+          val: null, valwidth: 10, idxmax: -1, fld: BL_IN, hilite_rule: null, thresholds: null },
+        { fldname: $c.lit("wisdom"), fldfmt: $c.lit(" Wi:%s"), time: 0, chg: 0, percent_matters: 0, percent_value: 0, anytype: ANY_INT, a: {}, rawval: {},
+          val: null, valwidth: 10, idxmax: -1, fld: BL_WI, hilite_rule: null, thresholds: null },
+        { fldname: $c.lit("charisma"), fldfmt: $c.lit(" Ch:%s"), time: 0, chg: 0, percent_matters: 0, percent_value: 0, anytype: ANY_INT, a: {}, rawval: {},
+          val: null, valwidth: 10, idxmax: -1, fld: BL_CH, hilite_rule: null, thresholds: null },
+        { fldname: $c.lit("alignment"), fldfmt: $c.lit(" %s"), time: 0, chg: 0, percent_matters: 0, percent_value: 0, anytype: ANY_STR, a: {}, rawval: {},
+          val: null, valwidth: 20, idxmax: -1, fld: BL_ALIGN, hilite_rule: null, thresholds: null },
+        { fldname: $c.lit("score"), fldfmt: $c.lit(" S:%s"), time: 0, chg: 0, percent_matters: 0, percent_value: 0, anytype: ANY_LONG, a: {}, rawval: {},
+          val: null, valwidth: 30, idxmax: -1, fld: BL_SCORE, hilite_rule: null, thresholds: null },
+        { fldname: $c.lit("carrying-capacity"), fldfmt: $c.lit(" %s"), time: 0, chg: 0, percent_matters: 0, percent_value: 0, anytype: ANY_INT, a: {}, rawval:
+          {}, val: null, valwidth: 20, idxmax: -1, fld: BL_CAP, hilite_rule: null, thresholds: null },
+        { fldname: $c.lit("gold"), fldfmt: $c.lit(" %s"), time: 0, chg: 0, percent_matters: 0, percent_value: 0, anytype: ANY_LONG, a: {}, rawval: {},
+          val: null, valwidth: 40, idxmax: -1, fld: BL_GOLD, hilite_rule: null, thresholds: null },
+        { fldname: $c.lit("power"), fldfmt: $c.lit(" Pw:%s"), time: 0, chg: 0, percent_matters: 1, percent_value: 0, anytype: ANY_INT, a: {}, rawval: {},
+          val: null, valwidth: 10, idxmax: BL_ENEMAX, fld: BL_ENE, hilite_rule: null, thresholds: null },
+        { fldname: $c.lit("power-max"), fldfmt: $c.lit("(%s)"), time: 0, chg: 0, percent_matters: 0, percent_value: 0, anytype: ANY_INT, a: {}, rawval: {},
+          val: null, valwidth: 10, idxmax: -1, fld: BL_ENEMAX, hilite_rule: null, thresholds: null },
+        { fldname: $c.lit("experience-level"), fldfmt: $c.lit(" Xp:%s"), time: 0, chg: 0, percent_matters: 1, percent_value: 0, anytype: ANY_INT, a: {}, rawval:
+          {}, val: null, valwidth: 10, idxmax: BL_EXP, fld: BL_XP, hilite_rule: null, thresholds: null },
+        { fldname: $c.lit("armor-class"), fldfmt: $c.lit(" AC:%s"), time: 0, chg: 0, percent_matters: 0, percent_value: 0, anytype: ANY_INT, a: {}, rawval: {},
+          val: null, valwidth: 10, idxmax: -1, fld: BL_AC, hilite_rule: null, thresholds: null },
+        { fldname: $c.lit("HD"), fldfmt: $c.lit(" HD:%s"), time: 0, chg: 0, percent_matters: 0, percent_value: 0, anytype: ANY_INT, a: {}, rawval: {},
+          val: null, valwidth: 10, idxmax: -1, fld: BL_HD, hilite_rule: null, thresholds: null },
+        { fldname: $c.lit("time"), fldfmt: $c.lit(" T:%s"), time: 0, chg: 0, percent_matters: 0, percent_value: 0, anytype: ANY_LONG, a: {}, rawval: {},
+          val: null, valwidth: 30, idxmax: -1, fld: BL_TIME, hilite_rule: null, thresholds: null },
+        { fldname: $c.lit("hunger"), fldfmt: $c.lit(" %s"), time: 0, chg: 0, percent_matters: 0, percent_value: 0, anytype: ANY_INT, a: {}, rawval: {},
+          val: null, valwidth: 20, idxmax: -1, fld: BL_HUNGER, hilite_rule: null, thresholds: null },
+        { fldname: $c.lit("hitpoints"), fldfmt: $c.lit(" HP:%s"), time: 0, chg: 0, percent_matters: 1, percent_value: 0, anytype: ANY_INT, a: {}, rawval: {},
+          val: null, valwidth: 10, idxmax: BL_HPMAX, fld: BL_HP, hilite_rule: null, thresholds: null },
+        { fldname: $c.lit("hitpoints-max"), fldfmt: $c.lit("(%s)"), time: 0, chg: 0, percent_matters: 0, percent_value: 0, anytype: ANY_INT, a: {}, rawval: {},
+          val: null, valwidth: 10, idxmax: -1, fld: BL_HPMAX, hilite_rule: null, thresholds: null },
+        { fldname: $c.lit("dungeon-level"), fldfmt: $c.lit("%s"), time: 0, chg: 0, percent_matters: 0, percent_value: 0, anytype: ANY_STR, a: {}, rawval: {},
+          val: null, valwidth: MAXVALWIDTH, idxmax: -1, fld: BL_LEVELDESC, hilite_rule: null, thresholds: null },
+        { fldname: $c.lit("experience"), fldfmt: $c.lit("/%s"), time: 0, chg: 0, percent_matters: 1, percent_value: 0, anytype: ANY_LONG, a: {}, rawval: {},
+          val: null, valwidth: 30, idxmax: BL_EXP, fld: BL_EXP, hilite_rule: null, thresholds: null },
+        { fldname: $c.lit("condition"), fldfmt: $c.lit("%s"), time: 0, chg: 0, percent_matters: 0, percent_value: 0, anytype: ANY_MASK32, a: {}, rawval: {},
+          val: null, valwidth: 0, idxmax: -1, fld: BL_CONDITION, hilite_rule: null, thresholds: null },
+        { fldname: $c.lit("version"), fldfmt: $c.lit(" %s"), time: 0, chg: 0, percent_matters: 0, percent_value: 0, anytype: ANY_STR, a: {}, rawval: {},
+          val: null, valwidth: MAXVALWIDTH, idxmax: -1, fld: BL_VERS, hilite_rule: null, thresholds: null },
+        { fldname: $c.lit("weapon"), fldfmt: $c.lit(" %s"), time: 0, chg: 0, percent_matters: 0, percent_value: 0, anytype: ANY_STR, a: {}, rawval: {},
+          val: null, valwidth: 20, idxmax: -1, fld: BL_WEAPON, hilite_rule: null, thresholds: null },
+        { fldname: $c.lit("armor"), fldfmt: $c.lit(" %s"), time: 0, chg: 0, percent_matters: 0, percent_value: 0, anytype: ANY_STR, a: {}, rawval: {},
+          val: null, valwidth: 20, idxmax: -1, fld: BL_ARMOR, hilite_rule: null, thresholds: null },
+        { fldname: $c.lit("terrain"), fldfmt: $c.lit(" %s"), time: 0, chg: 0, percent_matters: 0, percent_value: 0, anytype: ANY_STR, a: {}, rawval: {},
+          val: null, valwidth: 20, idxmax: -1, fld: BL_TERRAIN,
+          hilite_rule: null, thresholds: null }
+    ]);
     for (let $i0 = 0; $i0 < 6; $i0++) {
         condition_aliases[$i0].$copyFrom(new $T.condmap());
     }
-    condition_aliases[0].id = $c.lit("strangled");
-    condition_aliases[0].bitmask = BL_MASK_STRNGL;
-    condition_aliases[1].id = $c.lit("all");
-    condition_aliases[1].bitmask = BL_MASK_BAREH | BL_MASK_BLIND | BL_MASK_BUSY | BL_MASK_CONF | BL_MASK_DEAF | BL_MASK_ELF_IRON | BL_MASK_FLY | BL_MASK_FOODPOIS | BL_MASK_GLOWHANDS | BL_MASK_GRAB | BL_MASK_HALLU | BL_MASK_HELD | BL_MASK_ICY | BL_MASK_INLAVA | BL_MASK_LEV | BL_MASK_PARLYZ | BL_MASK_RIDE | BL_MASK_SLEEPING | BL_MASK_SLIME | BL_MASK_SLIPPERY | BL_MASK_STONE | BL_MASK_STRNGL | BL_MASK_STUN | BL_MASK_SUBMERGED | BL_MASK_TERMILL | BL_MASK_TETHERED | BL_MASK_TRAPPED | BL_MASK_UNCONSC | BL_MASK_WOUNDEDL | BL_MASK_HOLDING;
-    condition_aliases[2].id = $c.lit("major_troubles");
-    condition_aliases[2].bitmask = BL_MASK_FOODPOIS | BL_MASK_GRAB | BL_MASK_INLAVA | BL_MASK_SLIME | BL_MASK_STONE | BL_MASK_STRNGL | BL_MASK_TERMILL;
-    condition_aliases[3].id = $c.lit("minor_troubles");
-    condition_aliases[3].bitmask = BL_MASK_BLIND | BL_MASK_CONF | BL_MASK_DEAF | BL_MASK_HALLU | BL_MASK_PARLYZ | BL_MASK_SUBMERGED | BL_MASK_STUN;
-    condition_aliases[4].id = $c.lit("movement");
-    condition_aliases[4].bitmask = BL_MASK_LEV | BL_MASK_FLY | BL_MASK_RIDE;
-    condition_aliases[5].id = $c.lit("opt_in");
-    condition_aliases[5].bitmask = BL_MASK_BAREH | BL_MASK_BUSY | BL_MASK_GLOWHANDS | BL_MASK_HELD | BL_MASK_ICY | BL_MASK_PARLYZ | BL_MASK_SLEEPING | BL_MASK_SLIPPERY | BL_MASK_SUBMERGED | BL_MASK_TETHERED | BL_MASK_TRAPPED | BL_MASK_UNCONSC | BL_MASK_WOUNDEDL | BL_MASK_HOLDING;
+    $c.init(condition_aliases, [
+        { id: $c.lit("strangled"), bitmask: BL_MASK_STRNGL },
+        { id: $c.lit("all"),
+          bitmask: BL_MASK_BAREH | BL_MASK_BLIND | BL_MASK_BUSY | BL_MASK_CONF | BL_MASK_DEAF | BL_MASK_ELF_IRON | BL_MASK_FLY | BL_MASK_FOODPOIS | BL_MASK_GLOWHANDS | BL_MASK_GRAB | BL_MASK_HALLU | BL_MASK_HELD | BL_MASK_ICY | BL_MASK_INLAVA | BL_MASK_LEV | BL_MASK_PARLYZ | BL_MASK_RIDE | BL_MASK_SLEEPING | BL_MASK_SLIME | BL_MASK_SLIPPERY | BL_MASK_STONE | BL_MASK_STRNGL | BL_MASK_STUN | BL_MASK_SUBMERGED | BL_MASK_TERMILL | BL_MASK_TETHERED | BL_MASK_TRAPPED | BL_MASK_UNCONSC | BL_MASK_WOUNDEDL | BL_MASK_HOLDING },
+        { id: $c.lit("major_troubles"),
+          bitmask: BL_MASK_FOODPOIS | BL_MASK_GRAB | BL_MASK_INLAVA | BL_MASK_SLIME | BL_MASK_STONE | BL_MASK_STRNGL | BL_MASK_TERMILL },
+        { id: $c.lit("minor_troubles"),
+          bitmask: BL_MASK_BLIND | BL_MASK_CONF | BL_MASK_DEAF | BL_MASK_HALLU | BL_MASK_PARLYZ | BL_MASK_SUBMERGED | BL_MASK_STUN },
+        { id: $c.lit("movement"), bitmask: BL_MASK_LEV | BL_MASK_FLY | BL_MASK_RIDE },
+        { id: $c.lit("opt_in"),
+          bitmask: BL_MASK_BAREH | BL_MASK_BUSY | BL_MASK_GLOWHANDS | BL_MASK_HELD | BL_MASK_ICY | BL_MASK_PARLYZ | BL_MASK_SLEEPING | BL_MASK_SLIPPERY | BL_MASK_SUBMERGED | BL_MASK_TETHERED | BL_MASK_TRAPPED | BL_MASK_UNCONSC | BL_MASK_WOUNDEDL | BL_MASK_HOLDING }
+    ]);
     for (let $i0 = 0; $i0 < 30; $i0++) {
         conditions[$i0].$copyFrom(new $T.conditions_t());
     }
-    conditions[0].ranking = 20;
-    conditions[0].mask = BL_MASK_BAREH;
-    conditions[0].c = bl_bareh;
-    conditions[0].text[0] = $c.lit("Bare");
-    conditions[0].text[1] = $c.lit("Bar");
-    conditions[0].text[2] = $c.lit("Bh");
-    conditions[1].ranking = 10;
-    conditions[1].mask = BL_MASK_BLIND;
-    conditions[1].c = bl_blind;
-    conditions[1].text[0] = $c.lit("Blind");
-    conditions[1].text[1] = $c.lit("Blnd");
-    conditions[1].text[2] = $c.lit("Bl");
-    conditions[2].ranking = 20;
-    conditions[2].mask = BL_MASK_BUSY;
-    conditions[2].c = bl_busy;
-    conditions[2].text[0] = $c.lit("Busy");
-    conditions[2].text[1] = $c.lit("Bsy");
-    conditions[2].text[2] = $c.lit("By");
-    conditions[3].ranking = 10;
-    conditions[3].mask = BL_MASK_CONF;
-    conditions[3].c = bl_conf;
-    conditions[3].text[0] = $c.lit("Conf");
-    conditions[3].text[1] = $c.lit("Cnf");
-    conditions[3].text[2] = $c.lit("Cf");
-    conditions[4].ranking = 10;
-    conditions[4].mask = BL_MASK_DEAF;
-    conditions[4].c = bl_deaf;
-    conditions[4].text[0] = $c.lit("Deaf");
-    conditions[4].text[1] = $c.lit("Def");
-    conditions[4].text[2] = $c.lit("Df");
-    conditions[5].ranking = 15;
-    conditions[5].mask = BL_MASK_ELF_IRON;
-    conditions[5].c = bl_elf_iron;
-    conditions[5].text[0] = $c.lit("Iron");
-    conditions[5].text[1] = $c.lit("Irn");
-    conditions[5].text[2] = $c.lit("Fe");
-    conditions[6].ranking = 10;
-    conditions[6].mask = BL_MASK_FLY;
-    conditions[6].c = bl_fly;
-    conditions[6].text[0] = $c.lit("Fly");
-    conditions[6].text[1] = $c.lit("Fly");
-    conditions[6].text[2] = $c.lit("Fl");
-    conditions[7].ranking = 6;
-    conditions[7].mask = BL_MASK_FOODPOIS;
-    conditions[7].c = bl_foodpois;
-    conditions[7].text[0] = $c.lit("FoodPois");
-    conditions[7].text[1] = $c.lit("Fpois");
-    conditions[7].text[2] = $c.lit("Poi");
-    conditions[8].ranking = 20;
-    conditions[8].mask = BL_MASK_GLOWHANDS;
-    conditions[8].c = bl_glowhands;
-    conditions[8].text[0] = $c.lit("Glow");
-    conditions[8].text[1] = $c.lit("Glo");
-    conditions[8].text[2] = $c.lit("Gl");
-    conditions[9].ranking = 2;
-    conditions[9].mask = BL_MASK_GRAB;
-    conditions[9].c = bl_grab;
-    conditions[9].text[0] = $c.lit("Grab");
-    conditions[9].text[1] = $c.lit("Grb");
-    conditions[9].text[2] = $c.lit("Gr");
-    conditions[10].ranking = 10;
-    conditions[10].mask = BL_MASK_HALLU;
-    conditions[10].c = bl_hallu;
-    conditions[10].text[0] = $c.lit("Hallu");
-    conditions[10].text[1] = $c.lit("Hal");
-    conditions[10].text[2] = $c.lit("Hl");
-    conditions[11].ranking = 20;
-    conditions[11].mask = BL_MASK_HELD;
-    conditions[11].c = bl_held;
-    conditions[11].text[0] = $c.lit("Held");
-    conditions[11].text[1] = $c.lit("Hld");
-    conditions[11].text[2] = $c.lit("Hd");
-    conditions[12].ranking = 20;
-    conditions[12].mask = BL_MASK_ICY;
-    conditions[12].c = bl_icy;
-    conditions[12].text[0] = $c.lit("Icy");
-    conditions[12].text[1] = $c.lit("Icy");
-    conditions[12].text[2] = $c.lit("Ic");
-    conditions[13].ranking = 8;
-    conditions[13].mask = BL_MASK_INLAVA;
-    conditions[13].c = bl_inlava;
-    conditions[13].text[0] = $c.lit("InLava");
-    conditions[13].text[1] = $c.lit("Lav");
-    conditions[13].text[2] = $c.lit("La");
-    conditions[14].ranking = 10;
-    conditions[14].mask = BL_MASK_LEV;
-    conditions[14].c = bl_lev;
-    conditions[14].text[0] = $c.lit("Lev");
-    conditions[14].text[1] = $c.lit("Lev");
-    conditions[14].text[2] = $c.lit("Lv");
-    conditions[15].ranking = 20;
-    conditions[15].mask = BL_MASK_PARLYZ;
-    conditions[15].c = bl_parlyz;
-    conditions[15].text[0] = $c.lit("Parlyz");
-    conditions[15].text[1] = $c.lit("Para");
-    conditions[15].text[2] = $c.lit("Par");
-    conditions[16].ranking = 10;
-    conditions[16].mask = BL_MASK_RIDE;
-    conditions[16].c = bl_ride;
-    conditions[16].text[0] = $c.lit("Ride");
-    conditions[16].text[1] = $c.lit("Rid");
-    conditions[16].text[2] = $c.lit("Rd");
-    conditions[17].ranking = 20;
-    conditions[17].mask = BL_MASK_SLEEPING;
-    conditions[17].c = bl_sleeping;
-    conditions[17].text[0] = $c.lit("Zzz");
-    conditions[17].text[1] = $c.lit("Zzz");
-    conditions[17].text[2] = $c.lit("Zz");
-    conditions[18].ranking = 6;
-    conditions[18].mask = BL_MASK_SLIME;
-    conditions[18].c = bl_slime;
-    conditions[18].text[0] = $c.lit("Slime");
-    conditions[18].text[1] = $c.lit("Slim");
-    conditions[18].text[2] = $c.lit("Slm");
-    conditions[19].ranking = 20;
-    conditions[19].mask = BL_MASK_SLIPPERY;
-    conditions[19].c = bl_slippery;
-    conditions[19].text[0] = $c.lit("Slip");
-    conditions[19].text[1] = $c.lit("Slp");
-    conditions[19].text[2] = $c.lit("Sl");
-    conditions[20].ranking = 6;
-    conditions[20].mask = BL_MASK_STONE;
-    conditions[20].c = bl_stone;
-    conditions[20].text[0] = $c.lit("Stone");
-    conditions[20].text[1] = $c.lit("Ston");
-    conditions[20].text[2] = $c.lit("Sto");
-    conditions[21].ranking = 4;
-    conditions[21].mask = BL_MASK_STRNGL;
-    conditions[21].c = bl_strngl;
-    conditions[21].text[0] = $c.lit("Strngl");
-    conditions[21].text[1] = $c.lit("Stngl");
-    conditions[21].text[2] = $c.lit("Str");
-    conditions[22].ranking = 10;
-    conditions[22].mask = BL_MASK_STUN;
-    conditions[22].c = bl_stun;
-    conditions[22].text[0] = $c.lit("Stun");
-    conditions[22].text[1] = $c.lit("Stun");
-    conditions[22].text[2] = $c.lit("St");
-    conditions[23].ranking = 15;
-    conditions[23].mask = BL_MASK_SUBMERGED;
-    conditions[23].c = bl_submerged;
-    conditions[23].text[0] = $c.lit("Submrg");
-    conditions[23].text[1] = $c.lit("Subm");
-    conditions[23].text[2] = $c.lit("Sm");
-    conditions[24].ranking = 6;
-    conditions[24].mask = BL_MASK_TERMILL;
-    conditions[24].c = bl_termill;
-    conditions[24].text[0] = $c.lit("TermIll");
-    conditions[24].text[1] = $c.lit("Ill");
-    conditions[24].text[2] = $c.lit("Ill");
-    conditions[25].ranking = 20;
-    conditions[25].mask = BL_MASK_TETHERED;
-    conditions[25].c = bl_tethered;
-    conditions[25].text[0] = $c.lit("Teth");
-    conditions[25].text[1] = $c.lit("Tth");
-    conditions[25].text[2] = $c.lit("Te");
-    conditions[26].ranking = 20;
-    conditions[26].mask = BL_MASK_TRAPPED;
-    conditions[26].c = bl_trapped;
-    conditions[26].text[0] = $c.lit("Trap");
-    conditions[26].text[1] = $c.lit("Trp");
-    conditions[26].text[2] = $c.lit("Tr");
-    conditions[27].ranking = 20;
-    conditions[27].mask = BL_MASK_UNCONSC;
-    conditions[27].c = bl_unconsc;
-    conditions[27].text[0] = $c.lit("Out");
-    conditions[27].text[1] = $c.lit("Out");
-    conditions[27].text[2] = $c.lit("KO");
-    conditions[28].ranking = 20;
-    conditions[28].mask = BL_MASK_WOUNDEDL;
-    conditions[28].c = bl_woundedl;
-    conditions[28].text[0] = $c.lit("WLegs");
-    conditions[28].text[1] = $c.lit("Leg");
-    conditions[28].text[2] = $c.lit("Lg");
-    conditions[29].ranking = 20;
-    conditions[29].mask = BL_MASK_HOLDING;
-    conditions[29].c = bl_holding;
-    conditions[29].text[0] = $c.lit("UHold");
-    conditions[29].text[1] = $c.lit("UHld");
-    conditions[29].text[2] = $c.lit("UHd");
+    $c.init(conditions, [
+        { ranking: 20, mask: BL_MASK_BAREH, c: bl_bareh, text: [$c.lit("Bare"), $c.lit("Bar"), $c.lit("Bh")] },
+        { ranking: 10, mask: BL_MASK_BLIND, c: bl_blind, text: [$c.lit("Blind"), $c.lit("Blnd"), $c.lit("Bl")] },
+        { ranking: 20, mask: BL_MASK_BUSY, c: bl_busy, text: [$c.lit("Busy"), $c.lit("Bsy"), $c.lit("By")] },
+        { ranking: 10, mask: BL_MASK_CONF, c: bl_conf, text: [$c.lit("Conf"), $c.lit("Cnf"), $c.lit("Cf")] },
+        { ranking: 10, mask: BL_MASK_DEAF, c: bl_deaf, text: [$c.lit("Deaf"), $c.lit("Def"), $c.lit("Df")] },
+        { ranking: 15, mask: BL_MASK_ELF_IRON, c: bl_elf_iron, text: [$c.lit("Iron"), $c.lit("Irn"), $c.lit("Fe")] },
+        { ranking: 10, mask: BL_MASK_FLY, c: bl_fly, text: [$c.lit("Fly"), $c.lit("Fly"), $c.lit("Fl")] },
+        { ranking: 6, mask: BL_MASK_FOODPOIS, c: bl_foodpois, text: [$c.lit("FoodPois"), $c.lit("Fpois"), $c.lit("Poi")] },
+        { ranking: 20, mask: BL_MASK_GLOWHANDS, c: bl_glowhands, text: [$c.lit("Glow"), $c.lit("Glo"), $c.lit("Gl")] },
+        { ranking: 2, mask: BL_MASK_GRAB, c: bl_grab, text: [$c.lit("Grab"), $c.lit("Grb"), $c.lit("Gr")] },
+        { ranking: 10, mask: BL_MASK_HALLU, c: bl_hallu, text: [$c.lit("Hallu"), $c.lit("Hal"), $c.lit("Hl")] },
+        { ranking: 20, mask: BL_MASK_HELD, c: bl_held, text: [$c.lit("Held"), $c.lit("Hld"), $c.lit("Hd")] },
+        { ranking: 20, mask: BL_MASK_ICY, c: bl_icy, text: [$c.lit("Icy"), $c.lit("Icy"), $c.lit("Ic")] },
+        { ranking: 8, mask: BL_MASK_INLAVA, c: bl_inlava, text: [$c.lit("InLava"), $c.lit("Lav"), $c.lit("La")] },
+        { ranking: 10, mask: BL_MASK_LEV, c: bl_lev, text: [$c.lit("Lev"), $c.lit("Lev"), $c.lit("Lv")] },
+        { ranking: 20, mask: BL_MASK_PARLYZ, c: bl_parlyz, text: [$c.lit("Parlyz"), $c.lit("Para"), $c.lit("Par")] },
+        { ranking: 10, mask: BL_MASK_RIDE, c: bl_ride, text: [$c.lit("Ride"), $c.lit("Rid"), $c.lit("Rd")] },
+        { ranking: 20, mask: BL_MASK_SLEEPING, c: bl_sleeping, text: [$c.lit("Zzz"), $c.lit("Zzz"), $c.lit("Zz")] },
+        { ranking: 6, mask: BL_MASK_SLIME, c: bl_slime, text: [$c.lit("Slime"), $c.lit("Slim"), $c.lit("Slm")] },
+        { ranking: 20, mask: BL_MASK_SLIPPERY, c: bl_slippery, text: [$c.lit("Slip"), $c.lit("Slp"), $c.lit("Sl")] },
+        { ranking: 6, mask: BL_MASK_STONE, c: bl_stone, text: [$c.lit("Stone"), $c.lit("Ston"), $c.lit("Sto")] },
+        { ranking: 4, mask: BL_MASK_STRNGL, c: bl_strngl, text: [$c.lit("Strngl"), $c.lit("Stngl"), $c.lit("Str")] },
+        { ranking: 10, mask: BL_MASK_STUN, c: bl_stun, text: [$c.lit("Stun"), $c.lit("Stun"), $c.lit("St")] },
+        { ranking: 15, mask: BL_MASK_SUBMERGED, c: bl_submerged, text: [$c.lit("Submrg"), $c.lit("Subm"), $c.lit("Sm")] },
+        { ranking: 6, mask: BL_MASK_TERMILL, c: bl_termill, text: [$c.lit("TermIll"), $c.lit("Ill"), $c.lit("Ill")] },
+        { ranking: 20, mask: BL_MASK_TETHERED, c: bl_tethered, text: [$c.lit("Teth"), $c.lit("Tth"), $c.lit("Te")] },
+        { ranking: 20, mask: BL_MASK_TRAPPED, c: bl_trapped, text: [$c.lit("Trap"), $c.lit("Trp"), $c.lit("Tr")] },
+        { ranking: 20, mask: BL_MASK_UNCONSC, c: bl_unconsc, text: [$c.lit("Out"), $c.lit("Out"), $c.lit("KO")] },
+        { ranking: 20, mask: BL_MASK_WOUNDEDL, c: bl_woundedl, text: [$c.lit("WLegs"), $c.lit("Leg"), $c.lit("Lg")] },
+        { ranking: 20, mask: BL_MASK_HOLDING, c: bl_holding, text: [$c.lit("UHold"), $c.lit("UHld"), $c.lit("UHd")] }
+    ]);
     for (let $i0 = 0; $i0 < 30; $i0++) {
         condtests[$i0].$copyFrom(new $T.condtests_t());
     }
-    condtests[0].c = bl_bareh;
-    condtests[0].useroption = $c.lit("barehanded");
-    condtests[0].opt = opt_in;
-    condtests[0].enabled = 0;
-    condtests[0].choice = 0;
-    condtests[0].test = 0;
-    condtests[1].c = bl_blind;
-    condtests[1].useroption = $c.lit("blind");
-    condtests[1].opt = opt_out;
-    condtests[1].enabled = 1;
-    condtests[1].choice = 0;
-    condtests[1].test = 0;
-    condtests[2].c = bl_busy;
-    condtests[2].useroption = $c.lit("busy");
-    condtests[2].opt = opt_in;
-    condtests[2].enabled = 0;
-    condtests[2].choice = 0;
-    condtests[2].test = 0;
-    condtests[3].c = bl_conf;
-    condtests[3].useroption = $c.lit("conf");
-    condtests[3].opt = opt_out;
-    condtests[3].enabled = 1;
-    condtests[3].choice = 0;
-    condtests[3].test = 0;
-    condtests[4].c = bl_deaf;
-    condtests[4].useroption = $c.lit("deaf");
-    condtests[4].opt = opt_out;
-    condtests[4].enabled = 1;
-    condtests[4].choice = 0;
-    condtests[4].test = 0;
-    condtests[5].c = bl_elf_iron;
-    condtests[5].useroption = $c.lit("iron");
-    condtests[5].opt = opt_out;
-    condtests[5].enabled = 1;
-    condtests[5].choice = 0;
-    condtests[5].test = 0;
-    condtests[6].c = bl_fly;
-    condtests[6].useroption = $c.lit("fly");
-    condtests[6].opt = opt_out;
-    condtests[6].enabled = 1;
-    condtests[6].choice = 0;
-    condtests[6].test = 0;
-    condtests[7].c = bl_foodpois;
-    condtests[7].useroption = $c.lit("foodPois");
-    condtests[7].opt = opt_out;
-    condtests[7].enabled = 1;
-    condtests[7].choice = 0;
-    condtests[7].test = 0;
-    condtests[8].c = bl_glowhands;
-    condtests[8].useroption = $c.lit("glowhands");
-    condtests[8].opt = opt_in;
-    condtests[8].enabled = 0;
-    condtests[8].choice = 0;
-    condtests[8].test = 0;
-    condtests[9].c = bl_grab;
-    condtests[9].useroption = $c.lit("grab");
-    condtests[9].opt = opt_out;
-    condtests[9].enabled = 1;
-    condtests[9].choice = 0;
-    condtests[9].test = 0;
-    condtests[10].c = bl_hallu;
-    condtests[10].useroption = $c.lit("hallucinat");
-    condtests[10].opt = opt_out;
-    condtests[10].enabled = 1;
-    condtests[10].choice = 0;
-    condtests[10].test = 0;
-    condtests[11].c = bl_held;
-    condtests[11].useroption = $c.lit("held");
-    condtests[11].opt = opt_in;
-    condtests[11].enabled = 0;
-    condtests[11].choice = 0;
-    condtests[11].test = 0;
-    condtests[12].c = bl_icy;
-    condtests[12].useroption = $c.lit("ice");
-    condtests[12].opt = opt_in;
-    condtests[12].enabled = 0;
-    condtests[12].choice = 0;
-    condtests[12].test = 0;
-    condtests[13].c = bl_inlava;
-    condtests[13].useroption = $c.lit("lava");
-    condtests[13].opt = opt_out;
-    condtests[13].enabled = 1;
-    condtests[13].choice = 0;
-    condtests[13].test = 0;
-    condtests[14].c = bl_lev;
-    condtests[14].useroption = $c.lit("levitate");
-    condtests[14].opt = opt_out;
-    condtests[14].enabled = 1;
-    condtests[14].choice = 0;
-    condtests[14].test = 0;
-    condtests[15].c = bl_parlyz;
-    condtests[15].useroption = $c.lit("paralyzed");
-    condtests[15].opt = opt_in;
-    condtests[15].enabled = 0;
-    condtests[15].choice = 0;
-    condtests[15].test = 0;
-    condtests[16].c = bl_ride;
-    condtests[16].useroption = $c.lit("ride");
-    condtests[16].opt = opt_out;
-    condtests[16].enabled = 1;
-    condtests[16].choice = 0;
-    condtests[16].test = 0;
-    condtests[17].c = bl_sleeping;
-    condtests[17].useroption = $c.lit("sleep");
-    condtests[17].opt = opt_in;
-    condtests[17].enabled = 0;
-    condtests[17].choice = 0;
-    condtests[17].test = 0;
-    condtests[18].c = bl_slime;
-    condtests[18].useroption = $c.lit("slime");
-    condtests[18].opt = opt_out;
-    condtests[18].enabled = 1;
-    condtests[18].choice = 0;
-    condtests[18].test = 0;
-    condtests[19].c = bl_slippery;
-    condtests[19].useroption = $c.lit("slip");
-    condtests[19].opt = opt_in;
-    condtests[19].enabled = 0;
-    condtests[19].choice = 0;
-    condtests[19].test = 0;
-    condtests[20].c = bl_stone;
-    condtests[20].useroption = $c.lit("stone");
-    condtests[20].opt = opt_out;
-    condtests[20].enabled = 1;
-    condtests[20].choice = 0;
-    condtests[20].test = 0;
-    condtests[21].c = bl_strngl;
-    condtests[21].useroption = $c.lit("strngl");
-    condtests[21].opt = opt_out;
-    condtests[21].enabled = 1;
-    condtests[21].choice = 0;
-    condtests[21].test = 0;
-    condtests[22].c = bl_stun;
-    condtests[22].useroption = $c.lit("stun");
-    condtests[22].opt = opt_out;
-    condtests[22].enabled = 1;
-    condtests[22].choice = 0;
-    condtests[22].test = 0;
-    condtests[23].c = bl_submerged;
-    condtests[23].useroption = $c.lit("submerged");
-    condtests[23].opt = opt_in;
-    condtests[23].enabled = 0;
-    condtests[23].choice = 0;
-    condtests[23].test = 0;
-    condtests[24].c = bl_termill;
-    condtests[24].useroption = $c.lit("termIll");
-    condtests[24].opt = opt_out;
-    condtests[24].enabled = 1;
-    condtests[24].choice = 0;
-    condtests[24].test = 0;
-    condtests[25].c = bl_tethered;
-    condtests[25].useroption = $c.lit("tethered");
-    condtests[25].opt = opt_in;
-    condtests[25].enabled = 0;
-    condtests[25].choice = 0;
-    condtests[25].test = 0;
-    condtests[26].c = bl_trapped;
-    condtests[26].useroption = $c.lit("trap");
-    condtests[26].opt = opt_in;
-    condtests[26].enabled = 0;
-    condtests[26].choice = 0;
-    condtests[26].test = 0;
-    condtests[27].c = bl_unconsc;
-    condtests[27].useroption = $c.lit("unconscious");
-    condtests[27].opt = opt_in;
-    condtests[27].enabled = 0;
-    condtests[27].choice = 0;
-    condtests[27].test = 0;
-    condtests[28].c = bl_woundedl;
-    condtests[28].useroption = $c.lit("woundedlegs");
-    condtests[28].opt = opt_in;
-    condtests[28].enabled = 0;
-    condtests[28].choice = 0;
-    condtests[28].test = 0;
-    condtests[29].c = bl_holding;
-    condtests[29].useroption = $c.lit("holding");
-    condtests[29].opt = opt_in;
-    condtests[29].enabled = 0;
-    condtests[29].choice = 0;
-    condtests[29].test = 0;
+    $c.init(condtests, [
+        { c: bl_bareh, useroption: $c.lit("barehanded"), opt: opt_in, enabled: 0, choice: 0, test: 0 },
+        { c: bl_blind, useroption: $c.lit("blind"), opt: opt_out, enabled: 1, choice: 0, test: 0 },
+        { c: bl_busy, useroption: $c.lit("busy"), opt: opt_in, enabled: 0, choice: 0, test: 0 },
+        { c: bl_conf, useroption: $c.lit("conf"), opt: opt_out, enabled: 1, choice: 0, test: 0 },
+        { c: bl_deaf, useroption: $c.lit("deaf"), opt: opt_out, enabled: 1, choice: 0, test: 0 },
+        { c: bl_elf_iron, useroption: $c.lit("iron"), opt: opt_out, enabled: 1, choice: 0, test: 0 },
+        { c: bl_fly, useroption: $c.lit("fly"), opt: opt_out, enabled: 1, choice: 0, test: 0 },
+        { c: bl_foodpois, useroption: $c.lit("foodPois"), opt: opt_out, enabled: 1, choice: 0, test: 0 },
+        { c: bl_glowhands, useroption: $c.lit("glowhands"), opt: opt_in, enabled: 0, choice: 0, test: 0 },
+        { c: bl_grab, useroption: $c.lit("grab"), opt: opt_out, enabled: 1, choice: 0, test: 0 },
+        { c: bl_hallu, useroption: $c.lit("hallucinat"), opt: opt_out, enabled: 1, choice: 0, test: 0 },
+        { c: bl_held, useroption: $c.lit("held"), opt: opt_in, enabled: 0, choice: 0, test: 0 },
+        { c: bl_icy, useroption: $c.lit("ice"), opt: opt_in, enabled: 0, choice: 0, test: 0 },
+        { c: bl_inlava, useroption: $c.lit("lava"), opt: opt_out, enabled: 1, choice: 0, test: 0 },
+        { c: bl_lev, useroption: $c.lit("levitate"), opt: opt_out, enabled: 1, choice: 0, test: 0 },
+        { c: bl_parlyz, useroption: $c.lit("paralyzed"), opt: opt_in, enabled: 0, choice: 0, test: 0 },
+        { c: bl_ride, useroption: $c.lit("ride"), opt: opt_out, enabled: 1, choice: 0, test: 0 },
+        { c: bl_sleeping, useroption: $c.lit("sleep"), opt: opt_in, enabled: 0, choice: 0, test: 0 },
+        { c: bl_slime, useroption: $c.lit("slime"), opt: opt_out, enabled: 1, choice: 0, test: 0 },
+        { c: bl_slippery, useroption: $c.lit("slip"), opt: opt_in, enabled: 0, choice: 0, test: 0 },
+        { c: bl_stone, useroption: $c.lit("stone"), opt: opt_out, enabled: 1, choice: 0, test: 0 },
+        { c: bl_strngl, useroption: $c.lit("strngl"), opt: opt_out, enabled: 1, choice: 0, test: 0 },
+        { c: bl_stun, useroption: $c.lit("stun"), opt: opt_out, enabled: 1, choice: 0, test: 0 },
+        { c: bl_submerged, useroption: $c.lit("submerged"), opt: opt_in, enabled: 0, choice: 0, test: 0 },
+        { c: bl_termill, useroption: $c.lit("termIll"), opt: opt_out, enabled: 1, choice: 0, test: 0 },
+        { c: bl_tethered, useroption: $c.lit("tethered"), opt: opt_in, enabled: 0, choice: 0, test: 0 },
+        { c: bl_trapped, useroption: $c.lit("trap"), opt: opt_in, enabled: 0, choice: 0, test: 0 },
+        { c: bl_unconsc, useroption: $c.lit("unconscious"), opt: opt_in, enabled: 0, choice: 0, test: 0 },
+        { c: bl_woundedl, useroption: $c.lit("woundedlegs"), opt: opt_in, enabled: 0, choice: 0, test: 0 },
+        { c: bl_holding, useroption: $c.lit("holding"), opt: opt_in, enabled: 0, choice: 0, test: 0 }
+    ]);
     cond_idx.fill(0);
-    cond_idx[0] = 0;
+    $c.init(cond_idx, [
+        0
+    ]);
     c_Wall.fill(0);
     c_Wall.set([87, 97, 108, 108]);   // "Wall"
     terrain_descr.fill(null);
-    terrain_descr[0] = $c.lit("Stone");
-    terrain_descr[1] = new $c.Ptr(c_Wall, 0);
-    terrain_descr[2] = new $c.Ptr(c_Wall, 0);
-    terrain_descr[3] = new $c.Ptr(c_Wall, 0);
-    terrain_descr[4] = new $c.Ptr(c_Wall, 0);
-    terrain_descr[5] = new $c.Ptr(c_Wall, 0);
-    terrain_descr[6] = new $c.Ptr(c_Wall, 0);
-    terrain_descr[7] = new $c.Ptr(c_Wall, 0);
-    terrain_descr[8] = new $c.Ptr(c_Wall, 0);
-    terrain_descr[9] = new $c.Ptr(c_Wall, 0);
-    terrain_descr[10] = new $c.Ptr(c_Wall, 0);
-    terrain_descr[11] = new $c.Ptr(c_Wall, 0);
-    terrain_descr[12] = $c.lit("Portcullis");
-    terrain_descr[13] = $c.lit("Tree");
-    terrain_descr[14] = new $c.Ptr(c_Wall, 0);
-    terrain_descr[15] = $c.lit("Stone");
-    terrain_descr[16] = $c.lit("Pool");
-    terrain_descr[17] = $c.lit("Moat");
-    terrain_descr[18] = $c.lit("Water");
-    terrain_descr[19] = $c.lit("(gap)");
-    terrain_descr[20] = $c.lit("Lava");
-    terrain_descr[21] = $c.lit("LavaWall");
-    terrain_descr[22] = $c.lit("Bars");
-    terrain_descr[23] = $c.lit("Doorway");
-    terrain_descr[24] = $c.lit("Corridor");
-    terrain_descr[25] = $c.lit("Room");
-    terrain_descr[26] = $c.lit("Stairs");
-    terrain_descr[27] = $c.lit("Ladder");
-    terrain_descr[28] = $c.lit("Fountain");
-    terrain_descr[29] = $c.lit("Throne");
-    terrain_descr[30] = $c.lit("Sink");
-    terrain_descr[31] = $c.lit("Grave");
-    terrain_descr[32] = $c.lit("Altar");
-    terrain_descr[33] = $c.lit("Ice");
-    terrain_descr[34] = $c.lit("Bridge");
-    terrain_descr[35] = $c.lit("Air");
-    terrain_descr[36] = $c.lit("Cloud");
-    terrain_descr[37] = $c.lit("");
-    terrain_descr[38] = new $c.Ptr(c_Wall, 0);
-    terrain_descr[39] = $c.lit("Floor");
-    terrain_descr[40] = $c.lit("Ground");
-    terrain_descr[41] = $c.lit("Open-door");
-    terrain_descr[42] = $c.lit("Shut-door");
-    terrain_descr[43] = $c.lit("Swamp");
-    terrain_descr[44] = $c.lit("Submerged");
-    terrain_descr[45] = $c.lit("Sea");
-    terrain_descr[46] = $c.lit("WaterWall");
+    $c.init(terrain_descr, [
+        $c.lit("Stone"),
+        new $c.Ptr(c_Wall, 0),
+        new $c.Ptr(c_Wall, 0),
+        new $c.Ptr(c_Wall, 0),
+        new $c.Ptr(c_Wall, 0),
+        new $c.Ptr(c_Wall, 0),
+        new $c.Ptr(c_Wall, 0),
+        new $c.Ptr(c_Wall, 0),
+        new $c.Ptr(c_Wall, 0),
+        new $c.Ptr(c_Wall, 0),
+        new $c.Ptr(c_Wall, 0),
+        new $c.Ptr(c_Wall, 0),
+        $c.lit("Portcullis"),
+        $c.lit("Tree"),
+        new $c.Ptr(c_Wall, 0),
+        $c.lit("Stone"),
+        $c.lit("Pool"),
+        $c.lit("Moat"),
+        $c.lit("Water"),
+        $c.lit("(gap)"),
+        $c.lit("Lava"),
+        $c.lit("LavaWall"),
+        $c.lit("Bars"),
+        $c.lit("Doorway"),
+        $c.lit("Corridor"),
+        $c.lit("Room"),
+        $c.lit("Stairs"),
+        $c.lit("Ladder"),
+        $c.lit("Fountain"),
+        $c.lit("Throne"),
+        $c.lit("Sink"),
+        $c.lit("Grave"),
+        $c.lit("Altar"),
+        $c.lit("Ice"),
+        $c.lit("Bridge"),
+        $c.lit("Air"),
+        $c.lit("Cloud"),
+        $c.lit(""),
+        new $c.Ptr(c_Wall, 0),
+        $c.lit("Floor"),
+        $c.lit("Ground"),
+        $c.lit("Open-door"),
+        $c.lit("Shut-door"),
+        $c.lit("Swamp"),
+        $c.lit("Submerged"),
+        $c.lit("Sea"),
+        $c.lit("WaterWall")
+    ]);
     cache_avail.fill(0);
-    cache_avail[0] = 0;
-    cache_avail[1] = 0;
-    cache_avail[2] = 0;
+    $c.init(cache_avail, [
+        0,
+        0,
+        0
+    ]);
     cache_reslt.fill(0);
-    cache_reslt[0] = 0;
-    cache_reslt[1] = 0;
-    cache_reslt[2] = 0;
+    $c.init(cache_reslt, [
+        0,
+        0,
+        0
+    ]);
     cache_nomovemsg = null;
     cache_multi_reason = null;
     for (let $i0 = 0; $i0 < 22; $i0++) {
         fieldids_alias[$i0].$copyFrom(new $T.fieldid_t());
     }
-    fieldids_alias[0].fieldname = $c.lit("characteristics");
-    fieldids_alias[0].fldid = BL_CHARACTERISTICS;
-    fieldids_alias[1].fieldname = $c.lit("encumbrance");
-    fieldids_alias[1].fldid = BL_CAP;
-    fieldids_alias[2].fieldname = $c.lit("experience-points");
-    fieldids_alias[2].fldid = BL_EXP;
-    fieldids_alias[3].fieldname = $c.lit("dx");
-    fieldids_alias[3].fldid = BL_DX;
-    fieldids_alias[4].fieldname = $c.lit("co");
-    fieldids_alias[4].fldid = BL_CO;
-    fieldids_alias[5].fieldname = $c.lit("con");
-    fieldids_alias[5].fldid = BL_CO;
-    fieldids_alias[6].fieldname = $c.lit("points");
-    fieldids_alias[6].fldid = BL_SCORE;
-    fieldids_alias[7].fieldname = $c.lit("cap");
-    fieldids_alias[7].fldid = BL_CAP;
-    fieldids_alias[8].fieldname = $c.lit("pw");
-    fieldids_alias[8].fldid = BL_ENE;
-    fieldids_alias[9].fieldname = $c.lit("pw-max");
-    fieldids_alias[9].fldid = BL_ENEMAX;
-    fieldids_alias[10].fieldname = $c.lit("xl");
-    fieldids_alias[10].fldid = BL_XP;
-    fieldids_alias[11].fieldname = $c.lit("xplvl");
-    fieldids_alias[11].fldid = BL_XP;
-    fieldids_alias[12].fieldname = $c.lit("ac");
-    fieldids_alias[12].fldid = BL_AC;
-    fieldids_alias[13].fieldname = $c.lit("hit-dice");
-    fieldids_alias[13].fldid = BL_HD;
-    fieldids_alias[14].fieldname = $c.lit("turns");
-    fieldids_alias[14].fldid = BL_TIME;
-    fieldids_alias[15].fieldname = $c.lit("hp");
-    fieldids_alias[15].fldid = BL_HP;
-    fieldids_alias[16].fieldname = $c.lit("hp-max");
-    fieldids_alias[16].fldid = BL_HPMAX;
-    fieldids_alias[17].fieldname = $c.lit("dgn");
-    fieldids_alias[17].fldid = BL_LEVELDESC;
-    fieldids_alias[18].fieldname = $c.lit("xp");
-    fieldids_alias[18].fldid = BL_EXP;
-    fieldids_alias[19].fieldname = $c.lit("exp");
-    fieldids_alias[19].fldid = BL_EXP;
-    fieldids_alias[20].fieldname = $c.lit("flags");
-    fieldids_alias[20].fldid = BL_CONDITION;
-    fieldids_alias[21].fieldname = null;
-    fieldids_alias[21].fldid = BL_FLUSH;
+    $c.init(fieldids_alias, [
+        { fieldname: $c.lit("characteristics"), fldid: BL_CHARACTERISTICS },
+        { fieldname: $c.lit("encumbrance"), fldid: BL_CAP },
+        { fieldname: $c.lit("experience-points"), fldid: BL_EXP },
+        { fieldname: $c.lit("dx"), fldid: BL_DX },
+        { fieldname: $c.lit("co"), fldid: BL_CO },
+        { fieldname: $c.lit("con"), fldid: BL_CO },
+        { fieldname: $c.lit("points"), fldid: BL_SCORE },
+        { fieldname: $c.lit("cap"), fldid: BL_CAP },
+        { fieldname: $c.lit("pw"), fldid: BL_ENE },
+        { fieldname: $c.lit("pw-max"), fldid: BL_ENEMAX },
+        { fieldname: $c.lit("xl"), fldid: BL_XP },
+        { fieldname: $c.lit("xplvl"), fldid: BL_XP },
+        { fieldname: $c.lit("ac"), fldid: BL_AC },
+        { fieldname: $c.lit("hit-dice"), fldid: BL_HD },
+        { fieldname: $c.lit("turns"), fldid: BL_TIME },
+        { fieldname: $c.lit("hp"), fldid: BL_HP },
+        { fieldname: $c.lit("hp-max"), fldid: BL_HPMAX },
+        { fieldname: $c.lit("dgn"), fldid: BL_LEVELDESC },
+        { fieldname: $c.lit("xp"), fldid: BL_EXP },
+        { fieldname: $c.lit("exp"), fldid: BL_EXP },
+        { fieldname: $c.lit("flags"), fldid: BL_CONDITION },
+        { fieldname: null, fldid: BL_FLUSH }
+    ]);
     threshold_value.fill(0);
     threshold_value.set([104, 105, 108, 105, 116, 101, 95, 115, 116, 97, 116, 117, 115, 32, 116, 104, 114, 101, 115, 104, 111, 108, 100, 32]);   // "hilite_status threshold "
     is_out_of_range.fill(0);
@@ -3868,36 +3215,46 @@ export function $init() {
     do_statusline2$cond.fill(0);
     do_statusline2$vers.fill(0);
     cond_menu$menutitle.fill(null);
-    cond_menu$menutitle[0] = $c.lit("alphabetically");
-    cond_menu$menutitle[1] = $c.lit("by ranking");
+    $c.init(cond_menu$menutitle, [
+        $c.lit("alphabetically"),
+        $c.lit("by ranking")
+    ]);
     eval_notify_windowport_field$oldrndencode = 0;
     eval_notify_windowport_field$oldgoldsym = 0;
     init_blstats$initalready = FALSE;
     splitsubfields$subfields.fill(null);
     parse_status_hl2$aligntxt.fill(null);
-    parse_status_hl2$aligntxt[0] = $c.lit("chaotic");
-    parse_status_hl2$aligntxt[1] = $c.lit("neutral");
-    parse_status_hl2$aligntxt[2] = $c.lit("lawful");
+    $c.init(parse_status_hl2$aligntxt, [
+        $c.lit("chaotic"),
+        $c.lit("neutral"),
+        $c.lit("lawful")
+    ]);
     parse_status_hl2$hutxt.fill(null);
-    parse_status_hl2$hutxt[0] = $c.lit("Satiated");
-    parse_status_hl2$hutxt[1] = $c.lit("");
-    parse_status_hl2$hutxt[2] = $c.lit("Hungry");
-    parse_status_hl2$hutxt[3] = $c.lit("Weak");
-    parse_status_hl2$hutxt[4] = $c.lit("Fainting");
-    parse_status_hl2$hutxt[5] = $c.lit("Fainted");
-    parse_status_hl2$hutxt[6] = $c.lit("Starved");
+    $c.init(parse_status_hl2$hutxt, [
+        $c.lit("Satiated"),
+        $c.lit(""),
+        $c.lit("Hungry"),
+        $c.lit("Weak"),
+        $c.lit("Fainting"),
+        $c.lit("Fainted"),
+        $c.lit("Starved")
+    ]);
     conditionbitmask2str$buf.fill(0);
     status_hilite2str$buf.fill(0);
     status_hilite_menu_add$aligntxt.fill(null);
-    status_hilite_menu_add$aligntxt[0] = $c.lit("chaotic");
-    status_hilite_menu_add$aligntxt[1] = $c.lit("neutral");
-    status_hilite_menu_add$aligntxt[2] = $c.lit("lawful");
+    $c.init(status_hilite_menu_add$aligntxt, [
+        $c.lit("chaotic"),
+        $c.lit("neutral"),
+        $c.lit("lawful")
+    ]);
     status_hilite_menu_add$hutxt.fill(null);
-    status_hilite_menu_add$hutxt[0] = $c.lit("Satiated");
-    status_hilite_menu_add$hutxt[1] = null;
-    status_hilite_menu_add$hutxt[2] = $c.lit("Hungry");
-    status_hilite_menu_add$hutxt[3] = $c.lit("Weak");
-    status_hilite_menu_add$hutxt[4] = $c.lit("Fainting");
-    status_hilite_menu_add$hutxt[5] = $c.lit("Fainted");
-    status_hilite_menu_add$hutxt[6] = $c.lit("Starved");
+    $c.init(status_hilite_menu_add$hutxt, [
+        $c.lit("Satiated"),
+        null,
+        $c.lit("Hungry"),
+        $c.lit("Weak"),
+        $c.lit("Fainting"),
+        $c.lit("Fainted"),
+        $c.lit("Starved")
+    ]);
 }

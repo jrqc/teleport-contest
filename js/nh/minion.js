@@ -445,8 +445,10 @@ export async function gain_guardian_angel() {   // minion.c:498
 
 export function $init() {
     elementals.fill(0);
-    elementals[0] = PM_AIR_ELEMENTAL;
-    elementals[1] = PM_FIRE_ELEMENTAL;
-    elementals[2] = PM_EARTH_ELEMENTAL;
-    elementals[3] = PM_WATER_ELEMENTAL;
+    $c.init(elementals, [
+        PM_AIR_ELEMENTAL,
+        PM_FIRE_ELEMENTAL,
+        PM_EARTH_ELEMENTAL,
+        PM_WATER_ELEMENTAL
+    ]);
 }

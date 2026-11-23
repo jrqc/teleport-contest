@@ -672,7 +672,7 @@ async function angrygods(resp_god) {   // pray.c:704
         case 7:
         case 8:
             await godvoice(resp_god, null);
-            await verbalize($c.lit("Thou durst %s me?"), svl.level.locations[u.ux][u.uy].typ === ALTAR && $c.i8(((svl.level.locations[u.ux][u.uy].flags | 0) & 7 & AM_MASK) === 0 ? A_NONE : ((svl.level.locations[u.ux][u.uy].flags | 0) & 7 & AM_MASK) === AM_LAWFUL ? A_LAWFUL : ((svl.level.locations[u.ux][u.uy].flags | 0) & 7 & AM_MASK) - 2 | 0) !== resp_god ? $c.lit("scorn") : $c.lit("call upon"));
+            await verbalize($c.lit("Thou durst %s me?"), svl.level.locations[u.ux][u.uy].typ === ALTAR && $c.i8(((svl.level.locations[u.ux][u.uy].flags | 0) & AM_MASK & AM_MASK) === 0 ? A_NONE : ((svl.level.locations[u.ux][u.uy].flags | 0) & AM_MASK & AM_MASK) === AM_LAWFUL ? A_LAWFUL : ((svl.level.locations[u.ux][u.uy].flags | 0) & AM_MASK & AM_MASK) - 2 | 0) !== resp_god ? $c.lit("scorn") : $c.lit("call upon"));
             await pline($c.lit("\"Then die, %s!\""), gy.youmonst.data.mlet === S_HUMAN ? $c.lit("mortal") : $c.lit("creature"));
             await summon_minion(resp_god, FALSE);
             break;
@@ -886,7 +886,7 @@ async function pleased(g_align) {   // pray.c:1071
     } else {
         tryct = 0;
         prayer_luck = (u.uluck + u.moreluck | 0) > -1 ? u.uluck + u.moreluck | 0 : -1;
-        action = rn2(prayer_luck + (svl.level.locations[u.ux][u.uy].typ === ALTAR ? 3 + (((svl.level.locations[u.ux][u.uy].flags | 0) & 8) !== 0 ? 1 : 0) | 0 : 2) | 0) + 1 | 0;
+        action = rn2(prayer_luck + (svl.level.locations[u.ux][u.uy].typ === ALTAR ? 3 + (((svl.level.locations[u.ux][u.uy].flags | 0) & AM_SHRINE) !== 0 ? 1 : 0) | 0 : 2) | 0) + 1 | 0;
         if (!(svl.level.locations[u.ux][u.uy].typ === ALTAR)) {
             action = action < 3 ? action : 3;
         }
@@ -1379,7 +1379,7 @@ async function bestow_artifact(max_giftvalue) {   // pray.c:1781
         }
     }
     if (do_bestow) {
-        otmp = await mk_artifact(null, $c.i8(((svl.level.locations[u.ux][u.uy].flags | 0) & 7 & AM_MASK) === 0 ? A_NONE : ((svl.level.locations[u.ux][u.uy].flags | 0) & 7 & AM_MASK) === AM_LAWFUL ? A_LAWFUL : ((svl.level.locations[u.ux][u.uy].flags | 0) & 7 & AM_MASK) - 2 | 0), max_giftvalue, TRUE);
+        otmp = await mk_artifact(null, $c.i8(((svl.level.locations[u.ux][u.uy].flags | 0) & AM_MASK & AM_MASK) === 0 ? A_NONE : ((svl.level.locations[u.ux][u.uy].flags | 0) & AM_MASK & AM_MASK) === AM_LAWFUL ? A_LAWFUL : ((svl.level.locations[u.ux][u.uy].flags | 0) & AM_MASK & AM_MASK) - 2 | 0), max_giftvalue, TRUE);
         if (otmp) {
             await artifact_origin(otmp, ONAME_GIFT | ONAME_KNOW_ARTI);
             if (otmp.spe < 0) {
@@ -1424,7 +1424,7 @@ async function sacrifice_value(otmp) {   // pray.c:1839
 }
 export async function dosacrifice() {   // pray.c:1854
     let otmp = null, highaltar = 0, altaralign = 0;
-    altaralign = $c.i8(((svl.level.locations[u.ux][u.uy].flags | 0) & 7 & AM_MASK) === 0 ? A_NONE : ((svl.level.locations[u.ux][u.uy].flags | 0) & 7 & AM_MASK) === AM_LAWFUL ? A_LAWFUL : ((svl.level.locations[u.ux][u.uy].flags | 0) & 7 & AM_MASK) - 2 | 0);
+    altaralign = $c.i8(((svl.level.locations[u.ux][u.uy].flags | 0) & AM_MASK & AM_MASK) === 0 ? A_NONE : ((svl.level.locations[u.ux][u.uy].flags | 0) & AM_MASK & AM_MASK) === AM_LAWFUL ? A_LAWFUL : ((svl.level.locations[u.ux][u.uy].flags | 0) & AM_MASK & AM_MASK) - 2 | 0);
     if (!(svl.level.locations[u.ux][u.uy].typ === ALTAR) || u.uswallow | 0) {
         await You($c.lit("are not %s an altar."), Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked ? $c.lit("over") : $c.lit("on"));
         return ECMD_OK;
@@ -1616,7 +1616,7 @@ async function offer_corpse(otmp, highaltar, altaralign) {   // pray.c:1959
 }
 export async function can_pray(praying) {   // pray.c:2124
     let alignment = 0, $t1;
-    gp.p_aligntyp = $c.i8(svl.level.locations[u.ux][u.uy].typ === ALTAR ? $c.i8(((svl.level.locations[u.ux][u.uy].flags | 0) & 7 & AM_MASK) === 0 ? A_NONE : ((svl.level.locations[u.ux][u.uy].flags | 0) & 7 & AM_MASK) === AM_LAWFUL ? A_LAWFUL : ((svl.level.locations[u.ux][u.uy].flags | 0) & 7 & AM_MASK) - 2 | 0) : u.ualign.type);
+    gp.p_aligntyp = $c.i8(svl.level.locations[u.ux][u.uy].typ === ALTAR ? $c.i8(((svl.level.locations[u.ux][u.uy].flags | 0) & AM_MASK & AM_MASK) === 0 ? A_NONE : ((svl.level.locations[u.ux][u.uy].flags | 0) & AM_MASK & AM_MASK) === AM_LAWFUL ? A_LAWFUL : ((svl.level.locations[u.ux][u.uy].flags | 0) & AM_MASK & AM_MASK) - 2 | 0) : u.ualign.type);
     $t1 = await in_trouble(), gp.p_trouble = $t1;
     if (is_demon(gy.youmonst.data) && (gp.p_aligntyp === A_LAWFUL || gp.p_aligntyp !== A_NEUTRAL)) {
         if (praying) {
@@ -1877,7 +1877,7 @@ export async function a_gname_at(x, y) {   // pray.c:2514
     if (!(svl.level.locations[x][y].typ === ALTAR)) {
         return null;
     }
-    return await align_gname($c.i8(((svl.level.locations[x][y].flags | 0) & 7 & AM_MASK) === 0 ? A_NONE : ((svl.level.locations[x][y].flags | 0) & 7 & AM_MASK) === AM_LAWFUL ? A_LAWFUL : ((svl.level.locations[x][y].flags | 0) & 7 & AM_MASK) - 2 | 0));
+    return await align_gname($c.i8(((svl.level.locations[x][y].flags | 0) & AM_MASK & AM_MASK) === 0 ? A_NONE : ((svl.level.locations[x][y].flags | 0) & AM_MASK & AM_MASK) === AM_LAWFUL ? A_LAWFUL : ((svl.level.locations[x][y].flags | 0) & AM_MASK & AM_MASK) - 2 | 0));
 }
 export async function u_gname() {   // pray.c:2524
     return await align_gname(u.ualign.type);
@@ -1972,7 +1972,7 @@ export function align_gtitle(alignment) {   // pray.c:2628
 }
 export async function altar_wrath(x, y) {   // pray.c:2652
     let altaralign = 0;
-    altaralign = $c.i8(((svl.level.locations[x][y].flags | 0) & 7 & AM_MASK) === 0 ? A_NONE : ((svl.level.locations[x][y].flags | 0) & 7 & AM_MASK) === AM_LAWFUL ? A_LAWFUL : ((svl.level.locations[x][y].flags | 0) & 7 & AM_MASK) - 2 | 0);
+    altaralign = $c.i8(((svl.level.locations[x][y].flags | 0) & AM_MASK & AM_MASK) === 0 ? A_NONE : ((svl.level.locations[x][y].flags | 0) & AM_MASK & AM_MASK) === AM_LAWFUL ? A_LAWFUL : ((svl.level.locations[x][y].flags | 0) & AM_MASK & AM_MASK) - 2 | 0);
     if (u.ualign.type === altaralign && u.ualign.record > (-rn2(4) | 0)) {
         await godvoice(altaralign, $c.lit("How darest thou desecrate my altar!"));
         await adjattrib(A_WIS, -1, FALSE);
@@ -2033,27 +2033,31 @@ function ok_wep(o) {
 export function $init() {
     Moloch = $c.lit("Moloch");
     godvoices.fill(null);
-    godvoices[0] = $c.lit("booms out");
-    godvoices[1] = $c.lit("thunders");
-    godvoices[2] = $c.lit("rings out");
-    godvoices[3] = $c.lit("booms");
+    $c.init(godvoices, [
+        $c.lit("booms out"),
+        $c.lit("thunders"),
+        $c.lit("rings out"),
+        $c.lit("booms")
+    ]);
     turn_undead_range = 0;
     turn_undead_msg_cnt = 0;
     hallu_gods.fill(null);
-    hallu_gods[0] = $c.lit("the Flying Spaghetti Monster");
-    hallu_gods[1] = $c.lit("Eris");
-    hallu_gods[2] = $c.lit("the Martians");
-    hallu_gods[3] = $c.lit("Xom");
-    hallu_gods[4] = $c.lit("AnDoR dRaKoN");
-    hallu_gods[5] = $c.lit("the Central Bank of Yendor");
-    hallu_gods[6] = $c.lit("Tooth Fairy");
-    hallu_gods[7] = $c.lit("Om");
-    hallu_gods[8] = $c.lit("Yawgmoth");
-    hallu_gods[9] = $c.lit("Morgoth");
-    hallu_gods[10] = $c.lit("Cthulhu");
-    hallu_gods[11] = $c.lit("the Ori");
-    hallu_gods[12] = $c.lit("destiny");
-    hallu_gods[13] = $c.lit("your Friend the Computer");
+    $c.init(hallu_gods, [
+        $c.lit("the Flying Spaghetti Monster"),
+        $c.lit("Eris"),
+        $c.lit("the Martians"),
+        $c.lit("Xom"),
+        $c.lit("AnDoR dRaKoN"),
+        $c.lit("the Central Bank of Yendor"),
+        $c.lit("Tooth Fairy"),
+        $c.lit("Om"),
+        $c.lit("Yawgmoth"),
+        $c.lit("Morgoth"),
+        $c.lit("Cthulhu"),
+        $c.lit("the Ori"),
+        $c.lit("destiny"),
+        $c.lit("your Friend the Computer")
+    ]);
     fix_worst_trouble$leftglow.fill(0);
     fix_worst_trouble$leftglow.set([89, 111, 117, 114, 32, 108, 101, 102, 116, 32, 114, 105, 110, 103, 32, 115, 111, 102, 116, 108, 121, 32, 103, 108, 111, 119, 115]);   // "Your left ring softly glows"
     fix_worst_trouble$rightglow.fill(0);

@@ -2480,161 +2480,175 @@ function Your_Own_Race(mndx) {
 
 export function $init() {
     candy_wrappers.fill(null);
-    candy_wrappers[0] = $c.lit("");
-    candy_wrappers[1] = $c.lit("Apollo");
-    candy_wrappers[2] = $c.lit("Moon Crunchy");
-    candy_wrappers[3] = $c.lit("Snacky Cake");
-    candy_wrappers[4] = $c.lit("Chocolate Nuggie");
-    candy_wrappers[5] = $c.lit("The Small Bar");
-    candy_wrappers[6] = $c.lit("Crispy Yum Yum");
-    candy_wrappers[7] = $c.lit("Nilla Crunchie");
-    candy_wrappers[8] = $c.lit("Berry Bar");
-    candy_wrappers[9] = $c.lit("Choco Nummer");
-    candy_wrappers[10] = $c.lit("Om-nom");
-    candy_wrappers[11] = $c.lit("Fruity Oaty");
-    candy_wrappers[12] = $c.lit("Wonka Bar");
+    $c.init(candy_wrappers, [
+        $c.lit(""),
+        $c.lit("Apollo"),
+        $c.lit("Moon Crunchy"),
+        $c.lit("Snacky Cake"),
+        $c.lit("Chocolate Nuggie"),
+        $c.lit("The Small Bar"),
+        $c.lit("Crispy Yum Yum"),
+        $c.lit("Nilla Crunchie"),
+        $c.lit("Berry Bar"),
+        $c.lit("Choco Nummer"),
+        $c.lit("Om-nom"),
+        $c.lit("Fruity Oaty"),
+        $c.lit("Wonka Bar")
+    ]);
     gremlins = null;
     tshirt_text$shirt_msgs.fill(null);
-    tshirt_text$shirt_msgs[0] = $c.lit("I explored the Dungeons of Doom and all I got was this lousy T-shirt!");
-    tshirt_text$shirt_msgs[1] = $c.lit("Is that Mjollnir in your pocket or are you just happy to see me?");
-    tshirt_text$shirt_msgs[2] = $c.lit("It's not the size of your sword, it's how #enhance'd you are with it.");
-    tshirt_text$shirt_msgs[3] = $c.lit("Madame Elvira's House O' Succubi Lifetime Customer");
-    tshirt_text$shirt_msgs[4] = $c.lit("Madame Elvira's House O' Succubi Employee of the Month");
-    tshirt_text$shirt_msgs[5] = $c.lit("Ludios Vault Guards Do It In Small, Dark Rooms");
-    tshirt_text$shirt_msgs[6] = $c.lit("Yendor Military Soldiers Do It In Large Groups");
-    tshirt_text$shirt_msgs[7] = $c.lit("I survived Yendor Military Boot Camp");
-    tshirt_text$shirt_msgs[8] = $c.lit("Ludios Accounting School Intra-Mural Lacrosse Team");
-    tshirt_text$shirt_msgs[9] = $c.lit("Oracle(TM) Fountains 10th Annual Wet T-Shirt Contest");
-    tshirt_text$shirt_msgs[10] = $c.lit("Hey, black dragon!  Disintegrate THIS!");
-    tshirt_text$shirt_msgs[11] = $c.lit("I'm With Stupid -->");
-    tshirt_text$shirt_msgs[12] = $c.lit("Don't blame me, I voted for Izchak!");
-    tshirt_text$shirt_msgs[13] = $c.lit("Don't Panic");
-    tshirt_text$shirt_msgs[14] = $c.lit("Furinkan High School Athletic Dept.");
-    tshirt_text$shirt_msgs[15] = $c.lit("Hel-LOOO, Nurse!");
-    tshirt_text$shirt_msgs[16] = $c.lit("=^.^=");
-    tshirt_text$shirt_msgs[17] = $c.lit("100% goblin hair - do not wash");
-    tshirt_text$shirt_msgs[18] = $c.lit("Aberzombie and Fitch");
-    tshirt_text$shirt_msgs[19] = $c.lit("cK -- Cockatrice touches the Kop");
-    tshirt_text$shirt_msgs[20] = $c.lit("Don't ask me, I only adventure here");
-    tshirt_text$shirt_msgs[21] = $c.lit("Down with pants!");
-    tshirt_text$shirt_msgs[22] = $c.lit("d, your dog or a killer?");
-    tshirt_text$shirt_msgs[23] = $c.lit("FREE PUG AND NEWT!");
-    tshirt_text$shirt_msgs[24] = $c.lit("Go team ant!");
-    tshirt_text$shirt_msgs[25] = $c.lit("Got newt?");
-    tshirt_text$shirt_msgs[26] = $c.lit("Hello, my darlings!");
-    tshirt_text$shirt_msgs[27] = $c.lit("Hey!  Nymphs!  Steal This T-Shirt!");
-    tshirt_text$shirt_msgs[28] = $c.lit("I <3 Dungeon of Doom");
-    tshirt_text$shirt_msgs[29] = $c.lit("I <3 Maud");
-    tshirt_text$shirt_msgs[30] = $c.lit("I am a Valkyrie.  If you see me running, try to keep up.");
-    tshirt_text$shirt_msgs[31] = $c.lit("I am not a pack rat - I am a collector");
-    tshirt_text$shirt_msgs[32] = $c.lit("I bounced off a rubber tree");
-    tshirt_text$shirt_msgs[33] = $c.lit("Plunder Island Brimstone Beach Club");
-    tshirt_text$shirt_msgs[34] = $c.lit("If you can read this, I can hit you with my polearm");
-    tshirt_text$shirt_msgs[35] = $c.lit("I'm confused!");
-    tshirt_text$shirt_msgs[36] = $c.lit("I scored with the princess");
-    tshirt_text$shirt_msgs[37] = $c.lit("I want to live forever or die in the attempt.");
-    tshirt_text$shirt_msgs[38] = $c.lit("Lichen Park");
-    tshirt_text$shirt_msgs[39] = $c.lit("LOST IN THOUGHT - please send search party");
-    tshirt_text$shirt_msgs[40] = $c.lit("Meat is Mordor");
-    tshirt_text$shirt_msgs[41] = $c.lit("Minetown Better Business Bureau");
-    tshirt_text$shirt_msgs[42] = $c.lit("Minetown Watch");
-    tshirt_text$shirt_msgs[43] = $c.lit("Ms. Palm's House of Negotiable Affection--A Very Reputable House Of Disrepute");
-    tshirt_text$shirt_msgs[44] = $c.lit("Protection Racketeer");
-    tshirt_text$shirt_msgs[45] = $c.lit("Real men love Crom");
-    tshirt_text$shirt_msgs[46] = $c.lit("Somebody stole my Mojo!");
-    tshirt_text$shirt_msgs[47] = $c.lit("The Hellhound Gang");
-    tshirt_text$shirt_msgs[48] = $c.lit("The Werewolves");
-    tshirt_text$shirt_msgs[49] = $c.lit("They Might Be Storm Giants");
-    tshirt_text$shirt_msgs[50] = $c.lit("Weapons don't kill people, I kill people");
-    tshirt_text$shirt_msgs[51] = $c.lit("White Zombie");
-    tshirt_text$shirt_msgs[52] = $c.lit("You're killing me!");
-    tshirt_text$shirt_msgs[53] = $c.lit("Anhur State University - Home of the Fighting Fire Ants!");
-    tshirt_text$shirt_msgs[54] = $c.lit("FREE HUGS");
-    tshirt_text$shirt_msgs[55] = $c.lit("Serial Ascender");
-    tshirt_text$shirt_msgs[56] = $c.lit("Real men are valkyries");
-    tshirt_text$shirt_msgs[57] = $c.lit("Young Men's Cavedigging Association");
-    tshirt_text$shirt_msgs[58] = $c.lit("Occupy Fort Ludios");
-    tshirt_text$shirt_msgs[59] = $c.lit("I couldn't afford this T-shirt so I stole it!");
-    tshirt_text$shirt_msgs[60] = $c.lit("Mind flayers suck");
-    tshirt_text$shirt_msgs[61] = $c.lit("I'm not wearing any pants");
-    tshirt_text$shirt_msgs[62] = $c.lit("Down with the living!");
-    tshirt_text$shirt_msgs[63] = $c.lit("Pudding farmer");
-    tshirt_text$shirt_msgs[64] = $c.lit("Vegetarian");
-    tshirt_text$shirt_msgs[65] = $c.lit("Hello, I'm War!");
-    tshirt_text$shirt_msgs[66] = $c.lit("It is better to light a candle than to curse the darkness");
-    tshirt_text$shirt_msgs[67] = $c.lit("It is easier to curse the darkness than to light a candle");
-    tshirt_text$shirt_msgs[68] = $c.lit("rock--paper--scissors--lizard--Spock!");
-    tshirt_text$shirt_msgs[69] = $c.lit("/Valar morghulis/ -- /Valar dohaeris/");
+    $c.init(tshirt_text$shirt_msgs, [
+        $c.lit("I explored the Dungeons of Doom and all I got was this lousy T-shirt!"),
+        $c.lit("Is that Mjollnir in your pocket or are you just happy to see me?"),
+        $c.lit("It's not the size of your sword, it's how #enhance'd you are with it."),
+        $c.lit("Madame Elvira's House O' Succubi Lifetime Customer"),
+        $c.lit("Madame Elvira's House O' Succubi Employee of the Month"),
+        $c.lit("Ludios Vault Guards Do It In Small, Dark Rooms"),
+        $c.lit("Yendor Military Soldiers Do It In Large Groups"),
+        $c.lit("I survived Yendor Military Boot Camp"),
+        $c.lit("Ludios Accounting School Intra-Mural Lacrosse Team"),
+        $c.lit("Oracle(TM) Fountains 10th Annual Wet T-Shirt Contest"),
+        $c.lit("Hey, black dragon!  Disintegrate THIS!"),
+        $c.lit("I'm With Stupid -->"),
+        $c.lit("Don't blame me, I voted for Izchak!"),
+        $c.lit("Don't Panic"),
+        $c.lit("Furinkan High School Athletic Dept."),
+        $c.lit("Hel-LOOO, Nurse!"),
+        $c.lit("=^.^="),
+        $c.lit("100% goblin hair - do not wash"),
+        $c.lit("Aberzombie and Fitch"),
+        $c.lit("cK -- Cockatrice touches the Kop"),
+        $c.lit("Don't ask me, I only adventure here"),
+        $c.lit("Down with pants!"),
+        $c.lit("d, your dog or a killer?"),
+        $c.lit("FREE PUG AND NEWT!"),
+        $c.lit("Go team ant!"),
+        $c.lit("Got newt?"),
+        $c.lit("Hello, my darlings!"),
+        $c.lit("Hey!  Nymphs!  Steal This T-Shirt!"),
+        $c.lit("I <3 Dungeon of Doom"),
+        $c.lit("I <3 Maud"),
+        $c.lit("I am a Valkyrie.  If you see me running, try to keep up."),
+        $c.lit("I am not a pack rat - I am a collector"),
+        $c.lit("I bounced off a rubber tree"),
+        $c.lit("Plunder Island Brimstone Beach Club"),
+        $c.lit("If you can read this, I can hit you with my polearm"),
+        $c.lit("I'm confused!"),
+        $c.lit("I scored with the princess"),
+        $c.lit("I want to live forever or die in the attempt."),
+        $c.lit("Lichen Park"),
+        $c.lit("LOST IN THOUGHT - please send search party"),
+        $c.lit("Meat is Mordor"),
+        $c.lit("Minetown Better Business Bureau"),
+        $c.lit("Minetown Watch"),
+        $c.lit("Ms. Palm's House of Negotiable Affection--A Very Reputable House Of Disrepute"),
+        $c.lit("Protection Racketeer"),
+        $c.lit("Real men love Crom"),
+        $c.lit("Somebody stole my Mojo!"),
+        $c.lit("The Hellhound Gang"),
+        $c.lit("The Werewolves"),
+        $c.lit("They Might Be Storm Giants"),
+        $c.lit("Weapons don't kill people, I kill people"),
+        $c.lit("White Zombie"),
+        $c.lit("You're killing me!"),
+        $c.lit("Anhur State University - Home of the Fighting Fire Ants!"),
+        $c.lit("FREE HUGS"),
+        $c.lit("Serial Ascender"),
+        $c.lit("Real men are valkyries"),
+        $c.lit("Young Men's Cavedigging Association"),
+        $c.lit("Occupy Fort Ludios"),
+        $c.lit("I couldn't afford this T-shirt so I stole it!"),
+        $c.lit("Mind flayers suck"),
+        $c.lit("I'm not wearing any pants"),
+        $c.lit("Down with the living!"),
+        $c.lit("Pudding farmer"),
+        $c.lit("Vegetarian"),
+        $c.lit("Hello, I'm War!"),
+        $c.lit("It is better to light a candle than to curse the darkness"),
+        $c.lit("It is easier to curse the darkness than to light a candle"),
+        $c.lit("rock--paper--scissors--lizard--Spock!"),
+        $c.lit("/Valar morghulis/ -- /Valar dohaeris/")
+    ]);
     hawaiian_motif$hawaiian_motifs.fill(null);
-    hawaiian_motif$hawaiian_motifs[0] = $c.lit("flamingo");
-    hawaiian_motif$hawaiian_motifs[1] = $c.lit("parrot");
-    hawaiian_motif$hawaiian_motifs[2] = $c.lit("toucan");
-    hawaiian_motif$hawaiian_motifs[3] = $c.lit("bird of paradise");
-    hawaiian_motif$hawaiian_motifs[4] = $c.lit("sea turtle");
-    hawaiian_motif$hawaiian_motifs[5] = $c.lit("tropical fish");
-    hawaiian_motif$hawaiian_motifs[6] = $c.lit("jellyfish");
-    hawaiian_motif$hawaiian_motifs[7] = $c.lit("giant eel");
-    hawaiian_motif$hawaiian_motifs[8] = $c.lit("water nymph");
-    hawaiian_motif$hawaiian_motifs[9] = $c.lit("plumeria");
-    hawaiian_motif$hawaiian_motifs[10] = $c.lit("orchid");
-    hawaiian_motif$hawaiian_motifs[11] = $c.lit("hibiscus flower");
-    hawaiian_motif$hawaiian_motifs[12] = $c.lit("palm tree");
-    hawaiian_motif$hawaiian_motifs[13] = $c.lit("hula dancer");
-    hawaiian_motif$hawaiian_motifs[14] = $c.lit("sailboat");
-    hawaiian_motif$hawaiian_motifs[15] = $c.lit("ukulele");
+    $c.init(hawaiian_motif$hawaiian_motifs, [
+        $c.lit("flamingo"),
+        $c.lit("parrot"),
+        $c.lit("toucan"),
+        $c.lit("bird of paradise"),
+        $c.lit("sea turtle"),
+        $c.lit("tropical fish"),
+        $c.lit("jellyfish"),
+        $c.lit("giant eel"),
+        $c.lit("water nymph"),
+        $c.lit("plumeria"),
+        $c.lit("orchid"),
+        $c.lit("hibiscus flower"),
+        $c.lit("palm tree"),
+        $c.lit("hula dancer"),
+        $c.lit("sailboat"),
+        $c.lit("ukulele")
+    ]);
     hawaiian_design$hawaiian_bgs.fill(null);
-    hawaiian_design$hawaiian_bgs[0] = $c.lit("purple");
-    hawaiian_design$hawaiian_bgs[1] = $c.lit("yellow");
-    hawaiian_design$hawaiian_bgs[2] = $c.lit("red");
-    hawaiian_design$hawaiian_bgs[3] = $c.lit("blue");
-    hawaiian_design$hawaiian_bgs[4] = $c.lit("orange");
-    hawaiian_design$hawaiian_bgs[5] = $c.lit("black");
-    hawaiian_design$hawaiian_bgs[6] = $c.lit("green");
-    hawaiian_design$hawaiian_bgs[7] = $c.lit("abstract");
-    hawaiian_design$hawaiian_bgs[8] = $c.lit("geometric");
-    hawaiian_design$hawaiian_bgs[9] = $c.lit("patterned");
-    hawaiian_design$hawaiian_bgs[10] = $c.lit("naturalistic");
+    $c.init(hawaiian_design$hawaiian_bgs, [
+        $c.lit("purple"),
+        $c.lit("yellow"),
+        $c.lit("red"),
+        $c.lit("blue"),
+        $c.lit("orange"),
+        $c.lit("black"),
+        $c.lit("green"),
+        $c.lit("abstract"),
+        $c.lit("geometric"),
+        $c.lit("patterned"),
+        $c.lit("naturalistic")
+    ]);
     apron_text$apron_msgs.fill(null);
-    apron_text$apron_msgs[0] = $c.lit("Kiss the cook");
-    apron_text$apron_msgs[1] = $c.lit("I'm making SCIENCE!");
-    apron_text$apron_msgs[2] = $c.lit("Don't mess with the chef");
-    apron_text$apron_msgs[3] = $c.lit("Don't make me poison you");
-    apron_text$apron_msgs[4] = $c.lit("Gehennom's Kitchen");
-    apron_text$apron_msgs[5] = $c.lit("Rat: The other white meat");
-    apron_text$apron_msgs[6] = $c.lit("If you can't stand the heat, get out of Gehennom!");
-    apron_text$apron_msgs[7] = $c.lit("If we weren't meant to eat animals, why are they made out of meat?");
-    apron_text$apron_msgs[8] = $c.lit("If you don't like the food, I'll stab you");
-    apron_text$apron_msgs[9] = $c.lit("I am an alchemist; if you see me running, try to catch up...");
+    $c.init(apron_text$apron_msgs, [
+        $c.lit("Kiss the cook"),
+        $c.lit("I'm making SCIENCE!"),
+        $c.lit("Don't mess with the chef"),
+        $c.lit("Don't make me poison you"),
+        $c.lit("Gehennom's Kitchen"),
+        $c.lit("Rat: The other white meat"),
+        $c.lit("If you can't stand the heat, get out of Gehennom!"),
+        $c.lit("If we weren't meant to eat animals, why are they made out of meat?"),
+        $c.lit("If you don't like the food, I'll stab you"),
+        $c.lit("I am an alchemist; if you see me running, try to catch up...")
+    ]);
     doread$find_any_braille.fill(0);
     doread$find_any_braille.set([102, 101, 101, 108, 32, 97, 110, 121, 32, 66, 114, 97, 105, 108, 108, 101, 32, 119, 114, 105, 116, 105, 110, 103, 46]);   // "feel any Braille writing."
     doread$card_msgs.fill(null);
-    doread$card_msgs[0] = $c.lit("Leprechaun Gold Tru$t - Shamrock Card");
-    doread$card_msgs[1] = $c.lit("Magic Memory Vault Charge Card");
-    doread$card_msgs[2] = $c.lit("Larn National Bank");
-    doread$card_msgs[3] = $c.lit("First Bank of Omega");
-    doread$card_msgs[4] = $c.lit("Bank of Zork - Frobozz Magic Card");
-    doread$card_msgs[5] = $c.lit("Ankh-Morpork Merchant's Guild Barter Card");
-    doread$card_msgs[6] = $c.lit("Ankh-Morpork Thieves' Guild Unlimited Transaction Card");
-    doread$card_msgs[7] = $c.lit("Ransmannsby Moneylenders Association");
-    doread$card_msgs[8] = $c.lit("Bank of Gehennom - 99% Interest Card");
-    doread$card_msgs[9] = $c.lit("Yendorian Express - Copper Card");
-    doread$card_msgs[10] = $c.lit("Yendorian Express - Silver Card");
-    doread$card_msgs[11] = $c.lit("Yendorian Express - Gold Card");
-    doread$card_msgs[12] = $c.lit("Yendorian Express - Mithril Card");
-    doread$card_msgs[13] = $c.lit("Yendorian Express - Platinum Card");
+    $c.init(doread$card_msgs, [
+        $c.lit("Leprechaun Gold Tru$t - Shamrock Card"),
+        $c.lit("Magic Memory Vault Charge Card"),
+        $c.lit("Larn National Bank"),
+        $c.lit("First Bank of Omega"),
+        $c.lit("Bank of Zork - Frobozz Magic Card"),
+        $c.lit("Ankh-Morpork Merchant's Guild Barter Card"),
+        $c.lit("Ankh-Morpork Thieves' Guild Unlimited Transaction Card"),
+        $c.lit("Ransmannsby Moneylenders Association"),
+        $c.lit("Bank of Gehennom - 99% Interest Card"),
+        $c.lit("Yendorian Express - Copper Card"),
+        $c.lit("Yendorian Express - Silver Card"),
+        $c.lit("Yendorian Express - Gold Card"),
+        $c.lit("Yendorian Express - Mithril Card"),
+        $c.lit("Yendorian Express - Platinum Card")
+    ]);
     doread$red_mons.fill(0);
-    doread$red_mons[0] = PM_FIRE_ANT;
-    doread$red_mons[1] = PM_PYROLISK;
-    doread$red_mons[2] = PM_HELL_HOUND;
-    doread$red_mons[3] = PM_IMP;
-    doread$red_mons[4] = PM_LARGE_MIMIC;
-    doread$red_mons[5] = PM_LEOCROTTA;
-    doread$red_mons[6] = PM_SCORPION;
-    doread$red_mons[7] = PM_XAN;
-    doread$red_mons[8] = PM_GIANT_BAT;
-    doread$red_mons[9] = PM_WATER_MOCCASIN;
-    doread$red_mons[10] = PM_FLESH_GOLEM;
-    doread$red_mons[11] = PM_BARBED_DEVIL;
-    doread$red_mons[12] = PM_MARILITH;
-    doread$red_mons[13] = PM_PIRANHA;
+    $c.init(doread$red_mons, [
+        PM_FIRE_ANT,
+        PM_PYROLISK,
+        PM_HELL_HOUND,
+        PM_IMP,
+        PM_LARGE_MIMIC,
+        PM_LEOCROTTA,
+        PM_SCORPION,
+        PM_XAN,
+        PM_GIANT_BAT,
+        PM_WATER_MOCCASIN,
+        PM_FLESH_GOLEM,
+        PM_BARBED_DEVIL,
+        PM_MARILITH,
+        PM_PIRANHA
+    ]);
 }

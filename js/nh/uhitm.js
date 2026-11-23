@@ -35,7 +35,7 @@ import { ParanoidHit } from './flag.macros.js';
 import { FALSE, LL_CONDUCT, TRUE } from './global.h.js';
 import { glyph_to_cmap } from './glyphs.js';
 import { check_capacity, doorless_door, end_running, in_rooms, inv_cnt, near_capacity, nomul, overexertion, test_move } from './hack.js';
-import { ARTICLE_A, ARTICLE_YOUR, CXN_ARTICLE, CXN_PFX_THE, DIED, DIR_ERR, DISMOUNT_KNOCKED, DISMOUNT_POLY, DROWNING, ECMD_TIME, EXACT_NAME, FACE, HAND, HMON_APPLIED, HMON_KICKED, HMON_MELEE, HMON_THROWN, KILLED_BY, KILLED_BY_AN, LEG, MHID_ALTMON, MIM_OMIT_WAIT, MIM_REVEAL, MMOVE_DIED, NC_SHOW_MSG, NOTELL, NO_KILLER_PREFIX, NO_MM_FLAGS, NO_NC_FLAGS, NO_TRAP_FLAGS, RLOC_MSG, RLOC_NOMSG, STOMACH, STONING, SUPPRESS_HALLUCINATION, SUPPRESS_INVISIBLE, SUPPRESS_IT, SUPPRESS_NAME, SUPPRESS_SADDLE, TEST_MOVE, XKILL_GIVEMSG, XKILL_NOCORPSE, XKILL_NOMSG, invlet_basic } from './hack.h.js';
+import { ARTICLE_A, ARTICLE_THE, ARTICLE_YOUR, CXN_ARTICLE, CXN_PFX_THE, DIED, DIR_ERR, DISMOUNT_KNOCKED, DISMOUNT_POLY, DROWNING, ECMD_TIME, EXACT_NAME, FACE, HAND, HMON_APPLIED, HMON_KICKED, HMON_MELEE, HMON_THROWN, KILLED_BY, KILLED_BY_AN, LEG, MHID_ALTMON, MIM_OMIT_WAIT, MIM_REVEAL, MMOVE_DIED, NC_SHOW_MSG, NOTELL, NO_KILLER_PREFIX, NO_MM_FLAGS, NO_NC_FLAGS, NO_TRAP_FLAGS, RLOC_MSG, RLOC_NOMSG, STOMACH, STONING, SUPPRESS_HALLUCINATION, SUPPRESS_INVISIBLE, SUPPRESS_IT, SUPPRESS_NAME, SUPPRESS_SADDLE, TEST_MOVE, XKILL_GIVEMSG, XKILL_NOCORPSE, XKILL_NOMSG, invlet_basic } from './hack.h.js';
 import { DIR_LEFT, DIR_LEFT2, DIR_RIGHT, DIR_RIGHT2, NODIAG, plur } from './hack.macros.js';
 import { dist2, eos, highc, ing_suffix, nh_snprintf, s_suffix, sgn, strNsubst, strstri, upstart } from './hacklib.js';
 import { addinv, carrying, freeinv, hold_another_object, merge_choice, update_inventory, useup, useupall } from './invent.js';
@@ -51,7 +51,7 @@ import { angry_guards, corpse_chance, golemeffects, healmon, killed, mlifesaver,
 import { AD_ACID, AD_BLND, AD_COLD, AD_CONF, AD_CORR, AD_CURS, AD_DCAY, AD_DETH, AD_DGST, AD_DISE, AD_DRCO, AD_DRDX, AD_DREN, AD_DRIN, AD_DRLI, AD_DRST, AD_ELEC, AD_ENCH, AD_FAMN, AD_FIRE, AD_HALU, AD_HEAL, AD_LEGS, AD_MAGM, AD_PEST, AD_PHYS, AD_PLYS, AD_POLY, AD_RUST, AD_SAMU, AD_SEDU, AD_SGLD, AD_SITM, AD_SLEE, AD_SLIM, AD_SLOW, AD_SPEL, AD_SSEX, AD_STCK, AD_STON, AD_STUN, AD_TLPT, AD_WERE, AD_WRAP, AT_BITE, AT_BOOM, AT_BREA, AT_BUTT, AT_CLAW, AT_ENGL, AT_EXPL, AT_GAZE, AT_HUGS, AT_KICK, AT_MAGC, AT_NONE, AT_SPIT, AT_STNG, AT_TENT, AT_TUCH, AT_WEAP, M_ATTK_AGR_DIED, M_ATTK_AGR_DONE, M_ATTK_DEF_DIED, M_ATTK_HIT, M_ATTK_MISS } from './monattk.h.js';
 import { attacktype, can_be_strangled, can_blnd, defended, dmgtype, dmgtype_fromattack, gender, locomotion, mon_hates_blessings, mon_hates_light, mon_hates_silver, monstseesu, monstunseesu, noattacks, on_fire, poly_when_stoned, pronoun_gender, resists_blnd, resists_blnd_by_arti, resists_drli, stagger, sticks } from './mondata.js';
 import { amorphous, amphibious, bigmonst, breathless, cant_drown, cantwield, carnivorous, completelyburns, completelyrots, completelyrusts, flaming, has_head, haseyes, herbivorous, hides_under, hug_throttles, humanoid, is_animal, is_demon, is_floater, is_flyer, is_longworm, is_orc, is_rider, is_undead, is_watch, is_were, is_whirly, metallivorous, mindless, noncorporeal, nonliving, passes_rocks, passes_walls, slimeproof, slithy, thick_skinned, touch_petrifies, type_is_pname, unsolid } from './mondata.macros.js';
-import { G_NOCORPSE, G_UNIQ, M1_AMPHIBIOUS, M1_BREATHLESS, M1_FLY, M1_SWIM, NEUTRAL } from './monflag.h.js';
+import { G_NOCORPSE, G_UNIQ, M1_AMPHIBIOUS, M1_BREATHLESS, M1_FLY, M1_SWIM, M2_ELF, NEUTRAL } from './monflag.h.js';
 import { m_move, monflee, set_apparxy } from './monmove.js';
 import { mons } from './monst.js';
 import { MSLOW, M_AP_FURNITURE, M_AP_MONSTER, M_AP_NOTHING, M_AP_OBJECT, M_SEEN_ACID, M_SEEN_COLD, M_SEEN_ELEC, M_SEEN_FIRE, M_SEEN_MAGR, M_SEEN_SLEEP, NEED_WEAPON } from './monst.h.js';
@@ -290,7 +290,7 @@ export async function find_roll_to_hit(mtmp, aatyp, weapon, attk_count, role_rol
             tmp = tmp + ($c.div32(u.ulevel, 3) + 2 | 0) | 0;
         }
     }
-    if (is_orc(mtmp.data) && (u.umonnum !== u.umonster ? $c.andu64(gy.youmonst.data.mflags2, 16) !== 0 : gu.urace.mnum === PM_ELF)) {
+    if (is_orc(mtmp.data) && (u.umonnum !== u.umonster ? $c.andu64(gy.youmonst.data.mflags2, M2_ELF) !== 0 : gu.urace.mnum === PM_ELF)) {
         tmp = tmp + 1 | 0;
     }
     if ((tmp2 = near_capacity()) !== 0) {
@@ -1411,7 +1411,7 @@ async function steal_it(mdef, mattk) {   // uhitm.c:2174
     gold = findgold(mdef.minvent);
     if (ustealo) {
         if (gender(mdef) === (u.mfemale | 0) && gy.youmonst.data.mlet === S_NYMPH) {
-            await You($c.lit("charm %s.  %s gladly hands over %s%s possessions."), await mon_nam(mdef), upstart($c.__builtin___strcpy_chk(new $c.Ptr(heshe, 0), genders[pronoun_gender(mdef, 2)].he, 20)), !gold ? $c.lit("") : $c.lit("most of "), genders[pronoun_gender(mdef, PRONOUN_HALLU)].his);
+            await You($c.lit("charm %s.  %s gladly hands over %s%s possessions."), await mon_nam(mdef), upstart($c.__builtin___strcpy_chk(new $c.Ptr(heshe, 0), genders[pronoun_gender(mdef, PRONOUN_HALLU)].he, 20)), !gold ? $c.lit("") : $c.lit("most of "), genders[pronoun_gender(mdef, PRONOUN_HALLU)].his);
         } else {
             await You($c.lit("seduce %s and %s starts to take off %s clothes."), await mon_nam(mdef), genders[pronoun_gender(mdef, PRONOUN_HALLU)].he, genders[pronoun_gender(mdef, PRONOUN_HALLU)].his);
         }
@@ -3372,7 +3372,7 @@ export async function mhitm_ad_sedu(magr, mattk, mdef, mhm) {   // uhitm.c:4623
             }
         }
         if (obj) {
-            $c.__builtin___strcpy_chk(new $c.Ptr(mdefnambuf, 0), await x_monnam(mdef, 1, null, 0, 0), 256);
+            $c.__builtin___strcpy_chk(new $c.Ptr(mdefnambuf, 0), await x_monnam(mdef, ARTICLE_THE, null, 0, FALSE), 256);
             if ($c.peq(u.usteed, mdef) && $c.peq(obj, await which_armor(mdef, W_SADDLE))) {
                 await dismount_steed(DISMOUNT_POLY);
             }

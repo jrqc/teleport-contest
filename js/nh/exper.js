@@ -206,7 +206,7 @@ export async function losexp(drainer) {   // exper.c:207
         u.uexp = 0;
         await livelog_printf(LL_MINORAC, $c.lit("lost all experience"));
     }
-    (!(u.ulevel >= 0 && u.ulevel < 30) ? 1 : 0) ? $c.__assert_rtn($c.lit("losexp"), $c.lit("exper.c"), 247, $c.lit("u.ulevel >= 0 && u.ulevel < MAXULEV")) : 0;
+    (!(u.ulevel >= 0 && u.ulevel < MAXULEV) ? 1 : 0) ? $c.__assert_rtn($c.lit("losexp"), $c.lit("exper.c"), 247, $c.lit("u.ulevel >= 0 && u.ulevel < MAXULEV")) : 0;
     olduhpmax = u.uhpmax;
     uhpmin = minuhpmax(10);
     num = u.uhpinc[u.ulevel];

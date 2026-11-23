@@ -550,9 +550,15 @@ function dealloc_seg(wseg) {
 
 export function $init() {
     wheads.fill(null);
-    wheads[0] = null;
+    $c.init(wheads, [
+        null
+    ]);
     wtails.fill(null);
-    wtails[0] = null;
+    $c.init(wtails, [
+        null
+    ]);
     wgrowtime.fill(0);
-    wgrowtime[0] = 0;
+    $c.init(wgrowtime, [
+        0
+    ]);
 }

@@ -12,6 +12,7 @@ import { set_bc } from './ball.js';
 import { condtests } from './botl.js';
 import { bl_bareh } from './botl.h.js';
 import { cmdq_clear, cmdq_peek, cmdq_pop, paranoid_ynq, set_occupation, yn_function } from './cmd.js';
+import { CONTEXTVERBSZ } from './context.h.js';
 import { is_lava, is_pool, is_pool_or_lava } from './dbridge.js';
 import { c_color_names, c_common_strings, cg, disp, flags, ga, gi, gm, gn, gu, gw, gy, iflags, program_state, rightleftchars, svc, svd, u } from './decl.js';
 import { AMULET_CLASS, ARMOR_CLASS, RING_CLASS, S_CENTAUR, WEAPON_CLASS } from './defsym.h.js';
@@ -33,7 +34,7 @@ import { curse, is_flammable, is_rottable, set_bknown } from './mkobj.js';
 import { rescham, restartcham } from './mon.js';
 import { breakarm, can_be_strangled, num_horns, sliparm } from './mondata.js';
 import { cant_drown, has_head, humanoid, is_clinger, nohands, nolimbs, slithy, touch_petrifies, verysmall } from './mondata.macros.js';
-import { M1_BREATHLESS, M1_FLY, M1_SWIM, MZ_SMALL } from './monflag.h.js';
+import { M1_BREATHLESS, M1_FLY, M1_HUMANOID, M1_SWIM, MZ_SMALL } from './monflag.h.js';
 import { mons } from './monst.js';
 import { PM_ARCHEOLOGIST, PM_CLERIC, PM_WIZARD } from './monsters.h.js';
 import { discover_object, observe_object } from './o_init.js';
@@ -1827,7 +1828,7 @@ async function accessory_or_armor_on(obj$in) {   // do_wear.c:2209
                 mask[0] = W_RINGL;
             } else {
                 do {
-                    $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("Which %s%s, Right or Left?"), $c.andu64(gy.youmonst.data.mflags1, 131072) !== 0 ? $c.lit("ring-") : $c.lit(""), await body_part(FINGER));
+                    $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("Which %s%s, Right or Left?"), $c.andu64(gy.youmonst.data.mflags1, M1_HUMANOID) !== 0 ? $c.lit("ring-") : $c.lit(""), await body_part(FINGER));
                     answer = await yn_function(new $c.Ptr(qbuf, 0), new $c.Ptr(rightleftchars, 0), 0, TRUE);
                     switch (answer) {
                         case 0:
@@ -2438,7 +2439,7 @@ export async function doddoremarm() {   // do_wear.c:3022
         await menu_remarm(result);
     }
     if (svc.context.takeoff.mask) {
-        $c.__builtin___strncpy_chk(new $c.Ptr(svc.context.takeoff.disrobing, 0), $c.and64(svc.context.takeoff.mask, -1793) !== 0 ? $c.lit("disrobing") : $c.lit("disarming"), 30, 31);
+        $c.__builtin___strncpy_chk(new $c.Ptr(svc.context.takeoff.disrobing, 0), $c.and64(svc.context.takeoff.mask, ~W_WEAPONS) !== 0 ? $c.lit("disrobing") : $c.lit("disarming"), CONTEXTVERBSZ, 31);
         await take_off();
     }
     return ECMD_OK;
@@ -2800,21 +2801,23 @@ export function $init() {
     c_that_.fill(0);
     c_that_.set([116, 104, 97, 116]);   // "that"
     takeoff_order.fill(0);
-    takeoff_order[0] = W_TOOL;
-    takeoff_order[1] = W_WEP;
-    takeoff_order[2] = W_ARMS;
-    takeoff_order[3] = W_ARMG;
-    takeoff_order[4] = W_RINGL;
-    takeoff_order[5] = W_RINGR;
-    takeoff_order[6] = W_ARMC;
-    takeoff_order[7] = W_ARMH;
-    takeoff_order[8] = W_AMUL;
-    takeoff_order[9] = W_ARM;
-    takeoff_order[10] = W_ARMU;
-    takeoff_order[11] = W_ARMF;
-    takeoff_order[12] = W_SWAPWEP;
-    takeoff_order[13] = W_QUIVER;
-    takeoff_order[14] = 0;
+    $c.init(takeoff_order, [
+        W_TOOL,
+        W_WEP,
+        W_ARMS,
+        W_ARMG,
+        W_RINGL,
+        W_RINGR,
+        W_ARMC,
+        W_ARMH,
+        W_AMUL,
+        W_ARM,
+        W_ARMU,
+        W_ARMF,
+        W_SWAPWEP,
+        W_QUIVER,
+        0
+    ]);
     Narmorpieces = 0;
     Naccessories = 0;
     armoroff$offdelaybuf.fill(0);

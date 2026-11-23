@@ -2,14 +2,14 @@
 import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
-import { A_NONE } from './align.h.js';
+import { A_CHAOTIC, A_LAWFUL, A_NEUTRAL, A_NONE } from './align.h.js';
 import { do_blinding_ray, next_to_u } from './apply.js';
-import { BANISH, BLINDING_RAY, CHARGE_OBJ, CREATE_AMMO, CREATE_PORTAL, ENERGY_BOOST, ENLIGHTENING, FIRESTORM, FLING_POISON, HEALING, LEV_TELE, SNOWSTORM, SPFX_ATTK, SPFX_BEHEAD, SPFX_DALIGN, SPFX_DBONUS, SPFX_DCLAS, SPFX_DFLAG1, SPFX_DFLAG2, SPFX_DMONS, SPFX_DRLI, SPFX_EREGEN, SPFX_ESP, SPFX_HALRES, SPFX_HPHDAM, SPFX_HSPDAM, SPFX_INTEL, SPFX_LUCK, SPFX_NOGEN, SPFX_PROTECT, SPFX_REFLECT, SPFX_REGEN, SPFX_RESTR, SPFX_SEARCH, SPFX_SPEAK, SPFX_STLTH, SPFX_TCTRL, SPFX_WARN, SPFX_XRAY, TAMING, UNTRAP } from './artifact.h.js';
+import { BANISH, BLINDING_RAY, CHARGE_OBJ, CREATE_AMMO, CREATE_PORTAL, ENERGY_BOOST, ENLIGHTENING, FIRESTORM, FLING_POISON, HEALING, LEV_TELE, SNOWSTORM, SPFX_ATTK, SPFX_BEHEAD, SPFX_DALIGN, SPFX_DBONUS, SPFX_DCLAS, SPFX_DEFN, SPFX_DFLAG1, SPFX_DFLAG2, SPFX_DMONS, SPFX_DRLI, SPFX_EREGEN, SPFX_ESP, SPFX_HALRES, SPFX_HPHDAM, SPFX_HSPDAM, SPFX_INTEL, SPFX_LUCK, SPFX_NOGEN, SPFX_PROTECT, SPFX_REFLECT, SPFX_REGEN, SPFX_RESTR, SPFX_SEARCH, SPFX_SEEK, SPFX_SPEAK, SPFX_STLTH, SPFX_TCTRL, SPFX_WARN, SPFX_XRAY, TAMING, UNTRAP } from './artifact.h.js';
 import { ART_EXCALIBUR, ART_GRIMTOOTH, ART_MASTER_KEY_OF_THIEVERY, ART_NONARTIFACT, ART_ORCRIST, ART_STING, ART_STORMBRINGER, ART_SUNSWORD, ART_TSURUGI_OF_MURAMASA, ART_VORPAL_BLADE } from './artilist.h.js';
 import { exercise } from './attrib.js';
 import { A_CON, A_WIS } from './attrib.h.js';
 import { getdir, isok } from './cmd.js';
-import { NO_COLOR } from './color.h.js';
+import { CLR_BRIGHT_BLUE, CLR_RED, NO_COLOR } from './color.h.js';
 import { clr2colorname } from './coloratt.js';
 import { c_color_names, c_common_strings, cg, disp, flags, gi, gm, gn, gs, gu, gv, gw, gy, iflags, program_state, svb, svc, svd, svl, svm, svn, svq, u } from './decl.js';
 import { RING_CLASS, S_DRAGON, S_IMP, S_OGRE, S_TROLL, TOOL_CLASS, WAND_CLASS, WEAPON_CLASS } from './defsym.h.js';
@@ -36,10 +36,10 @@ import { monhp_per_lvl } from './makemon.js';
 import { bcsign, mksobj, obj_extract_self, uncurse, weight } from './mkobj.js';
 import { NO_ROOM } from './mkroom.h.js';
 import { healmon, migrate_mon, set_ustuck, wake_nearto } from './mon.js';
-import { AD_ACID, AD_COLD, AD_DISE, AD_DISN, AD_DRLI, AD_DRST, AD_ELEC, AD_FIRE, AD_HALU, AD_MAGM, AD_PHYS, AD_PLYS, AD_SLEE, AD_SLOW, AD_STON, AD_STUN, AT_MAGC } from './monattk.h.js';
+import { AD_ACID, AD_BLND, AD_COLD, AD_DISE, AD_DISN, AD_DRLI, AD_DRST, AD_ELEC, AD_FIRE, AD_HALU, AD_MAGM, AD_PHYS, AD_PLYS, AD_SLEE, AD_SLOW, AD_STON, AD_STUN, AD_WERE, AT_MAGC } from './monattk.h.js';
 import { attacktype, defended, resists_drli, sticks } from './mondata.js';
 import { amorphous, bigmonst, has_head, is_covetous, is_demon, is_dlord, is_dprince, is_mplayer, noncorporeal, nonliving, race_hostile } from './mondata.macros.js';
-import { M2_UNDEAD, M2_WERE, MS_NEMESIS } from './monflag.h.js';
+import { M2_DEMON, M2_ELF, M2_GIANT, M2_ORC, M2_UNDEAD, M2_WERE, MS_NEMESIS } from './monflag.h.js';
 import { monflee } from './monmove.js';
 import { mons } from './monst.js';
 import { DEADMONSTER, engulfing_u, ismnum, resists_cold, resists_elec, resists_fire, resists_poison, resists_ston } from './monst.macros.js';
@@ -2003,881 +2003,149 @@ export function $init() {
     for (let $i0 = 0; $i0 < 35; $i0++) {
         artilist[$i0].$copyFrom(new $T.artifact());
     }
-    artilist[0].otyp = STRANGE_OBJECT;
-    artilist[0].name = $c.lit("");
-    artilist[0].spfx = 0;
-    artilist[0].cspfx = 0;
-    artilist[0].mtype = 0;
-    artilist[0].attk.aatyp = 0;
-    artilist[0].attk.adtyp = 0;
-    artilist[0].attk.damn = 0;
-    artilist[0].attk.damd = 0;
-    artilist[0].defn.aatyp = 0;
-    artilist[0].defn.adtyp = 0;
-    artilist[0].defn.damn = 0;
-    artilist[0].defn.damd = 0;
-    artilist[0].cary.aatyp = 0;
-    artilist[0].cary.adtyp = 0;
-    artilist[0].cary.damn = 0;
-    artilist[0].cary.damd = 0;
-    artilist[0].inv_prop = 0;
-    artilist[0].alignment = -128;
-    artilist[0].role = NON_PM;
-    artilist[0].race = NON_PM;
-    artilist[0].gen_spe = 0;
-    artilist[0].gift_value = 0;
-    artilist[0].cost = 0;
-    artilist[0].acolor = 8;
-    artilist[1].otyp = LONG_SWORD;
-    artilist[1].name = $c.lit("Excalibur");
-    artilist[1].spfx = 663;
-    artilist[1].cspfx = 0;
-    artilist[1].mtype = 0;
-    artilist[1].attk.aatyp = 0;
-    artilist[1].attk.adtyp = 0;
-    artilist[1].attk.damn = 5;
-    artilist[1].attk.damd = 10;
-    artilist[1].defn.aatyp = 0;
-    artilist[1].defn.adtyp = 15;
-    artilist[1].defn.damn = 0;
-    artilist[1].defn.damd = 0;
-    artilist[1].cary.aatyp = 0;
-    artilist[1].cary.adtyp = 0;
-    artilist[1].cary.damn = 0;
-    artilist[1].cary.damd = 0;
-    artilist[1].inv_prop = 0;
-    artilist[1].alignment = 1;
-    artilist[1].role = PM_KNIGHT;
-    artilist[1].race = NON_PM;
-    artilist[1].gen_spe = 0;
-    artilist[1].gift_value = 10;
-    artilist[1].cost = 4000;
-    artilist[1].acolor = 8;
-    artilist[2].otyp = RUNESWORD;
-    artilist[2].name = $c.lit("Stormbringer");
-    artilist[2].spfx = 454;
-    artilist[2].cspfx = 0;
-    artilist[2].mtype = 0;
-    artilist[2].attk.aatyp = 0;
-    artilist[2].attk.adtyp = 15;
-    artilist[2].attk.damn = 5;
-    artilist[2].attk.damd = 2;
-    artilist[2].defn.aatyp = 0;
-    artilist[2].defn.adtyp = 15;
-    artilist[2].defn.damn = 0;
-    artilist[2].defn.damd = 0;
-    artilist[2].cary.aatyp = 0;
-    artilist[2].cary.adtyp = 0;
-    artilist[2].cary.damn = 0;
-    artilist[2].cary.damd = 0;
-    artilist[2].inv_prop = 0;
-    artilist[2].alignment = -1;
-    artilist[2].role = NON_PM;
-    artilist[2].race = NON_PM;
-    artilist[2].gen_spe = 0;
-    artilist[2].gift_value = 9;
-    artilist[2].cost = 8000;
-    artilist[2].acolor = 8;
-    artilist[3].otyp = WAR_HAMMER;
-    artilist[3].name = $c.lit("Mjollnir");
-    artilist[3].spfx = 66;
-    artilist[3].cspfx = 0;
-    artilist[3].mtype = 0;
-    artilist[3].attk.aatyp = 0;
-    artilist[3].attk.adtyp = 6;
-    artilist[3].attk.damn = 5;
-    artilist[3].attk.damd = 24;
-    artilist[3].defn.aatyp = 0;
-    artilist[3].defn.adtyp = 0;
-    artilist[3].defn.damn = 0;
-    artilist[3].defn.damd = 0;
-    artilist[3].cary.aatyp = 0;
-    artilist[3].cary.adtyp = 0;
-    artilist[3].cary.damn = 0;
-    artilist[3].cary.damd = 0;
-    artilist[3].inv_prop = 0;
-    artilist[3].alignment = 0;
-    artilist[3].role = PM_VALKYRIE;
-    artilist[3].race = NON_PM;
-    artilist[3].gen_spe = 0;
-    artilist[3].gift_value = 8;
-    artilist[3].cost = 4000;
-    artilist[3].acolor = 8;
-    artilist[4].otyp = BATTLE_AXE;
-    artilist[4].name = $c.lit("Cleaver");
-    artilist[4].spfx = 2;
-    artilist[4].cspfx = 0;
-    artilist[4].mtype = 0;
-    artilist[4].attk.aatyp = 0;
-    artilist[4].attk.adtyp = 0;
-    artilist[4].attk.damn = 3;
-    artilist[4].attk.damd = 6;
-    artilist[4].defn.aatyp = 0;
-    artilist[4].defn.adtyp = 0;
-    artilist[4].defn.damn = 0;
-    artilist[4].defn.damd = 0;
-    artilist[4].cary.aatyp = 0;
-    artilist[4].cary.adtyp = 0;
-    artilist[4].cary.damn = 0;
-    artilist[4].cary.damd = 0;
-    artilist[4].inv_prop = 0;
-    artilist[4].alignment = 0;
-    artilist[4].role = PM_BARBARIAN;
-    artilist[4].race = NON_PM;
-    artilist[4].gen_spe = 0;
-    artilist[4].gift_value = 8;
-    artilist[4].cost = 1500;
-    artilist[4].acolor = 8;
-    artilist[5].otyp = ORCISH_DAGGER;
-    artilist[5].name = $c.lit("Grimtooth");
-    artilist[5].spfx = 8388642;
-    artilist[5].cspfx = 0;
-    artilist[5].mtype = 16;
-    artilist[5].attk.aatyp = 0;
-    artilist[5].attk.adtyp = 0;
-    artilist[5].attk.damn = 2;
-    artilist[5].attk.damd = 6;
-    artilist[5].defn.aatyp = 0;
-    artilist[5].defn.adtyp = 7;
-    artilist[5].defn.damn = 0;
-    artilist[5].defn.damd = 0;
-    artilist[5].cary.aatyp = 0;
-    artilist[5].cary.adtyp = 0;
-    artilist[5].cary.damn = 0;
-    artilist[5].cary.damd = 0;
-    artilist[5].inv_prop = FLING_POISON;
-    artilist[5].alignment = -1;
-    artilist[5].role = NON_PM;
-    artilist[5].race = PM_ORC;
-    artilist[5].gen_spe = 0;
-    artilist[5].gift_value = 5;
-    artilist[5].cost = 1200;
-    artilist[5].acolor = 1;
-    artilist[6].otyp = ELVEN_BROADSWORD;
-    artilist[6].name = $c.lit("Orcrist");
-    artilist[6].spfx = 8388640;
-    artilist[6].cspfx = 0;
-    artilist[6].mtype = 128;
-    artilist[6].attk.aatyp = 0;
-    artilist[6].attk.adtyp = 0;
-    artilist[6].attk.damn = 5;
-    artilist[6].attk.damd = 0;
-    artilist[6].defn.aatyp = 0;
-    artilist[6].defn.adtyp = 0;
-    artilist[6].defn.damn = 0;
-    artilist[6].defn.damd = 0;
-    artilist[6].cary.aatyp = 0;
-    artilist[6].cary.adtyp = 0;
-    artilist[6].cary.damn = 0;
-    artilist[6].cary.damd = 0;
-    artilist[6].inv_prop = 0;
-    artilist[6].alignment = -1;
-    artilist[6].role = NON_PM;
-    artilist[6].race = PM_ELF;
-    artilist[6].gen_spe = 3;
-    artilist[6].gift_value = 4;
-    artilist[6].cost = 2000;
-    artilist[6].acolor = 12;
-    artilist[7].otyp = ELVEN_DAGGER;
-    artilist[7].name = $c.lit("Sting");
-    artilist[7].spfx = 8388640;
-    artilist[7].cspfx = 0;
-    artilist[7].mtype = 128;
-    artilist[7].attk.aatyp = 0;
-    artilist[7].attk.adtyp = 0;
-    artilist[7].attk.damn = 5;
-    artilist[7].attk.damd = 0;
-    artilist[7].defn.aatyp = 0;
-    artilist[7].defn.adtyp = 0;
-    artilist[7].defn.damn = 0;
-    artilist[7].defn.damd = 0;
-    artilist[7].cary.aatyp = 0;
-    artilist[7].cary.adtyp = 0;
-    artilist[7].cary.damn = 0;
-    artilist[7].cary.damd = 0;
-    artilist[7].inv_prop = 0;
-    artilist[7].alignment = -1;
-    artilist[7].role = NON_PM;
-    artilist[7].race = PM_ELF;
-    artilist[7].gen_spe = 3;
-    artilist[7].gift_value = 1;
-    artilist[7].cost = 800;
-    artilist[7].acolor = 12;
-    artilist[8].otyp = ATHAME;
-    artilist[8].name = $c.lit("Magicbane");
-    artilist[8].spfx = 194;
-    artilist[8].cspfx = 0;
-    artilist[8].mtype = 0;
-    artilist[8].attk.aatyp = 0;
-    artilist[8].attk.adtyp = 12;
-    artilist[8].attk.damn = 3;
-    artilist[8].attk.damd = 4;
-    artilist[8].defn.aatyp = 0;
-    artilist[8].defn.adtyp = 1;
-    artilist[8].defn.damn = 0;
-    artilist[8].defn.damd = 0;
-    artilist[8].cary.aatyp = 0;
-    artilist[8].cary.adtyp = 0;
-    artilist[8].cary.damn = 0;
-    artilist[8].cary.damd = 0;
-    artilist[8].inv_prop = 0;
-    artilist[8].alignment = 0;
-    artilist[8].role = PM_WIZARD;
-    artilist[8].race = NON_PM;
-    artilist[8].gen_spe = 0;
-    artilist[8].gift_value = 7;
-    artilist[8].cost = 3500;
-    artilist[8].acolor = 8;
-    artilist[9].otyp = LONG_SWORD;
-    artilist[9].name = $c.lit("Frost Brand");
-    artilist[9].spfx = 194;
-    artilist[9].cspfx = 0;
-    artilist[9].mtype = 0;
-    artilist[9].attk.aatyp = 0;
-    artilist[9].attk.adtyp = 3;
-    artilist[9].attk.damn = 5;
-    artilist[9].attk.damd = 0;
-    artilist[9].defn.aatyp = 0;
-    artilist[9].defn.adtyp = 3;
-    artilist[9].defn.damn = 0;
-    artilist[9].defn.damd = 0;
-    artilist[9].cary.aatyp = 0;
-    artilist[9].cary.adtyp = 0;
-    artilist[9].cary.damn = 0;
-    artilist[9].cary.damd = 0;
-    artilist[9].inv_prop = SNOWSTORM;
-    artilist[9].alignment = -128;
-    artilist[9].role = NON_PM;
-    artilist[9].race = NON_PM;
-    artilist[9].gen_spe = 0;
-    artilist[9].gift_value = 9;
-    artilist[9].cost = 3000;
-    artilist[9].acolor = 8;
-    artilist[10].otyp = LONG_SWORD;
-    artilist[10].name = $c.lit("Fire Brand");
-    artilist[10].spfx = 194;
-    artilist[10].cspfx = 0;
-    artilist[10].mtype = 0;
-    artilist[10].attk.aatyp = 0;
-    artilist[10].attk.adtyp = 2;
-    artilist[10].attk.damn = 5;
-    artilist[10].attk.damd = 0;
-    artilist[10].defn.aatyp = 0;
-    artilist[10].defn.adtyp = 2;
-    artilist[10].defn.damn = 0;
-    artilist[10].defn.damd = 0;
-    artilist[10].cary.aatyp = 0;
-    artilist[10].cary.adtyp = 0;
-    artilist[10].cary.damn = 0;
-    artilist[10].cary.damd = 0;
-    artilist[10].inv_prop = FIRESTORM;
-    artilist[10].alignment = -128;
-    artilist[10].role = NON_PM;
-    artilist[10].race = NON_PM;
-    artilist[10].gen_spe = 0;
-    artilist[10].gift_value = 5;
-    artilist[10].cost = 3000;
-    artilist[10].acolor = 8;
-    artilist[11].otyp = BROADSWORD;
-    artilist[11].name = $c.lit("Dragonbane");
-    artilist[11].spfx = 69206018;
-    artilist[11].cspfx = 0;
-    artilist[11].mtype = S_DRAGON;
-    artilist[11].attk.aatyp = 0;
-    artilist[11].attk.adtyp = 0;
-    artilist[11].attk.damn = 5;
-    artilist[11].attk.damd = 0;
-    artilist[11].defn.aatyp = 0;
-    artilist[11].defn.adtyp = 0;
-    artilist[11].defn.damn = 0;
-    artilist[11].defn.damd = 0;
-    artilist[11].cary.aatyp = 0;
-    artilist[11].cary.adtyp = 0;
-    artilist[11].cary.damn = 0;
-    artilist[11].cary.damd = 0;
-    artilist[11].inv_prop = 0;
-    artilist[11].alignment = -128;
-    artilist[11].role = NON_PM;
-    artilist[11].race = NON_PM;
-    artilist[11].gen_spe = 2;
-    artilist[11].gift_value = 5;
-    artilist[11].cost = 500;
-    artilist[11].acolor = 8;
-    artilist[12].otyp = SILVER_MACE;
-    artilist[12].name = $c.lit("Demonbane");
-    artilist[12].spfx = 8388610;
-    artilist[12].cspfx = 0;
-    artilist[12].mtype = 256;
-    artilist[12].attk.aatyp = 0;
-    artilist[12].attk.adtyp = 0;
-    artilist[12].attk.damn = 5;
-    artilist[12].attk.damd = 0;
-    artilist[12].defn.aatyp = 0;
-    artilist[12].defn.adtyp = 0;
-    artilist[12].defn.damn = 0;
-    artilist[12].defn.damd = 0;
-    artilist[12].cary.aatyp = 0;
-    artilist[12].cary.adtyp = 0;
-    artilist[12].cary.damn = 0;
-    artilist[12].cary.damd = 0;
-    artilist[12].inv_prop = BANISH;
-    artilist[12].alignment = 1;
-    artilist[12].role = PM_CLERIC;
-    artilist[12].race = NON_PM;
-    artilist[12].gen_spe = 1;
-    artilist[12].gift_value = 3;
-    artilist[12].cost = 2500;
-    artilist[12].acolor = 8;
-    artilist[13].otyp = SILVER_SABER;
-    artilist[13].name = $c.lit("Werebane");
-    artilist[13].spfx = 8388610;
-    artilist[13].cspfx = 0;
-    artilist[13].mtype = 4;
-    artilist[13].attk.aatyp = 0;
-    artilist[13].attk.adtyp = 0;
-    artilist[13].attk.damn = 5;
-    artilist[13].attk.damd = 0;
-    artilist[13].defn.aatyp = 0;
-    artilist[13].defn.adtyp = 29;
-    artilist[13].defn.damn = 0;
-    artilist[13].defn.damd = 0;
-    artilist[13].cary.aatyp = 0;
-    artilist[13].cary.adtyp = 0;
-    artilist[13].cary.damn = 0;
-    artilist[13].cary.damd = 0;
-    artilist[13].inv_prop = 0;
-    artilist[13].alignment = -128;
-    artilist[13].role = NON_PM;
-    artilist[13].race = NON_PM;
-    artilist[13].gen_spe = 1;
-    artilist[13].gift_value = 4;
-    artilist[13].cost = 1500;
-    artilist[13].acolor = 8;
-    artilist[14].otyp = SILVER_SABER;
-    artilist[14].name = $c.lit("Grayswandir");
-    artilist[14].spfx = 2050;
-    artilist[14].cspfx = 0;
-    artilist[14].mtype = 0;
-    artilist[14].attk.aatyp = 0;
-    artilist[14].attk.adtyp = 0;
-    artilist[14].attk.damn = 5;
-    artilist[14].attk.damd = 0;
-    artilist[14].defn.aatyp = 0;
-    artilist[14].defn.adtyp = 0;
-    artilist[14].defn.damn = 0;
-    artilist[14].defn.damd = 0;
-    artilist[14].cary.aatyp = 0;
-    artilist[14].cary.adtyp = 0;
-    artilist[14].cary.damn = 0;
-    artilist[14].cary.damd = 0;
-    artilist[14].inv_prop = 0;
-    artilist[14].alignment = 1;
-    artilist[14].role = NON_PM;
-    artilist[14].race = NON_PM;
-    artilist[14].gen_spe = 0;
-    artilist[14].gift_value = 10;
-    artilist[14].cost = 8000;
-    artilist[14].acolor = 8;
-    artilist[15].otyp = LONG_SWORD;
-    artilist[15].name = $c.lit("Giantslayer");
-    artilist[15].spfx = 8388610;
-    artilist[15].cspfx = 0;
-    artilist[15].mtype = 8192;
-    artilist[15].attk.aatyp = 0;
-    artilist[15].attk.adtyp = 0;
-    artilist[15].attk.damn = 5;
-    artilist[15].attk.damd = 0;
-    artilist[15].defn.aatyp = 0;
-    artilist[15].defn.adtyp = 0;
-    artilist[15].defn.damn = 0;
-    artilist[15].defn.damd = 0;
-    artilist[15].cary.aatyp = 0;
-    artilist[15].cary.adtyp = 0;
-    artilist[15].cary.damn = 0;
-    artilist[15].cary.damd = 0;
-    artilist[15].inv_prop = 0;
-    artilist[15].alignment = 0;
-    artilist[15].role = NON_PM;
-    artilist[15].race = NON_PM;
-    artilist[15].gen_spe = 2;
-    artilist[15].gift_value = 4;
-    artilist[15].cost = 200;
-    artilist[15].acolor = 8;
-    artilist[16].otyp = WAR_HAMMER;
-    artilist[16].name = $c.lit("Ogresmasher");
-    artilist[16].spfx = 2097154;
-    artilist[16].cspfx = 0;
-    artilist[16].mtype = S_OGRE;
-    artilist[16].attk.aatyp = 0;
-    artilist[16].attk.adtyp = 0;
-    artilist[16].attk.damn = 5;
-    artilist[16].attk.damd = 0;
-    artilist[16].defn.aatyp = 0;
-    artilist[16].defn.adtyp = 0;
-    artilist[16].defn.damn = 0;
-    artilist[16].defn.damd = 0;
-    artilist[16].cary.aatyp = 0;
-    artilist[16].cary.adtyp = 0;
-    artilist[16].cary.damn = 0;
-    artilist[16].cary.damd = 0;
-    artilist[16].inv_prop = 0;
-    artilist[16].alignment = -128;
-    artilist[16].role = NON_PM;
-    artilist[16].race = NON_PM;
-    artilist[16].gen_spe = 2;
-    artilist[16].gift_value = 1;
-    artilist[16].cost = 200;
-    artilist[16].acolor = 8;
-    artilist[17].otyp = MORNING_STAR;
-    artilist[17].name = $c.lit("Trollsbane");
-    artilist[17].spfx = 2113538;
-    artilist[17].cspfx = 0;
-    artilist[17].mtype = S_TROLL;
-    artilist[17].attk.aatyp = 0;
-    artilist[17].attk.adtyp = 0;
-    artilist[17].attk.damn = 5;
-    artilist[17].attk.damd = 0;
-    artilist[17].defn.aatyp = 0;
-    artilist[17].defn.adtyp = 0;
-    artilist[17].defn.damn = 0;
-    artilist[17].defn.damd = 0;
-    artilist[17].cary.aatyp = 0;
-    artilist[17].cary.adtyp = 0;
-    artilist[17].cary.damn = 0;
-    artilist[17].cary.damd = 0;
-    artilist[17].inv_prop = 0;
-    artilist[17].alignment = -128;
-    artilist[17].role = NON_PM;
-    artilist[17].race = NON_PM;
-    artilist[17].gen_spe = 2;
-    artilist[17].gift_value = 1;
-    artilist[17].cost = 200;
-    artilist[17].acolor = 8;
-    artilist[18].otyp = LONG_SWORD;
-    artilist[18].name = $c.lit("Vorpal Blade");
-    artilist[18].spfx = 1026;
-    artilist[18].cspfx = 0;
-    artilist[18].mtype = 0;
-    artilist[18].attk.aatyp = 0;
-    artilist[18].attk.adtyp = 0;
-    artilist[18].attk.damn = 5;
-    artilist[18].attk.damd = 1;
-    artilist[18].defn.aatyp = 0;
-    artilist[18].defn.adtyp = 0;
-    artilist[18].defn.damn = 0;
-    artilist[18].defn.damd = 0;
-    artilist[18].cary.aatyp = 0;
-    artilist[18].cary.adtyp = 0;
-    artilist[18].cary.damn = 0;
-    artilist[18].cary.damd = 0;
-    artilist[18].inv_prop = 0;
-    artilist[18].alignment = 0;
-    artilist[18].role = NON_PM;
-    artilist[18].race = NON_PM;
-    artilist[18].gen_spe = 1;
-    artilist[18].gift_value = 5;
-    artilist[18].cost = 4000;
-    artilist[18].acolor = 8;
-    artilist[19].otyp = KATANA;
-    artilist[19].name = $c.lit("Snickersnee");
-    artilist[19].spfx = 2;
-    artilist[19].cspfx = 0;
-    artilist[19].mtype = 0;
-    artilist[19].attk.aatyp = 0;
-    artilist[19].attk.adtyp = 0;
-    artilist[19].attk.damn = 0;
-    artilist[19].attk.damd = 8;
-    artilist[19].defn.aatyp = 0;
-    artilist[19].defn.adtyp = 0;
-    artilist[19].defn.damn = 0;
-    artilist[19].defn.damd = 0;
-    artilist[19].cary.aatyp = 0;
-    artilist[19].cary.adtyp = 0;
-    artilist[19].cary.damn = 0;
-    artilist[19].cary.damd = 0;
-    artilist[19].inv_prop = 0;
-    artilist[19].alignment = 1;
-    artilist[19].role = PM_SAMURAI;
-    artilist[19].race = NON_PM;
-    artilist[19].gen_spe = 0;
-    artilist[19].gift_value = 8;
-    artilist[19].cost = 1200;
-    artilist[19].acolor = 8;
-    artilist[20].otyp = LONG_SWORD;
-    artilist[20].name = $c.lit("Sunsword");
-    artilist[20].spfx = 8388610;
-    artilist[20].cspfx = 0;
-    artilist[20].mtype = 2;
-    artilist[20].attk.aatyp = 0;
-    artilist[20].attk.adtyp = 0;
-    artilist[20].attk.damn = 5;
-    artilist[20].attk.damd = 0;
-    artilist[20].defn.aatyp = 0;
-    artilist[20].defn.adtyp = 11;
-    artilist[20].defn.damn = 0;
-    artilist[20].defn.damd = 0;
-    artilist[20].cary.aatyp = 0;
-    artilist[20].cary.adtyp = 0;
-    artilist[20].cary.damn = 0;
-    artilist[20].cary.damd = 0;
-    artilist[20].inv_prop = BLINDING_RAY;
-    artilist[20].alignment = 1;
-    artilist[20].role = NON_PM;
-    artilist[20].race = NON_PM;
-    artilist[20].gen_spe = 0;
-    artilist[20].gift_value = 6;
-    artilist[20].cost = 1500;
-    artilist[20].acolor = 8;
-    artilist[21].otyp = CRYSTAL_BALL;
-    artilist[21].name = $c.lit("The Orb of Detection");
-    artilist[21].spfx = 7;
-    artilist[21].cspfx = 69632;
-    artilist[21].mtype = 0;
-    artilist[21].attk.aatyp = 0;
-    artilist[21].attk.adtyp = 0;
-    artilist[21].attk.damn = 0;
-    artilist[21].attk.damd = 0;
-    artilist[21].defn.aatyp = 0;
-    artilist[21].defn.adtyp = 0;
-    artilist[21].defn.damn = 0;
-    artilist[21].defn.damd = 0;
-    artilist[21].cary.aatyp = 0;
-    artilist[21].cary.adtyp = 1;
-    artilist[21].cary.damn = 0;
-    artilist[21].cary.damd = 0;
-    artilist[21].inv_prop = INVIS;
-    artilist[21].alignment = 1;
-    artilist[21].role = PM_ARCHEOLOGIST;
-    artilist[21].race = NON_PM;
-    artilist[21].gen_spe = 0;
-    artilist[21].gift_value = 12;
-    artilist[21].cost = 2500;
-    artilist[21].acolor = 8;
-    artilist[22].otyp = LUCKSTONE;
-    artilist[22].name = $c.lit("The Heart of Ahriman");
-    artilist[22].spfx = 7;
-    artilist[22].cspfx = 8192;
-    artilist[22].mtype = 0;
-    artilist[22].attk.aatyp = 0;
-    artilist[22].attk.adtyp = 0;
-    artilist[22].attk.damn = 5;
-    artilist[22].attk.damd = 0;
-    artilist[22].defn.aatyp = 0;
-    artilist[22].defn.adtyp = 0;
-    artilist[22].defn.damn = 0;
-    artilist[22].defn.damd = 0;
-    artilist[22].cary.aatyp = 0;
-    artilist[22].cary.adtyp = 0;
-    artilist[22].cary.damn = 0;
-    artilist[22].cary.damd = 0;
-    artilist[22].inv_prop = LEVITATION;
-    artilist[22].alignment = 0;
-    artilist[22].role = PM_BARBARIAN;
-    artilist[22].race = NON_PM;
-    artilist[22].gen_spe = 0;
-    artilist[22].gift_value = 12;
-    artilist[22].cost = 2500;
-    artilist[22].acolor = 8;
-    artilist[23].otyp = MACE;
-    artilist[23].name = $c.lit("The Sceptre of Might");
-    artilist[23].spfx = 16777223;
-    artilist[23].cspfx = 0;
-    artilist[23].mtype = 0;
-    artilist[23].attk.aatyp = 0;
-    artilist[23].attk.adtyp = 0;
-    artilist[23].attk.damn = 5;
-    artilist[23].attk.damd = 0;
-    artilist[23].defn.aatyp = 0;
-    artilist[23].defn.adtyp = 1;
-    artilist[23].defn.damn = 0;
-    artilist[23].defn.damd = 0;
-    artilist[23].cary.aatyp = 0;
-    artilist[23].cary.adtyp = 0;
-    artilist[23].cary.damn = 0;
-    artilist[23].cary.damd = 0;
-    artilist[23].inv_prop = CONFLICT;
-    artilist[23].alignment = 1;
-    artilist[23].role = PM_CAVE_DWELLER;
-    artilist[23].race = NON_PM;
-    artilist[23].gen_spe = 0;
-    artilist[23].gift_value = 12;
-    artilist[23].cost = 2500;
-    artilist[23].acolor = 8;
-    artilist[24].otyp = QUARTERSTAFF;
-    artilist[24].name = $c.lit("The Staff of Aesculapius");
-    artilist[24].spfx = 16711;
-    artilist[24].cspfx = 0;
-    artilist[24].mtype = 0;
-    artilist[24].attk.aatyp = 0;
-    artilist[24].attk.adtyp = 15;
-    artilist[24].attk.damn = 0;
-    artilist[24].attk.damd = 0;
-    artilist[24].defn.aatyp = 0;
-    artilist[24].defn.adtyp = 15;
-    artilist[24].defn.damn = 0;
-    artilist[24].defn.damd = 0;
-    artilist[24].cary.aatyp = 0;
-    artilist[24].cary.adtyp = 0;
-    artilist[24].cary.damn = 0;
-    artilist[24].cary.damd = 0;
-    artilist[24].inv_prop = HEALING;
-    artilist[24].alignment = 0;
-    artilist[24].role = PM_HEALER;
-    artilist[24].race = NON_PM;
-    artilist[24].gen_spe = 0;
-    artilist[24].gift_value = 12;
-    artilist[24].cost = 5000;
-    artilist[24].acolor = 8;
-    artilist[25].otyp = MIRROR;
-    artilist[25].name = $c.lit("The Magic Mirror of Merlin");
-    artilist[25].spfx = 15;
-    artilist[25].cspfx = 4096;
-    artilist[25].mtype = 0;
-    artilist[25].attk.aatyp = 0;
-    artilist[25].attk.adtyp = 0;
-    artilist[25].attk.damn = 0;
-    artilist[25].attk.damd = 0;
-    artilist[25].defn.aatyp = 0;
-    artilist[25].defn.adtyp = 0;
-    artilist[25].defn.damn = 0;
-    artilist[25].defn.damd = 0;
-    artilist[25].cary.aatyp = 0;
-    artilist[25].cary.adtyp = 1;
-    artilist[25].cary.damn = 0;
-    artilist[25].cary.damd = 0;
-    artilist[25].inv_prop = 0;
-    artilist[25].alignment = 1;
-    artilist[25].role = PM_KNIGHT;
-    artilist[25].race = NON_PM;
-    artilist[25].gen_spe = 0;
-    artilist[25].gift_value = 12;
-    artilist[25].cost = 1500;
-    artilist[25].acolor = 8;
-    artilist[26].otyp = LENSES;
-    artilist[26].name = $c.lit("The Eyes of the Overworld");
-    artilist[26].spfx = 33554439;
-    artilist[26].cspfx = 0;
-    artilist[26].mtype = 0;
-    artilist[26].attk.aatyp = 0;
-    artilist[26].attk.adtyp = 0;
-    artilist[26].attk.damn = 0;
-    artilist[26].attk.damd = 0;
-    artilist[26].defn.aatyp = 0;
-    artilist[26].defn.adtyp = 1;
-    artilist[26].defn.damn = 0;
-    artilist[26].defn.damd = 0;
-    artilist[26].cary.aatyp = 0;
-    artilist[26].cary.adtyp = 0;
-    artilist[26].cary.damn = 0;
-    artilist[26].cary.damd = 0;
-    artilist[26].inv_prop = ENLIGHTENING;
-    artilist[26].alignment = 0;
-    artilist[26].role = PM_MONK;
-    artilist[26].race = NON_PM;
-    artilist[26].gen_spe = 0;
-    artilist[26].gift_value = 12;
-    artilist[26].cost = 2500;
-    artilist[26].acolor = 8;
-    artilist[27].otyp = HELM_OF_BRILLIANCE;
-    artilist[27].name = $c.lit("The Mitre of Holiness");
-    artilist[27].spfx = 142606343;
-    artilist[27].cspfx = 0;
-    artilist[27].mtype = 2;
-    artilist[27].attk.aatyp = 0;
-    artilist[27].attk.adtyp = 0;
-    artilist[27].attk.damn = 0;
-    artilist[27].attk.damd = 0;
-    artilist[27].defn.aatyp = 0;
-    artilist[27].defn.adtyp = 0;
-    artilist[27].defn.damn = 0;
-    artilist[27].defn.damd = 0;
-    artilist[27].cary.aatyp = 0;
-    artilist[27].cary.adtyp = 2;
-    artilist[27].cary.damn = 0;
-    artilist[27].cary.damd = 0;
-    artilist[27].inv_prop = ENERGY_BOOST;
-    artilist[27].alignment = 1;
-    artilist[27].role = PM_CLERIC;
-    artilist[27].race = NON_PM;
-    artilist[27].gen_spe = 0;
-    artilist[27].gift_value = 12;
-    artilist[27].cost = 2000;
-    artilist[27].acolor = 8;
-    artilist[28].otyp = BOW;
-    artilist[28].name = $c.lit("The Longbow of Diana");
-    artilist[28].spfx = 67108871;
-    artilist[28].cspfx = 4096;
-    artilist[28].mtype = 0;
-    artilist[28].attk.aatyp = 0;
-    artilist[28].attk.adtyp = 0;
-    artilist[28].attk.damn = 5;
-    artilist[28].attk.damd = 0;
-    artilist[28].defn.aatyp = 0;
-    artilist[28].defn.adtyp = 0;
-    artilist[28].defn.damn = 0;
-    artilist[28].defn.damd = 0;
-    artilist[28].cary.aatyp = 0;
-    artilist[28].cary.adtyp = 0;
-    artilist[28].cary.damn = 0;
-    artilist[28].cary.damd = 0;
-    artilist[28].inv_prop = CREATE_AMMO;
-    artilist[28].alignment = -1;
-    artilist[28].role = PM_RANGER;
-    artilist[28].race = NON_PM;
-    artilist[28].gen_spe = 0;
-    artilist[28].gift_value = 12;
-    artilist[28].cost = 4000;
-    artilist[28].acolor = 8;
-    artilist[29].otyp = SKELETON_KEY;
-    artilist[29].name = $c.lit("The Master Key of Thievery");
-    artilist[29].spfx = 15;
-    artilist[29].cspfx = 393248;
-    artilist[29].mtype = 0;
-    artilist[29].attk.aatyp = 0;
-    artilist[29].attk.adtyp = 0;
-    artilist[29].attk.damn = 0;
-    artilist[29].attk.damd = 0;
-    artilist[29].defn.aatyp = 0;
-    artilist[29].defn.adtyp = 0;
-    artilist[29].defn.damn = 0;
-    artilist[29].defn.damd = 0;
-    artilist[29].cary.aatyp = 0;
-    artilist[29].cary.adtyp = 0;
-    artilist[29].cary.damn = 0;
-    artilist[29].cary.damd = 0;
-    artilist[29].inv_prop = UNTRAP;
-    artilist[29].alignment = -1;
-    artilist[29].role = PM_ROGUE;
-    artilist[29].race = NON_PM;
-    artilist[29].gen_spe = 0;
-    artilist[29].gift_value = 12;
-    artilist[29].cost = 3500;
-    artilist[29].acolor = 8;
-    artilist[30].otyp = TSURUGI;
-    artilist[30].name = $c.lit("The Tsurugi of Muramasa");
-    artilist[30].spfx = 134743047;
-    artilist[30].cspfx = 0;
-    artilist[30].mtype = 0;
-    artilist[30].attk.aatyp = 0;
-    artilist[30].attk.adtyp = 0;
-    artilist[30].attk.damn = 0;
-    artilist[30].attk.damd = 8;
-    artilist[30].defn.aatyp = 0;
-    artilist[30].defn.adtyp = 0;
-    artilist[30].defn.damn = 0;
-    artilist[30].defn.damd = 0;
-    artilist[30].cary.aatyp = 0;
-    artilist[30].cary.adtyp = 0;
-    artilist[30].cary.damn = 0;
-    artilist[30].cary.damd = 0;
-    artilist[30].inv_prop = 0;
-    artilist[30].alignment = 1;
-    artilist[30].role = PM_SAMURAI;
-    artilist[30].race = NON_PM;
-    artilist[30].gen_spe = 0;
-    artilist[30].gift_value = 12;
-    artilist[30].cost = 4500;
-    artilist[30].acolor = 8;
-    artilist[31].otyp = CREDIT_CARD;
-    artilist[31].name = $c.lit("The Platinum Yendorian Express Card");
-    artilist[31].spfx = 135;
-    artilist[31].cspfx = 69632;
-    artilist[31].mtype = 0;
-    artilist[31].attk.aatyp = 0;
-    artilist[31].attk.adtyp = 0;
-    artilist[31].attk.damn = 0;
-    artilist[31].attk.damd = 0;
-    artilist[31].defn.aatyp = 0;
-    artilist[31].defn.adtyp = 0;
-    artilist[31].defn.damn = 0;
-    artilist[31].defn.damd = 0;
-    artilist[31].cary.aatyp = 0;
-    artilist[31].cary.adtyp = 1;
-    artilist[31].cary.damn = 0;
-    artilist[31].cary.damd = 0;
-    artilist[31].inv_prop = CHARGE_OBJ;
-    artilist[31].alignment = 0;
-    artilist[31].role = PM_TOURIST;
-    artilist[31].race = NON_PM;
-    artilist[31].gen_spe = 0;
-    artilist[31].gift_value = 12;
-    artilist[31].cost = 7000;
-    artilist[31].acolor = 8;
-    artilist[32].otyp = CRYSTAL_BALL;
-    artilist[32].name = $c.lit("The Orb of Fate");
-    artilist[32].spfx = 524295;
-    artilist[32].cspfx = 196640;
-    artilist[32].mtype = 0;
-    artilist[32].attk.aatyp = 0;
-    artilist[32].attk.adtyp = 0;
-    artilist[32].attk.damn = 0;
-    artilist[32].attk.damd = 0;
-    artilist[32].defn.aatyp = 0;
-    artilist[32].defn.adtyp = 0;
-    artilist[32].defn.damn = 0;
-    artilist[32].defn.damd = 0;
-    artilist[32].cary.aatyp = 0;
-    artilist[32].cary.adtyp = 0;
-    artilist[32].cary.damn = 0;
-    artilist[32].cary.damd = 0;
-    artilist[32].inv_prop = LEV_TELE;
-    artilist[32].alignment = 0;
-    artilist[32].role = PM_VALKYRIE;
-    artilist[32].race = NON_PM;
-    artilist[32].gen_spe = 0;
-    artilist[32].gift_value = 12;
-    artilist[32].cost = 3500;
-    artilist[32].acolor = 8;
-    artilist[33].otyp = AMULET_OF_ESP;
-    artilist[33].name = $c.lit("The Eye of the Aethiopica");
-    artilist[33].spfx = 7;
-    artilist[33].cspfx = 98304;
-    artilist[33].mtype = 0;
-    artilist[33].attk.aatyp = 0;
-    artilist[33].attk.adtyp = 0;
-    artilist[33].attk.damn = 0;
-    artilist[33].attk.damd = 0;
-    artilist[33].defn.aatyp = 0;
-    artilist[33].defn.adtyp = 1;
-    artilist[33].defn.damn = 0;
-    artilist[33].defn.damd = 0;
-    artilist[33].cary.aatyp = 0;
-    artilist[33].cary.adtyp = 0;
-    artilist[33].cary.damn = 0;
-    artilist[33].cary.damd = 0;
-    artilist[33].inv_prop = CREATE_PORTAL;
-    artilist[33].alignment = 0;
-    artilist[33].role = PM_WIZARD;
-    artilist[33].race = NON_PM;
-    artilist[33].gen_spe = 0;
-    artilist[33].gift_value = 12;
-    artilist[33].cost = 4000;
-    artilist[33].acolor = 8;
-    artilist[34].otyp = 0;
-    artilist[34].name = null;
-    artilist[34].spfx = 0;
-    artilist[34].cspfx = 0;
-    artilist[34].mtype = 0;
-    artilist[34].attk.aatyp = 0;
-    artilist[34].attk.adtyp = 0;
-    artilist[34].attk.damn = 0;
-    artilist[34].attk.damd = 0;
-    artilist[34].defn.aatyp = 0;
-    artilist[34].defn.adtyp = 0;
-    artilist[34].defn.damn = 0;
-    artilist[34].defn.damd = 0;
-    artilist[34].cary.aatyp = 0;
-    artilist[34].cary.adtyp = 0;
-    artilist[34].cary.damn = 0;
-    artilist[34].cary.damd = 0;
-    artilist[34].inv_prop = 0;
-    artilist[34].alignment = -128;
-    artilist[34].role = NON_PM;
-    artilist[34].race = NON_PM;
-    artilist[34].gen_spe = 0;
-    artilist[34].gift_value = 0;
-    artilist[34].cost = 0;
-    artilist[34].acolor = 8;
+    $c.init(artilist, [
+        { name: $c.lit(""), otyp: STRANGE_OBJECT, spfx: 0, cspfx: 0, mtype: 0, attk: {}, defn: {}, cary: {}, inv_prop: 0, alignment: A_NONE,
+          role: NON_PM, race: NON_PM,
+          gen_spe: 0, gift_value: 0, cost: 0, acolor: NO_COLOR },
+        { name: $c.lit("Excalibur"), otyp: LONG_SWORD, spfx: SPFX_NOGEN | SPFX_RESTR | SPFX_SEEK | SPFX_DEFN | SPFX_INTEL | SPFX_SEARCH,
+          cspfx: 0, mtype: 0, attk: { aatyp: 0, adtyp: AD_PHYS, damn: 5, damd: 10 }, defn: { aatyp: 0, adtyp: AD_DRLI, damn: 0, damd: 0 }, cary: {},
+          inv_prop: 0, alignment: A_LAWFUL, role: PM_KNIGHT, race: NON_PM,
+          gen_spe: 0, gift_value: 10, cost: 4000, acolor: NO_COLOR },
+        { name: $c.lit("Stormbringer"), otyp: RUNESWORD,
+          spfx: SPFX_RESTR | SPFX_ATTK | SPFX_DEFN | SPFX_INTEL | SPFX_DRLI, cspfx: 0, mtype: 0,
+          attk: { aatyp: 0, adtyp: AD_DRLI, damn: 5, damd: 2 }, defn: { aatyp: 0, adtyp: AD_DRLI, damn: 0, damd: 0 }, cary: {}, inv_prop: 0,
+          alignment: A_CHAOTIC, role: NON_PM, race: NON_PM,
+          gen_spe: 0, gift_value: 9, cost: 8000, acolor: NO_COLOR },
+        { name: $c.lit("Mjollnir"), otyp: WAR_HAMMER,
+          spfx: SPFX_RESTR | SPFX_ATTK, cspfx: 0, mtype: 0, attk: { aatyp: 0, adtyp: AD_ELEC, damn: 5, damd: 24 }, defn: {}, cary: {}, inv_prop: 0,
+          alignment: A_NEUTRAL, role: PM_VALKYRIE, race: NON_PM,
+          gen_spe: 0, gift_value: 8, cost: 4000, acolor: NO_COLOR },
+        { name: $c.lit("Cleaver"), otyp: BATTLE_AXE, spfx: SPFX_RESTR, cspfx: 0, mtype: 0, attk: { aatyp: 0, adtyp: AD_PHYS, damn: 3, damd: 6 }, defn: {}, cary:
+          {},
+          inv_prop: 0, alignment: A_NEUTRAL, role: PM_BARBARIAN, race: NON_PM,
+          gen_spe: 0, gift_value: 8, cost: 1500, acolor: NO_COLOR },
+        { name: $c.lit("Grimtooth"), otyp: ORCISH_DAGGER, spfx: SPFX_RESTR | SPFX_WARN | SPFX_DFLAG2,
+          cspfx: 0, mtype: M2_ELF, attk: { aatyp: 0, adtyp: AD_PHYS, damn: 2, damd: 6 }, defn: { aatyp: 0, adtyp: AD_DRST, damn: 0, damd: 0 },
+          cary: {}, inv_prop: FLING_POISON, alignment: A_CHAOTIC, role: NON_PM, race: PM_ORC,
+          gen_spe: 0, gift_value: 5, cost: 1200, acolor: CLR_RED },
+        { name: $c.lit("Orcrist"), otyp: ELVEN_BROADSWORD, spfx: SPFX_WARN | SPFX_DFLAG2, cspfx: 0, mtype: M2_ORC,
+          attk: { aatyp: 0, adtyp: AD_PHYS, damn: 5, damd: 0 }, defn: {}, cary: {}, inv_prop: 0, alignment: A_CHAOTIC, role: NON_PM, race: PM_ELF,
+          gen_spe: 3, gift_value: 4, cost: 2000, acolor: CLR_BRIGHT_BLUE },
+        { name: $c.lit("Sting"), otyp: ELVEN_DAGGER, spfx: SPFX_WARN | SPFX_DFLAG2, cspfx: 0, mtype: M2_ORC,
+          attk: { aatyp: 0, adtyp: AD_PHYS, damn: 5, damd: 0 }, defn: {}, cary: {}, inv_prop: 0, alignment: A_CHAOTIC, role: NON_PM, race: PM_ELF,
+          gen_spe: 3, gift_value: 1, cost: 800, acolor: CLR_BRIGHT_BLUE },
+        { name: $c.lit("Magicbane"), otyp: ATHAME, spfx: SPFX_RESTR | SPFX_ATTK | SPFX_DEFN, cspfx: 0, mtype: 0,
+          attk: { aatyp: 0, adtyp: AD_STUN, damn: 3, damd: 4 }, defn: { aatyp: 0, adtyp: AD_MAGM, damn: 0, damd: 0 }, cary: {}, inv_prop: 0,
+          alignment: A_NEUTRAL, role: PM_WIZARD, race: NON_PM,
+          gen_spe: 0, gift_value: 7, cost: 3500, acolor: NO_COLOR },
+        { name: $c.lit("Frost Brand"), otyp: LONG_SWORD, spfx: SPFX_RESTR | SPFX_ATTK | SPFX_DEFN, cspfx: 0, mtype: 0,
+          attk: { aatyp: 0, adtyp: AD_COLD, damn: 5, damd: 0 }, defn: { aatyp: 0, adtyp: AD_COLD, damn: 0, damd: 0 }, cary: {}, inv_prop: SNOWSTORM,
+          alignment: A_NONE, role: NON_PM, race: NON_PM,
+          gen_spe: 0, gift_value: 9, cost: 3000, acolor: NO_COLOR },
+        { name: $c.lit("Fire Brand"), otyp: LONG_SWORD, spfx: SPFX_RESTR | SPFX_ATTK | SPFX_DEFN, cspfx: 0, mtype: 0,
+          attk: { aatyp: 0, adtyp: AD_FIRE, damn: 5, damd: 0 }, defn: { aatyp: 0, adtyp: AD_FIRE, damn: 0, damd: 0 }, cary: {}, inv_prop: FIRESTORM,
+          alignment: A_NONE, role: NON_PM, race: NON_PM,
+          gen_spe: 0, gift_value: 5, cost: 3000, acolor: NO_COLOR },
+        { name: $c.lit("Dragonbane"), otyp: BROADSWORD,
+          spfx: SPFX_RESTR | SPFX_DCLAS | SPFX_REFLECT, cspfx: 0, mtype: S_DRAGON,
+          attk: { aatyp: 0, adtyp: AD_PHYS, damn: 5, damd: 0 }, defn: {}, cary: {}, inv_prop: 0, alignment: A_NONE, role: NON_PM, race: NON_PM,
+          gen_spe: 2, gift_value: 5, cost: 500, acolor: NO_COLOR },
+        { name: $c.lit("Demonbane"), otyp: SILVER_MACE, spfx: SPFX_RESTR | SPFX_DFLAG2, cspfx: 0, mtype: M2_DEMON,
+          attk: { aatyp: 0, adtyp: AD_PHYS, damn: 5, damd: 0 }, defn: {}, cary: {}, inv_prop: BANISH, alignment: A_LAWFUL, role: PM_CLERIC, race: NON_PM,
+          gen_spe: 1, gift_value: 3, cost: 2500, acolor: NO_COLOR },
+        { name: $c.lit("Werebane"), otyp: SILVER_SABER, spfx: SPFX_RESTR | SPFX_DFLAG2, cspfx: 0, mtype: M2_WERE,
+          attk: { aatyp: 0, adtyp: AD_PHYS, damn: 5, damd: 0 }, defn: { aatyp: 0, adtyp: AD_WERE, damn: 0, damd: 0 }, cary: {}, inv_prop: 0, alignment: A_NONE,
+          role: NON_PM, race: NON_PM,
+          gen_spe: 1, gift_value: 4, cost: 1500, acolor: NO_COLOR },
+        { name: $c.lit("Grayswandir"), otyp: SILVER_SABER, spfx: SPFX_RESTR | SPFX_HALRES, cspfx: 0, mtype: 0,
+          attk: { aatyp: 0, adtyp: AD_PHYS, damn: 5, damd: 0 }, defn: {}, cary: {}, inv_prop: 0, alignment: A_LAWFUL, role: NON_PM, race: NON_PM,
+          gen_spe: 0, gift_value: 10, cost: 8000, acolor: NO_COLOR },
+        { name: $c.lit("Giantslayer"), otyp: LONG_SWORD, spfx: SPFX_RESTR | SPFX_DFLAG2, cspfx: 0, mtype: M2_GIANT,
+          attk: { aatyp: 0, adtyp: AD_PHYS, damn: 5, damd: 0 }, defn: {}, cary: {}, inv_prop: 0, alignment: A_NEUTRAL, role: NON_PM, race: NON_PM,
+          gen_spe: 2, gift_value: 4, cost: 200, acolor: NO_COLOR },
+        { name: $c.lit("Ogresmasher"), otyp: WAR_HAMMER, spfx: SPFX_RESTR | SPFX_DCLAS, cspfx: 0, mtype: S_OGRE,
+          attk: { aatyp: 0, adtyp: AD_PHYS, damn: 5, damd: 0 }, defn: {}, cary: {}, inv_prop: 0, alignment: A_NONE, role: NON_PM, race: NON_PM,
+          gen_spe: 2, gift_value: 1, cost: 200, acolor: NO_COLOR },
+        { name: $c.lit("Trollsbane"), otyp: MORNING_STAR, spfx: SPFX_RESTR | SPFX_DCLAS | SPFX_REGEN, cspfx: 0,
+          mtype: S_TROLL, attk: { aatyp: 0, adtyp: AD_PHYS, damn: 5, damd: 0 }, defn: {}, cary: {}, inv_prop: 0, alignment: A_NONE, role: NON_PM, race: NON_PM,
+          gen_spe: 2, gift_value: 1, cost: 200, acolor: NO_COLOR },
+        { name: $c.lit("Vorpal Blade"), otyp: LONG_SWORD, spfx: SPFX_RESTR | SPFX_BEHEAD, cspfx: 0, mtype: 0,
+          attk: { aatyp: 0, adtyp: AD_PHYS, damn: 5, damd: 1 }, defn: {}, cary: {}, inv_prop: 0, alignment: A_NEUTRAL, role: NON_PM, race: NON_PM,
+          gen_spe: 1, gift_value: 5, cost: 4000, acolor: NO_COLOR },
+        { name: $c.lit("Snickersnee"), otyp: KATANA, spfx: SPFX_RESTR, cspfx: 0, mtype: 0, attk: { aatyp: 0, adtyp: AD_PHYS, damn: 0, damd: 8 }, defn: {}, cary:
+          {},
+          inv_prop: 0, alignment: A_LAWFUL, role: PM_SAMURAI, race: NON_PM,
+          gen_spe: 0, gift_value: 8, cost: 1200, acolor: NO_COLOR },
+        { name: $c.lit("Sunsword"), otyp: LONG_SWORD, spfx: SPFX_RESTR | SPFX_DFLAG2, cspfx: 0, mtype: M2_UNDEAD,
+          attk: { aatyp: 0, adtyp: AD_PHYS, damn: 5, damd: 0 }, defn: { aatyp: 0, adtyp: AD_BLND, damn: 0, damd: 0 }, cary: {}, inv_prop: BLINDING_RAY,
+          alignment: A_LAWFUL, role: NON_PM,
+          race: NON_PM,
+          gen_spe: 0, gift_value: 6, cost: 1500, acolor: NO_COLOR },
+        { name: $c.lit("The Orb of Detection"), otyp: CRYSTAL_BALL,
+          spfx: SPFX_NOGEN | SPFX_RESTR | SPFX_INTEL, cspfx: SPFX_ESP | SPFX_HSPDAM, mtype: 0,
+          attk: {}, defn: {}, cary: { aatyp: 0, adtyp: AD_MAGM, damn: 0, damd: 0 }, inv_prop: INVIS, alignment: A_LAWFUL, role: PM_ARCHEOLOGIST,
+          race: NON_PM,
+          gen_spe: 0, gift_value: 12, cost: 2500, acolor: NO_COLOR },
+        { name: $c.lit("The Heart of Ahriman"), otyp: LUCKSTONE,
+          spfx: SPFX_NOGEN | SPFX_RESTR | SPFX_INTEL, cspfx: SPFX_STLTH, mtype: 0,
+          attk: { aatyp: 0, adtyp: AD_PHYS, damn: 5, damd: 0 }, defn: {}, cary: {}, inv_prop: LEVITATION, alignment: A_NEUTRAL, role: PM_BARBARIAN,
+          race: NON_PM,
+          gen_spe: 0, gift_value: 12, cost: 2500, acolor: NO_COLOR },
+        { name: $c.lit("The Sceptre of Might"), otyp: MACE,
+          spfx: SPFX_NOGEN | SPFX_RESTR | SPFX_INTEL | SPFX_DALIGN, cspfx: 0, mtype: 0, attk: { aatyp: 0, adtyp: AD_PHYS, damn: 5, damd: 0 },
+          defn: { aatyp: 0, adtyp: AD_MAGM, damn: 0, damd: 0 }, cary: {}, inv_prop: CONFLICT, alignment: A_LAWFUL, role: PM_CAVE_DWELLER, race: NON_PM,
+          gen_spe: 0, gift_value: 12, cost: 2500, acolor: NO_COLOR },
+        { name: $c.lit("The Staff of Aesculapius"), otyp: QUARTERSTAFF,
+          spfx: SPFX_NOGEN | SPFX_RESTR | SPFX_ATTK | SPFX_INTEL | SPFX_DRLI | SPFX_REGEN,
+          cspfx: 0, mtype: 0, attk: { aatyp: 0, adtyp: AD_DRLI, damn: 0, damd: 0 }, defn: { aatyp: 0, adtyp: AD_DRLI, damn: 0, damd: 0 }, cary: {},
+          inv_prop: HEALING, alignment: A_NEUTRAL, role: PM_HEALER,
+          race: NON_PM,
+          gen_spe: 0, gift_value: 12, cost: 5000, acolor: NO_COLOR },
+        { name: $c.lit("The Magic Mirror of Merlin"), otyp: MIRROR,
+          spfx: SPFX_NOGEN | SPFX_RESTR | SPFX_INTEL | SPFX_SPEAK, cspfx: SPFX_ESP, mtype: 0,
+          attk: {}, defn: {}, cary: { aatyp: 0, adtyp: AD_MAGM, damn: 0, damd: 0 }, inv_prop: 0, alignment: A_LAWFUL, role: PM_KNIGHT, race: NON_PM,
+          gen_spe: 0, gift_value: 12, cost: 1500, acolor: NO_COLOR },
+        { name: $c.lit("The Eyes of the Overworld"), otyp: LENSES,
+          spfx: SPFX_NOGEN | SPFX_RESTR | SPFX_INTEL | SPFX_XRAY, cspfx: 0, mtype: 0, attk: {},
+          defn: { aatyp: 0, adtyp: AD_MAGM, damn: 0, damd: 0 }, cary: {}, inv_prop: ENLIGHTENING, alignment: A_NEUTRAL, role: PM_MONK, race: NON_PM,
+          gen_spe: 0, gift_value: 12, cost: 2500, acolor: NO_COLOR },
+        { name: $c.lit("The Mitre of Holiness"), otyp: HELM_OF_BRILLIANCE,
+          spfx: SPFX_NOGEN | SPFX_RESTR | SPFX_DFLAG2 | SPFX_INTEL | SPFX_PROTECT, cspfx: 0,
+          mtype: M2_UNDEAD, attk: {}, defn: {}, cary: { aatyp: 0, adtyp: AD_FIRE, damn: 0, damd: 0 }, inv_prop: ENERGY_BOOST, alignment: A_LAWFUL,
+          role: PM_CLERIC, race: NON_PM,
+          gen_spe: 0, gift_value: 12, cost: 2000, acolor: NO_COLOR },
+        { name: $c.lit("The Longbow of Diana"), otyp: BOW,
+          spfx: SPFX_NOGEN | SPFX_RESTR | SPFX_INTEL | SPFX_REFLECT, cspfx: SPFX_ESP, mtype: 0,
+          attk: { aatyp: 0, adtyp: AD_PHYS, damn: 5, damd: 0 }, defn: {}, cary: {}, inv_prop: CREATE_AMMO, alignment: A_CHAOTIC, role: PM_RANGER, race: NON_PM,
+          gen_spe: 0, gift_value: 12, cost: 4000, acolor: NO_COLOR },
+        { name: $c.lit("The Master Key of Thievery"), otyp: SKELETON_KEY,
+          spfx: SPFX_NOGEN | SPFX_RESTR | SPFX_INTEL | SPFX_SPEAK,
+          cspfx: SPFX_WARN | SPFX_TCTRL | SPFX_HPHDAM, mtype: 0, attk: {}, defn: {}, cary: {},
+          inv_prop: UNTRAP, alignment: A_CHAOTIC, role: PM_ROGUE, race: NON_PM,
+          gen_spe: 0, gift_value: 12, cost: 3500, acolor: NO_COLOR },
+        { name: $c.lit("The Tsurugi of Muramasa"), otyp: TSURUGI,
+          spfx: SPFX_NOGEN | SPFX_RESTR | SPFX_INTEL | SPFX_BEHEAD | SPFX_LUCK | SPFX_PROTECT,
+          cspfx: 0, mtype: 0, attk: { aatyp: 0, adtyp: AD_PHYS, damn: 0, damd: 8 }, defn: {}, cary: {}, inv_prop: 0, alignment: A_LAWFUL, role: PM_SAMURAI,
+          race: NON_PM,
+          gen_spe: 0, gift_value: 12, cost: 4500, acolor: NO_COLOR },
+        { name: $c.lit("The Platinum Yendorian Express Card"), otyp: CREDIT_CARD,
+          spfx: SPFX_NOGEN | SPFX_RESTR | SPFX_INTEL | SPFX_DEFN,
+          cspfx: SPFX_ESP | SPFX_HSPDAM, mtype: 0, attk: {}, defn: {}, cary: { aatyp: 0, adtyp: AD_MAGM, damn: 0, damd: 0 },
+          inv_prop: CHARGE_OBJ, alignment: A_NEUTRAL, role: PM_TOURIST, race: NON_PM,
+          gen_spe: 0, gift_value: 12, cost: 7000, acolor: NO_COLOR },
+        { name: $c.lit("The Orb of Fate"), otyp: CRYSTAL_BALL,
+          spfx: SPFX_NOGEN | SPFX_RESTR | SPFX_INTEL | SPFX_LUCK,
+          cspfx: SPFX_WARN | SPFX_HSPDAM | SPFX_HPHDAM, mtype: 0, attk: {}, defn: {}, cary: {},
+          inv_prop: LEV_TELE, alignment: A_NEUTRAL, role: PM_VALKYRIE, race: NON_PM,
+          gen_spe: 0, gift_value: 12, cost: 3500, acolor: NO_COLOR },
+        { name: $c.lit("The Eye of the Aethiopica"), otyp: AMULET_OF_ESP,
+          spfx: SPFX_NOGEN | SPFX_RESTR | SPFX_INTEL, cspfx: SPFX_EREGEN | SPFX_HSPDAM, mtype: 0,
+          attk: {}, defn: { aatyp: 0, adtyp: AD_MAGM, damn: 0, damd: 0 }, cary: {}, inv_prop: CREATE_PORTAL, alignment: A_NEUTRAL, role: PM_WIZARD,
+          race: NON_PM,
+          gen_spe: 0, gift_value: 12, cost: 4000, acolor: NO_COLOR },
+        { name: null, otyp: 0, spfx: 0, cspfx: 0, mtype: 0, attk: {}, defn: {}, cary: {}, inv_prop: 0, alignment: A_NONE, role: NON_PM, race: NON_PM,
+          gen_spe: 0, gift_value: 0, cost: 0, acolor: NO_COLOR }
+    ]);
     for (let $i0 = 0; $i0 < 34; $i0++) {
         artiexist[$i0].$copyFrom(new $T.arti_info());
     }
@@ -2888,59 +2156,51 @@ export function $init() {
     for (let $i0 = 0; $i0 < 2; $i0++) {
         mb_verb[$i0].fill(null);
     }
-    mb_verb[0][0] = $c.lit("probe");
-    mb_verb[0][1] = $c.lit("stun");
-    mb_verb[0][2] = $c.lit("scare");
-    mb_verb[0][3] = $c.lit("cancel");
-    mb_verb[1][0] = $c.lit("prod");
-    mb_verb[1][1] = $c.lit("amaze");
-    mb_verb[1][2] = $c.lit("tickle");
-    mb_verb[1][3] = $c.lit("purge");
+    $c.init(mb_verb, [
+        [$c.lit("probe"), $c.lit("stun"), $c.lit("scare"), $c.lit("cancel")],
+        [$c.lit("prod"), $c.lit("amaze"), $c.lit("tickle"), $c.lit("purge")]
+    ]);
     glow_verbs.fill(null);
-    glow_verbs[0] = $c.lit("quiver");
-    glow_verbs[1] = $c.lit("flicker");
-    glow_verbs[2] = $c.lit("glimmer");
-    glow_verbs[3] = $c.lit("gleam");
+    $c.init(glow_verbs, [
+        $c.lit("quiver"),
+        $c.lit("flicker"),
+        $c.lit("glimmer"),
+        $c.lit("gleam")
+    ]);
     artifact_hit$you.fill(0);
     artifact_hit$you.set([121, 111, 117]);   // "you"
     artifact_hit$behead_msg.fill(null);
-    artifact_hit$behead_msg[0] = $c.lit("%s beheads %s!");
-    artifact_hit$behead_msg[1] = $c.lit("%s decapitates %s!");
+    $c.init(artifact_hit$behead_msg, [
+        $c.lit("%s beheads %s!"),
+        $c.lit("%s decapitates %s!")
+    ]);
     for (let $i0 = 0; $i0 < 12; $i0++) {
         abil_to_spfx$abil2spfx[$i0].$copyFrom(new $T.abil2spfx_tag());
     }
-    abil_to_spfx$abil2spfx[0].abil = new $c.FieldRef(u.uprops[SEARCHING], "extrinsic", "i64");
-    abil_to_spfx$abil2spfx[0].spfx = SPFX_SEARCH;
-    abil_to_spfx$abil2spfx[1].abil = new $c.FieldRef(u.uprops[HALLUC_RES], "extrinsic", "i64");
-    abil_to_spfx$abil2spfx[1].spfx = SPFX_HALRES;
-    abil_to_spfx$abil2spfx[2].abil = new $c.FieldRef(u.uprops[TELEPAT], "extrinsic", "i64");
-    abil_to_spfx$abil2spfx[2].spfx = SPFX_ESP;
-    abil_to_spfx$abil2spfx[3].abil = new $c.FieldRef(u.uprops[STEALTH], "extrinsic", "i64");
-    abil_to_spfx$abil2spfx[3].spfx = SPFX_STLTH;
-    abil_to_spfx$abil2spfx[4].abil = new $c.FieldRef(u.uprops[REGENERATION], "extrinsic", "i64");
-    abil_to_spfx$abil2spfx[4].spfx = SPFX_REGEN;
-    abil_to_spfx$abil2spfx[5].abil = new $c.FieldRef(u.uprops[TELEPORT_CONTROL], "extrinsic", "i64");
-    abil_to_spfx$abil2spfx[5].spfx = SPFX_TCTRL;
-    abil_to_spfx$abil2spfx[6].abil = new $c.FieldRef(u.uprops[WARN_OF_MON], "extrinsic", "i64");
-    abil_to_spfx$abil2spfx[6].spfx = SPFX_WARN;
-    abil_to_spfx$abil2spfx[7].abil = new $c.FieldRef(u.uprops[WARNING], "extrinsic", "i64");
-    abil_to_spfx$abil2spfx[7].spfx = SPFX_WARN;
-    abil_to_spfx$abil2spfx[8].abil = new $c.FieldRef(u.uprops[ENERGY_REGENERATION], "extrinsic", "i64");
-    abil_to_spfx$abil2spfx[8].spfx = SPFX_EREGEN;
-    abil_to_spfx$abil2spfx[9].abil = new $c.FieldRef(u.uprops[HALF_SPDAM], "extrinsic", "i64");
-    abil_to_spfx$abil2spfx[9].spfx = SPFX_HSPDAM;
-    abil_to_spfx$abil2spfx[10].abil = new $c.FieldRef(u.uprops[HALF_PHDAM], "extrinsic", "i64");
-    abil_to_spfx$abil2spfx[10].spfx = SPFX_HPHDAM;
-    abil_to_spfx$abil2spfx[11].abil = new $c.FieldRef(u.uprops[REFLECTING], "extrinsic", "i64");
-    abil_to_spfx$abil2spfx[11].spfx = SPFX_REFLECT;
+    $c.init(abil_to_spfx$abil2spfx, [
+        { abil: new $c.FieldRef(u.uprops[SEARCHING], "extrinsic", "i64"), spfx: SPFX_SEARCH },
+        { abil: new $c.FieldRef(u.uprops[HALLUC_RES], "extrinsic", "i64"), spfx: SPFX_HALRES },
+        { abil: new $c.FieldRef(u.uprops[TELEPAT], "extrinsic", "i64"), spfx: SPFX_ESP },
+        { abil: new $c.FieldRef(u.uprops[STEALTH], "extrinsic", "i64"), spfx: SPFX_STLTH },
+        { abil: new $c.FieldRef(u.uprops[REGENERATION], "extrinsic", "i64"), spfx: SPFX_REGEN },
+        { abil: new $c.FieldRef(u.uprops[TELEPORT_CONTROL], "extrinsic", "i64"), spfx: SPFX_TCTRL },
+        { abil: new $c.FieldRef(u.uprops[WARN_OF_MON], "extrinsic", "i64"), spfx: SPFX_WARN },
+        { abil: new $c.FieldRef(u.uprops[WARNING], "extrinsic", "i64"), spfx: SPFX_WARN },
+        { abil: new $c.FieldRef(u.uprops[ENERGY_REGENERATION], "extrinsic", "i64"), spfx: SPFX_EREGEN },
+        { abil: new $c.FieldRef(u.uprops[HALF_SPDAM], "extrinsic", "i64"), spfx: SPFX_HSPDAM },
+        { abil: new $c.FieldRef(u.uprops[HALF_PHDAM], "extrinsic", "i64"), spfx: SPFX_HPHDAM },
+        { abil: new $c.FieldRef(u.uprops[REFLECTING], "extrinsic", "i64"), spfx: SPFX_REFLECT }
+    ]);
     glow_verb$resbuf.fill(0);
     retouch_equipment$nesting = 0;
     mkot_trap_warn$heat.fill(null);
-    mkot_trap_warn$heat[0] = $c.lit("cool");
-    mkot_trap_warn$heat[1] = $c.lit("slightly warm");
-    mkot_trap_warn$heat[2] = $c.lit("warm");
-    mkot_trap_warn$heat[3] = $c.lit("very warm");
-    mkot_trap_warn$heat[4] = $c.lit("hot");
-    mkot_trap_warn$heat[5] = $c.lit("very hot");
-    mkot_trap_warn$heat[6] = $c.lit("like fire");
+    $c.init(mkot_trap_warn$heat, [
+        $c.lit("cool"),
+        $c.lit("slightly warm"),
+        $c.lit("warm"),
+        $c.lit("very warm"),
+        $c.lit("hot"),
+        $c.lit("very hot"),
+        $c.lit("like fire")
+    ]);
 }

@@ -92,6 +92,7 @@ import { block_point, does_block, vision_reset } from './vision.js';
 import { LS_MONSTER } from './vision.h.js';
 import { flip_worm_segs_horizontal, flip_worm_segs_vertical } from './worm.js';
 import { m_dowear } from './worn.js';
+import { A_ORIGINAL } from './you.h.js';
 import { Protection_from_shape_changers, Punished } from './youprop.macros.js';
 
 const SPLEV_LEFT = 1;
@@ -307,8 +308,8 @@ async function lvlfill_solid(filling, lit) {   // sp_lev.c:374
 async function lvlfill_swamp(fg, bg, lit) {   // sp_lev.c:391
     let x = 0, y = 0, c = 0;
     await lvlfill_solid(bg, lit);
-    for (x = 2; x <= (gx.x_maze_max < 78 ? gx.x_maze_max : 78); x = x + 2 | 0) {
-        for (y = 0; y <= (gy.y_maze_max < 19 ? gy.y_maze_max : 19); y = y + 2 | 0) {
+    for (x = 2; x <= (gx.x_maze_max < COLNO - 2 ? gx.x_maze_max : COLNO - 2); x = x + 2 | 0) {
+        for (y = 0; y <= (gy.y_maze_max < ROWNO - 2 ? gy.y_maze_max : ROWNO - 2); y = y + 2 | 0) {
             c = 0;
             await set_levltyp_lit($c.i16(x), $c.i16(y), fg, lit);
             if (svl.level.locations[x + 1 | 0][y].typ === bg) {
@@ -887,9 +888,9 @@ function set_wall_property(x1, y1, x2, y2, prop$in) {   // sp_lev.c:1001
     const prop = Int32Array.of(prop$in);
     let x = 0, y = 0;
     x1 = $c.i16(x1 > 1 ? x1 : 1);
-    x2 = $c.i16(x2 < 79 ? x2 : 79);
+    x2 = $c.i16(x2 < COLNO - 1 ? x2 : COLNO - 1);
     y1 = $c.i16(y1 > 0 ? y1 : 0);
-    y2 = $c.i16(y2 < 20 ? y2 : 20);
+    y2 = $c.i16(y2 < ROWNO - 1 ? y2 : ROWNO - 1);
     for (y = y1; y <= y2; y = $c.i16(y + 1)) {
         for (x = x1; x <= x2; x = $c.i16(x + 1)) {
             sel_set_wall_property(x, y, new $c.Ptr(prop, 0));
@@ -1610,9 +1611,9 @@ function pm_to_humidity(pm) {   // sp_lev.c:1884
 function sp_amask_to_amask(sp_amask) {   // sp_lev.c:1908
     let amask = 0;
     if (sp_amask === AM_SPLEV_CO) {
-        amask = Align2amask(u.ualignbase[1]);
+        amask = Align2amask(u.ualignbase[A_ORIGINAL]);
     } else if (sp_amask === AM_SPLEV_NONCO) {
-        amask = (noncoalignment(u.ualignbase[1]) === A_NONE ? AM_NONE : noncoalignment(u.ualignbase[1]) === A_LAWFUL ? AM_LAWFUL : noncoalignment(u.ualignbase[1]) + 2 | 0) >>> 0;
+        amask = (noncoalignment(u.ualignbase[A_ORIGINAL]) === A_NONE ? AM_NONE : noncoalignment(u.ualignbase[A_ORIGINAL]) === A_LAWFUL ? AM_LAWFUL : noncoalignment(u.ualignbase[A_ORIGINAL]) + 2 | 0) >>> 0;
     } else if (sp_amask === AM_SPLEV_RANDOM) {
         amask = induced_align(80);
     } else {
@@ -2355,9 +2356,9 @@ function light_region(tmpregion) {   // sp_lev.c:2839
     hix = tmpregion.x2;
     if (litstate) {
         lowx = (lowx - 1 | 0) > 1 ? lowx - 1 | 0 : 1;
-        hix = (hix + 1 | 0) < 79 ? hix + 1 | 0 : 79;
+        hix = (hix + 1 | 0) < COLNO - 1 ? hix + 1 | 0 : COLNO - 1;
         lowy = (lowy - 1 | 0) > 0 ? lowy - 1 | 0 : 0;
-        hiy = (hiy + 1 | 0) < 20 ? hiy + 1 | 0 : 20;
+        hiy = (hiy + 1 | 0) < ROWNO - 1 ? hiy + 1 | 0 : ROWNO - 1;
     }
     for (x = lowx; x <= hix; x = x + 1 | 0) {
         lev = $c.relem(svl.level.locations[x], lowy);
@@ -2371,8 +2372,8 @@ export function wallify_map(x1, y1, x2, y2) {   // sp_lev.c:2865
     let x = 0, y = 0, xx = 0, yy = 0, lo_xx = 0, lo_yy = 0, hi_xx = 0, hi_yy = 0;
     y1 = $c.i16(y1 > 0 ? y1 : 0);
     x1 = $c.i16(x1 > 1 ? x1 : 1);
-    y2 = $c.i16(y2 < 20 ? y2 : 20);
-    x2 = $c.i16(x2 < 79 ? x2 : 79);
+    y2 = $c.i16(y2 < ROWNO - 1 ? y2 : ROWNO - 1);
+    x2 = $c.i16(x2 < COLNO - 1 ? x2 : COLNO - 1);
     for (y = y1; y <= y2; y = $c.i16(y + 1)) {
         lo_yy = $c.i16(y > 0 ? y - 1 | 0 : 0);
         hi_yy = $c.i16(y < y2 ? y + 1 | 0 : y2);
@@ -3902,8 +3903,8 @@ export async function lspo_replace_terrain(L) {   // sp_lev.c:5051
             rx1[0] = $c.i16(x1[0]), ry1[0] = $c.i16(y1[0]), rx2[0] = $c.i16(x2[0]), ry2[0] = $c.i16(y2[0]);
             await get_location(new $c.Ptr(rx1, 0), new $c.Ptr(ry1, 0), ANY_LOC, gc.coder.croom);
             await get_location(new $c.Ptr(rx2, 0), new $c.Ptr(ry2, 0), ANY_LOC, gc.coder.croom);
-            for (x = $c.i16(rx1[0] > 0 ? rx1[0] : 0); x <= (rx2[0] < 79 ? rx2[0] : 79); x = $c.i16(x + 1)) {
-                for (y = $c.i16(ry1[0] > 0 ? ry1[0] : 0); y <= (ry2[0] < 20 ? ry2[0] : 20); y = $c.i16(y + 1)) {
+            for (x = $c.i16(rx1[0] > 0 ? rx1[0] : 0); x <= (rx2[0] < COLNO - 1 ? rx2[0] : COLNO - 1); x = $c.i16(x + 1)) {
+                for (y = $c.i16(ry1[0] > 0 ? ry1[0] : 0); y <= (ry2[0] < ROWNO - 1 ? ry2[0] : ROWNO - 1); y = $c.i16(y + 1)) {
                     selection_setpoint(x, y, sel, 1);
                 }
             }
@@ -4576,7 +4577,7 @@ export async function lspo_map(L) {   // sp_lev.c:6075
                             x[0] = 1;
                         }
                     } else {
-                        x[0] = 1 + rn2(79 - mf[0].wid | 0) | 0;
+                        x[0] = 1 + rn2(COLNO - 1 - mf[0].wid | 0) | 0;
                     }
                 }
                 if (oy === -1) {
@@ -4586,7 +4587,7 @@ export async function lspo_map(L) {   // sp_lev.c:6075
                             y[0] = 1;
                         }
                     } else {
-                        y[0] = rn2(21 - mf[0].hei | 0);
+                        y[0] = rn2(ROWNO - mf[0].hei | 0);
                     }
                 }
             }
@@ -4663,8 +4664,8 @@ export async function lspo_map(L) {   // sp_lev.c:6075
             } else {
                 if (gi.in_mk_themerooms) {
                     isokp = TRUE;
-                    for (y[0] = gy.ystart - 1 | 0; y[0] < ((21 < (gy.ystart + gy.ysize | 0) ? 21 : gy.ystart + gy.ysize | 0) + 1 | 0); y[0] = $c.add64(y[0], 1)) {
-                        for (x[0] = gx.xstart - 1 | 0; x[0] < ((80 < (gx.xstart + gx.xsize | 0) ? 80 : gx.xstart + gx.xsize | 0) + 1 | 0); x[0] = $c.add64(x[0], 1)) {
+                    for (y[0] = gy.ystart - 1 | 0; y[0] < ((ROWNO < (gy.ystart + gy.ysize | 0) ? ROWNO : gy.ystart + gy.ysize | 0) + 1 | 0); y[0] = $c.add64(y[0], 1)) {
+                        for (x[0] = gx.xstart - 1 | 0; x[0] < ((COLNO < (gx.xstart + gx.xsize | 0) ? COLNO : gx.xstart + gx.xsize | 0) + 1 | 0); x[0] = $c.add64(x[0], 1)) {
                             if (!isok($c.i16(x[0]), $c.i16(y[0]))) {
                                 isokp = FALSE;
                             } else if (y[0] < gy.ystart || y[0] >= (gy.ystart + gy.ysize | 0) || x[0] < gx.xstart || x[0] >= (gx.xstart + gx.xsize | 0)) {
@@ -4690,8 +4691,8 @@ export async function lspo_map(L) {   // sp_lev.c:6075
                         }
                     }
                 }
-                for (y[0] = gy.ystart; y[0] < (21 < (gy.ystart + gy.ysize | 0) ? 21 : gy.ystart + gy.ysize | 0); y[0] = $c.add64(y[0], 1)) {
-                    for (x[0] = gx.xstart; x[0] < (80 < (gx.xstart + gx.xsize | 0) ? 80 : gx.xstart + gx.xsize | 0); x[0] = $c.add64(x[0], 1)) {
+                for (y[0] = gy.ystart; y[0] < (ROWNO < (gy.ystart + gy.ysize | 0) ? ROWNO : gy.ystart + gy.ysize | 0); y[0] = $c.add64(y[0], 1)) {
+                    for (x[0] = gx.xstart; x[0] < (COLNO < (gx.xstart + gx.xsize | 0) ? COLNO : gx.xstart + gx.xsize | 0); x[0] = $c.add64(x[0], 1)) {
                         mptyp = $c.i16(await mapfrag_get(mf[0], $c.i32($c.sub64(x[0], gx.xstart)), $c.i32($c.sub64(y[0], gy.ystart))));
                         if (mptyp === INVALID_TYPE) {
                             continue;
@@ -4833,247 +4834,172 @@ export function $init() {
     for (let $i0 = 0; $i0 < 27; $i0++) {
         room_types[$i0].$copyFrom(new $T.anon_sp_lev_3957());
     }
-    room_types[0].name = $c.lit("ordinary");
-    room_types[0].type = OROOM;
-    room_types[1].name = $c.lit("themed");
-    room_types[1].type = THEMEROOM;
-    room_types[2].name = $c.lit("throne");
-    room_types[2].type = COURT;
-    room_types[3].name = $c.lit("swamp");
-    room_types[3].type = SWAMP;
-    room_types[4].name = $c.lit("vault");
-    room_types[4].type = VAULT;
-    room_types[5].name = $c.lit("beehive");
-    room_types[5].type = BEEHIVE;
-    room_types[6].name = $c.lit("morgue");
-    room_types[6].type = MORGUE;
-    room_types[7].name = $c.lit("barracks");
-    room_types[7].type = BARRACKS;
-    room_types[8].name = $c.lit("zoo");
-    room_types[8].type = ZOO;
-    room_types[9].name = $c.lit("delphi");
-    room_types[9].type = DELPHI;
-    room_types[10].name = $c.lit("temple");
-    room_types[10].type = TEMPLE;
-    room_types[11].name = $c.lit("anthole");
-    room_types[11].type = ANTHOLE;
-    room_types[12].name = $c.lit("cocknest");
-    room_types[12].type = COCKNEST;
-    room_types[13].name = $c.lit("leprehall");
-    room_types[13].type = LEPREHALL;
-    room_types[14].name = $c.lit("shop");
-    room_types[14].type = SHOPBASE;
-    room_types[15].name = $c.lit("armor shop");
-    room_types[15].type = ARMORSHOP;
-    room_types[16].name = $c.lit("scroll shop");
-    room_types[16].type = SCROLLSHOP;
-    room_types[17].name = $c.lit("potion shop");
-    room_types[17].type = POTIONSHOP;
-    room_types[18].name = $c.lit("weapon shop");
-    room_types[18].type = WEAPONSHOP;
-    room_types[19].name = $c.lit("food shop");
-    room_types[19].type = FOODSHOP;
-    room_types[20].name = $c.lit("ring shop");
-    room_types[20].type = RINGSHOP;
-    room_types[21].name = $c.lit("wand shop");
-    room_types[21].type = WANDSHOP;
-    room_types[22].name = $c.lit("tool shop");
-    room_types[22].type = TOOLSHOP;
-    room_types[23].name = $c.lit("book shop");
-    room_types[23].type = BOOKSHOP;
-    room_types[24].name = $c.lit("health food shop");
-    room_types[24].type = FODDERSHOP;
-    room_types[25].name = $c.lit("candle shop");
-    room_types[25].type = CANDLESHOP;
-    room_types[26].name = null;
-    room_types[26].type = 0;
+    $c.init(room_types, [
+        { name: $c.lit("ordinary"), type: OROOM },
+        { name: $c.lit("themed"), type: THEMEROOM },
+        { name: $c.lit("throne"), type: COURT },
+        { name: $c.lit("swamp"), type: SWAMP },
+        { name: $c.lit("vault"), type: VAULT },
+        { name: $c.lit("beehive"), type: BEEHIVE },
+        { name: $c.lit("morgue"), type: MORGUE },
+        { name: $c.lit("barracks"), type: BARRACKS },
+        { name: $c.lit("zoo"), type: ZOO },
+        { name: $c.lit("delphi"), type: DELPHI },
+        { name: $c.lit("temple"), type: TEMPLE },
+        { name: $c.lit("anthole"), type: ANTHOLE },
+        { name: $c.lit("cocknest"), type: COCKNEST },
+        { name: $c.lit("leprehall"), type: LEPREHALL },
+        { name: $c.lit("shop"), type: SHOPBASE },
+        { name: $c.lit("armor shop"), type: ARMORSHOP },
+        { name: $c.lit("scroll shop"), type: SCROLLSHOP },
+        { name: $c.lit("potion shop"), type: POTIONSHOP },
+        { name: $c.lit("weapon shop"), type: WEAPONSHOP },
+        { name: $c.lit("food shop"), type: FOODSHOP },
+        { name: $c.lit("ring shop"), type: RINGSHOP },
+        { name: $c.lit("wand shop"), type: WANDSHOP },
+        { name: $c.lit("tool shop"), type: TOOLSHOP },
+        { name: $c.lit("book shop"), type: BOOKSHOP },
+        { name: $c.lit("health food shop"), type: FODDERSHOP },
+        { name: $c.lit("candle shop"), type: CANDLESHOP },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 25; $i0++) {
         trap_types[$i0].$copyFrom(new $T.anon_sp_lev_4320());
     }
-    trap_types[0].name = $c.lit("arrow");
-    trap_types[0].type = ARROW_TRAP;
-    trap_types[1].name = $c.lit("dart");
-    trap_types[1].type = DART_TRAP;
-    trap_types[2].name = $c.lit("falling rock");
-    trap_types[2].type = ROCKTRAP;
-    trap_types[3].name = $c.lit("board");
-    trap_types[3].type = SQKY_BOARD;
-    trap_types[4].name = $c.lit("bear");
-    trap_types[4].type = BEAR_TRAP;
-    trap_types[5].name = $c.lit("land mine");
-    trap_types[5].type = LANDMINE;
-    trap_types[6].name = $c.lit("rolling boulder");
-    trap_types[6].type = ROLLING_BOULDER_TRAP;
-    trap_types[7].name = $c.lit("sleep gas");
-    trap_types[7].type = SLP_GAS_TRAP;
-    trap_types[8].name = $c.lit("rust");
-    trap_types[8].type = RUST_TRAP;
-    trap_types[9].name = $c.lit("fire");
-    trap_types[9].type = FIRE_TRAP;
-    trap_types[10].name = $c.lit("pit");
-    trap_types[10].type = PIT;
-    trap_types[11].name = $c.lit("spiked pit");
-    trap_types[11].type = SPIKED_PIT;
-    trap_types[12].name = $c.lit("hole");
-    trap_types[12].type = HOLE;
-    trap_types[13].name = $c.lit("trap door");
-    trap_types[13].type = TRAPDOOR;
-    trap_types[14].name = $c.lit("teleport");
-    trap_types[14].type = TELEP_TRAP;
-    trap_types[15].name = $c.lit("level teleport");
-    trap_types[15].type = LEVEL_TELEP;
-    trap_types[16].name = $c.lit("magic portal");
-    trap_types[16].type = MAGIC_PORTAL;
-    trap_types[17].name = $c.lit("web");
-    trap_types[17].type = WEB;
-    trap_types[18].name = $c.lit("statue");
-    trap_types[18].type = STATUE_TRAP;
-    trap_types[19].name = $c.lit("magic");
-    trap_types[19].type = MAGIC_TRAP;
-    trap_types[20].name = $c.lit("anti magic");
-    trap_types[20].type = ANTI_MAGIC;
-    trap_types[21].name = $c.lit("polymorph");
-    trap_types[21].type = POLY_TRAP;
-    trap_types[22].name = $c.lit("vibrating square");
-    trap_types[22].type = VIBRATING_SQUARE;
-    trap_types[23].name = $c.lit("random");
-    trap_types[23].type = -1;
-    trap_types[24].name = null;
-    trap_types[24].type = NO_TRAP;
+    $c.init(trap_types, [
+        { name: $c.lit("arrow"), type: ARROW_TRAP },
+        { name: $c.lit("dart"), type: DART_TRAP },
+        { name: $c.lit("falling rock"), type: ROCKTRAP },
+        { name: $c.lit("board"), type: SQKY_BOARD },
+        { name: $c.lit("bear"), type: BEAR_TRAP },
+        { name: $c.lit("land mine"), type: LANDMINE },
+        { name: $c.lit("rolling boulder"), type: ROLLING_BOULDER_TRAP },
+        { name: $c.lit("sleep gas"), type: SLP_GAS_TRAP },
+        { name: $c.lit("rust"), type: RUST_TRAP },
+        { name: $c.lit("fire"), type: FIRE_TRAP },
+        { name: $c.lit("pit"), type: PIT },
+        { name: $c.lit("spiked pit"), type: SPIKED_PIT },
+        { name: $c.lit("hole"), type: HOLE },
+        { name: $c.lit("trap door"), type: TRAPDOOR },
+        { name: $c.lit("teleport"), type: TELEP_TRAP },
+        { name: $c.lit("level teleport"), type: LEVEL_TELEP },
+        { name: $c.lit("magic portal"), type: MAGIC_PORTAL },
+        { name: $c.lit("web"), type: WEB },
+        { name: $c.lit("statue"), type: STATUE_TRAP },
+        { name: $c.lit("magic"), type: MAGIC_TRAP },
+        { name: $c.lit("anti magic"), type: ANTI_MAGIC },
+        { name: $c.lit("polymorph"), type: POLY_TRAP },
+        { name: $c.lit("vibrating square"), type: VIBRATING_SQUARE },
+        { name: $c.lit("random"), type: -1 },
+        {}
+    ]);
     floodfillchk_match_under_typ = 0;
     for (let $i0 = 0; $i0 < 35; $i0++) {
         nhl_functions[$i0].$copyFrom(new $T.luaL_Reg());
     }
-    nhl_functions[0].name = $c.lit("message");
-    nhl_functions[0].func = lspo_message;
-    nhl_functions[1].name = $c.lit("monster");
-    nhl_functions[1].func = lspo_monster;
-    nhl_functions[2].name = $c.lit("object");
-    nhl_functions[2].func = lspo_object;
-    nhl_functions[3].name = $c.lit("level_flags");
-    nhl_functions[3].func = lspo_level_flags;
-    nhl_functions[4].name = $c.lit("level_init");
-    nhl_functions[4].func = lspo_level_init;
-    nhl_functions[5].name = $c.lit("engraving");
-    nhl_functions[5].func = lspo_engraving;
-    nhl_functions[6].name = $c.lit("mineralize");
-    nhl_functions[6].func = lspo_mineralize;
-    nhl_functions[7].name = $c.lit("door");
-    nhl_functions[7].func = lspo_door;
-    nhl_functions[8].name = $c.lit("stair");
-    nhl_functions[8].func = lspo_stair;
-    nhl_functions[9].name = $c.lit("ladder");
-    nhl_functions[9].func = lspo_ladder;
-    nhl_functions[10].name = $c.lit("grave");
-    nhl_functions[10].func = lspo_grave;
-    nhl_functions[11].name = $c.lit("altar");
-    nhl_functions[11].func = lspo_altar;
-    nhl_functions[12].name = $c.lit("map");
-    nhl_functions[12].func = lspo_map;
-    nhl_functions[13].name = $c.lit("feature");
-    nhl_functions[13].func = lspo_feature;
-    nhl_functions[14].name = $c.lit("terrain");
-    nhl_functions[14].func = lspo_terrain;
-    nhl_functions[15].name = $c.lit("replace_terrain");
-    nhl_functions[15].func = lspo_replace_terrain;
-    nhl_functions[16].name = $c.lit("room");
-    nhl_functions[16].func = lspo_room;
-    nhl_functions[17].name = $c.lit("corridor");
-    nhl_functions[17].func = lspo_corridor;
-    nhl_functions[18].name = $c.lit("random_corridors");
-    nhl_functions[18].func = lspo_random_corridors;
-    nhl_functions[19].name = $c.lit("gold");
-    nhl_functions[19].func = lspo_gold;
-    nhl_functions[20].name = $c.lit("trap");
-    nhl_functions[20].func = lspo_trap;
-    nhl_functions[21].name = $c.lit("mazewalk");
-    nhl_functions[21].func = lspo_mazewalk;
-    nhl_functions[22].name = $c.lit("drawbridge");
-    nhl_functions[22].func = lspo_drawbridge;
-    nhl_functions[23].name = $c.lit("region");
-    nhl_functions[23].func = lspo_region;
-    nhl_functions[24].name = $c.lit("levregion");
-    nhl_functions[24].func = lspo_levregion;
-    nhl_functions[25].name = $c.lit("exclusion");
-    nhl_functions[25].func = lspo_exclusion;
-    nhl_functions[26].name = $c.lit("wallify");
-    nhl_functions[26].func = lspo_wallify;
-    nhl_functions[27].name = $c.lit("wall_property");
-    nhl_functions[27].func = lspo_wall_property;
-    nhl_functions[28].name = $c.lit("non_diggable");
-    nhl_functions[28].func = lspo_non_diggable;
-    nhl_functions[29].name = $c.lit("non_passwall");
-    nhl_functions[29].func = lspo_non_passwall;
-    nhl_functions[30].name = $c.lit("teleport_region");
-    nhl_functions[30].func = lspo_teleport_region;
-    nhl_functions[31].name = $c.lit("reset_level");
-    nhl_functions[31].func = lspo_reset_level;
-    nhl_functions[32].name = $c.lit("finalize_level");
-    nhl_functions[32].func = lspo_finalize_level;
-    nhl_functions[33].name = $c.lit("gas_cloud");
-    nhl_functions[33].func = lspo_gas_cloud;
-    nhl_functions[34].name = null;
-    nhl_functions[34].func = null;
+    $c.init(nhl_functions, [
+        { name: $c.lit("message"), func: lspo_message },
+        { name: $c.lit("monster"), func: lspo_monster },
+        { name: $c.lit("object"), func: lspo_object },
+        { name: $c.lit("level_flags"), func: lspo_level_flags },
+        { name: $c.lit("level_init"), func: lspo_level_init },
+        { name: $c.lit("engraving"), func: lspo_engraving },
+        { name: $c.lit("mineralize"), func: lspo_mineralize },
+        { name: $c.lit("door"), func: lspo_door },
+        { name: $c.lit("stair"), func: lspo_stair },
+        { name: $c.lit("ladder"), func: lspo_ladder },
+        { name: $c.lit("grave"), func: lspo_grave },
+        { name: $c.lit("altar"), func: lspo_altar },
+        { name: $c.lit("map"), func: lspo_map },
+        { name: $c.lit("feature"), func: lspo_feature },
+        { name: $c.lit("terrain"), func: lspo_terrain },
+        { name: $c.lit("replace_terrain"), func: lspo_replace_terrain },
+        { name: $c.lit("room"), func: lspo_room },
+        { name: $c.lit("corridor"), func: lspo_corridor },
+        { name: $c.lit("random_corridors"), func: lspo_random_corridors },
+        { name: $c.lit("gold"), func: lspo_gold },
+        { name: $c.lit("trap"), func: lspo_trap },
+        { name: $c.lit("mazewalk"), func: lspo_mazewalk },
+        { name: $c.lit("drawbridge"), func: lspo_drawbridge },
+        { name: $c.lit("region"), func: lspo_region },
+        { name: $c.lit("levregion"), func: lspo_levregion },
+        { name: $c.lit("exclusion"), func: lspo_exclusion },
+        { name: $c.lit("wallify"), func: lspo_wallify },
+        { name: $c.lit("wall_property"), func: lspo_wall_property },
+        { name: $c.lit("non_diggable"), func: lspo_non_diggable },
+        { name: $c.lit("non_passwall"), func: lspo_non_passwall },
+        { name: $c.lit("teleport_region"), func: lspo_teleport_region },
+        { name: $c.lit("reset_level"), func: lspo_reset_level },
+        { name: $c.lit("finalize_level"), func: lspo_finalize_level },
+        { name: $c.lit("gas_cloud"), func: lspo_gas_cloud },
+        {}
+    ]);
     rnddoor$state.fill(0);
-    rnddoor$state[0] = D_NODOOR;
-    rnddoor$state[1] = D_BROKEN;
-    rnddoor$state[2] = D_ISOPEN;
-    rnddoor$state[3] = D_CLOSED;
-    rnddoor$state[4] = D_LOCKED;
+    $c.init(rnddoor$state, [
+        D_NODOOR,
+        D_BROKEN,
+        D_ISOPEN,
+        D_CLOSED,
+        D_LOCKED
+    ]);
     get_unpacked_coord$c.$copyFrom(new $T.unpacked_coord());
     create_object$prize_warning.fill(0);
     create_object$prize_warning.set([109, 117, 108, 116, 105, 112, 108, 101, 32, 112, 114, 105, 122, 101, 115, 32, 111, 110, 32, 37, 115, 32, 108, 101, 118, 101, 108]);   // "multiple prizes on %s level"
     get_table_align$gtaligns.fill(null);
-    get_table_align$gtaligns[0] = $c.lit("noalign");
-    get_table_align$gtaligns[1] = $c.lit("law");
-    get_table_align$gtaligns[2] = $c.lit("neutral");
-    get_table_align$gtaligns[3] = $c.lit("chaos");
-    get_table_align$gtaligns[4] = $c.lit("coaligned");
-    get_table_align$gtaligns[5] = $c.lit("noncoaligned");
-    get_table_align$gtaligns[6] = $c.lit("random");
-    get_table_align$gtaligns[7] = null;
+    $c.init(get_table_align$gtaligns, [
+        $c.lit("noalign"),
+        $c.lit("law"),
+        $c.lit("neutral"),
+        $c.lit("chaos"),
+        $c.lit("coaligned"),
+        $c.lit("noncoaligned"),
+        $c.lit("random"),
+        null
+    ]);
     get_table_align$aligns2i.fill(0);
-    get_table_align$aligns2i[0] = AM_NONE;
-    get_table_align$aligns2i[1] = AM_LAWFUL;
-    get_table_align$aligns2i[2] = AM_NEUTRAL;
-    get_table_align$aligns2i[3] = AM_CHAOTIC;
-    get_table_align$aligns2i[4] = AM_SPLEV_CO;
-    get_table_align$aligns2i[5] = AM_SPLEV_NONCO;
-    get_table_align$aligns2i[6] = AM_SPLEV_RANDOM;
-    get_table_align$aligns2i[7] = 0;
+    $c.init(get_table_align$aligns2i, [
+        AM_NONE,
+        AM_LAWFUL,
+        AM_NEUTRAL,
+        AM_CHAOTIC,
+        AM_SPLEV_CO,
+        AM_SPLEV_NONCO,
+        AM_SPLEV_RANDOM,
+        0
+    ]);
     get_table_buc$bucs.fill(null);
-    get_table_buc$bucs[0] = $c.lit("random");
-    get_table_buc$bucs[1] = $c.lit("blessed");
-    get_table_buc$bucs[2] = $c.lit("uncursed");
-    get_table_buc$bucs[3] = $c.lit("cursed");
-    get_table_buc$bucs[4] = $c.lit("not-cursed");
-    get_table_buc$bucs[5] = $c.lit("not-uncursed");
-    get_table_buc$bucs[6] = $c.lit("not-blessed");
-    get_table_buc$bucs[7] = null;
+    $c.init(get_table_buc$bucs, [
+        $c.lit("random"),
+        $c.lit("blessed"),
+        $c.lit("uncursed"),
+        $c.lit("cursed"),
+        $c.lit("not-cursed"),
+        $c.lit("not-uncursed"),
+        $c.lit("not-blessed"),
+        null
+    ]);
     get_table_buc$bucs2i.fill(0);
-    get_table_buc$bucs2i[0] = 0;
-    get_table_buc$bucs2i[1] = 1;
-    get_table_buc$bucs2i[2] = 2;
-    get_table_buc$bucs2i[3] = 3;
-    get_table_buc$bucs2i[4] = 4;
-    get_table_buc$bucs2i[5] = 5;
-    get_table_buc$bucs2i[6] = 6;
-    get_table_buc$bucs2i[7] = 0;
+    $c.init(get_table_buc$bucs2i, [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+    ]);
     for (let $i0 = 0; $i0 < 6; $i0++) {
         find_objtype$class_prefixes[$i0].$copyFrom(new $T.objclasspfx());
     }
-    find_objtype$class_prefixes[0].prefix = $c.lit("ring of ");
-    find_objtype$class_prefixes[0].class = RING_CLASS;
-    find_objtype$class_prefixes[1].prefix = $c.lit("potion of ");
-    find_objtype$class_prefixes[1].class = POTION_CLASS;
-    find_objtype$class_prefixes[2].prefix = $c.lit("scroll of ");
-    find_objtype$class_prefixes[2].class = SCROLL_CLASS;
-    find_objtype$class_prefixes[3].prefix = $c.lit("spellbook of ");
-    find_objtype$class_prefixes[3].class = SPBOOK_CLASS;
-    find_objtype$class_prefixes[4].prefix = $c.lit("wand of ");
-    find_objtype$class_prefixes[4].class = WAND_CLASS;
-    find_objtype$class_prefixes[5].prefix = null;
-    find_objtype$class_prefixes[5].class = 0;
+    $c.init(find_objtype$class_prefixes, [
+        { prefix: $c.lit("ring of "), class: RING_CLASS },
+        { prefix: $c.lit("potion of "), class: POTION_CLASS },
+        { prefix: $c.lit("scroll of "), class: SCROLL_CLASS },
+        { prefix: $c.lit("spellbook of "), class: SPBOOK_CLASS },
+        { prefix: $c.lit("wand of "), class: WAND_CLASS },
+        {}
+    ]);
     lspo_object$zeroobject.$copyFrom(new $T.object());
     lspo_object$zeroobject.name.str = null;
     lspo_object$zeroobject.corpsenm = 0;
@@ -5098,275 +5024,357 @@ export function $init() {
     lspo_object$zeroobject.broken = 0;
     lspo_object$zeroobject.achievement = 0;
     lspo_level_init$initstyles.fill(null);
-    lspo_level_init$initstyles[0] = $c.lit("solidfill");
-    lspo_level_init$initstyles[1] = $c.lit("mazegrid");
-    lspo_level_init$initstyles[2] = $c.lit("maze");
-    lspo_level_init$initstyles[3] = $c.lit("rogue");
-    lspo_level_init$initstyles[4] = $c.lit("mines");
-    lspo_level_init$initstyles[5] = $c.lit("swamp");
-    lspo_level_init$initstyles[6] = null;
+    $c.init(lspo_level_init$initstyles, [
+        $c.lit("solidfill"),
+        $c.lit("mazegrid"),
+        $c.lit("maze"),
+        $c.lit("rogue"),
+        $c.lit("mines"),
+        $c.lit("swamp"),
+        null
+    ]);
     lspo_level_init$initstyles2i.fill(0);
-    lspo_level_init$initstyles2i[0] = LVLINIT_SOLIDFILL;
-    lspo_level_init$initstyles2i[1] = LVLINIT_MAZEGRID;
-    lspo_level_init$initstyles2i[2] = LVLINIT_MAZE;
-    lspo_level_init$initstyles2i[3] = LVLINIT_ROGUE;
-    lspo_level_init$initstyles2i[4] = LVLINIT_MINES;
-    lspo_level_init$initstyles2i[5] = LVLINIT_SWAMP;
-    lspo_level_init$initstyles2i[6] = 0;
+    $c.init(lspo_level_init$initstyles2i, [
+        LVLINIT_SOLIDFILL,
+        LVLINIT_MAZEGRID,
+        LVLINIT_MAZE,
+        LVLINIT_ROGUE,
+        LVLINIT_MINES,
+        LVLINIT_SWAMP,
+        0
+    ]);
     lspo_engraving$engrtypes.fill(null);
-    lspo_engraving$engrtypes[0] = $c.lit("dust");
-    lspo_engraving$engrtypes[1] = $c.lit("engrave");
-    lspo_engraving$engrtypes[2] = $c.lit("burn");
-    lspo_engraving$engrtypes[3] = $c.lit("mark");
-    lspo_engraving$engrtypes[4] = $c.lit("blood");
-    lspo_engraving$engrtypes[5] = null;
+    $c.init(lspo_engraving$engrtypes, [
+        $c.lit("dust"),
+        $c.lit("engrave"),
+        $c.lit("burn"),
+        $c.lit("mark"),
+        $c.lit("blood"),
+        null
+    ]);
     lspo_engraving$engrtypes2i.fill(0);
-    lspo_engraving$engrtypes2i[0] = DUST;
-    lspo_engraving$engrtypes2i[1] = ENGRAVE;
-    lspo_engraving$engrtypes2i[2] = BURN;
-    lspo_engraving$engrtypes2i[3] = MARK;
-    lspo_engraving$engrtypes2i[4] = ENGR_BLOOD;
-    lspo_engraving$engrtypes2i[5] = 0;
+    $c.init(lspo_engraving$engrtypes2i, [
+        DUST,
+        ENGRAVE,
+        BURN,
+        MARK,
+        ENGR_BLOOD,
+        0
+    ]);
     lspo_room$left_or_right.fill(null);
-    lspo_room$left_or_right[0] = $c.lit("left");
-    lspo_room$left_or_right[1] = $c.lit("half-left");
-    lspo_room$left_or_right[2] = $c.lit("center");
-    lspo_room$left_or_right[3] = $c.lit("half-right");
-    lspo_room$left_or_right[4] = $c.lit("right");
-    lspo_room$left_or_right[5] = $c.lit("none");
-    lspo_room$left_or_right[6] = $c.lit("random");
-    lspo_room$left_or_right[7] = null;
+    $c.init(lspo_room$left_or_right, [
+        $c.lit("left"),
+        $c.lit("half-left"),
+        $c.lit("center"),
+        $c.lit("half-right"),
+        $c.lit("right"),
+        $c.lit("none"),
+        $c.lit("random"),
+        null
+    ]);
     lspo_room$l_or_r2i.fill(0);
-    lspo_room$l_or_r2i[0] = SPLEV_LEFT;
-    lspo_room$l_or_r2i[1] = SPLEV_H_LEFT;
-    lspo_room$l_or_r2i[2] = SPLEV_CENTER;
-    lspo_room$l_or_r2i[3] = SPLEV_H_RIGHT;
-    lspo_room$l_or_r2i[4] = SPLEV_RIGHT;
-    lspo_room$l_or_r2i[5] = -1;
-    lspo_room$l_or_r2i[6] = -1;
-    lspo_room$l_or_r2i[7] = -1;
+    $c.init(lspo_room$l_or_r2i, [
+        SPLEV_LEFT,
+        SPLEV_H_LEFT,
+        SPLEV_CENTER,
+        SPLEV_H_RIGHT,
+        SPLEV_RIGHT,
+        -1,
+        -1,
+        -1
+    ]);
     lspo_room$top_or_bot.fill(null);
-    lspo_room$top_or_bot[0] = $c.lit("top");
-    lspo_room$top_or_bot[1] = $c.lit("center");
-    lspo_room$top_or_bot[2] = $c.lit("bottom");
-    lspo_room$top_or_bot[3] = $c.lit("none");
-    lspo_room$top_or_bot[4] = $c.lit("random");
-    lspo_room$top_or_bot[5] = null;
+    $c.init(lspo_room$top_or_bot, [
+        $c.lit("top"),
+        $c.lit("center"),
+        $c.lit("bottom"),
+        $c.lit("none"),
+        $c.lit("random"),
+        null
+    ]);
     lspo_room$t_or_b2i.fill(0);
-    lspo_room$t_or_b2i[0] = TOP;
-    lspo_room$t_or_b2i[1] = SPLEV_CENTER;
-    lspo_room$t_or_b2i[2] = BOTTOM;
-    lspo_room$t_or_b2i[3] = -1;
-    lspo_room$t_or_b2i[4] = -1;
-    lspo_room$t_or_b2i[5] = -1;
+    $c.init(lspo_room$t_or_b2i, [
+        TOP,
+        SPLEV_CENTER,
+        BOTTOM,
+        -1,
+        -1,
+        -1
+    ]);
     l_create_stairway$stairdirs.fill(null);
-    l_create_stairway$stairdirs[0] = $c.lit("down");
-    l_create_stairway$stairdirs[1] = $c.lit("up");
-    l_create_stairway$stairdirs[2] = null;
+    $c.init(l_create_stairway$stairdirs, [
+        $c.lit("down"),
+        $c.lit("up"),
+        null
+    ]);
     l_create_stairway$stairdirs2i.fill(0);
-    l_create_stairway$stairdirs2i[0] = 0;
-    l_create_stairway$stairdirs2i[1] = 1;
+    $c.init(l_create_stairway$stairdirs2i, [
+        0,
+        1
+    ]);
     lspo_altar$shrines.fill(null);
-    lspo_altar$shrines[0] = $c.lit("altar");
-    lspo_altar$shrines[1] = $c.lit("shrine");
-    lspo_altar$shrines[2] = $c.lit("sanctum");
-    lspo_altar$shrines[3] = null;
+    $c.init(lspo_altar$shrines, [
+        $c.lit("altar"),
+        $c.lit("shrine"),
+        $c.lit("sanctum"),
+        null
+    ]);
     lspo_altar$shrines2i.fill(0);
-    lspo_altar$shrines2i[0] = 0;
-    lspo_altar$shrines2i[1] = 1;
-    lspo_altar$shrines2i[2] = 2;
-    lspo_altar$shrines2i[3] = 0;
+    $c.init(lspo_altar$shrines2i, [
+        0,
+        1,
+        2,
+        0
+    ]);
     lspo_corridor$walldirs.fill(null);
-    lspo_corridor$walldirs[0] = $c.lit("all");
-    lspo_corridor$walldirs[1] = $c.lit("random");
-    lspo_corridor$walldirs[2] = $c.lit("north");
-    lspo_corridor$walldirs[3] = $c.lit("west");
-    lspo_corridor$walldirs[4] = $c.lit("east");
-    lspo_corridor$walldirs[5] = $c.lit("south");
-    lspo_corridor$walldirs[6] = null;
+    $c.init(lspo_corridor$walldirs, [
+        $c.lit("all"),
+        $c.lit("random"),
+        $c.lit("north"),
+        $c.lit("west"),
+        $c.lit("east"),
+        $c.lit("south"),
+        null
+    ]);
     lspo_corridor$walldirs2i.fill(0);
-    lspo_corridor$walldirs2i[0] = W_NORTH | W_SOUTH | W_EAST | W_WEST;
-    lspo_corridor$walldirs2i[1] = W_RANDOM;
-    lspo_corridor$walldirs2i[2] = W_NORTH;
-    lspo_corridor$walldirs2i[3] = W_WEST;
-    lspo_corridor$walldirs2i[4] = W_EAST;
-    lspo_corridor$walldirs2i[5] = W_SOUTH;
-    lspo_corridor$walldirs2i[6] = 0;
+    $c.init(lspo_corridor$walldirs2i, [
+        W_NORTH | W_SOUTH | W_EAST | W_WEST,
+        W_RANDOM,
+        W_NORTH,
+        W_WEST,
+        W_EAST,
+        W_SOUTH,
+        0
+    ]);
     random_wdir$wdirs.fill(0);
-    random_wdir$wdirs[0] = W_NORTH;
-    random_wdir$wdirs[1] = W_SOUTH;
-    random_wdir$wdirs[2] = W_EAST;
-    random_wdir$wdirs[3] = W_WEST;
+    $c.init(random_wdir$wdirs, [
+        W_NORTH,
+        W_SOUTH,
+        W_EAST,
+        W_WEST
+    ]);
     lspo_door$doorstates.fill(null);
-    lspo_door$doorstates[0] = $c.lit("random");
-    lspo_door$doorstates[1] = $c.lit("open");
-    lspo_door$doorstates[2] = $c.lit("closed");
-    lspo_door$doorstates[3] = $c.lit("locked");
-    lspo_door$doorstates[4] = $c.lit("nodoor");
-    lspo_door$doorstates[5] = $c.lit("broken");
-    lspo_door$doorstates[6] = $c.lit("secret");
-    lspo_door$doorstates[7] = null;
+    $c.init(lspo_door$doorstates, [
+        $c.lit("random"),
+        $c.lit("open"),
+        $c.lit("closed"),
+        $c.lit("locked"),
+        $c.lit("nodoor"),
+        $c.lit("broken"),
+        $c.lit("secret"),
+        null
+    ]);
     lspo_door$doorstates2i.fill(0);
-    lspo_door$doorstates2i[0] = -1;
-    lspo_door$doorstates2i[1] = D_ISOPEN;
-    lspo_door$doorstates2i[2] = D_CLOSED;
-    lspo_door$doorstates2i[3] = D_LOCKED;
-    lspo_door$doorstates2i[4] = D_NODOOR;
-    lspo_door$doorstates2i[5] = D_BROKEN;
-    lspo_door$doorstates2i[6] = D_SECRET;
+    $c.init(lspo_door$doorstates2i, [
+        -1,
+        D_ISOPEN,
+        D_CLOSED,
+        D_LOCKED,
+        D_NODOOR,
+        D_BROKEN,
+        D_SECRET
+    ]);
     lspo_door$walldirs.fill(null);
-    lspo_door$walldirs[0] = $c.lit("all");
-    lspo_door$walldirs[1] = $c.lit("random");
-    lspo_door$walldirs[2] = $c.lit("north");
-    lspo_door$walldirs[3] = $c.lit("west");
-    lspo_door$walldirs[4] = $c.lit("east");
-    lspo_door$walldirs[5] = $c.lit("south");
-    lspo_door$walldirs[6] = null;
+    $c.init(lspo_door$walldirs, [
+        $c.lit("all"),
+        $c.lit("random"),
+        $c.lit("north"),
+        $c.lit("west"),
+        $c.lit("east"),
+        $c.lit("south"),
+        null
+    ]);
     lspo_door$walldirs2i.fill(0);
-    lspo_door$walldirs2i[0] = W_NORTH | W_SOUTH | W_EAST | W_WEST;
-    lspo_door$walldirs2i[1] = W_NORTH | W_SOUTH | W_EAST | W_WEST;
-    lspo_door$walldirs2i[2] = W_NORTH;
-    lspo_door$walldirs2i[3] = W_WEST;
-    lspo_door$walldirs2i[4] = W_EAST;
-    lspo_door$walldirs2i[5] = W_SOUTH;
-    lspo_door$walldirs2i[6] = 0;
+    $c.init(lspo_door$walldirs2i, [
+        W_NORTH | W_SOUTH | W_EAST | W_WEST,
+        W_NORTH | W_SOUTH | W_EAST | W_WEST,
+        W_NORTH,
+        W_WEST,
+        W_EAST,
+        W_SOUTH,
+        0
+    ]);
     lspo_feature$features.fill(null);
-    lspo_feature$features[0] = $c.lit("fountain");
-    lspo_feature$features[1] = $c.lit("sink");
-    lspo_feature$features[2] = $c.lit("pool");
-    lspo_feature$features[3] = $c.lit("throne");
-    lspo_feature$features[4] = $c.lit("tree");
-    lspo_feature$features[5] = null;
+    $c.init(lspo_feature$features, [
+        $c.lit("fountain"),
+        $c.lit("sink"),
+        $c.lit("pool"),
+        $c.lit("throne"),
+        $c.lit("tree"),
+        null
+    ]);
     lspo_feature$features2i.fill(0);
-    lspo_feature$features2i[0] = FOUNTAIN;
-    lspo_feature$features2i[1] = SINK;
-    lspo_feature$features2i[2] = POOL;
-    lspo_feature$features2i[3] = THRONE;
-    lspo_feature$features2i[4] = TREE;
-    lspo_feature$features2i[5] = STONE;
+    $c.init(lspo_feature$features2i, [
+        FOUNTAIN,
+        SINK,
+        POOL,
+        THRONE,
+        TREE,
+        STONE
+    ]);
     generate_way_out_method$escapeitems.fill(0);
-    generate_way_out_method$escapeitems[0] = PICK_AXE;
-    generate_way_out_method$escapeitems[1] = DWARVISH_MATTOCK;
-    generate_way_out_method$escapeitems[2] = WAN_DIGGING;
-    generate_way_out_method$escapeitems[3] = WAN_TELEPORTATION;
-    generate_way_out_method$escapeitems[4] = SCR_TELEPORTATION;
-    generate_way_out_method$escapeitems[5] = RIN_TELEPORTATION;
+    $c.init(generate_way_out_method$escapeitems, [
+        PICK_AXE,
+        DWARVISH_MATTOCK,
+        WAN_DIGGING,
+        WAN_TELEPORTATION,
+        SCR_TELEPORTATION,
+        RIN_TELEPORTATION
+    ]);
     lspo_teleport_region$teledirs.fill(null);
-    lspo_teleport_region$teledirs[0] = $c.lit("both");
-    lspo_teleport_region$teledirs[1] = $c.lit("down");
-    lspo_teleport_region$teledirs[2] = $c.lit("up");
-    lspo_teleport_region$teledirs[3] = null;
+    $c.init(lspo_teleport_region$teledirs, [
+        $c.lit("both"),
+        $c.lit("down"),
+        $c.lit("up"),
+        null
+    ]);
     lspo_teleport_region$teledirs2i.fill(0);
-    lspo_teleport_region$teledirs2i[0] = LR_TELE;
-    lspo_teleport_region$teledirs2i[1] = LR_DOWNTELE;
-    lspo_teleport_region$teledirs2i[2] = LR_UPTELE;
-    lspo_teleport_region$teledirs2i[3] = -1;
+    $c.init(lspo_teleport_region$teledirs2i, [
+        LR_TELE,
+        LR_DOWNTELE,
+        LR_UPTELE,
+        -1
+    ]);
     lspo_levregion$regiontypes.fill(null);
-    lspo_levregion$regiontypes[0] = $c.lit("stair-down");
-    lspo_levregion$regiontypes[1] = $c.lit("stair-up");
-    lspo_levregion$regiontypes[2] = $c.lit("portal");
-    lspo_levregion$regiontypes[3] = $c.lit("branch");
-    lspo_levregion$regiontypes[4] = $c.lit("teleport");
-    lspo_levregion$regiontypes[5] = $c.lit("teleport-up");
-    lspo_levregion$regiontypes[6] = $c.lit("teleport-down");
-    lspo_levregion$regiontypes[7] = null;
+    $c.init(lspo_levregion$regiontypes, [
+        $c.lit("stair-down"),
+        $c.lit("stair-up"),
+        $c.lit("portal"),
+        $c.lit("branch"),
+        $c.lit("teleport"),
+        $c.lit("teleport-up"),
+        $c.lit("teleport-down"),
+        null
+    ]);
     lspo_levregion$regiontypes2i.fill(0);
-    lspo_levregion$regiontypes2i[0] = LR_DOWNSTAIR;
-    lspo_levregion$regiontypes2i[1] = LR_UPSTAIR;
-    lspo_levregion$regiontypes2i[2] = LR_PORTAL;
-    lspo_levregion$regiontypes2i[3] = LR_BRANCH;
-    lspo_levregion$regiontypes2i[4] = LR_TELE;
-    lspo_levregion$regiontypes2i[5] = LR_UPTELE;
-    lspo_levregion$regiontypes2i[6] = LR_DOWNTELE;
-    lspo_levregion$regiontypes2i[7] = 0;
+    $c.init(lspo_levregion$regiontypes2i, [
+        LR_DOWNSTAIR,
+        LR_UPSTAIR,
+        LR_PORTAL,
+        LR_BRANCH,
+        LR_TELE,
+        LR_UPTELE,
+        LR_DOWNTELE,
+        0
+    ]);
     lspo_exclusion$ez_types.fill(null);
-    lspo_exclusion$ez_types[0] = $c.lit("teleport");
-    lspo_exclusion$ez_types[1] = $c.lit("teleport-up");
-    lspo_exclusion$ez_types[2] = $c.lit("teleport-down");
-    lspo_exclusion$ez_types[3] = $c.lit("monster-generation");
-    lspo_exclusion$ez_types[4] = null;
+    $c.init(lspo_exclusion$ez_types, [
+        $c.lit("teleport"),
+        $c.lit("teleport-up"),
+        $c.lit("teleport-down"),
+        $c.lit("monster-generation"),
+        null
+    ]);
     lspo_exclusion$ez_types2i.fill(0);
-    lspo_exclusion$ez_types2i[0] = LR_TELE;
-    lspo_exclusion$ez_types2i[1] = LR_UPTELE;
-    lspo_exclusion$ez_types2i[2] = LR_DOWNTELE;
-    lspo_exclusion$ez_types2i[3] = LR_MONGEN;
-    lspo_exclusion$ez_types2i[4] = 0;
+    $c.init(lspo_exclusion$ez_types2i, [
+        LR_TELE,
+        LR_UPTELE,
+        LR_DOWNTELE,
+        LR_MONGEN,
+        0
+    ]);
     lspo_region$lits.fill(null);
-    lspo_region$lits[0] = $c.lit("unlit");
-    lspo_region$lits[1] = $c.lit("lit");
-    lspo_region$lits[2] = null;
+    $c.init(lspo_region$lits, [
+        $c.lit("unlit"),
+        $c.lit("lit"),
+        null
+    ]);
     lspo_drawbridge$mwdirs.fill(null);
-    lspo_drawbridge$mwdirs[0] = $c.lit("north");
-    lspo_drawbridge$mwdirs[1] = $c.lit("south");
-    lspo_drawbridge$mwdirs[2] = $c.lit("west");
-    lspo_drawbridge$mwdirs[3] = $c.lit("east");
-    lspo_drawbridge$mwdirs[4] = $c.lit("random");
-    lspo_drawbridge$mwdirs[5] = null;
+    $c.init(lspo_drawbridge$mwdirs, [
+        $c.lit("north"),
+        $c.lit("south"),
+        $c.lit("west"),
+        $c.lit("east"),
+        $c.lit("random"),
+        null
+    ]);
     lspo_drawbridge$mwdirs2i.fill(0);
-    lspo_drawbridge$mwdirs2i[0] = DB_NORTH;
-    lspo_drawbridge$mwdirs2i[1] = DB_SOUTH;
-    lspo_drawbridge$mwdirs2i[2] = DB_WEST;
-    lspo_drawbridge$mwdirs2i[3] = DB_EAST;
-    lspo_drawbridge$mwdirs2i[4] = -1;
-    lspo_drawbridge$mwdirs2i[5] = -2;
+    $c.init(lspo_drawbridge$mwdirs2i, [
+        DB_NORTH,
+        DB_SOUTH,
+        DB_WEST,
+        DB_EAST,
+        -1,
+        -2
+    ]);
     lspo_drawbridge$dbopens.fill(null);
-    lspo_drawbridge$dbopens[0] = $c.lit("open");
-    lspo_drawbridge$dbopens[1] = $c.lit("closed");
-    lspo_drawbridge$dbopens[2] = $c.lit("random");
-    lspo_drawbridge$dbopens[3] = null;
+    $c.init(lspo_drawbridge$dbopens, [
+        $c.lit("open"),
+        $c.lit("closed"),
+        $c.lit("random"),
+        null
+    ]);
     lspo_drawbridge$dbopens2i.fill(0);
-    lspo_drawbridge$dbopens2i[0] = 1;
-    lspo_drawbridge$dbopens2i[1] = 0;
-    lspo_drawbridge$dbopens2i[2] = -1;
-    lspo_drawbridge$dbopens2i[3] = -2;
+    $c.init(lspo_drawbridge$dbopens2i, [
+        1,
+        0,
+        -1,
+        -2
+    ]);
     lspo_mazewalk$mwdirs.fill(null);
-    lspo_mazewalk$mwdirs[0] = $c.lit("north");
-    lspo_mazewalk$mwdirs[1] = $c.lit("south");
-    lspo_mazewalk$mwdirs[2] = $c.lit("east");
-    lspo_mazewalk$mwdirs[3] = $c.lit("west");
-    lspo_mazewalk$mwdirs[4] = $c.lit("random");
-    lspo_mazewalk$mwdirs[5] = null;
+    $c.init(lspo_mazewalk$mwdirs, [
+        $c.lit("north"),
+        $c.lit("south"),
+        $c.lit("east"),
+        $c.lit("west"),
+        $c.lit("random"),
+        null
+    ]);
     lspo_mazewalk$mwdirs2i.fill(0);
-    lspo_mazewalk$mwdirs2i[0] = W_NORTH;
-    lspo_mazewalk$mwdirs2i[1] = W_SOUTH;
-    lspo_mazewalk$mwdirs2i[2] = W_EAST;
-    lspo_mazewalk$mwdirs2i[3] = W_WEST;
-    lspo_mazewalk$mwdirs2i[4] = W_RANDOM;
-    lspo_mazewalk$mwdirs2i[5] = -2;
+    $c.init(lspo_mazewalk$mwdirs2i, [
+        W_NORTH,
+        W_SOUTH,
+        W_EAST,
+        W_WEST,
+        W_RANDOM,
+        -2
+    ]);
     lspo_wall_property$wprops.fill(null);
-    lspo_wall_property$wprops[0] = $c.lit("nondiggable");
-    lspo_wall_property$wprops[1] = $c.lit("nonpasswall");
-    lspo_wall_property$wprops[2] = null;
+    $c.init(lspo_wall_property$wprops, [
+        $c.lit("nondiggable"),
+        $c.lit("nonpasswall"),
+        null
+    ]);
     lspo_wall_property$wprop2i.fill(0);
-    lspo_wall_property$wprop2i[0] = W_NONDIGGABLE;
-    lspo_wall_property$wprop2i[1] = W_NONPASSWALL;
-    lspo_wall_property$wprop2i[2] = -1;
+    $c.init(lspo_wall_property$wprop2i, [
+        W_NONDIGGABLE,
+        W_NONPASSWALL,
+        -1
+    ]);
     lspo_map$left_or_right.fill(null);
-    lspo_map$left_or_right[0] = $c.lit("left");
-    lspo_map$left_or_right[1] = $c.lit("half-left");
-    lspo_map$left_or_right[2] = $c.lit("center");
-    lspo_map$left_or_right[3] = $c.lit("half-right");
-    lspo_map$left_or_right[4] = $c.lit("right");
-    lspo_map$left_or_right[5] = $c.lit("none");
-    lspo_map$left_or_right[6] = null;
+    $c.init(lspo_map$left_or_right, [
+        $c.lit("left"),
+        $c.lit("half-left"),
+        $c.lit("center"),
+        $c.lit("half-right"),
+        $c.lit("right"),
+        $c.lit("none"),
+        null
+    ]);
     lspo_map$l_or_r2i.fill(0);
-    lspo_map$l_or_r2i[0] = SPLEV_LEFT;
-    lspo_map$l_or_r2i[1] = SPLEV_H_LEFT;
-    lspo_map$l_or_r2i[2] = SPLEV_CENTER;
-    lspo_map$l_or_r2i[3] = SPLEV_H_RIGHT;
-    lspo_map$l_or_r2i[4] = SPLEV_RIGHT;
-    lspo_map$l_or_r2i[5] = -1;
-    lspo_map$l_or_r2i[6] = -1;
+    $c.init(lspo_map$l_or_r2i, [
+        SPLEV_LEFT,
+        SPLEV_H_LEFT,
+        SPLEV_CENTER,
+        SPLEV_H_RIGHT,
+        SPLEV_RIGHT,
+        -1,
+        -1
+    ]);
     lspo_map$top_or_bot.fill(null);
-    lspo_map$top_or_bot[0] = $c.lit("top");
-    lspo_map$top_or_bot[1] = $c.lit("center");
-    lspo_map$top_or_bot[2] = $c.lit("bottom");
-    lspo_map$top_or_bot[3] = $c.lit("none");
-    lspo_map$top_or_bot[4] = null;
+    $c.init(lspo_map$top_or_bot, [
+        $c.lit("top"),
+        $c.lit("center"),
+        $c.lit("bottom"),
+        $c.lit("none"),
+        null
+    ]);
     lspo_map$t_or_b2i.fill(0);
-    lspo_map$t_or_b2i[0] = TOP;
-    lspo_map$t_or_b2i[1] = SPLEV_CENTER;
-    lspo_map$t_or_b2i[2] = BOTTOM;
-    lspo_map$t_or_b2i[3] = -1;
-    lspo_map$t_or_b2i[4] = -1;
+    $c.init(lspo_map$t_or_b2i, [
+        TOP,
+        SPLEV_CENTER,
+        BOTTOM,
+        -1,
+        -1
+    ]);
 }

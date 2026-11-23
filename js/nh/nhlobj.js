@@ -478,43 +478,29 @@ export function $init() {
     for (let $i0 = 0; $i0 < 16; $i0++) {
         l_obj_methods[$i0].$copyFrom(new $T.luaL_Reg());
     }
-    l_obj_methods[0].name = $c.lit("new");
-    l_obj_methods[0].func = l_obj_new_readobjnam;
-    l_obj_methods[1].name = $c.lit("isnull");
-    l_obj_methods[1].func = l_obj_isnull;
-    l_obj_methods[2].name = $c.lit("at");
-    l_obj_methods[2].func = l_obj_at;
-    l_obj_methods[3].name = $c.lit("next");
-    l_obj_methods[3].func = l_obj_nextobj;
-    l_obj_methods[4].name = $c.lit("totable");
-    l_obj_methods[4].func = l_obj_to_table;
-    l_obj_methods[5].name = $c.lit("class");
-    l_obj_methods[5].func = l_obj_objects_to_table;
-    l_obj_methods[6].name = $c.lit("placeobj");
-    l_obj_methods[6].func = l_obj_placeobj;
-    l_obj_methods[7].name = $c.lit("container");
-    l_obj_methods[7].func = l_obj_container;
-    l_obj_methods[8].name = $c.lit("contents");
-    l_obj_methods[8].func = l_obj_getcontents;
-    l_obj_methods[9].name = $c.lit("addcontent");
-    l_obj_methods[9].func = l_obj_add_to_container;
-    l_obj_methods[10].name = $c.lit("has_timer");
-    l_obj_methods[10].func = l_obj_timer_has;
-    l_obj_methods[11].name = $c.lit("peek_timer");
-    l_obj_methods[11].func = l_obj_timer_peek;
-    l_obj_methods[12].name = $c.lit("stop_timer");
-    l_obj_methods[12].func = l_obj_timer_stop;
-    l_obj_methods[13].name = $c.lit("start_timer");
-    l_obj_methods[13].func = l_obj_timer_start;
-    l_obj_methods[14].name = $c.lit("bury");
-    l_obj_methods[14].func = l_obj_bury;
-    l_obj_methods[15].name = null;
-    l_obj_methods[15].func = null;
+    $c.init(l_obj_methods, [
+        { name: $c.lit("new"), func: l_obj_new_readobjnam },
+        { name: $c.lit("isnull"), func: l_obj_isnull },
+        { name: $c.lit("at"), func: l_obj_at },
+        { name: $c.lit("next"), func: l_obj_nextobj },
+        { name: $c.lit("totable"), func: l_obj_to_table },
+        { name: $c.lit("class"), func: l_obj_objects_to_table },
+        { name: $c.lit("placeobj"), func: l_obj_placeobj },
+        { name: $c.lit("container"), func: l_obj_container },
+        { name: $c.lit("contents"), func: l_obj_getcontents },
+        { name: $c.lit("addcontent"), func: l_obj_add_to_container },
+        { name: $c.lit("has_timer"), func: l_obj_timer_has },
+        { name: $c.lit("peek_timer"), func: l_obj_timer_peek },
+        { name: $c.lit("stop_timer"), func: l_obj_timer_stop },
+        { name: $c.lit("start_timer"), func: l_obj_timer_start },
+        { name: $c.lit("bury"), func: l_obj_bury },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 2; $i0++) {
         l_obj_meta[$i0].$copyFrom(new $T.luaL_Reg());
     }
-    l_obj_meta[0].name = $c.lit("__gc");
-    l_obj_meta[0].func = l_obj_gc;
-    l_obj_meta[1].name = null;
-    l_obj_meta[1].func = null;
+    $c.init(l_obj_meta, [
+        { name: $c.lit("__gc"), func: l_obj_gc },
+        {}
+    ]);
 }

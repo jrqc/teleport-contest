@@ -935,6 +935,8 @@ export async function region_safety() {   // region.c:1368
 
 export function $init() {
     callbacks.fill(null);
-    callbacks[0] = inside_gas_cloud;
-    callbacks[1] = expire_gas_cloud;
+    $c.init(callbacks, [
+        inside_gas_cloud,
+        expire_gas_cloud
+    ]);
 }

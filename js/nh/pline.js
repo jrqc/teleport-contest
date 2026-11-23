@@ -143,7 +143,7 @@ async function vpline(line, the_args) {   // pline.c:153
     }
     if (ln > BUFSZ - 1) {
         if (!$c.peq(line, new $c.Ptr(pbuf, 0))) {
-            $c.__builtin___strncpy_chk(new $c.Ptr(pbuf, 0), line, 255, 1280);
+            $c.__builtin___strncpy_chk(new $c.Ptr(pbuf, 0), line, BUFSZ - 1, 1280);
         }
         $t3 = ($t2 = pbuf[BUFSZ - 1 - 4] = 46, pbuf[BUFSZ - 1 - 5] = $t2), pbuf[BUFSZ - 1 - 6] = $t3;
         pbuf[BUFSZ - 1 - 3] = line.get(ln - 3 | 0);
@@ -181,7 +181,7 @@ async function vpline(line, the_args) {   // pline.c:153
         await putmesg(line);
         await execplinehandler(line);
         iflags.last_msg = PLNMSG_UNKNOWN;
-        $c.__builtin___strncpy_chk(new $c.Ptr(gp.prevmsg, 0), line, 256, 256), gp.prevmsg[BUFSZ - 1] = 0;
+        $c.__builtin___strncpy_chk(new $c.Ptr(gp.prevmsg, 0), line, BUFSZ, 256), gp.prevmsg[BUFSZ - 1] = 0;
         if (msgtyp === MSGTYP_STOP) {
             await display_nhwindow()($G.WIN_MESSAGE, TRUE);
         }
@@ -354,7 +354,7 @@ async function vraw_printf(line, the_args) {   // pline.c:563
     }
     if ($c.i32($c.strlen(line)) > BUFSZ - 1) {
         if (!$c.peq(line, new $c.Ptr(pbuf, 0))) {
-            line = $c.__builtin___strncpy_chk(new $c.Ptr(pbuf, 0), line, 255, 1280);
+            line = $c.__builtin___strncpy_chk(new $c.Ptr(pbuf, 0), line, BUFSZ - 1, 1280);
         }
         pbuf[BUFSZ - 1] = 0;
     }

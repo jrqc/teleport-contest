@@ -20,7 +20,7 @@ import { MIGR_APPROX_XY, MIGR_EXACT_XY, MIGR_LADDER_DOWN, MIGR_LADDER_UP, MIGR_L
 import { In_endgame } from './dungeon.macros.js';
 import { panic } from './end.js';
 import { FULL_MOON } from './flag.h.js';
-import { FALSE, LARGEST_INT, LL_CONDUCT, MAXMONNO, TRUE } from './global.h.js';
+import { COLNO, FALSE, LARGEST_INT, LL_CONDUCT, MAXMONNO, ROWNO, TRUE } from './global.h.js';
 import { in_rooms, monst_to_any } from './hack.js';
 import { CORPSTAT_FEMALE, CORPSTAT_GENDER, CORPSTAT_MALE, DF_ALL, DISMOUNT_GENERIC, DISMOUNT_THROWN, EYE, MM_EDOG, MM_FEMALE, MM_IGNOREWATER, MM_MALE, MM_NOMSG, NO_MINVENT, NO_TRAP_FLAGS, RLOC_NOMSG } from './hack.h.js';
 import { max } from './hack.macros.js';
@@ -42,7 +42,7 @@ import { acidic, carnivorous, emits_light, flesh_petrifies, haseyes, herbivorous
 import { G_EXTINCT, M3_WANTSARTI } from './monflag.h.js';
 import { find_pmmonst, mon_track_clear } from './monmove.js';
 import { mons } from './monst.js';
-import { MON_LIMBO, MON_MIGRATING, MON_STILL_ARRIVING, NEED_HTH_WEAPON, STRAT_ARRIVE, STRAT_WAITFORU } from './monst.h.js';
+import { MAX_NUM_WORMS, MON_LIMBO, MON_MIGRATING, MON_STILL_ARRIVING, NEED_HTH_WEAPON, STRAT_ARRIVE, STRAT_WAITFORU } from './monst.h.js';
 import { DEADMONSTER, helpless, is_vampshifter, ismnum, resists_acid, resists_poison, resists_ston } from './monst.macros.js';
 import { PM_BARBARIAN, PM_CAVE_DWELLER, PM_GELATINOUS_CUBE, PM_GHOUL, PM_KILLER_BEE, PM_KITTEN, PM_LICHEN, PM_LITTLE_DOG, PM_LIZARD, PM_LONG_WORM, PM_MEDUSA, PM_PONY, PM_PYROLISK, PM_QUEEN_BEE, PM_RANGER, PM_RUST_MONSTER, PM_SAMURAI } from './monsters.h.js';
 import { OBJ_FREE } from './obj.h.js';
@@ -473,10 +473,10 @@ export async function mon_arrive(mtmp, when) {   // dog.c:420
             }
         } else {
             i = 1 > (xlocale - wander | 0) ? 1 : xlocale - wander | 0;
-            j = 79 < (xlocale + wander | 0) ? 79 : xlocale + wander | 0;
+            j = COLNO - 1 < (xlocale + wander | 0) ? COLNO - 1 : xlocale + wander | 0;
             xlocale = $c.i16(rn2(j - i | 0) + i | 0);
             i = 0 > (ylocale - wander | 0) ? 0 : ylocale - wander | 0;
-            j = 20 < (ylocale + wander | 0) ? 20 : ylocale + wander | 0;
+            j = ROWNO - 1 < (ylocale + wander | 0) ? ROWNO - 1 : ylocale + wander | 0;
             ylocale = $c.i16(rn2(j - i | 0) + i | 0);
         }
     }
@@ -593,7 +593,7 @@ async function mon_leave(mtmp) {   // dog.c:729
         cnt = count_wsegs(mtmp);
         mx = mtmp.mx;
         my = mtmp.my;
-        num_segs = cnt < 31 ? cnt : 31;
+        num_segs = cnt < MAX_NUM_WORMS - 1 ? cnt : MAX_NUM_WORMS - 1;
         await wormgone(mtmp);
         if (mx) {
             await place_monster(mtmp, $c.i16(mx), $c.i16(my));

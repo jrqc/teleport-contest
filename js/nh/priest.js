@@ -14,7 +14,7 @@ import { assign_level, mapseen_temple, on_level } from './dungeon.js';
 import { In_endgame } from './dungeon.macros.js';
 import { FALSE, LL_CONDUCT, TRUE } from './global.h.js';
 import { check_special_room, in_rooms, money_cnt, nomul } from './hack.js';
-import { ARTICLE_A, ARTICLE_NONE, ARTICLE_THE, ARTICLE_YOUR, MM_ADJACENTOK, MM_EMIN, MM_EPRI, MM_NOMSG, N_DIRS, N_DIRS_Z, RLOC_NOMSG, SPINE } from './hack.h.js';
+import { ARTICLE_A, ARTICLE_NONE, ARTICLE_THE, ARTICLE_YOUR, MM_ADJACENTOK, MM_EMIN, MM_EPRI, MM_NOMSG, N_DIRS, RLOC_NOMSG, SPINE } from './hack.h.js';
 import { DIR_CLAMP, onlineu, verbalize1 } from './hack.macros.js';
 import { dist2, s_suffix, sgn, strncmpi } from './hacklib.js';
 import { record_achievement } from './insight.js';
@@ -27,6 +27,7 @@ import { bribe, newemin } from './minion.js';
 import { curse, mkobj, uncurse } from './mkobj.js';
 import { ROOMOFFSET, TEMPLE } from './mkroom.h.js';
 import { mfndpos, mon_allowflags, mongone, monnear, setmangry, wakeup } from './mon.js';
+import { AD_ELEC, AD_MAGM } from './monattk.h.js';
 import { mon_learns_traps, pronoun_gender, resist_conflict } from './mondata.js';
 import { is_minion, is_rider } from './mondata.macros.js';
 import { M1_SEE_INVIS } from './monflag.h.js';
@@ -213,7 +214,7 @@ export async function priestini(lvl, sroom, sx, sy, sanctum) {   // priest.c:220
     let priest = null, otmp = null, cnt = 0, px = 0, py = 0, i = 0, si = 0, prim = null;
     px = 0;
     py = 0;
-    si = rn2(N_DIRS_Z - 2);
+    si = rn2(N_DIRS);
     prim = $c.relem(mons, sanctum ? PM_HIGH_CLERIC : PM_ALIGNED_CLERIC);
     for (i = 0; i < N_DIRS; i = i + 1 | 0) {
         px = sx + xdir[DIR_CLAMP(i + si | 0)] | 0;
@@ -331,7 +332,7 @@ function has_shrine(pri) {   // priest.c:376
     if (!IS_ALTAR(lev.typ) || !((lev.flags | 0) & AM_SHRINE)) {
         return FALSE;
     }
-    return $c.i8(epri_p.shralign === $c.i8(((lev.flags | 0) & -9 & AM_MASK) === 0 ? A_NONE : ((lev.flags | 0) & -9 & AM_MASK) === AM_LAWFUL ? A_LAWFUL : ((lev.flags | 0) & -9 & AM_MASK) - 2 | 0) ? 1 : 0);
+    return $c.i8(epri_p.shralign === $c.i8(((lev.flags | 0) & ~AM_SHRINE & AM_MASK) === 0 ? A_NONE : ((lev.flags | 0) & ~AM_SHRINE & AM_MASK) === AM_LAWFUL ? A_LAWFUL : ((lev.flags | 0) & ~AM_SHRINE & AM_MASK) - 2 | 0) ? 1 : 0);
 }
 export function findpriest(roomno) {   // priest.c:392
     let mtmp = null;
@@ -680,7 +681,7 @@ export async function ghod_hitsu(priest) {   // priest.c:796
     gc.current_wand = null;
     oldbuzzer = gb.buzzer;
     gb.buzzer = null;
-    await buzz(-10 - $c.rem32($c.abs(5), 10) | 0, 6, x, y, sgn(gt.tbx), sgn(gt.tby));
+    await buzz(-10 - $c.rem32($c.abs(AD_ELEC - AD_MAGM), 10) | 0, 6, x, y, sgn(gt.tbx), sgn(gt.tby));
     gb.buzzer = oldbuzzer;
     gc.current_wand = oldcurrwand;
     await exercise(A_WIS, FALSE);
@@ -692,7 +693,7 @@ export async function angry_priest() {   // priest.c:877
         await wakeup(priest, FALSE);
         await setmangry(priest, FALSE);
         lev = $c.relem(svl.level.locations[eprip.shrpos.x], eprip.shrpos.y);
-        if (!IS_ALTAR(lev.typ) || $c.i8(((lev.flags | 0) & 7 & AM_MASK) === 0 ? A_NONE : ((lev.flags | 0) & 7 & AM_MASK) === AM_LAWFUL ? A_LAWFUL : ((lev.flags | 0) & 7 & AM_MASK) - 2 | 0) !== eprip.shralign) {
+        if (!IS_ALTAR(lev.typ) || $c.i8(((lev.flags | 0) & AM_MASK & AM_MASK) === 0 ? A_NONE : ((lev.flags | 0) & AM_MASK & AM_MASK) === AM_LAWFUL ? A_LAWFUL : ((lev.flags | 0) & AM_MASK & AM_MASK) - 2 | 0) !== eprip.shralign) {
             if (!EMIN(priest)) {
                 await newemin(priest);
             }
@@ -726,7 +727,9 @@ export function restpriest(mtmp, ghostly) {   // priest.c:933
 
 export function $init() {
     priest_talk$cranky_msg.fill(null);
-    priest_talk$cranky_msg[0] = $c.lit("Thou wouldst have words, eh?  I'll give thee a word or two!");
-    priest_talk$cranky_msg[1] = $c.lit("Talk?  Here is what I have to say!");
-    priest_talk$cranky_msg[2] = $c.lit("Pilgrim, I would speak no longer with thee.");
+    $c.init(priest_talk$cranky_msg, [
+        $c.lit("Thou wouldst have words, eh?  I'll give thee a word or two!"),
+        $c.lit("Talk?  Here is what I have to say!"),
+        $c.lit("Pilgrim, I would speak no longer with thee.")
+    ]);
 }

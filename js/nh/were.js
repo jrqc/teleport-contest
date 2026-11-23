@@ -8,6 +8,7 @@ import { flags, gw, gy, svc, u } from './decl.js';
 import { canseemon, newsym } from './display.js';
 import { Mgender, Monnam, pmname } from './do_name.js';
 import { tamedog } from './dog.js';
+import { FULL_MOON } from './flag.h.js';
 import { ParanoidWerechange } from './flag.macros.js';
 import { FALSE, TRUE } from './global.h.js';
 import { monster_nearby } from './hack.js';
@@ -37,7 +38,7 @@ export async function were_change(mon) {   // were.c:9
         return;
     }
     if (is_human(mon.data)) {
-        if (!Protection_from_shape_changers() && !rn2(night() ? flags.moonphase === 4 ? 3 : 30 : flags.moonphase === 4 ? 10 : 50)) {
+        if (!Protection_from_shape_changers() && !rn2(night() ? flags.moonphase === FULL_MOON ? 3 : 30 : flags.moonphase === FULL_MOON ? 10 : 50)) {
             await new_were(mon);
             gw.were_changes = $c.add64(gw.were_changes, 1);
             if (!Deaf() && !canseemon(mon)) {

@@ -113,7 +113,7 @@ export async function choose_windows(s) {   // windows.c:267
     }
     if ($c.strlen(s) >= WINDOW_TYPE_MAXLEN) {
         tmps = $c.asArr(await alloc(WINDOW_TYPE_MAXLEN), Int8Array);
-        $c.__builtin___strncpy_chk(tmps, s, 49, -1);
+        $c.__builtin___strncpy_chk(tmps, s, WINDOW_TYPE_MAXLEN - 1, -1);
         tmps.set(WINDOW_TYPE_MAXLEN - 1, 0);
         s = tmps;
     }
@@ -802,10 +802,10 @@ export function $init() {
     for (let $i0 = 0; $i0 < 2; $i0++) {
         winchoices[$i0].$copyFrom(new $T.win_choices());
     }
-    winchoices[0].procs = tty_procs;
-    winchoices[0].ini_routine = win_tty_init;
-    winchoices[1].procs = null;
-    winchoices[1].ini_routine = null;
+    $c.init(winchoices, [
+        { procs: tty_procs, ini_routine: win_tty_init },
+        {}
+    ]);
     hup_procs.$copyFrom(new $T.window_procs());
     hup_procs.name = $c.lit("hup");
     hup_procs.wp_id = wp_hup;
@@ -896,80 +896,28 @@ export function $init() {
     for (let $i0 = 0; $i0 < 5; $i0++) {
         genl_status_update$fieldorder[$i0].fill(0);
     }
-    genl_status_update$fieldorder[0][0] = BL_TITLE;
-    genl_status_update$fieldorder[0][1] = BL_STR;
-    genl_status_update$fieldorder[0][2] = BL_DX;
-    genl_status_update$fieldorder[0][3] = BL_CO;
-    genl_status_update$fieldorder[0][4] = BL_IN;
-    genl_status_update$fieldorder[0][5] = BL_WI;
-    genl_status_update$fieldorder[0][6] = BL_CH;
-    genl_status_update$fieldorder[0][7] = BL_ALIGN;
-    genl_status_update$fieldorder[0][8] = BL_SCORE;
-    genl_status_update$fieldorder[0][9] = BL_FLUSH;
-    genl_status_update$fieldorder[0][10] = BL_FLUSH;
-    genl_status_update$fieldorder[0][11] = BL_FLUSH;
-    genl_status_update$fieldorder[0][12] = BL_FLUSH;
-    genl_status_update$fieldorder[0][13] = BL_FLUSH;
-    genl_status_update$fieldorder[0][14] = BL_FLUSH;
-    genl_status_update$fieldorder[1][0] = BL_LEVELDESC;
-    genl_status_update$fieldorder[1][1] = BL_GOLD;
-    genl_status_update$fieldorder[1][2] = BL_HP;
-    genl_status_update$fieldorder[1][3] = BL_HPMAX;
-    genl_status_update$fieldorder[1][4] = BL_ENE;
-    genl_status_update$fieldorder[1][5] = BL_ENEMAX;
-    genl_status_update$fieldorder[1][6] = BL_AC;
-    genl_status_update$fieldorder[1][7] = BL_XP;
-    genl_status_update$fieldorder[1][8] = BL_EXP;
-    genl_status_update$fieldorder[1][9] = BL_HD;
-    genl_status_update$fieldorder[1][10] = BL_TIME;
-    genl_status_update$fieldorder[1][11] = BL_HUNGER;
-    genl_status_update$fieldorder[1][12] = BL_CAP;
-    genl_status_update$fieldorder[1][13] = BL_CONDITION;
-    genl_status_update$fieldorder[1][14] = BL_FLUSH;
-    genl_status_update$fieldorder[2][0] = BL_LEVELDESC;
-    genl_status_update$fieldorder[2][1] = BL_GOLD;
-    genl_status_update$fieldorder[2][2] = BL_HP;
-    genl_status_update$fieldorder[2][3] = BL_HPMAX;
-    genl_status_update$fieldorder[2][4] = BL_ENE;
-    genl_status_update$fieldorder[2][5] = BL_ENEMAX;
-    genl_status_update$fieldorder[2][6] = BL_AC;
-    genl_status_update$fieldorder[2][7] = BL_XP;
-    genl_status_update$fieldorder[2][8] = BL_EXP;
-    genl_status_update$fieldorder[2][9] = BL_HD;
-    genl_status_update$fieldorder[2][10] = BL_HUNGER;
-    genl_status_update$fieldorder[2][11] = BL_CAP;
-    genl_status_update$fieldorder[2][12] = BL_CONDITION;
-    genl_status_update$fieldorder[2][13] = BL_TIME;
-    genl_status_update$fieldorder[2][14] = BL_FLUSH;
-    genl_status_update$fieldorder[3][0] = BL_LEVELDESC;
-    genl_status_update$fieldorder[3][1] = BL_GOLD;
-    genl_status_update$fieldorder[3][2] = BL_HP;
-    genl_status_update$fieldorder[3][3] = BL_HPMAX;
-    genl_status_update$fieldorder[3][4] = BL_ENE;
-    genl_status_update$fieldorder[3][5] = BL_ENEMAX;
-    genl_status_update$fieldorder[3][6] = BL_AC;
-    genl_status_update$fieldorder[3][7] = BL_HUNGER;
-    genl_status_update$fieldorder[3][8] = BL_CAP;
-    genl_status_update$fieldorder[3][9] = BL_CONDITION;
-    genl_status_update$fieldorder[3][10] = BL_XP;
-    genl_status_update$fieldorder[3][11] = BL_EXP;
-    genl_status_update$fieldorder[3][12] = BL_HD;
-    genl_status_update$fieldorder[3][13] = BL_TIME;
-    genl_status_update$fieldorder[3][14] = BL_FLUSH;
-    genl_status_update$fieldorder[4][0] = BL_HP;
-    genl_status_update$fieldorder[4][1] = BL_HPMAX;
-    genl_status_update$fieldorder[4][2] = BL_ENE;
-    genl_status_update$fieldorder[4][3] = BL_ENEMAX;
-    genl_status_update$fieldorder[4][4] = BL_AC;
-    genl_status_update$fieldorder[4][5] = BL_HUNGER;
-    genl_status_update$fieldorder[4][6] = BL_CAP;
-    genl_status_update$fieldorder[4][7] = BL_CONDITION;
-    genl_status_update$fieldorder[4][8] = BL_LEVELDESC;
-    genl_status_update$fieldorder[4][9] = BL_GOLD;
-    genl_status_update$fieldorder[4][10] = BL_XP;
-    genl_status_update$fieldorder[4][11] = BL_EXP;
-    genl_status_update$fieldorder[4][12] = BL_HD;
-    genl_status_update$fieldorder[4][13] = BL_TIME;
-    genl_status_update$fieldorder[4][14] = BL_FLUSH;
+    $c.init(genl_status_update$fieldorder, [
+        [BL_TITLE, BL_STR, BL_DX, BL_CO, BL_IN, BL_WI, BL_CH, BL_ALIGN,
+          BL_SCORE, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH, BL_FLUSH,
+          BL_FLUSH],
+        [BL_LEVELDESC, BL_GOLD,
+          BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX, BL_AC,
+          BL_XP, BL_EXP, BL_HD,
+          BL_TIME,
+          BL_HUNGER, BL_CAP, BL_CONDITION,
+          BL_FLUSH],
+        [BL_LEVELDESC, BL_GOLD,
+          BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX, BL_AC,
+          BL_XP, BL_EXP, BL_HD,
+          BL_HUNGER, BL_CAP, BL_CONDITION,
+          BL_TIME, BL_FLUSH],
+        [BL_LEVELDESC, BL_GOLD,
+          BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX, BL_AC,
+          BL_HUNGER, BL_CAP, BL_CONDITION,
+          BL_XP, BL_EXP, BL_HD, BL_TIME, BL_FLUSH],
+        [BL_HP, BL_HPMAX, BL_ENE, BL_ENEMAX, BL_AC,
+          BL_HUNGER, BL_CAP, BL_CONDITION,
+          BL_LEVELDESC, BL_GOLD, BL_XP, BL_EXP, BL_HD, BL_TIME, BL_FLUSH]
+    ]);
     encglyph$encbuf.fill(0);
 }

@@ -29,7 +29,7 @@ export async function selection_new() {   // selvar.c:15
     tmps.bounds.ly = ROWNO;
     $t1 = tmps.bounds.hy = 0, tmps.bounds.hx = $t1;
     $t2 = $c.asArr(await alloc(COLNO * ROWNO + 1), Int8Array), tmps.map = $t2;
-    $c.__builtin___memset_chk(tmps.map, 1, 1680, -1);
+    $c.__builtin___memset_chk(tmps.map, 1, COLNO * ROWNO, -1);
     tmps.map.set(COLNO * ROWNO, 0);
     return tmps;
 }
@@ -48,7 +48,7 @@ export function selection_free(sel, freesel) {   // selvar.c:33
 }
 export function selection_clear(sel, val) {   // selvar.c:48
     let $t1;
-    $c.__builtin___memset_chk(sel.map, 1 + val | 0, 1680, -1);
+    $c.__builtin___memset_chk(sel.map, 1 + val | 0, COLNO * ROWNO, -1);
     if (val) {
         sel.bounds.lx = 0;
         sel.bounds.ly = 0;
@@ -280,8 +280,8 @@ export async function selection_do_grow(ov, dir) {   // selvar.c:321
         dir = random_wdir();
     }
     selection_getbounds(ov, rect);
-    for (x = $c.i16(0 > (rect.lx - 1 | 0) ? 0 : rect.lx - 1 | 0); x <= (79 < (rect.hx + 1 | 0) ? 79 : rect.hx + 1 | 0); x = $c.i16(x + 1)) {
-        for (y = $c.i16(0 > (rect.ly - 1 | 0) ? 0 : rect.ly - 1 | 0); y <= (20 < (rect.hy + 1 | 0) ? 20 : rect.hy + 1 | 0); y = $c.i16(y + 1)) {
+    for (x = $c.i16(0 > (rect.lx - 1 | 0) ? 0 : rect.lx - 1 | 0); x <= (COLNO - 1 < (rect.hx + 1 | 0) ? COLNO - 1 : rect.hx + 1 | 0); x = $c.i16(x + 1)) {
+        for (y = $c.i16(0 > (rect.ly - 1 | 0) ? 0 : rect.ly - 1 | 0); y <= (ROWNO - 1 < (rect.hy + 1 | 0) ? ROWNO - 1 : rect.hy + 1 | 0); y = $c.i16(y + 1)) {
             if (dir & W_WEST && selection_getpoint($c.i16(x + 1 | 0), y, ov) || (dir & (W_WEST | W_NORTH)) === (W_WEST | W_NORTH) && selection_getpoint($c.i16(x + 1 | 0), $c.i16(y + 1 | 0), ov) || dir & W_NORTH && selection_getpoint(x, $c.i16(y + 1 | 0), ov) || (dir & (W_NORTH | W_EAST)) === (W_NORTH | W_EAST) && selection_getpoint($c.i16(x - 1 | 0), $c.i16(y + 1 | 0), ov) || dir & W_EAST && selection_getpoint($c.i16(x - 1 | 0), y, ov) || (dir & (W_EAST | W_SOUTH)) === (W_EAST | W_SOUTH) && selection_getpoint($c.i16(x - 1 | 0), $c.i16(y - 1 | 0), ov) || dir & W_SOUTH && selection_getpoint(x, $c.i16(y - 1 | 0), ov) || (dir & (W_SOUTH | W_WEST)) === (W_SOUTH | W_WEST) && selection_getpoint($c.i16(x + 1 | 0), $c.i16(y - 1 | 0), ov)) {
                 selection_setpoint(x, y, tmp, 1);
             }

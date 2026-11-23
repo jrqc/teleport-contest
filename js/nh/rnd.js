@@ -218,10 +218,8 @@ export function $init() {
     for (let $i0 = 0; $i0 < 2; $i0++) {
         rnglist[$i0].$copyFrom(new $T.rnglist_t());
     }
-    rnglist[0].fn = rn2;
-    rnglist[0].init = 0;
-    rnglist[0].rng_state.n = 0;
-    rnglist[1].fn = rn2_on_display_rng;
-    rnglist[1].init = 0;
-    rnglist[1].rng_state.n = 0;
+    $c.init(rnglist, [
+        { fn: rn2, init: 0, rng_state: {} },
+        { fn: rn2_on_display_rng, init: 0, rng_state: {} }
+    ]);
 }

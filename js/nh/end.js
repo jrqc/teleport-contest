@@ -1204,50 +1204,50 @@ export async function NH_abort(why) {   // end.c:1910
 
 export function $init() {
     deaths.fill(null);
-    deaths[0] = $c.lit("died");
-    deaths[1] = $c.lit("choked");
-    deaths[2] = $c.lit("poisoned");
-    deaths[3] = $c.lit("starvation");
-    deaths[4] = $c.lit("drowning");
-    deaths[5] = $c.lit("burning");
-    deaths[6] = $c.lit("dissolving under the heat and pressure");
-    deaths[7] = $c.lit("crushed");
-    deaths[8] = $c.lit("turned to stone");
-    deaths[9] = $c.lit("turned into slime");
-    deaths[10] = $c.lit("genocided");
-    deaths[11] = $c.lit("panic");
-    deaths[12] = $c.lit("trickery");
-    deaths[13] = $c.lit("quit");
-    deaths[14] = $c.lit("escaped");
-    deaths[15] = $c.lit("ascended");
+    $c.init(deaths, [
+        $c.lit("died"),
+        $c.lit("choked"),
+        $c.lit("poisoned"),
+        $c.lit("starvation"),
+        $c.lit("drowning"),
+        $c.lit("burning"),
+        $c.lit("dissolving under the heat and pressure"),
+        $c.lit("crushed"),
+        $c.lit("turned to stone"),
+        $c.lit("turned into slime"),
+        $c.lit("genocided"),
+        $c.lit("panic"),
+        $c.lit("trickery"),
+        $c.lit("quit"),
+        $c.lit("escaped"),
+        $c.lit("ascended")
+    ]);
     ends.fill(null);
-    ends[0] = $c.lit("died");
-    ends[1] = $c.lit("choked");
-    ends[2] = $c.lit("were poisoned");
-    ends[3] = $c.lit("starved");
-    ends[4] = $c.lit("drowned");
-    ends[5] = $c.lit("burned");
-    ends[6] = $c.lit("dissolved in the lava");
-    ends[7] = $c.lit("were crushed");
-    ends[8] = $c.lit("turned to stone");
-    ends[9] = $c.lit("turned into slime");
-    ends[10] = $c.lit("were genocided");
-    ends[11] = $c.lit("panicked");
-    ends[12] = $c.lit("were tricked");
-    ends[13] = $c.lit("quit");
-    ends[14] = $c.lit("escaped");
-    ends[15] = $c.lit("ascended");
+    $c.init(ends, [
+        $c.lit("died"),
+        $c.lit("choked"),
+        $c.lit("were poisoned"),
+        $c.lit("starved"),
+        $c.lit("drowned"),
+        $c.lit("burned"),
+        $c.lit("dissolved in the lava"),
+        $c.lit("were crushed"),
+        $c.lit("turned to stone"),
+        $c.lit("turned into slime"),
+        $c.lit("were genocided"),
+        $c.lit("panicked"),
+        $c.lit("were tricked"),
+        $c.lit("quit"),
+        $c.lit("escaped"),
+        $c.lit("ascended")
+    ]);
     Schroedingers_cat = 0;
     for (let $i0 = 0; $i0 < 2; $i0++) {
         death_fixups[$i0].$copyFrom(new $T.anon_end_350());
     }
-    death_fixups[0].why = STONING;
-    death_fixups[0].unmulti = 1;
-    death_fixups[0].exclude = $c.lit("getting stoned");
-    death_fixups[0].include = null;
-    death_fixups[1].why = STARVING;
-    death_fixups[1].unmulti = 0;
-    death_fixups[1].exclude = $c.lit("fainted from lack of food");
-    death_fixups[1].include = $c.lit("fainted");
+    $c.init(death_fixups, [
+        { why: STONING, unmulti: 1, exclude: $c.lit("getting stoned"), include: null },
+        { why: STARVING, unmulti: 0, exclude: $c.lit("fainted from lack of food"), include: $c.lit("fainted") }
+    ]);
     NH_abort$aborting = 0;
 }

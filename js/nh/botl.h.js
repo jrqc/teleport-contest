@@ -118,3 +118,4 @@ export const HL_ITALIC = 8;
 export const HL_ULINE = 16;
 export const HL_BLINK = 32;
 export const HL_INVERSE = 64;
+export const MAXVALWIDTH = 80;

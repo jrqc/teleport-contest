@@ -27,7 +27,7 @@ import { In_endgame } from './dungeon.macros.js';
 import { del_engr_at, disturb_grave, u_wipe_engr } from './engrave.js';
 import { scatter } from './explode.js';
 import { sink_backs_up } from './fountain.js';
-import { FALSE, TRUE } from './global.h.js';
+import { FALSE, PL_NSIZ, TRUE } from './global.h.js';
 import { impact_disturbs_zombies, in_rooms, in_town, inv_weight, losehp, money_cnt, near_capacity, overexertion, weight_cap } from './hack.js';
 import { CXN_PFX_THE, DF_ALL, DF_RANDOM, ECMD_CANCEL, ECMD_FAIL, ECMD_OK, ECMD_TIME, FOOT, KICKED_WEAPON, KILLED_BY, LEG, MAY_HIT, MM_ANGRY, MM_FEMALE, MM_MALE, MM_NOMSG, NO_TRAP_FLAGS, SHOP_DOOR_COST, SLT_ENCUMBER, VIS_EFFECTS } from './hack.h.js';
 import { Maybe_Half_Phys } from './hack.macros.js';
@@ -1297,7 +1297,7 @@ export async function impact_drop(missile, x, y, dlev) {   // dokick.c:1511
             await You($c.lit("removed %ld %s worth of goods!"), price, await currency(price));
             if (cansee(shkp.mx, shkp.my)) {
                 if (shkp.mextra.eshk.customer[0] === 0) {
-                    $c.__builtin___strncpy_chk(new $c.Ptr(shkp.mextra.eshk.customer, 0), new $c.Ptr(svp.plname, 0), 32, 32);
+                    $c.__builtin___strncpy_chk(new $c.Ptr(shkp.mextra.eshk.customer, 0), new $c.Ptr(svp.plname, 0), PL_NSIZ, 32);
                 }
                 if (angry) {
                     await pline($c.lit("%s is infuriated!"), await Shknam(shkp));
@@ -1576,7 +1576,9 @@ export function $init() {
     kick_passes_thru.fill(0);
     kick_passes_thru.set([107, 105, 99, 107, 32, 112, 97, 115, 115, 101, 115, 32, 104, 97, 114, 109, 108, 101, 115, 115, 108, 121, 32, 116, 104, 114, 111, 117, 103, 104]);   // "kick passes harmlessly through"
     really_kick_object$flyingcoinmsg.fill(null);
-    really_kick_object$flyingcoinmsg[0] = $c.lit("scatter the coins");
-    really_kick_object$flyingcoinmsg[1] = $c.lit("knock coins all over the place");
-    really_kick_object$flyingcoinmsg[2] = $c.lit("send coins flying in all directions");
+    $c.init(really_kick_object$flyingcoinmsg, [
+        $c.lit("scatter the coins"),
+        $c.lit("knock coins all over the place"),
+        $c.lit("send coins flying in all directions")
+    ]);
 }

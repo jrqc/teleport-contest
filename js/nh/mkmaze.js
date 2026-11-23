@@ -31,7 +31,7 @@ import { somex, somey } from './mkroom.js';
 import { dmonsfree, elemental_clog, m_into_limbo, mnearto, mnexto } from './mon.js';
 import { poly_when_stoned } from './mondata.js';
 import { is_orc } from './mondata.macros.js';
-import { M1_SWIM, M2_ORC } from './monflag.h.js';
+import { M1_SWIM, M2_ORC, MR_STONE } from './monflag.h.js';
 import { mons } from './monst.js';
 import { MON_BUBBLEMOVE } from './monst.h.js';
 import { DEADMONSTER } from './monst.macros.js';
@@ -413,7 +413,7 @@ async function baalz_fixup() {   // mkmaze.c:475
             }
         }
     }
-    await wallification($c.i16((gb.bughack.inarea.x1 - 2 | 0) > 1 ? gb.bughack.inarea.x1 - 2 | 0 : 1), $c.i16((gb.bughack.inarea.y1 - 2 | 0) > 0 ? gb.bughack.inarea.y1 - 2 | 0 : 0), $c.i16((gb.bughack.inarea.x2 + 2 | 0) < 79 ? gb.bughack.inarea.x2 + 2 | 0 : 79), $c.i16((gb.bughack.inarea.y2 + 2 | 0) < 20 ? gb.bughack.inarea.y2 + 2 | 0 : 20));
+    await wallification($c.i16((gb.bughack.inarea.x1 - 2 | 0) > 1 ? gb.bughack.inarea.x1 - 2 | 0 : 1), $c.i16((gb.bughack.inarea.y1 - 2 | 0) > 0 ? gb.bughack.inarea.y1 - 2 | 0 : 0), $c.i16((gb.bughack.inarea.x2 + 2 | 0) < COLNO - 1 ? gb.bughack.inarea.x2 + 2 | 0 : COLNO - 1), $c.i16((gb.bughack.inarea.y2 + 2 | 0) < ROWNO - 1 ? gb.bughack.inarea.y2 + 2 | 0 : ROWNO - 1));
     x = gb.bughack.delarea.x1, y = gb.bughack.delarea.y1;
     if (isok($c.i16(x), $c.i16(y)) && (svl.level.locations[x][y].typ === TLWALL || svl.level.locations[x][y].typ === TRWALL) && isok($c.i16(x), $c.i16(y + 1 | 0)) && svl.level.locations[x][y + 1 | 0].typ === TUWALL) {
         svl.level.locations[x][y].typ = $c.i8(svl.level.locations[x][y].typ === TLWALL ? BRCORNER : BLCORNER);
@@ -505,7 +505,7 @@ export async function fixup_special() {   // mkmaze.c:570
             if (goodpos($c.i16(x), $c.i16(y), null, 0)) {
                 tryct2 = 0;
                 otmp = await mk_tt_object(STATUE, $c.i16(x), $c.i16(y));
-                while ((tryct2 = tryct2 + 1 | 0) < 100 && otmp && (poly_when_stoned($c.relem(mons, otmp.corpsenm)) || ($c.relem(mons, otmp.corpsenm).mresists & 128) !== 0)) {
+                while ((tryct2 = tryct2 + 1 | 0) < 100 && otmp && (poly_when_stoned($c.relem(mons, otmp.corpsenm)) || ($c.relem(mons, otmp.corpsenm).mresists & MR_STONE) !== 0)) {
                     await set_corpsenm(otmp, await rndmonnum());
                 }
             }
@@ -517,7 +517,7 @@ export async function fixup_special() {   // mkmaze.c:570
         }
         if (otmp) {
             tryct = 0;
-            while ((tryct = tryct + 1 | 0) < 100 && (($c.relem(mons, otmp.corpsenm).mresists & 128) !== 0 || poly_when_stoned($c.relem(mons, otmp.corpsenm)))) {
+            while ((tryct = tryct + 1 | 0) < 100 && (($c.relem(mons, otmp.corpsenm).mresists & MR_STONE) !== 0 || poly_when_stoned($c.relem(mons, otmp.corpsenm)))) {
                 await set_corpsenm(otmp, await rndmonnum());
             }
         }
@@ -859,8 +859,8 @@ export async function pick_vibrasquare_location() {   // mkmaze.c:1042
     }
     $t1 = svi.inv_pos.y = 0, svi.inv_pos.x = $t1;
     do {
-        x = $c.i16(rn2(x_range) + 7 | 0);
-        y = $c.i16(rn2(y_range) + 6 | 0);
+        x = $c.i16(rn2(x_range) + (x_maze_min + INVPOS_X_MARGIN + 1) | 0);
+        y = $c.i16(rn2(y_range) + (y_maze_min + INVPOS_Y_MARGIN + 1) | 0);
         if ((trycnt = trycnt + 1 | 0) > 1000) {
             break;
         }
@@ -1180,8 +1180,8 @@ export async function fumaroles() {   // mkmaze.c:1484
         sizemin = sizemin + 5 | 0;
     }
     for (n = nmax; n; n = $c.i16(n - 1)) {
-        x = $c.i16(rn2(76) + 3 | 0);
-        y = $c.i16(rn2(17) + 3 | 0);
+        x = $c.i16(rn2(COLNO - 4) + 3 | 0);
+        y = $c.i16(rn2(ROWNO - 4) + 3 | 0);
         if (svl.level.locations[x][y].typ === LAVAPOOL) {
             r = await create_gas_cloud(x, y, rn2(10) + sizemin | 0, rn2(10) + 5 | 0);
             clear_heros_fault(r);
@@ -1403,9 +1403,9 @@ async function setup_waterlevel() {   // mkmaze.c:1812
     svx.xmin = 3;
     svy.ymin = 1;
     svx.xmax = 78;
-    svx.xmax = svx.xmax < 78 ? svx.xmax : 78;
+    svx.xmax = svx.xmax < COLNO - 1 - 1 ? svx.xmax : COLNO - 1 - 1;
     svy.ymax = 20;
-    svy.ymax = svy.ymax < 20 ? svy.ymax : 20;
+    svy.ymax = svy.ymax < ROWNO - 1 ? svy.ymax : ROWNO - 1;
     glyph = ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S_water : S_air) === S_stone ? GLYPH_CMAP_STONE_OFF : ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S_water : S_air) <= S_trwall ? (((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S_water : S_air) - S_vwall | 0) + (In_mines(u.uz) ? GLYPH_CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH_CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH_CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH_CMAP_SOKO_OFF : GLYPH_CMAP_MAIN_OFF) | 0 : ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S_water : S_air) < S_altar ? (((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S_water : S_air) - S_ndoor | 0) + GLYPH_CMAP_A_OFF | 0 : ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S_water : S_air) === S_altar ? 4008 : ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S_water : S_air) < S_arrow_trap + MAXTCHARS ? (((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S_water : S_air) - S_grave | 0) + GLYPH_CMAP_B_OFF | 0 : ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S_water : S_air) <= S_goodpos ? (((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S_water : S_air) - S_digbeam | 0) + GLYPH_CMAP_C_OFF | 0 : NO_GLYPH;
     typ = (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? WATER : AIR;
     for (x = 1; x <= COLNO - 1; x = $c.i16(x + 1)) {
@@ -1634,26 +1634,30 @@ function gbymax() {
 
 export function $init() {
     orcfruit.fill(null);
-    orcfruit[0] = $c.lit("paddle cactus");
-    orcfruit[1] = $c.lit("dwarven root");
+    $c.init(orcfruit, [
+        $c.lit("paddle cactus"),
+        $c.lit("dwarven root")
+    ]);
     hero_bubble = null;
     fix_wall_spines$spine_array.fill(0);
-    fix_wall_spines$spine_array[0] = VWALL;
-    fix_wall_spines$spine_array[1] = HWALL;
-    fix_wall_spines$spine_array[2] = HWALL;
-    fix_wall_spines$spine_array[3] = HWALL;
-    fix_wall_spines$spine_array[4] = VWALL;
-    fix_wall_spines$spine_array[5] = TRCORNER;
-    fix_wall_spines$spine_array[6] = TLCORNER;
-    fix_wall_spines$spine_array[7] = TDWALL;
-    fix_wall_spines$spine_array[8] = VWALL;
-    fix_wall_spines$spine_array[9] = BRCORNER;
-    fix_wall_spines$spine_array[10] = BLCORNER;
-    fix_wall_spines$spine_array[11] = TUWALL;
-    fix_wall_spines$spine_array[12] = VWALL;
-    fix_wall_spines$spine_array[13] = TLWALL;
-    fix_wall_spines$spine_array[14] = TRWALL;
-    fix_wall_spines$spine_array[15] = CROSSWALL;
+    $c.init(fix_wall_spines$spine_array, [
+        VWALL,
+        HWALL,
+        HWALL,
+        HWALL,
+        VWALL,
+        TRCORNER,
+        TLCORNER,
+        TDWALL,
+        VWALL,
+        BRCORNER,
+        BLCORNER,
+        TUWALL,
+        VWALL,
+        TLWALL,
+        TRWALL,
+        CROSSWALL
+    ]);
     movebubbles$water_pos.$copyFrom(new $T.rm());
     movebubbles$water_pos.glyph = S_water - S_grave + GLYPH_CMAP_B_OFF;
     movebubbles$water_pos.typ = WATER;
@@ -1678,53 +1682,69 @@ export function $init() {
     movebubbles$air_pos.candig = (0) & 1;
     movebubbles$up = FALSE;
     mk_bubble$bm2.fill(0);
-    mk_bubble$bm2[0] = 2;
-    mk_bubble$bm2[1] = 1;
-    mk_bubble$bm2[2] = 3;
+    $c.init(mk_bubble$bm2, [
+        2,
+        1,
+        3
+    ]);
     mk_bubble$bm3.fill(0);
-    mk_bubble$bm3[0] = 3;
-    mk_bubble$bm3[1] = 2;
-    mk_bubble$bm3[2] = 7;
-    mk_bubble$bm3[3] = 7;
+    $c.init(mk_bubble$bm3, [
+        3,
+        2,
+        7,
+        7
+    ]);
     mk_bubble$bm4.fill(0);
-    mk_bubble$bm4[0] = 4;
-    mk_bubble$bm4[1] = 3;
-    mk_bubble$bm4[2] = 6;
-    mk_bubble$bm4[3] = 15;
-    mk_bubble$bm4[4] = 6;
+    $c.init(mk_bubble$bm4, [
+        4,
+        3,
+        6,
+        15,
+        6
+    ]);
     mk_bubble$bm5.fill(0);
-    mk_bubble$bm5[0] = 5;
-    mk_bubble$bm5[1] = 3;
-    mk_bubble$bm5[2] = 14;
-    mk_bubble$bm5[3] = 31;
-    mk_bubble$bm5[4] = 14;
+    $c.init(mk_bubble$bm5, [
+        5,
+        3,
+        14,
+        31,
+        14
+    ]);
     mk_bubble$bm6.fill(0);
-    mk_bubble$bm6[0] = 6;
-    mk_bubble$bm6[1] = 4;
-    mk_bubble$bm6[2] = 30;
-    mk_bubble$bm6[3] = 63;
-    mk_bubble$bm6[4] = 63;
-    mk_bubble$bm6[5] = 30;
+    $c.init(mk_bubble$bm6, [
+        6,
+        4,
+        30,
+        63,
+        63,
+        30
+    ]);
     mk_bubble$bm7.fill(0);
-    mk_bubble$bm7[0] = 7;
-    mk_bubble$bm7[1] = 4;
-    mk_bubble$bm7[2] = 62;
-    mk_bubble$bm7[3] = 127;
-    mk_bubble$bm7[4] = 127;
-    mk_bubble$bm7[5] = 62;
+    $c.init(mk_bubble$bm7, [
+        7,
+        4,
+        62,
+        127,
+        127,
+        62
+    ]);
     mk_bubble$bm8.fill(0);
-    mk_bubble$bm8[0] = 8;
-    mk_bubble$bm8[1] = 4;
-    mk_bubble$bm8[2] = 126;
-    mk_bubble$bm8[3] = 255;
-    mk_bubble$bm8[4] = 255;
-    mk_bubble$bm8[5] = 126;
+    $c.init(mk_bubble$bm8, [
+        8,
+        4,
+        126,
+        255,
+        255,
+        126
+    ]);
     mk_bubble$bmask.fill(null);
-    mk_bubble$bmask[0] = new $c.Ptr(mk_bubble$bm2, 0);
-    mk_bubble$bmask[1] = new $c.Ptr(mk_bubble$bm3, 0);
-    mk_bubble$bmask[2] = new $c.Ptr(mk_bubble$bm4, 0);
-    mk_bubble$bmask[3] = new $c.Ptr(mk_bubble$bm5, 0);
-    mk_bubble$bmask[4] = new $c.Ptr(mk_bubble$bm6, 0);
-    mk_bubble$bmask[5] = new $c.Ptr(mk_bubble$bm7, 0);
-    mk_bubble$bmask[6] = new $c.Ptr(mk_bubble$bm8, 0);
+    $c.init(mk_bubble$bmask, [
+        new $c.Ptr(mk_bubble$bm2, 0),
+        new $c.Ptr(mk_bubble$bm3, 0),
+        new $c.Ptr(mk_bubble$bm4, 0),
+        new $c.Ptr(mk_bubble$bm5, 0),
+        new $c.Ptr(mk_bubble$bm6, 0),
+        new $c.Ptr(mk_bubble$bm7, 0),
+        new $c.Ptr(mk_bubble$bm8, 0)
+    ]);
 }

@@ -11,7 +11,7 @@ import { is_fainted } from './eat.js';
 import { more_experienced, newexplevel } from './exper.js';
 import { debugcore } from './files.js';
 import { wizard } from './flag.macros.js';
-import { COLNO, FALSE, TRUE } from './global.h.js';
+import { COLNO, FALSE, MD_PAD_RUMORS, TRUE } from './global.h.js';
 import { money_cnt } from './hack.js';
 import { BY_COOKIE, BY_ORACLE, BY_PAPER, ECMD_OK, ECMD_TIME } from './hack.h.js';
 import { pline1, release_data, update_file, verbalize1, y_n, ynq } from './hack.macros.js';
@@ -96,7 +96,7 @@ export async function getrumor(truth, rumor_buf, exclude_cookie) {   // rumors.c
                     await impossible($c.lit("strange truth value for rumor"));
                     return $c.__builtin___strcpy_chk(rumor_buf, $c.lit("Oops..."), -1);
             }
-            $c.__builtin___strcpy_chk(rumor_buf, await get_rnd_line(rumors, new $c.Ptr(line, 0), 256, rn2, beginning, ending, 60), -1);
+            $c.__builtin___strcpy_chk(rumor_buf, await get_rnd_line(rumors, new $c.Ptr(line, 0), 256, rn2, beginning, ending, MD_PAD_RUMORS), -1);
         } while (($t1 = count, count = $t1 + 1 | 0, $t1) < 50 && exclude_cookie && !$c.strncmp(rumor_buf, getrumor$cookie_marker, $c.u64(marklen)));
         $c.fclose(rumors);
         if (count >= 50) {

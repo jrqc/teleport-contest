@@ -902,7 +902,7 @@ export async function get_plname_from_file(nhfp, outbuf, name_only) {   // resto
     if (!name_only) {
         eos(new $c.Ptr(plbuf, 0)).set(0, 45);
     }
-    $c.__builtin___memcpy_chk(outbuf, new $c.Ptr(plbuf, 0), 49, -1);
+    $c.__builtin___memcpy_chk(outbuf, new $c.Ptr(plbuf, 0), PL_NSIZ_PLUS, -1);
     return;
 }
 async function rest_bubbles(nhfp) {   // restore.c:1369
@@ -1051,9 +1051,9 @@ export async function restore_menu(bannerwin) {   // restore.c:1536
             next = saved.get(k);
             mode = next.get(PL_NSIZ_PLUS - 1);
             if (all_normal) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(menutext, 0), 0, 256, $c.lit("%.*s"), 48, next);
+                $c.__builtin___sprintf_chk(new $c.Ptr(menutext, 0), 0, 256, $c.lit("%.*s"), PL_NSIZ_PLUS - 1, next);
             } else {
-                $c.__builtin___sprintf_chk(new $c.Ptr(menutext, 0), 0, 256, $c.lit("%c %.*s"), mode, 48, next);
+                $c.__builtin___sprintf_chk(new $c.Ptr(menutext, 0), 0, 256, $c.lit("%c %.*s"), mode, PL_NSIZ_PLUS - 1, next);
             }
             await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR_NONE, clr, new $c.Ptr(menutext, 0), MENU_ITEMFLAGS_SKIPMENUCOLORS);
         }

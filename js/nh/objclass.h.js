@@ -33,6 +33,7 @@ export const NODIR = 1;
 export const IMMEDIATE = 2;
 export const RAY = 3;
 export const PIERCE = 1;
+export const SLASH = 2;
 export const WHACK = 4;
 export const RANDOM_CLASS = 0;
 export const MAXOCLASSES = 18;

@@ -671,99 +671,77 @@ export function $init() {
     for (let $i0 = 0; $i0 < 25; $i0++) {
         l_selection_methods[$i0].$copyFrom(new $T.luaL_Reg());
     }
-    l_selection_methods[0].name = $c.lit("new");
-    l_selection_methods[0].func = l_selection_new;
-    l_selection_methods[1].name = $c.lit("clone");
-    l_selection_methods[1].func = l_selection_clone;
-    l_selection_methods[2].name = $c.lit("get");
-    l_selection_methods[2].func = l_selection_getpoint;
-    l_selection_methods[3].name = $c.lit("set");
-    l_selection_methods[3].func = l_selection_setpoint;
-    l_selection_methods[4].name = $c.lit("numpoints");
-    l_selection_methods[4].func = l_selection_numpoints;
-    l_selection_methods[5].name = $c.lit("negate");
-    l_selection_methods[5].func = l_selection_not;
-    l_selection_methods[6].name = $c.lit("percentage");
-    l_selection_methods[6].func = l_selection_filter_percent;
-    l_selection_methods[7].name = $c.lit("rndcoord");
-    l_selection_methods[7].func = l_selection_rndcoord;
-    l_selection_methods[8].name = $c.lit("line");
-    l_selection_methods[8].func = l_selection_line;
-    l_selection_methods[9].name = $c.lit("randline");
-    l_selection_methods[9].func = l_selection_randline;
-    l_selection_methods[10].name = $c.lit("rect");
-    l_selection_methods[10].func = l_selection_rect;
-    l_selection_methods[11].name = $c.lit("fillrect");
-    l_selection_methods[11].func = l_selection_fillrect;
-    l_selection_methods[12].name = $c.lit("area");
-    l_selection_methods[12].func = l_selection_fillrect;
-    l_selection_methods[13].name = $c.lit("grow");
-    l_selection_methods[13].func = l_selection_grow;
-    l_selection_methods[14].name = $c.lit("filter_mapchar");
-    l_selection_methods[14].func = l_selection_filter_mapchar;
-    l_selection_methods[15].name = $c.lit("match");
-    l_selection_methods[15].func = l_selection_match;
-    l_selection_methods[16].name = $c.lit("floodfill");
-    l_selection_methods[16].func = l_selection_flood;
-    l_selection_methods[17].name = $c.lit("circle");
-    l_selection_methods[17].func = l_selection_circle;
-    l_selection_methods[18].name = $c.lit("ellipse");
-    l_selection_methods[18].func = l_selection_ellipse;
-    l_selection_methods[19].name = $c.lit("gradient");
-    l_selection_methods[19].func = l_selection_gradient;
-    l_selection_methods[20].name = $c.lit("iterate");
-    l_selection_methods[20].func = l_selection_iterate;
-    l_selection_methods[21].name = $c.lit("bounds");
-    l_selection_methods[21].func = l_selection_getbounds;
-    l_selection_methods[22].name = $c.lit("room");
-    l_selection_methods[22].func = l_selection_room;
-    l_selection_methods[23].name = $c.lit("describe_size");
-    l_selection_methods[23].func = l_selection_size_description;
-    l_selection_methods[24].name = null;
-    l_selection_methods[24].func = null;
+    $c.init(l_selection_methods, [
+        { name: $c.lit("new"), func: l_selection_new },
+        { name: $c.lit("clone"), func: l_selection_clone },
+        { name: $c.lit("get"), func: l_selection_getpoint },
+        { name: $c.lit("set"), func: l_selection_setpoint },
+        { name: $c.lit("numpoints"), func: l_selection_numpoints },
+        { name: $c.lit("negate"), func: l_selection_not },
+        { name: $c.lit("percentage"), func: l_selection_filter_percent },
+        { name: $c.lit("rndcoord"), func: l_selection_rndcoord },
+        { name: $c.lit("line"), func: l_selection_line },
+        { name: $c.lit("randline"), func: l_selection_randline },
+        { name: $c.lit("rect"), func: l_selection_rect },
+        { name: $c.lit("fillrect"), func: l_selection_fillrect },
+        { name: $c.lit("area"), func: l_selection_fillrect },
+        { name: $c.lit("grow"), func: l_selection_grow },
+        { name: $c.lit("filter_mapchar"), func: l_selection_filter_mapchar },
+        { name: $c.lit("match"), func: l_selection_match },
+        { name: $c.lit("floodfill"), func: l_selection_flood },
+        { name: $c.lit("circle"), func: l_selection_circle },
+        { name: $c.lit("ellipse"), func: l_selection_ellipse },
+        { name: $c.lit("gradient"), func: l_selection_gradient },
+        { name: $c.lit("iterate"), func: l_selection_iterate },
+        { name: $c.lit("bounds"), func: l_selection_getbounds },
+        { name: $c.lit("room"), func: l_selection_room },
+        { name: $c.lit("describe_size"), func: l_selection_size_description },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 9; $i0++) {
         l_selection_meta[$i0].$copyFrom(new $T.luaL_Reg());
     }
-    l_selection_meta[0].name = $c.lit("__gc");
-    l_selection_meta[0].func = l_selection_gc;
-    l_selection_meta[1].name = $c.lit("__unm");
-    l_selection_meta[1].func = l_selection_not;
-    l_selection_meta[2].name = $c.lit("__band");
-    l_selection_meta[2].func = l_selection_and;
-    l_selection_meta[3].name = $c.lit("__bor");
-    l_selection_meta[3].func = l_selection_or;
-    l_selection_meta[4].name = $c.lit("__bxor");
-    l_selection_meta[4].func = l_selection_xor;
-    l_selection_meta[5].name = $c.lit("__bnot");
-    l_selection_meta[5].func = l_selection_not;
-    l_selection_meta[6].name = $c.lit("__add");
-    l_selection_meta[6].func = l_selection_or;
-    l_selection_meta[7].name = $c.lit("__sub");
-    l_selection_meta[7].func = l_selection_sub;
-    l_selection_meta[8].name = null;
-    l_selection_meta[8].func = null;
+    $c.init(l_selection_meta, [
+        { name: $c.lit("__gc"), func: l_selection_gc },
+        { name: $c.lit("__unm"), func: l_selection_not },
+        { name: $c.lit("__band"), func: l_selection_and },
+        { name: $c.lit("__bor"), func: l_selection_or },
+        { name: $c.lit("__bxor"), func: l_selection_xor },
+        { name: $c.lit("__bnot"), func: l_selection_not },
+        { name: $c.lit("__add"), func: l_selection_or },
+        { name: $c.lit("__sub"), func: l_selection_sub },
+        {}
+    ]);
     l_selection_grow$growdirs.fill(null);
-    l_selection_grow$growdirs[0] = $c.lit("all");
-    l_selection_grow$growdirs[1] = $c.lit("random");
-    l_selection_grow$growdirs[2] = $c.lit("north");
-    l_selection_grow$growdirs[3] = $c.lit("west");
-    l_selection_grow$growdirs[4] = $c.lit("east");
-    l_selection_grow$growdirs[5] = $c.lit("south");
-    l_selection_grow$growdirs[6] = null;
+    $c.init(l_selection_grow$growdirs, [
+        $c.lit("all"),
+        $c.lit("random"),
+        $c.lit("north"),
+        $c.lit("west"),
+        $c.lit("east"),
+        $c.lit("south"),
+        null
+    ]);
     l_selection_grow$growdirs2i.fill(0);
-    l_selection_grow$growdirs2i[0] = W_NORTH | W_SOUTH | W_EAST | W_WEST;
-    l_selection_grow$growdirs2i[1] = W_RANDOM;
-    l_selection_grow$growdirs2i[2] = W_NORTH;
-    l_selection_grow$growdirs2i[3] = W_WEST;
-    l_selection_grow$growdirs2i[4] = W_EAST;
-    l_selection_grow$growdirs2i[5] = W_SOUTH;
-    l_selection_grow$growdirs2i[6] = 0;
+    $c.init(l_selection_grow$growdirs2i, [
+        W_NORTH | W_SOUTH | W_EAST | W_WEST,
+        W_RANDOM,
+        W_NORTH,
+        W_WEST,
+        W_EAST,
+        W_SOUTH,
+        0
+    ]);
     l_selection_gradient$gradtypes.fill(null);
-    l_selection_gradient$gradtypes[0] = $c.lit("radial");
-    l_selection_gradient$gradtypes[1] = $c.lit("square");
-    l_selection_gradient$gradtypes[2] = null;
+    $c.init(l_selection_gradient$gradtypes, [
+        $c.lit("radial"),
+        $c.lit("square"),
+        null
+    ]);
     l_selection_gradient$gradtypes2i.fill(0);
-    l_selection_gradient$gradtypes2i[0] = SEL_GRADIENT_RADIAL;
-    l_selection_gradient$gradtypes2i[1] = SEL_GRADIENT_SQUARE;
-    l_selection_gradient$gradtypes2i[2] = -1;
+    $c.init(l_selection_gradient$gradtypes2i, [
+        SEL_GRADIENT_RADIAL,
+        SEL_GRADIENT_SQUARE,
+        -1
+    ]);
 }

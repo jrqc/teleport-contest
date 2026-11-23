@@ -33,7 +33,7 @@ import { M1_FLY } from './monflag.h.js';
 import { monflee } from './monmove.js';
 import { mons } from './monst.js';
 import { DEADMONSTER, engulfing_u } from './monst.macros.js';
-import { LOST_DROPPED, LOST_NONE, LOST_STOLEN, LOST_THROWN, OBJ_DELETED } from './obj.h.js';
+import { LOST_DROPPED, LOST_NONE, LOST_STOLEN, LOST_THROWN, OBJ_DELETED, OBJ_FLOOR } from './obj.h.js';
 import { Has_contents, any_quest_artifact, bimanual, carried } from './obj.macros.js';
 import { objects } from './objects.js';
 import { AMULET_OF_YENDOR, BELL, BELL_OF_OPENING, BOULDER, CANDELABRUM_OF_INVOCATION, CORPSE, FAKE_AMULET_OF_YENDOR, GOLD_PIECE, LEASH, SPE_BOOK_OF_THE_DEAD } from './objects.h.js';
@@ -310,7 +310,7 @@ export async function steal(mtmp, objnambuf) {   // steal.c:343
             if ($goto === "nothing_to_steal" || (!icnt || icnt === 1 && $G.uskin)) {
                 $goto = null;   // nothing_to_steal:
                 if (Punished() && !monkey_business && rn2(4)) {
-                    (!(!$c.peq($G.uball, $c.asRec(null, $T.obj, 112)) && $G.uball.where === 1) ? 1 : 0) ? $c.__assert_rtn($c.lit("steal"), $c.lit("steal.c"), 381, $c.lit("uball != NULL && uball->where == OBJ_FLOOR")) : 0;
+                    (!(!$c.peq($G.uball, $c.asRec(null, $T.obj, 112)) && $G.uball.where === OBJ_FLOOR) ? 1 : 0) ? $c.__assert_rtn($c.lit("steal"), $c.lit("steal.c"), 381, $c.lit("uball != NULL && uball->where == OBJ_FLOOR")) : 0;
                     await worn_item_removal(mtmp, $G.uchain);
                 } else if (u.utrap && u.utraptype === TT_BURIEDBALL && !monkey_business && !rn2(4)) {
                     await pline($c.lit("%s takes off your unseen chain."), new $c.Ptr(Monnambuf, 0));
@@ -399,7 +399,7 @@ export async function steal(mtmp, objnambuf) {   // steal.c:343
                                 case "cant_take":
                                     $goto = null;   // cant_take:
                                     await pline($c.lit("%s tries to %s %s%s but gives up."), new $c.Ptr(Monnambuf, 0), steal$how[rn2(4)], $c.and64(otmp.owornmask, W_ARMOR) ? $c.lit("your ") : $c.lit(""), $c.and64(otmp.owornmask, W_ARMOR) ? await armor_simple_name(otmp) : await yname(otmp));
-                                    return !rn2($c.div32(inv_cnt(0), 5) + 2 | 0) ? 1 : 0;
+                                    return !rn2($c.div32(inv_cnt(FALSE), 5) + 2 | 0) ? 1 : 0;
                                 }
                                 break;
                             }
@@ -709,8 +709,10 @@ export async function relobj(mtmp, show, is_pet) {   // steal.c:875
 
 export function $init() {
     steal$how.fill(null);
-    steal$how[0] = $c.lit("steal");
-    steal$how[1] = $c.lit("snatch");
-    steal$how[2] = $c.lit("grab");
-    steal$how[3] = $c.lit("take");
+    $c.init(steal$how, [
+        $c.lit("steal"),
+        $c.lit("snatch"),
+        $c.lit("grab"),
+        $c.lit("take")
+    ]);
 }

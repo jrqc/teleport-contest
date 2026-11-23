@@ -1049,55 +1049,23 @@ export function $init() {
     for (let $i0 = 0; $i0 < 17; $i0++) {
         worn[$i0].$copyFrom(new $T.worn());
     }
-    worn[0].w_mask = W_ARM;
-    worn[0].w_obj = new $c.FieldRef($G, "uarm", "ptr");
-    worn[0].w_what = $c.lit("suit");
-    worn[1].w_mask = W_ARMC;
-    worn[1].w_obj = new $c.FieldRef($G, "uarmc", "ptr");
-    worn[1].w_what = $c.lit("cloak");
-    worn[2].w_mask = W_ARMH;
-    worn[2].w_obj = new $c.FieldRef($G, "uarmh", "ptr");
-    worn[2].w_what = $c.lit("helmet");
-    worn[3].w_mask = W_ARMS;
-    worn[3].w_obj = new $c.FieldRef($G, "uarms", "ptr");
-    worn[3].w_what = $c.lit("shield");
-    worn[4].w_mask = W_ARMG;
-    worn[4].w_obj = new $c.FieldRef($G, "uarmg", "ptr");
-    worn[4].w_what = $c.lit("gloves");
-    worn[5].w_mask = W_ARMF;
-    worn[5].w_obj = new $c.FieldRef($G, "uarmf", "ptr");
-    worn[5].w_what = $c.lit("boots");
-    worn[6].w_mask = W_ARMU;
-    worn[6].w_obj = new $c.FieldRef($G, "uarmu", "ptr");
-    worn[6].w_what = $c.lit("shirt");
-    worn[7].w_mask = W_RINGL;
-    worn[7].w_obj = new $c.FieldRef($G, "uleft", "ptr");
-    worn[7].w_what = $c.lit("left ring");
-    worn[8].w_mask = W_RINGR;
-    worn[8].w_obj = new $c.FieldRef($G, "uright", "ptr");
-    worn[8].w_what = $c.lit("right ring");
-    worn[9].w_mask = W_WEP;
-    worn[9].w_obj = new $c.FieldRef($G, "uwep", "ptr");
-    worn[9].w_what = $c.lit("weapon");
-    worn[10].w_mask = W_SWAPWEP;
-    worn[10].w_obj = new $c.FieldRef($G, "uswapwep", "ptr");
-    worn[10].w_what = $c.lit("alternate weapon");
-    worn[11].w_mask = W_QUIVER;
-    worn[11].w_obj = new $c.FieldRef($G, "uquiver", "ptr");
-    worn[11].w_what = $c.lit("quiver");
-    worn[12].w_mask = W_AMUL;
-    worn[12].w_obj = new $c.FieldRef($G, "uamul", "ptr");
-    worn[12].w_what = $c.lit("amulet");
-    worn[13].w_mask = W_TOOL;
-    worn[13].w_obj = new $c.FieldRef($G, "ublindf", "ptr");
-    worn[13].w_what = $c.lit("facewear");
-    worn[14].w_mask = W_BALL;
-    worn[14].w_obj = new $c.FieldRef($G, "uball", "ptr");
-    worn[14].w_what = $c.lit("chained ball");
-    worn[15].w_mask = W_CHAIN;
-    worn[15].w_obj = new $c.FieldRef($G, "uchain", "ptr");
-    worn[15].w_what = $c.lit("attached chain");
-    worn[16].w_mask = 0;
-    worn[16].w_obj = null;
-    worn[16].w_what = null;
+    $c.init(worn, [
+        { w_mask: W_ARM, w_obj: new $c.FieldRef($G, "uarm", "ptr"), w_what: $c.lit("suit") },
+        { w_mask: W_ARMC, w_obj: new $c.FieldRef($G, "uarmc", "ptr"), w_what: $c.lit("cloak") },
+        { w_mask: W_ARMH, w_obj: new $c.FieldRef($G, "uarmh", "ptr"), w_what: $c.lit("helmet") },
+        { w_mask: W_ARMS, w_obj: new $c.FieldRef($G, "uarms", "ptr"), w_what: $c.lit("shield") },
+        { w_mask: W_ARMG, w_obj: new $c.FieldRef($G, "uarmg", "ptr"), w_what: $c.lit("gloves") },
+        { w_mask: W_ARMF, w_obj: new $c.FieldRef($G, "uarmf", "ptr"), w_what: $c.lit("boots") },
+        { w_mask: W_ARMU, w_obj: new $c.FieldRef($G, "uarmu", "ptr"), w_what: $c.lit("shirt") },
+        { w_mask: W_RINGL, w_obj: new $c.FieldRef($G, "uleft", "ptr"), w_what: $c.lit("left ring") },
+        { w_mask: W_RINGR, w_obj: new $c.FieldRef($G, "uright", "ptr"), w_what: $c.lit("right ring") },
+        { w_mask: W_WEP, w_obj: new $c.FieldRef($G, "uwep", "ptr"), w_what: $c.lit("weapon") },
+        { w_mask: W_SWAPWEP, w_obj: new $c.FieldRef($G, "uswapwep", "ptr"), w_what: $c.lit("alternate weapon") },
+        { w_mask: W_QUIVER, w_obj: new $c.FieldRef($G, "uquiver", "ptr"), w_what: $c.lit("quiver") },
+        { w_mask: W_AMUL, w_obj: new $c.FieldRef($G, "uamul", "ptr"), w_what: $c.lit("amulet") },
+        { w_mask: W_TOOL, w_obj: new $c.FieldRef($G, "ublindf", "ptr"), w_what: $c.lit("facewear") },
+        { w_mask: W_BALL, w_obj: new $c.FieldRef($G, "uball", "ptr"), w_what: $c.lit("chained ball") },
+        { w_mask: W_CHAIN, w_obj: new $c.FieldRef($G, "uchain", "ptr"), w_what: $c.lit("attached chain") },
+        {}
+    ]);
 }

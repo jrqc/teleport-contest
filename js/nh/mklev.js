@@ -2,6 +2,7 @@
 import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
+import { A_LAWFUL } from './align.h.js';
 import { Align2amask } from './align.macros.js';
 import { alloc } from './alloc.js';
 import { getbones } from './bones.js';
@@ -64,6 +65,9 @@ import { COULD_SEE, IN_SIGHT } from './vision.h.js';
 import { display_nhwindow, nh_delay_output } from './winprocs.macros.js';
 import { TT_BURIEDBALL } from './you.h.js';
 import { fracture_rock } from './zap.js';
+
+const x_maze_min = 2;
+const y_maze_min = 2;
 
 const clear_level_structures$zerorm = new $T.rm();   // static in clear_level_structures()
 const fill_ordinary_room$supply_items = new Int32Array(9);   // static in fill_ordinary_room()
@@ -1364,7 +1368,7 @@ async function mktrap_victim(ttmp) {   // mklev.c:1815
     kind = ttmp.ttyp | 0;
     x = ttmp.tx;
     y = ttmp.ty;
-    (!(x > 0 && x < 80 && y >= 0 && y < 21) ? 1 : 0) ? $c.__assert_rtn($c.lit("mktrap_victim"), $c.lit("mklev.c"), 1825, $c.lit("x > 0 && x < COLNO && y >= 0 && y < ROWNO")) : 0;
+    (!(x > 0 && x < COLNO && y >= 0 && y < ROWNO) ? 1 : 0) ? $c.__assert_rtn($c.lit("mktrap_victim"), $c.lit("mklev.c"), 1825, $c.lit("x > 0 && x < COLNO && y >= 0 && y < ROWNO")) : 0;
     switch (kind) {
         case ARROW_TRAP:
             otmp = await mksobj(ARROW, TRUE, FALSE);
@@ -1722,7 +1726,7 @@ async function mkaltar(croom) {   // mklev.c:2332
     if (!await set_levltyp(m.x, m.y, ALTAR)) {
         return;
     }
-    al = $c.i8(rn2(3) - 1 | 0);
+    al = $c.i8(rn2(A_LAWFUL + 2) - 1 | 0);
     svl.level.locations[m.x][m.y].flags = (Align2amask(al)) & 31;
 }
 async function mkgrave(croom) {   // mklev.c:2353
@@ -1829,7 +1833,7 @@ export async function mkinvokearea() {   // mklev.c:2410
 async function mkinvpos(x, y, dist) {   // mklev.c:2503
     let ttmp = null, otmp = null, make_rocks = 0, lev = null, mon = null, errfunc = null;
     lev = $c.relem(svl.level.locations[x], y);
-    if (!(x >= 2 && x <= gx.x_maze_max && y >= 2 && y <= gy.y_maze_max)) {
+    if (!(x >= x_maze_min && x <= gx.x_maze_max && y >= y_maze_min && y <= gy.y_maze_max)) {
         if (dist < 5) {
             errfunc = !isok(x, y) ? panic : impossible;
             await errfunc($c.lit("mkinvpos: <%d,%d> (%d) off map edge!"), x, y, dist);
@@ -1902,8 +1906,8 @@ function mkinvk_check_wall(x, y) {   // mklev.c:2603
     if (!isok(x, y)) {
         return 0;
     }
-    (!(x > 0 && x < 80) ? 1 : 0) ? $c.__assert_rtn($c.lit("mkinvk_check_wall"), $c.lit("mklev.c"), 2609, $c.lit("x > 0 && x < COLNO")) : 0;
-    (!(y >= 0 && y < 21) ? 1 : 0) ? $c.__assert_rtn($c.lit("mkinvk_check_wall"), $c.lit("mklev.c"), 2610, $c.lit("y >= 0 && y < ROWNO")) : 0;
+    (!(x > 0 && x < COLNO) ? 1 : 0) ? $c.__assert_rtn($c.lit("mkinvk_check_wall"), $c.lit("mklev.c"), 2609, $c.lit("x > 0 && x < COLNO")) : 0;
+    (!(y >= 0 && y < ROWNO) ? 1 : 0) ? $c.__assert_rtn($c.lit("mkinvk_check_wall"), $c.lit("mklev.c"), 2610, $c.lit("y >= 0 && y < ROWNO")) : 0;
     ltyp = svl.level.locations[x][y].typ >>> 0;
     return IS_STWALL(ltyp) || ltyp === IRONBARS ? 1 : 0;
 }
@@ -1951,32 +1955,34 @@ function ROOM_IS_FILLABLE(croom) {
 
 export function $init() {
     trap_engravings.fill(null);
-    trap_engravings[0] = null;
-    trap_engravings[1] = null;
-    trap_engravings[2] = null;
-    trap_engravings[3] = null;
-    trap_engravings[4] = null;
-    trap_engravings[5] = null;
-    trap_engravings[6] = null;
-    trap_engravings[7] = null;
-    trap_engravings[8] = null;
-    trap_engravings[9] = null;
-    trap_engravings[10] = null;
-    trap_engravings[11] = null;
-    trap_engravings[12] = null;
-    trap_engravings[13] = null;
-    trap_engravings[14] = $c.lit("Vlad was here");
-    trap_engravings[15] = $c.lit("ad aerarium");
-    trap_engravings[16] = $c.lit("ad aerarium");
-    trap_engravings[17] = null;
-    trap_engravings[18] = null;
-    trap_engravings[19] = null;
-    trap_engravings[20] = null;
-    trap_engravings[21] = null;
-    trap_engravings[22] = null;
-    trap_engravings[23] = null;
-    trap_engravings[24] = null;
-    trap_engravings[25] = null;
+    $c.init(trap_engravings, [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        $c.lit("Vlad was here"),
+        $c.lit("ad aerarium"),
+        $c.lit("ad aerarium"),
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+    ]);
     clear_level_structures$zerorm.$copyFrom(new $T.rm());
     clear_level_structures$zerorm.glyph = GLYPH_UNEXPLORED;
     clear_level_structures$zerorm.typ = 0;
@@ -1989,26 +1995,30 @@ export function $init() {
     clear_level_structures$zerorm.edge = (0) & 1;
     clear_level_structures$zerorm.candig = (0) & 1;
     fill_ordinary_room$supply_items.fill(0);
-    fill_ordinary_room$supply_items[0] = POT_EXTRA_HEALING;
-    fill_ordinary_room$supply_items[1] = POT_SPEED;
-    fill_ordinary_room$supply_items[2] = POT_GAIN_ENERGY;
-    fill_ordinary_room$supply_items[3] = SCR_ENCHANT_WEAPON;
-    fill_ordinary_room$supply_items[4] = SCR_ENCHANT_ARMOR;
-    fill_ordinary_room$supply_items[5] = SCR_CONFUSE_MONSTER;
-    fill_ordinary_room$supply_items[6] = SCR_SCARE_MONSTER;
-    fill_ordinary_room$supply_items[7] = WAN_DIGGING;
-    fill_ordinary_room$supply_items[8] = SPE_HEALING;
+    $c.init(fill_ordinary_room$supply_items, [
+        POT_EXTRA_HEALING,
+        POT_SPEED,
+        POT_GAIN_ENERGY,
+        SCR_ENCHANT_WEAPON,
+        SCR_ENCHANT_ARMOR,
+        SCR_CONFUSE_MONSTER,
+        SCR_SCARE_MONSTER,
+        WAN_DIGGING,
+        SPE_HEALING
+    ]);
     fill_ordinary_room$extra_classes.fill(0);
-    fill_ordinary_room$extra_classes[0] = FOOD_CLASS;
-    fill_ordinary_room$extra_classes[1] = WEAPON_CLASS;
-    fill_ordinary_room$extra_classes[2] = ARMOR_CLASS;
-    fill_ordinary_room$extra_classes[3] = GEM_CLASS;
-    fill_ordinary_room$extra_classes[4] = SCROLL_CLASS;
-    fill_ordinary_room$extra_classes[5] = POTION_CLASS;
-    fill_ordinary_room$extra_classes[6] = RING_CLASS;
-    fill_ordinary_room$extra_classes[7] = 0 - SPBOOK_CLASS;
-    fill_ordinary_room$extra_classes[8] = 0 - SPBOOK_CLASS;
-    fill_ordinary_room$extra_classes[9] = 0 - SPBOOK_CLASS;
+    $c.init(fill_ordinary_room$extra_classes, [
+        FOOD_CLASS,
+        WEAPON_CLASS,
+        ARMOR_CLASS,
+        GEM_CLASS,
+        SCROLL_CLASS,
+        POTION_CLASS,
+        RING_CLASS,
+        0 - SPBOOK_CLASS,
+        0 - SPBOOK_CLASS,
+        0 - SPBOOK_CLASS
+    ]);
     mktrap$mktrap_err = 0;
     generate_stairs$gen_stairs_panic.fill(0);
     generate_stairs$gen_stairs_panic.set([103, 101, 110, 101, 114, 97, 116, 101, 95, 115, 116, 97, 105, 114, 115, 58, 32, 102, 97, 105, 108, 101, 100, 32, 116, 111, 32, 102, 105, 110, 100, 32, 97, 32, 114, 111, 111, 109, 33, 32, 40, 37, 100, 41]);   // "generate_stairs: failed to find a room! (%d)"

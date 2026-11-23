@@ -38,9 +38,9 @@ import { debugcore } from './files.js';
 import { PLNMSG_ENVELOPED_IN_GAS, PLNMSG_OBJ_GLOWS } from './flag.h.js';
 import { wizard } from './flag.macros.js';
 import { dryup } from './fountain.js';
-import { FALSE, LARGEST_INT, LL_ARTIFACT, LL_CONDUCT, LL_WISH, TRUE } from './global.h.js';
+import { COLNO, FALSE, LARGEST_INT, LL_ARTIFACT, LL_CONDUCT, LL_WISH, ROWNO, TRUE } from './global.h.js';
 import { check_capacity, in_rooms, long_to_any, losehp, nomul, obj_to_any, set_uinwater, spoteffects, test_move } from './hack.js';
-import { ARM, ARTICLE_THE, CORPSTAT_FEMALE, CORPSTAT_GENDER, CORPSTAT_HISTORIC, CORPSTAT_MALE, COST_CANCEL, COST_DRAIN, COST_UNBLSS, COST_UNCURS, CXN_PFX_THE, DIED, ECMD_CANCEL, ECMD_OK, ECMD_TIME, ENL_GAMEINPROGRESS, EYE, FACE, FLASHED_LIGHT, FM_FMON, FOOT, GETOBJ_EXCLUDE, GETOBJ_NOFLAGS, GETOBJ_SUGGEST, HEAD, INVIS_BEAM, KICKED_WEAPON, KILLED_BY, KILLED_BY_AN, MAGICENLIGHTENMENT, MIM_OMIT_WAIT, MIM_REVEAL, MM_ADJACENTOK, MM_FEMALE, MM_MALE, MM_NOCOUNTBIRTH, MM_NOMSG, MM_NOTAIL, MM_NOWAIT, NC_SHOW_MSG, NC_VIA_WAND_OR_SPELL, NOTELL, NO_KILLER_PREFIX, NO_MINVENT, NO_NC_FLAGS, NO_TRAP_FLAGS, ONAME_KNOW_ARTI, ONAME_WISH, PHYS_EXPL_TYPE, POLY_NOFLAGS, SHOP_BARS_COST, SHOP_DOOR_COST, TELL, TEST_MOVE, THROWN_TETHERED_WEAPON, THROWN_WEAPON, XKILL_GIVEMSG, XKILL_NOCORPSE, XKILL_NOMSG, ZAPPED_WAND, st_all } from './hack.h.js';
+import { ARM, ARTICLE_THE, CORPSTAT_FEMALE, CORPSTAT_GENDER, CORPSTAT_HISTORIC, CORPSTAT_MALE, COST_CANCEL, COST_DRAIN, COST_UNBLSS, COST_UNCURS, CXN_NORMAL, CXN_NO_PFX, CXN_PFX_THE, DIED, ECMD_CANCEL, ECMD_OK, ECMD_TIME, ENL_GAMEINPROGRESS, EYE, FACE, FLASHED_LIGHT, FM_FMON, FOOT, GETOBJ_EXCLUDE, GETOBJ_NOFLAGS, GETOBJ_SUGGEST, HEAD, INVIS_BEAM, KICKED_WEAPON, KILLED_BY, KILLED_BY_AN, MAGICENLIGHTENMENT, MIM_OMIT_WAIT, MIM_REVEAL, MM_ADJACENTOK, MM_FEMALE, MM_MALE, MM_NOCOUNTBIRTH, MM_NOMSG, MM_NOTAIL, MM_NOWAIT, NC_SHOW_MSG, NC_VIA_WAND_OR_SPELL, NOTELL, NO_KILLER_PREFIX, NO_MINVENT, NO_NC_FLAGS, NO_TRAP_FLAGS, ONAME_KNOW_ARTI, ONAME_WISH, PHYS_EXPL_TYPE, POLY_NOFLAGS, SHOP_BARS_COST, SHOP_DOOR_COST, TELL, TEST_MOVE, THROWN_TETHERED_WEAPON, THROWN_WEAPON, WAND_BACKFIRE_CHANCE, WAND_WREST_CHANCE, XKILL_GIVEMSG, XKILL_NOCORPSE, XKILL_NOMSG, ZAPPED_WAND, st_all } from './hack.h.js';
 import { DIR_CLAMP, DIR_LEFT, DIR_RIGHT, Maybe_Half_Phys, You1, You_hear1, min, pline1 } from './hack.macros.js';
 import { dist2, eos, mungspaces, nh_snprintf, s_suffix, sgn, strncmpi, strsubst, upstart } from './hacklib.js';
 import { enlightenment, mstatusline, ustatusline } from './insight.js';
@@ -845,7 +845,7 @@ export async function revive(corpse, by_hero) {   // zap.c:884
             if (one_of) {
                 corpse.quan = $c.add64(corpse.quan, 1);
             }
-            $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), await corpse_xname(corpse, null, 2), 256);
+            $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), await corpse_xname(corpse, null, CXN_NO_PFX), 256);
             if (one_of) {
                 corpse.quan = $c.sub64(corpse.quan, 1);
             }
@@ -939,7 +939,7 @@ export async function unturn_dead(mon) {   // zap.c:1156
             continue;
         }
         if (youseeit) {
-            $c.__builtin___strcpy_chk(new $c.Ptr(corpse, 0), await corpse_xname(otmp, null, 0), 256);
+            $c.__builtin___strcpy_chk(new $c.Ptr(corpse, 0), await corpse_xname(otmp, null, CXN_NORMAL), 256);
             if (otmp.quan > 1) {
                 $c.__builtin___strcpy_chk(new $c.Ptr(owner, 0), $c.lit("One of "), 256);
                 await shk_your(eos(new $c.Ptr(owner, 0)), otmp);
@@ -1936,7 +1936,7 @@ export async function bhitpile(obj, fhito, tx, ty, zz) {   // zap.c:2428
     return hitanything;
 }
 export async function zappable(wand) {   // zap.c:2514
-    if (wand.spe < 0 || wand.spe === 0 && rn2(121)) {
+    if (wand.spe < 0 || wand.spe === 0 && rn2(WAND_WREST_CHANCE)) {
         return 0;
     }
     if (wand.spe === 0) {
@@ -2034,7 +2034,7 @@ export async function dozap() {   // zap.c:2627
     need_dir = (objects[obj.otyp].oc_dir | 0) !== NODIR ? 1 : 0;
     if (!await zappable(obj)) {
         await pline($c.lit("%s"), c_common_strings.c_nothing_happens);
-    } else if (obj.cursed | 0 && !rn2(100)) {
+    } else if (obj.cursed | 0 && !rn2(WAND_BACKFIRE_CHANCE)) {
         await backfire(obj);
         await exercise(A_STR, FALSE);
         return ECMD_TIME;
@@ -3249,10 +3249,10 @@ export async function zhitm(mon, type, nd, ootmp) {   // zap.c:4238
             break;
         case ZT_SLEEP:
             tmp = 0;
-            await sleep_monst(mon, d(nd, 25), type === 3 ? WAND_CLASS : 0);
+            await sleep_monst(mon, d(nd, 25), type === ZT_SLEEP ? WAND_CLASS : 0);
             break;
         case ZT_DEATH:
-            if ($c.abs(type) !== 24) {
+            if ($c.abs(type) !== 20 + ZT_DEATH) {
                 if ($c.peq(mon.data, $c.relem(mons, PM_DEATH))) {
                     await healmon(mon, $c.div32(Math.imul(mon.mhpmax, 3), 2), $c.div32(mon.mhpmax, 2));
                     if (mon.mhpmax >= MAGIC_COOKIE) {
@@ -3420,7 +3420,7 @@ async function zhitu(type, nd, fltxt, sx, sy) {   // zap.c:4401
             }
             break;
         case ZT_DEATH:
-            if (abstyp === 24) {
+            if (abstyp === 20 + ZT_DEATH) {
                 disn_prot = inventory_resistance_check(AD_DISN);
                 if (Disint_resistance()) {
                     await You($c.lit("are not disintegrated."));
@@ -3459,7 +3459,7 @@ async function zhitu(type, nd, fltxt, sx, sy) {   // zap.c:4401
             monstunseesu(M_SEEN_MAGR);
             svk.killer.format = KILLED_BY_AN;
             $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), fltxt ? fltxt : $c.lit(""), 256);
-            u.ugrave_arise = type === -24 ? -3 : NON_PM;
+            u.ugrave_arise = type === -(20 + ZT_DEATH) ? -3 : NON_PM;
             await done(DIED);
             return;
         case ZT_LIGHTNING:
@@ -3642,7 +3642,7 @@ export async function dobuzz(type, nd, sx, sy, dx$in, dy$in, sayhit, saymiss, fo
     fltyp = zaptype(type);
     damgtype = $c.rem32(fltyp, 10);
     shopdamage[0] = FALSE;
-    fireball = $c.i8(type === 11 ? 1 : 0);
+    fireball = $c.i8(type === 10 + ZT_FIRE ? 1 : 0);
     gas_hit = FALSE;
     hdmgtype = Hallucination() ? rn2(6) : damgtype;
     spell_type = is_hero_spell(type) ? SPE_MAGIC_MISSILE + damgtype | 0 : 0;
@@ -3729,7 +3729,7 @@ export async function dobuzz(type, nd, sx, sy, dx$in, dy$in, sayhit, saymiss, fo
                                 } else {
                                     mon_could_move = $c.i8(mon.mcanmove);
                                     tmp$2 = await zhitm(mon, type, nd, new $c.Ptr(otmp, 0));
-                                    if (is_rider(mon.data) && $c.abs(type) === 24) {
+                                    if (is_rider(mon.data) && $c.abs(type) === 20 + ZT_DEATH) {
                                         if (canseemon(mon)) {
                                             await hit(flash_str(fltyp, FALSE), mon, $c.lit("."));
                                             await pline($c.lit("%s disintegrates."), await Monnam(mon));
@@ -3742,7 +3742,7 @@ export async function dobuzz(type, nd, sx, sy, dx$in, dy$in, sayhit, saymiss, fo
                                     if ($c.peq(mon.data, $c.relem(mons, PM_DEATH)) && damgtype === ZT_DEATH) {
                                         if (canseemon(mon)) {
                                             await hit(flash_str(fltyp, FALSE), mon, $c.lit("."));
-                                            await pline($c.lit("%s absorbs the deadly %s!"), await Monnam(mon), type === 24 ? $c.lit("blast") : $c.lit("ray"));
+                                            await pline($c.lit("%s absorbs the deadly %s!"), await Monnam(mon), type === 20 + ZT_DEATH ? $c.lit("blast") : $c.lit("ray"));
                                             await pline($c.lit("It seems even stronger than before."));
                                         }
                                         break L3;
@@ -3836,7 +3836,7 @@ export async function dobuzz(type, nd, sx, sy, dx$in, dy$in, sayhit, saymiss, fo
                                 if ((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level)) {
                                     await pline_The($c.lit("%s vanishes into the aether!"), flash_str(fltyp, FALSE));
                                     if (fireball) {
-                                        type = 1;
+                                        type = ZT_FIRE;
                                     }
                                     break L3;
                                 } else if (fireball) {
@@ -3916,7 +3916,7 @@ export async function start_melt_ice_timeout(x, y, min_time) {   // zap.c:5088
         when = MIN_ICE_TIME - 1;
     }
     while ((when = when + 1 | 0) <= MAX_ICE_TIME) {
-        if (!rn2((2000 - when | 0) + 50 | 0)) {
+        if (!rn2((MAX_ICE_TIME - when | 0) + MIN_ICE_TIME | 0)) {
             break;
         }
     }
@@ -4037,7 +4037,7 @@ export async function zap_over_floor(x, y, type, shopdamage, ignoremon, explodin
                             } else {
                                 lev.typ = HWALL;
                             }
-                            await fix_wall_spines($c.i16(0 > (x - 1 | 0) ? 0 : x - 1 | 0), $c.i16(0 > (y - 1 | 0) ? 0 : y - 1 | 0), $c.i16(79 < (x + 1 | 0) ? 79 : x + 1 | 0), $c.i16(20 < (y + 1 | 0) ? 20 : y + 1 | 0));
+                            await fix_wall_spines($c.i16(0 > (x - 1 | 0) ? 0 : x - 1 | 0), $c.i16(0 > (y - 1 | 0) ? 0 : y - 1 | 0), $c.i16(COLNO - 1 < (x + 1 | 0) ? COLNO - 1 : x + 1 | 0), $c.i16(ROWNO - 1 < (y + 1 | 0) ? ROWNO - 1 : y + 1 | 0));
                         } else {
                             lev.typ = $c.i8(lava ? ROOM : ICE);
                         }
@@ -4164,7 +4164,7 @@ export async function zap_over_floor(x, y, type, shopdamage, ignoremon, explodin
                     hear_txt = $c.lit("a deep cracking sound.");
                     break;
                 case ZT_DEATH:
-                    if ($c.abs(type) !== 24) {
+                    if ($c.abs(type) !== 20 + ZT_DEATH) {
                         $goto = "def_case"; continue S1;
                     }
                     new_doormask = D_NODOOR;
@@ -4559,7 +4559,7 @@ export async function destroy_items(mon, dmgtyp, dmg_in) {   // zap.c:5965
         items_to_destroy[i].deferred = FALSE;
     }
     limit = $c.div32(dmg_in, DMG_DESTROY_SCALE);
-    if ($c.rem32(dmg_in, DMG_DESTROY_SCALE) > rn2(5)) {
+    if ($c.rem32(dmg_in, DMG_DESTROY_SCALE) > rn2(DMG_DESTROY_SCALE)) {
         limit = limit + 1 | 0;
     }
     if (limit > MAX_ITEMS_DESTROYED) {
@@ -4672,7 +4672,7 @@ async function wishcmdassist(triesleft) {   // zap.c:6165
         await putstr()(win, 0, new $c.Ptr(wishcmdassist$preserve_wishless, 0));
     }
     await putstr()(win, 0, $c.lit(""));
-    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(wishcmdassist$retry_info, 0), triesleft >= 0 && triesleft < 6 ? wishcmdassist$cardinals[triesleft] : new $c.Ptr(wishcmdassist$too_many, 0), triesleft < 5 ? $c.lit(" more") : $c.lit(""), triesleft === 1 ? $c.lit("") : $c.lit("s"));
+    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(wishcmdassist$retry_info, 0), triesleft >= 0 && triesleft < 6 ? wishcmdassist$cardinals[triesleft] : new $c.Ptr(wishcmdassist$too_many, 0), triesleft < MAXWISHTRY ? $c.lit(" more") : $c.lit(""), triesleft === 1 ? $c.lit("") : $c.lit("s"));
     await putstr()(win, 0, new $c.Ptr(buf, 0));
     await putstr()(win, 0, new $c.Ptr(wishcmdassist$retry_too, 0));
     await putstr()(win, 0, $c.lit(""));
@@ -4846,67 +4846,61 @@ export function $init() {
     are_blinded_by_the_flash.fill(0);
     are_blinded_by_the_flash.set([97, 114, 101, 32, 98, 108, 105, 110, 100, 101, 100, 32, 98, 121, 32, 116, 104, 101, 32, 102, 108, 97, 115, 104, 33]);   // "are blinded by the flash!"
     flash_types.fill(null);
-    flash_types[0] = $c.lit("magic missile");
-    flash_types[1] = $c.lit("bolt of fire");
-    flash_types[2] = $c.lit("bolt of cold");
-    flash_types[3] = $c.lit("sleep ray");
-    flash_types[4] = $c.lit("death ray");
-    flash_types[5] = $c.lit("bolt of lightning");
-    flash_types[6] = $c.lit("");
-    flash_types[7] = $c.lit("");
-    flash_types[8] = $c.lit("");
-    flash_types[9] = $c.lit("");
-    flash_types[10] = $c.lit("magic missile");
-    flash_types[11] = $c.lit("fireball");
-    flash_types[12] = $c.lit("cone of cold");
-    flash_types[13] = $c.lit("sleep ray");
-    flash_types[14] = $c.lit("finger of death");
-    flash_types[15] = $c.lit("bolt of lightning");
-    flash_types[16] = $c.lit("");
-    flash_types[17] = $c.lit("");
-    flash_types[18] = $c.lit("");
-    flash_types[19] = $c.lit("");
-    flash_types[20] = $c.lit("blast of missiles");
-    flash_types[21] = $c.lit("blast of fire");
-    flash_types[22] = $c.lit("blast of frost");
-    flash_types[23] = $c.lit("blast of sleep gas");
-    flash_types[24] = $c.lit("blast of disintegration");
-    flash_types[25] = $c.lit("blast of lightning");
-    flash_types[26] = $c.lit("blast of poison gas");
-    flash_types[27] = $c.lit("blast of acid");
-    flash_types[28] = $c.lit("");
-    flash_types[29] = $c.lit("");
+    $c.init(flash_types, [
+        $c.lit("magic missile"),
+        $c.lit("bolt of fire"),
+        $c.lit("bolt of cold"),
+        $c.lit("sleep ray"),
+        $c.lit("death ray"),
+        $c.lit("bolt of lightning"),
+        $c.lit(""),
+        $c.lit(""),
+        $c.lit(""),
+        $c.lit(""),
+        $c.lit("magic missile"),
+        $c.lit("fireball"),
+        $c.lit("cone of cold"),
+        $c.lit("sleep ray"),
+        $c.lit("finger of death"),
+        $c.lit("bolt of lightning"),
+        $c.lit(""),
+        $c.lit(""),
+        $c.lit(""),
+        $c.lit(""),
+        $c.lit("blast of missiles"),
+        $c.lit("blast of fire"),
+        $c.lit("blast of frost"),
+        $c.lit("blast of sleep gas"),
+        $c.lit("blast of disintegration"),
+        $c.lit("blast of lightning"),
+        $c.lit("blast of poison gas"),
+        $c.lit("blast of acid"),
+        $c.lit(""),
+        $c.lit("")
+    ]);
     charged_objs.fill(0);
-    charged_objs[0] = WAND_CLASS;
-    charged_objs[1] = WEAPON_CLASS;
-    charged_objs[2] = ARMOR_CLASS;
-    charged_objs[3] = 0;
+    $c.init(charged_objs, [
+        WAND_CLASS,
+        WEAPON_CLASS,
+        ARMOR_CLASS,
+        0
+    ]);
     for (let $i0 = 0; $i0 < 7; $i0++) {
         destroy_strings[$i0].fill(null);
     }
-    destroy_strings[0][0] = $c.lit("freezes and shatters");
-    destroy_strings[0][1] = $c.lit("freeze and shatter");
-    destroy_strings[0][2] = $c.lit("shattered potion");
-    destroy_strings[1][0] = $c.lit("boils and explodes");
-    destroy_strings[1][1] = $c.lit("boil and explode");
-    destroy_strings[1][2] = $c.lit("boiling potion");
-    destroy_strings[2][0] = $c.lit("ignites and explodes");
-    destroy_strings[2][1] = $c.lit("ignite and explode");
-    destroy_strings[2][2] = $c.lit("exploding potion");
-    destroy_strings[3][0] = $c.lit("catches fire and burns");
-    destroy_strings[3][1] = $c.lit("catch fire and burn");
-    destroy_strings[3][2] = $c.lit("burning scroll");
-    destroy_strings[4][0] = $c.lit("catches fire and burns");
-    destroy_strings[4][1] = $c.lit("");
-    destroy_strings[4][2] = $c.lit("burning book");
-    destroy_strings[5][0] = $c.lit("turns to dust and vanishes");
-    destroy_strings[5][1] = $c.lit("");
-    destroy_strings[5][2] = $c.lit("");
-    destroy_strings[6][0] = $c.lit("breaks apart and explodes");
-    destroy_strings[6][1] = $c.lit("");
-    destroy_strings[6][2] = $c.lit("exploding wand");
+    $c.init(destroy_strings, [
+        [$c.lit("freezes and shatters"), $c.lit("freeze and shatter"), $c.lit("shattered potion")],
+        [$c.lit("boils and explodes"), $c.lit("boil and explode"), $c.lit("boiling potion")],
+        [$c.lit("ignites and explodes"), $c.lit("ignite and explode"), $c.lit("exploding potion")],
+        [$c.lit("catches fire and burns"), $c.lit("catch fire and burn"), $c.lit("burning scroll")],
+        [$c.lit("catches fire and burns"), $c.lit(""), $c.lit("burning book")],
+        [$c.lit("turns to dust and vanishes"), $c.lit(""), $c.lit("")],
+        [$c.lit("breaks apart and explodes"), $c.lit(""), $c.lit("exploding wand")]
+    ]);
     wish_history.fill(null);
-    wish_history[0] = null;
+    $c.init(wish_history, [
+        null
+    ]);
     wish_history_idx = 0;
     cancel_monst$writing_vanishes.fill(0);
     cancel_monst$writing_vanishes.set([83, 111, 109, 101, 32, 119, 114, 105, 116, 105, 110, 103, 32, 118, 97, 110, 105, 115, 104, 101, 115, 32, 102, 114, 111, 109, 32, 37, 115, 32, 104, 101, 97, 100, 33]);   // "Some writing vanishes from %s head!"
@@ -4914,22 +4908,24 @@ export function $init() {
     cancel_monst$your.set([121, 111, 117, 114]);   // "your"
     item_what$whatbuf.fill(0);
     wishcmdassist$wishinfo.fill(null);
-    wishcmdassist$wishinfo[0] = $c.lit("Wish details:");
-    wishcmdassist$wishinfo[1] = $c.lit("");
-    wishcmdassist$wishinfo[2] = $c.lit("Enter the name of an object, such as \"potion of monster detection\",");
-    wishcmdassist$wishinfo[3] = $c.lit("\"scroll labeled README\", \"elven mithril-coat\", or \"Grimtooth\"");
-    wishcmdassist$wishinfo[4] = $c.lit("(without the quotes).");
-    wishcmdassist$wishinfo[5] = $c.lit("");
-    wishcmdassist$wishinfo[6] = $c.lit("For object types which come in stacks, you may specify a plural name");
-    wishcmdassist$wishinfo[7] = $c.lit("such as \"potions of healing\", or specify a count, such as \"1000 gold");
-    wishcmdassist$wishinfo[8] = $c.lit("pieces\", although that aspect of your wish might not be granted.");
-    wishcmdassist$wishinfo[9] = $c.lit("");
-    wishcmdassist$wishinfo[10] = $c.lit("You may also specify various prefix values which might be used to");
-    wishcmdassist$wishinfo[11] = $c.lit("modify the item, such as \"uncursed\" or \"rustproof\" or \"+1\".");
-    wishcmdassist$wishinfo[12] = $c.lit("Most modifiers shown when viewing your inventory can be specified.");
-    wishcmdassist$wishinfo[13] = $c.lit("");
-    wishcmdassist$wishinfo[14] = $c.lit("You may specify 'nothing' to explicitly decline this wish.");
-    wishcmdassist$wishinfo[15] = null;
+    $c.init(wishcmdassist$wishinfo, [
+        $c.lit("Wish details:"),
+        $c.lit(""),
+        $c.lit("Enter the name of an object, such as \"potion of monster detection\","),
+        $c.lit("\"scroll labeled README\", \"elven mithril-coat\", or \"Grimtooth\""),
+        $c.lit("(without the quotes)."),
+        $c.lit(""),
+        $c.lit("For object types which come in stacks, you may specify a plural name"),
+        $c.lit("such as \"potions of healing\", or specify a count, such as \"1000 gold"),
+        $c.lit("pieces\", although that aspect of your wish might not be granted."),
+        $c.lit(""),
+        $c.lit("You may also specify various prefix values which might be used to"),
+        $c.lit("modify the item, such as \"uncursed\" or \"rustproof\" or \"+1\"."),
+        $c.lit("Most modifiers shown when viewing your inventory can be specified."),
+        $c.lit(""),
+        $c.lit("You may specify 'nothing' to explicitly decline this wish."),
+        null
+    ]);
     wishcmdassist$preserve_wishless.fill(0);
     wishcmdassist$preserve_wishless.set([68, 111, 105, 110, 103, 32, 115, 111, 32, 119, 105, 108, 108, 32, 112, 114, 101, 115, 101, 114, 118, 101, 32, 39, 119, 105, 115, 104, 108, 101, 115, 115, 39, 32, 99, 111, 110, 100, 117, 99, 116, 46]);   // "Doing so will preserve 'wishless' conduct."
     wishcmdassist$retry_info.fill(0);
@@ -4939,12 +4935,14 @@ export function $init() {
     wishcmdassist$suppress_cmdassist.fill(0);
     wishcmdassist$suppress_cmdassist.set([40, 83, 117, 112, 112, 114, 101, 115, 115, 32, 116, 104, 105, 115, 32, 97, 115, 115, 105, 115, 116, 97, 110, 99, 101, 32, 119, 105, 116, 104, 32, 33, 99, 109, 100, 97, 115, 115, 105, 115, 116, 32, 105, 110, 32, 121, 111, 117, 114, 32, 99, 111, 110, 102, 105, 103, 32, 102, 105, 108, 101, 46, 41]);   // "(Suppress this assistance with !cmdassist in your config file.)"
     wishcmdassist$cardinals.fill(null);
-    wishcmdassist$cardinals[0] = $c.lit("zero");
-    wishcmdassist$cardinals[1] = $c.lit("one");
-    wishcmdassist$cardinals[2] = $c.lit("two");
-    wishcmdassist$cardinals[3] = $c.lit("three");
-    wishcmdassist$cardinals[4] = $c.lit("four");
-    wishcmdassist$cardinals[5] = $c.lit("five");
+    $c.init(wishcmdassist$cardinals, [
+        $c.lit("zero"),
+        $c.lit("one"),
+        $c.lit("two"),
+        $c.lit("three"),
+        $c.lit("four"),
+        $c.lit("five")
+    ]);
     wishcmdassist$too_many.fill(0);
     wishcmdassist$too_many.set([116, 111, 111, 32, 109, 97, 110, 121]);   // "too many"
     flash_str$fltxt.fill(0);

@@ -808,7 +808,7 @@ export async function store_plname_in_file(nhfp) {   // save.c:999
     $c.__builtin___memset_chk(new $c.Ptr(hero, 0), 0, 49, 49);
     nh_snprintf($c.lit("store_plname_in_file"), 1010, new $c.Ptr(hero, 0), 49, $c.lit("%s-%.3s-%.3s-%.3s-%.3s"), new $c.Ptr(svp.plname, 0), gu.urole.filecode, gu.urace.filecode, genders[flags.female].filecode, aligns[1 - u.ualign.type | 0].filecode);
     hero[$c.idx($c.strlen(new $c.Ptr(svp.plname, 0)))] = 0;
-    (!(hero[47] === 0) ? 1 : 0) ? $c.__assert_rtn($c.lit("store_plname_in_file"), $c.lit("save.c"), 1017, $c.lit("hero[PL_NSIZ_PLUS - 1 - 1] == '\\0'")) : 0;
+    (!(hero[PL_NSIZ_PLUS - 1 - 1] === 0) ? 1 : 0) ? $c.__assert_rtn($c.lit("store_plname_in_file"), $c.lit("save.c"), 1017, $c.lit("hero[PL_NSIZ_PLUS - 1 - 1] == '\\0'")) : 0;
     hero[PL_NSIZ_PLUS - 1] = $c.i8(wizard() ? 68 : discover() ? 88 : 45);
     if (nhfp.structlevel) {
         await bufoff(nhfp.fd);
@@ -874,8 +874,8 @@ export async function freedynamicdata() {   // save.c:1077
     await done_object_cleanup();
     await savelev(tnhfp, -1);
     await save_killers(tnhfp);
-    await save_timers(tnhfp, 1);
-    await save_light_sources(tnhfp, 1);
+    await save_timers(tnhfp, RANGE_GLOBAL);
+    await save_light_sources(tnhfp, RANGE_GLOBAL);
     await saveobjchn(tnhfp, new $c.FieldRef(gi, "invent", "ptr")), gi.invent = null;
     await saveobjchn(tnhfp, new $c.FieldRef(gm, "migrating_objs", "ptr")), gm.migrating_objs = null;
     await savemonchn(tnhfp, gm.migrating_mons), gm.migrating_mons = null;

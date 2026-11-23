@@ -458,11 +458,11 @@ async function disco_append_typename(buf, dis) {   // o_init.c:694
         eos[0] = buf.add($c.idx(len)).add($c.idx(typnm_len));
     } else if ((p = $c.strrchr(typnm, 40)) !== null && $c.pcmp(p, typnm) > 0 && p.get(-1) === 32 && $c.strchr(p, 41) !== null) {
         p = p.add(-1);
-        $c.__builtin___strncat_chk(buf, typnm, $c.subu64(255, $c.addu64(len, $c.u32($c.strlen(p)))), -1);
+        $c.__builtin___strncat_chk(buf, typnm, $c.subu64(BUFSZ - 1, $c.addu64(len, $c.u32($c.strlen(p)))), -1);
         $c.__builtin___strcat_chk(buf, p, -1);
         eos[0] = buf.add($c.idx($c.strlen(buf)));
     } else {
-        $c.__builtin___strncat_chk(buf, typnm, $c.subu64(255, len), -1);
+        $c.__builtin___strncat_chk(buf, typnm, $c.subu64(BUFSZ - 1, len), -1);
         eos[0] = buf.add($c.idx($c.strlen(buf)));
     }
     append_price_quote(buf, new $c.Ptr(eos, 0), dis);
@@ -569,7 +569,7 @@ export async function dodiscovered() {   // o_init.c:764
 }
 async function oclass_to_name(oclass, buf) {   // o_init.c:877
     let s = null, $t1;
-    $c.__builtin___strcpy_chk(buf, await let_to_name(oclass, 0, 0), -1);
+    $c.__builtin___strcpy_chk(buf, await let_to_name(oclass, FALSE, FALSE), -1);
     for (s = buf; s.get(0); s = s.add(1)) {
         $t1 = lowc(s.get(0)), s.set(0, $t1);
     }
@@ -708,7 +708,7 @@ export async function doclassdisco() {   // o_init.c:891
             if (oclass === MAXOCLASSES) {
                 await impossible($c.lit("doclassdisco: invalid object class '%s'"), visctrl(c));
             }
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Discovered %s in %s"), await let_to_name(oclass, 0, 0), flags.discosort === 111 ? $c.lit("order of discovery") : flags.discosort === 115 ? $c.lit("'sortloot' order") : $c.lit("alphabetical order"));
+            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Discovered %s in %s"), await let_to_name(oclass, FALSE, FALSE), flags.discosort === 111 ? $c.lit("order of discovery") : flags.discosort === 115 ? $c.lit("'sortloot' order") : $c.lit("alphabetical order"));
             await putstr()(tmpwin, 0, new $c.Ptr(buf, 0));
             sorted_ct = 0;
             for (i = svb.bases[oclass]; i <= (svb.bases[oclass + 1 | 0] - 1 | 0); i = i + 1 | 0) {
@@ -821,31 +821,39 @@ export function get_sortdisco(opts, cnf) {   // o_init.c:1210
 
 export function $init() {
     uniq_objs.fill(0);
-    uniq_objs[0] = AMULET_OF_YENDOR;
-    uniq_objs[1] = BELL_OF_OPENING;
-    uniq_objs[2] = SPE_BOOK_OF_THE_DEAD;
-    uniq_objs[3] = CANDELABRUM_OF_INVOCATION;
+    $c.init(uniq_objs, [
+        AMULET_OF_YENDOR,
+        BELL_OF_OPENING,
+        SPE_BOOK_OF_THE_DEAD,
+        CANDELABRUM_OF_INVOCATION
+    ]);
     disco_order_let.fill(0);
     disco_order_let.set([111, 115, 99, 97]);   // "osca"
     disco_orders_descr.fill(null);
-    disco_orders_descr[0] = $c.lit("by order of discovery within each class");
-    disco_orders_descr[1] = $c.lit("sortloot order (by class with some sub-class groupings)");
-    disco_orders_descr[2] = $c.lit("alphabetical within each class");
-    disco_orders_descr[3] = $c.lit("alphabetical across all classes");
-    disco_orders_descr[4] = null;
+    $c.init(disco_orders_descr, [
+        $c.lit("by order of discovery within each class"),
+        $c.lit("sortloot order (by class with some sub-class groupings)"),
+        $c.lit("alphabetical within each class"),
+        $c.lit("alphabetical across all classes"),
+        null
+    ]);
     shuffle_all$shuffle_classes.fill(0);
-    shuffle_all$shuffle_classes[0] = AMULET_CLASS;
-    shuffle_all$shuffle_classes[1] = POTION_CLASS;
-    shuffle_all$shuffle_classes[2] = RING_CLASS;
-    shuffle_all$shuffle_classes[3] = SCROLL_CLASS;
-    shuffle_all$shuffle_classes[4] = SPBOOK_CLASS;
-    shuffle_all$shuffle_classes[5] = WAND_CLASS;
-    shuffle_all$shuffle_classes[6] = VENOM_CLASS;
+    $c.init(shuffle_all$shuffle_classes, [
+        AMULET_CLASS,
+        POTION_CLASS,
+        RING_CLASS,
+        SCROLL_CLASS,
+        SPBOOK_CLASS,
+        WAND_CLASS,
+        VENOM_CLASS
+    ]);
     shuffle_all$shuffle_types.fill(0);
-    shuffle_all$shuffle_types[0] = HELMET;
-    shuffle_all$shuffle_types[1] = LEATHER_GLOVES;
-    shuffle_all$shuffle_types[2] = CLOAK_OF_PROTECTION;
-    shuffle_all$shuffle_types[3] = SPEED_BOOTS;
+    $c.init(shuffle_all$shuffle_types, [
+        HELMET,
+        LEATHER_GLOVES,
+        CLOAK_OF_PROTECTION,
+        SPEED_BOOTS
+    ]);
     doclassdisco$prompt.fill(0);
     doclassdisco$prompt.set([86, 105, 101, 119, 32, 100, 105, 115, 99, 111, 118, 101, 114, 105, 101, 115, 32, 102, 111, 114, 32, 119, 104, 105, 99, 104, 32, 115, 111, 114, 116, 32, 111, 102, 32, 111, 98, 106, 101, 99, 116, 115, 63]);   // "View discoveries for which sort of objects?"
     doclassdisco$havent_discovered_any.fill(0);

@@ -41,7 +41,7 @@ import { AD_ACID, AD_ANY, AD_BLND, AD_COLD, AD_CONF, AD_DGST, AD_DISE, AD_DREN, 
 import { DISTANCE_ATTK_TYPE } from './monattk.macros.js';
 import { attacktype_fordmg, can_blnd, cvt_adtyp_to_mseenres, defended, dmgtype, dmgtype_fromattack, gender, get_atkdam_type, mon_hates_blessings, monstseesu, monstunseesu, poly_when_stoned, pronoun_gender, resists_blnd, resists_drli, stagger, sticks } from './mondata.js';
 import { amorphous, amphibious, digests, enfolds, flaming, haseyes, hides_under, is_animal, is_demon, is_hider, is_human, is_minion, is_swimmer, is_undead, is_were, is_whirly, likes_gold, nolimbs, perceives, thick_skinned, touch_petrifies, unsolid } from './mondata.macros.js';
-import { FEMALE, G_EXTINCT, M1_AMPHIBIOUS, M1_BREATHLESS, M1_SEE_INVIS, MALE, MZ_HUGE, NEUTRAL } from './monflag.h.js';
+import { FEMALE, G_EXTINCT, M1_AMPHIBIOUS, M1_BREATHLESS, M1_SEE_INVIS, M2_ORC, MALE, MZ_HUGE, NEUTRAL } from './monflag.h.js';
 import { set_apparxy } from './monmove.js';
 import { c_sa_no, mons } from './monst.js';
 import { M_AP_NOTHING, M_AP_OBJECT, M_SEEN_ACID, M_SEEN_COLD, M_SEEN_ELEC, M_SEEN_FIRE, NEED_HTH_WEAPON, NEED_WEAPON } from './monst.h.js';
@@ -394,7 +394,7 @@ export async function mattacku(mtmp) {   // mhitu.c:491
         if ($c.peq(mtmp, u.usteed)) {
             return 0;
         }
-        if (!rn2($c.andu64(mtmp.data.mflags2, 128) !== 0 ? 2 : 4) && dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 2) {
+        if (!rn2($c.andu64(mtmp.data.mflags2, M2_ORC) !== 0 ? 2 : 4) && dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 2) {
             i = await mattackm(mtmp, u.usteed);
             if ((i & M_ATTK_AGR_DIED) !== 0) {
                 return 1;
@@ -1713,7 +1713,7 @@ export async function doseduce(mon) {   // mhitu.c:1985
     } else {
         umoney = money_cnt(gi.invent);
         if (umoney > LARGEST_INT - 10) {
-            cost = $c.add64(rnd(32767), 500);
+            cost = $c.add64(rnd(LARGEST_INT), 500);
         } else {
             cost = $c.add64(rnd($c.i32(umoney) + 10 | 0), 500);
         }
@@ -1985,12 +1985,14 @@ function ld() {
 export function $init() {
     mon_currwep = null;
     gazemu$reactions.fill(null);
-    gazemu$reactions[0] = $c.lit("confused");
-    gazemu$reactions[1] = $c.lit("stunned");
-    gazemu$reactions[2] = $c.lit("puzzled");
-    gazemu$reactions[3] = $c.lit("dazzled");
-    gazemu$reactions[4] = $c.lit("irritated");
-    gazemu$reactions[5] = $c.lit("inflamed");
-    gazemu$reactions[6] = $c.lit("tired");
-    gazemu$reactions[7] = $c.lit("dulled");
+    $c.init(gazemu$reactions, [
+        $c.lit("confused"),
+        $c.lit("stunned"),
+        $c.lit("puzzled"),
+        $c.lit("dazzled"),
+        $c.lit("irritated"),
+        $c.lit("inflamed"),
+        $c.lit("tired"),
+        $c.lit("dulled")
+    ]);
 }

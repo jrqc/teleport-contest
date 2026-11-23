@@ -588,7 +588,7 @@ export async function cuss(mtmp) {   // wizard.c:846
     } else if ($c.andu64(mtmp.data.mflags2, M2_MINION) !== 0 && mon_aligntyp(mtmp) === A_LAWFUL && !(mtmp.isminion | 0 && mtmp.mextra.emin.renegade)) {
         await com_pager($c.lit("angel_cuss"));
     } else {
-        if (!rn2($c.andu64(mtmp.data.mflags2, 4096) !== 0 ? 100 : 5)) {
+        if (!rn2($c.andu64(mtmp.data.mflags2, M2_MINION) !== 0 ? 100 : 5)) {
             await pline($c.lit("%s casts aspersions on your ancestry."), await Monnam(mtmp));
         } else {
             await com_pager($c.lit("demon_cuss"));
@@ -599,102 +599,110 @@ export async function cuss(mtmp) {   // wizard.c:846
 
 export function $init() {
     nasties.fill(0);
-    nasties[0] = PM_COCKATRICE;
-    nasties[1] = PM_ETTIN;
-    nasties[2] = PM_STALKER;
-    nasties[3] = PM_MINOTAUR;
-    nasties[4] = PM_OWLBEAR;
-    nasties[5] = PM_PURPLE_WORM;
-    nasties[6] = PM_XAN;
-    nasties[7] = PM_UMBER_HULK;
-    nasties[8] = PM_XORN;
-    nasties[9] = PM_ZRUTY;
-    nasties[10] = PM_LEOCROTTA;
-    nasties[11] = PM_BALUCHITHERIUM;
-    nasties[12] = PM_CARNIVOROUS_APE;
-    nasties[13] = PM_FIRE_ELEMENTAL;
-    nasties[14] = PM_JABBERWOCK;
-    nasties[15] = PM_IRON_GOLEM;
-    nasties[16] = PM_OCHRE_JELLY;
-    nasties[17] = PM_GREEN_SLIME;
-    nasties[18] = PM_DISPLACER_BEAST;
-    nasties[19] = PM_GENETIC_ENGINEER;
-    nasties[20] = PM_BLACK_DRAGON;
-    nasties[21] = PM_RED_DRAGON;
-    nasties[22] = PM_ARCH_LICH;
-    nasties[23] = PM_VAMPIRE_LEADER;
-    nasties[24] = PM_MASTER_MIND_FLAYER;
-    nasties[25] = PM_DISENCHANTER;
-    nasties[26] = PM_WINGED_GARGOYLE;
-    nasties[27] = PM_STORM_GIANT;
-    nasties[28] = PM_OLOG_HAI;
-    nasties[29] = PM_ELF_NOBLE;
-    nasties[30] = PM_ELVEN_MONARCH;
-    nasties[31] = PM_OGRE_TYRANT;
-    nasties[32] = PM_CAPTAIN;
-    nasties[33] = PM_GREMLIN;
-    nasties[34] = PM_SILVER_DRAGON;
-    nasties[35] = PM_ORANGE_DRAGON;
-    nasties[36] = PM_GREEN_DRAGON;
-    nasties[37] = PM_YELLOW_DRAGON;
-    nasties[38] = PM_GUARDIAN_NAGA;
-    nasties[39] = PM_FIRE_GIANT;
-    nasties[40] = PM_ALEAX;
-    nasties[41] = PM_COUATL;
-    nasties[42] = PM_HORNED_DEVIL;
-    nasties[43] = PM_BARBED_DEVIL;
+    $c.init(nasties, [
+        PM_COCKATRICE,
+        PM_ETTIN,
+        PM_STALKER,
+        PM_MINOTAUR,
+        PM_OWLBEAR,
+        PM_PURPLE_WORM,
+        PM_XAN,
+        PM_UMBER_HULK,
+        PM_XORN,
+        PM_ZRUTY,
+        PM_LEOCROTTA,
+        PM_BALUCHITHERIUM,
+        PM_CARNIVOROUS_APE,
+        PM_FIRE_ELEMENTAL,
+        PM_JABBERWOCK,
+        PM_IRON_GOLEM,
+        PM_OCHRE_JELLY,
+        PM_GREEN_SLIME,
+        PM_DISPLACER_BEAST,
+        PM_GENETIC_ENGINEER,
+        PM_BLACK_DRAGON,
+        PM_RED_DRAGON,
+        PM_ARCH_LICH,
+        PM_VAMPIRE_LEADER,
+        PM_MASTER_MIND_FLAYER,
+        PM_DISENCHANTER,
+        PM_WINGED_GARGOYLE,
+        PM_STORM_GIANT,
+        PM_OLOG_HAI,
+        PM_ELF_NOBLE,
+        PM_ELVEN_MONARCH,
+        PM_OGRE_TYRANT,
+        PM_CAPTAIN,
+        PM_GREMLIN,
+        PM_SILVER_DRAGON,
+        PM_ORANGE_DRAGON,
+        PM_GREEN_DRAGON,
+        PM_YELLOW_DRAGON,
+        PM_GUARDIAN_NAGA,
+        PM_FIRE_GIANT,
+        PM_ALEAX,
+        PM_COUATL,
+        PM_HORNED_DEVIL,
+        PM_BARBED_DEVIL
+    ]);
     wizapp.fill(0);
-    wizapp[0] = PM_HUMAN;
-    wizapp[1] = PM_WATER_DEMON;
-    wizapp[2] = PM_VAMPIRE;
-    wizapp[3] = PM_RED_DRAGON;
-    wizapp[4] = PM_TROLL;
-    wizapp[5] = PM_UMBER_HULK;
-    wizapp[6] = PM_XORN;
-    wizapp[7] = PM_XAN;
-    wizapp[8] = PM_COCKATRICE;
-    wizapp[9] = PM_FLOATING_EYE;
-    wizapp[10] = PM_GUARDIAN_NAGA;
-    wizapp[11] = PM_TRAPPER;
+    $c.init(wizapp, [
+        PM_HUMAN,
+        PM_WATER_DEMON,
+        PM_VAMPIRE,
+        PM_RED_DRAGON,
+        PM_TROLL,
+        PM_UMBER_HULK,
+        PM_XORN,
+        PM_XAN,
+        PM_COCKATRICE,
+        PM_FLOATING_EYE,
+        PM_GUARDIAN_NAGA,
+        PM_TRAPPER
+    ]);
     random_insult.fill(null);
-    random_insult[0] = $c.lit("antic");
-    random_insult[1] = $c.lit("blackguard");
-    random_insult[2] = $c.lit("caitiff");
-    random_insult[3] = $c.lit("chucklehead");
-    random_insult[4] = $c.lit("coistrel");
-    random_insult[5] = $c.lit("craven");
-    random_insult[6] = $c.lit("cretin");
-    random_insult[7] = $c.lit("cur");
-    random_insult[8] = $c.lit("dastard");
-    random_insult[9] = $c.lit("demon fodder");
-    random_insult[10] = $c.lit("dimwit");
-    random_insult[11] = $c.lit("dolt");
-    random_insult[12] = $c.lit("fool");
-    random_insult[13] = $c.lit("footpad");
-    random_insult[14] = $c.lit("imbecile");
-    random_insult[15] = $c.lit("knave");
-    random_insult[16] = $c.lit("maledict");
-    random_insult[17] = $c.lit("miscreant");
-    random_insult[18] = $c.lit("niddering");
-    random_insult[19] = $c.lit("poltroon");
-    random_insult[20] = $c.lit("rattlepate");
-    random_insult[21] = $c.lit("reprobate");
-    random_insult[22] = $c.lit("scapegrace");
-    random_insult[23] = $c.lit("varlet");
-    random_insult[24] = $c.lit("villein");
-    random_insult[25] = $c.lit("wittol");
-    random_insult[26] = $c.lit("worm");
-    random_insult[27] = $c.lit("wretch");
+    $c.init(random_insult, [
+        $c.lit("antic"),
+        $c.lit("blackguard"),
+        $c.lit("caitiff"),
+        $c.lit("chucklehead"),
+        $c.lit("coistrel"),
+        $c.lit("craven"),
+        $c.lit("cretin"),
+        $c.lit("cur"),
+        $c.lit("dastard"),
+        $c.lit("demon fodder"),
+        $c.lit("dimwit"),
+        $c.lit("dolt"),
+        $c.lit("fool"),
+        $c.lit("footpad"),
+        $c.lit("imbecile"),
+        $c.lit("knave"),
+        $c.lit("maledict"),
+        $c.lit("miscreant"),
+        $c.lit("niddering"),
+        $c.lit("poltroon"),
+        $c.lit("rattlepate"),
+        $c.lit("reprobate"),
+        $c.lit("scapegrace"),
+        $c.lit("varlet"),
+        $c.lit("villein"),
+        $c.lit("wittol"),
+        $c.lit("worm"),
+        $c.lit("wretch")
+    ]);
     random_malediction.fill(null);
-    random_malediction[0] = $c.lit("Hell shall soon claim thy remains,");
-    random_malediction[1] = $c.lit("I chortle at thee, thou pathetic");
-    random_malediction[2] = $c.lit("Prepare to die, thou");
-    random_malediction[3] = $c.lit("Resistance is useless,");
-    random_malediction[4] = $c.lit("Surrender or die, thou");
-    random_malediction[5] = $c.lit("There shall be no mercy, thou");
-    random_malediction[6] = $c.lit("Thou shalt repent of thy cunning,");
-    random_malediction[7] = $c.lit("Thou art as a flea to me,");
-    random_malediction[8] = $c.lit("Thou art doomed,");
-    random_malediction[9] = $c.lit("Thy fate is sealed,");
-    random_malediction[10] = $c.lit("Verily, thou shalt be one dead");
+    $c.init(random_malediction, [
+        $c.lit("Hell shall soon claim thy remains,"),
+        $c.lit("I chortle at thee, thou pathetic"),
+        $c.lit("Prepare to die, thou"),
+        $c.lit("Resistance is useless,"),
+        $c.lit("Surrender or die, thou"),
+        $c.lit("There shall be no mercy, thou"),
+        $c.lit("Thou shalt repent of thy cunning,"),
+        $c.lit("Thou art as a flea to me,"),
+        $c.lit("Thou art doomed,"),
+        $c.lit("Thy fate is sealed,"),
+        $c.lit("Verily, thou shalt be one dead")
+    ]);
 }

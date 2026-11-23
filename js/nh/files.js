@@ -17,7 +17,7 @@ import { discover, wizard } from './flag.macros.js';
 import { BUFSZ, PL_NSIZ_PLUS } from './global.h.js';
 import { strcmpi } from './global.macros.js';
 import { inv_cnt } from './hack.js';
-import { BONESPREFIX, COUNTING, FREEING, HACKPREFIX, LEVELPREFIX, NHF_BONESFILE, NHF_LEVELFILE, NHF_SAVEFILE, READING, SAVEPREFIX, SCOREPREFIX, SF_CRITICAL_BYTE_COUNT_MISMATCH, SF_DM_I32LP64_ON_IL32LLP64, SF_DM_I32LP64_ON_ILP32LL64, SF_DM_IL32LLP64_ON_I32LP64, SF_DM_IL32LLP64_ON_ILP32LL64, SF_DM_ILP32LL64_ON_I32LP64, SF_DM_ILP32LL64_ON_IL32LLP64, SF_DM_MISMATCH, SF_OUTDATED, SF_UPTODATE, SYSCONFPREFIX, TROUBLEPREFIX, WRITING, exportascii, historical, invlet_basic } from './hack.h.js';
+import { BONESPREFIX, COUNTING, FREEING, HACKPREFIX, LEVELPREFIX, NHF_BONESFILE, NHF_LEVELFILE, NHF_SAVEFILE, READING, SAVEPREFIX, SCOREPREFIX, SF_CRITICAL_BYTE_COUNT_MISMATCH, SF_DM_I32LP64_ON_IL32LLP64, SF_DM_I32LP64_ON_ILP32LL64, SF_DM_IL32LLP64_ON_I32LP64, SF_DM_IL32LLP64_ON_ILP32LL64, SF_DM_ILP32LL64_ON_I32LP64, SF_DM_ILP32LL64_ON_IL32LLP64, SF_DM_MISMATCH, SF_OUTDATED, SF_UPTODATE, SYSCONFPREFIX, TROUBLEPREFIX, WIZKIT_MAX, WRITING, exportascii, historical, invlet_basic } from './hack.h.js';
 import { c_eos, copynchars, eos, fuzzymatch, mungspaces, nh_snprintf, s_suffix, strip_newline, strncmpi } from './hacklib.js';
 import { addinv, merge_choice } from './invent.js';
 import { nhUse } from './lint.macros.js';
@@ -874,7 +874,7 @@ async function fopen_wizkit_file() {   // files.c:2465
     let fp = null, tmp_wizkit = new Int8Array(256), envp = null;
     envp = nh_getenv($c.lit("WIZKIT"));
     if (envp && envp.get(0)) {
-        $c.__builtin___strncpy_chk(new $c.Ptr(gw.wizkit, 0), envp, 127, 128);
+        $c.__builtin___strncpy_chk(new $c.Ptr(gw.wizkit, 0), envp, WIZKIT_MAX - 1, 128);
     }
     if (!gw.wizkit[0]) {
         return null;
@@ -1320,26 +1320,18 @@ export function $init() {
     for (let $i0 = 0; $i0 < 10; $i0++) {
         sf2msg[$i0].$copyFrom(new $T.sfstatus_to_msg());
     }
-    sf2msg[0].sfstatus = SF_UPTODATE;
-    sf2msg[0].msg = $c.lit("everything matches");
-    sf2msg[1].sfstatus = SF_OUTDATED;
-    sf2msg[1].msg = $c.lit("outdated savefile");
-    sf2msg[2].sfstatus = SF_CRITICAL_BYTE_COUNT_MISMATCH;
-    sf2msg[2].msg = $c.lit("savefile critical byte-count mismatch");
-    sf2msg[3].sfstatus = SF_DM_IL32LLP64_ON_ILP32LL64;
-    sf2msg[3].msg = $c.lit("Windows x64 savefile on x86");
-    sf2msg[4].sfstatus = SF_DM_I32LP64_ON_ILP32LL64;
-    sf2msg[4].msg = $c.lit("Unix 64 savefile on x86");
-    sf2msg[5].sfstatus = SF_DM_ILP32LL64_ON_I32LP64;
-    sf2msg[5].msg = $c.lit("x86 savefile on Unix 64");
-    sf2msg[6].sfstatus = SF_DM_ILP32LL64_ON_IL32LLP64;
-    sf2msg[6].msg = $c.lit("x86 savefile on Windows x64");
-    sf2msg[7].sfstatus = SF_DM_I32LP64_ON_IL32LLP64;
-    sf2msg[7].msg = $c.lit("Unix 64 savefile on Windows x64");
-    sf2msg[8].sfstatus = SF_DM_IL32LLP64_ON_I32LP64;
-    sf2msg[8].msg = $c.lit("Windows x64 savefile on Unix 64");
-    sf2msg[9].sfstatus = SF_DM_MISMATCH;
-    sf2msg[9].msg = $c.lit("generic savefile mismatch");
+    $c.init(sf2msg, [
+        { sfstatus: SF_UPTODATE, msg: $c.lit("everything matches") },
+        { sfstatus: SF_OUTDATED, msg: $c.lit("outdated savefile") },
+        { sfstatus: SF_CRITICAL_BYTE_COUNT_MISMATCH, msg: $c.lit("savefile critical byte-count mismatch") },
+        { sfstatus: SF_DM_IL32LLP64_ON_ILP32LL64, msg: $c.lit("Windows x64 savefile on x86") },
+        { sfstatus: SF_DM_I32LP64_ON_ILP32LL64, msg: $c.lit("Unix 64 savefile on x86") },
+        { sfstatus: SF_DM_ILP32LL64_ON_I32LP64, msg: $c.lit("x86 savefile on Unix 64") },
+        { sfstatus: SF_DM_ILP32LL64_ON_IL32LLP64, msg: $c.lit("x86 savefile on Windows x64") },
+        { sfstatus: SF_DM_I32LP64_ON_IL32LLP64, msg: $c.lit("Unix 64 savefile on Windows x64") },
+        { sfstatus: SF_DM_IL32LLP64_ON_I32LP64, msg: $c.lit("Windows x64 savefile on Unix 64") },
+        { sfstatus: SF_DM_MISMATCH, msg: $c.lit("generic savefile mismatch") }
+    ]);
     cvtinit = 0;
     unconverted_filename = null;
     converted_filename = null;

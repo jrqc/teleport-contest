@@ -35,7 +35,7 @@ import { DELPHI, FODDERSHOP, ROOMOFFSET, SHOPBASE, TEMPLE, VAULT, ZOO } from './
 import { can_be_hatched, hideunder, mondied, mongone, newcham, pm_to_cham } from './mon.js';
 import { little_to_big, mon_learns_traps, pronoun_gender, set_mon_data } from './mondata.js';
 import { always_hostile, always_peaceful, amorphous, emits_light, extra_nasty, humanoid, is_armed, is_bat, is_demon, is_domestic, is_dprince, is_dwarf, is_elf, is_female, is_floater, is_flyer, is_giant, is_golem, is_lord, is_male, is_mercenary, is_minion, is_mplayer, is_ndemon, is_neuter, is_placeholder, is_prince, is_rider, is_shapeshifter, is_swimmer, is_unicorn, is_whirly, likes_gold, mindless, noncorporeal, nonliving, race_hostile, race_peaceful, strongmonst, throws_rocks } from './mondata.macros.js';
-import { G_EXTINCT, G_FREQ, G_GENOD, G_GONE, G_HELL, G_IGNORE, G_LGROUP, G_NOCORPSE, G_NOGEN, G_NOHELL, G_SGROUP, G_UNIQ, M2_MINION, M3_CLOSE, M3_COVETOUS, M3_WAITFORU, M3_WAITMASK, MS_BRIBE, MS_GUARDIAN, MS_LEADER, MS_NEMESIS, MS_PRIEST, NEUTRAL } from './monflag.h.js';
+import { G_EXTINCT, G_FREQ, G_GENOD, G_GONE, G_HELL, G_IGNORE, G_LGROUP, G_NOCORPSE, G_NOGEN, G_NOHELL, G_SGROUP, G_UNIQ, M2_MINION, M3_CLOSE, M3_COVETOUS, M3_WAITFORU, M3_WAITMASK, MR_COLD, MR_FIRE, MS_BRIBE, MS_GUARDIAN, MS_LEADER, MS_NEMESIS, MS_PRIEST, NEUTRAL } from './monflag.h.js';
 import { dochugw, mon_track_clear, set_apparxy } from './monmove.js';
 import { mons, monst_globals_init } from './monst.js';
 import { M_AP_FURNITURE, M_AP_MONSTER, M_AP_NOTHING, M_AP_OBJECT, M_SEEN_NOTHING, STRAT_CLOSE, STRAT_WAITFORU } from './monst.h.js';
@@ -116,7 +116,7 @@ function wrong_elem_type(ptr) {   // makemon.c:56
             return TRUE;
         }
     } else if ((svd.dungeon_topology.d_fire_level.dlevel || svd.dungeon_topology.d_fire_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_fire_level)) {
-        if (!((ptr.mresists & 1) !== 0)) {
+        if (!((ptr.mresists & MR_FIRE) !== 0)) {
             return TRUE;
         }
     } else if ((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level)) {
@@ -970,8 +970,8 @@ function makemon_rnd_goodpos(mon, gpflags, cc) {   // makemon.c:1076
             tryct = 0;
             gpflags = $c.u32($c.or64(gpflags, GP_AVOID_MONPOS));
             do {
-                nx = $c.i16(rn2(77) + 2 | 0);
-                ny = $c.i16(rn2(21));
+                nx = $c.i16(rn2(COLNO - 3) + 2 | 0);
+                ny = $c.i16(rn2(ROWNO));
                 good = $c.i8(!gi.in_mklev && cansee(nx, ny) ? FALSE : goodpos(nx, ny, mon, gpflags));
             } while ((tryct = tryct + 1 | 0) < 50 && !good);
         case "gotgood":
@@ -1416,7 +1416,7 @@ function align_shift(ptr) {   // makemon.c:1611
     return alshift;
 }
 function temperature_shift(ptr) {   // makemon.c:1641
-    if (svl.level.flags.temperature && (ptr.mresists & (svl.level.flags.temperature > 0 ? 1 : 2)) !== 0) {
+    if (svl.level.flags.temperature && (ptr.mresists & (svl.level.flags.temperature > 0 ? MR_FIRE : MR_COLD)) !== 0) {
         return 3;
     }
     return 0;
@@ -2089,32 +2089,36 @@ export function $init() {
     mclass_maxf.fill(0);
     mongen_order_init = FALSE;
     syms.fill(0);
-    syms[0] = MAXOCLASSES;
-    syms[1] = MAXOCLASSES;
-    syms[2] = RING_CLASS;
-    syms[3] = WAND_CLASS;
-    syms[4] = WEAPON_CLASS;
-    syms[5] = FOOD_CLASS;
-    syms[6] = COIN_CLASS;
-    syms[7] = SCROLL_CLASS;
-    syms[8] = POTION_CLASS;
-    syms[9] = ARMOR_CLASS;
-    syms[10] = AMULET_CLASS;
-    syms[11] = TOOL_CLASS;
-    syms[12] = ROCK_CLASS;
-    syms[13] = GEM_CLASS;
-    syms[14] = SPBOOK_CLASS;
-    syms[15] = S_MIMIC_DEF;
-    syms[16] = S_MIMIC_DEF;
+    $c.init(syms, [
+        MAXOCLASSES,
+        MAXOCLASSES,
+        RING_CLASS,
+        WAND_CLASS,
+        WEAPON_CLASS,
+        FOOD_CLASS,
+        COIN_CLASS,
+        SCROLL_CLASS,
+        POTION_CLASS,
+        ARMOR_CLASS,
+        AMULET_CLASS,
+        TOOL_CLASS,
+        ROCK_CLASS,
+        GEM_CLASS,
+        SPBOOK_CLASS,
+        S_MIMIC_DEF,
+        S_MIMIC_DEF
+    ]);
     align_shift$oldmoves = 0;
     align_shift$lev = null;
     set_mimic_sym$furnsyms.fill(0);
-    set_mimic_sym$furnsyms[0] = S_upstair;
-    set_mimic_sym$furnsyms[1] = S_upstair;
-    set_mimic_sym$furnsyms[2] = S_dnstair;
-    set_mimic_sym$furnsyms[3] = S_dnstair;
-    set_mimic_sym$furnsyms[4] = S_altar;
-    set_mimic_sym$furnsyms[5] = S_grave;
-    set_mimic_sym$furnsyms[6] = S_throne;
-    set_mimic_sym$furnsyms[7] = S_sink;
+    $c.init(set_mimic_sym$furnsyms, [
+        S_upstair,
+        S_upstair,
+        S_dnstair,
+        S_dnstair,
+        S_altar,
+        S_grave,
+        S_throne,
+        S_sink
+    ]);
 }

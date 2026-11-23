@@ -9,8 +9,8 @@ import { add_menu_coloring } from './coloratt.js';
 import { flags, gc, gd, gn, go, gw, iflags, program_state, svp } from './decl.js';
 import { build_english_list } from './end.js';
 import { debugcore, do_deferred_showpaths, fqname } from './files.js';
-import { BUFSZ, FALSE, TRUE, environ_opt, rc_file_opt, set_in_config, set_in_sysconf } from './global.h.js';
-import { ECMD_OK, SYM_OFF_X, SYSCONFPREFIX } from './hack.h.js';
+import { BUFSZ, FALSE, PL_NSIZ, PL_PSIZ, TRUE, environ_opt, rc_file_opt, set_in_config, set_in_sysconf } from './global.h.js';
+import { ECMD_OK, SYM_OFF_X, SYSCONFPREFIX, WIZKIT_MAX } from './hack.h.js';
 import { plur } from './hack.macros.js';
 import { c_eos, eos, mungspaces, nh_snprintf, trimspaces } from './hacklib.js';
 import { nhUse } from './lint.macros.js';
@@ -369,7 +369,7 @@ function cnf_line_TROUBLEDIR(bufp) {   // cfgfiles.c:750
     return TRUE;
 }
 function cnf_line_NAME(bufp) {   // cfgfiles.c:761
-    $c.__builtin___strncpy_chk(new $c.Ptr(svp.plname, 0), bufp, 31, 32);
+    $c.__builtin___strncpy_chk(new $c.Ptr(svp.plname, 0), bufp, PL_NSIZ - 1, 32);
     return TRUE;
 }
 async function cnf_line_ROLE(bufp) {   // cfgfiles.c:768
@@ -380,11 +380,11 @@ async function cnf_line_ROLE(bufp) {   // cfgfiles.c:768
     return TRUE;
 }
 function cnf_line_dogname(bufp) {   // cfgfiles.c:778
-    $c.__builtin___strncpy_chk(new $c.Ptr(gd.dogname, 0), bufp, 62, 63);
+    $c.__builtin___strncpy_chk(new $c.Ptr(gd.dogname, 0), bufp, PL_PSIZ - 1, 63);
     return TRUE;
 }
 function cnf_line_catname(bufp) {   // cfgfiles.c:785
-    $c.__builtin___strncpy_chk(new $c.Ptr(gc.catname, 0), bufp, 62, 63);
+    $c.__builtin___strncpy_chk(new $c.Ptr(gc.catname, 0), bufp, PL_PSIZ - 1, 63);
     return TRUE;
 }
 async function cnf_line_WIZARDS(bufp) {   // cfgfiles.c:795
@@ -672,7 +672,7 @@ async function cnf_line_SYMBOLS(bufp) {   // cfgfiles.c:1202
     return FALSE;
 }
 function cnf_line_WIZKIT(bufp) {   // cfgfiles.c:1214
-    $c.__builtin___strncpy_chk(new $c.Ptr(gw.wizkit, 0), bufp, 127, 128);
+    $c.__builtin___strncpy_chk(new $c.Ptr(gw.wizkit, 0), bufp, WIZKIT_MAX - 1, 128);
     return TRUE;
 }
 function cnf_line_QT_TILEWIDTH(bufp) {   // cfgfiles.c:1239
@@ -1151,301 +1151,67 @@ export function $init() {
     for (let $i0 = 0; $i0 < 59; $i0++) {
         config_line_stmt[$i0].$copyFrom(new $T.match_config_line_stmt());
     }
-    config_line_stmt[0].name = $c.lit("OPTIONS");
-    config_line_stmt[0].len = 4;
-    config_line_stmt[0].syscnf_only = 0;
-    config_line_stmt[0].origbuf = 1;
-    config_line_stmt[0].fn = cnf_line_OPTIONS;
-    config_line_stmt[1].name = $c.lit("AUTOPICKUP_EXCEPTION");
-    config_line_stmt[1].len = 5;
-    config_line_stmt[1].syscnf_only = 0;
-    config_line_stmt[1].origbuf = 0;
-    config_line_stmt[1].fn = cnf_line_AUTOPICKUP_EXCEPTION;
-    config_line_stmt[2].name = $c.lit("BINDINGS");
-    config_line_stmt[2].len = 4;
-    config_line_stmt[2].syscnf_only = 0;
-    config_line_stmt[2].origbuf = 0;
-    config_line_stmt[2].fn = cnf_line_BINDINGS;
-    config_line_stmt[3].name = $c.lit("AUTOCOMPLETE");
-    config_line_stmt[3].len = 5;
-    config_line_stmt[3].syscnf_only = 0;
-    config_line_stmt[3].origbuf = 0;
-    config_line_stmt[3].fn = cnf_line_AUTOCOMPLETE;
-    config_line_stmt[4].name = $c.lit("MSGTYPE");
-    config_line_stmt[4].len = 7;
-    config_line_stmt[4].syscnf_only = 0;
-    config_line_stmt[4].origbuf = 0;
-    config_line_stmt[4].fn = cnf_line_MSGTYPE;
-    config_line_stmt[5].name = $c.lit("HACKDIR");
-    config_line_stmt[5].len = 4;
-    config_line_stmt[5].syscnf_only = 0;
-    config_line_stmt[5].origbuf = 0;
-    config_line_stmt[5].fn = cnf_line_HACKDIR;
-    config_line_stmt[6].name = $c.lit("LEVELDIR");
-    config_line_stmt[6].len = 4;
-    config_line_stmt[6].syscnf_only = 0;
-    config_line_stmt[6].origbuf = 0;
-    config_line_stmt[6].fn = cnf_line_LEVELDIR;
-    config_line_stmt[7].name = $c.lit("LEVELS");
-    config_line_stmt[7].len = 4;
-    config_line_stmt[7].syscnf_only = 0;
-    config_line_stmt[7].origbuf = 0;
-    config_line_stmt[7].fn = cnf_line_LEVELDIR;
-    config_line_stmt[8].name = $c.lit("SAVEDIR");
-    config_line_stmt[8].len = 4;
-    config_line_stmt[8].syscnf_only = 0;
-    config_line_stmt[8].origbuf = 0;
-    config_line_stmt[8].fn = cnf_line_SAVEDIR;
-    config_line_stmt[9].name = $c.lit("BONESDIR");
-    config_line_stmt[9].len = 5;
-    config_line_stmt[9].syscnf_only = 0;
-    config_line_stmt[9].origbuf = 0;
-    config_line_stmt[9].fn = cnf_line_BONESDIR;
-    config_line_stmt[10].name = $c.lit("DATADIR");
-    config_line_stmt[10].len = 4;
-    config_line_stmt[10].syscnf_only = 0;
-    config_line_stmt[10].origbuf = 0;
-    config_line_stmt[10].fn = cnf_line_DATADIR;
-    config_line_stmt[11].name = $c.lit("SCOREDIR");
-    config_line_stmt[11].len = 4;
-    config_line_stmt[11].syscnf_only = 0;
-    config_line_stmt[11].origbuf = 0;
-    config_line_stmt[11].fn = cnf_line_SCOREDIR;
-    config_line_stmt[12].name = $c.lit("LOCKDIR");
-    config_line_stmt[12].len = 4;
-    config_line_stmt[12].syscnf_only = 0;
-    config_line_stmt[12].origbuf = 0;
-    config_line_stmt[12].fn = cnf_line_LOCKDIR;
-    config_line_stmt[13].name = $c.lit("CONFIGDIR");
-    config_line_stmt[13].len = 4;
-    config_line_stmt[13].syscnf_only = 0;
-    config_line_stmt[13].origbuf = 0;
-    config_line_stmt[13].fn = cnf_line_CONFIGDIR;
-    config_line_stmt[14].name = $c.lit("TROUBLEDIR");
-    config_line_stmt[14].len = 4;
-    config_line_stmt[14].syscnf_only = 0;
-    config_line_stmt[14].origbuf = 0;
-    config_line_stmt[14].fn = cnf_line_TROUBLEDIR;
-    config_line_stmt[15].name = $c.lit("NAME");
-    config_line_stmt[15].len = 4;
-    config_line_stmt[15].syscnf_only = 0;
-    config_line_stmt[15].origbuf = 0;
-    config_line_stmt[15].fn = cnf_line_NAME;
-    config_line_stmt[16].name = $c.lit("ROLE");
-    config_line_stmt[16].len = 4;
-    config_line_stmt[16].syscnf_only = 0;
-    config_line_stmt[16].origbuf = 0;
-    config_line_stmt[16].fn = cnf_line_ROLE;
-    config_line_stmt[17].name = $c.lit("CHARACTER");
-    config_line_stmt[17].len = 4;
-    config_line_stmt[17].syscnf_only = 0;
-    config_line_stmt[17].origbuf = 0;
-    config_line_stmt[17].fn = cnf_line_ROLE;
-    config_line_stmt[18].name = $c.lit("dogname");
-    config_line_stmt[18].len = 3;
-    config_line_stmt[18].syscnf_only = 0;
-    config_line_stmt[18].origbuf = 0;
-    config_line_stmt[18].fn = cnf_line_dogname;
-    config_line_stmt[19].name = $c.lit("catname");
-    config_line_stmt[19].len = 3;
-    config_line_stmt[19].syscnf_only = 0;
-    config_line_stmt[19].origbuf = 0;
-    config_line_stmt[19].fn = cnf_line_catname;
-    config_line_stmt[20].name = $c.lit("WIZARDS");
-    config_line_stmt[20].len = 7;
-    config_line_stmt[20].syscnf_only = 1;
-    config_line_stmt[20].origbuf = 0;
-    config_line_stmt[20].fn = cnf_line_WIZARDS;
-    config_line_stmt[21].name = $c.lit("SHELLERS");
-    config_line_stmt[21].len = 8;
-    config_line_stmt[21].syscnf_only = 1;
-    config_line_stmt[21].origbuf = 0;
-    config_line_stmt[21].fn = cnf_line_SHELLERS;
-    config_line_stmt[22].name = $c.lit("MSGHANDLER");
-    config_line_stmt[22].len = 9;
-    config_line_stmt[22].syscnf_only = 1;
-    config_line_stmt[22].origbuf = 0;
-    config_line_stmt[22].fn = cnf_line_MSGHANDLER;
-    config_line_stmt[23].name = $c.lit("EXPLORERS");
-    config_line_stmt[23].len = 7;
-    config_line_stmt[23].syscnf_only = 1;
-    config_line_stmt[23].origbuf = 0;
-    config_line_stmt[23].fn = cnf_line_EXPLORERS;
-    config_line_stmt[24].name = $c.lit("DEBUGFILES");
-    config_line_stmt[24].len = 5;
-    config_line_stmt[24].syscnf_only = 1;
-    config_line_stmt[24].origbuf = 0;
-    config_line_stmt[24].fn = cnf_line_DEBUGFILES;
-    config_line_stmt[25].name = $c.lit("DUMPLOGFILE");
-    config_line_stmt[25].len = 7;
-    config_line_stmt[25].syscnf_only = 1;
-    config_line_stmt[25].origbuf = 0;
-    config_line_stmt[25].fn = cnf_line_DUMPLOGFILE;
-    config_line_stmt[26].name = $c.lit("GENERICUSERS");
-    config_line_stmt[26].len = 12;
-    config_line_stmt[26].syscnf_only = 1;
-    config_line_stmt[26].origbuf = 0;
-    config_line_stmt[26].fn = cnf_line_GENERICUSERS;
-    config_line_stmt[27].name = $c.lit("BONES_POOLS");
-    config_line_stmt[27].len = 10;
-    config_line_stmt[27].syscnf_only = 1;
-    config_line_stmt[27].origbuf = 0;
-    config_line_stmt[27].fn = cnf_line_BONES_POOLS;
-    config_line_stmt[28].name = $c.lit("SUPPORT");
-    config_line_stmt[28].len = 7;
-    config_line_stmt[28].syscnf_only = 1;
-    config_line_stmt[28].origbuf = 0;
-    config_line_stmt[28].fn = cnf_line_SUPPORT;
-    config_line_stmt[29].name = $c.lit("RECOVER");
-    config_line_stmt[29].len = 7;
-    config_line_stmt[29].syscnf_only = 1;
-    config_line_stmt[29].origbuf = 0;
-    config_line_stmt[29].fn = cnf_line_RECOVER;
-    config_line_stmt[30].name = $c.lit("CHECK_SAVE_UID");
-    config_line_stmt[30].len = 14;
-    config_line_stmt[30].syscnf_only = 1;
-    config_line_stmt[30].origbuf = 0;
-    config_line_stmt[30].fn = cnf_line_CHECK_SAVE_UID;
-    config_line_stmt[31].name = $c.lit("CHECK_PLNAME");
-    config_line_stmt[31].len = 12;
-    config_line_stmt[31].syscnf_only = 1;
-    config_line_stmt[31].origbuf = 0;
-    config_line_stmt[31].fn = cnf_line_CHECK_PLNAME;
-    config_line_stmt[32].name = $c.lit("SEDUCE");
-    config_line_stmt[32].len = 6;
-    config_line_stmt[32].syscnf_only = 1;
-    config_line_stmt[32].origbuf = 0;
-    config_line_stmt[32].fn = cnf_line_SEDUCE;
-    config_line_stmt[33].name = $c.lit("HIDEUSAGE");
-    config_line_stmt[33].len = 9;
-    config_line_stmt[33].syscnf_only = 1;
-    config_line_stmt[33].origbuf = 0;
-    config_line_stmt[33].fn = cnf_line_HIDEUSAGE;
-    config_line_stmt[34].name = $c.lit("MAXPLAYERS");
-    config_line_stmt[34].len = 10;
-    config_line_stmt[34].syscnf_only = 1;
-    config_line_stmt[34].origbuf = 0;
-    config_line_stmt[34].fn = cnf_line_MAXPLAYERS;
-    config_line_stmt[35].name = $c.lit("PERSMAX");
-    config_line_stmt[35].len = 7;
-    config_line_stmt[35].syscnf_only = 1;
-    config_line_stmt[35].origbuf = 0;
-    config_line_stmt[35].fn = cnf_line_PERSMAX;
-    config_line_stmt[36].name = $c.lit("PERS_IS_UID");
-    config_line_stmt[36].len = 11;
-    config_line_stmt[36].syscnf_only = 1;
-    config_line_stmt[36].origbuf = 0;
-    config_line_stmt[36].fn = cnf_line_PERS_IS_UID;
-    config_line_stmt[37].name = $c.lit("ENTRYMAX");
-    config_line_stmt[37].len = 8;
-    config_line_stmt[37].syscnf_only = 1;
-    config_line_stmt[37].origbuf = 0;
-    config_line_stmt[37].fn = cnf_line_ENTRYMAX;
-    config_line_stmt[38].name = $c.lit("POINTSMIN");
-    config_line_stmt[38].len = 9;
-    config_line_stmt[38].syscnf_only = 1;
-    config_line_stmt[38].origbuf = 0;
-    config_line_stmt[38].fn = cnf_line_POINTSMIN;
-    config_line_stmt[39].name = $c.lit("MAX_STATUENAME_RANK");
-    config_line_stmt[39].len = 10;
-    config_line_stmt[39].syscnf_only = 1;
-    config_line_stmt[39].origbuf = 0;
-    config_line_stmt[39].fn = cnf_line_MAX_STATUENAME_RANK;
-    config_line_stmt[40].name = $c.lit("LIVELOG");
-    config_line_stmt[40].len = 7;
-    config_line_stmt[40].syscnf_only = 1;
-    config_line_stmt[40].origbuf = 0;
-    config_line_stmt[40].fn = cnf_line_LIVELOG;
-    config_line_stmt[41].name = $c.lit("PANICTRACE_LIBC");
-    config_line_stmt[41].len = 15;
-    config_line_stmt[41].syscnf_only = 1;
-    config_line_stmt[41].origbuf = 0;
-    config_line_stmt[41].fn = cnf_line_PANICTRACE_LIBC;
-    config_line_stmt[42].name = $c.lit("PANICTRACE_GDB");
-    config_line_stmt[42].len = 14;
-    config_line_stmt[42].syscnf_only = 1;
-    config_line_stmt[42].origbuf = 0;
-    config_line_stmt[42].fn = cnf_line_PANICTRACE_GDB;
-    config_line_stmt[43].name = $c.lit("CRASHREPORTURL");
-    config_line_stmt[43].len = 13;
-    config_line_stmt[43].syscnf_only = 1;
-    config_line_stmt[43].origbuf = 0;
-    config_line_stmt[43].fn = cnf_line_CRASHREPORTURL;
-    config_line_stmt[44].name = $c.lit("GDBPATH");
-    config_line_stmt[44].len = 7;
-    config_line_stmt[44].syscnf_only = 1;
-    config_line_stmt[44].origbuf = 0;
-    config_line_stmt[44].fn = cnf_line_GDBPATH;
-    config_line_stmt[45].name = $c.lit("GREPPATH");
-    config_line_stmt[45].len = 7;
-    config_line_stmt[45].syscnf_only = 1;
-    config_line_stmt[45].origbuf = 0;
-    config_line_stmt[45].fn = cnf_line_GREPPATH;
-    config_line_stmt[46].name = $c.lit("ACCESSIBILITY");
-    config_line_stmt[46].len = 13;
-    config_line_stmt[46].syscnf_only = 1;
-    config_line_stmt[46].origbuf = 0;
-    config_line_stmt[46].fn = cnf_line_ACCESSIBILITY;
-    config_line_stmt[47].name = $c.lit("PORTABLE_DEVICE_PATHS");
-    config_line_stmt[47].len = 8;
-    config_line_stmt[47].syscnf_only = 1;
-    config_line_stmt[47].origbuf = 0;
-    config_line_stmt[47].fn = cnf_line_PORTABLE_DEVICE_PATHS;
-    config_line_stmt[48].name = $c.lit("BOULDER");
-    config_line_stmt[48].len = 3;
-    config_line_stmt[48].syscnf_only = 0;
-    config_line_stmt[48].origbuf = 0;
-    config_line_stmt[48].fn = cnf_line_BOULDER;
-    config_line_stmt[49].name = $c.lit("MENUCOLOR");
-    config_line_stmt[49].len = 9;
-    config_line_stmt[49].syscnf_only = 0;
-    config_line_stmt[49].origbuf = 0;
-    config_line_stmt[49].fn = cnf_line_MENUCOLOR;
-    config_line_stmt[50].name = $c.lit("HILITE_STATUS");
-    config_line_stmt[50].len = 6;
-    config_line_stmt[50].syscnf_only = 0;
-    config_line_stmt[50].origbuf = 0;
-    config_line_stmt[50].fn = cnf_line_HILITE_STATUS;
-    config_line_stmt[51].name = $c.lit("WARNINGS");
-    config_line_stmt[51].len = 5;
-    config_line_stmt[51].syscnf_only = 0;
-    config_line_stmt[51].origbuf = 0;
-    config_line_stmt[51].fn = cnf_line_WARNINGS;
-    config_line_stmt[52].name = $c.lit("ROGUESYMBOLS");
-    config_line_stmt[52].len = 4;
-    config_line_stmt[52].syscnf_only = 0;
-    config_line_stmt[52].origbuf = 0;
-    config_line_stmt[52].fn = cnf_line_ROGUESYMBOLS;
-    config_line_stmt[53].name = $c.lit("SYMBOLS");
-    config_line_stmt[53].len = 4;
-    config_line_stmt[53].syscnf_only = 0;
-    config_line_stmt[53].origbuf = 0;
-    config_line_stmt[53].fn = cnf_line_SYMBOLS;
-    config_line_stmt[54].name = $c.lit("WIZKIT");
-    config_line_stmt[54].len = 6;
-    config_line_stmt[54].syscnf_only = 0;
-    config_line_stmt[54].origbuf = 0;
-    config_line_stmt[54].fn = cnf_line_WIZKIT;
-    config_line_stmt[55].name = $c.lit("QT_TILEWIDTH");
-    config_line_stmt[55].len = 12;
-    config_line_stmt[55].syscnf_only = 0;
-    config_line_stmt[55].origbuf = 0;
-    config_line_stmt[55].fn = cnf_line_QT_TILEWIDTH;
-    config_line_stmt[56].name = $c.lit("QT_TILEHEIGHT");
-    config_line_stmt[56].len = 13;
-    config_line_stmt[56].syscnf_only = 0;
-    config_line_stmt[56].origbuf = 0;
-    config_line_stmt[56].fn = cnf_line_QT_TILEHEIGHT;
-    config_line_stmt[57].name = $c.lit("QT_FONTSIZE");
-    config_line_stmt[57].len = 11;
-    config_line_stmt[57].syscnf_only = 0;
-    config_line_stmt[57].origbuf = 0;
-    config_line_stmt[57].fn = cnf_line_QT_FONTSIZE;
-    config_line_stmt[58].name = $c.lit("QT_COMPACT");
-    config_line_stmt[58].len = 10;
-    config_line_stmt[58].syscnf_only = 0;
-    config_line_stmt[58].origbuf = 0;
-    config_line_stmt[58].fn = cnf_line_QT_COMPACT;
+    $c.init(config_line_stmt, [
+        { name: $c.lit("OPTIONS"), len: 4, syscnf_only: 0, origbuf: 1, fn: cnf_line_OPTIONS },
+        { name: $c.lit("AUTOPICKUP_EXCEPTION"), len: 5, syscnf_only: 0, origbuf: 0, fn: cnf_line_AUTOPICKUP_EXCEPTION },
+        { name: $c.lit("BINDINGS"), len: 4, syscnf_only: 0, origbuf: 0, fn: cnf_line_BINDINGS },
+        { name: $c.lit("AUTOCOMPLETE"), len: 5, syscnf_only: 0, origbuf: 0, fn: cnf_line_AUTOCOMPLETE },
+        { name: $c.lit("MSGTYPE"), len: 7, syscnf_only: 0, origbuf: 0, fn: cnf_line_MSGTYPE },
+        { name: $c.lit("HACKDIR"), len: 4, syscnf_only: 0, origbuf: 0, fn: cnf_line_HACKDIR },
+        { name: $c.lit("LEVELDIR"), len: 4, syscnf_only: 0, origbuf: 0, fn: cnf_line_LEVELDIR },
+        { name: $c.lit("LEVELS"), len: 4, syscnf_only: 0, origbuf: 0, fn: cnf_line_LEVELDIR },
+        { name: $c.lit("SAVEDIR"), len: 4, syscnf_only: 0, origbuf: 0, fn: cnf_line_SAVEDIR },
+        { name: $c.lit("BONESDIR"), len: 5, syscnf_only: 0, origbuf: 0, fn: cnf_line_BONESDIR },
+        { name: $c.lit("DATADIR"), len: 4, syscnf_only: 0, origbuf: 0, fn: cnf_line_DATADIR },
+        { name: $c.lit("SCOREDIR"), len: 4, syscnf_only: 0, origbuf: 0, fn: cnf_line_SCOREDIR },
+        { name: $c.lit("LOCKDIR"), len: 4, syscnf_only: 0, origbuf: 0, fn: cnf_line_LOCKDIR },
+        { name: $c.lit("CONFIGDIR"), len: 4, syscnf_only: 0, origbuf: 0, fn: cnf_line_CONFIGDIR },
+        { name: $c.lit("TROUBLEDIR"), len: 4, syscnf_only: 0, origbuf: 0, fn: cnf_line_TROUBLEDIR },
+        { name: $c.lit("NAME"), len: 4, syscnf_only: 0, origbuf: 0, fn: cnf_line_NAME },
+        { name: $c.lit("ROLE"), len: 4, syscnf_only: 0, origbuf: 0, fn: cnf_line_ROLE },
+        { name: $c.lit("CHARACTER"), len: 4, syscnf_only: 0, origbuf: 0, fn: cnf_line_ROLE },
+        { name: $c.lit("dogname"), len: 3, syscnf_only: 0, origbuf: 0, fn: cnf_line_dogname },
+        { name: $c.lit("catname"), len: 3, syscnf_only: 0, origbuf: 0, fn: cnf_line_catname },
+        { name: $c.lit("WIZARDS"), len: 7, syscnf_only: 1, origbuf: 0, fn: cnf_line_WIZARDS },
+        { name: $c.lit("SHELLERS"), len: 8, syscnf_only: 1, origbuf: 0, fn: cnf_line_SHELLERS },
+        { name: $c.lit("MSGHANDLER"), len: 9, syscnf_only: 1, origbuf: 0, fn: cnf_line_MSGHANDLER },
+        { name: $c.lit("EXPLORERS"), len: 7, syscnf_only: 1, origbuf: 0, fn: cnf_line_EXPLORERS },
+        { name: $c.lit("DEBUGFILES"), len: 5, syscnf_only: 1, origbuf: 0, fn: cnf_line_DEBUGFILES },
+        { name: $c.lit("DUMPLOGFILE"), len: 7, syscnf_only: 1, origbuf: 0, fn: cnf_line_DUMPLOGFILE },
+        { name: $c.lit("GENERICUSERS"), len: 12, syscnf_only: 1, origbuf: 0, fn: cnf_line_GENERICUSERS },
+        { name: $c.lit("BONES_POOLS"), len: 10, syscnf_only: 1, origbuf: 0, fn: cnf_line_BONES_POOLS },
+        { name: $c.lit("SUPPORT"), len: 7, syscnf_only: 1, origbuf: 0, fn: cnf_line_SUPPORT },
+        { name: $c.lit("RECOVER"), len: 7, syscnf_only: 1, origbuf: 0, fn: cnf_line_RECOVER },
+        { name: $c.lit("CHECK_SAVE_UID"), len: 14, syscnf_only: 1, origbuf: 0, fn: cnf_line_CHECK_SAVE_UID },
+        { name: $c.lit("CHECK_PLNAME"), len: 12, syscnf_only: 1, origbuf: 0, fn: cnf_line_CHECK_PLNAME },
+        { name: $c.lit("SEDUCE"), len: 6, syscnf_only: 1, origbuf: 0, fn: cnf_line_SEDUCE },
+        { name: $c.lit("HIDEUSAGE"), len: 9, syscnf_only: 1, origbuf: 0, fn: cnf_line_HIDEUSAGE },
+        { name: $c.lit("MAXPLAYERS"), len: 10, syscnf_only: 1, origbuf: 0, fn: cnf_line_MAXPLAYERS },
+        { name: $c.lit("PERSMAX"), len: 7, syscnf_only: 1, origbuf: 0, fn: cnf_line_PERSMAX },
+        { name: $c.lit("PERS_IS_UID"), len: 11, syscnf_only: 1, origbuf: 0, fn: cnf_line_PERS_IS_UID },
+        { name: $c.lit("ENTRYMAX"), len: 8, syscnf_only: 1, origbuf: 0, fn: cnf_line_ENTRYMAX },
+        { name: $c.lit("POINTSMIN"), len: 9, syscnf_only: 1, origbuf: 0, fn: cnf_line_POINTSMIN },
+        { name: $c.lit("MAX_STATUENAME_RANK"), len: 10, syscnf_only: 1, origbuf: 0, fn: cnf_line_MAX_STATUENAME_RANK },
+        { name: $c.lit("LIVELOG"), len: 7, syscnf_only: 1, origbuf: 0, fn: cnf_line_LIVELOG },
+        { name: $c.lit("PANICTRACE_LIBC"), len: 15, syscnf_only: 1, origbuf: 0, fn: cnf_line_PANICTRACE_LIBC },
+        { name: $c.lit("PANICTRACE_GDB"), len: 14, syscnf_only: 1, origbuf: 0, fn: cnf_line_PANICTRACE_GDB },
+        { name: $c.lit("CRASHREPORTURL"), len: 13, syscnf_only: 1, origbuf: 0, fn: cnf_line_CRASHREPORTURL },
+        { name: $c.lit("GDBPATH"), len: 7, syscnf_only: 1, origbuf: 0, fn: cnf_line_GDBPATH },
+        { name: $c.lit("GREPPATH"), len: 7, syscnf_only: 1, origbuf: 0, fn: cnf_line_GREPPATH },
+        { name: $c.lit("ACCESSIBILITY"), len: 13, syscnf_only: 1, origbuf: 0, fn: cnf_line_ACCESSIBILITY },
+        { name: $c.lit("PORTABLE_DEVICE_PATHS"), len: 8, syscnf_only: 1, origbuf: 0, fn: cnf_line_PORTABLE_DEVICE_PATHS },
+        { name: $c.lit("BOULDER"), len: 3, syscnf_only: 0, origbuf: 0, fn: cnf_line_BOULDER },
+        { name: $c.lit("MENUCOLOR"), len: 9, syscnf_only: 0, origbuf: 0, fn: cnf_line_MENUCOLOR },
+        { name: $c.lit("HILITE_STATUS"), len: 6, syscnf_only: 0, origbuf: 0, fn: cnf_line_HILITE_STATUS },
+        { name: $c.lit("WARNINGS"), len: 5, syscnf_only: 0, origbuf: 0, fn: cnf_line_WARNINGS },
+        { name: $c.lit("ROGUESYMBOLS"), len: 4, syscnf_only: 0, origbuf: 0, fn: cnf_line_ROGUESYMBOLS },
+        { name: $c.lit("SYMBOLS"), len: 4, syscnf_only: 0, origbuf: 0, fn: cnf_line_SYMBOLS },
+        { name: $c.lit("WIZKIT"), len: 6, syscnf_only: 0, origbuf: 0, fn: cnf_line_WIZKIT },
+        { name: $c.lit("QT_TILEWIDTH"), len: 12, syscnf_only: 0, origbuf: 0, fn: cnf_line_QT_TILEWIDTH },
+        { name: $c.lit("QT_TILEHEIGHT"), len: 13, syscnf_only: 0, origbuf: 0, fn: cnf_line_QT_TILEHEIGHT },
+        { name: $c.lit("QT_FONTSIZE"), len: 11, syscnf_only: 0, origbuf: 0, fn: cnf_line_QT_FONTSIZE }, { name: $c.lit("QT_COMPACT"), len: 10, syscnf_only: 0,
+          origbuf: 0, fn: cnf_line_QT_COMPACT }
+    ]);
     disregarded_config_lines.fill(0);
     config_error_data = null;
     config_error_msg = null;

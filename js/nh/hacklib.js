@@ -634,41 +634,15 @@ export function $init() {
     for (let $i0 = 0; $i0 < 5; $i0++) {
         dm[$i0].$copyFrom(new $T.datamodel_information());
     }
-    dm[0].sz[0] = 2;
-    dm[0].sz[1] = 4;
-    dm[0].sz[2] = 8;
-    dm[0].sz[3] = 8;
-    dm[0].sz[4] = 8;
-    dm[0].datamodel = $c.lit("");
-    dm[0].dmplatform = $c.lit("");
-    dm[1].sz[0] = 2;
-    dm[1].sz[1] = 4;
-    dm[1].sz[2] = 4;
-    dm[1].sz[3] = 8;
-    dm[1].sz[4] = 4;
-    dm[1].datamodel = $c.lit("ILP32LL64");
-    dm[1].dmplatform = $c.lit("x86 32-bit");
-    dm[2].sz[0] = 2;
-    dm[2].sz[1] = 4;
-    dm[2].sz[2] = 4;
-    dm[2].sz[3] = 8;
-    dm[2].sz[4] = 8;
-    dm[2].datamodel = $c.lit("IL32LLP64");
-    dm[2].dmplatform = $c.lit("Windows x64 64-bit");
-    dm[3].sz[0] = 2;
-    dm[3].sz[1] = 4;
-    dm[3].sz[2] = 8;
-    dm[3].sz[3] = 8;
-    dm[3].sz[4] = 8;
-    dm[3].datamodel = $c.lit("I32LP64");
-    dm[3].dmplatform = $c.lit("Unix 64-bit");
-    dm[4].sz[0] = 2;
-    dm[4].sz[1] = 8;
-    dm[4].sz[2] = 8;
-    dm[4].sz[3] = 8;
-    dm[4].sz[4] = 8;
-    dm[4].datamodel = $c.lit("ILP64");
-    dm[4].dmplatform = $c.lit("Unix ILP64");
+    $c.init(dm, [
+        { sz: [2, 4, 8,
+          8, 8],
+          datamodel: $c.lit(""), dmplatform: $c.lit("") },
+        { sz: [2, 4, 4, 8, 4], datamodel: $c.lit("ILP32LL64"), dmplatform: $c.lit("x86 32-bit") },
+        { sz: [2, 4, 4, 8, 8], datamodel: $c.lit("IL32LLP64"), dmplatform: $c.lit("Windows x64 64-bit") },
+        { sz: [2, 4, 8, 8, 8], datamodel: $c.lit("I32LP64"), dmplatform: $c.lit("Unix 64-bit") },
+        { sz: [2, 8, 8, 8, 8], datamodel: $c.lit("ILP64"), dmplatform: $c.lit("Unix ILP64") }
+    ]);
     s_suffix$buf.fill(0);
     ing_suffix$vowel.fill(0);
     ing_suffix$vowel.set([97, 101, 105, 111, 117, 119, 121]);   // "aeiouwy"

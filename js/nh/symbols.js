@@ -742,633 +742,237 @@ export function $init() {
     $G.decgraphics_mode_callback = null;
     $G.utf8graphics_mode_callback = null;
     known_handling.fill(null);
-    known_handling[0] = $c.lit("UNKNOWN");
-    known_handling[1] = $c.lit("IBM");
-    known_handling[2] = $c.lit("DEC");
-    known_handling[3] = $c.lit("CURS");
-    known_handling[4] = $c.lit("MAC");
-    known_handling[5] = $c.lit("UTF8");
-    known_handling[6] = null;
+    $c.init(known_handling, [
+        $c.lit("UNKNOWN"),
+        $c.lit("IBM"),
+        $c.lit("DEC"),
+        $c.lit("CURS"),
+        $c.lit("MAC"),
+        $c.lit("UTF8"),
+        null
+    ]);
     known_restrictions.fill(null);
-    known_restrictions[0] = $c.lit("primary");
-    known_restrictions[1] = $c.lit("rogue");
-    known_restrictions[2] = null;
+    $c.init(known_restrictions, [
+        $c.lit("primary"),
+        $c.lit("rogue"),
+        null
+    ]);
     for (let $i0 = 0; $i0 < 197; $i0++) {
         loadsyms[$i0].$copyFrom(new $T.symparse());
     }
-    loadsyms[0].range = SYM_CONTROL;
-    loadsyms[0].idx = 0;
-    loadsyms[0].name = $c.lit("start");
-    loadsyms[1].range = SYM_CONTROL;
-    loadsyms[1].idx = 0;
-    loadsyms[1].name = $c.lit("begin");
-    loadsyms[2].range = SYM_CONTROL;
-    loadsyms[2].idx = 1;
-    loadsyms[2].name = $c.lit("finish");
-    loadsyms[3].range = SYM_CONTROL;
-    loadsyms[3].idx = 2;
-    loadsyms[3].name = $c.lit("handling");
-    loadsyms[4].range = SYM_CONTROL;
-    loadsyms[4].idx = 3;
-    loadsyms[4].name = $c.lit("description");
-    loadsyms[5].range = SYM_CONTROL;
-    loadsyms[5].idx = 4;
-    loadsyms[5].name = $c.lit("color");
-    loadsyms[6].range = SYM_CONTROL;
-    loadsyms[6].idx = 4;
-    loadsyms[6].name = $c.lit("colour");
-    loadsyms[7].range = SYM_CONTROL;
-    loadsyms[7].idx = 5;
-    loadsyms[7].name = $c.lit("restrictions");
-    loadsyms[8].range = SYM_PCHAR;
-    loadsyms[8].idx = S_stone;
-    loadsyms[8].name = $c.lit("S_stone");
-    loadsyms[9].range = SYM_PCHAR;
-    loadsyms[9].idx = S_vwall;
-    loadsyms[9].name = $c.lit("S_vwall");
-    loadsyms[10].range = SYM_PCHAR;
-    loadsyms[10].idx = S_hwall;
-    loadsyms[10].name = $c.lit("S_hwall");
-    loadsyms[11].range = SYM_PCHAR;
-    loadsyms[11].idx = S_tlcorn;
-    loadsyms[11].name = $c.lit("S_tlcorn");
-    loadsyms[12].range = SYM_PCHAR;
-    loadsyms[12].idx = S_trcorn;
-    loadsyms[12].name = $c.lit("S_trcorn");
-    loadsyms[13].range = SYM_PCHAR;
-    loadsyms[13].idx = S_blcorn;
-    loadsyms[13].name = $c.lit("S_blcorn");
-    loadsyms[14].range = SYM_PCHAR;
-    loadsyms[14].idx = S_brcorn;
-    loadsyms[14].name = $c.lit("S_brcorn");
-    loadsyms[15].range = SYM_PCHAR;
-    loadsyms[15].idx = S_crwall;
-    loadsyms[15].name = $c.lit("S_crwall");
-    loadsyms[16].range = SYM_PCHAR;
-    loadsyms[16].idx = S_tuwall;
-    loadsyms[16].name = $c.lit("S_tuwall");
-    loadsyms[17].range = SYM_PCHAR;
-    loadsyms[17].idx = S_tdwall;
-    loadsyms[17].name = $c.lit("S_tdwall");
-    loadsyms[18].range = SYM_PCHAR;
-    loadsyms[18].idx = S_tlwall;
-    loadsyms[18].name = $c.lit("S_tlwall");
-    loadsyms[19].range = SYM_PCHAR;
-    loadsyms[19].idx = S_trwall;
-    loadsyms[19].name = $c.lit("S_trwall");
-    loadsyms[20].range = SYM_PCHAR;
-    loadsyms[20].idx = S_ndoor;
-    loadsyms[20].name = $c.lit("S_ndoor");
-    loadsyms[21].range = SYM_PCHAR;
-    loadsyms[21].idx = S_vodoor;
-    loadsyms[21].name = $c.lit("S_vodoor");
-    loadsyms[22].range = SYM_PCHAR;
-    loadsyms[22].idx = S_hodoor;
-    loadsyms[22].name = $c.lit("S_hodoor");
-    loadsyms[23].range = SYM_PCHAR;
-    loadsyms[23].idx = S_vcdoor;
-    loadsyms[23].name = $c.lit("S_vcdoor");
-    loadsyms[24].range = SYM_PCHAR;
-    loadsyms[24].idx = S_hcdoor;
-    loadsyms[24].name = $c.lit("S_hcdoor");
-    loadsyms[25].range = SYM_PCHAR;
-    loadsyms[25].idx = S_bars;
-    loadsyms[25].name = $c.lit("S_bars");
-    loadsyms[26].range = SYM_PCHAR;
-    loadsyms[26].idx = S_tree;
-    loadsyms[26].name = $c.lit("S_tree");
-    loadsyms[27].range = SYM_PCHAR;
-    loadsyms[27].idx = S_room;
-    loadsyms[27].name = $c.lit("S_room");
-    loadsyms[28].range = SYM_PCHAR;
-    loadsyms[28].idx = S_darkroom;
-    loadsyms[28].name = $c.lit("S_darkroom");
-    loadsyms[29].range = SYM_PCHAR;
-    loadsyms[29].idx = S_engroom;
-    loadsyms[29].name = $c.lit("S_engroom");
-    loadsyms[30].range = SYM_PCHAR;
-    loadsyms[30].idx = S_corr;
-    loadsyms[30].name = $c.lit("S_corr");
-    loadsyms[31].range = SYM_PCHAR;
-    loadsyms[31].idx = S_litcorr;
-    loadsyms[31].name = $c.lit("S_litcorr");
-    loadsyms[32].range = SYM_PCHAR;
-    loadsyms[32].idx = S_engrcorr;
-    loadsyms[32].name = $c.lit("S_engrcorr");
-    loadsyms[33].range = SYM_PCHAR;
-    loadsyms[33].idx = S_upstair;
-    loadsyms[33].name = $c.lit("S_upstair");
-    loadsyms[34].range = SYM_PCHAR;
-    loadsyms[34].idx = S_dnstair;
-    loadsyms[34].name = $c.lit("S_dnstair");
-    loadsyms[35].range = SYM_PCHAR;
-    loadsyms[35].idx = S_upladder;
-    loadsyms[35].name = $c.lit("S_upladder");
-    loadsyms[36].range = SYM_PCHAR;
-    loadsyms[36].idx = S_dnladder;
-    loadsyms[36].name = $c.lit("S_dnladder");
-    loadsyms[37].range = SYM_PCHAR;
-    loadsyms[37].idx = S_brupstair;
-    loadsyms[37].name = $c.lit("S_brupstair");
-    loadsyms[38].range = SYM_PCHAR;
-    loadsyms[38].idx = S_brdnstair;
-    loadsyms[38].name = $c.lit("S_brdnstair");
-    loadsyms[39].range = SYM_PCHAR;
-    loadsyms[39].idx = S_brupladder;
-    loadsyms[39].name = $c.lit("S_brupladder");
-    loadsyms[40].range = SYM_PCHAR;
-    loadsyms[40].idx = S_brdnladder;
-    loadsyms[40].name = $c.lit("S_brdnladder");
-    loadsyms[41].range = SYM_PCHAR;
-    loadsyms[41].idx = S_altar;
-    loadsyms[41].name = $c.lit("S_altar");
-    loadsyms[42].range = SYM_PCHAR;
-    loadsyms[42].idx = S_grave;
-    loadsyms[42].name = $c.lit("S_grave");
-    loadsyms[43].range = SYM_PCHAR;
-    loadsyms[43].idx = S_throne;
-    loadsyms[43].name = $c.lit("S_throne");
-    loadsyms[44].range = SYM_PCHAR;
-    loadsyms[44].idx = S_sink;
-    loadsyms[44].name = $c.lit("S_sink");
-    loadsyms[45].range = SYM_PCHAR;
-    loadsyms[45].idx = S_fountain;
-    loadsyms[45].name = $c.lit("S_fountain");
-    loadsyms[46].range = SYM_PCHAR;
-    loadsyms[46].idx = S_pool;
-    loadsyms[46].name = $c.lit("S_pool");
-    loadsyms[47].range = SYM_PCHAR;
-    loadsyms[47].idx = S_ice;
-    loadsyms[47].name = $c.lit("S_ice");
-    loadsyms[48].range = SYM_PCHAR;
-    loadsyms[48].idx = S_lava;
-    loadsyms[48].name = $c.lit("S_lava");
-    loadsyms[49].range = SYM_PCHAR;
-    loadsyms[49].idx = S_lavawall;
-    loadsyms[49].name = $c.lit("S_lavawall");
-    loadsyms[50].range = SYM_PCHAR;
-    loadsyms[50].idx = S_vodbridge;
-    loadsyms[50].name = $c.lit("S_vodbridge");
-    loadsyms[51].range = SYM_PCHAR;
-    loadsyms[51].idx = S_hodbridge;
-    loadsyms[51].name = $c.lit("S_hodbridge");
-    loadsyms[52].range = SYM_PCHAR;
-    loadsyms[52].idx = S_vcdbridge;
-    loadsyms[52].name = $c.lit("S_vcdbridge");
-    loadsyms[53].range = SYM_PCHAR;
-    loadsyms[53].idx = S_hcdbridge;
-    loadsyms[53].name = $c.lit("S_hcdbridge");
-    loadsyms[54].range = SYM_PCHAR;
-    loadsyms[54].idx = S_air;
-    loadsyms[54].name = $c.lit("S_air");
-    loadsyms[55].range = SYM_PCHAR;
-    loadsyms[55].idx = S_cloud;
-    loadsyms[55].name = $c.lit("S_cloud");
-    loadsyms[56].range = SYM_PCHAR;
-    loadsyms[56].idx = S_water;
-    loadsyms[56].name = $c.lit("S_water");
-    loadsyms[57].range = SYM_PCHAR;
-    loadsyms[57].idx = S_arrow_trap;
-    loadsyms[57].name = $c.lit("S_arrow_trap");
-    loadsyms[58].range = SYM_PCHAR;
-    loadsyms[58].idx = S_dart_trap;
-    loadsyms[58].name = $c.lit("S_dart_trap");
-    loadsyms[59].range = SYM_PCHAR;
-    loadsyms[59].idx = S_falling_rock_trap;
-    loadsyms[59].name = $c.lit("S_falling_rock_trap");
-    loadsyms[60].range = SYM_PCHAR;
-    loadsyms[60].idx = S_squeaky_board;
-    loadsyms[60].name = $c.lit("S_squeaky_board");
-    loadsyms[61].range = SYM_PCHAR;
-    loadsyms[61].idx = S_bear_trap;
-    loadsyms[61].name = $c.lit("S_bear_trap");
-    loadsyms[62].range = SYM_PCHAR;
-    loadsyms[62].idx = S_land_mine;
-    loadsyms[62].name = $c.lit("S_land_mine");
-    loadsyms[63].range = SYM_PCHAR;
-    loadsyms[63].idx = S_rolling_boulder_trap;
-    loadsyms[63].name = $c.lit("S_rolling_boulder_trap");
-    loadsyms[64].range = SYM_PCHAR;
-    loadsyms[64].idx = S_sleeping_gas_trap;
-    loadsyms[64].name = $c.lit("S_sleeping_gas_trap");
-    loadsyms[65].range = SYM_PCHAR;
-    loadsyms[65].idx = S_rust_trap;
-    loadsyms[65].name = $c.lit("S_rust_trap");
-    loadsyms[66].range = SYM_PCHAR;
-    loadsyms[66].idx = S_fire_trap;
-    loadsyms[66].name = $c.lit("S_fire_trap");
-    loadsyms[67].range = SYM_PCHAR;
-    loadsyms[67].idx = S_pit;
-    loadsyms[67].name = $c.lit("S_pit");
-    loadsyms[68].range = SYM_PCHAR;
-    loadsyms[68].idx = S_spiked_pit;
-    loadsyms[68].name = $c.lit("S_spiked_pit");
-    loadsyms[69].range = SYM_PCHAR;
-    loadsyms[69].idx = S_hole;
-    loadsyms[69].name = $c.lit("S_hole");
-    loadsyms[70].range = SYM_PCHAR;
-    loadsyms[70].idx = S_trap_door;
-    loadsyms[70].name = $c.lit("S_trap_door");
-    loadsyms[71].range = SYM_PCHAR;
-    loadsyms[71].idx = S_teleportation_trap;
-    loadsyms[71].name = $c.lit("S_teleportation_trap");
-    loadsyms[72].range = SYM_PCHAR;
-    loadsyms[72].idx = S_level_teleporter;
-    loadsyms[72].name = $c.lit("S_level_teleporter");
-    loadsyms[73].range = SYM_PCHAR;
-    loadsyms[73].idx = S_magic_portal;
-    loadsyms[73].name = $c.lit("S_magic_portal");
-    loadsyms[74].range = SYM_PCHAR;
-    loadsyms[74].idx = S_web;
-    loadsyms[74].name = $c.lit("S_web");
-    loadsyms[75].range = SYM_PCHAR;
-    loadsyms[75].idx = S_statue_trap;
-    loadsyms[75].name = $c.lit("S_statue_trap");
-    loadsyms[76].range = SYM_PCHAR;
-    loadsyms[76].idx = S_magic_trap;
-    loadsyms[76].name = $c.lit("S_magic_trap");
-    loadsyms[77].range = SYM_PCHAR;
-    loadsyms[77].idx = S_anti_magic_trap;
-    loadsyms[77].name = $c.lit("S_anti_magic_trap");
-    loadsyms[78].range = SYM_PCHAR;
-    loadsyms[78].idx = S_polymorph_trap;
-    loadsyms[78].name = $c.lit("S_polymorph_trap");
-    loadsyms[79].range = SYM_PCHAR;
-    loadsyms[79].idx = S_vibrating_square;
-    loadsyms[79].name = $c.lit("S_vibrating_square");
-    loadsyms[80].range = SYM_PCHAR;
-    loadsyms[80].idx = S_trapped_door;
-    loadsyms[80].name = $c.lit("S_trapped_door");
-    loadsyms[81].range = SYM_PCHAR;
-    loadsyms[81].idx = S_trapped_chest;
-    loadsyms[81].name = $c.lit("S_trapped_chest");
-    loadsyms[82].range = SYM_PCHAR;
-    loadsyms[82].idx = S_vbeam;
-    loadsyms[82].name = $c.lit("S_vbeam");
-    loadsyms[83].range = SYM_PCHAR;
-    loadsyms[83].idx = S_hbeam;
-    loadsyms[83].name = $c.lit("S_hbeam");
-    loadsyms[84].range = SYM_PCHAR;
-    loadsyms[84].idx = S_lslant;
-    loadsyms[84].name = $c.lit("S_lslant");
-    loadsyms[85].range = SYM_PCHAR;
-    loadsyms[85].idx = S_rslant;
-    loadsyms[85].name = $c.lit("S_rslant");
-    loadsyms[86].range = SYM_PCHAR;
-    loadsyms[86].idx = S_digbeam;
-    loadsyms[86].name = $c.lit("S_digbeam");
-    loadsyms[87].range = SYM_PCHAR;
-    loadsyms[87].idx = S_flashbeam;
-    loadsyms[87].name = $c.lit("S_flashbeam");
-    loadsyms[88].range = SYM_PCHAR;
-    loadsyms[88].idx = S_boomleft;
-    loadsyms[88].name = $c.lit("S_boomleft");
-    loadsyms[89].range = SYM_PCHAR;
-    loadsyms[89].idx = S_boomright;
-    loadsyms[89].name = $c.lit("S_boomright");
-    loadsyms[90].range = SYM_PCHAR;
-    loadsyms[90].idx = S_ss1;
-    loadsyms[90].name = $c.lit("S_ss1");
-    loadsyms[91].range = SYM_PCHAR;
-    loadsyms[91].idx = S_ss2;
-    loadsyms[91].name = $c.lit("S_ss2");
-    loadsyms[92].range = SYM_PCHAR;
-    loadsyms[92].idx = S_ss3;
-    loadsyms[92].name = $c.lit("S_ss3");
-    loadsyms[93].range = SYM_PCHAR;
-    loadsyms[93].idx = S_ss4;
-    loadsyms[93].name = $c.lit("S_ss4");
-    loadsyms[94].range = SYM_PCHAR;
-    loadsyms[94].idx = S_poisoncloud;
-    loadsyms[94].name = $c.lit("S_poisoncloud");
-    loadsyms[95].range = SYM_PCHAR;
-    loadsyms[95].idx = S_goodpos;
-    loadsyms[95].name = $c.lit("S_goodpos");
-    loadsyms[96].range = SYM_PCHAR;
-    loadsyms[96].idx = S_sw_tl;
-    loadsyms[96].name = $c.lit("S_sw_tl");
-    loadsyms[97].range = SYM_PCHAR;
-    loadsyms[97].idx = S_sw_tc;
-    loadsyms[97].name = $c.lit("S_sw_tc");
-    loadsyms[98].range = SYM_PCHAR;
-    loadsyms[98].idx = S_sw_tr;
-    loadsyms[98].name = $c.lit("S_sw_tr");
-    loadsyms[99].range = SYM_PCHAR;
-    loadsyms[99].idx = S_sw_ml;
-    loadsyms[99].name = $c.lit("S_sw_ml");
-    loadsyms[100].range = SYM_PCHAR;
-    loadsyms[100].idx = S_sw_mr;
-    loadsyms[100].name = $c.lit("S_sw_mr");
-    loadsyms[101].range = SYM_PCHAR;
-    loadsyms[101].idx = S_sw_bl;
-    loadsyms[101].name = $c.lit("S_sw_bl");
-    loadsyms[102].range = SYM_PCHAR;
-    loadsyms[102].idx = S_sw_bc;
-    loadsyms[102].name = $c.lit("S_sw_bc");
-    loadsyms[103].range = SYM_PCHAR;
-    loadsyms[103].idx = S_sw_br;
-    loadsyms[103].name = $c.lit("S_sw_br");
-    loadsyms[104].range = SYM_PCHAR;
-    loadsyms[104].idx = S_expl_tl;
-    loadsyms[104].name = $c.lit("S_expl_tl");
-    loadsyms[105].range = SYM_PCHAR;
-    loadsyms[105].idx = S_expl_tc;
-    loadsyms[105].name = $c.lit("S_expl_tc");
-    loadsyms[106].range = SYM_PCHAR;
-    loadsyms[106].idx = S_expl_tr;
-    loadsyms[106].name = $c.lit("S_expl_tr");
-    loadsyms[107].range = SYM_PCHAR;
-    loadsyms[107].idx = S_expl_ml;
-    loadsyms[107].name = $c.lit("S_expl_ml");
-    loadsyms[108].range = SYM_PCHAR;
-    loadsyms[108].idx = S_expl_mc;
-    loadsyms[108].name = $c.lit("S_expl_mc");
-    loadsyms[109].range = SYM_PCHAR;
-    loadsyms[109].idx = S_expl_mr;
-    loadsyms[109].name = $c.lit("S_expl_mr");
-    loadsyms[110].range = SYM_PCHAR;
-    loadsyms[110].idx = S_expl_bl;
-    loadsyms[110].name = $c.lit("S_expl_bl");
-    loadsyms[111].range = SYM_PCHAR;
-    loadsyms[111].idx = S_expl_bc;
-    loadsyms[111].name = $c.lit("S_expl_bc");
-    loadsyms[112].range = SYM_PCHAR;
-    loadsyms[112].idx = S_expl_br;
-    loadsyms[112].name = $c.lit("S_expl_br");
-    loadsyms[113].range = SYM_OC;
-    loadsyms[113].idx = S_strange_obj + SYM_OFF_O;
-    loadsyms[113].name = $c.lit("S_strange_obj");
-    loadsyms[114].range = SYM_OC;
-    loadsyms[114].idx = S_weapon + SYM_OFF_O;
-    loadsyms[114].name = $c.lit("S_weapon");
-    loadsyms[115].range = SYM_OC;
-    loadsyms[115].idx = S_armor + SYM_OFF_O;
-    loadsyms[115].name = $c.lit("S_armor");
-    loadsyms[116].range = SYM_OC;
-    loadsyms[116].idx = S_ring + SYM_OFF_O;
-    loadsyms[116].name = $c.lit("S_ring");
-    loadsyms[117].range = SYM_OC;
-    loadsyms[117].idx = S_amulet + SYM_OFF_O;
-    loadsyms[117].name = $c.lit("S_amulet");
-    loadsyms[118].range = SYM_OC;
-    loadsyms[118].idx = S_tool + SYM_OFF_O;
-    loadsyms[118].name = $c.lit("S_tool");
-    loadsyms[119].range = SYM_OC;
-    loadsyms[119].idx = S_food + SYM_OFF_O;
-    loadsyms[119].name = $c.lit("S_food");
-    loadsyms[120].range = SYM_OC;
-    loadsyms[120].idx = S_potion + SYM_OFF_O;
-    loadsyms[120].name = $c.lit("S_potion");
-    loadsyms[121].range = SYM_OC;
-    loadsyms[121].idx = S_scroll + SYM_OFF_O;
-    loadsyms[121].name = $c.lit("S_scroll");
-    loadsyms[122].range = SYM_OC;
-    loadsyms[122].idx = S_book + SYM_OFF_O;
-    loadsyms[122].name = $c.lit("S_book");
-    loadsyms[123].range = SYM_OC;
-    loadsyms[123].idx = S_wand + SYM_OFF_O;
-    loadsyms[123].name = $c.lit("S_wand");
-    loadsyms[124].range = SYM_OC;
-    loadsyms[124].idx = S_coin + SYM_OFF_O;
-    loadsyms[124].name = $c.lit("S_coin");
-    loadsyms[125].range = SYM_OC;
-    loadsyms[125].idx = S_gem + SYM_OFF_O;
-    loadsyms[125].name = $c.lit("S_gem");
-    loadsyms[126].range = SYM_OC;
-    loadsyms[126].idx = S_rock + SYM_OFF_O;
-    loadsyms[126].name = $c.lit("S_rock");
-    loadsyms[127].range = SYM_OC;
-    loadsyms[127].idx = S_ball + SYM_OFF_O;
-    loadsyms[127].name = $c.lit("S_ball");
-    loadsyms[128].range = SYM_OC;
-    loadsyms[128].idx = S_chain + SYM_OFF_O;
-    loadsyms[128].name = $c.lit("S_chain");
-    loadsyms[129].range = SYM_OC;
-    loadsyms[129].idx = S_venom + SYM_OFF_O;
-    loadsyms[129].name = $c.lit("S_venom");
-    loadsyms[130].range = SYM_MON;
-    loadsyms[130].idx = S_ANT + SYM_OFF_M;
-    loadsyms[130].name = $c.lit("S_ANT");
-    loadsyms[131].range = SYM_MON;
-    loadsyms[131].idx = S_BLOB + SYM_OFF_M;
-    loadsyms[131].name = $c.lit("S_BLOB");
-    loadsyms[132].range = SYM_MON;
-    loadsyms[132].idx = S_COCKATRICE + SYM_OFF_M;
-    loadsyms[132].name = $c.lit("S_COCKATRICE");
-    loadsyms[133].range = SYM_MON;
-    loadsyms[133].idx = S_DOG + SYM_OFF_M;
-    loadsyms[133].name = $c.lit("S_DOG");
-    loadsyms[134].range = SYM_MON;
-    loadsyms[134].idx = S_EYE + SYM_OFF_M;
-    loadsyms[134].name = $c.lit("S_EYE");
-    loadsyms[135].range = SYM_MON;
-    loadsyms[135].idx = S_FELINE + SYM_OFF_M;
-    loadsyms[135].name = $c.lit("S_FELINE");
-    loadsyms[136].range = SYM_MON;
-    loadsyms[136].idx = S_GREMLIN + SYM_OFF_M;
-    loadsyms[136].name = $c.lit("S_GREMLIN");
-    loadsyms[137].range = SYM_MON;
-    loadsyms[137].idx = S_HUMANOID + SYM_OFF_M;
-    loadsyms[137].name = $c.lit("S_HUMANOID");
-    loadsyms[138].range = SYM_MON;
-    loadsyms[138].idx = S_IMP + SYM_OFF_M;
-    loadsyms[138].name = $c.lit("S_IMP");
-    loadsyms[139].range = SYM_MON;
-    loadsyms[139].idx = S_JELLY + SYM_OFF_M;
-    loadsyms[139].name = $c.lit("S_JELLY");
-    loadsyms[140].range = SYM_MON;
-    loadsyms[140].idx = S_KOBOLD + SYM_OFF_M;
-    loadsyms[140].name = $c.lit("S_KOBOLD");
-    loadsyms[141].range = SYM_MON;
-    loadsyms[141].idx = S_LEPRECHAUN + SYM_OFF_M;
-    loadsyms[141].name = $c.lit("S_LEPRECHAUN");
-    loadsyms[142].range = SYM_MON;
-    loadsyms[142].idx = S_MIMIC + SYM_OFF_M;
-    loadsyms[142].name = $c.lit("S_MIMIC");
-    loadsyms[143].range = SYM_MON;
-    loadsyms[143].idx = S_NYMPH + SYM_OFF_M;
-    loadsyms[143].name = $c.lit("S_NYMPH");
-    loadsyms[144].range = SYM_MON;
-    loadsyms[144].idx = S_ORC + SYM_OFF_M;
-    loadsyms[144].name = $c.lit("S_ORC");
-    loadsyms[145].range = SYM_MON;
-    loadsyms[145].idx = S_PIERCER + SYM_OFF_M;
-    loadsyms[145].name = $c.lit("S_PIERCER");
-    loadsyms[146].range = SYM_MON;
-    loadsyms[146].idx = S_QUADRUPED + SYM_OFF_M;
-    loadsyms[146].name = $c.lit("S_QUADRUPED");
-    loadsyms[147].range = SYM_MON;
-    loadsyms[147].idx = S_RODENT + SYM_OFF_M;
-    loadsyms[147].name = $c.lit("S_RODENT");
-    loadsyms[148].range = SYM_MON;
-    loadsyms[148].idx = S_SPIDER + SYM_OFF_M;
-    loadsyms[148].name = $c.lit("S_SPIDER");
-    loadsyms[149].range = SYM_MON;
-    loadsyms[149].idx = S_TRAPPER + SYM_OFF_M;
-    loadsyms[149].name = $c.lit("S_TRAPPER");
-    loadsyms[150].range = SYM_MON;
-    loadsyms[150].idx = S_UNICORN + SYM_OFF_M;
-    loadsyms[150].name = $c.lit("S_UNICORN");
-    loadsyms[151].range = SYM_MON;
-    loadsyms[151].idx = S_VORTEX + SYM_OFF_M;
-    loadsyms[151].name = $c.lit("S_VORTEX");
-    loadsyms[152].range = SYM_MON;
-    loadsyms[152].idx = S_WORM + SYM_OFF_M;
-    loadsyms[152].name = $c.lit("S_WORM");
-    loadsyms[153].range = SYM_MON;
-    loadsyms[153].idx = S_XAN + SYM_OFF_M;
-    loadsyms[153].name = $c.lit("S_XAN");
-    loadsyms[154].range = SYM_MON;
-    loadsyms[154].idx = S_LIGHT + SYM_OFF_M;
-    loadsyms[154].name = $c.lit("S_LIGHT");
-    loadsyms[155].range = SYM_MON;
-    loadsyms[155].idx = S_ZRUTY + SYM_OFF_M;
-    loadsyms[155].name = $c.lit("S_ZRUTY");
-    loadsyms[156].range = SYM_MON;
-    loadsyms[156].idx = S_ANGEL + SYM_OFF_M;
-    loadsyms[156].name = $c.lit("S_ANGEL");
-    loadsyms[157].range = SYM_MON;
-    loadsyms[157].idx = S_BAT + SYM_OFF_M;
-    loadsyms[157].name = $c.lit("S_BAT");
-    loadsyms[158].range = SYM_MON;
-    loadsyms[158].idx = S_CENTAUR + SYM_OFF_M;
-    loadsyms[158].name = $c.lit("S_CENTAUR");
-    loadsyms[159].range = SYM_MON;
-    loadsyms[159].idx = S_DRAGON + SYM_OFF_M;
-    loadsyms[159].name = $c.lit("S_DRAGON");
-    loadsyms[160].range = SYM_MON;
-    loadsyms[160].idx = S_ELEMENTAL + SYM_OFF_M;
-    loadsyms[160].name = $c.lit("S_ELEMENTAL");
-    loadsyms[161].range = SYM_MON;
-    loadsyms[161].idx = S_FUNGUS + SYM_OFF_M;
-    loadsyms[161].name = $c.lit("S_FUNGUS");
-    loadsyms[162].range = SYM_MON;
-    loadsyms[162].idx = S_GNOME + SYM_OFF_M;
-    loadsyms[162].name = $c.lit("S_GNOME");
-    loadsyms[163].range = SYM_MON;
-    loadsyms[163].idx = S_GIANT + SYM_OFF_M;
-    loadsyms[163].name = $c.lit("S_GIANT");
-    loadsyms[164].range = SYM_MON;
-    loadsyms[164].idx = S_invisible + SYM_OFF_M;
-    loadsyms[164].name = $c.lit("S_invisible");
-    loadsyms[165].range = SYM_MON;
-    loadsyms[165].idx = S_JABBERWOCK + SYM_OFF_M;
-    loadsyms[165].name = $c.lit("S_JABBERWOCK");
-    loadsyms[166].range = SYM_MON;
-    loadsyms[166].idx = S_KOP + SYM_OFF_M;
-    loadsyms[166].name = $c.lit("S_KOP");
-    loadsyms[167].range = SYM_MON;
-    loadsyms[167].idx = S_LICH + SYM_OFF_M;
-    loadsyms[167].name = $c.lit("S_LICH");
-    loadsyms[168].range = SYM_MON;
-    loadsyms[168].idx = S_MUMMY + SYM_OFF_M;
-    loadsyms[168].name = $c.lit("S_MUMMY");
-    loadsyms[169].range = SYM_MON;
-    loadsyms[169].idx = S_NAGA + SYM_OFF_M;
-    loadsyms[169].name = $c.lit("S_NAGA");
-    loadsyms[170].range = SYM_MON;
-    loadsyms[170].idx = S_OGRE + SYM_OFF_M;
-    loadsyms[170].name = $c.lit("S_OGRE");
-    loadsyms[171].range = SYM_MON;
-    loadsyms[171].idx = S_PUDDING + SYM_OFF_M;
-    loadsyms[171].name = $c.lit("S_PUDDING");
-    loadsyms[172].range = SYM_MON;
-    loadsyms[172].idx = S_QUANTMECH + SYM_OFF_M;
-    loadsyms[172].name = $c.lit("S_QUANTMECH");
-    loadsyms[173].range = SYM_MON;
-    loadsyms[173].idx = S_RUSTMONST + SYM_OFF_M;
-    loadsyms[173].name = $c.lit("S_RUSTMONST");
-    loadsyms[174].range = SYM_MON;
-    loadsyms[174].idx = S_SNAKE + SYM_OFF_M;
-    loadsyms[174].name = $c.lit("S_SNAKE");
-    loadsyms[175].range = SYM_MON;
-    loadsyms[175].idx = S_TROLL + SYM_OFF_M;
-    loadsyms[175].name = $c.lit("S_TROLL");
-    loadsyms[176].range = SYM_MON;
-    loadsyms[176].idx = S_UMBER + SYM_OFF_M;
-    loadsyms[176].name = $c.lit("S_UMBER");
-    loadsyms[177].range = SYM_MON;
-    loadsyms[177].idx = S_VAMPIRE + SYM_OFF_M;
-    loadsyms[177].name = $c.lit("S_VAMPIRE");
-    loadsyms[178].range = SYM_MON;
-    loadsyms[178].idx = S_WRAITH + SYM_OFF_M;
-    loadsyms[178].name = $c.lit("S_WRAITH");
-    loadsyms[179].range = SYM_MON;
-    loadsyms[179].idx = S_XORN + SYM_OFF_M;
-    loadsyms[179].name = $c.lit("S_XORN");
-    loadsyms[180].range = SYM_MON;
-    loadsyms[180].idx = S_YETI + SYM_OFF_M;
-    loadsyms[180].name = $c.lit("S_YETI");
-    loadsyms[181].range = SYM_MON;
-    loadsyms[181].idx = S_ZOMBIE + SYM_OFF_M;
-    loadsyms[181].name = $c.lit("S_ZOMBIE");
-    loadsyms[182].range = SYM_MON;
-    loadsyms[182].idx = S_HUMAN + SYM_OFF_M;
-    loadsyms[182].name = $c.lit("S_HUMAN");
-    loadsyms[183].range = SYM_MON;
-    loadsyms[183].idx = S_GHOST + SYM_OFF_M;
-    loadsyms[183].name = $c.lit("S_GHOST");
-    loadsyms[184].range = SYM_MON;
-    loadsyms[184].idx = S_GOLEM + SYM_OFF_M;
-    loadsyms[184].name = $c.lit("S_GOLEM");
-    loadsyms[185].range = SYM_MON;
-    loadsyms[185].idx = S_DEMON + SYM_OFF_M;
-    loadsyms[185].name = $c.lit("S_DEMON");
-    loadsyms[186].range = SYM_MON;
-    loadsyms[186].idx = S_EEL + SYM_OFF_M;
-    loadsyms[186].name = $c.lit("S_EEL");
-    loadsyms[187].range = SYM_MON;
-    loadsyms[187].idx = S_LIZARD + SYM_OFF_M;
-    loadsyms[187].name = $c.lit("S_LIZARD");
-    loadsyms[188].range = SYM_MON;
-    loadsyms[188].idx = S_WORM_TAIL + SYM_OFF_M;
-    loadsyms[188].name = $c.lit("S_WORM_TAIL");
-    loadsyms[189].range = SYM_MON;
-    loadsyms[189].idx = S_MIMIC_DEF + SYM_OFF_M;
-    loadsyms[189].name = $c.lit("S_MIMIC_DEF");
-    loadsyms[190].range = SYM_OTH;
-    loadsyms[190].idx = SYM_NOTHING + SYM_OFF_X;
-    loadsyms[190].name = $c.lit("S_nothing");
-    loadsyms[191].range = SYM_OTH;
-    loadsyms[191].idx = SYM_UNEXPLORED + SYM_OFF_X;
-    loadsyms[191].name = $c.lit("S_unexplored");
-    loadsyms[192].range = SYM_OTH;
-    loadsyms[192].idx = SYM_BOULDER + SYM_OFF_X;
-    loadsyms[192].name = $c.lit("S_boulder");
-    loadsyms[193].range = SYM_OTH;
-    loadsyms[193].idx = SYM_INVISIBLE + SYM_OFF_X;
-    loadsyms[193].name = $c.lit("S_invisible");
-    loadsyms[194].range = SYM_OTH;
-    loadsyms[194].idx = SYM_PET_OVERRIDE + SYM_OFF_X;
-    loadsyms[194].name = $c.lit("S_pet_override");
-    loadsyms[195].range = SYM_OTH;
-    loadsyms[195].idx = SYM_HERO_OVERRIDE + SYM_OFF_X;
-    loadsyms[195].name = $c.lit("S_hero_override");
-    loadsyms[196].range = SYM_INVALID;
-    loadsyms[196].idx = 0;
-    loadsyms[196].name = null;
+    $c.init(loadsyms, [
+        { range: SYM_CONTROL, idx: 0, name: $c.lit("start") },
+        { range: SYM_CONTROL, idx: 0, name: $c.lit("begin") },
+        { range: SYM_CONTROL, idx: 1, name: $c.lit("finish") },
+        { range: SYM_CONTROL, idx: 2, name: $c.lit("handling") },
+        { range: SYM_CONTROL, idx: 3, name: $c.lit("description") },
+        { range: SYM_CONTROL, idx: 4, name: $c.lit("color") },
+        { range: SYM_CONTROL, idx: 4, name: $c.lit("colour") },
+        { range: SYM_CONTROL, idx: 5, name: $c.lit("restrictions") },
+        { range: SYM_PCHAR, idx: S_stone, name: $c.lit("S_stone") },
+        { range: SYM_PCHAR, idx: S_vwall, name: $c.lit("S_vwall") },
+        { range: SYM_PCHAR, idx: S_hwall, name: $c.lit("S_hwall") },
+        { range: SYM_PCHAR, idx: S_tlcorn, name: $c.lit("S_tlcorn") },
+        { range: SYM_PCHAR, idx: S_trcorn, name: $c.lit("S_trcorn") },
+        { range: SYM_PCHAR, idx: S_blcorn, name: $c.lit("S_blcorn") },
+        { range: SYM_PCHAR, idx: S_brcorn, name: $c.lit("S_brcorn") },
+        { range: SYM_PCHAR, idx: S_crwall, name: $c.lit("S_crwall") },
+        { range: SYM_PCHAR, idx: S_tuwall, name: $c.lit("S_tuwall") },
+        { range: SYM_PCHAR, idx: S_tdwall, name: $c.lit("S_tdwall") },
+        { range: SYM_PCHAR, idx: S_tlwall, name: $c.lit("S_tlwall") },
+        { range: SYM_PCHAR, idx: S_trwall, name: $c.lit("S_trwall") },
+        { range: SYM_PCHAR, idx: S_ndoor, name: $c.lit("S_ndoor") },
+        { range: SYM_PCHAR, idx: S_vodoor, name: $c.lit("S_vodoor") },
+        { range: SYM_PCHAR, idx: S_hodoor, name: $c.lit("S_hodoor") },
+        { range: SYM_PCHAR, idx: S_vcdoor, name: $c.lit("S_vcdoor") },
+        { range: SYM_PCHAR, idx: S_hcdoor, name: $c.lit("S_hcdoor") },
+        { range: SYM_PCHAR, idx: S_bars, name: $c.lit("S_bars") },
+        { range: SYM_PCHAR, idx: S_tree, name: $c.lit("S_tree") },
+        { range: SYM_PCHAR, idx: S_room, name: $c.lit("S_room") },
+        { range: SYM_PCHAR, idx: S_darkroom, name: $c.lit("S_darkroom") },
+        { range: SYM_PCHAR, idx: S_engroom, name: $c.lit("S_engroom") },
+        { range: SYM_PCHAR, idx: S_corr, name: $c.lit("S_corr") },
+        { range: SYM_PCHAR, idx: S_litcorr, name: $c.lit("S_litcorr") },
+        { range: SYM_PCHAR, idx: S_engrcorr, name: $c.lit("S_engrcorr") },
+        { range: SYM_PCHAR, idx: S_upstair, name: $c.lit("S_upstair") },
+        { range: SYM_PCHAR, idx: S_dnstair, name: $c.lit("S_dnstair") },
+        { range: SYM_PCHAR, idx: S_upladder, name: $c.lit("S_upladder") },
+        { range: SYM_PCHAR, idx: S_dnladder, name: $c.lit("S_dnladder") },
+        { range: SYM_PCHAR, idx: S_brupstair, name: $c.lit("S_brupstair") },
+        { range: SYM_PCHAR, idx: S_brdnstair, name: $c.lit("S_brdnstair") },
+        { range: SYM_PCHAR, idx: S_brupladder, name: $c.lit("S_brupladder") },
+        { range: SYM_PCHAR, idx: S_brdnladder, name: $c.lit("S_brdnladder") },
+        { range: SYM_PCHAR, idx: S_altar, name: $c.lit("S_altar") },
+        { range: SYM_PCHAR, idx: S_grave, name: $c.lit("S_grave") },
+        { range: SYM_PCHAR, idx: S_throne, name: $c.lit("S_throne") },
+        { range: SYM_PCHAR, idx: S_sink, name: $c.lit("S_sink") },
+        { range: SYM_PCHAR, idx: S_fountain, name: $c.lit("S_fountain") },
+        { range: SYM_PCHAR, idx: S_pool, name: $c.lit("S_pool") },
+        { range: SYM_PCHAR, idx: S_ice, name: $c.lit("S_ice") },
+        { range: SYM_PCHAR, idx: S_lava, name: $c.lit("S_lava") },
+        { range: SYM_PCHAR, idx: S_lavawall, name: $c.lit("S_lavawall") },
+        { range: SYM_PCHAR, idx: S_vodbridge, name: $c.lit("S_vodbridge") },
+        { range: SYM_PCHAR, idx: S_hodbridge, name: $c.lit("S_hodbridge") },
+        { range: SYM_PCHAR, idx: S_vcdbridge, name: $c.lit("S_vcdbridge") },
+        { range: SYM_PCHAR, idx: S_hcdbridge, name: $c.lit("S_hcdbridge") },
+        { range: SYM_PCHAR, idx: S_air, name: $c.lit("S_air") },
+        { range: SYM_PCHAR, idx: S_cloud, name: $c.lit("S_cloud") },
+        { range: SYM_PCHAR, idx: S_water, name: $c.lit("S_water") },
+        { range: SYM_PCHAR, idx: S_arrow_trap, name: $c.lit("S_arrow_trap") },
+        { range: SYM_PCHAR, idx: S_dart_trap, name: $c.lit("S_dart_trap") },
+        { range: SYM_PCHAR, idx: S_falling_rock_trap, name: $c.lit("S_falling_rock_trap") },
+        { range: SYM_PCHAR, idx: S_squeaky_board, name: $c.lit("S_squeaky_board") },
+        { range: SYM_PCHAR, idx: S_bear_trap, name: $c.lit("S_bear_trap") },
+        { range: SYM_PCHAR, idx: S_land_mine, name: $c.lit("S_land_mine") },
+        { range: SYM_PCHAR, idx: S_rolling_boulder_trap, name: $c.lit("S_rolling_boulder_trap") },
+        { range: SYM_PCHAR, idx: S_sleeping_gas_trap, name: $c.lit("S_sleeping_gas_trap") },
+        { range: SYM_PCHAR, idx: S_rust_trap, name: $c.lit("S_rust_trap") },
+        { range: SYM_PCHAR, idx: S_fire_trap, name: $c.lit("S_fire_trap") },
+        { range: SYM_PCHAR, idx: S_pit, name: $c.lit("S_pit") },
+        { range: SYM_PCHAR, idx: S_spiked_pit, name: $c.lit("S_spiked_pit") },
+        { range: SYM_PCHAR, idx: S_hole, name: $c.lit("S_hole") },
+        { range: SYM_PCHAR, idx: S_trap_door, name: $c.lit("S_trap_door") },
+        { range: SYM_PCHAR, idx: S_teleportation_trap, name: $c.lit("S_teleportation_trap") },
+        { range: SYM_PCHAR, idx: S_level_teleporter, name: $c.lit("S_level_teleporter") },
+        { range: SYM_PCHAR, idx: S_magic_portal, name: $c.lit("S_magic_portal") },
+        { range: SYM_PCHAR, idx: S_web, name: $c.lit("S_web") },
+        { range: SYM_PCHAR, idx: S_statue_trap, name: $c.lit("S_statue_trap") },
+        { range: SYM_PCHAR, idx: S_magic_trap, name: $c.lit("S_magic_trap") },
+        { range: SYM_PCHAR, idx: S_anti_magic_trap, name: $c.lit("S_anti_magic_trap") },
+        { range: SYM_PCHAR, idx: S_polymorph_trap, name: $c.lit("S_polymorph_trap") },
+        { range: SYM_PCHAR, idx: S_vibrating_square, name: $c.lit("S_vibrating_square") },
+        { range: SYM_PCHAR, idx: S_trapped_door, name: $c.lit("S_trapped_door") },
+        { range: SYM_PCHAR, idx: S_trapped_chest, name: $c.lit("S_trapped_chest") },
+        { range: SYM_PCHAR, idx: S_vbeam, name: $c.lit("S_vbeam") },
+        { range: SYM_PCHAR, idx: S_hbeam, name: $c.lit("S_hbeam") },
+        { range: SYM_PCHAR, idx: S_lslant, name: $c.lit("S_lslant") },
+        { range: SYM_PCHAR, idx: S_rslant, name: $c.lit("S_rslant") },
+        { range: SYM_PCHAR, idx: S_digbeam, name: $c.lit("S_digbeam") },
+        { range: SYM_PCHAR, idx: S_flashbeam, name: $c.lit("S_flashbeam") },
+        { range: SYM_PCHAR, idx: S_boomleft, name: $c.lit("S_boomleft") },
+        { range: SYM_PCHAR, idx: S_boomright, name: $c.lit("S_boomright") },
+        { range: SYM_PCHAR, idx: S_ss1, name: $c.lit("S_ss1") },
+        { range: SYM_PCHAR, idx: S_ss2, name: $c.lit("S_ss2") },
+        { range: SYM_PCHAR, idx: S_ss3, name: $c.lit("S_ss3") },
+        { range: SYM_PCHAR, idx: S_ss4, name: $c.lit("S_ss4") },
+        { range: SYM_PCHAR, idx: S_poisoncloud, name: $c.lit("S_poisoncloud") },
+        { range: SYM_PCHAR, idx: S_goodpos, name: $c.lit("S_goodpos") },
+        { range: SYM_PCHAR, idx: S_sw_tl, name: $c.lit("S_sw_tl") },
+        { range: SYM_PCHAR, idx: S_sw_tc, name: $c.lit("S_sw_tc") },
+        { range: SYM_PCHAR, idx: S_sw_tr, name: $c.lit("S_sw_tr") },
+        { range: SYM_PCHAR, idx: S_sw_ml, name: $c.lit("S_sw_ml") },
+        { range: SYM_PCHAR, idx: S_sw_mr, name: $c.lit("S_sw_mr") },
+        { range: SYM_PCHAR, idx: S_sw_bl, name: $c.lit("S_sw_bl") },
+        { range: SYM_PCHAR, idx: S_sw_bc, name: $c.lit("S_sw_bc") },
+        { range: SYM_PCHAR, idx: S_sw_br, name: $c.lit("S_sw_br") },
+        { range: SYM_PCHAR, idx: S_expl_tl, name: $c.lit("S_expl_tl") },
+        { range: SYM_PCHAR, idx: S_expl_tc, name: $c.lit("S_expl_tc") },
+        { range: SYM_PCHAR, idx: S_expl_tr, name: $c.lit("S_expl_tr") },
+        { range: SYM_PCHAR, idx: S_expl_ml, name: $c.lit("S_expl_ml") },
+        { range: SYM_PCHAR, idx: S_expl_mc, name: $c.lit("S_expl_mc") },
+        { range: SYM_PCHAR, idx: S_expl_mr, name: $c.lit("S_expl_mr") },
+        { range: SYM_PCHAR, idx: S_expl_bl, name: $c.lit("S_expl_bl") },
+        { range: SYM_PCHAR, idx: S_expl_bc, name: $c.lit("S_expl_bc") },
+        { range: SYM_PCHAR, idx: S_expl_br, name: $c.lit("S_expl_br") },
+        { range: SYM_OC, idx: S_strange_obj + SYM_OFF_O, name: $c.lit("S_strange_obj") },
+        { range: SYM_OC, idx: S_weapon + SYM_OFF_O, name: $c.lit("S_weapon") },
+        { range: SYM_OC, idx: S_armor + SYM_OFF_O, name: $c.lit("S_armor") },
+        { range: SYM_OC, idx: S_ring + SYM_OFF_O, name: $c.lit("S_ring") },
+        { range: SYM_OC, idx: S_amulet + SYM_OFF_O, name: $c.lit("S_amulet") },
+        { range: SYM_OC, idx: S_tool + SYM_OFF_O, name: $c.lit("S_tool") },
+        { range: SYM_OC, idx: S_food + SYM_OFF_O, name: $c.lit("S_food") },
+        { range: SYM_OC, idx: S_potion + SYM_OFF_O, name: $c.lit("S_potion") },
+        { range: SYM_OC, idx: S_scroll + SYM_OFF_O, name: $c.lit("S_scroll") },
+        { range: SYM_OC, idx: S_book + SYM_OFF_O, name: $c.lit("S_book") },
+        { range: SYM_OC, idx: S_wand + SYM_OFF_O, name: $c.lit("S_wand") },
+        { range: SYM_OC, idx: S_coin + SYM_OFF_O, name: $c.lit("S_coin") },
+        { range: SYM_OC, idx: S_gem + SYM_OFF_O, name: $c.lit("S_gem") },
+        { range: SYM_OC, idx: S_rock + SYM_OFF_O, name: $c.lit("S_rock") },
+        { range: SYM_OC, idx: S_ball + SYM_OFF_O, name: $c.lit("S_ball") },
+        { range: SYM_OC, idx: S_chain + SYM_OFF_O, name: $c.lit("S_chain") },
+        { range: SYM_OC, idx: S_venom + SYM_OFF_O, name: $c.lit("S_venom") },
+        { range: SYM_MON, idx: S_ANT + SYM_OFF_M, name: $c.lit("S_ANT") },
+        { range: SYM_MON, idx: S_BLOB + SYM_OFF_M, name: $c.lit("S_BLOB") },
+        { range: SYM_MON, idx: S_COCKATRICE + SYM_OFF_M, name: $c.lit("S_COCKATRICE") },
+        { range: SYM_MON, idx: S_DOG + SYM_OFF_M, name: $c.lit("S_DOG") },
+        { range: SYM_MON, idx: S_EYE + SYM_OFF_M, name: $c.lit("S_EYE") },
+        { range: SYM_MON, idx: S_FELINE + SYM_OFF_M, name: $c.lit("S_FELINE") },
+        { range: SYM_MON, idx: S_GREMLIN + SYM_OFF_M, name: $c.lit("S_GREMLIN") },
+        { range: SYM_MON, idx: S_HUMANOID + SYM_OFF_M, name: $c.lit("S_HUMANOID") },
+        { range: SYM_MON, idx: S_IMP + SYM_OFF_M, name: $c.lit("S_IMP") },
+        { range: SYM_MON, idx: S_JELLY + SYM_OFF_M, name: $c.lit("S_JELLY") },
+        { range: SYM_MON, idx: S_KOBOLD + SYM_OFF_M, name: $c.lit("S_KOBOLD") },
+        { range: SYM_MON, idx: S_LEPRECHAUN + SYM_OFF_M, name: $c.lit("S_LEPRECHAUN") },
+        { range: SYM_MON, idx: S_MIMIC + SYM_OFF_M, name: $c.lit("S_MIMIC") },
+        { range: SYM_MON, idx: S_NYMPH + SYM_OFF_M, name: $c.lit("S_NYMPH") },
+        { range: SYM_MON, idx: S_ORC + SYM_OFF_M, name: $c.lit("S_ORC") },
+        { range: SYM_MON, idx: S_PIERCER + SYM_OFF_M, name: $c.lit("S_PIERCER") },
+        { range: SYM_MON, idx: S_QUADRUPED + SYM_OFF_M, name: $c.lit("S_QUADRUPED") },
+        { range: SYM_MON, idx: S_RODENT + SYM_OFF_M, name: $c.lit("S_RODENT") },
+        { range: SYM_MON, idx: S_SPIDER + SYM_OFF_M, name: $c.lit("S_SPIDER") },
+        { range: SYM_MON, idx: S_TRAPPER + SYM_OFF_M, name: $c.lit("S_TRAPPER") },
+        { range: SYM_MON, idx: S_UNICORN + SYM_OFF_M, name: $c.lit("S_UNICORN") },
+        { range: SYM_MON, idx: S_VORTEX + SYM_OFF_M, name: $c.lit("S_VORTEX") },
+        { range: SYM_MON, idx: S_WORM + SYM_OFF_M, name: $c.lit("S_WORM") },
+        { range: SYM_MON, idx: S_XAN + SYM_OFF_M, name: $c.lit("S_XAN") },
+        { range: SYM_MON, idx: S_LIGHT + SYM_OFF_M, name: $c.lit("S_LIGHT") },
+        { range: SYM_MON, idx: S_ZRUTY + SYM_OFF_M, name: $c.lit("S_ZRUTY") },
+        { range: SYM_MON, idx: S_ANGEL + SYM_OFF_M, name: $c.lit("S_ANGEL") },
+        { range: SYM_MON, idx: S_BAT + SYM_OFF_M, name: $c.lit("S_BAT") },
+        { range: SYM_MON, idx: S_CENTAUR + SYM_OFF_M, name: $c.lit("S_CENTAUR") },
+        { range: SYM_MON, idx: S_DRAGON + SYM_OFF_M, name: $c.lit("S_DRAGON") },
+        { range: SYM_MON, idx: S_ELEMENTAL + SYM_OFF_M, name: $c.lit("S_ELEMENTAL") },
+        { range: SYM_MON, idx: S_FUNGUS + SYM_OFF_M, name: $c.lit("S_FUNGUS") },
+        { range: SYM_MON, idx: S_GNOME + SYM_OFF_M, name: $c.lit("S_GNOME") },
+        { range: SYM_MON, idx: S_GIANT + SYM_OFF_M, name: $c.lit("S_GIANT") },
+        { range: SYM_MON, idx: S_invisible + SYM_OFF_M, name: $c.lit("S_invisible") },
+        { range: SYM_MON, idx: S_JABBERWOCK + SYM_OFF_M, name: $c.lit("S_JABBERWOCK") },
+        { range: SYM_MON, idx: S_KOP + SYM_OFF_M, name: $c.lit("S_KOP") },
+        { range: SYM_MON, idx: S_LICH + SYM_OFF_M, name: $c.lit("S_LICH") },
+        { range: SYM_MON, idx: S_MUMMY + SYM_OFF_M, name: $c.lit("S_MUMMY") },
+        { range: SYM_MON, idx: S_NAGA + SYM_OFF_M, name: $c.lit("S_NAGA") },
+        { range: SYM_MON, idx: S_OGRE + SYM_OFF_M, name: $c.lit("S_OGRE") },
+        { range: SYM_MON, idx: S_PUDDING + SYM_OFF_M, name: $c.lit("S_PUDDING") },
+        { range: SYM_MON, idx: S_QUANTMECH + SYM_OFF_M, name: $c.lit("S_QUANTMECH") },
+        { range: SYM_MON, idx: S_RUSTMONST + SYM_OFF_M, name: $c.lit("S_RUSTMONST") },
+        { range: SYM_MON, idx: S_SNAKE + SYM_OFF_M, name: $c.lit("S_SNAKE") },
+        { range: SYM_MON, idx: S_TROLL + SYM_OFF_M, name: $c.lit("S_TROLL") },
+        { range: SYM_MON, idx: S_UMBER + SYM_OFF_M, name: $c.lit("S_UMBER") },
+        { range: SYM_MON, idx: S_VAMPIRE + SYM_OFF_M, name: $c.lit("S_VAMPIRE") },
+        { range: SYM_MON, idx: S_WRAITH + SYM_OFF_M, name: $c.lit("S_WRAITH") },
+        { range: SYM_MON, idx: S_XORN + SYM_OFF_M, name: $c.lit("S_XORN") },
+        { range: SYM_MON, idx: S_YETI + SYM_OFF_M, name: $c.lit("S_YETI") },
+        { range: SYM_MON, idx: S_ZOMBIE + SYM_OFF_M, name: $c.lit("S_ZOMBIE") },
+        { range: SYM_MON, idx: S_HUMAN + SYM_OFF_M, name: $c.lit("S_HUMAN") },
+        { range: SYM_MON, idx: S_GHOST + SYM_OFF_M, name: $c.lit("S_GHOST") },
+        { range: SYM_MON, idx: S_GOLEM + SYM_OFF_M, name: $c.lit("S_GOLEM") },
+        { range: SYM_MON, idx: S_DEMON + SYM_OFF_M, name: $c.lit("S_DEMON") },
+        { range: SYM_MON, idx: S_EEL + SYM_OFF_M, name: $c.lit("S_EEL") },
+        { range: SYM_MON, idx: S_LIZARD + SYM_OFF_M, name: $c.lit("S_LIZARD") },
+        { range: SYM_MON, idx: S_WORM_TAIL + SYM_OFF_M, name: $c.lit("S_WORM_TAIL") },
+        { range: SYM_MON, idx: S_MIMIC_DEF + SYM_OFF_M, name: $c.lit("S_MIMIC_DEF") },
+        { range: SYM_OTH, idx: SYM_NOTHING + SYM_OFF_X, name: $c.lit("S_nothing") },
+        { range: SYM_OTH, idx: SYM_UNEXPLORED + SYM_OFF_X, name: $c.lit("S_unexplored") },
+        { range: SYM_OTH, idx: SYM_BOULDER + SYM_OFF_X, name: $c.lit("S_boulder") },
+        { range: SYM_OTH, idx: SYM_INVISIBLE + SYM_OFF_X, name: $c.lit("S_invisible") },
+        { range: SYM_OTH, idx: SYM_PET_OVERRIDE + SYM_OFF_X, name: $c.lit("S_pet_override") },
+        { range: SYM_OTH, idx: SYM_HERO_OVERRIDE + SYM_OFF_X, name: $c.lit("S_hero_override") },
+        {}
+    ]);
     $G.saved_symbols = null;
     for (let $i0 = 0; $i0 < 10; $i0++) {
         match_sym$alternates[$i0].$copyFrom(new $T.alternate_parse());
     }
-    match_sym$alternates[0].altnm = $c.lit("S_armour");
-    match_sym$alternates[0].nm = $c.lit("S_armor");
-    match_sym$alternates[1].altnm = $c.lit("S_explode1");
-    match_sym$alternates[1].nm = $c.lit("S_expl_tl");
-    match_sym$alternates[2].altnm = $c.lit("S_explode2");
-    match_sym$alternates[2].nm = $c.lit("S_expl_tc");
-    match_sym$alternates[3].altnm = $c.lit("S_explode3");
-    match_sym$alternates[3].nm = $c.lit("S_expl_tr");
-    match_sym$alternates[4].altnm = $c.lit("S_explode4");
-    match_sym$alternates[4].nm = $c.lit("S_expl_ml");
-    match_sym$alternates[5].altnm = $c.lit("S_explode5");
-    match_sym$alternates[5].nm = $c.lit("S_expl_mc");
-    match_sym$alternates[6].altnm = $c.lit("S_explode6");
-    match_sym$alternates[6].nm = $c.lit("S_expl_mr");
-    match_sym$alternates[7].altnm = $c.lit("S_explode7");
-    match_sym$alternates[7].nm = $c.lit("S_expl_bl");
-    match_sym$alternates[8].altnm = $c.lit("S_explode8");
-    match_sym$alternates[8].nm = $c.lit("S_expl_bc");
-    match_sym$alternates[9].altnm = $c.lit("S_explode9");
-    match_sym$alternates[9].nm = $c.lit("S_expl_br");
+    $c.init(match_sym$alternates, [
+        { altnm: $c.lit("S_armour"), nm: $c.lit("S_armor") },
+        { altnm: $c.lit("S_explode1"), nm: $c.lit("S_expl_tl") },
+        { altnm: $c.lit("S_explode2"), nm: $c.lit("S_expl_tc") },
+        { altnm: $c.lit("S_explode3"), nm: $c.lit("S_expl_tr") },
+        { altnm: $c.lit("S_explode4"), nm: $c.lit("S_expl_ml") },
+        { altnm: $c.lit("S_explode5"), nm: $c.lit("S_expl_mc") },
+        { altnm: $c.lit("S_explode6"), nm: $c.lit("S_expl_mr") },
+        { altnm: $c.lit("S_explode7"), nm: $c.lit("S_expl_bl") },
+        { altnm: $c.lit("S_explode8"), nm: $c.lit("S_expl_bc") },
+        { altnm: $c.lit("S_explode9"), nm: $c.lit("S_expl_br") }
+    ]);
 }

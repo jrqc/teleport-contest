@@ -24,7 +24,7 @@ import { on_level, surface } from './dungeon.js';
 import { Popeye, eating_dangerous_corpse, morehungry, vomit } from './eat.js';
 import { dealloc_killer, done, find_delayed_killer, panic } from './end.js';
 import { FULL_MOON, PLNMSG_OK_DONT_DIE, PLNMSG_ONE_ITEM_HERE } from './flag.h.js';
-import { FALSE, TRUE } from './global.h.js';
+import { COLNO, FALSE, ROWNO, TRUE } from './global.h.js';
 import { inv_weight, monst_to_any, nomul, obj_to_any, spoteffects } from './hack.js';
 import { ARTICLE_THE, DIED, DISMOUNT_FELL, ECMD_OK, FAINTING, FOOT, GENOCIDED, KILLED_BY, KILLED_BY_AN, MM_NOMSG, NECK, NHF_BONESFILE, NO_KILLER_PREFIX, NO_MINVENT, POISONING, STONING, SUPPRESS_SADDLE, TURNED_SLIME } from './hack.h.js';
 import { NODIAG, You1, pline1, release_data, update_file } from './hack.macros.js';
@@ -34,6 +34,7 @@ import { arti_light_radius, candle_light_range, del_light_source, new_light_sour
 import { makemon } from './makemon.js';
 import { container_weight, obj_extract_self, shrink_glob, weight } from './mkobj.js';
 import { hideunder, maybe_unhide_at, restartcham, wake_nearby } from './mon.js';
+import { AD_ELEC, AD_MAGM } from './monattk.h.js';
 import { big_to_little, cantvomit, little_to_big, locomotion, name_to_mon, pronoun_gender } from './mondata.js';
 import { emits_light, is_silent, is_were, nolimbs, touch_petrifies, type_is_pname } from './mondata.macros.js';
 import { G_EXTINCT, G_GENOD, G_UNIQ, M1_BREATHLESS, M1_FLY, MV_KNOWS_EGG, NEUTRAL } from './monflag.h.js';
@@ -70,7 +71,7 @@ import { you_unwere } from './were.js';
 import { create_nhwindow, destroy_nhwindow, display_nhwindow, putstr } from './winprocs.macros.js';
 import { NHW_MENU, WIN_ERR } from './wintype.h.js';
 import { which_armor } from './worn.js';
-import { SICK_ALL, SICK_NONVOMITABLE } from './you.h.js';
+import { PRONOUN_HALLU, SICK_ALL, SICK_NONVOMITABLE } from './you.h.js';
 import { Upolyd } from './you.macros.js';
 import { Acid_resistance, BInvis, Blind, Deaf, Displaced, EFumbling, ELevitation, EPasses_walls, Fast, Fire_resistance, Fumbling, Hallucination, Invis, Levitation, Passes_walls, Poison_resistance, Protection_from_shape_changers, See_invisible, Sick, Sleep_resistance, Sleepy, Slimed, Stone_resistance, Stoned, Strangled, Unaware, Unchanging, Very_fast, Vomiting, Warn_of_mon, Wounded_legs } from './youprop.macros.js';
 import { buzz, get_obj_location, melt_ice_away } from './zap.js';
@@ -240,7 +241,7 @@ async function sickness_dialogue() {   // timeout.c:323
             strsubst(new $c.Ptr(buf, 0), $c.lit("illness"), $c.lit("sickness"));
         }
         if (Hallucination() && strstri(new $c.Ptr(buf, 0), $c.lit("Death's door"))) {
-            $c.__builtin___strcpy_chk(new $c.Ptr(pronounbuf, 0), genders[pronoun_gender(gy.youmonst, 2)].he, 40);
+            $c.__builtin___strcpy_chk(new $c.Ptr(pronounbuf, 0), genders[pronoun_gender(gy.youmonst, PRONOUN_HALLU)].he, 40);
             $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit("  %s %s inviting you in."), upstart(new $c.Ptr(pronounbuf, 0)), await vtense(new $c.Ptr(pronounbuf, 0), $c.lit("are")));
         }
         await urgent_pline($c.lit("%s"), new $c.Ptr(buf, 0));
@@ -1295,15 +1296,15 @@ export async function do_storms() {   // timeout.c:1847
     for (nstrike = rnd(64); nstrike <= 64; nstrike = Math.imul(nstrike, 2)) {
         count = 0;
         do {
-            x = rnd(79);
-            y = rn2(21);
+            x = rnd(COLNO - 1);
+            y = rn2(ROWNO);
         } while ((count = count + 1 | 0) < 100 && svl.level.locations[x][y].typ !== CLOUD);
         if (count < 100) {
             dirx = rn2(3) - 1 | 0;
             diry = rn2(3) - 1 | 0;
             if (dirx !== 0 || diry !== 0) {
                 gb.buzzer = null;
-                await buzz(-10 - $c.rem32($c.abs(5), 10) | 0, 8, $c.i16(x), $c.i16(y), dirx, diry);
+                await buzz(-10 - $c.rem32($c.abs(AD_ELEC - AD_MAGM), 10) | 0, 8, $c.i16(x), $c.i16(y), dirx, diry);
             }
         }
     }
@@ -1390,7 +1391,7 @@ export async function wiz_timeout_queue() {   // timeout.c:2041
                     await putstr()(win, 0, $c.lit(" -- settable via #wizintrinsic only --"));
                     specindx = 0;
                 }
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit(" %*s %4ld"), -longestlen | 0, propname, $c.and64(intrinsic, 16777215));
+                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit(" %*s %4ld"), -longestlen | 0, propname, $c.and64(intrinsic, TIMEOUT));
                 await putstr()(win, 0, new $c.Ptr(buf, 0));
             }
         }
@@ -1454,7 +1455,7 @@ export async function timer_sanity_check() {   // timeout.c:2130
                     x[0] = $c.i16($c.and64($c.shr64(lwhere, 16), 65535));
                     y[0] = $c.i16($c.and64(lwhere, 65535));
                     if (isok(x[0], y[0])) {
-                        (!(x[0] > 0 && x[0] < 80 && y[0] >= 0 && y[0] < 21) ? 1 : 0) ? $c.__assert_rtn($c.lit("timer_sanity_check"), $c.lit("timeout.c"), 2188, $c.lit("x > 0 && x < COLNO && y >= 0 && y < ROWNO")) : 0;
+                        (!(x[0] > 0 && x[0] < COLNO && y[0] >= 0 && y[0] < ROWNO) ? 1 : 0) ? $c.__assert_rtn($c.lit("timer_sanity_check"), $c.lit("timeout.c"), 2188, $c.lit("x > 0 && x < COLNO && y >= 0 && y < ROWNO")) : 0;
                         if (curr.func_index === MELT_ICE_AWAY && !is_ice(x[0], y[0]) && !(svl.level.locations[x[0]][y[0]].typ === DRAWBRIDGE_DOWN && ((svl.level.locations[x[0]][y[0]].flags | 0) & DB_UNDER) === DB_ICE)) {
                             await impossible($c.lit("timer sanity: melt timer %lu on non-ice %d <%d,%d>"), t_id, svl.level.locations[x[0]][y[0]].typ, x[0], y[0]);
                         }
@@ -1848,215 +1849,150 @@ export function $init() {
     for (let $i0 = 0; $i0 < 69; $i0++) {
         propertynames[$i0].$copyFrom(new $T.propname());
     }
-    propertynames[0].prop_num = INVULNERABLE;
-    propertynames[0].prop_name = $c.lit("invulnerable");
-    propertynames[1].prop_num = STONED;
-    propertynames[1].prop_name = $c.lit("petrifying");
-    propertynames[2].prop_num = SLIMED;
-    propertynames[2].prop_name = $c.lit("becoming slime");
-    propertynames[3].prop_num = STRANGLED;
-    propertynames[3].prop_name = $c.lit("strangling");
-    propertynames[4].prop_num = SICK;
-    propertynames[4].prop_name = $c.lit("fatally sick");
-    propertynames[5].prop_num = STUNNED;
-    propertynames[5].prop_name = $c.lit("stunned");
-    propertynames[6].prop_num = CONFUSION;
-    propertynames[6].prop_name = $c.lit("confused");
-    propertynames[7].prop_num = HALLUC;
-    propertynames[7].prop_name = $c.lit("hallucinating");
-    propertynames[8].prop_num = BLINDED;
-    propertynames[8].prop_name = $c.lit("blinded");
-    propertynames[9].prop_num = DEAF;
-    propertynames[9].prop_name = $c.lit("deafness");
-    propertynames[10].prop_num = VOMITING;
-    propertynames[10].prop_name = $c.lit("vomiting");
-    propertynames[11].prop_num = GLIB;
-    propertynames[11].prop_name = $c.lit("slippery fingers");
-    propertynames[12].prop_num = WOUNDED_LEGS;
-    propertynames[12].prop_name = $c.lit("wounded legs");
-    propertynames[13].prop_num = SLEEPY;
-    propertynames[13].prop_name = $c.lit("sleepy");
-    propertynames[14].prop_num = TELEPORT;
-    propertynames[14].prop_name = $c.lit("teleporting");
-    propertynames[15].prop_num = POLYMORPH;
-    propertynames[15].prop_name = $c.lit("polymorphing");
-    propertynames[16].prop_num = LEVITATION;
-    propertynames[16].prop_name = $c.lit("levitating");
-    propertynames[17].prop_num = FAST;
-    propertynames[17].prop_name = $c.lit("very fast");
-    propertynames[18].prop_num = CLAIRVOYANT;
-    propertynames[18].prop_name = $c.lit("clairvoyant");
-    propertynames[19].prop_num = DETECT_MONSTERS;
-    propertynames[19].prop_name = $c.lit("monster detection");
-    propertynames[20].prop_num = SEE_INVIS;
-    propertynames[20].prop_name = $c.lit("see invisible");
-    propertynames[21].prop_num = INVIS;
-    propertynames[21].prop_name = $c.lit("invisible");
-    propertynames[22].prop_num = ACID_RES;
-    propertynames[22].prop_name = $c.lit("acid resistance");
-    propertynames[23].prop_num = STONE_RES;
-    propertynames[23].prop_name = $c.lit("stoning resistance");
-    propertynames[24].prop_num = DISPLACED;
-    propertynames[24].prop_name = $c.lit("displaced");
-    propertynames[25].prop_num = PASSES_WALLS;
-    propertynames[25].prop_name = $c.lit("pass thru walls");
-    propertynames[26].prop_num = MAGICAL_BREATHING;
-    propertynames[26].prop_name = $c.lit("magical breathing");
-    propertynames[27].prop_num = WWALKING;
-    propertynames[27].prop_name = $c.lit("water walking");
-    propertynames[28].prop_num = FIRE_RES;
-    propertynames[28].prop_name = $c.lit("fire resistance");
-    propertynames[29].prop_num = COLD_RES;
-    propertynames[29].prop_name = $c.lit("cold resistance");
-    propertynames[30].prop_num = SLEEP_RES;
-    propertynames[30].prop_name = $c.lit("sleep resistance");
-    propertynames[31].prop_num = DISINT_RES;
-    propertynames[31].prop_name = $c.lit("disintegration resistance");
-    propertynames[32].prop_num = SHOCK_RES;
-    propertynames[32].prop_name = $c.lit("shock resistance");
-    propertynames[33].prop_num = POISON_RES;
-    propertynames[33].prop_name = $c.lit("poison resistance");
-    propertynames[34].prop_num = DRAIN_RES;
-    propertynames[34].prop_name = $c.lit("drain resistance");
-    propertynames[35].prop_num = SICK_RES;
-    propertynames[35].prop_name = $c.lit("sickness resistance");
-    propertynames[36].prop_num = ANTIMAGIC;
-    propertynames[36].prop_name = $c.lit("magic resistance");
-    propertynames[37].prop_num = HALLUC_RES;
-    propertynames[37].prop_name = $c.lit("hallucination resistance");
-    propertynames[38].prop_num = BLND_RES;
-    propertynames[38].prop_name = $c.lit("light-induced blindness resistance");
-    propertynames[39].prop_num = FUMBLING;
-    propertynames[39].prop_name = $c.lit("fumbling");
-    propertynames[40].prop_num = HUNGER;
-    propertynames[40].prop_name = $c.lit("voracious hunger");
-    propertynames[41].prop_num = TELEPAT;
-    propertynames[41].prop_name = $c.lit("telepathic");
-    propertynames[42].prop_num = WARNING;
-    propertynames[42].prop_name = $c.lit("warning");
-    propertynames[43].prop_num = WARN_OF_MON;
-    propertynames[43].prop_name = $c.lit("warn: monster type or class");
-    propertynames[44].prop_num = WARN_UNDEAD;
-    propertynames[44].prop_name = $c.lit("warn: undead");
-    propertynames[45].prop_num = SEARCHING;
-    propertynames[45].prop_name = $c.lit("searching");
-    propertynames[46].prop_num = INFRAVISION;
-    propertynames[46].prop_name = $c.lit("infravision");
-    propertynames[47].prop_num = ADORNED;
-    propertynames[47].prop_name = $c.lit("adorned (+/- Cha)");
-    propertynames[48].prop_num = STEALTH;
-    propertynames[48].prop_name = $c.lit("stealthy");
-    propertynames[49].prop_num = AGGRAVATE_MONSTER;
-    propertynames[49].prop_name = $c.lit("monster aggravation");
-    propertynames[50].prop_num = CONFLICT;
-    propertynames[50].prop_name = $c.lit("conflict");
-    propertynames[51].prop_num = JUMPING;
-    propertynames[51].prop_name = $c.lit("jumping");
-    propertynames[52].prop_num = TELEPORT_CONTROL;
-    propertynames[52].prop_name = $c.lit("teleport control");
-    propertynames[53].prop_num = FLYING;
-    propertynames[53].prop_name = $c.lit("flying");
-    propertynames[54].prop_num = SWIMMING;
-    propertynames[54].prop_name = $c.lit("swimming");
-    propertynames[55].prop_num = SLOW_DIGESTION;
-    propertynames[55].prop_name = $c.lit("slow digestion");
-    propertynames[56].prop_num = HALF_SPDAM;
-    propertynames[56].prop_name = $c.lit("half spell damage");
-    propertynames[57].prop_num = HALF_PHDAM;
-    propertynames[57].prop_name = $c.lit("half physical damage");
-    propertynames[58].prop_num = REGENERATION;
-    propertynames[58].prop_name = $c.lit("HP regeneration");
-    propertynames[59].prop_num = ENERGY_REGENERATION;
-    propertynames[59].prop_name = $c.lit("energy regeneration");
-    propertynames[60].prop_num = PROTECTION;
-    propertynames[60].prop_name = $c.lit("extra protection");
-    propertynames[61].prop_num = PROT_FROM_SHAPE_CHANGERS;
-    propertynames[61].prop_name = $c.lit("protection from shape changers");
-    propertynames[62].prop_num = POLYMORPH_CONTROL;
-    propertynames[62].prop_name = $c.lit("polymorph control");
-    propertynames[63].prop_num = UNCHANGING;
-    propertynames[63].prop_name = $c.lit("unchanging");
-    propertynames[64].prop_num = REFLECTING;
-    propertynames[64].prop_name = $c.lit("reflecting");
-    propertynames[65].prop_num = FREE_ACTION;
-    propertynames[65].prop_name = $c.lit("free action");
-    propertynames[66].prop_num = FIXED_ABIL;
-    propertynames[66].prop_name = $c.lit("fixed abilities");
-    propertynames[67].prop_num = LIFESAVED;
-    propertynames[67].prop_name = $c.lit("life will be saved");
-    propertynames[68].prop_num = 0;
-    propertynames[68].prop_name = null;
+    $c.init(propertynames, [
+        { prop_num: INVULNERABLE, prop_name: $c.lit("invulnerable") },
+        { prop_num: STONED, prop_name: $c.lit("petrifying") },
+        { prop_num: SLIMED, prop_name: $c.lit("becoming slime") },
+        { prop_num: STRANGLED, prop_name: $c.lit("strangling") },
+        { prop_num: SICK, prop_name: $c.lit("fatally sick") },
+        { prop_num: STUNNED, prop_name: $c.lit("stunned") },
+        { prop_num: CONFUSION, prop_name: $c.lit("confused") },
+        { prop_num: HALLUC, prop_name: $c.lit("hallucinating") },
+        { prop_num: BLINDED, prop_name: $c.lit("blinded") },
+        { prop_num: DEAF, prop_name: $c.lit("deafness") },
+        { prop_num: VOMITING, prop_name: $c.lit("vomiting") },
+        { prop_num: GLIB, prop_name: $c.lit("slippery fingers") },
+        { prop_num: WOUNDED_LEGS, prop_name: $c.lit("wounded legs") },
+        { prop_num: SLEEPY, prop_name: $c.lit("sleepy") },
+        { prop_num: TELEPORT, prop_name: $c.lit("teleporting") },
+        { prop_num: POLYMORPH, prop_name: $c.lit("polymorphing") },
+        { prop_num: LEVITATION, prop_name: $c.lit("levitating") },
+        { prop_num: FAST, prop_name: $c.lit("very fast") },
+        { prop_num: CLAIRVOYANT, prop_name: $c.lit("clairvoyant") },
+        { prop_num: DETECT_MONSTERS, prop_name: $c.lit("monster detection") },
+        { prop_num: SEE_INVIS, prop_name: $c.lit("see invisible") },
+        { prop_num: INVIS, prop_name: $c.lit("invisible") },
+        { prop_num: ACID_RES, prop_name: $c.lit("acid resistance") },
+        { prop_num: STONE_RES, prop_name: $c.lit("stoning resistance") },
+        { prop_num: DISPLACED, prop_name: $c.lit("displaced") },
+        { prop_num: PASSES_WALLS, prop_name: $c.lit("pass thru walls") },
+        { prop_num: MAGICAL_BREATHING, prop_name: $c.lit("magical breathing") },
+        { prop_num: WWALKING, prop_name: $c.lit("water walking") },
+        { prop_num: FIRE_RES, prop_name: $c.lit("fire resistance") },
+        { prop_num: COLD_RES, prop_name: $c.lit("cold resistance") },
+        { prop_num: SLEEP_RES, prop_name: $c.lit("sleep resistance") },
+        { prop_num: DISINT_RES, prop_name: $c.lit("disintegration resistance") },
+        { prop_num: SHOCK_RES, prop_name: $c.lit("shock resistance") },
+        { prop_num: POISON_RES, prop_name: $c.lit("poison resistance") },
+        { prop_num: DRAIN_RES, prop_name: $c.lit("drain resistance") },
+        { prop_num: SICK_RES, prop_name: $c.lit("sickness resistance") },
+        { prop_num: ANTIMAGIC, prop_name: $c.lit("magic resistance") },
+        { prop_num: HALLUC_RES, prop_name: $c.lit("hallucination resistance") },
+        { prop_num: BLND_RES, prop_name: $c.lit("light-induced blindness resistance") },
+        { prop_num: FUMBLING, prop_name: $c.lit("fumbling") },
+        { prop_num: HUNGER, prop_name: $c.lit("voracious hunger") },
+        { prop_num: TELEPAT, prop_name: $c.lit("telepathic") },
+        { prop_num: WARNING, prop_name: $c.lit("warning") },
+        { prop_num: WARN_OF_MON, prop_name: $c.lit("warn: monster type or class") },
+        { prop_num: WARN_UNDEAD, prop_name: $c.lit("warn: undead") },
+        { prop_num: SEARCHING, prop_name: $c.lit("searching") },
+        { prop_num: INFRAVISION, prop_name: $c.lit("infravision") },
+        { prop_num: ADORNED, prop_name: $c.lit("adorned (+/- Cha)") },
+        { prop_num: STEALTH, prop_name: $c.lit("stealthy") },
+        { prop_num: AGGRAVATE_MONSTER, prop_name: $c.lit("monster aggravation") },
+        { prop_num: CONFLICT, prop_name: $c.lit("conflict") },
+        { prop_num: JUMPING, prop_name: $c.lit("jumping") },
+        { prop_num: TELEPORT_CONTROL, prop_name: $c.lit("teleport control") },
+        { prop_num: FLYING, prop_name: $c.lit("flying") },
+        { prop_num: SWIMMING, prop_name: $c.lit("swimming") },
+        { prop_num: SLOW_DIGESTION, prop_name: $c.lit("slow digestion") },
+        { prop_num: HALF_SPDAM, prop_name: $c.lit("half spell damage") },
+        { prop_num: HALF_PHDAM, prop_name: $c.lit("half physical damage") },
+        { prop_num: REGENERATION, prop_name: $c.lit("HP regeneration") },
+        { prop_num: ENERGY_REGENERATION, prop_name: $c.lit("energy regeneration") },
+        { prop_num: PROTECTION, prop_name: $c.lit("extra protection") },
+        { prop_num: PROT_FROM_SHAPE_CHANGERS, prop_name: $c.lit("protection from shape changers") },
+        { prop_num: POLYMORPH_CONTROL, prop_name: $c.lit("polymorph control") },
+        { prop_num: UNCHANGING, prop_name: $c.lit("unchanging") },
+        { prop_num: REFLECTING, prop_name: $c.lit("reflecting") },
+        { prop_num: FREE_ACTION, prop_name: $c.lit("free action") },
+        { prop_num: FIXED_ABIL, prop_name: $c.lit("fixed abilities") },
+        { prop_num: LIFESAVED, prop_name: $c.lit("life will be saved") },
+        {}
+    ]);
     stoned_texts.fill(null);
-    stoned_texts[0] = $c.lit("You are slowing down.");
-    stoned_texts[1] = $c.lit("Your limbs are stiffening.");
-    stoned_texts[2] = $c.lit("Your limbs have turned to stone.");
-    stoned_texts[3] = $c.lit("You have turned to stone.");
-    stoned_texts[4] = $c.lit("You are a statue.");
+    $c.init(stoned_texts, [
+        $c.lit("You are slowing down."),
+        $c.lit("Your limbs are stiffening."),
+        $c.lit("Your limbs have turned to stone."),
+        $c.lit("You have turned to stone."),
+        $c.lit("You are a statue.")
+    ]);
     vomiting_texts.fill(null);
-    vomiting_texts[0] = $c.lit("are feeling mildly nauseated.");
-    vomiting_texts[1] = $c.lit("feel slightly confused.");
-    vomiting_texts[2] = $c.lit("can't seem to think straight.");
-    vomiting_texts[3] = $c.lit("feel incredibly sick.");
-    vomiting_texts[4] = $c.lit("are about to vomit.");
+    $c.init(vomiting_texts, [
+        $c.lit("are feeling mildly nauseated."),
+        $c.lit("feel slightly confused."),
+        $c.lit("can't seem to think straight."),
+        $c.lit("feel incredibly sick."),
+        $c.lit("are about to vomit.")
+    ]);
     choke_texts.fill(null);
-    choke_texts[0] = $c.lit("You find it hard to breathe.");
-    choke_texts[1] = $c.lit("You're gasping for air.");
-    choke_texts[2] = $c.lit("You can no longer breathe.");
-    choke_texts[3] = $c.lit("You're turning %s.");
-    choke_texts[4] = $c.lit("You suffocate.");
+    $c.init(choke_texts, [
+        $c.lit("You find it hard to breathe."),
+        $c.lit("You're gasping for air."),
+        $c.lit("You can no longer breathe."),
+        $c.lit("You're turning %s."),
+        $c.lit("You suffocate.")
+    ]);
     choke_texts2.fill(null);
-    choke_texts2[0] = $c.lit("Your %s is becoming constricted.");
-    choke_texts2[1] = $c.lit("Your blood is having trouble reaching your brain.");
-    choke_texts2[2] = $c.lit("The pressure on your %s increases.");
-    choke_texts2[3] = $c.lit("Your consciousness is fading.");
-    choke_texts2[4] = $c.lit("You suffocate.");
+    $c.init(choke_texts2, [
+        $c.lit("Your %s is becoming constricted."),
+        $c.lit("Your blood is having trouble reaching your brain."),
+        $c.lit("The pressure on your %s increases."),
+        $c.lit("Your consciousness is fading."),
+        $c.lit("You suffocate.")
+    ]);
     sickness_texts.fill(null);
-    sickness_texts[0] = $c.lit("Your illness feels worse.");
-    sickness_texts[1] = $c.lit("Your illness is severe.");
-    sickness_texts[2] = $c.lit("You are at Death's door.");
+    $c.init(sickness_texts, [
+        $c.lit("Your illness feels worse."),
+        $c.lit("Your illness is severe."),
+        $c.lit("You are at Death's door.")
+    ]);
     levi_texts.fill(null);
-    levi_texts[0] = $c.lit("You float slightly lower.");
-    levi_texts[1] = $c.lit("You wobble unsteadily %s the %s.");
+    $c.init(levi_texts, [
+        $c.lit("You float slightly lower."),
+        $c.lit("You wobble unsteadily %s the %s.")
+    ]);
     slime_texts.fill(null);
-    slime_texts[0] = $c.lit("You are turning a little %s.");
-    slime_texts[1] = $c.lit("Your limbs are getting oozy.");
-    slime_texts[2] = $c.lit("Your skin begins to peel away.");
-    slime_texts[3] = $c.lit("You are turning into %s.");
-    slime_texts[4] = $c.lit("You have become %s.");
+    $c.init(slime_texts, [
+        $c.lit("You are turning a little %s."),
+        $c.lit("Your limbs are getting oozy."),
+        $c.lit("Your skin begins to peel away."),
+        $c.lit("You are turning into %s."),
+        $c.lit("You have become %s.")
+    ]);
     phaze_texts.fill(null);
-    phaze_texts[0] = $c.lit("You start to feel bloated.");
-    phaze_texts[1] = $c.lit("You are feeling rather flabby.");
+    $c.init(phaze_texts, [
+        $c.lit("You start to feel bloated."),
+        $c.lit("You are feeling rather flabby.")
+    ]);
     region_texts.fill(null);
-    region_texts[0] = $c.lit("You seem to have some trouble breathing.");
-    region_texts[1] = $c.lit("The air here seems foul.");
+    $c.init(region_texts, [
+        $c.lit("You seem to have some trouble breathing."),
+        $c.lit("The air here seems foul.")
+    ]);
     for (let $i0 = 0; $i0 < 9; $i0++) {
         timeout_funcs[$i0].$copyFrom(new $T.ttable());
     }
-    timeout_funcs[0].f = rot_organic;
-    timeout_funcs[0].cleanup = null;
-    timeout_funcs[0].name = $c.lit("rot_organic");
-    timeout_funcs[1].f = rot_corpse;
-    timeout_funcs[1].cleanup = null;
-    timeout_funcs[1].name = $c.lit("rot_corpse");
-    timeout_funcs[2].f = revive_mon;
-    timeout_funcs[2].cleanup = null;
-    timeout_funcs[2].name = $c.lit("revive_mon");
-    timeout_funcs[3].f = zombify_mon;
-    timeout_funcs[3].cleanup = null;
-    timeout_funcs[3].name = $c.lit("zombify_mon");
-    timeout_funcs[4].f = burn_object;
-    timeout_funcs[4].cleanup = cleanup_burn;
-    timeout_funcs[4].name = $c.lit("burn_object");
-    timeout_funcs[5].f = hatch_egg;
-    timeout_funcs[5].cleanup = null;
-    timeout_funcs[5].name = $c.lit("hatch_egg");
-    timeout_funcs[6].f = fig_transform;
-    timeout_funcs[6].cleanup = null;
-    timeout_funcs[6].name = $c.lit("fig_transform");
-    timeout_funcs[7].f = shrink_glob;
-    timeout_funcs[7].cleanup = null;
-    timeout_funcs[7].name = $c.lit("shrink_glob");
-    timeout_funcs[8].f = melt_ice_away;
-    timeout_funcs[8].cleanup = null;
-    timeout_funcs[8].name = $c.lit("melt_ice_away");
+    $c.init(timeout_funcs, [
+        { f: rot_organic, cleanup: null, name: $c.lit("rot_organic") },
+        { f: rot_corpse, cleanup: null, name: $c.lit("rot_corpse") },
+        { f: revive_mon, cleanup: null, name: $c.lit("revive_mon") },
+        { f: zombify_mon, cleanup: null, name: $c.lit("zombify_mon") },
+        { f: burn_object, cleanup: cleanup_burn, name: $c.lit("burn_object") },
+        { f: hatch_egg, cleanup: null, name: $c.lit("hatch_egg") },
+        { f: fig_transform, cleanup: null, name: $c.lit("fig_transform") },
+        { f: shrink_glob, cleanup: null, name: $c.lit("shrink_glob") },
+        { f: melt_ice_away, cleanup: null, name: $c.lit("melt_ice_away") }
+    ]);
 }

@@ -37,9 +37,9 @@ import { scatter } from './explode.js';
 import { debugcore } from './files.js';
 import { PLNMSG_BACK_ON_GROUND } from './flag.h.js';
 import { discover, wizard } from './flag.macros.js';
-import { FALSE, LL_DUMP, LL_MINORAC, TRUE } from './global.h.js';
+import { FALSE, LL_DUMP, LL_MINORAC, MAXULEV, TRUE } from './global.h.js';
 import { bad_rock, calc_capacity, check_capacity, crawl_destination, in_rooms, inv_cnt, inv_weight, losehp, movobj, near_capacity, nomul, set_uinwater, spot_checks, spoteffects, test_move, u_locomotion, unmul, weight_cap } from './hack.js';
-import { ARM, ARTICLE_NONE, ARTICLE_THE, BOLT_LIM, BURNING, CORPSTAT_FEMALE, CORPSTAT_GENDER, CORPSTAT_HISTORIC, CORPSTAT_MALE, CORPSTAT_NONE, COST_BURN, COST_CORRODE, COST_CRACK, COST_DECHNT, COST_ROT, COST_RUST, CXN_PFX_THE, DIR_ERR, DISMOUNT_FELL, DISMOUNT_GENERIC, DISMOUNT_POLY, DISSOLVED, DROWNING, ECMD_OK, ECMD_TIME, FAILEDUNTRAP, FINGER, FOOT, FORCEBUNGLE, FORCETRAP, GETOBJ_DOWNPLAY, GETOBJ_EXCLUDE, GETOBJ_PROMPT, GETOBJ_SUGGEST, HAND, HEAD, HURTLING, HVY_ENCUMBER, KILLED_BY, KILLED_BY_AN, LAUNCH_KNOWN, LAUNCH_UNSEEN, LEG, MAY_DESTROY, MAY_FRACTURE, MAY_HIT, MM_ADJACENTOK, MM_FEMALE, MM_MALE, MM_NOCOUNTBIRTH, MM_NOMSG, NC_SHOW_MSG, NOTELL, NOWEBMSG, NO_KILLER_PREFIX, NO_MINVENT, NO_MM_FLAGS, NO_NC_FLAGS, NO_PART, NO_TRAP_FLAGS, N_DIRS, N_DIRS_Z, POLY_NOFLAGS, RECURSIVETRAP, ROLL, SHOP_HOLE_COST, SLT_ENCUMBER, SPINE, STONING, SUPPRESS_SADDLE, TELEDS_ALLOW_DRAG, TELEDS_TELEPORT, TEST_MOVE, TOOKPLUNGE, UNENCUMBERED, VIASITTING, VIS_EFFECTS, XKILL_NOMSG } from './hack.h.js';
+import { ARM, ARTICLE_NONE, ARTICLE_THE, BOLT_LIM, BURNING, CORPSTAT_FEMALE, CORPSTAT_GENDER, CORPSTAT_HISTORIC, CORPSTAT_MALE, CORPSTAT_NONE, COST_BURN, COST_CORRODE, COST_CRACK, COST_DECHNT, COST_ROT, COST_RUST, CXN_PFX_THE, DIR_ERR, DISMOUNT_FELL, DISMOUNT_GENERIC, DISMOUNT_POLY, DISSOLVED, DROWNING, ECMD_OK, ECMD_TIME, FAILEDUNTRAP, FINGER, FOOT, FORCEBUNGLE, FORCETRAP, GETOBJ_DOWNPLAY, GETOBJ_EXCLUDE, GETOBJ_PROMPT, GETOBJ_SUGGEST, HAND, HEAD, HURTLING, HVY_ENCUMBER, KILLED_BY, KILLED_BY_AN, LAUNCH_KNOWN, LAUNCH_UNSEEN, LEG, MAY_DESTROY, MAY_FRACTURE, MAY_HIT, MM_ADJACENTOK, MM_FEMALE, MM_MALE, MM_NOCOUNTBIRTH, MM_NOMSG, NC_SHOW_MSG, NOTELL, NOWEBMSG, NO_KILLER_PREFIX, NO_MINVENT, NO_MM_FLAGS, NO_NC_FLAGS, NO_PART, NO_TRAP_FLAGS, N_DIRS, POLY_NOFLAGS, RECURSIVETRAP, ROLL, SHOP_HOLE_COST, SLT_ENCUMBER, SPINE, STONING, SUPPRESS_SADDLE, TELEDS_ALLOW_DRAG, TELEDS_TELEPORT, TEST_MOVE, TOOKPLUNGE, UNENCUMBERED, VIASITTING, VIS_EFFECTS, XKILL_NOMSG } from './hack.h.js';
 import { DIR_180, Maybe_Half_Phys, You1, distu, min, plur, ynq } from './hack.macros.js';
 import { copynchars, dist2, distmin, eos, lcase, nh_snprintf, ordin, s_suffix, sgn, strncmpi, strsubst, upstart } from './hacklib.js';
 import { carrying, consume_obj_charge, currency, delobj, getobj, nxtobj, prinv, sobj_at, stackobj, update_inventory, useup, useupall } from './invent.js';
@@ -62,7 +62,7 @@ import { DEADMONSTER, M_AP_TYPE, helpless, is_vampshifter, ismnum, resists_fire,
 import { PM_ARCHEOLOGIST, PM_BALROG, PM_BALUCHITHERIUM, PM_BUGBEAR, PM_CYCLOPS, PM_DOPPELGANGER, PM_FLESH_GOLEM, PM_FOG_CLOUD, PM_GELATINOUS_CUBE, PM_GREMLIN, PM_IRON_GOLEM, PM_JABBERWOCK, PM_KRAKEN, PM_LEATHER_GOLEM, PM_LORD_SURTUR, PM_MASTODON, PM_NORN, PM_ORION, PM_OWLBEAR, PM_PAPER_GOLEM, PM_PIT_FIEND, PM_PIT_VIPER, PM_PURPLE_WORM, PM_RANGER, PM_ROGUE, PM_STEAM_VORTEX, PM_STONE_GOLEM, PM_STRAW_GOLEM, PM_TITANOTHERE, PM_WATER_ELEMENTAL, PM_WOOD_GOLEM } from './monsters.h.js';
 import { hits_bars, linedup, m_carrying, ohitmon, thitu } from './mthrowu.js';
 import { discover_object, observe_object } from './o_init.js';
-import { BURIED_TOO, CONTAINED_TOO, EF_DESTROY, EF_GREASE, EF_NONE, EF_PAY, EF_VERBOSE, ERODE_BURN, ERODE_CORRODE, ERODE_CRACK, ERODE_ROT, ERODE_RUST, ER_DAMAGED, ER_DESTROYED, ER_GREASED, ER_NOTHING, MAX_ERODE, OBJ_FLOOR } from './obj.h.js';
+import { BURIED_TOO, CONTAINED_TOO, EF_DESTROY, EF_GREASE, EF_NONE, EF_PAY, EF_VERBOSE, ERODE_BURN, ERODE_CORRODE, ERODE_CRACK, ERODE_ROT, ERODE_RUST, ER_DAMAGED, ER_DESTROYED, ER_GREASED, ER_NOTHING, MAX_ERODE, OBJ_FLOOR, OBJ_INVENT } from './obj.h.js';
 import { Has_contents, Is_box, Is_container, Waterproof_container, bimanual, carried, has_omonst, has_oname, is_blade, is_plural, is_wet_towel, mcarried, stone_missile, u_wield_art } from './obj.macros.js';
 import { DRAGON_HIDE, IRON, NUM_OBJECTS } from './objclass.h.js';
 import { is_corrodeable, is_crackable, is_organic, is_rustprone } from './objclass.macros.js';
@@ -632,7 +632,7 @@ export async function animate_statue(statue, x, y, cause, fail_reason) {   // tr
     comes_to_life = !canspotmon(mon) ? $c.lit("disappears") : golem_xform ? $c.lit("turns into flesh") : nonliving(mon.data) || is_vampshifter(mon) ? $c.lit("moves") : $c.lit("comes to life");
     if (u_at(x, y) || cause === ANIMATE_SPELL) {
         shkp = await shop_keeper(in_rooms(mon.mx, mon.my, SHOPBASE).get(0));
-        $c.__builtin___sprintf_chk(new $c.Ptr(statuename, 0), 0, 256, $c.lit("%s%s"), await shk_your(new $c.Ptr(tmpbuf, 0), statue), cause === 2 && (!$c.peq(mon, shkp) || statue.where === 3) ? await xname(statue) : $c.lit("statue"));
+        $c.__builtin___sprintf_chk(new $c.Ptr(statuename, 0), 0, 256, $c.lit("%s%s"), await shk_your(new $c.Ptr(tmpbuf, 0), statue), cause === ANIMATE_SPELL && (!$c.peq(mon, shkp) || statue.where === OBJ_INVENT) ? await xname(statue) : $c.lit("statue"));
         await pline($c.lit("%s %s!"), upstart(new $c.Ptr(statuename, 0)), comes_to_life);
     } else if (Hallucination()) {
         await pline_The($c.lit("%s suddenly seems more animated."), await rndmonnam(null));
@@ -1452,9 +1452,9 @@ async function trapeffect_pit(mtmp, trap, trflags) {   // trap.c:1825
             new $c.Ptr(verbbuf, 0).set(0, 0);
             if (u.usteed) {
                 if ((trflags & RECURSIVETRAP) >>> 0 !== 0) {
-                    $c.__builtin___sprintf_chk(new $c.Ptr(verbbuf, 0), 0, 256, $c.lit("and %s fall"), await x_monnam(u.usteed, steed_article, null, 8, 0));
+                    $c.__builtin___sprintf_chk(new $c.Ptr(verbbuf, 0), 0, 256, $c.lit("and %s fall"), await x_monnam(u.usteed, steed_article, null, SUPPRESS_SADDLE, FALSE));
                 } else {
-                    $c.__builtin___sprintf_chk(new $c.Ptr(verbbuf, 0), 0, 256, $c.lit("lead %s"), await x_monnam(u.usteed, steed_article, $c.lit("poor"), 8, 0));
+                    $c.__builtin___sprintf_chk(new $c.Ptr(verbbuf, 0), 0, 256, $c.lit("lead %s"), await x_monnam(u.usteed, steed_article, $c.lit("poor"), SUPPRESS_SADDLE, FALSE));
                 }
             } else if (iflags.menu_requested && already_known) {
                 await You($c.lit("carefully %s into the pit."), u_locomotion($c.lit("lower yourself")));
@@ -1464,7 +1464,7 @@ async function trapeffect_pit(mtmp, trap, trflags) {   // trap.c:1825
             } else if (adj_pit) {
                 await You($c.lit("stumble over debris%s."), !rn2(5) ? $c.lit(" between the pits") : $c.lit(""));
             } else {
-                $c.__builtin___strcpy_chk(new $c.Ptr(verbbuf, 0), !plunged ? $c.lit("fall") : (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, 1) !== 0) && !u.uprops[FLYING].blocked ? $c.lit("dive") : $c.lit("plunge"), 256);
+                $c.__builtin___strcpy_chk(new $c.Ptr(verbbuf, 0), !plunged ? $c.lit("fall") : (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked ? $c.lit("dive") : $c.lit("plunge"), 256);
             }
             if (new $c.Ptr(verbbuf, 0).get(0)) {
                 await You($c.lit("%s into %s pit!"), new $c.Ptr(verbbuf, 0), a_your[trap.madeby_u]);
@@ -1645,7 +1645,7 @@ async function trapeffect_web(mtmp, trap, trflags) {   // trap.c:2106
             if (forcetrap || viasitting) {
                 $c.__builtin___strcpy_chk(new $c.Ptr(verbbuf, 0), $c.lit("are caught by"), 256);
             } else if (u.usteed) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(verbbuf, 0), 0, 256, $c.lit("lead %s into"), await x_monnam(u.usteed, steed_article, $c.lit("poor"), 8, 0));
+                $c.__builtin___sprintf_chk(new $c.Ptr(verbbuf, 0), 0, 256, $c.lit("lead %s into"), await x_monnam(u.usteed, steed_article, $c.lit("poor"), SUPPRESS_SADDLE, FALSE));
             } else {
                 $c.__builtin___sprintf_chk(new $c.Ptr(verbbuf, 0), 0, 256, $c.lit("%s into"), u_locomotion($c.lit("stumble")));
             }
@@ -1892,7 +1892,7 @@ async function trapeffect_poly_trap(mtmp, trap, trflags) {   // trap.c:2453
         if (viasitting) {
             $c.__builtin___strcpy_chk(new $c.Ptr(verbbuf, 0), $c.lit("trigger"), 256);
         } else if (u.usteed) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(verbbuf, 0), 0, 256, $c.lit("lead %s onto"), await x_monnam(u.usteed, steed_article, null, 8, 0));
+            $c.__builtin___sprintf_chk(new $c.Ptr(verbbuf, 0), 0, 256, $c.lit("lead %s onto"), await x_monnam(u.usteed, steed_article, null, SUPPRESS_SADDLE, FALSE));
         } else {
             $c.__builtin___sprintf_chk(new $c.Ptr(verbbuf, 0), 0, 256, $c.lit("%s onto"), u_locomotion($c.lit("step")));
         }
@@ -2750,7 +2750,7 @@ function find_random_launch_coord(ttmp, cc) {   // trap.c:3599
         mindist = 2;
     }
     distance = rn2(5) + 4 | 0;
-    tmp = rn2(N_DIRS_Z - 2);
+    tmp = rn2(N_DIRS);
     while (distance >= mindist) {
         dx = $c.i16(xdir[tmp]);
         dy = $c.i16(ydir[tmp]);
@@ -4011,7 +4011,7 @@ function untrap_prob(ttmp) {   // trap.c:5289
         return 0;
     }
     if (gu.urole.mnum === PM_ROGUE) {
-        if (rn2(60) < u.ulevel) {
+        if (rn2(2 * MAXULEV) < u.ulevel) {
             chance = chance - 1 | 0;
         }
         if (u.uhave.questart | 0 && chance > 1) {
@@ -4352,7 +4352,7 @@ async function disarm_box(box, force, confused) {   // trap.c:5794
     }
 }
 async function untrap_box(box, force, confused) {   // trap.c:5821
-    if (box.otrapped | 0 && (force || !confused && rn2(31 - u.ulevel | 0) < 10) || box.tknown | 0 || !force && confused && !rn2(3)) {
+    if (box.otrapped | 0 && (force || !confused && rn2(MAXULEV + 1 - u.ulevel | 0) < 10) || box.tknown | 0 || !force && confused && !rn2(3)) {
         if (!(box.tknown | 0 && box.dknown | 0)) {
             await You($c.lit("find a trap on %s!"), await the(await xname(box)));
         } else {
@@ -4533,7 +4533,7 @@ export async function untrap(force, rx, ry, container) {   // trap.c:5848
             await pline($c.lit("This door is broken."));
             return 0;
     }
-    if (((svl.level.locations[x][y].flags | 0) & D_TRAPPED) !== 0 && (force || !confused && rn2((30 - u.ulevel | 0) + 11 | 0) < 10) || !force && confused && !rn2(3)) {
+    if (((svl.level.locations[x][y].flags | 0) & D_TRAPPED) !== 0 && (force || !confused && rn2((MAXULEV - u.ulevel | 0) + 11 | 0) < 10) || !force && confused && !rn2(3)) {
         await You($c.lit("find a trap on the door!"));
         await exercise(A_WIS, TRUE);
         if (await yn_function($c.lit("Disarm it?"), new $c.Ptr(ynqchars, 0), 113, TRUE) !== 121) {
@@ -5328,41 +5328,53 @@ export async function trap_sanity_check() {   // trap.c:7198
 
 export function $init() {
     a_your.fill(null);
-    a_your[0] = $c.lit("a");
-    a_your[1] = $c.lit("your");
+    $c.init(a_your, [
+        $c.lit("a"),
+        $c.lit("your")
+    ]);
     A_Your.fill(null);
-    A_Your[0] = $c.lit("A");
-    A_Your[1] = $c.lit("Your");
+    $c.init(A_Your, [
+        $c.lit("A"),
+        $c.lit("Your")
+    ]);
     tower_of_flame.fill(0);
     tower_of_flame.set([116, 111, 119, 101, 114, 32, 111, 102, 32, 102, 108, 97, 109, 101]);   // "tower of flame"
     A_gush_of_water_hits = $c.lit("A gush of water hits");
     blindgas.fill(null);
-    blindgas[0] = $c.lit("humid");
-    blindgas[1] = $c.lit("odorless");
-    blindgas[2] = $c.lit("pungent");
-    blindgas[3] = $c.lit("chilling");
-    blindgas[4] = $c.lit("acrid");
-    blindgas[5] = $c.lit("biting");
+    $c.init(blindgas, [
+        $c.lit("humid"),
+        $c.lit("odorless"),
+        $c.lit("pungent"),
+        $c.lit("chilling"),
+        $c.lit("acrid"),
+        $c.lit("biting")
+    ]);
     lava_killer.fill(0);
     lava_killer.set([109, 111, 108, 116, 101, 110, 32, 108, 97, 118, 97]);   // "molten lava"
     erode_obj$action.fill(null);
-    erode_obj$action[0] = $c.lit("smoulder");
-    erode_obj$action[1] = $c.lit("rust");
-    erode_obj$action[2] = $c.lit("rot");
-    erode_obj$action[3] = $c.lit("corrode");
-    erode_obj$action[4] = $c.lit("crack");
+    $c.init(erode_obj$action, [
+        $c.lit("smoulder"),
+        $c.lit("rust"),
+        $c.lit("rot"),
+        $c.lit("corrode"),
+        $c.lit("crack")
+    ]);
     erode_obj$msg.fill(null);
-    erode_obj$msg[0] = $c.lit("burnt");
-    erode_obj$msg[1] = $c.lit("rusted");
-    erode_obj$msg[2] = $c.lit("rotten");
-    erode_obj$msg[3] = $c.lit("corroded");
-    erode_obj$msg[4] = $c.lit("cracked");
+    $c.init(erode_obj$msg, [
+        $c.lit("burnt"),
+        $c.lit("rusted"),
+        $c.lit("rotten"),
+        $c.lit("corroded"),
+        $c.lit("cracked")
+    ]);
     erode_obj$bythe.fill(null);
-    erode_obj$bythe[0] = $c.lit("heat");
-    erode_obj$bythe[1] = $c.lit("oxidation");
-    erode_obj$bythe[2] = $c.lit("decay");
-    erode_obj$bythe[3] = $c.lit("corrosion");
-    erode_obj$bythe[4] = $c.lit("impact");
+    $c.init(erode_obj$bythe, [
+        $c.lit("heat"),
+        $c.lit("oxidation"),
+        $c.lit("decay"),
+        $c.lit("corrosion"),
+        $c.lit("impact")
+    ]);
     grease_protect$txt.fill(0);
     grease_protect$txt.set([112, 114, 111, 116, 101, 99, 116, 101, 100, 32, 98, 121, 32, 116, 104, 101, 32, 108, 97, 121, 101, 114, 32, 111, 102, 32, 103, 114, 101, 97, 115, 101, 33]);   // "protected by the layer of grease!"
     maketrap$zero_vl.$copyFrom(new $T.vlaunchinfo());
@@ -5370,85 +5382,89 @@ export function $init() {
     animate_statue$historic_statue_is_gone.set([116, 104, 97, 116, 32, 116, 104, 101, 32, 104, 105, 115, 116, 111, 114, 105, 99, 32, 115, 116, 97, 116, 117, 101, 32, 105, 115, 32, 110, 111, 119, 32, 103, 111, 110, 101]);   // "that the historic statue is now gone"
     trapeffect_landmine$recursive_mine = FALSE;
     trapnote$tnnames.fill(null);
-    trapnote$tnnames[0] = $c.lit("C note");
-    trapnote$tnnames[1] = $c.lit("D flat");
-    trapnote$tnnames[2] = $c.lit("D note");
-    trapnote$tnnames[3] = $c.lit("E flat");
-    trapnote$tnnames[4] = $c.lit("E note");
-    trapnote$tnnames[5] = $c.lit("F note");
-    trapnote$tnnames[6] = $c.lit("F sharp");
-    trapnote$tnnames[7] = $c.lit("G note");
-    trapnote$tnnames[8] = $c.lit("G sharp");
-    trapnote$tnnames[9] = $c.lit("A note");
-    trapnote$tnnames[10] = $c.lit("B flat");
-    trapnote$tnnames[11] = $c.lit("B note");
+    $c.init(trapnote$tnnames, [
+        $c.lit("C note"),
+        $c.lit("D flat"),
+        $c.lit("D note"),
+        $c.lit("E flat"),
+        $c.lit("E note"),
+        $c.lit("F note"),
+        $c.lit("F sharp"),
+        $c.lit("G note"),
+        $c.lit("G sharp"),
+        $c.lit("A note"),
+        $c.lit("B flat"),
+        $c.lit("B note")
+    ]);
     trapnote$tnbuf.fill(0);
     rescued_from_terrain$find_yourself.fill(0);
     rescued_from_terrain$find_yourself.set([102, 105, 110, 100, 32, 121, 111, 117, 114, 115, 101, 108, 102]);   // "find yourself"
     sink_into_lava$sink_deeper.fill(0);
     sink_into_lava$sink_deeper.set([89, 111, 117, 32, 115, 105, 110, 107, 32, 100, 101, 101, 112, 101, 114, 32, 105, 110, 116, 111, 32, 116, 104, 101, 32, 108, 97, 118, 97, 46]);   // "You sink deeper into the lava."
     trapname$halu_trapnames.fill(null);
-    trapname$halu_trapnames[0] = $c.lit("bottomless pit");
-    trapname$halu_trapnames[1] = $c.lit("polymorphism trap");
-    trapname$halu_trapnames[2] = $c.lit("devil teleporter");
-    trapname$halu_trapnames[3] = $c.lit("falling boulder trap");
-    trapname$halu_trapnames[4] = $c.lit("anti-anti-magic field");
-    trapname$halu_trapnames[5] = $c.lit("weeping gas trap");
-    trapname$halu_trapnames[6] = $c.lit("queasy board");
-    trapname$halu_trapnames[7] = $c.lit("electrified web");
-    trapname$halu_trapnames[8] = $c.lit("owlbear trap");
-    trapname$halu_trapnames[9] = $c.lit("sand mine");
-    trapname$halu_trapnames[10] = $c.lit("vacillating triangle");
-    trapname$halu_trapnames[11] = $c.lit("death trap");
-    trapname$halu_trapnames[12] = $c.lit("disintegration trap");
-    trapname$halu_trapnames[13] = $c.lit("ice trap");
-    trapname$halu_trapnames[14] = $c.lit("monochrome trap");
-    trapname$halu_trapnames[15] = $c.lit("axeblade trap");
-    trapname$halu_trapnames[16] = $c.lit("pool of boiling oil");
-    trapname$halu_trapnames[17] = $c.lit("pool of quicksand");
-    trapname$halu_trapnames[18] = $c.lit("field of caltrops");
-    trapname$halu_trapnames[19] = $c.lit("buzzsaw trap");
-    trapname$halu_trapnames[20] = $c.lit("spiked floor");
-    trapname$halu_trapnames[21] = $c.lit("revolving wall");
-    trapname$halu_trapnames[22] = $c.lit("uneven floor");
-    trapname$halu_trapnames[23] = $c.lit("finger trap");
-    trapname$halu_trapnames[24] = $c.lit("jack-in-a-box");
-    trapname$halu_trapnames[25] = $c.lit("yellow snow");
-    trapname$halu_trapnames[26] = $c.lit("booby trap");
-    trapname$halu_trapnames[27] = $c.lit("rat trap");
-    trapname$halu_trapnames[28] = $c.lit("poisoned nail");
-    trapname$halu_trapnames[29] = $c.lit("snare");
-    trapname$halu_trapnames[30] = $c.lit("whirlpool");
-    trapname$halu_trapnames[31] = $c.lit("trip wire");
-    trapname$halu_trapnames[32] = $c.lit("roach motel (tm)");
-    trapname$halu_trapnames[33] = $c.lit("negative space");
-    trapname$halu_trapnames[34] = $c.lit("tensor field");
-    trapname$halu_trapnames[35] = $c.lit("singularity");
-    trapname$halu_trapnames[36] = $c.lit("imperial fleet");
-    trapname$halu_trapnames[37] = $c.lit("black hole");
-    trapname$halu_trapnames[38] = $c.lit("thermal detonator");
-    trapname$halu_trapnames[39] = $c.lit("event horizon");
-    trapname$halu_trapnames[40] = $c.lit("entoptic phenomenon");
-    trapname$halu_trapnames[41] = $c.lit("sweet-smelling gas vent");
-    trapname$halu_trapnames[42] = $c.lit("phone booth");
-    trapname$halu_trapnames[43] = $c.lit("exploding runes");
-    trapname$halu_trapnames[44] = $c.lit("never-ending elevator");
-    trapname$halu_trapnames[45] = $c.lit("slime pit");
-    trapname$halu_trapnames[46] = $c.lit("warp zone");
-    trapname$halu_trapnames[47] = $c.lit("illusory floor");
-    trapname$halu_trapnames[48] = $c.lit("pile of poo");
-    trapname$halu_trapnames[49] = $c.lit("honey trap");
-    trapname$halu_trapnames[50] = $c.lit("tourist trap");
-    trapname$halu_trapnames[51] = $c.lit("banana peel");
-    trapname$halu_trapnames[52] = $c.lit("garden rake");
-    trapname$halu_trapnames[53] = $c.lit("whoopie cushion");
-    trapname$halu_trapnames[54] = $c.lit("box and stick trap");
-    trapname$halu_trapnames[55] = $c.lit("fly trap");
-    trapname$halu_trapnames[56] = $c.lit("legal trap");
-    trapname$halu_trapnames[57] = $c.lit("pit of snakes");
-    trapname$halu_trapnames[58] = $c.lit("pollywog trap");
-    trapname$halu_trapnames[59] = $c.lit("slippery slope");
-    trapname$halu_trapnames[60] = $c.lit("thirst trap");
-    trapname$halu_trapnames[61] = $c.lit("suntrap");
+    $c.init(trapname$halu_trapnames, [
+        $c.lit("bottomless pit"),
+        $c.lit("polymorphism trap"),
+        $c.lit("devil teleporter"),
+        $c.lit("falling boulder trap"),
+        $c.lit("anti-anti-magic field"),
+        $c.lit("weeping gas trap"),
+        $c.lit("queasy board"),
+        $c.lit("electrified web"),
+        $c.lit("owlbear trap"),
+        $c.lit("sand mine"),
+        $c.lit("vacillating triangle"),
+        $c.lit("death trap"),
+        $c.lit("disintegration trap"),
+        $c.lit("ice trap"),
+        $c.lit("monochrome trap"),
+        $c.lit("axeblade trap"),
+        $c.lit("pool of boiling oil"),
+        $c.lit("pool of quicksand"),
+        $c.lit("field of caltrops"),
+        $c.lit("buzzsaw trap"),
+        $c.lit("spiked floor"),
+        $c.lit("revolving wall"),
+        $c.lit("uneven floor"),
+        $c.lit("finger trap"),
+        $c.lit("jack-in-a-box"),
+        $c.lit("yellow snow"),
+        $c.lit("booby trap"),
+        $c.lit("rat trap"),
+        $c.lit("poisoned nail"),
+        $c.lit("snare"),
+        $c.lit("whirlpool"),
+        $c.lit("trip wire"),
+        $c.lit("roach motel (tm)"),
+        $c.lit("negative space"),
+        $c.lit("tensor field"),
+        $c.lit("singularity"),
+        $c.lit("imperial fleet"),
+        $c.lit("black hole"),
+        $c.lit("thermal detonator"),
+        $c.lit("event horizon"),
+        $c.lit("entoptic phenomenon"),
+        $c.lit("sweet-smelling gas vent"),
+        $c.lit("phone booth"),
+        $c.lit("exploding runes"),
+        $c.lit("never-ending elevator"),
+        $c.lit("slime pit"),
+        $c.lit("warp zone"),
+        $c.lit("illusory floor"),
+        $c.lit("pile of poo"),
+        $c.lit("honey trap"),
+        $c.lit("tourist trap"),
+        $c.lit("banana peel"),
+        $c.lit("garden rake"),
+        $c.lit("whoopie cushion"),
+        $c.lit("box and stick trap"),
+        $c.lit("fly trap"),
+        $c.lit("legal trap"),
+        $c.lit("pit of snakes"),
+        $c.lit("pollywog trap"),
+        $c.lit("slippery slope"),
+        $c.lit("thirst trap"),
+        $c.lit("suntrap")
+    ]);
     trapname$roletrap.fill(0);
 }

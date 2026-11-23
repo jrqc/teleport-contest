@@ -38,8 +38,8 @@ function init_fill(bg_typ, fg_typ) {   // mkmap.c:37
     limit = 624;
     count = 0;
     while (count < limit) {
-        x = $c.i16(rn2(77) + 2 | 0);
-        y = $c.i16(rnd(19));
+        x = $c.i16(rn2(WIDTH - 1) + 2 | 0);
+        y = $c.i16(rnd(HEIGHT - 1));
         if (svl.level.locations[x][y].typ === bg_typ) {
             svl.level.locations[x][y].typ = fg_typ;
             count = $c.add64(count, 1);
@@ -365,20 +365,22 @@ export async function mkmap(init_lev) {   // mkmap.c:451
 
 export function $init() {
     dirs.fill(0);
-    dirs[0] = -1;
-    dirs[1] = -1;
-    dirs[2] = -1;
-    dirs[3] = 0;
-    dirs[4] = -1;
-    dirs[5] = 1;
-    dirs[6] = 0;
-    dirs[7] = -1;
-    dirs[8] = 0;
-    dirs[9] = 1;
-    dirs[10] = 1;
-    dirs[11] = -1;
-    dirs[12] = 1;
-    dirs[13] = 0;
-    dirs[14] = 1;
-    dirs[15] = 1;
+    $c.init(dirs, [
+        -1,
+        -1,
+        -1,
+        0,
+        -1,
+        1,
+        0,
+        -1,
+        0,
+        1,
+        1,
+        -1,
+        1,
+        0,
+        1,
+        1
+    ]);
 }

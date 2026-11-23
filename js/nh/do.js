@@ -33,10 +33,10 @@ import { more_experienced, newexplevel } from './exper.js';
 import { close_nhfile, create_levelfile, delete_levelfile, open_levelfile } from './files.js';
 import { wizard } from './flag.macros.js';
 import { floating_above } from './fountain.js';
-import { FALSE, LL_ACHIEVE, LL_CONDUCT, LL_DEBUG, NHLpa_panic, TRUE } from './global.h.js';
+import { COLNO, FALSE, LL_ACHIEVE, LL_CONDUCT, LL_DEBUG, NHLpa_panic, ROWNO, TRUE } from './global.h.js';
 import { glyph_to_cmap } from './glyphs.js';
 import { check_special_room, impact_disturbs_zombies, losehp, monster_nearby, near_capacity, notice_all_mons, pooleffects, set_uinwater, u_locomotion, u_rooted } from './hack.js';
-import { ALL_FINISHED, ALL_TYPES, ALL_TYPES_SELECTED, BUC_BLESSED, BUC_CURSED, BUC_UNCURSED, BUC_UNKNOWN, CHOOSE_ALL, COST_DEGRD, DIR_DOWN, DIR_UP, DISMOUNT_FELL, ECMD_FAIL, ECMD_OK, ECMD_TIME, ESCAPED, FACE, FREEING, GETOBJ_ALLOWCNT, GETOBJ_PROMPT, HAND, HMON_THROWN, INCLUDE_VENOM, INVORDER_SORT, JUSTPICKED, KILLED_BY, LEG, MENU_COMBINATION, MENU_FULL, MENU_TRADITIONAL, NC_SHOW_MSG, NHCB_LVL_LEAVE, NO_KILLER_PREFIX, NO_NC_FLAGS, RLOC_NOMSG, SELL_DELIBERATE, SELL_NORMAL, SLT_ENCUMBER, STOMACH, TELEDS_NO_FLAGS, TOOKPLUNGE, UNENCUMBERED, UNPAID_TYPES, USE_INVLET, WRITING, most_themes, st_all, tut_themes } from './hack.h.js';
+import { ALL_FINISHED, ALL_TYPES, ALL_TYPES_SELECTED, BUC_BLESSED, BUC_CURSED, BUC_UNCURSED, BUC_UNKNOWN, CHOOSE_ALL, COST_DEGRD, CXN_SINGULAR, DIR_DOWN, DIR_UP, DISMOUNT_FELL, ECMD_FAIL, ECMD_OK, ECMD_TIME, ESCAPED, FACE, FREEING, GETOBJ_ALLOWCNT, GETOBJ_PROMPT, HAND, HMON_THROWN, INCLUDE_VENOM, INVORDER_SORT, JUSTPICKED, KILLED_BY, LEG, MENU_COMBINATION, MENU_FULL, MENU_TRADITIONAL, NC_SHOW_MSG, NHCB_LVL_LEAVE, NO_KILLER_PREFIX, NO_NC_FLAGS, RLOC_NOMSG, SELL_DELIBERATE, SELL_NORMAL, SLT_ENCUMBER, STOMACH, TELEDS_NO_FLAGS, TOOKPLUNGE, UNENCUMBERED, UNPAID_TYPES, USE_INVLET, WRITING, most_themes, st_all, tut_themes } from './hack.h.js';
 import { Maybe_Half_Phys, distu, pline1, plur, y_n } from './hack.macros.js';
 import { dist2, nh_snprintf, s_suffix, strncmpi, upstart, visctrl } from './hacklib.js';
 import { record_achievement } from './insight.js';
@@ -410,8 +410,8 @@ async function teleport_sink() {   // do.c:460
     let cx = 0, cy = 0, alreadylooted = 0, trycnt = 0;
     trycnt = 0;
     do {
-        cx = $c.i16(1 + rnd(77) | 0);
-        cy = $c.i16(1 + rn2(19) | 0);
+        cx = $c.i16(1 + rnd(COLNO - 1 - 2) | 0);
+        cy = $c.i16(1 + rn2(ROWNO - 2) | 0);
         if (svl.level.locations[cx][cy].typ === ROOM && !t_at(cx, cy) && !engr_at(cx, cy) && (!cansee(cx, cy) || distu(cx, cy) > 9)) {
             alreadylooted = svl.level.locations[u.ux][u.uy].flags;
             await set_levltyp(u.ux, u.uy, ROOM);
@@ -1611,7 +1611,7 @@ export async function revive_corpse(corpse) {   // do.c:2111
     is_zomb = $c.i8(mons[montype].mlet === S_ZOMBIE || where === OBJ_BURIED && is_reviver($c.relem(mons, montype)) ? 1 : 0);
     is_uwep = $c.i8($c.peq(corpse, $G.uwep) ? 1 : 0);
     chewed = $c.i8(corpse.oeaten !== 0 ? 1 : 0);
-    $c.__builtin___strcpy_chk(new $c.Ptr(cname, 0), await corpse_xname(corpse, chewed ? $c.lit("bite-covered") : null, 1), 256);
+    $c.__builtin___strcpy_chk(new $c.Ptr(cname, 0), await corpse_xname(corpse, chewed ? $c.lit("bite-covered") : null, CXN_SINGULAR), 256);
     mcarry = where === OBJ_MINVENT ? corpse.v.v_ocarry : null;
     get_obj_location(corpse, new $c.Ptr(corpsex, 0), new $c.Ptr(corpsey, 0), CONTAINED_TOO | BURIED_TOO);
     if (where === OBJ_CONTAINED) {
@@ -1859,14 +1859,18 @@ export async function heal_legs(how) {   // do.c:2449
 
 export function $init() {
     familiar_level_msg$fam_msgs.fill(null);
-    familiar_level_msg$fam_msgs[0] = $c.lit("You have a sense of deja vu.");
-    familiar_level_msg$fam_msgs[1] = $c.lit("You feel like you've been here before.");
-    familiar_level_msg$fam_msgs[2] = $c.lit("This place %s familiar...");
-    familiar_level_msg$fam_msgs[3] = null;
+    $c.init(familiar_level_msg$fam_msgs, [
+        $c.lit("You have a sense of deja vu."),
+        $c.lit("You feel like you've been here before."),
+        $c.lit("This place %s familiar..."),
+        null
+    ]);
     familiar_level_msg$halu_fam_msgs.fill(null);
-    familiar_level_msg$halu_fam_msgs[0] = $c.lit("Whoa!  Everything %s different.");
-    familiar_level_msg$halu_fam_msgs[1] = $c.lit("You are surrounded by twisty little passages, all alike.");
-    familiar_level_msg$halu_fam_msgs[2] = $c.lit("Gee, this %s like uncle Conan's place...");
-    familiar_level_msg$halu_fam_msgs[3] = null;
+    $c.init(familiar_level_msg$halu_fam_msgs, [
+        $c.lit("Whoa!  Everything %s different."),
+        $c.lit("You are surrounded by twisty little passages, all alike."),
+        $c.lit("Gee, this %s like uncle Conan's place..."),
+        null
+    ]);
     dowipe$buf.fill(0);
 }

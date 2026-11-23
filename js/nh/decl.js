@@ -372,12 +372,16 @@ export function sa_victual(context_victual) {   // decl.c:1199
 
 export function $init() {
     nhcb_name.fill(null);
-    nhcb_name[0] = $c.lit("cmd_before");
-    nhcb_name[1] = $c.lit("level_enter");
-    nhcb_name[2] = $c.lit("level_leave");
-    nhcb_name[3] = $c.lit("end_turn");
+    $c.init(nhcb_name, [
+        $c.lit("cmd_before"),
+        $c.lit("level_enter"),
+        $c.lit("level_leave"),
+        $c.lit("end_turn")
+    ]);
     nhcb_counts.fill(0);
-    nhcb_counts[0] = 0;
+    $c.init(nhcb_counts, [
+        0
+    ]);
     c_color_names.$copyFrom(new $T.c_color_names());
     c_color_names.c_black = $c.lit("black");
     c_color_names.c_amber = $c.lit("amber");
@@ -391,22 +395,24 @@ export function $init() {
     c_color_names.c_white = $c.lit("white");
     c_color_names.c_orange = $c.lit("orange");
     c_obj_colors.fill(null);
-    c_obj_colors[0] = $c.lit("black");
-    c_obj_colors[1] = $c.lit("red");
-    c_obj_colors[2] = $c.lit("green");
-    c_obj_colors[3] = $c.lit("brown");
-    c_obj_colors[4] = $c.lit("blue");
-    c_obj_colors[5] = $c.lit("magenta");
-    c_obj_colors[6] = $c.lit("cyan");
-    c_obj_colors[7] = $c.lit("gray");
-    c_obj_colors[8] = $c.lit("transparent");
-    c_obj_colors[9] = $c.lit("orange");
-    c_obj_colors[10] = $c.lit("bright green");
-    c_obj_colors[11] = $c.lit("yellow");
-    c_obj_colors[12] = $c.lit("bright blue");
-    c_obj_colors[13] = $c.lit("bright magenta");
-    c_obj_colors[14] = $c.lit("bright cyan");
-    c_obj_colors[15] = $c.lit("white");
+    $c.init(c_obj_colors, [
+        $c.lit("black"),
+        $c.lit("red"),
+        $c.lit("green"),
+        $c.lit("brown"),
+        $c.lit("blue"),
+        $c.lit("magenta"),
+        $c.lit("cyan"),
+        $c.lit("gray"),
+        $c.lit("transparent"),
+        $c.lit("orange"),
+        $c.lit("bright green"),
+        $c.lit("yellow"),
+        $c.lit("bright blue"),
+        $c.lit("bright magenta"),
+        $c.lit("bright cyan"),
+        $c.lit("white")
+    ]);
     c_common_strings.$copyFrom(new $T.c_common_strings());
     c_common_strings.c_nothing_happens = $c.lit("Nothing happens.");
     c_common_strings.c_nothing_seems_to_happen = $c.lit("Nothing seems to happen.");
@@ -425,102 +431,116 @@ export function $init() {
     disclosure_options.fill(0);
     disclosure_options.set([105, 97, 118, 103, 99, 111]);   // "iavgco"
     emptystr.fill(0);
-    emptystr[0] = 0;
+    $c.init(emptystr, [
+        0
+    ]);
     flags.$copyFrom(new $T.flag());
     hexdd.fill(0);
     hexdd.set([48, 48, 49, 49, 50, 50, 51, 51, 52, 52, 53, 53, 54, 54, 55, 55, 56, 56, 57, 57, 97, 65, 98, 66, 99, 67, 100, 68, 101, 69, 102, 70]);   // "00112233445566778899aAbBcCdDeEfF"
     xdir.fill(0);
-    xdir[0] = -1;
-    xdir[1] = -1;
-    xdir[2] = 0;
-    xdir[3] = 1;
-    xdir[4] = 1;
-    xdir[5] = 1;
-    xdir[6] = 0;
-    xdir[7] = -1;
-    xdir[8] = 0;
-    xdir[9] = 0;
+    $c.init(xdir, [
+        -1,
+        -1,
+        0,
+        1,
+        1,
+        1,
+        0,
+        -1,
+        0,
+        0
+    ]);
     ydir.fill(0);
-    ydir[0] = 0;
-    ydir[1] = -1;
-    ydir[2] = -1;
-    ydir[3] = -1;
-    ydir[4] = 0;
-    ydir[5] = 1;
-    ydir[6] = 1;
-    ydir[7] = 1;
-    ydir[8] = 0;
-    ydir[9] = 0;
+    $c.init(ydir, [
+        0,
+        -1,
+        -1,
+        -1,
+        0,
+        1,
+        1,
+        1,
+        0,
+        0
+    ]);
     zdir.fill(0);
-    zdir[0] = 0;
-    zdir[1] = 0;
-    zdir[2] = 0;
-    zdir[3] = 0;
-    zdir[4] = 0;
-    zdir[5] = 0;
-    zdir[6] = 0;
-    zdir[7] = 0;
-    zdir[8] = 1;
-    zdir[9] = -1;
+    $c.init(zdir, [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        -1
+    ]);
     dirs_ord.fill(0);
-    dirs_ord[0] = DIR_W;
-    dirs_ord[1] = DIR_N;
-    dirs_ord[2] = DIR_E;
-    dirs_ord[3] = DIR_S;
-    dirs_ord[4] = DIR_NW;
-    dirs_ord[5] = DIR_NE;
-    dirs_ord[6] = DIR_SE;
-    dirs_ord[7] = DIR_SW;
+    $c.init(dirs_ord, [
+        DIR_W,
+        DIR_N,
+        DIR_E,
+        DIR_S,
+        DIR_NW,
+        DIR_NE,
+        DIR_SE,
+        DIR_SW
+    ]);
     $G.has_strong_rngseed = FALSE;
     iflags.$copyFrom(new $T.instance_flags());
     a11y.$copyFrom(new $T.accessibility_data());
     materialnm.fill(null);
-    materialnm[0] = $c.lit("mysterious");
-    materialnm[1] = $c.lit("liquid");
-    materialnm[2] = $c.lit("wax");
-    materialnm[3] = $c.lit("organic");
-    materialnm[4] = $c.lit("flesh");
-    materialnm[5] = $c.lit("paper");
-    materialnm[6] = $c.lit("cloth");
-    materialnm[7] = $c.lit("leather");
-    materialnm[8] = $c.lit("wooden");
-    materialnm[9] = $c.lit("bone");
-    materialnm[10] = $c.lit("dragonhide");
-    materialnm[11] = $c.lit("iron");
-    materialnm[12] = $c.lit("metal");
-    materialnm[13] = $c.lit("copper");
-    materialnm[14] = $c.lit("silver");
-    materialnm[15] = $c.lit("gold");
-    materialnm[16] = $c.lit("platinum");
-    materialnm[17] = $c.lit("mithril");
-    materialnm[18] = $c.lit("plastic");
-    materialnm[19] = $c.lit("glass");
-    materialnm[20] = $c.lit("gemstone");
-    materialnm[21] = $c.lit("stone");
+    $c.init(materialnm, [
+        $c.lit("mysterious"),
+        $c.lit("liquid"),
+        $c.lit("wax"),
+        $c.lit("organic"),
+        $c.lit("flesh"),
+        $c.lit("paper"),
+        $c.lit("cloth"),
+        $c.lit("leather"),
+        $c.lit("wooden"),
+        $c.lit("bone"),
+        $c.lit("dragonhide"),
+        $c.lit("iron"),
+        $c.lit("metal"),
+        $c.lit("copper"),
+        $c.lit("silver"),
+        $c.lit("gold"),
+        $c.lit("platinum"),
+        $c.lit("mithril"),
+        $c.lit("plastic"),
+        $c.lit("glass"),
+        $c.lit("gemstone"),
+        $c.lit("stone")
+    ]);
     quitchars.fill(0);
     quitchars.set([32, 13, 10, 27]);   // " \r\n\x1b"
     shield_static.fill(0);
-    shield_static[0] = S_ss1;
-    shield_static[1] = S_ss2;
-    shield_static[2] = S_ss3;
-    shield_static[3] = S_ss2;
-    shield_static[4] = S_ss1;
-    shield_static[5] = S_ss2;
-    shield_static[6] = S_ss4;
-    shield_static[7] = S_ss1;
-    shield_static[8] = S_ss2;
-    shield_static[9] = S_ss3;
-    shield_static[10] = S_ss2;
-    shield_static[11] = S_ss1;
-    shield_static[12] = S_ss2;
-    shield_static[13] = S_ss4;
-    shield_static[14] = S_ss1;
-    shield_static[15] = S_ss2;
-    shield_static[16] = S_ss3;
-    shield_static[17] = S_ss2;
-    shield_static[18] = S_ss1;
-    shield_static[19] = S_ss2;
-    shield_static[20] = S_ss4;
+    $c.init(shield_static, [
+        S_ss1,
+        S_ss2,
+        S_ss3,
+        S_ss2,
+        S_ss1,
+        S_ss2,
+        S_ss4,
+        S_ss1,
+        S_ss2,
+        S_ss3,
+        S_ss2,
+        S_ss1,
+        S_ss2,
+        S_ss4,
+        S_ss1,
+        S_ss2,
+        S_ss3,
+        S_ss2,
+        S_ss1,
+        S_ss2,
+        S_ss4
+    ]);
     u.$copyFrom(new $T.you());
     urealtime.$copyFrom(new $T.u_realtime());
     vowels.fill(0);

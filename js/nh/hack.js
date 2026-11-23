@@ -2447,7 +2447,7 @@ function move_update(newlev) {   // hack.c:3588
         if (!$c.strchr(new $c.Ptr(u.urooms0, 0), c)) {
             ($t1 = ptr2, ptr2 = $t1.add(1), $t1).set(0, c);
         }
-        if (svr.rooms[c - 3 | 0].rtype >= SHOPBASE) {
+        if (svr.rooms[c - ROOMOFFSET | 0].rtype >= SHOPBASE) {
             ($t2 = ptr3, ptr3 = $t2.add(1), $t2).set(0, c);
             if (!$c.strchr(new $c.Ptr(u.ushops0, 0), c)) {
                 ($t3 = ptr4, ptr4 = $t3.add(1), $t3).set(0, c);
@@ -3222,21 +3222,25 @@ export function $init() {
     spoteffects$spottrap = null;
     spoteffects$spottraptyp = NO_TRAP;
     spoteffects$icewarnings.fill(null);
-    spoteffects$icewarnings[0] = $c.lit("The ice seems very soft and slushy.");
-    spoteffects$icewarnings[1] = $c.lit("You feel the ice shift beneath you!");
-    spoteffects$icewarnings[2] = $c.lit("The ice, is gonna BREAK!");
+    $c.init(spoteffects$icewarnings, [
+        $c.lit("The ice seems very soft and slushy."),
+        $c.lit("You feel the ice shift beneath you!"),
+        $c.lit("The ice, is gonna BREAK!")
+    ]);
     in_rooms$buf.fill(0);
     maybe_wail$powers.fill(0);
-    maybe_wail$powers[0] = TELEPORT;
-    maybe_wail$powers[1] = SEE_INVIS;
-    maybe_wail$powers[2] = POISON_RES;
-    maybe_wail$powers[3] = COLD_RES;
-    maybe_wail$powers[4] = SHOCK_RES;
-    maybe_wail$powers[5] = FIRE_RES;
-    maybe_wail$powers[6] = SLEEP_RES;
-    maybe_wail$powers[7] = DISINT_RES;
-    maybe_wail$powers[8] = TELEPORT_CONTROL;
-    maybe_wail$powers[9] = STEALTH;
-    maybe_wail$powers[10] = FAST;
-    maybe_wail$powers[11] = INVIS;
+    $c.init(maybe_wail$powers, [
+        TELEPORT,
+        SEE_INVIS,
+        POISON_RES,
+        COLD_RES,
+        SHOCK_RES,
+        FIRE_RES,
+        SLEEP_RES,
+        DISINT_RES,
+        TELEPORT_CONTROL,
+        STEALTH,
+        FAST,
+        INVIS
+    ]);
 }

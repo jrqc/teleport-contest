@@ -901,7 +901,7 @@ export async function dog_move(mtmp, after) {   // dogmove.c:977
                     k = edog ? uncursedcnt : cnt;
                     for (j = 0; j < MTSZ && j < (k - 1 | 0); j = j + 1 | 0) {
                         if (nx === mtmp.mtrack[j].x && ny === mtmp.mtrack[j].y) {
-                            if (rn2(Math.imul(4, k - j | 0))) {
+                            if (rn2(Math.imul(MTSZ, k - j | 0))) {
                                 break nxti$;
                             }
                         }
@@ -1099,48 +1099,25 @@ function GDIST(x, y) {
 
 export function $init() {
     nofetch.fill(0);
-    nofetch[0] = BALL_CLASS;
-    nofetch[1] = CHAIN_CLASS;
-    nofetch[2] = ROCK_CLASS;
-    nofetch[3] = 0;
+    $c.init(nofetch, [
+        BALL_CLASS,
+        CHAIN_CLASS,
+        ROCK_CLASS,
+        0
+    ]);
     for (let $i0 = 0; $i0 < 9; $i0++) {
         qm[$i0].$copyFrom(new $T.qmchoices());
     }
-    qm[0].mndx = PM_LITTLE_DOG;
-    qm[0].mlet = 0;
-    qm[0].mappearance = PM_KITTEN;
-    qm[0].m_ap_type = M_AP_MONSTER;
-    qm[1].mndx = PM_DOG;
-    qm[1].mlet = 0;
-    qm[1].mappearance = PM_HOUSECAT;
-    qm[1].m_ap_type = M_AP_MONSTER;
-    qm[2].mndx = PM_LARGE_DOG;
-    qm[2].mlet = 0;
-    qm[2].mappearance = PM_LARGE_CAT;
-    qm[2].m_ap_type = M_AP_MONSTER;
-    qm[3].mndx = PM_KITTEN;
-    qm[3].mlet = 0;
-    qm[3].mappearance = PM_LITTLE_DOG;
-    qm[3].m_ap_type = M_AP_MONSTER;
-    qm[4].mndx = PM_HOUSECAT;
-    qm[4].mlet = 0;
-    qm[4].mappearance = PM_DOG;
-    qm[4].m_ap_type = M_AP_MONSTER;
-    qm[5].mndx = PM_LARGE_CAT;
-    qm[5].mlet = 0;
-    qm[5].mappearance = PM_LARGE_DOG;
-    qm[5].m_ap_type = M_AP_MONSTER;
-    qm[6].mndx = PM_HOUSECAT;
-    qm[6].mlet = 0;
-    qm[6].mappearance = PM_GIANT_RAT;
-    qm[6].m_ap_type = M_AP_MONSTER;
-    qm[7].mndx = 0;
-    qm[7].mlet = S_DOG;
-    qm[7].mappearance = S_sink;
-    qm[7].m_ap_type = M_AP_FURNITURE;
-    qm[8].mndx = 0;
-    qm[8].mlet = 0;
-    qm[8].mappearance = TRIPE_RATION;
-    qm[8].m_ap_type = M_AP_OBJECT;
+    $c.init(qm, [
+        { mndx: PM_LITTLE_DOG, mlet: 0, mappearance: PM_KITTEN, m_ap_type: M_AP_MONSTER },
+        { mndx: PM_DOG, mlet: 0, mappearance: PM_HOUSECAT, m_ap_type: M_AP_MONSTER },
+        { mndx: PM_LARGE_DOG, mlet: 0, mappearance: PM_LARGE_CAT, m_ap_type: M_AP_MONSTER },
+        { mndx: PM_KITTEN, mlet: 0, mappearance: PM_LITTLE_DOG, m_ap_type: M_AP_MONSTER },
+        { mndx: PM_HOUSECAT, mlet: 0, mappearance: PM_DOG, m_ap_type: M_AP_MONSTER },
+        { mndx: PM_LARGE_CAT, mlet: 0, mappearance: PM_LARGE_DOG, m_ap_type: M_AP_MONSTER },
+        { mndx: PM_HOUSECAT, mlet: 0, mappearance: PM_GIANT_RAT, m_ap_type: M_AP_MONSTER },
+        { mndx: 0, mlet: S_DOG, mappearance: S_sink, m_ap_type: M_AP_FURNITURE },
+        { mndx: 0, mlet: 0, mappearance: TRIPE_RATION, m_ap_type: M_AP_OBJECT }
+    ]);
     droppables$dummy.$copyFrom(new $T.obj());
 }

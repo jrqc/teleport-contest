@@ -15,7 +15,7 @@ import { nhUse } from './lint.macros.js';
 import { LUA_TTABLE } from './lua.h.js';
 import { luaL_checklstring, lua_getfield, lua_getglobal, lua_gettable, lua_len, lua_pushinteger, lua_settop, lua_tointegerx, lua_type } from './luabridge.js';
 import { mkclass } from './makemon.js';
-import { G_GENOD, MS_GUARDIAN, MS_LEADER, MS_NEMESIS, NEUTRAL } from './monflag.h.js';
+import { G_GENOD, M2_PNAME, MS_GUARDIAN, MS_LEADER, MS_NEMESIS, NEUTRAL } from './monflag.h.js';
 import { mons } from './monst.js';
 import { DEADMONSTER } from './monst.macros.js';
 import { get_table_option, get_table_str_opt, nhl_done, nhl_init, nhl_loadlua } from './nhlua.js';
@@ -53,7 +53,7 @@ export async function quest_info(typ) {   // questpgr.c:31
 export function ldrname() {   // questpgr.c:50
     let i = 0;
     i = gu.urole.ldrnum;
-    $c.__builtin___sprintf_chk(new $c.Ptr(gn.nambuf, 0), 0, 64, $c.lit("%s%s"), $c.andu64($c.relem(mons, i).mflags2, 524288) !== 0 ? $c.lit("") : $c.lit("the "), mons[i].pmnames[NEUTRAL]);
+    $c.__builtin___sprintf_chk(new $c.Ptr(gn.nambuf, 0), 0, 64, $c.lit("%s%s"), $c.andu64($c.relem(mons, i).mflags2, M2_PNAME) !== 0 ? $c.lit("") : $c.lit("the "), mons[i].pmnames[NEUTRAL]);
     return new $c.Ptr(gn.nambuf, 0);
 }
 function intermed() {   // questpgr.c:61
@@ -114,7 +114,7 @@ export function find_quest_artifact(whichchains) {   // questpgr.c:89
 function neminame() {   // questpgr.c:124
     let i = 0;
     i = gu.urole.neminum;
-    $c.__builtin___sprintf_chk(new $c.Ptr(gn.nambuf, 0), 0, 64, $c.lit("%s%s"), $c.andu64($c.relem(mons, i).mflags2, 524288) !== 0 ? $c.lit("") : $c.lit("the "), mons[i].pmnames[NEUTRAL]);
+    $c.__builtin___sprintf_chk(new $c.Ptr(gn.nambuf, 0), 0, 64, $c.lit("%s%s"), $c.andu64($c.relem(mons, i).mflags2, M2_PNAME) !== 0 ? $c.lit("") : $c.lit("the "), mons[i].pmnames[NEUTRAL]);
     return new $c.Ptr(gn.nambuf, 0);
 }
 function guardname() {   // questpgr.c:134
@@ -437,7 +437,7 @@ async function com_pager_core(section, msgid, showerror, rawtext) {   // questpg
         if (output === 0 && ($c.strchr(text, 10) || $c.strlen(text) >= BUFSZ - 1)) {
             output = 2;
             if (!synopsis) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(tmpbuf, 0), 0, 256, $c.lit("[%.*s]"), 253, text);
+                $c.__builtin___sprintf_chk(new $c.Ptr(tmpbuf, 0), 0, 256, $c.lit("[%.*s]"), BUFSZ - 1 - 2, text);
                 strNsubst(new $c.Ptr(tmpbuf, 0), $c.lit("\n"), $c.lit(" "), 0);
                 synopsis = await dupstr(new $c.Ptr(tmpbuf, 0));
             }
@@ -499,17 +499,21 @@ export async function deliver_splev_message() {   // questpgr.c:655
 
 export function $init() {
     com_pager_core$howtoput.fill(null);
-    com_pager_core$howtoput[0] = $c.lit("pline");
-    com_pager_core$howtoput[1] = $c.lit("window");
-    com_pager_core$howtoput[2] = $c.lit("text");
-    com_pager_core$howtoput[3] = $c.lit("menu");
-    com_pager_core$howtoput[4] = $c.lit("default");
-    com_pager_core$howtoput[5] = null;
+    $c.init(com_pager_core$howtoput, [
+        $c.lit("pline"),
+        $c.lit("window"),
+        $c.lit("text"),
+        $c.lit("menu"),
+        $c.lit("default"),
+        null
+    ]);
     com_pager_core$howtoput2i.fill(0);
-    com_pager_core$howtoput2i[0] = 1;
-    com_pager_core$howtoput2i[1] = 2;
-    com_pager_core$howtoput2i[2] = 2;
-    com_pager_core$howtoput2i[3] = 3;
-    com_pager_core$howtoput2i[4] = 0;
-    com_pager_core$howtoput2i[5] = 0;
+    $c.init(com_pager_core$howtoput2i, [
+        1,
+        2,
+        2,
+        3,
+        0,
+        0
+    ]);
 }

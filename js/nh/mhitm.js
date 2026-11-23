@@ -143,7 +143,7 @@ export async function fightm(mtmp) {   // mhitm.c:106
                 if (has_u_swallowed) {
                     return 0;
                 }
-                if ((result & (M_ATTK_HIT | M_ATTK_DEF_DIED)) === M_ATTK_HIT && rn2(4) && mon.movement > rn2(12)) {
+                if ((result & (M_ATTK_HIT | M_ATTK_DEF_DIED)) === M_ATTK_HIT && rn2(4) && mon.movement > rn2(NORMAL_SPEED)) {
                     if (mon.movement > NORMAL_SPEED) {
                         mon.movement = $c.i16(mon.movement - NORMAL_SPEED | 0);
                     } else {

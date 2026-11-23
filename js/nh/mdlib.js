@@ -44,7 +44,7 @@ function make_version() {   // mdlib.c:248
     return;
 }
 export function mdlib_version_string(outbuf, delim) {   // mdlib.c:300
-    $c.__builtin___sprintf_chk(outbuf, 0, -1, $c.lit("%d%s%d%s%d"), 5, delim, 0, delim, 0);
+    $c.__builtin___sprintf_chk(outbuf, 0, -1, $c.lit("%d%s%d%s%d"), VERSION_MAJOR, delim, VERSION_MINOR, delim, PATCHLEVEL);
     return outbuf;
 }
 export function version_id_string(outbuf, bufsz, build_date) {   // mdlib.c:316
@@ -62,7 +62,7 @@ export function bannerc_string(outbuf, bufsz, build_date) {   // mdlib.c:349
 }
 function build_savebones_compat_string() {   // mdlib.c:393
     $c.__builtin___strcpy_chk(new $c.Ptr(save_bones_compat_buf, 0), $c.lit("save and bones files accepted from version"), 256);
-    $c.__builtin___sprintf_chk(eos(new $c.Ptr(save_bones_compat_buf, 0)), 0, -1, $c.lit(" %d.%d.%d only"), 5, 0, 0);
+    $c.__builtin___sprintf_chk(eos(new $c.Ptr(save_bones_compat_buf, 0)), 0, -1, $c.lit(" %d.%d.%d only"), VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL);
 }
 function count_and_validate_winopts() {   // mdlib.c:602
     let i = 0, cnt = 0;
@@ -105,7 +105,7 @@ async function build_options() {   // mdlib.c:669
     defwinsys = $c.lit("tty");
     build_savebones_compat_string();
     idxopttext < MAXOPT ? ($t2 = await dupstr(new $c.Ptr(optbuf, 0)), $t3 = new $c.Ptr(opttext, ($t1 = idxopttext, idxopttext = $t1 + 1 | 0, $t1)), $t3.set(0, $t2)) : null;
-    $c.__builtin___sprintf_chk(new $c.Ptr(optbuf, 0), 0, 256, $c.lit("%sNetHack version %d.%d.%d%s\n"), new $c.Ptr(opt_indent, 0), 5, 0, 0, $c.lit(""));
+    $c.__builtin___sprintf_chk(new $c.Ptr(optbuf, 0), 0, 256, $c.lit("%sNetHack version %d.%d.%d%s\n"), new $c.Ptr(opt_indent, 0), VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL, $c.lit(""));
     idxopttext < MAXOPT ? ($t5 = await dupstr(new $c.Ptr(optbuf, 0)), $t6 = new $c.Ptr(opttext, ($t4 = idxopttext, idxopttext = $t4 + 1 | 0, $t4)), $t6.set(0, $t5)) : null;
     $c.__builtin___sprintf_chk(new $c.Ptr(optbuf, 0), 0, 256, $c.lit("Options compiled into this edition:"));
     idxopttext < MAXOPT ? ($t8 = await dupstr(new $c.Ptr(optbuf, 0)), $t9 = new $c.Ptr(opttext, ($t7 = idxopttext, idxopttext = $t7 + 1 | 0, $t7)), $t9.set(0, $t8)) : null;
@@ -208,46 +208,50 @@ export function release_runtime_info() {   // mdlib.c:864
 
 export function $init() {
     artifact_names.fill(null);
-    artifact_names[0] = $c.lit("");
-    artifact_names[1] = $c.lit("Excalibur");
-    artifact_names[2] = $c.lit("Stormbringer");
-    artifact_names[3] = $c.lit("Mjollnir");
-    artifact_names[4] = $c.lit("Cleaver");
-    artifact_names[5] = $c.lit("Grimtooth");
-    artifact_names[6] = $c.lit("Orcrist");
-    artifact_names[7] = $c.lit("Sting");
-    artifact_names[8] = $c.lit("Magicbane");
-    artifact_names[9] = $c.lit("Frost Brand");
-    artifact_names[10] = $c.lit("Fire Brand");
-    artifact_names[11] = $c.lit("Dragonbane");
-    artifact_names[12] = $c.lit("Demonbane");
-    artifact_names[13] = $c.lit("Werebane");
-    artifact_names[14] = $c.lit("Grayswandir");
-    artifact_names[15] = $c.lit("Giantslayer");
-    artifact_names[16] = $c.lit("Ogresmasher");
-    artifact_names[17] = $c.lit("Trollsbane");
-    artifact_names[18] = $c.lit("Vorpal Blade");
-    artifact_names[19] = $c.lit("Snickersnee");
-    artifact_names[20] = $c.lit("Sunsword");
-    artifact_names[21] = $c.lit("The Orb of Detection");
-    artifact_names[22] = $c.lit("The Heart of Ahriman");
-    artifact_names[23] = $c.lit("The Sceptre of Might");
-    artifact_names[24] = $c.lit("The Staff of Aesculapius");
-    artifact_names[25] = $c.lit("The Magic Mirror of Merlin");
-    artifact_names[26] = $c.lit("The Eyes of the Overworld");
-    artifact_names[27] = $c.lit("The Mitre of Holiness");
-    artifact_names[28] = $c.lit("The Longbow of Diana");
-    artifact_names[29] = $c.lit("The Master Key of Thievery");
-    artifact_names[30] = $c.lit("The Tsurugi of Muramasa");
-    artifact_names[31] = $c.lit("The Platinum Yendorian Express Card");
-    artifact_names[32] = $c.lit("The Orb of Fate");
-    artifact_names[33] = $c.lit("The Eye of the Aethiopica");
-    artifact_names[34] = null;
+    $c.init(artifact_names, [
+        $c.lit(""),
+        $c.lit("Excalibur"),
+        $c.lit("Stormbringer"),
+        $c.lit("Mjollnir"),
+        $c.lit("Cleaver"),
+        $c.lit("Grimtooth"),
+        $c.lit("Orcrist"),
+        $c.lit("Sting"),
+        $c.lit("Magicbane"),
+        $c.lit("Frost Brand"),
+        $c.lit("Fire Brand"),
+        $c.lit("Dragonbane"),
+        $c.lit("Demonbane"),
+        $c.lit("Werebane"),
+        $c.lit("Grayswandir"),
+        $c.lit("Giantslayer"),
+        $c.lit("Ogresmasher"),
+        $c.lit("Trollsbane"),
+        $c.lit("Vorpal Blade"),
+        $c.lit("Snickersnee"),
+        $c.lit("Sunsword"),
+        $c.lit("The Orb of Detection"),
+        $c.lit("The Heart of Ahriman"),
+        $c.lit("The Sceptre of Might"),
+        $c.lit("The Staff of Aesculapius"),
+        $c.lit("The Magic Mirror of Merlin"),
+        $c.lit("The Eyes of the Overworld"),
+        $c.lit("The Mitre of Holiness"),
+        $c.lit("The Longbow of Diana"),
+        $c.lit("The Master Key of Thievery"),
+        $c.lit("The Tsurugi of Muramasa"),
+        $c.lit("The Platinum Yendorian Express Card"),
+        $c.lit("The Orb of Fate"),
+        $c.lit("The Eye of the Aethiopica"),
+        null
+    ]);
     date_via_env = FALSE;
     idxopttext = 0;
     done_runtime_opt_init_once = 0;
     opttext.fill(null);
-    opttext[0] = null;
+    $c.init(opttext, [
+        null
+    ]);
     optbuf.fill(0);
     version.$copyFrom(new $T.version_info());
     opt_indent.fill(0);
@@ -255,65 +259,65 @@ export function $init() {
     for (let $i0 = 0; $i0 < 2; $i0++) {
         window_opts[$i0].$copyFrom(new $T.win_information());
     }
-    window_opts[0].id = $c.lit("tty");
-    window_opts[0].name = $c.lit("traditional text with optional line-drawing");
-    window_opts[0].valid = 1;
-    window_opts[1].id = null;
-    window_opts[1].name = null;
-    window_opts[1].valid = 0;
+    $c.init(window_opts, [
+        { id: $c.lit("tty"),
+          name: $c.lit("traditional text with optional line-drawing"),
+          valid: 1 },
+        {}
+    ]);
     for (let $i0 = 0; $i0 < 2; $i0++) {
         soundlib_opts[$i0].$copyFrom(new $T.soundlib_information());
     }
-    soundlib_opts[0].id = soundlib_nosound;
-    soundlib_opts[0].text_id = $c.lit("soundlib_nosound");
-    soundlib_opts[0].Url = $c.lit("");
-    soundlib_opts[0].valid = 0;
-    soundlib_opts[1].id = 0;
-    soundlib_opts[1].text_id = null;
-    soundlib_opts[1].Url = null;
-    soundlib_opts[1].valid = 0;
+    $c.init(soundlib_opts, [
+        { id: soundlib_nosound, text_id: $c.lit("soundlib_nosound"), Url: $c.lit(""), valid: 0 },
+        {}
+    ]);
     save_bones_compat_buf.fill(0);
     build_opts.fill(null);
-    build_opts[0] = $c.lit("color");
-    build_opts[1] = $c.lit("data file compression");
-    build_opts[2] = $c.lit("deferred handling of hangup signal");
-    build_opts[3] = $c.lit("insurance files for recovering from crashes");
-    build_opts[4] = $c.lit("live logging support");
-    build_opts[5] = $c.lit("log file");
-    build_opts[6] = $c.lit("extended log file");
-    build_opts[7] = $c.lit("errors and warnings log file");
-    build_opts[8] = $c.lit("mail daemon");
-    build_opts[9] = $c.lit("news file");
-    build_opts[10] = $c.lit("internal pager used for viewing help files");
-    build_opts[11] = $c.lit("pattern matching via :PATMATCH:");
-    build_opts[12] = $c.lit("pseudo random numbers generated by ISAAC64");
-    build_opts[13] = $c.lit("strong PRNG seed from /dev/random");
-    build_opts[14] = $c.lit("restore saved games via menu");
-    build_opts[15] = $c.lit("screen clipping");
-    build_opts[16] = $c.lit("shell command");
-    build_opts[17] = $c.lit("traditional status display");
-    build_opts[18] = $c.lit("status via windowport with highlighting");
-    build_opts[19] = $c.lit("suspend command");
-    build_opts[20] = $c.lit("terminal info library");
-    build_opts[21] = $c.lit("system configuration at run-time");
-    build_opts[22] = $c.lit("show stack trace on error");
-    build_opts[23] = $c.lit("launch browser to report issues");
-    build_opts[24] = new $c.Ptr(save_bones_compat_buf, 0);
-    build_opts[25] = $c.lit("and basic NetHack features");
+    $c.init(build_opts, [
+        $c.lit("color"),
+        $c.lit("data file compression"),
+        $c.lit("deferred handling of hangup signal"),
+        $c.lit("insurance files for recovering from crashes"),
+        $c.lit("live logging support"),
+        $c.lit("log file"),
+        $c.lit("extended log file"),
+        $c.lit("errors and warnings log file"),
+        $c.lit("mail daemon"),
+        $c.lit("news file"),
+        $c.lit("internal pager used for viewing help files"),
+        $c.lit("pattern matching via :PATMATCH:"),
+        $c.lit("pseudo random numbers generated by ISAAC64"),
+        $c.lit("strong PRNG seed from /dev/random"),
+        $c.lit("restore saved games via menu"),
+        $c.lit("screen clipping"),
+        $c.lit("shell command"),
+        $c.lit("traditional status display"),
+        $c.lit("status via windowport with highlighting"),
+        $c.lit("suspend command"),
+        $c.lit("terminal info library"),
+        $c.lit("system configuration at run-time"),
+        $c.lit("show stack trace on error"),
+        $c.lit("launch browser to report issues"),
+        new $c.Ptr(save_bones_compat_buf, 0),
+        $c.lit("and basic NetHack features")
+    ]);
     build_options$lua_info.fill(null);
-    build_options$lua_info[0] = $c.lit("");
-    build_options$lua_info[1] = $c.lit("NetHack 5.0.* uses the 'Lua' interpreter to process some data:");
-    build_options$lua_info[2] = $c.lit("");
-    build_options$lua_info[3] = $c.lit("    :LUACOPYRIGHT:");
-    build_options$lua_info[4] = $c.lit("");
-    build_options$lua_info[5] = $c.lit("    \"Permission is hereby granted, free of charge, to any person obtaining");
-    build_options$lua_info[6] = $c.lit("     a copy of this software and associated documentation files (the ");
-    build_options$lua_info[7] = $c.lit("     \"Software\"), to deal in the Software without restriction including");
-    build_options$lua_info[8] = $c.lit("     without limitation the rights to use, copy, modify, merge, publish,");
-    build_options$lua_info[9] = $c.lit("     distribute, sublicense, and/or sell copies of the Software, and to ");
-    build_options$lua_info[10] = $c.lit("     permit persons to whom the Software is furnished to do so, subject to");
-    build_options$lua_info[11] = $c.lit("     the following conditions:");
-    build_options$lua_info[12] = $c.lit("     The above copyright notice and this permission notice shall be");
-    build_options$lua_info[13] = $c.lit("     included in all copies or substantial portions of the Software.\"");
-    build_options$lua_info[14] = null;
+    $c.init(build_options$lua_info, [
+        $c.lit(""),
+        $c.lit("NetHack 5.0.* uses the 'Lua' interpreter to process some data:"),
+        $c.lit(""),
+        $c.lit("    :LUACOPYRIGHT:"),
+        $c.lit(""),
+        $c.lit("    \"Permission is hereby granted, free of charge, to any person obtaining"),
+        $c.lit("     a copy of this software and associated documentation files (the "),
+        $c.lit("     \"Software\"), to deal in the Software without restriction including"),
+        $c.lit("     without limitation the rights to use, copy, modify, merge, publish,"),
+        $c.lit("     distribute, sublicense, and/or sell copies of the Software, and to "),
+        $c.lit("     permit persons to whom the Software is furnished to do so, subject to"),
+        $c.lit("     the following conditions:"),
+        $c.lit("     The above copyright notice and this permission notice shall be"),
+        $c.lit("     included in all copies or substantial portions of the Software.\""),
+        null
+    ]);
 }

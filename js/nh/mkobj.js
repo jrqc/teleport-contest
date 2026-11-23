@@ -27,7 +27,7 @@ import { debugcore } from './files.js';
 import { PLNMSG_OBJ_GLOWS } from './flag.h.js';
 import { COLNO, FALSE, LARGEST_INT, ROWNO, TRUE } from './global.h.js';
 import { in_rooms, near_capacity, obj_to_any } from './hack.js';
-import { ARTICLE_A, CORPSTAT_FEMALE, CORPSTAT_INIT, CORPSTAT_MALE, CORPSTAT_NEUTER, CORPSTAT_NONE, CORPSTAT_SPE_VAL, COST_SINGLEOBJ, COST_UNBLSS, COST_UNCURS, EXACT_NAME, FM_FMON, ONAME_NO_FLAGS, ONAME_SKIP_INVUPD, RANDOM_TIN, ROT_AGE, SPINACH_TIN, TAINT_AGE } from './hack.h.js';
+import { ARTICLE_A, CORPSTAT_FEMALE, CORPSTAT_INIT, CORPSTAT_MALE, CORPSTAT_NEUTER, CORPSTAT_NONE, CORPSTAT_SPE_VAL, COST_SINGLEOBJ, COST_UNBLSS, COST_UNCURS, EXACT_NAME, FM_FMON, ONAME_NO_FLAGS, ONAME_SKIP_INVUPD, RANDOM_TIN, ROT_AGE, SPINACH_TIN, TAINT_AGE, TROLL_REVIVE_CHANCE } from './hack.h.js';
 import { copynchars, eos, s_suffix, strstri, strsubst } from './hacklib.js';
 import { consume_obj_charge, freeinv, g_at, hold_another_object, mergable, merged, nxtobj, sobj_at, update_inventory, useupall } from './invent.js';
 import { arti_light_radius, del_light_source, find_mid, obj_adjust_light_radius, obj_sheds_light, obj_split_light_source } from './light.js';
@@ -46,7 +46,7 @@ import { PM_ARCHEOLOGIST, PM_DEATH, PM_FAMINE, PM_GRAY_OOZE, PM_HUMAN, PM_LICHEN
 import { discover_object } from './o_init.js';
 import { BURIED_TOO, CONTAINED_TOO, LOST_NONE, MAX_OIL_IN_FLASK, NOBJ_STATES, OBJ_BURIED, OBJ_CONTAINED, OBJ_DELETED, OBJ_FLOOR, OBJ_FREE, OBJ_INVENT, OBJ_LUAFREE, OBJ_MIGRATING, OBJ_MINVENT, OBJ_ONBILL } from './obj.h.js';
 import { Has_contents, Is_candle, Is_container, Is_dragon_scales, Is_mbag, Is_pudding, OMAILCMD, OMID, OMONST, bimanual, carried, has_omailcmd, has_omid, has_omonst, has_oname, is_mines_prize, is_multigen, is_poisonable, is_soko_prize, mcarried, newobj } from './obj.macros.js';
-import { DRAGON_HIDE, LIQUID, PLASTIC, RANDOM_CLASS, SPBOOK_no_NOVEL, WOOD } from './objclass.h.js';
+import { DRAGON_HIDE, LIQUID, NODIR, PLASTIC, RANDOM_CLASS, SPBOOK_no_NOVEL, WOOD } from './objclass.h.js';
 import { is_corrodeable, is_crackable, is_damageable, is_rustprone } from './objclass.macros.js';
 import { obj_descr, objects } from './objects.js';
 import { AMULET_OF_CHANGE, AMULET_OF_RESTFUL_SLEEP, AMULET_OF_STRANGULATION, AMULET_OF_YENDOR, APPLE, BAG_OF_HOLDING, BAG_OF_TRICKS, BANANA, BELL_OF_OPENING, BLINDFOLD, BOULDER, BRASS_LANTERN, CANDELABRUM_OF_INVOCATION, CANDY_BAR, CAN_OF_GREASE, CHEST, CORPSE, CRYSTAL_BALL, DILITHIUM_CRYSTAL, DRUM_OF_EARTHQUAKE, EGG, ELVEN_SHIELD, EUCALYPTUS_LEAF, EXPENSIVE_CAMERA, FIGURINE, FIRE_HORN, FOOD_RATION, FROST_HORN, FUMBLE_BOOTS, GAUNTLETS_OF_FUMBLING, GLOB_OF_GRAY_OOZE, GOLD_PIECE, HEAVY_IRON_BALL, HELM_OF_OPPOSITE_ALIGNMENT, HORN_OF_PLENTY, ICE_BOX, KELP_FROND, LARGE_BOX, LEASH, LENSES, LEVITATION_BOOTS, LOADSTONE, LUCKSTONE, LUMP_OF_ROYAL_JELLY, MAGIC_FLUTE, MAGIC_HARP, MAGIC_LAMP, MAGIC_MARKER, MEAT_RING, OILSKIN_SACK, OIL_LAMP, ORANGE, ORCISH_SHIELD, PEAR, POT_BOOZE, POT_OIL, POT_SICKNESS, POT_WATER, RIN_AGGRAVATE_MONSTER, RIN_HUNGER, RIN_POLYMORPH, RIN_TELEPORTATION, ROCK, SACK, SADDLE, SCR_MAIL, SHIELD_OF_REFLECTION, SLIME_MOLD, SPE_BLANK_PAPER, SPE_NOVEL, SPLINT_MAIL, STATUE, TALLOW_CANDLE, TIN, TINNING_KIT, TOWEL, UNICORN_HORN, WAN_CANCELLATION, WAN_FIRE, WAN_LIGHT, WAN_LIGHTNING, WAN_STASIS, WAN_WISHING, WAX_CANDLE, WORM_TOOTH } from './objects.h.js';
@@ -871,7 +871,7 @@ async function mksobj_init(obj, artif) {   // mkobj.c:869
             } else if (otmp.otyp === WAN_STASIS) {
                 $t25 = $c.i8(rn2(4) + 3 | 0), otmp.spe = $t25;
             } else {
-                $t26 = $c.i8(rn2(5) + ((objects[otmp.otyp].oc_dir | 0) === 1 ? 11 : 4) | 0), otmp.spe = $t26;
+                $t26 = $c.i8(rn2(5) + ((objects[otmp.otyp].oc_dir | 0) === NODIR ? 11 : 4) | 0), otmp.spe = $t26;
             }
             await blessorcurse(otmp, 17);
             otmp.recharged = (0) & 7;
@@ -1065,7 +1065,7 @@ export async function start_corpse_timeout(body) {   // mkobj.c:1389
         when = rider_revival_time(body, FALSE);
     } else if (mons[body.corpsenm].mlet === S_TROLL) {
         for (age = 2; age <= TAINT_AGE; age = $c.add64(age, 1)) {
-            if (!rn2(37)) {
+            if (!rn2(TROLL_REVIVE_CHANCE)) {
                 action = REVIVE_MON;
                 when = age;
                 break;
@@ -1609,7 +1609,7 @@ export async function place_object(otmp, x, y) {   // mkobj.c:2305
     if (otmp.where !== OBJ_FREE) {
         await panic($c.lit("place_object: obj \"%s\" [%d] not free"), await safe_typename(otmp.otyp), otmp.where);
     }
-    (!(x >= 0 && x < 80 && y >= 0 && y < 21) ? 1 : 0) ? $c.__assert_rtn($c.lit("place_object"), $c.lit("mkobj.c"), 2327, $c.lit("x >= 0 && x < COLNO && y >= 0 && y < ROWNO")) : 0;
+    (!(x >= 0 && x < COLNO && y >= 0 && y < ROWNO) ? 1 : 0) ? $c.__assert_rtn($c.lit("place_object"), $c.lit("mkobj.c"), 2327, $c.lit("x >= 0 && x < COLNO && y >= 0 && y < ROWNO")) : 0;
     otmp2 = svl.level.objects[x][y];
     await obj_no_longer_held(otmp);
     if (otmp.otyp === BOULDER) {
@@ -2667,129 +2667,106 @@ export function $init() {
     for (let $i0 = 0; $i0 < 11; $i0++) {
         mkobjprobs[$i0].$copyFrom(new $T.icp());
     }
-    mkobjprobs[0].iprob = 10;
-    mkobjprobs[0].iclass = WEAPON_CLASS;
-    mkobjprobs[1].iprob = 11;
-    mkobjprobs[1].iclass = ARMOR_CLASS;
-    mkobjprobs[2].iprob = 20;
-    mkobjprobs[2].iclass = FOOD_CLASS;
-    mkobjprobs[3].iprob = 8;
-    mkobjprobs[3].iclass = TOOL_CLASS;
-    mkobjprobs[4].iprob = 7;
-    mkobjprobs[4].iclass = GEM_CLASS;
-    mkobjprobs[5].iprob = 16;
-    mkobjprobs[5].iclass = POTION_CLASS;
-    mkobjprobs[6].iprob = 16;
-    mkobjprobs[6].iclass = SCROLL_CLASS;
-    mkobjprobs[7].iprob = 4;
-    mkobjprobs[7].iclass = SPBOOK_CLASS;
-    mkobjprobs[8].iprob = 4;
-    mkobjprobs[8].iclass = WAND_CLASS;
-    mkobjprobs[9].iprob = 3;
-    mkobjprobs[9].iclass = RING_CLASS;
-    mkobjprobs[10].iprob = 1;
-    mkobjprobs[10].iclass = AMULET_CLASS;
+    $c.init(mkobjprobs, [
+        { iprob: 10, iclass: WEAPON_CLASS },
+        { iprob: 11, iclass: ARMOR_CLASS },
+        { iprob: 20, iclass: FOOD_CLASS },
+        { iprob: 8, iclass: TOOL_CLASS },
+        { iprob: 7, iclass: GEM_CLASS },
+        { iprob: 16, iclass: POTION_CLASS },
+        { iprob: 16, iclass: SCROLL_CLASS },
+        { iprob: 4, iclass: SPBOOK_CLASS },
+        { iprob: 4, iclass: WAND_CLASS },
+        { iprob: 3, iclass: RING_CLASS },
+        { iprob: 1, iclass: AMULET_CLASS }
+    ]);
     for (let $i0 = 0; $i0 < 9; $i0++) {
         boxiprobs[$i0].$copyFrom(new $T.icp());
     }
-    boxiprobs[0].iprob = 18;
-    boxiprobs[0].iclass = GEM_CLASS;
-    boxiprobs[1].iprob = 15;
-    boxiprobs[1].iclass = FOOD_CLASS;
-    boxiprobs[2].iprob = 18;
-    boxiprobs[2].iclass = POTION_CLASS;
-    boxiprobs[3].iprob = 18;
-    boxiprobs[3].iclass = SCROLL_CLASS;
-    boxiprobs[4].iprob = 12;
-    boxiprobs[4].iclass = SPBOOK_CLASS;
-    boxiprobs[5].iprob = 7;
-    boxiprobs[5].iclass = COIN_CLASS;
-    boxiprobs[6].iprob = 6;
-    boxiprobs[6].iclass = WAND_CLASS;
-    boxiprobs[7].iprob = 5;
-    boxiprobs[7].iclass = RING_CLASS;
-    boxiprobs[8].iprob = 1;
-    boxiprobs[8].iclass = AMULET_CLASS;
+    $c.init(boxiprobs, [
+        { iprob: 18, iclass: GEM_CLASS },
+        { iprob: 15, iclass: FOOD_CLASS },
+        { iprob: 18, iclass: POTION_CLASS },
+        { iprob: 18, iclass: SCROLL_CLASS },
+        { iprob: 12, iclass: SPBOOK_CLASS },
+        { iprob: 7, iclass: COIN_CLASS },
+        { iprob: 6, iclass: WAND_CLASS },
+        { iprob: 5, iclass: RING_CLASS },
+        { iprob: 1, iclass: AMULET_CLASS }
+    ]);
     for (let $i0 = 0; $i0 < 7; $i0++) {
         rogueprobs[$i0].$copyFrom(new $T.icp());
     }
-    rogueprobs[0].iprob = 12;
-    rogueprobs[0].iclass = WEAPON_CLASS;
-    rogueprobs[1].iprob = 12;
-    rogueprobs[1].iclass = ARMOR_CLASS;
-    rogueprobs[2].iprob = 22;
-    rogueprobs[2].iclass = FOOD_CLASS;
-    rogueprobs[3].iprob = 22;
-    rogueprobs[3].iclass = POTION_CLASS;
-    rogueprobs[4].iprob = 22;
-    rogueprobs[4].iclass = SCROLL_CLASS;
-    rogueprobs[5].iprob = 5;
-    rogueprobs[5].iclass = WAND_CLASS;
-    rogueprobs[6].iprob = 5;
-    rogueprobs[6].iclass = RING_CLASS;
+    $c.init(rogueprobs, [
+        { iprob: 12, iclass: WEAPON_CLASS },
+        { iprob: 12, iclass: ARMOR_CLASS },
+        { iprob: 22, iclass: FOOD_CLASS },
+        { iprob: 22, iclass: POTION_CLASS },
+        { iprob: 22, iclass: SCROLL_CLASS },
+        { iprob: 5, iclass: WAND_CLASS },
+        { iprob: 5, iclass: RING_CLASS }
+    ]);
     for (let $i0 = 0; $i0 < 10; $i0++) {
         hellprobs[$i0].$copyFrom(new $T.icp());
     }
-    hellprobs[0].iprob = 20;
-    hellprobs[0].iclass = WEAPON_CLASS;
-    hellprobs[1].iprob = 20;
-    hellprobs[1].iclass = ARMOR_CLASS;
-    hellprobs[2].iprob = 16;
-    hellprobs[2].iclass = FOOD_CLASS;
-    hellprobs[3].iprob = 12;
-    hellprobs[3].iclass = TOOL_CLASS;
-    hellprobs[4].iprob = 10;
-    hellprobs[4].iclass = GEM_CLASS;
-    hellprobs[5].iprob = 1;
-    hellprobs[5].iclass = POTION_CLASS;
-    hellprobs[6].iprob = 1;
-    hellprobs[6].iclass = SCROLL_CLASS;
-    hellprobs[7].iprob = 8;
-    hellprobs[7].iclass = WAND_CLASS;
-    hellprobs[8].iprob = 8;
-    hellprobs[8].iclass = RING_CLASS;
-    hellprobs[9].iprob = 4;
-    hellprobs[9].iclass = AMULET_CLASS;
+    $c.init(hellprobs, [
+        { iprob: 20, iclass: WEAPON_CLASS },
+        { iprob: 20, iclass: ARMOR_CLASS },
+        { iprob: 16, iclass: FOOD_CLASS },
+        { iprob: 12, iclass: TOOL_CLASS },
+        { iprob: 10, iclass: GEM_CLASS },
+        { iprob: 1, iclass: POTION_CLASS },
+        { iprob: 1, iclass: SCROLL_CLASS },
+        { iprob: 8, iclass: WAND_CLASS },
+        { iprob: 8, iclass: RING_CLASS },
+        { iprob: 4, iclass: AMULET_CLASS }
+    ]);
     zerooextra.$copyFrom(new $T.oextra());
     zerooextra.oname = null;
     alteration_verbs.fill(null);
-    alteration_verbs[0] = $c.lit("cancel");
-    alteration_verbs[1] = $c.lit("drain");
-    alteration_verbs[2] = $c.lit("uncharge");
-    alteration_verbs[3] = $c.lit("unbless");
-    alteration_verbs[4] = $c.lit("uncurse");
-    alteration_verbs[5] = $c.lit("disenchant");
-    alteration_verbs[6] = $c.lit("degrade");
-    alteration_verbs[7] = $c.lit("dilute");
-    alteration_verbs[8] = $c.lit("erase");
-    alteration_verbs[9] = $c.lit("burn");
-    alteration_verbs[10] = $c.lit("neutralize");
-    alteration_verbs[11] = $c.lit("destroy");
-    alteration_verbs[12] = $c.lit("splatter");
-    alteration_verbs[13] = $c.lit("bite");
-    alteration_verbs[14] = $c.lit("open");
-    alteration_verbs[15] = $c.lit("break the lock on");
-    alteration_verbs[16] = $c.lit("rust");
-    alteration_verbs[17] = $c.lit("rot");
-    alteration_verbs[18] = $c.lit("tarnish");
-    alteration_verbs[19] = $c.lit("crack");
+    $c.init(alteration_verbs, [
+        $c.lit("cancel"),
+        $c.lit("drain"),
+        $c.lit("uncharge"),
+        $c.lit("unbless"),
+        $c.lit("uncurse"),
+        $c.lit("disenchant"),
+        $c.lit("degrade"),
+        $c.lit("dilute"),
+        $c.lit("erase"),
+        $c.lit("burn"),
+        $c.lit("neutralize"),
+        $c.lit("destroy"),
+        $c.lit("splatter"),
+        $c.lit("bite"),
+        $c.lit("open"),
+        $c.lit("break the lock on"),
+        $c.lit("rust"),
+        $c.lit("rot"),
+        $c.lit("tarnish"),
+        $c.lit("crack")
+    ]);
     dknowns.fill(0);
-    dknowns[0] = WAND_CLASS;
-    dknowns[1] = RING_CLASS;
-    dknowns[2] = POTION_CLASS;
-    dknowns[3] = SCROLL_CLASS;
-    dknowns[4] = GEM_CLASS;
-    dknowns[5] = SPBOOK_CLASS;
-    dknowns[6] = WEAPON_CLASS;
-    dknowns[7] = TOOL_CLASS;
-    dknowns[8] = VENOM_CLASS;
-    dknowns[9] = 0;
+    $c.init(dknowns, [
+        WAND_CLASS,
+        RING_CLASS,
+        POTION_CLASS,
+        SCROLL_CLASS,
+        GEM_CLASS,
+        SPBOOK_CLASS,
+        WEAPON_CLASS,
+        TOOL_CLASS,
+        VENOM_CLASS,
+        0
+    ]);
     treefruits.fill(0);
-    treefruits[0] = APPLE;
-    treefruits[1] = ORANGE;
-    treefruits[2] = PEAR;
-    treefruits[3] = BANANA;
-    treefruits[4] = EUCALYPTUS_LEAF;
+    $c.init(treefruits, [
+        APPLE,
+        ORANGE,
+        PEAR,
+        BANANA,
+        EUCALYPTUS_LEAF
+    ]);
     ofmt0.fill(0);
     ofmt0.set([37, 115, 32, 111, 98, 106, 32, 37, 115, 32, 37, 115, 58, 32, 37, 115]);   // "%s obj %s %s: %s"
     ofmt3.fill(0);
@@ -2799,34 +2776,38 @@ export function $init() {
     mfmt2.fill(0);
     mfmt2.set([37, 115, 32, 111, 98, 106, 32, 37, 115, 32, 37, 115, 32, 40, 37, 115, 41, 32, 42, 110, 111, 116, 42]);   // "%s obj %s %s (%s) *not*"
     obj_state_names.fill(null);
-    obj_state_names[0] = $c.lit("free");
-    obj_state_names[1] = $c.lit("floor");
-    obj_state_names[2] = $c.lit("contained");
-    obj_state_names[3] = $c.lit("invent");
-    obj_state_names[4] = $c.lit("minvent");
-    obj_state_names[5] = $c.lit("migrating");
-    obj_state_names[6] = $c.lit("buried");
-    obj_state_names[7] = $c.lit("onbill");
-    obj_state_names[8] = $c.lit("luafree");
-    obj_state_names[9] = $c.lit("deleted");
+    $c.init(obj_state_names, [
+        $c.lit("free"),
+        $c.lit("floor"),
+        $c.lit("contained"),
+        $c.lit("invent"),
+        $c.lit("minvent"),
+        $c.lit("migrating"),
+        $c.lit("buried"),
+        $c.lit("onbill"),
+        $c.lit("luafree"),
+        $c.lit("deleted")
+    ]);
     where_name$unknown.fill(0);
     sanity_check_worn$wearbits.fill(0);
-    sanity_check_worn$wearbits[0] = W_ARM;
-    sanity_check_worn$wearbits[1] = W_ARMC;
-    sanity_check_worn$wearbits[2] = W_ARMH;
-    sanity_check_worn$wearbits[3] = W_ARMS;
-    sanity_check_worn$wearbits[4] = W_ARMG;
-    sanity_check_worn$wearbits[5] = W_ARMF;
-    sanity_check_worn$wearbits[6] = W_ARMU;
-    sanity_check_worn$wearbits[7] = W_WEP;
-    sanity_check_worn$wearbits[8] = W_QUIVER;
-    sanity_check_worn$wearbits[9] = W_SWAPWEP;
-    sanity_check_worn$wearbits[10] = W_AMUL;
-    sanity_check_worn$wearbits[11] = W_RINGL;
-    sanity_check_worn$wearbits[12] = W_RINGR;
-    sanity_check_worn$wearbits[13] = W_TOOL;
-    sanity_check_worn$wearbits[14] = W_SADDLE;
-    sanity_check_worn$wearbits[15] = W_BALL;
-    sanity_check_worn$wearbits[16] = W_CHAIN;
-    sanity_check_worn$wearbits[17] = 0;
+    $c.init(sanity_check_worn$wearbits, [
+        W_ARM,
+        W_ARMC,
+        W_ARMH,
+        W_ARMS,
+        W_ARMG,
+        W_ARMF,
+        W_ARMU,
+        W_WEP,
+        W_QUIVER,
+        W_SWAPWEP,
+        W_AMUL,
+        W_RINGL,
+        W_RINGR,
+        W_TOOL,
+        W_SADDLE,
+        W_BALL,
+        W_CHAIN,
+        0
+    ]);
 }

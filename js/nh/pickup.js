@@ -43,6 +43,7 @@ import { add_to_container, add_to_minv, get_mtraits, hornoplenty, obj_extract_se
 import { courtmon } from './mkroom.js';
 import { SHOPBASE } from './mkroom.h.js';
 import { hideunder } from './mon.js';
+import { AD_DGST, AT_ENGL } from './monattk.h.js';
 import { dmgtype_fromattack, poly_when_stoned, stagger } from './mondata.js';
 import { bigmonst, hides_under, is_rider, nohands, nolimbs, notake, throws_rocks, touch_petrifies } from './mondata.macros.js';
 import { mons } from './monst.js';
@@ -787,7 +788,7 @@ export async function query_objlist(qstr, olist_p, qflags, pick_list, how, allow
     if (engulfer) {
         any.$copyFrom(cg.zeroany);
         if (sorted && n > 1) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s Creatures"), dmgtype_fromattack(u.ustuck.data, 26, 11) !== null ? $c.lit("Swallowed") : $c.lit("Engulfed"));
+            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s Creatures"), dmgtype_fromattack(u.ustuck.data, AD_DGST, AT_ENGL) !== null ? $c.lit("Swallowed") : $c.lit("Engulfed"));
             await add_menu_heading(win, new $c.Ptr(buf, 0));
         }
         fake_hero_object.$copyFrom(cg.zeroobj);
@@ -1727,7 +1728,7 @@ export async function loot_mon(mtmp, passed_info, prev_loot) {   // pickup.c:243
         if (passed_info) {
             passed_info.set(0, 1);
         }
-        $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("Do you want to remove the saddle from %s?"), await x_monnam(mtmp, 1, null, 8, 0));
+        $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("Do you want to remove the saddle from %s?"), await x_monnam(mtmp, ARTICLE_THE, null, SUPPRESS_SADDLE, FALSE));
         if ((c = await yn_function(new $c.Ptr(qbuf, 0), new $c.Ptr(ynqchars, 0), 110, TRUE)) === 121) {
             if (nolimbs(gy.youmonst.data)) {
                 await You_cant($c.lit("do that without limbs."));
@@ -2834,20 +2835,22 @@ export function $init() {
     observe_quantum_cat$sc.fill(0);
     observe_quantum_cat$sc.set([83, 99, 104, 114, 111, 101, 100, 105, 110, 103, 101, 114, 39, 115, 32, 67, 97, 116]);   // "Schroedinger's Cat"
     explain_container_prompt$explaintext.fill(null);
-    explain_container_prompt$explaintext[0] = $c.lit("Container actions:");
-    explain_container_prompt$explaintext[1] = $c.lit("");
-    explain_container_prompt$explaintext[2] = $c.lit(" : -- Look: examine contents");
-    explain_container_prompt$explaintext[3] = $c.lit(" o -- Out: take things out");
-    explain_container_prompt$explaintext[4] = $c.lit(" i -- In: put things in");
-    explain_container_prompt$explaintext[5] = $c.lit(" b -- Both: first take things out, then put things in");
-    explain_container_prompt$explaintext[6] = $c.lit(" r -- Reversed: put things in, then take things out");
-    explain_container_prompt$explaintext[7] = $c.lit(" s -- Stash: put one item in");
-    explain_container_prompt$explaintext[8] = $c.lit("");
-    explain_container_prompt$explaintext[9] = $c.lit(" n -- Next: loot next selected container");
-    explain_container_prompt$explaintext[10] = $c.lit(" q -- Quit: finished");
-    explain_container_prompt$explaintext[11] = $c.lit(" ? -- Help: display this text.");
-    explain_container_prompt$explaintext[12] = $c.lit("");
-    explain_container_prompt$explaintext[13] = null;
+    $c.init(explain_container_prompt$explaintext, [
+        $c.lit("Container actions:"),
+        $c.lit(""),
+        $c.lit(" : -- Look: examine contents"),
+        $c.lit(" o -- Out: take things out"),
+        $c.lit(" i -- In: put things in"),
+        $c.lit(" b -- Both: first take things out, then put things in"),
+        $c.lit(" r -- Reversed: put things in, then take things out"),
+        $c.lit(" s -- Stash: put one item in"),
+        $c.lit(""),
+        $c.lit(" n -- Next: loot next selected container"),
+        $c.lit(" q -- Quit: finished"),
+        $c.lit(" ? -- Help: display this text."),
+        $c.lit(""),
+        null
+    ]);
     in_or_out_menu$lootchars.fill(0);
     in_or_out_menu$lootchars.set([95, 58, 111, 105, 98, 114, 115, 110, 113]);   // "_:oibrsnq"
     in_or_out_menu$abc_chars.fill(0);

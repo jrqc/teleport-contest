@@ -527,7 +527,7 @@ export async function pick_lock(pick, rx, ry, container) {   // lock.c:358
                     await You_cant($c.lit("lock a door with a credit card."));
                     return PICKLOCK_LEARNED_SOMETHING;
                 }
-                $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("%s it%s%s?"), (door.flags | 0) & 8 ? $c.lit("Unlock") : $c.lit("Lock"), autounlock ? $c.lit(" with ") : $c.lit(""), autounlock ? await yname(pick) : $c.lit(""));
+                $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("%s it%s%s?"), (door.flags | 0) & D_LOCKED ? $c.lit("Unlock") : $c.lit("Lock"), autounlock ? $c.lit(" with ") : $c.lit(""), autounlock ? await yname(pick) : $c.lit(""));
                 c = await ynq(new $c.Ptr(qbuf, 0));
                 if (c !== 121) {
                     return PICKLOCK_DID_NOTHING;
@@ -1103,10 +1103,12 @@ async function chest_shatter_msg(otmp) {   // lock.c:1276
 
 export function $init() {
     lock_action$actions.fill(null);
-    lock_action$actions[0] = $c.lit("unlocking the door");
-    lock_action$actions[1] = $c.lit("unlocking the chest");
-    lock_action$actions[2] = $c.lit("unlocking the box");
-    lock_action$actions[3] = $c.lit("picking the lock");
+    $c.init(lock_action$actions, [
+        $c.lit("unlocking the door"),
+        $c.lit("unlocking the chest"),
+        $c.lit("unlocking the box"),
+        $c.lit("picking the lock")
+    ]);
     pick_lock$no_longer.fill(0);
     pick_lock$no_longer.set([85, 110, 102, 111, 114, 116, 117, 110, 97, 116, 101, 108, 121, 44, 32, 121, 111, 117, 32, 99, 97, 110, 32, 110, 111, 32, 108, 111, 110, 103, 101, 114, 32, 37, 115, 32, 37, 115, 46]);   // "Unfortunately, you can no longer %s %s."
 }

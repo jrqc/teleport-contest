@@ -13,6 +13,7 @@ import { datamodel, eos, nh_snprintf, strip_newline, strncmpi, strstri, strsubst
 import { nhStr } from './lint.macros.js';
 import { do_runtime_info, mdlib_version_string, release_runtime_info, runtime_info_init } from './mdlib.js';
 import { get_lua_version } from './nhlua.js';
+import { PATCHLEVEL, VERSION_MAJOR, VERSION_MINOR } from './patchlevel.h.js';
 import { pline, raw_printf } from './pline.js';
 import { regex_id } from './posixregex.js';
 import { sfi_char, sfi_uchar, sfi_version_info, sfo_char, sfo_uchar, sfo_version_info } from './sfbase.js';
@@ -151,7 +152,7 @@ export async function doextversion() {   // version.c:169
                 done_rt = TRUE;
                 continue;
             }
-            $c.__builtin___strncpy_chk(new $c.Ptr(buf, 0), rtbuf, 255, 256);
+            $c.__builtin___strncpy_chk(new $c.Ptr(buf, 0), rtbuf, BUFSZ - 1, 256);
             buf[BUFSZ - 1] = 0;
         } else {
             break;
@@ -265,7 +266,7 @@ export function get_feature_notice_ver(str) {   // version.c:431
     return FEATURE_NOTICE_VER(ver_maj, ver_min, patch);
 }
 export function get_current_feature_ver() {   // version.c:464
-    return 83886080;
+    return VERSION_MAJOR << 24 | VERSION_MINOR << 16 | PATCHLEVEL << 8 | 0;
 }
 export function copyright_banner_line(indx) {   // version.c:471
     if (indx === 1) {
@@ -417,174 +418,95 @@ export function $init() {
     for (let $i0 = 0; $i0 < 3; $i0++) {
         rt_opts[$i0].$copyFrom(new $T.rt_opt());
     }
-    rt_opts[0].token = $c.lit(":PATMATCH:");
-    rt_opts[0].value = new $c.Ptr(regex_id, 0);
-    rt_opts[1].token = $c.lit(":LUAVERSION:");
-    rt_opts[1].value = new $c.Ptr(gl.lua_ver, 0);
-    rt_opts[2].token = $c.lit(":LUACOPYRIGHT:");
-    rt_opts[2].value = new $c.Ptr(gl.lua_copyright, 0);
+    $c.init(rt_opts, [
+        { token: $c.lit(":PATMATCH:"), value: new $c.Ptr(regex_id, 0) },
+        { token: $c.lit(":LUAVERSION:"), value: new $c.Ptr(gl.lua_ver, 0) },
+        { token: $c.lit(":LUACOPYRIGHT:"), value: new $c.Ptr(gl.lua_copyright, 0) }
+    ]);
     for (let $i0 = 0; $i0 < 80; $i0++) {
         critical_sizes[$i0].$copyFrom(new $T.critical_sizes_with_names());
     }
-    critical_sizes[0].ucsize = 0;
-    critical_sizes[0].nm = $c.lit("unused");
-    critical_sizes[1].ucsize = 2;
-    critical_sizes[1].nm = $c.lit("short");
-    critical_sizes[2].ucsize = 4;
-    critical_sizes[2].nm = $c.lit("int");
-    critical_sizes[3].ucsize = 8;
-    critical_sizes[3].nm = $c.lit("long");
-    critical_sizes[4].ucsize = 8;
-    critical_sizes[4].nm = $c.lit("long long");
-    critical_sizes[5].ucsize = 8;
-    critical_sizes[5].nm = $c.lit("genericptr_t");
-    critical_sizes[6].ucsize = 1;
-    critical_sizes[6].nm = $c.lit("aligntyp");
-    critical_sizes[7].ucsize = 1;
-    critical_sizes[7].nm = $c.lit("boolean");
-    critical_sizes[8].ucsize = 2;
-    critical_sizes[8].nm = $c.lit("coordxy");
-    critical_sizes[9].ucsize = 2;
-    critical_sizes[9].nm = $c.lit("int16");
-    critical_sizes[10].ucsize = 4;
-    critical_sizes[10].nm = $c.lit("int32");
-    critical_sizes[11].ucsize = 8;
-    critical_sizes[11].nm = $c.lit("int64");
-    critical_sizes[12].ucsize = 1;
-    critical_sizes[12].nm = $c.lit("schar");
-    critical_sizes[13].ucsize = 8;
-    critical_sizes[13].nm = $c.lit("size_t");
-    critical_sizes[14].ucsize = 1;
-    critical_sizes[14].nm = $c.lit("uchar");
-    critical_sizes[15].ucsize = 2;
-    critical_sizes[15].nm = $c.lit("uint16");
-    critical_sizes[16].ucsize = 4;
-    critical_sizes[16].nm = $c.lit("uint32");
-    critical_sizes[17].ucsize = 8;
-    critical_sizes[17].nm = $c.lit("uint64");
-    critical_sizes[18].ucsize = 8;
-    critical_sizes[18].nm = $c.lit("ulong");
-    critical_sizes[19].ucsize = 4;
-    critical_sizes[19].nm = $c.lit("unsigned");
-    critical_sizes[20].ucsize = 2;
-    critical_sizes[20].nm = $c.lit("ushort");
-    critical_sizes[21].ucsize = 2;
-    critical_sizes[21].nm = $c.lit("xint16");
-    critical_sizes[22].ucsize = 1;
-    critical_sizes[22].nm = $c.lit("xint8");
-    critical_sizes[23].ucsize = 4;
-    critical_sizes[23].nm = $c.lit("struct arti_info");
-    critical_sizes[24].ucsize = 8;
-    critical_sizes[24].nm = $c.lit("struct nhrect");
-    critical_sizes[25].ucsize = 32;
-    critical_sizes[25].nm = $c.lit("struct branch");
-    critical_sizes[26].ucsize = 40;
-    critical_sizes[26].nm = $c.lit("struct bubble");
-    critical_sizes[27].ucsize = 184;
-    critical_sizes[27].nm = $c.lit("struct cemetery");
-    critical_sizes[28].ucsize = 192;
-    critical_sizes[28].nm = $c.lit("struct context_info");
-    critical_sizes[29].ucsize = 4;
-    critical_sizes[29].nm = $c.lit("struct nhcoord");
-    critical_sizes[30].ucsize = 32;
-    critical_sizes[30].nm = $c.lit("struct damage");
-    critical_sizes[31].ucsize = 16;
-    critical_sizes[31].nm = $c.lit("struct dest_area");
-    critical_sizes[32].ucsize = 114;
-    critical_sizes[32].nm = $c.lit("struct dgn_topology");
-    critical_sizes[33].ucsize = 92;
-    critical_sizes[33].nm = $c.lit("struct dungeon");
-    critical_sizes[34].ucsize = 4;
-    critical_sizes[34].nm = $c.lit("struct d_level");
-    critical_sizes[35].ucsize = 28;
-    critical_sizes[35].nm = $c.lit("struct ebones");
-    critical_sizes[36].ucsize = 64;
-    critical_sizes[36].nm = $c.lit("struct edog");
-    critical_sizes[37].ucsize = 128;
-    critical_sizes[37].nm = $c.lit("struct egd");
-    critical_sizes[38].ucsize = 8;
-    critical_sizes[38].nm = $c.lit("struct emin");
-    critical_sizes[39].ucsize = 64;
-    critical_sizes[39].nm = $c.lit("struct engr");
-    critical_sizes[40].ucsize = 56;
-    critical_sizes[40].nm = $c.lit("struct epri");
-    critical_sizes[41].ucsize = 96;
-    critical_sizes[41].nm = $c.lit("struct eshk");
-    critical_sizes[42].ucsize = 48;
-    critical_sizes[42].nm = $c.lit("struct fe");
-    critical_sizes[43].ucsize = 208;
-    critical_sizes[43].nm = $c.lit("struct flag");
-    critical_sizes[44].ucsize = 48;
-    critical_sizes[44].nm = $c.lit("struct fruit");
-    critical_sizes[45].ucsize = 32;
-    critical_sizes[45].nm = $c.lit("struct gamelog_line");
-    critical_sizes[46].ucsize = 16;
-    critical_sizes[46].nm = $c.lit("struct kinfo");
-    critical_sizes[47].ucsize = 16;
-    critical_sizes[47].nm = $c.lit("struct levelflags");
-    critical_sizes[48].ucsize = 32;
-    critical_sizes[48].nm = $c.lit("struct ls_t");
-    critical_sizes[49].ucsize = 1;
-    critical_sizes[49].nm = $c.lit("struct linfo");
-    critical_sizes[50].ucsize = 4;
-    critical_sizes[50].nm = $c.lit("struct mapseen_feat");
-    critical_sizes[51].ucsize = 4;
-    critical_sizes[51].nm = $c.lit("struct mapseen_flags");
-    critical_sizes[52].ucsize = 4;
-    critical_sizes[52].nm = $c.lit("struct mapseen_rooms");
-    critical_sizes[53].ucsize = 64;
-    critical_sizes[53].nm = $c.lit("struct mextra");
-    critical_sizes[54].ucsize = 224;
-    critical_sizes[54].nm = $c.lit("struct mkroom");
-    critical_sizes[55].ucsize = 192;
-    critical_sizes[55].nm = $c.lit("struct monst");
-    critical_sizes[56].ucsize = 4;
-    critical_sizes[56].nm = $c.lit("struct mvitals");
-    critical_sizes[57].ucsize = 112;
-    critical_sizes[57].nm = $c.lit("struct obj");
-    critical_sizes[58].ucsize = 72;
-    critical_sizes[58].nm = $c.lit("struct objclass");
-    critical_sizes[59].ucsize = 32;
-    critical_sizes[59].nm = $c.lit("struct oextra");
-    critical_sizes[60].ucsize = 8;
-    critical_sizes[60].nm = $c.lit("struct q_score");
-    critical_sizes[61].ucsize = 8;
-    critical_sizes[61].nm = $c.lit("struct rm");
-    critical_sizes[62].ucsize = 8;
-    critical_sizes[62].nm = $c.lit("struct spell");
-    critical_sizes[63].ucsize = 24;
-    critical_sizes[63].nm = $c.lit("struct stairway");
-    critical_sizes[64].ucsize = 40;
-    critical_sizes[64].nm = $c.lit("struct s_level");
-    critical_sizes[65].ucsize = 32;
-    critical_sizes[65].nm = $c.lit("struct trap");
-    critical_sizes[66].ucsize = 24;
-    critical_sizes[66].nm = $c.lit("struct version_info");
-    critical_sizes[67].ucsize = 8;
-    critical_sizes[67].nm = $c.lit("anything");
-    critical_sizes[68].ucsize = 200;
-    critical_sizes[68].nm = $c.lit("you_LO");
-    critical_sizes[69].ucsize = 10;
-    critical_sizes[69].nm = $c.lit("you_HI");
-    critical_sizes[70].ucsize = 0;
-    critical_sizes[70].nm = $c.lit("");
-    critical_sizes[71].ucsize = 0;
-    critical_sizes[71].nm = $c.lit("");
-    critical_sizes[72].ucsize = 0;
-    critical_sizes[72].nm = $c.lit("");
-    critical_sizes[73].ucsize = 0;
-    critical_sizes[73].nm = $c.lit("");
-    critical_sizes[74].ucsize = 0;
-    critical_sizes[74].nm = $c.lit("");
-    critical_sizes[75].ucsize = 0;
-    critical_sizes[75].nm = $c.lit("");
-    critical_sizes[76].ucsize = 0;
-    critical_sizes[76].nm = $c.lit("");
-    critical_sizes[77].ucsize = 0;
-    critical_sizes[77].nm = $c.lit("");
-    critical_sizes[78].ucsize = 0;
-    critical_sizes[78].nm = $c.lit("");
-    critical_sizes[79].ucsize = 0;
-    critical_sizes[79].nm = $c.lit("");
+    $c.init(critical_sizes, [
+        { ucsize: 0, nm: $c.lit("unused") },
+        { ucsize: 2, nm: $c.lit("short") },
+        { ucsize: 4, nm: $c.lit("int") },
+        { ucsize: 8, nm: $c.lit("long") },
+        { ucsize: 8, nm: $c.lit("long long") },
+        { ucsize: 8, nm: $c.lit("genericptr_t") },
+        { ucsize: 1, nm: $c.lit("aligntyp") },
+        { ucsize: 1, nm: $c.lit("boolean") },
+        { ucsize: 2, nm: $c.lit("coordxy") },
+        { ucsize: 2, nm: $c.lit("int16") },
+        { ucsize: 4, nm: $c.lit("int32") },
+        { ucsize: 8, nm: $c.lit("int64") },
+        { ucsize: 1, nm: $c.lit("schar") },
+        { ucsize: 8, nm: $c.lit("size_t") },
+        { ucsize: 1, nm: $c.lit("uchar") },
+        { ucsize: 2, nm: $c.lit("uint16") },
+        { ucsize: 4, nm: $c.lit("uint32") },
+        { ucsize: 8, nm: $c.lit("uint64") },
+        { ucsize: 8, nm: $c.lit("ulong") },
+        { ucsize: 4, nm: $c.lit("unsigned") },
+        { ucsize: 2, nm: $c.lit("ushort") },
+        { ucsize: 2, nm: $c.lit("xint16") },
+        { ucsize: 1, nm: $c.lit("xint8") },
+        { ucsize: 4, nm: $c.lit("struct arti_info") },
+        { ucsize: 8, nm: $c.lit("struct nhrect") },
+        { ucsize: 32, nm: $c.lit("struct branch") },
+        { ucsize: 40, nm: $c.lit("struct bubble") },
+        { ucsize: 184, nm: $c.lit("struct cemetery") },
+        { ucsize: 192, nm: $c.lit("struct context_info") },
+        { ucsize: 4, nm: $c.lit("struct nhcoord") },
+        { ucsize: 32, nm: $c.lit("struct damage") },
+        { ucsize: 16, nm: $c.lit("struct dest_area") },
+        { ucsize: 114, nm: $c.lit("struct dgn_topology") },
+        { ucsize: 92, nm: $c.lit("struct dungeon") },
+        { ucsize: 4, nm: $c.lit("struct d_level") },
+        { ucsize: 28, nm: $c.lit("struct ebones") },
+        { ucsize: 64, nm: $c.lit("struct edog") },
+        { ucsize: 128, nm: $c.lit("struct egd") },
+        { ucsize: 8, nm: $c.lit("struct emin") },
+        { ucsize: 64, nm: $c.lit("struct engr") },
+        { ucsize: 56, nm: $c.lit("struct epri") },
+        { ucsize: 96, nm: $c.lit("struct eshk") },
+        { ucsize: 48, nm: $c.lit("struct fe") },
+        { ucsize: 208, nm: $c.lit("struct flag") },
+        { ucsize: 48, nm: $c.lit("struct fruit") },
+        { ucsize: 32, nm: $c.lit("struct gamelog_line") },
+        { ucsize: 16, nm: $c.lit("struct kinfo") },
+        { ucsize: 16, nm: $c.lit("struct levelflags") },
+        { ucsize: 32, nm: $c.lit("struct ls_t") },
+        { ucsize: 1, nm: $c.lit("struct linfo") },
+        { ucsize: 4, nm: $c.lit("struct mapseen_feat") },
+        { ucsize: 4, nm: $c.lit("struct mapseen_flags") },
+        { ucsize: 4, nm: $c.lit("struct mapseen_rooms") },
+        { ucsize: 64, nm: $c.lit("struct mextra") },
+        { ucsize: 224, nm: $c.lit("struct mkroom") },
+        { ucsize: 192, nm: $c.lit("struct monst") },
+        { ucsize: 4, nm: $c.lit("struct mvitals") },
+        { ucsize: 112, nm: $c.lit("struct obj") },
+        { ucsize: 72, nm: $c.lit("struct objclass") },
+        { ucsize: 32, nm: $c.lit("struct oextra") },
+        { ucsize: 8, nm: $c.lit("struct q_score") },
+        { ucsize: 8, nm: $c.lit("struct rm") },
+        { ucsize: 8, nm: $c.lit("struct spell") },
+        { ucsize: 24, nm: $c.lit("struct stairway") },
+        { ucsize: 40, nm: $c.lit("struct s_level") },
+        { ucsize: 32, nm: $c.lit("struct trap") },
+        { ucsize: 24, nm: $c.lit("struct version_info") },
+        { ucsize: 8, nm: $c.lit("anything") },
+        { ucsize: 200, nm: $c.lit("you_LO") },
+        { ucsize: 10, nm: $c.lit("you_HI") },
+        { ucsize: 0, nm: $c.lit("") },
+        { ucsize: 0, nm: $c.lit("") },
+        { ucsize: 0, nm: $c.lit("") },
+        { ucsize: 0, nm: $c.lit("") },
+        { ucsize: 0, nm: $c.lit("") },
+        { ucsize: 0, nm: $c.lit("") },
+        { ucsize: 0, nm: $c.lit("") },
+        { ucsize: 0, nm: $c.lit("") },
+        { ucsize: 0, nm: $c.lit("") },
+        { ucsize: 0, nm: $c.lit("") }
+    ]);
     cscbuf.fill(0);
 }

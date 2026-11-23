@@ -452,8 +452,8 @@ export async function collect_coords(ccc, cx, cy, maxradius, cc_flags, filter) {
 export async function safe_teleds(teleds_flags) {   // teleport.c:717
     let nux = 0, nuy = 0, cc_flags = 0, candy = $c.recArray($T.nhcoord, 1659), backupspot = new $T.nhcoord(), tcnt = 0, candycount = 0, $t1;
     for (tcnt = 0; tcnt < 40; tcnt = tcnt + 1 | 0) {
-        nux = $c.i16(rnd(79));
-        nuy = $c.i16(rn2(21));
+        nux = $c.i16(rnd(COLNO - 1));
+        nuy = $c.i16(rn2(ROWNO));
         if (await teleok(nux, nuy, FALSE)) {
             await teleds(nux, nuy, teleds_flags);
             return TRUE;
@@ -1219,8 +1219,8 @@ export async function rloc(mtmp, rlocflags) {   // teleport.c:1799
             }
         }
         for (trycount = 0; trycount < 50; trycount = trycount + 1 | 0) {
-            x = $c.i16(rnd(79));
-            y = $c.i16(rn2(21));
+            x = $c.i16(rnd(COLNO - 1));
+            y = $c.i16(rn2(ROWNO));
             if (rloc_pos_ok(x, y, mtmp)) {
                 break found_xy$;
             }
@@ -1408,8 +1408,8 @@ export async function rloco(obj) {   // teleport.c:2102
     oty = obj.oy;
     restricted_fall = $c.i8(otx === 0 && svd.dndest.lx ? 1 : 0);
     do {
-        tx = $c.i16(rn2(77) + 2 | 0);
-        ty = $c.i16(rn2(21));
+        tx = $c.i16(rn2(COLNO - 3) + 2 | 0);
+        ty = $c.i16(rn2(ROWNO));
         if (!(try_limit = try_limit - 1 | 0)) {
             break;
         }
@@ -1525,14 +1525,12 @@ export function $init() {
     for (let $i0 = 0; $i0 < 4; $i0++) {
         dotelecmd$tports[$i0].$copyFrom(new $T.tporttypes());
     }
-    dotelecmd$tports[0].menulet = 110;
-    dotelecmd$tports[0].menudesc = $c.lit("normal ^T on demand; no spell, obey restrictions");
-    dotelecmd$tports[1].menulet = 115;
-    dotelecmd$tports[1].menudesc = $c.lit("via spellcast; no intrinsic teleport");
-    dotelecmd$tports[2].menulet = 116;
-    dotelecmd$tports[2].menudesc = $c.lit("try ^T without having it; no spell");
-    dotelecmd$tports[3].menulet = 119;
-    dotelecmd$tports[3].menudesc = $c.lit("debug mode; ignore restrictions");
+    $c.init(dotelecmd$tports, [
+        { menulet: 110, menudesc: $c.lit("normal ^T on demand; no spell, obey restrictions") },
+        { menulet: 115, menudesc: $c.lit("via spellcast; no intrinsic teleport") },
+        { menulet: 116, menudesc: $c.lit("try ^T without having it; no spell") },
+        { menulet: 119, menudesc: $c.lit("debug mode; ignore restrictions") }
+    ]);
     level_tele$get_there_from.fill(0);
     level_tele$get_there_from.set([103, 101, 116, 32, 116, 104, 101, 114, 101, 32, 102, 114, 111, 109, 32, 37, 115, 46]);   // "get there from %s."
     tele_trap$in_tele_trap = FALSE;

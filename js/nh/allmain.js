@@ -659,7 +659,7 @@ export async function welcome(new_game) {   // allmain.c:854
     }
     new $c.Ptr(buf, 0).set(0, 0);
     if (new_game || u.ualignbase[A_ORIGINAL] !== u.ualignbase[A_CURRENT] || adrift) {
-        $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" %s%s"), adrift ? $c.lit("adrift ") : $c.lit(""), adrift ? align_str(u.ualign.type) : align_str(u.ualignbase[0]));
+        $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" %s%s"), adrift ? $c.lit("adrift ") : $c.lit(""), adrift ? align_str(u.ualign.type) : align_str(u.ualignbase[A_CURRENT]));
     }
     if (!gu.urole.name.f && (new_game ? (gu.urole.allow & ROLE_GENDMASK) === (ROLE_MALE | ROLE_FEMALE) : currentgend !== flags.initgend)) {
         $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" %s"), genders[currentgend].adj);
