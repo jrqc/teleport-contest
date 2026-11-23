@@ -64,15 +64,19 @@ const crtLink = path.join(out, '..', 'crt');
 if (!existsSync(crtLink)) symlinkSync(path.join(ROOT, 'js/crt'), crtLink);
 const errors = [];
 const perTu = [];
+const results = [];
 for (const e of [...db, ...luaDb]) {
     if (only.size && !only.has(path.basename(e.file))) continue;
     const tu = await load(e);
     const r = prog.emitTU(tu);
-    writeFileSync(path.join(out, r.path), r.code);
+    results.push(r);
     errors.push(...r.errors);
-    perTu.push({ file: tu.file, lines: r.code.split('\n').length, errors: r.errors.length });
+    perTu.push({ file: tu.file, errors: r.errors.length });
     process.stderr.write(r.errors.length ? 'x' : '.');
 }
+// readability plan P3: macro sites are resolved once every TU is emitted
+const finalCode = prog.resolveTUs(results);
+perTu.forEach((t, i) => { const code = finalCode.get(results[i].path); writeFileSync(path.join(out, results[i].path), code); t.lines = code.split('\n').length; });
 for (const [f, text] of prog.finish()) writeFileSync(path.join(out, f), text);
 process.stderr.write(` emit ${((Date.now() - t0) / 1000).toFixed(0)}s\n`);
 // syntax check

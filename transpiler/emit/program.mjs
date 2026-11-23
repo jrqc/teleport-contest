@@ -7,7 +7,7 @@
 // scalars and pointers, with their zero values) and index.js (the $init
 // order: TU link order, like C's static initialization, which has no order).
 import path from 'node:path';
-import { TUEmitter, EmitError } from './tu.mjs';
+import { TUEmitter, EmitError, IMPORTS_MARK, LOCAL_MACROS_MARK, SITE_RE } from './tu.mjs';
 import { HeapEmitter } from './heap.mjs';
 import { bridgeModule } from './bridge.mjs';
 import { classSource, zeroOf } from './classes.mjs';
@@ -26,6 +26,19 @@ const ident = (m) => m.replace(/[^A-Za-z0-9_$]/g, '_');
 export const moduleName = (file) => path.basename(file).replace(/\.c$/, '');
 /** Heap-world TUs (decision D2): the Lua interpreter. */
 export const isHeapFile = (file) => /(^|\/)lib\/lua[^/]*\//.test(file);
+
+const addTo = (m, mod, name) => { if (!m.has(mod)) m.set(mod, new Set()); m.get(mod).add(name); };
+const importLines = (m) => [...m.keys()].sort().map((mod) => `import { ${[...m.get(mod)].sort().join(', ')} } from './${mod}.js';`);
+/** The module of the macro functions of header `file`: rm.h -> rm.macros (rm.macros.js). */
+const macroModule = (file) => path.basename(file).replace(/\.h$/, '.macros');
+/** The JS function for macro `name` from its chosen site's body (parameters are \u0002i\u0002). */
+function macroFunction(name, s, exported) {
+    const plain = s.body.replace(/\u0002\d+\u0002/g, ' ');
+    const params = s.params.map((p) => { let q = jsName(p); while (new RegExp(`(^|[^\\w$.])${q.replace(/\$/g, '\\$')}(?![\\w$])`).test(plain)) q += '$'; return q; });
+    const body = s.body.replace(/\u0002(\d+)\u0002/g, (_, i) => params[Number(i)]);
+    const head = `${exported ? 'export ' : ''}${s.isAsync ? 'async ' : ''}function ${jsName(name)}(${params.join(', ')}) {`;
+    return s.isVoid ? `${head}\n    ${body};\n}` : `${head}\n    return ${body};\n}`;
+}
 
 export class Program {
     /**
@@ -57,6 +70,9 @@ export class Program {
         this.cells = new Set(opts.cells || []);   // union keys kept as union cells (union-pun verdict, D1)
         this.isHeapFile = opts.isHeapFile || null;   // tests: put every TU in the heap world
         this.consts = new ConstTable();   // enum constants by defining file (readability plan P2)
+        this.macroFunctions = opts.macroFunctions !== false;   // readability plan P3
+        this.macroSites = [];
+        this.collectors = [];
         this.importedModules = new Set();
         this.macroConsts = new Map();   // file -> Map(name -> { js, text, offset }): #define constants in use (P2)
     }
@@ -125,7 +141,7 @@ export class Program {
     functionRef(tu, name) {
         // a hand-written replacement in js/hand/ that the runtime index does not export: imported directly
         if (this.handMod.has(name) && !this.crt.has(name)) { this.noteImport(tu, this.handMod.get(name), jsName(name)); return jsName(name); }
-        if (this.definedIn(tu, name, 'fn')) return jsName(name);
+        if (this.definedIn(tu, name, 'fn')) { const dd = this.fnDef.get(name); this.localRef(tu, name, !(dd && dd.module === tu.tu.module)); return jsName(name); }
         const d = this.fnDef.get(name);
         if (d && d.heap && !tu.heap) {
             // an object-world use of a heap-world function: through the generated bridge
@@ -177,7 +193,7 @@ export class Program {
     globalRef(tu, name, t) {
         tu._defs = tu._defs || this.localDefs(tu);
         const local = tu._defs.var.get(name);
-        if (local && local.storageClass === 'static') return jsName(name);
+        if (local && local.storageClass === 'static') { this.localRef(tu, name, true); return jsName(name); }
         if (local && this.varDef.has(name) && this.varDef.get(name).module !== tu.tu.module && (t.k === 'rec' || t.k === 'arr')) {
             // a tentative definition another TU owns (a header defines it in every includer)
             this.noteImport(tu, this.varDef.get(name).module, jsName(name));
@@ -189,7 +205,7 @@ export class Program {
             if (this.crt.has(name)) return `$c.${name}`;
             throw new EmitError(`undefined variable ${name}`);
         }
-        if (local) return jsName(name);
+        if (local) { this.localRef(tu, name, false); return jsName(name); }
         const d = this.varDef.get(name);
         if (d) { this.noteImport(tu, d.module, jsName(name)); return jsName(name); }
         if (this.crt.has(name)) return `$c.${name}`;
@@ -223,15 +239,98 @@ export class Program {
 
     noteImport(tu, module, name) {
         if (module === tu.tu.module) return;
+        if (this.collectors.length) { const c = this.collectors[this.collectors.length - 1]; addTo(c.imports, module, name); c.refs.push([module, name]); return; }
         tu._imports = tu._imports || new Map();
         if (!tu._imports.has(module)) tu._imports.set(module, new Set());
         this.importedModules.add(module);
         tu._imports.get(module).add(name);
     }
-    importsFor(tu) {
-        const out = [];
-        const m = tu._imports || new Map();
-        for (const mod of [...m.keys()].sort()) out.push(`import { ${[...m.get(mod)].sort().join(', ')} } from './${mod}.js';`);
+    importsFor(tu) { return importLines(tu._imports || new Map()); }
+
+    // ---------- readability plan P3: macro functions ----------
+    /** Start collecting the imports and references of an emission (TUEmitter.macroSite). */
+    collect(tu) { const c = { imports: new Map(), refs: [], statics: false, tu }; this.collectors.push(c); return c; }
+    endCollect(c) { const i = this.collectors.lastIndexOf(c); if (i >= 0) this.collectors.splice(i, 1); }
+    /** A reference to a definition of TU `tu` itself (module-local in the generated code). */
+    localRef(tu, name, isStatic) {
+        if (!this.collectors.length) return;
+        const c = this.collectors[this.collectors.length - 1];
+        if (isStatic) c.statics = true; else c.refs.push([tu.tu.module, jsName(name)]);
+    }
+    addMacroSite(site) { this.macroSites.push(site); return this.macroSites.length - 1; }
+    /**
+     * After every TU is emitted: choose, per macro, the body text most of its sites
+     * share (ties: the first in sort order); those sites call the function, the others
+     * keep the expansion. Returns Map(path -> final code) and sets this.macroDefs.
+     */
+    resolveTUs(results) {
+        const byName = new Map();
+        this.macroSites.forEach((s, id) => { if (!byName.has(s.name)) byName.set(s.name, []); byName.get(s.name).push(id); });
+        const chosen = new Set();
+        this.macroDefs = new Map();   // module -> [{ name, text, imports, offset }]
+        for (const [name, ids] of [...byName].sort((a, b) => (a[0] < b[0] ? -1 : 1))) {
+            const files = new Set(ids.map((i) => this.macroSites[i].file));
+            if (files.size !== 1) continue;
+            const file = [...files][0];
+            const header = /\.h$/.test(file);
+            if (!header && ids.some((i) => `${this.macroSites[i].tu}.c` !== path.basename(file))) continue;
+            const groups = new Map();
+            for (const i of ids) {
+                const s = this.macroSites[i];
+                const k = JSON.stringify([s.body, s.fnlike, s.params.length, s.isVoid, s.isAsync]);
+                if (!groups.has(k)) groups.set(k, []);
+                groups.get(k).push(i);
+            }
+            const [, best] = [...groups].sort((a, b) => b[1].length - a[1].length || (a[0] < b[0] ? -1 : 1))[0];
+            for (const i of best) chosen.add(i);
+            const s0 = this.macroSites[best[0]];
+            const mod = header ? macroModule(file) : s0.tu;
+            const text = macroFunction(name, s0, header);
+            const imports = new Map();
+            for (const i of best) for (const [m, js] of this.macroSites[i].refs) if (m !== mod) addTo(imports, m, js);
+            if (!this.macroDefs.has(mod)) this.macroDefs.set(mod, []);
+            this.macroDefs.get(mod).push({ name, text, imports, offset: s0.defOffset || 0, file });
+        }
+        const out = new Map();
+        for (const r of results) {
+            if (!r.code.includes(IMPORTS_MARK)) { out.set(r.path, r.code); continue; }
+            const imports = new Map();
+            for (const [m, ns] of r.imports) for (const n of ns) addTo(imports, m, n);
+            let code = r.code.replace(SITE_RE, (_, id) => {
+                const s = this.macroSites[Number(id)];
+                if (chosen.has(Number(id))) {
+                    for (const [m, ns] of s.callImports) for (const n of ns) addTo(imports, m, n);
+                    if (/\.h$/.test(s.file)) addTo(imports, macroModule(s.file), jsName(s.name));
+                    const call = `${jsName(s.name)}(${s.args.join(', ')})`;
+                    return s.isAsync ? `await ${call}` : call;
+                }
+                for (const [m, ns] of s.expImports) for (const n of ns) addTo(imports, m, n);
+                return s.expP < s.callP || /^[-+]/.test(s.exp) ? `(${s.exp})` : s.exp;
+            });
+            const own = (this.macroDefs.get(r.module) || []).filter((d) => !/\.h$/.test(d.file));
+            for (const d of own) for (const [m, ns] of d.imports) if (m !== r.module) for (const n of ns) addTo(imports, m, n);
+            imports.delete(r.module);
+            const il = importLines(imports);
+            code = code.replace(IMPORTS_MARK + '\n', il.length ? il.join('\n') + '\n' : '');
+            code = code.replace(LOCAL_MACROS_MARK + '\n', own.length ? own.sort((a, b) => a.offset - b.offset || (a.name < b.name ? -1 : 1)).map((d) => d.text).join('\n') + '\n' : '');
+            if (/\u0001|\u0002/.test(code)) throw new EmitError(`${r.path}: unresolved placeholder`);
+            out.set(r.path, code);
+        }
+        return out;
+    }
+    /** The header modules of macro functions (after resolveTUs): Map(path -> text). */
+    macroModules() {
+        const out = new Map();
+        for (const [mod, defs] of [...(this.macroDefs || new Map())].sort((a, b) => (a[0] < b[0] ? -1 : 1))) {
+            if (!defs.length || !/\.h$/.test(defs[0].file)) continue;
+            const imports = new Map();
+            for (const d of defs) for (const [m, ns] of d.imports) for (const n of ns) if (m !== mod) addTo(imports, m, n);
+            const rel = path.relative(path.join(ROOT, 'tools/recorder-env/build/nethack-c/recorder'), path.resolve(ROOT, defs[0].file));
+            const lines = [`// ${mod}.js: the expression macros of ${rel} as functions (generated by transpiler/emit, readability plan P3). Do not edit.`,
+                "import * as $c from '../crt/index.js';", "import * as $T from './types.js';", "import { $G } from './globals.js';", ...importLines(imports), ''];
+            for (const d of defs.sort((a, b) => a.offset - b.offset || (a.name < b.name ? -1 : 1))) lines.push(d.text);
+            out.set(`${mod}.js`, lines.join('\n') + '\n');
+        }
         return out;
     }
 
@@ -243,7 +342,7 @@ export class Program {
         const em = this.heapModules.has(tu.module) ? new HeapEmitter(tu, this) : new TUEmitter(tu, this);
         em.heap = this.heapModules.has(tu.module);
         const code = em.run();   // imports are collected while emitting
-        return { path: `${tu.module}.js`, code, errors: em.errors.map((e) => `${tu.file}: ${e}`) };
+        return { path: `${tu.module}.js`, code, errors: em.errors.map((e) => `${tu.file}: ${e}`), imports: em._imports || new Map(), module: tu.module };
     }
     /** objKeys plus the records embedded in them (struct nhregex { regex_t re; }): every record object-world code holds. */
     objRecordKeys() {
@@ -267,6 +366,7 @@ export class Program {
         const bridge = this.heapModules.size ? bridgeModule(this) : null;
         const m = new Map([['types.js', this.typesModule()], ['globals.js', this.globalsModule()], ['index.js', this.indexModule()]]);
         for (const [f, text] of this.constModules()) m.set(f, text);
+        for (const [f, text] of this.macroModules()) m.set(f, text);
         if (bridge) m.set('luabridge.js', bridge);
         return m;
     }
@@ -275,7 +375,9 @@ export class Program {
         for (const tu of tus) this.addFacts(tu);
         const files = new Map();
         const errors = [];
-        for (const tu of tus) { const r = this.emitTU(tu); files.set(r.path, r.code); errors.push(...r.errors); }
+        const results = [];
+        for (const tu of tus) { const r = this.emitTU(tu); results.push(r); errors.push(...r.errors); }
+        for (const [k, v] of this.resolveTUs(results)) files.set(k, v);
         for (const [k, v] of this.finish()) files.set(k, v);
         return { files, errors };
     }
@@ -289,7 +391,9 @@ export class Program {
     useMacroConst(tu, b) {
         if (!this.macroConsts.has(b.file)) this.macroConsts.set(b.file, new Map());
         const m = this.macroConsts.get(b.file);
-        if (!m.has(b.macro.name)) m.set(b.macro.name, { offset: b.macro.offset, js: b.js, text: b.macro.text });
+        const old = m.get(b.macro.name);
+        if (old && old.text !== b.macro.text) throw new EmitError(`#define ${b.macro.name} has the values ${old.text} and ${b.macro.text} in different TUs`);
+        if (!old) m.set(b.macro.name, { offset: b.macro.offset, js: b.js, text: b.macro.text });
     }
     /** The definitions of the .c file's own #define constants that its code names. */
     localMacroConsts(tu) {

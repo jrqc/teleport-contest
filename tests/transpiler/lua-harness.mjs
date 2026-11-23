@@ -44,7 +44,10 @@ export async function build(work, { tag = 'run', script = path.join(SRC, 'script
     mkdirSync(out, { recursive: true });
     symlinkSync(path.join(ROOT, 'js/crt'), path.join(work, tag, 'crt'));
     const errors = [];
-    for (const e of entries) { const r = prog.emitTU(await load(e)); writeFileSync(path.join(out, r.path), r.code); errors.push(...r.errors); }
+    const results = [];
+    for (const e of entries) { const r = prog.emitTU(await load(e)); results.push(r); errors.push(...r.errors); }
+    // readability plan P3: macro sites are resolved once every TU is emitted
+    for (const [f, code] of prog.resolveTUs(results)) writeFileSync(path.join(out, f), code);
     for (const [f, text] of prog.finish()) writeFileSync(path.join(out, f), text);
     return { exe, out, errors, missing: [...prog.missingFn] };
 }

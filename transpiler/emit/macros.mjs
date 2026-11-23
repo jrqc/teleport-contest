@@ -107,10 +107,30 @@ export function defines(file) {
     return d;
 }
 
-/** The #define of `name` in `file` whose body is exactly the tokens from `begin` to `last`, or null. */
-export function defineCovering(file, name, begin, last) {
-    for (const d of defines(file)) if (d.name === name && d.bodyStart === begin && d.lastTok === last) return d;
+/**
+ * The #define of `name` in `file` whose body is exactly the tokens from `begin` to `last`,
+ * or, when the body is one parenthesized expression, the tokens inside those parentheses
+ * (callers that skip parentheses reach that node); with its `file`. Otherwise null.
+ */
+export function macroCovering(file, name, begin, last) {
+    const t = sourceText(file);
+    for (const d of defines(file)) {
+        if (d.name !== name || !d.toks.length) continue;
+        if (d.bodyStart === begin && d.lastTok === last) return { ...d, file };
+        const k = d.toks;
+        if (k.length >= 3 && t[k[0]] === '(' && t[k[k.length - 1]] === ')' && k[1] === begin && k[k.length - 2] === last && outerPair(t, k)) return { ...d, file };
+    }
     return null;
+}
+/** Whether the body's first '(' closes at its last token. */
+function outerPair(t, toks) {
+    let depth = 0;
+    for (let i = 0; i < toks.length; i++) {
+        const c = t[toks[i]];
+        if (c === '(') depth++;
+        else if (c === ')') { depth--; if (depth === 0 && i !== toks.length - 1) return false; }
+    }
+    return depth === 0;
 }
 
 /**

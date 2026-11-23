@@ -26,7 +26,7 @@ import { preprocess } from '../frontend/ast.mjs';
 import { jsName, field } from './names.mjs';
 import { zeroOf, typedArrayOf, arrayInit } from './classes.mjs';
 import { constExpr, exact, headerModule, macroConstText } from './consts.mjs';
-import { defines } from './macros.mjs';
+import { defines, sourceText, identAt, macroCovering, argSpans } from './macros.mjs';
 
 export const PREC = { comma: 1, assign: 2, cond: 2, or: 3, and: 4, bor: 5, bxor: 6, band: 7, eq: 8, rel: 9, shift: 10, add: 11, mul: 12, unary: 14, postfix: 15, call: 17, prim: 18 };
 export const E = (c, p = PREC.prim) => ({ c, p });
@@ -120,6 +120,13 @@ export function intLit(v, t) {
     return E(`${v}`);
 }
 
+/** Placeholders resolved by Program.resolveTU (readability plan P3). */
+export const IMPORTS_MARK = '\u0001IMPORTS\u0001';
+export const LOCAL_MACROS_MARK = '\u0001LOCALMACROS\u0001';
+export const SITE_RE = /\u0001M(\d+)\u0001/g;
+/** Node kinds a macro body must not contain: their emission is stateful or per site. */
+const MACRO_UNSAFE = new Set(['OffsetOfExpr', 'StmtExpr', 'CompoundLiteralExpr', 'VAArgExpr', 'PredefinedExpr', 'BlockExpr', 'InitListExpr']);
+
 /** The functions patch 003 wraps in an RNG caller tag (rngTagMacro). */
 const RNG_TAGGED = new Set(['rn2', 'rnd', 'rnl', 'd', 'rne', 'rnz']);
 
@@ -135,6 +142,7 @@ export class TUEmitter {
         this.out = [];
         this.errors = [];
         this.texts = new Map();   // file -> source text (offsetof)
+        this.macroOk = !!prog.macroFunctions;   // readability plan P3
     }
 
     T(n) {   // resolved type of a node
@@ -188,12 +196,13 @@ export class TUEmitter {
         // readability plan P2: the .c file's own enum constants (header constants are imported)
         const local = this.heap ? { lines: [] } : this.prog.consts.definitions(this.tu.file, jsName, true);
         if (local.imports) for (const [mod, names] of local.imports) for (const nm of names) this.prog.noteImport(this, mod, nm);
-        for (const line of this.prog.importsFor(this)) head.push(line);
+        head.push(IMPORTS_MARK);
         const lines = [...head, ''];
         const localDefs = [...(local.entries || []), ...this.prog.localMacroConsts(this)].sort((a, b) => a.offset - b.offset);
         if (localDefs.length) lines.push(...localDefs.map((x) => x.line), '');
         for (const s of statics) lines.push(s.decl);
         lines.push(...body);
+        lines.push(LOCAL_MACROS_MARK);
         lines.push('');
         lines.push('export function $init() {');
         for (const s of init) lines.push('    ' + s);
@@ -955,6 +964,7 @@ export class TUEmitter {
     }
     /** condition context: a JS truthy value is enough */
     cond(n) {
+        if (!this._macroBody && this.macroOk) { const m = this.macroSite(n, 'c'); if (m) return m; }
         n = this.skipParens(n);
         const t = this.T(n);
         if (isFloat(t)) return E(`${par(this.rv(n), PREC.eq)} !== 0`, PREC.eq);
@@ -1046,6 +1056,12 @@ export class TUEmitter {
     }
 
     ex(n, ctx) {
+        const mb = this._macroBody;
+        if (mb && mb.subst.has(n)) { mb.hits++; return E(`\u0002${mb.subst.get(n)}\u0002`); }
+        if (!mb && this.macroOk && n.kind !== 'ImplicitCastExpr' && n.kind !== 'ConstantExpr') {
+            const m = this.macroSite(n, ctx);
+            if (m) return m;
+        }
         if (n.kind !== 'IntegerLiteral' && n.kind !== 'CharacterLiteral' && n.kind !== 'DeclRefExpr' && n.kind !== 'ConstantExpr' && n.type) {
             const v = this.fold(n);
             if (v !== null) {
@@ -1117,6 +1133,139 @@ export class TUEmitter {
     }
 
     /**
+     * Readability plan P3 (method/readability-plan.md): an expression that is the whole
+     * expansion of a macro becomes a call of a JS function made from the macro, when the
+     * call is exactly equivalent to the expansion:
+     *   - n's tokens are exactly the macro body (or the body inside its outer parentheses),
+     *     from one invocation not nested in another macro;
+     *   - every parameter's argument is found as AST nodes (no type or stringized
+     *     arguments), every argument is free of side effects, calls and await, and is a
+     *     scalar or pointer read; an argument that might trap is evaluated unconditionally
+     *     by the body; when the body has side effects (calls, stores), every argument is a
+     *     constant or a local whose value nothing else can change;
+     *   - the body emitted with the arguments replaced by parameters uses every argument
+     *     occurrence through that replacement, needs no temporaries, and names no caller
+     *     local (and, for a header macro, no file-static name).
+     * A macro whose body awaits (it reaches a blocking function) becomes an async function,
+     * and its calls are awaited. The site is a placeholder: Program.resolveTU chooses, per
+     * macro, the body text most sites share; those sites call the function, the others keep
+     * the expansion (both texts are kept here). Returns the placeholder E, or null.
+     */
+    macroSite(n, ctx) {
+        if (!this.fn || this.heap) return null;
+        const r = n.range;
+        const bx = r && r.begin && r.begin.expansionLoc, ex1 = r && r.end && r.end.expansionLoc;
+        const bs = r && r.begin && r.begin.spellingLoc, es = r && r.end && r.end.spellingLoc;
+        if (!bx || !ex1 || !bs || !es || bx.isMacroArgExpansion || ex1.isMacroArgExpansion) return null;
+        if (bx.offset !== ex1.offset || !bx._f || bx._f !== ex1._f || !bs._f || bs._f !== es._f) return null;
+        if (path.isAbsolute(bs._f) || path.isAbsolute(bx._f)) return null;
+        if (n.kind === 'ConditionalOperator' && this.rngTagMacro(n)) return null;
+        const inv = sourceText(bx._f);
+        const name = identAt(inv, bx.offset);
+        if (!name || this.prog.macroNameTaken(this, name) || this.fn.names.has(jsName(name))) return null;
+        const def = macroCovering(bs._f, name, bs.offset, es.offset);
+        if (!def) return null;
+        // an object-like numeric constant is P2's (macroConst), never a function
+        if (!def.fnlike && (macroConstText(def.body) || this.fold(n) !== null)) return null;
+        const t = this.T(n);
+        if (t.k === 'rec' || t.k === 'arr') return null;
+        let unsafe = false;
+        const scan = (x) => { if (!x || typeof x !== 'object') return; if (MACRO_UNSAFE.has(x.kind)) unsafe = true; for (const c of kids(x)) scan(c); };
+        scan(n);
+        if (unsafe) return null;
+        // arguments: the outermost nodes spelled in each argument's text
+        const spans = def.fnlike ? argSpans(inv, bx.offset) : [];
+        if (def.fnlike && (!spans || (spans.length !== def.params.length && !(def.params.length === 0 && spans.length === 1 && inv.slice(spans[0][0], spans[0][1]).trim() === '')))) return null;
+        if (def.params.some((x) => x === '...' || /\.\.\./.test(x))) return null;
+        const argNodes = def.params.map(() => []);
+        let ok = true;
+        const parents = [];
+        const walk = (x) => {
+            if (!ok || !x || typeof x !== 'object' || !x.kind) return;
+            const xb = x.range && x.range.begin, xe = x.range && x.range.end;
+            const ab = xb && xb.expansionLoc, ae = xe && xe.expansionLoc;
+            if (ab && ae && ab.isMacroArgExpansion && ae.isMacroArgExpansion) {
+                const sb = xb.spellingLoc, se = xe.spellingLoc;
+                if (!sb || !se || sb._f !== bx._f || se._f !== bx._f) { ok = false; return; }
+                const i = spans.findIndex(([a, b]) => sb.offset >= a && sb.offset < b);
+                if (i < 0 || !(se.offset >= spans[i][0] && se.offset < spans[i][1])) { ok = false; return; }
+                argNodes[i].push({ node: x, path: parents.slice() });
+                return;
+            }
+            parents.push(x);
+            for (const c of kids(x)) walk(c);
+            parents.pop();
+        };
+        walk(n);
+        if (!ok || argNodes.some((a) => a.length === 0)) return null;
+        // the body's own effects (outside the arguments)
+        const argSet = new Set(argNodes.flat().map((a) => a.node));
+        let bodyEffects = false;
+        const eff = (x) => {
+            if (!x || typeof x !== 'object' || argSet.has(x)) return;
+            if (x.kind === 'CallExpr' || x.kind === 'CompoundAssignOperator' || (x.kind === 'BinaryOperator' && x.opcode === '=') || (x.kind === 'UnaryOperator' && (x.opcode === '++' || x.opcode === '--'))) bodyEffects = true;
+            for (const c of kids(x)) eff(c);
+        };
+        eff(n);
+        for (const occ of argNodes) {
+            const a = occ[0].node;
+            const at = this.T(a);
+            if (!(at.k === 'int' || at.k === 'ptr' || at.k === 'float' || at.k === 'enum')) return null;
+            if (!this.isSimple(a)) return null;
+            const leaf = this.stripCasts(a);
+            const isConst = this.fold(a) !== null;
+            const lv = leaf.kind === 'DeclRefExpr' && leaf.referencedDecl && this.fn.locals.get(leaf.referencedDecl.id);
+            const pureLocal = isConst || (lv && !lv.boxed && !lv.isStatic);
+            const trapFree = isConst || (leaf.kind === 'DeclRefExpr') || leaf.kind === 'StringLiteral';
+            if (bodyEffects && !pureLocal) return null;
+            if (!trapFree && !occ.some((o) => this.unconditional(o.path, n, o.node))) return null;
+        }
+        // the body with the arguments as parameters
+        const t0 = this.fn.temps;
+        const col = this.prog.collect(this);
+        this._macroBody = { subst: new Map(), hits: 0, local: false };
+        argNodes.forEach((occ, i) => occ.forEach((o) => this._macroBody.subst.set(o.node, i)));
+        const isVoid = t.k === 'void';
+        let body = null;
+        try { body = isVoid ? this.ex(n, 'd') : this.rv(n); } catch (e) { if (!(e instanceof EmitError) && !/^ctypes:/.test(e.message)) { this._macroBody = null; this.prog.endCollect(col); throw e; } body = null; }
+        const mb = this._macroBody;
+        this._macroBody = null;
+        this.prog.endCollect(col);
+        const total = argNodes.reduce((s, a) => s + a.length, 0);
+        const header = /\.h$/.test(def.file);
+        if (!body || mb.hits !== total || mb.local || this.fn.temps !== t0 || (header && col.statics)) return null;
+        // the expansion (exactly the code without P3) and the call's arguments, each with its own imports
+        const colE = this.prog.collect(this);
+        this.macroOk = false;
+        let exp;
+        try { exp = this.ex(n, ctx); } finally { this.macroOk = true; this.prog.endCollect(colE); }
+        const colC = this.prog.collect(this);
+        const args = argNodes.map((occ) => this.rv(occ[0].node).c);
+        this.prog.endCollect(colC);
+        if (this.fn.temps !== t0) return null;
+        const isAsync = /\bawait\b/.test(body.c);
+        const callP = isAsync ? PREC.unary : PREC.call;
+        const id = this.prog.addMacroSite({
+            tu: this.tu.module, file: def.file, defOffset: def.bodyStart, name, fnlike: def.fnlike, params: def.params, isVoid, isAsync,
+            body: body.c, refs: col.refs, exp: exp.c, expP: exp.p, expImports: colE.imports, args, callImports: colC.imports, callP,
+        });
+        return E(`\u0001M${id}\u0001`, callP);
+    }
+    /** Whether node `x` (reached through `path` from `top`) is evaluated on every evaluation of `top`. */
+    unconditional(pathNodes, top, x) {
+        const chain = [...pathNodes, x];
+        for (let i = 0; i + 1 < chain.length; i++) {
+            const p = chain[i], c = chain[i + 1], k = kids(p);
+            if (p.kind === 'BinaryOperator' && (p.opcode === '&&' || p.opcode === '||') && k[0] !== c) return false;
+            if (p.kind === 'ConditionalOperator' && k[0] !== c) return false;
+            if (p.kind === 'BinaryConditionalOperator') return false;
+            if (p.kind === 'UnaryExprOrTypeTraitExpr') return false;
+        }
+        void top;
+        return true;
+    }
+
+    /**
      * Readability plan P1 (method/readability-plan.md): patch 003 (hack.h) defines
      * `rn2(x)` (and rnd, rnl, d, rne, rnz) as
      *     rng_log_enabled() ? (rng_log_set_caller(__FILE__, __LINE__, __func__), rn2(x)) : rn2(x)
@@ -1175,8 +1324,15 @@ export class TUEmitter {
         const d = all.find((x) => !x.fnlike && x.bodyStart === bs.offset && x.lastTok === es.offset);
         if (!d || all.filter((x) => x.name === d.name).length !== 1) return null;
         if (this.prog.macroNameTaken(this, d.name)) return null;
-        const c = macroConstText(d.body);
-        if (!c) return null;
+        // a body of numbers and operators keeps its text; another integer constant
+        // expression (casts, enum constants: `#define FALSE ((boolean) 0)`) is named
+        // with clang's value
+        let c = macroConstText(d.body);
+        if (!c) {
+            const v = this.fold(n);
+            if (v === null || !Number.isSafeInteger(Number(v))) return null;
+            c = { text: String(v), v: Number(v) };
+        }
         const header = /\.h$/.test(bs._f);
         if (!header && bs._f !== this.tu.file) return null;
         return { js: jsName(d.name), file: bs._f, v: c.v, header, macro: { name: d.name, text: c.text, offset: d.bodyStart } };
@@ -1218,6 +1374,16 @@ export class TUEmitter {
      * get() -> E; set(v) -> E of the assignment (value = the stored value).
      */
     lvalue(n) {
+        const mb = this._macroBody;
+        if (mb) {
+            for (let x = n; x; x = x.kind === 'ParenExpr' ? kids(x)[0] : null) {
+                if (!mb.subst.has(x)) continue;
+                mb.hits++;
+                const ph = E(`\u0002${mb.subst.get(x)}\u0002`);
+                const no = () => { throw new EmitError('macro argument used as an lvalue'); };
+                return { t: this.T(x), simple: true, get: () => ph, set: no, addr: no };
+            }
+        }
         n = this.skipParens(n);
         const t = this.T(n);
         switch (n.kind) {
@@ -1225,6 +1391,7 @@ export class TUEmitter {
             const d = n.referencedDecl;
             if (d.kind === 'FunctionDecl') return { t, get: () => E(this.prog.functionRef(this, d.name)), addr: () => E(this.prog.functionRef(this, d.name)), simple: true };
             const v = this.fn && this.fn.locals.get(d.id);
+            if (v && mb) mb.local = true;   // a macro body that names a caller's local (not through a parameter)
             let base;
             let boxed = false;
             if (v) { base = v.name; boxed = v.boxed; }
