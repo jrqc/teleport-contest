@@ -62,6 +62,7 @@ export class Program {
         this.constNamespaces = opts.constNamespaces !== false;
         this.comments = opts.comments !== false;   // P4: C comments and notices
         this.jsdoc = opts.jsdoc !== false;         // JSDoc from the C signatures
+        this.lateDecls = opts.lateDecls !== false; // locals declared at first assignment (tu.mjs planLate)
         this.docKeys = []; this.docIdx = new Map();   // P2c: PM.ANGEL
         this.nsNames = new Set();
         this.macroUses = new Set();   // macros invoked in object-world function code (namespaces.mjs)

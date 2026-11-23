@@ -17,7 +17,10 @@
 // Every function's locals are hoisted to the top (`let`), numbered when C
 // shadows a name, so goto lowering and switch case jumps never meet JS's
 // temporal dead zone; at -O0 an uninitialized local also keeps its slot's
-// previous value across loop iterations, which hoisting reproduces.
+// previous value across loop iterations, which hoisting reproduces. Where none of
+// this can matter (planLate: no goto or setjmp, every use after the first assignment
+// in the same block, not a switch body), a scalar or pointer local is declared at its
+// first assignment instead: `const` when nothing writes it again, else `let`.
 // Address-taken scalar locals are one-element arrays (`x[0]`, `&x` = Ptr(x, 0)).
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -694,6 +697,7 @@ export class TUEmitter {
         };
         walkDecls(body);
         for (const s of statics) this.declareStaticLocal(s);
+        this.fn.lateAssign = this.planLate(body);
         this.planGotos(body);
         const stmts = this.block(body, '    ');
         const lines = [];
@@ -711,6 +715,8 @@ export class TUEmitter {
         }
         const decls = [];
         for (const v of this.fn.vars) {
+            if (v.late && !v.declared) this.err(f, `${v.name}: planned declaration at first assignment not emitted`);
+            if (v.late) continue;   // declared where it is first assigned (planLate)
             if (v.boxed) decls.push(`${v.name} = ${this.box(v.t, this.zero(v.t))}`);
             else if (v.isVa) decls.push(`${v.name} = null`);
             else decls.push(`${v.name} = ${this.zero(v.t)}`);
@@ -726,6 +732,94 @@ export class TUEmitter {
         lines.push('}');
         this.fn = null;
         return lines.join('\n');
+    }
+    /**
+     * Declarations at first assignment (readability step "Declarations"). Locals are hoisted
+     * (header of this file); a scalar or pointer local whose address is not taken is declared
+     * where it is first assigned instead (`let`, or `const` when nothing writes it again) when
+     * that changes nothing:
+     *   - the function has no goto and no setjmp (jumps would cross the declaration);
+     *   - the first assignment is a statement of a block (an initialized declaration, or
+     *     `v = e;`), and every other use of the local is a later statement of that block, so
+     *     no use comes before the declaration or outside its scope, and the local is never
+     *     read before it is assigned (an -O0 slot's stale value cannot show);
+     *   - that block is not a switch body (a case label would jump past the declaration).
+     * Marks each such local's `late` ('let' or 'const'); returns its assignment statements
+     * (node -> local). A DeclStmt declares in place (stmtBody).
+     */
+    planLate(body) {
+        const late = new Map();
+        if (this.heap || this.prog.lateDecls === false) return late;
+        let bad = false;
+        const refs = new Map(), writes = new Map(), declPath = new Map();
+        const stack = [];
+        const bump = (m, x) => {
+            const r = this.skipParens(x);
+            if (r && r.kind === 'DeclRefExpr' && r.referencedDecl) m.set(r.referencedDecl.id, (m.get(r.referencedDecl.id) || 0) + 1);
+        };
+        const visit = (n) => {
+            if (!n || typeof n !== 'object') return;
+            if (n.kind === 'GotoStmt' || n.kind === 'IndirectGotoStmt' || n.kind === 'StmtExpr') bad = true;
+            if (n.kind === 'DeclRefExpr' && n.referencedDecl) {
+                if (/setjmp/.test(n.referencedDecl.name || '')) bad = true;
+                const id = n.referencedDecl.id;
+                if (this.fn.locals.has(id)) { if (!refs.has(id)) refs.set(id, []); refs.get(id).push({ n, path: stack.slice() }); }
+            }
+            if (n.kind === 'VarDecl') declPath.set(n.id, stack.slice());
+            if ((n.kind === 'BinaryOperator' && n.opcode === '=') || n.kind === 'CompoundAssignOperator') bump(writes, kids(n)[0]);
+            if (n.kind === 'UnaryOperator' && (n.opcode === '++' || n.opcode === '--')) bump(writes, kids(n)[0]);
+            stack.push(n);
+            for (const c of kids(n)) visit(c);
+            stack.pop();
+        };
+        visit(body);
+        if (bad) return late;
+        // a statement S of block B (path: S's ancestors from the body down) that may declare
+        const blockOf = (path, S) => {
+            const B = path[path.length - 1], P = path[path.length - 2];
+            if (!B || B.kind !== 'CompoundStmt' || (P && P.kind === 'SwitchStmt')) return null;
+            return { B, at: path.length - 1, idx: kids(B).indexOf(S) };
+        };
+        // every use lies in a later statement of B (or, for a declaration `decl`, in a later
+        // declarator of its own DeclStmt: stmtBody emits them one by one, in order)
+        const after = (rs, blk, skip, decl) => rs.every((r) => {
+            if (r.n === skip) return true;
+            if (r.path[blk.at] !== blk.B) return false;
+            const child = r.path[blk.at + 1] || r.n;
+            const i = kids(blk.B).indexOf(child);
+            if (i === blk.idx && decl) {
+                const S = kids(blk.B)[i], d = r.path[blk.at + 2];
+                return !!d && d.kind === 'VarDecl' && kids(S).indexOf(d) > kids(S).indexOf(decl);
+            }
+            return i > blk.idx;
+        });
+        for (const v of this.fn.vars) {
+            if (v.boxed || v.isVa || !['int', 'float', 'ptr'].includes(this.S.resolve(v.t).k)) continue;
+            const id = v.decl.id;
+            const rs = refs.get(id) || [];
+            const w = writes.get(id) || 0;
+            if (v.decl.init) {
+                const dp = declPath.get(id);
+                const S = dp && dp[dp.length - 1];
+                if (!S || S.kind !== 'DeclStmt') continue;
+                const blk = blockOf(dp.slice(0, -1), S);
+                if (!blk || !after(rs, blk, null, v.decl)) continue;
+                v.late = w === 0 ? 'const' : 'let';
+                continue;
+            }
+            if (!rs.length) continue;
+            const r0 = rs[0];
+            // r0 is the left side of `v = e;`, a statement of a block
+            let k = r0.path.length - 1;
+            while (k >= 0 && r0.path[k].kind === 'ParenExpr') k--;
+            const A = r0.path[k];
+            if (!A || A.kind !== 'BinaryOperator' || A.opcode !== '=' || this.skipParens(kids(A)[0]) !== r0.n) continue;
+            const blk = blockOf(r0.path.slice(0, k), A);
+            if (!blk || !after(rs, blk, r0.n)) continue;
+            v.late = w === 1 ? 'const' : 'let';
+            late.set(A, v);
+        }
+        return late;
     }
     /**
      * JSDoc for a function from its C signature (readability step "JSDoc"; comments only):
@@ -939,7 +1033,10 @@ export class TUEmitter {
                     this.emitInitInto(v.name, it, init, out, ind);
                 } else if (v.boxed) out.push(`${ind}${v.name}[0] = ${this.rv(init).c};${tag}`);
                 else if (v.isVa) out.push(`${ind}${v.name} = ${this.rv(init).c};${tag}`);
-                else out.push(`${ind}${v.name} = ${this.rv(init).c};${tag}`);
+                else {
+                    if (v.late) { if (v.declared) this.err(n, `${v.name} declared twice`); v.declared = true; }
+                    out.push(`${ind}${v.late ? `${v.late} ` : ''}${v.name} = ${this.rv(init).c};${tag}`);
+                }
             }
             return out;
         }
@@ -1014,7 +1111,20 @@ export class TUEmitter {
         case 'CaseStmt': case 'DefaultStmt': this.err(n, 'case label outside the switch body list');
         // eslint-disable-next-line no-fallthrough
         default:
-            if (n.kind.endsWith('Expr') || n.kind.endsWith('Operator') || n.kind.endsWith('Literal')) return [`${ind}${this.exprStmtText(n)};${tag}`];
+            if (n.kind.endsWith('Expr') || n.kind.endsWith('Operator') || n.kind.endsWith('Literal')) {
+                const text = this.exprStmtText(n);
+                const v = this.fn.lateAssign && this.fn.lateAssign.get(n);
+                if (v) {
+                    // the local's first assignment declares it (planLate); any other text keeps it hoisted
+                    if (v.late && text.startsWith(`${v.name} = `)) {
+                        if (v.declared) this.err(n, `${v.name} declared twice`);
+                        v.declared = true;
+                        return [`${ind}${v.late} ${text};${tag}`];
+                    }
+                    v.late = null;
+                }
+                return [`${ind}${text};${tag}`];
+            }
             this.err(n, `unsupported statement ${n.kind}`);
         }
         return [];
