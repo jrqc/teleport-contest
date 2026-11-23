@@ -163,6 +163,12 @@ function lineOf(file, off) {
 // statements with sub-statements: their comments are placed by the sub-statements (P4)
 const NESTING = new Set(['CompoundStmt', 'IfStmt', 'ForStmt', 'WhileStmt', 'DoStmt', 'SwitchStmt', 'LabelStmt', 'CaseStmt', 'DefaultStmt', 'AttributedStmt']);
 
+// the arguments macOS fortify adds, by function (negative: from the end): readability step "fortify names"
+const FORTIFY_DROP = {
+    sprintf: [1, 2], vsprintf: [1, 2], snprintf: [2, 3], vsnprintf: [2, 3],
+    strcpy: [-1], strcat: [-1], stpcpy: [-1], strlcpy: [-1], strlcat: [-1],
+    strncpy: [-1], strncat: [-1], stpncpy: [-1], memcpy: [-1], memmove: [-1], memset: [-1],
+};
 // the sub-statement that ends a statement's head (an index into its children; -1: the last)
 const HEADED = { IfStmt: 1, WhileStmt: -1, ForStmt: -1, SwitchStmt: -1 };
 
@@ -2344,11 +2350,33 @@ export class TUEmitter {
     }
 
     // ---------- calls ----------
+    /**
+     * macOS fortify (<secure/_string.h>, <secure/_stdio.h>) turns sprintf(buf, ...) into
+     * __builtin___sprintf_chk(buf, 0, __builtin_object_size(buf, 1), ...). The C says
+     * sprintf, so that is what is emitted (owner, 2026-11-23): the flag and object-size
+     * arguments are dropped when they have no side effects. The plain runtime functions
+     * trap on a write past the destination buffer, so an overflow, where Darwin aborts,
+     * still traps; nothing else changes.
+     */
+    unfortify(fnName, args) {
+        const m = fnName && /^__builtin___(\w+)_chk$/.exec(fnName);
+        const drop = m && FORTIFY_DROP[m[1]];
+        if (!drop) return null;
+        const has = this.prog.crt.has(m[1]) || (this.heap && this.prog.heapCrt.has(m[1]));
+        const idx = drop.map((i) => (i < 0 ? args.length + i : i));
+        // droppable: a constant, a side-effect-free expression, or __builtin_object_size (it never evaluates its operand)
+        const objSize = (a) => { const x = this.stripCasts(a); const c = x.kind === 'CallExpr' && this.stripCasts(kids(x)[0]); return !!(c && c.kind === 'DeclRefExpr' && c.referencedDecl && c.referencedDecl.name === '__builtin_object_size'); };
+        if (!has || idx.some((i) => !args[i] || !(this.fold(args[i]) !== null || objSize(args[i]) || !this.hasEffects(args[i])))) return null;
+        const keep = args.map((a, i) => i).filter((i) => !idx.includes(i));
+        return { fnName: m[1], args: keep.map((i) => args[i]), keep };   // keep: the original argument positions
+    }
     call(n, ctx) {
-        const [callee, ...args] = kids(n);
+        let [callee, ...args] = kids(n);
         const c0 = this.stripCasts(callee);
         let fnName = null;
         if (c0.kind === 'DeclRefExpr' && c0.referencedDecl.kind === 'FunctionDecl') fnName = c0.referencedDecl.name;
+        const uf = this.unfortify(fnName, args);
+        if (uf) ({ fnName, args } = uf);
         const special = fnName && this.specialCall(fnName, args, n, ctx);
         if (special) return special;
         const argc = args.map((a) => this.argValue(a));

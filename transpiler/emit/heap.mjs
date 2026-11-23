@@ -458,10 +458,13 @@ export class HeapEmitter extends TUEmitter {
 
     // ---------- calls ----------
     call(n, ctx) {
-        const [callee, ...args] = kids(n);
+        let [callee, ...args] = kids(n);
         const c0 = this.stripCasts(callee);
         let fnName = null;
         if (c0.kind === 'DeclRefExpr' && c0.referencedDecl.kind === 'FunctionDecl') fnName = c0.referencedDecl.name;
+        const uf = this.unfortify(fnName, args);
+        if (uf) ({ fnName, args } = uf);
+        const keep = uf ? uf.keep : null;
         if (fnName === 'setjmp' || fnName === '_setjmp' || fnName === 'longjmp' || fnName === '_longjmp') return this.jmpCall(fnName, args, n);
         const special = fnName && this.specialCall(fnName, args, n, ctx);
         if (special) return special;
@@ -475,7 +478,7 @@ export class HeapEmitter extends TUEmitter {
             f = `$h.fnAt(${this.rv(callee).c})`;
             asyncCall = this.prog.isAsyncIndirect(this, this.T(callee));
         }
-        const argc = conv ? this.marshalArgs(callee, args, n) : args.map((a) => this.argValue(a));
+        const argc = conv ? this.marshalArgs(callee, args, n, keep) : args.map((a) => this.argValue(a));
         let e = E(`${f}(${argc.join(', ')})`, PREC.call);
         if (asyncCall) {
             if (!this.fn || !this.fn.isAsync) this.err(n, `await of ${fnName || 'an indirect call'} in a function outside the async set`);
@@ -489,12 +492,12 @@ export class HeapEmitter extends TUEmitter {
         return super.specialCall(name, args, n, ctx);
     }
     /** Arguments of a call into the object-world runtime. */
-    marshalArgs(callee, args, n) {
+    marshalArgs(callee, args, n, keep) {
         let ft = this.S.resolve(this.T(callee));
         if (ft.k === 'ptr') ft = this.S.resolve(ft.to);
         const params = (ft.k === 'fn' && ft.params) || [];
         return args.map((a, i) => {
-            const t = this.S.resolve(params[i] || this.T(a));
+            const t = this.S.resolve(params[keep ? keep[i] : i] || this.T(a));   // keep: positions in the callee's prototype (unfortify)
             const v = this.rv(a);
             return this.toRuntime(t, v, n);
         });
