@@ -131,7 +131,7 @@ async function knows_class(sym) {   // u_init.c:586
      *        for example, knows all elven weapons despite the bow,
      *        arrow, and spear limitation below.
      */
-    for (ct = svb.bases[$c.u8(sym)]; ct < svb.bases[$c.u8(sym) + 1 | 0]; ct = ct + 1 | 0) {
+    for (ct = svb.bases[$c.u8(sym)]; ct < svb.bases[$c.u8(sym) + 1]; ct = ct + 1 | 0) {
         /* not flagged as magic but shouldn't be pre-discovered
            (small shields look the same as two types of magical shield;
            cornuthaum / dunce cap look the same as each other) */
@@ -550,7 +550,7 @@ export async function u_init_misc() {   // u_init.c:944
         u.uprops[BLINDED].intrinsic = $c.or64(u.uprops[BLINDED].intrinsic, FROMOUTSIDE);   /* set PermaBlind */
     }
     /* roughly based on distribution in human population */
-    $t11 = (rn2(10) ? RIGHT_HANDED : LEFT_HANDED) >>> 0, u.uhandedness = ($t11) & 1;
+    $t11 = rn2(10) ? RIGHT_HANDED : LEFT_HANDED, u.uhandedness = ($t11) & 1;
     max_rank_sz();   /* set max str size for class ranks */
     return;
 }
@@ -632,7 +632,7 @@ function trquan(trop) {   // u_init.c:1106
     if (!trop.trquan_min) {
         return 1;
     }
-    return trop.trquan_min + rn2((trop.trquan_max - trop.trquan_min | 0) + 1 | 0) | 0;
+    return trop.trquan_min + rn2(trop.trquan_max - trop.trquan_min + 1) | 0;
 }
 /* create random object of certain class, filtering out too powerful items */
 /**
@@ -724,17 +724,17 @@ async function ini_inv_adjust_obj(trop, obj) {   // u_init.c:1205
         obj.quan = u.umoney0;
     } else {
         if (objects[obj.otyp].oc_uses_known) {
-            obj.known = (1) & 1;
+            obj.known = 1;
         }
         /* not observe_object during startup, that's handled later */
-        $t2 = ($t1 = obj.rknown = (1) & 1, obj.bknown = ($t1) & 1), obj.dknown = ($t2) & 1;
+        $t2 = ($t1 = obj.rknown = 1, obj.bknown = ($t1) & 1), obj.dknown = ($t2) & 1;
         if (Is_container(obj) || obj.otyp === STATUE) {
-            $t3 = obj.lknown = (1) & 1, obj.cknown = ($t3) & 1;
-            obj.otrapped = (0) & 1;
+            $t3 = obj.lknown = 1, obj.cknown = ($t3) & 1;
+            obj.otrapped = 0;
         }
-        obj.cursed = (0) & 1;
-        if (obj.otrapped | 0 && u.ualign.type !== A.CHAOTIC) {
-            obj.otrapped = (0) & 1;
+        obj.cursed = 0;
+        if (obj.otrapped && u.ualign.type !== A.CHAOTIC) {
+            obj.otrapped = 0;
         }
         if (obj.oclass === WEAPON_CLASS || obj.oclass === TOOL_CLASS) {
             $t4 = trquan(trop), obj.quan = $t4;
@@ -749,7 +749,7 @@ async function ini_inv_adjust_obj(trop, obj) {   // u_init.c:1205
             }
         } else {
             /* Don't start with +0 or negative rings */
-            if (objects[obj.otyp].oc_class === RING_CLASS && objects[obj.otyp].oc_charged | 0 && obj.spe <= 0) {
+            if (objects[obj.otyp].oc_class === RING_CLASS && objects[obj.otyp].oc_charged && obj.spe <= 0) {
                 $t6 = $c.i8(rne(3)), obj.spe = $t6;
             }
         }
@@ -768,7 +768,7 @@ async function ini_inv_adjust_obj(trop, obj) {   // u_init.c:1205
  */
 async function ini_inv_use_obj(obj) {   // u_init.c:1251
     /* Make the type known if necessary */
-    if (obj_descr[objects[obj.otyp].oc_descr_idx].oc_descr && obj.known | 0) {
+    if (obj_descr[objects[obj.otyp].oc_descr_idx].oc_descr && obj.known) {
         await discover_object(obj.otyp, TRUE, TRUE, FALSE);
     }
     if (obj.otyp === OIL_LAMP) {

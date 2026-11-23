@@ -62,7 +62,7 @@ export function getversionstring(buf, bufsz) {   // version.c:35
     {
         c = 0;
         p = eos(buf);
-        dotoff = $c.i8($c.pcmp(p, buf) > 0 && p.get(-1) === 46 ? 1 : 0);
+        dotoff = $c.pcmp(p, buf) > 0 && p.get(-1) === 46 ? 1 : 0;
         if (dotoff) {
             p = p.add(-1);
         }
@@ -103,9 +103,9 @@ export function status_version(buf, bufsz, indent) {   // version.c:89
     name = null;
     altname = null;
     vflags = flags.versinfo;
-    shownum = $c.i8((vflags & VI.NUMBER) >>> 0 !== 0 ? 1 : 0);
-    showname = $c.i8((vflags & VI.NAME) >>> 0 !== 0 ? 1 : 0);
-    showbranch = $c.i8((vflags & VI.BRANCH) >>> 0 !== 0 ? 1 : 0);
+    shownum = (vflags & VI.NUMBER) >>> 0 !== 0 ? 1 : 0;
+    showname = (vflags & VI.NAME) >>> 0 !== 0 ? 1 : 0;
+    showbranch = (vflags & VI.BRANCH) >>> 0 !== 0 ? 1 : 0;
     /* game's name {variants should use own name, not "NetHack"} */
     if (showname) {
         /* can be set to override default (base of filename) */
@@ -479,7 +479,7 @@ export async function store_critical_bytes(nhfp) {   // version.c:676
     csc_count[0] = 80;
     /* int cmc = 0; */
     if (nhfp.mode & WRITING) {
-        indicate[0] = $c.i8(nhfp.structlevel ? 104 : nhfp.fnidx === exportascii ? 97 : 63);
+        indicate[0] = nhfp.structlevel ? 104 : nhfp.fnidx === exportascii ? 97 : 63;
         await sfo_char(nhfp, new $c.Ptr(indicate, 0), $c.lit("indicate-format"), 1);
         await sfo_char(nhfp, new $c.Ptr(csc_count, 0), $c.lit("count-critical_sizes"), 1);
         cnt = csc_count[0];
@@ -514,8 +514,8 @@ export async function uptodate(nhfp, name, utdflags) {   // version.c:713
     let vers_info = new $T.version_info(), indicator = Int8Array.of(0), sfstatus = 0, idx_1st_mismatch = Int32Array.of(0), quietly = 0, verbose = 0;
     sfstatus = 0;
     idx_1st_mismatch[0] = 0;
-    quietly = $c.i8($c.andu64(utdflags, UTD.QUIETLY) !== 0 ? 1 : 0);
-    verbose = $c.i8(name ? TRUE : FALSE);
+    quietly = $c.andu64(utdflags, UTD.QUIETLY) !== 0 ? 1 : 0;
+    verbose = name ? TRUE : FALSE;
     await sfi_char(nhfp, new $c.Ptr(indicator, 0), $c.lit("indicate-format"), 1);
     if ((sfstatus = await compare_critical_bytes(nhfp, new $c.Ptr(idx_1st_mismatch, 0), utdflags)) !== SF.UPTODATE) {
         if (sfstatus > 0 && idx_1st_mismatch[0]) {
@@ -560,7 +560,7 @@ export async function compare_critical_bytes(nhfp, idx_1st_mismatch, utdflags) {
     active_csc_count = 80;
     cnt = active_csc_count;
     dmmismatch = SF.DM_MISMATCH;
-    quietly = $c.i8($c.andu64(utdflags, UTD.QUIETLY) !== 0 ? 1 : 0);
+    quietly = $c.andu64(utdflags, UTD.QUIETLY) !== 0 ? 1 : 0;
     await sfi_char(nhfp, new $c.Ptr(file_csc_count, 0), $c.lit("count-critical_sizes"), 1);
     if (file_csc_count[0] > cnt) {
         if (!quietly) {

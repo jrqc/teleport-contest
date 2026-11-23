@@ -68,7 +68,8 @@ import { Strlen_ } from './strutil.js';
 import { begin_burn, peek_timer, spot_stop_timers, start_timer } from './timeout.js';
 import { BURN_OBJECT, MELT_ICE_AWAY, TIMER, ZOMBIFY_MON } from './timeout.h.js';
 import { deltrap, fire_damage_chain, maketrap, reset_utrap, t_at, trapname, water_damage_chain } from './trap.js';
-import { BEAR_TRAP, HOLE, LANDMINE, MAGIC_PORTAL, NO_TRAP, ROCKTRAP, TRAPDOOR, TRAPNUM } from './trap.h.js';
+import { BEAR_TRAP, LANDMINE, MAGIC_PORTAL, NO_TRAP, ROCKTRAP, TRAPNUM } from './trap.h.js';
+import { is_hole } from './trap.macros.js';
 import { recalc_block_point } from './vision.js';
 import { cansee } from './vision.macros.js';
 import { WT } from './weight.h.js';
@@ -212,7 +213,7 @@ export async function obj_typename(otyp) {   // objnam.c:201
     actualn = obj_descr[ocl.oc_name_idx].oc_name;
     dn = obj_descr[ocl.oc_descr_idx].oc_descr;
     un = ocl.oc_uname;
-    nn = ocl.oc_name_known | 0;
+    nn = ocl.oc_name_known;
     if (gu.urole.mnum === PM.SAMURAI) {
         actualn = Japanese_item_name(otyp, actualn);
         if (otyp === WOODEN_HARP || otyp === MAGIC_HARP) {
@@ -283,7 +284,7 @@ export async function obj_typename(otyp) {   // objnam.c:201
             } else {
                 $c.strcat(buf, dn ? dn : actualn);
                 if (ocl.oc_class === GEM_CLASS) {
-                    $c.strcat(buf, (ocl.oc_material | 0) === MINERAL ? $c.lit(" stone") : $c.lit(" gem"));
+                    $c.strcat(buf, ocl.oc_material === MINERAL ? $c.lit(" stone") : $c.lit(" gem"));
                 }
                 if (un) {
                     await xcalled(buf, BUFSZ, $c.lit(""), un);
@@ -339,7 +340,7 @@ export async function safe_typename(otyp) {   // objnam.c:312
     } else {
         /* force it to be treated as fully discovered */
         save_nameknown = objects[otyp].oc_name_known;
-        objects[otyp].oc_name_known = (1) & 1;
+        objects[otyp].oc_name_known = 1;
         res = await simple_typename(otyp);
         objects[otyp].oc_name_known = (save_nameknown) & 1;
     }
@@ -614,12 +615,12 @@ async function xname_flags(obj, cxn_flags) {   // objnam.c:581
             /* bitmask of CXN_xxx values */
             typ = obj.otyp;
             ocl = $c.relem(objects, typ);
-            nn = ocl.oc_name_known | 0;
+            nn = ocl.oc_name_known;
             omndx = obj.corpsenm;
             actualn = obj_descr[ocl.oc_name_idx].oc_name;
             dn = obj_descr[ocl.oc_descr_idx].oc_descr;
             un = ocl.oc_uname;
-            pluralize = $c.i8(obj.quan !== 1 && !((cxn_flags & CXN.SINGULAR) >>> 0) ? 1 : 0);
+            pluralize = obj.quan !== 1 && !((cxn_flags & CXN.SINGULAR) >>> 0) ? 1 : 0;
             $t1 = nextobuf(), gx.xnamep = $t1;
             /* set up primary work buffer; the first 'PREFIX' bytes are set
                aside for use by doname() */
@@ -649,22 +650,22 @@ async function xname_flags(obj, cxn_flags) {   // objnam.c:581
              * printed for the object is tied to the combination of the two
              * and printing the wrong article gives away information.
              */
-            if (!nn && ocl.oc_uses_known | 0 && ocl.oc_unique | 0) {
-                obj.known = (0) & 1;
+            if (!nn && ocl.oc_uses_known && ocl.oc_unique) {
+                obj.known = 0;
             }
             if (!Blind() && !gd.distantname) {
                 await observe_object(obj);
             }
             if (gu.urole.mnum === PM.CLERIC) {
-                obj.bknown = (1) & 1;   /* avoid set_bknown() to bypass update_inventory() */
+                obj.bknown = 1;   /* avoid set_bknown() to bypass update_inventory() */
             }
             if (iflags.override_ID) {
                 known = dknown = bknown = TRUE;
                 nn = 1;
             } else {
-                known = $c.i8(obj.known);
-                dknown = $c.i8(obj.dknown);
-                bknown = $c.i8(obj.bknown);
+                known = obj.known;
+                dknown = obj.dknown;
+                bknown = obj.bknown;
             }
             /*
              * Maybe find a previously unseen artifact.
@@ -685,7 +686,7 @@ async function xname_flags(obj, cxn_flags) {   // objnam.c:581
              * so that wizard-mode ^I doesn't cause a not-yet-seen artifact in
              * inventory (picked up while blind, still blind) to become found.
              */
-            if (obj.oartifact && obj.dknown | 0) {
+            if (obj.oartifact && obj.dknown) {
                 await find_artifact(obj);
             }
             if (obj_is_pname(obj)) {
@@ -711,7 +712,7 @@ async function xname_flags(obj, cxn_flags) {   // objnam.c:581
                     }
                     break;
                 case WEAPON_CLASS:
-                    if (is_poisonable(obj) && obj.otrapped | 0) {
+                    if (is_poisonable(obj) && obj.otrapped) {
                         $c.strcpy(buf, $c.lit("poisoned "));
                     }
                 case VENOM_CLASS:
@@ -863,7 +864,7 @@ async function xname_flags(obj, cxn_flags) {   // objnam.c:581
                     $c.sprintf(buf, $c.lit("%sheavy iron ball"), obj.owt > ocl.oc_weight ? $c.lit("very ") : $c.lit(""));
                     break;
                 case POTION_CLASS:
-                    if (dknown && obj.oeroded | 0) {
+                    if (dknown && obj.oeroded) {
                         $c.strcpy(buf, $c.lit("diluted "));
                     }
                     if (nn || un || !dknown) {
@@ -873,8 +874,8 @@ async function xname_flags(obj, cxn_flags) {   // objnam.c:581
                         }
                         if (nn) {
                             $c.strcat(buf, $c.lit(" of "));
-                            if (typ === POT_WATER && bknown && (obj.blessed | 0 || obj.cursed | 0)) {
-                                $c.strcat(buf, obj.blessed | 0 ? $c.lit("holy ") : $c.lit("unholy "));
+                            if (typ === POT_WATER && bknown && (obj.blessed || obj.cursed)) {
+                                $c.strcat(buf, obj.blessed ? $c.lit("holy ") : $c.lit("unholy "));
                             }
                             $c.strcat(buf, actualn);
                         } else {
@@ -954,7 +955,7 @@ async function xname_flags(obj, cxn_flags) {   // objnam.c:581
                     break;
                 case GEM_CLASS:
                     {
-                        rock = (ocl.oc_material | 0) === MINERAL ? $c.lit("stone") : $c.lit("gem");
+                        rock = ocl.oc_material === MINERAL ? $c.lit("stone") : $c.lit("gem");
                         if (!dknown) {
                             $c.strcpy(buf, rock);
                         } else if (!nn) {
@@ -1106,9 +1107,9 @@ async function minimal_xname(obj) {   // objnam.c:1038
     /* suppress actual name if object's description is unknown */
     saveobcls.oc_name_known = (objects[otyp].oc_name_known) & 1;
     if (iflags.override_ID) {
-        objects[otyp].oc_name_known = (1) & 1;
+        objects[otyp].oc_name_known = 1;
     } else if (!obj.dknown) {
-        objects[otyp].oc_name_known = (0) & 1;
+        objects[otyp].oc_name_known = 0;
     }
     /* caveat: this makes a lot of assumptions about which fields
        are required in order for xname() to yield a sensible result */
@@ -1117,10 +1118,10 @@ async function minimal_xname(obj) {   // objnam.c:1038
     bareobj.oclass = obj.oclass;
     /* not observe_object, either the hero observed the object already or this
        is overriding ID and shouldn't discover the object */
-    bareobj.dknown = ((obj.dknown | 0 || iflags.override_ID ? 1 : 0) >>> 0) & 1;
+    bareobj.dknown = (obj.dknown || iflags.override_ID ? 1 : 0) & 1;
     /* suppress known except for amulets (needed for fakes and real A-of-Y) */
     /* default is "on" for types which don't use it */
-    bareobj.known = ((obj.oclass === AMULET_CLASS ? obj.known | 0 : !objects[otyp].oc_uses_known ? 1 : 0) >>> 0) & 1;
+    bareobj.known = (obj.oclass === AMULET_CLASS ? obj.known : !objects[otyp].oc_uses_known ? 1 : 0) & 1;
     bareobj.quan = 1;   /* don't want plural */
     /* for a boulder, leave corpsenm as 0; non-zero produces "next boulder" */
     if (otyp !== BOULDER) {
@@ -1164,13 +1165,13 @@ export async function mshot_xname(obj) {   // objnam.c:1090
  */
 export function the_unique_obj(obj) {   // objnam.c:1106
     let known = 0;
-    known = $c.i8(obj.known | 0 || iflags.override_ID ? 1 : 0);
+    known = obj.known || iflags.override_ID ? 1 : 0;
     if (!obj.dknown && !iflags.override_ID) {
         return FALSE;
     } else if (obj.otyp === FAKE_AMULET_OF_YENDOR && !known) {
         return TRUE;   /* lie */
     } else {
-        return $c.i8(objects[obj.otyp].oc_unique | 0 && (known || obj.otyp === AMULET_OF_YENDOR) ? 1 : 0);
+        return objects[obj.otyp].oc_unique && (known || obj.otyp === AMULET_OF_YENDOR) ? 1 : 0;
     }
 }
 /* should monster type be prefixed with "the"? (mostly used for corpses) */
@@ -1185,7 +1186,7 @@ export function the_unique_pm(ptr) {   // objnam.c:1121
     if (type_is_pname(ptr)) {
         return FALSE;
     }
-    uniq = $c.i8(ptr.geno & G_UNIQ ? TRUE : FALSE);
+    uniq = ptr.geno & G_UNIQ ? TRUE : FALSE;
     /* high priest is unique if it includes "of <deity>", otherwise not
        (caller needs to handle the 1st possibility; we assume the 2nd);
        worm tail should be irrelevant but is included for completeness */
@@ -1204,16 +1205,16 @@ export function the_unique_pm(ptr) {   // objnam.c:1121
  */
 function add_erosion_words(obj, prefix) {   // objnam.c:1143
     let iscrys = 0, rknown = 0;
-    iscrys = $c.i8(obj.otyp === CRYSKNIFE ? 1 : 0);
-    rknown = $c.i8(iflags.override_ID === 0 ? obj.rknown | 0 : TRUE);
+    iscrys = obj.otyp === CRYSKNIFE ? 1 : 0;
+    rknown = iflags.override_ID === 0 ? obj.rknown : TRUE;
     if (!is_damageable(obj) && !iscrys) {
         return;
     }
     /* The only cases where any of these bits do double duty are for
      * rotted food and diluted potions, which are all not is_damageable().
      */
-    if (obj.oeroded | 0 && !iscrys) {
-        switch (obj.oeroded | 0) {
+    if (obj.oeroded && !iscrys) {
+        switch (obj.oeroded) {
             case 2:
                 $c.strcat(prefix, $c.lit("very "));
                 break;
@@ -1221,10 +1222,10 @@ function add_erosion_words(obj, prefix) {   // objnam.c:1143
                 $c.strcat(prefix, $c.lit("thoroughly "));
                 break;
         }
-        $c.strcat(prefix, (objects[obj.otyp].oc_material | 0) === IRON ? $c.lit("rusty ") : (objects[obj.otyp].oc_material | 0) === GLASS && obj.oclass === ARMOR_CLASS ? $c.lit("cracked ") : $c.lit("burnt "));
+        $c.strcat(prefix, objects[obj.otyp].oc_material === IRON ? $c.lit("rusty ") : objects[obj.otyp].oc_material === GLASS && obj.oclass === ARMOR_CLASS ? $c.lit("cracked ") : $c.lit("burnt "));
     }
-    if (obj.oeroded2 | 0 && !iscrys) {
-        switch (obj.oeroded2 | 0) {
+    if (obj.oeroded2 && !iscrys) {
+        switch (obj.oeroded2) {
             case 2:
                 $c.strcat(prefix, $c.lit("very "));
                 break;
@@ -1232,13 +1233,13 @@ function add_erosion_words(obj, prefix) {   // objnam.c:1143
                 $c.strcat(prefix, $c.lit("thoroughly "));
                 break;
         }
-        $c.strcat(prefix, (objects[obj.otyp].oc_material | 0) === COPPER || (objects[obj.otyp].oc_material | 0) === IRON ? $c.lit("corroded ") : $c.lit("rotted "));
+        $c.strcat(prefix, objects[obj.otyp].oc_material === COPPER || objects[obj.otyp].oc_material === IRON ? $c.lit("corroded ") : $c.lit("rotted "));
     }
     /* note: it is possible for an item to be both eroded and erodeproof
        (cursed scroll of destroy armor read while confused erodeproofs an
        item of armor without repairing existing erosion) */
-    if (rknown && obj.oerodeproof | 0) {
-        $c.strcat(prefix, iscrys ? $c.lit("fixed ") : (objects[obj.otyp].oc_material | 0) === IRON ? $c.lit("rustproof ") : (objects[obj.otyp].oc_material | 0) === COPPER || (objects[obj.otyp].oc_material | 0) === IRON ? $c.lit("corrodeproof ") : is_flammable(obj) ? $c.lit("fireproof ") : (objects[obj.otyp].oc_material | 0) === GLASS && obj.oclass === ARMOR_CLASS ? $c.lit("tempered ") : is_rottable(obj) ? $c.lit("rotproof ") : $c.lit(""));
+    if (rknown && obj.oerodeproof) {
+        $c.strcat(prefix, iscrys ? $c.lit("fixed ") : objects[obj.otyp].oc_material === IRON ? $c.lit("rustproof ") : objects[obj.otyp].oc_material === COPPER || objects[obj.otyp].oc_material === IRON ? $c.lit("corrodeproof ") : is_flammable(obj) ? $c.lit("fireproof ") : objects[obj.otyp].oc_material === GLASS && obj.oclass === ARMOR_CLASS ? $c.lit("tempered ") : is_rottable(obj) ? $c.lit("rotproof ") : $c.lit(""));
     }
     /* hardened */
 }
@@ -1256,7 +1257,7 @@ export function erosion_matters(obj) {   // objnam.c:1195
                non-iron tool, in which case rust also implicitly goes away,
                so there's no particular reason to try to handle the first
                instance differently [this comment belongs in poly_obj()...] */
-            return $c.i8(is_weptool(obj) ? TRUE : FALSE);
+            return is_weptool(obj) ? TRUE : FALSE;
         case WEAPON_CLASS:
         case ARMOR_CLASS:
         case BALL_CLASS:
@@ -1279,9 +1280,9 @@ async function doname_base(obj, doname_flags) {   // objnam.c:1223
     /* object to format */
     /* special case requests */
     ispoisoned = FALSE;
-    with_price = $c.i8((doname_flags & DONAME_WITH_PRICE) >>> 0 !== 0 ? 1 : 0);
-    vague_quan = $c.i8((doname_flags & DONAME_VAGUE_QUAN) >>> 0 !== 0 ? 1 : 0);
-    for_menu = $c.i8((doname_flags & DONAME_FOR_MENU) >>> 0 !== 0 ? 1 : 0);
+    with_price = (doname_flags & DONAME_WITH_PRICE) >>> 0 !== 0 ? 1 : 0;
+    vague_quan = (doname_flags & DONAME_VAGUE_QUAN) >>> 0 !== 0 ? 1 : 0;
+    for_menu = (doname_flags & DONAME_FOR_MENU) >>> 0 !== 0 ? 1 : 0;
     /* for when we have to add something at
      * the start of prefix instead of the
      * end (Strcat is used on the end) */
@@ -1300,11 +1301,11 @@ async function doname_base(obj, doname_flags) {   // objnam.c:1223
     if (iflags.override_ID) {
         known = dknown = cknown = bknown = lknown = TRUE;
     } else {
-        known = $c.i8(obj.known);
-        dknown = $c.i8(obj.dknown);
-        cknown = $c.i8(obj.cknown);
-        bknown = $c.i8(obj.bknown);
-        lknown = $c.i8(obj.lknown);
+        known = obj.known;
+        dknown = obj.dknown;
+        cknown = obj.cknown;
+        bknown = obj.bknown;
+        lknown = obj.lknown;
     }
     /* When using xname, we want "poisoned arrow", and when using
      * doname, we want "poisoned +0 arrow".  This kludge is about the only
@@ -1312,15 +1313,15 @@ async function doname_base(obj, doname_flags) {   // objnam.c:1223
      * combining both into one function taking a parameter.
      */
     /* must check opoisoned--someone can have a weirdly-named fruit */
-    if (!$c.strncmp(bp, $c.lit("poisoned "), 9) && obj.otrapped | 0) {
+    if (!$c.strncmp(bp, $c.lit("poisoned "), 9) && obj.otrapped) {
         bp = bp.add(9);   /* doesn't affect bp_eos or bpspaceleft */
         ispoisoned = TRUE;
     }
     /* fruits are allowed to be given artifact names; when that happens,
        format the name like the corresponding artifact, which may or may not
        want "the" prefix and when it doesn't, avoid "a"/"an" prefix too */
-    fake_arti = $c.i8(obj.otyp === SLIME_MOLD && (aname = artifact_name(bp, null, FALSE)) !== null ? 1 : 0);
-    force_the = $c.i8(fake_arti && !strncmpi(aname, $c.lit("the "), 4) ? 1 : 0);
+    fake_arti = obj.otyp === SLIME_MOLD && (aname = artifact_name(bp, null, FALSE)) !== null ? 1 : 0;
+    force_the = fake_arti && !strncmpi(aname, $c.lit("the "), 4) ? 1 : 0;
     prefix[0] = 0;
     if (obj.quan !== 1) {
         if (dknown || !vague_quan) {
@@ -1380,7 +1381,7 @@ async function doname_base(obj, doname_flags) {   // objnam.c:1223
        yield "a non-trapped large box"? (not "an untrapped large box");
        TODO: this should be ``(Is_box(obj) || obj->otyp == TIN) && ...''
        but at present there's no way to set obj->tknown for tins */
-    if (Is_box(obj) && obj.otrapped | 0 && obj.tknown | 0 && obj.dknown | 0) {
+    if (Is_box(obj) && obj.otrapped && obj.tknown && obj.dknown) {
         $c.strcat(new $c.Ptr(prefix, 0), $c.lit("trapped "));
     }
     if (lknown && Is_box(obj)) {
@@ -1447,7 +1448,7 @@ async function doname_base(obj, doname_flags) {   // objnam.c:1223
                         /* there could be light-emitting artifact gloves someday,
                            so add 'lit' separately from 'slippery' rather than via
                            'else if' after uarmg+Glib */
-                        if (!Blind() && obj.lamplit | 0 && artifact_light(obj)) {
+                        if (!Blind() && obj.lamplit && artifact_light(obj)) {
                             do {
                                 nh_snprintf($c.lit("doname_base"), 1413, bp_eos[0].add(-1), $c.addu64(bpspaceleft, 1), $c.lit(", %s lit)"), arti_light_description(obj));
                                 bp_eos[0] = eos(bp), bpspaceleft = $c.u64($c.pdiff(bp_end, bp_eos[0]));
@@ -1536,13 +1537,13 @@ async function doname_base(obj, doname_flags) {   // objnam.c:1223
                 $goto = null;   // charges:
                 if (known) {
                     do {
-                        nh_snprintf($c.lit("doname_base"), 1486, bp_eos[0].add(-0), $c.addu64(bpspaceleft, 0), $c.lit(" (%d:%d)"), obj.recharged | 0, obj.spe);
+                        nh_snprintf($c.lit("doname_base"), 1486, bp_eos[0].add(-0), $c.addu64(bpspaceleft, 0), $c.lit(" (%d:%d)"), obj.recharged, obj.spe);
                         bp_eos[0] = eos(bp), bpspaceleft = $c.u64($c.pdiff(bp_end, bp_eos[0]));
                     } while (0);
                 }
                 break;
             case POTION_CLASS:
-                if (obj.otyp === POT_OIL && obj.lamplit | 0) {
+                if (obj.otyp === POT_OIL && obj.lamplit) {
                     do {
                         $c.strncat(bp_eos[0].add(-0), $c.lit(" (lit)"), $c.addu64(bpspaceleft, 0));
                         bp_eos[0] = eos(bp), bpspaceleft = $c.u64($c.pdiff(bp_end, bp_eos[0]));
@@ -1571,7 +1572,7 @@ async function doname_base(obj, doname_flags) {   // objnam.c:1223
                         bp_eos[0] = eos(bp), bpspaceleft = $c.u64($c.pdiff(bp_end, bp_eos[0]));
                     } while (0);
                 }
-                if (known && objects[obj.otyp].oc_charged | 0) {
+                if (known && objects[obj.otyp].oc_charged) {
                     $c.sprintf(eos(new $c.Ptr(prefix, 0)), $c.lit("%+d "), obj.spe);   /* sitoa(obj->spe)+" " */
                 }
                 break;
@@ -1583,7 +1584,7 @@ async function doname_base(obj, doname_flags) {   // objnam.c:1223
                     /* (quan == 1) => want corpse_xname() to supply article,
                        (quan != 1) => already have count or "some" as prefix;
                        "corpse" is already in the buffer returned by xname() */
-                    cxarg = ((obj.quan !== 1 ? 0 : CXN.ARTICLE) | CXN.NOCORPSE) >>> 0;
+                    cxarg = (obj.quan !== 1 ? 0 : CXN.ARTICLE) | CXN.NOCORPSE;
                     /* corpse_xname() sets xnamep; callers other than doname_base()
                        itself shouldn't care about xnamep (pointer to start of
                        current obuf[]) but keep it accurate anyway */
@@ -1631,8 +1632,8 @@ async function doname_base(obj, doname_flags) {   // objnam.c:1223
         } while (0);
     }
     if ($c.and64(obj.owornmask, W.WEP) && !gm.mrg_to_wielded) {
-        twoweap_primary = $c.i8($c.peq(obj, $G.uwep) && u.twoweap ? 1 : 0);
-        tethered = $c.i8(obj.otyp === AKLYS ? 1 : 0);
+        twoweap_primary = $c.peq(obj, $G.uwep) && u.twoweap ? 1 : 0;
+        tethered = obj.otyp === AKLYS ? 1 : 0;
         /* use alternate phrasing for non-weapons and for wielded ammo
            (arrows, bolts), or missiles (darts, shuriken, boomerangs)
            except when those are being actively dual-wielded where the
@@ -1651,7 +1652,7 @@ async function doname_base(obj, doname_flags) {   // objnam.c:1223
                 releaseobuf(obufp);
             } else {
                 /* "right hand" or "left hand" */
-                $c.sprintf(new $c.Ptr(handsbuf, 0), $c.lit("%s %s"), (u.uhandedness | 0) === RIGHT_HANDED ? $c.lit("right") : $c.lit("left"), hand_s);
+                $c.sprintf(new $c.Ptr(handsbuf, 0), $c.lit("%s %s"), u.uhandedness === RIGHT_HANDED ? $c.lit("right") : $c.lit("left"), hand_s);
                 hand_s = new $c.Ptr(handsbuf, 0);
             }
             /* note: Sting's glow message, if added, will insert text
@@ -1668,7 +1669,7 @@ async function doname_base(obj, doname_flags) {   // objnam.c:1223
                         nh_snprintf($c.lit("doname_base"), 1605, bp_eos[0].add(-1), $c.addu64(bpspaceleft, 1), $c.lit(", %s %s)"), glow_verb(gw.warn_obj_cnt, TRUE), glow_color(obj.oartifact));
                         bp_eos[0] = eos(bp), bpspaceleft = $c.u64($c.pdiff(bp_end, bp_eos[0]));
                     } while (0);
-                } else if (obj.lamplit | 0 && artifact_light(obj)) {   /* as above, overwrite known closing paren */
+                } else if (obj.lamplit && artifact_light(obj)) {   /* as above, overwrite known closing paren */
                     do {
                         nh_snprintf($c.lit("doname_base"), 1609, bp_eos[0].add(-1), $c.addu64(bpspaceleft, 1), $c.lit(", %s lit)"), arti_light_description(obj));
                         bp_eos[0] = eos(bp), bpspaceleft = $c.u64($c.pdiff(bp_end, bp_eos[0]));
@@ -1680,7 +1681,7 @@ async function doname_base(obj, doname_flags) {   // objnam.c:1223
     if ($c.and64(obj.owornmask, W.SWAPWEP)) {
         if (u.twoweap) {
             do {
-                nh_snprintf($c.lit("doname_base"), 1616, bp_eos[0].add(-0), $c.addu64(bpspaceleft, 0), $c.lit(" (wielded in %s %s)"), (u.uhandedness | 0) === RIGHT_HANDED ? $c.lit("left") : $c.lit("right"), await body_part(HAND));
+                nh_snprintf($c.lit("doname_base"), 1616, bp_eos[0].add(-0), $c.addu64(bpspaceleft, 0), $c.lit(" (wielded in %s %s)"), u.uhandedness === RIGHT_HANDED ? $c.lit("left") : $c.lit("right"), await body_part(HAND));
                 bp_eos[0] = eos(bp), bpspaceleft = $c.u64($c.pdiff(bp_end, bp_eos[0]));
             } while (0);
         } else {
@@ -1727,7 +1728,7 @@ async function doname_base(obj, doname_flags) {   // objnam.c:1223
         /* separately formatted suffix avoids need for ConcatF3() */
         $c.sprintf(new $c.Ptr(pricebuf, 0), $c.lit("%ld %s"), quotedprice, await currency(quotedprice));
         do {
-            nh_snprintf($c.lit("doname_base"), 1661, bp_eos[0].add(-0), $c.addu64(bpspaceleft, 0), $c.lit(" (%s, %s)"), obj.unpaid | 0 ? $c.lit("unpaid") : $c.lit("contents"), new $c.Ptr(pricebuf, 0));
+            nh_snprintf($c.lit("doname_base"), 1661, bp_eos[0].add(-0), $c.addu64(bpspaceleft, 0), $c.lit(" (%s, %s)"), obj.unpaid ? $c.lit("unpaid") : $c.lit("contents"), new $c.Ptr(pricebuf, 0));
             bp_eos[0] = eos(bp), bpspaceleft = $c.u64($c.pdiff(bp_end, bp_eos[0]));
         } while (0);
         record_price_quote(obj.otyp, $c.u64($c.div64(quotedprice, obj.quan)), TRUE);
@@ -1872,7 +1873,7 @@ export function not_fully_identified(otmp) {   // objnam.c:1787
     if (!otmp.cknown && (Is_container(otmp) || otmp.otyp === STATUE) || !otmp.lknown && Is_box(otmp)) {
         return TRUE;
     }
-    if (otmp.oartifact && undiscovered_artifact($c.i16(otmp.oartifact))) {
+    if (otmp.oartifact && undiscovered_artifact(otmp.oartifact)) {
         return TRUE;
     }
     /* otmp->rknown is the only item of interest if we reach here */
@@ -1882,11 +1883,11 @@ export function not_fully_identified(otmp) {   // objnam.c:1787
      *  `rknown' ID only matters if xname() will provide the info about it.
      */
     /* (redundant) */
-    if (otmp.rknown | 0 || otmp.oclass !== ARMOR_CLASS && otmp.oclass !== WEAPON_CLASS && !is_weptool(otmp) && otmp.oclass !== BALL_CLASS) {   /* (useless) */
+    if (otmp.rknown || otmp.oclass !== ARMOR_CLASS && otmp.oclass !== WEAPON_CLASS && !is_weptool(otmp) && otmp.oclass !== BALL_CLASS) {   /* (useless) */
         return FALSE;
     } else {
         /* lack of `rknown' only matters for vulnerable objects */
-        return $c.i8(is_damageable(otmp));
+        return is_damageable(otmp);
     }
 }
 /* format a corpse name (xname() omits monster type; doname() calls us);
@@ -1905,13 +1906,13 @@ export async function corpse_xname(otmp, adjective, cxn_flags) {   // objnam.c:1
     /* include "the" for "the woodchuck corpse */
     /* include "an" for "an ogre corpse */
     /* leave off suffix (do_name() appends "corpse" itself) */
-    ignore_quan = $c.i8((cxn_flags & CXN.SINGULAR) >>> 0 !== 0 ? 1 : 0);
-    no_prefix = $c.i8((cxn_flags & CXN.NO_PFX) >>> 0 !== 0 ? 1 : 0);
-    the_prefix = $c.i8((cxn_flags & CXN.PFX_THE) >>> 0 !== 0 ? 1 : 0);
-    any_prefix = $c.i8((cxn_flags & CXN.ARTICLE) >>> 0 !== 0 ? 1 : 0);
-    omit_corpse = $c.i8((cxn_flags & CXN.NOCORPSE) >>> 0 !== 0 ? 1 : 0);
+    ignore_quan = (cxn_flags & CXN.SINGULAR) >>> 0 !== 0 ? 1 : 0;
+    no_prefix = (cxn_flags & CXN.NO_PFX) >>> 0 !== 0 ? 1 : 0;
+    the_prefix = (cxn_flags & CXN.PFX_THE) >>> 0 !== 0 ? 1 : 0;
+    any_prefix = (cxn_flags & CXN.ARTICLE) >>> 0 !== 0 ? 1 : 0;
+    omit_corpse = (cxn_flags & CXN.NOCORPSE) >>> 0 !== 0 ? 1 : 0;
     possessive = FALSE;
-    glob = $c.i8(otmp.otyp !== CORPSE && otmp.globby | 0 ? 1 : 0);
+    glob = otmp.otyp !== CORPSE && otmp.globby ? 1 : 0;
     /* some callers [aobjnam()] rely on prefix area that xname() sets aside */
     $t1 = nextobuf(), gx.xnamep = $t1;
     nambuf = gx.xnamep.add(PREFIX);
@@ -2033,25 +2034,25 @@ export async function killer_xname(obj) {   // objnam.c:1942
     /* killer name should be more specific than general xname; however, exact
        info like blessed/cursed and rustproof makes things be too verbose; set
        dknown (not observe_object) because dead characters don't observe */
-    $t1 = obj.dknown = (1) & 1, obj.known = ($t1) & 1;
-    $t3 = ($t2 = obj.greased = (0) & 1, obj.rknown = ($t2) & 1), obj.bknown = ($t3) & 1;
+    $t1 = obj.dknown = 1, obj.known = ($t1) & 1;
+    $t3 = ($t2 = obj.greased = 0, obj.rknown = ($t2) & 1), obj.bknown = ($t3) & 1;
     /* if character is a priest[ess], bknown will get toggled back on */
     if (obj.otyp !== POT_WATER) {
-        $t4 = obj.cursed = (0) & 1, obj.blessed = ($t4) & 1;
+        $t4 = obj.cursed = 0, obj.blessed = ($t4) & 1;
     } else {
-        obj.bknown = (1) & 1;   /* describe holy/unholy water as such */
+        obj.bknown = 1;   /* describe holy/unholy water as such */
     }
     /* "killed by poisoned <obj>" would be misleading when poison is
        not the cause of death and "poisoned by poisoned <obj>" would
        be redundant when it is, so suppress "poisoned" prefix */
-    obj.otrapped = (0) & 1;
+    obj.otrapped = 0;
     /* strip user-supplied name; artifacts keep theirs */
     if (!obj.oartifact && save_oname) {
         obj.oextra.oname = null;
     }
     /* temporarily identify the type of object */
     save_ocknown = objects[obj.otyp].oc_name_known;
-    objects[obj.otyp].oc_name_known = (1) & 1;
+    objects[obj.otyp].oc_name_known = 1;
     save_ocuname = objects[obj.otyp].oc_uname;
     objects[obj.otyp].oc_uname = null;   /* avoid "foo called bar" */
     /* format the object */
@@ -2136,8 +2137,8 @@ export async function short_oname(obj, func, altfunc, lenlimit) {   // objnam.c:
     /* still long; strip several name-lengthening attributes;
        called and named strings are still in truncated form */
     save_obj.$copyFrom(obj);
-    $t2 = ($t1 = obj.greased = (0) & 1, obj.rknown = ($t1) & 1), obj.bknown = ($t2) & 1;
-    $t3 = obj.oeroded2 = (0) & 3, obj.oeroded = ($t3) & 3;
+    $t2 = ($t1 = obj.greased = 0, obj.rknown = ($t1) & 1), obj.bknown = ($t2) & 1;
+    $t3 = obj.oeroded2 = 0, obj.oeroded = ($t3) & 3;
     releaseobuf(outbuf);
     outbuf = await func(obj);
     if (altfunc && $c.u32($c.strlen(outbuf)) > lenlimit) {
@@ -2267,7 +2268,7 @@ export async function the(str) {   // objnam.c:2171
             /* insert "the" unless we have an apostrophe (where we assume
                we're dealing with "Unique's corpse" when "Unique" wasn't
                caught by CapitalMon() above) */
-            insert_the = $c.i8(!$c.strchr(str, 39) ? 1 : 0);
+            insert_the = !$c.strchr(str, 39) ? 1 : 0;
         } else if (tmp && $c.pcmp($c.strchr(str, 32), tmp) < 0) {
             /* has spaces */
             /* it needs an article if the name contains "of" */
@@ -2387,7 +2388,7 @@ export async function paydoname(obj) {   // objnam.c:2313
     save_cknown = obj.cknown;
     save_wizweight = iflags.wizweight;
     if (Has_contents(obj)) {
-        obj.cknown = (0) & 1;
+        obj.cknown = 0;
     }
     /* avoid showing item weights to unclutter billing's pay-menu a bit */
     iflags.wizweight = FALSE;
@@ -2407,7 +2408,7 @@ export async function paydoname(obj) {   // objnam.c:2313
             } else if (!$c.strncmp(p, $c.lit("an "), 3)) {
                 p = p.add(3);
             }
-            p = await strprepend(p, obj.unpaid | 0 ? $c.lit("an unpaid ") : $c.lit("your "));
+            p = await strprepend(p, obj.unpaid ? $c.lit("an unpaid ") : $c.lit("your "));
         }
         if (!obj.cknown) {
             if (obj.unpaid) {
@@ -2525,7 +2526,7 @@ export async function ansimpleoname(obj) {   // objnam.c:2446
     if (otyp === FAKE_AMULET_OF_YENDOR) {
         otyp = AMULET_OF_YENDOR;
     }
-    if (objects[otyp].oc_unique | 0 && obj_descr[objects[otyp].oc_name_idx].oc_name && !$c.strcmp(simpleoname, obj_descr[objects[otyp].oc_name_idx].oc_name)) {
+    if (objects[otyp].oc_unique && obj_descr[objects[otyp].oc_name_idx].oc_name && !$c.strcmp(simpleoname, obj_descr[objects[otyp].oc_name_idx].oc_name)) {
         /* the() will allocate another obuf[]; we want to avoid using two */
         obufp = await the(simpleoname);
         $c.strcpy(simpleoname, obufp);
@@ -3298,13 +3299,13 @@ async function rnd_otyp_by_namedesc(name, oclass, xtra_prob) {   // objnam.c:345
         return STRANGE_OBJECT;
     }
     /* only skip "foo of" for "foo of bar" if target doesn't contain " of " */
-    check_of = $c.i8(strstri(name, $c.lit(" of ")) === null ? 1 : 0);
+    check_of = strstri(name, $c.lit(" of ")) === null ? 1 : 0;
     minglob = GLOB_OF_GRAY_OOZE;
     maxglob = GLOB_OF_BLACK_PUDDING;
     $c.memset(new $c.Ptr(validobjs, 0), 0, 962);
     if (oclass) {
         lo = svb.bases[$c.u8(oclass)];
-        hi = svb.bases[$c.u8(oclass) + 1 | 0] - 1 | 0;
+        hi = svb.bases[$c.u8(oclass) + 1] - 1 | 0;
     } else {
         lo = MAXOCLASSES;   /* STRANGE_OBJECT + 1; */
         hi = NUM_OBJECTS - 1;
@@ -3394,11 +3395,11 @@ async function wizterrainwish(d) {   // objnam.c:3554
             continue;
         }
         /* found it; avoid stupid mistakes */
-        if ((trap === HOLE || trap === TRAPDOOR) && !Can_fall_thru(u.uz)) {
+        if (is_hole(trap) && !Can_fall_thru(u.uz)) {
             trap = ROCKTRAP;
         }
         if ((t = await maketrap(x, y, trap)) !== null) {
-            trap = t.ttyp | 0;
+            trap = t.ttyp;
             tname = trapname(trap, TRUE);
             await pline($c.lit("%s%s."), await An(tname), trap !== MAGIC_PORTAL ? $c.lit("") : $c.lit(" to nowhere"));
         } else {
@@ -3410,20 +3411,20 @@ async function wizterrainwish(d) {   // objnam.c:3554
        or place furniture on existing traps which shouldn't be allowed) */
     lev = $c.relem(svl.level.locations[x], y);
     oldtyp = lev.typ >>> 0;
-    is_dbridge = $c.i8(oldtyp === DRAWBRIDGE_DOWN || oldtyp === DRAWBRIDGE_UP ? 1 : 0);
+    is_dbridge = oldtyp === DRAWBRIDGE_DOWN || oldtyp === DRAWBRIDGE_UP ? 1 : 0;
     p = eos(bp);
     if (!($c.pcmp(p.add(-8), bp) < 0 || strncmpi(p.add(-8), $c.lit("fountain"), -1))) {
         lev.typ = FOUNTAIN;
         if (oldtyp !== FOUNTAIN) {
             svl.level.flags.nfountains = $c.u8(svl.level.flags.nfountains + 1);
         }
-        lev.flags = ((d.flags ? F_LOOTED : 0) >>> 0) & 31;   /* overlays 'flags' */
-        $t1 = (d.blessed || !strncmpi(bp, $c.lit("magic "), 6) ? 1 : 0) >>> 0, lev.horizontal = ($t1) & 1;
-        await pline($c.lit("A %sfountain."), lev.horizontal | 0 ? $c.lit("magic ") : $c.lit(""));
+        lev.flags = (d.flags ? F_LOOTED : 0) & 31;   /* overlays 'flags' */
+        $t1 = d.blessed || !strncmpi(bp, $c.lit("magic "), 6) ? 1 : 0, lev.horizontal = ($t1) & 1;
+        await pline($c.lit("A %sfountain."), lev.horizontal ? $c.lit("magic ") : $c.lit(""));
         madeterrain = TRUE;
     } else if (!($c.pcmp(p.add(-6), bp) < 0 || strncmpi(p.add(-6), $c.lit("throne"), -1))) {
         lev.typ = THRONE;
-        lev.flags = ((d.flags ? T_LOOTED : 0) >>> 0) & 31;   /* overlays 'flags' */
+        lev.flags = (d.flags ? T_LOOTED : 0) & 31;   /* overlays 'flags' */
         await pline($c.lit("A throne."));
         madeterrain = TRUE;
     } else if (!($c.pcmp(p.add(-4), bp) < 0 || strncmpi(p.add(-4), $c.lit("sink"), -1))) {
@@ -3431,15 +3432,15 @@ async function wizterrainwish(d) {   // objnam.c:3554
         if (oldtyp !== SINK) {
             svl.level.flags.nsinks = $c.u8(svl.level.flags.nsinks + 1);
         }
-        lev.flags = ((d.flags ? S.LPUDDING | S.LDWASHER | S.LRING : 0) >>> 0) & 31;
+        lev.flags = (d.flags ? S.LPUDDING | S.LDWASHER | S.LRING : 0) & 31;
         await pline($c.lit("A sink."));
         madeterrain = TRUE;
         /* ("water" matches "potion of water" rather than terrain) */
     } else if (!($c.pcmp(p.add(-4), bp) < 0 || strncmpi(p.add(-4), $c.lit("pool"), -1)) || !($c.pcmp(p.add(-4), bp) < 0 || strncmpi(p.add(-4), $c.lit("moat"), -1)) || !($c.pcmp(p.add(-13), bp) < 0 || strncmpi(p.add(-13), $c.lit("wall of water"), -1))) {
-        ltyp = (!($c.pcmp(p.add(-4), bp) < 0 || strncmpi(p.add(-4), $c.lit("pool"), -1)) ? POOL : !($c.pcmp(p.add(-4), bp) < 0 || strncmpi(p.add(-4), $c.lit("moat"), -1)) ? MOAT : WATER) >>> 0;
+        ltyp = !($c.pcmp(p.add(-4), bp) < 0 || strncmpi(p.add(-4), $c.lit("pool"), -1)) ? POOL : !($c.pcmp(p.add(-4), bp) < 0 || strncmpi(p.add(-4), $c.lit("moat"), -1)) ? MOAT : WATER;
         if (!is_dbridge) {
             lev.typ = $c.i8(ltyp);
-            lev.flags = (0) & 31;
+            lev.flags = 0;
         } else {
             /* drawbridgemask overloads flags */
             lev.flags = (((lev.flags | 0) & ~DB.UNDER) >>> 0) & 31;
@@ -3460,10 +3461,10 @@ async function wizterrainwish(d) {   // objnam.c:3554
         madeterrain = TRUE;
         /* also matches "molten lava" */
     } else if (!($c.pcmp(p.add(-4), bp) < 0 || strncmpi(p.add(-4), $c.lit("lava"), -1)) || !($c.pcmp(p.add(-12), bp) < 0 || strncmpi(p.add(-12), $c.lit("wall of lava"), -1))) {
-        ltyp = (!($c.pcmp(p.add(-12), bp) < 0 || strncmpi(p.add(-12), $c.lit("wall of lava"), -1)) ? LAVAWALL : LAVAPOOL) >>> 0;
+        ltyp = !($c.pcmp(p.add(-12), bp) < 0 || strncmpi(p.add(-12), $c.lit("wall of lava"), -1)) ? LAVAWALL : LAVAPOOL;
         if (!is_dbridge) {
             lev.typ = $c.i8(ltyp);
-            lev.flags = (0) & 31;
+            lev.flags = 0;
         } else {
             /* drawbridgemask overloads flags */
             lev.flags = (((lev.flags | 0) & ~DB.UNDER) >>> 0) & 31;
@@ -3484,7 +3485,7 @@ async function wizterrainwish(d) {   // objnam.c:3554
         if (!is_dbridge) {
             lev.typ = ICE;
             /* icedpool overloads flags; specifies what ice will melt into */
-            lev.flags = ((oldtyp === ROOM ? ICED.POOL : ICED.MOAT) >>> 0) & 31;
+            lev.flags = (oldtyp === ROOM ? ICED.POOL : ICED.MOAT) & 31;
         } else {
             /* drawbridgemask overloads flags */
             lev.flags = (((lev.flags | 0) & ~DB.UNDER) >>> 0) & 31;
@@ -3520,9 +3521,9 @@ async function wizterrainwish(d) {   // objnam.c:3554
     } else if (!($c.pcmp(p.add(-5), bp) < 0 || strncmpi(p.add(-5), $c.lit("grave"), -1)) || !($c.pcmp(p.add(-9), bp) < 0 || strncmpi(p.add(-9), $c.lit("headstone"), -1))) {
         await make_grave(x, y, null);
         if (IS_GRAVE(lev.typ)) {
-            lev.flags = (0) & 31;   /* overlays 'flags' */
-            lev.horizontal = ((d.flags ? 1 : 0) >>> 0) & 1;
-            await pline($c.lit("A %sgrave."), lev.horizontal | 0 ? $c.lit("disturbed ") : $c.lit(""));
+            lev.flags = 0;   /* overlays 'flags' */
+            lev.horizontal = (d.flags ? 1 : 0) & 1;
+            await pline($c.lit("A %sgrave."), lev.horizontal ? $c.lit("disturbed ") : $c.lit(""));
             madeterrain = TRUE;
         } else {
             await pline($c.lit("Can't place a grave here."));
@@ -3530,13 +3531,13 @@ async function wizterrainwish(d) {   // objnam.c:3554
         }
     } else if (!($c.pcmp(p.add(-4), bp) < 0 || strncmpi(p.add(-4), $c.lit("tree"), -1))) {
         lev.typ = TREE;
-        lev.flags = ((d.flags ? TREE_LOOTED | TREE_SWARM : 0) >>> 0) & 31;
+        lev.flags = (d.flags ? TREE_LOOTED | TREE_SWARM : 0) & 31;
         set_wallprop_from_str(bp);
         await pline($c.lit("A tree."));
         madeterrain = TRUE;
     } else if (!($c.pcmp(p.add(-4), bp) < 0 || strncmpi(p.add(-4), $c.lit("bars"), -1))) {
         lev.typ = IRONBARS;
-        lev.flags = (0) & 31;
+        lev.flags = 0;
         set_wallprop_from_str(bp);
         /* [FIXME: if this isn't a wall or door location where 'horizontal'
             is already set up, that should be calculated for this spot.
@@ -3546,12 +3547,12 @@ async function wizterrainwish(d) {   // objnam.c:3554
         madeterrain = TRUE;
     } else if (!($c.pcmp(p.add(-5), bp) < 0 || strncmpi(p.add(-5), $c.lit("cloud"), -1))) {
         lev.typ = CLOUD;
-        lev.flags = (0) & 31;
+        lev.flags = 0;
         await pline($c.lit("A cloud."));
         await del_engr_at(x, y);
         madeterrain = TRUE;
     } else if (!($c.pcmp(p.add(-4), bp) < 0 || strncmpi(p.add(-4), $c.lit("door"), -1)) || d.doorless && !($c.pcmp(p.add(-7), bp) < 0 || strncmpi(p.add(-7), $c.lit("doorway"), -1))) {
-        secret = $c.i8(!($c.pcmp(p.add(-11), bp) < 0 || strncmpi(p.add(-11), $c.lit("secret door"), -1)) ? 1 : 0);
+        secret = !($c.pcmp(p.add(-11), bp) < 0 || strncmpi(p.add(-11), $c.lit("secret door"), -1)) ? 1 : 0;
         /* require door or wall so that the 'horizontal' flag will
            already have the correct value; player might choose to put
            DOOR on top of existing DOOR or SDOOR on top of existing SDOOR
@@ -3560,10 +3561,10 @@ async function wizterrainwish(d) {   // objnam.c:3554
            doorless doorway so will be acceptable here */
         if (lev.typ === DOOR || lev.typ === SDOOR || IS_WALL(lev.typ) && lev.typ !== DBWALL || lev.typ === IRONBARS) {
             /* remember previous wall info [is this right for iron bars?] */
-            old_wall_info = (lev.typ !== DOOR ? lev.flags | 0 : 0) >>> 0;
+            old_wall_info = lev.typ !== DOOR ? lev.flags : 0;
             /* set the new terrain type */
-            lev.typ = $c.i8(secret ? SDOOR : DOOR);
-            lev.flags = (0) & 31;   /* overlays 'flags' */
+            lev.typ = secret ? SDOOR : DOOR;
+            lev.flags = 0;   /* overlays 'flags' */
             /* lev->horizontal stays as-is */
             if ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level)) {
                 /* all doors on the rogue level are doorless; locking magic
@@ -3576,7 +3577,7 @@ async function wizterrainwish(d) {   // objnam.c:3554
                doormask and wall_info which both overload rm[x][y].flags
                (CLOSED overlaps wall_info bits, LOCKED and TRAPPED don't);
                conversion from SDOOR to DOOR changes NODOOR to CLOSED */
-            lev.flags = ((d.locked ? D.LOCKED : d.doorless || secret ? D.NODOOR : d.open ? D.ISOPEN : d.broken ? D.BROKEN : D.CLOSED) >>> 0) & 31;
+            lev.flags = (d.locked ? D.LOCKED : d.doorless || secret ? D.NODOOR : d.open ? D.ISOPEN : d.broken ? D.BROKEN : D.CLOSED) & 31;
             /* SDOOR uses wall_info, restore relevant bits.
              * FIXME? if we're changing a regular door into a secret door,
              * old_wall_info bits will be 0 instead of being set properly.
@@ -3589,7 +3590,7 @@ async function wizterrainwish(d) {   // objnam.c:3554
             /* set up trapped flag; open door states aren't eligible */
             /* 2: wish includes explicit "untrapped" */
             /* D_CLOSED is implicit for secret doors */
-            if (d.trapped === 2 || ((lev.flags | 0) & (D.LOCKED | D.CLOSED)) === 0 && !secret) {
+            if (d.trapped === 2 || (lev.flags & (D.LOCKED | D.CLOSED)) === 0 && !secret) {
                 d.trapped = 0;
             }
             if (d.trapped) {
@@ -3597,10 +3598,10 @@ async function wizterrainwish(d) {   // objnam.c:3554
             }
             /* feedback */
             dbuf[0] = 0;
-            if ((lev.flags | 0) & D.TRAPPED) {
+            if (lev.flags & D.TRAPPED) {
                 $c.strcat(new $c.Ptr(dbuf, 0), $c.lit("trapped "));
             }
-            if ((lev.flags | 0) & D.LOCKED) {
+            if (lev.flags & D.LOCKED) {
                 $c.strcat(new $c.Ptr(dbuf, 0), $c.lit("locked "));
             }
             if (lev.typ === SDOOR) {
@@ -3608,16 +3609,16 @@ async function wizterrainwish(d) {   // objnam.c:3554
             } else {
                 /* these should be mutually exclusive but we describe them
                    as if they're independent to maybe catch future bugs... */
-                if ((lev.flags | 0) & D.CLOSED) {
+                if (lev.flags & D.CLOSED) {
                     $c.strcat(new $c.Ptr(dbuf, 0), $c.lit("closed "));
                 }
-                if ((lev.flags | 0) & D.ISOPEN) {
+                if (lev.flags & D.ISOPEN) {
                     $c.strcat(new $c.Ptr(dbuf, 0), $c.lit("open "));
                 }
-                if ((lev.flags | 0) & D.BROKEN) {
+                if (lev.flags & D.BROKEN) {
                     $c.strcat(new $c.Ptr(dbuf, 0), $c.lit("broken "));
                 }
-                if (((lev.flags | 0) & ~D.TRAPPED) === D.NODOOR) {
+                if ((lev.flags & ~D.TRAPPED) === D.NODOOR) {
                     $c.strcat(new $c.Ptr(dbuf, 0), $c.lit("doorless doorway"));
                 } else {
                     $c.strcat(new $c.Ptr(dbuf, 0), $c.lit("door"));
@@ -3632,14 +3633,14 @@ async function wizterrainwish(d) {   // objnam.c:3554
         }
     } else if (!($c.pcmp(p.add(-4), bp) < 0 || strncmpi(p.add(-4), $c.lit("wall"), -1)) && ($c.peq(bp, p.add(-4)) || p.get(-5) === 32)) {
         wall = HWALL;
-        if (isok(u.ux, $c.i16(u.uy - 1 | 0)) && (svl.level.locations[u.ux][u.uy - 1 | 0].typ && svl.level.locations[u.ux][u.uy - 1 | 0].typ <= DBWALL) || isok(u.ux, $c.i16(u.uy + 1 | 0)) && (svl.level.locations[u.ux][u.uy + 1 | 0].typ && svl.level.locations[u.ux][u.uy + 1 | 0].typ <= DBWALL)) {
+        if (isok(u.ux, $c.i16(u.uy - 1)) && (svl.level.locations[u.ux][u.uy - 1].typ && svl.level.locations[u.ux][u.uy - 1].typ <= DBWALL) || isok(u.ux, $c.i16(u.uy + 1)) && (svl.level.locations[u.ux][u.uy + 1].typ && svl.level.locations[u.ux][u.uy + 1].typ <= DBWALL)) {
             wall = VWALL;
         }
         madeterrain = TRUE;
         lev.typ = wall;
-        lev.flags = (0) & 31;
+        lev.flags = 0;
         set_wallprop_from_str(bp);
-        await fix_wall_spines($c.i16(0 > (u.ux - 1 | 0) ? 0 : u.ux - 1 | 0), $c.i16(0 > (u.uy - 1 | 0) ? 0 : u.uy - 1 | 0), $c.i16(COLNO < (u.ux + 1 | 0) ? COLNO : u.ux + 1 | 0), $c.i16(ROWNO < (u.uy + 1 | 0) ? ROWNO : u.uy + 1 | 0));
+        await fix_wall_spines($c.i16(0 > u.ux - 1 ? 0 : u.ux - 1), $c.i16(0 > u.uy - 1 ? 0 : u.uy - 1), $c.i16(COLNO < u.ux + 1 ? COLNO : u.ux + 1), $c.i16(ROWNO < u.uy + 1 ? ROWNO : u.uy + 1));
         await pline($c.lit("A wall."));
     } else if (!($c.pcmp(p.add(-15), bp) < 0 || strncmpi(p.add(-15), $c.lit("secret corridor"), -1))) {
         if (lev.typ === CORR) {
@@ -3658,7 +3659,7 @@ async function wizterrainwish(d) {   // objnam.c:3554
             if (IS_FURNITURE(oldtyp)) {
                 count_level_features();
             }
-            if ((t$2 = t_at(x, y)) !== null && (t$2.ttyp | 0) !== MAGIC_PORTAL) {
+            if ((t$2 = t_at(x, y)) !== null && t$2.ttyp !== MAGIC_PORTAL) {
                 await deltrap(t$2);
             }
             madeterrain = TRUE;
@@ -3676,7 +3677,7 @@ async function wizterrainwish(d) {   // objnam.c:3554
         await feel_newsym(x, y);   /* map the spot where the wish occurred */
         /* hero started at <x,y> but might not be there anymore (create
            lava, decline to die, and get teleported away to safety) */
-        if (u.uinwater | 0 && !is_pool(u.ux, u.uy)) {
+        if (u.uinwater && !is_pool(u.ux, u.uy)) {
             await set_uinwater(0);   /* u.uinwater = 0; leave the water */
             await docrt();
             /* [block/unblock_point handled by docrt -> vision_recalc] */
@@ -3700,7 +3701,7 @@ async function wizterrainwish(d) {   // objnam.c:3554
                door, the old type was a wall or a door and we retain the
                'horizontal' value from those */
             if (!IS_FOUNTAIN(lev.typ) && !IS_GRAVE(lev.typ) && !IS_DOOR(lev.typ) && lev.typ !== SDOOR) {
-                lev.horizontal = (0) & 1;   /* also clears blessedftn, disturbed */
+                lev.horizontal = 0;   /* also clears blessedftn, disturbed */
             }
         }
         /* note: lev->lit and lev->nondiggable retain their values even
@@ -4377,7 +4378,7 @@ async function readobjnam_postparse1(d) {   // objnam.c:4240
      * name or the object name.
      */
     if (wizard() && (!strncmpi(d.bp, $c.lit("bear"), 4) || !strncmpi(d.bp, $c.lit("land"), 4))) {
-        beartrap = $c.i8(lowc(d.bp.get(0)) === 98 ? 1 : 0);
+        beartrap = lowc(d.bp.get(0)) === 98 ? 1 : 0;
         zp = d.bp.add(4);   /* skip "bear"/"land" */
         if (zp.get(0) === 32) {
             zp = zp.add(1);   /* embedded space is optional */
@@ -4810,7 +4811,7 @@ export async function readobjnam(bp, no_wish) {   // objnam.c:4910
                    fail the 'cnt < rnd(6)' test and could produce more
                    than 1 if mksobj() creates the item that way */
                 /* WEAPON_CLASS test excludes gems, gray stones */
-                if (objects[d.typ].oc_merge | 0 && (wizard() || d.cnt < rnd(6) || d.cnt <= 7 && Is_candle(d.otmp) || d.cnt <= 20 && (d.typ === ROCK || d.typ === FLINT || is_missile(d.otmp) || d.oclass === WEAPON_CLASS && is_ammo(d.otmp)))) {
+                if (objects[d.typ].oc_merge && (wizard() || d.cnt < rnd(6) || d.cnt <= 7 && Is_candle(d.otmp) || d.cnt <= 20 && (d.typ === ROCK || d.typ === FLINT || is_missile(d.otmp) || d.oclass === WEAPON_CLASS && is_ammo(d.otmp)))) {
                     d.otmp.quan = d.cnt;
                 }
             }
@@ -4824,7 +4825,7 @@ export async function readobjnam(bp, no_wish) {   // objnam.c:4910
                 d.spe = d.otmp.spe;
             } else if (wizard()) {
                 /* no restrictions except SPE_LIM */
-            } else if (d.oclass === ARMOR_CLASS || d.oclass === WEAPON_CLASS || is_weptool(d.otmp) || d.oclass === RING_CLASS && objects[d.typ].oc_charged | 0) {
+            } else if (d.oclass === ARMOR_CLASS || d.oclass === WEAPON_CLASS || is_weptool(d.otmp) || d.oclass === RING_CLASS && objects[d.typ].oc_charged) {
                 if (d.spe > rnd(5) && d.spe > d.otmp.spe) {
                     d.spe = 0;
                 }
@@ -4883,9 +4884,9 @@ export async function readobjnam(bp, no_wish) {   // objnam.c:4910
                         /* if neuter, force neuter regardless of wish request */
                         /* not neuter, honor wish unless it conflicts */
                         /* unspecified or wish conflicts */
-                        d.otmp.spe = $c.i8(!P$ ? CORPSTAT.RANDOM : is_neuter(P$) ? CORPSTAT.NEUTER : d.mgend === FEMALE && !is_male(P$) ? CORPSTAT.FEMALE : d.mgend === MALE && !is_female(P$) ? CORPSTAT.MALE : CORPSTAT.RANDOM);
+                        d.otmp.spe = !P$ ? CORPSTAT.RANDOM : is_neuter(P$) ? CORPSTAT.NEUTER : d.mgend === FEMALE && !is_male(P$) ? CORPSTAT.FEMALE : d.mgend === MALE && !is_female(P$) ? CORPSTAT.MALE : CORPSTAT.RANDOM;
                         if (P$ && d.otmp.spe === CORPSTAT.RANDOM) {
-                            $t8 = $c.i8(is_male(P$) ? CORPSTAT.MALE : is_female(P$) ? CORPSTAT.FEMALE : rn2(2) ? CORPSTAT.MALE : CORPSTAT.FEMALE), d.otmp.spe = $t8;
+                            $t8 = is_male(P$) ? CORPSTAT.MALE : is_female(P$) ? CORPSTAT.FEMALE : rn2(2) ? CORPSTAT.MALE : CORPSTAT.FEMALE, d.otmp.spe = $t8;
                         }
                         if (d.ishistoric && d.typ === STATUE) {
                             d.otmp.spe = $c.i8(d.otmp.spe | CORPSTAT.HISTORIC);
@@ -4904,7 +4905,7 @@ export async function readobjnam(bp, no_wish) {   // objnam.c:4910
                     break;
                 case WAN_WISHING:
                     if (!wizard()) {
-                        $t9 = $c.i8(rn2(10) ? -1 : 0), d.otmp.spe = $t9;
+                        $t9 = rn2(10) ? -1 : 0, d.otmp.spe = $t9;
                         break;
                     }
                 default:
@@ -4971,18 +4972,18 @@ export async function readobjnam(bp, no_wish) {   // objnam.c:4910
             if (d.iscursed) {
                 await curse(d.otmp);
             } else if (d.uncursed) {
-                d.otmp.blessed = (0) & 1;
-                d.otmp.cursed = ((Luck() < 0 && !wizard() ? 1 : 0) >>> 0) & 1;
+                d.otmp.blessed = 0;
+                d.otmp.cursed = (Luck() < 0 && !wizard() ? 1 : 0) & 1;
             } else if (d.blessed) {
-                d.otmp.blessed = ((Luck() >= 0 || wizard() ? 1 : 0) >>> 0) & 1;
-                d.otmp.cursed = ((Luck() < 0 && !wizard() ? 1 : 0) >>> 0) & 1;
+                d.otmp.blessed = (Luck() >= 0 || wizard() ? 1 : 0) & 1;
+                d.otmp.cursed = (Luck() < 0 && !wizard() ? 1 : 0) & 1;
             } else if (d.spesgn < 0) {
                 await curse(d.otmp);
             }
             /* set eroded and erodeproof */
             if (erosion_matters(d.otmp)) {
                 /* wished-for item shouldn't be eroded unless specified */
-                $t12 = d.otmp.oeroded2 = (0) & 3, d.otmp.oeroded = ($t12) & 3;
+                $t12 = d.otmp.oeroded2 = 0, d.otmp.oeroded = ($t12) & 3;
                 if (d.eroded && (is_flammable(d.otmp) || is_rustprone(d.otmp) || is_crackable(d.otmp))) {
                     d.otmp.oeroded = (d.eroded >>> 0) & 3;
                 }
@@ -4995,8 +4996,8 @@ export async function readobjnam(bp, no_wish) {   // objnam.c:4910
                  * armor modified by confused reading of cursed destroy armor)
                  * so don't prevent player from wishing for such a combination.
                  */
-                if (d.erodeproof && ((objects[d.otmp.otyp].oc_material | 0) === IRON || is_flammable(d.otmp) || is_rottable(d.otmp) || ((objects[d.otmp.otyp].oc_material | 0) === COPPER || (objects[d.otmp.otyp].oc_material | 0) === IRON) || (objects[d.otmp.otyp].oc_material | 0) === GLASS && d.otmp.oclass === ARMOR_CLASS || d.otmp.otyp === CRYSKNIFE)) {
-                    d.otmp.oerodeproof = ((Luck() >= 0 || wizard() ? 1 : 0) >>> 0) & 1;
+                if (d.erodeproof && (objects[d.otmp.otyp].oc_material === IRON || is_flammable(d.otmp) || is_rottable(d.otmp) || (objects[d.otmp.otyp].oc_material === COPPER || objects[d.otmp.otyp].oc_material === IRON) || objects[d.otmp.otyp].oc_material === GLASS && d.otmp.oclass === ARMOR_CLASS || d.otmp.otyp === CRYSKNIFE)) {
+                    d.otmp.oerodeproof = (Luck() >= 0 || wizard() ? 1 : 0) & 1;
                 }
             }
             /* set otmp->recharged */
@@ -5010,7 +5011,7 @@ export async function readobjnam(bp, no_wish) {   // objnam.c:4910
             /* set poisoned */
             if (d.ispoisoned) {
                 if (d.otmp.oclass === WEAPON_CLASS && objects[d.otmp.otyp].oc_subtyp >= -P.SHURIKEN && objects[d.otmp.otyp].oc_subtyp <= -P.BOW || permapoisoned(d.otmp)) {
-                    d.otmp.otrapped = ((Luck() >= 0 ? 1 : 0) >>> 0) & 1;
+                    d.otmp.otrapped = (Luck() >= 0 ? 1 : 0) & 1;
                 } else if (d.oclass === FOOD_CLASS) {   /* try to taint by making it as old as possible */
                     d.otmp.age = 1;
                 }
@@ -5018,7 +5019,7 @@ export async function readobjnam(bp, no_wish) {   // objnam.c:4910
             /* and [un]trapped */
             if (d.trapped) {
                 if (Is_box(d.otmp) || d.typ === TIN) {
-                    d.otmp.otrapped = ((d.trapped === 1 ? 1 : 0) >>> 0) & 1;
+                    d.otmp.otrapped = (d.trapped === 1 ? 1 : 0) & 1;
                 }
             }
             /* empty for containers rather than for tins */
@@ -5037,21 +5038,21 @@ export async function readobjnam(bp, no_wish) {   // objnam.c:4910
             /* set locked/unlocked/broken */
             if (Is_box(d.otmp)) {
                 if (d.locked) {
-                    d.otmp.olocked = (1) & 1, d.otmp.obroken = (0) & 1;
+                    d.otmp.olocked = 1, d.otmp.obroken = 0;
                 } else if (d.unlocked) {
-                    d.otmp.olocked = (0) & 1, d.otmp.obroken = (0) & 1;
+                    d.otmp.olocked = 0, d.otmp.obroken = 0;
                 } else if (d.broken) {
-                    d.otmp.olocked = (0) & 1, d.otmp.obroken = (1) & 1;
+                    d.otmp.olocked = 0, d.otmp.obroken = 1;
                 }
                 if (d.otmp.obroken) {
-                    d.otmp.otrapped = (0) & 1;
+                    d.otmp.otrapped = 0;
                 }
             }
             if (d.isgreased) {
-                d.otmp.greased = (1) & 1;
+                d.otmp.greased = 1;
             }
             if (d.isdiluted && d.otmp.oclass === POTION_CLASS) {
-                d.otmp.oeroded = ((d.otmp.otyp !== POT_WATER ? 1 : 0) >>> 0) & 3;
+                d.otmp.oeroded = (d.otmp.otyp !== POT_WATER ? 1 : 0) & 3;
             }
             /* set tin variety */
             if (d.otmp.otyp === TIN && d.tvariety >= 0 && (rn2(4) || wizard())) {
@@ -5075,7 +5076,7 @@ export async function readobjnam(bp, no_wish) {   // objnam.c:4910
                 }
             }
             if (permapoisoned(d.otmp)) {
-                d.otmp.otrapped = (1) & 1;
+                d.otmp.otrapped = 1;
             }
             /* more wishing abuse: don't allow wishing for certain artifacts */
             /* and make them pay; charge them for the wish anyway! */
@@ -5218,7 +5219,7 @@ export function cloak_simple_name(cloak) {   // objnam.c:5492
             case MUMMY_WRAPPING:
                 return $c.lit("wrapping");
             case ALCHEMY_SMOCK:
-                return objects[cloak.otyp].oc_name_known | 0 && cloak.dknown | 0 ? $c.lit("smock") : $c.lit("apron");
+                return objects[cloak.otyp].oc_name_known && cloak.dknown ? $c.lit("smock") : $c.lit("apron");
             default:
                 break;
         }
@@ -5252,12 +5253,12 @@ export function helm_simple_name(helmet) {   // objnam.c:5513
  */
 export function gloves_simple_name(gloves) {   // objnam.c:5532
     let otyp = 0, ocl = null, actualn = null, descrpn = null;
-    if (gloves && gloves.dknown | 0) {
+    if (gloves && gloves.dknown) {
         otyp = gloves.otyp;
         ocl = $c.relem(objects, otyp);
         actualn = obj_descr[ocl.oc_name_idx].oc_name;
         descrpn = obj_descr[ocl.oc_descr_idx].oc_descr;
-        if (strstri(objects[otyp].oc_name_known | 0 ? actualn : descrpn, new $c.Ptr(gloves_simple_name$gauntlets, 0))) {
+        if (strstri(objects[otyp].oc_name_known ? actualn : descrpn, new $c.Ptr(gloves_simple_name$gauntlets, 0))) {
             return new $c.Ptr(gloves_simple_name$gauntlets, 0);
         }
     }
@@ -5270,12 +5271,12 @@ export function gloves_simple_name(gloves) {   // objnam.c:5532
  */
 export function boots_simple_name(boots) {   // objnam.c:5551
     let otyp = 0, ocl = null, actualn = null, descrpn = null;
-    if (boots && boots.dknown | 0) {
+    if (boots && boots.dknown) {
         otyp = boots.otyp;
         ocl = $c.relem(objects, otyp);
         actualn = obj_descr[ocl.oc_name_idx].oc_name;
         descrpn = obj_descr[ocl.oc_descr_idx].oc_descr;
-        if (strstri(descrpn, new $c.Ptr(boots_simple_name$shoes, 0)) || objects[otyp].oc_name_known | 0 && strstri(actualn, new $c.Ptr(boots_simple_name$shoes, 0))) {
+        if (strstri(descrpn, new $c.Ptr(boots_simple_name$shoes, 0)) || objects[otyp].oc_name_known && strstri(actualn, new $c.Ptr(boots_simple_name$shoes, 0))) {
             return new $c.Ptr(boots_simple_name$shoes, 0);
         }
     }
@@ -5290,7 +5291,7 @@ export function shield_simple_name(shield) {   // objnam.c:5570
     if (shield) {
         /* xname() describes unknown (unseen) reflection as smooth */
         if (shield.otyp === SHIELD_OF_REFLECTION) {
-            return shield.dknown | 0 ? $c.lit("silver shield") : $c.lit("smooth shield");
+            return shield.dknown ? $c.lit("silver shield") : $c.lit("smooth shield");
         }
         /*
          * We might distinguish between wooden vs metallic or
@@ -5412,7 +5413,7 @@ export async function safe_qbuf(qbuf, qprefix, qsuffix, obj, func, altfunc, last
     return qbuf;
 }
 function GemStone(typ) {
-    return typ === FLINT || (objects[typ].oc_material | 0) === GEMSTONE && (typ !== DILITHIUM_CRYSTAL && typ !== RUBY && typ !== DIAMOND && typ !== SAPPHIRE && typ !== BLACK_OPAL && typ !== EMERALD && typ !== OPAL) ? 1 : 0;
+    return typ === FLINT || objects[typ].oc_material === GEMSTONE && (typ !== DILITHIUM_CRYSTAL && typ !== RUBY && typ !== DIAMOND && typ !== SAPPHIRE && typ !== BLACK_OPAL && typ !== EMERALD && typ !== OPAL) ? 1 : 0;
 }
 
 export function $init() {

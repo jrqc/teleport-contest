@@ -75,7 +75,7 @@ export function newpw() {   // exper.c:45
     let en = 0, enrnd = 0, enfix = 0, lim = 0;
     en = 0;
     if (u.ulevel === 0) {
-        en = gu.urole.enadv.infix + gu.urace.enadv.infix | 0;
+        en = gu.urole.enadv.infix + gu.urace.enadv.infix;
         if (gu.urole.enadv.inrnd > 0) {
             en = en + rnd(gu.urole.enadv.inrnd) | 0;
         }
@@ -85,11 +85,11 @@ export function newpw() {   // exper.c:45
     } else {
         enrnd = $c.div32(ACURR(A.WIS), 2);
         if (u.ulevel < gu.urole.xlev) {
-            enrnd = enrnd + (gu.urole.enadv.lornd + gu.urace.enadv.lornd | 0) | 0;
-            enfix = gu.urole.enadv.lofix + gu.urace.enadv.lofix | 0;
+            enrnd = enrnd + (gu.urole.enadv.lornd + gu.urace.enadv.lornd) | 0;
+            enfix = gu.urole.enadv.lofix + gu.urace.enadv.lofix;
         } else {
-            enrnd = enrnd + (gu.urole.enadv.hirnd + gu.urace.enadv.hirnd | 0) | 0;
-            enfix = gu.urole.enadv.hifix + gu.urace.enadv.hifix | 0;
+            enrnd = enrnd + (gu.urole.enadv.hirnd + gu.urace.enadv.hirnd) | 0;
+            enfix = gu.urole.enadv.hifix + gu.urace.enadv.hifix;
         }
         en = enermod(rn2(enrnd) + enfix | 0);
     }
@@ -103,7 +103,7 @@ export function newpw() {   // exper.c:45
         /* after level 30, throttle energy gains from extra experience;
            once max reaches 600, further increments will be just 1 more */
         lim = $c.i8(4 - $c.div32(u.uenmax, 200) | 0);
-        lim = $c.i8(lim > 1 ? lim : 1);
+        lim = lim > 1 ? lim : 1;
         if (en > lim) {
             en = lim;
         }
@@ -119,7 +119,7 @@ export function newpw() {   // exper.c:45
 export function experience(mtmp, nk) {   // exper.c:85
     let ptr = null, i = 0, tmp = 0, tmp2 = 0;
     ptr = mtmp.data;
-    tmp = 1 + Math.imul(mtmp.m_lev, mtmp.m_lev) | 0;
+    tmp = 1 + mtmp.m_lev * mtmp.m_lev;
     /*  For higher ac values, give extra experience */
     if ((i = find_mac(mtmp)) < 3) {
         tmp = tmp + Math.imul(7 - i | 0, i < 0 ? 2 : 1) | 0;
@@ -145,14 +145,14 @@ export function experience(mtmp, nk) {   // exper.c:85
     for (i = 0; i < NATTK; i = i + 1 | 0) {
         tmp2 = ptr.mattk[i].adtyp;
         if (tmp2 > AD.PHYS && tmp2 < AD.BLND) {
-            tmp = tmp + Math.imul(2, mtmp.m_lev) | 0;
+            tmp = tmp + 2 * mtmp.m_lev | 0;
         } else if (tmp2 === AD.DRLI || tmp2 === AD.STON || tmp2 === AD.SLIM) {
             tmp = tmp + 50 | 0;
         } else if (tmp2 !== AD.PHYS) {
             tmp = tmp + mtmp.m_lev | 0;
         }
         /* extra heavy damage bonus */
-        if (Math.imul(ptr.mattk[i].damd, ptr.mattk[i].damn) > 23) {
+        if (ptr.mattk[i].damd * ptr.mattk[i].damn > 23) {
             tmp = tmp + mtmp.m_lev | 0;
         }
         if (tmp2 === AD.WRAP && ptr.mlet === S.EEL && !(u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.AMPHIBIOUS) !== 0)) {
@@ -161,7 +161,7 @@ export function experience(mtmp, nk) {   // exper.c:85
     }
     /*  For certain "extra nasty" monsters, give even more */
     if (extra_nasty(ptr)) {
-        tmp = tmp + Math.imul(7, mtmp.m_lev) | 0;
+        tmp = tmp + 7 * mtmp.m_lev | 0;
     }
     /*  For higher level monsters, an additional bonus is given */
     if (mtmp.m_lev > 8) {
@@ -171,7 +171,7 @@ export function experience(mtmp, nk) {   // exper.c:85
     if (mtmp.data === mons[PM.MAIL_DAEMON]) {
         tmp = 1;
     }
-    if (mtmp.mrevived | 0 || mtmp.mcloned | 0) {
+    if (mtmp.mrevived || mtmp.mcloned) {
         /*
          *      Reduce experience awarded for repeated killings of
          *      "the same monster".  Kill count includes all of this

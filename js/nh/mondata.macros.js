@@ -261,7 +261,7 @@ export function cantwield(ptr) {
     return $c.andu64(ptr.mflags1, M1.NOHANDS) !== 0 || ptr.msize < MZ.SMALL ? 1 : 0;
 }
 export function could_twoweap(ptr) {
-    return (((ptr.mattk[0].aatyp === AT.WEAP ? 1 : 0) + (ptr.mattk[1].aatyp === AT.WEAP ? 1 : 0) | 0) + (ptr.mattk[2].aatyp === AT.WEAP ? 1 : 0) | 0) > 1 ? 1 : 0;
+    return (ptr.mattk[0].aatyp === AT.WEAP ? 1 : 0) + (ptr.mattk[1].aatyp === AT.WEAP ? 1 : 0) + (ptr.mattk[2].aatyp === AT.WEAP ? 1 : 0) > 1 ? 1 : 0;
 }
 export function throws_rocks(ptr) {
     return $c.andu64(ptr.mflags2, M2.ROCKTHROW) !== 0 ? 1 : 0;
@@ -384,5 +384,5 @@ export function corpse_eater(ptr) {
     return ptr === mons[PM.PURPLE_WORM] || ptr === mons[PM.BABY_PURPLE_WORM] || ptr === mons[PM.GHOUL] || ptr === mons[PM.PIRANHA] ? 1 : 0;
 }
 export function befriend_with_obj(ptr, obj) {
-    return ptr === mons[PM.MONKEY] || ptr === mons[PM.APE] ? obj.otyp === BANANA ? 1 : 0 : $c.andu64(ptr.mflags2, M2.DOMESTIC) !== 0 && obj.oclass === FOOD_CLASS && (ptr.mlet !== S.UNICORN || (objects[obj.otyp].oc_material | 0) === VEGGY || obj.otyp === CORPSE && obj.corpsenm === PM.LICHEN) ? 1 : 0;
+    return ptr === mons[PM.MONKEY] || ptr === mons[PM.APE] ? obj.otyp === BANANA ? 1 : 0 : $c.andu64(ptr.mflags2, M2.DOMESTIC) !== 0 && obj.oclass === FOOD_CLASS && (ptr.mlet !== S.UNICORN || objects[obj.otyp].oc_material === VEGGY || obj.otyp === CORPSE && obj.corpsenm === PM.LICHEN) ? 1 : 0;
 }

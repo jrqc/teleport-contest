@@ -132,7 +132,7 @@ function iswall_or_stone(x, y) {   // mkmaze.c:59
  * @returns {number} boolean
  */
 function is_solid(x, y) {   // mkmaze.c:70
-    return $c.i8(!isok(x, y) || svl.level.locations[x][y].typ <= DBWALL ? 1 : 0);
+    return !isok(x, y) || svl.level.locations[x][y].typ <= DBWALL ? 1 : 0;
 }
 /* set map terrain type, handling lava lit, ice melt timers, etc */
 /**
@@ -148,7 +148,7 @@ export async function set_levltyp(x, y, newtyp) {   // mkmaze.c:77
         /* hack for secret doors in garden theme rooms */
         if (oldtyp === SDOOR && newtyp === AIR) {
             /* levl[][].typ stays SDOOR rather than change to AIR */
-            svl.level.locations[x][y].candig = (1) & 1;
+            svl.level.locations[x][y].candig = 1;
             return TRUE;
         }
         if (CAN_OVERWRITE_TERRAIN(oldtyp)) {
@@ -160,7 +160,7 @@ export async function set_levltyp(x, y, newtyp) {   // mkmaze.c:77
              *  the way newtyp will use them, clear them.
              */
             if (IS_LAVA(newtyp)) {   /* [what about IS_LAVA(oldtyp)=>.lit = 0?] */
-                svl.level.locations[x][y].lit = (1) & 1;
+                svl.level.locations[x][y].lit = 1;
             }
             if (was_ice && newtyp !== ICE) {
                 /* frozen corpses resume rotting, no more ice to melt away */
@@ -277,7 +277,7 @@ async function wall_cleanup(x1, y1, x2, y2) {   // mkmaze.c:198
             lev = $c.relem(svl.level.locations[x], y);
             type = $c.u8(lev.typ);
             if (IS_WALL(type) && type !== DBWALL) {
-                if (is_solid($c.i16(x - 1 | 0), $c.i16(y - 1 | 0)) && is_solid($c.i16(x - 1 | 0), y) && is_solid($c.i16(x - 1 | 0), $c.i16(y + 1 | 0)) && is_solid(x, $c.i16(y - 1 | 0)) && is_solid(x, $c.i16(y + 1 | 0)) && is_solid($c.i16(x + 1 | 0), $c.i16(y - 1 | 0)) && is_solid($c.i16(x + 1 | 0), y) && is_solid($c.i16(x + 1 | 0), $c.i16(y + 1 | 0))) {
+                if (is_solid($c.i16(x - 1), $c.i16(y - 1)) && is_solid($c.i16(x - 1), y) && is_solid($c.i16(x - 1), $c.i16(y + 1)) && is_solid(x, $c.i16(y - 1)) && is_solid(x, $c.i16(y + 1)) && is_solid($c.i16(x + 1), $c.i16(y - 1)) && is_solid($c.i16(x + 1), y) && is_solid($c.i16(x + 1), $c.i16(y + 1))) {
                     lev.typ = STONE;
                 }
             }
@@ -315,16 +315,16 @@ export async function fix_wall_spines(x1, y1, x2, y2) {   // mkmaze.c:229
             /* set the locations TRUE if rock or wall or out of bounds */
             /* for baalz insect */
             loc_f = x >= gb.bughack.inarea.x1 && x <= gb.bughack.inarea.x2 && y >= gb.bughack.inarea.y1 && y <= gb.bughack.inarea.y2 ? iswall : iswall_or_stone;
-            $t1 = await loc_f($c.i16(x - 1 | 0), $c.i16(y - 1 | 0)), locale[0][0] = $t1;
-            $t2 = await loc_f(x, $c.i16(y - 1 | 0)), locale[1][0] = $t2;
-            $t3 = await loc_f($c.i16(x + 1 | 0), $c.i16(y - 1 | 0)), locale[2][0] = $t3;
-            $t4 = await loc_f($c.i16(x - 1 | 0), y), locale[0][1] = $t4;
-            $t5 = await loc_f($c.i16(x + 1 | 0), y), locale[2][1] = $t5;
-            $t6 = await loc_f($c.i16(x - 1 | 0), $c.i16(y + 1 | 0)), locale[0][2] = $t6;
-            $t7 = await loc_f(x, $c.i16(y + 1 | 0)), locale[1][2] = $t7;
-            $t8 = await loc_f($c.i16(x + 1 | 0), $c.i16(y + 1 | 0)), locale[2][2] = $t8;
+            $t1 = await loc_f($c.i16(x - 1), $c.i16(y - 1)), locale[0][0] = $t1;
+            $t2 = await loc_f(x, $c.i16(y - 1)), locale[1][0] = $t2;
+            $t3 = await loc_f($c.i16(x + 1), $c.i16(y - 1)), locale[2][0] = $t3;
+            $t4 = await loc_f($c.i16(x - 1), y), locale[0][1] = $t4;
+            $t5 = await loc_f($c.i16(x + 1), y), locale[2][1] = $t5;
+            $t6 = await loc_f($c.i16(x - 1), $c.i16(y + 1)), locale[0][2] = $t6;
+            $t7 = await loc_f(x, $c.i16(y + 1)), locale[1][2] = $t7;
+            $t8 = await loc_f($c.i16(x + 1), $c.i16(y + 1)), locale[2][2] = $t8;
             /* determine if wall should extend to each direction NSEW */
-            bits = extend_spine(new $c.Ptr(locale, 0), iswall(x, $c.i16(y - 1 | 0)), 0, -1) << 3 | extend_spine(new $c.Ptr(locale, 0), iswall(x, $c.i16(y + 1 | 0)), 0, 1) << 2 | extend_spine(new $c.Ptr(locale, 0), iswall($c.i16(x + 1 | 0), y), 1, 0) << 1 | extend_spine(new $c.Ptr(locale, 0), iswall($c.i16(x - 1 | 0), y), -1, 0);
+            bits = extend_spine(new $c.Ptr(locale, 0), iswall(x, $c.i16(y - 1)), 0, -1) << 3 | extend_spine(new $c.Ptr(locale, 0), iswall(x, $c.i16(y + 1)), 0, 1) << 2 | extend_spine(new $c.Ptr(locale, 0), iswall($c.i16(x + 1), y), 1, 0) << 1 | extend_spine(new $c.Ptr(locale, 0), iswall($c.i16(x - 1), y), -1, 0);
             /* don't change typ if wall is free-standing */
             if (bits) {
                 lev.typ = $c.i8(fix_wall_spines$spine_array[bits]);
@@ -434,7 +434,7 @@ export function is_exclusion_zone(type, x, y) {   // mkmaze.c:317
  * @returns {number} boolean
  */
 export function bad_location(x, y, nlx, nly, nhx, nhy) {   // mkmaze.c:341
-    return $c.i8(occupied(x, y) || within_bounded_area(x, y, nlx, nly, nhx, nhy) || !(svl.level.locations[x][y].typ === CORR && svl.level.flags.is_maze_lev | 0 || svl.level.locations[x][y].typ === ROOM || svl.level.locations[x][y].typ === AIR) ? 1 : 0);
+    return occupied(x, y) || within_bounded_area(x, y, nlx, nly, nhx, nhy) || !(svl.level.locations[x][y].typ === CORR && svl.level.flags.is_maze_lev || svl.level.locations[x][y].typ === ROOM || svl.level.locations[x][y].typ === AIR) ? 1 : 0;
 }
 /* pick a location in area (lx, ly, hx, hy) but not in (nlx, nly, nhx, nhy)
    and place something (based on rtype) in that region */
@@ -482,10 +482,10 @@ export async function place_lregion(lx, ly, hx, hy, nlx, nly, nhx, nhy, rtype, l
         hy = ROWNO - 1;
     }
     /* first a probabilistic approach */
-    oneshot = $c.i8(lx === hx && ly === hy ? 1 : 0);
+    oneshot = lx === hx && ly === hy ? 1 : 0;
     for (trycnt = 0; trycnt < 200; trycnt = trycnt + 1 | 0) {
-        x = $c.i16(rn2((hx - lx | 0) + 1 | 0) + lx | 0);
-        y = $c.i16(rn2((hy - ly | 0) + 1 | 0) + ly | 0);
+        x = $c.i16(rn2(hx - lx + 1) + lx | 0);
+        y = $c.i16(rn2(hy - ly + 1) + ly | 0);
         if (await put_lregion_here(x, y, nlx, nly, nhx, nhy, rtype, oneshot, lev)) {
             return;
         }
@@ -523,8 +523,8 @@ async function put_lregion_here(x, y, nlx, nly, nhx, nhy, rtype, oneshot, lev) {
                It might still fail if there's a dungeon feature here. */
             t = t_at(x, y);
             if (t && !undestroyable_trap(t.ttyp)) {
-                if ((mtmp = svl.level.monsters[x][y]) !== null && mtmp.mtrapped | 0) {
-                    mtmp.mtrapped = (0) & 1;
+                if ((mtmp = svl.level.monsters[x][y]) !== null && mtmp.mtrapped) {
+                    mtmp.mtrapped = 0;
                 }
                 await deltrap(t);
             }
@@ -584,7 +584,7 @@ async function baalz_fixup() {   // mkmaze.c:475
     /* find low and high x for to-be-wallified portion of level */
     y = 10;
     for (lastx = x = 0; x < COLNO; x = x + 1 | 0) {
-        if (((svl.level.locations[x][y].flags | 0) & W.NONDIGGABLE) !== 0) {
+        if ((svl.level.locations[x][y].flags & W.NONDIGGABLE) !== 0) {
             if (!lastx) {
                 gb.bughack.inarea.x1 = $c.i16(x + 1 | 0);
             }
@@ -595,7 +595,7 @@ async function baalz_fixup() {   // mkmaze.c:475
     /* find low and high y for to-be-wallified portion of level */
     x = gb.bughack.inarea.x1;
     for (lasty = y = 0; y < ROWNO; y = y + 1 | 0) {
-        if (((svl.level.locations[x][y].flags | 0) & W.NONDIGGABLE) !== 0) {
+        if ((svl.level.locations[x][y].flags & W.NONDIGGABLE) !== 0) {
             if (!lasty) {
                 gb.bughack.inarea.y1 = $c.i16(y + 1 | 0);
             }
@@ -615,12 +615,12 @@ async function baalz_fixup() {   // mkmaze.c:475
                 }
             } else if (svl.level.locations[x][y].typ === IRONBARS) {
                 /* novelty effect; allowing digging in front of 'eyes' */
-                if (isok($c.i16(x - 1 | 0), $c.i16(y)) && ((svl.level.locations[x - 1 | 0][y].flags | 0) & W.NONDIGGABLE) !== 0) {
+                if (isok($c.i16(x - 1 | 0), $c.i16(y)) && (svl.level.locations[x - 1 | 0][y].flags & W.NONDIGGABLE) !== 0) {
                     svl.level.locations[x - 1 | 0][y].flags = (((svl.level.locations[x - 1 | 0][y].flags | 0) & ~W.NONDIGGABLE) >>> 0) & 31;
                     if (isok($c.i16(x - 2 | 0), $c.i16(y))) {
                         svl.level.locations[x - 2 | 0][y].flags = (((svl.level.locations[x - 2 | 0][y].flags | 0) & ~W.NONDIGGABLE) >>> 0) & 31;
                     }
-                } else if (isok($c.i16(x + 1 | 0), $c.i16(y)) && ((svl.level.locations[x + 1 | 0][y].flags | 0) & W.NONDIGGABLE) !== 0) {
+                } else if (isok($c.i16(x + 1 | 0), $c.i16(y)) && (svl.level.locations[x + 1 | 0][y].flags & W.NONDIGGABLE) !== 0) {
                     svl.level.locations[x + 1 | 0][y].flags = (((svl.level.locations[x + 1 | 0][y].flags | 0) & ~W.NONDIGGABLE) >>> 0) & 31;
                     if (isok($c.i16(x + 2 | 0), $c.i16(y))) {
                         svl.level.locations[x + 2 | 0][y].flags = (((svl.level.locations[x + 2 | 0][y].flags | 0) & ~W.NONDIGGABLE) >>> 0) & 31;
@@ -629,13 +629,13 @@ async function baalz_fixup() {   // mkmaze.c:475
             }
         }
     }
-    await wallification($c.i16((gb.bughack.inarea.x1 - 2 | 0) > 1 ? gb.bughack.inarea.x1 - 2 | 0 : 1), $c.i16((gb.bughack.inarea.y1 - 2 | 0) > 0 ? gb.bughack.inarea.y1 - 2 | 0 : 0), $c.i16((gb.bughack.inarea.x2 + 2 | 0) < COLNO - 1 ? gb.bughack.inarea.x2 + 2 | 0 : COLNO - 1), $c.i16((gb.bughack.inarea.y2 + 2 | 0) < ROWNO - 1 ? gb.bughack.inarea.y2 + 2 | 0 : ROWNO - 1));
+    await wallification($c.i16(gb.bughack.inarea.x1 - 2 > 1 ? gb.bughack.inarea.x1 - 2 : 1), $c.i16(gb.bughack.inarea.y1 - 2 > 0 ? gb.bughack.inarea.y1 - 2 : 0), $c.i16(gb.bughack.inarea.x2 + 2 < COLNO - 1 ? gb.bughack.inarea.x2 + 2 : COLNO - 1), $c.i16(gb.bughack.inarea.y2 + 2 < ROWNO - 1 ? gb.bughack.inarea.y2 + 2 : ROWNO - 1));
     /* bughack hack for rear-most legs on baalz level; first joint on
        both top and bottom gets a bogus extra connection to room area,
        producing unwanted rectangles; change back to separated legs */
     x = gb.bughack.delarea.x1, y = gb.bughack.delarea.y1;
     if (isok($c.i16(x), $c.i16(y)) && (svl.level.locations[x][y].typ === TLWALL || svl.level.locations[x][y].typ === TRWALL) && isok($c.i16(x), $c.i16(y + 1 | 0)) && svl.level.locations[x][y + 1 | 0].typ === TUWALL) {
-        svl.level.locations[x][y].typ = $c.i8(svl.level.locations[x][y].typ === TLWALL ? BRCORNER : BLCORNER);
+        svl.level.locations[x][y].typ = svl.level.locations[x][y].typ === TLWALL ? BRCORNER : BLCORNER;
         svl.level.locations[x][y + 1 | 0].typ = HWALL;
         if ((mtmp = svl.level.monsters[x][y]) !== null) {   /* something at temporary pool... */
             await rloc(mtmp, RLOC.ERR | RLOC.NOMSG);
@@ -643,7 +643,7 @@ async function baalz_fixup() {   // mkmaze.c:475
     }
     x = gb.bughack.delarea.x2, y = gb.bughack.delarea.y2;
     if (isok($c.i16(x), $c.i16(y)) && (svl.level.locations[x][y].typ === TLWALL || svl.level.locations[x][y].typ === TRWALL) && isok($c.i16(x), $c.i16(y - 1 | 0)) && svl.level.locations[x][y - 1 | 0].typ === TDWALL) {
-        svl.level.locations[x][y].typ = $c.i8(svl.level.locations[x][y].typ === TLWALL ? TRCORNER : TLCORNER);
+        svl.level.locations[x][y].typ = svl.level.locations[x][y].typ === TLWALL ? TRCORNER : TLCORNER;
         svl.level.locations[x][y - 1 | 0].typ = HWALL;
         if ((mtmp = svl.level.monsters[x][y]) !== null) {   /* something at temporary pool... */
             await rloc(mtmp, RLOC.ERR | RLOC.NOMSG);
@@ -666,7 +666,7 @@ export async function fixup_special() {   // mkmaze.c:570
     r = gl.lregions;
     added_branch = FALSE;
     if ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) || (svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level)) {
-        svl.level.flags.hero_memory = (0) & 1;
+        svl.level.flags.hero_memory = 0;
         /* water level is an odd beast - it has to be set up
            before calling place_lregions etc. */
         await setup_waterlevel();
@@ -760,17 +760,17 @@ export async function fixup_special() {   // mkmaze.c:570
         }
     } else if (gu.urole.mnum === PM.CLERIC && In_quest(u.uz)) {
         /* less chance for undead corpses (lured from lower morgues) */
-        svl.level.flags.graveyard = (1) & 1;
+        svl.level.flags.graveyard = 1;
     } else if ((svd.dungeon_topology.d_stronghold_level.dlevel || svd.dungeon_topology.d_stronghold_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_stronghold_level)) {
-        svl.level.flags.graveyard = (1) & 1;
+        svl.level.flags.graveyard = 1;
     } else if (on_level(u.uz, svd.dungeon_topology.d_baalzebub_level)) {
         /* custom wallify the "beetle" potion of the level */
         await baalz_fixup();
     } else if (u.uz.dnum === svd.dungeon_topology.d_mines_dnum && gr.ransacked) {
         await stolen_booty();
     }
-    if ((sp = Is_special(u.uz)) !== null && sp.flags.town | 0) {   /* Mine Town */
-        svl.level.flags.has_town = (1) & 1;
+    if ((sp = Is_special(u.uz)) !== null && sp.flags.town) {   /* Mine Town */
+        svl.level.flags.has_town = 1;
     }
     if (gl.lregions) {
         $c.free(gl.lregions), gl.lregions = null;
@@ -783,7 +783,7 @@ export async function fixup_special() {   // mkmaze.c:570
 function check_ransacked(s) {   // mkmaze.c:707
     let $t1;
     /* this kludge only works as long as orctown is minetn-1 */
-    $t1 = $c.i8(u.uz.dnum === svd.dungeon_topology.d_mines_dnum && !$c.strcmp(s, $c.lit("minetn-1")) ? 1 : 0), gr.ransacked = $t1;
+    $t1 = u.uz.dnum === svd.dungeon_topology.d_mines_dnum && !$c.strcmp(s, $c.lit("minetn-1")) ? 1 : 0, gr.ransacked = $t1;
 }
 /**
  * @param {$T.monst | null} mtmp struct monst *
@@ -824,7 +824,7 @@ async function migrate_orc(mtmp, mflags) {   // mkmaze.c:717
  */
 async function shiny_orc_stuff(mtmp) {   // mkmaze.c:748
     let gemprob = 0, goldprob = 0, otyp = 0, otmp = null, is_captain = 0, $t1, $t2;
-    is_captain = $c.i8(mtmp.data === mons[PM.ORC_CAPTAIN] ? 1 : 0);
+    is_captain = mtmp.data === mons[PM.ORC_CAPTAIN] ? 1 : 0;
     /* probabilities */
     goldprob = is_captain ? 600 : 300;
     gemprob = $c.div32(goldprob, 4);
@@ -918,7 +918,7 @@ async function stolen_booty() {   // mkmaze.c:799
     mtmp = await makemon(mons[PM.ORC_CAPTAIN], 0, 0, MM.NONAME);
     if (mtmp) {
         mtmp = await christen_monst(mtmp, upstart(gang));
-        mtmp.mpeaceful = (0) & 1;
+        mtmp.mpeaceful = 0;
         set_malign(mtmp);
         await shiny_orc_stuff(mtmp);
         await migrate_orc(mtmp, ORC_LEADER);
@@ -967,7 +967,7 @@ async function stolen_booty() {   // mkmaze.c:799
 function maze_inbounds(x, y) {   // mkmaze.c:894
     /* isok() test is superfluous here (unless something has
        clobbered the static *_maze_max variables) */
-    return $c.i8(x >= 2 && y >= 2 && x < gx.x_maze_max && y < gy.y_maze_max && isok(x, y) ? 1 : 0);
+    return x >= 2 && y >= 2 && x < gx.x_maze_max && y < gy.y_maze_max && isok(x, y) ? 1 : 0;
 }
 /**
  * @param {number} typ xint16
@@ -1055,7 +1055,7 @@ async function maze_remove_deadends(typ) {   // mkmaze.c:904
                 if (idx2 >= 3 && idx > 0) {
                     dx = x;
                     dy = y;
-                    dir = $c.i16(dirok[rn2(idx)]);
+                    dir = dirok[rn2(idx)];
                     do {
                         switch (dir) {
                             case 0:
@@ -1123,7 +1123,7 @@ export async function create_maze(corrwid, wallthick, rmdeadends) {   // mkmaze.
     } else {
         for (x = 2; x <= Math.imul(rdx, 2); x = $c.i16(x + 1)) {
             for (y = 2; y <= Math.imul(rdy, 2); y = $c.i16(y + 1)) {
-                svl.level.locations[x][y].typ = $c.i8($c.rem32(x, 2) && $c.rem32(y, 2) ? STONE : HWALL);
+                svl.level.locations[x][y].typ = $c.rem32(x, 2) && $c.rem32(y, 2) ? STONE : HWALL;
             }
         }
     }
@@ -1132,9 +1132,9 @@ export async function create_maze(corrwid, wallthick, rmdeadends) {   // mkmaze.
     gy.y_maze_max = Math.imul(rdy, 2);
     /* create maze */
     maze0xy(mm);
-    await walkfrom($c.i16(mm.x), $c.i16(mm.y), 0);
+    await walkfrom(mm.x, mm.y, 0);
     if (rmdeadends) {
-        await maze_remove_deadends($c.i16(svl.level.flags.corrmaze | 0 ? CORR : ROOM));
+        await maze_remove_deadends(svl.level.flags.corrmaze ? CORR : ROOM);
     }
     /* restore bounds */
     gx.x_maze_max = tmp_xmax;
@@ -1210,7 +1210,7 @@ export async function pick_vibrasquare_location() {   // mkmaze.c:1042
         if ((trycnt = trycnt + 1 | 0) > 1000) {
             break;
         }
-    } while ((stway = stairway_find_dir(TRUE)) !== null && (x === stway.sx || y === stway.sy || $c.abs(x - stway.sx | 0) === $c.abs(y - stway.sy | 0) || distmin(x, y, stway.sx, stway.sy) <= INVPOS_DISTANCE || !(svl.level.locations[x][y].typ > DOOR) || occupied(x, y)));
+    } while ((stway = stairway_find_dir(TRUE)) !== null && (x === stway.sx || y === stway.sy || $c.abs(x - stway.sx) === $c.abs(y - stway.sy) || distmin(x, y, stway.sx, stway.sy) <= INVPOS_DISTANCE || !(svl.level.locations[x][y].typ > DOOR) || occupied(x, y)));
     /*(direct line)*/
     svi.inv_pos.x = x;
     svi.inv_pos.y = y;
@@ -1223,7 +1223,7 @@ async function populate_maze() {   // mkmaze.c:1097
     let i = 0, mm = new $T.nhcoord();
     for (i = rn2(8) + 11 | 0; i; i = i - 1 | 0) {
         await mazexy(mm);
-        await mkobj_at($c.i8(rn2(2) ? GEM_CLASS : RANDOM_CLASS), mm.x, mm.y, TRUE);
+        await mkobj_at(rn2(2) ? GEM_CLASS : RANDOM_CLASS, mm.x, mm.y, TRUE);
     }
     for (i = rn2(10) + 2 | 0; i; i = i - 1 | 0) {
         await mazexy(mm);
@@ -1308,10 +1308,10 @@ export async function makemaz(s) {   // mkmaze.c:1127
         }
         await impossible($c.lit("Couldn't load \"%s\" - making a maze."), new $c.Ptr(protofile, 0));
     }
-    svl.level.flags.is_maze_lev = (1) & 1;
-    $t1 = (!rn2(3) ? 1 : 0) >>> 0, svl.level.flags.corrmaze = ($t1) & 1;
+    svl.level.flags.is_maze_lev = 1;
+    $t1 = !rn2(3) ? 1 : 0, svl.level.flags.corrmaze = ($t1) & 1;
     if (!Invocation_lev(u.uz) && rn2(2)) {
-        await create_maze(-1, -1, $c.i8(!rn2(5) ? 1 : 0));
+        await create_maze(-1, -1, !rn2(5) ? 1 : 0);
     } else {
         await create_maze(1, 1, FALSE);
     }
@@ -1359,7 +1359,7 @@ export async function walkfrom(x, y, typ) {   // mkmaze.c:1279
     if (!(svl.level.locations[x][y].typ === DOOR)) {
         /* might still be on edge of MAP, so don't overwrite */
         svl.level.locations[x][y].typ = typ;
-        svl.level.locations[x][y].flags = (0) & 31;
+        svl.level.locations[x][y].flags = 0;
     }
     while (1) {
         q = 0;
@@ -1421,7 +1421,7 @@ export async function walkfrom(x, y, typ) {   // mkmaze.c:1279
  */
 export async function mazexy(cc) {   // mkmaze.c:1316
     let x = 0, y = 0, allowedtyp = 0, cpt = 0;
-    allowedtyp = svl.level.flags.corrmaze | 0 ? CORR : ROOM;
+    allowedtyp = svl.level.flags.corrmaze ? CORR : ROOM;
     cpt = 0;
     do {
         /* once upon a time this only considered odd values greater than 2
@@ -1724,8 +1724,8 @@ export async function movebubbles() {   // mkmaze.c:1539
                 recalc_block_point(x, y);
                 /* all air or all cloud around the perimeter of the Air
                    level tends to look strange; break up the pattern */
-                xedge = $c.i8(x < gbxmin() || x > gbxmax() ? 1 : 0);
-                yedge = $c.i8(y < gbymin() || y > gbymax() ? 1 : 0);
+                xedge = x < gbxmin() || x > gbxmax() ? 1 : 0;
+                yedge = y < gbymin() || y > gbymax() ? 1 : 0;
                 if (xedge || yedge) {
                     if (!rn2(xedge ? 3 : 5)) {
                         svl.level.locations[x][y].typ = CLOUD;
@@ -1740,11 +1740,11 @@ export async function movebubbles() {   // mkmaze.c:1539
      * all the junk that changes owners when bubbles overlap
      * would eventually end up in the last bubble in the chain.
      */
-    movebubbles$up = $c.i8(!movebubbles$up ? 1 : 0);
+    movebubbles$up = !movebubbles$up ? 1 : 0;
     for (b = movebubbles$up ? svb.bbubbles : ge.ebubbles; b; b = movebubbles$up ? b.next : b.prev) {
         rx = rn2(3);
         ry = rn2(3);
-        await mv_bubble(b, $c.i16((b.dx + 1 | 0) - (!b.dx ? rx : rx ? 1 : 0) | 0), $c.i16((b.dy + 1 | 0) - (!b.dy ? ry : ry ? 1 : 0) | 0), FALSE);
+        await mv_bubble(b, $c.i16(b.dx + 1 - (!b.dx ? rx : rx ? 1 : 0) | 0), $c.i16(b.dy + 1 - (!b.dy ? ry : ry ? 1 : 0) | 0), FALSE);
     }
     /* put attached ball&chain back */
     if ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) && Punished()) {
@@ -1768,7 +1768,7 @@ export async function water_friction() {   // mkmaze.c:1689
         x = u.ux;
         do {
             dy = $c.i16(rn2(3) - 1 | 0);   /* -1, 0, 1 */
-            y = $c.i16(u.uy + dy | 0);
+            y = $c.i16(u.uy + dy);
         } while (dy && (!isok(x, y) || !is_pool(x, y)));
         u.dx = 0;
         u.dy = dy;
@@ -1779,7 +1779,7 @@ export async function water_friction() {   // mkmaze.c:1689
         y = u.uy;
         do {
             dx = $c.i16(rn2(3) - 1 | 0);   /* -1 .. 1 */
-            x = $c.i16(u.ux + dx | 0);
+            x = $c.i16(u.ux + dx);
         } while (dx && (!isok(x, y) || !is_pool(x, y)));
         u.dy = 0;
         u.dx = dx;
@@ -1863,7 +1863,7 @@ export async function restore_waterlevel(nhfp) {   // mkmaze.c:1750
 async function set_wportal() {   // mkmaze.c:1802
     /* there better be only one magic portal on water level... */
     for (gw.wportal = gf.ftrap; gw.wportal; gw.wportal = gw.wportal.ntrap) {
-        if ((gw.wportal.ttyp | 0) === MAGIC_PORTAL) {
+        if (gw.wportal.ttyp === MAGIC_PORTAL) {
             return;
         }
     }
@@ -1889,7 +1889,7 @@ async function setup_waterlevel() {   // mkmaze.c:1812
     svy.ymax = svy.ymax < ROWNO - 1 ? svy.ymax : ROWNO - 1;
     /* entire level is remembered as one glyph and any unspecified portion
        should default to level's base element rather than to usual stone */
-    glyph = ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S.water : S.air) === S.stone ? GLYPH.CMAP_STONE_OFF : ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S.water : S.air) <= S.trwall ? (((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S.water : S.air) - S.vwall | 0) + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) | 0 : ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S.water : S.air) < S.altar ? (((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S.water : S.air) - S.ndoor | 0) + GLYPH.CMAP_A_OFF | 0 : ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S.water : S.air) === S.altar ? 4008 : ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S.water : S.air) < S.arrow_trap + MAXTCHARS ? (((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S.water : S.air) - S.grave | 0) + GLYPH.CMAP_B_OFF | 0 : ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S.water : S.air) <= S.goodpos ? (((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S.water : S.air) - S.digbeam | 0) + GLYPH.CMAP_C_OFF | 0 : NO_GLYPH;
+    glyph = ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S.water : S.air) === S.stone ? GLYPH.CMAP_STONE_OFF : ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S.water : S.air) <= S.trwall ? ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S.water : S.air) - S.vwall + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) : ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S.water : S.air) < S.altar ? ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S.water : S.air) - S.ndoor + GLYPH.CMAP_A_OFF : ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S.water : S.air) === S.altar ? 4008 : ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S.water : S.air) < S.arrow_trap + MAXTCHARS ? ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S.water : S.air) - S.grave + GLYPH.CMAP_B_OFF : ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S.water : S.air) <= S.goodpos ? ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S.water : S.air) - S.digbeam + GLYPH.CMAP_C_OFF : NO_GLYPH;
     typ = (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? WATER : AIR;
     /* set unspecified terrain (stone) and hero's memory to water or air */
     for (x = 1; x <= COLNO - 1; x = $c.i16(x + 1)) {
@@ -1949,10 +1949,10 @@ async function mk_bubble(x, y, n) {   // mkmaze.c:1873
         await panic($c.lit("bmask size is larger than MAX_BMASK"));
     }
     b = $c.asRec(await alloc(40), $T.bubble, 40);
-    if (((x + mk_bubble$bmask[n].get(0) | 0) - 1 | 0) > gbxmax()) {
+    if (x + mk_bubble$bmask[n].get(0) - 1 > gbxmax()) {
         x = $c.i16((gbxmax() - mk_bubble$bmask[n].get(0) | 0) + 1 | 0);
     }
-    if (((y + mk_bubble$bmask[n].get(1) | 0) - 1 | 0) > gbymax()) {
+    if (y + mk_bubble$bmask[n].get(1) - 1 > gbymax()) {
         y = $c.i16((gbymax() - mk_bubble$bmask[n].get(1) | 0) + 1 | 0);
     }
     b.x = x;
@@ -1960,7 +1960,7 @@ async function mk_bubble(x, y, n) {   // mkmaze.c:1873
     $t1 = $c.i8(1 - rn2(3) | 0), b.dx = $t1;
     $t2 = $c.i8(1 - rn2(3) | 0), b.dy = $t2;
     /* y dimension is the length of bitmap data - see bmask above */
-    $c.memcpy(new $c.Ptr(b.bm, 0), mk_bubble$bmask[n], $c.mulu64($c.u64(mk_bubble$bmask[n].get(1) + 2 | 0), 1));
+    $c.memcpy(new $c.Ptr(b.bm, 0), mk_bubble$bmask[n], $c.mulu64($c.u64(mk_bubble$bmask[n].get(1) + 2), 1));
     b.cons = null;
     if (!svb.bbubbles) {
         svb.bbubbles = b;
@@ -2024,10 +2024,10 @@ async function mv_bubble(b, dx, dy, ini) {   // mkmaze.c:1952
         if (b.y <= gbymin()) {
             colli = colli | 1;
         }
-        if (((b.x + b.bm[0] | 0) - 1 | 0) >= gbxmax()) {
+        if (b.x + b.bm[0] - 1 >= gbxmax()) {
             colli = colli | 2;
         }
-        if (((b.y + b.bm[1] | 0) - 1 | 0) >= gbymax()) {
+        if (b.y + b.bm[1] - 1 >= gbymax()) {
             colli = colli | 1;
         }
         if (b.x < gbxmin()) {
@@ -2038,25 +2038,25 @@ async function mv_bubble(b, dx, dy, ini) {   // mkmaze.c:1952
             await pline($c.lit("bubble ymin: y = %d, ymin = %d"), b.y, gbymin());
             b.y = $c.i16(gbymin());
         }
-        if (((b.x + b.bm[0] | 0) - 1 | 0) > gbxmax()) {
-            await pline($c.lit("bubble xmax: x = %d, xmax = %d"), (b.x + b.bm[0] | 0) - 1 | 0, gbxmax());
+        if (b.x + b.bm[0] - 1 > gbxmax()) {
+            await pline($c.lit("bubble xmax: x = %d, xmax = %d"), b.x + b.bm[0] - 1, gbxmax());
             b.x = $c.i16((gbxmax() - b.bm[0] | 0) + 1 | 0);
         }
-        if (((b.y + b.bm[1] | 0) - 1 | 0) > gbymax()) {
-            await pline($c.lit("bubble ymax: y = %d, ymax = %d"), (b.y + b.bm[1] | 0) - 1 | 0, gbymax());
+        if (b.y + b.bm[1] - 1 > gbymax()) {
+            await pline($c.lit("bubble ymax: y = %d, ymax = %d"), b.y + b.bm[1] - 1, gbymax());
             b.y = $c.i16((gbymax() - b.bm[1] | 0) + 1 | 0);
         }
         /* bounce if we're trying to move off the border */
         if (b.x === gbxmin() && dx < 0) {
             dx = $c.i16(-dx | 0);
         }
-        if (((b.x + b.bm[0] | 0) - 1 | 0) === gbxmax() && dx > 0) {
+        if (b.x + b.bm[0] - 1 === gbxmax() && dx > 0) {
             dx = $c.i16(-dx | 0);
         }
         if (b.y === gbymin() && dy < 0) {
             dy = $c.i16(-dy | 0);
         }
-        if (((b.y + b.bm[1] | 0) - 1 | 0) === gbymax() && dy > 0) {
+        if (b.y + b.bm[1] - 1 === gbymax() && dy > 0) {
             dy = $c.i16(-dy | 0);
         }
         b.x = $c.i16(b.x + dx | 0);
@@ -2068,11 +2068,11 @@ async function mv_bubble(b, dx, dy, ini) {   // mkmaze.c:1952
             if (b.bm[j + 2 | 0] & 1 << i) {
                 if ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) {
                     svl.level.locations[x][y].typ = AIR;
-                    svl.level.locations[x][y].lit = (1) & 1;
+                    svl.level.locations[x][y].lit = 1;
                     unblock_point(x, y);
                 } else if ((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level)) {
                     svl.level.locations[x][y].typ = CLOUD;
-                    svl.level.locations[x][y].lit = (1) & 1;
+                    svl.level.locations[x][y].lit = 1;
                     block_point(x, y);
                 }
             }
@@ -2194,24 +2194,24 @@ export function $init() {
     movebubbles$water_pos.glyph = S.water - S.grave + GLYPH.CMAP_B_OFF;
     movebubbles$water_pos.typ = WATER;
     movebubbles$water_pos.seenv = 0;
-    movebubbles$water_pos.flags = (0) & 31;
-    movebubbles$water_pos.horizontal = (0) & 1;
-    movebubbles$water_pos.lit = (0) & 1;
-    movebubbles$water_pos.waslit = (0) & 1;
-    movebubbles$water_pos.roomno = (0) & 63;
-    movebubbles$water_pos.edge = (0) & 1;
-    movebubbles$water_pos.candig = (0) & 1;
+    movebubbles$water_pos.flags = 0;
+    movebubbles$water_pos.horizontal = 0;
+    movebubbles$water_pos.lit = 0;
+    movebubbles$water_pos.waslit = 0;
+    movebubbles$water_pos.roomno = 0;
+    movebubbles$water_pos.edge = 0;
+    movebubbles$water_pos.candig = 0;
     movebubbles$air_pos.$copyFrom(new $T.rm());
     movebubbles$air_pos.glyph = S.cloud - S.grave + GLYPH.CMAP_B_OFF;
     movebubbles$air_pos.typ = AIR;
     movebubbles$air_pos.seenv = 0;
-    movebubbles$air_pos.flags = (0) & 31;
-    movebubbles$air_pos.horizontal = (0) & 1;
-    movebubbles$air_pos.lit = (1) & 1;
-    movebubbles$air_pos.waslit = (0) & 1;
-    movebubbles$air_pos.roomno = (0) & 63;
-    movebubbles$air_pos.edge = (0) & 1;
-    movebubbles$air_pos.candig = (0) & 1;
+    movebubbles$air_pos.flags = 0;
+    movebubbles$air_pos.horizontal = 0;
+    movebubbles$air_pos.lit = 1;
+    movebubbles$air_pos.waslit = 0;
+    movebubbles$air_pos.roomno = 0;
+    movebubbles$air_pos.edge = 0;
+    movebubbles$air_pos.candig = 0;
     movebubbles$up = FALSE;
     mk_bubble$bm2.fill(0);
     $c.init(mk_bubble$bm2, [

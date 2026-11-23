@@ -184,7 +184,7 @@ async function enlght_combatinc(inctyp, incamt, final, outbuf) {   // insight.c:
     modif = !incamt ? $c.lit("no") : await an(modif);   /* ("no" case shouldn't happen) */
     bonus = incamt >= 0 ? $c.lit("bonus") : $c.lit("penalty");
     /* "bonus <foo>" (to hit) vs "<bar> bonus" (damage, defense) */
-    invrt = $c.i8($c.strcmp(inctyp, $c.lit("to hit")) ? TRUE : FALSE);
+    invrt = $c.strcmp(inctyp, $c.lit("to hit")) ? TRUE : FALSE;
     $c.sprintf(outbuf, $c.lit("%s %s %s"), modif, invrt ? inctyp : bonus, invrt ? bonus : inctyp);
     if (final || wizard()) {
         $c.sprintf(eos(outbuf), $c.lit(" (%s%d)"), incamt > 0 ? $c.lit("+") : $c.lit(""), incamt);
@@ -218,10 +218,10 @@ async function enlght_halfdmg(category, final) {   // insight.c:201
  * @returns {number} boolean
  */
 function walking_on_water() {   // insight.c:224
-    if (u.uinwater | 0 || Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) {
+    if (u.uinwater || Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) {
         return FALSE;
     }
-    return $c.i8((u.uprops[WWALKING].intrinsic || u.uprops[WWALKING].extrinsic) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) && is_pool_or_lava(u.ux, u.uy) ? 1 : 0);
+    return (u.uprops[WWALKING].intrinsic || u.uprops[WWALKING].extrinsic) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) && is_pool_or_lava(u.ux, u.uy) ? 1 : 0;
 }
 /* describe u.utraptype; used by status_enlightenment() and self_lookat() */
 /**
@@ -248,7 +248,7 @@ export async function trap_predicament(outbuf, final, wizxtra) {   // insight.c:
             /* TT_BEARTRAP, TT_PIT, or TT_WEB */
             $c.strcpy(outbuf, $c.lit("trapped"));
             if ((t = t_at(u.ux, u.uy)) !== null) {   /* should never be null */
-                $c.sprintf(eos(outbuf), $c.lit(" in %s"), await an(trapname(t.ttyp | 0, FALSE)));
+                $c.sprintf(eos(outbuf), $c.lit(" in %s"), await an(trapname(t.ttyp, FALSE)));
             }
             break;
     }
@@ -277,7 +277,7 @@ function cause_known(propindx) {   // insight.c:267
         if (!$c.and64(o.owornmask, mask)) {
             continue;
         }
-        if (objects[o.otyp].oc_oprop === propindx && objects[o.otyp].oc_name_known | 0 && o.dknown | 0) {
+        if (objects[o.otyp].oc_oprop === propindx && objects[o.otyp].oc_name_known && o.dknown) {
             return TRUE;
         }
     }
@@ -337,7 +337,7 @@ function fmt_elapsed_time(outbuf, final) {   // insight.c:314
     eminutes = $c.rem64(etim, 60), etim = $c.div64(etim, 60);
     ehours = $c.rem64(etim, 24);
     edays = $c.div64(etim, 24);
-    fieldcnt = (((!!edays ? 1 : 0) + (!!ehours ? 1 : 0) | 0) + (!!eminutes ? 1 : 0) | 0) + (!!eseconds ? 1 : 0) | 0;
+    fieldcnt = (!!edays ? 1 : 0) + (!!ehours ? 1 : 0) + (!!eminutes ? 1 : 0) + (!!eseconds ? 1 : 0);
     $c.strcpy(outbuf, fieldcnt ? $c.lit("") : $c.lit(" none"));   /* 'none' should never happen */
     if (edays) {
         $c.sprintf(eos(outbuf), $c.lit(" %ld day%s"), edays, edays === 1 ? $c.lit("") : $c.lit("s"));
@@ -399,7 +399,7 @@ export async function enlightenment(mode, final) {   // insight.c:383
     /* BASICENLIGHTENMENT | MAGICENLIGHTENMENT (| both) */
     /* ENL_GAMEINPROGRESS:0, ENL_GAMEOVERALIVE, ENL_GAMEOVERDEAD */
     $t1 = await create_nhwindow()(NHW.MENU), ge.en_win = $t1;
-    ge.en_via_menu = $c.i8(!final ? 1 : 0);
+    ge.en_via_menu = !final ? 1 : 0;
     if (ge.en_via_menu) {
         await start_menu()(ge.en_win, MENU.BEHAVE_STANDARD);
     }
@@ -407,7 +407,7 @@ export async function enlightenment(mode, final) {   // insight.c:383
     $t2 = highc(new $c.Ptr(tmpbuf, 0).get(0)), new $c.Ptr(tmpbuf, 0).set(0, $t2);   /* same adjustment as bottom line */
     /* as in background_enlightenment, when poly'd we need to use the saved
        gender in u.mfemale rather than the current you-as-monster gender */
-    nh_snprintf($c.lit("enlightenment"), 401, new $c.Ptr(buf, 0), 256, $c.lit("%s the %s's attributes:"), new $c.Ptr(tmpbuf, 0), (u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female) && gu.urole.name.f ? gu.urole.name.f : gu.urole.name.m);
+    nh_snprintf($c.lit("enlightenment"), 401, new $c.Ptr(buf, 0), 256, $c.lit("%s the %s's attributes:"), new $c.Ptr(tmpbuf, 0), (u.umonnum !== u.umonster ? u.mfemale : flags.female) && gu.urole.name.f ? gu.urole.name.f : gu.urole.name.m);
     /* title */
     await enlght_out(new $c.Ptr(buf, 0));   /* "Conan the Archeologist's attributes:" */
     /* background and characteristics; ^X or end-of-game disclosure */
@@ -474,7 +474,7 @@ async function background_enlightenment(unused_mode, final) {   // insight.c:468
     let role_titl = null, rank_titl = null, innategend = 0, difgend = 0, difalgn = 0, buf = new Int8Array(256), tmpbuf = new Int8Array(256), anbuf = new Int8Array(20), uasmon = null, altphrasing = 0, egdepth = 0, dgnbuf = new Int8Array(128), ulvl = 0, nxtlvl = 0, delta = 0, $t1, $t2;
     /* note that if poly'd, we need to use u.mfemale instead of flags.female
        to access hero's saved gender-as-human/elf/&c rather than current */
-    innategend = (Upolyd() ? u.mfemale | 0 : flags.female) ? 1 : 0;
+    innategend = (Upolyd() ? u.mfemale : flags.female) ? 1 : 0;
     role_titl = innategend && gu.urole.name.f ? gu.urole.name.f : gu.urole.name.m;
     rank_titl = rank_of(u.ulevel, gu.urole.mnum, $c.i8(innategend));
     await enlght_out($c.lit(""));   /* separator after title */
@@ -488,7 +488,7 @@ async function background_enlightenment(unused_mode, final) {   // insight.c:468
     if (Upolyd()) {
         /* includes trailing space; [4] suffices */
         uasmon = gy.youmonst.data;
-        altphrasing = $c.i8((gy.youmonst.cham === PM.VAMPIRE || gy.youmonst.cham === PM.VAMPIRE_LEADER || gy.youmonst.cham === PM.VLAD_THE_IMPALER) && !(gy.youmonst.data.mlet === S.VAMPIRE) ? 1 : 0);
+        altphrasing = (gy.youmonst.cham === PM.VAMPIRE || gy.youmonst.cham === PM.VAMPIRE_LEADER || gy.youmonst.cham === PM.VLAD_THE_IMPALER) && !(gy.youmonst.data.mlet === S.VAMPIRE) ? 1 : 0;
         tmpbuf[0] = 0;
         /* here we always use current gender, not saved role gender */
         if (!is_male(uasmon) && !is_female(uasmon) && !is_neuter(uasmon)) {
@@ -550,7 +550,7 @@ async function background_enlightenment(unused_mode, final) {   // insight.c:468
        for tricky phrasing otherwise necessitated by possibility of having
        helm of opposite alignment mask a permanent alignment conversion */
     difgend = innategend !== flags.initgend ? 1 : 0;
-    difalgn = (u.ualign.type !== u.ualignbase[A.CURRENT] ? 1 : 0) + (u.ualignbase[A.CURRENT] !== u.ualignbase[A.ORIGINAL] ? 2 : 0) | 0;
+    difalgn = (u.ualign.type !== u.ualignbase[A.CURRENT] ? 1 : 0) + (u.ualignbase[A.CURRENT] !== u.ualignbase[A.ORIGINAL] ? 2 : 0);
     if (difalgn & 1) {
         /* have temporary alignment so report permanent one */
         $c.sprintf(new $c.Ptr(buf, 0), $c.lit("actually %s"), align_str(u.ualignbase[A.CURRENT]));
@@ -564,7 +564,7 @@ async function background_enlightenment(unused_mode, final) {   // insight.c:468
     }
     /* "You are left-handed." won't work well if polymorphed into something
        without hands; use "You are normally left-handed." in that situation */
-    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s%s-handed"), !$c.strcmp(await body_part(HANDED), $c.lit("handed")) ? $c.lit("") : $c.lit("normally "), (u.uhandedness | 0) === RIGHT_HANDED ? $c.lit("right") : $c.lit("left"));
+    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s%s-handed"), !$c.strcmp(await body_part(HANDED), $c.lit("handed")) ? $c.lit("") : $c.lit("normally "), u.uhandedness === RIGHT_HANDED ? $c.lit("right") : $c.lit("left"));
     await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), new $c.Ptr(buf, 0), $c.lit(""));
     /* As of 3.6.2: dungeon level, so that ^X really has all status info as
        claimed by the comment below; this reveals more information than
@@ -807,24 +807,24 @@ async function one_characteristic(mode, final, attrindx) {   // insight.c:846
     }
     switch (attrindx) {
         case A.STR:
-            if ($G.uarmg && $G.uarmg.otyp === GAUNTLETS_OF_POWER && $G.uarmg.cursed | 0) {
+            if ($G.uarmg && $G.uarmg.otyp === GAUNTLETS_OF_POWER && $G.uarmg.cursed) {
                 hide_innate_value = TRUE;
             }
             break;
         case A.DEX:
             break;
         case A.CON:
-            if (u_wield_art(ART.OGRESMASHER) && $G.uwep.cursed | 0) {
+            if (u_wield_art(ART.OGRESMASHER) && $G.uwep.cursed) {
                 hide_innate_value = TRUE;
             }
             break;
         case A.INT:
-            if ($G.uarmh && $G.uarmh.otyp === DUNCE_CAP && $G.uarmh.cursed | 0) {
+            if ($G.uarmh && $G.uarmh.otyp === DUNCE_CAP && $G.uarmh.cursed) {
                 hide_innate_value = TRUE;
             }
             break;
         case A.WIS:
-            if ($G.uarmh && $G.uarmh.otyp === DUNCE_CAP && $G.uarmh.cursed | 0) {
+            if ($G.uarmh && $G.uarmh.otyp === DUNCE_CAP && $G.uarmh.cursed) {
                 hide_innate_value = TRUE;
             }
             break;
@@ -853,7 +853,7 @@ async function one_characteristic(mode, final, attrindx) {   // insight.c:846
         alimit = ATTRMAX(attrindx);
         /* criterium for whether the limit is interesting varies */
         /* was originally `(abase != alimit)' */
-        interesting_alimit = $c.i8(final ? TRUE : alimit !== (attrindx !== A.STR ? 18 : 118) ? 1 : 0);
+        interesting_alimit = final ? TRUE : alimit !== (attrindx !== A.STR ? 18 : 118) ? 1 : 0;
         paren_pfx = final ? $c.lit(" (") : $c.lit(" (current; ");
         if (acurrent !== abase) {
             $c.sprintf(eos(new $c.Ptr(valubuf, 0)), $c.lit("%sbase:%s"), paren_pfx, attrval(attrindx, abase, new $c.Ptr(valstring, 0)));
@@ -882,10 +882,10 @@ async function one_characteristic(mode, final, attrindx) {   // insight.c:846
  */
 async function status_enlightenment(mode, final) {   // insight.c:940
     let magic = 0, cap = 0, buf = new Int8Array(256), youtoo = new Int8Array(256), heldmon = new Int8Array(256), Riding = 0, steedname = null, predicament = new Int8Array(256), anchored = 0, ustick = 0, dx = 0, dy = 0, saddle = null, whichleg = 0, bp = null, article = null, leftright = null, steednambuf = new Int8Array(256), adj = null, $t1, $t2, $t3, $t4;
-    magic = $c.i8(mode & MAGICENLIGHTENMENT ? TRUE : FALSE);
+    magic = mode & MAGICENLIGHTENMENT ? TRUE : FALSE;
     /* if hero dies while dismounting, u.usteed will still
        be set; we want to ignore steed in that situation */
-    Riding = $c.i8(u.usteed && !(final === ENL.GAMEOVERDEAD && !$c.strcmp(new $c.Ptr(svk.killer.name, 0), $c.lit("riding accident"))) ? 1 : 0);
+    Riding = u.usteed && !(final === ENL.GAMEOVERDEAD && !$c.strcmp(new $c.Ptr(svk.killer.name, 0), $c.lit("riding accident"))) ? 1 : 0;
     steedname = !Riding ? null : await x_monnam(u.usteed, u.usteed.mtame ? ARTICLE.YOUR : ARTICLE.THE, null, SUPPRESS.SADDLE | SUPPRESS.HALLUCINATION, FALSE);
     /*\
      * Status (many are abbreviated on bottom line; others are or
@@ -931,7 +931,7 @@ async function status_enlightenment(mode, final) {   // insight.c:940
         /* catchall; shouldn't happen */
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), new $c.Ptr(buf, 0), await from_what(WWALKING));
     }
-    if (Upolyd() && (u.uundetected | 0 || U_AP_TYPE() !== M_AP.NOTHING)) {
+    if (Upolyd() && (u.uundetected || U_AP_TYPE() !== M_AP.NOTHING)) {
         await youhiding(TRUE, final);
     }
     /* internal troubles, mostly in the order that prayer ranks them */
@@ -970,16 +970,16 @@ async function status_enlightenment(mode, final) {   // insight.c:940
            puts TermIll before FoodPois and death due to timeout reports
            terminal illness if both are in effect, so do the same here */
         if (final && $c.and64(u.uprops[SICK].intrinsic, I_SPECIAL)) {
-            $c.sprintf(new $c.Ptr(buf, 0), $c.lit(" %sdied from %s."), new $c.Ptr(You_, 0), (u.usick_type | 0) & SICK_NONVOMITABLE ? $c.lit("terminal illness") : $c.lit("food poisoning"));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit(" %sdied from %s."), new $c.Ptr(You_, 0), u.usick_type & SICK_NONVOMITABLE ? $c.lit("terminal illness") : $c.lit("food poisoning"));
             /* has trailing space */
             await enlght_out(new $c.Ptr(buf, 0));
         } else {
             /* unlike death due to sickness, report the two cases separately
                because it is possible to cure one without curing the other */
-            if ((u.usick_type | 0) & SICK_NONVOMITABLE) {
+            if (u.usick_type & SICK_NONVOMITABLE) {
                 await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), $c.lit("terminally sick from illness"), $c.lit(""));
             }
-            if ((u.usick_type | 0) & SICK_VOMITABLE) {
+            if (u.usick_type & SICK_VOMITABLE) {
                 await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), $c.lit("terminally sick from food poisoning"), $c.lit(""));
             }
         }
@@ -1021,7 +1021,7 @@ async function status_enlightenment(mode, final) {   // insight.c:940
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), new $c.Ptr(buf, 0), $c.lit(""));
     }
     if (u.utrap) {
-        anchored = $c.i8(u.utraptype === TT.BURIEDBALL ? 1 : 0);
+        anchored = u.utraptype === TT.BURIEDBALL ? 1 : 0;
         await trap_predicament(new $c.Ptr(predicament, 0), final, flags.debug);
         if (u.usteed) {
             /* not `Riding' here */
@@ -1057,15 +1057,15 @@ async function status_enlightenment(mode, final) {   // insight.c:940
         }
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), new $c.Ptr(buf, 0), $c.lit(""));
     } else if (u.ustuck) {
-        ustick = $c.i8(Upolyd() && sticks(gy.youmonst.data) ? 1 : 0);
-        dx = u.ustuck.mx - u.ux | 0;
-        dy = u.ustuck.my - u.uy | 0;
+        ustick = Upolyd() && sticks(gy.youmonst.data) ? 1 : 0;
+        dx = u.ustuck.mx - u.ux;
+        dy = u.ustuck.my - u.uy;
         nh_snprintf($c.lit("status_enlightenment"), 1130, new $c.Ptr(buf, 0), 256, $c.lit("%s %s (%s)"), ustick ? $c.lit("holding") : $c.lit("held by"), new $c.Ptr(heldmon, 0), dxdy_to_dist_descr($c.i16(dx), $c.i16(dy), TRUE));
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), new $c.Ptr(buf, 0), $c.lit(""));
     }
     if (Riding) {
         saddle = await which_armor(u.usteed, W.SADDLE);
-        if (saddle && saddle.cursed | 0) {
+        if (saddle && saddle.cursed) {
             $c.sprintf(new $c.Ptr(buf, 0), $c.lit("stuck to %s %s"), s_suffix(steedname), await simpleonames(saddle));
             await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), new $c.Ptr(buf, 0), $c.lit(""));
         }
@@ -1243,7 +1243,7 @@ async function weapon_insight(final) {   // insight.c:1270
      */
     if ((wtype = weapon_type($G.uwep)) !== P.NONE && (!$G.uwep || !is_ammo($G.uwep))) {
         sklvl = u.weapon_skills[wtype].skill;
-        hav = $c.i8(sklvl !== P.UNSKILLED && sklvl !== P.SKILLED ? 1 : 0);
+        hav = sklvl !== P.UNSKILLED && sklvl !== P.SKILLED ? 1 : 0;
         if (sklvl === P.ISRESTRICTED) {
             $c.strcpy(new $c.Ptr(sklvlbuf, 0), $c.lit("no"));
         } else {
@@ -1269,7 +1269,7 @@ async function weapon_insight(final) {   // insight.c:1270
             wtype2 = weapon_type($G.uswapwep);
             sklvl2 = u.weapon_skills[wtype2].skill;
             twoskl = u.weapon_skills[P.TWO_WEAPON_COMBAT].skill;
-            hav2 = $c.i8(sklvl2 !== P.UNSKILLED && sklvl2 !== P.SKILLED ? 1 : 0);
+            hav2 = sklvl2 !== P.UNSKILLED && sklvl2 !== P.SKILLED ? 1 : 0;
             /* normally hero must have access to two-weapon skill in
                order to initiate u.twoweap, but not if polymorphed into
                a form which has multiple weapon attacks, so we need to
@@ -1361,7 +1361,7 @@ async function weapon_insight(final) {   // insight.c:1270
                spending skill credits enhancing one might make either
                or both of the others become ineligible for enhancement */
             a1 = can_advance(wtype, FALSE);
-            a2 = $c.i8(wtype2 !== wtype ? can_advance(wtype2, FALSE) : FALSE);
+            a2 = wtype2 !== wtype ? can_advance(wtype2, FALSE) : FALSE;
             ab = can_advance(P.TWO_WEAPON_COMBAT, FALSE);
             if (a1 || a2 || ab) {
                 /* for just one, the conditionals yield
@@ -1373,7 +1373,7 @@ async function weapon_insight(final) {   // insight.c:1270
                    (no 'also's or extra 'with's for case 5); when primary
                    and secondary use the same skill, only cases 1 and 3 are
                    possible because 'a2' gets forced to False above */
-                $c.sprintf(new $c.Ptr(sfx, 0), $c.lit(" skill%s with %s%s%s%s%s"), ((a1 + a2 | 0) + ab | 0) > 1 ? $c.lit("s") : $c.lit(""), a1 ? skill_name(wtype) : $c.lit(""), a1 && a2 && ab ? $c.lit(", ") : a1 && (a2 || ab) ? new $c.Ptr(weapon_insight$also_wik_, 0) : $c.lit(""), a2 ? skill_name(wtype2) : $c.lit(""), a1 && a2 && ab ? $c.lit(", and ") : a2 && ab ? new $c.Ptr(weapon_insight$also_wik_, 0) : $c.lit(""), ab ? $c.lit("two weapons") : $c.lit(""));
+                $c.sprintf(new $c.Ptr(sfx, 0), $c.lit(" skill%s with %s%s%s%s%s"), a1 + a2 + ab > 1 ? $c.lit("s") : $c.lit(""), a1 ? skill_name(wtype) : $c.lit(""), a1 && a2 && ab ? $c.lit(", ") : a1 && (a2 || ab) ? new $c.Ptr(weapon_insight$also_wik_, 0) : $c.lit(""), a2 ? skill_name(wtype2) : $c.lit(""), a1 && a2 && ab ? $c.lit(", and ") : a2 && ab ? new $c.Ptr(weapon_insight$also_wik_, 0) : $c.lit(""), ab ? $c.lit("two weapons") : $c.lit(""));
                 await enlght_line(new $c.Ptr(You_, 0), final ? $c.lit("could have enhanced") : $c.lit("can enhance"), new $c.Ptr(sfx, 0), $c.lit(""));
             }
         }   /* two-weapon */
@@ -1389,7 +1389,7 @@ async function item_resistance_message(adtyp, prot_message, final) {   // insigh
     let protection = 0, somewhat = 0;
     protection = u_adtyp_resistance_obj(adtyp);
     if (protection) {
-        somewhat = $c.i8(protection < 99 ? 1 : 0);
+        somewhat = protection < 99 ? 1 : 0;
         await enlght_line($c.lit("Your items "), final ? somewhat ? $c.lit("were somewhat") : $c.lit("were") : somewhat ? $c.lit("are somewhat") : $c.lit("are"), prot_message, await item_what(adtyp));
     }
 }
@@ -1407,7 +1407,7 @@ async function attributes_enlightenment(unused_mode, final) {   // insight.c:148
     await enlght_out($c.lit(""));
     await enlght_out(final ? $c.lit("Final Attributes:") : $c.lit("Attributes:"));
     if (u.uevent.uhand_of_elbereth) {
-        await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), attributes_enlightenment$hofe_titles[(u.uevent.uhand_of_elbereth | 0) - 1 | 0], $c.lit(""));
+        await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), attributes_enlightenment$hofe_titles[u.uevent.uhand_of_elbereth - 1], $c.lit(""));
     }
     $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s"), piousness(TRUE, $c.lit("aligned")));
     if (u.ualign.record >= 0) {
@@ -1601,8 +1601,8 @@ async function attributes_enlightenment(unused_mode, final) {   // insight.c:148
             /* either trapped in the floor or inside solid rock
                (or both if chained to buried iron ball and have
                moved one step into solid rock somehow) */
-            trapped = $c.i8($c.and64(save_BLev, I_SPECIAL) !== 0 ? 1 : 0);
-            terrain = $c.i8($c.and64(save_BLev, FROMOUTSIDE) !== 0 ? 1 : 0);
+            trapped = $c.and64(save_BLev, I_SPECIAL) !== 0 ? 1 : 0;
+            terrain = $c.and64(save_BLev, FROMOUTSIDE) !== 0 ? 1 : 0;
             $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s%s%s"), trapped ? $c.lit(" if not trapped") : $c.lit(""), trapped && terrain ? $c.lit(" and") : $c.lit(""), terrain ? new $c.Ptr(attributes_enlightenment$if_surroundings_permitted, 0) : $c.lit(""));
             await enlght_line(new $c.Ptr(You_, 0), final ? $c.lit("would have levitated") : $c.lit("would levitate"), new $c.Ptr(buf, 0), $c.lit(""));
         }
@@ -1635,7 +1635,7 @@ async function attributes_enlightenment(unused_mode, final) {   // insight.c:148
         if (has_lid && !u.uinwater) {
             await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(could, 0) : new $c.Ptr(can, 0), $c.lit("cling to the ceiling"), $c.lit(""));
         } else {
-            $c.sprintf(new $c.Ptr(buf, 0), $c.lit(" to the ceiling if %s%s%s"), !has_lid ? $c.lit("there was one") : $c.lit(""), !has_lid && u.uinwater | 0 ? $c.lit(" and ") : $c.lit(""), u.uinwater | 0 ? u.uinwater | 0 ? $c.lit("you weren't underwater") : $c.lit("you weren't in the water") : $c.lit(""));
+            $c.sprintf(new $c.Ptr(buf, 0), $c.lit(" to the ceiling if %s%s%s"), !has_lid ? $c.lit("there was one") : $c.lit(""), !has_lid && u.uinwater ? $c.lit(" and ") : $c.lit(""), u.uinwater ? u.uinwater ? $c.lit("you weren't underwater") : $c.lit("you weren't in the water") : $c.lit(""));
             /* past tense is applicable for death while Unchanging */
             await enlght_line(new $c.Ptr(You_, 0), final ? $c.lit("could have clung") : $c.lit("could cling"), new $c.Ptr(buf, 0), $c.lit(""));
         }
@@ -1645,7 +1645,7 @@ async function attributes_enlightenment(unused_mode, final) {   // insight.c:148
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(could, 0) : new $c.Ptr(can, 0), $c.lit("walk on water"), await from_what(WWALKING));
     }
     /* actively swimming (in water but not under it) handled earlier */
-    if ((u.uprops[SWIMMING].intrinsic || u.uprops[SWIMMING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.SWIM) !== 0) && ((u.uinwater | 0) || !u.uinwater)) {
+    if ((u.uprops[SWIMMING].intrinsic || u.uprops[SWIMMING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.SWIM) !== 0) && (Underwater() || !u.uinwater)) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(could, 0) : new $c.Ptr(can, 0), $c.lit("swim"), await from_what(SWIMMING));
     }
     if (u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.BREATHLESS) !== 0) {
@@ -1713,8 +1713,8 @@ async function attributes_enlightenment(unused_mode, final) {   // insight.c:148
         /* skip if no spells are known yet */
         /* greatly simplified edition of percent_success(spell.c)--may need
            to be suppressed if oversimplification leads to player confusion */
-        suit = $c.i8($G.uarm && is_metallic($G.uarm) ? 1 : 0);
-        robe = $c.i8($G.uarmc && $G.uarmc.otyp === ROBE ? 1 : 0);
+        suit = $G.uarm && is_metallic($G.uarm) ? 1 : 0;
+        robe = $G.uarmc && $G.uarmc.otyp === ROBE ? 1 : 0;
         new $c.Ptr(cast_adj, 0).set(0, 0);
         if (suit) {   /* omit "wearing" to shorten the text */
             $c.sprintf(new $c.Ptr(cast_adj, 0), $c.lit(" impaired by metallic armor%s"), robe ? $c.lit(", mitigated by your robe") : $c.lit(""));
@@ -1805,9 +1805,9 @@ async function attributes_enlightenment(unused_mode, final) {   // insight.c:148
     /*** Miscellany ***/
     if (Luck()) {
         ltmp = $c.abs(Luck());
-        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s%slucky"), ltmp >= 10 ? $c.lit("extremely ") : ltmp >= 5 ? $c.lit("very ") : $c.lit(""), (u.uluck + u.moreluck | 0) < 0 ? $c.lit("un") : $c.lit(""));
+        $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s%slucky"), ltmp >= 10 ? $c.lit("extremely ") : ltmp >= 5 ? $c.lit("very ") : $c.lit(""), u.uluck + u.moreluck < 0 ? $c.lit("un") : $c.lit(""));
         if (wizard()) {
-            $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit(" (%d)"), u.uluck + u.moreluck | 0);
+            $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit(" (%d)"), u.uluck + u.moreluck);
         }
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), new $c.Ptr(buf, 0), $c.lit(""));
     } else if (wizard()) {
@@ -1949,7 +1949,7 @@ export async function youhiding(via_enlghtmt, msgflag) {   // insight.c:2022
             /* on floor; is_hider() but otherwise not special: 'trapper' */
             if (u.utrap && u.utraptype === TT.PIT) {
                 t = t_at(u.ux, u.uy);
-                $c.sprintf(bp, $c.lit(" in a %spit"), t && (t.ttyp | 0) === SPIKED_PIT ? $c.lit("spiked ") : $c.lit(""));
+                $c.sprintf(bp, $c.lit(" in a %spit"), t && t.ttyp === SPIKED_PIT ? $c.lit("spiked ") : $c.lit(""));
             } else {
                 $c.sprintf(bp, $c.lit(" on the %s"), surface(u.ux, u.uy));
             }
@@ -2202,16 +2202,16 @@ async function show_achievements(final) {   // insight.c:2243
             case ACH.BELL:
                 /* alternate phrasing for present vs past and also for
                    possessing the item vs once held it */
-                await enlght_line(new $c.Ptr(You_, 0), final ? u.uhave.bell | 0 ? $c.lit("had") : $c.lit("handled") : u.uhave.bell | 0 ? $c.lit("have") : $c.lit("have handled"), $c.lit(" the Bell of Opening"), $c.lit(""));
+                await enlght_line(new $c.Ptr(You_, 0), final ? u.uhave.bell ? $c.lit("had") : $c.lit("handled") : u.uhave.bell ? $c.lit("have") : $c.lit("have handled"), $c.lit(" the Bell of Opening"), $c.lit(""));
                 break;
             case ACH.HELL:
                 await enlght_line(new $c.Ptr(You_, 0), final ? $c.lit("") : $c.lit("have "), $c.lit("entered Gehennom"), $c.lit(""));
                 break;
             case ACH.CNDL:
-                await enlght_line(new $c.Ptr(You_, 0), final ? u.uhave.menorah | 0 ? $c.lit("had") : $c.lit("handled") : u.uhave.menorah | 0 ? $c.lit("have") : $c.lit("have handled"), $c.lit(" the Candelabrum of Invocation"), $c.lit(""));
+                await enlght_line(new $c.Ptr(You_, 0), final ? u.uhave.menorah ? $c.lit("had") : $c.lit("handled") : u.uhave.menorah ? $c.lit("have") : $c.lit("have handled"), $c.lit(" the Candelabrum of Invocation"), $c.lit(""));
                 break;
             case ACH.BOOK:
-                await enlght_line(new $c.Ptr(You_, 0), final ? u.uhave.book | 0 ? $c.lit("had") : $c.lit("handled") : u.uhave.book | 0 ? $c.lit("have") : $c.lit("have handled"), $c.lit(" the Book of the Dead"), $c.lit(""));
+                await enlght_line(new $c.Ptr(You_, 0), final ? u.uhave.book ? $c.lit("had") : $c.lit("handled") : u.uhave.book ? $c.lit("have") : $c.lit("have handled"), $c.lit(" the Book of the Dead"), $c.lit(""));
                 break;
             case ACH.INVK:
                 await enlght_line(new $c.Ptr(You_, 0), final ? $c.lit("") : new $c.Ptr(have, 0), $c.lit("gained access to Moloch's Sanctum"), $c.lit(""));
@@ -2219,7 +2219,7 @@ async function show_achievements(final) {   // insight.c:2243
             case ACH.AMUL:
                 /* alternate wording for ascended (always past tense) since
                    hero had it until #offer forced it to be relinquished */
-                await enlght_line(new $c.Ptr(You_, 0), final ? u.uevent.ascended | 0 ? $c.lit("delivered") : u.uhave.amulet | 0 ? $c.lit("had") : $c.lit("had obtained") : u.uhave.amulet | 0 ? $c.lit("have") : $c.lit("have obtained"), $c.lit(" the Amulet of Yendor"), $c.lit(""));
+                await enlght_line(new $c.Ptr(You_, 0), final ? u.uevent.ascended ? $c.lit("delivered") : u.uhave.amulet ? $c.lit("had") : $c.lit("had obtained") : u.uhave.amulet ? $c.lit("have") : $c.lit("have obtained"), $c.lit(" the Amulet of Yendor"), $c.lit(""));
                 break;
             case ACH.ENDG:
                 /* reaching Astral makes feedback about reaching the Planes
@@ -2243,7 +2243,7 @@ async function show_achievements(final) {   // insight.c:2243
             case ACH.RNK7:
             case ACH.RNK8:
                 /* rank 0 is the starting condition, not an achievement; 8 is Xp 30 */
-                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("attained the rank of %s"), rank_of(rank_to_xlev(absidx - (ACH.RNK1 - 1) | 0), gu.urole.mnum, $c.i8(achidx < 0 ? TRUE : FALSE)));
+                $c.sprintf(new $c.Ptr(buf, 0), $c.lit("attained the rank of %s"), rank_of(rank_to_xlev(absidx - (ACH.RNK1 - 1) | 0), gu.urole.mnum, achidx < 0 ? TRUE : FALSE));
                 await enlght_line(new $c.Ptr(You_, 0), final ? $c.lit("") : new $c.Ptr(have, 0), new $c.Ptr(buf, 0), $c.lit(""));
                 break;
             default:
@@ -2300,10 +2300,10 @@ export async function record_achievement(achidx) {   // insight.c:2407
         return;
     }
     if (absidx >= ACH.RNK1 && absidx <= ACH.RNK8) {
-        await livelog_printf(achieve_msg[absidx].llflag, $c.lit("attained the rank of %s (level %d)"), rank_of(rank_to_xlev(absidx - (ACH.RNK1 - 1) | 0), gu.urole.mnum, $c.i8(achidx < 0 ? TRUE : FALSE)), u.ulevel);
+        await livelog_printf(achieve_msg[absidx].llflag, $c.lit("attained the rank of %s (level %d)"), rank_of(rank_to_xlev(absidx - (ACH.RNK1 - 1) | 0), gu.urole.mnum, achidx < 0 ? TRUE : FALSE), u.ulevel);
     } else if (achidx === ACH.SOKO_PRIZE || achidx === ACH.MINE_PRIZE) {
         /* need to supply extra information for these two */
-        otyp = $c.i16(achidx === ACH.SOKO_PRIZE ? svc.context.achieveo.soko_prize_otyp : svc.context.achieveo.mines_prize_otyp);
+        otyp = achidx === ACH.SOKO_PRIZE ? svc.context.achieveo.soko_prize_otyp : svc.context.achieveo.mines_prize_otyp;
         /* note: OBJ_NAME() works here because both "bag of holding" and
            "amulet of reflection" are fully named in their objects[] entry
            but that's not true in the general case */
@@ -2484,12 +2484,12 @@ function vanqsort_cmp(vptr1, vptr2) {   // insight.c:2621
                     mcls2 = $c.i8(S.ZOMBIE + 1 + $c.i32($c.pdiff(punct, new $c.Ptr(vanqsort_cmp$punctclasses, 0))) | 0);
                 }
             }
-            res = mcls1 - mcls2 | 0;   /* class */
+            res = mcls1 - mcls2;   /* class */
             if (res === 0) {
                 /* Riders are in the same class as major demons, yielding res==0
                    above when both mcls1 and mcls2 are either Riders or demons or
                    one of each; force Riders to be sorted before demons */
-                res = is_rider($c.relem(mons, indx2)) - is_rider($c.relem(mons, indx1)) | 0;
+                res = is_rider($c.relem(mons, indx2)) - is_rider($c.relem(mons, indx1));
                 /* res -1 => #1 is a Rider, #2 isn't;
                         0 => both Riders or neither;
                        +1 => #2 is a Rider, #1 isn't */
@@ -2569,7 +2569,7 @@ export async function set_vanq_order(for_vanq) {   // insight.c:2718
  * @returns {Promise<number>} int
  */
 export async function dovanquished() {   // insight.c:2769
-    await list_vanquished($c.i8(iflags.menu_requested ? 65 : 121), FALSE);
+    await list_vanquished(iflags.menu_requested ? 65 : 121, FALSE);
     iflags.menu_requested = FALSE;
     return ECMD.OK;
 }
@@ -2586,8 +2586,8 @@ export async function list_vanquished(defquery, ask) {   // insight.c:2784
     /* 'A' is only supplied by 'm #vanquished'; 'd' is only supplied by
        dump_everything() when writing dumplog, so won't happen if built
        without '#define DUMPLOG' but there's no need for conditionals here */
-    force_sort = $c.i8(defquery === 65 ? 1 : 0);
-    dumping = $c.i8(defquery === 100 ? 1 : 0);
+    force_sort = defquery === 65 ? 1 : 0;
+    dumping = defquery === 100 ? 1 : 0;
     /* normally we don't ask about sort order for the vanquished list unless
        it contains at least two entries; however, if player has used explicit
        'm #vanquished', choose order no matter what it contains so far */
@@ -2645,8 +2645,8 @@ export async function list_vanquished(defquery, ask) {   // insight.c:2784
                     return;
                 }
             }
-            uniq_header = $c.i8(flags.vanq_sortmode === VANQ.ALPHA_SEP ? 1 : 0);
-            class_header = $c.i8((flags.vanq_sortmode === VANQ.MCLS_LTOH || flags.vanq_sortmode === VANQ.MCLS_HTOL) && ntypes > 1 ? 1 : 0);
+            uniq_header = flags.vanq_sortmode === VANQ.ALPHA_SEP ? 1 : 0;
+            class_header = (flags.vanq_sortmode === VANQ.MCLS_LTOH || flags.vanq_sortmode === VANQ.MCLS_HTOL) && ntypes > 1 ? 1 : 0;
             klwin = await create_nhwindow()(NHW.MENU);
             await putstr()(klwin, 0, $c.lit("Vanquished creatures:"));
             if (!dumping) {
@@ -2656,7 +2656,7 @@ export async function list_vanquished(defquery, ask) {   // insight.c:2784
             for (ni = 0; ni < ntypes; ni = ni + 1 >>> 0) {
                 i = mindx[ni];
                 nkilled = svm.mvitals[i].died;
-                Rider = $c.i8(is_rider($c.relem(mons, i)));
+                Rider = is_rider($c.relem(mons, i));
                 mlet = mons[i].mlet;
                 if (class_header && (mlet !== prev_mlet || special_hdr && !Rider)) {
                     if (!Rider) {
@@ -2794,9 +2794,9 @@ export async function list_genocided(defquery, ask) {   // insight.c:3007
     let i = 0, mndx = 0, ngenocided = 0, nextinct = 0, ngone = 0, mvflags = 0, mindx = new Int32Array(383), c = 0, klwin = 0, buf = new Int8Array(256), genoing = 0, dumping = 0, both = 0, save_sortmode = 0, mlet = 0, prev_mlet = 0, class_header = 0;
     /* prompting for genocide or class genocide */
     /* for DUMPLOG; doesn't need to be conditional */
-    both = $c.i8(program_state.gameover || wizard() || discover() ? 1 : 0);
-    dumping = $c.i8(defquery === 100 ? 1 : 0);
-    genoing = $c.i8(defquery === 103 ? 1 : 0);
+    both = program_state.gameover || wizard() || discover() ? 1 : 0;
+    dumping = defquery === 100 ? 1 : 0;
+    genoing = defquery === 103 ? 1 : 0;
     if (dumping || genoing) {
         defquery = 121;
     }
@@ -2814,7 +2814,7 @@ export async function list_genocided(defquery, ask) {   // insight.c:3007
     /* genocided or extinct species list */
     if (ngone > 0) {
         $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Do you want a list of %sspecies%s%s?"), nextinct && !ngenocided ? $c.lit("extinct ") : $c.lit(""), ngenocided ? $c.lit(" genocided") : $c.lit(""), nextinct && ngenocided ? $c.lit(" and extinct") : $c.lit(""));
-        c = $c.i8(ask ? await yn_function(new $c.Ptr(buf, 0), ngone > 1 ? $c.lit("ynaq") : $c.lit("ynq\x1ba"), defquery, TRUE) : defquery);
+        c = ask ? await yn_function(new $c.Ptr(buf, 0), ngone > 1 ? $c.lit("ynaq") : $c.lit("ynq\x1ba"), defquery, TRUE) : defquery;
         if (c === 113) {
             program_state.stopprint = program_state.stopprint + 1 | 0;
         }
@@ -2839,7 +2839,7 @@ export async function list_genocided(defquery, ask) {   // insight.c:3007
                     flags.vanq_sortmode = VANQ.ALPHA_MIX;
                 }
                 $c.nh_deterministic_qsort(new $c.Ptr(mindx, 0), $c.u64(ngone), 4, vanqsort_cmp);
-                class_header = $c.i8(flags.vanq_sortmode === VANQ.MCLS_LTOH || flags.vanq_sortmode === VANQ.MCLS_HTOL ? 1 : 0);
+                class_header = flags.vanq_sortmode === VANQ.MCLS_LTOH || flags.vanq_sortmode === VANQ.MCLS_HTOL ? 1 : 0;
                 flags.vanq_sortmode = $c.u8(save_sortmode);
             }
             klwin = await create_nhwindow()(NHW.MENU);
@@ -2901,7 +2901,7 @@ export async function list_genocided(defquery, ask) {   // insight.c:3007
  * @returns {Promise<number>} int
  */
 export async function dogenocided() {   // insight.c:3135
-    await list_genocided($c.i8(iflags.menu_requested ? 97 : 121), FALSE);
+    await list_genocided(iflags.menu_requested ? 97 : 121, FALSE);
     return ECMD.OK;
 }
 /* #wizborn extended command */
@@ -3067,7 +3067,7 @@ export async function mstatusline(mtmp) {   // insight.c:3275
     }
     /* a stethoscope exposes mimic before getting here so this
        won't be relevant for it, but wand of probing doesn't */
-    if (mtmp.mundetected | 0 || mtmp.m_ap_type || visible_region_at(gb.bhitpos.x, gb.bhitpos.y)) {
+    if (mtmp.mundetected || mtmp.m_ap_type || visible_region_at(gb.bhitpos.x, gb.bhitpos.y)) {
         await mhidden_description(mtmp, MHID.PREFIX | MHID.ARTICLE | MHID.ALTMON | MHID.REGION, eos(new $c.Ptr(info, 0)));
     }
     if (mtmp.mcan) {
@@ -3076,7 +3076,7 @@ export async function mstatusline(mtmp) {   // insight.c:3275
     if (mtmp.mconf) {
         $c.strcat(new $c.Ptr(info, 0), $c.lit(", confused"));
     }
-    if (mtmp.mblinded | 0 || !mtmp.mcansee) {
+    if (mtmp.mblinded || !mtmp.mcansee) {
         $c.strcat(new $c.Ptr(info, 0), $c.lit(", blind"));
     }
     if (mtmp.mstun) {
@@ -3084,7 +3084,7 @@ export async function mstatusline(mtmp) {   // insight.c:3275
     }
     if (mtmp.msleeping) {
         $c.strcat(new $c.Ptr(info, 0), $c.lit(", asleep"));
-    } else if (mtmp.mfrozen | 0 || !mtmp.mcanmove) {
+    } else if (mtmp.mfrozen || !mtmp.mcanmove) {
         /* unfortunately mfrozen covers temporary sleep and being busy
          * (donning armor, for instance) as well as paralysis */
         $c.strcat(new $c.Ptr(info, 0), $c.lit(", can't move"));
@@ -3099,7 +3099,7 @@ export async function mstatusline(mtmp) {   // insight.c:3275
         $c.strcat(new $c.Ptr(info, 0), $c.lit(", trapped"));
     }
     if (mtmp.mspeed) {
-        $c.strcat(new $c.Ptr(info, 0), (mtmp.mspeed | 0) === MFAST ? $c.lit(", fast") : (mtmp.mspeed | 0) === MSLOW ? $c.lit(", slow") : $c.lit(", [? speed]"));
+        $c.strcat(new $c.Ptr(info, 0), mtmp.mspeed === MFAST ? $c.lit(", fast") : mtmp.mspeed === MSLOW ? $c.lit(", slow") : $c.lit(", [? speed]"));
     }
     if (mtmp.minvis) {
         $c.strcat(new $c.Ptr(info, 0), $c.lit(", invisible"));
@@ -3108,7 +3108,7 @@ export async function mstatusline(mtmp) {   // insight.c:3275
         pm = u.ustuck.data;
         /* being swallowed/engulfed takes priority over sticks(youmonst);
            this used to have that backwards and checked sticks() first */
-        $c.strcat(new $c.Ptr(info, 0), u.uswallow | 0 ? dmgtype_fromattack(pm, AD.DGST, AT.ENGL) !== null ? $c.lit(", digesting you") : $c.andu64(pm.mflags1, M1.ANIMAL) !== 0 && !(dmgtype_fromattack(pm, AD.WRAP, AT.ENGL) !== null) ? $c.lit(", swallowing you") : $c.lit(", engulfing you") : !sticks(gy.youmonst.data) ? $c.lit(", holding you") : $c.lit(", held by you"));
+        $c.strcat(new $c.Ptr(info, 0), u.uswallow ? dmgtype_fromattack(pm, AD.DGST, AT.ENGL) !== null ? $c.lit(", digesting you") : $c.andu64(pm.mflags1, M1.ANIMAL) !== 0 && !(dmgtype_fromattack(pm, AD.WRAP, AT.ENGL) !== null) ? $c.lit(", swallowing you") : $c.lit(", engulfing you") : !sticks(gy.youmonst.data) ? $c.lit(", holding you") : $c.lit(", held by you"));
         /* note: the "swallowing you" case won't
            happen because all animal engulfers
            either digest their victims (purple
@@ -3148,11 +3148,11 @@ export async function ustatusline() {   // insight.c:3402
     info[0] = 0;
     if (Sick()) {
         $c.strcat(new $c.Ptr(info, 0), $c.lit(", dying from"));
-        if ((u.usick_type | 0) & SICK_VOMITABLE) {
+        if (u.usick_type & SICK_VOMITABLE) {
             $c.strcat(new $c.Ptr(info, 0), $c.lit(" food poisoning"));
         }
-        if ((u.usick_type | 0) & SICK_NONVOMITABLE) {
-            if ((u.usick_type | 0) & SICK_VOMITABLE) {
+        if (u.usick_type & SICK_NONVOMITABLE) {
+            if (u.usick_type & SICK_VOMITABLE) {
                 $c.strcat(new $c.Ptr(info, 0), $c.lit(" and"));
             }
             $c.strcat(new $c.Ptr(info, 0), $c.lit(" illness"));

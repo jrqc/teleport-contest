@@ -1456,7 +1456,7 @@ export function $init() {
     init_svd.dungeons[0].fill_lvl[0] = 0;
     init_svd.dungeons[0].themerms[0] = 0;
     init_svd.dungeons[0].boneid = 0;
-    init_svd.dungeons[0].flags.town = (0) & 1;
+    init_svd.dungeons[0].flags.town = 0;
     init_svd.dungeons[0].entry_lev = 0;
     init_svd.dungeons[0].num_dunlevs = 0;
     init_svd.dungeons[0].dunlev_ureached = 0;
@@ -1596,7 +1596,7 @@ export function $init() {
     init_svp.pl_fruit[0] = 0;   /* pl_fruit */
     init_svq.$copyFrom(new $T.instance_globals_saved_q());
     /* quest.c */
-    init_svq.quest_status.first_start = (0) & 1;   /* quest_status */
+    init_svq.quest_status.first_start = 0;   /* quest_status */
     init_svr.$copyFrom(new $T.instance_globals_saved_r());
     /* mkroom.c */
     init_svr.rooms[0].lx = 0;   /* rooms */

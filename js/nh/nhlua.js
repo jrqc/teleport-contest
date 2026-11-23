@@ -378,11 +378,11 @@ async function nhl_gettrap(L) {   // nhlua.c:418
             await nhl_add_table_entry_int(L, $c.lit("tx"), ttmp.tx);
             await nhl_add_table_entry_int(L, $c.lit("ty"), ttmp.ty);
             await nhl_add_table_entry_int(L, $c.lit("ttyp"), ttmp.ttyp);
-            await nhl_add_table_entry_str(L, $c.lit("ttyp_name"), get_trapname_bytype(ttmp.ttyp | 0));
-            await nhl_add_table_entry_bool(L, $c.lit("tseen"), $c.i8(ttmp.tseen));
-            await nhl_add_table_entry_bool(L, $c.lit("madeby_u"), $c.i8(ttmp.madeby_u));
-            await nhl_add_table_entry_bool(L, $c.lit("once"), $c.i8(ttmp.once));
-            switch (ttmp.ttyp | 0) {
+            await nhl_add_table_entry_str(L, $c.lit("ttyp_name"), get_trapname_bytype(ttmp.ttyp));
+            await nhl_add_table_entry_bool(L, $c.lit("tseen"), ttmp.tseen);
+            await nhl_add_table_entry_bool(L, $c.lit("madeby_u"), ttmp.madeby_u);
+            await nhl_add_table_entry_bool(L, $c.lit("once"), ttmp.once);
+            switch (ttmp.ttyp) {
                 case SQKY_BOARD:
                     await nhl_add_table_entry_int(L, $c.lit("tnote"), ttmp.vl.v_tnote);
                     break;
@@ -483,38 +483,38 @@ async function nhl_getmap(L) {   // nhlua.c:532
         $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%c"), splev_typ2chr(svl.level.locations[x[0]][y[0]].typ));
         await nhl_add_table_entry_str(L, $c.lit("mapchr"), new $c.Ptr(buf, 0));
         await nhl_add_table_entry_int(L, $c.lit("seenv"), svl.level.locations[x[0]][y[0]].seenv);
-        await nhl_add_table_entry_bool(L, $c.lit("horizontal"), $c.i8(svl.level.locations[x[0]][y[0]].horizontal));
-        await nhl_add_table_entry_bool(L, $c.lit("lit"), $c.i8(svl.level.locations[x[0]][y[0]].lit));
-        await nhl_add_table_entry_bool(L, $c.lit("waslit"), $c.i8(svl.level.locations[x[0]][y[0]].waslit));
+        await nhl_add_table_entry_bool(L, $c.lit("horizontal"), svl.level.locations[x[0]][y[0]].horizontal);
+        await nhl_add_table_entry_bool(L, $c.lit("lit"), svl.level.locations[x[0]][y[0]].lit);
+        await nhl_add_table_entry_bool(L, $c.lit("waslit"), svl.level.locations[x[0]][y[0]].waslit);
         await nhl_add_table_entry_int(L, $c.lit("roomno"), svl.level.locations[x[0]][y[0]].roomno);
-        await nhl_add_table_entry_bool(L, $c.lit("edge"), $c.i8(svl.level.locations[x[0]][y[0]].edge));
-        await nhl_add_table_entry_bool(L, $c.lit("candig"), $c.i8(svl.level.locations[x[0]][y[0]].candig));
-        await nhl_add_table_entry_bool(L, $c.lit("has_trap"), $c.i8(t_at(x[0], y[0]) ? 1 : 0));
+        await nhl_add_table_entry_bool(L, $c.lit("edge"), svl.level.locations[x[0]][y[0]].edge);
+        await nhl_add_table_entry_bool(L, $c.lit("candig"), svl.level.locations[x[0]][y[0]].candig);
+        await nhl_add_table_entry_bool(L, $c.lit("has_trap"), t_at(x[0], y[0]) ? 1 : 0);
         /* TODO: FIXME: levl[x][y].flags */
         await lua_pushstring(L, $c.lit("flags"));
         await lua_newtable(L);
         if (svl.level.locations[x[0]][y[0]].typ === DOOR) {
-            await nhl_add_table_entry_bool(L, $c.lit("nodoor"), $c.i8((svl.level.locations[x[0]][y[0]].flags | 0) === D.NODOOR ? 1 : 0));
-            await nhl_add_table_entry_bool(L, $c.lit("broken"), $c.i8((svl.level.locations[x[0]][y[0]].flags | 0) & D.BROKEN));
-            await nhl_add_table_entry_bool(L, $c.lit("isopen"), $c.i8((svl.level.locations[x[0]][y[0]].flags | 0) & D.ISOPEN));
-            await nhl_add_table_entry_bool(L, $c.lit("closed"), $c.i8((svl.level.locations[x[0]][y[0]].flags | 0) & D.CLOSED));
-            await nhl_add_table_entry_bool(L, $c.lit("locked"), $c.i8((svl.level.locations[x[0]][y[0]].flags | 0) & D.LOCKED));
-            await nhl_add_table_entry_bool(L, $c.lit("trapped"), $c.i8((svl.level.locations[x[0]][y[0]].flags | 0) & D.TRAPPED));
+            await nhl_add_table_entry_bool(L, $c.lit("nodoor"), svl.level.locations[x[0]][y[0]].flags === D.NODOOR ? 1 : 0);
+            await nhl_add_table_entry_bool(L, $c.lit("broken"), svl.level.locations[x[0]][y[0]].flags & D.BROKEN);
+            await nhl_add_table_entry_bool(L, $c.lit("isopen"), svl.level.locations[x[0]][y[0]].flags & D.ISOPEN);
+            await nhl_add_table_entry_bool(L, $c.lit("closed"), svl.level.locations[x[0]][y[0]].flags & D.CLOSED);
+            await nhl_add_table_entry_bool(L, $c.lit("locked"), svl.level.locations[x[0]][y[0]].flags & D.LOCKED);
+            await nhl_add_table_entry_bool(L, $c.lit("trapped"), svl.level.locations[x[0]][y[0]].flags & D.TRAPPED);
         } else if (svl.level.locations[x[0]][y[0]].typ === ALTAR) {
             /* TODO: bits 0, 1, 2 */
-            await nhl_add_table_entry_bool(L, $c.lit("shrine"), $c.i8((svl.level.locations[x[0]][y[0]].flags | 0) & AM.SHRINE));
+            await nhl_add_table_entry_bool(L, $c.lit("shrine"), svl.level.locations[x[0]][y[0]].flags & AM.SHRINE);
         } else if (svl.level.locations[x[0]][y[0]].typ === THRONE) {
-            await nhl_add_table_entry_bool(L, $c.lit("looted"), $c.i8((svl.level.locations[x[0]][y[0]].flags | 0) & T_LOOTED));
+            await nhl_add_table_entry_bool(L, $c.lit("looted"), svl.level.locations[x[0]][y[0]].flags & T_LOOTED);
         } else if (svl.level.locations[x[0]][y[0]].typ === TREE) {
-            await nhl_add_table_entry_bool(L, $c.lit("looted"), $c.i8((svl.level.locations[x[0]][y[0]].flags | 0) & TREE_LOOTED));
-            await nhl_add_table_entry_bool(L, $c.lit("swarm"), $c.i8((svl.level.locations[x[0]][y[0]].flags | 0) & TREE_SWARM));
+            await nhl_add_table_entry_bool(L, $c.lit("looted"), svl.level.locations[x[0]][y[0]].flags & TREE_LOOTED);
+            await nhl_add_table_entry_bool(L, $c.lit("swarm"), svl.level.locations[x[0]][y[0]].flags & TREE_SWARM);
         } else if (svl.level.locations[x[0]][y[0]].typ === FOUNTAIN) {
-            await nhl_add_table_entry_bool(L, $c.lit("looted"), $c.i8((svl.level.locations[x[0]][y[0]].flags | 0) & F_LOOTED));
-            await nhl_add_table_entry_bool(L, $c.lit("warned"), $c.i8((svl.level.locations[x[0]][y[0]].flags | 0) & F_WARNED));
+            await nhl_add_table_entry_bool(L, $c.lit("looted"), svl.level.locations[x[0]][y[0]].flags & F_LOOTED);
+            await nhl_add_table_entry_bool(L, $c.lit("warned"), svl.level.locations[x[0]][y[0]].flags & F_WARNED);
         } else if (svl.level.locations[x[0]][y[0]].typ === SINK) {
-            await nhl_add_table_entry_bool(L, $c.lit("pudding"), $c.i8((svl.level.locations[x[0]][y[0]].flags | 0) & S.LPUDDING));
-            await nhl_add_table_entry_bool(L, $c.lit("dishwasher"), $c.i8((svl.level.locations[x[0]][y[0]].flags | 0) & S.LDWASHER));
-            await nhl_add_table_entry_bool(L, $c.lit("ring"), $c.i8((svl.level.locations[x[0]][y[0]].flags | 0) & S.LRING));
+            await nhl_add_table_entry_bool(L, $c.lit("pudding"), svl.level.locations[x[0]][y[0]].flags & S.LPUDDING);
+            await nhl_add_table_entry_bool(L, $c.lit("dishwasher"), svl.level.locations[x[0]][y[0]].flags & S.LDWASHER);
+            await nhl_add_table_entry_bool(L, $c.lit("ring"), svl.level.locations[x[0]][y[0]].flags & S.LRING);
         }
         /* TODO: drawbridges, walls, ladders, room=>ICED_xxx */
         await lua_settable(L, -3);
@@ -827,17 +827,17 @@ async function nhl_an(L) {   // nhlua.c:913
 function nhl_lua_rnglog_ctx_enabled() {   // nhlua.c:927
     let env = null, rnglog = null;
     if (nhl_lua_rnglog_ctx_enabled$enabled >= 0) {
-        return $c.i8(nhl_lua_rnglog_ctx_enabled$enabled ? TRUE : FALSE);
+        return nhl_lua_rnglog_ctx_enabled$enabled ? TRUE : FALSE;
     }
     env = $c.getenv($c.lit("NETHACK_LUA_RNGLOG_CTX"));
     if (env) {
         nhl_lua_rnglog_ctx_enabled$enabled = env.get(0) && $c.strcmp(env, $c.lit("0")) ? 1 : 0;
-        return $c.i8(nhl_lua_rnglog_ctx_enabled$enabled ? TRUE : FALSE);
+        return nhl_lua_rnglog_ctx_enabled$enabled ? TRUE : FALSE;
     }
     /* Harness default: when RNG logging is active, include Lua callsites. */
     rnglog = $c.getenv($c.lit("NETHACK_RNGLOG"));
     nhl_lua_rnglog_ctx_enabled$enabled = rnglog && rnglog.get(0) ? 1 : 0;
-    return $c.i8(nhl_lua_rnglog_ctx_enabled$enabled ? TRUE : FALSE);
+    return nhl_lua_rnglog_ctx_enabled$enabled ? TRUE : FALSE;
 }
 /**
  * @param {*} L lua_State *
@@ -1462,7 +1462,7 @@ async function nhl_debug_flags(L) {   // nhlua.c:1617
     /* disable monster generation */
     val = await get_table_boolean_opt(L, $c.lit("mongen"), -1);
     if (val !== -1) {
-        iflags.debug_mongen = $c.i8(!$c.i8(val) ? 1 : 0);   /* value in lua is negated */
+        iflags.debug_mongen = !$c.i8(val) ? 1 : 0;   /* value in lua is negated */
         if (iflags.debug_mongen) {
             for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp2) {
                 mtmp2 = mtmp.nmon;
@@ -1476,7 +1476,7 @@ async function nhl_debug_flags(L) {   // nhlua.c:1617
     /* prevent hunger */
     val = await get_table_boolean_opt(L, $c.lit("hunger"), -1);
     if (val !== -1) {
-        iflags.debug_hunger = $c.i8(!$c.i8(val) ? 1 : 0);   /* value in lua is negated */
+        iflags.debug_hunger = !$c.i8(val) ? 1 : 0;   /* value in lua is negated */
     }
     /* allow overwriting stairs */
     val = await get_table_boolean_opt(L, $c.lit("overwrite_stairs"), -1);
@@ -1503,7 +1503,7 @@ async function nhl_flip_level(L) {   // nhlua.c:1663
     if (argc === 1) {
         flp = $c.i32(lua_tointegerx(L, 1, null));
     }
-    await flip_level(flp, $c.i8(!gi.in_mklev ? 1 : 0));
+    await flip_level(flp, !gi.in_mklev ? 1 : 0);
     return 0;
 }
 /* does location at x,y have timer? */
@@ -1528,7 +1528,7 @@ async function nhl_timer_has_at(L) {   // nhlua.c:1682
     cvt_to_abscoord(new $c.Ptr(x, 0), new $c.Ptr(y, 0));
     if (isok(x[0], y[0])) {
         when = spot_time_expires(x[0], y[0], timertype);
-        ret = $c.i8(when > 0 ? 1 : 0);
+        ret = when > 0 ? 1 : 0;
     }
     lua_pushboolean(L, ret);
     return 1;

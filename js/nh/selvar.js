@@ -190,7 +190,7 @@ export function selection_getpoint(x, y, sel) {   // selvar.c:168
     if (x < 0 || y < 0 || x >= sel.wid || y >= sel.hei) {
         return 0;
     }
-    return $c.i16(sel.map.get(Math.imul(sel.wid, y) + x | 0) - 1 | 0);
+    return sel.map.get(Math.imul(sel.wid, y) + x | 0) - 1;
 }
 /**
  * @param {number} x coordxy
@@ -278,7 +278,7 @@ export async function selection_filter_mapchar(ov, typ, lit) {   // selvar.c:248
     selection_getbounds(ov, rect);
     for (x = rect.lx; x <= rect.hx; x = x + 1 | 0) {
         for (y = rect.ly; y <= rect.hy; y = y + 1 | 0) {
-            if (selection_getpoint($c.i16(x), $c.i16(y), ov) && match_maptyps(typ, $c.i16(svl.level.locations[x][y].typ))) {
+            if (selection_getpoint($c.i16(x), $c.i16(y), ov) && match_maptyps(typ, svl.level.locations[x][y].typ)) {
                 switch (lit) {
                     default:
                     case -2:
@@ -355,13 +355,13 @@ export async function selection_do_grow(ov, dir) {   // selvar.c:321
         dir = random_wdir();
     }
     selection_getbounds(ov, rect);
-    for (x = $c.i16(0 > (rect.lx - 1 | 0) ? 0 : rect.lx - 1 | 0); x <= (COLNO - 1 < (rect.hx + 1 | 0) ? COLNO - 1 : rect.hx + 1 | 0); x = $c.i16(x + 1)) {
-        for (y = $c.i16(0 > (rect.ly - 1 | 0) ? 0 : rect.ly - 1 | 0); y <= (ROWNO - 1 < (rect.hy + 1 | 0) ? ROWNO - 1 : rect.hy + 1 | 0); y = $c.i16(y + 1)) {
+    for (x = $c.i16(0 > rect.lx - 1 ? 0 : rect.lx - 1); x <= (COLNO - 1 < rect.hx + 1 ? COLNO - 1 : rect.hx + 1); x = $c.i16(x + 1)) {
+        for (y = $c.i16(0 > rect.ly - 1 ? 0 : rect.ly - 1); y <= (ROWNO - 1 < rect.hy + 1 ? ROWNO - 1 : rect.hy + 1); y = $c.i16(y + 1)) {
             /* note:  dir is a mask of multiple directions, but the only
                way to specify diagonals is by including the two adjacent
                orthogonal directions, which effectively specifies three-
                way growth [WEST|NORTH => WEST plus WEST|NORTH plus NORTH] */
-            if (dir & W.WEST && selection_getpoint($c.i16(x + 1 | 0), y, ov) || (dir & (W.WEST | W.NORTH)) === (W.WEST | W.NORTH) && selection_getpoint($c.i16(x + 1 | 0), $c.i16(y + 1 | 0), ov) || dir & W.NORTH && selection_getpoint(x, $c.i16(y + 1 | 0), ov) || (dir & (W.NORTH | W.EAST)) === (W.NORTH | W.EAST) && selection_getpoint($c.i16(x - 1 | 0), $c.i16(y + 1 | 0), ov) || dir & W.EAST && selection_getpoint($c.i16(x - 1 | 0), y, ov) || (dir & (W.EAST | W.SOUTH)) === (W.EAST | W.SOUTH) && selection_getpoint($c.i16(x - 1 | 0), $c.i16(y - 1 | 0), ov) || dir & W.SOUTH && selection_getpoint(x, $c.i16(y - 1 | 0), ov) || (dir & (W.SOUTH | W.WEST)) === (W.SOUTH | W.WEST) && selection_getpoint($c.i16(x + 1 | 0), $c.i16(y - 1 | 0), ov)) {
+            if (dir & W.WEST && selection_getpoint($c.i16(x + 1), y, ov) || (dir & (W.WEST | W.NORTH)) === (W.WEST | W.NORTH) && selection_getpoint($c.i16(x + 1), $c.i16(y + 1), ov) || dir & W.NORTH && selection_getpoint(x, $c.i16(y + 1), ov) || (dir & (W.NORTH | W.EAST)) === (W.NORTH | W.EAST) && selection_getpoint($c.i16(x - 1), $c.i16(y + 1), ov) || dir & W.EAST && selection_getpoint($c.i16(x - 1), y, ov) || (dir & (W.EAST | W.SOUTH)) === (W.EAST | W.SOUTH) && selection_getpoint($c.i16(x - 1), $c.i16(y - 1), ov) || dir & W.SOUTH && selection_getpoint(x, $c.i16(y - 1), ov) || (dir & (W.SOUTH | W.WEST)) === (W.SOUTH | W.WEST) && selection_getpoint($c.i16(x + 1), $c.i16(y - 1), ov)) {
                 selection_setpoint(x, y, tmp, 1);
             }
         }
@@ -436,10 +436,10 @@ export async function selection_floodfill(ov, x, y, diagonals) {   // selvar.c:3
             selection_setpoint(x, y, tmp, 1);
         }
         do {
-            if (isok($c.i16(x + 1 | 0), y) && await selection_flood_check_func($c.i16(x + 1 | 0), y) && !selection_getpoint($c.i16(x + 1 | 0), y, tmp) && !sel_flood_havepoint($c.i16(x + 1 | 0), y, new $c.Ptr(dx, 0), new $c.Ptr(dy, 0), idx)) {
+            if (isok($c.i16(x + 1), y) && await selection_flood_check_func($c.i16(x + 1), y) && !selection_getpoint($c.i16(x + 1), y, tmp) && !sel_flood_havepoint($c.i16(x + 1), y, new $c.Ptr(dx, 0), new $c.Ptr(dy, 0), idx)) {
                 do {
                     if (idx < SEL_FLOOD_STACK) {
-                        dx[idx] = $c.i16(x + 1 | 0);
+                        dx[idx] = $c.i16(x + 1);
                         dy[idx] = y;
                         idx = idx + 1 | 0;
                     } else {
@@ -449,10 +449,10 @@ export async function selection_floodfill(ov, x, y, diagonals) {   // selvar.c:3
             }
         } while (0);
         do {
-            if (isok($c.i16(x - 1 | 0), y) && await selection_flood_check_func($c.i16(x - 1 | 0), y) && !selection_getpoint($c.i16(x - 1 | 0), y, tmp) && !sel_flood_havepoint($c.i16(x - 1 | 0), y, new $c.Ptr(dx, 0), new $c.Ptr(dy, 0), idx)) {
+            if (isok($c.i16(x - 1), y) && await selection_flood_check_func($c.i16(x - 1), y) && !selection_getpoint($c.i16(x - 1), y, tmp) && !sel_flood_havepoint($c.i16(x - 1), y, new $c.Ptr(dx, 0), new $c.Ptr(dy, 0), idx)) {
                 do {
                     if (idx < SEL_FLOOD_STACK) {
-                        dx[idx] = $c.i16(x - 1 | 0);
+                        dx[idx] = $c.i16(x - 1);
                         dy[idx] = y;
                         idx = idx + 1 | 0;
                     } else {
@@ -462,11 +462,11 @@ export async function selection_floodfill(ov, x, y, diagonals) {   // selvar.c:3
             }
         } while (0);
         do {
-            if (isok(x, $c.i16(y + 1 | 0)) && await selection_flood_check_func(x, $c.i16(y + 1 | 0)) && !selection_getpoint(x, $c.i16(y + 1 | 0), tmp) && !sel_flood_havepoint(x, $c.i16(y + 1 | 0), new $c.Ptr(dx, 0), new $c.Ptr(dy, 0), idx)) {
+            if (isok(x, $c.i16(y + 1)) && await selection_flood_check_func(x, $c.i16(y + 1)) && !selection_getpoint(x, $c.i16(y + 1), tmp) && !sel_flood_havepoint(x, $c.i16(y + 1), new $c.Ptr(dx, 0), new $c.Ptr(dy, 0), idx)) {
                 do {
                     if (idx < SEL_FLOOD_STACK) {
                         dx[idx] = x;
-                        dy[idx] = $c.i16(y + 1 | 0);
+                        dy[idx] = $c.i16(y + 1);
                         idx = idx + 1 | 0;
                     } else {
                         await panic(new $c.Ptr(selection_floodfill$floodfill_stack_overrun, 0));
@@ -475,11 +475,11 @@ export async function selection_floodfill(ov, x, y, diagonals) {   // selvar.c:3
             }
         } while (0);
         do {
-            if (isok(x, $c.i16(y - 1 | 0)) && await selection_flood_check_func(x, $c.i16(y - 1 | 0)) && !selection_getpoint(x, $c.i16(y - 1 | 0), tmp) && !sel_flood_havepoint(x, $c.i16(y - 1 | 0), new $c.Ptr(dx, 0), new $c.Ptr(dy, 0), idx)) {
+            if (isok(x, $c.i16(y - 1)) && await selection_flood_check_func(x, $c.i16(y - 1)) && !selection_getpoint(x, $c.i16(y - 1), tmp) && !sel_flood_havepoint(x, $c.i16(y - 1), new $c.Ptr(dx, 0), new $c.Ptr(dy, 0), idx)) {
                 do {
                     if (idx < SEL_FLOOD_STACK) {
                         dx[idx] = x;
-                        dy[idx] = $c.i16(y - 1 | 0);
+                        dy[idx] = $c.i16(y - 1);
                         idx = idx + 1 | 0;
                     } else {
                         await panic(new $c.Ptr(selection_floodfill$floodfill_stack_overrun, 0));
@@ -489,11 +489,11 @@ export async function selection_floodfill(ov, x, y, diagonals) {   // selvar.c:3
         } while (0);
         if (diagonals) {
             do {
-                if (isok($c.i16(x + 1 | 0), $c.i16(y + 1 | 0)) && await selection_flood_check_func($c.i16(x + 1 | 0), $c.i16(y + 1 | 0)) && !selection_getpoint($c.i16(x + 1 | 0), $c.i16(y + 1 | 0), tmp) && !sel_flood_havepoint($c.i16(x + 1 | 0), $c.i16(y + 1 | 0), new $c.Ptr(dx, 0), new $c.Ptr(dy, 0), idx)) {
+                if (isok($c.i16(x + 1), $c.i16(y + 1)) && await selection_flood_check_func($c.i16(x + 1), $c.i16(y + 1)) && !selection_getpoint($c.i16(x + 1), $c.i16(y + 1), tmp) && !sel_flood_havepoint($c.i16(x + 1), $c.i16(y + 1), new $c.Ptr(dx, 0), new $c.Ptr(dy, 0), idx)) {
                     do {
                         if (idx < SEL_FLOOD_STACK) {
-                            dx[idx] = $c.i16(x + 1 | 0);
-                            dy[idx] = $c.i16(y + 1 | 0);
+                            dx[idx] = $c.i16(x + 1);
+                            dy[idx] = $c.i16(y + 1);
                             idx = idx + 1 | 0;
                         } else {
                             await panic(new $c.Ptr(selection_floodfill$floodfill_stack_overrun, 0));
@@ -502,11 +502,11 @@ export async function selection_floodfill(ov, x, y, diagonals) {   // selvar.c:3
                 }
             } while (0);
             do {
-                if (isok($c.i16(x - 1 | 0), $c.i16(y - 1 | 0)) && await selection_flood_check_func($c.i16(x - 1 | 0), $c.i16(y - 1 | 0)) && !selection_getpoint($c.i16(x - 1 | 0), $c.i16(y - 1 | 0), tmp) && !sel_flood_havepoint($c.i16(x - 1 | 0), $c.i16(y - 1 | 0), new $c.Ptr(dx, 0), new $c.Ptr(dy, 0), idx)) {
+                if (isok($c.i16(x - 1), $c.i16(y - 1)) && await selection_flood_check_func($c.i16(x - 1), $c.i16(y - 1)) && !selection_getpoint($c.i16(x - 1), $c.i16(y - 1), tmp) && !sel_flood_havepoint($c.i16(x - 1), $c.i16(y - 1), new $c.Ptr(dx, 0), new $c.Ptr(dy, 0), idx)) {
                     do {
                         if (idx < SEL_FLOOD_STACK) {
-                            dx[idx] = $c.i16(x - 1 | 0);
-                            dy[idx] = $c.i16(y - 1 | 0);
+                            dx[idx] = $c.i16(x - 1);
+                            dy[idx] = $c.i16(y - 1);
                             idx = idx + 1 | 0;
                         } else {
                             await panic(new $c.Ptr(selection_floodfill$floodfill_stack_overrun, 0));
@@ -515,11 +515,11 @@ export async function selection_floodfill(ov, x, y, diagonals) {   // selvar.c:3
                 }
             } while (0);
             do {
-                if (isok($c.i16(x - 1 | 0), $c.i16(y + 1 | 0)) && await selection_flood_check_func($c.i16(x - 1 | 0), $c.i16(y + 1 | 0)) && !selection_getpoint($c.i16(x - 1 | 0), $c.i16(y + 1 | 0), tmp) && !sel_flood_havepoint($c.i16(x - 1 | 0), $c.i16(y + 1 | 0), new $c.Ptr(dx, 0), new $c.Ptr(dy, 0), idx)) {
+                if (isok($c.i16(x - 1), $c.i16(y + 1)) && await selection_flood_check_func($c.i16(x - 1), $c.i16(y + 1)) && !selection_getpoint($c.i16(x - 1), $c.i16(y + 1), tmp) && !sel_flood_havepoint($c.i16(x - 1), $c.i16(y + 1), new $c.Ptr(dx, 0), new $c.Ptr(dy, 0), idx)) {
                     do {
                         if (idx < SEL_FLOOD_STACK) {
-                            dx[idx] = $c.i16(x - 1 | 0);
-                            dy[idx] = $c.i16(y + 1 | 0);
+                            dx[idx] = $c.i16(x - 1);
+                            dy[idx] = $c.i16(y + 1);
                             idx = idx + 1 | 0;
                         } else {
                             await panic(new $c.Ptr(selection_floodfill$floodfill_stack_overrun, 0));
@@ -528,11 +528,11 @@ export async function selection_floodfill(ov, x, y, diagonals) {   // selvar.c:3
                 }
             } while (0);
             do {
-                if (isok($c.i16(x + 1 | 0), $c.i16(y - 1 | 0)) && await selection_flood_check_func($c.i16(x + 1 | 0), $c.i16(y - 1 | 0)) && !selection_getpoint($c.i16(x + 1 | 0), $c.i16(y - 1 | 0), tmp) && !sel_flood_havepoint($c.i16(x + 1 | 0), $c.i16(y - 1 | 0), new $c.Ptr(dx, 0), new $c.Ptr(dy, 0), idx)) {
+                if (isok($c.i16(x + 1), $c.i16(y - 1)) && await selection_flood_check_func($c.i16(x + 1), $c.i16(y - 1)) && !selection_getpoint($c.i16(x + 1), $c.i16(y - 1), tmp) && !sel_flood_havepoint($c.i16(x + 1), $c.i16(y - 1), new $c.Ptr(dx, 0), new $c.Ptr(dy, 0), idx)) {
                     do {
                         if (idx < SEL_FLOOD_STACK) {
-                            dx[idx] = $c.i16(x + 1 | 0);
-                            dy[idx] = $c.i16(y - 1 | 0);
+                            dx[idx] = $c.i16(x + 1);
+                            dy[idx] = $c.i16(y - 1);
                             idx = idx + 1 | 0;
                         } else {
                             await panic(new $c.Ptr(selection_floodfill$floodfill_stack_overrun, 0));
@@ -748,17 +748,17 @@ export function selection_do_line(x1, y1, x2, y2, ov) {   // selvar.c:626
     let d0 = 0, dx = 0, dy = 0, ai = 0, bi = 0, xi = 0, yi = 0;
     if (x1 < x2) {
         xi = 1;
-        dx = x2 - x1 | 0;
+        dx = x2 - x1;
     } else {
         xi = -1;
-        dx = x1 - x2 | 0;
+        dx = x1 - x2;
     }
     if (y1 < y2) {
         yi = 1;
-        dy = y2 - y1 | 0;
+        dy = y2 - y1;
     } else {
         yi = -1;
-        dy = y1 - y2 | 0;
+        dy = y1 - y2;
     }
     selection_setpoint(x1, y1, ov, 1);
     if (!dx && !dy) {
@@ -807,18 +807,18 @@ export function selection_do_randline(x1, y1, x2, y2, rough, rec, ov) {   // sel
     if (rec < 1 || x2 === x1 && y2 === y1) {
         return;
     }
-    if (rough > ($c.abs(x2 - x1 | 0) > $c.abs(y2 - y1 | 0) ? $c.abs(x2 - x1 | 0) : $c.abs(y2 - y1 | 0))) {
-        rough = $c.i8($c.abs(x2 - x1 | 0) > $c.abs(y2 - y1 | 0) ? $c.abs(x2 - x1 | 0) : $c.abs(y2 - y1 | 0));
+    if (rough > ($c.abs(x2 - x1) > $c.abs(y2 - y1) ? $c.abs(x2 - x1) : $c.abs(y2 - y1))) {
+        rough = $c.i8($c.abs(x2 - x1) > $c.abs(y2 - y1) ? $c.abs(x2 - x1) : $c.abs(y2 - y1));
     }
     if (rough < 2) {
-        mx = $c.div32(x1 + x2 | 0, 2);
-        my = $c.div32(y1 + y2 | 0, 2);
+        mx = $c.div32(x1 + x2, 2);
+        my = $c.div32(y1 + y2, 2);
     } else {
         do {
             dx = rn2(rough) - $c.div32(rough, 2) | 0;
             dy = rn2(rough) - $c.div32(rough, 2) | 0;
-            mx = $c.div32(x1 + x2 | 0, 2) + dx | 0;
-            my = $c.div32(y1 + y2 | 0, 2) + dy | 0;
+            mx = $c.div32(x1 + x2, 2) + dx | 0;
+            my = $c.div32(y1 + y2, 2) + dy | 0;
         } while (mx > COLNO - 1 || mx < 0 || my < 0 || my > ROWNO - 1);
     }
     if (!selection_getpoint($c.i16(mx), $c.i16(my), ov)) {
@@ -879,8 +879,8 @@ export function selection_size_description(sel, buf) {   // selvar.c:764
     let rect = new $T.nhrect(), dx = 0, dy = 0;
     rect.$copyFrom(cg.zeroNhRect);
     selection_getbounds(sel, rect);
-    dx = $c.i16((rect.hx - rect.lx | 0) + 1 | 0);
-    dy = $c.i16((rect.hy - rect.ly | 0) + 1 | 0);
+    dx = $c.i16(rect.hx - rect.lx + 1);
+    dy = $c.i16(rect.hy - rect.ly + 1);
     $c.sprintf(buf, $c.lit("%s %i by %i"), selection_is_irregular(sel) ? $c.lit("irregularly shaped") : dx === dy ? $c.lit("square") : $c.lit("rectangular"), dx, dy);
     return buf;
 }

@@ -178,7 +178,7 @@ async function restlevchn(nhfp) {   // restore.c:130
 async function restdamage(nhfp) {   // restore.c:153
     let dmgcount = Uint32Array.of(0), counter = 0, tmp_dam = null, ghostly = 0;
     dmgcount[0] = 0;
-    ghostly = $c.i8(nhfp.ftype === NHF.BONESFILE ? 1 : 0);
+    ghostly = nhfp.ftype === NHF.BONESFILE ? 1 : 0;
     await sfi_unsigned(nhfp, new $c.Ptr(dmgcount, 0), $c.lit("damage-damage_count"));
     counter = dmgcount[0] | 0;
     if (!counter) {
@@ -252,7 +252,7 @@ async function restobjchn(nhfp, frozen) {   // restore.c:231
     otmp2 = null;
     first = null;
     buflen[0] = 0;
-    ghostly = $c.i8(nhfp.ftype === NHF.BONESFILE ? 1 : 0);
+    ghostly = nhfp.ftype === NHF.BONESFILE ? 1 : 0;
     while (1) {
         await sfi_int(nhfp, new $c.Ptr(buflen, 0), $c.lit("obj-obj_length"));
         if (buflen[0] === -1) {
@@ -284,14 +284,14 @@ async function restobjchn(nhfp, frozen) {   // restore.c:231
         /* !SFCTOOL */
         /* get contents of a container or statue */
         if (Has_contents(otmp)) {
-            $t1 = await restobjchn(nhfp, $c.i8(Is_IceBox(otmp))), otmp.cobj = $t1;
+            $t1 = await restobjchn(nhfp, Is_IceBox(otmp)), otmp.cobj = $t1;
             /* restore container back pointers */
             for (otmp3 = otmp.cobj; otmp3; otmp3 = otmp3.nobj) {
                 otmp3.v.v_ocontainer = otmp;
             }
         }
         if (otmp.bypass) {
-            otmp.bypass = (0) & 1;
+            otmp.bypass = 0;
         }
         if (!ghostly) {
             /* fix the pointers */
@@ -395,7 +395,7 @@ async function restmonchn(nhfp) {   // restore.c:376
     mtmp2 = null;
     first = null;
     buflen[0] = 0;
-    ghostly = $c.i8(nhfp.ftype === NHF.BONESFILE ? 1 : 0);
+    ghostly = nhfp.ftype === NHF.BONESFILE ? 1 : 0;
     while (1) {
         await sfi_int(nhfp, new $c.Ptr(buflen, 0), $c.lit("monst-monst_length"));
         if (buflen[0] === -1) {
@@ -566,8 +566,8 @@ async function restgamestate(nhfp) {   // restore.c:525
        player might be overriding the save file values for them;
        in the discover case, we don't want to set that for a normal
        game until after the save file has been removed */
-    iflags.deferred_X = $c.i8(newgameflags.explore && !discover() ? 1 : 0);
-    restoring_special = $c.i8(wizard() || discover() ? 1 : 0);
+    iflags.deferred_X = newgameflags.explore && !discover() ? 1 : 0;
+    restoring_special = wizard() || discover() ? 1 : 0;
     if (newgameflags.debug) {
         /* authorized by startup code; wizard mode exists and is allowed */
         flags.debug = TRUE, ($t1 = iflags.deferred_X = FALSE, flags.explore = $t1);
@@ -946,7 +946,7 @@ export async function getlev(nhfp, pid, lev) {   // restore.c:1046
     elapsed = 0;
     hpid[0] = 0;
     dlvl[0] = 0;
-    ghostly = $c.i8(nhfp.ftype === NHF.BONESFILE ? 1 : 0);
+    ghostly = nhfp.ftype === NHF.BONESFILE ? 1 : 0;
     tmpc = null;
     program_state.in_getlev = TRUE;
     if (ghostly) {
@@ -1060,7 +1060,7 @@ export async function getlev(nhfp, pid, lev) {   // restore.c:1046
             if (mtmp.wormno) {
                 await place_wsegs(mtmp, null);
             }
-            if (hides_under(mtmp.data) && mtmp.mundetected | 0) {
+            if (hides_under(mtmp.data) && mtmp.mundetected) {
                 await hideunder(mtmp);
             }
         }
@@ -1104,7 +1104,7 @@ export async function getlev(nhfp, pid, lev) {   // restore.c:1046
         freefruitchn(go.oldfruit), go.oldfruit = null;
         if (lev > ledger_no(svd.dungeon_topology.d_medusa_level) && lev < ledger_no(svd.dungeon_topology.d_stronghold_level) && !stway) {
             dest.dnum = u.uz.dnum;
-            dest.dlevel = $c.i16(u.uz.dlevel + 1 | 0);
+            dest.dlevel = $c.i16(u.uz.dlevel + 1);
             await mazexy(cc);
             await stairway_add(cc.x, cc.y, FALSE, FALSE, dest);
             svl.level.locations[cc.x][cc.y].typ = STAIRS;
@@ -1134,7 +1134,7 @@ export async function getlev(nhfp, pid, lev) {   // restore.c:1046
                 case BR.PORTAL:
                     /* max of 1 portal per level */
                     for (trap = gf.ftrap; trap; trap = trap.ntrap) {
-                        if ((trap.ttyp | 0) === MAGIC_PORTAL) {
+                        if (trap.ttyp === MAGIC_PORTAL) {
                             break;
                         }
                     }
@@ -1149,7 +1149,7 @@ export async function getlev(nhfp, pid, lev) {   // restore.c:1046
             /* Remove any dangling portals. */
             for (trap = gf.ftrap; trap; trap = ttmp) {
                 ttmp = trap.ntrap;
-                if ((trap.ttyp | 0) === MAGIC_PORTAL) {
+                if (trap.ttyp === MAGIC_PORTAL) {
                     await deltrap(trap);
                 }
             }

@@ -63,7 +63,7 @@ const callbacks = $c.nulls(2);
  * @returns {number} boolean
  */
 export function inside_rect(r, x, y) {   // region.c:54
-    return $c.i8(x >= r.lx && x <= r.hx && y >= r.ly && y <= r.hy ? 1 : 0);
+    return x >= r.lx && x <= r.hx && y >= r.ly && y <= r.hy ? 1 : 0;
 }
 /*
  * Check if a point is inside a region.
@@ -154,7 +154,7 @@ export async function create_region(rects, nrect) {   // region.c:79
  */
 export async function add_rect_to_reg(reg, rect) {   // region.c:133
     let tmp_rect = null;
-    tmp_rect = $c.asRec(await alloc($c.u32($c.mulu64($c.u64(reg.nrects + 1 | 0), 8))), $T.nhrect, 8);
+    tmp_rect = $c.asRec(await alloc($c.u32($c.mulu64($c.u64(reg.nrects + 1), 8))), $T.nhrect, 8);
     if (reg.nrects > 0) {
         $c.memcpy(tmp_rect, reg.rects, $c.mulu64($c.u64(reg.nrects), 8));
         $c.free(reg.rects);
@@ -195,7 +195,7 @@ export async function add_mon_to_reg(reg, mon) {   // region.c:161
         return;
     }
     if (reg.max_monst <= reg.n_monst) {
-        tmp_m = $c.asArr(await alloc($c.u32($c.mulu64(4, $c.u64(reg.max_monst + MONST_INC | 0)))), Uint32Array);
+        tmp_m = $c.asArr(await alloc($c.u32($c.mulu64(4, $c.u64(reg.max_monst + MONST_INC)))), Uint32Array);
         if (reg.max_monst > 0) {
             for (i = 0; i < reg.max_monst; i = i + 1 | 0) {
                 tmp_m.set(i, reg.monsters.get(i));
@@ -356,7 +356,7 @@ export async function remove_region(reg) {   // region.c:344
     /* Update screen if necessary */
     reg.ttl = -2;   /* for visible_region_at */
     if (reg.visible) {
-        tmp_uinwater = $c.i8(u.uinwater);
+        tmp_uinwater = u.uinwater;
         /* need to process the region's spots twice, first unblocking all
            locations which no longer block line-of-sight, then redrawing
            spots within revised line-of-sight; skip second pass if blind */
@@ -766,7 +766,7 @@ export async function rest_regions(nhfp) {   // region.c:799
     let r = null, i = 0, j = 0, n = Uint32Array.of(0), tmstamp = [0], msg_buf = null, ghostly = 0, $t1, $t2, $t3, $t4;
     n[0] = 0;
     tmstamp[0] = 0;
-    ghostly = $c.i8(nhfp.ftype === NHF.BONESFILE ? 1 : 0);
+    ghostly = nhfp.ftype === NHF.BONESFILE ? 1 : 0;
     clear_regions();   /* Just for security */
     await sfi_long(nhfp, new $c.Ptr(tmstamp, 0), $c.lit("region-tmstamp"));
     if (ghostly) {
@@ -1033,9 +1033,9 @@ export async function inside_gas_cloud(p1, p2) {   // region.c:1091
             if (heros_fault(reg)) {
                 await setmangry(mtmp, TRUE);
             }
-            if (haseyes(mtmp.data) && mtmp.mcansee | 0) {
-                mtmp.mblinded = (1) & 127;
-                mtmp.mcansee = (0) & 1;
+            if (haseyes(mtmp.data) && mtmp.mcansee) {
+                mtmp.mblinded = 1;
+                mtmp.mcansee = 0;
             }
             if (await resists_poison(mtmp)) {
                 return FALSE;
@@ -1086,7 +1086,7 @@ async function make_gas_cloud(cloud, damage, inside_cloud) {   // region.c:1182
     cloud.arg.$copyFrom(cg.zeroany);
     cloud.arg.a_int = damage;
     cloud.visible = TRUE;
-    $t1 = (damage ? S.poisoncloud : S.cloud) === S.stone ? GLYPH.CMAP_STONE_OFF : (damage ? S.poisoncloud : S.cloud) <= S.trwall ? ((damage ? S.poisoncloud : S.cloud) - S.vwall | 0) + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) | 0 : (damage ? S.poisoncloud : S.cloud) < S.altar ? ((damage ? S.poisoncloud : S.cloud) - S.ndoor | 0) + GLYPH.CMAP_A_OFF | 0 : (damage ? S.poisoncloud : S.cloud) === S.altar ? 4008 : (damage ? S.poisoncloud : S.cloud) < S.arrow_trap + MAXTCHARS ? ((damage ? S.poisoncloud : S.cloud) - S.grave | 0) + GLYPH.CMAP_B_OFF | 0 : (damage ? S.poisoncloud : S.cloud) <= S.goodpos ? ((damage ? S.poisoncloud : S.cloud) - S.digbeam | 0) + GLYPH.CMAP_C_OFF | 0 : NO_GLYPH, cloud.glyph = $t1;
+    $t1 = (damage ? S.poisoncloud : S.cloud) === S.stone ? GLYPH.CMAP_STONE_OFF : (damage ? S.poisoncloud : S.cloud) <= S.trwall ? (damage ? S.poisoncloud : S.cloud) - S.vwall + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) : (damage ? S.poisoncloud : S.cloud) < S.altar ? (damage ? S.poisoncloud : S.cloud) - S.ndoor + GLYPH.CMAP_A_OFF : (damage ? S.poisoncloud : S.cloud) === S.altar ? 4008 : (damage ? S.poisoncloud : S.cloud) < S.arrow_trap + MAXTCHARS ? (damage ? S.poisoncloud : S.cloud) - S.grave + GLYPH.CMAP_B_OFF : (damage ? S.poisoncloud : S.cloud) <= S.goodpos ? (damage ? S.poisoncloud : S.cloud) - S.digbeam + GLYPH.CMAP_C_OFF : NO_GLYPH, cloud.glyph = $t1;
     await add_region(cloud);
     if (!gi.in_mklev && !inside_cloud && is_hero_inside_gas_cloud()) {
         /* FIXME: "steam" is wrong if this cloud is just the trail of
@@ -1249,7 +1249,7 @@ export function region_danger() {   // region.c:1341
             n = n + 1 | 0;
         }
     }
-    return $c.i8(n ? TRUE : FALSE);
+    return n ? TRUE : FALSE;
 }
 /* for fixing trouble at end of prayer;
    danger detected at start of prayer might have expired by now */

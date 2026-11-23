@@ -3197,7 +3197,7 @@ export async function sfi_version_info(nhfp, d_version_info, myname) {   // sfba
 export function sf_log(nhfp, t1, sz, cnt, txtvalue) {   // sfbase.c:377
     let fp = null, iocount = null, dolog = 0;
     fp = nhfp.fplog;
-    dolog = $c.i8((nhfp.mode & TURN_OFF_LOGGING) === 0 ? 1 : 0);
+    dolog = (nhfp.mode & TURN_OFF_LOGGING) === 0 ? 1 : 0;
     if (fp && dolog) {
         iocount = (nhfp.mode & WRITING) === 0 ? new $c.FieldRef(nhfp, "rcount", "i64") : new $c.FieldRef(nhfp, "wcount", "i64");
         $c.fprintf(fp, $c.lit("%08ld %s sz=%zu cnt=%d |%s|\n"), iocount.get(0), t1, sz, cnt, txtvalue);

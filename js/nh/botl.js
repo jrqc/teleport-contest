@@ -155,7 +155,7 @@ export function get_strength_str() {   // botl.c:21
 export function check_gold_symbol() {   // botl.c:40
     let goldch = 0;
     goldch = gs.showsyms[COIN_CLASS + SYM_OFF_O];
-    iflags.invis_goldsym = $c.i8(goldch <= 32 ? 1 : 0);
+    iflags.invis_goldsym = goldch <= 32 ? 1 : 0;
 }
 /**
  * @returns {$c.Ptr | null} char *
@@ -173,7 +173,7 @@ export function do_statusline1() {   // botl.c:48
     $c.sprintf(nb = eos(new $c.Ptr(do_statusline1$newbot1, 0)), $c.lit(" the "));
     if (Upolyd()) {
         k = 0;
-        $c.strcpy(new $c.Ptr(mbot, 0), pmname($c.relem(mons, u.umonnum), (u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female) ? 1 : 0));
+        $c.strcpy(new $c.Ptr(mbot, 0), pmname($c.relem(mons, u.umonnum), (u.umonnum !== u.umonster ? u.mfemale : flags.female) ? 1 : 0));
         while (mbot[k] !== 0) {
             if ((k === 0 || k > 0 && mbot[k - 1 | 0] === 32) && 97 <= mbot[k] && mbot[k] <= 122) {
                 mbot[k] = $c.i8(mbot[k] + -32 | 0);
@@ -267,10 +267,10 @@ export async function do_statusline2() {   // botl.c:101
         $c.strcpy(nb = eos(nb), $c.lit(" Strngl"));
     }
     if (Sick()) {
-        if ((u.usick_type | 0) & SICK_VOMITABLE) {
+        if (u.usick_type & SICK_VOMITABLE) {
             $c.strcpy(nb = eos(nb), $c.lit(" FoodPois"));
         }
-        if ((u.usick_type | 0) & SICK_NONVOMITABLE) {
+        if (u.usick_type & SICK_NONVOMITABLE) {
             $c.strcpy(nb = eos(nb), $c.lit(" TermIll"));
         }
     }
@@ -531,8 +531,8 @@ export function describe_level(buf, dflgs) {   // botl.c:441
     /* output buffer */
     /* 1: append trailing space; 2: include dungeon branch name */
     /* (used to be unconditional) */
-    addspace = $c.i8((dflgs & 1) !== 0 ? 1 : 0);
-    addbranch = $c.i8((dflgs & 2) !== 0 ? 1 : 0);   /* False: status, True: livelog */
+    addspace = (dflgs & 1) !== 0 ? 1 : 0;
+    addbranch = (dflgs & 2) !== 0 ? 1 : 0;   /* False: status, True: livelog */
     ret = 1;
     if ((svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level)) {
         $c.sprintf(buf, $c.lit("%s"), new $c.Ptr(svd.dungeons[u.uz.dnum].dname, 0));
@@ -649,7 +649,7 @@ export async function weapon_status(outbuf) {   // botl.c:481
  */
 export function armor_status(armbuf) {   // botl.c:559
     let n = 0, p = null, $t1, $t2, $t3, $t4, $t5, $t6, $t7;
-    n = ((((((!!$G.uarmg ? 1 : 0) + (!!$G.uarmc ? 1 : 0) | 0) + (!!$G.uarm ? 1 : 0) | 0) + (!!$G.uarmu ? 1 : 0) | 0) + (!!$G.uarmh ? 1 : 0) | 0) + (!!$G.uarmf ? 1 : 0) | 0) + (!!$G.uarms ? 1 : 0) | 0;
+    n = (!!$G.uarmg ? 1 : 0) + (!!$G.uarmc ? 1 : 0) + (!!$G.uarm ? 1 : 0) + (!!$G.uarmu ? 1 : 0) + (!!$G.uarmh ? 1 : 0) + (!!$G.uarmf ? 1 : 0) + (!!$G.uarms ? 1 : 0);
     /*
      * FIXME: ^X needs to provide non-abbreviated version of this info.
      * At present it just reports the "no armor" case.
@@ -863,24 +863,24 @@ async function bot_via_windowport() {   // botl.c:962
     $t9 = condtests[bl_termill].test = FALSE, condtests[bl_foodpois].test = $t9;
     if (Sick()) {
         if (condtests[bl_foodpois].enabled) {
-            condtests[bl_foodpois].test = $c.i8(((u.usick_type | 0) & SICK_VOMITABLE) !== 0 ? 1 : 0);
+            condtests[bl_foodpois].test = (u.usick_type & SICK_VOMITABLE) !== 0 ? 1 : 0;
         }
         if (condtests[bl_termill].enabled) {
-            condtests[bl_termill].test = $c.i8(((u.usick_type | 0) & SICK_NONVOMITABLE) !== 0 ? 1 : 0);
+            condtests[bl_termill].test = (u.usick_type & SICK_NONVOMITABLE) !== 0 ? 1 : 0;
         }
     }
     $t11 = ($t10 = condtests[bl_trapped].test = FALSE, condtests[bl_tethered].test = $t10), condtests[bl_inlava].test = $t11;
     if (u.utrap) {
         if (condtests[bl_inlava].enabled) {
-            condtests[bl_inlava].test = $c.i8(u.utraptype === TT.LAVA ? 1 : 0);
+            condtests[bl_inlava].test = u.utraptype === TT.LAVA ? 1 : 0;
         }
         if (condtests[bl_tethered].enabled) {
-            condtests[bl_tethered].test = $c.i8(u.utraptype === TT.BURIEDBALL ? 1 : 0);
+            condtests[bl_tethered].test = u.utraptype === TT.BURIEDBALL ? 1 : 0;
         }
         /* if in-lava or tethered is disabled and the condition applies,
            lump it in with trapped */
         if (condtests[bl_trapped].enabled) {
-            condtests[bl_trapped].test = $c.i8(!condtests[bl_inlava].test && !condtests[bl_tethered].test ? 1 : 0);
+            condtests[bl_trapped].test = !condtests[bl_inlava].test && !condtests[bl_tethered].test ? 1 : 0;
         }
     }
     $t13 = ($t12 = condtests[bl_holding].test = FALSE, condtests[bl_held].test = $t12), condtests[bl_grab].test = $t13;
@@ -903,40 +903,40 @@ async function bot_via_windowport() {   // botl.c:962
             /* grab == hero is held by sea monster and about to be drowned;
                held == hero is held by something else and can't move away */
             if (condtests[bl_grab].enabled) {
-                condtests[bl_grab].test = $c.i8(u.ustuck.data.mlet === S.EEL ? 1 : 0);
+                condtests[bl_grab].test = u.ustuck.data.mlet === S.EEL ? 1 : 0;
             }
             if (condtests[bl_held].enabled) {
-                condtests[bl_held].test = $c.i8(!condtests[bl_grab].test ? 1 : 0);
+                condtests[bl_held].test = !condtests[bl_grab].test ? 1 : 0;
             }
         }
     }
-    condtests[bl_blind].test = $c.i8((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked ? TRUE : FALSE);
-    condtests[bl_conf].test = $c.i8(u.uprops[CONFUSION].intrinsic ? TRUE : FALSE);
-    condtests[bl_deaf].test = $c.i8(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf ? TRUE : FALSE);
-    condtests[bl_fly].test = $c.i8((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked ? TRUE : FALSE);
-    condtests[bl_glowhands].test = $c.i8(u.umconf ? TRUE : FALSE);
-    condtests[bl_hallu].test = $c.i8(u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? TRUE : FALSE);
-    condtests[bl_lev].test = $c.i8((u.uprops[LEVITATION].intrinsic || u.uprops[LEVITATION].extrinsic) && !u.uprops[LEVITATION].blocked ? TRUE : FALSE);
-    condtests[bl_ride].test = $c.i8(u.usteed ? TRUE : FALSE);
-    condtests[bl_slime].test = $c.i8(u.uprops[SLIMED].intrinsic ? TRUE : FALSE);
-    condtests[bl_stone].test = $c.i8(u.uprops[STONED].intrinsic ? TRUE : FALSE);
-    condtests[bl_strngl].test = $c.i8(u.uprops[STRANGLED].intrinsic ? TRUE : FALSE);
-    condtests[bl_stun].test = $c.i8(u.uprops[STUNNED].intrinsic ? TRUE : FALSE);
-    condtests[bl_submerged].test = $c.i8(u.uinwater | 0 ? TRUE : FALSE);
+    condtests[bl_blind].test = (u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked ? TRUE : FALSE;
+    condtests[bl_conf].test = u.uprops[CONFUSION].intrinsic ? TRUE : FALSE;
+    condtests[bl_deaf].test = u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf ? TRUE : FALSE;
+    condtests[bl_fly].test = (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked ? TRUE : FALSE;
+    condtests[bl_glowhands].test = u.umconf ? TRUE : FALSE;
+    condtests[bl_hallu].test = u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? TRUE : FALSE;
+    condtests[bl_lev].test = (u.uprops[LEVITATION].intrinsic || u.uprops[LEVITATION].extrinsic) && !u.uprops[LEVITATION].blocked ? TRUE : FALSE;
+    condtests[bl_ride].test = u.usteed ? TRUE : FALSE;
+    condtests[bl_slime].test = u.uprops[SLIMED].intrinsic ? TRUE : FALSE;
+    condtests[bl_stone].test = u.uprops[STONED].intrinsic ? TRUE : FALSE;
+    condtests[bl_strngl].test = u.uprops[STRANGLED].intrinsic ? TRUE : FALSE;
+    condtests[bl_stun].test = u.uprops[STUNNED].intrinsic ? TRUE : FALSE;
+    condtests[bl_submerged].test = u.uinwater ? TRUE : FALSE;
     if (condtests[bl_elf_iron].enabled) {
         condtests[bl_elf_iron].test = FALSE;
     }
     if (condtests[bl_bareh].enabled) {
-        condtests[bl_bareh].test = $c.i8(!$G.uarmg && !$G.uwep ? 1 : 0);
+        condtests[bl_bareh].test = !$G.uarmg && !$G.uwep ? 1 : 0;
     }
     if (condtests[bl_icy].enabled) {
-        condtests[bl_icy].test = $c.i8(svl.level.locations[u.ux][u.uy].typ === ICE ? 1 : 0);
+        condtests[bl_icy].test = svl.level.locations[u.ux][u.uy].typ === ICE ? 1 : 0;
     }
     if (condtests[bl_slippery].enabled) {
-        condtests[bl_slippery].test = $c.i8(u.uprops[GLIB].intrinsic ? TRUE : FALSE);
+        condtests[bl_slippery].test = u.uprops[GLIB].intrinsic ? TRUE : FALSE;
     }
     if (condtests[bl_woundedl].enabled) {
-        condtests[bl_woundedl].test = $c.i8(u.uprops[WOUNDED_LEGS].intrinsic || u.uprops[WOUNDED_LEGS].extrinsic ? TRUE : FALSE);
+        condtests[bl_woundedl].test = u.uprops[WOUNDED_LEGS].intrinsic || u.uprops[WOUNDED_LEGS].extrinsic ? TRUE : FALSE;
     }
     if (gm.multi < 0) {
         do {
@@ -970,11 +970,11 @@ async function bot_via_windowport() {   // botl.c:962
             }
         } while (0);
         if (condtests[bl_unconsc].enabled && cache_nomovemsg && !cache_avail[0]) {
-            $t16 = $c.i8(!u.usleep && unconscious() ? 1 : 0), cache_reslt[0] = $t16;
+            $t16 = !u.usleep && unconscious() ? 1 : 0, cache_reslt[0] = $t16;
             cache_avail[0] = TRUE;
         }
         if (condtests[bl_parlyz].enabled && cache_multi_reason && !cache_avail[1]) {
-            $t17 = $c.i8(!$c.strncmp(cache_multi_reason, $c.lit("paralyzed"), 9) || !$c.strncmp(cache_multi_reason, $c.lit("frozen"), 6) ? 1 : 0), cache_reslt[1] = $t17;
+            $t17 = !$c.strncmp(cache_multi_reason, $c.lit("paralyzed"), 9) || !$c.strncmp(cache_multi_reason, $c.lit("frozen"), 6) ? 1 : 0, cache_reslt[1] = $t17;
             cache_avail[1] = TRUE;
         }
         if (cache_avail[0] && cache_reslt[0]) {
@@ -1068,7 +1068,7 @@ export async function condopt(idx, addr, negated) {   // botl.c:1303
         $c.nh_deterministic_qsort(new $c.Ptr(cond_idx, 0), CONDITION_COUNT, 4, cond_cmp);
     } else {
         /* (addr == &condtests[idx].choice) */
-        condtests[idx].enabled = $c.i8(negated ? FALSE : TRUE);
+        condtests[idx].enabled = negated ? FALSE : TRUE;
         condtests[idx].choice = condtests[idx].enabled;
         /* avoid lingering false positives if test is no longer run */
         condtests[idx].test = FALSE;
@@ -1400,7 +1400,7 @@ export async function status_initialize(reassessment) {   // botl.c:1683
     }
     for (i = 0; i < MAXBLSTATS; i = i + 1 | 0) {
         fld = initblstats[i].fld;
-        fldenabl = $c.i8(fld === BL.SCORE ? flags.showscore : fld === BL.TIME ? flags.time : fld === BL.EXP ? $c.i8(flags.showexp && !Upolyd() ? 1 : 0) : fld === BL.XP ? $c.i8(!Upolyd() ? 1 : 0) : fld === BL.HD ? $c.i8(Upolyd()) : fld === BL.VERS ? flags.showvers : fld === BL.WEAPON ? flags.weaponstatus : fld === BL.ARMOR ? flags.armorstatus : fld === BL.TERRAIN ? flags.terrainstatus : TRUE);
+        fldenabl = fld === BL.SCORE ? flags.showscore : fld === BL.TIME ? flags.time : fld === BL.EXP ? flags.showexp && !Upolyd() ? 1 : 0 : fld === BL.XP ? !Upolyd() ? 1 : 0 : fld === BL.HD ? Upolyd() : fld === BL.VERS ? flags.showvers : fld === BL.WEAPON ? flags.weaponstatus : fld === BL.ARMOR ? flags.armorstatus : fld === BL.TERRAIN ? flags.terrainstatus : TRUE;
         fieldname = initblstats[i].fldname;
         fieldfmt = fld === BL.TITLE && iflags.wc2_hitpointbar ? $c.lit("%-30.30s") : initblstats[i].fldfmt;
         status_enablefield()(fld, fieldname, fieldfmt, fldenabl);
@@ -1502,7 +1502,7 @@ async function compare_blstats(bl1, bl2) {   // botl.c:1809
         anytype = ANY.INT;
     }
     fld = bl1.fld;
-    use_rawval = $c.i8(fld === BL.HP || fld === BL.HPMAX || fld === BL.ENE || fld === BL.ENEMAX || fld === BL.GOLD ? 1 : 0);
+    use_rawval = fld === BL.HP || fld === BL.HPMAX || fld === BL.ENE || fld === BL.ENEMAX || fld === BL.GOLD ? 1 : 0;
     a1 = use_rawval ? bl1.rawval : bl1.a;
     a2 = use_rawval ? bl2.rawval : bl2.a;
     switch (anytype) {
@@ -1654,7 +1654,7 @@ async function percentage(bl, maxbl) {   // botl.c:1977
         return 0;
     }
     fld = bl.fld;
-    use_rawval = $c.i8(fld === BL.HP || fld === BL.ENE ? 1 : 0);
+    use_rawval = fld === BL.HP || fld === BL.ENE ? 1 : 0;
     ival = 0, lval = 0, uval = 0, ulval = 0;
     anytype = bl.anytype | 0;
     if (maxbl.a.a_void) {
@@ -2247,7 +2247,7 @@ function is_ltgt_percentnumber(str) {   // botl.c:2652
     if (s.get(0) === 37) {
         s = s.add(1);
     }
-    return $c.i8(s.get(0) === 0 ? 1 : 0);
+    return s.get(0) === 0 ? 1 : 0;
 }
 /* does str only contain "<>=-+0-9%" chars */
 /**
@@ -2622,7 +2622,7 @@ async function parse_status_hl2(s, from_configfile) {   // botl.c:2814
         successes = successes + 1 | 0;
         sidx = sidx + 1 | 0;
     }
-    return $c.i8(successes > 0 ? 1 : 0);
+    return successes > 0 ? 1 : 0;
 }
 /**
  * @returns {Promise<number | bigint>} unsigned long
@@ -2943,7 +2943,7 @@ function status_hilite_linestr_done() {   // botl.c:3448
  */
 function status_hilite_linestr_countfield(fld) {   // botl.c:3462
     let tmp = null, countall = 0, count = 0;
-    countall = $c.i8(fld === BL.FLUSH ? 1 : 0);
+    countall = fld === BL.FLUSH ? 1 : 0;
     count = 0;
     for (tmp = status_hilite_str; tmp; tmp = tmp.next) {
         if (countall || tmp.fld === fld) {
@@ -3353,7 +3353,7 @@ async function status_hilite_menu_add(origfld) {   // botl.c:3890
             }
             if (behavior === BL_TH.VAL_PERCENTAGE || behavior === BL_TH.VAL_ABSOLUTE) {
                 gotnum = FALSE;
-                percent = $c.i8(behavior === BL_TH.VAL_PERCENTAGE ? 1 : 0);
+                percent = behavior === BL_TH.VAL_PERCENTAGE ? 1 : 0;
                 lt_gt_eq = NO_LTEQGT;   /* not set up yet */
                 inbuf[0] = 0;
                 $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Enter %svalue for %s threshold:"), percent ? $c.lit("percentage ") : $c.lit(""), initblstats[fld].fldname);
@@ -3434,8 +3434,8 @@ async function status_hilite_menu_add(origfld) {   // botl.c:3890
                     $goto = "choose_value"; continue D1;
                 }
                 if (lt_gt_eq === NO_LTEQGT) {
-                    ltok = $c.i8(dt === ANY.INT ? aval.a_int > 0 || fld === BL.AC ? 1 : 0 : aval.a_long > 0 ? 1 : 0);
-                    gtok = $c.i8(!percent || aval.a_long < 100 ? 1 : 0);
+                    ltok = dt === ANY.INT ? aval.a_int > 0 || fld === BL.AC ? 1 : 0 : aval.a_long > 0 ? 1 : 0;
+                    gtok = !percent || aval.a_long < 100 ? 1 : 0;
                     lt_gt_eq = await status_hilite_menu_choose_updownboth(fld, new $c.Ptr(inbuf, 0), ltok, gtok);
                     if (lt_gt_eq === NO_LTEQGT) {
                         $goto = "choose_value"; continue D1;
@@ -3447,7 +3447,7 @@ async function status_hilite_menu_add(origfld) {   // botl.c:3890
                 hilite.value.$copyFrom(aval);
             } else if (behavior === BL_TH.UPDOWN) {
                 if (initblstats[fld].anytype !== ANY.STR) {
-                    ltok$2 = $c.i8(fld !== BL.TIME ? 1 : 0);
+                    ltok$2 = fld !== BL.TIME ? 1 : 0;
                     gtok$2 = TRUE;
                     lt_gt_eq = await status_hilite_menu_choose_updownboth(fld, null, ltok$2, gtok$2);
                     if (lt_gt_eq === NO_LTEQGT) {

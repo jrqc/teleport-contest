@@ -261,7 +261,7 @@ export async function mapfrag_get(mf, x, y) {   // sp_lev.c:266
  * @returns {number} boolean
  */
 export function mapfrag_canmatch(mf) {   // sp_lev.c:275
-    return $c.i8($c.rem32(mf.wid, 2) && $c.rem32(mf.hei, 2) ? 1 : 0);
+    return $c.rem32(mf.wid, 2) && $c.rem32(mf.hei, 2) ? 1 : 0;
 }
 /**
  * @param {$T.mapfragment | null} mf$in struct mapfragment *
@@ -293,8 +293,8 @@ export async function mapfrag_match(mf, x, y) {   // sp_lev.c:298
     for (rx = -$c.div32(mf.wid, 2) | 0; rx <= $c.div32(mf.wid, 2); rx = rx + 1 | 0) {
         for (ry = -$c.div32(mf.hei, 2) | 0; ry <= $c.div32(mf.hei, 2); ry = ry + 1 | 0) {
             mapc = await mapfrag_get(mf, rx + $c.div32(mf.wid, 2) | 0, ry + $c.div32(mf.hei, 2) | 0);
-            levc = $c.i8(isok($c.i16(x + rx | 0), $c.i16(y + ry | 0)) ? svl.level.locations[x + rx | 0][y + ry | 0].typ : STONE);
-            if (!match_maptyps($c.i16(mapc), $c.i16(levc))) {
+            levc = isok($c.i16(x + rx | 0), $c.i16(y + ry | 0)) ? svl.level.locations[x + rx | 0][y + ry | 0].typ : STONE;
+            if (!match_maptyps(mapc, levc)) {
                 return FALSE;
             }
         }
@@ -353,7 +353,7 @@ function lvlfill_maze_grid(x1, y1, x2, y2, filling) {   // sp_lev.c:359
             if (svl.level.flags.corrmaze) {
                 svl.level.locations[x][y].typ = STONE;
             } else {
-                svl.level.locations[x][y].typ = $c.i8(y < 2 || $c.rem32(x, 2) && $c.rem32(y, 2) ? STONE : filling);
+                svl.level.locations[x][y].typ = y < 2 || $c.rem32(x, 2) && $c.rem32(y, 2) ? STONE : filling;
             }
         }
     }
@@ -371,10 +371,10 @@ async function lvlfill_solid(filling, lit) {   // sp_lev.c:374
                 continue;
             }
             /* TODO: consolidate this w lspo_map ? */
-            svl.level.locations[x][y].flags = (0) & 31;
-            svl.level.locations[x][y].horizontal = (0) & 1;
-            svl.level.locations[x][y].roomno = (0) & 63;
-            svl.level.locations[x][y].edge = (0) & 1;
+            svl.level.locations[x][y].flags = 0;
+            svl.level.locations[x][y].horizontal = 0;
+            svl.level.locations[x][y].roomno = 0;
+            svl.level.locations[x][y].edge = 0;
         }
     }
 }
@@ -424,10 +424,10 @@ async function lvlfill_swamp(fg, bg, lit) {   // sp_lev.c:391
  */
 function flip_dbridge_horizontal(lev) {   // sp_lev.c:428
     if (IS_DRAWBRIDGE(lev.typ)) {
-        if (((lev.flags | 0) & DB.DIR) === DB.WEST) {
+        if ((lev.flags & DB.DIR) === DB.WEST) {
             lev.flags = (((lev.flags | 0) & ~DB.WEST) >>> 0) & 31;
             lev.flags = ((lev.flags | 0 | DB.EAST) >>> 0) & 31;
-        } else if (((lev.flags | 0) & DB.DIR) === DB.EAST) {
+        } else if ((lev.flags & DB.DIR) === DB.EAST) {
             lev.flags = (((lev.flags | 0) & ~DB.EAST) >>> 0) & 31;
             lev.flags = ((lev.flags | 0 | DB.WEST) >>> 0) & 31;
         }
@@ -438,10 +438,10 @@ function flip_dbridge_horizontal(lev) {   // sp_lev.c:428
  */
 function flip_dbridge_vertical(lev) {   // sp_lev.c:442
     if (IS_DRAWBRIDGE(lev.typ)) {
-        if (((lev.flags | 0) & DB.DIR) === DB.NORTH) {
+        if ((lev.flags & DB.DIR) === DB.NORTH) {
             lev.flags = (((lev.flags | 0) & ~DB.NORTH) >>> 0) & 31;
             lev.flags = ((lev.flags | 0 | DB.SOUTH) >>> 0) & 31;
-        } else if (((lev.flags | 0) & DB.DIR) === DB.SOUTH) {
+        } else if ((lev.flags & DB.DIR) === DB.SOUTH) {
             lev.flags = (((lev.flags | 0) & ~DB.SOUTH) >>> 0) & 31;
             lev.flags = ((lev.flags | 0 | DB.NORTH) >>> 0) & 31;
         }
@@ -559,7 +559,7 @@ export async function flip_level(flp, extras) {   // sp_lev.c:533
             if (carried($G.uball)) {
                 $G.uball.ox = u.ux, $G.uball.oy = u.uy;
             }
-            ball_fliparea = $c.i8(($G.uball.ox >= minx[0] && $G.uball.ox <= maxx[0] && $G.uball.oy >= miny[0] && $G.uball.oy <= maxy[0] ? 1 : 0) === ($G.uchain.ox >= minx[0] && $G.uchain.ox <= maxx[0] && $G.uchain.oy >= miny[0] && $G.uchain.oy <= maxy[0] ? 1 : 0) && ($G.uball.ox >= minx[0] && $G.uball.ox <= maxx[0] && $G.uball.oy >= miny[0] && $G.uball.oy <= maxy[0] ? 1 : 0) === (u.ux >= minx[0] && u.ux <= maxx[0] && u.uy >= miny[0] && u.uy <= maxy[0] ? 1 : 0) ? 1 : 0);
+            ball_fliparea = ($G.uball.ox >= minx[0] && $G.uball.ox <= maxx[0] && $G.uball.oy >= miny[0] && $G.uball.oy <= maxy[0] ? 1 : 0) === ($G.uchain.ox >= minx[0] && $G.uchain.ox <= maxx[0] && $G.uchain.oy >= miny[0] && $G.uchain.oy <= maxy[0] ? 1 : 0) && ($G.uball.ox >= minx[0] && $G.uball.ox <= maxx[0] && $G.uball.oy >= miny[0] && $G.uball.oy <= maxy[0] ? 1 : 0) === (u.ux >= minx[0] && u.ux <= maxx[0] && u.uy >= miny[0] && u.uy <= maxy[0] ? 1 : 0) ? 1 : 0;
             if (!ball_fliparea) {
                 await unplacebc();
             }
@@ -568,10 +568,10 @@ export async function flip_level(flp, extras) {   // sp_lev.c:533
     /* stairs and ladders */
     for (stway = gs.stairs; stway; stway = stway.next) {
         if (flp & 1) {
-            stway.sy = $c.i16((maxy[0] - stway.sy | 0) + miny[0] | 0);
+            stway.sy = $c.i16(maxy[0] - stway.sy + miny[0]);
         }
         if (flp & 2) {
-            stway.sx = $c.i16((maxx[0] - stway.sx | 0) + minx[0] | 0);
+            stway.sx = $c.i16(maxx[0] - stway.sx + minx[0]);
         }
     }
     /* traps */
@@ -580,19 +580,19 @@ export async function flip_level(flp, extras) {   // sp_lev.c:533
             continue;
         }
         if (flp & 1) {
-            ttmp.ty = $c.i16((maxy[0] - ttmp.ty | 0) + miny[0] | 0);
-            if ((ttmp.ttyp | 0) === ROLLING_BOULDER_TRAP) {
-                ttmp.launch.y = $c.i16((maxy[0] - ttmp.launch.y | 0) + miny[0] | 0);
-                ttmp.vl.v_launch2.y = $c.i16((maxy[0] - ttmp.vl.v_launch2.y | 0) + miny[0] | 0);
+            ttmp.ty = $c.i16(maxy[0] - ttmp.ty + miny[0]);
+            if (ttmp.ttyp === ROLLING_BOULDER_TRAP) {
+                ttmp.launch.y = $c.i16(maxy[0] - ttmp.launch.y + miny[0]);
+                ttmp.vl.v_launch2.y = $c.i16(maxy[0] - ttmp.vl.v_launch2.y + miny[0]);
             } else if (is_pit(ttmp.ttyp) && ttmp.vl.v_conjoined) {
                 $t1 = $c.u8(flip_encoded_dir_bits(flp, ttmp.vl.v_conjoined)), ttmp.vl.v_conjoined = $t1;
             }
         }
         if (flp & 2) {
-            ttmp.tx = $c.i16((maxx[0] - ttmp.tx | 0) + minx[0] | 0);
-            if ((ttmp.ttyp | 0) === ROLLING_BOULDER_TRAP) {
-                ttmp.launch.x = $c.i16((maxx[0] - ttmp.launch.x | 0) + minx[0] | 0);
-                ttmp.vl.v_launch2.x = $c.i16((maxx[0] - ttmp.vl.v_launch2.x | 0) + minx[0] | 0);
+            ttmp.tx = $c.i16(maxx[0] - ttmp.tx + minx[0]);
+            if (ttmp.ttyp === ROLLING_BOULDER_TRAP) {
+                ttmp.launch.x = $c.i16(maxx[0] - ttmp.launch.x + minx[0]);
+                ttmp.vl.v_launch2.x = $c.i16(maxx[0] - ttmp.vl.v_launch2.x + minx[0]);
             } else if (is_pit(ttmp.ttyp) && ttmp.vl.v_conjoined) {
                 $t2 = $c.u8(flip_encoded_dir_bits(flp, ttmp.vl.v_conjoined)), ttmp.vl.v_conjoined = $t2;
             }
@@ -604,10 +604,10 @@ export async function flip_level(flp, extras) {   // sp_lev.c:533
             continue;
         }
         if (flp & 1) {
-            otmp.oy = $c.i16((maxy[0] - otmp.oy | 0) + miny[0] | 0);
+            otmp.oy = $c.i16(maxy[0] - otmp.oy + miny[0]);
         }
         if (flp & 2) {
-            otmp.ox = $c.i16((maxx[0] - otmp.ox | 0) + minx[0] | 0);
+            otmp.ox = $c.i16(maxx[0] - otmp.ox + minx[0]);
         }
     }
     /* buried objects */
@@ -616,10 +616,10 @@ export async function flip_level(flp, extras) {   // sp_lev.c:533
             continue;
         }
         if (flp & 1) {
-            otmp.oy = $c.i16((maxy[0] - otmp.oy | 0) + miny[0] | 0);
+            otmp.oy = $c.i16(maxy[0] - otmp.oy + miny[0]);
         }
         if (flp & 2) {
-            otmp.ox = $c.i16((maxx[0] - otmp.ox | 0) + minx[0] | 0);
+            otmp.ox = $c.i16(maxx[0] - otmp.ox + minx[0]);
         }
     }
     /* monsters */
@@ -637,18 +637,18 @@ export async function flip_level(flp, extras) {   // sp_lev.c:533
             continue;
         }
         if (flp & 1) {
-            mtmp.my = $c.i16((maxy[0] - mtmp.my | 0) + miny[0] | 0);
+            mtmp.my = $c.i16(maxy[0] - mtmp.my + miny[0]);
         }
         if (flp & 2) {
-            mtmp.mx = $c.i16((maxx[0] - mtmp.mx | 0) + minx[0] | 0);
+            mtmp.mx = $c.i16(maxx[0] - mtmp.mx + minx[0]);
         }
         do {
             if (mtmp.mgoal.x && (mtmp.mgoal.x >= minx[0] && mtmp.mgoal.x <= maxx[0] && mtmp.mgoal.y >= miny[0] && mtmp.mgoal.y <= maxy[0])) {
                 if (flp & 1) {
-                    mtmp.mgoal.y = $c.i16((maxy[0] - mtmp.mgoal.y | 0) + miny[0] | 0);
+                    mtmp.mgoal.y = $c.i16(maxy[0] - mtmp.mgoal.y + miny[0]);
                 }
                 if (flp & 2) {
-                    mtmp.mgoal.x = $c.i16((maxx[0] - mtmp.mgoal.x | 0) + minx[0] | 0);
+                    mtmp.mgoal.x = $c.i16(maxx[0] - mtmp.mgoal.x + minx[0]);
                 }
             }
         } while (0);
@@ -656,10 +656,10 @@ export async function flip_level(flp, extras) {   // sp_lev.c:533
             do {
                 if (mtmp.mextra.epri.shrpos.x && (mtmp.mextra.epri.shrpos.x >= minx[0] && mtmp.mextra.epri.shrpos.x <= maxx[0] && mtmp.mextra.epri.shrpos.y >= miny[0] && mtmp.mextra.epri.shrpos.y <= maxy[0])) {
                     if (flp & 1) {
-                        mtmp.mextra.epri.shrpos.y = $c.i16((maxy[0] - mtmp.mextra.epri.shrpos.y | 0) + miny[0] | 0);
+                        mtmp.mextra.epri.shrpos.y = $c.i16(maxy[0] - mtmp.mextra.epri.shrpos.y + miny[0]);
                     }
                     if (flp & 2) {
-                        mtmp.mextra.epri.shrpos.x = $c.i16((maxx[0] - mtmp.mextra.epri.shrpos.x | 0) + minx[0] | 0);
+                        mtmp.mextra.epri.shrpos.x = $c.i16(maxx[0] - mtmp.mextra.epri.shrpos.x + minx[0]);
                     }
                 }
             } while (0);
@@ -667,20 +667,20 @@ export async function flip_level(flp, extras) {   // sp_lev.c:533
             do {
                 if (mtmp.mextra.eshk.shk.x && (mtmp.mextra.eshk.shk.x >= minx[0] && mtmp.mextra.eshk.shk.x <= maxx[0] && mtmp.mextra.eshk.shk.y >= miny[0] && mtmp.mextra.eshk.shk.y <= maxy[0])) {
                     if (flp & 1) {
-                        mtmp.mextra.eshk.shk.y = $c.i16((maxy[0] - mtmp.mextra.eshk.shk.y | 0) + miny[0] | 0);   /* shk's preferred spot */
+                        mtmp.mextra.eshk.shk.y = $c.i16(maxy[0] - mtmp.mextra.eshk.shk.y + miny[0]);   /* shk's preferred spot */
                     }
                     if (flp & 2) {
-                        mtmp.mextra.eshk.shk.x = $c.i16((maxx[0] - mtmp.mextra.eshk.shk.x | 0) + minx[0] | 0);
+                        mtmp.mextra.eshk.shk.x = $c.i16(maxx[0] - mtmp.mextra.eshk.shk.x + minx[0]);
                     }
                 }
             } while (0);
             do {
                 if (mtmp.mextra.eshk.shd.x && (mtmp.mextra.eshk.shd.x >= minx[0] && mtmp.mextra.eshk.shd.x <= maxx[0] && mtmp.mextra.eshk.shd.y >= miny[0] && mtmp.mextra.eshk.shd.y <= maxy[0])) {
                     if (flp & 1) {
-                        mtmp.mextra.eshk.shd.y = $c.i16((maxy[0] - mtmp.mextra.eshk.shd.y | 0) + miny[0] | 0);   /* shop door */
+                        mtmp.mextra.eshk.shd.y = $c.i16(maxy[0] - mtmp.mextra.eshk.shd.y + miny[0]);   /* shop door */
                     }
                     if (flp & 2) {
-                        mtmp.mextra.eshk.shd.x = $c.i16((maxx[0] - mtmp.mextra.eshk.shd.x | 0) + minx[0] | 0);
+                        mtmp.mextra.eshk.shd.x = $c.i16(maxx[0] - mtmp.mextra.eshk.shd.x + minx[0]);
                     }
                 }
             } while (0);
@@ -697,37 +697,37 @@ export async function flip_level(flp, extras) {   // sp_lev.c:533
     if (extras) {
         /* #wizfliplevel rather than level creation */
         for (mtmp = gm.migrating_mons; mtmp; mtmp = mtmp.nmon) {
-            if (mtmp.isgd | 0 && on_level(u.uz, mtmp.mextra.egd.gdlevel)) {
+            if (mtmp.isgd && on_level(u.uz, mtmp.mextra.egd.gdlevel)) {
                 flip_vault_guard(flp, mtmp, minx[0], miny[0], maxx[0], maxy[0]);   /* egd */
-            } else if (mtmp.ispriest | 0 && on_level(u.uz, mtmp.mextra.epri.shrlevel)) {
+            } else if (mtmp.ispriest && on_level(u.uz, mtmp.mextra.epri.shrlevel)) {
                 do {
                     if (mtmp.mextra.epri.shrpos.x && (mtmp.mextra.epri.shrpos.x >= minx[0] && mtmp.mextra.epri.shrpos.x <= maxx[0] && mtmp.mextra.epri.shrpos.y >= miny[0] && mtmp.mextra.epri.shrpos.y <= maxy[0])) {
                         if (flp & 1) {
-                            mtmp.mextra.epri.shrpos.y = $c.i16((maxy[0] - mtmp.mextra.epri.shrpos.y | 0) + miny[0] | 0);   /* priest's altar */
+                            mtmp.mextra.epri.shrpos.y = $c.i16(maxy[0] - mtmp.mextra.epri.shrpos.y + miny[0]);   /* priest's altar */
                         }
                         if (flp & 2) {
-                            mtmp.mextra.epri.shrpos.x = $c.i16((maxx[0] - mtmp.mextra.epri.shrpos.x | 0) + minx[0] | 0);
+                            mtmp.mextra.epri.shrpos.x = $c.i16(maxx[0] - mtmp.mextra.epri.shrpos.x + minx[0]);
                         }
                     }
                 } while (0);
-            } else if (mtmp.isshk | 0 && on_level(u.uz, mtmp.mextra.eshk.shoplevel)) {
+            } else if (mtmp.isshk && on_level(u.uz, mtmp.mextra.eshk.shoplevel)) {
                 do {
                     if (mtmp.mextra.eshk.shk.x && (mtmp.mextra.eshk.shk.x >= minx[0] && mtmp.mextra.eshk.shk.x <= maxx[0] && mtmp.mextra.eshk.shk.y >= miny[0] && mtmp.mextra.eshk.shk.y <= maxy[0])) {
                         if (flp & 1) {
-                            mtmp.mextra.eshk.shk.y = $c.i16((maxy[0] - mtmp.mextra.eshk.shk.y | 0) + miny[0] | 0);   /* shk's preferred spot */
+                            mtmp.mextra.eshk.shk.y = $c.i16(maxy[0] - mtmp.mextra.eshk.shk.y + miny[0]);   /* shk's preferred spot */
                         }
                         if (flp & 2) {
-                            mtmp.mextra.eshk.shk.x = $c.i16((maxx[0] - mtmp.mextra.eshk.shk.x | 0) + minx[0] | 0);
+                            mtmp.mextra.eshk.shk.x = $c.i16(maxx[0] - mtmp.mextra.eshk.shk.x + minx[0]);
                         }
                     }
                 } while (0);
                 do {
                     if (mtmp.mextra.eshk.shd.x && (mtmp.mextra.eshk.shd.x >= minx[0] && mtmp.mextra.eshk.shd.x <= maxx[0] && mtmp.mextra.eshk.shd.y >= miny[0] && mtmp.mextra.eshk.shd.y <= maxy[0])) {
                         if (flp & 1) {
-                            mtmp.mextra.eshk.shd.y = $c.i16((maxy[0] - mtmp.mextra.eshk.shd.y | 0) + miny[0] | 0);   /* shop door */
+                            mtmp.mextra.eshk.shd.y = $c.i16(maxy[0] - mtmp.mextra.eshk.shd.y + miny[0]);   /* shop door */
                         }
                         if (flp & 2) {
-                            mtmp.mextra.eshk.shd.x = $c.i16((maxx[0] - mtmp.mextra.eshk.shd.x | 0) + minx[0] | 0);
+                            mtmp.mextra.eshk.shd.x = $c.i16(maxx[0] - mtmp.mextra.eshk.shd.x + minx[0]);
                         }
                     }
                 } while (0);
@@ -737,24 +737,24 @@ export async function flip_level(flp, extras) {   // sp_lev.c:533
     /* engravings */
     for (etmp = $G.head_engr; etmp; etmp = etmp.nxt_engr) {
         if (flp & 1) {
-            etmp.engr_y = $c.i16((maxy[0] - etmp.engr_y | 0) + miny[0] | 0);
+            etmp.engr_y = $c.i16(maxy[0] - etmp.engr_y + miny[0]);
         }
         if (flp & 2) {
-            etmp.engr_x = $c.i16((maxx[0] - etmp.engr_x | 0) + minx[0] | 0);
+            etmp.engr_x = $c.i16(maxx[0] - etmp.engr_x + minx[0]);
         }
     }
     /* level (teleport) regions */
     for (i = 0; i < gn.num_lregions; i = i + 1 | 0) {
         if (flp & 1) {
-            $c.radd(gl.lregions, i).inarea.y1 = $c.i16((maxy[0] - $c.radd(gl.lregions, i).inarea.y1 | 0) + miny[0] | 0);
-            $c.radd(gl.lregions, i).inarea.y2 = $c.i16((maxy[0] - $c.radd(gl.lregions, i).inarea.y2 | 0) + miny[0] | 0);
+            $c.radd(gl.lregions, i).inarea.y1 = $c.i16(maxy[0] - $c.radd(gl.lregions, i).inarea.y1 + miny[0]);
+            $c.radd(gl.lregions, i).inarea.y2 = $c.i16(maxy[0] - $c.radd(gl.lregions, i).inarea.y2 + miny[0]);
             if ($c.radd(gl.lregions, i).inarea.y1 > $c.radd(gl.lregions, i).inarea.y2) {
                 itmp = $c.radd(gl.lregions, i).inarea.y1;
                 $c.radd(gl.lregions, i).inarea.y1 = $c.radd(gl.lregions, i).inarea.y2;
                 $c.radd(gl.lregions, i).inarea.y2 = $c.i16(itmp);
             }
-            $c.radd(gl.lregions, i).delarea.y1 = $c.i16((maxy[0] - $c.radd(gl.lregions, i).delarea.y1 | 0) + miny[0] | 0);
-            $c.radd(gl.lregions, i).delarea.y2 = $c.i16((maxy[0] - $c.radd(gl.lregions, i).delarea.y2 | 0) + miny[0] | 0);
+            $c.radd(gl.lregions, i).delarea.y1 = $c.i16(maxy[0] - $c.radd(gl.lregions, i).delarea.y1 + miny[0]);
+            $c.radd(gl.lregions, i).delarea.y2 = $c.i16(maxy[0] - $c.radd(gl.lregions, i).delarea.y2 + miny[0]);
             if ($c.radd(gl.lregions, i).delarea.y1 > $c.radd(gl.lregions, i).delarea.y2) {
                 itmp = $c.radd(gl.lregions, i).delarea.y1;
                 $c.radd(gl.lregions, i).delarea.y1 = $c.radd(gl.lregions, i).delarea.y2;
@@ -762,15 +762,15 @@ export async function flip_level(flp, extras) {   // sp_lev.c:533
             }
         }
         if (flp & 2) {
-            $c.radd(gl.lregions, i).inarea.x1 = $c.i16((maxx[0] - $c.radd(gl.lregions, i).inarea.x1 | 0) + minx[0] | 0);
-            $c.radd(gl.lregions, i).inarea.x2 = $c.i16((maxx[0] - $c.radd(gl.lregions, i).inarea.x2 | 0) + minx[0] | 0);
+            $c.radd(gl.lregions, i).inarea.x1 = $c.i16(maxx[0] - $c.radd(gl.lregions, i).inarea.x1 + minx[0]);
+            $c.radd(gl.lregions, i).inarea.x2 = $c.i16(maxx[0] - $c.radd(gl.lregions, i).inarea.x2 + minx[0]);
             if ($c.radd(gl.lregions, i).inarea.x1 > $c.radd(gl.lregions, i).inarea.x2) {
                 itmp = $c.radd(gl.lregions, i).inarea.x1;
                 $c.radd(gl.lregions, i).inarea.x1 = $c.radd(gl.lregions, i).inarea.x2;
                 $c.radd(gl.lregions, i).inarea.x2 = $c.i16(itmp);
             }
-            $c.radd(gl.lregions, i).delarea.x1 = $c.i16((maxx[0] - $c.radd(gl.lregions, i).delarea.x1 | 0) + minx[0] | 0);
-            $c.radd(gl.lregions, i).delarea.x2 = $c.i16((maxx[0] - $c.radd(gl.lregions, i).delarea.x2 | 0) + minx[0] | 0);
+            $c.radd(gl.lregions, i).delarea.x1 = $c.i16(maxx[0] - $c.radd(gl.lregions, i).delarea.x1 + minx[0]);
+            $c.radd(gl.lregions, i).delarea.x2 = $c.i16(maxx[0] - $c.radd(gl.lregions, i).delarea.x2 + minx[0]);
             if ($c.radd(gl.lregions, i).delarea.x1 > $c.radd(gl.lregions, i).delarea.x2) {
                 itmp = $c.radd(gl.lregions, i).delarea.x1;
                 $c.radd(gl.lregions, i).delarea.x1 = $c.radd(gl.lregions, i).delarea.x2;
@@ -781,25 +781,25 @@ export async function flip_level(flp, extras) {   // sp_lev.c:533
     /* regions (poison clouds, etc) */
     for (i = 0; i < svn.n_regions; i = i + 1 | 0) {
         if (flp & 1) {
-            tmp1 = (maxy[0] - gr.regions.get(i).bounding_box.ly | 0) + miny[0] | 0;
-            tmp2 = (maxy[0] - gr.regions.get(i).bounding_box.hy | 0) + miny[0] | 0;
+            tmp1 = maxy[0] - gr.regions.get(i).bounding_box.ly + miny[0];
+            tmp2 = maxy[0] - gr.regions.get(i).bounding_box.hy + miny[0];
             gr.regions.get(i).bounding_box.ly = $c.i16(min(tmp1, tmp2));
             gr.regions.get(i).bounding_box.hy = $c.i16(max(tmp1, tmp2));
             for (j = 0; j < gr.regions.get(i).nrects; j = j + 1 | 0) {
-                tmp1 = (maxy[0] - $c.radd(gr.regions.get(i).rects, j).ly | 0) + miny[0] | 0;
-                tmp2 = (maxy[0] - $c.radd(gr.regions.get(i).rects, j).hy | 0) + miny[0] | 0;
+                tmp1 = maxy[0] - $c.radd(gr.regions.get(i).rects, j).ly + miny[0];
+                tmp2 = maxy[0] - $c.radd(gr.regions.get(i).rects, j).hy + miny[0];
                 $c.radd(gr.regions.get(i).rects, j).ly = $c.i16(min(tmp1, tmp2));
                 $c.radd(gr.regions.get(i).rects, j).hy = $c.i16(max(tmp1, tmp2));
             }
         }
         if (flp & 2) {
-            tmp1 = (maxx[0] - gr.regions.get(i).bounding_box.lx | 0) + minx[0] | 0;
-            tmp2 = (maxx[0] - gr.regions.get(i).bounding_box.hx | 0) + minx[0] | 0;
+            tmp1 = maxx[0] - gr.regions.get(i).bounding_box.lx + minx[0];
+            tmp2 = maxx[0] - gr.regions.get(i).bounding_box.hx + minx[0];
             gr.regions.get(i).bounding_box.lx = $c.i16(min(tmp1, tmp2));
             gr.regions.get(i).bounding_box.hx = $c.i16(max(tmp1, tmp2));
             for (j = 0; j < gr.regions.get(i).nrects; j = j + 1 | 0) {
-                tmp1 = (maxx[0] - $c.radd(gr.regions.get(i).rects, j).lx | 0) + minx[0] | 0;
-                tmp2 = (maxx[0] - $c.radd(gr.regions.get(i).rects, j).hx | 0) + minx[0] | 0;
+                tmp1 = maxx[0] - $c.radd(gr.regions.get(i).rects, j).lx + minx[0];
+                tmp2 = maxx[0] - $c.radd(gr.regions.get(i).rects, j).hx + minx[0];
                 $c.radd(gr.regions.get(i).rects, j).lx = $c.i16(min(tmp1, tmp2));
                 $c.radd(gr.regions.get(i).rects, j).hx = $c.i16(max(tmp1, tmp2));
             }
@@ -811,8 +811,8 @@ export async function flip_level(flp, extras) {   // sp_lev.c:533
             break;
         }
         if (flp & 1) {
-            sroom.ly = $c.i16((maxy[0] - sroom.ly | 0) + miny[0] | 0);
-            sroom.hy = $c.i16((maxy[0] - sroom.hy | 0) + miny[0] | 0);
+            sroom.ly = $c.i16(maxy[0] - sroom.ly + miny[0]);
+            sroom.hy = $c.i16(maxy[0] - sroom.hy + miny[0]);
             if (sroom.ly > sroom.hy) {
                 itmp = sroom.ly;
                 sroom.ly = sroom.hy;
@@ -820,8 +820,8 @@ export async function flip_level(flp, extras) {   // sp_lev.c:533
             }
         }
         if (flp & 2) {
-            sroom.lx = $c.i16((maxx[0] - sroom.lx | 0) + minx[0] | 0);
-            sroom.hx = $c.i16((maxx[0] - sroom.hx | 0) + minx[0] | 0);
+            sroom.lx = $c.i16(maxx[0] - sroom.lx + minx[0]);
+            sroom.hx = $c.i16(maxx[0] - sroom.hx + minx[0]);
             if (sroom.lx > sroom.hx) {
                 itmp = sroom.lx;
                 sroom.lx = sroom.hx;
@@ -832,8 +832,8 @@ export async function flip_level(flp, extras) {   // sp_lev.c:533
             for (i = 0; i < sroom.nsubrooms; i = i + 1 | 0) {
                 rroom = sroom.sbrooms[i];
                 if (flp & 1) {
-                    rroom.ly = $c.i16((maxy[0] - rroom.ly | 0) + miny[0] | 0);
-                    rroom.hy = $c.i16((maxy[0] - rroom.hy | 0) + miny[0] | 0);
+                    rroom.ly = $c.i16(maxy[0] - rroom.ly + miny[0]);
+                    rroom.hy = $c.i16(maxy[0] - rroom.hy + miny[0]);
                     if (rroom.ly > rroom.hy) {
                         itmp = rroom.ly;
                         rroom.ly = rroom.hy;
@@ -841,8 +841,8 @@ export async function flip_level(flp, extras) {   // sp_lev.c:533
                     }
                 }
                 if (flp & 2) {
-                    rroom.lx = $c.i16((maxx[0] - rroom.lx | 0) + minx[0] | 0);
-                    rroom.hx = $c.i16((maxx[0] - rroom.hx | 0) + minx[0] | 0);
+                    rroom.lx = $c.i16(maxx[0] - rroom.lx + minx[0]);
+                    rroom.hx = $c.i16(maxx[0] - rroom.hx + minx[0]);
                     if (rroom.lx > rroom.hx) {
                         itmp = rroom.lx;
                         rroom.lx = rroom.hx;
@@ -857,10 +857,10 @@ export async function flip_level(flp, extras) {   // sp_lev.c:533
         do {
             if ($c.radd(svd.doors, i).x && ($c.radd(svd.doors, i).x >= minx[0] && $c.radd(svd.doors, i).x <= maxx[0] && $c.radd(svd.doors, i).y >= miny[0] && $c.radd(svd.doors, i).y <= maxy[0])) {
                 if (flp & 1) {
-                    $c.radd(svd.doors, i).y = $c.i16((maxy[0] - $c.radd(svd.doors, i).y | 0) + miny[0] | 0);
+                    $c.radd(svd.doors, i).y = $c.i16(maxy[0] - $c.radd(svd.doors, i).y + miny[0]);
                 }
                 if (flp & 2) {
-                    $c.radd(svd.doors, i).x = $c.i16((maxx[0] - $c.radd(svd.doors, i).x | 0) + minx[0] | 0);
+                    $c.radd(svd.doors, i).x = $c.i16(maxx[0] - $c.radd(svd.doors, i).x + minx[0]);
                 }
             }
         } while (0);
@@ -868,7 +868,7 @@ export async function flip_level(flp, extras) {   // sp_lev.c:533
     /* the map */
     if (flp & 1) {
         for (x = minx[0]; x <= maxx[0]; x = x + 1 | 0) {
-            for (y = miny[0]; y < (miny[0] + $c.div32((maxy[0] - miny[0] | 0) + 1 | 0, 2) | 0); y = y + 1 | 0) {
+            for (y = miny[0]; y < (miny[0] + $c.div32(maxy[0] - miny[0] + 1, 2) | 0); y = y + 1 | 0) {
                 ny = (maxy[0] - y | 0) + miny[0] | 0;
                 flip_dbridge_vertical($c.relem(svl.level.locations[x], y));
                 flip_dbridge_vertical($c.relem(svl.level.locations[x], ny));
@@ -885,7 +885,7 @@ export async function flip_level(flp, extras) {   // sp_lev.c:533
         }
     }
     if (flp & 2) {
-        for (x = minx[0]; x < (minx[0] + $c.div32((maxx[0] - minx[0] | 0) + 1 | 0, 2) | 0); x = x + 1 | 0) {
+        for (x = minx[0]; x < (minx[0] + $c.div32(maxx[0] - minx[0] + 1, 2) | 0); x = x + 1 | 0) {
             for (y = miny[0]; y <= maxy[0]; y = y + 1 | 0) {
                 nx = (maxx[0] - x | 0) + minx[0] | 0;
                 flip_dbridge_horizontal($c.relem(svl.level.locations[x], y));
@@ -919,8 +919,8 @@ export async function flip_level(flp, extras) {   // sp_lev.c:533
     /* exclusion zones */
     for (ez = sve.exclusion_zones; ez; ez = ez.next) {
         if (flp & 1) {
-            ez.ly = $c.i16((maxy[0] - ez.ly | 0) + miny[0] | 0);
-            ez.hy = $c.i16((maxy[0] - ez.hy | 0) + miny[0] | 0);
+            ez.ly = $c.i16(maxy[0] - ez.ly + miny[0]);
+            ez.hy = $c.i16(maxy[0] - ez.hy + miny[0]);
             if (ez.ly > ez.hy) {
                 itmp = ez.ly;
                 ez.ly = ez.hy;
@@ -928,8 +928,8 @@ export async function flip_level(flp, extras) {   // sp_lev.c:533
             }
         }
         if (flp & 2) {
-            ez.lx = $c.i16((maxx[0] - ez.lx | 0) + minx[0] | 0);
-            ez.hx = $c.i16((maxx[0] - ez.hx | 0) + minx[0] | 0);
+            ez.lx = $c.i16(maxx[0] - ez.lx + minx[0]);
+            ez.hx = $c.i16(maxx[0] - ez.hx + minx[0]);
             if (ez.lx > ez.hx) {
                 itmp = ez.lx;
                 ez.lx = ez.hx;
@@ -942,10 +942,10 @@ export async function flip_level(flp, extras) {   // sp_lev.c:533
         /* flip hero location only if inside the flippable area */
         if (u.ux >= minx[0] && u.ux <= maxx[0] && u.uy >= miny[0] && u.uy <= maxy[0]) {
             if (flp & 1) {
-                u.uy = $c.i16((maxy[0] - u.uy | 0) + miny[0] | 0);
+                u.uy = $c.i16(maxy[0] - u.uy + miny[0]);
             }
             if (flp & 2) {
-                u.ux = $c.i16((maxx[0] - u.ux | 0) + minx[0] | 0);
+                u.ux = $c.i16(maxx[0] - u.ux + minx[0]);
             }
             /* we could flip <ux0,uy0> too if it's inside the flip area,
                but have to resort to this if outside, so just do this */
@@ -957,20 +957,20 @@ export async function flip_level(flp, extras) {   // sp_lev.c:533
         do {
             if (iflags.travelcc.x && (iflags.travelcc.x >= minx[0] && iflags.travelcc.x <= maxx[0] && iflags.travelcc.y >= miny[0] && iflags.travelcc.y <= maxy[0])) {
                 if (flp & 1) {
-                    iflags.travelcc.y = $c.i16((maxy[0] - iflags.travelcc.y | 0) + miny[0] | 0);
+                    iflags.travelcc.y = $c.i16(maxy[0] - iflags.travelcc.y + miny[0]);
                 }
                 if (flp & 2) {
-                    iflags.travelcc.x = $c.i16((maxx[0] - iflags.travelcc.x | 0) + minx[0] | 0);
+                    iflags.travelcc.x = $c.i16(maxx[0] - iflags.travelcc.x + minx[0]);
                 }
             }
         } while (0);
         do {
             if (svc.context.digging.pos.x && (svc.context.digging.pos.x >= minx[0] && svc.context.digging.pos.x <= maxx[0] && svc.context.digging.pos.y >= miny[0] && svc.context.digging.pos.y <= maxy[0])) {
                 if (flp & 1) {
-                    svc.context.digging.pos.y = $c.i16((maxy[0] - svc.context.digging.pos.y | 0) + miny[0] | 0);
+                    svc.context.digging.pos.y = $c.i16(maxy[0] - svc.context.digging.pos.y + miny[0]);
                 }
                 if (flp & 2) {
-                    svc.context.digging.pos.x = $c.i16((maxx[0] - svc.context.digging.pos.x | 0) + minx[0] | 0);
+                    svc.context.digging.pos.x = $c.i16(maxx[0] - svc.context.digging.pos.x + minx[0]);
                 }
             }
         } while (0);
@@ -1001,18 +1001,18 @@ function flip_vault_guard(flp, grd, minx, miny, maxx, maxy) {   // sp_lev.c:926
     egd = grd.mextra.egd;
     if (egd.gdx >= minx && egd.gdx <= maxx && egd.gdy >= miny && egd.gdy <= maxy) {
         if (flp & 1) {
-            egd.gdy = $c.i16((maxy - egd.gdy | 0) + miny | 0);
+            egd.gdy = $c.i16(maxy - egd.gdy + miny);
         }
         if (flp & 2) {
-            egd.gdx = $c.i16((maxx - egd.gdx | 0) + minx | 0);
+            egd.gdx = $c.i16(maxx - egd.gdx + minx);
         }
     }
     if (egd.ogx >= minx && egd.ogx <= maxx && egd.ogy >= miny && egd.ogy <= maxy) {
         if (flp & 1) {
-            egd.ogy = $c.i16((maxy - egd.ogy | 0) + miny | 0);
+            egd.ogy = $c.i16(maxy - egd.ogy + miny);
         }
         if (flp & 2) {
-            egd.ogx = $c.i16((maxx - egd.ogx | 0) + minx | 0);
+            egd.ogx = $c.i16(maxx - egd.ogx + minx);
         }
     }
     for (i = egd.fcbeg; i < egd.fcend; i = i + 1 | 0) {
@@ -1020,10 +1020,10 @@ function flip_vault_guard(flp, grd, minx, miny, maxx, maxy) {   // sp_lev.c:926
         fy = egd.fakecorr[i].fy;
         if (fx >= minx && fx <= maxx && fy >= miny && fy <= maxy) {
             if (flp & 1) {
-                egd.fakecorr[i].fy = $c.i16((maxy - fy | 0) + miny | 0);
+                egd.fakecorr[i].fy = $c.i16(maxy - fy + miny);
             }
             if (flp & 2) {
-                egd.fakecorr[i].fx = $c.i16((maxx - fx | 0) + minx | 0);
+                egd.fakecorr[i].fx = $c.i16(maxx - fx + minx);
             }
         }
     }
@@ -1063,7 +1063,7 @@ function sel_set_wall_property(x, y, arg) {   // sp_lev.c:986
     prop = $c.asArr(arg, Int32Array).get(0);
     /* 3.6.2: made iron bars eligible to be flagged nondiggable
        (checked by chewing(hack.c) and zap_over_floor(zap.c)) */
-    if (svl.level.locations[x][y].typ <= DBWALL || (svl.level.locations[x][y].typ === TREE || svl.level.flags.arboreal | 0 && svl.level.locations[x][y].typ === STONE) || svl.level.locations[x][y].typ === IRONBARS) {
+    if (svl.level.locations[x][y].typ <= DBWALL || (svl.level.locations[x][y].typ === TREE || svl.level.flags.arboreal && svl.level.locations[x][y].typ === STONE) || svl.level.locations[x][y].typ === IRONBARS) {
         svl.level.locations[x][y].flags = ((svl.level.locations[x][y].flags | 0 | prop) >>> 0) & 31;
     }
 }
@@ -1080,10 +1080,10 @@ function sel_set_wall_property(x, y, arg) {   // sp_lev.c:986
 function set_wall_property(x1, y1, x2, y2, prop$in) {   // sp_lev.c:1001
     const prop = Int32Array.of(prop$in);
     let x = 0, y = 0;
-    x1 = $c.i16(x1 > 1 ? x1 : 1);
-    x2 = $c.i16(x2 < COLNO - 1 ? x2 : COLNO - 1);
-    y1 = $c.i16(y1 > 0 ? y1 : 0);
-    y2 = $c.i16(y2 < ROWNO - 1 ? y2 : ROWNO - 1);
+    x1 = x1 > 1 ? x1 : 1;
+    x2 = x2 < COLNO - 1 ? x2 : COLNO - 1;
+    y1 = y1 > 0 ? y1 : 0;
+    y2 = y2 < ROWNO - 1 ? y2 : ROWNO - 1;
     for (y = y1; y <= y2; y = $c.i16(y + 1)) {
         for (x = x1; x <= x2; x = $c.i16(x + 1)) {
             sel_set_wall_property(x, y, new $c.Ptr(prop, 0));
@@ -1141,19 +1141,19 @@ function set_door_orientation(x, y) {   // sp_lev.c:1042
      * to that, we check for solid rock which hasn't been wallified
      * yet (cf lower leftside of leader's room in Cav quest).
      */
-    wleft = $c.i8(isok($c.i16(x - 1 | 0), $c.i16(y)) && (svl.level.locations[x - 1 | 0][y].typ && svl.level.locations[x - 1 | 0][y].typ <= DBWALL || svl.level.locations[x - 1 | 0][y].typ === DOOR || svl.level.locations[x - 1 | 0][y].typ === SDOOR) ? 1 : 0);
-    wright = $c.i8(isok($c.i16(x + 1 | 0), $c.i16(y)) && (svl.level.locations[x + 1 | 0][y].typ && svl.level.locations[x + 1 | 0][y].typ <= DBWALL || svl.level.locations[x + 1 | 0][y].typ === DOOR || svl.level.locations[x + 1 | 0][y].typ === SDOOR) ? 1 : 0);
-    wup = $c.i8(isok($c.i16(x), $c.i16(y - 1 | 0)) && (svl.level.locations[x][y - 1 | 0].typ && svl.level.locations[x][y - 1 | 0].typ <= DBWALL || svl.level.locations[x][y - 1 | 0].typ === DOOR || svl.level.locations[x][y - 1 | 0].typ === SDOOR) ? 1 : 0);
-    wdown = $c.i8(isok($c.i16(x), $c.i16(y + 1 | 0)) && (svl.level.locations[x][y + 1 | 0].typ && svl.level.locations[x][y + 1 | 0].typ <= DBWALL || svl.level.locations[x][y + 1 | 0].typ === DOOR || svl.level.locations[x][y + 1 | 0].typ === SDOOR) ? 1 : 0);
+    wleft = isok($c.i16(x - 1 | 0), $c.i16(y)) && (svl.level.locations[x - 1 | 0][y].typ && svl.level.locations[x - 1 | 0][y].typ <= DBWALL || svl.level.locations[x - 1 | 0][y].typ === DOOR || svl.level.locations[x - 1 | 0][y].typ === SDOOR) ? 1 : 0;
+    wright = isok($c.i16(x + 1 | 0), $c.i16(y)) && (svl.level.locations[x + 1 | 0][y].typ && svl.level.locations[x + 1 | 0][y].typ <= DBWALL || svl.level.locations[x + 1 | 0][y].typ === DOOR || svl.level.locations[x + 1 | 0][y].typ === SDOOR) ? 1 : 0;
+    wup = isok($c.i16(x), $c.i16(y - 1 | 0)) && (svl.level.locations[x][y - 1 | 0].typ && svl.level.locations[x][y - 1 | 0].typ <= DBWALL || svl.level.locations[x][y - 1 | 0].typ === DOOR || svl.level.locations[x][y - 1 | 0].typ === SDOOR) ? 1 : 0;
+    wdown = isok($c.i16(x), $c.i16(y + 1 | 0)) && (svl.level.locations[x][y + 1 | 0].typ && svl.level.locations[x][y + 1 | 0].typ <= DBWALL || svl.level.locations[x][y + 1 | 0].typ === DOOR || svl.level.locations[x][y + 1 | 0].typ === SDOOR) ? 1 : 0;
     if (!wleft && !wright && !wup && !wdown) {
         /* out of bounds is treated as implicit wall; should be academic
            because we don't expect to have doors so near the level's edge */
-        wleft = $c.i8(!isok($c.i16(x - 1 | 0), $c.i16(y)) || (svl.level.locations[x - 1 | 0][y].typ < POOL || svl.level.locations[x - 1 | 0][y].typ === IRONBARS) ? 1 : 0);
-        wright = $c.i8(!isok($c.i16(x + 1 | 0), $c.i16(y)) || (svl.level.locations[x + 1 | 0][y].typ < POOL || svl.level.locations[x + 1 | 0][y].typ === IRONBARS) ? 1 : 0);
-        wup = $c.i8(!isok($c.i16(x), $c.i16(y - 1 | 0)) || (svl.level.locations[x][y - 1 | 0].typ < POOL || svl.level.locations[x][y - 1 | 0].typ === IRONBARS) ? 1 : 0);
-        wdown = $c.i8(!isok($c.i16(x), $c.i16(y + 1 | 0)) || (svl.level.locations[x][y + 1 | 0].typ < POOL || svl.level.locations[x][y + 1 | 0].typ === IRONBARS) ? 1 : 0);
+        wleft = !isok($c.i16(x - 1 | 0), $c.i16(y)) || (svl.level.locations[x - 1 | 0][y].typ < POOL || svl.level.locations[x - 1 | 0][y].typ === IRONBARS) ? 1 : 0;
+        wright = !isok($c.i16(x + 1 | 0), $c.i16(y)) || (svl.level.locations[x + 1 | 0][y].typ < POOL || svl.level.locations[x + 1 | 0][y].typ === IRONBARS) ? 1 : 0;
+        wup = !isok($c.i16(x), $c.i16(y - 1 | 0)) || (svl.level.locations[x][y - 1 | 0].typ < POOL || svl.level.locations[x][y - 1 | 0].typ === IRONBARS) ? 1 : 0;
+        wdown = !isok($c.i16(x), $c.i16(y + 1 | 0)) || (svl.level.locations[x][y + 1 | 0].typ < POOL || svl.level.locations[x][y + 1 | 0].typ === IRONBARS) ? 1 : 0;
     }
-    svl.level.locations[x][y].horizontal = (((wleft || wright) && !(wup && wdown) ? 1 : 0) >>> 0) & 1;
+    svl.level.locations[x][y].horizontal = ((wleft || wright) && !(wup && wdown) ? 1 : 0) & 1;
 }
 /* is x,y right next to room droom? */
 /**
@@ -1168,19 +1168,19 @@ function shared_with_room(x, y, droom) {   // sp_lev.c:1089
     if (!isok($c.i16(x), $c.i16(y))) {
         return FALSE;
     }
-    if ((svl.level.locations[x][y].roomno | 0) === rmno && !svl.level.locations[x][y].edge) {
+    if (svl.level.locations[x][y].roomno === rmno && !svl.level.locations[x][y].edge) {
         return FALSE;
     }
-    if (isok($c.i16(x - 1 | 0), $c.i16(y)) && (svl.level.locations[x - 1 | 0][y].roomno | 0) === rmno && (x - 1 | 0) <= droom.hx) {
+    if (isok($c.i16(x - 1 | 0), $c.i16(y)) && svl.level.locations[x - 1 | 0][y].roomno === rmno && (x - 1 | 0) <= droom.hx) {
         return TRUE;
     }
-    if (isok($c.i16(x + 1 | 0), $c.i16(y)) && (svl.level.locations[x + 1 | 0][y].roomno | 0) === rmno && (x + 1 | 0) >= droom.lx) {
+    if (isok($c.i16(x + 1 | 0), $c.i16(y)) && svl.level.locations[x + 1 | 0][y].roomno === rmno && (x + 1 | 0) >= droom.lx) {
         return TRUE;
     }
-    if (isok($c.i16(x), $c.i16(y - 1 | 0)) && (svl.level.locations[x][y - 1 | 0].roomno | 0) === rmno && (y - 1 | 0) <= droom.hy) {
+    if (isok($c.i16(x), $c.i16(y - 1 | 0)) && svl.level.locations[x][y - 1 | 0].roomno === rmno && (y - 1 | 0) <= droom.hy) {
         return TRUE;
     }
-    if (isok($c.i16(x), $c.i16(y + 1 | 0)) && (svl.level.locations[x][y + 1 | 0].roomno | 0) === rmno && (y + 1 | 0) >= droom.ly) {
+    if (isok($c.i16(x), $c.i16(y + 1 | 0)) && svl.level.locations[x][y + 1 | 0].roomno === rmno && (y + 1 | 0) >= droom.ly) {
         return TRUE;
     }
     return FALSE;
@@ -1193,7 +1193,7 @@ function shared_with_room(x, y, droom) {   // sp_lev.c:1089
  * @returns {Promise<void>}
  */
 async function maybe_add_door(x, y, droom) {   // sp_lev.c:1110
-    if (droom.hx >= 0 && (!droom.irregular && inside_room(droom, $c.i16(x), $c.i16(y)) || (svl.level.locations[x][y].roomno | 0) === $c.add64($c.rdiff(droom, svr.rooms[0]), ROOMOFFSET) || shared_with_room(x, y, droom))) {
+    if (droom.hx >= 0 && (!droom.irregular && inside_room(droom, $c.i16(x), $c.i16(y)) || svl.level.locations[x][y].roomno === $c.add64($c.rdiff(droom, svr.rooms[0]), ROOMOFFSET) || shared_with_room(x, y, droom))) {
         await add_door($c.i16(x), $c.i16(y), droom);
     }
 }
@@ -1378,7 +1378,7 @@ async function is_ok_location(x, y, humidity) {   // sp_lev.c:1280
         return TRUE;
     }
     if ((humidity & (DRY | SPACELOC)) >>> 0 && SPACE_POS(typ)) {
-        bould = $c.i8(!$c.peq(sobj_at(BOULDER, x, y), $c.asRec(null, $T.obj, 112)) ? 1 : 0);
+        bould = !$c.peq(sobj_at(BOULDER, x, y), $c.asRec(null, $T.obj, 112)) ? 1 : 0;
         if (!bould || bould && (humidity & SOLID) >>> 0) {
             return TRUE;
         }
@@ -1435,7 +1435,7 @@ export async function get_location_coord(x, y, humidity, croom, crd) {   // sp_l
     c.$copyFrom(get_unpacked_coord(crd, humidity));
     x.set(0, $c.i16(c.x));
     y.set(0, $c.i16(c.y));
-    await get_location(x, y, (c.getloc_flags | (c.is_random ? NO_LOC_WARN : 0) >>> 0) >>> 0, croom);
+    await get_location(x, y, (c.getloc_flags | (c.is_random ? NO_LOC_WARN : 0)) >>> 0, croom);
     if (x.get(0) === -1 && y.get(0) === -1 && c.is_random) {
         await get_location(x, y, humidity >>> 0, croom);
     }
@@ -1461,10 +1461,10 @@ async function get_room_loc(x, y, croom) {   // sp_lev.c:1360
         }
     } else {
         if (x.get(0) < 0) {
-            $t1 = $c.i16(rn2((croom.hx - croom.lx | 0) + 1 | 0)), x.set(0, $t1);
+            $t1 = $c.i16(rn2(croom.hx - croom.lx + 1)), x.set(0, $t1);
         }
         if (y.get(0) < 0) {
-            $t2 = $c.i16(rn2((croom.hy - croom.ly | 0) + 1 | 0)), y.set(0, $t2);
+            $t2 = $c.i16(rn2(croom.hy - croom.ly + 1)), y.set(0, $t2);
         }
         x.set(0, $c.i16(x.get(0) + croom.lx | 0));
         y.set(0, $c.i16(y.get(0) + croom.ly | 0));
@@ -1506,14 +1506,14 @@ async function get_free_room_loc(x, y, croom, pos) {   // sp_lev.c:1385
  */
 export async function check_room(lowx, ddx, lowy, ddy, vault) {   // sp_lev.c:1407
     let x = 0, y = 0, hix = 0, hiy = 0, lev = null, xlim = 0, ylim = 0, ymax = 0, s_lowx = 0, s_ddx = 0, s_lowy = 0, s_ddy = 0, save_plnmsg = 0, $t1;
-    hix = lowx.get(0) + ddx.get(0) | 0;
-    hiy = lowy.get(0) + ddy.get(0) | 0;
+    hix = lowx.get(0) + ddx.get(0);
+    hiy = lowy.get(0) + ddy.get(0);
     s_lowx = lowx.get(0);
     s_ddx = ddx.get(0);
     s_lowy = lowy.get(0);
     s_ddy = ddy.get(0);
-    xlim = XLIM + (vault ? 1 : 0) | 0;
-    ylim = YLIM + (vault ? 1 : 0) | 0;
+    xlim = XLIM + (vault ? 1 : 0);
+    ylim = YLIM + (vault ? 1 : 0);
     if (lowx.get(0) < 3) {
         lowx.set(0, 3);
     }
@@ -1622,7 +1622,7 @@ export async function create_room(x, y, w, h, xal, yal, rtype, rlit) {   // sp_l
     /* on low levels the room is lit (usually) */
     /* some other rooms may require lighting */
     /* is light state random ? */
-    rlit = $c.i16(litstate_rnd(rlit));
+    rlit = litstate_rnd(rlit);
     /*
      * Here we will try to create a room. If some parameters are
      * random we are willing to make several try before we give
@@ -1656,7 +1656,7 @@ export async function create_room(x, y, w, h, xal, yal, rtype, rlit) {   // sp_l
             if (vault) {
                 dx[0] = dy[0] = 1;
             } else {
-                dx[0] = $c.i16(2 + rn2((hx - lx | 0) > 28 ? 12 : 8) | 0);
+                dx[0] = $c.i16(2 + rn2(hx - lx > 28 ? 12 : 8) | 0);
                 dy[0] = $c.i16(2 + rn2(4) | 0);
                 if (Math.imul(dx[0], dy[0]) > 50) {
                     dy[0] = $c.i16($c.div32(50, dx[0]));
@@ -1664,13 +1664,13 @@ export async function create_room(x, y, w, h, xal, yal, rtype, rlit) {   // sp_l
             }
             xborder = $c.i16(lx > 0 && hx < COLNO - 1 ? Math.imul(2, xlim) : xlim + 1 | 0);
             yborder = $c.i16(ly > 0 && hy < ROWNO - 1 ? Math.imul(2, ylim) : ylim + 1 | 0);
-            if ((hx - lx | 0) < ((dx[0] + 3 | 0) + xborder | 0) || (hy - ly | 0) < ((dy[0] + 3 | 0) + yborder | 0)) {
+            if (hx - lx < dx[0] + 3 + xborder || hy - ly < dy[0] + 3 + yborder) {
                 r1 = null;
                 continue;
             }
-            xabs[0] = $c.i16((lx + (lx > 0 ? xlim : 3) | 0) + rn2((((hx - (lx > 0 ? lx : 3) | 0) - dx[0] | 0) - xborder | 0) + 1 | 0) | 0);
-            yabs[0] = $c.i16((ly + (ly > 0 ? ylim : 2) | 0) + rn2((((hy - (ly > 0 ? ly : 2) | 0) - dy[0] | 0) - yborder | 0) + 1 | 0) | 0);
-            if (ly === 0 && hy >= ROWNO - 1 && (!svn.nroom || !rn2(svn.nroom)) && (yabs[0] + dy[0] | 0) > 10) {
+            xabs[0] = $c.i16((lx + (lx > 0 ? xlim : 3) | 0) + rn2(hx - (lx > 0 ? lx : 3) - dx[0] - xborder + 1) | 0);
+            yabs[0] = $c.i16((ly + (ly > 0 ? ylim : 2) | 0) + rn2(hy - (ly > 0 ? ly : 2) - dy[0] - yborder + 1) | 0);
+            if (ly === 0 && hy >= ROWNO - 1 && (!svn.nroom || !rn2(svn.nroom)) && yabs[0] + dy[0] > 10) {
                 yabs[0] = $c.i16(rn2(3) + 2 | 0);
                 if (svn.nroom < 4 && dy[0] > 1) {
                     dy[0] = $c.i16(dy[0] - 1);
@@ -1680,10 +1680,10 @@ export async function create_room(x, y, w, h, xal, yal, rtype, rlit) {   // sp_l
                 r1 = null;
                 continue;
             }
-            wtmp = dx[0] + 1 | 0;
-            htmp = dy[0] + 1 | 0;
-            r2.lx = $c.i16(xabs[0] - 1 | 0);
-            r2.ly = $c.i16(yabs[0] - 1 | 0);
+            wtmp = dx[0] + 1;
+            htmp = dy[0] + 1;
+            r2.lx = $c.i16(xabs[0] - 1);
+            r2.ly = $c.i16(yabs[0] - 1);
             r2.hx = $c.i16(xabs[0] + wtmp | 0);
             r2.hy = $c.i16(yabs[0] + htmp | 0);
         } else {
@@ -1742,8 +1742,8 @@ export async function create_room(x, y, w, h, xal, yal, rtype, rlit) {   // sp_l
                 yabs[0] = 2;
             }
             /* Try to find a rectangle that fit our room ! */
-            r2.lx = $c.i16(xabs[0] - 1 | 0);
-            r2.ly = $c.i16(yabs[0] - 1 | 0);
+            r2.lx = $c.i16(xabs[0] - 1);
+            r2.ly = $c.i16(yabs[0] - 1);
             r2.hx = $c.i16((xabs[0] + wtmp | 0) + rndpos | 0);
             r2.hy = $c.i16((yabs[0] + htmp | 0) + rndpos | 0);
             r1 = get_rect(r2);
@@ -1784,24 +1784,24 @@ export async function create_room(x, y, w, h, xal, yal, rtype, rlit) {   // sp_l
  */
 async function create_subroom(proom, x, y, w, h, rtype, rlit) {   // sp_lev.c:1668
     let width = 0, height = 0;
-    width = $c.i16((proom.hx - proom.lx | 0) + 1 | 0);
-    height = $c.i16((proom.hy - proom.ly | 0) + 1 | 0);
+    width = $c.i16(proom.hx - proom.lx + 1);
+    height = $c.i16(proom.hy - proom.ly + 1);
     /* There is a minimum size for the parent room */
     if (width < 4 || height < 4) {
         return FALSE;
     }
     /* Check for random position, size, etc... */
     if (w === -1) {
-        w = $c.i16(rnd(width - 3 | 0));
+        w = $c.i16(rnd(width - 3));
     }
     if (h === -1) {
-        h = $c.i16(rnd(height - 3 | 0));
+        h = $c.i16(rnd(height - 3));
     }
     if (x === -1) {
-        x = $c.i16(rnd(width - w | 0));
+        x = $c.i16(rnd(width - w));
     }
     if (y === -1) {
-        y = $c.i16(rnd(height - h | 0));
+        y = $c.i16(rnd(height - h));
     }
     if (x === 1) {
         x = 0;
@@ -1809,17 +1809,17 @@ async function create_subroom(proom, x, y, w, h, rtype, rlit) {   // sp_lev.c:16
     if (y === 1) {
         y = 0;
     }
-    if (((x + w | 0) + 1 | 0) === width) {
+    if (x + w + 1 === width) {
         x = $c.i16(x + 1);
     }
-    if (((y + h | 0) + 1 | 0) === height) {
+    if (y + h + 1 === height) {
         y = $c.i16(y + 1);
     }
     if (rtype === -1) {
         rtype = OROOM;
     }
-    rlit = $c.i16(litstate_rnd(rlit));
-    await add_subroom(proom, $c.i16(proom.lx + x | 0), $c.i16(proom.ly + y | 0), $c.i16(((proom.lx + x | 0) + w | 0) - 1 | 0), $c.i16(((proom.ly + y | 0) + h | 0) - 1 | 0), $c.i8(rlit), $c.i8(rtype), FALSE);
+    rlit = litstate_rnd(rlit);
+    await add_subroom(proom, $c.i16(proom.lx + x), $c.i16(proom.ly + y), $c.i16(proom.lx + x + w - 1), $c.i16(proom.ly + y + h - 1), $c.i8(rlit), $c.i8(rtype), FALSE);
     return TRUE;
 }
 /*
@@ -1878,8 +1878,8 @@ async function create_door(dd, broom) {   // sp_lev.c:1714
                 if (!(dwall & W.NORTH)) {
                     continue L1;
                 }
-                y = broom.ly - 1 | 0;
-                x = broom.lx + (dpos === -1 ? rn2((1 + broom.hx | 0) - broom.lx | 0) : dpos) | 0;
+                y = broom.ly - 1;
+                x = broom.lx + (dpos === -1 ? rn2(1 + broom.hx - broom.lx) : dpos) | 0;
                 if (!isok($c.i16(x), $c.i16(y - 1 | 0)) || svl.level.locations[x][y - 1 | 0].typ < POOL) {
                     continue L1;
                 }
@@ -1888,8 +1888,8 @@ async function create_door(dd, broom) {   // sp_lev.c:1714
                 if (!(dwall & W.SOUTH)) {
                     continue L1;
                 }
-                y = broom.hy + 1 | 0;
-                x = broom.lx + (dpos === -1 ? rn2((1 + broom.hx | 0) - broom.lx | 0) : dpos) | 0;
+                y = broom.hy + 1;
+                x = broom.lx + (dpos === -1 ? rn2(1 + broom.hx - broom.lx) : dpos) | 0;
                 if (!isok($c.i16(x), $c.i16(y + 1 | 0)) || svl.level.locations[x][y + 1 | 0].typ < POOL) {
                     continue L1;
                 }
@@ -1898,8 +1898,8 @@ async function create_door(dd, broom) {   // sp_lev.c:1714
                 if (!(dwall & W.WEST)) {
                     continue L1;
                 }
-                x = broom.lx - 1 | 0;
-                y = broom.ly + (dpos === -1 ? rn2((1 + broom.hy | 0) - broom.ly | 0) : dpos) | 0;
+                x = broom.lx - 1;
+                y = broom.ly + (dpos === -1 ? rn2(1 + broom.hy - broom.ly) : dpos) | 0;
                 if (!isok($c.i16(x - 1 | 0), $c.i16(y)) || svl.level.locations[x - 1 | 0][y].typ < POOL) {
                     continue L1;
                 }
@@ -1908,8 +1908,8 @@ async function create_door(dd, broom) {   // sp_lev.c:1714
                 if (!(dwall & W.EAST)) {
                     continue L1;
                 }
-                x = broom.hx + 1 | 0;
-                y = broom.ly + (dpos === -1 ? rn2((1 + broom.hy | 0) - broom.ly | 0) : dpos) | 0;
+                x = broom.hx + 1;
+                y = broom.ly + (dpos === -1 ? rn2(1 + broom.hy - broom.ly) : dpos) | 0;
                 if (!isok($c.i16(x + 1 | 0), $c.i16(y)) || svl.level.locations[x + 1 | 0][y].typ < POOL) {
                     continue L1;
                 }
@@ -1926,7 +1926,7 @@ async function create_door(dd, broom) {   // sp_lev.c:1714
         await impossible($c.lit("create_door: Can't find a proper place!"));
         return;
     }
-    if (!await set_levltyp($c.i16(x), $c.i16(y), $c.i8(dd.secret ? SDOOR : DOOR))) {
+    if (!await set_levltyp($c.i16(x), $c.i16(y), dd.secret ? SDOOR : DOOR)) {
         return;
     }
     svl.level.locations[x][y].flags = (dd.mask >>> 0) & 31;
@@ -2006,7 +2006,7 @@ function m_bad_boulder_spot(x, y) {   // sp_lev.c:1864
     }
     /* avoid closed doors */
     lev = $c.relem(svl.level.locations[x], y);
-    if (IS_DOOR(lev.typ) && ((lev.flags | 0) & (D.CLOSED | D.LOCKED)) !== 0) {
+    if (IS_DOOR(lev.typ) && (lev.flags & (D.CLOSED | D.LOCKED)) !== 0) {
         return TRUE;
     }
     /* spot is ok */
@@ -2221,7 +2221,7 @@ async function create_monster(m, croom) {   // sp_lev.c:1925
                                 }
                             }
                             if (!mtmp.perminvis || pm_invisible(olddata)) {
-                                mtmp.perminvis = (pm_invisible(mdat) >>> 0) & 1;
+                                mtmp.perminvis = (pm_invisible(mdat)) & 1;
                             }
                         }
                         break;
@@ -2247,33 +2247,33 @@ async function create_monster(m, croom) {   // sp_lev.c:1925
             mtmp.mtrapseen = m.seentraps;
         }
         if (m.cancelled) {
-            mtmp.mcan = (1) & 1;
+            mtmp.mcan = 1;
         }
         if (m.revived) {
-            mtmp.mrevived = (1) & 1;
+            mtmp.mrevived = 1;
         }
         if (m.avenge) {
-            mtmp.mavenge = (1) & 1;
+            mtmp.mavenge = 1;
         }
         if (m.stunned) {
-            mtmp.mstun = (1) & 1;
+            mtmp.mstun = 1;
         }
         if (m.confused) {
-            mtmp.mconf = (1) & 1;
+            mtmp.mconf = 1;
         }
         if (m.invis) {
-            $t1 = mtmp.perminvis = (1) & 1, mtmp.minvis = ($t1) & 1;
+            $t1 = mtmp.perminvis = 1, mtmp.minvis = ($t1) & 1;
         }
         if (m.blinded) {
-            mtmp.mcansee = (0) & 1;
+            mtmp.mcansee = 0;
             mtmp.mblinded = ($c.rem32(m.blinded, 127) >>> 0) & 127;
         }
         if (m.paralyzed) {
-            mtmp.mcanmove = (0) & 1;
+            mtmp.mcanmove = 0;
             mtmp.mfrozen = ($c.rem32(m.paralyzed, 127) >>> 0) & 127;
         }
         if (m.fleeing) {
-            mtmp.mflee = (1) & 1;
+            mtmp.mflee = 1;
             mtmp.mfleetim = ($c.rem32(m.fleeing, 127) >>> 0) & 127;
         }
         if (m.waiting) {
@@ -2286,9 +2286,9 @@ async function create_monster(m, croom) {   // sp_lev.c:1925
             }
         }
         if (m.m_lev_adj) {
-            if ((mtmp.m_lev + m.m_lev_adj | 0) > 49) {
+            if (mtmp.m_lev + m.m_lev_adj > 49) {
                 mtmp.m_lev = 49;
-            } else if ((mtmp.m_lev + m.m_lev_adj | 0) < 0) {
+            } else if (mtmp.m_lev + m.m_lev_adj < 0) {
                 mtmp.m_lev = 0;
             } else {
                 mtmp.m_lev = $c.u8(mtmp.m_lev + m.m_lev_adj | 0);
@@ -2317,7 +2317,7 @@ async function create_monster(m, croom) {   // sp_lev.c:1925
 async function create_object(o, croom) {   // sp_lev.c:2193
     let otmp = null, x = Int16Array.of(0), y = Int16Array.of(0), c = 0, named = 0, oclass = 0, cobj = null, was = null, obj = null, wastyp = 0, i = 0, lbuf = new Int8Array(128), dealloced = Int8Array.of(0), $t1, $t2, $t3, $t4;
     /* has a name been supplied in level description? */
-    named = $c.i8(o.name.str ? TRUE : FALSE);
+    named = o.name.str ? TRUE : FALSE;
     await get_location_coord(new $c.Ptr(x, 0), new $c.Ptr(y, 0), DRY, croom, o.coord);
     if (o.class >= 0) {
         c = $c.i8(o.class);
@@ -2325,9 +2325,9 @@ async function create_object(o, croom) {   // sp_lev.c:2193
         c = 0;
     }
     if (!c) {
-        otmp = await mkobj_at(RANDOM_CLASS, x[0], y[0], $c.i8(!named ? 1 : 0));
+        otmp = await mkobj_at(RANDOM_CLASS, x[0], y[0], !named ? 1 : 0);
     } else if (o.id !== -1) {
-        otmp = await mksobj_at(o.id, x[0], y[0], TRUE, $c.i8(!named ? 1 : 0));
+        otmp = await mksobj_at(o.id, x[0], y[0], TRUE, !named ? 1 : 0);
     } else {
         /*
          * The special levels are compiled with the default "text" object
@@ -2341,7 +2341,7 @@ async function create_object(o, croom) {   // sp_lev.c:2193
         if (oclass === COIN_CLASS) {
             otmp = await mkgold(0, x[0], y[0]);
         } else {
-            otmp = await mkobj_at(oclass, x[0], y[0], $c.i8(!named ? 1 : 0));
+            otmp = await mkobj_at(oclass, x[0], y[0], !named ? 1 : 0);
         }
     }
     if (o.spe !== -127) {   /* That means NOT RANDOM! */
@@ -2395,14 +2395,14 @@ async function create_object(o, croom) {   // sp_lev.c:2193
     }
     if (o.eroded) {
         if (o.eroded < 0) {
-            otmp.oerodeproof = (1) & 1;
+            otmp.oerodeproof = 1;
         } else {
             otmp.oeroded = ($c.rem32(o.eroded, 4) >>> 0) & 3;
             otmp.oeroded2 = ($c.rem32(o.eroded >> 2, 4) >>> 0) & 3;
         }
     } else {
-        $t1 = otmp.oeroded2 = (0) & 3, otmp.oeroded = ($t1) & 3;
-        otmp.oerodeproof = (0) & 1;
+        $t1 = otmp.oeroded2 = 0, otmp.oeroded = ($t1) & 3;
+        otmp.oerodeproof = 0;
     }
     if (o.recharged) {
         otmp.recharged = ($c.rem32(o.recharged, 8) >>> 0) & 7;
@@ -2410,8 +2410,8 @@ async function create_object(o, croom) {   // sp_lev.c:2193
     if (o.locked === 0 || o.locked === 1) {
         otmp.olocked = (o.locked >>> 0) & 1;
     } else if (o.broken) {
-        otmp.obroken = (1) & 1;
-        otmp.olocked = (0) & 1;   /* obj generation may set */
+        otmp.obroken = 1;
+        otmp.olocked = 0;   /* obj generation may set */
     }
     if (o.trapped === 0 || o.trapped === 1) {
         otmp.otrapped = (o.trapped >>> 0) & 1;
@@ -2419,8 +2419,8 @@ async function create_object(o, croom) {   // sp_lev.c:2193
     if (o.trapped && (o.tknown === 0 || o.tknown === 1)) {
         otmp.tknown = (o.tknown >>> 0) & 1;
     }
-    otmp.greased = ((o.greased ? 1 : 0) >>> 0) & 1;
-    if (o.quan > 0 && objects[otmp.otyp].oc_merge | 0) {
+    otmp.greased = (o.greased ? 1 : 0) & 1;
+    if (o.quan > 0 && objects[otmp.otyp].oc_merge) {
         otmp.quan = o.quan;
         $t2 = await weight(otmp) >>> 0, otmp.owt = $t2;
     }
@@ -2515,7 +2515,7 @@ async function create_object(o, croom) {   // sp_lev.c:2193
                 svc.context.achieveo.mines_prize_otyp = otmp.otyp;
                 /* prevent stacking; cleared when achievement is recorded;
                    will be reset in addinv_core1() */
-                otmp.nomerge = (1) & 1;
+                otmp.nomerge = 1;
             } else {
                 await impossible(new $c.Ptr(create_object$prize_warning, 0), $c.lit("mines end"));
             }
@@ -2523,7 +2523,7 @@ async function create_object(o, croom) {   // sp_lev.c:2193
             if (!svc.context.achieveo.soko_prize_oid) {
                 svc.context.achieveo.soko_prize_oid = otmp.o_id;
                 svc.context.achieveo.soko_prize_otyp = otmp.otyp;
-                otmp.nomerge = (1) & 1;
+                otmp.nomerge = 1;
                 /* redundant; Sokoban prizes don't stack;
                  * will be reset in addinv_core1() */
             } else {
@@ -2572,7 +2572,7 @@ async function create_altar(a, croom) {   // sp_lev.c:2446
     } else {
         await get_location_coord(new $c.Ptr(x, 0), new $c.Ptr(y, 0), DRY, croom, a.coord);
         if ((sproom = in_rooms(x[0], y[0], TEMPLE).get(0)) !== 0) {
-            croom = $c.relem(svr.rooms, sproom - ROOMOFFSET | 0);
+            croom = $c.relem(svr.rooms, sproom - ROOMOFFSET);
         } else {
             croom_is_temple = FALSE;
         }
@@ -2591,7 +2591,7 @@ async function create_altar(a, croom) {   // sp_lev.c:2446
     }
     if (a.shrine) {
         /* Is it a shrine  or sanctum? */
-        await priestini(u.uz, croom, x[0], y[0], $c.i8(a.shrine > 1 ? 1 : 0));
+        await priestini(u.uz, croom, x[0], y[0], a.shrine > 1 ? 1 : 0);
         svl.level.locations[x[0]][y[0]].flags = ((svl.level.locations[x[0]][y[0]].flags | 0 | AM.SHRINE) >>> 0) & 31;
         if (a.shrine === 2) {   /* high altar or sanctum */
             svl.level.locations[x[0]][y[0]].flags = ((svl.level.locations[x[0]][y[0]].flags | 0 | AM.SANCTUM) >>> 0) & 31;
@@ -2617,31 +2617,31 @@ async function search_door(croom, x, y, wall, cnt) {   // sp_lev.c:2492
             dy = 0;
             dx = 1;
             xx = croom.lx;
-            yy = croom.hy + 1 | 0;
+            yy = croom.hy + 1;
             break;
         case W.NORTH:
             dy = 0;
             dx = 1;
             xx = croom.lx;
-            yy = croom.ly - 1 | 0;
+            yy = croom.ly - 1;
             break;
         case W.EAST:
             dy = 1;
             dx = 0;
-            xx = croom.hx + 1 | 0;
+            xx = croom.hx + 1;
             yy = croom.ly;
             break;
         case W.WEST:
             dy = 1;
             dx = 0;
-            xx = croom.lx - 1 | 0;
+            xx = croom.lx - 1;
             yy = croom.ly;
             break;
         default:
             await panic($c.lit("search_door: Bad wall!"));
     }
     /*NOTREACHED*/
-    while (xx <= (croom.hx + 1 | 0) && yy <= (croom.hy + 1 | 0)) {
+    while (xx <= croom.hx + 1 && yy <= croom.hy + 1) {
         if (svl.level.locations[xx][yy].typ === DOOR || svl.level.locations[xx][yy].typ === SDOOR) {
             x.set(0, $c.i16(xx));
             y.set(0, $c.i16(yy));
@@ -2864,7 +2864,7 @@ export async function fill_special_room(croom) {   // sp_lev.c:2731
     if (croom.needfill === FILL_NORMAL) {
         /* Shop ? */
         if (croom.rtype >= SHOPBASE) {
-            await stock_room(croom.rtype - SHOPBASE | 0, croom);
+            await stock_room(croom.rtype - SHOPBASE, croom);
             svl.level.flags.has_shop = (TRUE) & 1;
             return;
         }
@@ -2922,7 +2922,7 @@ export async function fill_special_room(croom) {   // sp_lev.c:2731
  */
 async function build_room(r, mkr) {   // sp_lev.c:2807
     let okroom = 0, aroom = null, rtype = 0;
-    rtype = $c.i16(!r.chance || rn2(100) < r.chance ? r.rtype : OROOM);
+    rtype = !r.chance || rn2(100) < r.chance ? r.rtype : OROOM;
     if (mkr) {
         aroom = $c.radd(gs.subrooms, gn.nsubroom);
         okroom = await create_subroom(mkr, r.x, r.y, r.w, r.h, rtype, r.rlit);
@@ -2947,7 +2947,7 @@ async function build_room(r, mkr) {   // sp_lev.c:2807
  */
 function light_region(tmpregion) {   // sp_lev.c:2839
     let litstate = 0, hiy = 0, x = 0, y = 0, lev = null, lowy = 0, lowx = 0, hix = 0;
-    litstate = $c.i8(tmpregion.rlit ? 1 : 0);
+    litstate = tmpregion.rlit ? 1 : 0;
     hiy = tmpregion.y2;
     lowy = tmpregion.y1;
     lowx = tmpregion.x1;
@@ -2975,23 +2975,23 @@ function light_region(tmpregion) {   // sp_lev.c:2839
  */
 export function wallify_map(x1, y1, x2, y2) {   // sp_lev.c:2865
     let x = 0, y = 0, xx = 0, yy = 0, lo_xx = 0, lo_yy = 0, hi_xx = 0, hi_yy = 0;
-    y1 = $c.i16(y1 > 0 ? y1 : 0);
-    x1 = $c.i16(x1 > 1 ? x1 : 1);
-    y2 = $c.i16(y2 < ROWNO - 1 ? y2 : ROWNO - 1);
-    x2 = $c.i16(x2 < COLNO - 1 ? x2 : COLNO - 1);
+    y1 = y1 > 0 ? y1 : 0;
+    x1 = x1 > 1 ? x1 : 1;
+    y2 = y2 < ROWNO - 1 ? y2 : ROWNO - 1;
+    x2 = x2 < COLNO - 1 ? x2 : COLNO - 1;
     for (y = y1; y <= y2; y = $c.i16(y + 1)) {
-        lo_yy = $c.i16(y > 0 ? y - 1 | 0 : 0);
-        hi_yy = $c.i16(y < y2 ? y + 1 | 0 : y2);
+        lo_yy = $c.i16(y > 0 ? y - 1 : 0);
+        hi_yy = $c.i16(y < y2 ? y + 1 : y2);
         for (x = x1; x <= x2; x = $c.i16(x + 1)) {
             if (svl.level.locations[x][y].typ !== STONE) {
                 continue;
             }
-            lo_xx = $c.i16(x > 1 ? x - 1 | 0 : 1);
-            hi_xx = $c.i16(x < x2 ? x + 1 | 0 : x2);
+            lo_xx = $c.i16(x > 1 ? x - 1 : 1);
+            hi_xx = $c.i16(x < x2 ? x + 1 : x2);
             for (yy = lo_yy; yy <= hi_yy; yy = $c.i16(yy + 1)) {
                 for (xx = lo_xx; xx <= hi_xx; xx = $c.i16(xx + 1)) {
                     if (svl.level.locations[xx][yy].typ >= ROOM || svl.level.locations[xx][yy].typ === CROSSWALL) {
-                        svl.level.locations[x][y].typ = $c.i8(yy !== y ? HWALL : VWALL);
+                        svl.level.locations[x][y].typ = yy !== y ? HWALL : VWALL;
                         yy = hi_yy;   /* end `yy' loop */
                         break;   /* end `xx' loop */
                     }
@@ -3051,7 +3051,7 @@ async function fill_empty_maze() {   // sp_lev.c:2926
         mapfact = $c.i32($c.div64($c.mul64(mapcount, 100), mapcountmax));
         for (x = $c.i16(rnd($c.div32(Math.imul(20, mapfact), 100))); x; x = $c.i16(x - 1)) {
             await maze1xy(mm, DRY);
-            await mkobj_at($c.i8(rn2(2) ? GEM_CLASS : RANDOM_CLASS), mm.x, mm.y, TRUE);
+            await mkobj_at(rn2(2) ? GEM_CLASS : RANDOM_CLASS, mm.x, mm.y, TRUE);
         }
         for (x = $c.i16(rnd($c.div32(Math.imul(12, mapfact), 100))); x; x = $c.i16(x - 1)) {
             await maze1xy(mm, DRY);
@@ -3076,7 +3076,7 @@ async function fill_empty_maze() {   // sp_lev.c:2926
             await maze1xy(mm, DRY);
             trytrap = rndtrap();
             if (sobj_at(BOULDER, mm.x, mm.y)) {
-                while ((trytrap === PIT || trytrap === SPIKED_PIT) || (trytrap === HOLE || trytrap === TRAPDOOR)) {
+                while (is_pit(trytrap) || is_hole(trytrap)) {
                     trytrap = rndtrap();
                 }
             }
@@ -3166,8 +3166,8 @@ async function l_push_wid_hei_table(L, wid, hei) {   // sp_lev.c:3050
  */
 async function l_push_mkroom_table(L, tmpr) {   // sp_lev.c:3059
     await lua_newtable(L);
-    await nhl_add_table_entry_int(L, $c.lit("width"), 1 + (tmpr.hx - tmpr.lx | 0) | 0);
-    await nhl_add_table_entry_int(L, $c.lit("height"), 1 + (tmpr.hy - tmpr.ly | 0) | 0);
+    await nhl_add_table_entry_int(L, $c.lit("width"), 1 + (tmpr.hx - tmpr.lx));
+    await nhl_add_table_entry_int(L, $c.lit("height"), 1 + (tmpr.hy - tmpr.ly));
     await nhl_add_table_entry_region(L, $c.lit("region"), tmpr.lx, tmpr.ly, tmpr.hx, tmpr.hy);
     await nhl_add_table_entry_bool(L, $c.lit("lit"), tmpr.rlit);
     await nhl_add_table_entry_bool(L, $c.lit("irregular"), tmpr.irregular);
@@ -3350,7 +3350,7 @@ export async function lspo_monster(L) {   // sp_lev.c:3214
     if (argc === 1 && lua_type(L, 1) === LUA.TSTRING) {
         paramstr = await luaL_checklstring(L, 1, null);
         if ($c.strlen(paramstr) === 1) {
-            tmpmons.class = $c.i16(paramstr.get(0));
+            tmpmons.class = paramstr.get(0);
             tmpmons.id = NON_PM;
         } else {
             tmpmons.class = -1;
@@ -3361,7 +3361,7 @@ export async function lspo_monster(L) {   // sp_lev.c:3214
         paramstr$2 = await luaL_checklstring(L, 1, null);
         await get_coord(L, 2, new $c.Ptr(mx, 0), new $c.Ptr(my, 0));
         if ($c.strlen(paramstr$2) === 1) {
-            tmpmons.class = $c.i16(paramstr$2.get(0));
+            tmpmons.class = paramstr$2.get(0);
             tmpmons.id = NON_PM;
         } else {
             tmpmons.class = -1;
@@ -3373,7 +3373,7 @@ export async function lspo_monster(L) {   // sp_lev.c:3214
         mx[0] = await luaL_checkinteger(L, 2);
         my[0] = await luaL_checkinteger(L, 3);
         if ($c.strlen(paramstr$3) === 1) {
-            tmpmons.class = $c.i16(paramstr$3.get(0));
+            tmpmons.class = paramstr$3.get(0);
             tmpmons.id = NON_PM;
         } else {
             tmpmons.class = -1;
@@ -3476,7 +3476,7 @@ export async function lspo_monster(L) {   // sp_lev.c:3214
         tmpmons.coord = $c.add64($c.and64(mx[0], 255), $c.shl64($c.and64(my[0], 255), 16));
     }
     if (tmpmons.id !== NON_PM && tmpmons.class === -1) {
-        tmpmons.class = $c.i16(def_monsyms[$c.relem(mons, tmpmons.id).mlet].sym);
+        tmpmons.class = def_monsyms[$c.relem(mons, tmpmons.id).mlet].sym;
     }
     await create_monster(tmpmons, gc.coder.croom);
     if (tmpmons.has_invent & CUSTOM_INVENT && lua_type(L, -1) === LUA.TFUNCTION) {
@@ -3664,7 +3664,7 @@ export async function lspo_object(L) {   // sp_lev.c:3557
     if (argc === 1 && lua_type(L, 1) === LUA.TSTRING) {
         paramstr = await luaL_checklstring(L, 1, null);
         if ($c.strlen(paramstr) === 1) {
-            tmpobj.class = $c.i16(paramstr.get(0));
+            tmpobj.class = paramstr.get(0);
             tmpobj.id = STRANGE_OBJECT;
         } else {
             tmpobj.class = -1;
@@ -3674,7 +3674,7 @@ export async function lspo_object(L) {   // sp_lev.c:3557
         paramstr$2 = await luaL_checklstring(L, 1, null);
         await get_coord(L, 2, new $c.Ptr(ox, 0), new $c.Ptr(oy, 0));
         if ($c.strlen(paramstr$2) === 1) {
-            tmpobj.class = $c.i16(paramstr$2.get(0));
+            tmpobj.class = paramstr$2.get(0);
             tmpobj.id = STRANGE_OBJECT;
         } else {
             tmpobj.class = -1;
@@ -3685,7 +3685,7 @@ export async function lspo_object(L) {   // sp_lev.c:3557
         ox[0] = await luaL_checkinteger(L, 2);
         oy[0] = await luaL_checkinteger(L, 3);
         if ($c.strlen(paramstr$3) === 1) {
-            tmpobj.class = $c.i16(paramstr$3.get(0));
+            tmpobj.class = paramstr$3.get(0);
             tmpobj.id = STRANGE_OBJECT;
         } else {
             tmpobj.class = -1;
@@ -3719,7 +3719,7 @@ export async function lspo_object(L) {   // sp_lev.c:3557
         tmpobj.coord = $c.add64($c.and64(ox[0], 255), $c.shl64($c.and64(oy[0], 255), 16));
     }
     if (tmpobj.class === -1 && tmpobj.id > STRANGE_OBJECT) {
-        tmpobj.class = $c.i16(objects[tmpobj.id].oc_class);
+        tmpobj.class = objects[tmpobj.id].oc_class;
     } else if (tmpobj.class > -1 && tmpobj.id === STRANGE_OBJECT) {
         tmpobj.id = -1;
     }
@@ -3733,7 +3733,7 @@ export async function lspo_object(L) {   // sp_lev.c:3557
                egg rather than an "empty egg" */
             if (tmpobj.id === TIN && (!strncmpi(montype, $c.lit("spinach"), -1) || !strncmpi(montype, $c.lit("empty"), -1)) || tmpobj.id === EGG && !strncmpi(montype, $c.lit("empty"), -1)) {
                 tmpobj.corpsenm = NON_PM;
-                $t20 = $c.i16(!strncmpi(montype, $c.lit("spinach"), -1) ? 1 : 0), tmpobj.spe = $t20;
+                $t20 = !strncmpi(montype, $c.lit("spinach"), -1) ? 1 : 0, tmpobj.spe = $t20;
                 nonpmobj = TRUE;
             } else if ($c.strlen(montype) === 1 && def_char_to_monclass(montype.get(0)) !== MAXMCLASSES) {
                 pm = await mkclass($c.i8(def_char_to_monclass(montype.get(0))), G_NOGEN | G_IGNORE);
@@ -3765,7 +3765,7 @@ export async function lspo_object(L) {   // sp_lev.c:3557
             }
             tmpobj.spe = $c.i16(lflags);
         } else if (tmpobj.id === EGG) {
-            $t21 = $c.i16(await get_table_boolean_opt(L, $c.lit("laid_by_you"), 0) ? 1 : 0), tmpobj.spe = $t21;
+            $t21 = await get_table_boolean_opt(L, $c.lit("laid_by_you"), 0) ? 1 : 0, tmpobj.spe = $t21;
         } else if (!nonpmobj) {
             /* tmpobj.spe is already set for nonpmobj */
             tmpobj.spe = 0;
@@ -3818,31 +3818,31 @@ export async function lspo_level_flags(L) {   // sp_lev.c:3759
     for (i = 1; i <= argc; i = i + 1 | 0) {
         s = await luaL_checkstring(L, i);
         if (!strncmpi(s, $c.lit("noteleport"), -1)) {
-            svl.level.flags.noteleport = (1) & 1;
+            svl.level.flags.noteleport = 1;
         } else if (!strncmpi(s, $c.lit("hardfloor"), -1)) {
-            svl.level.flags.hardfloor = (1) & 1;
+            svl.level.flags.hardfloor = 1;
         } else if (!strncmpi(s, $c.lit("nommap"), -1)) {
-            svl.level.flags.nommap = (1) & 1;
+            svl.level.flags.nommap = 1;
         } else if (!strncmpi(s, $c.lit("shortsighted"), -1)) {
-            svl.level.flags.shortsighted = (1) & 1;
+            svl.level.flags.shortsighted = 1;
         } else if (!strncmpi(s, $c.lit("arboreal"), -1)) {
-            svl.level.flags.arboreal = (1) & 1;
+            svl.level.flags.arboreal = 1;
         } else if (!strncmpi(s, $c.lit("mazelevel"), -1)) {
-            svl.level.flags.is_maze_lev = (1) & 1;
+            svl.level.flags.is_maze_lev = 1;
         } else if (!strncmpi(s, $c.lit("shroud"), -1)) {
-            svl.level.flags.hero_memory = (1) & 1;
+            svl.level.flags.hero_memory = 1;
         } else if (!strncmpi(s, $c.lit("graveyard"), -1)) {
-            svl.level.flags.graveyard = (1) & 1;
+            svl.level.flags.graveyard = 1;
         } else if (!strncmpi(s, $c.lit("icedpools"), -1)) {
             icedpools = 1;
         } else if (!strncmpi(s, $c.lit("corrmaze"), -1)) {
-            svl.level.flags.corrmaze = (1) & 1;
+            svl.level.flags.corrmaze = 1;
         } else if (!strncmpi(s, $c.lit("premapped"), -1)) {
             gc.coder.premapped = 1;
         } else if (!strncmpi(s, $c.lit("solidify"), -1)) {
             gc.coder.solidify = 1;
         } else if (!strncmpi(s, $c.lit("sokoban"), -1)) {
-            svl.level.flags.sokoban_rules = (1) & 1;   /* svl.level.flags.sokoban_rules */
+            svl.level.flags.sokoban_rules = 1;   /* svl.level.flags.sokoban_rules */
         } else if (!strncmpi(s, $c.lit("inaccessibles"), -1)) {
             gc.coder.check_inaccessibles = 1;
         } else if (!strncmpi(s, $c.lit("noflipx"), -1)) {
@@ -3858,15 +3858,15 @@ export async function lspo_level_flags(L) {   // sp_lev.c:3759
         } else if (!strncmpi(s, $c.lit("cold"), -1)) {
             svl.level.flags.temperature = -1;
         } else if (!strncmpi(s, $c.lit("nomongen"), -1)) {
-            svl.level.flags.rndmongen = (0) & 1;
+            svl.level.flags.rndmongen = 0;
         } else if (!strncmpi(s, $c.lit("nodeathdrops"), -1)) {
-            svl.level.flags.deathdrops = (0) & 1;
+            svl.level.flags.deathdrops = 0;
         } else if (!strncmpi(s, $c.lit("noautosearch"), -1)) {
-            svl.level.flags.noautosearch = (1) & 1;
+            svl.level.flags.noautosearch = 1;
         } else if (!strncmpi(s, $c.lit("fumaroles"), -1)) {
-            svl.level.flags.fumaroles = (1) & 1;
+            svl.level.flags.fumaroles = 1;
         } else if (!strncmpi(s, $c.lit("stormy"), -1)) {
-            svl.level.flags.stormy = (1) & 1;
+            svl.level.flags.stormy = 1;
         } else {
             $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Unknown level flag %s"), s);
             await nhl_error(L, new $c.Ptr(buf, 0));
@@ -3896,10 +3896,10 @@ export async function lspo_level_init(L) {   // sp_lev.c:3837
     $t8 = await get_table_mapchr_opt(L, $c.lit("filling"), init_lev.fg), init_lev.filling = $t8;
     $t9 = await get_table_int_opt(L, $c.lit("corrwid"), -1), init_lev.corrwid = $t9;
     $t10 = await get_table_int_opt(L, $c.lit("wallthick"), -1), init_lev.wallthick = $t10;
-    $t11 = $c.i8(!await get_table_boolean_opt(L, $c.lit("deadends"), TRUE) ? 1 : 0), init_lev.rm_deadends = $t11;
+    $t11 = !await get_table_boolean_opt(L, $c.lit("deadends"), TRUE) ? 1 : 0, init_lev.rm_deadends = $t11;
     gc.coder.lvl_is_joined = init_lev.joined;
     if (init_lev.bg === INVALID_TYPE) {
-        init_lev.bg = $c.i8(init_lev.init_style === LVLINIT.SWAMP ? MOAT : STONE);
+        init_lev.bg = init_lev.init_style === LVLINIT.SWAMP ? MOAT : STONE;
     }
     await splev_initlev(init_lev);
     return 0;
@@ -3954,7 +3954,7 @@ export async function lspo_engraving(L) {   // sp_lev.c:3881
     ep = engr_at(x[0], y[0]);
     if (ep) {
         ep.guardobjects = (guardobjs >>> 0) & 1;
-        ep.nowipeout = ((!wipeout ? 1 : 0) >>> 0) & 1;
+        ep.nowipeout = (!wipeout ? 1 : 0) & 1;
     }
     return 0;
 }
@@ -4121,7 +4121,7 @@ function spo_endroom(coder) {   // sp_lev.c:4119
 function good_stair_loc(x, y) {   // sp_lev.c:4139
     let typ = 0;
     typ = svl.level.locations[x][y].typ;
-    return $c.i8(typ === ROOM || typ === CORR || typ === ICE ? 1 : 0);
+    return typ === ROOM || typ === CORR || typ === ICE ? 1 : 0;
 }
 /**
  * @param {*} L lua_State *
@@ -4171,17 +4171,17 @@ async function l_create_stairway(L, using_ladder) {   // sp_lev.c:4147
         svl.level.locations[x[0]][y[0]].typ = LADDER;
         if (up) {
             dest.dnum = u.uz.dnum;
-            dest.dlevel = $c.i16(u.uz.dlevel - 1 | 0);
+            dest.dlevel = $c.i16(u.uz.dlevel - 1);
             await stairway_add(x[0], y[0], TRUE, TRUE, dest);
             svl.level.locations[x[0]][y[0]].flags = (LA.UP) & 31;
         } else {
             dest$2.dnum = u.uz.dnum;
-            dest$2.dlevel = $c.i16(u.uz.dlevel + 1 | 0);
+            dest$2.dlevel = $c.i16(u.uz.dlevel + 1);
             await stairway_add(x[0], y[0], FALSE, TRUE, dest$2);
             svl.level.locations[x[0]][y[0]].flags = (LA.DOWN) & 31;
         }
     } else {
-        await mkstairs(x[0], y[0], $c.i8(up), gc.coder.croom, $c.i8(!$c.and64(scoord, SP_COORD_IS_RANDOM) ? 1 : 0));
+        await mkstairs(x[0], y[0], $c.i8(up), gc.coder.croom, !$c.and64(scoord, SP_COORD_IS_RANDOM) ? 1 : 0);
     }
     return 0;
 }
@@ -4360,7 +4360,7 @@ export async function lspo_trap(L) {   // sp_lev.c:4397
         $t4 = $c.i16(await get_table_traptype_opt(L, $c.lit("type"), -1)), tmptrap.type = $t4;
         $t5 = $c.i8(await get_table_boolean_opt(L, $c.lit("spider_on_web"), 1)), tmptrap.spider_on_web = $t5;
         $t6 = $c.i8(await get_table_boolean_opt(L, $c.lit("seen"), FALSE)), tmptrap.seen = $t6;
-        $t7 = $c.i8(!await get_table_boolean_opt(L, $c.lit("victim"), TRUE) ? 1 : 0), tmptrap.novictim = $t7;
+        $t7 = !await get_table_boolean_opt(L, $c.lit("victim"), TRUE) ? 1 : 0, tmptrap.novictim = $t7;
         await lua_getfield(L, -1, $c.lit("launchfrom"));
         if (lua_type(L, -1) === LUA.TTABLE) {
             lx[0] = -1;
@@ -4525,13 +4525,13 @@ async function sel_set_ter(x, y, arg) {   // sp_lev.c:4609
         if (svl.level.locations[x][y].typ === SDOOR) {
             svl.level.locations[x][y].flags = (D.CLOSED) & 31;
         }
-        if (x && (svl.level.locations[x - 1 | 0][y].typ && svl.level.locations[x - 1 | 0][y].typ <= DBWALL || svl.level.locations[x - 1 | 0][y].horizontal | 0)) {
-            svl.level.locations[x][y].horizontal = (1) & 1;
+        if (x && (svl.level.locations[x - 1][y].typ && svl.level.locations[x - 1][y].typ <= DBWALL || svl.level.locations[x - 1][y].horizontal)) {
+            svl.level.locations[x][y].horizontal = 1;
         }
     } else if (svl.level.locations[x][y].typ === HWALL || svl.level.locations[x][y].typ === IRONBARS) {
-        svl.level.locations[x][y].horizontal = (1) & 1;
+        svl.level.locations[x][y].horizontal = 1;
     } else if (splev_init_present && svl.level.locations[x][y].typ === ICE) {
-        svl.level.locations[x][y].flags = ((icedpools ? ICED.POOL : ICED.MOAT) >>> 0) & 31;
+        svl.level.locations[x][y].flags = (icedpools ? ICED.POOL : ICED.MOAT) & 31;
     } else if (svl.level.locations[x][y].typ === CLOUD) {
         await del_engr_at(x, y);   /* clouds cannot have engravings */
     }
@@ -4562,7 +4562,7 @@ function sel_set_door(dx, dy, arg) {   // sp_lev.c:4647
     x = dx;
     y = dy;
     if (!(svl.level.locations[x][y].typ === DOOR) && svl.level.locations[x][y].typ !== SDOOR) {
-        svl.level.locations[x][y].typ = $c.i8(typ & D.SECRET ? SDOOR : DOOR);
+        svl.level.locations[x][y].typ = typ & D.SECRET ? SDOOR : DOOR;
     }
     if (typ & D.SECRET) {
         typ = $c.i16(typ & ~D.SECRET);
@@ -4600,7 +4600,7 @@ export async function lspo_door(L) {   // sp_lev.c:4671
     if (x[0] === -1 && y[0] === -1) {
         /* Note that "random" is also W_ANY, because create_door just wants a
          * mask of acceptable walls */
-        tmpd.secret = $c.i16(typ[0] === D.SECRET ? 1 : 0);
+        tmpd.secret = typ[0] === D.SECRET ? 1 : 0;
         tmpd.mask = $c.i16(msk);
         $t1 = $c.i16(await get_table_int_opt(L, $c.lit("pos"), -1)), tmpd.pos = $t1;
         $t2 = $c.i16(lspo_door$walldirs2i[await get_table_option(L, $c.lit("wall"), $c.lit("all"), new $c.Ptr(lspo_door$walldirs, 0))]), tmpd.wall = $t2;
@@ -4864,21 +4864,21 @@ export async function lspo_terrain(L) {   // sp_lev.c:4978
             sel = await l_selection_check(L, -1);
             await lua_settop(L, -2);
         }
-        $t1 = $c.i16(await get_table_mapchr(L, $c.lit("typ"))), tmpterrain.ter = $t1;
+        $t1 = await get_table_mapchr(L, $c.lit("typ")), tmpterrain.ter = $t1;
         $t2 = $c.i16(await get_table_int_opt(L, $c.lit("lit"), SET_LIT.NOCHANGE)), tmpterrain.tlit = $t2;
     } else if (argc === 2 && lua_type(L, 1) === LUA.TTABLE && lua_type(L, 2) === LUA.TSTRING) {
-        $t3 = $c.i16(check_mapchr(await luaL_checklstring(L, 2, null))), tmpterrain.ter = $t3;
+        $t3 = check_mapchr(await luaL_checklstring(L, 2, null)), tmpterrain.ter = $t3;
         await lua_settop(L, -2);
         await get_coord(L, 1, new $c.Ptr(tx$2, 0), new $c.Ptr(ty$2, 0));
         x[0] = $c.i16(tx$2[0]);
         y[0] = $c.i16(ty$2[0]);
     } else if (argc === 2) {
         sel = await l_selection_check(L, 1);
-        $t4 = $c.i16(check_mapchr(await luaL_checklstring(L, 2, null))), tmpterrain.ter = $t4;
+        $t4 = check_mapchr(await luaL_checklstring(L, 2, null)), tmpterrain.ter = $t4;
     } else if (argc === 3) {
         x[0] = $c.i16(await luaL_checkinteger(L, 1));
         y[0] = $c.i16(await luaL_checkinteger(L, 2));
-        $t5 = $c.i16(check_mapchr(await luaL_checklstring(L, 3, null))), tmpterrain.ter = $t5;
+        $t5 = check_mapchr(await luaL_checklstring(L, 3, null)), tmpterrain.ter = $t5;
     } else {
         await nhl_error(L, $c.lit("wrong parameters"));
     }
@@ -4920,11 +4920,11 @@ export async function lspo_replace_terrain(L) {   // sp_lev.c:5051
     rect.$copyFrom(cg.zeroNhRect);
     await create_des_coder();
     await lcheck_param_table(L);
-    totyp = $c.i16(await get_table_mapchr(L, $c.lit("toterrain")));
+    totyp = await get_table_mapchr(L, $c.lit("toterrain"));
     if (totyp >= MAX_TYPE) {
         return 0;
     }
-    fromtyp = $c.i16(await get_table_mapchr_opt(L, $c.lit("fromterrain"), INVALID_TYPE));
+    fromtyp = await get_table_mapchr_opt(L, $c.lit("fromterrain"), INVALID_TYPE);
     if (fromtyp === INVALID_TYPE) {
         tmpstr = await get_table_str(L, $c.lit("mapfragment"));
         mf[0] = await mapfrag_fromstr(tmpstr);
@@ -4959,15 +4959,15 @@ export async function lspo_replace_terrain(L) {   // sp_lev.c:5051
             rx1[0] = $c.i16(x1[0]), ry1[0] = $c.i16(y1[0]), rx2[0] = $c.i16(x2[0]), ry2[0] = $c.i16(y2[0]);
             await get_location(new $c.Ptr(rx1, 0), new $c.Ptr(ry1, 0), ANY_LOC, gc.coder.croom);
             await get_location(new $c.Ptr(rx2, 0), new $c.Ptr(ry2, 0), ANY_LOC, gc.coder.croom);
-            for (x = $c.i16(rx1[0] > 0 ? rx1[0] : 0); x <= (rx2[0] < COLNO - 1 ? rx2[0] : COLNO - 1); x = $c.i16(x + 1)) {
-                for (y = $c.i16(ry1[0] > 0 ? ry1[0] : 0); y <= (ry2[0] < ROWNO - 1 ? ry2[0] : ROWNO - 1); y = $c.i16(y + 1)) {
+            for (x = rx1[0] > 0 ? rx1[0] : 0; x <= (rx2[0] < COLNO - 1 ? rx2[0] : COLNO - 1); x = $c.i16(x + 1)) {
+                for (y = ry1[0] > 0 ? ry1[0] : 0; y <= (ry2[0] < ROWNO - 1 ? ry2[0] : ROWNO - 1); y = $c.i16(y + 1)) {
                     selection_setpoint(x, y, sel, 1);
                 }
             }
         }
     }
     selection_getbounds(sel, rect);
-    for (x = $c.i16(1 > rect.lx ? 1 : rect.lx); x <= rect.hx; x = $c.i16(x + 1)) {
+    for (x = 1 > rect.lx ? 1 : rect.lx; x <= rect.hx; x = $c.i16(x + 1)) {
         for (y = rect.ly; y <= rect.hy; y = $c.i16(y + 1)) {
             if (selection_getpoint(x, y, sel)) {
                 if (mf[0]) {
@@ -5003,20 +5003,20 @@ async function generate_way_out_method(nx, ny, ov) {   // sp_lev.c:5146
     gotitdone$: {
         /* try to make a secret door */
         while (selection_rndcoord(ov3, new $c.Ptr(x, 0), new $c.Ptr(y, 0), TRUE)) {
-            if (isok($c.i16(x[0] + 1 | 0), y[0]) && !selection_getpoint($c.i16(x[0] + 1 | 0), y[0], ov) && (svl.level.locations[x[0] + 1 | 0][y[0]].typ && svl.level.locations[x[0] + 1 | 0][y[0]].typ <= DBWALL) && isok($c.i16(x[0] + 2 | 0), y[0]) && selection_getpoint($c.i16(x[0] + 2 | 0), y[0], ov) && svl.level.locations[x[0] + 2 | 0][y[0]].typ >= DOOR) {
-                svl.level.locations[x[0] + 1 | 0][y[0]].typ = SDOOR;
+            if (isok($c.i16(x[0] + 1), y[0]) && !selection_getpoint($c.i16(x[0] + 1), y[0], ov) && (svl.level.locations[x[0] + 1][y[0]].typ && svl.level.locations[x[0] + 1][y[0]].typ <= DBWALL) && isok($c.i16(x[0] + 2), y[0]) && selection_getpoint($c.i16(x[0] + 2), y[0], ov) && svl.level.locations[x[0] + 2][y[0]].typ >= DOOR) {
+                svl.level.locations[x[0] + 1][y[0]].typ = SDOOR;
                 break gotitdone$;
             }
-            if (isok($c.i16(x[0] - 1 | 0), y[0]) && !selection_getpoint($c.i16(x[0] - 1 | 0), y[0], ov) && (svl.level.locations[x[0] - 1 | 0][y[0]].typ && svl.level.locations[x[0] - 1 | 0][y[0]].typ <= DBWALL) && isok($c.i16(x[0] - 2 | 0), y[0]) && selection_getpoint($c.i16(x[0] - 2 | 0), y[0], ov) && svl.level.locations[x[0] - 2 | 0][y[0]].typ >= DOOR) {
-                svl.level.locations[x[0] - 1 | 0][y[0]].typ = SDOOR;
+            if (isok($c.i16(x[0] - 1), y[0]) && !selection_getpoint($c.i16(x[0] - 1), y[0], ov) && (svl.level.locations[x[0] - 1][y[0]].typ && svl.level.locations[x[0] - 1][y[0]].typ <= DBWALL) && isok($c.i16(x[0] - 2), y[0]) && selection_getpoint($c.i16(x[0] - 2), y[0], ov) && svl.level.locations[x[0] - 2][y[0]].typ >= DOOR) {
+                svl.level.locations[x[0] - 1][y[0]].typ = SDOOR;
                 break gotitdone$;
             }
-            if (isok(x[0], $c.i16(y[0] + 1 | 0)) && !selection_getpoint(x[0], $c.i16(y[0] + 1 | 0), ov) && (svl.level.locations[x[0]][y[0] + 1 | 0].typ && svl.level.locations[x[0]][y[0] + 1 | 0].typ <= DBWALL) && isok(x[0], $c.i16(y[0] + 2 | 0)) && selection_getpoint(x[0], $c.i16(y[0] + 2 | 0), ov) && svl.level.locations[x[0]][y[0] + 2 | 0].typ >= DOOR) {
-                svl.level.locations[x[0]][y[0] + 1 | 0].typ = SDOOR;
+            if (isok(x[0], $c.i16(y[0] + 1)) && !selection_getpoint(x[0], $c.i16(y[0] + 1), ov) && (svl.level.locations[x[0]][y[0] + 1].typ && svl.level.locations[x[0]][y[0] + 1].typ <= DBWALL) && isok(x[0], $c.i16(y[0] + 2)) && selection_getpoint(x[0], $c.i16(y[0] + 2), ov) && svl.level.locations[x[0]][y[0] + 2].typ >= DOOR) {
+                svl.level.locations[x[0]][y[0] + 1].typ = SDOOR;
                 break gotitdone$;
             }
-            if (isok(x[0], $c.i16(y[0] - 1 | 0)) && !selection_getpoint(x[0], $c.i16(y[0] - 1 | 0), ov) && (svl.level.locations[x[0]][y[0] - 1 | 0].typ && svl.level.locations[x[0]][y[0] - 1 | 0].typ <= DBWALL) && isok(x[0], $c.i16(y[0] - 2 | 0)) && selection_getpoint(x[0], $c.i16(y[0] - 2 | 0), ov) && svl.level.locations[x[0]][y[0] - 2 | 0].typ >= DOOR) {
-                svl.level.locations[x[0]][y[0] - 1 | 0].typ = SDOOR;
+            if (isok(x[0], $c.i16(y[0] - 1)) && !selection_getpoint(x[0], $c.i16(y[0] - 1), ov) && (svl.level.locations[x[0]][y[0] - 1].typ && svl.level.locations[x[0]][y[0] - 1].typ <= DBWALL) && isok(x[0], $c.i16(y[0] - 2)) && selection_getpoint(x[0], $c.i16(y[0] - 2), ov) && svl.level.locations[x[0]][y[0] - 2].typ >= DOOR) {
+                svl.level.locations[x[0]][y[0] - 1].typ = SDOOR;
                 break gotitdone$;
             }
         }
@@ -5326,7 +5326,7 @@ export async function lspo_exclusion(L) {   // sp_lev.c:5498
 function sel_set_lit(x, y, arg) {   // sp_lev.c:5535
     let lit = 0;
     lit = $c.asArr(arg, Int32Array).get(0);
-    svl.level.locations[x][y].lit = ((svl.level.locations[x][y].typ === LAVAPOOL || svl.level.locations[x][y].typ === LAVAWALL || lit ? 1 : 0) >>> 0) & 1;
+    svl.level.locations[x][y].lit = (svl.level.locations[x][y].typ === LAVAPOOL || svl.level.locations[x][y].typ === LAVAWALL || lit ? 1 : 0) & 1;
 }
 /* Add to the room any doors within/bordering it */
 /**
@@ -5335,8 +5335,8 @@ function sel_set_lit(x, y, arg) {   // sp_lev.c:5535
  */
 async function add_doors_to_room(croom) {   // sp_lev.c:5544
     let x = 0, y = 0, i = 0;
-    for (x = $c.i16(croom.lx - 1 | 0); x <= (croom.hx + 1 | 0); x = $c.i16(x + 1)) {
-        for (y = $c.i16(croom.ly - 1 | 0); y <= (croom.hy + 1 | 0); y = $c.i16(y + 1)) {
+    for (x = $c.i16(croom.lx - 1); x <= croom.hx + 1; x = $c.i16(x + 1)) {
+        for (y = $c.i16(croom.ly - 1); y <= croom.hy + 1; y = $c.i16(y + 1)) {
             if (svl.level.locations[x][y].typ === DOOR || svl.level.locations[x][y].typ === SDOOR) {
                 await maybe_add_door(x, y, croom);
             }
@@ -5433,7 +5433,7 @@ export async function lspo_region(L) {   // sp_lev.c:5584
      *  - When a room is desired to constrain the arrival of migrating
      *    monsters (see the mon_arrive function for details).
      */
-    room_not_needed = $c.i8(rtype === OROOM && !irregular && !do_arrival_room && !gi.in_mk_themerooms ? 1 : 0);
+    room_not_needed = rtype === OROOM && !irregular && !do_arrival_room && !gi.in_mk_themerooms ? 1 : 0;
     if (room_not_needed || svn.nroom >= MAXNROFROOMS) {
         if (!room_not_needed) {
             await impossible($c.lit("Too many rooms on new level!"));
@@ -5510,7 +5510,7 @@ export async function lspo_drawbridge(L) {   // sp_lev.c:5720
     if (db_open === -1) {
         db_open = !rn2(2) ? 1 : 0;
     }
-    if (!await create_drawbridge(x[0], y[0], dir, $c.i8(db_open ? TRUE : FALSE))) {
+    if (!await create_drawbridge(x[0], y[0], dir, db_open ? TRUE : FALSE)) {
         await impossible($c.lit("Cannot create drawbridge."));
     }
     SpLev_Map[x[0]][y[0]] = 1;
@@ -5537,7 +5537,7 @@ export async function lspo_mazewalk(L) {   // sp_lev.c:5769
     } else {
         await lcheck_param_table(L);
         await get_table_xy_or_coord(L, new $c.Ptr(mx, 0), new $c.Ptr(my, 0));
-        ftyp = $c.i16(await get_table_mapchr_opt(L, $c.lit("typ"), ROOM));
+        ftyp = await get_table_mapchr_opt(L, $c.lit("typ"), ROOM);
         fstocked = await get_table_boolean_opt(L, $c.lit("stocked"), 1);
         dir = lspo_mazewalk$mwdirs2i[await get_table_option(L, $c.lit("dir"), $c.lit("random"), new $c.Ptr(lspo_mazewalk$mwdirs, 0))];
     }
@@ -5551,7 +5551,7 @@ export async function lspo_mazewalk(L) {   // sp_lev.c:5769
         return 0;
     }
     if (ftyp < 1) {
-        ftyp = $c.i16(svl.level.flags.corrmaze | 0 ? CORR : ROOM);
+        ftyp = svl.level.flags.corrmaze ? CORR : ROOM;
     }
     if (dir === W.RANDOM) {
         dir = random_wdir();
@@ -5575,7 +5575,7 @@ export async function lspo_mazewalk(L) {   // sp_lev.c:5769
     }
     if (!(svl.level.locations[x[0]][y[0]].typ === DOOR)) {
         svl.level.locations[x[0]][y[0]].typ = $c.i8(ftyp);
-        svl.level.locations[x[0]][y[0]].flags = (0) & 31;
+        svl.level.locations[x[0]][y[0]].flags = 0;
     }
     /*
      * We must be sure that the parity of the coordinates for
@@ -5590,7 +5590,7 @@ export async function lspo_mazewalk(L) {   // sp_lev.c:5769
         }
         /* no need for IS_DOOR check; out of map bounds */
         svl.level.locations[x[0]][y[0]].typ = $c.i8(ftyp);
-        svl.level.locations[x[0]][y[0]].flags = (0) & 31;
+        svl.level.locations[x[0]][y[0]].flags = 0;
     }
     if (!$c.rem32(y[0], 2)) {
         if (dir === W.SOUTH) {
@@ -5622,16 +5622,16 @@ export async function lspo_wall_property(L) {   // sp_lev.c:5876
     await get_table_coords_or_region(L, new $c.Ptr(dx1, 0), new $c.Ptr(dy1, 0), new $c.Ptr(dx2, 0), new $c.Ptr(dy2, 0));
     wprop = lspo_wall_property$wprop2i[await get_table_option(L, $c.lit("property"), $c.lit("nondiggable"), new $c.Ptr(lspo_wall_property$wprops, 0))];
     if (dx1[0] === -1) {
-        dx1[0] = $c.i16(gx.xstart - 1 | 0);
+        dx1[0] = $c.i16(gx.xstart - 1);
     }
     if (dy1[0] === -1) {
-        dy1[0] = $c.i16(gy.ystart - 1 | 0);
+        dy1[0] = $c.i16(gy.ystart - 1);
     }
     if (dx2[0] === -1) {
-        dx2[0] = $c.i16((gx.xstart + gx.xsize | 0) + 1 | 0);
+        dx2[0] = $c.i16(gx.xstart + gx.xsize + 1);
     }
     if (dy2[0] === -1) {
-        dy2[0] = $c.i16((gy.ystart + gy.ysize | 0) + 1 | 0);
+        dy2[0] = $c.i16(gy.ystart + gy.ysize + 1);
     }
     await get_location(new $c.Ptr(dx1, 0), new $c.Ptr(dy1, 0), ANY_LOC, null);
     await get_location(new $c.Ptr(dx2, 0), new $c.Ptr(dy2, 0), ANY_LOC, null);
@@ -5709,7 +5709,7 @@ export async function lspo_wallify(L) {   // sp_lev.c:5965
         dx2 = await get_table_int(L, $c.lit("x2"));
         dy2 = await get_table_int(L, $c.lit("y2"));
     }
-    wallify_map($c.i16(dx1 < 0 ? gx.xstart - 1 | 0 : dx1), $c.i16(dy1 < 0 ? gy.ystart - 1 | 0 : dy1), $c.i16(dx2 < 0 ? (gx.xstart + gx.xsize | 0) + 1 | 0 : dx2), $c.i16(dy2 < 0 ? (gy.ystart + gy.ysize | 0) + 1 | 0 : dy2));
+    wallify_map($c.i16(dx1 < 0 ? gx.xstart - 1 : dx1), $c.i16(dy1 < 0 ? gy.ystart - 1 : dy1), $c.i16(dx2 < 0 ? gx.xstart + gx.xsize + 1 : dx2), $c.i16(dy2 < 0 ? gy.ystart + gy.ysize + 1 : dy2));
     return 0;
 }
 /* reset_level is only needed for testing purposes */
@@ -5875,8 +5875,8 @@ export async function lspo_map(L) {   // sp_lev.c:6075
                     /* in a room? adjust to room relative coords */
                     gx.xstart = $c.i16($c.add64(x[0], gc.coder.croom.lx));
                     gy.ystart = $c.i16($c.add64(y[0], gc.coder.croom.ly));
-                    gx.xsize = $c.i16(min(mf[0].wid, gc.coder.croom.hx - gc.coder.croom.lx | 0));
-                    gy.ysize = $c.i16(min(mf[0].hei, gc.coder.croom.hy - gc.coder.croom.ly | 0));
+                    gx.xsize = $c.i16(min(mf[0].wid, gc.coder.croom.hx - gc.coder.croom.lx));
+                    gy.ysize = $c.i16(min(mf[0].hei, gc.coder.croom.hy - gc.coder.croom.ly));
                 } else {
                     gx.xsize = $c.i16(mf[0].wid);
                     gy.ysize = $c.i16(mf[0].hei);
@@ -5893,7 +5893,7 @@ export async function lspo_map(L) {   // sp_lev.c:6075
             /* place map starting at halign,valign */
             switch (lr) {
                 case SPLEV_LEFT:
-                    gx.xstart = $c.i16(splev_init_present ? 1 : 3);
+                    gx.xstart = splev_init_present ? 1 : 3;
                     break;
                 case SPLEV_H_LEFT:
                     gx.xstart = $c.i16(2 + $c.div32((gx.x_maze_max - 2 | 0) - gx.xsize | 0, 4) | 0);
@@ -5927,7 +5927,7 @@ export async function lspo_map(L) {   // sp_lev.c:6075
             }
         }
         skipmap$: {
-            if (gy.ystart < 0 || (gy.ystart + gy.ysize | 0) > ROWNO) {
+            if (gy.ystart < 0 || gy.ystart + gy.ysize > ROWNO) {
                 if (gi.in_mk_themerooms) {
                     gt.themeroom_failed = TRUE;
                     break skipmap$;
@@ -5937,7 +5937,7 @@ export async function lspo_map(L) {   // sp_lev.c:6075
                 if (gy.ysize === ROWNO) {
                     gy.ystart = 0;
                 }
-                if (gy.ystart < 0 || (gy.ystart + gy.ysize | 0) > ROWNO) {
+                if (gy.ystart < 0 || gy.ystart + gy.ysize > ROWNO) {
                     gy.ystart = 0;
                 }
             }
@@ -5947,20 +5947,20 @@ export async function lspo_map(L) {   // sp_lev.c:6075
                 /* Themed rooms should never overwrite anything */
                 if (gi.in_mk_themerooms) {
                     isokp = TRUE;
-                    for (y[0] = gy.ystart - 1 | 0; y[0] < ((ROWNO < (gy.ystart + gy.ysize | 0) ? ROWNO : gy.ystart + gy.ysize | 0) + 1 | 0); y[0] = $c.add64(y[0], 1)) {
-                        for (x[0] = gx.xstart - 1 | 0; x[0] < ((COLNO < (gx.xstart + gx.xsize | 0) ? COLNO : gx.xstart + gx.xsize | 0) + 1 | 0); x[0] = $c.add64(x[0], 1)) {
+                    for (y[0] = gy.ystart - 1; y[0] < (ROWNO < gy.ystart + gy.ysize ? ROWNO : gy.ystart + gy.ysize) + 1; y[0] = $c.add64(y[0], 1)) {
+                        for (x[0] = gx.xstart - 1; x[0] < (COLNO < gx.xstart + gx.xsize ? COLNO : gx.xstart + gx.xsize) + 1; x[0] = $c.add64(x[0], 1)) {
                             if (!isok($c.i16(x[0]), $c.i16(y[0]))) {
                                 isokp = FALSE;
-                            } else if (y[0] < gy.ystart || y[0] >= (gy.ystart + gy.ysize | 0) || x[0] < gx.xstart || x[0] >= (gx.xstart + gx.xsize | 0)) {
-                                if (svl.level.locations[$c.idx(x[0])][$c.idx(y[0])].typ !== STONE || (svl.level.locations[$c.idx(x[0])][$c.idx(y[0])].roomno | 0) !== NO_ROOM) {
+                            } else if (y[0] < gy.ystart || y[0] >= gy.ystart + gy.ysize || x[0] < gx.xstart || x[0] >= gx.xstart + gx.xsize) {
+                                if (svl.level.locations[$c.idx(x[0])][$c.idx(y[0])].typ !== STONE || svl.level.locations[$c.idx(x[0])][$c.idx(y[0])].roomno !== NO_ROOM) {
                                     isokp = FALSE;
                                 }
                             } else {
-                                mptyp = $c.i16(await mapfrag_get(mf[0], $c.i32($c.sub64(x[0], gx.xstart)), $c.i32($c.sub64(y[0], gy.ystart))));
+                                mptyp = await mapfrag_get(mf[0], $c.i32($c.sub64(x[0], gx.xstart)), $c.i32($c.sub64(y[0], gy.ystart)));
                                 if (mptyp >= MAX_TYPE) {
                                     continue;
                                 }
-                                if (svl.level.locations[$c.idx(x[0])][$c.idx(y[0])].typ !== STONE && svl.level.locations[$c.idx(x[0])][$c.idx(y[0])].typ !== mptyp || (svl.level.locations[$c.idx(x[0])][$c.idx(y[0])].roomno | 0) !== NO_ROOM) {
+                                if (svl.level.locations[$c.idx(x[0])][$c.idx(y[0])].typ !== STONE && svl.level.locations[$c.idx(x[0])][$c.idx(y[0])].typ !== mptyp || svl.level.locations[$c.idx(x[0])][$c.idx(y[0])].roomno !== NO_ROOM) {
                                     isokp = FALSE;
                                 }
                             }
@@ -5975,9 +5975,9 @@ export async function lspo_map(L) {   // sp_lev.c:6075
                     }
                 }
                 /* Load the map */
-                for (y[0] = gy.ystart; y[0] < (ROWNO < (gy.ystart + gy.ysize | 0) ? ROWNO : gy.ystart + gy.ysize | 0); y[0] = $c.add64(y[0], 1)) {
-                    for (x[0] = gx.xstart; x[0] < (COLNO < (gx.xstart + gx.xsize | 0) ? COLNO : gx.xstart + gx.xsize | 0); x[0] = $c.add64(x[0], 1)) {
-                        mptyp = $c.i16(await mapfrag_get(mf[0], $c.i32($c.sub64(x[0], gx.xstart)), $c.i32($c.sub64(y[0], gy.ystart))));
+                for (y[0] = gy.ystart; y[0] < (ROWNO < gy.ystart + gy.ysize ? ROWNO : gy.ystart + gy.ysize); y[0] = $c.add64(y[0], 1)) {
+                    for (x[0] = gx.xstart; x[0] < (COLNO < gx.xstart + gx.xsize ? COLNO : gx.xstart + gx.xsize); x[0] = $c.add64(x[0], 1)) {
+                        mptyp = await mapfrag_get(mf[0], $c.i32($c.sub64(x[0], gx.xstart)), $c.i32($c.sub64(y[0], gy.ystart)));
                         if (mptyp === INVALID_TYPE) {
                             /* TODO: warn about illegal map char */
                             continue;
@@ -5986,14 +5986,14 @@ export async function lspo_map(L) {   // sp_lev.c:6075
                             continue;
                         }
                         /* clear out levl: load_common_data may set them */
-                        svl.level.locations[$c.idx(x[0])][$c.idx(y[0])].flags = (0) & 31;
-                        svl.level.locations[$c.idx(x[0])][$c.idx(y[0])].horizontal = (0) & 1;
-                        svl.level.locations[$c.idx(x[0])][$c.idx(y[0])].roomno = (0) & 63;
-                        svl.level.locations[$c.idx(x[0])][$c.idx(y[0])].edge = (0) & 1;
+                        svl.level.locations[$c.idx(x[0])][$c.idx(y[0])].flags = 0;
+                        svl.level.locations[$c.idx(x[0])][$c.idx(y[0])].horizontal = 0;
+                        svl.level.locations[$c.idx(x[0])][$c.idx(y[0])].roomno = 0;
+                        svl.level.locations[$c.idx(x[0])][$c.idx(y[0])].edge = 0;
                         SpLev_Map[$c.idx(x[0])][$c.idx(y[0])] = 1;
                         selection_setpoint($c.i16(x[0]), $c.i16(y[0]), sel, 1);
                         terr.ter = mptyp;
-                        terr.tlit = $c.i16(lit);
+                        terr.tlit = lit;
                         await sel_set_ter($c.i16(x[0]), $c.i16(y[0]), terr);
                     }
                 }
@@ -6053,10 +6053,10 @@ async function sp_level_coder_init() {   // sp_lev.c:6336
     container_idx = 0;
     invent_carrying_monster = null;
     $c.memset(new $c.Ptr(SpLev_Map, 0), 0, 1680);
-    svl.level.flags.is_maze_lev = (0) & 1;
-    $t1 = $c.i8(In_hell(u.uz) ? 1 : 0), svl.level.flags.temperature = $t1;
-    svl.level.flags.rndmongen = (1) & 1;
-    svl.level.flags.deathdrops = (1) & 1;
+    svl.level.flags.is_maze_lev = 0;
+    $t1 = In_hell(u.uz) ? 1 : 0, svl.level.flags.temperature = $t1;
+    svl.level.flags.rndmongen = 1;
+    svl.level.flags.deathdrops = 1;
     reset_xystart_size();
     return coder;
 }

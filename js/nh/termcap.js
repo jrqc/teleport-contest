@@ -724,7 +724,7 @@ export function nomux_set_fg(color) {   // termcap.c:776
     if (color === CLR.BLACK && iflags.wc2_darkgray) {
         color = 8;   /* index 8 -> ANSI 90m (bright black / dark gray) */
     }
-    nomux_fg_cur = $c.u8(color < 0 || color >= 16 ? 7 : $c.u8(color));
+    nomux_fg_cur = color < 0 || color >= 16 ? 7 : $c.u8(color);
 }
 export function nomux_end_fg() {   // termcap.c:787
     nomux_fg_cur = 7;
@@ -765,7 +765,7 @@ export function nomux_capture_screen() {   // termcap.c:796
         in_dec = 0;
         for (col = 0; col <= end; col = col + 1 | 0) {
             c = $c.relem(nomux_buf[row], col);
-            ch = $c.i8(c.ch ? c.ch : 32);
+            ch = c.ch ? c.ch : 32;
             fg = c.fg ? c.fg : 7;
             at = c.attr;
             /* Emit incremental SGR changes */
@@ -949,14 +949,14 @@ export async function cl_end() {   // termcap.c:974
         nomux_clear_to_eol($G.ttyDisplay.cury, $G.ttyDisplay.curx);
     } else {
         /* no-CE fix - free after Harold Rynes */
-        cx = $G.ttyDisplay.curx + 1 | 0;
+        cx = $G.ttyDisplay.curx + 1;
         /* this looks terrible, especially on a slow terminal
            but is better than nothing */
         while (cx < gt.tc_gbl_data.tc_CO) {
             xputc(32);
             cx = cx + 1 | 0;
         }
-        await tty_curs($G.BASE_WINDOW, $G.ttyDisplay.curx + 1 | 0, $G.ttyDisplay.cury);
+        await tty_curs($G.BASE_WINDOW, $G.ttyDisplay.curx + 1, $G.ttyDisplay.cury);
     }
 }
 /**
@@ -1077,19 +1077,19 @@ export async function cl_eos() {   // termcap.c:1198
         xputs(tc_lcl_data.tc_CD);
         {
             nomux_clear_to_eol($G.ttyDisplay.cury, $G.ttyDisplay.curx);
-            for (r = $G.ttyDisplay.cury + 1 | 0; r < 24; r = r + 1 | 0) {
+            for (r = $G.ttyDisplay.cury + 1; r < 24; r = r + 1 | 0) {
                 nomux_clear_to_eol(r, 0);
             }
         }
     } else {
-        cy = $G.ttyDisplay.cury + 1 | 0;
+        cy = $G.ttyDisplay.cury + 1;
         while (cy <= (gt.tc_gbl_data.tc_LI - 2 | 0)) {
             await cl_end();
             xputc(10);
             cy = cy + 1 | 0;
         }
         await cl_end();
-        await tty_curs($G.BASE_WINDOW, $G.ttyDisplay.curx + 1 | 0, $G.ttyDisplay.cury);
+        await tty_curs($G.BASE_WINDOW, $G.ttyDisplay.curx + 1, $G.ttyDisplay.cury);
     }
 }
 /**

@@ -102,7 +102,7 @@ async function throne_sit_effect() {   // sit.c:39
     let tx = 0, ty = 0, special_throne = 0, effect = 0, buf = new Int8Array(256), which = 0, cnt = 0, num_of_eyes = 0, eye = null, $t1;
     tx = u.ux;
     ty = u.uy;
-    special_throne = $c.i8(!!In_V_tower(u.uz) ? 1 : 0);
+    special_throne = !!In_V_tower(u.uz) ? 1 : 0;
     if (rnd(6) > 4) {
         /* [why so convoluted? it's the same as '!rn2(3)'] */
         effect = rnd(13);
@@ -260,7 +260,7 @@ async function throne_sit_effect() {   // sit.c:39
                 break;
         }
     } else {
-        if (is_prince(gy.youmonst.data) || u.uevent.uhand_of_elbereth | 0) {
+        if (is_prince(gy.youmonst.data) || u.uevent.uhand_of_elbereth) {
             await You_feel($c.lit("very comfortable here."));
         } else {
             await You_feel($c.lit("somehow out of place..."));
@@ -274,7 +274,7 @@ async function throne_sit_effect() {   // sit.c:39
        started from.]  "Analyzing a throne" doesn't really make any sense
        but if the answer is yes than it will vanish in a puff of logic. */
     if (!special_throne && !rn2(3) && (!wizard() || await yn_function($c.lit("Analyze throne?"), new $c.Ptr(ynchars, 0), 110, TRUE) === 121)) {
-        svl.level.locations[tx][ty].typ = ROOM, svl.level.locations[tx][ty].flags = (0) & 31;
+        svl.level.locations[tx][ty].typ = ROOM, svl.level.locations[tx][ty].flags = 0;
         await map_background(tx, ty, FALSE);
         await newsym_force(tx, ty);
         /* "[God] promptly vanishes in a puff of logic" is from
@@ -302,7 +302,7 @@ async function special_throne_effect(effect) {   // sit.c:238
                on it, so if you sit on it enough (enduring the negative
                effects) you are guaranteed an eventual wish. */
             await makewish();
-            svl.level.locations[tx][ty].typ = ROOM, svl.level.locations[tx][ty].flags = (0) & 31;
+            svl.level.locations[tx][ty].typ = ROOM, svl.level.locations[tx][ty].flags = 0;
             await map_background(tx, ty, FALSE);
             await newsym_force(tx, ty);
             await pline_The($c.lit("throne disintegrates, having spent its power."));
@@ -325,7 +325,7 @@ async function special_throne_effect(effect) {   // sit.c:238
                 await pline($c.lit("A greasy liquid sprays all over you!"));
                 for (otmp = gi.invent; otmp; otmp = otmp.nobj) {
                     if (otmp.oclass !== COIN_CLASS) {
-                        otmp.greased = (1) & 1;
+                        otmp.greased = 1;
                     }
                 }
                 await make_glib(rn2(101) + 100 | 0);
@@ -341,7 +341,7 @@ async function special_throne_effect(effect) {   // sit.c:238
             {
                 /* level teleport to Vibrating Square level */
                 find_hell(vs_level);
-                vs_level.dlevel = $c.i16(svd.dungeons[vs_level.dnum].num_dunlevs - 1 | 0);
+                vs_level.dlevel = $c.i16(svd.dungeons[vs_level.dnum].num_dunlevs - 1);
                 if (u.uhave.amulet) {
                     await You_feel($c.lit("extremely disoriented for a moment."));
                 } else {
@@ -366,7 +366,7 @@ async function special_throne_effect(effect) {   // sit.c:238
                 fake_spellbook.$copyFrom(cg.zeroobj);
                 fake_spellbook.otyp = SPE_REMOVE_CURSE;
                 fake_spellbook.oclass = SPBOOK_CLASS;
-                fake_spellbook.blessed = (1) & 1;
+                fake_spellbook.blessed = 1;
                 u.uprops[CONFUSION].intrinsic = 1;
                 await seffects(fake_spellbook);
                 u.uprops[CONFUSION].intrinsic = save_confusion;
@@ -413,7 +413,7 @@ async function lay_an_egg() {   // sit.c:358
         await You($c.lit("don't have enough energy to lay an egg."));
         return ECMD.OK;
     } else if (eggs_in_water(gy.youmonst.data)) {
-        if (!((u.uinwater | 0) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) {
+        if (!(Underwater() || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) {
             await pline($c.lit("A splash tetra you are not."));
             return ECMD.OK;
         }
@@ -428,7 +428,7 @@ async function lay_an_egg() {   // sit.c:358
     $t1 = await weight(uegg) >>> 0, uegg.owt = $t1;
     /* this sets hatch timers if appropriate */
     await set_corpsenm(uegg, egg_type_from_parent(u.umonnum, FALSE));
-    uegg.known = (1) & 1;
+    uegg.known = 1;
     await observe_object(uegg);
     await You($c.lit("%s an egg."), eggs_in_water(gy.youmonst.data) ? $c.lit("spawn") : $c.lit("lay"));
     await dropy(uegg);
@@ -451,8 +451,8 @@ export async function dosit() {   // sit.c:400
                 await You($c.lit("are already sitting on %s."), await mon_nam(u.usteed));
                 return ECMD.OK;
             }
-            if (u.uundetected | 0 && is_hider(gy.youmonst.data) && u.umonnum !== PM.TRAPPER) {   /* trapper can stay hidden on floor */
-                u.uundetected = (0) & 1;   /* no longer on the ceiling */
+            if (u.uundetected && is_hider(gy.youmonst.data) && u.umonnum !== PM.TRAPPER) {   /* trapper can stay hidden on floor */
+                u.uundetected = 0;   /* no longer on the ceiling */
             }
             if (!can_reach_floor(FALSE)) {
                 if (u.uswallow) {
@@ -499,7 +499,7 @@ export async function dosit() {   // sit.c:400
                             await pline($c.lit("Squelch!"));
                         }
                         await useupf(obj, obj.quan);
-                    } else if (!(Is_box(obj) || (objects[obj.otyp].oc_material | 0) === CLOTH)) {
+                    } else if (!(Is_box(obj) || objects[obj.otyp].oc_material === CLOTH)) {
                         await pline($c.lit("It's not very comfortable..."));
                     }
                 }
@@ -510,7 +510,7 @@ export async function dosit() {   // sit.c:400
                         await You_cant($c.lit("sit down with your %s in the bear trap."), await body_part(FOOT));
                         u.utrap = u.utrap + 1 >>> 0;
                     } else if (u.utraptype === TT.PIT) {
-                        if (trap && (trap.ttyp | 0) === SPIKED_PIT) {
+                        if (trap && trap.ttyp === SPIKED_PIT) {
                             await You($c.lit("sit down on a spike.  Ouch!"));
                             await losehp(Half_physical_damage() ? rn2(2) : 1, $c.lit("sitting on an iron spike"), KILLED.BY);
                             await exercise(A.STR, FALSE);
@@ -540,7 +540,7 @@ export async function dosit() {   // sit.c:400
                     await You($c.lit("%s."), (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked ? $c.lit("land") : $c.lit("sit down"));
                     await dotrap(trap, VIASITTING);
                 }
-            } else if ($goto !== "in_water" && (((u.uinwater | 0) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) && !eggs_in_water(gy.youmonst.data))) {
+            } else if ($goto !== "in_water" && ((Underwater() || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) && !eggs_in_water(gy.youmonst.data))) {
                 if ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) {
                     await There($c.lit("are no cushions floating nearby."));
                 } else {
@@ -629,7 +629,7 @@ export async function rndcurse() {   // sit.c:569
         }
         nobj = nobj + 1 | 0;
     }
-    cnt = rnd($c.div32(6, ((!!(u.uprops[ANTIMAGIC].intrinsic || u.uprops[ANTIMAGIC].extrinsic) ? 1 : 0) + (!!(u.uprops[HALF_SPDAM].intrinsic || u.uprops[HALF_SPDAM].extrinsic) ? 1 : 0) | 0) + 1 | 0));
+    cnt = rnd($c.div32(6, (!!(u.uprops[ANTIMAGIC].intrinsic || u.uprops[ANTIMAGIC].extrinsic) ? 1 : 0) + (!!(u.uprops[HALF_SPDAM].intrinsic || u.uprops[HALF_SPDAM].extrinsic) ? 1 : 0) + 1));
     if (nobj) {
         for (; cnt > 0; cnt = cnt - 1 | 0) {
             onum = rnd(nobj);
@@ -644,7 +644,7 @@ export async function rndcurse() {   // sit.c:569
             }
             /* the !otmp case should never happen; picking an already
                cursed item happens--avoid "resists" message in that case */
-            if (!otmp || otmp.cursed | 0) {
+            if (!otmp || otmp.cursed) {
                 continue;   /* next target */
             }
             if (otmp.oartifact && spec_ability(otmp, SPFX.INTEL) && rn2(10) < 8) {
@@ -668,10 +668,10 @@ export async function rndcurse() {   // sit.c:569
             await curse(otmp);
         }
         if (!Blind()) {
-            await pline($c.lit("%s %s."), await Yobjnam2(otmp, $c.lit("glow")), hcolor(otmp.cursed | 0 ? c_color_names.c_black : $c.lit("brown")));
-            otmp.bknown = ((Hallucination() ? 0 : 1) >>> 0) & 1;   /* bypass set_bknown() */
+            await pline($c.lit("%s %s."), await Yobjnam2(otmp, $c.lit("glow")), hcolor(otmp.cursed ? c_color_names.c_black : $c.lit("brown")));
+            otmp.bknown = (Hallucination() ? 0 : 1) & 1;   /* bypass set_bknown() */
         } else {
-            otmp.bknown = (0) & 1;   /* bypass set_bknown() */
+            otmp.bknown = 0;   /* bypass set_bknown() */
         }
     }
 }

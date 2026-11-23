@@ -225,7 +225,7 @@ export function glyph_to_cmap(glyph) {   // glyphs.c:200
     } else if (glyph_is_cmap_zap(glyph)) {
         return $c.rem32(glyph - GLYPH.ZAP_OFF | 0, 4) + S.vbeam | 0;
     } else if (glyph_is_swallow(glyph)) {
-        return glyph_to_swallow(glyph) + S.sw_tl | 0;
+        return glyph_to_swallow(glyph) + S.sw_tl;
     } else if (glyph_is_explosion(glyph)) {
         return glyph_to_explosion(glyph) + S.expl_tl | 0;
     } else {
@@ -449,7 +449,7 @@ function glyph_hash(id) {   // glyphs.c:435
  * @returns {number} boolean
  */
 export function glyphid_cache_status() {   // glyphs.c:452
-    return $c.i8(glyphid_cache !== null ? 1 : 0);
+    return glyphid_cache !== null ? 1 : 0;
 }
 /**
  * @param {$c.Ptr | null} buf char *
@@ -530,8 +530,8 @@ export async function add_custom_nhcolor_entry(customization_name, glyphidx, nhc
 export async function apply_customizations(which_set, docustomize) {   // glyphs.c:531
     let gmap = null, details = null, sc = null, at_least_one = 0, do_colors = 0, do_symbols = 0, custs = 0;
     at_least_one = FALSE;
-    do_colors = $c.i8((docustomize & do_custom_colors) >>> 0 !== 0 ? 1 : 0);
-    do_symbols = $c.i8((docustomize & do_custom_symbols) >>> 0 !== 0 ? 1 : 0);
+    do_colors = (docustomize & do_custom_colors) >>> 0 !== 0 ? 1 : 0;
+    do_symbols = (docustomize & do_custom_symbols) >>> 0 !== 0 ? 1 : 0;
     for (custs = 0; custs < custom_count; custs = custs + 1 | 0) {
         sc = $c.relem(gs.sym_customizations[which_set], custs);
         if (sc.count && sc.details) {
@@ -757,8 +757,8 @@ async function parse_id(id, findwhat) {   // glyphs.c:824
             }
         }
     }
-    is_G = $c.i8(id && id.get(0) === 71 && id.get(1) === 95 ? 1 : 0);
-    is_S = $c.i8(id && id.get(0) === 83 && id.get(1) === 95 ? 1 : 0);
+    is_G = id && id.get(0) === 71 && id.get(1) === 95 ? 1 : 0;
+    is_S = id && id.get(0) === 83 && id.get(1) === 95 ? 1 : 0;
     if (is_G && !glyphid_cache || filling_cache || dump_ids || is_S) {
         while (loadsyms[i].range) {
             if (!pm_offset && loadsyms[i].range === SYM.MON) {

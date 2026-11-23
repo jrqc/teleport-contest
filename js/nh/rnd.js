@@ -54,13 +54,13 @@ export function rng_log_init() {   // rnd.c:38
             $c.setvbuf(rng_logfile, null, 1, 0);   /* line-buffered */
         }
     }
-    rng_log_disp = $c.i8(disp && disp.get(0) && disp.get(0) !== 48 ? TRUE : FALSE);
+    rng_log_disp = disp && disp.get(0) && disp.get(0) !== 48 ? TRUE : FALSE;
 }
 /**
  * @returns {number} boolean
  */
 export function rng_log_enabled() {   // rnd.c:52
-    return $c.i8(rng_logfile ? TRUE : FALSE);
+    return rng_logfile ? TRUE : FALSE;
 }
 /**
  * @param {$c.Ptr | null} file const char *

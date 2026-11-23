@@ -134,7 +134,7 @@ export async function done2() {   // end.c:91
     if (In_tutorial(u.uz) && await yn_function($c.lit("Switch from the tutorial back to regular play?"), new $c.Ptr(ynchars, 0), 110, 1) === 121) {
         abandon_tutorial = 1;
     }
-    if (abandon_tutorial || !await paranoid_query($c.i8(ParanoidQuit()), $c.lit("Really quit without saving?"))) {
+    if (abandon_tutorial || !await paranoid_query(ParanoidQuit(), $c.lit("Really quit without saving?"))) {
         $c.signal(2, done1);
         await clear_nhwindow()($G.WIN_MESSAGE);
         await curs_on_u();
@@ -143,7 +143,7 @@ export async function done2() {   // end.c:91
             nomul(0);
         }
         if (gm.multi === 0) {
-            u.uinvulnerable = (0) & 1;   /* avoid ctrl-C bug -dlc */
+            u.uinvulnerable = 0;   /* avoid ctrl-C bug -dlc */
             u.usleep = 0;
         }
         if (abandon_tutorial) {
@@ -203,9 +203,9 @@ export async function done_in_by(mtmp, how) {   // end.c:186
     let buf = new Int8Array(256), mptr = null, champtr = null, distorted = 0, mimicker = 0, imitator = 0, shape = new Int8Array(256), realnm = null, fakenm = null, alt = 0, shknm = null, honorific = null, reasondummy = Int8Array.of(0), p = null, reasonmid = Uint32Array.of(0);
     mptr = mtmp.data;
     champtr = ismnum(mtmp.cham) ? $c.relem(mons, mtmp.cham) : mptr;
-    distorted = $c.i8(Hallucination() && canspotmon(mtmp) ? 1 : 0);
-    mimicker = $c.i8(M_AP_TYPE(mtmp) === M_AP.MONSTER ? 1 : 0);
-    imitator = $c.i8(!$c.peq(mptr, champtr) || mimicker ? 1 : 0);
+    distorted = Hallucination() && canspotmon(mtmp) ? 1 : 0;
+    mimicker = M_AP_TYPE(mtmp) === M_AP.MONSTER ? 1 : 0;
+    imitator = !$c.peq(mptr, champtr) || mimicker ? 1 : 0;
     await You(how === STONING ? $c.lit("turn to stone...") : $c.lit("die..."));
     await mark_synch()();   /* flush buffered screen output */
     buf[0] = 0;
@@ -234,7 +234,7 @@ export async function done_in_by(mtmp, how) {   // end.c:186
     if (imitator) {
         realnm = pmname(champtr, Mgender(mtmp));
         fakenm = pmname(mptr, Mgender(mtmp));
-        alt = $c.i8(is_vampshifter(mtmp));
+        alt = is_vampshifter(mtmp);
         if (mimicker) {
             /* realnm is already correct because champtr==mptr;
                set up fake mptr for type_is_pname/the_unique_pm */
@@ -267,10 +267,10 @@ export async function done_in_by(mtmp, how) {   // end.c:186
         }
     } else if (mtmp.isshk) {
         shknm = await shkname(mtmp);
-        honorific = shkname_is_pname(mtmp) ? $c.lit("") : mtmp.female | 0 ? $c.lit("Ms. ") : $c.lit("Mr. ");
+        honorific = shkname_is_pname(mtmp) ? $c.lit("") : mtmp.female ? $c.lit("Ms. ") : $c.lit("Mr. ");
         $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit("%s%s, the shopkeeper"), honorific, shknm);
         svk.killer.format = KILLED.BY;
-    } else if (mtmp.ispriest | 0 || mtmp.isminion | 0) {
+    } else if (mtmp.ispriest || mtmp.isminion) {
         /* m_monnam() suppresses "the" prefix plus "invisible", and
            it overrides the effect of Hallucination on priestname() */
         $c.strcat(new $c.Ptr(buf, 0), await m_monnam(mtmp));
@@ -499,7 +499,7 @@ async function disclose(how, taken) {   // end.c:620
             $c.strcpy(new $c.Ptr(qbuf, 0), $c.lit("Do you want your possessions identified?"));
         }
         ask = await should_query_disclose_option(105, new $c.Ptr(defquery, 0));
-        c = $c.i8(ask ? await yn_function(new $c.Ptr(qbuf, 0), new $c.Ptr(ynqchars, 0), defquery[0], 1) : defquery[0]);
+        c = ask ? await yn_function(new $c.Ptr(qbuf, 0), new $c.Ptr(ynqchars, 0), defquery[0], 1) : defquery[0];
         if (c === 121) {
             /* caller has already ID'd everything; we pass 'want_reply=True'
                to force display_pickinv() to avoid using WIN_INVENT */
@@ -513,7 +513,7 @@ async function disclose(how, taken) {   // end.c:620
     }
     if (!program_state.stopprint) {
         ask = await should_query_disclose_option(97, new $c.Ptr(defquery, 0));
-        c = $c.i8(ask ? await yn_function($c.lit("Do you want to see your attributes?"), new $c.Ptr(ynqchars, 0), defquery[0], 1) : defquery[0]);
+        c = ask ? await yn_function($c.lit("Do you want to see your attributes?"), new $c.Ptr(ynqchars, 0), defquery[0], 1) : defquery[0];
         if (c === 121) {
             await enlightenment(BASICENLIGHTENMENT | MAGICENLIGHTENMENT, how >= PANICKED ? ENL.GAMEOVERALIVE : ENL.GAMEOVERDEAD);
         }
@@ -552,7 +552,7 @@ async function disclose(how, taken) {   // end.c:620
     }
     if (!program_state.stopprint) {
         ask = await should_query_disclose_option(111, new $c.Ptr(defquery, 0));
-        c = $c.i8(ask ? await yn_function($c.lit("Do you want to see the dungeon overview?"), new $c.Ptr(ynqchars, 0), defquery[0], 1) : defquery[0]);
+        c = ask ? await yn_function($c.lit("Do you want to see the dungeon overview?"), new $c.Ptr(ynqchars, 0), defquery[0], 1) : defquery[0];
         if (c === 121) {
             await show_overview(how >= PANICKED ? 1 : 2, how);
         }
@@ -637,7 +637,7 @@ function get_valuables(list) {   // end.c:764
         } else if (obj.oartifact) {
             continue;
         } else if (obj.oclass === AMULET_CLASS) {
-            i = obj.otyp - FIRST_AMULET | 0;
+            i = obj.otyp - FIRST_AMULET;
             if (!ga.amulets[i].count) {
                 ga.amulets[i].count = obj.quan;
                 ga.amulets[i].typ = obj.otyp;
@@ -646,7 +646,7 @@ function get_valuables(list) {   // end.c:764
             }
         } else if (obj.oclass === GEM_CLASS && obj.otyp <= LAST_GLASS_GEM) {
             /* last+1: combine all glass gems into one slot */
-            i = (obj.otyp < LAST_REAL_GEM + 1 ? obj.otyp : LAST_REAL_GEM + 1) - FIRST_REAL_GEM | 0;
+            i = (obj.otyp < LAST_REAL_GEM + 1 ? obj.otyp : LAST_REAL_GEM + 1) - FIRST_REAL_GEM;
             if (!gg.gems[i].count) {
                 gg.gems[i].count = obj.quan;
                 gg.gems[i].typ = obj.otyp;
@@ -765,7 +765,7 @@ async function artifact_score(list, counting, endwin) {   // end.c:908
             } else {
                 await discover_object(otmp.otyp, 1, 1, 0);
                 /* not observe_object; dead characters don't observe */
-                $t3 = ($t2 = ($t1 = otmp.rknown = (1) & 1, otmp.bknown = ($t1) & 1), otmp.dknown = ($t2) & 1), otmp.known = ($t3) & 1;
+                $t3 = ($t2 = ($t1 = otmp.rknown = 1, otmp.bknown = ($t1) & 1), otmp.dknown = ($t2) & 1), otmp.known = ($t3) & 1;
                 /* assumes artifacts don't have quan > 1 */
                 $c.sprintf(new $c.Ptr(pbuf, 0), $c.lit("%s%s (worth %ld %s and %ld points)"), the_unique_obj(otmp) ? $c.lit("The ") : $c.lit(""), otmp.oartifact ? artiname(otmp.oartifact) : obj_descr[objects[otmp.otyp].oc_name_idx].oc_name, value, await currency(value), points);
                 await putstr()(endwin, 0, new $c.Ptr(pbuf, 0));
@@ -938,7 +938,7 @@ export async function done(how) {   // end.c:1021
     /* if hangup has occurred, the only possible answer to a paranoid
        query is 'no'; we want 'no' as the default for "Die?" but can't
        accept it more than once if there's no user supplying it */
-    if (!survive && (wizard() || discover()) && how <= GENOCIDED && !(program_state.done_hup && ($t4 = gd.done_seq, gd.done_seq = $c.add64($t4, 1), $t4) === gh.hero_seq) && !await paranoid_query($c.i8(ParanoidDie()), $c.lit("Die?"))) {
+    if (!survive && (wizard() || discover()) && how <= GENOCIDED && !(program_state.done_hup && ($t4 = gd.done_seq, gd.done_seq = $c.add64($t4, 1), $t4) === gh.hero_seq) && !await paranoid_query(ParanoidDie(), $c.lit("Die?"))) {
         await pline($c.lit("OK, so you don't %s."), how === CHOKING ? $c.lit("choke") : $c.lit("die"));
         iflags.last_msg = PLNMSG.OK_DONT_DIE;
         await savelife(how);
@@ -1016,7 +1016,7 @@ async function really_done(how) {   // end.c:1132
     $c.signal(3, done_intr);
     sethanguphandler(done_hangup);
     /* NO_SIGNAL */
-    bones_ok = $c.i8(how < GENOCIDED && can_make_bones() ? 1 : 0);
+    bones_ok = how < GENOCIDED && can_make_bones() ? 1 : 0;
     if (bones_ok && launch_in_progress()) {
         await force_launch_placement();
     }
@@ -1047,7 +1047,7 @@ async function really_done(how) {   // end.c:1132
     }
     fixup_death(how);   /* actually, fixup gm.multi_reason */
     if (how !== PANICKED) {
-        silently = $c.i8(program_state.stopprint ? 1 : 0);
+        silently = program_state.stopprint ? 1 : 0;
         /* these affect score and/or bones, but avoid them during panic */
         taken = await paybill(how === ESCAPED ? -1 : how !== QUIT ? 1 : 0, silently);
         await paygd(silently);
@@ -1069,7 +1069,7 @@ async function really_done(how) {   // end.c:1132
             nextobj = obj.nobj;
             await discover_object(obj.otyp, 1, 1, 0);
             /* observe_object not necessary after discover_object */
-            $t7 = ($t6 = ($t5 = obj.rknown = (1) & 1, obj.dknown = ($t5) & 1), obj.bknown = ($t6) & 1), obj.known = ($t7) & 1;
+            $t7 = ($t6 = ($t5 = obj.rknown = 1, obj.dknown = ($t5) & 1), obj.bknown = ($t6) & 1), obj.known = ($t7) & 1;
             set_cknown_lknown(obj);   /* set flags when applicable */
             /* we resolve Schroedinger's cat now in case of both
                disclosure and dumplog, where the 50:50 chance for
@@ -1124,7 +1124,7 @@ async function really_done(how) {   // end.c:1132
         await formatkiller(eos(new $c.Ptr(pbuf, 0)), $c.u32($c.subu64(256, await Strlen_(new $c.Ptr(pbuf, 0), $c.lit("really_done"), 1317))), how, 1);
         await make_grave(u.ux, u.uy, new $c.Ptr(pbuf, 0));
         if (svl.level.locations[u.ux][u.uy].typ === GRAVE && !was_already_grave) {
-            svl.level.locations[u.ux][u.uy].flags = (1) & 31;   /* corpse isn't buried */
+            svl.level.locations[u.ux][u.uy].flags = 1;   /* corpse isn't buried */
         }
     }
     pbuf[0] = 0;   /* clear grave text; also lint suppression */
@@ -1162,7 +1162,7 @@ async function really_done(how) {   // end.c:1132
         await display_nhwindow()($G.WIN_MESSAGE, 0);
     }
     if (bones_ok) {
-        if (!wizard() || await paranoid_query($c.i8(ParanoidBones()), $c.lit("Save bones?"))) {
+        if (!wizard() || await paranoid_query(ParanoidBones(), $c.lit("Save bones?"))) {
             await savebones(how, endtime, corpse);
         }
         /* corpse may be invalid pointer now so
@@ -1270,9 +1270,9 @@ async function really_done(how) {   // end.c:1132
                 if (objects[typ].oc_class !== GEM_CLASS || typ <= LAST_REAL_GEM) {
                     otmp = await mksobj(typ, 0, 0);
                     await discover_object(otmp.otyp, 1, 1, 0);
-                    otmp.dknown = (1) & 1;   /* seen it (blindness fix) */
+                    otmp.dknown = 1;   /* seen it (blindness fix) */
                     /* observe_object not necessary after discover_object */
-                    otmp.known = (1) & 1;   /* for fake amulets */
+                    otmp.known = 1;   /* for fake amulets */
                     if (has_oname(otmp)) {
                         free_oname(otmp);
                     }
@@ -1364,9 +1364,9 @@ export async function container_contents(list, identified, all_containers, repor
     for (box = list; box; box = box.nobj) {
         if (Is_container(box) || box.otyp === STATUE) {
             if (!box.cknown || identified && !box.lknown) {
-                box.cknown = (1) & 1;   /* we're looking at the contents now */
+                box.cknown = 1;   /* we're looking at the contents now */
                 if (identified) {
-                    box.lknown = (1) & 1;
+                    box.lknown = 1;
                 }
                 await update_inventory();
             }
@@ -1380,7 +1380,7 @@ export async function container_contents(list, identified, all_containers, repor
                    for dead cat, the flag will be clear and there'll be
                    a cat corpse inside the box; either way, inventory
                    reports the box as containing "1 item" */
-                cat = $c.i8(SchroedingersBox(box));
+                cat = SchroedingersBox(box);
                 $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Contents of %s:"), await the(await xname(box)));
                 await putstr()(tmpwin, 0, new $c.Ptr(buf, 0));
                 if (!dumping) {
@@ -1388,15 +1388,15 @@ export async function container_contents(list, identified, all_containers, repor
                 }
                 $t1 = buf[1] = 32, buf[0] = $t1;   /* two leading spaces */
                 if (box.cobj && !cat) {
-                    sortflags = ((flags.sortloot === 108 || flags.sortloot === 102 ? SORTLOOT.LOOT : 0) | (flags.sortpack ? SORTLOOT.PACK : 0)) >>> 0;
+                    sortflags = (flags.sortloot === 108 || flags.sortloot === 102 ? SORTLOOT.LOOT : 0) | (flags.sortpack ? SORTLOOT.PACK : 0);
                     sortedcobj[0] = await sortloot(new $c.FieldRef(box, "cobj", "ptr"), sortflags, 0, null);
                     for (srtc = sortedcobj[0]; (obj = srtc.obj) !== null; srtc = $c.radd(srtc, 1)) {
                         if (identified) {
                             await discover_object(obj.otyp, 1, 1, 0);
-                            obj.dknown = (1) & 1;   /* observe_object unnecessary */
-                            $t3 = ($t2 = obj.rknown = (1) & 1, obj.bknown = ($t2) & 1), obj.known = ($t3) & 1;
+                            obj.dknown = 1;   /* observe_object unnecessary */
+                            $t3 = ($t2 = obj.rknown = 1, obj.bknown = ($t2) & 1), obj.known = ($t3) & 1;
                             if (Is_container(obj) || obj.otyp === STATUE) {
-                                $t4 = obj.lknown = (1) & 1, obj.cknown = ($t4) & 1;
+                                $t4 = obj.lknown = 1, obj.cknown = ($t4) & 1;
                             }
                         }
                         $c.strcpy(new $c.Ptr(buf, 2), await doname_with_price(obj));

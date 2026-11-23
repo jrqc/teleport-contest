@@ -211,7 +211,7 @@ function next_shkp(shkp, withbill) {   // shk.c:215
         if (DEADMONSTER(shkp)) {
             continue;
         }
-        if (shkp.isshk | 0 && (shkp.mextra.eshk.billct || !withbill)) {
+        if (shkp.isshk && (shkp.mextra.eshk.billct || !withbill)) {
             break;
         }
     }
@@ -232,20 +232,20 @@ function next_shkp(shkp, withbill) {   // shk.c:215
 export async function shkgone(mtmp) {   // shk.c:235
     let eshk = null, sroom = null, otmp = null, p = null, sx = 0, sy = 0;
     eshk = mtmp.mextra.eshk;
-    sroom = $c.relem(svr.rooms, eshk.shoproom - ROOMOFFSET | 0);
+    sroom = $c.relem(svr.rooms, eshk.shoproom - ROOMOFFSET);
     /* [BUG: some of this should be done on the shop level */
     /*       even when the shk dies on a different level.] */
     if (on_level(eshk.shoplevel, u.uz)) {
         discard_damage_owned_by(mtmp);
         sroom.resident = null;
         if (!search_special(ANY.SHOP)) {
-            svl.level.flags.has_shop = (0) & 1;
+            svl.level.flags.has_shop = 0;
         }
         /* items on shop floor revert to ordinary objects */
         for (sx = sroom.lx; sx <= sroom.hx; sx = sx + 1 | 0) {
             for (sy = sroom.ly; sy <= sroom.hy; sy = sy + 1 | 0) {
                 for (otmp = svl.level.objects[sx][sy]; otmp; otmp = otmp.v.v_nexthere) {
-                    otmp.no_charge = (0) & 1;
+                    otmp.no_charge = 0;
                 }
             }
         }
@@ -267,7 +267,7 @@ export async function shkgone(mtmp) {   // shk.c:235
  */
 export function set_residency(shkp, zero_out) {   // shk.c:272
     if (on_level(shkp.mextra.eshk.shoplevel, u.uz)) {
-        svr.rooms[shkp.mextra.eshk.shoproom - ROOMOFFSET | 0].resident = zero_out ? null : shkp;
+        svr.rooms[shkp.mextra.eshk.shoproom - ROOMOFFSET].resident = zero_out ? null : shkp;
     }
 }
 /**
@@ -275,7 +275,7 @@ export function set_residency(shkp, zero_out) {   // shk.c:272
  * @param {$T.monst | null} mtmp2 struct monst *
  */
 export function replshk(mtmp, mtmp2) {   // shk.c:280
-    svr.rooms[mtmp2.mextra.eshk.shoproom - ROOMOFFSET | 0].resident = mtmp2;
+    svr.rooms[mtmp2.mextra.eshk.shoproom - ROOMOFFSET].resident = mtmp2;
     if (inhishop(mtmp) && new $c.Ptr(u.ushops, 0).get(0) === mtmp.mextra.eshk.shoproom) {
         mtmp2.mextra.eshk.bill_p = mtmp2.mextra.eshk.bill[0];
     }
@@ -313,7 +313,7 @@ async function clear_unpaid_obj(shkp, otmp) {   // shk.c:309
         await clear_unpaid(shkp, otmp.cobj);
     }
     if (await onbill(otmp, shkp, TRUE)) {
-        otmp.unpaid = (0) & 1;
+        otmp.unpaid = 0;
     }
 }
 /* clear the unpaid bit on all of the objects in the list */
@@ -361,8 +361,8 @@ function clear_no_charge_obj(shkp, otmp) {   // shk.c:329
          * become owned by the shop now and will be for-sale once the shk
          * returns.
          */
-        if (!shkp || otmp.where !== OBJ.FLOOR && otmp.where !== OBJ.CONTAINED && otmp.where !== OBJ.BURIED || !get_obj_location(otmp, new $c.Ptr(x, 0), new $c.Ptr(y, 0), OBJ.CONTAINED | OBJ.BURIED) || !isok(x[0], y[0]) || (rno = svl.level.locations[x[0]][y[0]].roomno | 0) < ROOMOFFSET || !(svr.rooms[rno - ROOMOFFSET | 0].rtype >= SHOPBASE) || (rm_shkp = svr.rooms[rno - ROOMOFFSET | 0].resident) === null || $c.peq(rm_shkp, shkp)) {
-            otmp.no_charge = (0) & 1;
+        if (!shkp || otmp.where !== OBJ.FLOOR && otmp.where !== OBJ.CONTAINED && otmp.where !== OBJ.BURIED || !get_obj_location(otmp, new $c.Ptr(x, 0), new $c.Ptr(y, 0), OBJ.CONTAINED | OBJ.BURIED) || !isok(x[0], y[0]) || (rno = svl.level.locations[x[0]][y[0]].roomno) < ROOMOFFSET || !(svr.rooms[rno - ROOMOFFSET | 0].rtype >= SHOPBASE) || (rm_shkp = svr.rooms[rno - ROOMOFFSET | 0].resident) === null || $c.peq(rm_shkp, shkp)) {
+            otmp.no_charge = 0;
         }
     }
 }
@@ -524,8 +524,8 @@ async function call_kops(shkp, nearshop) {   // shk.c:510
     if (!Deaf()) {
         await pline($c.lit("An alarm sounds!"));
     }
-    nokops = $c.i8(svm.mvitals[PM.KEYSTONE_KOP].mvflags & G_GONE && svm.mvitals[PM.KOP_SERGEANT].mvflags & G_GONE && svm.mvitals[PM.KOP_LIEUTENANT].mvflags & G_GONE && svm.mvitals[PM.KOP_KAPTAIN].mvflags & G_GONE ? 1 : 0);
-    if (!await angry_guards($c.i8(!!Deaf() ? 1 : 0)) && nokops) {
+    nokops = svm.mvitals[PM.KEYSTONE_KOP].mvflags & G_GONE && svm.mvitals[PM.KOP_SERGEANT].mvflags & G_GONE && svm.mvitals[PM.KOP_LIEUTENANT].mvflags & G_GONE && svm.mvitals[PM.KOP_KAPTAIN].mvflags & G_GONE ? 1 : 0;
+    if (!await angry_guards(!!Deaf() ? 1 : 0) && nokops) {
         if (flags.verbose && !Deaf()) {
             await pline($c.lit("But no one seems to respond to it."));
         }
@@ -571,8 +571,8 @@ async function call_kops(shkp, nearshop) {   // shk.c:510
  */
 export function inside_shop(x, y) {   // shk.c:568
     let rno = 0;
-    rno = $c.i8(svl.level.locations[x][y].roomno);
-    if (rno < ROOMOFFSET || svl.level.locations[x][y].edge | 0 || !(svr.rooms[rno - ROOMOFFSET | 0].rtype >= SHOPBASE)) {
+    rno = svl.level.locations[x][y].roomno;
+    if (rno < ROOMOFFSET || svl.level.locations[x][y].edge || !(svr.rooms[rno - ROOMOFFSET].rtype >= SHOPBASE)) {
         rno = NO_ROOM;
     }
     return rno;
@@ -591,10 +591,10 @@ export async function u_left_shop(leavestring, newlev) {   // shk.c:579
      *   (he wasn't strictly-inside last turn anyway)))
      * THEN (there's nothing to do, so just return)
      */
-    if (!leavestring.get(0) && (!svl.level.locations[u.ux][u.uy].edge || svl.level.locations[u.ux0][u.uy0].edge | 0)) {
+    if (!leavestring.get(0) && (!svl.level.locations[u.ux][u.uy].edge || svl.level.locations[u.ux0][u.uy0].edge)) {
         return;
     }
-    shkp = await shop_keeper($c.i8(leavestring.get(0) ? leavestring.get(0) : new $c.Ptr(u.ushops0, 0).get(0)));
+    shkp = await shop_keeper(leavestring.get(0) ? leavestring.get(0) : new $c.Ptr(u.ushops0, 0).get(0));
     if (!shkp || !inhishop(shkp)) {
         return;   /* shk died, teleported, changed levels... */
     }
@@ -607,7 +607,7 @@ export async function u_left_shop(leavestring, newlev) {   // shk.c:579
          * Player just stepped onto shop-boundary (known from above logic).
          * Try to intimidate him into paying his bill
          */
-        not_upset = $c.i8(!eshkp.surcharge ? 1 : 0);
+        not_upset = !eshkp.surcharge ? 1 : 0;
         if (!Deaf() && !muteshk(shkp)) {
             await verbalize(not_upset ? $c.lit("%s!  Please pay before leaving.") : $c.lit("%s!  Don't you leave without paying!"), new $c.Ptr(svp.plname, 0));
         } else {
@@ -616,7 +616,7 @@ export async function u_left_shop(leavestring, newlev) {   // shk.c:579
         return;
     }
     if (await rob_shop(shkp)) {
-        await call_kops(shkp, $c.i8(!newlev && svl.level.locations[u.ux0][u.uy0].edge | 0 ? 1 : 0));
+        await call_kops(shkp, !newlev && svl.level.locations[u.ux0][u.uy0].edge ? 1 : 0);
     }
 }
 /**
@@ -715,7 +715,7 @@ async function rob_shop(shkp) {   // shk.c:687
 async function deserted_shop(enterstring) {   // shk.c:723
     let mtmp = null, r = null, x = 0, y = 0, m = 0, n = 0;
     /*const*/
-    r = $c.relem(svr.rooms, enterstring.get(0) - ROOMOFFSET | 0);
+    r = $c.relem(svr.rooms, enterstring.get(0) - ROOMOFFSET);
     m = 0;
     n = 0;
     for (x = r.lx; x <= r.hx; x = x + 1 | 0) {
@@ -787,7 +787,7 @@ export async function u_entered_shop(enterstring) {   // shk.c:751
         }
         return;
     }
-    rt = svr.rooms[enterstring.get(0) - ROOMOFFSET | 0].rtype;
+    rt = svr.rooms[enterstring.get(0) - ROOMOFFSET].rtype;
     if (ANGRY(shkp)) {
         if (!Deaf() && !muteshk(shkp)) {
             await verbalize($c.lit("So, %s, you dare return to %s %s?!"), new $c.Ptr(svp.plname, 0), s_suffix(await shkname(shkp)), shtypes[rt - SHOPBASE | 0].name);
@@ -816,7 +816,7 @@ export async function u_entered_shop(enterstring) {   // shk.c:751
     }
     /* can't do anything about blocking if teleported in */
     if (!inside_shop(u.ux, u.uy)) {
-        not_upset = $c.i8(!eshkp.surcharge ? 1 : 0);
+        not_upset = !eshkp.surcharge ? 1 : 0;
         pick = carrying(PICK_AXE);
         mattock = carrying(DWARVISH_MATTOCK);
         if (pick || mattock) {
@@ -860,7 +860,7 @@ export async function u_entered_shop(enterstring) {   // shk.c:751
             }
             should_block = TRUE;
         } else {
-            should_block = $c.i8(Fast() && (sobj_at(PICK_AXE, u.ux, u.uy) || sobj_at(DWARVISH_MATTOCK, u.ux, u.uy)) ? 1 : 0);
+            should_block = Fast() && (sobj_at(PICK_AXE, u.ux, u.uy) || sobj_at(DWARVISH_MATTOCK, u.ux, u.uy)) ? 1 : 0;
         }
         if (should_block) {
             await dochug(shkp);   /* shk gets extra move */
@@ -875,7 +875,7 @@ export async function u_entered_shop(enterstring) {   // shk.c:751
  */
 export async function pick_pick(obj) {   // shk.c:921
     let shkp = null;
-    if (obj.unpaid | 0 || !is_pick(obj)) {
+    if (obj.unpaid || !is_pick(obj)) {
         return;
     }
     shkp = await shop_keeper(new $c.Ptr(u.ushops, 0).get(0));
@@ -926,7 +926,7 @@ export async function same_price(obj1, obj2) {   // shk.c:955
     if (!bp1 || !bp2) {
         await impossible($c.lit("same_price: object wasn't on any bill!"));
     } else {
-        are_mergable = $c.i8($c.peq(shkp1, shkp2) && bp1.price === bp2.price ? 1 : 0);
+        are_mergable = $c.peq(shkp1, shkp2) && bp1.price === bp2.price ? 1 : 0;
     }
     return are_mergable;
 }
@@ -1002,7 +1002,7 @@ export function inhishop(shkp) {   // shk.c:1039
  */
 export async function shop_keeper(rmno) {   // shk.c:1052
     let shkp = null;
-    shkp = rmno >= ROOMOFFSET ? svr.rooms[rmno - ROOMOFFSET | 0].resident : null;
+    shkp = rmno >= ROOMOFFSET ? svr.rooms[rmno - ROOMOFFSET].resident : null;
     if (shkp) {
         if (has_eshk(shkp)) {
             if (ANGRY(shkp)) {
@@ -1014,7 +1014,7 @@ export async function shop_keeper(rmno) {   // shk.c:1052
             /* would have segfaulted on ESHK dereference previously */
             /* [real shopkeeper name is kept in ESHK,
                not MGIVENNAME] */
-            await impossible($c.lit("%s? (rmno=%d, rtype=%d, mnum=%d, \"%s\")"), shkp.isshk | 0 ? $c.lit("shopkeeper career change") : $c.lit("shop resident not shopkeeper"), rmno, svr.rooms[rmno - ROOMOFFSET | 0].rtype, shkp.mnum, has_mgivenname(shkp) ? shkp.mextra.mgivenname : $c.lit("anonymous"));
+            await impossible($c.lit("%s? (rmno=%d, rtype=%d, mnum=%d, \"%s\")"), shkp.isshk ? $c.lit("shopkeeper career change") : $c.lit("shop resident not shopkeeper"), rmno, svr.rooms[rmno - ROOMOFFSET].rtype, shkp.mnum, has_mgivenname(shkp) ? shkp.mextra.mgivenname : $c.lit("anonymous"));
             /* not sure if this is appropriate, because it does nothing to
                correct the underlying svr.rooms[].resident issue but... */
             return null;
@@ -1069,7 +1069,7 @@ export async function find_objowner(obj, x, y) {   // shk.c:1084
 export function tended_shop(sroom) {   // shk.c:1118
     let mtmp = null;
     mtmp = sroom.resident;
-    return $c.i8(!mtmp ? FALSE : $c.i8(inhishop(mtmp)));
+    return !mtmp ? FALSE : $c.i8(inhishop(mtmp));
 }
 /**
  * @param {$T.mkroom | null} sroom struct mkroom *
@@ -1100,7 +1100,7 @@ async function onbill(obj, shkp, silent) {   // shk.c:1136
             }
         }
     }
-    if (obj.unpaid | 0 && !silent) {
+    if (obj.unpaid && !silent) {
         await impossible($c.lit("onbill: unpaid obj %s?"), !shkp ? $c.lit("without shopkeeper") : $c.lit("not on shk's bill"));
     }
     return null;
@@ -1114,7 +1114,7 @@ async function onbill(obj, shkp, silent) {   // shk.c:1136
  * @returns {Promise<number>} boolean
  */
 export async function onshopbill(obj, shkp, silent) {   // shk.c:1160
-    return $c.i8(await onbill(obj, shkp, silent) ? TRUE : FALSE);
+    return await onbill(obj, shkp, silent) ? TRUE : FALSE;
 }
 /* check whether an object or any of its contents belongs to a shop */
 /**
@@ -1122,7 +1122,7 @@ export async function onshopbill(obj, shkp, silent) {   // shk.c:1160
  * @returns {number} boolean
  */
 export function is_unpaid(obj) {   // shk.c:1167
-    return $c.i8(obj.unpaid | 0 || Has_contents(obj) && count_unpaid(obj.cobj) ? 1 : 0);
+    return obj.unpaid || Has_contents(obj) && count_unpaid(obj.cobj) ? 1 : 0;
 }
 /* Delete the contents of the given object. */
 /**
@@ -1184,10 +1184,10 @@ export async function obfree(obj, merge) {   // shk.c:1187
     if ((bp = await onbill(obj, shkp, FALSE)) !== null) {
         if (!merge) {
             bp.useup = TRUE;
-            obj.unpaid = (0) & 1;   /* only for doinvbill */
+            obj.unpaid = 0;   /* only for doinvbill */
             /* for used up glob, put back original weight in case it gets
                formatted ('I x' or itemized billing) with 'wizweight' On */
-            if (obj.globby | 0 && !obj.owt && has_omid(obj)) {
+            if (obj.globby && !obj.owt && has_omid(obj)) {
                 obj.owt = obj.oextra.omid;
             }
             await add_to_billobjs(obj);
@@ -1197,7 +1197,7 @@ export async function obfree(obj, merge) {   // shk.c:1187
         if (!bpm) {
             /* this used to be a rename */
             /* !merge already returned */
-            await impossible($c.lit("obfree: not on bill, %s = (%d,%d,%ld,%d) (%d,%d,%ld,%d)?"), $c.lit("otyp,where,quan,unpaid"), obj.otyp, obj.where, obj.quan, obj.unpaid | 0 ? 1 : 0, merge.otyp, merge.where, merge.quan, merge.unpaid | 0 ? 1 : 0);
+            await impossible($c.lit("obfree: not on bill, %s = (%d,%d,%ld,%d) (%d,%d,%ld,%d)?"), $c.lit("otyp,where,quan,unpaid"), obj.otyp, obj.where, obj.quan, obj.unpaid ? 1 : 0, merge.otyp, merge.where, merge.quan, merge.unpaid ? 1 : 0);
             return;
         } else {
             eshkp = shkp.mextra.eshk;
@@ -1282,7 +1282,7 @@ async function home_shk(shkp, killkops) {   // shk.c:1317
     x = shkp.mextra.eshk.shk.x;
     y = shkp.mextra.eshk.shk.y;
     await mnearto(shkp, x, y, TRUE, RLOC.NOMSG);
-    svl.level.flags.has_shop = (1) & 1;
+    svl.level.flags.has_shop = 1;
     if (killkops) {
         await kops_gone(TRUE);
         await pacify_guards();
@@ -1348,11 +1348,11 @@ async function rouse_shk(shkp, verbosely) {   // shk.c:1381
     if (helpless(shkp)) {
         /* greed induced recovery... */
         if (verbosely && canspotmon(shkp)) {
-            await pline($c.lit("%s %s."), await Shknam(shkp), shkp.msleeping | 0 ? $c.lit("wakes up") : $c.lit("can move again"));
+            await pline($c.lit("%s %s."), await Shknam(shkp), shkp.msleeping ? $c.lit("wakes up") : $c.lit("can move again"));
         }
-        shkp.msleeping = (0) & 1;
-        shkp.mfrozen = (0) & 127;
-        shkp.mcanmove = (1) & 1;
+        shkp.msleeping = 0;
+        shkp.mfrozen = 0;
+        shkp.mcanmove = 1;
     }
 }
 /**
@@ -1362,7 +1362,7 @@ async function rouse_shk(shkp, verbosely) {   // shk.c:1381
  */
 export async function make_happy_shk(shkp, silentkops) {   // shk.c:1395
     let wasmad = 0, eshkp = null, shk_nam = new Int8Array(256), vanished = 0;
-    wasmad = $c.i8(ANGRY(shkp));
+    wasmad = ANGRY(shkp);
     eshkp = shkp.mextra.eshk;
     pacify_shk(shkp, FALSE);
     eshkp.following = 0;
@@ -1590,7 +1590,7 @@ async function make_itemized_bill(shkp, ibill_p) {   // shk.c:1545
                    saved in ibill[j] is based on the container even if the
                    entry was initially created for an item of its contents */
                 if ($c.radd(ibill, j).usedup === FullyIntact) {
-                    $c.radd(ibill, j).usedup = $c.i8(cknown ? KnownContainer : UndisclosedContainer);
+                    $c.radd(ibill, j).usedup = cknown ? KnownContainer : UndisclosedContainer;
                 }
                 continue;   /* 'i' loop */
             }
@@ -1603,13 +1603,13 @@ async function make_itemized_bill(shkp, ibill_p) {   // shk.c:1545
             /* an unpaid container without any unpaid contents is classified
                as 'FullyIntact'; a container with unpaid contents will be
                '*Container' regardless of whether it is unpaid itself */
-            used = $c.i8($c.peq(otmp, item) ? FullyIntact : cknown ? KnownContainer : UndisclosedContainer);
+            used = $c.peq(otmp, item) ? FullyIntact : cknown ? KnownContainer : UndisclosedContainer;
         } else {
             /* ordinary unpaid; when partly used, these are values for the
                intact portion; might be an empty shop-owned container */
             quan = otmp.quan;
             cost = $c.mul64(bp.price, quan);
-            used = $c.i8(quan < bp.bquan ? PartlyIntact : FullyIntact);
+            used = quan < bp.bquan ? PartlyIntact : FullyIntact;
         }
         $c.radd(ibill, n).obj = otmp;
         $c.radd(ibill, n).quan = quan;
@@ -1704,7 +1704,7 @@ export async function dopay() {   // shk.c:1743
     seensk = 0;
     nexttosk = 0;
     paid[0] = FALSE;
-    stashed_gold = $c.i8(hidden_gold(TRUE) > 0 ? 1 : 0);
+    stashed_gold = hidden_gold(TRUE) > 0 ? 1 : 0;
     gm.multi = 0;
     /* Find how many shk's there are, how many are in
      * sight, and are you in a shop room with one.
@@ -1996,7 +1996,7 @@ async function pay_billed_items(shkp, ibillct, ibill, stashed_gold, paid_p) {   
     ebillct = eshkp.billct;
     /* note: will only get here for a single item, so
        we can deduce that it is ibill[0] */
-    more_than_one = $c.i8(ebillct > 1 || otmp.quan < bp.bquan || $c.radd(ibill, 0).usedup === UndisclosedContainer ? 1 : 0);
+    more_than_one = ebillct > 1 || otmp.quan < bp.bquan || $c.radd(ibill, 0).usedup === UndisclosedContainer ? 1 : 0;
     if ($c.add64(umoney, eshkp.credit) < cheapest_item(ibillct, ibill)) {
         await You($c.lit("don't have enough gold to buy%s the item%s %s."), more_than_one ? $c.lit(" any of") : $c.lit(""), plur(more_than_one ? 2 : 1), ebillct > 1 ? $c.lit("you've picked") : $c.lit("on your bill"));
         if (stashed_gold) {
@@ -2004,14 +2004,14 @@ async function pay_billed_items(shkp, ibillct, ibill, stashed_gold, paid_p) {   
         }
         return TRUE;
     }
-    via_menu = $c.i8(flags.menu_style !== MENU.TRADITIONAL ? 1 : 0);
+    via_menu = flags.menu_style !== MENU.TRADITIONAL ? 1 : 0;
     /* allow 'm p' to request a menu for menustyle:traditional;
        for other styles, it will do the opposite; that doesn't make
        a whole lot of sense for a 'request-menu' prefix, but otherwise
        it would simply be redundant and there wouldn't be any way to
        skip the menu when hero owes for multiple items */
     if (iflags.menu_requested) {
-        via_menu = $c.i8(!via_menu ? 1 : 0);
+        via_menu = !via_menu ? 1 : 0;
     }
     /* this will loop for a second iteration iff not initially using a
        menu and player answers 'm' at custom ynq prompt */
@@ -2029,8 +2029,8 @@ async function pay_billed_items(shkp, ibillct, ibill, stashed_gold, paid_p) {   
             if (iprompt === 113) {
                 return TRUE;
             }
-            itemize = $c.i8(iprompt === 121 ? 1 : 0);
-            via_menu = $c.i8(iprompt === 109 ? 1 : 0);
+            itemize = iprompt === 121 ? 1 : 0;
+            via_menu = iprompt === 109 ? 1 : 0;
         }
     } while (via_menu);
     /*
@@ -2121,7 +2121,7 @@ async function update_bill(indx, ibillct, ibill, eshkp, bp, paiditem) {   // shk
            from shop bill; if it was used up, remove it from the billobjs
            list and delete it; update shop's bill by moving last bill_p[]
            entry into vacated slot; also update ibill[] indices for that */
-        paiditem.unpaid = (0) & 1;   /* clear before maybe deallocating */
+        paiditem.unpaid = 0;   /* clear before maybe deallocating */
         if (paiditem.where === OBJ.ONBILL) {
             await obj_extract_self(paiditem);
             await dealloc_obj(paiditem);
@@ -2155,7 +2155,7 @@ async function update_bill(indx, ibillct, ibill, eshkp, bp, paiditem) {   // shk
 async function dopayobj(shkp, bp, obj, which, itemize, unseen) {   // shk.c:2220
     let ltmp = 0, quan = 0, save_quan = 0, buy = 0, consumed = 0, qbuf = new Int8Array(256), qsfx = new Int8Array(256);
     /* 0 => used-up item, 1 => other (unpaid or lost) */
-    consumed = $c.i8(which === 0 ? 1 : 0);
+    consumed = which === 0 ? 1 : 0;
     if (!obj.unpaid && !bp.useup && !(Has_contents(obj) && await unpaid_cost(obj, COST.CONTENTS))) {
         await impossible($c.lit("Paid object on bill??"));
         return PAY_BUY;
@@ -2237,7 +2237,7 @@ async function buy_container(shkp, indx, ibillct, ibill) {   // shk.c:2309
     /* give feedback just for container+contents rather
        than for individiual contents even when those
        contents are known */
-    sightunseen = $c.i8($c.radd(ibill, indx).usedup === UndisclosedContainer || $c.radd(ibill, indx).usedup === KnownContainer ? 1 : 0);
+    sightunseen = $c.radd(ibill, indx).usedup === UndisclosedContainer || $c.radd(ibill, indx).usedup === KnownContainer ? 1 : 0;
     /* check for no-gold first, then for not-enough-gold; feedback is
        different for the two cases */
     if (await insufficient_funds(shkp, container, 0) || await insufficient_funds(shkp, container, totalcost)) {
@@ -2310,10 +2310,10 @@ async function buy_container(shkp, indx, ibillct, ibill) {   // shk.c:2309
            "a/an <container> and its contents"; temporarily set
            obj->unpaid to reflect the before-purchase state too */
         if (unpaidcontainer) {
-            $t3 = container.no_charge = (1) & 1, container.unpaid = ($t3) & 1;
+            $t3 = container.no_charge = 1, container.unpaid = ($t3) & 1;
         }
         await shk_names_obj(shkp, container, $c.lit("bought %s for %ld gold piece%s.%s"), totalcost, $c.lit(""));
-        $t4 = container.no_charge = (0) & 1, container.unpaid = ($t4) & 1;
+        $t4 = container.no_charge = 0, container.unpaid = ($t4) & 1;
     }
     return buycount ? 0 : 2;   /* we don't expect buycount to be 0 */
 }
@@ -2478,11 +2478,11 @@ async function inherits(shkp, numsk, croaked, silently) {   // shk.c:2577
             eshkp = shkp.mextra.eshk;
             take = FALSE;
             taken = FALSE;
-            uinshop = $c.i8($c.strchr(new $c.Ptr(u.ushops, 0), eshkp.shoproom) !== null ? 1 : 0);
+            uinshop = $c.strchr(new $c.Ptr(u.ushops, 0), eshkp.shoproom) !== null ? 1 : 0;
             /* not strictly consistent; affects messages and prevents next player
                (if bones are saved) from blundering into or being ambushed by an
                invisible shopkeeper */
-            $t1 = shkp.perminvis = (0) & 1, shkp.minvis = ($t1) & 1;
+            $t1 = shkp.perminvis = 0, shkp.minvis = ($t1) & 1;
             /* The simplifying principle is that first-come
                already took everything you had. */
             if (numsk > 1) {
@@ -2499,7 +2499,7 @@ async function inherits(shkp, numsk, croaked, silently) {   // shk.c:2577
             /* get one case out of the way: you die in the shop, the
                shopkeeper is peaceful, nothing stolen, nothing owed */
             if (uinshop && inhishop(shkp) && !eshkp.billct && !eshkp.robbed && !eshkp.debit && NOTANGRY(shkp) && !eshkp.following && u.ugrave_arise < LOW_PM) {
-                taken = $c.i8(gi.invent !== null ? 1 : 0);
+                taken = gi.invent !== null ? 1 : 0;
                 if (taken && !silently) {
                     await pline($c.lit("%s gratefully inherits all your possessions."), await Shknam(shkp));
                 }
@@ -2595,8 +2595,8 @@ function set_repo_loc(shkp) {   // shk.c:2682
        impossible "place_object: \"<item>\" off map <0,0>" when hero died
        in a gap in a shop's wall (in Minetown, so multiple shopkeepers in
        play, and prior to adding 'if (gr.repo.shopkeeper) return' above) */
-    ox = $c.i16(u.ux ? u.ux : u.ux0);
-    oy = $c.i16(u.ux ? u.uy : u.uy0);   /* [testing u.ux when setting oy is correct] */
+    ox = u.ux ? u.ux : u.ux0;
+    oy = u.ux ? u.uy : u.uy0;   /* [testing u.ux when setting oy is correct] */
     /* if you're not in this shk's shop room, or if you're in its doorway
        or entry spot or one of its walls (temporary gap or Passes_walls),
        then your gear gets dumped all the way inside */
@@ -2605,8 +2605,8 @@ function set_repo_loc(shkp) {   // shk.c:2682
            move in one more space */
         ox = eshkp.shk.x;
         oy = eshkp.shk.y;
-        ox = $c.i16(ox + sgn(ox - eshkp.shd.x | 0) | 0);
-        oy = $c.i16(oy + sgn(oy - eshkp.shd.y | 0) | 0);
+        ox = $c.i16(ox + sgn(ox - eshkp.shd.x) | 0);
+        oy = $c.i16(oy + sgn(oy - eshkp.shd.y) | 0);
     } else {
         /* already inside this shk's shop so use ox,oy as-is */
     }
@@ -2724,11 +2724,11 @@ export async function get_cost_of_shop_item(obj, nochrg) {   // shk.c:2809
         for (top = obj; top.where === OBJ.CONTAINED; top = top.v.v_ocontainer) {
             continue;
         }
-        freespot = $c.i8(top.where === OBJ.FLOOR && x[0] === shkp.mextra.eshk.shk.x && y[0] === shkp.mextra.eshk.shk.y ? 1 : 0);
+        freespot = top.where === OBJ.FLOOR && x[0] === shkp.mextra.eshk.shk.x && y[0] === shkp.mextra.eshk.shk.y ? 1 : 0;
         /* no_charge is only set for floor items inside shop proper;
            items on freespot are implicitly 'no charge' */
-        nochrg.set(0, top.where === OBJ.FLOOR && (obj.no_charge | 0 || freespot) ? 1 : 0);
-        if (carried(top) ? obj.unpaid | 0 : !nochrg.get(0)) {
+        nochrg.set(0, top.where === OBJ.FLOOR && (obj.no_charge || freespot) ? 1 : 0);
+        if (carried(top) ? obj.unpaid : !nochrg.get(0)) {
             per_unit_cost = await get_cost(obj, shkp);
             cost = $c.mul64(await get_pricing_units(obj), per_unit_cost);
         }
@@ -2766,7 +2766,7 @@ export function oid_price_adjustment(obj, oid) {   // shk.c:2864
     let res = 0, otyp = 0;
     res = 0;
     otyp = obj.otyp;
-    if (!(obj.dknown | 0 && objects[otyp].oc_name_known | 0) && (obj.oclass !== GEM_CLASS || (objects[otyp].oc_material | 0) !== GLASS)) {
+    if (!(obj.dknown && objects[otyp].oc_name_known) && (obj.oclass !== GEM_CLASS || objects[otyp].oc_material !== GLASS)) {
         res = $c.remu32(oid, 4) === 0 ? 1 : 0;   /* id%4 ==0 -> +1, ==1..3 -> 0 */
     }
     return res;
@@ -2798,12 +2798,12 @@ async function get_cost(obj, shkp) {   // shk.c:2877
     /* shopkeeper may notice if the player isn't very knowledgeable -
        especially when gem prices are concerned */
     if (!obj.dknown || !objects[obj.otyp].oc_name_known) {
-        if (obj.oclass === GEM_CLASS && (objects[obj.otyp].oc_material | 0) === GLASS) {
+        if (obj.oclass === GEM_CLASS && objects[obj.otyp].oc_material === GLASS) {
             /* get a value that's 'random' from game to game, but the
                same within the same game */
-            pseudorand = $c.i8($c.rem32($c.i32($G.ubirthday), obj.otyp) >= $c.div32(obj.otyp, 2) ? 1 : 0);
+            pseudorand = $c.rem32($c.i32($G.ubirthday), obj.otyp) >= $c.div32(obj.otyp, 2) ? 1 : 0;
             /* all gems are priced high - real or not */
-            switch (obj.otyp - FIRST_GLASS_GEM | 0) {
+            switch (obj.otyp - FIRST_GLASS_GEM) {
                 case 0:
                     /* white */
                     i = pseudorand ? DIAMOND : OPAL;
@@ -2914,11 +2914,11 @@ export async function contained_cost(obj, shkp, price, usell, unpaid_only) {   /
     /* pick_obj() removes item from floor, adds it to shop bill, then
        puts it in inventory; behave as if it is still on the floor
        during the add-to-bill portion of that situation */
-    on_floor = $c.i8(top.where === OBJ.FLOOR || top.where === OBJ.FREE ? 1 : 0);
+    on_floor = top.where === OBJ.FLOOR || top.where === OBJ.FREE ? 1 : 0;
     if (top.where === OBJ.FREE || !get_obj_location(top, new $c.Ptr(x, 0), new $c.Ptr(y, 0), 0)) {
         x[0] = u.ux, y[0] = u.uy;
     }
-    freespot = $c.i8(on_floor && x[0] === shkp.mextra.eshk.shk.x && y[0] === shkp.mextra.eshk.shk.y ? 1 : 0);
+    freespot = on_floor && x[0] === shkp.mextra.eshk.shk.x && y[0] === shkp.mextra.eshk.shk.y ? 1 : 0;
     /* price of contained objects; "top" container handled by caller */
     for (otmp = obj.cobj; otmp; otmp = otmp.nobj) {
         if (otmp.oclass === COIN_CLASS) {
@@ -2932,7 +2932,7 @@ export async function contained_cost(obj, shkp, price, usell, unpaid_only) {   /
             /* no_charge is only set for floor items (including
                contents of floor containers) inside shop proper;
                items on freespot are implicitly 'no charge' */
-            if (on_floor ? !otmp.no_charge && !freespot : otmp.unpaid | 0 || !unpaid_only) {
+            if (on_floor ? !otmp.no_charge && !freespot : otmp.unpaid || !unpaid_only) {
                 price = $c.add64(price, $c.mul64(await get_cost(otmp, shkp), await get_pricing_units(otmp)));
             }
         }
@@ -2956,7 +2956,7 @@ export function contained_gold(obj, even_if_unknown) {   // shk.c:3046
     for (otmp = obj.cobj; otmp; otmp = otmp.nobj) {
         if (otmp.oclass === COIN_CLASS) {
             value = $c.add64(value, otmp.quan);
-        } else if (Has_contents(otmp) && (otmp.cknown | 0 || even_if_unknown)) {
+        } else if (Has_contents(otmp) && (otmp.cknown || even_if_unknown)) {
             value = $c.add64(value, contained_gold(otmp, even_if_unknown));
         }
     }
@@ -2975,7 +2975,7 @@ function dropped_container(obj, shkp, sale) {   // shk.c:3064
             continue;
         }
         if (!otmp.unpaid && !(sale && saleable(shkp, otmp))) {
-            otmp.no_charge = (1) & 1;
+            otmp.no_charge = 1;
         }
         if (Has_contents(otmp)) {
             dropped_container(otmp, shkp, sale);
@@ -2993,7 +2993,7 @@ export function picked_container(obj) {   // shk.c:3085
             continue;
         }
         if (otmp.no_charge) {
-            otmp.no_charge = (0) & 1;
+            otmp.no_charge = 0;
         }
         if (Has_contents(otmp)) {
             picked_container(otmp);
@@ -3016,7 +3016,7 @@ async function special_stock(obj, shkp, quietly) {   // shk.c:3103
                 } else {
                     await verbalize($c.lit("No thanks, I'd hang onto that if I were you."));
                     if (obj.spe < 7) {
-                        await verbalize($c.lit("You'll need %d%s candle%s to go along with it."), 7 - obj.spe | 0, obj.spe > 0 ? $c.lit(" more") : $c.lit(""), plur(7 - obj.spe | 0));
+                        await verbalize($c.lit("You'll need %d%s candle%s to go along with it."), 7 - obj.spe, obj.spe > 0 ? $c.lit(" more") : $c.lit(""), plur(7 - obj.spe));
                     }
                     /* [what if hero is already carrying enough candles?
                        should Izchak explain how to attach them instead?] */
@@ -3057,8 +3057,8 @@ async function set_cost(obj, shkp) {   // shk.c:3148
     if (!obj.dknown || !objects[obj.otyp].oc_name_known) {
         if (obj.oclass === GEM_CLASS) {
             /* different shop keepers give different prices */
-            if ((objects[obj.otyp].oc_material | 0) === GEMSTONE || (objects[obj.otyp].oc_material | 0) === GLASS) {
-                tmp = $c.remu32((obj.otyp - FIRST_REAL_GEM | 0) >>> 0, 6 - $c.remu32(shkp.m_id, 3) >>> 0);
+            if (objects[obj.otyp].oc_material === GEMSTONE || objects[obj.otyp].oc_material === GLASS) {
+                tmp = $c.remu32(obj.otyp - FIRST_REAL_GEM >>> 0, 6 - $c.remu32(shkp.m_id, 3) >>> 0);
                 tmp = $c.mul64($c.add64(tmp, 3), obj.quan);
                 divisor = 1;
             }
@@ -3178,7 +3178,7 @@ export async function unpaid_cost(unp_obj, cost_type) {   // shk.c:3260
         }
     }
     /* onbill() gave no message if unexpected problem occurred */
-    if (!shkp || unp_obj.unpaid | 0 && !bp) {
+    if (!shkp || unp_obj.unpaid && !bp) {
         await impossible($c.lit("unpaid_cost: object wasn't on any bill."));
     }
     return amt;
@@ -3239,7 +3239,7 @@ async function add_one_tobill(obj, dummy, shkp$in) {   // shk.c:3309
         obj.oextra.omid = obj.owt;
     }
     eshkp.billct = eshkp.billct + 1 | 0;
-    obj.unpaid = (1) & 1;
+    obj.unpaid = 1;
     record_price_quote(obj.otyp, $c.u64(bp.price), TRUE);
 }
 /**
@@ -3259,9 +3259,9 @@ async function add_to_billobjs(obj) {   // shk.c:3366
     /* if hero drinks a shop-owned potion, it will have been flagged
        in_use by dodrink/dopotion but isn't being used up yet because
        it stays on the bill; only object sanity checking actually cares */
-    obj.in_use = (0) & 1;
+    obj.in_use = 0;
     /* ... same for bypass by destroy_items */
-    obj.bypass = (0) & 1;
+    obj.bypass = 0;
 }
 /* recursive billing of objects within containers. */
 /**
@@ -3301,7 +3301,7 @@ async function bill_box_content(obj, ininv, dummy, shkp) {   // shk.c:3387
 async function shk_names_obj(shkp, obj, fmt, amt, arg) {   // shk.c:3413
     let obj_name = null, fmtbuf = new Int8Array(256), was_unknown = 0, $t1;
     /* "%s %ld %s %s", doname(obj), amt, plur(amt), arg */
-    was_unknown = $c.i8(!obj.dknown ? 1 : 0);
+    was_unknown = !obj.dknown ? 1 : 0;
     await observe_object(obj);
     /* Use real name for ordinary weapons/armor, and spell-less
      * scrolls/books (that is, blank and mail), but only if the
@@ -3352,17 +3352,17 @@ export async function billable(shkpp, obj, roomno, reset_nocharge) {   // shk.c:
     /* outer container might be marked no_charge but still have contents
        which should be charged for; clear no_charge when picking things up */
     if (obj.no_charge) {
-        if (!Has_contents(obj) || contained_gold(obj, TRUE) === 0 && await contained_cost(obj, shkp, 0, FALSE, $c.i8(!reset_nocharge ? 1 : 0)) === 0) {
+        if (!Has_contents(obj) || contained_gold(obj, TRUE) === 0 && await contained_cost(obj, shkp, 0, FALSE, !reset_nocharge ? 1 : 0) === 0) {
             shkp = null;   /* not billable */
         }
         if (reset_nocharge && !shkp && obj.oclass !== COIN_CLASS) {
-            obj.no_charge = (0) & 1;
+            obj.no_charge = 0;
             if (Has_contents(obj)) {
                 picked_container(obj);   /* clear no_charge */
             }
         }
     }
-    return $c.i8(shkp ? TRUE : FALSE);
+    return shkp ? TRUE : FALSE;
 }
 /**
  * @param {$T.obj | null} obj struct obj *
@@ -3387,15 +3387,15 @@ export async function addtobill(obj, ininv, dummy, silent) {   // shk.c:3490
         return;
     }
     ltmp = cltmp = gltmp = 0;
-    container = $c.i8(Has_contents(obj));
+    container = Has_contents(obj);
     if (!obj.no_charge) {
         ltmp = await get_cost(obj, shkp[0]);
         if (obj.globby) {
             ltmp = $c.mul64(ltmp, await get_pricing_units(obj));
         }
     }
-    if (obj.no_charge | 0 && !container) {
-        obj.no_charge = (0) & 1;
+    if (obj.no_charge && !container) {
+        obj.no_charge = 0;
         return;
     }
     if (container) {
@@ -3416,7 +3416,7 @@ export async function addtobill(obj, ininv, dummy, silent) {   // shk.c:3490
             }
         }
         if (obj.no_charge) {
-            obj.no_charge = (0) & 1;
+            obj.no_charge = 0;
         }
         contentscount = count_unpaid(obj.cobj);
     } else {
@@ -3445,13 +3445,13 @@ export async function addtobill(obj, ininv, dummy, silent) {   // shk.c:3490
             }
             obj.quan = 1;   /* fool xname() into giving singular */
             set_voice(shkp[0], 0, 80, 0);
-            await pline($c.lit("%s %ld %s %s %s%s.\""), new $c.Ptr(buf, 0), ltmp, await currency(ltmp), save_quan > 1 ? $c.lit("per") : contentscount && !obj.unpaid ? $c.lit("for the contents of this") : $c.lit("for this"), await xname(obj), contentscount && obj.unpaid | 0 ? new $c.Ptr(and_its_contents, 0) : $c.lit(""));
+            await pline($c.lit("%s %ld %s %s %s%s.\""), new $c.Ptr(buf, 0), ltmp, await currency(ltmp), save_quan > 1 ? $c.lit("per") : contentscount && !obj.unpaid ? $c.lit("for the contents of this") : $c.lit("for this"), await xname(obj), contentscount && obj.unpaid ? new $c.Ptr(and_its_contents, 0) : $c.lit(""));
             obj.quan = save_quan;
         }
     } else if (!silent) {
         if (ltmp) {
             set_voice(shkp[0], 0, 80, 0);
-            await pline_The($c.lit("list price of %s%s%s is %ld %s%s."), contentscount && !obj.unpaid ? new $c.Ptr(the_contents_of, 0) : $c.lit(""), await the(await xname(obj)), contentscount && obj.unpaid | 0 ? new $c.Ptr(and_its_contents, 0) : $c.lit(""), ltmp, await currency(ltmp), obj.quan > 1 ? $c.lit(" each") : $c.lit(""));
+            await pline_The($c.lit("list price of %s%s%s is %ld %s%s."), contentscount && !obj.unpaid ? new $c.Ptr(the_contents_of, 0) : $c.lit(""), await the(await xname(obj)), contentscount && obj.unpaid ? new $c.Ptr(and_its_contents, 0) : $c.lit(""), ltmp, await currency(ltmp), obj.quan > 1 ? $c.lit(" each") : $c.lit(""));
         } else {
             await pline($c.lit("%s does not notice."), await Shknam(shkp[0]));
         }
@@ -3463,7 +3463,7 @@ export async function addtobill(obj, ininv, dummy, silent) {   // shk.c:3490
 function append_honorific(buf) {   // shk.c:3602
     /* (chooses among [0]..[3] normally; [1]..[4] after the
        Wizard has been killed or invocation ritual performed) */
-    $c.strcat(buf, append_honorific$honored[rn2(4) + (u.uevent.udemigod | 0) | 0]);
+    $c.strcat(buf, append_honorific$honored[rn2(4) + u.uevent.udemigod | 0]);
     if (is_vampire(gy.youmonst.data)) {
         $c.strcat(buf, flags.female ? $c.lit(" dark lady") : $c.lit(" dark lord"));
     } else if (u.umonnum !== u.umonster ? $c.andu64(gy.youmonst.data.mflags2, M2.ELF) !== 0 : gu.urace.mnum === PM.ELF) {
@@ -3498,7 +3498,7 @@ export async function splitbill(obj, otmp) {   // shk.c:3623
     }
     bp.bquan = $c.sub64(bp.bquan, otmp.quan);
     if (shkp.mextra.eshk.billct === BILLSZ) {
-        otmp.unpaid = (0) & 1;
+        otmp.unpaid = 0;
     } else {
         tmp = bp.price;
         bp = $c.radd(shkp.mextra.eshk.bill_p, shkp.mextra.eshk.billct);
@@ -3517,7 +3517,7 @@ export async function splitbill(obj, otmp) {   // shk.c:3623
 async function sub_one_frombill(obj, shkp) {   // shk.c:3661
     let bp = null, eshkp = null, otmp = null, $t1, $t2, $t3;
     if ((bp = await onbill(obj, shkp, FALSE)) !== null) {
-        obj.unpaid = (0) & 1;
+        obj.unpaid = 0;
         if (bp.bquan > obj.quan) {
             otmp = await newobj();
             otmp.$copyFrom(obj);
@@ -3536,7 +3536,7 @@ async function sub_one_frombill(obj, shkp) {   // shk.c:3661
         return;
     } else if (obj.unpaid) {
         await impossible($c.lit("sub_one_frombill: unpaid object not on bill"));
-        obj.unpaid = (0) & 1;
+        obj.unpaid = 0;
     }
 }
 /* recursive check of unpaid objects within nested containers. */
@@ -3592,7 +3592,7 @@ async function stolen_container(obj, shkp$in, price, ininv) {   // shk.c:3713
         }
         if (billamt) {
             price = $c.add64(price, billamt);
-        } else if (ininv ? otmp.unpaid | 0 : !otmp.no_charge) {
+        } else if (ininv ? otmp.unpaid : !otmp.no_charge) {
             price = $c.add64(price, $c.mul64(await get_pricing_units(otmp), await get_cost(otmp, shkp[0])));
         }
         if (Has_contents(otmp)) {
@@ -3622,7 +3622,7 @@ export async function stolen_value(obj, x, y, peaceful, silent) {   // shk.c:375
         roomno = in_rooms(x, y, SHOPBASE).get(0);
     }
     /* gather information for message(s) prior to manipulating bill */
-    was_unpaid = $c.i8(obj.unpaid | 0 ? TRUE : FALSE);
+    was_unpaid = obj.unpaid ? TRUE : FALSE;
     if (Has_contents(obj)) {
         c_count = await count_contents(obj, TRUE, FALSE, TRUE, FALSE);
         u_count = await count_contents(obj, TRUE, FALSE, FALSE, FALSE);
@@ -3650,7 +3650,7 @@ export async function stolen_value(obj, x, y, peaceful, silent) {   // shk.c:375
             value = $c.add64(value, $c.mul64(await get_pricing_units(obj), await get_cost(obj, shkp[0])));
         }
         if (Has_contents(obj)) {
-            ininv = $c.i8(obj.where === OBJ.INVENT || obj.where === OBJ.FREE ? 1 : 0);
+            ininv = obj.where === OBJ.INVENT || obj.where === OBJ.FREE ? 1 : 0;
             value = $c.add64(value, await stolen_container(obj, shkp[0], 0, ininv));
             if (!ininv) {
                 gvalue = $c.add64(gvalue, contained_gold(obj, TRUE));
@@ -3662,7 +3662,7 @@ export async function stolen_value(obj, x, y, peaceful, silent) {   // shk.c:375
     }
     value = $c.add64(value, gvalue);
     if (peaceful) {
-        credit_use = $c.i8(!!shkp[0].mextra.eshk.credit ? 1 : 0);
+        credit_use = !!shkp[0].mextra.eshk.credit ? 1 : 0;
         value = await check_credit(value, shkp[0]);
         /* 'peaceful' affects general treatment, but doesn't affect
          * the fact that other code expects that all charges after the
@@ -3754,7 +3754,7 @@ export function sellobj_state(deliberate) {   // shk.c:3913
        This retains the old pre-query risk that slippery fingers while in
        shops entailed:  you drop it, you've lost it.
      */
-    gs.sell_response = $c.i8(deliberate !== SELL.NORMAL ? 0 : 97);
+    gs.sell_response = deliberate !== SELL.NORMAL ? 0 : 97;
     gs.sell_how = deliberate;
     ga.auto_credit = FALSE;
 }
@@ -3770,8 +3770,8 @@ export async function sellobj(obj, x, y) {   // shk.c:3927
     cltmp = 0;
     gltmp = 0;
     cgold = FALSE;
-    container = $c.i8(Has_contents(obj));
-    isgold = $c.i8(obj.oclass === COIN_CLASS ? 1 : 0);
+    container = Has_contents(obj);
+    isgold = obj.oclass === COIN_CLASS ? 1 : 0;
     only_partially_your_contents = FALSE;
     if (!new $c.Ptr(u.ushops, 0).get(0)) {   /* do cheapest exclusion test first */
         return;
@@ -3783,7 +3783,7 @@ export async function sellobj(obj, x, y) {   // shk.c:3927
     if (!await costly_spot(x, y)) {
         return;
     }
-    if (obj.unpaid | 0 && !container && !isgold) {
+    if (obj.unpaid && !container && !isgold) {
         await sub_one_frombill(obj, shkp);
         return;
     }
@@ -3792,7 +3792,7 @@ export async function sellobj(obj, x, y) {   // shk.c:3927
         cltmp = await contained_cost(obj, shkp, cltmp, TRUE, FALSE);
         /* find the value of contained gold */
         gltmp = $c.add64(gltmp, contained_gold(obj, TRUE));
-        cgold = $c.i8(gltmp > 0 ? 1 : 0);
+        cgold = gltmp > 0 ? 1 : 0;
     }
     saleitem = saleable(shkp, obj);
     if (!isgold && !obj.unpaid && saleitem) {
@@ -3818,13 +3818,13 @@ export async function sellobj(obj, x, y) {   // shk.c:3927
         if (container) {
             dropped_container(obj, shkp, FALSE);
             if (!obj.unpaid) {
-                obj.no_charge = (1) & 1;
+                obj.no_charge = 1;
             }
             if (unpaid) {
                 await subfrombill(obj, shkp);
             }
         } else {
-            obj.no_charge = (1) & 1;
+            obj.no_charge = 1;
         }
         if (!unpaid && gs.sell_how !== SELL.DONTSELL && !await special_stock(obj, shkp, FALSE)) {
             await pline($c.lit("%s seems uninterested."), await Shknam(shkp));
@@ -3858,7 +3858,7 @@ export async function sellobj(obj, x, y) {   // shk.c:3927
                     dropped_container(obj, shkp, FALSE);
                 }
                 if (!obj.unpaid) {
-                    obj.no_charge = (1) & 1;
+                    obj.no_charge = 1;
                 }
                 await subfrombill(obj, shkp);
             }
@@ -3870,7 +3870,7 @@ export async function sellobj(obj, x, y) {   // shk.c:3927
         if (container) {
             dropped_container(obj, shkp, FALSE);
         }
-        obj.no_charge = (1) & 1;
+        obj.no_charge = 1;
         return;
     }
     shkmoney = money_cnt(shkp.minvent);
@@ -3906,12 +3906,12 @@ export async function sellobj(obj, x, y) {   // shk.c:3927
                 dropped_container(obj, shkp, FALSE);
             }
             if (!obj.unpaid) {
-                obj.no_charge = (1) & 1;
+                obj.no_charge = 1;
             }
             await subfrombill(obj, shkp);
         }
     } else {
-        short_funds = $c.i8(offer > shkmoney ? 1 : 0);
+        short_funds = offer > shkmoney ? 1 : 0;
         if (short_funds) {
             offer = shkmoney;
         }
@@ -3922,7 +3922,7 @@ export async function sellobj(obj, x, y) {   // shk.c:3927
                 shksc = await count_contents(obj, TRUE, TRUE, FALSE, TRUE);
                 /* number of items owned by you (total - shksc) */
                 yourc = $c.sub64(await count_contents(obj, TRUE, TRUE, TRUE, TRUE), shksc);
-                only_partially_your_contents = $c.i8(shksc && yourc ? 1 : 0);
+                only_partially_your_contents = shksc && yourc ? 1 : 0;
             }
             /*
                "<shk> offers * for ..." query formatting.
@@ -3959,8 +3959,8 @@ export async function sellobj(obj, x, y) {   // shk.c:3927
                when container's contents are unknown, plural "items"
                should be used to not give away information.
              */
-            $c.sprintf(new $c.Ptr(qbuf$2, 0), $c.lit("%s offers%s %ld gold piece%s for %s%s "), await Shknam(shkp), short_funds ? $c.lit(" only") : $c.lit(""), offer, offer === 1 ? $c.lit("") : $c.lit("s"), cltmp && !ltmp ? yourc === 1 ? $c.lit("your item in ") : $c.lit("your items in ") : $c.lit(""), obj.unpaid | 0 ? $c.lit("the") : $c.lit("your"));
-            one = $c.i8(!ltmp ? yourc === 1 ? 1 : 0 : obj.quan === 1 && !cltmp ? 1 : 0);
+            $c.sprintf(new $c.Ptr(qbuf$2, 0), $c.lit("%s offers%s %ld gold piece%s for %s%s "), await Shknam(shkp), short_funds ? $c.lit(" only") : $c.lit(""), offer, offer === 1 ? $c.lit("") : $c.lit("s"), cltmp && !ltmp ? yourc === 1 ? $c.lit("your item in ") : $c.lit("your items in ") : $c.lit(""), obj.unpaid ? $c.lit("the") : $c.lit("your"));
+            one = !ltmp ? yourc === 1 ? 1 : 0 : obj.quan === 1 && !cltmp ? 1 : 0;
             $c.sprintf(new $c.Ptr(qsfx, 0), $c.lit("%s.  Sell %s?"), cltmp && ltmp ? only_partially_your_contents ? yourc === 1 ? $c.lit(" and item inside") : $c.lit(" and items inside") : new $c.Ptr(and_its_contents, 0) : $c.lit(""), one ? $c.lit("it") : $c.lit("them"));
             record_price_quote(obj.otyp, $c.u64($c.div64(offer, obj.quan)), FALSE);
             await safe_qbuf(new $c.Ptr(qbuf$2, 0), new $c.Ptr(qbuf$2, 0), new $c.Ptr(qsfx, 0), obj, xname, simpleonames, one ? $c.lit("that") : $c.lit("those"));
@@ -3976,7 +3976,7 @@ export async function sellobj(obj, x, y) {   // shk.c:3927
                     dropped_container(obj, shkp, FALSE);
                 }
                 if (!obj.unpaid) {
-                    obj.no_charge = (1) & 1;
+                    obj.no_charge = 1;
                 }
                 await subfrombill(obj, shkp);
                 break;
@@ -3988,7 +3988,7 @@ export async function sellobj(obj, x, y) {   // shk.c:3927
                     dropped_container(obj, shkp, TRUE);
                 }
                 if (!obj.unpaid && !saleitem) {
-                    obj.no_charge = (1) & 1;
+                    obj.no_charge = 1;
                 }
                 await subfrombill(obj, shkp);
                 await pay($c.neg64(offer), shkp);
@@ -4109,7 +4109,7 @@ async function corpsenm_price_adj(obj) {   // shk.c:4275
         if (unique_corpstat(ptr)) {
             tmp = $c.add64(tmp, 50);
         }
-        val = 1 > Math.imul(ptr.mlevel - 1 | 0, 2) ? 1 : Math.imul(ptr.mlevel - 1 | 0, 2);
+        val = 1 > Math.imul(ptr.mlevel - 1, 2) ? 1 : Math.imul(ptr.mlevel - 1, 2);
         if (obj.otyp === CORPSE) {
             val = $c.add64(val, 1 > $c.div32(ptr.cnutrit, 30) ? 1 : $c.div32(ptr.cnutrit, 30));
         }
@@ -4231,7 +4231,7 @@ export async function add_damage(x, y, cost) {   // shk.c:4399
     tmp_dam.place.y = y;
     tmp_dam.cost = cost;
     tmp_dam.typ = svl.level.locations[x][y].typ;
-    tmp_dam.flags = $c.u8(svl.level.locations[x][y].flags);
+    tmp_dam.flags = svl.level.locations[x][y].flags;
     tmp_dam.next = svl.level.damagelist;
     svl.level.damagelist = tmp_dam;
     /* If player saw damage, display walls post-repair as walls, not stone */
@@ -4282,7 +4282,7 @@ function repairable_damage(dam, shkp) {   // shk.c:4452
         if (u_at(x, y)) {
             return FALSE;
         }
-        if ((mtmp = svl.level.monsters[x][y]) !== null && mtmp.mtrapped | 0) {
+        if ((mtmp = svl.level.monsters[x][y]) !== null && mtmp.mtrapped) {
             return FALSE;
         }
     }
@@ -4372,7 +4372,7 @@ async function shk_fixes_damage(shkp) {   // shk.c:4556
     if (!dam) {
         return;
     }
-    shk_closeby = $c.i8(dist2(shkp.mx, shkp.my, u.ux, u.uy) <= 16 ? 1 : 0);
+    shk_closeby = dist2(shkp.mx, shkp.my, u.ux, u.uy) <= 16 ? 1 : 0;
     if (canseemon(shkp)) {
         await pline($c.lit("%s whispers %s."), await Shknam(shkp), shk_closeby ? $c.lit("an incantation") : $c.lit("something"));
     } else if (!Deaf() && shk_closeby) {
@@ -4489,7 +4489,7 @@ async function litter_scatter(litter, x, y, shkp) {   // shk.c:4622
                     /* not strictly necessary; destination is inside a
                        shop so existing no_charge remains relevant */
                     if (!await costly_spot($c.i16(ix), $c.i16(iy)) && !costly_adjacent(shkp, $c.i16(ix), $c.i16(iy))) {
-                        otmp.no_charge = (0) & 1;
+                        otmp.no_charge = 0;
                     }
                 }
                 await remove_object(otmp);
@@ -4532,21 +4532,21 @@ async function repair_damage(shkp, tmp_dam, catchup) {   // shk.c:4732
     }
     x = tmp_dam.place.x;
     y = tmp_dam.place.y;
-    seeit = $c.i8(cansee(x, y));
+    seeit = cansee(x, y);
     ttmp = t_at(x, y);
     if (ttmp) {
-        switch (ttmp.ttyp | 0) {
+        switch (ttmp.ttyp) {
             case LANDMINE:
             case BEAR_TRAP:
                 /* convert to an object */
-                otmp = await mksobj((ttmp.ttyp | 0) === LANDMINE ? LAND_MINE : BEARTRAP, TRUE, FALSE);
+                otmp = await mksobj(ttmp.ttyp === LANDMINE ? LAND_MINE : BEARTRAP, TRUE, FALSE);
                 otmp.quan = 1;
                 $t1 = await weight(otmp) >>> 0, otmp.owt = $t1;
                 if (!catchup) {
                     if (canseemon(shkp) && dist2(x, y, shkp.mx, shkp.my) <= 2) {
                         await pline($c.lit("%s untraps %s."), await Shknam(shkp), await ansimpleoname(otmp));
-                    } else if (ttmp.tseen | 0 && cansee(ttmp.tx, ttmp.ty)) {
-                        await pline($c.lit("The %s vanishes."), trapname(ttmp.ttyp | 0, TRUE));
+                    } else if (ttmp.tseen && cansee(ttmp.tx, ttmp.ty)) {
+                        await pline($c.lit("The %s vanishes."), trapname(ttmp.ttyp, TRUE));
                     }
                 }
                 await mpickobj(shkp, otmp);
@@ -4554,13 +4554,13 @@ async function repair_damage(shkp, tmp_dam, catchup) {   // shk.c:4732
             case HOLE:
             case PIT:
             case SPIKED_PIT:
-                if (!catchup && ttmp.tseen | 0 && cansee(ttmp.tx, ttmp.ty)) {
-                    await pline($c.lit("The %s is filled in."), trapname(ttmp.ttyp | 0, TRUE));
+                if (!catchup && ttmp.tseen && cansee(ttmp.tx, ttmp.ty)) {
+                    await pline($c.lit("The %s is filled in."), trapname(ttmp.ttyp, TRUE));
                 }
                 break;
             default:
-                if (!catchup && ttmp.tseen | 0 && cansee(ttmp.tx, ttmp.ty)) {
-                    await pline($c.lit("The %s vanishes."), trapname(ttmp.ttyp | 0, TRUE));
+                if (!catchup && ttmp.tseen && cansee(ttmp.tx, ttmp.ty)) {
+                    await pline($c.lit("The %s vanishes."), trapname(ttmp.ttyp, TRUE));
                 }
                 break;
         }
@@ -4573,7 +4573,7 @@ async function repair_damage(shkp, tmp_dam, catchup) {   // shk.c:4732
             disposition = 3;
         }
     }
-    if (IS_ROOM(tmp_dam.typ) || tmp_dam.typ === svl.level.locations[x][y].typ && (!IS_DOOR(tmp_dam.typ) || (svl.level.locations[x][y].flags | 0) > D.BROKEN)) {   /* no terrain fix necessary (trap removal or manually repaired) */
+    if (IS_ROOM(tmp_dam.typ) || tmp_dam.typ === svl.level.locations[x][y].typ && (!IS_DOOR(tmp_dam.typ) || svl.level.locations[x][y].flags > D.BROKEN)) {   /* no terrain fix necessary (trap removal or manually repaired) */
         return disposition;
     }
     if (closed_door(x, y)) {
@@ -4711,7 +4711,7 @@ export async function shk_move(shkp) {   // shk.c:4880
     appr = 1;
     gtx = eshkp.shk.x;
     gty = eshkp.shk.y;
-    satdoor = $c.i8(gtx === omx && gty === omy ? 1 : 0);
+    satdoor = gtx === omx && gty === omy ? 1 : 0;
     if (eshkp.following || (z = holetime()) >= 0 && Math.imul(z, z) <= udist) {
         /* [This distance check used to apply regardless of
             whether the shk was following, but that resulted in
@@ -4727,7 +4727,7 @@ export async function shk_move(shkp) {   // shk.c:4880
         gty = u.uy;
     } else if (ANGRY(shkp)) {
         /* Move towards the hero if the shopkeeper can see him. */
-        if (shkp.mcansee | 0 && ((!((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked) || $c.andu64(shkp.data.mflags1, M1.SEE_INVIS) !== 0) && !u.uinwater && (gv.viz_array.get(shkp.my).get(shkp.mx) & COULD_SEE) !== 0)) {
+        if (shkp.mcansee && ((!((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked) || $c.andu64(shkp.data.mflags1, M1.SEE_INVIS) !== 0) && !u.uinwater && (gv.viz_array.get(shkp.my).get(shkp.mx) & COULD_SEE) !== 0)) {
             gtx = u.ux;
             gty = u.uy;
         }
@@ -4736,15 +4736,15 @@ export async function shk_move(shkp) {   // shk.c:4880
         if (Invis() || u.usteed) {
             avoid = FALSE;
         } else {
-            uondoor = $c.i8(eshkp.shd.x === u.ux && eshkp.shd.y === u.uy ? 1 : 0);
+            uondoor = eshkp.shd.x === u.ux && eshkp.shd.y === u.uy ? 1 : 0;
             if (uondoor) {
-                badinv = $c.i8(carrying(PICK_AXE) || carrying(DWARVISH_MATTOCK) || Fast() && (sobj_at(PICK_AXE, u.ux, u.uy) || sobj_at(DWARVISH_MATTOCK, u.ux, u.uy)) ? 1 : 0);
+                badinv = carrying(PICK_AXE) || carrying(DWARVISH_MATTOCK) || Fast() && (sobj_at(PICK_AXE, u.ux, u.uy) || sobj_at(DWARVISH_MATTOCK, u.ux, u.uy)) ? 1 : 0;
                 if (satdoor && badinv) {
                     return 0;
                 }
-                avoid = $c.i8(!badinv ? 1 : 0);
+                avoid = !badinv ? 1 : 0;
             } else {
-                avoid = $c.i8(new $c.Ptr(u.ushops, 0).get(0) && distu(gtx, gty) > 8 ? 1 : 0);
+                avoid = new $c.Ptr(u.ushops, 0).get(0) && distu(gtx, gty) > 8 ? 1 : 0;
                 badinv = FALSE;
             }
             if ((!eshkp.robbed && !eshkp.billct && !eshkp.debit || avoid) && dist2(omx, omy, gtx, gty) < 3) {
@@ -4786,7 +4786,7 @@ export async function after_shk_move(shkp) {   // shk.c:4997
  * @returns {number} boolean
  */
 export function is_fshk(mtmp) {   // shk.c:5012
-    return $c.i8(mtmp.isshk | 0 && mtmp.mextra.eshk.following ? 1 : 0);
+    return mtmp.isshk && mtmp.mextra.eshk.following ? 1 : 0;
 }
 /* You are digging in the shop. */
 /**
@@ -4907,7 +4907,7 @@ async function makekops(mm) {   // shk.c:5113
 async function getcad(shkp, dmgstr, x, y, uinshp, animal, pursue) {   // shk.c:5138
     let dugwall = 0;
     /* wand */
-    dugwall = $c.i8(!$c.strcmp(dmgstr, $c.lit("dig into")) || !$c.strcmp(dmgstr, $c.lit("damage")) ? 1 : 0);   /* pick-axe */
+    dugwall = !$c.strcmp(dmgstr, $c.lit("dig into")) || !$c.strcmp(dmgstr, $c.lit("damage")) ? 1 : 0;   /* pick-axe */
     if (muteshk(shkp)) {
         if (animal && !helpless(shkp)) {
             await yelp(shkp);
@@ -4936,7 +4936,7 @@ async function getcad(shkp, dmgstr, x, y, uinshp, animal, pursue) {   // shk.c:5
 export async function pay_for_damage(dmgstr, cant_mollify) {   // shk.c:5174
     let shkp = null, shops_affected = new Int8Array(5), uinshp = 0, qbuf = new Int8Array(80), x = 0, y = 0, animal = 0, pursue = 0, tmp_dam = null, appear_here = null, cost_of_damage = 0, nearest_shk = 0, nearest_damage = 0, picks = 0, shp = null, tmp_shk = null, shk_distance = 0, damage_distance = 0, is_seen = 0, was_seen = 0, was_outside = 0, sx = 0, sy = 0;
     shkp = null;
-    uinshp = $c.i8(new $c.Ptr(u.ushops, 0).get(0) !== 0 ? 1 : 0);
+    uinshp = new $c.Ptr(u.ushops, 0).get(0) !== 0 ? 1 : 0;
     appear_here = null;
     cost_of_damage = 0;
     nearest_shk = ROWNO * ROWNO + COLNO * COLNO;
@@ -4983,7 +4983,7 @@ export async function pay_for_damage(dmgstr, cant_mollify) {   // shk.c:5174
     if (!cost_of_damage || !shkp) {
         return;
     }
-    animal = $c.i8(shkp.data.msound <= MS.ANIMAL ? 1 : 0);
+    animal = shkp.data.msound <= MS.ANIMAL ? 1 : 0;
     pursue = FALSE;
     x = appear_here.place.x;
     y = appear_here.place.y;
@@ -5045,7 +5045,7 @@ export async function pay_for_damage(dmgstr, cant_mollify) {   // shk.c:5174
     $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("%sYou did %ld %s worth of damage!%s  Pay?"), !animal ? await cad(TRUE) : $c.lit(""), cost_of_damage, await currency(cost_of_damage), !animal ? $c.lit("\"") : $c.lit(""));
     if (await y_n(new $c.Ptr(qbuf, 0)) !== 110) {
         was_seen = $c.i8(canseemon(shkp));
-        was_outside = $c.i8(!inhishop(shkp) ? 1 : 0);
+        was_outside = !inhishop(shkp) ? 1 : 0;
         sx = shkp.mx;
         sy = shkp.my;
         cost_of_damage = await check_credit(cost_of_damage, shkp);
@@ -5095,7 +5095,7 @@ export async function costly_spot(x, y) {   // shk.c:5350
         return FALSE;
     }
     eshkp = shkp.mextra.eshk;
-    return $c.i8(inside_shop(x, y) && !(x === eshkp.shk.x && y === eshkp.shk.y) ? 1 : 0);
+    return inside_shop(x, y) && !(x === eshkp.shk.x && y === eshkp.shk.y) ? 1 : 0;
 }
 /* called by sanity checking when an unpaid or no_charge item is not at a
    costly_spot; it might still be within the boundary of the shop; if so,
@@ -5114,7 +5114,7 @@ export function costly_adjacent(shkp, x, y) {   // shk.c:5369
     eshkp = shkp.mextra.eshk;
     /* adjacent if <x,y> is a shop wall spot, including door;
        also treat "free spot" one step inside the door as adjacent */
-    return $c.i8(svl.level.locations[x][y].edge | 0 || x === eshkp.shk.x && y === eshkp.shk.y ? 1 : 0);
+    return svl.level.locations[x][y].edge || x === eshkp.shk.x && y === eshkp.shk.y ? 1 : 0;
 }
 /* called by dotalk(sounds.c) when #chatting; returns obj if location
    contains shop goods and shopkeeper is willing & able to speak */
@@ -5160,8 +5160,8 @@ export async function price_quote(first_obj) {   // shk.c:5406
         if (otmp.oclass === COIN_CLASS) {
             continue;
         }
-        cost = otmp.no_charge | 0 || $c.peq(otmp, $G.uball) || $c.peq(otmp, $G.uchain) ? 0 : await get_cost(otmp, shkp);
-        contentsonly = $c.i8(!cost ? 1 : 0);
+        cost = otmp.no_charge || $c.peq(otmp, $G.uball) || $c.peq(otmp, $G.uchain) ? 0 : await get_cost(otmp, shkp);
+        contentsonly = !cost ? 1 : 0;
         if (Has_contents(otmp)) {
             cost = $c.add64(cost, await contained_cost(otmp, shkp, 0, FALSE, FALSE));
         }
@@ -5214,7 +5214,7 @@ function shk_embellish(itm, cost) {   // shk.c:5468
                 if (o === FOOD_CLASS) {
                     return $c.lit(", gourmets' delight!");
                 }
-                if (objects[itm.otyp].oc_name_known | 0 ? objects[itm.otyp].oc_magic | 0 : o === AMULET_CLASS || o === RING_CLASS || o === WAND_CLASS || o === POTION_CLASS || o === SCROLL_CLASS || o === SPBOOK_CLASS) {
+                if (objects[itm.otyp].oc_name_known ? objects[itm.otyp].oc_magic : o === AMULET_CLASS || o === RING_CLASS || o === WAND_CLASS || o === POTION_CLASS || o === SCROLL_CLASS || o === SPBOOK_CLASS) {
                     return $c.lit(", painstakingly developed!");
                 }
                 return $c.lit(", superb craftsmanship!");
@@ -5383,7 +5383,7 @@ async function cost_per_charge(shkp, otmp, altusage) {   // shk.c:5627
  */
 export async function check_unpaid_usage(otmp, altusage) {   // shk.c:5688
     let shkp = null, fmt = null, arg1 = null, arg2 = null, buf = new Int8Array(256), tmp = 0;
-    if (!otmp.unpaid || !new $c.Ptr(u.ushops, 0).get(0) || otmp.spe <= 0 && objects[otmp.otyp].oc_charged | 0) {
+    if (!otmp.unpaid || !new $c.Ptr(u.ushops, 0).get(0) || otmp.spe <= 0 && objects[otmp.otyp].oc_charged) {
         return;
     }
     shkp = await shop_keeper(new $c.Ptr(u.ushops, 0).get(0));
@@ -5520,7 +5520,7 @@ export async function block_door(x, y) {   // shk.c:5791
  */
 export async function block_entry(x, y) {   // shk.c:5826
     let sx = 0, sy = 0, roomno = 0, shkp = null;
-    if (!(svl.level.locations[u.ux][u.uy].typ === DOOR && (svl.level.locations[u.ux][u.uy].flags | 0) === D.BROKEN)) {
+    if (!(svl.level.locations[u.ux][u.uy].typ === DOOR && svl.level.locations[u.ux][u.uy].flags === D.BROKEN)) {
         return FALSE;
     }
     roomno = in_rooms(x, y, SHOPBASE).get(0);
@@ -5536,7 +5536,7 @@ export async function block_entry(x, y) {   // shk.c:5826
     }
     sx = shkp.mextra.eshk.shk.x;
     sy = shkp.mextra.eshk.shk.y;
-    if (shkp.mx === sx && shkp.my === sy && !helpless(shkp) && (x === (sx - 1 | 0) || x === (sx + 1 | 0) || y === (sy - 1 | 0) || y === (sy + 1 | 0)) && (Invis() || carrying(PICK_AXE) || carrying(DWARVISH_MATTOCK) || u.usteed)) {
+    if (shkp.mx === sx && shkp.my === sy && !helpless(shkp) && (x === sx - 1 || x === sx + 1 || y === sy - 1 || y === sy + 1) && (Invis() || carrying(PICK_AXE) || carrying(DWARVISH_MATTOCK) || u.usteed)) {
         await pline($c.lit("%s%s blocks your way!"), await Shknam(shkp), Invis() ? $c.lit(" senses your motion and") : $c.lit(""));
         return TRUE;
     }
@@ -5550,7 +5550,7 @@ export async function block_entry(x, y) {   // shk.c:5826
  */
 export async function shk_your(buf, obj) {   // shk.c:5862
     let chk_pm = 0;
-    chk_pm = $c.i8(obj.otyp === CORPSE && ismnum(obj.corpsenm) ? 1 : 0);
+    chk_pm = obj.otyp === CORPSE && ismnum(obj.corpsenm) ? 1 : 0;
     buf.set(0, 0);
     if (chk_pm && type_is_pname($c.relem(mons, obj.corpsenm))) {
         return buf;   /* skip ownership prefix and space: "Medusa's corpse" */
@@ -5579,7 +5579,7 @@ export async function Shk_Your(buf, obj) {   // shk.c:5877
  */
 async function shk_owns(buf, obj) {   // shk.c:5885
     let shkp = null, x = Int16Array.of(0), y = Int16Array.of(0);
-    if (get_obj_location(obj, new $c.Ptr(x, 0), new $c.Ptr(y, 0), 0) && (obj.unpaid | 0 || obj.where === OBJ.FLOOR && !obj.no_charge && await costly_spot(x[0], y[0]))) {
+    if (get_obj_location(obj, new $c.Ptr(x, 0), new $c.Ptr(y, 0), 0) && (obj.unpaid || obj.where === OBJ.FLOOR && !obj.no_charge && await costly_spot(x[0], y[0]))) {
         shkp = await shop_keeper(inside_shop(x[0], y[0]));
         return $c.strcpy(buf, shkp ? s_suffix(await shkname(shkp)) : c_common_strings.c_the_your[0]);
     }
@@ -5667,7 +5667,7 @@ export async function globby_bill_fixup(obj_absorber, obj_absorbed) {   // shk.c
     y = 0;
     bp_absorber = null;
     shkp[0] = null;
-    floor_absorber = $c.i8(obj_absorber.where === OBJ.FLOOR ? 1 : 0);
+    floor_absorber = obj_absorber.where === OBJ.FLOOR ? 1 : 0;
     if (!obj_absorber.globby) {
         await impossible($c.lit("globby_bill_fixup called for non-globby object"));
     }
@@ -5756,7 +5756,7 @@ export async function globby_bill_fixup(obj_absorber, obj_absorbed) {   // shk.c
     /**************************************************************
      * Scenario 3. shop_owned glob merging into player_owned glob
      **************************************************************/
-    if (bp && (obj_absorber.no_charge | 0 || floor_absorber && !await costly_spot($c.i16(x), $c.i16(y)))) {
+    if (bp && (obj_absorber.no_charge || floor_absorber && !await costly_spot($c.i16(x), $c.i16(y)))) {
         amount = bp.price;
         await bill_dummy_object(obj_absorbed);
         await verbalize($c.lit("You owe me %ld %s for my %s that you %s with your%s"), amount, await currency(amount), await obj_typename(obj_absorbed.otyp), ANGRY(shkp[0]) ? $c.lit("had the audacity to mix") : $c.lit("just mixed"), ANGRY(shkp[0]) ? $c.lit(" stinking batch!") : $c.lit("s."));
@@ -5787,7 +5787,7 @@ export async function use_unpaid_trapobj(otmp, x, y) {   // shk.c:6101
     }
 }
 function NOTANGRY(mon) {
-    return mon.mpeaceful | 0;
+    return mon.mpeaceful;
 }
 function ANGRY(mon) {
     return !mon.mpeaceful ? 1 : 0;
@@ -5796,7 +5796,7 @@ function IS_SHOP(x) {
     return svr.rooms[x].rtype >= SHOPBASE ? 1 : 0;
 }
 function muteshk(shkp) {
-    return shkp.msleeping | 0 || !shkp.mcanmove || shkp.data.msound <= MS.ANIMAL ? 1 : 0;
+    return shkp.msleeping || !shkp.mcanmove || shkp.data.msound <= MS.ANIMAL ? 1 : 0;
 }
 function horiz(i) {
     return $c.rem32(i, 3) - 1 | 0;

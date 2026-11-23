@@ -165,10 +165,10 @@ async function makemap_unmakemon(mtmp, migratory) {   // wizcmds.c:73
        be parked at <0,0>; for the latter, might already be flagged as
        dead but is being kept around because of the 'isgd' flag */
     if (mtmp.isgd) {
-        mtmp.isgd = (0) & 1;   /* after this, fall through to mongone() */
+        mtmp.isgd = 0;   /* after this, fall through to mongone() */
     } else if (DEADMONSTER(mtmp)) {
         return;   /* already set to be discarded */
-    } else if (mtmp.isshk | 0 && on_level(u.uz, mtmp.mextra.eshk.shoplevel)) {
+    } else if (mtmp.isshk && on_level(u.uz, mtmp.mextra.eshk.shoplevel)) {
         await setpaid(mtmp);
     }
     if (migratory) {
@@ -211,7 +211,7 @@ export async function makemap_remove_mons() {   // wizcmds.c:110
        present location instead of being saved with whatever level they
        happen to be on; see keepdogs() and keep_mon_accessible(dog.c)] */
     for (mprev = new $c.FieldRef(gm, "migrating_mons", "ptr"); (mtmp = mprev.get(0)) !== null; ) {
-        if (mtmp.mextra && (mtmp.isshk | 0 && on_level(u.uz, mtmp.mextra.eshk.shoplevel) || mtmp.ispriest | 0 && on_level(u.uz, mtmp.mextra.epri.shrlevel) || mtmp.isgd | 0 && on_level(u.uz, mtmp.mextra.egd.gdlevel))) {
+        if (mtmp.mextra && (mtmp.isshk && on_level(u.uz, mtmp.mextra.eshk.shoplevel) || mtmp.ispriest && on_level(u.uz, mtmp.mextra.epri.shrlevel) || mtmp.isgd && on_level(u.uz, mtmp.mextra.egd.gdlevel))) {
             mprev.set(0, mtmp.nmon);
             await makemap_unmakemon(mtmp, TRUE);
         } else {
@@ -259,7 +259,7 @@ export async function wiz_map() {   // wizcmds.c:176
         } while (0);
         $t1 = u.uprops[HALLUC].intrinsic = 0, u.uprops[CONFUSION].intrinsic = $t1;
         for (t = gf.ftrap; t !== null; t = t.ntrap) {
-            t.tseen = (1) & 1;
+            t.tseen = 1;
             await map_trap(t, TRUE);
         }
         for (ep = $G.head_engr; ep !== null; ep = ep.nxt_engr) {
@@ -377,7 +377,7 @@ export async function wiz_kill() {   // wizcmds.c:243
                isn't; note that if it triggers other kills, those might
                be referred to as "it" */
             tame = !!mtmp.mtame ? 1 : 0;
-            seen = canspotmon(mtmp) || u.uswallow | 0 && $c.peq(mtmp, u.ustuck) ? 1 : 0;
+            seen = canspotmon(mtmp) || u.uswallow && $c.peq(mtmp, u.ustuck) ? 1 : 0;
             flgs = SUPPRESS.IT | SUPPRESS.HALLUCINATION | (tame && has_mgivenname(mtmp) ? SUPPRESS.SADDLE : 0);
             articl = tame ? ARTICLE.YOUR : seen ? ARTICLE.THE : ARTICLE.A;
             adjs = tame ? !seen ? $c.lit("poor, unseen") : $c.lit("poor") : !seen ? $c.lit("unseen") : null;
@@ -649,32 +649,32 @@ export async function wiz_show_seenv() {   // wizcmds.c:576
      * Each seenv description takes up 2 characters, so center
      * the seenv display around the hero.
      */
-    startx = $c.i16(1 > (u.ux - 20 | 0) ? 1 : u.ux - 20 | 0);
-    stopx = $c.i16((startx + 40 | 0) < COLNO ? startx + 40 | 0 : COLNO);
+    startx = $c.i16(1 > u.ux - 20 ? 1 : u.ux - 20);
+    stopx = $c.i16(startx + 40 < COLNO ? startx + 40 : COLNO);
     /* can't have a line exactly 80 chars long */
-    if ((stopx - startx | 0) === 40) {
+    if (stopx - startx === 40) {
         startx = $c.i16(startx + 1);
     }
     for (y = 0; y < ROWNO; y = $c.i16(y + 1)) {
         for (x = startx, curx = 0; x < stopx; x = $c.i16(x + 1), curx = $c.i16(curx + 2 | 0)) {
             if (u_at(x, y)) {
-                $t1 = row[curx + 1 | 0] = 64, row[curx] = $t1;
+                $t1 = row[curx + 1] = 64, row[curx] = $t1;
             } else {
                 v = svl.level.locations[x][y].seenv & 255;
                 if (v === 0) {
-                    $t2 = row[curx + 1 | 0] = 32, row[curx] = $t2;
+                    $t2 = row[curx + 1] = 32, row[curx] = $t2;
                 } else {
                     $c.sprintf(new $c.Ptr(row, curx), $c.lit("%02x"), v);
                 }
             }
         }
         /* remove trailing spaces */
-        for (x = $c.i16(curx - 1 | 0); x >= 0; x = $c.i16(x - 1)) {
+        for (x = $c.i16(curx - 1); x >= 0; x = $c.i16(x - 1)) {
             if (row[x] !== 32) {
                 break;
             }
         }
-        row[x + 1 | 0] = 0;
+        row[x + 1] = 0;
         await putstr()(win, 0, new $c.Ptr(row, 0));
     }
     await display_nhwindow()(win, TRUE);
@@ -706,7 +706,7 @@ export async function wiz_show_vision() {   // wizcmds.c:621
                 break;
             }
         }
-        row[x + 1 | 0] = 0;
+        row[x + 1] = 0;
         await putstr()(win, 0, new $c.Ptr(row, 1));
     }
     await display_nhwindow()(win, TRUE);
@@ -719,7 +719,7 @@ export async function wiz_show_vision() {   // wizcmds.c:621
  */
 export async function wiz_show_wmodes() {   // wizcmds.c:657
     let win = 0, x = 0, y = 0, row = new Int8Array(81), lev = null, istty = 0;
-    istty = $c.i8(windowprocs.wp_id === wp_tty ? 1 : 0);
+    istty = windowprocs.wp_id === wp_tty ? 1 : 0;
     win = await create_nhwindow()(NHW.TEXT);
     if (istty) {
         await putstr()(win, 0, $c.lit(""));   /* tty only: blank top line */
@@ -730,7 +730,7 @@ export async function wiz_show_wmodes() {   // wizcmds.c:657
             if (u_at(x, y)) {
                 row[x] = 64;
             } else if (IS_WALL(lev.typ) || lev.typ === SDOOR) {
-                row[x] = $c.i8(48 + ((lev.flags | 0) & WM_MASK) | 0);
+                row[x] = 48 + (lev.flags & WM_MASK);
             } else if (lev.typ === CORR) {
                 row[x] = 35;
             } else if (IS_ROOM(lev.typ) || IS_DOOR(lev.typ)) {
@@ -753,7 +753,7 @@ export async function wiz_show_wmodes() {   // wizcmds.c:657
  */
 export async function wiz_map_levltyp() {   // wizcmds.c:693
     let win = 0, x = 0, y = 0, terrain = 0, row = new Int8Array(81), istty = 0, dsc = new Int8Array(256), slev = null, brname = null, $t1, $t2;
-    istty = $c.i8(!$c.strcmp(windowprocs.name, $c.lit("tty")) ? 1 : 0);
+    istty = !$c.strcmp(windowprocs.name, $c.lit("tty")) ? 1 : 0;
     win = await create_nhwindow()(NHW.TEXT);
     /* map row 0, levl[][0], is drawn on the second line of tty screen */
     if (istty) {
@@ -765,7 +765,7 @@ export async function wiz_map_levltyp() {   // wizcmds.c:693
         for (x = 1; x < COLNO; x = $c.i16(x + 1)) {
             terrain = svl.level.locations[x][y].typ;
             /* assumes there aren't more than 10+26+26 terrain types */
-            $t1 = $c.i8(terrain === STONE && !may_dig(x, y) ? 42 : terrain < 10 ? 48 + terrain | 0 : terrain < 36 ? (97 + terrain | 0) - 10 | 0 : (65 + terrain | 0) - 36 | 0), row[x - 1 | 0] = $t1;
+            $t1 = $c.i8(terrain === STONE && !may_dig(x, y) ? 42 : terrain < 10 ? 48 + terrain | 0 : terrain < 36 ? (97 + terrain | 0) - 10 | 0 : (65 + terrain | 0) - 36 | 0), row[x - 1] = $t1;
         }
         x = $c.i16(x - 1);
         if (svl.level.locations[0][y].typ !== STONE || may_dig(0, y)) {
@@ -1272,7 +1272,7 @@ async function contained_stats(win, src, total_count, total_size) {   // wizcmds
 function size_monst(mtmp, incl_wsegs) {   // wizcmds.c:1228
     let sz = 0;
     sz = 192;
-    if (mtmp.wormno | 0 && incl_wsegs) {
+    if (mtmp.wormno && incl_wsegs) {
         sz = sz + size_wseg(mtmp) | 0;
     }
     if (mtmp.mextra) {
@@ -1314,7 +1314,7 @@ function size_monst(mtmp, incl_wsegs) {   // wizcmds.c:1228
 async function mon_chain(win, src, chain, force, total_count, total_size) {   // wizcmds.c:1257
     let buf = new Int8Array(256), count = 0, size = 0, mon = null, incl_wsegs = 0;
     /* mon->wormno means something different for migrating_mons and mydogs */
-    incl_wsegs = $c.i8(!strncmpi(src, $c.lit("fmon"), -1) ? 1 : 0);
+    incl_wsegs = !strncmpi(src, $c.lit("fmon"), -1) ? 1 : 0;
     count = size = 0;
     for (mon = chain; mon; mon = mon.nmon) {
         count = $c.add64(count, 1);
@@ -1437,12 +1437,12 @@ async function misc_stats(win, total_count, total_size) {   // wizcmds.c:1284
  */
 async function you_sanity_check() {   // wizcmds.c:1402
     let mtmp = null;
-    if (u.uswallow | 0 && !u.ustuck) {
+    if (u.uswallow && !u.ustuck) {
         /* this probably ought to be panic() */
         await impossible($c.lit("sanity_check: swallowed by nothing?"));
         await display_nhwindow()($G.WIN_MESSAGE, TRUE);
         /* try to recover from whatever the problem is */
-        u.uswallow = (0) & 1;
+        u.uswallow = 0;
         u.uswldtim = 0;
         await docrt();
     }
@@ -1596,11 +1596,11 @@ async function list_migrating_mons(nextlevl) {   // wizcmds.c:1506
                 if (c === 97) {
                     showit = TRUE;
                 } else if (mtmp.mux === u.uz.dnum && mtmp.muy === u.uz.dlevel) {
-                    showit = $c.i8(c === 99 ? 1 : 0);
+                    showit = c === 99 ? 1 : 0;
                 } else if (mtmp.mux === nextlevl.dnum && mtmp.muy === nextlevl.dlevel) {
-                    showit = $c.i8(c === 110 ? 1 : 0);
+                    showit = c === 110 ? 1 : 0;
                 } else {
-                    showit = $c.i8(c === 111 ? 1 : 0);
+                    showit = c === 111 ? 1 : 0;
                 }
                 if (showit) {
                     marray.set(($t2 = n, n = $t2 + 1 >>> 0, $t2), mtmp);
@@ -1856,7 +1856,7 @@ export async function wiz_migrate_mons() {   // wizcmds.c:1873
     if ((svd.dungeon_topology.d_stronghold_level.dlevel || svd.dungeon_topology.d_stronghold_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_stronghold_level)) {
         assign_level(tolevel, svd.dungeon_topology.d_valley_level);
     } else if (!Is_botlevel(u.uz)) {
-        await get_level(tolevel, depth(u.uz) + 1 | 0);
+        await get_level(tolevel, depth(u.uz) + 1);
     } else {
         tolevel.dnum = 0, tolevel.dlevel = 0;
     }

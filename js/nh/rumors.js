@@ -143,7 +143,7 @@ export async function getrumor(truth, rumor_buf, exclude_cookie) {   // rumors.c
         if (count >= 50) {
             await impossible($c.lit("Can't find non-cookie rumor?"));
         } else if (!gi.in_mklev) {   /* avoid exercising wisdom for graffiti */
-            await exercise(A.WIS, $c.i8(adjtruth > 0 ? 1 : 0));
+            await exercise(A.WIS, adjtruth > 0 ? 1 : 0);
         }
     } else {
         await couldnt_open_file($c.lit("rumors"));
@@ -495,7 +495,7 @@ export async function get_rnd_text(fname, buf, rng, padlength) {   // rumors.c:4
 export async function outrumor(truth, mechanism) {   // rumors.c:529
     let line = null, buf = new Int8Array(256), reading = 0;
     /* 1=true, -1=false, 0=either */
-    reading = $c.i8(mechanism === BY.COOKIE || mechanism === BY.PAPER ? 1 : 0);
+    reading = mechanism === BY.COOKIE || mechanism === BY.PAPER ? 1 : 0;
     if (reading) {
         /* deal with various things that prevent reading */
         if (is_fainted() && mechanism === BY.COOKIE) {
@@ -508,7 +508,7 @@ export async function outrumor(truth, mechanism) {   // rumors.c:529
             return;
         }
     }
-    line = await getrumor(truth, new $c.Ptr(buf, 0), $c.i8(reading ? FALSE : TRUE));
+    line = await getrumor(truth, new $c.Ptr(buf, 0), reading ? FALSE : TRUE);
     if (!line.get(0)) {
         line = $c.lit("NetHack rumors file closed for renovation.");
     }
@@ -696,19 +696,19 @@ export async function doconsult(oracl) {   // rumors.c:696
     if (u_pay === minor_cost) {
         await outrumor(1, BY.ORACLE);
         if (!u.uevent.minor_oracle) {
-            add_xpts = $c.div32(u_pay, u.uevent.major_oracle | 0 ? 25 : 10);
+            add_xpts = $c.div32(u_pay, u.uevent.major_oracle ? 25 : 10);
         }
         /* 5 pts if very 1st, or 2 pts if major already done */
         u.uevent.minor_oracle = (TRUE) & 1;
     } else {
-        cheapskate = $c.i8(u_pay < major_cost ? 1 : 0);
+        cheapskate = u_pay < major_cost ? 1 : 0;
         await outoracle(cheapskate, TRUE);
         if (!cheapskate && !u.uevent.major_oracle) {
-            add_xpts = $c.div32(u_pay, u.uevent.minor_oracle | 0 ? 25 : 10);
+            add_xpts = $c.div32(u_pay, u.uevent.minor_oracle ? 25 : 10);
         }
         /* ~100 pts if very 1st, ~40 pts if minor already done */
         u.uevent.major_oracle = (TRUE) & 1;
-        await exercise(A.WIS, $c.i8(!cheapskate ? 1 : 0));
+        await exercise(A.WIS, !cheapskate ? 1 : 0);
     }
     if (add_xpts) {
         await more_experienced(add_xpts, $c.div32(u_pay, 50));

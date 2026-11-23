@@ -72,7 +72,7 @@ async function cursetxt(mtmp, undirected) {   // mcastu.c:63
         /* spellcasting monsters are impolite */
         if (undirected) {
             point_msg = $c.lit("all around, then curses");
-        } else if (Invis() && !perceives(mtmp.data) && (mtmp.mux !== u.ux || mtmp.muy !== u.uy) || (gy.youmonst.m_ap_type & M_AP.TYPMASK) === M_AP.OBJECT && gy.youmonst.mappearance === STRANGE_OBJECT || u.uundetected | 0) {
+        } else if (Invis() && !perceives(mtmp.data) && (mtmp.mux !== u.ux || mtmp.muy !== u.uy) || (gy.youmonst.m_ap_type & M_AP.TYPMASK) === M_AP.OBJECT && gy.youmonst.mappearance === STRANGE_OBJECT || u.uundetected) {
             point_msg = $c.lit("and curses in your general direction");
         } else if (Displaced() && (mtmp.mux !== u.ux || mtmp.muy !== u.uy)) {
             point_msg = $c.lit("and curses at your displaced image");
@@ -174,7 +174,7 @@ export async function castmu(mtmp, mattk, thinks_it_foundyou, foundyou) {   // m
         }
     }
     /* monster unable to cast spells? */
-    if (mtmp.mcan | 0 || mtmp.mspec_used || !ml || $c.andu64(mtmp.seen_resistance, cvt_adtyp_to_mseenres(mattk.adtyp))) {
+    if (mtmp.mcan || mtmp.mspec_used || !ml || $c.andu64(mtmp.seen_resistance, cvt_adtyp_to_mseenres(mattk.adtyp))) {
         await cursetxt(mtmp, is_undirected_spell(spellnum));
         return M_ATTK.MISS;
     }
@@ -187,7 +187,7 @@ export async function castmu(mtmp, mattk, thinks_it_foundyou, foundyou) {   // m
     } while (0);
     if (mattk.adtyp === AD.SPEL || mattk.adtyp === AD.CLRC) {
         /* monst->m_lev is unsigned (uchar), monst->mspec_used is int */
-        mtmp.mspec_used = mtmp.m_lev < 8 ? 10 - mtmp.m_lev | 0 : 2;
+        mtmp.mspec_used = mtmp.m_lev < 8 ? 10 - mtmp.m_lev : 2;
     }
     /* Monster can cast spells, but is casting a directed spell at the
      * wrong place?  If so, give a message, and return.
@@ -204,7 +204,7 @@ export async function castmu(mtmp, mattk, thinks_it_foundyou, foundyou) {   // m
         return M_ATTK.MISS;
     }
     nomul(0);
-    if (rn2(Math.imul(ml, 10)) < (mtmp.mconf | 0 ? 100 : 20)) {
+    if (rn2(Math.imul(ml, 10)) < (mtmp.mconf ? 100 : 20)) {
         /* fumbled attack */
         if (canseemon(mtmp) && !Deaf()) {
             set_msg_xy(mtmp.mx, mtmp.my);
@@ -409,7 +409,7 @@ async function mcast_death_touch(mtmp) {   // mcastu.c:389
  * @returns {Promise<void>}
  */
 async function mcast_clone_wiz(mtmp) {   // mcastu.c:411
-    if (mtmp.iswiz | 0 && svc.context.no_of_wizards === 1) {
+    if (mtmp.iswiz && svc.context.no_of_wizards === 1) {
         await pline($c.lit("Double Trouble..."));
         await clonewiz();
     } else {
@@ -428,7 +428,7 @@ async function mcast_summon_mons(mtmp) {   // mcastu.c:421
     } else if (mtmp.iswiz) {
         await verbalize($c.lit("Destroy the thief, my pet%s!"), plur(count));
     } else {
-        one = $c.i8(count === 1 ? 1 : 0);
+        one = count === 1 ? 1 : 0;
         mappear = one ? $c.lit("A monster appears") : $c.lit("Monsters appear");
         /* messages not quite right if plural monsters created but
            only a single monster is seen */
@@ -470,7 +470,7 @@ async function mcast_weaken_you(mtmp, dmg) {   // mcastu.c:466
         await You_feel($c.lit("momentarily weakened."));
     } else {
         await You($c.lit("suddenly feel weaker!"));
-        dmg = mtmp.m_lev - 6 | 0;
+        dmg = mtmp.m_lev - 6;
         if (dmg < 1) {   /* paranoia since only chosen when m_lev is high */
             dmg = 1;
         }
@@ -659,7 +659,7 @@ async function mcast_insects(mtmp) {   // mcastu.c:645
        left, go for (sticks to) snakes.  -3. */
     pm = await mkclass(S.ANT, 0);
     mtmp2 = null;
-    let_ = $c.i8(pm ? S.ANT : S.SNAKE);
+    let_ = pm ? S.ANT : S.SNAKE;
     success = FALSE;
     oldseen = monster_census(TRUE);
     quan = mtmp.m_lev < 2 ? 1 : rnd($c.div32(mtmp.m_lev, 2));
@@ -678,7 +678,7 @@ async function mcast_insects(mtmp) {   // mcastu.c:645
     }
     newseen = monster_census(TRUE);
     /* not canspotmon() which includes unseen things sensed via warning */
-    seecaster = $c.i8(canseemon(mtmp) || tp_sensemon(mtmp) || Detect_monsters() ? 1 : 0);
+    seecaster = canseemon(mtmp) || tp_sensemon(mtmp) || Detect_monsters() ? 1 : 0;
     what = let_ === S.SNAKE ? $c.lit("snakes") : $c.lit("insects");
     if (Hallucination()) {
         what = await makeplural(await bogusmon(new $c.Ptr(whatbuf, 0), null));
@@ -757,7 +757,7 @@ async function mcast_paralyze(mtmp) {   // mcastu.c:746
         if (gm.multi >= 0) {
             await You($c.lit("are frozen in place!"));
         }
-        dmg = 4 + mtmp.m_lev | 0;
+        dmg = 4 + mtmp.m_lev;
         if (Half_spell_damage()) {
             dmg = $c.div32(dmg + 1 | 0, 2);
         }
@@ -779,7 +779,7 @@ async function mcast_confuse_you(mtmp) {   // mcastu.c:771
         monstseesu(M_SEEN.MAGR);
         await You_feel($c.lit("momentarily dizzy."));
     } else {
-        oldprop = $c.i8(!!u.uprops[CONFUSION].intrinsic ? 1 : 0);
+        oldprop = !!u.uprops[CONFUSION].intrinsic ? 1 : 0;
         dmg = mtmp.m_lev;
         if (Half_spell_damage()) {
             dmg = $c.div32(dmg + 1 | 0, 2);
@@ -935,7 +935,7 @@ async function spell_would_be_useless(mtmp, spellnum) {   // mcastu.c:909
     }
     /* spell needs the monster to see hero */
     if ((mcast_data[spellnum].flags & MCF.SIGHT) !== 0) {
-        mcouldseeu = $c.i8(couldsee(mtmp.mx, mtmp.my));
+        mcouldseeu = couldsee(mtmp.mx, mtmp.my);
         if (!mcouldseeu) {
             return TRUE;
         }
@@ -964,18 +964,18 @@ async function spell_would_be_useless(mtmp, spellnum) {   // mcastu.c:909
                must be very small otherwise caller's many retry attempts
                will eventually end up picking it too often] */
             if (!await has_aggravatables(mtmp)) {
-                return $c.i8(rn2(100) ? TRUE : FALSE);
+                return rn2(100) ? TRUE : FALSE;
             }
             break;
         case MCAST.HASTE_SELF:
             /* haste self when already fast */
-            if ((mtmp.permspeed | 0) === MFAST) {
+            if (mtmp.permspeed === MFAST) {
                 return TRUE;
             }
             break;
         case MCAST.DISAPPEAR:
             /* invisibility when already invisible */
-            if (mtmp.minvis | 0 || mtmp.invis_blkd | 0) {
+            if (mtmp.minvis || mtmp.invis_blkd) {
                 return TRUE;
             }
             /* peaceful monster won't cast invisibility if you can't see
@@ -983,7 +983,7 @@ async function spell_would_be_useless(mtmp, spellnum) {   // mcastu.c:909
                same as when monsters drink potions of invisibility.  This doesn't
                really make a lot of sense, but lets the player avoid hitting
                peaceful monsters by mistake */
-            if (mtmp.mpeaceful | 0 && !See_invisible()) {
+            if (mtmp.mpeaceful && !See_invisible()) {
                 return TRUE;
             }
             break;
@@ -1015,17 +1015,17 @@ export async function buzzmu(mtmp, mattk) {   // mcastu.c:989
     if (!BZ_VALID_ADTYP(mattk.adtyp)) {
         return M_ATTK.MISS;
     }
-    if (mtmp.mcan | 0 || $c.andu64(mtmp.seen_resistance, cvt_adtyp_to_mseenres(mattk.adtyp))) {
+    if (mtmp.mcan || $c.andu64(mtmp.seen_resistance, cvt_adtyp_to_mseenres(mattk.adtyp))) {
         await cursetxt(mtmp, FALSE);
         return M_ATTK.MISS;
     }
     if (lined_up(mtmp) && rn2(3)) {
         nomul(0);
         if (canseemon(mtmp)) {
-            await pline_mon(mtmp, $c.lit("%s zaps you with a %s!"), await Monnam(mtmp), flash_str($c.rem32($c.abs(mattk.adtyp - AD.MAGM | 0), 10), FALSE));
+            await pline_mon(mtmp, $c.lit("%s zaps you with a %s!"), await Monnam(mtmp), flash_str($c.rem32($c.abs(mattk.adtyp - AD.MAGM), 10), FALSE));
         }
         gb.buzzer = mtmp;
-        await buzz(-10 - $c.rem32($c.abs(mattk.adtyp - AD.MAGM | 0), 10) | 0, mattk.damn, mtmp.mx, mtmp.my, sgn(gt.tbx), sgn(gt.tby));
+        await buzz(-10 - $c.rem32($c.abs(mattk.adtyp - AD.MAGM), 10) | 0, mattk.damn, mtmp.mx, mtmp.my, sgn(gt.tbx), sgn(gt.tby));
         gb.buzzer = null;
         return M_ATTK.HIT;
     }

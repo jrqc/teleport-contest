@@ -144,9 +144,9 @@ function pmatch_internal(patrn, strng, ci, sk) {   // strutil.c:105
             } while ($c.strchr(sk, p));
         }
         if (!p) {   /* end of pattern */
-            return $c.i8(s === 0 ? 1 : 0);   /* matches iff end of string too */
+            return s === 0 ? 1 : 0;   /* matches iff end of string too */
         } else if (p === 42) {   /* wildcard reached */
-            return $c.i8(!patrn.get(0) || pmatch_internal(patrn, strng.add(-1), ci, sk) ? TRUE : s ? pmatch_internal(patrn.add(-1), strng, ci, sk) : FALSE);
+            return !patrn.get(0) || pmatch_internal(patrn, strng.add(-1), ci, sk) ? TRUE : s ? pmatch_internal(patrn.add(-1), strng, ci, sk) : FALSE;
         } else if ((ci ? lowc(p) !== lowc(s) : p !== s) && (p !== 63 || !s)) {   /* & single-char wildcard */
             /* check single character */
             return FALSE;   /* doesn't match */

@@ -90,7 +90,7 @@ export function check_tty_wincap(wincap) {   // windows.c:231
     let wc = null;
     wc = win_choices_find($c.lit("tty"));
     if (wc) {
-        return $c.i8($c.andu64(wc.procs.wincap, wincap) === wincap ? 1 : 0);
+        return $c.andu64(wc.procs.wincap, wincap) === wincap ? 1 : 0;
     }
     return 0;
 }
@@ -102,7 +102,7 @@ export function check_tty_wincap2(wincap2) {   // windows.c:241
     let wc = null;
     wc = win_choices_find($c.lit("tty"));
     if (wc) {
-        return $c.i8($c.andu64(wc.procs.wincap2, wincap2) === wincap2 ? 1 : 0);
+        return $c.andu64(wc.procs.wincap2, wincap2) === wincap2 ? 1 : 0;
     }
     return 0;
 }
@@ -657,7 +657,7 @@ export async function genl_status_update(idx, ptr, chg, percent, color, colormas
     }
     /* if '$' is encoded, buffer length of \GXXXXNNNN is 9 greater than
        single char; we want to subtract that 9 when checking display length */
-    lndelta = (status_activefields[BL.GOLD] && $c.strstr(status_vals[BL.GOLD], $c.lit("\\G")) ? 9 : 0) >>> 0;
+    lndelta = status_activefields[BL.GOLD] && $c.strstr(status_vals[BL.GOLD], $c.lit("\\G")) ? 9 : 0;
     /* basic bot2 formats groups of second line fields into five buffers,
        then decides how to order those buffers based on comparing lengths
        of [sub]sets of them to the width of the map; we have more control
@@ -1080,7 +1080,7 @@ export function menuitem_invert_test(mode, itemflags, is_selected) {   // window
     /* 0: invert; 1: select; 2: deselect */
     /* itemflags for the item */
     /* current selection status of the item */
-    skipinvert = $c.i8((itemflags & MENU.ITEMFLAGS_SKIPINVERT) >>> 0 !== 0 ? 1 : 0);
+    skipinvert = (itemflags & MENU.ITEMFLAGS_SKIPINVERT) >>> 0 !== 0 ? 1 : 0;
     if (!skipinvert) {   /* if not flagged SKIPINVERT, always pass test */
         return 1;
     }
@@ -1099,7 +1099,7 @@ export function menuitem_invert_test(mode, itemflags, is_selected) {   // window
     if (iflags.menuinvertmode === 2) {
         return 0;
     } else if (iflags.menuinvertmode === 1) {
-        return $c.i8(is_selected ? 1 : 0);
+        return is_selected ? 1 : 0;
     }
     return 1;
 }
@@ -1211,7 +1211,7 @@ export async function choose_classes_menu(prompt, category, way, class_list, cla
             }
         }
         any.a_int = class_list.get(0);
-        await add_menu(win, nul_glyphinfo, any, $c.i8(accelerator), $c.i8(category ? class_list.get(0) : 0), ATR.NONE, clr, new $c.Ptr(buf, 0), selected ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+        await add_menu(win, nul_glyphinfo, any, $c.i8(accelerator), category ? class_list.get(0) : 0, ATR.NONE, clr, new $c.Ptr(buf, 0), selected ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
         if (category > 0) {
             if (next_accelerator === 90) {
                 break;
@@ -1407,7 +1407,7 @@ export async function getlin(query, bufp) {   // windows.c:1868
     while ((cmdq = cmdq_pop()) !== null) {
         if (cmdq.typ === CMDQ.KEY) {
             got_cmdq = 1;
-            bufp.set(0, $c.i8(cmdq.key !== 10 ? cmdq.key : 0));
+            bufp.set(0, cmdq.key !== 10 ? cmdq.key : 0);
             bufp = bufp.add(1);
             if (cmdq.key === 10) {
                 break;

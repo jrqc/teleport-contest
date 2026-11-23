@@ -196,7 +196,7 @@ async function resize_tty() {   // wintty.c:392
     }
     /* try to figure out where we'll want to leave the cursor */
     cw = $G.WIN_MAP !== WIN_ERR ? wins[$G.WIN_MAP] : null;
-    map_active = $c.i8(cw && cw.active ? 1 : 0);
+    map_active = cw && cw.active ? 1 : 0;
     if (!map_active) {
         mapx = 1, mapy = 0;
     } else if (gg.getposx < 1) {
@@ -356,7 +356,7 @@ export async function tty_init_nhwindows(argcp, argv) {   // wintty.c:511
  */
 export async function tty_preference_update(pref) {   // wintty.c:596
     let newstatuslines = 0;
-    newstatuslines = $c.i8(!$c.strcmp(pref, $c.lit("statuslines")) && iflags.window_inited ? 1 : 0);
+    newstatuslines = !$c.strcmp(pref, $c.lit("statuslines")) && iflags.window_inited ? 1 : 0;
     if (newstatuslines) {
         await new_status_window();
         await newclipping(u.ux, u.uy);
@@ -907,7 +907,7 @@ async function dmore(cw, s) {   // wintty.c:1178
  */
 async function set_item_state(window, lineno, item) {   // wintty.c:1204
     let ch = 0;
-    ch = $c.i8(item.selected ? item.count === -1 ? 43 : 35 : 45);
+    ch = item.selected ? item.count === -1 ? 43 : 35 : 45;
     do {
         if (program_state.done_hup) {
             $G.morc = 27;
@@ -1067,7 +1067,7 @@ function toggle_menu_attr(on, color, attr) {   // wintty.c:1345
  */
 async function process_menu_window(window, cw) {   // wintty.c:1359
     let page_start = null, page_end = null, curr = null, count = 0, n = 0, attr_n = 0, curr_page = 0, page_lines = 0, resp_len = 0, previous_page_lines = 0, finished = 0, counting = 0, reset_count = 0, show_obj_syms = 0, only_if_no_headers = 0, cp = null, rp = null, resp = new Int8Array(128), gacc = new Int8Array(128), msave = null, morestr = null, really_morc = 0, i = 0, gcnt = new Int32Array(128), attr = 0, color = 0, c = 0, svx = 0, gcolor = 0, svx$2 = 0, svx$3 = 0, row_startoffset = 0, dgt = 0, searchbuf = new Int8Array(258), tmpbuf = new Int8Array(256), on_curr_page = 0, lineno = 0, $goto = null, $t1, $t2, $t3;
-    only_if_no_headers = $c.i8((iflags.menuobjsyms & 4) !== 0 ? 1 : 0);
+    only_if_no_headers = (iflags.menuobjsyms & 4) !== 0 ? 1 : 0;
     /* pseudo menu manipulation char */
     curr_page = page_lines = 0;
     page_start = page_end = null;
@@ -1183,7 +1183,7 @@ async function process_menu_window(window, cw) {   // wintty.c:1359
                             toggle_menu_attr(1, color, attr);
                         }
                         if (n === 2 && curr.identifier.a_void !== null && curr.selected) {
-                            c = $c.i8(curr.count === -1 ? 42 : 35);
+                            c = curr.count === -1 ? 42 : 35;
                             {
                                 svx = $G.ttyDisplay.curx;
                                 $G.ttyDisplay.curx = $c.i16($G.ttyDisplay.curx - 1);
@@ -1306,7 +1306,7 @@ async function process_menu_window(window, cw) {   // wintty.c:1359
                         $goto = "group_accel"; continue S1;
                     }
                     {
-                        dgt = $G.morc - 48 | 0;
+                        dgt = $G.morc - 48;
                         /* count = (10 * count) + (morc - '0'); */
                         count = AppendLongDigit(count, dgt);
                         if (count < 0) {   /* overflow */
@@ -1517,7 +1517,7 @@ async function process_text_window(window, cw) {   // wintty.c:1810
                 return;
             }
         } while (0);
-        if (!cw.offx && (n + cw.offy | 0) === ($G.ttyDisplay.rows - 1 | 0)) {
+        if (!cw.offx && (n + cw.offy | 0) === $G.ttyDisplay.rows - 1) {
             await tty_curs(window, 1, n);
             await cl_end();
             await dmore(cw, new $c.Ptr(quitchars, 0));
@@ -1536,7 +1536,7 @@ async function process_text_window(window, cw) {   // wintty.c:1810
         await tty_curs(window, 1, ($t1 = n, n = $t1 + 1 | 0, $t1));
         await cl_end();
         if (cw.data.get(i)) {
-            attr = cw.data.get(i).get(0) - 1 | 0;
+            attr = cw.data.get(i).get(0) - 1;
             if (cw.offx) {
                 $c.putchar(32);
                 nomux_putch(32);
@@ -1578,10 +1578,10 @@ async function process_text_window(window, cw) {   // wintty.c:1810
     }
     if (i === cw.maxrow) {
         if (cw.type === NHW.TEXT) {
-            await tty_curs($G.BASE_WINDOW, 1, $G.ttyDisplay.cury + 1 | 0);
+            await tty_curs($G.BASE_WINDOW, 1, $G.ttyDisplay.cury + 1);
             await cl_eos();
         }
-        await tty_curs($G.BASE_WINDOW, cw.offx + 1 | 0, cw.type === NHW.TEXT ? $G.ttyDisplay.rows - 1 | 0 : n);
+        await tty_curs($G.BASE_WINDOW, cw.offx + 1, cw.type === NHW.TEXT ? $G.ttyDisplay.rows - 1 : n);
         await cl_end();
         await dmore(cw, new $c.Ptr(quitchars, 0));
         if ($G.morc === 27) {
@@ -1649,7 +1649,7 @@ export async function tty_display_nhwindow(window, blocking) {   // wintty.c:190
             /* cw->maxcol is a long, but its value is constrained to
                be <= ttyDisplay->cols, so is sure to fit within a short */
             s_maxcol = $c.i16(cw.maxcol);
-            cw.offx = $c.i16(cw.type === NHW.TEXT ? 0 : (82 < $c.div32($G.ttyDisplay.cols, 2) ? 82 : $c.div32($G.ttyDisplay.cols, 2)) < (($G.ttyDisplay.cols - s_maxcol | 0) - 1 | 0) ? 82 < $c.div32($G.ttyDisplay.cols, 2) ? 82 : $c.div32($G.ttyDisplay.cols, 2) : ($G.ttyDisplay.cols - s_maxcol | 0) - 1 | 0);
+            cw.offx = $c.i16(cw.type === NHW.TEXT ? 0 : (82 < $c.div32($G.ttyDisplay.cols, 2) ? 82 : $c.div32($G.ttyDisplay.cols, 2)) < $G.ttyDisplay.cols - s_maxcol - 1 ? 82 < $c.div32($G.ttyDisplay.cols, 2) ? 82 : $c.div32($G.ttyDisplay.cols, 2) : $G.ttyDisplay.cols - s_maxcol - 1);
             /* avoid converting to uchar before calculations are finished */
             if (cw.offx < 0) {
                 cw.offx = 0;
@@ -1713,7 +1713,7 @@ export async function tty_dismiss_nhwindow(window) {   // wintty.c:2001
              * these should only get dismissed when the game is going away
              * or suspending
              */
-            await tty_curs($G.BASE_WINDOW, 1, $G.ttyDisplay.rows - 1 | 0);
+            await tty_curs($G.BASE_WINDOW, 1, $G.ttyDisplay.rows - 1);
             cw.active = 0;
             break;
         case NHW.MENU:
@@ -1920,7 +1920,7 @@ function compress_str(str) {   // wintty.c:2247
                 continue;
             }
             ($t2 = outstr, outstr = $t2.add(1), $t2).set(0, c);
-            was_space = $c.i8(c === 32 ? 1 : 0);
+            was_space = c === 32 ? 1 : 0;
         }
         if (was_space && $c.pcmp(outstr, new $c.Ptr(compress_str$cbuf, 0)) > 0 || $c.peq(outstr, outend)) {
             outstr = outstr.add(-1);   /* remove trailing space or make room for terminator */
@@ -2005,7 +2005,7 @@ export async function tty_putstr(window, attr, str) {   // wintty.c:2277
             /* STATUS_HILITES */
             await tty_curs(window, $c.i32($c.add64(cw.curx, 1)), $c.i32(cw.cury));
             term_start_attr(attr);
-            while (str.get(0) && $G.ttyDisplay.curx < ($G.ttyDisplay.cols - 1 | 0)) {
+            while (str.get(0) && $G.ttyDisplay.curx < $G.ttyDisplay.cols - 1) {
                 $c.putchar(str.get(0));
                 nomux_putch(str.get(0));
                 str = str.add(1);
@@ -2019,7 +2019,7 @@ export async function tty_putstr(window, attr, str) {   // wintty.c:2277
             await tty_curs(window, $c.i32($c.add64(cw.curx, 1)), $c.i32(cw.cury));
             term_start_attr(attr);
             while (str.get(0)) {
-                if ($G.ttyDisplay.curx >= ($G.ttyDisplay.cols - 1 | 0)) {
+                if ($G.ttyDisplay.curx >= $G.ttyDisplay.cols - 1) {
                     cw.curx = 0;
                     cw.cury = $c.add64(cw.cury, 1);
                     await tty_curs(window, $c.i32($c.add64(cw.curx, 1)), $c.i32(cw.cury));
@@ -2035,7 +2035,7 @@ export async function tty_putstr(window, attr, str) {   // wintty.c:2277
             break;
         case NHW.MENU:
         case NHW.TEXT:
-            if (cw.type === NHW.TEXT && $c.add64(cw.cury, cw.offy) === ($G.ttyDisplay.rows - 1 | 0)) {
+            if (cw.type === NHW.TEXT && $c.add64(cw.cury, cw.offy) === $G.ttyDisplay.rows - 1) {
                 /* not a menu, so save memory and output 1 page at a time */
                 cw.maxcol = $G.ttyDisplay.cols;   /* force full-screen mode */
                 await tty_display_nhwindow(window, 1);
@@ -2127,8 +2127,8 @@ export async function tty_display_file(fname, complain) {   // wintty.c:2482
             empty = 1;
             if (complain && nh_CD()) {
                 /* attempt to scroll text below map window if there's room */
-                wins[datawin].offy = $c.i16(wins[$G.WIN_STATUS].offy + StatusRows() | 0);
-                if ((wins[datawin].offy + 12 | 0) > $G.ttyDisplay.rows) {
+                wins[datawin].offy = $c.i16(wins[$G.WIN_STATUS].offy + StatusRows());
+                if (wins[datawin].offy + 12 > $G.ttyDisplay.rows) {
                     wins[datawin].offy = 0;
                 }
             }
@@ -2201,7 +2201,7 @@ export async function tty_add_menu(window, glyphinfo, identifier, ch, gch, attr,
     /* color for string */
     /* menu string */
     /* itemflags such as MENU_ITEMFLAGS_SELECTED */
-    preselected = $c.i8((itemflags & MENU.ITEMFLAGS_SELECTED) >>> 0 !== 0 ? 1 : 0);
+    preselected = (itemflags & MENU.ITEMFLAGS_SELECTED) >>> 0 !== 0 ? 1 : 0;
     cw = null;
     do {
         if (program_state.done_hup) {
@@ -2296,7 +2296,7 @@ export async function tty_end_menu(window, prompt) {   // wintty.c:2706
         await tty_add_menu(window, nul_glyphinfo, any, 0, 0, tty_menu_promptstyle.attr, tty_menu_promptstyle.color, prompt, MENU.ITEMFLAGS_NONE);
     }
     /* 52: 'a'..'z' and 'A'..'Z'; avoids selector duplication within a page */
-    lmax = 52 < ($G.ttyDisplay.rows - 1 | 0) ? 52 : $G.ttyDisplay.rows - 1 | 0;   /* # lines per page */
+    lmax = 52 < $G.ttyDisplay.rows - 1 ? 52 : $G.ttyDisplay.rows - 1;   /* # lines per page */
     cw.npages = $c.div64($c.add64(cw.nitems, lmax - 1 | 0), lmax);   /* # of pages */
     /*
      * TODO?
@@ -2333,7 +2333,7 @@ export async function tty_end_menu(window, prompt) {   // wintty.c:2706
         /* cut off any lines that are too long */
         len = $c.i16($c.addu64($c.strlen(curr.str), 2));   /* extra space at beg & end */
         if (len > $G.ttyDisplay.cols) {
-            curr.str.set($G.ttyDisplay.cols - 2 | 0, 0);
+            curr.str.set($G.ttyDisplay.cols - 2, 0);
             len = $G.ttyDisplay.cols;
         }
         if (len > cw.cols) {
@@ -2451,7 +2451,7 @@ export async function tty_message_menu(let_, how, mesg) {   // wintty.c:2876
        continue to be output normally */
     wins[$G.WIN_MESSAGE].flags = wins[$G.WIN_MESSAGE].flags & ~WIN.CANCELLED;
     $G.ttyDisplay.dismiss_more = 0;
-    return $c.i8(how === PICK.ONE && $G.morc === let_ || $G.morc === 27 ? $G.morc : 0);
+    return how === PICK.ONE && $G.morc === let_ || $G.morc === 27 ? $G.morc : 0;
 }
 /**
  * @param {number} window winid
@@ -3748,7 +3748,7 @@ async function render_status() {   // wintty.c:5068
             text = status_vals[idx];   /* always "" for BL_CONDITION */
             tlth = $c.i32(tty_status[NOW][idx].lth);   /* valid for BL_CONDITION */
             if (tty_status[NOW][idx].redraw || !do_field_opt) {
-                hitpointbar = $c.i8(idx === BL.TITLE && iflags.wc2_hitpointbar ? 1 : 0);
+                hitpointbar = idx === BL.TITLE && iflags.wc2_hitpointbar ? 1 : 0;
                 if (idx === BL.CONDITION) {
                     /*
                      * +-----------------+
@@ -3890,7 +3890,7 @@ async function render_status() {   // wintty.c:5068
                     bar_pos = 0;
                     bar2 = null;
                     savedch = 0;
-                    twoparts = $c.i8(hpbar_percent < 100 ? 1 : 0);
+                    twoparts = hpbar_percent < 100 ? 1 : 0;
                     /* force exactly 30 characters, padded with spaces
                        if shorter or truncated if longer */
                     if ($c.strlen(text) !== 30) {

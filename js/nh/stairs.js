@@ -172,7 +172,7 @@ export async function u_on_dnstairs() {   // stairs.c:137
  * @returns {number} boolean
  */
 export function On_stairs(x, y) {   // stairs.c:148
-    return $c.i8(!$c.peq(stairway_at(x, y), $c.asRec(null, $T.stairway, 24)) ? 1 : 0);
+    return !$c.peq(stairway_at(x, y), $c.asRec(null, $T.stairway, 24)) ? 1 : 0;
 }
 /**
  * @param {number} x coordxy
@@ -182,7 +182,7 @@ export function On_stairs(x, y) {   // stairs.c:148
 export function On_ladder(x, y) {   // stairs.c:154
     let stway = null;
     stway = stairway_at(x, y);
-    return $c.i8(stway && stway.isladder ? 1 : 0);
+    return stway && stway.isladder ? 1 : 0;
 }
 /**
  * @param {number} x coordxy
@@ -192,7 +192,7 @@ export function On_ladder(x, y) {   // stairs.c:154
 export function On_stairs_up(x, y) {   // stairs.c:162
     let stway = null;
     stway = stairway_at(x, y);
-    return $c.i8(stway && stway.up ? 1 : 0);
+    return stway && stway.up ? 1 : 0;
 }
 /**
  * @param {number} x coordxy
@@ -202,7 +202,7 @@ export function On_stairs_up(x, y) {   // stairs.c:162
 export function On_stairs_dn(x, y) {   // stairs.c:170
     let stway = null;
     stway = stairway_at(x, y);
-    return $c.i8(stway && !stway.up ? 1 : 0);
+    return stway && !stway.up ? 1 : 0;
 }
 /* return True if 'sway' is a branch staircase and hero has used these stairs
    to visit the branch */
@@ -211,7 +211,7 @@ export function On_stairs_dn(x, y) {   // stairs.c:170
  * @returns {number} boolean
  */
 export function known_branch_stairs(sway) {   // stairs.c:180
-    return $c.i8(sway && sway.tolev.dnum !== u.uz.dnum && sway.u_traversed ? 1 : 0);
+    return sway && sway.tolev.dnum !== u.uz.dnum && sway.u_traversed ? 1 : 0;
 }
 /* describe staircase 'sway' based on whether hero knows the destination */
 /**
@@ -234,7 +234,7 @@ export function stairs_description(sway, outbuf, stcase) {   // stairs.c:187
         /* ordinary stairs or branch stairs to not-yet-visited branch */
         $c.sprintf(outbuf, $c.lit("%s %s"), stairs, updown);
         if (sway.u_traversed) {
-            specialdepth = $c.i8(tolev.dnum === svd.dungeon_topology.d_quest_dnum || single_level_branch(tolev) ? 1 : 0);   /* knox */
+            specialdepth = tolev.dnum === svd.dungeon_topology.d_quest_dnum || single_level_branch(tolev) ? 1 : 0;   /* knox */
             to_dlev = specialdepth ? dunlev(tolev) : depth(tolev);
             $c.sprintf(eos(outbuf), $c.lit(" to level %d"), to_dlev);
         }

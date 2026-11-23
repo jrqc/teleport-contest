@@ -121,7 +121,7 @@ export async function adjattrib(ndx, incr, msgflg) {   // attrib.c:117
             }
         }
         attrstr = plusattr[ndx];
-        abonflg = $c.i8(u.abon.a[ndx] < 0 ? 1 : 0);
+        abonflg = u.abon.a[ndx] < 0 ? 1 : 0;
     } else {
         /* incr is negative */
         if (u.acurr.a[ndx] < gu.urace.attrmin[ndx]) {
@@ -142,7 +142,7 @@ export async function adjattrib(ndx, incr, msgflg) {   // attrib.c:117
              *
              * decr = rn2(-(ABASE - ATTRMIN) + 1);
              */
-            decr = rn2((gu.urace.attrmin[ndx] - u.acurr.a[ndx] | 0) + 1 | 0);
+            decr = rn2(gu.urace.attrmin[ndx] - u.acurr.a[ndx] + 1);
             u.acurr.a[ndx] = $c.i8(gu.urace.attrmin[ndx]);
             u.amax.a[ndx] = $c.i8(u.amax.a[ndx] - decr | 0);
             if (u.amax.a[ndx] < gu.urace.attrmin[ndx]) {
@@ -150,7 +150,7 @@ export async function adjattrib(ndx, incr, msgflg) {   // attrib.c:117
             }
         }
         attrstr = minusattr[ndx];
-        abonflg = $c.i8(u.abon.a[ndx] > 0 ? 1 : 0);
+        abonflg = u.abon.a[ndx] > 0 ? 1 : 0;
     }
     if (ACURR(ndx) === old_acurr) {
         if (msgflg === 0 && flags.verbose) {
@@ -194,7 +194,7 @@ export async function gainstr(otmp, incr, givemsg) {   // attrib.c:203
             num = 1;
         }
     }
-    await adjattrib(A.STR, otmp && otmp.cursed | 0 ? -num | 0 : num, givemsg ? -1 : 1);
+    await adjattrib(A.STR, otmp && otmp.cursed ? -num | 0 : num, givemsg ? -1 : 1);
 }
 /* strength loss, may kill you; cause may be poison or monster like 'a' */
 /**
@@ -208,7 +208,7 @@ export async function losestr(num, knam, k_format) {   // attrib.c:221
     uhpmin = minuhpmax(1);
     olduhpmax = u.uhpmax;
     ustr = u.acurr.a[A.STR] - num | 0;
-    waspolyd = $c.i8(Upolyd());
+    waspolyd = Upolyd();
     if (num <= 0 || u.acurr.a[A.STR] < gu.urace.attrmin[A.STR]) {
         await impossible($c.lit("losestr: %d - %d"), u.acurr.a[A.STR], num);
         return;
@@ -302,12 +302,12 @@ export async function poisoned(reason, typ, pkiller, fatal, thrown_weapon) {   /
     /* if fatal is 0, limit damage to adjattrib */
     /* thrown weapons are less deadly */
     kprefix = KILLED.BY_AN;
-    blast = $c.i8(!$c.strcmp(reason, $c.lit("blast")) ? 1 : 0);
+    blast = !$c.strcmp(reason, $c.lit("blast")) ? 1 : 0;
     /* inform player about being poisoned unless that's already been done;
        "blast" has given a "blast of poison gas" message; "poison arrow",
        "poison dart", etc have implicitly given poison messages too... */
     if (!blast && !strstri(reason, $c.lit("poison"))) {
-        plural = $c.i8(reason.get($c.idx($c.subu64($c.strlen(reason), 1))) === 115 ? 1 : 0);
+        plural = reason.get($c.idx($c.subu64($c.strlen(reason), 1))) === 115 ? 1 : 0;
         /* avoid "The" Orcus's sting was poisoned... */
         await pline($c.lit("%s%s %s poisoned!"), $c.isupper($c.u8(reason.get(0))) ? $c.lit("") : $c.lit("The "), reason, plural ? $c.lit("were") : $c.lit("was"));
     }
@@ -356,7 +356,7 @@ export async function poisoned(reason, typ, pkiller, fatal, thrown_weapon) {   /
             }
         }
     } else if (i > 5) {
-        cloud = $c.i8(!$c.strcmp(reason, $c.lit("gas cloud")) ? 1 : 0);
+        cloud = !$c.strcmp(reason, $c.lit("gas cloud")) ? 1 : 0;
         /* HP damage; more likely--but less severe--with missiles */
         loss = thrown_weapon ? rnd(6) : rn2(10) + 6 | 0;
         if ((blast || cloud) && Half_gas_damage()) {   /* worn towel */
@@ -405,7 +405,7 @@ export function stone_luck(include_uncursed) {   // attrib.c:423
         if (confers_luck(otmp)) {
             if (otmp.cursed) {
                 bonchance = $c.sub64(bonchance, otmp.quan);
-            } else if (otmp.blessed | 0 || include_uncursed) {
+            } else if (otmp.blessed || include_uncursed) {
                 bonchance = $c.add64(bonchance, otmp.quan);
             }
         }
@@ -979,7 +979,7 @@ export async function from_what(propidx) {   // attrib.c:905
             } else if (innateness === FROM_FORM) {
                 $c.strcpy(new $c.Ptr(from_what$buf, 0), $c.lit(" from your creature form"));
             } else if (propidx === FAST && Very_fast()) {
-                $c.sprintf(new $c.Ptr(from_what$buf, 0), new $c.Ptr(from_what$because_of, 0), $c.and64(u.uprops[FAST].intrinsic, TIMEOUT) !== 0 ? $c.lit("a potion or spell") : $c.and64(u.uprops[FAST].extrinsic, W.ARMF) !== 0 && $G.uarmf.dknown | 0 && objects[$G.uarmf.otyp].oc_name_known | 0 ? await ysimple_name($G.uarmf) : u.uprops[FAST].extrinsic ? $c.lit("worn equipment") : c_common_strings.c_something);
+                $c.sprintf(new $c.Ptr(from_what$buf, 0), new $c.Ptr(from_what$because_of, 0), $c.and64(u.uprops[FAST].intrinsic, TIMEOUT) !== 0 ? $c.lit("a potion or spell") : $c.and64(u.uprops[FAST].extrinsic, W.ARMF) !== 0 && $G.uarmf.dknown && objects[$G.uarmf.otyp].oc_name_known ? await ysimple_name($G.uarmf) : u.uprops[FAST].extrinsic ? $c.lit("worn equipment") : c_common_strings.c_something);
             } else if (wizard() && (obj = what_gives(new $c.FieldRef(u.uprops[propidx], "extrinsic", "i64"))) !== null) {
                 /* speed boots */
                 $c.sprintf(new $c.Ptr(from_what$buf, 0), new $c.Ptr(from_what$because_of, 0), obj.oartifact ? await bare_artifactname(obj) : await ysimple_name(obj));
@@ -1107,7 +1107,7 @@ export function newhp() {   // attrib.c:1080
     let hp = 0, conplus = 0, lim = 0;
     if (u.ulevel === 0) {
         /* Initialize hit points */
-        hp = gu.urole.hpadv.infix + gu.urace.hpadv.infix | 0;
+        hp = gu.urole.hpadv.infix + gu.urace.hpadv.infix;
         if (gu.urole.hpadv.inrnd > 0) {
             hp = hp + rnd(gu.urole.hpadv.inrnd) | 0;
         }
@@ -1123,7 +1123,7 @@ export function newhp() {   // attrib.c:1080
         /* no Con adjustment for initial hit points */
     } else {
         if (u.ulevel < gu.urole.xlev) {
-            hp = gu.urole.hpadv.lofix + gu.urace.hpadv.lofix | 0;
+            hp = gu.urole.hpadv.lofix + gu.urace.hpadv.lofix;
             if (gu.urole.hpadv.lornd > 0) {
                 hp = hp + rnd(gu.urole.hpadv.lornd) | 0;
             }
@@ -1131,7 +1131,7 @@ export function newhp() {   // attrib.c:1080
                 hp = hp + rnd(gu.urace.hpadv.lornd) | 0;
             }
         } else {
-            hp = gu.urole.hpadv.hifix + gu.urace.hpadv.hifix | 0;
+            hp = gu.urole.hpadv.hifix + gu.urace.hpadv.hifix;
             if (gu.urole.hpadv.hirnd > 0) {
                 hp = hp + rnd(gu.urole.hpadv.hirnd) | 0;
             }
@@ -1166,7 +1166,7 @@ export function newhp() {   // attrib.c:1080
         /* after level 30, throttle hit point gains from extra experience;
            once max reaches 1200, further increments will be just 1 more */
         lim = $c.i8(5 - $c.div32(u.uhpmax, 300) | 0);
-        lim = $c.i8(lim > 1 ? lim : 1);
+        lim = lim > 1 ? lim : 1;
         if (hp > lim) {
             hp = lim;
         }
@@ -1247,7 +1247,7 @@ export function acurr(chridx) {   // attrib.c:1200
     let tmp = 0, result = 0;
     result = 0;   /* 'result' will always be reset to positive value */
     (!(chridx >= 0 && chridx < A.MAX) ? 1 : 0) ? $c.__assert_rtn($c.lit("acurr"), $c.lit("attrib.c"), 1204, $c.lit("chridx >= 0 && chridx < A_MAX")) : 0;
-    tmp = (u.abon.a[chridx] + u.atemp.a[chridx] | 0) + u.acurr.a[chridx] | 0;
+    tmp = u.abon.a[chridx] + u.atemp.a[chridx] + u.acurr.a[chridx];
     /* for Strength:  3 <= result <= 125;
        for all others:  3 <= result <= 25 */
     if (chridx === A.STR) {
@@ -1342,7 +1342,7 @@ export function extremeattr(attrindx) {   // attrib.c:1268
         }
     }
     /* are we currently at either limit? */
-    return $c.i8(curval === lolimit || curval === hilimit ? TRUE : FALSE);
+    return curval === lolimit || curval === hilimit ? TRUE : FALSE;
 }
 /* avoid possible problems with alignment overflow, and provide a centralized
    location for any future alignment limits */

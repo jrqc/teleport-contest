@@ -598,7 +598,7 @@ async function l_selection_filter_mapchar(L) {   // nhlsel.c:657
     argc = lua_gettop(L);
     sel = await l_selection_check(L, 1);
     mapchr = await dupstr(await luaL_checklstring(L, 2, null));
-    typ = $c.i16(check_mapchr(mapchr));
+    typ = check_mapchr(mapchr);
     lit = $c.i32(await luaL_optinteger(L, 3, -2));   /* TODO: special lit values */
     if (typ === INVALID_TYPE) {
         await nhl_error(L, $c.lit("Erroneous map char"));
@@ -676,7 +676,7 @@ async function l_selection_flood(L) {   // nhlsel.c:726
     }
     await get_location_coord(new $c.Ptr(x, 0), new $c.Ptr(y, 0), ANY_LOC, gc.coder ? gc.coder.croom : null, SP_COORD_PACK(x[0], y[0]));
     if (isok(x[0], y[0])) {
-        set_floodfillchk_match_under($c.i16(svl.level.locations[x[0]][y[0]].typ));
+        set_floodfillchk_match_under(svl.level.locations[x[0]][y[0]].typ);
         await selection_floodfill(sel, x[0], y[0], diagonals);
     }
     return 1;

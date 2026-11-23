@@ -248,7 +248,7 @@ async function alreadynamed(mtmp, monnambuf, usrbuf) {   // do_name.c:158
     let pronounbuf = new Int8Array(10), p = null, name_not_title = 0;
     if (!usrbuf.get(0)) {
         /* attempt to erase existing name */
-        name_not_title = $c.i8(has_mgivenname(mtmp) || type_is_pname(mtmp.data) || mtmp.isshk | 0 ? 1 : 0);
+        name_not_title = has_mgivenname(mtmp) || type_is_pname(mtmp.data) || mtmp.isshk ? 1 : 0;
         await pline($c.lit("%s would rather keep %s existing %s."), upstart(monnambuf), is_rider(mtmp.data) ? $c.lit("its") : genders[pronoun_gender(mtmp, PRONOUN.HALLU)].his, name_not_title ? $c.lit("name") : $c.lit("title"));
         return TRUE;
     } else if (fuzzymatch(usrbuf, monnambuf, $c.lit(" -_"), TRUE) || !strncmpi(monnambuf, $c.lit("the "), 4) && fuzzymatch(usrbuf, monnambuf.add(4), $c.lit(" -_"), TRUE) || (p = strstri(monnambuf, $c.lit("invisible "))) !== null && fuzzymatch(usrbuf, p.add(10), $c.lit(" -_"), TRUE) || (p = strstri(monnambuf, $c.lit(" of "))) !== null && fuzzymatch(usrbuf, p.add(4), $c.lit(" -_"), TRUE)) {
@@ -297,14 +297,14 @@ async function do_mgivenname() {   // do_name.c:199
         mtmp = svl.level.monsters[cx][cy];
     }
     /* Allow you to name the monster that has swallowed you */
-    if (!mtmp && u.uswallow | 0) {
+    if (!mtmp && u.uswallow) {
         glyph = glyph_at($c.i16(cx), $c.i16(cy));
         if (glyph_is_swallow(glyph)) {
             mtmp = u.ustuck;
             do_swallow = TRUE;
         }
     }
-    if (!do_swallow && (!mtmp || !sensemon(mtmp) && (!(cansee(cx, cy) || see_with_infrared(mtmp)) || mtmp.mundetected | 0 || M_AP_TYPE(mtmp) === M_AP.FURNITURE || M_AP_TYPE(mtmp) === M_AP.OBJECT || mtmp.minvis | 0 && !See_invisible()))) {
+    if (!do_swallow && (!mtmp || !sensemon(mtmp) && (!(cansee(cx, cy) || see_with_infrared(mtmp)) || mtmp.mundetected || M_AP_TYPE(mtmp) === M_AP.FURNITURE || M_AP_TYPE(mtmp) === M_AP.OBJECT || mtmp.minvis && !See_invisible()))) {
         await pline($c.lit("I see no monster there."));
         return;
     }
@@ -326,11 +326,11 @@ async function do_mgivenname() {   // do_name.c:199
         if (!await alreadynamed(mtmp, new $c.Ptr(monnambuf, 0), new $c.Ptr(buf, 0))) {
             await pline($c.lit("%s doesn't like being called names!"), upstart(new $c.Ptr(monnambuf, 0)));
         }
-    } else if (mtmp.isshk | 0 && !(Deaf() || helpless(mtmp) || mtmp.data.msound <= MS.ANIMAL)) {
+    } else if (mtmp.isshk && !(Deaf() || helpless(mtmp) || mtmp.data.msound <= MS.ANIMAL)) {
         if (!await alreadynamed(mtmp, new $c.Ptr(monnambuf, 0), new $c.Ptr(buf, 0))) {
             await verbalize($c.lit("I'm %s, not %s."), await shkname(mtmp), new $c.Ptr(buf, 0));
         }
-    } else if (mtmp.ispriest | 0 || mtmp.isminion | 0 || mtmp.isshk | 0 || mtmp.data === mons[PM.GHOST] || has_ebones(mtmp)) {
+    } else if (mtmp.ispriest || mtmp.isminion || mtmp.isshk || mtmp.data === mons[PM.GHOST] || has_ebones(mtmp)) {
         if (!await alreadynamed(mtmp, new $c.Ptr(monnambuf, 0), new $c.Ptr(buf, 0))) {
             await pline($c.lit("%s will not accept the name %s."), upstart(new $c.Ptr(monnambuf, 0)), new $c.Ptr(buf, 0));
         }
@@ -427,8 +427,8 @@ export async function oname(obj, name, oflgs) {   // do_name.c:372
     /* item to assign name to */
     /* name to assign */
     /* flags, mostly for artifact creation */
-    via_naming = $c.i8((oflgs & ONAME_VIA_NAMING) >>> 0 !== 0 ? 1 : 0);
-    skip_inv_update = $c.i8((oflgs & ONAME_SKIP_INVUPD) >>> 0 !== 0 ? 1 : 0);
+    via_naming = (oflgs & ONAME_VIA_NAMING) >>> 0 !== 0 ? 1 : 0;
+    skip_inv_update = (oflgs & ONAME_SKIP_INVUPD) >>> 0 !== 0 ? 1 : 0;
     lth = name.get(0) ? $c.i32($c.addu64($c.strlen(name), 1)) : 0;
     if (lth > PL.PSIZ) {
         lth = PL.PSIZ;
@@ -543,7 +543,7 @@ export function call_ok(obj) {   // do_name.c:480
        when something has been named and then becomes discovered, it
        remains a likely candidate until player renames it to <space>
        to remove that no longer needed name */
-    if (!obj.dknown || objects[obj.otyp].oc_name_known | 0 && !objects[obj.otyp].oc_uname) {
+    if (!obj.dknown || objects[obj.otyp].oc_name_known && !objects[obj.otyp].oc_uname) {
         return GETOBJ.DOWNPLAY;
     }
     return GETOBJ.SUGGEST;
@@ -574,21 +574,21 @@ export async function docallcmd() {   // do_name.c:499
         await start_menu()(win, MENU.BEHAVE_STANDARD);
         any.$copyFrom(cg.zeroany);
         any.a_char = 109;   /* group accelerator 'C' */
-        await add_menu(win, nul_glyphinfo, any, $c.i8(abc ? 0 : any.a_char), 67, ATR.NONE, clr, $c.lit("a monster"), MENU.ITEMFLAGS_NONE);
+        await add_menu(win, nul_glyphinfo, any, abc ? 0 : any.a_char, 67, ATR.NONE, clr, $c.lit("a monster"), MENU.ITEMFLAGS_NONE);
         if (gi.invent) {
             /* we use y and n as accelerators so that we can accept user's
                response keyed to old "name an individual object?" prompt */
             any.a_char = 105;   /* group accelerator 'y' */
-            await add_menu(win, nul_glyphinfo, any, $c.i8(abc ? 0 : any.a_char), 121, ATR.NONE, clr, $c.lit("a particular object in inventory"), MENU.ITEMFLAGS_NONE);
+            await add_menu(win, nul_glyphinfo, any, abc ? 0 : any.a_char, 121, ATR.NONE, clr, $c.lit("a particular object in inventory"), MENU.ITEMFLAGS_NONE);
             any.a_char = 111;   /* group accelerator 'n' */
-            await add_menu(win, nul_glyphinfo, any, $c.i8(abc ? 0 : any.a_char), 110, ATR.NONE, clr, $c.lit("the type of an object in inventory"), MENU.ITEMFLAGS_NONE);
+            await add_menu(win, nul_glyphinfo, any, abc ? 0 : any.a_char, 110, ATR.NONE, clr, $c.lit("the type of an object in inventory"), MENU.ITEMFLAGS_NONE);
         }
         any.a_char = 102;   /* group accelerator ',' (or ':' instead?) */
-        await add_menu(win, nul_glyphinfo, any, $c.i8(abc ? 0 : any.a_char), 44, ATR.NONE, clr, $c.lit("the type of an object upon the floor"), MENU.ITEMFLAGS_NONE);
+        await add_menu(win, nul_glyphinfo, any, abc ? 0 : any.a_char, 44, ATR.NONE, clr, $c.lit("the type of an object upon the floor"), MENU.ITEMFLAGS_NONE);
         any.a_char = 100;   /* group accelerator '\' */
-        await add_menu(win, nul_glyphinfo, any, $c.i8(abc ? 0 : any.a_char), 92, ATR.NONE, clr, $c.lit("the type of an object on discoveries list"), MENU.ITEMFLAGS_NONE);
+        await add_menu(win, nul_glyphinfo, any, abc ? 0 : any.a_char, 92, ATR.NONE, clr, $c.lit("the type of an object on discoveries list"), MENU.ITEMFLAGS_NONE);
         any.a_char = 97;   /* group accelerator 'l' */
-        await add_menu(win, nul_glyphinfo, any, $c.i8(abc ? 0 : any.a_char), 108, ATR.NONE, clr, $c.lit("record an annotation for the current level"), MENU.ITEMFLAGS_NONE);
+        await add_menu(win, nul_glyphinfo, any, abc ? 0 : any.a_char, 108, ATR.NONE, clr, $c.lit("record an annotation for the current level"), MENU.ITEMFLAGS_NONE);
         await end_menu()(win, $c.lit("What do you want to name?"));
         if (await select_menu(win, PICK.ONE, new $c.Ptr(pick_list, 0)) > 0) {
             ch = $c.radd(pick_list[0], 0).item.a_char;
@@ -654,23 +654,23 @@ async function docall_xname(obj) {   // do_name.c:605
     otemp.oextra = null;
     otemp.quan = 1;
     /* in case water is already known, convert "[un]holy water" to "water" */
-    $t1 = otemp.cursed = (0) & 1, otemp.blessed = ($t1) & 1;
+    $t1 = otemp.cursed = 0, otemp.blessed = ($t1) & 1;
     /* remove attributes that are doname() caliber but get formatted
        by xname(); most of these fixups aren't really needed because the
        relevant type of object isn't callable so won't reach this far */
     if (otemp.oclass === WEAPON_CLASS) {
-        otemp.otrapped = (0) & 1;   /* not poisoned */
+        otemp.otrapped = 0;   /* not poisoned */
     } else if (otemp.oclass === POTION_CLASS) {
-        otemp.oeroded = (0) & 3;   /* not diluted */
+        otemp.oeroded = 0;   /* not diluted */
     } else if (otemp.otyp === TOWEL || otemp.otyp === STATUE) {
         otemp.spe = 0;   /* not wet or historic */
     } else if (otemp.otyp === TIN) {
-        otemp.known = (0) & 1;   /* suppress tin type (homemade, &c) and mon type */
+        otemp.known = 0;   /* suppress tin type (homemade, &c) and mon type */
     } else if (otemp.otyp === FIGURINE) {
         otemp.corpsenm = NON_PM;   /* suppress mon type */
     } else if (otemp.otyp === HEAVY_IRON_BALL) {
         otemp.owt = objects[HEAVY_IRON_BALL].oc_weight;   /* not "very heavy" */
-    } else if (otemp.oclass === FOOD_CLASS && otemp.globby | 0) {
+    } else if (otemp.oclass === FOOD_CLASS && otemp.globby) {
         otemp.owt = 120;   /* 6*20, neither a small glob nor a large one */
     }
     return await an(await xname(otemp));
@@ -727,7 +727,7 @@ async function namefloorobj() {   // do_name.c:679
     /* "dot for under/over you" only makes sense when the cursor hasn't
        been moved off the hero's '@' yet, but there's no way to adjust
        the help text once getpos() has started */
-    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("object on map (or '.' for one %s you)"), u.uundetected | 0 && $c.andu64(gy.youmonst.data.mflags1, M1.CONCEAL) !== 0 ? $c.lit("over") : $c.lit("under"));
+    $c.sprintf(new $c.Ptr(buf, 0), $c.lit("object on map (or '.' for one %s you)"), u.uundetected && $c.andu64(gy.youmonst.data.mflags1, M1.CONCEAL) !== 0 ? $c.lit("over") : $c.lit("under"));
     if (await getpos(cc, FALSE, new $c.Ptr(buf, 0)) < 0 || cc.x <= 0) {
         return;
     }
@@ -751,10 +751,10 @@ async function namefloorobj() {   // do_name.c:679
        always fail the Hallucination test and pass the !callable test,
        resulting in the "can't be assigned a type name" message */
     $c.strcpy(new $c.Ptr(buf, 0), obj[0].otyp !== STRANGE_OBJECT ? await simpleonames(obj[0]) : obj_descr[STRANGE_OBJECT].oc_name);
-    use_plural = $c.i8(obj[0].quan > 1 ? 1 : 0);
+    use_plural = obj[0].quan > 1 ? 1 : 0;
     if (Hallucination()) {
         /* straight role name */
-        unames[0] = (Upolyd() ? u.mfemale | 0 : flags.female) && gu.urole.name.f ? gu.urole.name.f : gu.urole.name.m;
+        unames[0] = (Upolyd() ? u.mfemale : flags.female) && gu.urole.name.f ? gu.urole.name.f : gu.urole.name.m;
         /* random rank title for hero's role
 
            note: the 30 is hardcoded in xlev_to_rank, so should be
@@ -847,7 +847,7 @@ export async function x_monnam(mtmp, article, adjective, suppress, called) {   /
     let buf = null, mdat = null, pm_name = null, do_hallu = 0, do_invis = 0, do_it = 0, do_saddle = 0, do_mappear = 0, do_exact = 0, do_name = 0, augment_it = 0, name_at_start = 0, has_adjectives = 0, insertbuf2 = 0, mappear_as_mon = 0, bp = null, buf2 = new Int8Array(256), s_one = 0, name = null, save_prop = 0, save_invis = 0, rnamecode = Int8Array.of(0), rname = null, name$2 = null, pbuf = new Int8Array(256), pbuf$2 = new Int8Array(256);
     buf = nextmbuf();
     mdat = mtmp.data;
-    mappear_as_mon = $c.i8(M_AP_TYPE(mtmp) === M_AP.MONSTER ? 1 : 0);
+    mappear_as_mon = M_AP_TYPE(mtmp) === M_AP.MONSTER ? 1 : 0;
     if ($c.peq(mtmp, gy.youmonst)) {
         return $c.strcpy(buf, $c.lit("you"));   /* ignore article, "invisible", &c */
     }
@@ -857,7 +857,7 @@ export async function x_monnam(mtmp, article, adjective, suppress, called) {   /
     if (article === ARTICLE.YOUR && !mtmp.mtame) {
         article = ARTICLE.THE;
     }
-    if (u.uswallow | 0 && $c.peq(mtmp, u.ustuck)) {
+    if (u.uswallow && $c.peq(mtmp, u.ustuck)) {
         /*
          * This monster has become important, for the moment anyway.
          * As the hero's consumer, it is worthy of ARTICLE_THE.
@@ -867,25 +867,25 @@ export async function x_monnam(mtmp, article, adjective, suppress, called) {   /
         article = ARTICLE.THE;
         suppress = suppress | SUPPRESS.INVISIBLE;
     }
-    do_hallu = $c.i8(Hallucination() && !(suppress & SUPPRESS.HALLUCINATION) ? 1 : 0);
-    do_invis = $c.i8(mtmp.minvis | 0 && !(suppress & SUPPRESS.INVISIBLE) ? 1 : 0);
-    do_it = $c.i8(!canspotmon(mtmp) && article !== ARTICLE.YOUR && !program_state.gameover && !$c.peq(mtmp, u.usteed) && !engulfing_u(mtmp) && !(suppress & SUPPRESS.IT) ? 1 : 0);
-    do_saddle = $c.i8(!(suppress & SUPPRESS.SADDLE) ? 1 : 0);
-    do_mappear = $c.i8(mappear_as_mon && !(suppress & SUPPRESS.MAPPEARANCE) ? 1 : 0);
-    do_exact = $c.i8((suppress & EXACT_NAME) === EXACT_NAME ? 1 : 0);
-    do_name = $c.i8(!(suppress & SUPPRESS_NAME) || type_is_pname(mdat) ? 1 : 0);
-    augment_it = $c.i8((suppress & AUGMENT_IT) !== 0 ? 1 : 0);
+    do_hallu = Hallucination() && !(suppress & SUPPRESS.HALLUCINATION) ? 1 : 0;
+    do_invis = mtmp.minvis && !(suppress & SUPPRESS.INVISIBLE) ? 1 : 0;
+    do_it = !canspotmon(mtmp) && article !== ARTICLE.YOUR && !program_state.gameover && !$c.peq(mtmp, u.usteed) && !engulfing_u(mtmp) && !(suppress & SUPPRESS.IT) ? 1 : 0;
+    do_saddle = !(suppress & SUPPRESS.SADDLE) ? 1 : 0;
+    do_mappear = mappear_as_mon && !(suppress & SUPPRESS.MAPPEARANCE) ? 1 : 0;
+    do_exact = (suppress & EXACT_NAME) === EXACT_NAME ? 1 : 0;
+    do_name = !(suppress & SUPPRESS_NAME) || type_is_pname(mdat) ? 1 : 0;
+    augment_it = (suppress & AUGMENT_IT) !== 0 ? 1 : 0;
     buf.set(0, 0);
     /* unseen monsters, etc.; usually "it" but sometimes more specific;
        when hallucinating, the more specific values might be inverted */
     if (do_it) {
         /* !is_animal excludes all Y; !mindless excludes Z, M, \' */
-        s_one = $c.i8(humanoid(mdat) && !is_animal(mdat) && !mindless(mdat) ? 1 : 0);
+        s_one = humanoid(mdat) && !is_animal(mdat) && !mindless(mdat) ? 1 : 0;
         $c.strcpy(buf, !augment_it ? $c.lit("it") : (!do_hallu ? s_one : !rn2(2)) ? $c.lit("someone") : $c.lit("something"));
         return buf;
     }
     /* priests and minions: don't even use this function */
-    if ((mtmp.ispriest | 0 || mtmp.isminion | 0) && !do_mappear) {
+    if ((mtmp.ispriest || mtmp.isminion) && !do_mappear) {
         save_prop = u.uprops[HALLUC_RES].extrinsic;
         save_invis = mtmp.minvis;
         /* when true name is wanted, explicitly block Hallucination */
@@ -893,7 +893,7 @@ export async function x_monnam(mtmp, article, adjective, suppress, called) {   /
             u.uprops[HALLUC_RES].extrinsic = 1;
         }
         if (!do_invis) {
-            mtmp.minvis = (0) & 1;
+            mtmp.minvis = 0;
         }
         /* EXACT_NAME will force "of <deity>" on the Astral Plane */
         name = await priestname(mtmp, article, do_exact, new $c.Ptr(buf2, 0));
@@ -916,7 +916,7 @@ export async function x_monnam(mtmp, article, adjective, suppress, called) {   /
      * shopkeeper" or "Asidonhopo the blue dragon".  If hallucinating,
      * none of this applies.
      */
-    if (mtmp.isshk | 0 && !do_hallu && !do_mappear) {
+    if (mtmp.isshk && !do_hallu && !do_mappear) {
         if (adjective && article === ARTICLE.THE) {
             /* pathological case: "the angry Asidonhopo the blue dragon"
                sounds silly */
@@ -945,7 +945,7 @@ export async function x_monnam(mtmp, article, adjective, suppress, called) {   /
     if (do_saddle && $c.and64(mtmp.misc_worn_check, W.SADDLE) && !Blind() && !Hallucination()) {
         $c.strcat(buf, $c.lit("saddled "));
     }
-    has_adjectives = $c.i8(buf.get(0) !== 0 ? 1 : 0);
+    has_adjectives = buf.get(0) !== 0 ? 1 : 0;
     /* Put the actual monster name or type into the buffer now.
        Remember whether the buffer starts with a personal name. */
     if (do_hallu) {
@@ -960,7 +960,7 @@ export async function x_monnam(mtmp, article, adjective, suppress, called) {   /
             name_at_start = TRUE;
         } else if (called) {
             $c.sprintf(eos(buf), $c.lit("%s called %s"), pm_name, name$2);
-            name_at_start = $c.i8(type_is_pname(mdat));
+            name_at_start = type_is_pname(mdat);
         } else if (is_mplayer(mdat) && (bp = strstri(name$2, $c.lit(" the "))) !== null) {
             /* <name> the <adjective> <invisible> <saddled> <rank> */
             $c.strcpy(new $c.Ptr(pbuf, 0), name$2);
@@ -978,12 +978,12 @@ export async function x_monnam(mtmp, article, adjective, suppress, called) {   /
         }
         /* hardfought */
     } else if (is_mplayer(mdat) && !In_endgame(u.uz)) {
-        $c.strcpy(new $c.Ptr(pbuf$2, 0), rank_of(mtmp.m_lev, $c.i16(mdat.pmidx), $c.i8(mtmp.female)));
+        $c.strcpy(new $c.Ptr(pbuf$2, 0), rank_of(mtmp.m_lev, $c.i16(mdat.pmidx), mtmp.female));
         $c.strcat(buf, lcase(new $c.Ptr(pbuf$2, 0)));
         name_at_start = FALSE;
     } else {
         $c.strcat(buf, pm_name);
-        name_at_start = $c.i8(type_is_pname(mdat));
+        name_at_start = type_is_pname(mdat);
     }
     if (name_at_start && (article === ARTICLE.YOUR || !has_adjectives)) {
         if (mdat === mons[PM.WIZARD_OF_YENDOR]) {
@@ -1167,7 +1167,7 @@ export async function distant_monnam(mon, article, outbuf) {   // do_name.c:1170
        its own obfuscation) */
     if (mon.data === mons[PM.HIGH_CLERIC] && !Hallucination() && ((svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level)) && !(dist2(mon.mx, mon.my, u.ux, u.uy) <= 2)) {
         $c.strcpy(outbuf, article === ARTICLE.THE ? $c.lit("the ") : $c.lit(""));
-        $c.strcat(outbuf, mon.female | 0 ? $c.lit("high priestess") : $c.lit("high priest"));
+        $c.strcat(outbuf, mon.female ? $c.lit("high priestess") : $c.lit("high priest"));
     } else {
         $c.strcpy(outbuf, await x_monnam(mon, article, null, 0, TRUE));
     }
@@ -1227,7 +1227,7 @@ export async function monverbself(mon, monnamtext, verb, othertext) {   // do_na
         monnamtext = await makeplural(monnamtext);
         /* for "it", makeplural() produces "them" but we want "they" */
         if (!strncmpi(monnamtext, genders[3].he, -1)) {
-            capitaliz = $c.i8(monnamtext.get(0) === highc(monnamtext.get(0)) ? 1 : 0);
+            capitaliz = monnamtext.get(0) === highc(monnamtext.get(0)) ? 1 : 0;
             $c.strcpy(monnamtext, genders[3].him);
             if (capitaliz) {
                 $t1 = highc(monnamtext.get(0)), monnamtext.set(0, $t1);
@@ -1262,7 +1262,7 @@ export function minimal_monnam(mon, ckloc) {   // do_name.c:1254
     } else if (ckloc && ptr === mons[PM.LONG_WORM] && mon.mx && !$c.peq(svl.level.monsters[mon.mx][mon.my], mon)) {
         $c.sprintf(outbuf, $c.lit("%s <%d,%d>"), pmname(mons[PM.LONG_WORM_TAIL], Mgender(mon)), mon.mx, mon.my);
     } else {
-        $c.sprintf(outbuf, $c.lit("%s%s <%d,%d>"), mon.mtame ? $c.lit("tame ") : mon.mpeaceful | 0 ? $c.lit("peaceful ") : $c.lit(""), mon_pmname(mon), mon.mx, mon.my);
+        $c.sprintf(outbuf, $c.lit("%s%s <%d,%d>"), mon.mtame ? $c.lit("tame ") : mon.mpeaceful ? $c.lit("peaceful ") : $c.lit(""), mon_pmname(mon), mon.mx, mon.my);
         if (mon.cham !== NON_PM) {
             $c.sprintf(eos(outbuf), $c.lit("{%s}"), pmname($c.relem(mons, mon.cham), Mgender(mon)));
         }
@@ -1277,7 +1277,7 @@ export function Mgender(mtmp) {   // do_name.c:1289
     let mgender = 0;
     mgender = MALE;
     if ($c.peq(mtmp, gy.youmonst)) {
-        if (Upolyd() ? u.mfemale | 0 : flags.female) {
+        if (Upolyd() ? u.mfemale : flags.female) {
             mgender = FEMALE;
         }
     } else if (mtmp.female) {
@@ -1376,7 +1376,7 @@ export async function rndmonnam(code) {   // do_name.c:1389
         code.set(0, 0);
     }
     do {
-        name = rn2_on_display_rng(SPECIAL_PM + BOGUSMONSIZE - LOW_PM) + LOW_PM | 0;
+        name = rn2_on_display_rng(SPECIAL_PM + BOGUSMONSIZE - LOW_PM) + LOW_PM;
     } while (name < SPECIAL_PM && (type_is_pname($c.relem(mons, name)) || mons[name].geno & G_NOGEN));
     if (name >= SPECIAL_PM) {
         mnam = await bogusmon(new $c.Ptr(rndmonnam$buf, 0), code);
@@ -1394,7 +1394,7 @@ export function bogon_is_pname(code) {   // do_name.c:1415
     if (!code) {
         return FALSE;
     }
-    return $c.i8($c.strchr($c.lit("-+="), code) ? TRUE : FALSE);
+    return $c.strchr($c.lit("-+="), code) ? TRUE : FALSE;
 }
 /* name of a Rogue player */
 /**
@@ -1438,7 +1438,7 @@ export function rndcolor() {   // do_name.c:1470
 export function hliquid(liquidpref) {   // do_name.c:1493
     let hallucinate = 0, indx = 0, count = 0;
     /* use as-is when not hallucintg (unless empty) */
-    hallucinate = $c.i8(Hallucination() && !program_state.gameover ? 1 : 0);
+    hallucinate = Hallucination() && !program_state.gameover ? 1 : 0;
     if (hallucinate || !liquidpref || !liquidpref.get(0)) {
         count = 40;
         /* if we have a non-hallucinatory default value, include it
@@ -1460,7 +1460,7 @@ export function hliquid(liquidpref) {   // do_name.c:1493
  */
 export async function coyotename(mtmp, buf) {   // do_name.c:1526
     if (mtmp && buf) {
-        $c.sprintf(buf, $c.lit("%s - %s"), await x_monnam(mtmp, ARTICLE.NONE, null, 0, TRUE), mtmp.mcan | 0 ? coynames[21] : coynames[$c.remu32(mtmp.m_id, 21)]);
+        $c.sprintf(buf, $c.lit("%s - %s"), await x_monnam(mtmp, ARTICLE.NONE, null, 0, TRUE), mtmp.mcan ? coynames[21] : coynames[$c.remu32(mtmp.m_id, 21)]);
     }
     return buf;
 }

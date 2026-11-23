@@ -121,8 +121,8 @@ export async function settty(s) {   // unixtty.c:247
             $c.perror($c.lit("NetHack (settty)"));
         }
     }
-    iflags.echo = $c.i8($c.andu64(inittyb.c_lflag, 8) ? ON : OFF);
-    iflags.cbreak = $c.i8(!$c.andu64(inittyb.c_lflag, 256) ? ON : OFF);
+    iflags.echo = $c.andu64(inittyb.c_lflag, 8) ? ON : OFF;
+    iflags.cbreak = !$c.andu64(inittyb.c_lflag, 256) ? ON : OFF;
     curttyb.c_iflag = $c.oru64(curttyb.c_iflag, 32);
     setioctls();
     settty_needed = 0;

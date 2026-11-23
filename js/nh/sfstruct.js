@@ -1908,12 +1908,12 @@ export async function bwrite(fd, loc, num) {   // sfstruct.c:494
             return;
         }
         if (bw_buffered[idx] && bw_FILE[idx]) {
-            failed = $c.i8($c.fwrite(loc, $c.u64(num | 0), 1, bw_FILE[idx]) !== 1 ? 1 : 0);
+            failed = $c.fwrite(loc, $c.u64(num | 0), 1, bw_FILE[idx]) !== 1 ? 1 : 0;
         } else {
             /* UNIX */
             /* lint wants 3rd arg of write to be an int; lint -p an unsigned */
             /* e.g. SYSV, __TURBOC__ */
-            failed = $c.i8($c.write(fd, loc, num) !== num ? 1 : 0);
+            failed = $c.write(fd, loc, num) !== num ? 1 : 0;
         }
         if (failed) {
             if (program_state.done_hup) {

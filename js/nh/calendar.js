@@ -198,7 +198,7 @@ export function friday_13th() {   // calendar.c:215
     let lt = null;
     lt = getlt();
     /* tm_wday (day of week; 0==Sunday) == 5 => Friday */
-    return $c.i8(lt.tm_wday === 5 && lt.tm_mday === 13 ? 1 : 0);
+    return lt.tm_wday === 5 && lt.tm_mday === 13 ? 1 : 0;
 }
 /**
  * @returns {number} int

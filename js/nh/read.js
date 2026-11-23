@@ -279,7 +279,7 @@ export async function doread() {   // read.c:330
         return ECMD.CANCEL;
     }
     otyp = scroll.otyp;
-    scroll.pickup_prev = (0) & 1;   /* no longer 'just picked up' */
+    scroll.pickup_prev = 0;   /* no longer 'just picked up' */
     /* outrumor has its own blindness check */
     if (otyp === FORTUNE_COOKIE) {
         if (flags.verbose) {
@@ -300,7 +300,7 @@ export async function doread() {   // read.c:330
         }
         /* can't read shirt worn under suit (under cloak is ok though) */
         if ((otyp === T_SHIRT || otyp === HAWAIIAN_SHIRT) && $G.uarm && $c.peq(scroll, $G.uarmu)) {
-            await pline($c.lit("%s shirt is obscured by %s%s."), scroll.unpaid | 0 ? $c.lit("That") : $c.lit("Your"), await shk_your(new $c.Ptr(buf, 0), $G.uarm), suit_simple_name($G.uarm));
+            await pline($c.lit("%s shirt is obscured by %s%s."), scroll.unpaid ? $c.lit("That") : $c.lit("Your"), await shk_your(new $c.Ptr(buf, 0), $G.uarm), suit_simple_name($G.uarm));
             return ECMD.OK;
         }
         if (otyp === HAWAIIAN_SHIRT) {
@@ -438,7 +438,7 @@ export async function doread() {   // read.c:330
             return ECMD.OK;
         }
     }
-    confused = $c.i8(u.uprops[CONFUSION].intrinsic !== 0 ? 1 : 0);
+    confused = u.uprops[CONFUSION].intrinsic !== 0 ? 1 : 0;
     if (otyp === SCR_MAIL) {
         confused = FALSE;   /* override */
         /* reading mail is a convenience for the player and takes
@@ -466,10 +466,10 @@ export async function doread() {   // read.c:330
     }
     scroll.in_use = (TRUE) & 1;   /* scroll, not spellbook, now being read */
     if (otyp !== SCR_BLANK_PAPER) {
-        silently = $c.i8(!can_chant(gy.youmonst) ? 1 : 0);
+        silently = !can_chant(gy.youmonst) ? 1 : 0;
         /* a few scroll feedback messages describe something happening
            to the scroll itself, so avoid "it disappears" for those */
-        nodisappear = $c.i8(otyp === SCR_FIRE || otyp === SCR_REMOVE_CURSE && scroll.cursed | 0 ? 1 : 0);
+        nodisappear = otyp === SCR_FIRE || otyp === SCR_REMOVE_CURSE && scroll.cursed ? 1 : 0;
         if (Blind()) {
             await pline(nodisappear ? $c.lit("You %s the formula on the scroll.") : $c.lit("As you %s the formula on it, the scroll disappears."), silently ? $c.lit("cogitate") : $c.lit("pronounce"));
         } else {
@@ -503,7 +503,7 @@ export async function doread() {   // read.c:330
  * @returns {Promise<void>}
  */
 async function stripspe(obj) {   // read.c:652
-    if (obj.blessed | 0 || obj.spe <= 0) {
+    if (obj.blessed || obj.spe <= 0) {
         await pline($c.lit("%s"), c_common_strings.c_nothing_happens);
     } else {
         /* order matters: message, shop handling, actual transformation */
@@ -550,7 +550,7 @@ export function charge_ok(obj) {   // read.c:689
     if (obj.oclass === WAND_CLASS) {
         return GETOBJ.SUGGEST;
     }
-    if (obj.oclass === RING_CLASS && objects[obj.otyp].oc_charged | 0 && obj.dknown | 0 && objects[obj.otyp].oc_name_known | 0) {
+    if (obj.oclass === RING_CLASS && objects[obj.otyp].oc_charged && obj.dknown && objects[obj.otyp].oc_name_known) {
         return GETOBJ.SUGGEST;
     }
     if (is_weptool(obj)) {   /* specific check before general tools */
@@ -565,7 +565,7 @@ export function charge_ok(obj) {   // read.c:689
         /* suggest chargeable tools only if discovered, to prevent leaking
            info (e.g. revealing if an unidentified 'flute' is magic or not) */
         if (objects[obj.otyp].oc_charged) {
-            return obj.dknown | 0 && objects[obj.otyp].oc_name_known | 0 ? GETOBJ.SUGGEST : GETOBJ.DOWNPLAY;
+            return obj.dknown && objects[obj.otyp].oc_name_known ? GETOBJ.SUGGEST : GETOBJ.DOWNPLAY;
         }
         return GETOBJ.EXCLUDE;
     }
@@ -585,11 +585,11 @@ export async function recharge(obj, curse_bless) {   // read.c:729
     D1: for (;;) {
         switch ($goto) {
         case null:
-            is_cursed = $c.i8(curse_bless < 0 ? 1 : 0);
-            is_blessed = $c.i8(curse_bless > 0 ? 1 : 0);
+            is_cursed = curse_bless < 0 ? 1 : 0;
+            is_blessed = curse_bless > 0 ? 1 : 0;
         case "not_chargable":
             if ($goto !== "not_chargable" && obj.oclass === WAND_CLASS) {
-                lim = obj.otyp === WAN_WISHING ? 1 : (objects[obj.otyp].oc_dir | 0) !== NODIR ? 8 : 15;
+                lim = obj.otyp === WAN_WISHING ? 1 : objects[obj.otyp].oc_dir !== NODIR ? 8 : 15;
                 /* undo any prior cancellation, even when is_cursed */
                 if (obj.spe === -1) {
                     obj.spe = 0;
@@ -608,7 +608,7 @@ export async function recharge(obj, curse_bless) {   // read.c:729
                  *      6 :  62.97   82.83
                  *      7 : 100     100
                  */
-                n = obj.recharged | 0;
+                n = obj.recharged;
                 if (n > 0 && (obj.otyp === WAN_WISHING || Math.imul(Math.imul(n, n), n) > rn2(343))) {
                     /* recharge_limit */
                     await wand_explode(obj, rnd(lim));
@@ -646,10 +646,10 @@ export async function recharge(obj, curse_bless) {   // read.c:729
                     /*[shop price doesn't vary by charge count]*/
                     /* update shop bill to reflect new higher price */
                 }
-            } else if ($goto !== "not_chargable" && (obj.oclass === RING_CLASS && objects[obj.otyp].oc_charged | 0)) {
+            } else if ($goto !== "not_chargable" && (obj.oclass === RING_CLASS && objects[obj.otyp].oc_charged)) {
                 /* charging does not affect ring's curse/bless status */
                 s = is_blessed ? rnd(3) : is_cursed ? -rnd(2) | 0 : 1;
-                is_on = $c.i8($c.peq(obj, $G.uleft) || $c.peq(obj, $G.uright) ? 1 : 0);
+                is_on = $c.peq(obj, $G.uleft) || $c.peq(obj, $G.uright) ? 1 : 0;
                 /* destruction depends on current state, not adjustment */
                 if (obj.spe > rn2(7) || obj.spe <= -5) {
                     await pline($c.lit("%s momentarily, then %s!"), await Yobjnam2(obj, $c.lit("pulsate")), await otense(obj, $c.lit("explode")));
@@ -676,12 +676,12 @@ export async function recharge(obj, curse_bless) {   // read.c:729
                     /* oartifact: if a touch-sensitive artifact ring is
                        ever created the above will need to be revised  */
                     /* update shop bill to reflect new higher price */
-                    if (s > 0 && obj.unpaid | 0) {
+                    if (s > 0 && obj.unpaid) {
                         await alter_cost(obj, 0);
                     }
                 }
             } else if ($goto !== "not_chargable" && obj.oclass === TOOL_CLASS) {
-                rechrg = obj.recharged | 0;
+                rechrg = obj.recharged;
                 if (objects[obj.otyp].oc_charged) {
                     /* tools don't have a limit, but the counter used does */
                     if (rechrg < 7) {   /* recharge_limit */
@@ -708,7 +708,7 @@ export async function recharge(obj, curse_bless) {   // read.c:729
                             await stripspe(obj);
                         } else if (rechrg && obj.otyp === MAGIC_MARKER) {
                             /* previously recharged */
-                            obj.recharged = (1) & 7;   /* override increment done above */
+                            obj.recharged = 1;   /* override increment done above */
                             if (obj.spe < 3) {
                                 await Your($c.lit("marker seems permanently dried out."));
                             } else {
@@ -794,7 +794,7 @@ export async function recharge(obj, curse_bless) {   // read.c:729
                             /* [shop price stays the same regardless of charges or BUC] */
                         } else {
                             /* uncursed scroll increments charges and uncurses ball */
-                            if (obj.spe < 7 || obj.cursed | 0) {
+                            if (obj.spe < 7 || obj.cursed) {
                                 n = rnd(2);
                                 obj.spe = $c.i8((obj.spe + n | 0) < 7 ? obj.spe + n | 0 : 7);
                                 if (!obj.cursed) {
@@ -894,12 +894,12 @@ async function forget(howmuch) {   // read.c:1020
     /* forget having seen monsts (affects recognizing unseen ones by sound) */
     for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
         if (!$c.peq(mtmp, u.usteed) && !$c.peq(mtmp, u.ustuck)) {
-            mtmp.meverseen = (0) & 1;
+            mtmp.meverseen = 0;
         }
     }
     /* [perhaps ought to forget having seen every monster on every level] */
     for (mtmp = gm.migrating_mons; mtmp; mtmp = mtmp.nmon) {
-        mtmp.meverseen = (0) & 1;
+        mtmp.meverseen = 0;
     }
 }
 /* monster is hit by scroll of taming's effect */
@@ -920,10 +920,10 @@ async function maybe_tame(mtmp, sobj) {   // read.c:1044
     } else {
         /* for a shopkeeper, tamedog() will call make_happy_shk() but
            not tame the target, so call it even if taming gets resisted */
-        if (!await resist(mtmp, sobj.oclass, 0, NOTELL) || mtmp.isshk | 0) {
+        if (!await resist(mtmp, sobj.oclass, 0, NOTELL) || mtmp.isshk) {
             await tamedog(mtmp, sobj, FALSE);
         }
-        if (!was_peaceful && mtmp.mpeaceful | 0 || was_tame !== mtmp.mtame) {
+        if (!was_peaceful && mtmp.mpeaceful || was_tame !== mtmp.mtame) {
             return 1;
         }
     }
@@ -941,7 +941,7 @@ export function valid_cloud_pos(x, y) {   // read.c:1069
     if (!isok(x, y)) {
         return FALSE;
     }
-    return $c.i8(svl.level.locations[x][y].typ >= DOOR || is_pool(x, y) || is_lava(x, y) ? 1 : 0);
+    return svl.level.locations[x][y].typ >= DOOR || is_pool(x, y) || is_lava(x, y) ? 1 : 0;
 }
 /* Callback for getpos_sethilite, also used in determining whether a scroll
  * should have its regular effects, or not because it was out of range.
@@ -955,7 +955,7 @@ function can_center_cloud(x, y) {   // read.c:1080
     if (!valid_cloud_pos(x, y)) {
         return FALSE;
     }
-    return $c.i8(cansee(x, y) && distu(x, y) < 32 ? 1 : 0);
+    return cansee(x, y) && distu(x, y) < 32 ? 1 : 0;
 }
 /**
  * @param {number} on_off boolean
@@ -969,8 +969,8 @@ async function display_stinking_cloud_positions(on_off) {   // read.c:1088
         await tmp_at(DISP_BEAM, 4092);
         for (dx = $c.i16(-dist | 0); dx <= dist; dx = $c.i16(dx + 1)) {
             for (dy = $c.i16(-dist | 0); dy <= dist; dy = $c.i16(dy + 1)) {
-                x = $c.i16(u.ux + dx | 0);
-                y = $c.i16(u.uy + dy | 0);
+                x = $c.i16(u.ux + dx);
+                y = $c.i16(u.uy + dy);
                 /* hero's location is allowed but highlighting the hero's
                    spot makes map harder to read (if using '$' rather than
                    by changing background color) */
@@ -995,20 +995,20 @@ async function seffect_enchant_armor(sobjp) {   // read.c:1115
     let sobj = null, s = 0, special_armor = 0, same_color = 0, otmp = null, sblessed = 0, scursed = 0, confused = 0, old_erodeproof = 0, new_erodeproof = 0, was_lit = 0, old_light = 0, oldspe = 0, $t1;
     sobj = sobjp.get(0);
     otmp = await some_armor(gy.youmonst);
-    sblessed = $c.i8(sobj.blessed);
-    scursed = $c.i8(sobj.cursed);
-    confused = $c.i8(u.uprops[CONFUSION].intrinsic !== 0 ? 1 : 0);
+    sblessed = sobj.blessed;
+    scursed = sobj.cursed;
+    confused = u.uprops[CONFUSION].intrinsic !== 0 ? 1 : 0;
     if (!otmp) {
         await strange_feeling(sobj, !Blind() ? $c.lit("Your skin glows then fades.") : $c.lit("Your skin feels warm for a moment."));
         sobjp.set(0, null);   /* useup() in strange_feeling() */
-        await exercise(A.CON, $c.i8(!scursed ? 1 : 0));
-        await exercise(A.STR, $c.i8(!scursed ? 1 : 0));
+        await exercise(A.CON, !scursed ? 1 : 0);
+        await exercise(A.STR, !scursed ? 1 : 0);
         return;
     }
     if (confused) {
-        old_erodeproof = $c.i8((otmp.oerodeproof | 0) !== 0 ? 1 : 0);
-        new_erodeproof = $c.i8(!scursed ? 1 : 0);
-        otmp.oerodeproof = (0) & 1;   /* for messages */
+        old_erodeproof = otmp.oerodeproof !== 0 ? 1 : 0;
+        new_erodeproof = !scursed ? 1 : 0;
+        otmp.oerodeproof = 0;   /* for messages */
         if (Blind()) {
             otmp.rknown = (FALSE) & 1;
             await pline($c.lit("%s warm for a moment."), await Yobjnam2(otmp, $c.lit("feel")));
@@ -1016,24 +1016,24 @@ async function seffect_enchant_armor(sobjp) {   // read.c:1115
             otmp.rknown = (TRUE) & 1;
             await pline($c.lit("%s covered by a %s %s %s!"), await Yobjnam2(otmp, $c.lit("are")), scursed ? $c.lit("mottled") : $c.lit("shimmering"), hcolor(scursed ? c_color_names.c_black : c_color_names.c_golden), scursed ? $c.lit("glow") : is_shield(otmp) ? $c.lit("layer") : $c.lit("shield"));
         }
-        if (new_erodeproof && (otmp.oeroded | 0 || otmp.oeroded2 | 0)) {
-            $t1 = otmp.oeroded2 = (0) & 3, otmp.oeroded = ($t1) & 3;
+        if (new_erodeproof && (otmp.oeroded || otmp.oeroded2)) {
+            $t1 = otmp.oeroded2 = 0, otmp.oeroded = ($t1) & 3;
             await pline($c.lit("%s as good as new!"), await Yobjnam2(otmp, Blind() ? $c.lit("feel") : $c.lit("look")));
         }
         if (old_erodeproof && !new_erodeproof) {
             /* restore old_erodeproof before shop charges */
-            otmp.oerodeproof = (1) & 1;
+            otmp.oerodeproof = 1;
             await costly_alteration(otmp, COST.DEGRD);
         }
-        otmp.oerodeproof = ((new_erodeproof ? 1 : 0) >>> 0) & 1;
+        otmp.oerodeproof = (new_erodeproof ? 1 : 0) & 1;
         return;
     }
     /* elven armor vibrates warningly when enchanted beyond a limit */
-    special_armor = $c.i8(is_elven_armor(otmp) || gu.urole.mnum === PM.WIZARD && otmp.otyp === CORNUTHAUM ? 1 : 0);
+    special_armor = is_elven_armor(otmp) || gu.urole.mnum === PM.WIZARD && otmp.otyp === CORNUTHAUM ? 1 : 0;
     if (scursed) {
-        same_color = $c.i8(otmp.otyp === BLACK_DRAGON_SCALE_MAIL || otmp.otyp === BLACK_DRAGON_SCALES ? 1 : 0);
+        same_color = otmp.otyp === BLACK_DRAGON_SCALE_MAIL || otmp.otyp === BLACK_DRAGON_SCALES ? 1 : 0;
     } else {
-        same_color = $c.i8(otmp.otyp === SILVER_DRAGON_SCALE_MAIL || otmp.otyp === SILVER_DRAGON_SCALES || otmp.otyp === SHIELD_OF_REFLECTION ? 1 : 0);
+        same_color = otmp.otyp === SILVER_DRAGON_SCALE_MAIL || otmp.otyp === SILVER_DRAGON_SCALES || otmp.otyp === SHIELD_OF_REFLECTION ? 1 : 0;
     }
     if (Blind()) {
         same_color = FALSE;
@@ -1057,7 +1057,7 @@ async function seffect_enchant_armor(sobjp) {   // read.c:1115
        0 for +3 to +4 armor, etc.
 
        When disenchanting, everything is done with reversed signs. */
-    s = $c.i8($c.div32(4 - s | 0, 2));
+    s = $c.i8($c.div32(4 - s, 2));
     /* Elven/artifact and nonmagical armor is easier to enchant;
        blessed scrolls are more effective. */
     if (special_armor) {
@@ -1091,7 +1091,7 @@ async function seffect_enchant_armor(sobjp) {   // read.c:1115
         await setworn(null, W.ARM);
         /* assumes same order */
         otmp.otyp = $c.i16(otmp.otyp + (GRAY_DRAGON_SCALE_MAIL - GRAY_DRAGON_SCALES) | 0);
-        otmp.lamplit = (0) & 1;
+        otmp.lamplit = 0;
         /* don't want bless() or uncurse() to adjust
          * light radius because scales -> scale_mail will
          * result in a second increase with own message */
@@ -1104,7 +1104,7 @@ async function seffect_enchant_armor(sobjp) {   // read.c:1115
         } else if (otmp.cursed) {
             await uncurse(otmp);
         }
-        otmp.known = (1) & 1;
+        otmp.known = 1;
         await setworn(otmp, W.ARM);
         if (otmp.unpaid) {
             await alter_cost(otmp, 0);   /* shop bill */
@@ -1125,7 +1125,7 @@ async function seffect_enchant_armor(sobjp) {   // read.c:1115
         await curse(otmp);
     } else if (sblessed && !otmp.blessed) {
         await bless(otmp);
-    } else if (!scursed && otmp.cursed | 0) {
+    } else if (!scursed && otmp.cursed) {
         await uncurse(otmp);
     }
     if (s) {
@@ -1139,9 +1139,9 @@ async function seffect_enchant_armor(sobjp) {   // read.c:1115
         if (s) {   /* skip if it got changed to 0 */
             await adj_abon(otmp, s);   /* adjust armor bonus for Dex or Int+Wis */
         }
-        gk.known = $c.i8(otmp.known);
+        gk.known = otmp.known;
         /* update shop bill to reflect new higher price */
-        if (s > 0 && otmp.unpaid | 0) {
+        if (s > 0 && otmp.unpaid) {
             await alter_cost(otmp, 0);
         }
     }
@@ -1157,25 +1157,25 @@ async function disintegrate_cursed_armor() {   // read.c:1294
     let armors = $c.nulls(10), idx = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7;
     idx = 0;
     armors[0] = null;
-    if ($G.uarm && $G.uarm.cursed | 0) {
+    if ($G.uarm && $G.uarm.cursed) {
         armors[($t1 = idx, idx = $t1 + 1 | 0, $t1)] = $G.uarm;
     }
-    if ($G.uarmc && $G.uarmc.cursed | 0) {
+    if ($G.uarmc && $G.uarmc.cursed) {
         armors[($t2 = idx, idx = $t2 + 1 | 0, $t2)] = $G.uarmc;
     }
-    if ($G.uarmh && $G.uarmh.cursed | 0) {
+    if ($G.uarmh && $G.uarmh.cursed) {
         armors[($t3 = idx, idx = $t3 + 1 | 0, $t3)] = $G.uarmh;
     }
-    if ($G.uarms && $G.uarms.cursed | 0) {
+    if ($G.uarms && $G.uarms.cursed) {
         armors[($t4 = idx, idx = $t4 + 1 | 0, $t4)] = $G.uarms;
     }
-    if ($G.uarmg && $G.uarmg.cursed | 0) {
+    if ($G.uarmg && $G.uarmg.cursed) {
         armors[($t5 = idx, idx = $t5 + 1 | 0, $t5)] = $G.uarmg;
     }
-    if ($G.uarmf && $G.uarmf.cursed | 0) {
+    if ($G.uarmf && $G.uarmf.cursed) {
         armors[($t6 = idx, idx = $t6 + 1 | 0, $t6)] = $G.uarmf;
     }
-    if ($G.uarmu && $G.uarmu.cursed | 0) {
+    if ($G.uarmu && $G.uarmu.cursed) {
         armors[($t7 = idx, idx = $t7 + 1 | 0, $t7)] = $G.uarmu;
     }
     if (!idx) {
@@ -1194,8 +1194,8 @@ async function seffect_destroy_armor(sobjp) {   // read.c:1324
     let sobj = null, otmp = null, scursed = 0, confused = 0, old_erodeproof = 0, new_erodeproof = 0, gets_choice = 0, atmp = null;
     sobj = sobjp.get(0);
     otmp = await some_armor(gy.youmonst);
-    scursed = $c.i8(sobj.cursed);
-    confused = $c.i8(u.uprops[CONFUSION].intrinsic !== 0 ? 1 : 0);
+    scursed = sobj.cursed;
+    confused = u.uprops[CONFUSION].intrinsic !== 0 ? 1 : 0;
     if (confused) {
         if (!otmp) {
             await strange_feeling(sobj, $c.lit("Your bones itch."));
@@ -1204,20 +1204,20 @@ async function seffect_destroy_armor(sobjp) {   // read.c:1324
             await exercise(A.CON, FALSE);
             return;
         }
-        old_erodeproof = $c.i8((otmp.oerodeproof | 0) !== 0 ? 1 : 0);
+        old_erodeproof = otmp.oerodeproof !== 0 ? 1 : 0;
         new_erodeproof = scursed;
-        otmp.oerodeproof = (0) & 1;   /* for messages */
+        otmp.oerodeproof = 0;   /* for messages */
         await p_glow2(otmp, c_color_names.c_purple);
         if (old_erodeproof && !new_erodeproof) {
             /* restore old_erodeproof before shop charges */
-            otmp.oerodeproof = (1) & 1;
+            otmp.oerodeproof = 1;
             await costly_alteration(otmp, COST.DEGRD);
         }
-        otmp.oerodeproof = ((new_erodeproof ? 1 : 0) >>> 0) & 1;
+        otmp.oerodeproof = (new_erodeproof ? 1 : 0) & 1;
         return;
     }
     if (scursed) {
-        if (otmp && otmp.cursed | 0) {
+        if (otmp && otmp.cursed) {
             /* armor and scroll both cursed */
             await pline($c.lit("%s."), await Yobjnam2(otmp, $c.lit("vibrate")));
             if (otmp.spe >= -6) {
@@ -1230,7 +1230,7 @@ async function seffect_destroy_armor(sobjp) {   // read.c:1324
             return;
         }
     } else {
-        gets_choice = $c.i8(otmp && sobj && sobj.blessed | 0 && count_worn_armor() > 1 ? 1 : 0);
+        gets_choice = otmp && sobj && sobj.blessed && count_worn_armor() > 1 ? 1 : 0;
         if (gets_choice) {
             if (!objects[sobj.otyp].oc_name_known) {
                 await pline($c.lit("This is %s!"), await an(await actualoname(sobj)));
@@ -1245,7 +1245,7 @@ async function seffect_destroy_armor(sobjp) {   // read.c:1324
                 gk.known = TRUE;
                 return;
             }
-        } else if (sobj.blessed | 0 && await disintegrate_cursed_armor()) {
+        } else if (sobj.blessed && await disintegrate_cursed_armor()) {
             gk.known = TRUE;
             return;
         } else if (!await destroy_arm()) {
@@ -1266,10 +1266,10 @@ async function seffect_destroy_armor(sobjp) {   // read.c:1324
 async function seffect_confuse_monster(sobjp) {   // read.c:1399
     let sobj = null, sblessed = 0, scursed = 0, confused = 0, altfeedback = 0, hands = null, incr = 0;
     sobj = sobjp.get(0);
-    sblessed = $c.i8(sobj.blessed);
-    scursed = $c.i8(sobj.cursed);
-    confused = $c.i8(u.uprops[CONFUSION].intrinsic !== 0 ? 1 : 0);
-    altfeedback = $c.i8(Blind() || Invisible() ? 1 : 0);
+    sblessed = sobj.blessed;
+    scursed = sobj.cursed;
+    confused = u.uprops[CONFUSION].intrinsic !== 0 ? 1 : 0;
+    altfeedback = Blind() || Invisible() ? 1 : 0;
     hands = await makeplural(await body_part(HAND));
     if (gy.youmonst.data.mlet !== S.HUMAN || scursed) {
         if (!HConfusion()) {
@@ -1319,8 +1319,8 @@ async function seffect_scare_monster(sobjp) {   // read.c:1454
     let sobj = null, otyp = 0, scursed = 0, confused = 0, ct = 0, mtmp = null, $t1, $t2;
     sobj = sobjp.get(0);
     otyp = sobj.otyp;
-    scursed = $c.i8(sobj.cursed);
-    confused = $c.i8(u.uprops[CONFUSION].intrinsic !== 0 ? 1 : 0);
+    scursed = sobj.cursed;
+    confused = u.uprops[CONFUSION].intrinsic !== 0 ? 1 : 0;
     ct = 0;
     for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
         if (DEADMONSTER(mtmp)) {
@@ -1328,8 +1328,8 @@ async function seffect_scare_monster(sobjp) {   // read.c:1454
         }
         if (cansee(mtmp.mx, mtmp.my)) {
             if (confused || scursed) {
-                $t2 = ($t1 = mtmp.msleeping = (0) & 1, mtmp.mfrozen = ($t1) & 127), mtmp.mflee = ($t2) & 1;
-                mtmp.mcanmove = (1) & 1;
+                $t2 = ($t1 = mtmp.msleeping = 0, mtmp.mfrozen = ($t1) & 127), mtmp.mflee = ($t2) & 1;
+                mtmp.mcanmove = 1;
             } else if (!await resist(mtmp, sobj.oclass, 0, NOTELL)) {
                 await monflee(mtmp, 0, FALSE, FALSE);
             }
@@ -1353,9 +1353,9 @@ async function seffect_remove_curse(sobjp) {   // read.c:1489
     let sobj = null, otyp = 0, sblessed = 0, scursed = 0, confused = 0, obj = null, nxto = null, wornmask = 0, shop_h2o = 0;
     sobj = sobjp.get(0);   /* scroll or fake spellbook */
     otyp = sobj.otyp;
-    sblessed = $c.i8(sobj.blessed);
-    scursed = $c.i8(sobj.cursed);
-    confused = $c.i8(u.uprops[CONFUSION].intrinsic !== 0 ? 1 : 0);
+    sblessed = sobj.blessed;
+    scursed = sobj.cursed;
+    confused = u.uprops[CONFUSION].intrinsic !== 0 ? 1 : 0;
     await You_feel(!Hallucination() ? !confused ? $c.lit("like someone is helping you.") : $c.lit("like you need some help.") : !confused ? $c.lit("in touch with the Universal Oneness.") : $c.lit("the power of the Force against you!"));
     if (scursed) {
         await pline_The($c.lit("scroll disintegrates."));
@@ -1410,16 +1410,16 @@ async function seffect_remove_curse(sobjp) {   // read.c:1489
                do the same for lit lamp/candle [seems inconsistent] */
             if (sblessed || wornmask || obj.otyp === LOADSTONE || obj.otyp === LEASH && obj.corpsenm) {
                 /* water price varies by curse/bless status */
-                shop_h2o = $c.i8(obj.unpaid | 0 && obj.otyp === POT_WATER ? 1 : 0);
+                shop_h2o = obj.unpaid && obj.otyp === POT_WATER ? 1 : 0;
                 if (confused) {
                     await blessorcurse(obj, 2);
                     /* lose knowledge of this object's curse/bless
                        state (even if it didn't actually change) */
-                    obj.bknown = (0) & 1;
+                    obj.bknown = 0;
                     /* blessorcurse() only affects uncursed items
                        so no need to worry about price of water
                        going down (hence no costly_alteration) */
-                    if (shop_h2o && (obj.cursed | 0 || obj.blessed | 0)) {
+                    if (shop_h2o && (obj.cursed || obj.blessed)) {
                         await alter_cost(obj, 0);   /* price goes up */
                     }
                 } else if (obj.cursed) {
@@ -1431,7 +1431,7 @@ async function seffect_remove_curse(sobjp) {   // read.c:1489
                        known not to be, make the scroll known; it's
                        trivial to identify anyway by comparing inventory
                        before and after */
-                    if (obj.bknown | 0 && otyp === SCR_REMOVE_CURSE) {
+                    if (obj.bknown && otyp === SCR_REMOVE_CURSE) {
                         await learnscrolltyp(SCR_REMOVE_CURSE);
                     }
                 }
@@ -1441,16 +1441,16 @@ async function seffect_remove_curse(sobjp) {   // read.c:1489
         if (u.usteed && (obj = await which_armor(u.usteed, W.SADDLE)) !== null) {
             if (confused) {
                 await blessorcurse(obj, 2);
-                obj.bknown = (0) & 1;   /* skip set_bknown() */
+                obj.bknown = 0;   /* skip set_bknown() */
             } else if (obj.cursed) {
                 await uncurse(obj);
                 /* like rndcurse(sit.c), effect on regular inventory
                    doesn't show things glowing but saddle does */
                 if (!Blind()) {
                     await pline($c.lit("%s %s."), await Yobjnam2(obj, $c.lit("glow")), hcolor($c.lit("amber")));
-                    obj.bknown = ((Hallucination() ? 0 : 1) >>> 0) & 1;
+                    obj.bknown = (Hallucination() ? 0 : 1) & 1;
                 } else {
-                    obj.bknown = (0) & 1;   /* skip set_bknown() */
+                    obj.bknown = 0;   /* skip set_bknown() */
                 }
             }
         }
@@ -1471,10 +1471,10 @@ async function seffect_remove_curse(sobjp) {   // read.c:1489
 async function seffect_create_monster(sobjp) {   // read.c:1608
     let sobj = null, sblessed = 0, scursed = 0, confused = 0;
     sobj = sobjp.get(0);
-    sblessed = $c.i8(sobj.blessed);
-    scursed = $c.i8(sobj.cursed);
-    confused = $c.i8(u.uprops[CONFUSION].intrinsic !== 0 ? 1 : 0);
-    if (await create_critters((1 + (confused || scursed ? 12 : 0) | 0) + (sblessed || rn2(73) ? 0 : rnd(4)) | 0, confused ? mons[PM.ACID_BLOB] : null, FALSE)) {
+    sblessed = sobj.blessed;
+    scursed = sobj.cursed;
+    confused = u.uprops[CONFUSION].intrinsic !== 0 ? 1 : 0;
+    if (await create_critters(1 + (confused || scursed ? 12 : 0) + (sblessed || rn2(73) ? 0 : rnd(4)) | 0, confused ? mons[PM.ACID_BLOB] : null, FALSE)) {
         gk.known = TRUE;
     }
     /* no need to flush monsters; we ask for identification only if the
@@ -1488,16 +1488,16 @@ async function seffect_create_monster(sobjp) {   // read.c:1608
 async function seffect_enchant_weapon(sobjp) {   // read.c:1627
     let sobj = null, sblessed = 0, scursed = 0, confused = 0, old_erodeproof = 0, new_erodeproof = 0, s = 0, $t1;
     sobj = sobjp.get(0);
-    sblessed = $c.i8(sobj.blessed);
-    scursed = $c.i8(sobj.cursed);
-    confused = $c.i8(u.uprops[CONFUSION].intrinsic !== 0 ? 1 : 0);
+    sblessed = sobj.blessed;
+    scursed = sobj.cursed;
+    confused = u.uprops[CONFUSION].intrinsic !== 0 ? 1 : 0;
     /* [What about twoweapon mode?  Proofing/repairing/enchanting both
        would be too powerful, but shouldn't we choose randomly between
        primary and secondary instead of always acting on primary?] */
     if (confused && $G.uwep && erosion_matters($G.uwep) && $G.uwep.oclass !== ARMOR_CLASS) {
-        old_erodeproof = $c.i8(($G.uwep.oerodeproof | 0) !== 0 ? 1 : 0);
-        new_erodeproof = $c.i8(!scursed ? 1 : 0);
-        $G.uwep.oerodeproof = (0) & 1;   /* for messages */
+        old_erodeproof = $G.uwep.oerodeproof !== 0 ? 1 : 0;
+        new_erodeproof = !scursed ? 1 : 0;
+        $G.uwep.oerodeproof = 0;   /* for messages */
         if (Blind()) {
             $G.uwep.rknown = (FALSE) & 1;
             await Your($c.lit("weapon feels warm for a moment."));
@@ -1505,16 +1505,16 @@ async function seffect_enchant_weapon(sobjp) {   // read.c:1627
             $G.uwep.rknown = (TRUE) & 1;
             await pline($c.lit("%s covered by a %s %s %s!"), await Yobjnam2($G.uwep, $c.lit("are")), scursed ? $c.lit("mottled") : $c.lit("shimmering"), hcolor(scursed ? c_color_names.c_purple : c_color_names.c_golden), scursed ? $c.lit("glow") : $c.lit("shield"));
         }
-        if (new_erodeproof && ($G.uwep.oeroded | 0 || $G.uwep.oeroded2 | 0)) {
-            $t1 = $G.uwep.oeroded2 = (0) & 3, $G.uwep.oeroded = ($t1) & 3;
+        if (new_erodeproof && ($G.uwep.oeroded || $G.uwep.oeroded2)) {
+            $t1 = $G.uwep.oeroded2 = 0, $G.uwep.oeroded = ($t1) & 3;
             await pline($c.lit("%s as good as new!"), await Yobjnam2($G.uwep, Blind() ? $c.lit("feel") : $c.lit("look")));
         }
         if (old_erodeproof && !new_erodeproof) {
             /* restore old_erodeproof before shop charges */
-            $G.uwep.oerodeproof = (1) & 1;
+            $G.uwep.oerodeproof = 1;
             await costly_alteration($G.uwep, COST.DEGRD);
         }
-        $G.uwep.oerodeproof = ((new_erodeproof ? 1 : 0) >>> 0) & 1;
+        $G.uwep.oerodeproof = (new_erodeproof ? 1 : 0) & 1;
         return;
     }
     /* guard further tests against null pointer */
@@ -1535,7 +1535,7 @@ async function seffect_enchant_weapon(sobjp) {   // read.c:1627
 async function seffect_taming(sobjp) {   // read.c:1679
     let sobj = null, confused = 0, candidates = 0, res = 0, results = 0, vis_results = 0, i = 0, j = 0, bd = 0, mtmp = null;
     sobj = sobjp.get(0);
-    confused = $c.i8(u.uprops[CONFUSION].intrinsic !== 0 ? 1 : 0);
+    confused = u.uprops[CONFUSION].intrinsic !== 0 ? 1 : 0;
     if (u.uswallow) {
         candidates = 1;
         results = vis_results = await maybe_tame(u.ustuck, sobj);
@@ -1577,10 +1577,10 @@ async function seffect_genocide(sobjp) {   // read.c:1722
     let sobj = null, otyp = 0, sblessed = 0, scursed = 0, already_known = 0;
     sobj = sobjp.get(0);
     otyp = sobj.otyp;
-    sblessed = $c.i8(sobj.blessed);
-    scursed = $c.i8(sobj.cursed);
+    sblessed = sobj.blessed;
+    scursed = sobj.cursed;
     /* spell */
-    already_known = $c.i8(sobj.oclass === SPBOOK_CLASS || objects[otyp].oc_name_known | 0 ? 1 : 0);
+    already_known = sobj.oclass === SPBOOK_CLASS || objects[otyp].oc_name_known ? 1 : 0;
     if (!already_known) {
         await You($c.lit("have found a scroll of genocide!"));
     }
@@ -1588,7 +1588,7 @@ async function seffect_genocide(sobjp) {   // read.c:1722
     if (sblessed) {
         await do_class_genocide();
     } else {
-        await do_genocide((!scursed ? 1 : 0) | Math.imul(2, !!u.uprops[CONFUSION].intrinsic ? 1 : 0));
+        await do_genocide((!scursed ? 1 : 0) | 2 * (!!u.uprops[CONFUSION].intrinsic ? 1 : 0));
     }
 }
 /**
@@ -1598,14 +1598,14 @@ async function seffect_genocide(sobjp) {   // read.c:1722
 async function seffect_light(sobjp) {   // read.c:1741
     let sobj = null, sblessed = 0, scursed = 0, confused = 0, pm = 0, mon = null, sawlights = 0, i = 0, numlights = 0;
     sobj = sobjp.get(0);
-    sblessed = $c.i8(sobj.blessed);
-    scursed = $c.i8(sobj.cursed);
-    confused = $c.i8(u.uprops[CONFUSION].intrinsic !== 0 ? 1 : 0);
+    sblessed = sobj.blessed;
+    scursed = sobj.cursed;
+    confused = u.uprops[CONFUSION].intrinsic !== 0 ? 1 : 0;
     if (!confused) {
         if (!Blind()) {
             gk.known = TRUE;
         }
-        await litroom($c.i8(!scursed ? 1 : 0), sobj);
+        await litroom(!scursed ? 1 : 0, sobj);
         if (!scursed) {
             if (await lightdamage(sobj, TRUE, 5)) {
                 gk.known = TRUE;
@@ -1623,7 +1623,7 @@ async function seffect_light(sobjp) {   // read.c:1741
                 mon = await makemon($c.relem(mons, pm), u.ux, u.uy, MM.EDOG | NO.MINVENT | MM.NOMSG);
                 if (mon) {
                     await initedog(mon, TRUE);
-                    mon.msleeping = (0) & 1;
+                    mon.msleeping = 0;
                     mon.mcan = (TRUE) & 1;
                     if (canspotmon(mon)) {
                         sawlights = TRUE;
@@ -1646,11 +1646,11 @@ async function seffect_charging(sobjp) {   // read.c:1788
     let sobj = null, otyp = 0, sblessed = 0, scursed = 0, confused = 0, already_known = 0, otmp = null, $t1;
     sobj = sobjp.get(0);
     otyp = sobj.otyp;
-    sblessed = $c.i8(sobj.blessed);
-    scursed = $c.i8(sobj.cursed);
-    confused = $c.i8(u.uprops[CONFUSION].intrinsic !== 0 ? 1 : 0);
+    sblessed = sobj.blessed;
+    scursed = sobj.cursed;
+    confused = u.uprops[CONFUSION].intrinsic !== 0 ? 1 : 0;
     /* spell */
-    already_known = $c.i8(sobj.oclass === SPBOOK_CLASS || objects[otyp].oc_name_known | 0 ? 1 : 0);
+    already_known = sobj.oclass === SPBOOK_CLASS || objects[otyp].oc_name_known ? 1 : 0;
     if (confused) {
         if (scursed) {
             await You_feel($c.lit("discharged."));
@@ -1689,7 +1689,7 @@ async function seffect_charging(sobjp) {   // read.c:1788
 async function seffect_amnesia(sobjp) {   // read.c:1830
     let sobj = null, sblessed = 0;
     sobj = sobjp.get(0);
-    sblessed = $c.i8(sobj.blessed);
+    sblessed = sobj.blessed;
     gk.known = TRUE;
     await forget(!sblessed ? ALL_SPELLS : 0);
     if (Hallucination()) {   /* Ommmmmm! */
@@ -1711,10 +1711,10 @@ async function seffect_fire(sobjp) {   // read.c:1850
     let sobj = null, otyp = 0, sblessed = 0, confused = 0, already_known = 0, cc = new $T.nhcoord(), dam = 0, cval = 0;
     sobj = sobjp.get(0);
     otyp = sobj.otyp;
-    sblessed = $c.i8(sobj.blessed);
-    confused = $c.i8(u.uprops[CONFUSION].intrinsic !== 0 ? 1 : 0);
+    sblessed = sobj.blessed;
+    confused = u.uprops[CONFUSION].intrinsic !== 0 ? 1 : 0;
     /* spell */
-    already_known = $c.i8(sobj.oclass === SPBOOK_CLASS || objects[otyp].oc_name_known | 0 ? 1 : 0);
+    already_known = sobj.oclass === SPBOOK_CLASS || objects[otyp].oc_name_known ? 1 : 0;
     cc.x = u.ux;
     cc.y = u.uy;
     cval = bcsign(sobj);
@@ -1775,9 +1775,9 @@ async function seffect_fire(sobjp) {   // read.c:1850
 async function seffect_earth(sobjp) {   // read.c:1919
     let sobj = null, sblessed = 0, scursed = 0, confused = 0, x = 0, y = 0, nboulders = 0, matbuf = new Int8Array(256), avalanche = null;
     sobj = sobjp.get(0);
-    sblessed = $c.i8(sobj.blessed);
-    scursed = $c.i8(sobj.cursed);
-    confused = $c.i8(u.uprops[CONFUSION].intrinsic !== 0 ? 1 : 0);
+    sblessed = sobj.blessed;
+    scursed = sobj.cursed;
+    confused = u.uprops[CONFUSION].intrinsic !== 0 ? 1 : 0;
     /* TODO: handle steeds */
     if (!((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level)) && has_ceiling(u.uz) && (!In_endgame(u.uz) || (svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_earth_level))) {
         nboulders = 0;
@@ -1797,8 +1797,8 @@ async function seffect_earth(sobjp) {   // read.c:1919
         sokoban_guilt();
         /* Loop through the surrounding squares */
         if (!scursed) {
-            for (x = $c.i16(u.ux - 1 | 0); x <= (u.ux + 1 | 0); x = $c.i16(x + 1)) {
-                for (y = $c.i16(u.uy - 1 | 0); y <= (u.uy + 1 | 0); y = $c.i16(y + 1)) {
+            for (x = $c.i16(u.ux - 1); x <= u.ux + 1; x = $c.i16(x + 1)) {
+                for (y = $c.i16(u.uy - 1); y <= u.uy + 1; y = $c.i16(y + 1)) {
                     /* Is this a suitable spot? */
                     if (isok(x, y) && !closed_door(x, y) && !(svl.level.locations[x][y].typ < POOL) && !(svl.level.locations[x][y].typ === AIR || svl.level.locations[x][y].typ === CLOUD) && (x !== u.ux || y !== u.uy)) {
                         nboulders = nboulders + await drop_boulder_on_monster(x, y, confused, TRUE) | 0;
@@ -1808,7 +1808,7 @@ async function seffect_earth(sobjp) {   // read.c:1919
         }
         /* Attack the player */
         if (!sblessed) {
-            await drop_boulder_on_player(confused, $c.i8(!scursed ? 1 : 0), TRUE, FALSE);
+            await drop_boulder_on_player(confused, !scursed ? 1 : 0, TRUE, FALSE);
         } else if (!nboulders) {
             await pline($c.lit("But nothing else happens."));
         }
@@ -1821,8 +1821,8 @@ async function seffect_earth(sobjp) {   // read.c:1919
 async function seffect_punishment(sobjp) {   // read.c:1976
     let sobj = null, sblessed = 0, confused = 0;
     sobj = sobjp.get(0);
-    sblessed = $c.i8(sobj.blessed);
-    confused = $c.i8(u.uprops[CONFUSION].intrinsic !== 0 ? 1 : 0);
+    sblessed = sobj.blessed;
+    confused = u.uprops[CONFUSION].intrinsic !== 0 ? 1 : 0;
     gk.known = TRUE;
     if (confused || sblessed) {
         await You_feel($c.lit("guilty."));
@@ -1839,7 +1839,7 @@ async function seffect_stinking_cloud(sobjp) {   // read.c:1991
     sobj = sobjp.get(0);
     otyp = sobj.otyp;
     /* spell */
-    already_known = $c.i8(sobj.oclass === SPBOOK_CLASS || objects[otyp].oc_name_known | 0 ? 1 : 0);
+    already_known = sobj.oclass === SPBOOK_CLASS || objects[otyp].oc_name_known ? 1 : 0;
     if (!already_known) {
         await You($c.lit("have found a scroll of stinking cloud!"));
     }
@@ -1865,8 +1865,8 @@ async function seffect_blank_paper(sobjp) {   // read.c:2005
 async function seffect_teleportation(sobjp) {   // read.c:2015
     let sobj = null, scursed = 0, confused = 0;
     sobj = sobjp.get(0);
-    scursed = $c.i8(sobj.cursed);
-    confused = $c.i8(u.uprops[CONFUSION].intrinsic !== 0 ? 1 : 0);
+    scursed = sobj.cursed;
+    confused = u.uprops[CONFUSION].intrinsic !== 0 ? 1 : 0;
     if (confused || scursed) {
         await level_tele();
         /* gives "materialize on different/same level!" message, must
@@ -1886,8 +1886,8 @@ async function seffect_teleportation(sobjp) {   // read.c:2015
 async function seffect_gold_detection(sobjp) {   // read.c:2035
     let sobj = null, scursed = 0, confused = 0;
     sobj = sobjp.get(0);
-    scursed = $c.i8(sobj.cursed);
-    confused = $c.i8(u.uprops[CONFUSION].intrinsic !== 0 ? 1 : 0);
+    scursed = sobj.cursed;
+    confused = u.uprops[CONFUSION].intrinsic !== 0 ? 1 : 0;
     if (confused || scursed ? await trap_detect(sobj) : await gold_detect(sobj)) {
         sobjp.set(0, null);   /* failure: strange_feeling() -> useup() */
     }
@@ -1911,12 +1911,12 @@ async function seffect_identify(sobjp) {   // read.c:2055
     let sobj = null, otyp = 0, is_scroll = 0, sblessed = 0, scursed = 0, confused = 0, already_known = 0, cval = 0;
     sobj = sobjp.get(0);
     otyp = sobj.otyp;
-    is_scroll = $c.i8(sobj.oclass === SCROLL_CLASS ? 1 : 0);
-    sblessed = $c.i8(sobj.blessed);
-    scursed = $c.i8(sobj.cursed);
-    confused = $c.i8(u.uprops[CONFUSION].intrinsic !== 0 ? 1 : 0);
+    is_scroll = sobj.oclass === SCROLL_CLASS ? 1 : 0;
+    sblessed = sobj.blessed;
+    scursed = sobj.cursed;
+    confused = u.uprops[CONFUSION].intrinsic !== 0 ? 1 : 0;
     /* spell */
-    already_known = $c.i8(sobj.oclass === SPBOOK_CLASS || objects[otyp].oc_name_known | 0 ? 1 : 0);
+    already_known = sobj.oclass === SPBOOK_CLASS || objects[otyp].oc_name_known ? 1 : 0;
     if (is_scroll) {
         /* scroll of identify */
         /* known = TRUE; -- handled inline here */
@@ -1947,7 +1947,7 @@ async function seffect_identify(sobjp) {   // read.c:2055
                 cval = cval + 1 | 0;
             }
         }
-        await identify_pack(cval, $c.i8(!already_known ? 1 : 0));
+        await identify_pack(cval, !already_known ? 1 : 0);
     } else {
         /* spell cast with inventory empty or scroll read when it's
            the only item leaving empty inventory after being used up */
@@ -1961,10 +1961,10 @@ async function seffect_identify(sobjp) {   // read.c:2055
 async function seffect_magic_mapping(sobjp) {   // read.c:2102
     let sobj = null, is_scroll = 0, sblessed = 0, scursed = 0, confused = 0, cval = 0, x = 0, y = 0;
     sobj = sobjp.get(0);
-    is_scroll = $c.i8(sobj.oclass === SCROLL_CLASS ? 1 : 0);
-    sblessed = $c.i8(sobj.blessed);
-    scursed = $c.i8(sobj.cursed);
-    confused = $c.i8(u.uprops[CONFUSION].intrinsic !== 0 ? 1 : 0);
+    is_scroll = sobj.oclass === SCROLL_CLASS ? 1 : 0;
+    sblessed = sobj.blessed;
+    scursed = sobj.cursed;
+    confused = u.uprops[CONFUSION].intrinsic !== 0 ? 1 : 0;
     if (is_scroll) {
         if (svl.level.flags.nommap) {
             await Your($c.lit("mind is filled with crazy lines!"));
@@ -2023,7 +2023,7 @@ async function seffect_magic_mapping(sobjp) {   // read.c:2102
 async function seffect_mail(sobjp) {   // read.c:2157
     let sobj = null, odd = 0;
     sobj = sobjp.get(0);
-    odd = $c.i8($c.remu32(sobj.o_id, 2) === 1 ? 1 : 0);
+    odd = $c.remu32(sobj.o_id, 2) === 1 ? 1 : 0;
     gk.known = TRUE;
     switch (sobj.spe) {
         case 2:
@@ -2158,7 +2158,7 @@ export async function seffects(sobj$in) {   // read.c:2194
 export async function drop_boulder_on_player(confused, helmet_protects, byu, skip_uswallow) {   // read.c:2294
     let dmg = 0, otmp2 = null, $t1, $t2;
     /* hit monster if swallowed */
-    if (u.uswallow | 0 && !skip_uswallow) {
+    if (u.uswallow && !skip_uswallow) {
         await drop_boulder_on_monster(u.ux, u.uy, confused, byu);
         return;
     }
@@ -2217,7 +2217,7 @@ export async function drop_boulder_on_monster(x, y, confused, byu) {   // read.c
         helmet = await which_armor(mtmp, W.ARMH);
         if (cansee(mtmp.mx, mtmp.my)) {
             await pline($c.lit("%s is hit by %s!"), await Monnam(mtmp), await doname(otmp2));
-            if (mtmp.minvis | 0 && !canspotmon(mtmp)) {
+            if (mtmp.minvis && !canspotmon(mtmp)) {
                 await map_invisible(mtmp.mx, mtmp.my);
             }
         } else if (engulfing_u(mtmp)) {
@@ -2329,7 +2329,7 @@ export async function wand_explode(obj, chg) {   // read.c:2414
 async function set_lit(x, y, val) {   // read.c:2471
     let mtmp = null, gremlin = null;
     if (val) {
-        svl.level.locations[x][y].lit = (1) & 1;
+        svl.level.locations[x][y].lit = 1;
         if ((mtmp = svl.level.monsters[x][y]) !== null && mtmp.data === mons[PM.GREMLIN]) {
             gremlin = $c.asRec(await alloc(16), $T.litmon, 16);
             gremlin.mon = mtmp;
@@ -2337,7 +2337,7 @@ async function set_lit(x, y, val) {   // read.c:2471
             gremlins = gremlin;
         }
     } else {
-        svl.level.locations[x][y].lit = (0) & 1;
+        svl.level.locations[x][y].lit = 0;
         await snuff_light_source(x, y);
     }
 }
@@ -2350,8 +2350,8 @@ export async function litroom(on, obj) {   // read.c:2491
     let otmp = null, nextobj = null, blessed_effect = 0, no_op = 0, is_lit = Int8Array.of(0), still_lit = 0, rnum = 0, rx = 0, ry = 0, gremlin = null;
     /* True: make nearby area lit; False: cursed scroll */
     /* scroll, spellbook (for spell), or wand of light */
-    blessed_effect = $c.i8(obj && obj.oclass === SCROLL_CLASS && obj.blessed | 0 ? 1 : 0);
-    no_op = $c.i8(u.uswallow | 0 || (u.uinwater | 0) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? 1 : 0);
+    blessed_effect = obj && obj.oclass === SCROLL_CLASS && obj.blessed ? 1 : 0;
+    no_op = u.uswallow || Underwater() || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? 1 : 0;
     is_lit[0] = 0;
     /* value is irrelevant but assign something anyway; its
      * address is used as a 'not null' flag for set_lit() */
@@ -2373,7 +2373,7 @@ export async function litroom(on, obj) {   // read.c:2491
                 } else {
                     /* wielded Sunsword or worn gold dragon scales/mail;
                        maybe lower its BUC state if not already cursed */
-                    await impact_arti_light(otmp, TRUE, $c.i8(!Blind() ? 1 : 0));
+                    await impact_arti_light(otmp, TRUE, !Blind() ? 1 : 0);
                 }
                 if (otmp.lamplit) {
                     still_lit = still_lit + 1 | 0;
@@ -2404,8 +2404,8 @@ export async function litroom(on, obj) {   // read.c:2491
                 nextobj = otmp.nobj;
                 /* wielded Sunsword or worn gold dragon scales/mail;
                    maybe raise its BUC state if not already blessed */
-                if (otmp.lamplit | 0 && artifact_light(otmp)) {
-                    await impact_arti_light(otmp, FALSE, $c.i8(!Blind() ? 1 : 0));
+                if (otmp.lamplit && artifact_light(otmp)) {
+                    await impact_arti_light(otmp, FALSE, !Blind() ? 1 : 0);
                 }
             }
         }
@@ -2438,10 +2438,10 @@ export async function litroom(on, obj) {   // read.c:2491
     if ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level)) {
         /* Can't use do_clear_area because MAX_RADIUS is too small */
         /* rogue lighting must light the entire room */
-        rnum = (svl.level.locations[u.ux][u.uy].roomno | 0) - ROOMOFFSET | 0;
+        rnum = svl.level.locations[u.ux][u.uy].roomno - ROOMOFFSET;
         if (rnum >= 0) {
-            for (rx = svr.rooms[rnum].lx - 1 | 0; rx <= (svr.rooms[rnum].hx + 1 | 0); rx = rx + 1 | 0) {
-                for (ry = svr.rooms[rnum].ly - 1 | 0; ry <= (svr.rooms[rnum].hy + 1 | 0); ry = ry + 1 | 0) {
+            for (rx = svr.rooms[rnum].lx - 1; rx <= svr.rooms[rnum].hx + 1; rx = rx + 1 | 0) {
+                for (ry = svr.rooms[rnum].ly - 1; ry <= svr.rooms[rnum].hy + 1; ry = ry + 1 | 0) {
                     await set_lit($c.i16(rx), $c.i16(ry), on ? new $c.Ptr(is_lit, 0) : null);
                 }
             }
@@ -2625,8 +2625,8 @@ async function do_class_genocide() {   // read.c:2638
                        */
                     /* nuisance */
                     if ((mons[i].msound !== MS.LEADER || await quest_info(MS.LEADER) === i) && (mons[i].msound !== MS.NEMESIS || await quest_info(MS.NEMESIS) === i) && (mons[i].msound !== MS.GUARDIAN || await quest_info(MS.GUARDIAN) === i) && (i !== PM.NINJA || gu.urole.mnum === PM.SAMURAI)) {
-                        named = $c.i8(type_is_pname($c.relem(mons, i)) ? TRUE : FALSE);
-                        uniq = $c.i8(mons[i].geno & G_UNIQ ? TRUE : FALSE);
+                        named = type_is_pname($c.relem(mons, i)) ? TRUE : FALSE;
+                        uniq = mons[i].geno & G_UNIQ ? TRUE : FALSE;
                         /* one special case */
                         if (i === PM.HIGH_CLERIC) {
                             uniq = FALSE;
@@ -2660,7 +2660,7 @@ export async function do_genocide(how) {   // read.c:2826
     if (how & PLAYER) {
         mndx = u.umonster;   /* non-polymorphed mon num */
         ptr = $c.relem(mons, mndx);
-        $c.strcpy(new $c.Ptr(buf, 0), pmname(ptr, (u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female) ? 1 : 0));
+        $c.strcpy(new $c.Ptr(buf, 0), pmname(ptr, (u.umonnum !== u.umonster ? u.mfemale : flags.female) ? 1 : 0));
         killplayer = killplayer + 1 | 0;
     } else {
         buf[0] = 0;   /* init for EDIT_GETLIN */
@@ -2833,7 +2833,7 @@ export async function punish(sobj) {   // read.c:3019
     reuse_ball = sobj && sobj.otyp === HEAVY_IRON_BALL ? sobj : null;
     /* analyzer doesn't know that the one caller that passes a NULL
      * sobj (angrygods) checks !Punished first, so add a guard */
-    cursed_levy = sobj && sobj.cursed | 0 ? 1 : 0;
+    cursed_levy = sobj && sobj.cursed ? 1 : 0;
     /* KMH -- Punishment is still okay when you are riding */
     if (!reuse_ball) {
         await You($c.lit("are being punished for your misbehavior!"));
@@ -3123,7 +3123,7 @@ async function create_particular_creation(d) {   // read.c:3252
             await tamedog(mtmp, null, FALSE);
         } else if (d.makepeaceful || d.makehostile) {
             mtmp.mtame = 0;   /* sanity precaution */
-            mtmp.mpeaceful = ((d.makepeaceful ? 1 : 0) >>> 0) & 1;
+            mtmp.mpeaceful = (d.makepeaceful ? 1 : 0) & 1;
             set_malign(mtmp);
         }
         if (d.saddled && can_saddle(mtmp) && !await which_armor(mtmp, W.SADDLE)) {
@@ -3132,10 +3132,10 @@ async function create_particular_creation(d) {   // read.c:3252
             await put_saddle_on_mon(null, mtmp);
         }
         if (d.hidden && (is_hider(mtmp.data) && mtmp.data.mlet !== S.MIMIC || hides_under(mtmp.data) && OBJ_AT(mx, my) || mtmp.data.mlet === S.EEL && is_pool($c.i16(mx), $c.i16(my)))) {
-            mtmp.mundetected = (1) & 1;
+            mtmp.mundetected = 1;
         }
         if (d.sleeping) {
-            mtmp.msleeping = (1) & 1;
+            mtmp.msleeping = 1;
         }
         /* if asking for 'hidden', show location of every created monster
            that can't be seen--whether that's due to successfully hiding

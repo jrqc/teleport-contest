@@ -72,7 +72,7 @@ export async function populate_nomakedefs(version) {   // date.c:52
         $t1 = $c.atoi(new $c.Ptr(tmpbuf2, 0)) - 1900 | 0, t.tm_year = $t1;
         do {
             for (i = 0; i < 3; i = i + 1 | 0) {
-                tmpbuf2[i] = tmpbuf1[i + 0 | 0];   /* mon */
+                tmpbuf2[i] = tmpbuf1[i + 0];   /* mon */
             }
             tmpbuf2[i] = 0;
         } while (0);

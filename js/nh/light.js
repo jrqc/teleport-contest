@@ -193,15 +193,15 @@ export function do_light_sources(cs_rows) {   // light.c:169
              * method is faster for radius <= 3 (or so).
              */
             limits = circle_ptr(ls.range);
-            if ((max_y = $c.i16(ls.y + ls.range | 0)) >= ROWNO) {
+            if ((max_y = $c.i16(ls.y + ls.range)) >= ROWNO) {
                 max_y = ROWNO - 1;
             }
-            if ((y = $c.i16(ls.y - ls.range | 0)) < 0) {
+            if ((y = $c.i16(ls.y - ls.range)) < 0) {
                 y = 0;
             }
             for (; y <= max_y; y = $c.i16(y + 1)) {
                 row = cs_rows.get(y);
-                offset = limits.get($c.abs(y - ls.y | 0));
+                offset = limits.get($c.abs(y - ls.y));
                 if ((min_x = $c.i16(ls.x - offset | 0)) < 1) {
                     min_x = 1;
                 }
@@ -274,7 +274,7 @@ export async function show_transient_light(obj, x, y) {   // light.c:257
         }
         (!!$c.peq(obj, $c.asRec(null, $T.obj, 112)) ? 1 : 0) ? $c.__assert_rtn($c.lit("show_transient_light"), $c.lit("light.c"), 285, $c.lit("obj != NULL")) : 0;   /* necessary condition to get into this 'else' */
         if (!ls || obj.where !== OBJ.FREE) {
-            await impossible($c.lit("transient light %s %s %s not %s?"), obj.lamplit | 0 ? $c.lit("lit") : $c.lit("unlit"), await simpleonames(obj), await otense(obj, $c.lit("are")), !ls ? $c.lit("a light source") : $c.lit("free"));
+            await impossible($c.lit("transient light %s %s %s not %s?"), obj.lamplit ? $c.lit("lit") : $c.lit("unlit"), await simpleonames(obj), await otense(obj, $c.lit("are")), !ls ? $c.lit("a light source") : $c.lit("free"));
             return;
         }
     }
@@ -289,7 +289,7 @@ export async function show_transient_light(obj, x, y) {   // light.c:257
     await flush_screen(0);
     radius_squared = Math.imul(ls.range, ls.range);
     for (mon = svl.level.monlist; mon; mon = mon.nmon) {
-        if (DEADMONSTER(mon) || mon.isgd | 0 && !mon.mx) {
+        if (DEADMONSTER(mon) || mon.isgd && !mon.mx) {
             continue;
         }
         /* light range is the radius of a circle and we're limiting
@@ -299,7 +299,7 @@ export async function show_transient_light(obj, x, y) {   // light.c:257
            'obj' has reached its destination after missile traversal */
         if (dist2(mon.mx, mon.my, x, y) <= radius_squared) {
             if (canseemon(mon)) {
-                mon.mtemplit = (1) & 1;
+                mon.mtemplit = 1;
             }
         }
         /* [what about worm tails?] */
@@ -333,7 +333,7 @@ export async function transient_light_cleanup() {   // light.c:330
             continue;
         }
         if (mon.mtemplit) {
-            mon.mtemplit = (0) & 1;
+            mon.mtemplit = 0;
             mtempcount = mtempcount + 1 | 0;
             if (!canspotmon(mon)) {
                 await map_invisible(mon.mx, mon.my);
@@ -705,15 +705,15 @@ export function obj_move_light_source(src, dest) {   // light.c:706
             ls.id.a_obj = dest;
         }
     }
-    src.lamplit = (0) & 1;
-    dest.lamplit = (1) & 1;
+    src.lamplit = 0;
+    dest.lamplit = 1;
 }
 /* return true if there exist any light sources */
 /**
  * @returns {number} boolean
  */
 export function any_light_source() {   // light.c:719
-    return $c.i8(gl.light_base !== null ? 1 : 0);
+    return gl.light_base !== null ? 1 : 0;
 }
 /*
  * Snuff an object light source if at (x,y).  This currently works
@@ -743,7 +743,7 @@ export async function snuff_light_source(x, y) {   // light.c:729
                 if (artifact_light(obj)) {
                     continue;
                 }
-                await end_burn(obj, $c.i8(obj.otyp !== MAGIC_LAMP ? 1 : 0));
+                await end_burn(obj, obj.otyp !== MAGIC_LAMP ? 1 : 0);
                 /*
                  * The current ls element has just been removed (and
                  * ls->next is now invalid).  Return assuming that there
@@ -769,7 +769,7 @@ export function obj_sheds_light(obj) {   // light.c:763
  * @returns {number} boolean
  */
 export function obj_is_burning(obj) {   // light.c:771
-    return $c.i8(obj.lamplit | 0 && (ignitable(obj) || artifact_light(obj)) ? 1 : 0);
+    return obj.lamplit && (ignitable(obj) || artifact_light(obj)) ? 1 : 0;
 }
 /* copy the light source(s) attached to src, and attach it/them to dest */
 /**
@@ -797,7 +797,7 @@ export async function obj_split_light_source(src, dest) {   // light.c:779
             new_ls.id.a_obj = dest;
             new_ls.next = gl.light_base;
             gl.light_base = new_ls;
-            dest.lamplit = (1) & 1;   /* now an active light source */
+            dest.lamplit = 1;   /* now an active light source */
         }
     }
 }
@@ -899,7 +899,7 @@ export function arti_light_radius(obj) {   // light.c:881
     /* cursed radius of 1 is not noticeable for an item that's
        carried by the hero but is if it's carried by a monster
        or left lit on the floor (not applicable for Sunsword) */
-    res = obj.blessed | 0 ? 3 : !obj.cursed ? 2 : 1;
+    res = obj.blessed ? 3 : !obj.cursed ? 2 : 1;
     /* if poly'd into gold dragon with embedded scales, make the scales
        have minimum radiance (hero as light source will use light radius
        based on monster form); otherwise, worn gold DSM gives off more

@@ -305,7 +305,7 @@ export async function init_nhfile(nhfp) {   // files.c:461
     nhfp.structlevel = 1;
     nhfp.fieldlevel = 0;
     nhfp.addinfo = 0;
-    nhfp.bendian = $c.i8(IS_BIGENDIAN());
+    nhfp.bendian = IS_BIGENDIAN();
     nhfp.fplog = null;
     nhfp.fpdebug = null;
     $t1 = nhfp.wcount = 0, nhfp.rcount = $t1;
@@ -712,7 +712,7 @@ export async function open_bonesfile(lev, bonesid) {   // files.c:940
         nhfp.mode = READING;
         nhfp.addinfo = 1;
         nhfp.style.deflt = 1;
-        nhfp.style.binary = $c.i8(sysopt.bonesformat[0] !== exportascii ? 1 : 0);
+        nhfp.style.binary = sysopt.bonesformat[0] !== exportascii ? 1 : 0;
         nhfp.fnidx = sysopt.bonesformat[0];
         nhfp.fd = -1;
         nhfp.fpdef = null;
@@ -1405,7 +1405,7 @@ async function wizkit_addinv(obj) {   // files.c:2537
     /* subset of starting inventory pre-ID */
     await observe_object(obj);
     if (gu.urole.mnum === PM.CLERIC) {
-        obj.bknown = (1) & 1;   /* ok to bypass set_bknown() */
+        obj.bknown = 1;   /* ok to bypass set_bknown() */
     }
     /* same criteria as lift_object()'s check for available inventory slot */
     if (obj.oclass !== COIN_CLASS && inv_cnt(0) >= invlet_basic && !await merge_choice(gi.invent, obj)) {
@@ -1476,11 +1476,11 @@ function fopen_sym_file() {   // files.c:2611
  */
 export async function read_sym_file(which_set) {   // files.c:2631
     let fp = null, $t1;
-    gs.symset[which_set].explicitly = (0) & 1;
+    gs.symset[which_set].explicitly = 0;
     if (!(fp = fopen_sym_file())) {
         return 0;
     }
-    gs.symset[which_set].explicitly = (1) & 1;
+    gs.symset[which_set].explicitly = 1;
     $t1 = gc.chosen_symset_end = 0, gc.chosen_symset_start = $t1;
     gs.symset_which_set = which_set;
     gs.symset_count = 0;
@@ -1497,7 +1497,7 @@ export async function read_sym_file(which_set) {   // files.c:2631
         await config_error_done();
         /* If name was defined, it was invalid. Then we're loading fallback */
         if (gs.symset[which_set].name) {
-            gs.symset[which_set].explicitly = (0) & 1;
+            gs.symset[which_set].explicitly = 0;
             return 0;
         }
         return 1;
@@ -1565,7 +1565,7 @@ export function paniclog(type, reason) {   // files.c:2801
         if (lfile) {
             now = getnow();
             uid = $c.getuid() | 0;
-            playmode = $c.i8(wizard() ? 68 : discover() ? 88 : 45);
+            playmode = wizard() ? 68 : discover() ? 88 : 45;
             $c.fprintf(lfile, $c.lit("%s %08ld %06ld %d %c: %s %s\n"), version_string(new $c.Ptr(buf, 0), 256), yyyymmdd(now), hhmmss(now), uid, playmode, type, reason);
             /* !PANICLOG_FMT2 */
             $c.fclose(lfile);
@@ -1922,7 +1922,7 @@ export async function read_tribute(tribsection, tribtitle, tribpassage, nowin_bu
                     if (!strncmpi(new $c.Ptr(line, 1), $c.lit("section "), 8)) {
                         st = new $c.Ptr(line, 9);   /* 9 from "%section " */
                         scope = SECTIONSCOPE;
-                        matchedsection = $c.i8(!strcmpi(st, tribsection) ? 1 : 0);
+                        matchedsection = !strcmpi(st, tribsection) ? 1 : 0;
                     } else if (!strncmpi(new $c.Ptr(line, 1), $c.lit("title "), 6)) {
                         st$2 = new $c.Ptr(line, 7);   /* 7 from "%title " */
                         if ((p1 = $c.strchr(st$2, 40)) !== null) {
@@ -2003,7 +2003,7 @@ export async function read_tribute(tribsection, tribtitle, tribpassage, nowin_bu
     $c.fclose(fp);
     if (nowin_buf) {
         /* one-line buffer */
-        grasped = $c.i8(nowin_buf.get(0) ? 1 : 0);
+        grasped = nowin_buf.get(0) ? 1 : 0;
     } else {
         if (tribwin !== WIN_ERR) {
             /* implies 'foundpassage' */
@@ -2074,7 +2074,7 @@ export async function livelog_add(ll_type, str) {   // files.c:3667
                aligns[] uses [0] lawful, [1] neutral, [2] chaotic;
                u.ualign.type uses -1 chaotic, 0 neutral, 1 lawful;
            so subtracting from 1 converts from either to the other */
-        aindx = 1 - u.ualign.type | 0;
+        aindx = 1 - u.ualign.type;
         /* format relies on STD C's implicit concatenation of
            adjacent string literals */
         $c.fprintf(livelogfile, $c.lit("lltype=%ld\tname=%s\trole=%s\trace=%s\tgender=%s\talign=%s\tturns=%ld\tstarttime=%ld\tcurtime=%ld\tmessage=%s\n"), $c.and64(ll_type, sysopt.livelog), new $c.Ptr(svp.plname, 0), gu.urole.filecode, gu.urace.filecode, genders[gindx].filecode, aligns[aindx].filecode, svm.moves, timet_to_seconds($G.ubirthday), timet_to_seconds(now), str);

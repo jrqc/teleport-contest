@@ -264,7 +264,7 @@ async function writexlentry(rfile, tt, how) {   // topten.c:340
     $c.fprintf(rfile, $c.lit("%cachieveX=%s"), 9, encode_extended_achievements(new $c.Ptr(achbuf, 0)));
     $c.fprintf(rfile, $c.lit("%cconductX=%s"), 9, await encode_extended_conducts(new $c.Ptr(buf, 0)));   /* reuse 'buf[]' */
     $c.fprintf(rfile, $c.lit("%crealtime=%ld%cstarttime=%ld%cendtime=%ld"), 9, urealtime.realtime, 9, timet_to_seconds($G.ubirthday), 9, timet_to_seconds(urealtime.finish_time));
-    $c.fprintf(rfile, $c.lit("%cgender0=%s%calign0=%s"), 9, genders[flags.initgend].filecode, 9, aligns[1 - u.ualignbase[A.ORIGINAL] | 0].filecode);
+    $c.fprintf(rfile, $c.lit("%cgender0=%s%calign0=%s"), 9, genders[flags.initgend].filecode, 9, aligns[1 - u.ualignbase[A.ORIGINAL]].filecode);
     $c.fprintf(rfile, $c.lit("%cflags=0x%lx"), 9, encodexlogflags());
     $c.fprintf(rfile, $c.lit("%cgold=%ld"), 9, $c.add64(money_cnt(gi.invent), hidden_gold(TRUE)));
     $c.fprintf(rfile, $c.lit("%cwish_cnt=%ld"), 9, u.uconduct.wishes);
@@ -473,7 +473,7 @@ function encode_extended_achievements(buf) {   // topten.c:491
             case ACH.RNK7:
             case ACH.RNK8:
                 /* rank 0 is the starting condition, not an achievement; 8 is Xp 30 */
-                $c.sprintf(new $c.Ptr(rnkbuf, 0), $c.lit("attained_the_rank_of_%s"), rank_of(rank_to_xlev(absidx - (ACH.RNK1 - 1) | 0), gu.urole.mnum, $c.i8(achidx < 0 ? TRUE : FALSE)));
+                $c.sprintf(new $c.Ptr(rnkbuf, 0), $c.lit("attained_the_rank_of_%s"), rank_of(rank_to_xlev(absidx - (ACH.RNK1 - 1) | 0), gu.urole.mnum, achidx < 0 ? TRUE : FALSE));
                 strNsubst(new $c.Ptr(rnkbuf, 0), $c.lit(" "), $c.lit("_"), 0);   /* replace every ' ' with '_' */
                 achievement = lcase(new $c.Ptr(rnkbuf, 0));
                 break;
@@ -490,28 +490,28 @@ function encode_extended_achievements(buf) {   // topten.c:491
  */
 async function encode_extended_conducts(buf) {   // topten.c:584
     buf.set(0, 0);
-    add_achieveX(buf, $c.lit("foodless"), $c.i8(!u.uconduct.food ? 1 : 0));
-    add_achieveX(buf, $c.lit("vegan"), $c.i8(!u.uconduct.unvegan ? 1 : 0));
-    add_achieveX(buf, $c.lit("vegetarian"), $c.i8(!u.uconduct.unvegetarian ? 1 : 0));
-    add_achieveX(buf, $c.lit("atheist"), $c.i8(!u.uconduct.gnostic ? 1 : 0));
-    add_achieveX(buf, $c.lit("weaponless"), $c.i8(!u.uconduct.weaphit ? 1 : 0));
-    add_achieveX(buf, $c.lit("pacifist"), $c.i8(!u.uconduct.killer ? 1 : 0));
-    add_achieveX(buf, $c.lit("illiterate"), $c.i8(!u.uconduct.literate ? 1 : 0));
-    add_achieveX(buf, $c.lit("polyless"), $c.i8(!u.uconduct.polypiles ? 1 : 0));
-    add_achieveX(buf, $c.lit("polyselfless"), $c.i8(!u.uconduct.polyselfs ? 1 : 0));
-    add_achieveX(buf, $c.lit("wishless"), $c.i8(!u.uconduct.wishes ? 1 : 0));
-    add_achieveX(buf, $c.lit("artiwishless"), $c.i8(!u.uconduct.wisharti ? 1 : 0));
-    add_achieveX(buf, $c.lit("genocideless"), $c.i8(!await num_genocides() ? 1 : 0));
+    add_achieveX(buf, $c.lit("foodless"), !u.uconduct.food ? 1 : 0);
+    add_achieveX(buf, $c.lit("vegan"), !u.uconduct.unvegan ? 1 : 0);
+    add_achieveX(buf, $c.lit("vegetarian"), !u.uconduct.unvegetarian ? 1 : 0);
+    add_achieveX(buf, $c.lit("atheist"), !u.uconduct.gnostic ? 1 : 0);
+    add_achieveX(buf, $c.lit("weaponless"), !u.uconduct.weaphit ? 1 : 0);
+    add_achieveX(buf, $c.lit("pacifist"), !u.uconduct.killer ? 1 : 0);
+    add_achieveX(buf, $c.lit("illiterate"), !u.uconduct.literate ? 1 : 0);
+    add_achieveX(buf, $c.lit("polyless"), !u.uconduct.polypiles ? 1 : 0);
+    add_achieveX(buf, $c.lit("polyselfless"), !u.uconduct.polyselfs ? 1 : 0);
+    add_achieveX(buf, $c.lit("wishless"), !u.uconduct.wishes ? 1 : 0);
+    add_achieveX(buf, $c.lit("artiwishless"), !u.uconduct.wisharti ? 1 : 0);
+    add_achieveX(buf, $c.lit("genocideless"), !await num_genocides() ? 1 : 0);
     if (sokoban_in_play()) {
-        add_achieveX(buf, $c.lit("sokoban"), $c.i8(!u.uconduct.sokocheat ? 1 : 0));
+        add_achieveX(buf, $c.lit("sokoban"), !u.uconduct.sokocheat ? 1 : 0);
     }
     add_achieveX(buf, $c.lit("blind"), u.uroleplay.blind);
     add_achieveX(buf, $c.lit("deaf"), u.uroleplay.deaf);
     add_achieveX(buf, $c.lit("nudist"), u.uroleplay.nudist);
     add_achieveX(buf, $c.lit("pauper"), u.uroleplay.pauper);
-    add_achieveX(buf, $c.lit("bonesless"), $c.i8(!flags.bones ? 1 : 0));
-    add_achieveX(buf, $c.lit("petless"), $c.i8(!u.uconduct.pets ? 1 : 0));
-    add_achieveX(buf, $c.lit("unrerolled"), $c.i8(!u.uroleplay.reroll ? 1 : 0));
+    add_achieveX(buf, $c.lit("bonesless"), !flags.bones ? 1 : 0);
+    add_achieveX(buf, $c.lit("petless"), !u.uconduct.pets ? 1 : 0);
+    add_achieveX(buf, $c.lit("unrerolled"), !u.uroleplay.reroll ? 1 : 0);
     return buf;
 }
 /* XLOGFILE */
@@ -577,7 +577,7 @@ export async function topten(how, when) {   // topten.c:628
             copynchars(new $c.Ptr(t0.plrole, 0), gu.urole.filecode, ROLESZ);
             copynchars(new $c.Ptr(t0.plrace, 0), gu.urace.filecode, ROLESZ);
             copynchars(new $c.Ptr(t0.plgend, 0), genders[flags.female].filecode, ROLESZ);
-            copynchars(new $c.Ptr(t0.plalign, 0), aligns[1 - u.ualign.type | 0].filecode, ROLESZ);
+            copynchars(new $c.Ptr(t0.plalign, 0), aligns[1 - u.ualign.type].filecode, ROLESZ);
             copynchars(new $c.Ptr(t0.name, 0), new $c.Ptr(svp.plname, 0), NAMSZ);
             await formatkiller(new $c.Ptr(t0.death, 0), 101, how, TRUE);
             $t4 = yyyymmdd($G.ubirthday), t0.birthdate = $t4;
@@ -711,7 +711,7 @@ export async function topten(how, when) {   // topten.c:628
                     }
                 }
             }
-            skip_scores = $c.i8(!flags.end_top && !flags.end_around && !flags.end_own ? 1 : 0);
+            skip_scores = !flags.end_top && !flags.end_around && !flags.end_own ? 1 : 0;
             if (rank0 === 0) {
                 rank0 = rank1;
             }
@@ -831,7 +831,7 @@ async function outentry(rank, t1, so) {   // topten.c:946
         $c.sprintf(eos(new $c.Ptr(linebuf, 0)), $c.lit("escaped the dungeon %s[max level %d]"), !$c.strncmp($c.lit(" ("), new $c.Ptr(t1.death, 0).add(7), 2) ? new $c.Ptr(t1.death, 0).add(7).add(2) : $c.lit(""), t1.maxlvl);
         /* fixup for closing paren in "escaped... with...Amulet)[max..." */
         if ((bp = $c.strchr(new $c.Ptr(linebuf, 0), 41)) !== null) {
-            bp.set(0, $c.i8(t1.deathdnum === svd.dungeon_topology.d_astral_level.dnum ? 0 : 32));
+            bp.set(0, t1.deathdnum === svd.dungeon_topology.d_astral_level.dnum ? 0 : 32);
         }
         second_line = FALSE;
     } else if (!$c.strncmp($c.lit("ascended"), new $c.Ptr(t1.death, 0), 8)) {
@@ -1268,9 +1268,9 @@ export async function tt_doppel(mon) {   // topten.c:1445
         ret = rn2(PM.WIZARD - PM.ARCHEOLOGIST + 1) + PM.ARCHEOLOGIST | 0;
     } else {
         if (tt.plgend[0] === 70) {
-            mon.female = (1) & 1;
+            mon.female = 1;
         } else if (tt.plgend[0] === 77) {
-            mon.female = (0) & 1;
+            mon.female = 0;
         }
         ret = await classmon(new $c.Ptr(tt.plrole, 0));
         /* Only take on a name if the player can see

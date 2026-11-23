@@ -205,7 +205,7 @@ export async function remember_topl() {   // topl.c:170
         if (cw.data.get(idx)) {
             $c.free(cw.data.get(idx));
         }
-        len = len + (8 - ((len & 7) >>> 0) >>> 0) >>> 0;   /* pad up to next multiple of 8 */
+        len = len + (8 - ((len & 7) >>> 0)) >>> 0;   /* pad up to next multiple of 8 */
         $t1 = $c.asArr(await alloc(len), Int8Array), cw.data.set(idx, $t1);
         cw.datlen.set(idx, $c.i16(len));
     }
@@ -280,7 +280,7 @@ export async function update_topl(bp) {   // topl.c:251
     let tl = null, otl = null, n0 = 0, notdied = 0, cw = null, skip = 0, $t1, $t2;
     notdied = 1;
     cw = wins[$G.WIN_MESSAGE];
-    skip = $c.i8((cw.flags & (WIN_STOP | WIN_NOSTOP)) === WIN_STOP ? 1 : 0);
+    skip = (cw.flags & (WIN_STOP | WIN_NOSTOP)) === WIN_STOP ? 1 : 0;
     /* If there is room on the line, print message on same line */
     /* But messages like "You die..." deserve their own line */
     n0 = $c.i32($c.strlen(bp));
@@ -342,7 +342,7 @@ async function topl_putsym(c) {   // topl.c:305
     switch (c) {
         case 8:
             if ($G.ttyDisplay.curx === 0 && $G.ttyDisplay.cury > 0) {
-                await tty_curs($G.BASE_WINDOW, gt.tc_gbl_data.tc_CO, $G.ttyDisplay.cury - 1 | 0);
+                await tty_curs($G.BASE_WINDOW, gt.tc_gbl_data.tc_CO, $G.ttyDisplay.cury - 1);
             }
             backsp();
             !!($G.ttyDisplay.curx > 0) || (await nhassert_failed($c.lit("ttyDisplay->curx > 0"), $c.lit("../win/tty/topl.c"), 317), 0);
@@ -433,7 +433,7 @@ export async function tty_yn_function(query, resp, def) {   // topl.c:373
     $G.ttyDisplay.inread = $G.ttyDisplay.inread + 1 | 0;
     clean_up$: {
         if (resp) {
-            allow_num = $c.i8($c.strchr(resp, 35) !== null ? 1 : 0);
+            allow_num = $c.strchr(resp, 35) !== null ? 1 : 0;
             $c.strcpy(new $c.Ptr(respbuf, 0), resp);
             /* normally we force lowercase, but if any uppercase letters
                are present in the allowed response, preserve case;
@@ -502,7 +502,7 @@ export async function tty_yn_function(query, resp, def) {   // topl.c:373
                 q = 0;   /* force another loop iteration */
                 continue;
             }
-            digit_ok = $c.i8(allow_num && digit(q) ? 1 : 0);
+            digit_ok = allow_num && digit(q) ? 1 : 0;
             if (q === 27) {
                 if ($c.strchr(resp, 113)) {
                     q = 113;
@@ -527,7 +527,7 @@ export async function tty_yn_function(query, resp, def) {   // topl.c:373
                 if (q !== 35) {
                     digit_string[0] = q;
                     await addtopl(new $c.Ptr(digit_string, 0)), n_len = n_len + 1 | 0;
-                    value = q - 48 | 0;
+                    value = q - 48;
                     q = 35;
                 }
                 do {
@@ -537,7 +537,7 @@ export async function tty_yn_function(query, resp, def) {   // topl.c:373
                         z = lowc(z);
                     }
                     if (digit(z)) {
-                        dgt = z - 48 | 0;
+                        dgt = z - 48;
                         /* value = (10 * value) + (z - '0'); */
                         value = AppendLongDigit(value, dgt);
                         if (value < 0) {

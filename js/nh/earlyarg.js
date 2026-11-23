@@ -99,8 +99,8 @@ async function lopt(arg, lflags, optname, origarg, argc_p, argv_p) {   // earlya
             argv = argv_p.get(0);
             nextarg = argc > 1 && argv.get(1).get(0) !== 45 ? argv.get(1) : null;
             opttype = lflags & ArgVal_mask;
-            oneletterok = $c.i8((lflags & ArgNam_mask) === ArgNamOneLetter ? 1 : 0);
-            complain = $c.i8((lflags & ArgErr_mask) === ArgErrComplain ? 1 : 0);
+            oneletterok = (lflags & ArgNam_mask) === ArgNamOneLetter ? 1 : 0;
+            complain = (lflags & ArgErr_mask) === ArgErrComplain ? 1 : 0;
         case "loptnotallowed": case "loptbail": case "loptrequired":
             /* first letter must match */
             if ($goto === "loptnotallowed" || $goto === "loptbail" || $goto === "loptrequired" || arg.get(1) !== optname.get(1)) {
@@ -577,13 +577,13 @@ function debug_fields(opts) {   // earlyarg.c:576
         } else {
             opts = opts.add(2);
         }
-        negated = $c.i8(!negated ? 1 : 0);
+        negated = !negated ? 1 : 0;
     }
     if (match_optname(opts, $c.lit("test"), 4, FALSE)) {
-        iflags.debug.test = $c.i8(negated ? FALSE : TRUE);
+        iflags.debug.test = negated ? FALSE : TRUE;
     }
     if (match_optname(opts, $c.lit("ttystatus"), 9, FALSE)) {
-        iflags.debug.ttystatus = $c.i8(negated ? FALSE : TRUE);
+        iflags.debug.ttystatus = negated ? FALSE : TRUE;
     }
     if (match_optname(opts, $c.lit("fuzzer"), 4, FALSE)) {
         iflags.fuzzerpending = TRUE;

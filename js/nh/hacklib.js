@@ -99,7 +99,7 @@ async function nh_qsort_idx_cmp(va, vb) {   // hacklib.c:19
  * @returns {number} boolean
  */
 export function digit(c) {   // hacklib.c:126
-    return $c.i8(48 <= c && c <= 57 ? 1 : 0);
+    return 48 <= c && c <= 57 ? 1 : 0;
 }
 /* is 'c' a letter?  note: '@' classed as letter */
 /**
@@ -107,7 +107,7 @@ export function digit(c) {   // hacklib.c:126
  * @returns {number} boolean
  */
 export function letter(c) {   // hacklib.c:133
-    return $c.i8($c.i8(64 <= c && c <= 90 ? 1 : 0) || 97 <= c && c <= 122 ? 1 : 0);
+    return (64 <= c && c <= 90 ? 1 : 0) || 97 <= c && c <= 122 ? 1 : 0;
 }
 /* force 'c' into uppercase */
 /**
@@ -203,7 +203,7 @@ export function mungspaces(bp) {   // hacklib.c:206
         if (c !== 32 || !was_space) {
             ($t1 = p2, p2 = $t1.add(1), $t1).set(0, c);
         }
-        was_space = $c.i8(c === 32 ? 1 : 0);
+        was_space = c === 32 ? 1 : 0;
     }
     if (was_space && $c.pcmp(p2, bp) > 0) {
         p2 = p2.add(-1);
@@ -279,12 +279,12 @@ export function str_start_is(str, chkstr, caseblind) {   // hacklib.c:277
     n = LARGEST_INT;
     while (n = n - 1 | 0) {
         if (!str.get(0)) {
-            return $c.i8(chkstr.get(0) === 0 ? 1 : 0);   /* chkstr >= str */
+            return chkstr.get(0) === 0 ? 1 : 0;   /* chkstr >= str */
         } else if (!chkstr.get(0)) {
             return TRUE;   /* chkstr < str */
         }
-        t1 = $c.i8(caseblind ? lowc(str.get(0)) : str.get(0));
-        t2 = $c.i8(caseblind ? lowc(chkstr.get(0)) : chkstr.get(0));
+        t1 = caseblind ? lowc(str.get(0)) : str.get(0);
+        t2 = caseblind ? lowc(chkstr.get(0)) : chkstr.get(0);
         str = str.add(1), chkstr = chkstr.add(1);
         if (t1 !== t2) {
             return FALSE;
@@ -302,7 +302,7 @@ export function str_end_is(str, chkstr) {   // hacklib.c:305
     let clen = 0;
     clen = $c.i32($c.strlen(chkstr));
     if ($c.i32($c.strlen(str)) >= clen) {
-        return $c.i8(!$c.strncmp(eos(str).add(-clen), chkstr, $c.u64(clen)) ? 1 : 0);
+        return !$c.strncmp(eos(str).add(-clen), chkstr, $c.u64(clen)) ? 1 : 0;
     }
     return FALSE;
 }
@@ -738,8 +738,8 @@ export function sgn(n) {   // hacklib.c:714
  */
 export function distmin(x0, y0, x1, y1) {   // hacklib.c:721
     let dx = 0, dy = 0;
-    dx = $c.i16(x0 - x1 | 0);
-    dy = $c.i16(y0 - y1 | 0);
+    dx = $c.i16(x0 - x1);
+    dy = $c.i16(y0 - y1);
     if (dx < 0) {
         dx = $c.i16(-dx | 0);
     }
@@ -761,8 +761,8 @@ export function distmin(x0, y0, x1, y1) {   // hacklib.c:721
  */
 export function dist2(x0, y0, x1, y1) {   // hacklib.c:737
     let dx = 0, dy = 0;
-    dx = $c.i16(x0 - x1 | 0);
-    dy = $c.i16(y0 - y1 | 0);
+    dx = $c.i16(x0 - x1);
+    dy = $c.i16(y0 - y1);
     return Math.imul(dx, dx) + Math.imul(dy, dy) | 0;
 }
 /* integer square root function without using floating point */
@@ -799,12 +799,12 @@ export function isqrt(val) {   // hacklib.c:746
  */
 export function online2(x0, y0, x1, y1) {   // hacklib.c:768
     let dx = 0, dy = 0;
-    dx = x0 - x1 | 0;
-    dy = y0 - y1 | 0;
+    dx = x0 - x1;
+    dy = y0 - y1;
     /*  If either delta is zero then they're on an orthogonal line,
      *  else if the deltas are equal (signs ignored) they're on a diagonal.
      */
-    return $c.i8(!dy || !dx || dy === dx || dy === (-dx | 0) ? 1 : 0);
+    return !dy || !dx || dy === dx || dy === (-dx | 0) ? 1 : 0;
 }
 /* case-insensitive counted string comparison */
 /*{ aka strncasecmp }*/
@@ -907,7 +907,7 @@ export function fuzzymatch(s1, s2, ignore_chars, caseblind) {   // hacklib.c:849
         }
     } while (c1 === c2);
     /* match occurs only when the end of both strings has been reached */
-    return $c.i8(!c1 && !c2 ? 1 : 0);
+    return !c1 && !c2 ? 1 : 0;
 }
 /*
  * Time routines
@@ -1028,7 +1028,7 @@ export function case_insensitive_comp(s1, s2) {   // hacklib.c:986
             break;
         }
     }
-    return u1 - u2 | 0;
+    return u1 - u2;
 }
 /**
  * @param {number} ifd int

@@ -78,7 +78,7 @@ function intermed() {   // questpgr.c:61
  * @returns {number} boolean
  */
 export function is_quest_artifact(otmp) {   // questpgr.c:67
-    return $c.i8(otmp.oartifact === gu.urole.questarti ? 1 : 0);
+    return otmp.oartifact === gu.urole.questarti ? 1 : 0;
 }
 /**
  * @param {$T.obj | null} ochain struct obj *
@@ -220,7 +220,7 @@ async function qtext_pronoun(who, which) {   // questpgr.c:199
     if (who === 111 && (strstri(new $c.Ptr(gc.cvt_buf, 0), $c.lit("Eyes ")) || strncmpi(new $c.Ptr(gc.cvt_buf, 0), await makesingular(new $c.Ptr(gc.cvt_buf, 0)), -1))) {
         pnoun = lwhich === 104 ? $c.lit("they") : lwhich === 105 ? $c.lit("them") : lwhich === 106 ? $c.lit("their") : $c.lit("?");
     } else {
-        godgend = who === 100 ? svq.quest_status.godgend | 0 : who === 108 ? svq.quest_status.ldrgend | 0 : who === 110 ? svq.quest_status.nemgend | 0 : 2;   /* default to neuter */
+        godgend = who === 100 ? svq.quest_status.godgend : who === 108 ? svq.quest_status.ldrgend : who === 110 ? svq.quest_status.nemgend : 2;   /* default to neuter */
         pnoun = lwhich === 104 ? genders[godgend].he : lwhich === 105 ? genders[godgend].him : lwhich === 106 ? genders[godgend].his : $c.lit("?");
     }
     $c.strcpy(new $c.Ptr(gc.cvt_buf, 0), pnoun);

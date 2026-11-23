@@ -204,7 +204,7 @@ export async function main(argc$in, argv$in) {   // unixmain.c:58
             }
         }
         if (!resuming) {
-            neednewlock = $c.i8(!new $c.Ptr(svp.plname, 0).get(0) ? 1 : 0);
+            neednewlock = !new $c.Ptr(svp.plname, 0).get(0) ? 1 : 0;
             /* new game:  start by choosing role, race, etc;
                player might change the hero's name while doing that,
                in which case we try to restore under the new name
@@ -382,7 +382,7 @@ async function process_options(argc, argv) {   // unixmain.c:330
     }
     if (argc > 1) {
         mxplyrs = $c.atoi(argv.get(1));
-        mx_ok = $c.i8(mxplyrs > 0 ? 1 : 0);
+        mx_ok = mxplyrs > 0 ? 1 : 0;
         await config_error_add($c.lit("%s%s%s"), mx_ok ? $c.lit("MAXPLAYERS are set in sysconf file") : $c.lit("Expected MAXPLAYERS, found \""), mx_ok ? $c.lit("") : argv.get(1), mx_ok ? $c.lit("") : $c.lit("\""));
         /* XXX This is deprecated in favor of SYSCF with MAXPLAYERS */
     }

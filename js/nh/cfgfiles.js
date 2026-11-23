@@ -270,7 +270,7 @@ async function get_uchars(bufp, list, modlist, size, name) {   // cfgfiles.c:381
                 case 56:
                 case 57:
                     havenum = TRUE;
-                    num = (Math.imul(num, 10) >>> 0) + ((bufp.get(0) - 48 | 0) >>> 0) >>> 0;
+                    num = (Math.imul(num, 10) >>> 0) + (bufp.get(0) - 48 >>> 0) >>> 0;
                     bufp = bufp.add(1);
                     break;
                 case 92:
@@ -763,7 +763,7 @@ async function cnf_line_SEDUCE(bufp) {   // cfgfiles.c:924
     let n = 0, src = 0, in_sysconf = 0;
     n = !!$c.atoi(bufp) ? 1 : 0;   /* XXX this could be tighter */
     src = iflags.parse_config_file_src;
-    in_sysconf = $c.i8(src === set_in_sysconf ? 1 : 0);
+    in_sysconf = src === set_in_sysconf ? 1 : 0;
     /* allow anyone to disable it but can only enable it in sysconf
        or as a no-op for the user when sysconf hasn't disabled it */
     if (!in_sysconf && !sysopt.seduce && n !== 0) {
@@ -1089,7 +1089,7 @@ function cnf_line_QT_COMPACT(bufp) {   // cfgfiles.c:1281
 export async function parse_config_line(origbuf) {   // cfgfiles.c:1389
     let src = 0, in_sysconf = 0, bufp = null, buf = new Int8Array(1024), i = 0, parm = null;
     src = iflags.parse_config_file_src;
-    in_sysconf = $c.i8(src === set_in_sysconf ? 1 : 0);
+    in_sysconf = src === set_in_sysconf ? 1 : 0;
     while (origbuf.get(0) === 32 || origbuf.get(0) === 9) {   /* skip leading whitespace */
         origbuf = origbuf.add(1);   /* (caller probably already did this) */
     }
@@ -1260,7 +1260,7 @@ export async function config_error_done() {   // cfgfiles.c:1592
         gn.no_sound_notified = 0;
     }
     if (n) {
-        cmdline = $c.i8(!$c.strcmp(new $c.Ptr(config_error_data.source, 0), $c.lit("command line")) ? 1 : 0);
+        cmdline = !$c.strcmp(new $c.Ptr(config_error_data.source, 0), $c.lit("command line")) ? 1 : 0;
         await pline($c.lit("\n%d error%s %s %s.\n"), n, plur(n), cmdline ? $c.lit("on") : $c.lit("in"), new $c.Ptr(config_error_data.source, 0).get(0) ? new $c.Ptr(config_error_data.source, 0) : new $c.Ptr(configfile, 0));
         await wait_synch()();
     }
@@ -1363,7 +1363,7 @@ async function parse_conf_buf(p, proc) {   // cfgfiles.c:1693
             ignoreline = FALSE;
             oldline = FALSE;
             /* line continuation (trailing '\') */
-            $t3 = $c.i8($c.pcmp(p.ep = p.ep.add(-1), p.inbuf) >= 0 && p.ep.get(0) === 92 ? 1 : 0), p.morelines = $t3;
+            $t3 = $c.pcmp(p.ep = p.ep.add(-1), p.inbuf) >= 0 && p.ep.get(0) === 92 ? 1 : 0, p.morelines = $t3;
             if (p.morelines) {
                 p.ep.set(0, 0);
             }
@@ -1572,7 +1572,7 @@ export async function rcfile() {   // cfgfiles.c:1894
         await config_error_done();
         nameval = namesrc = null;   /* revert to default nethackrc */
     }
-    await config_error_init(TRUE, nameval, $c.i8(nameval ? TRUE : FALSE));
+    await config_error_init(TRUE, nameval, nameval ? TRUE : FALSE);
     await read_config_file(nameval, set_in_config);
     await config_error_done();
     if (xtraopts) {

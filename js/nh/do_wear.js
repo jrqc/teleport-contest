@@ -167,7 +167,7 @@ async function toggle_stealth(obj, oldprop, on) {   // do_wear.c:107
                 await You($c.lit("walk very quietly."));
             }
         } else {
-            riding = $c.i8(!$c.peq(u.usteed, $c.asRec(null, $T.monst, 192)) ? 1 : 0);
+            riding = !$c.peq(u.usteed, $c.asRec(null, $T.monst, 192)) ? 1 : 0;
             await You($c.lit("%s%s are noisy."), riding ? $c.lit("and ") : $c.lit("sure"), riding ? await x_monnam(u.usteed, ARTICLE.YOUR, $c.asArr(null, Int8Array), SUPPRESS.SADDLE | SUPPRESS.HALLUCINATION, FALSE) : $c.lit(""));
         }
     }
@@ -265,7 +265,7 @@ export async function Boots_on() {   // do_wear.c:187
             break;
         case LEVITATION_BOOTS:
             if (!oldprop && !HLevitation() && !$c.and64(u.uprops[LEVITATION].blocked, FROMOUTSIDE)) {
-                $G.uarmf.known = (1) & 1;
+                $G.uarmf.known = 1;
                 /* might come off if putting on over a sink,
                  * so uarmf could be Null below; status line
                  * gets updated during brief interval they're
@@ -285,7 +285,7 @@ export async function Boots_on() {   // do_wear.c:187
     }
     /* uarmf could be Null here (levitation boots put on over a sink) */
     if ($G.uarmf && !$G.uarmf.known) {
-        $G.uarmf.known = (1) & 1;   /* boots' +/- evident because of status line AC */
+        $G.uarmf.known = 1;   /* boots' +/- evident because of status line AC */
         await update_inventory();
     }
     return 0;
@@ -401,7 +401,7 @@ async function Cloak_on() {   // do_wear.c:326
     }
     if ($G.uarmc && !$G.uarmc.known) {
         /* no known instance of !uarmc here */
-        $G.uarmc.known = (1) & 1;   /* cloak's +/- evident because of status line AC */
+        $G.uarmc.known = 1;   /* cloak's +/- evident because of status line AC */
         await update_inventory();
     }
     return 0;
@@ -486,7 +486,7 @@ async function Helmet_on() {   // do_wear.c:434
             await discover_object($G.uarmh.otyp, TRUE, TRUE, TRUE);
             break;
         case HELM_OF_OPPOSITE_ALIGNMENT:
-            $G.uarmh.known = (1) & 1;   /* do this here because uarmh could get cleared */
+            $G.uarmh.known = 1;   /* do this here because uarmh could get cleared */
             /* changing alignment can toggle off active artifact properties,
                including levitation; uarmh could get dropped or destroyed here
                by hero falling onto a polymorph trap or into water (emergency
@@ -517,7 +517,7 @@ async function Helmet_on() {   // do_wear.c:434
                 await pline($c.lit("My brain hurts!"));   /* Monty Python's Flying Circus */
             } else if ($G.uarmh && $G.uarmh.otyp === DUNCE_CAP) {
                 /* track INT change; ignore WIS */
-                await You_feel($c.lit("%s."), ACURR(A.INT) <= ((u.acurr.a[A.INT] + u.abon.a[A.INT] | 0) + u.atemp.a[A.INT] | 0) ? $c.lit("like sitting in a corner") : $c.lit("giddy"));
+                await You_feel($c.lit("%s."), ACURR(A.INT) <= u.acurr.a[A.INT] + u.abon.a[A.INT] + u.atemp.a[A.INT] ? $c.lit("like sitting in a corner") : $c.lit("giddy"));
             } else {
                 /* [message formerly given here moved to uchangealign()] */
                 await discover_object(HELM_OF_OPPOSITE_ALIGNMENT, TRUE, TRUE, TRUE);
@@ -528,7 +528,7 @@ async function Helmet_on() {   // do_wear.c:434
     }
     /* uarmh could be Null due to uchangealign() */
     if ($G.uarmh && !$G.uarmh.known) {
-        $G.uarmh.known = (1) & 1;   /* helmet's +/- evident because of status line AC */
+        $G.uarmh.known = 1;   /* helmet's +/- evident because of status line AC */
         await update_inventory();
     }
     return 0;
@@ -592,7 +592,7 @@ export function hard_helmet(obj) {   // do_wear.c:568
     if (!obj || !is_helmet(obj)) {
         return FALSE;
     }
-    return $c.i8(is_metallic(obj) || is_crackable(obj) ? TRUE : FALSE);
+    return is_metallic(obj) || is_crackable(obj) ? TRUE : FALSE;
 }
 /**
  * @returns {Promise<number>} int
@@ -619,7 +619,7 @@ async function Gloves_on() {   // do_wear.c:576
             await impossible(new $c.Ptr(unknown_type, 0), new $c.Ptr(c_gloves, 0), $G.uarmg.otyp);
     }
     if (!$G.uarmg.known) {
-        $G.uarmg.known = (1) & 1;   /* gloves' +/- evident because of status line AC */
+        $G.uarmg.known = 1;   /* gloves' +/- evident because of status line AC */
         await update_inventory();
     }
     return 0;
@@ -670,7 +670,7 @@ export async function Gloves_off() {   // do_wear.c:646
     let gloves = null, oldprop = 0, on_purpose = 0, $t1;
     gloves = $G.uarmg;   /* needed after uarmg has been set to Null */
     oldprop = $c.and64(u.uprops[objects[$G.uarmg.otyp].oc_oprop].extrinsic, ~W.ARMG);
-    on_purpose = $c.i8(!svc.context.mon_moving && !$G.uarmg.in_use ? 1 : 0);
+    on_purpose = !svc.context.mon_moving && !$G.uarmg.in_use ? 1 : 0;
     svc.context.takeoff.mask = $c.and64(svc.context.takeoff.mask, ~W.ARMG);
     switch ($G.uarmg.otyp) {
         case LEATHER_GLOVES:
@@ -745,7 +745,7 @@ async function Shield_on() {   // do_wear.c:705
             await impossible(new $c.Ptr(unknown_type, 0), new $c.Ptr(c_shield, 0), $G.uarms.otyp);
     }
     if (!$G.uarms.known) {
-        $G.uarms.known = (1) & 1;   /* shield's +/- evident because of status line AC */
+        $G.uarms.known = 1;   /* shield's +/- evident because of status line AC */
         await update_inventory();
     }
     return 0;
@@ -788,7 +788,7 @@ async function Shirt_on() {   // do_wear.c:759
             await impossible(new $c.Ptr(unknown_type, 0), new $c.Ptr(c_shirt, 0), $G.uarmu.otyp);
     }
     if (!$G.uarmu.known) {
-        $G.uarmu.known = (1) & 1;   /* shirt's +/- evident because of status line AC */
+        $G.uarmu.known = 1;   /* shirt's +/- evident because of status line AC */
         await update_inventory();
     }
     return 0;
@@ -868,7 +868,7 @@ async function dragon_armor_handling(otmp, puton, on_purpose) {   // do_wear.c:7
             break;
         case GOLD_DRAGON_SCALES:
         case GOLD_DRAGON_SCALE_MAIL:
-            await make_hallucinated(!puton ? 1 : 0, $c.i8(program_state.restoring ? FALSE : TRUE), W.ARM);
+            await make_hallucinated(!puton ? 1 : 0, program_state.restoring ? FALSE : TRUE, W.ARM);
             break;
         case ORANGE_DRAGON_SCALES:
         case ORANGE_DRAGON_SCALE_MAIL:
@@ -910,7 +910,7 @@ async function Armor_on() {   // do_wear.c:887
         return 0;
     }
     if (!$G.uarm.known) {
-        $G.uarm.known = (1) & 1;   /* suit's +/- evident because of status line AC */
+        $G.uarm.known = 1;   /* suit's +/- evident because of status line AC */
         await update_inventory();
     }
     await dragon_armor_handling($G.uarm, TRUE, TRUE);
@@ -930,7 +930,7 @@ async function Armor_on() {   // do_wear.c:887
 export async function Armor_off() {   // do_wear.c:909
     let otmp = null, was_arti_light = 0;
     otmp = $G.uarm;
-    was_arti_light = $c.i8(otmp && otmp.lamplit | 0 && artifact_light(otmp) ? 1 : 0);
+    was_arti_light = otmp && otmp.lamplit && artifact_light(otmp) ? 1 : 0;
     svc.context.takeoff.mask = $c.and64(svc.context.takeoff.mask, ~W.ARM);
     await setworn(null, W.ARM);
     svc.context.takeoff.cancelled_don = FALSE;
@@ -959,7 +959,7 @@ export async function Armor_off() {   // do_wear.c:909
 export async function Armor_gone() {   // do_wear.c:939
     let otmp = null, was_arti_light = 0;
     otmp = $G.uarm;
-    was_arti_light = $c.i8(otmp && otmp.lamplit | 0 && artifact_light(otmp) ? 1 : 0);
+    was_arti_light = otmp && otmp.lamplit && artifact_light(otmp) ? 1 : 0;
     svc.context.takeoff.mask = $c.and64(svc.context.takeoff.mask, ~W.ARM);
     await setnotworn($G.uarm);
     svc.context.takeoff.cancelled_don = FALSE;
@@ -1041,7 +1041,7 @@ async function Amulet_on(amul) {   // do_wear.c:963
                        changed the character's base sex */
                     await You($c.lit("don't feel like yourself."));
                     /* checking dknown is redundant--amulets always have dknown set */
-                    call_it = $c.i8(($G.uamul.dknown | 0) !== 0 ? 1 : 0);
+                    call_it = $G.uamul.dknown !== 0 ? 1 : 0;
                 }
                 await livelog_newform(FALSE, orig_sex, new_sex);
                 await pline_The($c.lit("amulet disintegrates!"));
@@ -1080,7 +1080,7 @@ async function Amulet_on(amul) {   // do_wear.c:963
                 /* to determine whether this flight is new we have to muck
                    about in the Flying intrinsic (actually extrinsic) */
                 u.uprops[FLYING].extrinsic = $c.and64(u.uprops[FLYING].extrinsic, ~W.AMUL);
-                already_flying = $c.i8(!!((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) ? 1 : 0);
+                already_flying = !!((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) ? 1 : 0;
                 u.uprops[FLYING].extrinsic = $c.or64(u.uprops[FLYING].extrinsic, W.AMUL);
                 if (!already_flying) {
                     await discover_object(AMULET_OF_FLYING, TRUE, TRUE, TRUE);
@@ -1169,7 +1169,7 @@ export async function Amulet_off() {   // do_wear.c:1090
             break;
         case AMULET_OF_FLYING:
             {
-                was_flying = $c.i8(!!((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) ? 1 : 0);
+                was_flying = !!((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) ? 1 : 0;
                 /* remove amulet 'early' to determine whether Flying changes;
                    also in case spoteffects() does something with the amulet */
                 await setworn(null, W.AMUL);
@@ -1223,9 +1223,9 @@ async function learnring(ring, observed) {   // do_wear.c:1193
     }
     /* make enchantment of charged ring known (might be +0) and update
        perm invent window if we've seen this ring and know its type */
-    if (ring.dknown | 0 && objects[ringtype].oc_name_known | 0) {
+    if (ring.dknown && objects[ringtype].oc_name_known) {
         if (objects[ringtype].oc_charged) {
-            ring.known = (1) & 1;
+            ring.known = 1;
         }
         await update_inventory();
     }
@@ -1240,7 +1240,7 @@ async function adjust_attrib(obj, which, val) {   // do_wear.c:1223
     let old_attrib = 0, observable = 0;
     old_attrib = ACURR(which);
     u.abon.a[which] = $c.i8(u.abon.a[which] + val | 0);
-    observable = $c.i8(old_attrib !== ACURR(which) ? 1 : 0);
+    observable = old_attrib !== ACURR(which) ? 1 : 0;
     /* if didn't change, usually means ring is +0 but might
         be because nonzero couldn't go below min or above max;
         learn +0 enchantment if attribute value is not stuck
@@ -1350,7 +1350,7 @@ export async function Ring_on(obj) {   // do_wear.c:1242
             /* usually learn enchantment and discover type;
                won't happen if ring is unseen or if it's +0
                and the type hasn't been discovered yet */
-            observable = $c.i8(obj.spe !== 0 ? 1 : 0);
+            observable = obj.spe !== 0 ? 1 : 0;
             await learnring(obj, observable);
             if (obj.spe) {
                 find_ac();   /* updates botl */
@@ -1448,7 +1448,7 @@ async function Ring_off_or_gone(obj, gone) {   // do_wear.c:1347
         case RIN_PROTECTION:
             /* might have been put on while blind and we can now see
                or perhaps been forgotten due to amnesia */
-            observable = $c.i8(obj.spe !== 0 ? 1 : 0);
+            observable = obj.spe !== 0 ? 1 : 0;
             await learnring(obj, observable);
             if (obj.spe) {
                 find_ac();   /* updates botl */
@@ -1484,7 +1484,7 @@ export async function Ring_gone(obj) {   // do_wear.c:1455
  */
 export async function Blindf_on(otmp) {   // do_wear.c:1461
     let already_blind = 0, changed = 0;
-    already_blind = $c.i8(Blind());
+    already_blind = Blind();
     changed = FALSE;
     /* blindfold might be wielded; release it for wearing */
     await remove_worn_item(otmp, FALSE);
@@ -1522,9 +1522,9 @@ export async function Blindf_on(otmp) {   // do_wear.c:1461
  */
 export async function Blindf_off(otmp) {   // do_wear.c:1495
     let was_blind = 0, changed = 0, nooffmsg = 0;
-    was_blind = $c.i8(Blind());
+    was_blind = Blind();
     changed = FALSE;
-    nooffmsg = $c.i8(!otmp ? 1 : 0);
+    nooffmsg = !otmp ? 1 : 0;
     if (!otmp) {
         otmp = $G.ublindf;
     }
@@ -1571,7 +1571,7 @@ export async function Blindf_off(otmp) {   // do_wear.c:1495
  */
 export async function set_wear(obj) {   // do_wear.c:1539
     /* if Null, do all worn items; otherwise just obj */
-    gi.initial_don = $c.i8(!obj ? 1 : 0);
+    gi.initial_don = !obj ? 1 : 0;
     if (!obj ? $G.ublindf !== null : $c.peq(obj, $G.ublindf)) {
         await Blindf_on($G.ublindf);
     }
@@ -1620,19 +1620,19 @@ export function donning(otmp) {   // do_wear.c:1574
     if (doffing(otmp)) {
         result = TRUE;
     } else if ($c.peq(otmp, $G.uarm)) {
-        result = $c.i8(ga.afternmv === Armor_on ? 1 : 0);
+        result = ga.afternmv === Armor_on ? 1 : 0;
     } else if ($c.peq(otmp, $G.uarmu)) {
-        result = $c.i8(ga.afternmv === Shirt_on ? 1 : 0);
+        result = ga.afternmv === Shirt_on ? 1 : 0;
     } else if ($c.peq(otmp, $G.uarmc)) {
-        result = $c.i8(ga.afternmv === Cloak_on ? 1 : 0);
+        result = ga.afternmv === Cloak_on ? 1 : 0;
     } else if ($c.peq(otmp, $G.uarmf)) {
-        result = $c.i8(ga.afternmv === Boots_on ? 1 : 0);
+        result = ga.afternmv === Boots_on ? 1 : 0;
     } else if ($c.peq(otmp, $G.uarmh)) {
-        result = $c.i8(ga.afternmv === Helmet_on ? 1 : 0);
+        result = ga.afternmv === Helmet_on ? 1 : 0;
     } else if ($c.peq(otmp, $G.uarmg)) {
-        result = $c.i8(ga.afternmv === Gloves_on ? 1 : 0);
+        result = ga.afternmv === Gloves_on ? 1 : 0;
     } else if ($c.peq(otmp, $G.uarms)) {
-        result = $c.i8(ga.afternmv === Shield_on ? 1 : 0);
+        result = ga.afternmv === Shield_on ? 1 : 0;
     }
     return result;
 }
@@ -1649,34 +1649,34 @@ export function doffing(otmp) {   // do_wear.c:1603
     result = FALSE;
     /* 'T' (or 'R' used for armor) sets ga.afternmv, 'A' sets takeoff.what */
     if ($c.peq(otmp, $G.uarm)) {
-        result = $c.i8(ga.afternmv === Armor_off || what === W.ARM ? 1 : 0);
+        result = ga.afternmv === Armor_off || what === W.ARM ? 1 : 0;
     } else if ($c.peq(otmp, $G.uarmu)) {
-        result = $c.i8(ga.afternmv === Shirt_off || what === W.ARMU ? 1 : 0);
+        result = ga.afternmv === Shirt_off || what === W.ARMU ? 1 : 0;
     } else if ($c.peq(otmp, $G.uarmc)) {
-        result = $c.i8(ga.afternmv === Cloak_off || what === W.ARMC ? 1 : 0);
+        result = ga.afternmv === Cloak_off || what === W.ARMC ? 1 : 0;
     } else if ($c.peq(otmp, $G.uarmf)) {
-        result = $c.i8(ga.afternmv === Boots_off || what === W.ARMF ? 1 : 0);
+        result = ga.afternmv === Boots_off || what === W.ARMF ? 1 : 0;
     } else if ($c.peq(otmp, $G.uarmh)) {
-        result = $c.i8(ga.afternmv === Helmet_off || what === W.ARMH ? 1 : 0);
+        result = ga.afternmv === Helmet_off || what === W.ARMH ? 1 : 0;
     } else if ($c.peq(otmp, $G.uarmg)) {
-        result = $c.i8(ga.afternmv === Gloves_off || what === W.ARMG ? 1 : 0);
+        result = ga.afternmv === Gloves_off || what === W.ARMG ? 1 : 0;
     } else if ($c.peq(otmp, $G.uarms)) {
-        result = $c.i8(ga.afternmv === Shield_off || what === W.ARMS ? 1 : 0);
+        result = ga.afternmv === Shield_off || what === W.ARMS ? 1 : 0;
     } else if ($c.peq(otmp, $G.uamul)) {
         /* these 1-turn items don't need 'ga.afternmv' checks */
-        result = $c.i8(what === W.AMUL ? 1 : 0);
+        result = what === W.AMUL ? 1 : 0;
     } else if ($c.peq(otmp, $G.uleft)) {
-        result = $c.i8(what === W.RINGL ? 1 : 0);
+        result = what === W.RINGL ? 1 : 0;
     } else if ($c.peq(otmp, $G.uright)) {
-        result = $c.i8(what === W.RINGR ? 1 : 0);
+        result = what === W.RINGR ? 1 : 0;
     } else if ($c.peq(otmp, $G.ublindf)) {
-        result = $c.i8(what === W.TOOL ? 1 : 0);
+        result = what === W.TOOL ? 1 : 0;
     } else if ($c.peq(otmp, $G.uwep)) {
-        result = $c.i8(what === W.WEP ? 1 : 0);
+        result = what === W.WEP ? 1 : 0;
     } else if ($c.peq(otmp, $G.uswapwep)) {
-        result = $c.i8(what === W.SWAPWEP ? 1 : 0);
+        result = what === W.SWAPWEP ? 1 : 0;
     } else if ($c.peq(otmp, $G.uquiver)) {
-        result = $c.i8(what === W.QUIVER ? 1 : 0);
+        result = what === W.QUIVER ? 1 : 0;
     }
     return result;
 }
@@ -1710,7 +1710,7 @@ export function cancel_don() {   // do_wear.c:1664
      * every item of the corresponding armor category takes 1 turn to wear,
      * but check all of them anyway
      */
-    svc.context.takeoff.cancelled_don = $c.i8(ga.afternmv === Cloak_on || ga.afternmv === Armor_on || ga.afternmv === Shirt_on || ga.afternmv === Helmet_on || ga.afternmv === Gloves_on || ga.afternmv === Boots_on || ga.afternmv === Shield_on ? 1 : 0);
+    svc.context.takeoff.cancelled_don = ga.afternmv === Cloak_on || ga.afternmv === Armor_on || ga.afternmv === Shirt_on || ga.afternmv === Helmet_on || ga.afternmv === Gloves_on || ga.afternmv === Boots_on || ga.afternmv === Shield_on ? 1 : 0;
     ga.afternmv = null;
     gn.nomovemsg = null;
     gm.multi = 0;
@@ -1736,7 +1736,7 @@ export async function stop_donning(stolenobj) {   // do_wear.c:1688
         return 0;
     }
     /* donning() returns True when doffing too; doffing() is more specific */
-    putting_on = $c.i8(!doffing(otmp) ? 1 : 0);
+    putting_on = !doffing(otmp) ? 1 : 0;
     /* cancel_don() looks at afternmv; it can also cancel doffing */
     cancel_don();
     /* don't want <armor>_on() or <armor>_off() being called
@@ -1980,11 +1980,11 @@ export async function cursed(otmp) {   // do_wear.c:1893
         return 0;
     }
     /* Curses, like chickens, come home to roost. */
-    if ($c.peq(otmp, $G.uwep) ? await welded(otmp) : otmp.cursed | 0) {
-        use_plural = $c.i8(is_boots(otmp) || is_gloves(otmp) || otmp.otyp === LENSES || otmp.quan > 1 ? 1 : 0);
+    if ($c.peq(otmp, $G.uwep) ? await welded(otmp) : otmp.cursed) {
+        use_plural = is_boots(otmp) || is_gloves(otmp) || otmp.otyp === LENSES || otmp.quan > 1 ? 1 : 0;
         /* might be trying again after applying grease to hands */
         /* for weapon, we'll only get here via 'A )' */
-        if (Glib() && otmp.bknown | 0 && ($G.uarmg ? $c.peq(otmp, $G.uwep) : $c.and64(otmp.owornmask, W.WEP | W_RING) !== 0)) {
+        if (Glib() && otmp.bknown && ($G.uarmg ? $c.peq(otmp, $G.uwep) : $c.and64(otmp.owornmask, W.WEP | W_RING) !== 0)) {
             await pline($c.lit("Despite your slippery %s, you can't."), await fingers_or_gloves(TRUE));
         } else {
             await You($c.lit("can't.  %s cursed."), use_plural ? $c.lit("They are") : $c.lit("It is"));
@@ -2304,10 +2304,10 @@ async function accessory_or_armor_on(obj$in) {   // do_wear.c:2209
         await already_wearing(new $c.Ptr(c_that_, 0));
         return ECMD.OK;
     }
-    armor = $c.i8(obj[0].oclass === ARMOR_CLASS ? 1 : 0);
-    ring = $c.i8(obj[0].oclass === RING_CLASS || obj[0].otyp === MEAT_RING ? 1 : 0);
-    amulet = $c.i8(obj[0].oclass === AMULET_CLASS ? 1 : 0);
-    eyewear = $c.i8(obj[0].otyp === BLINDFOLD || obj[0].otyp === TOWEL || obj[0].otyp === LENSES ? 1 : 0);
+    armor = obj[0].oclass === ARMOR_CLASS ? 1 : 0;
+    ring = obj[0].oclass === RING_CLASS || obj[0].otyp === MEAT_RING ? 1 : 0;
+    amulet = obj[0].oclass === AMULET_CLASS ? 1 : 0;
+    eyewear = obj[0].otyp === BLINDFOLD || obj[0].otyp === TOWEL || obj[0].otyp === LENSES ? 1 : 0;
     /* checks which are performed prior to actually touching the item */
     if (armor) {
         if (!await canwearobj(obj[0], new $c.Ptr(mask, 0), TRUE)) {
@@ -2373,7 +2373,7 @@ async function accessory_or_armor_on(obj$in) {   // do_wear.c:2209
                 await Your($c.lit("%s are too slippery to remove, so you cannot put on the ring."), gloves_simple_name($G.uarmg));
                 return ECMD.TIME;   /* always uses move */
             }
-            if ($G.uarmg && $G.uarmg.cursed | 0) {
+            if ($G.uarmg && $G.uarmg.cursed) {
                 res = !$G.uarmg.bknown ? 1 : 0;
                 await set_bknown($G.uarmg, 1);
                 await You($c.lit("cannot remove your %s to put on the ring."), new $c.Ptr(c_gloves, 0));
@@ -2448,7 +2448,7 @@ async function accessory_or_armor_on(obj$in) {   // do_wear.c:2209
          *
         obj->known = 1;
          */
-        gw.wasinwater = $c.u8(u.uinwater);   /* for WWALKING; Boots_on() is too late */
+        gw.wasinwater = u.uinwater;   /* for WWALKING; Boots_on() is too late */
         await setworn(obj[0], mask[0]);
         /* if there's no delay, we'll execute 'afternmv' immediately */
         if ($c.peq(obj[0], $G.uarm)) {
@@ -2543,25 +2543,25 @@ export function find_ac() {   // do_wear.c:2473
     uac = mons[u.umonnum].ac;   /* base armor class for current form */
     /* armor class from worn gear */
     if ($G.uarm) {
-        uac = uac - ((objects[$G.uarm.otyp].oc_oc1 + $G.uarm.spe | 0) - ((($G.uarm.oeroded | 0) > ($G.uarm.oeroded2 | 0) ? $G.uarm.oeroded | 0 : $G.uarm.oeroded2 | 0) < objects[$G.uarm.otyp].oc_oc1 ? ($G.uarm.oeroded | 0) > ($G.uarm.oeroded2 | 0) ? $G.uarm.oeroded | 0 : $G.uarm.oeroded2 | 0 : objects[$G.uarm.otyp].oc_oc1) | 0) | 0;
+        uac = uac - (objects[$G.uarm.otyp].oc_oc1 + $G.uarm.spe - (($G.uarm.oeroded > $G.uarm.oeroded2 ? $G.uarm.oeroded : $G.uarm.oeroded2) < objects[$G.uarm.otyp].oc_oc1 ? $G.uarm.oeroded > $G.uarm.oeroded2 ? $G.uarm.oeroded : $G.uarm.oeroded2 : objects[$G.uarm.otyp].oc_oc1)) | 0;
     }
     if ($G.uarmc) {
-        uac = uac - ((objects[$G.uarmc.otyp].oc_oc1 + $G.uarmc.spe | 0) - ((($G.uarmc.oeroded | 0) > ($G.uarmc.oeroded2 | 0) ? $G.uarmc.oeroded | 0 : $G.uarmc.oeroded2 | 0) < objects[$G.uarmc.otyp].oc_oc1 ? ($G.uarmc.oeroded | 0) > ($G.uarmc.oeroded2 | 0) ? $G.uarmc.oeroded | 0 : $G.uarmc.oeroded2 | 0 : objects[$G.uarmc.otyp].oc_oc1) | 0) | 0;
+        uac = uac - (objects[$G.uarmc.otyp].oc_oc1 + $G.uarmc.spe - (($G.uarmc.oeroded > $G.uarmc.oeroded2 ? $G.uarmc.oeroded : $G.uarmc.oeroded2) < objects[$G.uarmc.otyp].oc_oc1 ? $G.uarmc.oeroded > $G.uarmc.oeroded2 ? $G.uarmc.oeroded : $G.uarmc.oeroded2 : objects[$G.uarmc.otyp].oc_oc1)) | 0;
     }
     if ($G.uarmh) {
-        uac = uac - ((objects[$G.uarmh.otyp].oc_oc1 + $G.uarmh.spe | 0) - ((($G.uarmh.oeroded | 0) > ($G.uarmh.oeroded2 | 0) ? $G.uarmh.oeroded | 0 : $G.uarmh.oeroded2 | 0) < objects[$G.uarmh.otyp].oc_oc1 ? ($G.uarmh.oeroded | 0) > ($G.uarmh.oeroded2 | 0) ? $G.uarmh.oeroded | 0 : $G.uarmh.oeroded2 | 0 : objects[$G.uarmh.otyp].oc_oc1) | 0) | 0;
+        uac = uac - (objects[$G.uarmh.otyp].oc_oc1 + $G.uarmh.spe - (($G.uarmh.oeroded > $G.uarmh.oeroded2 ? $G.uarmh.oeroded : $G.uarmh.oeroded2) < objects[$G.uarmh.otyp].oc_oc1 ? $G.uarmh.oeroded > $G.uarmh.oeroded2 ? $G.uarmh.oeroded : $G.uarmh.oeroded2 : objects[$G.uarmh.otyp].oc_oc1)) | 0;
     }
     if ($G.uarmf) {
-        uac = uac - ((objects[$G.uarmf.otyp].oc_oc1 + $G.uarmf.spe | 0) - ((($G.uarmf.oeroded | 0) > ($G.uarmf.oeroded2 | 0) ? $G.uarmf.oeroded | 0 : $G.uarmf.oeroded2 | 0) < objects[$G.uarmf.otyp].oc_oc1 ? ($G.uarmf.oeroded | 0) > ($G.uarmf.oeroded2 | 0) ? $G.uarmf.oeroded | 0 : $G.uarmf.oeroded2 | 0 : objects[$G.uarmf.otyp].oc_oc1) | 0) | 0;
+        uac = uac - (objects[$G.uarmf.otyp].oc_oc1 + $G.uarmf.spe - (($G.uarmf.oeroded > $G.uarmf.oeroded2 ? $G.uarmf.oeroded : $G.uarmf.oeroded2) < objects[$G.uarmf.otyp].oc_oc1 ? $G.uarmf.oeroded > $G.uarmf.oeroded2 ? $G.uarmf.oeroded : $G.uarmf.oeroded2 : objects[$G.uarmf.otyp].oc_oc1)) | 0;
     }
     if ($G.uarms) {
-        uac = uac - ((objects[$G.uarms.otyp].oc_oc1 + $G.uarms.spe | 0) - ((($G.uarms.oeroded | 0) > ($G.uarms.oeroded2 | 0) ? $G.uarms.oeroded | 0 : $G.uarms.oeroded2 | 0) < objects[$G.uarms.otyp].oc_oc1 ? ($G.uarms.oeroded | 0) > ($G.uarms.oeroded2 | 0) ? $G.uarms.oeroded | 0 : $G.uarms.oeroded2 | 0 : objects[$G.uarms.otyp].oc_oc1) | 0) | 0;
+        uac = uac - (objects[$G.uarms.otyp].oc_oc1 + $G.uarms.spe - (($G.uarms.oeroded > $G.uarms.oeroded2 ? $G.uarms.oeroded : $G.uarms.oeroded2) < objects[$G.uarms.otyp].oc_oc1 ? $G.uarms.oeroded > $G.uarms.oeroded2 ? $G.uarms.oeroded : $G.uarms.oeroded2 : objects[$G.uarms.otyp].oc_oc1)) | 0;
     }
     if ($G.uarmg) {
-        uac = uac - ((objects[$G.uarmg.otyp].oc_oc1 + $G.uarmg.spe | 0) - ((($G.uarmg.oeroded | 0) > ($G.uarmg.oeroded2 | 0) ? $G.uarmg.oeroded | 0 : $G.uarmg.oeroded2 | 0) < objects[$G.uarmg.otyp].oc_oc1 ? ($G.uarmg.oeroded | 0) > ($G.uarmg.oeroded2 | 0) ? $G.uarmg.oeroded | 0 : $G.uarmg.oeroded2 | 0 : objects[$G.uarmg.otyp].oc_oc1) | 0) | 0;
+        uac = uac - (objects[$G.uarmg.otyp].oc_oc1 + $G.uarmg.spe - (($G.uarmg.oeroded > $G.uarmg.oeroded2 ? $G.uarmg.oeroded : $G.uarmg.oeroded2) < objects[$G.uarmg.otyp].oc_oc1 ? $G.uarmg.oeroded > $G.uarmg.oeroded2 ? $G.uarmg.oeroded : $G.uarmg.oeroded2 : objects[$G.uarmg.otyp].oc_oc1)) | 0;
     }
     if ($G.uarmu) {
-        uac = uac - ((objects[$G.uarmu.otyp].oc_oc1 + $G.uarmu.spe | 0) - ((($G.uarmu.oeroded | 0) > ($G.uarmu.oeroded2 | 0) ? $G.uarmu.oeroded | 0 : $G.uarmu.oeroded2 | 0) < objects[$G.uarmu.otyp].oc_oc1 ? ($G.uarmu.oeroded | 0) > ($G.uarmu.oeroded2 | 0) ? $G.uarmu.oeroded | 0 : $G.uarmu.oeroded2 | 0 : objects[$G.uarmu.otyp].oc_oc1) | 0) | 0;
+        uac = uac - (objects[$G.uarmu.otyp].oc_oc1 + $G.uarmu.spe - (($G.uarmu.oeroded > $G.uarmu.oeroded2 ? $G.uarmu.oeroded : $G.uarmu.oeroded2) < objects[$G.uarmu.otyp].oc_oc1 ? $G.uarmu.oeroded > $G.uarmu.oeroded2 ? $G.uarmu.oeroded : $G.uarmu.oeroded2 : objects[$G.uarmu.otyp].oc_oc1)) | 0;
     }
     if ($G.uleft && $G.uleft.otyp === RIN_PROTECTION) {
         uac = uac - $G.uleft.spe | 0;
@@ -2599,8 +2599,8 @@ export async function glibr() {   // do_wear.c:2528
     xfl = 0;
     wastwoweap = FALSE;
     otherwep = null;
-    leftfall = $c.i8($G.uleft && !$G.uleft.cursed && (!$G.uwep || !(await welded($G.uwep) && ULEFTY()) || !bimanual($G.uwep)) ? 1 : 0);
-    rightfall = $c.i8($G.uright && !$G.uright.cursed && (!$G.uwep || !(await welded($G.uwep) && URIGHTY()) || !bimanual($G.uwep)) ? 1 : 0);
+    leftfall = $G.uleft && !$G.uleft.cursed && (!$G.uwep || !(await welded($G.uwep) && ULEFTY()) || !bimanual($G.uwep)) ? 1 : 0;
+    rightfall = $G.uright && !$G.uright.cursed && (!$G.uwep || !(await welded($G.uwep) && URIGHTY()) || !bimanual($G.uwep)) ? 1 : 0;
     /*
         leftfall = (uleft && !uleft->cursed
                     && (!uwep || !welded(uwep) || !bimanual(uwep)));
@@ -2728,13 +2728,13 @@ export async function stuck_ring(ring, otyp) {   // do_wear.c:2657
     if (ring && ring.otyp === otyp) {
         /* reasons ring can't be removed match those checked by select_off();
            limbless case has extra checks because ordinarily it's temporary */
-        if (nolimbs(gy.youmonst.data) && $G.uamul && $G.uamul.otyp === AMULET_OF_UNCHANGING && $G.uamul.cursed | 0) {
+        if (nolimbs(gy.youmonst.data) && $G.uamul && $G.uamul.otyp === AMULET_OF_UNCHANGING && $G.uamul.cursed) {
             return $G.uamul;
         }
         if (await welded($G.uwep) && ($c.peq(ring, RING_ON_PRIMARY()) || bimanual($G.uwep))) {
             return $G.uwep;
         }
-        if ($G.uarmg && $G.uarmg.cursed | 0) {
+        if ($G.uarmg && $G.uarmg.cursed) {
             return $G.uarmg;
         }
         if (ring.cursed) {
@@ -2780,7 +2780,7 @@ async function select_off(otmp) {   // do_wear.c:2696
         if (await welded($G.uwep) && ($c.peq(otmp, RING_ON_PRIMARY()) || bimanual($G.uwep))) {
             $c.sprintf(new $c.Ptr(buf, 0), $c.lit("free a weapon %s"), await body_part(HAND));
             why = $G.uwep;
-        } else if ($G.uarmg && ($G.uarmg.cursed | 0 || Glib())) {
+        } else if ($G.uarmg && ($G.uarmg.cursed || Glib())) {
             $c.sprintf(new $c.Ptr(buf, 0), $c.lit("take off your %s%s"), u.uprops[GLIB].intrinsic ? $c.lit("slippery ") : $c.lit(""), gloves_simple_name($G.uarmg));
             why = !Glib() ? $G.uarmg : glibdummy;
         }
@@ -2798,7 +2798,7 @@ async function select_off(otmp) {   // do_wear.c:2696
             return 0;
         } else if (Glib()) {
             /* simplified Shk_Your() */
-            await pline($c.lit("%s %s are too slippery to take off."), $G.uarmg.unpaid | 0 ? $c.lit("The") : $c.lit("Your"), gloves_simple_name($G.uarmg));
+            await pline($c.lit("%s %s are too slippery to take off."), $G.uarmg.unpaid ? $c.lit("The") : $c.lit("Your"), gloves_simple_name($G.uarmg));
             return 0;
         }
         if (await better_not_take_that_off(otmp)) {
@@ -2818,10 +2818,10 @@ async function select_off(otmp) {   // do_wear.c:2696
     /* special suit and shirt checks */
     if ($c.peq(otmp, $G.uarm) || $c.peq(otmp, $G.uarmu)) {
         why = null;   /* the item which prevents disrobing */
-        if ($G.uarmc && $G.uarmc.cursed | 0) {
+        if ($G.uarmc && $G.uarmc.cursed) {
             $c.sprintf(new $c.Ptr(buf, 0), $c.lit("remove your %s"), cloak_simple_name($G.uarmc));
             why = $G.uarmc;
-        } else if ($c.peq(otmp, $G.uarmu) && $G.uarm && $G.uarm.cursed | 0) {
+        } else if ($c.peq(otmp, $G.uarmu) && $G.uarm && $G.uarm.cursed) {
             $c.sprintf(new $c.Ptr(buf, 0), $c.lit("remove your %s"), new $c.Ptr(c_suit, 0));
             why = $G.uarm;
         } else if (await welded($G.uwep) && bimanual($G.uwep)) {
@@ -3002,7 +3002,7 @@ async function take_off() {   // do_wear.c:2900
          * known cloaks, add 1 so that it actually matters...
          */
         if ($G.uarmc) {
-            doff.delay = doff.delay + (Math.imul(2, objects[$G.uarmc.otyp].oc_delay) + 1 | 0) | 0;
+            doff.delay = doff.delay + (Math.imul(2, objects[$G.uarmc.otyp].oc_delay) + 1) | 0;
         }
     } else if (doff.what === W.ARMC) {
         otmp = $G.uarmc;
@@ -3021,7 +3021,7 @@ async function take_off() {   // do_wear.c:2900
             doff.delay = doff.delay + Math.imul(2, objects[$G.uarm.otyp].oc_delay) | 0;
         }
         if ($G.uarmc) {
-            doff.delay = doff.delay + (Math.imul(2, objects[$G.uarmc.otyp].oc_delay) + 1 | 0) | 0;
+            doff.delay = doff.delay + (Math.imul(2, objects[$G.uarmc.otyp].oc_delay) + 1) | 0;
         }
     } else if (doff.what === W.AMUL) {
         doff.delay = 1;
@@ -3066,7 +3066,7 @@ async function better_not_take_that_off(otmp) {   // do_wear.c:2990
        so we won't factor that in */
     if (corpse && !u_safe_from_fatal_corpse(corpse, st_corpse | st_petrifies)) {
         nh_snprintf($c.lit("better_not_take_that_off"), 3006, new $c.Ptr(buf, 0), 256, $c.lit("Take off your %s despite carrying a dead %s?"), gloves_simple_name(otmp), await obj_pmname(corpse));
-        return $c.i8(await paranoid_ynq(TRUE, new $c.Ptr(buf, 0), FALSE) !== 121 ? 1 : 0);
+        return await paranoid_ynq(TRUE, new $c.Ptr(buf, 0), FALSE) !== 121 ? 1 : 0;
     }
     return FALSE;
 }
@@ -3146,7 +3146,7 @@ async function menu_remarm(retry) {   // do_wear.c:3090
     i = 0;
     all_worn_categories = TRUE;
     if (retry) {
-        all_worn_categories = $c.i8(retry === -2 ? 1 : 0);
+        all_worn_categories = retry === -2 ? 1 : 0;
     } else if (flags.menu_style === MENU.FULL) {
         all_worn_categories = FALSE;
         n = await query_category($c.lit("What type of things do you want to take off?"), gi.invent, WORN_TYPES | ALL_TYPES | UNPAID_TYPES | BUCX_TYPES, new $c.Ptr(pick_list, 0), PICK.ANY);
@@ -3167,7 +3167,7 @@ async function menu_remarm(retry) {   // do_wear.c:3090
         if ((ggofeedback[0] & ALL_FINISHED) >>> 0) {
             return 0;
         }
-        all_worn_categories = $c.i8(i === -2 ? 1 : 0);
+        all_worn_categories = i === -2 ? 1 : 0;
     }
     if (menu_class_present(117) || menu_class_present(66) || menu_class_present(85) || menu_class_present(67) || menu_class_present(88)) {
         all_worn_categories = FALSE;
@@ -3240,7 +3240,7 @@ async function wornarm_destroyed(wornarm) {   // do_wear.c:3144
 function maybe_destroy_armor(armor, atmp, resisted) {   // do_wear.c:3189
     let $t1;
     if (armor !== null && (!atmp || $c.peq(atmp, armor)) && ($t1 = obj_resists(armor, 0, 90), resisted.set(0, $t1)) === FALSE) {
-        armor.in_use = (1) & 1;
+        armor.in_use = 1;
         return armor;
     }
     return null;
@@ -3411,12 +3411,12 @@ export async function inaccessible_equipment(obj, verb, only_if_known_cursed) { 
     /* "dip" or "grease", or null to avoid messages */
     /* ignore covering unless it is known to
      * be cursed */
-    anycovering = $c.i8(!only_if_known_cursed ? 1 : 0);   /* more comprehensible... */
+    anycovering = !only_if_known_cursed ? 1 : 0;   /* more comprehensible... */
     if (!obj || !obj.owornmask) {
         return FALSE;   /* not inaccessible */
     }
     /* check for suit covered by cloak */
-    if ($c.peq(obj, $G.uarm) && $G.uarmc && (anycovering || $G.uarmc.cursed | 0 && $G.uarmc.bknown | 0)) {
+    if ($c.peq(obj, $G.uarm) && $G.uarmc && (anycovering || $G.uarmc.cursed && $G.uarmc.bknown)) {
         if (verb) {
             $c.strcpy(new $c.Ptr(buf, 0), await yname($G.uarmc));
             await You(new $c.Ptr(inaccessible_equipment$need_to_take_off_outer_armor, 0), new $c.Ptr(buf, 0), verb, await yname(obj));
@@ -3424,12 +3424,12 @@ export async function inaccessible_equipment(obj, verb, only_if_known_cursed) { 
         return TRUE;
     }
     /* check for shirt covered by suit and/or cloak */
-    if ($c.peq(obj, $G.uarmu) && ($G.uarm && (anycovering || $G.uarm.cursed | 0 && $G.uarm.bknown | 0) || $G.uarmc && (anycovering || $G.uarmc.cursed | 0 && $G.uarmc.bknown | 0))) {
+    if ($c.peq(obj, $G.uarmu) && ($G.uarm && (anycovering || $G.uarm.cursed && $G.uarm.bknown) || $G.uarmc && (anycovering || $G.uarmc.cursed && $G.uarmc.bknown))) {
         if (verb) {
             /* if sameprefix, use yname and xname to get "your cloak and suit"
                or "Manlobbi's cloak and suit"; otherwise, use yname and yname
                to get "your cloak and Manlobbi's suit" or vice versa */
-            sameprefix = $c.i8($G.uarm && $G.uarmc && !$c.strcmp(await shk_your(new $c.Ptr(cloaktmp, 0), $G.uarmc), await shk_your(new $c.Ptr(suittmp, 0), $G.uarm)) ? 1 : 0);
+            sameprefix = $G.uarm && $G.uarmc && !$c.strcmp(await shk_your(new $c.Ptr(cloaktmp, 0), $G.uarmc), await shk_your(new $c.Ptr(suittmp, 0), $G.uarm)) ? 1 : 0;
             new $c.Ptr(buf, 0).set(0, 0);
             if ($G.uarmc) {
                 $c.strcat(new $c.Ptr(buf, 0), await yname($G.uarmc));
@@ -3445,7 +3445,7 @@ export async function inaccessible_equipment(obj, verb, only_if_known_cursed) { 
         return TRUE;
     }
     /* check for ring covered by gloves */
-    if (($c.peq(obj, $G.uleft) || $c.peq(obj, $G.uright)) && $G.uarmg && (anycovering || $G.uarmg.cursed | 0 && $G.uarmg.bknown | 0)) {
+    if (($c.peq(obj, $G.uleft) || $c.peq(obj, $G.uright)) && $G.uarmg && (anycovering || $G.uarmg.cursed && $G.uarmg.bknown)) {
         if (verb) {
             $c.strcpy(new $c.Ptr(buf, 0), await yname($G.uarmg));
             await You(new $c.Ptr(inaccessible_equipment$need_to_take_off_outer_armor, 0), new $c.Ptr(buf, 0), verb, await yname(obj));
@@ -3469,7 +3469,7 @@ async function equip_ok(obj, removing, accessory) {   // do_wear.c:3404
         return GETOBJ.EXCLUDE;
     }
     /* ignore for putting on if already worn, or removing if not worn */
-    is_worn = $c.i8($c.and64(obj.owornmask, W_ARMOR | W_ACCESSORY) !== 0 ? 1 : 0);
+    is_worn = $c.and64(obj.owornmask, W_ARMOR | W_ACCESSORY) !== 0 ? 1 : 0;
     if (removing ^ is_worn) {
         return GETOBJ.EXCLUDE_INACCESS;
     }
@@ -3492,7 +3492,7 @@ async function equip_ok(obj, removing, accessory) {   // do_wear.c:3404
      * can't be worn because the slot is filled with something else. */
     /* removing inaccessible equipment */
     if (removing && !gi.item_action_in_progress) {
-        if (await inaccessible_equipment(obj, null, $c.i8(obj.oclass === RING_CLASS ? 1 : 0))) {
+        if (await inaccessible_equipment(obj, null, obj.oclass === RING_CLASS ? 1 : 0)) {
             return GETOBJ.EXCLUDE_INACCESS;
         }
     }

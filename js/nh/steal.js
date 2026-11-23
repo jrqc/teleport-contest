@@ -187,7 +187,7 @@ export function unresponsive() {   // steal.c:133
     if (gm.multi >= 0) {
         return FALSE;
     }
-    return $c.i8(unconscious() || is_fainted() || gm.multi_reason && (!$c.strncmp(gm.multi_reason, $c.lit("frozen"), 6) || !$c.strncmp(gm.multi_reason, $c.lit("paralyzed"), 9)) ? 1 : 0);
+    return unconscious() || is_fainted() || gm.multi_reason && (!$c.strncmp(gm.multi_reason, $c.lit("frozen"), 6) || !$c.strncmp(gm.multi_reason, $c.lit("paralyzed"), 9)) ? 1 : 0;
 }
 /* called via (*ga.afternmv)() when hero finishes taking off armor that
    was slated to be stolen but the thief died in the interim */
@@ -289,7 +289,7 @@ export async function remove_worn_item(obj, unchain_ball) {   // steal.c:213
      * message about something undesirable followed by --More--.
      */
     oldinuse = obj.in_use;
-    obj.in_use = (1) & 1;
+    obj.in_use = 1;
     if ($c.and64(obj.owornmask, W_ARMOR)) {
         if ($c.peq(obj, $G.uskin)) {
             await impossible($c.lit("Removing embedded scales?"));
@@ -403,9 +403,9 @@ export async function steal(mtmp, objnambuf) {   // steal.c:343
         case null:
             named = 0;
             retrycnt = 0;
-            monkey_business = $c.i8(is_animal(mtmp.data));
-            seen = $c.i8(canspotmon(mtmp));
-            was_punished = $c.i8(Punished());
+            monkey_business = is_animal(mtmp.data);
+            seen = canspotmon(mtmp);
+            was_punished = Punished();
             if (objnambuf) {
                 objnambuf.set(0, 0);
             }
@@ -526,7 +526,7 @@ export async function steal(mtmp, objnambuf) {   // steal.c:343
                         } else {
                             /* nymphs can steal rings from under
                                cursed weapon but animals can't */
-                            ostuck = $c.i8(otmp.cursed | 0 && otmp.owornmask || $c.peq(otmp, RING_ON_PRIMARY()) && await welded($G.uwep) || $c.peq(otmp, RING_ON_SECONDARY()) && await welded($G.uwep) && bimanual($G.uwep) ? 1 : 0);
+                            ostuck = otmp.cursed && otmp.owornmask || $c.peq(otmp, RING_ON_PRIMARY()) && await welded($G.uwep) || $c.peq(otmp, RING_ON_SECONDARY()) && await welded($G.uwep) && bimanual($G.uwep) ? 1 : 0;
                         }
                     case "cant_take":
                         if ($goto === "cant_take" || (ostuck || await can_carry(mtmp, otmp) === 0)) {
@@ -549,7 +549,7 @@ export async function steal(mtmp, objnambuf) {   // steal.c:343
                 }
             }
             if (otmp.otyp === LEASH && otmp.corpsenm) {
-                if (monkey_business && otmp.cursed | 0) {
+                if (monkey_business && otmp.cursed) {
                     $goto = "cant_take"; continue D1;
                 }
                 await o_unleash(otmp);
@@ -584,8 +584,8 @@ export async function steal(mtmp, objnambuf) {   // steal.c:343
                             await worn_item_removal(mtmp, otmp);
                             break;
                         } else {
-                            curssv = otmp.cursed | 0;
-                            otmp.cursed = (0) & 1;
+                            curssv = otmp.cursed;
+                            otmp.cursed = 0;
                             slowly = armordelay >= 1 || gm.multi < 0 ? 1 : 0;
                             if (flags.female) {
                                 await urgent_pline($c.lit("%s charms you.  You gladly %s your %s."), !seen ? $c.lit("She") : new $c.Ptr(Monnambuf, 0), curssv ? $c.lit("let her take") : !slowly ? $c.lit("hand over") : was_doffing ? $c.lit("continue removing") : $c.lit("start removing"), await armor_simple_name(otmp));
@@ -639,7 +639,7 @@ export async function steal(mtmp, objnambuf) {   // steal.c:343
             /* usually set mavenge bit so knights won't suffer an alignment penalty
                during retaliation; not applicable for removing attached iron ball */
             if (!Conflict() && !(was_punished && !Punished())) {
-                mtmp.mavenge = (1) & 1;
+                mtmp.mavenge = 1;
             }
             if (otmp.unpaid) {
                 await subfrombill(otmp, await shop_keeper(new $c.Ptr(u.ushops, 0).get(0)));
@@ -689,7 +689,7 @@ export async function mpickobj(mtmp, otmp) {   // steal.c:618
     }
     /* an unpaid item can be on the floor; if a monster picks it up, take
        it off the shop bill */
-    if (otmp.unpaid | 0 || Has_contents(otmp) && count_unpaid(otmp.cobj)) {
+    if (otmp.unpaid || Has_contents(otmp) && count_unpaid(otmp.cobj)) {
         await subfrombill(otmp, await find_objowner(otmp, otmp.ox, otmp.oy));
     }
     /* don't want hidden light source inside the monster; assumes that
@@ -704,7 +704,7 @@ export async function mpickobj(mtmp, otmp) {   // steal.c:618
     }
     /* for hero owned object on shop floor, mtmp is taking possession
        and if it's eventually dropped in a shop, shk will claim it */
-    otmp.no_charge = (0) & 1;
+    otmp.no_charge = 0;
     /* some object handling is only done if mtmp isn't a pet */
     if (!mtmp.mtame) {
         /* if monst is unseen, some info hero knows about this object becomes
@@ -721,9 +721,9 @@ export async function mpickobj(mtmp, otmp) {   // steal.c:618
            rather than 'pickup_thrown'; if previously stolen, stays stolen;
            if previously dropped, now forgotten and autopickup will operate
            normally regardless of the setting for 'dropped_nopick' */
-        if ((otmp.how_lost | 0) === LOST.THROWN) {
+        if (otmp.how_lost === LOST.THROWN) {
             otmp.how_lost = (LOST.STOLEN) & 7;
-        } else if ((otmp.how_lost | 0) === LOST.DROPPED) {
+        } else if (otmp.how_lost === LOST.DROPPED) {
             otmp.how_lost = (LOST.NONE) & 7;
         }
     }
@@ -896,8 +896,8 @@ export async function mdrop_obj(mon, obj, verbosely) {   // steal.c:814
     /* don't charge for an owned saddle on dead steed (provided
         that the hero is within the same shop at the time) */
     /* being at costly_spot guarantees lev->roomno is not 0 */
-    if (unwornmask && mon.mtame && $c.and64(unwornmask, W.SADDLE) !== 0 && !obj.unpaid && await costly_spot(omx, omy) && $c.strchr(in_rooms(u.ux, u.uy, SHOPBASE), svl.level.locations[omx][omy].roomno | 0)) {
-        obj.no_charge = (1) & 1;
+    if (unwornmask && mon.mtame && $c.and64(unwornmask, W.SADDLE) !== 0 && !obj.unpaid && await costly_spot(omx, omy) && $c.strchr(in_rooms(u.ux, u.uy, SHOPBASE), svl.level.locations[omx][omy].roomno)) {
+        obj.no_charge = 1;
     }
     /* obj_no_longer_held(obj); -- done by place_object */
     if (verbosely && cansee(omx, omy)) {
@@ -953,7 +953,7 @@ export async function relobj(mtmp, show, is_pet) {   // steal.c:875
     omx = mtmp.mx;
     omy = mtmp.my;
     /* vault guard's gold goes away rather than be dropped... */
-    if (mtmp.isgd | 0 && (otmp = findgold(mtmp.minvent)) !== null) {
+    if (mtmp.isgd && (otmp = findgold(mtmp.minvent)) !== null) {
         if (canspotmon(mtmp)) {
             await pline($c.lit("%s gold %s."), s_suffix(await Monnam(mtmp)), canseemon(mtmp) ? $c.lit("vanishes") : $c.lit("seems to vanish"));
         }
@@ -961,7 +961,7 @@ export async function relobj(mtmp, show, is_pet) {   // steal.c:875
         await obfree(otmp, null);
     }   /* isgd && has gold */
     while ((otmp = is_pet ? await droppables(mtmp) : mtmp.minvent) !== null) {
-        await mdrop_obj(mtmp, otmp, $c.i8(is_pet && flags.verbose ? 1 : 0));
+        await mdrop_obj(mtmp, otmp, is_pet && flags.verbose ? 1 : 0);
     }
     if (show && cansee(omx, omy)) {
         await newsym($c.i16(omx), $c.i16(omy));

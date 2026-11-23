@@ -67,7 +67,7 @@ export async function getpos_sethilite(gp_hilitef, gp_getvalidf) {   // getpos.c
     old_getvalid = getpos_getvalid;
     old_map_frame_color = gw.wsettings.map_frame_color;
     sel = await selection_new();
-    defaultHiliteState = (iflags.bgcolors ? HiliteBackground : HiliteNormalMap) >>> 0;
+    defaultHiliteState = iflags.bgcolors ? HiliteBackground : HiliteNormalMap;
     if (gp_getvalidf !== old_getvalid) {
         getpos_hilite_state = defaultHiliteState;
     }
@@ -75,7 +75,7 @@ export async function getpos_sethilite(gp_hilitef, gp_getvalidf) {   // getpos.c
     getpos_hilitefunc = gp_hilitef;
     getpos_getvalid = gp_getvalidf;
     await getpos_getvalids_selection(sel, getpos_getvalid);
-    gw.wsettings.map_frame_color = (getpos_hilite_state === HiliteBackground ? CLR.BRIGHT_BLUE : NO_COLOR) >>> 0;
+    gw.wsettings.map_frame_color = getpos_hilite_state === HiliteBackground ? CLR.BRIGHT_BLUE : NO_COLOR;
     if (getpos_getvalid !== old_getvalid || gw.wsettings.map_frame_color !== old_map_frame_color) {
         await selection_force_newsyms(sel);
     }
@@ -95,7 +95,7 @@ async function getpos_toggle_hilite_state() {   // getpos.c:72
         /* currently on, finish */
         await getpos_hilitefunc(FALSE);   /* tmp_at(DISP_END) */
     }
-    getpos_hilite_state = $c.remu32(getpos_hilite_state + 1 >>> 0, (iflags.bgcolors ? 3 : 2) >>> 0);
+    getpos_hilite_state = $c.remu32(getpos_hilite_state + 1 >>> 0, iflags.bgcolors ? 3 : 2);
     /* resetting the callback functions to their current values will draw
        valid-spots with background color if that is the new state and turn
        off that color if it was the previous state */
@@ -155,7 +155,7 @@ async function getpos_help_keyxhelp(tmpwin, k1, k2, gloc) {   // getpos.c:137
             filtertxt = strsubst($c.strcpy(new $c.Ptr(fbuf, 0), filtertxt), $c.lit("this area"), $c.lit("area"));
         }
     }
-    $c.sprintf(new $c.Ptr(sbuf, 0), $c.lit("Use '%s'/'%s' to %s%s%s."), k1, k2, iflags.getloc_usemenu ? $c.lit("get a menu of ") : move_cursor_to, gloc_descr[gloc][2 + iflags.getloc_usemenu | 0], filtertxt);
+    $c.sprintf(new $c.Ptr(sbuf, 0), $c.lit("Use '%s'/'%s' to %s%s%s."), k1, k2, iflags.getloc_usemenu ? $c.lit("get a menu of ") : move_cursor_to, gloc_descr[gloc][2 + iflags.getloc_usemenu], filtertxt);
     await putstr()(tmpwin, 0, new $c.Ptr(sbuf, 0));
 }
 /* the response for '?' help request in getpos() */
@@ -228,7 +228,7 @@ async function getpos_help(force, goal) {   // getpos.c:167
                         /* disgusting hack; the alternate selection characters work for any
                            getpos call, but only matter for dowhatis (and doquickwhatis,
                            also for dotherecmdmenu's simulated mouse) */
-                        doing_what_is = $c.i8($c.peq(goal, new $c.Ptr(what_is_a_location, 0)) ? 1 : 0);
+                        doing_what_is = $c.peq(goal, new $c.Ptr(what_is_a_location, 0)) ? 1 : 0;
                         if (doing_what_is) {
                             $c.sprintf(new $c.Ptr(kbuf, 0), $c.lit("'%s' or '%s' or '%s' or '%s'"), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_PICK]), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_PICK_Q]), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_PICK_O]), visctrl(gc.Cmd.spkeys[NHKF.GETPOS_PICK_V]));
                         } else {
@@ -269,14 +269,14 @@ function cmp_coord_distu(a, b) {   // getpos.c:312
     let c1 = null, c2 = null, dx = 0, dy = 0, dist_1 = 0, dist_2 = 0;
     c1 = $c.asRec(a, $T.nhcoord, 4);
     c2 = $c.asRec(b, $T.nhcoord, 4);
-    dx = u.ux - c1.x | 0;
-    dy = u.uy - c1.y | 0;
+    dx = u.ux - c1.x;
+    dy = u.uy - c1.y;
     dist_1 = $c.abs(dx) > $c.abs(dy) ? $c.abs(dx) : $c.abs(dy);
-    dx = u.ux - c2.x | 0;
-    dy = u.uy - c2.y | 0;
+    dx = u.ux - c2.x;
+    dy = u.uy - c2.y;
     dist_2 = $c.abs(dx) > $c.abs(dy) ? $c.abs(dx) : $c.abs(dy);
     if (dist_1 === dist_2) {
-        return c1.y !== c2.y ? c1.y - c2.y | 0 : c1.x - c2.x | 0;
+        return c1.y !== c2.y ? c1.y - c2.y : c1.x - c2.x;
     }
     return dist_1 - dist_2 | 0;
 }
@@ -373,7 +373,7 @@ function known_vibrating_square_at(x, y) {   // getpos.c:422
        possibly be transfered to normal play via bones file */
     if (invocation_pos(x, y)) {
         ttmp = t_at(x, y);
-        return $c.i8(ttmp && (ttmp.ttyp | 0) === VIBRATING_SQUARE && ttmp.tseen | 0 ? 1 : 0);
+        return ttmp && ttmp.ttyp === VIBRATING_SQUARE && ttmp.tseen ? 1 : 0;
     }
     return FALSE;
 }
@@ -388,7 +388,7 @@ export async function gather_locs_interesting(x, y, gloc) {   // getpos.c:438
     if (iflags.getloc_filter === GFILTER_VIEW && !cansee(x, y)) {
         return FALSE;
     }
-    if (iflags.getloc_filter === GFILTER_AREA && !GLOC_SAME_AREA(x, y) && !(isok($c.i16(x - 1 | 0), y) && selection_getpoint($c.i16(x - 1 | 0), y, gg.gloc_filter_map)) && !(isok(x, $c.i16(y - 1 | 0)) && selection_getpoint(x, $c.i16(y - 1 | 0), gg.gloc_filter_map)) && !(isok($c.i16(x + 1 | 0), y) && selection_getpoint($c.i16(x + 1 | 0), y, gg.gloc_filter_map)) && !(isok(x, $c.i16(y + 1 | 0)) && selection_getpoint(x, $c.i16(y + 1 | 0), gg.gloc_filter_map))) {
+    if (iflags.getloc_filter === GFILTER_AREA && !GLOC_SAME_AREA(x, y) && !(isok($c.i16(x - 1), y) && selection_getpoint($c.i16(x - 1), y, gg.gloc_filter_map)) && !(isok(x, $c.i16(y - 1)) && selection_getpoint(x, $c.i16(y - 1), gg.gloc_filter_map)) && !(isok($c.i16(x + 1), y) && selection_getpoint($c.i16(x + 1), y, gg.gloc_filter_map)) && !(isok(x, $c.i16(y + 1)) && selection_getpoint(x, $c.i16(y + 1), gg.gloc_filter_map))) {
         return FALSE;
     }
     glyph = glyph_at(x, y);
@@ -398,20 +398,20 @@ export async function gather_locs_interesting(x, y, gloc) {   // getpos.c:438
         case GLOC.MONS:
             /* unlike '/M', this skips monsters revealed by
                warning glyphs and remembered unseen ones */
-            return $c.i8(glyph_is_monster(glyph) && glyph !== 330 && glyph !== 713 ? 1 : 0);
+            return glyph_is_monster(glyph) && glyph !== 330 && glyph !== 713 ? 1 : 0;
         case GLOC.OBJS:
-            return $c.i8(glyph_is_object(glyph) && glyph !== BOULDER + GLYPH.OBJ_OFF && glyph !== ROCK + GLYPH.OBJ_OFF ? 1 : 0);
+            return glyph_is_object(glyph) && glyph !== BOULDER + GLYPH.OBJ_OFF && glyph !== ROCK + GLYPH.OBJ_OFF ? 1 : 0;
         case GLOC.DOOR:
-            return $c.i8(glyph_is_cmap(glyph) && (is_cmap_door(sym) || is_cmap_drawbridge(sym) || sym === S.ndoor) ? 1 : 0);
+            return glyph_is_cmap(glyph) && (is_cmap_door(sym) || is_cmap_drawbridge(sym) || sym === S.ndoor) ? 1 : 0;
         case GLOC.EXPLORE:
-            return $c.i8(glyph_is_cmap(glyph) && !(glyph_to_cmap(glyph) === GLYPH_NOTHING) && (is_cmap_door(sym) || is_cmap_drawbridge(sym) || sym === S.ndoor || is_cmap_room(sym) || is_cmap_corr(sym)) && (isok($c.i16(x + 1 | 0), y) && svl.level.locations[x + 1 | 0][y].glyph === GLYPH_UNEXPLORED && !svl.level.locations[x + 1 | 0][y].seenv || isok($c.i16(x - 1 | 0), y) && svl.level.locations[x - 1 | 0][y].glyph === GLYPH_UNEXPLORED && !svl.level.locations[x - 1 | 0][y].seenv || isok(x, $c.i16(y + 1 | 0)) && svl.level.locations[x][y + 1 | 0].glyph === GLYPH_UNEXPLORED && !svl.level.locations[x][y + 1 | 0].seenv || isok(x, $c.i16(y - 1 | 0)) && svl.level.locations[x][y - 1 | 0].glyph === GLYPH_UNEXPLORED && !svl.level.locations[x][y - 1 | 0].seenv) ? 1 : 0);
+            return glyph_is_cmap(glyph) && !(glyph_to_cmap(glyph) === GLYPH_NOTHING) && (is_cmap_door(sym) || is_cmap_drawbridge(sym) || sym === S.ndoor || is_cmap_room(sym) || is_cmap_corr(sym)) && (isok($c.i16(x + 1), y) && svl.level.locations[x + 1][y].glyph === GLYPH_UNEXPLORED && !svl.level.locations[x + 1][y].seenv || isok($c.i16(x - 1), y) && svl.level.locations[x - 1][y].glyph === GLYPH_UNEXPLORED && !svl.level.locations[x - 1][y].seenv || isok(x, $c.i16(y + 1)) && svl.level.locations[x][y + 1].glyph === GLYPH_UNEXPLORED && !svl.level.locations[x][y + 1].seenv || isok(x, $c.i16(y - 1)) && svl.level.locations[x][y - 1].glyph === GLYPH_UNEXPLORED && !svl.level.locations[x][y - 1].seenv) ? 1 : 0;
         case GLOC.VALID:
             if (getpos_getvalid) {
                 return await getpos_getvalid(x, y);
             }
         case GLOC.INTERESTING:
             /*FALLTHRU*/
-            return $c.i8(await gather_locs_interesting(x, y, GLOC.DOOR) || !(glyph_is_cmap(glyph) && (is_cmap_wall(sym) || sym === S.tree || sym === S.bars || sym === S.ice || sym === S.air || sym === S.cloud || is_cmap_lava(sym) || is_cmap_water(sym) || sym === S.ndoor || is_cmap_room(sym) || is_cmap_corr(sym)) || glyph_is_nothing(glyph) || glyph_is_unexplored(glyph)) || known_vibrating_square_at(x, y) ? 1 : 0);
+            return await gather_locs_interesting(x, y, GLOC.DOOR) || !(glyph_is_cmap(glyph) && (is_cmap_wall(sym) || sym === S.tree || sym === S.bars || sym === S.ice || sym === S.air || sym === S.cloud || is_cmap_lava(sym) || is_cmap_water(sym) || sym === S.ndoor || is_cmap_room(sym) || is_cmap_corr(sym)) || glyph_is_nothing(glyph) || glyph_is_unexplored(glyph)) || known_vibrating_square_at(x, y) ? 1 : 0;
     }
     /*NOTREACHED*/
     return FALSE;
@@ -487,7 +487,7 @@ export function dxdy_to_dist_descr(dx, dy, fulldir) {   // getpos.c:557
             if ($c.abs(dx) > 9999) {
                 dx = $c.i16(Math.imul(sgn(dx), 9999));
             }
-            $c.sprintf(eos(new $c.Ptr(dxdy_to_dist_descr$buf, 0)), $c.lit("%d%s"), $c.abs(dx), dxdy_to_dist_descr$dirnames[2 + (dx > 0 ? 1 : 0) | 0][fulldir]);
+            $c.sprintf(eos(new $c.Ptr(dxdy_to_dist_descr$buf, 0)), $c.lit("%d%s"), $c.abs(dx), dxdy_to_dist_descr$dirnames[2 + (dx > 0 ? 1 : 0)][fulldir]);
         }
     }
     return new $c.Ptr(dxdy_to_dist_descr$buf, 0);
@@ -510,9 +510,9 @@ export function coord_desc(x, y, outbuf, cmode) {   // getpos.c:595
         case 102:
         case 99:
             /* "east", "3s", "2n,4w" */
-            dx = x - u.ux | 0;
-            dy = y - u.uy | 0;
-            $c.sprintf(outbuf, $c.lit("(%s)"), dxdy_to_dist_descr($c.i16(dx), $c.i16(dy), $c.i8(cmode === 102 ? 1 : 0)));
+            dx = x - u.ux;
+            dy = y - u.uy;
+            $c.sprintf(outbuf, $c.lit("(%s)"), dxdy_to_dist_descr($c.i16(dx), $c.i16(dy), cmode === 102 ? 1 : 0));
             break;
         case 109:
             /* x,y */
@@ -534,7 +534,7 @@ export function coord_desc(x, y, outbuf, cmode) {   // getpos.c:595
             }
             /* map line 0 is screen row 2;
                map column 0 isn't used, map column 1 is screen column 1 */
-            $c.sprintf(outbuf, new $c.Ptr(coord_desc$screen_fmt, 0), y + 2 | 0, x);
+            $c.sprintf(outbuf, new $c.Ptr(coord_desc$screen_fmt, 0), y + 2, x);
             break;
     }
     return outbuf;
@@ -601,7 +601,7 @@ export async function getpos_menu(ccp, gloc) {   // getpos.c:665
         $c.free(picks[0]);
     }
     $c.free(garr[0]);
-    return $c.i8(pick_cnt > 0 ? 1 : 0);
+    return pick_cnt > 0 ? 1 : 0;
 }
 /* add dx,dy to cx,cy, truncating at map edges */
 /**
@@ -612,19 +612,19 @@ export async function getpos_menu(ccp, gloc) {   // getpos.c:665
  */
 function truncate_to_map(cx, cy, dx, dy) {   // getpos.c:729
     /* diagonal moves complicate this... */
-    if ((cx.get(0) + dx | 0) < 1) {
-        dy = $c.i8(dy - Math.imul(sgn(dy), 1 - (cx.get(0) + dx | 0) | 0) | 0);
-        dx = $c.i8(1 - cx.get(0) | 0);   /* so that (cx+dx == 1) */
-    } else if ((cx.get(0) + dx | 0) > COLNO - 1) {
-        dy = $c.i8(dy + Math.imul(sgn(dy), COLNO - 1 - (cx.get(0) + dx | 0) | 0) | 0);
-        dx = $c.i8(COLNO - 1 - cx.get(0) | 0);
+    if (cx.get(0) + dx < 1) {
+        dy = $c.i8(dy - Math.imul(sgn(dy), 1 - (cx.get(0) + dx)) | 0);
+        dx = $c.i8(1 - cx.get(0));   /* so that (cx+dx == 1) */
+    } else if (cx.get(0) + dx > COLNO - 1) {
+        dy = $c.i8(dy + Math.imul(sgn(dy), COLNO - 1 - (cx.get(0) + dx)) | 0);
+        dx = $c.i8(COLNO - 1 - cx.get(0));
     }
-    if ((cy.get(0) + dy | 0) < 0) {
-        dx = $c.i8(dx - Math.imul(sgn(dx), 0 - (cy.get(0) + dy | 0) | 0) | 0);
-        dy = $c.i8(0 - cy.get(0) | 0);   /* so that (cy+dy == 0) */
-    } else if ((cy.get(0) + dy | 0) > ROWNO - 1) {
-        dx = $c.i8(dx + Math.imul(sgn(dx), ROWNO - 1 - (cy.get(0) + dy | 0) | 0) | 0);
-        dy = $c.i8(ROWNO - 1 - cy.get(0) | 0);
+    if (cy.get(0) + dy < 0) {
+        dx = $c.i8(dx - Math.imul(sgn(dx), 0 - (cy.get(0) + dy)) | 0);
+        dy = $c.i8(0 - cy.get(0));   /* so that (cy+dy == 0) */
+    } else if (cy.get(0) + dy > ROWNO - 1) {
+        dx = $c.i8(dx + Math.imul(sgn(dx), ROWNO - 1 - (cy.get(0) + dy)) | 0);
+        dy = $c.i8(ROWNO - 1 - cy.get(0));
     }
     cx.set(0, $c.i16(cx.get(0) + dx | 0));
     cy.set(0, $c.i16(cy.get(0) + dy | 0));
@@ -677,8 +677,8 @@ export async function getpos(ccp, force, goal) {   // getpos.c:771
             cq.$copyFrom(cmdq);
             $c.free(cmdq);
             if (cq.typ === CMDQ.DIR && !cq.dirz) {
-                ccp.x = $c.i16(u.ux + cq.dirx | 0);
-                ccp.y = $c.i16(u.uy + cq.diry | 0);
+                ccp.x = $c.i16(u.ux + cq.dirx);
+                ccp.y = $c.i16(u.uy + cq.diry);
             } else {
                 cmdq_clear(CQ_CANNED);
                 result = -1;
@@ -814,7 +814,7 @@ export async function getpos(ccp, force, goal) {   // getpos.c:771
                         show_goal_msg = TRUE;   /* we're still targeting */
                         $goto = "nxtc"; continue D1;
                     } else if (c === gc.Cmd.spkeys[NHKF.GETPOS_AUTODESC]) {
-                        iflags.autodescribe = $c.i8(!iflags.autodescribe ? 1 : 0);
+                        iflags.autodescribe = !iflags.autodescribe ? 1 : 0;
                         await pline($c.lit("Automatic description %sis %s."), flags.verbose ? $c.lit("of features under cursor ") : $c.lit(""), iflags.autodescribe ? $c.lit("on") : $c.lit("off"));
                         if (!iflags.autodescribe) {
                             show_goal_msg = TRUE;
@@ -834,7 +834,7 @@ export async function getpos(ccp, force, goal) {   // getpos.c:771
                         msg_given = TRUE;
                         $goto = "nxtc"; continue D1;
                     } else if (c === gc.Cmd.spkeys[NHKF.GETPOS_MENU]) {
-                        iflags.getloc_usemenu = $c.i8(!iflags.getloc_usemenu ? 1 : 0);
+                        iflags.getloc_usemenu = !iflags.getloc_usemenu ? 1 : 0;
                         await pline($c.lit("%s a menu to show possible targets%s."), iflags.getloc_usemenu ? $c.lit("Using") : $c.lit("Not using"), iflags.getloc_usemenu ? $c.lit(" for 'm|M', 'o|O', 'd|D', and 'x|X'") : $c.lit(""));
                         msg_given = TRUE;
                         $goto = "nxtc"; continue D1;
@@ -848,7 +848,7 @@ export async function getpos(ccp, force, goal) {   // getpos.c:771
                         cy[0] = u.uy;
                         $goto = "nxtc"; continue D1;
                     } else if (c === gc.Cmd.spkeys[NHKF.GETPOS_MOVESKIP]) {
-                        iflags.getloc_moveskip = $c.i8(!iflags.getloc_moveskip ? 1 : 0);
+                        iflags.getloc_moveskip = !iflags.getloc_moveskip ? 1 : 0;
                         await pline($c.lit("%skipping over similar terrain when fastmoving the cursor."), iflags.getloc_moveskip ? $c.lit("S") : $c.lit("Not s"));
                         msg_given = TRUE;
                         $goto = "nxtc"; continue D1;
@@ -902,11 +902,11 @@ export async function getpos(ccp, force, goal) {   // getpos.c:771
                                 for (pass = 0; pass <= 1; pass = pass + 1 | 0) {
                                     /* pass 0: just past current pos to lower right;
                                        pass 1: upper left corner to current pos */
-                                    lo_y = $c.i16(pass === 0 ? cy[0] : 0);
-                                    hi_y = $c.i16(pass === 0 ? ROWNO - 1 : cy[0]);
+                                    lo_y = pass === 0 ? cy[0] : 0;
+                                    hi_y = pass === 0 ? ROWNO - 1 : cy[0];
                                     for (ty[0] = lo_y; ty[0] <= hi_y; ty[0] = $c.i16(ty[0] + 1)) {
-                                        lo_x = $c.i16(pass === 0 && ty[0] === lo_y ? cx[0] + 1 | 0 : 1);
-                                        hi_x = $c.i16(pass === 1 && ty[0] === hi_y ? cx[0] : COLNO - 1);
+                                        lo_x = $c.i16(pass === 0 && ty[0] === lo_y ? cx[0] + 1 : 1);
+                                        hi_x = pass === 1 && ty[0] === hi_y ? cx[0] : COLNO - 1;
                                         for (tx[0] = lo_x; tx[0] <= hi_x; tx[0] = $c.i16(tx[0] + 1)) {
                                             /* first, look at what is currently visible
                                                (might be monster) */
@@ -919,7 +919,7 @@ export async function getpos(ccp, force, goal) {   // getpos.c:771
                                                    (might be trap or object) */
                                                 /* !terrainmode: don't move to remembered
                                                    trap or object if not currently shown */
-                                                if (svl.level.flags.hero_memory | 0 && !iflags.terrainmode) {
+                                                if (svl.level.flags.hero_memory && !iflags.terrainmode) {
                                                     k = svl.level.locations[tx[0]][ty[0]].glyph;
                                                     if (glyph_is_cmap(k) && matching[glyph_to_cmap(k)]) {
                                                         break foundc$;

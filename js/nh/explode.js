@@ -285,7 +285,7 @@ export async function explode(x, y, type, dam, olet, expltype) {   // explode.c:
     generic = FALSE;
     do_hallu = FALSE;
     exploding_wand_typ = 0;
-    you_exploding = $c.i8(olet === MON_EXPLODE && type >= 0 ? 1 : 0);
+    you_exploding = olet === MON_EXPLODE && type >= 0 ? 1 : 0;
     didmsg = FALSE;
     if (olet === WAND_CLASS) {
         /* retributive strike */
@@ -296,7 +296,7 @@ export async function explode(x, y, type, dam, olet, expltype) {   // explode.c:
             exploding_wand_typ = $c.i16(type);
             /* most attack wands produce specific explosions;
                other types produce a generic magical explosion */
-            if ((objects[type].oc_dir | 0) === RAY && type !== WAN_DIGGING && type !== WAN_SLEEP) {
+            if (objects[type].oc_dir === RAY && type !== WAN_DIGGING && type !== WAN_SLEEP) {
                 type = type - WAN_MAGIC_MISSILE | 0;
                 if (type < 0 || type > 9) {
                     await impossible($c.lit("explode: wand has bad zap type (%d)."), type);
@@ -336,7 +336,7 @@ export async function explode(x, y, type, dam, olet, expltype) {   // explode.c:
     }
     /* if hero is engulfed and caused the explosion, only hero and
        engulfer will be affected */
-    inside_engulfer = $c.i8(u.uswallow | 0 && type >= 0 ? 1 : 0);
+    inside_engulfer = u.uswallow && type >= 0 ? 1 : 0;
     /* held but not engulfed implies holder is reaching into second spot
        so might get hit by double damage */
     grabbed = grabbing = FALSE;
@@ -367,7 +367,7 @@ export async function explode(x, y, type, dam, olet, expltype) {   // explode.c:
         /* when explode() is called recursively, svk.killer.name might change
            so retain a copy of the current value for this explosion */
         str = $c.strcpy(new $c.Ptr(killr_buf, 0), new $c.Ptr(svk.killer.name, 0));
-        do_hallu = $c.i8(Hallucination() && (strstri(str, $c.lit("'s explosion")) || strstri(str, $c.lit("s' explosion"))) ? 1 : 0);
+        do_hallu = Hallucination() && (strstri(str, $c.lit("'s explosion")) || strstri(str, $c.lit("s' explosion"))) ? 1 : 0;
     }
     if (type === PHYS_EXPL_TYPE) {
         /* currently only gas spores */
@@ -460,7 +460,7 @@ export async function explode(x, y, type, dam, olet, expltype) {   // explode.c:
                 }
                 xx = $c.i16((x + i | 0) - 1 | 0);
                 yy = $c.i16((y + j | 0) - 1 | 0);
-                await tmp_at($c.i16(starting ? DISP_BEAM : DISP_CHANGE), $c.i16(explosion_to_glyph(expltype, explosion[i][j])));
+                await tmp_at(starting ? DISP_BEAM : DISP_CHANGE, $c.i16(explosion_to_glyph(expltype, explosion[i][j])));
                 await tmp_at(xx, yy);
                 starting = 0;
             }
@@ -541,7 +541,7 @@ export async function explode(x, y, type, dam, olet, expltype) {   // explode.c:
                 }
                 /* Affect the floor unless the player caused the explosion
                  * from inside their engulfer. */
-                if (!(u.uswallow | 0 && !svc.context.mon_moving)) {
+                if (!(u.uswallow && !svc.context.mon_moving)) {
                     await zap_over_floor(xx, yy, type, new $c.Ptr(shopdamage, 0), FALSE, exploding_wand_typ);
                 }
                 mtmp = svl.level.monsters[xx][yy];
@@ -680,7 +680,7 @@ export async function explode(x, y, type, dam, olet, expltype) {   // explode.c:
             /* if poly'd hero is grabbing another victim, hero takes
                double damage (note: don't rely on u.ustuck here because
                that victim might have been killed when hit by the blast) */
-            if (grabbing && dist2($c.i16(grabxy.x), $c.i16(grabxy.y), x, y) <= 2) {
+            if (grabbing && dist2(grabxy.x, grabxy.y, x, y) <= 2) {
                 damu = Math.imul(damu, 2);
             }
             /* hero does not get same fire-resistant vs cold and
@@ -768,7 +768,7 @@ export async function scatter(sx, sy, blastforce, scflags, obj) {   // explode.c
     /* force behind the scattering */
     /* only scatter this obj */
     farthest = 0;
-    individual_object = $c.i8(obj ? TRUE : FALSE);
+    individual_object = obj ? TRUE : FALSE;
     lostgoods = FALSE;
     shkp = null;
     stmp2 = null;
@@ -777,13 +777,13 @@ export async function scatter(sx, sy, blastforce, scflags, obj) {   // explode.c
     if (individual_object && (obj.ox !== sx || obj.oy !== sy)) {
         await impossible($c.lit("scattered object <%d,%d> not at scatter site <%d,%d>"), obj.ox, obj.oy, sx, sy);
     }
-    shop_origin = $c.i8((shkp = await shop_keeper(in_rooms(sx, sy, SHOPBASE).get(0))) !== null && await costly_spot(sx, sy) ? 1 : 0);
+    shop_origin = (shkp = await shop_keeper(in_rooms(sx, sy, SHOPBASE).get(0))) !== null && await costly_spot(sx, sy) ? 1 : 0;
     if (shop_origin) {
         await credit_report(shkp, 0, TRUE);   /* establish baseline, without msgs */
     }
     while ((otmp = individual_object ? obj : svl.level.objects[sx][sy]) !== null) {
         if ($c.peq(otmp, $G.uball) || $c.peq(otmp, $G.uchain)) {
-            waschain = $c.i8($c.peq(otmp, $G.uchain) ? 1 : 0);
+            waschain = $c.peq(otmp, $G.uchain) ? 1 : 0;
             await pline_The($c.lit("chain shatters!"));
             await unpunish();
             if (waschain) {
@@ -818,7 +818,7 @@ export async function scatter(sx, sy, blastforce, scflags, obj) {   // explode.c
                     await place_object(otmp, sx, sy);
                 }
             } else {
-                if ((trap = t_at(sx, sy)) && (trap.ttyp | 0) === STATUE_TRAP) {
+                if ((trap = t_at(sx, sy)) && trap.ttyp === STATUE_TRAP) {
                     await deltrap(trap);
                 }
                 if (cansee(sx, sy)) {
@@ -832,7 +832,7 @@ export async function scatter(sx, sy, blastforce, scflags, obj) {   // explode.c
             await newsym(sx, sy);   /* in case it's beyond radius of 'farthest' */
             used_up = TRUE;
             /* 1 in 10 chance of destruction of obj; glass, egg destruction */
-        } else if ((scflags & MAY.DESTROY) >>> 0 !== 0 && (!rn2(10) || ((objects[otmp.otyp].oc_material | 0) === GLASS || otmp.otyp === EGG))) {
+        } else if ((scflags & MAY.DESTROY) >>> 0 !== 0 && (!rn2(10) || (objects[otmp.otyp].oc_material === GLASS || otmp.otyp === EGG))) {
             if (await breaks(otmp, sx, sy)) {
                 used_up = TRUE;
             }
@@ -867,8 +867,8 @@ export async function scatter(sx, sy, blastforce, scflags, obj) {   // explode.c
         for (stmp = schain; stmp; stmp = stmp.next) {
             if (($t3 = stmp.range, stmp.range = $t3 - 1 | 0, $t3) > 0 && !stmp.stopped) {
                 gt.thrownobj = stmp.obj;   /* mainly in case it kills hero */
-                gb.bhitpos.x = $c.i16(stmp.ox + stmp.dx | 0);
-                gb.bhitpos.y = $c.i16(stmp.oy + stmp.dy | 0);
+                gb.bhitpos.x = $c.i16(stmp.ox + stmp.dx);
+                gb.bhitpos.y = $c.i16(stmp.oy + stmp.dy);
                 if (isok(gb.bhitpos.x, gb.bhitpos.y)) {
                     typ = $c.u8(svl.level.locations[gb.bhitpos.x][gb.bhitpos.y].typ);
                 } else {
@@ -896,7 +896,7 @@ export async function scatter(sx, sy, blastforce, scflags, obj) {   // explode.c
                             nomul(0);
                         }
                         dam = await dmgval(stmp.obj, gy.youmonst);
-                        hitvalu = 8 + stmp.obj.spe | 0;
+                        hitvalu = 8 + stmp.obj.spe;
                         if (bigmonst(gy.youmonst.data)) {
                             hitvalu = hitvalu + 1 | 0;
                         }
@@ -932,7 +932,7 @@ export async function scatter(sx, sy, blastforce, scflags, obj) {   // explode.c
         if (stmp.obj) {
             if (x !== sx || y !== sy) {
                 total = $c.add64(total, stmp.obj.quan);
-                obj_left_shop = $c.i8(shop_origin && !await costly_spot(x, y) ? 1 : 0);
+                obj_left_shop = shop_origin && !await costly_spot(x, y) ? 1 : 0;
             }
             if (!await flooreffects(stmp.obj, x, y, $c.lit("land"))) {
                 if (obj_left_shop && $c.strchr(new $c.Ptr(u.urooms, 0), in_rooms(u.ux, u.uy, SHOPBASE).get(0))) {
@@ -961,11 +961,11 @@ export async function scatter(sx, sy, blastforce, scflags, obj) {   // explode.c
         await newsym(x, y);
     }
     await newsym(sx, sy);
-    if (u_at(sx, sy) && u.uundetected | 0 && hides_under(gy.youmonst.data)) {
+    if (u_at(sx, sy) && u.uundetected && hides_under(gy.youmonst.data)) {
         await hideunder(gy.youmonst);
     }
-    if ((mtmp = svl.level.monsters[sx][sy]) !== null && mtmp.mtrapped | 0) {
-        mtmp.mtrapped = (0) & 1;
+    if ((mtmp = svl.level.monsters[sx][sy]) !== null && mtmp.mtrapped) {
+        mtmp.mtrapped = 0;
     }
     await maybe_unhide_at(sx, sy);
     if (lostgoods) {   /* implies shop_origin and therefore shkp valid */
@@ -1008,7 +1008,7 @@ export async function splatter_burning_oil(x, y, diluted_oil) {   // explode.c:9
  */
 export async function explode_oil(obj, x, y) {   // explode.c:974
     let diluted_oil = 0;
-    diluted_oil = $c.i8(obj.oeroded);
+    diluted_oil = obj.oeroded;
     if (!obj.lamplit) {
         await impossible($c.lit("exploding unlit oil"));
     }
@@ -1061,7 +1061,7 @@ export async function mon_explodes(mon, mattk) {   // explode.c:1019
     if (mattk.damn) {
         dmg = d(mattk.damn, mattk.damd);
     } else if (mattk.damd) {
-        dmg = d(mon.data.mlevel + 1 | 0, mattk.damd);
+        dmg = d(mon.data.mlevel + 1, mattk.damd);
     } else {
         dmg = 0;
     }
@@ -1071,7 +1071,7 @@ export async function mon_explodes(mon, mattk) {   // explode.c:1019
         /* The -1, +20, *-1 math is to set it up as a 'monster breath' type
          * for the explosions (it isn't, but this is the closest analogue). */
         /* FIXME: there are macros for kind of thing... */
-        type = -((mattk.adtyp - 1 | 0) + 20 | 0) | 0;
+        type = -(mattk.adtyp - 1 + 20) | 0;
     } else {
         await impossible($c.lit("unknown type for mon_explode %d"), mattk.adtyp);
         return;

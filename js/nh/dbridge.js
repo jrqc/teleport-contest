@@ -104,7 +104,7 @@ export function is_lava(x, y) {   // dbridge.c:62
         return FALSE;
     }
     ltyp = svl.level.locations[x][y].typ;
-    if (ltyp === LAVAPOOL || ltyp === LAVAWALL || ltyp === DRAWBRIDGE_UP && ((svl.level.locations[x][y].flags | 0) & DB.UNDER) === DB.LAVA) {
+    if (ltyp === LAVAPOOL || ltyp === LAVAWALL || ltyp === DRAWBRIDGE_UP && (svl.level.locations[x][y].flags & DB.UNDER) === DB.LAVA) {
         return TRUE;
     }
     return FALSE;
@@ -132,7 +132,7 @@ export function is_ice(x, y) {   // dbridge.c:86
         return FALSE;
     }
     ltyp = svl.level.locations[x][y].typ;
-    if (ltyp === ICE || ltyp === DRAWBRIDGE_UP && ((svl.level.locations[x][y].flags | 0) & DB.UNDER) === DB.ICE) {
+    if (ltyp === ICE || ltyp === DRAWBRIDGE_UP && (svl.level.locations[x][y].flags & DB.UNDER) === DB.ICE) {
         return TRUE;
     }
     return FALSE;
@@ -148,7 +148,7 @@ export function is_moat(x, y) {   // dbridge.c:100
         return FALSE;
     }
     ltyp = svl.level.locations[x][y].typ;
-    if (!((svd.dungeon_topology.d_juiblex_level.dlevel || svd.dungeon_topology.d_juiblex_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_juiblex_level)) && (ltyp === MOAT || ltyp === DRAWBRIDGE_UP && ((svl.level.locations[x][y].flags | 0) & DB.UNDER) === DB.MOAT)) {
+    if (!((svd.dungeon_topology.d_juiblex_level.dlevel || svd.dungeon_topology.d_juiblex_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_juiblex_level)) && (ltyp === MOAT || ltyp === DRAWBRIDGE_UP && (svl.level.locations[x][y].flags & DB.UNDER) === DB.MOAT)) {
         return TRUE;
     }
     return FALSE;
@@ -189,16 +189,16 @@ export function is_drawbridge_wall(x, y) {   // dbridge.c:137
     if (lev.typ !== DOOR && lev.typ !== DBWALL) {
         return -1;
     }
-    if (isok($c.i16(x + 1 | 0), y) && (svl.level.locations[x + 1 | 0][y].typ === DRAWBRIDGE_UP || svl.level.locations[x + 1 | 0][y].typ === DRAWBRIDGE_DOWN) && ((svl.level.locations[x + 1 | 0][y].flags | 0) & DB.DIR) === DB.WEST) {
+    if (isok($c.i16(x + 1), y) && (svl.level.locations[x + 1][y].typ === DRAWBRIDGE_UP || svl.level.locations[x + 1][y].typ === DRAWBRIDGE_DOWN) && (svl.level.locations[x + 1][y].flags & DB.DIR) === DB.WEST) {
         return DB.WEST;
     }
-    if (isok($c.i16(x - 1 | 0), y) && (svl.level.locations[x - 1 | 0][y].typ === DRAWBRIDGE_UP || svl.level.locations[x - 1 | 0][y].typ === DRAWBRIDGE_DOWN) && ((svl.level.locations[x - 1 | 0][y].flags | 0) & DB.DIR) === DB.EAST) {
+    if (isok($c.i16(x - 1), y) && (svl.level.locations[x - 1][y].typ === DRAWBRIDGE_UP || svl.level.locations[x - 1][y].typ === DRAWBRIDGE_DOWN) && (svl.level.locations[x - 1][y].flags & DB.DIR) === DB.EAST) {
         return DB.EAST;
     }
-    if (isok(x, $c.i16(y - 1 | 0)) && (svl.level.locations[x][y - 1 | 0].typ === DRAWBRIDGE_UP || svl.level.locations[x][y - 1 | 0].typ === DRAWBRIDGE_DOWN) && ((svl.level.locations[x][y - 1 | 0].flags | 0) & DB.DIR) === DB.SOUTH) {
+    if (isok(x, $c.i16(y - 1)) && (svl.level.locations[x][y - 1].typ === DRAWBRIDGE_UP || svl.level.locations[x][y - 1].typ === DRAWBRIDGE_DOWN) && (svl.level.locations[x][y - 1].flags & DB.DIR) === DB.SOUTH) {
         return DB.SOUTH;
     }
-    if (isok(x, $c.i16(y + 1 | 0)) && (svl.level.locations[x][y + 1 | 0].typ === DRAWBRIDGE_UP || svl.level.locations[x][y + 1 | 0].typ === DRAWBRIDGE_DOWN) && ((svl.level.locations[x][y + 1 | 0].flags | 0) & DB.DIR) === DB.NORTH) {
+    if (isok(x, $c.i16(y + 1)) && (svl.level.locations[x][y + 1].typ === DRAWBRIDGE_UP || svl.level.locations[x][y + 1].typ === DRAWBRIDGE_DOWN) && (svl.level.locations[x][y + 1].flags & DB.DIR) === DB.NORTH) {
         return DB.NORTH;
     }
     return -1;
@@ -214,7 +214,7 @@ export function is_drawbridge_wall(x, y) {   // dbridge.c:137
  * @returns {number} boolean
  */
 export function is_db_wall(x, y) {   // dbridge.c:170
-    return $c.i8(svl.level.locations[x][y].typ === DBWALL ? 1 : 0);
+    return svl.level.locations[x][y].typ === DBWALL ? 1 : 0;
 }
 /*
  * Return true with x,y pointing to the drawbridge if x,y initially indicate
@@ -258,7 +258,7 @@ export function find_drawbridge(x, y) {   // dbridge.c:180
  * @param {*} y coordxy *
  */
 function get_wall_for_db(x, y) {   // dbridge.c:211
-    switch ((svl.level.locations[x.get(0)][y.get(0)].flags | 0) & DB.DIR) {
+    switch (svl.level.locations[x.get(0)][y.get(0)].flags & DB.DIR) {
         case DB.NORTH:
             y.set(0, $c.i16(y.get(0) - 1));
             break;
@@ -287,7 +287,7 @@ function get_wall_for_db(x, y) {   // dbridge.c:211
  */
 export async function create_drawbridge(x, y, dir, flag) {   // dbridge.c:235
     let x2 = 0, y2 = 0, horiz = 0, lava = 0;
-    lava = $c.i8(svl.level.locations[x][y].typ === LAVAPOOL ? 1 : 0);   /* assume initialized map */
+    lava = svl.level.locations[x][y].typ === LAVAPOOL ? 1 : 0;   /* assume initialized map */
     x2 = x;
     y2 = y;
     switch (dir) {
@@ -325,7 +325,7 @@ export async function create_drawbridge(x, y, dir, flag) {   // dbridge.c:235
         /* Drawbridges are non-diggable. */
         svl.level.locations[x2][y2].flags = (W.NONDIGGABLE) & 31;
     }
-    svl.level.locations[x][y].horizontal = ((!horiz ? 1 : 0) >>> 0) & 1;
+    svl.level.locations[x][y].horizontal = (!horiz ? 1 : 0) & 1;
     svl.level.locations[x2][y2].horizontal = (horiz >>> 0) & 1;
     svl.level.locations[x][y].flags = (dir >>> 0) & 31;
     if (lava) {
@@ -366,7 +366,7 @@ function m_to_e(mtmp, x, y, etmp) {   // dbridge.c:304
     if (mtmp) {
         etmp.ex = x;
         etmp.ey = y;
-        if (mtmp.wormno | 0 && (x !== mtmp.mx || y !== mtmp.my)) {
+        if (mtmp.wormno && (x !== mtmp.mx || y !== mtmp.my)) {
             etmp.edata = mons[PM.LONG_WORM_TAIL];
         } else {
             etmp.edata = mtmp.data;
@@ -448,14 +448,14 @@ function e_survives_at(etmp, x, y) {   // dbridge.c:380
         return TRUE;
     }
     if (is_pool(x, y)) {
-        return $c.i8(is_u(etmp) && ((u.uprops[WWALKING].intrinsic || u.uprops[WWALKING].extrinsic) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) || (u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.AMPHIBIOUS) !== 0) || (u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.BREATHLESS) !== 0) || (u.uprops[SWIMMING].intrinsic || u.uprops[SWIMMING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.SWIM) !== 0) || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked || Levitation()) || is_swimmer(etmp.edata) || is_flyer(etmp.edata) || is_floater(etmp.edata) ? 1 : 0);
+        return is_u(etmp) && ((u.uprops[WWALKING].intrinsic || u.uprops[WWALKING].extrinsic) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) || (u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.AMPHIBIOUS) !== 0) || (u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.BREATHLESS) !== 0) || (u.uprops[SWIMMING].intrinsic || u.uprops[SWIMMING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.SWIM) !== 0) || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked || Levitation()) || is_swimmer(etmp.edata) || is_flyer(etmp.edata) || is_floater(etmp.edata) ? 1 : 0;
     }
     /* must force call to lava_effects in e_died if is_u */
     if (is_lava(x, y)) {
-        return $c.i8(is_u(etmp) && (Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) || likes_lava(etmp.edata) || is_flyer(etmp.edata) ? 1 : 0);
+        return is_u(etmp) && (Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) || likes_lava(etmp.edata) || is_flyer(etmp.edata) ? 1 : 0;
     }
     if (is_db_wall(x, y)) {
-        return $c.i8(is_u(etmp) ? Passes_walls() : passes_walls(etmp.edata));
+        return is_u(etmp) ? Passes_walls() : passes_walls(etmp.edata);
     }
     return TRUE;
 }
@@ -540,7 +540,7 @@ async function e_died(etmp, xkill_flags, how) {   // dbridge.c:402
  * @returns {number} boolean
  */
 function automiss(etmp) {   // dbridge.c:486
-    return $c.i8((is_u(etmp) ? Passes_walls() : passes_walls(etmp.edata)) || noncorporeal(etmp.edata) ? 1 : 0);
+    return (is_u(etmp) ? Passes_walls() : passes_walls(etmp.edata)) || noncorporeal(etmp.edata) ? 1 : 0;
 }
 /*
  * Does falling drawbridge or portcullis miss etmp?
@@ -583,7 +583,7 @@ async function e_missed(etmp, chunks) {   // dbridge.c:496
             iflags.last_msg = save_plnmsg$2;
         }
     } while (0);
-    return $c.i8(misses >= rnd(8) ? TRUE : FALSE);
+    return misses >= rnd(8) ? TRUE : FALSE;
 }
 /*
  * Can etmp jump from death?
@@ -595,7 +595,7 @@ async function e_missed(etmp, chunks) {   // dbridge.c:496
 async function e_jumps(etmp) {   // dbridge.c:531
     let tmp = 0, save_plnmsg = 0;
     tmp = 4;   /* out of 10 */
-    if (is_u(etmp) ? Unaware() || Fumbling() : helpless(etmp.emon) || !etmp.edata.mmove || etmp.emon.wormno | 0) {
+    if (is_u(etmp) ? Unaware() || Fumbling() : helpless(etmp.emon) || !etmp.edata.mmove || etmp.emon.wormno) {
         return FALSE;
     }
     if (is_u(etmp) ? u.uprops[CONFUSION].intrinsic : etmp.emon.mconf) {
@@ -614,7 +614,7 @@ async function e_jumps(etmp) {   // dbridge.c:531
             iflags.last_msg = save_plnmsg;
         }
     } while (0);
-    return $c.i8(tmp >= rnd(10) ? TRUE : FALSE);
+    return tmp >= rnd(10) ? TRUE : FALSE;
 }
 /**
  * @param {$T.entity | null} etmp struct entity *
@@ -627,7 +627,7 @@ async function do_entity(etmp) {   // dbridge.c:554
     if (!etmp.edata) {
         return;
     }
-    e_inview = $c.i8(e_canseemon(etmp));
+    e_inview = e_canseemon(etmp);
     oldx = $c.i16(etmp.ex);
     oldy = $c.i16(etmp.ey);
     at_portcullis = is_db_wall(oldx, oldy);
@@ -704,7 +704,7 @@ async function do_entity(etmp) {   // dbridge.c:554
             }
         } else {
             /* tries to jump off bridge to original square */
-            relocates = $c.i8(!await e_jumps(etmp) ? 1 : 0);
+            relocates = !await e_jumps(etmp) ? 1 : 0;
             do {
                 if (debugcore($c.lit("dbridge.c"), TRUE)) {
                     save_plnmsg$4 = iflags.last_msg;
@@ -814,7 +814,7 @@ async function do_entity(etmp) {   // dbridge.c:554
         }
         etmp.ex = newx[0];
         etmp.ey = newy[0];
-        e_inview = $c.i8(e_canseemon(etmp));
+        e_inview = e_canseemon(etmp);
     }
     do {
         if (debugcore($c.lit("dbridge.c"), TRUE)) {
@@ -933,7 +933,7 @@ export async function close_drawbridge(x, y) {   // dbridge.c:775
     lev1.typ = DRAWBRIDGE_UP;
     lev2 = $c.relem(svl.level.locations[x2[0]], y2[0]);
     lev2.typ = DBWALL;
-    switch ((lev1.flags | 0) & DB.DIR) {
+    switch (lev1.flags & DB.DIR) {
         case DB.NORTH:
         case DB.SOUTH:
             lev2.horizontal = (TRUE) & 1;
@@ -1039,8 +1039,8 @@ export async function destroy_drawbridge(x, y) {   // dbridge.c:888
     y2[0] = y;
     get_wall_for_db(new $c.Ptr(x2, 0), new $c.Ptr(y2, 0));
     lev2 = $c.relem(svl.level.locations[x2[0]], y2[0]);
-    if (((lev1.flags | 0) & DB.UNDER) === DB.MOAT || ((lev1.flags | 0) & DB.UNDER) === DB.LAVA) {
-        lava = $c.i8(((lev1.flags | 0) & DB.UNDER) === DB.LAVA ? 1 : 0);
+    if ((lev1.flags & DB.UNDER) === DB.MOAT || (lev1.flags & DB.UNDER) === DB.LAVA) {
+        lava = (lev1.flags & DB.UNDER) === DB.LAVA ? 1 : 0;
         /* Deaf-aware */
         if (lev1.typ === DRAWBRIDGE_UP) {
             if (cansee(x2[0], y2[0]) || u_at(x2[0], y2[0])) {
@@ -1055,8 +1055,8 @@ export async function destroy_drawbridge(x, y) {   // dbridge.c:888
                 await You_hear($c.lit("a loud *SPLASH*!"));   /* Deaf-aware */
             }
         }
-        lev1.typ = $c.i8(lava ? LAVAPOOL : MOAT);
-        lev1.flags = (0) & 31;
+        lev1.typ = lava ? LAVAPOOL : MOAT;
+        lev1.flags = 0;
         if ((otmp2 = sobj_at(BOULDER, x, y)) !== null) {
             await obj_extract_self(otmp2);
             await flooreffects(otmp2, x, y, $c.lit("fall"));
@@ -1069,8 +1069,8 @@ export async function destroy_drawbridge(x, y) {   // dbridge.c:888
         } else {
             await You_hear($c.lit("a loud *CRASH*!"));   /* Deaf-aware */
         }
-        lev1.typ = $c.i8((lev1.flags | 0) & DB.ICE ? ICE : ROOM);
-        lev1.flags = (((lev1.flags | 0) & DB.ICE ? ICED.MOAT : 0) >>> 0) & 31;
+        lev1.typ = lev1.flags & DB.ICE ? ICE : ROOM;
+        lev1.flags = (lev1.flags & DB.ICE ? ICED.MOAT : 0) & 31;
     }
     await wake_nearto(x, y, 500);
     lev2.typ = DOOR;
@@ -1088,7 +1088,7 @@ export async function destroy_drawbridge(x, y) {   // dbridge.c:888
         /* doesn't matter if we happen to pick <x,y2> or <x2,y>;
            since drawbridges are never placed diagonally, those
            pairings will always match one of <x,y> or <x2,y2> */
-        otmp = await mksobj_at(IRON_CHAIN, $c.i16(rn2(2) ? x : x2[0]), $c.i16(rn2(2) ? y : y2[0]), TRUE, FALSE);
+        otmp = await mksobj_at(IRON_CHAIN, rn2(2) ? x : x2[0], rn2(2) ? y : y2[0], TRUE, FALSE);
         /* a force of 5 here would yield a radius of 2 for
            iron chain; anything less produces a radius of 1 */
         await scatter(otmp.ox, otmp.oy, 1, MAY_HIT, otmp);
@@ -1104,7 +1104,7 @@ export async function destroy_drawbridge(x, y) {   // dbridge.c:888
     }
     set_entity(x2[0], y2[0], etmp2);   /* currently only automissers can be here */
     if (etmp2.edata) {
-        e_inview = $c.i8(e_canseemon(etmp2));
+        e_inview = e_canseemon(etmp2);
         if (!automiss(etmp2)) {
             if (e_inview) {
                 await pline($c.lit("%s blown apart by flying debris."), await E_phrase(etmp2, $c.lit("are")));
@@ -1116,7 +1116,7 @@ export async function destroy_drawbridge(x, y) {   // dbridge.c:888
     }
     set_entity(x, y, etmp1);
     if (etmp1.edata) {
-        e_inview = $c.i8(e_canseemon(etmp1));
+        e_inview = e_canseemon(etmp1);
         if (await e_missed(etmp1, TRUE)) {
             do {
                 if (debugcore($c.lit("dbridge.c"), TRUE)) {
@@ -1161,7 +1161,7 @@ export async function destroy_drawbridge(x, y) {   // dbridge.c:888
     }
     nokiller();
     if ((svd.dungeon_topology.d_stronghold_level.dlevel || svd.dungeon_topology.d_stronghold_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_stronghold_level)) {
-        u.uevent.uheard_tune = (3) & 3;   /* bridge is gone so tune is now useless */
+        u.uevent.uheard_tune = 3;   /* bridge is gone so tune is now useless */
     }
 }
 function is_u(etmp) {

@@ -181,7 +181,7 @@ function inuse_classify(sort_item, obj) {   // invent.c:70
         } while (0);
         do {
             rating = rating + 1 | 0;
-            if ((!w_mask && obj.oclass === TOOL_CLASS && obj.lamplit | 0 ? 1 : 0) !== 0) {
+            if ((!w_mask && obj.oclass === TOOL_CLASS && obj.lamplit ? 1 : 0) !== 0) {
                 break assign_rating$;
             }
         } while (0);
@@ -262,13 +262,13 @@ function inuse_classify(sort_item, obj) {   // invent.c:70
         } while (0);
         do {
             rating = rating + 1 | 0;   /* off hand */
-            if ($c.and64(w_mask, (u.uhandedness | 0) === LEFT_HANDED ? W.RINGR : W.RINGL) !== 0) {
+            if ($c.and64(w_mask, u.uhandedness === LEFT_HANDED ? W.RINGR : W.RINGL) !== 0) {
                 break assign_rating$;
             }
         } while (0);
         do {
             rating = rating + 1 | 0;   /* main hand */
-            if ($c.and64(w_mask, (u.uhandedness | 0) === RIGHT_HANDED ? W.RINGR : W.RINGL) !== 0) {
+            if ($c.and64(w_mask, u.uhandedness === RIGHT_HANDED ? W.RINGR : W.RINGL) !== 0) {
                 break assign_rating$;
             }
         } while (0);
@@ -303,7 +303,7 @@ export async function loot_classify(sort_item, obj) {   // invent.c:149
        likely to be picked up are moved to the front */
     otyp = obj.otyp;
     oclass = obj.oclass;
-    discovered = $c.i8(objects[otyp].oc_name_known | 0 ? TRUE : FALSE);
+    discovered = objects[otyp].oc_name_known ? TRUE : FALSE;
     /*
      * For the value types assigned by this classification, sortloot()
      * will put lower valued ones before higher valued ones.
@@ -312,7 +312,7 @@ export async function loot_classify(sort_item, obj) {   // invent.c:149
         await observe_object(obj);   /* xname(obj) does this; we want it sooner */
     }
     /* class order */
-    seen = $c.i8(obj.dknown | 0 ? TRUE : FALSE), classorder = flags.sortpack ? new $c.Ptr(flags.inv_order, 0) : new $c.Ptr(loot_classify$def_srt_order, 0);
+    seen = obj.dknown ? TRUE : FALSE, classorder = flags.sortpack ? new $c.Ptr(flags.inv_order, 0) : new $c.Ptr(loot_classify$def_srt_order, 0);
     p = $c.strchr(classorder, oclass);
     if (p) {
         k = 1 + $c.i32($c.pdiff(p, classorder)) | 0;
@@ -386,7 +386,7 @@ export async function loot_classify(sort_item, obj) {   // invent.c:149
                     break;
                 default:
                     /* [maybe separate one-bite foods from rations and such?] */
-                    k = obj.globby | 0 ? 6 : 2;
+                    k = obj.globby ? 6 : 2;
                     break;
                 case TIN:
                     k = 3;
@@ -416,7 +416,7 @@ export async function loot_classify(sort_item, obj) {   // invent.c:149
              *  7) discovered gray stones ("touchstone"),
              *  8) seen rocks ("rock").
              */
-            switch (objects[obj.otyp].oc_material | 0) {
+            switch (objects[obj.otyp].oc_material) {
                 case GEMSTONE:
                     k = !seen ? 1 : !discovered ? 2 : 3;
                     break;
@@ -465,9 +465,9 @@ async function loot_xname(obj) {   // invent.c:309
     /* suppress "diluted" for potions and "holy/unholy" for water;
        sortloot() will deal with them using other criteria than name */
     if (obj.oclass === POTION_CLASS) {
-        obj.oeroded = (0) & 3;
+        obj.oeroded = 0;
         if (obj.otyp === POT_WATER) {
-            obj.blessed = (0) & 1, obj.cursed = (0) & 1;
+            obj.blessed = 0, obj.cursed = 0;
         }
     }
     /* make "wet towel" and "moist towel" format as "towel" so that all
@@ -531,7 +531,7 @@ async function loot_xname(obj) {   // invent.c:309
  * @returns {number} int
  */
 function invletter_value(c) {   // invent.c:391
-    return 97 <= c && c <= 122 ? (c - 97 | 0) + 2 | 0 : 65 <= c && c <= 90 ? ((c - 65 | 0) + 2 | 0) + 26 | 0 : c === 36 ? 1 : c === 35 ? 1 + invlet_basic + 1 : 1 + invlet_basic + 1 + 1;
+    return 97 <= c && c <= 122 ? c - 97 + 2 : 65 <= c && c <= 90 ? c - 65 + 2 + 26 : c === 36 ? 1 : c === 35 ? 1 + invlet_basic + 1 : 1 + invlet_basic + 1 + 1;
     /* none of the above
      * (shouldn't happen) */
 }
@@ -641,14 +641,14 @@ async function sortloot_cmp(vptr1, vptr2) {   // invent.c:403
             return namcmp;
         }
         /* Sort by BUCX. */
-        val1 = obj1.bknown | 0 ? obj1.blessed | 0 ? 3 : !obj1.cursed ? 2 : 1 : 0;
-        val2 = obj2.bknown | 0 ? obj2.blessed | 0 ? 3 : !obj2.cursed ? 2 : 1 : 0;
+        val1 = obj1.bknown ? obj1.blessed ? 3 : !obj1.cursed ? 2 : 1 : 0;
+        val2 = obj2.bknown ? obj2.blessed ? 3 : !obj2.cursed ? 2 : 1 : 0;
         if (val1 !== val2) {
             return val2 - val1 | 0;   /* bigger is better */
         }
         /* Sort by greasing.  This will put the objects in degreasing order. */
-        val1 = obj1.greased | 0;
-        val2 = obj2.greased | 0;
+        val1 = obj1.greased;
+        val2 = obj2.greased;
         if (val1 !== val2) {
             return val2 - val1 | 0;   /* bigger is better */
         }
@@ -661,8 +661,8 @@ async function sortloot_cmp(vptr1, vptr2) {   // invent.c:403
         /* Sort by erodeproofing.  Map known-invulnerable to 1, and both
            known-vulnerable and unknown-vulnerability to 0, because that's
            how they're displayed. */
-        val1 = obj1.rknown | 0 && obj1.oerodeproof | 0 ? 1 : 0;
-        val2 = obj2.rknown | 0 && obj2.oerodeproof | 0 ? 1 : 0;
+        val1 = obj1.rknown && obj1.oerodeproof ? 1 : 0;
+        val2 = obj2.rknown && obj2.oerodeproof ? 1 : 0;
         if (val1 !== val2) {
             return val2 - val1 | 0;   /* bigger is better */
         }
@@ -671,9 +671,9 @@ async function sortloot_cmp(vptr1, vptr2) {   // invent.c:403
            matters, which usually indirectly means that obj->spe is relevant.
            Lots of objects use obj->spe for some other purpose (see obj.h). */
         /* exclude eggs (laid by you) and tins (homemade, pureed, &c) */
-        if (objects[obj1.otyp].oc_uses_known | 0 && obj1.oclass !== FOOD_CLASS) {
-            val1 = obj1.known | 0 ? obj1.spe : -1000;
-            val2 = obj2.known | 0 ? obj2.spe : -1000;
+        if (objects[obj1.otyp].oc_uses_known && obj1.oclass !== FOOD_CLASS) {
+            val1 = obj1.known ? obj1.spe : -1000;
+            val2 = obj2.known ? obj2.spe : -1000;
             if (val1 !== val2) {
                 return val2 - val1 | 0;   /* bigger is better */
             }
@@ -746,7 +746,7 @@ export async function sortloot(olist, mode, by_nexthere, filterfunc) {   // inve
     /* note: if there is a filter function, this might overallocate */
     sliarray = $c.asRec(await alloc($c.u32($c.mulu64(n + 1 >>> 0, 24))), $T.sortloot_item, 24);
     /* the 'keep cockatrice corpses' flag is overloaded with sort mode */
-    augment_filter = $c.i8((mode & SORTLOOT.PETRIFY) >>> 0 ? TRUE : FALSE);
+    augment_filter = (mode & SORTLOOT.PETRIFY) >>> 0 ? TRUE : FALSE;
     mode = (mode & 4294967263) >>> 0;   /* remove flag, leaving mode */
     /* populate aliarray[0..n-1] */
     for (i = 0, o = olist.get(0); o; o = by_nexthere ? o.v.v_nexthere : o.nobj) {
@@ -885,7 +885,7 @@ export async function merge_choice(objlist, obj) {   // invent.c:775
     save_nocharge = obj.no_charge;
     if ($c.peq(objlist, gi.invent) && obj.where === OBJ.FLOOR && (shkp = await shop_keeper(inside_shop(obj.ox, obj.oy))) !== null) {
         if (obj.no_charge) {
-            obj.no_charge = (0) & 1;
+            obj.no_charge = 0;
         } else if (inhishop(shkp)) {
             /* A billable object won't have its `unpaid' bit set, so would
                erroneously seem to be a candidate to merge with a similar
@@ -938,7 +938,7 @@ export async function merged(potmp, pobj) {   // invent.c:814
         }
         /* temporary special case for gold objects!!!! */
         if (otmp.oclass === COIN_CLASS) {
-            $t1 = await weight(otmp) >>> 0, otmp.owt = $t1, otmp.bknown = (0) & 1;
+            $t1 = await weight(otmp) >>> 0, otmp.owt = $t1, otmp.bknown = 0;
         } else if (!Is_pudding(otmp)) {
             /* and puddings!!!1!!one! */
             $t2 = await weight(otmp) >>> 0, otmp.owt = $t2;
@@ -947,8 +947,8 @@ export async function merged(potmp, pobj) {   // invent.c:814
             otmp = ($t3 = await oname(otmp, obj.oextra.oname, ONAME_SKIP_INVUPD), potmp.set(0, $t3));
         }
         await obj_extract_self(obj);
-        if (obj.pickup_prev | 0 && otmp.where === OBJ.INVENT) {
-            otmp.pickup_prev = (1) & 1;
+        if (obj.pickup_prev && otmp.where === OBJ.INVENT) {
+            otmp.pickup_prev = 1;
         }
         /* really should merge the timeouts */
         if (obj.lamplit) {
@@ -963,18 +963,18 @@ export async function merged(potmp, pobj) {   // invent.c:814
            previously identified in that dimension, and if the
            identification states don't match, one of them must have
            previously been identified */
-        if ((obj.known | 0) !== (otmp.known | 0)) {
-            otmp.known = (1) & 1;
+        if (obj.known !== otmp.known) {
+            otmp.known = 1;
             discovered = TRUE;
         }
-        if ((obj.rknown | 0) !== (otmp.rknown | 0)) {
-            otmp.rknown = (1) & 1;
+        if (obj.rknown !== otmp.rknown) {
+            otmp.rknown = 1;
             if (otmp.oerodeproof) {
                 discovered = TRUE;
             }
         }
-        if ((obj.bknown | 0) !== (otmp.bknown | 0)) {
-            otmp.bknown = (1) & 1;
+        if (obj.bknown !== otmp.bknown) {
+            otmp.bknown = 1;
             if (!(gu.urole.mnum === PM.CLERIC)) {
                 discovered = TRUE;
             }
@@ -1019,7 +1019,7 @@ export async function merged(potmp, pobj) {   // invent.c:814
            objects at the monster's spot (but also in case we're called by
            code that's using obj->bypass to track 'already processed') */
         if (obj.bypass) {
-            otmp.bypass = (1) & 1;
+            otmp.bypass = 1;
         }
         /* handle puddings a bit differently; absorption will free the
            other object automatically so we can just return out from here */
@@ -1032,7 +1032,7 @@ export async function merged(potmp, pobj) {   // invent.c:814
            information about the items (with the exception of thrown
            items, where this would be too spammy as such items get
            unidentified by monsters very frequently). */
-        if (discovered && otmp.where === OBJ.INVENT && (obj.how_lost | 0) !== LOST.THROWN && (otmp.how_lost | 0) !== LOST.THROWN) {
+        if (discovered && otmp.where === OBJ.INVENT && obj.how_lost !== LOST.THROWN && otmp.how_lost !== LOST.THROWN) {
             await pline($c.lit("You learn more about your items by comparing them."));
         }
         await obfree(obj, otmp);   /* free(obj), bill->otmp */
@@ -1060,32 +1060,32 @@ export async function addinv_core1(obj) {   // invent.c:960
         if (u.uhave.amulet) {
             await impossible($c.lit("already have amulet?"));
         }
-        u.uhave.amulet = (1) & 1;
+        u.uhave.amulet = 1;
         await record_achievement(ACH.AMUL);
     } else if (obj.otyp === CANDELABRUM_OF_INVOCATION) {
         if (u.uhave.menorah) {
             await impossible($c.lit("already have candelabrum?"));
         }
-        u.uhave.menorah = (1) & 1;
+        u.uhave.menorah = 1;
         await record_achievement(ACH.CNDL);
     } else if (obj.otyp === BELL_OF_OPENING) {
         if (u.uhave.bell) {
             await impossible($c.lit("already have silver bell?"));
         }
-        u.uhave.bell = (1) & 1;
+        u.uhave.bell = 1;
         await record_achievement(ACH.BELL);
     } else if (obj.otyp === SPE_BOOK_OF_THE_DEAD) {
         if (u.uhave.book) {
             await impossible($c.lit("already have the book?"));
         }
-        u.uhave.book = (1) & 1;
+        u.uhave.book = 1;
         await record_achievement(ACH.BOOK);
     } else if (obj.oartifact) {
         if (is_quest_artifact(obj)) {
             if (u.uhave.questart) {
                 await impossible($c.lit("already have quest artifact?"));
             }
-            u.uhave.questart = (1) & 1;
+            u.uhave.questart = 1;
             await artitouch(obj);
         }
         await set_artifact_intrinsic(obj, 1, W.ART);
@@ -1095,11 +1095,11 @@ export async function addinv_core1(obj) {   // invent.c:960
     if (is_mines_prize(obj)) {
         await record_achievement(ACH.MINE_PRIZE);
         svc.context.achieveo.mines_prize_oid = 0;   /* done w/ luckstone o_id */
-        obj.nomerge = (0) & 1;   /* was set in create_object(sp_lev.c) */
+        obj.nomerge = 0;   /* was set in create_object(sp_lev.c) */
     } else if (is_soko_prize(obj)) {
         await record_achievement(ACH.SOKO_PRIZE);
         svc.context.achieveo.soko_prize_oid = 0;   /* done w/ bag/amulet o_id */
-        obj.nomerge = (0) & 1;   /* (got set in sp_lev.c) */
+        obj.nomerge = 0;   /* (got set in sp_lev.c) */
     }
 }
 /*
@@ -1161,16 +1161,16 @@ async function addinv_core0(obj$in, other_obj, update_perm_invent) {   // invent
     if (obj[0].where !== OBJ.FREE) {
         await panic($c.lit("addinv: obj not free"));
     }
-    if ((obj[0].how_lost | 0) === LOST.EXPLODING) {
+    if (obj[0].how_lost === LOST.EXPLODING) {
         return $c.asRec(null, $T.obj, 112);
     }
     /* normally addtobill() clears no_charge when items in a shop are
        picked up, but won't do so if the shop has become untended */
-    obj[0].no_charge = (0) & 1;   /* should not be set in hero's invent */
+    obj[0].no_charge = 0;   /* should not be set in hero's invent */
     if (Has_contents(obj[0])) {
         picked_container(obj[0]);   /* clear no_charge */
     }
-    obj_was_thrown = $c.i8((obj[0].how_lost | 0) === LOST.THROWN ? 1 : 0);
+    obj_was_thrown = obj[0].how_lost === LOST.THROWN ? 1 : 0;
     obj[0].how_lost = (LOST.NONE) & 7;
     if (gl.loot_reset_justpicked) {
         gl.loot_reset_justpicked = FALSE;
@@ -1237,7 +1237,7 @@ async function addinv_core0(obj$in, other_obj, update_perm_invent) {   // invent
             await setuqwep(obj[0]);
         }
     }
-    obj[0].pickup_prev = (1) & 1;
+    obj[0].pickup_prev = 1;
     await addinv_core2(obj[0]);   /* handle extrinsics conferred by carrying obj */
     await carry_obj_effects(obj[0]);   /* carrying affects the obj */
     if (update_perm_invent) {
@@ -1272,7 +1272,7 @@ export async function addinv_before(obj, other_obj) {   // invent.c:1160
 export async function addinv_nomerge(obj) {   // invent.c:1169
     let result = null, save_nomerge = 0;
     save_nomerge = obj.nomerge;
-    obj.nomerge = (1) & 1;
+    obj.nomerge = 1;
     result = await addinv(obj);
     obj.nomerge = (save_nomerge) & 1;
     return result;
@@ -1290,7 +1290,7 @@ export async function addinv_nomerge(obj) {   // invent.c:1169
 export async function carry_obj_effects(obj) {   // invent.c:1187
     /* Cursed figurines can spontaneously transform when carried. */
     if (obj.otyp === FIGURINE) {
-        if (obj.cursed | 0 && obj.corpsenm !== NON_PM && !dead_species(obj.corpsenm, TRUE)) {
+        if (obj.cursed && obj.corpsenm !== NON_PM && !dead_species(obj.corpsenm, TRUE)) {
             await attach_fig_transform_timeout(obj);
         }
     }
@@ -1320,9 +1320,9 @@ export async function hold_another_object(obj, drop_fmt, drop_arg, hold_msg) {  
     }
     if (obj.oartifact) {
         /* place_object may change these */
-        crysknife = $c.i8(obj.otyp === CRYSKNIFE ? 1 : 0);
-        oerode = obj.oerodeproof | 0;
-        wasUpolyd = $c.i8(Upolyd());
+        crysknife = obj.otyp === CRYSKNIFE ? 1 : 0;
+        oerode = obj.oerodeproof;
+        wasUpolyd = Upolyd();
         /* in case touching this object turns out to be fatal */
         await place_object(obj, u.ux, u.uy);
         if (!await touch_artifact(obj, gy.youmonst)) {
@@ -1346,7 +1346,7 @@ export async function hold_another_object(obj, drop_fmt, drop_arg, hold_msg) {  
     }
     drop_it$: {
         if (Fumbling()) {
-            obj.nomerge = (1) & 1;
+            obj.nomerge = 1;
             /* dropping expects obj to be in invent; since it's going to be
                dropped, avoid perminv update when temporarily adding it */
             obj = await addinv_core0(obj, null, FALSE);
@@ -1395,8 +1395,8 @@ export async function hold_another_object(obj, drop_fmt, drop_arg, hold_msg) {  
     if (drop_fmt) {
         await pline(drop_fmt, drop_arg);
     }
-    obj.nomerge = (0) & 1;
-    if (can_reach_floor(TRUE) || u.uswallow | 0) {
+    obj.nomerge = 0;
+    if (can_reach_floor(TRUE) || u.uswallow) {
         await dropx(obj);
     } else {
         await freeinv(obj);
@@ -1467,28 +1467,28 @@ export async function freeinv_core(obj) {   // invent.c:1356
         if (!u.uhave.amulet) {
             await impossible($c.lit("don't have amulet?"));
         }
-        u.uhave.amulet = (0) & 1;
+        u.uhave.amulet = 0;
     } else if (obj.otyp === CANDELABRUM_OF_INVOCATION) {
         if (!u.uhave.menorah) {
             await impossible($c.lit("don't have candelabrum?"));
         }
-        u.uhave.menorah = (0) & 1;
+        u.uhave.menorah = 0;
     } else if (obj.otyp === BELL_OF_OPENING) {
         if (!u.uhave.bell) {
             await impossible($c.lit("don't have silver bell?"));
         }
-        u.uhave.bell = (0) & 1;
+        u.uhave.bell = 0;
     } else if (obj.otyp === SPE_BOOK_OF_THE_DEAD) {
         if (!u.uhave.book) {
             await impossible($c.lit("don't have the book?"));
         }
-        u.uhave.book = (0) & 1;
+        u.uhave.book = 0;
     } else if (obj.oartifact) {
         if (is_quest_artifact(obj)) {
             if (!u.uhave.questart) {
                 await impossible($c.lit("don't have quest artifact?"));
             }
-            u.uhave.questart = (0) & 1;
+            u.uhave.questart = 0;
         }
         await set_artifact_intrinsic(obj, 0, W.ART);
     }
@@ -1512,7 +1512,7 @@ export async function freeinv_core(obj) {   // invent.c:1356
  */
 export async function freeinv(obj) {   // invent.c:1403
     await extract_nobj(obj, new $c.FieldRef(gi, "invent", "ptr"));
-    obj.pickup_prev = (0) & 1;
+    obj.pickup_prev = 0;
     await freeinv_core(obj);
     await update_inventory();
 }
@@ -1562,10 +1562,10 @@ export async function delobj_core(obj, force) {   // invent.c:1438
          * are indestructible via drawbridges, and exploding
          * chests, and golem creation, and ...
          */
-        obj.in_use = (0) & 1;   /* in case caller has set this to 1 */
+        obj.in_use = 0;   /* in case caller has set this to 1 */
         return;
     }
-    update_map = $c.i8(obj.where === OBJ.FLOOR ? 1 : 0);
+    update_map = obj.where === OBJ.FLOOR ? 1 : 0;
     await obj_extract_self(obj);
     if (update_map) {
         /* floor object's coordinates are always up to date */
@@ -1741,8 +1741,8 @@ function compactify(buf) {   // invent.c:1627
     $t1 = buf.get(i1 = i1 + 1 | 0), $t2 = buf.add(i2 = i2 + 1 | 0), $t2.set(0, $t1);
     ilet = buf.get(i1);
     while (ilet) {
-        if (ilet === (ilet1 + 1 | 0)) {
-            if (ilet1 === (ilet2 + 1 | 0)) {
+        if (ilet === ilet1 + 1) {
+            if (ilet1 === ilet2 + 1) {
                 $t3 = ilet1 = 45, buf.set(i2 - 1 | 0, $t3);
             } else if (ilet2 === 45) {
                 $t4 = ilet1 = $c.i8(ilet1 + 1), buf.set(i2 - 1 | 0, $t4);
@@ -1771,7 +1771,7 @@ function compactify(buf) {   // invent.c:1627
  * @returns {Promise<number>} boolean
  */
 export async function splittable(obj) {   // invent.c:1664
-    return $c.i8(!(obj.otyp === LOADSTONE && obj.cursed | 0 || $c.peq(obj, $G.uwep) && await welded($G.uwep)) ? 1 : 0);
+    return !(obj.otyp === LOADSTONE && obj.cursed || $c.peq(obj, $G.uwep) && await welded($G.uwep)) ? 1 : 0;
 }
 /* match the prompt for either 'T' or 'R' command */
 /**
@@ -1779,7 +1779,7 @@ export async function splittable(obj) {   // invent.c:1664
  * @returns {number} boolean
  */
 function taking_off(action) {   // invent.c:1672
-    return $c.i8(!$c.strcmp(action, $c.lit("take off")) || !$c.strcmp(action, $c.lit("remove")) ? 1 : 0);
+    return !$c.strcmp(action, $c.lit("take off")) || !$c.strcmp(action, $c.lit("remove")) ? 1 : 0;
 }
 /**
  * @param {$c.Ptr | null} word const char *
@@ -1867,8 +1867,8 @@ export async function getobj(word, obj_ok, ctrlflags) {   // invent.c:1752
     suggested = 0;
     bp = new $c.Ptr(buf, 0);
     ap = new $c.Ptr(altlets, 0);
-    allowcnt = $c.i8((ctrlflags & GETOBJ.ALLOWCNT) >>> 0);
-    forceprompt = $c.i8((ctrlflags & GETOBJ_PROMPT) >>> 0);
+    allowcnt = (ctrlflags & GETOBJ.ALLOWCNT) >>> 0;
+    forceprompt = (ctrlflags & GETOBJ_PROMPT) >>> 0;
     allownone = FALSE;
     inaccess = 0;
     /* counts GETOBJ_EXCLUDE_INACCESS items to decide
@@ -2033,7 +2033,7 @@ export async function getobj(word, obj_ok, ctrlflags) {   // invent.c:1752
             } else if (iflags.force_invmenu) {
                 /* don't overwrite a possible quitchars */
                 if (!oneloop) {
-                    ilet = $c.i8(new $c.Ptr(lets, 0).get(0) || new $c.Ptr(altlets, 0).get(0) ? 63 : 42);
+                    ilet = new $c.Ptr(lets, 0).get(0) || new $c.Ptr(altlets, 0).get(0) ? 63 : 42;
                 }
                 if (!msggiven) {
                     await putmsghistory()(new $c.Ptr(qbuf, 0), FALSE);
@@ -2152,7 +2152,7 @@ export async function getobj(word, obj_ok, ctrlflags) {   // invent.c:1752
                 if (cnt === 0 || !otmp) {
                     return null;
                 }
-                coins = $c.i8(otmp.oclass === COIN_CLASS ? 1 : 0);
+                coins = otmp.oclass === COIN_CLASS ? 1 : 0;
                 if (cnt > 1 && (!coins || cnt > otmp.quan)) {
                     if (cnt > otmp.quan) {
                         await You($c.lit("only have %ld%s%s."), otmp.quan, !coins && otmp.quan > 1 ? $c.lit(" and ") : $c.lit(""), !coins && otmp.quan > 1 ? new $c.Ptr(getobj$only_one, 0) : $c.lit(""));
@@ -2200,7 +2200,7 @@ export async function getobj(word, obj_ok, ctrlflags) {   // invent.c:1752
             /* don't split a stack of cursed loadstones */
             if (await splittable(otmp)) {
                 otmp = await splitobj(otmp, cnt);
-            } else if (otmp.otyp === LOADSTONE && otmp.cursed | 0) {   /* kludge for canletgo()'s can't-drop-this message */
+            } else if (otmp.otyp === LOADSTONE && otmp.cursed) {   /* kludge for canletgo()'s can't-drop-this message */
                 otmp.corpsenm = $c.i32(cnt);
             }
         }
@@ -2237,20 +2237,20 @@ async function ckvalidcat(otmp) {   // invent.c:2136
  * @returns {number} int
  */
 function ckunpaid(otmp) {   // invent.c:2143
-    return otmp.unpaid | 0 || Has_contents(otmp) && count_unpaid(otmp.cobj) ? 1 : 0;
+    return otmp.unpaid || Has_contents(otmp) && count_unpaid(otmp.cobj) ? 1 : 0;
 }
 /**
  * @returns {number} boolean
  */
 export function wearing_armor() {   // invent.c:2149
-    return $c.i8($G.uarm || $G.uarmc || $G.uarmf || $G.uarmg || $G.uarmh || $G.uarms || $G.uarmu ? 1 : 0);
+    return $G.uarm || $G.uarmc || $G.uarmf || $G.uarmg || $G.uarmh || $G.uarms || $G.uarmu ? 1 : 0;
 }
 /**
  * @param {$T.obj | null} otmp struct obj *
  * @returns {number} boolean
  */
 export function is_worn(otmp) {   // invent.c:2156
-    return $c.i8($c.and64(otmp.owornmask, W_ARMOR | W_ACCESSORY | W.SADDLE | W_WEAPONS) ? TRUE : FALSE);
+    return $c.and64(otmp.owornmask, W_ARMOR | W_ACCESSORY | W.SADDLE | W_WEAPONS) ? TRUE : FALSE;
 }
 /* is 'obj' being used by the hero?  worn, wielded, active lamp or leash;
    not to be confused with obj->in_use, which finishes using up an item
@@ -2260,7 +2260,7 @@ export function is_worn(otmp) {   // invent.c:2156
  * @returns {number} boolean
  */
 export function is_inuse(obj) {   // invent.c:2167
-    return $c.i8(carried(obj) && (is_worn(obj) || tool_being_used(obj)) ? 1 : 0);
+    return carried(obj) && (is_worn(obj) || tool_being_used(obj)) ? 1 : 0;
 }
 /* safe_qbuf() -> short_oname() callback */
 /**
@@ -2488,12 +2488,12 @@ export async function askchain(objchn, olets, allflag, fn, ckfn, mx, word) {   /
             dud = 0;
             sortedchn[0] = null;
             takeoff = taking_off(word);
-            ident = $c.i8(!$c.strcmp(word, $c.lit("identify")) ? 1 : 0);
-            take_out = $c.i8(!$c.strcmp(word, $c.lit("take out")) ? 1 : 0);
-            put_in = $c.i8(!$c.strcmp(word, $c.lit("put in")) ? 1 : 0);
-            nodot = $c.i8(!$c.strcmp(word, $c.lit("nodot")) || !$c.strcmp(word, $c.lit("drop")) || ident || takeoff || take_out || put_in ? 1 : 0);
-            ininv = $c.i8($c.peq(objchn.get(0), gi.invent) ? 1 : 0);
-            bycat = $c.i8(menu_class_present(117) || menu_class_present(66) || menu_class_present(85) || menu_class_present(67) || menu_class_present(88) || menu_class_present(80) ? 1 : 0);
+            ident = !$c.strcmp(word, $c.lit("identify")) ? 1 : 0;
+            take_out = !$c.strcmp(word, $c.lit("take out")) ? 1 : 0;
+            put_in = !$c.strcmp(word, $c.lit("put in")) ? 1 : 0;
+            nodot = !$c.strcmp(word, $c.lit("nodot")) || !$c.strcmp(word, $c.lit("drop")) || ident || takeoff || take_out || put_in ? 1 : 0;
+            ininv = $c.peq(objchn.get(0), gi.invent) ? 1 : 0;
+            bycat = menu_class_present(117) || menu_class_present(66) || menu_class_present(85) || menu_class_present(67) || menu_class_present(88) || menu_class_present(80) ? 1 : 0;
             /* someday maybe we'll sort by 'olets' too (temporarily replace
                flags.packorder and pass SORTLOOT_PACK), but not yet... */
             sortedchn[0] = await sortloot(objchn, SORTLOOT.INVLET, FALSE, null);
@@ -2547,7 +2547,7 @@ export async function askchain(objchn, olets, allflag, fn, ckfn, mx, word) {   /
                 }
                 if (!allflag) {
                     safeq_xprn_ctx.let = ilet;
-                    safeq_xprn_ctx.dot = $c.i8(!nodot ? 1 : 0);
+                    safeq_xprn_ctx.dot = !nodot ? 1 : 0;
                     new $c.Ptr(qpfx, 0).set(0, 0);
                     if (first) {
                         /* traditional_loot() skips prompting when only one
@@ -2656,15 +2656,15 @@ export async function reroll_menu() {   // invent.c:2552
     await start_menu()(win, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     any.a_char = 110;
-    await add_menu(win, nul_glyphinfo, any, $c.i8(flags.lootabc ? 0 : 112), 0, ATR.NONE, NO_COLOR, $c.lit("start the game with this character"), MENU.ITEMFLAGS_NONE);
+    await add_menu(win, nul_glyphinfo, any, flags.lootabc ? 0 : 112, 0, ATR.NONE, NO_COLOR, $c.lit("start the game with this character"), MENU.ITEMFLAGS_NONE);
     any.a_char = 121;
-    await add_menu(win, nul_glyphinfo, any, $c.i8(flags.lootabc ? 0 : 114), 0, ATR.NONE, NO_COLOR, $c.lit("reroll another character"), MENU.ITEMFLAGS_NONE);
+    await add_menu(win, nul_glyphinfo, any, flags.lootabc ? 0 : 114, 0, ATR.NONE, NO_COLOR, $c.lit("reroll another character"), MENU.ITEMFLAGS_NONE);
     any.a_char = 0;
     await add_menu(win, nul_glyphinfo, any, 0, 0, ATR.NONE, NO_COLOR, $c.lit(""), MENU.ITEMFLAGS_NONE);
     gd.distantname = gd.distantname + 1 | 0;   /* avoid adding items to discoveries */
     iflags.override_ID = iflags.override_ID + 1 | 0;   /* identify them */
     for (otmp = gi.invent; otmp; otmp = otmp.nobj) {
-        tmpglyph = otmp.otyp === STATUE ? u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) + (!rn2_on_display_rng(2) ? GLYPH.MON_MALE_OFF : GLYPH.MON_FEM_OFF) | 0 : otmp.corpsenm + ((otmp.spe & CORPSTAT.GENDER) === CORPSTAT.FEMALE ? otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.STATUE_FEM_PILETOP_OFF : GLYPH.STATUE_FEM_OFF : otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.STATUE_MALE_PILETOP_OFF : GLYPH.STATUE_MALE_OFF) | 0 : u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? ($t1 = await rn2_on_display_rng(NUM_OBJECTS - FIRST_OBJECT) + FIRST_OBJECT | 0, go.otg_temp = $t1) === CORPSE ? await rn2_on_display_rng(NUMMONS) + GLYPH.BODY_OFF | 0 : go.otg_temp + GLYPH.OBJ_OFF | 0 : otmp.otyp === CORPSE ? otmp.corpsenm + (otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.BODY_PILETOP_OFF : GLYPH.BODY_OFF) | 0 : !otmp.dknown && (otmp.oclass === POTION_CLASS || otmp.otyp >= FIRST_REAL_GEM && otmp.otyp <= LAST_GLASS_GEM || otmp.otyp >= FIRST_SPELL && otmp.otyp <= LAST_SPELL) ? otmp.oclass + (otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.OBJ_PILETOP_OFF : GLYPH.OBJ_OFF) | 0 : otmp.otyp + (otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.OBJ_PILETOP_OFF : GLYPH.OBJ_OFF) | 0;
+        tmpglyph = otmp.otyp === STATUE ? u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) + (!rn2_on_display_rng(2) ? GLYPH.MON_MALE_OFF : GLYPH.MON_FEM_OFF) | 0 : otmp.corpsenm + ((otmp.spe & CORPSTAT.GENDER) === CORPSTAT.FEMALE ? otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.STATUE_FEM_PILETOP_OFF : GLYPH.STATUE_FEM_OFF : otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.STATUE_MALE_PILETOP_OFF : GLYPH.STATUE_MALE_OFF) | 0 : u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? ($t1 = await rn2_on_display_rng(NUM_OBJECTS - FIRST_OBJECT) + FIRST_OBJECT | 0, go.otg_temp = $t1) === CORPSE ? await rn2_on_display_rng(NUMMONS) + GLYPH.BODY_OFF | 0 : go.otg_temp + GLYPH.OBJ_OFF | 0 : otmp.otyp === CORPSE ? otmp.corpsenm + (otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.BODY_PILETOP_OFF : GLYPH.BODY_OFF) | 0 : !otmp.dknown && (otmp.oclass === POTION_CLASS || otmp.otyp >= FIRST_REAL_GEM && otmp.otyp <= LAST_GLASS_GEM || otmp.otyp >= FIRST_SPELL && otmp.otyp <= LAST_SPELL) ? otmp.oclass + (otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.OBJ_PILETOP_OFF : GLYPH.OBJ_OFF) : otmp.otyp + (otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.OBJ_PILETOP_OFF : GLYPH.OBJ_OFF);
         map_glyphinfo(0, 0, tmpglyph, 0, tmpglyphinfo);
         await add_menu(win, tmpglyphinfo, any, 0, 0, ATR.NONE, NO_COLOR, await doname(otmp), MENU.ITEMFLAGS_NONE);
     }
@@ -2700,9 +2700,9 @@ export async function reroll_menu() {   // invent.c:2552
 export function set_cknown_lknown(obj) {   // invent.c:2624
     let $t1;
     if (Is_container(obj) || obj.otyp === STATUE) {
-        $t1 = obj.lknown = (1) & 1, obj.cknown = ($t1) & 1;
+        $t1 = obj.lknown = 1, obj.cknown = ($t1) & 1;
     } else if (obj.otyp === TIN) {
-        obj.cknown = (1) & 1;
+        obj.cknown = 1;
     }
     /* TODO? cknown might be extended to candy bar, where it would mean that
        wrapper's text was known which in turn indicates candy bar's content */
@@ -2717,10 +2717,10 @@ export async function fully_identify_obj(otmp) {   // invent.c:2637
     let $t1, $t2;
     await discover_object(otmp.otyp, TRUE, TRUE, TRUE);
     if (otmp.oartifact) {
-        await discover_artifact($c.i16(otmp.oartifact));
+        await discover_artifact(otmp.oartifact);
     }
     await observe_object(otmp);
-    $t2 = ($t1 = otmp.rknown = (1) & 1, otmp.bknown = ($t1) & 1), otmp.known = ($t2) & 1;
+    $t2 = ($t1 = otmp.rknown = 1, otmp.bknown = ($t1) & 1), otmp.known = ($t2) & 1;
     set_cknown_lknown(otmp);   /* set otmp->{cknown,lknown} if applicable */
     if (otmp.otyp === EGG && otmp.corpsenm !== NON_PM) {
         await learn_egg_type(otmp.corpsenm);
@@ -2845,7 +2845,7 @@ export async function learn_unseen_invent() {   // invent.c:2750
         return;   /* sanity check */
     }
     for (otmp = gi.invent; otmp; otmp = otmp.nobj) {
-        if (otmp.dknown | 0 && (otmp.bknown | 0 || !(gu.urole.mnum === PM.CLERIC)) && (otmp.oclass !== SCROLL_CLASS || !(gu.urole.mnum === PM.ARCHEOLOGIST))) {
+        if (otmp.dknown && (otmp.bknown || !(gu.urole.mnum === PM.CLERIC)) && (otmp.oclass !== SCROLL_CLASS || !(gu.urole.mnum === PM.ARCHEOLOGIST))) {
             continue;   /* already seen */
         }
         invupdated = TRUE;
@@ -2957,7 +2957,7 @@ function obj_to_let(obj) {   // invent.c:2861
  */
 export async function prinv(prefix, obj, quan) {   // invent.c:2875
     let total_of = 0, totalbuf = new Int8Array(128);
-    total_of = $c.i8(quan && quan < obj.quan ? 1 : 0);
+    total_of = quan && quan < obj.quan ? 1 : 0;
     if (!prefix) {
         prefix = $c.lit("");
     }
@@ -2965,7 +2965,7 @@ export async function prinv(prefix, obj, quan) {   // invent.c:2875
     if (total_of) {
         nh_snprintf($c.lit("prinv"), 2886, new $c.Ptr(totalbuf, 0), 128, $c.lit(" (%ld in total)."), obj.quan);
     }
-    await pline($c.lit("%s%s%s%s"), prefix, prefix.get(0) ? $c.lit(" ") : $c.lit(""), await xprname(obj, null, obj_to_let(obj), $c.i8(!total_of ? 1 : 0), 0, quan), flags.verbose ? new $c.Ptr(totalbuf, 0) : $c.lit(""));
+    await pline($c.lit("%s%s%s%s"), prefix, prefix.get(0) ? $c.lit(" ") : $c.lit(""), await xprname(obj, null, obj_to_let(obj), !total_of ? 1 : 0, 0, quan), flags.verbose ? new $c.Ptr(totalbuf, 0) : $c.lit(""));
 }
 /**
  * @param {$T.obj | null} obj struct obj *
@@ -2985,7 +2985,7 @@ export async function xprname(obj, txt, let_, dot, cost, quan) {   // invent.c:2
     /* if non-0, print this quantity, not obj->quan */
     /* plenty of room for count and hallucinatory currency */
     /* signed int for %*s formatting */
-    use_invlet = $c.i8(flags.invlet_constant && !$c.peq(obj, $c.asRec(null, $T.obj, 112)) && let_ !== 62 && let_ !== 45 ? 1 : 0);
+    use_invlet = flags.invlet_constant && !$c.peq(obj, $c.asRec(null, $T.obj, 112)) && let_ !== 62 && let_ !== 45 ? 1 : 0;
     savequan = 0;
     if (quan && obj) {
         savequan = obj.quan;
@@ -3050,7 +3050,7 @@ async function dispinv_with_action(lets, use_inuse_ordering, alt_label) {   // i
     save_accessories = null;
     save_sortloot = 0;
     len = lets ? $c.u32($c.strlen(lets)) : 0;
-    menumode = $c.i8(len !== 1 || iflags.menu_requested ? TRUE : FALSE);
+    menumode = len !== 1 || iflags.menu_requested ? TRUE : FALSE;
     save_force_invmenu = iflags.force_invmenu;
     if (use_inuse_ordering) {
         save_accessories = inuse_headers[4];
@@ -3155,7 +3155,7 @@ async function display_pickinv(lets, xtra_choice, query, allowxtra, want_reply, 
     inusecount = 0;
     /* windows being used */
     filter = null;
-    wizid = $c.i8(wizard() && iflags.override_ID ? 1 : 0);
+    wizid = wizard() && iflags.override_ID ? 1 : 0;
     gotsomething = FALSE;
     clr = NO_COLOR;
     menu_behavior = MENU.BEHAVE_STANDARD;
@@ -3163,7 +3163,7 @@ async function display_pickinv(lets, xtra_choice, query, allowxtra, want_reply, 
     inuse_only = FALSE;
     skipped_gold = FALSE;
     doing_perm_invent = FALSE;
-    usextra = $c.i8(xtra_choice && allowxtra ? 1 : 0);
+    usextra = xtra_choice && allowxtra ? 1 : 0;
     if (lets && !lets.get(0)) {
         lets = null;   /* simplify tests: (lets) instead of (lets && *lets) */
     }
@@ -3184,8 +3184,8 @@ async function display_pickinv(lets, xtra_choice, query, allowxtra, want_reply, 
         win = $G.WIN_INVEN;
         menu_behavior = MENU.BEHAVE_PERMINV;
         prepare_perminvent(win);
-        show_gold = $c.i8((wri_info.fromcore.invmode & InvShowGold) >>> 0 !== 0 ? 1 : 0);
-        inuse_only = $c.i8((wri_info.fromcore.invmode & InvInUse) >>> 0 !== 0 ? 1 : 0);
+        show_gold = (wri_info.fromcore.invmode & InvShowGold) >>> 0 !== 0 ? 1 : 0;
+        inuse_only = (wri_info.fromcore.invmode & InvInUse) >>> 0 !== 0 ? 1 : 0;
         doing_perm_invent = TRUE;
     }
     /*
@@ -3244,7 +3244,7 @@ async function display_pickinv(lets, xtra_choice, query, allowxtra, want_reply, 
         }
         return ret;
     }
-    sortflags = (flags.sortloot === 102 ? SORTLOOT.LOOT : SORTLOOT.INVLET) >>> 0;
+    sortflags = flags.sortloot === 102 ? SORTLOOT.LOOT : SORTLOOT.INVLET;
     if (flags.sortpack) {
         sortflags = (sortflags | SORTLOOT.PACK) >>> 0;
     }
@@ -3344,7 +3344,7 @@ async function display_pickinv(lets, xtra_choice, query, allowxtra, want_reply, 
                 }
                 /* maybe insert a class header */
                 if (inuse_only ? srtinv.orderclass !== prevorderclass : flags.sortpack && !classcount) {
-                    withsym = $c.i8(want_reply && iflags.menu_head_objsym ? 1 : 0);
+                    withsym = want_reply && iflags.menu_head_objsym ? 1 : 0;
                     class_header = inuse_only ? inuse_headers[srtinv.orderclass] : await let_to_name(invlet.get(0), FALSE, withsym);
                     await add_menu_heading(win, class_header);
                     classcount = classcount + 1 | 0;
@@ -3365,10 +3365,10 @@ async function display_pickinv(lets, xtra_choice, query, allowxtra, want_reply, 
                     await add_menu(win, nul_glyphinfo, any, ilet, 0, ATR.NONE, clr, new $c.Ptr(barehands, 0), MENU.ITEMFLAGS_NONE);
                 } else {
                     /* normal inventory item */
-                    tmpglyph = otmp.otyp === STATUE ? u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) + (!rn2_on_display_rng(2) ? GLYPH.MON_MALE_OFF : GLYPH.MON_FEM_OFF) | 0 : otmp.corpsenm + ((otmp.spe & CORPSTAT.GENDER) === CORPSTAT.FEMALE ? otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.STATUE_FEM_PILETOP_OFF : GLYPH.STATUE_FEM_OFF : otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.STATUE_MALE_PILETOP_OFF : GLYPH.STATUE_MALE_OFF) | 0 : u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? ($t3 = await rn2_on_display_rng(NUM_OBJECTS - FIRST_OBJECT) + FIRST_OBJECT | 0, go.otg_temp = $t3) === CORPSE ? await rn2_on_display_rng(NUMMONS) + GLYPH.BODY_OFF | 0 : go.otg_temp + GLYPH.OBJ_OFF | 0 : otmp.otyp === CORPSE ? otmp.corpsenm + (otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.BODY_PILETOP_OFF : GLYPH.BODY_OFF) | 0 : !otmp.dknown && (otmp.oclass === POTION_CLASS || otmp.otyp >= FIRST_REAL_GEM && otmp.otyp <= LAST_GLASS_GEM || otmp.otyp >= FIRST_SPELL && otmp.otyp <= LAST_SPELL) ? otmp.oclass + (otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.OBJ_PILETOP_OFF : GLYPH.OBJ_OFF) | 0 : otmp.otyp + (otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.OBJ_PILETOP_OFF : GLYPH.OBJ_OFF) | 0;
+                    tmpglyph = otmp.otyp === STATUE ? u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) + (!rn2_on_display_rng(2) ? GLYPH.MON_MALE_OFF : GLYPH.MON_FEM_OFF) | 0 : otmp.corpsenm + ((otmp.spe & CORPSTAT.GENDER) === CORPSTAT.FEMALE ? otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.STATUE_FEM_PILETOP_OFF : GLYPH.STATUE_FEM_OFF : otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.STATUE_MALE_PILETOP_OFF : GLYPH.STATUE_MALE_OFF) | 0 : u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? ($t3 = await rn2_on_display_rng(NUM_OBJECTS - FIRST_OBJECT) + FIRST_OBJECT | 0, go.otg_temp = $t3) === CORPSE ? await rn2_on_display_rng(NUMMONS) + GLYPH.BODY_OFF | 0 : go.otg_temp + GLYPH.OBJ_OFF | 0 : otmp.otyp === CORPSE ? otmp.corpsenm + (otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.BODY_PILETOP_OFF : GLYPH.BODY_OFF) | 0 : !otmp.dknown && (otmp.oclass === POTION_CLASS || otmp.otyp >= FIRST_REAL_GEM && otmp.otyp <= LAST_GLASS_GEM || otmp.otyp >= FIRST_SPELL && otmp.otyp <= LAST_SPELL) ? otmp.oclass + (otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.OBJ_PILETOP_OFF : GLYPH.OBJ_OFF) : otmp.otyp + (otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.OBJ_PILETOP_OFF : GLYPH.OBJ_OFF);
                     map_glyphinfo(0, 0, tmpglyph, 0, tmpglyphinfo);
                     formattedobj = await doname(otmp);
-                    await add_menu(win, tmpglyphinfo, any, ilet, $c.i8(wizid ? def_oc_syms[otmp.oclass].sym : 0), ATR.NONE, clr, formattedobj, MENU.ITEMFLAGS_NONE);
+                    await add_menu(win, tmpglyphinfo, any, ilet, wizid ? def_oc_syms[otmp.oclass].sym : 0, ATR.NONE, clr, formattedobj, MENU.ITEMFLAGS_NONE);
                 }
                 /* doname() uses a static pool of obuf[] output buffers and
                    we don't want inventory display to overwrite all of them,
@@ -3454,7 +3454,7 @@ async function display_pickinv(lets, xtra_choice, query, allowxtra, want_reply, 
         }
         $c.free(selected[0]);
     } else {
-        ret = $c.i8(!n ? 0 : 27);   /* cancelled */
+        ret = !n ? 0 : 27;   /* cancelled */
     }
     return ret;
 }
@@ -3528,7 +3528,7 @@ async function display_used_invlets(avoidlet) {   // invent.c:3467
                         classcount = classcount + 1 | 0;
                     }
                     any.a_char = ilet;
-                    tmpglyph = otmp.otyp === STATUE ? u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) + (!rn2_on_display_rng(2) ? GLYPH.MON_MALE_OFF : GLYPH.MON_FEM_OFF) | 0 : otmp.corpsenm + ((otmp.spe & CORPSTAT.GENDER) === CORPSTAT.FEMALE ? otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.STATUE_FEM_PILETOP_OFF : GLYPH.STATUE_FEM_OFF : otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.STATUE_MALE_PILETOP_OFF : GLYPH.STATUE_MALE_OFF) | 0 : u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? ($t1 = await rn2_on_display_rng(NUM_OBJECTS - FIRST_OBJECT) + FIRST_OBJECT | 0, go.otg_temp = $t1) === CORPSE ? await rn2_on_display_rng(NUMMONS) + GLYPH.BODY_OFF | 0 : go.otg_temp + GLYPH.OBJ_OFF | 0 : otmp.otyp === CORPSE ? otmp.corpsenm + (otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.BODY_PILETOP_OFF : GLYPH.BODY_OFF) | 0 : !otmp.dknown && (otmp.oclass === POTION_CLASS || otmp.otyp >= FIRST_REAL_GEM && otmp.otyp <= LAST_GLASS_GEM || otmp.otyp >= FIRST_SPELL && otmp.otyp <= LAST_SPELL) ? otmp.oclass + (otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.OBJ_PILETOP_OFF : GLYPH.OBJ_OFF) | 0 : otmp.otyp + (otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.OBJ_PILETOP_OFF : GLYPH.OBJ_OFF) | 0;
+                    tmpglyph = otmp.otyp === STATUE ? u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) + (!rn2_on_display_rng(2) ? GLYPH.MON_MALE_OFF : GLYPH.MON_FEM_OFF) | 0 : otmp.corpsenm + ((otmp.spe & CORPSTAT.GENDER) === CORPSTAT.FEMALE ? otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.STATUE_FEM_PILETOP_OFF : GLYPH.STATUE_FEM_OFF : otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.STATUE_MALE_PILETOP_OFF : GLYPH.STATUE_MALE_OFF) | 0 : u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? ($t1 = await rn2_on_display_rng(NUM_OBJECTS - FIRST_OBJECT) + FIRST_OBJECT | 0, go.otg_temp = $t1) === CORPSE ? await rn2_on_display_rng(NUMMONS) + GLYPH.BODY_OFF | 0 : go.otg_temp + GLYPH.OBJ_OFF | 0 : otmp.otyp === CORPSE ? otmp.corpsenm + (otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.BODY_PILETOP_OFF : GLYPH.BODY_OFF) | 0 : !otmp.dknown && (otmp.oclass === POTION_CLASS || otmp.otyp >= FIRST_REAL_GEM && otmp.otyp <= LAST_GLASS_GEM || otmp.otyp >= FIRST_SPELL && otmp.otyp <= LAST_SPELL) ? otmp.oclass + (otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.OBJ_PILETOP_OFF : GLYPH.OBJ_OFF) : otmp.otyp + (otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.OBJ_PILETOP_OFF : GLYPH.OBJ_OFF);
                     map_glyphinfo(0, 0, tmpglyph, 0, tmpglyphinfo);
                     await add_menu(win, tmpglyphinfo, any, ilet, 0, ATR.NONE, clr, await doname(otmp), MENU.ITEMFLAGS_NONE);
                 }
@@ -3544,7 +3544,7 @@ async function display_used_invlets(avoidlet) {   // invent.c:3467
             ret = $c.radd(selected[0], 0).item.a_char;
             $c.free(selected[0]);
         } else {
-            ret = $c.i8(!n ? 0 : 27);   /* cancelled */
+            ret = !n ? 0 : 27;   /* cancelled */
         }
         await destroy_nhwindow()(win);
     }
@@ -3591,7 +3591,7 @@ export async function count_buc(list, type, filterfunc) {   // invent.c:3548
     for (; list; list = list.nobj) {
         /* priests always know bless/curse state */
         if (gu.urole.mnum === PM.CLERIC) {
-            list.bknown = ((list.oclass !== COIN_CLASS ? 1 : 0) >>> 0) & 1;
+            list.bknown = (list.oclass !== COIN_CLASS ? 1 : 0) & 1;
         }
         /* some actions exclude some or most items */
         if (filterfunc && !await filterfunc(list)) {
@@ -3605,7 +3605,7 @@ export async function count_buc(list, type, filterfunc) {   // invent.c:3548
             continue;
         }
         /* check whether this object matches the requested type */
-        if (!list.bknown ? type === BUC.UNKNOWN : list.blessed | 0 ? type === BUC.BLESSED : list.cursed | 0 ? type === BUC.CURSED : type === BUC.UNCURSED) {
+        if (!list.bknown ? type === BUC.UNKNOWN : list.blessed ? type === BUC.BLESSED : list.cursed ? type === BUC.CURSED : type === BUC.UNCURSED) {
             count = count + 1 | 0;
         }
     }
@@ -3635,7 +3635,7 @@ export function tally_BUCX(list, by_nexthere, bcp, ucp, ccp, xcp, ocp, jcp) {   
     for (; list; list = by_nexthere ? list.v.v_nexthere : list.nobj) {
         /* priests always know bless/curse state */
         if (gu.urole.mnum === PM.CLERIC) {
-            list.bknown = ((list.oclass !== COIN_CLASS ? 1 : 0) >>> 0) & 1;
+            list.bknown = (list.oclass !== COIN_CLASS ? 1 : 0) & 1;
         }
         if (list.pickup_prev) {
             jcp.set(0, jcp.get(0) + 1 | 0);
@@ -3694,7 +3694,7 @@ export async function count_contents(container, nested, quantity, everything, ne
         if (nested && Has_contents(otmp)) {
             count = $c.add64(count, await count_contents(otmp, nested, quantity, everything, newdrop));
         }
-        if (everything || otmp.unpaid | 0 || shoppy && !otmp.no_charge) {
+        if (everything || otmp.unpaid || shoppy && !otmp.no_charge) {
             count = $c.add64(count, quantity ? otmp.quan : 1);
         }
     }
@@ -3722,7 +3722,7 @@ async function dounpaid(count, floorcount, buriedcount) {   // invent.c:3654
         /* 1 item; use pline instead of popup menu */
         cost = await unpaid_cost(otmp, COST.NOCONTENTS);
         iflags.suppress_price = iflags.suppress_price + 1 | 0;   /* suppress "(unpaid)" suffix */
-        await pline($c.lit("%s"), await xprname(otmp, await distant_name(otmp, doname), $c.i8(otmp.where === OBJ.INVENT ? otmp.invlet : 62), TRUE, cost, 0));
+        await pline($c.lit("%s"), await xprname(otmp, await distant_name(otmp, doname), otmp.where === OBJ.INVENT ? otmp.invlet : 62, TRUE, cost, 0));
         iflags.suppress_price = iflags.suppress_price - 1 | 0;
         return;
     }
@@ -3820,28 +3820,28 @@ async function dounpaid(count, floorcount, buriedcount) {   // invent.c:3654
  */
 function this_type_only(obj) {   // invent.c:3793
     let res = 0;
-    res = $c.i8(obj.oclass === gt.this_type ? 1 : 0);
+    res = obj.oclass === gt.this_type ? 1 : 0;
     if (gt.this_type === 80) {
-        res = $c.i8(obj.pickup_prev);
+        res = obj.pickup_prev;
     } else if (obj.oclass === COIN_CLASS) {
         /* if filtering by bless/curse state, gold is classified as
            either unknown or uncursed based on user option setting */
         if (gt.this_type && $c.strchr($c.lit("BUCX"), gt.this_type)) {
-            res = $c.i8(gt.this_type === (flags.goldX ? 88 : 85) ? 1 : 0);
+            res = gt.this_type === (flags.goldX ? 88 : 85) ? 1 : 0;
         }
     } else {
         switch (gt.this_type) {
             case 66:
-                res = $c.i8(obj.bknown | 0 && obj.blessed | 0 ? 1 : 0);
+                res = obj.bknown && obj.blessed ? 1 : 0;
                 break;
             case 85:
-                res = $c.i8(obj.bknown | 0 && !(obj.blessed | 0 || obj.cursed | 0) ? 1 : 0);
+                res = obj.bknown && !(obj.blessed || obj.cursed) ? 1 : 0;
                 break;
             case 67:
-                res = $c.i8(obj.bknown | 0 && obj.cursed | 0 ? 1 : 0);
+                res = obj.bknown && obj.cursed ? 1 : 0;
                 break;
             case 88:
-                res = $c.i8(!obj.bknown ? 1 : 0);
+                res = !obj.bknown ? 1 : 0;
                 break;
             default:
                 break;   /* use 'res' as-is */
@@ -3859,7 +3859,7 @@ export async function dotypeinv() {   // invent.c:3827
     i = 0;
     before = $c.lit("");
     after = $c.lit("");
-    billx = $c.i8(new $c.Ptr(u.ushops, 0).get(0) && await doinvbill(0) ? 1 : 0);
+    billx = new $c.Ptr(u.ushops, 0).get(0) && await doinvbill(0) ? 1 : 0;
     traditional = TRUE;
     gt.this_type = 0;
     gt.this_title = null;
@@ -4077,7 +4077,7 @@ export async function dfeature_at(x, y, buf) {   // invent.c:4037
     dfeature = null;
     stway = stairway_at(x, y);
     if (IS_DOOR(ltyp)) {
-        switch (lev.flags | 0) {
+        switch (lev.flags) {
             case D.NODOOR:
                 cmap = S.ndoor;
                 break;   /* "doorway" */
@@ -4108,7 +4108,7 @@ export async function dfeature_at(x, y, buf) {   // invent.c:4037
     } else if (IS_SINK(ltyp)) {
         cmap = S.sink;   /* "sink" */
     } else if (IS_ALTAR(ltyp)) {
-        $c.sprintf(new $c.Ptr(dfeature_at$altbuf, 0), $c.lit("%saltar to %s (%s)"), (lev.flags | 0) & AM.SANCTUM ? $c.lit("high ") : $c.lit(""), await a_gname(), align_str($c.i8(((lev.flags | 0) & ~AM.SHRINE & AM.MASK) === 0 ? A.NONE : ((lev.flags | 0) & ~AM.SHRINE & AM.MASK) === AM.LAWFUL ? A.LAWFUL : ((lev.flags | 0) & ~AM.SHRINE & AM.MASK) - 2 | 0)));
+        $c.sprintf(new $c.Ptr(dfeature_at$altbuf, 0), $c.lit("%saltar to %s (%s)"), lev.flags & AM.SANCTUM ? $c.lit("high ") : $c.lit(""), await a_gname(), align_str((lev.flags & ~AM.SHRINE & AM.MASK) === 0 ? A.NONE : (lev.flags & ~AM.SHRINE & AM.MASK) === AM.LAWFUL ? A.LAWFUL : (lev.flags & ~AM.SHRINE & AM.MASK) - 2));
         dfeature = new $c.Ptr(dfeature_at$altbuf, 0);
     } else if (stway) {
         dfeature = stairs_description(stway, new $c.Ptr(dfeature_at$altbuf, 0), TRUE);
@@ -4145,11 +4145,11 @@ export async function look_here(obj_cnt, lookhere_flags) {   // invent.c:4104
     dfeature = null;
     /* skip 'dfeature' if caller used describe_decor() to show it */
     felt_cockatrice = FALSE;
-    picked_some = $c.i8((lookhere_flags & LOOKHERE.PICKED_SOME) >>> 0 !== 0 ? 1 : 0);
-    skip_dfeature = $c.i8((lookhere_flags & LOOKHERE.SKIP_DFEATURE) >>> 0 !== 0 ? 1 : 0);
+    picked_some = (lookhere_flags & LOOKHERE.PICKED_SOME) >>> 0 !== 0 ? 1 : 0;
+    skip_dfeature = (lookhere_flags & LOOKHERE.SKIP_DFEATURE) >>> 0 !== 0 ? 1 : 0;
     /* default pile_limit is 5; a value of 0 means "never skip"
        (and 1 effectively forces "always skip") */
-    skip_objects = $c.i8(flags.pile_limit > 0 && obj_cnt >= flags.pile_limit ? 1 : 0);
+    skip_objects = flags.pile_limit > 0 && obj_cnt >= flags.pile_limit ? 1 : 0;
     if (u.uswallow) {
         mtmp = u.ustuck;
         /*
@@ -4198,20 +4198,20 @@ export async function look_here(obj_cnt, lookhere_flags) {   // invent.c:4104
             trap = $c.asRec(null, $T.trap, 32);
         }
         if (reg || trap) {
-            await There($c.lit("is %s%s%s here."), reg ? new $c.Ptr(regbuf, 0) : $c.lit(""), reg && trap ? $c.lit(" and ") : $c.lit(""), trap ? await an(trapname(trap.ttyp | 0, FALSE)) : $c.lit(""));
+            await There($c.lit("is %s%s%s here."), reg ? new $c.Ptr(regbuf, 0) : $c.lit(""), reg && trap ? $c.lit(" and ") : $c.lit(""), trap ? await an(trapname(trap.ttyp, FALSE)) : $c.lit(""));
         }
     }
     otmp = svl.level.objects[u.ux][u.uy];
     dfeature = await dfeature_at(u.ux, u.uy, new $c.Ptr(fbuf2, 0));
-    if (dfeature && !$c.strcmp(dfeature, $c.lit("pool of water")) && (u.uinwater | 0)) {
+    if (dfeature && !$c.strcmp(dfeature, $c.lit("pool of water")) && Underwater()) {
         dfeature = null;
     }
     if (Blind()) {
-        drift = $c.i8((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? 1 : 0);
+        drift = (svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? 1 : 0;
         if (dfeature && !$c.strncmp(dfeature, $c.lit("altar "), 6)) {
             /* don't say "altar" twice, dfeature has more info */
             await You($c.lit("try to feel what is here."));
-        } else if ((svl.level.locations[u.ux][u.uy].typ === DRAWBRIDGE_UP ? db_under_typ(svl.level.locations[u.ux][u.uy].flags | 0) : svl.level.locations[u.ux][u.uy].typ) === ICE) {
+        } else if ((svl.level.locations[u.ux][u.uy].typ === DRAWBRIDGE_UP ? db_under_typ(svl.level.locations[u.ux][u.uy].flags) : svl.level.locations[u.ux][u.uy].typ) === ICE) {
             /* using describe_decor() to handle ice is simpler than
                replicating it in the conditional message construction */
             if (!flags.mention_decor || iflags.prev_decor === ICE) {
@@ -4222,7 +4222,7 @@ export async function look_here(obj_cnt, lookhere_flags) {   // invent.c:4104
             await You($c.lit("try to feel what is on it."));
             skip_dfeature = TRUE;   /* ice already described */
         } else {
-            cant_reach = $c.i8(!can_reach_floor(TRUE) ? 1 : 0);
+            cant_reach = !can_reach_floor(TRUE) ? 1 : 0;
             surf = surface(u.ux, u.uy);
             where = cant_reach ? $c.lit("lying beneath you") : $c.lit("lying here on the ");
             onwhat = cant_reach ? $c.lit("") : surf;
@@ -4232,7 +4232,7 @@ export async function look_here(obj_cnt, lookhere_flags) {   // invent.c:4104
             }
         }
         trap = t_at(u.ux, u.uy);
-        if (!can_reach_floor($c.i8(trap && is_pit(trap.ttyp) ? 1 : 0))) {
+        if (!can_reach_floor(trap && is_pit(trap.ttyp) ? 1 : 0)) {
             await pline($c.lit("But you can't reach it!"));
             return ECMD.OK;
         }
@@ -4396,20 +4396,20 @@ export async function mergable(otmp, obj) {   // invent.c:4379
     otmpnamelth = 0;
     /* fail if already the same object, if different types, if either is
        explicitly marked to prevent merge, or if not mergable in general */
-    if ($c.peq(obj, otmp) || obj.otyp !== otmp.otyp || obj.nomerge | 0 || otmp.nomerge | 0 || !objects[obj.otyp].oc_merge) {
+    if ($c.peq(obj, otmp) || obj.otyp !== otmp.otyp || obj.nomerge || otmp.nomerge || !objects[obj.otyp].oc_merge) {
         return FALSE;
     }
     /* coins of the same kind will always merge */
     if (obj.oclass === COIN_CLASS) {
         return TRUE;
     }
-    if ((obj.cursed | 0) !== (otmp.cursed | 0) || (obj.blessed | 0) !== (otmp.blessed | 0)) {
+    if (obj.cursed !== otmp.cursed || obj.blessed !== otmp.blessed) {
         return FALSE;
     }
-    if ((obj.how_lost | 0) === LOST.EXPLODING || (otmp.how_lost | 0) === LOST.EXPLODING) {
+    if (obj.how_lost === LOST.EXPLODING || otmp.how_lost === LOST.EXPLODING) {
         return FALSE;
     }
-    if ((otmp.how_lost | 0) !== LOST.NONE && (obj.how_lost | 0) !== (otmp.how_lost | 0)) {
+    if (otmp.how_lost !== LOST.NONE && obj.how_lost !== otmp.how_lost) {
         return FALSE;
     }
     /* don't require 'bypass' to match; that results in items dropped
@@ -4421,16 +4421,16 @@ export async function mergable(otmp, obj) {   // invent.c:4379
     /* Checks beyond this point either aren't applicable to globs
      * or don't inhibit their merger.
      */
-    if ((obj.unpaid | 0) !== (otmp.unpaid | 0) || obj.spe !== otmp.spe || (obj.no_charge | 0) !== (otmp.no_charge | 0) || (obj.obroken | 0) !== (otmp.obroken | 0) || (obj.otrapped | 0) !== (otmp.otrapped | 0) || (obj.lamplit | 0) !== (otmp.lamplit | 0)) {
+    if (obj.unpaid !== otmp.unpaid || obj.spe !== otmp.spe || obj.no_charge !== otmp.no_charge || obj.obroken !== otmp.obroken || obj.otrapped !== otmp.otrapped || obj.lamplit !== otmp.lamplit) {
         return FALSE;
     }
-    if (obj.oclass === FOOD_CLASS && (obj.oeaten !== otmp.oeaten || (obj.oeroded | 0) !== (otmp.oeroded | 0))) {
+    if (obj.oclass === FOOD_CLASS && (obj.oeaten !== otmp.oeaten || obj.oeroded !== otmp.oeroded)) {
         return FALSE;
     }
-    if ((obj.dknown | 0) !== (otmp.dknown | 0) || (obj.bknown | 0) !== (otmp.bknown | 0) && !(gu.urole.mnum === PM.CLERIC) && (Blind() || Hallucination()) || (obj.oeroded | 0) !== (otmp.oeroded | 0) || (obj.oeroded2 | 0) !== (otmp.oeroded2 | 0) || (obj.greased | 0) !== (otmp.greased | 0)) {
+    if (obj.dknown !== otmp.dknown || obj.bknown !== otmp.bknown && !(gu.urole.mnum === PM.CLERIC) && (Blind() || Hallucination()) || obj.oeroded !== otmp.oeroded || obj.oeroded2 !== otmp.oeroded2 || obj.greased !== otmp.greased) {
         return FALSE;
     }
-    if (erosion_matters(obj) && ((obj.oerodeproof | 0) !== (otmp.oerodeproof | 0) || (obj.rknown | 0) !== (otmp.rknown | 0) && (Blind() || Hallucination()))) {
+    if (erosion_matters(obj) && (obj.oerodeproof !== otmp.oerodeproof || obj.rknown !== otmp.rknown && (Blind() || Hallucination()))) {
         return FALSE;
     }
     if (obj.otyp === CORPSE || obj.otyp === EGG || obj.otyp === TIN) {
@@ -4448,11 +4448,11 @@ export async function mergable(otmp, obj) {   // invent.c:4379
         return FALSE;
     }
     /* burning potions of oil never merge */
-    if (obj.otyp === POT_OIL && obj.lamplit | 0) {
+    if (obj.otyp === POT_OIL && obj.lamplit) {
         return FALSE;
     }
     /* don't merge surcharged item with base-cost item */
-    if (obj.unpaid | 0 && !await same_price(obj, otmp)) {
+    if (obj.unpaid && !await same_price(obj, otmp)) {
         return FALSE;
     }
     /* some additional information is always incompatible */
@@ -4480,7 +4480,7 @@ export async function mergable(otmp, obj) {   // invent.c:4379
     if (obj.oartifact !== otmp.oartifact) {
         return FALSE;
     }
-    if ((obj.known | 0) !== (otmp.known | 0) && (Blind() || Hallucination())) {
+    if (obj.known !== otmp.known && (Blind() || Hallucination())) {
         return FALSE;
     }
     return TRUE;
@@ -4696,7 +4696,7 @@ function tool_being_used(obj) {   // invent.c:4698
         return FALSE;
     }
     /* [don't actually need to check uwep here; caller catches it] */
-    return $c.i8($c.peq(obj, $G.uwep) || obj.lamplit | 0 || obj.otyp === LEASH && obj.corpsenm ? 1 : 0);
+    return $c.peq(obj, $G.uwep) || obj.lamplit || obj.otyp === LEASH && obj.corpsenm ? 1 : 0;
 }
 /* the #seetools command */
 /**
@@ -4756,7 +4756,7 @@ export async function doprinuse() {   // invent.c:4740
  */
 export async function useupf(obj, numused) {   // invent.c:4763
     let otmp = null, at_u = 0;
-    at_u = $c.i8(obj.ox === u.ux && obj.oy === u.uy ? 1 : 0);
+    at_u = obj.ox === u.ux && obj.oy === u.uy ? 1 : 0;
     /* burn_floor_objects() keeps an object pointer that it tries to
      * useupf() multiple times, so obj must survive if plural */
     if (obj.quan > numused) {
@@ -4772,7 +4772,7 @@ export async function useupf(obj, numused) {   // invent.c:4763
         }
     }
     await delobj(otmp);
-    if (at_u && u.uundetected | 0 && hides_under(gy.youmonst.data)) {
+    if (at_u && u.uundetected && hides_under(gy.youmonst.data)) {
         await hideunder(gy.youmonst);
     }
 }
@@ -5044,7 +5044,7 @@ async function doorganize_core(obj$in) {   // invent.c:5068
        stacks and/or gold in some other slot, otherwise (*adjust_filter)()
        won't allow gold to be picked; if player has picked any stack of gold
        as #adjust 'from' slot, we'll force the 'to' slot to be '$' below */
-    isgold = $c.i8(obj[0].oclass === COIN_CLASS ? 1 : 0);
+    isgold = obj[0].oclass === COIN_CLASS ? 1 : 0;
     /* figure out whether user gave a split count to getobj() */
     splitting[0] = bumped = null;
     for (otmp[0] = gi.invent; otmp[0]; otmp[0] = otmp[0].nobj) {
@@ -5057,7 +5057,7 @@ async function doorganize_core(obj$in) {   // invent.c:5068
         }
     }
     /* initialize the list with all lower and upper case letters */
-    lets[GOLD_INDX] = $c.i8(obj[0].oclass === COIN_CLASS ? GOLD_SYM : 32);
+    lets[GOLD_INDX] = obj[0].oclass === COIN_CLASS ? GOLD_SYM : 32;
     for (ix = GOLD_OFFSET, let_ = 97; let_ <= 122; ) {
         $t3 = ($t2 = let_, let_ = $c.i8($t2 + 1), $t2), $t4 = new $c.Ptr(lets, ($t1 = ix, ix = $t1 + 1 | 0, $t1)), $t4.set(0, $t3);
     }
@@ -5076,9 +5076,9 @@ async function doorganize_core(obj$in) {   // invent.c:5068
         if (!$c.peq(otmp[0], obj[0]) && !await mergable(otmp[0], obj[0])) {
             let_ = otmp[0].invlet;
             if (let_ >= 97 && let_ <= 122) {
-                lets[(GOLD_OFFSET + let_ | 0) - 97 | 0] = 32;
+                lets[GOLD_OFFSET + let_ - 97] = 32;
             } else if (let_ >= 65 && let_ <= 90) {
-                lets[((GOLD_OFFSET + let_ | 0) - 65 | 0) + 26 | 0] = 32;
+                lets[GOLD_OFFSET + let_ - 65 + 26] = 32;
             } else if (let_ === 35) {
                 /* overflow defaults to off, but it we find a stack using that
                    slot, switch to on -- the opposite of normal invlet handling */
@@ -5109,9 +5109,9 @@ async function doorganize_core(obj$in) {   // invent.c:5068
         D1: for (;;) {
             switch ($goto) {
             case null:
-                let_ = $c.i8(!isgold ? await yn_function(new $c.Ptr(qbuf, 0), null, 0, TRUE) : GOLD_SYM);
+                let_ = !isgold ? await yn_function(new $c.Ptr(qbuf, 0), null, 0, TRUE) : GOLD_SYM;
                 if (let_ === 63 || let_ === 42) {
-                    let_ = await display_used_invlets($c.i8(splitting[0] ? obj[0].invlet : 0));
+                    let_ = await display_used_invlets(splitting[0] ? obj[0].invlet : 0);
                     if (!let_) {
                         continue L2;
                     }
@@ -5151,7 +5151,7 @@ async function doorganize_core(obj$in) {   // invent.c:5068
             break;
         }
     }
-    collect = $c.i8(let_ === obj[0].invlet ? 1 : 0);
+    collect = let_ === obj[0].invlet ? 1 : 0;
     /* change the inventory and print the resulting item */
     adj_type = collect ? $c.lit("Collecting:") : !splitting[0] ? $c.lit("Moving:") : $c.lit("Splitting:");
     /*
@@ -5282,7 +5282,7 @@ async function invdisp_nothing(hdr, txt) {   // invent.c:5290
 function worn_wield_only(obj) {   // invent.c:5309
     /* check for things that *are* worn or wielded (only used for monsters,
        so we don't worry about excluding W_CHAIN, W_ARTI and the like) */
-    return $c.i8(obj.owornmask !== 0 ? 1 : 0);
+    return obj.owornmask !== 0 ? 1 : 0;
     /* this used to check for things that *might* be worn or wielded,
        but that's not particularly interesting */
 }
@@ -5357,7 +5357,7 @@ async function cinv_doname(obj) {   // invent.c:5391
     /* 'result' is an obuf[] but might point into the middle (&buf[PREFIX])
        rather than the beginning and we don't have access to that;
        assume that there is at least QBUFSZ available when reusing it */
-    if (obj.otrapped | 0 && $c.addu64($c.strlen(result), 9) <= QBUFSZ) {
+    if (obj.otrapped && $c.addu64($c.strlen(result), 9) <= QBUFSZ) {
         /* obj->lknown has been set before calling us so either "locked" or
            "unlocked" should always be present (for a trapped container) */
         p = strstri(result, $c.lit(" locked"));
@@ -5422,7 +5422,7 @@ export async function display_cinventory(obj) {   // invent.c:5446
     } else {
         ret = null;
     }
-    obj.cknown = (1) & 1;
+    obj.cknown = 1;
     return ret;
 }
 /**
@@ -5430,7 +5430,7 @@ export async function display_cinventory(obj) {   // invent.c:5446
  * @returns {number} boolean
  */
 function only_here(obj) {   // invent.c:5477
-    return $c.i8(obj.ox === go.only.x && obj.oy === go.only.y ? 1 : 0);
+    return obj.ox === go.only.x && obj.oy === go.only.y ? 1 : 0;
 }
 /*
  * Display a list of buried or underwater items in inventory style.
@@ -5457,7 +5457,7 @@ export async function display_binventory(x, y, as_if_seen) {   // invent.c:5489
         real_liquid = is_pool(x, y) ? $c.lit("water") : $c.lit("lava");
         seen_liquid = hliquid(real_liquid);
         if (!obj.v.v_nexthere) {
-            more_than_1 = $c.i8(is_plural(obj));
+            more_than_1 = is_plural(obj);
             await There($c.lit("%s %s under the %s here."), more_than_1 ? $c.lit("are") : $c.lit("is"), await doname(obj), seen_liquid);
             n2 = 1;
             /* "pair of boots" is singular but "beneath it" sounds strange */

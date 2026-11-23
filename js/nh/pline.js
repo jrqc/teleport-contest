@@ -250,7 +250,7 @@ async function vpline(line, the_args) {   // pline.c:153
             iflags.last_msg = PLNMSG.UNKNOWN;
             break pline_done$;
         }
-        no_repeat = $c.i8((gp.pline_flags & PLINE_NOREPEAT) >>> 0 ? TRUE : FALSE);
+        no_repeat = (gp.pline_flags & PLINE_NOREPEAT) >>> 0 ? TRUE : FALSE;
         if ((gp.pline_flags & OVERRIDE_MSGTYPE) >>> 0 === 0) {
             msgtyp = msgtype_type(line, no_repeat);
             /* FIXME: we need a way to tell our caller that this message
@@ -600,7 +600,7 @@ export async function impossible(s, ...$va) {   // pline.c:584
         await pline($c.lit("Alternatively, contact local support: %s"), sysopt.support);
     }
     if (sysopt.crashreporturl) {
-        report = $c.i8(121 === await yn_function($c.lit("Report now?"), new $c.Ptr(ynchars, 0), 110, FALSE) ? 1 : 0);
+        report = 121 === await yn_function($c.lit("Report now?"), new $c.Ptr(ynchars, 0), 110, FALSE) ? 1 : 0;
         await raw_print()($c.lit(""));   /* prove to the user the character was accepted */
         if (report) {
             await submit_web_report(1, $c.lit("Impossible"), new $c.Ptr(pbuf, 0));

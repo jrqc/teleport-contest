@@ -121,15 +121,15 @@ export async function dosave0() {   // save.c:74
     /* we may get here via hangup signal, in which case we want to fix up
        a few of things before saving so that they won't be restored in
        an improper state; these will be no-ops for normal save sequence */
-    u.uinvulnerable = (0) & 1;
+    u.uinvulnerable = 0;
     if (iflags.save_uswallow) {
-        u.uswallow = (1) & 1, iflags.save_uswallow = (0) & 1;
+        u.uswallow = 1, iflags.save_uswallow = 0;
     }
     if (iflags.save_uinwater) {
-        u.uinwater = (1) & 1, iflags.save_uinwater = (0) & 1;   /* bypass set_uinwater() */
+        u.uinwater = 1, iflags.save_uinwater = 0;   /* bypass set_uinwater() */
     }
     if (iflags.save_uburied) {
-        u.uburied = (1) & 1, iflags.save_uburied = (0) & 1;
+        u.uburied = 1, iflags.save_uburied = 0;
     }
     /* extra handling for hangup save or panic save; without this,
        a thrown light source might trigger an "obj_is_local" panic;
@@ -337,7 +337,7 @@ async function savegamestate(nhfp) {   // save.c:265
     for (i = 0; i < NUMMONS; i = i + 1 | 0) {
         await sfo_mvitals(nhfp, $c.relem(svm.mvitals, i), $c.lit("gamestate-mvitals"));
     }
-    await save_dungeon(nhfp, $c.i8(!!update_file(nhfp) ? 1 : 0), $c.i8(!!release_data(nhfp) ? 1 : 0));
+    await save_dungeon(nhfp, !!update_file(nhfp) ? 1 : 0, !!release_data(nhfp) ? 1 : 0);
     await savelevchn(nhfp);
     await sfo_q_score(nhfp, svq.quest_status, $c.lit("gamestate-quest_status"));
     for (i = 0; i < MAXSPELL + 1; i = i + 1 | 0) {
@@ -465,7 +465,7 @@ export async function savestateinlock() {   // save.c:351
  */
 export async function savelev(nhfp, lev) {   // save.c:429
     let set_uz_save = 0, $t1;
-    set_uz_save = $c.i8(gu.uz_save.dnum === 0 && gu.uz_save.dlevel === 0 ? 1 : 0);
+    set_uz_save = gu.uz_save.dnum === 0 && gu.uz_save.dlevel === 0 ? 1 : 0;
     /* caller might have already set up gu.uz_save and zeroed u.uz;
        if not, we need to set it for save_bubbles(); caveat: if the
        player quits during character selection, u.uz won't be set yet
@@ -702,7 +702,7 @@ async function save_stairs(nhfp) {   // save.c:665
     buflen[0] = 24;
     while (stway) {
         if (update_file(nhfp)) {
-            use_relative = $c.i8(program_state.restoring !== REST.GSTATE && stway.tolev.dnum === u.uz.dnum ? 1 : 0);
+            use_relative = program_state.restoring !== REST.GSTATE && stway.tolev.dnum === u.uz.dnum ? 1 : 0;
             if (use_relative) {
                 /* make dlevel relative to current level */
                 stway.tolev.dlevel = $c.i16(stway.tolev.dlevel - u.uz.dlevel | 0);
@@ -799,7 +799,7 @@ async function saveobj(nhfp, otmp) {   // save.c:726
 async function saveobjchn(nhfp, obj_p) {   // save.c:762
     let otmp = null, otmp2 = null, is_invent = 0, minusone = Int32Array.of(0);
     otmp = obj_p.get(0);
-    is_invent = $c.i8(otmp && $c.peq(otmp, gi.invent) ? 1 : 0);
+    is_invent = otmp && $c.peq(otmp, gi.invent) ? 1 : 0;
     minusone[0] = -1;
     while (otmp) {
         otmp2 = otmp.nobj;
@@ -832,7 +832,7 @@ async function saveobjchn(nhfp, obj_p) {   // save.c:762
             otmp.nobj = null;   /* nobj saved into otmp2 */
             otmp.cobj = null;   /* contents handled above */
             otmp.timed = 0;   /* not timed any more */
-            otmp.lamplit = (0) & 1;   /* caller handled lights */
+            otmp.lamplit = 0;   /* caller handled lights */
             otmp.corpsenm = 0;
             /* mon->mleashed could still be set;
              * unfortunately, we can't clear that
@@ -866,7 +866,7 @@ async function saveobjchn(nhfp, obj_p) {   // save.c:762
  */
 async function savemon(nhfp, mtmp) {   // save.c:826
     let buflen = Int32Array.of(0);
-    mtmp.mtemplit = (0) & 1;
+    mtmp.mtemplit = 0;
     /* normally clear; if set here then a panic save
      * is being written while bhit() was executing */
     buflen[0] = 192;
@@ -968,7 +968,7 @@ async function savemonchn(nhfp, mtmp) {   // save.c:884
 async function savetrapchn(nhfp, trap) {   // save.c:920
     let trap2 = null, use_relative = 0;
     while (trap) {
-        use_relative = $c.i8(program_state.restoring !== REST.GSTATE && trap.dst.dnum === u.uz.dnum ? 1 : 0);
+        use_relative = program_state.restoring !== REST.GSTATE && trap.dst.dnum === u.uz.dnum ? 1 : 0;
         trap2 = trap.ntrap;
         if (use_relative) {
             trap.dst.dlevel = $c.i16(trap.dst.dlevel - u.uz.dlevel | 0);   /* make it relative */
@@ -1056,7 +1056,7 @@ export async function store_plname_in_file(nhfp) {   // save.c:999
     $c.memset(new $c.Ptr(hero, 0), 0, 49);
     /* augment svp.plname[]; the gender and alignment values reflect those
        in effect at time of saving rather than at start of game */
-    nh_snprintf($c.lit("store_plname_in_file"), 1010, new $c.Ptr(hero, 0), 49, $c.lit("%s-%.3s-%.3s-%.3s-%.3s"), new $c.Ptr(svp.plname, 0), gu.urole.filecode, gu.urace.filecode, genders[flags.female].filecode, aligns[1 - u.ualign.type | 0].filecode);
+    nh_snprintf($c.lit("store_plname_in_file"), 1010, new $c.Ptr(hero, 0), 49, $c.lit("%s-%.3s-%.3s-%.3s-%.3s"), new $c.Ptr(svp.plname, 0), gu.urole.filecode, gu.urace.filecode, genders[flags.female].filecode, aligns[1 - u.ualign.type].filecode);
     /* replace "-role-race..." with "\0role-race..." so that we can include
        or exclude the role-&c suffix easily, without worrying about whether
        plname contains any dashes; but don't rely on snprintf() for this */
@@ -1064,7 +1064,7 @@ export async function store_plname_in_file(nhfp) {   // save.c:999
     /* insert playmode into final slot of hero[];
        'D','X','-' are the same characters as are used for paniclog entries */
     (!(hero[PL_NSIZ_PLUS - 1 - 1] === 0) ? 1 : 0) ? $c.__assert_rtn($c.lit("store_plname_in_file"), $c.lit("save.c"), 1017, $c.lit("hero[PL_NSIZ_PLUS - 1 - 1] == '\\0'")) : 0;
-    hero[PL_NSIZ_PLUS - 1] = $c.i8(wizard() ? 68 : discover() ? 88 : 45);
+    hero[PL_NSIZ_PLUS - 1] = wizard() ? 68 : discover() ? 88 : 45;
     if (nhfp.structlevel) {
         await bufoff(nhfp.fd);   /* bwrite() before bufon() uses plain write() */
     }

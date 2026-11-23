@@ -209,7 +209,7 @@ export async function match_str2attr(str, complain) {   // coloratt.c:374
 export async function query_attr(prompt, dflt_attr) {   // coloratt.c:396
     let tmpwin = 0, any = new $T.any(), i = 0, pick_cnt = 0, picks = [null], allow_many = 0, clr = 0, j = 0, k = 0;
     picks[0] = null;
-    allow_many = $c.i8(prompt && !strncmpi(prompt, $c.lit("Choose"), 6) ? 1 : 0);
+    allow_many = prompt && !strncmpi(prompt, $c.lit("Choose"), 6) ? 1 : 0;
     clr = NO_COLOR;
     tmpwin = await create_nhwindow()(NHW.MENU);
     await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
@@ -343,7 +343,7 @@ export async function basic_menu_colors(load_colors) {   // coloratt.c:530
             gm.menu_colorings = gc.color_colorings;
         } else {
             /* create the alternate colorings once */
-            pmatchregex = $c.i8(!strncmpi(new $c.Ptr(regex_id, 0), $c.lit("pmatchregex"), -1) ? 1 : 0);
+            pmatchregex = !strncmpi(new $c.Ptr(regex_id, 0), $c.lit("pmatchregex"), -1) ? 1 : 0;
             patternfmt = pmatchregex ? $c.lit("*%s") : $c.lit("%s");
             /* menu_colorings pointer has been saved; clear it in order
                to add the alternate entries as if from scratch */
@@ -681,12 +681,12 @@ export function set_map_customcolor(gmap, nhcolor) {   // coloratt.c:868
  */
 export function color_distance(rgb1, rgb2) {   // coloratt.c:979
     let r1 = 0, g1 = 0, b1 = 0, r2 = 0, g2 = 0, b2 = 0, rmean = 0, r = 0, g = 0, b = 0;
-    r1 = (rgb1 >>> 16 & 255) >>> 0 | 0;
-    g1 = (rgb1 >>> 8 & 255) >>> 0 | 0;
-    b1 = (rgb1 & 255) >>> 0 | 0;
-    r2 = (rgb2 >>> 16 & 255) >>> 0 | 0;
-    g2 = (rgb2 >>> 8 & 255) >>> 0 | 0;
-    b2 = (rgb2 & 255) >>> 0 | 0;
+    r1 = (rgb1 >>> 16 & 255) >>> 0;
+    g1 = (rgb1 >>> 8 & 255) >>> 0;
+    b1 = (rgb1 & 255) >>> 0;
+    r2 = (rgb2 >>> 16 & 255) >>> 0;
+    g2 = (rgb2 >>> 8 & 255) >>> 0;
+    b2 = (rgb2 & 255) >>> 0;
     rmean = $c.div32(r1 + r2 | 0, 2);
     r = r1 - r2 | 0;
     g = g1 - g2 | 0;

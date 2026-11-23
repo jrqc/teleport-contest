@@ -232,7 +232,7 @@ function u_calc_moveamt(wtcap) {   // allmain.c:114
  * @returns {Promise<void>}
  */
 async function maybe_generate_rnd_mon() {   // allmain.c:162
-    if (!rn2(u.uevent.udemigod | 0 ? 25 : depth(u.uz) > depth(svd.dungeon_topology.d_stronghold_level) ? 50 : 70)) {
+    if (!rn2(u.uevent.udemigod ? 25 : depth(u.uz) > depth(svd.dungeon_topology.d_stronghold_level) ? 50 : 70)) {
         await makemon(null, 0, 0, NO.MM_FLAGS);
     }
 }
@@ -402,10 +402,10 @@ export async function moveloop_core() {   // allmain.c:177
                 if (u.uhave.amulet) {
                     await amulet();
                 }
-                if (!rn2(40 + Math.imul(acurr(A.DEX), 3) | 0)) {
+                if (!rn2(40 + Math.imul(acurr(A.DEX), 3))) {
                     await u_wipe_engr(rnd(3));
                 }
-                if (u.uevent.udemigod | 0 && !u.uinvulnerable) {
+                if (u.uevent.udemigod && !u.uinvulnerable) {
                     if (u.udg_cnt) {
                         u.udg_cnt = u.udg_cnt - 1 >>> 0;
                     }
@@ -451,7 +451,7 @@ export async function moveloop_core() {   // allmain.c:177
             status_eval_next_unhilite();
         }
         if (svm.moves >= svc.context.seer_turn) {
-            if ((u.uhave.amulet | 0 || Clairvoyant()) && !In_endgame(u.uz) && !BClairvoyant()) {
+            if ((u.uhave.amulet || Clairvoyant()) && !In_endgame(u.uz) && !BClairvoyant()) {
                 await do_vicinity_map(null);
             }
             /* we maintain this counter even when clairvoyance isn't
@@ -484,8 +484,8 @@ export async function moveloop_core() {   // allmain.c:177
     /****************************************/
     clear_splitobjs();
     /* the Amulet of Yendor gives a wish when initially picked up */
-    if (u.uhave.amulet | 0 && !u.uevent.amulet_wish) {
-        u.uevent.amulet_wish = (1) & 1;
+    if (u.uhave.amulet && !u.uevent.amulet_wish) {
+        u.uevent.amulet_wish = 1;
         await display_nhwindow()($G.WIN_MESSAGE, TRUE);
         await urgent_pline($c.lit("The Amulet is bestowing a wish upon you!"));
         await makewish();
@@ -619,7 +619,7 @@ export async function moveloop(resuming) {   // allmain.c:587
 async function regen_pw(wtcap) {   // allmain.c:600
     let upper = 0, $t1;
     if (u.uen < u.uenmax && (wtcap < MOD_ENCUMBER && !$c.rem64(svm.moves, $c.div32(Math.imul(MAXULEV + 8 - u.ulevel | 0, gu.urole.mnum === PM.WIZARD ? 3 : 4), 6)) || Energy_regeneration())) {
-        upper = $c.div32(ACURR(A.WIS) + ACURR(A.INT) | 0, 15) + 1 | 0;
+        upper = $c.div32(ACURR(A.WIS) + ACURR(A.INT), 15) + 1 | 0;
         if (EMagical_breathing()) {
             upper = upper + 2 | 0;
         }
@@ -642,7 +642,7 @@ async function regen_hp(wtcap) {   // allmain.c:625
     let heal = 0, reached_full = 0, encumbrance_ok = 0;
     heal = 0;
     reached_full = FALSE;
-    encumbrance_ok = $c.i8(wtcap < MOD_ENCUMBER || !u.umoved ? 1 : 0);
+    encumbrance_ok = wtcap < MOD_ENCUMBER || !u.umoved ? 1 : 0;
     if (Upolyd()) {
         if (u.mh < 1) {
             /* shouldn't happen... */
@@ -661,7 +661,7 @@ async function regen_hp(wtcap) {   // allmain.c:625
         if (heal) {
             disp.botl = TRUE;
             u.mh = u.mh + heal | 0;
-            reached_full = $c.i8(u.mh === u.mhmax ? 1 : 0);
+            reached_full = u.mh === u.mhmax ? 1 : 0;
         }
         /* !Upolyd */
     } else {
@@ -684,7 +684,7 @@ async function regen_hp(wtcap) {   // allmain.c:625
                     u.uhp = u.uhpmax;
                 }
                 /* stop voluntary multi-turn activity if now fully healed */
-                reached_full = $c.i8(u.uhp === u.uhpmax ? 1 : 0);
+                reached_full = u.uhp === u.uhpmax ? 1 : 0;
             }
         }
     }
@@ -765,7 +765,7 @@ export async function newgame() {   // allmain.c:766
     svc.context.tribute.tributesz = 16;
     get_nhuuid();
     for (i = LOW_PM; i < NUMMONS; i = i + 1 | 0) {
-        svm.mvitals[i].mvflags = $c.u8(mons[i].geno & G_NOCORPSE);
+        svm.mvitals[i].mvflags = mons[i].geno & G_NOCORPSE;
     }
     await init_objects();   /* must be before u_init() */
     flags.pantheon = -1;   /* role_init() will reset this */
@@ -838,8 +838,8 @@ export async function newgame() {   // allmain.c:766
 export async function welcome(new_game) {   // allmain.c:854
     let buf = new Int8Array(256), currentgend = 0, adrift = 0;
     /* false => restoring an old game */
-    currentgend = $c.i8(Upolyd() ? u.mfemale | 0 : flags.female);
-    adrift = $c.i8(u.ualign.type !== u.ualignbase[A.CURRENT] ? 1 : 0);
+    currentgend = Upolyd() ? u.mfemale : flags.female;
+    adrift = u.ualign.type !== u.ualignbase[A.CURRENT] ? 1 : 0;
     await l_nhcore_call(new_game ? NHCORE.START_NEW_GAME : NHCORE.RESTORE_OLD_GAME);
     /* skip "welcome back" if restoring a doomed character */
     if (!new_game && Upolyd() && ugenocided()) {

@@ -110,7 +110,7 @@ export function wipeout_text(engr, cnt, seed) {   // engrave.c:120
                    sequence by varying any of them */
                 nxt = $c.remu32(seed, lth) | 0;
                 seed = Math.imul(seed, 31) >>> 0, seed = $c.remu32(seed, BUFSZ - 1);
-                use_rubout = (seed & 3) >>> 0 | 0;
+                use_rubout = (seed & 3) >>> 0;
             }
             s = engr.add(nxt);
             if (s.get(0) === 32) {
@@ -163,14 +163,14 @@ export function can_reach_floor(check_pit) {   // engrave.c:187
        has been lifted up above the floor [doesn't explain
        how hero can attack the creature holding him or her;
        that's life in nethack...] */
-    if (u.uswallow | 0 || u.ustuck && !sticks(gy.youmonst.data) && attacktype(u.ustuck.data, AT.HUGS) || Levitation() && !((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) {
+    if (u.uswallow || u.ustuck && !sticks(gy.youmonst.data) && attacktype(u.ustuck.data, AT.HUGS) || Levitation() && !((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) {
         return FALSE;
     }
     /* Restricted/unskilled riders can't reach the floor */
     if (u.usteed && u.weapon_skills[P.RIDING].skill < P.BASIC) {
         return FALSE;
     }
-    if (u.uundetected | 0 && ceiling_hider(gy.youmonst.data)) {
+    if (u.uundetected && ceiling_hider(gy.youmonst.data)) {
         return FALSE;
     }
     if ((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked || gy.youmonst.data.msize >= MZ.HUGE) {
@@ -263,7 +263,7 @@ export async function wipe_engr_at(x, y, cnt, magical) {   // engrave.c:271
         } while (0);
         if (ep.engr_type !== BURN || is_ice(x, y) || magical && !rn2(2)) {
             if (ep.engr_type !== DUST && ep.engr_type !== ENGR_BLOOD) {
-                cnt = $c.i16(rn2(1 + $c.div32(50, cnt + 1 | 0) | 0) ? 0 : 1);
+                cnt = rn2(1 + $c.div32(50, cnt + 1) | 0) ? 0 : 1;
                 do {
                     if (debugcore($c.lit("engrave.c"), TRUE)) {
                         save_plnmsg$2 = iflags.last_msg;
@@ -382,8 +382,8 @@ export async function read_engr_at(x, y) {   // engrave.c:318
             }
             await You($c.lit("%s: \"%s\"%s"), (u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked ? $c.lit("feel the words") : $c.lit("read"), et, endpunct);
             $c.strcpy(ep.engr_txt[remembered_text], ep.engr_txt[actual_text]);
-            ep.eread = (1) & 1;
-            ep.erevealed = (1) & 1;
+            ep.eread = 1;
+            ep.erevealed = 1;
             if (svc.context.run > 0) {
                 nomul(0);
             }
@@ -433,7 +433,7 @@ export async function make_engr_at(x, y, s, pristine_s, e_time, e_type) {   // e
            an old-style Elbereth that deters monsters when any objects are
            present; otherwise (done by the player), exercises wisdom */
         if (gi.in_mklev) {
-            ep.guardobjects = (1) & 1;
+            ep.guardobjects = 1;
         } else {
             await exercise(A.WIS, TRUE);
         }
@@ -494,7 +494,7 @@ function stylus_ok(obj) {   // engrave.c:481
  */
 async function u_can_engrave() {   // engrave.c:503
     let levtyp = 0;
-    levtyp = svl.level.locations[u.ux][u.uy].typ === DRAWBRIDGE_UP ? db_under_typ(svl.level.locations[u.ux][u.uy].flags | 0) : svl.level.locations[u.ux][u.uy].typ;
+    levtyp = svl.level.locations[u.ux][u.uy].typ === DRAWBRIDGE_UP ? db_under_typ(svl.level.locations[u.ux][u.uy].flags) : svl.level.locations[u.ux][u.uy].typ;
     if (u.uswallow) {
         if (is_animal(u.ustuck.data)) {
             await pline($c.lit("What would you write?  \"Jonah was here\"?"));
@@ -561,7 +561,7 @@ function doengrave_ctx_init(de) {   // engrave.c:545
     if (is_demon(gy.youmonst.data) || is_vampire(gy.youmonst.data)) {
         de.type = ENGR_BLOOD;
     }
-    de.jello = $c.i8(u.uswallow | 0 && !(is_animal(u.ustuck.data) || is_whirly(u.ustuck.data)) ? 1 : 0);
+    de.jello = u.uswallow && !(is_animal(u.ustuck.data) || is_whirly(u.ustuck.data)) ? 1 : 0;
     $t2 = is_ice(u.ux, u.uy), de.frosted = $t2;
 }
 /* special engraving effects for WAND objects */
@@ -763,7 +763,7 @@ async function doengrave_sfx_item(de) {   // engrave.c:742
              */
             if (await zappable(de.otmp)) {
                 await check_unpaid(de.otmp);
-                if (de.otmp.cursed | 0 && !rn2(WAND.BACKFIRE_CHANCE)) {
+                if (de.otmp.cursed && !rn2(WAND.BACKFIRE_CHANCE)) {
                     await wand_explode(de.otmp, 0);
                     de.ret = ECMD.TIME;
                     return FALSE;
@@ -1012,8 +1012,8 @@ export async function doengrave() {   // engrave.c:956
         }
         if (de.teleengr) {
             await rloc_engr(de.oep);
-            de.oep.eread = (0) & 1;
-            de.oep.erevealed = (0) & 1;
+            de.oep.eread = 0;
+            de.oep.erevealed = 0;
             de.disprefresh = TRUE;
             de.oep = null;
         }
@@ -1029,8 +1029,8 @@ export async function doengrave() {   // engrave.c:956
             if (!Blind()) {
                 if (tmp_ep !== null) {
                     await pline_The($c.lit("engraving now reads: \"%s\"."), new $c.Ptr(de.buf, 0));
-                    tmp_ep.eread = (1) & 1;
-                    tmp_ep.erevealed = (1) & 1;
+                    tmp_ep.eread = 1;
+                    tmp_ep.erevealed = 1;
                     de.disprefresh = TRUE;
                 }
             }
@@ -1098,7 +1098,7 @@ export async function doengrave() {   // engrave.c:956
             }
         }
         $t3 = surface(u.ux, u.uy), de.eloc = $t3;
-        de.adding = $c.i8(de.oep && !de.eow ? 1 : 0);
+        de.adding = de.oep && !de.eow ? 1 : 0;
         doengrave_ctx_verb(de);
         /* Tell adventurer what is going on */
         if (!$c.peq(de.otmp, hands_obj)) {
@@ -1195,11 +1195,11 @@ async function engrave() {   // engrave.c:1267
      * anything already there */
     /* "You finish [foo]." */
     /* shorthand for svc.context.engraving.stylus */
-    firsttime = $c.i8(svc.context.engraving.actionct === 0 ? 1 : 0);
+    firsttime = svc.context.engraving.actionct === 0 ? 1 : 0;
     rate = 10;   /* # characters that can be engraved in this action */
     truncate = FALSE;
-    neweng = $c.i8(svc.context.engraving.actionct === 0 ? 1 : 0);
-    carving = $c.i8(svc.context.engraving.type === ENGRAVE || svc.context.engraving.type === HEADSTONE ? 1 : 0);
+    neweng = svc.context.engraving.actionct === 0 ? 1 : 0;
+    carving = svc.context.engraving.type === ENGRAVE || svc.context.engraving.type === HEADSTONE ? 1 : 0;
     /* points at character 1 beyond the last character to engrave
      * this action */
     if (svc.context.engraving.pos.x !== u.ux || svc.context.engraving.pos.y !== u.uy) {
@@ -1223,8 +1223,8 @@ async function engrave() {   // engrave.c:1267
             return 0;
         }
     }
-    dulling_wep = $c.i8(carving && stylus && stylus.oclass === WEAPON_CLASS && (stylus.otyp !== ATHAME || stylus.cursed | 0) ? 1 : 0);
-    marker = $c.i8(stylus && stylus.otyp === MAGIC_MARKER && svc.context.engraving.type === MARK ? 1 : 0);
+    dulling_wep = carving && stylus && stylus.oclass === WEAPON_CLASS && (stylus.otyp !== ATHAME || stylus.cursed) ? 1 : 0;
+    marker = stylus && stylus.otyp === MAGIC_MARKER && svc.context.engraving.type === MARK ? 1 : 0;
     svc.context.engraving.actionct = svc.context.engraving.actionct + 1 | 0;
     /* sanity checks */
     if (dulling_wep && !is_blade(stylus)) {
@@ -1298,7 +1298,7 @@ async function engrave() {   // engrave.c:1267
             await obj_extract_self(stylus);
             stylus = await hold_another_object(stylus, $c.lit("You drop one %s!"), await doname(stylus), $c.asArr(null, Int8Array));
             nhUse(stylus);
-        } else if (dulled && stylus.known | 0) {
+        } else if (dulled && stylus.known) {
             /* reflect change in stylus->spe; not needed for splitstack
                since hold_another_object() does this */
             await prinv($c.asArr(null, Int8Array), stylus, 1);
@@ -1365,8 +1365,8 @@ async function engrave() {   // engrave.c:1267
     await make_engr_at(u.ux, u.uy, new $c.Ptr(buf, 0), null, $c.sub64(svm.moves, gm.multi), svc.context.engraving.type);
     oep = engr_at(u.ux, u.uy);
     if (oep) {
-        oep.eread = (1) & 1;
-        oep.erevealed = (1) & 1;
+        oep.eread = 1;
+        oep.erevealed = 1;
     }
     if (endc.get(0)) {
         svc.context.engraving.nextc = endc;
@@ -1406,7 +1406,7 @@ export function sanitize_engravings() {   // engrave.c:1498
 export function forget_engravings() {   // engrave.c:1509
     let ep = null, $t1;
     for (ep = $G.head_engr; ep; ep = ep.nxt_engr) {
-        $t1 = ep.eread = (0) & 1, ep.erevealed = ($t1) & 1;
+        $t1 = ep.eread = 0, ep.erevealed = ($t1) & 1;
         /* Note: engr_txt[actual_text], engr_txt[rememberd_text], and
          * engr_txt[pristine_text] retain their original text rather
          * than get updated to reflect each engraving's current text.
@@ -1604,7 +1604,7 @@ export async function disturb_grave(x, y) {   // engrave.c:1707
         await impossible($c.lit("Disturbing already disturbed grave?"));
     } else {
         await You($c.lit("disturb the undead!"));
-        lev.horizontal = (1) & 1;
+        lev.horizontal = 1;
         await makemon(mons[PM.GHOUL], x, y, NO.MM_FLAGS);
         await exercise(A.WIS, FALSE);
     }
@@ -1624,8 +1624,8 @@ export async function see_engraving(ep) {   // engrave.c:1724
  */
 export async function feel_engraving(ep) {   // engrave.c:1732
     if (engr_can_be_felt(ep)) {
-        ep.eread = (1) & 1;
-        ep.erevealed = (1) & 1;
+        ep.eread = 1;
+        ep.erevealed = 1;
         await map_engraving(ep, 1);
         /* in case it's beneath something, redisplay the something */
         await newsym(ep.engr_x, ep.engr_y);

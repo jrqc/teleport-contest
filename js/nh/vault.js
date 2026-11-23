@@ -93,7 +93,7 @@ export function free_egd(mtmp) {   // vault.c:35
         $c.free(mtmp.mextra.egd);
         mtmp.mextra.egd = null;
     }
-    mtmp.isgd = (0) & 1;
+    mtmp.isgd = 0;
 }
 /* try to remove the temporary corridor (from vault to rest of map) being
    maintained by guard 'grd'; if guard is still in it, removal will fail,
@@ -106,7 +106,7 @@ export function free_egd(mtmp) {   // vault.c:35
 async function clear_fcorr(grd, forceshow) {   // vault.c:48
     let fcx = 0, fcy = 0, fcbeg = 0, mtmp = null, sawcorridor = 0, silently = 0, egrd = null, trap = null, lev = null;
     sawcorridor = FALSE;
-    silently = $c.i8(program_state.stopprint ? TRUE : FALSE);
+    silently = program_state.stopprint ? TRUE : FALSE;
     egrd = grd.mextra.egd;
     if (!on_level(egrd.gdlevel, u.uz)) {
         return TRUE;
@@ -117,7 +117,7 @@ async function clear_fcorr(grd, forceshow) {   // vault.c:48
     while ((fcbeg = $c.i16(egrd.fcbeg)) < egrd.fcend) {
         fcx = egrd.fakecorr[fcbeg].fx;
         fcy = egrd.fakecorr[fcbeg].fy;
-        if ((DEADMONSTER(grd) || !in_fcorridor(grd, u.ux, u.uy)) && egrd.gddone | 0) {
+        if ((DEADMONSTER(grd) || !in_fcorridor(grd, u.ux, u.uy)) && egrd.gddone) {
             forceshow = TRUE;
         }
         if (u_at(fcx, fcy) && !DEADMONSTER(grd) || !forceshow && couldsee(fcx, fcy) || Punished() && !carried($G.uball) && $G.uball.ox === fcx && $G.uball.oy === fcy) {
@@ -180,8 +180,8 @@ async function clear_fcorr(grd, forceshow) {   // vault.c:48
  */
 function blackout(x, y) {   // vault.c:123
     let lev = null, i = 0, j = 0, $t1;
-    for (i = x - 1 | 0; i <= (x + 1 | 0); i = i + 1 | 0) {
-        for (j = y - 1 | 0; j <= (y + 1 | 0); j = j + 1 | 0) {
+    for (i = x - 1; i <= x + 1; i = i + 1 | 0) {
+        for (j = y - 1; j <= y + 1; j = j + 1 | 0) {
             if (!isok($c.i16(i), $c.i16(j))) {
                 continue;
             }
@@ -190,7 +190,7 @@ function blackout(x, y) {   // vault.c:123
                to check whether the spot on the far side is lit instead
                of doing a blanket blackout of adjacent locations] */
             if (lev.typ === STONE) {
-                $t1 = lev.waslit = (0) & 1, lev.lit = ($t1) & 1;
+                $t1 = lev.waslit = 0, lev.lit = ($t1) & 1;
             }
             /* mark <i,j> as not having been seen from <x,y> */
             unset_seenv(lev, x, y, $c.i16(i), $c.i16(j));
@@ -204,7 +204,7 @@ function blackout(x, y) {   // vault.c:123
 async function restfakecorr(grd) {   // vault.c:144
     /* it seems you left the corridor - let the guard disappear */
     if (await clear_fcorr(grd, FALSE)) {
-        grd.isgd = (0) & 1;   /* dmonsfree() should delete this mon */
+        grd.isgd = 0;   /* dmonsfree() should delete this mon */
         await mongone(grd);
     }
 }
@@ -247,7 +247,7 @@ export async function grddead(grd) {   // vault.c:175
         dispose = await clear_fcorr(grd, TRUE);
     }
     if (dispose) {
-        grd.isgd = (0) & 1;   /* for dmonsfree() */
+        grd.isgd = 0;   /* for dmonsfree() */
     }
     return dispose;
 }
@@ -274,7 +274,7 @@ export async function findgd() {   // vault.c:204
     let mtmp = null, mprev = null, $t1;
     /* this might find a guard parked at <0,0> since it'll be on fmon list */
     for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
-        if (mtmp.isgd | 0 && on_level(mtmp.mextra.egd.gdlevel, u.uz)) {
+        if (mtmp.isgd && on_level(mtmp.mextra.egd.gdlevel, u.uz)) {
             if (!mtmp.mx && !mtmp.mextra.egd.gddone) {
                 mtmp.mhp = mtmp.mhpmax;
             }
@@ -283,7 +283,7 @@ export async function findgd() {   // vault.c:204
     }
     /* if not on fmon, look for a guard waiting to migrate to this level */
     for (mprev = new $c.FieldRef(gm, "migrating_mons", "ptr"); (mtmp = mprev.get(0)) !== null; mprev = new $c.FieldRef(mtmp, "nmon", "ptr")) {
-        if (mtmp.isgd | 0 && on_level(mtmp.mextra.egd.gdlevel, u.uz)) {
+        if (mtmp.isgd && on_level(mtmp.mextra.egd.gdlevel, u.uz)) {
             /* take out of migrating_mons and place at <0,0>;
                simplified mon_arrive(); avoid that because it would
                send mtmp into limbo if no regular map spot is available */
@@ -314,7 +314,7 @@ export async function vault_summon_gd() {   // vault.c:237
 export function vault_occupied(array) {   // vault.c:244
     let ptr = null;
     for (ptr = array; ptr.get(0); ptr = ptr.add(1)) {
-        if (svr.rooms[ptr.get(0) - ROOMOFFSET | 0].rtype === VAULT) {
+        if (svr.rooms[ptr.get(0) - ROOMOFFSET].rtype === VAULT) {
             return ptr.get(0);
         }
     }
@@ -338,7 +338,7 @@ export async function uleftvault(grd) {   // vault.c:256
             if (canspotmon(grd)) {   /* see or sense via telepathy */
                 await pline($c.lit("%s becomes irate."), await Monnam(grd));
             }
-            grd.mpeaceful = (0) & 1;   /* bypass setmangry() */
+            grd.mpeaceful = 0;   /* bypass setmangry() */
         }
         /* if arriving outside guard's temporary corridor, give the
            guard an extra move to deliver message(s) and to teleport
@@ -358,23 +358,23 @@ async function find_guard_dest(guard, rx, ry) {   // vault.c:281
     let x = 0, y = 0, dd = 0, lx = 0, ly = 0;
     for (dd = 2; dd < ROWNO || dd < COLNO; dd = $c.i16(dd + 1)) {
         incr_radius$: {
-            for (y = $c.i16(u.uy - dd | 0); y <= (u.uy + dd | 0); y = $c.i16(y + 1)) {
+            for (y = $c.i16(u.uy - dd); y <= u.uy + dd; y = $c.i16(y + 1)) {
                 if (y < 0 || y > ROWNO - 1) {
                     continue;
                 }
-                for (x = $c.i16(u.ux - dd | 0); x <= (u.ux + dd | 0); x = $c.i16(x + 1)) {
-                    if (y !== (u.uy - dd | 0) && y !== (u.uy + dd | 0) && x !== (u.ux - dd | 0)) {
-                        x = $c.i16(u.ux + dd | 0);
+                for (x = $c.i16(u.ux - dd); x <= u.ux + dd; x = $c.i16(x + 1)) {
+                    if (y !== u.uy - dd && y !== u.uy + dd && x !== u.ux - dd) {
+                        x = $c.i16(u.ux + dd);
                     }
                     if (x < 1 || x > COLNO - 1) {
                         continue;
                     }
-                    if (guard && (x === guard.mx && y === guard.my || guard.isgd | 0 && in_fcorridor(guard, x, y))) {
+                    if (guard && (x === guard.mx && y === guard.my || guard.isgd && in_fcorridor(guard, x, y))) {
                         continue;
                     }
                     if (svl.level.locations[x][y].typ === CORR) {
-                        lx = $c.i16(x < u.ux ? x + 1 | 0 : x > u.ux ? x - 1 | 0 : x);
-                        ly = $c.i16(y < u.uy ? y + 1 | 0 : y > u.uy ? y - 1 | 0 : y);
+                        lx = $c.i16(x < u.ux ? x + 1 : x > u.ux ? x - 1 : x);
+                        ly = $c.i16(y < u.uy ? y + 1 : y > u.uy ? y - 1 : y);
                         if (svl.level.locations[lx][ly].typ !== STONE && svl.level.locations[lx][ly].typ !== CORR) {
                             break incr_radius$;
                         }
@@ -472,10 +472,10 @@ export async function invault() {   // vault.c:317
         if (!(guard = await makemon(mons[PM.GUARD], $c.i16(x), $c.i16(y), MM.EGD | MM.NOMSG))) {
             return;
         }
-        guard.isgd = (1) & 1;
-        guard.mpeaceful = (1) & 1;
+        guard.isgd = 1;
+        guard.mpeaceful = 1;
         set_malign(guard);
-        guard.mextra.egd.gddone = (0) & 1;
+        guard.mextra.egd.gddone = 0;
         guard.mextra.egd.ogx = $c.i16(x);
         guard.mextra.egd.ogy = $c.i16(y);
         assign_level(guard.mextra.egd.gdlevel, u.uz);
@@ -501,7 +501,7 @@ export async function invault() {   // vault.c:317
             func = !Blind() ? You_see : You_hear;
             await func($c.lit("%s shatter."), bcnt === 1 ? await an(bname) : await makeplural(bname));
         }
-        spotted = $c.i8(canspotmon(guard));
+        spotted = canspotmon(guard);
         if (spotted) {
             await pline($c.lit("Suddenly one of the Vault's %s enters!"), await makeplural(pmname(guard.data, Mgender(guard))));
             await newsym(guard.mx, guard.my);
@@ -523,7 +523,7 @@ export async function invault() {   // vault.c:317
             await mongone(guard);
             return;
         }
-        if (U_AP_TYPE() === M_AP.OBJECT || u.uundetected | 0) {
+        if (U_AP_TYPE() === M_AP.OBJECT || u.uundetected) {
             if (U_AP_TYPE() === M_AP.OBJECT && gy.youmonst.mappearance !== GOLD_PIECE) {
                 if (!Deaf()) {
                     await verbalize($c.lit("Hey!  Who left that %s in here?"), await mimic_obj_name(gy.youmonst));
@@ -636,27 +636,27 @@ export async function invault() {   // vault.c:317
             hix = svr.rooms[vlt].hx;
             lowy = svr.rooms[vlt].ly;
             hiy = svr.rooms[vlt].hy;
-            if (x === (lowx - 1 | 0) && y === (lowy - 1 | 0)) {
+            if (x === lowx - 1 && y === lowy - 1) {
                 typ = TLCORNER;
-            } else if (x === (hix + 1 | 0) && y === (lowy - 1 | 0)) {
+            } else if (x === hix + 1 && y === lowy - 1) {
                 typ = TRCORNER;
-            } else if (x === (lowx - 1 | 0) && y === (hiy + 1 | 0)) {
+            } else if (x === lowx - 1 && y === hiy + 1) {
                 typ = BLCORNER;
-            } else if (x === (hix + 1 | 0) && y === (hiy + 1 | 0)) {
+            } else if (x === hix + 1 && y === hiy + 1) {
                 typ = BRCORNER;
-            } else if (y === (lowy - 1 | 0) || y === (hiy + 1 | 0)) {
+            } else if (y === lowy - 1 || y === hiy + 1) {
                 typ = HWALL;
-            } else if (x === (lowx - 1 | 0) || x === (hix + 1 | 0)) {
+            } else if (x === lowx - 1 || x === hix + 1) {
                 typ = VWALL;
             }
             /* we lack access to the original wall_info bit mask for this
                former wall location so recreate it */
             svl.level.locations[x][y].typ = $c.i8(typ);   /* wall; will be changed to door below */
-            svl.level.locations[x][y].flags = (0) & 31;   /* will be reset too via doormask */
+            svl.level.locations[x][y].flags = 0;   /* will be reset too via doormask */
             xy_set_wall_state($c.i16(x), $c.i16(y));   /* set WA_MASK bits in .wall_info */
         }
         guard.mextra.egd.fakecorr[0].ftyp = $c.i8(typ);
-        guard.mextra.egd.fakecorr[0].flags = $c.u8(svl.level.locations[x][y].flags);
+        guard.mextra.egd.fakecorr[0].flags = svl.level.locations[x][y].flags;
         /* guard's entry point where confrontation with hero takes place */
         await spot_stop_timers($c.i16(x), $c.i16(y), MELT_ICE_AWAY);
         svl.level.locations[x][y].typ = DOOR;
@@ -688,10 +688,10 @@ async function move_gold(gold, vroom) {   // vault.c:632
 async function wallify_vault(grd) {   // vault.c:646
     let typ = 0, x = 0, y = 0, vlt = 0, tmp_viz = 0, lox = 0, hix = 0, loy = 0, hiy = 0, mon = null, gold = null, rocks = null, trap = null, fixed = 0, movedgold = 0;
     vlt = grd.mextra.egd.vroom;
-    lox = $c.i16(svr.rooms[vlt].lx - 1 | 0);
-    hix = $c.i16(svr.rooms[vlt].hx + 1 | 0);
-    loy = $c.i16(svr.rooms[vlt].ly - 1 | 0);
-    hiy = $c.i16(svr.rooms[vlt].hy + 1 | 0);
+    lox = $c.i16(svr.rooms[vlt].lx - 1);
+    hix = $c.i16(svr.rooms[vlt].hx + 1);
+    loy = $c.i16(svr.rooms[vlt].ly - 1);
+    hiy = $c.i16(svr.rooms[vlt].hy + 1);
     fixed = FALSE;
     movedgold = FALSE;
     for (x = lox; x <= hix; x = $c.i16(x + 1)) {
@@ -736,7 +736,7 @@ async function wallify_vault(grd) {   // vault.c:646
                     typ = HWALL;
                 }
                 svl.level.locations[x][y].typ = $c.i8(typ);
-                svl.level.locations[x][y].flags = (0) & 31;
+                svl.level.locations[x][y].flags = 0;
                 xy_set_wall_state(x, y);   /* set WA_MASK bits in .wall_info */
                 await del_engr_at(x, y);
                 /*
@@ -797,8 +797,8 @@ async function gd_pick_corridor_gold(grd, goldx, goldy) {   // vault.c:752
     let gold = null, newcc = new $T.nhcoord(), bestcc = new $T.nhcoord(), gdelta = 0, newdelta = 0, bestdelta = 0, tryct = 0, guardx = 0, guardy = 0, under_u = 0, see_it = 0;
     guardx = grd.mx;
     guardy = grd.my;
-    under_u = $c.i8(u_at(goldx, goldy));
-    see_it = $c.i8(cansee(goldx, goldy));
+    under_u = u_at(goldx, goldy);
+    see_it = cansee(goldx, goldy);
     if (under_u) {
         /* Grab the gold from between the hero's feet.
            If guard is two or more steps away; bring him closer first. */
@@ -827,7 +827,7 @@ async function gd_pick_corridor_gold(grd, goldx, goldy) {   // vault.c:752
             if (bestdelta < gdelta) {
                 remove_monster(guardx, guardy);
                 await newsym($c.i16(guardx), $c.i16(guardy));
-                await place_monster(grd, $c.i16(bestcc.x), $c.i16(bestcc.y));
+                await place_monster(grd, bestcc.x, bestcc.y);
                 await newsym(grd.mx, grd.my);
             }
         }
@@ -851,7 +851,7 @@ async function gd_pick_corridor_gold(grd, goldx, goldy) {   // vault.c:752
     }
     if (see_it) {
         /* cansee(goldx, goldy) */
-        await pline($c.lit("%s%s picks up the gold%s."), await Some_Monnam(grd), grd.mpeaceful | 0 && grd.mextra.egd.warncnt > 5 ? $c.lit(" calms down and") : $c.lit(""), under_u ? $c.lit(" from beneath you") : $c.lit(""));
+        await pline($c.lit("%s%s picks up the gold%s."), await Some_Monnam(grd), grd.mpeaceful && grd.mextra.egd.warncnt > 5 ? $c.lit(" calms down and") : $c.lit(""), under_u ? $c.lit(" from beneath you") : $c.lit(""));
     }
     /* if guard was moved to get the gold, move him back */
     if (grd.mx !== guardx || grd.my !== guardy) {
@@ -880,14 +880,14 @@ async function gd_move_cleanup(grd, semi_dead, disappear_msg_seen) {   // vault.
      * At the end of the process, the guard is killed in restfakecorr().
      */
     x = grd.mx, y = grd.my;
-    see_guard = $c.i8(canspotmon(grd));
+    see_guard = canspotmon(grd);
     await parkguard(grd);   /* move to <0,0> */
     await wallify_vault(grd);
     await restfakecorr(grd);
     do {
         if (debugcore($c.lit("vault.c"), TRUE)) {
             save_plnmsg = iflags.last_msg;
-            await pline($c.lit("gd_move_cleanup: %scleanup%s"), grd.isgd | 0 ? $c.lit("") : $c.lit("final "), grd.isgd | 0 ? $c.lit(" attempt") : $c.lit(""));
+            await pline($c.lit("gd_move_cleanup: %scleanup%s"), grd.isgd ? $c.lit("") : $c.lit("final "), grd.isgd ? $c.lit(" attempt") : $c.lit(""));
             iflags.last_msg = save_plnmsg;
         }
     } while (0);
@@ -930,25 +930,25 @@ export async function gd_move(grd) {   // vault.c:888
             goldincorridor = FALSE;
             u_in_vault = FALSE;
             grd_in_vault = FALSE;
-            semi_dead = $c.i8(DEADMONSTER(grd));
+            semi_dead = DEADMONSTER(grd);
             u_carry_gold = FALSE;
             newspot = FALSE;
             if (!on_level(egrd.gdlevel, u.uz)) {
                 return -1;
             }
-            if (semi_dead || !grd.mx || egrd.gddone | 0) {
-                egrd.gddone = (1) & 1;
+            if (semi_dead || !grd.mx || egrd.gddone) {
+                egrd.gddone = 1;
                 return await gd_move_cleanup(grd, semi_dead, FALSE);
             }
             do {
                 if (debugcore($c.lit("vault.c"), TRUE)) {
                     save_plnmsg = iflags.last_msg;
-                    await pline($c.lit("gd_move: %s guard"), grd.mpeaceful | 0 ? $c.lit("peaceful") : $c.lit("hostile"));
+                    await pline($c.lit("gd_move: %s guard"), grd.mpeaceful ? $c.lit("peaceful") : $c.lit("hostile"));
                     iflags.last_msg = save_plnmsg;
                 }
             } while (0);
-            u_in_vault = $c.i8(vault_occupied(new $c.Ptr(u.urooms, 0)) ? TRUE : FALSE);
-            grd_in_vault = $c.i8(in_rooms(grd.mx, grd.my, VAULT).get(0) ? TRUE : FALSE);
+            u_in_vault = vault_occupied(new $c.Ptr(u.urooms, 0)) ? TRUE : FALSE;
+            grd_in_vault = in_rooms(grd.mx, grd.my, VAULT).get(0) ? TRUE : FALSE;
             if (!u_in_vault && !grd_in_vault) {
                 await wallify_vault(grd);
             }
@@ -967,19 +967,19 @@ export async function gd_move(grd) {   // vault.c:888
                 }
                 return -1;
             }
-            if ($c.abs(egrd.ogx - grd.mx | 0) > 1 || $c.abs(egrd.ogy - grd.my | 0) > 1) {
+            if ($c.abs(egrd.ogx - grd.mx) > 1 || $c.abs(egrd.ogy - grd.my) > 1) {
                 return -1;   /* teleported guard - treat as monster */
             }
             if (egrd.witness) {
                 if (!Deaf()) {
-                    await verbalize($c.lit("How dare you %s that gold, scoundrel!"), (egrd.witness | 0) & GD.EATGOLD ? $c.lit("consume") : $c.lit("destroy"));
+                    await verbalize($c.lit("How dare you %s that gold, scoundrel!"), egrd.witness & GD.EATGOLD ? $c.lit("consume") : $c.lit("destroy"));
                 }
-                egrd.witness = (0) & 3;
-                grd.mpeaceful = (0) & 1;
+                egrd.witness = 0;
+                grd.mpeaceful = 0;
                 return -1;
             }
             umoney = money_cnt(gi.invent);
-            u_carry_gold = $c.i8(umoney > 0 || hidden_gold(TRUE) > 0 ? 1 : 0);
+            u_carry_gold = umoney > 0 || hidden_gold(TRUE) > 0 ? 1 : 0;
             if (egrd.fcend === 1) {
                 if (u_in_vault && (u_carry_gold || um_dist(grd.mx, grd.my, 1))) {
                     if (egrd.warncnt === 3 && !Deaf()) {
@@ -999,7 +999,7 @@ export async function gd_move(grd) {   // vault.c:888
                         if (!Deaf()) {
                             await verbalize($c.lit("You've been warned, knave!"));
                         }
-                        grd.mpeaceful = (0) & 1;
+                        grd.mpeaceful = 0;
                         await mnexto(grd, RLOC.NOMSG);
                         svl.level.locations[m][n].typ = egrd.fakecorr[0].ftyp;
                         svl.level.locations[m][n].flags = (egrd.fakecorr[0].flags) & 31;
@@ -1025,14 +1025,14 @@ export async function gd_move(grd) {   // vault.c:888
                         recalc_block_point(m, n);   /* guard corridor goes away */
                         await del_engr_at(m, n);
                         await newsym(m, n);
-                        grd.mpeaceful = (0) & 1;
+                        grd.mpeaceful = 0;
                         await gd_letknow(grd);
                         return -1;
                     } else {
                         if (!Deaf()) {
                             await verbalize($c.lit("Well, begone."));
                         }
-                        egrd.gddone = (1) & 1;
+                        egrd.gddone = 1;
                         return await gd_move_cleanup(grd, semi_dead, FALSE);
                     }
                 }
@@ -1066,7 +1066,7 @@ export async function gd_move(grd) {   // vault.c:888
                         } else {
                             await verbalize($c.lit("So be it, rogue!"));
                         }
-                        grd.mpeaceful = (0) & 1;
+                        grd.mpeaceful = 0;
                         return -1;
                     }
                 }
@@ -1090,7 +1090,7 @@ export async function gd_move(grd) {   // vault.c:888
                 egrd.warncnt = 5;
                 return 0;
             }
-            if (um_dist(grd.mx, grd.my, 1) || egrd.gddone | 0) {
+            if (um_dist(grd.mx, grd.my, 1) || egrd.gddone) {
                 if (!egrd.gddone && !rn2(10) && !Deaf() && !u.uswallow && !(u.ustuck && !sticks(gy.youmonst.data))) {
                     await verbalize($c.lit("Move along!"));
                 }
@@ -1103,8 +1103,8 @@ export async function gd_move(grd) {   // vault.c:888
                 $goto = "nextpos"; continue D1;
             }
             /* look around (hor & vert only) for accessible places */
-            for (nx = $c.i16(x - 1 | 0); nx <= (x + 1 | 0); nx = $c.i16(nx + 1)) {
-                for (ny = $c.i16(y - 1 | 0); ny <= (y + 1 | 0); ny = $c.i16(ny + 1)) {
+            for (nx = $c.i16(x - 1); nx <= x + 1; nx = $c.i16(nx + 1)) {
+                for (ny = $c.i16(y - 1); ny <= y + 1; ny = $c.i16(ny + 1)) {
                     nextnxy$: {
                         if ((nx === x || ny === y) && (nx !== x || ny !== y) && isok(nx, ny)) {
                             crm = $c.relem(svl.level.locations[nx], ny);
@@ -1117,15 +1117,15 @@ export async function gd_move(grd) {   // vault.c:888
                                     continue;
                                 }
                                 /* seems we found a good place to leave him alone */
-                                egrd.gddone = (1) & 1;
+                                egrd.gddone = 1;
                                 if (ACCESSIBLE(typ)) {
                                     $goto = "newpos"; continue D1;
                                 }
-                                crm.typ = $c.i8(typ === SCORR ? CORR : DOOR);
+                                crm.typ = typ === SCORR ? CORR : DOOR;
                                 if (crm.typ === DOOR) {
                                     crm.flags = (D.NODOOR) & 31;
                                 } else {
-                                    crm.flags = (0) & 31;
+                                    crm.flags = 0;
                                 }
                                 await del_engr_at(nx, ny);
                                 $goto = "proceed"; continue D1;
@@ -1140,16 +1140,16 @@ export async function gd_move(grd) {   // vault.c:888
             ny = y;
             ggx = egrd.gdx;
             ggy = egrd.gdy;
-            dx = $c.i16(ggx > x ? 1 : ggx < x ? -1 : 0);
-            dy = $c.i16(ggy > y ? 1 : ggy < y ? -1 : 0);
-            if ($c.abs(ggx - x | 0) >= $c.abs(ggy - y | 0)) {
+            dx = ggx > x ? 1 : ggx < x ? -1 : 0;
+            dy = ggy > y ? 1 : ggy < y ? -1 : 0;
+            if ($c.abs(ggx - x) >= $c.abs(ggy - y)) {
                 nx = $c.i16(nx + dx | 0);
             } else {
                 ny = $c.i16(ny + dy | 0);
             }
             while ((typ = $c.u8((crm = $c.relem(svl.level.locations[nx], ny)).typ)) !== STONE) {
-                ex = $c.i16((nx + nx | 0) - x | 0);
-                ey = $c.i16((ny + ny | 0) - y | 0);
+                ex = $c.i16(nx + nx - x);
+                ey = $c.i16(ny + ny - y);
                 /* in view of the above we must have IS_WALL(typ) or typ == POOL */
                 /* must be a wall here */
                 if (isok(ex, ey) && svl.level.locations[ex][ey].typ >= ROOM) {
@@ -1160,12 +1160,12 @@ export async function gd_move(grd) {   // vault.c:888
                 }
                 if (dy && nx !== x) {
                     nx = x;
-                    ny = $c.i16(y + dy | 0);
+                    ny = $c.i16(y + dy);
                     continue;
                 }
                 if (dx && ny !== y) {
                     ny = y;
-                    nx = $c.i16(x + dx | 0);
+                    nx = $c.i16(x + dx);
                     dy = 0;
                     continue;
                 }
@@ -1179,7 +1179,7 @@ export async function gd_move(grd) {   // vault.c:888
                 break;
             }
             crm.typ = CORR;
-            crm.flags = (0) & 31;
+            crm.flags = 0;
         case "proceed":
             $goto = null;   // proceed:
             newspot = TRUE;
@@ -1198,7 +1198,7 @@ export async function gd_move(grd) {   // vault.c:888
                 fcp.fx = nx;
                 fcp.fy = ny;
                 fcp.ftyp = $c.i8(typ);
-                fcp.flags = $c.u8(crm.flags);
+                fcp.flags = crm.flags;
             } else if (!egrd.gddone) {
                 /* We're stuck, so try to find a new destination. */
                 if (!await find_guard_dest(grd, new $c.FieldRef(egrd, "gdx", "i16"), new $c.FieldRef(egrd, "gdy", "i16")) || egrd.gdx === ggx && egrd.gdy === ggy) {
@@ -1294,7 +1294,7 @@ export function hidden_gold(even_if_unknown) {   // vault.c:1257
     let value = 0, obj = null;
     value = 0;
     for (obj = gi.invent; obj; obj = obj.nobj) {
-        if (Has_contents(obj) && (obj.cknown | 0 || even_if_unknown)) {
+        if (Has_contents(obj) && (obj.cknown || even_if_unknown)) {
             value = $c.add64(value, contained_gold(obj, even_if_unknown));
         }
     }
@@ -1306,7 +1306,7 @@ export function hidden_gold(even_if_unknown) {   // vault.c:1257
  * @returns {Promise<number>} boolean
  */
 export async function gd_sound() {   // vault.c:1272
-    return $c.i8(!(vault_occupied(new $c.Ptr(u.urooms, 0)) || await findgd()) ? 1 : 0);
+    return !(vault_occupied(new $c.Ptr(u.urooms, 0)) || await findgd()) ? 1 : 0;
 }
 /**
  * @param {number} activity unsigned int
@@ -1315,7 +1315,7 @@ export async function gd_sound() {   // vault.c:1272
 export async function vault_gd_watching(activity) {   // vault.c:1278
     let guard = null;
     guard = await findgd();
-    if (guard && guard.mx && guard.mcansee | 0 && ((!((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked) || $c.andu64(guard.data.mflags1, M1.SEE_INVIS) !== 0) && !u.uinwater && (gv.viz_array.get(guard.my).get(guard.mx) & COULD_SEE) !== 0)) {
+    if (guard && guard.mx && guard.mcansee && ((!((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked) || $c.andu64(guard.data.mflags1, M1.SEE_INVIS) !== 0) && !u.uinwater && (gv.viz_array.get(guard.my).get(guard.mx) & COULD_SEE) !== 0)) {
         if (activity === GD.EATGOLD || activity === GD.DESTROYGOLD) {
             guard.mextra.egd.witness = (activity) & 3;
         }

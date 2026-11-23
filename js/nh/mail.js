@@ -190,8 +190,8 @@ async function md_stop(stopp, startp) {   // mail.c:248
     /* stopping position (we fill it in) */
     /* starting position (read only) */
     min_distance = -1;
-    for (x = $c.i16(u.ux - 1 | 0); x <= (u.ux + 1 | 0); x = $c.i16(x + 1)) {
-        for (y = $c.i16(u.uy - 1 | 0); y <= (u.uy + 1 | 0); y = $c.i16(y + 1)) {
+    for (x = $c.i16(u.ux - 1); x <= u.ux + 1; x = $c.i16(x + 1)) {
+        for (y = $c.i16(u.uy - 1); y <= u.uy + 1; y = $c.i16(y + 1)) {
             if (!isok(x, y) || u_at(x, y)) {
                 continue;
             }
@@ -401,7 +401,7 @@ async function newmail(info) {   // mail.c:399
  */
 export async function ckmailstatus() {   // mail.c:550
     ck_server_admin_msg();
-    if (!mailbox || u.uswallow | 0 || !flags.biff || svm.moves < $c.add64(laststattime, MAILCKFREQ)) {
+    if (!mailbox || u.uswallow || !flags.biff || svm.moves < $c.add64(laststattime, MAILCKFREQ)) {
         return;
     }
     laststattime = svm.moves;

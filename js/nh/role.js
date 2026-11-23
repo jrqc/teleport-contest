@@ -78,7 +78,7 @@ const randomstr = new Int8Array(7);
  * @returns {number} boolean
  */
 export function validrole(rolenum) {   // role.c:713
-    return $c.i8(rolenum >= 0 && rolenum < 13 ? 1 : 0);
+    return rolenum >= 0 && rolenum < 13 ? 1 : 0;
 }
 /**
  * @param {number} for_display boolean
@@ -148,7 +148,7 @@ export async function str2role(str) {   // role.c:747
  */
 export function validrace(rolenum, racenum) {   // role.c:778
     /* Assumes validrole */
-    return $c.i8(racenum >= 0 && racenum < 5 && roles[rolenum].allow & races[racenum].allow & ROLE_RACEMASK ? 1 : 0);
+    return racenum >= 0 && racenum < 5 && roles[rolenum].allow & races[racenum].allow & ROLE_RACEMASK ? 1 : 0;
 }
 /**
  * @param {number} rolenum int
@@ -220,7 +220,7 @@ export async function str2race(str) {   // role.c:813
  */
 export function validgend(rolenum, racenum, gendnum) {   // role.c:844
     /* Assumes validrole and validrace */
-    return $c.i8(gendnum >= 0 && gendnum < ROLE_GENDERS && roles[rolenum].allow & races[racenum].allow & genders[gendnum].allow & ROLE_GENDMASK ? 1 : 0);
+    return gendnum >= 0 && gendnum < ROLE_GENDERS && roles[rolenum].allow & races[racenum].allow & genders[gendnum].allow & ROLE_GENDMASK ? 1 : 0;
 }
 /**
  * @param {number} rolenum int
@@ -288,7 +288,7 @@ export async function str2gend(str) {   // role.c:880
  */
 export function validalign(rolenum, racenum, alignnum) {   // role.c:907
     /* Assumes validrole and validrace */
-    return $c.i8(alignnum >= 0 && alignnum < ROLE_ALIGNS && roles[rolenum].allow & races[racenum].allow & aligns[alignnum].allow & AM.MASK ? 1 : 0);
+    return alignnum >= 0 && alignnum < ROLE_ALIGNS && roles[rolenum].allow & races[racenum].allow & aligns[alignnum].allow & AM.MASK ? 1 : 0;
 }
 /**
  * @param {number} rolenum int
@@ -1398,7 +1398,7 @@ export async function role_init() {   // role.c:1980
     if (flags.pantheon === -1) {
         /* new game */
         if (!validgend(flags.initrole, flags.initrace, flags.female)) {
-            flags.female = $c.i8(!flags.female ? 1 : 0);
+            flags.female = !flags.female ? 1 : 0;
         }
     }
     if (!validgend(flags.initrole, flags.initrace, flags.initgend)) {   /* Note that there is no way to check for an unspecified gender. */
@@ -1421,7 +1421,7 @@ export async function role_init() {   // role.c:1980
         pm.maligntyp = $c.i8(Math.imul(alignmnt, 3));
         /* if gender is random, we choose it now instead of waiting
            until the leader monster is created */
-        $t5 = (is_neuter(pm) ? 2 : is_female(pm) ? 1 : is_male(pm) ? 0 : rn2(100) < 50 ? 1 : 0) >>> 0, svq.quest_status.ldrgend = ($t5) & 3;
+        $t5 = is_neuter(pm) ? 2 : is_female(pm) ? 1 : is_male(pm) ? 0 : rn2(100) < 50 ? 1 : 0, svq.quest_status.ldrgend = ($t5) & 3;
     }
     /* Fix up the quest guardians */
     if (gu.urole.guardnum !== NON_PM) {
@@ -1439,7 +1439,7 @@ export async function role_init() {   // role.c:1980
         pm.mflags3 = $c.u16(pm.mflags3 | (M3.WANTSARTI | M3.WAITFORU));
         /* if gender is random, we choose it now instead of waiting
            until the nemesis monster is created */
-        $t6 = (is_neuter(pm) ? 2 : is_female(pm) ? 1 : is_male(pm) ? 0 : rn2(100) < 50 ? 1 : 0) >>> 0, svq.quest_status.nemgend = ($t6) & 3;
+        $t6 = is_neuter(pm) ? 2 : is_female(pm) ? 1 : is_male(pm) ? 0 : rn2(100) < 50 ? 1 : 0, svq.quest_status.nemgend = ($t6) & 3;
     }
     /* Fix up the god names */
     if (flags.pantheon === -1) {
@@ -1465,7 +1465,7 @@ export async function role_init() {   // role.c:1980
         gu.urole.cgod = roles[flags.pantheon].cgod;
     }
     /* 0 or 1; no gods are neuter, nor is gender randomized */
-    $t8 = (!strncmpi(align_gtitle($c.i8(alignmnt)), $c.lit("goddess"), -1) ? 1 : 0) >>> 0, svq.quest_status.godgend = ($t8) & 3;
+    $t8 = !strncmpi(align_gtitle($c.i8(alignmnt)), $c.lit("goddess"), -1) ? 1 : 0, svq.quest_status.godgend = ($t8) & 3;
     if (gu.urole.mnum === PM.CLERIC) {
         objects[SPE_LIGHT].oc_subtyp = P.CLERIC_SPELL;
     }
@@ -1575,7 +1575,7 @@ export async function genl_player_setup(screenheight) {   // role.c:2206
      * have a specific value, but that will still require confirmation;
      * player can specify the forced ones if avoiding that is demanded.
      */
-    picksomething = $c.i8(flags.initrole === ROLE_NONE || flags.initrace === ROLE_NONE || flags.initgend === ROLE_NONE || flags.initalign === ROLE_NONE ? 1 : 0);
+    picksomething = flags.initrole === ROLE_NONE || flags.initrace === ROLE_NONE || flags.initgend === ROLE_NONE || flags.initalign === ROLE_NONE ? 1 : 0;
     /* Used for '-@';
      * choose randomly without asking for all unspecified facets.
      */
@@ -2011,7 +2011,7 @@ export async function genl_player_setup(screenheight) {   // role.c:2206
              *           q - quit
              *           (end)
              */
-            getconfirmation = $c.i8(picksomething && pick4u !== 97 && !flags.randomall ? 1 : 0);
+            getconfirmation = picksomething && pick4u !== 97 && !flags.randomall ? 1 : 0;
             while (getconfirmation) {
                 win = await plsel_startmenu(screenheight, RS.filter);   /* filter: not ROLE */
                 any.$copyFrom(cg.zeroany);   /* zero out all bits */
@@ -2116,7 +2116,7 @@ async function reset_role_filtering() {   // role.c:2728
         $c.free(selected[0]), selected[0] = null;
     }
     await destroy_nhwindow()(win);
-    return $c.i8(n > 0 ? TRUE : FALSE);
+    return n > 0 ? TRUE : FALSE;
 }
 /* the change in format when this extended role selection was converted from
    tty-only to tty+curses+? made the role selection menu require two pages
@@ -2203,7 +2203,7 @@ async function setup_rolemenu(win, filtering, race, gend, algn) {   // role.c:28
     any.$copyFrom(cg.zeroany);   /* zero out all bits */
     for (i = 0; roles[i].name.m; i = i + 1 | 0) {
         /* role can be constrained by any of race, gender, or alignment */
-        role_ok = $c.i8(ok_role(i, race, gend, algn) && ok_race(i, race, gend, algn) && ok_gend(i, race, gend, algn) && ok_align(i, race, gend, algn) ? 1 : 0);
+        role_ok = ok_role(i, race, gend, algn) && ok_race(i, race, gend, algn) && ok_gend(i, race, gend, algn) && ok_align(i, race, gend, algn) ? 1 : 0;
         if (filtering && !role_ok) {
             continue;
         }
@@ -2248,7 +2248,7 @@ async function setup_racemenu(win, filtering, role, gend, algn) {   // role.c:29
     any.$copyFrom(cg.zeroany);
     for (i = 0; races[i].noun; i = i + 1 | 0) {
         /* no ok_gend(); race isn't constrained by gender */
-        race_ok = $c.i8(ok_race(role, i, gend, algn) && ok_role(role, i, gend, algn) && ok_align(role, i, gend, algn) ? 1 : 0);
+        race_ok = ok_race(role, i, gend, algn) && ok_role(role, i, gend, algn) && ok_align(role, i, gend, algn) ? 1 : 0;
         if (filtering && !race_ok) {
             continue;
         }
@@ -2262,7 +2262,7 @@ async function setup_racemenu(win, filtering, role, gend, algn) {   // role.c:29
            capital letter as unseen accelerator;
            !filtering: resetting filter rather than picking, choose by
            capital letter since lowercase role letters will be present */
-        await add_menu(win, nul_glyphinfo, any, $c.i8(filtering ? this_ch : highc(this_ch)), $c.i8(filtering ? highc(this_ch) : 0), ATR.NONE, clr, races[i].noun, !filtering && !race_ok ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+        await add_menu(win, nul_glyphinfo, any, filtering ? this_ch : highc(this_ch), filtering ? highc(this_ch) : 0, ATR.NONE, clr, races[i].noun, !filtering && !race_ok ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     }
 }
 /**
@@ -2279,7 +2279,7 @@ async function setup_gendmenu(win, filtering, role, race, algn) {   // role.c:29
     any.$copyFrom(cg.zeroany);
     for (i = 0; i < ROLE_GENDERS; i = i + 1 | 0) {
         /* no ok_align(); gender isn't constrained by alignment */
-        gend_ok = $c.i8(ok_gend(role, race, i, algn) && ok_role(role, race, i, algn) && ok_race(role, race, i, algn) ? 1 : 0);
+        gend_ok = ok_gend(role, race, i, algn) && ok_role(role, race, i, algn) && ok_race(role, race, i, algn) ? 1 : 0;
         if (filtering && !gend_ok) {
             continue;
         }
@@ -2291,7 +2291,7 @@ async function setup_gendmenu(win, filtering, role, race, algn) {   // role.c:29
         this_ch = genders[i].adj.get(0);
         /* (see setup_racemenu for explanation of selector letters
            and setup_rolemenu for preselection) */
-        await add_menu(win, nul_glyphinfo, any, $c.i8(filtering ? this_ch : highc(this_ch)), $c.i8(filtering ? highc(this_ch) : 0), ATR.NONE, clr, genders[i].adj, !filtering && !gend_ok ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+        await add_menu(win, nul_glyphinfo, any, filtering ? this_ch : highc(this_ch), filtering ? highc(this_ch) : 0, ATR.NONE, clr, genders[i].adj, !filtering && !gend_ok ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     }
 }
 /**
@@ -2308,7 +2308,7 @@ async function setup_algnmenu(win, filtering, role, race, gend) {   // role.c:29
     any.$copyFrom(cg.zeroany);
     for (i = 0; i < ROLE_ALIGNS; i = i + 1 | 0) {
         /* no ok_gend(); alignment isn't constrained by gender */
-        algn_ok = $c.i8(ok_align(role, race, gend, i) && ok_role(role, race, gend, i) && ok_race(role, race, gend, i) ? 1 : 0);
+        algn_ok = ok_align(role, race, gend, i) && ok_role(role, race, gend, i) && ok_race(role, race, gend, i) ? 1 : 0;
         if (filtering && !algn_ok) {
             continue;
         }
@@ -2320,7 +2320,7 @@ async function setup_algnmenu(win, filtering, role, race, gend) {   // role.c:29
         this_ch = aligns[i].adj.get(0);
         /* (see setup_racemenu for explanation of selector letters
            and setup_rolemenu for preselection) */
-        await add_menu(win, nul_glyphinfo, any, $c.i8(filtering ? this_ch : highc(this_ch)), $c.i8(filtering ? highc(this_ch) : 0), ATR.NONE, clr, aligns[i].adj, !filtering && !algn_ok ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+        await add_menu(win, nul_glyphinfo, any, filtering ? this_ch : highc(this_ch), filtering ? highc(this_ch) : 0, ATR.NONE, clr, aligns[i].adj, !filtering && !algn_ok ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     }
 }
 
