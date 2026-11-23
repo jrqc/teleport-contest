@@ -262,7 +262,7 @@ async function alreadynamed(mtmp, monnambuf, usrbuf) {   // do_name.c:158
             await pline($c.lit("%s is already called %s."), upstart($c.strcpy(new $c.Ptr(pronounbuf, 0), genders[pronoun_gender(mtmp, PRONOUN.HALLU)].he)), monnambuf);
         }
         return TRUE;
-    } else if ($c.peq(mtmp.data, $c.relem(mons, PM.JUIBLEX)) && strstri(monnambuf, $c.lit("Juiblex")) && !strncmpi(usrbuf, $c.lit("Jubilex"), -1)) {
+    } else if (mtmp.data === mons[PM.JUIBLEX] && strstri(monnambuf, $c.lit("Juiblex")) && !strncmpi(usrbuf, $c.lit("Jubilex"), -1)) {
         await pline($c.lit("%s doesn't like being called %s."), upstart(monnambuf), usrbuf);
         return TRUE;
     }
@@ -330,7 +330,7 @@ async function do_mgivenname() {   // do_name.c:199
         if (!await alreadynamed(mtmp, new $c.Ptr(monnambuf, 0), new $c.Ptr(buf, 0))) {
             await verbalize($c.lit("I'm %s, not %s."), await shkname(mtmp), new $c.Ptr(buf, 0));
         }
-    } else if (mtmp.ispriest | 0 || mtmp.isminion | 0 || mtmp.isshk | 0 || $c.peq(mtmp.data, $c.relem(mons, PM.GHOST)) || has_ebones(mtmp)) {
+    } else if (mtmp.ispriest | 0 || mtmp.isminion | 0 || mtmp.isshk | 0 || mtmp.data === mons[PM.GHOST] || has_ebones(mtmp)) {
         if (!await alreadynamed(mtmp, new $c.Ptr(monnambuf, 0), new $c.Ptr(buf, 0))) {
             await pline($c.lit("%s will not accept the name %s."), upstart(new $c.Ptr(monnambuf, 0)), new $c.Ptr(buf, 0));
         }
@@ -925,7 +925,7 @@ export async function x_monnam(mtmp, article, adjective, suppress, called) {   /
             $c.strcat(buf, await shkname(mtmp));
         } else {
             $c.strcat(buf, await shkname(mtmp));
-            if (!$c.peq(mdat, $c.relem(mons, PM.SHOPKEEPER)) || do_invis) {
+            if (mdat !== mons[PM.SHOPKEEPER] || do_invis) {
                 $c.strcat(buf, $c.lit(" the "));
                 if (do_invis) {
                     $c.strcat(buf, $c.lit("invisible "));
@@ -955,7 +955,7 @@ export async function x_monnam(mtmp, article, adjective, suppress, called) {   /
     } else if (do_name && has_mgivenname(mtmp)) {
         name$2 = mtmp.mextra.mgivenname;
         /* hardfought */
-        if ($c.peq(mdat, $c.relem(mons, PM.GHOST))) {
+        if (mdat === mons[PM.GHOST]) {
             $c.sprintf(eos(buf), $c.lit("%s ghost"), s_suffix(name$2));
             name_at_start = TRUE;
         } else if (called) {
@@ -986,7 +986,7 @@ export async function x_monnam(mtmp, article, adjective, suppress, called) {   /
         name_at_start = $c.i8(type_is_pname(mdat));
     }
     if (name_at_start && (article === ARTICLE.YOUR || !has_adjectives)) {
-        if ($c.peq(mdat, $c.relem(mons, PM.WIZARD_OF_YENDOR))) {
+        if (mdat === mons[PM.WIZARD_OF_YENDOR]) {
             article = ARTICLE.THE;
         } else {
             article = ARTICLE.NONE;
@@ -1165,7 +1165,7 @@ export async function distant_monnam(mon, article, outbuf) {   // do_name.c:1170
     /* high priest(ess)'s identity is concealed on the Astral Plane,
        unless you're adjacent (overridden for hallucination which does
        its own obfuscation) */
-    if ($c.peq(mon.data, $c.relem(mons, PM.HIGH_CLERIC)) && !Hallucination() && ((svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level)) && !(dist2(mon.mx, mon.my, u.ux, u.uy) <= 2)) {
+    if (mon.data === mons[PM.HIGH_CLERIC] && !Hallucination() && ((svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level)) && !(dist2(mon.mx, mon.my, u.ux, u.uy) <= 2)) {
         $c.strcpy(outbuf, article === ARTICLE.THE ? $c.lit("the ") : $c.lit(""));
         $c.strcat(outbuf, mon.female | 0 ? $c.lit("high priestess") : $c.lit("high priest"));
     } else {
@@ -1255,12 +1255,12 @@ export function minimal_monnam(mon, ckloc) {   // do_name.c:1254
         $c.strcpy(outbuf, $c.lit("[Null monster]"));
     } else if ((ptr = mon.data) === null) {
         $c.strcpy(outbuf, $c.lit("[Null mon->data]"));
-    } else if ($c.pcmp(ptr, $c.relem(mons, 0)) < 0) {
-        $c.sprintf(outbuf, $c.lit("[Invalid mon->data %s < %s]"), fmt_ptr(mon.data), fmt_ptr($c.relem(mons, 0)));
-    } else if ($c.pcmp(ptr, $c.relem(mons, NUMMONS)) >= 0) {
-        $c.sprintf(outbuf, $c.lit("[Invalid mon->data %s >= %s]"), fmt_ptr(mon.data), fmt_ptr($c.relem(mons, NUMMONS)));
-    } else if (ckloc && $c.peq(ptr, $c.relem(mons, PM.LONG_WORM)) && mon.mx && !$c.peq(svl.level.monsters[mon.mx][mon.my], mon)) {
-        $c.sprintf(outbuf, $c.lit("%s <%d,%d>"), pmname($c.relem(mons, PM.LONG_WORM_TAIL), Mgender(mon)), mon.mx, mon.my);
+    } else if ($c.pcmp(ptr, mons[0]) < 0) {
+        $c.sprintf(outbuf, $c.lit("[Invalid mon->data %s < %s]"), fmt_ptr(mon.data), fmt_ptr(mons[0]));
+    } else if ($c.pcmp(ptr, mons[NUMMONS]) >= 0) {
+        $c.sprintf(outbuf, $c.lit("[Invalid mon->data %s >= %s]"), fmt_ptr(mon.data), fmt_ptr(mons[NUMMONS]));
+    } else if (ckloc && ptr === mons[PM.LONG_WORM] && mon.mx && !$c.peq(svl.level.monsters[mon.mx][mon.my], mon)) {
+        $c.sprintf(outbuf, $c.lit("%s <%d,%d>"), pmname(mons[PM.LONG_WORM_TAIL], Mgender(mon)), mon.mx, mon.my);
     } else {
         $c.sprintf(outbuf, $c.lit("%s%s <%d,%d>"), mon.mtame ? $c.lit("tame ") : mon.mpeaceful | 0 ? $c.lit("peaceful ") : $c.lit(""), mon_pmname(mon), mon.mx, mon.my);
         if (mon.cham !== NON_PM) {

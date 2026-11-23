@@ -204,9 +204,9 @@ export async function decl_globals_init() {   // decl.c:1080
     svw.$copyFrom(init_svw);
     svx.$copyFrom(init_svx);
     svy.$copyFrom(init_svy);
-    gv.valuables[0].list = $c.relem(gg.gems, 0);
+    gv.valuables[0].list = gg.gems[0];
     gv.valuables[0].size = 23;
-    gv.valuables[1].list = $c.relem(ga.amulets, 0);
+    gv.valuables[1].list = ga.amulets[0];
     gv.valuables[1].size = 13;
     gv.valuables[2].list = null;
     gv.valuables[2].size = 0;
@@ -366,7 +366,7 @@ export async function decl_globals_init() {   // decl.c:1080
             $c.exit(1);
         }
     } while (0);
-    gs.subrooms = $c.relem(svr.rooms, MAXNROFROOMS + 1);
+    gs.subrooms = svr.rooms[MAXNROFROOMS + 1];
     $c.memset(flags, 0, 208);
     $c.memset(iflags, 0, 424);
     $c.memset(a11y, 0, 16);

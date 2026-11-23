@@ -57,10 +57,10 @@ export function is_vampshifter(mon) {
     return mon.cham === PM.VAMPIRE || mon.cham === PM.VAMPIRE_LEADER || mon.cham === PM.VLAD_THE_IMPALER ? 1 : 0;
 }
 export function is_Vlad(m) {
-    return $c.peq(m.data, $c.relem(mons, PM.VLAD_THE_IMPALER)) || m.cham === PM.VLAD_THE_IMPALER ? 1 : 0;
+    return m.data === mons[PM.VLAD_THE_IMPALER] || m.cham === PM.VLAD_THE_IMPALER ? 1 : 0;
 }
 export function mundisplaceable(mon) {
-    return mon.ispriest | 0 || mon.isshk | 0 || mon.isgd | 0 || $c.peq(mon.data, $c.relem(mons, PM.ORACLE)) || mon.m_id === svq.quest_status.leader_m_id ? 1 : 0;
+    return mon.ispriest | 0 || mon.isshk | 0 || mon.isgd | 0 || mon.data === mons[PM.ORACLE] || mon.m_id === svq.quest_status.leader_m_id ? 1 : 0;
 }
 export function is_door_mappear(mon) {
     return (mon.m_ap_type & M_AP.TYPMASK) === M_AP.FURNITURE && (mon.mappearance === S.hcdoor || mon.mappearance === S.vcdoor) ? 1 : 0;

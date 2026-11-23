@@ -745,9 +745,9 @@ export async function animate_statue(statue, x, y, cause, fail_reason) {   // tr
         use_saved_traits = FALSE;
     } else if (is_golem(mptr) && cause === ANIMATE.SPELL) {
         /* statue of any golem hit by stone-to-flesh becomes flesh golem */
-        golem_xform = $c.i8(!$c.peq(mptr, $c.relem(mons, PM.FLESH_GOLEM)) ? 1 : 0);
+        golem_xform = $c.i8(mptr !== mons[PM.FLESH_GOLEM] ? 1 : 0);
         mnum[0] = PM.FLESH_GOLEM;
-        mptr = $c.relem(mons, PM.FLESH_GOLEM);
+        mptr = mons[PM.FLESH_GOLEM];
         use_saved_traits = $c.i8(has_omonst(statue) && !golem_xform ? 1 : 0);
     } else {
         use_saved_traits = $c.i8(has_omonst(statue));
@@ -766,9 +766,9 @@ export async function animate_statue(statue, x, y, cause, fail_reason) {   // tr
            up here (cant_revive() sets mnum to be doppelganger;
            mptr reflects the original form for use by newcham()) */
         /* block quest guards from other roles */
-        if (mnum[0] === PM.DOPPELGANGER && !$c.peq(mptr, $c.relem(mons, PM.DOPPELGANGER)) || mptr.msound === MS.GUARDIAN && await quest_info(MS.GUARDIAN) !== mnum[0]) {
+        if (mnum[0] === PM.DOPPELGANGER && mptr !== mons[PM.DOPPELGANGER] || mptr.msound === MS.GUARDIAN && await quest_info(MS.GUARDIAN) !== mnum[0]) {
             mmflags = $c.u32($c.or64(mmflags, MM.NOCOUNTBIRTH | MM.ADJACENTOK));
-            mon = await makemon($c.relem(mons, PM.DOPPELGANGER), x, y, mmflags);
+            mon = await makemon(mons[PM.DOPPELGANGER], x, y, mmflags);
             /* if hero has protection from shape changers, cham field will
                be NON_PM; otherwise, set form to match the statue */
             if (mon && ismnum(mon.cham)) {
@@ -951,7 +951,7 @@ async function mu_maybe_destroy_web(mtmp, domsg, trap) {   // trap.c:972
     let isyou = 0, mptr = null, x = 0, y = 0;
     isyou = $c.i8($c.peq(mtmp, gy.youmonst) ? 1 : 0);
     mptr = mtmp.data;
-    if (amorphous(mptr) || is_whirly(mptr) || flaming(mptr) || unsolid(mptr) || $c.peq(mptr, $c.relem(mons, PM.GELATINOUS_CUBE))) {
+    if (amorphous(mptr) || is_whirly(mptr) || flaming(mptr) || unsolid(mptr) || mptr === mons[PM.GELATINOUS_CUBE]) {
         x = trap.tx;
         y = trap.ty;
         if (flaming(mptr) || acidic(mptr)) {
@@ -1112,7 +1112,7 @@ export async function m_harmless_trap(mtmp, ttmp) {   // trap.c:1106
             }
             break;
         case RUST_TRAP:
-            if (!$c.peq(mdat, $c.relem(mons, PM.IRON_GOLEM))) {
+            if (mdat !== mons[PM.IRON_GOLEM]) {
                 return TRUE;
             }
             break;
@@ -1481,7 +1481,7 @@ async function trapeffect_bear_trap(mtmp, trap, trflags) {   // trap.c:1479
                 await pline_mon(mtmp, $c.lit("%s is caught in %s bear trap!"), await Monnam(mtmp), a_your[trap.madeby_u]);
                 await seetrap(trap);
             } else {
-                if ($c.peq(mptr, $c.relem(mons, PM.OWLBEAR)) || $c.peq(mptr, $c.relem(mons, PM.BUGBEAR))) {
+                if (mptr === mons[PM.OWLBEAR] || mptr === mons[PM.BUGBEAR]) {
                     await You_hear($c.lit("the roaring of an angry bear!"));
                 }
             }
@@ -1660,7 +1660,7 @@ async function trapeffect_rust_trap(mtmp, trap, trflags) {   // trap.c:1595
             if (DEADMONSTER(mtmp)) {
                 trapkilled = TRUE;
             }
-        } else if ($c.peq(mptr, $c.relem(mons, PM.GREMLIN)) && rn2(3)) {
+        } else if (mptr === mons[PM.GREMLIN] && rn2(3)) {
             await split_mon(mtmp, null);
         }
         return trapkilled ? Trap.Killed_Mon : mtmp.mtrapped | 0 ? Trap.Caught_Mon : Trap.Effect_Finished;
@@ -1905,7 +1905,7 @@ async function trapeffect_pit(mtmp, trap, trflags) {   // trap.c:1825
         }
         if (in_sight) {
             await pline_mon(mtmp, $c.lit("%s %s into %s pit!"), await Monnam(mtmp), fallverb, a_your[trap.madeby_u]);
-            if ($c.peq(mptr, $c.relem(mons, PM.PIT_VIPER)) || $c.peq(mptr, $c.relem(mons, PM.PIT_FIEND))) {
+            if (mptr === mons[PM.PIT_VIPER] || mptr === mons[PM.PIT_FIEND]) {
                 await pline($c.lit("How pitiful.  Isn't that the pits?"));
             }
             await seetrap(trap);
@@ -2730,7 +2730,7 @@ export async function immune_to_trap(mon, ttype) {   // trap.c:2783
             return TRAP.NOT_IMMUNE;
         case WEB:
             /* most of this code is lifted from mu_maybe_destroy_web */
-            if (webmaker(pm) || amorphous(pm) || is_whirly(pm) || flaming(pm) || unsolid(pm) || $c.peq(pm, $c.relem(mons, PM.GELATINOUS_CUBE))) {
+            if (webmaker(pm) || amorphous(pm) || is_whirly(pm) || flaming(pm) || unsolid(pm) || pm === mons[PM.GELATINOUS_CUBE]) {
                 return TRAP.CLEARLY_IMMUNE;
             }
             return TRAP.NOT_IMMUNE;
@@ -2749,7 +2749,7 @@ export async function immune_to_trap(mon, ttype) {   // trap.c:2783
             return TRAP.NOT_IMMUNE;
         case RUST_TRAP:
             /* harmful if wearing anything rustable or if mon is an iron golem */
-            if ($c.peq(pm, $c.relem(mons, PM.IRON_GOLEM))) {
+            if (pm === mons[PM.IRON_GOLEM]) {
                 return TRAP.NOT_IMMUNE;
             }
             for (obj = is_you ? gi.invent : mon.minvent; obj; obj = obj.nobj) {
@@ -3564,7 +3564,7 @@ function isclearpath(cc, distance, dx, dy) {   // trap.c:3695
  * @returns {number} boolean
  */
 function m_easy_escape_pit(mtmp) {   // trap.c:3726
-    return $c.i8($c.peq(mtmp.data, $c.relem(mons, PM.PIT_FIEND)) || mtmp.data.msize >= MZ.HUGE ? 1 : 0);
+    return $c.i8(mtmp.data === mons[PM.PIT_FIEND] || mtmp.data.msize >= MZ.HUGE ? 1 : 0);
 }
 /**
  * @param {$T.monst | null} mtmp struct monst *

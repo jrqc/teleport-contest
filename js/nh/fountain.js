@@ -101,7 +101,7 @@ async function dowatersnakes() {   // fountain.c:38
             await You_hear($c.lit("%s hissing!"), c_common_strings.c_something);
         }
         while (($t1 = num, num = $t1 - 1 | 0, $t1) > 0) {
-            if ((mtmp = await makemon($c.relem(mons, PM.WATER_MOCCASIN), u.ux, u.uy, MM.NOMSG)) !== null && t_at(mtmp.mx, mtmp.my)) {
+            if ((mtmp = await makemon(mons[PM.WATER_MOCCASIN], u.ux, u.uy, MM.NOMSG)) !== null && t_at(mtmp.mx, mtmp.my)) {
                 await mintrap(mtmp, NO_TRAP_FLAGS);
             }
         }
@@ -116,7 +116,7 @@ async function dowatersnakes() {   // fountain.c:38
 async function dowaterdemon() {   // fountain.c:64
     let mtmp = [null];
     if (!(svm.mvitals[PM.WATER_DEMON].mvflags & G_GONE)) {
-        if ((mtmp[0] = await makemon($c.relem(mons, PM.WATER_DEMON), u.ux, u.uy, MM.NOMSG)) !== null) {
+        if ((mtmp[0] = await makemon(mons[PM.WATER_DEMON], u.ux, u.uy, MM.NOMSG)) !== null) {
             if (!Blind()) {
                 await You($c.lit("unleash %s!"), await a_monnam(mtmp[0]));
             } else {
@@ -142,7 +142,7 @@ async function dowaterdemon() {   // fountain.c:64
  */
 async function dowaternymph() {   // fountain.c:94
     let mtmp = null;
-    if (!(svm.mvitals[PM.WATER_NYMPH].mvflags & G_GONE) && (mtmp = await makemon($c.relem(mons, PM.WATER_NYMPH), u.ux, u.uy, MM.NOMSG)) !== null) {
+    if (!(svm.mvitals[PM.WATER_NYMPH].mvflags & G_GONE) && (mtmp = await makemon(mons[PM.WATER_NYMPH], u.ux, u.uy, MM.NOMSG)) !== null) {
         if (!Blind()) {
             await You($c.lit("attract %s!"), await a_monnam(mtmp));
         } else {
@@ -672,7 +672,7 @@ export async function drinksink() {   // fountain.c:595
             if (svm.mvitals[PM.SEWER_RAT].mvflags & G_GONE) {
                 await pline_The($c.lit("sink seems quite dirty."));
             } else {
-                mtmp = await makemon($c.relem(mons, PM.SEWER_RAT), u.ux, u.uy, MM.NOMSG);
+                mtmp = await makemon(mons[PM.SEWER_RAT], u.ux, u.uy, MM.NOMSG);
                 if (mtmp) {
                     await pline($c.lit("Eek!  There's %s in the sink!"), Blind() || !canspotmon(mtmp) ? $c.lit("something squirmy") : await a_monnam(mtmp));
                 }
@@ -713,7 +713,7 @@ export async function drinksink() {   // fountain.c:595
             break;
         case 7:
             await pline_The($c.lit("%s moves as though of its own will!"), hliquid($c.lit("water")));
-            if (svm.mvitals[PM.WATER_ELEMENTAL].mvflags & G_GONE || !await makemon($c.relem(mons, PM.WATER_ELEMENTAL), u.ux, u.uy, MM.NOMSG)) {
+            if (svm.mvitals[PM.WATER_ELEMENTAL].mvflags & G_GONE || !await makemon(mons[PM.WATER_ELEMENTAL], u.ux, u.uy, MM.NOMSG)) {
                 await pline($c.lit("But it quiets down."));
             }
             break;

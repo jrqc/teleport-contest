@@ -343,7 +343,7 @@ export async function wormgone(worm) {   // worm.c:308
        when a long worm gets created by a polymorph zap, it gets flagged
        with MCORPSENM()==PM_LONG_WORM so that the same zap won't trigger
        another polymorph if it hits the new tail */
-    if ($c.peq(worm.data, $c.relem(mons, PM.LONG_WORM)) && has_mcorpsenm(worm)) {
+    if (worm.data === mons[PM.LONG_WORM] && has_mcorpsenm(worm)) {
         worm.mextra.mcorpsenm = NON_PM;   /* no longer polymorph-proof */
     }
 }

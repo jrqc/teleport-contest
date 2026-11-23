@@ -225,7 +225,7 @@ export async function awaken_soldiers(bugler) {   // music.c:162
         if (DEADMONSTER(mtmp)) {
             continue;
         }
-        if (is_mercenary(mtmp.data) && !$c.peq(mtmp.data, $c.relem(mons, PM.GUARD))) {
+        if (is_mercenary(mtmp.data) && mtmp.data !== mons[PM.GUARD]) {
             if (!mtmp.mtame) {
                 mtmp.mpeaceful = (0) & 1;
             }

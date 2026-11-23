@@ -732,7 +732,7 @@ export async function fixup_special() {   // mkmaze.c:570
     }
     /* Still need to add some stuff to level file */
     if ((svd.dungeon_topology.d_medusa_level.dlevel || svd.dungeon_topology.d_medusa_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_medusa_level)) {
-        croom = $c.relem(svr.rooms, 0);   /* the first room defined on the medusa level */
+        croom = svr.rooms[0];   /* the first room defined on the medusa level */
         for (tryct = rnd(4); tryct; tryct = tryct - 1 | 0) {
             x = somex(croom);
             y = somey(croom);
@@ -824,7 +824,7 @@ async function migrate_orc(mtmp, mflags) {   // mkmaze.c:717
  */
 async function shiny_orc_stuff(mtmp) {   // mkmaze.c:748
     let gemprob = 0, goldprob = 0, otyp = 0, otmp = null, is_captain = 0, $t1, $t2;
-    is_captain = $c.i8($c.peq(mtmp.data, $c.relem(mons, PM.ORC_CAPTAIN)) ? 1 : 0);
+    is_captain = $c.i8(mtmp.data === mons[PM.ORC_CAPTAIN] ? 1 : 0);
     /* probabilities */
     goldprob = is_captain ? 600 : 300;
     gemprob = $c.div32(goldprob, 4);
@@ -915,7 +915,7 @@ async function stolen_booty() {   // mkmaze.c:799
     }
     await migr_booty_item(rn2(2) ? LONG_SWORD : SILVER_SABER, gang);
     /* create the leader of the orc gang */
-    mtmp = await makemon($c.relem(mons, PM.ORC_CAPTAIN), 0, 0, MM.NONAME);
+    mtmp = await makemon(mons[PM.ORC_CAPTAIN], 0, 0, MM.NONAME);
     if (mtmp) {
         mtmp = await christen_monst(mtmp, upstart(gang));
         mtmp.mpeaceful = (0) & 1;
@@ -938,7 +938,7 @@ async function stolen_booty() {   // mkmaze.c:799
              * Don't christen the orc captain as a subordinate
              * member of the main orc horde.
              */
-            if (!$c.peq(mtmp.data, $c.relem(mons, PM.ORC_CAPTAIN))) {
+            if (mtmp.data !== mons[PM.ORC_CAPTAIN]) {
                 mtmp = await christen_orc(mtmp, upstart(gang), $c.lit(""));
             }
         }
@@ -1231,7 +1231,7 @@ async function populate_maze() {   // mkmaze.c:1097
     }
     for (i = rn2(3); i; i = i - 1 | 0) {
         await mazexy(mm);
-        await makemon($c.relem(mons, PM.MINOTAUR), mm.x, mm.y, NO.MM_FLAGS);
+        await makemon(mons[PM.MINOTAUR], mm.x, mm.y, NO.MM_FLAGS);
     }
     for (i = rn2(5) + 7 | 0; i; i = i - 1 | 0) {
         await mazexy(mm);
@@ -1464,7 +1464,7 @@ export function get_level_extends(left, top, right, bottom) {   // mkmaze.c:1353
     let x = 0, y = 0, typ = 0, lev = null, found = 0, nonwall = 0, xmin = 0, xmax = 0, ymin = 0, ymax = 0;
     found = nonwall = FALSE;
     for (xmin = 0; !found && xmin <= COLNO; xmin = $c.i16(xmin + 1)) {
-        lev = $c.relem(svl.level.locations[xmin], 0);
+        lev = svl.level.locations[xmin][0];
         for (y = 0; y <= ROWNO - 1; y = $c.i16(y + 1), lev = $c.radd(lev, 1)) {
             typ = lev.typ >>> 0;
             if (typ !== STONE) {
@@ -1481,7 +1481,7 @@ export function get_level_extends(left, top, right, bottom) {   // mkmaze.c:1353
     }
     found = nonwall = FALSE;
     for (xmax = COLNO - 1; !found && xmax >= 0; xmax = $c.i16(xmax - 1)) {
-        lev = $c.relem(svl.level.locations[xmax], 0);
+        lev = svl.level.locations[xmax][0];
         for (y = 0; y <= ROWNO - 1; y = $c.i16(y + 1), lev = $c.radd(lev, 1)) {
             typ = lev.typ >>> 0;
             if (typ !== STONE) {

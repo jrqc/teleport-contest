@@ -115,11 +115,11 @@ async function kickdmg(mon, clumsy) {   // dokick.c:34
         dmg = 0;
     }
     /* attacking a shade is normally useless */
-    if ($c.peq(mon.data, $c.relem(mons, PM.SHADE))) {
+    if (mon.data === mons[PM.SHADE]) {
         dmg = 0;
     }
     specialdmg = await special_dmgval(gy.youmonst, mon, W.ARMF, null);
-    if ($c.peq(mon.data, $c.relem(mons, PM.SHADE)) && !specialdmg) {
+    if (mon.data === mons[PM.SHADE] && !specialdmg) {
         await pline_The($c.lit("%s."), new $c.Ptr(kick_passes_thru, 0));
         /* doesn't exercise skill or abuse alignment or frighten pet,
            and shades have no passive counterattack */
@@ -141,7 +141,7 @@ async function kickdmg(mon, clumsy) {   // dokick.c:34
     if (dmg > 0) {
         /* convert potential damage to actual damage */
         dmg = rnd(dmg);
-        if (gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || $c.peq(gy.youmonst.data, $c.relem(mons, PM.SASQUATCH)) || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS) {
+        if (gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || gy.youmonst.data === mons[PM.SASQUATCH] || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS) {
             if (dmg > 1) {
                 kick_skill = P_MARTIAL_ARTS;
             }
@@ -158,7 +158,7 @@ async function kickdmg(mon, clumsy) {   // dokick.c:34
     if (dmg > 0) {
         mon.mhp = mon.mhp - dmg | 0;
     }
-    if (!DEADMONSTER(mon) && (gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || $c.peq(gy.youmonst.data, $c.relem(mons, PM.SASQUATCH)) || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS) && !bigmonst(mon.data) && !rn2(3) && mon.mcanmove | 0 && !$c.peq(mon, u.ustuck) && !mon.mtrapped) {
+    if (!DEADMONSTER(mon) && (gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || gy.youmonst.data === mons[PM.SASQUATCH] || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS) && !bigmonst(mon.data) && !rn2(3) && mon.mcanmove | 0 && !$c.peq(mon, u.ustuck) && !mon.mtrapped) {
         /* see if the monster has a place to move into */
         mdx = mon.mx + u.dx | 0;
         mdy = mon.my + u.dy | 0;
@@ -265,7 +265,7 @@ async function kick_monster(mon, x, y) {   // dokick.c:146
             }
             kickdieroll = rnd(20);
             specialdmg = await special_dmgval(gy.youmonst, mon, W.ARMF, null);
-            if ($c.peq(mon.data, $c.relem(mons, PM.SHADE)) && !specialdmg) {
+            if (mon.data === mons[PM.SHADE] && !specialdmg) {
                 /* doesn't matter whether it would have hit or missed,
                    and shades have no passive counterattack */
                 await Your($c.lit("%s %s."), new $c.Ptr(kick_passes_thru, 0), await mon_nam(mon));
@@ -297,7 +297,7 @@ async function kick_monster(mon, x, y) {   // dokick.c:146
          */
         if (i < $c.div32(Math.imul(j, 3), 10)) {
             if (!rn2(i < $c.div32(j, 10) ? 2 : i < $c.div32(j, 5) ? 3 : 4)) {
-                if (gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || $c.peq(gy.youmonst.data, $c.relem(mons, PM.SASQUATCH)) || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS) {
+                if (gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || gy.youmonst.data === mons[PM.SASQUATCH] || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS) {
                     break doit$;
                 }
                 await Your($c.lit("clumsy kick does no damage."));
@@ -318,7 +318,7 @@ async function kick_monster(mon, x, y) {   // dokick.c:146
     }
     await You($c.lit("kick %s."), await mon_nam(mon));
     if (!rn2(clumsy ? 3 : 4) && (clumsy || !bigmonst(mon.data)) && mon.mcansee | 0 && !mon.mtrapped && !thick_skinned(mon.data) && mon.data.mlet !== S.EEL && haseyes(mon.data) && mon.mcanmove | 0 && !mon.mstun && !mon.mconf && !mon.msleeping && mon.data.mmove >= 12) {
-        if (!nohands(mon.data) && !rn2(gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || $c.peq(gy.youmonst.data, $c.relem(mons, PM.SASQUATCH)) || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS ? 5 : 3)) {
+        if (!nohands(mon.data) && !rn2(gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || gy.youmonst.data === mons[PM.SASQUATCH] || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS ? 5 : 3)) {
             await pline($c.lit("%s blocks your %skick."), await Monnam(mon), clumsy ? $c.lit("clumsy ") : $c.lit(""));
             await passive(mon, $G.uarmf, FALSE, 1, AT.KICK, FALSE);
             return;
@@ -408,13 +408,13 @@ export async function ghitm(mtmp, gold) {   // dokick.c:295
         } else if (is_mercenary(mtmp.data)) {
             was_angry = $c.i8(!mtmp.mpeaceful ? 1 : 0);
             goldreqd = 0;
-            if ($c.peq(mtmp.data, $c.relem(mons, PM.SOLDIER))) {
+            if (mtmp.data === mons[PM.SOLDIER]) {
                 goldreqd = 100;
-            } else if ($c.peq(mtmp.data, $c.relem(mons, PM.SERGEANT))) {
+            } else if (mtmp.data === mons[PM.SERGEANT]) {
                 goldreqd = 250;
-            } else if ($c.peq(mtmp.data, $c.relem(mons, PM.LIEUTENANT))) {
+            } else if (mtmp.data === mons[PM.LIEUTENANT]) {
                 goldreqd = 500;
-            } else if ($c.peq(mtmp.data, $c.relem(mons, PM.CAPTAIN))) {
+            } else if (mtmp.data === mons[PM.CAPTAIN]) {
                 goldreqd = 750;
             }
             if (goldreqd && rn2(3)) {
@@ -595,7 +595,7 @@ async function really_kick_object(x, y) {   // dokick.c:508
            (maybe dexterity should also figure here) */
         range = $c.div32(ACURRSTR(), 2) - $c.div32(k_owt, 40) | 0;
     }
-    if (gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || $c.peq(gy.youmonst.data, $c.relem(mons, PM.SASQUATCH)) || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS) {
+    if (gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || gy.youmonst.data === mons[PM.SASQUATCH] || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS) {
         range = range + rnd(3) | 0;
     }
     if (is_pool(x, y)) {
@@ -629,13 +629,13 @@ async function really_kick_object(x, y) {   // dokick.c:508
        messages refer to "it" */
     await Norep($c.lit("You kick %s."), !isgold ? await singular(gk.kickedobj, doname) : await doname(gk.kickedobj));
     if (svl.level.locations[x][y].typ < POOL || closed_door(x, y)) {
-        if (!(gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || $c.peq(gy.youmonst.data, $c.relem(mons, PM.SASQUATCH)) || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS) && rn2(20) > ACURR(A.DEX) || svl.level.locations[u.ux][u.uy].typ < POOL || closed_door(u.ux, u.uy)) {
+        if (!(gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || gy.youmonst.data === mons[PM.SASQUATCH] || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS) && rn2(20) > ACURR(A.DEX) || svl.level.locations[u.ux][u.uy].typ < POOL || closed_door(u.ux, u.uy)) {
             if (Blind()) {
                 await pline($c.lit("It doesn't come loose."));
             } else {
                 await pline($c.lit("%s %sn't come loose."), await The(await distant_name(gk.kickedobj, xname)), await otense(gk.kickedobj, $c.lit("do")));
             }
-            return !rn2(3) || (gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || $c.peq(gy.youmonst.data, $c.relem(mons, PM.SASQUATCH)) || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS) ? 1 : 0;
+            return !rn2(3) || (gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || gy.youmonst.data === mons[PM.SASQUATCH] || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS) ? 1 : 0;
         }
         if (Blind()) {
             await pline($c.lit("It comes loose."));
@@ -668,7 +668,7 @@ async function really_kick_object(x, y) {   // dokick.c:508
         }
         await container_impact_dmg(gk.kickedobj, x, y);
         if (gk.kickedobj.olocked) {
-            if (!rn2(5) || (gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || $c.peq(gy.youmonst.data, $c.relem(mons, PM.SASQUATCH)) || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS) && !rn2(2)) {
+            if (!rn2(5) || (gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || gy.youmonst.data === mons[PM.SASQUATCH] || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS) && !rn2(2)) {
                 await You($c.lit("break open the lock!"));
                 await breakchestlock(gk.kickedobj, FALSE);
                 if (otrp) {
@@ -677,7 +677,7 @@ async function really_kick_object(x, y) {   // dokick.c:508
                 return 1;
             }
         } else {
-            if (!rn2(3) || (gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || $c.peq(gy.youmonst.data, $c.relem(mons, PM.SASQUATCH)) || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS) && !rn2(2)) {
+            if (!rn2(3) || (gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || gy.youmonst.data === mons[PM.SASQUATCH] || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS) && !rn2(2)) {
                 await pline_The($c.lit("lid slams open, then falls shut."));
                 gk.kickedobj.lknown = (1) & 1;
                 if (otrp) {
@@ -703,7 +703,7 @@ async function really_kick_object(x, y) {   // dokick.c:508
         if (!Is_box(gk.kickedobj)) {
             await pline($c.lit("Thump!"));
         }
-        return !rn2(3) || (gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || $c.peq(gy.youmonst.data, $c.relem(mons, PM.SASQUATCH)) || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS) ? 1 : 0;
+        return !rn2(3) || (gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || gy.youmonst.data === mons[PM.SASQUATCH] || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS) ? 1 : 0;
     }
     if (gk.kickedobj.quan > 1) {
         if (!isgold) {
@@ -720,7 +720,7 @@ async function really_kick_object(x, y) {   // dokick.c:508
             }
             if (gk.kickedobj.quan > 300) {
                 await pline($c.lit("Thump!"));
-                return !rn2(3) || (gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || $c.peq(gy.youmonst.data, $c.relem(mons, PM.SASQUATCH)) || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS) ? 1 : 0;
+                return !rn2(3) || (gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || gy.youmonst.data === mons[PM.SASQUATCH] || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS) ? 1 : 0;
             }
         }
     }
@@ -871,7 +871,7 @@ async function watchman_door_damage(mtmp, x, y) {   // dokick.c:846
  */
 async function kick_dumb(x, y) {   // dokick.c:864
     await exercise(A.DEX, FALSE);
-    if (gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || $c.peq(gy.youmonst.data, $c.relem(mons, PM.SASQUATCH)) || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS || ACURR(A.DEX) >= 16 || rn2(3)) {
+    if (gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || gy.youmonst.data === mons[PM.SASQUATCH] || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS || ACURR(A.DEX) >= 16 || rn2(3)) {
         await You($c.lit("kick at empty space."));
         if (Blind()) {
             await feel_location(x, y);
@@ -940,7 +940,7 @@ async function kick_door(x, y, avrg_attrib) {   // dokick.c:910
     await exercise(A.DEX, TRUE);
     doorbuster = $c.i8(Upolyd() && is_giant(gy.youmonst.data) ? 1 : 0);
     /* door is known to be CLOSED or LOCKED */
-    if (doorbuster || rnl(35) < (avrg_attrib + (!(gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || $c.peq(gy.youmonst.data, $c.relem(mons, PM.SASQUATCH)) || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS) ? 0 : ACURR(A.DEX)) | 0)) {
+    if (doorbuster || rnl(35) < (avrg_attrib + (!(gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || gy.youmonst.data === mons[PM.SASQUATCH] || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS) ? 0 : ACURR(A.DEX)) | 0)) {
         shopdoor = $c.i8(in_rooms(x, y, SHOPBASE).get(0) ? TRUE : FALSE);
         /* break the door */
         if ((gm.maploc.flags | 0) & D.TRAPPED) {
@@ -1184,7 +1184,7 @@ async function kick_nondoor(x, y, avrg_attrib) {   // dokick.c:974
             mm.x = x;
             mm.y = y;
             while ($t3 = cnt, cnt = $t3 - 1 | 0, $t3) {
-                if (await enexto(mm, mm.x, mm.y, $c.relem(mons, PM.KILLER_BEE)) && await makemon($c.relem(mons, PM.KILLER_BEE), mm.x, mm.y, MM.ANGRY | MM.NOMSG)) {
+                if (await enexto(mm, mm.x, mm.y, mons[PM.KILLER_BEE]) && await makemon(mons[PM.KILLER_BEE], mm.x, mm.y, MM.ANGRY | MM.NOMSG)) {
                     made = made + 1 | 0;
                 }
             }
@@ -1221,7 +1221,7 @@ async function kick_nondoor(x, y, avrg_attrib) {   // dokick.c:974
             } else {
                 await pline($c.lit("A %s ooze gushes up from the drain!"), hcolor(c_color_names.c_black));
             }
-            await makemon($c.relem(mons, PM.BLACK_PUDDING), x, y, MM.NOMSG);
+            await makemon(mons[PM.BLACK_PUDDING], x, y, MM.NOMSG);
             await exercise(A.DEX, TRUE);
             await newsym(x, y);
             gm.maploc.flags = ((gm.maploc.flags | 0 | S.LPUDDING) >>> 0) & 31;
@@ -1229,7 +1229,7 @@ async function kick_nondoor(x, y, avrg_attrib) {   // dokick.c:974
         } else if (!((gm.maploc.flags | 0) & S.LDWASHER) && !rn2(3) && !(svm.mvitals[PM.AMOROUS_DEMON].mvflags & G_GONE)) {
             /* can't resist... */
             await pline($c.lit("%s returns!"), Blind() ? c_common_strings.c_Something : $c.lit("The dish washer"));
-            if (await makemon($c.relem(mons, PM.AMOROUS_DEMON), x, y, $c.u32($c.or64(MM.NOMSG, gend === 1 || gend === 2 && rn2(2) ? MM.MALE : MM.FEMALE)))) {
+            if (await makemon(mons[PM.AMOROUS_DEMON], x, y, $c.u32($c.or64(MM.NOMSG, gend === 1 || gend === 2 && rn2(2) ? MM.MALE : MM.FEMALE)))) {
                 await newsym(x, y);
             }
             gm.maploc.flags = ((gm.maploc.flags | 0 | S.LDWASHER) >>> 0) & 31;

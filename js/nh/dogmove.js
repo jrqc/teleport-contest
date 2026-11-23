@@ -319,7 +319,7 @@ export async function dog_eat(mtmp, obj, x, y, devour) {   // dogmove.c:218
         await newsym(x, y);
         await newsym(mtmp.mx, mtmp.my);
     }
-    if ($c.peq(mtmp.data, $c.relem(mons, PM.KILLER_BEE)) && obj.otyp === LUMP_OF_ROYAL_JELLY && (res = await bee_eat_jelly(mtmp, obj)) >= 0) {   /* bypass most of dog_eat(), including apport update */
+    if (mtmp.data === mons[PM.KILLER_BEE] && obj.otyp === LUMP_OF_ROYAL_JELLY && (res = await bee_eat_jelly(mtmp, obj)) >= 0) {   /* bypass most of dog_eat(), including apport update */
         return res + 1 | 0;   /* 1 -> 2, 0 -> 1; -1, keep going */
     }
     /* food items are eaten one at a time; entire stack for other stuff */
@@ -362,7 +362,7 @@ export async function dog_eat(mtmp, obj, x, y, devour) {   // dogmove.c:218
         $c.strcpy(new $c.Ptr(objnambuf, 0), await xname(obj));
         iflags.suppress_price = iflags.suppress_price - 1 | 0;
     }
-    if ($c.peq(mtmp.data, $c.relem(mons, PM.RUST_MONSTER)) && obj.oerodeproof | 0) {
+    if (mtmp.data === mons[PM.RUST_MONSTER] && obj.oerodeproof | 0) {
         /* The object's rustproofing is gone now */
         if (obj.unpaid) {
             await costly_alteration(obj, COST.DEGRD);
@@ -1148,7 +1148,7 @@ export async function dog_move(mtmp, after) {   // dogmove.c:977
                 if (mtmp2.m_lev >= balk || mtmp2.mtame && mtmp.mtame && !Conflict() || await max_passive_dmg(mtmp2, mtmp) >= mtmp.mhp || (Math.imul(mtmp.mhp, 4) < mtmp.mhpmax || mtmp2.data.msound === MS.GUARDIAN || mtmp2.data.msound === MS.LEADER) && mtmp2.mpeaceful | 0 && !Conflict()) {
                     continue;
                 }
-                if ($c.peq(mtmp2.data, $c.relem(mons, PM.FLOATING_EYE)) && rn2(10) && mtmp.mcansee | 0 && haseyes(mtmp.data) && mtmp2.mcansee | 0 && (!mtmp2.minvis || perceives(mtmp.data)) && !await mon_reflects(mtmp, $c.asArr(null, Int8Array)) || $c.peq(mtmp2.data, $c.relem(mons, PM.GELATINOUS_CUBE)) && rn2(10) || touch_petrifies(mtmp2.data) && !await resists_ston(mtmp)) {
+                if (mtmp2.data === mons[PM.FLOATING_EYE] && rn2(10) && mtmp.mcansee | 0 && haseyes(mtmp.data) && mtmp2.mcansee | 0 && (!mtmp2.minvis || perceives(mtmp.data)) && !await mon_reflects(mtmp, $c.asArr(null, Int8Array)) || mtmp2.data === mons[PM.GELATINOUS_CUBE] && rn2(10) || touch_petrifies(mtmp2.data) && !await resists_ston(mtmp)) {
                     /* only skip this foe if a ranged attack isn't viable */
                     if (dist2(mtmp.mx, mtmp.my, mtmp2.mx, mtmp2.my) <= 2 || !$c.peq(best_target(mtmp, FALSE), mtmp2)) {
                         continue;

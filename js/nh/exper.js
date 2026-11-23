@@ -168,7 +168,7 @@ export function experience(mtmp, nk) {   // exper.c:85
         tmp = tmp + 50 | 0;
     }
     /* Mail daemons put up no fight. */
-    if ($c.peq(mtmp.data, $c.relem(mons, PM.MAIL_DAEMON))) {
+    if (mtmp.data === mons[PM.MAIL_DAEMON]) {
         tmp = 1;
     }
     if (mtmp.mrevived | 0 || mtmp.mcloned | 0) {

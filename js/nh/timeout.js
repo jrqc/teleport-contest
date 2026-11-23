@@ -417,7 +417,7 @@ export async function burn_away_slime() {   // timeout.c:448
 async function slimed_to_death(kptr) {   // timeout.c:457
     let save_mvflags = 0, slimebuf = new Int8Array(256);
     /* redundant: polymon() cures sliming when polying into green slime */
-    if (Upolyd() && $c.peq(gy.youmonst.data, $c.relem(mons, PM.GREEN_SLIME))) {
+    if (Upolyd() && gy.youmonst.data === mons[PM.GREEN_SLIME]) {
         await dealloc_killer(kptr);
         return;
     }
@@ -609,10 +609,10 @@ export async function nh_timeout() {   // timeout.c:588
         }
     }
     was_flying = $c.i8((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked ? 1 : 0);
-    for (upp = $c.relem(u.uprops, 0); $c.pcmp(upp, $c.radd($c.relem(u.uprops, 0), 69)) < 0; upp = $c.radd(upp, 1)) {
+    for (upp = u.uprops[0]; $c.pcmp(upp, $c.radd(u.uprops[0], 69)) < 0; upp = $c.radd(upp, 1)) {
         if ($c.and64(upp.intrinsic, TIMEOUT) && !$c.and64(upp.intrinsic = $c.sub64(upp.intrinsic, 1), TIMEOUT)) {
-            kptr = find_delayed_killer($c.i32($c.rdiff(upp, $c.relem(u.uprops, 0))));
-            switch ($c.rdiff(upp, $c.relem(u.uprops, 0))) {
+            kptr = find_delayed_killer($c.i32($c.rdiff(upp, u.uprops[0])));
+            switch ($c.rdiff(upp, u.uprops[0])) {
                 case STONED:
                     if (kptr && kptr.name[0]) {
                         svk.killer.format = kptr.format;

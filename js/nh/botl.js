@@ -1753,7 +1753,7 @@ export async function exp_percent_changing() {   // botl.c:2090
          * Status update is warranted iff percent integer changes and the new
          * percentage results in a different highlighting rule being selected.
          */
-        curr = $c.relem(gb.blstats[gn.now_or_before_idx], BL.XP);
+        curr = gb.blstats[gn.now_or_before_idx][BL.XP];
         /* TODO: [see eval_notify_windowport_field() about percent_matters
            and the check against 'thresholds'] */
         if (curr.percent_matters && curr.thresholds && (pc = await exp_percentage()) !== curr.percent_value) {
@@ -2968,7 +2968,7 @@ export async function count_status_hilites() {   // botl.c:3477
  */
 async function status_hilite_linestr_gather_conditions() {   // botl.c:3488
     let i = 0, cond_maps = $c.recArray($T._cond_map, 30), clr = 0, atr = 0, j = 0, ca = 0, added_condmap = 0, clr$2 = Int32Array.of(0), atr$2 = Int32Array.of(0), clrbuf = new Int8Array(256), attrbuf = new Int8Array(256), condbuf = new Int8Array(256), tmpattr = null;
-    $c.memset($c.relem(cond_maps, 0), 0, 480);
+    $c.memset(cond_maps[0], 0, 480);
     for (i = 0; i < 30; i = i + 1 | 0) {
         clr = NO_COLOR;
         atr = HL.NONE;

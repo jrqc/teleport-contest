@@ -323,7 +323,7 @@ export async function mksobj_migr_to_species(otyp, mflags2, init, artif) {   // 
 export async function mkobj(oclass, artif) {   // mkobj.c:270
     let tprob = 0, i = 0, prob = 0, iprobs = null;
     if (oclass === RANDOM_CLASS) {
-        iprobs = (svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? $c.relem(rogueprobs, 0) : Inhell() ? $c.relem(hellprobs, 0) : $c.relem(mkobjprobs, 0);
+        iprobs = (svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? rogueprobs[0] : Inhell() ? hellprobs[0] : mkobjprobs[0];
         for (tprob = rnd(100); (tprob = tprob - iprobs.iprob | 0) > 0; iprobs = $c.radd(iprobs, 1)) {
             continue;
         }
@@ -390,7 +390,7 @@ async function mkbox_cnts(box) {   // mkobj.c:304
                 await stop_timer(SHRINK_GLOB, obj_to_any(otmp));
             }
         } else {
-            iprobs = $c.relem(boxiprobs, 0);
+            iprobs = boxiprobs[0];
             for (tprob = rnd(100); (tprob = tprob - iprobs.iprob | 0) > 0; iprobs = $c.radd(iprobs, 1)) {
             }
             if (!(otmp = await mkobj(iprobs.iclass, FALSE))) {
@@ -2159,7 +2159,7 @@ export async function mkcorpstat(objtype, mtmp, ptr, x, y, corpstatflags) {   //
         old_corpsenm = otmp.corpsenm;
         otmp.corpsenm = ptr.pmidx;
         $t1 = await weight(otmp) >>> 0, otmp.owt = $t1;
-        if (otmp.otyp === CORPSE && (gz.zombify || (old_corpsenm === PM.LIZARD || old_corpsenm === PM.LICHEN || (mons[old_corpsenm].mlet === S.TROLL || ($c.peq($c.relem(mons, old_corpsenm), $c.relem(mons, PM.DEATH)) || $c.peq($c.relem(mons, old_corpsenm), $c.relem(mons, PM.FAMINE)) || $c.peq($c.relem(mons, old_corpsenm), $c.relem(mons, PM.PESTILENCE))))) || (otmp.corpsenm === PM.LIZARD || otmp.corpsenm === PM.LICHEN || (mons[otmp.corpsenm].mlet === S.TROLL || ($c.peq($c.relem(mons, otmp.corpsenm), $c.relem(mons, PM.DEATH)) || $c.peq($c.relem(mons, otmp.corpsenm), $c.relem(mons, PM.FAMINE)) || $c.peq($c.relem(mons, otmp.corpsenm), $c.relem(mons, PM.PESTILENCE))))))) {
+        if (otmp.otyp === CORPSE && (gz.zombify || (old_corpsenm === PM.LIZARD || old_corpsenm === PM.LICHEN || (mons[old_corpsenm].mlet === S.TROLL || ($c.relem(mons, old_corpsenm) === mons[PM.DEATH] || $c.relem(mons, old_corpsenm) === mons[PM.FAMINE] || $c.relem(mons, old_corpsenm) === mons[PM.PESTILENCE]))) || (otmp.corpsenm === PM.LIZARD || otmp.corpsenm === PM.LICHEN || (mons[otmp.corpsenm].mlet === S.TROLL || ($c.relem(mons, otmp.corpsenm) === mons[PM.DEATH] || $c.relem(mons, otmp.corpsenm) === mons[PM.FAMINE] || $c.relem(mons, otmp.corpsenm) === mons[PM.PESTILENCE]))))) {
             await obj_stop_timers(otmp);
             await start_corpse_timeout(otmp);
         }

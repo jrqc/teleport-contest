@@ -1140,7 +1140,7 @@ async function use_mirror(obj$in) {   // apply.c:1018
         if (vis) {
             await pline($c.lit("%s doesn't have a reflection."), await Monnam(mtmp));
         }
-    } else if (monable && $c.peq(mtmp.data, $c.relem(mons, PM.MEDUSA))) {
+    } else if (monable && mtmp.data === mons[PM.MEDUSA]) {
         if (await mon_reflects(mtmp, $c.lit("The gaze is reflected away by %s %s!"))) {
             return ECMD.TIME;
         }
@@ -1149,7 +1149,7 @@ async function use_mirror(obj$in) {   // apply.c:1018
         }
         gs.stoned = TRUE;
         await killed(mtmp);
-    } else if (monable && $c.peq(mtmp.data, $c.relem(mons, PM.FLOATING_EYE))) {
+    } else if (monable && mtmp.data === mons[PM.FLOATING_EYE]) {
         tmp = d(mtmp.m_lev, mtmp.data.mattk[0].damd);
         if (!rn2(4)) {
             tmp = 120;
@@ -1160,12 +1160,12 @@ async function use_mirror(obj$in) {   // apply.c:1018
             await You_hear($c.lit("%s stop moving."), c_common_strings.c_something);
         }
         paralyze_monst(mtmp, (mtmp.mfrozen | 0) + tmp | 0);
-    } else if (monable && $c.peq(mtmp.data, $c.relem(mons, PM.UMBER_HULK))) {
+    } else if (monable && mtmp.data === mons[PM.UMBER_HULK]) {
         if (vis) {
             await pline($c.lit("%s confuses itself!"), await Monnam(mtmp));
         }
         mtmp.mconf = (1) & 1;
-    } else if (monable && (mlet === S.NYMPH || $c.peq(mtmp.data, $c.relem(mons, PM.AMOROUS_DEMON)))) {
+    } else if (monable && (mlet === S.NYMPH || mtmp.data === mons[PM.AMOROUS_DEMON])) {
         if (vis) {
             /* "She" or "He" */
             /* "<mon> admires self in your mirror " */

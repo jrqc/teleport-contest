@@ -2098,7 +2098,7 @@ export async function bind_mousebtn(btn, command) {   // cmd.c:2624
         gc.Cmd.mousebtn[btn] = null;
         return TRUE;
     }
-    for (extcmd = $c.relem(extcmdlist, 0); extcmd.ef_txt; extcmd = $c.radd(extcmd, 1)) {
+    for (extcmd = extcmdlist[0]; extcmd.ef_txt; extcmd = $c.radd(extcmd, 1)) {
         if (strncmpi(command, extcmd.ef_txt, -1)) {
             continue;
         }
@@ -2137,7 +2137,7 @@ export async function bind_key(key, command, user) {   // cmd.c:2662
         /* p points to the parameter */
         p = p.add(1);
     }
-    for (extcmd = $c.relem(extcmdlist, 0); extcmd.ef_txt; extcmd = $c.radd(extcmd, 1)) {
+    for (extcmd = extcmdlist[0]; extcmd.ef_txt; extcmd = $c.radd(extcmd, 1)) {
         if (strncmpi(buf, extcmd.ef_txt, -1)) {
             continue;
         }
@@ -2177,7 +2177,7 @@ export async function bind_key(key, command, user) {   // cmd.c:2662
  */
 async function bind_key_fn(key, fn) {   // cmd.c:2732
     let extcmd = null;
-    for (extcmd = $c.relem(extcmdlist, 0); extcmd.ef_txt; extcmd = $c.radd(extcmd, 1)) {
+    for (extcmd = extcmdlist[0]; extcmd.ef_txt; extcmd = $c.radd(extcmd, 1)) {
         if (extcmd.ef_funct !== fn) {
             continue;
         }
@@ -2195,7 +2195,7 @@ async function bind_key_fn(key, fn) {   // cmd.c:2732
  */
 async function commands_init() {   // cmd.c:2750
     let extcmd = null;
-    for (extcmd = $c.relem(extcmdlist, 0); extcmd.ef_txt; extcmd = $c.radd(extcmd, 1)) {
+    for (extcmd = extcmdlist[0]; extcmd.ef_txt; extcmd = $c.radd(extcmd, 1)) {
         if (extcmd.key) {
             await cmdbind_add(extcmd.key, extcmd, FALSE);
         }
@@ -2279,7 +2279,7 @@ async function keylist_putcmds(datawin, docount, incl_flags, excl_flags, keys_us
         }
     }
     /* also list commands that lack key assignments; most are wizard mode */
-    for (extcmd = $c.relem(extcmdlist, 0); extcmd.ef_txt; extcmd = $c.radd(extcmd, 1)) {
+    for (extcmd = extcmdlist[0]; extcmd.ef_txt; extcmd = $c.radd(extcmd, 1)) {
         if (incl_flags && !((extcmd.flags & incl_flags >>> 0) >>> 0) || excl_flags && (extcmd.flags & excl_flags >>> 0) >>> 0) {
             continue;
         }
@@ -2335,7 +2335,7 @@ export async function dokeylist() {   // cmd.c:2867
     await putstr()(datawin, 0, $c.lit(""));
     $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%7s %s"), $c.lit(""), $c.lit("    Full Current Key Bindings List"));
     await putstr()(datawin, 0, new $c.Ptr(buf, 0));
-    for (extcmd = $c.relem(extcmdlist, 0); extcmd.ef_txt; extcmd = $c.radd(extcmd, 1)) {
+    for (extcmd = extcmdlist[0]; extcmd.ef_txt; extcmd = $c.radd(extcmd, 1)) {
         if (spkey_gap || !keylist_func_has_key(extcmd, new $c.Ptr(keys_used, 0))) {
             $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%7s %s"), $c.lit(""), $c.lit("(also commands with no key assignment)"));
             await putstr()(datawin, 0, new $c.Ptr(buf, 0));
@@ -2424,7 +2424,7 @@ export async function dokeylist() {   // cmd.c:2867
  */
 export function ext_func_tab_from_func(fn) {   // cmd.c:3016
     let extcmd = null;
-    for (extcmd = $c.relem(extcmdlist, 0); extcmd.ef_txt; extcmd = $c.radd(extcmd, 1)) {
+    for (extcmd = extcmdlist[0]; extcmd.ef_txt; extcmd = $c.radd(extcmd, 1)) {
         if (extcmd.ef_funct === fn) {
             return extcmd;
         }
@@ -2481,7 +2481,7 @@ export function cmd_from_func(fn) {   // cmd.c:3036
  */
 export async function cmd_from_ecname(ecname) {   // cmd.c:3071
     let extcmd = null, key = 0;
-    for (extcmd = $c.relem(extcmdlist, 0); extcmd.ef_txt; extcmd = $c.radd(extcmd, 1)) {
+    for (extcmd = extcmdlist[0]; extcmd.ef_txt; extcmd = $c.radd(extcmd, 1)) {
         if (!$c.strcmp(extcmd.ef_txt, ecname)) {
             key = cmd_from_func(extcmd.ef_funct);
             if (key) {
@@ -2502,7 +2502,7 @@ export async function cmd_from_ecname(ecname) {   // cmd.c:3071
 export function ecname_from_fn(fn) {   // cmd.c:3092
     let extcmd = null, cmdptr = null;
     cmdptr = null;
-    for (extcmd = $c.relem(extcmdlist, 0); extcmd.ef_txt; extcmd = $c.radd(extcmd, 1)) {
+    for (extcmd = extcmdlist[0]; extcmd.ef_txt; extcmd = $c.radd(extcmd, 1)) {
         if (extcmd.ef_funct === fn) {
             cmdptr = extcmd;
             return cmdptr.ef_txt;
@@ -2524,7 +2524,7 @@ export async function cmdname_from_func(fn, outbuf, fullname) {   // cmd.c:3106
     /* False: just enough to disambiguate */
     cmdptr = null;
     res = null;
-    for (extcmd = $c.relem(extcmdlist, 0); extcmd.ef_txt; extcmd = $c.radd(extcmd, 1)) {
+    for (extcmd = extcmdlist[0]; extcmd.ef_txt; extcmd = $c.radd(extcmd, 1)) {
         if (extcmd.ef_funct === fn) {
             cmdptr = extcmd;
             res = cmdptr.ef_txt;
@@ -2539,7 +2539,7 @@ export async function cmdname_from_func(fn, outbuf, fullname) {   // cmd.c:3106
         /* easy; the entire command name */
         res = $c.strcpy(outbuf, res);
     } else {
-        matchcmd = $c.relem(extcmdlist, 0);
+        matchcmd = extcmdlist[0];
         len = 0;
         maxlen = await Strlen_(res, $c.lit("cmdname_from_func"), 3130);
         /* find the shortest leading substring which is unambiguous */
@@ -2655,7 +2655,7 @@ export async function parseautocomplete(autocomplete, condition) {   // cmd.c:32
         condition = $c.i8(!condition ? 1 : 0);
     }
     /* find and modify the extended command */
-    for (efp = $c.relem(extcmdlist, 0); efp.ef_txt; efp = $c.radd(efp, 1)) {
+    for (efp = extcmdlist[0]; efp.ef_txt; efp = $c.radd(efp, 1)) {
         if (!$c.strcmp(autocomplete, efp.ef_txt)) {
             if (condition === ((efp.flags & AUTOCOMPLETE) >>> 0 ? FALSE : TRUE)) {
                 if ((efp.flags & AUTOCOMP_ADJ) >>> 0) {
@@ -2683,7 +2683,7 @@ export async function parseautocomplete(autocomplete, condition) {   // cmd.c:32
  */
 export async function all_options_autocomplete(sbuf) {   // cmd.c:3296
     let efp = null, buf = new Int8Array(256);
-    for (efp = $c.relem(extcmdlist, 0); efp.ef_txt; efp = $c.radd(efp, 1)) {
+    for (efp = extcmdlist[0]; efp.ef_txt; efp = $c.radd(efp, 1)) {
         if ((efp.flags & AUTOCOMP_ADJ) >>> 0 !== 0) {
             $c.sprintf(new $c.Ptr(buf, 0), $c.lit("AUTOCOMPLETE=%s%s\n"), (efp.flags & AUTOCOMPLETE) >>> 0 ? $c.lit("") : $c.lit("!"), efp.ef_txt);
             await strbuf_append(sbuf, new $c.Ptr(buf, 0));
@@ -2697,7 +2697,7 @@ export async function all_options_autocomplete(sbuf) {   // cmd.c:3296
 export function count_autocompletions() {   // cmd.c:3312
     let efp = null, n = 0;
     n = 0;
-    for (efp = $c.relem(extcmdlist, 0); efp.ef_txt; efp = $c.radd(efp, 1)) {
+    for (efp = extcmdlist[0]; efp.ef_txt; efp = $c.radd(efp, 1)) {
         if ((efp.flags & AUTOCOMP_ADJ) >>> 0 !== 0) {
             n = n + 1 | 0;
         }

@@ -467,7 +467,7 @@ async function chat_with_guardian() {   // quest.c:441
  * @returns {Promise<void>}
  */
 async function prisoner_speaks(mtmp) {   // quest.c:451
-    if ($c.peq(mtmp.data, $c.relem(mons, PM.PRISONER)) && $c.andu64(mtmp.mstrategy, STRAT_WAITMASK)) {
+    if (mtmp.data === mons[PM.PRISONER] && $c.andu64(mtmp.mstrategy, STRAT_WAITMASK)) {
         /* Awaken the prisoner */
         if (canseemon(mtmp)) {
             await pline($c.lit("%s speaks:"), await Monnam(mtmp));

@@ -125,16 +125,16 @@ export async function msummon(mon) {   // minion.c:59
         }
         atyp = $c.i8(mon.ispriest | 0 ? mon.mextra.epri.shralign : mon.isminion | 0 ? mon.mextra.emin.min_align : ptr.maligntyp === A.NONE ? A.NONE : sgn(ptr.maligntyp));
     } else {
-        ptr = $c.relem(mons, PM.WIZARD_OF_YENDOR);
+        ptr = mons[PM.WIZARD_OF_YENDOR];
         atyp = $c.i8(ptr.maligntyp === A.NONE ? A.NONE : sgn(ptr.maligntyp));
     }
-    if (is_dprince(ptr) || $c.peq(ptr, $c.relem(mons, PM.WIZARD_OF_YENDOR))) {
+    if (is_dprince(ptr) || ptr === mons[PM.WIZARD_OF_YENDOR]) {
         dtype = !rn2(20) ? await dprince(atyp) : !rn2(4) ? await dlord(atyp) : await ndemon(atyp);
         cnt = dtype !== NON_PM && !rn2(4) && is_ndemon($c.relem(mons, dtype)) ? 2 : 1;
     } else if (is_dlord(ptr)) {
         dtype = !rn2(50) ? await dprince(atyp) : !rn2(20) ? await dlord(atyp) : await ndemon(atyp);
         cnt = dtype !== NON_PM && !rn2(4) && is_ndemon($c.relem(mons, dtype)) ? 2 : 1;
-    } else if ($c.peq(ptr, $c.relem(mons, PM.BONE_DEVIL))) {
+    } else if (ptr === mons[PM.BONE_DEVIL]) {
         dtype = PM.SKELETON;
         cnt = 1;
     } else if (is_ndemon(ptr)) {
@@ -143,7 +143,7 @@ export async function msummon(mon) {   // minion.c:59
     } else if ($c.andu64(mon.data.mflags2, M2.MINION) !== 0 && mon_aligntyp(mon) === A.LAWFUL) {
         dtype = is_lord(ptr) && !rn2(20) ? await llord() : is_lord(ptr) || !rn2(6) ? await lminion() : ptr.pmidx;
         cnt = dtype !== NON_PM && !rn2(4) && !is_lord($c.relem(mons, dtype)) ? 2 : 1;
-    } else if ($c.peq(ptr, $c.relem(mons, PM.ANGEL))) {
+    } else if (ptr === mons[PM.ANGEL]) {
         /* non-lawful angels can also summon */
         if (!rn2(6)) {
             switch (atyp) {
@@ -501,8 +501,8 @@ export async function lose_guardian_angel(mon) {   // minion.c:468
     for (i = rn2(3) + 2 | 0; i > 0; i = i - 1 | 0) {
         mm.x = u.ux;
         mm.y = u.uy;
-        if (await enexto(mm, mm.x, mm.y, $c.relem(mons, PM.ANGEL))) {
-            await mk_roamer($c.relem(mons, PM.ANGEL), u.ualign.type, mm.x, mm.y, FALSE);
+        if (await enexto(mm, mm.x, mm.y, mons[PM.ANGEL])) {
+            await mk_roamer(mons[PM.ANGEL], u.ualign.type, mm.x, mm.y, FALSE);
         }
     }
 }
@@ -534,7 +534,7 @@ export async function gain_guardian_angel() {   // minion.c:498
         await verbalize($c.lit("Thou hast been worthy of me!"));
         mm.x = u.ux;
         mm.y = u.uy;
-        if (await enexto(mm, mm.x, mm.y, $c.relem(mons, PM.ANGEL)) && (mtmp = await mk_roamer($c.relem(mons, PM.ANGEL), u.ualign.type, mm.x, mm.y, TRUE)) !== null) {
+        if (await enexto(mm, mm.x, mm.y, mons[PM.ANGEL]) && (mtmp = await mk_roamer(mons[PM.ANGEL], u.ualign.type, mm.x, mm.y, TRUE)) !== null) {
             mtmp.mstrategy = $c.andu64(mtmp.mstrategy, 18446744071562067967n);
             /* guardian angel -- the one case mtame doesn't imply an
              * edog structure, so we don't want to call tamedog().

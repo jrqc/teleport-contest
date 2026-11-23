@@ -189,7 +189,7 @@ export async function add_mon_to_reg(reg, mon) {   // region.c:161
     /* if this is a long worm, it might already be present in the region;
        only include it once no matter how segments the region contains */
     if (mon_in_region(reg, mon)) {
-        if (!$c.peq(mon.data, $c.relem(mons, PM.LONG_WORM))) {
+        if (mon.data !== mons[PM.LONG_WORM]) {
             await impossible($c.lit("add_mon_to_reg: %s [#%u] already in region."), await m_monnam(mon), mon.m_id);
         }
         return;
@@ -988,7 +988,7 @@ export async function inside_gas_cloud(p1, p2) {   // region.c:1091
      * start next to water and spread over it.
      */
     /* fog clouds maintain gas clouds, even poisonous ones */
-    if (reg.ttl < 20 && umon && $c.peq(umon.data, $c.relem(mons, PM.FOG_CLOUD))) {
+    if (reg.ttl < 20 && umon && umon.data === mons[PM.FOG_CLOUD]) {
         reg.ttl = $c.add64(reg.ttl, 5);
     }
     if (dam < 1) {

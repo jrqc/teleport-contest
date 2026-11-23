@@ -324,7 +324,7 @@ export async function makerogueghost() {   // extralev.c:288
     croom = $c.relem(svr.rooms, rn2(svn.nroom));
     x = $c.i16(somex(croom));
     y = $c.i16(somey(croom));
-    if (!(ghost = await makemon($c.relem(mons, PM.GHOST), x, y, NO.MM_FLAGS))) {
+    if (!(ghost = await makemon(mons[PM.GHOST], x, y, NO.MM_FLAGS))) {
         return;
     }
     ghost.msleeping = (1) & 1;

@@ -806,7 +806,7 @@ export async function flip_level(flp, extras) {   // sp_lev.c:533
         }
     }
     /* rooms */
-    for (sroom = $c.relem(svr.rooms, 0); ; sroom = $c.radd(sroom, 1)) {
+    for (sroom = svr.rooms[0]; ; sroom = $c.radd(sroom, 1)) {
         if (sroom.hx < 0) {
             break;
         }
@@ -1164,7 +1164,7 @@ function set_door_orientation(x, y) {   // sp_lev.c:1042
  */
 function shared_with_room(x, y, droom) {   // sp_lev.c:1089
     let rmno = 0;
-    rmno = $c.i32($c.add64($c.rdiff(droom, $c.relem(svr.rooms, 0)), ROOMOFFSET));
+    rmno = $c.i32($c.add64($c.rdiff(droom, svr.rooms[0]), ROOMOFFSET));
     if (!isok($c.i16(x), $c.i16(y))) {
         return FALSE;
     }
@@ -1193,7 +1193,7 @@ function shared_with_room(x, y, droom) {   // sp_lev.c:1089
  * @returns {Promise<void>}
  */
 async function maybe_add_door(x, y, droom) {   // sp_lev.c:1110
-    if (droom.hx >= 0 && (!droom.irregular && inside_room(droom, $c.i16(x), $c.i16(y)) || (svl.level.locations[x][y].roomno | 0) === $c.add64($c.rdiff(droom, $c.relem(svr.rooms, 0)), ROOMOFFSET) || shared_with_room(x, y, droom))) {
+    if (droom.hx >= 0 && (!droom.irregular && inside_room(droom, $c.i16(x), $c.i16(y)) || (svl.level.locations[x][y].roomno | 0) === $c.add64($c.rdiff(droom, svr.rooms[0]), ROOMOFFSET) || shared_with_room(x, y, droom))) {
         await add_door($c.i16(x), $c.i16(y), droom);
     }
 }
@@ -2191,12 +2191,12 @@ async function create_monster(m, croom) {   // sp_lev.c:1925
                             mndx[0] = await name_to_mon(m.appear_as.str, new $c.Ptr(gender_name_var, 0));
                         }
                         if (mndx[0] === NON_PM || is_vampshifter(mtmp) && !validvamp(mtmp, new $c.Ptr(mndx, 0), S.HUMAN)) {
-                            await impossible($c.lit("create_monster: invalid %s (\"%s\")"), mtmp.data.mlet === S.MIMIC ? $c.lit("mimic appearance") : $c.peq(mtmp.data, $c.relem(mons, PM.WIZARD_OF_YENDOR)) ? $c.lit("Wizard appearance") : is_vampshifter(mtmp) ? $c.lit("vampire shape") : $c.lit("chameleon shape"), m.appear_as.str);
+                            await impossible($c.lit("create_monster: invalid %s (\"%s\")"), mtmp.data.mlet === S.MIMIC ? $c.lit("mimic appearance") : mtmp.data === mons[PM.WIZARD_OF_YENDOR] ? $c.lit("Wizard appearance") : is_vampshifter(mtmp) ? $c.lit("vampire shape") : $c.lit("chameleon shape"), m.appear_as.str);
                         } else if ($c.peq($c.relem(mons, mndx[0]), mtmp.data)) {
                             /* explicitly forcing a mimic to appear as itself */
                             mtmp.m_ap_type = M_AP.NOTHING;
                             mtmp.mappearance = 0;
-                        } else if (mtmp.data.mlet === S.MIMIC || $c.peq(mtmp.data, $c.relem(mons, PM.WIZARD_OF_YENDOR))) {
+                        } else if (mtmp.data.mlet === S.MIMIC || mtmp.data === mons[PM.WIZARD_OF_YENDOR]) {
                             /* this is ordinarily only used for Wizard clones
                                and hasn't been exhaustively tested for mimics */
                             mtmp.m_ap_type = M_AP.MONSTER;
@@ -3062,7 +3062,7 @@ async function fill_empty_maze() {   // sp_lev.c:2926
         }
         for (x = $c.i16(rn2(2)); x; x = $c.i16(x - 1)) {
             await maze1xy(mm, DRY);
-            await makemon($c.relem(mons, PM.MINOTAUR), mm.x, mm.y, NO.MM_FLAGS);
+            await makemon(mons[PM.MINOTAUR], mm.x, mm.y, NO.MM_FLAGS);
         }
         for (x = $c.i16(rnd($c.div32(Math.imul(12, mapfact), 100))); x; x = $c.i16(x - 1)) {
             await maze1xy(mm, DRY);
@@ -6081,7 +6081,7 @@ async function sp_level_coder_init() {   // sp_lev.c:6336
 export async function l_register_des(L) {   // sp_lev.c:6435
     /* register des -table, and functions for it */
     await lua_newtable(L);
-    await luaL_setfuncs(L, $c.relem(nhl_functions, 0), 0);
+    await luaL_setfuncs(L, nhl_functions[0], 0);
     await lua_setglobal(L, $c.lit("des"));
 }
 /**

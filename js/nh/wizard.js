@@ -298,7 +298,7 @@ function strategy(mtmp) {   // wizard.c:270
             return STRAT.HEAL;
         case 1:
             /* the wiz is less cautious */
-            if (!$c.peq(mtmp.data, $c.relem(mons, PM.WIZARD_OF_YENDOR))) {
+            if (mtmp.data !== mons[PM.WIZARD_OF_YENDOR]) {
                 return STRAT.HEAL;
             }
         case 2:
@@ -543,7 +543,7 @@ export async function aggravate() {   // wizard.c:494
  */
 export async function clonewiz() {   // wizard.c:517
     let mtmp2 = null, $t1, $t2, $t3;
-    if ((mtmp2 = await makemon($c.relem(mons, PM.WIZARD_OF_YENDOR), u.ux, u.uy, MM.NOWAIT)) !== null) {
+    if ((mtmp2 = await makemon(mons[PM.WIZARD_OF_YENDOR], u.ux, u.uy, MM.NOWAIT)) !== null) {
         $t2 = ($t1 = $c.i8(mtmp2.mpeaceful = (0) & 1), mtmp2.mtame = $t1) >>> 0, mtmp2.msleeping = ($t2) & 1;
         if (!u.uhave.amulet && rn2(2)) {
             /* give clone a fake */
@@ -691,7 +691,7 @@ export async function nasty(summoner) {   // wizard.c:591
                            substitues for geno victims will usually be less
                            (note: Archon is not in nasties[] but could be chosen
                            as random replacement for a genocided selection) */
-                        if ($c.peq(mtmp.data, $c.relem(mons, PM.ARCH_LICH)) || $c.peq(mtmp.data, $c.relem(mons, PM.ARCHON))) {
+                        if (mtmp.data === mons[PM.ARCH_LICH] || mtmp.data === mons[PM.ARCHON]) {
                             tmp = min(mons[PM.ARCHON].difficulty, mons[PM.ARCH_LICH].difficulty);   /* A:26 */
                             /* L:31 */
                             if (!difcap || difcap > tmp) {
@@ -723,7 +723,7 @@ export async function resurrect() {   // wizard.c:715
     if (!svc.context.no_of_wizards) {
         /* make a new Wizard */
         verb = $c.lit("kill");
-        mtmp = await makemon($c.relem(mons, PM.WIZARD_OF_YENDOR), u.ux, u.uy, MM.NOWAIT);
+        mtmp = await makemon(mons[PM.WIZARD_OF_YENDOR], u.ux, u.uy, MM.NOWAIT);
         /* affects experience; he's not coming back from a corpse
            but is subject to repeated killing like a revived corpse */
         if (mtmp) {

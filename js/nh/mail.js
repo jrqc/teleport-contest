@@ -206,7 +206,7 @@ async function md_stop(stopp, startp) {   // mail.c:248
         }
     }
     /* If we didn't find a good spot, try enexto(). */
-    if (min_distance < 0 && !await enexto(stopp, u.ux, u.uy, $c.relem(mons, PM.MAIL_DAEMON))) {
+    if (min_distance < 0 && !await enexto(stopp, u.ux, u.uy, mons[PM.MAIL_DAEMON])) {
         return FALSE;
     }
     return TRUE;
@@ -339,7 +339,7 @@ async function newmail(info) {   // mail.c:399
             break give_up$;
         }
         /* Make the daemon.  Have it rush towards the hero. */
-        if (!(md = await makemon($c.relem(mons, PM.MAIL_DAEMON), start.x, start.y, NO.MM_FLAGS))) {
+        if (!(md = await makemon(mons[PM.MAIL_DAEMON], start.x, start.y, NO.MM_FLAGS))) {
             break give_up$;
         }
         go_back$: {

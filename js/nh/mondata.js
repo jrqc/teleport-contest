@@ -101,7 +101,7 @@ export function set_mon_data(mon, ptr) {   // mondata.c:13
  */
 export function attacktype_fordmg(ptr, atyp, dtyp) {   // mondata.c:42
     let a = null;
-    for (a = $c.relem(ptr.mattk, 0); $c.pcmp(a, $c.relem(ptr.mattk, NATTK)) < 0; a = $c.radd(a, 1)) {
+    for (a = ptr.mattk[0]; $c.pcmp(a, $c.relem(ptr.mattk, NATTK)) < 0; a = $c.radd(a, 1)) {
         if (a.aatyp === atyp && (dtyp === AD.ANY || a.adtyp === dtyp)) {
             return a;
         }
@@ -124,7 +124,7 @@ export function attacktype(ptr, atyp) {   // mondata.c:54
  */
 export function noattacks(ptr) {   // mondata.c:61
     let i = 0, mattk = null;
-    mattk = $c.relem(ptr.mattk, 0);
+    mattk = ptr.mattk[0];
     for (i = 0; i < NATTK; i = i + 1 | 0) {
         /* AT_BOOM "passive attack" (gas spore's explosion upon death)
            isn't an attack as far as our callers are concerned */
@@ -144,7 +144,7 @@ export function noattacks(ptr) {   // mondata.c:61
  */
 export function poly_when_stoned(ptr) {   // mondata.c:80
     /* non-stone golems turn into stone golems unless latter is genocided */
-    return $c.i8(is_golem(ptr) && !$c.peq(ptr, $c.relem(mons, PM.STONE_GOLEM)) && !(svm.mvitals[PM.STONE_GOLEM].mvflags & G_GENOD) ? 1 : 0);
+    return $c.i8(is_golem(ptr) && ptr !== mons[PM.STONE_GOLEM] && !(svm.mvitals[PM.STONE_GOLEM].mvflags & G_GENOD) ? 1 : 0);
     /* allow G_EXTINCT */
 }
 /* is 'mon' (possibly youmonst) protected against damage type 'adtype' via
@@ -273,7 +273,7 @@ export async function resists_drli(mon) {   // mondata.c:201
     let ptr = null;
     ptr = mon.data;
     /* is_were() doesn't handle hero in human form */
-    if (is_undead(ptr) || is_demon(ptr) || is_were(ptr) || $c.peq(mon, gy.youmonst) && u.ulycn >= LOW_PM || $c.peq(ptr, $c.relem(mons, PM.DEATH)) || is_vampshifter(mon)) {
+    if (is_undead(ptr) || is_demon(ptr) || is_were(ptr) || $c.peq(mon, gy.youmonst) && u.ulycn >= LOW_PM || ptr === mons[PM.DEATH] || is_vampshifter(mon)) {
         return TRUE;
     }
     return await defended(mon, AD.DRLI);
@@ -288,7 +288,7 @@ export function resists_magm(mon) {   // mondata.c:215
     ptr = mon.data;
     is_you = $c.i8($c.peq(mon, gy.youmonst) ? 1 : 0);
     /* as of 3.2.0:  gray dragons, Angels, Oracle, Yeenoghu */
-    if (dmgtype(ptr, AD.MAGM) || $c.peq(ptr, $c.relem(mons, PM.BABY_GRAY_DRAGON)) || dmgtype(ptr, AD.RBRE)) {   /* Chromatic Dragon */
+    if (dmgtype(ptr, AD.MAGM) || ptr === mons[PM.BABY_GRAY_DRAGON] || dmgtype(ptr, AD.RBRE)) {   /* Chromatic Dragon */
         return TRUE;
     }
     /* check for magic resistance granted by wielded weapon */
@@ -398,7 +398,7 @@ export async function can_blnd(magr, mdef, aatyp, obj) {   // mondata.c:305
        a saying expressed in Latin rather than a zoological observation:
        "a crow will not pluck out the eye of another crow"
        so prevent ravens from blinding each other */
-    if (magr && $c.peq(magr.data, $c.relem(mons, PM.RAVEN)) && $c.peq(mdef.data, $c.relem(mons, PM.RAVEN))) {
+    if (magr && magr.data === mons[PM.RAVEN] && mdef.data === mons[PM.RAVEN]) {
         return FALSE;
     }
     switch (aatyp) {
@@ -587,7 +587,7 @@ export function mon_hates_silver(mon) {   // mondata.c:517
  * @returns {number} boolean
  */
 export function hates_silver(ptr) {   // mondata.c:524
-    return $c.i8(is_were(ptr) || ptr.mlet === S.VAMPIRE || is_demon(ptr) || $c.peq(ptr, $c.relem(mons, PM.SHADE)) || ptr.mlet === S.IMP && !$c.peq(ptr, $c.relem(mons, PM.TENGU)) ? 1 : 0);
+    return $c.i8(is_were(ptr) || ptr.mlet === S.VAMPIRE || is_demon(ptr) || ptr === mons[PM.SHADE] || ptr.mlet === S.IMP && ptr !== mons[PM.TENGU] ? 1 : 0);
 }
 /* True if specific monster is especially affected by blessed objects */
 /**
@@ -707,7 +707,7 @@ export function breakarm(ptr) {   // mondata.c:640
         return FALSE;
     }
     /* special cases of humanoids that cannot wear suits */
-    return $c.i8(bigmonst(ptr) || ptr.msize > MZ.SMALL && !humanoid(ptr) || $c.peq(ptr, $c.relem(mons, PM.MARILITH)) || $c.peq(ptr, $c.relem(mons, PM.WINGED_GARGOYLE)) ? 1 : 0);
+    return $c.i8(bigmonst(ptr) || ptr.msize > MZ.SMALL && !humanoid(ptr) || ptr === mons[PM.MARILITH] || ptr === mons[PM.WINGED_GARGOYLE] ? 1 : 0);
 }
 /* creature sticks other creatures it hits */
 /**
@@ -725,10 +725,10 @@ export function sticks(ptr) {   // mondata.c:654
 export function cantvomit(ptr) {   // mondata.c:663
     /* rats and mice are incapable of vomiting; likewise with horses;
        which other creatures have the same limitation? */
-    if (ptr.mlet === S.RODENT && !$c.peq(ptr, $c.relem(mons, PM.ROCK_MOLE)) && !$c.peq(ptr, $c.relem(mons, PM.WOODCHUCK))) {
+    if (ptr.mlet === S.RODENT && ptr !== mons[PM.ROCK_MOLE] && ptr !== mons[PM.WOODCHUCK]) {
         return TRUE;
     }
-    if ($c.peq(ptr, $c.relem(mons, PM.WARHORSE)) || $c.peq(ptr, $c.relem(mons, PM.HORSE)) || $c.peq(ptr, $c.relem(mons, PM.PONY))) {
+    if (ptr === mons[PM.WARHORSE] || ptr === mons[PM.HORSE] || ptr === mons[PM.PONY]) {
         return TRUE;
     }
     return FALSE;
@@ -766,7 +766,7 @@ export function num_horns(ptr) {   // mondata.c:678
  */
 export function dmgtype_fromattack(ptr, dtyp, atyp) {   // mondata.c:700
     let a = null;
-    for (a = $c.relem(ptr.mattk, 0); $c.pcmp(a, $c.relem(ptr.mattk, NATTK)) < 0; a = $c.radd(a, 1)) {
+    for (a = ptr.mattk[0]; $c.pcmp(a, $c.relem(ptr.mattk, NATTK)) < 0; a = $c.radd(a, 1)) {
         if (a.adtyp === dtyp && (atyp === AT.ANY || a.aatyp === atyp)) {
             return a;
         }
@@ -869,8 +869,8 @@ export function same_race(pm1, pm2) {   // mondata.c:771
     if (is_mind_flayer(pm1)) {
         return $c.i8(is_mind_flayer(pm2));
     }
-    if (let1 === S.KOBOLD || $c.peq(pm1, $c.relem(mons, PM.KOBOLD_ZOMBIE)) || $c.peq(pm1, $c.relem(mons, PM.KOBOLD_MUMMY))) {
-        return $c.i8(let2 === S.KOBOLD || $c.peq(pm2, $c.relem(mons, PM.KOBOLD_ZOMBIE)) || $c.peq(pm2, $c.relem(mons, PM.KOBOLD_MUMMY)) ? 1 : 0);
+    if (let1 === S.KOBOLD || pm1 === mons[PM.KOBOLD_ZOMBIE] || pm1 === mons[PM.KOBOLD_MUMMY]) {
+        return $c.i8(let2 === S.KOBOLD || pm2 === mons[PM.KOBOLD_ZOMBIE] || pm2 === mons[PM.KOBOLD_MUMMY] ? 1 : 0);
     }
     if (let1 === S.OGRE) {
         return $c.i8(let2 === S.OGRE ? 1 : 0);
@@ -898,7 +898,7 @@ export function same_race(pm1, pm2) {   // mondata.c:771
         return $c.i8(is_minion(pm2));   /* [needs work?] */
     }
     /* tengu don't match imps (first test handled case of both being tengu) */
-    if ($c.peq(pm1, $c.relem(mons, PM.TENGU)) || $c.peq(pm2, $c.relem(mons, PM.TENGU))) {
+    if (pm1 === mons[PM.TENGU] || pm2 === mons[PM.TENGU]) {
         return FALSE;
     }
     if (let1 === S.IMP) {
@@ -951,11 +951,11 @@ export function same_race(pm1, pm2) {   // mondata.c:771
         }
     }
     /* not caught by little/big handling */
-    if ($c.peq(pm1, $c.relem(mons, PM.GARGOYLE)) || $c.peq(pm1, $c.relem(mons, PM.WINGED_GARGOYLE))) {
-        return $c.i8($c.peq(pm2, $c.relem(mons, PM.GARGOYLE)) || $c.peq(pm2, $c.relem(mons, PM.WINGED_GARGOYLE)) ? 1 : 0);
+    if (pm1 === mons[PM.GARGOYLE] || pm1 === mons[PM.WINGED_GARGOYLE]) {
+        return $c.i8(pm2 === mons[PM.GARGOYLE] || pm2 === mons[PM.WINGED_GARGOYLE] ? 1 : 0);
     }
-    if ($c.peq(pm1, $c.relem(mons, PM.KILLER_BEE)) || $c.peq(pm1, $c.relem(mons, PM.QUEEN_BEE))) {
-        return $c.i8($c.peq(pm2, $c.relem(mons, PM.KILLER_BEE)) || $c.peq(pm2, $c.relem(mons, PM.QUEEN_BEE)) ? 1 : 0);
+    if (pm1 === mons[PM.KILLER_BEE] || pm1 === mons[PM.QUEEN_BEE]) {
+        return $c.i8(pm2 === mons[PM.KILLER_BEE] || pm2 === mons[PM.QUEEN_BEE] ? 1 : 0);
     }
     if (is_longworm(pm1)) {
         return $c.i8(is_longworm(pm2));   /* handles tail */
@@ -1027,7 +1027,7 @@ export async function name_to_monplus(in_str, remainder_p, gender_name_var) {   
     slen = $c.strlen(str);   /* length possibly needs recomputing */
     {
         /* Alternate spellings */
-        for (namep = $c.relem(name_to_monplus$names, 0); namep.name; namep = $c.radd(namep, 1)) {
+        for (namep = name_to_monplus$names[0]; namep.name; namep = $c.radd(namep, 1)) {
             len[0] = $c.i32($c.strlen(namep.name));
             /* force full word (which could conceivably be possessive) */
             if (!strncmpi(str, namep.name, len[0]) && (!str.get(len[0]) || str.get(len[0]) === 32 || str.get(len[0]) === 39)) {

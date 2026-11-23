@@ -6416,7 +6416,7 @@ export async function initoptions_finish() {   // options.c:7324
 export async function allopt_array_init() {   // options.c:7405
     let i = 0;
     if (!allopt_array_init$options_array_inited_already) {
-        $c.memcpy($c.relem(allopt, 0), $c.relem(allopt_init, 0), 22672);
+        $c.memcpy(allopt[0], allopt_init[0], 22672);
         await determine_ambiguities();
         for (i = 0; allopt[i].name; i = i + 1 | 0) {
             if (allopt[i].addr) {
@@ -7996,7 +7996,7 @@ export async function show_menu_controls(win, dolist) {   // options.c:9070
         fmt = $c.lit("%9s  %-8s %s");
         arg = $c.lit("Other ");   /* prefix for first hardcoded[] entry, then reset */
     }
-    for (xcp = $c.relem(show_menu_controls$hardcoded, 0); xcp.key; xcp = $c.radd(xcp, 1)) {
+    for (xcp = show_menu_controls$hardcoded[0]; xcp.key; xcp = $c.radd(xcp, 1)) {
         $c.sprintf(new $c.Ptr(buf, 0), fmt, arg, xcp.key, xcp.desc);
         await putstr()(win, 0, new $c.Ptr(buf, 0));
         arg = $c.lit("");

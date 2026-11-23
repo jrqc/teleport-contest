@@ -1899,7 +1899,7 @@ async function eval_offering(otmp, altaralign) {   // pray.c:1899
            bonus for wraith to chaotics too because they are sacrificing
            something valuable (unless hero refuses to eat such things) */
         /* reaching this side of the 'or' means hero is chaotic */
-        if (u.ualign.type !== A.CHAOTIC || $c.peq(ptr, $c.relem(mons, PM.WRAITH)) && u.uconduct.unvegetarian) {
+        if (u.ualign.type !== A.CHAOTIC || ptr === mons[PM.WRAITH] && u.uconduct.unvegetarian) {
             value = value + 1 | 0;
         }
     } else if (is_unicorn(ptr)) {

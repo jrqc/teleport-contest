@@ -469,7 +469,7 @@ export async function invault() {   // vault.c:317
             }
         }
         /* make something interesting happen */
-        if (!(guard = await makemon($c.relem(mons, PM.GUARD), $c.i16(x), $c.i16(y), MM.EGD | MM.NOMSG))) {
+        if (!(guard = await makemon(mons[PM.GUARD], $c.i16(x), $c.i16(y), MM.EGD | MM.NOMSG))) {
             return;
         }
         guard.isgd = (1) & 1;

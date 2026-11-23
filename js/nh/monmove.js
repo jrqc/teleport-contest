@@ -167,7 +167,7 @@ export function mon_track_add(mtmp, x, y) {   // monmove.c:78
  * @param {$T.monst | null} mtmp struct monst *
  */
 export function mon_track_clear(mtmp) {   // monmove.c:89
-    $c.memset($c.relem(mtmp.mtrack, 0), 0, 16);
+    $c.memset(mtmp.mtrack[0], 0, 16);
 }
 /* check whether a monster is carrying a locking/unlocking tool */
 /**
@@ -318,7 +318,7 @@ export function onscary(x, y, mtmp) {   // monmove.c:241
     magical_scare = $c.i8(!auditory_scare ? 1 : 0);
     /* creatures who are directly resistant to any type of scaring:
      * Rodney, lawful minions, Angels, the Riders */
-    if (mtmp.iswiz | 0 || $c.andu64(mtmp.data.mflags2, M2.MINION) !== 0 && mon_aligntyp(mtmp) === A.LAWFUL || $c.peq(mtmp.data, $c.relem(mons, PM.ANGEL)) || is_rider(mtmp.data)) {
+    if (mtmp.iswiz | 0 || $c.andu64(mtmp.data.mflags2, M2.MINION) !== 0 && mon_aligntyp(mtmp) === A.LAWFUL || mtmp.data === mons[PM.ANGEL] || is_rider(mtmp.data)) {
         return FALSE;
     }
     /* creatures who are directly resistant to magical scaring
@@ -358,7 +358,7 @@ export function onscary(x, y, mtmp) {   // monmove.c:241
      * Elbereth doesn't work in Gehennom, the Elemental Planes, or the
      * Astral Plane; the influence of the Valar only reaches so far.
      */
-    return $c.i8((ep = sengr_at($c.lit("Elbereth"), x, y, TRUE)) !== null && (u_at(x, y) || Displaced() && mtmp.mux === x && mtmp.muy === y || ep.guardobjects | 0 && vobj_at(x, y)) && !(mtmp.isshk | 0 || mtmp.isgd | 0 || !mtmp.mcansee || mtmp.mpeaceful | 0 || $c.peq(mtmp.data, $c.relem(mons, PM.MINOTAUR)) || Inhell() || In_endgame(u.uz)) ? 1 : 0);
+    return $c.i8((ep = sengr_at($c.lit("Elbereth"), x, y, TRUE)) !== null && (u_at(x, y) || Displaced() && mtmp.mux === x && mtmp.muy === y || ep.guardobjects | 0 && vobj_at(x, y)) && !(mtmp.isshk | 0 || mtmp.isgd | 0 || !mtmp.mcansee || mtmp.mpeaceful | 0 || mtmp.data === mons[PM.MINOTAUR] || Inhell() || In_endgame(u.uz)) ? 1 : 0);
 }
 /* regenerate lost hit points */
 /**
@@ -404,7 +404,7 @@ async function disturb(mtmp) {   // monmove.c:327
      *      (1/7 and mon is not mimicking furniture or object)
      */
     /* DEFERRED */
-    if (couldsee(mtmp.mx, mtmp.my) && dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 100 && (!Stealth() || $c.peq(mtmp.data, $c.relem(mons, PM.ETTIN)) && rn2(10)) && (!(mtmp.data.mlet === S.NYMPH || $c.peq(mtmp.data, $c.relem(mons, PM.JABBERWOCK)) || mtmp.data.mlet === S.LEPRECHAUN) || !rn2(50)) && (Aggravate_monster() || (mtmp.data.mlet === S.DOG || mtmp.data.mlet === S.HUMAN) || !rn2(7) && M_AP_TYPE(mtmp) !== M_AP.FURNITURE && M_AP_TYPE(mtmp) !== M_AP.OBJECT)) {
+    if (couldsee(mtmp.mx, mtmp.my) && dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 100 && (!Stealth() || mtmp.data === mons[PM.ETTIN] && rn2(10)) && (!(mtmp.data.mlet === S.NYMPH || mtmp.data === mons[PM.JABBERWOCK] || mtmp.data.mlet === S.LEPRECHAUN) || !rn2(50)) && (Aggravate_monster() || (mtmp.data.mlet === S.DOG || mtmp.data.mlet === S.HUMAN) || !rn2(7) && M_AP_TYPE(mtmp) !== M_AP.FURNITURE && M_AP_TYPE(mtmp) !== M_AP.OBJECT)) {
         await wake_msg(mtmp, $c.i8(!mtmp.mpeaceful ? 1 : 0));
         mtmp.msleeping = (0) & 1;
         return 1;
@@ -546,7 +546,7 @@ export async function monflee(mtmp, fleetime, first, fleemsg) {   // monmove.c:4
                receive the same alternate message */
             if (!mtmp.mcanmove || !mtmp.data.mmove) {
                 await pline_mon(mtmp, $c.lit("%s seems to flinch."), await Adjmonnam(mtmp, $c.lit("immobile")));
-            } else if ($c.peq(mtmp.data, $c.relem(mons, PM.GREMLIN)) && ($G.uwep && $G.uwep.lamplit | 0 && artifact_light($G.uwep) || $G.uarm && $G.uarm.lamplit | 0 && artifact_light($G.uarm)) && mtmp.mcansee | 0 && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & COULD_SEE) !== 0) {
+            } else if (mtmp.data === mons[PM.GREMLIN] && ($G.uwep && $G.uwep.lamplit | 0 && artifact_light($G.uwep) || $G.uarm && $G.uarm.lamplit | 0 && artifact_light($G.uarm)) && mtmp.mcansee | 0 && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & COULD_SEE) !== 0) {
                 if (Unaware()) {
                     /* tell the player even if the hero is unconscious */
                     await pline_mon(mtmp, $c.lit("%s is frightened."), await Monnam(mtmp));
@@ -564,7 +564,7 @@ export async function monflee(mtmp, fleetime, first, fleemsg) {   // monmove.c:4
                 await pline_mon(mtmp, $c.lit("%s turns to flee."), await Monnam(mtmp));
             }
         }
-        if ($c.peq(mtmp.data, $c.relem(mons, PM.VROCK)) && !mtmp.mspec_used) {
+        if (mtmp.data === mons[PM.VROCK] && !mtmp.mspec_used) {
             $t1 = 75 + rn2(25) | 0, mtmp.mspec_used = $t1;
             await create_gas_cloud(mtmp.mx, mtmp.my, 5, 8);
         }
@@ -602,7 +602,7 @@ async function distfleeck(mtmp, inrange, nearby, scared) {   // monmove.c:533
         seescaryy = u.uy;
     }
     sawscary = onscary($c.i16(seescaryx), $c.i16(seescaryy), mtmp);
-    if (nearby.get(0) && (sawscary || $c.peq(mtmp.data, $c.relem(mons, PM.GREMLIN)) && ($G.uwep && $G.uwep.lamplit | 0 && artifact_light($G.uwep) || $G.uarm && $G.uarm.lamplit | 0 && artifact_light($G.uarm)) && mtmp.mcansee | 0 && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & COULD_SEE) !== 0 && !bravegremlin || !mtmp.mpeaceful && in_your_sanctuary(mtmp, 0, 0))) {
+    if (nearby.get(0) && (sawscary || mtmp.data === mons[PM.GREMLIN] && ($G.uwep && $G.uwep.lamplit | 0 && artifact_light($G.uwep) || $G.uarm && $G.uarm.lamplit | 0 && artifact_light($G.uarm)) && mtmp.mcansee | 0 && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & COULD_SEE) !== 0 && !bravegremlin || !mtmp.mpeaceful && in_your_sanctuary(mtmp, 0, 0))) {
         scared.set(0, 1);
         await monflee(mtmp, rnd(rn2(7) ? 10 : 100), TRUE, TRUE);
     } else {
@@ -698,7 +698,7 @@ export async function m_everyturn_effect(mtmp) {   // monmove.c:650
     is_u = $c.i8($c.peq(mtmp, gy.youmonst) ? TRUE : FALSE);
     x = $c.i16(is_u ? u.ux : mtmp.mx);
     y = $c.i16(is_u ? u.uy : mtmp.my);
-    if ($c.peq(mtmp.data, $c.relem(mons, PM.FOG_CLOUD))) {
+    if (mtmp.data === mons[PM.FOG_CLOUD]) {
         /* don't leave a vapor cloud if some other gas cloud is already
            present, or when flowing under closed doors so that visibility
            changes aren't mixed with messages about doing such */
@@ -723,9 +723,9 @@ export async function m_postmove_effect(mtmp) {   // monmove.c:672
     x = $c.i16(is_u ? u.ux0 : mtmp.mx);
     y = $c.i16(is_u ? u.uy0 : mtmp.my);
     /* Hezrous create clouds of stench. This does not cost a move. */
-    if ($c.peq(mtmp.data, $c.relem(mons, PM.HEZROU))) {   /* stench */
+    if (mtmp.data === mons[PM.HEZROU]) {   /* stench */
         await create_gas_cloud(x, y, 1, 8);
-    } else if ($c.peq(mtmp.data, $c.relem(mons, PM.STEAM_VORTEX)) && !mtmp.mcan) {
+    } else if (mtmp.data === mons[PM.STEAM_VORTEX] && !mtmp.mcan) {
         await create_gas_cloud(x, y, 1, 0);   /* harmless vapor */
     }
 }
@@ -896,10 +896,10 @@ export async function dochug(mtmp) {   // monmove.c:690
     /* could be smarter and deliberately move to royal jelly, but
        then we'd need to scan the level for queen bee in advance;
        avoid that overhead and rely on serendipity... */
-    if ($c.peq(mdat, $c.relem(mons, PM.KILLER_BEE)) && (otmp = sobj_at(LUMP_OF_ROYAL_JELLY, mtmp.mx, mtmp.my)) !== null && (res = await bee_eat_jelly(mtmp, otmp)) >= 0) {
+    if (mdat === mons[PM.KILLER_BEE] && (otmp = sobj_at(LUMP_OF_ROYAL_JELLY, mtmp.mx, mtmp.my)) !== null && (res = await bee_eat_jelly(mtmp, otmp)) >= 0) {
         return res;
     }
-    if ($c.peq(mdat, $c.relem(mons, PM.GELATINOUS_CUBE)) && (res = await gelcube_digests(mtmp)) >= 0) {
+    if (mdat === mons[PM.GELATINOUS_CUBE] && (res = await gelcube_digests(mtmp)) >= 0) {
         return res;
     }
     /* A monster that passes the following checks has the opportunity
@@ -912,7 +912,7 @@ export async function dochug(mtmp) {   // monmove.c:690
            from you from having cast dozens of sticks-to-snakes
            or similar spells by the time you reach it */
         if (!mtmp.mspec_used && dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 49) {
-            for (a = $c.relem(mdat.mattk, 0); $c.pcmp(a, $c.relem(mdat.mattk, NATTK)) < 0; a = $c.radd(a, 1)) {
+            for (a = mdat.mattk[0]; $c.pcmp(a, $c.relem(mdat.mattk, NATTK)) < 0; a = $c.radd(a, 1)) {
                 if (a.aatyp === AT.MAGC && (a.adtyp === AD.SPEL || a.adtyp === AD.CLRC)) {
                     if (await castmu(mtmp, a, FALSE, FALSE) & M_ATTK.HIT) {
                         status = MMOVE.DONE;   /* bypass m_move() */
@@ -1046,7 +1046,7 @@ export async function mon_would_take_item(mtmp, otmp) {   // monmove.c:999
     if (throws_rocks(mtmp.data) && otmp.otyp === BOULDER && pctload < 50 && !Sokoban()) {
         return TRUE;
     }
-    if ($c.peq(mtmp.data, $c.relem(mons, PM.GELATINOUS_CUBE)) && otmp.oclass !== ROCK_CLASS && otmp.oclass !== BALL_CLASS && !(otmp.otyp === CORPSE && touch_petrifies($c.relem(mons, otmp.corpsenm)))) {
+    if (mtmp.data === mons[PM.GELATINOUS_CUBE] && otmp.oclass !== ROCK_CLASS && otmp.oclass !== BALL_CLASS && !(otmp.otyp === CORPSE && touch_petrifies($c.relem(mons, otmp.corpsenm)))) {
         return TRUE;
     }
     return FALSE;
@@ -1161,7 +1161,7 @@ export async function m_digweapon_check(mtmp, nix, niy) {   // monmove.c:1108
  */
 function leppie_avoidance(mtmp) {   // monmove.c:1139
     let lepgold = null, ygold = null;
-    if ($c.peq(mtmp.data, $c.relem(mons, PM.LEPRECHAUN)) && ((lepgold = findgold(mtmp.minvent)) && lepgold.quan > ((ygold = findgold(gi.invent)) ? ygold.quan : 0))) {
+    if (mtmp.data === mons[PM.LEPRECHAUN] && ((lepgold = findgold(mtmp.minvent)) && lepgold.quan > ((ygold = findgold(gi.invent)) ? ygold.quan : 0))) {
         return TRUE;
     }
     return FALSE;
@@ -1173,7 +1173,7 @@ function leppie_avoidance(mtmp) {   // monmove.c:1139
  */
 async function leppie_stash(mtmp) {   // monmove.c:1154
     let gold = null;
-    if ($c.peq(mtmp.data, $c.relem(mons, PM.LEPRECHAUN)) && !DEADMONSTER(mtmp) && !((!((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked) || $c.andu64(mtmp.data.mflags1, M1.SEE_INVIS) !== 0) && !u.uinwater && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & COULD_SEE) !== 0) && !in_rooms(mtmp.mx, mtmp.my, SHOPBASE).get(0) && svl.level.locations[mtmp.mx][mtmp.my].typ === ROOM && !t_at(mtmp.mx, mtmp.my) && rn2(4) && (gold = findgold(mtmp.minvent)) !== null) {
+    if (mtmp.data === mons[PM.LEPRECHAUN] && !DEADMONSTER(mtmp) && !((!((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked) || $c.andu64(mtmp.data.mflags1, M1.SEE_INVIS) !== 0) && !u.uinwater && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & COULD_SEE) !== 0) && !in_rooms(mtmp.mx, mtmp.my, SHOPBASE).get(0) && svl.level.locations[mtmp.mx][mtmp.my].typ === ROOM && !t_at(mtmp.mx, mtmp.my) && rn2(4) && (gold = findgold(mtmp.minvent)) !== null) {
         await mdrop_obj(mtmp, gold, FALSE);
         gold = g_at(mtmp.mx, mtmp.my);
         if (gold) {
@@ -1287,7 +1287,7 @@ function soko_allow_web(mon) {   // monmove.c:1252
 async function maybe_spin_web(mtmp) {   // monmove.c:1269
     let trap = null, prob = 0, mbuf = new Int8Array(256), $t1;
     if (webmaker(mtmp.data) && !helpless(mtmp) && !mtmp.mspec_used && !t_at(mtmp.mx, mtmp.my) && soko_allow_web(mtmp)) {
-        prob = Math.imul($c.peq(mtmp.data, $c.relem(mons, PM.GIANT_SPIDER)) ? 15 : 5, count_webbing_walls(mtmp.mx, mtmp.my) + 1 | 0) - Math.imul(3, count_traps(WEB)) | 0;
+        prob = Math.imul(mtmp.data === mons[PM.GIANT_SPIDER] ? 15 : 5, count_webbing_walls(mtmp.mx, mtmp.my) + 1 | 0) - Math.imul(3, count_traps(WEB)) | 0;
         if (rn2(1000) < prob && (trap = await maketrap(mtmp.mx, mtmp.my, WEB)) !== null) {
             $t1 = d(4, 4), mtmp.mspec_used = $t1;   /* 4..16 */
             if (cansee(mtmp.mx, mtmp.my)) {
@@ -1486,7 +1486,7 @@ async function postmov(mtmp, ptr, omx, omy, mmoved, seenflgs, can_tunnel, can_un
                 await place_monster(mtmp, omx, omy);
                 await newsym(nix, niy), await newsym(omx, omy);
             }
-            if (await vamp_shift(mtmp, $c.relem(mons, PM.FOG_CLOUD), $c.i8((seenflgs & 1) >>> 0 !== 0 ? TRUE : FALSE))) {
+            if (await vamp_shift(mtmp, mons[PM.FOG_CLOUD], $c.i8((seenflgs & 1) >>> 0 !== 0 ? TRUE : FALSE))) {
                 ptr = mtmp.data;   /* update cached value */
                 nhUse(ptr);
             }
@@ -1528,7 +1528,7 @@ async function postmov(mtmp, ptr, omx, omy, mmoved, seenflgs, can_tunnel, can_un
             }
             if (((here.flags | 0) & (D.LOCKED | D.CLOSED)) !== 0 && amorphous(ptr)) {
                 if (flags.verbose && canseemon(mtmp)) {
-                    await pline_mon(mtmp, $c.lit("%s %s under the door."), await YMonnam(mtmp), $c.peq(ptr, $c.relem(mons, PM.FOG_CLOUD)) || ptr.mlet === S.LIGHT ? $c.lit("flows") : $c.lit("oozes"));
+                    await pline_mon(mtmp, $c.lit("%s %s under the door."), await YMonnam(mtmp), ptr === mons[PM.FOG_CLOUD] || ptr.mlet === S.LIGHT ? $c.lit("flows") : $c.lit("oozes"));
                 }
             } else if (((here.flags | 0) & D.LOCKED) !== 0 && can_unlock) {
                 /* like the vampshift hack, there are sequencing
@@ -1648,7 +1648,7 @@ async function postmov(mtmp, ptr, omx, omy, mmoved, seenflgs, can_tunnel, can_un
                 }
             }
             /* Maybe a cube ate just about anything */
-            if ($c.peq(ptr, $c.relem(mons, PM.GELATINOUS_CUBE))) {
+            if (ptr === mons[PM.GELATINOUS_CUBE]) {
                 if ((etmp = await meatobj(mtmp)) >= 2) {
                     return etmp;   /* it died or got forced off the level */
                 }
@@ -1795,7 +1795,7 @@ export async function m_move(mtmp, after) {   // monmove.c:1715
                     return await postmov(mtmp, ptr, omx, omy, xm !== 1 ? MMOVE.NOTHING : MMOVE.MOVED, seenflgs, can_tunnel, can_unlock, can_open);
             }
         }
-        if ($c.peq(ptr, $c.relem(mons, PM.MAIL_DAEMON))) {
+        if (ptr === mons[PM.MAIL_DAEMON]) {
             if (!Deaf() && canseemon(mtmp)) {
                 await verbalize($c.lit("I'm late!"));
             }
@@ -1803,7 +1803,7 @@ export async function m_move(mtmp, after) {   // monmove.c:1715
             return MMOVE.DIED;
         }
         /* teleport if that lies in our nature */
-        if ($c.peq(ptr, $c.relem(mons, PM.TENGU)) && !rn2(5) && !mtmp.mcan && !await tele_restrict(mtmp)) {
+        if (ptr === mons[PM.TENGU] && !rn2(5) && !mtmp.mcan && !await tele_restrict(mtmp)) {
             if (mtmp.mhp < 7 || mtmp.mpeaceful | 0 || rn2(2)) {
                 await rloc(mtmp, RLOC.MSG);
             } else {
@@ -1900,7 +1900,7 @@ export async function m_move(mtmp, after) {   // monmove.c:1715
             }
             nxti$: {
                 if (appr[0] !== 0) {
-                    mtrk = $c.relem(mtmp.mtrack, 0);
+                    mtrk = mtmp.mtrack[0];
                     for (j = 0; j < jcnt; mtrk = $c.radd(mtrk, 1), j = j + 1 | 0) {
                         if (nx === mtrk.x && ny === mtrk.y) {
                             if (rn2(Math.imul(4, cnt - j | 0))) {
@@ -2146,14 +2146,14 @@ export function set_apparxy(mtmp) {   // monmove.c:2198
         return;
     }
     notseen = $c.i8(!mtmp.mcansee || Invis() && !perceives(mtmp.data) ? 1 : 0);
-    notthere = $c.i8(Displaced() && !$c.peq(mtmp.data, $c.relem(mons, PM.DISPLACER_BEAST)) ? 1 : 0);
+    notthere = $c.i8(Displaced() && mtmp.data !== mons[PM.DISPLACER_BEAST] ? 1 : 0);
     /* add cases as required.  eg. Displacement ... */
     if (Underwater()) {
         displ = 1;
     } else if (notseen) {
         /* Xorns can smell quantities of valuable metal
            like that in solid gold coins, treat as seen */
-        displ = $c.peq(mtmp.data, $c.relem(mons, PM.XORN)) && umoney ? 0 : 1;
+        displ = mtmp.data === mons[PM.XORN] && umoney ? 0 : 1;
     } else if (notthere) {
         displ = couldsee(mx, my) ? 2 : 1;
     } else {

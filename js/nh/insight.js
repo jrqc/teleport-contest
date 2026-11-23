@@ -3043,7 +3043,7 @@ export async function mstatusline(mtmp) {   // insight.c:3275
     } else if (mtmp.mpeaceful) {
         $c.strcat(new $c.Ptr(info, 0), $c.lit(", peaceful"));
     }
-    if ($c.peq(mtmp.data, $c.relem(mons, PM.LONG_WORM))) {
+    if (mtmp.data === mons[PM.LONG_WORM]) {
         nsegs = count_wsegs(mtmp);
         /* the worm code internals don't consider the head to be one of
            the worm's segments, but we count it as such when presenting

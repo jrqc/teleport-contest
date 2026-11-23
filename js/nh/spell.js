@@ -364,7 +364,7 @@ async function deadbook(book2) {   // spell.c:231
                 $goto = null;   // raise_dead:
                 await You($c.lit("raised the dead!"));
                 /* first maybe place a dangerous adversary */
-                if (!rn2(3) && ((mtmp = await makemon($c.relem(mons, PM.MASTER_LICH), u.ux, u.uy, NO.MINVENT)) !== null || (mtmp = await makemon($c.relem(mons, PM.NALFESHNEE), u.ux, u.uy, NO.MINVENT)) !== null)) {
+                if (!rn2(3) && ((mtmp = await makemon(mons[PM.MASTER_LICH], u.ux, u.uy, NO.MINVENT)) !== null || (mtmp = await makemon(mons[PM.NALFESHNEE], u.ux, u.uy, NO.MINVENT)) !== null)) {
                     mtmp.mpeaceful = (0) & 1;
                     set_malign(mtmp);
                 }
@@ -1113,7 +1113,7 @@ async function cast_protection() {   // spell.c:1104
             } else {
                 pm = u.ustuck ? u.ustuck.data : null;
                 rmtyp = svl.level.locations[u.ux][u.uy].typ;
-                atmosphere = pm && u.uswallow | 0 ? $c.peq(pm, $c.relem(mons, PM.FOG_CLOUD)) ? $c.lit("mist") : is_whirly(pm) ? $c.lit("maelstrom") : enfolds(pm) ? $c.lit("folds") : is_animal(pm) ? $c.lit("maw") : $c.lit("ooze") : u.uinwater | 0 ? hliquid($c.lit("water")) : rmtyp === CLOUD ? $c.lit("cloud") : IS_TREE(rmtyp) ? $c.lit("vegetation") : IS_STWALL(rmtyp) ? $c.lit("stone") : $c.lit("air");
+                atmosphere = pm && u.uswallow | 0 ? pm === mons[PM.FOG_CLOUD] ? $c.lit("mist") : is_whirly(pm) ? $c.lit("maelstrom") : enfolds(pm) ? $c.lit("folds") : is_animal(pm) ? $c.lit("maw") : $c.lit("ooze") : u.uinwater | 0 ? hliquid($c.lit("water")) : rmtyp === CLOUD ? $c.lit("cloud") : IS_TREE(rmtyp) ? $c.lit("vegetation") : IS_STWALL(rmtyp) ? $c.lit("stone") : $c.lit("air");
                 await pline_The($c.lit("%s around you begins to shimmer with %s haze."), atmosphere, await an(hgolden));
             }
         }

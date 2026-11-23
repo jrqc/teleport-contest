@@ -122,7 +122,7 @@ export async function use_saddle(otmp) {   // steed.c:36
             await instapetrify(new $c.Ptr(kbuf, 0));
         }
     }
-    if ($c.peq(ptr, $c.relem(mons, PM.AMOROUS_DEMON))) {
+    if (ptr === mons[PM.AMOROUS_DEMON]) {
         await pline($c.lit("Shame on you!"));
         await exercise(A.WIS, FALSE);
         return ECMD.TIME;
@@ -296,7 +296,7 @@ export async function mount_steed(mtmp, force) {   // steed.c:197
         await pline($c.lit("I see nobody there."));
         return FALSE;
     }
-    if ($c.peq(mtmp.data, $c.relem(mons, PM.LONG_WORM)) && ((u.ux + u.dx | 0) !== mtmp.mx || (u.uy + u.dy | 0) !== mtmp.my)) {
+    if (mtmp.data === mons[PM.LONG_WORM] && ((u.ux + u.dx | 0) !== mtmp.mx || (u.uy + u.dy | 0) !== mtmp.my)) {
         /* As of 3.6.2:  test_move(below) is used to check for trying to mount
            diagonally into or out of a doorway or through a tight squeeze;
            attempting to mount a tail segment when hero was not adjacent
@@ -486,7 +486,7 @@ async function landing_spot(spot, reason, forceit) {   // steed.c:460
     /* landing position (we fill it in) */
     /* 8: the 8 spots adjacent to the hero's spot */
     min_distance = -1;
-    $c.memset($c.relem(try_, 0), 0, 32);
+    $c.memset(try_[0], 0, 32);
     n = 0;
     j = xytodir(u.dx, u.dy);
     if (reason === DISMOUNT.KNOCKED && j !== DIR.ERR) {
@@ -699,8 +699,8 @@ export async function dismount_steed(reason) {   // steed.c:576
            shouldn't run into this situation; find nearest viable spot */
         /* no spot? must have been engulfed by a lurker-above over
            water or lava; try requesting a location for a flyer */
-        if (!await enexto(steedcc, u.ux, u.uy, mtmp.data) && !await enexto(steedcc, u.ux, u.uy, $c.relem(mons, PM.BAT))) {   /* still no spot; last resort is any spot within bounds */
-            await enexto(steedcc, u.ux, u.uy, $c.relem(mons, PM.GHOST));
+        if (!await enexto(steedcc, u.ux, u.uy, mtmp.data) && !await enexto(steedcc, u.ux, u.uy, mons[PM.BAT])) {   /* still no spot; last resort is any spot within bounds */
+            await enexto(steedcc, u.ux, u.uy, mons[PM.GHOST]);
         }
     }
     if (!DEADMONSTER(mtmp)) {

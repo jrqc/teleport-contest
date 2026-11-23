@@ -417,7 +417,7 @@ async function lay_an_egg() {   // sit.c:358
             await pline($c.lit("A splash tetra you are not."));
             return ECMD.OK;
         }
-        if (Upolyd() && ($c.peq(gy.youmonst.data, $c.relem(mons, PM.GIANT_EEL)) || $c.peq(gy.youmonst.data, $c.relem(mons, PM.ELECTRIC_EEL)))) {
+        if (Upolyd() && (gy.youmonst.data === mons[PM.GIANT_EEL] || gy.youmonst.data === mons[PM.ELECTRIC_EEL])) {
             await You($c.lit("yearn for the Sargasso Sea."));
             return ECMD.OK;
         }

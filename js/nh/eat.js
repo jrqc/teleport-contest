@@ -133,10 +133,10 @@ export function is_edible(obj) {   // eat.c:91
     }
     /* above also prevents the Amulet from being eaten, so we must never
        allow fake amulets to be eaten either [which is already the case] */
-    if ($c.peq(gy.youmonst.data, $c.relem(mons, PM.FIRE_ELEMENTAL)) && is_flammable(obj)) {
+    if (gy.youmonst.data === mons[PM.FIRE_ELEMENTAL] && is_flammable(obj)) {
         return TRUE;
     }
-    if (metallivorous(gy.youmonst.data) && is_metallic(obj) && (!$c.peq(gy.youmonst.data, $c.relem(mons, PM.RUST_MONSTER)) || is_rustprone(obj))) {
+    if (metallivorous(gy.youmonst.data) && is_metallic(obj) && (gy.youmonst.data !== mons[PM.RUST_MONSTER] || is_rustprone(obj))) {
         return TRUE;
     }
     /* Ghouls only eat non-veggy corpses or eggs (see dogfood()) */
@@ -586,7 +586,7 @@ async function done_eating(message) {   // eat.c:544
         }
         gn.nomovemsg = null;
     } else if (message) {
-        await You($c.lit("finish %s %s."), $c.peq(gy.youmonst.data, $c.relem(mons, PM.FIRE_ELEMENTAL)) ? $c.lit("consuming") : $c.lit("eating"), await food_xname(piece, TRUE));
+        await You($c.lit("finish %s %s."), gy.youmonst.data === mons[PM.FIRE_ELEMENTAL] ? $c.lit("consuming") : $c.lit("eating"), await food_xname(piece, TRUE));
     }
     if (piece.otyp === CORPSE || piece.globby | 0) {
         await cpostfx(piece.corpsenm);
@@ -1092,7 +1092,7 @@ export function should_givit(type, ptr) {   // eat.c:961
     /* some intrinsics are easier to get than others */
     switch (type) {
         case POISON_RES:
-            if (($c.peq(ptr, $c.relem(mons, PM.KILLER_BEE)) || $c.peq(ptr, $c.relem(mons, PM.SCORPION))) && !rn2(4)) {
+            if ((ptr === mons[PM.KILLER_BEE] || ptr === mons[PM.SCORPION]) && !rn2(4)) {
                 chance = 1;
             } else {
                 chance = 15;
@@ -1695,7 +1695,7 @@ export function set_tin_variety(obj, forcetype) {   // eat.c:1461
     } else {
         /* RANDOM_TIN */
         r = rn2(15);   /* take your pick */
-        if (r === ROTTEN_TIN && (ismnum(mnum) && (mnum === PM.LIZARD || mnum === PM.LICHEN || ($c.peq($c.relem(mons, mnum), $c.relem(mons, PM.DEATH)) || $c.peq($c.relem(mons, mnum), $c.relem(mons, PM.FAMINE)) || $c.peq($c.relem(mons, mnum), $c.relem(mons, PM.PESTILENCE))) || mnum === PM.ACID_BLOB))) {
+        if (r === ROTTEN_TIN && (ismnum(mnum) && (mnum === PM.LIZARD || mnum === PM.LICHEN || ($c.relem(mons, mnum) === mons[PM.DEATH] || $c.relem(mons, mnum) === mons[PM.FAMINE] || $c.relem(mons, mnum) === mons[PM.PESTILENCE]) || mnum === PM.ACID_BLOB))) {
             r = HOMEMADE_TIN;   /* lizards don't rot */
         }
     }
@@ -1723,7 +1723,7 @@ function tin_variety(obj, displ) {   // eat.c:1489
     if (!displ && r === HOMEMADE_TIN && !obj.blessed && !rn2(7)) {
         r = ROTTEN_TIN;   /* some homemade tins go bad */
     }
-    if (r === ROTTEN_TIN && (ismnum(mnum) && (mnum === PM.LIZARD || mnum === PM.LICHEN || ($c.peq($c.relem(mons, mnum), $c.relem(mons, PM.DEATH)) || $c.peq($c.relem(mons, mnum), $c.relem(mons, PM.FAMINE)) || $c.peq($c.relem(mons, mnum), $c.relem(mons, PM.PESTILENCE))) || mnum === PM.ACID_BLOB))) {
+    if (r === ROTTEN_TIN && (ismnum(mnum) && (mnum === PM.LIZARD || mnum === PM.LICHEN || ($c.relem(mons, mnum) === mons[PM.DEATH] || $c.relem(mons, mnum) === mons[PM.FAMINE] || $c.relem(mons, mnum) === mons[PM.PESTILENCE]) || mnum === PM.ACID_BLOB))) {
         r = HOMEMADE_TIN;   /* lizards don't rot */
     }
     return r;
@@ -2097,7 +2097,7 @@ async function eatcorpse(otmp) {   // eat.c:1855
         }
         await violated_vegetarian();
     }
-    if (!(mnum === PM.LIZARD || mnum === PM.LICHEN || ($c.peq($c.relem(mons, mnum), $c.relem(mons, PM.DEATH)) || $c.peq($c.relem(mons, mnum), $c.relem(mons, PM.FAMINE)) || $c.peq($c.relem(mons, mnum), $c.relem(mons, PM.PESTILENCE))) || mnum === PM.ACID_BLOB)) {
+    if (!(mnum === PM.LIZARD || mnum === PM.LICHEN || ($c.relem(mons, mnum) === mons[PM.DEATH] || $c.relem(mons, mnum) === mons[PM.FAMINE] || $c.relem(mons, mnum) === mons[PM.PESTILENCE]) || mnum === PM.ACID_BLOB)) {
         age = await peek_at_iced_corpse_age(otmp);
         rotted = $c.div64($c.sub64(svm.moves, age), $c.add64(10, rn2(20)));
         if (otmp.cursed) {
@@ -2148,7 +2148,7 @@ async function eatcorpse(otmp) {   // eat.c:1855
     }
     /* delay is weight dependent */
     svc.context.victual.reqtime = 3 + ((!glob ? mons[mnum].cwt : otmp.owt) >>> 6) >>> 0 | 0;
-    if (!tp && !(mnum === PM.LIZARD || mnum === PM.LICHEN || ($c.peq($c.relem(mons, mnum), $c.relem(mons, PM.DEATH)) || $c.peq($c.relem(mons, mnum), $c.relem(mons, PM.FAMINE)) || $c.peq($c.relem(mons, mnum), $c.relem(mons, PM.PESTILENCE))) || mnum === PM.ACID_BLOB) && (otmp.oeroded | 0 || !rn2(7))) {
+    if (!tp && !(mnum === PM.LIZARD || mnum === PM.LICHEN || ($c.relem(mons, mnum) === mons[PM.DEATH] || $c.relem(mons, mnum) === mons[PM.FAMINE] || $c.relem(mons, mnum) === mons[PM.PESTILENCE]) || mnum === PM.ACID_BLOB) && (otmp.oeroded | 0 || !rn2(7))) {
         if (await rottenfood(otmp)) {
             otmp.oeroded = (TRUE) & 3;
             otmp = await touchfood(otmp);
@@ -2722,7 +2722,7 @@ async function fpostfx(otmp) {   // eat.c:2510
             }
             break;
         case LUMP_OF_ROYAL_JELLY:
-            if ($c.peq(gy.youmonst.data, $c.relem(mons, PM.KILLER_BEE)) && !Unchanging() && await polymon(PM.QUEEN_BEE)) {
+            if (gy.youmonst.data === mons[PM.KILLER_BEE] && !Unchanging() && await polymon(PM.QUEEN_BEE)) {
                 break;
             }
             /* This stuff seems to be VERY healthy! */
@@ -2823,7 +2823,7 @@ async function edibility_prompts(otmp) {   // eat.c:2627
         if (mnum === PM.GREEN_SLIME || otmp.otyp === GLOB_OF_GREEN_SLIME) {
             stoneorslime = $c.i8(!Unchanging() && !slimeproof(gy.youmonst.data) ? 1 : 0);
         }
-        if (cadaver && !(mnum === PM.LIZARD || mnum === PM.LICHEN || ($c.peq($c.relem(mons, mnum), $c.relem(mons, PM.DEATH)) || $c.peq($c.relem(mons, mnum), $c.relem(mons, PM.FAMINE)) || $c.peq($c.relem(mons, mnum), $c.relem(mons, PM.PESTILENCE))) || mnum === PM.ACID_BLOB)) {
+        if (cadaver && !(mnum === PM.LIZARD || mnum === PM.LICHEN || ($c.relem(mons, mnum) === mons[PM.DEATH] || $c.relem(mons, mnum) === mons[PM.FAMINE] || $c.relem(mons, mnum) === mons[PM.PESTILENCE]) || mnum === PM.ACID_BLOB)) {
             age = await peek_at_iced_corpse_age(otmp);
             /* worst case rather than random
                in this calculation to force prompt */
@@ -3735,7 +3735,7 @@ export async function floorfood(verb, corpsecheck) {   // eat.c:3579
                 }
                 getobj_else = getobj_else + 1 | 0;
             }
-            if (!$c.peq(uptr, $c.relem(mons, PM.RUST_MONSTER)) && (gold = g_at(u.ux, u.uy)) !== null) {
+            if (uptr !== mons[PM.RUST_MONSTER] && (gold = g_at(u.ux, u.uy)) !== null) {
                 if (gold.quan === 1) {
                     $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("There is 1 gold piece here; eat it?"));
                 } else {

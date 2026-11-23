@@ -1381,7 +1381,7 @@ async function toss_up(obj, hitsroof) {   // dothrow.c:1256
                                dmgval()'s artifact light against gremlin or axe against
                                woody creature since both involve weapons; hero-as-shade is
                                hypothetical because hero can't polymorph into that form */
-                            if ($c.peq(gy.youmonst.data, $c.relem(mons, PM.SHADE)) && !is_silver) {
+                            if (gy.youmonst.data === mons[PM.SHADE] && !is_silver) {
                                 dmg[0] = 0;
                             }
                             if (obj.blessed | 0 && mon_hates_blessings(gy.youmonst)) {
@@ -2275,7 +2275,7 @@ export async function thitmonst(mon, obj) {   // dothrow.c:2011
                 }
             }
         }
-        $c.strcpy(new $c.Ptr(trail, 0), dmgtype_fromattack(md, AD.DGST, AT.ENGL) !== null ? $c.lit(" entrails") : md.mlet === S.VORTEX || $c.peq(md, $c.relem(mons, PM.AIR_ELEMENTAL)) ? $c.lit(" currents") : $c.lit(""));
+        $c.strcpy(new $c.Ptr(trail, 0), dmgtype_fromattack(md, AD.DGST, AT.ENGL) !== null ? $c.lit(" entrails") : md.mlet === S.VORTEX || md === mons[PM.AIR_ELEMENTAL] ? $c.lit(" currents") : $c.lit(""));
         monname = await mon_nam(mon);
         if (new $c.Ptr(trail, 0).get(0)) {
             monname = s_suffix(monname);

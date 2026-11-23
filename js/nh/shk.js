@@ -277,7 +277,7 @@ export function set_residency(shkp, zero_out) {   // shk.c:272
 export function replshk(mtmp, mtmp2) {   // shk.c:280
     svr.rooms[mtmp2.mextra.eshk.shoproom - ROOMOFFSET | 0].resident = mtmp2;
     if (inhishop(mtmp) && new $c.Ptr(u.ushops, 0).get(0) === mtmp.mextra.eshk.shoproom) {
-        mtmp2.mextra.eshk.bill_p = $c.relem(mtmp2.mextra.eshk.bill, 0);
+        mtmp2.mextra.eshk.bill_p = mtmp2.mextra.eshk.bill[0];
     }
 }
 /* do shopkeeper specific structure munging -dlc */
@@ -290,7 +290,7 @@ export function restshk(shkp, ghostly) {   // shk.c:290
     if (u.uz.dlevel) {
         eshkp = shkp.mextra.eshk;
         if (!$c.peq(eshkp.bill_p, $c.ptrConst(-1000))) {
-            eshkp.bill_p = $c.relem(eshkp.bill, 0);
+            eshkp.bill_p = eshkp.bill[0];
         }
         /* shoplevel can change as dungeons move around */
         /* savebones guarantees that non-homed shk's will be gone */
@@ -767,7 +767,7 @@ export async function u_entered_shop(enterstring) {   // shk.c:751
         return;
     }
     await record_achievement(ACH.SHOP);
-    eshkp.bill_p = $c.relem(eshkp.bill, 0);
+    eshkp.bill_p = eshkp.bill[0];
     if ((!eshkp.visitct || new $c.Ptr(eshkp.customer, 0).get(0)) && strncmpi(new $c.Ptr(eshkp.customer, 0), new $c.Ptr(svp.plname, 0), PL.NSIZ)) {
         /* You seem to be new here */
         eshkp.visitct = 0;
@@ -3200,7 +3200,7 @@ async function add_one_tobill(obj, dummy, shkp$in) {   // shk.c:3309
        might be going onto the bill because hero just snagged it with
        a grappling hook from outside without ever having been inside */
     if (!eshkp.bill_p) {
-        eshkp.bill_p = $c.relem(eshkp.bill, 0);
+        eshkp.bill_p = eshkp.bill[0];
     }
     if (!await billable(new $c.Ptr(shkp, 0), obj, new $c.Ptr(u.ushops, 0).get(0), TRUE)) {
         /* shk doesn't want it */
@@ -4675,7 +4675,7 @@ export async function shk_move(shkp) {   // shk.c:4880
     if (inhishop(shkp)) {
         await shk_fixes_damage(shkp);
     }
-    if ((udist = distu(omx, omy)) < 3 && (!$c.peq(shkp.data, $c.relem(mons, PM.GRID_BUG)) || (omx === u.ux || omy === u.uy))) {
+    if ((udist = distu(omx, omy)) < 3 && (shkp.data !== mons[PM.GRID_BUG] || (omx === u.ux || omy === u.uy))) {
         if (ANGRY(shkp) || Conflict() && !resist_conflict(shkp)) {
             if (Displaced()) {
                 await Your($c.lit("displaced image doesn't fool %s!"), await shkname(shkp));
@@ -4773,7 +4773,7 @@ export async function after_shk_move(shkp) {   // shk.c:4997
     eshkp = shkp.mextra.eshk;
     if ($c.peq(eshkp.bill_p, $c.ptrConst(-1000)) && inhishop(shkp)) {
         /* reset bill_p, need to re-calc player's occupancy too */
-        eshkp.bill_p = $c.relem(eshkp.bill, 0);
+        eshkp.bill_p = eshkp.bill[0];
         /* only re-check occupancy if game hasn't just ended */
         if (!program_state.gameover) {
             await check_special_room(FALSE);

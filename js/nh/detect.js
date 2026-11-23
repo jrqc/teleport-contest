@@ -164,7 +164,7 @@ async function map_monst(mtmp, showtail) {   // detect.c:122
     let glyph = 0;
     glyph = def_monsyms[mtmp.data.mlet].sym === 32 ? (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) : mtmp.data.pmidx) + ((mtmp.female | 0) === 0 ? GLYPH.DETECT_MALE_OFF : GLYPH.DETECT_FEM_OFF) | 0 : mtmp.mtame ? (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) : mtmp.data.pmidx) + ((mtmp.female | 0) === 0 ? GLYPH.PET_MALE_OFF : GLYPH.PET_FEM_OFF) | 0 : (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) : mtmp.data.pmidx) + ((mtmp.female | 0) === 0 ? GLYPH.MON_MALE_OFF : GLYPH.MON_FEM_OFF) | 0;
     await show_glyph(mtmp.mx, mtmp.my, glyph);
-    if (showtail && $c.peq(mtmp.data, $c.relem(mons, PM.LONG_WORM))) {
+    if (showtail && mtmp.data === mons[PM.LONG_WORM]) {
         await detect_wsegs(mtmp, 0);
     }
 }
@@ -448,7 +448,7 @@ export async function gold_detect(sobj) {   // detect.c:335
         if (!gk.known) {
             /* no gold found on floor or monster's inventory.
                adjust message if you have gold in your inventory */
-            if ($c.peq(gy.youmonst.data, $c.relem(mons, PM.GOLD_GOLEM))) {
+            if (gy.youmonst.data === mons[PM.GOLD_GOLEM]) {
                 $c.sprintf(new $c.Ptr(buf, 0), $c.lit("You feel like a million %s!"), await currency(2));
             } else if (money_cnt(gi.invent) || hidden_gold(TRUE)) {
                 $c.strcpy(new $c.Ptr(buf, 0), $c.lit("You feel worried about your future financial situation."));
@@ -887,7 +887,7 @@ export async function monster_detect(otmp, mclass) {   // detect.c:798
             if (DEADMONSTER(mtmp) || mtmp.isgd | 0 && !mtmp.mx) {
                 continue;
             }
-            if (!mclass || mtmp.data.mlet === mclass || $c.peq(mtmp.data, $c.relem(mons, PM.LONG_WORM)) && mclass === S.WORM_TAIL) {
+            if (!mclass || mtmp.data.mlet === mclass || mtmp.data === mons[PM.LONG_WORM] && mclass === S.WORM_TAIL) {
                 await map_monst(mtmp, TRUE);
             }
             if (otmp && otmp.cursed | 0 && helpless(mtmp)) {

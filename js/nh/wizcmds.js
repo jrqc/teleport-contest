@@ -1793,7 +1793,7 @@ export async function wiz_mon_diff() {   // wizcmds.c:1790
      * showing all monsters, or monsters within a particular class.
      */
     win = await create_nhwindow()(NHW.TEXT);
-    for (ptr = $c.relem(mons, 0); ptr.mlet; ptr = $c.radd(ptr, 1), cnt = cnt + 1 | 0) {
+    for (ptr = mons[0]; ptr.mlet; ptr = $c.radd(ptr, 1), cnt = cnt + 1 | 0) {
         mcalculated = mstrength(ptr);
         mhardcoded = ptr.difficulty;
         mdiff = mhardcoded - mcalculated | 0;

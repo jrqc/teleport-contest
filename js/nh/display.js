@@ -1826,7 +1826,7 @@ export async function docrt_flags(refresh_flags) {   // display.c:1709
         }
         /* display memory */
         for (x = 1; x < COLNO; x = $c.i16(x + 1)) {
-            lev = $c.relem(svl.level.locations[x], 0);
+            lev = svl.level.locations[x][0];
             for (y = 0; y < ROWNO; y = $c.i16(y + 1), lev = $c.radd(lev, 1)) {
                 await show_glyph(x, y, lev.glyph);
             }
@@ -2108,11 +2108,11 @@ export async function show_glyph(x, y, glyph) {   // display.c:1877
  */
 export function clear_glyph_buffer() {   // display.c:2107
     let x = 0, y = 0, gptr = null, giptr = null, $t1;
-    gptr = $c.relem(gg.gbuf[0], 0);
+    gptr = gg.gbuf[0][0];
     giptr = gptr.glyphinfo;
     nul_gbuf.gnew = $c.i8(giptr.ttychar !== nul_gbuf.glyphinfo.ttychar || giptr.gm.sym.color !== nul_gbuf.glyphinfo.gm.sym.color || giptr.gm.glyphflags !== nul_gbuf.glyphinfo.gm.glyphflags || giptr.gm.customcolor !== nul_gbuf.glyphinfo.gm.customcolor || giptr.gm.tileidx !== nul_gbuf.glyphinfo.gm.tileidx ? 1 : 0);
     for (y = 0; y < ROWNO; y = $c.i16(y + 1)) {
-        gptr = $c.relem(gg.gbuf[y], 0);
+        gptr = gg.gbuf[y][0];
         for (x = COLNO; x; x = $c.i16(x - 1)) {
             ($t1 = gptr, gptr = $c.radd($t1, 1), $t1).$copyFrom(nul_gbuf);
         }
@@ -2130,7 +2130,7 @@ export function clear_glyph_buffer() {   // display.c:2107
  */
 export async function row_refresh(start, stop, y) {   // display.c:2147
     let x = 0, glyph = 0, force = 0, gptr = null, bkglyphinfo = new $T.glyphinfo(), giptr = null;
-    gptr = $c.relem(gg.gbuf[0], 0);
+    gptr = gg.gbuf[0][0];
     bkglyphinfo.$copyFrom(nul_glyphinfo);
     giptr = gptr.glyphinfo;
     force = $c.i8(giptr.ttychar !== nul_gbuf.glyphinfo.ttychar || giptr.gm.sym.color !== nul_gbuf.glyphinfo.gm.sym.color || giptr.gm.glyphflags !== nul_gbuf.glyphinfo.gm.glyphflags || giptr.gm.customcolor !== nul_gbuf.glyphinfo.gm.customcolor || giptr.gm.tileidx !== nul_gbuf.glyphinfo.gm.tileidx ? 1 : 0);

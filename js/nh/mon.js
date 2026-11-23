@@ -161,7 +161,7 @@ async function sanity_check_single_mon(mtmp, chk_geno, msg) {   // mon.c:73
     mptr = mtmp.data;
     mx = mtmp.mx;
     my = mtmp.my;
-    if (!mptr || $c.pcmp(mptr, $c.relem(mons, LOW_PM)) < 0 || $c.pcmp(mptr, $c.relem(mons, HIGH_PM)) > 0) {
+    if (!mptr || $c.pcmp(mptr, mons[LOW_PM]) < 0 || $c.pcmp(mptr, mons[HIGH_PM]) > 0) {
         /* most sanity checks issue warnings if they detect a problem,
            but this would be too extreme to keep going */
         await panic($c.lit("illegal mon data %s; mnum=%d (%s)"), fmt_ptr(mptr), mtmp.mnum, msg);
@@ -333,7 +333,7 @@ export async function mon_sanity_check() {   // mon.c:258
                     await impossible($c.lit("map mon (%s) at <%d,%d> not in fmon list!"), fmt_ptr(mtmp), x, y);
                 } else if ($c.peq(mtmp, u.usteed)) {
                     await impossible($c.lit("steed (%s) is on the map at <%d,%d>!"), fmt_ptr(mtmp), x, y);
-                } else if ((mtmp.mx !== x || mtmp.my !== y) && !$c.peq(mtmp.data, $c.relem(mons, PM.LONG_WORM))) {
+                } else if ((mtmp.mx !== x || mtmp.my !== y) && mtmp.data !== mons[PM.LONG_WORM]) {
                     await impossible($c.lit("map mon (%s) at <%d,%d> is found at <%d,%d>?"), fmt_ptr(mtmp), mtmp.mx, mtmp.my, x, y);
                 }
             }
@@ -397,7 +397,7 @@ export function zombie_maker(mon) {   // mon.c:362
     switch (pm.mlet) {
         case S.ZOMBIE:
             /* Z-class monsters that aren't actually zombies go here */
-            if ($c.peq(pm, $c.relem(mons, PM.GHOUL)) || $c.peq(pm, $c.relem(mons, PM.SKELETON))) {
+            if (pm === mons[PM.GHOUL] || pm === mons[PM.SKELETON]) {
                 return FALSE;
             }
             return TRUE;
@@ -424,7 +424,7 @@ export function zombie_form(pm) {   // mon.c:386
         case S.ORC:
             return PM.ORC_ZOMBIE;
         case S.GIANT:
-            if ($c.peq(pm, $c.relem(mons, PM.ETTIN))) {
+            if (pm === mons[PM.ETTIN]) {
                 return PM.ETTIN_ZOMBIE;
             }
             return PM.GIANT_ZOMBIE;
@@ -766,7 +766,7 @@ async function make_corpse(mtmp, corpseflags) {   // mon.c:564
                 } else {
                     corpstatflags = (corpstatflags | CORPSTAT.INIT) >>> 0;
                     /* preserve the unique traits of some creatures */
-                    obj[0] = await mkcorpstat(CORPSE, mtmp.isshk | 0 || mtmp.mtame || (mtmp.data.geno & G_UNIQ) !== 0 || ($c.peq(mtmp.data, $c.relem(mons, PM.DEATH)) || $c.peq(mtmp.data, $c.relem(mons, PM.FAMINE)) || $c.peq(mtmp.data, $c.relem(mons, PM.PESTILENCE)) || mtmp.data.mlet === S.TROLL) || mtmp.m_id === svq.quest_status.leader_m_id || (dmgtype(mtmp.data, AD.SEDU) || dmgtype(mtmp.data, AD.SSEX)) ? mtmp : null, mdat, x, y, corpstatflags);
+                    obj[0] = await mkcorpstat(CORPSE, mtmp.isshk | 0 || mtmp.mtame || (mtmp.data.geno & G_UNIQ) !== 0 || (mtmp.data === mons[PM.DEATH] || mtmp.data === mons[PM.FAMINE] || mtmp.data === mons[PM.PESTILENCE] || mtmp.data.mlet === S.TROLL) || mtmp.m_id === svq.quest_status.leader_m_id || (dmgtype(mtmp.data, AD.SEDU) || dmgtype(mtmp.data, AD.SSEX)) ? mtmp : null, mdat, x, y, corpstatflags);
                     if (burythem) {
                         await bury_an_obj(obj[0], new $c.Ptr(dealloc, 0));
                         await newsym(x, y);
@@ -848,7 +848,7 @@ async function minliquid_core(mtmp) {   // mon.c:961
      * keep going down, and when it gets to 1 hit point the clone
      * function will fail.
      */
-    if ($c.peq(mtmp.data, $c.relem(mons, PM.GREMLIN)) && (inpool || infountain) && rn2(3)) {
+    if (mtmp.data === mons[PM.GREMLIN] && (inpool || infountain) && rn2(3)) {
         if (await split_mon(mtmp, null)) {
             await dryup(mtmp.mx, mtmp.my, FALSE);
         }
@@ -856,7 +856,7 @@ async function minliquid_core(mtmp) {   // mon.c:961
             await water_damage_chain(mtmp.minvent, FALSE);
         }
         return 0;
-    } else if ($c.peq(mtmp.data, $c.relem(mons, PM.IRON_GOLEM)) && inpool && !rn2(5)) {
+    } else if (mtmp.data === mons[PM.IRON_GOLEM] && inpool && !rn2(5)) {
         dam = d(2, 6);
         if (cansee(mtmp.mx, mtmp.my)) {
             await pline_mon(mtmp, $c.lit("%s rusts."), await Monnam(mtmp));
@@ -890,7 +890,7 @@ async function minliquid_core(mtmp) {   // mon.c:961
             }
             if (!await resists_fire(mtmp)) {
                 if (cansee(mtmp.mx, mtmp.my)) {
-                    dummy = $c.relem(mtmp.data.mattk, 0);
+                    dummy = mtmp.data.mattk[0];
                     how = on_fire(mtmp.data, dummy);
                     await pline_mon(mtmp, $c.lit("%s %s."), await Monnam(mtmp), !$c.strcmp(how, $c.lit("boiling")) ? $c.lit("boils away") : !$c.strcmp(how, $c.lit("melting")) ? $c.lit("melts away") : $c.lit("burns to a crisp"));
                 }
@@ -1218,7 +1218,7 @@ export async function movemon() {   // mon.c:1326
  */
 export async function meatbox(mon, otmp) {   // mon.c:1354
     let engulf_contents = 0, x = 0, y = 0, cobj = null;
-    engulf_contents = $c.i8($c.peq(mon.data, $c.relem(mons, PM.GELATINOUS_CUBE)) ? 1 : 0);
+    engulf_contents = $c.i8(mon.data === mons[PM.GELATINOUS_CUBE] ? 1 : 0);
     x = mon.mx;
     y = mon.my;
     if (!Has_contents(otmp) || !isok($c.i16(x), $c.i16(y))) {
@@ -1276,10 +1276,10 @@ export async function m_consume_obj(mtmp, otmp) {   // mon.c:1392
         grow = mlevelgain(otmp);
         heal = mhealup(otmp);
         eyes = otmp.otyp === CARROT ? 1 : 0;
-        mstone = (otmp.otyp === CORPSE || otmp.otyp === EGG || otmp.otyp === TIN) && (otmp.corpsenm >= LOW_PM && otmp.corpsenm < NUMMONS) && ($c.peq($c.relem(mons, otmp.corpsenm), $c.relem(mons, PM.COCKATRICE)) || $c.peq($c.relem(mons, otmp.corpsenm), $c.relem(mons, PM.CHICKATRICE)) || $c.peq($c.relem(mons, otmp.corpsenm), $c.relem(mons, PM.MEDUSA))) ? 1 : 0;
+        mstone = (otmp.otyp === CORPSE || otmp.otyp === EGG || otmp.otyp === TIN) && (otmp.corpsenm >= LOW_PM && otmp.corpsenm < NUMMONS) && ($c.relem(mons, otmp.corpsenm) === mons[PM.COCKATRICE] || $c.relem(mons, otmp.corpsenm) === mons[PM.CHICKATRICE] || $c.relem(mons, otmp.corpsenm) === mons[PM.MEDUSA]) ? 1 : 0;
         await delobj(otmp);   /* munch */
         if (poly || slimer) {
-            ptr = slimer ? $c.relem(mons, PM.GREEN_SLIME) : null;
+            ptr = slimer ? mons[PM.GREEN_SLIME] : null;
             await newcham(mtmp, ptr, vis ? NC.SHOW_MSG : NO_NC_FLAGS);
         }
         if (grow) {
@@ -1335,11 +1335,11 @@ export async function meatmetal(mtmp) {   // mon.c:1463
     /* Eats topmost metal object if it is there */
     for (otmp = svl.level.objects[mtmp.mx][mtmp.my]; otmp; otmp = otmp.v.v_nexthere) {
         /* Don't eat indigestible/choking/inappropriate objects */
-        if ($c.peq(mtmp.data, $c.relem(mons, PM.RUST_MONSTER)) && !is_rustprone(otmp) || (otmp.otyp === AMULET_OF_STRANGULATION || otmp.otyp === RIN_SLOW_DIGESTION) || otmp.otrapped | 0 && !await resists_poison(mtmp)) {
+        if (mtmp.data === mons[PM.RUST_MONSTER] && !is_rustprone(otmp) || (otmp.otyp === AMULET_OF_STRANGULATION || otmp.otyp === RIN_SLOW_DIGESTION) || otmp.otrapped | 0 && !await resists_poison(mtmp)) {
             continue;
         }
         if (is_metallic(otmp) && !obj_resists(otmp, 5, 95) && await touch_artifact(otmp, mtmp)) {
-            if ($c.peq(mtmp.data, $c.relem(mons, PM.RUST_MONSTER)) && otmp.oerodeproof | 0) {
+            if (mtmp.data === mons[PM.RUST_MONSTER] && otmp.oerodeproof | 0) {
                 if (vis) {
                     /* call distant_name() for its side-effects even when
                        !verbose so won't be printed */
@@ -1436,7 +1436,7 @@ export async function meatobj(mtmp) {   // mon.c:1533
             /* do nothing--neither eaten nor engulfed */
             continue;
             /* inedible items -- engulf these */
-        } else if (!is_organic(otmp) || obj_resists(otmp, 5, 95) || !await touch_artifact(otmp, mtmp) || (otmp.otyp === AMULET_OF_STRANGULATION || otmp.otyp === RIN_SLOW_DIGESTION) || otmp.otrapped | 0 && !await resists_poison(mtmp) || (otmp.otyp === CORPSE || otmp.otyp === EGG || otmp.otyp === TIN) && (otmp.corpsenm >= LOW_PM && otmp.corpsenm < NUMMONS) && ($c.peq($c.relem(mons, otmp.corpsenm), $c.relem(mons, PM.COCKATRICE)) || $c.peq($c.relem(mons, otmp.corpsenm), $c.relem(mons, PM.CHICKATRICE)) || $c.peq($c.relem(mons, otmp.corpsenm), $c.relem(mons, PM.MEDUSA))) && !await resists_ston(mtmp) || otmp.otyp === GLOB_OF_GREEN_SLIME && !slimeproof(mtmp.data)) {
+        } else if (!is_organic(otmp) || obj_resists(otmp, 5, 95) || !await touch_artifact(otmp, mtmp) || (otmp.otyp === AMULET_OF_STRANGULATION || otmp.otyp === RIN_SLOW_DIGESTION) || otmp.otrapped | 0 && !await resists_poison(mtmp) || (otmp.otyp === CORPSE || otmp.otyp === EGG || otmp.otyp === TIN) && (otmp.corpsenm >= LOW_PM && otmp.corpsenm < NUMMONS) && ($c.relem(mons, otmp.corpsenm) === mons[PM.COCKATRICE] || $c.relem(mons, otmp.corpsenm) === mons[PM.CHICKATRICE] || $c.relem(mons, otmp.corpsenm) === mons[PM.MEDUSA]) && !await resists_ston(mtmp) || otmp.otyp === GLOB_OF_GREEN_SLIME && !slimeproof(mtmp.data)) {
             /* redundant due to non-organic composition but
                included for emphasis */
             /* cockatrice corpses handled above; this
@@ -1626,7 +1626,7 @@ export async function mon_givit(mtmp, ptr) {   // mon.c:1778
     if (DEADMONSTER(mtmp)) {
         return;
     }
-    if ($c.peq(ptr, $c.relem(mons, PM.STALKER))) {
+    if (ptr === mons[PM.STALKER]) {
         /*
          * Invisible stalker isn't flagged as conferring invisibility
          * so prop is 0.  For hero, eating a stalker corpse confers
@@ -1963,7 +1963,7 @@ export async function mon_allowflags(mtmp) {   // mon.c:2064
     if (is_unicorn(mtmp.data) && !await noteleport_level(mtmp)) {
         allowflags = $c.or64(allowflags, NOTONL);
     }
-    if (is_human(mtmp.data) || $c.peq(mtmp.data, $c.relem(mons, PM.MINOTAUR))) {
+    if (is_human(mtmp.data) || mtmp.data === mons[PM.MINOTAUR]) {
         allowflags = $c.or64(allowflags, ALLOW.SSM);
     }
     if (is_undead(mtmp.data) && mtmp.data.mlet !== S.GHOST || is_vampshifter(mtmp)) {
@@ -1997,11 +1997,11 @@ export async function mfndpos(mon, data, flag) {   // mon.c:2140
     y = mon.my;
     nowtyp = $c.u8(svl.level.locations[x][y].typ);
     $c.memset(data, 0, 112);
-    nodiag = $c.i8(NODIAG($c.rdiff(mdat, $c.relem(mons, 0))));
+    nodiag = $c.i8(NODIAG($c.rdiff(mdat, mons[0])));
     wantpool = $c.i8(mdat.mlet === S.EEL ? 1 : 0);
     poolok = $c.i8(!((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) && m_in_air(mon) || is_swimmer(mdat) && !wantpool ? 1 : 0);
     lavaok = $c.i8(m_in_air(mon) || likes_lava(mdat) ? 1 : 0);
-    if ($c.peq(mdat, $c.relem(mons, PM.FLOATING_EYE))) {   /* prefers to avoid heat */
+    if (mdat === mons[PM.FLOATING_EYE]) {   /* prefers to avoid heat */
         lavaok = FALSE;
     }
     thrudoor = $c.i8($c.and64(flag, ALLOW.WALL | BUSTDOOR) !== 0 ? 1 : 0);
@@ -2255,7 +2255,7 @@ async function mm_aggression(magr, mdef) {   // mon.c:2428
     }
     /* supposedly purple worms are attracted to shrieking because they
        like to eat shriekers, so attack the latter when feasible */
-    if ((mndx === PM.PURPLE_WORM || mndx === PM.BABY_PURPLE_WORM) && $c.peq(mdef.data, $c.relem(mons, PM.SHRIEKER))) {
+    if ((mndx === PM.PURPLE_WORM || mndx === PM.BABY_PURPLE_WORM) && mdef.data === mons[PM.SHRIEKER]) {
         return ALLOW.M | ALLOW.TM;
     }
     /* Various other combinations such as dog vs cat, cat vs rat, and
@@ -2298,7 +2298,7 @@ function mm_displacement(magr, mdef) {   // mon.c:2451
 export function monnear(mon, x, y) {   // mon.c:2476
     let distance = 0;
     distance = dist2(mon.mx, mon.my, x, y);
-    if (distance === 2 && NODIAG($c.rdiff(mon.data, $c.relem(mons, 0)))) {
+    if (distance === 2 && NODIAG($c.rdiff(mon.data, mons[0]))) {
         return 0;
     }
     return $c.i8(distance < 3 ? 1 : 0);
@@ -2920,7 +2920,7 @@ export async function mondead(mtmp) {   // mon.c:3081
     if (be_sad) {
         await You($c.lit("have a sad feeling for a moment, then it passes."));
     }
-    if ($c.peq(mtmp.data, $c.relem(mons, PM.STEAM_VORTEX))) {
+    if (mtmp.data === mons[PM.STEAM_VORTEX]) {
         await create_gas_cloud(mtmp.mx, mtmp.my, rn2(10) + 5 | 0, 0);   /* harmless */
     }
     /* dead vault guard is actually kept at coordinate <0,0> until
@@ -2934,12 +2934,12 @@ export async function mondead(mtmp) {   // mon.c:3081
     if (ismnum(mtmp.cham)) {
         set_mon_data(mtmp, $c.relem(mons, mtmp.cham));
         mtmp.cham = NON_PM;
-    } else if ($c.peq(mtmp.data, $c.relem(mons, PM.WEREJACKAL))) {
-        set_mon_data(mtmp, $c.relem(mons, PM.HUMAN_WEREJACKAL));
-    } else if ($c.peq(mtmp.data, $c.relem(mons, PM.WEREWOLF))) {
-        set_mon_data(mtmp, $c.relem(mons, PM.HUMAN_WEREWOLF));
-    } else if ($c.peq(mtmp.data, $c.relem(mons, PM.WERERAT))) {
-        set_mon_data(mtmp, $c.relem(mons, PM.HUMAN_WERERAT));
+    } else if (mtmp.data === mons[PM.WEREJACKAL]) {
+        set_mon_data(mtmp, mons[PM.HUMAN_WEREJACKAL]);
+    } else if (mtmp.data === mons[PM.WEREWOLF]) {
+        set_mon_data(mtmp, mons[PM.HUMAN_WEREWOLF]);
+    } else if (mtmp.data === mons[PM.WERERAT]) {
+        set_mon_data(mtmp, mons[PM.HUMAN_WERERAT]);
     }
     /*
      * svm.mvitals[].died does double duty as total number of dead monsters
@@ -3007,7 +3007,7 @@ export async function corpse_chance(mon, magr, was_swallowed) {   // mon.c:3181
     if (!magr && gm.mswallower && attacktype(gm.mswallower.data, AT.ENGL)) {
         magr = gm.mswallower, was_swallowed = TRUE;   /* for gas spore boom */
     }
-    if ($c.peq(mdat, $c.relem(mons, PM.VLAD_THE_IMPALER)) || mdat.mlet === S.LICH) {
+    if (mdat === mons[PM.VLAD_THE_IMPALER] || mdat.mlet === S.LICH) {
         if (cansee(mon.mx, mon.my) && !was_swallowed) {
             await pline_mon(mon, $c.lit("%s body crumbles into dust."), s_suffix(await Monnam(mon)));
         }
@@ -3057,7 +3057,7 @@ export async function corpse_chance(mon, magr, was_swallowed) {   // mon.c:3181
     if ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) || !svl.level.flags.deathdrops || svl.level.flags.graveyard | 0 && $c.andu64(mdat.mflags2, M2.UNDEAD) !== 0 && rn2(3)) {
         return FALSE;
     }
-    if ((bigmonst(mdat) || $c.peq(mdat, $c.relem(mons, PM.LIZARD))) && !mon.mcloned || is_golem(mdat) || is_mplayer(mdat) || is_rider(mdat) || mon.isshk | 0) {
+    if ((bigmonst(mdat) || mdat === mons[PM.LIZARD]) && !mon.mcloned || is_golem(mdat) || is_mplayer(mdat) || is_rider(mdat) || mon.isshk | 0) {
         return TRUE;
     }
     tmp = (2 + ((mdat.geno & G_FREQ) < 2 ? 1 : 0) | 0) + verysmall(mdat) | 0;
@@ -3379,7 +3379,7 @@ export async function xkilled(mtmp, xkill_flags) {   // mon.c:3477
         if (nocorpse || ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) || !svl.level.flags.deathdrops || svl.level.flags.graveyard | 0 && $c.andu64(mdat.mflags2, M2.UNDEAD) !== 0 && rn2(3))) {
             break cleanup$;
         }
-        if ($c.peq(mdat, $c.relem(mons, PM.MAIL_DAEMON))) {
+        if (mdat === mons[PM.MAIL_DAEMON]) {
             await stackobj(await mksobj_at(SCR_MAIL, x, y, FALSE, FALSE));
         }
         if (accessible(x, y) || is_pool(x, y)) {
@@ -3525,7 +3525,7 @@ export async function mon_to_stone(mtmp) {   // mon.c:3748
         if (canseemon(mtmp)) {
             await pline_mon(mtmp, $c.lit("%s solidifies..."), await Monnam(mtmp));
         }
-        if (await newcham(mtmp, $c.relem(mons, PM.STONE_GOLEM), NO_NC_FLAGS)) {
+        if (await newcham(mtmp, mons[PM.STONE_GOLEM], NO_NC_FLAGS)) {
             if (canseemon(mtmp)) {
                 await pline($c.lit("Now it's %s."), await an(pmname(mtmp.data, Mgender(mtmp))));
             }
@@ -3638,7 +3638,7 @@ function ok_to_obliterate(mtmp) {   // mon.c:3864
      * Add checks for monsters that should not be obliterated
      * here (return FALSE).
      */
-    if ($c.peq(mtmp.data, $c.relem(mons, PM.WIZARD_OF_YENDOR)) || is_rider(mtmp.data) || has_emin(mtmp) || has_epri(mtmp) || has_eshk(mtmp) || $c.peq(mtmp, u.ustuck) || $c.peq(mtmp, u.usteed)) {
+    if (mtmp.data === mons[PM.WIZARD_OF_YENDOR] || is_rider(mtmp.data) || has_emin(mtmp) || has_epri(mtmp) || has_eshk(mtmp) || $c.peq(mtmp, u.ustuck) || $c.peq(mtmp, u.usteed)) {
         return FALSE;
     }
     return TRUE;
@@ -3786,7 +3786,7 @@ export async function deal_with_overcrowding(mtmp) {   // mon.c:3986
 export async function maybe_mnexto(mtmp) {   // mon.c:3999
     let mm = new $T.nhcoord(), ptr = null, diagok = 0, tryct = 0;
     ptr = mtmp.data;
-    diagok = $c.i8(!NODIAG($c.rdiff(ptr, $c.relem(mons, 0))) ? 1 : 0);
+    diagok = $c.i8(!NODIAG($c.rdiff(ptr, mons[0])) ? 1 : 0);
     tryct = 20;
     do {
         if (!await enexto(mm, u.ux, u.uy, ptr)) {
@@ -3906,11 +3906,11 @@ export async function m_respond(mtmp) {   // mon.c:4122
     if (mtmp.data.msound === MS.SHRIEK && !um_dist(mtmp.mx, mtmp.my, 1)) {
         await m_respond_shrieker(mtmp);
     }
-    if ($c.peq(mtmp.data, $c.relem(mons, PM.MEDUSA)) && couldsee(mtmp.mx, mtmp.my)) {
+    if (mtmp.data === mons[PM.MEDUSA] && couldsee(mtmp.mx, mtmp.my)) {
         await m_respond_medusa(mtmp);
     }
     /* Erinyes will inform surrounding monsters of your crimes */
-    if ($c.peq(mtmp.data, $c.relem(mons, PM.ERINYS)) && !mtmp.mpeaceful && ((!((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked) || $c.andu64(mtmp.data.mflags1, M1.SEE_INVIS) !== 0) && !u.uinwater && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & COULD_SEE) !== 0)) {
+    if (mtmp.data === mons[PM.ERINYS] && !mtmp.mpeaceful && ((!((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked) || $c.andu64(mtmp.data.mflags1, M1.SEE_INVIS) !== 0) && !u.uinwater && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & COULD_SEE) !== 0)) {
         await aggravate();
     }
 }
@@ -4108,7 +4108,7 @@ export async function setmangry(mtmp, via_attack) {   // mon.c:4265
  */
 export async function wake_msg(mtmp, interesting) {   // mon.c:4322
     if (mtmp.msleeping | 0 && canseemon(mtmp)) {
-        await pline_mon(mtmp, $c.lit("%s wakes up%s%s"), await Monnam(mtmp), interesting ? $c.lit("!") : $c.lit("."), $c.peq(mtmp.data, $c.relem(mons, PM.FLESH_GOLEM)) ? $c.lit(" It's alive!") : $c.lit(""));
+        await pline_mon(mtmp, $c.lit("%s wakes up%s%s"), await Monnam(mtmp), interesting ? $c.lit("!") : $c.lit("."), mtmp.data === mons[PM.FLESH_GOLEM] ? $c.lit(" It's alive!") : $c.lit(""));
     }
 }
 /* wake up a monster, possibly making it angry in the process */
@@ -4694,7 +4694,7 @@ export async function decide_to_shapeshift(mon) {   // mon.c:4872
             if (mon.mhp <= $c.div32(mon.mhpmax + 5 | 0, 6) && rn2(4) && ismnum(mon.cham)) {
                 ptr = $c.relem(mons, mon.cham);
                 dochng = TRUE;
-            } else if ($c.peq(mon.data, $c.relem(mons, PM.FOG_CLOUD)) && mon.mhp === mon.mhpmax && !rn2(4) && (!canseemon(mon) || dist2(mon.mx, mon.my, u.ux, u.uy) > BOLT_LIM * BOLT_LIM)) {
+            } else if (mon.data === mons[PM.FOG_CLOUD] && mon.mhp === mon.mhpmax && !rn2(4) && (!canseemon(mon) || dist2(mon.mx, mon.my, u.ux, u.uy) > BOLT_LIM * BOLT_LIM)) {
                 /* if a fog cloud, maybe change to wolf or vampire bat;
                    those are more likely to take damage--at least when
                    tame--and then switch back to vampire; they'll also
@@ -5003,9 +5003,9 @@ export async function select_newcham_form(mon) {   // mon.c:5157
             {
                 m_armr = await which_armor(mon, W.ARM);
                 if (m_armr && Is_dragon_scales(m_armr)) {
-                    mndx = $c.i32($c.rdiff(Dragon_scales_to_pm(m_armr), $c.relem(mons, 0)));
+                    mndx = $c.i32($c.rdiff(Dragon_scales_to_pm(m_armr), mons[0]));
                 } else if (m_armr && Is_dragon_mail(m_armr)) {
-                    mndx = $c.i32($c.rdiff(Dragon_mail_to_pm(m_armr), $c.relem(mons, 0)));
+                    mndx = $c.i32($c.rdiff(Dragon_mail_to_pm(m_armr), mons[0]));
                 }
             }
             break;
@@ -5246,7 +5246,7 @@ export async function newcham(mtmp, mdat, ncflags) {   // mon.c:5278
             await unstuck(mtmp);
         }
     }
-    if ($c.peq(mdat, $c.relem(mons, PM.LONG_WORM)) && (($t3 = get_wormno() >>> 0, mtmp.wormno = ($t3) & 31) | 0) !== 0) {
+    if (mdat === mons[PM.LONG_WORM] && (($t3 = get_wormno() >>> 0, mtmp.wormno = ($t3) & 31) | 0) !== 0) {
         await initworm(mtmp, rn2(5));
         await place_worm_tail_randomly(mtmp, mtmp.mx, mtmp.my);
     }
@@ -5471,13 +5471,13 @@ export async function golemeffects(mon, damtype, dam) {   // mon.c:5680
     let heal = 0, slow = 0;
     heal = 0;
     slow = 0;
-    if ($c.peq(mon.data, $c.relem(mons, PM.FLESH_GOLEM))) {
+    if (mon.data === mons[PM.FLESH_GOLEM]) {
         if (damtype === AD.ELEC) {
             heal = $c.div32(dam + 5 | 0, 6);
         } else if (damtype === AD.FIRE || damtype === AD.COLD) {
             slow = 1;
         }
-    } else if ($c.peq(mon.data, $c.relem(mons, PM.IRON_GOLEM))) {
+    } else if (mon.data === mons[PM.IRON_GOLEM]) {
         if (damtype === AD.ELEC) {
             slow = 1;
         } else if (damtype === AD.FIRE) {
@@ -5721,7 +5721,7 @@ export function check_gear_next_turn(mon) {   // mon.c:5915
  */
 export function adj_erinys(abuse) {   // mon.c:5922
     let pm = null;
-    pm = $c.relem(mons, PM.ERINYS);
+    pm = mons[PM.ERINYS];
     if (abuse > 5) {
         pm.mflags1 = $c.oru64(pm.mflags1, M1.SEE_INVIS);
     }

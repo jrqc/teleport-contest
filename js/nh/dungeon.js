@@ -976,7 +976,7 @@ async function fixup_level_locations() {   // dungeon.c:1122
      * Find most of the special levels and dungeons so we can access their
      * locations quickly.
      */
-    for (lev_map = $c.relem(level_map, 0); lev_map.lev_name.get(0); lev_map = $c.radd(lev_map, 1)) {
+    for (lev_map = level_map[0]; lev_map.lev_name.get(0); lev_map = $c.radd(lev_map, 1)) {
         x = find_level(lev_map.lev_name);
         if (x) {
             assign_level(lev_map.lev_spec, x.dlevel);
@@ -1988,7 +1988,7 @@ export async function lev_by_name(nam) {   // dungeon.c:2098
  */
 function unplaced_floater(dptr) {   // dungeon.c:2175
     let br = null, idx = 0;
-    idx = $c.i32($c.rdiff(dptr, $c.relem(svd.dungeons, 0)));
+    idx = $c.i32($c.rdiff(dptr, svd.dungeons[0]));
     /* if other floating branches are added, this will need to change */
     if (idx !== svd.dungeon_topology.d_knox_level.dnum) {
         return FALSE;
@@ -2115,7 +2115,7 @@ export async function print_dungeon(bymenu, rlev, rdgn) {   // dungeon.c:2290
         lchoices.idx = 0;
         lchoices.menuletter = 97;
     }
-    for (i = 0, dptr = $c.relem(svd.dungeons, 0); i < svn.n_dgns; i = i + 1 | 0, dptr = $c.radd(dptr, 1)) {
+    for (i = 0, dptr = svd.dungeons[0]; i < svn.n_dgns; i = i + 1 | 0, dptr = $c.radd(dptr, 1)) {
         if (bymenu && In_endgame(u.uz) && i !== svd.dungeon_topology.d_astral_level.dnum) {
             continue;
         }

@@ -472,7 +472,7 @@ async function look_at_monster(buf, monbuf, mtmp, x, y) {   // pager.c:422
     let name = null, monnambuf = new Int8Array(256), healthbuf = new Int8Array(256), accurate = 0, t = null, tt = 0, how_seen = 0, mW = 0, m2 = 0, whom = null;
     /* buf: output, monbuf: optional output */
     accurate = $c.i8(!Hallucination() ? 1 : 0);
-    name = $c.peq(mtmp.data, $c.relem(mons, PM.COYOTE)) && accurate ? await coyotename(mtmp, new $c.Ptr(monnambuf, 0)) : await distant_monnam(mtmp, ARTICLE.NONE, new $c.Ptr(monnambuf, 0));
+    name = mtmp.data === mons[PM.COYOTE] && accurate ? await coyotename(mtmp, new $c.Ptr(monnambuf, 0)) : await distant_monnam(mtmp, ARTICLE.NONE, new $c.Ptr(monnambuf, 0));
     $c.sprintf(buf, $c.lit("%s%s%s%s"), mtmp.mx !== x || mtmp.my !== y ? mtmp.isshk | 0 && accurate ? $c.lit("tail of ") : $c.lit("tail of a ") : $c.lit(""), accurate ? monhealthdescr(mtmp, TRUE, new $c.Ptr(healthbuf, 0)) : $c.lit(""), mtmp.mtame && accurate ? $c.lit("tame ") : mtmp.mpeaceful | 0 && accurate ? $c.lit("peaceful ") : $c.lit(""), name);
     if ($c.peq(u.ustuck, mtmp)) {
         if (u.uswallow | 0 || iflags.save_uswallow | 0) {   /* monster detection */
@@ -693,7 +693,7 @@ async function lookat(x, y, buf, monbuf) {   // pager.c:657
            and correspondingly named player character, always picking the
            former; force it to find the general "wizard" entry instead */
         if (gu.urole.mnum === PM.WIZARD && gu.urace.mnum === PM.GNOME && !Upolyd()) {
-            pm = $c.relem(mons, PM.WIZARD);
+            pm = mons[PM.WIZARD];
         }
         /* When you see yourself normally, no explanation is appended
            (even if you could also see yourself via other means).

@@ -212,7 +212,7 @@ export async function done_in_by(mtmp, how) {   // end.c:186
     svk.killer.format = KILLED.BY_AN;
     /* "killed by the high priest of Crom" is okay,
        "killed by the high priest" alone isn't */
-    if ((mptr.geno & G_UNIQ) !== 0 && !(imitator && !mimicker) && !($c.peq(mptr, $c.relem(mons, PM.HIGH_CLERIC)) && !mtmp.ispriest)) {
+    if ((mptr.geno & G_UNIQ) !== 0 && !(imitator && !mimicker) && !(mptr === mons[PM.HIGH_CLERIC] && !mtmp.ispriest)) {
         if (!type_is_pname(mptr)) {
             $c.strcat(new $c.Ptr(buf, 0), $c.lit("the "));
         }
@@ -220,7 +220,7 @@ export async function done_in_by(mtmp, how) {   // end.c:186
     }
     /* _the_ <invisible> <distorted> ghost of Dudley */
     /* hardfought */
-    if ($c.peq(mptr, $c.relem(mons, PM.GHOST)) && has_mgivenname(mtmp)) {
+    if (mptr === mons[PM.GHOST] && has_mgivenname(mtmp)) {
         $c.strcat(new $c.Ptr(buf, 0), $c.lit("the "));
         svk.killer.format = KILLED.BY;
     }
@@ -260,7 +260,7 @@ export async function done_in_by(mtmp, how) {   // end.c:186
         $c.sprintf(eos(new $c.Ptr(buf, 0)), alt ? $c.lit("%s in %s form") : mimicker ? $c.lit("%s disguised as %s") : $c.lit("%s imitating %s"), realnm, new $c.Ptr(shape, 0));
         mptr = mtmp.data;   /* reset for mimicker case */
         /* hardfought */
-    } else if ($c.peq(mptr, $c.relem(mons, PM.GHOST))) {
+    } else if (mptr === mons[PM.GHOST]) {
         $c.strcat(new $c.Ptr(buf, 0), $c.lit("ghost"));
         if (has_mgivenname(mtmp)) {
             $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit(" of %s"), mtmp.mextra.mgivenname);
@@ -323,7 +323,7 @@ export async function done_in_by(mtmp, how) {   // end.c:186
         u.ugrave_arise = gu.urace.zombienum;
     } else if (mptr.mlet === S.VAMPIRE && gu.urace.mnum === PM.HUMAN) {
         u.ugrave_arise = PM.VAMPIRE;
-    } else if ($c.peq(mptr, $c.relem(mons, PM.GHOUL))) {
+    } else if (mptr === mons[PM.GHOUL]) {
         u.ugrave_arise = PM.GHOUL;
     }
     /* this could happen if a high-end vampire kills the hero
@@ -1212,14 +1212,14 @@ async function really_done(how) {   // end.c:1132
     await dump_forward_putstr(endwin, 0, new $c.Ptr(pbuf, 0), program_state.stopprint);
     await dump_forward_putstr(endwin, 0, $c.lit(""), program_state.stopprint);
     if (how === ESCAPED || how === ASCENDED) {
-        for (val = $c.relem(gv.valuables, 0); val.list; val = $c.radd(val, 1)) {
+        for (val = gv.valuables[0]; val.list; val = $c.radd(val, 1)) {
             for (i = 0; i < val.size; i = i + 1 | 0) {
                 $c.radd(val.list, i).count = 0;
             }
         }
         get_valuables(gi.invent);
         /* add points for collected valuables */
-        for (val = $c.relem(gv.valuables, 0); val.list; val = $c.radd(val, 1)) {
+        for (val = gv.valuables[0]; val.list; val = $c.radd(val, 1)) {
             for (i = 0; i < val.size; i = i + 1 | 0) {
                 if ($c.radd(val.list, i).count !== 0) {
                     tmp = $c.mul64($c.radd(val.list, i).count, objects[$c.radd(val.list, i).typ].oc_cost);
@@ -1243,7 +1243,7 @@ async function really_done(how) {   // end.c:1132
             /* [it might be more robust to create a housecat and add it to
                gm.mydogs; it doesn't have to be placed on the map for that] */
             if (Schroedingers_cat) {
-                m_lev = await adj_lev($c.relem(mons, PM.HOUSECAT));
+                m_lev = await adj_lev(mons[PM.HOUSECAT]);
                 mhp = d(m_lev, 8);
                 u.urexp = nowrap_add(u.urexp, mhp);
                 $c.strcat(eos(new $c.Ptr(pbuf, 0)), $c.lit(" and Schroedinger's cat"));
@@ -1259,7 +1259,7 @@ async function really_done(how) {   // end.c:1132
             await artifact_score(gi.invent, 0, endwin);   /* list artifacts */
         }
         /* list valuables here */
-        for (val = $c.relem(gv.valuables, 0); val.list; val = $c.radd(val, 1)) {
+        for (val = gv.valuables[0]; val.list; val = $c.radd(val, 1)) {
             sort_valuables(val.list, val.size);
             for (i = 0; i < val.size && !program_state.stopprint; i = i + 1 | 0) {
                 typ = $c.radd(val.list, i).typ;

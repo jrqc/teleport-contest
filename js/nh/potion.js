@@ -553,7 +553,7 @@ export async function self_invis_message() {   // potion.c:471
  */
 async function ghost_from_bottle() {   // potion.c:481
     let mtmp = null;
-    mtmp = await makemon($c.relem(mons, PM.GHOST), u.ux, u.uy, MM.NOMSG);
+    mtmp = await makemon(mons[PM.GHOST], u.ux, u.uy, MM.NOMSG);
     if (!mtmp) {
         await pline($c.lit("This bottle turns out to be empty."));
         return;
@@ -1812,7 +1812,7 @@ export async function potionhit(mon, obj, how) {   // potion.c:1625
                     if (obj.blessed) {
                         cureblind = TRUE;
                     }
-                    if ($c.peq(mon.data, $c.relem(mons, PM.PESTILENCE))) {
+                    if (mon.data === mons[PM.PESTILENCE]) {
                         $goto = "do_illness"; continue S1;
                     }
                 case POT_RESTORE_ABILITY:
@@ -1832,7 +1832,7 @@ export async function potionhit(mon, obj, how) {   // potion.c:1625
                     }
                     break;
                 case POT_SICKNESS:
-                    if ($c.peq(mon.data, $c.relem(mons, PM.PESTILENCE))) {
+                    if (mon.data === mons[PM.PESTILENCE]) {
                         $goto = "do_healing"; continue S1;
                     }
                     /* won't happen, see prior goto */
@@ -1930,10 +1930,10 @@ export async function potionhit(mon, obj, how) {   // potion.c:1625
                                 await new_were(mon);   /* transform into beast */
                             }
                         }
-                    } else if ($c.peq(mon.data, $c.relem(mons, PM.GREMLIN))) {
+                    } else if (mon.data === mons[PM.GREMLIN]) {
                         angermon = FALSE;
                         await split_mon(mon, null);
-                    } else if ($c.peq(mon.data, $c.relem(mons, PM.IRON_GOLEM))) {
+                    } else if (mon.data === mons[PM.IRON_GOLEM]) {
                         if (canseemon(mon)) {
                             await pline($c.lit("%s rusts."), await Monnam(mon));
                         }
@@ -2872,7 +2872,7 @@ export async function mongrantswish(monp) {   // potion.c:2796
  */
 export async function djinni_from_bottle(obj) {   // potion.c:2815
     let mtmp = [null], chance = 0;
-    if (!(mtmp[0] = await makemon($c.relem(mons, PM.DJINNI), u.ux, u.uy, MM.NOMSG))) {
+    if (!(mtmp[0] = await makemon(mons[PM.DJINNI], u.ux, u.uy, MM.NOMSG))) {
         await pline($c.lit("It turns out to be empty."));
         return;
     }

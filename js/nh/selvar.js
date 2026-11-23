@@ -897,7 +897,7 @@ export async function selection_from_mkroom(croom) {   // selvar.c:781
     if (!croom) {
         return sel;
     }
-    rmno = $c.u32($c.add64($c.rdiff(croom, $c.relem(svr.rooms, 0)), ROOMOFFSET));
+    rmno = $c.u32($c.add64($c.rdiff(croom, svr.rooms[0]), ROOMOFFSET));
     for (y = croom.ly; y <= croom.hy; y = $c.i16(y + 1)) {
         for (x = croom.lx; x <= croom.hx; x = $c.i16(x + 1)) {
             if (isok(x, y) && !svl.level.locations[x][y].edge && svl.level.locations[x][y].roomno === rmno) {

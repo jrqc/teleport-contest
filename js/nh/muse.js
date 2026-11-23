@@ -161,12 +161,12 @@ async function precheck(mon, obj) {   // muse.c:59
     if (obj.oclass === POTION_CLASS) {
         if (await objdescr_is(obj, $c.lit("milky"))) {
             if (!(svm.mvitals[PM.GHOST].mvflags & G_GONE) && !rn2(13 + Math.imul(2, svm.mvitals[PM.GHOST].born) | 0)) {
-                if (!await enexto(cc, mon.mx, mon.my, $c.relem(mons, PM.GHOST))) {
+                if (!await enexto(cc, mon.mx, mon.my, mons[PM.GHOST])) {
                     return 0;
                 }
                 await mquaffmsg(mon, obj);
                 await m_useup(mon, obj);
-                mtmp = await makemon($c.relem(mons, PM.GHOST), cc.x, cc.y, MM.NOMSG);
+                mtmp = await makemon(mons[PM.GHOST], cc.x, cc.y, MM.NOMSG);
                 if (!mtmp) {
                     if (vis) {
                         await pline($c.lit("%s"), precheck$empty);
@@ -182,12 +182,12 @@ async function precheck(mon, obj) {   // muse.c:59
             }
         }
         if (await objdescr_is(obj, $c.lit("smoky")) && !(svm.mvitals[PM.DJINNI].mvflags & G_GONE) && !rn2(13 + Math.imul(2, svm.mvitals[PM.DJINNI].born) | 0)) {
-            if (!await enexto(cc, mon.mx, mon.my, $c.relem(mons, PM.DJINNI))) {
+            if (!await enexto(cc, mon.mx, mon.my, mons[PM.DJINNI])) {
                 return 0;
             }
             await mquaffmsg(mon, obj);
             await m_useup(mon, obj);
-            mtmp = await makemon($c.relem(mons, PM.DJINNI), cc.x, cc.y, MM.NOMSG);
+            mtmp = await makemon(mons[PM.DJINNI], cc.x, cc.y, MM.NOMSG);
             if (!mtmp) {
                 if (vis) {
                     await pline($c.lit("%s"), precheck$empty);
@@ -418,7 +418,7 @@ function m_sees_sleepy_soldier(mtmp) {   // muse.c:361
             if (!isok(xx, yy) || xx === x && yy === y) {
                 continue;
             }
-            if ((mon = svl.level.monsters[xx][yy]) !== null && is_mercenary(mon.data) && !$c.peq(mon.data, $c.relem(mons, PM.GUARD)) && helpless(mon)) {
+            if ((mon = svl.level.monsters[xx][yy]) !== null && is_mercenary(mon.data) && mon.data !== mons[PM.GUARD] && helpless(mon)) {
                 return TRUE;
             }
         }
@@ -538,7 +538,7 @@ export async function find_defensive(mtmp, tryescape) {   // muse.c:441
                 }
             }
         }
-        if (obj || is_unicorn(mtmp.data) || $c.peq(mtmp.data, $c.relem(mons, PM.KI_RIN))) {
+        if (obj || is_unicorn(mtmp.data) || mtmp.data === mons[PM.KI_RIN]) {
             gm.m.defensive = obj;
             gm.m.has_defense = MUSE_UNICORN_HORN;
             return TRUE;
@@ -571,7 +571,7 @@ export async function find_defensive(mtmp, tryescape) {   // muse.c:441
      * These would be hard to combine because of the control flow.
      * Pestilence won't use healing even when blind.
      */
-    if (!mtmp.mcansee && !nohands(mtmp.data) && !$c.peq(mtmp.data, $c.relem(mons, PM.PESTILENCE))) {
+    if (!mtmp.mcansee && !nohands(mtmp.data) && mtmp.data !== mons[PM.PESTILENCE]) {
         if (m_use_healing(mtmp)) {
             return TRUE;
         }
@@ -743,7 +743,7 @@ export async function find_defensive(mtmp, tryescape) {   // muse.c:441
                     gm.m.has_defense = MUSE_SCR_TELEPORTATION;
                 }
             }
-            if (!$c.peq(mtmp.data, $c.relem(mons, PM.PESTILENCE))) {
+            if (mtmp.data !== mons[PM.PESTILENCE]) {
                 if (gm.m.has_defense === MUSE_POT_FULL_HEALING) {
                     continue;
                 }
@@ -1065,7 +1065,7 @@ export async function use_defensive(mtmp) {   // muse.c:796
                     cnt = cnt + 12 | 0;
                 }
                 if (mtmp.mconf) {
-                    pm$2 = fish = $c.relem(mons, PM.ACID_BLOB);
+                    pm$2 = fish = mons[PM.ACID_BLOB];
                 } else if (is_pool(mtmp.mx, mtmp.my)) {
                     fish = $c.relem(mons, u.uinwater | 0 ? PM.GIANT_EEL : PM.CROCODILE);
                 }
@@ -1339,7 +1339,7 @@ export async function rnd_defensive_item(mtmp) {   // muse.c:1222
             case 4:
                 return POT_EXTRA_HEALING;
             case 5:
-                return !$c.peq(mtmp.data, $c.relem(mons, PM.PESTILENCE)) ? POT_FULL_HEALING : POT_SICKNESS;
+                return mtmp.data !== mons[PM.PESTILENCE] ? POT_FULL_HEALING : POT_SICKNESS;
             case 7:
                 /* wand of digging */
                 /* usually avoid digging in Sokoban */
@@ -2698,7 +2698,7 @@ export async function searches_for_item(mon, obj) {   // muse.c:2706
     if (obj.where === OBJ.FLOOR && (obj.ox === mon.mx && obj.oy === mon.my) && onscary(obj.ox, obj.oy, mon)) {
         return FALSE;
     }
-    if (is_animal(mon.data) || mindless(mon.data) || $c.peq(mon.data, $c.relem(mons, PM.GHOST))) {   /* don't loot bones piles */
+    if (is_animal(mon.data) || mindless(mon.data) || mon.data === mons[PM.GHOST]) {   /* don't loot bones piles */
         return FALSE;
     }
     if (typ === WAN_MAKE_INVISIBLE || typ === POT_INVISIBILITY) {
@@ -2748,7 +2748,7 @@ export async function searches_for_item(mon, obj) {   // muse.c:2706
                 return $c.i8(needspick(mon.data));
             }
             if (typ === UNICORN_HORN) {
-                return $c.i8(!obj.cursed && !is_unicorn(mon.data) && !$c.peq(mon.data, $c.relem(mons, PM.KI_RIN)) ? 1 : 0);
+                return $c.i8(!obj.cursed && !is_unicorn(mon.data) && mon.data !== mons[PM.KI_RIN] ? 1 : 0);
             }
             if (typ === FROST_HORN || typ === FIRE_HORN) {
                 return $c.i8(obj.spe > 0 && can_blow(mon) ? 1 : 0);
@@ -2807,7 +2807,7 @@ export async function mon_reflects(mon, str) {   // muse.c:2797
             await pline(str, s_suffix(await mon_nam(mon)), $c.lit("armor"));
         }
         return TRUE;
-    } else if ($c.peq(mon.data, $c.relem(mons, PM.SILVER_DRAGON)) || $c.peq(mon.data, $c.relem(mons, PM.CHROMATIC_DRAGON))) {
+    } else if (mon.data === mons[PM.SILVER_DRAGON] || mon.data === mons[PM.CHROMATIC_DRAGON]) {
         /* Silver dragons only reflect when mature; babies do not */
         if (str) {
             await pline(str, s_suffix(await mon_nam(mon)), $c.lit("scales"));
@@ -2846,7 +2846,7 @@ export async function ureflects(fmt, str) {   // muse.c:2836
             await pline(fmt, str, $G.uskin ? $c.lit("luster") : $c.lit("armor"));
         }
         return TRUE;
-    } else if ($c.peq(gy.youmonst.data, $c.relem(mons, PM.SILVER_DRAGON))) {
+    } else if (gy.youmonst.data === mons[PM.SILVER_DRAGON]) {
         if (fmt && str) {
             await pline(fmt, str, $c.lit("scales"));
         }
@@ -2952,7 +2952,7 @@ async function mon_consume_unstone(mon, obj, by_you, stoning) {   // muse.c:2906
     if (lizard && (mon.mconf | 0 || mon.mstun | 0)) {
         mon.mconf = (0) & 1;
         mon.mstun = (0) & 1;
-        if (vis && !is_bat(mon.data) && !$c.peq(mon.data, $c.relem(mons, PM.STALKER))) {
+        if (vis && !is_bat(mon.data) && mon.data !== mons[PM.STALKER]) {
             await pline_mon(mon, $c.lit("%s seems steadier now."), await Monnam(mon));
         }
     }

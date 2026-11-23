@@ -2720,7 +2720,7 @@ export async function removed_from_icebox(obj) {   // pickup.c:2781
         obj.age = $c.sub64(svm.moves, obj.age);   /* actual age */
         if (obj.otyp === CORPSE) {
             m = await get_mtraits(obj, FALSE);
-            iceT = $c.i8(m ? $c.peq(m.data, $c.relem(mons, PM.ICE_TROLL)) ? 1 : 0 : obj.corpsenm === PM.ICE_TROLL ? 1 : 0);
+            iceT = $c.i8(m ? m.data === mons[PM.ICE_TROLL] ? 1 : 0 : obj.corpsenm === PM.ICE_TROLL ? 1 : 0);
             /* start a revive timer if this corpse is for an ice troll,
                otherwise start a rot-away timer (even for other trolls) */
             obj.oeroded2 = ((iceT ? 0 : 1) >>> 0) & 3;
@@ -2778,7 +2778,7 @@ export async function observe_quantum_cat(box, makecat, givemsg) {   // pickup.c
     deadcat = box.cobj;
     if (itsalive) {
         if (makecat) {
-            livecat = await makemon($c.relem(mons, PM.HOUSECAT), box.ox, box.oy, NO.MINVENT | MM.ADJACENTOK | MM.NOMSG);
+            livecat = await makemon(mons[PM.HOUSECAT], box.ox, box.oy, NO.MINVENT | MM.ADJACENTOK | MM.NOMSG);
         }
         if (livecat) {
             livecat.mpeaceful = (1) & 1;

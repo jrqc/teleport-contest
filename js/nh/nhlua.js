@@ -1742,7 +1742,7 @@ async function nhl_gamestate(L) {   // nhlua.c:1876
         await init_uhunger();
         await free_tutorial();   /* release gg.gmst_XYZ */
         gg.gmst_stored = FALSE;
-        $c.memcpy($c.relem(svs.spl_book, 0), $c.relem(gg.gmst_spl_book, 0), 344);
+        $c.memcpy(svs.spl_book[0], gg.gmst_spl_book[0], 344);
     } else if (!reststate && !gg.gmst_stored) {
         /* store game state */
         gg.gmst_moves = svm.moves;
@@ -1761,8 +1761,8 @@ async function nhl_gamestate(L) {   // nhlua.c:1876
         $c.memcpy(gg.gmst_disco, new $c.Ptr([svd.disco], 0), 962);
         $t3 = $c.asArr(await alloc(1532), 'ptr'), gg.gmst_mvitals = $t3;
         $c.memcpy(gg.gmst_mvitals, new $c.Ptr([svm.mvitals], 0), 1532);
-        $c.memcpy($c.relem(gg.gmst_spl_book, 0), $c.relem(svs.spl_book, 0), 344);
-        $c.memset($c.relem(svs.spl_book, 0), 0, 344);
+        $c.memcpy(gg.gmst_spl_book[0], svs.spl_book[0], 344);
+        $c.memset(svs.spl_book[0], 0, 344);
         gg.gmst_stored = TRUE;
     } else {
         await impossible($c.lit("nhl_gamestate: inconsistent state (%s vs %s)"), reststate ? $c.lit("restore") : $c.lit("save"), gg.gmst_stored ? $c.lit("already stored") : $c.lit("not stored"));
@@ -1923,7 +1923,7 @@ async function nhl_u_giveobj(L) {   // nhlua.c:2205
  */
 async function init_u_data(L) {   // nhlua.c:2217
     await lua_newtable(L);
-    await luaL_setfuncs(L, $c.relem(nhl_u_functions, 0), 0);
+    await luaL_setfuncs(L, nhl_u_functions[0], 0);
     await lua_newtable(L);
     await lua_pushcclosure(L, nhl_meta_u_index, 0);
     await lua_setfield(L, -2, $c.lit("__index"));
@@ -2149,7 +2149,7 @@ export async function nhl_init(sbi) {   // nhlua.c:2449
     /* XXX Is this still needed? */
     /* register nh -table, and functions for it */
     await lua_newtable(L);
-    await luaL_setfuncs(L, $c.relem(nhl_functions, 0), 0);
+    await luaL_setfuncs(L, nhl_functions[0], 0);
     await lua_setglobal(L, $c.lit("nh"));
     /* init nhc -table */
     await init_nhc_data(L);
@@ -2433,11 +2433,11 @@ async function nhlL_openlibs(L, lflags) {   // nhlua.c:3000
         await luaL_requiref(L, $c.lit("_G"), luaopen_base, 1);
         baselib = lua_gettop(L);
         /* ... and remove anything unsupported or not requested */
-        await nhl_clearfromtable(L, !!((lflags & NHL_SB.BASE_BASE) >>> 0) ? 1 : 0, baselib, $c.relem(ct_base_base, 0));
-        await nhl_clearfromtable(L, !!((lflags & NHL_SB.BASE_ERROR) >>> 0) ? 1 : 0, baselib, $c.relem(ct_base_error, 0));
-        await nhl_clearfromtable(L, !!((lflags & NHL_SB.BASE_META) >>> 0) ? 1 : 0, baselib, $c.relem(ct_base_meta, 0));
-        await nhl_clearfromtable(L, !!((lflags & NHL_SB.BASE_GC) >>> 0) ? 1 : 0, baselib, $c.relem(ct_base_iffy, 0));
-        await nhl_clearfromtable(L, !!((lflags & NHL_SB.BASE_UNSAFE) >>> 0) ? 1 : 0, baselib, $c.relem(ct_base_unsafe, 0));
+        await nhl_clearfromtable(L, !!((lflags & NHL_SB.BASE_BASE) >>> 0) ? 1 : 0, baselib, ct_base_base[0]);
+        await nhl_clearfromtable(L, !!((lflags & NHL_SB.BASE_ERROR) >>> 0) ? 1 : 0, baselib, ct_base_error[0]);
+        await nhl_clearfromtable(L, !!((lflags & NHL_SB.BASE_META) >>> 0) ? 1 : 0, baselib, ct_base_meta[0]);
+        await nhl_clearfromtable(L, !!((lflags & NHL_SB.BASE_GC) >>> 0) ? 1 : 0, baselib, ct_base_iffy[0]);
+        await nhl_clearfromtable(L, !!((lflags & NHL_SB.BASE_UNSAFE) >>> 0) ? 1 : 0, baselib, ct_base_unsafe[0]);
         await lua_settop(L, -2);
     }
     if ((lflags & NHL_SB.COROUTINE) >>> 0) {
@@ -2451,8 +2451,8 @@ async function nhlL_openlibs(L, lflags) {   // nhlua.c:3000
     if ((lflags & NHL_SB.OSMASK) >>> 0) {
         await luaL_requiref(L, $c.lit("os"), luaopen_os, 1);
         oslib = lua_gettop(L);
-        await nhl_clearfromtable(L, !!((lflags & NHL_SB.OS_TIME) >>> 0) ? 1 : 0, oslib, $c.relem(ct_os_time, 0));
-        await nhl_clearfromtable(L, !!((lflags & NHL_SB.OS_FILES) >>> 0) ? 1 : 0, oslib, $c.relem(ct_os_files, 0));
+        await nhl_clearfromtable(L, !!((lflags & NHL_SB.OS_TIME) >>> 0) ? 1 : 0, oslib, ct_os_time[0]);
+        await nhl_clearfromtable(L, !!((lflags & NHL_SB.OS_FILES) >>> 0) ? 1 : 0, oslib, ct_os_files[0]);
         await lua_settop(L, -2);
     }
     if ((lflags & NHL_SB.STRING) >>> 0) {
@@ -2482,8 +2482,8 @@ async function nhlL_openlibs(L, lflags) {   // nhlua.c:3000
     if ((lflags & NHL_SB.DBMASK) >>> 0) {
         await luaL_requiref(L, $c.lit("debug"), luaopen_debug, 1);
         dblib = lua_gettop(L);
-        await nhl_clearfromtable(L, !!((lflags & NHL_SB.DB_DB) >>> 0) ? 1 : 0, dblib, $c.relem(ct_debug_debug, 0));
-        await nhl_clearfromtable(L, !!((lflags & NHL_SB.DB_SAFE) >>> 0) ? 1 : 0, dblib, $c.relem(ct_debug_safe, 0));
+        await nhl_clearfromtable(L, !!((lflags & NHL_SB.DB_DB) >>> 0) ? 1 : 0, dblib, ct_debug_debug[0]);
+        await nhl_clearfromtable(L, !!((lflags & NHL_SB.DB_SAFE) >>> 0) ? 1 : 0, dblib, ct_debug_safe[0]);
         await lua_settop(L, -2);
     }
 }

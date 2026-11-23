@@ -1474,7 +1474,7 @@ async function seffect_create_monster(sobjp) {   // read.c:1608
     sblessed = $c.i8(sobj.blessed);
     scursed = $c.i8(sobj.cursed);
     confused = $c.i8(u.uprops[CONFUSION].intrinsic !== 0 ? 1 : 0);
-    if (await create_critters((1 + (confused || scursed ? 12 : 0) | 0) + (sblessed || rn2(73) ? 0 : rnd(4)) | 0, confused ? $c.relem(mons, PM.ACID_BLOB) : null, FALSE)) {
+    if (await create_critters((1 + (confused || scursed ? 12 : 0) | 0) + (sblessed || rn2(73) ? 0 : rnd(4)) | 0, confused ? mons[PM.ACID_BLOB] : null, FALSE)) {
         gk.known = TRUE;
     }
     /* no need to flush monsters; we ask for identification only if the
@@ -2330,7 +2330,7 @@ async function set_lit(x, y, val) {   // read.c:2471
     let mtmp = null, gremlin = null;
     if (val) {
         svl.level.locations[x][y].lit = (1) & 1;
-        if ((mtmp = svl.level.monsters[x][y]) !== null && $c.peq(mtmp.data, $c.relem(mons, PM.GREMLIN))) {
+        if ((mtmp = svl.level.monsters[x][y]) !== null && mtmp.data === mons[PM.GREMLIN]) {
             gremlin = $c.asRec(await alloc(16), $T.litmon, 16);
             gremlin.mon = mtmp;
             gremlin.nxt = gremlins;
@@ -2759,7 +2759,7 @@ export async function do_genocide(how) {   // read.c:2826
     } else {
         /* use actual type */
         $c.strcpy(new $c.Ptr(buf, 0), new $c.Ptr(realbuf, 0));
-        if (ptr.geno & G_UNIQ && !$c.peq(ptr, $c.relem(mons, PM.HIGH_CLERIC))) {
+        if (ptr.geno & G_UNIQ && ptr !== mons[PM.HIGH_CLERIC]) {
             which = !type_is_pname(ptr) ? $c.lit("the ") : $c.lit("");
         }
     }

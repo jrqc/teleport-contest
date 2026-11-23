@@ -331,7 +331,7 @@ export async function dmgval(otmp, mon) {   // weapon.c:216
     if ((objects[otyp].oc_material | 0) <= LEATHER && thick_skinned(ptr)) {   /* thick-skinned or scaled creatures don't feel it */
         tmp = 0;
     }
-    if ($c.peq(ptr, $c.relem(mons, PM.SHADE)) && !shade_glare(otmp)) {
+    if (ptr === mons[PM.SHADE] && !shade_glare(otmp)) {
         tmp = 0;
     }
     /* "very heavy iron ball"; weight increase is in increments */
@@ -693,7 +693,7 @@ export async function select_hwep(mtmp) {   // weapon.c:705
                 return otmp;
             }
         } while (0);
-    } else if ($c.peq(mtmp.data, $c.relem(mons, PM.BALROG)) && $G.uwep) {
+    } else if (mtmp.data === mons[PM.BALROG] && $G.uwep) {
         do {
             if ((otmp = await oselect(mtmp, BULLWHIP)) !== null) {
                 return otmp;

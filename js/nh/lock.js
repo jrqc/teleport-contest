@@ -587,7 +587,7 @@ export async function pick_lock(pick, rx, ry, container) {   // lock.c:358
         door = $c.relem(svl.level.locations[cc.x], cc.y);
         mtmp = svl.level.monsters[cc.x][cc.y];
         if (mtmp && canseemon(mtmp) && M_AP_TYPE(mtmp) !== M_AP.FURNITURE && M_AP_TYPE(mtmp) !== M_AP.OBJECT) {
-            if (picktyp === CREDIT_CARD && (mtmp.isshk | 0 || $c.peq(mtmp.data, $c.relem(mons, PM.ORACLE)))) {
+            if (picktyp === CREDIT_CARD && (mtmp.isshk | 0 || mtmp.data === mons[PM.ORACLE])) {
                 await verbalize($c.lit("No checks, no credit, no problem."));
             } else {
                 await pline($c.lit("I don't think %s would appreciate that."), await mon_nam(mtmp));

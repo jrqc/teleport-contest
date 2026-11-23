@@ -138,7 +138,7 @@ function hack_artifacts() {   // artifact.c:87
     let art = null, alignmnt = 0;
     alignmnt = aligns[flags.initalign].value;
     /* Fix up the alignments of "gift" artifacts */
-    for (art = $c.radd($c.relem(artilist, 0), 1); art.otyp; art = $c.radd(art, 1)) {
+    for (art = $c.radd(artilist[0], 1); art.otyp; art = $c.radd(art, 1)) {
         if (art.role === gu.urole.mnum && art.alignment !== A.NONE) {
             art.alignment = $c.i8(alignmnt);
         }
@@ -156,7 +156,7 @@ function hack_artifacts() {   // artifact.c:87
 }
 /* zero out the artifact existence list */
 export function init_artifacts() {   // artifact.c:111
-    $c.memset($c.relem(artiexist, 0), 0, 136);
+    $c.memset(artiexist[0], 0, 136);
     $c.memset(new $c.Ptr(artidisco, 0), 0, 66);
     hack_artifacts();
 }
@@ -380,7 +380,7 @@ export function artifact_name(name, otyp_p, fuzzy) {   // artifact.c:329
     if (!strncmpi(name, $c.lit("the "), 4)) {
         name = name.add(4);
     }
-    for (a = $c.radd($c.relem(artilist, 0), 1); a.otyp; a = $c.radd(a, 1)) {
+    for (a = $c.radd(artilist[0], 1); a.otyp; a = $c.radd(a, 1)) {
         aname = a.name;
         if (!strncmpi(aname, $c.lit("the "), 4)) {
             aname = aname.add(4);
@@ -402,7 +402,7 @@ export function artifact_name(name, otyp_p, fuzzy) {   // artifact.c:329
 export function exist_artifact(otyp, name) {   // artifact.c:356
     let a = null, arex = null;
     if (otyp && name.get(0)) {
-        for (a = $c.radd($c.relem(artilist, 0), 1), arex = $c.radd($c.relem(artiexist, 0), 1); a.otyp; a = $c.radd(a, 1), arex = $c.radd(arex, 1)) {
+        for (a = $c.radd(artilist[0], 1), arex = $c.radd(artiexist[0], 1); a.otyp; a = $c.radd(a, 1), arex = $c.radd(arex, 1)) {
             if (a.otyp === otyp && !$c.strcmp(a.name, name)) {
                 return $c.i8(arex.exists | 0 ? TRUE : FALSE);
             }
@@ -424,9 +424,9 @@ export async function artifact_exists(otmp, name, mod, flgs) {   // artifact.c:3
     /* True: exists, False: being un-created */
     /* ONAME_xyz flags; not relevant if !mod */
     if (otmp && name.get(0)) {
-        for (a = $c.radd($c.relem(artilist, 0), 1); a.otyp; a = $c.radd(a, 1)) {
+        for (a = $c.radd(artilist[0], 1); a.otyp; a = $c.radd(a, 1)) {
             if (a.otyp === otmp.otyp && !$c.strcmp(a.name, name)) {
-                m = $c.i32($c.rdiff(a, $c.relem(artilist, 0)));
+                m = $c.i32($c.rdiff(a, artilist[0]));
                 otmp.oartifact = $c.i8(mod ? m : 0);
                 otmp.age = 0;
                 if (otmp.otyp === RIN_INCREASE_DAMAGE) {
@@ -575,7 +575,7 @@ export async function artifact_origin(arti, aflags) {   // artifact.c:478
 export function spec_ability(otmp, abil) {   // artifact.c:516
     let arti = null;
     arti = get_artifact(otmp);
-    return $c.i8(!$c.peq(arti, $c.relem(artilist, ART.NONARTIFACT)) && $c.andu64(arti.spfx, abil) !== 0 ? 1 : 0);
+    return $c.i8(!$c.peq(arti, artilist[ART.NONARTIFACT]) && $c.andu64(arti.spfx, abil) !== 0 ? 1 : 0);
 }
 /* used so that callers don't need to known about SPFX_ codes */
 /**
@@ -597,7 +597,7 @@ export function confers_luck(obj) {   // artifact.c:526
 export function arti_reflects(obj) {   // artifact.c:537
     let arti = null;
     arti = get_artifact(obj);
-    if (!$c.peq(arti, $c.relem(artilist, ART.NONARTIFACT))) {
+    if (!$c.peq(arti, artilist[ART.NONARTIFACT])) {
         /* while being worn */
         if ($c.and64(obj.owornmask, ~W.ART) && $c.andu64(arti.spfx, SPFX.REFLECT)) {
             return TRUE;
@@ -623,7 +623,7 @@ export function shade_glare(obj) {   // artifact.c:555
     }
     /* non-silver artifacts with bonus against undead also are effective */
     arti = get_artifact(obj);
-    if (!$c.peq(arti, $c.relem(artilist, ART.NONARTIFACT)) && $c.andu64(arti.spfx, SPFX.DFLAG2) && arti.mtype === M2.UNDEAD) {
+    if (!$c.peq(arti, artilist[ART.NONARTIFACT]) && $c.andu64(arti.spfx, SPFX.DFLAG2) && arti.mtype === M2.UNDEAD) {
         return TRUE;
     }
     /* [if there was anything with special bonus against noncorporeals,
@@ -669,7 +669,7 @@ export function restrict_name(otmp, name) {   // artifact.c:575
        us much to do the string comparison before the spfx check.
        Bug fix:  don't name multiple elven daggers "Sting".
      */
-    for (a = $c.radd($c.relem(artilist, 0), 1); a.otyp; a = $c.radd(a, 1)) {
+    for (a = $c.radd(artilist[0], 1); a.otyp; a = $c.radd(a, 1)) {
         if (!sametype[a.otyp]) {
             continue;
         }
@@ -690,7 +690,7 @@ export function restrict_name(otmp, name) {   // artifact.c:575
  */
 export function attacks(adtyp, otmp) {   // artifact.c:626
     let weap = null;
-    if (!$c.peq(weap = get_artifact(otmp), $c.relem(artilist, ART.NONARTIFACT))) {
+    if (!$c.peq(weap = get_artifact(otmp), artilist[ART.NONARTIFACT])) {
         return $c.i8(weap.attk.adtyp === adtyp ? 1 : 0);
     }
     return FALSE;
@@ -705,7 +705,7 @@ export function defends(adtyp, otmp) {   // artifact.c:636
     if (!otmp) {
         return FALSE;
     }
-    if (!$c.peq(weap = get_artifact(otmp), $c.relem(artilist, ART.NONARTIFACT))) {
+    if (!$c.peq(weap = get_artifact(otmp), artilist[ART.NONARTIFACT])) {
         return $c.i8(weap.defn.adtyp === adtyp ? 1 : 0);
     }
     if (Is_dragon_armor(otmp)) {
@@ -766,7 +766,7 @@ export function defends(adtyp, otmp) {   // artifact.c:636
  */
 export function defends_when_carried(adtyp, otmp) {   // artifact.c:687
     let weap = null;
-    if (!$c.peq(weap = get_artifact(otmp), $c.relem(artilist, ART.NONARTIFACT))) {
+    if (!$c.peq(weap = get_artifact(otmp), artilist[ART.NONARTIFACT])) {
         return $c.i8(weap.cary.adtyp === adtyp ? 1 : 0);
     }
     return FALSE;
@@ -783,7 +783,7 @@ export function protects(otmp, being_worn) {   // artifact.c:698
         return TRUE;
     }
     arti = get_artifact(otmp);
-    if ($c.peq(arti, $c.relem(artilist, ART.NONARTIFACT))) {
+    if ($c.peq(arti, artilist[ART.NONARTIFACT])) {
         return FALSE;
     }
     return $c.i8($c.andu64(arti.cspfx, SPFX.PROTECT) !== 0 || being_worn && $c.andu64(arti.spfx, SPFX.PROTECT) !== 0 ? 1 : 0);
@@ -802,7 +802,7 @@ export async function set_artifact_intrinsic(otmp, on, wp_mask) {   // artifact.
     let mask = null, art = null, oart = null, obj = null, dtyp = 0, spfx = 0, $t1, $t2;
     mask = null;
     oart = get_artifact(otmp);
-    if ($c.peq(oart, $c.relem(artilist, ART.NONARTIFACT))) {
+    if ($c.peq(oart, artilist[ART.NONARTIFACT])) {
         return;
     }
     /* effects from the defn field */
@@ -828,7 +828,7 @@ export async function set_artifact_intrinsic(otmp, on, wp_mask) {   // artifact.
         for (obj = gi.invent; obj; obj = obj.nobj) {
             if (!$c.peq(obj, otmp) && obj.oartifact) {
                 art = get_artifact(obj);
-                if (!$c.peq(art, $c.relem(artilist, ART.NONARTIFACT)) && art.cary.adtyp === dtyp) {
+                if (!$c.peq(art, artilist[ART.NONARTIFACT]) && art.cary.adtyp === dtyp) {
                     mask = null;
                     break;
                 }
@@ -849,7 +849,7 @@ export async function set_artifact_intrinsic(otmp, on, wp_mask) {   // artifact.
         for (obj = gi.invent; obj; obj = obj.nobj) {
             if (!$c.peq(obj, otmp) && obj.oartifact) {
                 art = get_artifact(obj);
-                if (!$c.peq(art, $c.relem(artilist, ART.NONARTIFACT))) {
+                if (!$c.peq(art, artilist[ART.NONARTIFACT])) {
                     spfx = $c.i64($c.andu64($c.u64(spfx), $c.notu64(art.cspfx)));
                 }
             }
@@ -993,7 +993,7 @@ export async function touch_artifact(obj, mon) {   // artifact.c:908
     let oart = null, badclass = 0, badalign = 0, self_willed = 0, yours = 0, dmg = 0, tmp = 0, buf = new Int8Array(256);
     oart = get_artifact(obj);
     touch_blasted = FALSE;
-    if ($c.peq(oart, $c.relem(artilist, ART.NONARTIFACT))) {
+    if ($c.peq(oart, artilist[ART.NONARTIFACT])) {
         return 1;
     }
     yours = $c.i8($c.peq(mon, gy.youmonst) ? 1 : 0);
@@ -1004,7 +1004,7 @@ export async function touch_artifact(obj, mon) {   // artifact.c:908
         badclass = $c.i8(self_willed && (oart.role !== NON_PM && !Role_if(oart.role) || oart.race !== NON_PM && !Race_if(oart.race)) ? 1 : 0);
         badalign = $c.i8($c.andu64(oart.spfx, SPFX.RESTR) !== 0 && oart.alignment !== A.NONE && (oart.alignment !== u.ualign.type || u.ualign.record < 0) ? 1 : 0);
     } else if (!is_covetous(mon.data) && !is_mplayer(mon.data)) {
-        badclass = $c.i8(self_willed && oart.role !== NON_PM && !$c.peq(oart, $c.relem(artilist, ART.EXCALIBUR)) ? 1 : 0);
+        badclass = $c.i8(self_willed && oart.role !== NON_PM && !$c.peq(oart, artilist[ART.EXCALIBUR]) ? 1 : 0);
         badalign = $c.i8($c.andu64(oart.spfx, SPFX.RESTR) && oart.alignment !== A.NONE && oart.alignment !== mon_aligntyp(mon) ? 1 : 0);
     } else {
         /* an M3_WANTSxxx monster or a fake player */
@@ -1055,7 +1055,7 @@ export async function touch_artifact(obj, mon) {   // artifact.c:908
 export function arti_immune(obj, dtyp) {   // artifact.c:979
     let weap = null;
     weap = get_artifact(obj);
-    if ($c.peq(weap, $c.relem(artilist, ART.NONARTIFACT))) {
+    if ($c.peq(weap, artilist[ART.NONARTIFACT])) {
         return FALSE;
     }
     if (dtyp === AD.PHYS) {
@@ -1070,7 +1070,7 @@ export function arti_immune(obj, dtyp) {   // artifact.c:979
  */
 async function bane_applies(oart, mon) {   // artifact.c:993
     let atmp = new $T.artifact();
-    if (!$c.peq(oart, $c.relem(artilist, ART.NONARTIFACT)) && $c.andu64(oart.spfx, SPFX.DBONUS) !== 0) {
+    if (!$c.peq(oart, artilist[ART.NONARTIFACT]) && $c.andu64(oart.spfx, SPFX.DBONUS) !== 0) {
         atmp.$copyFrom(oart);
         atmp.spfx = $c.andu64(atmp.spfx, SPFX.DBONUS);   /* clear other spfx fields */
         if (await spec_applies(atmp, mon)) {
@@ -1137,7 +1137,7 @@ async function spec_applies(weap, mtmp) {   // artifact.c:1009
 export function spec_m2(otmp) {   // artifact.c:1065
     let artifact = null;
     artifact = get_artifact(otmp);
-    if (!$c.peq(artifact, $c.relem(artilist, ART.NONARTIFACT))) {
+    if (!$c.peq(artifact, artilist[ART.NONARTIFACT])) {
         return $c.i64(artifact.mtype);
     }
     return 0;
@@ -1153,7 +1153,7 @@ export async function spec_abon(otmp, mon) {   // artifact.c:1076
     weap = get_artifact(otmp);
     /* no need for an extra check for `NO_ATTK' because this will
        always return 0 for any artifact which has that attribute */
-    if (!$c.peq(weap, $c.relem(artilist, ART.NONARTIFACT)) && weap.attk.damn && await spec_applies(weap, mon)) {
+    if (!$c.peq(weap, artilist[ART.NONARTIFACT]) && weap.attk.damn && await spec_applies(weap, mon)) {
         return rnd(weap.attk.damn);
     }
     return 0;
@@ -1169,7 +1169,7 @@ export async function spec_dbon(otmp, mon, tmp) {   // artifact.c:1091
     let weap = null, $t1;
     weap = get_artifact(otmp);
     /* check for `NO_ATTK' */
-    if ($c.peq(weap, $c.relem(artilist, ART.NONARTIFACT)) || weap.attk.adtyp === AD.PHYS && weap.attk.damn === 0 && weap.attk.damd === 0) {
+    if ($c.peq(weap, artilist[ART.NONARTIFACT]) || weap.attk.adtyp === AD.PHYS && weap.attk.damn === 0 && weap.attk.damd === 0) {
         gs.spec_dbon_applies = FALSE;
     } else if (is_art(otmp, ART.GRIMTOOTH)) {
         /* Grimtooth has SPFX settings to warn against elves but we want its
@@ -1371,7 +1371,7 @@ async function Mb_hit(magr, mdef, mb, dmgptr, dieroll, vis, hittee) {   // artif
                     if (!$c.peq(mdef.data, old_mdat)) {
                         $c.strcpy(hittee, await mon_nam(mdef));
                     }
-                    if ($c.peq(mdef.data, $c.relem(mons, PM.CLAY_GOLEM))) {
+                    if (mdef.data === mons[PM.CLAY_GOLEM]) {
                         mdef.mhp = 1;   /* cancelled clay golems will die */
                     }
                     if (youattack && attacktype(mdef.data, AT.MAGC)) {
@@ -1508,7 +1508,7 @@ export async function artifact_hit(magr, mdef, otmp, dmgptr, dieroll) {   // art
     /* the four basic attacks: fire, cold, shock and missiles */
     if (attacks(AD.FIRE, otmp)) {
         if (realizes_damage) {
-            await pline_The($c.lit("fiery blade %s %s%c"), !gs.spec_dbon_applies ? $c.lit("hits") : $c.peq(mdef.data, $c.relem(mons, PM.WATER_ELEMENTAL)) ? $c.lit("vaporizes part of") : $c.lit("burns"), new $c.Ptr(hittee, 0), !gs.spec_dbon_applies ? 46 : 33);
+            await pline_The($c.lit("fiery blade %s %s%c"), !gs.spec_dbon_applies ? $c.lit("hits") : mdef.data === mons[PM.WATER_ELEMENTAL] ? $c.lit("vaporizes part of") : $c.lit("burns"), new $c.Ptr(hittee, 0), !gs.spec_dbon_applies ? 46 : 33);
         }
         if (!rn2(4)) {
             itemdmg = await destroy_items(mdef, AD.FIRE, dmgptr.get(0));
@@ -1609,7 +1609,7 @@ export async function artifact_hit(magr, mdef, otmp, dmgptr, dieroll) {   // art
                 await observe_object(otmp);
                 return TRUE;
             }
-        } else if (is_art(otmp, ART.VORPAL_BLADE) && (dieroll === 1 || $c.peq(mdef.data, $c.relem(mons, PM.JABBERWOCK)))) {
+        } else if (is_art(otmp, ART.VORPAL_BLADE) && (dieroll === 1 || mdef.data === mons[PM.JABBERWOCK])) {
             if (youattack && engulfing_u(mdef)) {
                 return FALSE;
             }
@@ -2145,7 +2145,7 @@ async function arti_invoke(obj$in) {   // artifact.c:2131
         return ECMD.OK;
     }
     oart = get_artifact(obj[0]);
-    if ($c.peq(oart, $c.relem(artilist, ART.NONARTIFACT)) || !oart.inv_prop) {
+    if ($c.peq(oart, artilist[ART.NONARTIFACT]) || !oart.inv_prop) {
         if (obj[0].otyp === CRYSTAL_BALL) {
             await use_crystal_ball(new $c.Ptr(obj, 0));
         } else {
@@ -2269,7 +2269,7 @@ export function finesse_ahriman(obj) {   // artifact.c:2236
     let oart = null, save_Lev = new $T.prop(), result = 0;
     /* if we aren't levitating or this isn't an artifact which confers
        levitation via #invoke then freeinv() won't toggle levitation */
-    if (!Levitation() || $c.peq(oart = get_artifact(obj), $c.relem(artilist, ART.NONARTIFACT)) || oart.inv_prop !== LEVITATION || !$c.and64(u.uprops[LEVITATION].extrinsic, W.ARTI)) {
+    if (!Levitation() || $c.peq(oart = get_artifact(obj), artilist[ART.NONARTIFACT]) || oart.inv_prop !== LEVITATION || !$c.and64(u.uprops[LEVITATION].extrinsic, W.ARTI)) {
         return FALSE;
     }
     /* arti_invoke(off) -> float_down() clears I_SPECIAL|TIMEOUT & W_ARTI;
@@ -2295,7 +2295,7 @@ export function artifact_light(obj) {   // artifact.c:2264
     if (obj && (obj.otyp === GOLD_DRAGON_SCALE_MAIL || obj.otyp === GOLD_DRAGON_SCALES) && $c.and64(obj.owornmask, W.ARM) !== 0) {
         return TRUE;
     }
-    return $c.i8(!$c.peq(get_artifact(obj), $c.relem(artilist, ART.NONARTIFACT)) && is_art(obj, ART.SUNSWORD) ? 1 : 0);
+    return $c.i8(get_artifact(obj) !== artilist[ART.NONARTIFACT] && is_art(obj, ART.SUNSWORD) ? 1 : 0);
 }
 /* KMH -- Talking artifacts are finally implemented */
 /**
@@ -2306,7 +2306,7 @@ export async function arti_speak(obj) {   // artifact.c:2279
     let oart = null, line = null, buf = new Int8Array(256);
     oart = get_artifact(obj);
     /* Is this a speaking artifact? */
-    if ($c.peq(oart, $c.relem(artilist, ART.NONARTIFACT)) || !$c.andu64(oart.spfx, SPFX.SPEAK)) {
+    if ($c.peq(oart, artilist[ART.NONARTIFACT]) || !$c.andu64(oart.spfx, SPFX.SPEAK)) {
         return ECMD.OK;   /* nothing happened */
     }
     line = await getrumor(bcsign(obj), new $c.Ptr(buf, 0), TRUE);
@@ -2325,7 +2325,7 @@ export async function arti_speak(obj) {   // artifact.c:2279
 export function artifact_has_invprop(otmp, inv_prop) {   // artifact.c:2299
     let arti = null;
     arti = get_artifact(otmp);
-    return $c.i8(!$c.peq(arti, $c.relem(artilist, ART.NONARTIFACT)) && arti.inv_prop === inv_prop ? 1 : 0);
+    return $c.i8(!$c.peq(arti, artilist[ART.NONARTIFACT]) && arti.inv_prop === inv_prop ? 1 : 0);
 }
 /* Return the price sold to the hero of a given artifact or unique item */
 /**
@@ -2403,7 +2403,7 @@ export function what_gives(abil) {   // artifact.c:2376
     for (obj = gi.invent; obj; obj = obj.nobj) {
         if (obj.oartifact && (!$c.peq(abil, new $c.FieldRef(u.uprops[WARN_OF_MON], "extrinsic", "i64")) || svc.context.warntype.obj)) {
             art = get_artifact(obj);
-            if (!$c.peq(art, $c.relem(artilist, ART.NONARTIFACT))) {
+            if (!$c.peq(art, artilist[ART.NONARTIFACT])) {
                 if (dtyp) {
                     /* carried */
                     /* defends while worn */
@@ -2608,7 +2608,7 @@ async function untouchable(obj$in, drop_untouchable) {   // artifact.c:2598
      * the get_artifact() macro tests 'obj' for Null */
     /* some items in use don't have any wornmask setting */
     beingworn = $c.i8(obj[0] && ($c.and64(obj[0].owornmask, wearmask) !== 0 || obj[0].oclass === TOOL_CLASS && (obj[0].lamplit | 0 || obj[0].otyp === LEASH && obj[0].corpsenm || Is_container(obj[0]) && Has_contents(obj[0]))) ? 1 : 0);
-    if (!$c.peq(art = get_artifact(obj[0]), $c.relem(artilist, ART.NONARTIFACT))) {
+    if ((art = get_artifact(obj[0])) !== artilist[ART.NONARTIFACT]) {
         carryeffect = $c.i8(art.cary.adtyp || art.cspfx ? 1 : 0);
         invoked = $c.i8(art.inv_prop > 0 && art.inv_prop <= LAST_PROP && $c.and64(u.uprops[art.inv_prop].extrinsic, W.ARTI) !== 0 ? 1 : 0);
     } else {
@@ -2773,7 +2773,7 @@ export async function mkot_trap_warn() {   // artifact.c:2753
 export function is_magic_key(mon, obj) {   // artifact.c:2775
     /* if null, non-rogue is assumed */
     if (is_art(obj, ART.MASTER_KEY_OF_THIEVERY)) {
-        if ($c.peq(mon, gy.youmonst) ? gu.urole.mnum === PM.ROGUE : mon && $c.peq(mon.data, $c.relem(mons, PM.ROGUE))) {
+        if ($c.peq(mon, gy.youmonst) ? gu.urole.mnum === PM.ROGUE : mon && mon.data === mons[PM.ROGUE]) {
             return $c.i8(!obj.cursed ? 1 : 0);   /* a rogue; non-cursed suffices for magic */
         }
         /* not a rogue; key must be blessed to behave as a magic one */
@@ -2831,7 +2831,7 @@ function get_artifact(obj) {   // artifact.c:2821
             return $c.relem(artilist, artidx);
         }
     }
-    return $c.relem(artilist, ART.NONARTIFACT);
+    return artilist[ART.NONARTIFACT];
 }
 /* is object permanently poisoned? (currently only Grimtooth) */
 /**

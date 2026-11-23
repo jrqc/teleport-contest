@@ -157,7 +157,7 @@ function goodpos_onscary(x, y, mptr) {   // teleport.c:53
     }
     /* creatures who don't (or can't) fear a written Elbereth and weren't
        caught by the minions check */
-    if ($c.peq(mptr, $c.relem(mons, PM.MINOTAUR)) || !haseyes(mptr)) {
+    if (mptr === mons[PM.MINOTAUR] || !haseyes(mptr)) {
         return FALSE;
     }
     return $c.i8(sengr_at($c.lit("Elbereth"), x, y, TRUE) ? TRUE : FALSE);
@@ -231,7 +231,7 @@ export function goodpos(x, y, mtmp, gpflags) {   // teleport.c:86
         } else if (is_lava(x, y) && !ignorelava) {
             /* 3.6.3: floating eye can levitate over lava but it avoids
                that due the effect of the heat causing it to dry out */
-            if ($c.peq(mdat, $c.relem(mons, PM.FLOATING_EYE))) {
+            if (mdat === mons[PM.FLOATING_EYE]) {
                 return FALSE;
             } else if ($c.peq(mtmp, gy.youmonst)) {
                 return $c.i8(Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked || Fire_resistance() && ((u.uprops[WWALKING].intrinsic || u.uprops[WWALKING].extrinsic) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) && $G.uarmf && $G.uarmf.oerodeproof | 0 || Upolyd() && likes_lava(gy.youmonst.data) ? 1 : 0);
@@ -331,7 +331,7 @@ export async function enexto_core(cc, xx, yy, mdat, entflags) {   // teleport.c:
     /* gather candidate coordinates within 3 steps, those 1 step away in
        random order first, then those 2 steps away in random order, then 3;
        this will usually find a good spot without scanning the whole map */
-    nearcandyct = await collect_coords($c.relem(candy, 0), xx, yy, 3, CC_NO_FLAGS, null);
+    nearcandyct = await collect_coords(candy[0], xx, yy, 3, CC_NO_FLAGS, null);
     for (i = 0; i < nearcandyct; i = i + 1 | 0) {
         cc.$copyFrom(candy[i]);
         if (goodpos(cc.x, cc.y, fakemon, entflags)) {
@@ -341,7 +341,7 @@ export async function enexto_core(cc, xx, yy, mdat, entflags) {   // teleport.c:
     /* didn't find a spot; gather coordinates for the whole map except
        for <xx,yy> itself, ordered in expanding distance from <xx,yy>
        (subsets of equal distance grouped together with order randomized) */
-    allcandyct = await collect_coords($c.relem(candy, 0), xx, yy, 0, CC_NO_FLAGS, null);
+    allcandyct = await collect_coords(candy[0], xx, yy, 0, CC_NO_FLAGS, null);
     /* skip first 'nearcandyct' spots, they have already been rejected;
        they will occur in different random order but same overall total */
     for (i = nearcandyct; i < allcandyct; i = i + 1 | 0) {
@@ -780,7 +780,7 @@ export async function safe_teleds(teleds_flags) {   // teleport.c:717
     if (!Passes_walls()) {
         cc_flags = (cc_flags | CC_SKIP_INACCS) >>> 0;
     }
-    candycount = await collect_coords($c.relem(candy, 0), u.ux, u.uy, 0, cc_flags, null);
+    candycount = await collect_coords(candy[0], u.ux, u.uy, 0, cc_flags, null);
     $t1 = backupspot.y = 0, backupspot.x = $t1;
     /* skip trap locations via teleok(,,FALSE) but remember first
        encountered trap spot that is acceptable to teleok(,,TRUE) */
@@ -1827,7 +1827,7 @@ export async function rloc(mtmp, rlocflags) {   // teleport.c:1799
         if (!passes_walls(mtmp.data)) {
             cc_flags = (cc_flags | CC_SKIP_INACCS) >>> 0;
         }
-        candycount = await collect_coords($c.relem(candy, 0), 40, 10, 0, cc_flags, null);
+        candycount = await collect_coords(candy[0], 40, 10, 0, cc_flags, null);
         $t1 = backupcc.y = 0, backupcc.x = $t1;
         for (i = 0; i < candycount; i = i + 1 | 0) {
             if ((j = rn2(candycount - i | 0)) > 0) {

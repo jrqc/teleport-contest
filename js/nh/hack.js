@@ -1903,7 +1903,7 @@ async function domove_attackmon_at(mtmp, x, y, displaceu) {   // hack.c:1955
      */
     if (svc.context.forcefight || !mtmp.mundetected || sensemon(mtmp) || (hides_under(mtmp.data) || mtmp.data.mlet === S.EEL) && !is_safemon(mtmp)) {
         /* target monster might decide to switch places with you... */
-        $t1 = $c.i8($c.peq(mtmp.data, $c.relem(mons, PM.DISPLACER_BEAST)) && !rn2(2) && mtmp.mux === u.ux0 && mtmp.muy === u.uy0 && !helpless(mtmp) && !mtmp.meating && !mtmp.mtrapped && !u.utrap && !u.ustuck && !u.usteed && !(u.dx && u.dy && (NODIAG(u.umonnum) || bad_rock(mtmp.data, x, u.uy0) && bad_rock(mtmp.data, u.ux0, y) || bad_rock(gy.youmonst.data, u.ux0, y) && bad_rock(gy.youmonst.data, x, u.uy0))) && goodpos(u.ux0, u.uy0, mtmp, GP.ALLOW_U) ? 1 : 0), displaceu.set(0, $t1);
+        $t1 = $c.i8(mtmp.data === mons[PM.DISPLACER_BEAST] && !rn2(2) && mtmp.mux === u.ux0 && mtmp.muy === u.uy0 && !helpless(mtmp) && !mtmp.meating && !mtmp.mtrapped && !u.utrap && !u.ustuck && !u.usteed && !(u.dx && u.dy && (NODIAG(u.umonnum) || bad_rock(mtmp.data, x, u.uy0) && bad_rock(mtmp.data, u.ux0, y) || bad_rock(gy.youmonst.data, u.ux0, y) && bad_rock(gy.youmonst.data, x, u.uy0))) && goodpos(u.ux0, u.uy0, mtmp, GP.ALLOW_U) ? 1 : 0), displaceu.set(0, $t1);
         /* if not displacing, try to attack; note that it might evade;
            also, we don't attack tame or peaceful when safemon() */
         if (!displaceu.get(0)) {
@@ -2037,7 +2037,7 @@ async function domove_swap_with_pet(mtmp, x, y) {   // hack.c:2098
     if (mtmp.mtrapped | 0 && is_pit(trap.ttyp) && sobj_at(BOULDER, trap.tx, trap.ty)) {
         /* can't swap places with pet pinned in a pit by a boulder */
         didnt_move = TRUE;
-    } else if (u.ux0 !== x && u.uy0 !== y && NODIAG($c.rdiff(mtmp.data, $c.relem(mons, 0)))) {
+    } else if (u.ux0 !== x && u.uy0 !== y && NODIAG($c.rdiff(mtmp.data, mons[0]))) {
         /* can't swap places when pet can't move to your spot */
         await You($c.lit("stop.  %s can't move diagonally."), await YMonnam(mtmp));
         didnt_move = TRUE;
@@ -3389,7 +3389,7 @@ export function in_town(x, y) {   // hack.c:3564
      * See if (x,y) is in a room with subrooms, if so, assume it's the
      * town.  If there are no subrooms, the whole level is in town.
      */
-    for (sroom = $c.relem(svr.rooms, 0); sroom.hx > 0; sroom = $c.radd(sroom, 1)) {
+    for (sroom = svr.rooms[0]; sroom.hx > 0; sroom = $c.radd(sroom, 1)) {
         if (sroom.nsubrooms > 0) {
             has_subrooms = TRUE;
             if (inside_room(sroom, x, y)) {
@@ -3510,7 +3510,7 @@ export async function check_special_room(newlev) {   // hack.c:3626
                 await You($c.lit("enter an anthole!"));
                 break;
             case BARRACKS:
-                if (monstinroom($c.relem(mons, PM.SOLDIER), roomno) || monstinroom($c.relem(mons, PM.SERGEANT), roomno) || monstinroom($c.relem(mons, PM.LIEUTENANT), roomno) || monstinroom($c.relem(mons, PM.CAPTAIN), roomno)) {
+                if (monstinroom(mons[PM.SOLDIER], roomno) || monstinroom(mons[PM.SERGEANT], roomno) || monstinroom(mons[PM.LIEUTENANT], roomno) || monstinroom(mons[PM.CAPTAIN], roomno)) {
                     await You($c.lit("enter a military barracks!"));
                 } else {
                     await You($c.lit("enter an abandoned barracks."));
@@ -3518,7 +3518,7 @@ export async function check_special_room(newlev) {   // hack.c:3626
                 break;
             case DELPHI:
                 {
-                    oracle = monstinroom($c.relem(mons, PM.ORACLE), roomno);
+                    oracle = monstinroom(mons[PM.ORACLE], roomno);
                     if (oracle) {
                         if (!oracle.mpeaceful) {
                             await verbalize($c.lit("You're in Delphi, %s."), new $c.Ptr(svp.plname, 0));

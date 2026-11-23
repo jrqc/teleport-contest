@@ -309,7 +309,7 @@ async function join_map(bg_typ, fg_typ) {   // mkmap.c:258
      * so don't call sort_rooms(), which can screw up the roomno's
      * validity in the levl structure.
      */
-    for (croom = $c.relem(svr.rooms, 0), croom2 = $c.radd(croom, 1); $c.pcmp(croom2, $c.relem(svr.rooms, svn.nroom)) < 0; ) {
+    for (croom = svr.rooms[0], croom2 = $c.radd(croom, 1); $c.pcmp(croom2, $c.relem(svr.rooms, svn.nroom)) < 0; ) {
         /* pick random starting and end locations for "corridor" */
         if (!somexy(croom, sm) || !somexy(croom2, em)) {
             /* ack! -- the level is going to be busted */

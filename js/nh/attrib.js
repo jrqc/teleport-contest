@@ -815,31 +815,31 @@ function role_abil(r) {   // attrib.c:789
         roleabils[$i4].$copyFrom(new $T.anon_attrib_791());
     }
     roleabils[0].role = PM.ARCHEOLOGIST;
-    roleabils[0].abil = $c.relem(arc_abil, 0);
+    roleabils[0].abil = arc_abil[0];
     roleabils[1].role = PM.BARBARIAN;
-    roleabils[1].abil = $c.relem(bar_abil, 0);
+    roleabils[1].abil = bar_abil[0];
     roleabils[2].role = PM.CAVE_DWELLER;
-    roleabils[2].abil = $c.relem(cav_abil, 0);
+    roleabils[2].abil = cav_abil[0];
     roleabils[3].role = PM.HEALER;
-    roleabils[3].abil = $c.relem(hea_abil, 0);
+    roleabils[3].abil = hea_abil[0];
     roleabils[4].role = PM.KNIGHT;
-    roleabils[4].abil = $c.relem(kni_abil, 0);
+    roleabils[4].abil = kni_abil[0];
     roleabils[5].role = PM.MONK;
-    roleabils[5].abil = $c.relem(mon_abil, 0);
+    roleabils[5].abil = mon_abil[0];
     roleabils[6].role = PM.CLERIC;
-    roleabils[6].abil = $c.relem(pri_abil, 0);
+    roleabils[6].abil = pri_abil[0];
     roleabils[7].role = PM.RANGER;
-    roleabils[7].abil = $c.relem(ran_abil, 0);
+    roleabils[7].abil = ran_abil[0];
     roleabils[8].role = PM.ROGUE;
-    roleabils[8].abil = $c.relem(rog_abil, 0);
+    roleabils[8].abil = rog_abil[0];
     roleabils[9].role = PM.SAMURAI;
-    roleabils[9].abil = $c.relem(sam_abil, 0);
+    roleabils[9].abil = sam_abil[0];
     roleabils[10].role = PM.TOURIST;
-    roleabils[10].abil = $c.relem(tou_abil, 0);
+    roleabils[10].abil = tou_abil[0];
     roleabils[11].role = PM.VALKYRIE;
-    roleabils[11].abil = $c.relem(val_abil, 0);
+    roleabils[11].abil = val_abil[0];
     roleabils[12].role = PM.WIZARD;
-    roleabils[12].abil = $c.relem(wiz_abil, 0);
+    roleabils[12].abil = wiz_abil[0];
     roleabils[13].role = 0;
     roleabils[13].abil = null;
     for (i = 0; roleabils[i].abil && roleabils[i].role !== r; i = i + 1 | 0) {
@@ -860,19 +860,19 @@ function check_innate_abil(ability, frommask) {   // attrib.c:818
     } else if (frommask === FROMRACE) {
         switch (gu.urace.mnum) {
             case PM.DWARF:
-                abil = $c.relem(dwa_abil, 0);
+                abil = dwa_abil[0];
                 break;
             case PM.ELF:
-                abil = $c.relem(elf_abil, 0);
+                abil = elf_abil[0];
                 break;
             case PM.GNOME:
-                abil = $c.relem(gno_abil, 0);
+                abil = gno_abil[0];
                 break;
             case PM.ORC:
-                abil = $c.relem(orc_abil, 0);
+                abil = orc_abil[0];
                 break;
             case PM.HUMAN:
-                abil = $c.relem(hum_abil, 0);
+                abil = hum_abil[0];
                 break;
             default:
                 break;
@@ -1033,10 +1033,10 @@ export async function adjabil(oldlevel, newlevel) {   // attrib.c:1006
     abil = role_abil(gu.urole.mnum);
     switch (gu.urace.mnum) {
         case PM.ELF:
-            rabil = $c.relem(elf_abil, 0);
+            rabil = elf_abil[0];
             break;
         case PM.ORC:
-            rabil = $c.relem(orc_abil, 0);
+            rabil = orc_abil[0];
             break;
         case PM.HUMAN:
         case PM.DWARF:

@@ -120,7 +120,7 @@ function good_rm_wall_doorpos(x, y, dir, room) {   // mklev.c:73
     if (!isok(tx, ty) || svl.level.locations[tx][ty].typ < POOL) {
         return FALSE;
     }
-    rmno = $c.i32($c.add64($c.rdiff(room, $c.relem(svr.rooms, 0)), ROOMOFFSET));
+    rmno = $c.i32($c.add64($c.rdiff(room, svr.rooms[0]), ROOMOFFSET));
     if (rmno !== (svl.level.locations[tx][ty].roomno | 0)) {
         return FALSE;
     }
@@ -243,7 +243,7 @@ export async function sort_rooms() {   // mklev.c:210
     ri.fill(0);
     ri[0] = 0;
     n = svn.nroom >>> 0;
-    $c.nh_deterministic_qsort($c.relem(svr.rooms, 0), n, 224, mkroom_cmp);
+    $c.nh_deterministic_qsort(svr.rooms[0], n, 224, mkroom_cmp);
     /* Update the roomnos on the map */
     for (i = 0; i < n; i = i + 1 >>> 0) {
         ri[svr.rooms[i].roomnoidx] = i;
@@ -296,7 +296,7 @@ async function do_room_or_subroom(croom, lowx, lowy, hix, hiy, lit, rtype, speci
     } else {
         croom.rlit = 0;
     }
-    croom.roomnoidx = $c.i8($c.rdiff(croom, $c.relem(svr.rooms, 0)));
+    croom.roomnoidx = $c.i8($c.rdiff(croom, svr.rooms[0]));
     croom.lx = lowx;
     croom.hx = hix;
     croom.ly = lowy;
@@ -737,7 +737,7 @@ async function dosdoor(x, y, aroom, type) {   // mklev.c:615
  */
 function cardinal_nextto_room(aroom, x, y) {   // mklev.c:681
     let rmno = 0;
-    rmno = $c.i32($c.add64($c.rdiff(aroom, $c.relem(svr.rooms, 0)), ROOMOFFSET));
+    rmno = $c.i32($c.add64($c.rdiff(aroom, svr.rooms[0]), ROOMOFFSET));
     if (isok($c.i16(x - 1 | 0), y) && !svl.level.locations[x - 1 | 0][y].edge && (svl.level.locations[x - 1 | 0][y].roomno | 0) === rmno) {
         return TRUE;
     }
@@ -893,7 +893,7 @@ export async function clear_level_structures() {   // mklev.c:850
        but not from the level); explicitly reset column #0 along with the
        rest so that we start the new level with a completely clean slate */
     for (x = 0; x < COLNO; x = $c.i16(x + 1)) {
-        lev = $c.relem(svl.level.locations[x], 0);
+        lev = svl.level.locations[x][0];
         for (y = 0; y < ROWNO; y = $c.i16(y + 1)) {
             ($t1 = lev, lev = $c.radd($t1, 1), $t1).$copyFrom(clear_level_structures$zerorm);
             svl.level.objects[x][y] = null;
@@ -996,7 +996,7 @@ async function fill_ordinary_room(croom, bonus_items) {   // mklev.c:939
        we have to check for monsters on the stairs anyway. */
     if ((u.uhave.amulet | 0 || !rn2(3)) && somexyspace(croom, pos)) {
         tmonst = await makemon(null, pos.x, pos.y, MM.NOGRP);
-        if (tmonst && $c.peq(tmonst.data, $c.relem(mons, PM.GIANT_SPIDER)) && !occupied(pos.x, pos.y)) {
+        if (tmonst && tmonst.data === mons[PM.GIANT_SPIDER] && !occupied(pos.x, pos.y)) {
             await maketrap(pos.x, pos.y, WEB);
         }
     }
@@ -1361,7 +1361,7 @@ async function makelevel() {   // mklev.c:1251
            rooms (intended to be indistinguishable from the normally
            generated items); work out which room these will be placed in */
         fillable_room_count = 0;
-        for (croom = $c.relem(svr.rooms, 0); croom.hx > 0; croom = $c.radd(croom, 1)) {
+        for (croom = svr.rooms[0]; croom.hx > 0; croom = $c.radd(croom, 1)) {
             if (ROOM_IS_FILLABLE(croom)) {
                 fillable_room_count = fillable_room_count + 1 | 0;
             }
@@ -1372,7 +1372,7 @@ async function makelevel() {   // mklev.c:1251
            typically don't have any bonus items to generate anyway) */
         bonus_item_room_countdown = fillable_room_count ? rn2(fillable_room_count) : -1;
         /* for each room: put things inside */
-        for (croom = $c.relem(svr.rooms, 0); croom.hx > 0; croom = $c.radd(croom, 1)) {
+        for (croom = svr.rooms[0]; croom.hx > 0; croom = $c.radd(croom, 1)) {
             fillable = $c.i8(ROOM_IS_FILLABLE(croom));
             await fill_ordinary_room(croom, $c.i8(fillable && bonus_item_room_countdown === 0 ? 1 : 0));
             if (fillable) {
@@ -1527,7 +1527,7 @@ export async function level_finalize_topology() {   // mklev.c:1544
         svl.level.flags.graveyard = (1) & 1;
     }
     if (!svl.level.flags.is_maze_lev) {
-        for (croom = $c.relem(svr.rooms, 0); !$c.peq(croom, $c.relem(svr.rooms, svn.nroom)); croom = $c.radd(croom, 1)) {
+        for (croom = svr.rooms[0]; !$c.peq(croom, $c.relem(svr.rooms, svn.nroom)); croom = $c.radd(croom, 1)) {
             topologize(croom);
         }
     }
@@ -1559,7 +1559,7 @@ export async function mklev() {   // mklev.c:1577
  */
 export function topologize(croom) {   // mklev.c:1599
     let x = 0, y = 0, roomno = 0, lowx = 0, lowy = 0, hix = 0, hiy = 0, subindex = 0, nsubrooms = 0;
-    roomno = $c.i32($c.add64($c.rdiff(croom, $c.relem(svr.rooms, 0)), ROOMOFFSET));
+    roomno = $c.i32($c.add64($c.rdiff(croom, svr.rooms[0]), ROOMOFFSET));
     lowx = croom.lx;
     lowy = croom.ly;
     hix = croom.hx;
@@ -1633,7 +1633,7 @@ async function find_branch_room(mp) {   // mklev.c:1660
  */
 function pos_to_room(x, y) {   // mklev.c:1677
     let i = 0, curr = null;
-    for (curr = $c.relem(svr.rooms, 0), i = 0; i < svn.nroom; curr = $c.radd(curr, 1), i = i + 1 | 0) {
+    for (curr = svr.rooms[0], i = 0; i < svn.nroom; curr = $c.radd(curr, 1), i = i + 1 | 0) {
         if (inside_room(curr, x, y)) {
             return curr;
         }
@@ -2069,7 +2069,7 @@ export async function mktrap(num, mktrapflags, croom, tm) {   // mklev.c:2036
        should prevent cases where that might not happen) but be paranoid */
     kind = t ? t.ttyp | 0 : NO_TRAP;
     if (kind === WEB && !((mktrapflags & MKTRAP.NOSPIDERONWEB) >>> 0)) {
-        await makemon($c.relem(mons, PM.GIANT_SPIDER), m.x, m.y, NO.MM_FLAGS);
+        await makemon(mons[PM.GIANT_SPIDER], m.x, m.y, NO.MM_FLAGS);
     }
     if (t && (mktrapflags & MKTRAP.SEEN) >>> 0) {
         t.tseen = (TRUE) & 1;

@@ -618,16 +618,16 @@ async function l_obj_bury(L) {   // nhlobj.c:603
 export async function l_obj_register(L) {   // nhlobj.c:654
     /* Table of instance methods (e.g. an_object:isnull())
        and static methods (e.g. obj.new("dagger")). */
-    await luaL_checkversion_(L, LUA.VERSION_NUM, LUAL_NUMSIZES), await lua_createtable(L, 0, 15), await luaL_setfuncs(L, $c.relem(l_obj_methods, 0), 0);
+    await luaL_checkversion_(L, LUA.VERSION_NUM, LUAL_NUMSIZES), await lua_createtable(L, 0, 15), await luaL_setfuncs(L, l_obj_methods[0], 0);
     /* metatable = { __name = "obj", __gc = l_obj_gc } */
     await luaL_newmetatable(L, $c.lit("obj"));
-    await luaL_setfuncs(L, $c.relem(l_obj_meta, 0), 0);
+    await luaL_setfuncs(L, l_obj_meta[0], 0);
     /* metatable.__index points at the object method table. */
     lua_pushvalue(L, -2);
     await lua_setfield(L, -2, $c.lit("__index"));
     /* Don't let lua code mess with the real metatable.
        Instead offer a fake one that only contains __gc. */
-    await luaL_checkversion_(L, LUA.VERSION_NUM, LUAL_NUMSIZES), await lua_createtable(L, 0, 1), await luaL_setfuncs(L, $c.relem(l_obj_meta, 0), 0);
+    await luaL_checkversion_(L, LUA.VERSION_NUM, LUAL_NUMSIZES), await lua_createtable(L, 0, 1), await luaL_setfuncs(L, l_obj_meta[0], 0);
     await lua_setfield(L, -2, $c.lit("__metatable"));
     /* We don't need the metatable anymore. It's safe in the
        Lua registry for use by luaL_setmetatable. */

@@ -768,7 +768,7 @@ export function match_sym(buf) {   // symbols.c:852
     len = $c.strlen(buf);
     p = $c.strchr(buf, 58);
     q = $c.strchr(buf, 61);
-    sp = $c.relem(loadsyms, 0);
+    sp = loadsyms[0];
     /* G_ lines will never match here */
     if ((buf.get(0) === 71 || buf.get(0) === 103) && buf.get(1) === 95) {
         return null;
@@ -792,7 +792,7 @@ export function match_sym(buf) {   // symbols.c:852
     }
     for (i = 0; i < 10; i = i + 1 | 0) {
         if (len >= $c.strlen(match_sym$alternates[i].altnm) && !strncmpi(buf, match_sym$alternates[i].altnm, $c.i32(len))) {
-            sp = $c.relem(loadsyms, 0);
+            sp = loadsyms[0];
             while (sp.range) {
                 if (!$c.strcmp(match_sym$alternates[i].nm, sp.name)) {
                     return sp;

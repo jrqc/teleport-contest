@@ -229,5 +229,5 @@ export function u_wield_art(art) {
     return is_art($G.uwep, art);
 }
 export function WrappingAllowed(mptr) {
-    return $c.andu64(mptr.mflags1, M1.HUMANOID) !== 0 && mptr.msize >= MZ.SMALL && mptr.msize <= MZ.HUGE && !(mptr.mlet === S.GHOST) && mptr.mlet !== S.CENTAUR && !$c.peq(mptr, $c.relem(mons, PM.WINGED_GARGOYLE)) && !$c.peq(mptr, $c.relem(mons, PM.MARILITH)) ? 1 : 0;
+    return $c.andu64(mptr.mflags1, M1.HUMANOID) !== 0 && mptr.msize >= MZ.SMALL && mptr.msize <= MZ.HUGE && !(mptr.mlet === S.GHOST) && mptr.mlet !== S.CENTAUR && mptr !== mons[PM.WINGED_GARGOYLE] && mptr !== mons[PM.MARILITH] ? 1 : 0;
 }

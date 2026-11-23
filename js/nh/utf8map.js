@@ -157,7 +157,7 @@ export function mixed_to_utf8(buf, bufsz, str, retflags) {   // utf8map.c:86
  */
 export async function add_custom_urep_entry(customization_name, glyphidx, utf32ch, utf8str, which_set) {   // utf8map.c:148
     let gdc = null, details = null, newdetails = null, $t1, $t2, $t3;
-    gdc = $c.relem(gs.sym_customizations[which_set], custom_ureps);
+    gdc = gs.sym_customizations[which_set][custom_ureps];
     newdetails = null;
     if (!gdc.details) {
         $t1 = await dupstr(customization_name), gdc.customization_name = $t1;

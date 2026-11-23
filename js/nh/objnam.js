@@ -1189,11 +1189,11 @@ export function the_unique_pm(ptr) {   // objnam.c:1121
     /* high priest is unique if it includes "of <deity>", otherwise not
        (caller needs to handle the 1st possibility; we assume the 2nd);
        worm tail should be irrelevant but is included for completeness */
-    if ($c.peq(ptr, $c.relem(mons, PM.HIGH_CLERIC)) || $c.peq(ptr, $c.relem(mons, PM.LONG_WORM_TAIL))) {
+    if (ptr === mons[PM.HIGH_CLERIC] || ptr === mons[PM.LONG_WORM_TAIL]) {
         uniq = FALSE;
     }
     /* Wizard no longer needs this; he's flagged as unique these days */
-    if ($c.peq(ptr, $c.relem(mons, PM.WIZARD_OF_YENDOR))) {
+    if (ptr === mons[PM.WIZARD_OF_YENDOR]) {
         uniq = TRUE;
     }
     return uniq;
@@ -2750,7 +2750,7 @@ async function singplur_lookup(basestr, endstring, to_plural, alt_as_is) {   // 
             return TRUE;
         }
     }
-    for (sp = $c.relem(one_off, 0); sp.sing; sp = $c.radd(sp, 1)) {
+    for (sp = one_off[0]; sp.sing; sp = $c.radd(sp, 1)) {
         /* check whether endstring already matches */
         same = to_plural ? sp.plur : sp.sing;
         al = $c.i32($c.strlen(same));
@@ -4214,7 +4214,7 @@ async function readobjnam_postparse1(d) {   // objnam.c:4240
     }
     /* Alternate spellings (pick-ax, silver sabre, &c) */
     {
-        as = $c.relem(spellings, 0);
+        as = spellings[0];
         while (as.sp) {
             if (await wishymatch(d.bp, as.sp, TRUE)) {
                 d.typ = as.ob;
@@ -4487,7 +4487,7 @@ async function readobjnam_postparse3(d) {   // objnam.c:4727
     }
     d.typ = 0;
     if (d.actualn) {
-        j = $c.relem(Japanese_items, 0);
+        j = Japanese_items[0];
         while (j.item) {
             if (!strncmpi(d.actualn, j.name, -1)) {
                 d.typ = j.item;
@@ -4602,7 +4602,7 @@ async function readobjnam_postparse3(d) {   // objnam.c:4727
     /* got a class, but not specific type;
        check alternate spellings of items with matching classes */
     if (d.oclass && !d.typ) {
-        as = $c.relem(spellings, 0);
+        as = spellings[0];
         while (as.sp) {
             if (objects[as.ob].oc_class === d.oclass && await wishymatch(d.bp, as.sp, TRUE)) {
                 d.typ = as.ob;
@@ -5137,7 +5137,7 @@ export function rnd_class(first, last) {   // objnam.c:5403
  */
 export function Japanese_item_name(i, ordinaryname) {   // objnam.c:5422
     let j = null;
-    j = $c.relem(Japanese_items, 0);
+    j = Japanese_items[0];
     while (j.item) {
         if (i === j.item) {
             return j.name;

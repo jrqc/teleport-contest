@@ -50,8 +50,8 @@ export function gettrack(x, y) {   // track.c:42
     let cnt = 0, ndist = 0, tc = null, $t1;
     cnt = utcnt[0];
     for (tc = $c.relem(utrack, utpnt[0]); $t1 = cnt, cnt = $t1 - 1 | 0, $t1; ) {
-        if ($c.peq(tc, $c.relem(utrack, 0))) {
-            tc = $c.relem(utrack, UTSZ - 1);
+        if (tc === utrack[0]) {
+            tc = utrack[UTSZ - 1];
         } else {
             tc = $c.radd(tc, -1);
         }

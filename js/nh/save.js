@@ -592,7 +592,7 @@ async function savelev_core(nhfp, lev$in) {   // save.c:452
         await clear_level_structures();
         gf.ftrap = null;
         gb.billobjs = null;
-        $c.memset($c.relem(svr.rooms, 0), 0, 18368);
+        $c.memset(svr.rooms[0], 0, 18368);
     }
     return;
 }

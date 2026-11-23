@@ -300,7 +300,7 @@ export async function priestini(lvl, sroom, sx, sy, sanctum) {   // priest.c:220
     }
     priest = await makemon(prim, $c.i16(px), $c.i16(py), MM.EPRI);
     if (priest) {
-        priest.mextra.epri.shroom = $c.i8($c.add64($c.rdiff(sroom, $c.relem(svr.rooms, 0)), ROOMOFFSET));
+        priest.mextra.epri.shroom = $c.i8($c.add64($c.rdiff(sroom, svr.rooms[0]), ROOMOFFSET));
         priest.mextra.epri.shralign = $c.i8(((svl.level.locations[sx][sy].flags | 0) & AM.MASK) === 0 ? A.NONE : ((svl.level.locations[sx][sy].flags | 0) & AM.MASK) === AM.LAWFUL ? A.LAWFUL : ((svl.level.locations[sx][sy].flags | 0) & AM.MASK) - 2 | 0);
         priest.mextra.epri.shrpos.x = $c.i16(sx);
         priest.mextra.epri.shrpos.y = $c.i16(sy);
@@ -363,8 +363,8 @@ export async function priestname(mon, article, reveal_high_priest, pname) {   //
     let do_hallu = 0, aligned_priest = 0, high_priest = 0, whatcode = Int8Array.of(0), what = null;
     /* caller-supplied output buffer */
     do_hallu = $c.i8(Hallucination());
-    aligned_priest = $c.i8($c.peq(mon.data, $c.relem(mons, PM.ALIGNED_CLERIC)) ? 1 : 0);
-    high_priest = $c.i8($c.peq(mon.data, $c.relem(mons, PM.HIGH_CLERIC)) ? 1 : 0);
+    aligned_priest = $c.i8(mon.data === mons[PM.ALIGNED_CLERIC] ? 1 : 0);
+    high_priest = $c.i8(mon.data === mons[PM.HIGH_CLERIC] ? 1 : 0);
     whatcode[0] = 0;
     what = do_hallu ? await rndmonnam(new $c.Ptr(whatcode, 0)) : mon_pmname(mon);
     if (!mon.ispriest && !mon.isminion) {   /* should never happen...  */
@@ -477,7 +477,7 @@ export async function intemple(roomno) {   // priest.c:410
         await record_achievement(ACH.TMPL);
         epri_p = priest.mextra.epri;
         shrined = has_shrine(priest);
-        sanctum = $c.i8($c.peq(priest.data, $c.relem(mons, PM.HIGH_CLERIC)) && ((svd.dungeon_topology.d_sanctum_level.dlevel || svd.dungeon_topology.d_sanctum_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_sanctum_level) || In_endgame(u.uz)) ? 1 : 0);
+        sanctum = $c.i8(priest.data === mons[PM.HIGH_CLERIC] && ((svd.dungeon_topology.d_sanctum_level.dlevel || svd.dungeon_topology.d_sanctum_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_sanctum_level) || In_endgame(u.uz)) ? 1 : 0);
         can_speak = $c.i8(!helpless(priest) ? 1 : 0);
         if (can_speak && !Deaf() && svm.moves >= epri_p.intone_time) {
             save_priest = priest.ispriest;
@@ -564,7 +564,7 @@ export async function intemple(roomno) {   // priest.c:410
         /* no message; unfortunately there's no
            EPRI(priest)->eerie_time available to
            make sure we give one the first time */
-        if (!rn2(5) && (mtmp = await makemon($c.relem(mons, PM.GHOST), u.ux, u.uy, MM.NOMSG)) !== null) {
+        if (!rn2(5) && (mtmp = await makemon(mons[PM.GHOST], u.ux, u.uy, MM.NOMSG)) !== null) {
             ngen = svm.mvitals[PM.GHOST].born;
             if (canspotmon(mtmp)) {
                 await pline($c.lit("A%s ghost appears next to you%c"), ngen < 5 ? $c.lit("n enormous") : $c.lit(""), ngen < 10 ? 33 : 46);
@@ -777,7 +777,7 @@ export async function reset_hostility(roamer) {   // priest.c:755
     if (!roamer.isminion) {
         return;
     }
-    if (!$c.peq(roamer.data, $c.relem(mons, PM.ALIGNED_CLERIC)) && !$c.peq(roamer.data, $c.relem(mons, PM.ANGEL))) {
+    if (roamer.data !== mons[PM.ALIGNED_CLERIC] && roamer.data !== mons[PM.ANGEL]) {
         return;
     }
     if (roamer.mextra.emin.min_align !== u.ualign.type) {

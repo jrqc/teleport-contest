@@ -180,13 +180,13 @@ async function u_init_role() {   // u_init.c:637
              * random number generators are bad enough to seriously
              * skew the results if we use rn2(2)...  --KAA
              */
-            await ini_inv($c.relem(Archeologist, 0));
+            await ini_inv(Archeologist[0]);
             if (!rn2(10)) {
-                await ini_inv($c.relem(Tinopener, 0));
+                await ini_inv(Tinopener[0]);
             } else if (!rn2(4)) {
-                await ini_inv($c.relem(Lamp, 0));
+                await ini_inv(Lamp[0]);
             } else if (!rn2(5)) {
-                await ini_inv($c.relem(Magicmarker, 0));
+                await ini_inv(Magicmarker[0]);
             }
             await knows_object(SACK, FALSE);
             await knows_object(TOUCHSTONE, FALSE);
@@ -197,29 +197,29 @@ async function u_init_role() {   // u_init.c:637
         case PM.BARBARIAN:
             if (rn2(100) >= 50) {
                 /* see above comment */
-                await ini_inv($c.relem(Barbarian_0, 0));
+                await ini_inv(Barbarian_0[0]);
             } else {
-                await ini_inv($c.relem(Barbarian_1, 0));
+                await ini_inv(Barbarian_1[0]);
             }
             if (!rn2(6)) {
-                await ini_inv($c.relem(Lamp, 0));
+                await ini_inv(Lamp[0]);
             }
             await knows_class(WEAPON_CLASS);   /* excluding polearms */
             await knows_class(ARMOR_CLASS);
             break;
         case PM.CAVE_DWELLER:
-            await ini_inv($c.relem(Cave_man, 0));
+            await ini_inv(Cave_man[0]);
             break;
         case PM.HEALER:
             $t1 = rn2(1000) + 1001 | 0, u.umoney0 = $t1;
-            await ini_inv($c.relem(Healer, 0));
+            await ini_inv(Healer[0]);
             if (!rn2(25)) {
-                await ini_inv($c.relem(Lamp, 0));
+                await ini_inv(Lamp[0]);
             }
             await knows_object(POT_FULL_HEALING, FALSE);
             break;
         case PM.KNIGHT:
-            await ini_inv($c.relem(Knight, 0));
+            await ini_inv(Knight[0]);
             await knows_class(WEAPON_CLASS);   /* all weapons */
             await knows_class(ARMOR_CLASS);
             /* give knights chess-like mobility--idea from wooledge@..cwru.edu */
@@ -227,12 +227,12 @@ async function u_init_role() {   // u_init.c:637
             break;
         case PM.MONK:
             {
-                await ini_inv($c.relem(Monk, 0));
+                await ini_inv(Monk[0]);
                 await ini_inv(u_init_role$M_spell[$c.div32(rn2(90), 30)]);   /* [0..2] */
                 if (!rn2(4)) {
-                    await ini_inv($c.relem(Magicmarker, 0));
+                    await ini_inv(Magicmarker[0]);
                 } else if (!rn2(10)) {
-                    await ini_inv($c.relem(Lamp, 0));
+                    await ini_inv(Lamp[0]);
                 }
                 await knows_class(ARMOR_CLASS);
                 /* sufficiently martial-arts oriented item to ignore language issue */
@@ -241,11 +241,11 @@ async function u_init_role() {   // u_init.c:637
             }
         case PM.CLERIC:
             /* priest/priestess */
-            await ini_inv($c.relem(Priest, 0));
+            await ini_inv(Priest[0]);
             if (!rn2(5)) {
-                await ini_inv($c.relem(Magicmarker, 0));
+                await ini_inv(Magicmarker[0]);
             } else if (!rn2(10)) {
-                await ini_inv($c.relem(Lamp, 0));
+                await ini_inv(Lamp[0]);
             }
             await knows_object(POT_WATER, TRUE);   /* override pauper */
             /* KMH, conduct --
@@ -257,14 +257,14 @@ async function u_init_role() {   // u_init.c:637
              */
             break;
         case PM.RANGER:
-            await ini_inv($c.relem(Ranger, 0));
+            await ini_inv(Ranger[0]);
             await knows_class(WEAPON_CLASS);   /* bows, arrows, spears only */
             break;
         case PM.ROGUE:
             u.umoney0 = 0;
-            await ini_inv($c.relem(Rogue, 0));
+            await ini_inv(Rogue[0]);
             if (!rn2(5)) {
-                await ini_inv($c.relem(Blindfold, 0));
+                await ini_inv(Blindfold[0]);
             }
             await knows_object(SACK, FALSE);
             /* FALSE: don't override pauper here,
@@ -273,9 +273,9 @@ async function u_init_role() {   // u_init.c:637
             await knows_class(WEAPON_CLASS);   /* daggers only */
             break;
         case PM.SAMURAI:
-            await ini_inv($c.relem(Samurai, 0));
+            await ini_inv(Samurai[0]);
             if (!rn2(5)) {
-                await ini_inv($c.relem(Blindfold, 0));
+                await ini_inv(Blindfold[0]);
             }
             await knows_class(WEAPON_CLASS);   /* all weapons */
             await knows_class(ARMOR_CLASS);
@@ -294,29 +294,29 @@ async function u_init_role() {   // u_init.c:637
             break;
         case PM.TOURIST:
             $t2 = rnd(1000), u.umoney0 = $t2;
-            await ini_inv($c.relem(Tourist, 0));
+            await ini_inv(Tourist[0]);
             if (!rn2(25)) {
-                await ini_inv($c.relem(Tinopener, 0));
+                await ini_inv(Tinopener[0]);
             } else if (!rn2(25)) {
-                await ini_inv($c.relem(Leash, 0));
+                await ini_inv(Leash[0]);
             } else if (!rn2(25)) {
-                await ini_inv($c.relem(Towel, 0));
+                await ini_inv(Towel[0]);
             } else if (!rn2(20)) {
-                await ini_inv($c.relem(Magicmarker, 0));
+                await ini_inv(Magicmarker[0]);
             }
             break;
         case PM.VALKYRIE:
-            await ini_inv($c.relem(Valkyrie, 0));
+            await ini_inv(Valkyrie[0]);
             if (!rn2(6)) {
-                await ini_inv($c.relem(Lamp, 0));
+                await ini_inv(Lamp[0]);
             }
             await knows_class(WEAPON_CLASS);   /* excludes polearms */
             await knows_class(ARMOR_CLASS);
             break;
         case PM.WIZARD:
-            await ini_inv($c.relem(Wizard, 0));
+            await ini_inv(Wizard[0]);
             if (!rn2(5)) {
-                await ini_inv($c.relem(Blindfold, 0));
+                await ini_inv(Blindfold[0]);
             }
             break;
         default:
@@ -360,7 +360,7 @@ async function u_init_race() {   // u_init.c:792
                 Instrument[1].trquan_min = 0;
                 Instrument[1].trquan_max = 0;
                 Instrument[1].trbless = 0;
-                await ini_inv($c.relem(Instrument, 0));
+                await ini_inv(Instrument[0]);
             }
             /* Elves can recognize all elvish objects */
             await knows_object(ELVEN_SHORT_SWORD, FALSE);
@@ -390,7 +390,7 @@ async function u_init_race() {   // u_init.c:792
         case PM.ORC:
             /* compensate for generally inferior equipment */
             if (!(gu.urole.mnum === PM.WIZARD)) {
-                await ini_inv($c.relem(Xtra_food, 0));
+                await ini_inv(Xtra_food[0]);
             }
             /* Orcs can recognize all orcish objects */
             await knows_object(ORCISH_SHORT_SWORD, FALSE);
@@ -562,43 +562,43 @@ async function skills_for_role() {   // u_init.c:1037
     let skills = null;
     switch (gu.urole.mnum) {
         case PM.ARCHEOLOGIST:
-            skills = $c.relem(Skill_A, 0);
+            skills = Skill_A[0];
             break;
         case PM.BARBARIAN:
-            skills = $c.relem(Skill_B, 0);
+            skills = Skill_B[0];
             break;
         case PM.CAVE_DWELLER:
-            skills = $c.relem(Skill_C, 0);
+            skills = Skill_C[0];
             break;
         case PM.HEALER:
-            skills = $c.relem(Skill_H, 0);
+            skills = Skill_H[0];
             break;
         case PM.KNIGHT:
-            skills = $c.relem(Skill_K, 0);
+            skills = Skill_K[0];
             break;
         case PM.MONK:
-            skills = $c.relem(Skill_Mon, 0);
+            skills = Skill_Mon[0];
             break;
         case PM.CLERIC:
-            skills = $c.relem(Skill_P, 0);
+            skills = Skill_P[0];
             break;
         case PM.RANGER:
-            skills = $c.relem(Skill_Ran, 0);
+            skills = Skill_Ran[0];
             break;
         case PM.ROGUE:
-            skills = $c.relem(Skill_R, 0);
+            skills = Skill_R[0];
             break;
         case PM.SAMURAI:
-            skills = $c.relem(Skill_S, 0);
+            skills = Skill_S[0];
             break;
         case PM.TOURIST:
-            skills = $c.relem(Skill_T, 0);
+            skills = Skill_T[0];
             break;
         case PM.VALKYRIE:
-            skills = $c.relem(Skill_V, 0);
+            skills = Skill_V[0];
             break;
         case PM.WIZARD:
-            skills = $c.relem(Skill_W, 0);
+            skills = Skill_W[0];
             break;
         default:
             await panic($c.lit("No skills found for role"));
@@ -894,10 +894,10 @@ export async function u_init_inventory_attrs() {   // u_init.c:1370
     await u_init_role();
     await u_init_race();
     if (discover()) {
-        await ini_inv($c.relem(Wishing, 0));
+        await ini_inv(Wishing[0]);
     }
     if (u.umoney0) {
-        await ini_inv($c.relem(Money, 0));
+        await ini_inv(Money[0]);
     }
     $t1 = hidden_gold(TRUE), u.umoney0 = $c.add64(u.umoney0, $t1);   /* in case sack has gold in it */
     init_attr(75);   /* init attribute values */
@@ -1580,9 +1580,9 @@ export function $init() {
     ]);
     u_init_role$M_spell.fill(null);
     $c.init(u_init_role$M_spell, [
-        $c.relem(Healing_book, 0),
-        $c.relem(Protection_book, 0),
-        $c.relem(Confuse_monster_book, 0)
+        Healing_book[0],
+        Protection_book[0],
+        Confuse_monster_book[0]
     ]);
     u_init_race$trotyp.fill(0);
     $c.init(u_init_race$trotyp, [

@@ -1500,11 +1500,11 @@ export function Hello(mtmp) {   // role.c:2120
         case PM.KNIGHT:
             return $c.lit("Salutations");   /* Olde English */
         case PM.SAMURAI:
-            return mtmp && $c.peq(mtmp.data, $c.relem(mons, PM.SHOPKEEPER)) ? $c.lit("Irasshaimase") : $c.lit("Konnichi wa");   /* Japanese */
+            return mtmp && mtmp.data === mons[PM.SHOPKEEPER] ? $c.lit("Irasshaimase") : $c.lit("Konnichi wa");   /* Japanese */
         case PM.TOURIST:
             return $c.lit("Aloha");   /* Hawaiian */
         case PM.VALKYRIE:
-            return mtmp && $c.peq(mtmp.data, $c.relem(mons, PM.MAIL_DAEMON)) ? $c.lit("Hallo") : $c.lit("Velkommen");   /* Norse */
+            return mtmp && mtmp.data === mons[PM.MAIL_DAEMON] ? $c.lit("Hallo") : $c.lit("Velkommen");   /* Norse */
         default:
             return $c.lit("Hello");
     }
@@ -1535,7 +1535,7 @@ export function Goodbye() {   // role.c:2143
  */
 export function character_race(pmindex) {   // role.c:2163
     let r = null;
-    for (r = $c.relem(races, 0); !$c.peq(r.noun, $c.asArr(null, Int8Array)); r = $c.radd(r, 1)) {
+    for (r = races[0]; !$c.peq(r.noun, $c.asArr(null, Int8Array)); r = $c.radd(r, 1)) {
         if (r.mnum === pmindex) {
             return r;
         }

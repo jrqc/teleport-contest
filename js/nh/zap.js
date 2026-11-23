@@ -365,7 +365,7 @@ export async function bhitm(mtmp, otmp) {   // zap.c:160
         case WAN_POLYMORPH:
         case SPE_POLYMORPH:
         case POT_POLYMORPH:
-            if ($c.peq(mtmp.data, $c.relem(mons, PM.LONG_WORM)) && has_mcorpsenm(mtmp)) {
+            if (mtmp.data === mons[PM.LONG_WORM] && has_mcorpsenm(mtmp)) {
                 /* if a long worm has mcorpsenm set, it was polymorphed by
                    the current zap and shouldn't be affected if hit again */
             } else if (resists_magm(mtmp)) {
@@ -414,7 +414,7 @@ export async function bhitm(mtmp, otmp) {   // zap.c:160
                 /* do this even if polymorphed failed (otherwise using
                    flags.mon_polycontrol prompting to force mtmp to remain
                    'long worm' would prompt again if zap hit another segment) */
-                if (!DEADMONSTER(mtmp) && $c.peq(mtmp.data, $c.relem(mons, PM.LONG_WORM))) {
+                if (!DEADMONSTER(mtmp) && mtmp.data === mons[PM.LONG_WORM]) {
                     if (!has_mcorpsenm(mtmp)) {
                         await newmcorpsenm(mtmp);
                     }
@@ -533,7 +533,7 @@ export async function bhitm(mtmp, otmp) {   // zap.c:160
             {
                 healamt = d(6, otyp === SPE_EXTRA_HEALING ? 8 : 4);
                 reveal_invis = TRUE;
-                if (!$c.peq(mtmp.data, $c.relem(mons, PM.PESTILENCE))) {
+                if (mtmp.data !== mons[PM.PESTILENCE]) {
                     delta = mtmp.mhpmax - mtmp.mhp | 0;
                     wake = FALSE;   /* wakeup() makes the target angry */
                     await healmon(mtmp, healamt, 0);
@@ -595,7 +595,7 @@ export async function bhitm(mtmp, otmp) {   // zap.c:160
             if (mtmp.data.mlet === S.GOLEM) {
                 name = await Monnam(mtmp);   /* before possible polymorph */
                 /* turn stone golem into flesh golem */
-                if (mtmp.data.pmidx === PM.STONE_GOLEM && await newcham(mtmp, $c.relem(mons, PM.FLESH_GOLEM), NO_NC_FLAGS)) {
+                if (mtmp.data.pmidx === PM.STONE_GOLEM && await newcham(mtmp, mons[PM.FLESH_GOLEM], NO_NC_FLAGS)) {
                     mesg = $c.lit("turns to flesh!");
                 } else if (mtmp.data.pmidx === PM.FLESH_GOLEM) {
                     mesg = $c.lit("seems fleshier...");
@@ -922,7 +922,7 @@ export async function montraits(obj, cc, adjacentok) {   // zap.c:713
             await neweshk(mtmp);
             mtmp.mextra.eshk.$copyFrom(mtmp2.mextra.eshk);
             if (mtmp2.mextra.eshk.bill_p !== null && !$c.peq(mtmp2.mextra.eshk.bill_p, $c.ptrConst(-1000))) {
-                mtmp.mextra.eshk.bill_p = $c.relem(mtmp.mextra.eshk.bill, 0);
+                mtmp.mextra.eshk.bill_p = mtmp.mextra.eshk.bill[0];
             }
             mtmp.isshk = (1) & 1;
         }
@@ -1162,7 +1162,7 @@ export async function revive(corpse, by_hero) {   // zap.c:884
     if (has_omid(corpse)) {
         m_id = corpse.oextra.omid;
         ghost = find_mid(m_id, FM.FMON);
-        if (ghost && $c.peq(ghost.data, $c.relem(mons, PM.GHOST))) {
+        if (ghost && ghost.data === mons[PM.GHOST]) {
             if (canseemon(ghost)) {
                 await pline($c.lit("%s is suddenly drawn into its former body!"), await Monnam(ghost));
             }
@@ -2085,7 +2085,7 @@ async function stone_to_flesh_obj(obj) {   // zap.c:1993
             } else if (obj.otyp === STATUE || obj.otyp === FIGURINE) {
                 ptr = $c.relem(mons, obj.corpsenm);
                 if (is_golem(ptr)) {
-                    golem_xform = $c.i8(!$c.peq(ptr, $c.relem(mons, PM.FLESH_GOLEM)) ? 1 : 0);
+                    golem_xform = $c.i8(ptr !== mons[PM.FLESH_GOLEM] ? 1 : 0);
                 } else if (vegetarian(ptr)) {
                     /* Don't animate monsters that aren't flesh */
                     obj = await poly_obj(obj, MEATBALL);
@@ -2098,7 +2098,7 @@ async function stone_to_flesh_obj(obj) {   // zap.c:1993
                 } else {
                     /* (obj->otyp == FIGURINE) */
                     if (golem_xform) {
-                        ptr = $c.relem(mons, PM.FLESH_GOLEM);
+                        ptr = mons[PM.FLESH_GOLEM];
                     }
                     mon = await makemon(ptr, oox[0], ooy[0], NO.MINVENT | MM.NOMSG);
                     if (mon) {
@@ -2122,8 +2122,8 @@ async function stone_to_flesh_obj(obj) {   // zap.c:1993
                 if (mon) {
                     ptr = mon.data;
                     /* this golem handling is redundant... */
-                    if (is_golem(ptr) && !$c.peq(ptr, $c.relem(mons, PM.FLESH_GOLEM))) {
-                        await newcham(mon, $c.relem(mons, PM.FLESH_GOLEM), NC.VIA_WAND_OR_SPELL);
+                    if (is_golem(ptr) && ptr !== mons[PM.FLESH_GOLEM]) {
+                        await newcham(mon, mons[PM.FLESH_GOLEM], NC.VIA_WAND_OR_SPELL);
                     }
                 } else if ((ptr.geno & (G_NOCORPSE | G_UNIQ)) !== 0) {
                     /* didn't revive but can't leave corpse either */
@@ -3117,7 +3117,7 @@ export async function lightdamage(obj, ordinary, amt) {   // zap.c:3026
     /* wand/camera zap vs wand destruction */
     /* pseudo-damage used to determine blindness duration */
     dmg = amt;
-    if (dmg && $c.peq(gy.youmonst.data, $c.relem(mons, PM.GREMLIN))) {
+    if (dmg && gy.youmonst.data === mons[PM.GREMLIN]) {
         /* reduce high values (from destruction of wand with many charges) */
         dmg = rnd(dmg);
         if (dmg > 10) {
@@ -3287,7 +3287,7 @@ export async function cancel_monst(mdef, obj, youattack, allow_cancel_kill, self
         mdef.mcan = (1) & 1;
         /* force shapeshifter into its base form or mimic to unhide */
         await normal_shape(mdef);
-        if ($c.peq(mdef.data, $c.relem(mons, PM.CLAY_GOLEM))) {
+        if (mdef.data === mons[PM.CLAY_GOLEM]) {
             if (canseemon(mdef)) {
                 await pline(new $c.Ptr(cancel_monst$writing_vanishes, 0), s_suffix(await mon_nam(mdef)));
             }
@@ -4355,7 +4355,7 @@ export async function zhitm(mon, type, nd, ootmp) {   // zap.c:4238
             /* death/disintegration */
             if ($c.abs(type) !== 20 + ZT_DEATH) {
                 /* death */
-                if ($c.peq(mon.data, $c.relem(mons, PM.DEATH))) {
+                if (mon.data === mons[PM.DEATH]) {
                     await healmon(mon, $c.div32(Math.imul(mon.mhpmax, 3), 2), $c.div32(mon.mhpmax, 2));
                     if (mon.mhpmax >= MAGIC_COOKIE) {
                         mon.mhpmax = MAGIC_COOKIE - 1;
@@ -4981,7 +4981,7 @@ export async function dobuzz(type, nd, sx, sy, dx$in, dy$in, sayhit, saymiss, fo
                                         mon.mhp = mon.mhpmax;
                                         break L3;   /* Out of while loop */
                                     }
-                                    if ($c.peq(mon.data, $c.relem(mons, PM.DEATH)) && damgtype === ZT_DEATH) {
+                                    if (mon.data === mons[PM.DEATH] && damgtype === ZT_DEATH) {
                                         if (canseemon(mon)) {
                                             await hit(flash_str(fltyp, FALSE), mon, $c.lit("."));
                                             await pline($c.lit("%s absorbs the deadly %s!"), await Monnam(mon), type === 20 + ZT_DEATH ? $c.lit("blast") : $c.lit("ray"));

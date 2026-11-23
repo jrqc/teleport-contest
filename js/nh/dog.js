@@ -499,7 +499,7 @@ export async function mon_arrive(mtmp, when) {   // dog.c:420
     }
     num_segs = mtmp.wormno | 0;
     /* baby long worms have no tail so don't use is_longworm() */
-    if ($c.peq(mtmp.data, $c.relem(mons, PM.LONG_WORM))) {
+    if (mtmp.data === mons[PM.LONG_WORM]) {
         $t1 = get_wormno() >>> 0, mtmp.wormno = ($t1) & 31;
         if (mtmp.wormno) {
             await initworm(mtmp, num_segs);
@@ -1069,7 +1069,7 @@ export async function dogfood(mon, obj) {   // dog.c:995
             if ((obj.otyp === CORPSE || obj.otyp === EGG) && flesh_petrifies(fptr) && !await resists_ston(mon)) {
                 return POISON;
             }
-            if (obj.otyp === LUMP_OF_ROYAL_JELLY && $c.peq(mon.data, $c.relem(mons, PM.KILLER_BEE))) {
+            if (obj.otyp === LUMP_OF_ROYAL_JELLY && mon.data === mons[PM.KILLER_BEE]) {
                 mtmp = find_pmmonst(PM.QUEEN_BEE);
                 /* if there's a queen bee on the level, don't eat royal jelly;
                    if there isn't, do eat it and grow into a queen */
@@ -1085,7 +1085,7 @@ export async function dogfood(mon, obj) {   // dog.c:995
             /* ghouls prefer old corpses and unhatchable eggs, yum!
                they'll eat fresh non-veggy corpses and hatchable eggs
                when starving; they never eat stone-to-flesh'd meat */
-            if ($c.peq(mptr, $c.relem(mons, PM.GHOUL))) {
+            if (mptr === mons[PM.GHOUL]) {
                 if (obj.otyp === CORPSE) {
                     return $c.add64(await peek_at_iced_corpse_age(obj), 50) <= svm.moves && !(fx === PM.LIZARD || fx === PM.LICHEN) ? DOGFOOD : starving && !vegan(fptr) ? ACCFOOD : POISON;
                 }
@@ -1151,10 +1151,10 @@ export async function dogfood(mon, obj) {   // dog.c:995
             if (mon_hates_silver(mon) && (objects[obj.otyp].oc_material | 0) === SILVER) {
                 return TABU;
             }
-            if ($c.peq(mptr, $c.relem(mons, PM.GELATINOUS_CUBE)) && is_organic(obj)) {
+            if (mptr === mons[PM.GELATINOUS_CUBE] && is_organic(obj)) {
                 return ACCFOOD;
             }
-            if (metallivorous(mptr) && is_metallic(obj) && (is_rustprone(obj) || !$c.peq(mptr, $c.relem(mons, PM.RUST_MONSTER)))) {
+            if (metallivorous(mptr) && is_metallic(obj) && (is_rustprone(obj) || mptr !== mons[PM.RUST_MONSTER])) {
                 /* Non-rustproofed ferrous-based metals are preferred. */
                 return is_rustprone(obj) && !obj.oerodeproof ? DOGFOOD : ACCFOOD;
             }
@@ -1197,7 +1197,7 @@ export async function tamedog(mtmp, obj, givemsg) {   // dog.c:1143
         await wake_nearto(mtmp.mx, mtmp.my, 1);   /* [different from wakeup()] */
     }
     /* The Wiz, Medusa and the quest nemeses aren't even made peaceful. */
-    if (mtmp.iswiz | 0 || $c.peq(mtmp.data, $c.relem(mons, PM.MEDUSA)) || mtmp.data.mflags3 & M3.WANTSARTI) {
+    if (mtmp.iswiz | 0 || mtmp.data === mons[PM.MEDUSA] || mtmp.data.mflags3 & M3.WANTSARTI) {
         return FALSE;
     }
     /* worst case, at least it'll be peaceful. */

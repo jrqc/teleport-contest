@@ -490,7 +490,7 @@ export async function glyphrep(op) {   // glyphs.c:470
  */
 export async function add_custom_nhcolor_entry(customization_name, glyphidx, nhcolor, which_set) {   // glyphs.c:484
     let gdc = null, details = null, newdetails = null, $t1;
-    gdc = $c.relem(gs.sym_customizations[which_set], custom_nhcolor);
+    gdc = gs.sym_customizations[which_set][custom_nhcolor];
     newdetails = null;
     if (!gdc.details) {
         $t1 = await dupstr(customization_name), gdc.customization_name = $t1;
@@ -585,7 +585,7 @@ export async function maybe_shuffle_customizations() {   // glyphs.c:581
 async function shuffle_customizations() {   // glyphs.c:646
     let j = 0, obj_glyphs = null, i = 0, tmp_u = $c.nulls(481), tmp_customcolor = new Uint32Array(481), tmp_color256idx = new Uint16Array(481), duplicate = new Int32Array(481), idx = 0, other = null, other_customcolor = 0, other_color256idx = 0, $t1, $t2;
     for (j = 0; j < 2; j = j + 1 | 0) {
-        obj_glyphs = $c.radd($c.relem(glyphmap, 0), shuffle_customizations$offsets[j]);
+        obj_glyphs = $c.radd(glyphmap[0], shuffle_customizations$offsets[j]);
         for (i = 0; i < NUM_OBJECTS; i = i + 1 | 0) {
             duplicate[i] = -1;
             tmp_u[i] = null;

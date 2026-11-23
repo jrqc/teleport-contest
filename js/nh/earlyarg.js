@@ -2265,17 +2265,17 @@ export function $init() {
     ]);
     dump_enums$ed.fill(null);
     $c.init(dump_enums$ed, [
-        $c.relem(monsdump, 0),
-        $c.relem(objdump, 0),
-        $c.relem(dump_enums$omdump, 0),
-        $c.relem(defsym_cmap_dump, 0),
-        $c.relem(defsym_mon_syms_dump, 0),
-        $c.relem(defsym_mon_defchars_dump, 0),
-        $c.relem(objclass_defchars_dump, 0),
-        $c.relem(objclass_classes_dump, 0),
-        $c.relem(objclass_syms_dump, 0),
-        $c.relem(arti_enum_dump, 0),
-        $c.relem(mcastu_enum_dump, 0)
+        monsdump[0],
+        objdump[0],
+        dump_enums$omdump[0],
+        defsym_cmap_dump[0],
+        defsym_mon_syms_dump[0],
+        defsym_mon_defchars_dump[0],
+        objclass_defchars_dump[0],
+        objclass_classes_dump[0],
+        objclass_syms_dump[0],
+        arti_enum_dump[0],
+        mcastu_enum_dump[0]
     ]);
     for (let $i0 = 0; $i0 < 11; $i0++) {
         dump_enums$edmp[$i0].$copyFrom(new $T.de_params());

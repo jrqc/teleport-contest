@@ -194,7 +194,7 @@ async function mkshobj_at(shp, sx, sy, mkspecl) {   // shknam.c:454
     if (rn2(100) < depth(u.uz) && !MON_AT(sx, sy) && (ptr = await mkclass(S.MIMIC, 0)) !== null && (mtmp = await makemon(ptr, $c.i16(sx), $c.i16(sy), NO.MM_FLAGS)) !== null) {
         /* nothing */
     } else {
-        atype = get_shop_item($c.i32($c.rdiff(shp, $c.relem(shtypes, 0))));
+        atype = get_shop_item($c.i32($c.rdiff(shp, shtypes[0])));
         if (atype === VEGETARIAN_CLASS) {
             await mkveggy_at(sx, sy);
         } else if (atype < 0) {
@@ -318,7 +318,7 @@ function good_shopdoor(sroom, sx, sy) {   // shknam.c:582
         sy.set(0, $c.radd(svd.doors, di).y);
         /* check that the shopkeeper placement is sane */
         if (sroom.irregular) {
-            rmno = $c.i32($c.add64($c.rdiff(sroom, $c.relem(svr.rooms, 0)), ROOMOFFSET));
+            rmno = $c.i32($c.add64($c.rdiff(sroom, svr.rooms[0]), ROOMOFFSET));
             if (isok($c.i16(sx.get(0) - 1 | 0), sy.get(0)) && !svl.level.locations[sx.get(0) - 1 | 0][sy.get(0)].edge && (svl.level.locations[sx.get(0) - 1 | 0][sy.get(0)].roomno | 0) === rmno) {
                 sx.set(0, $c.i16(sx.get(0) - 1));
             } else if (isok($c.i16(sx.get(0) + 1 | 0), sy.get(0)) && !svl.level.locations[sx.get(0) + 1 | 0][sy.get(0)].edge && (svl.level.locations[sx.get(0) + 1 | 0][sy.get(0)].roomno | 0) === rmno) {
@@ -375,7 +375,7 @@ async function shkinit(shp, sroom) {   // shknam.c:628
         await rloc(svl.level.monsters[sx[0]][sy[0]], RLOC.NOMSG);   /* insurance */
     }
     /* now initialize the shopkeeper monster structure */
-    if (!(shk = await makemon($c.relem(mons, PM.SHOPKEEPER), sx[0], sy[0], MM.ESHK))) {
+    if (!(shk = await makemon(mons[PM.SHOPKEEPER], sx[0], sy[0], MM.ESHK))) {
         return -1;
     }
     eshkp = shk.mextra.eshk;   /* makemon(...,MM_ESHK) allocates this */
@@ -383,7 +383,7 @@ async function shkinit(shp, sroom) {   // shknam.c:628
     set_malign(shk);
     shk.msleeping = (0) & 1;
     mon_learns_traps(shk, ALL_TRAPS);   /* we know all the traps already */
-    eshkp.shoproom = $c.i8($c.add64($c.rdiff(sroom, $c.relem(svr.rooms, 0)), ROOMOFFSET));
+    eshkp.shoproom = $c.i8($c.add64($c.rdiff(sroom, svr.rooms[0]), ROOMOFFSET));
     sroom.resident = shk;
     eshkp.shoptype = sroom.rtype;
     assign_level(eshkp.shoplevel, u.uz);
@@ -443,7 +443,7 @@ export async function stock_room(shp_indx, sroom) {   // shknam.c:718
      */
     stockcount = 0;
     specialspot = 0;
-    rmno = $c.i32($c.add64($c.rdiff(sroom, $c.relem(svr.rooms, 0)), ROOMOFFSET));
+    rmno = $c.i32($c.add64($c.rdiff(sroom, svr.rooms[0]), ROOMOFFSET));
     shp = $c.relem(shtypes, shp_indx);
     /* first, try to place a shopkeeper in the room */
     if ((sh = await shkinit(shp, sroom)) < 0) {
@@ -550,7 +550,7 @@ export function saleable(shkp, obj) {   // shknam.c:805
  */
 export function get_shop_item(type) {   // shknam.c:829
     let shp = null, i = 0, j = 0;
-    shp = $c.radd($c.relem(shtypes, 0), type);
+    shp = $c.radd(shtypes[0], type);
     /* select an appropriate object type at random */
     for (j = rnd(100), i = 0; (j = j - shp.iprobs[i].iprob | 0) > 0; i = i + 1 | 0) {
         continue;

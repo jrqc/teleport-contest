@@ -367,7 +367,7 @@ function m_to_e(mtmp, x, y, etmp) {   // dbridge.c:304
         etmp.ex = x;
         etmp.ey = y;
         if (mtmp.wormno | 0 && (x !== mtmp.mx || y !== mtmp.my)) {
-            etmp.edata = $c.relem(mons, PM.LONG_WORM_TAIL);
+            etmp.edata = mons[PM.LONG_WORM_TAIL];
         } else {
             etmp.edata = mtmp.data;
         }
@@ -904,8 +904,8 @@ async function do_entity(etmp) {   // dbridge.c:554
 function nokiller() {   // dbridge.c:763
     svk.killer.name[0] = 0;
     svk.killer.format = 0;
-    m_to_e(null, 0, 0, $c.relem(go.occupants, 0));
-    m_to_e(null, 0, 0, $c.relem(go.occupants, 1));
+    m_to_e(null, 0, 0, go.occupants[0]);
+    m_to_e(null, 0, 0, go.occupants[1]);
 }
 /*
  * Close the drawbridge located at x,y
@@ -944,11 +944,11 @@ export async function close_drawbridge(x, y) {   // dbridge.c:775
             break;
     }
     lev2.flags = (W.NONDIGGABLE) & 31;
-    set_entity(x, y, $c.relem(go.occupants, 0));
-    set_entity(x2[0], y2[0], $c.relem(go.occupants, 1));
-    await do_entity($c.relem(go.occupants, 0));   /* Do set_entity after first */
-    set_entity(x2[0], y2[0], $c.relem(go.occupants, 1));   /* do_entity for worm tail */
-    await do_entity($c.relem(go.occupants, 1));
+    set_entity(x, y, go.occupants[0]);
+    set_entity(x2[0], y2[0], go.occupants[1]);
+    await do_entity(go.occupants[0]);   /* Do set_entity after first */
+    set_entity(x2[0], y2[0], go.occupants[1]);   /* do_entity for worm tail */
+    await do_entity(go.occupants[1]);
     if (OBJ_AT(x, y) && !Deaf()) {
         await You_hear($c.lit("smashing and crushing."));
     }
@@ -996,11 +996,11 @@ export async function open_drawbridge(x, y) {   // dbridge.c:840
     lev2 = $c.relem(svl.level.locations[x2[0]], y2[0]);
     lev2.typ = DOOR;
     lev2.flags = (D.NODOOR) & 31;
-    set_entity(x, y, $c.relem(go.occupants, 0));
-    set_entity(x2[0], y2[0], $c.relem(go.occupants, 1));
-    await do_entity($c.relem(go.occupants, 0));   /* do set_entity after first */
-    set_entity(x2[0], y2[0], $c.relem(go.occupants, 1));   /* do_entity for worm tails */
-    await do_entity($c.relem(go.occupants, 1));
+    set_entity(x, y, go.occupants[0]);
+    set_entity(x2[0], y2[0], go.occupants[1]);
+    await do_entity(go.occupants[0]);   /* do set_entity after first */
+    set_entity(x2[0], y2[0], go.occupants[1]);   /* do_entity for worm tails */
+    await do_entity(go.occupants[1]);
     await revive_nasty(x, y, null);
     await delallobj(x, y);
     if ((t = t_at(x, y)) !== null) {
@@ -1029,8 +1029,8 @@ export async function open_drawbridge(x, y) {   // dbridge.c:840
  */
 export async function destroy_drawbridge(x, y) {   // dbridge.c:888
     let lev1 = null, lev2 = null, t = null, otmp = null, x2 = Int16Array.of(0), y2 = Int16Array.of(0), i = 0, e_inview = 0, etmp1 = null, etmp2 = null, otmp2 = null, lava = 0, save_plnmsg = 0, save_plnmsg$2 = 0;
-    etmp1 = $c.relem(go.occupants, 0);
-    etmp2 = $c.relem(go.occupants, 1);
+    etmp1 = go.occupants[0];
+    etmp2 = go.occupants[1];
     lev1 = $c.relem(svl.level.locations[x], y);
     if (!IS_DRAWBRIDGE(lev1.typ)) {
         return;

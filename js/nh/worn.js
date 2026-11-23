@@ -67,7 +67,7 @@ const worn = $c.recArray($T.worn, 17);
 export function recalc_telepat_range() {   // worn.c:50
     let wp = null, nobjs = 0, oobj = null;
     nobjs = 0;
-    for (wp = $c.relem(worn, 0); wp.w_mask; wp = $c.radd(wp, 1)) {
+    for (wp = worn[0]; wp.w_mask; wp = $c.radd(wp, 1)) {
         oobj = wp.w_obj.get(0);
         if (oobj && objects[oobj.otyp].oc_oprop === TELEPAT) {
             nobjs = nobjs + 1 | 0;
@@ -96,7 +96,7 @@ export async function setworn(obj, mask) {   // worn.c:73
         $G.uskin = obj;
         /* assert( !uarm ); */
     } else {
-        for (wp = $c.relem(worn, 0); wp.w_mask; wp = $c.radd(wp, 1)) {
+        for (wp = worn[0]; wp.w_mask; wp = $c.radd(wp, 1)) {
             if ($c.and64(wp.w_mask, mask)) {
                 oobj = wp.w_obj.get(0);
                 if (oobj && !$c.and64(oobj.owornmask, wp.w_mask)) {
@@ -177,7 +177,7 @@ export async function setnotworn(obj) {   // worn.c:150
     if (u.twoweap && ($c.peq(obj, $G.uwep) || $c.peq(obj, $G.uswapwep))) {
         set_twoweap(FALSE);   /* u.twoweap = FALSE */
     }
-    for (wp = $c.relem(worn, 0); wp.w_mask; wp = $c.radd(wp, 1)) {
+    for (wp = worn[0]; wp.w_mask; wp = $c.radd(wp, 1)) {
         if ($c.peq(obj, wp.w_obj.get(0))) {
             /* in case wearing or removal is in progress or removal
                is pending (via 'A' command for multiple items) */
@@ -213,7 +213,7 @@ export function allunworn() {   // worn.c:188
        (without first being unworn) while saving invent during game save;
        note: uball and uchain might not be freed yet but we clear them
        here anyway (savegamestate() and its callers deal with them) */
-    for (wp = $c.relem(worn, 0); wp.w_mask; wp = $c.radd(wp, 1)) {
+    for (wp = worn[0]; wp.w_mask; wp = $c.radd(wp, 1)) {
         /* object is already gone so we don't/can't update is owornmask */
         wp.w_obj.set(0, null);
     }
@@ -225,7 +225,7 @@ export function allunworn() {   // worn.c:188
  */
 export function wearmask_to_obj(wornmask) {   // worn.c:206
     let wp = null;
-    for (wp = $c.relem(worn, 0); wp.w_mask; wp = $c.radd(wp, 1)) {
+    for (wp = worn[0]; wp.w_mask; wp = $c.radd(wp, 1)) {
         if ($c.and64(wp.w_mask, wornmask)) {
             return wp.w_obj.get(0);
         }
@@ -382,7 +382,7 @@ export function wearslot(obj) {   // worn.c:282
 export async function check_wornmask_slots() {   // worn.c:355
     let whybuf = new Int8Array(256), wp = null, o = null, otmp = null, m = 0;
     /* we'll skip ball and chain here--they warrant separate sanity check */
-    for (wp = $c.relem(worn, 0); wp.w_mask; wp = $c.radd(wp, 1)) {
+    for (wp = worn[0]; wp.w_mask; wp = $c.radd(wp, 1)) {
         m = wp.w_mask;
         if ($c.and64(m, IGNORE_SLOTS) !== 0 && $c.and64(m, ~IGNORE_SLOTS) === 0) {
             continue;
@@ -736,7 +736,7 @@ export async function m_dowear(mon, creation) {   // worn.c:757
     }
     /* give mummies a chance to wear their wrappings
      * and let skeletons wear their initial armor */
-    if (mindless(mon.data) && (!creation || mon.data.mlet !== S.MUMMY && !$c.peq(mon.data, $c.relem(mons, PM.SKELETON)))) {
+    if (mindless(mon.data) && (!creation || mon.data.mlet !== S.MUMMY && mon.data !== mons[PM.SKELETON])) {
         return;
     }
     await m_dowear_type(mon, W.AMUL, creation, FALSE);
@@ -1073,7 +1073,7 @@ export function clear_bypasses() {   // worn.c:1070
            polymorph (so polymorph zap won't hit monster to transform it
            into a long worm, then hit that worm's tail and transform it
            again on same zap); clearing mcorpsenm reverts worm to normal */
-        if ($c.peq(mtmp.data, $c.relem(mons, PM.LONG_WORM)) && has_mcorpsenm(mtmp)) {
+        if (mtmp.data === mons[PM.LONG_WORM] && has_mcorpsenm(mtmp)) {
             mtmp.mextra.mcorpsenm = NON_PM;
         }
     }
@@ -1342,7 +1342,7 @@ export function racial_exception(mon, obj) {   // worn.c:1360
     ptr = raceptr(mon);
     /* Acceptable Exceptions: */
     /* Allow hobbits to wear elven armor - LoTR */
-    if ($c.peq(ptr, $c.relem(mons, PM.HOBBIT)) && is_elven_armor(obj)) {
+    if ($c.peq(ptr, mons[PM.HOBBIT]) && is_elven_armor(obj)) {
         return 1;
     }
     /* Unacceptable Exceptions: */

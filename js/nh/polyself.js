@@ -202,21 +202,21 @@ export async function set_uasmon() {   // polyself.c:38
     /* resists_magm() takes wielded, worn, and carried equipment into
        into account; cheat and duplicate its monster-specific part */
     do {
-        if (dmgtype(mdat, AD.MAGM) || $c.peq(mdat, $c.relem(mons, PM.BABY_GRAY_DRAGON)) || dmgtype(mdat, AD.RBRE)) {
+        if (dmgtype(mdat, AD.MAGM) || mdat === mons[PM.BABY_GRAY_DRAGON] || dmgtype(mdat, AD.RBRE)) {
             u.uprops[ANTIMAGIC].intrinsic = $c.or64(u.uprops[ANTIMAGIC].intrinsic, FROMFORM);
         } else {
             u.uprops[ANTIMAGIC].intrinsic = $c.and64(u.uprops[ANTIMAGIC].intrinsic, ~FROMFORM);
         }
     } while (0);
     do {
-        if (mdat.mlet === S.FUNGUS || $c.peq(mdat, $c.relem(mons, PM.GHOUL))) {
+        if (mdat.mlet === S.FUNGUS || mdat === mons[PM.GHOUL]) {
             u.uprops[SICK_RES].intrinsic = $c.or64(u.uprops[SICK_RES].intrinsic, FROMFORM);
         } else {
             u.uprops[SICK_RES].intrinsic = $c.and64(u.uprops[SICK_RES].intrinsic, ~FROMFORM);
         }
     } while (0);
     do {
-        if ($c.peq(mdat, $c.relem(mons, PM.STALKER)) || ($c.peq(mdat, $c.relem(mons, PM.BAT)) || $c.peq(mdat, $c.relem(mons, PM.GIANT_BAT)) || $c.peq(mdat, $c.relem(mons, PM.VAMPIRE_BAT)))) {
+        if (mdat === mons[PM.STALKER] || (mdat === mons[PM.BAT] || mdat === mons[PM.GIANT_BAT] || mdat === mons[PM.VAMPIRE_BAT])) {
             u.uprops[STUNNED].intrinsic = $c.or64(u.uprops[STUNNED].intrinsic, FROMFORM);
         } else {
             u.uprops[STUNNED].intrinsic = $c.and64(u.uprops[STUNNED].intrinsic, ~FROMFORM);
@@ -237,7 +237,7 @@ export async function set_uasmon() {   // polyself.c:38
         }
     } while (0);
     do {
-        if ($c.peq(mdat, $c.relem(mons, PM.FLOATING_EYE)) || $c.peq(mdat, $c.relem(mons, PM.MIND_FLAYER)) || $c.peq(mdat, $c.relem(mons, PM.MASTER_MIND_FLAYER))) {
+        if (mdat === mons[PM.FLOATING_EYE] || mdat === mons[PM.MIND_FLAYER] || mdat === mons[PM.MASTER_MIND_FLAYER]) {
             u.uprops[TELEPAT].intrinsic = $c.or64(u.uprops[TELEPAT].intrinsic, FROMFORM);
         } else {
             u.uprops[TELEPAT].intrinsic = $c.and64(u.uprops[TELEPAT].intrinsic, ~FROMFORM);
@@ -252,7 +252,7 @@ export async function set_uasmon() {   // polyself.c:38
         }
     } while (0);
     do {
-        if ($c.peq(mdat, $c.relem(mons, PM.STALKER)) || $c.peq(mdat, $c.relem(mons, PM.BLACK_LIGHT))) {
+        if (mdat === mons[PM.STALKER] || mdat === mons[PM.BLACK_LIGHT]) {
             u.uprops[INVIS].intrinsic = $c.or64(u.uprops[INVIS].intrinsic, FROMFORM);
         } else {
             u.uprops[INVIS].intrinsic = $c.and64(u.uprops[INVIS].intrinsic, ~FROMFORM);
@@ -313,7 +313,7 @@ export async function set_uasmon() {   // polyself.c:38
         }
     } while (0);
     do {
-        if ($c.peq(mdat, $c.relem(mons, PM.SILVER_DRAGON))) {
+        if (mdat === mons[PM.SILVER_DRAGON]) {
             u.uprops[REFLECTING].intrinsic = $c.or64(u.uprops[REFLECTING].intrinsic, FROMFORM);
         } else {
             u.uprops[REFLECTING].intrinsic = $c.and64(u.uprops[REFLECTING].intrinsic, ~FROMFORM);
@@ -871,7 +871,7 @@ export async function polyself(psflags) {   // polyself.c:469
                 } else if ($goto === "do_vampyr" || isvamp) {
                     $goto = null;   // do_vampyr:
                     if (mntmp[0] < LOW_PM || mons[mntmp[0]].geno & G_UNIQ) {
-                        mntmp[0] = $c.peq(gy.youmonst.data, $c.relem(mons, PM.VAMPIRE_LEADER)) && !rn2(10) ? PM.WOLF : !rn2(4) ? PM.FOG_CLOUD : PM.VAMPIRE_BAT;
+                        mntmp[0] = gy.youmonst.data === mons[PM.VAMPIRE_LEADER] && !rn2(10) ? PM.WOLF : !rn2(4) ? PM.FOG_CLOUD : PM.VAMPIRE_BAT;
                         if (ismnum(gy.youmonst.cham) && !is_vampire(gy.youmonst.data) && !rn2(2)) {
                             mntmp[0] = gy.youmonst.cham;
                         }
@@ -1238,7 +1238,7 @@ export async function polymon(mntmp) {   // polyself.c:735
         if (is_vampire(uptr) || is_vampshifter(gy.youmonst)) {
             await pline(new $c.Ptr(polymon$use_thec, 0), new $c.Ptr(polymon$monsterc, 0), $c.lit("change shape"));
         }
-        if (lays_eggs(uptr) && flags.female && !($c.peq(uptr, $c.relem(mons, PM.GIANT_EEL)) || $c.peq(uptr, $c.relem(mons, PM.ELECTRIC_EEL)))) {
+        if (lays_eggs(uptr) && flags.female && !(uptr === mons[PM.GIANT_EEL] || uptr === mons[PM.ELECTRIC_EEL])) {
             await pline(new $c.Ptr(polymon$use_thec, 0), $c.lit("sit"), eggs_in_water(uptr) ? $c.lit("spawn in the water") : $c.lit("lay an egg"));
         }
     }
@@ -1887,7 +1887,7 @@ export async function dogaze() {   // polyself.c:1642
                 if (DEADMONSTER(mtmp)) {
                     continue;
                 }
-                if ($c.peq(mtmp.data, $c.relem(mons, PM.FLOATING_EYE)) && !mtmp.mcan) {
+                if (mtmp.data === mons[PM.FLOATING_EYE] && !mtmp.mcan) {
                     if (!Free_action()) {
                         await You($c.lit("are frozen by %s gaze!"), s_suffix(await mon_nam(mtmp)));
                         nomul(u.ulevel > 6 || rn2(4) ? -d(mtmp.m_lev + 1 | 0, mtmp.data.mattk[0].damd) | 0 : -200);
@@ -1903,7 +1903,7 @@ export async function dogaze() {   // polyself.c:1642
                  * works on the monster's turn, but for it to *not* have an
                  * effect would be too weird.
                  */
-                if ($c.peq(mtmp.data, $c.relem(mons, PM.MEDUSA)) && !mtmp.mcan) {
+                if (mtmp.data === mons[PM.MEDUSA] && !mtmp.mcan) {
                     await pline($c.lit("Gazing at the awake %s is not a very good idea."), await l_monnam(mtmp));
                     /* as if gazing at a sleeping anything is fruitful... */
                     await urgent_pline($c.lit("You turn to stone..."));
@@ -2117,7 +2117,7 @@ export async function mbodypart(mon, part) {   // polyself.c:1972
         return $c.lit("mystery part");
     }
     /* some special cases */
-    if (mptr.mlet === S.DOG || mptr.mlet === S.FELINE || mptr.mlet === S.RODENT || $c.peq(mptr, $c.relem(mons, PM.OWLBEAR))) {
+    if (mptr.mlet === S.DOG || mptr.mlet === S.FELINE || mptr.mlet === S.RODENT || mptr === mons[PM.OWLBEAR]) {
         switch (part) {
             case HAND:
                 return $c.lit("paw");
@@ -2136,19 +2136,19 @@ export async function mbodypart(mon, part) {   // polyself.c:1972
         /* opposable thumbs, hence "hands", "arms", "legs", &c */
         return mbodypart$humanoid_parts[part];   /* yeti/sasquatch, monkey/ape */
     }
-    if ((part === HAND || part === HANDED) && (humanoid(mptr) && attacktype(mptr, AT.CLAW) && !$c.strchr(new $c.Ptr(mbodypart$not_claws, 0), mptr.mlet) && !$c.peq(mptr, $c.relem(mons, PM.STONE_GOLEM)) && !$c.peq(mptr, $c.relem(mons, PM.AMOROUS_DEMON)))) {
+    if ((part === HAND || part === HANDED) && (humanoid(mptr) && attacktype(mptr, AT.CLAW) && !$c.strchr(new $c.Ptr(mbodypart$not_claws, 0), mptr.mlet) && mptr !== mons[PM.STONE_GOLEM] && mptr !== mons[PM.AMOROUS_DEMON])) {
         return part === HAND ? $c.lit("claw") : $c.lit("clawed");
     }
-    if (($c.peq(mptr, $c.relem(mons, PM.MUMAK)) || $c.peq(mptr, $c.relem(mons, PM.MASTODON))) && part === NOSE) {
+    if ((mptr === mons[PM.MUMAK] || mptr === mons[PM.MASTODON]) && part === NOSE) {
         return $c.lit("trunk");
     }
-    if ($c.peq(mptr, $c.relem(mons, PM.SHARK)) && part === HAIR) {
+    if (mptr === mons[PM.SHARK] && part === HAIR) {
         return $c.lit("skin");   /* sharks don't have scales */
     }
-    if (($c.peq(mptr, $c.relem(mons, PM.JELLYFISH)) || $c.peq(mptr, $c.relem(mons, PM.KRAKEN))) && (part === ARM || part === FINGER || part === HAND || part === FOOT || part === TOE)) {
+    if ((mptr === mons[PM.JELLYFISH] || mptr === mons[PM.KRAKEN]) && (part === ARM || part === FINGER || part === HAND || part === FOOT || part === TOE)) {
         return $c.lit("tentacle");
     }
-    if ($c.peq(mptr, $c.relem(mons, PM.FLOATING_EYE)) && part === EYE) {
+    if (mptr === mons[PM.FLOATING_EYE] && part === EYE) {
         return $c.lit("cornea");
     }
     if (humanoid(mptr) && (part === ARM || part === FINGER || part === FINGERTIP || part === HAND || part === HANDED)) {
@@ -2157,10 +2157,10 @@ export async function mbodypart(mon, part) {   // polyself.c:1972
     if (mptr.mlet === S.COCKATRICE) {
         return part === HAIR ? mbodypart$snake_parts[part] : mbodypart$bird_parts[part];
     }
-    if ($c.peq(mptr, $c.relem(mons, PM.RAVEN))) {
+    if (mptr === mons[PM.RAVEN]) {
         return mbodypart$bird_parts[part];
     }
-    if (mptr.mlet === S.CENTAUR || mptr.mlet === S.UNICORN || $c.peq(mptr, $c.relem(mons, PM.KI_RIN)) || $c.peq(mptr, $c.relem(mons, PM.ROTHE)) && part !== HAIR) {
+    if (mptr.mlet === S.CENTAUR || mptr.mlet === S.UNICORN || mptr === mons[PM.KI_RIN] || mptr === mons[PM.ROTHE] && part !== HAIR) {
         return mbodypart$horse_parts[part];
     }
     if (mptr.mlet === S.LIGHT) {
@@ -2172,10 +2172,10 @@ export async function mbodypart(mon, part) {   // polyself.c:1972
             return $c.lit("beam");
         }
     }
-    if ($c.peq(mptr, $c.relem(mons, PM.STALKER)) && part === HEAD) {
+    if (mptr === mons[PM.STALKER] && part === HEAD) {
         return $c.lit("head");
     }
-    if (mptr.mlet === S.EEL && !$c.peq(mptr, $c.relem(mons, PM.JELLYFISH))) {
+    if (mptr.mlet === S.EEL && mptr !== mons[PM.JELLYFISH]) {
         return mbodypart$fish_parts[part];
     }
     if (mptr.mlet === S.WORM) {
@@ -2190,7 +2190,7 @@ export async function mbodypart(mon, part) {   // polyself.c:1972
     if (mptr.mlet === S.EYE) {
         return mbodypart$sphere_parts[part];
     }
-    if (mptr.mlet === S.JELLY || mptr.mlet === S.PUDDING || mptr.mlet === S.BLOB || $c.peq(mptr, $c.relem(mons, PM.JELLYFISH))) {
+    if (mptr.mlet === S.JELLY || mptr.mlet === S.PUDDING || mptr.mlet === S.BLOB || mptr === mons[PM.JELLYFISH]) {
         return mbodypart$jelly_parts[part];
     }
     if (mptr.mlet === S.VORTEX || mptr.mlet === S.ELEMENTAL) {

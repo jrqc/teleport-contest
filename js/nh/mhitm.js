@@ -244,7 +244,7 @@ export async function mdisplacem(magr, mdef, quietly) {   // mhitm.c:179
         return M_ATTK.MISS;
     }
     /* Grid bugs cannot displace at an angle. */
-    if ($c.peq(pa, $c.relem(mons, PM.GRID_BUG)) && magr.mx !== mdef.mx && magr.my !== mdef.my) {
+    if (pa === mons[PM.GRID_BUG] && magr.mx !== mdef.mx && magr.my !== mdef.my) {
         return M_ATTK.MISS;
     }
     /* undetected monster becomes un-hidden if it is displaced */
@@ -355,7 +355,7 @@ export async function mattackm(magr, mdef) {   // mhitm.c:293
     pa = magr.data;
     pd = mdef.data;
     /* Grid bugs cannot attack at an angle. */
-    if ($c.peq(pa, $c.relem(mons, PM.GRID_BUG)) && magr.mx !== mdef.mx && magr.my !== mdef.my) {
+    if (pa === mons[PM.GRID_BUG] && magr.mx !== mdef.mx && magr.my !== mdef.my) {
         return M_ATTK.MISS;
     }
     /* Calculate the armour class differential. */
@@ -489,7 +489,7 @@ export async function mattackm(magr, mdef) {   // mhitm.c:293
                         break;
                     }
                     $t2 = await hitmm(magr, mdef, mattk, mwep, dieroll), res[i] = $t2;
-                    if (($c.peq(mdef.data, $c.relem(mons, PM.BLACK_PUDDING)) || $c.peq(mdef.data, $c.relem(mons, PM.BROWN_PUDDING))) && (mwep && ((objects[mwep.otyp].oc_material | 0) === IRON || (objects[mwep.otyp].oc_material | 0) === METAL)) && mdef.mhp > 1 && !mdef.mcan) {
+                    if ((mdef.data === mons[PM.BLACK_PUDDING] || mdef.data === mons[PM.BROWN_PUDDING]) && (mwep && ((objects[mwep.otyp].oc_material | 0) === IRON || (objects[mwep.otyp].oc_material | 0) === METAL)) && mdef.mhp > 1 && !mdef.mcan) {
                         if ((mclone = await clone_mon(mdef, 0, 0)) !== null) {
                             if (gv.vis && canspotmon(mdef)) {
                                 await pline($c.lit("%s divides as %s hits it!"), await Monnam(mdef), await mon_nam(magr));
@@ -539,7 +539,7 @@ export async function mattackm(magr, mdef) {   // mhitm.c:293
                 }
                 break;
             case AT.ENGL:
-                if ($c.peq(mdef.data, $c.relem(mons, PM.SHADE))) {
+                if (mdef.data === mons[PM.SHADE]) {
                     /* no silver teeth... */
                     if (gv.vis) {
                         await pline($c.lit("%s attempt to engulf %s is futile."), s_suffix(await Monnam(magr)), await mon_nam(mdef));
@@ -754,7 +754,7 @@ async function hitmm(magr, mdef, mattk, mwep, dieroll) {   // mhitm.c:644
 async function gazemm(magr, mdef, mattk) {   // mhitm.c:736
     let buf = new Int8Array(256), archon = 0, altmesg = 0;
     /* an Archon's gaze affects target even if Archon itself is blinded */
-    archon = $c.i8($c.peq(magr.data, $c.relem(mons, PM.ARCHON)) && mattk.adtyp === AD.BLND ? 1 : 0);
+    archon = $c.i8(magr.data === mons[PM.ARCHON] && mattk.adtyp === AD.BLND ? 1 : 0);
     altmesg = $c.i8(archon && !magr.mcansee ? 1 : 0);
     /* bring target out of hiding even if hero doesn't see it happen (this
        is already done in pre_mm_attack() and shouldn't be needed here) */
@@ -773,7 +773,7 @@ async function gazemm(magr, mdef, mattk) {   // mhitm.c:736
         return M_ATTK.MISS;
     }
     /* call mon_reflects 2x, first test, then, if visible, print message */
-    if ($c.peq(magr.data, $c.relem(mons, PM.MEDUSA)) && await mon_reflects(mdef, null)) {
+    if (magr.data === mons[PM.MEDUSA] && await mon_reflects(mdef, null)) {
         if (canseemon(mdef)) {
             await mon_reflects(mdef, $c.lit("The gaze is reflected away by %s %s."));
         }
@@ -1018,7 +1018,7 @@ async function mdamagem(magr, mdef, mattk, mwep, dieroll) {   // mhitm.c:1016
     mhm.dieroll = dieroll;
     mhm.done = FALSE;
     /* or flesh_petrifies() */
-    if ((touch_petrifies(pd) || mattk.adtyp === AD.DGST && $c.peq(pd, $c.relem(mons, PM.MEDUSA))) && !await resists_ston(magr)) {
+    if ((touch_petrifies(pd) || mattk.adtyp === AD.DGST && pd === mons[PM.MEDUSA]) && !await resists_ston(magr)) {
         protector = attk_protection(mattk.aatyp);
         wornitems = magr.misc_worn_check;
         /* wielded weapon gives same protection as gloves here */
@@ -1078,13 +1078,13 @@ async function mdamagem(magr, mdef, mattk, mwep, dieroll) {   // mhitm.c:1016
              * after monkilled() to provide better message ordering */
             if (ismnum(mdef.cham)) {
                 await newcham(magr, null, NC.SHOW_MSG);
-            } else if ($c.peq(pd, $c.relem(mons, PM.GREEN_SLIME)) && !slimeproof(pa)) {
-                await newcham(magr, $c.relem(mons, PM.GREEN_SLIME), NC.SHOW_MSG);
-            } else if ($c.peq(pd, $c.relem(mons, PM.WRAITH))) {
+            } else if (pd === mons[PM.GREEN_SLIME] && !slimeproof(pa)) {
+                await newcham(magr, mons[PM.GREEN_SLIME], NC.SHOW_MSG);
+            } else if (pd === mons[PM.WRAITH]) {
                 await grow_up(magr, null);
                 /* don't grow up twice */
                 return M_ATTK.DEF_DIED | (!DEADMONSTER(magr) ? 0 : M_ATTK.AGR_DIED);
-            } else if ($c.peq(pd, $c.relem(mons, PM.NURSE))) {
+            } else if (pd === mons[PM.NURSE]) {
                 await healmon(magr, magr.mhpmax, 0);
             }
             await mon_givit(magr, pd);
@@ -1249,7 +1249,7 @@ export async function rustm(mdef, obj) {   // mhitm.c:1260
         dmgtyp = ERODE.CORRODE;
     } else if (dmgtype(mdef.data, AD.RUST)) {
         dmgtyp = ERODE.RUST;
-    } else if (dmgtype(mdef.data, AD.FIRE) && !$c.peq(mdef.data, $c.relem(mons, PM.STEAM_VORTEX))) {
+    } else if (dmgtype(mdef.data, AD.FIRE) && mdef.data !== mons[PM.STEAM_VORTEX]) {
         /* steam vortex: fire resist applies, fire damage doesn't */
         dmgtyp = ERODE.BURN;
         chance = 6;
@@ -1352,7 +1352,7 @@ async function passivemm(magr, mdef, mhitb, mdead, mwep) {   // mhitm.c:1304
                     if (tmp > 127) {
                         tmp = 127;
                     }
-                    if ($c.peq(mddat, $c.relem(mons, PM.FLOATING_EYE))) {
+                    if (mddat === mons[PM.FLOATING_EYE]) {
                         if (!rn2(4)) {
                             tmp = 127;
                         }

@@ -252,7 +252,7 @@ async function temple_priest_sound(mtmp) {   // sounds.c:131
  */
 async function oracle_sound(mtmp) {   // sounds.c:181
     let hallu = 0;
-    if (!$c.peq(mtmp.data, $c.relem(mons, PM.ORACLE))) {
+    if (mtmp.data !== mons[PM.ORACLE]) {
         return FALSE;
     }
     /* and don't produce silly effects when she's clearly visible */
@@ -721,12 +721,12 @@ export function cry_sound(mtmp) {   // sounds.c:617
 function mon_is_gecko(mon) {   // sounds.c:659
     let glyph = 0;
     /* return True if it is actually a gecko */
-    if ($c.peq(mon.data, $c.relem(mons, PM.GECKO))) {
+    if (mon.data === mons[PM.GECKO]) {
         return TRUE;
     }
     /* return False if it is a long worm; we might be chatting to its tail
        (not strictly needed; long worms are MS_SILENT so won't get here) */
-    if ($c.peq(mon.data, $c.relem(mons, PM.LONG_WORM))) {
+    if (mon.data === mons[PM.LONG_WORM]) {
         return FALSE;
     }
     /* result depends upon whether map spot shows a gecko, which will
@@ -836,9 +836,9 @@ export async function domonnoise(mtmp) {   // sounds.c:679
                     /* These first two (0 and 1) are specially handled below */
                     if (kindred) {
                         verbl_msg = $c.lit("This is my hunting ground that you dare to prowl!");
-                    } else if ($c.peq(gy.youmonst.data, $c.relem(mons, PM.SILVER_DRAGON)) || $c.peq(gy.youmonst.data, $c.relem(mons, PM.BABY_SILVER_DRAGON))) {
+                    } else if (gy.youmonst.data === mons[PM.SILVER_DRAGON] || gy.youmonst.data === mons[PM.BABY_SILVER_DRAGON]) {
                         /* Silver dragons are silver in color, not made of silver */
-                        $c.sprintf(new $c.Ptr(verbuf, 0), $c.lit("%s!  Your silver sheen does not frighten me!"), $c.peq(gy.youmonst.data, $c.relem(mons, PM.SILVER_DRAGON)) ? $c.lit("Fool") : $c.lit("Young Fool"));
+                        $c.sprintf(new $c.Ptr(verbuf, 0), $c.lit("%s!  Your silver sheen does not frighten me!"), gy.youmonst.data === mons[PM.SILVER_DRAGON] ? $c.lit("Fool") : $c.lit("Young Fool"));
                         verbl_msg = new $c.Ptr(verbuf, 0);
                     } else {
                         vampindex = rn2(2);
@@ -857,7 +857,7 @@ export async function domonnoise(mtmp) {   // sounds.c:679
             }
         case MS.WERE:
             if (flags.moonphase === FULL_MOON && night() ^ (!rn2(13) ? 1 : 0)) {
-                await pline($c.lit("%s throws back %s head and lets out a blood curdling %s!"), await Monnam(mtmp), genders[pronoun_gender(mtmp, PRONOUN.HALLU)].his, $c.peq(ptr, $c.relem(mons, PM.HUMAN_WERERAT)) ? $c.lit("shriek") : $c.lit("howl"));
+                await pline($c.lit("%s throws back %s head and lets out a blood curdling %s!"), await Monnam(mtmp), genders[pronoun_gender(mtmp, PRONOUN.HALLU)].his, ptr === mons[PM.HUMAN_WERERAT] ? $c.lit("shriek") : $c.lit("howl"));
                 await wake_nearto(mtmp.mx, mtmp.my, 121);
             } else {
                 pline_msg = $c.lit("whispers inaudibly.  All you can make out is \"moon\".");
@@ -872,7 +872,7 @@ export async function domonnoise(mtmp) {   // sounds.c:679
                 } else if (mtmp.mtame && mtmp.mextra.edog.hungrytime > $c.add64(svm.moves, 1000)) {
                     pline_msg = $c.lit("yips.");
                 } else {
-                    if (!$c.peq(ptr, $c.relem(mons, PM.DINGO))) {   /* dingos do not actually bark */
+                    if (ptr !== mons[PM.DINGO]) {   /* dingos do not actually bark */
                         pline_msg = $c.lit("barks.");
                     }
                 }
@@ -904,7 +904,7 @@ export async function domonnoise(mtmp) {   // sounds.c:679
             pline_msg = $c.lit("squeaks.");
             break;
         case MS.SQAWK:
-            if ($c.peq(ptr, $c.relem(mons, PM.RAVEN)) && !mtmp.mpeaceful) {
+            if (ptr === mons[PM.RAVEN] && !mtmp.mpeaceful) {
                 verbl_msg = $c.lit("Nevermore!");
             } else {
                 pline_msg = $c.lit("squawks.");
@@ -989,13 +989,13 @@ export async function domonnoise(mtmp) {   // sounds.c:679
             if (mtmp.mtame) {
                 verbl_msg = $c.lit("Sorry, I'm all out of wishes.");
             } else if (mtmp.mpeaceful) {
-                if ($c.peq(ptr, $c.relem(mons, PM.WATER_DEMON))) {
+                if (ptr === mons[PM.WATER_DEMON]) {
                     pline_msg = $c.lit("gurgles.");
                 } else {
                     verbl_msg = $c.lit("I'm free!");
                 }
             } else {
-                if (!$c.peq(ptr, $c.relem(mons, PM.PRISONER))) {
+                if (ptr !== mons[PM.PRISONER]) {
                     verbl_msg = $c.lit("This will teach you not to disturb me!");
                 } else {
                     /* vague because prisoner might already be out of cell */
@@ -1170,7 +1170,7 @@ export async function domonnoise(mtmp) {   // sounds.c:679
         case MS.RIDER:
             {
                 book = null;
-                ms_Death = $c.i8($c.peq(ptr, $c.relem(mons, PM.DEATH)) ? 1 : 0);
+                ms_Death = $c.i8(ptr === mons[PM.DEATH] ? 1 : 0);
                 /* 3.6 tribute */
                 if (ms_Death && !svc.context.tribute.Deathnotice && (book = u_have_novel()) !== null) {
                     if ((tribtitle = noveltitle(new $c.FieldRef(book, "corpsenm", "i32"))) !== null) {
@@ -1199,7 +1199,7 @@ export async function domonnoise(mtmp) {   // sounds.c:679
         await verbalize1(verbl_msg_mcan);
     } else if (verbl_msg) {
         /* more 3.6 tribute */
-        if ($c.peq(ptr, $c.relem(mons, PM.DEATH))) {
+        if (ptr === mons[PM.DEATH]) {
             /* Death talks in CAPITAL LETTERS
                and without quotation marks */
             await pline($c.lit("%s"), ucase($c.strcpy(new $c.Ptr(tmpbuf, 0), verbl_msg)));

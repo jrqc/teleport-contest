@@ -451,7 +451,7 @@ export async function getmattk(magr, mdef, indx, prev_result, alt_attk_buf) {   
            they won't use the spell for monster vs monster so become impotent
            against cold resistant foes; change the touch damage from cold to
            physical if target will resist */
-    } else if (indx === 0 && attk.aatyp === AT.TUCH && attk.adtyp === AD.COLD && (udefend ? Cold_resistance() : await resists_cold(mdef)) && !$c.peq(mdef.data, $c.relem(mons, PM.SHADE))) {
+    } else if (indx === 0 && attk.aatyp === AT.TUCH && attk.adtyp === AD.COLD && (udefend ? Cold_resistance() : await resists_cold(mdef)) && mdef.data !== mons[PM.SHADE]) {
         /* don't substitute if target is immune to normal damage */
         alt_attk_buf.$copyFrom(attk);
         attk = alt_attk_buf;
@@ -846,7 +846,7 @@ export async function mattacku(mtmp) {   // mhitu.c:491
                 /* can affect you either ranged or not */
                 /* Medusa gaze already operated through m_respond in
                    dochug(); don't gaze more than once per round. */
-                if (!$c.peq(mdat, $c.relem(mons, PM.MEDUSA))) {
+                if (mdat !== mons[PM.MEDUSA]) {
                     $t4 = await gazemu(mtmp, mattk), sum[i] = $t4;
                 }
                 break;
@@ -981,7 +981,7 @@ async function summonmu(mtmp, youseeit) {   // mhitu.c:956
      * and isn't a shapechanger.
      */
     if (is_demon(mdat)) {
-        if (!$c.peq(mdat, $c.relem(mons, PM.BALROG)) && !$c.peq(mdat, $c.relem(mons, PM.AMOROUS_DEMON))) {
+        if (mdat !== mons[PM.BALROG] && mdat !== mons[PM.AMOROUS_DEMON]) {
             if (!rn2(In_hell(u.uz) ? 10 : 16)) {
                 await msummon(mtmp);
             }
@@ -1102,7 +1102,7 @@ export function magic_negation(mon) {   // mhitu.c:1089
     /* high priests have innate protection */
     is_you = $c.i8($c.peq(mon, gy.youmonst) ? 1 : 0);
     via_amul = FALSE;
-    gotprot = $c.i8(is_you ? u.uprops[PROTECTION].extrinsic !== 0 ? 1 : 0 : $c.peq(mon.data, $c.relem(mons, PM.HIGH_CLERIC)) ? 1 : 0);
+    gotprot = $c.i8(is_you ? u.uprops[PROTECTION].extrinsic !== 0 ? 1 : 0 : mon.data === mons[PM.HIGH_CLERIC] ? 1 : 0);
     for (o = is_you ? gi.invent : mon.minvent; o; o = o.nobj) {
         /* a_can field is only applicable for armor (which must be worn) */
         if ($c.and64(o.owornmask, W_ARMOR) !== 0) {
@@ -1137,7 +1137,7 @@ export function magic_negation(mon) {   // mhitu.c:1089
         /* intrinsic Protection is weaker (play balance; obtaining divine
            protection is too easy); it confers minimum mc 1 instead of 0 */
         /* aligned priests and angels have innate intrinsic Protection */
-        if (is_you && (HProtection() && u.ublessed > 0 || u.uspellprot) || ($c.peq(mon.data, $c.relem(mons, PM.ALIGNED_CLERIC)) || is_minion(mon.data))) {
+        if (is_you && (HProtection() && u.ublessed > 0 || u.uspellprot) || (mon.data === mons[PM.ALIGNED_CLERIC] || is_minion(mon.data))) {
             mc = 1;
         }
     }
@@ -1419,7 +1419,7 @@ async function gulpmu(mtmp, mattk) {   // mhitu.c:1289
             break;
         case AD.PHYS:
             physical_damage = TRUE;
-            if ($c.peq(mtmp.data, $c.relem(mons, PM.FOG_CLOUD))) {
+            if (mtmp.data === mons[PM.FOG_CLOUD]) {
                 await You($c.lit("are laden with moisture and %s"), flaming(gy.youmonst.data) ? $c.lit("are smoldering out!") : u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.BREATHLESS) !== 0 ? $c.lit("find it mildly uncomfortable.") : amphibious(gy.youmonst.data) ? $c.lit("feel comforted.") : $c.lit("can barely breathe!"));
                 if ((u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.AMPHIBIOUS) !== 0 || (u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.BREATHLESS) !== 0)) && !flaming(gy.youmonst.data)) {
                     tmp = 0;
@@ -1650,7 +1650,7 @@ export async function gazemu(mtmp, mattk) {   // mhitu.c:1668
     if ($c.andu64(mtmp.seen_resistance, cvt_adtyp_to_mseenres(mattk.adtyp))) {
         return M_ATTK.MISS;
     }
-    is_medusa = $c.i8($c.peq(mtmp.data, $c.relem(mons, PM.MEDUSA)) ? 1 : 0);
+    is_medusa = $c.i8(mtmp.data === mons[PM.MEDUSA] ? 1 : 0);
     reflectable = $c.i8(Reflecting() && couldsee(mtmp.mx, mtmp.my) && is_medusa ? 1 : 0);
     /* assumes that hero has to see monster's gaze in order to be
        affected, rather than monster just having to look at hero;
@@ -1761,7 +1761,7 @@ export async function gazemu(mtmp, mattk) {   // mhitu.c:1668
                     already = $c.i8((mtmp.mcansee | 0) === 0 ? 1 : 0);
                     /* Archons gaze every round; we don't want cancelled ones
                        giving the "seems puzzled/dazzled" message that often */
-                    if (mtmp.mcan | 0 && $c.peq(mtmp.data, $c.relem(mons, PM.ARCHON)) && rn2(5)) {
+                    if (mtmp.mcan | 0 && mtmp.data === mons[PM.ARCHON] && rn2(5)) {
                         react = -1;
                     }
                 } else {
@@ -1913,7 +1913,7 @@ export function could_seduce(magr, mdef, mattk) {   // mhitu.c:1934
        for seduction, both pass the could_seduce() test;
        incubi/succubi have three attacks, their claw attacks for damage
        don't pass the test */
-    if (pagr.mlet !== S.NYMPH && !$c.peq(pagr, $c.relem(mons, PM.AMOROUS_DEMON)) || adtyp !== AD.SEDU && adtyp !== AD.SSEX && adtyp !== AD.SITM) {
+    if (pagr.mlet !== S.NYMPH && pagr !== mons[PM.AMOROUS_DEMON] || adtyp !== AD.SEDU && adtyp !== AD.SSEX && adtyp !== AD.SITM) {
         return 0;
     }
     return genagr === (1 - gendef | 0) ? 1 : pagr.mlet === S.NYMPH ? 2 : 0;
@@ -1925,7 +1925,7 @@ export function could_seduce(magr, mdef, mattk) {   // mhitu.c:1934
  */
 export async function doseduce(mon) {   // mhitu.c:1985
     let ring = null, nring = null, fem = 0, seewho = 0, naked = 0, attr_tot = 0, tried_gloves = 0, qbuf = new Int8Array(128), Who = new Int8Array(128), yourgloves = null, tmp = 0, cost = 0, umoney = 0, $t1, $t2, $t3, $t4, $t5, $t6;
-    fem = $c.i8($c.peq(mon.data, $c.relem(mons, PM.AMOROUS_DEMON)) && Mgender(mon) === FEMALE ? 1 : 0);   /* otherwise incubus */
+    fem = $c.i8(mon.data === mons[PM.AMOROUS_DEMON] && Mgender(mon) === FEMALE ? 1 : 0);   /* otherwise incubus */
     /* True iff no armor */
     tried_gloves = 0;
     if (mon.mcan | 0 || mon.mspec_used) {

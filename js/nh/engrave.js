@@ -1605,7 +1605,7 @@ export async function disturb_grave(x, y) {   // engrave.c:1707
     } else {
         await You($c.lit("disturb the undead!"));
         lev.horizontal = (1) & 1;
-        await makemon($c.relem(mons, PM.GHOUL), x, y, NO.MM_FLAGS);
+        await makemon(mons[PM.GHOUL], x, y, NO.MM_FLAGS);
         await exercise(A.WIS, FALSE);
     }
 }

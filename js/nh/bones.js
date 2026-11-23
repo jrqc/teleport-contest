@@ -448,7 +448,7 @@ async function remove_mon_from_bones(mtmp) {   // bones.c:390
     let mptr = null;
     mptr = mtmp.data;
     /* mptr == &mons[VLAD_THE_IMPALER] || cham == VLAD */
-    if (mtmp.iswiz | 0 || $c.peq(mptr, $c.relem(mons, PM.MEDUSA)) || mptr.msound === MS.NEMESIS || mptr.msound === MS.LEADER || is_Vlad(mtmp) || $c.peq(mptr, $c.relem(mons, PM.ORACLE)) && !await fixuporacle(mtmp)) {
+    if (mtmp.iswiz | 0 || mptr === mons[PM.MEDUSA] || mptr.msound === MS.NEMESIS || mptr.msound === MS.LEADER || is_Vlad(mtmp) || mptr === mons[PM.ORACLE] && !await fixuporacle(mtmp)) {
         await mongone(mtmp);
     }
 }
@@ -544,7 +544,7 @@ export async function savebones(how, when, corpse) {   // bones.c:403
          * on your location
          */
         gi.in_mklev = TRUE;
-        mtmp = await makemon($c.relem(mons, PM.GHOST), u.ux, u.uy, MM.NONAME);
+        mtmp = await makemon(mons[PM.GHOST], u.ux, u.uy, MM.NONAME);
         gi.in_mklev = FALSE;
         if (!mtmp) {
             return;

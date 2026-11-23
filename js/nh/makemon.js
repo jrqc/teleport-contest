@@ -563,7 +563,7 @@ async function m_initweap(mtmp) {   // makemon.c:161
             break;
         case S.CENTAUR:
             if (rn2(2)) {
-                if ($c.peq(ptr, $c.relem(mons, PM.FOREST_CENTAUR))) {
+                if (ptr === mons[PM.FOREST_CENTAUR]) {
                     await mongets(mtmp, BOW);
                     await m_initthrow(mtmp, ARROW, 12);
                 } else {
@@ -780,13 +780,13 @@ async function m_initinv(mtmp) {   // makemon.c:589
                 }
                 otmp = null;
                 nhUse(mac);   /* suppress 'dead increment' from static analyzer */
-                if ($c.peq(ptr, $c.relem(mons, PM.WATCH_CAPTAIN))) {
+                if (ptr === mons[PM.WATCH_CAPTAIN]) {
                     /* better weapon rather than extra gear here */
-                } else if ($c.peq(ptr, $c.relem(mons, PM.WATCHMAN))) {
+                } else if (ptr === mons[PM.WATCHMAN]) {
                     if (rn2(3)) {   /* most watchmen carry a whistle */
                         await mongets(mtmp, TIN_WHISTLE);
                     }
-                } else if ($c.peq(ptr, $c.relem(mons, PM.GUARD))) {
+                } else if (ptr === mons[PM.GUARD]) {
                     /* if hero teleports out of a vault while being confronted
                        by the vault's guard, there is a shrill whistling sound,
                        so guard evidently carries a cursed whistle */
@@ -801,11 +801,11 @@ async function m_initinv(mtmp) {   // makemon.c:589
                     if (!rn2(2)) {
                         await mongets(mtmp, C_RATION);
                     }
-                    if (!$c.peq(ptr, $c.relem(mons, PM.SOLDIER)) && !rn2(3)) {
+                    if (ptr !== mons[PM.SOLDIER] && !rn2(3)) {
                         await mongets(mtmp, BUGLE);
                     }
                 }
-            } else if ($c.peq(ptr, $c.relem(mons, PM.SHOPKEEPER))) {
+            } else if (ptr === mons[PM.SHOPKEEPER]) {
                 await mongets(mtmp, SKELETON_KEY);
                 switch (rn2(4)) {
                     case 0:
@@ -838,7 +838,7 @@ async function m_initinv(mtmp) {   // makemon.c:589
             }
             break;
         case S.GIANT:
-            if ($c.peq(ptr, $c.relem(mons, PM.MINOTAUR))) {
+            if (ptr === mons[PM.MINOTAUR]) {
                 if (!rn2(8) || gi.in_mklev && ((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_earth_level))) {
                     await mongets(mtmp, WAN_DIGGING);
                 }
@@ -852,16 +852,16 @@ async function m_initinv(mtmp) {   // makemon.c:589
             }
             break;
         case S.WRAITH:
-            if ($c.peq(ptr, $c.relem(mons, PM.NAZGUL))) {
+            if (ptr === mons[PM.NAZGUL]) {
                 otmp = await mksobj(RIN_INVISIBILITY, FALSE, FALSE);
                 await curse(otmp);
                 await mpickobj(mtmp, otmp);
             }
             break;
         case S.LICH:
-            if ($c.peq(ptr, $c.relem(mons, PM.MASTER_LICH)) && !rn2(13)) {
+            if (ptr === mons[PM.MASTER_LICH] && !rn2(13)) {
                 await mongets(mtmp, rn2(7) ? ATHAME : WAN_NOTHING);
-            } else if ($c.peq(ptr, $c.relem(mons, PM.ARCH_LICH)) && !rn2(3)) {
+            } else if (ptr === mons[PM.ARCH_LICH] && !rn2(3)) {
                 otmp = await mksobj(rn2(3) ? ATHAME : QUARTERSTAFF, TRUE, $c.i8(rn2(13) ? FALSE : TRUE));
                 if (otmp.spe < 2) {
                     $t3 = $c.i8(rnd(3)), otmp.spe = $t3;
@@ -878,7 +878,7 @@ async function m_initinv(mtmp) {   // makemon.c:589
             }
             break;
         case S.QUANTMECH:
-            if (!rn2(20) && $c.peq(ptr, $c.relem(mons, PM.QUANTUM_MECHANIC))) {
+            if (!rn2(20) && ptr === mons[PM.QUANTUM_MECHANIC]) {
                 otmp = await mksobj(LARGE_BOX, FALSE, FALSE);
                 /* we used to just set the flag, which resulted in weight()
                    treating the box as being heavier by the weight of a cat;
@@ -901,9 +901,9 @@ async function m_initinv(mtmp) {   // makemon.c:589
         case S.DEMON:
             /* moved here from m_initweap() because these don't
                have AT_WEAP so m_initweap() is not called for them */
-            if ($c.peq(ptr, $c.relem(mons, PM.ICE_DEVIL)) && !rn2(4)) {
+            if (ptr === mons[PM.ICE_DEVIL] && !rn2(4)) {
                 await mongets(mtmp, SPEAR);
-            } else if ($c.peq(ptr, $c.relem(mons, PM.ASMODEUS))) {
+            } else if (ptr === mons[PM.ASMODEUS]) {
                 await mongets(mtmp, WAN_COLD);
                 await mongets(mtmp, WAN_FIRE);
             }
@@ -922,7 +922,7 @@ async function m_initinv(mtmp) {   // makemon.c:589
             break;
     }
     /* ordinary soldiers rarely have access to magic (or gold :-) */
-    if ($c.peq(ptr, $c.relem(mons, PM.SOLDIER)) && rn2(13)) {
+    if (ptr === mons[PM.SOLDIER] && rn2(13)) {
         return;
     }
     if (mtmp.m_lev > rn2(50)) {
@@ -1677,7 +1677,7 @@ export async function create_critters(cnt, mptr, neverask) {   // makemon.c:1556
         x = u.ux, y = u.uy;
         /* if in water, try to encourage an aquatic monster
            by finding and then specifying another wet location */
-        if (!mptr && u.uinwater | 0 && await enexto(c, x, y, $c.relem(mons, PM.GIANT_EEL))) {
+        if (!mptr && u.uinwater | 0 && await enexto(c, x, y, mons[PM.GIANT_EEL])) {
             x = c.x, y = c.y;
         }
         if ((mon = await makemon(mptr, x, y, NO.MM_FLAGS)) === null) {
@@ -1861,7 +1861,7 @@ function mk_gen_ok(mndx, mvflagsmask, genomask) {   // makemon.c:1736
         return FALSE;
     }
     /* special levels might ask for random demon type; reject this one */
-    if ($c.peq(ptr, $c.relem(mons, PM.MAIL_DAEMON))) {
+    if (ptr === mons[PM.MAIL_DAEMON]) {
         return FALSE;
     }
     return TRUE;
@@ -2084,7 +2084,7 @@ export function mkclass_poly(class_) {   // makemon.c:1983
  */
 export async function adj_lev(ptr) {   // makemon.c:2016
     let tmp = 0, tmp2 = 0;
-    if ($c.peq(ptr, $c.relem(mons, PM.WIZARD_OF_YENDOR))) {
+    if (ptr === mons[PM.WIZARD_OF_YENDOR]) {
         /* does not depend on other strengths, but does get stronger
          * every time he is killed
          */
@@ -2344,7 +2344,7 @@ export function peace_minded(ptr) {   // makemon.c:2268
     if (ptr.msound === MS.NEMESIS) {
         return FALSE;
     }
-    if ($c.peq(ptr, $c.relem(mons, PM.ERINYS))) {
+    if (ptr === mons[PM.ERINYS]) {
         return $c.i8(!u.ualign.abuse ? 1 : 0);
     }
     if (race_peaceful(ptr)) {
@@ -2669,7 +2669,7 @@ export async function summon_furies(limit) {   // makemon.c:2605
     /* number to create, or 0 to create until extinct */
     i = 0;
     while (mk_gen_ok(PM.ERINYS, G_GONE, 0) && (i < limit || !limit)) {
-        await makemon($c.relem(mons, PM.ERINYS), u.ux, u.uy, MM.ADJACENTOK | MM.NOWAIT);
+        await makemon(mons[PM.ERINYS], u.ux, u.uy, MM.ADJACENTOK | MM.NOWAIT);
         i = i + 1 | 0;
     }
 }

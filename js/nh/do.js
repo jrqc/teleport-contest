@@ -946,7 +946,7 @@ async function engulfer_digests_food(obj) {   // do.c:849
         /* see or feel the effect */
         await pline($c.lit("%s instantly digested!"), await Tobjnam(obj, $c.lit("are")));
         if (could_poly || could_slime) {
-            await newcham(u.ustuck, could_slime ? $c.relem(mons, PM.GREEN_SLIME) : null, could_slime ? NC.SHOW_MSG : NO_NC_FLAGS);
+            await newcham(u.ustuck, could_slime ? mons[PM.GREEN_SLIME] : null, could_slime ? NC.SHOW_MSG : NO_NC_FLAGS);
         } else if (could_petrify) {
             await minstapetrify(u.ustuck, TRUE);
         } else if (could_grow) {
@@ -2165,11 +2165,11 @@ export async function revive_corpse(corpse) {   // do.c:2111
             case OBJ.FLOOR:
                 if (cansee(corpsex[0], corpsey[0]) || canseemon(mtmp)) {
                     effect = $c.lit("");
-                    if ($c.peq(mtmp.data, $c.relem(mons, PM.DEATH))) {
+                    if (mtmp.data === mons[PM.DEATH]) {
                         effect = $c.lit(" in a whirl of spectral skulls");
-                    } else if ($c.peq(mtmp.data, $c.relem(mons, PM.PESTILENCE))) {
+                    } else if (mtmp.data === mons[PM.PESTILENCE]) {
                         effect = $c.lit(" in a churning pillar of flies");
-                    } else if ($c.peq(mtmp.data, $c.relem(mons, PM.FAMINE))) {
+                    } else if (mtmp.data === mons[PM.FAMINE]) {
                         effect = $c.lit(" in a ring of withered crops");
                     }
                     if (canseemon(mtmp)) {
