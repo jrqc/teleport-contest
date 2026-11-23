@@ -10,19 +10,19 @@ import { config_error_add, config_error_done, config_error_init, get_configfile,
 import { flags, gb, gc, gd, gh, gi, gl, gn, gs, gu, gw, hands_obj, iflags, program_state, svc, svd, svl, svm, svn, svp, u } from './decl.js';
 import { COIN_CLASS } from './defsym.h.js';
 import { In_quest, Is_special, maxledgerno } from './dungeon.js';
-import { LFILE_EXISTS, MIGR_NOBREAK, MIGR_NOSCATTER, MIGR_WITH_HERO } from './dungeon.h.js';
+import { LFILE_EXISTS, MIGR } from './dungeon.h.js';
 import { after_opt_showpaths } from './earlyarg.js';
 import { nh_terminate } from './end.js';
 import { discover, wizard } from './flag.macros.js';
 import { BUFSZ, PL_NSIZ_PLUS } from './global.h.js';
 import { strcmpi } from './global.macros.js';
 import { inv_cnt } from './hack.js';
-import { BONESPREFIX, COUNTING, FREEING, HACKPREFIX, LEVELPREFIX, NHF_BONESFILE, NHF_LEVELFILE, NHF_SAVEFILE, READING, SAVEPREFIX, SCOREPREFIX, SF_CRITICAL_BYTE_COUNT_MISMATCH, SF_DM_I32LP64_ON_IL32LLP64, SF_DM_I32LP64_ON_ILP32LL64, SF_DM_IL32LLP64_ON_I32LP64, SF_DM_IL32LLP64_ON_ILP32LL64, SF_DM_ILP32LL64_ON_I32LP64, SF_DM_ILP32LL64_ON_IL32LLP64, SF_DM_MISMATCH, SF_OUTDATED, SF_UPTODATE, SYSCONFPREFIX, TROUBLEPREFIX, WIZKIT_MAX, WRITING, exportascii, historical, invlet_basic } from './hack.h.js';
+import { BONESPREFIX, COUNTING, FREEING, HACKPREFIX, LEVELPREFIX, NHF, READING, SAVEPREFIX, SCOREPREFIX, SF, SYSCONFPREFIX, TROUBLEPREFIX, WIZKIT_MAX, WRITING, exportascii, historical, invlet_basic } from './hack.h.js';
 import { c_eos, copynchars, eos, fuzzymatch, mungspaces, nh_snprintf, s_suffix, strip_newline, strncmpi } from './hacklib.js';
 import { addinv, merge_choice } from './invent.js';
 import { nhUse } from './lint.macros.js';
 import { add_to_migration } from './mkobj.js';
-import { PM_CLERIC } from './monsters.h.js';
+import { PM } from './monsters.h.js';
 import { l_nhcore_done } from './nhlua.js';
 import { observe_object } from './o_init.js';
 import { readobjnam } from './objnam.js';
@@ -42,7 +42,7 @@ import { sethanguphandler } from './unixmain.js';
 import { regularize } from './unixunix.js';
 import { validate, version_string } from './version.js';
 import { create_nhwindow, destroy_nhwindow, display_nhwindow, putmsghistory, putstr, raw_print, wait_synch } from './winprocs.macros.js';
-import { NHW_MENU, WIN_ERR } from './wintype.h.js';
+import { NHW, WIN_ERR } from './wintype.h.js';
 import { wish_history_add } from './zap.js';
 
 const O_BINARY = 0;
@@ -278,7 +278,7 @@ export async function create_levelfile(lev, errbuf) {   // files.c:621
     fq_lock = fqname(new $c.Ptr(gl.lock, 0), LEVELPREFIX, 0);
     nhfp = await new_nhfile();
     if (nhfp) {
-        nhfp.ftype = NHF_LEVELFILE;
+        nhfp.ftype = NHF.LEVELFILE;
         nhfp.mode = WRITING;
         nhfp.structlevel = 1;
         nhfp.fieldlevel = 0;
@@ -314,7 +314,7 @@ export async function open_levelfile(lev, errbuf) {   // files.c:673
         nhfp.addinfo = 0;
         nhfp.style.deflt = 0;
         nhfp.style.binary = 1;
-        nhfp.ftype = NHF_LEVELFILE;
+        nhfp.ftype = NHF.LEVELFILE;
         nhfp.fnidx = historical;
         nhfp.fd = -1;
         nhfp.fpdef = null;
@@ -387,7 +387,7 @@ export async function create_bonesfile(lev, bonesid, errbuf) {   // files.c:833
     file = fqname(file, BONESPREFIX, 0);
     nhfp = await new_nhfile();
     if (nhfp) {
-        nhfp.ftype = NHF_BONESFILE;
+        nhfp.ftype = NHF.BONESFILE;
         nhfp.mode = WRITING;
         nhfp.structlevel = 1;
         nhfp.fieldlevel = 0;
@@ -435,7 +435,7 @@ export async function open_bonesfile(lev, bonesid) {   // files.c:940
     if (nhfp) {
         nhfp.structlevel = 1;
         nhfp.fieldlevel = 0;
-        nhfp.ftype = NHF_BONESFILE;
+        nhfp.ftype = NHF.BONESFILE;
         nhfp.mode = READING;
         nhfp.addinfo = 1;
         nhfp.style.deflt = 1;
@@ -518,7 +518,7 @@ export async function create_savefile() {   // files.c:1159
     fq_save = fqname(new $c.Ptr(gs.SAVEF, 0), SAVEPREFIX, 0);
     nhfp = await new_nhfile();
     if (nhfp) {
-        nhfp.ftype = NHF_SAVEFILE;
+        nhfp.ftype = NHF.SAVEFILE;
         nhfp.mode = WRITING;
         if (program_state.in_self_recover || do_historical) {
             nhUse(do_historical);
@@ -543,7 +543,7 @@ export async function open_savefile() {   // files.c:1217
     fq_save = fqname(new $c.Ptr(gs.SAVEF, 0), SAVEPREFIX, 0);
     nhfp = await new_nhfile();
     if (nhfp) {
-        nhfp.ftype = NHF_SAVEFILE;
+        nhfp.ftype = NHF.SAVEFILE;
         nhfp.mode = READING;
         if (program_state.in_self_recover || do_historical) {
             do_historical = 1;
@@ -577,7 +577,7 @@ export async function restore_saved_game() {   // files.c:1270
     fq_save = fqname(new $c.Ptr(gs.SAVEF, 0), SAVEPREFIX, 0);
     await nh_uncompress(fq_save);
     if ((nhfp = await open_savefile()) !== null) {
-        if ((sfstatus = await validate(nhfp, fq_save, 0)) !== SF_UPTODATE) {
+        if ((sfstatus = await validate(nhfp, fq_save, 0)) !== SF.UPTODATE) {
             await close_nhfile(nhfp);
             nhfp = await problematic_savefile(sfstatus, fq_save);
         }
@@ -630,7 +630,7 @@ export async function plname_from_file(filename, without_wait_synch_per_file) { 
     }
     await nh_uncompress(new $c.Ptr(gs.SAVEF, 0));
     if ((nhfp = await open_savefile()) !== null) {
-        if ((sfstatus = await validate(nhfp, filename, without_wait_synch_per_file)) === SF_UPTODATE) {
+        if ((sfstatus = await validate(nhfp, filename, without_wait_synch_per_file)) === SF.UPTODATE) {
             ln = PL_NSIZ_PLUS;
             result = $c.asArr($c.__builtin___memset_chk(await alloc(ln), 0, ln, -1), Int8Array);
             await get_plname_from_file(nhfp, result, 0);
@@ -713,21 +713,21 @@ async function problematic_savefile(sfstatus, savefilenm) {   // files.c:2015
     let i = 0, nhfp = null;
     nhfp = null;
     switch (sfstatus) {
-        case SF_UPTODATE:
+        case SF.UPTODATE:
             break;
-        case SF_DM_IL32LLP64_ON_ILP32LL64:
-        case SF_DM_I32LP64_ON_ILP32LL64:
-        case SF_DM_ILP32LL64_ON_I32LP64:
-        case SF_DM_ILP32LL64_ON_IL32LLP64:
-        case SF_DM_I32LP64_ON_IL32LLP64:
-        case SF_DM_IL32LLP64_ON_I32LP64:
-        case SF_DM_MISMATCH:
-        case SF_OUTDATED:
-        case SF_CRITICAL_BYTE_COUNT_MISMATCH:
+        case SF.DM_IL32LLP64_ON_ILP32LL64:
+        case SF.DM_I32LP64_ON_ILP32LL64:
+        case SF.DM_ILP32LL64_ON_I32LP64:
+        case SF.DM_ILP32LL64_ON_IL32LLP64:
+        case SF.DM_I32LP64_ON_IL32LLP64:
+        case SF.DM_IL32LLP64_ON_I32LP64:
+        case SF.DM_MISMATCH:
+        case SF.OUTDATED:
+        case SF.CRITICAL_BYTE_COUNT_MISMATCH:
         default:
             for (i = 0; i < 10; i = i + 1 | 0) {
                 if (sf2msg[i].sfstatus === sfstatus) {
-                    await raw_printf($c.lit("\n%s is %s %s\n"), savefilenm, sfstatus === SF_OUTDATED ? $c.lit("an") : $c.lit("a"), sf2msg[i].msg);
+                    await raw_printf($c.lit("\n%s is %s %s\n"), savefilenm, sfstatus === SF.OUTDATED ? $c.lit("an") : $c.lit("a"), sf2msg[i].msg);
                     break;
                 }
             }
@@ -907,14 +907,14 @@ async function wizkit_addinv(obj) {   // files.c:2537
         return;
     }
     await observe_object(obj);
-    if (gu.urole.mnum === PM_CLERIC) {
+    if (gu.urole.mnum === PM.CLERIC) {
         obj.bknown = (1) & 1;
     }
     if (obj.oclass !== COIN_CLASS && inv_cnt(0) >= invlet_basic && !await merge_choice(gi.invent, obj)) {
         await add_to_migration(obj);
         obj.ox = 0;
         obj.oy = 1;
-        obj.owornmask = MIGR_WITH_HERO | MIGR_NOBREAK | MIGR_NOSCATTER;
+        obj.owornmask = MIGR.WITH_HERO | MIGR.NOBREAK | MIGR.NOSCATTER;
     } else {
         await addinv(obj);
     }
@@ -1214,7 +1214,7 @@ export async function read_tribute(tribsection, tribtitle, tribpassage, nowin_bu
                             if (matchedtitle && passagenum === targetpassage) {
                                 foundpassage = 1;
                                 if (!nowin_buf) {
-                                    tribwin = await create_nhwindow()(NHW_MENU);
+                                    tribwin = await create_nhwindow()(NHW.MENU);
                                     if (tribwin === WIN_ERR) {
                                         break cleanup$;
                                     }
@@ -1321,16 +1321,16 @@ export function $init() {
         sf2msg[$i0].$copyFrom(new $T.sfstatus_to_msg());
     }
     $c.init(sf2msg, [
-        { sfstatus: SF_UPTODATE, msg: $c.lit("everything matches") },
-        { sfstatus: SF_OUTDATED, msg: $c.lit("outdated savefile") },
-        { sfstatus: SF_CRITICAL_BYTE_COUNT_MISMATCH, msg: $c.lit("savefile critical byte-count mismatch") },
-        { sfstatus: SF_DM_IL32LLP64_ON_ILP32LL64, msg: $c.lit("Windows x64 savefile on x86") },
-        { sfstatus: SF_DM_I32LP64_ON_ILP32LL64, msg: $c.lit("Unix 64 savefile on x86") },
-        { sfstatus: SF_DM_ILP32LL64_ON_I32LP64, msg: $c.lit("x86 savefile on Unix 64") },
-        { sfstatus: SF_DM_ILP32LL64_ON_IL32LLP64, msg: $c.lit("x86 savefile on Windows x64") },
-        { sfstatus: SF_DM_I32LP64_ON_IL32LLP64, msg: $c.lit("Unix 64 savefile on Windows x64") },
-        { sfstatus: SF_DM_IL32LLP64_ON_I32LP64, msg: $c.lit("Windows x64 savefile on Unix 64") },
-        { sfstatus: SF_DM_MISMATCH, msg: $c.lit("generic savefile mismatch") }
+        { sfstatus: SF.UPTODATE, msg: $c.lit("everything matches") },
+        { sfstatus: SF.OUTDATED, msg: $c.lit("outdated savefile") },
+        { sfstatus: SF.CRITICAL_BYTE_COUNT_MISMATCH, msg: $c.lit("savefile critical byte-count mismatch") },
+        { sfstatus: SF.DM_IL32LLP64_ON_ILP32LL64, msg: $c.lit("Windows x64 savefile on x86") },
+        { sfstatus: SF.DM_I32LP64_ON_ILP32LL64, msg: $c.lit("Unix 64 savefile on x86") },
+        { sfstatus: SF.DM_ILP32LL64_ON_I32LP64, msg: $c.lit("x86 savefile on Unix 64") },
+        { sfstatus: SF.DM_ILP32LL64_ON_IL32LLP64, msg: $c.lit("x86 savefile on Windows x64") },
+        { sfstatus: SF.DM_I32LP64_ON_IL32LLP64, msg: $c.lit("Unix 64 savefile on Windows x64") },
+        { sfstatus: SF.DM_IL32LLP64_ON_I32LP64, msg: $c.lit("Windows x64 savefile on Unix 64") },
+        { sfstatus: SF.DM_MISMATCH, msg: $c.lit("generic savefile mismatch") }
     ]);
     cvtinit = 0;
     unconverted_filename = null;

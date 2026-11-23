@@ -4,6 +4,7 @@ import * as $T from './types.js';
 import { $G } from './globals.js';
 import { timet_to_seconds } from './allmain.js';
 import { alloc } from './alloc.js';
+import { A } from './attrib.h.js';
 import { rank_of, rank_to_xlev } from './botl.js';
 import { yyyymmdd } from './calendar.js';
 import { flags, gh, gi, gm, gt, gu, iflags, program_state, svd, svk, svm, svp, u, urealtime } from './decl.js';
@@ -14,13 +15,13 @@ import { fopen_datafile, lock_file, unlock_file } from './files.js';
 import { discover, wizard } from './flag.macros.js';
 import { BUFSZ, COLNO, FALSE, TRUE } from './global.h.js';
 import { money_cnt } from './hack.js';
-import { CORPSTAT_FEMALE, CORPSTAT_MALE, KILLED_BY, KILLED_BY_AN, NO_KILLER_PREFIX, ONAME_NO_FLAGS, PANICKED, SCOREPREFIX } from './hack.h.js';
+import { CORPSTAT, KILLED, NO_KILLER_PREFIX, ONAME_NO_FLAGS, PANICKED, SCOREPREFIX } from './hack.h.js';
 import { copynchars, digit, eos, highc, lcase, nh_snprintf, onlyspace, ordin, strNsubst, strsubst } from './hacklib.js';
 import { num_genocides, sokoban_in_play } from './insight.js';
 import { set_corpsenm } from './mkobj.js';
-import { PM_ARCHEOLOGIST, PM_HUMAN, PM_HUMAN_MUMMY, PM_RANGER, PM_WIZARD } from './monsters.h.js';
+import { PM } from './monsters.h.js';
 import { an } from './objnam.js';
-import { PATCHLEVEL, VERSION_MAJOR, VERSION_MINOR } from './patchlevel.h.js';
+import { PATCHLEVEL, VERSION } from './patchlevel.h.js';
 import { NON_PM } from './permonst.h.js';
 import { impossible, raw_printf } from './pline.js';
 import { rn2, rnd } from './rnd.js';
@@ -30,8 +31,8 @@ import { Strlen_ } from './strutil.js';
 import { sysopt } from './sys.js';
 import { hidden_gold } from './vault.js';
 import { create_nhwindow, destroy_nhwindow, display_nhwindow, putstr, raw_print, raw_print_bold } from './winprocs.macros.js';
-import { ATR_BOLD, ATR_NONE, NHW_TEXT, WIN_ERR } from './wintype.h.js';
-import { ACH_AMUL, ACH_ASTR, ACH_BELL, ACH_BGRM, ACH_BOOK, ACH_CNDL, ACH_ENDG, ACH_HELL, ACH_INVK, ACH_MEDU, ACH_MINE, ACH_MINE_PRIZE, ACH_NOVL, ACH_ORCL, ACH_RNK1, ACH_RNK2, ACH_RNK3, ACH_RNK4, ACH_RNK5, ACH_RNK6, ACH_RNK7, ACH_RNK8, ACH_SHOP, ACH_SOKO, ACH_SOKO_PRIZE, ACH_TMPL, ACH_TOWN, ACH_TUNE, ACH_UWIN, A_ORIGINAL } from './you.h.js';
+import { ATR, NHW, WIN_ERR } from './wintype.h.js';
+import { ACH } from './you.h.js';
 
 const NAMSZ = 10;
 const ROLESZ = 3;
@@ -57,9 +58,9 @@ export async function formatkiller(buf, siz, how, incl_helpless) {   // topten.c
             await impossible($c.lit("bad killer format? (%d)"), svk.killer.format);
         case NO_KILLER_PREFIX:
             break;
-        case KILLED_BY_AN:
+        case KILLED.BY_AN:
             kname = await an(kname);
-        case KILLED_BY:
+        case KILLED.BY:
             $c.__builtin___strncat_chk(buf, formatkiller$killed_by_prefix[how], siz - 1 >>> 0, -1);
             l = await Strlen_(buf, $c.lit("formatkiller"), 123);
             buf = buf.add(l), siz = siz - l >>> 0;
@@ -91,14 +92,14 @@ async function topten_print(x) {   // topten.c:165
     if (gt.toptenwin === WIN_ERR) {
         await raw_print()(x);
     } else {
-        await putstr()(gt.toptenwin, ATR_NONE, x);
+        await putstr()(gt.toptenwin, ATR.NONE, x);
     }
 }
 async function topten_print_bold(x) {   // topten.c:174
     if (gt.toptenwin === WIN_ERR) {
         await raw_print_bold()(x);
     } else {
-        await putstr()(gt.toptenwin, ATR_BOLD, x);
+        await putstr()(gt.toptenwin, ATR.BOLD, x);
     }
 }
 export function observable_depth(lev) {   // topten.c:183
@@ -183,7 +184,7 @@ async function writexlentry(rfile, tt, how) {   // topten.c:340
     $c.fprintf(rfile, $c.lit("%cachieveX=%s"), 9, encode_extended_achievements(new $c.Ptr(achbuf, 0)));
     $c.fprintf(rfile, $c.lit("%cconductX=%s"), 9, await encode_extended_conducts(new $c.Ptr(buf, 0)));
     $c.fprintf(rfile, $c.lit("%crealtime=%ld%cstarttime=%ld%cendtime=%ld"), 9, urealtime.realtime, 9, timet_to_seconds($G.ubirthday), 9, timet_to_seconds(urealtime.finish_time));
-    $c.fprintf(rfile, $c.lit("%cgender0=%s%calign0=%s"), 9, genders[flags.initgend].filecode, 9, aligns[1 - u.ualignbase[A_ORIGINAL] | 0].filecode);
+    $c.fprintf(rfile, $c.lit("%cgender0=%s%calign0=%s"), 9, genders[flags.initgend].filecode, 9, aligns[1 - u.ualignbase[A.ORIGINAL] | 0].filecode);
     $c.fprintf(rfile, $c.lit("%cflags=0x%lx"), 9, encodexlogflags());
     $c.fprintf(rfile, $c.lit("%cgold=%ld"), 9, $c.add64(money_cnt(gi.invent), hidden_gold(TRUE)));
     $c.fprintf(rfile, $c.lit("%cwish_cnt=%ld"), 9, u.uconduct.wishes);
@@ -284,78 +285,78 @@ function encode_extended_achievements(buf) {   // topten.c:491
         achidx = u.uachieved[i];
         absidx = $c.abs(achidx);
         switch (absidx) {
-            case ACH_UWIN:
+            case ACH.UWIN:
                 achievement = $c.lit("ascended");
                 break;
-            case ACH_ASTR:
+            case ACH.ASTR:
                 achievement = $c.lit("entered_astral_plane");
                 break;
-            case ACH_ENDG:
+            case ACH.ENDG:
                 achievement = $c.lit("entered_elemental_planes");
                 break;
-            case ACH_AMUL:
+            case ACH.AMUL:
                 achievement = $c.lit("obtained_the_amulet_of_yendor");
                 break;
-            case ACH_INVK:
+            case ACH.INVK:
                 achievement = $c.lit("performed_the_invocation_ritual");
                 break;
-            case ACH_BOOK:
+            case ACH.BOOK:
                 achievement = $c.lit("obtained_the_book_of_the_dead");
                 break;
-            case ACH_BELL:
+            case ACH.BELL:
                 achievement = $c.lit("obtained_the_bell_of_opening");
                 break;
-            case ACH_CNDL:
+            case ACH.CNDL:
                 achievement = $c.lit("obtained_the_candelabrum_of_invocation");
                 break;
-            case ACH_HELL:
+            case ACH.HELL:
                 achievement = $c.lit("entered_gehennom");
                 break;
-            case ACH_MEDU:
+            case ACH.MEDU:
                 achievement = $c.lit("defeated_medusa");
                 break;
-            case ACH_MINE_PRIZE:
+            case ACH.MINE_PRIZE:
                 achievement = $c.lit("obtained_the_luckstone_from_the_mines");
                 break;
-            case ACH_SOKO_PRIZE:
+            case ACH.SOKO_PRIZE:
                 achievement = $c.lit("obtained_the_sokoban_prize");
                 break;
-            case ACH_ORCL:
+            case ACH.ORCL:
                 achievement = $c.lit("consulted_the_oracle");
                 break;
-            case ACH_NOVL:
+            case ACH.NOVL:
                 achievement = $c.lit("read_a_discworld_novel");
                 break;
-            case ACH_MINE:
+            case ACH.MINE:
                 achievement = $c.lit("entered_the_gnomish_mines");
                 break;
-            case ACH_TOWN:
+            case ACH.TOWN:
                 achievement = $c.lit("entered_mine_town");
                 break;
-            case ACH_SHOP:
+            case ACH.SHOP:
                 achievement = $c.lit("entered_a_shop");
                 break;
-            case ACH_TMPL:
+            case ACH.TMPL:
                 achievement = $c.lit("entered_a_temple");
                 break;
-            case ACH_SOKO:
+            case ACH.SOKO:
                 achievement = $c.lit("entered_sokoban");
                 break;
-            case ACH_BGRM:
+            case ACH.BGRM:
                 achievement = $c.lit("entered_bigroom");
                 break;
-            case ACH_TUNE:
+            case ACH.TUNE:
                 achievement = $c.lit("learned_castle_drawbridge_tune");
                 break;
-            case ACH_RNK1:
-            case ACH_RNK2:
-            case ACH_RNK3:
-            case ACH_RNK4:
-            case ACH_RNK5:
-            case ACH_RNK6:
-            case ACH_RNK7:
-            case ACH_RNK8:
-                $c.__builtin___sprintf_chk(new $c.Ptr(rnkbuf, 0), 0, 40, $c.lit("attained_the_rank_of_%s"), rank_of(rank_to_xlev(absidx - (ACH_RNK1 - 1) | 0), gu.urole.mnum, $c.i8(achidx < 0 ? TRUE : FALSE)));
+            case ACH.RNK1:
+            case ACH.RNK2:
+            case ACH.RNK3:
+            case ACH.RNK4:
+            case ACH.RNK5:
+            case ACH.RNK6:
+            case ACH.RNK7:
+            case ACH.RNK8:
+                $c.__builtin___sprintf_chk(new $c.Ptr(rnkbuf, 0), 0, 40, $c.lit("attained_the_rank_of_%s"), rank_of(rank_to_xlev(absidx - (ACH.RNK1 - 1) | 0), gu.urole.mnum, $c.i8(achidx < 0 ? TRUE : FALSE)));
                 strNsubst(new $c.Ptr(rnkbuf, 0), $c.lit(" "), $c.lit("_"), 0);
                 achievement = lcase(new $c.Ptr(rnkbuf, 0));
                 break;
@@ -415,13 +416,13 @@ export async function topten(how, when) {   // topten.c:628
                 return;
             }
             if (iflags.toptenwin) {
-                $t1 = await create_nhwindow()(NHW_TEXT), gt.toptenwin = $t1;
+                $t1 = await create_nhwindow()(NHW.TEXT), gt.toptenwin = $t1;
             }
             t0_used = FALSE;
             t0 = await newttentry();
             t0.$copyFrom(zerott);
-            t0.ver_major = VERSION_MAJOR;
-            t0.ver_minor = VERSION_MINOR;
+            t0.ver_major = VERSION.MAJOR;
+            t0.ver_minor = VERSION.MINOR;
             t0.patchlevel = PATCHLEVEL;
             t0.points = u.urexp;
             t0.deathdnum = u.uz.dnum;
@@ -776,7 +777,7 @@ async function outentry(rank, t1, so) {   // topten.c:946
 }
 async function score_wanted(current_ver, rank, t1, playerct, players, uid) {   // topten.c:1112
     let arg = null, nxt = null, i = 0;
-    if (current_ver && (t1.ver_major !== VERSION_MAJOR || t1.ver_minor !== VERSION_MINOR || t1.patchlevel !== PATCHLEVEL)) {
+    if (current_ver && (t1.ver_major !== VERSION.MAJOR || t1.ver_minor !== VERSION.MINOR || t1.patchlevel !== PATCHLEVEL)) {
         return 0;
     }
     if (sysopt.pers_is_uid && !playerct && t1.uid === uid) {
@@ -921,15 +922,15 @@ async function classmon(plch) {   // topten.c:1356
             if (roles[i].mnum !== NON_PM) {
                 return roles[i].mnum;
             } else {
-                return PM_HUMAN;
+                return PM.HUMAN;
             }
         }
     }
     if (!$c.strcmp(plch, $c.lit("E"))) {
-        return PM_RANGER;
+        return PM.RANGER;
     }
     await impossible($c.lit("What weird role is this? (%s)"), plch);
-    return PM_HUMAN_MUMMY;
+    return PM.HUMAN_MUMMY;
 }
 export async function get_rnd_toptenentry() {   // topten.c:1381
     let rank = 0, i = 0, rfile = null, tt = null;
@@ -971,9 +972,9 @@ export async function tt_oname(otmp) {   // topten.c:1422
     }
     await set_corpsenm(otmp, await classmon(new $c.Ptr(tt.plrole, 0)));
     if (tt.plgend[0] === 70) {
-        otmp.spe = CORPSTAT_FEMALE;
+        otmp.spe = CORPSTAT.FEMALE;
     } else if (tt.plgend[0] === 77) {
-        otmp.spe = CORPSTAT_MALE;
+        otmp.spe = CORPSTAT.MALE;
     }
     otmp = await oname(otmp, new $c.Ptr(tt.name, 0), ONAME_NO_FLAGS);
     return otmp;
@@ -982,7 +983,7 @@ export async function tt_doppel(mon) {   // topten.c:1445
     let tt = null, ret = 0;
     tt = rn2(13) ? await get_rnd_toptenentry() : null;
     if (!tt) {
-        ret = rn2(PM_WIZARD - PM_ARCHEOLOGIST + 1) + PM_ARCHEOLOGIST | 0;
+        ret = rn2(PM.WIZARD - PM.ARCHEOLOGIST + 1) + PM.ARCHEOLOGIST | 0;
     } else {
         if (tt.plgend[0] === 70) {
             mon.female = (1) & 1;

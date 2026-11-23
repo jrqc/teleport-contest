@@ -22,13 +22,13 @@ import { def_char_to_monclass, def_char_to_objclass, def_oc_syms, def_warnsyms }
 import { on_level } from './dungeon.js';
 import { nh_terminate, panic } from './end.js';
 import { do_deferred_showpaths, nh_basename, read_sym_file } from './files.js';
-import { AUTOUNLOCK_APPLY_KEY, AUTOUNLOCK_FORCE, AUTOUNLOCK_KICK, AUTOUNLOCK_UNTRAP, DISCLOSE_NO_WITHOUT_PROMPT, DISCLOSE_PROMPT_DEFAULT_NO, DISCLOSE_PROMPT_DEFAULT_SPECIAL, DISCLOSE_PROMPT_DEFAULT_YES, DISCLOSE_SPECIAL_WITHOUT_PROMPT, DISCLOSE_YES_WITHOUT_PROMPT, GFILTER_AREA, GFILTER_NONE, GFILTER_VIEW, GPCOORDS_COMFULL, GPCOORDS_COMPASS, GPCOORDS_MAP, GPCOORDS_NONE, GPCOORDS_SCREEN, NUM_DISCLOSURE_OPTIONS, PARANOID_AUTOALL, PARANOID_BONES, PARANOID_BREAKWAND, PARANOID_CONFIRM, PARANOID_DIE, PARANOID_EATING, PARANOID_HIT, PARANOID_PRAY, PARANOID_QUIT, PARANOID_REMOVE, PARANOID_SWIM, PARANOID_TRAP, PARANOID_WERECHANGE, RUN_CRAWL, RUN_LEAP, RUN_STEP, RUN_TPORT, VI_BRANCH, VI_NAME, VI_NUMBER, WC_COUNT, wcolor_menu, wcolor_message, wcolor_status, wcolor_text } from './flag.h.js';
+import { AUTOUNLOCK, DISCLOSE_NO_WITHOUT_PROMPT, DISCLOSE_PROMPT_DEFAULT_NO, DISCLOSE_PROMPT_DEFAULT_SPECIAL, DISCLOSE_PROMPT_DEFAULT_YES, DISCLOSE_SPECIAL_WITHOUT_PROMPT, DISCLOSE_YES_WITHOUT_PROMPT, GFILTER_AREA, GFILTER_NONE, GFILTER_VIEW, GPCOORDS_COMFULL, GPCOORDS_COMPASS, GPCOORDS_MAP, GPCOORDS_NONE, GPCOORDS_SCREEN, NUM_DISCLOSURE_OPTIONS, PARANOID, RUN, VI, WC_COUNT, wcolor_menu, wcolor_message, wcolor_status, wcolor_text } from './flag.h.js';
 import { discover, wizard } from './flag.macros.js';
-import { BUFSZ, COLNO, FALSE, LARGEST_INT, OPTCOUNT, PL_CSIZ, PL_FSIZ, PL_NSIZ, PL_PSIZ, ROWNO, TRUE, builtin_opt, cmdline_opt, environ_opt, num_opt_phases, opt_in, opt_out, play_opt, set_gameview, set_hidden, set_in_config, set_in_game, set_in_sysconf, set_wiznofuz, set_wizonly, syscf_opt } from './global.h.js';
+import { BUFSZ, COLNO, FALSE, LARGEST_INT, OPTCOUNT, PL, ROWNO, TRUE, builtin_opt, cmdline_opt, environ_opt, num_opt_phases, opt_in, opt_out, play_opt, set_gameview, set_hidden, set_in_config, set_in_game, set_in_sysconf, set_wiznofuz, set_wizonly, syscf_opt } from './global.h.js';
 import { C, M, SET__IS_VALUE_VALID } from './global.macros.js';
 import { apply_customizations, fill_glyphid_cache, free_glyphid_cache, glyphid_cache_status, glyphrep_to_custom_map_entries, reset_customcolors } from './glyphs.js';
 import { classify_terrain } from './hack.js';
-import { ECMD_FAIL, ECMD_OK, EXT_ENCUMBER, HVY_ENCUMBER, MAX_MENU_MAPPED_CMDS, MENUTYPELEN, MENU_COMBINATION, MENU_FULL, MENU_PARTIAL, MENU_TRADITIONAL, MOD_ENCUMBER, MSGTYP_NOREP, MSGTYP_NORMAL, MSGTYP_NOSHOW, MSGTYP_STOP, OVERLOADED, SLT_ENCUMBER, SYM_OFF_O, SYM_OFF_X, UNENCUMBERED, VANQ_MLVL_MNDX, WINTYPELEN } from './hack.h.js';
+import { ECMD, EXT_ENCUMBER, HVY_ENCUMBER, MAX_MENU_MAPPED_CMDS, MENUTYPELEN, MOD_ENCUMBER, MSGTYP, OVERLOADED, SLT_ENCUMBER, SYM_OFF_O, SYM_OFF_X, UNENCUMBERED, VANQ, WINTYPELEN } from './hack.h.js';
 import { copynchars, digit, eos, fuzzymatch, highc, letter, lowc, mungspaces, nh_snprintf, strNsubst, str_end_is, str_start_is, strkitten, strncmpi, strstri, strsubst, trimspaces, visctrl } from './hacklib.js';
 import { set_vanq_order, vanqorders } from './insight.js';
 import { reassign, update_inventory } from './invent.js';
@@ -40,7 +40,7 @@ import { newfruit } from './objclass.macros.js';
 import { obj_descr, objects } from './objects.js';
 import { BOULDER, SLIME_MOLD } from './objects.h.js';
 import { fruit_from_name, makeplural, makesingular } from './objnam.js';
-import { BoolOpt, CompOpt, No, Off, On, OptS_Advanced, OptS_Behavior, OptS_General, OptS_Map, OptS_Status, OthrOpt, Term_Excluded, Term_False, Term_Off, Yes, num_terms, opt_BIOS, opt_DECgraphics, opt_IBMgraphics, opt_accessiblemsg, opt_acoustics, opt_align_message, opt_align_status, opt_alignment, opt_altkeyhandling, opt_altmeta, opt_armorstatus, opt_ascii_map, opt_autodescribe, opt_autodig, opt_autoopen, opt_autopickup, opt_autoquiver, opt_autounlock, opt_bgcolors, opt_blind, opt_bones, opt_boulder, opt_catname, opt_checkpoint, opt_cmdassist, opt_color, opt_confirm, opt_crash_email, opt_crash_name, opt_crash_urlmax, opt_customcolors, opt_customsymbols, opt_dark_room, opt_deaf, opt_debug_hunger, opt_debug_mongen, opt_debug_overwrite_stairs, opt_disclose, opt_dogname, opt_dropped_nopick, opt_dungeon, opt_effects, opt_eight_bit_tty, opt_extmenu, opt_female, opt_fireassist, opt_fixinv, opt_font_map, opt_font_menu, opt_font_message, opt_font_size_map, opt_font_size_menu, opt_font_size_message, opt_font_size_status, opt_font_size_text, opt_font_status, opt_font_text, opt_force_invmenu, opt_fruit, opt_fullscreen, opt_gender, opt_glyph, opt_goldX, opt_guicolor, opt_help, opt_herecmd_menu, opt_hilite_pet, opt_hilite_pile, opt_hilite_status, opt_hitpointbar, opt_horsename, opt_idlecheckpoint, opt_ignintr, opt_implicit_uncursed, opt_legacy, opt_lit_corridor, opt_lootabc, opt_mail, opt_map_mode, opt_mention_decor, opt_mention_map, opt_mention_walls, opt_menu_deselect_all, opt_menu_deselect_page, opt_menu_first_page, opt_menu_headings, opt_menu_invert_all, opt_menu_invert_page, opt_menu_last_page, opt_menu_next_page, opt_menu_objsyms, opt_menu_overlay, opt_menu_previous_page, opt_menu_search, opt_menu_select_all, opt_menu_select_page, opt_menu_shift_left, opt_menu_shift_right, opt_menu_tab_sep, opt_menucolors, opt_menuinvertmode, opt_menustyle, opt_mon_movement, opt_monpolycontrol, opt_monsters, opt_montelecontrol, opt_mouse_support, opt_msg_window, opt_msghistory, opt_name, opt_news, opt_nudist, opt_null, opt_number_pad, opt_o_autocomplete, opt_o_autopickup_exceptions, opt_o_bind_keys, opt_o_menu_colors, opt_o_message_types, opt_o_status_cond, opt_o_status_hilites, opt_objects, opt_packorder, opt_paranoid_confirmation, opt_pauper, opt_perm_invent, opt_perminv_mode, opt_petattr, opt_pettype, opt_pickup_burden, opt_pickup_stolen, opt_pickup_thrown, opt_pickup_types, opt_pile_limit, opt_player_selection, opt_playmode, opt_popup_dialog, opt_preload_tiles, opt_price_quotes, opt_pushweapon, opt_query_menu, opt_quick_farsight, opt_race, opt_rawio, opt_reroll, opt_rest_on_space, opt_roguesymset, opt_role, opt_runmode, opt_safe_pet, opt_safe_wait, opt_sanity_check, opt_scores, opt_scroll_amount, opt_scroll_margin, opt_selectsaved, opt_showdamage, opt_showexp, opt_showrace, opt_showscore, opt_showvers, opt_silent, opt_softkeyboard, opt_sortdiscoveries, opt_sortloot, opt_sortpack, opt_sortvanquished, opt_soundlib, opt_sounds, opt_sparkle, opt_splash_screen, opt_spot_monsters, opt_standout, opt_status_updates, opt_statushilites, opt_statuslines, opt_suppress_alert, opt_symset, opt_term_cols, opt_term_rows, opt_terrainstatus, opt_tile_file, opt_tile_height, opt_tile_width, opt_tiled_map, opt_time, opt_timed_delay, opt_tips, opt_tombstone, opt_toptenwin, opt_traps, opt_travel, opt_travel_debug, opt_tutorial, opt_use_darkgray, opt_use_inverse, opt_use_truecolor, opt_vary_msgcount, opt_verbose, opt_versinfo, opt_voices, opt_vt_sounddata, opt_vt_tiledata, opt_warnings, opt_weaponstatus, opt_whatis_coord, opt_whatis_filter, opt_whatis_menu, opt_whatis_moveskip, opt_windowborders, opt_windowcolors, opt_windowtype, opt_wizmgender, opt_wizweight, opt_wraptext, pfx_cond_, pfx_font } from './optlist.h.js';
+import { BoolOpt, CompOpt, No, Off, On, OptS, OthrOpt, Term, Yes, num_terms, opt_BIOS, opt_DECgraphics, opt_IBMgraphics, opt_accessiblemsg, opt_acoustics, opt_align_message, opt_align_status, opt_alignment, opt_altkeyhandling, opt_altmeta, opt_armorstatus, opt_ascii_map, opt_autodescribe, opt_autodig, opt_autoopen, opt_autopickup, opt_autoquiver, opt_autounlock, opt_bgcolors, opt_blind, opt_bones, opt_boulder, opt_catname, opt_checkpoint, opt_cmdassist, opt_color, opt_confirm, opt_crash_email, opt_crash_name, opt_crash_urlmax, opt_customcolors, opt_customsymbols, opt_dark_room, opt_deaf, opt_debug_hunger, opt_debug_mongen, opt_debug_overwrite_stairs, opt_disclose, opt_dogname, opt_dropped_nopick, opt_dungeon, opt_effects, opt_eight_bit_tty, opt_extmenu, opt_female, opt_fireassist, opt_fixinv, opt_font_map, opt_font_menu, opt_font_message, opt_font_size_map, opt_font_size_menu, opt_font_size_message, opt_font_size_status, opt_font_size_text, opt_font_status, opt_font_text, opt_force_invmenu, opt_fruit, opt_fullscreen, opt_gender, opt_glyph, opt_goldX, opt_guicolor, opt_help, opt_herecmd_menu, opt_hilite_pet, opt_hilite_pile, opt_hilite_status, opt_hitpointbar, opt_horsename, opt_idlecheckpoint, opt_ignintr, opt_implicit_uncursed, opt_legacy, opt_lit_corridor, opt_lootabc, opt_mail, opt_map_mode, opt_mention_decor, opt_mention_map, opt_mention_walls, opt_menu_deselect_all, opt_menu_deselect_page, opt_menu_first_page, opt_menu_headings, opt_menu_invert_all, opt_menu_invert_page, opt_menu_last_page, opt_menu_next_page, opt_menu_objsyms, opt_menu_overlay, opt_menu_previous_page, opt_menu_search, opt_menu_select_all, opt_menu_select_page, opt_menu_shift_left, opt_menu_shift_right, opt_menu_tab_sep, opt_menucolors, opt_menuinvertmode, opt_menustyle, opt_mon_movement, opt_monpolycontrol, opt_monsters, opt_montelecontrol, opt_mouse_support, opt_msg_window, opt_msghistory, opt_name, opt_news, opt_nudist, opt_null, opt_number_pad, opt_o_autocomplete, opt_o_autopickup_exceptions, opt_o_bind_keys, opt_o_menu_colors, opt_o_message_types, opt_o_status_cond, opt_o_status_hilites, opt_objects, opt_packorder, opt_paranoid_confirmation, opt_pauper, opt_perm_invent, opt_perminv_mode, opt_petattr, opt_pettype, opt_pickup_burden, opt_pickup_stolen, opt_pickup_thrown, opt_pickup_types, opt_pile_limit, opt_player_selection, opt_playmode, opt_popup_dialog, opt_preload_tiles, opt_price_quotes, opt_pushweapon, opt_query_menu, opt_quick_farsight, opt_race, opt_rawio, opt_reroll, opt_rest_on_space, opt_roguesymset, opt_role, opt_runmode, opt_safe_pet, opt_safe_wait, opt_sanity_check, opt_scores, opt_scroll_amount, opt_scroll_margin, opt_selectsaved, opt_showdamage, opt_showexp, opt_showrace, opt_showscore, opt_showvers, opt_silent, opt_softkeyboard, opt_sortdiscoveries, opt_sortloot, opt_sortpack, opt_sortvanquished, opt_soundlib, opt_sounds, opt_sparkle, opt_splash_screen, opt_spot_monsters, opt_standout, opt_status_updates, opt_statushilites, opt_statuslines, opt_suppress_alert, opt_symset, opt_term_cols, opt_term_rows, opt_terrainstatus, opt_tile_file, opt_tile_height, opt_tile_width, opt_tiled_map, opt_time, opt_timed_delay, opt_tips, opt_tombstone, opt_toptenwin, opt_traps, opt_travel, opt_travel_debug, opt_tutorial, opt_use_darkgray, opt_use_inverse, opt_use_truecolor, opt_vary_msgcount, opt_verbose, opt_versinfo, opt_voices, opt_vt_sounddata, opt_vt_tiledata, opt_warnings, opt_weaponstatus, opt_whatis_coord, opt_whatis_filter, opt_whatis_menu, opt_whatis_moveskip, opt_windowborders, opt_windowcolors, opt_windowtype, opt_wizmgender, opt_wizweight, opt_wraptext, pfx_cond_, pfx_font } from './optlist.h.js';
 import { LOW_PM, NUMMONS } from './permonst.h.js';
 import { You_cant, impossible, pline, raw_printf } from './pline.js';
 import { regex_compile, regex_error_desc, regex_free, regex_init, regex_match } from './posixregex.js';
@@ -50,16 +50,16 @@ import { aligns, clearrolefilter, genders, races, rolefilterstring, roles, setro
 import { sf_init } from './sfbase.js';
 import { assign_soundlib, get_soundlib_name, soundlib_id_from_opt } from './sounds.js';
 import { Strlen_, strbuf_append, strbuf_init } from './strutil.js';
-import { MAXDCHARS, MAXECHARS, MAXMCLASSES, MAXTCHARS, NUM_GRAPHICS, PRIMARYSET, ROGUESET, SYM_BOULDER, WARNCOUNT, do_custom_colors, do_custom_symbols } from './sym.h.js';
+import { MAXDCHARS, MAXECHARS, MAXMCLASSES, MAXTCHARS, NUM_GRAPHICS, PRIMARYSET, ROGUESET, SYM, WARNCOUNT, do_custom_colors, do_custom_symbols } from './sym.h.js';
 import { assign_graphics, clear_symsetentry, do_symset, get_othersym, init_ov_primary_symbols, init_ov_rogue_symbols, init_rogue_symbols, init_symbols, known_handling, load_symset, parsesymbols, savedsym_strbuf, switch_symbols } from './symbols.js';
 import { authorize_explore_mode, authorize_wizard_mode } from './unixmain.js';
 import { reset_customsymbols } from './utf8map.js';
 import { get_current_feature_ver, get_feature_notice_ver, status_version } from './version.js';
 import { vision_recalc } from './vision.js';
 import { add_menu, add_menu_heading, add_menu_str, adjust_menu_promptstyle, choose_classes_menu, choose_windows, getlin, select_menu, windowprocs } from './windows.js';
-import { ALIGN_BOTTOM, ALIGN_LEFT, ALIGN_RIGHT, ALIGN_TOP, MAP_MODE_ASCII10x18, MAP_MODE_ASCII12x16, MAP_MODE_ASCII16x12, MAP_MODE_ASCII16x8, MAP_MODE_ASCII4x6, MAP_MODE_ASCII6x8, MAP_MODE_ASCII7x12, MAP_MODE_ASCII8x12, MAP_MODE_ASCII8x8, MAP_MODE_ASCII_FIT_TO_SCREEN, MAP_MODE_TILES, MAP_MODE_TILES_FIT_TO_SCREEN, RS_ALGNMNT, RS_GENDER, RS_RACE, RS_ROLE, RS_filter, VIA_DIALOG, VIA_PROMPTS, WC2_DARKGRAY, WC2_EXTRASTATUS, WC2_FULLSCREEN, WC2_GUICOLOR, WC2_HILITE_STATUS, WC2_HITPOINTBAR, WC2_MENU_SHIFT, WC2_PETATTR, WC2_SOFTKEYBOARD, WC2_STATUSLINES, WC2_TERM_SIZE, WC2_WINDOWBORDERS, WC2_WRAPTEXT, WC_ALIGN_MESSAGE, WC_ALIGN_STATUS, WC_ASCII_MAP, WC_COLOR, WC_EIGHT_BIT_IN, WC_FONTSIZ_MAP, WC_FONTSIZ_MENU, WC_FONTSIZ_MESSAGE, WC_FONTSIZ_STATUS, WC_FONTSIZ_TEXT, WC_FONT_MAP, WC_FONT_MENU, WC_FONT_MESSAGE, WC_FONT_STATUS, WC_FONT_TEXT, WC_HILITE_PET, WC_INVERSE, WC_MAP_MODE, WC_PERM_INVENT, WC_PLAYER_SELECTION, WC_POPUP_DIALOG, WC_PRELOAD_TILES, WC_SCROLL_AMOUNT, WC_SCROLL_MARGIN, WC_SPLASH_SCREEN, WC_TILED_MAP, WC_TILE_FILE, WC_TILE_HEIGHT, WC_TILE_WIDTH, WC_VARY_MSGCOUNT, WC_WINDOWCOLORS, wp_curses, wp_tty } from './winprocs.h.js';
+import { ALIGN, MAP_MODE, RS, VIA, WC, WC2, WC2_EXTRASTATUS, wp_curses, wp_tty } from './winprocs.h.js';
 import { create_nhwindow, destroy_nhwindow, display_file, display_nhwindow, end_menu, number_pad, preference_update, putstr, start_menu, wait_synch } from './winprocs.macros.js';
-import { ATR_INVERSE, ATR_NONE, InvOptInUse, InvOptNone, InvOptOn, InvSparse, MENU_BEHAVE_STANDARD, MENU_FIRST_PAGE, MENU_INVERT_ALL, MENU_INVERT_PAGE, MENU_ITEMFLAGS_NONE, MENU_ITEMFLAGS_SELECTED, MENU_ITEMFLAGS_SKIPINVERT, MENU_LAST_PAGE, MENU_NEXT_PAGE, MENU_PREVIOUS_PAGE, MENU_SEARCH, MENU_SELECT_ALL, MENU_SELECT_PAGE, MENU_SHIFT_LEFT, MENU_SHIFT_RIGHT, MENU_UNSELECT_ALL, MENU_UNSELECT_PAGE, NHW_MENU, NHW_TEXT, PICK_ANY, PICK_NONE, PICK_ONE } from './wintype.h.js';
+import { ATR, InvOptInUse, InvOptNone, InvOptOn, InvSparse, MENU, MENU_FIRST_PAGE, MENU_INVERT_ALL, MENU_INVERT_PAGE, MENU_LAST_PAGE, MENU_NEXT_PAGE, MENU_PREVIOUS_PAGE, MENU_SEARCH, MENU_SELECT_ALL, MENU_SELECT_PAGE, MENU_SHIFT_LEFT, MENU_SHIFT_RIGHT, MENU_UNSELECT_ALL, MENU_UNSELECT_PAGE, NHW, PICK } from './wintype.h.js';
 import { ROLE_NONE, ROLE_RANDOM } from './you.h.js';
 
 const PILE_LIMIT_DFLT = 5;
@@ -157,20 +157,20 @@ export async function ask_do_tutorial() {   // options.c:430
         norc = $c.i8(!$c.strcmp(get_configfile(), $c.lit("/dev/null")) ? 1 : 0);
         nh_snprintf($c.lit("ask_do_tutorial"), 447, new $c.Ptr(buf, 0), 256, $c.lit("Put \"OPTIONS=!tutorial\" in %s to skip this query."), rc && rc.get(0) && !norc ? rc : $c.lit("your configuration file"));
         do {
-            win = await create_nhwindow()(NHW_MENU);
-            await start_menu()(win, MENU_BEHAVE_STANDARD);
+            win = await create_nhwindow()(NHW.MENU);
+            await start_menu()(win, MENU.BEHAVE_STANDARD);
             any.$copyFrom(cg.zeroany);
             any.a_char = 121;
-            await add_menu(win, nul_glyphinfo, any, any.a_char, 0, ATR_NONE, NO_COLOR, $c.lit("Yes, do a tutorial"), MENU_ITEMFLAGS_NONE);
+            await add_menu(win, nul_glyphinfo, any, any.a_char, 0, ATR.NONE, NO_COLOR, $c.lit("Yes, do a tutorial"), MENU.ITEMFLAGS_NONE);
             any.a_char = 110;
-            await add_menu(win, nul_glyphinfo, any, any.a_char, 0, ATR_NONE, NO_COLOR, $c.lit("No, just start play"), MENU_ITEMFLAGS_NONE);
+            await add_menu(win, nul_glyphinfo, any, any.a_char, 0, ATR.NONE, NO_COLOR, $c.lit("No, just start play"), MENU.ITEMFLAGS_NONE);
             await add_menu_str(win, $c.lit(""));
             await add_menu_str(win, new $c.Ptr(buf, 0));
             if ($t1 = pass, pass = $t1 + 1 | 0, $t1) {
                 await add_menu_str(win, $c.lit("(Please choose 'y' or 'n'.)"));
             }
             await end_menu()(win, $c.lit("Do you want a tutorial?"));
-            n = await select_menu(win, PICK_ONE, new $c.Ptr(sel, 0));
+            n = await select_menu(win, PICK.ONE, new $c.Ptr(sel, 0));
             await destroy_nhwindow()(win);
         } while (!n);
         if (n > 0) {
@@ -389,7 +389,7 @@ function petname_optfn(optidx, req, negated, opts, op) {   // options.c:848
         if (negated || !$c.strcmp(op, $c.lit("none")) || !$c.strcmp(op, new $c.Ptr(none, 0))) {
             op = new $c.Ptr(empty_optstr, 0);
         }
-        nmcpy(petname, op, PL_PSIZ);
+        nmcpy(petname, op, PL.PSIZ);
         sanitize_name(petname);
     } else if (req === get_val || req === get_cnf_val) {
         failsafe[0] = 0;
@@ -436,13 +436,13 @@ async function optfn_align_message(optidx, req, negated, opts, op) {   // option
         op = await string_for_opt(opts, negated);
         if (!$c.peq(op, new $c.Ptr(empty_optstr, 0)) && !negated) {
             if (!strncmpi(op, $c.lit("left"), 4)) {
-                iflags.wc_align_message = ALIGN_LEFT;
+                iflags.wc_align_message = ALIGN.LEFT;
             } else if (!strncmpi(op, $c.lit("top"), 3)) {
-                iflags.wc_align_message = ALIGN_TOP;
+                iflags.wc_align_message = ALIGN.TOP;
             } else if (!strncmpi(op, $c.lit("right"), 5)) {
-                iflags.wc_align_message = ALIGN_RIGHT;
+                iflags.wc_align_message = ALIGN.RIGHT;
             } else if (!strncmpi(op, $c.lit("bottom"), 6)) {
-                iflags.wc_align_message = ALIGN_BOTTOM;
+                iflags.wc_align_message = ALIGN.BOTTOM;
             } else {
                 await config_error_add($c.lit("Unknown %s parameter '%s'"), allopt[optidx].name, op);
                 return optn_err;
@@ -455,7 +455,7 @@ async function optfn_align_message(optidx, req, negated, opts, op) {   // option
     }
     if (req === get_val || req === get_cnf_val) {
         which = iflags.wc_align_message;
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), which === ALIGN_TOP ? $c.lit("top") : which === ALIGN_LEFT ? $c.lit("left") : which === ALIGN_BOTTOM ? $c.lit("bottom") : which === ALIGN_RIGHT ? $c.lit("right") : new $c.Ptr(defopt, 0));
+        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), which === ALIGN.TOP ? $c.lit("top") : which === ALIGN.LEFT ? $c.lit("left") : which === ALIGN.BOTTOM ? $c.lit("bottom") : which === ALIGN.RIGHT ? $c.lit("right") : new $c.Ptr(defopt, 0));
         return optn_ok;
     }
     if (req === do_handler) {
@@ -472,13 +472,13 @@ async function optfn_align_status(optidx, req, negated, opts, op) {   // options
         op = await string_for_opt(opts, negated);
         if (!$c.peq(op, new $c.Ptr(empty_optstr, 0)) && !negated) {
             if (!strncmpi(op, $c.lit("left"), 4)) {
-                iflags.wc_align_status = ALIGN_LEFT;
+                iflags.wc_align_status = ALIGN.LEFT;
             } else if (!strncmpi(op, $c.lit("top"), 3)) {
-                iflags.wc_align_status = ALIGN_TOP;
+                iflags.wc_align_status = ALIGN.TOP;
             } else if (!strncmpi(op, $c.lit("right"), 5)) {
-                iflags.wc_align_status = ALIGN_RIGHT;
+                iflags.wc_align_status = ALIGN.RIGHT;
             } else if (!strncmpi(op, $c.lit("bottom"), 6)) {
-                iflags.wc_align_status = ALIGN_BOTTOM;
+                iflags.wc_align_status = ALIGN.BOTTOM;
             } else {
                 await config_error_add($c.lit("Unknown %s parameter '%s'"), allopt[optidx].name, op);
                 return optn_err;
@@ -491,7 +491,7 @@ async function optfn_align_status(optidx, req, negated, opts, op) {   // options
     }
     if (req === get_val || req === get_cnf_val) {
         which = iflags.wc_align_status;
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), which === ALIGN_TOP ? $c.lit("top") : which === ALIGN_LEFT ? $c.lit("left") : which === ALIGN_BOTTOM ? $c.lit("bottom") : which === ALIGN_RIGHT ? $c.lit("right") : new $c.Ptr(defopt, 0));
+        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), which === ALIGN.TOP ? $c.lit("top") : which === ALIGN.LEFT ? $c.lit("left") : which === ALIGN.BOTTOM ? $c.lit("bottom") : which === ALIGN.RIGHT ? $c.lit("right") : new $c.Ptr(defopt, 0));
         return optn_ok;
     }
     if (req === do_handler) {
@@ -517,12 +517,12 @@ function optfn_altkeyhandling(optidx, req, negated, opts, op) {   // options.c:1
 async function optfn_autounlock(optidx, req, negated, opts, op) {   // options.c:1066
     let sep = 0, nxt = null, newflags = 0, i = 0, matched = 0, p = null, $t1;
     if (req === do_init) {
-        flags.autounlock = AUTOUNLOCK_APPLY_KEY;
+        flags.autounlock = AUTOUNLOCK.APPLY_KEY;
         return optn_ok;
     }
     if (req === do_set) {
         if ($c.peq(op = await string_for_opt(opts, TRUE), new $c.Ptr(empty_optstr, 0))) {
-            flags.autounlock = (negated ? 0 : AUTOUNLOCK_APPLY_KEY) >>> 0;
+            flags.autounlock = (negated ? 0 : AUTOUNLOCK.APPLY_KEY) >>> 0;
             return optn_ok;
         }
         newflags = 0;
@@ -542,16 +542,16 @@ async function optfn_autounlock(optidx, req, negated, opts, op) {   // options.c
                     matched = TRUE;
                     switch (op.get(0)) {
                         case 117:
-                            newflags = (newflags | AUTOUNLOCK_UNTRAP) >>> 0;
+                            newflags = (newflags | AUTOUNLOCK.UNTRAP) >>> 0;
                             break;
                         case 97:
-                            newflags = (newflags | AUTOUNLOCK_APPLY_KEY) >>> 0;
+                            newflags = (newflags | AUTOUNLOCK.APPLY_KEY) >>> 0;
                             break;
                         case 107:
-                            newflags = (newflags | AUTOUNLOCK_KICK) >>> 0;
+                            newflags = (newflags | AUTOUNLOCK.KICK) >>> 0;
                             break;
                         case 102:
-                            newflags = (newflags | AUTOUNLOCK_FORCE) >>> 0;
+                            newflags = (newflags | AUTOUNLOCK.FORCE) >>> 0;
                             break;
                         default:
                             matched = FALSE;
@@ -578,16 +578,16 @@ async function optfn_autounlock(optidx, req, negated, opts, op) {   // options.c
         } else {
             p = $c.lit("");
             opts.set(0, 0);
-            if ((flags.autounlock & AUTOUNLOCK_UNTRAP) >>> 0) {
+            if ((flags.autounlock & AUTOUNLOCK.UNTRAP) >>> 0) {
                 $c.__builtin___sprintf_chk(eos(opts), 0, -1, $c.lit("%s%s"), p, unlocktypes[0][0]), p = new $c.Ptr(optfn_autounlock$plus, 0);
             }
-            if ((flags.autounlock & AUTOUNLOCK_APPLY_KEY) >>> 0) {
+            if ((flags.autounlock & AUTOUNLOCK.APPLY_KEY) >>> 0) {
                 $c.__builtin___sprintf_chk(eos(opts), 0, -1, $c.lit("%s%s"), p, unlocktypes[1][0]), p = new $c.Ptr(optfn_autounlock$plus, 0);
             }
-            if ((flags.autounlock & AUTOUNLOCK_KICK) >>> 0) {
+            if ((flags.autounlock & AUTOUNLOCK.KICK) >>> 0) {
                 $c.__builtin___sprintf_chk(eos(opts), 0, -1, $c.lit("%s%s"), p, unlocktypes[2][0]), p = new $c.Ptr(optfn_autounlock$plus, 0);
             }
-            if ((flags.autounlock & AUTOUNLOCK_FORCE) >>> 0) {
+            if ((flags.autounlock & AUTOUNLOCK.FORCE) >>> 0) {
                 $c.__builtin___sprintf_chk(eos(opts), 0, -1, $c.lit("%s%s"), p, unlocktypes[3][0]);
             }
         }
@@ -620,12 +620,12 @@ async function optfn_boulder(optidx, req, negated, opts, op) {   // options.c:11
         } else if (clash) {
             await config_error_add($c.lit("Badoption - boulder symbol '%s' would conflict with a %s symbol"), visctrl(opts.get(0)), clash === 1 ? $c.lit("monster") : $c.lit("warning"));
         } else {
-            go.ov_primary_syms[SYM_BOULDER + SYM_OFF_X] = $c.u8(opts.get(0));
-            go.ov_rogue_syms[SYM_BOULDER + SYM_OFF_X] = $c.u8(opts.get(0));
+            go.ov_primary_syms[SYM.BOULDER + SYM_OFF_X] = $c.u8(opts.get(0));
+            go.ov_rogue_syms[SYM.BOULDER + SYM_OFF_X] = $c.u8(opts.get(0));
             if (!go.opt_initial) {
-                sym = get_othersym(SYM_BOULDER, (svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? ROGUESET : PRIMARYSET);
+                sym = get_othersym(SYM.BOULDER, (svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? ROGUESET : PRIMARYSET);
                 if (sym) {
-                    gs.showsyms[SYM_BOULDER + SYM_OFF_X] = sym;
+                    gs.showsyms[SYM.BOULDER + SYM_OFF_X] = sym;
                 }
                 go.opt_need_redraw = TRUE;
             }
@@ -634,7 +634,7 @@ async function optfn_boulder(optidx, req, negated, opts, op) {   // options.c:11
     }
     if (req === get_val || req === get_cnf_val) {
         opts.set(0, 0);
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%c"), go.ov_primary_syms[SYM_BOULDER + SYM_OFF_X] ? go.ov_primary_syms[SYM_BOULDER + SYM_OFF_X] : gs.showsyms[objects[BOULDER].oc_class + SYM_OFF_O | 0]);
+        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%c"), go.ov_primary_syms[SYM.BOULDER + SYM_OFF_X] ? go.ov_primary_syms[SYM.BOULDER + SYM_OFF_X] : gs.showsyms[objects[BOULDER].oc_class + SYM_OFF_O | 0]);
         return optn_ok;
     }
     return optn_ok;
@@ -933,10 +933,10 @@ async function optfn_fruit(optidx, req, negated, opts, op) {   // options.c:1706
                 }
             }
         }
-        nmcpy(new $c.Ptr(svp.pl_fruit, 0), op, PL_FSIZ);
+        nmcpy(new $c.Ptr(svp.pl_fruit, 0), op, PL.FSIZ);
         sanitize_name(new $c.Ptr(svp.pl_fruit, 0));
         if (!new $c.Ptr(svp.pl_fruit, 0).get(0)) {
-            nmcpy(new $c.Ptr(svp.pl_fruit, 0), $c.lit("slime mold"), PL_FSIZ);
+            nmcpy(new $c.Ptr(svp.pl_fruit, 0), $c.lit("slime mold"), PL.FSIZ);
         }
         if (!go.opt_initial) {
             await fruitadd(new $c.Ptr(svp.pl_fruit, 0), forig);
@@ -1096,31 +1096,31 @@ async function optfn_map_mode(optidx, req, negated, opts, op) {   // options.c:1
         if (!$c.peq(op, new $c.Ptr(empty_optstr, 0)) && !negated) {
             save_map_mode = iflags.wc_map_mode;
             if (!strncmpi(op, $c.lit("tiles"), -1)) {
-                iflags.wc_map_mode = MAP_MODE_TILES;
+                iflags.wc_map_mode = MAP_MODE.TILES;
             } else if (!strncmpi(op, $c.lit("ascii4x6"), 8)) {
-                iflags.wc_map_mode = MAP_MODE_ASCII4x6;
+                iflags.wc_map_mode = MAP_MODE.ASCII4x6;
             } else if (!strncmpi(op, $c.lit("ascii6x8"), 8)) {
-                iflags.wc_map_mode = MAP_MODE_ASCII6x8;
+                iflags.wc_map_mode = MAP_MODE.ASCII6x8;
             } else if (!strncmpi(op, $c.lit("ascii8x8"), 8)) {
-                iflags.wc_map_mode = MAP_MODE_ASCII8x8;
+                iflags.wc_map_mode = MAP_MODE.ASCII8x8;
             } else if (!strncmpi(op, $c.lit("ascii16x8"), 9)) {
-                iflags.wc_map_mode = MAP_MODE_ASCII16x8;
+                iflags.wc_map_mode = MAP_MODE.ASCII16x8;
             } else if (!strncmpi(op, $c.lit("ascii7x12"), 9)) {
-                iflags.wc_map_mode = MAP_MODE_ASCII7x12;
+                iflags.wc_map_mode = MAP_MODE.ASCII7x12;
             } else if (!strncmpi(op, $c.lit("ascii8x12"), 9)) {
-                iflags.wc_map_mode = MAP_MODE_ASCII8x12;
+                iflags.wc_map_mode = MAP_MODE.ASCII8x12;
             } else if (!strncmpi(op, $c.lit("ascii16x12"), 10)) {
-                iflags.wc_map_mode = MAP_MODE_ASCII16x12;
+                iflags.wc_map_mode = MAP_MODE.ASCII16x12;
             } else if (!strncmpi(op, $c.lit("ascii12x16"), 10)) {
-                iflags.wc_map_mode = MAP_MODE_ASCII12x16;
+                iflags.wc_map_mode = MAP_MODE.ASCII12x16;
             } else if (!strncmpi(op, $c.lit("ascii10x18"), 10)) {
-                iflags.wc_map_mode = MAP_MODE_ASCII10x18;
+                iflags.wc_map_mode = MAP_MODE.ASCII10x18;
             } else if (!strncmpi(op, $c.lit("fit_to_screen"), 13)) {
-                iflags.wc_map_mode = MAP_MODE_ASCII_FIT_TO_SCREEN;
+                iflags.wc_map_mode = MAP_MODE.ASCII_FIT_TO_SCREEN;
             } else if (!strncmpi(op, $c.lit("ascii_fit_to_screen"), 19)) {
-                iflags.wc_map_mode = MAP_MODE_ASCII_FIT_TO_SCREEN;
+                iflags.wc_map_mode = MAP_MODE.ASCII_FIT_TO_SCREEN;
             } else if (!strncmpi(op, $c.lit("tiles_fit_to_screen"), 19)) {
-                iflags.wc_map_mode = MAP_MODE_TILES_FIT_TO_SCREEN;
+                iflags.wc_map_mode = MAP_MODE.TILES_FIT_TO_SCREEN;
             } else {
                 await config_error_add($c.lit("Unknown %s parameter '%s'"), allopt[optidx].name, op);
                 return optn_err;
@@ -1138,7 +1138,7 @@ async function optfn_map_mode(optidx, req, negated, opts, op) {   // options.c:1
     }
     if (req === get_val || req === get_cnf_val) {
         i = iflags.wc_map_mode;
-        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), i === MAP_MODE_TILES ? $c.lit("tiles") : i === MAP_MODE_ASCII4x6 ? $c.lit("ascii4x6") : i === MAP_MODE_ASCII6x8 ? $c.lit("ascii6x8") : i === MAP_MODE_ASCII8x8 ? $c.lit("ascii8x8") : i === MAP_MODE_ASCII16x8 ? $c.lit("ascii16x8") : i === MAP_MODE_ASCII7x12 ? $c.lit("ascii7x12") : i === MAP_MODE_ASCII8x12 ? $c.lit("ascii8x12") : i === MAP_MODE_ASCII16x12 ? $c.lit("ascii16x12") : i === MAP_MODE_ASCII12x16 ? $c.lit("ascii12x16") : i === MAP_MODE_ASCII10x18 ? $c.lit("ascii10x18") : i === MAP_MODE_ASCII_FIT_TO_SCREEN ? $c.lit("fit_to_screen") : new $c.Ptr(defopt, 0));
+        $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%s"), i === MAP_MODE.TILES ? $c.lit("tiles") : i === MAP_MODE.ASCII4x6 ? $c.lit("ascii4x6") : i === MAP_MODE.ASCII6x8 ? $c.lit("ascii6x8") : i === MAP_MODE.ASCII8x8 ? $c.lit("ascii8x8") : i === MAP_MODE.ASCII16x8 ? $c.lit("ascii16x8") : i === MAP_MODE.ASCII7x12 ? $c.lit("ascii7x12") : i === MAP_MODE.ASCII8x12 ? $c.lit("ascii8x12") : i === MAP_MODE.ASCII16x12 ? $c.lit("ascii16x12") : i === MAP_MODE.ASCII12x16 ? $c.lit("ascii12x16") : i === MAP_MODE.ASCII10x18 ? $c.lit("ascii10x18") : i === MAP_MODE.ASCII_FIT_TO_SCREEN ? $c.lit("fit_to_screen") : new $c.Ptr(defopt, 0));
         return optn_ok;
     }
     return optn_ok;
@@ -1211,7 +1211,7 @@ async function optfn_menu_headings(optidx, req, negated, opts, op) {   // option
     }
     if (req === do_set) {
         if ($c.peq(op, new $c.Ptr(empty_optstr, 0))) {
-            iflags.menu_headings.attr = negated ? ATR_NONE : ATR_INVERSE;
+            iflags.menu_headings.attr = negated ? ATR.NONE : ATR.INVERSE;
             iflags.menu_headings.color = NO_COLOR;
             return optn_ok;
         } else if (negated) {
@@ -1320,16 +1320,16 @@ async function optfn_menustyle(optidx, req, negated, opts, op) {   // options.c:
         switch (tmp) {
             case 110:
             case 116:
-                flags.menu_style = MENU_TRADITIONAL;
+                flags.menu_style = MENU.TRADITIONAL;
                 break;
             case 99:
-                flags.menu_style = MENU_COMBINATION;
+                flags.menu_style = MENU.COMBINATION;
                 break;
             case 102:
-                flags.menu_style = MENU_FULL;
+                flags.menu_style = MENU.FULL;
                 break;
             case 112:
-                flags.menu_style = MENU_PARTIAL;
+                flags.menu_style = MENU.PARTIAL;
                 break;
             default:
                 await config_error_add($c.lit("Unknown %s parameter '%s'"), allopt[optidx].name, op);
@@ -1467,7 +1467,7 @@ async function optfn_name(optidx, req, negated, opts, op) {   // options.c:2549
     }
     if (req === do_set) {
         if (!$c.peq(op = await string_for_env_opt(allopt[optidx].name, opts, FALSE), new $c.Ptr(empty_optstr, 0))) {
-            nmcpy(new $c.Ptr(svp.plname, 0), op, PL_NSIZ);
+            nmcpy(new $c.Ptr(svp.plname, 0), op, PL.NSIZ);
         } else {
             return optn_err;
         }
@@ -1653,7 +1653,7 @@ async function optfn_paranoid_confirmation(optidx, req, opt_negated, opts, op) {
     if (req === get_val || req === get_cnf_val) {
         tmpbuf[0] = 0;
         for (i = 0; paranoia[i].flagmask !== 0; i = i + 1 | 0) {
-            if ((flags.paranoia_bits & paranoia[i].flagmask >>> 0) >>> 0 !== 0 && (paranoia[i].flagmask !== PARANOID_BONES || wizard() || req === get_cnf_val)) {
+            if ((flags.paranoia_bits & paranoia[i].flagmask >>> 0) >>> 0 !== 0 && (paranoia[i].flagmask !== PARANOID.BONES || wizard() || req === get_cnf_val)) {
                 nh_snprintf($c.lit("optfn_paranoid_confirmation"), 3032, eos(new $c.Ptr(tmpbuf, 0)), $c.subu64(256, $c.strlen(new $c.Ptr(tmpbuf, 0))), $c.lit(" %s"), paranoia[i].argname);
             }
         }
@@ -1747,10 +1747,10 @@ async function optfn_petattr(optidx, req, negated, opts, op) {   // options.c:31
                 iflags.wc2_petattr = itmp;
             }
         } else if (negated) {
-            iflags.wc2_petattr = ATR_NONE;
+            iflags.wc2_petattr = ATR.NONE;
         }
         if (retval !== optn_err) {
-            iflags.wc_hilite_pet = $c.i8(iflags.wc2_petattr !== ATR_NONE ? 1 : 0);
+            iflags.wc_hilite_pet = $c.i8(iflags.wc2_petattr !== ATR.NONE ? 1 : 0);
             if (!go.opt_initial) {
                 go.opt_need_redraw = TRUE;
             }
@@ -1884,7 +1884,7 @@ async function optfn_pickup_types(optidx, req, negated, opts, op) {   // options
             }
             await oc_to_str(new $c.Ptr(flags.inv_order, 0), new $c.Ptr(ocl, 0));
             use_menu = TRUE;
-            if (flags.menu_style === MENU_TRADITIONAL || flags.menu_style === MENU_COMBINATION) {
+            if (flags.menu_style === MENU.TRADITIONAL || flags.menu_style === MENU.COMBINATION) {
                 use_menu = FALSE;
                 $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("New %s: [%s am] (%s)"), allopt[optidx].name, new $c.Ptr(ocl, 0), new $c.Ptr(tbuf, 0).get(0) ? new $c.Ptr(tbuf, 0) : $c.lit("all"));
                 abuf[0] = 0;
@@ -1976,9 +1976,9 @@ async function optfn_player_selection(optidx, req, negated, opts, op) {   // opt
         op = await string_for_opt(opts, negated);
         if (!$c.peq(op, new $c.Ptr(empty_optstr, 0)) && !negated) {
             if (!strncmpi(op, $c.lit("dialog"), 6)) {
-                iflags.wc_player_selection = VIA_DIALOG;
+                iflags.wc_player_selection = VIA.DIALOG;
             } else if (!strncmpi(op, $c.lit("prompt"), 6)) {
-                iflags.wc_player_selection = VIA_PROMPTS;
+                iflags.wc_player_selection = VIA.PROMPTS;
             } else {
                 await config_error_add($c.lit("Unknown %s parameter '%s'"), allopt[optidx].name, op);
                 return optn_err;
@@ -2107,7 +2107,7 @@ async function optfn_role(optidx, req, negated, opts, op$in) {   // options.c:35
                 await config_error_add($c.lit("Unknown %s '%s'"), allopt[optidx].name, op[0]);
                 return optn_err;
             }
-            nmcpy(new $c.Ptr(svp.pl_character, 0), op[0], PL_NSIZ);
+            nmcpy(new $c.Ptr(svp.pl_character, 0), op[0], PL.NSIZ);
             await saveoptstr(optidx, flags.initrole >= 0 ? roles[flags.initrole].name.m : flags.initrole === ROLE_RANDOM ? new $c.Ptr(randomrole, 0) : new $c.Ptr(none, 0));
         }
         return optn_ok;
@@ -2129,16 +2129,16 @@ async function optfn_runmode(optidx, req, negated, opts, op) {   // options.c:36
     }
     if (req === do_set) {
         if (negated) {
-            flags.runmode = RUN_TPORT;
+            flags.runmode = RUN.TPORT;
         } else if (!$c.peq(op, new $c.Ptr(empty_optstr, 0))) {
             if (str_start_is($c.lit("teleport"), op, TRUE)) {
-                flags.runmode = RUN_TPORT;
+                flags.runmode = RUN.TPORT;
             } else if (str_start_is($c.lit("run"), op, TRUE)) {
-                flags.runmode = RUN_LEAP;
+                flags.runmode = RUN.LEAP;
             } else if (str_start_is($c.lit("walk"), op, TRUE)) {
-                flags.runmode = RUN_STEP;
+                flags.runmode = RUN.STEP;
             } else if (str_start_is($c.lit("crawl"), op, TRUE)) {
-                flags.runmode = RUN_CRAWL;
+                flags.runmode = RUN.CRAWL;
             } else {
                 await config_error_add($c.lit("Unknown %s parameter '%s'"), allopt[optidx].name, op);
                 return optn_err;
@@ -2398,13 +2398,13 @@ async function optfn_sortvanquished(optidx, req, negated, opts, op) {   // optio
     let optname = null, p = null, vndx = 0, prev_sortmode = 0;
     optname = allopt[optidx].name;
     if (req === do_init) {
-        flags.vanq_sortmode = VANQ_MLVL_MNDX;
+        flags.vanq_sortmode = VANQ.MLVL_MNDX;
         return optn_ok;
     }
     if (req === do_set) {
         op = await string_for_env_opt(allopt[optidx].name, opts, FALSE);
         if (negated) {
-            flags.vanq_sortmode = VANQ_MLVL_MNDX;
+            flags.vanq_sortmode = VANQ.MLVL_MNDX;
         } else if (!$c.peq(op, new $c.Ptr(empty_optstr, 0))) {
             vndx = 0;
             if ((p = $c.strchr(new $c.Ptr(optfn_sortvanquished$vanqmodes, 0), op.get(0))) !== null) {
@@ -2780,7 +2780,7 @@ async function optfn_versinfo(optidx, req, negated, opts, op) {   // options.c:4
     }
     if (req === do_set) {
         have_branch = $c.i8(nomakedefs.git_branch && nomakedefs.git_branch.get(0) ? 1 : 0);
-        dflt = have_branch ? VI_BRANCH : VI_NUMBER;
+        dflt = have_branch ? VI.BRANCH : VI.NUMBER;
         if (negated) {
             await bad_negation(allopt[optidx].name, TRUE);
             return optn_silenterr;
@@ -2800,9 +2800,9 @@ async function optfn_versinfo(optidx, req, negated, opts, op) {   // options.c:4
         await handler_versinfo();
         await pline($c.lit("'%s' %s %u."), optname, flags.versinfo === vi ? $c.lit("not changed, still") : $c.lit("changed to"), flags.versinfo);
     } else if (req === get_val) {
-        g = $c.i8((vi & VI_NAME) >>> 0 !== 0 ? 1 : 0);
-        b = $c.i8((vi & VI_BRANCH) >>> 0 !== 0 ? 1 : 0);
-        n = $c.i8((vi & VI_NUMBER) >>> 0 !== 0 ? 1 : 0);
+        g = $c.i8((vi & VI.NAME) >>> 0 !== 0 ? 1 : 0);
+        b = $c.i8((vi & VI.BRANCH) >>> 0 !== 0 ? 1 : 0);
+        n = $c.i8((vi & VI.NUMBER) >>> 0 !== 0 ? 1 : 0);
         $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%u: %s%s%s%s%s (%.99s)"), flags.versinfo, g ? $c.lit("name") : $c.lit(""), b && g ? $c.lit("+") : $c.lit(""), b ? $c.lit("branch") : $c.lit(""), n && (b || g) ? $c.lit("+") : $c.lit(""), n ? $c.lit("number") : $c.lit(""), status_version(new $c.Ptr(vbuf, 0), 128, FALSE));
     } else if (req === get_cnf_val) {
         $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%u"), flags.versinfo);
@@ -3234,7 +3234,7 @@ export async function optfn_boolean(optidx, req, negated, opts, op) {   // optio
             case opt_hilite_pet:
                 if (windowprocs.wp_id === wp_tty || windowprocs.wp_id === wp_curses) {
                     if (iflags.wc_hilite_pet && !iflags.wc2_petattr) {
-                        iflags.wc2_petattr = ATR_INVERSE;
+                        iflags.wc2_petattr = ATR.INVERSE;
                     }
                 }
                 go.opt_need_redraw = TRUE;
@@ -3367,7 +3367,7 @@ async function spcfn_misc_menu_cmd(midx, req, negated, opts, op) {   // options.
 function can_set_perm_invent() {   // options.c:5488
     let old_perminv_mode = 0;
     old_perminv_mode = iflags.perminv_mode;
-    if (!$c.andu64(windowprocs.wincap, WC_PERM_INVENT)) {
+    if (!$c.andu64(windowprocs.wincap, WC.PERM_INVENT)) {
         return FALSE;
     }
     if (iflags.perminv_mode === InvOptNone) {
@@ -3382,18 +3382,18 @@ async function handler_menustyle() {   // options.c:5544
     sep = $c.i8(iflags.menu_tab_sep ? 9 : 32);
     style_pick[0] = null;
     clr = NO_COLOR;
-    tmpwin = await create_nhwindow()(NHW_MENU);
-    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW.MENU);
+    await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     for (i = 0; i < 4; i = i + 1 | 0) {
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%-12.12s%c%.60s"), menutype[i][0], sep, menutype[i][1]);
         any.a_int = i + 1 | 0;
-        await add_menu(tmpwin, nul_glyphinfo, any, new $c.Ptr(buf, 0).get(0), 0, ATR_NONE, clr, new $c.Ptr(buf, 0), i === flags.menu_style ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, new $c.Ptr(buf, 0).get(0), 0, ATR.NONE, clr, new $c.Ptr(buf, 0), i === flags.menu_style ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%4s%-12.12s%c%.60s"), $c.lit(""), $c.lit(""), sep, menutype[i][2]);
         await add_menu_str(tmpwin, new $c.Ptr(buf, 0));
     }
     await end_menu()(tmpwin, $c.lit("Select menustyle:"));
-    n = await select_menu(tmpwin, PICK_ONE, new $c.Ptr(style_pick, 0));
+    n = await select_menu(tmpwin, PICK.ONE, new $c.Ptr(style_pick, 0));
     if (n > 0) {
         i = $c.radd(style_pick[0], 0).item.a_int - 1 | 0;
         if (n > 1 && i === old_menu_style) {
@@ -3413,20 +3413,20 @@ async function handler_align_misc(optidx) {   // options.c:5586
     let tmpwin = 0, any = new $T.any(), window_pick = [null], abuf = new Int8Array(256), clr = 0;
     window_pick[0] = null;
     clr = NO_COLOR;
-    tmpwin = await create_nhwindow()(NHW_MENU);
-    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW.MENU);
+    await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
-    any.a_int = ALIGN_TOP;
-    await add_menu(tmpwin, nul_glyphinfo, any, 116, 0, ATR_NONE, clr, $c.lit("top"), MENU_ITEMFLAGS_NONE);
-    any.a_int = ALIGN_BOTTOM;
-    await add_menu(tmpwin, nul_glyphinfo, any, 98, 0, ATR_NONE, clr, $c.lit("bottom"), MENU_ITEMFLAGS_NONE);
-    any.a_int = ALIGN_LEFT;
-    await add_menu(tmpwin, nul_glyphinfo, any, 108, 0, ATR_NONE, clr, $c.lit("left"), MENU_ITEMFLAGS_NONE);
-    any.a_int = ALIGN_RIGHT;
-    await add_menu(tmpwin, nul_glyphinfo, any, 114, 0, ATR_NONE, clr, $c.lit("right"), MENU_ITEMFLAGS_NONE);
+    any.a_int = ALIGN.TOP;
+    await add_menu(tmpwin, nul_glyphinfo, any, 116, 0, ATR.NONE, clr, $c.lit("top"), MENU.ITEMFLAGS_NONE);
+    any.a_int = ALIGN.BOTTOM;
+    await add_menu(tmpwin, nul_glyphinfo, any, 98, 0, ATR.NONE, clr, $c.lit("bottom"), MENU.ITEMFLAGS_NONE);
+    any.a_int = ALIGN.LEFT;
+    await add_menu(tmpwin, nul_glyphinfo, any, 108, 0, ATR.NONE, clr, $c.lit("left"), MENU.ITEMFLAGS_NONE);
+    any.a_int = ALIGN.RIGHT;
+    await add_menu(tmpwin, nul_glyphinfo, any, 114, 0, ATR.NONE, clr, $c.lit("right"), MENU.ITEMFLAGS_NONE);
     $c.__builtin___sprintf_chk(new $c.Ptr(abuf, 0), 0, 256, $c.lit("Select %s window placement relative to the map:"), optidx === opt_align_message ? $c.lit("message") : $c.lit("status"));
     await end_menu()(tmpwin, new $c.Ptr(abuf, 0));
-    if (await select_menu(tmpwin, PICK_ONE, new $c.Ptr(window_pick, 0)) > 0) {
+    if (await select_menu(tmpwin, PICK.ONE, new $c.Ptr(window_pick, 0)) > 0) {
         if (optidx === opt_align_message) {
             iflags.wc_align_message = window_pick[0].item.a_int;
         } else {
@@ -3445,18 +3445,18 @@ async function handler_autounlock(optidx) {   // options.c:5624
     window_pick[0] = null;
     res = optn_ok;
     clr = NO_COLOR;
-    tmpwin = await create_nhwindow()(NHW_MENU);
-    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW.MENU);
+    await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     for (i = 0; i < 4; i = i + 1 | 0) {
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%-10.10s%c%.40s"), unlocktypes[i][0], sep, unlocktypes[i][1]);
         presel = (flags.autounlock & 1 << i >>> 0) >>> 0 | 0;
         any.a_int = i + 1 | 0;
-        await add_menu(tmpwin, nul_glyphinfo, any, unlocktypes[i][0].get(0), 0, ATR_NONE, clr, new $c.Ptr(buf, 0), presel ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, unlocktypes[i][0].get(0), 0, ATR.NONE, clr, new $c.Ptr(buf, 0), presel ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     }
     $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Select '%.20s' actions:"), optname);
     await end_menu()(tmpwin, new $c.Ptr(buf, 0));
-    n = await select_menu(tmpwin, PICK_ANY, new $c.Ptr(window_pick, 0));
+    n = await select_menu(tmpwin, PICK.ANY, new $c.Ptr(window_pick, 0));
     if (n > 0) {
         newflags = 0;
         for (i = 0; i < n; i = i + 1 | 0) {
@@ -3479,17 +3479,17 @@ async function handler_disclose() {   // options.c:5675
     let tmpwin = 0, any = new $T.any(), i = 0, n = 0, buf = new Int8Array(256), disc_cat = new Int32Array(6), pick_cnt = 0, pick_idx = 0, opt_idx = 0, c = 0, disclosure_pick = [null], clr = 0;
     disclosure_pick[0] = null;
     clr = NO_COLOR;
-    tmpwin = await create_nhwindow()(NHW_MENU);
-    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW.MENU);
+    await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i = i + 1 | 0) {
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%-12s[%c%c]"), handler_disclose$disclosure_names[i], flags.end_disclose[i], disclosure_options[i]);
         any.a_int = i + 1 | 0;
-        await add_menu(tmpwin, nul_glyphinfo, any, disclosure_options[i], 0, ATR_NONE, clr, new $c.Ptr(buf, 0), MENU_ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, disclosure_options[i], 0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
         disc_cat[i] = 0;
     }
     await end_menu()(tmpwin, $c.lit("Change which disclosure options categories:"));
-    pick_cnt = await select_menu(tmpwin, PICK_ANY, new $c.Ptr(disclosure_pick, 0));
+    pick_cnt = await select_menu(tmpwin, PICK.ANY, new $c.Ptr(disclosure_pick, 0));
     if (pick_cnt > 0) {
         for (pick_idx = 0; pick_idx < pick_cnt; pick_idx = pick_idx + 1 | 0) {
             opt_idx = $c.radd(disclosure_pick[0], pick_idx).item.a_int - 1 | 0;
@@ -3503,27 +3503,27 @@ async function handler_disclose() {   // options.c:5675
         if (disc_cat[i]) {
             c = flags.end_disclose[i];
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Disclosure options for %s:"), handler_disclose$disclosure_names[i]);
-            tmpwin = await create_nhwindow()(NHW_MENU);
-            await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
+            tmpwin = await create_nhwindow()(NHW.MENU);
+            await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
             any.$copyFrom(cg.zeroany);
             any.a_char = DISCLOSE_NO_WITHOUT_PROMPT;
-            await add_menu(tmpwin, nul_glyphinfo, any, 0, any.a_char, ATR_NONE, clr, $c.lit("Never disclose, without prompting"), c === any.a_char ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+            await add_menu(tmpwin, nul_glyphinfo, any, 0, any.a_char, ATR.NONE, clr, $c.lit("Never disclose, without prompting"), c === any.a_char ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
             any.a_char = DISCLOSE_YES_WITHOUT_PROMPT;
-            await add_menu(tmpwin, nul_glyphinfo, any, 0, any.a_char, ATR_NONE, clr, $c.lit("Always disclose, without prompting"), c === any.a_char ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+            await add_menu(tmpwin, nul_glyphinfo, any, 0, any.a_char, ATR.NONE, clr, $c.lit("Always disclose, without prompting"), c === any.a_char ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
             if (handler_disclose$disclosure_names[i].get(0) === 118 || handler_disclose$disclosure_names[i].get(0) === 103) {
                 any.a_char = DISCLOSE_SPECIAL_WITHOUT_PROMPT;
-                await add_menu(tmpwin, nul_glyphinfo, any, 0, any.a_char, ATR_NONE, clr, $c.lit("Always disclose, pick sort order from menu"), c === any.a_char ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+                await add_menu(tmpwin, nul_glyphinfo, any, 0, any.a_char, ATR.NONE, clr, $c.lit("Always disclose, pick sort order from menu"), c === any.a_char ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
             }
             any.a_char = DISCLOSE_PROMPT_DEFAULT_NO;
-            await add_menu(tmpwin, nul_glyphinfo, any, 0, any.a_char, ATR_NONE, clr, $c.lit("Prompt, with default answer of \"No\""), c === any.a_char ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+            await add_menu(tmpwin, nul_glyphinfo, any, 0, any.a_char, ATR.NONE, clr, $c.lit("Prompt, with default answer of \"No\""), c === any.a_char ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
             any.a_char = DISCLOSE_PROMPT_DEFAULT_YES;
-            await add_menu(tmpwin, nul_glyphinfo, any, 0, any.a_char, ATR_NONE, clr, $c.lit("Prompt, with default answer of \"Yes\""), c === any.a_char ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+            await add_menu(tmpwin, nul_glyphinfo, any, 0, any.a_char, ATR.NONE, clr, $c.lit("Prompt, with default answer of \"Yes\""), c === any.a_char ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
             if (handler_disclose$disclosure_names[i].get(0) === 118 || handler_disclose$disclosure_names[i].get(0) === 103) {
                 any.a_char = DISCLOSE_PROMPT_DEFAULT_SPECIAL;
-                await add_menu(tmpwin, nul_glyphinfo, any, 0, any.a_char, ATR_NONE, clr, $c.lit("Prompt, with default answer of \"Ask\" to request sort menu"), c === any.a_char ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+                await add_menu(tmpwin, nul_glyphinfo, any, 0, any.a_char, ATR.NONE, clr, $c.lit("Prompt, with default answer of \"Ask\" to request sort menu"), c === any.a_char ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
             }
             await end_menu()(tmpwin, new $c.Ptr(buf, 0));
-            n = await select_menu(tmpwin, PICK_ONE, new $c.Ptr(disclosure_pick, 0));
+            n = await select_menu(tmpwin, PICK.ONE, new $c.Ptr(disclosure_pick, 0));
             if (n > 0) {
                 flags.end_disclose[i] = $c.radd(disclosure_pick[0], 0).item.a_char;
                 if (n > 1 && flags.end_disclose[i] === c) {
@@ -3552,17 +3552,17 @@ async function handler_menu_objsyms() {   // options.c:5795
     picklist[0] = null;
     sep = $c.i8(iflags.menu_tab_sep ? 9 : 32);
     clr = NO_COLOR;
-    tmpwin = await create_nhwindow()(NHW_MENU);
-    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW.MENU);
+    await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     for (i = 0; i < 6; i = i + 1 | 0) {
         nh_snprintf($c.lit("handler_menu_objsyms"), 5809, new $c.Ptr(buf, 0), 256, $c.lit("%-12.12s%c%.60s"), objsymvals[i].nam, sep, objsymvals[i].descr);
         any.a_int = i + 1 | 0;
         j = objsymvals[i].num;
-        await add_menu(tmpwin, nul_glyphinfo, any, $c.i8(48 + i | 0), new $c.Ptr(buf, 0).get(0), ATR_NONE, clr, new $c.Ptr(buf, 0), j === iflags.menuobjsyms ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, $c.i8(48 + i | 0), new $c.Ptr(buf, 0).get(0), ATR.NONE, clr, new $c.Ptr(buf, 0), j === iflags.menuobjsyms ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     }
     await end_menu()(tmpwin, $c.lit("Set object symbols in menus to what?"));
-    n = await select_menu(tmpwin, PICK_ONE, new $c.Ptr(picklist, 0));
+    n = await select_menu(tmpwin, PICK.ONE, new $c.Ptr(picklist, 0));
     if (n > 0) {
         i = $c.radd(picklist[0], 0).item.a_int - 1 | 0;
         if (n > 1 && i === iflags.menuobjsyms) {
@@ -3583,8 +3583,8 @@ async function handler_msg_window() {   // options.c:5832
         sep = $c.i8(iflags.menu_tab_sep ? 9 : 32);
         old_prevmsg_window = iflags.prevmsg_window;
         window_pick[0] = null;
-        tmpwin = await create_nhwindow()(NHW_MENU);
-        await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
+        tmpwin = await create_nhwindow()(NHW.MENU);
+        await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
         any.$copyFrom(cg.zeroany);
         for (i = 0; i < 4; i = i + 1 | 0) {
             if (i < 2 && is_curses) {
@@ -3592,12 +3592,12 @@ async function handler_msg_window() {   // options.c:5832
             }
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%-12.12s%c%.60s"), msgwind[i][0], sep, msgwind[i][1]);
             $t1 = c = msgwind[i][0].get(0), any.a_char = $t1;
-            await add_menu(tmpwin, nul_glyphinfo, any, new $c.Ptr(buf, 0).get(0), 0, ATR_NONE, clr, new $c.Ptr(buf, 0), c === iflags.prevmsg_window ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+            await add_menu(tmpwin, nul_glyphinfo, any, new $c.Ptr(buf, 0).get(0), 0, ATR.NONE, clr, new $c.Ptr(buf, 0), c === iflags.prevmsg_window ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%4s%-12.12s%c%.60s"), $c.lit(""), $c.lit(""), sep, msgwind[i][2]);
             await add_menu_str(tmpwin, new $c.Ptr(buf, 0));
         }
         await end_menu()(tmpwin, $c.lit("Select message history display type:"));
-        n = await select_menu(tmpwin, PICK_ONE, new $c.Ptr(window_pick, 0));
+        n = await select_menu(tmpwin, PICK.ONE, new $c.Ptr(window_pick, 0));
         if (n > 0) {
             c = $c.radd(window_pick[0], 0).item.a_char;
             if (n > 1 && c === old_prevmsg_window) {
@@ -3621,15 +3621,15 @@ async function handler_number_pad() {   // options.c:5893
     let tmpwin = 0, any = new $T.any(), i = 0, mode_pick = [null], clr = 0;
     mode_pick[0] = null;
     clr = NO_COLOR;
-    tmpwin = await create_nhwindow()(NHW_MENU);
-    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW.MENU);
+    await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     for (i = 0; i < 6; i = i + 1 | 0) {
         any.a_int = i + 1 | 0;
-        await add_menu(tmpwin, nul_glyphinfo, any, $c.i8(97 + i | 0), $c.i8(48 + i | 0), ATR_NONE, clr, handler_number_pad$npchoices[i], MENU_ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, $c.i8(97 + i | 0), $c.i8(48 + i | 0), ATR.NONE, clr, handler_number_pad$npchoices[i], MENU.ITEMFLAGS_NONE);
     }
     await end_menu()(tmpwin, $c.lit("Select number_pad mode:"));
-    if (await select_menu(tmpwin, PICK_ONE, new $c.Ptr(mode_pick, 0)) > 0) {
+    if (await select_menu(tmpwin, PICK.ONE, new $c.Ptr(mode_pick, 0)) > 0) {
         switch (mode_pick[0].item.a_int - 1 | 0) {
             case 0:
                 iflags.num_pad = FALSE;
@@ -3667,11 +3667,11 @@ async function handler_paranoid_confirmation() {   // options.c:5953
     let tmpwin = 0, any = new $T.any(), i = 0, mkey = 0, mbuf = new Int8Array(128), ebuf = new Int8Array(256), cbuf = new Int8Array(128), explain = null, cmdnm = null, paranoia_picks = [null], clr = 0;
     paranoia_picks[0] = null;
     clr = NO_COLOR;
-    tmpwin = await create_nhwindow()(NHW_MENU);
-    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW.MENU);
+    await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     for (i = 0; paranoia[i].flagmask !== 0; i = i + 1 | 0) {
-        if (paranoia[i].flagmask === PARANOID_BONES && !wizard()) {
+        if (paranoia[i].flagmask === PARANOID.BONES && !wizard()) {
             continue;
         }
         explain = paranoia[i].explain;
@@ -3688,10 +3688,10 @@ async function handler_paranoid_confirmation() {   // options.c:5953
             explain = strsubst($c.__builtin___strcpy_chk(new $c.Ptr(ebuf, 0), explain, 256), $c.lit("'m'"), new $c.Ptr(mbuf, 0));
         }
         any.a_int = paranoia[i].flagmask;
-        await add_menu(tmpwin, nul_glyphinfo, any, paranoia[i].argname.get(0), 0, ATR_NONE, clr, explain, (flags.paranoia_bits & paranoia[i].flagmask >>> 0) >>> 0 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, paranoia[i].argname.get(0), 0, ATR.NONE, clr, explain, (flags.paranoia_bits & paranoia[i].flagmask >>> 0) >>> 0 ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     }
     await end_menu()(tmpwin, $c.lit("Actions requiring extra confirmation:"));
-    i = await select_menu(tmpwin, PICK_ANY, new $c.Ptr(paranoia_picks, 0));
+    i = await select_menu(tmpwin, PICK.ANY, new $c.Ptr(paranoia_picks, 0));
     if (i >= 0) {
         flags.paranoia_bits = 0;
         if (i > 0) {
@@ -3711,8 +3711,8 @@ async function handler_perminv_mode() {   // options.c:6011
     old_pi = iflags.perminv_mode;
     new_pi = old_pi;
     widest = !(windowprocs.wp_id === wp_tty) ? 8 : 11;
-    tmpwin = await create_nhwindow()(NHW_MENU);
-    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW.MENU);
+    await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     for (i = 0; i < 9; i = i + 1 | 0) {
         if (!(pi0 = perminv_modes[i][0])) {
@@ -3728,10 +3728,10 @@ async function handler_perminv_mode() {   // options.c:6011
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s%s%s"), pi0, new $c.Ptr(sepbuf, 0), perminv_modes[i][2]);
         let_ = $c.i8((i & InvSparse) !== 0 ? highc(pi1.get(0)) : pi0.get(0));
         any.a_int = i + 1 | 0;
-        await add_menu(tmpwin, nul_glyphinfo, any, let_, $c.i8(48 + i | 0), ATR_NONE, NO_COLOR, new $c.Ptr(buf, 0), i === old_pi ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, let_, $c.i8(48 + i | 0), ATR.NONE, NO_COLOR, new $c.Ptr(buf, 0), i === old_pi ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     }
     await end_menu()(tmpwin, $c.lit("Choose permanent inventory mode:"));
-    n = await select_menu(tmpwin, PICK_ONE, new $c.Ptr(pi_pick, 0));
+    n = await select_menu(tmpwin, PICK.ONE, new $c.Ptr(pi_pick, 0));
     await destroy_nhwindow()(tmpwin);
     if (n > 0) {
         new_pi = $c.radd(pi_pick[0], 0).item.a_int - 1 | 0;
@@ -3761,16 +3761,16 @@ async function handler_pickup_burden() {   // options.c:6086
     burden_letters = $c.lit("ubsntl");
     burden_pick[0] = null;
     clr = NO_COLOR;
-    tmpwin = await create_nhwindow()(NHW_MENU);
-    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW.MENU);
+    await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     for (i = 0; i < 6; i = i + 1 | 0) {
         burden_name = burdentype[i];
         any.a_int = i + 1 | 0;
-        await add_menu(tmpwin, nul_glyphinfo, any, burden_letters.get(i), 0, ATR_NONE, clr, burden_name, MENU_ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, burden_letters.get(i), 0, ATR.NONE, clr, burden_name, MENU.ITEMFLAGS_NONE);
     }
     await end_menu()(tmpwin, $c.lit("Select encumbrance level:"));
-    if (await select_menu(tmpwin, PICK_ONE, new $c.Ptr(burden_pick, 0)) > 0) {
+    if (await select_menu(tmpwin, PICK.ONE, new $c.Ptr(burden_pick, 0)) > 0) {
         flags.pickup_burden = burden_pick[0].item.a_int - 1 | 0;
         $c.free(burden_pick[0]);
     }
@@ -3786,16 +3786,16 @@ async function handler_runmode() {   // options.c:6124
     let tmpwin = 0, any = new $T.any(), i = 0, mode_name = null, mode_pick = [null], clr = 0;
     mode_pick[0] = null;
     clr = NO_COLOR;
-    tmpwin = await create_nhwindow()(NHW_MENU);
-    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW.MENU);
+    await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     for (i = 0; i < 4; i = i + 1 | 0) {
         mode_name = runmodes[i];
         any.a_int = i + 1 | 0;
-        await add_menu(tmpwin, nul_glyphinfo, any, mode_name.get(0), 0, ATR_NONE, clr, mode_name, MENU_ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, mode_name.get(0), 0, ATR.NONE, clr, mode_name, MENU.ITEMFLAGS_NONE);
     }
     await end_menu()(tmpwin, $c.lit("Select run/travel display mode:"));
-    if (await select_menu(tmpwin, PICK_ONE, new $c.Ptr(mode_pick, 0)) > 0) {
+    if (await select_menu(tmpwin, PICK.ONE, new $c.Ptr(mode_pick, 0)) > 0) {
         flags.runmode = mode_pick[0].item.a_int - 1 | 0;
         $c.free(mode_pick[0]);
     }
@@ -3807,7 +3807,7 @@ async function handler_petattr() {   // options.c:6152
     tmp = await query_attr($c.lit("Select pet highlight attribute"), iflags.wc2_petattr);
     if (tmp !== -1) {
         iflags.wc2_petattr = tmp;
-        iflags.wc_hilite_pet = $c.i8(iflags.wc2_petattr !== ATR_NONE ? 1 : 0);
+        iflags.wc_hilite_pet = $c.i8(iflags.wc2_petattr !== ATR.NONE ? 1 : 0);
         if (!go.opt_initial) {
             go.opt_need_redraw = TRUE;
         }
@@ -3818,16 +3818,16 @@ async function handler_sortloot() {   // options.c:6167
     let tmpwin = 0, any = new $T.any(), i = 0, n = 0, sortl_name = null, sortl_pick = [null], clr = 0, c = 0;
     sortl_pick[0] = null;
     clr = NO_COLOR;
-    tmpwin = await create_nhwindow()(NHW_MENU);
-    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW.MENU);
+    await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     for (i = 0; i < 3; i = i + 1 | 0) {
         sortl_name = sortltype[i];
         any.a_char = sortl_name.get(0);
-        await add_menu(tmpwin, nul_glyphinfo, any, sortl_name.get(0), 0, ATR_NONE, clr, sortl_name, flags.sortloot === sortl_name.get(0) ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, sortl_name.get(0), 0, ATR.NONE, clr, sortl_name, flags.sortloot === sortl_name.get(0) ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     }
     await end_menu()(tmpwin, $c.lit("Select loot sorting type:"));
-    n = await select_menu(tmpwin, PICK_ONE, new $c.Ptr(sortl_pick, 0));
+    n = await select_menu(tmpwin, PICK.ONE, new $c.Ptr(sortl_pick, 0));
     if (n > 0) {
         c = $c.radd(sortl_pick[0], 0).item.a_char;
         if (n > 1 && c === flags.sortloot) {
@@ -3847,19 +3847,19 @@ async function handler_whatis_coord() {   // options.c:6206
     window_pick[0] = null;
     gpc = $c.i8(iflags.getpos_coords);
     clr = NO_COLOR;
-    tmpwin = await create_nhwindow()(NHW_MENU);
-    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW.MENU);
+    await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     any.a_char = GPCOORDS_COMPASS;
-    await add_menu(tmpwin, nul_glyphinfo, any, GPCOORDS_COMPASS, 0, ATR_NONE, clr, $c.lit("compass ('east' or '3s' or '2n,4w')"), gpc === 99 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+    await add_menu(tmpwin, nul_glyphinfo, any, GPCOORDS_COMPASS, 0, ATR.NONE, clr, $c.lit("compass ('east' or '3s' or '2n,4w')"), gpc === 99 ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     any.a_char = GPCOORDS_COMFULL;
-    await add_menu(tmpwin, nul_glyphinfo, any, GPCOORDS_COMFULL, 0, ATR_NONE, clr, $c.lit("full compass ('east' or '3south' or '2north,4west')"), gpc === 102 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+    await add_menu(tmpwin, nul_glyphinfo, any, GPCOORDS_COMFULL, 0, ATR.NONE, clr, $c.lit("full compass ('east' or '3south' or '2north,4west')"), gpc === 102 ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     any.a_char = GPCOORDS_MAP;
-    await add_menu(tmpwin, nul_glyphinfo, any, GPCOORDS_MAP, 0, ATR_NONE, clr, $c.lit("map <x,y>"), gpc === 109 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+    await add_menu(tmpwin, nul_glyphinfo, any, GPCOORDS_MAP, 0, ATR.NONE, clr, $c.lit("map <x,y>"), gpc === 109 ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     any.a_char = GPCOORDS_SCREEN;
-    await add_menu(tmpwin, nul_glyphinfo, any, GPCOORDS_SCREEN, 0, ATR_NONE, clr, $c.lit("screen [row,column]"), gpc === 115 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+    await add_menu(tmpwin, nul_glyphinfo, any, GPCOORDS_SCREEN, 0, ATR.NONE, clr, $c.lit("screen [row,column]"), gpc === 115 ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     any.a_char = GPCOORDS_NONE;
-    await add_menu(tmpwin, nul_glyphinfo, any, GPCOORDS_NONE, 0, ATR_NONE, clr, $c.lit("none (no coordinates displayed)"), gpc === 110 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+    await add_menu(tmpwin, nul_glyphinfo, any, GPCOORDS_NONE, 0, ATR.NONE, clr, $c.lit("none (no coordinates displayed)"), gpc === 110 ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     await add_menu_str(tmpwin, $c.lit(""));
     $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("map: upper-left: <%d,%d>, lower-right: <%d,%d>%s"), 1, 0, COLNO - 1, ROWNO - 1, flags.verbose ? $c.lit("; column 0 unused, off left edge") : $c.lit(""));
     await add_menu_str(tmpwin, new $c.Ptr(buf, 0));
@@ -3870,7 +3870,7 @@ async function handler_whatis_coord() {   // options.c:6206
     await add_menu_str(tmpwin, new $c.Ptr(buf, 0));
     await add_menu_str(tmpwin, $c.lit(""));
     await end_menu()(tmpwin, $c.lit("Select coordinate display when auto-describing a map position:"));
-    if ((pick_cnt = await select_menu(tmpwin, PICK_ONE, new $c.Ptr(window_pick, 0))) > 0) {
+    if ((pick_cnt = await select_menu(tmpwin, PICK.ONE, new $c.Ptr(window_pick, 0))) > 0) {
         iflags.getpos_coords = $c.radd(window_pick[0], 0).item.a_char;
         if (pick_cnt > 1 && iflags.getpos_coords === gpc) {
             iflags.getpos_coords = $c.radd(window_pick[0], 1).item.a_char;
@@ -3885,17 +3885,17 @@ async function handler_whatis_filter() {   // options.c:6279
     window_pick[0] = null;
     gfilt = $c.i8(iflags.getloc_filter);
     clr = NO_COLOR;
-    tmpwin = await create_nhwindow()(NHW_MENU);
-    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW.MENU);
+    await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     any.a_char = GFILTER_NONE + 1;
-    await add_menu(tmpwin, nul_glyphinfo, any, 110, 0, ATR_NONE, clr, $c.lit("no filtering"), gfilt === GFILTER_NONE ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+    await add_menu(tmpwin, nul_glyphinfo, any, 110, 0, ATR.NONE, clr, $c.lit("no filtering"), gfilt === GFILTER_NONE ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     any.a_char = GFILTER_VIEW + 1;
-    await add_menu(tmpwin, nul_glyphinfo, any, 118, 0, ATR_NONE, clr, $c.lit("in view only"), gfilt === GFILTER_VIEW ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+    await add_menu(tmpwin, nul_glyphinfo, any, 118, 0, ATR.NONE, clr, $c.lit("in view only"), gfilt === GFILTER_VIEW ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     any.a_char = GFILTER_AREA + 1;
-    await add_menu(tmpwin, nul_glyphinfo, any, 97, 0, ATR_NONE, clr, $c.lit("in same area"), gfilt === GFILTER_AREA ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+    await add_menu(tmpwin, nul_glyphinfo, any, 97, 0, ATR.NONE, clr, $c.lit("in same area"), gfilt === GFILTER_AREA ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     await end_menu()(tmpwin, $c.lit("Select location filtering when going for next/previous map position:"));
-    if ((pick_cnt = await select_menu(tmpwin, PICK_ONE, new $c.Ptr(window_pick, 0))) > 0) {
+    if ((pick_cnt = await select_menu(tmpwin, PICK.ONE, new $c.Ptr(window_pick, 0))) > 0) {
         iflags.getloc_filter = $c.radd(window_pick[0], 0).item.a_char - 1 | 0;
         if (pick_cnt > 1 && iflags.getloc_filter === gfilt) {
             iflags.getloc_filter = $c.radd(window_pick[0], 1).item.a_char - 1 | 0;
@@ -3936,8 +3936,8 @@ async function handler_autopickup_exception() {   // options.c:6331
             continue ape_again$;
         } else {
             pick_list[0] = null;
-            tmpwin = await create_nhwindow()(NHW_MENU);
-            await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
+            tmpwin = await create_nhwindow()(NHW.MENU);
+            await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
             if (numapes) {
                 ape = ga.apelist;
                 any.$copyFrom(cg.zeroany);
@@ -3945,13 +3945,13 @@ async function handler_autopickup_exception() {   // options.c:6331
                 for (i = 0; i < numapes && ape; i = i + 1 | 0) {
                     any.a_void = opt_idx === 1 ? null : ape;
                     $c.__builtin___sprintf_chk(new $c.Ptr(apebuf, 0), 0, 258, $c.lit("\"%c%s\""), ape.grab ? 60 : 62, ape.pattern);
-                    await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR_NONE, clr, new $c.Ptr(apebuf, 0), MENU_ITEMFLAGS_NONE);
+                    await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(apebuf, 0), MENU.ITEMFLAGS_NONE);
                     ape = ape.next;
                 }
             }
             $c.__builtin___sprintf_chk(new $c.Ptr(apebuf, 0), 0, 258, $c.lit("%s autopickup exceptions"), opt_idx === 1 ? $c.lit("List of") : $c.lit("Remove which"));
             await end_menu()(tmpwin, new $c.Ptr(apebuf, 0));
-            pick_cnt = await select_menu(tmpwin, opt_idx === 1 ? PICK_NONE : PICK_ANY, new $c.Ptr(pick_list, 0));
+            pick_cnt = await select_menu(tmpwin, opt_idx === 1 ? PICK.NONE : PICK.ANY, new $c.Ptr(pick_list, 0));
             if (pick_cnt > 0) {
                 for (pick_idx = 0; pick_idx < pick_cnt; pick_idx = pick_idx + 1 | 0) {
                     remove_autopickup_exception($c.asRec($c.radd(pick_list[0], pick_idx).item.a_void, $T.autopickup_exception, 32));
@@ -3992,7 +3992,7 @@ async function handler_menu_colors() {   // options.c:6407
                 if (new $c.Ptr(mcbuf, 0).get(0) === 27) {
                     $goto = "menucolors_done"; continue D1;
                 }
-                if (new $c.Ptr(mcbuf, 0).get(0) && await test_regex_pattern(new $c.Ptr(mcbuf, 0), $c.lit("MENUCOLORS regex")) && (mcclr = await query_color(null, NO_COLOR)) !== -1 && (mcattr = await query_attr(null, ATR_NONE)) !== -1 && !await add_menu_coloring_parsed(new $c.Ptr(mcbuf, 0), mcclr, mcattr)) {
+                if (new $c.Ptr(mcbuf, 0).get(0) && await test_regex_pattern(new $c.Ptr(mcbuf, 0), $c.lit("MENUCOLORS regex")) && (mcclr = await query_color(null, NO_COLOR)) !== -1 && (mcattr = await query_attr(null, ATR.NONE)) !== -1 && !await add_menu_coloring_parsed(new $c.Ptr(mcbuf, 0), mcclr, mcattr)) {
                     await pline($c.lit("Error adding the menu color."));
                     await wait_synch()();
                 }
@@ -4000,8 +4000,8 @@ async function handler_menu_colors() {   // options.c:6407
             } else {
                 pick_list[0] = null;
                 tmp = gm.menu_colorings;
-                tmpwin = await create_nhwindow()(NHW_MENU);
-                await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
+                tmpwin = await create_nhwindow()(NHW.MENU);
+                await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
                 any.$copyFrom(cg.zeroany);
                 mc_idx = 0;
                 while (tmp) {
@@ -4009,7 +4009,7 @@ async function handler_menu_colors() {   // options.c:6407
                     sclr = $c.__builtin___strcpy_chk(new $c.Ptr(clrbuf, 0), clr2colorname(tmp.color), 128);
                     strNsubst(new $c.Ptr(clrbuf, 0), $c.lit(" "), $c.lit("-"), 0);
                     $t1 = mc_idx = mc_idx + 1 | 0, any.a_int = $t1;
-                    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("\"\"=%s%s%s"), sclr, tmp.attr !== ATR_NONE ? $c.lit("&") : $c.lit(""), tmp.attr !== ATR_NONE ? sattr : $c.lit(""));
+                    $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("\"\"=%s%s%s"), sclr, tmp.attr !== ATR.NONE ? $c.lit("&") : $c.lit(""), tmp.attr !== ATR.NONE ? sattr : $c.lit(""));
                     ln = $c.u32($c.subu64($c.subu64(256, await Strlen_(new $c.Ptr(buf, 0), $c.lit("handler_menu_colors"), 6470)), 1));
                     $c.__builtin___strcpy_chk(new $c.Ptr(mcbuf, 0), $c.lit("\""), 256);
                     if ($c.strlen(tmp.origstr) > ln) {
@@ -4018,12 +4018,12 @@ async function handler_menu_colors() {   // options.c:6407
                         $c.__builtin___strcat_chk(new $c.Ptr(mcbuf, 0), tmp.origstr, 256);
                     }
                     $c.__builtin___strcat_chk(new $c.Ptr(mcbuf, 0), new $c.Ptr(buf, 1), 256);
-                    await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR_NONE, clr, new $c.Ptr(mcbuf, 0), MENU_ITEMFLAGS_NONE);
+                    await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(mcbuf, 0), MENU.ITEMFLAGS_NONE);
                     tmp = tmp.next;
                 }
                 $c.__builtin___sprintf_chk(new $c.Ptr(mcbuf, 0), 0, 256, $c.lit("%s menu colors"), opt_idx === 1 ? $c.lit("List of") : $c.lit("Remove which"));
                 await end_menu()(tmpwin, new $c.Ptr(mcbuf, 0));
-                pick_cnt = await select_menu(tmpwin, opt_idx === 1 ? PICK_NONE : PICK_ANY, new $c.Ptr(pick_list, 0));
+                pick_cnt = await select_menu(tmpwin, opt_idx === 1 ? PICK.NONE : PICK.ANY, new $c.Ptr(pick_list, 0));
                 if (pick_cnt > 0) {
                     for (pick_idx = 0; pick_idx < pick_cnt; pick_idx = pick_idx + 1 | 0) {
                         free_one_menu_coloring(($c.radd(pick_list[0], pick_idx).item.a_int - 1 | 0) - pick_idx | 0);
@@ -4062,8 +4062,8 @@ async function handler_msgtype() {   // options.c:6502
             pick_list[0] = null;
             tmp = gp.plinemsg_types;
             clr = NO_COLOR;
-            tmpwin = await create_nhwindow()(NHW_MENU);
-            await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
+            tmpwin = await create_nhwindow()(NHW.MENU);
+            await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
             any.$copyFrom(cg.zeroany);
             mt_idx = 0;
             while (tmp) {
@@ -4076,12 +4076,12 @@ async function handler_msgtype() {   // options.c:6502
                 } else {
                     $c.__builtin___strcat_chk($c.__builtin___strcat_chk(new $c.Ptr(mtbuf, 0), tmp.pattern, 256), $c.lit("\""), -1);
                 }
-                await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR_NONE, clr, new $c.Ptr(mtbuf, 0), MENU_ITEMFLAGS_NONE);
+                await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(mtbuf, 0), MENU.ITEMFLAGS_NONE);
                 tmp = tmp.next;
             }
             $c.__builtin___sprintf_chk(new $c.Ptr(mtbuf, 0), 0, 256, $c.lit("%s message types"), opt_idx === 1 ? $c.lit("List of") : $c.lit("Remove which"));
             await end_menu()(tmpwin, new $c.Ptr(mtbuf, 0));
-            pick_cnt = await select_menu(tmpwin, opt_idx === 1 ? PICK_NONE : PICK_ANY, new $c.Ptr(pick_list, 0));
+            pick_cnt = await select_menu(tmpwin, opt_idx === 1 ? PICK.NONE : PICK.ANY, new $c.Ptr(pick_list, 0));
             if (pick_cnt > 0) {
                 for (pick_idx = 0; pick_idx < pick_cnt; pick_idx = pick_idx + 1 | 0) {
                     free_one_msgtype(($c.radd(pick_list[0], pick_idx).item.a_int - 1 | 0) - pick_idx | 0);
@@ -4102,17 +4102,17 @@ async function handler_versinfo() {   // options.c:6573
     vi_pick[0] = null;
     have_branch = $c.i8(nomakedefs.git_branch && nomakedefs.git_branch.get(0) ? 1 : 0);
     vi = flags.versinfo | 0;
-    tmpwin = await create_nhwindow()(NHW_MENU);
-    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW.MENU);
+    await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
-    $t1 = n = VI_NUMBER, any.a_int = $t1;
-    await add_menu(tmpwin, nul_glyphinfo, any, 110, $c.i8(n + 48 | 0), ATR_NONE, NO_COLOR, $c.lit("version number"), vi & n ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
-    $t2 = n = VI_NAME, any.a_int = $t2;
-    await add_menu(tmpwin, nul_glyphinfo, any, 103, $c.i8(n + 48 | 0), ATR_NONE, NO_COLOR, $c.lit("game name"), vi & n ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
-    $t3 = n = VI_BRANCH, any.a_int = $t3;
-    await add_menu(tmpwin, nul_glyphinfo, any, 98, $c.i8(n + 48 | 0), ATR_NONE, NO_COLOR, have_branch ? $c.lit("development branch") : $c.lit("(not applicable)"), vi & n ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+    $t1 = n = VI.NUMBER, any.a_int = $t1;
+    await add_menu(tmpwin, nul_glyphinfo, any, 110, $c.i8(n + 48 | 0), ATR.NONE, NO_COLOR, $c.lit("version number"), vi & n ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+    $t2 = n = VI.NAME, any.a_int = $t2;
+    await add_menu(tmpwin, nul_glyphinfo, any, 103, $c.i8(n + 48 | 0), ATR.NONE, NO_COLOR, $c.lit("game name"), vi & n ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
+    $t3 = n = VI.BRANCH, any.a_int = $t3;
+    await add_menu(tmpwin, nul_glyphinfo, any, 98, $c.i8(n + 48 | 0), ATR.NONE, NO_COLOR, have_branch ? $c.lit("development branch") : $c.lit("(not applicable)"), vi & n ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     await end_menu()(tmpwin, $c.lit("Select version information flags:"));
-    n = await select_menu(tmpwin, PICK_ANY, new $c.Ptr(vi_pick, 0));
+    n = await select_menu(tmpwin, PICK.ANY, new $c.Ptr(vi_pick, 0));
     if (n > 0) {
         newval = 0;
         for (i = 0; i < n; i = i + 1 | 0) {
@@ -4131,16 +4131,16 @@ async function handler_windowborders() {   // options.c:6620
     let tmpwin = 0, any = new $T.any(), i = 0, mode_name = null, mode_pick = [null], clr = 0;
     mode_pick[0] = null;
     clr = NO_COLOR;
-    tmpwin = await create_nhwindow()(NHW_MENU);
-    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW.MENU);
+    await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     for (i = 0; i < 5; i = i + 1 | 0) {
         mode_name = handler_windowborders$windowborders_text[i];
         any.a_int = i + 1 | 0;
-        await add_menu(tmpwin, nul_glyphinfo, any, $c.i8(97 + i | 0), $c.i8(48 + i | 0), ATR_NONE, clr, mode_name, MENU_ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, $c.i8(97 + i | 0), $c.i8(48 + i | 0), ATR.NONE, clr, mode_name, MENU.ITEMFLAGS_NONE);
     }
     await end_menu()(tmpwin, $c.lit("Select window borders mode:"));
-    if (await select_menu(tmpwin, PICK_ONE, new $c.Ptr(mode_pick, 0)) > 0) {
+    if (await select_menu(tmpwin, PICK.ONE, new $c.Ptr(mode_pick, 0)) > 0) {
         iflags.wc2_windowborders = mode_pick[0].item.a_int - 1 | 0;
         $c.free(mode_pick[0]);
     }
@@ -4445,13 +4445,13 @@ export async function initoptions_init() {   // options.c:7119
     flags.end_own = FALSE;
     flags.end_top = 3;
     flags.end_around = 2;
-    flags.paranoia_bits = PARANOID_PRAY | PARANOID_SWIM | PARANOID_TRAP;
+    flags.paranoia_bits = PARANOID.PRAY | PARANOID.SWIM | PARANOID.TRAP;
     flags.versinfo = (have_branch ? 4 : 1) >>> 0;
     flags.pile_limit = PILE_LIMIT_DFLT;
-    flags.runmode = RUN_LEAP;
+    flags.runmode = RUN.LEAP;
     iflags.msg_history = 20;
     iflags.prevmsg_window = 115;
-    iflags.menu_headings.attr = ATR_INVERSE;
+    iflags.menu_headings.attr = ATR.INVERSE;
     iflags.menu_headings.color = NO_COLOR;
     iflags.getpos_coords = 110;
     $t3 = ($t2 = ($t1 = flags.initalign = ROLE_NONE, flags.initgend = $t1), flags.initrace = $t2), flags.initrole = $t3;
@@ -4486,15 +4486,15 @@ export async function initoptions_init() {   // options.c:7119
         }
         await switch_symbols(TRUE);
     }
-    flags.menu_style = MENU_FULL;
-    iflags.wc_align_message = ALIGN_TOP;
-    iflags.wc_align_status = ALIGN_BOTTOM;
+    flags.menu_style = MENU.FULL;
+    iflags.wc_align_message = ALIGN.TOP;
+    iflags.wc_align_status = ALIGN.BOTTOM;
     iflags.wc2_statuslines = 2;
-    iflags.wc2_petattr = ATR_INVERSE;
+    iflags.wc2_petattr = ATR.INVERSE;
     iflags.wc2_windowborders = 2;
     iflags.menuinvertmode = 1;
     objects[SLIME_MOLD].oc_name_idx = SLIME_MOLD;
-    nmcpy(new $c.Ptr(svp.pl_fruit, 0), obj_descr[objects[SLIME_MOLD].oc_name_idx].oc_name, PL_FSIZ);
+    nmcpy(new $c.Ptr(svp.pl_fruit, 0), obj_descr[objects[SLIME_MOLD].oc_name_idx].oc_name, PL.FSIZ);
     await assure_syscf_file();
     await config_error_init(TRUE, $c.lit("sysconf"), FALSE);
     go.opt_phase = syscf_opt;
@@ -4511,9 +4511,9 @@ export async function initoptions_finish() {   // options.c:7324
     await rcfile();
     await fruitadd(new $c.Ptr(svp.pl_fruit, 0), null);
     obj_descr[SLIME_MOLD].oc_name = $c.lit("fruit");
-    sym = get_othersym(SYM_BOULDER, (svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? ROGUESET : PRIMARYSET);
+    sym = get_othersym(SYM.BOULDER, (svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? ROGUESET : PRIMARYSET);
     if (sym) {
-        gs.showsyms[SYM_BOULDER + SYM_OFF_X] = sym;
+        gs.showsyms[SYM.BOULDER + SYM_OFF_X] = sym;
     }
     reglyph_darkroom();
     reset_glyphmap(gm_optionchange);
@@ -4705,17 +4705,17 @@ async function query_msgtype() {   // options.c:7701
     let tmpwin = 0, any = new $T.any(), i = 0, pick_cnt = 0, picks = [null], clr = 0;
     picks[0] = null;
     clr = NO_COLOR;
-    tmpwin = await create_nhwindow()(NHW_MENU);
-    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW.MENU);
+    await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     for (i = 0; i < 6; i = i + 1 | 0) {
         if (msgtype_names[i].descr) {
             any.a_int = msgtype_names[i].msgtyp + 1 | 0;
-            await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR_NONE, clr, msgtype_names[i].descr, MENU_ITEMFLAGS_NONE);
+            await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, msgtype_names[i].descr, MENU.ITEMFLAGS_NONE);
         }
     }
     await end_menu()(tmpwin, $c.lit("How to show the message"));
-    pick_cnt = await select_menu(tmpwin, PICK_ONE, new $c.Ptr(picks, 0));
+    pick_cnt = await select_menu(tmpwin, PICK.ONE, new $c.Ptr(picks, 0));
     await destroy_nhwindow()(tmpwin);
     if (pick_cnt > 0) {
         i = picks[0].item.a_int - 1 | 0;
@@ -4784,7 +4784,7 @@ export function msgtype_type(msg, norepeat) {   // options.c:7797
         }
         tmp = tmp.next;
     }
-    return norepeat ? MSGTYP_NOREP : MSGTYP_NORMAL;
+    return norepeat ? MSGTYP.NOREP : MSGTYP.NORMAL;
 }
 export function hide_unhide_msgtypes(hide, hide_mask) {   // options.c:7815
     let tmp = null, mt = 0;
@@ -4851,7 +4851,7 @@ async function test_regex_pattern(str, errmsg) {   // options.c:7871
 }
 async function parse_role_opt(optidx, negated, fullname, opts, opp) {   // options.c:7905
     let preval = null, op = null, which = 0, ok = 0, sp = null, val_negated = 0, prev_negated = 0, first = 0, negbuf = new Int8Array(256);
-    which = optidx === opt_role ? RS_ROLE : optidx === opt_race ? RS_RACE : optidx === opt_gender ? RS_GENDER : optidx === opt_alignment ? RS_ALGNMNT : RS_filter;
+    which = optidx === opt_role ? RS.ROLE : optidx === opt_race ? RS.RACE : optidx === opt_gender ? RS.GENDER : optidx === opt_alignment ? RS.ALGNMNT : RS.filter;
     ok = FALSE;
     if (!$c.peq(op = await string_for_env_opt(fullname, opts, FALSE), new $c.Ptr(empty_optstr, 0))) {
         prev_negated = FALSE;
@@ -5006,7 +5006,7 @@ export async function fruitadd(str, replace_fruit) {   // options.c:8170
         if (user_specified) {
             found = FALSE;
             numeric = FALSE;
-            nmcpy(new $c.Ptr(svp.pl_fruit, 0), await makesingular(str), PL_FSIZ);
+            nmcpy(new $c.Ptr(svp.pl_fruit, 0), await makesingular(str), PL.FSIZ);
             globpfx = !$c.strncmp(new $c.Ptr(svp.pl_fruit, 0), $c.lit("small "), 6) || !$c.strncmp(new $c.Ptr(svp.pl_fruit, 0), $c.lit("large "), 6) ? 6 : !$c.strncmp(new $c.Ptr(svp.pl_fruit, 0), $c.lit("medium "), 7) ? 7 : !$c.strncmp(new $c.Ptr(svp.pl_fruit, 0), $c.lit("very large "), 11) ? 11 : 0;
             for (i = svb.bases[FOOD_CLASS]; objects[i].oc_class === FOOD_CLASS; i = i + 1 | 0) {
                 if (!$c.strcmp(obj_descr[objects[i].oc_name_idx].oc_name, new $c.Ptr(svp.pl_fruit, 0)) || globpfx > 0 && !$c.strcmp(obj_descr[objects[i].oc_name_idx].oc_name, new $c.Ptr(svp.pl_fruit, globpfx))) {
@@ -5025,17 +5025,17 @@ export async function fruitadd(str, replace_fruit) {   // options.c:8170
             if (found || numeric || !$c.strncmp(new $c.Ptr(svp.pl_fruit, 0), $c.lit("cursed "), 7) || !$c.strncmp(new $c.Ptr(svp.pl_fruit, 0), $c.lit("uncursed "), 9) || !$c.strncmp(new $c.Ptr(svp.pl_fruit, 0), $c.lit("blessed "), 8) || !$c.strncmp(new $c.Ptr(svp.pl_fruit, 0), $c.lit("partly eaten "), 13) || !$c.strncmp(new $c.Ptr(svp.pl_fruit, 0), $c.lit("tin of "), 7) && (!$c.strcmp(new $c.Ptr(svp.pl_fruit, 0).add(7), $c.lit("spinach")) || await name_to_mon(new $c.Ptr(svp.pl_fruit, 0).add(7), null) >= LOW_PM && await name_to_mon(new $c.Ptr(svp.pl_fruit, 0).add(7), null) < NUMMONS) || !$c.strcmp(new $c.Ptr(svp.pl_fruit, 0), $c.lit("empty tin")) || (!$c.strcmp(new $c.Ptr(svp.pl_fruit, 0), $c.lit("glob")) || globpfx > 0 && !$c.strcmp($c.lit("glob"), new $c.Ptr(svp.pl_fruit, globpfx))) || (str_end_is(new $c.Ptr(svp.pl_fruit, 0), $c.lit(" corpse")) || str_end_is(new $c.Ptr(svp.pl_fruit, 0), $c.lit(" egg"))) && (await name_to_mon(new $c.Ptr(svp.pl_fruit, 0), null) >= LOW_PM && await name_to_mon(new $c.Ptr(svp.pl_fruit, 0), null) < NUMMONS)) {
                 $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), new $c.Ptr(svp.pl_fruit, 0), 32);
                 $c.__builtin___strcpy_chk(new $c.Ptr(svp.pl_fruit, 0), $c.lit("candied "), 32);
-                nmcpy(new $c.Ptr(svp.pl_fruit, 0).add(8), new $c.Ptr(buf, 0), PL_FSIZ - 8);
+                nmcpy(new $c.Ptr(svp.pl_fruit, 0).add(8), new $c.Ptr(buf, 0), PL.FSIZ - 8);
             }
             new $c.Ptr(altname, 0).set(0, 0);
             flags.made_fruit = FALSE;
             if (replace_fruit) {
                 f = replace_fruit;
-                copynchars(new $c.Ptr(f.fname, 0), new $c.Ptr(svp.pl_fruit, 0), PL_FSIZ - 1);
+                copynchars(new $c.Ptr(f.fname, 0), new $c.Ptr(svp.pl_fruit, 0), PL.FSIZ - 1);
                 break nonew$;
             }
         } else {
-            copynchars(new $c.Ptr(altname, 0), str, PL_FSIZ - 1);
+            copynchars(new $c.Ptr(altname, 0), str, PL.FSIZ - 1);
             sanitize_name(new $c.Ptr(altname, 0));
             flags.made_fruit = TRUE;
         }
@@ -5048,7 +5048,7 @@ export async function fruitadd(str, replace_fruit) {   // options.c:8170
         }
         f = await newfruit();
         $c.__builtin___memset_chk(f, 0, 48, -1);
-        copynchars(new $c.Ptr(f.fname, 0), new $c.Ptr(altname, 0).get(0) ? new $c.Ptr(altname, 0) : str, PL_FSIZ - 1);
+        copynchars(new $c.Ptr(f.fname, 0), new $c.Ptr(altname, 0).get(0) ? new $c.Ptr(altname, 0) : str, PL.FSIZ - 1);
         $t1 = highest_fruit_id[0] = highest_fruit_id[0] + 1 | 0, f.fid = $t1;
         f.nextf = gf.ffruit;
         gf.ffruit = f;
@@ -5248,16 +5248,16 @@ async function doset_simple_menu() {   // options.c:8536
     }
     fmtstr = new $c.Ptr(fmtstr_doset_simple, 0);
     redo_opt_help$: for (;;) {
-        tmpwin = await create_nhwindow()(NHW_MENU);
-        await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
+        tmpwin = await create_nhwindow()(NHW.MENU);
+        await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
         if (gs.simple_options_help) {
             $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("Use command '#optionsfull' to get the complete options list."), 256);
             await add_menu_str(tmpwin, new $c.Ptr(buf, 0));
         }
         any.$copyFrom(cg.zeroany);
         any.a_int = -1;
-        await add_menu(tmpwin, nul_glyphinfo, any, 63, 0, ATR_NONE, NO_COLOR, gs.simple_options_help ? $c.lit("hide help") : $c.lit("show help"), MENU_ITEMFLAGS_NONE);
-        for (section = OptS_General; section < OptS_Advanced; section = section + 1 >>> 0) {
+        await add_menu(tmpwin, nul_glyphinfo, any, 63, 0, ATR.NONE, NO_COLOR, gs.simple_options_help ? $c.lit("hide help") : $c.lit("show help"), MENU.ITEMFLAGS_NONE);
+        for (section = OptS.General; section < OptS.Advanced; section = section + 1 >>> 0) {
             any.$copyFrom(cg.zeroany);
             await add_menu_str(tmpwin, $c.lit(""));
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit(" %-30s "), OptS_type[section]);
@@ -5303,7 +5303,7 @@ async function doset_simple_menu() {   // options.c:8536
                 if (allopt[i].idx === opt_pickup_types || allopt[i].idx === opt_pickup_thrown || allopt[i].idx === opt_pickup_stolen || allopt[i].idx === opt_dropped_nopick) {
                     $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit("  (for autopickup)"), 256);
                 }
-                await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR_NONE, NO_COLOR, new $c.Ptr(buf, 0), MENU_ITEMFLAGS_NONE);
+                await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, NO_COLOR, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
                 if (gs.simple_options_help && allopt[i].descr) {
                     $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("    %s"), allopt[i].descr);
                     await add_menu_str(tmpwin, new $c.Ptr(buf, 0));
@@ -5317,7 +5317,7 @@ async function doset_simple_menu() {   // options.c:8536
         go.opt_reset_customcolors = FALSE;
         go.opt_reset_customsymbols = FALSE;
         go.opt_update_basic_palette = FALSE;
-        pick_cnt = await select_menu(tmpwin, PICK_ONE, new $c.Ptr(pick_list, 0));
+        pick_cnt = await select_menu(tmpwin, PICK.ONE, new $c.Ptr(pick_list, 0));
         if (pick_cnt > 0) {
             k = $c.radd(pick_list[0], 0).item.a_int - 1 | 0;
             abuf[0] = 0;
@@ -5377,14 +5377,14 @@ export async function doset_simple() {   // options.c:8707
         }
     } while (pickedone > 0);
     give_opt_msg = TRUE;
-    return ECMD_OK;
+    return ECMD.OK;
 }
 function term_for_boolean(idx, b) {   // options.c:8738
     let i = 0, f_t = 0, boolean_term = null;
     f_t = b.get(0) ? 1 : 0;
     boolean_term = term_for_boolean$booleanterms[f_t][0];
     i = allopt[idx].termpref | 0;
-    if (i > Term_False && i < num_terms && i < 4) {
+    if (i > Term.False && i < num_terms && i < 4) {
         boolean_term = term_for_boolean$booleanterms[f_t][i];
     }
     return boolean_term;
@@ -5401,8 +5401,8 @@ export async function doset() {   // options.c:8758
     }
     go.opt_phase = play_opt;
     rerun$: for (;;) {
-        tmpwin = await create_nhwindow()(NHW_MENU);
-        await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
+        tmpwin = await create_nhwindow()(NHW.MENU);
+        await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
         if (!skiphelp) {
             any.$copyFrom(cg.zeroany);
             for (i = 0; i < 5; i = i + 1 | 0) {
@@ -5411,7 +5411,7 @@ export async function doset() {   // options.c:8758
                     await add_menu_str(tmpwin, new $c.Ptr(buf, 0));
                 } else {
                     any.a_int = HELP_IDX + 1;
-                    await add_menu(tmpwin, nul_glyphinfo, any, 63, 63, ATR_NONE, clr, $c.lit("view help for options menu"), MENU_ITEMFLAGS_SKIPINVERT);
+                    await add_menu(tmpwin, nul_glyphinfo, any, 63, 63, ATR.NONE, clr, $c.lit("view help for options menu"), MENU.ITEMFLAGS_SKIPINVERT);
                 }
             }
         }
@@ -5447,7 +5447,7 @@ export async function doset() {   // options.c:8758
                     if (pass === 0) {
                         enhance_menu_text(new $c.Ptr(buf, 0), 256, pass, bool_p, $c.relem(allopt, i));
                     }
-                    await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR_NONE, clr, new $c.Ptr(buf, 0), MENU_ITEMFLAGS_SKIPINVERT);
+                    await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_SKIPINVERT);
                 }
             }
         }
@@ -5484,7 +5484,7 @@ export async function doset() {   // options.c:8758
         await end_menu()(tmpwin, $c.lit("Set what options?"));
         go.opt_need_redraw = FALSE;
         go.opt_need_glyph_reset = FALSE;
-        if ((pick_cnt = await select_menu(tmpwin, PICK_ANY, new $c.Ptr(pick_list, 0))) > 0) {
+        if ((pick_cnt = await select_menu(tmpwin, PICK.ANY, new $c.Ptr(pick_list, 0))) > 0) {
             for (pick_idx = 0; pick_idx < pick_cnt; pick_idx = pick_idx + 1 | 0) {
                 opt_indx = $c.radd(pick_list[0], pick_idx).item.a_int - 1 | 0;
                 if (opt_indx === HELP_IDX) {
@@ -5534,7 +5534,7 @@ export async function doset() {   // options.c:8758
         break;
     }
     await reset_needed_visuals();
-    return ECMD_OK;
+    return ECMD.OK;
 }
 async function reset_needed_visuals() {   // options.c:8980
     if (go.opt_need_glyph_reset) {
@@ -5593,7 +5593,7 @@ async function doset_add_menu(win, option, fmtstr, idx, indexoffset) {   // opti
     }
     indent = !any.a_int ? $c.lit("    ") : $c.lit("");
     $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, fmtstr, indent, option, value);
-    await add_menu(win, nul_glyphinfo, any, 0, 0, ATR_NONE, clr, new $c.Ptr(buf, 0), MENU_ITEMFLAGS_SKIPINVERT);
+    await add_menu(win, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_SKIPINVERT);
 }
 export async function show_menu_controls(win, dolist) {   // options.c:9070
     let buf = new Int8Array(256), fmt = null, arg = null, xcp = null, has_menu_shift = 0, i = 0, ch = 0;
@@ -5675,8 +5675,8 @@ async function handle_add_list_remove(optname, numtotal) {   // options.c:9208
     let tmpwin = 0, any = new $T.any(), i = 0, pick_cnt = 0, opt_idx = 0, pick_list = [null], clr = 0, tmpbuf = new Int8Array(256);
     pick_list[0] = null;
     clr = NO_COLOR;
-    tmpwin = await create_nhwindow()(NHW_MENU);
-    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW.MENU);
+    await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     for (i = 0; i < 4; i = i + 1 | 0) {
         any.a_int = any.a_int + 1 | 0;
@@ -5684,10 +5684,10 @@ async function handle_add_list_remove(optname, numtotal) {   // options.c:9208
             continue;
         }
         $c.__builtin___sprintf_chk(new $c.Ptr(tmpbuf, 0), 0, 256, handle_add_list_remove$action_titles[i].desc, i === 1 ? await makeplural(optname) : optname);
-        await add_menu(tmpwin, nul_glyphinfo, any, handle_add_list_remove$action_titles[i].letr, 0, ATR_NONE, clr, new $c.Ptr(tmpbuf, 0), i === 3 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, handle_add_list_remove$action_titles[i].letr, 0, ATR.NONE, clr, new $c.Ptr(tmpbuf, 0), i === 3 ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     }
     await end_menu()(tmpwin, $c.lit("Do what?"));
-    if ((pick_cnt = await select_menu(tmpwin, PICK_ONE, new $c.Ptr(pick_list, 0))) > 0) {
+    if ((pick_cnt = await select_menu(tmpwin, PICK.ONE, new $c.Ptr(pick_list, 0))) > 0) {
         opt_idx = $c.radd(pick_list[0], 0).item.a_int - 1 | 0;
         if (pick_cnt > 1 && opt_idx === 3) {
             opt_idx = $c.radd(pick_list[0], 1).item.a_int - 1 | 0;
@@ -5709,16 +5709,16 @@ export async function dotogglepickup() {   // options.c:9256
         $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("OFF"), 256);
     }
     await pline($c.lit("Autopickup: %s."), new $c.Ptr(buf, 0));
-    return ECMD_OK;
+    return ECMD.OK;
 }
 export async function toggle_bool_option(p) {   // options.c:9278
     let i = 0, ret = 0, buf = new Int8Array(256);
-    ret = ECMD_FAIL;
+    ret = ECMD.FAIL;
     for (i = 0; i < OPTCOUNT; i = i + 1 | 0) {
         if (!strncmpi(allopt[i].name, p, $c.i32($c.strlen(p))) && allopt[i].opttyp === BoolOpt && allopt[i].setwhere === set_in_game && allopt[i].addr !== null) {
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s%s"), allopt[i].addr.get(0) ? $c.lit("!") : $c.lit(""), allopt[i].name);
             if (await parseoptions(new $c.Ptr(buf, 0), FALSE, FALSE)) {
-                ret = ECMD_OK;
+                ret = ECMD.OK;
             }
             await reset_needed_visuals();
         }
@@ -5811,7 +5811,7 @@ export function sym_val(strval) {   // options.c:9385
 }
 export async function option_help() {   // options.c:9462
     let buf = new Int8Array(256), buf2 = new Int8Array(256), optname = null, i = 0, datawin = 0;
-    datawin = await create_nhwindow()(NHW_TEXT);
+    datawin = await create_nhwindow()(NHW.TEXT);
     nh_snprintf($c.lit("option_help"), 9471, new $c.Ptr(buf, 0), 256, $c.lit("Set options as OPTIONS=<options> in %s"), get_configfile());
     opt_intro[CONFIG_SLOT] = new $c.Ptr(buf, 0);
     for (i = 0; opt_intro[i]; i = i + 1 | 0) {
@@ -5907,7 +5907,7 @@ async function all_options_menucolors(sbuf) {   // options.c:9595
         tmp = arr.get(i - 1 | 0);
         sattr = attr2attrname(tmp.attr);
         sclr = clr2colorname(tmp.color);
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 512, $c.lit("MENUCOLOR=\"%s\"=%s%s%s\n"), tmp.origstr, sclr, tmp.attr !== ATR_NONE ? $c.lit("&") : $c.lit(""), tmp.attr !== ATR_NONE ? sattr : $c.lit(""));
+        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 512, $c.lit("MENUCOLOR=\"%s\"=%s%s%s\n"), tmp.origstr, sclr, tmp.attr !== ATR.NONE ? $c.lit("&") : $c.lit(""), tmp.attr !== ATR.NONE ? sattr : $c.lit(""));
         await strbuf_append(sbuf, new $c.Ptr(buf, 0));
     }
     $c.free(arr);
@@ -6266,745 +6266,745 @@ export function $init() {
         allopt_init[$i0].$copyFrom(new $T.allopt_t());
     }
     $c.init(allopt_init, [
-        { name: $c.lit("windowtype"), section: OptS_Advanced, minmatch: 0, expectedbuf: WINTYPELEN, idx: opt_windowtype, setwhere: set_gameview,
+        { name: $c.lit("windowtype"), section: OptS.Advanced, minmatch: 0, expectedbuf: WINTYPELEN, idx: opt_windowtype, setwhere: set_gameview,
           opttyp: CompOpt, negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_windowtype, alias: null,
           descr: $c.lit("windowing system to use (should be specified first)"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("playmode"), section: OptS_Advanced, minmatch: 0, expectedbuf: 8, idx: opt_playmode, setwhere: set_gameview, opttyp: CompOpt,
+        { name: $c.lit("playmode"), section: OptS.Advanced, minmatch: 0, expectedbuf: 8, idx: opt_playmode, setwhere: set_gameview, opttyp: CompOpt,
           negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_playmode, alias: null,
           descr: $c.lit("normal play, non-scoring explore mode, or debug mode"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("name"), section: OptS_Advanced, minmatch: 0, expectedbuf: PL_NSIZ, idx: opt_name, setwhere: set_gameview, opttyp: CompOpt, negateok: No,
+        { name: $c.lit("name"), section: OptS.Advanced, minmatch: 0, expectedbuf: PL.NSIZ, idx: opt_name, setwhere: set_gameview, opttyp: CompOpt, negateok: No,
           valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_name, alias: null,
           descr: $c.lit("your character's name (e.g., name:Merlin-W)"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("role"), section: OptS_Advanced, minmatch: 0, expectedbuf: PL_CSIZ, idx: opt_role, setwhere: set_gameview, opttyp: CompOpt,
+        { name: $c.lit("role"), section: OptS.Advanced, minmatch: 0, expectedbuf: PL.CSIZ, idx: opt_role, setwhere: set_gameview, opttyp: CompOpt,
           negateok: Yes, valok: Yes, dupeok: Yes, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_role, alias: $c.lit("character"),
           descr: $c.lit("your starting role (e.g., Barbarian, Valkyrie)"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("race"), section: OptS_Advanced, minmatch: 0, expectedbuf: PL_CSIZ, idx: opt_race, setwhere: set_gameview, opttyp: CompOpt,
+        { name: $c.lit("race"), section: OptS.Advanced, minmatch: 0, expectedbuf: PL.CSIZ, idx: opt_race, setwhere: set_gameview, opttyp: CompOpt,
           negateok: Yes, valok: Yes, dupeok: Yes, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_race, alias: null,
           descr: $c.lit("your starting race (e.g., Human, Elf)"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("gender"), section: OptS_Advanced, minmatch: 0, expectedbuf: 8, idx: opt_gender, setwhere: set_gameview, opttyp: CompOpt, negateok: Yes,
+        { name: $c.lit("gender"), section: OptS.Advanced, minmatch: 0, expectedbuf: 8, idx: opt_gender, setwhere: set_gameview, opttyp: CompOpt, negateok: Yes,
           valok: Yes, dupeok: Yes, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_gender, alias: null,
           descr: $c.lit("your starting gender (male or female)"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("alignment"), section: OptS_Advanced, minmatch: 0, expectedbuf: 8, idx: opt_alignment, setwhere: set_gameview, opttyp: CompOpt,
+        { name: $c.lit("alignment"), section: OptS.Advanced, minmatch: 0, expectedbuf: 8, idx: opt_alignment, setwhere: set_gameview, opttyp: CompOpt,
           negateok: Yes, valok: Yes, dupeok: Yes, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_alignment, alias: $c.lit("align"),
           descr: $c.lit("your starting alignment (lawful, neutral, or chaotic)"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("accessiblemsg"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_accessiblemsg, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(a11y, "accessiblemsg", "i8"),
+        { name: $c.lit("accessiblemsg"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_accessiblemsg, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_out, addr: new $c.FieldRef(a11y, "accessiblemsg", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("add location information to messages"), prefixgw: null, initval: Off, has_handler: 0,
           dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("acoustics"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_acoustics, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "acoustics", "i8"),
+        { name: $c.lit("acoustics"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_acoustics, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "acoustics", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("can your character hear anything"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("align_message"), section: OptS_Advanced, minmatch: 0, expectedbuf: 20, idx: opt_align_message, setwhere: set_gameview, opttyp: CompOpt,
+        { name: $c.lit("align_message"), section: OptS.Advanced, minmatch: 0, expectedbuf: 20, idx: opt_align_message, setwhere: set_gameview, opttyp: CompOpt,
           negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_align_message, alias: null,
           descr: $c.lit("message window alignment"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("align_status"), section: OptS_Advanced, minmatch: 0, expectedbuf: 20, idx: opt_align_status, setwhere: set_gameview, opttyp: CompOpt,
+        { name: $c.lit("align_status"), section: OptS.Advanced, minmatch: 0, expectedbuf: 20, idx: opt_align_status, setwhere: set_gameview, opttyp: CompOpt,
           negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_align_status, alias: null,
           descr: $c.lit("status window alignment"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("altkeyhandling"), section: OptS_Advanced, minmatch: 0, expectedbuf: 20, idx: opt_altkeyhandling, setwhere: set_in_config,
+        { name: $c.lit("altkeyhandling"), section: OptS.Advanced, minmatch: 0, expectedbuf: 20, idx: opt_altkeyhandling, setwhere: set_in_config,
           opttyp: CompOpt, negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_altkeyhandling,
           alias: $c.lit("altkeyhandler"), descr: $c.lit("(not applicable)"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("altmeta"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_altmeta, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
-          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(iflags, "altmeta", "i8"), optfn: optfn_boolean,
+        { name: $c.lit("altmeta"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_altmeta, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_out, addr: new $c.FieldRef(iflags, "altmeta", "i8"), optfn: optfn_boolean,
           alias: null, descr: $c.lit("treat \"ESC c\" as M-c (Meta+c, 8th bit set)"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("armorstatus"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_armorstatus, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "armorstatus", "i8"),
+        { name: $c.lit("armorstatus"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_armorstatus, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "armorstatus", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("summarize currently worn armor in a status field"), prefixgw: null, initval: Off, has_handler: 0,
           dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("ascii_map"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_ascii_map, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "wc_ascii_map", "i8"),
+        { name: $c.lit("ascii_map"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_ascii_map, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "wc_ascii_map", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("show map as text"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("autocompletions"), section: OptS_Advanced, minmatch: 0, expectedbuf: BUFSZ, idx: opt_o_autocomplete, opt_in_out: opt_in, addr: null,
+        { name: $c.lit("autocompletions"), section: OptS.Advanced, minmatch: 0, expectedbuf: BUFSZ, idx: opt_o_autocomplete, opt_in_out: opt_in, addr: null,
           optfn: optfn_o_autocomplete,
           setwhere: set_in_game, opttyp: OthrOpt, negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, alias: null,
           descr: $c.lit("edit autocompletions"), prefixgw: null, initval: On, has_handler: On, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("autodescribe"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_autodescribe, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(iflags, "autodescribe", "i8"),
+        { name: $c.lit("autodescribe"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_autodescribe, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_out, addr: new $c.FieldRef(iflags, "autodescribe", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("describe terrain under cursor"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("autodig"), section: OptS_Behavior, minmatch: 0, expectedbuf: 0, idx: opt_autodig, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
-          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "autodig", "i8"), optfn: optfn_boolean,
+        { name: $c.lit("autodig"), section: OptS.Behavior, minmatch: 0, expectedbuf: 0, idx: opt_autodig, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "autodig", "i8"), optfn: optfn_boolean,
           alias: null, descr: $c.lit("dig if moving and wielding a digging tool"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("autoopen"), section: OptS_Behavior, minmatch: 0, expectedbuf: 0, idx: opt_autoopen, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "autoopen", "i8"),
+        { name: $c.lit("autoopen"), section: OptS.Behavior, minmatch: 0, expectedbuf: 0, idx: opt_autoopen, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "autoopen", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("walking into a door attempts to open it"), prefixgw: null, initval: On, has_handler: 0,
           dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("autopickup"), section: OptS_Behavior, minmatch: 0, expectedbuf: 0, idx: opt_autopickup, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "pickup", "i8"),
+        { name: $c.lit("autopickup"), section: OptS.Behavior, minmatch: 0, expectedbuf: 0, idx: opt_autopickup, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "pickup", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("automatically pick up objects"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("autopickup exceptions"), section: OptS_Behavior, minmatch: 0, expectedbuf: BUFSZ, idx: opt_o_autopickup_exceptions,
+        { name: $c.lit("autopickup exceptions"), section: OptS.Behavior, minmatch: 0, expectedbuf: BUFSZ, idx: opt_o_autopickup_exceptions,
           opt_in_out: opt_in, addr: null, optfn: optfn_o_autopickup_exceptions, setwhere: set_in_game, opttyp: OthrOpt,
           negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, alias: null, descr: $c.lit("edit autopickup exceptions"), prefixgw: null, initval: On,
           has_handler: On, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("autoquiver"), section: OptS_Behavior, minmatch: 0, expectedbuf: 0, idx: opt_autoquiver, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "autoquiver", "i8"),
+        { name: $c.lit("autoquiver"), section: OptS.Behavior, minmatch: 0, expectedbuf: 0, idx: opt_autoquiver, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "autoquiver", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("fill empty quiver automatically when firing"), prefixgw: null, initval: Off, has_handler: 0,
           dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("autounlock"), section: OptS_Behavior, minmatch: 0, expectedbuf: 80, idx: opt_autounlock, setwhere: set_in_game, opttyp: CompOpt,
+        { name: $c.lit("autounlock"), section: OptS.Behavior, minmatch: 0, expectedbuf: 80, idx: opt_autounlock, setwhere: set_in_game, opttyp: CompOpt,
           negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_out, addr: null, optfn: optfn_autounlock, alias: null,
           descr: $c.lit("action to take when encountering locked door or chest"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("bgcolors"), section: OptS_Map, minmatch: 0, expectedbuf: 0, idx: opt_bgcolors, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
-          valok: No, dupeok: No, pfx: No, termpref: Term_Off, opt_in_out: opt_out, addr: new $c.FieldRef(iflags, "bgcolors", "i8"), optfn: optfn_boolean,
+        { name: $c.lit("bgcolors"), section: OptS.Map, minmatch: 0, expectedbuf: 0, idx: opt_bgcolors, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term.Off, opt_in_out: opt_out, addr: new $c.FieldRef(iflags, "bgcolors", "i8"), optfn: optfn_boolean,
           alias: null, descr: $c.lit("use background color for some map hilighting"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("bind keys"), section: OptS_Advanced, minmatch: 0, expectedbuf: BUFSZ, idx: opt_o_bind_keys, opt_in_out: opt_in, addr: null,
+        { name: $c.lit("bind keys"), section: OptS.Advanced, minmatch: 0, expectedbuf: BUFSZ, idx: opt_o_bind_keys, opt_in_out: opt_in, addr: null,
           optfn: optfn_o_bind_keys, setwhere: set_in_game, opttyp: OthrOpt,
           negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, alias: null, descr: $c.lit("edit key binds"), prefixgw: null, initval: On,
           has_handler: On, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("BIOS"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_BIOS, setwhere: set_in_config, opttyp: BoolOpt, negateok: No,
-          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: null, optfn: optfn_boolean, alias: null, descr: null, prefixgw: null,
+        { name: $c.lit("BIOS"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_BIOS, setwhere: set_in_config, opttyp: BoolOpt, negateok: No,
+          valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: null, optfn: optfn_boolean, alias: null, descr: null, prefixgw: null,
           initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("blind"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_blind, setwhere: set_in_config, opttyp: BoolOpt, negateok: Yes,
-          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(u.uroleplay, "blind", "i8"), optfn: optfn_boolean,
+        { name: $c.lit("blind"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_blind, setwhere: set_in_config, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(u.uroleplay, "blind", "i8"), optfn: optfn_boolean,
           alias: $c.lit("permablind"), descr: $c.lit("your character is permanently blind"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("bones"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_bones, setwhere: set_in_config, opttyp: BoolOpt, negateok: Yes,
-          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "bones", "i8"), optfn: optfn_boolean,
+        { name: $c.lit("bones"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_bones, setwhere: set_in_config, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "bones", "i8"), optfn: optfn_boolean,
           alias: null, descr: $c.lit("allow loading bones files"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("boulder"), section: OptS_Advanced, minmatch: 0, expectedbuf: 1, idx: opt_boulder, setwhere: set_in_game, opttyp: CompOpt, negateok: No,
+        { name: $c.lit("boulder"), section: OptS.Advanced, minmatch: 0, expectedbuf: 1, idx: opt_boulder, setwhere: set_in_game, opttyp: CompOpt, negateok: No,
           valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_boulder, alias: null,
           descr: $c.lit("deprecated (use S_boulder in sym file instead)"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("catname"), section: OptS_Advanced, minmatch: 0, expectedbuf: PL_PSIZ, idx: opt_catname, setwhere: set_gameview, opttyp: CompOpt,
+        { name: $c.lit("catname"), section: OptS.Advanced, minmatch: 0, expectedbuf: PL.PSIZ, idx: opt_catname, setwhere: set_gameview, opttyp: CompOpt,
           negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_catname, alias: null,
           descr: $c.lit("name of your starting pet if it is a kitten"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("checkpoint"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_checkpoint, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "ins_chkpt", "i8"),
+        { name: $c.lit("checkpoint"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_checkpoint, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "ins_chkpt", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("save game state after each level change"), prefixgw: null, initval: On, has_handler: 0,
           dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("cmdassist"), section: OptS_Behavior, minmatch: 0, expectedbuf: 0, idx: opt_cmdassist, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(iflags, "cmdassist", "i8"),
+        { name: $c.lit("cmdassist"), section: OptS.Behavior, minmatch: 0, expectedbuf: 0, idx: opt_cmdassist, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_out, addr: new $c.FieldRef(iflags, "cmdassist", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("give help for errors on direction input"), prefixgw: null, initval: On, has_handler: 0,
           dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("color"), section: OptS_Map, minmatch: 0, expectedbuf: 0, idx: opt_color, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
-          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "wc_color", "i8"), optfn: optfn_boolean,
+        { name: $c.lit("color"), section: OptS.Map, minmatch: 0, expectedbuf: 0, idx: opt_color, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "wc_color", "i8"), optfn: optfn_boolean,
           alias: $c.lit("colour"), descr: $c.lit("use color in map"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("confirm"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_confirm, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
-          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "confirm", "i8"), optfn: optfn_boolean,
+        { name: $c.lit("confirm"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_confirm, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "confirm", "i8"), optfn: optfn_boolean,
           alias: null, descr: $c.lit("ask before hitting tame or peaceful monsters"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("crash_email"), section: OptS_Advanced, minmatch: 0, expectedbuf: PL_NSIZ, idx: opt_crash_email, setwhere: set_in_game, opttyp: CompOpt,
+        { name: $c.lit("crash_email"), section: OptS.Advanced, minmatch: 0, expectedbuf: PL.NSIZ, idx: opt_crash_email, setwhere: set_in_game, opttyp: CompOpt,
           negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_crash_email, alias: null,
           descr: $c.lit("email address for reporting"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("crash_name"), section: OptS_Advanced, minmatch: 0, expectedbuf: PL_NSIZ, idx: opt_crash_name, setwhere: set_in_game, opttyp: CompOpt,
+        { name: $c.lit("crash_name"), section: OptS.Advanced, minmatch: 0, expectedbuf: PL.NSIZ, idx: opt_crash_name, setwhere: set_in_game, opttyp: CompOpt,
           negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_crash_name, alias: null,
           descr: $c.lit("your name for reporting"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("crash_urlmax"), section: OptS_Advanced, minmatch: 0, expectedbuf: PL_NSIZ, idx: opt_crash_urlmax, setwhere: set_in_game,
+        { name: $c.lit("crash_urlmax"), section: OptS.Advanced, minmatch: 0, expectedbuf: PL.NSIZ, idx: opt_crash_urlmax, setwhere: set_in_game,
           opttyp: CompOpt, negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_crash_urlmax, alias: null,
           descr: $c.lit("length of longest url we can generate"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("customcolors"), section: OptS_Map, minmatch: 0, expectedbuf: 0, idx: opt_customcolors, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(iflags, "customcolors", "i8"),
+        { name: $c.lit("customcolors"), section: OptS.Map, minmatch: 0, expectedbuf: 0, idx: opt_customcolors, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_out, addr: new $c.FieldRef(iflags, "customcolors", "i8"),
           optfn: optfn_boolean, alias: $c.lit("customcolours"), descr: $c.lit("use custom colors in map"), prefixgw: null, initval: On, has_handler: 0,
           dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("customsymbols"), section: OptS_Map, minmatch: 0, expectedbuf: 0, idx: opt_customsymbols, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(iflags, "customsymbols", "i8"),
+        { name: $c.lit("customsymbols"), section: OptS.Map, minmatch: 0, expectedbuf: 0, idx: opt_customsymbols, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_out, addr: new $c.FieldRef(iflags, "customsymbols", "i8"),
           optfn: optfn_boolean, alias: $c.lit("customsymbols"), descr: $c.lit("use custom utf8 symbols in map"), prefixgw: null, initval: On, has_handler: 0,
           dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("dark_room"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_dark_room, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "dark_room", "i8"),
+        { name: $c.lit("dark_room"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_dark_room, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "dark_room", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("show floor outside line of sight differently"), prefixgw: null, initval: On, has_handler: 0,
           dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("deaf"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_deaf, setwhere: set_in_config, opttyp: BoolOpt, negateok: Yes,
-          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(u.uroleplay, "deaf", "i8"), optfn: optfn_boolean,
+        { name: $c.lit("deaf"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_deaf, setwhere: set_in_config, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(u.uroleplay, "deaf", "i8"), optfn: optfn_boolean,
           alias: $c.lit("permadeaf"), descr: $c.lit("your character is permanently deaf"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("DECgraphics"), section: OptS_Advanced, minmatch: 0, expectedbuf: 70, idx: opt_DECgraphics, setwhere: set_in_config, opttyp: CompOpt,
+        { name: $c.lit("DECgraphics"), section: OptS.Advanced, minmatch: 0, expectedbuf: 70, idx: opt_DECgraphics, setwhere: set_in_config, opttyp: CompOpt,
           negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_DECgraphics, alias: null,
           descr: $c.lit("load DECGraphics display symbols into symset"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("debug_hunger"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_debug_hunger, setwhere: set_wiznofuz, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "debug_hunger", "i8"),
+        { name: $c.lit("debug_hunger"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_debug_hunger, setwhere: set_wiznofuz, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "debug_hunger", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("no hunger"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("debug_mongen"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_debug_mongen, setwhere: set_wiznofuz, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "debug_mongen", "i8"),
+        { name: $c.lit("debug_mongen"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_debug_mongen, setwhere: set_wiznofuz, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "debug_mongen", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("no random monster generation"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("debug_overwrite_stairs"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_debug_overwrite_stairs, setwhere: set_wiznofuz,
-          opttyp: BoolOpt, negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in,
+        { name: $c.lit("debug_overwrite_stairs"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_debug_overwrite_stairs, setwhere: set_wiznofuz,
+          opttyp: BoolOpt, negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in,
           addr: new $c.FieldRef(iflags, "debug_overwrite_stairs", "i8"), optfn: optfn_boolean, alias: null,
           descr: $c.lit("level generation can overwrite stairs"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("disclose"), section: OptS_Advanced, minmatch: 0, expectedbuf: 14, idx: opt_disclose, setwhere: set_in_game, opttyp: CompOpt,
+        { name: $c.lit("disclose"), section: OptS.Advanced, minmatch: 0, expectedbuf: 14, idx: opt_disclose, setwhere: set_in_game, opttyp: CompOpt,
           negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_disclose, alias: null,
           descr: $c.lit("the kinds of information to disclose at end of game"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("dogname"), section: OptS_Advanced, minmatch: 0, expectedbuf: PL_PSIZ, idx: opt_dogname, setwhere: set_gameview, opttyp: CompOpt,
+        { name: $c.lit("dogname"), section: OptS.Advanced, minmatch: 0, expectedbuf: PL.PSIZ, idx: opt_dogname, setwhere: set_gameview, opttyp: CompOpt,
           negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_dogname, alias: null,
           descr: $c.lit("name of your starting pet if it is a little dog"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("dropped_nopick"), section: OptS_Behavior, minmatch: 0, expectedbuf: 0, idx: opt_dropped_nopick, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "nopick_dropped", "i8"),
+        { name: $c.lit("dropped_nopick"), section: OptS.Behavior, minmatch: 0, expectedbuf: 0, idx: opt_dropped_nopick, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "nopick_dropped", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("don't autopickup dropped items"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("dungeon"), section: OptS_Advanced, minmatch: 0, expectedbuf: MAXDCHARS + 1, idx: opt_dungeon, setwhere: set_in_config, opttyp: CompOpt,
+        { name: $c.lit("dungeon"), section: OptS.Advanced, minmatch: 0, expectedbuf: MAXDCHARS + 1, idx: opt_dungeon, setwhere: set_in_config, opttyp: CompOpt,
           negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_dungeon, alias: null,
           descr: $c.lit("list of symbols to use in drawing the dungeon map"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("effects"), section: OptS_Advanced, minmatch: 0, expectedbuf: MAXECHARS + 1, idx: opt_effects, setwhere: set_in_config, opttyp: CompOpt,
+        { name: $c.lit("effects"), section: OptS.Advanced, minmatch: 0, expectedbuf: MAXECHARS + 1, idx: opt_effects, setwhere: set_in_config, opttyp: CompOpt,
           negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_effects, alias: null,
           descr: $c.lit("list of symbols to use in drawing special effects"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("eight_bit_tty"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_eight_bit_tty, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "wc_eight_bit_input", "i8"),
+        { name: $c.lit("eight_bit_tty"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_eight_bit_tty, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "wc_eight_bit_input", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("send 8-bit characters directly to terminal"), prefixgw: null, initval: Off, has_handler: 0,
           dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("extmenu"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_extmenu, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
-          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "extmenu", "i8"), optfn: optfn_boolean,
+        { name: $c.lit("extmenu"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_extmenu, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "extmenu", "i8"), optfn: optfn_boolean,
           alias: null, descr: $c.lit("use menu for getting extended commands"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("female"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_female, setwhere: set_in_config, opttyp: BoolOpt, negateok: Yes,
-          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "female", "i8"), optfn: optfn_boolean,
+        { name: $c.lit("female"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_female, setwhere: set_in_config, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "female", "i8"), optfn: optfn_boolean,
           alias: $c.lit("male"), descr: $c.lit("deprecated; use gender:female"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("fireassist"), section: OptS_Behavior, minmatch: 0, expectedbuf: 0, idx: opt_fireassist, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(iflags, "fireassist", "i8"),
+        { name: $c.lit("fireassist"), section: OptS.Behavior, minmatch: 0, expectedbuf: 0, idx: opt_fireassist, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_out, addr: new $c.FieldRef(iflags, "fireassist", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("fire-command tries to be helpful"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("fixinv"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_fixinv, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
-          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "invlet_constant", "i8"),
+        { name: $c.lit("fixinv"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_fixinv, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "invlet_constant", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("inventory items keep their letters"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("font_map"), section: OptS_Advanced, minmatch: 0, expectedbuf: 40, idx: opt_font_map, setwhere: set_gameview, opttyp: CompOpt,
+        { name: $c.lit("font_map"), section: OptS.Advanced, minmatch: 0, expectedbuf: 40, idx: opt_font_map, setwhere: set_gameview, opttyp: CompOpt,
           negateok: Yes, valok: Yes, dupeok: Yes, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_font_map, alias: null,
           descr: $c.lit("font to use in the map window"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("font_menu"), section: OptS_Advanced, minmatch: 0, expectedbuf: 40, idx: opt_font_menu, setwhere: set_gameview, opttyp: CompOpt,
+        { name: $c.lit("font_menu"), section: OptS.Advanced, minmatch: 0, expectedbuf: 40, idx: opt_font_menu, setwhere: set_gameview, opttyp: CompOpt,
           negateok: Yes, valok: Yes, dupeok: Yes, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_font_menu, alias: null,
           descr: $c.lit("font to use in menus"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("font_message"), section: OptS_Advanced, minmatch: 0, expectedbuf: 40, idx: opt_font_message, setwhere: set_gameview, opttyp: CompOpt,
+        { name: $c.lit("font_message"), section: OptS.Advanced, minmatch: 0, expectedbuf: 40, idx: opt_font_message, setwhere: set_gameview, opttyp: CompOpt,
           negateok: Yes, valok: Yes, dupeok: Yes, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_font_message, alias: null,
           descr: $c.lit("font to use in the message window"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("font_size_map"), section: OptS_Advanced, minmatch: 0, expectedbuf: 20, idx: opt_font_size_map, setwhere: set_gameview, opttyp: CompOpt,
+        { name: $c.lit("font_size_map"), section: OptS.Advanced, minmatch: 0, expectedbuf: 20, idx: opt_font_size_map, setwhere: set_gameview, opttyp: CompOpt,
           negateok: Yes, valok: Yes, dupeok: Yes, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_font_size_map, alias: null,
           descr: $c.lit("size of the map font"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("font_size_menu"), section: OptS_Advanced, minmatch: 0, expectedbuf: 20, idx: opt_font_size_menu, setwhere: set_gameview,
+        { name: $c.lit("font_size_menu"), section: OptS.Advanced, minmatch: 0, expectedbuf: 20, idx: opt_font_size_menu, setwhere: set_gameview,
           opttyp: CompOpt, negateok: Yes, valok: Yes, dupeok: Yes, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_font_size_menu,
           alias: null, descr: $c.lit("size of the menu font"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("font_size_message"), section: OptS_Advanced, minmatch: 0, expectedbuf: 20, idx: opt_font_size_message, setwhere: set_gameview,
+        { name: $c.lit("font_size_message"), section: OptS.Advanced, minmatch: 0, expectedbuf: 20, idx: opt_font_size_message, setwhere: set_gameview,
           opttyp: CompOpt, negateok: Yes, valok: Yes, dupeok: Yes, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_font_size_message,
           alias: null, descr: $c.lit("size of the message font"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("font_size_status"), section: OptS_Advanced, minmatch: 0, expectedbuf: 20, idx: opt_font_size_status, setwhere: set_gameview,
+        { name: $c.lit("font_size_status"), section: OptS.Advanced, minmatch: 0, expectedbuf: 20, idx: opt_font_size_status, setwhere: set_gameview,
           opttyp: CompOpt, negateok: Yes, valok: Yes, dupeok: Yes, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_font_size_status,
           alias: null, descr: $c.lit("size of the status font"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("font_size_text"), section: OptS_Advanced, minmatch: 0, expectedbuf: 20, idx: opt_font_size_text, setwhere: set_gameview,
+        { name: $c.lit("font_size_text"), section: OptS.Advanced, minmatch: 0, expectedbuf: 20, idx: opt_font_size_text, setwhere: set_gameview,
           opttyp: CompOpt, negateok: Yes, valok: Yes, dupeok: Yes, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_font_size_text,
           alias: null, descr: $c.lit("size of the text font"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("font_status"), section: OptS_Advanced, minmatch: 0, expectedbuf: 40, idx: opt_font_status, setwhere: set_gameview, opttyp: CompOpt,
+        { name: $c.lit("font_status"), section: OptS.Advanced, minmatch: 0, expectedbuf: 40, idx: opt_font_status, setwhere: set_gameview, opttyp: CompOpt,
           negateok: Yes, valok: Yes, dupeok: Yes, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_font_status, alias: null,
           descr: $c.lit("font to use in status window"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("font_text"), section: OptS_Advanced, minmatch: 0, expectedbuf: 40, idx: opt_font_text, setwhere: set_gameview, opttyp: CompOpt,
+        { name: $c.lit("font_text"), section: OptS.Advanced, minmatch: 0, expectedbuf: 40, idx: opt_font_text, setwhere: set_gameview, opttyp: CompOpt,
           negateok: Yes, valok: Yes, dupeok: Yes, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_font_text, alias: null,
           descr: $c.lit("font to use in text windows"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("force_invmenu"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_force_invmenu, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "force_invmenu", "i8"),
+        { name: $c.lit("force_invmenu"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_force_invmenu, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "force_invmenu", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("commands asking for inventory item show a menu"), prefixgw: null, initval: Off, has_handler: 0,
           dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("fruit"), section: OptS_General, minmatch: 0, expectedbuf: PL_FSIZ, idx: opt_fruit, setwhere: set_in_game, opttyp: CompOpt, negateok: No,
+        { name: $c.lit("fruit"), section: OptS.General, minmatch: 0, expectedbuf: PL.FSIZ, idx: opt_fruit, setwhere: set_in_game, opttyp: CompOpt, negateok: No,
           valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_fruit, alias: null,
           descr: $c.lit("name of a fruit you enjoy eating"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("fullscreen"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_fullscreen, setwhere: set_in_config, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "wc2_fullscreen", "i8"),
+        { name: $c.lit("fullscreen"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_fullscreen, setwhere: set_in_config, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "wc2_fullscreen", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("toggle fullscreen"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("glyph"), section: OptS_Advanced, minmatch: 0, expectedbuf: 40, idx: opt_glyph, setwhere: set_in_game, opttyp: CompOpt, negateok: No,
+        { name: $c.lit("glyph"), section: OptS.Advanced, minmatch: 0, expectedbuf: 40, idx: opt_glyph, setwhere: set_in_game, opttyp: CompOpt, negateok: No,
           valok: Yes, dupeok: Yes, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_glyph, alias: null,
           descr: $c.lit("set representation of a glyph to a unicode value and color"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("goldX"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_goldX, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
-          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "goldX", "i8"), optfn: optfn_boolean,
+        { name: $c.lit("goldX"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_goldX, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "goldX", "i8"), optfn: optfn_boolean,
           alias: null, descr: $c.lit("classify gold as unknown or uncursed"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("guicolor"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_guicolor, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(iflags, "wc2_guicolor", "i8"),
+        { name: $c.lit("guicolor"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_guicolor, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_out, addr: new $c.FieldRef(iflags, "wc2_guicolor", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("use color for UI"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("help"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_help, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
-          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "help", "i8"), optfn: optfn_boolean,
+        { name: $c.lit("help"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_help, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "help", "i8"), optfn: optfn_boolean,
           alias: null, descr: $c.lit("show all available info when using whatis-command"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("herecmd_menu"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_herecmd_menu, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "herecmd_menu", "i8"),
+        { name: $c.lit("herecmd_menu"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_herecmd_menu, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "herecmd_menu", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("show commands available in this location"), prefixgw: null, initval: Off, has_handler: 0,
           dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("hilite_pet"), section: OptS_Map, minmatch: 0, expectedbuf: 0, idx: opt_hilite_pet, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "wc_hilite_pet", "i8"),
+        { name: $c.lit("hilite_pet"), section: OptS.Map, minmatch: 0, expectedbuf: 0, idx: opt_hilite_pet, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "wc_hilite_pet", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("use highlight for pets"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("hilite_pile"), section: OptS_Map, minmatch: 0, expectedbuf: 0, idx: opt_hilite_pile, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "hilite_pile", "i8"),
+        { name: $c.lit("hilite_pile"), section: OptS.Map, minmatch: 0, expectedbuf: 0, idx: opt_hilite_pile, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "hilite_pile", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("highlight piles of items"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("hilite_status"), section: OptS_Advanced, minmatch: 0, expectedbuf: 13, idx: opt_hilite_status, setwhere: set_in_game, opttyp: CompOpt,
+        { name: $c.lit("hilite_status"), section: OptS.Advanced, minmatch: 0, expectedbuf: 13, idx: opt_hilite_status, setwhere: set_in_game, opttyp: CompOpt,
           negateok: Yes, valok: Yes, dupeok: Yes, pfx: No, termpref: 0, opt_in_out: opt_out, addr: null, optfn: optfn_hilite_status, alias: null,
           descr: $c.lit("a status highlighting rule (can occur multiple times)"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("hitpointbar"), section: OptS_Status, minmatch: 0, expectedbuf: 0, idx: opt_hitpointbar, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "wc2_hitpointbar", "i8"),
+        { name: $c.lit("hitpointbar"), section: OptS.Status, minmatch: 0, expectedbuf: 0, idx: opt_hitpointbar, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "wc2_hitpointbar", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("show colored bar for hit points"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("horsename"), section: OptS_Advanced, minmatch: 0, expectedbuf: PL_PSIZ, idx: opt_horsename, setwhere: set_gameview, opttyp: CompOpt,
+        { name: $c.lit("horsename"), section: OptS.Advanced, minmatch: 0, expectedbuf: PL.PSIZ, idx: opt_horsename, setwhere: set_gameview, opttyp: CompOpt,
           negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_horsename, alias: null,
           descr: $c.lit("name of your starting pet if it is a pony"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("IBMgraphics"), section: OptS_Advanced, minmatch: 0, expectedbuf: 70, idx: opt_IBMgraphics, setwhere: set_in_config, opttyp: CompOpt,
+        { name: $c.lit("IBMgraphics"), section: OptS.Advanced, minmatch: 0, expectedbuf: 70, idx: opt_IBMgraphics, setwhere: set_in_config, opttyp: CompOpt,
           negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_IBMgraphics, alias: null,
           descr: $c.lit("load IBMGraphics display symbols into symset"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("idlecheckpoint"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_idlecheckpoint, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_Off, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "idlecheckpoint", "i8"),
+        { name: $c.lit("idlecheckpoint"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_idlecheckpoint, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.Off, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "idlecheckpoint", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("update checkpoint file if input is idle for 10 seconds"), prefixgw: null, initval: Off,
           has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("ignintr"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_ignintr, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
-          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "ignintr", "i8"), optfn: optfn_boolean,
+        { name: $c.lit("ignintr"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_ignintr, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "ignintr", "i8"), optfn: optfn_boolean,
           alias: null, descr: $c.lit("ignore interrupt signals"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("implicit_uncursed"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_implicit_uncursed, setwhere: set_in_game,
-          opttyp: BoolOpt, negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out,
+        { name: $c.lit("implicit_uncursed"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_implicit_uncursed, setwhere: set_in_game,
+          opttyp: BoolOpt, negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_out,
           addr: new $c.FieldRef(flags, "implicit_uncursed", "i8"), optfn: optfn_boolean, alias: null, descr: $c.lit("omit \"uncursed\" from inventory"),
           prefixgw: null, initval: On, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("legacy"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_legacy, setwhere: set_in_config, opttyp: BoolOpt, negateok: Yes,
-          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "legacy", "i8"), optfn: optfn_boolean,
+        { name: $c.lit("legacy"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_legacy, setwhere: set_in_config, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "legacy", "i8"), optfn: optfn_boolean,
           alias: null, descr: $c.lit("show introductory message"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("lit_corridor"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_lit_corridor, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "lit_corridor", "i8"),
+        { name: $c.lit("lit_corridor"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_lit_corridor, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "lit_corridor", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("show dark corridors as lit if in sight"), prefixgw: null, initval: Off, has_handler: 0,
           dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("lootabc"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_lootabc, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
-          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "lootabc", "i8"), optfn: optfn_boolean,
+        { name: $c.lit("lootabc"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_lootabc, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "lootabc", "i8"), optfn: optfn_boolean,
           alias: null, descr: $c.lit("use a/b/c rather than o/i/c when looting"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("mail"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_mail, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
-          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "biff", "i8"), optfn: optfn_boolean,
+        { name: $c.lit("mail"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_mail, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "biff", "i8"), optfn: optfn_boolean,
           alias: null, descr: $c.lit("enable the mail daemon"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("map_mode"), section: OptS_Advanced, minmatch: 0, expectedbuf: 20, idx: opt_map_mode, setwhere: set_gameview, opttyp: CompOpt,
+        { name: $c.lit("map_mode"), section: OptS.Advanced, minmatch: 0, expectedbuf: 20, idx: opt_map_mode, setwhere: set_gameview, opttyp: CompOpt,
           negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_map_mode, alias: null,
           descr: $c.lit("map display mode under Windows"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("mention_decor"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_mention_decor, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "mention_decor", "i8"),
+        { name: $c.lit("mention_decor"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_mention_decor, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "mention_decor", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("give feedback when walking over interesting features"), prefixgw: null, initval: Off,
           has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("mention_map"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_mention_map, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(a11y, "glyph_updates", "i8"),
+        { name: $c.lit("mention_map"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_mention_map, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(a11y, "glyph_updates", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("give feedback when interesting map locations change"), prefixgw: null, initval: Off, has_handler: 0,
           dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("mention_walls"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_mention_walls, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "mention_walls", "i8"),
+        { name: $c.lit("mention_walls"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_mention_walls, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "mention_walls", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("give feedback when walking into walls"), prefixgw: null, initval: Off, has_handler: 0,
           dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("menu_deselect_all"), section: OptS_Advanced, minmatch: 0, expectedbuf: 4, idx: opt_menu_deselect_all, setwhere: set_in_config,
+        { name: $c.lit("menu_deselect_all"), section: OptS.Advanced, minmatch: 0, expectedbuf: 4, idx: opt_menu_deselect_all, setwhere: set_in_config,
           opttyp: CompOpt, negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_menu_deselect_all,
           alias: null, descr: $c.lit("deselect all items in a menu"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("menu_deselect_page"), section: OptS_Advanced, minmatch: 0, expectedbuf: 4, idx: opt_menu_deselect_page, setwhere: set_in_config,
+        { name: $c.lit("menu_deselect_page"), section: OptS.Advanced, minmatch: 0, expectedbuf: 4, idx: opt_menu_deselect_page, setwhere: set_in_config,
           opttyp: CompOpt, negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_menu_deselect_page,
           alias: null, descr: $c.lit("deselect all items on this page of a menu"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("menu_first_page"), section: OptS_Advanced, minmatch: 0, expectedbuf: 4, idx: opt_menu_first_page, setwhere: set_in_config,
+        { name: $c.lit("menu_first_page"), section: OptS.Advanced, minmatch: 0, expectedbuf: 4, idx: opt_menu_first_page, setwhere: set_in_config,
           opttyp: CompOpt, negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_menu_first_page,
           alias: null, descr: $c.lit("jump to the first page in a menu"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("menu_headings"), section: OptS_Advanced, minmatch: 0, expectedbuf: 4, idx: opt_menu_headings, setwhere: set_in_game, opttyp: CompOpt,
+        { name: $c.lit("menu_headings"), section: OptS.Advanced, minmatch: 0, expectedbuf: 4, idx: opt_menu_headings, setwhere: set_in_game, opttyp: CompOpt,
           negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_menu_headings, alias: null,
           descr: $c.lit("display style for menu headings"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("menu_invert_all"), section: OptS_Advanced, minmatch: 0, expectedbuf: 4, idx: opt_menu_invert_all, setwhere: set_in_config,
+        { name: $c.lit("menu_invert_all"), section: OptS.Advanced, minmatch: 0, expectedbuf: 4, idx: opt_menu_invert_all, setwhere: set_in_config,
           opttyp: CompOpt, negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_menu_invert_all,
           alias: null, descr: $c.lit("invert all items in a menu"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("menu_invert_page"), section: OptS_Advanced, minmatch: 0, expectedbuf: 4, idx: opt_menu_invert_page, setwhere: set_in_config,
+        { name: $c.lit("menu_invert_page"), section: OptS.Advanced, minmatch: 0, expectedbuf: 4, idx: opt_menu_invert_page, setwhere: set_in_config,
           opttyp: CompOpt, negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_menu_invert_page,
           alias: null, descr: $c.lit("invert all items on this page of a menu"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("menu_last_page"), section: OptS_Advanced, minmatch: 0, expectedbuf: 4, idx: opt_menu_last_page, setwhere: set_in_config,
+        { name: $c.lit("menu_last_page"), section: OptS.Advanced, minmatch: 0, expectedbuf: 4, idx: opt_menu_last_page, setwhere: set_in_config,
           opttyp: CompOpt, negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_menu_last_page, alias: null,
           descr: $c.lit("jump to the last page in a menu"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("menu_next_page"), section: OptS_Advanced, minmatch: 0, expectedbuf: 4, idx: opt_menu_next_page, setwhere: set_in_config,
+        { name: $c.lit("menu_next_page"), section: OptS.Advanced, minmatch: 0, expectedbuf: 4, idx: opt_menu_next_page, setwhere: set_in_config,
           opttyp: CompOpt, negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_menu_next_page, alias: null,
           descr: $c.lit("go to the next menu page"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("menu_objsyms"), section: OptS_Advanced, minmatch: 0, expectedbuf: 12, idx: opt_menu_objsyms, setwhere: set_in_game, opttyp: CompOpt,
+        { name: $c.lit("menu_objsyms"), section: OptS.Advanced, minmatch: 0, expectedbuf: 12, idx: opt_menu_objsyms, setwhere: set_in_game, opttyp: CompOpt,
           negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_menu_objsyms,
           alias: $c.lit("use_menu_glyphs"), descr: $c.lit("show object symbols in menus"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("menu_overlay"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_menu_overlay, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "menu_overlay", "i8"),
+        { name: $c.lit("menu_overlay"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_menu_overlay, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "menu_overlay", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("menus overlay and align to right"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("menu_previous_page"), section: OptS_Advanced, minmatch: 0, expectedbuf: 4, idx: opt_menu_previous_page, setwhere: set_in_config,
+        { name: $c.lit("menu_previous_page"), section: OptS.Advanced, minmatch: 0, expectedbuf: 4, idx: opt_menu_previous_page, setwhere: set_in_config,
           opttyp: CompOpt, negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_menu_previous_page,
           alias: null, descr: $c.lit("go to the previous menu page"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("menu_search"), section: OptS_Advanced, minmatch: 0, expectedbuf: 4, idx: opt_menu_search, setwhere: set_in_config, opttyp: CompOpt,
+        { name: $c.lit("menu_search"), section: OptS.Advanced, minmatch: 0, expectedbuf: 4, idx: opt_menu_search, setwhere: set_in_config, opttyp: CompOpt,
           negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_menu_search, alias: null,
           descr: $c.lit("search for a menu item"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("menu_select_all"), section: OptS_Advanced, minmatch: 0, expectedbuf: 4, idx: opt_menu_select_all, setwhere: set_in_config,
+        { name: $c.lit("menu_select_all"), section: OptS.Advanced, minmatch: 0, expectedbuf: 4, idx: opt_menu_select_all, setwhere: set_in_config,
           opttyp: CompOpt, negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_menu_select_all,
           alias: null, descr: $c.lit("select all items in a menu"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("menu_select_page"), section: OptS_Advanced, minmatch: 0, expectedbuf: 4, idx: opt_menu_select_page, setwhere: set_in_config,
+        { name: $c.lit("menu_select_page"), section: OptS.Advanced, minmatch: 0, expectedbuf: 4, idx: opt_menu_select_page, setwhere: set_in_config,
           opttyp: CompOpt, negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_menu_select_page,
           alias: null, descr: $c.lit("select all items on this page of a menu"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("menu_shift_left"), section: OptS_Advanced, minmatch: 0, expectedbuf: 4, idx: opt_menu_shift_left, setwhere: set_in_config,
+        { name: $c.lit("menu_shift_left"), section: OptS.Advanced, minmatch: 0, expectedbuf: 4, idx: opt_menu_shift_left, setwhere: set_in_config,
           opttyp: CompOpt, negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_menu_shift_left,
           alias: null, descr: $c.lit("pan current menu page left"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("menu_shift_right"), section: OptS_Advanced, minmatch: 0, expectedbuf: 4, idx: opt_menu_shift_right, setwhere: set_in_config,
+        { name: $c.lit("menu_shift_right"), section: OptS.Advanced, minmatch: 0, expectedbuf: 4, idx: opt_menu_shift_right, setwhere: set_in_config,
           opttyp: CompOpt, negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_menu_shift_right,
           alias: null, descr: $c.lit("pan current menu page right"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("menu_tab_sep"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_menu_tab_sep, setwhere: set_wizonly, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "menu_tab_sep", "i8"),
+        { name: $c.lit("menu_tab_sep"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_menu_tab_sep, setwhere: set_wizonly, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "menu_tab_sep", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("menu formatting"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("menucolors"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_menucolors, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "use_menu_color", "i8"),
+        { name: $c.lit("menucolors"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_menucolors, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "use_menu_color", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("use colors in menus"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("menu colors"), section: OptS_Status, minmatch: 0, expectedbuf: BUFSZ, idx: opt_o_menu_colors, opt_in_out: opt_in, addr: null,
+        { name: $c.lit("menu colors"), section: OptS.Status, minmatch: 0, expectedbuf: BUFSZ, idx: opt_o_menu_colors, opt_in_out: opt_in, addr: null,
           optfn: optfn_o_menu_colors, setwhere: set_in_game, opttyp: OthrOpt,
           negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, alias: null, descr: $c.lit("change colors used in menus"), prefixgw: null, initval: On,
           has_handler: On, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("menuinvertmode"), section: OptS_Advanced, minmatch: 0, expectedbuf: 5, idx: opt_menuinvertmode, setwhere: set_in_game, opttyp: CompOpt,
+        { name: $c.lit("menuinvertmode"), section: OptS.Advanced, minmatch: 0, expectedbuf: 5, idx: opt_menuinvertmode, setwhere: set_in_game, opttyp: CompOpt,
           negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_menuinvertmode, alias: null,
           descr: $c.lit("experimental behavior of menu inverts"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("menustyle"), section: OptS_Advanced, minmatch: 0, expectedbuf: MENUTYPELEN, idx: opt_menustyle, setwhere: set_in_game, opttyp: CompOpt,
+        { name: $c.lit("menustyle"), section: OptS.Advanced, minmatch: 0, expectedbuf: MENUTYPELEN, idx: opt_menustyle, setwhere: set_in_game, opttyp: CompOpt,
           negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_menustyle, alias: null,
           descr: $c.lit("user interface for object selection"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("message types"), section: OptS_Advanced, minmatch: 0, expectedbuf: BUFSZ, idx: opt_o_message_types,
+        { name: $c.lit("message types"), section: OptS.Advanced, minmatch: 0, expectedbuf: BUFSZ, idx: opt_o_message_types,
           opt_in_out: opt_in, addr: null, optfn: optfn_o_message_types, setwhere: set_in_game, opttyp: OthrOpt,
           negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, alias: null, descr: $c.lit("edit message types"), prefixgw: null, initval: On,
           has_handler: On, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("mon_movement"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_mon_movement, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(a11y, "mon_movement", "i8"),
+        { name: $c.lit("mon_movement"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_mon_movement, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(a11y, "mon_movement", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("message when hero sees monster movement"), prefixgw: null, initval: Off, has_handler: 0,
           dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("monpolycontrol"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_monpolycontrol, setwhere: set_wizonly, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "mon_polycontrol", "i8"),
+        { name: $c.lit("monpolycontrol"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_monpolycontrol, setwhere: set_wizonly, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "mon_polycontrol", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("control monster polymorphs"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("montelecontrol"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_montelecontrol, setwhere: set_wizonly, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "mon_telecontrol", "i8"),
+        { name: $c.lit("montelecontrol"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_montelecontrol, setwhere: set_wizonly, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "mon_telecontrol", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("control monster teleport destinations"), prefixgw: null, initval: Off, has_handler: 0,
           dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("monsters"), section: OptS_Advanced, minmatch: 0, expectedbuf: MAXMCLASSES, idx: opt_monsters, setwhere: set_in_config, opttyp: CompOpt,
+        { name: $c.lit("monsters"), section: OptS.Advanced, minmatch: 0, expectedbuf: MAXMCLASSES, idx: opt_monsters, setwhere: set_in_config, opttyp: CompOpt,
           negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_monsters, alias: null,
           descr: $c.lit("list of symbols to use for monsters"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("mouse_support"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_mouse_support, setwhere: set_in_game, opttyp: CompOpt,
+        { name: $c.lit("mouse_support"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_mouse_support, setwhere: set_in_game, opttyp: CompOpt,
           negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_mouse_support, alias: null,
           descr: $c.lit("game receives click info from mouse"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("msg_window"), section: OptS_Advanced, minmatch: 0, expectedbuf: 1, idx: opt_msg_window, setwhere: set_in_game, opttyp: CompOpt,
+        { name: $c.lit("msg_window"), section: OptS.Advanced, minmatch: 0, expectedbuf: 1, idx: opt_msg_window, setwhere: set_in_game, opttyp: CompOpt,
           negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_msg_window, alias: null,
           descr: $c.lit("control of \"view previous message(s)\" (^P) behavior"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("msghistory"), section: OptS_Advanced, minmatch: 0, expectedbuf: 5, idx: opt_msghistory, setwhere: set_gameview, opttyp: CompOpt,
+        { name: $c.lit("msghistory"), section: OptS.Advanced, minmatch: 0, expectedbuf: 5, idx: opt_msghistory, setwhere: set_gameview, opttyp: CompOpt,
           negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_msghistory, alias: null,
           descr: $c.lit("number of top line messages to save"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("news"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_news, setwhere: set_in_config, opttyp: BoolOpt, negateok: Yes,
-          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "news", "i8"), optfn: optfn_boolean,
+        { name: $c.lit("news"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_news, setwhere: set_in_config, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "news", "i8"), optfn: optfn_boolean,
           alias: null, descr: $c.lit("show any news at game start"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("nudist"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_nudist, setwhere: set_in_config, opttyp: BoolOpt, negateok: Yes,
-          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(u.uroleplay, "nudist", "i8"), optfn: optfn_boolean,
+        { name: $c.lit("nudist"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_nudist, setwhere: set_in_config, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(u.uroleplay, "nudist", "i8"), optfn: optfn_boolean,
           alias: null, descr: $c.lit("start your character without armor"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("null"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_null, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
-          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "null", "i8"), optfn: optfn_boolean,
+        { name: $c.lit("null"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_null, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "null", "i8"), optfn: optfn_boolean,
           alias: null, descr: $c.lit("allow nulls to be sent to terminal"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("number_pad"), section: OptS_General, minmatch: 0, expectedbuf: 1, idx: opt_number_pad, setwhere: set_in_game, opttyp: CompOpt,
+        { name: $c.lit("number_pad"), section: OptS.General, minmatch: 0, expectedbuf: 1, idx: opt_number_pad, setwhere: set_in_game, opttyp: CompOpt,
           negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_number_pad, alias: null,
           descr: $c.lit("use the number pad for movement"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("objects"), section: OptS_Advanced, minmatch: 0, expectedbuf: MAXOCLASSES, idx: opt_objects, setwhere: set_in_config, opttyp: CompOpt,
+        { name: $c.lit("objects"), section: OptS.Advanced, minmatch: 0, expectedbuf: MAXOCLASSES, idx: opt_objects, setwhere: set_in_config, opttyp: CompOpt,
           negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_objects, alias: null,
           descr: $c.lit("list of symbols to use for objects"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("packorder"), section: OptS_Advanced, minmatch: 0, expectedbuf: MAXOCLASSES, idx: opt_packorder, setwhere: set_in_game, opttyp: CompOpt,
+        { name: $c.lit("packorder"), section: OptS.Advanced, minmatch: 0, expectedbuf: MAXOCLASSES, idx: opt_packorder, setwhere: set_in_game, opttyp: CompOpt,
           negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_packorder, alias: null,
           descr: $c.lit("the inventory order of the items in your pack"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("paranoid_confirmation"), section: OptS_Advanced, minmatch: 0, expectedbuf: 28, idx: opt_paranoid_confirmation, setwhere: set_in_game,
+        { name: $c.lit("paranoid_confirmation"), section: OptS.Advanced, minmatch: 0, expectedbuf: 28, idx: opt_paranoid_confirmation, setwhere: set_in_game,
           opttyp: CompOpt, negateok: Yes, valok: Yes, dupeok: Yes, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_paranoid_confirmation,
           alias: $c.lit("prayconfirm"), descr: $c.lit("extra prompting in certain situations"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("pauper"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_pauper, setwhere: set_in_config, opttyp: BoolOpt, negateok: Yes,
-          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(u.uroleplay, "pauper", "i8"), optfn: optfn_boolean,
+        { name: $c.lit("pauper"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_pauper, setwhere: set_in_config, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(u.uroleplay, "pauper", "i8"), optfn: optfn_boolean,
           alias: null, descr: $c.lit("start your character without any items"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("perm_invent"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_perm_invent, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_Off, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "perm_invent", "i8"),
+        { name: $c.lit("perm_invent"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_perm_invent, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.Off, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "perm_invent", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("show persistent inventory window"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("perminv_mode"), section: OptS_Advanced, minmatch: 0, expectedbuf: 20, idx: opt_perminv_mode, setwhere: set_in_game, opttyp: CompOpt,
+        { name: $c.lit("perminv_mode"), section: OptS.Advanced, minmatch: 0, expectedbuf: 20, idx: opt_perminv_mode, setwhere: set_in_game, opttyp: CompOpt,
           negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_perminv_mode, alias: null,
           descr: $c.lit("what to show in persistent inventory window"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("petattr"), section: OptS_Advanced, minmatch: 0, expectedbuf: 88, idx: opt_petattr, setwhere: set_in_game, opttyp: CompOpt, negateok: No,
+        { name: $c.lit("petattr"), section: OptS.Advanced, minmatch: 0, expectedbuf: 88, idx: opt_petattr, setwhere: set_in_game, opttyp: CompOpt, negateok: No,
           valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_petattr, alias: null,
           descr: $c.lit("attributes for highlighting pets"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("pettype"), section: OptS_Advanced, minmatch: 0, expectedbuf: 4, idx: opt_pettype, setwhere: set_gameview, opttyp: CompOpt,
+        { name: $c.lit("pettype"), section: OptS.Advanced, minmatch: 0, expectedbuf: 4, idx: opt_pettype, setwhere: set_gameview, opttyp: CompOpt,
           negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_pettype, alias: $c.lit("pet"),
           descr: $c.lit("your preferred initial pet type"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("pickup_burden"), section: OptS_Advanced, minmatch: 0, expectedbuf: 20, idx: opt_pickup_burden, setwhere: set_in_game, opttyp: CompOpt,
+        { name: $c.lit("pickup_burden"), section: OptS.Advanced, minmatch: 0, expectedbuf: 20, idx: opt_pickup_burden, setwhere: set_in_game, opttyp: CompOpt,
           negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_pickup_burden, alias: null,
           descr: $c.lit("maximum burden picked up before prompt"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("pickup_stolen"), section: OptS_Behavior, minmatch: 0, expectedbuf: 0, idx: opt_pickup_stolen, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "pickup_stolen", "i8"),
+        { name: $c.lit("pickup_stolen"), section: OptS.Behavior, minmatch: 0, expectedbuf: 0, idx: opt_pickup_stolen, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "pickup_stolen", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("autopickup stolen items"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("pickup_thrown"), section: OptS_Behavior, minmatch: 0, expectedbuf: 0, idx: opt_pickup_thrown, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "pickup_thrown", "i8"),
+        { name: $c.lit("pickup_thrown"), section: OptS.Behavior, minmatch: 0, expectedbuf: 0, idx: opt_pickup_thrown, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "pickup_thrown", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("autopickup thrown items"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("pickup_types"), section: OptS_Behavior, minmatch: 0, expectedbuf: MAXOCLASSES, idx: opt_pickup_types, setwhere: set_in_game,
+        { name: $c.lit("pickup_types"), section: OptS.Behavior, minmatch: 0, expectedbuf: MAXOCLASSES, idx: opt_pickup_types, setwhere: set_in_game,
           opttyp: CompOpt, negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_pickup_types, alias: null,
           descr: $c.lit("types of objects to pick up automatically"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("pile_limit"), section: OptS_Advanced, minmatch: 0, expectedbuf: 24, idx: opt_pile_limit, setwhere: set_in_game, opttyp: CompOpt,
+        { name: $c.lit("pile_limit"), section: OptS.Advanced, minmatch: 0, expectedbuf: 24, idx: opt_pile_limit, setwhere: set_in_game, opttyp: CompOpt,
           negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_pile_limit, alias: null,
           descr: $c.lit("threshold for \"there are many objects here\""), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("player_selection"), section: OptS_Advanced, minmatch: 0, expectedbuf: 12, idx: opt_player_selection, setwhere: set_gameview,
+        { name: $c.lit("player_selection"), section: OptS.Advanced, minmatch: 0, expectedbuf: 12, idx: opt_player_selection, setwhere: set_gameview,
           opttyp: CompOpt, negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_player_selection,
           alias: null, descr: $c.lit("choose character via dialog or prompts"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("popup_dialog"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_popup_dialog, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "wc_popup_dialog", "i8"),
+        { name: $c.lit("popup_dialog"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_popup_dialog, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "wc_popup_dialog", "i8"),
           optfn: optfn_boolean, alias: null, descr: null, prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("preload_tiles"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_preload_tiles, setwhere: set_in_config, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(iflags, "wc_preload_tiles", "i8"),
+        { name: $c.lit("preload_tiles"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_preload_tiles, setwhere: set_in_config, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_out, addr: new $c.FieldRef(iflags, "wc_preload_tiles", "i8"),
           optfn: optfn_boolean, alias: null, descr: null, prefixgw: null, initval: On, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("price_quotes"), section: OptS_General, minmatch: 0, expectedbuf: 0, idx: opt_price_quotes, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "pricequotes", "i8"),
+        { name: $c.lit("price_quotes"), section: OptS.General, minmatch: 0, expectedbuf: 0, idx: opt_price_quotes, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "pricequotes", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("display prices you have seen for unidentified objects"), prefixgw: null, initval: Off,
           has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("pushweapon"), section: OptS_Behavior, minmatch: 0, expectedbuf: 0, idx: opt_pushweapon, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "pushweapon", "i8"),
+        { name: $c.lit("pushweapon"), section: OptS.Behavior, minmatch: 0, expectedbuf: 0, idx: opt_pushweapon, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "pushweapon", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("previous weapon goes to secondary slot"), prefixgw: null, initval: Off, has_handler: 0,
           dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("query_menu"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_query_menu, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "query_menu", "i8"),
+        { name: $c.lit("query_menu"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_query_menu, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "query_menu", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("use a menu for yes/no queries"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("quick_farsight"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_quick_farsight, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "quick_farsight", "i8"),
+        { name: $c.lit("quick_farsight"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_quick_farsight, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "quick_farsight", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("skip map browse when forced to looked at map"), prefixgw: null, initval: Off, has_handler: 0,
           dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("rawio"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_rawio, setwhere: set_in_config, opttyp: BoolOpt, negateok: No,
-          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: null, optfn: optfn_boolean, alias: null, descr: null, prefixgw: null,
+        { name: $c.lit("rawio"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_rawio, setwhere: set_in_config, opttyp: BoolOpt, negateok: No,
+          valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: null, optfn: optfn_boolean, alias: null, descr: null, prefixgw: null,
           initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("reroll"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_reroll, setwhere: set_in_config, opttyp: BoolOpt, negateok: Yes,
-          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(u.uroleplay, "reroll", "i8"), optfn: optfn_boolean,
+        { name: $c.lit("reroll"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_reroll, setwhere: set_in_config, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(u.uroleplay, "reroll", "i8"), optfn: optfn_boolean,
           alias: null, descr: $c.lit("allow rerolling of starting inventory and items"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("rest_on_space"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_rest_on_space, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "rest_on_space", "i8"),
+        { name: $c.lit("rest_on_space"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_rest_on_space, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "rest_on_space", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("space bar is bound to the rest-command"), prefixgw: null, initval: Off, has_handler: 0,
           dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("roguesymset"), section: OptS_Advanced, minmatch: 0, expectedbuf: 70, idx: opt_roguesymset, setwhere: set_in_game, opttyp: CompOpt,
+        { name: $c.lit("roguesymset"), section: OptS.Advanced, minmatch: 0, expectedbuf: 70, idx: opt_roguesymset, setwhere: set_in_game, opttyp: CompOpt,
           negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_roguesymset, alias: null,
           descr: $c.lit("load a set of rogue display symbols from symbols file"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("runmode"), section: OptS_Advanced, minmatch: 0, expectedbuf: 9, idx: opt_runmode, setwhere: set_in_game, opttyp: CompOpt, negateok: Yes,
+        { name: $c.lit("runmode"), section: OptS.Advanced, minmatch: 0, expectedbuf: 9, idx: opt_runmode, setwhere: set_in_game, opttyp: CompOpt, negateok: Yes,
           valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_runmode, alias: null,
           descr: $c.lit("display frequency when `running' or `travelling'"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("safe_pet"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_safe_pet, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "safe_dog", "i8"),
+        { name: $c.lit("safe_pet"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_safe_pet, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "safe_dog", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("prevent you from hitting pets"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("safe_wait"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_safe_wait, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "safe_wait", "i8"),
+        { name: $c.lit("safe_wait"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_safe_wait, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "safe_wait", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("prevent waiting next to hostiles"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("sanity_check"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_sanity_check, setwhere: set_wizonly, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "sanity_check", "i8"),
+        { name: $c.lit("sanity_check"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_sanity_check, setwhere: set_wizonly, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "sanity_check", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("perform data sanity checks"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("scores"), section: OptS_Advanced, minmatch: 0, expectedbuf: 32, idx: opt_scores, setwhere: set_in_game, opttyp: CompOpt, negateok: No,
+        { name: $c.lit("scores"), section: OptS.Advanced, minmatch: 0, expectedbuf: 32, idx: opt_scores, setwhere: set_in_game, opttyp: CompOpt, negateok: No,
           valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_scores, alias: null,
           descr: $c.lit("the parts of the score list you wish to see"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("scroll_amount"), section: OptS_Advanced, minmatch: 0, expectedbuf: 20, idx: opt_scroll_amount, setwhere: set_gameview, opttyp: CompOpt,
+        { name: $c.lit("scroll_amount"), section: OptS.Advanced, minmatch: 0, expectedbuf: 20, idx: opt_scroll_amount, setwhere: set_gameview, opttyp: CompOpt,
           negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_scroll_amount, alias: null,
           descr: $c.lit("amount to scroll map when scroll_margin is reached"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("scroll_margin"), section: OptS_Advanced, minmatch: 0, expectedbuf: 20, idx: opt_scroll_margin, setwhere: set_gameview, opttyp: CompOpt,
+        { name: $c.lit("scroll_margin"), section: OptS.Advanced, minmatch: 0, expectedbuf: 20, idx: opt_scroll_margin, setwhere: set_gameview, opttyp: CompOpt,
           negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_scroll_margin, alias: null,
           descr: $c.lit("scroll map when this far from the edge"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("selectsaved"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_selectsaved, setwhere: set_in_config, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(iflags, "wc2_selectsaved", "i8"),
+        { name: $c.lit("selectsaved"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_selectsaved, setwhere: set_in_config, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_out, addr: new $c.FieldRef(iflags, "wc2_selectsaved", "i8"),
           optfn: optfn_boolean, alias: null, descr: null, prefixgw: null, initval: On, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("showdamage"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_showdamage, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "showdamage", "i8"),
+        { name: $c.lit("showdamage"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_showdamage, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "showdamage", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("show damage hero takes in message line"), prefixgw: null, initval: Off, has_handler: 0,
           dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("showexp"), section: OptS_Status, minmatch: 0, expectedbuf: 0, idx: opt_showexp, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
-          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "showexp", "i8"), optfn: optfn_boolean,
+        { name: $c.lit("showexp"), section: OptS.Status, minmatch: 0, expectedbuf: 0, idx: opt_showexp, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "showexp", "i8"), optfn: optfn_boolean,
           alias: null, descr: $c.lit("show experience points in status line"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("showrace"), section: OptS_Map, minmatch: 0, expectedbuf: 0, idx: opt_showrace, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
-          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "showrace", "i8"), optfn: optfn_boolean,
+        { name: $c.lit("showrace"), section: OptS.Map, minmatch: 0, expectedbuf: 0, idx: opt_showrace, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "showrace", "i8"), optfn: optfn_boolean,
           alias: null, descr: $c.lit("show your character by race rather than role"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("showscore"), section: OptS_Status, minmatch: 0, expectedbuf: 0, idx: opt_showscore, setwhere: set_in_config, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: null, optfn: optfn_boolean, alias: null, descr: null,
+        { name: $c.lit("showscore"), section: OptS.Status, minmatch: 0, expectedbuf: 0, idx: opt_showscore, setwhere: set_in_config, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: null, optfn: optfn_boolean, alias: null, descr: null,
           prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("showvers"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_showvers, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "showvers", "i8"),
+        { name: $c.lit("showvers"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_showvers, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "showvers", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("show version info on status line"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("silent"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_silent, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
-          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "silent", "i8"), optfn: optfn_boolean,
+        { name: $c.lit("silent"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_silent, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "silent", "i8"), optfn: optfn_boolean,
           alias: null, descr: $c.lit("don't use terminal bell"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("softkeyboard"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_softkeyboard, setwhere: set_in_config, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "wc2_softkeyboard", "i8"),
+        { name: $c.lit("softkeyboard"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_softkeyboard, setwhere: set_in_config, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "wc2_softkeyboard", "i8"),
           optfn: optfn_boolean, alias: null, descr: null, prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("sortdiscoveries"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_sortdiscoveries, setwhere: set_in_game,
+        { name: $c.lit("sortdiscoveries"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_sortdiscoveries, setwhere: set_in_game,
           opttyp: CompOpt, negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_sortdiscoveries,
           alias: null, descr: $c.lit("preferred order when displaying discovered objects"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("sortloot"), section: OptS_Advanced, minmatch: 0, expectedbuf: 4, idx: opt_sortloot, setwhere: set_in_game, opttyp: CompOpt,
+        { name: $c.lit("sortloot"), section: OptS.Advanced, minmatch: 0, expectedbuf: 4, idx: opt_sortloot, setwhere: set_in_game, opttyp: CompOpt,
           negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_sortloot, alias: null,
           descr: $c.lit("sort object selection lists by description"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("sortpack"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_sortpack, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "sortpack", "i8"),
+        { name: $c.lit("sortpack"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_sortpack, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "sortpack", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("group inventory items by type"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("sortvanquished"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_sortvanquished, setwhere: set_in_game, opttyp: CompOpt,
+        { name: $c.lit("sortvanquished"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_sortvanquished, setwhere: set_in_game, opttyp: CompOpt,
           negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_sortvanquished, alias: null,
           descr: $c.lit("preferred order when displaying vanquished monsters"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("soundlib"), section: OptS_Advanced, minmatch: 0, expectedbuf: WINTYPELEN, idx: opt_soundlib, setwhere: set_gameview, opttyp: CompOpt,
+        { name: $c.lit("soundlib"), section: OptS.Advanced, minmatch: 0, expectedbuf: WINTYPELEN, idx: opt_soundlib, setwhere: set_gameview, opttyp: CompOpt,
           negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_soundlib, alias: null,
           descr: $c.lit("soundlib interface to use (if any)"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("sounds"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_sounds, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
-          valok: No, dupeok: No, pfx: No, termpref: Term_Off, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "sounds", "i8"), optfn: optfn_boolean,
+        { name: $c.lit("sounds"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_sounds, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term.Off, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "sounds", "i8"), optfn: optfn_boolean,
           alias: null, descr: $c.lit("use sounds"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("sparkle"), section: OptS_Map, minmatch: 0, expectedbuf: 0, idx: opt_sparkle, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
-          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "sparkle", "i8"), optfn: optfn_boolean,
+        { name: $c.lit("sparkle"), section: OptS.Map, minmatch: 0, expectedbuf: 0, idx: opt_sparkle, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "sparkle", "i8"), optfn: optfn_boolean,
           alias: null, descr: $c.lit("display sparkly effect when resisting magic"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("spot_monsters"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_spot_monsters, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(a11y, "mon_notices", "i8"),
+        { name: $c.lit("spot_monsters"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_spot_monsters, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(a11y, "mon_notices", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("message when hero spots a monster"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("splash_screen"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_splash_screen, setwhere: set_in_config, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(iflags, "wc_splash_screen", "i8"),
+        { name: $c.lit("splash_screen"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_splash_screen, setwhere: set_in_config, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_out, addr: new $c.FieldRef(iflags, "wc_splash_screen", "i8"),
           optfn: optfn_boolean, alias: null, descr: null, prefixgw: null, initval: On, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("standout"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_standout, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "standout", "i8"),
+        { name: $c.lit("standout"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_standout, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "standout", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("use standout for --more--"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("status_updates"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_status_updates, setwhere: set_in_config,
-          opttyp: BoolOpt, negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out,
+        { name: $c.lit("status_updates"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_status_updates, setwhere: set_in_config,
+          opttyp: BoolOpt, negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_out,
           addr: new $c.FieldRef(iflags, "status_updates", "i8"), optfn: optfn_boolean, alias: null, descr: $c.lit("allow the status lines to update"),
           prefixgw: null, initval: On, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("status condition fields"), section: OptS_Status, minmatch: 0, expectedbuf: BUFSZ, idx: opt_o_status_cond,
+        { name: $c.lit("status condition fields"), section: OptS.Status, minmatch: 0, expectedbuf: BUFSZ, idx: opt_o_status_cond,
           opt_in_out: opt_in, addr: null, optfn: optfn_o_status_cond, setwhere: set_in_game, opttyp: OthrOpt,
           negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, alias: null, descr: $c.lit("change status condition highlighting"), prefixgw: null,
           initval: On, has_handler: On, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("statushilites"), section: OptS_Advanced, minmatch: 0, expectedbuf: 20, idx: opt_statushilites, setwhere: set_in_game, opttyp: CompOpt,
+        { name: $c.lit("statushilites"), section: OptS.Advanced, minmatch: 0, expectedbuf: 20, idx: opt_statushilites, setwhere: set_in_game, opttyp: CompOpt,
           negateok: Yes, valok: Yes, dupeok: Yes, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_statushilites, alias: null,
           descr: $c.lit("0=no status highlighting, N=show highlights for N turns"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("status highlight rules"), section: OptS_Status, minmatch: 0, expectedbuf: BUFSZ, idx: opt_o_status_hilites,
+        { name: $c.lit("status highlight rules"), section: OptS.Status, minmatch: 0, expectedbuf: BUFSZ, idx: opt_o_status_hilites,
           opt_in_out: opt_in, addr: null, optfn: optfn_o_status_hilites, setwhere: set_in_game, opttyp: OthrOpt,
           negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, alias: null, descr: $c.lit("change status line highlighting"), prefixgw: null,
           initval: On, has_handler: On, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("statuslines"), section: OptS_Status, minmatch: 0, expectedbuf: 20, idx: opt_statuslines, setwhere: set_in_game, opttyp: CompOpt,
+        { name: $c.lit("statuslines"), section: OptS.Status, minmatch: 0, expectedbuf: 20, idx: opt_statuslines, setwhere: set_in_game, opttyp: CompOpt,
           negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_statuslines, alias: null,
           descr: $c.lit("2 or 3 lines for status display"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("suppress_alert"), section: OptS_Advanced, minmatch: 0, expectedbuf: 8, idx: opt_suppress_alert, setwhere: set_in_game, opttyp: CompOpt,
+        { name: $c.lit("suppress_alert"), section: OptS.Advanced, minmatch: 0, expectedbuf: 8, idx: opt_suppress_alert, setwhere: set_in_game, opttyp: CompOpt,
           negateok: No, valok: Yes, dupeok: Yes, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_suppress_alert, alias: null,
           descr: $c.lit("suppress alerts about version-specific features"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("symset"), section: OptS_Map, minmatch: 0, expectedbuf: 70, idx: opt_symset, setwhere: set_in_game, opttyp: CompOpt, negateok: No,
+        { name: $c.lit("symset"), section: OptS.Map, minmatch: 0, expectedbuf: 70, idx: opt_symset, setwhere: set_in_game, opttyp: CompOpt, negateok: No,
           valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_symset, alias: null,
           descr: $c.lit("load a set of display symbols from symbols file"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("term_cols"), section: OptS_Advanced, minmatch: 0, expectedbuf: 6, idx: opt_term_cols, setwhere: set_in_config, opttyp: CompOpt,
+        { name: $c.lit("term_cols"), section: OptS.Advanced, minmatch: 0, expectedbuf: 6, idx: opt_term_cols, setwhere: set_in_config, opttyp: CompOpt,
           negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_term_cols, alias: $c.lit("termcolumns"),
           descr: $c.lit("number of columns"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("term_rows"), section: OptS_Advanced, minmatch: 0, expectedbuf: 6, idx: opt_term_rows, setwhere: set_in_config, opttyp: CompOpt,
+        { name: $c.lit("term_rows"), section: OptS.Advanced, minmatch: 0, expectedbuf: 6, idx: opt_term_rows, setwhere: set_in_config, opttyp: CompOpt,
           negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_term_rows, alias: null,
           descr: $c.lit("number of rows"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("terrainstatus"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_terrainstatus, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "terrainstatus", "i8"),
+        { name: $c.lit("terrainstatus"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_terrainstatus, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "terrainstatus", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("show hero's location as a status field"), prefixgw: null, initval: Off, has_handler: 0,
           dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("tile_file"), section: OptS_Advanced, minmatch: 0, expectedbuf: 70, idx: opt_tile_file, setwhere: set_gameview, opttyp: CompOpt,
+        { name: $c.lit("tile_file"), section: OptS.Advanced, minmatch: 0, expectedbuf: 70, idx: opt_tile_file, setwhere: set_gameview, opttyp: CompOpt,
           negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_tile_file, alias: null,
           descr: $c.lit("name of tile file"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("tile_height"), section: OptS_Advanced, minmatch: 0, expectedbuf: 20, idx: opt_tile_height, setwhere: set_gameview, opttyp: CompOpt,
+        { name: $c.lit("tile_height"), section: OptS.Advanced, minmatch: 0, expectedbuf: 20, idx: opt_tile_height, setwhere: set_gameview, opttyp: CompOpt,
           negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_tile_height, alias: null,
           descr: $c.lit("height of tiles"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("tile_width"), section: OptS_Advanced, minmatch: 0, expectedbuf: 20, idx: opt_tile_width, setwhere: set_gameview, opttyp: CompOpt,
+        { name: $c.lit("tile_width"), section: OptS.Advanced, minmatch: 0, expectedbuf: 20, idx: opt_tile_width, setwhere: set_gameview, opttyp: CompOpt,
           negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_tile_width, alias: null,
           descr: $c.lit("width of tiles"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("tiled_map"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_tiled_map, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "wc_tiled_map", "i8"),
+        { name: $c.lit("tiled_map"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_tiled_map, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "wc_tiled_map", "i8"),
           optfn: optfn_boolean, alias: null, descr: null, prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("time"), section: OptS_Status, minmatch: 0, expectedbuf: 0, idx: opt_time, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
-          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "time", "i8"), optfn: optfn_boolean,
+        { name: $c.lit("time"), section: OptS.Status, minmatch: 0, expectedbuf: 0, idx: opt_time, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "time", "i8"), optfn: optfn_boolean,
           alias: null, descr: $c.lit("display game turns in status line"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("timed_delay"), section: OptS_Map, minmatch: 0, expectedbuf: 0, idx: opt_timed_delay, setwhere: set_in_config, opttyp: BoolOpt,
-          negateok: No, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: null, optfn: optfn_boolean, alias: null, descr: null,
+        { name: $c.lit("timed_delay"), section: OptS.Map, minmatch: 0, expectedbuf: 0, idx: opt_timed_delay, setwhere: set_in_config, opttyp: BoolOpt,
+          negateok: No, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: null, optfn: optfn_boolean, alias: null, descr: null,
           prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("tips"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_tips, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
-          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "tips", "i8"), optfn: optfn_boolean,
+        { name: $c.lit("tips"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_tips, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "tips", "i8"), optfn: optfn_boolean,
           alias: null, descr: $c.lit("show some helpful tips during gameplay"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("tombstone"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_tombstone, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "tombstone", "i8"),
+        { name: $c.lit("tombstone"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_tombstone, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "tombstone", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("show tombstone when your character dies"), prefixgw: null, initval: On, has_handler: 0,
           dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("toptenwin"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_toptenwin, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "toptenwin", "i8"),
+        { name: $c.lit("toptenwin"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_toptenwin, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "toptenwin", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("show top scores in window"), prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("traps"), section: OptS_Advanced, minmatch: 0, expectedbuf: MAXTCHARS + 1, idx: opt_traps, setwhere: set_in_config, opttyp: CompOpt,
+        { name: $c.lit("traps"), section: OptS.Advanced, minmatch: 0, expectedbuf: MAXTCHARS + 1, idx: opt_traps, setwhere: set_in_config, opttyp: CompOpt,
           negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_traps, alias: null,
           descr: $c.lit("list of symbols to use in drawing traps"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("travel"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_travel, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
-          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "travelcmd", "i8"), optfn: optfn_boolean,
+        { name: $c.lit("travel"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_travel, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "travelcmd", "i8"), optfn: optfn_boolean,
           alias: null, descr: $c.lit("enable traveling via mouse click"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("travel_debug"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_travel_debug, setwhere: set_wizonly, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(iflags, "trav_debug", "i8"),
+        { name: $c.lit("travel_debug"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_travel_debug, setwhere: set_wizonly, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_out, addr: new $c.FieldRef(iflags, "trav_debug", "i8"),
           optfn: optfn_boolean, alias: null, descr: null, prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("tutorial"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_tutorial, setwhere: set_in_config, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "tutorial", "i8"),
+        { name: $c.lit("tutorial"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_tutorial, setwhere: set_in_config, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "tutorial", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("ask if you want the tutorial"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("use_darkgray"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_use_darkgray, setwhere: set_in_config, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(iflags, "wc2_darkgray", "i8"),
+        { name: $c.lit("use_darkgray"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_use_darkgray, setwhere: set_in_config, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_out, addr: new $c.FieldRef(iflags, "wc2_darkgray", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("use bold black color instead of blue"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("use_inverse"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_use_inverse, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(iflags, "wc_inverse", "i8"),
+        { name: $c.lit("use_inverse"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_use_inverse, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_out, addr: new $c.FieldRef(iflags, "wc_inverse", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("display detected monsters in inverse"), prefixgw: null, initval: On, has_handler: 0, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("use_truecolor"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_use_truecolor, setwhere: set_in_config, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "use_truecolor", "i8"),
+        { name: $c.lit("use_truecolor"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_use_truecolor, setwhere: set_in_config, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "use_truecolor", "i8"),
           optfn: optfn_boolean, alias: $c.lit("use_truecolour"), descr: null, prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("vary_msgcount"), section: OptS_Advanced, minmatch: 0, expectedbuf: 20, idx: opt_vary_msgcount, setwhere: set_gameview, opttyp: CompOpt,
+        { name: $c.lit("vary_msgcount"), section: OptS.Advanced, minmatch: 0, expectedbuf: 20, idx: opt_vary_msgcount, setwhere: set_gameview, opttyp: CompOpt,
           negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_vary_msgcount, alias: null,
           descr: $c.lit("show more old messages at a time"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("verbose"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_verbose, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
-          valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "verbose", "i8"), optfn: optfn_boolean,
+        { name: $c.lit("verbose"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_verbose, setwhere: set_in_game, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_out, addr: new $c.FieldRef(flags, "verbose", "i8"), optfn: optfn_boolean,
           alias: null, descr: null, prefixgw: null, initval: On, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("versinfo"), section: OptS_Advanced, minmatch: 0, expectedbuf: 80, idx: opt_versinfo, setwhere: set_in_game, opttyp: CompOpt,
+        { name: $c.lit("versinfo"), section: OptS.Advanced, minmatch: 0, expectedbuf: 80, idx: opt_versinfo, setwhere: set_in_game, opttyp: CompOpt,
           negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_out, addr: null, optfn: optfn_versinfo, alias: null,
           descr: $c.lit("extra information for 'showvers'"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("voices"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_voices, setwhere: set_gameview, opttyp: BoolOpt, negateok: Yes,
-          valok: No, dupeok: No, pfx: No, termpref: Term_Excluded, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "voices", "i8"), optfn: optfn_boolean,
+        { name: $c.lit("voices"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_voices, setwhere: set_gameview, opttyp: BoolOpt, negateok: Yes,
+          valok: No, dupeok: No, pfx: No, termpref: Term.Excluded, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "voices", "i8"), optfn: optfn_boolean,
           alias: null, descr: null, prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("vt_tiledata"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_vt_tiledata, setwhere: set_in_config, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: null, optfn: optfn_boolean, alias: null, descr: null,
+        { name: $c.lit("vt_tiledata"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_vt_tiledata, setwhere: set_in_config, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: null, optfn: optfn_boolean, alias: null, descr: null,
           prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("vt_sounddata"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_vt_sounddata, setwhere: set_in_config, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: null, optfn: optfn_boolean, alias: null, descr: null,
+        { name: $c.lit("vt_sounddata"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_vt_sounddata, setwhere: set_in_config, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: null, optfn: optfn_boolean, alias: null, descr: null,
           prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("warnings"), section: OptS_Advanced, minmatch: 0, expectedbuf: 10, idx: opt_warnings, setwhere: set_in_config, opttyp: CompOpt,
+        { name: $c.lit("warnings"), section: OptS.Advanced, minmatch: 0, expectedbuf: 10, idx: opt_warnings, setwhere: set_in_config, opttyp: CompOpt,
           negateok: No, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_warnings, alias: null,
           descr: $c.lit("display characters for warnings"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("weaponstatus"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_weaponstatus, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "weaponstatus", "i8"),
+        { name: $c.lit("weaponstatus"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_weaponstatus, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(flags, "weaponstatus", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("show currently wielded weapon in a status field"), prefixgw: null, initval: Off, has_handler: 0,
           dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("whatis_coord"), section: OptS_Advanced, minmatch: 0, expectedbuf: 1, idx: opt_whatis_coord, setwhere: set_in_game, opttyp: CompOpt,
+        { name: $c.lit("whatis_coord"), section: OptS.Advanced, minmatch: 0, expectedbuf: 1, idx: opt_whatis_coord, setwhere: set_in_game, opttyp: CompOpt,
           negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_whatis_coord, alias: null,
           descr: $c.lit("show coordinates when auto-describing cursor position"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("whatis_filter"), section: OptS_Advanced, minmatch: 0, expectedbuf: 1, idx: opt_whatis_filter, setwhere: set_in_game, opttyp: CompOpt,
+        { name: $c.lit("whatis_filter"), section: OptS.Advanced, minmatch: 0, expectedbuf: 1, idx: opt_whatis_filter, setwhere: set_in_game, opttyp: CompOpt,
           negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_whatis_filter, alias: null,
           descr: $c.lit("filter coordinate locations when targeting next or previous"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0,
           disregarded: 0 },
-        { name: $c.lit("whatis_menu"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_whatis_menu, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "getloc_usemenu", "i8"),
+        { name: $c.lit("whatis_menu"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_whatis_menu, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "getloc_usemenu", "i8"),
           optfn: optfn_boolean, alias: null, descr: $c.lit("show menu when getting a map location"), prefixgw: null, initval: Off, has_handler: 0,
           dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("whatis_moveskip"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_whatis_moveskip, setwhere: set_in_game,
-          opttyp: BoolOpt, negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in,
+        { name: $c.lit("whatis_moveskip"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_whatis_moveskip, setwhere: set_in_game,
+          opttyp: BoolOpt, negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in,
           addr: new $c.FieldRef(iflags, "getloc_moveskip", "i8"), optfn: optfn_boolean, alias: null, descr: $c.lit("skip same glyph when getting map location"),
           prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("windowborders"), section: OptS_Advanced, minmatch: 0, expectedbuf: 9, idx: opt_windowborders, setwhere: set_in_game, opttyp: CompOpt,
+        { name: $c.lit("windowborders"), section: OptS.Advanced, minmatch: 0, expectedbuf: 9, idx: opt_windowborders, setwhere: set_in_game, opttyp: CompOpt,
           negateok: Yes, valok: Yes, dupeok: No, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_windowborders, alias: null,
           descr: $c.lit("0 (off), 1 (on), 2 (auto)"), prefixgw: null, initval: Off, has_handler: Yes, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("windowcolors"), section: OptS_Advanced, minmatch: 0, expectedbuf: 80, idx: opt_windowcolors, setwhere: set_gameview, opttyp: CompOpt,
+        { name: $c.lit("windowcolors"), section: OptS.Advanced, minmatch: 0, expectedbuf: 80, idx: opt_windowcolors, setwhere: set_gameview, opttyp: CompOpt,
           negateok: No, valok: Yes, dupeok: Yes, pfx: No, termpref: 0, opt_in_out: opt_in, addr: null, optfn: optfn_windowcolors, alias: null,
           descr: $c.lit("the foreground/background colors of windows"), prefixgw: null, initval: Off, has_handler: No, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("wizmgender"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_wizmgender, setwhere: set_wizonly, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "wizmgender", "i8"),
+        { name: $c.lit("wizmgender"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_wizmgender, setwhere: set_wizonly, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "wizmgender", "i8"),
           optfn: optfn_boolean, alias: null, descr: null, prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("wizweight"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_wizweight, setwhere: set_wizonly, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "wizweight", "i8"),
+        { name: $c.lit("wizweight"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_wizweight, setwhere: set_wizonly, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "wizweight", "i8"),
           optfn: optfn_boolean, alias: null, descr: null, prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("wraptext"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: opt_wraptext, setwhere: set_in_game, opttyp: BoolOpt,
-          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "wc2_wraptext", "i8"),
+        { name: $c.lit("wraptext"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: opt_wraptext, setwhere: set_in_game, opttyp: BoolOpt,
+          negateok: Yes, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: opt_in, addr: new $c.FieldRef(iflags, "wc2_wraptext", "i8"),
           optfn: optfn_boolean, alias: null, descr: null, prefixgw: null, initval: Off, has_handler: 0, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("cond_"), section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: pfx_cond_, setwhere: set_hidden, opttyp: CompOpt, negateok: Yes,
+        { name: $c.lit("cond_"), section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: pfx_cond_, setwhere: set_hidden, opttyp: CompOpt, negateok: Yes,
           valok: No, dupeok: Yes, pfx: Yes, termpref: 0, opt_in_out: opt_in, addr: null, optfn: pfxfn_cond_, alias: null,
           descr: $c.lit("prefix for cond_ options"), prefixgw: $c.lit("cond_"), initval: Off, has_handler: Yes, dupdetected: 0, disregarded: 0 },
-        { name: $c.lit("font"), prefixgw: $c.lit("font"), initval: Off, has_handler: No, dupdetected: 0, disregarded: 0, section: OptS_Advanced, minmatch: 0,
+        { name: $c.lit("font"), prefixgw: $c.lit("font"), initval: Off, has_handler: No, dupdetected: 0, disregarded: 0, section: OptS.Advanced, minmatch: 0,
           expectedbuf: 0, idx: pfx_font, setwhere: set_hidden, opttyp: CompOpt, negateok: Yes, valok: Yes, dupeok: Yes, pfx: Yes, termpref: 0,
           opt_in_out: opt_in, addr: null, optfn: pfxfn_font, alias: null, descr: $c.lit("prefix for font options") },
-        { name: null, section: OptS_Advanced, minmatch: 0, expectedbuf: 0, idx: 0, setwhere: set_in_sysconf, opttyp: BoolOpt,
-          negateok: No, valok: No, dupeok: No, pfx: No, termpref: Term_False, opt_in_out: 0, addr: null,
+        { name: null, section: OptS.Advanced, minmatch: 0, expectedbuf: 0, idx: 0, setwhere: set_in_sysconf, opttyp: BoolOpt,
+          negateok: No, valok: No, dupeok: No, pfx: No, termpref: Term.False, opt_in_out: 0, addr: null,
           optfn: null,
           alias: null, descr: null, prefixgw: null, initval: 0, has_handler: 0, dupdetected: 0, disregarded: 1 }
     ]);
@@ -7063,31 +7063,31 @@ export function $init() {
         paranoia[$i0].$copyFrom(new $T.paranoia_opts());
     }
     $c.init(paranoia, [
-        { flagmask: PARANOID_CONFIRM, argname: $c.lit("Confirm"), argMinLen: 1, synonym: $c.lit("Paranoia"), synMinLen: 2,
+        { flagmask: PARANOID.CONFIRM, argname: $c.lit("Confirm"), argMinLen: 1, synonym: $c.lit("Paranoia"), synMinLen: 2,
           explain: $c.lit("for \"yes\" confirmations, require \"no\" to reject") },
-        { flagmask: PARANOID_QUIT, argname: $c.lit("quit"), argMinLen: 1, synonym: $c.lit("explore"), synMinLen: 2,
+        { flagmask: PARANOID.QUIT, argname: $c.lit("quit"), argMinLen: 1, synonym: $c.lit("explore"), synMinLen: 2,
           explain: $c.lit("yes vs y to quit or to enter explore mode") },
-        { flagmask: PARANOID_DIE, argname: $c.lit("die"), argMinLen: 1, synonym: $c.lit("death"), synMinLen: 2,
+        { flagmask: PARANOID.DIE, argname: $c.lit("die"), argMinLen: 1, synonym: $c.lit("death"), synMinLen: 2,
           explain: $c.lit("yes vs y to die (explore mode or debug mode)") },
-        { flagmask: PARANOID_BONES, argname: $c.lit("bones"), argMinLen: 1, synonym: null, synMinLen: 0,
+        { flagmask: PARANOID.BONES, argname: $c.lit("bones"), argMinLen: 1, synonym: null, synMinLen: 0,
           explain: $c.lit("yes vs y to save bones data when dying in debug mode") },
-        { flagmask: PARANOID_HIT, argname: $c.lit("attack"), argMinLen: 1, synonym: $c.lit("hit"), synMinLen: 1,
+        { flagmask: PARANOID.HIT, argname: $c.lit("attack"), argMinLen: 1, synonym: $c.lit("hit"), synMinLen: 1,
           explain: $c.lit("yes vs y to attack a peaceful monster") },
-        { flagmask: PARANOID_BREAKWAND, argname: $c.lit("wand-break"), argMinLen: 2, synonym: $c.lit("break-wand"), synMinLen: 2,
+        { flagmask: PARANOID.BREAKWAND, argname: $c.lit("wand-break"), argMinLen: 2, synonym: $c.lit("break-wand"), synMinLen: 2,
           explain: $c.lit("yes vs y to break a wand via (a)pply") },
-        { flagmask: PARANOID_EATING, argname: $c.lit("eat"), argMinLen: 1, synonym: $c.lit("continue"), synMinLen: 4,
+        { flagmask: PARANOID.EATING, argname: $c.lit("eat"), argMinLen: 1, synonym: $c.lit("continue"), synMinLen: 4,
           explain: $c.lit("yes vs y to continue eating after first bite when satiated") },
-        { flagmask: PARANOID_WERECHANGE, argname: $c.lit("Were-change"), argMinLen: 2, synonym: null, synMinLen: 0,
+        { flagmask: PARANOID.WERECHANGE, argname: $c.lit("Were-change"), argMinLen: 2, synonym: null, synMinLen: 0,
           explain: $c.lit("yes vs y to change form when lycanthropy is controllable") },
-        { flagmask: PARANOID_PRAY, argname: $c.lit("pray"), argMinLen: 1, synonym: null, synMinLen: 0,
+        { flagmask: PARANOID.PRAY, argname: $c.lit("pray"), argMinLen: 1, synonym: null, synMinLen: 0,
           explain: $c.lit("y required to pray (supersedes old \"prayconfirm\" option)") },
-        { flagmask: PARANOID_TRAP, argname: $c.lit("trap"), argMinLen: 1, synonym: $c.lit("move-trap"), synMinLen: 1,
+        { flagmask: PARANOID.TRAP, argname: $c.lit("trap"), argMinLen: 1, synonym: $c.lit("move-trap"), synMinLen: 1,
           explain: $c.lit("y required to enter known trap unless considered harmless") },
-        { flagmask: PARANOID_AUTOALL, argname: $c.lit("Autoall"), argMinLen: 2, synonym: $c.lit("autoselect-all"), synMinLen: 2,
+        { flagmask: PARANOID.AUTOALL, argname: $c.lit("Autoall"), argMinLen: 2, synonym: $c.lit("autoselect-all"), synMinLen: 2,
           explain: $c.lit("y required to pick filter choice 'A' for menustyle:Full") },
-        { flagmask: PARANOID_SWIM, argname: $c.lit("swim"), argMinLen: 1, synonym: null, synMinLen: 0,
+        { flagmask: PARANOID.SWIM, argname: $c.lit("swim"), argMinLen: 1, synonym: null, synMinLen: 0,
           explain: $c.lit("'m' prefix necessary to deliberately walk into lava or water") },
-        { flagmask: PARANOID_REMOVE, argname: $c.lit("Remove"), argMinLen: 1, synonym: $c.lit("Takeoff"), synMinLen: 1,
+        { flagmask: PARANOID.REMOVE, argname: $c.lit("Remove"), argMinLen: 1, synonym: $c.lit("Takeoff"), synMinLen: 1,
           explain: $c.lit("always pick from inventory for Remove and Takeoff") },
         { flagmask: 0, argname: $c.lit("none"), argMinLen: 4, synonym: null, synMinLen: 0, explain: null },
         { flagmask: -1, argname: $c.lit("all"), argMinLen: 3, synonym: null, synMinLen: 0, explain: null }
@@ -7230,12 +7230,12 @@ export function $init() {
         msgtype_names[$i0].$copyFrom(new $T.anon_options_7676());
     }
     $c.init(msgtype_names, [
-        { name: $c.lit("show"), msgtyp: MSGTYP_NORMAL, descr: $c.lit("Show message normally") },
-        { name: $c.lit("hide"), msgtyp: MSGTYP_NOSHOW, descr: $c.lit("Hide message") },
-        { name: $c.lit("noshow"), msgtyp: MSGTYP_NOSHOW, descr: null },
-        { name: $c.lit("stop"), msgtyp: MSGTYP_STOP, descr: $c.lit("Prompt for more after the message") },
-        { name: $c.lit("more"), msgtyp: MSGTYP_STOP, descr: null },
-        { name: $c.lit("norep"), msgtyp: MSGTYP_NOREP, descr: $c.lit("Do not repeat the message") }
+        { name: $c.lit("show"), msgtyp: MSGTYP.NORMAL, descr: $c.lit("Show message normally") },
+        { name: $c.lit("hide"), msgtyp: MSGTYP.NOSHOW, descr: $c.lit("Hide message") },
+        { name: $c.lit("noshow"), msgtyp: MSGTYP.NOSHOW, descr: null },
+        { name: $c.lit("stop"), msgtyp: MSGTYP.STOP, descr: $c.lit("Prompt for more after the message") },
+        { name: $c.lit("more"), msgtyp: MSGTYP.STOP, descr: null },
+        { name: $c.lit("norep"), msgtyp: MSGTYP.NOREP, descr: $c.lit("Do not repeat the message") }
     ]);
     opt_intro.fill(null);
     $c.init(opt_intro, [
@@ -7267,38 +7267,38 @@ export function $init() {
         wc_options[$i0].$copyFrom(new $T.wc_Opt());
     }
     $c.init(wc_options, [
-        { wc_name: $c.lit("ascii_map"), wc_bit: WC_ASCII_MAP },
-        { wc_name: $c.lit("color"), wc_bit: WC_COLOR },
-        { wc_name: $c.lit("eight_bit_tty"), wc_bit: WC_EIGHT_BIT_IN },
-        { wc_name: $c.lit("hilite_pet"), wc_bit: WC_HILITE_PET },
-        { wc_name: $c.lit("perm_invent"), wc_bit: WC_PERM_INVENT },
-        { wc_name: $c.lit("perminv_mode"), wc_bit: WC_PERM_INVENT },
-        { wc_name: $c.lit("popup_dialog"), wc_bit: WC_POPUP_DIALOG },
-        { wc_name: $c.lit("player_selection"), wc_bit: WC_PLAYER_SELECTION },
-        { wc_name: $c.lit("preload_tiles"), wc_bit: WC_PRELOAD_TILES },
-        { wc_name: $c.lit("tiled_map"), wc_bit: WC_TILED_MAP },
-        { wc_name: $c.lit("tile_file"), wc_bit: WC_TILE_FILE },
-        { wc_name: $c.lit("tile_width"), wc_bit: WC_TILE_WIDTH },
-        { wc_name: $c.lit("tile_height"), wc_bit: WC_TILE_HEIGHT },
-        { wc_name: $c.lit("align_message"), wc_bit: WC_ALIGN_MESSAGE },
-        { wc_name: $c.lit("align_status"), wc_bit: WC_ALIGN_STATUS },
-        { wc_name: $c.lit("font_map"), wc_bit: WC_FONT_MAP },
-        { wc_name: $c.lit("font_menu"), wc_bit: WC_FONT_MENU },
-        { wc_name: $c.lit("font_message"), wc_bit: WC_FONT_MESSAGE },
-        { wc_name: $c.lit("font_size_map"), wc_bit: WC_FONTSIZ_MAP },
-        { wc_name: $c.lit("font_size_menu"), wc_bit: WC_FONTSIZ_MENU },
-        { wc_name: $c.lit("font_size_message"), wc_bit: WC_FONTSIZ_MESSAGE },
-        { wc_name: $c.lit("font_size_status"), wc_bit: WC_FONTSIZ_STATUS },
-        { wc_name: $c.lit("font_size_text"), wc_bit: WC_FONTSIZ_TEXT },
-        { wc_name: $c.lit("font_status"), wc_bit: WC_FONT_STATUS },
-        { wc_name: $c.lit("font_text"), wc_bit: WC_FONT_TEXT },
-        { wc_name: $c.lit("map_mode"), wc_bit: WC_MAP_MODE },
-        { wc_name: $c.lit("scroll_amount"), wc_bit: WC_SCROLL_AMOUNT },
-        { wc_name: $c.lit("scroll_margin"), wc_bit: WC_SCROLL_MARGIN },
-        { wc_name: $c.lit("splash_screen"), wc_bit: WC_SPLASH_SCREEN },
-        { wc_name: $c.lit("use_inverse"), wc_bit: WC_INVERSE },
-        { wc_name: $c.lit("vary_msgcount"), wc_bit: WC_VARY_MSGCOUNT },
-        { wc_name: $c.lit("windowcolors"), wc_bit: WC_WINDOWCOLORS },
+        { wc_name: $c.lit("ascii_map"), wc_bit: WC.ASCII_MAP },
+        { wc_name: $c.lit("color"), wc_bit: WC.COLOR },
+        { wc_name: $c.lit("eight_bit_tty"), wc_bit: WC.EIGHT_BIT_IN },
+        { wc_name: $c.lit("hilite_pet"), wc_bit: WC.HILITE_PET },
+        { wc_name: $c.lit("perm_invent"), wc_bit: WC.PERM_INVENT },
+        { wc_name: $c.lit("perminv_mode"), wc_bit: WC.PERM_INVENT },
+        { wc_name: $c.lit("popup_dialog"), wc_bit: WC.POPUP_DIALOG },
+        { wc_name: $c.lit("player_selection"), wc_bit: WC.PLAYER_SELECTION },
+        { wc_name: $c.lit("preload_tiles"), wc_bit: WC.PRELOAD_TILES },
+        { wc_name: $c.lit("tiled_map"), wc_bit: WC.TILED_MAP },
+        { wc_name: $c.lit("tile_file"), wc_bit: WC.TILE_FILE },
+        { wc_name: $c.lit("tile_width"), wc_bit: WC.TILE_WIDTH },
+        { wc_name: $c.lit("tile_height"), wc_bit: WC.TILE_HEIGHT },
+        { wc_name: $c.lit("align_message"), wc_bit: WC.ALIGN_MESSAGE },
+        { wc_name: $c.lit("align_status"), wc_bit: WC.ALIGN_STATUS },
+        { wc_name: $c.lit("font_map"), wc_bit: WC.FONT_MAP },
+        { wc_name: $c.lit("font_menu"), wc_bit: WC.FONT_MENU },
+        { wc_name: $c.lit("font_message"), wc_bit: WC.FONT_MESSAGE },
+        { wc_name: $c.lit("font_size_map"), wc_bit: WC.FONTSIZ_MAP },
+        { wc_name: $c.lit("font_size_menu"), wc_bit: WC.FONTSIZ_MENU },
+        { wc_name: $c.lit("font_size_message"), wc_bit: WC.FONTSIZ_MESSAGE },
+        { wc_name: $c.lit("font_size_status"), wc_bit: WC.FONTSIZ_STATUS },
+        { wc_name: $c.lit("font_size_text"), wc_bit: WC.FONTSIZ_TEXT },
+        { wc_name: $c.lit("font_status"), wc_bit: WC.FONT_STATUS },
+        { wc_name: $c.lit("font_text"), wc_bit: WC.FONT_TEXT },
+        { wc_name: $c.lit("map_mode"), wc_bit: WC.MAP_MODE },
+        { wc_name: $c.lit("scroll_amount"), wc_bit: WC.SCROLL_AMOUNT },
+        { wc_name: $c.lit("scroll_margin"), wc_bit: WC.SCROLL_MARGIN },
+        { wc_name: $c.lit("splash_screen"), wc_bit: WC.SPLASH_SCREEN },
+        { wc_name: $c.lit("use_inverse"), wc_bit: WC.INVERSE },
+        { wc_name: $c.lit("vary_msgcount"), wc_bit: WC.VARY_MSGCOUNT },
+        { wc_name: $c.lit("windowcolors"), wc_bit: WC.WINDOWCOLORS },
         { wc_name: $c.lit("mouse_support"), wc_bit: 2147483648 },
         {}
     ]);
@@ -7307,23 +7307,23 @@ export function $init() {
     }
     $c.init(wc2_options, [
         { wc_name: $c.lit("armorstatus"), wc_bit: WC2_EXTRASTATUS },
-        { wc_name: $c.lit("fullscreen"), wc_bit: WC2_FULLSCREEN },
-        { wc_name: $c.lit("guicolor"), wc_bit: WC2_GUICOLOR },
-        { wc_name: $c.lit("hilite_status"), wc_bit: WC2_HILITE_STATUS },
-        { wc_name: $c.lit("hitpointbar"), wc_bit: WC2_HITPOINTBAR },
-        { wc_name: $c.lit("menu_shift"), wc_bit: WC2_MENU_SHIFT },
-        { wc_name: $c.lit("petattr"), wc_bit: WC2_PETATTR },
-        { wc_name: $c.lit("softkeyboard"), wc_bit: WC2_SOFTKEYBOARD },
-        { wc_name: $c.lit("status hilite rules"), wc_bit: WC2_HILITE_STATUS },
-        { wc_name: $c.lit("statushilites"), wc_bit: WC2_HILITE_STATUS },
-        { wc_name: $c.lit("statuslines"), wc_bit: WC2_STATUSLINES },
-        { wc_name: $c.lit("term_cols"), wc_bit: WC2_TERM_SIZE },
-        { wc_name: $c.lit("term_rows"), wc_bit: WC2_TERM_SIZE },
+        { wc_name: $c.lit("fullscreen"), wc_bit: WC2.FULLSCREEN },
+        { wc_name: $c.lit("guicolor"), wc_bit: WC2.GUICOLOR },
+        { wc_name: $c.lit("hilite_status"), wc_bit: WC2.HILITE_STATUS },
+        { wc_name: $c.lit("hitpointbar"), wc_bit: WC2.HITPOINTBAR },
+        { wc_name: $c.lit("menu_shift"), wc_bit: WC2.MENU_SHIFT },
+        { wc_name: $c.lit("petattr"), wc_bit: WC2.PETATTR },
+        { wc_name: $c.lit("softkeyboard"), wc_bit: WC2.SOFTKEYBOARD },
+        { wc_name: $c.lit("status hilite rules"), wc_bit: WC2.HILITE_STATUS },
+        { wc_name: $c.lit("statushilites"), wc_bit: WC2.HILITE_STATUS },
+        { wc_name: $c.lit("statuslines"), wc_bit: WC2.STATUSLINES },
+        { wc_name: $c.lit("term_cols"), wc_bit: WC2.TERM_SIZE },
+        { wc_name: $c.lit("term_rows"), wc_bit: WC2.TERM_SIZE },
         { wc_name: $c.lit("terrainstatus"), wc_bit: WC2_EXTRASTATUS },
-        { wc_name: $c.lit("use_darkgray"), wc_bit: WC2_DARKGRAY },
+        { wc_name: $c.lit("use_darkgray"), wc_bit: WC2.DARKGRAY },
         { wc_name: $c.lit("weaponstatus"), wc_bit: WC2_EXTRASTATUS },
-        { wc_name: $c.lit("windowborders"), wc_bit: WC2_WINDOWBORDERS },
-        { wc_name: $c.lit("wraptext"), wc_bit: WC2_WRAPTEXT },
+        { wc_name: $c.lit("windowborders"), wc_bit: WC2.WINDOWBORDERS },
+        { wc_name: $c.lit("wraptext"), wc_bit: WC2.WRAPTEXT },
         {}
     ]);
     fgp.fill(null);

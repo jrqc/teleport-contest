@@ -2,15 +2,15 @@
 import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
-import { A_LAWFUL } from './align.h.js';
 import { stop_occupation } from './allmain.js';
 import { artifact_light, has_magic_key, is_art } from './artifact.js';
-import { ART_SNICKERSNEE } from './artilist.h.js';
+import { ART } from './artilist.h.js';
+import { A } from './attrib.h.js';
 import { ACURRSTR } from './attrib.macros.js';
 import { isok } from './cmd.js';
 import { is_pool } from './dbridge.js';
 import { a11y, c_common_strings, flags, gb, gi, gk, gn, go, gv, gy, svc, svd, svl, svm, u } from './decl.js';
-import { AMULET_CLASS, ARMOR_CLASS, BALL_CLASS, COIN_CLASS, FOOD_CLASS, GEM_CLASS, POTION_CLASS, RING_CLASS, ROCK_CLASS, SCROLL_CLASS, SPBOOK_CLASS, S_BAT, S_DOG, S_EEL, S_HUMAN, S_LEPRECHAUN, S_LIGHT, S_NYMPH, S_VAMPIRE, TOOL_CLASS, VENOM_CLASS, WAND_CLASS, WEAPON_CLASS } from './defsym.h.js';
+import { AMULET_CLASS, ARMOR_CLASS, BALL_CLASS, COIN_CLASS, FOOD_CLASS, GEM_CLASS, POTION_CLASS, RING_CLASS, ROCK_CLASS, S, SCROLL_CLASS, SPBOOK_CLASS, TOOL_CLASS, VENOM_CLASS, WAND_CLASS, WEAPON_CLASS } from './defsym.h.js';
 import { bury_an_obj, is_digging, mdig_tunnel, watch_dig } from './dig.js';
 import { canseemon, newsym, sensemon, swallowed } from './display.js';
 import { canspotmon, vobj_at } from './display.macros.js';
@@ -23,7 +23,7 @@ import { eaten_stat } from './eat.js';
 import { sengr_at, wipe_engr_at } from './engrave.js';
 import { COLNO, FALSE, ROWNO, TRUE } from './global.h.js';
 import { disturb_buried_zombies, in_rooms, in_town, losehp, may_dig, money_cnt, notice_mon, switch_terrain } from './hack.js';
-import { ARM, BOLT_LIM, HEAD, KILLED_BY_AN, MMOVE_DIED, MMOVE_DONE, MMOVE_MOVED, MMOVE_NOMOVES, MMOVE_NOTHING, MON_POLE_DIST, NC_SHOW_MSG, NO_NC_FLAGS, NO_TRAP_FLAGS, RLOC_MSG } from './hack.h.js';
+import { ARM, BOLT_LIM, HEAD, KILLED, MMOVE, MON_POLE_DIST, NC, NO_NC_FLAGS, NO_TRAP_FLAGS, RLOC } from './hack.h.js';
 import { distu, verbalize1 } from './hack.macros.js';
 import { dist2, distmin, sgn, upstart } from './hacklib.js';
 import { delobj, g_at, sobj_at } from './invent.js';
@@ -33,24 +33,24 @@ import { grow_up, set_malign } from './makemon.js';
 import { castmu } from './mcastu.js';
 import { ACCFOOD, MANFOOD } from './mextra.h.js';
 import { has_edog } from './mextra.macros.js';
-import { ALLOW_M, ALLOW_MDISP, ALLOW_ROCK, ALLOW_U, NOTONL } from './mfndpos.h.js';
+import { ALLOW, NOTONL } from './mfndpos.h.js';
 import { mattackm, mdisplacem } from './mhitm.js';
 import { expels, mattacku, ranged_attk_available } from './mhitu.js';
 import { demon_talk } from './minion.js';
 import { bill_dummy_object, splitobj } from './mkobj.js';
 import { SHOPBASE } from './mkroom.h.js';
 import { angry_guards, can_carry, can_touch_safely, curr_mon_load, healmon, hideunder, m_consume_obj, m_respond, max_mon_load, maybe_unhide_at, meatcorpse, meatmetal, meatobj, mfndpos, mnexto, mon_allowflags, mondied, mongone, monkilled, monnear, mpickstuff, newcham, unstuck, wake_msg, wake_nearto, wakeup } from './mon.js';
-import { AD_CLRC, AD_CORR, AD_DRIN, AD_RUST, AD_SPEL, AT_MAGC, AT_WEAP, M_ATTK_AGR_DIED, M_ATTK_DEF_DIED, M_ATTK_HIT } from './monattk.h.js';
+import { AD, AT, M_ATTK } from './monattk.h.js';
 import { attacktype, can_track, dmgtype, locomotion, mon_knows_traps, mon_learns_traps, noattacks, pronoun_gender, resist_conflict, sticks } from './mondata.js';
 import { amorphous, can_teleport, corpse_eater, grounded, hides_under, is_animal, is_covetous, is_demon, is_mercenary, is_mind_flayer, is_rider, is_unicorn, is_wanderer, is_watch, likes_gems, likes_gold, likes_magic, metallivorous, mindless, needspick, nohands, nolimbs, passes_walls, perceives, regenerates, telepathic, throws_rocks, touch_petrifies, tunnels, unique_corpstat, verysmall, webmaker } from './mondata.macros.js';
-import { G_GENOD, M1_SEE_INVIS, M2_COLLECT, M2_MINION, MS_BRIBE, MS_CUSS, MS_LEADER } from './monflag.h.js';
+import { G_GENOD, M1, M2, MS } from './monflag.h.js';
 import { mons } from './monst.js';
-import { MTSZ, M_AP_FURNITURE, M_AP_MONSTER, M_AP_NOTHING, M_AP_OBJECT, M_AP_TYPMASK, NEED_AXE, NEED_HTH_WEAPON, NEED_PICK_AXE, NEED_PICK_OR_AXE, NEED_WEAPON, STRAT_ARRIVE, STRAT_CLOSE, STRAT_WAITFORU, STRAT_WAITMASK } from './monst.h.js';
+import { MTSZ, M_AP, NEED, STRAT, STRAT_WAITMASK } from './monst.h.js';
 import { DEADMONSTER, MON_WEP, M_AP_TYPE, U_AP_TYPE, engulfing_u, helpless, is_vampshifter, mon_offmap } from './monst.macros.js';
-import { PM_ANGEL, PM_DISPLACER_BEAST, PM_ETTIN, PM_FOG_CLOUD, PM_GELATINOUS_CUBE, PM_GIANT_SPIDER, PM_GREMLIN, PM_HEZROU, PM_JABBERWOCK, PM_KILLER_BEE, PM_LEPRECHAUN, PM_MAIL_DAEMON, PM_MINOTAUR, PM_QUEEN_BEE, PM_STALKER, PM_STEAM_VORTEX, PM_TENGU, PM_VROCK, PM_XORN } from './monsters.h.js';
+import { PM } from './monsters.h.js';
 import { lined_up, m_carrying, m_has_launcher_and_ammo } from './mthrowu.js';
 import { find_defensive, find_misc, find_offensive, searches_for_item, use_defensive, use_misc } from './muse.js';
-import { OBJ_FLOOR } from './obj.h.js';
+import { OBJ } from './obj.h.js';
 import { Is_candle, Is_container, is_axe, is_cloak, is_gloves, is_mines_prize, is_pick, is_shirt, is_soko_prize } from './obj.macros.js';
 import { GEMSTONE, MINERAL } from './objclass.h.js';
 import { is_organic } from './objclass.macros.js';
@@ -61,22 +61,22 @@ import { NATTK, NORMAL_SPEED } from './permonst.h.js';
 import { Norep, You, You_hear, You_see, impossible, pline, pline_The, pline_mon, pline_xy, set_msg_xy, verbalize } from './pline.js';
 import { mbodypart } from './polyself.js';
 import { in_your_sanctuary, inhistemple, mon_aligntyp, pri_move } from './priest.js';
-import { INVIS } from './prop.h.js';
+import { INVIS, W } from './prop.h.js';
 import { quest_stat_check, quest_talk } from './quest.js';
 import { create_gas_cloud, m_in_out_region, visible_region_at } from './region.js';
-import { ALTAR, CORR, DBWALL, DOOR, D_BROKEN, D_CLOSED, D_ISOPEN, D_LOCKED, D_NODOOR, D_TRAPPED, D_WARNED, IRONBARS, LADDER, POOL, ROOM, STAIRS, STONE, TREE, W_NONDIGGABLE } from './rm.h.js';
+import { ALTAR, CORR, D, DBWALL, DOOR, D_WARNED, IRONBARS, LADDER, POOL, ROOM, STAIRS, STONE, TREE } from './rm.h.js';
 import { ACCESSIBLE, MON_AT, OBJ_AT, SURFACE_AT, Sokoban, remove_monster } from './rm.macros.js';
 import { d, rn2, rnd } from './rnd.js';
 import { genders } from './role.js';
 import { add_damage, after_shk_move, costly_spot, inhishop, shk_move } from './shk.js';
-import { P_LANCE, P_POLEARMS } from './skills.h.js';
+import { P } from './skills.h.js';
 import { stairway_at, stairway_find_dir } from './stairs.js';
 import { findgold, mdrop_obj } from './steal.js';
 import { place_monster } from './steed.js';
 import { noteleport_level, rloc, tele_restrict } from './teleport.js';
 import { gettrack } from './track.js';
 import { count_traps, maketrap, mintrap, t_at } from './trap.js';
-import { TRAPPED_DOOR, Trap_Caught_Mon, Trap_Killed_Mon, Trap_Moved_Mon, WEB } from './trap.h.js';
+import { TRAPPED_DOOR, Trap, WEB } from './trap.h.js';
 import { is_pit } from './trap.macros.js';
 import { gd_move } from './vault.js';
 import { clear_path, recalc_block_point, vision_recalc } from './vision.js';
@@ -88,7 +88,7 @@ import { display_nhwindow } from './winprocs.macros.js';
 import { cuss, tactics } from './wizard.js';
 import { see_wsegs, worm_move, worm_nomove, wormhitu } from './worm.js';
 import { extract_from_minvent } from './worn.js';
-import { PRONOUN_HALLU } from './you.h.js';
+import { PRONOUN } from './you.h.js';
 import { Upolyd, u_at } from './you.macros.js';
 import { Aggravate_monster, Blind_telepat, Conflict, Deaf, Displaced, Half_spell_damage, Hallucination, Invis, Protection_from_shape_changers, Stealth, Unaware, Underwater } from './youprop.macros.js';
 import { fracture_rock } from './zap.js';
@@ -149,7 +149,7 @@ export function monhaskey(mon, for_unlocking) {   // monmove.c:96
 export async function mon_yells(mon, shout) {   // monmove.c:106
     if (Deaf()) {
         if (canspotmon(mon)) {
-            await pline_mon(mon, $c.lit("%s angrily %s %s %s!"), await Amonnam(mon), nolimbs(mon.data) ? $c.lit("shakes") : $c.lit("waves"), genders[pronoun_gender(mon, PRONOUN_HALLU)].his, nolimbs(mon.data) ? await mbodypart(mon, HEAD) : await makeplural(await mbodypart(mon, ARM)));
+            await pline_mon(mon, $c.lit("%s angrily %s %s %s!"), await Amonnam(mon), nolimbs(mon.data) ? $c.lit("shakes") : $c.lit("waves"), genders[pronoun_gender(mon, PRONOUN.HALLU)].his, nolimbs(mon.data) ? await mbodypart(mon, HEAD) : await makeplural(await mbodypart(mon, ARM)));
         }
     } else {
         if (canspotmon(mon)) {
@@ -161,7 +161,7 @@ export async function mon_yells(mon, shout) {   // monmove.c:106
     }
 }
 export function m_can_break_boulder(mtmp) {   // monmove.c:133
-    return $c.i8(is_rider(mtmp.data) || !mtmp.mspec_used && (mtmp.isshk | 0 || mtmp.ispriest | 0 || mtmp.data.msound === MS_LEADER) ? 1 : 0);
+    return $c.i8(is_rider(mtmp.data) || !mtmp.mspec_used && (mtmp.isshk | 0 || mtmp.ispriest | 0 || mtmp.data.msound === MS.LEADER) ? 1 : 0);
 }
 export async function m_break_boulder(mtmp, x, y) {   // monmove.c:143
     let otmp = null, $t1;
@@ -187,8 +187,8 @@ export async function m_break_boulder(mtmp, x, y) {   // monmove.c:143
 }
 async function watch_on_duty(mtmp) {   // monmove.c:176
     let x = Int16Array.of(0), y = Int16Array.of(0);
-    if (mtmp.mpeaceful | 0 && in_town($c.i16(u.ux + u.dx | 0), $c.i16(u.uy + u.dy | 0)) && mtmp.mcansee | 0 && ((!((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked) || $c.andu64(mtmp.data.mflags1, M1_SEE_INVIS) !== 0) && !u.uinwater && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & COULD_SEE) !== 0) && !rn2(3)) {
-        if (picking_lock(new $c.Ptr(x, 0), new $c.Ptr(y, 0)) && svl.level.locations[x[0]][y[0]].typ === DOOR && (svl.level.locations[x[0]][y[0]].flags | 0) & D_LOCKED) {
+    if (mtmp.mpeaceful | 0 && in_town($c.i16(u.ux + u.dx | 0), $c.i16(u.uy + u.dy | 0)) && mtmp.mcansee | 0 && ((!((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked) || $c.andu64(mtmp.data.mflags1, M1.SEE_INVIS) !== 0) && !u.uinwater && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & COULD_SEE) !== 0) && !rn2(3)) {
+        if (picking_lock(new $c.Ptr(x, 0), new $c.Ptr(y, 0)) && svl.level.locations[x[0]][y[0]].typ === DOOR && (svl.level.locations[x[0]][y[0]].flags | 0) & D.LOCKED) {
             if (couldsee(mtmp.mx, mtmp.my)) {
                 if ((svl.level.locations[x[0]][y[0]].flags | 0) & D_WARNED) {
                     await mon_yells(mtmp, $c.lit("Halt, thief!  You're under arrest!"));
@@ -219,10 +219,10 @@ export function onscary(x, y, mtmp) {   // monmove.c:241
     let ep = null, auditory_scare = 0, magical_scare = 0;
     auditory_scare = $c.i8(x === 0 && y === 0 ? 1 : 0);
     magical_scare = $c.i8(!auditory_scare ? 1 : 0);
-    if (mtmp.iswiz | 0 || $c.andu64(mtmp.data.mflags2, M2_MINION) !== 0 && mon_aligntyp(mtmp) === A_LAWFUL || $c.peq(mtmp.data, $c.relem(mons, PM_ANGEL)) || is_rider(mtmp.data)) {
+    if (mtmp.iswiz | 0 || $c.andu64(mtmp.data.mflags2, M2.MINION) !== 0 && mon_aligntyp(mtmp) === A.LAWFUL || $c.peq(mtmp.data, $c.relem(mons, PM.ANGEL)) || is_rider(mtmp.data)) {
         return FALSE;
     }
-    if (magical_scare && (mtmp.data.mlet === S_HUMAN || unique_corpstat(mtmp.data))) {
+    if (magical_scare && (mtmp.data.mlet === S.HUMAN || unique_corpstat(mtmp.data))) {
         return FALSE;
     }
     if (mtmp.isshk | 0 && inhishop(mtmp) || mtmp.ispriest | 0 && inhistemple(mtmp)) {
@@ -231,13 +231,13 @@ export function onscary(x, y, mtmp) {   // monmove.c:241
     if (auditory_scare) {
         return TRUE;
     }
-    if (svl.level.locations[x][y].typ === ALTAR && (mtmp.data.mlet === S_VAMPIRE || is_vampshifter(mtmp))) {
+    if (svl.level.locations[x][y].typ === ALTAR && (mtmp.data.mlet === S.VAMPIRE || is_vampshifter(mtmp))) {
         return TRUE;
     }
     if (sobj_at(SCR_SCARE_MONSTER, x, y)) {
         return TRUE;
     }
-    return $c.i8((ep = sengr_at($c.lit("Elbereth"), x, y, TRUE)) !== null && (u_at(x, y) || Displaced() && mtmp.mux === x && mtmp.muy === y || ep.guardobjects | 0 && vobj_at(x, y)) && !(mtmp.isshk | 0 || mtmp.isgd | 0 || !mtmp.mcansee || mtmp.mpeaceful | 0 || $c.peq(mtmp.data, $c.relem(mons, PM_MINOTAUR)) || Inhell() || In_endgame(u.uz)) ? 1 : 0);
+    return $c.i8((ep = sengr_at($c.lit("Elbereth"), x, y, TRUE)) !== null && (u_at(x, y) || Displaced() && mtmp.mux === x && mtmp.muy === y || ep.guardobjects | 0 && vobj_at(x, y)) && !(mtmp.isshk | 0 || mtmp.isgd | 0 || !mtmp.mcansee || mtmp.mpeaceful | 0 || $c.peq(mtmp.data, $c.relem(mons, PM.MINOTAUR)) || Inhell() || In_endgame(u.uz)) ? 1 : 0);
 }
 export async function mon_regen(mon, digest_meal) {   // monmove.c:307
     if ($c.rem64(svm.moves, 20) === 0 || regenerates(mon.data)) {
@@ -256,7 +256,7 @@ export async function mon_regen(mon, digest_meal) {   // monmove.c:307
     }
 }
 async function disturb(mtmp) {   // monmove.c:327
-    if (couldsee(mtmp.mx, mtmp.my) && dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 100 && (!Stealth() || $c.peq(mtmp.data, $c.relem(mons, PM_ETTIN)) && rn2(10)) && (!(mtmp.data.mlet === S_NYMPH || $c.peq(mtmp.data, $c.relem(mons, PM_JABBERWOCK)) || mtmp.data.mlet === S_LEPRECHAUN) || !rn2(50)) && (Aggravate_monster() || (mtmp.data.mlet === S_DOG || mtmp.data.mlet === S_HUMAN) || !rn2(7) && M_AP_TYPE(mtmp) !== M_AP_FURNITURE && M_AP_TYPE(mtmp) !== M_AP_OBJECT)) {
+    if (couldsee(mtmp.mx, mtmp.my) && dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 100 && (!Stealth() || $c.peq(mtmp.data, $c.relem(mons, PM.ETTIN)) && rn2(10)) && (!(mtmp.data.mlet === S.NYMPH || $c.peq(mtmp.data, $c.relem(mons, PM.JABBERWOCK)) || mtmp.data.mlet === S.LEPRECHAUN) || !rn2(50)) && (Aggravate_monster() || (mtmp.data.mlet === S.DOG || mtmp.data.mlet === S.HUMAN) || !rn2(7) && M_AP_TYPE(mtmp) !== M_AP.FURNITURE && M_AP_TYPE(mtmp) !== M_AP.OBJECT)) {
         await wake_msg(mtmp, $c.i8(!mtmp.mpeaceful ? 1 : 0));
         mtmp.msleeping = (0) & 1;
         return 1;
@@ -290,7 +290,7 @@ export function find_pmmonst(pm) {   // monmove.c:375
 }
 export async function bee_eat_jelly(mon, obj) {   // monmove.c:394
     let m_delay = 0, mtmp = null;
-    mtmp = find_pmmonst(PM_QUEEN_BEE);
+    mtmp = find_pmmonst(PM.QUEEN_BEE);
     if (!mtmp) {
         m_delay = obj.blessed | 0 ? 3 : !obj.cursed ? 5 : 7;
         if (obj.quan > 1) {
@@ -300,8 +300,8 @@ export async function bee_eat_jelly(mon, obj) {   // monmove.c:394
             await pline_mon(mon, $c.lit("%s eats %s."), await Monnam(mon), await an(await xname(obj)));
         }
         await delobj(obj);
-        if (mon.m_lev < (mons[PM_QUEEN_BEE].mlevel - 1 | 0)) {
-            mon.m_lev = $c.u8(mons[PM_QUEEN_BEE].mlevel - 1 | 0);
+        if (mon.m_lev < (mons[PM.QUEEN_BEE].mlevel - 1 | 0)) {
+            mon.m_lev = $c.u8(mons[PM.QUEEN_BEE].mlevel - 1 | 0);
         }
         await grow_up(mon, null);
         if (DEADMONSTER(mon)) {
@@ -350,10 +350,10 @@ export async function monflee(mtmp, fleetime, first, fleemsg) {   // monmove.c:4
             }
             mtmp.mfleetim = ((fleetime < 127 ? fleetime : 127) >>> 0) & 127;
         }
-        if (!mtmp.mflee && fleemsg && canseemon(mtmp) && M_AP_TYPE(mtmp) !== M_AP_FURNITURE && M_AP_TYPE(mtmp) !== M_AP_OBJECT) {
+        if (!mtmp.mflee && fleemsg && canseemon(mtmp) && M_AP_TYPE(mtmp) !== M_AP.FURNITURE && M_AP_TYPE(mtmp) !== M_AP.OBJECT) {
             if (!mtmp.mcanmove || !mtmp.data.mmove) {
                 await pline_mon(mtmp, $c.lit("%s seems to flinch."), await Adjmonnam(mtmp, $c.lit("immobile")));
-            } else if ($c.peq(mtmp.data, $c.relem(mons, PM_GREMLIN)) && ($G.uwep && $G.uwep.lamplit | 0 && artifact_light($G.uwep) || $G.uarm && $G.uarm.lamplit | 0 && artifact_light($G.uarm)) && mtmp.mcansee | 0 && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & COULD_SEE) !== 0) {
+            } else if ($c.peq(mtmp.data, $c.relem(mons, PM.GREMLIN)) && ($G.uwep && $G.uwep.lamplit | 0 && artifact_light($G.uwep) || $G.uarm && $G.uarm.lamplit | 0 && artifact_light($G.uarm)) && mtmp.mcansee | 0 && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & COULD_SEE) !== 0) {
                 if (Unaware()) {
                     await pline_mon(mtmp, $c.lit("%s is frightened."), await Monnam(mtmp));
                 } else if (rn2(10) || Deaf()) {
@@ -366,7 +366,7 @@ export async function monflee(mtmp, fleetime, first, fleemsg) {   // monmove.c:4
                 await pline_mon(mtmp, $c.lit("%s turns to flee."), await Monnam(mtmp));
             }
         }
-        if ($c.peq(mtmp.data, $c.relem(mons, PM_VROCK)) && !mtmp.mspec_used) {
+        if ($c.peq(mtmp.data, $c.relem(mons, PM.VROCK)) && !mtmp.mspec_used) {
             $t1 = 75 + rn2(25) | 0, mtmp.mspec_used = $t1;
             await create_gas_cloud(mtmp.mx, mtmp.my, 5, 8);
         }
@@ -388,7 +388,7 @@ async function distfleeck(mtmp, inrange, nearby, scared) {   // monmove.c:533
         seescaryy = u.uy;
     }
     sawscary = onscary($c.i16(seescaryx), $c.i16(seescaryy), mtmp);
-    if (nearby.get(0) && (sawscary || $c.peq(mtmp.data, $c.relem(mons, PM_GREMLIN)) && ($G.uwep && $G.uwep.lamplit | 0 && artifact_light($G.uwep) || $G.uarm && $G.uarm.lamplit | 0 && artifact_light($G.uarm)) && mtmp.mcansee | 0 && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & COULD_SEE) !== 0 && !bravegremlin || !mtmp.mpeaceful && in_your_sanctuary(mtmp, 0, 0))) {
+    if (nearby.get(0) && (sawscary || $c.peq(mtmp.data, $c.relem(mons, PM.GREMLIN)) && ($G.uwep && $G.uwep.lamplit | 0 && artifact_light($G.uwep) || $G.uarm && $G.uarm.lamplit | 0 && artifact_light($G.uarm)) && mtmp.mcansee | 0 && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & COULD_SEE) !== 0 && !bravegremlin || !mtmp.mpeaceful && in_your_sanctuary(mtmp, 0, 0))) {
         scared.set(0, 1);
         await monflee(mtmp, rnd(rn2(7) ? 10 : 100), TRUE, TRUE);
     } else {
@@ -418,8 +418,8 @@ async function mind_blast(mtmp) {   // monmove.c:583
             if (u.uundetected) {
                 u.uundetected = (0) & 1;
                 await newsym(u.ux, u.uy);
-            } else if (U_AP_TYPE() !== M_AP_NOTHING && U_AP_TYPE() !== M_AP_MONSTER) {
-                gy.youmonst.m_ap_type = M_AP_NOTHING;
+            } else if (U_AP_TYPE() !== M_AP.NOTHING && U_AP_TYPE() !== M_AP.MONSTER) {
+                gy.youmonst.m_ap_type = M_AP.NOTHING;
                 gy.youmonst.mappearance = 0;
                 await newsym(u.ux, u.uy);
             }
@@ -428,7 +428,7 @@ async function mind_blast(mtmp) {   // monmove.c:583
             if (Half_spell_damage()) {
                 dmg = $c.div32(dmg + 1 | 0, 2);
             }
-            await losehp(dmg, $c.lit("psychic blast"), KILLED_BY_AN);
+            await losehp(dmg, $c.lit("psychic blast"), KILLED.BY_AN);
         }
     }
     for (m2 = svl.level.monlist; m2; m2 = nmon) {
@@ -452,7 +452,7 @@ async function mind_blast(mtmp) {   // monmove.c:583
             }
             $t1 = rnd(15), m2.mhp = m2.mhp - $t1 | 0;
             if (DEADMONSTER(m2)) {
-                await monkilled(m2, $c.lit(""), AD_DRIN);
+                await monkilled(m2, $c.lit(""), AD.DRIN);
             }
         }
     }
@@ -462,7 +462,7 @@ export async function m_everyturn_effect(mtmp) {   // monmove.c:650
     is_u = $c.i8($c.peq(mtmp, gy.youmonst) ? TRUE : FALSE);
     x = $c.i16(is_u ? u.ux : mtmp.mx);
     y = $c.i16(is_u ? u.uy : mtmp.my);
-    if ($c.peq(mtmp.data, $c.relem(mons, PM_FOG_CLOUD))) {
+    if ($c.peq(mtmp.data, $c.relem(mons, PM.FOG_CLOUD))) {
         if (!closed_door(x, y) && !visible_region_at(x, y)) {
             await create_gas_cloud(x, y, 1, 0);
         }
@@ -473,24 +473,24 @@ export async function m_postmove_effect(mtmp) {   // monmove.c:672
     is_u = $c.i8($c.peq(mtmp, gy.youmonst) ? TRUE : FALSE);
     x = $c.i16(is_u ? u.ux0 : mtmp.mx);
     y = $c.i16(is_u ? u.uy0 : mtmp.my);
-    if ($c.peq(mtmp.data, $c.relem(mons, PM_HEZROU))) {
+    if ($c.peq(mtmp.data, $c.relem(mons, PM.HEZROU))) {
         await create_gas_cloud(x, y, 1, 8);
-    } else if ($c.peq(mtmp.data, $c.relem(mons, PM_STEAM_VORTEX)) && !mtmp.mcan) {
+    } else if ($c.peq(mtmp.data, $c.relem(mons, PM.STEAM_VORTEX)) && !mtmp.mcan) {
         await create_gas_cloud(x, y, 1, 0);
     }
 }
 export async function dochug(mtmp) {   // monmove.c:690
     let mdat = null, status = 0, inrange = Int32Array.of(0), nearby = Int32Array.of(0), scared = Int32Array.of(0), res = 0, otmp = null, panicattk = 0, mw_tmp = null, a = null, $t1;
-    status = MMOVE_NOTHING;
+    status = MMOVE.NOTHING;
     panicattk = FALSE;
     mdat = mtmp.data;
-    if ($c.andu64(mtmp.mstrategy, STRAT_ARRIVE)) {
+    if ($c.andu64(mtmp.mstrategy, STRAT.ARRIVE)) {
         res = m_arrival(mtmp);
         if (res >= 0) {
             return res;
         }
     }
-    if ($c.andu64(mtmp.mstrategy, STRAT_WAITFORU) && ((!((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked) || $c.andu64(mtmp.data.mflags1, M1_SEE_INVIS) !== 0) && !u.uinwater && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & COULD_SEE) !== 0 || mtmp.mhp < mtmp.mhpmax)) {
+    if ($c.andu64(mtmp.mstrategy, STRAT.WAITFORU) && ((!((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked) || $c.andu64(mtmp.data.mflags1, M1.SEE_INVIS) !== 0) && !u.uinwater && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & COULD_SEE) !== 0 || mtmp.mhp < mtmp.mhpmax)) {
         mtmp.mstrategy = $c.andu64(mtmp.mstrategy, 18446744073172680703n);
     }
     quest_stat_check(mtmp);
@@ -498,7 +498,7 @@ export async function dochug(mtmp) {   // monmove.c:690
         if (Hallucination()) {
             await newsym(mtmp.mx, mtmp.my);
         }
-        if (mtmp.mcanmove | 0 && $c.andu64(mtmp.mstrategy, STRAT_CLOSE) && !mtmp.msleeping && monnear(mtmp, u.ux, u.uy)) {
+        if (mtmp.mcanmove | 0 && $c.andu64(mtmp.mstrategy, STRAT.CLOSE) && !mtmp.msleeping && monnear(mtmp, u.ux, u.uy)) {
             await quest_talk(mtmp);
         }
         return 0;
@@ -517,7 +517,7 @@ export async function dochug(mtmp) {   // monmove.c:690
         mtmp.mstun = (0) & 1;
     }
     if (mtmp.mflee | 0 && !rn2(40) && can_teleport(mdat) && !mtmp.iswiz && !await noteleport_level(mtmp)) {
-        if (await rloc(mtmp, RLOC_MSG)) {
+        if (await rloc(mtmp, RLOC.MSG)) {
             await leppie_stash(mtmp);
         }
         return 0;
@@ -551,12 +551,12 @@ export async function dochug(mtmp) {   // monmove.c:690
             return 1;
         }
     }
-    if (nearby[0] && mdat.msound === MS_BRIBE && mtmp.mpeaceful | 0 && !mtmp.mtame && !u.uswallow) {
+    if (nearby[0] && mdat.msound === MS.BRIBE && mtmp.mpeaceful | 0 && !mtmp.mtame && !u.uswallow) {
         if (mtmp.mux !== u.ux || mtmp.muy !== u.uy) {
             await pline($c.lit("%s whispers at thin air."), cansee(mtmp.mux, mtmp.muy) ? await Monnam(mtmp) : $c.lit("It"));
             if (is_demon(gy.youmonst.data)) {
                 if (!await tele_restrict(mtmp)) {
-                    await rloc(mtmp, RLOC_MSG);
+                    await rloc(mtmp, RLOC.MSG);
                 }
             } else {
                 $t1 = mtmp.perminvis = (0) & 1, mtmp.minvis = ($t1) & 1;
@@ -578,27 +578,27 @@ export async function dochug(mtmp) {   // monmove.c:690
         set_apparxy(mtmp);
         await distfleeck(mtmp, new $c.Ptr(inrange, 0), new $c.Ptr(nearby, 0), new $c.Ptr(scared, 0));
     }
-    if ((!mtmp.mpeaceful || Conflict()) && inrange[0] && dist2(mtmp.mx, mtmp.my, mtmp.mux, mtmp.muy) <= 8 && attacktype(mdat, AT_WEAP)) {
+    if ((!mtmp.mpeaceful || Conflict()) && inrange[0] && dist2(mtmp.mx, mtmp.my, mtmp.mux, mtmp.muy) <= 8 && attacktype(mdat, AT.WEAP)) {
         mw_tmp = mtmp.mw;
-        if (!(scared[0] && mw_tmp && is_pick(mw_tmp)) && mtmp.weapon_check === NEED_WEAPON && !(mtmp.mtrapped | 0 && !nearby[0] && await select_rwep(mtmp))) {
-            mtmp.weapon_check = NEED_HTH_WEAPON;
+        if (!(scared[0] && mw_tmp && is_pick(mw_tmp)) && mtmp.weapon_check === NEED.WEAPON && !(mtmp.mtrapped | 0 && !nearby[0] && await select_rwep(mtmp))) {
+            mtmp.weapon_check = NEED.HTH_WEAPON;
             if (await mon_wield_item(mtmp) !== 0) {
                 return 0;
             }
         }
     }
-    if ($c.peq(mdat, $c.relem(mons, PM_KILLER_BEE)) && (otmp = sobj_at(LUMP_OF_ROYAL_JELLY, mtmp.mx, mtmp.my)) !== null && (res = await bee_eat_jelly(mtmp, otmp)) >= 0) {
+    if ($c.peq(mdat, $c.relem(mons, PM.KILLER_BEE)) && (otmp = sobj_at(LUMP_OF_ROYAL_JELLY, mtmp.mx, mtmp.my)) !== null && (res = await bee_eat_jelly(mtmp, otmp)) >= 0) {
         return res;
     }
-    if ($c.peq(mdat, $c.relem(mons, PM_GELATINOUS_CUBE)) && (res = await gelcube_digests(mtmp)) >= 0) {
+    if ($c.peq(mdat, $c.relem(mons, PM.GELATINOUS_CUBE)) && (res = await gelcube_digests(mtmp)) >= 0) {
         return res;
     }
-    if (!nearby[0] || mtmp.mflee | 0 || scared[0] || mtmp.mconf | 0 || mtmp.mstun | 0 || mtmp.minvis | 0 && !rn2(3) || mdat.mlet === S_LEPRECHAUN && !findgold(gi.invent) && (findgold(mtmp.minvent) || rn2(2)) || is_wanderer(mdat) && !rn2(4) || Conflict() && !mtmp.iswiz || !mtmp.mcansee && !rn2(4) || mtmp.mpeaceful | 0) {
+    if (!nearby[0] || mtmp.mflee | 0 || scared[0] || mtmp.mconf | 0 || mtmp.mstun | 0 || mtmp.minvis | 0 && !rn2(3) || mdat.mlet === S.LEPRECHAUN && !findgold(gi.invent) && (findgold(mtmp.minvent) || rn2(2)) || is_wanderer(mdat) && !rn2(4) || Conflict() && !mtmp.iswiz || !mtmp.mcansee && !rn2(4) || mtmp.mpeaceful | 0) {
         if (!mtmp.mspec_used && dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 49) {
             for (a = $c.relem(mdat.mattk, 0); $c.pcmp(a, $c.relem(mdat.mattk, NATTK)) < 0; a = $c.radd(a, 1)) {
-                if (a.aatyp === AT_MAGC && (a.adtyp === AD_SPEL || a.adtyp === AD_CLRC)) {
-                    if (await castmu(mtmp, a, FALSE, FALSE) & M_ATTK_HIT) {
-                        status = MMOVE_DONE;
+                if (a.aatyp === AT.MAGC && (a.adtyp === AD.SPEL || a.adtyp === AD.CLRC)) {
+                    if (await castmu(mtmp, a, FALSE, FALSE) & M_ATTK.HIT) {
+                        status = MMOVE.DONE;
                         break;
                     }
                 }
@@ -610,16 +610,16 @@ export async function dochug(mtmp) {   // monmove.c:690
         if (mon_offmap(mtmp)) {
             return 1;
         }
-        if (status !== MMOVE_DIED) {
+        if (status !== MMOVE.DIED) {
             await distfleeck(mtmp, new $c.Ptr(inrange, 0), new $c.Ptr(nearby, 0), new $c.Ptr(scared, 0));
         }
         switch (status) {
-            case MMOVE_NOMOVES:
+            case MMOVE.NOMOVES:
                 if (scared[0]) {
                     panicattk = TRUE;
                 }
-            case MMOVE_NOTHING:
-            case MMOVE_DONE:
+            case MMOVE.NOTHING:
+            case MMOVE.DONE:
                 if (mtmp.isgd | 0 && (DEADMONSTER(mtmp) || mtmp.mx === 0)) {
                     return 1;
                 }
@@ -627,7 +627,7 @@ export async function dochug(mtmp) {   // monmove.c:690
                     await newsym(mtmp.mx, mtmp.my);
                 }
                 break;
-            case MMOVE_MOVED:
+            case MMOVE.MOVED:
                 if ($c.peq(mtmp, u.ustuck) && !(dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 2)) {
                     await unstuck(mtmp);
                 }
@@ -637,18 +637,18 @@ export async function dochug(mtmp) {   // monmove.c:690
                 if (helpless(mtmp)) {
                     return 0;
                 }
-                if (!nearby[0] && (ranged_attk_available(mtmp) || attacktype(mdat, AT_WEAP) || await find_offensive(mtmp))) {
+                if (!nearby[0] && (ranged_attk_available(mtmp) || attacktype(mdat, AT.WEAP) || await find_offensive(mtmp))) {
                     break;
                 }
                 if (engulfing_u(mtmp)) {
                     return await mattacku(mtmp);
                 }
                 return 0;
-            case MMOVE_DIED:
+            case MMOVE.DIED:
                 return 1;
         }
     }
-    if (status !== MMOVE_DONE && (!mtmp.mpeaceful || Conflict() && !resist_conflict(mtmp))) {
+    if (status !== MMOVE.DONE && (!mtmp.mpeaceful || Conflict() && !resist_conflict(mtmp))) {
         if ((inrange[0] && !scared[0] || panicattk) && !noattacks(mdat) && (Upolyd() ? u.mh : u.uhp) > 0) {
             if (await mattacku(mtmp)) {
                 return 1;
@@ -663,10 +663,10 @@ export async function dochug(mtmp) {   // monmove.c:690
     if (!helpless(mtmp) && nearby[0]) {
         await quest_talk(mtmp);
     }
-    if (inrange[0] && mtmp.data.msound === MS_CUSS && !mtmp.mpeaceful && couldsee(mtmp.mx, mtmp.my) && !mtmp.minvis && !rn2(5)) {
+    if (inrange[0] && mtmp.data.msound === MS.CUSS && !mtmp.mpeaceful && couldsee(mtmp.mx, mtmp.my) && !mtmp.minvis && !rn2(5)) {
         await cuss(mtmp);
     }
-    return status === MMOVE_DIED ? 1 : 0;
+    return status === MMOVE.DIED ? 1 : 0;
 }
 export async function mon_would_take_item(mtmp, otmp) {   // monmove.c:999
     let pctload = 0;
@@ -689,7 +689,7 @@ export async function mon_would_take_item(mtmp, otmp) {   // monmove.c:999
     if (likes_gems(mtmp.data) && otmp.oclass === GEM_CLASS && (objects[otmp.otyp].oc_material | 0) !== MINERAL && pctload < 85) {
         return TRUE;
     }
-    if (($c.andu64(mtmp.data.mflags2, M2_COLLECT) !== 0 || attacktype(mtmp.data, AT_WEAP)) && $c.strchr(new $c.Ptr(practical, 0), otmp.oclass) && pctload < 75) {
+    if (($c.andu64(mtmp.data.mflags2, M2.COLLECT) !== 0 || attacktype(mtmp.data, AT.WEAP)) && $c.strchr(new $c.Ptr(practical, 0), otmp.oclass) && pctload < 75) {
         return TRUE;
     }
     if (likes_magic(mtmp.data) && $c.strchr(new $c.Ptr(magical, 0), otmp.oclass) && pctload < 85) {
@@ -698,7 +698,7 @@ export async function mon_would_take_item(mtmp, otmp) {   // monmove.c:999
     if (throws_rocks(mtmp.data) && otmp.otyp === BOULDER && pctload < 50 && !Sokoban()) {
         return TRUE;
     }
-    if ($c.peq(mtmp.data, $c.relem(mons, PM_GELATINOUS_CUBE)) && otmp.oclass !== ROCK_CLASS && otmp.oclass !== BALL_CLASS && !(otmp.otyp === CORPSE && touch_petrifies($c.relem(mons, otmp.corpsenm)))) {
+    if ($c.peq(mtmp.data, $c.relem(mons, PM.GELATINOUS_CUBE)) && otmp.oclass !== ROCK_CLASS && otmp.oclass !== BALL_CLASS && !(otmp.otyp === CORPSE && touch_petrifies($c.relem(mons, otmp.corpsenm)))) {
         return TRUE;
     }
     return FALSE;
@@ -729,7 +729,7 @@ export function should_displace(mtmp, data, ggx, ggy) {   // monmove.c:1070
         nx = data.poss[i].x;
         ny = data.poss[i].y;
         ndist = dist2($c.i16(nx), $c.i16(ny), ggx, ggy);
-        if (MON_AT(nx, ny) && $c.and64(data.info[i], ALLOW_MDISP) && !$c.and64(data.info[i], ALLOW_M) && !undesirable_disp(mtmp, $c.i16(nx), $c.i16(ny))) {
+        if (MON_AT(nx, ny) && $c.and64(data.info[i], ALLOW.MDISP) && !$c.and64(data.info[i], ALLOW.M) && !undesirable_disp(mtmp, $c.i16(nx), $c.i16(ny))) {
             if (shortest_with_displacing === -1 || ndist < shortest_with_displacing) {
                 shortest_with_displacing = ndist;
             }
@@ -755,18 +755,18 @@ export async function m_digweapon_check(mtmp, nix, niy) {   // monmove.c:1108
     if (can_tunnel && needspick(mtmp.data) && !mwelded(mw_tmp) && (may_dig(nix, niy) || closed_door(nix, niy))) {
         if (closed_door(nix, niy)) {
             if (!mw_tmp || !is_pick(mw_tmp) || !is_axe(mw_tmp)) {
-                mtmp.weapon_check = NEED_PICK_OR_AXE;
+                mtmp.weapon_check = NEED.PICK_OR_AXE;
             }
         } else if (svl.level.locations[nix][niy].typ === TREE || svl.level.flags.arboreal | 0 && svl.level.locations[nix][niy].typ === STONE) {
             if (!mw_tmp || !is_axe(mw_tmp)) {
-                mtmp.weapon_check = NEED_AXE;
+                mtmp.weapon_check = NEED.AXE;
             }
         } else if (svl.level.locations[nix][niy].typ <= DBWALL) {
             if (!mw_tmp || !is_pick(mw_tmp)) {
-                mtmp.weapon_check = NEED_PICK_AXE;
+                mtmp.weapon_check = NEED.PICK_AXE;
             }
         }
-        if (mtmp.weapon_check >= NEED_PICK_AXE && await mon_wield_item(mtmp)) {
+        if (mtmp.weapon_check >= NEED.PICK_AXE && await mon_wield_item(mtmp)) {
             return TRUE;
         }
     }
@@ -774,14 +774,14 @@ export async function m_digweapon_check(mtmp, nix, niy) {   // monmove.c:1108
 }
 function leppie_avoidance(mtmp) {   // monmove.c:1139
     let lepgold = null, ygold = null;
-    if ($c.peq(mtmp.data, $c.relem(mons, PM_LEPRECHAUN)) && ((lepgold = findgold(mtmp.minvent)) && lepgold.quan > ((ygold = findgold(gi.invent)) ? ygold.quan : 0))) {
+    if ($c.peq(mtmp.data, $c.relem(mons, PM.LEPRECHAUN)) && ((lepgold = findgold(mtmp.minvent)) && lepgold.quan > ((ygold = findgold(gi.invent)) ? ygold.quan : 0))) {
         return TRUE;
     }
     return FALSE;
 }
 async function leppie_stash(mtmp) {   // monmove.c:1154
     let gold = null;
-    if ($c.peq(mtmp.data, $c.relem(mons, PM_LEPRECHAUN)) && !DEADMONSTER(mtmp) && !((!((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked) || $c.andu64(mtmp.data.mflags1, M1_SEE_INVIS) !== 0) && !u.uinwater && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & COULD_SEE) !== 0) && !in_rooms(mtmp.mx, mtmp.my, SHOPBASE).get(0) && svl.level.locations[mtmp.mx][mtmp.my].typ === ROOM && !t_at(mtmp.mx, mtmp.my) && rn2(4) && (gold = findgold(mtmp.minvent)) !== null) {
+    if ($c.peq(mtmp.data, $c.relem(mons, PM.LEPRECHAUN)) && !DEADMONSTER(mtmp) && !((!((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked) || $c.andu64(mtmp.data.mflags1, M1.SEE_INVIS) !== 0) && !u.uinwater && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & COULD_SEE) !== 0) && !in_rooms(mtmp.mx, mtmp.my, SHOPBASE).get(0) && svl.level.locations[mtmp.mx][mtmp.my].typ === ROOM && !t_at(mtmp.mx, mtmp.my) && rn2(4) && (gold = findgold(mtmp.minvent)) !== null) {
         await mdrop_obj(mtmp, gold, FALSE);
         gold = g_at(mtmp.mx, mtmp.my);
         if (gold) {
@@ -803,13 +803,13 @@ function m_balks_at_approaching(oldappr, mtmp, pdistmin, pdistmax) {   // monmov
     if (pdistmax) {
         pdistmax.set(0, 0);
     }
-    if (mtmp.mpeaceful | 0 || edist >= 25 || !((!((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked) || $c.andu64(mtmp.data.mflags1, M1_SEE_INVIS) !== 0) && !u.uinwater && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & COULD_SEE) !== 0)) {
+    if (mtmp.mpeaceful | 0 || edist >= 25 || !((!((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked) || $c.andu64(mtmp.data.mflags1, M1.SEE_INVIS) !== 0) && !u.uinwater && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & COULD_SEE) !== 0)) {
         return oldappr;
     }
     if (m_has_launcher_and_ammo(mtmp)) {
         return -1;
     }
-    if (MON_WEP(mtmp) && ((mtmp.mw.oclass === WEAPON_CLASS || mtmp.mw.oclass === TOOL_CLASS) && (objects[mtmp.mw.otyp].oc_subtyp === P_POLEARMS || objects[mtmp.mw.otyp].oc_subtyp === P_LANCE || is_art(mtmp.mw, ART_SNICKERSNEE))) && edist <= MON_POLE_DIST) {
+    if (MON_WEP(mtmp) && ((mtmp.mw.oclass === WEAPON_CLASS || mtmp.mw.oclass === TOOL_CLASS) && (objects[mtmp.mw.otyp].oc_subtyp === P.POLEARMS || objects[mtmp.mw.otyp].oc_subtyp === P.LANCE || is_art(mtmp.mw, ART.SNICKERSNEE))) && edist <= MON_POLE_DIST) {
         return -1;
     }
     if (mwep && (arw = autoreturn_weapon(mwep)) !== null) {
@@ -850,7 +850,7 @@ function soko_allow_web(mon) {   // monmove.c:1252
 async function maybe_spin_web(mtmp) {   // monmove.c:1269
     let trap = null, prob = 0, mbuf = new Int8Array(256), $t1;
     if (webmaker(mtmp.data) && !helpless(mtmp) && !mtmp.mspec_used && !t_at(mtmp.mx, mtmp.my) && soko_allow_web(mtmp)) {
-        prob = Math.imul($c.peq(mtmp.data, $c.relem(mons, PM_GIANT_SPIDER)) ? 15 : 5, count_webbing_walls(mtmp.mx, mtmp.my) + 1 | 0) - Math.imul(3, count_traps(WEB)) | 0;
+        prob = Math.imul($c.peq(mtmp.data, $c.relem(mons, PM.GIANT_SPIDER)) ? 15 : 5, count_webbing_walls(mtmp.mx, mtmp.my) + 1 | 0) - Math.imul(3, count_traps(WEB)) | 0;
         if (rn2(1000) < prob && (trap = await maketrap(mtmp.mx, mtmp.my, WEB)) !== null) {
             $t1 = d(4, 4), mtmp.mspec_used = $t1;
             if (cansee(mtmp.mx, mtmp.my)) {
@@ -942,7 +942,7 @@ async function m_search_items(mtmp, ggx, ggy, mmoved, appr) {   // monmove.c:133
                         ggx.set(0, otmp.ox);
                         ggy.set(0, otmp.oy);
                         if (ggx.get(0) === omx && ggy.get(0) === omy) {
-                            mmoved.set(0, MMOVE_DONE);
+                            mmoved.set(0, MMOVE.DONE);
                             return TRUE;
                         }
                         break;
@@ -966,15 +966,15 @@ async function postmov(mtmp, ptr, omx, omy, mmoved, seenflgs, can_tunnel, can_un
     canseeit = $c.i8(cansee(mtmp.mx, mtmp.my));
     didseeit = canseeit;
     await notice_mon(mtmp);
-    if (mmoved === MMOVE_MOVED) {
+    if (mmoved === MMOVE.MOVED) {
         nix = mtmp.mx, niy = mtmp.my;
-        if (is_vampshifter(mtmp) && !amorphous(mtmp.data) && svl.level.locations[nix][niy].typ === DOOR && ((svl.level.locations[nix][niy].flags | 0) & (D_LOCKED | D_CLOSED)) !== 0 && can_fog(mtmp)) {
+        if (is_vampshifter(mtmp) && !amorphous(mtmp.data) && svl.level.locations[nix][niy].typ === DOOR && ((svl.level.locations[nix][niy].flags | 0) & (D.LOCKED | D.CLOSED)) !== 0 && can_fog(mtmp)) {
             if (seenflgs) {
                 remove_monster(nix, niy);
                 await place_monster(mtmp, omx, omy);
                 await newsym(nix, niy), await newsym(omx, omy);
             }
-            if (await vamp_shift(mtmp, $c.relem(mons, PM_FOG_CLOUD), $c.i8((seenflgs & 1) >>> 0 !== 0 ? TRUE : FALSE))) {
+            if (await vamp_shift(mtmp, $c.relem(mons, PM.FOG_CLOUD), $c.i8((seenflgs & 1) >>> 0 !== 0 ? TRUE : FALSE))) {
                 ptr = mtmp.data;
                 nhUse(ptr);
             }
@@ -986,29 +986,29 @@ async function postmov(mtmp, ptr, omx, omy, mmoved, seenflgs, can_tunnel, can_un
         }
         await newsym(omx, omy);
         trapret = await mintrap(mtmp, NO_TRAP_FLAGS);
-        if (trapret === Trap_Killed_Mon || trapret === Trap_Moved_Mon) {
+        if (trapret === Trap.Killed_Mon || trapret === Trap.Moved_Mon) {
             if (mtmp.mx) {
                 await newsym(mtmp.mx, mtmp.my);
             }
-            return MMOVE_DIED;
+            return MMOVE.DIED;
         } else if (mon_offmap(mtmp)) {
-            return MMOVE_DONE;
+            return MMOVE.DONE;
         }
         ptr = mtmp.data;
         if (svl.level.locations[mtmp.mx][mtmp.my].typ === DOOR && !passes_walls(ptr) && !can_tunnel) {
             here = $c.relem(svl.level.locations[mtmp.mx], mtmp.my);
-            btrapped = $c.i8(((here.flags | 0) & D_TRAPPED) !== 0 ? 1 : 0);
+            btrapped = $c.i8(((here.flags | 0) & D.TRAPPED) !== 0 ? 1 : 0);
             if (btrapped && has_magic_key(mtmp)) {
-                here.flags = (((here.flags | 0) & ~D_TRAPPED) >>> 0) & 31;
+                here.flags = (((here.flags | 0) & ~D.TRAPPED) >>> 0) & 31;
                 btrapped = FALSE;
             }
-            if (((here.flags | 0) & (D_LOCKED | D_CLOSED)) !== 0 && amorphous(ptr)) {
+            if (((here.flags | 0) & (D.LOCKED | D.CLOSED)) !== 0 && amorphous(ptr)) {
                 if (flags.verbose && canseemon(mtmp)) {
-                    await pline_mon(mtmp, $c.lit("%s %s under the door."), await YMonnam(mtmp), $c.peq(ptr, $c.relem(mons, PM_FOG_CLOUD)) || ptr.mlet === S_LIGHT ? $c.lit("flows") : $c.lit("oozes"));
+                    await pline_mon(mtmp, $c.lit("%s %s under the door."), await YMonnam(mtmp), $c.peq(ptr, $c.relem(mons, PM.FOG_CLOUD)) || ptr.mlet === S.LIGHT ? $c.lit("flows") : $c.lit("oozes"));
                 }
-            } else if (((here.flags | 0) & D_LOCKED) !== 0 && can_unlock) {
+            } else if (((here.flags | 0) & D.LOCKED) !== 0 && can_unlock) {
                 do {
-                    here.flags = ((!btrapped ? D_ISOPEN : D_NODOOR) >>> 0) & 31;
+                    here.flags = ((!btrapped ? D.ISOPEN : D.NODOOR) >>> 0) & 31;
                     await newsym(mtmp.mx, mtmp.my);
                     recalc_block_point(mtmp.mx, mtmp.my);
                     await vision_recalc(0);
@@ -1016,7 +1016,7 @@ async function postmov(mtmp, ptr, omx, omy, mmoved, seenflgs, can_tunnel, can_un
                 } while (0);
                 if (btrapped) {
                     if (await mb_trapped(mtmp, canseeit)) {
-                        return MMOVE_DIED;
+                        return MMOVE.DIED;
                     }
                 } else {
                     if (flags.verbose) {
@@ -1029,9 +1029,9 @@ async function postmov(mtmp, ptr, omx, omy, mmoved, seenflgs, can_tunnel, can_un
                         }
                     }
                 }
-            } else if ((here.flags | 0) === D_CLOSED && can_open) {
+            } else if ((here.flags | 0) === D.CLOSED && can_open) {
                 do {
-                    here.flags = ((!btrapped ? D_ISOPEN : D_NODOOR) >>> 0) & 31;
+                    here.flags = ((!btrapped ? D.ISOPEN : D.NODOOR) >>> 0) & 31;
                     await newsym(mtmp.mx, mtmp.my);
                     recalc_block_point(mtmp.mx, mtmp.my);
                     await vision_recalc(0);
@@ -1039,7 +1039,7 @@ async function postmov(mtmp, ptr, omx, omy, mmoved, seenflgs, can_tunnel, can_un
                 } while (0);
                 if (btrapped) {
                     if (await mb_trapped(mtmp, canseeit)) {
-                        return MMOVE_DIED;
+                        return MMOVE.DIED;
                     }
                 } else {
                     if (flags.verbose) {
@@ -1052,8 +1052,8 @@ async function postmov(mtmp, ptr, omx, omy, mmoved, seenflgs, can_tunnel, can_un
                         }
                     }
                 }
-            } else if (((here.flags | 0) & (D_LOCKED | D_CLOSED)) !== 0) {
-                mask = (btrapped || ((here.flags | 0) & D_LOCKED) !== 0 && !rn2(2) ? D_NODOOR : D_BROKEN) >>> 0;
+            } else if (((here.flags | 0) & (D.LOCKED | D.CLOSED)) !== 0) {
+                mask = (btrapped || ((here.flags | 0) & D.LOCKED) !== 0 && !rn2(2) ? D.NODOOR : D.BROKEN) >>> 0;
                 do {
                     here.flags = (mask) & 31;
                     await newsym(mtmp.mx, mtmp.my);
@@ -1063,7 +1063,7 @@ async function postmov(mtmp, ptr, omx, omy, mmoved, seenflgs, can_tunnel, can_un
                 } while (0);
                 if (btrapped) {
                     if (await mb_trapped(mtmp, canseeit)) {
-                        return MMOVE_DIED;
+                        return MMOVE.DIED;
                     }
                 } else {
                     if (flags.verbose) {
@@ -1081,18 +1081,18 @@ async function postmov(mtmp, ptr, omx, omy, mmoved, seenflgs, can_tunnel, can_un
                 }
             }
         } else if (svl.level.locations[mtmp.mx][mtmp.my].typ === IRONBARS) {
-            if (!((svl.level.locations[mtmp.mx][mtmp.my].flags | 0) & W_NONDIGGABLE) && (dmgtype(ptr, AD_RUST) || dmgtype(ptr, AD_CORR) || metallivorous(ptr))) {
+            if (!((svl.level.locations[mtmp.mx][mtmp.my].flags | 0) & W.NONDIGGABLE) && (dmgtype(ptr, AD.RUST) || dmgtype(ptr, AD.CORR) || metallivorous(ptr))) {
                 if (canseemon(mtmp)) {
                     await pline_mon(mtmp, $c.lit("%s eats through the iron bars."), await Monnam(mtmp));
                 }
                 await dissolve_bars(mtmp.mx, mtmp.my);
-                return MMOVE_DONE;
+                return MMOVE.DONE;
             } else if (flags.verbose && canseemon(mtmp)) {
                 await Norep($c.lit("%s %s %s the iron bars."), await Monnam(mtmp), await makeplural(locomotion(ptr, $c.lit("pass"))), passes_walls(ptr) ? $c.lit("through") : $c.lit("between"));
             }
         }
         if (can_tunnel && may_dig(mtmp.mx, mtmp.my) && await mdig_tunnel(mtmp)) {
-            return MMOVE_DIED;
+            return MMOVE.DIED;
         }
         if (engulfing_u(mtmp) && (mtmp.mx !== omx || mtmp.my !== omy)) {
             u.ux0 = u.ux;
@@ -1103,14 +1103,14 @@ async function postmov(mtmp, ptr, omx, omy, mmoved, seenflgs, can_tunnel, can_un
             await newsym(mtmp.mx, mtmp.my);
         }
     }
-    if (mmoved === MMOVE_MOVED || mmoved === MMOVE_DONE) {
+    if (mmoved === MMOVE.MOVED || mmoved === MMOVE.DONE) {
         if (OBJ_AT(mtmp.mx, mtmp.my) && mtmp.mcanmove | 0) {
             if (metallivorous(ptr)) {
                 if (await meatmetal(mtmp) === 2) {
-                    return MMOVE_DIED;
+                    return MMOVE.DIED;
                 }
             }
-            if ($c.peq(ptr, $c.relem(mons, PM_GELATINOUS_CUBE))) {
+            if ($c.peq(ptr, $c.relem(mons, PM.GELATINOUS_CUBE))) {
                 if ((etmp = await meatobj(mtmp)) >= 2) {
                     return etmp;
                 }
@@ -1121,7 +1121,7 @@ async function postmov(mtmp, ptr, omx, omy, mmoved, seenflgs, can_tunnel, can_un
                 }
             }
             if (await mpickstuff(mtmp)) {
-                mmoved = MMOVE_DONE;
+                mmoved = MMOVE.DONE;
             }
             if (mtmp.minvis) {
                 await newsym(mtmp.mx, mtmp.my);
@@ -1131,7 +1131,7 @@ async function postmov(mtmp, ptr, omx, omy, mmoved, seenflgs, can_tunnel, can_un
             }
         }
         await maybe_spin_web(mtmp);
-        if (hides_under(ptr) || ptr.mlet === S_EEL) {
+        if (hides_under(ptr) || ptr.mlet === S.EEL) {
             if (mtmp.mundetected | 0 || !helpless(mtmp) && rn2(5)) {
                 await hideunder(mtmp);
             }
@@ -1151,19 +1151,19 @@ export async function m_move(mtmp, after) {   // monmove.c:1715
     getitems = FALSE;
     avoid = FALSE;
     better_with_displacing = FALSE;
-    mmoved[0] = MMOVE_NOTHING;
+    mmoved[0] = MMOVE.NOTHING;
     preferredrange_min[0] = 0;
     preferredrange_max[0] = 0;
     omx = mtmp.mx;
     omy = mtmp.my;
     if (mtmp.mtrapped) {
         i = await mintrap(mtmp, NO_TRAP_FLAGS);
-        if (i === Trap_Killed_Mon) {
+        if (i === Trap.Killed_Mon) {
             await newsym(mtmp.mx, mtmp.my);
-            return MMOVE_DIED;
+            return MMOVE.DIED;
         }
-        if (i === Trap_Caught_Mon) {
-            return MMOVE_NOTHING;
+        if (i === Trap.Caught_Mon) {
+            return MMOVE.NOTHING;
         }
     }
     ptr = mtmp.data;
@@ -1172,10 +1172,10 @@ export async function m_move(mtmp, after) {   // monmove.c:1715
         if (mtmp.meating <= 0) {
             await finish_meating(mtmp);
         }
-        return MMOVE_DONE;
+        return MMOVE.DONE;
     }
     if (hides_under(ptr) && OBJ_AT(mtmp.mx, mtmp.my) && can_hide_under_obj(svl.level.objects[mtmp.mx][mtmp.my]) && rn2(10)) {
-        return MMOVE_NOTHING;
+        return MMOVE.NOTHING;
     }
     seenflgs = ((canseemon(mtmp) ? 1 : 0) | (canspotmon(mtmp) ? 2 : 0)) >>> 0;
     set_apparxy(mtmp);
@@ -1199,10 +1199,10 @@ export async function m_move(mtmp, after) {   // monmove.c:1715
                 gb.bhitpos.x = tx, gb.bhitpos.y = ty;
                 gn.notonhead = $c.i8(intruder.mx !== tx || intruder.my !== ty ? 1 : 0);
                 covetousattack = await mattackm(mtmp, intruder);
-                if (covetousattack & M_ATTK_AGR_DIED) {
-                    return MMOVE_DIED;
+                if (covetousattack & M_ATTK.AGR_DIED) {
+                    return MMOVE.DIED;
                 }
-                mmoved[0] = MMOVE_MOVED;
+                mmoved[0] = MMOVE.MOVED;
                 return await postmov(mtmp, ptr, omx, omy, mmoved[0], seenflgs, can_tunnel, can_unlock, can_open);
             }
         }
@@ -1210,35 +1210,35 @@ export async function m_move(mtmp, after) {   // monmove.c:1715
             xm = mtmp.isshk | 0 ? await shk_move(mtmp) : mtmp.isgd | 0 ? await gd_move(mtmp) : await pri_move(mtmp);
             switch (xm) {
                 case -2:
-                    return MMOVE_DIED;
+                    return MMOVE.DIED;
                 case -1:
-                    mmoved[0] = MMOVE_NOTHING;
+                    mmoved[0] = MMOVE.NOTHING;
                     break;
                 default:
                     await impossible($c.lit("unknown shk/gd/pri_move return value (%d)"), xm);
                 case 0:
                 case 1:
-                    return await postmov(mtmp, ptr, omx, omy, xm !== 1 ? MMOVE_NOTHING : MMOVE_MOVED, seenflgs, can_tunnel, can_unlock, can_open);
+                    return await postmov(mtmp, ptr, omx, omy, xm !== 1 ? MMOVE.NOTHING : MMOVE.MOVED, seenflgs, can_tunnel, can_unlock, can_open);
             }
         }
-        if ($c.peq(ptr, $c.relem(mons, PM_MAIL_DAEMON))) {
+        if ($c.peq(ptr, $c.relem(mons, PM.MAIL_DAEMON))) {
             if (!Deaf() && canseemon(mtmp)) {
                 await verbalize($c.lit("I'm late!"));
             }
             await mongone(mtmp);
-            return MMOVE_DIED;
+            return MMOVE.DIED;
         }
-        if ($c.peq(ptr, $c.relem(mons, PM_TENGU)) && !rn2(5) && !mtmp.mcan && !await tele_restrict(mtmp)) {
+        if ($c.peq(ptr, $c.relem(mons, PM.TENGU)) && !rn2(5) && !mtmp.mcan && !await tele_restrict(mtmp)) {
             if (mtmp.mhp < 7 || mtmp.mpeaceful | 0 || rn2(2)) {
-                await rloc(mtmp, RLOC_MSG);
+                await rloc(mtmp, RLOC.MSG);
             } else {
-                await mnexto(mtmp, RLOC_MSG);
+                await mnexto(mtmp, RLOC.MSG);
             }
-            return await postmov(mtmp, ptr, omx, omy, MMOVE_MOVED, seenflgs, can_tunnel, can_unlock, can_open);
+            return await postmov(mtmp, ptr, omx, omy, MMOVE.MOVED, seenflgs, can_tunnel, can_unlock, can_open);
         }
     }
     if (u.uswallow | 0 && !mtmp.mflee && !$c.peq(u.ustuck, mtmp)) {
-        return MMOVE_MOVED;
+        return MMOVE.MOVED;
     }
     omx = mtmp.mx;
     omy = mtmp.my;
@@ -1249,7 +1249,7 @@ export async function m_move(mtmp, after) {   // monmove.c:1715
         appr[0] = 0;
     } else {
         should_see = $c.i8(couldsee(omx, omy) && (svl.level.locations[ggx[0]][ggy[0]].lit | 0 || !svl.level.locations[omx][omy].lit) && dist2(omx, omy, ggx[0], ggy[0]) <= 36 ? 1 : 0);
-        if (!mtmp.mcansee || should_see && Invis() && !perceives(ptr) && rn2(11) || (gy.youmonst.m_ap_type & M_AP_TYPMASK) === M_AP_OBJECT && gy.youmonst.mappearance === STRANGE_OBJECT || u.uundetected | 0 || (gy.youmonst.m_ap_type & M_AP_TYPMASK) === M_AP_OBJECT && gy.youmonst.mappearance === GOLD_PIECE && !likes_gold(ptr) || mtmp.mpeaceful | 0 && !mtmp.isshk || (ptr.pmidx === PM_STALKER || ptr.mlet === S_BAT || ptr.mlet === S_LIGHT) && !rn2(3)) {
+        if (!mtmp.mcansee || should_see && Invis() && !perceives(ptr) && rn2(11) || (gy.youmonst.m_ap_type & M_AP.TYPMASK) === M_AP.OBJECT && gy.youmonst.mappearance === STRANGE_OBJECT || u.uundetected | 0 || (gy.youmonst.m_ap_type & M_AP.TYPMASK) === M_AP.OBJECT && gy.youmonst.mappearance === GOLD_PIECE && !likes_gold(ptr) || mtmp.mpeaceful | 0 && !mtmp.isshk || (ptr.pmidx === PM.STALKER || ptr.mlet === S.BAT || ptr.mlet === S.LIGHT) && !rn2(3)) {
             appr[0] = 0;
         }
         if (appr[0] === 1 && leppie_avoidance(mtmp)) {
@@ -1283,9 +1283,9 @@ export async function m_move(mtmp, after) {   // monmove.c:1715
         cnt = await mfndpos(mtmp, mfp, flag);
         if (cnt === 0 && !is_unicorn(mtmp.data)) {
             if (await find_defensive(mtmp, TRUE) && await use_defensive(mtmp)) {
-                return MMOVE_DONE;
+                return MMOVE.DONE;
             }
-            return MMOVE_NOMOVES;
+            return MMOVE.NOMOVES;
         }
         chcnt = 0;
         jcnt = MTSZ < (cnt - 1 | 0) ? MTSZ : cnt - 1 | 0;
@@ -1311,7 +1311,7 @@ export async function m_move(mtmp, after) {   // monmove.c:1715
             if (m_avoid_kicked_loc(mtmp, $c.i16(nx), $c.i16(ny))) {
                 continue;
             }
-            if (MON_AT(nx, ny) && $c.and64(mfp.info[i$2], ALLOW_MDISP) && !$c.and64(mfp.info[i$2], ALLOW_M) && !better_with_displacing) {
+            if (MON_AT(nx, ny) && $c.and64(mfp.info[i$2], ALLOW.MDISP) && !$c.and64(mfp.info[i$2], ALLOW.M) && !better_with_displacing) {
                 continue;
             }
             nxti$: {
@@ -1326,53 +1326,53 @@ export async function m_move(mtmp, after) {   // monmove.c:1715
                     }
                 }
                 nearer = (ndist = dist2($c.i16(nx), $c.i16(ny), ggx[0], ggy[0])) < nidist ? 1 : 0;
-                if (appr[0] === 1 && nearer || appr[0] === -1 && !nearer || !appr[0] && !rn2(chcnt = $c.i16(chcnt + 1)) || appr[0] === -2 && (ndist <= preferredrange_min[0] && !nearer || ndist >= preferredrange_max[0] && nearer) || mmoved[0] === MMOVE_NOTHING) {
+                if (appr[0] === 1 && nearer || appr[0] === -1 && !nearer || !appr[0] && !rn2(chcnt = $c.i16(chcnt + 1)) || appr[0] === -2 && (ndist <= preferredrange_min[0] && !nearer || ndist >= preferredrange_max[0] && nearer) || mmoved[0] === MMOVE.NOTHING) {
                     nix = $c.i16(nx);
                     niy = $c.i16(ny);
                     nidist = ndist;
                     chi = i$2;
-                    mmoved[0] = MMOVE_MOVED;
+                    mmoved[0] = MMOVE.MOVED;
                 }
             }
         }
     }
-    if (mmoved[0] !== MMOVE_NOTHING) {
-        if (mmoved[0] === MMOVE_MOVED && !u_at(nix, niy) && await itsstuck(mtmp)) {
-            return MMOVE_DONE;
+    if (mmoved[0] !== MMOVE.NOTHING) {
+        if (mmoved[0] === MMOVE.MOVED && !u_at(nix, niy) && await itsstuck(mtmp)) {
+            return MMOVE.DONE;
         }
-        if (mmoved[0] === MMOVE_MOVED && await m_digweapon_check(mtmp, nix, niy)) {
-            return MMOVE_DONE;
+        if (mmoved[0] === MMOVE.MOVED && await m_digweapon_check(mtmp, nix, niy)) {
+            return MMOVE.DONE;
         }
         (!(chi >= 0 && chi < 9) ? 1 : 0) ? $c.__assert_rtn($c.lit("m_move"), $c.lit("monmove.c"), 2005, $c.lit("IndexOk(chi, mfp.info)")) : 0;
-        if ($c.and64(mfp.info[chi], ALLOW_U)) {
+        if ($c.and64(mfp.info[chi], ALLOW.U)) {
             nix = mtmp.mux;
             niy = mtmp.muy;
         }
         if (u_at(nix, niy)) {
             mtmp.mux = u.ux;
             mtmp.muy = u.uy;
-            return MMOVE_NOTHING;
+            return MMOVE.NOTHING;
         }
-        if ($c.and64(mfp.info[chi], ALLOW_M) !== 0 || nix === mtmp.mux && niy === mtmp.muy) {
+        if ($c.and64(mfp.info[chi], ALLOW.M) !== 0 || nix === mtmp.mux && niy === mtmp.muy) {
             return await m_move_aggress(mtmp, nix, niy);
         }
-        if ($c.and64(mfp.info[chi], ALLOW_MDISP) !== 0) {
+        if ($c.and64(mfp.info[chi], ALLOW.MDISP) !== 0) {
             mtmp2 = svl.level.monsters[nix][niy];
             mstatus = await mdisplacem(mtmp, mtmp2, FALSE);
-            if (mstatus & (M_ATTK_AGR_DIED | M_ATTK_DEF_DIED)) {
-                return MMOVE_DIED;
+            if (mstatus & (M_ATTK.AGR_DIED | M_ATTK.DEF_DIED)) {
+                return MMOVE.DIED;
             }
-            if (mstatus & M_ATTK_HIT) {
-                return MMOVE_MOVED;
+            if (mstatus & M_ATTK.HIT) {
+                return MMOVE.MOVED;
             }
-            return MMOVE_DONE;
+            return MMOVE.DONE;
         }
         if (!await m_in_out_region(mtmp, nix, niy)) {
-            return MMOVE_DONE;
+            return MMOVE.DONE;
         }
-        if ($c.and64(mfp.info[chi], ALLOW_ROCK) && m_can_break_boulder(mtmp)) {
+        if ($c.and64(mfp.info[chi], ALLOW.ROCK) && m_can_break_boulder(mtmp)) {
             await m_break_boulder(mtmp, nix, niy);
-            return MMOVE_DONE;
+            return MMOVE.DONE;
         }
         await m_postmove_effect(mtmp);
         remove_monster(omx, omy);
@@ -1385,8 +1385,8 @@ export async function m_move(mtmp, after) {   // monmove.c:1715
         mon_track_add(mtmp, omx, omy);
     } else {
         if (is_unicorn(ptr) && rn2(2) && !await tele_restrict(mtmp)) {
-            await rloc(mtmp, RLOC_MSG);
-            return MMOVE_MOVED;
+            await rloc(mtmp, RLOC.MSG);
+            return MMOVE.MOVED;
         }
         if (mtmp.wormno) {
             await worm_nomove(mtmp);
@@ -1403,10 +1403,10 @@ export async function m_move_aggress(mtmp, x, y) {   // monmove.c:2088
         gn.notonhead = $c.i8(x !== mtmp2.mx || y !== mtmp2.my ? 1 : 0);
         mstatus = await mattackm(mtmp, mtmp2);
     }
-    if (mstatus & M_ATTK_AGR_DIED || DEADMONSTER(mtmp)) {
-        return MMOVE_DIED;
+    if (mstatus & M_ATTK.AGR_DIED || DEADMONSTER(mtmp)) {
+        return MMOVE.DIED;
     }
-    if ((mstatus & (M_ATTK_HIT | M_ATTK_DEF_DIED)) === M_ATTK_HIT && rn2(4) && mtmp2.movement > rn2(NORMAL_SPEED)) {
+    if ((mstatus & (M_ATTK.HIT | M_ATTK.DEF_DIED)) === M_ATTK.HIT && rn2(4) && mtmp2.movement > rn2(NORMAL_SPEED)) {
         if (mtmp2.movement > NORMAL_SPEED) {
             mtmp2.movement = $c.i16(mtmp2.movement - NORMAL_SPEED | 0);
         } else {
@@ -1415,15 +1415,15 @@ export async function m_move_aggress(mtmp, x, y) {   // monmove.c:2088
         gb.bhitpos.x = mtmp.mx, gb.bhitpos.y = mtmp.my;
         gn.notonhead = FALSE;
         mstatus = await mattackm(mtmp2, mtmp);
-        if (mstatus & M_ATTK_DEF_DIED) {
-            return MMOVE_DIED;
+        if (mstatus & M_ATTK.DEF_DIED) {
+            return MMOVE.DIED;
         }
     }
-    return MMOVE_DONE;
+    return MMOVE.DONE;
 }
 export function can_hide_under_obj(obj) {   // monmove.c:2121
     let t = null, coinquan = 0;
-    if (!obj || obj.where !== OBJ_FLOOR) {
+    if (!obj || obj.where !== OBJ.FLOOR) {
         return FALSE;
     }
     if ((t = t_at(obj.ox, obj.oy)) !== null && !is_pit(t.ttyp)) {
@@ -1453,7 +1453,7 @@ export async function dissolve_bars(x, y) {   // monmove.c:2170
     }
 }
 export function closed_door(x, y) {   // monmove.c:2181
-    return $c.i8(svl.level.locations[x][y].typ === DOOR && (svl.level.locations[x][y].flags | 0) & (D_LOCKED | D_CLOSED) ? 1 : 0);
+    return $c.i8(svl.level.locations[x][y].typ === DOOR && (svl.level.locations[x][y].flags | 0) & (D.LOCKED | D.CLOSED) ? 1 : 0);
 }
 export function accessible(x, y) {   // monmove.c:2188
     let levtyp = 0;
@@ -1471,11 +1471,11 @@ export function set_apparxy(mtmp) {   // monmove.c:2198
         return;
     }
     notseen = $c.i8(!mtmp.mcansee || Invis() && !perceives(mtmp.data) ? 1 : 0);
-    notthere = $c.i8(Displaced() && !$c.peq(mtmp.data, $c.relem(mons, PM_DISPLACER_BEAST)) ? 1 : 0);
+    notthere = $c.i8(Displaced() && !$c.peq(mtmp.data, $c.relem(mons, PM.DISPLACER_BEAST)) ? 1 : 0);
     if (Underwater()) {
         displ = 1;
     } else if (notseen) {
-        displ = $c.peq(mtmp.data, $c.relem(mons, PM_XORN)) && umoney ? 0 : 1;
+        displ = $c.peq(mtmp.data, $c.relem(mons, PM.XORN)) && umoney ? 0 : 1;
     } else if (notthere) {
         displ = couldsee(mx, my) ? 2 : 1;
     } else {
@@ -1552,7 +1552,7 @@ export function can_ooze(mtmp) {   // monmove.c:2356
     return TRUE;
 }
 export function can_fog(mtmp) {   // monmove.c:2365
-    if (!(svm.mvitals[PM_FOG_CLOUD].mvflags & G_GENOD) && is_vampshifter(mtmp) && !Protection_from_shape_changers() && !stuff_prevents_passage(mtmp)) {
+    if (!(svm.mvitals[PM.FOG_CLOUD].mvflags & G_GENOD) && is_vampshifter(mtmp) && !Protection_from_shape_changers() && !stuff_prevents_passage(mtmp)) {
         return TRUE;
     }
     return FALSE;
@@ -1563,7 +1563,7 @@ async function vamp_shift(mon, ptr, domsg) {   // monmove.c:2377
     if ($c.peq(mon.data, ptr)) {
         reslt = 1;
     } else if (is_vampshifter(mon)) {
-        reslt = await newcham(mon, ptr, domsg ? NC_SHOW_MSG : NO_NC_FLAGS);
+        reslt = await newcham(mon, ptr, domsg ? NC.SHOW_MSG : NO_NC_FLAGS);
         await display_nhwindow()($G.WIN_MESSAGE, FALSE);
     }
     return reslt;

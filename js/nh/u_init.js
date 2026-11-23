@@ -2,9 +2,8 @@
 import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
-import { A_CHAOTIC } from './align.h.js';
 import { adjabil, adjattrib, init_attr, newhp, vary_init_attr } from './attrib.js';
-import { A_CON, A_STR } from './attrib.h.js';
+import { A } from './attrib.h.js';
 import { max_rank_sz } from './botl.js';
 import { getnow } from './calendar.js';
 import { cg, flags, gi, gl, gn, gu, iflags, svb, svm, svs, u, urealtime } from './decl.js';
@@ -20,7 +19,7 @@ import { inv_weight } from './hack.js';
 import { addinv, useupall } from './invent.js';
 import { nhUse } from './lint.macros.js';
 import { dealloc_obj, mkobj, mksobj, weight } from './mkobj.js';
-import { PM_ARCHEOLOGIST, PM_BARBARIAN, PM_CAVE_DWELLER, PM_CLERIC, PM_DWARF, PM_ELF, PM_GNOME, PM_HEALER, PM_HUMAN, PM_KNIGHT, PM_MONK, PM_ORC, PM_RANGER, PM_ROGUE, PM_SAMURAI, PM_TOURIST, PM_VALKYRIE, PM_WIZARD } from './monsters.h.js';
+import { PM } from './monsters.h.js';
 import { discover_object } from './o_init.js';
 import { Is_container, bimanual, is_ammo, is_boots, is_cloak, is_gloves, is_graystone, is_helmet, is_launcher, is_missile, is_pole, is_shield, is_shirt, is_spear, is_suit, is_weptool } from './obj.macros.js';
 import { MAXOCLASSES, MAXSPELL, NUM_OBJECTS } from './objclass.h.js';
@@ -30,17 +29,17 @@ import { Japanese_item_name } from './objnam.js';
 import { NON_PM } from './permonst.h.js';
 import { pline } from './pline.js';
 import { set_uasmon } from './polyself.js';
-import { BLINDED, FROMOUTSIDE, JUMPING, W_ARM, W_ARMC, W_ARMF, W_ARMG, W_ARMH, W_ARMS, W_ARMU } from './prop.h.js';
+import { BLINDED, FROMOUTSIDE, JUMPING, W } from './prop.h.js';
 import { rn2, rnd, rne } from './rnd.js';
 import { aligns } from './role.js';
-import { P_ATTACK_SPELL, P_AXE, P_BARE_HANDED_COMBAT, P_BASIC, P_BOOMERANG, P_BOW, P_BROAD_SWORD, P_CLERIC_SPELL, P_CLUB, P_CROSSBOW, P_DAGGER, P_DART, P_DIVINATION_SPELL, P_ENCHANTMENT_SPELL, P_ESCAPE_SPELL, P_EXPERT, P_FLAIL, P_GRAND_MASTER, P_HAMMER, P_HEALING_SPELL, P_KNIFE, P_LANCE, P_LONG_SWORD, P_MACE, P_MARTIAL_ARTS, P_MASTER, P_MATTER_SPELL, P_MORNING_STAR, P_NONE, P_NUM_SKILLS, P_PICK_AXE, P_POLEARMS, P_QUARTERSTAFF, P_RIDING, P_SABER, P_SHORT_SWORD, P_SHURIKEN, P_SKILLED, P_SLING, P_SPEAR, P_TRIDENT, P_TWO_HANDED_SWORD, P_TWO_WEAPON_COMBAT, P_UNICORN_HORN, P_UNSKILLED, P_WHIP } from './skills.h.js';
+import { P, P_MARTIAL_ARTS } from './skills.h.js';
 import { initialspell, num_spells, spell_skilltype } from './spell.js';
 import { NO_SPELL } from './spell.h.js';
 import { hidden_gold } from './vault.js';
 import { skill_init } from './weapon.js';
 import { set_twoweap, setuqwep, setuswapwep, setuwep } from './wield.js';
 import { setworn } from './worn.js';
-import { A_CURRENT, A_ORIGINAL, LEFT_HANDED, RIGHT_HANDED } from './you.h.js';
+import { LEFT_HANDED, RIGHT_HANDED } from './you.h.js';
 
 const UNDEF_TYP = 0;
 const UNDEF_SPE = 127;
@@ -108,13 +107,13 @@ async function knows_class(sym) {   // u_init.c:586
         }
         if (sym === WEAPON_CLASS) {
             odummy.otyp = $c.i16(ct);
-            if (!(gu.urole.mnum === PM_KNIGHT) && !(gu.urole.mnum === PM_SAMURAI) && is_pole(o)) {
+            if (!(gu.urole.mnum === PM.KNIGHT) && !(gu.urole.mnum === PM.SAMURAI) && is_pole(o)) {
                 continue;
             }
-            if (gu.urole.mnum === PM_RANGER && (!is_launcher(o) && !is_ammo(o) && !is_spear(o))) {
+            if (gu.urole.mnum === PM.RANGER && (!is_launcher(o) && !is_ammo(o) && !is_spear(o))) {
                 continue;
             }
-            if (gu.urole.mnum === PM_ROGUE && objects[o.otyp].oc_subtyp !== P_DAGGER) {
+            if (gu.urole.mnum === PM.ROGUE && objects[o.otyp].oc_subtyp !== P.DAGGER) {
                 continue;
             }
         }
@@ -127,7 +126,7 @@ async function u_init_role() {   // u_init.c:637
     let i = 0, $t1, $t2;
     svm.moves = 1;
     switch (gu.urole.mnum) {
-        case PM_ARCHEOLOGIST:
+        case PM.ARCHEOLOGIST:
             await ini_inv($c.relem(Archeologist, 0));
             if (!rn2(10)) {
                 await ini_inv($c.relem(Tinopener, 0));
@@ -139,7 +138,7 @@ async function u_init_role() {   // u_init.c:637
             await knows_object(SACK, FALSE);
             await knows_object(TOUCHSTONE, FALSE);
             break;
-        case PM_BARBARIAN:
+        case PM.BARBARIAN:
             if (rn2(100) >= 50) {
                 await ini_inv($c.relem(Barbarian_0, 0));
             } else {
@@ -151,10 +150,10 @@ async function u_init_role() {   // u_init.c:637
             await knows_class(WEAPON_CLASS);
             await knows_class(ARMOR_CLASS);
             break;
-        case PM_CAVE_DWELLER:
+        case PM.CAVE_DWELLER:
             await ini_inv($c.relem(Cave_man, 0));
             break;
-        case PM_HEALER:
+        case PM.HEALER:
             $t1 = rn2(1000) + 1001 | 0, u.umoney0 = $t1;
             await ini_inv($c.relem(Healer, 0));
             if (!rn2(25)) {
@@ -162,13 +161,13 @@ async function u_init_role() {   // u_init.c:637
             }
             await knows_object(POT_FULL_HEALING, FALSE);
             break;
-        case PM_KNIGHT:
+        case PM.KNIGHT:
             await ini_inv($c.relem(Knight, 0));
             await knows_class(WEAPON_CLASS);
             await knows_class(ARMOR_CLASS);
             u.uprops[JUMPING].intrinsic = $c.or64(u.uprops[JUMPING].intrinsic, FROMOUTSIDE);
             break;
-        case PM_MONK:
+        case PM.MONK:
             {
                 await ini_inv($c.relem(Monk, 0));
                 await ini_inv(u_init_role$M_spell[$c.div32(rn2(90), 30)]);
@@ -181,7 +180,7 @@ async function u_init_role() {   // u_init.c:637
                 await knows_object(SHURIKEN, FALSE);
                 break;
             }
-        case PM_CLERIC:
+        case PM.CLERIC:
             await ini_inv($c.relem(Priest, 0));
             if (!rn2(5)) {
                 await ini_inv($c.relem(Magicmarker, 0));
@@ -190,11 +189,11 @@ async function u_init_role() {   // u_init.c:637
             }
             await knows_object(POT_WATER, TRUE);
             break;
-        case PM_RANGER:
+        case PM.RANGER:
             await ini_inv($c.relem(Ranger, 0));
             await knows_class(WEAPON_CLASS);
             break;
-        case PM_ROGUE:
+        case PM.ROGUE:
             u.umoney0 = 0;
             await ini_inv($c.relem(Rogue, 0));
             if (!rn2(5)) {
@@ -203,7 +202,7 @@ async function u_init_role() {   // u_init.c:637
             await knows_object(SACK, FALSE);
             await knows_class(WEAPON_CLASS);
             break;
-        case PM_SAMURAI:
+        case PM.SAMURAI:
             await ini_inv($c.relem(Samurai, 0));
             if (!rn2(5)) {
                 await ini_inv($c.relem(Blindfold, 0));
@@ -219,7 +218,7 @@ async function u_init_role() {   // u_init.c:637
                 }
             }
             break;
-        case PM_TOURIST:
+        case PM.TOURIST:
             $t2 = rnd(1000), u.umoney0 = $t2;
             await ini_inv($c.relem(Tourist, 0));
             if (!rn2(25)) {
@@ -232,7 +231,7 @@ async function u_init_role() {   // u_init.c:637
                 await ini_inv($c.relem(Magicmarker, 0));
             }
             break;
-        case PM_VALKYRIE:
+        case PM.VALKYRIE:
             await ini_inv($c.relem(Valkyrie, 0));
             if (!rn2(6)) {
                 await ini_inv($c.relem(Lamp, 0));
@@ -240,7 +239,7 @@ async function u_init_role() {   // u_init.c:637
             await knows_class(WEAPON_CLASS);
             await knows_class(ARMOR_CLASS);
             break;
-        case PM_WIZARD:
+        case PM.WIZARD:
             await ini_inv($c.relem(Wizard, 0));
             if (!rn2(5)) {
                 await ini_inv($c.relem(Blindfold, 0));
@@ -257,10 +256,10 @@ async function u_init_role() {   // u_init.c:637
 async function u_init_race() {   // u_init.c:792
     let Instrument = $c.recArray($T.trobj, 2);
     switch (gu.urace.mnum) {
-        case PM_HUMAN:
+        case PM.HUMAN:
             break;
-        case PM_ELF:
-            if (gu.urole.mnum === PM_CLERIC || gu.urole.mnum === PM_WIZARD) {
+        case PM.ELF:
+            if (gu.urole.mnum === PM.CLERIC || gu.urole.mnum === PM.WIZARD) {
                 for (let $i16 = 0; $i16 < 2; $i16++) {
                     Instrument[$i16].$copyFrom(new $T.trobj());
                 }
@@ -290,7 +289,7 @@ async function u_init_race() {   // u_init.c:792
             await knows_object(ELVEN_BOOTS, FALSE);
             await knows_object(ELVEN_CLOAK, FALSE);
             break;
-        case PM_DWARF:
+        case PM.DWARF:
             await knows_object(DWARVISH_SPEAR, FALSE);
             await knows_object(DWARVISH_SHORT_SWORD, FALSE);
             await knows_object(DWARVISH_MATTOCK, FALSE);
@@ -299,10 +298,10 @@ async function u_init_race() {   // u_init.c:792
             await knows_object(DWARVISH_CLOAK, FALSE);
             await knows_object(DWARVISH_ROUNDSHIELD, FALSE);
             break;
-        case PM_GNOME:
+        case PM.GNOME:
             break;
-        case PM_ORC:
-            if (!(gu.urole.mnum === PM_WIZARD)) {
+        case PM.ORC:
+            if (!(gu.urole.mnum === PM.WIZARD)) {
                 await ini_inv($c.relem(Xtra_food, 0));
             }
             await knows_object(ORCISH_SHORT_SWORD, FALSE);
@@ -327,42 +326,42 @@ async function pauper_reinit() {   // u_init.c:870
     if (!u.uroleplay.pauper) {
         return;
     }
-    for (skill = 0; skill < P_NUM_SKILLS; skill = skill + 1 | 0) {
-        if (u.weapon_skills[skill].skill > P_UNSKILLED) {
-            u.weapon_skills[skill].skill = P_UNSKILLED;
+    for (skill = 0; skill < P.NUM_SKILLS; skill = skill + 1 | 0) {
+        if (u.weapon_skills[skill].skill > P.UNSKILLED) {
+            u.weapon_skills[skill].skill = P.UNSKILLED;
             u.weapon_skills[skill].advance = 0;
         }
     }
     u.weapon_slots = 2;
     switch (gu.urole.mnum) {
-        case PM_HEALER:
+        case PM.HEALER:
             preknown = SPE_HEALING;
             break;
-        case PM_CLERIC:
-        case PM_KNIGHT:
-        case PM_MONK:
+        case PM.CLERIC:
+        case PM.KNIGHT:
+        case PM.MONK:
             preknown = SPE_PROTECTION;
             break;
-        case PM_WIZARD:
+        case PM.WIZARD:
             preknown = SPE_FORCE_BOLT;
             break;
-        case PM_ARCHEOLOGIST:
+        case PM.ARCHEOLOGIST:
             preknown = TOUCHSTONE;
             break;
-        case PM_CAVE_DWELLER:
+        case PM.CAVE_DWELLER:
             preknown = FLINT;
             break;
-        case PM_ROGUE:
-        case PM_TOURIST:
+        case PM.ROGUE:
+        case PM.TOURIST:
             preknown = SACK;
             break;
-        case PM_SAMURAI:
+        case PM.SAMURAI:
             preknown = FOOD_RATION;
             break;
         default:
-        case PM_BARBARIAN:
-        case PM_RANGER:
-        case PM_VALKYRIE:
+        case PM.BARBARIAN:
+        case PM.RANGER:
+        case PM.VALKYRIE:
             break;
     }
     if (preknown !== STRANGE_OBJECT) {
@@ -371,10 +370,10 @@ async function pauper_reinit() {   // u_init.c:870
 }
 async function u_init_carry_attr_boost() {   // u_init.c:929
     while (inv_weight() > 0) {
-        if (await adjattrib(A_STR, 1, TRUE)) {
+        if (await adjattrib(A.STR, 1, TRUE)) {
             continue;
         }
-        if (await adjattrib(A_CON, 1, TRUE)) {
+        if (await adjattrib(A.CON, 1, TRUE)) {
             continue;
         }
         break;
@@ -410,7 +409,7 @@ export async function u_init_misc() {   // u_init.c:944
         svs.spl_book[i].sp_id = NO_SPELL;
     }
     u.ublesscnt = 300;
-    $t10 = ($t9 = u.ualign.type = aligns[flags.initalign].value, u.ualignbase[A_ORIGINAL] = $t9), u.ualignbase[A_CURRENT] = $t10;
+    $t10 = ($t9 = u.ualign.type = aligns[flags.initalign].value, u.ualignbase[A.ORIGINAL] = $t9), u.ualignbase[A.CURRENT] = $t10;
     $G.ubirthday = getnow();
     u.nv_range = 1;
     u.xray_range = -1;
@@ -425,43 +424,43 @@ export async function u_init_misc() {   // u_init.c:944
 async function skills_for_role() {   // u_init.c:1037
     let skills = null;
     switch (gu.urole.mnum) {
-        case PM_ARCHEOLOGIST:
+        case PM.ARCHEOLOGIST:
             skills = $c.relem(Skill_A, 0);
             break;
-        case PM_BARBARIAN:
+        case PM.BARBARIAN:
             skills = $c.relem(Skill_B, 0);
             break;
-        case PM_CAVE_DWELLER:
+        case PM.CAVE_DWELLER:
             skills = $c.relem(Skill_C, 0);
             break;
-        case PM_HEALER:
+        case PM.HEALER:
             skills = $c.relem(Skill_H, 0);
             break;
-        case PM_KNIGHT:
+        case PM.KNIGHT:
             skills = $c.relem(Skill_K, 0);
             break;
-        case PM_MONK:
+        case PM.MONK:
             skills = $c.relem(Skill_Mon, 0);
             break;
-        case PM_CLERIC:
+        case PM.CLERIC:
             skills = $c.relem(Skill_P, 0);
             break;
-        case PM_RANGER:
+        case PM.RANGER:
             skills = $c.relem(Skill_Ran, 0);
             break;
-        case PM_ROGUE:
+        case PM.ROGUE:
             skills = $c.relem(Skill_R, 0);
             break;
-        case PM_SAMURAI:
+        case PM.SAMURAI:
             skills = $c.relem(Skill_S, 0);
             break;
-        case PM_TOURIST:
+        case PM.TOURIST:
             skills = $c.relem(Skill_T, 0);
             break;
-        case PM_VALKYRIE:
+        case PM.VALKYRIE:
             skills = $c.relem(Skill_V, 0);
             break;
-        case PM_WIZARD:
+        case PM.WIZARD:
             skills = $c.relem(Skill_W, 0);
             break;
         default:
@@ -474,7 +473,7 @@ async function restricted_spell_discipline(otyp) {   // u_init.c:1091
     let skills = null, this_skill = 0;
     skills = await skills_for_role();
     this_skill = spell_skilltype(otyp);
-    while (skills && skills.skill !== P_NONE) {
+    while (skills && skills.skill !== P.NONE) {
         if (skills.skill === this_skill) {
             return FALSE;
         }
@@ -493,7 +492,7 @@ async function ini_inv_mkobj_filter(oclass, got_level1_spellbook) {   // u_init.
     trycnt = 0;
     obj = await mkobj(oclass, FALSE);
     otyp = obj.otyp;
-    while (otyp === WAN_WISHING || otyp === gn.nocreate || otyp === gn.nocreate2 || otyp === gn.nocreate3 || otyp === gn.nocreate4 || otyp === RIN_LEVITATION || otyp === POT_HALLUCINATION || otyp === POT_ACID || otyp === SCR_AMNESIA || otyp === SCR_FIRE || otyp === SCR_BLANK_PAPER || otyp === SPE_BLANK_PAPER || otyp === RIN_AGGRAVATE_MONSTER || otyp === RIN_HUNGER || otyp === WAN_NOTHING || otyp === RIN_POISON_RESISTANCE && gu.urace.mnum === PM_ORC || otyp === SCR_ENCHANT_WEAPON && gu.urole.mnum === PM_MONK || otyp === SPE_FORCE_BOLT && gu.urole.mnum === PM_WIZARD || obj.oclass === SPBOOK_CLASS && (objects[otyp].oc_oc2 > (got_level1_spellbook ? 3 : 1) || await restricted_spell_discipline(otyp)) || otyp === SPE_NOVEL) {
+    while (otyp === WAN_WISHING || otyp === gn.nocreate || otyp === gn.nocreate2 || otyp === gn.nocreate3 || otyp === gn.nocreate4 || otyp === RIN_LEVITATION || otyp === POT_HALLUCINATION || otyp === POT_ACID || otyp === SCR_AMNESIA || otyp === SCR_FIRE || otyp === SCR_BLANK_PAPER || otyp === SPE_BLANK_PAPER || otyp === RIN_AGGRAVATE_MONSTER || otyp === RIN_HUNGER || otyp === WAN_NOTHING || otyp === RIN_POISON_RESISTANCE && gu.urace.mnum === PM.ORC || otyp === SCR_ENCHANT_WEAPON && gu.urole.mnum === PM.MONK || otyp === SPE_FORCE_BOLT && gu.urole.mnum === PM.WIZARD || obj.oclass === SPBOOK_CLASS && (objects[otyp].oc_oc2 > (got_level1_spellbook ? 3 : 1) || await restricted_spell_discipline(otyp)) || otyp === SPE_NOVEL) {
         await dealloc_obj(obj);
         if ((trycnt = trycnt + 1 | 0) > 1000) {
             obj = await mksobj(PANCAKE, TRUE, FALSE);
@@ -506,7 +505,7 @@ async function ini_inv_mkobj_filter(oclass, got_level1_spellbook) {   // u_init.
 }
 async function ini_inv_obj_substitution(trop, obj) {   // u_init.c:1179
     let i = 0, save_plnmsg = 0;
-    if (gu.urace.mnum !== PM_HUMAN) {
+    if (gu.urace.mnum !== PM.HUMAN) {
         for (i = 0; inv_subs[i].race_pm !== NON_PM; i = i + 1 | 0) {
             if (inv_subs[i].race_pm === gu.urace.mnum && obj.otyp === inv_subs[i].item_otyp) {
                 do {
@@ -538,7 +537,7 @@ async function ini_inv_adjust_obj(trop, obj) {   // u_init.c:1205
             obj.otrapped = (0) & 1;
         }
         obj.cursed = (0) & 1;
-        if (obj.otrapped | 0 && u.ualign.type !== A_CHAOTIC) {
+        if (obj.otrapped | 0 && u.ualign.type !== A.CHAOTIC) {
             obj.otrapped = (0) & 1;
         }
         if (obj.oclass === WEAPON_CLASS || obj.oclass === TOOL_CLASS) {
@@ -574,19 +573,19 @@ async function ini_inv_use_obj(obj) {   // u_init.c:1251
     if (obj.oclass === ARMOR_CLASS) {
         if (is_shield(obj) && !$G.uarms && !($G.uwep && bimanual($G.uwep))) {
             set_twoweap(FALSE);
-            await setworn(obj, W_ARMS);
+            await setworn(obj, W.ARMS);
         } else if (is_helmet(obj) && !$G.uarmh) {
-            await setworn(obj, W_ARMH);
+            await setworn(obj, W.ARMH);
         } else if (is_gloves(obj) && !$G.uarmg) {
-            await setworn(obj, W_ARMG);
+            await setworn(obj, W.ARMG);
         } else if (is_shirt(obj) && !$G.uarmu) {
-            await setworn(obj, W_ARMU);
+            await setworn(obj, W.ARMU);
         } else if (is_cloak(obj) && !$G.uarmc) {
-            await setworn(obj, W_ARMC);
+            await setworn(obj, W.ARMC);
         } else if (is_boots(obj) && !$G.uarmf) {
-            await setworn(obj, W_ARMF);
+            await setworn(obj, W.ARMF);
         } else if (is_suit(obj) && !$G.uarm) {
-            await setworn(obj, W_ARM);
+            await setworn(obj, W.ARM);
         }
     }
     if (obj.oclass === WEAPON_CLASS || is_weptool(obj) || obj.otyp === TIN_OPENER || obj.otyp === FLINT || obj.otyp === ROCK) {
@@ -953,386 +952,386 @@ export function $init() {
         inv_subs[$i0].$copyFrom(new $T.inv_sub());
     }
     $c.init(inv_subs, [
-        { race_pm: PM_ELF, item_otyp: DAGGER, subs_otyp: ELVEN_DAGGER },
-        { race_pm: PM_ELF, item_otyp: SPEAR, subs_otyp: ELVEN_SPEAR },
-        { race_pm: PM_ELF, item_otyp: SHORT_SWORD, subs_otyp: ELVEN_SHORT_SWORD },
-        { race_pm: PM_ELF, item_otyp: BOW, subs_otyp: ELVEN_BOW },
-        { race_pm: PM_ELF, item_otyp: ARROW, subs_otyp: ELVEN_ARROW },
-        { race_pm: PM_ELF, item_otyp: HELMET, subs_otyp: ELVEN_LEATHER_HELM },
-        { race_pm: PM_ELF, item_otyp: CLOAK_OF_DISPLACEMENT, subs_otyp: ELVEN_CLOAK },
-        { race_pm: PM_ELF, item_otyp: CRAM_RATION, subs_otyp: LEMBAS_WAFER },
-        { race_pm: PM_ORC, item_otyp: DAGGER, subs_otyp: ORCISH_DAGGER },
-        { race_pm: PM_ORC, item_otyp: SPEAR, subs_otyp: ORCISH_SPEAR },
-        { race_pm: PM_ORC, item_otyp: SHORT_SWORD, subs_otyp: ORCISH_SHORT_SWORD },
-        { race_pm: PM_ORC, item_otyp: BOW, subs_otyp: ORCISH_BOW },
-        { race_pm: PM_ORC, item_otyp: ARROW, subs_otyp: ORCISH_ARROW },
-        { race_pm: PM_ORC, item_otyp: HELMET, subs_otyp: ORCISH_HELM },
-        { race_pm: PM_ORC, item_otyp: SMALL_SHIELD, subs_otyp: ORCISH_SHIELD },
-        { race_pm: PM_ORC, item_otyp: RING_MAIL, subs_otyp: ORCISH_RING_MAIL },
-        { race_pm: PM_ORC, item_otyp: CHAIN_MAIL, subs_otyp: ORCISH_CHAIN_MAIL },
-        { race_pm: PM_ORC, item_otyp: CRAM_RATION, subs_otyp: TRIPE_RATION },
-        { race_pm: PM_ORC, item_otyp: LEMBAS_WAFER, subs_otyp: TRIPE_RATION },
-        { race_pm: PM_DWARF, item_otyp: SPEAR, subs_otyp: DWARVISH_SPEAR },
-        { race_pm: PM_DWARF, item_otyp: SHORT_SWORD, subs_otyp: DWARVISH_SHORT_SWORD },
-        { race_pm: PM_DWARF, item_otyp: HELMET, subs_otyp: DWARVISH_IRON_HELM },
-        { race_pm: PM_DWARF, item_otyp: LEMBAS_WAFER, subs_otyp: CRAM_RATION },
-        { race_pm: PM_GNOME, item_otyp: BOW, subs_otyp: CROSSBOW },
-        { race_pm: PM_GNOME, item_otyp: ARROW, subs_otyp: CROSSBOW_BOLT },
+        { race_pm: PM.ELF, item_otyp: DAGGER, subs_otyp: ELVEN_DAGGER },
+        { race_pm: PM.ELF, item_otyp: SPEAR, subs_otyp: ELVEN_SPEAR },
+        { race_pm: PM.ELF, item_otyp: SHORT_SWORD, subs_otyp: ELVEN_SHORT_SWORD },
+        { race_pm: PM.ELF, item_otyp: BOW, subs_otyp: ELVEN_BOW },
+        { race_pm: PM.ELF, item_otyp: ARROW, subs_otyp: ELVEN_ARROW },
+        { race_pm: PM.ELF, item_otyp: HELMET, subs_otyp: ELVEN_LEATHER_HELM },
+        { race_pm: PM.ELF, item_otyp: CLOAK_OF_DISPLACEMENT, subs_otyp: ELVEN_CLOAK },
+        { race_pm: PM.ELF, item_otyp: CRAM_RATION, subs_otyp: LEMBAS_WAFER },
+        { race_pm: PM.ORC, item_otyp: DAGGER, subs_otyp: ORCISH_DAGGER },
+        { race_pm: PM.ORC, item_otyp: SPEAR, subs_otyp: ORCISH_SPEAR },
+        { race_pm: PM.ORC, item_otyp: SHORT_SWORD, subs_otyp: ORCISH_SHORT_SWORD },
+        { race_pm: PM.ORC, item_otyp: BOW, subs_otyp: ORCISH_BOW },
+        { race_pm: PM.ORC, item_otyp: ARROW, subs_otyp: ORCISH_ARROW },
+        { race_pm: PM.ORC, item_otyp: HELMET, subs_otyp: ORCISH_HELM },
+        { race_pm: PM.ORC, item_otyp: SMALL_SHIELD, subs_otyp: ORCISH_SHIELD },
+        { race_pm: PM.ORC, item_otyp: RING_MAIL, subs_otyp: ORCISH_RING_MAIL },
+        { race_pm: PM.ORC, item_otyp: CHAIN_MAIL, subs_otyp: ORCISH_CHAIN_MAIL },
+        { race_pm: PM.ORC, item_otyp: CRAM_RATION, subs_otyp: TRIPE_RATION },
+        { race_pm: PM.ORC, item_otyp: LEMBAS_WAFER, subs_otyp: TRIPE_RATION },
+        { race_pm: PM.DWARF, item_otyp: SPEAR, subs_otyp: DWARVISH_SPEAR },
+        { race_pm: PM.DWARF, item_otyp: SHORT_SWORD, subs_otyp: DWARVISH_SHORT_SWORD },
+        { race_pm: PM.DWARF, item_otyp: HELMET, subs_otyp: DWARVISH_IRON_HELM },
+        { race_pm: PM.DWARF, item_otyp: LEMBAS_WAFER, subs_otyp: CRAM_RATION },
+        { race_pm: PM.GNOME, item_otyp: BOW, subs_otyp: CROSSBOW },
+        { race_pm: PM.GNOME, item_otyp: ARROW, subs_otyp: CROSSBOW_BOLT },
         { race_pm: NON_PM, item_otyp: STRANGE_OBJECT, subs_otyp: STRANGE_OBJECT }
     ]);
     for (let $i0 = 0; $i0 < 20; $i0++) {
         Skill_A[$i0].$copyFrom(new $T.def_skill());
     }
     $c.init(Skill_A, [
-        { skill: P_DAGGER, skmax: P_BASIC },
-        { skill: P_KNIFE, skmax: P_BASIC },
-        { skill: P_PICK_AXE, skmax: P_EXPERT },
-        { skill: P_SHORT_SWORD, skmax: P_BASIC },
-        { skill: P_SABER, skmax: P_EXPERT },
-        { skill: P_CLUB, skmax: P_SKILLED },
-        { skill: P_QUARTERSTAFF, skmax: P_SKILLED },
-        { skill: P_SLING, skmax: P_SKILLED },
-        { skill: P_DART, skmax: P_BASIC },
-        { skill: P_BOOMERANG, skmax: P_EXPERT },
-        { skill: P_WHIP, skmax: P_EXPERT },
-        { skill: P_UNICORN_HORN, skmax: P_SKILLED },
-        { skill: P_ATTACK_SPELL, skmax: P_BASIC },
-        { skill: P_HEALING_SPELL, skmax: P_BASIC },
-        { skill: P_DIVINATION_SPELL, skmax: P_EXPERT },
-        { skill: P_MATTER_SPELL, skmax: P_BASIC },
-        { skill: P_RIDING, skmax: P_BASIC },
-        { skill: P_TWO_WEAPON_COMBAT, skmax: P_BASIC },
-        { skill: P_BARE_HANDED_COMBAT, skmax: P_EXPERT },
+        { skill: P.DAGGER, skmax: P.BASIC },
+        { skill: P.KNIFE, skmax: P.BASIC },
+        { skill: P.PICK_AXE, skmax: P.EXPERT },
+        { skill: P.SHORT_SWORD, skmax: P.BASIC },
+        { skill: P.SABER, skmax: P.EXPERT },
+        { skill: P.CLUB, skmax: P.SKILLED },
+        { skill: P.QUARTERSTAFF, skmax: P.SKILLED },
+        { skill: P.SLING, skmax: P.SKILLED },
+        { skill: P.DART, skmax: P.BASIC },
+        { skill: P.BOOMERANG, skmax: P.EXPERT },
+        { skill: P.WHIP, skmax: P.EXPERT },
+        { skill: P.UNICORN_HORN, skmax: P.SKILLED },
+        { skill: P.ATTACK_SPELL, skmax: P.BASIC },
+        { skill: P.HEALING_SPELL, skmax: P.BASIC },
+        { skill: P.DIVINATION_SPELL, skmax: P.EXPERT },
+        { skill: P.MATTER_SPELL, skmax: P.BASIC },
+        { skill: P.RIDING, skmax: P.BASIC },
+        { skill: P.TWO_WEAPON_COMBAT, skmax: P.BASIC },
+        { skill: P.BARE_HANDED_COMBAT, skmax: P.EXPERT },
         {}
     ]);
     for (let $i0 = 0; $i0 < 23; $i0++) {
         Skill_B[$i0].$copyFrom(new $T.def_skill());
     }
     $c.init(Skill_B, [
-        { skill: P_DAGGER, skmax: P_BASIC },
-        { skill: P_AXE, skmax: P_EXPERT },
-        { skill: P_PICK_AXE, skmax: P_SKILLED },
-        { skill: P_SHORT_SWORD, skmax: P_EXPERT },
-        { skill: P_BROAD_SWORD, skmax: P_SKILLED },
-        { skill: P_LONG_SWORD, skmax: P_SKILLED },
-        { skill: P_TWO_HANDED_SWORD, skmax: P_EXPERT },
-        { skill: P_SABER, skmax: P_SKILLED },
-        { skill: P_CLUB, skmax: P_SKILLED },
-        { skill: P_MACE, skmax: P_SKILLED },
-        { skill: P_MORNING_STAR, skmax: P_SKILLED },
-        { skill: P_FLAIL, skmax: P_BASIC },
-        { skill: P_HAMMER, skmax: P_EXPERT },
-        { skill: P_QUARTERSTAFF, skmax: P_BASIC },
-        { skill: P_SPEAR, skmax: P_SKILLED },
-        { skill: P_TRIDENT, skmax: P_SKILLED },
-        { skill: P_BOW, skmax: P_BASIC },
-        { skill: P_ATTACK_SPELL, skmax: P_BASIC },
-        { skill: P_ESCAPE_SPELL, skmax: P_BASIC },
-        { skill: P_RIDING, skmax: P_BASIC },
-        { skill: P_TWO_WEAPON_COMBAT, skmax: P_BASIC },
-        { skill: P_BARE_HANDED_COMBAT, skmax: P_MASTER },
+        { skill: P.DAGGER, skmax: P.BASIC },
+        { skill: P.AXE, skmax: P.EXPERT },
+        { skill: P.PICK_AXE, skmax: P.SKILLED },
+        { skill: P.SHORT_SWORD, skmax: P.EXPERT },
+        { skill: P.BROAD_SWORD, skmax: P.SKILLED },
+        { skill: P.LONG_SWORD, skmax: P.SKILLED },
+        { skill: P.TWO_HANDED_SWORD, skmax: P.EXPERT },
+        { skill: P.SABER, skmax: P.SKILLED },
+        { skill: P.CLUB, skmax: P.SKILLED },
+        { skill: P.MACE, skmax: P.SKILLED },
+        { skill: P.MORNING_STAR, skmax: P.SKILLED },
+        { skill: P.FLAIL, skmax: P.BASIC },
+        { skill: P.HAMMER, skmax: P.EXPERT },
+        { skill: P.QUARTERSTAFF, skmax: P.BASIC },
+        { skill: P.SPEAR, skmax: P.SKILLED },
+        { skill: P.TRIDENT, skmax: P.SKILLED },
+        { skill: P.BOW, skmax: P.BASIC },
+        { skill: P.ATTACK_SPELL, skmax: P.BASIC },
+        { skill: P.ESCAPE_SPELL, skmax: P.BASIC },
+        { skill: P.RIDING, skmax: P.BASIC },
+        { skill: P.TWO_WEAPON_COMBAT, skmax: P.BASIC },
+        { skill: P.BARE_HANDED_COMBAT, skmax: P.MASTER },
         {}
     ]);
     for (let $i0 = 0; $i0 < 21; $i0++) {
         Skill_C[$i0].$copyFrom(new $T.def_skill());
     }
     $c.init(Skill_C, [
-        { skill: P_DAGGER, skmax: P_BASIC },
-        { skill: P_KNIFE, skmax: P_SKILLED },
-        { skill: P_AXE, skmax: P_SKILLED },
-        { skill: P_PICK_AXE, skmax: P_BASIC },
-        { skill: P_CLUB, skmax: P_EXPERT },
-        { skill: P_MACE, skmax: P_EXPERT },
-        { skill: P_MORNING_STAR, skmax: P_BASIC },
-        { skill: P_FLAIL, skmax: P_SKILLED },
-        { skill: P_HAMMER, skmax: P_SKILLED },
-        { skill: P_QUARTERSTAFF, skmax: P_EXPERT },
-        { skill: P_POLEARMS, skmax: P_SKILLED },
-        { skill: P_SPEAR, skmax: P_EXPERT },
-        { skill: P_TRIDENT, skmax: P_SKILLED },
-        { skill: P_BOW, skmax: P_SKILLED },
-        { skill: P_SLING, skmax: P_EXPERT },
-        { skill: P_ATTACK_SPELL, skmax: P_BASIC },
-        { skill: P_MATTER_SPELL, skmax: P_SKILLED },
-        { skill: P_BOOMERANG, skmax: P_EXPERT },
-        { skill: P_UNICORN_HORN, skmax: P_BASIC },
-        { skill: P_BARE_HANDED_COMBAT, skmax: P_MASTER },
+        { skill: P.DAGGER, skmax: P.BASIC },
+        { skill: P.KNIFE, skmax: P.SKILLED },
+        { skill: P.AXE, skmax: P.SKILLED },
+        { skill: P.PICK_AXE, skmax: P.BASIC },
+        { skill: P.CLUB, skmax: P.EXPERT },
+        { skill: P.MACE, skmax: P.EXPERT },
+        { skill: P.MORNING_STAR, skmax: P.BASIC },
+        { skill: P.FLAIL, skmax: P.SKILLED },
+        { skill: P.HAMMER, skmax: P.SKILLED },
+        { skill: P.QUARTERSTAFF, skmax: P.EXPERT },
+        { skill: P.POLEARMS, skmax: P.SKILLED },
+        { skill: P.SPEAR, skmax: P.EXPERT },
+        { skill: P.TRIDENT, skmax: P.SKILLED },
+        { skill: P.BOW, skmax: P.SKILLED },
+        { skill: P.SLING, skmax: P.EXPERT },
+        { skill: P.ATTACK_SPELL, skmax: P.BASIC },
+        { skill: P.MATTER_SPELL, skmax: P.SKILLED },
+        { skill: P.BOOMERANG, skmax: P.EXPERT },
+        { skill: P.UNICORN_HORN, skmax: P.BASIC },
+        { skill: P.BARE_HANDED_COMBAT, skmax: P.MASTER },
         {}
     ]);
     for (let $i0 = 0; $i0 < 17; $i0++) {
         Skill_H[$i0].$copyFrom(new $T.def_skill());
     }
     $c.init(Skill_H, [
-        { skill: P_DAGGER, skmax: P_SKILLED },
-        { skill: P_KNIFE, skmax: P_EXPERT },
-        { skill: P_SHORT_SWORD, skmax: P_SKILLED },
-        { skill: P_SABER, skmax: P_BASIC },
-        { skill: P_CLUB, skmax: P_SKILLED },
-        { skill: P_MACE, skmax: P_BASIC },
-        { skill: P_QUARTERSTAFF, skmax: P_EXPERT },
-        { skill: P_POLEARMS, skmax: P_BASIC },
-        { skill: P_SPEAR, skmax: P_BASIC },
-        { skill: P_TRIDENT, skmax: P_BASIC },
-        { skill: P_SLING, skmax: P_SKILLED },
-        { skill: P_DART, skmax: P_EXPERT },
-        { skill: P_SHURIKEN, skmax: P_SKILLED },
-        { skill: P_UNICORN_HORN, skmax: P_EXPERT },
-        { skill: P_HEALING_SPELL, skmax: P_EXPERT },
-        { skill: P_BARE_HANDED_COMBAT, skmax: P_BASIC },
+        { skill: P.DAGGER, skmax: P.SKILLED },
+        { skill: P.KNIFE, skmax: P.EXPERT },
+        { skill: P.SHORT_SWORD, skmax: P.SKILLED },
+        { skill: P.SABER, skmax: P.BASIC },
+        { skill: P.CLUB, skmax: P.SKILLED },
+        { skill: P.MACE, skmax: P.BASIC },
+        { skill: P.QUARTERSTAFF, skmax: P.EXPERT },
+        { skill: P.POLEARMS, skmax: P.BASIC },
+        { skill: P.SPEAR, skmax: P.BASIC },
+        { skill: P.TRIDENT, skmax: P.BASIC },
+        { skill: P.SLING, skmax: P.SKILLED },
+        { skill: P.DART, skmax: P.EXPERT },
+        { skill: P.SHURIKEN, skmax: P.SKILLED },
+        { skill: P.UNICORN_HORN, skmax: P.EXPERT },
+        { skill: P.HEALING_SPELL, skmax: P.EXPERT },
+        { skill: P.BARE_HANDED_COMBAT, skmax: P.BASIC },
         {}
     ]);
     for (let $i0 = 0; $i0 < 27; $i0++) {
         Skill_K[$i0].$copyFrom(new $T.def_skill());
     }
     $c.init(Skill_K, [
-        { skill: P_DAGGER, skmax: P_BASIC },
-        { skill: P_KNIFE, skmax: P_BASIC },
-        { skill: P_AXE, skmax: P_SKILLED },
-        { skill: P_PICK_AXE, skmax: P_BASIC },
-        { skill: P_SHORT_SWORD, skmax: P_SKILLED },
-        { skill: P_BROAD_SWORD, skmax: P_SKILLED },
-        { skill: P_LONG_SWORD, skmax: P_EXPERT },
-        { skill: P_TWO_HANDED_SWORD, skmax: P_SKILLED },
-        { skill: P_SABER, skmax: P_SKILLED },
-        { skill: P_CLUB, skmax: P_BASIC },
-        { skill: P_MACE, skmax: P_SKILLED },
-        { skill: P_MORNING_STAR, skmax: P_SKILLED },
-        { skill: P_FLAIL, skmax: P_BASIC },
-        { skill: P_HAMMER, skmax: P_BASIC },
-        { skill: P_POLEARMS, skmax: P_SKILLED },
-        { skill: P_SPEAR, skmax: P_SKILLED },
-        { skill: P_TRIDENT, skmax: P_BASIC },
-        { skill: P_LANCE, skmax: P_EXPERT },
-        { skill: P_BOW, skmax: P_BASIC },
-        { skill: P_CROSSBOW, skmax: P_SKILLED },
-        { skill: P_ATTACK_SPELL, skmax: P_SKILLED },
-        { skill: P_HEALING_SPELL, skmax: P_SKILLED },
-        { skill: P_CLERIC_SPELL, skmax: P_SKILLED },
-        { skill: P_RIDING, skmax: P_EXPERT },
-        { skill: P_TWO_WEAPON_COMBAT, skmax: P_SKILLED },
-        { skill: P_BARE_HANDED_COMBAT, skmax: P_EXPERT },
+        { skill: P.DAGGER, skmax: P.BASIC },
+        { skill: P.KNIFE, skmax: P.BASIC },
+        { skill: P.AXE, skmax: P.SKILLED },
+        { skill: P.PICK_AXE, skmax: P.BASIC },
+        { skill: P.SHORT_SWORD, skmax: P.SKILLED },
+        { skill: P.BROAD_SWORD, skmax: P.SKILLED },
+        { skill: P.LONG_SWORD, skmax: P.EXPERT },
+        { skill: P.TWO_HANDED_SWORD, skmax: P.SKILLED },
+        { skill: P.SABER, skmax: P.SKILLED },
+        { skill: P.CLUB, skmax: P.BASIC },
+        { skill: P.MACE, skmax: P.SKILLED },
+        { skill: P.MORNING_STAR, skmax: P.SKILLED },
+        { skill: P.FLAIL, skmax: P.BASIC },
+        { skill: P.HAMMER, skmax: P.BASIC },
+        { skill: P.POLEARMS, skmax: P.SKILLED },
+        { skill: P.SPEAR, skmax: P.SKILLED },
+        { skill: P.TRIDENT, skmax: P.BASIC },
+        { skill: P.LANCE, skmax: P.EXPERT },
+        { skill: P.BOW, skmax: P.BASIC },
+        { skill: P.CROSSBOW, skmax: P.SKILLED },
+        { skill: P.ATTACK_SPELL, skmax: P.SKILLED },
+        { skill: P.HEALING_SPELL, skmax: P.SKILLED },
+        { skill: P.CLERIC_SPELL, skmax: P.SKILLED },
+        { skill: P.RIDING, skmax: P.EXPERT },
+        { skill: P.TWO_WEAPON_COMBAT, skmax: P.SKILLED },
+        { skill: P.BARE_HANDED_COMBAT, skmax: P.EXPERT },
         {}
     ]);
     for (let $i0 = 0; $i0 < 13; $i0++) {
         Skill_Mon[$i0].$copyFrom(new $T.def_skill());
     }
     $c.init(Skill_Mon, [
-        { skill: P_QUARTERSTAFF, skmax: P_BASIC },
-        { skill: P_SPEAR, skmax: P_BASIC },
-        { skill: P_CROSSBOW, skmax: P_BASIC },
-        { skill: P_SHURIKEN, skmax: P_BASIC },
-        { skill: P_ATTACK_SPELL, skmax: P_BASIC },
-        { skill: P_HEALING_SPELL, skmax: P_EXPERT },
-        { skill: P_DIVINATION_SPELL, skmax: P_BASIC },
-        { skill: P_ENCHANTMENT_SPELL, skmax: P_BASIC },
-        { skill: P_CLERIC_SPELL, skmax: P_SKILLED },
-        { skill: P_ESCAPE_SPELL, skmax: P_SKILLED },
-        { skill: P_MATTER_SPELL, skmax: P_BASIC },
-        { skill: P_MARTIAL_ARTS, skmax: P_GRAND_MASTER },
+        { skill: P.QUARTERSTAFF, skmax: P.BASIC },
+        { skill: P.SPEAR, skmax: P.BASIC },
+        { skill: P.CROSSBOW, skmax: P.BASIC },
+        { skill: P.SHURIKEN, skmax: P.BASIC },
+        { skill: P.ATTACK_SPELL, skmax: P.BASIC },
+        { skill: P.HEALING_SPELL, skmax: P.EXPERT },
+        { skill: P.DIVINATION_SPELL, skmax: P.BASIC },
+        { skill: P.ENCHANTMENT_SPELL, skmax: P.BASIC },
+        { skill: P.CLERIC_SPELL, skmax: P.SKILLED },
+        { skill: P.ESCAPE_SPELL, skmax: P.SKILLED },
+        { skill: P.MATTER_SPELL, skmax: P.BASIC },
+        { skill: P_MARTIAL_ARTS, skmax: P.GRAND_MASTER },
         {}
     ]);
     for (let $i0 = 0; $i0 < 22; $i0++) {
         Skill_P[$i0].$copyFrom(new $T.def_skill());
     }
     $c.init(Skill_P, [
-        { skill: P_CLUB, skmax: P_EXPERT },
-        { skill: P_MACE, skmax: P_EXPERT },
-        { skill: P_MORNING_STAR, skmax: P_EXPERT },
-        { skill: P_FLAIL, skmax: P_EXPERT },
-        { skill: P_HAMMER, skmax: P_EXPERT },
-        { skill: P_QUARTERSTAFF, skmax: P_EXPERT },
-        { skill: P_POLEARMS, skmax: P_SKILLED },
-        { skill: P_SPEAR, skmax: P_SKILLED },
-        { skill: P_TRIDENT, skmax: P_SKILLED },
-        { skill: P_LANCE, skmax: P_BASIC },
-        { skill: P_BOW, skmax: P_BASIC },
-        { skill: P_SLING, skmax: P_BASIC },
-        { skill: P_CROSSBOW, skmax: P_BASIC },
-        { skill: P_DART, skmax: P_BASIC },
-        { skill: P_SHURIKEN, skmax: P_BASIC },
-        { skill: P_BOOMERANG, skmax: P_BASIC },
-        { skill: P_UNICORN_HORN, skmax: P_SKILLED },
-        { skill: P_HEALING_SPELL, skmax: P_EXPERT },
-        { skill: P_DIVINATION_SPELL, skmax: P_EXPERT },
-        { skill: P_CLERIC_SPELL, skmax: P_EXPERT },
-        { skill: P_BARE_HANDED_COMBAT, skmax: P_BASIC },
+        { skill: P.CLUB, skmax: P.EXPERT },
+        { skill: P.MACE, skmax: P.EXPERT },
+        { skill: P.MORNING_STAR, skmax: P.EXPERT },
+        { skill: P.FLAIL, skmax: P.EXPERT },
+        { skill: P.HAMMER, skmax: P.EXPERT },
+        { skill: P.QUARTERSTAFF, skmax: P.EXPERT },
+        { skill: P.POLEARMS, skmax: P.SKILLED },
+        { skill: P.SPEAR, skmax: P.SKILLED },
+        { skill: P.TRIDENT, skmax: P.SKILLED },
+        { skill: P.LANCE, skmax: P.BASIC },
+        { skill: P.BOW, skmax: P.BASIC },
+        { skill: P.SLING, skmax: P.BASIC },
+        { skill: P.CROSSBOW, skmax: P.BASIC },
+        { skill: P.DART, skmax: P.BASIC },
+        { skill: P.SHURIKEN, skmax: P.BASIC },
+        { skill: P.BOOMERANG, skmax: P.BASIC },
+        { skill: P.UNICORN_HORN, skmax: P.SKILLED },
+        { skill: P.HEALING_SPELL, skmax: P.EXPERT },
+        { skill: P.DIVINATION_SPELL, skmax: P.EXPERT },
+        { skill: P.CLERIC_SPELL, skmax: P.EXPERT },
+        { skill: P.BARE_HANDED_COMBAT, skmax: P.BASIC },
         {}
     ]);
     for (let $i0 = 0; $i0 < 24; $i0++) {
         Skill_R[$i0].$copyFrom(new $T.def_skill());
     }
     $c.init(Skill_R, [
-        { skill: P_DAGGER, skmax: P_EXPERT },
-        { skill: P_KNIFE, skmax: P_EXPERT },
-        { skill: P_SHORT_SWORD, skmax: P_EXPERT },
-        { skill: P_BROAD_SWORD, skmax: P_SKILLED },
-        { skill: P_LONG_SWORD, skmax: P_SKILLED },
-        { skill: P_TWO_HANDED_SWORD, skmax: P_BASIC },
-        { skill: P_SABER, skmax: P_SKILLED },
-        { skill: P_CLUB, skmax: P_SKILLED },
-        { skill: P_MACE, skmax: P_SKILLED },
-        { skill: P_MORNING_STAR, skmax: P_BASIC },
-        { skill: P_FLAIL, skmax: P_BASIC },
-        { skill: P_HAMMER, skmax: P_BASIC },
-        { skill: P_POLEARMS, skmax: P_BASIC },
-        { skill: P_SPEAR, skmax: P_BASIC },
-        { skill: P_CROSSBOW, skmax: P_EXPERT },
-        { skill: P_DART, skmax: P_EXPERT },
-        { skill: P_SHURIKEN, skmax: P_SKILLED },
-        { skill: P_DIVINATION_SPELL, skmax: P_SKILLED },
-        { skill: P_ESCAPE_SPELL, skmax: P_SKILLED },
-        { skill: P_MATTER_SPELL, skmax: P_SKILLED },
-        { skill: P_RIDING, skmax: P_BASIC },
-        { skill: P_TWO_WEAPON_COMBAT, skmax: P_EXPERT },
-        { skill: P_BARE_HANDED_COMBAT, skmax: P_EXPERT },
+        { skill: P.DAGGER, skmax: P.EXPERT },
+        { skill: P.KNIFE, skmax: P.EXPERT },
+        { skill: P.SHORT_SWORD, skmax: P.EXPERT },
+        { skill: P.BROAD_SWORD, skmax: P.SKILLED },
+        { skill: P.LONG_SWORD, skmax: P.SKILLED },
+        { skill: P.TWO_HANDED_SWORD, skmax: P.BASIC },
+        { skill: P.SABER, skmax: P.SKILLED },
+        { skill: P.CLUB, skmax: P.SKILLED },
+        { skill: P.MACE, skmax: P.SKILLED },
+        { skill: P.MORNING_STAR, skmax: P.BASIC },
+        { skill: P.FLAIL, skmax: P.BASIC },
+        { skill: P.HAMMER, skmax: P.BASIC },
+        { skill: P.POLEARMS, skmax: P.BASIC },
+        { skill: P.SPEAR, skmax: P.BASIC },
+        { skill: P.CROSSBOW, skmax: P.EXPERT },
+        { skill: P.DART, skmax: P.EXPERT },
+        { skill: P.SHURIKEN, skmax: P.SKILLED },
+        { skill: P.DIVINATION_SPELL, skmax: P.SKILLED },
+        { skill: P.ESCAPE_SPELL, skmax: P.SKILLED },
+        { skill: P.MATTER_SPELL, skmax: P.SKILLED },
+        { skill: P.RIDING, skmax: P.BASIC },
+        { skill: P.TWO_WEAPON_COMBAT, skmax: P.EXPERT },
+        { skill: P.BARE_HANDED_COMBAT, skmax: P.EXPERT },
         {}
     ]);
     for (let $i0 = 0; $i0 < 25; $i0++) {
         Skill_Ran[$i0].$copyFrom(new $T.def_skill());
     }
     $c.init(Skill_Ran, [
-        { skill: P_DAGGER, skmax: P_EXPERT },
-        { skill: P_KNIFE, skmax: P_SKILLED },
-        { skill: P_AXE, skmax: P_SKILLED },
-        { skill: P_PICK_AXE, skmax: P_BASIC },
-        { skill: P_SHORT_SWORD, skmax: P_BASIC },
-        { skill: P_MORNING_STAR, skmax: P_BASIC },
-        { skill: P_FLAIL, skmax: P_SKILLED },
-        { skill: P_HAMMER, skmax: P_BASIC },
-        { skill: P_QUARTERSTAFF, skmax: P_BASIC },
-        { skill: P_POLEARMS, skmax: P_SKILLED },
-        { skill: P_SPEAR, skmax: P_EXPERT },
-        { skill: P_TRIDENT, skmax: P_BASIC },
-        { skill: P_BOW, skmax: P_EXPERT },
-        { skill: P_SLING, skmax: P_EXPERT },
-        { skill: P_CROSSBOW, skmax: P_EXPERT },
-        { skill: P_DART, skmax: P_EXPERT },
-        { skill: P_SHURIKEN, skmax: P_SKILLED },
-        { skill: P_BOOMERANG, skmax: P_EXPERT },
-        { skill: P_WHIP, skmax: P_BASIC },
-        { skill: P_HEALING_SPELL, skmax: P_BASIC },
-        { skill: P_DIVINATION_SPELL, skmax: P_EXPERT },
-        { skill: P_ESCAPE_SPELL, skmax: P_BASIC },
-        { skill: P_RIDING, skmax: P_BASIC },
-        { skill: P_BARE_HANDED_COMBAT, skmax: P_BASIC },
+        { skill: P.DAGGER, skmax: P.EXPERT },
+        { skill: P.KNIFE, skmax: P.SKILLED },
+        { skill: P.AXE, skmax: P.SKILLED },
+        { skill: P.PICK_AXE, skmax: P.BASIC },
+        { skill: P.SHORT_SWORD, skmax: P.BASIC },
+        { skill: P.MORNING_STAR, skmax: P.BASIC },
+        { skill: P.FLAIL, skmax: P.SKILLED },
+        { skill: P.HAMMER, skmax: P.BASIC },
+        { skill: P.QUARTERSTAFF, skmax: P.BASIC },
+        { skill: P.POLEARMS, skmax: P.SKILLED },
+        { skill: P.SPEAR, skmax: P.EXPERT },
+        { skill: P.TRIDENT, skmax: P.BASIC },
+        { skill: P.BOW, skmax: P.EXPERT },
+        { skill: P.SLING, skmax: P.EXPERT },
+        { skill: P.CROSSBOW, skmax: P.EXPERT },
+        { skill: P.DART, skmax: P.EXPERT },
+        { skill: P.SHURIKEN, skmax: P.SKILLED },
+        { skill: P.BOOMERANG, skmax: P.EXPERT },
+        { skill: P.WHIP, skmax: P.BASIC },
+        { skill: P.HEALING_SPELL, skmax: P.BASIC },
+        { skill: P.DIVINATION_SPELL, skmax: P.EXPERT },
+        { skill: P.ESCAPE_SPELL, skmax: P.BASIC },
+        { skill: P.RIDING, skmax: P.BASIC },
+        { skill: P.BARE_HANDED_COMBAT, skmax: P.BASIC },
         {}
     ]);
     for (let $i0 = 0; $i0 < 21; $i0++) {
         Skill_S[$i0].$copyFrom(new $T.def_skill());
     }
     $c.init(Skill_S, [
-        { skill: P_DAGGER, skmax: P_BASIC },
-        { skill: P_KNIFE, skmax: P_SKILLED },
-        { skill: P_SHORT_SWORD, skmax: P_EXPERT },
-        { skill: P_BROAD_SWORD, skmax: P_SKILLED },
-        { skill: P_LONG_SWORD, skmax: P_EXPERT },
-        { skill: P_TWO_HANDED_SWORD, skmax: P_EXPERT },
-        { skill: P_SABER, skmax: P_BASIC },
-        { skill: P_FLAIL, skmax: P_SKILLED },
-        { skill: P_QUARTERSTAFF, skmax: P_BASIC },
-        { skill: P_POLEARMS, skmax: P_SKILLED },
-        { skill: P_SPEAR, skmax: P_SKILLED },
-        { skill: P_LANCE, skmax: P_SKILLED },
-        { skill: P_BOW, skmax: P_EXPERT },
-        { skill: P_SHURIKEN, skmax: P_EXPERT },
-        { skill: P_ATTACK_SPELL, skmax: P_BASIC },
-        { skill: P_DIVINATION_SPELL, skmax: P_BASIC },
-        { skill: P_CLERIC_SPELL, skmax: P_SKILLED },
-        { skill: P_RIDING, skmax: P_SKILLED },
-        { skill: P_TWO_WEAPON_COMBAT, skmax: P_EXPERT },
-        { skill: P_MARTIAL_ARTS, skmax: P_MASTER },
+        { skill: P.DAGGER, skmax: P.BASIC },
+        { skill: P.KNIFE, skmax: P.SKILLED },
+        { skill: P.SHORT_SWORD, skmax: P.EXPERT },
+        { skill: P.BROAD_SWORD, skmax: P.SKILLED },
+        { skill: P.LONG_SWORD, skmax: P.EXPERT },
+        { skill: P.TWO_HANDED_SWORD, skmax: P.EXPERT },
+        { skill: P.SABER, skmax: P.BASIC },
+        { skill: P.FLAIL, skmax: P.SKILLED },
+        { skill: P.QUARTERSTAFF, skmax: P.BASIC },
+        { skill: P.POLEARMS, skmax: P.SKILLED },
+        { skill: P.SPEAR, skmax: P.SKILLED },
+        { skill: P.LANCE, skmax: P.SKILLED },
+        { skill: P.BOW, skmax: P.EXPERT },
+        { skill: P.SHURIKEN, skmax: P.EXPERT },
+        { skill: P.ATTACK_SPELL, skmax: P.BASIC },
+        { skill: P.DIVINATION_SPELL, skmax: P.BASIC },
+        { skill: P.CLERIC_SPELL, skmax: P.SKILLED },
+        { skill: P.RIDING, skmax: P.SKILLED },
+        { skill: P.TWO_WEAPON_COMBAT, skmax: P.EXPERT },
+        { skill: P_MARTIAL_ARTS, skmax: P.MASTER },
         {}
     ]);
     for (let $i0 = 0; $i0 < 33; $i0++) {
         Skill_T[$i0].$copyFrom(new $T.def_skill());
     }
     $c.init(Skill_T, [
-        { skill: P_DAGGER, skmax: P_EXPERT },
-        { skill: P_KNIFE, skmax: P_SKILLED },
-        { skill: P_AXE, skmax: P_BASIC },
-        { skill: P_PICK_AXE, skmax: P_BASIC },
-        { skill: P_SHORT_SWORD, skmax: P_EXPERT },
-        { skill: P_BROAD_SWORD, skmax: P_BASIC },
-        { skill: P_LONG_SWORD, skmax: P_BASIC },
-        { skill: P_TWO_HANDED_SWORD, skmax: P_BASIC },
-        { skill: P_SABER, skmax: P_SKILLED },
-        { skill: P_MACE, skmax: P_BASIC },
-        { skill: P_MORNING_STAR, skmax: P_BASIC },
-        { skill: P_FLAIL, skmax: P_BASIC },
-        { skill: P_HAMMER, skmax: P_BASIC },
-        { skill: P_QUARTERSTAFF, skmax: P_BASIC },
-        { skill: P_POLEARMS, skmax: P_BASIC },
-        { skill: P_SPEAR, skmax: P_BASIC },
-        { skill: P_TRIDENT, skmax: P_BASIC },
-        { skill: P_LANCE, skmax: P_BASIC },
-        { skill: P_BOW, skmax: P_BASIC },
-        { skill: P_SLING, skmax: P_BASIC },
-        { skill: P_CROSSBOW, skmax: P_BASIC },
-        { skill: P_DART, skmax: P_EXPERT },
-        { skill: P_SHURIKEN, skmax: P_BASIC },
-        { skill: P_BOOMERANG, skmax: P_BASIC },
-        { skill: P_WHIP, skmax: P_BASIC },
-        { skill: P_UNICORN_HORN, skmax: P_SKILLED },
-        { skill: P_DIVINATION_SPELL, skmax: P_BASIC },
-        { skill: P_ENCHANTMENT_SPELL, skmax: P_BASIC },
-        { skill: P_ESCAPE_SPELL, skmax: P_SKILLED },
-        { skill: P_RIDING, skmax: P_BASIC },
-        { skill: P_TWO_WEAPON_COMBAT, skmax: P_SKILLED },
-        { skill: P_BARE_HANDED_COMBAT, skmax: P_SKILLED },
+        { skill: P.DAGGER, skmax: P.EXPERT },
+        { skill: P.KNIFE, skmax: P.SKILLED },
+        { skill: P.AXE, skmax: P.BASIC },
+        { skill: P.PICK_AXE, skmax: P.BASIC },
+        { skill: P.SHORT_SWORD, skmax: P.EXPERT },
+        { skill: P.BROAD_SWORD, skmax: P.BASIC },
+        { skill: P.LONG_SWORD, skmax: P.BASIC },
+        { skill: P.TWO_HANDED_SWORD, skmax: P.BASIC },
+        { skill: P.SABER, skmax: P.SKILLED },
+        { skill: P.MACE, skmax: P.BASIC },
+        { skill: P.MORNING_STAR, skmax: P.BASIC },
+        { skill: P.FLAIL, skmax: P.BASIC },
+        { skill: P.HAMMER, skmax: P.BASIC },
+        { skill: P.QUARTERSTAFF, skmax: P.BASIC },
+        { skill: P.POLEARMS, skmax: P.BASIC },
+        { skill: P.SPEAR, skmax: P.BASIC },
+        { skill: P.TRIDENT, skmax: P.BASIC },
+        { skill: P.LANCE, skmax: P.BASIC },
+        { skill: P.BOW, skmax: P.BASIC },
+        { skill: P.SLING, skmax: P.BASIC },
+        { skill: P.CROSSBOW, skmax: P.BASIC },
+        { skill: P.DART, skmax: P.EXPERT },
+        { skill: P.SHURIKEN, skmax: P.BASIC },
+        { skill: P.BOOMERANG, skmax: P.BASIC },
+        { skill: P.WHIP, skmax: P.BASIC },
+        { skill: P.UNICORN_HORN, skmax: P.SKILLED },
+        { skill: P.DIVINATION_SPELL, skmax: P.BASIC },
+        { skill: P.ENCHANTMENT_SPELL, skmax: P.BASIC },
+        { skill: P.ESCAPE_SPELL, skmax: P.SKILLED },
+        { skill: P.RIDING, skmax: P.BASIC },
+        { skill: P.TWO_WEAPON_COMBAT, skmax: P.SKILLED },
+        { skill: P.BARE_HANDED_COMBAT, skmax: P.SKILLED },
         {}
     ]);
     for (let $i0 = 0; $i0 < 21; $i0++) {
         Skill_V[$i0].$copyFrom(new $T.def_skill());
     }
     $c.init(Skill_V, [
-        { skill: P_DAGGER, skmax: P_EXPERT },
-        { skill: P_AXE, skmax: P_EXPERT },
-        { skill: P_PICK_AXE, skmax: P_SKILLED },
-        { skill: P_SHORT_SWORD, skmax: P_SKILLED },
-        { skill: P_BROAD_SWORD, skmax: P_SKILLED },
-        { skill: P_LONG_SWORD, skmax: P_EXPERT },
-        { skill: P_TWO_HANDED_SWORD, skmax: P_EXPERT },
-        { skill: P_SABER, skmax: P_BASIC },
-        { skill: P_HAMMER, skmax: P_EXPERT },
-        { skill: P_QUARTERSTAFF, skmax: P_BASIC },
-        { skill: P_POLEARMS, skmax: P_SKILLED },
-        { skill: P_SPEAR, skmax: P_EXPERT },
-        { skill: P_TRIDENT, skmax: P_BASIC },
-        { skill: P_LANCE, skmax: P_SKILLED },
-        { skill: P_SLING, skmax: P_BASIC },
-        { skill: P_ATTACK_SPELL, skmax: P_BASIC },
-        { skill: P_ESCAPE_SPELL, skmax: P_BASIC },
-        { skill: P_RIDING, skmax: P_SKILLED },
-        { skill: P_TWO_WEAPON_COMBAT, skmax: P_SKILLED },
-        { skill: P_BARE_HANDED_COMBAT, skmax: P_EXPERT },
+        { skill: P.DAGGER, skmax: P.EXPERT },
+        { skill: P.AXE, skmax: P.EXPERT },
+        { skill: P.PICK_AXE, skmax: P.SKILLED },
+        { skill: P.SHORT_SWORD, skmax: P.SKILLED },
+        { skill: P.BROAD_SWORD, skmax: P.SKILLED },
+        { skill: P.LONG_SWORD, skmax: P.EXPERT },
+        { skill: P.TWO_HANDED_SWORD, skmax: P.EXPERT },
+        { skill: P.SABER, skmax: P.BASIC },
+        { skill: P.HAMMER, skmax: P.EXPERT },
+        { skill: P.QUARTERSTAFF, skmax: P.BASIC },
+        { skill: P.POLEARMS, skmax: P.SKILLED },
+        { skill: P.SPEAR, skmax: P.EXPERT },
+        { skill: P.TRIDENT, skmax: P.BASIC },
+        { skill: P.LANCE, skmax: P.SKILLED },
+        { skill: P.SLING, skmax: P.BASIC },
+        { skill: P.ATTACK_SPELL, skmax: P.BASIC },
+        { skill: P.ESCAPE_SPELL, skmax: P.BASIC },
+        { skill: P.RIDING, skmax: P.SKILLED },
+        { skill: P.TWO_WEAPON_COMBAT, skmax: P.SKILLED },
+        { skill: P.BARE_HANDED_COMBAT, skmax: P.EXPERT },
         {}
     ]);
     for (let $i0 = 0; $i0 < 23; $i0++) {
         Skill_W[$i0].$copyFrom(new $T.def_skill());
     }
     $c.init(Skill_W, [
-        { skill: P_DAGGER, skmax: P_EXPERT },
-        { skill: P_KNIFE, skmax: P_SKILLED },
-        { skill: P_AXE, skmax: P_SKILLED },
-        { skill: P_SHORT_SWORD, skmax: P_BASIC },
-        { skill: P_CLUB, skmax: P_SKILLED },
-        { skill: P_MACE, skmax: P_BASIC },
-        { skill: P_QUARTERSTAFF, skmax: P_EXPERT },
-        { skill: P_POLEARMS, skmax: P_SKILLED },
-        { skill: P_SPEAR, skmax: P_BASIC },
-        { skill: P_TRIDENT, skmax: P_BASIC },
-        { skill: P_SLING, skmax: P_SKILLED },
-        { skill: P_DART, skmax: P_EXPERT },
-        { skill: P_SHURIKEN, skmax: P_BASIC },
-        { skill: P_ATTACK_SPELL, skmax: P_EXPERT },
-        { skill: P_HEALING_SPELL, skmax: P_SKILLED },
-        { skill: P_DIVINATION_SPELL, skmax: P_EXPERT },
-        { skill: P_ENCHANTMENT_SPELL, skmax: P_SKILLED },
-        { skill: P_CLERIC_SPELL, skmax: P_SKILLED },
-        { skill: P_ESCAPE_SPELL, skmax: P_EXPERT },
-        { skill: P_MATTER_SPELL, skmax: P_EXPERT },
-        { skill: P_RIDING, skmax: P_BASIC },
-        { skill: P_BARE_HANDED_COMBAT, skmax: P_BASIC },
+        { skill: P.DAGGER, skmax: P.EXPERT },
+        { skill: P.KNIFE, skmax: P.SKILLED },
+        { skill: P.AXE, skmax: P.SKILLED },
+        { skill: P.SHORT_SWORD, skmax: P.BASIC },
+        { skill: P.CLUB, skmax: P.SKILLED },
+        { skill: P.MACE, skmax: P.BASIC },
+        { skill: P.QUARTERSTAFF, skmax: P.EXPERT },
+        { skill: P.POLEARMS, skmax: P.SKILLED },
+        { skill: P.SPEAR, skmax: P.BASIC },
+        { skill: P.TRIDENT, skmax: P.BASIC },
+        { skill: P.SLING, skmax: P.SKILLED },
+        { skill: P.DART, skmax: P.EXPERT },
+        { skill: P.SHURIKEN, skmax: P.BASIC },
+        { skill: P.ATTACK_SPELL, skmax: P.EXPERT },
+        { skill: P.HEALING_SPELL, skmax: P.SKILLED },
+        { skill: P.DIVINATION_SPELL, skmax: P.EXPERT },
+        { skill: P.ENCHANTMENT_SPELL, skmax: P.SKILLED },
+        { skill: P.CLERIC_SPELL, skmax: P.SKILLED },
+        { skill: P.ESCAPE_SPELL, skmax: P.EXPERT },
+        { skill: P.MATTER_SPELL, skmax: P.EXPERT },
+        { skill: P.RIDING, skmax: P.BASIC },
+        { skill: P.BARE_HANDED_COMBAT, skmax: P.BASIC },
         {}
     ]);
     u_init_role$M_spell.fill(null);

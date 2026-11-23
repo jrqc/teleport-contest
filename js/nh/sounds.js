@@ -2,13 +2,13 @@
 import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
-import { A_LAWFUL } from './align.h.js';
+import { A } from './attrib.h.js';
 import { midnight, night } from './calendar.js';
 import { getdir, isok } from './cmd.js';
 import { c_common_strings, flags, ga, gc, gi, gm, gn, gu, gy, iflags, svc, svd, svl, svm, svq, svr, u } from './decl.js';
-import { S_ANT, S_CENTAUR, S_EEL, S_NYMPH, WEAPON_CLASS } from './defsym.h.js';
+import { S, WEAPON_CLASS } from './defsym.h.js';
 import { canseemon, glyph_at, map_invisible } from './display.js';
-import { GLYPH_MON_OFF } from './display.h.js';
+import { GLYPH } from './display.h.js';
 import { canspotmon, glyph_is_invisible, glyph_is_statue, glyph_to_mon } from './display.macros.js';
 import { Monnam, mon_nam, noveltitle, pmname, rndmonnam } from './do_name.js';
 import { cursed } from './do_wear.js';
@@ -16,10 +16,10 @@ import { on_level } from './dungeon.js';
 import { In_endgame } from './dungeon.macros.js';
 import { panic } from './end.js';
 import { Death_quote } from './files.js';
-import { FULL_MOON, PLNMSG_GROWL } from './flag.h.js';
+import { FULL_MOON, PLNMSG } from './flag.h.js';
 import { FALSE, TRUE } from './global.h.js';
 import { money_cnt, nomul } from './hack.js';
-import { BLOOD, BOLT_LIM, ECMD_CANCEL, ECMD_OK, ECMD_TIME, HAIR, HEAD, NECK } from './hack.h.js';
+import { BLOOD, BOLT_LIM, ECMD, HAIR, HEAD, NECK } from './hack.h.js';
 import { You_hear1, verbalize1 } from './hack.macros.js';
 import { dist2, letter, nh_snprintf, strncmpi, ucase } from './hacklib.js';
 import { currency, g_at, u_have_novel } from './invent.js';
@@ -28,17 +28,17 @@ import { has_emin } from './mextra.macros.js';
 import { could_seduce, doseduce } from './mhitu.js';
 import { demon_talk } from './minion.js';
 import { search_special } from './mkroom.js';
-import { ANY_SHOP, BARRACKS, BEEHIVE, COURT, MORGUE, ROOMOFFSET, VAULT, ZOO } from './mkroom.h.js';
+import { BARRACKS, BEEHIVE, COURT, MORGUE, ROOMOFFSET, VAULT, ZOO } from './mkroom.h.js';
 import { ROOM_INDEX } from './mkroom.macros.js';
 import { genus, get_iter_mons, wake_nearto } from './mon.js';
 import { pronoun_gender, same_race } from './mondata.js';
 import { carnivorous, haseyes, herbivorous, humanoid, is_animal, is_dwarf, is_elf, is_flyer, is_gnome, is_lord, is_mercenary, is_mplayer, is_prince, is_silent, is_undead, likes_magic, perceives } from './mondata.macros.js';
-import { FEMALE, M2_MINION, MALE, MS_ANIMAL, MS_ARREST, MS_BARK, MS_BELLOW, MS_BOAST, MS_BONES, MS_BRIBE, MS_BURBLE, MS_BUZZ, MS_CHIRP, MS_CUSS, MS_DJINNI, MS_GROAN, MS_GROWL, MS_GRUNT, MS_GUARD, MS_GUARDIAN, MS_GURGLE, MS_HISS, MS_HUMANOID, MS_IMITATE, MS_LAUGH, MS_LEADER, MS_MEW, MS_MOO, MS_MUMBLE, MS_NEIGH, MS_NEMESIS, MS_NURSE, MS_ORACLE, MS_ORC, MS_PRIEST, MS_RIDER, MS_ROAR, MS_SEDUCE, MS_SELL, MS_SHRIEK, MS_SILENT, MS_SOLDIER, MS_SPELL, MS_SQAWK, MS_SQEEK, MS_TRUMPET, MS_VAMPIRE, MS_WAIL, MS_WERE } from './monflag.h.js';
+import { FEMALE, M2, MALE, MS } from './monflag.h.js';
 import { accessible } from './monmove.js';
 import { mons } from './monst.js';
-import { M_AP_FURNITURE, M_AP_OBJECT } from './monst.h.js';
+import { M_AP } from './monst.h.js';
 import { DEADMONSTER, M_AP_TYPE, helpless, is_vampshifter } from './monst.macros.js';
-import { PM_ARCHEOLOGIST, PM_BABY_SILVER_DRAGON, PM_DEATH, PM_DINGO, PM_GECKO, PM_HEALER, PM_HOBBIT, PM_HUMAN_WERERAT, PM_LONG_WORM, PM_ORACLE, PM_PRISONER, PM_RAVEN, PM_SILVER_DRAGON, PM_TOURIST, PM_VAMPIRE, PM_VAMPIRE_LEADER, PM_WATER_DEMON, PM_WINTER_WOLF, PM_WINTER_WOLF_CUB, PM_WOLF } from './monsters.h.js';
+import { PM } from './monsters.h.js';
 import { mplayer_talk } from './mplayer.js';
 import { is_weptool } from './obj.macros.js';
 import { STATUE } from './objects.h.js';
@@ -47,7 +47,7 @@ import { You, You_cant, You_hear, Your, pline, pline_The, verbalize } from './pl
 import { body_part, poly_gender } from './polyself.js';
 import { halu_gname } from './pray.js';
 import { inhistemple, mon_aligntyp, p_coaligned, priest_talk, temple_occupied } from './priest.js';
-import { W_ARMH } from './prop.h.js';
+import { W } from './prop.h.js';
 import { quest_chat } from './quest.js';
 import { DBWALL, IRONBARS, SDOOR } from './rm.h.js';
 import { IS_WALL } from './rm.macros.js';
@@ -61,9 +61,10 @@ import { SYSOPT_SEDUCE } from './sys.macros.js';
 import { t_at } from './trap.js';
 import { gd_sound, vault_occupied } from './vault.js';
 import { cansee, couldsee } from './vision.macros.js';
+import { ANY } from './wintype.h.js';
 import { aggravate, cuss } from './wizard.js';
 import { which_armor } from './worn.js';
-import { PRONOUN_HALLU } from './you.h.js';
+import { PRONOUN } from './you.h.js';
 import { Upolyd } from './you.macros.js';
 import { Blind, Conflict, Deaf, Hallucination, Invis, Strangled, Underwater } from './youprop.macros.js';
 
@@ -115,7 +116,7 @@ async function throne_mon_sound(mtmp) {   // sounds.c:30
 }
 async function beehive_mon_sound(mtmp) {   // sounds.c:62
     let hallu = 0;
-    if (mtmp.data.mlet === S_ANT && is_flyer(mtmp.data) && mon_in_room(mtmp, BEEHIVE)) {
+    if (mtmp.data.mlet === S.ANT && is_flyer(mtmp.data) && mon_in_room(mtmp, BEEHIVE)) {
         hallu = Hallucination() ? 1 : 0;
         switch (rn2(2) + hallu | 0) {
             case 0:
@@ -169,7 +170,7 @@ async function temple_priest_sound(mtmp) {   // sounds.c:131
         trycount = 0;
         ax = mtmp.mextra.epri.shrpos.x;
         ay = mtmp.mextra.epri.shrpos.y;
-        speechless = $c.i8(mtmp.data.msound <= MS_ANIMAL ? 1 : 0);
+        speechless = $c.i8(mtmp.data.msound <= MS.ANIMAL ? 1 : 0);
         in_sight = $c.i8(canseemon(mtmp) || cansee(ax, ay) ? 1 : 0);
         do {
             msg = temple_priest_sound$temple_msg[rn2(3 + hallu | 0)];
@@ -195,7 +196,7 @@ async function temple_priest_sound(mtmp) {   // sounds.c:131
 }
 async function oracle_sound(mtmp) {   // sounds.c:181
     let hallu = 0;
-    if (!$c.peq(mtmp.data, $c.relem(mons, PM_ORACLE))) {
+    if (!$c.peq(mtmp.data, $c.relem(mons, PM.ORACLE))) {
         return FALSE;
     }
     if (Hallucination() || !canseemon(mtmp)) {
@@ -289,7 +290,7 @@ export async function dosounds() {   // sounds.c:202
         }
     }
     if (svl.level.flags.has_shop | 0 && !rn2(200)) {
-        if (!(sroom = search_special(ANY_SHOP))) {
+        if (!(sroom = search_special(ANY.SHOP))) {
             svl.level.flags.has_shop = (0) & 1;
             return;
         }
@@ -313,42 +314,42 @@ export async function dosounds() {   // sounds.c:202
 export function growl_sound(mtmp) {   // sounds.c:351
     let ret = null;
     switch (mtmp.data.msound) {
-        case MS_MEW:
-        case MS_HISS:
+        case MS.MEW:
+        case MS.HISS:
             ret = $c.lit("hiss");
             break;
-        case MS_BARK:
-        case MS_GROWL:
+        case MS.BARK:
+        case MS.GROWL:
             ret = $c.lit("growl");
             break;
-        case MS_ROAR:
+        case MS.ROAR:
             ret = $c.lit("roar");
             break;
-        case MS_BELLOW:
+        case MS.BELLOW:
             ret = $c.lit("bellow");
             break;
-        case MS_BUZZ:
+        case MS.BUZZ:
             ret = $c.lit("buzz");
             break;
-        case MS_SQEEK:
+        case MS.SQEEK:
             ret = $c.lit("squeal");
             break;
-        case MS_SQAWK:
+        case MS.SQAWK:
             ret = $c.lit("screech");
             break;
-        case MS_NEIGH:
+        case MS.NEIGH:
             ret = $c.lit("neigh");
             break;
-        case MS_WAIL:
+        case MS.WAIL:
             ret = $c.lit("wail");
             break;
-        case MS_GROAN:
+        case MS.GROAN:
             ret = $c.lit("groan");
             break;
-        case MS_MOO:
+        case MS.MOO:
             ret = $c.lit("low");
             break;
-        case MS_SILENT:
+        case MS.SILENT:
             ret = $c.lit("commotion");
             break;
         default:
@@ -359,7 +360,7 @@ export function growl_sound(mtmp) {   // sounds.c:351
 export async function growl(mtmp) {   // sounds.c:402
     let growl_verb = null;
     growl_verb = null;
-    if (helpless(mtmp) || mtmp.data.msound === MS_SILENT) {
+    if (helpless(mtmp) || mtmp.data.msound === MS.SILENT) {
         return;
     }
     if (Hallucination()) {
@@ -370,7 +371,7 @@ export async function growl(mtmp) {   // sounds.c:402
     if (growl_verb) {
         if (canseemon(mtmp) || !Deaf()) {
             await pline($c.lit("%s %s!"), await Monnam(mtmp), await vtense(null, growl_verb));
-            iflags.last_msg = PLNMSG_GROWL;
+            iflags.last_msg = PLNMSG.GROWL;
             if (svc.context.run) {
                 nomul(0);
             }
@@ -389,27 +390,27 @@ export async function yelp(mtmp) {   // sounds.c:427
         yelp_verb = h_sounds[rn2(35)];
     } else {
         switch (mtmp.data.msound) {
-            case MS_MEW:
+            case MS.MEW:
                 se = se_feline_yelp;
                 yelp_verb = !Deaf() ? $c.lit("yowl") : $c.lit("arch");
                 break;
-            case MS_BARK:
-            case MS_GROWL:
+            case MS.BARK:
+            case MS.GROWL:
                 se = se_canine_yelp;
                 yelp_verb = !Deaf() ? $c.lit("yelp") : $c.lit("recoil");
                 break;
-            case MS_ROAR:
+            case MS.ROAR:
                 yelp_verb = !Deaf() ? $c.lit("snarl") : $c.lit("bluff");
                 break;
-            case MS_SQEEK:
+            case MS.SQEEK:
                 se = se_squeal;
                 yelp_verb = !Deaf() ? $c.lit("squeal") : $c.lit("quiver");
                 break;
-            case MS_SQAWK:
+            case MS.SQAWK:
                 se = se_avian_screak;
                 yelp_verb = !Deaf() ? $c.lit("screak") : $c.lit("thrash");
                 break;
-            case MS_WAIL:
+            case MS.WAIL:
                 se = se_wail;
                 yelp_verb = !Deaf() ? $c.lit("wail") : $c.lit("cringe");
                 break;
@@ -435,14 +436,14 @@ export async function whimper(mtmp) {   // sounds.c:479
         whimper_verb = h_sounds[rn2(35)];
     } else {
         switch (mtmp.data.msound) {
-            case MS_MEW:
-            case MS_GROWL:
+            case MS.MEW:
+            case MS.GROWL:
                 whimper_verb = $c.lit("whimper");
                 break;
-            case MS_BARK:
+            case MS.BARK:
                 whimper_verb = $c.lit("whine");
                 break;
-            case MS_SQEEK:
+            case MS.SQEEK:
                 se = se_squeal;
                 whimper_verb = $c.lit("squeal");
                 break;
@@ -463,9 +464,9 @@ export async function beg(mtmp) {   // sounds.c:519
     if (helpless(mtmp) || !(carnivorous(mtmp.data) || herbivorous(mtmp.data))) {
         return;
     }
-    if (!is_silent(mtmp.data) && mtmp.data.msound <= MS_ANIMAL) {
+    if (!is_silent(mtmp.data) && mtmp.data.msound <= MS.ANIMAL) {
         await domonnoise(mtmp);
-    } else if (mtmp.data.msound >= MS_HUMANOID) {
+    } else if (mtmp.data.msound >= MS.HUMANOID) {
         if (!canspotmon(mtmp)) {
             await map_invisible(mtmp.mx, mtmp.my);
         }
@@ -481,43 +482,43 @@ export function maybe_gasp(mon) {   // sounds.c:546
     mptr = mon.data;
     msound = mptr.msound;
     dogasp = FALSE;
-    if (msound === MS_GUARDIAN && !$c.peq(mptr, $c.relem(mons, gu.urole.guardnum)) || msound === MS_PRIEST && !p_coaligned(mon)) {
-        msound = MS_SILENT;
-    } else if (msound === MS_CUSS && has_emin(mon) && (p_coaligned(mon) ? !mon.mextra.emin.renegade : mon.mextra.emin.renegade)) {
-        msound = MS_HUMANOID;
+    if (msound === MS.GUARDIAN && !$c.peq(mptr, $c.relem(mons, gu.urole.guardnum)) || msound === MS.PRIEST && !p_coaligned(mon)) {
+        msound = MS.SILENT;
+    } else if (msound === MS.CUSS && has_emin(mon) && (p_coaligned(mon) ? !mon.mextra.emin.renegade : mon.mextra.emin.renegade)) {
+        msound = MS.HUMANOID;
     }
     switch (msound) {
-        case MS_HUMANOID:
-        case MS_ARREST:
-        case MS_SOLDIER:
-        case MS_GUARD:
-        case MS_NURSE:
-        case MS_SEDUCE:
-        case MS_LEADER:
-        case MS_GUARDIAN:
-        case MS_SELL:
-        case MS_ORACLE:
-        case MS_PRIEST:
-        case MS_BOAST:
-        case MS_IMITATE:
+        case MS.HUMANOID:
+        case MS.ARREST:
+        case MS.SOLDIER:
+        case MS.GUARD:
+        case MS.NURSE:
+        case MS.SEDUCE:
+        case MS.LEADER:
+        case MS.GUARDIAN:
+        case MS.SELL:
+        case MS.ORACLE:
+        case MS.PRIEST:
+        case MS.BOAST:
+        case MS.IMITATE:
             dogasp = TRUE;
             break;
-        case MS_ORC:
-        case MS_GRUNT:
-        case MS_LAUGH:
-        case MS_ROAR:
-        case MS_BELLOW:
-        case MS_DJINNI:
-        case MS_VAMPIRE:
-        case MS_WERE:
-        case MS_SPELL:
+        case MS.ORC:
+        case MS.GRUNT:
+        case MS.LAUGH:
+        case MS.ROAR:
+        case MS.BELLOW:
+        case MS.DJINNI:
+        case MS.VAMPIRE:
+        case MS.WERE:
+        case MS.SPELL:
             dogasp = $c.i8(mptr.mlet === gy.youmonst.data.mlet ? 1 : 0);
             break;
-        case MS_BRIBE:
-        case MS_CUSS:
-        case MS_RIDER:
-        case MS_NEMESIS:
-        case MS_SILENT:
+        case MS.BRIBE:
+        case MS.CUSS:
+        case MS.RIDER:
+        case MS.NEMESIS:
+        case MS.SILENT:
         default:
             break;
     }
@@ -532,29 +533,29 @@ export function cry_sound(mtmp) {   // sounds.c:617
     ptr = mtmp.data;
     switch (ptr.msound) {
         default:
-        case MS_SILENT:
-            ret = ptr.mlet === S_EEL ? $c.lit("gurgle") : $c.lit("chitter");
+        case MS.SILENT:
+            ret = ptr.mlet === S.EEL ? $c.lit("gurgle") : $c.lit("chitter");
             break;
-        case MS_HISS:
+        case MS.HISS:
             ret = $c.lit("hiss");
             break;
-        case MS_ROAR:
-        case MS_GROWL:
+        case MS.ROAR:
+        case MS.GROWL:
             ret = $c.lit("growl");
             break;
-        case MS_CHIRP:
+        case MS.CHIRP:
             ret = $c.lit("chirp");
             break;
-        case MS_BUZZ:
+        case MS.BUZZ:
             ret = $c.lit("buzz");
             break;
-        case MS_SQAWK:
+        case MS.SQAWK:
             ret = $c.lit("screech");
             break;
-        case MS_GRUNT:
+        case MS.GRUNT:
             ret = $c.lit("grunt");
             break;
-        case MS_MUMBLE:
+        case MS.MUMBLE:
             ret = $c.lit("mumble");
             break;
     }
@@ -562,14 +563,14 @@ export function cry_sound(mtmp) {   // sounds.c:617
 }
 function mon_is_gecko(mon) {   // sounds.c:659
     let glyph = 0;
-    if ($c.peq(mon.data, $c.relem(mons, PM_GECKO))) {
+    if ($c.peq(mon.data, $c.relem(mons, PM.GECKO))) {
         return TRUE;
     }
-    if ($c.peq(mon.data, $c.relem(mons, PM_LONG_WORM))) {
+    if ($c.peq(mon.data, $c.relem(mons, PM.LONG_WORM))) {
         return FALSE;
     }
     glyph = glyph_at(mon.mx, mon.my);
-    return $c.i8(glyph_to_mon(glyph) === PM_GECKO ? 1 : 0);
+    return $c.i8(glyph_to_mon(glyph) === PM.GECKO ? 1 : 0);
 }
 export async function domonnoise(mtmp) {   // sounds.c:679
     let verbuf = new Int8Array(256), pline_msg = null, verbl_msg = null, verbl_msg_mcan = null, ptr = null, msound = 0, gnomeplan = 0, isnight = 0, kindred = 0, nightchild = 0, racenoun = null, vampindex = 0, t = null, swval = 0, tribtitle = null, book = null, ms_Death = 0, tmpbuf = new Int8Array(256);
@@ -580,39 +581,39 @@ export async function domonnoise(mtmp) {   // sounds.c:679
     msound = ptr.msound;
     gnomeplan = 0;
     if (Deaf()) {
-        return ECMD_OK;
+        return ECMD.OK;
     }
     if (is_silent(ptr) && !mtmp.isshk) {
-        return ECMD_OK;
+        return ECMD.OK;
     }
-    if (mtmp.m_id === svq.quest_status.leader_m_id && msound > MS_ANIMAL) {
-        msound = MS_LEADER;
-    } else if (msound === MS_GUARDIAN && !$c.peq(ptr, $c.relem(mons, gu.urole.guardnum))) {
+    if (mtmp.m_id === svq.quest_status.leader_m_id && msound > MS.ANIMAL) {
+        msound = MS.LEADER;
+    } else if (msound === MS.GUARDIAN && !$c.peq(ptr, $c.relem(mons, gu.urole.guardnum))) {
         msound = mons[genus(ptr.pmidx, 1)].msound;
     } else if (mtmp.isshk) {
-        msound = MS_SELL;
-    } else if (msound === MS_ORC && (same_race(ptr, gy.youmonst.data) || same_race(ptr, $c.relem(mons, gu.urace.mnum)) || Hallucination())) {
-        msound = MS_HUMANOID;
-    } else if (msound === MS_MOO && !mtmp.mtame) {
-        msound = MS_BELLOW;
+        msound = MS.SELL;
+    } else if (msound === MS.ORC && (same_race(ptr, gy.youmonst.data) || same_race(ptr, $c.relem(mons, gu.urace.mnum)) || Hallucination())) {
+        msound = MS.HUMANOID;
+    } else if (msound === MS.MOO && !mtmp.mtame) {
+        msound = MS.BELLOW;
     } else if (Hallucination() && mon_is_gecko(mtmp)) {
-        msound = MS_SELL;
+        msound = MS.SELL;
     }
     if (!canspotmon(mtmp)) {
         await map_invisible(mtmp.mx, mtmp.my);
     }
     switch (msound) {
-        case MS_ORACLE:
+        case MS.ORACLE:
             return await doconsult(mtmp);
-        case MS_PRIEST:
+        case MS.PRIEST:
             await priest_talk(mtmp);
             break;
-        case MS_LEADER:
-        case MS_NEMESIS:
-        case MS_GUARDIAN:
+        case MS.LEADER:
+        case MS.NEMESIS:
+        case MS.GUARDIAN:
             await quest_chat(mtmp);
             break;
-        case MS_SELL:
+        case MS.SELL:
             if (!Hallucination() || is_silent(ptr) || mtmp.isshk | 0 && !rn2(2)) {
                 await shk_chat(mtmp);
             } else {
@@ -620,11 +621,11 @@ export async function domonnoise(mtmp) {   // sounds.c:679
                 verbl_msg = new $c.Ptr(verbuf, 0);
             }
             break;
-        case MS_VAMPIRE:
+        case MS.VAMPIRE:
             {
                 isnight = $c.i8(night());
-                kindred = $c.i8(Upolyd() && (u.umonnum === PM_VAMPIRE || u.umonnum === PM_VAMPIRE_LEADER) ? 1 : 0);
-                nightchild = $c.i8(Upolyd() && (u.umonnum === PM_WOLF || u.umonnum === PM_WINTER_WOLF || u.umonnum === PM_WINTER_WOLF_CUB) ? 1 : 0);
+                kindred = $c.i8(Upolyd() && (u.umonnum === PM.VAMPIRE || u.umonnum === PM.VAMPIRE_LEADER) ? 1 : 0);
+                nightchild = $c.i8(Upolyd() && (u.umonnum === PM.WOLF || u.umonnum === PM.WINTER_WOLF || u.umonnum === PM.WINTER_WOLF_CUB) ? 1 : 0);
                 racenoun = flags.female && gu.urace.individual.f ? gu.urace.individual.f : gu.urace.individual.m ? gu.urace.individual.m : gu.urace.noun;
                 if (mtmp.mtame) {
                     if (kindred) {
@@ -647,8 +648,8 @@ export async function domonnoise(mtmp) {   // sounds.c:679
                 } else {
                     if (kindred) {
                         verbl_msg = $c.lit("This is my hunting ground that you dare to prowl!");
-                    } else if ($c.peq(gy.youmonst.data, $c.relem(mons, PM_SILVER_DRAGON)) || $c.peq(gy.youmonst.data, $c.relem(mons, PM_BABY_SILVER_DRAGON))) {
-                        $c.__builtin___sprintf_chk(new $c.Ptr(verbuf, 0), 0, 256, $c.lit("%s!  Your silver sheen does not frighten me!"), $c.peq(gy.youmonst.data, $c.relem(mons, PM_SILVER_DRAGON)) ? $c.lit("Fool") : $c.lit("Young Fool"));
+                    } else if ($c.peq(gy.youmonst.data, $c.relem(mons, PM.SILVER_DRAGON)) || $c.peq(gy.youmonst.data, $c.relem(mons, PM.BABY_SILVER_DRAGON))) {
+                        $c.__builtin___sprintf_chk(new $c.Ptr(verbuf, 0), 0, 256, $c.lit("%s!  Your silver sheen does not frighten me!"), $c.peq(gy.youmonst.data, $c.relem(mons, PM.SILVER_DRAGON)) ? $c.lit("Fool") : $c.lit("Young Fool"));
                         verbl_msg = new $c.Ptr(verbuf, 0);
                     } else {
                         vampindex = rn2(2);
@@ -665,15 +666,15 @@ export async function domonnoise(mtmp) {   // sounds.c:679
                 }
                 break;
             }
-        case MS_WERE:
+        case MS.WERE:
             if (flags.moonphase === FULL_MOON && night() ^ (!rn2(13) ? 1 : 0)) {
-                await pline($c.lit("%s throws back %s head and lets out a blood curdling %s!"), await Monnam(mtmp), genders[pronoun_gender(mtmp, PRONOUN_HALLU)].his, $c.peq(ptr, $c.relem(mons, PM_HUMAN_WERERAT)) ? $c.lit("shriek") : $c.lit("howl"));
+                await pline($c.lit("%s throws back %s head and lets out a blood curdling %s!"), await Monnam(mtmp), genders[pronoun_gender(mtmp, PRONOUN.HALLU)].his, $c.peq(ptr, $c.relem(mons, PM.HUMAN_WERERAT)) ? $c.lit("shriek") : $c.lit("howl"));
                 await wake_nearto(mtmp.mx, mtmp.my, 121);
             } else {
                 pline_msg = $c.lit("whispers inaudibly.  All you can make out is \"moon\".");
             }
             break;
-        case MS_BARK:
+        case MS.BARK:
             if (flags.moonphase === FULL_MOON && night()) {
                 pline_msg = $c.lit("howls.");
             } else if (mtmp.mpeaceful) {
@@ -682,7 +683,7 @@ export async function domonnoise(mtmp) {   // sounds.c:679
                 } else if (mtmp.mtame && mtmp.mextra.edog.hungrytime > $c.add64(svm.moves, 1000)) {
                     pline_msg = $c.lit("yips.");
                 } else {
-                    if (!$c.peq(ptr, $c.relem(mons, PM_DINGO))) {
+                    if (!$c.peq(ptr, $c.relem(mons, PM.DINGO))) {
                         pline_msg = $c.lit("barks.");
                     }
                 }
@@ -690,7 +691,7 @@ export async function domonnoise(mtmp) {   // sounds.c:679
                 pline_msg = $c.lit("growls.");
             }
             break;
-        case MS_MEW:
+        case MS.MEW:
             if (mtmp.mtame) {
                 if (mtmp.mconf | 0 || mtmp.mflee | 0 || mtmp.mtrapped | 0 || mtmp.mtame < 5) {
                     pline_msg = $c.lit("yowls.");
@@ -703,36 +704,36 @@ export async function domonnoise(mtmp) {   // sounds.c:679
                 }
                 break;
             }
-        case MS_GROWL:
+        case MS.GROWL:
             pline_msg = mtmp.mpeaceful | 0 ? $c.lit("snarls.") : $c.lit("growls!");
             break;
-        case MS_ROAR:
+        case MS.ROAR:
             pline_msg = mtmp.mpeaceful | 0 ? $c.lit("snarls.") : $c.lit("roars!");
             break;
-        case MS_SQEEK:
+        case MS.SQEEK:
             pline_msg = $c.lit("squeaks.");
             break;
-        case MS_SQAWK:
-            if ($c.peq(ptr, $c.relem(mons, PM_RAVEN)) && !mtmp.mpeaceful) {
+        case MS.SQAWK:
+            if ($c.peq(ptr, $c.relem(mons, PM.RAVEN)) && !mtmp.mpeaceful) {
                 verbl_msg = $c.lit("Nevermore!");
             } else {
                 pline_msg = $c.lit("squawks.");
             }
             break;
-        case MS_HISS:
+        case MS.HISS:
             if (!mtmp.mpeaceful) {
                 pline_msg = $c.lit("hisses!");
             } else {
-                return ECMD_OK;
+                return ECMD.OK;
             }
             break;
-        case MS_BUZZ:
+        case MS.BUZZ:
             pline_msg = mtmp.mpeaceful | 0 ? $c.lit("drones.") : $c.lit("buzzes angrily.");
             break;
-        case MS_GRUNT:
+        case MS.GRUNT:
             pline_msg = $c.lit("grunts.");
             break;
-        case MS_NEIGH:
+        case MS.NEIGH:
             if (mtmp.mtame < 5) {
                 pline_msg = $c.lit("neighs.");
             } else if (svm.moves > mtmp.mextra.edog.hungrytime) {
@@ -741,80 +742,80 @@ export async function domonnoise(mtmp) {   // sounds.c:679
                 pline_msg = $c.lit("whickers.");
             }
             break;
-        case MS_MOO:
+        case MS.MOO:
             pline_msg = $c.lit("moos.");
             break;
-        case MS_BELLOW:
+        case MS.BELLOW:
             pline_msg = $c.lit("bellows!");
             break;
-        case MS_CHIRP:
+        case MS.CHIRP:
             pline_msg = $c.lit("chirps.");
             break;
-        case MS_WAIL:
+        case MS.WAIL:
             pline_msg = $c.lit("wails mournfully.");
             break;
-        case MS_GROAN:
+        case MS.GROAN:
             if (!rn2(3)) {
                 pline_msg = $c.lit("groans.");
             }
             break;
-        case MS_GURGLE:
+        case MS.GURGLE:
             pline_msg = $c.lit("gurgles.");
             break;
-        case MS_BURBLE:
+        case MS.BURBLE:
             pline_msg = $c.lit("burbles.");
             break;
-        case MS_TRUMPET:
+        case MS.TRUMPET:
             pline_msg = $c.lit("trumpets!");
             await wake_nearto(mtmp.mx, mtmp.my, 121);
             break;
-        case MS_SHRIEK:
+        case MS.SHRIEK:
             pline_msg = $c.lit("shrieks.");
             await aggravate();
             break;
-        case MS_IMITATE:
+        case MS.IMITATE:
             pline_msg = $c.lit("imitates you.");
             break;
-        case MS_BONES:
+        case MS.BONES:
             await pline($c.lit("%s rattles noisily."), await Monnam(mtmp));
             await You($c.lit("freeze for a moment."));
             nomul(-2);
             gm.multi_reason = $c.lit("scared by rattling");
             gn.nomovemsg = null;
             break;
-        case MS_LAUGH:
+        case MS.LAUGH:
             {
                 pline_msg = domonnoise$laugh_msg[rn2(4)];
                 break;
             }
-        case MS_MUMBLE:
+        case MS.MUMBLE:
             pline_msg = $c.lit("mumbles incomprehensibly.");
             break;
-        case MS_ORC:
+        case MS.ORC:
             pline_msg = $c.lit("grunts.");
             break;
-        case MS_DJINNI:
+        case MS.DJINNI:
             if (mtmp.mtame) {
                 verbl_msg = $c.lit("Sorry, I'm all out of wishes.");
             } else if (mtmp.mpeaceful) {
-                if ($c.peq(ptr, $c.relem(mons, PM_WATER_DEMON))) {
+                if ($c.peq(ptr, $c.relem(mons, PM.WATER_DEMON))) {
                     pline_msg = $c.lit("gurgles.");
                 } else {
                     verbl_msg = $c.lit("I'm free!");
                 }
             } else {
-                if (!$c.peq(ptr, $c.relem(mons, PM_PRISONER))) {
+                if (!$c.peq(ptr, $c.relem(mons, PM.PRISONER))) {
                     verbl_msg = $c.lit("This will teach you not to disturb me!");
                 } else {
                     verbl_msg = $c.lit("Get me out of here.");
                 }
             }
             break;
-        case MS_BOAST:
+        case MS.BOAST:
             if (!mtmp.mpeaceful) {
                 switch (rn2(4)) {
                     case 0:
-                        await pline($c.lit("%s boasts about %s gem collection."), await Monnam(mtmp), genders[pronoun_gender(mtmp, PRONOUN_HALLU)].his);
+                        await pline($c.lit("%s boasts about %s gem collection."), await Monnam(mtmp), genders[pronoun_gender(mtmp, PRONOUN.HALLU)].his);
                         break;
                     case 1:
                         pline_msg = $c.lit("complains about a diet of mutton.");
@@ -826,7 +827,7 @@ export async function domonnoise(mtmp) {   // sounds.c:679
                 }
                 break;
             }
-        case MS_HUMANOID:
+        case MS.HUMANOID:
             if (!mtmp.mpeaceful) {
                 if (In_endgame(u.uz) && is_mplayer(ptr)) {
                     await mplayer_talk(mtmp);
@@ -859,7 +860,7 @@ export async function domonnoise(mtmp) {   // sounds.c:679
                 pline_msg = $c.lit("talks about mining.");
             } else if (likes_magic(ptr)) {
                 pline_msg = $c.lit("talks about spellcraft.");
-            } else if (ptr.mlet === S_CENTAUR) {
+            } else if (ptr.mlet === S.CENTAUR) {
                 pline_msg = $c.lit("discusses hunting.");
             } else if (is_gnome(ptr)) {
                 if (Hallucination() && $c.rem32(gnomeplan = rn2(4), 2)) {
@@ -869,13 +870,13 @@ export async function domonnoise(mtmp) {   // sounds.c:679
                 }
             } else {
                 switch (ptr.pmidx) {
-                    case PM_HOBBIT:
+                    case PM.HOBBIT:
                         pline_msg = mtmp.mhp < mtmp.mhpmax && (mtmp.mhpmax <= 10 || mtmp.mhp <= (mtmp.mhpmax - 10 | 0)) ? $c.lit("complains about unpleasant dungeon conditions.") : $c.lit("asks you about the One Ring.");
                         break;
-                    case PM_ARCHEOLOGIST:
+                    case PM.ARCHEOLOGIST:
                         pline_msg = $c.lit("describes a recent article in \"Spelunker Today\" magazine.");
                         break;
-                    case PM_TOURIST:
+                    case PM.TOURIST:
                         verbl_msg = $c.lit("Aloha.");
                         break;
                     default:
@@ -884,10 +885,10 @@ export async function domonnoise(mtmp) {   // sounds.c:679
                 }
             }
             break;
-        case MS_SEDUCE:
+        case MS.SEDUCE:
             {
                 if (SYSOPT_SEDUCE()) {
-                    if (ptr.mlet !== S_NYMPH && could_seduce(mtmp, gy.youmonst, null) === 1) {
+                    if (ptr.mlet !== S.NYMPH && could_seduce(mtmp, gy.youmonst, null) === 1) {
                         await doseduce(mtmp);
                         break;
                     }
@@ -907,58 +908,58 @@ export async function domonnoise(mtmp) {   // sounds.c:679
                 }
             }
             break;
-        case MS_ARREST:
+        case MS.ARREST:
             if (mtmp.mpeaceful) {
                 await verbalize($c.lit("Just the facts, %s."), flags.female ? $c.lit("Ma'am") : $c.lit("Sir"));
             } else {
                 verbl_msg = domonnoise$arrest_msg[rn2(3)];
             }
             break;
-        case MS_BRIBE:
+        case MS.BRIBE:
             if (mtmp.mpeaceful | 0 && !mtmp.mtame) {
                 await demon_talk(mtmp);
                 break;
             }
-        case MS_CUSS:
+        case MS.CUSS:
             if (!mtmp.mpeaceful) {
                 await cuss(mtmp);
-            } else if ($c.andu64(mtmp.data.mflags2, M2_MINION) !== 0 && mon_aligntyp(mtmp) === A_LAWFUL) {
+            } else if ($c.andu64(mtmp.data.mflags2, M2.MINION) !== 0 && mon_aligntyp(mtmp) === A.LAWFUL) {
                 verbl_msg = $c.lit("It's not too late.");
             } else {
                 verbl_msg = $c.lit("We're all doomed.");
             }
             break;
-        case MS_SPELL:
+        case MS.SPELL:
             pline_msg = $c.lit("seems to mutter a cantrip.");
             break;
-        case MS_NURSE:
+        case MS.NURSE:
             verbl_msg_mcan = $c.lit("I hate this job!");
             if ($G.uwep && ($G.uwep.oclass === WEAPON_CLASS || is_weptool($G.uwep))) {
                 verbl_msg = $c.lit("Put that weapon away before you hurt someone!");
             } else if ($G.uarmc || $G.uarm || $G.uarmh || $G.uarms || $G.uarmg || $G.uarmf) {
-                verbl_msg = gu.urole.mnum === PM_HEALER ? $c.lit("Doc, I can't help you unless you cooperate.") : $c.lit("Please undress so I can examine you.");
+                verbl_msg = gu.urole.mnum === PM.HEALER ? $c.lit("Doc, I can't help you unless you cooperate.") : $c.lit("Please undress so I can examine you.");
             } else if ($G.uarmu) {
                 verbl_msg = $c.lit("Take off your shirt, please.");
             } else {
                 verbl_msg = $c.lit("Relax, this won't hurt a bit.");
             }
             break;
-        case MS_GUARD:
+        case MS.GUARD:
             if (money_cnt(gi.invent)) {
                 verbl_msg = $c.lit("Please drop that gold and follow me.");
             } else {
                 verbl_msg = $c.lit("Please follow me.");
             }
             break;
-        case MS_SOLDIER:
+        case MS.SOLDIER:
             {
                 verbl_msg = mtmp.mpeaceful | 0 ? domonnoise$soldier_pax_msg[rn2(3)] : domonnoise$soldier_foe_msg[rn2(3)];
                 break;
             }
-        case MS_RIDER:
+        case MS.RIDER:
             {
                 book = null;
-                ms_Death = $c.i8($c.peq(ptr, $c.relem(mons, PM_DEATH)) ? 1 : 0);
+                ms_Death = $c.i8($c.peq(ptr, $c.relem(mons, PM.DEATH)) ? 1 : 0);
                 if (ms_Death && !svc.context.tribute.Deathnotice && (book = u_have_novel()) !== null) {
                     if ((tribtitle = noveltitle(new $c.FieldRef(book, "corpsenm", "i32"))) !== null) {
                         $c.__builtin___sprintf_chk(new $c.Ptr(verbuf, 0), 0, 256, $c.lit("Ah, so you have a copy of /%s/."), tribtitle);
@@ -983,14 +984,14 @@ export async function domonnoise(mtmp) {   // sounds.c:679
     } else if (mtmp.mcan | 0 && verbl_msg_mcan) {
         await verbalize1(verbl_msg_mcan);
     } else if (verbl_msg) {
-        if ($c.peq(ptr, $c.relem(mons, PM_DEATH))) {
+        if ($c.peq(ptr, $c.relem(mons, PM.DEATH))) {
             await pline($c.lit("%s"), ucase($c.__builtin___strcpy_chk(new $c.Ptr(tmpbuf, 0), verbl_msg, 256)));
             sound_speak(new $c.Ptr(tmpbuf, 0));
         } else {
             await verbalize1(verbl_msg);
         }
     }
-    return ECMD_TIME;
+    return ECMD.TIME;
 }
 export async function dotalk() {   // sounds.c:1248
     let result = 0;
@@ -1001,47 +1002,47 @@ async function dochat() {   // sounds.c:1257
     let mtmp = null, tx = 0, ty = 0, otmp = null, idx = 0, xresponse = null;
     if (is_silent(gy.youmonst.data)) {
         await pline($c.lit("As %s, you cannot speak."), await an(pmname(gy.youmonst.data, flags.female ? FEMALE : MALE)));
-        return ECMD_OK;
+        return ECMD.OK;
     }
     if (Strangled()) {
         await You_cant($c.lit("speak.  You're choking!"));
-        return ECMD_OK;
+        return ECMD.OK;
     }
     if (u.uswallow) {
         await pline($c.lit("They won't hear you out there."));
-        return ECMD_OK;
+        return ECMD.OK;
     }
     if (Underwater()) {
         await Your($c.lit("speech is unintelligible underwater."));
-        return ECMD_OK;
+        return ECMD.OK;
     }
     if (!Deaf() && !Blind() && (otmp = await shop_object(u.ux, u.uy)) !== null) {
         await price_quote(otmp);
-        return ECMD_TIME;
+        return ECMD.TIME;
     }
     if (!await getdir($c.lit("Talk to whom? (in what direction)"))) {
-        return ECMD_CANCEL;
+        return ECMD.CANCEL;
     }
     if (u.usteed && u.dz > 0) {
         if (helpless(u.usteed)) {
             await pline($c.lit("%s seems not to notice you."), await Monnam(u.usteed));
-            return ECMD_TIME;
+            return ECMD.TIME;
         } else {
             return await domonnoise(u.usteed);
         }
     }
     if (u.dz) {
         await pline($c.lit("They won't hear you %s there."), u.dz < 0 ? $c.lit("up") : $c.lit("down"));
-        return ECMD_OK;
+        return ECMD.OK;
     }
     if (u.dx === 0 && u.dy === 0) {
         await pline($c.lit("Talking to yourself is a bad habit for a dungeoneer."));
-        return ECMD_OK;
+        return ECMD.OK;
     }
     tx = u.ux + u.dx | 0;
     ty = u.uy + u.dy | 0;
     if (!isok($c.i16(tx), $c.i16(ty))) {
-        return ECMD_OK;
+        return ECMD.OK;
     }
     mtmp = svl.level.monsters[tx][ty];
     if (!mtmp || mtmp.mundetected | 0) {
@@ -1049,7 +1050,7 @@ async function dochat() {   // sounds.c:1257
             if (!Blind()) {
                 await pline_The($c.lit("%s seems not to notice you."), Hallucination() ? await rndmonnam(null) : $c.lit("statue"));
             }
-            return ECMD_OK;
+            return ECMD.OK;
         }
         if (!Deaf() && (svl.level.locations[tx][ty].typ && svl.level.locations[tx][ty].typ <= DBWALL || svl.level.locations[tx][ty].typ === SDOOR)) {
             if (Blind() && !IS_WALL(svl.lastseentyp[tx][ty])) {
@@ -1062,17 +1063,17 @@ async function dochat() {   // sounds.c:1257
                 }
                 await pline_The($c.lit("wall %s"), dochat$walltalk[idx]);
             }
-            return ECMD_OK;
+            return ECMD.OK;
         }
     }
-    if (!mtmp || mtmp.mundetected | 0 || M_AP_TYPE(mtmp) === M_AP_FURNITURE || M_AP_TYPE(mtmp) === M_AP_OBJECT) {
-        return ECMD_OK;
+    if (!mtmp || mtmp.mundetected | 0 || M_AP_TYPE(mtmp) === M_AP.FURNITURE || M_AP_TYPE(mtmp) === M_AP.OBJECT) {
+        return ECMD.OK;
     }
     if (helpless(mtmp) && !mtmp.ispriest) {
         if (canspotmon(mtmp)) {
             await pline($c.lit("%s seems not to notice you."), await Monnam(mtmp));
         }
-        return ECMD_OK;
+        return ECMD.OK;
     }
     mtmp.mstrategy = $c.andu64(mtmp.mstrategy, 18446744072904245247n);
     if (!Deaf() && mtmp.mtame && mtmp.meating) {
@@ -1080,12 +1081,12 @@ async function dochat() {   // sounds.c:1257
             await map_invisible(mtmp.mx, mtmp.my);
         }
         await pline($c.lit("%s is eating noisily."), await Monnam(mtmp));
-        return ECMD_OK;
+        return ECMD.OK;
     }
     if (Deaf()) {
         xresponse = humanoid(gy.youmonst.data) ? $c.lit("falls on deaf ears") : $c.lit("is inaudible");
         await pline($c.lit("Any response%s%s %s."), canspotmon(mtmp) ? $c.lit(" from ") : $c.lit(""), canspotmon(mtmp) ? await mon_nam(mtmp) : $c.lit(""), xresponse);
-        return ECMD_OK;
+        return ECMD.OK;
     }
     return await domonnoise(mtmp);
 }
@@ -1129,7 +1130,7 @@ export async function tiphat() {   // sounds.c:1427
                 return res;
             }
             mtmp = null;
-            vismon = unseen = statue = 0, glyph = GLYPH_MON_OFF;
+            vismon = unseen = statue = 0, glyph = GLYPH.MON_OFF;
             x = u.ux, y = u.uy;
             for (range = 1; range <= BOLT_LIM + 1; range = range + 1 | 0) {
                 x = x + u.dx | 0, y = y + u.dy | 0;
@@ -1142,7 +1143,7 @@ export async function tiphat() {   // sounds.c:1427
                 glyph = glyph_at($c.i16(x), $c.i16(y));
                 unseen = glyph_is_invisible(glyph);
                 statue = glyph_is_statue(glyph) || !vismon && !unseen && (otmp = svl.level.objects[x][y]) !== null && otmp.otyp === STATUE ? 1 : 0;
-                if (vismon && (M_AP_TYPE(mtmp) === M_AP_FURNITURE || M_AP_TYPE(mtmp) === M_AP_OBJECT)) {
+                if (vismon && (M_AP_TYPE(mtmp) === M_AP.FURNITURE || M_AP_TYPE(mtmp) === M_AP.OBJECT)) {
                     vismon = 0, mtmp = null;
                 }
                 if (vismon || unseen || statue && Hallucination() || range === 1 && mtmp && responsive_mon_at(x, y) && !is_silent(mtmp.data) || !(accessible($c.i16(x), $c.i16(y)) || svl.level.locations[x][y].typ === IRONBARS)) {
@@ -1165,13 +1166,13 @@ export async function tiphat() {   // sounds.c:1427
                         mtmp.mstrategy = $c.andu64(mtmp.mstrategy, 18446744072904245247n);
                     case "nada":
                         if ($goto !== "nada" && (vismon && humanoid(mtmp.data) && mtmp.mpeaceful | 0 && !Conflict())) {
-                            if ((otmp = await which_armor(mtmp, W_ARMH)) === null) {
+                            if ((otmp = await which_armor(mtmp, W.ARMH)) === null) {
                                 await pline($c.lit("%s waves."), await Monnam(mtmp));
                             } else if (otmp.cursed) {
-                                await pline($c.lit("%s grasps %s %s but can't remove it."), await Monnam(mtmp), genders[pronoun_gender(mtmp, PRONOUN_HALLU)].his, helm_simple_name(otmp));
+                                await pline($c.lit("%s grasps %s %s but can't remove it."), await Monnam(mtmp), genders[pronoun_gender(mtmp, PRONOUN.HALLU)].his, helm_simple_name(otmp));
                                 otmp.bknown = (1) & 1;
                             } else {
-                                await pline($c.lit("%s tips %s %s in response."), await Monnam(mtmp), genders[pronoun_gender(mtmp, PRONOUN_HALLU)].his, helm_simple_name(otmp));
+                                await pline($c.lit("%s tips %s %s in response."), await Monnam(mtmp), genders[pronoun_gender(mtmp, PRONOUN.HALLU)].his, helm_simple_name(otmp));
                             }
                         } else if ($goto !== "nada" && (vismon && humanoid(mtmp.data))) {
                             which = !Deaf() ? rn2(3) : rn2(2) + 1 | 0;

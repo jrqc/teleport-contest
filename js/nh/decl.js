@@ -2,16 +2,16 @@
 import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
-import { A_INT } from './attrib.h.js';
+import { A } from './attrib.h.js';
 import { NO_COLOR } from './color.h.js';
-import { S_ss1, S_ss2, S_ss3, S_ss4 } from './defsym.h.js';
+import { S } from './defsym.h.js';
 import { COLNO, FALSE, MAXNROFROOMS, ROWNO, TRUE, phase_not_set } from './global.h.js';
-import { DIR_E, DIR_N, DIR_NE, DIR_NW, DIR_S, DIR_SE, DIR_SW, DIR_W, UNDEFINED_VALUE } from './hack.h.js';
+import { DIR, UNDEFINED_VALUE } from './hack.h.js';
 import { STRANGE_OBJECT } from './objects.h.js';
 import { NON_PM } from './permonst.h.js';
 import { raw_printf } from './pline.js';
 import { soundlib_nosound } from './sndprocs.h.js';
-import { ANY_INVALID, WIN_ERR, wdmode_traditional } from './wintype.h.js';
+import { ANY, WIN_ERR, wdmode_traditional } from './wintype.h.js';
 
 export const nhcb_name = $c.nulls(4);
 export const nhcb_counts = new Int32Array(4);
@@ -478,14 +478,14 @@ export function $init() {
     ]);
     dirs_ord.fill(0);
     $c.init(dirs_ord, [
-        DIR_W,
-        DIR_N,
-        DIR_E,
-        DIR_S,
-        DIR_NW,
-        DIR_NE,
-        DIR_SE,
-        DIR_SW
+        DIR.W,
+        DIR.N,
+        DIR.E,
+        DIR.S,
+        DIR.NW,
+        DIR.NE,
+        DIR.SE,
+        DIR.SW
     ]);
     $G.has_strong_rngseed = FALSE;
     iflags.$copyFrom(new $T.instance_flags());
@@ -519,27 +519,27 @@ export function $init() {
     quitchars.set([32, 13, 10, 27]);   // " \r\n\x1b"
     shield_static.fill(0);
     $c.init(shield_static, [
-        S_ss1,
-        S_ss2,
-        S_ss3,
-        S_ss2,
-        S_ss1,
-        S_ss2,
-        S_ss4,
-        S_ss1,
-        S_ss2,
-        S_ss3,
-        S_ss2,
-        S_ss1,
-        S_ss2,
-        S_ss4,
-        S_ss1,
-        S_ss2,
-        S_ss3,
-        S_ss2,
-        S_ss1,
-        S_ss2,
-        S_ss4
+        S.ss1,
+        S.ss2,
+        S.ss3,
+        S.ss2,
+        S.ss1,
+        S.ss2,
+        S.ss4,
+        S.ss1,
+        S.ss2,
+        S.ss3,
+        S.ss2,
+        S.ss1,
+        S.ss2,
+        S.ss4,
+        S.ss1,
+        S.ss2,
+        S.ss3,
+        S.ss2,
+        S.ss1,
+        S.ss2,
+        S.ss4
     ]);
     u.$copyFrom(new $T.you());
     urealtime.$copyFrom(new $T.u_realtime());
@@ -626,7 +626,7 @@ export function $init() {
     urole_init_data.spelheal = 0;
     urole_init_data.spelshld = 0;
     urole_init_data.spelarmr = 4;
-    urole_init_data.spelstat = A_INT;
+    urole_init_data.spelstat = A.INT;
     urole_init_data.spelspec = 0;
     urole_init_data.spelsbon = -3;
     urace_init_data.$copyFrom(new $T.Race());
@@ -693,7 +693,7 @@ export function $init() {
     g_init_b.blstats[0][0].chg = 0;
     g_init_b.blstats[0][0].percent_matters = 0;
     g_init_b.blstats[0][0].percent_value = 0;
-    g_init_b.blstats[0][0].anytype = ANY_INVALID;
+    g_init_b.blstats[0][0].anytype = ANY.INVALID;
     g_init_b.blstats[0][0].a.a_void = null;
     g_init_b.blstats[0][0].rawval.a_void = null;
     g_init_b.blstats[0][0].val = null;

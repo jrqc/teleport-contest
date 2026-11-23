@@ -3,8 +3,8 @@ import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
 import { u } from './decl.js';
-import { P_ISRESTRICTED } from './skills.h.js';
+import { P } from './skills.h.js';
 
 export function P_RESTRICTED(type) {
-    return u.weapon_skills[type].skill === P_ISRESTRICTED ? 1 : 0;
+    return u.weapon_skills[type].skill === P.ISRESTRICTED ? 1 : 0;
 }

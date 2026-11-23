@@ -3,9 +3,9 @@ import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
 import { alloc, dupstr } from './alloc.js';
-import { HL_BLINK, HL_BOLD, HL_DIM, HL_INVERSE, HL_ITALIC, HL_NONE, HL_ULINE } from './botl.h.js';
+import { HL } from './botl.h.js';
 import { config_error_add } from './cfgfiles.js';
-import { CLR_BLACK, CLR_BLUE, CLR_BRIGHT_BLUE, CLR_BRIGHT_CYAN, CLR_BRIGHT_GREEN, CLR_BRIGHT_MAGENTA, CLR_BROWN, CLR_CYAN, CLR_GRAY, CLR_GREEN, CLR_MAGENTA, CLR_MAX, CLR_ORANGE, CLR_RED, CLR_WHITE, CLR_YELLOW, NH_BASIC_COLOR, NO_COLOR, nh_color, rgb_color } from './color.h.js';
+import { CLR, NH_BASIC_COLOR, NO_COLOR, nh_color, rgb_color } from './color.h.js';
 import { cg, gc, gm, gs, hexdd, iflags } from './decl.js';
 import { nul_glyphinfo } from './display.js';
 import { FALSE, TRUE } from './global.h.js';
@@ -13,7 +13,7 @@ import { digit, fuzzymatch, mungspaces, nh_snprintf, strncmpi, strstri } from '.
 import { regex_compile, regex_error_desc, regex_free, regex_id, regex_init } from './posixregex.js';
 import { add_menu, select_menu } from './windows.js';
 import { create_nhwindow, destroy_nhwindow, end_menu, start_menu } from './winprocs.macros.js';
-import { ATR_BLINK, ATR_BOLD, ATR_DIM, ATR_INVERSE, ATR_ITALIC, ATR_NONE, ATR_ULINE, MENU_BEHAVE_STANDARD, MENU_ITEMFLAGS_NONE, MENU_ITEMFLAGS_SELECTED, NHW_MENU, PICK_ANY, PICK_ONE } from './wintype.h.js';
+import { ATR, MENU, NHW, PICK } from './wintype.h.js';
 
 const NHC = 1;
 const NOC = 0;
@@ -44,7 +44,7 @@ export async function color_attr_parse_str(ca, str) {   // coloratt.c:261
     let buf = new Int8Array(256), amp = null, tmp = 0, c = 0, a = 0;
     amp = null;
     c = NO_COLOR;
-    a = ATR_NONE;
+    a = ATR.NONE;
     $c.__builtin___strncpy_chk(new $c.Ptr(buf, 0), str, 255, 256);
     buf[$c.idx(255)] = 0;
     if ((amp = $c.strchr(new $c.Ptr(buf, 0), 38)) !== null) {
@@ -54,18 +54,18 @@ export async function color_attr_parse_str(ca, str) {   // coloratt.c:261
         amp = amp.add(1);
         c = await match_str2clr(new $c.Ptr(buf, 0), FALSE);
         a = await match_str2attr(amp, TRUE);
-        if (c >= CLR_MAX && a === -1) {
+        if (c >= CLR.MAX && a === -1) {
             c = await match_str2clr(amp, FALSE);
             a = await match_str2attr(new $c.Ptr(buf, 0), TRUE);
         }
-        if (c >= CLR_MAX || a === -1) {
+        if (c >= CLR.MAX || a === -1) {
             return FALSE;
         }
     } else {
         tmp = await match_str2attr(new $c.Ptr(buf, 0), FALSE);
         if (tmp === -1) {
             tmp = await match_str2clr(new $c.Ptr(buf, 0), FALSE);
-            if (tmp >= CLR_MAX) {
+            if (tmp >= CLR.MAX) {
                 return FALSE;
             }
             c = tmp;
@@ -111,7 +111,7 @@ export function clr2colorname(clr) {   // coloratt.c:338
 }
 export async function match_str2clr(str, suppress_msg) {   // coloratt.c:349
     let i = 0, c = 0;
-    c = CLR_MAX;
+    c = CLR.MAX;
     for (i = 0; i < 27; i = i + 1 | 0) {
         if (colornames[i].name && fuzzymatch(str, colornames[i].name, $c.lit(" -_"), TRUE)) {
             c = colornames[i].color;
@@ -121,11 +121,11 @@ export async function match_str2clr(str, suppress_msg) {   // coloratt.c:349
     if (i === 27 && digit(str.get(0))) {
         c = $c.atoi(str);
     }
-    if (c < 0 || c >= CLR_MAX) {
+    if (c < 0 || c >= CLR.MAX) {
         if (!suppress_msg) {
             await config_error_add($c.lit("Unknown color '%.60s'"), str);
         }
-        c = CLR_MAX;
+        c = CLR.MAX;
     }
     return c;
 }
@@ -148,46 +148,46 @@ export async function query_attr(prompt, dflt_attr) {   // coloratt.c:396
     picks[0] = null;
     allow_many = $c.i8(prompt && !strncmpi(prompt, $c.lit("Choose"), 6) ? 1 : 0);
     clr = NO_COLOR;
-    tmpwin = await create_nhwindow()(NHW_MENU);
-    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW.MENU);
+    await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     for (i = 0; i < 11; i = i + 1 | 0) {
         if (!attrnames[i].name) {
             break;
         }
         any.a_int = i + 1 | 0;
-        await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, attrnames[i].attr, clr, attrnames[i].name, attrnames[i].attr === dflt_attr ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, attrnames[i].attr, clr, attrnames[i].name, attrnames[i].attr === dflt_attr ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     }
     await end_menu()(tmpwin, prompt && prompt.get(0) ? prompt : $c.lit("Pick an attribute"));
-    pick_cnt = await select_menu(tmpwin, allow_many ? PICK_ANY : PICK_ONE, new $c.Ptr(picks, 0));
+    pick_cnt = await select_menu(tmpwin, allow_many ? PICK.ANY : PICK.ONE, new $c.Ptr(picks, 0));
     await destroy_nhwindow()(tmpwin);
     if (pick_cnt > 0) {
         k = 0;
         if (allow_many) {
             for (i = 0; i < pick_cnt; i = i + 1 | 0) {
                 j = $c.radd(picks[0], i).item.a_int - 1 | 0;
-                if (attrnames[j].attr !== ATR_NONE || pick_cnt === 1) {
+                if (attrnames[j].attr !== ATR.NONE || pick_cnt === 1) {
                     switch (attrnames[j].attr) {
-                        case ATR_NONE:
-                            k = HL_NONE;
+                        case ATR.NONE:
+                            k = HL.NONE;
                             break;
-                        case ATR_BOLD:
-                            k = k | HL_BOLD;
+                        case ATR.BOLD:
+                            k = k | HL.BOLD;
                             break;
-                        case ATR_DIM:
-                            k = k | HL_DIM;
+                        case ATR.DIM:
+                            k = k | HL.DIM;
                             break;
-                        case ATR_ITALIC:
-                            k = k | HL_ITALIC;
+                        case ATR.ITALIC:
+                            k = k | HL.ITALIC;
                             break;
-                        case ATR_ULINE:
-                            k = k | HL_ULINE;
+                        case ATR.ULINE:
+                            k = k | HL.ULINE;
                             break;
-                        case ATR_BLINK:
-                            k = k | HL_BLINK;
+                        case ATR.BLINK:
+                            k = k | HL.BLINK;
                             break;
-                        case ATR_INVERSE:
-                            k = k | HL_INVERSE;
+                        case ATR.INVERSE:
+                            k = k | HL.INVERSE;
                             break;
                     }
                 }
@@ -210,18 +210,18 @@ export async function query_color(prompt, dflt_color) {   // coloratt.c:475
     let tmpwin = 0, any = new $T.any(), i = 0, pick_cnt = 0, picks = [null];
     picks[0] = null;
     await basic_menu_colors(TRUE);
-    tmpwin = await create_nhwindow()(NHW_MENU);
-    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW.MENU);
+    await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     for (i = 0; i < 27; i = i + 1 | 0) {
         if (!colornames[i].name) {
             break;
         }
         any.a_int = i + 1 | 0;
-        await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR_NONE, NO_COLOR, colornames[i].name, colornames[i].color === dflt_color ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, NO_COLOR, colornames[i].name, colornames[i].color === dflt_color ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
     }
     await end_menu()(tmpwin, prompt && prompt.get(0) ? prompt : $c.lit("Pick a color"));
-    pick_cnt = await select_menu(tmpwin, PICK_ONE, new $c.Ptr(picks, 0));
+    pick_cnt = await select_menu(tmpwin, PICK.ONE, new $c.Ptr(picks, 0));
     await destroy_nhwindow()(tmpwin);
     await basic_menu_colors(FALSE);
     if (pick_cnt > 0) {
@@ -253,11 +253,11 @@ export async function basic_menu_colors(load_colors) {   // coloratt.c:530
                     break;
                 }
                 c = colornames[i].color;
-                if (c === CLR_BLACK || c === CLR_WHITE || c === NO_COLOR) {
+                if (c === CLR.BLACK || c === CLR.WHITE || c === NO_COLOR) {
                     continue;
                 }
                 $c.__builtin___sprintf_chk(new $c.Ptr(cnm, 0), 0, 128, patternfmt, colornames[i].name);
-                await add_menu_coloring_parsed(new $c.Ptr(cnm, 0), c, ATR_NONE);
+                await add_menu_coloring_parsed(new $c.Ptr(cnm, 0), c, ATR.NONE);
             }
             gc.color_colorings = gm.menu_colorings;
         }
@@ -291,7 +291,7 @@ export async function add_menu_coloring_parsed(str, c, a) {   // coloratt.c:585
 export async function add_menu_coloring(tmpstr) {   // coloratt.c:617
     let c = 0, a = 0, tmps = null, cs = null, amp = null, str = new Int8Array(256);
     c = NO_COLOR;
-    a = ATR_NONE;
+    a = ATR.NONE;
     $c.__builtin___strncpy_chk(new $c.Ptr(str, 0), tmpstr, 255, 256);
     str[$c.idx(255)] = 0;
     if ((cs = $c.strchr(new $c.Ptr(str, 0), 61)) === null) {
@@ -304,7 +304,7 @@ export async function add_menu_coloring(tmpstr) {   // coloratt.c:617
         amp.set(0, 0);
     }
     c = await match_str2clr(tmps, FALSE);
-    if (c >= CLR_MAX) {
+    if (c >= CLR.MAX) {
         return FALSE;
     }
     if (amp) {
@@ -375,7 +375,7 @@ export async function check_enhanced_colors(buf) {   // coloratt.c:723
     let xtra = Int8Array.of(0), r = Uint32Array.of(0), g = Uint32Array.of(0), b = Uint32Array.of(0), retcolor = 0, color = 0, altbuf = null, grey = null, greyoffset = 0;
     xtra[0] = 0;
     retcolor = -1;
-    if ((color = await match_str2clr(buf, TRUE)) !== CLR_MAX) {
+    if ((color = await match_str2clr(buf, TRUE)) !== CLR.MAX) {
         retcolor = color | NH_BASIC_COLOR;
     } else if ($c.sscanf(buf, $c.lit("#%02x%02x%02x%c"), new $c.Ptr(r, 0), new $c.Ptr(g, 0), new $c.Ptr(b, 0), new $c.Ptr(xtra, 0)) >= 3) {
         retcolor = !xtra[0] ? ((r[0] << 16 >>> 0 | g[0] << 8 >>> 0) >>> 0 | b[0]) >>> 0 | 0 : -1;
@@ -543,49 +543,49 @@ export function $init() {
         colornames[$i0].$copyFrom(new $T.color_names());
     }
     $c.init(colornames, [
-        { name: $c.lit("black"), color: CLR_BLACK },
-        { name: $c.lit("red"), color: CLR_RED },
-        { name: $c.lit("green"), color: CLR_GREEN },
-        { name: $c.lit("brown"), color: CLR_BROWN },
-        { name: $c.lit("blue"), color: CLR_BLUE },
-        { name: $c.lit("magenta"), color: CLR_MAGENTA },
-        { name: $c.lit("cyan"), color: CLR_CYAN },
-        { name: $c.lit("gray"), color: CLR_GRAY },
-        { name: $c.lit("orange"), color: CLR_ORANGE },
-        { name: $c.lit("light green"), color: CLR_BRIGHT_GREEN },
-        { name: $c.lit("yellow"), color: CLR_YELLOW },
-        { name: $c.lit("light blue"), color: CLR_BRIGHT_BLUE },
-        { name: $c.lit("light magenta"), color: CLR_BRIGHT_MAGENTA },
-        { name: $c.lit("light cyan"), color: CLR_BRIGHT_CYAN },
-        { name: $c.lit("white"), color: CLR_WHITE },
+        { name: $c.lit("black"), color: CLR.BLACK },
+        { name: $c.lit("red"), color: CLR.RED },
+        { name: $c.lit("green"), color: CLR.GREEN },
+        { name: $c.lit("brown"), color: CLR.BROWN },
+        { name: $c.lit("blue"), color: CLR.BLUE },
+        { name: $c.lit("magenta"), color: CLR.MAGENTA },
+        { name: $c.lit("cyan"), color: CLR.CYAN },
+        { name: $c.lit("gray"), color: CLR.GRAY },
+        { name: $c.lit("orange"), color: CLR.ORANGE },
+        { name: $c.lit("light green"), color: CLR.BRIGHT_GREEN },
+        { name: $c.lit("yellow"), color: CLR.YELLOW },
+        { name: $c.lit("light blue"), color: CLR.BRIGHT_BLUE },
+        { name: $c.lit("light magenta"), color: CLR.BRIGHT_MAGENTA },
+        { name: $c.lit("light cyan"), color: CLR.BRIGHT_CYAN },
+        { name: $c.lit("white"), color: CLR.WHITE },
         { name: $c.lit("no color"), color: NO_COLOR },
         {},
         { name: $c.lit("transparent"), color: NO_COLOR },
-        { name: $c.lit("purple"), color: CLR_MAGENTA },
-        { name: $c.lit("light purple"), color: CLR_BRIGHT_MAGENTA },
-        { name: $c.lit("bright purple"), color: CLR_BRIGHT_MAGENTA },
-        { name: $c.lit("grey"), color: CLR_GRAY },
-        { name: $c.lit("bright red"), color: CLR_ORANGE },
-        { name: $c.lit("bright green"), color: CLR_BRIGHT_GREEN },
-        { name: $c.lit("bright blue"), color: CLR_BRIGHT_BLUE },
-        { name: $c.lit("bright magenta"), color: CLR_BRIGHT_MAGENTA },
-        { name: $c.lit("bright cyan"), color: CLR_BRIGHT_CYAN }
+        { name: $c.lit("purple"), color: CLR.MAGENTA },
+        { name: $c.lit("light purple"), color: CLR.BRIGHT_MAGENTA },
+        { name: $c.lit("bright purple"), color: CLR.BRIGHT_MAGENTA },
+        { name: $c.lit("grey"), color: CLR.GRAY },
+        { name: $c.lit("bright red"), color: CLR.ORANGE },
+        { name: $c.lit("bright green"), color: CLR.BRIGHT_GREEN },
+        { name: $c.lit("bright blue"), color: CLR.BRIGHT_BLUE },
+        { name: $c.lit("bright magenta"), color: CLR.BRIGHT_MAGENTA },
+        { name: $c.lit("bright cyan"), color: CLR.BRIGHT_CYAN }
     ]);
     for (let $i0 = 0; $i0 < 11; $i0++) {
         attrnames[$i0].$copyFrom(new $T.attr_names());
     }
     $c.init(attrnames, [
-        { name: $c.lit("none"), attr: ATR_NONE },
-        { name: $c.lit("bold"), attr: ATR_BOLD },
-        { name: $c.lit("dim"), attr: ATR_DIM },
-        { name: $c.lit("italic"), attr: ATR_ITALIC },
-        { name: $c.lit("underline"), attr: ATR_ULINE },
-        { name: $c.lit("blink"), attr: ATR_BLINK },
-        { name: $c.lit("inverse"), attr: ATR_INVERSE },
+        { name: $c.lit("none"), attr: ATR.NONE },
+        { name: $c.lit("bold"), attr: ATR.BOLD },
+        { name: $c.lit("dim"), attr: ATR.DIM },
+        { name: $c.lit("italic"), attr: ATR.ITALIC },
+        { name: $c.lit("underline"), attr: ATR.ULINE },
+        { name: $c.lit("blink"), attr: ATR.BLINK },
+        { name: $c.lit("inverse"), attr: ATR.INVERSE },
         {},
-        { name: $c.lit("normal"), attr: ATR_NONE },
-        { name: $c.lit("uline"), attr: ATR_ULINE },
-        { name: $c.lit("reverse"), attr: ATR_INVERSE }
+        { name: $c.lit("normal"), attr: ATR.NONE },
+        { name: $c.lit("uline"), attr: ATR.ULINE },
+        { name: $c.lit("reverse"), attr: ATR.INVERSE }
     ]);
     for (let $i0 = 0; $i0 < 155; $i0++) {
         colortable[$i0].$copyFrom(new $T.nethack_color());

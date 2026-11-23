@@ -4,14 +4,14 @@ import * as $T from './types.js';
 import { $G } from './globals.js';
 import { get_mleash, m_unleash, next_to_u } from './apply.js';
 import { exercise } from './attrib.js';
-import { A_STR, A_WIS } from './attrib.h.js';
+import { A } from './attrib.h.js';
 import { ACURR } from './attrib.macros.js';
 import { drag_ball, move_bc, placebc, unplacebc } from './ball.js';
 import { isok, yn_function } from './cmd.js';
 import { NO_COLOR } from './color.h.js';
 import { is_lava, is_pool, is_waterwall } from './dbridge.js';
 import { a11y, c_common_strings, cg, disp, flags, gc, gi, go, gs, gu, gv, gy, iflags, svd, svk, svl, svm, svn, svu, u, ynchars, ynqchars } from './decl.js';
-import { S_ANGEL, S_EEL, S_ELEMENTAL, S_HUMAN, S_MIMIC, S_VAMPIRE } from './defsym.h.js';
+import { S } from './defsym.h.js';
 import { buried_ball_to_punishment } from './dig.js';
 import { canseemon, docrt, newsym, nul_glyphinfo, see_monsters, sensemon, shieldeff } from './display.js';
 import { canspotmon } from './display.macros.js';
@@ -19,7 +19,7 @@ import { flooreffects, revive_corpse, schedule_goto } from './do.js';
 import { Amonnam, Monnam, mon_nam, noit_mon_nam } from './do_name.js';
 import { migrate_to_level } from './dog.js';
 import { In_W_tower, In_hell, In_mines, In_quest, Is_botlevel, On_W_tower_level, assign_level, depth, dunlevs_in_dungeon, find_hell, get_level, ledger_no, lev_by_name, on_level, print_dungeon, single_level_branch, surface, u_on_newpos } from './dungeon.js';
-import { LR_MONGEN, MIGR_PORTAL, MIGR_RANDOM } from './dungeon.h.js';
+import { LR, MIGR } from './dungeon.h.js';
 import { In_endgame, In_sokoban, In_tutorial, Inhell } from './dungeon.macros.js';
 import { morehungry } from './eat.js';
 import { done } from './end.js';
@@ -29,7 +29,7 @@ import { wizard } from './flag.macros.js';
 import { getpos } from './getpos.js';
 import { COLNO, FALSE, ROWNO, TRUE } from './global.h.js';
 import { check_capacity, check_special_room, in_rooms, invocation_message, may_passwall, near_capacity, nomul, notice_all_mons, spoteffects, switch_terrain, u_locomotion } from './hack.js';
-import { BOLT_LIM, CC_INCL_CENTER, CC_NO_FLAGS, CC_RING_PAIRS, CC_SKIP_INACCS, CC_SKIP_MONS, CC_UNSHUFFLED, DIED, ECMD_OK, ECMD_TIME, FORCETRAP, GP_ALLOW_U, GP_ALLOW_XY, GP_AVOID_MONPOS, GP_CHECKSCARY, MM_IGNORELAVA, MM_IGNOREWATER, NO_KILLER_PREFIX, NO_MM_FLAGS, NO_TRAP_FLAGS, RLOC_ERR, RLOC_MSG, RLOC_NOMSG, RLOC_NONE, SLT_ENCUMBER, TELEDS_ALLOW_DRAG, TELEDS_TELEPORT, VIASITTING } from './hack.h.js';
+import { BOLT_LIM, CC, CC_NO_FLAGS, CC_SKIP_INACCS, DIED, ECMD, FORCETRAP, GP, GP_ALLOW_XY, MM, NO, NO_KILLER_PREFIX, NO_TRAP_FLAGS, RLOC, SLT_ENCUMBER, TELEDS, VIASITTING } from './hack.h.js';
 import { distu, max, min, y_n } from './hack.macros.js';
 import { digit, dist2, distmin, eos } from './hacklib.js';
 import { addinv, prinv, sobj_at } from './invent.js';
@@ -41,14 +41,14 @@ import { SHOPBASE, TEMPLE, VAULT } from './mkroom.h.js';
 import { get_iter_mons, hideunder, m_in_air, m_into_limbo, maybe_unhide_at, set_ustuck, unstuck } from './mon.js';
 import { set_mon_data } from './mondata.js';
 import { amorphous, can_teleport, control_teleport, haseyes, is_covetous, is_dlord, is_dprince, is_rider, is_silent, is_swimmer, likes_lava, passes_walls, throws_rocks, unique_corpstat } from './mondata.macros.js';
-import { M1_AMPHIBIOUS, M1_FLY, M1_SWIM, NEUTRAL } from './monflag.h.js';
+import { M1, NEUTRAL } from './monflag.h.js';
 import { accessible, closed_door, dochugw, mon_track_clear, onscary, set_apparxy } from './monmove.js';
 import { mons } from './monst.js';
-import { M_AP_NOTHING } from './monst.h.js';
+import { M_AP } from './monst.h.js';
 import { DEADMONSTER, engulfing_u, mon_offmap } from './monst.macros.js';
-import { PM_FLOATING_EYE, PM_MINOTAUR, PM_WIZARD } from './monsters.h.js';
+import { PM } from './monsters.h.js';
 import { discover_object } from './o_init.js';
-import { OBJ_FREE } from './obj.h.js';
+import { OBJ } from './obj.h.js';
 import { carried } from './obj.macros.js';
 import { objects } from './objects.js';
 import { AMULET_OF_YENDOR, BOULDER, CORPSE, SCR_SCARE_MONSTER, SPE_TELEPORT_AWAY, WAN_TELEPORTATION } from './objects.h.js';
@@ -69,17 +69,17 @@ import { spe_Fresh, spe_Unknown } from './spell.h.js';
 import { place_monster } from './steed.js';
 import { settrack } from './track.js';
 import { clamp_hole_destination, deltrap, fill_pit, mintrap, reset_utrap, seetrap, t_at, unconscious } from './trap.js';
-import { HOLE, LEVEL_TELEP, MAGIC_PORTAL, NO_TRAP, TELEP_TRAP, TRAPDOOR, Trap_Effect_Finished, Trap_Moved_Mon, VIBRATING_SQUARE } from './trap.h.js';
+import { HOLE, LEVEL_TELEP, MAGIC_PORTAL, NO_TRAP, TELEP_TRAP, TRAPDOOR, Trap, VIBRATING_SQUARE } from './trap.h.js';
 import { is_hole, is_pit } from './trap.macros.js';
 import { findgd, uleftvault, vault_occupied } from './vault.js';
 import { vision_recalc } from './vision.js';
 import { couldsee } from './vision.macros.js';
 import { add_menu, getlin, select_menu } from './windows.js';
 import { create_nhwindow, destroy_nhwindow, display_nhwindow, end_menu, start_menu } from './winprocs.macros.js';
-import { ATR_NONE, MENU_BEHAVE_STANDARD, MENU_ITEMFLAGS_NONE, MENU_ITEMFLAGS_SELECTED, NHW_MENU, PICK_ONE } from './wintype.h.js';
+import { ATR, MENU, NHW, PICK } from './wintype.h.js';
 import { mon_has_amulet } from './wizard.js';
 import { place_worm_tail_randomly, remove_worm } from './worm.js';
-import { TT_BURIEDBALL, UTOTYPE_ATSTAIRS, UTOTYPE_NONE, UTOTYPE_PORTAL } from './you.h.js';
+import { TT, UTOTYPE } from './you.h.js';
 import { Upolyd, u_at } from './you.macros.js';
 import { Antimagic, Blind, Blinded, Fire_resistance, Hallucination, Levitation, Passes_walls, Punished, Teleport_control, Teleportation } from './youprop.macros.js';
 
@@ -111,10 +111,10 @@ export async function noteleport_level(mon) {   // teleport.c:30
     return FALSE;
 }
 function goodpos_onscary(x, y, mptr) {   // teleport.c:53
-    if (mptr.mlet === S_HUMAN || mptr.mlet === S_ANGEL || is_rider(mptr) || unique_corpstat(mptr)) {
+    if (mptr.mlet === S.HUMAN || mptr.mlet === S.ANGEL || is_rider(mptr) || unique_corpstat(mptr)) {
         return FALSE;
     }
-    if (svl.level.locations[x][y].typ === ALTAR && mptr.mlet === S_VAMPIRE) {
+    if (svl.level.locations[x][y].typ === ALTAR && mptr.mlet === S.VAMPIRE) {
         return TRUE;
     }
     if (sobj_at(SCR_SCARE_MONSTER, x, y)) {
@@ -123,7 +123,7 @@ function goodpos_onscary(x, y, mptr) {   // teleport.c:53
     if (Inhell() || In_endgame(u.uz)) {
         return FALSE;
     }
-    if ($c.peq(mptr, $c.relem(mons, PM_MINOTAUR)) || !haseyes(mptr)) {
+    if ($c.peq(mptr, $c.relem(mons, PM.MINOTAUR)) || !haseyes(mptr)) {
         return FALSE;
     }
     return $c.i8(sengr_at($c.lit("Elbereth"), x, y, TRUE) ? TRUE : FALSE);
@@ -131,11 +131,11 @@ function goodpos_onscary(x, y, mptr) {   // teleport.c:53
 export function goodpos(x, y, mtmp, gpflags) {   // teleport.c:86
     let mdat = null, ignorewater = 0, ignorelava = 0, checkscary = 0, allow_u = 0, avoid_monpos = 0, mtmp2 = null;
     mdat = null;
-    ignorewater = $c.i8($c.and64(gpflags, MM_IGNOREWATER) !== 0 ? 1 : 0);
-    ignorelava = $c.i8($c.and64(gpflags, MM_IGNORELAVA) !== 0 ? 1 : 0);
-    checkscary = $c.i8($c.and64(gpflags, GP_CHECKSCARY) !== 0 ? 1 : 0);
-    allow_u = $c.i8($c.and64(gpflags, GP_ALLOW_U) !== 0 ? 1 : 0);
-    avoid_monpos = $c.i8($c.and64(gpflags, GP_AVOID_MONPOS) !== 0 ? 1 : 0);
+    ignorewater = $c.i8($c.and64(gpflags, MM.IGNOREWATER) !== 0 ? 1 : 0);
+    ignorelava = $c.i8($c.and64(gpflags, MM.IGNORELAVA) !== 0 ? 1 : 0);
+    checkscary = $c.i8($c.and64(gpflags, GP.CHECKSCARY) !== 0 ? 1 : 0);
+    allow_u = $c.i8($c.and64(gpflags, GP.ALLOW_U) !== 0 ? 1 : 0);
+    avoid_monpos = $c.i8($c.and64(gpflags, GP.AVOID_MONPOS) !== 0 ? 1 : 0);
     if (!isok(x, y)) {
         return FALSE;
     }
@@ -155,17 +155,17 @@ export function goodpos(x, y, mtmp, gpflags) {   // teleport.c:86
         mdat = mtmp.data;
         if (is_pool(x, y) && !ignorewater) {
             if ($c.peq(mtmp, gy.youmonst)) {
-                return $c.i8(u.uprops[SWIMMING].intrinsic || u.uprops[SWIMMING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_SWIM) !== 0 || (u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1_AMPHIBIOUS) !== 0) || !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) && !is_waterwall(x, y) && (Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked || (u.uprops[WWALKING].intrinsic || u.uprops[WWALKING].extrinsic) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) ? 1 : 0);
+                return $c.i8(u.uprops[SWIMMING].intrinsic || u.uprops[SWIMMING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.SWIM) !== 0 || (u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.AMPHIBIOUS) !== 0) || !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) && !is_waterwall(x, y) && (Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked || (u.uprops[WWALKING].intrinsic || u.uprops[WWALKING].extrinsic) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) ? 1 : 0);
             } else {
                 return $c.i8(is_swimmer(mdat) || !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) && !is_waterwall(x, y) && m_in_air(mtmp) ? 1 : 0);
             }
-        } else if (mdat.mlet === S_EEL && rn2(13) && !ignorewater) {
+        } else if (mdat.mlet === S.EEL && rn2(13) && !ignorewater) {
             return FALSE;
         } else if (is_lava(x, y) && !ignorelava) {
-            if ($c.peq(mdat, $c.relem(mons, PM_FLOATING_EYE))) {
+            if ($c.peq(mdat, $c.relem(mons, PM.FLOATING_EYE))) {
                 return FALSE;
             } else if ($c.peq(mtmp, gy.youmonst)) {
-                return $c.i8(Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked || Fire_resistance() && ((u.uprops[WWALKING].intrinsic || u.uprops[WWALKING].extrinsic) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) && $G.uarmf && $G.uarmf.oerodeproof | 0 || Upolyd() && likes_lava(gy.youmonst.data) ? 1 : 0);
+                return $c.i8(Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked || Fire_resistance() && ((u.uprops[WWALKING].intrinsic || u.uprops[WWALKING].extrinsic) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) && $G.uarmf && $G.uarmf.oerodeproof | 0 || Upolyd() && likes_lava(gy.youmonst.data) ? 1 : 0);
             } else {
                 return $c.i8(m_in_air(mtmp) || likes_lava(mdat) ? 1 : 0);
             }
@@ -188,16 +188,16 @@ export function goodpos(x, y, mtmp, gpflags) {   // teleport.c:86
     if (sobj_at(BOULDER, x, y) && (!mdat || !throws_rocks(mdat))) {
         return FALSE;
     }
-    if (avoid_monpos && is_exclusion_zone(LR_MONGEN, x, y)) {
+    if (avoid_monpos && is_exclusion_zone(LR.MONGEN, x, y)) {
         return FALSE;
     }
     return TRUE;
 }
 export async function enexto(cc, xx, yy, mdat) {   // teleport.c:196
-    return $c.i8(await enexto_core(cc, xx, yy, mdat, GP_CHECKSCARY) || await enexto_core(cc, xx, yy, mdat, NO_MM_FLAGS) ? 1 : 0);
+    return $c.i8(await enexto_core(cc, xx, yy, mdat, GP.CHECKSCARY) || await enexto_core(cc, xx, yy, mdat, NO.MM_FLAGS) ? 1 : 0);
 }
 export async function enexto_gpflags(cc, xx, yy, mdat, entflags) {   // teleport.c:206
-    return $c.i8(await enexto_core(cc, xx, yy, mdat, $c.u32($c.or64(GP_CHECKSCARY, entflags))) || await enexto_core(cc, xx, yy, mdat, entflags) ? 1 : 0);
+    return $c.i8(await enexto_core(cc, xx, yy, mdat, $c.u32($c.or64(GP.CHECKSCARY, entflags))) || await enexto_core(cc, xx, yy, mdat, entflags) ? 1 : 0);
 }
 export async function enexto_core(cc, xx, yy, mdat, entflags) {   // teleport.c:219
     let candy = $c.recArray($T.nhcoord, 1659), i = 0, nearcandyct = 0, allcandyct = 0, fakemon = new $T.monst(), allow_xx_yy = 0, save_plnmsg = 0, save_plnmsg$2 = 0;
@@ -271,7 +271,7 @@ async function teleok(x, y, trapok) {   // teleport.c:420
             trapok = TRUE;
         } else if ((trap.ttyp | 0) === VIBRATING_SQUARE) {
             trapok = TRUE;
-        } else if ((is_pit(trap.ttyp) || is_hole(trap.ttyp)) && (Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked)) {
+        } else if ((is_pit(trap.ttyp) || is_hole(trap.ttyp)) && (Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked)) {
             trapok = TRUE;
         }
         if (!trapok) {
@@ -292,13 +292,13 @@ async function teleok(x, y, trapok) {   // teleport.c:420
 export async function teleds(nux, nuy, teleds_flags) {   // teleport.c:448
     let was_swallowed = 0, ball_active = 0, ball_still_in_range = 0, allow_drag = 0, is_teleport = 0, vault_guard = null, bc_control = Int32Array.of(0), ballx = Int16Array.of(0), bally = Int16Array.of(0), chainx = Int16Array.of(0), chainy = Int16Array.of(0), cause_delay = Int8Array.of(0), save_urooms = new Int8Array(5);
     ball_still_in_range = FALSE;
-    allow_drag = $c.i8((teleds_flags & TELEDS_ALLOW_DRAG) !== 0 ? 1 : 0);
-    is_teleport = $c.i8((teleds_flags & TELEDS_TELEPORT) !== 0 ? 1 : 0);
+    allow_drag = $c.i8((teleds_flags & TELEDS.ALLOW_DRAG) !== 0 ? 1 : 0);
+    is_teleport = $c.i8((teleds_flags & TELEDS.TELEPORT) !== 0 ? 1 : 0);
     vault_guard = vault_occupied(new $c.Ptr(u.urooms, 0)) ? await findgd() : null;
-    if (u.utraptype === TT_BURIEDBALL) {
+    if (u.utraptype === TT.BURIEDBALL) {
         await buried_ball_to_punishment();
     }
-    ball_active = $c.i8(Punished() && $G.uball.where !== OBJ_FREE ? 1 : 0);
+    ball_active = $c.i8(Punished() && $G.uball.where !== OBJ.FREE ? 1 : 0);
     if (!ball_active || near_capacity() > SLT_ENCUMBER || distmin(u.ux, u.uy, nux, nuy) > 1) {
         allow_drag = FALSE;
     }
@@ -314,8 +314,8 @@ export async function teleds(nux, nuy, teleds_flags) {   // teleport.c:448
     await set_ustuck(null);
     u.ux0 = u.ux;
     u.uy0 = u.uy;
-    if (!await hideunder(gy.youmonst) && gy.youmonst.data.mlet === S_MIMIC) {
-        gy.youmonst.m_ap_type = M_AP_NOTHING;
+    if (!await hideunder(gy.youmonst) && gy.youmonst.data.mlet === S.MIMIC) {
+        gy.youmonst.m_ap_type = M_AP.NOTHING;
     }
     if (was_swallowed) {
         if (Punished()) {
@@ -328,7 +328,7 @@ export async function teleds(nux, nuy, teleds_flags) {   // teleport.c:448
         if (await drag_ball(nux, nuy, new $c.Ptr(bc_control, 0), new $c.Ptr(ballx, 0), new $c.Ptr(bally, 0), new $c.Ptr(chainx, 0), new $c.Ptr(chainy, 0), new $c.Ptr(cause_delay, 0), allow_drag)) {
             await move_bc(0, bc_control[0], ballx[0], bally[0], chainx[0], chainy[0]);
         } else {
-            ball_active = $c.i8(Punished() && $G.uball.where !== OBJ_FREE ? 1 : 0);
+            ball_active = $c.i8(Punished() && $G.uball.where !== OBJ.FREE ? 1 : 0);
             if (ball_active) {
                 await unplacebc();
             }
@@ -336,7 +336,7 @@ export async function teleds(nux, nuy, teleds_flags) {   // teleport.c:448
     }
     await u_on_newpos(nux, nuy);
     await fill_pit(u.ux0, u.uy0);
-    if (ball_active && $G.uchain && $G.uchain.where === OBJ_FREE) {
+    if (ball_active && $G.uchain && $G.uchain.where === OBJ.FREE) {
         await placebc();
     }
     update_player_regions();
@@ -377,10 +377,10 @@ export async function collect_coords(ccc, cx, cy, maxradius, cc_flags, filter) {
     let x = 0, y = 0, lox = 0, hix = 0, loy = 0, hiy = 0, radius = 0, rowrange = 0, colrange = 0, k = 0, n = 0, cc = new $T.nhcoord(), passcc = null, newpass = 0, passend = 0, include_cxcy = 0, scramble = 0, ring_pairs = 0, skip_mons = 0, skip_inaccessible = 0, result = 0, save_plnmsg = 0, $t1;
     n = 0;
     passcc = null;
-    include_cxcy = $c.i8((cc_flags & CC_INCL_CENTER) >>> 0 !== 0 ? 1 : 0);
-    scramble = $c.i8((cc_flags & CC_UNSHUFFLED) >>> 0 === 0 ? 1 : 0);
-    ring_pairs = $c.i8(scramble && (cc_flags & CC_RING_PAIRS) >>> 0 !== 0 ? 1 : 0);
-    skip_mons = $c.i8((cc_flags & CC_SKIP_MONS) >>> 0 !== 0 ? 1 : 0);
+    include_cxcy = $c.i8((cc_flags & CC.INCL_CENTER) >>> 0 !== 0 ? 1 : 0);
+    scramble = $c.i8((cc_flags & CC.UNSHUFFLED) >>> 0 === 0 ? 1 : 0);
+    ring_pairs = $c.i8(scramble && (cc_flags & CC.RING_PAIRS) >>> 0 !== 0 ? 1 : 0);
+    skip_mons = $c.i8((cc_flags & CC.SKIP_MONS) >>> 0 !== 0 ? 1 : 0);
     skip_inaccessible = $c.i8((cc_flags & CC_SKIP_INACCS) >>> 0 !== 0 ? 1 : 0);
     result = 0;
     rowrange = cy < 10 ? ROWNO - 1 - cy | 0 : cy;
@@ -459,7 +459,7 @@ export async function safe_teleds(teleds_flags) {   // teleport.c:717
             return TRUE;
         }
     }
-    cc_flags = CC_RING_PAIRS | CC_SKIP_MONS;
+    cc_flags = CC.RING_PAIRS | CC.SKIP_MONS;
     if (!Passes_walls()) {
         cc_flags = (cc_flags | CC_SKIP_INACCS) >>> 0;
     }
@@ -485,7 +485,7 @@ async function vault_tele() {   // teleport.c:773
     let croom = null, c = new $T.nhcoord();
     croom = search_special(VAULT);
     if (croom && somexyspace(croom, c) && await teleok(c.x, c.y, FALSE)) {
-        await teleds(c.x, c.y, TELEDS_TELEPORT);
+        await teleds(c.x, c.y, TELEDS.TELEPORT);
         return;
     }
     await tele();
@@ -547,7 +547,7 @@ export async function tele_to_rnd_pet() {   // teleport.c:814
         tx = $c.i16((pet.mx + rn2(3) | 0) - 1 | 0);
         ty = $c.i16((pet.my + rn2(3) | 0) - 1 | 0);
         if (isok(tx, ty) && await teleok(tx, ty, FALSE)) {
-            await teleds(tx, ty, TELEDS_TELEPORT);
+            await teleds(tx, ty, TELEDS.TELEPORT);
         }
     }
 }
@@ -593,7 +593,7 @@ export async function scrolltele(scroll) {   // teleport.c:849
                 return;
             }
             if (await teleok(cc.x, cc.y, FALSE)) {
-                await teleds(cc.x, cc.y, TELEDS_TELEPORT);
+                await teleds(cc.x, cc.y, TELEDS.TELEPORT);
                 if (iflags.travelcc.x === u.ux && iflags.travelcc.y === u.uy) {
                     $t1 = iflags.travelcc.y = 0, iflags.travelcc.x = $t1;
                 }
@@ -605,13 +605,13 @@ export async function scrolltele(scroll) {   // teleport.c:849
     if (scroll) {
         await learnscroll(scroll);
     }
-    await safe_teleds(TELEDS_TELEPORT);
+    await safe_teleds(TELEDS.TELEPORT);
 }
 export async function dotelecmd() {   // teleport.c:919
     let save_HTele = 0, save_ETele = 0, res = 0, added = 0, hidden = 0, ignore_restrictions = 0, picks = [null], any = new $T.any(), win = 0, i = 0, tmode = 0, clr = 0, $t1, $t2;
     ignore_restrictions = FALSE;
     if (!wizard()) {
-        return await dotele(FALSE) ? ECMD_TIME : ECMD_OK;
+        return await dotele(FALSE) ? ECMD.TIME : ECMD.OK;
     }
     added = hidden = NOOP_SPELL;
     save_HTele = u.uprops[TELEPORT].intrinsic, save_ETele = u.uprops[TELEPORT].extrinsic;
@@ -620,15 +620,15 @@ export async function dotelecmd() {   // teleport.c:919
     } else {
         picks[0] = null;
         clr = NO_COLOR;
-        win = await create_nhwindow()(NHW_MENU);
-        await start_menu()(win, MENU_BEHAVE_STANDARD);
+        win = await create_nhwindow()(NHW.MENU);
+        await start_menu()(win, MENU.BEHAVE_STANDARD);
         any.$copyFrom(cg.zeroany);
         for (i = 0; i < 4; i = i + 1 | 0) {
             any.a_int = dotelecmd$tports[i].menulet;
-            await add_menu(win, nul_glyphinfo, any, $c.i8(any.a_int), 0, ATR_NONE, clr, dotelecmd$tports[i].menudesc, dotelecmd$tports[i].menulet === 119 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+            await add_menu(win, nul_glyphinfo, any, $c.i8(any.a_int), 0, ATR.NONE, clr, dotelecmd$tports[i].menudesc, dotelecmd$tports[i].menulet === 119 ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
         }
         await end_menu()(win, $c.lit("Which way do you want to teleport?"));
-        i = await select_menu(win, PICK_ONE, new $c.Ptr(picks, 0));
+        i = await select_menu(win, PICK.ONE, new $c.Ptr(picks, 0));
         await destroy_nhwindow()(win);
         if (i > 0) {
             tmode = $c.radd(picks[0], 0).item.a_int;
@@ -639,7 +639,7 @@ export async function dotelecmd() {   // teleport.c:919
         } else if (i === 0) {
             tmode = 119;
         } else {
-            return ECMD_OK;
+            return ECMD.OK;
         }
         switch (tmode) {
             case 110:
@@ -665,7 +665,7 @@ export async function dotelecmd() {   // teleport.c:919
     if (added !== NOOP_SPELL || hidden !== NOOP_SPELL) {
         await tport_spell((added + hidden | 0) - NOOP_SPELL | 0);
     }
-    return res ? ECMD_TIME : ECMD_OK;
+    return res ? ECMD.TIME : ECMD.OK;
 }
 export async function dotele(break_the_rules) {   // teleport.c:1034
     let trap = null, cantdoit = null, trap_once = 0, castit = 0, energy = 0, knownsp = 0, $t1;
@@ -703,7 +703,7 @@ export async function dotele(break_the_rules) {   // teleport.c:1034
     if (!trap && !break_the_rules) {
         castit = FALSE;
         energy = 0;
-        if (!Teleportation() || u.ulevel < (gu.urole.mnum === PM_WIZARD ? 8 : 12) && !can_teleport(gy.youmonst.data)) {
+        if (!Teleportation() || u.ulevel < (gu.urole.mnum === PM.WIZARD ? 8 : 12) && !can_teleport(gy.youmonst.data)) {
             knownsp = known_spell(SPE_TELEPORT_AWAY);
             castit = $c.i8(knownsp >= spe_Fresh && !u.uprops[CONFUSION].intrinsic ? 1 : 0);
             if (!castit && !break_the_rules) {
@@ -715,7 +715,7 @@ export async function dotele(break_the_rules) {   // teleport.c:1034
         energy = Math.imul(5, spellev(SPE_TELEPORT_AWAY));
         if (u.uhunger <= 10) {
             cantdoit = $c.lit("are too weak from hunger");
-        } else if (ACURR(A_STR) < 4) {
+        } else if (ACURR(A.STR) < 4) {
             cantdoit = $c.lit("lack the strength");
         } else if (energy > u.uen) {
             cantdoit = $c.lit("lack the energy");
@@ -727,8 +727,8 @@ export async function dotele(break_the_rules) {   // teleport.c:1034
             return 1;
         }
         if (castit) {
-            await exercise(A_WIS, TRUE);
-            if (await spelleffects(SPE_TELEPORT_AWAY, TRUE, FALSE) & ECMD_TIME) {
+            await exercise(A.WIS, TRUE);
+            if (await spelleffects(SPE_TELEPORT_AWAY, TRUE, FALSE) & ECMD.TIME) {
                 return 1;
             } else if (!break_the_rules) {
                 return 0;
@@ -742,7 +742,7 @@ export async function dotele(break_the_rules) {   // teleport.c:1034
         if (trap && trap_once) {
             await vault_tele();
         } else if (trap && isok(trap.launch.x, trap.launch.y)) {
-            await teleds(trap.launch.x, trap.launch.y, TELEDS_TELEPORT);
+            await teleds(trap.launch.x, trap.launch.y, TELEDS.TELEPORT);
         } else {
             $t1 = iflags.travelcc.y = 0, iflags.travelcc.x = $t1;
             await tele();
@@ -770,7 +770,7 @@ export async function level_tele() {   // teleport.c:1165
                 } while (newlevel.dnum === svd.dungeon_topology.d_astral_level.dnum || svd.dungeons[newlevel.dnum].flags.unconnected | 0 || !svd.dungeons[newlevel.dnum].num_dunlevs);
                 $t2 = $c.i16(1 + rn2(dunlevs_in_dungeon(newlevel)) | 0), newlevel.dlevel = $t2;
                 assign_level(u.ucamefrom, u.uz);
-                await schedule_goto(newlevel, UTOTYPE_NONE, null, null);
+                await schedule_goto(newlevel, UTOTYPE.NONE, null, null);
                 return;
             }
             if ((u.uhave.amulet | 0 || In_endgame(u.uz) || In_sokoban(u.uz)) && !wizard()) {
@@ -875,7 +875,7 @@ export async function level_tele() {   // teleport.c:1165
                     return;
                 }
             }
-            if (u.utrap && u.utraptype === TT_BURIEDBALL) {
+            if (u.utrap && u.utraptype === TT.BURIEDBALL) {
                 await buried_ball_to_punishment();
             }
             if (!await next_to_u() && !force_dest) {
@@ -890,7 +890,7 @@ export async function level_tele() {   // teleport.c:1165
                 }
                 newlevel.dnum = u.uz.dnum;
                 newlevel.dlevel = $c.i16(llimit + newlev | 0);
-                await schedule_goto(newlevel, UTOTYPE_NONE, null, null);
+                await schedule_goto(newlevel, UTOTYPE.NONE, null, null);
                 return;
             }
             svk.killer.name[0] = 0;
@@ -919,7 +919,7 @@ export async function level_tele() {   // teleport.c:1165
                 if (svk.killer.name[0]) {
                 } else if (Levitation()) {
                     escape_by_flying = $c.lit("float gently down to earth");
-                } else if ((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked) {
+                } else if ((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) {
                     escape_by_flying = $c.lit("fly down to the ground");
                 } else {
                     await pline($c.lit("Unfortunately, you don't know how to fly."));
@@ -959,7 +959,7 @@ export async function level_tele() {   // teleport.c:1165
                     return;
                 }
             }
-            await schedule_goto(newlevel, UTOTYPE_NONE, null, flags.verbose ? $c.lit("You materialize on a different level!") : null);
+            await schedule_goto(newlevel, UTOTYPE.NONE, null, flags.verbose ? $c.lit("You materialize on a different level!") : null);
         }
         break;
     }
@@ -967,7 +967,7 @@ export async function level_tele() {   // teleport.c:1165
 export async function domagicportal(ttmp) {   // teleport.c:1444
     let target_level = new $T.d_level(), totype = 0, stunmsg = null;
     stunmsg = null;
-    if (u.utrap && u.utraptype === TT_BURIEDBALL) {
+    if (u.utrap && u.utraptype === TT.BURIEDBALL) {
         await buried_ball_to_punishment();
     }
     if (!await next_to_u()) {
@@ -984,10 +984,10 @@ export async function domagicportal(ttmp) {   // teleport.c:1444
     }
     target_level.$copyFrom(ttmp.dst);
     if (In_tutorial(u.uz) && !In_tutorial(target_level)) {
-        totype = UTOTYPE_ATSTAIRS;
+        totype = UTOTYPE.ATSTAIRS;
         stunmsg = $c.lit("Resuming regular play.");
     } else {
-        totype = UTOTYPE_PORTAL;
+        totype = UTOTYPE.PORTAL;
         stunmsg = !u.uprops[STUNNED].intrinsic ? $c.lit("You feel slightly dizzy.") : $c.lit("You feel dizzier.");
         await make_stunned($c.add64($c.and64(u.uprops[STUNNED].intrinsic, TIMEOUT), 3), FALSE);
     }
@@ -1022,7 +1022,7 @@ export async function tele_trap(trap) {   // teleport.c:1492
             }
         }
         if (!mtmp) {
-            await teleds(trap.launch.x, trap.launch.y, TELEDS_TELEPORT);
+            await teleds(trap.launch.x, trap.launch.y, TELEDS.TELEPORT);
         }
     } else {
         await tele();
@@ -1060,7 +1060,7 @@ export async function level_tele_trap(trap, trflags) {   // teleport.c:1538
 }
 function rloc_pos_ok(x, y, mtmp) {   // teleport.c:1575
     let xx = 0, yy = 0;
-    if (!goodpos(x, y, mtmp, GP_CHECKSCARY)) {
+    if (!goodpos(x, y, mtmp, GP.CHECKSCARY)) {
         return FALSE;
     }
     xx = mtmp.mx;
@@ -1096,8 +1096,8 @@ async function rloc_to_core(mtmp, x, y, rlocflags) {   // teleport.c:1645
     oldx = mtmp.mx;
     oldy = mtmp.my;
     resident_shk = $c.i8(mtmp.isshk | 0 && inhishop(mtmp) ? 1 : 0);
-    preventmsg = $c.i8((rlocflags & RLOC_NOMSG) >>> 0 !== 0 ? 1 : 0);
-    vanishmsg = $c.i8((rlocflags & RLOC_MSG) >>> 0 !== 0 ? 1 : 0);
+    preventmsg = $c.i8((rlocflags & RLOC.NOMSG) >>> 0 !== 0 ? 1 : 0);
+    vanishmsg = $c.i8((rlocflags & RLOC.MSG) >>> 0 !== 0 ? 1 : 0);
     appearmsg = $c.i8($c.andu64(mtmp.mstrategy, 2147483648) !== 0 ? 1 : 0);
     domsg = $c.i8(!gi.in_mklev && (vanishmsg || appearmsg) && !preventmsg ? 1 : 0);
     telemsg = FALSE;
@@ -1177,7 +1177,7 @@ async function rloc_to_core(mtmp, x, y, rlocflags) {   // teleport.c:1645
     }
 }
 export async function rloc_to(mtmp, x, y) {   // teleport.c:1771
-    await rloc_to_core(mtmp, x, y, RLOC_NOMSG);
+    await rloc_to_core(mtmp, x, y, RLOC.NOMSG);
 }
 export async function rloc_to_flag(mtmp, x, y, rlocflags) {   // teleport.c:1777
     await rloc_to_core(mtmp, x, y, rlocflags);
@@ -1207,7 +1207,7 @@ export async function rloc(mtmp, rlocflags) {   // teleport.c:1799
             }
             x = $c.i16(stway ? stway.sx : 0);
             y = $c.i16(stway ? stway.sy : 0);
-            if (goodpos(x, y, mtmp, NO_MM_FLAGS)) {
+            if (goodpos(x, y, mtmp, NO.MM_FLAGS)) {
                 break found_xy$;
             }
         }
@@ -1225,7 +1225,7 @@ export async function rloc(mtmp, rlocflags) {   // teleport.c:1799
                 break found_xy$;
             }
         }
-        cc_flags = CC_INCL_CENTER | CC_UNSHUFFLED | CC_SKIP_MONS;
+        cc_flags = CC.INCL_CENTER | CC.UNSHUFFLED | CC.SKIP_MONS;
         if (!passes_walls(mtmp.data)) {
             cc_flags = (cc_flags | CC_SKIP_INACCS) >>> 0;
         }
@@ -1241,12 +1241,12 @@ export async function rloc(mtmp, rlocflags) {   // teleport.c:1799
             if (rloc_pos_ok(x, y, mtmp)) {
                 break found_xy$;
             }
-            if (!backupcc.x && goodpos(x, y, mtmp, NO_MM_FLAGS)) {
+            if (!backupcc.x && goodpos(x, y, mtmp, NO.MM_FLAGS)) {
                 backupcc.x = x, backupcc.y = y;
             }
         }
         if (!backupcc.x) {
-            if ((rlocflags & RLOC_ERR) >>> 0 !== 0) {
+            if ((rlocflags & RLOC.ERR) >>> 0 !== 0) {
                 await impossible($c.lit("rloc(): couldn't relocate monster"));
             }
             return FALSE;
@@ -1290,7 +1290,7 @@ async function mvault_tele(mtmp) {   // teleport.c:1937
         await rloc_to(mtmp, c.x, c.y);
         return;
     }
-    await rloc(mtmp, RLOC_NONE);
+    await rloc(mtmp, RLOC.NONE);
 }
 export async function tele_restrict(mon) {   // teleport.c:1950
     if (await noteleport_level(mon)) {
@@ -1312,10 +1312,10 @@ export async function mtele_trap(mtmp, trap, in_sight) {   // teleport.c:1962
             await mvault_tele(mtmp);
         } else if (isok(trap.launch.x, trap.launch.y)) {
             if (!(m_at(trap.launch.x, trap.launch.y) || trap.launch.x === u.ux && trap.launch.y === u.uy)) {
-                await rloc_to_core(mtmp, trap.launch.x, trap.launch.y, RLOC_MSG);
+                await rloc_to_core(mtmp, trap.launch.x, trap.launch.y, RLOC.MSG);
             }
         } else {
-            await rloc(mtmp, RLOC_NONE);
+            await rloc(mtmp, RLOC.NONE);
         }
         if (in_sight) {
             if (canseemon(mtmp)) {
@@ -1331,10 +1331,10 @@ export async function mlevel_tele_trap(mtmp, trap, force_it, in_sight) {   // te
     let tt = 0, tolevel = new $T.d_level(), migrate_typ = 0, nlev = 0;
     tt = trap ? trap.ttyp | 0 : NO_TRAP;
     if ($c.peq(mtmp, u.ustuck)) {
-        return Trap_Effect_Finished;
+        return Trap.Effect_Finished;
     }
     if (await teleport_pet(mtmp, force_it)) {
-        migrate_typ = MIGR_RANDOM;
+        migrate_typ = MIGR.RANDOM;
         if ((tt === HOLE || tt === TRAPDOOR)) {
             if ((svd.dungeon_topology.d_stronghold_level.dlevel || svd.dungeon_topology.d_stronghold_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_stronghold_level)) {
                 assign_level(tolevel, svd.dungeon_topology.d_valley_level);
@@ -1342,28 +1342,28 @@ export async function mlevel_tele_trap(mtmp, trap, force_it, in_sight) {   // te
                 if (in_sight && trap.tseen | 0) {
                     await pline_mon(mtmp, $c.lit("%s avoids the %s."), await Monnam(mtmp), tt === HOLE ? $c.lit("hole") : $c.lit("trap"));
                 }
-                return Trap_Effect_Finished;
+                return Trap.Effect_Finished;
             } else {
                 assign_level(tolevel, trap.dst);
                 clamp_hole_destination(tolevel);
             }
         } else if (tt === MAGIC_PORTAL) {
             if (In_endgame(u.uz) && (mon_has_amulet(mtmp) || is_home_elemental(mtmp.data) || rn2(7))) {
-                if (in_sight && mtmp.data.mlet !== S_ELEMENTAL) {
+                if (in_sight && mtmp.data.mlet !== S.ELEMENTAL) {
                     await pline_mon(mtmp, $c.lit("%s seems to shimmer for a moment."), await Monnam(mtmp));
                     await seetrap(trap);
                 }
-                return Trap_Effect_Finished;
+                return Trap.Effect_Finished;
             } else {
                 assign_level(tolevel, trap.dst);
-                migrate_typ = MIGR_PORTAL;
+                migrate_typ = MIGR.PORTAL;
             }
         } else if (tt === LEVEL_TELEP || tt === NO_TRAP) {
             if (mon_has_amulet(mtmp) || In_endgame(u.uz) || tt === NO_TRAP && onscary(0, 0, mtmp)) {
                 if (in_sight) {
                     await pline_mon(mtmp, $c.lit("%s seems very disoriented for a moment."), await Monnam(mtmp));
                 }
-                return Trap_Effect_Finished;
+                return Trap.Effect_Finished;
             }
             if (tt === NO_TRAP) {
                 assign_level(tolevel, u.uz);
@@ -1373,13 +1373,13 @@ export async function mlevel_tele_trap(mtmp, trap, force_it, in_sight) {   // te
                     if (in_sight) {
                         await pline_mon(mtmp, $c.lit("%s shudders for a moment."), await Monnam(mtmp));
                     }
-                    return Trap_Effect_Finished;
+                    return Trap.Effect_Finished;
                 }
                 await get_level(tolevel, nlev);
             }
         } else {
             await impossible($c.lit("mlevel_tele_trap: unexpected trap type (%d)"), tt);
-            return Trap_Effect_Finished;
+            return Trap.Effect_Finished;
         }
         if (in_sight) {
             await pline_mon(mtmp, $c.lit("Suddenly, %s %s."), await mon_nam(mtmp), tt === HOLE ? $c.lit("falls into a hole") : tt === TRAPDOOR ? $c.lit("falls through a trap door") : $c.lit("disappears out of sight"));
@@ -1391,9 +1391,9 @@ export async function mlevel_tele_trap(mtmp, trap, force_it, in_sight) {   // te
             mtmp.mconf = (1) & 1;
         }
         await migrate_to_level(mtmp, ledger_no(tolevel), $c.i16(migrate_typ), null);
-        return Trap_Moved_Mon;
+        return Trap.Moved_Mon;
     }
-    return Trap_Effect_Finished;
+    return Trap.Effect_Finished;
 }
 export async function rloco(obj) {   // teleport.c:2102
     let tx = 0, ty = 0, otx = 0, oty = 0, restricted_fall = 0, try_limit = 0, shkp = null, objinshop = 0, onboundary = 0, h = 0, oo = 0, hinshop = 0;
@@ -1505,13 +1505,13 @@ export async function u_teleport_mon(mtmp, give_feedback) {   // teleport.c:2263
             await You($c.lit("are no longer inside %s!"), await mon_nam(mtmp));
         }
         await unstuck(mtmp);
-        if (!await rloc(mtmp, RLOC_MSG)) {
+        if (!await rloc(mtmp, RLOC.MSG)) {
             await m_into_limbo(mtmp);
         }
     } else if ((is_rider(mtmp.data) || control_teleport(mtmp.data)) && rn2(13) && await enexto(cc, u.ux, u.uy, mtmp.data)) {
         await rloc_to(mtmp, cc.x, cc.y);
     } else {
-        if (!await rloc(mtmp, RLOC_MSG)) {
+        if (!await rloc(mtmp, RLOC.MSG)) {
             return FALSE;
         }
     }

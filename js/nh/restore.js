@@ -15,14 +15,14 @@ import { gm_levelchange } from './display.h.js';
 import { new_mgivenname, new_oname } from './do_name.js';
 import { mon_catchup_elapsed_time, newedog } from './dog.js';
 import { Is_branchlev, assign_level, ledger_no, load_exclusions, on_level, restore_dungeon } from './dungeon.js';
-import { BR_NO_END1, BR_NO_END2, BR_PORTAL, BR_STAIR } from './dungeon.h.js';
+import { BR, BR_NO_END1, BR_NO_END2 } from './dungeon.h.js';
 import { done, panic, restore_killers } from './end.js';
 import { rest_engravings } from './engrave.js';
 import { close_nhfile, create_levelfile, debugcore, delete_savefile, free_saved_games, get_freeing_nhfile, get_saved_games, rewind_nhfile } from './files.js';
 import { discover, wizard } from './flag.macros.js';
 import { BUFSZ, COLNO, FALSE, PL_NSIZ_PLUS, ROWNO, TRUE } from './global.h.js';
 import { check_special_room } from './hack.js';
-import { CONVERTING, DEFUNCT_MONSTER, FREEING, NHF_BONESFILE, REST_CURRENT_LEVEL, REST_GSTATE, REST_LEVELS, TRICKED, UNCONVERTING, WRITING } from './hack.h.js';
+import { CONVERTING, DEFUNCT_MONSTER, FREEING, NHF, REST, TRICKED, UNCONVERTING, WRITING } from './hack.h.js';
 import { pline1 } from './hack.macros.js';
 import { eos, sgn } from './hacklib.js';
 import { useup } from './invent.js';
@@ -38,7 +38,7 @@ import { mons } from './monst.js';
 import { MON_NOWEP, ismnum, newmonst } from './monst.macros.js';
 import { restore_luadata } from './nhlua.js';
 import { init_oclass_probs, restnames } from './o_init.js';
-import { OBJ_FREE } from './obj.h.js';
+import { OBJ } from './obj.h.js';
 import { Has_contents, age_is_relative, has_omid, has_omonst, newobj } from './obj.macros.js';
 import { MAXSPELL } from './objclass.h.js';
 import { dealloc_fruit, newfruit } from './objclass.macros.js';
@@ -49,7 +49,7 @@ import { NON_PM, NUMMONS } from './permonst.h.js';
 import { You, gamelog_add, impossible, pline } from './pline.js';
 import { set_uasmon } from './polyself.js';
 import { newepri, restpriest } from './priest.js';
-import { W_BALL, W_CHAIN, W_WEP } from './prop.h.js';
+import { W } from './prop.h.js';
 import { rest_regions } from './region.js';
 import { STAIRS } from './rm.h.js';
 import { rnd } from './rnd.js';
@@ -66,7 +66,7 @@ import { ROGUESET } from './sym.h.js';
 import { assign_graphics } from './symbols.js';
 import { sysopt } from './sys.js';
 import { relink_timers, restore_timers, run_timers } from './timeout.js';
-import { RANGE_GLOBAL, RANGE_LEVEL } from './timeout.h.js';
+import { RANGE } from './timeout.h.js';
 import { rest_track } from './track.js';
 import { deltrap } from './trap.js';
 import { MAGIC_PORTAL } from './trap.h.js';
@@ -77,7 +77,7 @@ import { vision_reset } from './vision.js';
 import { setuwep } from './wield.js';
 import { add_menu, add_menu_str, select_menu } from './windows.js';
 import { clear_nhwindow, cliparound, create_nhwindow, destroy_nhwindow, display_nhwindow, end_menu, putmsghistory, putstr, start_menu, wait_synch } from './winprocs.macros.js';
-import { ATR_NONE, MENU_BEHAVE_STANDARD, MENU_ITEMFLAGS_NONE, MENU_ITEMFLAGS_SELECTED, MENU_ITEMFLAGS_SKIPMENUCOLORS, NHW_MENU, PICK_ONE, WIN_ERR } from './wintype.h.js';
+import { ATR, MENU, NHW, PICK, WIN_ERR } from './wintype.h.js';
 import { place_wsegs, rest_worm } from './worm.js';
 import { setworn } from './worn.js';
 import { Upolyd } from './you.macros.js';
@@ -95,14 +95,14 @@ async function find_lev_obj() {   // restore.c:71
     while ((otmp = svl.level.objlist) !== null) {
         svl.level.objlist = otmp.nobj;
         otmp.nobj = fobjtmp;
-        otmp.where = OBJ_FREE;
+        otmp.where = OBJ.FREE;
         fobjtmp = otmp;
     }
     while ((otmp = fobjtmp) !== null) {
         fobjtmp = otmp.nobj;
         await place_object(otmp, otmp.ox, otmp.oy);
         if (u.uz.dlevel) {
-            if ($c.and64(otmp.owornmask, W_BALL | W_CHAIN)) {
+            if ($c.and64(otmp.owornmask, W.BALL | W.CHAIN)) {
                 await setworn(otmp, otmp.owornmask);
             }
         }
@@ -141,7 +141,7 @@ async function restlevchn(nhfp) {   // restore.c:130
 async function restdamage(nhfp) {   // restore.c:153
     let dmgcount = Uint32Array.of(0), counter = 0, tmp_dam = null, ghostly = 0;
     dmgcount[0] = 0;
-    ghostly = $c.i8(nhfp.ftype === NHF_BONESFILE ? 1 : 0);
+    ghostly = $c.i8(nhfp.ftype === NHF.BONESFILE ? 1 : 0);
     await sfi_unsigned(nhfp, new $c.Ptr(dmgcount, 0), $c.lit("damage-damage_count"));
     counter = dmgcount[0] | 0;
     if (!counter) {
@@ -193,7 +193,7 @@ async function restobjchn(nhfp, frozen) {   // restore.c:231
     otmp2 = null;
     first = null;
     buflen[0] = 0;
-    ghostly = $c.i8(nhfp.ftype === NHF_BONESFILE ? 1 : 0);
+    ghostly = $c.i8(nhfp.ftype === NHF.BONESFILE ? 1 : 0);
     while (1) {
         await sfi_int(nhfp, new $c.Ptr(buflen, 0), $c.lit("obj-obj_length"));
         if (buflen[0] === -1) {
@@ -303,7 +303,7 @@ async function restmonchn(nhfp) {   // restore.c:376
     mtmp2 = null;
     first = null;
     buflen[0] = 0;
-    ghostly = $c.i8(nhfp.ftype === NHF_BONESFILE ? 1 : 0);
+    ghostly = $c.i8(nhfp.ftype === NHF.BONESFILE ? 1 : 0);
     while (1) {
         await sfi_int(nhfp, new $c.Ptr(buflen, 0), $c.lit("monst-monst_length"));
         if (buflen[0] === -1) {
@@ -338,7 +338,7 @@ async function restmonchn(nhfp) {   // restore.c:376
         }
         if (mtmp.mw) {
             for (obj$2 = mtmp.minvent; obj$2; obj$2 = obj$2.nobj) {
-                if ($c.and64(obj$2.owornmask, W_WEP)) {
+                if ($c.and64(obj$2.owornmask, W.WEP)) {
                     break;
                 }
             }
@@ -472,7 +472,7 @@ async function restgamestate(nhfp) {   // restore.c:525
     }
     assign_level(u.uz0, u.uz);
     await restore_killers(nhfp);
-    await restore_timers(nhfp, RANGE_GLOBAL, 0);
+    await restore_timers(nhfp, RANGE.GLOBAL, 0);
     await restore_light_sources(nhfp);
     $t5 = await restobjchn(nhfp, FALSE), gi.invent = $t5;
     bc_obj = await restobjchn(nhfp, FALSE);
@@ -544,7 +544,7 @@ async function restlevelfile(ltmp) {   // restore.c:755
 export async function dorecover(nhfp) {   // restore.c:789
     let ltmp = Int8Array.of(0), rtmp = 0, tnhfp = null, $t1, $t2;
     ltmp[0] = 0;
-    program_state.restoring = REST_GSTATE;
+    program_state.restoring = REST.GSTATE;
     await get_plname_from_file(nhfp, new $c.Ptr(svp.plname, 0), TRUE);
     await getlev(nhfp, 0, 0);
     if (!await restgamestate(nhfp)) {
@@ -565,7 +565,7 @@ export async function dorecover(nhfp) {   // restore.c:789
     if (rtmp < 2) {
         return rtmp;
     }
-    program_state.restoring = REST_LEVELS;
+    program_state.restoring = REST.LEVELS;
     u.ustuck = null;
     u.usteed = null;
     restoreinfo.mread_flags = 1;
@@ -584,7 +584,7 @@ export async function dorecover(nhfp) {   // restore.c:789
     rewind_nhfile(nhfp);
     await validate(nhfp, null, FALSE);
     await get_plname_from_file(nhfp, new $c.Ptr(svp.plname, 0), TRUE);
-    program_state.restoring = REST_CURRENT_LEVEL;
+    program_state.restoring = REST.CURRENT_LEVEL;
     await getlev(nhfp, 0, 0);
     await close_nhfile(nhfp);
     restlevelstate();
@@ -599,8 +599,8 @@ export async function dorecover(nhfp) {   // restore.c:789
     max_rank_sz();
     if ($G.uball && !$G.uchain || $G.uchain && !$G.uball) {
         await impossible($c.lit("restgamestate: lost ball & chain"));
-        await setworn(null, W_CHAIN);
-        await setworn(null, W_BALL);
+        await setworn(null, W.CHAIN);
+        await setworn(null, W.BALL);
     }
     await inven_inuse(FALSE);
     reglyph_darkroom();
@@ -632,7 +632,7 @@ async function rest_stairs(nhfp) {   // restore.c:955
             break;
         }
         await sfi_stairway(nhfp, stway, $c.lit("stairs-stairway"));
-        if (program_state.restoring !== REST_GSTATE && stway.tolev.dnum === u.uz.dnum) {
+        if (program_state.restoring !== REST.GSTATE && stway.tolev.dnum === u.uz.dnum) {
             stway.tolev.dlevel = $c.i16(stway.tolev.dlevel + u.uz.dlevel | 0);
         }
         await stairway_add(stway.sx, stway.sy, stway.up, stway.isladder, stway.tolev);
@@ -686,7 +686,7 @@ export async function getlev(nhfp, pid, lev) {   // restore.c:1046
     elapsed = 0;
     hpid[0] = 0;
     dlvl[0] = 0;
-    ghostly = $c.i8(nhfp.ftype === NHF_BONESFILE ? 1 : 0);
+    ghostly = $c.i8(nhfp.ftype === NHF.BONESFILE ? 1 : 0);
     tmpc = null;
     program_state.in_getlev = TRUE;
     if (ghostly) {
@@ -741,7 +741,7 @@ export async function getlev(nhfp, pid, lev) {   // restore.c:1046
     } else {
         gd.doorindex = 0;
     }
-    await restore_timers(nhfp, RANGE_LEVEL, elapsed);
+    await restore_timers(nhfp, RANGE.LEVEL, elapsed);
     await restore_light_sources(nhfp);
     $t3 = await restmonchn(nhfp), svl.level.monlist = $t3;
     await rest_worm(nhfp);
@@ -750,7 +750,7 @@ export async function getlev(nhfp, pid, lev) {   // restore.c:1046
         trap = await newtrap();
         await sfi_trap(nhfp, trap, $c.lit("trap"));
         if (trap.tx !== 0) {
-            if (program_state.restoring !== REST_GSTATE && trap.dst.dnum === u.uz.dnum) {
+            if (program_state.restoring !== REST.GSTATE && trap.dst.dnum === u.uz.dnum) {
                 trap.dst.dlevel = $c.i16(trap.dst.dlevel + u.uz.dlevel | 0);
             }
             trap.ntrap = gf.ftrap;
@@ -790,7 +790,7 @@ export async function getlev(nhfp, pid, lev) {   // restore.c:1046
                 await hideunder(mtmp);
             }
         }
-        if (!u.uz.dlevel || program_state.restoring === REST_LEVELS) {
+        if (!u.uz.dlevel || program_state.restoring === REST.LEVELS) {
             continue;
         }
         if (ghostly) {
@@ -835,7 +835,7 @@ export async function getlev(nhfp, pid, lev) {   // restore.c:1046
                 assign_level(ltmp, br.end1);
             }
             switch (br.type) {
-                case BR_STAIR:
+                case BR.STAIR:
                 case BR_NO_END1:
                 case BR_NO_END2:
                     stway = gs.stairs;
@@ -849,7 +849,7 @@ export async function getlev(nhfp, pid, lev) {   // restore.c:1046
                         assign_level(stway.tolev, ltmp);
                     }
                     break;
-                case BR_PORTAL:
+                case BR.PORTAL:
                     for (trap = gf.ftrap; trap; trap = trap.ntrap) {
                         if ((trap.ttyp | 0) === MAGIC_PORTAL) {
                             break;
@@ -1028,8 +1028,8 @@ export async function restore_menu(bannerwin) {   // restore.c:1536
     new $c.Ptr(svp.plname, 0).set(0, 0);
     saved = await get_saved_games();
     if (saved && saved.get(0)) {
-        tmpwin = await create_nhwindow()(NHW_MENU);
-        await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
+        tmpwin = await create_nhwindow()(NHW.MENU);
+        await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
         any.$copyFrom(cg.zeroany);
         if (bannerwin !== WIN_ERR) {
             await clear_nhwindow()(bannerwin);
@@ -1055,16 +1055,16 @@ export async function restore_menu(bannerwin) {   // restore.c:1536
             } else {
                 $c.__builtin___sprintf_chk(new $c.Ptr(menutext, 0), 0, 256, $c.lit("%c %.*s"), mode, PL_NSIZ_PLUS - 1, next);
             }
-            await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR_NONE, clr, new $c.Ptr(menutext, 0), MENU_ITEMFLAGS_SKIPMENUCOLORS);
+            await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(menutext, 0), MENU.ITEMFLAGS_SKIPMENUCOLORS);
         }
         clet = k <= 13 ? 110 : k <= 39 ? 78 : 0;
         any.a_int = -1;
-        await add_menu(tmpwin, nul_glyphinfo, any, $c.i8(clet), 78, ATR_NONE, clr, $c.lit("Start a new character"), MENU_ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, $c.i8(clet), 78, ATR.NONE, clr, $c.lit("Start a new character"), MENU.ITEMFLAGS_NONE);
         clet = (k + 1 | 0) <= 16 && clet === 110 ? 113 : (k + 1 | 0) <= 42 && clet === 78 ? 81 : 0;
         any.a_int = -2;
-        await add_menu(tmpwin, nul_glyphinfo, any, $c.i8(clet), 81, ATR_NONE, clr, $c.lit("Never mind (quit)"), MENU_ITEMFLAGS_SELECTED);
+        await add_menu(tmpwin, nul_glyphinfo, any, $c.i8(clet), 81, ATR.NONE, clr, $c.lit("Never mind (quit)"), MENU.ITEMFLAGS_SELECTED);
         await end_menu()(tmpwin, null);
-        if (await select_menu(tmpwin, PICK_ONE, new $c.Ptr(chosen_game, 0)) > 0) {
+        if (await select_menu(tmpwin, PICK.ONE, new $c.Ptr(chosen_game, 0)) > 0) {
             ch = chosen_game[0].item.a_int;
             if (ch > 0) {
                 $c.__builtin___strcpy_chk(new $c.Ptr(svp.plname, 0), saved.get(ch - 1 | 0), 32);

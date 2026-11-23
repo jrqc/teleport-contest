@@ -6,7 +6,7 @@ import { DUMPLOG_MSG_COUNT } from './config.h.js';
 import { gc, gs } from './decl.js';
 import { NH_abort } from './end.js';
 import { FALSE, TRUE } from './global.h.js';
-import { ECMD_OK } from './hack.h.js';
+import { ECMD } from './hack.h.js';
 import { copynchars, nh_snprintf, strsubst } from './hacklib.js';
 import { nhUse } from './lint.macros.js';
 import { pline, raw_printf } from './pline.js';
@@ -303,7 +303,7 @@ export async function dobugreport() {   // report.c:461
     if (!await submit_web_report(2, null, $c.lit("#bugreport command"))) {
         await pline($c.lit("Unable to send bug report.  Please visit %s instead."), sysopt.crashreporturl && sysopt.crashreporturl.get(0) ? sysopt.crashreporturl : $c.lit("https://www.nethack.org/"));
     }
-    return ECMD_OK;
+    return ECMD.OK;
 }
 export async function NH_panictrace_libc() {   // report.c:485
     let bt = $c.nulls(20), count = 0, x = 0, info = null, buf = new Int8Array(256);

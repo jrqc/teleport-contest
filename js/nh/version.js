@@ -5,22 +5,22 @@ import { $G } from './globals.js';
 import { nomakedefs } from './date.js';
 import { flags, gc, gh, gl, iflags } from './decl.js';
 import { nh_basename } from './files.js';
-import { VI_BRANCH, VI_NAME, VI_NUMBER } from './flag.h.js';
+import { VI } from './flag.h.js';
 import { BUFSZ, COLNO, FALSE, SFCTOOL_BIT, TRUE } from './global.h.js';
-import { ECMD_OK, SF_CRITICAL_BYTE_COUNT_MISMATCH, SF_DM_I32LP64_ON_IL32LLP64, SF_DM_I32LP64_ON_ILP32LL64, SF_DM_IL32LLP64_ON_I32LP64, SF_DM_IL32LLP64_ON_ILP32LL64, SF_DM_ILP32LL64_ON_I32LP64, SF_DM_ILP32LL64_ON_IL32LLP64, SF_DM_MISMATCH, SF_OUTDATED, SF_UPTODATE, UTD_CHECKFIELDCOUNTS, UTD_CHECKSIZES, UTD_QUIETLY, UTD_SKIP_SANITY1, UTD_WITHOUT_WAITSYNCH_PERFILE, WRITING, exportascii } from './hack.h.js';
+import { ECMD, SF, UTD, WRITING, exportascii } from './hack.h.js';
 import { FEATURE_NOTICE_VER } from './hack.macros.js';
 import { datamodel, eos, nh_snprintf, strip_newline, strncmpi, strstri, strsubst, tabexpand, what_datamodel_is_this } from './hacklib.js';
 import { nhStr } from './lint.macros.js';
 import { do_runtime_info, mdlib_version_string, release_runtime_info, runtime_info_init } from './mdlib.js';
 import { get_lua_version } from './nhlua.js';
-import { PATCHLEVEL, VERSION_MAJOR, VERSION_MINOR } from './patchlevel.h.js';
+import { PATCHLEVEL, VERSION } from './patchlevel.h.js';
 import { pline, raw_printf } from './pline.js';
 import { regex_id } from './posixregex.js';
 import { sfi_char, sfi_uchar, sfi_version_info, sfo_char, sfo_uchar, sfo_version_info } from './sfbase.js';
 import { bufoff, bufon } from './sfstruct.js';
 import { port_insert_pastebuf } from './unixmain.js';
 import { create_nhwindow, destroy_nhwindow, display_nhwindow, putstr, raw_print, wait_synch } from './winprocs.macros.js';
-import { NHW_TEXT, WIN_ERR } from './wintype.h.js';
+import { NHW, WIN_ERR } from './wintype.h.js';
 
 const rt_opts = $c.recArray($T.rt_opt, 3);
 export const critical_sizes = $c.recArray($T.critical_sizes_with_names, 80);
@@ -62,9 +62,9 @@ export function status_version(buf, bufsz, indent) {   // version.c:89
     name = null;
     altname = null;
     vflags = flags.versinfo;
-    shownum = $c.i8((vflags & VI_NUMBER) >>> 0 !== 0 ? 1 : 0);
-    showname = $c.i8((vflags & VI_NAME) >>> 0 !== 0 ? 1 : 0);
-    showbranch = $c.i8((vflags & VI_BRANCH) >>> 0 !== 0 ? 1 : 0);
+    shownum = $c.i8((vflags & VI.NUMBER) >>> 0 !== 0 ? 1 : 0);
+    showname = $c.i8((vflags & VI.NAME) >>> 0 !== 0 ? 1 : 0);
+    showbranch = $c.i8((vflags & VI.BRANCH) >>> 0 !== 0 ? 1 : 0);
     if (showname) {
         name = nh_basename(gh.hname, FALSE);
         if (!name || !name.get(0)) {
@@ -105,14 +105,14 @@ export async function doversion() {   // version.c:156
         return await doextversion();
     }
     await pline($c.lit("%s"), getversionstring(new $c.Ptr(buf, 0), 256));
-    return ECMD_OK;
+    return ECMD.OK;
 }
 export async function doextversion() {   // version.c:169
     let rtcontext = Int32Array.of(0), rtbuf = null, f = null, buf = new Int8Array(256), p = null, win = 0, use_dlb = 0, done_rt = 0, done_dlb = 0, prolog = 0;
     rtcontext[0] = 0;
     f = null;
     p = null;
-    win = await create_nhwindow()(NHW_TEXT);
+    win = await create_nhwindow()(NHW.TEXT);
     use_dlb = TRUE;
     done_rt = FALSE;
     done_dlb = FALSE;
@@ -180,7 +180,7 @@ export async function doextversion() {   // version.c:169
     }
     await display_nhwindow()(win, FALSE);
     await destroy_nhwindow()(win);
-    return ECMD_OK;
+    return ECMD.OK;
 }
 export async function early_version_info(pastebuf) {   // version.c:280
     let buf1 = new Int8Array(256), buf2 = new Int8Array(256), buf = null, tmp = null, $t1;
@@ -226,7 +226,7 @@ export async function check_version(version_data, filename, complain, utdflags) 
             }
         }
         return FALSE;
-    } else if ($c.andu64(version_data.feature_set, $c.notu64(nomakedefs.ignored_features)) !== $c.andu64(nomakedefs.version_features, $c.notu64(nomakedefs.ignored_features)) || $c.andu64(utdflags, UTD_SKIP_SANITY1) === 0 && version_data.entity_count !== nomakedefs.version_sanity1) {
+    } else if ($c.andu64(version_data.feature_set, $c.notu64(nomakedefs.ignored_features)) !== $c.andu64(nomakedefs.version_features, $c.notu64(nomakedefs.ignored_features)) || $c.andu64(utdflags, UTD.SKIP_SANITY1) === 0 && version_data.entity_count !== nomakedefs.version_sanity1) {
         if (complain) {
             await pline($c.lit("Configuration incompatibility for file \"%s\"."), filename);
             await display_nhwindow()($G.WIN_MESSAGE, TRUE);
@@ -266,7 +266,7 @@ export function get_feature_notice_ver(str) {   // version.c:431
     return FEATURE_NOTICE_VER(ver_maj, ver_min, patch);
 }
 export function get_current_feature_ver() {   // version.c:464
-    return VERSION_MAJOR << 24 | VERSION_MINOR << 16 | PATCHLEVEL << 8 | 0;
+    return VERSION.MAJOR << 24 | VERSION.MINOR << 16 | PATCHLEVEL << 8 | 0;
 }
 export function copyright_banner_line(indx) {   // version.c:471
     if (indx === 1) {
@@ -335,10 +335,10 @@ export async function uptodate(nhfp, name, utdflags) {   // version.c:713
     let vers_info = new $T.version_info(), indicator = Int8Array.of(0), sfstatus = 0, idx_1st_mismatch = Int32Array.of(0), quietly = 0, verbose = 0;
     sfstatus = 0;
     idx_1st_mismatch[0] = 0;
-    quietly = $c.i8($c.andu64(utdflags, UTD_QUIETLY) !== 0 ? 1 : 0);
+    quietly = $c.i8($c.andu64(utdflags, UTD.QUIETLY) !== 0 ? 1 : 0);
     verbose = $c.i8(name ? TRUE : FALSE);
     await sfi_char(nhfp, new $c.Ptr(indicator, 0), $c.lit("indicate-format"), 1);
-    if ((sfstatus = await compare_critical_bytes(nhfp, new $c.Ptr(idx_1st_mismatch, 0), utdflags)) !== SF_UPTODATE) {
+    if ((sfstatus = await compare_critical_bytes(nhfp, new $c.Ptr(idx_1st_mismatch, 0), utdflags)) !== SF.UPTODATE) {
         if (sfstatus > 0 && idx_1st_mismatch[0]) {
             if (!quietly) {
                 await raw_printf($c.lit("comparison of critical bytes mismatched at %d (%s)."), critical_sizes[idx_1st_mismatch[0]].ucsize, critical_sizes[idx_1st_mismatch[0]].nm);
@@ -348,11 +348,11 @@ export async function uptodate(nhfp, name, utdflags) {   // version.c:713
     await sfi_version_info(nhfp, vers_info, $c.lit("version_info"));
     if (!await check_version(vers_info, name, verbose, utdflags)) {
         if (verbose) {
-            if ($c.andu64(utdflags, UTD_WITHOUT_WAITSYNCH_PERFILE) === 0) {
+            if ($c.andu64(utdflags, UTD.WITHOUT_WAITSYNCH_PERFILE) === 0) {
                 await wait_synch()();
             }
         }
-        return SF_OUTDATED;
+        return SF.OUTDATED;
     }
     return sfstatus;
 }
@@ -360,14 +360,14 @@ export async function compare_critical_bytes(nhfp, idx_1st_mismatch, utdflags) {
     let active_csc_count = 0, file_csc_count = Int8Array.of(0), i = 0, cnt = 0, dmmismatch = 0, quietly = 0, dm = null, dmfile = null;
     active_csc_count = 80;
     cnt = active_csc_count;
-    dmmismatch = SF_DM_MISMATCH;
-    quietly = $c.i8($c.andu64(utdflags, UTD_QUIETLY) !== 0 ? 1 : 0);
+    dmmismatch = SF.DM_MISMATCH;
+    quietly = $c.i8($c.andu64(utdflags, UTD.QUIETLY) !== 0 ? 1 : 0);
     await sfi_char(nhfp, new $c.Ptr(file_csc_count, 0), $c.lit("count-critical_sizes"), 1);
     if (file_csc_count[0] > cnt) {
         if (!quietly) {
             await raw_printf($c.lit("critical byte counts do not match, file:%d, critical_sizes:%d."), file_csc_count[0], 80);
         }
-        return SF_CRITICAL_BYTE_COUNT_MISMATCH;
+        return SF.CRITICAL_BYTE_COUNT_MISMATCH;
     }
     for (i = 0; i < file_csc_count[0]; i = i + 1 | 0) {
         await sfi_uchar(nhfp, new $c.Ptr(cscbuf, i), $c.lit("critical_sizes"));
@@ -377,17 +377,17 @@ export async function compare_critical_bytes(nhfp, idx_1st_mismatch, utdflags) {
             dm = datamodel(0);
             dmfile = what_datamodel_is_this(0, cscbuf[1], cscbuf[2], cscbuf[3], cscbuf[4], cscbuf[5]);
             if (!$c.strcmp(dmfile, $c.lit("IL32LLP64")) && !$c.strcmp(dm, $c.lit("ILP32LL64"))) {
-                dmmismatch = SF_DM_IL32LLP64_ON_ILP32LL64;
+                dmmismatch = SF.DM_IL32LLP64_ON_ILP32LL64;
             } else if (!$c.strcmp(dmfile, $c.lit("I32LP64")) && !$c.strcmp(dm, $c.lit("ILP32LL64"))) {
-                dmmismatch = SF_DM_I32LP64_ON_ILP32LL64;
+                dmmismatch = SF.DM_I32LP64_ON_ILP32LL64;
             } else if (!$c.strcmp(dmfile, $c.lit("ILP32LL64")) && !$c.strcmp(dm, $c.lit("I32LP64"))) {
-                dmmismatch = SF_DM_ILP32LL64_ON_I32LP64;
+                dmmismatch = SF.DM_ILP32LL64_ON_I32LP64;
             } else if (!$c.strcmp(dmfile, $c.lit("ILP32LL64")) && !$c.strcmp(dm, $c.lit("IL32LLP64"))) {
-                dmmismatch = SF_DM_ILP32LL64_ON_IL32LLP64;
+                dmmismatch = SF.DM_ILP32LL64_ON_IL32LLP64;
             } else if (!$c.strcmp(dmfile, $c.lit("I32LP64")) && !$c.strcmp(dm, $c.lit("IL32LLP64"))) {
-                dmmismatch = SF_DM_I32LP64_ON_IL32LLP64;
+                dmmismatch = SF.DM_I32LP64_ON_IL32LLP64;
             } else if (!$c.strcmp(dmfile, $c.lit("IL32LLP64")) && !$c.strcmp(dm, $c.lit("I32LP64"))) {
-                dmmismatch = SF_DM_IL32LLP64_ON_I32LP64;
+                dmmismatch = SF.DM_IL32LLP64_ON_I32LP64;
             }
             if (idx_1st_mismatch) {
                 idx_1st_mismatch.set(0, i);
@@ -395,20 +395,20 @@ export async function compare_critical_bytes(nhfp, idx_1st_mismatch, utdflags) {
             return dmmismatch;
         }
     }
-    return SF_UPTODATE;
+    return SF.UPTODATE;
 }
 export async function validate(nhfp, name, without_waitsynch_perfile) {   // version.c:840
     let utdflags = 0, validsf = 0;
     utdflags = 0;
     validsf = 0;
     if (nhfp.structlevel) {
-        utdflags = $c.oru64(utdflags, UTD_CHECKSIZES);
+        utdflags = $c.oru64(utdflags, UTD.CHECKSIZES);
     }
     if (without_waitsynch_perfile) {
-        utdflags = $c.oru64(utdflags, UTD_WITHOUT_WAITSYNCH_PERFILE);
+        utdflags = $c.oru64(utdflags, UTD.WITHOUT_WAITSYNCH_PERFILE);
     }
     if (nhfp.fieldlevel) {
-        utdflags = $c.oru64(utdflags, UTD_CHECKFIELDCOUNTS | UTD_SKIP_SANITY1);
+        utdflags = $c.oru64(utdflags, UTD.CHECKFIELDCOUNTS | UTD.SKIP_SANITY1);
     }
     validsf = await uptodate(nhfp, name, utdflags);
     return validsf;

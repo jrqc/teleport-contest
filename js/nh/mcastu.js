@@ -3,10 +3,10 @@ import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
 import { acurr, adjuhploss, losestr, minuhpmax, setuhpmax } from './attrib.js';
-import { A_DEX } from './attrib.h.js';
+import { A } from './attrib.h.js';
 import { is_waterwall } from './dbridge.js';
 import { c_common_strings, gb, gi, gm, gn, gt, gy, iflags, svc, svk, svm, u } from './decl.js';
-import { S_ANT, S_SNAKE } from './defsym.h.js';
+import { S } from './defsym.h.js';
 import { canseemon, map_invisible, shieldeff, tp_sensemon } from './display.js';
 import { canspotmon } from './display.macros.js';
 import { Mgender, Monnam, bogusmon, mon_nam, noit_Monnam, pmname } from './do_name.js';
@@ -15,19 +15,19 @@ import { done } from './end.js';
 import { debugcore } from './files.js';
 import { FALSE, TRUE } from './global.h.js';
 import { losehp, nomul } from './hack.js';
-import { DIED, EYE, HEAD, KILLED_BY, MM_ANGRY, MM_NOMSG } from './hack.h.js';
+import { DIED, EYE, HEAD, KILLED, MM } from './hack.h.js';
 import { BZ_VALID_ADTYP, max, plur } from './hack.macros.js';
 import { eos, sgn, upstart } from './hacklib.js';
 import { makemon, mkclass, set_malign } from './makemon.js';
-import { MCAST_AGGRAVATION, MCAST_BLIND_YOU, MCAST_CLONE_WIZ, MCAST_CONFUSE_YOU, MCAST_CURE_SELF, MCAST_CURSE_ITEMS, MCAST_DEATH_TOUCH, MCAST_DESTRY_ARMR, MCAST_DISAPPEAR, MCAST_FIRE_PILLAR, MCAST_GEYSER, MCAST_HASTE_SELF, MCAST_INSECTS, MCAST_LIGHTNING, MCAST_OPEN_WOUNDS, MCAST_PARALYZE, MCAST_PSI_BOLT, MCAST_STUN_YOU, MCAST_SUMMON_MONS, MCAST_WEAKEN_YOU, MCF_HOSTILE, MCF_INDIRECT, MCF_SIGHT } from './mcastu.h.js';
+import { MCAST, MCF } from './mcastu.h.js';
 import { mdamageu } from './mhitu.js';
 import { monster_census } from './minion.js';
 import { healmon } from './mon.js';
-import { AD_CLRC, AD_COLD, AD_ELEC, AD_FIRE, AD_MAGM, AD_SPEL, M_ATTK_HIT, M_ATTK_MISS } from './monattk.h.js';
+import { AD, M_ATTK } from './monattk.h.js';
 import { cvt_adtyp_to_mseenres, monstseesu, monstunseesu, pronoun_gender } from './mondata.js';
 import { eyecount, is_demon, nonliving, perceives, type_is_pname } from './mondata.macros.js';
 import { mons } from './monst.js';
-import { MFAST, M_AP_OBJECT, M_AP_TYPMASK, M_SEEN_COLD, M_SEEN_ELEC, M_SEEN_FIRE, M_SEEN_MAGR, M_SEEN_REFL } from './monst.h.js';
+import { MFAST, M_AP, M_SEEN } from './monst.h.js';
 import { ismnum } from './monst.macros.js';
 import { lined_up } from './mthrowu.js';
 import { ureflects } from './muse.js';
@@ -46,7 +46,7 @@ import { burnarmor, ignite_items } from './trap.js';
 import { cansee, couldsee } from './vision.macros.js';
 import { aggravate, clonewiz, has_aggravatables, nasty } from './wizard.js';
 import { mon_adjust_speed, mon_set_minvis } from './worn.js';
-import { PRONOUN_HALLU } from './you.h.js';
+import { PRONOUN } from './you.h.js';
 import { Upolyd } from './you.macros.js';
 import { Antimagic, Blind, Blinded, Cold_resistance, Deaf, Detect_monsters, Displaced, Fire_resistance, Free_action, Half_physical_damage, Half_spell_damage, Hallucination, Invis, See_invisible, Shock_resistance, Unaware } from './youprop.macros.js';
 import { buzz, destroy_items, flash_str, flashburn, mon_spell_hits_spot } from './zap.js';
@@ -59,7 +59,7 @@ async function cursetxt(mtmp, undirected) {   // mcastu.c:63
     if (canseemon(mtmp) && couldsee(mtmp.mx, mtmp.my)) {
         if (undirected) {
             point_msg = $c.lit("all around, then curses");
-        } else if (Invis() && !perceives(mtmp.data) && (mtmp.mux !== u.ux || mtmp.muy !== u.uy) || (gy.youmonst.m_ap_type & M_AP_TYPMASK) === M_AP_OBJECT && gy.youmonst.mappearance === STRANGE_OBJECT || u.uundetected | 0) {
+        } else if (Invis() && !perceives(mtmp.data) && (mtmp.mux !== u.ux || mtmp.muy !== u.uy) || (gy.youmonst.m_ap_type & M_AP.TYPMASK) === M_AP.OBJECT && gy.youmonst.mappearance === STRANGE_OBJECT || u.uundetected | 0) {
             point_msg = $c.lit("and curses in your general direction");
         } else if (Displaced() && (mtmp.mux !== u.ux || mtmp.muy !== u.uy)) {
             point_msg = $c.lit("and curses at your displaced image");
@@ -77,15 +77,15 @@ async function choose_monster_spell(mtmp, adtyp) {   // mcastu.c:89
     let list = null, i = 0, spellval = 0, len = 0, maxlev = 0;
     list = null;
     len = 0;
-    if (adtyp === AD_SPEL) {
+    if (adtyp === AD.SPEL) {
         list = new $c.Ptr(mon_wizard_spells, 0);
         len = 12;
-    } else if (adtyp === AD_CLRC) {
+    } else if (adtyp === AD.CLRC) {
         list = new $c.Ptr(mon_cleric_spells, 0);
         len = 10;
     }
     if (!list || len < 1) {
-        return MCAST_PSI_BOLT;
+        return MCAST.PSI_BOLT;
     }
     maxlev = mcast_data[list.get(len - 1 | 0)].level;
     spellval = rn2(mtmp.m_lev);
@@ -103,7 +103,7 @@ export async function castmu(mtmp, mattk, thinks_it_foundyou, foundyou) {   // m
     let dmg = 0, ml = 0, ret = 0, spellnum = 0, cnt = 0, save_plnmsg = 0;
     ml = mtmp.m_lev;
     spellnum = 0;
-    if ((mattk.adtyp === AD_SPEL || mattk.adtyp === AD_CLRC) && ml) {
+    if ((mattk.adtyp === AD.SPEL || mattk.adtyp === AD.CLRC) && ml) {
         cnt = 40;
         do {
             spellnum = await choose_monster_spell(mtmp, mattk.adtyp);
@@ -112,18 +112,18 @@ export async function castmu(mtmp, mattk, thinks_it_foundyou, foundyou) {   // m
                     if (foundyou) {
                         await impossible($c.lit("spellcasting monster found you and doesn't know it?"));
                     }
-                    return M_ATTK_MISS;
+                    return M_ATTK.MISS;
                 }
                 break;
             }
         } while ((cnt = cnt - 1 | 0) > 0 && await spell_would_be_useless(mtmp, spellnum));
         if (cnt === 0) {
-            return M_ATTK_MISS;
+            return M_ATTK.MISS;
         }
     }
     if (mtmp.mcan | 0 || mtmp.mspec_used || !ml || $c.andu64(mtmp.seen_resistance, cvt_adtyp_to_mseenres(mattk.adtyp))) {
         await cursetxt(mtmp, is_undirected_spell(spellnum));
-        return M_ATTK_MISS;
+        return M_ATTK.MISS;
     }
     do {
         if (debugcore($c.lit("mcastu.c"), TRUE)) {
@@ -132,12 +132,12 @@ export async function castmu(mtmp, mattk, thinks_it_foundyou, foundyou) {   // m
             iflags.last_msg = save_plnmsg;
         }
     } while (0);
-    if (mattk.adtyp === AD_SPEL || mattk.adtyp === AD_CLRC) {
+    if (mattk.adtyp === AD.SPEL || mattk.adtyp === AD.CLRC) {
         mtmp.mspec_used = mtmp.m_lev < 8 ? 10 - mtmp.m_lev | 0 : 2;
     }
     if (!foundyou && thinks_it_foundyou && !is_undirected_spell(spellnum)) {
         await pline_mon(mtmp, $c.lit("%s casts a spell at %s!"), canseemon(mtmp) ? await Monnam(mtmp) : $c.lit("Something"), is_waterwall(mtmp.mux, mtmp.muy) ? $c.lit("empty water") : $c.lit("thin air"));
-        return M_ATTK_MISS;
+        return M_ATTK.MISS;
     }
     nomul(0);
     if (rn2(Math.imul(ml, 10)) < (mtmp.mconf | 0 ? 100 : 20)) {
@@ -145,16 +145,16 @@ export async function castmu(mtmp, mattk, thinks_it_foundyou, foundyou) {   // m
             set_msg_xy(mtmp.mx, mtmp.my);
             await pline_The($c.lit("air crackles around %s."), await mon_nam(mtmp));
         }
-        return M_ATTK_MISS;
+        return M_ATTK.MISS;
     }
     if (canspotmon(mtmp) || !is_undirected_spell(spellnum)) {
         await pline_mon(mtmp, $c.lit("%s casts a spell%s!"), canspotmon(mtmp) ? await Monnam(mtmp) : $c.lit("Something"), is_undirected_spell(spellnum) ? $c.lit("") : Invis() && !perceives(mtmp.data) && !(mtmp.mux === u.ux && mtmp.muy === u.uy) ? $c.lit(" at a spot near you") : Displaced() && !(mtmp.mux === u.ux && mtmp.muy === u.uy) ? $c.lit(" at your displaced image") : $c.lit(" at you"));
     }
     if (!foundyou) {
         dmg = 0;
-        if (mattk.adtyp !== AD_SPEL && mattk.adtyp !== AD_CLRC) {
+        if (mattk.adtyp !== AD.SPEL && mattk.adtyp !== AD.CLRC) {
             await impossible($c.lit("%s casting non-hand-to-hand version of hand-to-hand spell %d?"), await Monnam(mtmp), mattk.adtyp);
-            return M_ATTK_MISS;
+            return M_ATTK.MISS;
         }
     } else if (mattk.damd) {
         dmg = d($c.div32(ml, 2) + mattk.damn | 0, mattk.damd);
@@ -164,48 +164,48 @@ export async function castmu(mtmp, mattk, thinks_it_foundyou, foundyou) {   // m
     if (Half_spell_damage()) {
         dmg = $c.div32(dmg + 1 | 0, 2);
     }
-    ret = M_ATTK_HIT;
+    ret = M_ATTK.HIT;
     switch (mattk.adtyp) {
-        case AD_FIRE:
+        case AD.FIRE:
             await pline($c.lit("You're enveloped in flames."));
             if (Fire_resistance()) {
                 await shieldeff(u.ux, u.uy);
                 await pline($c.lit("But you resist the effects."));
-                monstseesu(M_SEEN_FIRE);
+                monstseesu(M_SEEN.FIRE);
                 dmg = 0;
             } else {
-                monstunseesu(M_SEEN_FIRE);
+                monstunseesu(M_SEEN.FIRE);
             }
             await burn_away_slime();
-            await mon_spell_hits_spot(mtmp, AD_FIRE, u.ux, u.uy);
+            await mon_spell_hits_spot(mtmp, AD.FIRE, u.ux, u.uy);
             break;
-        case AD_COLD:
+        case AD.COLD:
             await pline($c.lit("You're covered in frost."));
             if (Cold_resistance()) {
                 await shieldeff(u.ux, u.uy);
                 await pline($c.lit("But you resist the effects."));
-                monstseesu(M_SEEN_COLD);
+                monstseesu(M_SEEN.COLD);
                 dmg = 0;
             } else {
-                monstunseesu(M_SEEN_COLD);
+                monstunseesu(M_SEEN.COLD);
             }
-            await mon_spell_hits_spot(mtmp, AD_COLD, u.ux, u.uy);
+            await mon_spell_hits_spot(mtmp, AD.COLD, u.ux, u.uy);
             break;
-        case AD_MAGM:
+        case AD.MAGM:
             await You($c.lit("are hit by a shower of missiles!"));
             if (Antimagic()) {
                 await shieldeff(u.ux, u.uy);
                 await pline_The($c.lit("missiles bounce off!"));
-                monstseesu(M_SEEN_MAGR);
+                monstseesu(M_SEEN.MAGR);
                 dmg = 0;
             } else {
                 dmg = d($c.div32(mtmp.m_lev, 2) + 1 | 0, 6);
-                monstunseesu(M_SEEN_MAGR);
+                monstunseesu(M_SEEN.MAGR);
             }
-            await mon_spell_hits_spot(mtmp, AD_MAGM, u.ux, u.uy);
+            await mon_spell_hits_spot(mtmp, AD.MAGM, u.ux, u.uy);
             break;
-        case AD_SPEL:
-        case AD_CLRC:
+        case AD.SPEL:
+        case AD.CLRC:
             await mcast_spell(mtmp, dmg, spellnum);
             dmg = 0;
             break;
@@ -235,7 +235,7 @@ export async function touch_of_death(mtmp) {   // mcastu.c:323
         u.mh = 0;
         await rehumanize();
     } else if (drain >= u.uhpmax) {
-        svk.killer.format = KILLED_BY;
+        svk.killer.format = KILLED.BY;
         $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), new $c.Ptr(kbuf, 0), 256);
         await done(DIED);
     } else {
@@ -244,7 +244,7 @@ export async function touch_of_death(mtmp) {   // mcastu.c:323
         newuhpmax = u.uhpmax - drain | 0;
         setuhpmax(max(newuhpmax, uhpmin), FALSE);
         dmg = adjuhploss(dmg, olduhp);
-        await losehp(dmg, new $c.Ptr(kbuf, 0), KILLED_BY);
+        await losehp(dmg, new $c.Ptr(kbuf, 0), KILLED.BY);
     }
     svk.killer.name[0] = 0;
 }
@@ -267,7 +267,7 @@ export async function death_inflicted_by(outbuf, deathreason, mtmp) {   // mcast
     return outbuf;
 }
 async function mcast_death_touch(mtmp) {   // mcastu.c:389
-    await pline($c.lit("Oh no, %s's using the touch of death!"), genders[pronoun_gender(mtmp, PRONOUN_HALLU)].he);
+    await pline($c.lit("Oh no, %s's using the touch of death!"), genders[pronoun_gender(mtmp, PRONOUN.HALLU)].he);
     if (nonliving(gy.youmonst.data) || is_demon(gy.youmonst.data)) {
         await You($c.lit("seem no deader than before."));
     } else if (!Antimagic() && rn2(mtmp.m_lev) > 12) {
@@ -276,11 +276,11 @@ async function mcast_death_touch(mtmp) {   // mcastu.c:389
         } else {
             await touch_of_death(mtmp);
         }
-        monstunseesu(M_SEEN_MAGR);
+        monstunseesu(M_SEEN.MAGR);
     } else {
         if (Antimagic()) {
             await shieldeff(u.ux, u.uy);
-            monstseesu(M_SEEN_MAGR);
+            monstseesu(M_SEEN.MAGR);
         }
         await pline($c.lit("Lucky for you, it didn't work!"));
     }
@@ -314,19 +314,19 @@ async function mcast_summon_mons(mtmp) {   // mcastu.c:421
 async function mcast_destroy_armor() {   // mcastu.c:450
     if (Antimagic()) {
         await shieldeff(u.ux, u.uy);
-        monstseesu(M_SEEN_MAGR);
+        monstseesu(M_SEEN.MAGR);
         await pline($c.lit("A field of force surrounds you!"));
     } else if (!await destroy_arm()) {
         await Your($c.lit("skin itches."));
     } else {
-        monstunseesu(M_SEEN_MAGR);
+        monstunseesu(M_SEEN.MAGR);
     }
 }
 async function mcast_weaken_you(mtmp, dmg) {   // mcastu.c:466
     let kbuf = new Int8Array(256);
     if (Antimagic()) {
         await shieldeff(u.ux, u.uy);
-        monstseesu(M_SEEN_MAGR);
+        monstseesu(M_SEEN.MAGR);
         await You_feel($c.lit("momentarily weakened."));
     } else {
         await You($c.lit("suddenly feel weaker!"));
@@ -337,9 +337,9 @@ async function mcast_weaken_you(mtmp, dmg) {   // mcastu.c:466
         if (Half_spell_damage()) {
             dmg = $c.div32(dmg + 1 | 0, 2);
         }
-        await losestr(rnd(dmg), await death_inflicted_by(new $c.Ptr(kbuf, 0), $c.lit("strength loss"), mtmp), KILLED_BY);
+        await losestr(rnd(dmg), await death_inflicted_by(new $c.Ptr(kbuf, 0), $c.lit("strength loss"), mtmp), KILLED.BY);
         svk.killer.name[0] = 0;
-        monstunseesu(M_SEEN_MAGR);
+        monstunseesu(M_SEEN.MAGR);
     }
 }
 async function mcast_disappear(mtmp) {   // mcastu.c:490
@@ -358,19 +358,19 @@ async function mcast_disappear(mtmp) {   // mcastu.c:490
 async function mcast_stun_you(dmg) {   // mcastu.c:504
     if (Antimagic() || Free_action()) {
         await shieldeff(u.ux, u.uy);
-        monstseesu(M_SEEN_MAGR);
+        monstseesu(M_SEEN.MAGR);
         if (!u.uprops[STUNNED].intrinsic) {
             await You_feel($c.lit("momentarily disoriented."));
         }
         await make_stunned(1, FALSE);
     } else {
         await You(u.uprops[STUNNED].intrinsic ? $c.lit("struggle to keep your balance.") : $c.lit("reel..."));
-        dmg = d(acurr(A_DEX) < 12 ? 6 : 4, 4);
+        dmg = d(acurr(A.DEX) < 12 ? 6 : 4, 4);
         if (Half_spell_damage()) {
             dmg = $c.div32(dmg + 1 | 0, 2);
         }
         await make_stunned($c.add64($c.and64(u.uprops[STUNNED].intrinsic, TIMEOUT), dmg), FALSE);
-        monstunseesu(M_SEEN_MAGR);
+        monstunseesu(M_SEEN.MAGR);
     }
 }
 async function mcast_geyser(dmg) {   // mcastu.c:523
@@ -387,19 +387,19 @@ async function mcast_fire_pillar(mtmp, dmg) {   // mcastu.c:540
     orig_dmg = dmg = d(8, 6);
     if (Fire_resistance()) {
         await shieldeff(u.ux, u.uy);
-        monstseesu(M_SEEN_FIRE);
+        monstseesu(M_SEEN.FIRE);
         dmg = 0;
     } else {
-        monstunseesu(M_SEEN_FIRE);
+        monstunseesu(M_SEEN.FIRE);
     }
     if (Half_spell_damage()) {
         dmg = $c.div32(dmg + 1 | 0, 2);
     }
     await burn_away_slime();
     await burnarmor(gy.youmonst);
-    await destroy_items(gy.youmonst, AD_FIRE, orig_dmg);
+    await destroy_items(gy.youmonst, AD.FIRE, orig_dmg);
     await ignite_items(gi.invent);
-    await mon_spell_hits_spot(mtmp, AD_FIRE, u.ux, u.uy);
+    await mon_spell_hits_spot(mtmp, AD.FIRE, u.ux, u.uy);
     return dmg;
 }
 async function mcast_lightning(mtmp, dmg) {   // mcastu.c:566
@@ -411,29 +411,29 @@ async function mcast_lightning(mtmp, dmg) {   // mcastu.c:566
         await shieldeff(u.ux, u.uy);
         dmg = 0;
         if (reflects) {
-            monstseesu(M_SEEN_REFL);
+            monstseesu(M_SEEN.REFL);
             return dmg;
         }
-        monstunseesu(M_SEEN_REFL);
-        monstseesu(M_SEEN_ELEC);
+        monstunseesu(M_SEEN.REFL);
+        monstseesu(M_SEEN.ELEC);
     } else {
-        monstunseesu(M_SEEN_ELEC | M_SEEN_REFL);
+        monstunseesu(M_SEEN.ELEC | M_SEEN.REFL);
     }
     if (Half_spell_damage()) {
         dmg = $c.div32(dmg + 1 | 0, 2);
     }
-    await destroy_items(gy.youmonst, AD_ELEC, orig_dmg);
-    await mon_spell_hits_spot(mtmp, AD_ELEC, u.ux, u.uy);
+    await destroy_items(gy.youmonst, AD.ELEC, orig_dmg);
+    await mon_spell_hits_spot(mtmp, AD.ELEC, u.ux, u.uy);
     await flashburn(rnd(100), TRUE);
     return dmg;
 }
 async function mcast_psi_bolt(dmg) {   // mcastu.c:601
     if (Antimagic()) {
         await shieldeff(u.ux, u.uy);
-        monstseesu(M_SEEN_MAGR);
+        monstseesu(M_SEEN.MAGR);
         dmg = $c.div32(dmg + 1 | 0, 2);
     } else {
-        monstunseesu(M_SEEN_MAGR);
+        monstunseesu(M_SEEN.MAGR);
     }
     if (dmg <= 5) {
         await You($c.lit("get a slight %sache."), await body_part(HEAD));
@@ -449,10 +449,10 @@ async function mcast_psi_bolt(dmg) {   // mcastu.c:601
 async function mcast_open_wounds(dmg) {   // mcastu.c:624
     if (Antimagic()) {
         await shieldeff(u.ux, u.uy);
-        monstseesu(M_SEEN_MAGR);
+        monstseesu(M_SEEN.MAGR);
         dmg = $c.div32(dmg + 1 | 0, 2);
     } else {
-        monstunseesu(M_SEEN_MAGR);
+        monstunseesu(M_SEEN.MAGR);
     }
     if (dmg <= 5) {
         await Your($c.lit("skin itches badly for a moment."));
@@ -467,9 +467,9 @@ async function mcast_open_wounds(dmg) {   // mcastu.c:624
 }
 async function mcast_insects(mtmp) {   // mcastu.c:645
     let pm = null, mtmp2 = null, whatbuf = new Int8Array(128), let_ = 0, success = 0, seecaster = 0, i = 0, quan = 0, oldseen = 0, newseen = 0, bypos = new $T.nhcoord(), fmt = null, what = null, arg = null, $t1, $t2;
-    pm = await mkclass(S_ANT, 0);
+    pm = await mkclass(S.ANT, 0);
     mtmp2 = null;
-    let_ = $c.i8(pm ? S_ANT : S_SNAKE);
+    let_ = $c.i8(pm ? S.ANT : S.SNAKE);
     success = FALSE;
     oldseen = monster_census(TRUE);
     quan = mtmp.m_lev < 2 ? 1 : rnd($c.div32(mtmp.m_lev, 2));
@@ -480,7 +480,7 @@ async function mcast_insects(mtmp) {   // mcastu.c:645
         if (!await enexto(bypos, mtmp.mux, mtmp.muy, mtmp.data)) {
             return;
         }
-        if ((pm = await mkclass(let_, 0)) !== null && (mtmp2 = await makemon(pm, bypos.x, bypos.y, MM_ANGRY | MM_NOMSG)) !== null) {
+        if ((pm = await mkclass(let_, 0)) !== null && (mtmp2 = await makemon(pm, bypos.x, bypos.y, MM.ANGRY | MM.NOMSG)) !== null) {
             success = TRUE;
             $t2 = ($t1 = (mtmp2.mtame = 0) >>> 0, mtmp2.mpeaceful = ($t1) & 1), mtmp2.msleeping = ($t2) & 1;
             set_malign(mtmp2);
@@ -488,7 +488,7 @@ async function mcast_insects(mtmp) {   // mcastu.c:645
     }
     newseen = monster_census(TRUE);
     seecaster = $c.i8(canseemon(mtmp) || tp_sensemon(mtmp) || Detect_monsters() ? 1 : 0);
-    what = let_ === S_SNAKE ? $c.lit("snakes") : $c.lit("insects");
+    what = let_ === S.SNAKE ? $c.lit("snakes") : $c.lit("insects");
     if (Hallucination()) {
         what = await makeplural(await bogusmon(new $c.Ptr(whatbuf, 0), null));
     }
@@ -510,7 +510,7 @@ async function mcast_insects(mtmp) {   // mcastu.c:645
     } else if (!success) {
         fmt = $c.lit("%s casts at a clump of sticks, but nothing happens.%s");
         what = $c.lit("");
-    } else if (let_ === S_SNAKE) {
+    } else if (let_ === S.SNAKE) {
         fmt = $c.lit("%s transforms a clump of sticks into %s!");
     } else if (Invis() && !perceives(mtmp.data) && (mtmp.mux !== u.ux || mtmp.muy !== u.uy)) {
         fmt = $c.lit("%s summons %s around a spot near you!");
@@ -541,7 +541,7 @@ async function mcast_paralyze(mtmp) {   // mcastu.c:746
     dmg = 0;
     if (Antimagic() || Free_action()) {
         await shieldeff(u.ux, u.uy);
-        monstseesu(M_SEEN_MAGR);
+        monstseesu(M_SEEN.MAGR);
         if (gm.multi >= 0) {
             await You($c.lit("stiffen briefly."));
         }
@@ -554,7 +554,7 @@ async function mcast_paralyze(mtmp) {   // mcastu.c:746
         if (Half_spell_damage()) {
             dmg = $c.div32(dmg + 1 | 0, 2);
         }
-        monstunseesu(M_SEEN_MAGR);
+        monstunseesu(M_SEEN.MAGR);
     }
     nomul(-dmg | 0);
     gm.multi_reason = $c.lit("paralyzed by a monster");
@@ -565,7 +565,7 @@ async function mcast_confuse_you(mtmp) {   // mcastu.c:771
     let oldprop = 0, dmg = 0;
     if (Antimagic()) {
         await shieldeff(u.ux, u.uy);
-        monstseesu(M_SEEN_MAGR);
+        monstseesu(M_SEEN.MAGR);
         await You_feel($c.lit("momentarily dizzy."));
     } else {
         oldprop = $c.i8(!!u.uprops[CONFUSION].intrinsic ? 1 : 0);
@@ -579,7 +579,7 @@ async function mcast_confuse_you(mtmp) {   // mcastu.c:771
         } else {
             await You_feel($c.lit("%sconfused!"), oldprop ? $c.lit("more ") : $c.lit(""));
         }
-        monstunseesu(M_SEEN_MAGR);
+        monstunseesu(M_SEEN.MAGR);
     }
 }
 async function mcast_spell(mtmp, dmg, spellnum) {   // mcastu.c:801
@@ -592,79 +592,79 @@ async function mcast_spell(mtmp, dmg, spellnum) {   // mcastu.c:801
         return;
     }
     switch (spellnum) {
-        case MCAST_DEATH_TOUCH:
+        case MCAST.DEATH_TOUCH:
             await mcast_death_touch(mtmp);
             dmg = 0;
             break;
-        case MCAST_CLONE_WIZ:
+        case MCAST.CLONE_WIZ:
             await mcast_clone_wiz(mtmp);
             dmg = 0;
             break;
-        case MCAST_SUMMON_MONS:
+        case MCAST.SUMMON_MONS:
             await mcast_summon_mons(mtmp);
             dmg = 0;
             break;
-        case MCAST_AGGRAVATION:
+        case MCAST.AGGRAVATION:
             await You_feel($c.lit("that monsters are aware of your presence."));
             await aggravate();
             dmg = 0;
             break;
-        case MCAST_CURSE_ITEMS:
+        case MCAST.CURSE_ITEMS:
             await You_feel($c.lit("as if you need some help."));
             await rndcurse();
             dmg = 0;
             break;
-        case MCAST_DESTRY_ARMR:
+        case MCAST.DESTRY_ARMR:
             await mcast_destroy_armor();
             dmg = 0;
             break;
-        case MCAST_WEAKEN_YOU:
+        case MCAST.WEAKEN_YOU:
             await mcast_weaken_you(mtmp, dmg);
             dmg = 0;
             break;
-        case MCAST_DISAPPEAR:
+        case MCAST.DISAPPEAR:
             await mcast_disappear(mtmp);
             dmg = 0;
             break;
-        case MCAST_STUN_YOU:
+        case MCAST.STUN_YOU:
             await mcast_stun_you(dmg);
             dmg = 0;
             break;
-        case MCAST_HASTE_SELF:
+        case MCAST.HASTE_SELF:
             await mon_adjust_speed(mtmp, 1, null);
             dmg = 0;
             break;
-        case MCAST_CURE_SELF:
+        case MCAST.CURE_SELF:
             dmg = await m_cure_self(mtmp, dmg);
             break;
-        case MCAST_PSI_BOLT:
+        case MCAST.PSI_BOLT:
             dmg = await mcast_psi_bolt(dmg);
             break;
-        case MCAST_GEYSER:
+        case MCAST.GEYSER:
             dmg = await mcast_geyser(dmg);
             break;
-        case MCAST_FIRE_PILLAR:
+        case MCAST.FIRE_PILLAR:
             dmg = await mcast_fire_pillar(mtmp, dmg);
             break;
-        case MCAST_LIGHTNING:
+        case MCAST.LIGHTNING:
             dmg = await mcast_lightning(mtmp, dmg);
             break;
-        case MCAST_INSECTS:
+        case MCAST.INSECTS:
             await mcast_insects(mtmp);
             dmg = 0;
             break;
-        case MCAST_BLIND_YOU:
+        case MCAST.BLIND_YOU:
             await mcast_blind_you();
             dmg = 0;
             break;
-        case MCAST_PARALYZE:
+        case MCAST.PARALYZE:
             dmg = await mcast_paralyze(mtmp);
             break;
-        case MCAST_CONFUSE_YOU:
+        case MCAST.CONFUSE_YOU:
             await mcast_confuse_you(mtmp);
             dmg = 0;
             break;
-        case MCAST_OPEN_WOUNDS:
+        case MCAST.OPEN_WOUNDS:
             dmg = await mcast_open_wounds(dmg);
             break;
         default:
@@ -677,51 +677,51 @@ async function mcast_spell(mtmp, dmg, spellnum) {   // mcastu.c:801
     }
 }
 function is_undirected_spell(spellnum) {   // mcastu.c:900
-    if ((mcast_data[spellnum].flags & MCF_INDIRECT) !== 0) {
+    if ((mcast_data[spellnum].flags & MCF.INDIRECT) !== 0) {
         return TRUE;
     }
     return FALSE;
 }
 async function spell_would_be_useless(mtmp, spellnum) {   // mcastu.c:909
     let mcouldseeu = 0;
-    if ((mcast_data[spellnum].flags & MCF_HOSTILE) !== 0) {
+    if ((mcast_data[spellnum].flags & MCF.HOSTILE) !== 0) {
         if (mtmp.mpeaceful) {
             return TRUE;
         }
     }
-    if ((mcast_data[spellnum].flags & MCF_SIGHT) !== 0) {
+    if ((mcast_data[spellnum].flags & MCF.SIGHT) !== 0) {
         mcouldseeu = $c.i8(couldsee(mtmp.mx, mtmp.my));
         if (!mcouldseeu) {
             return TRUE;
         }
     }
     switch (spellnum) {
-        case MCAST_DEATH_TOUCH:
+        case MCAST.DEATH_TOUCH:
             if ((Antimagic() || Hallucination()) && !rn2(2)) {
                 return TRUE;
             }
             break;
-        case MCAST_GEYSER:
+        case MCAST.GEYSER:
             if (!rn2(5)) {
                 return TRUE;
             }
             break;
-        case MCAST_CLONE_WIZ:
+        case MCAST.CLONE_WIZ:
             if (!mtmp.iswiz || svc.context.no_of_wizards > 1) {
                 return TRUE;
             }
             break;
-        case MCAST_AGGRAVATION:
+        case MCAST.AGGRAVATION:
             if (!await has_aggravatables(mtmp)) {
                 return $c.i8(rn2(100) ? TRUE : FALSE);
             }
             break;
-        case MCAST_HASTE_SELF:
+        case MCAST.HASTE_SELF:
             if ((mtmp.permspeed | 0) === MFAST) {
                 return TRUE;
             }
             break;
-        case MCAST_DISAPPEAR:
+        case MCAST.DISAPPEAR:
             if (mtmp.minvis | 0 || mtmp.invis_blkd | 0) {
                 return TRUE;
             }
@@ -729,12 +729,12 @@ async function spell_would_be_useless(mtmp, spellnum) {   // mcastu.c:909
                 return TRUE;
             }
             break;
-        case MCAST_CURE_SELF:
+        case MCAST.CURE_SELF:
             if (mtmp.mhp === mtmp.mhpmax) {
                 return TRUE;
             }
             break;
-        case MCAST_BLIND_YOU:
+        case MCAST.BLIND_YOU:
             if (Blinded()) {
                 return TRUE;
             }
@@ -746,23 +746,23 @@ async function spell_would_be_useless(mtmp, spellnum) {   // mcastu.c:909
 }
 export async function buzzmu(mtmp, mattk) {   // mcastu.c:989
     if (!BZ_VALID_ADTYP(mattk.adtyp)) {
-        return M_ATTK_MISS;
+        return M_ATTK.MISS;
     }
     if (mtmp.mcan | 0 || $c.andu64(mtmp.seen_resistance, cvt_adtyp_to_mseenres(mattk.adtyp))) {
         await cursetxt(mtmp, FALSE);
-        return M_ATTK_MISS;
+        return M_ATTK.MISS;
     }
     if (lined_up(mtmp) && rn2(3)) {
         nomul(0);
         if (canseemon(mtmp)) {
-            await pline_mon(mtmp, $c.lit("%s zaps you with a %s!"), await Monnam(mtmp), flash_str($c.rem32($c.abs(mattk.adtyp - AD_MAGM | 0), 10), FALSE));
+            await pline_mon(mtmp, $c.lit("%s zaps you with a %s!"), await Monnam(mtmp), flash_str($c.rem32($c.abs(mattk.adtyp - AD.MAGM | 0), 10), FALSE));
         }
         gb.buzzer = mtmp;
-        await buzz(-10 - $c.rem32($c.abs(mattk.adtyp - AD_MAGM | 0), 10) | 0, mattk.damn, mtmp.mx, mtmp.my, sgn(gt.tbx), sgn(gt.tby));
+        await buzz(-10 - $c.rem32($c.abs(mattk.adtyp - AD.MAGM | 0), 10) | 0, mattk.damn, mtmp.mx, mtmp.my, sgn(gt.tbx), sgn(gt.tby));
         gb.buzzer = null;
-        return M_ATTK_HIT;
+        return M_ATTK.HIT;
     }
-    return M_ATTK_MISS;
+    return M_ATTK.MISS;
 }
 
 export function $init() {
@@ -770,53 +770,53 @@ export function $init() {
         mcast_data[$i0].$copyFrom(new $T._mcast_data());
     }
     $c.init(mcast_data, [
-        { level: 0, flags: MCF_HOSTILE | MCF_SIGHT },
-        { level: 0, flags: MCF_HOSTILE | MCF_SIGHT },
-        { level: 1, flags: MCF_INDIRECT },
-        { level: 2, flags: MCF_INDIRECT },
-        { level: 2, flags: MCF_HOSTILE | MCF_SIGHT },
-        { level: 3, flags: MCF_HOSTILE | MCF_SIGHT },
-        { level: 4, flags: MCF_INDIRECT },
-        { level: 4, flags: MCF_HOSTILE | MCF_SIGHT },
-        { level: 6, flags: MCF_HOSTILE | MCF_SIGHT },
-        { level: 6, flags: MCF_HOSTILE | MCF_SIGHT },
-        { level: 8, flags: MCF_HOSTILE | MCF_SIGHT },
-        { level: 8, flags: MCF_HOSTILE | MCF_INDIRECT | MCF_SIGHT },
-        { level: 10, flags: MCF_HOSTILE | MCF_SIGHT },
-        { level: 11, flags: MCF_HOSTILE | MCF_SIGHT },
-        { level: 12, flags: MCF_HOSTILE | MCF_SIGHT },
-        { level: 13, flags: MCF_HOSTILE | MCF_SIGHT },
-        { level: 13, flags: MCF_INDIRECT | MCF_HOSTILE | MCF_SIGHT },
-        { level: 15, flags: MCF_HOSTILE | MCF_INDIRECT | MCF_SIGHT },
-        { level: 18, flags: MCF_HOSTILE | MCF_INDIRECT | MCF_SIGHT },
-        { level: 20, flags: MCF_HOSTILE | MCF_SIGHT }
+        { level: 0, flags: MCF.HOSTILE | MCF.SIGHT },
+        { level: 0, flags: MCF.HOSTILE | MCF.SIGHT },
+        { level: 1, flags: MCF.INDIRECT },
+        { level: 2, flags: MCF.INDIRECT },
+        { level: 2, flags: MCF.HOSTILE | MCF.SIGHT },
+        { level: 3, flags: MCF.HOSTILE | MCF.SIGHT },
+        { level: 4, flags: MCF.INDIRECT },
+        { level: 4, flags: MCF.HOSTILE | MCF.SIGHT },
+        { level: 6, flags: MCF.HOSTILE | MCF.SIGHT },
+        { level: 6, flags: MCF.HOSTILE | MCF.SIGHT },
+        { level: 8, flags: MCF.HOSTILE | MCF.SIGHT },
+        { level: 8, flags: MCF.HOSTILE | MCF.INDIRECT | MCF.SIGHT },
+        { level: 10, flags: MCF.HOSTILE | MCF.SIGHT },
+        { level: 11, flags: MCF.HOSTILE | MCF.SIGHT },
+        { level: 12, flags: MCF.HOSTILE | MCF.SIGHT },
+        { level: 13, flags: MCF.HOSTILE | MCF.SIGHT },
+        { level: 13, flags: MCF.INDIRECT | MCF.HOSTILE | MCF.SIGHT },
+        { level: 15, flags: MCF.HOSTILE | MCF.INDIRECT | MCF.SIGHT },
+        { level: 18, flags: MCF.HOSTILE | MCF.INDIRECT | MCF.SIGHT },
+        { level: 20, flags: MCF.HOSTILE | MCF.SIGHT }
     ]);
     mon_cleric_spells.fill(0);
     $c.init(mon_cleric_spells, [
-        MCAST_OPEN_WOUNDS,
-        MCAST_CURE_SELF,
-        MCAST_CONFUSE_YOU,
-        MCAST_PARALYZE,
-        MCAST_BLIND_YOU,
-        MCAST_INSECTS,
-        MCAST_CURSE_ITEMS,
-        MCAST_LIGHTNING,
-        MCAST_FIRE_PILLAR,
-        MCAST_GEYSER
+        MCAST.OPEN_WOUNDS,
+        MCAST.CURE_SELF,
+        MCAST.CONFUSE_YOU,
+        MCAST.PARALYZE,
+        MCAST.BLIND_YOU,
+        MCAST.INSECTS,
+        MCAST.CURSE_ITEMS,
+        MCAST.LIGHTNING,
+        MCAST.FIRE_PILLAR,
+        MCAST.GEYSER
     ]);
     mon_wizard_spells.fill(0);
     $c.init(mon_wizard_spells, [
-        MCAST_PSI_BOLT,
-        MCAST_CURE_SELF,
-        MCAST_HASTE_SELF,
-        MCAST_STUN_YOU,
-        MCAST_DISAPPEAR,
-        MCAST_WEAKEN_YOU,
-        MCAST_DESTRY_ARMR,
-        MCAST_CURSE_ITEMS,
-        MCAST_AGGRAVATION,
-        MCAST_SUMMON_MONS,
-        MCAST_CLONE_WIZ,
-        MCAST_DEATH_TOUCH
+        MCAST.PSI_BOLT,
+        MCAST.CURE_SELF,
+        MCAST.HASTE_SELF,
+        MCAST.STUN_YOU,
+        MCAST.DISAPPEAR,
+        MCAST.WEAKEN_YOU,
+        MCAST.DESTRY_ARMR,
+        MCAST.CURSE_ITEMS,
+        MCAST.AGGRAVATION,
+        MCAST.SUMMON_MONS,
+        MCAST.CLONE_WIZ,
+        MCAST.DEATH_TOUCH
     ]);
 }

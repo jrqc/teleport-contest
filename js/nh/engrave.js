@@ -4,9 +4,9 @@ import * as $T from './types.js';
 import { $G } from './globals.js';
 import { alloc } from './alloc.js';
 import { is_art } from './artifact.js';
-import { ART_FIRE_BRAND } from './artilist.h.js';
+import { ART } from './artilist.h.js';
 import { exercise } from './attrib.js';
-import { A_WIS } from './attrib.h.js';
+import { A } from './attrib.h.js';
 import { sanitize_name } from './bones.js';
 import { isok, set_occupation, yn_function } from './cmd.js';
 import { db_under_typ, is_ice, is_lava, is_pool, is_pool_or_lava } from './dbridge.js';
@@ -19,9 +19,9 @@ import { BURN, DUST, ENGRAVE, ENGR_BLOOD, HEADSTONE, MARK, N_ENGRAVE, actual_tex
 import { dealloc_engr } from './engrave.macros.js';
 import { more_experienced } from './exper.js';
 import { debugcore } from './files.js';
-import { BUFSZ, COLNO, FALSE, LL_CONDUCT, MD_PAD_RUMORS, ROWNO, TRUE } from './global.h.js';
+import { BUFSZ, COLNO, FALSE, LL, MD_PAD, ROWNO, TRUE } from './global.h.js';
 import { check_capacity, nomul } from './hack.js';
-import { ECMD_CANCEL, ECMD_FAIL, ECMD_OK, ECMD_TIME, FINGERTIP, GETOBJ_DOWNPLAY, GETOBJ_PROMPT, GETOBJ_SUGGEST, HAND, NO_MM_FLAGS, WAND_BACKFIRE_CHANCE } from './hack.h.js';
+import { ECMD, FINGERTIP, GETOBJ, GETOBJ_PROMPT, HAND, NO, WAND } from './hack.h.js';
 import { min, release_data, update_file } from './hack.macros.js';
 import { mungspaces, strncmpi, strstri, xcrypt } from './hacklib.js';
 import { getobj, hold_another_object, prinv, update_inventory, useup } from './invent.js';
@@ -29,12 +29,12 @@ import { nhUse } from './lint.macros.js';
 import { makemon } from './makemon.js';
 import { set_levltyp } from './mkmaze.js';
 import { obj_extract_self, splitobj } from './mkobj.js';
-import { AT_HUGS } from './monattk.h.js';
+import { AT } from './monattk.h.js';
 import { attacktype, resists_blnd, sticks } from './mondata.js';
 import { cantwield, ceiling_hider, is_animal, is_demon, is_vampire, is_whirly } from './mondata.macros.js';
-import { M1_FLY, MZ_HUGE } from './monflag.h.js';
+import { M1, MZ } from './monflag.h.js';
 import { mons } from './monst.js';
-import { PM_GHOUL } from './monsters.h.js';
+import { PM } from './monsters.h.js';
 import { bimanual, is_blade, is_boots, is_wet_towel } from './obj.macros.js';
 import { RANDOM_CLASS } from './objclass.h.js';
 import { objects } from './objects.js';
@@ -52,7 +52,7 @@ import { rn2, rnd } from './rnd.js';
 import { get_rnd_text, getrumor } from './rumors.js';
 import { sfi_char, sfi_engr, sfi_unsigned, sfo_char, sfo_engr, sfo_unsigned } from './sfbase.js';
 import { check_unpaid } from './shk.js';
-import { P_BASIC, P_RIDING } from './skills.h.js';
+import { P } from './skills.h.js';
 import { Strlen_ } from './strutil.js';
 import { goodpos } from './teleport.js';
 import { t_at, uescaped_shaft, uteetering_at_seen_pit } from './trap.js';
@@ -67,7 +67,7 @@ const blind_writing = $c.matrix(Int8Array, [9, 21]);
 export async function random_engraving(outbuf, pristine_copy) {   // engrave.c:51
     let rumor = null;
     if (!rn2(4) || !(rumor = await getrumor(0, pristine_copy, TRUE)) || !rumor.get(0)) {
-        await get_rnd_text($c.lit("engrave"), pristine_copy, rn2, MD_PAD_RUMORS);
+        await get_rnd_text($c.lit("engrave"), pristine_copy, rn2, MD_PAD.RUMORS);
     }
     $c.__builtin___strcpy_chk(outbuf, pristine_copy, -1);
     wipeout_text(outbuf, $c.i32($c.divu64($c.strlen(outbuf), 4)), 0);
@@ -122,16 +122,16 @@ export function wipeout_text(engr, cnt, seed) {   // engrave.c:120
 }
 export function can_reach_floor(check_pit) {   // engrave.c:187
     let t = null;
-    if (u.uswallow | 0 || u.ustuck && !sticks(gy.youmonst.data) && attacktype(u.ustuck.data, AT_HUGS) || Levitation() && !((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) {
+    if (u.uswallow | 0 || u.ustuck && !sticks(gy.youmonst.data) && attacktype(u.ustuck.data, AT.HUGS) || Levitation() && !((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) {
         return FALSE;
     }
-    if (u.usteed && u.weapon_skills[P_RIDING].skill < P_BASIC) {
+    if (u.usteed && u.weapon_skills[P.RIDING].skill < P.BASIC) {
         return FALSE;
     }
     if (u.uundetected | 0 && ceiling_hider(gy.youmonst.data)) {
         return FALSE;
     }
-    if ((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked || gy.youmonst.data.msize >= MZ_HUGE) {
+    if ((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked || gy.youmonst.data.msize >= MZ.HUGE) {
         return TRUE;
     }
     if (check_pit && (t = t_at(u.ux, u.uy)) !== null && (uteetering_at_seen_pit(t) || uescaped_shaft(t))) {
@@ -319,7 +319,7 @@ export async function make_engr_at(x, y, s, pristine_s, e_time, e_type) {   // e
         if (gi.in_mklev) {
             ep.guardobjects = (1) & 1;
         } else {
-            await exercise(A_WIS, TRUE);
+            await exercise(A.WIS, TRUE);
         }
     }
     ep.engr_time = e_time;
@@ -339,15 +339,15 @@ export async function freehand() {   // engrave.c:473
 }
 function stylus_ok(obj) {   // engrave.c:481
     if (!obj) {
-        return GETOBJ_SUGGEST;
+        return GETOBJ.SUGGEST;
     }
     if (obj.oclass === WEAPON_CLASS || obj.oclass === WAND_CLASS || obj.oclass === GEM_CLASS || obj.oclass === RING_CLASS) {
-        return GETOBJ_SUGGEST;
+        return GETOBJ.SUGGEST;
     }
     if (obj.oclass === TOOL_CLASS && (obj.otyp === TOWEL || obj.otyp === MAGIC_MARKER)) {
-        return GETOBJ_SUGGEST;
+        return GETOBJ.SUGGEST;
     }
-    return GETOBJ_DOWNPLAY;
+    return GETOBJ.DOWNPLAY;
 }
 async function u_can_engrave() {   // engrave.c:503
     let levtyp = 0;
@@ -393,7 +393,7 @@ function doengrave_ctx_init(de) {   // engrave.c:545
     de.zapwand = FALSE;
     de.disprefresh = FALSE;
     de.adding = FALSE;
-    de.ret = ECMD_OK;
+    de.ret = ECMD.OK;
     de.type = DUST;
     de.oetype = 0;
     de.otmp = null;
@@ -570,9 +570,9 @@ async function doengrave_sfx_item(de) {   // engrave.c:742
         case WAND_CLASS:
             if (await zappable(de.otmp)) {
                 await check_unpaid(de.otmp);
-                if (de.otmp.cursed | 0 && !rn2(WAND_BACKFIRE_CHANCE)) {
+                if (de.otmp.cursed | 0 && !rn2(WAND.BACKFIRE_CHANCE)) {
                     await wand_explode(de.otmp, 0);
-                    de.ret = ECMD_TIME;
+                    de.ret = ECMD.TIME;
                     return FALSE;
                 }
                 de.zapwand = TRUE;
@@ -592,7 +592,7 @@ async function doengrave_sfx_item(de) {   // engrave.c:742
             }
             break;
         case WEAPON_CLASS:
-            if (is_art(de.otmp, ART_FIRE_BRAND)) {
+            if (is_art(de.otmp, ART.FIRE_BRAND)) {
                 de.type = BURN;
             } else if (is_blade(de.otmp)) {
                 if (await welded(de.otmp)) {
@@ -607,7 +607,7 @@ async function doengrave_sfx_item(de) {   // engrave.c:742
         case TOOL_CLASS:
             if ($c.peq(de.otmp, $G.ublindf)) {
                 await pline($c.lit("That is a bit difficult to engrave with, don't you think?"));
-                de.ret = ECMD_FAIL;
+                de.ret = ECMD.FAIL;
                 return FALSE;
             }
             switch (de.otmp.otyp) {
@@ -681,7 +681,7 @@ export async function doengrave() {   // engrave.c:956
     let sp = null, de = null, retval = 0, initial_msg_given = 0, tmp_ep = null, c = 0, $t1, $t2, $t3, $t4, $t5, $t6;
     initial_msg_given = FALSE;
     if (!await u_can_engrave()) {
-        return ECMD_FAIL;
+        return ECMD.FAIL;
     }
     de = $c.asRec(await alloc(1224), $T._doengrave_ctx, 1224);
     doengrave_ctx_init(de);
@@ -690,7 +690,7 @@ export async function doengrave() {   // engrave.c:956
     $t1 = await getobj($c.lit("write with"), stylus_ok, GETOBJ_PROMPT), de.otmp = $t1;
     doengr_exit$: {
         if (!de.otmp) {
-            de.ret = ECMD_CANCEL;
+            de.ret = ECMD.CANCEL;
             break doengr_exit$;
         }
         if ($c.peq(de.otmp, hands_obj)) {
@@ -790,7 +790,7 @@ export async function doengrave() {   // engrave.c:956
             if (de.otmp && de.otmp.oclass === WAND_CLASS && !can_reach_floor(TRUE)) {
                 await cant_reach_floor(u.ux, u.uy, FALSE, TRUE, TRUE);
             }
-            de.ret = ECMD_TIME;
+            de.ret = ECMD.TIME;
             break doengr_exit$;
         }
         if (de.oep) {
@@ -816,7 +816,7 @@ export async function doengrave() {   // engrave.c:956
                     }
                 } else if (de.type === DUST || de.type === MARK || de.type === ENGR_BLOOD) {
                     await You($c.lit("cannot wipe out the message that is %s the %s here."), de.oep.engr_type === BURN ? de.frosted ? $c.lit("melted into") : $c.lit("burned into") : $c.lit("engraved in"), surface(u.ux, u.uy));
-                    de.ret = ECMD_TIME;
+                    de.ret = ECMD.TIME;
                     break doengr_exit$;
                 } else if (de.type !== de.oep.engr_type || c === 110) {
                     if (!Blind() || can_reach_floor(TRUE)) {
@@ -826,7 +826,7 @@ export async function doengrave() {   // engrave.c:956
                 }
             } else if (de.oep && await Strlen_(de.oep.engr_txt[actual_text], $c.lit("doengrave"), 1163) >= BUFSZ - 1) {
                 await There($c.lit("is no room to add anything else here."));
-                de.ret = ECMD_TIME;
+                de.ret = ECMD.TIME;
                 break doengr_exit$;
             }
         }
@@ -852,7 +852,7 @@ export async function doengrave() {   // engrave.c:956
                 if (!Blind()) {
                     await pline($c.lit("%s, then %s."), await Tobjnam(de.otmp, $c.lit("glow")), await otense(de.otmp, $c.lit("fade")));
                 }
-                de.ret = ECMD_TIME;
+                de.ret = ECMD.TIME;
                 break doengr_exit$;
             } else {
                 await pline($c.lit("%s"), c_common_strings.c_Never_mind);
@@ -861,7 +861,7 @@ export async function doengrave() {   // engrave.c:956
         }
         if (de.len !== 1 || !$c.strchr(new $c.Ptr(de.ebuf, 0), 120) && !$c.strchr(new $c.Ptr(de.ebuf, 0), 88)) {
             if (!($t5 = u.uconduct.literate, u.uconduct.literate = $c.add64($t5, 1), $t5)) {
-                await livelog_printf(LL_CONDUCT, $c.lit("became literate by engraving \"%s\""), new $c.Ptr(de.ebuf, 0));
+                await livelog_printf(LL.CONDUCT, $c.lit("became literate by engraving \"%s\""), new $c.Ptr(de.ebuf, 0));
             }
         }
         for (sp = new $c.Ptr(de.ebuf, 0); sp.get(0); sp = sp.add(1)) {
@@ -1199,7 +1199,7 @@ export async function make_grave(x, y, str) {   // engrave.c:1687
     }
     await del_engr_at(x, y);
     if (!str) {
-        str = await get_rnd_text($c.lit("epitaph"), new $c.Ptr(buf, 0), rn2, MD_PAD_RUMORS);
+        str = await get_rnd_text($c.lit("epitaph"), new $c.Ptr(buf, 0), rn2, MD_PAD.RUMORS);
     }
     await make_engr_at(x, y, str, null, 0, HEADSTONE);
     return;
@@ -1214,8 +1214,8 @@ export async function disturb_grave(x, y) {   // engrave.c:1707
     } else {
         await You($c.lit("disturb the undead!"));
         lev.horizontal = (1) & 1;
-        await makemon($c.relem(mons, PM_GHOUL), x, y, NO_MM_FLAGS);
-        await exercise(A_WIS, FALSE);
+        await makemon($c.relem(mons, PM.GHOUL), x, y, NO.MM_FLAGS);
+        await exercise(A.WIS, FALSE);
     }
 }
 export async function see_engraving(ep) {   // engrave.c:1724

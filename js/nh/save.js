@@ -23,7 +23,7 @@ import { discover, wizard } from './flag.macros.js';
 import { BUFSZ, COLNO, FALSE, PL_NSIZ_PLUS, ROWNO, TRUE } from './global.h.js';
 import { free_glyphid_cache, glyphid_cache_status, purge_all_custom_entries } from './glyphs.js';
 import { nomul } from './hack.js';
-import { COUNTING, CQ_CANNED, CQ_REPEAT, ECMD_OK, FREEING, REST_GSTATE, SAVEPREFIX, TRICKED, WRITING, all_themes } from './hack.h.js';
+import { COUNTING, CQ_CANNED, CQ_REPEAT, ECMD, FREEING, REST, SAVEPREFIX, TRICKED, WRITING, all_themes } from './hack.h.js';
 import { BALL_IN_MON, CHAIN_IN_MON, pline1, release_data, update_file } from './hack.macros.js';
 import { nh_snprintf } from './hacklib.js';
 import { free_invbuf } from './invent.js';
@@ -38,7 +38,7 @@ import { save_rooms } from './mkroom.js';
 import { alloc_itermonarr, dealloc_monst, dmonsfree, mon_animal_list, set_ustuck } from './mon.js';
 import { free_tutorial, save_luadata } from './nhlua.js';
 import { savenames } from './o_init.js';
-import { OBJ_FREE } from './obj.h.js';
+import { OBJ } from './obj.h.js';
 import { Has_contents, OMAILCMD, OMONST, ONAME } from './obj.macros.js';
 import { MAXSPELL } from './objclass.h.js';
 import { dealloc_fruit } from './objclass.macros.js';
@@ -46,7 +46,7 @@ import { free_autopickup_exceptions, freeroleoptvals, msgtype_free, options_free
 import { NUMMONS } from './permonst.h.js';
 import { There, dumplogfreemessages, free_youbuf, impossible, pline } from './pline.js';
 import { forget_temple_entry } from './priest.js';
-import { W_BALL, W_CHAIN } from './prop.h.js';
+import { W } from './prop.h.js';
 import { free_rect } from './rect.js';
 import { save_regions } from './region.js';
 import { getlev, moves_to_relative_time, relative_time_to_moves, rest_adjust_levelflags } from './restore.js';
@@ -59,7 +59,7 @@ import { Strlen_ } from './strutil.js';
 import { free_symsets, savedsym_free } from './symbols.js';
 import { sysopt_release } from './sys.js';
 import { save_timers } from './timeout.js';
-import { RANGE_GLOBAL, RANGE_LEVEL } from './timeout.h.js';
+import { RANGE } from './timeout.h.js';
 import { save_track } from './track.js';
 import { dealloc_trap } from './trap.macros.js';
 import { free_nhuuid, sethanguphandler } from './unixmain.js';
@@ -96,7 +96,7 @@ export async function dosave() {   // save.c:43
             await docrt();
         }
     }
-    return ECMD_OK;
+    return ECMD.OK;
 }
 export async function dosave0() {   // save.c:74
     let fq_save = null, ltmp = Int8Array.of(0), whynot = new Int8Array(256), nhfp = null, onhfp = null, res = 0, $t1, $t2, $t3;
@@ -271,8 +271,8 @@ async function savegamestate(nhfp) {   // save.c:265
     await sfo_char(nhfp, yyyymmddhhmmss(urealtime.start_timing), $c.lit("gamestate-start_timing"), 14);
     urealtime.start_timing = urealtime.finish_time;
     await save_killers(nhfp);
-    await save_timers(nhfp, RANGE_GLOBAL);
-    await save_light_sources(nhfp, RANGE_GLOBAL);
+    await save_timers(nhfp, RANGE.GLOBAL);
+    await save_light_sources(nhfp, RANGE.GLOBAL);
     await saveobjchn(nhfp, new $c.FieldRef(gi, "invent", "ptr"));
     await save_bc(nhfp);
     await saveobjchn(nhfp, new $c.FieldRef(gm, "migrating_objs", "ptr"));
@@ -434,8 +434,8 @@ async function savelev_core(nhfp, lev$in) {   // save.c:452
         }
         await save_rooms(nhfp);
     }
-    await save_timers(nhfp, RANGE_LEVEL);
-    await save_light_sources(nhfp, RANGE_LEVEL);
+    await save_timers(nhfp, RANGE.LEVEL);
+    await save_light_sources(nhfp, RANGE.LEVEL);
     await savemonchn(nhfp, svl.level.monlist);
     await save_worm(nhfp);
     await savetrapchn(nhfp, gf.ftrap);
@@ -537,7 +537,7 @@ async function save_stairs(nhfp) {   // save.c:665
     buflen[0] = 24;
     while (stway) {
         if (update_file(nhfp)) {
-            use_relative = $c.i8(program_state.restoring !== REST_GSTATE && stway.tolev.dnum === u.uz.dnum ? 1 : 0);
+            use_relative = $c.i8(program_state.restoring !== REST.GSTATE && stway.tolev.dnum === u.uz.dnum ? 1 : 0);
             if (use_relative) {
                 stway.tolev.dlevel = $c.i16(stway.tolev.dlevel - u.uz.dlevel | 0);
             }
@@ -561,7 +561,7 @@ async function save_bc(nhfp) {   // save.c:696
         gl.loosechain.nobj = bc_objs[0];
         bc_objs[0] = gl.loosechain;
         if (nhfp.mode & FREEING) {
-            await setworn(null, W_CHAIN);
+            await setworn(null, W.CHAIN);
             gl.loosechain = null;
         }
     }
@@ -569,7 +569,7 @@ async function save_bc(nhfp) {   // save.c:696
         gl.looseball.nobj = bc_objs[0];
         bc_objs[0] = gl.looseball;
         if (nhfp.mode & FREEING) {
-            await setworn(null, W_BALL);
+            await setworn(null, W.BALL);
             gl.looseball = null;
         }
     }
@@ -626,14 +626,14 @@ async function saveobjchn(nhfp, obj_p) {   // save.c:762
                 svc.context.spbook.o_id = otmp.o_id;
                 svc.context.spbook.book = null;
             }
-            otmp.where = OBJ_FREE;
+            otmp.where = OBJ.FREE;
             otmp.nobj = null;
             otmp.cobj = null;
             otmp.timed = 0;
             otmp.lamplit = (0) & 1;
             otmp.corpsenm = 0;
-            if ($c.and64(otmp.owornmask, W_BALL | W_CHAIN) !== 0) {
-                await setworn(null, $c.and64(otmp.owornmask, W_BALL | W_CHAIN));
+            if ($c.and64(otmp.owornmask, W.BALL | W.CHAIN) !== 0) {
+                await setworn(null, $c.and64(otmp.owornmask, W.BALL | W.CHAIN));
             }
             otmp.owornmask = 0;
             program_state.freeingdata = program_state.freeingdata + 1 | 0;
@@ -740,7 +740,7 @@ async function savemonchn(nhfp, mtmp) {   // save.c:884
 async function savetrapchn(nhfp, trap) {   // save.c:920
     let trap2 = null, use_relative = 0;
     while (trap) {
-        use_relative = $c.i8(program_state.restoring !== REST_GSTATE && trap.dst.dnum === u.uz.dnum ? 1 : 0);
+        use_relative = $c.i8(program_state.restoring !== REST.GSTATE && trap.dst.dnum === u.uz.dnum ? 1 : 0);
         trap2 = trap.ntrap;
         if (use_relative) {
             trap.dst.dlevel = $c.i16(trap.dst.dlevel - u.uz.dlevel | 0);
@@ -874,8 +874,8 @@ export async function freedynamicdata() {   // save.c:1077
     await done_object_cleanup();
     await savelev(tnhfp, -1);
     await save_killers(tnhfp);
-    await save_timers(tnhfp, RANGE_GLOBAL);
-    await save_light_sources(tnhfp, RANGE_GLOBAL);
+    await save_timers(tnhfp, RANGE.GLOBAL);
+    await save_light_sources(tnhfp, RANGE.GLOBAL);
     await saveobjchn(tnhfp, new $c.FieldRef(gi, "invent", "ptr")), gi.invent = null;
     await saveobjchn(tnhfp, new $c.FieldRef(gm, "migrating_objs", "ptr")), gm.migrating_objs = null;
     await savemonchn(tnhfp, gm.migrating_mons), gm.migrating_mons = null;

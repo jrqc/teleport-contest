@@ -4,9 +4,9 @@ import * as $T from './types.js';
 import { $G } from './globals.js';
 import { is_pool } from './dbridge.js';
 import { svl, u } from './decl.js';
-import { S_arrow_trap, S_brdnladder, S_digbeam, S_expl_br, S_expl_tl, S_goodpos, S_grave, S_ndoor, S_trwall, S_vwall } from './defsym.h.js';
+import { S } from './defsym.h.js';
 import { canseemon, sensemon } from './display.js';
-import { EXPL_FROSTY, EXPL_MAGICAL, EXPL_MUDDY, EXPL_NOXIOUS, EXPL_WET, GLYPH_ALTAR_OFF, GLYPH_BODY_OFF, GLYPH_BODY_PILETOP_OFF, GLYPH_CMAP_A_OFF, GLYPH_CMAP_B_OFF, GLYPH_CMAP_C_OFF, GLYPH_CMAP_GEH_OFF, GLYPH_CMAP_KNOX_OFF, GLYPH_CMAP_MAIN_OFF, GLYPH_CMAP_MINES_OFF, GLYPH_CMAP_SOKO_OFF, GLYPH_CMAP_STONE_OFF, GLYPH_DETECT_FEM_OFF, GLYPH_DETECT_MALE_OFF, GLYPH_EXPLODE_FIERY_OFF, GLYPH_EXPLODE_FROSTY_OFF, GLYPH_EXPLODE_MAGICAL_OFF, GLYPH_EXPLODE_MUDDY_OFF, GLYPH_EXPLODE_NOXIOUS_OFF, GLYPH_EXPLODE_OFF, GLYPH_EXPLODE_WET_OFF, GLYPH_INVISIBLE, GLYPH_MON_FEM_OFF, GLYPH_MON_MALE_OFF, GLYPH_NOTHING, GLYPH_OBJ_OFF, GLYPH_OBJ_PILETOP_OFF, GLYPH_PET_FEM_OFF, GLYPH_PET_MALE_OFF, GLYPH_RIDDEN_FEM_OFF, GLYPH_RIDDEN_MALE_OFF, GLYPH_STATUE_FEM_OFF, GLYPH_STATUE_FEM_PILETOP_OFF, GLYPH_STATUE_MALE_OFF, GLYPH_STATUE_MALE_PILETOP_OFF, GLYPH_SWALLOW_OFF, GLYPH_TRAP_OFF, GLYPH_UNEXPLORED, GLYPH_WARNING_OFF, GLYPH_ZAP_OFF, NO_GLYPH, NUM_ZAP } from './display.h.js';
+import { EXPL, GLYPH, GLYPH_INVISIBLE, GLYPH_NOTHING, GLYPH_TRAP_OFF, GLYPH_UNEXPLORED, NO_GLYPH, NUM_ZAP } from './display.h.js';
 import { MALE } from './monflag.h.js';
 import { NUM_OBJECTS } from './objclass.h.js';
 import { CORPSE, FIRST_OBJECT, STATUE } from './objects.h.js';
@@ -31,154 +31,154 @@ export function covers_objects(xx, yy) {
     return is_pool(xx, yy) && !u.uinwater || svl.level.locations[xx][yy].typ === LAVAPOOL || svl.level.locations[xx][yy].typ === LAVAWALL ? 1 : 0;
 }
 export function warning_to_glyph(mwarnlev) {
-    return mwarnlev + GLYPH_WARNING_OFF | 0;
+    return mwarnlev + GLYPH.WARNING_OFF | 0;
 }
 export function explosion_to_glyph(expltyp, idx) {
-    return (idx - S_expl_tl | 0) + (expltyp === EXPL_FROSTY ? GLYPH_EXPLODE_FROSTY_OFF : expltyp === EXPL_MAGICAL ? GLYPH_EXPLODE_MAGICAL_OFF : expltyp === EXPL_WET ? GLYPH_EXPLODE_WET_OFF : expltyp === EXPL_MUDDY ? GLYPH_EXPLODE_MUDDY_OFF : expltyp === EXPL_NOXIOUS ? GLYPH_EXPLODE_NOXIOUS_OFF : GLYPH_EXPLODE_FIERY_OFF) | 0;
+    return (idx - S.expl_tl | 0) + (expltyp === EXPL.FROSTY ? GLYPH.EXPLODE_FROSTY_OFF : expltyp === EXPL.MAGICAL ? GLYPH.EXPLODE_MAGICAL_OFF : expltyp === EXPL.WET ? GLYPH.EXPLODE_WET_OFF : expltyp === EXPL.MUDDY ? GLYPH.EXPLODE_MUDDY_OFF : expltyp === EXPL.NOXIOUS ? GLYPH.EXPLODE_NOXIOUS_OFF : GLYPH.EXPLODE_FIERY_OFF) | 0;
 }
 export function monnum_to_glyph(mnum, gnd) {
-    return mnum + (gnd === MALE ? GLYPH_MON_MALE_OFF : GLYPH_MON_FEM_OFF) | 0;
+    return mnum + (gnd === MALE ? GLYPH.MON_MALE_OFF : GLYPH.MON_FEM_OFF) | 0;
 }
 export function detected_monnum_to_glyph(mnum, gnd) {
-    return mnum + (gnd === MALE ? GLYPH_DETECT_MALE_OFF : GLYPH_DETECT_FEM_OFF) | 0;
+    return mnum + (gnd === MALE ? GLYPH.DETECT_MALE_OFF : GLYPH.DETECT_FEM_OFF) | 0;
 }
 export function petnum_to_glyph(mnum, gnd) {
-    return mnum + (gnd === MALE ? GLYPH_PET_MALE_OFF : GLYPH_PET_FEM_OFF) | 0;
+    return mnum + (gnd === MALE ? GLYPH.PET_MALE_OFF : GLYPH.PET_FEM_OFF) | 0;
 }
 export function glyph_is_cmap_main(glyph) {
-    return glyph >= GLYPH_CMAP_MAIN_OFF && glyph < S_trwall - S_vwall + 1 + GLYPH_CMAP_MAIN_OFF ? 1 : 0;
+    return glyph >= GLYPH.CMAP_MAIN_OFF && glyph < S.trwall - S.vwall + 1 + GLYPH.CMAP_MAIN_OFF ? 1 : 0;
 }
 export function glyph_is_cmap_mines(glyph) {
-    return glyph >= GLYPH_CMAP_MINES_OFF && glyph < S_trwall - S_vwall + 1 + GLYPH_CMAP_MINES_OFF ? 1 : 0;
+    return glyph >= GLYPH.CMAP_MINES_OFF && glyph < S.trwall - S.vwall + 1 + GLYPH.CMAP_MINES_OFF ? 1 : 0;
 }
 export function glyph_is_cmap_gehennom(glyph) {
-    return glyph >= GLYPH_CMAP_GEH_OFF && glyph < S_trwall - S_vwall + 1 + GLYPH_CMAP_GEH_OFF ? 1 : 0;
+    return glyph >= GLYPH.CMAP_GEH_OFF && glyph < S.trwall - S.vwall + 1 + GLYPH.CMAP_GEH_OFF ? 1 : 0;
 }
 export function glyph_is_cmap_knox(glyph) {
-    return glyph >= GLYPH_CMAP_KNOX_OFF && glyph < S_trwall - S_vwall + 1 + GLYPH_CMAP_KNOX_OFF ? 1 : 0;
+    return glyph >= GLYPH.CMAP_KNOX_OFF && glyph < S.trwall - S.vwall + 1 + GLYPH.CMAP_KNOX_OFF ? 1 : 0;
 }
 export function glyph_is_cmap_sokoban(glyph) {
-    return glyph >= GLYPH_CMAP_SOKO_OFF && glyph < S_trwall - S_vwall + 1 + GLYPH_CMAP_SOKO_OFF ? 1 : 0;
+    return glyph >= GLYPH.CMAP_SOKO_OFF && glyph < S.trwall - S.vwall + 1 + GLYPH.CMAP_SOKO_OFF ? 1 : 0;
 }
 export function glyph_is_cmap_a(glyph) {
-    return glyph >= GLYPH_CMAP_A_OFF && glyph < S_brdnladder - S_ndoor + 1 + GLYPH_CMAP_A_OFF ? 1 : 0;
+    return glyph >= GLYPH.CMAP_A_OFF && glyph < S.brdnladder - S.ndoor + 1 + GLYPH.CMAP_A_OFF ? 1 : 0;
 }
 export function glyph_is_cmap_altar(glyph) {
-    return glyph >= GLYPH_ALTAR_OFF && glyph < 5 + GLYPH_ALTAR_OFF ? 1 : 0;
+    return glyph >= GLYPH.ALTAR_OFF && glyph < 5 + GLYPH.ALTAR_OFF ? 1 : 0;
 }
 export function glyph_is_cmap_b(glyph) {
-    return glyph >= GLYPH_CMAP_B_OFF && glyph < S_arrow_trap + MAXTCHARS - S_grave + GLYPH_CMAP_B_OFF ? 1 : 0;
+    return glyph >= GLYPH.CMAP_B_OFF && glyph < S.arrow_trap + MAXTCHARS - S.grave + GLYPH.CMAP_B_OFF ? 1 : 0;
 }
 export function glyph_is_cmap_zap(glyph) {
-    return glyph >= GLYPH_ZAP_OFF && glyph < (NUM_ZAP << 2) + GLYPH_ZAP_OFF ? 1 : 0;
+    return glyph >= GLYPH.ZAP_OFF && glyph < (NUM_ZAP << 2) + GLYPH.ZAP_OFF ? 1 : 0;
 }
 export function glyph_is_cmap_c(glyph) {
-    return glyph >= GLYPH_CMAP_C_OFF && glyph < S_goodpos - S_digbeam + 1 + GLYPH_CMAP_C_OFF ? 1 : 0;
+    return glyph >= GLYPH.CMAP_C_OFF && glyph < S.goodpos - S.digbeam + 1 + GLYPH.CMAP_C_OFF ? 1 : 0;
 }
 export function glyph_is_swallow(glyph) {
-    return glyph >= GLYPH_SWALLOW_OFF && glyph < (NUMMONS << 3) + GLYPH_SWALLOW_OFF ? 1 : 0;
+    return glyph >= GLYPH.SWALLOW_OFF && glyph < (NUMMONS << 3) + GLYPH.SWALLOW_OFF ? 1 : 0;
 }
 export function glyph_is_explosion(glyph) {
-    return glyph >= GLYPH_EXPLODE_OFF && glyph < MAXEXPCHARS + GLYPH_EXPLODE_FROSTY_OFF ? 1 : 0;
+    return glyph >= GLYPH.EXPLODE_OFF && glyph < MAXEXPCHARS + GLYPH.EXPLODE_FROSTY_OFF ? 1 : 0;
 }
 export function glyph_is_cmap(glyph) {
-    return glyph >= GLYPH_CMAP_STONE_OFF && glyph < GLYPH_CMAP_C_OFF + (S_goodpos - S_digbeam + 1) ? 1 : 0;
+    return glyph >= GLYPH.CMAP_STONE_OFF && glyph < GLYPH.CMAP_C_OFF + (S.goodpos - S.digbeam + 1) ? 1 : 0;
 }
 export function glyph_to_swallow(glyph) {
-    return glyph >= GLYPH_SWALLOW_OFF && glyph < (NUMMONS << 3) + GLYPH_SWALLOW_OFF ? (glyph - GLYPH_SWALLOW_OFF | 0) & 7 : 0;
+    return glyph >= GLYPH.SWALLOW_OFF && glyph < (NUMMONS << 3) + GLYPH.SWALLOW_OFF ? (glyph - GLYPH.SWALLOW_OFF | 0) & 7 : 0;
 }
 export function glyph_to_explosion(glyph) {
-    return glyph >= GLYPH_EXPLODE_OFF && glyph < MAXEXPCHARS + GLYPH_EXPLODE_FROSTY_OFF ? $c.rem32(glyph - GLYPH_EXPLODE_OFF | 0, S_expl_br - S_expl_tl + 1) : 0;
+    return glyph >= GLYPH.EXPLODE_OFF && glyph < MAXEXPCHARS + GLYPH.EXPLODE_FROSTY_OFF ? $c.rem32(glyph - GLYPH.EXPLODE_OFF | 0, S.expl_br - S.expl_tl + 1) : 0;
 }
 export function glyph_to_warning(glyph) {
-    return glyph >= GLYPH_WARNING_OFF && glyph < GLYPH_WARNING_OFF + WARNCOUNT ? glyph - GLYPH_WARNING_OFF | 0 : 0;
+    return glyph >= GLYPH.WARNING_OFF && glyph < GLYPH.WARNING_OFF + WARNCOUNT ? glyph - GLYPH.WARNING_OFF | 0 : 0;
 }
 export function glyph_is_normal_male_monster(glyph) {
-    return glyph >= GLYPH_MON_MALE_OFF && glyph < GLYPH_MON_MALE_OFF + NUMMONS ? 1 : 0;
+    return glyph >= GLYPH.MON_MALE_OFF && glyph < GLYPH.MON_MALE_OFF + NUMMONS ? 1 : 0;
 }
 export function glyph_is_normal_female_monster(glyph) {
-    return glyph >= GLYPH_MON_FEM_OFF && glyph < GLYPH_MON_FEM_OFF + NUMMONS ? 1 : 0;
+    return glyph >= GLYPH.MON_FEM_OFF && glyph < GLYPH.MON_FEM_OFF + NUMMONS ? 1 : 0;
 }
 export function glyph_is_female_pet(glyph) {
-    return glyph >= GLYPH_PET_FEM_OFF && glyph < GLYPH_PET_FEM_OFF + NUMMONS ? 1 : 0;
+    return glyph >= GLYPH.PET_FEM_OFF && glyph < GLYPH.PET_FEM_OFF + NUMMONS ? 1 : 0;
 }
 export function glyph_is_male_pet(glyph) {
-    return glyph >= GLYPH_PET_MALE_OFF && glyph < GLYPH_PET_MALE_OFF + NUMMONS ? 1 : 0;
+    return glyph >= GLYPH.PET_MALE_OFF && glyph < GLYPH.PET_MALE_OFF + NUMMONS ? 1 : 0;
 }
 export function glyph_is_pet(glyph) {
-    return glyph >= GLYPH_PET_MALE_OFF && glyph < GLYPH_PET_MALE_OFF + NUMMONS || glyph >= GLYPH_PET_FEM_OFF && glyph < GLYPH_PET_FEM_OFF + NUMMONS ? 1 : 0;
+    return glyph >= GLYPH.PET_MALE_OFF && glyph < GLYPH.PET_MALE_OFF + NUMMONS || glyph >= GLYPH.PET_FEM_OFF && glyph < GLYPH.PET_FEM_OFF + NUMMONS ? 1 : 0;
 }
 export function glyph_is_ridden_female_monster(glyph) {
-    return glyph >= GLYPH_RIDDEN_FEM_OFF && glyph < GLYPH_RIDDEN_FEM_OFF + NUMMONS ? 1 : 0;
+    return glyph >= GLYPH.RIDDEN_FEM_OFF && glyph < GLYPH.RIDDEN_FEM_OFF + NUMMONS ? 1 : 0;
 }
 export function glyph_is_ridden_male_monster(glyph) {
-    return glyph >= GLYPH_RIDDEN_MALE_OFF && glyph < GLYPH_RIDDEN_MALE_OFF + NUMMONS ? 1 : 0;
+    return glyph >= GLYPH.RIDDEN_MALE_OFF && glyph < GLYPH.RIDDEN_MALE_OFF + NUMMONS ? 1 : 0;
 }
 export function glyph_is_detected_female_monster(glyph) {
-    return glyph >= GLYPH_DETECT_FEM_OFF && glyph < GLYPH_DETECT_FEM_OFF + NUMMONS ? 1 : 0;
+    return glyph >= GLYPH.DETECT_FEM_OFF && glyph < GLYPH.DETECT_FEM_OFF + NUMMONS ? 1 : 0;
 }
 export function glyph_is_detected_male_monster(glyph) {
-    return glyph >= GLYPH_DETECT_MALE_OFF && glyph < GLYPH_DETECT_MALE_OFF + NUMMONS ? 1 : 0;
+    return glyph >= GLYPH.DETECT_MALE_OFF && glyph < GLYPH.DETECT_MALE_OFF + NUMMONS ? 1 : 0;
 }
 export function glyph_is_monster(glyph) {
-    return glyph >= GLYPH_MON_MALE_OFF && glyph < GLYPH_MON_MALE_OFF + NUMMONS || glyph >= GLYPH_MON_FEM_OFF && glyph < GLYPH_MON_FEM_OFF + NUMMONS || (glyph >= GLYPH_PET_MALE_OFF && glyph < GLYPH_PET_MALE_OFF + NUMMONS || glyph >= GLYPH_PET_FEM_OFF && glyph < GLYPH_PET_FEM_OFF + NUMMONS) || (glyph >= GLYPH_RIDDEN_MALE_OFF && glyph < GLYPH_RIDDEN_MALE_OFF + NUMMONS || glyph >= GLYPH_RIDDEN_FEM_OFF && glyph < GLYPH_RIDDEN_FEM_OFF + NUMMONS) || (glyph >= GLYPH_DETECT_MALE_OFF && glyph < GLYPH_DETECT_MALE_OFF + NUMMONS || glyph >= GLYPH_DETECT_FEM_OFF && glyph < GLYPH_DETECT_FEM_OFF + NUMMONS) ? 1 : 0;
+    return glyph >= GLYPH.MON_MALE_OFF && glyph < GLYPH.MON_MALE_OFF + NUMMONS || glyph >= GLYPH.MON_FEM_OFF && glyph < GLYPH.MON_FEM_OFF + NUMMONS || (glyph >= GLYPH.PET_MALE_OFF && glyph < GLYPH.PET_MALE_OFF + NUMMONS || glyph >= GLYPH.PET_FEM_OFF && glyph < GLYPH.PET_FEM_OFF + NUMMONS) || (glyph >= GLYPH.RIDDEN_MALE_OFF && glyph < GLYPH.RIDDEN_MALE_OFF + NUMMONS || glyph >= GLYPH.RIDDEN_FEM_OFF && glyph < GLYPH.RIDDEN_FEM_OFF + NUMMONS) || (glyph >= GLYPH.DETECT_MALE_OFF && glyph < GLYPH.DETECT_MALE_OFF + NUMMONS || glyph >= GLYPH.DETECT_FEM_OFF && glyph < GLYPH.DETECT_FEM_OFF + NUMMONS) ? 1 : 0;
 }
 export function glyph_is_invisible(glyph) {
     return glyph === GLYPH_INVISIBLE ? 1 : 0;
 }
 export function glyph_to_mon(glyph) {
-    return glyph >= GLYPH_MON_FEM_OFF && glyph < GLYPH_MON_FEM_OFF + NUMMONS ? glyph - GLYPH_MON_FEM_OFF | 0 : glyph >= GLYPH_MON_MALE_OFF && glyph < GLYPH_MON_MALE_OFF + NUMMONS ? glyph - GLYPH_MON_MALE_OFF | 0 : glyph >= GLYPH_PET_FEM_OFF && glyph < GLYPH_PET_FEM_OFF + NUMMONS ? glyph - GLYPH_PET_FEM_OFF | 0 : glyph >= GLYPH_PET_MALE_OFF && glyph < GLYPH_PET_MALE_OFF + NUMMONS ? glyph - GLYPH_PET_MALE_OFF | 0 : glyph >= GLYPH_DETECT_FEM_OFF && glyph < GLYPH_DETECT_FEM_OFF + NUMMONS ? glyph - GLYPH_DETECT_FEM_OFF | 0 : glyph >= GLYPH_DETECT_MALE_OFF && glyph < GLYPH_DETECT_MALE_OFF + NUMMONS ? glyph - GLYPH_DETECT_MALE_OFF | 0 : glyph >= GLYPH_RIDDEN_FEM_OFF && glyph < GLYPH_RIDDEN_FEM_OFF + NUMMONS ? glyph - GLYPH_RIDDEN_FEM_OFF | 0 : glyph >= GLYPH_RIDDEN_MALE_OFF && glyph < GLYPH_RIDDEN_MALE_OFF + NUMMONS ? glyph - GLYPH_RIDDEN_MALE_OFF | 0 : NUMMONS;
+    return glyph >= GLYPH.MON_FEM_OFF && glyph < GLYPH.MON_FEM_OFF + NUMMONS ? glyph - GLYPH.MON_FEM_OFF | 0 : glyph >= GLYPH.MON_MALE_OFF && glyph < GLYPH.MON_MALE_OFF + NUMMONS ? glyph - GLYPH.MON_MALE_OFF | 0 : glyph >= GLYPH.PET_FEM_OFF && glyph < GLYPH.PET_FEM_OFF + NUMMONS ? glyph - GLYPH.PET_FEM_OFF | 0 : glyph >= GLYPH.PET_MALE_OFF && glyph < GLYPH.PET_MALE_OFF + NUMMONS ? glyph - GLYPH.PET_MALE_OFF | 0 : glyph >= GLYPH.DETECT_FEM_OFF && glyph < GLYPH.DETECT_FEM_OFF + NUMMONS ? glyph - GLYPH.DETECT_FEM_OFF | 0 : glyph >= GLYPH.DETECT_MALE_OFF && glyph < GLYPH.DETECT_MALE_OFF + NUMMONS ? glyph - GLYPH.DETECT_MALE_OFF | 0 : glyph >= GLYPH.RIDDEN_FEM_OFF && glyph < GLYPH.RIDDEN_FEM_OFF + NUMMONS ? glyph - GLYPH.RIDDEN_FEM_OFF | 0 : glyph >= GLYPH.RIDDEN_MALE_OFF && glyph < GLYPH.RIDDEN_MALE_OFF + NUMMONS ? glyph - GLYPH.RIDDEN_MALE_OFF | 0 : NUMMONS;
 }
 export function glyph_is_body_piletop(glyph) {
-    return glyph >= GLYPH_BODY_PILETOP_OFF && glyph < GLYPH_BODY_PILETOP_OFF + NUMMONS ? 1 : 0;
+    return glyph >= GLYPH.BODY_PILETOP_OFF && glyph < GLYPH.BODY_PILETOP_OFF + NUMMONS ? 1 : 0;
 }
 export function glyph_is_body(glyph) {
-    return glyph >= GLYPH_BODY_OFF && glyph < GLYPH_BODY_OFF + NUMMONS || glyph >= GLYPH_BODY_PILETOP_OFF && glyph < GLYPH_BODY_PILETOP_OFF + NUMMONS ? 1 : 0;
+    return glyph >= GLYPH.BODY_OFF && glyph < GLYPH.BODY_OFF + NUMMONS || glyph >= GLYPH.BODY_PILETOP_OFF && glyph < GLYPH.BODY_PILETOP_OFF + NUMMONS ? 1 : 0;
 }
 export function glyph_is_fem_statue_piletop(glyph) {
-    return glyph >= GLYPH_STATUE_FEM_PILETOP_OFF && glyph < GLYPH_STATUE_FEM_PILETOP_OFF + NUMMONS ? 1 : 0;
+    return glyph >= GLYPH.STATUE_FEM_PILETOP_OFF && glyph < GLYPH.STATUE_FEM_PILETOP_OFF + NUMMONS ? 1 : 0;
 }
 export function glyph_is_male_statue_piletop(glyph) {
-    return glyph >= GLYPH_STATUE_MALE_PILETOP_OFF && glyph < GLYPH_STATUE_MALE_PILETOP_OFF + NUMMONS ? 1 : 0;
+    return glyph >= GLYPH.STATUE_MALE_PILETOP_OFF && glyph < GLYPH.STATUE_MALE_PILETOP_OFF + NUMMONS ? 1 : 0;
 }
 export function glyph_is_fem_statue(glyph) {
-    return glyph >= GLYPH_STATUE_FEM_OFF && glyph < GLYPH_STATUE_FEM_OFF + NUMMONS || glyph >= GLYPH_STATUE_FEM_PILETOP_OFF && glyph < GLYPH_STATUE_FEM_PILETOP_OFF + NUMMONS ? 1 : 0;
+    return glyph >= GLYPH.STATUE_FEM_OFF && glyph < GLYPH.STATUE_FEM_OFF + NUMMONS || glyph >= GLYPH.STATUE_FEM_PILETOP_OFF && glyph < GLYPH.STATUE_FEM_PILETOP_OFF + NUMMONS ? 1 : 0;
 }
 export function glyph_is_male_statue(glyph) {
-    return glyph >= GLYPH_STATUE_MALE_OFF && glyph < GLYPH_STATUE_MALE_OFF + NUMMONS || glyph >= GLYPH_STATUE_MALE_PILETOP_OFF && glyph < GLYPH_STATUE_MALE_PILETOP_OFF + NUMMONS ? 1 : 0;
+    return glyph >= GLYPH.STATUE_MALE_OFF && glyph < GLYPH.STATUE_MALE_OFF + NUMMONS || glyph >= GLYPH.STATUE_MALE_PILETOP_OFF && glyph < GLYPH.STATUE_MALE_PILETOP_OFF + NUMMONS ? 1 : 0;
 }
 export function glyph_is_statue(glyph) {
-    return glyph >= GLYPH_STATUE_MALE_OFF && glyph < GLYPH_STATUE_MALE_OFF + NUMMONS || glyph >= GLYPH_STATUE_MALE_PILETOP_OFF && glyph < GLYPH_STATUE_MALE_PILETOP_OFF + NUMMONS || (glyph >= GLYPH_STATUE_FEM_OFF && glyph < GLYPH_STATUE_FEM_OFF + NUMMONS || glyph >= GLYPH_STATUE_FEM_PILETOP_OFF && glyph < GLYPH_STATUE_FEM_PILETOP_OFF + NUMMONS) ? 1 : 0;
+    return glyph >= GLYPH.STATUE_MALE_OFF && glyph < GLYPH.STATUE_MALE_OFF + NUMMONS || glyph >= GLYPH.STATUE_MALE_PILETOP_OFF && glyph < GLYPH.STATUE_MALE_PILETOP_OFF + NUMMONS || (glyph >= GLYPH.STATUE_FEM_OFF && glyph < GLYPH.STATUE_FEM_OFF + NUMMONS || glyph >= GLYPH.STATUE_FEM_PILETOP_OFF && glyph < GLYPH.STATUE_FEM_PILETOP_OFF + NUMMONS) ? 1 : 0;
 }
 export function glyph_is_normal_generic_obj(glyph) {
-    return glyph > GLYPH_OBJ_OFF && glyph < GLYPH_OBJ_OFF + FIRST_OBJECT - 1 ? 1 : 0;
+    return glyph > GLYPH.OBJ_OFF && glyph < GLYPH.OBJ_OFF + FIRST_OBJECT - 1 ? 1 : 0;
 }
 export function glyph_is_piletop_generic_obj(glyph) {
-    return glyph > GLYPH_OBJ_PILETOP_OFF && glyph < GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT - 1 ? 1 : 0;
+    return glyph > GLYPH.OBJ_PILETOP_OFF && glyph < GLYPH.OBJ_PILETOP_OFF + FIRST_OBJECT - 1 ? 1 : 0;
 }
 export function glyph_is_generic_object(glyph) {
-    return glyph > GLYPH_OBJ_OFF && glyph < GLYPH_OBJ_OFF + FIRST_OBJECT - 1 || glyph > GLYPH_OBJ_PILETOP_OFF && glyph < GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT - 1 ? 1 : 0;
+    return glyph > GLYPH.OBJ_OFF && glyph < GLYPH.OBJ_OFF + FIRST_OBJECT - 1 || glyph > GLYPH.OBJ_PILETOP_OFF && glyph < GLYPH.OBJ_PILETOP_OFF + FIRST_OBJECT - 1 ? 1 : 0;
 }
 export function glyph_is_normal_piletop_obj(glyph) {
-    return glyph === GLYPH_OBJ_PILETOP_OFF || glyph > GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT - 1 && glyph < GLYPH_OBJ_PILETOP_OFF + NUM_OBJECTS ? 1 : 0;
+    return glyph === GLYPH.OBJ_PILETOP_OFF || glyph > GLYPH.OBJ_PILETOP_OFF + FIRST_OBJECT - 1 && glyph < GLYPH.OBJ_PILETOP_OFF + NUM_OBJECTS ? 1 : 0;
 }
 export function glyph_is_object(glyph) {
-    return glyph === GLYPH_OBJ_OFF || glyph >= GLYPH_OBJ_OFF + FIRST_OBJECT - 1 && glyph < GLYPH_OBJ_OFF + NUM_OBJECTS || (glyph === GLYPH_OBJ_PILETOP_OFF || glyph > GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT - 1 && glyph < GLYPH_OBJ_PILETOP_OFF + NUM_OBJECTS) || (glyph > GLYPH_OBJ_OFF && glyph < GLYPH_OBJ_OFF + FIRST_OBJECT - 1 || glyph > GLYPH_OBJ_PILETOP_OFF && glyph < GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT - 1) || (glyph >= GLYPH_STATUE_MALE_OFF && glyph < GLYPH_STATUE_MALE_OFF + NUMMONS || glyph >= GLYPH_STATUE_MALE_PILETOP_OFF && glyph < GLYPH_STATUE_MALE_PILETOP_OFF + NUMMONS || (glyph >= GLYPH_STATUE_FEM_OFF && glyph < GLYPH_STATUE_FEM_OFF + NUMMONS || glyph >= GLYPH_STATUE_FEM_PILETOP_OFF && glyph < GLYPH_STATUE_FEM_PILETOP_OFF + NUMMONS)) || (glyph >= GLYPH_BODY_OFF && glyph < GLYPH_BODY_OFF + NUMMONS || glyph >= GLYPH_BODY_PILETOP_OFF && glyph < GLYPH_BODY_PILETOP_OFF + NUMMONS) ? 1 : 0;
+    return glyph === GLYPH.OBJ_OFF || glyph >= GLYPH.OBJ_OFF + FIRST_OBJECT - 1 && glyph < GLYPH.OBJ_OFF + NUM_OBJECTS || (glyph === GLYPH.OBJ_PILETOP_OFF || glyph > GLYPH.OBJ_PILETOP_OFF + FIRST_OBJECT - 1 && glyph < GLYPH.OBJ_PILETOP_OFF + NUM_OBJECTS) || (glyph > GLYPH.OBJ_OFF && glyph < GLYPH.OBJ_OFF + FIRST_OBJECT - 1 || glyph > GLYPH.OBJ_PILETOP_OFF && glyph < GLYPH.OBJ_PILETOP_OFF + FIRST_OBJECT - 1) || (glyph >= GLYPH.STATUE_MALE_OFF && glyph < GLYPH.STATUE_MALE_OFF + NUMMONS || glyph >= GLYPH.STATUE_MALE_PILETOP_OFF && glyph < GLYPH.STATUE_MALE_PILETOP_OFF + NUMMONS || (glyph >= GLYPH.STATUE_FEM_OFF && glyph < GLYPH.STATUE_FEM_OFF + NUMMONS || glyph >= GLYPH.STATUE_FEM_PILETOP_OFF && glyph < GLYPH.STATUE_FEM_PILETOP_OFF + NUMMONS)) || (glyph >= GLYPH.BODY_OFF && glyph < GLYPH.BODY_OFF + NUMMONS || glyph >= GLYPH.BODY_PILETOP_OFF && glyph < GLYPH.BODY_PILETOP_OFF + NUMMONS) ? 1 : 0;
 }
 export function glyph_to_obj(glyph) {
-    return glyph >= GLYPH_BODY_OFF && glyph < GLYPH_BODY_OFF + NUMMONS || glyph >= GLYPH_BODY_PILETOP_OFF && glyph < GLYPH_BODY_PILETOP_OFF + NUMMONS ? CORPSE : glyph >= GLYPH_STATUE_MALE_OFF && glyph < GLYPH_STATUE_MALE_OFF + NUMMONS || glyph >= GLYPH_STATUE_MALE_PILETOP_OFF && glyph < GLYPH_STATUE_MALE_PILETOP_OFF + NUMMONS || (glyph >= GLYPH_STATUE_FEM_OFF && glyph < GLYPH_STATUE_FEM_OFF + NUMMONS || glyph >= GLYPH_STATUE_FEM_PILETOP_OFF && glyph < GLYPH_STATUE_FEM_PILETOP_OFF + NUMMONS) ? STATUE : glyph > GLYPH_OBJ_OFF && glyph < GLYPH_OBJ_OFF + FIRST_OBJECT - 1 || glyph > GLYPH_OBJ_PILETOP_OFF && glyph < GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT - 1 ? glyph - (glyph > GLYPH_OBJ_PILETOP_OFF && glyph < GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT - 1 ? GLYPH_OBJ_PILETOP_OFF : GLYPH_OBJ_OFF) | 0 : glyph === GLYPH_OBJ_OFF || glyph >= GLYPH_OBJ_OFF + FIRST_OBJECT - 1 && glyph < GLYPH_OBJ_OFF + NUM_OBJECTS || (glyph === GLYPH_OBJ_PILETOP_OFF || glyph > GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT - 1 && glyph < GLYPH_OBJ_PILETOP_OFF + NUM_OBJECTS) ? glyph - (glyph === GLYPH_OBJ_PILETOP_OFF || glyph > GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT - 1 && glyph < GLYPH_OBJ_PILETOP_OFF + NUM_OBJECTS ? GLYPH_OBJ_PILETOP_OFF : GLYPH_OBJ_OFF) | 0 : NUM_OBJECTS;
+    return glyph >= GLYPH.BODY_OFF && glyph < GLYPH.BODY_OFF + NUMMONS || glyph >= GLYPH.BODY_PILETOP_OFF && glyph < GLYPH.BODY_PILETOP_OFF + NUMMONS ? CORPSE : glyph >= GLYPH.STATUE_MALE_OFF && glyph < GLYPH.STATUE_MALE_OFF + NUMMONS || glyph >= GLYPH.STATUE_MALE_PILETOP_OFF && glyph < GLYPH.STATUE_MALE_PILETOP_OFF + NUMMONS || (glyph >= GLYPH.STATUE_FEM_OFF && glyph < GLYPH.STATUE_FEM_OFF + NUMMONS || glyph >= GLYPH.STATUE_FEM_PILETOP_OFF && glyph < GLYPH.STATUE_FEM_PILETOP_OFF + NUMMONS) ? STATUE : glyph > GLYPH.OBJ_OFF && glyph < GLYPH.OBJ_OFF + FIRST_OBJECT - 1 || glyph > GLYPH.OBJ_PILETOP_OFF && glyph < GLYPH.OBJ_PILETOP_OFF + FIRST_OBJECT - 1 ? glyph - (glyph > GLYPH.OBJ_PILETOP_OFF && glyph < GLYPH.OBJ_PILETOP_OFF + FIRST_OBJECT - 1 ? GLYPH.OBJ_PILETOP_OFF : GLYPH.OBJ_OFF) | 0 : glyph === GLYPH.OBJ_OFF || glyph >= GLYPH.OBJ_OFF + FIRST_OBJECT - 1 && glyph < GLYPH.OBJ_OFF + NUM_OBJECTS || (glyph === GLYPH.OBJ_PILETOP_OFF || glyph > GLYPH.OBJ_PILETOP_OFF + FIRST_OBJECT - 1 && glyph < GLYPH.OBJ_PILETOP_OFF + NUM_OBJECTS) ? glyph - (glyph === GLYPH.OBJ_PILETOP_OFF || glyph > GLYPH.OBJ_PILETOP_OFF + FIRST_OBJECT - 1 && glyph < GLYPH.OBJ_PILETOP_OFF + NUM_OBJECTS ? GLYPH.OBJ_PILETOP_OFF : GLYPH.OBJ_OFF) | 0 : NUM_OBJECTS;
 }
 export function glyph_to_body_corpsenm(glyph) {
-    return glyph >= GLYPH_BODY_PILETOP_OFF && glyph < GLYPH_BODY_PILETOP_OFF + NUMMONS ? glyph - GLYPH_BODY_PILETOP_OFF | 0 : glyph - GLYPH_BODY_OFF | 0;
+    return glyph >= GLYPH.BODY_PILETOP_OFF && glyph < GLYPH.BODY_PILETOP_OFF + NUMMONS ? glyph - GLYPH.BODY_PILETOP_OFF | 0 : glyph - GLYPH.BODY_OFF | 0;
 }
 export function glyph_to_statue_corpsenm(glyph) {
-    return glyph >= GLYPH_STATUE_FEM_PILETOP_OFF && glyph < GLYPH_STATUE_FEM_PILETOP_OFF + NUMMONS ? glyph - GLYPH_STATUE_FEM_PILETOP_OFF | 0 : glyph >= GLYPH_STATUE_MALE_PILETOP_OFF && glyph < GLYPH_STATUE_MALE_PILETOP_OFF + NUMMONS ? glyph - GLYPH_STATUE_MALE_PILETOP_OFF | 0 : glyph >= GLYPH_STATUE_FEM_OFF && glyph < GLYPH_STATUE_FEM_OFF + NUMMONS || glyph >= GLYPH_STATUE_FEM_PILETOP_OFF && glyph < GLYPH_STATUE_FEM_PILETOP_OFF + NUMMONS ? glyph - GLYPH_STATUE_FEM_OFF | 0 : glyph >= GLYPH_STATUE_MALE_OFF && glyph < GLYPH_STATUE_MALE_OFF + NUMMONS || glyph >= GLYPH_STATUE_MALE_PILETOP_OFF && glyph < GLYPH_STATUE_MALE_PILETOP_OFF + NUMMONS ? glyph - GLYPH_STATUE_MALE_OFF | 0 : NO_GLYPH;
+    return glyph >= GLYPH.STATUE_FEM_PILETOP_OFF && glyph < GLYPH.STATUE_FEM_PILETOP_OFF + NUMMONS ? glyph - GLYPH.STATUE_FEM_PILETOP_OFF | 0 : glyph >= GLYPH.STATUE_MALE_PILETOP_OFF && glyph < GLYPH.STATUE_MALE_PILETOP_OFF + NUMMONS ? glyph - GLYPH.STATUE_MALE_PILETOP_OFF | 0 : glyph >= GLYPH.STATUE_FEM_OFF && glyph < GLYPH.STATUE_FEM_OFF + NUMMONS || glyph >= GLYPH.STATUE_FEM_PILETOP_OFF && glyph < GLYPH.STATUE_FEM_PILETOP_OFF + NUMMONS ? glyph - GLYPH.STATUE_FEM_OFF | 0 : glyph >= GLYPH.STATUE_MALE_OFF && glyph < GLYPH.STATUE_MALE_OFF + NUMMONS || glyph >= GLYPH.STATUE_MALE_PILETOP_OFF && glyph < GLYPH.STATUE_MALE_PILETOP_OFF + NUMMONS ? glyph - GLYPH.STATUE_MALE_OFF | 0 : NO_GLYPH;
 }
 export function glyph_is_trap(glyph) {
     return glyph >= GLYPH_TRAP_OFF && glyph < GLYPH_TRAP_OFF + MAXTCHARS ? 1 : 0;
 }
 export function glyph_is_warning(glyph) {
-    return glyph >= GLYPH_WARNING_OFF && glyph < GLYPH_WARNING_OFF + WARNCOUNT ? 1 : 0;
+    return glyph >= GLYPH.WARNING_OFF && glyph < GLYPH.WARNING_OFF + WARNCOUNT ? 1 : 0;
 }
 export function glyph_is_unexplored(glyph) {
     return glyph === GLYPH_UNEXPLORED ? 1 : 0;

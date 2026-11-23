@@ -5,34 +5,34 @@ import { $G } from './globals.js';
 import { alloc } from './alloc.js';
 import { isok } from './cmd.js';
 import { c_common_strings, cg, gg, gi, gm, gr, gy, iflags, svc, svd, svl, svm, svn, u } from './decl.js';
-import { S_altar, S_arrow_trap, S_cloud, S_digbeam, S_goodpos, S_grave, S_ndoor, S_poisoncloud, S_stone, S_trwall, S_vwall } from './defsym.h.js';
+import { S } from './defsym.h.js';
 import { newsym, show_glyph } from './display.js';
-import { GLYPH_CMAP_A_OFF, GLYPH_CMAP_B_OFF, GLYPH_CMAP_C_OFF, GLYPH_CMAP_GEH_OFF, GLYPH_CMAP_KNOX_OFF, GLYPH_CMAP_MAIN_OFF, GLYPH_CMAP_MINES_OFF, GLYPH_CMAP_SOKO_OFF, GLYPH_CMAP_STONE_OFF, NO_GLYPH } from './display.h.js';
+import { GLYPH, NO_GLYPH } from './display.h.js';
 import { Monnam, m_monnam } from './do_name.js';
 import { In_hell, In_mines, on_level } from './dungeon.js';
-import { PLNMSG_ENVELOPED_IN_GAS } from './flag.h.js';
+import { PLNMSG } from './flag.h.js';
 import { COLNO, FALSE, ROWNO, TRUE } from './global.h.js';
 import { losehp } from './hack.js';
-import { EYE, FM_FMON, KILLED_BY_AN, LUNG, M_POISONGAS_OK, NHF_BONESFILE, TELEDS_NO_FLAGS } from './hack.h.js';
+import { EYE, FM, KILLED, LUNG, M_POISONGAS, NHF, TELEDS } from './hack.h.js';
 import { plur, release_data, update_file } from './hack.macros.js';
 import { dist2, eos } from './hacklib.js';
 import { find_mid } from './light.js';
 import { killed, m_poisongas_ok, monkilled, setmangry, wake_nearto } from './mon.js';
-import { AD_DRST } from './monattk.h.js';
+import { AD } from './monattk.h.js';
 import { monstseesu, monstunseesu } from './mondata.js';
 import { haseyes, is_silent, nonliving } from './mondata.macros.js';
-import { M1_BREATHLESS } from './monflag.h.js';
+import { M1 } from './monflag.h.js';
 import { mons } from './monst.js';
-import { M_SEEN_POISON } from './monst.h.js';
+import { M_SEEN } from './monst.h.js';
 import { DEADMONSTER, resists_poison } from './monst.macros.js';
-import { PM_FOG_CLOUD, PM_LONG_WORM } from './monsters.h.js';
+import { PM } from './monsters.h.js';
 import { makeplural } from './objnam.js';
 import { You, You_feel, You_see, Your, impossible, pline, pline_The } from './pline.js';
 import { body_part } from './polyself.js';
 import { make_blinded, set_itimeout } from './potion.js';
 import { HALF_PHDAM, MAGICAL_BREATHING } from './prop.h.js';
 import { valid_cloud_pos } from './read.js';
-import { MONST_INC, REG_HERO_INSIDE } from './region.h.js';
+import { MONST_INC, REG } from './region.h.js';
 import { clear_hero_inside, clear_heros_fault, hero_inside, heros_fault, set_hero_inside, set_heros_fault } from './region.macros.js';
 import { lookup_id_mapping } from './restore.js';
 import { d, rn2, rnd } from './rnd.js';
@@ -141,7 +141,7 @@ export async function add_rect_to_reg(reg, rect) {   // region.c:133
 export async function add_mon_to_reg(reg, mon) {   // region.c:161
     let i = 0, tmp_m = null, $t1;
     if (mon_in_region(reg, mon)) {
-        if (!$c.peq(mon.data, $c.relem(mons, PM_LONG_WORM))) {
+        if (!$c.peq(mon.data, $c.relem(mons, PM.LONG_WORM))) {
             await impossible($c.lit("add_mon_to_reg: %s [#%u] already in region."), await m_monnam(mon), mon.m_id);
         }
         return;
@@ -308,7 +308,7 @@ export async function run_regions() {   // region.c:414
         }
         if (f_indx !== NO_CALLBACK) {
             for (j = 0; j < gr.regions.get(i).n_monst; j = j + 1 | 0) {
-                mtmp = find_mid(gr.regions.get(i).monsters.get(j), FM_FMON);
+                mtmp = find_mid(gr.regions.get(i).monsters.get(j), FM.FMON);
                 if (!mtmp || DEADMONSTER(mtmp) || await callbacks[f_indx](gr.regions.get(i), mtmp)) {
                     k = gr.regions.get(i).n_monst = $c.i16(gr.regions.get(i).n_monst - 1 | 0);
                     gr.regions.get(i).monsters.set(j, gr.regions.get(i).monsters.get(k));
@@ -362,7 +362,7 @@ export async function in_out_region(x, y) {   // region.c:480
             continue;
         }
         if (!hero_inside(gr.regions.get(i)) && inside_region(gr.regions.get(i), x, y)) {
-            gr.regions.get(i).player_flags = (gr.regions.get(i).player_flags | REG_HERO_INSIDE) >>> 0;
+            gr.regions.get(i).player_flags = (gr.regions.get(i).player_flags | REG.HERO_INSIDE) >>> 0;
             if (gr.regions.get(i).enter_msg !== null) {
                 await pline($c.lit("%s"), gr.regions.get(i).enter_msg);
             }
@@ -414,7 +414,7 @@ export function update_player_regions() {   // region.c:582
     let i = 0;
     for (i = 0; i < svn.n_regions; i = i + 1 | 0) {
         if (!gr.regions.get(i).attach_2_u && inside_region(gr.regions.get(i), u.ux, u.uy)) {
-            gr.regions.get(i).player_flags = (gr.regions.get(i).player_flags | REG_HERO_INSIDE) >>> 0;
+            gr.regions.get(i).player_flags = (gr.regions.get(i).player_flags | REG.HERO_INSIDE) >>> 0;
         } else {
             gr.regions.get(i).player_flags = (gr.regions.get(i).player_flags & 4294967294) >>> 0;
         }
@@ -542,7 +542,7 @@ export async function rest_regions(nhfp) {   // region.c:799
     let r = null, i = 0, j = 0, n = Uint32Array.of(0), tmstamp = [0], msg_buf = null, ghostly = 0, $t1, $t2, $t3, $t4;
     n[0] = 0;
     tmstamp[0] = 0;
-    ghostly = $c.i8(nhfp.ftype === NHF_BONESFILE ? 1 : 0);
+    ghostly = $c.i8(nhfp.ftype === NHF.BONESFILE ? 1 : 0);
     clear_regions();
     await sfi_long(nhfp, new $c.Ptr(tmstamp, 0), $c.lit("region-tmstamp"));
     if (ghostly) {
@@ -698,14 +698,14 @@ export async function inside_gas_cloud(p1, p2) {   // region.c:1091
     mtmp = $c.asRec(p2, $T.monst, 192);
     umon = mtmp ? mtmp : gy.youmonst;
     dam = reg.arg.a_int;
-    if (reg.ttl < 20 && umon && $c.peq(umon.data, $c.relem(mons, PM_FOG_CLOUD))) {
+    if (reg.ttl < 20 && umon && $c.peq(umon.data, $c.relem(mons, PM.FOG_CLOUD))) {
         reg.ttl = $c.add64(reg.ttl, 5);
     }
     if (dam < 1) {
         return FALSE;
     }
     if (!mtmp) {
-        if (await m_poisongas_ok(gy.youmonst) === M_POISONGAS_OK) {
+        if (await m_poisongas_ok(gy.youmonst) === M_POISONGAS.OK) {
             return FALSE;
         }
         if (!Blind()) {
@@ -720,18 +720,18 @@ export async function inside_gas_cloud(p1, p2) {   // region.c:1091
             if (Half_gas_damage()) {
                 dam = $c.div32(dam + 1 | 0, 2);
             }
-            await losehp(dam, $c.lit("gas cloud"), KILLED_BY_AN);
-            monstunseesu(M_SEEN_POISON);
+            await losehp(dam, $c.lit("gas cloud"), KILLED.BY_AN);
+            monstunseesu(M_SEEN.POISON);
             return FALSE;
         } else {
             await You($c.lit("cough!"));
             await wake_nearto(u.ux, u.uy, 2);
-            monstseesu(M_SEEN_POISON);
+            monstseesu(M_SEEN.POISON);
             return FALSE;
         }
     } else {
         mtmp = $c.asRec(p2, $T.monst, 192);
-        if (await m_poisongas_ok(mtmp) !== M_POISONGAS_OK) {
+        if (await m_poisongas_ok(mtmp) !== M_POISONGAS.OK) {
             if (!is_silent(mtmp.data)) {
                 if (cansee(mtmp.mx, mtmp.my) || dist2(mtmp.mx, mtmp.my, u.ux, u.uy) < 8) {
                     await pline($c.lit("%s coughs!"), await Monnam(mtmp));
@@ -753,7 +753,7 @@ export async function inside_gas_cloud(p1, p2) {   // region.c:1091
                 if (heros_fault(reg)) {
                     await killed(mtmp);
                 } else {
-                    await monkilled(mtmp, $c.lit("gas cloud"), AD_DRST);
+                    await monkilled(mtmp, $c.lit("gas cloud"), AD.DRST);
                 }
                 if (DEADMONSTER(mtmp)) {
                     return TRUE;
@@ -782,11 +782,11 @@ async function make_gas_cloud(cloud, damage, inside_cloud) {   // region.c:1182
     cloud.arg.$copyFrom(cg.zeroany);
     cloud.arg.a_int = damage;
     cloud.visible = TRUE;
-    $t1 = (damage ? S_poisoncloud : S_cloud) === S_stone ? GLYPH_CMAP_STONE_OFF : (damage ? S_poisoncloud : S_cloud) <= S_trwall ? ((damage ? S_poisoncloud : S_cloud) - S_vwall | 0) + (In_mines(u.uz) ? GLYPH_CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH_CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH_CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH_CMAP_SOKO_OFF : GLYPH_CMAP_MAIN_OFF) | 0 : (damage ? S_poisoncloud : S_cloud) < S_altar ? ((damage ? S_poisoncloud : S_cloud) - S_ndoor | 0) + GLYPH_CMAP_A_OFF | 0 : (damage ? S_poisoncloud : S_cloud) === S_altar ? 4008 : (damage ? S_poisoncloud : S_cloud) < S_arrow_trap + MAXTCHARS ? ((damage ? S_poisoncloud : S_cloud) - S_grave | 0) + GLYPH_CMAP_B_OFF | 0 : (damage ? S_poisoncloud : S_cloud) <= S_goodpos ? ((damage ? S_poisoncloud : S_cloud) - S_digbeam | 0) + GLYPH_CMAP_C_OFF | 0 : NO_GLYPH, cloud.glyph = $t1;
+    $t1 = (damage ? S.poisoncloud : S.cloud) === S.stone ? GLYPH.CMAP_STONE_OFF : (damage ? S.poisoncloud : S.cloud) <= S.trwall ? ((damage ? S.poisoncloud : S.cloud) - S.vwall | 0) + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) | 0 : (damage ? S.poisoncloud : S.cloud) < S.altar ? ((damage ? S.poisoncloud : S.cloud) - S.ndoor | 0) + GLYPH.CMAP_A_OFF | 0 : (damage ? S.poisoncloud : S.cloud) === S.altar ? 4008 : (damage ? S.poisoncloud : S.cloud) < S.arrow_trap + MAXTCHARS ? ((damage ? S.poisoncloud : S.cloud) - S.grave | 0) + GLYPH.CMAP_B_OFF | 0 : (damage ? S.poisoncloud : S.cloud) <= S.goodpos ? ((damage ? S.poisoncloud : S.cloud) - S.digbeam | 0) + GLYPH.CMAP_C_OFF | 0 : NO_GLYPH, cloud.glyph = $t1;
     await add_region(cloud);
     if (!gi.in_mklev && !inside_cloud && is_hero_inside_gas_cloud()) {
         await You($c.lit("are enveloped in a cloud of %s!"), damage ? $c.lit("noxious gas") : $c.lit("steam"));
-        iflags.last_msg = PLNMSG_ENVELOPED_IN_GAS;
+        iflags.last_msg = PLNMSG.ENVELOPED_IN_GAS;
     }
 }
 export async function create_gas_cloud(x, y, cloudsize, damage) {   // region.c:1213
@@ -795,7 +795,7 @@ export async function create_gas_cloud(x, y, cloudsize, damage) {   // region.c:
     ycoords[0] = y;
     newidx = 1;
     inside_cloud = is_hero_inside_gas_cloud();
-    if (!svc.context.mon_moving && u_at(x, y) && cloudsize === 1 && (!damage || damage && await m_poisongas_ok(gy.youmonst) === M_POISONGAS_OK)) {
+    if (!svc.context.mon_moving && u_at(x, y) && cloudsize === 1 && (!damage || damage && await m_poisongas_ok(gy.youmonst) === M_POISONGAS.OK)) {
         inside_cloud = TRUE;
     }
     if (cloudsize > MAX_CLOUD_SIZE) {
@@ -890,7 +890,7 @@ export function region_danger() {   // region.c:1341
         }
         f_indx = gr.regions.get(i).inside_f;
         if (f_indx === INSIDE_GAS_CLOUD) {
-            if (nonliving(gy.youmonst.data) || (u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1_BREATHLESS) !== 0)) {
+            if (nonliving(gy.youmonst.data) || (u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.BREATHLESS) !== 0)) {
                 continue;
             }
             if (Poison_resistance()) {
@@ -917,7 +917,7 @@ export async function region_safety() {   // region.c:1368
         }
     }
     if (n > 1 || n === 1 && !r) {
-        await safe_teleds(TELEDS_NO_FLAGS);
+        await safe_teleds(TELEDS.NO_FLAGS);
         if (region_danger()) {
             set_itimeout(new $c.FieldRef(u.uprops[MAGICAL_BREATHING], "intrinsic", "i64"), d(4, 4) + 4 | 0);
             await You_feel($c.lit("able to breathe."));

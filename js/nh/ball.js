@@ -3,7 +3,7 @@ import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
 import { exercise } from './attrib.js';
-import { A_STR } from './attrib.h.js';
+import { A } from './attrib.h.js';
 import { is_pool } from './dbridge.js';
 import { flags, gi, gv, svd, svl, u } from './decl.js';
 import { cls, map_object, newsym } from './display.js';
@@ -14,21 +14,21 @@ import { hitfloor, omon_adj } from './dothrow.js';
 import { on_level } from './dungeon.js';
 import { FALSE, TRUE } from './global.h.js';
 import { losehp, movobj, near_capacity, nomul, spoteffects, weight_cap } from './hack.js';
-import { HEAD, HMON_DRAGGED, KILLED_BY, KILLED_BY_AN, LEG, NO_KILLER_PREFIX, SLT_ENCUMBER, override_restriction } from './hack.h.js';
+import { HEAD, HMON, KILLED, LEG, NO_KILLER_PREFIX, SLT_ENCUMBER, override_restriction } from './hack.h.js';
 import { Maybe_Half_Phys } from './hack.macros.js';
 import { dist2, distmin } from './hacklib.js';
 import { freeinv } from './invent.js';
 import { obj_extract_self, place_object, remove_object } from './mkobj.js';
 import { maybe_unhide_at } from './mon.js';
-import { OBJ_FLOOR, OBJ_FREE, OBJ_INVENT } from './obj.h.js';
+import { OBJ } from './obj.h.js';
 import { carried } from './obj.macros.js';
 import { HEAVY_IRON_BALL, IRON_CHAIN } from './objects.h.js';
 import { Yname2, otense, safe_typename, xname, yname } from './objnam.js';
 import { encumber_msg } from './pickup.js';
 import { You, You_feel, Your, impossible, pline, pline_The } from './pline.js';
 import { body_part } from './polyself.js';
-import { HALF_PHDAM, W_BALL, W_CHAIN, W_RINGL, W_RINGR, W_WEAPONS } from './prop.h.js';
-import { DOOR, D_CLOSED, D_LOCKED, POOL } from './rm.h.js';
+import { HALF_PHDAM, W, W_WEAPONS } from './prop.h.js';
+import { D, DOOR, POOL } from './rm.h.js';
 import { MON_AT, m_at } from './rm.macros.js';
 import { rn2, rnd } from './rnd.js';
 import { deltrap, fill_pit, reset_utrap, t_at } from './trap.js';
@@ -36,7 +36,7 @@ import { is_hole, is_pit } from './trap.macros.js';
 import { hmon } from './uhitm.js';
 import { setuqwep, setuswapwep, setuwep, welded } from './wield.js';
 import { find_mac, setnotworn } from './worn.js';
-import { BC_BALL, BC_CHAIN, TT_BEARTRAP, TT_BURIEDBALL, TT_INFLOOR, TT_LAVA, TT_PIT, TT_WEB } from './you.h.js';
+import { BC, TT } from './you.h.js';
 import { Luck } from './you.macros.js';
 import { Blind, Levitation, Punished } from './youprop.macros.js';
 import { miss } from './zap.js';
@@ -117,14 +117,14 @@ async function unplacebc_core() {   // ball.c:147
     }
     if (!carried($G.uball)) {
         await obj_extract_self($G.uball);
-        if (Blind() && u.bc_felt & BC_BALL) {
+        if (Blind() && u.bc_felt & BC.BALL) {
             svl.level.locations[$G.uball.ox][$G.uball.oy].glyph = u.bglyph;
         }
         await maybe_unhide_at($G.uball.ox, $G.uball.oy);
         await newsym($G.uball.ox, $G.uball.oy);
     }
     await obj_extract_self($G.uchain);
-    if (Blind() && u.bc_felt & BC_CHAIN) {
+    if (Blind() && u.bc_felt & BC.CHAIN) {
         svl.level.locations[$G.uchain.ox][$G.uchain.oy].glyph = u.cglyph;
     }
     await maybe_unhide_at($G.uchain.ox, $G.uchain.oy);
@@ -145,7 +145,7 @@ export async function placebc() {   // ball.c:193
     if (!check_restriction(0)) {
         return;
     }
-    if ($G.uchain && $G.uchain.where !== OBJ_FREE) {
+    if ($G.uchain && $G.uchain.where !== OBJ.FREE) {
         await impossible($c.lit("bc already placed?"));
         return;
     }
@@ -173,7 +173,7 @@ export async function lift_covet_and_placebc(pin) {   // ball.c:236
     if (!check_restriction(pin)) {
         return;
     }
-    if ($G.uchain && $G.uchain.where !== OBJ_FREE) {
+    if ($G.uchain && $G.uchain.where !== OBJ.FREE) {
         await impossible($c.lit("bc already placed?"));
         return;
     }
@@ -199,7 +199,7 @@ export async function set_bc(already_blind) {   // ball.c:380
     let ball_on_floor = 0, $t1, $t2;
     ball_on_floor = !carried($G.uball) ? 1 : 0;
     $t1 = await bc_order(), u.bc_order = $t1;
-    u.bc_felt = ball_on_floor ? BC_BALL | BC_CHAIN : BC_CHAIN;
+    u.bc_felt = ball_on_floor ? BC.BALL | BC.CHAIN : BC.CHAIN;
     if (already_blind || u.uswallow | 0) {
         $t2 = u.bglyph = svl.level.locations[u.ux][u.uy].glyph, u.cglyph = $t2;
         return;
@@ -235,11 +235,11 @@ export async function move_bc(before, control, ballx, bally, chainx, chainy) {  
     let on_floor = 0, $t1, $t2;
     if (Blind()) {
         if (!before) {
-            if (control & BC_CHAIN && control & BC_BALL) {
-                if (u.bc_felt & BC_BALL) {
+            if (control & BC.CHAIN && control & BC.BALL) {
+                if (u.bc_felt & BC.BALL) {
                     svl.level.locations[$G.uball.ox][$G.uball.oy].glyph = u.bglyph;
                 }
-                if (u.bc_felt & BC_CHAIN) {
+                if (u.bc_felt & BC.CHAIN) {
                     svl.level.locations[$G.uchain.ox][$G.uchain.oy].glyph = u.cglyph;
                 }
                 u.bc_felt = 0;
@@ -247,33 +247,33 @@ export async function move_bc(before, control, ballx, bally, chainx, chainy) {  
                 u.cglyph = svl.level.locations[chainx][chainy].glyph;
                 await movobj($G.uball, ballx, bally);
                 await movobj($G.uchain, chainx, chainy);
-            } else if (control & BC_BALL) {
-                if (u.bc_felt & BC_BALL) {
+            } else if (control & BC.BALL) {
+                if (u.bc_felt & BC.BALL) {
                     if (u.bc_order === BCPOS_DIFFER) {
                         svl.level.locations[$G.uball.ox][$G.uball.oy].glyph = u.bglyph;
                     } else if (u.bc_order === BCPOS_BALL) {
-                        if (u.bc_felt & BC_CHAIN) {
+                        if (u.bc_felt & BC.CHAIN) {
                             await map_object($G.uchain, 0);
                         } else {
                             svl.level.locations[$G.uball.ox][$G.uball.oy].glyph = u.bglyph;
                         }
                     }
-                    u.bc_felt = u.bc_felt & ~BC_BALL;
+                    u.bc_felt = u.bc_felt & ~BC.BALL;
                 }
                 u.bglyph = ballx !== chainx || bally !== chainy ? svl.level.locations[ballx][bally].glyph : u.cglyph;
                 await movobj($G.uball, ballx, bally);
-            } else if (control & BC_CHAIN) {
-                if (u.bc_felt & BC_CHAIN) {
+            } else if (control & BC.CHAIN) {
+                if (u.bc_felt & BC.CHAIN) {
                     if (u.bc_order === BCPOS_DIFFER) {
                         svl.level.locations[$G.uchain.ox][$G.uchain.oy].glyph = u.cglyph;
                     } else if (u.bc_order === BCPOS_CHAIN) {
-                        if (u.bc_felt & BC_BALL) {
+                        if (u.bc_felt & BC.BALL) {
                             await map_object($G.uball, 0);
                         } else {
                             svl.level.locations[$G.uchain.ox][$G.uchain.oy].glyph = u.cglyph;
                         }
                     }
-                    u.bc_felt = u.bc_felt & ~BC_CHAIN;
+                    u.bc_felt = u.bc_felt & ~BC.CHAIN;
                 }
                 u.cglyph = ballx !== chainx || bally !== chainy ? svl.level.locations[chainx][chainy].glyph : u.bglyph;
                 await movobj($G.uchain, chainx, chainy);
@@ -295,7 +295,7 @@ export async function move_bc(before, control, ballx, bally, chainx, chainy) {  
             }
         } else {
             on_floor = !carried($G.uball) ? 1 : 0;
-            if (control & BC_CHAIN || !control && u.bc_order === BCPOS_CHAIN) {
+            if (control & BC.CHAIN || !control && u.bc_order === BCPOS_CHAIN) {
                 if (on_floor) {
                     await place_object($G.uball, ballx, bally);
                 }
@@ -330,7 +330,7 @@ export async function drag_ball(x, y, bc_control, ballx, bally, chainx, chainy, 
         if (carried($G.uball) || distmin(x, y, $G.uball.ox, $G.uball.oy) <= 2) {
             oldchainx = $G.uchain.ox;
             oldchainy = $G.uchain.oy;
-            bc_control.set(0, BC_CHAIN);
+            bc_control.set(0, BC.CHAIN);
             await move_bc(1, bc_control.get(0), ballx.get(0), bally.get(0), chainx.get(0), chainy.get(0));
             if (carried($G.uball)) {
                 if (distmin(x, y, $G.uchain.ox, $G.uchain.oy) > 1) {
@@ -339,7 +339,7 @@ export async function drag_ball(x, y, bc_control, ballx, bally, chainx, chainy, 
                 }
                 return TRUE;
             }
-            if (svl.level.locations[u.ux][u.uy].typ < POOL || svl.level.locations[u.ux][u.uy].typ === DOOR && (svl.level.locations[u.ux][u.uy].flags | 0) & (D_CLOSED | D_LOCKED) || (svl.level.locations[chainx.get(0)][chainy.get(0)].typ < POOL || svl.level.locations[chainx.get(0)][chainy.get(0)].typ === DOOR && (svl.level.locations[chainx.get(0)][chainy.get(0)].flags | 0) & (D_CLOSED | D_LOCKED)) || (svl.level.locations[$G.uball.ox][$G.uball.oy].typ < POOL || svl.level.locations[$G.uball.ox][$G.uball.oy].typ === DOOR && (svl.level.locations[$G.uball.ox][$G.uball.oy].flags | 0) & (D_CLOSED | D_LOCKED))) {
+            if (svl.level.locations[u.ux][u.uy].typ < POOL || svl.level.locations[u.ux][u.uy].typ === DOOR && (svl.level.locations[u.ux][u.uy].flags | 0) & (D.CLOSED | D.LOCKED) || (svl.level.locations[chainx.get(0)][chainy.get(0)].typ < POOL || svl.level.locations[chainx.get(0)][chainy.get(0)].typ === DOOR && (svl.level.locations[chainx.get(0)][chainy.get(0)].flags | 0) & (D.CLOSED | D.LOCKED)) || (svl.level.locations[$G.uball.ox][$G.uball.oy].typ < POOL || svl.level.locations[$G.uball.ox][$G.uball.oy].typ === DOOR && (svl.level.locations[$G.uball.ox][$G.uball.oy].flags | 0) & (D.CLOSED | D.LOCKED))) {
                 already_in_rock = TRUE;
             } else {
                 already_in_rock = FALSE;
@@ -348,7 +348,7 @@ export async function drag_ball(x, y, bc_control, ballx, bally, chainx, chainy, 
                 case 8:
                     chainx.set(0, $c.i16($c.div32($G.uball.ox + x | 0, 2)));
                     chainy.set(0, $c.i16($c.div32($G.uball.oy + y | 0, 2)));
-                    if ((svl.level.locations[chainx.get(0)][chainy.get(0)].typ < POOL || svl.level.locations[chainx.get(0)][chainy.get(0)].typ === DOOR && (svl.level.locations[chainx.get(0)][chainy.get(0)].flags | 0) & (D_CLOSED | D_LOCKED)) && !already_in_rock) {
+                    if ((svl.level.locations[chainx.get(0)][chainy.get(0)].typ < POOL || svl.level.locations[chainx.get(0)][chainy.get(0)].typ === DOOR && (svl.level.locations[chainx.get(0)][chainy.get(0)].flags | 0) & (D.CLOSED | D.LOCKED)) && !already_in_rock) {
                         do {
                             chainx.set(0, oldchainx);
                             chainy.set(0, oldchainy);
@@ -368,7 +368,7 @@ export async function drag_ball(x, y, bc_control, ballx, bally, chainx, chainy, 
                             tempy = y;
                             tempy2 = $G.uball.oy;
                         }
-                        if ((svl.level.locations[tempx][tempy].typ < POOL || svl.level.locations[tempx][tempy].typ === DOOR && (svl.level.locations[tempx][tempy].flags | 0) & (D_CLOSED | D_LOCKED)) && !(svl.level.locations[tempx2][tempy2].typ < POOL || svl.level.locations[tempx2][tempy2].typ === DOOR && (svl.level.locations[tempx2][tempy2].flags | 0) & (D_CLOSED | D_LOCKED)) && !already_in_rock) {
+                        if ((svl.level.locations[tempx][tempy].typ < POOL || svl.level.locations[tempx][tempy].typ === DOOR && (svl.level.locations[tempx][tempy].flags | 0) & (D.CLOSED | D.LOCKED)) && !(svl.level.locations[tempx2][tempy2].typ < POOL || svl.level.locations[tempx2][tempy2].typ === DOOR && (svl.level.locations[tempx2][tempy2].flags | 0) & (D.CLOSED | D.LOCKED)) && !already_in_rock) {
                             if (allow_drag) {
                                 if (dist2(u.ux, u.uy, $G.uball.ox, $G.uball.oy) === 5 && dist2(x, y, tempx, tempy) === 1) {
                                     do {
@@ -389,7 +389,7 @@ export async function drag_ball(x, y, bc_control, ballx, bally, chainx, chainy, 
                             }
                             chainx.set(0, tempx2);
                             chainy.set(0, tempy2);
-                        } else if (!(svl.level.locations[tempx][tempy].typ < POOL || svl.level.locations[tempx][tempy].typ === DOOR && (svl.level.locations[tempx][tempy].flags | 0) & (D_CLOSED | D_LOCKED)) && (svl.level.locations[tempx2][tempy2].typ < POOL || svl.level.locations[tempx2][tempy2].typ === DOOR && (svl.level.locations[tempx2][tempy2].flags | 0) & (D_CLOSED | D_LOCKED)) && !already_in_rock) {
+                        } else if (!(svl.level.locations[tempx][tempy].typ < POOL || svl.level.locations[tempx][tempy].typ === DOOR && (svl.level.locations[tempx][tempy].flags | 0) & (D.CLOSED | D.LOCKED)) && (svl.level.locations[tempx2][tempy2].typ < POOL || svl.level.locations[tempx2][tempy2].typ === DOOR && (svl.level.locations[tempx2][tempy2].flags | 0) & (D.CLOSED | D.LOCKED)) && !already_in_rock) {
                             if (allow_drag) {
                                 if (dist2(u.ux, u.uy, $G.uball.ox, $G.uball.oy) === 5 && dist2(x, y, tempx2, tempy2) === 1) {
                                     do {
@@ -410,7 +410,7 @@ export async function drag_ball(x, y, bc_control, ballx, bally, chainx, chainy, 
                             }
                             chainx.set(0, tempx);
                             chainy.set(0, tempy);
-                        } else if ((svl.level.locations[tempx][tempy].typ < POOL || svl.level.locations[tempx][tempy].typ === DOOR && (svl.level.locations[tempx][tempy].flags | 0) & (D_CLOSED | D_LOCKED)) && (svl.level.locations[tempx2][tempy2].typ < POOL || svl.level.locations[tempx2][tempy2].typ === DOOR && (svl.level.locations[tempx2][tempy2].flags | 0) & (D_CLOSED | D_LOCKED)) && !already_in_rock) {
+                        } else if ((svl.level.locations[tempx][tempy].typ < POOL || svl.level.locations[tempx][tempy].typ === DOOR && (svl.level.locations[tempx][tempy].flags | 0) & (D.CLOSED | D.LOCKED)) && (svl.level.locations[tempx2][tempy2].typ < POOL || svl.level.locations[tempx2][tempy2].typ === DOOR && (svl.level.locations[tempx2][tempy2].flags | 0) & (D.CLOSED | D.LOCKED)) && !already_in_rock) {
                             do {
                                 chainx.set(0, oldchainx);
                                 chainy.set(0, oldchainy);
@@ -432,7 +432,7 @@ export async function drag_ball(x, y, bc_control, ballx, bally, chainx, chainy, 
                     }
                     chainx.set(0, $c.i16($c.div32(x + $G.uball.ox | 0, 2)));
                     chainy.set(0, $c.i16($c.div32(y + $G.uball.oy | 0, 2)));
-                    if ((svl.level.locations[chainx.get(0)][chainy.get(0)].typ < POOL || svl.level.locations[chainx.get(0)][chainy.get(0)].typ === DOOR && (svl.level.locations[chainx.get(0)][chainy.get(0)].flags | 0) & (D_CLOSED | D_LOCKED)) && !already_in_rock) {
+                    if ((svl.level.locations[chainx.get(0)][chainy.get(0)].typ < POOL || svl.level.locations[chainx.get(0)][chainy.get(0)].typ === DOOR && (svl.level.locations[chainx.get(0)][chainy.get(0)].flags | 0) & (D.CLOSED | D.LOCKED)) && !already_in_rock) {
                         do {
                             chainx.set(0, oldchainx);
                             chainy.set(0, oldchainy);
@@ -448,7 +448,7 @@ export async function drag_ball(x, y, bc_control, ballx, bally, chainx, chainy, 
                         } else {
                             chainy.set(0, $G.uball.oy);
                         }
-                        if ((svl.level.locations[chainx.get(0)][chainy.get(0)].typ < POOL || svl.level.locations[chainx.get(0)][chainy.get(0)].typ === DOOR && (svl.level.locations[chainx.get(0)][chainy.get(0)].flags | 0) & (D_CLOSED | D_LOCKED)) && !already_in_rock) {
+                        if ((svl.level.locations[chainx.get(0)][chainy.get(0)].typ < POOL || svl.level.locations[chainx.get(0)][chainy.get(0)].typ === DOOR && (svl.level.locations[chainx.get(0)][chainy.get(0)].flags | 0) & (D.CLOSED | D.LOCKED)) && !already_in_rock) {
                             do {
                                 chainx.set(0, oldchainx);
                                 chainy.set(0, oldchainy);
@@ -496,7 +496,7 @@ export async function drag_ball(x, y, bc_control, ballx, bally, chainx, chainy, 
                 tmp = (-2 + Luck() | 0) + find_mac(victim) | 0;
                 tmp = tmp + await omon_adj(victim, $G.uball, TRUE) | 0;
                 if (tmp >= dieroll) {
-                    await hmon(victim, $G.uball, HMON_DRAGGED, dieroll);
+                    await hmon(victim, $G.uball, HMON.DRAGGED, dieroll);
                 } else {
                     await miss(await xname($G.uball), victim);
                 }
@@ -507,7 +507,7 @@ export async function drag_ball(x, y, bc_control, ballx, bally, chainx, chainy, 
                 await newsym(u.ux0, u.uy0);
             }
             nomul(0);
-            bc_control.set(0, BC_BALL);
+            bc_control.set(0, BC.BALL);
             await move_bc(1, bc_control.get(0), ballx.get(0), bally.get(0), chainx.get(0), chainy.get(0));
             ballx.set(0, $G.uchain.ox);
             bally.set(0, $G.uchain.oy);
@@ -516,7 +516,7 @@ export async function drag_ball(x, y, bc_control, ballx, bally, chainx, chainy, 
             return FALSE;
         }
     }
-    bc_control.set(0, BC_BALL | BC_CHAIN);
+    bc_control.set(0, BC.BALL | BC.CHAIN);
     await move_bc(1, bc_control.get(0), ballx.get(0), bally.get(0), chainx.get(0), chainy.get(0));
     if (dist2(x, y, u.ux, u.uy) > 2) {
         $t1 = chainx.set(0, x), ballx.set(0, $t1);
@@ -524,10 +524,10 @@ export async function drag_ball(x, y, bc_control, ballx, bally, chainx, chainy, 
     } else {
         newchainx = u.ux;
         newchainy = u.uy;
-        if (dist2(x, y, $G.uchain.ox, $G.uchain.oy) === 4 && !(svl.level.locations[newchainx][newchainy].typ < POOL || svl.level.locations[newchainx][newchainy].typ === DOOR && (svl.level.locations[newchainx][newchainy].flags | 0) & (D_CLOSED | D_LOCKED))) {
+        if (dist2(x, y, $G.uchain.ox, $G.uchain.oy) === 4 && !(svl.level.locations[newchainx][newchainy].typ < POOL || svl.level.locations[newchainx][newchainy].typ === DOOR && (svl.level.locations[newchainx][newchainy].flags | 0) & (D.CLOSED | D.LOCKED))) {
             newchainx = $c.i16($c.div32(x + $G.uchain.ox | 0, 2));
             newchainy = $c.i16($c.div32(y + $G.uchain.oy | 0, 2));
-            if (svl.level.locations[newchainx][newchainy].typ < POOL || svl.level.locations[newchainx][newchainy].typ === DOOR && (svl.level.locations[newchainx][newchainy].flags | 0) & (D_CLOSED | D_LOCKED)) {
+            if (svl.level.locations[newchainx][newchainy].typ < POOL || svl.level.locations[newchainx][newchainy].typ === DOOR && (svl.level.locations[newchainx][newchainy].flags | 0) & (D.CLOSED | D.LOCKED)) {
                 newchainx = u.ux;
                 newchainy = u.uy;
             }
@@ -547,26 +547,26 @@ export async function drop_ball(x, y) {   // ball.c:882
         u.bglyph = u.bc_order ? u.cglyph : svl.level.locations[x][y].glyph;
     }
     if (x !== u.ux || y !== u.uy) {
-        if (u.utrap && u.utraptype !== TT_INFLOOR && u.utraptype !== TT_BURIEDBALL) {
+        if (u.utrap && u.utraptype !== TT.INFLOOR && u.utraptype !== TT.BURIEDBALL) {
             switch (u.utraptype) {
-                case TT_PIT:
+                case TT.PIT:
                     await pline($c.lit("%s%s!"), new $c.Ptr(drop_ball$pullmsg, 0), $c.lit("pit"));
                     break;
-                case TT_WEB:
+                case TT.WEB:
                     await pline($c.lit("%s%s!"), new $c.Ptr(drop_ball$pullmsg, 0), $c.lit("web"));
                     await pline_The($c.lit("web is destroyed!"));
                     await deltrap(t_at(u.ux, u.uy));
                     break;
-                case TT_LAVA:
+                case TT.LAVA:
                     await pline($c.lit("%s%s!"), new $c.Ptr(drop_ball$pullmsg, 0), hliquid($c.lit("lava")));
                     break;
-                case TT_BEARTRAP:
-                    side = rn2(3) ? W_RINGL : W_RINGR;
+                case TT.BEARTRAP:
+                    side = rn2(3) ? W.RINGL : W.RINGR;
                     await pline($c.lit("%s%s!"), new $c.Ptr(drop_ball$pullmsg, 0), $c.lit("bear trap"));
                     await set_wounded_legs(side, rn2(1000) + 500 | 0);
                     if (!u.usteed) {
-                        await Your($c.lit("%s %s is severely damaged."), side === W_RINGL ? $c.lit("left") : $c.lit("right"), await body_part(LEG));
-                        await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? 1 : 2, $c.lit("leg damage from being pulled out of a bear trap"), KILLED_BY);
+                        await Your($c.lit("%s %s is severely damaged."), side === W.RINGL ? $c.lit("left") : $c.lit("right"), await body_part(LEG));
+                        await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? 1 : 2, $c.lit("leg damage from being pulled out of a bear trap"), KILLED.BY);
                     }
                     break;
             }
@@ -584,7 +584,7 @@ export async function drop_ball(x, y) {   // ball.c:882
         }
         gv.vision_full_recalc = 1;
         if (Blind()) {
-            if (u.bc_felt & BC_CHAIN) {
+            if (u.bc_felt & BC.CHAIN) {
                 svl.level.locations[$G.uchain.ox][$G.uchain.oy].glyph = u.cglyph;
             }
             u.bc_felt = 0;
@@ -633,14 +633,14 @@ export async function drag_down() {   // ball.c:986
     } else {
         if (rn2(2)) {
             await pline_The($c.lit("iron ball smacks into you!"));
-            await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(rnd(20) + 1 | 0, 2) : rnd(20), $c.lit("iron ball collision"), KILLED_BY_AN);
-            await exercise(A_STR, FALSE);
+            await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(rnd(20) + 1 | 0, 2) : rnd(20), $c.lit("iron ball collision"), KILLED.BY_AN);
+            await exercise(A.STR, FALSE);
             dragchance = $c.u8(dragchance - 2 | 0);
         }
         if (dragchance >= rnd(6)) {
             await pline_The($c.lit("iron ball drags you downstairs!"));
             await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(rnd(3) + 1 | 0, 2) : rnd(3), $c.lit("dragged downstairs by an iron ball"), NO_KILLER_PREFIX);
-            await exercise(A_STR, FALSE);
+            await exercise(A.STR, FALSE);
             await litter();
         }
     }
@@ -652,14 +652,14 @@ export async function bc_sanity_check() {   // ball.c:1034
     } else if (!Punished() && ($G.uball || $G.uchain)) {
         await impossible($c.lit("Attached %s%s%s without being Punished?"), $G.uchain ? $c.lit("chain") : $c.lit(""), $G.uchain && $G.uball ? $c.lit(" and ") : $c.lit(""), $G.uball ? $c.lit("iron ball") : $c.lit(""));
     }
-    freechain = !$G.uchain || $G.uchain.where === OBJ_FREE ? 1 : 0;
-    freeball = !$G.uball || $G.uball.where === OBJ_FREE || freechain && $G.uball.where === OBJ_INVENT ? 1 : 0;
-    if ($G.uball && ($G.uball.otyp !== HEAVY_IRON_BALL || $G.uball.where !== OBJ_FLOOR && $G.uball.where !== OBJ_INVENT && $G.uball.where !== OBJ_FREE || freeball ^ freechain || $c.and64($G.uball.owornmask, W_BALL) === 0 || $c.and64($G.uball.owornmask, ~(W_BALL | W_WEAPONS)) !== 0)) {
+    freechain = !$G.uchain || $G.uchain.where === OBJ.FREE ? 1 : 0;
+    freeball = !$G.uball || $G.uball.where === OBJ.FREE || freechain && $G.uball.where === OBJ.INVENT ? 1 : 0;
+    if ($G.uball && ($G.uball.otyp !== HEAVY_IRON_BALL || $G.uball.where !== OBJ.FLOOR && $G.uball.where !== OBJ.INVENT && $G.uball.where !== OBJ.FREE || freeball ^ freechain || $c.and64($G.uball.owornmask, W.BALL) === 0 || $c.and64($G.uball.owornmask, ~(W.BALL | W_WEAPONS)) !== 0)) {
         otyp = $G.uball.otyp;
         onam = await safe_typename(otyp);
         await impossible($c.lit("uball: type %d (%s), where %d, wornmask=0x%08lx"), otyp, onam, $G.uball.where, $G.uball.owornmask);
     }
-    if ($G.uchain && ($G.uchain.otyp !== IRON_CHAIN || $G.uchain.where !== OBJ_FLOOR && $G.uchain.where !== OBJ_FREE || freechain ^ freeball || $c.and64($G.uchain.owornmask, W_CHAIN) === 0 || $c.and64($G.uchain.owornmask, ~W_CHAIN) !== 0)) {
+    if ($G.uchain && ($G.uchain.otyp !== IRON_CHAIN || $G.uchain.where !== OBJ.FLOOR && $G.uchain.where !== OBJ.FREE || freechain ^ freeball || $c.and64($G.uchain.owornmask, W.CHAIN) === 0 || $c.and64($G.uchain.owornmask, ~W.CHAIN) !== 0)) {
         otyp = $G.uchain.otyp;
         onam = await safe_typename(otyp);
         await impossible($c.lit("uchain: type %d (%s), where %d, wornmask=0x%08lx"), otyp, onam, $G.uchain.where, $G.uchain.owornmask);
@@ -668,7 +668,7 @@ export async function bc_sanity_check() {   // ball.c:1034
         cx = $G.uchain.ox, cy = $G.uchain.oy;
         cdx = cx - u.ux | 0, cdy = cy - u.uy | 0;
         cdx = $c.abs(cdx), cdy = $c.abs(cdy);
-        if ($G.uball.where === OBJ_INVENT) {
+        if ($G.uball.where === OBJ.INVENT) {
             bx = u.ux, by = u.uy;
         } else {
             bx = $G.uball.ox, by = $G.uball.oy;

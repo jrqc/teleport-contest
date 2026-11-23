@@ -7,7 +7,7 @@ import { free_nomakedefs, populate_nomakedefs } from './date.js';
 import { COLNO, FALSE, SFCTOOL_BIT, TRUE } from './global.h.js';
 import { datamodel, eos, nh_snprintf } from './hacklib.js';
 import { NUM_OBJECTS } from './objclass.h.js';
-import { EDITLEVEL, PATCHLEVEL, VERSION_MAJOR, VERSION_MINOR } from './patchlevel.h.js';
+import { EDITLEVEL, PATCHLEVEL, VERSION } from './patchlevel.h.js';
 import { NUMMONS } from './permonst.h.js';
 import { soundlib_nosound } from './sndprocs.h.js';
 
@@ -31,7 +31,7 @@ export function md_ignored_features() {   // mdlib.c:236
 }
 function make_version() {   // mdlib.c:248
     let i = 0;
-    version.incarnation = VERSION_MAJOR << 24 | VERSION_MINOR << 16 | PATCHLEVEL << 8 | EDITLEVEL;
+    version.incarnation = VERSION.MAJOR << 24 | VERSION.MINOR << 16 | PATCHLEVEL << 8 | EDITLEVEL;
     version.feature_set = 393280;
     for (i = 1; artifact_names[i]; i = i + 1 | 0) {
         continue;
@@ -44,7 +44,7 @@ function make_version() {   // mdlib.c:248
     return;
 }
 export function mdlib_version_string(outbuf, delim) {   // mdlib.c:300
-    $c.__builtin___sprintf_chk(outbuf, 0, -1, $c.lit("%d%s%d%s%d"), VERSION_MAJOR, delim, VERSION_MINOR, delim, PATCHLEVEL);
+    $c.__builtin___sprintf_chk(outbuf, 0, -1, $c.lit("%d%s%d%s%d"), VERSION.MAJOR, delim, VERSION.MINOR, delim, PATCHLEVEL);
     return outbuf;
 }
 export function version_id_string(outbuf, bufsz, build_date) {   // mdlib.c:316
@@ -62,7 +62,7 @@ export function bannerc_string(outbuf, bufsz, build_date) {   // mdlib.c:349
 }
 function build_savebones_compat_string() {   // mdlib.c:393
     $c.__builtin___strcpy_chk(new $c.Ptr(save_bones_compat_buf, 0), $c.lit("save and bones files accepted from version"), 256);
-    $c.__builtin___sprintf_chk(eos(new $c.Ptr(save_bones_compat_buf, 0)), 0, -1, $c.lit(" %d.%d.%d only"), VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL);
+    $c.__builtin___sprintf_chk(eos(new $c.Ptr(save_bones_compat_buf, 0)), 0, -1, $c.lit(" %d.%d.%d only"), VERSION.MAJOR, VERSION.MINOR, PATCHLEVEL);
 }
 function count_and_validate_winopts() {   // mdlib.c:602
     let i = 0, cnt = 0;
@@ -105,7 +105,7 @@ async function build_options() {   // mdlib.c:669
     defwinsys = $c.lit("tty");
     build_savebones_compat_string();
     idxopttext < MAXOPT ? ($t2 = await dupstr(new $c.Ptr(optbuf, 0)), $t3 = new $c.Ptr(opttext, ($t1 = idxopttext, idxopttext = $t1 + 1 | 0, $t1)), $t3.set(0, $t2)) : null;
-    $c.__builtin___sprintf_chk(new $c.Ptr(optbuf, 0), 0, 256, $c.lit("%sNetHack version %d.%d.%d%s\n"), new $c.Ptr(opt_indent, 0), VERSION_MAJOR, VERSION_MINOR, PATCHLEVEL, $c.lit(""));
+    $c.__builtin___sprintf_chk(new $c.Ptr(optbuf, 0), 0, 256, $c.lit("%sNetHack version %d.%d.%d%s\n"), new $c.Ptr(opt_indent, 0), VERSION.MAJOR, VERSION.MINOR, PATCHLEVEL, $c.lit(""));
     idxopttext < MAXOPT ? ($t5 = await dupstr(new $c.Ptr(optbuf, 0)), $t6 = new $c.Ptr(opttext, ($t4 = idxopttext, idxopttext = $t4 + 1 | 0, $t4)), $t6.set(0, $t5)) : null;
     $c.__builtin___sprintf_chk(new $c.Ptr(optbuf, 0), 0, 256, $c.lit("Options compiled into this edition:"));
     idxopttext < MAXOPT ? ($t8 = await dupstr(new $c.Ptr(optbuf, 0)), $t9 = new $c.Ptr(opttext, ($t7 = idxopttext, idxopttext = $t7 + 1 | 0, $t7)), $t9.set(0, $t8)) : null;

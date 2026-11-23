@@ -2,14 +2,13 @@
 import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
-import { A_LAWFUL } from './align.h.js';
 import { artiname, discover_artifact, exist_artifact } from './artifact.js';
-import { ART_EXCALIBUR } from './artilist.h.js';
+import { ART } from './artilist.h.js';
 import { acurr, adjattrib, exercise, poison_strdmg } from './attrib.js';
-import { A_CON, A_DEX, A_MAX, A_WIS } from './attrib.h.js';
+import { A } from './attrib.h.js';
 import { yn_function } from './cmd.js';
 import { c_common_strings, disp, flags, gi, gu, gy, hands_obj, svl, svm, u, ynchars } from './decl.js';
-import { COIN_CLASS, POTION_CLASS, RING_CLASS, S_cloud } from './defsym.h.js';
+import { COIN_CLASS, POTION_CLASS, RING_CLASS, S } from './defsym.h.js';
 import { monster_detect } from './detect.js';
 import { glyph_at, newsym } from './display.js';
 import { canspotmon, glyph_is_cmap } from './display.macros.js';
@@ -21,10 +20,10 @@ import { morehungry, newuhs, vomit } from './eat.js';
 import { del_engr_at } from './engrave.js';
 import { more_experienced, newexplevel } from './exper.js';
 import { wizard } from './flag.macros.js';
-import { FALSE, LL_ARTIFACT, TRUE } from './global.h.js';
+import { FALSE, LL, TRUE } from './global.h.js';
 import { glyph_to_cmap } from './glyphs.js';
 import { in_town, losehp, money_cnt } from './hack.js';
-import { ARM, ENL_GAMEINPROGRESS, FACE, HAND, HEAD, KILLED_BY, KILLED_BY_AN, MAGICENLIGHTENMENT, MM_NOMSG, NO_TRAP_FLAGS, ONAME_KNOW_ARTI, ONAME_VIA_DIP, POLY_NOFLAGS } from './hack.h.js';
+import { ARM, ENL, FACE, HAND, HEAD, KILLED, MAGICENLIGHTENMENT, MM, NO_TRAP_FLAGS, ONAME_KNOW_ARTI, ONAME_VIA_DIP, POLY } from './hack.h.js';
 import { min } from './hack.macros.js';
 import { distmin } from './hacklib.js';
 import { enlightenment } from './insight.js';
@@ -39,11 +38,11 @@ import { breathless, haseyes, is_watch, nolimbs } from './mondata.macros.js';
 import { G_GONE } from './monflag.h.js';
 import { monflee } from './monmove.js';
 import { mons } from './monst.js';
-import { M_SEEN_FIRE } from './monst.h.js';
+import { M_SEEN } from './monst.h.js';
 import { DEADMONSTER } from './monst.macros.js';
-import { PM_KNIGHT, PM_SEWER_RAT, PM_WATER_DEMON, PM_WATER_ELEMENTAL, PM_WATER_MOCCASIN, PM_WATER_NYMPH } from './monsters.h.js';
+import { PM } from './monsters.h.js';
 import { observe_object } from './o_init.js';
-import { ER_DESTROYED, ER_GREASED, ER_NOTHING } from './obj.h.js';
+import { ER } from './obj.h.js';
 import { obj_descr, objects } from './objects.js';
 import { BOULDER, DILITHIUM_CRYSTAL, LONG_SWORD, LUCKSTONE, POT_ACID, POT_FRUIT_JUICE, POT_GAIN_ENERGY, POT_GAIN_LEVEL, POT_LEVITATION, POT_MONSTER_DETECTION, POT_OBJECT_DETECTION, POT_OIL, POT_POLYMORPH, POT_WATER } from './objects.h.js';
 import { fruitname, makeplural, rnd_class, the, xname } from './objnam.js';
@@ -52,7 +51,7 @@ import { body_part, mbodypart, polyself } from './polyself.js';
 import { dopotion, make_glib, mongrantswish, potionbreathe } from './potion.js';
 import { FROMOUTSIDE, SEE_INVIS } from './prop.h.js';
 import { create_gas_cloud } from './region.js';
-import { FOUNTAIN, F_LOOTED, F_WARNED, POOL, ROOM, S_LRING } from './rm.h.js';
+import { FOUNTAIN, F_LOOTED, F_WARNED, POOL, ROOM } from './rm.h.js';
 import { FOUNTAIN_IS_LOOTED, FOUNTAIN_IS_WARNED } from './rm.macros.js';
 import { rn2, rnd } from './rnd.js';
 import { genders } from './role.js';
@@ -62,7 +61,7 @@ import { delfloortrap, mintrap, t_at, water_damage, water_damage_chain } from '.
 import { do_clear_area } from './vision.js';
 import { cansee, couldsee } from './vision.macros.js';
 import { display_nhwindow } from './winprocs.macros.js';
-import { PRONOUN_HALLU, TT_INFLOOR, TT_LAVA } from './you.h.js';
+import { PRONOUN, TT } from './you.h.js';
 import { u_at } from './you.macros.js';
 import { Blind, Deaf, Fire_resistance, Glib, Hallucination, Invisible, Levitation, Poison_resistance, Unchanging } from './youprop.macros.js';
 
@@ -70,7 +69,7 @@ const dipfountain$lady = new Int8Array(17);   // static in dipfountain()
 export async function floating_above(what) {   // fountain.c:21
     let umsg = null;
     umsg = $c.lit("are floating high above the %s.");
-    if (u.utrap && (u.utraptype === TT_INFLOOR || u.utraptype === TT_LAVA)) {
+    if (u.utrap && (u.utraptype === TT.INFLOOR || u.utraptype === TT.LAVA)) {
         umsg = $c.lit("are trapped in the %s.");
         what = surface(u.ux, u.uy);
     }
@@ -79,14 +78,14 @@ export async function floating_above(what) {   // fountain.c:21
 async function dowatersnakes() {   // fountain.c:38
     let num = 0, mtmp = null, $t1;
     num = rn2(5) + 2 | 0;
-    if (!(svm.mvitals[PM_WATER_MOCCASIN].mvflags & G_GONE)) {
+    if (!(svm.mvitals[PM.WATER_MOCCASIN].mvflags & G_GONE)) {
         if (!Blind()) {
             await pline($c.lit("An endless stream of %s pours forth!"), Hallucination() ? await makeplural(await rndmonnam(null)) : $c.lit("snakes"));
         } else {
             await You_hear($c.lit("%s hissing!"), c_common_strings.c_something);
         }
         while (($t1 = num, num = $t1 - 1 | 0, $t1) > 0) {
-            if ((mtmp = await makemon($c.relem(mons, PM_WATER_MOCCASIN), u.ux, u.uy, MM_NOMSG)) !== null && t_at(mtmp.mx, mtmp.my)) {
+            if ((mtmp = await makemon($c.relem(mons, PM.WATER_MOCCASIN), u.ux, u.uy, MM.NOMSG)) !== null && t_at(mtmp.mx, mtmp.my)) {
                 await mintrap(mtmp, NO_TRAP_FLAGS);
             }
         }
@@ -96,15 +95,15 @@ async function dowatersnakes() {   // fountain.c:38
 }
 async function dowaterdemon() {   // fountain.c:64
     let mtmp = [null];
-    if (!(svm.mvitals[PM_WATER_DEMON].mvflags & G_GONE)) {
-        if ((mtmp[0] = await makemon($c.relem(mons, PM_WATER_DEMON), u.ux, u.uy, MM_NOMSG)) !== null) {
+    if (!(svm.mvitals[PM.WATER_DEMON].mvflags & G_GONE)) {
+        if ((mtmp[0] = await makemon($c.relem(mons, PM.WATER_DEMON), u.ux, u.uy, MM.NOMSG)) !== null) {
             if (!Blind()) {
                 await You($c.lit("unleash %s!"), await a_monnam(mtmp[0]));
             } else {
                 await You_feel($c.lit("the presence of evil."));
             }
             if (rnd(100) > (80 + await level_difficulty() | 0)) {
-                await pline($c.lit("Grateful for %s release, %s grants you a wish!"), genders[pronoun_gender(mtmp[0], PRONOUN_HALLU)].his, genders[pronoun_gender(mtmp[0], PRONOUN_HALLU)].he);
+                await pline($c.lit("Grateful for %s release, %s grants you a wish!"), genders[pronoun_gender(mtmp[0], PRONOUN.HALLU)].his, genders[pronoun_gender(mtmp[0], PRONOUN.HALLU)].he);
                 await mongrantswish(new $c.Ptr(mtmp, 0));
             } else if (t_at(mtmp[0].mx, mtmp[0].my)) {
                 await mintrap(mtmp[0], NO_TRAP_FLAGS);
@@ -116,7 +115,7 @@ async function dowaterdemon() {   // fountain.c:64
 }
 async function dowaternymph() {   // fountain.c:94
     let mtmp = null;
-    if (!(svm.mvitals[PM_WATER_NYMPH].mvflags & G_GONE) && (mtmp = await makemon($c.relem(mons, PM_WATER_NYMPH), u.ux, u.uy, MM_NOMSG)) !== null) {
+    if (!(svm.mvitals[PM.WATER_NYMPH].mvflags & G_GONE) && (mtmp = await makemon($c.relem(mons, PM.WATER_NYMPH), u.ux, u.uy, MM.NOMSG)) !== null) {
         if (!Blind()) {
             await You($c.lit("attract %s!"), await a_monnam(mtmp));
         } else {
@@ -174,7 +173,7 @@ async function dofindgem() {   // fountain.c:165
     await mksobj_at(rnd_class(DILITHIUM_CRYSTAL, LUCKSTONE - 1), u.ux, u.uy, FALSE, FALSE);
     svl.level.locations[u.ux][u.uy].flags = ((svl.level.locations[u.ux][u.uy].flags | 0 | F_LOOTED) >>> 0) & 31;
     await newsym(u.ux, u.uy);
-    await exercise(A_WIS, TRUE);
+    await exercise(A.WIS, TRUE);
 }
 async function watchman_warn_fountain(mtmp) {   // fountain.c:179
     if (is_watch(mtmp.data) && couldsee(mtmp.mx, mtmp.my) && mtmp.mpeaceful | 0) {
@@ -182,7 +181,7 @@ async function watchman_warn_fountain(mtmp) {   // fountain.c:179
             await pline($c.lit("%s yells:"), await Amonnam(mtmp));
             await verbalize($c.lit("Hey, stop using that fountain!"));
         } else {
-            await pline($c.lit("%s earnestly %s %s %s!"), await Amonnam(mtmp), nolimbs(mtmp.data) ? $c.lit("shakes") : $c.lit("waves"), genders[pronoun_gender(mtmp, PRONOUN_HALLU)].his, nolimbs(mtmp.data) ? await mbodypart(mtmp, HEAD) : await makeplural(await mbodypart(mtmp, ARM)));
+            await pline($c.lit("%s earnestly %s %s %s!"), await Amonnam(mtmp), nolimbs(mtmp.data) ? $c.lit("shakes") : $c.lit("waves"), genders[pronoun_gender(mtmp, PRONOUN.HALLU)].his, nolimbs(mtmp.data) ? await mbodypart(mtmp, HEAD) : await makeplural(await mbodypart(mtmp, ARM)));
         }
         return TRUE;
     }
@@ -206,7 +205,7 @@ export async function dryup(x, y, isyou) {   // fountain.c:201
         }
         if (cansee(x, y)) {
             glyph = glyph_at(x, y);
-            if (!glyph_is_cmap(glyph) || glyph_to_cmap(glyph) !== S_cloud) {
+            if (!glyph_is_cmap(glyph) || glyph_to_cmap(glyph) !== S.cloud) {
                 await pline_The($c.lit("fountain dries up!"));
             }
         }
@@ -230,24 +229,24 @@ export async function drinkfountain() {   // fountain.c:243
     if (mgkftn && u.uluck >= 0 && fate >= 10) {
         littleluck = u.uluck < 4 ? 1 : 0;
         await pline($c.lit("Wow!  This makes you feel great!"));
-        for (ii = 0; ii < A_MAX; ii = ii + 1 | 0) {
+        for (ii = 0; ii < A.MAX; ii = ii + 1 | 0) {
             if (u.acurr.a[ii] < u.amax.a[ii]) {
                 u.acurr.a[ii] = u.amax.a[ii];
                 disp.botl = TRUE;
             }
         }
-        i = rn2(A_MAX);
-        for (ii = 0; ii < A_MAX; ii = ii + 1 | 0) {
+        i = rn2(A.MAX);
+        for (ii = 0; ii < A.MAX; ii = ii + 1 | 0) {
             if (await adjattrib(i, 1, littleluck ? -1 : 0) && littleluck) {
                 break;
             }
-            if ((i = i + 1 | 0) >= A_MAX) {
+            if ((i = i + 1 | 0) >= A.MAX) {
                 i = 0;
             }
         }
         await display_nhwindow()($G.WIN_MESSAGE, FALSE);
         await pline($c.lit("A wisp of vapor escapes the fountain..."));
-        await exercise(A_WIS, TRUE);
+        await exercise(A.WIS, TRUE);
         svl.level.locations[u.ux][u.uy].horizontal = (0) & 1;
         return;
     }
@@ -263,8 +262,8 @@ export async function drinkfountain() {   // fountain.c:243
             case 19:
                 await You_feel($c.lit("self-knowledgeable..."));
                 await display_nhwindow()($G.WIN_MESSAGE, FALSE);
-                await enlightenment(MAGICENLIGHTENMENT, ENL_GAMEINPROGRESS);
-                await exercise(A_WIS, TRUE);
+                await enlightenment(MAGICENLIGHTENMENT, ENL.GAMEINPROGRESS);
+                await exercise(A.WIS, TRUE);
                 await pline_The($c.lit("feeling subsides."));
                 break;
             case 20:
@@ -276,11 +275,11 @@ export async function drinkfountain() {   // fountain.c:243
                 await pline_The($c.lit("water is contaminated!"));
                 if (Poison_resistance()) {
                     await pline($c.lit("Perhaps it is runoff from the nearby %s farm."), await fruitname(FALSE));
-                    await losehp(rnd(4), $c.lit("unrefrigerated sip of juice"), KILLED_BY_AN);
+                    await losehp(rnd(4), $c.lit("unrefrigerated sip of juice"), KILLED.BY_AN);
                     break;
                 }
-                await poison_strdmg(rn2(4) + 3 | 0, rnd(10), $c.lit("contaminated water"), KILLED_BY);
-                await exercise(A_CON, FALSE);
+                await poison_strdmg(rn2(4) + 3 | 0, rnd(10), $c.lit("contaminated water"), KILLED.BY);
+                await exercise(A.CON, FALSE);
                 break;
             case 22:
                 await dowatersnakes();
@@ -293,7 +292,7 @@ export async function drinkfountain() {   // fountain.c:243
                     buc_changed = 0;
                     await pline($c.lit("This water's no good!"));
                     await morehungry(rn2(20) + 11 | 0);
-                    await exercise(A_CON, FALSE);
+                    await exercise(A.CON, FALSE);
                     for (obj = gi.invent; obj; obj = nextobj) {
                         nextobj = obj.nobj;
                         if (obj.oclass !== COIN_CLASS && !obj.cursed && !rn2(5)) {
@@ -320,13 +319,13 @@ export async function drinkfountain() {   // fountain.c:243
                 }
                 u.uprops[SEE_INVIS].intrinsic = $c.or64(u.uprops[SEE_INVIS].intrinsic, FROMOUTSIDE);
                 await newsym(u.ux, u.uy);
-                await exercise(A_WIS, TRUE);
+                await exercise(A.WIS, TRUE);
                 break;
             case 26:
                 if (await monster_detect(null, 0)) {
                     await pline_The($c.lit("%s tastes like nothing."), hliquid($c.lit("water")));
                 }
-                await exercise(A_WIS, TRUE);
+                await exercise(A.WIS, TRUE);
                 break;
             case 27:
                 if (!FOUNTAIN_IS_LOOTED(u.ux, u.uy)) {
@@ -359,14 +358,14 @@ export async function drinkfountain() {   // fountain.c:243
 }
 export async function dipfountain(obj) {   // fountain.c:394
     let er = 0, is_hands = 0, money = 0, otmp = null, nextobj = null, denomination = 0, coin_loss = 0, $t1;
-    er = ER_NOTHING;
+    er = ER.NOTHING;
     is_hands = $c.i8($c.peq(obj, hands_obj) ? 1 : 0);
     if (Levitation()) {
         await floating_above($c.lit("fountain"));
         return;
     }
-    if (obj.otyp === LONG_SWORD && u.ulevel >= 5 && !rn2(gu.urole.mnum === PM_KNIGHT ? 6 : 30) && obj.quan === 1 && !obj.oartifact && !exist_artifact(LONG_SWORD, artiname(ART_EXCALIBUR))) {
-        if (u.ualign.type !== A_LAWFUL) {
+    if (obj.otyp === LONG_SWORD && u.ulevel >= 5 && !rn2(gu.urole.mnum === PM.KNIGHT ? 6 : 30) && obj.quan === 1 && !obj.oartifact && !exist_artifact(LONG_SWORD, artiname(ART.EXCALIBUR))) {
+        if (u.ualign.type !== A.LAWFUL) {
             await pline($c.lit("A freezing mist rises from the %s and envelopes the sword."), hliquid($c.lit("water")));
             await pline_The($c.lit("fountain disappears!"));
             await curse(obj);
@@ -374,18 +373,18 @@ export async function dipfountain(obj) {   // fountain.c:394
                 obj.spe = $c.i8(obj.spe - 1);
             }
             obj.oerodeproof = (FALSE) & 1;
-            await exercise(A_WIS, FALSE);
-            await livelog_printf(LL_ARTIFACT, $c.lit("was denied %s!  The %s has deemed %s unworthy"), artiname(ART_EXCALIBUR), new $c.Ptr(dipfountain$lady, 0), genders[flags.female ? 1 : 0].him);
+            await exercise(A.WIS, FALSE);
+            await livelog_printf(LL.ARTIFACT, $c.lit("was denied %s!  The %s has deemed %s unworthy"), artiname(ART.EXCALIBUR), new $c.Ptr(dipfountain$lady, 0), genders[flags.female ? 1 : 0].him);
         } else {
             await pline($c.lit("From the murky depths, a hand reaches up to bless the sword."));
             await pline($c.lit("As the hand retreats, the fountain disappears!"));
-            obj = await oname(obj, artiname(ART_EXCALIBUR), ONAME_VIA_DIP | ONAME_KNOW_ARTI);
-            await discover_artifact(ART_EXCALIBUR);
+            obj = await oname(obj, artiname(ART.EXCALIBUR), ONAME_VIA_DIP | ONAME_KNOW_ARTI);
+            await discover_artifact(ART.EXCALIBUR);
             await bless(obj);
             $t1 = obj.oeroded2 = (0) & 3, obj.oeroded = ($t1) & 3;
             obj.oerodeproof = (TRUE) & 1;
-            await exercise(A_WIS, TRUE);
-            await livelog_printf(LL_ARTIFACT, $c.lit("was given %s by the %s"), artiname(ART_EXCALIBUR), new $c.Ptr(dipfountain$lady, 0));
+            await exercise(A.WIS, TRUE);
+            await livelog_printf(LL.ARTIFACT, $c.lit("was given %s by the %s"), artiname(ART.EXCALIBUR), new $c.Ptr(dipfountain$lady, 0));
         }
         await update_inventory();
         await set_levltyp(u.ux, u.uy, ROOM);
@@ -400,7 +399,7 @@ export async function dipfountain(obj) {   // fountain.c:394
     } else {
         er = await water_damage(obj, null, TRUE);
     }
-    if (er === ER_DESTROYED || er !== ER_NOTHING && !rn2(2)) {
+    if (er === ER.DESTROYED || er !== ER.NOTHING && !rn2(2)) {
         return;
     }
     switch (rnd(30)) {
@@ -466,7 +465,7 @@ export async function dipfountain(obj) {   // fountain.c:394
                     }
                     await You($c.lit("lost some of your gold in the fountain!"));
                     svl.level.locations[u.ux][u.uy].flags = (((svl.level.locations[u.ux][u.uy].flags | 0) & ~F_LOOTED) >>> 0) & 31;
-                    await exercise(A_WIS, FALSE);
+                    await exercise(A.WIS, FALSE);
                 }
             }
             break;
@@ -479,11 +478,11 @@ export async function dipfountain(obj) {   // fountain.c:394
             if (!Blind()) {
                 await pline($c.lit("Far below you, you see coins glistening in the %s."), hliquid($c.lit("water")));
             }
-            await exercise(A_WIS, TRUE);
+            await exercise(A.WIS, TRUE);
             await newsym(u.ux, u.uy);
             break;
         default:
-            if (er === ER_NOTHING) {
+            if (er === ER.NOTHING) {
                 await pline($c.lit("%s"), c_common_strings.c_nothing_seems_to_happen);
             }
             break;
@@ -494,7 +493,7 @@ export async function dipfountain(obj) {   // fountain.c:394
 export async function wash_hands() {   // fountain.c:558
     let hands = null, res = 0, was_glib = 0;
     hands = await makeplural(await body_part(HAND));
-    res = ER_NOTHING;
+    res = ER.NOTHING;
     was_glib = $c.i8(!!Glib() ? 1 : 0);
     await You($c.lit("wash your %s%s in the %s."), $G.uarmg ? $c.lit("gloved ") : $c.lit(""), hands, hliquid($c.lit("water")));
     if (Glib()) {
@@ -504,8 +503,8 @@ export async function wash_hands() {   // fountain.c:558
     if ($G.uarmg) {
         res = await water_damage($G.uarmg, null, TRUE);
     }
-    if (was_glib && res === ER_NOTHING) {
-        res = ER_GREASED;
+    if (was_glib && res === ER.NOTHING) {
+        res = ER.GREASED;
     }
     return res;
 }
@@ -536,17 +535,17 @@ export async function drinksink() {   // fountain.c:595
             await You($c.lit("take a sip of scalding hot %s."), hliquid($c.lit("water")));
             if (Fire_resistance()) {
                 await pline($c.lit("It seems quite tasty."));
-                monstseesu(M_SEEN_FIRE);
+                monstseesu(M_SEEN.FIRE);
             } else {
-                await losehp(rnd(6), $c.lit("sipping boiling water"), KILLED_BY);
-                monstunseesu(M_SEEN_FIRE);
+                await losehp(rnd(6), $c.lit("sipping boiling water"), KILLED.BY);
+                monstunseesu(M_SEEN.FIRE);
             }
             break;
         case 3:
-            if (svm.mvitals[PM_SEWER_RAT].mvflags & G_GONE) {
+            if (svm.mvitals[PM.SEWER_RAT].mvflags & G_GONE) {
                 await pline_The($c.lit("sink seems quite dirty."));
             } else {
-                mtmp = await makemon($c.relem(mons, PM_SEWER_RAT), u.ux, u.uy, MM_NOMSG);
+                mtmp = await makemon($c.relem(mons, PM.SEWER_RAT), u.ux, u.uy, MM.NOMSG);
                 if (mtmp) {
                     await pline($c.lit("Eek!  There's %s in the sink!"), Blind() || !canspotmon(mtmp) ? $c.lit("something squirmy") : await a_monnam(mtmp));
                 }
@@ -571,11 +570,11 @@ export async function drinksink() {   // fountain.c:595
             await obfree(otmp, null);
             break;
         case 5:
-            if (!((svl.level.locations[u.ux][u.uy].flags | 0) & S_LRING)) {
+            if (!((svl.level.locations[u.ux][u.uy].flags | 0) & S.LRING)) {
                 await You($c.lit("find a ring in the sink!"));
                 await mkobj_at(RING_CLASS, u.ux, u.uy, TRUE);
-                svl.level.locations[u.ux][u.uy].flags = ((svl.level.locations[u.ux][u.uy].flags | 0 | S_LRING) >>> 0) & 31;
-                await exercise(A_WIS, TRUE);
+                svl.level.locations[u.ux][u.uy].flags = ((svl.level.locations[u.ux][u.uy].flags | 0 | S.LRING) >>> 0) & 31;
+                await exercise(A.WIS, TRUE);
                 await newsym(u.ux, u.uy);
             } else {
                 await pline($c.lit("Some dirty %s backs up in the drain."), hliquid($c.lit("water")));
@@ -586,7 +585,7 @@ export async function drinksink() {   // fountain.c:595
             break;
         case 7:
             await pline_The($c.lit("%s moves as though of its own will!"), hliquid($c.lit("water")));
-            if (svm.mvitals[PM_WATER_ELEMENTAL].mvflags & G_GONE || !await makemon($c.relem(mons, PM_WATER_ELEMENTAL), u.ux, u.uy, MM_NOMSG)) {
+            if (svm.mvitals[PM.WATER_ELEMENTAL].mvflags & G_GONE || !await makemon($c.relem(mons, PM.WATER_ELEMENTAL), u.ux, u.uy, MM.NOMSG)) {
                 await pline($c.lit("But it quiets down."));
             }
             break;
@@ -597,14 +596,14 @@ export async function drinksink() {   // fountain.c:595
             break;
         case 9:
             await pline($c.lit("Gaggg... this tastes like sewage!  You vomit."));
-            await morehungry(rn2(30 - acurr(A_CON) | 0) + 11 | 0);
+            await morehungry(rn2(30 - acurr(A.CON) | 0) + 11 | 0);
             await vomit();
             break;
         case 10:
             await pline($c.lit("This %s contains toxic wastes!"), hliquid($c.lit("water")));
             if (!Unchanging()) {
                 await You($c.lit("undergo a freakish metamorphosis!"));
-                await polyself(POLY_NOFLAGS);
+                await polyself(POLY.NOFLAGS);
             }
             break;
         case 11:
@@ -629,7 +628,7 @@ export async function drinksink() {   // fountain.c:595
 export async function dipsink(obj) {   // fountain.c:716
     let try_call = 0, not_looted_yet = 0, is_hands = 0;
     try_call = FALSE;
-    not_looted_yet = $c.i8(((svl.level.locations[u.ux][u.uy].flags | 0) & S_LRING) === 0 ? 1 : 0);
+    not_looted_yet = $c.i8(((svl.level.locations[u.ux][u.uy].flags | 0) & S.LRING) === 0 ? 1 : 0);
     is_hands = $c.i8($c.peq(obj, hands_obj) || $G.uarmg && $c.peq(obj, $G.uarmg) ? 1 : 0);
     if (!rn2(not_looted_yet ? 25 : 15)) {
         await breaksink(u.ux, u.uy);
@@ -642,7 +641,7 @@ export async function dipsink(obj) {   // fountain.c:716
         return;
     } else if (obj.oclass !== POTION_CLASS) {
         await You($c.lit("hold %s under the tap."), await the(await xname(obj)));
-        if (await water_damage(obj, null, TRUE) === ER_NOTHING) {
+        if (await water_damage(obj, null, TRUE) === ER.NOTHING) {
             await pline($c.lit("%s"), c_common_strings.c_nothing_seems_to_happen);
         }
         return;
@@ -677,7 +676,7 @@ export async function dipsink(obj) {   // fountain.c:716
             try_call = TRUE;
             break;
         case POT_OBJECT_DETECTION:
-            if (!((svl.level.locations[u.ux][u.uy].flags | 0) & S_LRING)) {
+            if (!((svl.level.locations[u.ux][u.uy].flags | 0) & S.LRING)) {
                 await You($c.lit("sense a ring lost down the drain."));
                 try_call = TRUE;
                 break;
@@ -711,15 +710,15 @@ export async function sink_backs_up(x, y) {   // fountain.c:805
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Something splashes you in the %s"), await body_part(FACE));
     }
     await pline($c.lit("%s%s."), !Deaf() ? $c.lit("Flupp!  ") : $c.lit(""), new $c.Ptr(buf, 0));
-    if (!((svl.level.locations[x][y].flags | 0) & S_LRING)) {
+    if (!((svl.level.locations[x][y].flags | 0) & S.LRING)) {
         if (!Blind()) {
             await You_see($c.lit("a ring shining in its midst."));
         }
         await mkobj_at(RING_CLASS, x, y, TRUE);
         await newsym(x, y);
-        await exercise(A_DEX, TRUE);
-        await exercise(A_WIS, TRUE);
-        svl.level.locations[x][y].flags = ((svl.level.locations[x][y].flags | 0 | S_LRING) >>> 0) & 31;
+        await exercise(A.DEX, TRUE);
+        await exercise(A.WIS, TRUE);
+        svl.level.locations[x][y].flags = ((svl.level.locations[x][y].flags | 0 | S.LRING) >>> 0) & 31;
     }
 }
 

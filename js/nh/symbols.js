@@ -6,7 +6,7 @@ import { alloc, dupstr } from './alloc.js';
 import { config_error_add } from './cfgfiles.js';
 import { NO_COLOR } from './color.h.js';
 import { cg, gc, go, gp, gr, gs, svd, u } from './decl.js';
-import { DEF_INVISIBLE, ROCK_CLASS, S_ANGEL, S_ANT, S_BAT, S_BLOB, S_CENTAUR, S_COCKATRICE, S_DEMON, S_DOG, S_DRAGON, S_EEL, S_ELEMENTAL, S_EYE, S_FELINE, S_FUNGUS, S_GHOST, S_GIANT, S_GNOME, S_GOLEM, S_GREMLIN, S_HUMAN, S_HUMANOID, S_IMP, S_JABBERWOCK, S_JELLY, S_KOBOLD, S_KOP, S_LEPRECHAUN, S_LICH, S_LIGHT, S_LIZARD, S_MIMIC, S_MIMIC_DEF, S_MUMMY, S_NAGA, S_NYMPH, S_OGRE, S_ORC, S_PIERCER, S_PUDDING, S_QUADRUPED, S_QUANTMECH, S_RODENT, S_RUSTMONST, S_SNAKE, S_SPIDER, S_TRAPPER, S_TROLL, S_UMBER, S_UNICORN, S_VAMPIRE, S_VORTEX, S_WORM, S_WORM_TAIL, S_WRAITH, S_XAN, S_XORN, S_YETI, S_ZOMBIE, S_ZRUTY, S_air, S_altar, S_amulet, S_anti_magic_trap, S_armor, S_arrow_trap, S_ball, S_bars, S_bear_trap, S_blcorn, S_book, S_boomleft, S_boomright, S_brcorn, S_brdnladder, S_brdnstair, S_brupladder, S_brupstair, S_chain, S_cloud, S_coin, S_corr, S_crwall, S_darkroom, S_dart_trap, S_digbeam, S_dnladder, S_dnstair, S_engrcorr, S_engroom, S_expl_bc, S_expl_bl, S_expl_br, S_expl_mc, S_expl_ml, S_expl_mr, S_expl_tc, S_expl_tl, S_expl_tr, S_falling_rock_trap, S_fire_trap, S_flashbeam, S_food, S_fountain, S_gem, S_goodpos, S_grave, S_hbeam, S_hcdbridge, S_hcdoor, S_hodbridge, S_hodoor, S_hole, S_hwall, S_ice, S_invisible, S_land_mine, S_lava, S_lavawall, S_level_teleporter, S_litcorr, S_lslant, S_magic_portal, S_magic_trap, S_ndoor, S_pit, S_poisoncloud, S_polymorph_trap, S_pool, S_potion, S_ring, S_rock, S_rolling_boulder_trap, S_room, S_rslant, S_rust_trap, S_scroll, S_sink, S_sleeping_gas_trap, S_spiked_pit, S_squeaky_board, S_ss1, S_ss2, S_ss3, S_ss4, S_statue_trap, S_stone, S_strange_obj, S_sw_bc, S_sw_bl, S_sw_br, S_sw_ml, S_sw_mr, S_sw_tc, S_sw_tl, S_sw_tr, S_tdwall, S_teleportation_trap, S_throne, S_tlcorn, S_tlwall, S_tool, S_trap_door, S_trapped_chest, S_trapped_door, S_trcorn, S_tree, S_trwall, S_tuwall, S_upladder, S_upstair, S_vbeam, S_vcdbridge, S_vcdoor, S_venom, S_vibrating_square, S_vodbridge, S_vodoor, S_vwall, S_wand, S_water, S_weapon, S_web } from './defsym.h.js';
+import { DEF, ROCK_CLASS, S } from './defsym.h.js';
 import { nul_glyphinfo, reset_glyphmap } from './display.js';
 import { NO_GLYPH, gm_symchange } from './display.h.js';
 import { def_monsyms, def_oc_syms, def_r_oc_syms, def_warnsyms, defsyms } from './drawing.js';
@@ -20,11 +20,11 @@ import { MAXOCLASSES } from './objclass.h.js';
 import { sym_val } from './options.js';
 import { There, pline } from './pline.js';
 import { strbuf_append } from './strutil.js';
-import { H_DEC, H_MAC, H_UNK, H_UTF8, MAXMCLASSES, MAXOTHER, MAXPCHARS, PRIMARYSET, ROGUESET, SYM_BOULDER, SYM_CONTROL, SYM_HERO_OVERRIDE, SYM_INVALID, SYM_INVISIBLE, SYM_MON, SYM_NOTHING, SYM_OC, SYM_OTH, SYM_PCHAR, SYM_PET_OVERRIDE, SYM_UNEXPLORED, WARNCOUNT, do_custom_colors, do_custom_symbols } from './sym.h.js';
+import { H_DEC, H_MAC, H_UNK, H_UTF8, MAXMCLASSES, MAXOTHER, MAXPCHARS, PRIMARYSET, ROGUESET, SYM, WARNCOUNT, do_custom_colors, do_custom_symbols } from './sym.h.js';
 import { free_all_glyphmap_u } from './utf8map.js';
 import { add_menu, select_menu } from './windows.js';
 import { create_nhwindow, destroy_nhwindow, end_menu, preference_update, start_menu } from './winprocs.macros.js';
-import { ATR_NONE, MENU_BEHAVE_STANDARD, MENU_ITEMFLAGS_NONE, MENU_ITEMFLAGS_SELECTED, NHW_MENU, PICK_ONE } from './wintype.h.js';
+import { ATR, MENU, NHW, PICK } from './wintype.h.js';
 
 const WC2_utf8_bits = 131072;
 
@@ -80,15 +80,15 @@ export function get_othersym(idx, which_set) {   // symbols.c:131
     }
     if (!sym) {
         switch (idx) {
-            case SYM_NOTHING:
-            case SYM_UNEXPLORED:
+            case SYM.NOTHING:
+            case SYM.UNEXPLORED:
                 sym = DEF_NOTHING;
                 break;
-            case SYM_BOULDER:
+            case SYM.BOULDER:
                 sym = $c.u8(def_oc_syms[ROCK_CLASS].sym);
                 break;
-            case SYM_INVISIBLE:
-                sym = DEF_INVISIBLE;
+            case SYM.INVISIBLE:
+                sym = DEF.INVISIBLE;
                 break;
         }
     }
@@ -118,8 +118,8 @@ export function init_rogue_symbols() {   // symbols.c:187
     for (i = 0; i < MAXPCHARS; i = i + 1 | 0) {
         gr.rogue_syms[i + SYM_OFF_P | 0] = defsyms[i].sym;
     }
-    $t2 = ($t1 = gr.rogue_syms[S_ndoor] = 43, gr.rogue_syms[S_hodoor] = $t1), gr.rogue_syms[S_vodoor] = $t2;
-    $t3 = gr.rogue_syms[S_dnstair] = 37, gr.rogue_syms[S_upstair] = $t3;
+    $t2 = ($t1 = gr.rogue_syms[S.ndoor] = 43, gr.rogue_syms[S.hodoor] = $t1), gr.rogue_syms[S.vodoor] = $t2;
+    $t3 = gr.rogue_syms[S.dnstair] = 37, gr.rogue_syms[S.upstair] = $t3;
     for (i = 0; i < MAXOCLASSES; i = i + 1 | 0) {
         gr.rogue_syms[i + SYM_OFF_O | 0] = def_r_oc_syms[i];
     }
@@ -264,7 +264,7 @@ export async function parse_sym_line(buf, which_set) {   // symbols.c:438
     }
     if (symp) {
         if (!gs.symset[which_set].name) {
-            if (symp.range === SYM_CONTROL) {
+            if (symp.range === SYM.CONTROL) {
                 for (lastsp = gs.symset_list; lastsp; lastsp = lastsp.next) {
                     if (!lastsp.next) {
                         break;
@@ -326,7 +326,7 @@ export async function parse_sym_line(buf, which_set) {   // symbols.c:438
             }
             return 1;
         }
-        if (symp.range && symp.range === SYM_CONTROL) {
+        if (symp.range && symp.range === SYM.CONTROL) {
             switch (symp.idx) {
                 case 0:
                     if (!strncmpi(bufp, gs.symset[which_set].name, -1)) {
@@ -535,7 +535,7 @@ export async function parsesymbols(opts, which_set) {   // symbols.c:773
         return FALSE;
     }
     if (symp) {
-        if (symp.range && symp.range !== SYM_CONTROL) {
+        if (symp.range && symp.range !== SYM.CONTROL) {
             if (gs.symset[which_set].handling === H_UTF8 || lowc(strval.get(0)) === 117 && strval.get(1) === 43) {
                 nh_snprintf($c.lit("parsesymbols"), 836, new $c.Ptr(buf, 0), 256, $c.lit("%s:%s"), opts, strval);
                 await glyphrep_to_custom_map_entries(new $c.Ptr(buf, 0), new $c.Ptr(glyph, 0));
@@ -629,14 +629,14 @@ export async function do_symset(rogueflag) {   // symbols.c:909
             return TRUE;
         }
         $c.__builtin___sprintf_chk(new $c.Ptr(fmtstr, 0), 0, 20, $c.lit("%%-%ds %%s"), biggest + 2 | 0);
-        tmpwin = await create_nhwindow()(NHW_MENU);
-        await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
+        tmpwin = await create_nhwindow()(NHW.MENU);
+        await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
         any.$copyFrom(cg.zeroany);
         any.a_int = 1;
         if (!symset_name) {
             defindx = any.a_int;
         }
-        await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR_NONE, clr, $c.lit("Default Symbols"), any.a_int === defindx ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, $c.lit("Default Symbols"), any.a_int === defindx ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
         for (sl = gs.symset_list; sl; sl = sl.next) {
             if (rogueflag ? sl.primary | 0 : sl.rogue | 0) {
                 continue;
@@ -650,12 +650,12 @@ export async function do_symset(rogueflag) {   // symbols.c:909
                     defindx = any.a_int;
                 }
                 $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(fmtstr, 0), sl.name, sl.desc ? sl.desc : $c.lit(""));
-                await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR_NONE, clr, new $c.Ptr(buf, 0), any.a_int === defindx ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+                await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(buf, 0), any.a_int === defindx ? MENU.ITEMFLAGS_SELECTED : MENU.ITEMFLAGS_NONE);
             }
         }
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Select %ssymbol set:"), rogueflag ? $c.lit("rogue level ") : $c.lit(""));
         await end_menu()(tmpwin, new $c.Ptr(buf, 0));
-        n = await select_menu(tmpwin, PICK_ONE, new $c.Ptr(symset_pick, 0));
+        n = await select_menu(tmpwin, PICK.ONE, new $c.Ptr(symset_pick, 0));
         if (n > 0) {
             chosen = $c.radd(symset_pick[0], 0).item.a_int;
             if (n === 2 && chosen === defindx) {
@@ -761,202 +761,202 @@ export function $init() {
         loadsyms[$i0].$copyFrom(new $T.symparse());
     }
     $c.init(loadsyms, [
-        { range: SYM_CONTROL, idx: 0, name: $c.lit("start") },
-        { range: SYM_CONTROL, idx: 0, name: $c.lit("begin") },
-        { range: SYM_CONTROL, idx: 1, name: $c.lit("finish") },
-        { range: SYM_CONTROL, idx: 2, name: $c.lit("handling") },
-        { range: SYM_CONTROL, idx: 3, name: $c.lit("description") },
-        { range: SYM_CONTROL, idx: 4, name: $c.lit("color") },
-        { range: SYM_CONTROL, idx: 4, name: $c.lit("colour") },
-        { range: SYM_CONTROL, idx: 5, name: $c.lit("restrictions") },
-        { range: SYM_PCHAR, idx: S_stone, name: $c.lit("S_stone") },
-        { range: SYM_PCHAR, idx: S_vwall, name: $c.lit("S_vwall") },
-        { range: SYM_PCHAR, idx: S_hwall, name: $c.lit("S_hwall") },
-        { range: SYM_PCHAR, idx: S_tlcorn, name: $c.lit("S_tlcorn") },
-        { range: SYM_PCHAR, idx: S_trcorn, name: $c.lit("S_trcorn") },
-        { range: SYM_PCHAR, idx: S_blcorn, name: $c.lit("S_blcorn") },
-        { range: SYM_PCHAR, idx: S_brcorn, name: $c.lit("S_brcorn") },
-        { range: SYM_PCHAR, idx: S_crwall, name: $c.lit("S_crwall") },
-        { range: SYM_PCHAR, idx: S_tuwall, name: $c.lit("S_tuwall") },
-        { range: SYM_PCHAR, idx: S_tdwall, name: $c.lit("S_tdwall") },
-        { range: SYM_PCHAR, idx: S_tlwall, name: $c.lit("S_tlwall") },
-        { range: SYM_PCHAR, idx: S_trwall, name: $c.lit("S_trwall") },
-        { range: SYM_PCHAR, idx: S_ndoor, name: $c.lit("S_ndoor") },
-        { range: SYM_PCHAR, idx: S_vodoor, name: $c.lit("S_vodoor") },
-        { range: SYM_PCHAR, idx: S_hodoor, name: $c.lit("S_hodoor") },
-        { range: SYM_PCHAR, idx: S_vcdoor, name: $c.lit("S_vcdoor") },
-        { range: SYM_PCHAR, idx: S_hcdoor, name: $c.lit("S_hcdoor") },
-        { range: SYM_PCHAR, idx: S_bars, name: $c.lit("S_bars") },
-        { range: SYM_PCHAR, idx: S_tree, name: $c.lit("S_tree") },
-        { range: SYM_PCHAR, idx: S_room, name: $c.lit("S_room") },
-        { range: SYM_PCHAR, idx: S_darkroom, name: $c.lit("S_darkroom") },
-        { range: SYM_PCHAR, idx: S_engroom, name: $c.lit("S_engroom") },
-        { range: SYM_PCHAR, idx: S_corr, name: $c.lit("S_corr") },
-        { range: SYM_PCHAR, idx: S_litcorr, name: $c.lit("S_litcorr") },
-        { range: SYM_PCHAR, idx: S_engrcorr, name: $c.lit("S_engrcorr") },
-        { range: SYM_PCHAR, idx: S_upstair, name: $c.lit("S_upstair") },
-        { range: SYM_PCHAR, idx: S_dnstair, name: $c.lit("S_dnstair") },
-        { range: SYM_PCHAR, idx: S_upladder, name: $c.lit("S_upladder") },
-        { range: SYM_PCHAR, idx: S_dnladder, name: $c.lit("S_dnladder") },
-        { range: SYM_PCHAR, idx: S_brupstair, name: $c.lit("S_brupstair") },
-        { range: SYM_PCHAR, idx: S_brdnstair, name: $c.lit("S_brdnstair") },
-        { range: SYM_PCHAR, idx: S_brupladder, name: $c.lit("S_brupladder") },
-        { range: SYM_PCHAR, idx: S_brdnladder, name: $c.lit("S_brdnladder") },
-        { range: SYM_PCHAR, idx: S_altar, name: $c.lit("S_altar") },
-        { range: SYM_PCHAR, idx: S_grave, name: $c.lit("S_grave") },
-        { range: SYM_PCHAR, idx: S_throne, name: $c.lit("S_throne") },
-        { range: SYM_PCHAR, idx: S_sink, name: $c.lit("S_sink") },
-        { range: SYM_PCHAR, idx: S_fountain, name: $c.lit("S_fountain") },
-        { range: SYM_PCHAR, idx: S_pool, name: $c.lit("S_pool") },
-        { range: SYM_PCHAR, idx: S_ice, name: $c.lit("S_ice") },
-        { range: SYM_PCHAR, idx: S_lava, name: $c.lit("S_lava") },
-        { range: SYM_PCHAR, idx: S_lavawall, name: $c.lit("S_lavawall") },
-        { range: SYM_PCHAR, idx: S_vodbridge, name: $c.lit("S_vodbridge") },
-        { range: SYM_PCHAR, idx: S_hodbridge, name: $c.lit("S_hodbridge") },
-        { range: SYM_PCHAR, idx: S_vcdbridge, name: $c.lit("S_vcdbridge") },
-        { range: SYM_PCHAR, idx: S_hcdbridge, name: $c.lit("S_hcdbridge") },
-        { range: SYM_PCHAR, idx: S_air, name: $c.lit("S_air") },
-        { range: SYM_PCHAR, idx: S_cloud, name: $c.lit("S_cloud") },
-        { range: SYM_PCHAR, idx: S_water, name: $c.lit("S_water") },
-        { range: SYM_PCHAR, idx: S_arrow_trap, name: $c.lit("S_arrow_trap") },
-        { range: SYM_PCHAR, idx: S_dart_trap, name: $c.lit("S_dart_trap") },
-        { range: SYM_PCHAR, idx: S_falling_rock_trap, name: $c.lit("S_falling_rock_trap") },
-        { range: SYM_PCHAR, idx: S_squeaky_board, name: $c.lit("S_squeaky_board") },
-        { range: SYM_PCHAR, idx: S_bear_trap, name: $c.lit("S_bear_trap") },
-        { range: SYM_PCHAR, idx: S_land_mine, name: $c.lit("S_land_mine") },
-        { range: SYM_PCHAR, idx: S_rolling_boulder_trap, name: $c.lit("S_rolling_boulder_trap") },
-        { range: SYM_PCHAR, idx: S_sleeping_gas_trap, name: $c.lit("S_sleeping_gas_trap") },
-        { range: SYM_PCHAR, idx: S_rust_trap, name: $c.lit("S_rust_trap") },
-        { range: SYM_PCHAR, idx: S_fire_trap, name: $c.lit("S_fire_trap") },
-        { range: SYM_PCHAR, idx: S_pit, name: $c.lit("S_pit") },
-        { range: SYM_PCHAR, idx: S_spiked_pit, name: $c.lit("S_spiked_pit") },
-        { range: SYM_PCHAR, idx: S_hole, name: $c.lit("S_hole") },
-        { range: SYM_PCHAR, idx: S_trap_door, name: $c.lit("S_trap_door") },
-        { range: SYM_PCHAR, idx: S_teleportation_trap, name: $c.lit("S_teleportation_trap") },
-        { range: SYM_PCHAR, idx: S_level_teleporter, name: $c.lit("S_level_teleporter") },
-        { range: SYM_PCHAR, idx: S_magic_portal, name: $c.lit("S_magic_portal") },
-        { range: SYM_PCHAR, idx: S_web, name: $c.lit("S_web") },
-        { range: SYM_PCHAR, idx: S_statue_trap, name: $c.lit("S_statue_trap") },
-        { range: SYM_PCHAR, idx: S_magic_trap, name: $c.lit("S_magic_trap") },
-        { range: SYM_PCHAR, idx: S_anti_magic_trap, name: $c.lit("S_anti_magic_trap") },
-        { range: SYM_PCHAR, idx: S_polymorph_trap, name: $c.lit("S_polymorph_trap") },
-        { range: SYM_PCHAR, idx: S_vibrating_square, name: $c.lit("S_vibrating_square") },
-        { range: SYM_PCHAR, idx: S_trapped_door, name: $c.lit("S_trapped_door") },
-        { range: SYM_PCHAR, idx: S_trapped_chest, name: $c.lit("S_trapped_chest") },
-        { range: SYM_PCHAR, idx: S_vbeam, name: $c.lit("S_vbeam") },
-        { range: SYM_PCHAR, idx: S_hbeam, name: $c.lit("S_hbeam") },
-        { range: SYM_PCHAR, idx: S_lslant, name: $c.lit("S_lslant") },
-        { range: SYM_PCHAR, idx: S_rslant, name: $c.lit("S_rslant") },
-        { range: SYM_PCHAR, idx: S_digbeam, name: $c.lit("S_digbeam") },
-        { range: SYM_PCHAR, idx: S_flashbeam, name: $c.lit("S_flashbeam") },
-        { range: SYM_PCHAR, idx: S_boomleft, name: $c.lit("S_boomleft") },
-        { range: SYM_PCHAR, idx: S_boomright, name: $c.lit("S_boomright") },
-        { range: SYM_PCHAR, idx: S_ss1, name: $c.lit("S_ss1") },
-        { range: SYM_PCHAR, idx: S_ss2, name: $c.lit("S_ss2") },
-        { range: SYM_PCHAR, idx: S_ss3, name: $c.lit("S_ss3") },
-        { range: SYM_PCHAR, idx: S_ss4, name: $c.lit("S_ss4") },
-        { range: SYM_PCHAR, idx: S_poisoncloud, name: $c.lit("S_poisoncloud") },
-        { range: SYM_PCHAR, idx: S_goodpos, name: $c.lit("S_goodpos") },
-        { range: SYM_PCHAR, idx: S_sw_tl, name: $c.lit("S_sw_tl") },
-        { range: SYM_PCHAR, idx: S_sw_tc, name: $c.lit("S_sw_tc") },
-        { range: SYM_PCHAR, idx: S_sw_tr, name: $c.lit("S_sw_tr") },
-        { range: SYM_PCHAR, idx: S_sw_ml, name: $c.lit("S_sw_ml") },
-        { range: SYM_PCHAR, idx: S_sw_mr, name: $c.lit("S_sw_mr") },
-        { range: SYM_PCHAR, idx: S_sw_bl, name: $c.lit("S_sw_bl") },
-        { range: SYM_PCHAR, idx: S_sw_bc, name: $c.lit("S_sw_bc") },
-        { range: SYM_PCHAR, idx: S_sw_br, name: $c.lit("S_sw_br") },
-        { range: SYM_PCHAR, idx: S_expl_tl, name: $c.lit("S_expl_tl") },
-        { range: SYM_PCHAR, idx: S_expl_tc, name: $c.lit("S_expl_tc") },
-        { range: SYM_PCHAR, idx: S_expl_tr, name: $c.lit("S_expl_tr") },
-        { range: SYM_PCHAR, idx: S_expl_ml, name: $c.lit("S_expl_ml") },
-        { range: SYM_PCHAR, idx: S_expl_mc, name: $c.lit("S_expl_mc") },
-        { range: SYM_PCHAR, idx: S_expl_mr, name: $c.lit("S_expl_mr") },
-        { range: SYM_PCHAR, idx: S_expl_bl, name: $c.lit("S_expl_bl") },
-        { range: SYM_PCHAR, idx: S_expl_bc, name: $c.lit("S_expl_bc") },
-        { range: SYM_PCHAR, idx: S_expl_br, name: $c.lit("S_expl_br") },
-        { range: SYM_OC, idx: S_strange_obj + SYM_OFF_O, name: $c.lit("S_strange_obj") },
-        { range: SYM_OC, idx: S_weapon + SYM_OFF_O, name: $c.lit("S_weapon") },
-        { range: SYM_OC, idx: S_armor + SYM_OFF_O, name: $c.lit("S_armor") },
-        { range: SYM_OC, idx: S_ring + SYM_OFF_O, name: $c.lit("S_ring") },
-        { range: SYM_OC, idx: S_amulet + SYM_OFF_O, name: $c.lit("S_amulet") },
-        { range: SYM_OC, idx: S_tool + SYM_OFF_O, name: $c.lit("S_tool") },
-        { range: SYM_OC, idx: S_food + SYM_OFF_O, name: $c.lit("S_food") },
-        { range: SYM_OC, idx: S_potion + SYM_OFF_O, name: $c.lit("S_potion") },
-        { range: SYM_OC, idx: S_scroll + SYM_OFF_O, name: $c.lit("S_scroll") },
-        { range: SYM_OC, idx: S_book + SYM_OFF_O, name: $c.lit("S_book") },
-        { range: SYM_OC, idx: S_wand + SYM_OFF_O, name: $c.lit("S_wand") },
-        { range: SYM_OC, idx: S_coin + SYM_OFF_O, name: $c.lit("S_coin") },
-        { range: SYM_OC, idx: S_gem + SYM_OFF_O, name: $c.lit("S_gem") },
-        { range: SYM_OC, idx: S_rock + SYM_OFF_O, name: $c.lit("S_rock") },
-        { range: SYM_OC, idx: S_ball + SYM_OFF_O, name: $c.lit("S_ball") },
-        { range: SYM_OC, idx: S_chain + SYM_OFF_O, name: $c.lit("S_chain") },
-        { range: SYM_OC, idx: S_venom + SYM_OFF_O, name: $c.lit("S_venom") },
-        { range: SYM_MON, idx: S_ANT + SYM_OFF_M, name: $c.lit("S_ANT") },
-        { range: SYM_MON, idx: S_BLOB + SYM_OFF_M, name: $c.lit("S_BLOB") },
-        { range: SYM_MON, idx: S_COCKATRICE + SYM_OFF_M, name: $c.lit("S_COCKATRICE") },
-        { range: SYM_MON, idx: S_DOG + SYM_OFF_M, name: $c.lit("S_DOG") },
-        { range: SYM_MON, idx: S_EYE + SYM_OFF_M, name: $c.lit("S_EYE") },
-        { range: SYM_MON, idx: S_FELINE + SYM_OFF_M, name: $c.lit("S_FELINE") },
-        { range: SYM_MON, idx: S_GREMLIN + SYM_OFF_M, name: $c.lit("S_GREMLIN") },
-        { range: SYM_MON, idx: S_HUMANOID + SYM_OFF_M, name: $c.lit("S_HUMANOID") },
-        { range: SYM_MON, idx: S_IMP + SYM_OFF_M, name: $c.lit("S_IMP") },
-        { range: SYM_MON, idx: S_JELLY + SYM_OFF_M, name: $c.lit("S_JELLY") },
-        { range: SYM_MON, idx: S_KOBOLD + SYM_OFF_M, name: $c.lit("S_KOBOLD") },
-        { range: SYM_MON, idx: S_LEPRECHAUN + SYM_OFF_M, name: $c.lit("S_LEPRECHAUN") },
-        { range: SYM_MON, idx: S_MIMIC + SYM_OFF_M, name: $c.lit("S_MIMIC") },
-        { range: SYM_MON, idx: S_NYMPH + SYM_OFF_M, name: $c.lit("S_NYMPH") },
-        { range: SYM_MON, idx: S_ORC + SYM_OFF_M, name: $c.lit("S_ORC") },
-        { range: SYM_MON, idx: S_PIERCER + SYM_OFF_M, name: $c.lit("S_PIERCER") },
-        { range: SYM_MON, idx: S_QUADRUPED + SYM_OFF_M, name: $c.lit("S_QUADRUPED") },
-        { range: SYM_MON, idx: S_RODENT + SYM_OFF_M, name: $c.lit("S_RODENT") },
-        { range: SYM_MON, idx: S_SPIDER + SYM_OFF_M, name: $c.lit("S_SPIDER") },
-        { range: SYM_MON, idx: S_TRAPPER + SYM_OFF_M, name: $c.lit("S_TRAPPER") },
-        { range: SYM_MON, idx: S_UNICORN + SYM_OFF_M, name: $c.lit("S_UNICORN") },
-        { range: SYM_MON, idx: S_VORTEX + SYM_OFF_M, name: $c.lit("S_VORTEX") },
-        { range: SYM_MON, idx: S_WORM + SYM_OFF_M, name: $c.lit("S_WORM") },
-        { range: SYM_MON, idx: S_XAN + SYM_OFF_M, name: $c.lit("S_XAN") },
-        { range: SYM_MON, idx: S_LIGHT + SYM_OFF_M, name: $c.lit("S_LIGHT") },
-        { range: SYM_MON, idx: S_ZRUTY + SYM_OFF_M, name: $c.lit("S_ZRUTY") },
-        { range: SYM_MON, idx: S_ANGEL + SYM_OFF_M, name: $c.lit("S_ANGEL") },
-        { range: SYM_MON, idx: S_BAT + SYM_OFF_M, name: $c.lit("S_BAT") },
-        { range: SYM_MON, idx: S_CENTAUR + SYM_OFF_M, name: $c.lit("S_CENTAUR") },
-        { range: SYM_MON, idx: S_DRAGON + SYM_OFF_M, name: $c.lit("S_DRAGON") },
-        { range: SYM_MON, idx: S_ELEMENTAL + SYM_OFF_M, name: $c.lit("S_ELEMENTAL") },
-        { range: SYM_MON, idx: S_FUNGUS + SYM_OFF_M, name: $c.lit("S_FUNGUS") },
-        { range: SYM_MON, idx: S_GNOME + SYM_OFF_M, name: $c.lit("S_GNOME") },
-        { range: SYM_MON, idx: S_GIANT + SYM_OFF_M, name: $c.lit("S_GIANT") },
-        { range: SYM_MON, idx: S_invisible + SYM_OFF_M, name: $c.lit("S_invisible") },
-        { range: SYM_MON, idx: S_JABBERWOCK + SYM_OFF_M, name: $c.lit("S_JABBERWOCK") },
-        { range: SYM_MON, idx: S_KOP + SYM_OFF_M, name: $c.lit("S_KOP") },
-        { range: SYM_MON, idx: S_LICH + SYM_OFF_M, name: $c.lit("S_LICH") },
-        { range: SYM_MON, idx: S_MUMMY + SYM_OFF_M, name: $c.lit("S_MUMMY") },
-        { range: SYM_MON, idx: S_NAGA + SYM_OFF_M, name: $c.lit("S_NAGA") },
-        { range: SYM_MON, idx: S_OGRE + SYM_OFF_M, name: $c.lit("S_OGRE") },
-        { range: SYM_MON, idx: S_PUDDING + SYM_OFF_M, name: $c.lit("S_PUDDING") },
-        { range: SYM_MON, idx: S_QUANTMECH + SYM_OFF_M, name: $c.lit("S_QUANTMECH") },
-        { range: SYM_MON, idx: S_RUSTMONST + SYM_OFF_M, name: $c.lit("S_RUSTMONST") },
-        { range: SYM_MON, idx: S_SNAKE + SYM_OFF_M, name: $c.lit("S_SNAKE") },
-        { range: SYM_MON, idx: S_TROLL + SYM_OFF_M, name: $c.lit("S_TROLL") },
-        { range: SYM_MON, idx: S_UMBER + SYM_OFF_M, name: $c.lit("S_UMBER") },
-        { range: SYM_MON, idx: S_VAMPIRE + SYM_OFF_M, name: $c.lit("S_VAMPIRE") },
-        { range: SYM_MON, idx: S_WRAITH + SYM_OFF_M, name: $c.lit("S_WRAITH") },
-        { range: SYM_MON, idx: S_XORN + SYM_OFF_M, name: $c.lit("S_XORN") },
-        { range: SYM_MON, idx: S_YETI + SYM_OFF_M, name: $c.lit("S_YETI") },
-        { range: SYM_MON, idx: S_ZOMBIE + SYM_OFF_M, name: $c.lit("S_ZOMBIE") },
-        { range: SYM_MON, idx: S_HUMAN + SYM_OFF_M, name: $c.lit("S_HUMAN") },
-        { range: SYM_MON, idx: S_GHOST + SYM_OFF_M, name: $c.lit("S_GHOST") },
-        { range: SYM_MON, idx: S_GOLEM + SYM_OFF_M, name: $c.lit("S_GOLEM") },
-        { range: SYM_MON, idx: S_DEMON + SYM_OFF_M, name: $c.lit("S_DEMON") },
-        { range: SYM_MON, idx: S_EEL + SYM_OFF_M, name: $c.lit("S_EEL") },
-        { range: SYM_MON, idx: S_LIZARD + SYM_OFF_M, name: $c.lit("S_LIZARD") },
-        { range: SYM_MON, idx: S_WORM_TAIL + SYM_OFF_M, name: $c.lit("S_WORM_TAIL") },
-        { range: SYM_MON, idx: S_MIMIC_DEF + SYM_OFF_M, name: $c.lit("S_MIMIC_DEF") },
-        { range: SYM_OTH, idx: SYM_NOTHING + SYM_OFF_X, name: $c.lit("S_nothing") },
-        { range: SYM_OTH, idx: SYM_UNEXPLORED + SYM_OFF_X, name: $c.lit("S_unexplored") },
-        { range: SYM_OTH, idx: SYM_BOULDER + SYM_OFF_X, name: $c.lit("S_boulder") },
-        { range: SYM_OTH, idx: SYM_INVISIBLE + SYM_OFF_X, name: $c.lit("S_invisible") },
-        { range: SYM_OTH, idx: SYM_PET_OVERRIDE + SYM_OFF_X, name: $c.lit("S_pet_override") },
-        { range: SYM_OTH, idx: SYM_HERO_OVERRIDE + SYM_OFF_X, name: $c.lit("S_hero_override") },
+        { range: SYM.CONTROL, idx: 0, name: $c.lit("start") },
+        { range: SYM.CONTROL, idx: 0, name: $c.lit("begin") },
+        { range: SYM.CONTROL, idx: 1, name: $c.lit("finish") },
+        { range: SYM.CONTROL, idx: 2, name: $c.lit("handling") },
+        { range: SYM.CONTROL, idx: 3, name: $c.lit("description") },
+        { range: SYM.CONTROL, idx: 4, name: $c.lit("color") },
+        { range: SYM.CONTROL, idx: 4, name: $c.lit("colour") },
+        { range: SYM.CONTROL, idx: 5, name: $c.lit("restrictions") },
+        { range: SYM.PCHAR, idx: S.stone, name: $c.lit("S_stone") },
+        { range: SYM.PCHAR, idx: S.vwall, name: $c.lit("S_vwall") },
+        { range: SYM.PCHAR, idx: S.hwall, name: $c.lit("S_hwall") },
+        { range: SYM.PCHAR, idx: S.tlcorn, name: $c.lit("S_tlcorn") },
+        { range: SYM.PCHAR, idx: S.trcorn, name: $c.lit("S_trcorn") },
+        { range: SYM.PCHAR, idx: S.blcorn, name: $c.lit("S_blcorn") },
+        { range: SYM.PCHAR, idx: S.brcorn, name: $c.lit("S_brcorn") },
+        { range: SYM.PCHAR, idx: S.crwall, name: $c.lit("S_crwall") },
+        { range: SYM.PCHAR, idx: S.tuwall, name: $c.lit("S_tuwall") },
+        { range: SYM.PCHAR, idx: S.tdwall, name: $c.lit("S_tdwall") },
+        { range: SYM.PCHAR, idx: S.tlwall, name: $c.lit("S_tlwall") },
+        { range: SYM.PCHAR, idx: S.trwall, name: $c.lit("S_trwall") },
+        { range: SYM.PCHAR, idx: S.ndoor, name: $c.lit("S_ndoor") },
+        { range: SYM.PCHAR, idx: S.vodoor, name: $c.lit("S_vodoor") },
+        { range: SYM.PCHAR, idx: S.hodoor, name: $c.lit("S_hodoor") },
+        { range: SYM.PCHAR, idx: S.vcdoor, name: $c.lit("S_vcdoor") },
+        { range: SYM.PCHAR, idx: S.hcdoor, name: $c.lit("S_hcdoor") },
+        { range: SYM.PCHAR, idx: S.bars, name: $c.lit("S_bars") },
+        { range: SYM.PCHAR, idx: S.tree, name: $c.lit("S_tree") },
+        { range: SYM.PCHAR, idx: S.room, name: $c.lit("S_room") },
+        { range: SYM.PCHAR, idx: S.darkroom, name: $c.lit("S_darkroom") },
+        { range: SYM.PCHAR, idx: S.engroom, name: $c.lit("S_engroom") },
+        { range: SYM.PCHAR, idx: S.corr, name: $c.lit("S_corr") },
+        { range: SYM.PCHAR, idx: S.litcorr, name: $c.lit("S_litcorr") },
+        { range: SYM.PCHAR, idx: S.engrcorr, name: $c.lit("S_engrcorr") },
+        { range: SYM.PCHAR, idx: S.upstair, name: $c.lit("S_upstair") },
+        { range: SYM.PCHAR, idx: S.dnstair, name: $c.lit("S_dnstair") },
+        { range: SYM.PCHAR, idx: S.upladder, name: $c.lit("S_upladder") },
+        { range: SYM.PCHAR, idx: S.dnladder, name: $c.lit("S_dnladder") },
+        { range: SYM.PCHAR, idx: S.brupstair, name: $c.lit("S_brupstair") },
+        { range: SYM.PCHAR, idx: S.brdnstair, name: $c.lit("S_brdnstair") },
+        { range: SYM.PCHAR, idx: S.brupladder, name: $c.lit("S_brupladder") },
+        { range: SYM.PCHAR, idx: S.brdnladder, name: $c.lit("S_brdnladder") },
+        { range: SYM.PCHAR, idx: S.altar, name: $c.lit("S_altar") },
+        { range: SYM.PCHAR, idx: S.grave, name: $c.lit("S_grave") },
+        { range: SYM.PCHAR, idx: S.throne, name: $c.lit("S_throne") },
+        { range: SYM.PCHAR, idx: S.sink, name: $c.lit("S_sink") },
+        { range: SYM.PCHAR, idx: S.fountain, name: $c.lit("S_fountain") },
+        { range: SYM.PCHAR, idx: S.pool, name: $c.lit("S_pool") },
+        { range: SYM.PCHAR, idx: S.ice, name: $c.lit("S_ice") },
+        { range: SYM.PCHAR, idx: S.lava, name: $c.lit("S_lava") },
+        { range: SYM.PCHAR, idx: S.lavawall, name: $c.lit("S_lavawall") },
+        { range: SYM.PCHAR, idx: S.vodbridge, name: $c.lit("S_vodbridge") },
+        { range: SYM.PCHAR, idx: S.hodbridge, name: $c.lit("S_hodbridge") },
+        { range: SYM.PCHAR, idx: S.vcdbridge, name: $c.lit("S_vcdbridge") },
+        { range: SYM.PCHAR, idx: S.hcdbridge, name: $c.lit("S_hcdbridge") },
+        { range: SYM.PCHAR, idx: S.air, name: $c.lit("S_air") },
+        { range: SYM.PCHAR, idx: S.cloud, name: $c.lit("S_cloud") },
+        { range: SYM.PCHAR, idx: S.water, name: $c.lit("S_water") },
+        { range: SYM.PCHAR, idx: S.arrow_trap, name: $c.lit("S_arrow_trap") },
+        { range: SYM.PCHAR, idx: S.dart_trap, name: $c.lit("S_dart_trap") },
+        { range: SYM.PCHAR, idx: S.falling_rock_trap, name: $c.lit("S_falling_rock_trap") },
+        { range: SYM.PCHAR, idx: S.squeaky_board, name: $c.lit("S_squeaky_board") },
+        { range: SYM.PCHAR, idx: S.bear_trap, name: $c.lit("S_bear_trap") },
+        { range: SYM.PCHAR, idx: S.land_mine, name: $c.lit("S_land_mine") },
+        { range: SYM.PCHAR, idx: S.rolling_boulder_trap, name: $c.lit("S_rolling_boulder_trap") },
+        { range: SYM.PCHAR, idx: S.sleeping_gas_trap, name: $c.lit("S_sleeping_gas_trap") },
+        { range: SYM.PCHAR, idx: S.rust_trap, name: $c.lit("S_rust_trap") },
+        { range: SYM.PCHAR, idx: S.fire_trap, name: $c.lit("S_fire_trap") },
+        { range: SYM.PCHAR, idx: S.pit, name: $c.lit("S_pit") },
+        { range: SYM.PCHAR, idx: S.spiked_pit, name: $c.lit("S_spiked_pit") },
+        { range: SYM.PCHAR, idx: S.hole, name: $c.lit("S_hole") },
+        { range: SYM.PCHAR, idx: S.trap_door, name: $c.lit("S_trap_door") },
+        { range: SYM.PCHAR, idx: S.teleportation_trap, name: $c.lit("S_teleportation_trap") },
+        { range: SYM.PCHAR, idx: S.level_teleporter, name: $c.lit("S_level_teleporter") },
+        { range: SYM.PCHAR, idx: S.magic_portal, name: $c.lit("S_magic_portal") },
+        { range: SYM.PCHAR, idx: S.web, name: $c.lit("S_web") },
+        { range: SYM.PCHAR, idx: S.statue_trap, name: $c.lit("S_statue_trap") },
+        { range: SYM.PCHAR, idx: S.magic_trap, name: $c.lit("S_magic_trap") },
+        { range: SYM.PCHAR, idx: S.anti_magic_trap, name: $c.lit("S_anti_magic_trap") },
+        { range: SYM.PCHAR, idx: S.polymorph_trap, name: $c.lit("S_polymorph_trap") },
+        { range: SYM.PCHAR, idx: S.vibrating_square, name: $c.lit("S_vibrating_square") },
+        { range: SYM.PCHAR, idx: S.trapped_door, name: $c.lit("S_trapped_door") },
+        { range: SYM.PCHAR, idx: S.trapped_chest, name: $c.lit("S_trapped_chest") },
+        { range: SYM.PCHAR, idx: S.vbeam, name: $c.lit("S_vbeam") },
+        { range: SYM.PCHAR, idx: S.hbeam, name: $c.lit("S_hbeam") },
+        { range: SYM.PCHAR, idx: S.lslant, name: $c.lit("S_lslant") },
+        { range: SYM.PCHAR, idx: S.rslant, name: $c.lit("S_rslant") },
+        { range: SYM.PCHAR, idx: S.digbeam, name: $c.lit("S_digbeam") },
+        { range: SYM.PCHAR, idx: S.flashbeam, name: $c.lit("S_flashbeam") },
+        { range: SYM.PCHAR, idx: S.boomleft, name: $c.lit("S_boomleft") },
+        { range: SYM.PCHAR, idx: S.boomright, name: $c.lit("S_boomright") },
+        { range: SYM.PCHAR, idx: S.ss1, name: $c.lit("S_ss1") },
+        { range: SYM.PCHAR, idx: S.ss2, name: $c.lit("S_ss2") },
+        { range: SYM.PCHAR, idx: S.ss3, name: $c.lit("S_ss3") },
+        { range: SYM.PCHAR, idx: S.ss4, name: $c.lit("S_ss4") },
+        { range: SYM.PCHAR, idx: S.poisoncloud, name: $c.lit("S_poisoncloud") },
+        { range: SYM.PCHAR, idx: S.goodpos, name: $c.lit("S_goodpos") },
+        { range: SYM.PCHAR, idx: S.sw_tl, name: $c.lit("S_sw_tl") },
+        { range: SYM.PCHAR, idx: S.sw_tc, name: $c.lit("S_sw_tc") },
+        { range: SYM.PCHAR, idx: S.sw_tr, name: $c.lit("S_sw_tr") },
+        { range: SYM.PCHAR, idx: S.sw_ml, name: $c.lit("S_sw_ml") },
+        { range: SYM.PCHAR, idx: S.sw_mr, name: $c.lit("S_sw_mr") },
+        { range: SYM.PCHAR, idx: S.sw_bl, name: $c.lit("S_sw_bl") },
+        { range: SYM.PCHAR, idx: S.sw_bc, name: $c.lit("S_sw_bc") },
+        { range: SYM.PCHAR, idx: S.sw_br, name: $c.lit("S_sw_br") },
+        { range: SYM.PCHAR, idx: S.expl_tl, name: $c.lit("S_expl_tl") },
+        { range: SYM.PCHAR, idx: S.expl_tc, name: $c.lit("S_expl_tc") },
+        { range: SYM.PCHAR, idx: S.expl_tr, name: $c.lit("S_expl_tr") },
+        { range: SYM.PCHAR, idx: S.expl_ml, name: $c.lit("S_expl_ml") },
+        { range: SYM.PCHAR, idx: S.expl_mc, name: $c.lit("S_expl_mc") },
+        { range: SYM.PCHAR, idx: S.expl_mr, name: $c.lit("S_expl_mr") },
+        { range: SYM.PCHAR, idx: S.expl_bl, name: $c.lit("S_expl_bl") },
+        { range: SYM.PCHAR, idx: S.expl_bc, name: $c.lit("S_expl_bc") },
+        { range: SYM.PCHAR, idx: S.expl_br, name: $c.lit("S_expl_br") },
+        { range: SYM.OC, idx: S.strange_obj + SYM_OFF_O, name: $c.lit("S_strange_obj") },
+        { range: SYM.OC, idx: S.weapon + SYM_OFF_O, name: $c.lit("S_weapon") },
+        { range: SYM.OC, idx: S.armor + SYM_OFF_O, name: $c.lit("S_armor") },
+        { range: SYM.OC, idx: S.ring + SYM_OFF_O, name: $c.lit("S_ring") },
+        { range: SYM.OC, idx: S.amulet + SYM_OFF_O, name: $c.lit("S_amulet") },
+        { range: SYM.OC, idx: S.tool + SYM_OFF_O, name: $c.lit("S_tool") },
+        { range: SYM.OC, idx: S.food + SYM_OFF_O, name: $c.lit("S_food") },
+        { range: SYM.OC, idx: S.potion + SYM_OFF_O, name: $c.lit("S_potion") },
+        { range: SYM.OC, idx: S.scroll + SYM_OFF_O, name: $c.lit("S_scroll") },
+        { range: SYM.OC, idx: S.book + SYM_OFF_O, name: $c.lit("S_book") },
+        { range: SYM.OC, idx: S.wand + SYM_OFF_O, name: $c.lit("S_wand") },
+        { range: SYM.OC, idx: S.coin + SYM_OFF_O, name: $c.lit("S_coin") },
+        { range: SYM.OC, idx: S.gem + SYM_OFF_O, name: $c.lit("S_gem") },
+        { range: SYM.OC, idx: S.rock + SYM_OFF_O, name: $c.lit("S_rock") },
+        { range: SYM.OC, idx: S.ball + SYM_OFF_O, name: $c.lit("S_ball") },
+        { range: SYM.OC, idx: S.chain + SYM_OFF_O, name: $c.lit("S_chain") },
+        { range: SYM.OC, idx: S.venom + SYM_OFF_O, name: $c.lit("S_venom") },
+        { range: SYM.MON, idx: S.ANT + SYM_OFF_M, name: $c.lit("S_ANT") },
+        { range: SYM.MON, idx: S.BLOB + SYM_OFF_M, name: $c.lit("S_BLOB") },
+        { range: SYM.MON, idx: S.COCKATRICE + SYM_OFF_M, name: $c.lit("S_COCKATRICE") },
+        { range: SYM.MON, idx: S.DOG + SYM_OFF_M, name: $c.lit("S_DOG") },
+        { range: SYM.MON, idx: S.EYE + SYM_OFF_M, name: $c.lit("S_EYE") },
+        { range: SYM.MON, idx: S.FELINE + SYM_OFF_M, name: $c.lit("S_FELINE") },
+        { range: SYM.MON, idx: S.GREMLIN + SYM_OFF_M, name: $c.lit("S_GREMLIN") },
+        { range: SYM.MON, idx: S.HUMANOID + SYM_OFF_M, name: $c.lit("S_HUMANOID") },
+        { range: SYM.MON, idx: S.IMP + SYM_OFF_M, name: $c.lit("S_IMP") },
+        { range: SYM.MON, idx: S.JELLY + SYM_OFF_M, name: $c.lit("S_JELLY") },
+        { range: SYM.MON, idx: S.KOBOLD + SYM_OFF_M, name: $c.lit("S_KOBOLD") },
+        { range: SYM.MON, idx: S.LEPRECHAUN + SYM_OFF_M, name: $c.lit("S_LEPRECHAUN") },
+        { range: SYM.MON, idx: S.MIMIC + SYM_OFF_M, name: $c.lit("S_MIMIC") },
+        { range: SYM.MON, idx: S.NYMPH + SYM_OFF_M, name: $c.lit("S_NYMPH") },
+        { range: SYM.MON, idx: S.ORC + SYM_OFF_M, name: $c.lit("S_ORC") },
+        { range: SYM.MON, idx: S.PIERCER + SYM_OFF_M, name: $c.lit("S_PIERCER") },
+        { range: SYM.MON, idx: S.QUADRUPED + SYM_OFF_M, name: $c.lit("S_QUADRUPED") },
+        { range: SYM.MON, idx: S.RODENT + SYM_OFF_M, name: $c.lit("S_RODENT") },
+        { range: SYM.MON, idx: S.SPIDER + SYM_OFF_M, name: $c.lit("S_SPIDER") },
+        { range: SYM.MON, idx: S.TRAPPER + SYM_OFF_M, name: $c.lit("S_TRAPPER") },
+        { range: SYM.MON, idx: S.UNICORN + SYM_OFF_M, name: $c.lit("S_UNICORN") },
+        { range: SYM.MON, idx: S.VORTEX + SYM_OFF_M, name: $c.lit("S_VORTEX") },
+        { range: SYM.MON, idx: S.WORM + SYM_OFF_M, name: $c.lit("S_WORM") },
+        { range: SYM.MON, idx: S.XAN + SYM_OFF_M, name: $c.lit("S_XAN") },
+        { range: SYM.MON, idx: S.LIGHT + SYM_OFF_M, name: $c.lit("S_LIGHT") },
+        { range: SYM.MON, idx: S.ZRUTY + SYM_OFF_M, name: $c.lit("S_ZRUTY") },
+        { range: SYM.MON, idx: S.ANGEL + SYM_OFF_M, name: $c.lit("S_ANGEL") },
+        { range: SYM.MON, idx: S.BAT + SYM_OFF_M, name: $c.lit("S_BAT") },
+        { range: SYM.MON, idx: S.CENTAUR + SYM_OFF_M, name: $c.lit("S_CENTAUR") },
+        { range: SYM.MON, idx: S.DRAGON + SYM_OFF_M, name: $c.lit("S_DRAGON") },
+        { range: SYM.MON, idx: S.ELEMENTAL + SYM_OFF_M, name: $c.lit("S_ELEMENTAL") },
+        { range: SYM.MON, idx: S.FUNGUS + SYM_OFF_M, name: $c.lit("S_FUNGUS") },
+        { range: SYM.MON, idx: S.GNOME + SYM_OFF_M, name: $c.lit("S_GNOME") },
+        { range: SYM.MON, idx: S.GIANT + SYM_OFF_M, name: $c.lit("S_GIANT") },
+        { range: SYM.MON, idx: S.invisible + SYM_OFF_M, name: $c.lit("S_invisible") },
+        { range: SYM.MON, idx: S.JABBERWOCK + SYM_OFF_M, name: $c.lit("S_JABBERWOCK") },
+        { range: SYM.MON, idx: S.KOP + SYM_OFF_M, name: $c.lit("S_KOP") },
+        { range: SYM.MON, idx: S.LICH + SYM_OFF_M, name: $c.lit("S_LICH") },
+        { range: SYM.MON, idx: S.MUMMY + SYM_OFF_M, name: $c.lit("S_MUMMY") },
+        { range: SYM.MON, idx: S.NAGA + SYM_OFF_M, name: $c.lit("S_NAGA") },
+        { range: SYM.MON, idx: S.OGRE + SYM_OFF_M, name: $c.lit("S_OGRE") },
+        { range: SYM.MON, idx: S.PUDDING + SYM_OFF_M, name: $c.lit("S_PUDDING") },
+        { range: SYM.MON, idx: S.QUANTMECH + SYM_OFF_M, name: $c.lit("S_QUANTMECH") },
+        { range: SYM.MON, idx: S.RUSTMONST + SYM_OFF_M, name: $c.lit("S_RUSTMONST") },
+        { range: SYM.MON, idx: S.SNAKE + SYM_OFF_M, name: $c.lit("S_SNAKE") },
+        { range: SYM.MON, idx: S.TROLL + SYM_OFF_M, name: $c.lit("S_TROLL") },
+        { range: SYM.MON, idx: S.UMBER + SYM_OFF_M, name: $c.lit("S_UMBER") },
+        { range: SYM.MON, idx: S.VAMPIRE + SYM_OFF_M, name: $c.lit("S_VAMPIRE") },
+        { range: SYM.MON, idx: S.WRAITH + SYM_OFF_M, name: $c.lit("S_WRAITH") },
+        { range: SYM.MON, idx: S.XORN + SYM_OFF_M, name: $c.lit("S_XORN") },
+        { range: SYM.MON, idx: S.YETI + SYM_OFF_M, name: $c.lit("S_YETI") },
+        { range: SYM.MON, idx: S.ZOMBIE + SYM_OFF_M, name: $c.lit("S_ZOMBIE") },
+        { range: SYM.MON, idx: S.HUMAN + SYM_OFF_M, name: $c.lit("S_HUMAN") },
+        { range: SYM.MON, idx: S.GHOST + SYM_OFF_M, name: $c.lit("S_GHOST") },
+        { range: SYM.MON, idx: S.GOLEM + SYM_OFF_M, name: $c.lit("S_GOLEM") },
+        { range: SYM.MON, idx: S.DEMON + SYM_OFF_M, name: $c.lit("S_DEMON") },
+        { range: SYM.MON, idx: S.EEL + SYM_OFF_M, name: $c.lit("S_EEL") },
+        { range: SYM.MON, idx: S.LIZARD + SYM_OFF_M, name: $c.lit("S_LIZARD") },
+        { range: SYM.MON, idx: S.WORM_TAIL + SYM_OFF_M, name: $c.lit("S_WORM_TAIL") },
+        { range: SYM.MON, idx: S.MIMIC_DEF + SYM_OFF_M, name: $c.lit("S_MIMIC_DEF") },
+        { range: SYM.OTH, idx: SYM.NOTHING + SYM_OFF_X, name: $c.lit("S_nothing") },
+        { range: SYM.OTH, idx: SYM.UNEXPLORED + SYM_OFF_X, name: $c.lit("S_unexplored") },
+        { range: SYM.OTH, idx: SYM.BOULDER + SYM_OFF_X, name: $c.lit("S_boulder") },
+        { range: SYM.OTH, idx: SYM.INVISIBLE + SYM_OFF_X, name: $c.lit("S_invisible") },
+        { range: SYM.OTH, idx: SYM.PET_OVERRIDE + SYM_OFF_X, name: $c.lit("S_pet_override") },
+        { range: SYM.OTH, idx: SYM.HERO_OVERRIDE + SYM_OFF_X, name: $c.lit("S_hero_override") },
         {}
     ]);
     $G.saved_symbols = null;

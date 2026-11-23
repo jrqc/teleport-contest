@@ -3,8 +3,8 @@ import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
 import { windowprocs } from './windows.js';
-import { WC2_FLUSH_STATUS, WC2_HILITE_STATUS } from './winprocs.h.js';
+import { WC2, WC2_FLUSH_STATUS } from './winprocs.h.js';
 
 export function VIA_WINDOWPORT() {
-    return $c.andu64(windowprocs.wincap2, WC2_HILITE_STATUS | WC2_FLUSH_STATUS) !== 0 ? 1 : 0;
+    return $c.andu64(windowprocs.wincap2, WC2.HILITE_STATUS | WC2_FLUSH_STATUS) !== 0 ? 1 : 0;
 }

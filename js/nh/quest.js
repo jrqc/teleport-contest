@@ -3,7 +3,7 @@ import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
 import { adjalign, exercise } from './attrib.js';
-import { A_WIS } from './attrib.h.js';
+import { A } from './attrib.h.js';
 import { yn_function } from './cmd.js';
 import { gf, gi, svc, svd, svq, u } from './decl.js';
 import { canseemon } from './display.js';
@@ -11,28 +11,28 @@ import { schedule_goto } from './do.js';
 import { Monnam, mon_nam, noit_mon_nam } from './do_name.js';
 import { Is_special, dungeon_branch, on_level, remdun_mapseen } from './dungeon.js';
 import { wizard } from './flag.macros.js';
-import { FALSE, LL_ACHIEVE, TRUE } from './global.h.js';
+import { FALSE, LL, TRUE } from './global.h.js';
 import { nomul } from './hack.js';
 import { align_str } from './insight.js';
 import { carrying, fully_identify_obj, update_inventory } from './invent.js';
 import { angry_guards, monnear, setmangry } from './mon.js';
-import { MS_DJINNI, MS_GUARDIAN, MS_NEMESIS } from './monflag.h.js';
+import { MS } from './monflag.h.js';
 import { mons } from './monst.js';
 import { STRAT_WAITMASK } from './monst.h.js';
 import { helpless } from './monst.macros.js';
-import { PM_PRISONER } from './monsters.h.js';
+import { PM } from './monsters.h.js';
 import { observe_object } from './o_init.js';
-import { OBJ_BURIED, OBJ_FLOOR, OBJ_MINVENT } from './obj.h.js';
+import { OBJ } from './obj.h.js';
 import { AMULET_OF_YENDOR, BELL_OF_OPENING, FAKE_AMULET_OF_YENDOR } from './objects.h.js';
 import { the, xname } from './objnam.js';
 import { You, impossible, livelog_printf, pline, verbalize } from './pline.js';
-import { MIN_QUEST_ALIGN, MIN_QUEST_LEVEL } from './quest.h.js';
+import { MIN_QUEST } from './quest.h.js';
 import { com_pager, find_quest_artifact, is_quest_artifact, qt_pager } from './questpgr.js';
 import { create_gas_cloud } from './region.js';
 import { rn2 } from './rnd.js';
 import { deltrap } from './trap.js';
 import { MAGIC_PORTAL } from './trap.h.js';
-import { A_CURRENT, A_ORIGINAL, UTOTYPE_NONE, UTOTYPE_PORTAL, UTOTYPE_RMPORTAL } from './you.h.js';
+import { UTOTYPE } from './you.h.js';
 import { Deaf } from './youprop.macros.js';
 
 async function on_start() {   // quest.c:26
@@ -71,7 +71,7 @@ async function on_goal() {   // quest.c:62
         await qt_pager($c.lit("goal_first"));
         svq.quest_status.made_goal = (1) & 7;
     } else {
-        whichobjchains = 1 << OBJ_FLOOR | 1 << OBJ_MINVENT | 1 << OBJ_BURIED;
+        whichobjchains = 1 << OBJ.FLOOR | 1 << OBJ.MINVENT | 1 << OBJ.BURIED;
         qarti = find_quest_artifact(whichobjchains);
         await qt_pager(qarti ? $c.lit("goal_next") : $c.lit("goal_alt"));
         if ((svq.quest_status.made_goal | 0) < 7) {
@@ -111,40 +111,40 @@ export async function artitouch(obj) {   // quest.c:125
         await observe_object(obj);
         svq.quest_status.touched_artifact = (TRUE) & 1;
         await qt_pager($c.lit("gotit"));
-        await exercise(A_WIS, TRUE);
+        await exercise(A.WIS, TRUE);
     }
 }
 export async function ok_to_quest() {   // quest.c:140
     return $c.i8((svq.quest_status.got_quest | 0 || svq.quest_status.got_thanks | 0) && await is_pure(FALSE) > 0 || svq.quest_status.killed_leader | 0 ? 1 : 0);
 }
 function not_capable() {   // quest.c:147
-    return $c.i8(u.ulevel < MIN_QUEST_LEVEL ? 1 : 0);
+    return $c.i8(u.ulevel < MIN_QUEST.LEVEL ? 1 : 0);
 }
 async function is_pure(talk) {   // quest.c:153
     let purity = 0, original_alignment = 0;
-    original_alignment = u.ualignbase[A_ORIGINAL];
+    original_alignment = u.ualignbase[A.ORIGINAL];
     if (wizard() && talk) {
         if (u.ualign.type !== original_alignment) {
             await You($c.lit("are currently %s instead of %s."), align_str(u.ualign.type), align_str(original_alignment));
-        } else if (u.ualignbase[A_CURRENT] !== original_alignment) {
+        } else if (u.ualignbase[A.CURRENT] !== original_alignment) {
             await You($c.lit("have converted."));
-        } else if (u.ualign.record < MIN_QUEST_ALIGN) {
-            await You($c.lit("are currently %d and require %d."), u.ualign.record, MIN_QUEST_ALIGN);
+        } else if (u.ualign.record < MIN_QUEST.ALIGN) {
+            await You($c.lit("are currently %d and require %d."), u.ualign.record, MIN_QUEST.ALIGN);
             if (await yn_function($c.lit("adjust?"), null, 121, TRUE) === 121) {
-                u.ualign.record = MIN_QUEST_ALIGN;
+                u.ualign.record = MIN_QUEST.ALIGN;
             }
         }
     }
-    purity = u.ualign.record >= MIN_QUEST_ALIGN && u.ualign.type === original_alignment && u.ualignbase[A_CURRENT] === original_alignment ? 1 : u.ualignbase[A_CURRENT] !== original_alignment ? -1 : 0;
+    purity = u.ualign.record >= MIN_QUEST.ALIGN && u.ualign.type === original_alignment && u.ualignbase[A.CURRENT] === original_alignment ? 1 : u.ualignbase[A.CURRENT] !== original_alignment ? -1 : 0;
     return purity;
 }
 async function expulsion(seal) {   // quest.c:186
     let br = null, dest = null, t = null, portal_flag = 0, reexpelled = 0;
-    portal_flag = u.uevent.qexpelled | 0 ? UTOTYPE_NONE : UTOTYPE_PORTAL;
+    portal_flag = u.uevent.qexpelled | 0 ? UTOTYPE.NONE : UTOTYPE.PORTAL;
     br = await dungeon_branch($c.lit("The Quest"));
     dest = br.end1.dnum === u.uz.dnum ? br.end2 : br.end1;
     if (seal) {
-        portal_flag = portal_flag | UTOTYPE_RMPORTAL;
+        portal_flag = portal_flag | UTOTYPE.RMPORTAL;
     }
     nomul(0);
     await schedule_goto(dest, portal_flag, null, null);
@@ -236,25 +236,25 @@ async function chat_with_leader(mtmp) {   // quest.c:282
         }
         if (not_capable()) {
             await qt_pager($c.lit("badlevel"));
-            await exercise(A_WIS, TRUE);
+            await exercise(A.WIS, TRUE);
             await expulsion(FALSE);
         } else if ((purity = await is_pure(TRUE)) < 0) {
             if (!svq.quest_status.pissed_off) {
                 await com_pager($c.lit("banished"));
                 svq.quest_status.pissed_off = (TRUE) & 1;
                 await expulsion(FALSE);
-                await livelog_printf(LL_ACHIEVE, $c.lit("%s has expelled you from the quest"), await noit_mon_nam(mtmp));
+                await livelog_printf(LL.ACHIEVE, $c.lit("%s has expelled you from the quest"), await noit_mon_nam(mtmp));
             }
         } else if (purity === 0) {
             await qt_pager($c.lit("badalign"));
             svq.quest_status.not_ready = (1) & 7;
-            await exercise(A_WIS, TRUE);
+            await exercise(A.WIS, TRUE);
             await expulsion(FALSE);
         } else {
             await qt_pager($c.lit("assignquest"));
-            await exercise(A_WIS, TRUE);
+            await exercise(A.WIS, TRUE);
             svq.quest_status.got_quest = (TRUE) & 1;
-            await livelog_printf(LL_ACHIEVE, $c.lit("%s has granted access to proceed deeper into the quest"), await noit_mon_nam(mtmp));
+            await livelog_printf(LL.ACHIEVE, $c.lit("%s has granted access to proceed deeper into the quest"), await noit_mon_nam(mtmp));
         }
     }
 }
@@ -315,7 +315,7 @@ async function chat_with_guardian() {   // quest.c:441
     }
 }
 async function prisoner_speaks(mtmp) {   // quest.c:451
-    if ($c.peq(mtmp.data, $c.relem(mons, PM_PRISONER)) && $c.andu64(mtmp.mstrategy, STRAT_WAITMASK)) {
+    if ($c.peq(mtmp.data, $c.relem(mons, PM.PRISONER)) && $c.andu64(mtmp.mstrategy, STRAT_WAITMASK)) {
         if (canseemon(mtmp)) {
             await pline($c.lit("%s speaks:"), await Monnam(mtmp));
         }
@@ -336,10 +336,10 @@ export async function quest_chat(mtmp) {   // quest.c:473
         return;
     }
     switch (mtmp.data.msound) {
-        case MS_NEMESIS:
+        case MS.NEMESIS:
             await chat_with_nemesis();
             break;
-        case MS_GUARDIAN:
+        case MS.GUARDIAN:
             await chat_with_guardian();
             break;
         default:
@@ -352,10 +352,10 @@ export async function quest_talk(mtmp) {   // quest.c:495
         return;
     }
     switch (mtmp.data.msound) {
-        case MS_NEMESIS:
+        case MS.NEMESIS:
             await nemesis_speaks();
             break;
-        case MS_DJINNI:
+        case MS.DJINNI:
             await prisoner_speaks(mtmp);
             break;
         default:
@@ -364,7 +364,7 @@ export async function quest_talk(mtmp) {   // quest.c:495
 }
 export function quest_stat_check(mtmp) {   // quest.c:514
     let $t1;
-    if (mtmp.data.msound === MS_NEMESIS) {
+    if (mtmp.data.msound === MS.NEMESIS) {
         $t1 = (!helpless(mtmp) && monnear(mtmp, u.ux, u.uy) ? 1 : 0) >>> 0, svq.quest_status.in_battle = ($t1) & 1;
     }
 }

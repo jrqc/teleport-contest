@@ -4,7 +4,7 @@ import * as $T from './types.js';
 import { $G } from './globals.js';
 import { db_under_typ } from './dbridge.js';
 import { iflags, svl } from './decl.js';
-import { S_arrow_trap } from './defsym.h.js';
+import { S } from './defsym.h.js';
 import { AIR, ALTAR, CLOUD, DBWALL, DOOR, DRAWBRIDGE_DOWN, DRAWBRIDGE_UP, FOUNTAIN, F_LOOTED, F_WARNED, GRAVE, LADDER, LAVAPOOL, LAVAWALL, POOL, ROOM, SDOOR, SINK, STAIRS, STONE, THRONE, TREE, WATER } from './rm.h.js';
 
 export function IS_WALL(typ) {
@@ -86,7 +86,7 @@ export function fmon() {
     return svl.level.monlist;
 }
 export function trap_to_defsym(t) {
-    return (S_arrow_trap + t | 0) - 1 | 0;
+    return (S.arrow_trap + t | 0) - 1 | 0;
 }
 export function OBJ_AT(x, y) {
     return svl.level.objects[x][y] !== null ? 1 : 0;

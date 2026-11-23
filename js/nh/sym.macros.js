@@ -2,36 +2,36 @@
 import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
-import { S_arrow_trap, S_corr, S_darkroom, S_engrcorr, S_engroom, S_fountain, S_hcdbridge, S_hcdoor, S_lava, S_lavawall, S_litcorr, S_pool, S_room, S_stone, S_trwall, S_upstair, S_vodbridge, S_vodoor, S_water } from './defsym.h.js';
+import { S } from './defsym.h.js';
 import { MAXTCHARS } from './sym.h.js';
 
 export function is_cmap_trap(i) {
-    return i >= S_arrow_trap && i < S_arrow_trap + MAXTCHARS ? 1 : 0;
+    return i >= S.arrow_trap && i < S.arrow_trap + MAXTCHARS ? 1 : 0;
 }
 export function is_cmap_drawbridge(i) {
-    return i >= S_vodbridge && i <= S_hcdbridge ? 1 : 0;
+    return i >= S.vodbridge && i <= S.hcdbridge ? 1 : 0;
 }
 export function is_cmap_door(i) {
-    return i >= S_vodoor && i <= S_hcdoor ? 1 : 0;
+    return i >= S.vodoor && i <= S.hcdoor ? 1 : 0;
 }
 export function is_cmap_wall(i) {
-    return i >= S_stone && i <= S_trwall ? 1 : 0;
+    return i >= S.stone && i <= S.trwall ? 1 : 0;
 }
 export function is_cmap_room(i) {
-    return i >= S_room && i <= S_darkroom ? 1 : 0;
+    return i >= S.room && i <= S.darkroom ? 1 : 0;
 }
 export function is_cmap_corr(i) {
-    return i >= S_corr && i <= S_litcorr ? 1 : 0;
+    return i >= S.corr && i <= S.litcorr ? 1 : 0;
 }
 export function is_cmap_furniture(i) {
-    return i >= S_upstair && i <= S_fountain ? 1 : 0;
+    return i >= S.upstair && i <= S.fountain ? 1 : 0;
 }
 export function is_cmap_water(i) {
-    return i === S_pool || i === S_water ? 1 : 0;
+    return i === S.pool || i === S.water ? 1 : 0;
 }
 export function is_cmap_lava(i) {
-    return i === S_lava || i === S_lavawall ? 1 : 0;
+    return i === S.lava || i === S.lavawall ? 1 : 0;
 }
 export function is_cmap_engraving(i) {
-    return i === S_engroom || i === S_engrcorr ? 1 : 0;
+    return i === S.engroom || i === S.engrcorr ? 1 : 0;
 }

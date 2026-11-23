@@ -4,16 +4,16 @@ import * as $T from './types.js';
 import { $G } from './globals.js';
 import { fmt_ptr } from './alloc.js';
 import { artifact_light, is_art, set_artifact_intrinsic } from './artifact.js';
-import { ART_EYES_OF_THE_OVERWORLD } from './artilist.h.js';
+import { ART } from './artilist.h.js';
 import { c_color_names, c_common_strings, disp, flags, gb, gi, gm, go, gu, gy, iflags, svc, svl, u } from './decl.js';
-import { AMULET_CLASS, ARMOR_CLASS, BALL_CLASS, CHAIN_CLASS, FOOD_CLASS, GEM_CLASS, RING_CLASS, S_CENTAUR, S_MUMMY, TOOL_CLASS, WEAPON_CLASS } from './defsym.h.js';
+import { AMULET_CLASS, ARMOR_CLASS, BALL_CLASS, CHAIN_CLASS, FOOD_CLASS, GEM_CLASS, RING_CLASS, S, TOOL_CLASS, WEAPON_CLASS } from './defsym.h.js';
 import { canseemon, newsym } from './display.js';
 import { obj_no_longer_held } from './do.js';
 import { Mgender, Monnam, hcolor, mon_nam, pmname } from './do_name.js';
 import { cancel_doff } from './do_wear.js';
 import { surface } from './dungeon.js';
 import { BUFSZ, FALSE, TRUE } from './global.h.js';
-import { BOLT_LIM, DISMOUNT_FELL } from './hack.h.js';
+import { BOLT_LIM, DISMOUNT } from './hack.h.js';
 import { nh_snprintf, s_suffix, sgn, strncmpi, strsubst } from './hacklib.js';
 import { update_inventory } from './invent.js';
 import { arti_light_description } from './light.js';
@@ -22,14 +22,14 @@ import { curse, obj_extract_self, place_object } from './mkobj.js';
 import { check_gear_next_turn } from './mon.js';
 import { breakarm, num_horns, pronoun_gender, raceptr, sliparm } from './mondata.js';
 import { has_horns, is_animal, is_whirly, mindless, nohands, slithy, touch_petrifies, verysmall } from './mondata.macros.js';
-import { MZ_MEDIUM, MZ_SMALL } from './monflag.h.js';
+import { MZ } from './monflag.h.js';
 import { mons } from './monst.js';
 import { MFAST, MSLOW } from './monst.h.js';
 import { DEADMONSTER, MON_WEP, monstunseesu_prop } from './monst.macros.js';
-import { PM_HOBBIT, PM_LONG_WORM, PM_MONK, PM_SKELETON, PM_WIZARD } from './monsters.h.js';
+import { PM } from './monsters.h.js';
 import { m_useup } from './mthrowu.js';
 import { discover_object } from './o_init.js';
-import { OBJ_MINVENT } from './obj.h.js';
+import { OBJ } from './obj.h.js';
 import { Dragon_mail_to_pm, Dragon_scales_to_pm, Has_contents, Is_dragon_mail, Is_dragon_scales, WrappingAllowed, is_boots, is_cloak, is_elven_armor, is_flimsy, is_gloves, is_helmet, is_shield, is_shirt, is_suit, is_weptool } from './obj.macros.js';
 import { ARM_BOOTS, ARM_CLOAK, ARM_GLOVES, ARM_HELM, ARM_SHIELD, ARM_SHIRT, ARM_SUIT } from './objclass.h.js';
 import { objects } from './objects.js';
@@ -37,7 +37,7 @@ import { ALCHEMY_SMOCK, AMULET_OF_GUARDING, AMULET_OF_LIFE_SAVING, AMULET_OF_REF
 import { Yname2, an, cloak_simple_name, distant_name, doname, otense, simpleonames } from './objnam.js';
 import { NON_PM } from './permonst.h.js';
 import { You, You_hear, impossible, pline, pline_mon } from './pline.js';
-import { ACID_RES, ANTIMAGIC, BLINDED, CLAIRVOYANT, COLD_RES, DISINT_RES, DISPLACED, FAST, FIRE_RES, FLYING, FUMBLING, INVIS, I_SPECIAL, JUMPING, LEVITATION, POISON_RES, PROTECTION, REFLECTING, SEE_INVIS, SHOCK_RES, SLEEP_RES, STEALTH, STONE_RES, TELEPAT, WWALKING, W_AMUL, W_ARM, W_ARMC, W_ARMF, W_ARMG, W_ARMH, W_ARMOR, W_ARMS, W_ARMU, W_ART, W_BALL, W_CHAIN, W_QUIVER, W_RINGL, W_RINGR, W_SADDLE, W_SWAPWEP, W_TOOL, W_WEP } from './prop.h.js';
+import { ACID_RES, ANTIMAGIC, BLINDED, CLAIRVOYANT, COLD_RES, DISINT_RES, DISPLACED, FAST, FIRE_RES, FLYING, FUMBLING, INVIS, I_SPECIAL, JUMPING, LEVITATION, POISON_RES, PROTECTION, REFLECTING, SEE_INVIS, SHOCK_RES, SLEEP_RES, STEALTH, STONE_RES, TELEPAT, W, WWALKING, W_ARMOR } from './prop.h.js';
 import { res_to_mr } from './prop.macros.js';
 import { rnl } from './rnd.js';
 import { genders } from './role.js';
@@ -49,7 +49,7 @@ import { cansee } from './vision.macros.js';
 import { mwepgone } from './weapon.js';
 import { set_twoweap } from './wield.js';
 import { see_wsegs } from './worm.js';
-import { AC_MAX, PRONOUN_HALLU } from './you.h.js';
+import { AC_MAX, PRONOUN } from './you.h.js';
 import { See_invisible, Stone_resistance } from './youprop.macros.js';
 import { learnwand } from './zap.js';
 
@@ -65,7 +65,7 @@ export function recalc_telepat_range() {   // worn.c:50
             nobjs = nobjs + 1 | 0;
         }
     }
-    if ($c.and64(u.uprops[TELEPAT].extrinsic, W_ART)) {
+    if ($c.and64(u.uprops[TELEPAT].extrinsic, W.ART)) {
         nobjs = nobjs + 1 | 0;
     }
     if (nobjs) {
@@ -76,7 +76,7 @@ export function recalc_telepat_range() {   // worn.c:50
 }
 export async function setworn(obj, mask) {   // worn.c:73
     let wp = null, oobj = null, p = 0;
-    if ($c.and64(mask, W_ARM | I_SPECIAL) === (W_ARM | I_SPECIAL)) {
+    if ($c.and64(mask, W.ARM | I_SPECIAL) === (W.ARM | I_SPECIAL)) {
         $G.uskin = obj;
     } else {
         for (wp = $c.relem(worn, 0); wp.w_mask; wp = $c.radd(wp, 1)) {
@@ -86,15 +86,15 @@ export async function setworn(obj, mask) {   // worn.c:73
                     await impossible($c.lit("Setworn: mask=0x%08lx."), wp.w_mask);
                 }
                 if (oobj) {
-                    if (u.twoweap && $c.and64(oobj.owornmask, W_WEP | W_SWAPWEP)) {
+                    if (u.twoweap && $c.and64(oobj.owornmask, W.WEP | W.SWAPWEP)) {
                         set_twoweap(FALSE);
                     }
                     oobj.owornmask = $c.and64(oobj.owornmask, $c.not64(wp.w_mask));
-                    if ($c.and64(wp.w_mask, ~(W_SWAPWEP | W_QUIVER))) {
+                    if ($c.and64(wp.w_mask, ~(W.SWAPWEP | W.QUIVER))) {
                         p = objects[oobj.otyp].oc_oprop;
                         u.uprops[p].extrinsic = $c.and64(u.uprops[p].extrinsic, $c.not64(wp.w_mask));
                         monstunseesu_prop($c.u8(p));
-                        if ((p = oobj.otyp === MUMMY_WRAPPING && $c.and64(mask, W_ARMC) !== 0 ? INVIS : oobj.otyp === CORNUTHAUM && $c.and64(mask, W_ARMH) !== 0 && !(gu.urole.mnum === PM_WIZARD) ? CLAIRVOYANT : is_art(oobj, ART_EYES_OF_THE_OVERWORLD) && $c.and64(mask, W_TOOL) !== 0 ? BLINDED : 0) !== 0) {
+                        if ((p = oobj.otyp === MUMMY_WRAPPING && $c.and64(mask, W.ARMC) !== 0 ? INVIS : oobj.otyp === CORNUTHAUM && $c.and64(mask, W.ARMH) !== 0 && !(gu.urole.mnum === PM.WIZARD) ? CLAIRVOYANT : is_art(oobj, ART.EYES_OF_THE_OVERWORLD) && $c.and64(mask, W.TOOL) !== 0 ? BLINDED : 0) !== 0) {
                             u.uprops[p].blocked = $c.and64(u.uprops[p].blocked, $c.not64(wp.w_mask));
                         }
                         if (oobj.oartifact) {
@@ -106,11 +106,11 @@ export async function setworn(obj, mask) {   // worn.c:73
                 wp.w_obj.set(0, obj);
                 if (obj) {
                     obj.owornmask = $c.or64(obj.owornmask, wp.w_mask);
-                    if ($c.and64(wp.w_mask, ~(W_SWAPWEP | W_QUIVER))) {
-                        if (obj.oclass === WEAPON_CLASS || is_weptool(obj) || mask !== W_WEP) {
+                    if ($c.and64(wp.w_mask, ~(W.SWAPWEP | W.QUIVER))) {
+                        if (obj.oclass === WEAPON_CLASS || is_weptool(obj) || mask !== W.WEP) {
                             p = objects[obj.otyp].oc_oprop;
                             u.uprops[p].extrinsic = $c.or64(u.uprops[p].extrinsic, wp.w_mask);
-                            if ((p = obj.otyp === MUMMY_WRAPPING && $c.and64(mask, W_ARMC) !== 0 ? INVIS : obj.otyp === CORNUTHAUM && $c.and64(mask, W_ARMH) !== 0 && !(gu.urole.mnum === PM_WIZARD) ? CLAIRVOYANT : is_art(obj, ART_EYES_OF_THE_OVERWORLD) && $c.and64(mask, W_TOOL) !== 0 ? BLINDED : 0) !== 0) {
+                            if ((p = obj.otyp === MUMMY_WRAPPING && $c.and64(mask, W.ARMC) !== 0 ? INVIS : obj.otyp === CORNUTHAUM && $c.and64(mask, W.ARMH) !== 0 && !(gu.urole.mnum === PM.WIZARD) ? CLAIRVOYANT : is_art(obj, ART.EYES_OF_THE_OVERWORLD) && $c.and64(mask, W.TOOL) !== 0 ? BLINDED : 0) !== 0) {
                                 u.uprops[p].blocked = $c.or64(u.uprops[p].blocked, wp.w_mask);
                             }
                         }
@@ -124,9 +124,9 @@ export async function setworn(obj, mask) {   // worn.c:73
         if (obj && $c.and64(obj.owornmask, W_ARMOR) !== 0) {
             u.uroleplay.nudist = FALSE;
         }
-        iflags.tux_penalty = $c.i8($G.uarm && gu.urole.mnum === PM_MONK && gu.urole.spelarmr ? 1 : 0);
+        iflags.tux_penalty = $c.i8($G.uarm && gu.urole.mnum === PM.MONK && gu.urole.spelarmr ? 1 : 0);
     }
-    if (flags.weaponstatus && $c.and64(mask, W_WEP) !== 0 || flags.armorstatus && $c.and64(mask, W_ARMOR) !== 0) {
+    if (flags.weaponstatus && $c.and64(mask, W.WEP) !== 0 || flags.armorstatus && $c.and64(mask, W_ARMOR) !== 0) {
         disp.botl = TRUE;
     }
     await update_inventory();
@@ -153,7 +153,7 @@ export async function setnotworn(obj) {   // worn.c:150
             if (obj.oartifact) {
                 await set_artifact_intrinsic(obj, 0, wp.w_mask);
             }
-            if ((p = obj.otyp === MUMMY_WRAPPING && $c.and64(wp.w_mask, W_ARMC) !== 0 ? INVIS : obj.otyp === CORNUTHAUM && $c.and64(wp.w_mask, W_ARMH) !== 0 && !(gu.urole.mnum === PM_WIZARD) ? CLAIRVOYANT : is_art(obj, ART_EYES_OF_THE_OVERWORLD) && $c.and64(wp.w_mask, W_TOOL) !== 0 ? BLINDED : 0) !== 0) {
+            if ((p = obj.otyp === MUMMY_WRAPPING && $c.and64(wp.w_mask, W.ARMC) !== 0 ? INVIS : obj.otyp === CORNUTHAUM && $c.and64(wp.w_mask, W.ARMH) !== 0 && !(gu.urole.mnum === PM.WIZARD) ? CLAIRVOYANT : is_art(obj, ART.EYES_OF_THE_OVERWORLD) && $c.and64(wp.w_mask, W.TOOL) !== 0 ? BLINDED : 0) !== 0) {
                 u.uprops[p].blocked = $c.and64(u.uprops[p].blocked, $c.not64(wp.w_mask));
             }
         }
@@ -161,7 +161,7 @@ export async function setnotworn(obj) {   // worn.c:150
     if (!$G.uarm) {
         iflags.tux_penalty = FALSE;
     }
-    if (flags.weaponstatus && $c.and64(unworn, W_WEP) !== 0 || flags.armorstatus && $c.and64(unworn, W_ARMOR) !== 0) {
+    if (flags.weaponstatus && $c.and64(unworn, W.WEP) !== 0 || flags.armorstatus && $c.and64(unworn, W_ARMOR) !== 0) {
         disp.botl = TRUE;
     }
     await update_inventory();
@@ -187,25 +187,25 @@ export function wornmask_to_armcat(mask) {   // worn.c:218
     let cat = 0;
     cat = 0;
     switch ($c.and64(mask, W_ARMOR)) {
-        case W_ARM:
+        case W.ARM:
             cat = ARM_SUIT;
             break;
-        case W_ARMC:
+        case W.ARMC:
             cat = ARM_CLOAK;
             break;
-        case W_ARMH:
+        case W.ARMH:
             cat = ARM_HELM;
             break;
-        case W_ARMS:
+        case W.ARMS:
             cat = ARM_SHIELD;
             break;
-        case W_ARMG:
+        case W.ARMG:
             cat = ARM_GLOVES;
             break;
-        case W_ARMF:
+        case W.ARMF:
             cat = ARM_BOOTS;
             break;
-        case W_ARMU:
+        case W.ARMU:
             cat = ARM_SHIRT;
             break;
     }
@@ -216,25 +216,25 @@ export function armcat_to_wornmask(cat) {   // worn.c:250
     mask = 0;
     switch (cat) {
         case ARM_SUIT:
-            mask = W_ARM;
+            mask = W.ARM;
             break;
         case ARM_CLOAK:
-            mask = W_ARMC;
+            mask = W.ARMC;
             break;
         case ARM_HELM:
-            mask = W_ARMH;
+            mask = W.ARMH;
             break;
         case ARM_SHIELD:
-            mask = W_ARMS;
+            mask = W.ARMS;
             break;
         case ARM_GLOVES:
-            mask = W_ARMG;
+            mask = W.ARMG;
             break;
         case ARM_BOOTS:
-            mask = W_ARMF;
+            mask = W.ARMF;
             break;
         case ARM_SHIRT:
-            mask = W_ARMU;
+            mask = W.ARMU;
             break;
     }
     return mask;
@@ -245,64 +245,64 @@ export function wearslot(obj) {   // worn.c:282
     res = 0;
     switch (obj.oclass) {
         case AMULET_CLASS:
-            res = W_AMUL;
+            res = W.AMUL;
             break;
         case RING_CLASS:
-            res = W_RINGL | W_RINGR;
+            res = W.RINGL | W.RINGR;
             break;
         case ARMOR_CLASS:
             switch (objects[otyp].oc_subtyp) {
                 case ARM_SUIT:
-                    res = W_ARM;
+                    res = W.ARM;
                     break;
                 case ARM_SHIELD:
-                    res = W_ARMS;
+                    res = W.ARMS;
                     break;
                 case ARM_HELM:
-                    res = W_ARMH;
+                    res = W.ARMH;
                     break;
                 case ARM_GLOVES:
-                    res = W_ARMG;
+                    res = W.ARMG;
                     break;
                 case ARM_BOOTS:
-                    res = W_ARMF;
+                    res = W.ARMF;
                     break;
                 case ARM_CLOAK:
-                    res = W_ARMC;
+                    res = W.ARMC;
                     break;
                 case ARM_SHIRT:
-                    res = W_ARMU;
+                    res = W.ARMU;
                     break;
             }
             break;
         case WEAPON_CLASS:
-            res = W_WEP | W_SWAPWEP;
+            res = W.WEP | W.SWAPWEP;
             if (objects[otyp].oc_merge) {
-                res = $c.or64(res, W_QUIVER);
+                res = $c.or64(res, W.QUIVER);
             }
             break;
         case TOOL_CLASS:
             if (otyp === BLINDFOLD || otyp === TOWEL || otyp === LENSES) {
-                res = W_TOOL;
+                res = W.TOOL;
             } else if (is_weptool(obj) || otyp === TIN_OPENER) {
-                res = W_WEP | W_SWAPWEP;
+                res = W.WEP | W.SWAPWEP;
             } else if (otyp === SADDLE) {
-                res = W_SADDLE;
+                res = W.SADDLE;
             }
             break;
         case FOOD_CLASS:
             if (obj.otyp === MEAT_RING) {
-                res = W_RINGL | W_RINGR;
+                res = W.RINGL | W.RINGR;
             }
             break;
         case GEM_CLASS:
-            res = W_QUIVER;
+            res = W.QUIVER;
             break;
         case BALL_CLASS:
-            res = W_BALL;
+            res = W.BALL;
             break;
         case CHAIN_CLASS:
-            res = W_CHAIN;
+            res = W.CHAIN;
             break;
         default:
             break;
@@ -335,7 +335,7 @@ export async function check_wornmask_slots() {   // worn.c:355
             }
         }
         for (otmp = gi.invent; otmp; otmp = otmp.nobj) {
-            if (!$c.peq(otmp, o) && $c.and64(otmp.owornmask, m) !== 0 && (m !== W_ARM || !$c.peq(otmp, $G.uskin) || $c.and64(otmp.owornmask, I_SPECIAL) === 0)) {
+            if (!$c.peq(otmp, o) && $c.and64(otmp.owornmask, m) !== 0 && (m !== W.ARM || !$c.peq(otmp, $G.uskin) || $c.and64(otmp.owornmask, I_SPECIAL) === 0)) {
                 $c.__builtin___sprintf_chk(new $c.Ptr(whybuf, 0), 0, 256, $c.lit("%s [0x%08lx] has %s mask 0x%08lx bit set"), await simpleonames(otmp), otmp.owornmask, wp.w_what, m);
                 await impossible($c.lit("Worn-slot insanity: %s."), new $c.Ptr(whybuf, 0));
             }
@@ -517,7 +517,7 @@ export async function update_mon_extrinsics(mon, obj, on, silently) {   // worn.
             break;
         }
     }
-    switch (obj.otyp === MUMMY_WRAPPING && 1 ? INVIS : obj.otyp === CORNUTHAUM && 1 && !(gu.urole.mnum === PM_WIZARD) ? CLAIRVOYANT : is_art(obj, ART_EYES_OF_THE_OVERWORLD) && 1 ? BLINDED : 0) {
+    switch (obj.otyp === MUMMY_WRAPPING && 1 ? INVIS : obj.otyp === CORNUTHAUM && 1 && !(gu.urole.mnum === PM.WIZARD) ? CLAIRVOYANT : is_art(obj, ART.EYES_OF_THE_OVERWORLD) && 1 ? BLINDED : 0) {
         case INVIS:
             mon.invis_blkd = ((on ? 1 : 0) >>> 0) & 1;
             mon.minvis = ((on ? 0 : mon.perminvis | 0) >>> 0) & 1;
@@ -526,7 +526,7 @@ export async function update_mon_extrinsics(mon, obj, on, silently) {   // worn.
             break;
     }
     if (!on && $c.peq(mon, u.usteed) && obj.otyp === SADDLE) {
-        await dismount_steed(DISMOUNT_FELL);
+        await dismount_steed(DISMOUNT.FELL);
     }
     if (!silently && unseen ^ (!canseemon(mon) ? 1 : 0)) {
         await newsym(mon.mx, mon.my);
@@ -555,29 +555,29 @@ export async function m_dowear(mon, creation) {   // worn.c:757
     if (verysmall(mon.data) || nohands(mon.data) || is_animal(mon.data)) {
         return;
     }
-    if (mindless(mon.data) && (!creation || mon.data.mlet !== S_MUMMY && !$c.peq(mon.data, $c.relem(mons, PM_SKELETON)))) {
+    if (mindless(mon.data) && (!creation || mon.data.mlet !== S.MUMMY && !$c.peq(mon.data, $c.relem(mons, PM.SKELETON)))) {
         return;
     }
-    await m_dowear_type(mon, W_AMUL, creation, FALSE);
+    await m_dowear_type(mon, W.AMUL, creation, FALSE);
     can_wear_armor = $c.i8(!(breakarm(mon.data) || sliparm(mon.data)) ? 1 : 0);
-    if (can_wear_armor && !$c.and64(mon.misc_worn_check, W_ARM)) {
-        await m_dowear_type(mon, W_ARMU, creation, FALSE);
+    if (can_wear_armor && !$c.and64(mon.misc_worn_check, W.ARM)) {
+        await m_dowear_type(mon, W.ARMU, creation, FALSE);
     }
     if (can_wear_armor || WrappingAllowed(mon.data)) {
-        await m_dowear_type(mon, W_ARMC, creation, FALSE);
+        await m_dowear_type(mon, W.ARMC, creation, FALSE);
     }
-    await m_dowear_type(mon, W_ARMH, creation, FALSE);
+    await m_dowear_type(mon, W.ARMH, creation, FALSE);
     if (!MON_WEP(mon) || !((mon.mw.oclass === WEAPON_CLASS || mon.mw.oclass === TOOL_CLASS) && objects[mon.mw.otyp].oc_big | 0)) {
-        await m_dowear_type(mon, W_ARMS, creation, FALSE);
+        await m_dowear_type(mon, W.ARMS, creation, FALSE);
     }
-    await m_dowear_type(mon, W_ARMG, creation, FALSE);
-    if (!slithy(mon.data) && mon.data.mlet !== S_CENTAUR) {
-        await m_dowear_type(mon, W_ARMF, creation, FALSE);
+    await m_dowear_type(mon, W.ARMG, creation, FALSE);
+    if (!slithy(mon.data) && mon.data.mlet !== S.CENTAUR) {
+        await m_dowear_type(mon, W.ARMF, creation, FALSE);
     }
     if (can_wear_armor) {
-        await m_dowear_type(mon, W_ARM, creation, FALSE);
+        await m_dowear_type(mon, W.ARM, creation, FALSE);
     } else {
-        await m_dowear_type(mon, W_ARM, creation, TRUE);
+        await m_dowear_type(mon, W.ARM, creation, TRUE);
     }
 }
 async function m_dowear_type(mon, flag, creation, racialexception) {   // worn.c:799
@@ -594,14 +594,14 @@ async function m_dowear_type(mon, flag, creation, racialexception) {   // worn.c
     if (old && old.cursed | 0) {
         return;
     }
-    if (old && flag === W_AMUL && old.otyp !== AMULET_OF_GUARDING) {
+    if (old && flag === W.AMUL && old.otyp !== AMULET_OF_GUARDING) {
         return;
     }
     best = old;
     outer_break$: {
         L1: for (obj = mon.minvent; obj; obj = obj.nobj) {
             switch (flag) {
-                case W_AMUL:
+                case W.AMUL:
                     if (obj.oclass !== AMULET_CLASS || obj.otyp !== AMULET_OF_LIFE_SAVING && obj.otyp !== AMULET_OF_REFLECTION && obj.otyp !== AMULET_OF_GUARDING) {
                         continue L1;
                     }
@@ -612,23 +612,23 @@ async function m_dowear_type(mon, flag, creation, racialexception) {   // worn.c
                         }
                     }
                     continue L1;
-                case W_ARMU:
+                case W.ARMU:
                     if (!is_shirt(obj)) {
                         continue L1;
                     }
                     break;
-                case W_ARMC:
+                case W.ARMC:
                     if (!is_cloak(obj)) {
                         continue L1;
                     }
-                    if (mon.data.msize > MZ_MEDIUM && obj.otyp !== MUMMY_WRAPPING) {
+                    if (mon.data.msize > MZ.MEDIUM && obj.otyp !== MUMMY_WRAPPING) {
                         continue L1;
                     }
-                    if (mon.minvis | 0 && (obj.otyp === MUMMY_WRAPPING && 1 ? INVIS : obj.otyp === CORNUTHAUM && 0 && !(gu.urole.mnum === PM_WIZARD) ? CLAIRVOYANT : is_art(obj, ART_EYES_OF_THE_OVERWORLD) && 0 ? BLINDED : 0) === INVIS && !See_invisible() && !creation) {
+                    if (mon.minvis | 0 && (obj.otyp === MUMMY_WRAPPING && 1 ? INVIS : obj.otyp === CORNUTHAUM && 0 && !(gu.urole.mnum === PM.WIZARD) ? CLAIRVOYANT : is_art(obj, ART.EYES_OF_THE_OVERWORLD) && 0 ? BLINDED : 0) === INVIS && !See_invisible() && !creation) {
                         continue L1;
                     }
                     break;
-                case W_ARMH:
+                case W.ARMH:
                     if (!is_helmet(obj)) {
                         continue L1;
                     }
@@ -639,22 +639,22 @@ async function m_dowear_type(mon, flag, creation, racialexception) {   // worn.c
                         continue L1;
                     }
                     break;
-                case W_ARMS:
+                case W.ARMS:
                     if (!is_shield(obj)) {
                         continue L1;
                     }
                     break;
-                case W_ARMG:
+                case W.ARMG:
                     if (!is_gloves(obj)) {
                         continue L1;
                     }
                     break;
-                case W_ARMF:
+                case W.ARMF:
                     if (!is_boots(obj)) {
                         continue L1;
                     }
                     break;
-                case W_ARM:
+                case W.ARM:
                     if (!is_suit(obj)) {
                         continue L1;
                     }
@@ -676,7 +676,7 @@ async function m_dowear_type(mon, flag, creation, racialexception) {   // worn.c
         return;
     }
     autocurse = $c.i8((best.otyp === HELM_OF_OPPOSITE_ALIGNMENT || best.otyp === DUNCE_CAP) && !best.cursed ? 1 : 0);
-    if ((flag === W_ARM || flag === W_ARMU) && $c.and64(mon.misc_worn_check, W_ARMC)) {
+    if ((flag === W.ARM || flag === W.ARMU) && $c.and64(mon.misc_worn_check, W.ARMC)) {
         m_delay = m_delay + 2 | 0;
     }
     if (old) {
@@ -753,19 +753,19 @@ export async function which_armor(mon, flag) {   // worn.c:1006
     let obj = null;
     if ($c.peq(mon, gy.youmonst)) {
         switch (flag) {
-            case W_ARM:
+            case W.ARM:
                 return $G.uarm;
-            case W_ARMC:
+            case W.ARMC:
                 return $G.uarmc;
-            case W_ARMH:
+            case W.ARMH:
                 return $G.uarmh;
-            case W_ARMS:
+            case W.ARMS:
                 return $G.uarms;
-            case W_ARMG:
+            case W.ARMG:
                 return $G.uarmg;
-            case W_ARMF:
+            case W.ARMF:
                 return $G.uarmf;
-            case W_ARMU:
+            case W.ARMU:
                 return $G.uarmu;
             default:
                 await impossible($c.lit("bad flag in which_armor"));
@@ -810,7 +810,7 @@ export function clear_bypasses() {   // worn.c:1070
             continue;
         }
         clear_bypass(mtmp.minvent);
-        if ($c.peq(mtmp.data, $c.relem(mons, PM_LONG_WORM)) && has_mcorpsenm(mtmp)) {
+        if ($c.peq(mtmp.data, $c.relem(mons, PM.LONG_WORM)) && has_mcorpsenm(mtmp)) {
             mtmp.mextra.mcorpsenm = NON_PM;
         }
     }
@@ -873,10 +873,10 @@ export async function mon_break_armor(mon, polyspot) {   // worn.c:1177
     vis = $c.i8(cansee(mon.mx, mon.my));
     handless_or_tiny = $c.i8(nohands(mdat) || verysmall(mdat) ? 1 : 0);
     noride = FALSE;
-    pronoun = genders[pronoun_gender(mon, PRONOUN_HALLU)].him;
-    ppronoun = genders[pronoun_gender(mon, PRONOUN_HALLU)].his;
+    pronoun = genders[pronoun_gender(mon, PRONOUN.HALLU)].him;
+    ppronoun = genders[pronoun_gender(mon, PRONOUN.HALLU)].his;
     if (breakarm(mdat)) {
-        if ((otmp = await which_armor(mon, W_ARM)) !== null) {
+        if ((otmp = await which_armor(mon, W.ARM)) !== null) {
             if (Is_dragon_scales(otmp) && $c.peq(mdat, Dragon_scales_to_pm(otmp)) || Is_dragon_mail(otmp) && $c.peq(mdat, Dragon_mail_to_pm(otmp))) {
             } else {
                 if (vis) {
@@ -887,7 +887,7 @@ export async function mon_break_armor(mon, polyspot) {   // worn.c:1177
             }
             await m_useup(mon, otmp);
         }
-        if ((otmp = await which_armor(mon, W_ARMC)) !== null && (otmp.otyp !== MUMMY_WRAPPING || !WrappingAllowed(mdat))) {
+        if ((otmp = await which_armor(mon, W.ARMC)) !== null && (otmp.otyp !== MUMMY_WRAPPING || !WrappingAllowed(mdat))) {
             if (otmp.oartifact) {
                 if (vis) {
                     await pline_mon(mon, $c.lit("%s %s falls off!"), s_suffix(await Monnam(mon)), cloak_simple_name(otmp));
@@ -902,7 +902,7 @@ export async function mon_break_armor(mon, polyspot) {   // worn.c:1177
                 await m_useup(mon, otmp);
             }
         }
-        if ((otmp = await which_armor(mon, W_ARMU)) !== null) {
+        if ((otmp = await which_armor(mon, W.ARMU)) !== null) {
             if (vis) {
                 await pline_mon(mon, $c.lit("%s shirt rips to shreds!"), s_suffix(await Monnam(mon)));
             } else {
@@ -911,8 +911,8 @@ export async function mon_break_armor(mon, polyspot) {   // worn.c:1177
             await m_useup(mon, otmp);
         }
     } else if (sliparm(mdat)) {
-        passes_thru_clothes = $c.i8(!(mdat.msize <= MZ_SMALL) ? 1 : 0);
-        if ((otmp = await which_armor(mon, W_ARM)) !== null) {
+        passes_thru_clothes = $c.i8(!(mdat.msize <= MZ.SMALL) ? 1 : 0);
+        if ((otmp = await which_armor(mon, W.ARM)) !== null) {
             if (vis) {
                 await pline_mon(mon, $c.lit("%s armor falls around %s!"), s_suffix(await Monnam(mon)), pronoun);
             } else {
@@ -920,7 +920,7 @@ export async function mon_break_armor(mon, polyspot) {   // worn.c:1177
             }
             await m_lose_armor(mon, otmp, polyspot);
         }
-        if ((otmp = await which_armor(mon, W_ARMC)) !== null && (otmp.otyp !== MUMMY_WRAPPING || !WrappingAllowed(mdat))) {
+        if ((otmp = await which_armor(mon, W.ARMC)) !== null && (otmp.otyp !== MUMMY_WRAPPING || !WrappingAllowed(mdat))) {
             if (vis) {
                 if (is_whirly(mon.data)) {
                     await pline_mon(mon, $c.lit("%s %s falls, unsupported!"), s_suffix(await Monnam(mon)), cloak_simple_name(otmp));
@@ -930,7 +930,7 @@ export async function mon_break_armor(mon, polyspot) {   // worn.c:1177
             }
             await m_lose_armor(mon, otmp, polyspot);
         }
-        if ((otmp = await which_armor(mon, W_ARMU)) !== null) {
+        if ((otmp = await which_armor(mon, W.ARMU)) !== null) {
             if (vis) {
                 if (passes_thru_clothes) {
                     await pline_mon(mon, $c.lit("%s seeps right through %s shirt!"), await Monnam(mon), ppronoun);
@@ -942,13 +942,13 @@ export async function mon_break_armor(mon, polyspot) {   // worn.c:1177
         }
     }
     if (handless_or_tiny) {
-        if ((otmp = await which_armor(mon, W_ARMG)) !== null) {
+        if ((otmp = await which_armor(mon, W.ARMG)) !== null) {
             if (vis) {
                 await pline_mon(mon, $c.lit("%s drops %s gloves%s!"), await Monnam(mon), ppronoun, MON_WEP(mon) ? $c.lit(" and weapon") : $c.lit(""));
             }
             await m_lose_armor(mon, otmp, polyspot);
         }
-        if ((otmp = await which_armor(mon, W_ARMS)) !== null) {
+        if ((otmp = await which_armor(mon, W.ARMS)) !== null) {
             if (vis) {
                 await pline_mon(mon, $c.lit("%s can no longer hold %s shield!"), await Monnam(mon), ppronoun);
             } else {
@@ -958,7 +958,7 @@ export async function mon_break_armor(mon, polyspot) {   // worn.c:1177
         }
     }
     if (handless_or_tiny || has_horns(mdat)) {
-        if ((otmp = await which_armor(mon, W_ARMH)) !== null && (handless_or_tiny || !is_flimsy(otmp))) {
+        if ((otmp = await which_armor(mon, W.ARMH)) !== null && (handless_or_tiny || !is_flimsy(otmp))) {
             if (vis) {
                 await pline_mon(mon, $c.lit("%s helmet falls to the %s!"), s_suffix(await Monnam(mon)), surface(mon.mx, mon.my));
             } else {
@@ -967,8 +967,8 @@ export async function mon_break_armor(mon, polyspot) {   // worn.c:1177
             await m_lose_armor(mon, otmp, polyspot);
         }
     }
-    if (handless_or_tiny || slithy(mdat) || mdat.mlet === S_CENTAUR) {
-        if ((otmp = await which_armor(mon, W_ARMF)) !== null) {
+    if (handless_or_tiny || slithy(mdat) || mdat.mlet === S.CENTAUR) {
+        if ((otmp = await which_armor(mon, W.ARMF)) !== null) {
             if (vis) {
                 if (is_whirly(mon.data)) {
                     await pline_mon(mon, $c.lit("%s boots fall away!"), s_suffix(await Monnam(mon)));
@@ -980,7 +980,7 @@ export async function mon_break_armor(mon, polyspot) {   // worn.c:1177
         }
     }
     if (!can_saddle(mon)) {
-        if ((otmp = await which_armor(mon, W_SADDLE)) !== null) {
+        if ((otmp = await which_armor(mon, W.SADDLE)) !== null) {
             await m_lose_armor(mon, otmp, polyspot);
             if (vis) {
                 await pline_mon(mon, $c.lit("%s saddle falls off."), s_suffix(await Monnam(mon)));
@@ -997,7 +997,7 @@ export async function mon_break_armor(mon, polyspot) {   // worn.c:1177
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("falling off %s"), await an(pmname(u.usteed.data, Mgender(u.usteed))));
             await instapetrify(new $c.Ptr(buf, 0));
         }
-        await dismount_steed(DISMOUNT_FELL);
+        await dismount_steed(DISMOUNT.FELL);
     }
     return;
 }
@@ -1012,7 +1012,7 @@ function extra_pref(mon, obj) {   // worn.c:1339
 export function racial_exception(mon, obj) {   // worn.c:1360
     let ptr = null;
     ptr = raceptr(mon);
-    if ($c.peq(ptr, $c.relem(mons, PM_HOBBIT)) && is_elven_armor(obj)) {
+    if ($c.peq(ptr, $c.relem(mons, PM.HOBBIT)) && is_elven_armor(obj)) {
         return 1;
     }
     return 0;
@@ -1020,11 +1020,11 @@ export function racial_exception(mon, obj) {   // worn.c:1360
 export async function extract_from_minvent(mon, obj, do_extrinsics, silently) {   // worn.c:1377
     let unwornmask = 0;
     unwornmask = obj.owornmask;
-    if (obj.where !== OBJ_MINVENT) {
+    if (obj.where !== OBJ.MINVENT) {
         await impossible($c.lit("extract_from_minvent called on object not in minvent"));
         return;
     }
-    if ($c.and64(unwornmask, W_ARM) !== 0 && obj.lamplit | 0 && artifact_light(obj)) {
+    if ($c.and64(unwornmask, W.ARM) !== 0 && obj.lamplit | 0 && artifact_light(obj)) {
         await end_burn(obj, FALSE);
     }
     await obj_extract_self(obj);
@@ -1037,7 +1037,7 @@ export async function extract_from_minvent(mon, obj, do_extrinsics, silently) { 
         check_gear_next_turn(mon);
     }
     await obj_no_longer_held(obj);
-    if ($c.and64(unwornmask, W_WEP)) {
+    if ($c.and64(unwornmask, W.WEP)) {
         await mwepgone(mon);
     }
 }
@@ -1050,22 +1050,22 @@ export function $init() {
         worn[$i0].$copyFrom(new $T.worn());
     }
     $c.init(worn, [
-        { w_mask: W_ARM, w_obj: new $c.FieldRef($G, "uarm", "ptr"), w_what: $c.lit("suit") },
-        { w_mask: W_ARMC, w_obj: new $c.FieldRef($G, "uarmc", "ptr"), w_what: $c.lit("cloak") },
-        { w_mask: W_ARMH, w_obj: new $c.FieldRef($G, "uarmh", "ptr"), w_what: $c.lit("helmet") },
-        { w_mask: W_ARMS, w_obj: new $c.FieldRef($G, "uarms", "ptr"), w_what: $c.lit("shield") },
-        { w_mask: W_ARMG, w_obj: new $c.FieldRef($G, "uarmg", "ptr"), w_what: $c.lit("gloves") },
-        { w_mask: W_ARMF, w_obj: new $c.FieldRef($G, "uarmf", "ptr"), w_what: $c.lit("boots") },
-        { w_mask: W_ARMU, w_obj: new $c.FieldRef($G, "uarmu", "ptr"), w_what: $c.lit("shirt") },
-        { w_mask: W_RINGL, w_obj: new $c.FieldRef($G, "uleft", "ptr"), w_what: $c.lit("left ring") },
-        { w_mask: W_RINGR, w_obj: new $c.FieldRef($G, "uright", "ptr"), w_what: $c.lit("right ring") },
-        { w_mask: W_WEP, w_obj: new $c.FieldRef($G, "uwep", "ptr"), w_what: $c.lit("weapon") },
-        { w_mask: W_SWAPWEP, w_obj: new $c.FieldRef($G, "uswapwep", "ptr"), w_what: $c.lit("alternate weapon") },
-        { w_mask: W_QUIVER, w_obj: new $c.FieldRef($G, "uquiver", "ptr"), w_what: $c.lit("quiver") },
-        { w_mask: W_AMUL, w_obj: new $c.FieldRef($G, "uamul", "ptr"), w_what: $c.lit("amulet") },
-        { w_mask: W_TOOL, w_obj: new $c.FieldRef($G, "ublindf", "ptr"), w_what: $c.lit("facewear") },
-        { w_mask: W_BALL, w_obj: new $c.FieldRef($G, "uball", "ptr"), w_what: $c.lit("chained ball") },
-        { w_mask: W_CHAIN, w_obj: new $c.FieldRef($G, "uchain", "ptr"), w_what: $c.lit("attached chain") },
+        { w_mask: W.ARM, w_obj: new $c.FieldRef($G, "uarm", "ptr"), w_what: $c.lit("suit") },
+        { w_mask: W.ARMC, w_obj: new $c.FieldRef($G, "uarmc", "ptr"), w_what: $c.lit("cloak") },
+        { w_mask: W.ARMH, w_obj: new $c.FieldRef($G, "uarmh", "ptr"), w_what: $c.lit("helmet") },
+        { w_mask: W.ARMS, w_obj: new $c.FieldRef($G, "uarms", "ptr"), w_what: $c.lit("shield") },
+        { w_mask: W.ARMG, w_obj: new $c.FieldRef($G, "uarmg", "ptr"), w_what: $c.lit("gloves") },
+        { w_mask: W.ARMF, w_obj: new $c.FieldRef($G, "uarmf", "ptr"), w_what: $c.lit("boots") },
+        { w_mask: W.ARMU, w_obj: new $c.FieldRef($G, "uarmu", "ptr"), w_what: $c.lit("shirt") },
+        { w_mask: W.RINGL, w_obj: new $c.FieldRef($G, "uleft", "ptr"), w_what: $c.lit("left ring") },
+        { w_mask: W.RINGR, w_obj: new $c.FieldRef($G, "uright", "ptr"), w_what: $c.lit("right ring") },
+        { w_mask: W.WEP, w_obj: new $c.FieldRef($G, "uwep", "ptr"), w_what: $c.lit("weapon") },
+        { w_mask: W.SWAPWEP, w_obj: new $c.FieldRef($G, "uswapwep", "ptr"), w_what: $c.lit("alternate weapon") },
+        { w_mask: W.QUIVER, w_obj: new $c.FieldRef($G, "uquiver", "ptr"), w_what: $c.lit("quiver") },
+        { w_mask: W.AMUL, w_obj: new $c.FieldRef($G, "uamul", "ptr"), w_what: $c.lit("amulet") },
+        { w_mask: W.TOOL, w_obj: new $c.FieldRef($G, "ublindf", "ptr"), w_what: $c.lit("facewear") },
+        { w_mask: W.BALL, w_obj: new $c.FieldRef($G, "uball", "ptr"), w_what: $c.lit("chained ball") },
+        { w_mask: W.CHAIN, w_obj: new $c.FieldRef($G, "uchain", "ptr"), w_what: $c.lit("attached chain") },
         {}
     ]);
 }

@@ -6,7 +6,7 @@ import { timet_delta } from './allmain.js';
 import { alloc } from './alloc.js';
 import { arti_cost, artiname } from './artifact.js';
 import { adjattrib, minuhpmax, setuhpmax } from './attrib.js';
-import { A_CON } from './attrib.h.js';
+import { A } from './attrib.h.js';
 import { ACURR } from './attrib.macros.js';
 import { lift_covet_and_placebc } from './ball.js';
 import { can_make_bones, savebones } from './bones.js';
@@ -14,7 +14,7 @@ import { bot } from './botl.js';
 import { getnow, midnight, night } from './calendar.js';
 import { cmdq_add_ec, isok, paranoid_query, yn_function } from './cmd.js';
 import { disclosure_options, disp, flags, ga, gb, gd, gg, gh, gi, gk, gm, gn, gt, gu, gv, gy, iflags, program_state, svc, svd, svk, svl, svm, svp, u, urealtime, ynchars, ynqchars } from './decl.js';
-import { AMULET_CLASS, GEM_CLASS, S_MUMMY, S_VAMPIRE, S_WRAITH } from './defsym.h.js';
+import { AMULET_CLASS, GEM_CLASS, S } from './defsym.h.js';
 import { curs_on_u } from './display.js';
 import { canspotmon } from './display.macros.js';
 import { schedule_goto } from './do.js';
@@ -26,11 +26,11 @@ import { In_endgame, In_tutorial } from './dungeon.macros.js';
 import { init_uhunger } from './eat.js';
 import { make_grave } from './engrave.js';
 import { clearlocks, debugcore, paniclog, set_error_savefile } from './files.js';
-import { DISCLOSE_PROMPT_DEFAULT_YES, NUM_DISCLOSURE_OPTIONS, PLNMSG_OK_DONT_DIE, fuzzer_off } from './flag.h.js';
+import { DISCLOSE_PROMPT_DEFAULT_YES, NUM_DISCLOSURE_OPTIONS, PLNMSG, fuzzer_off } from './flag.h.js';
 import { ParanoidBones, ParanoidDie, ParanoidQuit, discover, wizard } from './flag.macros.js';
-import { BUFSZ, LL_DUMP, LL_LIFESAVE } from './global.h.js';
+import { BUFSZ, LL } from './global.h.js';
 import { money_cnt, nomul } from './hack.js';
-import { ASCENDED, BASICENLIGHTENMENT, BURNING, CHOKING, CQ_CANNED, DIED, DISSOLVED, ECMD_OK, ENL_GAMEOVERALIVE, ENL_GAMEOVERDEAD, ESCAPED, GENOCIDED, KILLED_BY, KILLED_BY_AN, MAGICENLIGHTENMENT, NHCORE_GAME_EXIT, NO_KILLER_PREFIX, PANICKED, QUIT, SORTLOOT_LOOT, SORTLOOT_PACK, STARVING, STONING, TRICKED, TURNED_SLIME, override_restriction } from './hack.h.js';
+import { ASCENDED, BASICENLIGHTENMENT, BURNING, CHOKING, CQ_CANNED, DIED, DISSOLVED, ECMD, ENL, ESCAPED, GENOCIDED, KILLED, MAGICENLIGHTENMENT, NHCORE, NO_KILLER_PREFIX, PANICKED, QUIT, SORTLOOT, STARVING, STONING, TRICKED, TURNED_SLIME, override_restriction } from './hack.h.js';
 import { min, release_data, update_file } from './hack.macros.js';
 import { eos, strstri, upstart } from './hacklib.js';
 import { count_achievements, enlightenment, list_genocided, list_vanquished, record_achievement, show_conduct } from './insight.js';
@@ -47,12 +47,12 @@ import { type_is_pname } from './mondata.macros.js';
 import { G_GENOD, G_NOCORPSE, G_UNIQ } from './monflag.h.js';
 import { accessible } from './monmove.js';
 import { mons } from './monst.js';
-import { M_AP_MONSTER } from './monst.h.js';
+import { M_AP } from './monst.h.js';
 import { M_AP_TYPE, is_vampshifter, ismnum } from './monst.macros.js';
-import { PM_GHOST, PM_GHOUL, PM_GREEN_SLIME, PM_HIGH_CLERIC, PM_HOUSECAT, PM_HUMAN, PM_TOURIST, PM_VAMPIRE, PM_WRAITH } from './monsters.h.js';
+import { PM } from './monsters.h.js';
 import { l_nhcore_call, l_nhcore_done } from './nhlua.js';
 import { discover_object } from './o_init.js';
-import { OBJ_FREE } from './obj.h.js';
+import { OBJ } from './obj.h.js';
 import { Has_contents, Is_container, SchroedingersBox, has_oname } from './obj.macros.js';
 import { obj_descr, objects } from './objects.js';
 import { AMULET_OF_LIFE_SAVING, BAG_OF_TRICKS, BELL_OF_OPENING, CANDELABRUM_OF_INVOCATION, CORPSE, FAKE_AMULET_OF_YENDOR, FIRST_AMULET, FIRST_REAL_GEM, LAST_GLASS_GEM, LAST_REAL_GEM, POT_RESTORE_ABILITY, POT_WATER, SPE_BOOK_OF_THE_DEAD, STATUE } from './objects.h.js';
@@ -84,9 +84,9 @@ import { hidden_gold, paygd } from './vault.js';
 import { IN_SIGHT } from './vision.h.js';
 import { dump_close_log, dump_forward_putstr, dump_open_log } from './windows.js';
 import { clear_nhwindow, create_nhwindow, destroy_nhwindow, display_nhwindow, exit_nhwindows, mark_synch, outrip, putstr, raw_print, wait_synch } from './winprocs.macros.js';
-import { NHW_MENU, NHW_TEXT, WIN_ERR } from './wintype.h.js';
+import { NHW, WIN_ERR } from './wintype.h.js';
 import { wiz_makemap } from './wizcmds.js';
-import { ACH_BLND, ACH_NUDE, ACH_UWIN, A_CURRENT, A_ORIGINAL, SICK_ALL, TT_LAVA, UTOTYPE_ATSTAIRS } from './you.h.js';
+import { ACH, SICK_ALL, TT, UTOTYPE } from './you.h.js';
 import { Ugender, Upolyd } from './you.macros.js';
 import { Blind, Hallucination, Lifesaved } from './youprop.macros.js';
 
@@ -129,9 +129,9 @@ export async function done2() {   // end.c:91
             u.usleep = 0;
         }
         if (abandon_tutorial) {
-            await schedule_goto(u.ucamefrom, UTOTYPE_ATSTAIRS, $c.lit("Resuming regular play."), null);
+            await schedule_goto(u.ucamefrom, UTOTYPE.ATSTAIRS, $c.lit("Resuming regular play."), null);
         }
-        return ECMD_OK;
+        return ECMD.OK;
     }
     if (wizard()) {
         c = await yn_function($c.lit("Dump core?"), new $c.Ptr(ynqchars, 0), 113, 1);
@@ -147,7 +147,7 @@ export async function done2() {   // end.c:91
         }
     }
     await done(QUIT);
-    return ECMD_OK;
+    return ECMD.OK;
 }
 async function done_intr(sig_unused) {   // end.c:155
     program_state.stopprint = program_state.stopprint + 1 | 0;
@@ -166,21 +166,21 @@ export async function done_in_by(mtmp, how) {   // end.c:186
     mptr = mtmp.data;
     champtr = ismnum(mtmp.cham) ? $c.relem(mons, mtmp.cham) : mptr;
     distorted = $c.i8(Hallucination() && canspotmon(mtmp) ? 1 : 0);
-    mimicker = $c.i8(M_AP_TYPE(mtmp) === M_AP_MONSTER ? 1 : 0);
+    mimicker = $c.i8(M_AP_TYPE(mtmp) === M_AP.MONSTER ? 1 : 0);
     imitator = $c.i8(!$c.peq(mptr, champtr) || mimicker ? 1 : 0);
     await You(how === STONING ? $c.lit("turn to stone...") : $c.lit("die..."));
     await mark_synch()();
     buf[0] = 0;
-    svk.killer.format = KILLED_BY_AN;
-    if ((mptr.geno & G_UNIQ) !== 0 && !(imitator && !mimicker) && !($c.peq(mptr, $c.relem(mons, PM_HIGH_CLERIC)) && !mtmp.ispriest)) {
+    svk.killer.format = KILLED.BY_AN;
+    if ((mptr.geno & G_UNIQ) !== 0 && !(imitator && !mimicker) && !($c.peq(mptr, $c.relem(mons, PM.HIGH_CLERIC)) && !mtmp.ispriest)) {
         if (!type_is_pname(mptr)) {
             $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit("the "), 256);
         }
-        svk.killer.format = KILLED_BY;
+        svk.killer.format = KILLED.BY;
     }
-    if ($c.peq(mptr, $c.relem(mons, PM_GHOST)) && has_mgivenname(mtmp)) {
+    if ($c.peq(mptr, $c.relem(mons, PM.GHOST)) && has_mgivenname(mtmp)) {
         $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit("the "), 256);
-        svk.killer.format = KILLED_BY;
+        svk.killer.format = KILLED.BY;
     }
     monhealthdescr(mtmp, 1, eos(new $c.Ptr(buf, 0)));
     if (mtmp.minvis) {
@@ -208,7 +208,7 @@ export async function done_in_by(mtmp, how) {   // end.c:186
         }
         $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, alt ? $c.lit("%s in %s form") : mimicker ? $c.lit("%s disguised as %s") : $c.lit("%s imitating %s"), realnm, new $c.Ptr(shape, 0));
         mptr = mtmp.data;
-    } else if ($c.peq(mptr, $c.relem(mons, PM_GHOST))) {
+    } else if ($c.peq(mptr, $c.relem(mons, PM.GHOST))) {
         $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit("ghost"), 256);
         if (has_mgivenname(mtmp)) {
             $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" of %s"), mtmp.mextra.mgivenname);
@@ -217,7 +217,7 @@ export async function done_in_by(mtmp, how) {   // end.c:186
         shknm = await shkname(mtmp);
         honorific = shkname_is_pname(mtmp) ? $c.lit("") : mtmp.female | 0 ? $c.lit("Ms. ") : $c.lit("Mr. ");
         $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit("%s%s, the shopkeeper"), honorific, shknm);
-        svk.killer.format = KILLED_BY;
+        svk.killer.format = KILLED.BY;
     } else if (mtmp.ispriest | 0 || mtmp.isminion | 0) {
         $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), await m_monnam(mtmp), 256);
     } else {
@@ -235,16 +235,16 @@ export async function done_in_by(mtmp, how) {   // end.c:186
             }
         }
     }
-    if (mptr.mlet === S_WRAITH) {
-        u.ugrave_arise = PM_WRAITH;
-    } else if (mptr.mlet === S_MUMMY && gu.urace.mummynum !== NON_PM) {
+    if (mptr.mlet === S.WRAITH) {
+        u.ugrave_arise = PM.WRAITH;
+    } else if (mptr.mlet === S.MUMMY && gu.urace.mummynum !== NON_PM) {
         u.ugrave_arise = gu.urace.mummynum;
     } else if (zombie_maker(mtmp) && gu.urace.zombienum !== NON_PM) {
         u.ugrave_arise = gu.urace.zombienum;
-    } else if (mptr.mlet === S_VAMPIRE && gu.urace.mnum === PM_HUMAN) {
-        u.ugrave_arise = PM_VAMPIRE;
-    } else if ($c.peq(mptr, $c.relem(mons, PM_GHOUL))) {
-        u.ugrave_arise = PM_GHOUL;
+    } else if (mptr.mlet === S.VAMPIRE && gu.urace.mnum === PM.HUMAN) {
+        u.ugrave_arise = PM.VAMPIRE;
+    } else if ($c.peq(mptr, $c.relem(mons, PM.GHOUL))) {
+        u.ugrave_arise = PM.GHOUL;
     }
     if (u.ugrave_arise >= LOW_PM && svm.mvitals[u.ugrave_arise].mvflags & G_GENOD) {
         u.ugrave_arise = NON_PM;
@@ -378,7 +378,7 @@ async function disclose(how, taken) {   // end.c:620
         ask = await should_query_disclose_option(97, new $c.Ptr(defquery, 0));
         c = $c.i8(ask ? await yn_function($c.lit("Do you want to see your attributes?"), new $c.Ptr(ynqchars, 0), defquery[0], 1) : defquery[0]);
         if (c === 121) {
-            await enlightenment(BASICENLIGHTENMENT | MAGICENLIGHTENMENT, how >= PANICKED ? ENL_GAMEOVERALIVE : ENL_GAMEOVERDEAD);
+            await enlightenment(BASICENLIGHTENMENT | MAGICENLIGHTENMENT, how >= PANICKED ? ENL.GAMEOVERALIVE : ENL.GAMEOVERDEAD);
         }
         if (c === 113) {
             program_state.stopprint = program_state.stopprint + 1 | 0;
@@ -420,7 +420,7 @@ async function disclose(how, taken) {   // end.c:620
 }
 async function savelife(how) {   // end.c:705
     let uhpmin = 0, givehp = 0;
-    givehp = 50 + Math.imul(10, $c.div32(ACURR(A_CON), 2)) | 0;
+    givehp = 50 + Math.imul(10, $c.div32(ACURR(A.CON), 2)) | 0;
     if (u.ulevel < 1) {
         u.ulevel = 1;
     }
@@ -441,8 +441,8 @@ async function savelife(how) {   // end.c:705
     gn.nomovemsg = $c.lit("You survived that attempt on your life.");
     svc.context.move = 0;
     gm.multi = -1;
-    gm.multi_reason = gu.urole.mnum === PM_TOURIST ? $c.lit("being toyed with by Fate") : $c.lit("attempting to cheat Death");
-    if (u.utrap && u.utraptype === TT_LAVA) {
+    gm.multi_reason = gu.urole.mnum === PM.TOURIST ? $c.lit("being toyed with by Fate") : $c.lit("attempting to cheat Death");
+    if (u.utrap && u.utraptype === TT.LAVA) {
         await reset_utrap(0);
     }
     disp.botl = 1;
@@ -514,15 +514,15 @@ export async function done_object_cleanup() {   // end.c:852
     if (!isok($c.i16(ox), $c.i16(oy)) || !accessible($c.i16(ox), $c.i16(oy))) {
         ox = u.ux, oy = u.uy;
     }
-    if (gt.thrownobj && gt.thrownobj.where === OBJ_FREE) {
+    if (gt.thrownobj && gt.thrownobj.where === OBJ.FREE) {
         await place_object(gt.thrownobj, $c.i16(ox), $c.i16(oy));
         await stackobj(gt.thrownobj), gt.thrownobj = null;
     }
-    if (gk.kickedobj && gk.kickedobj.where === OBJ_FREE) {
+    if (gk.kickedobj && gk.kickedobj.where === OBJ.FREE) {
         await place_object(gk.kickedobj, $c.i16(ox), $c.i16(oy));
         await stackobj(gk.kickedobj), gk.kickedobj = null;
     }
-    if ($G.uchain && $G.uchain.where === OBJ_FREE) {
+    if ($G.uchain && $G.uchain.where === OBJ.FREE) {
         await lift_covet_and_placebc(override_restriction);
     }
     if (iflags.perm_invent) {
@@ -603,7 +603,7 @@ export async function done(how) {   // end.c:1021
             svk.killer.name[0] = 0;
         }
         if (wizard()) {
-            svk.killer.format = KILLED_BY_AN;
+            svk.killer.format = KILLED.BY_AN;
             return;
         }
     }
@@ -625,7 +625,7 @@ export async function done(how) {   // end.c:1021
         svk.killer.format = NO_KILLER_PREFIX;
     }
     if (!svk.killer.name[0] && (how === STARVING || how === BURNING)) {
-        svk.killer.format = KILLED_BY;
+        svk.killer.format = KILLED.BY;
     }
     if (!svk.killer.name[0] || how >= PANICKED) {
         $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), deaths[how], 256);
@@ -649,25 +649,25 @@ export async function done(how) {   // end.c:1021
         if ($G.uamul) {
             await useup($G.uamul);
         }
-        await adjattrib(A_CON, -1, 1);
+        await adjattrib(A.CON, -1, 1);
         await savelife(how);
         if (how === GENOCIDED) {
             await pline($c.lit("Unfortunately you are still genocided..."));
         } else {
             await formatkiller(new $c.Ptr(killbuf, 0), BUFSZ, how, 0);
-            await livelog_printf(LL_LIFESAVE, $c.lit("averted death (%s)"), new $c.Ptr(killbuf, 0));
+            await livelog_printf(LL.LIFESAVE, $c.lit("averted death (%s)"), new $c.Ptr(killbuf, 0));
             survive = 1;
         }
     }
     if (!survive && (wizard() || discover()) && how <= GENOCIDED && !(program_state.done_hup && ($t4 = gd.done_seq, gd.done_seq = $c.add64($t4, 1), $t4) === gh.hero_seq) && !await paranoid_query($c.i8(ParanoidDie()), $c.lit("Die?"))) {
         await pline($c.lit("OK, so you don't %s."), how === CHOKING ? $c.lit("choke") : $c.lit("die"));
-        iflags.last_msg = PLNMSG_OK_DONT_DIE;
+        iflags.last_msg = PLNMSG.OK_DONT_DIE;
         await savelife(how);
         survive = 1;
     }
     if (survive) {
         svk.killer.name[0] = 0;
-        svk.killer.format = KILLED_BY_AN;
+        svk.killer.format = KILLED.BY_AN;
         return;
     }
     await really_done(how);
@@ -693,14 +693,14 @@ async function really_done(how) {   // end.c:1132
     $t4 = midnight(), iflags.at_midnight = $t4;
     if (u.uachieved[0] || !flags.beginner) {
         if (u.uroleplay.blind) {
-            await record_achievement(ACH_BLND);
+            await record_achievement(ACH.BLND);
         }
         if (u.uroleplay.nudist) {
-            await record_achievement(ACH_NUDE);
+            await record_achievement(ACH.NUDE);
         }
     }
     if (how === ASCENDED) {
-        await record_achievement(ACH_UWIN);
+        await record_achievement(ACH.UWIN);
     }
     dump_open_log(endtime);
     if (svm.moves <= 1 && how < PANICKED && !program_state.stopprint) {
@@ -722,8 +722,8 @@ async function really_done(how) {   // end.c:1132
         u.ugrave_arise = NON_PM - 2;
     } else if (how === STONING) {
         u.ugrave_arise = LEAVESTATUE;
-    } else if (how === TURNED_SLIME && !(svm.mvitals[PM_GREEN_SLIME].mvflags & G_GENOD)) {
-        u.ugrave_arise = PM_GREEN_SLIME;
+    } else if (how === TURNED_SLIME && !(svm.mvitals[PM.GREEN_SLIME].mvflags & G_GENOD)) {
+        u.ugrave_arise = PM.GREEN_SLIME;
     }
     if (how === QUIT) {
         svk.killer.format = NO_KILLER_PREFIX;
@@ -773,7 +773,7 @@ async function really_done(how) {   // end.c:1132
         if (!new $c.Ptr(pbuf, 0).get(0)) {
             $c.__builtin___strcpy_chk(new $c.Ptr(pbuf, 0), deaths[how], 256);
         }
-        await livelog_printf(LL_DUMP, $c.lit("%s"), new $c.Ptr(pbuf, 0));
+        await livelog_printf(LL.DUMP, $c.lit("%s"), new $c.Ptr(pbuf, 0));
         dump_everything(how, endtime);
     }
     if (how === ESCAPED || how === ASCENDED) {
@@ -811,13 +811,13 @@ async function really_done(how) {   // end.c:1132
             tmp = $c.add64(tmp, $c.mul64(1000, deepest > 30 ? 10 : deepest - 20 | 0));
         }
         u.urexp = nowrap_add(u.urexp, tmp);
-        if (how === ASCENDED && u.ualign.type === u.ualignbase[A_ORIGINAL]) {
-            tmp = u.ualignbase[A_CURRENT] === u.ualignbase[A_ORIGINAL] ? u.urexp : $c.div64(u.urexp, 2);
+        if (how === ASCENDED && u.ualign.type === u.ualignbase[A.ORIGINAL]) {
+            tmp = u.ualignbase[A.CURRENT] === u.ualignbase[A.ORIGINAL] ? u.urexp : $c.div64(u.urexp, 2);
             u.urexp = nowrap_add(u.urexp, tmp);
         }
     }
     if (ismnum(u.ugrave_arise) && !program_state.stopprint) {
-        await Your($c.lit("%s as %s..."), u.ugrave_arise !== PM_GREEN_SLIME ? $c.lit("body rises from the dead") : $c.lit("revenant persists"), await an(pmname($c.relem(mons, u.ugrave_arise), Ugender())));
+        await Your($c.lit("%s as %s..."), u.ugrave_arise !== PM.GREEN_SLIME ? $c.lit("body rises from the dead") : $c.lit("revenant persists"), await an(pmname($c.relem(mons, u.ugrave_arise), Ugender())));
         await display_nhwindow()($G.WIN_MESSAGE, 0);
     }
     if (bones_ok) {
@@ -841,7 +841,7 @@ async function really_done(how) {   // end.c:1132
         }
         await destroy_nhwindow()($G.WIN_MESSAGE), $G.WIN_MESSAGE = WIN_ERR;
         if (!program_state.stopprint || flags.tombstone) {
-            endwin = await create_nhwindow()(NHW_TEXT);
+            endwin = await create_nhwindow()(NHW.TEXT);
         }
         if (how < GENOCIDED && flags.tombstone && endwin !== WIN_ERR) {
             await outrip()(endwin, how, endtime);
@@ -889,7 +889,7 @@ async function really_done(how) {   // end.c:1132
                 mtmp = mtmp.nmon;
             }
             if (Schroedingers_cat) {
-                m_lev = await adj_lev($c.relem(mons, PM_HOUSECAT));
+                m_lev = await adj_lev($c.relem(mons, PM.HOUSECAT));
                 mhp = d(m_lev, 8);
                 u.urexp = nowrap_add(u.urexp, mhp);
                 $c.__builtin___strcat_chk(eos(new $c.Ptr(pbuf, 0)), $c.lit(" and Schroedinger's cat"), -1);
@@ -988,7 +988,7 @@ export async function container_contents(list, identified, all_containers, repor
             if (box.otyp === BAG_OF_TRICKS) {
                 continue;
             } else if (box.cobj) {
-                tmpwin = await create_nhwindow()(NHW_MENU);
+                tmpwin = await create_nhwindow()(NHW.MENU);
                 cat = $c.i8(SchroedingersBox(box));
                 $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Contents of %s:"), await the(await xname(box)));
                 await putstr()(tmpwin, 0, new $c.Ptr(buf, 0));
@@ -997,7 +997,7 @@ export async function container_contents(list, identified, all_containers, repor
                 }
                 $t1 = buf[1] = 32, buf[0] = $t1;
                 if (box.cobj && !cat) {
-                    sortflags = ((flags.sortloot === 108 || flags.sortloot === 102 ? SORTLOOT_LOOT : 0) | (flags.sortpack ? SORTLOOT_PACK : 0)) >>> 0;
+                    sortflags = ((flags.sortloot === 108 || flags.sortloot === 102 ? SORTLOOT.LOOT : 0) | (flags.sortpack ? SORTLOOT.PACK : 0)) >>> 0;
                     sortedcobj[0] = await sortloot(new $c.FieldRef(box, "cobj", "ptr"), sortflags, 0, null);
                     for (srtc = sortedcobj[0]; (obj = srtc.obj) !== null; srtc = $c.radd(srtc, 1)) {
                         if (identified) {
@@ -1037,7 +1037,7 @@ export async function container_contents(list, identified, all_containers, repor
 export async function nh_terminate(status) {   // end.c:1676
     program_state.in_moveloop = 0;
     nomux_capture_write_input_boundary();
-    await l_nhcore_call(NHCORE_GAME_EXIT);
+    await l_nhcore_call(NHCORE.GAME_EXIT);
     if (!program_state.panicking) {
         await freedynamicdata();
         await l_nhcore_done();

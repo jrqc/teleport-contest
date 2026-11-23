@@ -9,12 +9,12 @@ import { canseemon, flush_screen, map_invisible } from './display.js';
 import { canspotmon } from './display.macros.js';
 import { panic } from './end.js';
 import { COLNO, FALSE, ROWNO, TRUE } from './global.h.js';
-import { ECMD_OK, FM_EVERYWHERE, FM_FMON, FM_MIGRATE, FM_MYDOGS, FM_YOU } from './hack.h.js';
+import { ECMD, FM, FM_EVERYWHERE } from './hack.h.js';
 import { release_data, update_file } from './hack.macros.js';
 import { dist2 } from './hacklib.js';
 import { place_object, remove_object } from './mkobj.js';
 import { DEADMONSTER } from './monst.macros.js';
-import { OBJ_FREE } from './obj.h.js';
+import { OBJ } from './obj.h.js';
 import { Is_candle, ignitable } from './obj.macros.js';
 import { CANDELABRUM_OF_INVOCATION, GOLD_DRAGON_SCALE_MAIL, MAGIC_LAMP } from './objects.h.js';
 import { otense, simpleonames, xname } from './objnam.js';
@@ -23,12 +23,12 @@ import { lookup_id_mapping } from './restore.js';
 import { sfi_int, sfi_ls_t, sfo_int, sfo_ls_t } from './sfbase.js';
 import { find_oid } from './shk.js';
 import { end_burn, obj_is_local } from './timeout.js';
-import { RANGE_LEVEL } from './timeout.h.js';
+import { RANGE } from './timeout.h.js';
 import { clear_path, vision_recalc } from './vision.js';
 import { COULD_SEE, LS_MONSTER, LS_NONE, LS_OBJECT, MAX_RADIUS, TEMP_LIT } from './vision.h.js';
 import { circle_ptr } from './vision.macros.js';
 import { create_nhwindow, destroy_nhwindow, display_nhwindow, nh_delay_output, putstr } from './winprocs.macros.js';
-import { NHW_MENU, WIN_ERR } from './wintype.h.js';
+import { NHW, WIN_ERR } from './wintype.h.js';
 import { get_mon_location, get_obj_location } from './zap.js';
 
 const LSF_SHOW = 0x1;
@@ -186,7 +186,7 @@ export async function show_transient_light(obj, x, y) {   // light.c:257
             }
         }
         (!!$c.peq(obj, $c.asRec(null, $T.obj, 112)) ? 1 : 0) ? $c.__assert_rtn($c.lit("show_transient_light"), $c.lit("light.c"), 285, $c.lit("obj != NULL")) : 0;
-        if (!ls || obj.where !== OBJ_FREE) {
+        if (!ls || obj.where !== OBJ.FREE) {
             await impossible($c.lit("transient light %s %s %s not %s?"), obj.lamplit | 0 ? $c.lit("lit") : $c.lit("unlit"), await simpleonames(obj), await otense(obj, $c.lit("are")), !ls ? $c.lit("a light source") : $c.lit("free"));
             return;
         }
@@ -248,24 +248,24 @@ async function discard_flashes() {   // light.c:361
 }
 export function find_mid(nid, fmflags) {   // light.c:376
     let mtmp = null;
-    if ((fmflags & FM_YOU) >>> 0 && nid === 1) {
+    if ((fmflags & FM.YOU) >>> 0 && nid === 1) {
         return gy.youmonst;
     }
-    if ((fmflags & FM_FMON) >>> 0) {
+    if ((fmflags & FM.FMON) >>> 0) {
         for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
             if (!DEADMONSTER(mtmp) && mtmp.m_id === nid) {
                 return mtmp;
             }
         }
     }
-    if ((fmflags & FM_MIGRATE) >>> 0) {
+    if ((fmflags & FM.MIGRATE) >>> 0) {
         for (mtmp = gm.migrating_mons; mtmp; mtmp = mtmp.nmon) {
             if (mtmp.m_id === nid) {
                 return mtmp;
             }
         }
     }
-    if ((fmflags & FM_MYDOGS) >>> 0) {
+    if ((fmflags & FM.MYDOGS) >>> 0) {
         for (mtmp = gm.mydogs; mtmp; mtmp = mtmp.nmon) {
             if (mtmp.m_id === nid) {
                 return mtmp;
@@ -276,27 +276,27 @@ export function find_mid(nid, fmflags) {   // light.c:376
 }
 function whereis_mon(mon, fmflags) {   // light.c:398
     let mtmp = null;
-    if ((fmflags & FM_YOU) >>> 0 && $c.peq(mon, gy.youmonst)) {
-        return FM_YOU;
+    if ((fmflags & FM.YOU) >>> 0 && $c.peq(mon, gy.youmonst)) {
+        return FM.YOU;
     }
-    if ((fmflags & FM_FMON) >>> 0) {
+    if ((fmflags & FM.FMON) >>> 0) {
         for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
             if ($c.peq(mtmp, mon)) {
-                return FM_FMON;
+                return FM.FMON;
             }
         }
     }
-    if ((fmflags & FM_MIGRATE) >>> 0) {
+    if ((fmflags & FM.MIGRATE) >>> 0) {
         for (mtmp = gm.migrating_mons; mtmp; mtmp = mtmp.nmon) {
             if ($c.peq(mtmp, mon)) {
-                return FM_MIGRATE;
+                return FM.MIGRATE;
             }
         }
     }
-    if ((fmflags & FM_MYDOGS) >>> 0) {
+    if ((fmflags & FM.MYDOGS) >>> 0) {
         for (mtmp = gm.mydogs; mtmp; mtmp = mtmp.nmon) {
             if ($c.peq(mtmp, mon)) {
-                return FM_MYDOGS;
+                return FM.MYDOGS;
             }
         }
     }
@@ -333,7 +333,7 @@ export async function save_light_sources(nhfp, range) {   // light.c:421
                         break;
                 }
             }
-            if (is_global ^ (range === RANGE_LEVEL ? 1 : 0)) {
+            if (is_global ^ (range === RANGE.LEVEL ? 1 : 0)) {
                 prev.set(0, curr.next);
                 $c.__builtin___memset_chk(curr, 0, 32, -1);
                 $c.free(curr);
@@ -412,7 +412,7 @@ async function maybe_write_ls(nhfp, range, write_it) {   // light.c:571
                 await impossible($c.lit("maybe_write_ls: bad type (%d) [range=%d]"), ls.type, range);
                 break;
         }
-        if (is_global ^ (range === RANGE_LEVEL ? 1 : 0)) {
+        if (is_global ^ (range === RANGE.LEVEL ? 1 : 0)) {
             count = count + 1 | 0;
             if (write_it) {
                 await write_ls(nhfp, ls);
@@ -609,9 +609,9 @@ export function arti_light_description(obj) {   // light.c:916
 }
 export async function wiz_light_sources() {   // light.c:935
     let win = 0, buf = new Int8Array(256), ls = null;
-    win = await create_nhwindow()(NHW_MENU);
+    win = await create_nhwindow()(NHW.MENU);
     if (win === WIN_ERR) {
-        return ECMD_OK;
+        return ECMD.OK;
     }
     $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Mobile light sources: hero @ (%2d,%2d)"), u.ux, u.uy);
     await putstr()(win, 0, new $c.Ptr(buf, 0));
@@ -628,7 +628,7 @@ export async function wiz_light_sources() {   // light.c:935
     }
     await display_nhwindow()(win, FALSE);
     await destroy_nhwindow()(win);
-    return ECMD_OK;
+    return ECMD.OK;
 }
 function mon_is_local(mon) {
     return mon.mx > 0 ? 1 : 0;

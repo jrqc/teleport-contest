@@ -5,7 +5,7 @@ import { $G } from './globals.js';
 import { alloc } from './alloc.js';
 import { isok } from './cmd.js';
 import { gd, program_state, svb, svc, svd, svl, svr, u } from './decl.js';
-import { AMULET_CLASS, ARMOR_CLASS, FOOD_CLASS, GEM_CLASS, POTION_CLASS, RING_CLASS, SCROLL_CLASS, SPBOOK_CLASS, S_MIMIC, TOOL_CLASS, WAND_CLASS, WEAPON_CLASS } from './defsym.h.js';
+import { AMULET_CLASS, ARMOR_CLASS, FOOD_CLASS, GEM_CLASS, POTION_CLASS, RING_CLASS, S, SCROLL_CLASS, SPBOOK_CLASS, TOOL_CLASS, WAND_CLASS, WEAPON_CLASS } from './defsym.h.js';
 import { cvt_sdoor_to_door } from './detect.js';
 import { newsym } from './display.js';
 import { noit_mon_nam } from './do_name.js';
@@ -15,9 +15,9 @@ import { panic } from './end.js';
 import { make_engr_at } from './engrave.js';
 import { DUST } from './engrave.h.js';
 import { wizard } from './flag.macros.js';
-import { FALSE, PL_NSIZ, TRUE } from './global.h.js';
+import { FALSE, PL, TRUE } from './global.h.js';
 import { in_rooms, in_town } from './hack.js';
-import { HEALTHY_TIN, MM_ESHK, NO_MM_FLAGS, RLOC_NOMSG } from './hack.h.js';
+import { HEALTHY_TIN, MM, NO, RLOC } from './hack.h.js';
 import { distmin, highc, letter } from './hacklib.js';
 import { makemon, mkclass, mkmonmoney, mongets, newmextra, set_malign } from './makemon.js';
 import { ESHK, has_eshk } from './mextra.macros.js';
@@ -28,13 +28,13 @@ import { mon_learns_traps } from './mondata.js';
 import { vegetarian } from './mondata.macros.js';
 import { mons } from './monst.js';
 import { DEADMONSTER, ismnum } from './monst.macros.js';
-import { PM_LICHEN, PM_SHOPKEEPER } from './monsters.h.js';
+import { PM } from './monsters.h.js';
 import { MAXOCLASSES, NUM_OBJECTS, RANDOM_CLASS, VEGGY } from './objclass.h.js';
 import { obj_descr, objects } from './objects.js';
 import { BRASS_LANTERN, CORPSE, EGG, ELVEN_CLOAK, ICE_BOX, LEATHER_GLOVES, LUMP_OF_ROYAL_JELLY, MAGIC_LAMP, OIL_LAMP, POT_BOOZE, POT_FRUIT_JUICE, POT_FULL_HEALING, POT_HEALING, POT_OIL, POT_WATER, SCR_CHARGING, SCR_FOOD_DETECTION, SCR_LIGHT, SPE_LIGHT, SPE_NOVEL, TALLOW_CANDLE, TIN, TOUCHSTONE, WAN_LIGHT, WAX_CANDLE } from './objects.h.js';
 import { NON_PM } from './permonst.h.js';
 import { impossible, pline } from './pline.js';
-import { CORR, D_ISOPEN, D_LOCKED, D_NODOOR, D_TRAPPED, ROOM, SDOOR } from './rm.h.js';
+import { CORR, D, ROOM, SDOOR } from './rm.h.js';
 import { MON_AT } from './rm.macros.js';
 import { rn2, rnd } from './rnd.js';
 import { inside_shop, shop_keeper } from './shk.js';
@@ -65,7 +65,7 @@ function veggy_item(obj, otyp) {   // shknam.c:380
         corpsenm = obj.corpsenm;
     } else {
         oclass = objects[otyp].oc_class;
-        corpsenm = PM_LICHEN;
+        corpsenm = PM.LICHEN;
     }
     if (oclass === FOOD_CLASS) {
         if ((objects[otyp].oc_material | 0) === VEGGY || otyp === EGG) {
@@ -126,7 +126,7 @@ async function mkshobj_at(shp, sx, sy, mkspecl) {   // shknam.c:454
         }
         return;
     }
-    if (rn2(100) < depth(u.uz) && !MON_AT(sx, sy) && (ptr = await mkclass(S_MIMIC, 0)) !== null && (mtmp = await makemon(ptr, $c.i16(sx), $c.i16(sy), NO_MM_FLAGS)) !== null) {
+    if (rn2(100) < depth(u.uz) && !MON_AT(sx, sy) && (ptr = await mkclass(S.MIMIC, 0)) !== null && (mtmp = await makemon(ptr, $c.i16(sx), $c.i16(sy), NO.MM_FLAGS)) !== null) {
     } else {
         atype = get_shop_item($c.i32($c.rdiff(shp, $c.relem(shtypes, 0))));
         if (atype === VEGETARIAN_CLASS) {
@@ -195,8 +195,8 @@ function nameshk(shk, nlp) {   // shknam.c:487
             }
         }
     }
-    $c.__builtin___strncpy_chk(new $c.Ptr(shk.mextra.eshk.shknam, 0), shname, PL_NSIZ, -1);
-    shk.mextra.eshk.shknam[PL_NSIZ - 1] = 0;
+    $c.__builtin___strncpy_chk(new $c.Ptr(shk.mextra.eshk.shknam, 0), shname, PL.NSIZ, -1);
+    shk.mextra.eshk.shknam[PL.NSIZ - 1] = 0;
 }
 export async function neweshk(mtmp) {   // shknam.c:557
     let $t1, $t2;
@@ -269,9 +269,9 @@ async function shkinit(shp, sroom) {   // shknam.c:628
         return -1;
     }
     if (MON_AT(sx[0], sy[0])) {
-        await rloc(svl.level.monsters[sx[0]][sy[0]], RLOC_NOMSG);
+        await rloc(svl.level.monsters[sx[0]][sy[0]], RLOC.NOMSG);
     }
-    if (!(shk = await makemon($c.relem(mons, PM_SHOPKEEPER), sx[0], sy[0], MM_ESHK))) {
+    if (!(shk = await makemon($c.relem(mons, PM.SHOPKEEPER), sx[0], sy[0], MM.ESHK))) {
         return -1;
     }
     eshkp = shk.mextra.eshk;
@@ -325,18 +325,18 @@ export async function stock_room(shp_indx, sroom) {   // shknam.c:718
     }
     sx = $c.radd(svd.doors, sroom.fdoor).x;
     sy = $c.radd(svd.doors, sroom.fdoor).y;
-    if ((svl.level.locations[sx][sy].flags | 0) === D_NODOOR) {
-        svl.level.locations[sx][sy].flags = (D_ISOPEN) & 31;
+    if ((svl.level.locations[sx][sy].flags | 0) === D.NODOOR) {
+        svl.level.locations[sx][sy].flags = (D.ISOPEN) & 31;
         await newsym($c.i16(sx), $c.i16(sy));
     }
     if (svl.level.locations[sx][sy].typ === SDOOR) {
         cvt_sdoor_to_door($c.relem(svl.level.locations[sx], sy));
         await newsym($c.i16(sx), $c.i16(sy));
     }
-    if ((svl.level.locations[sx][sy].flags | 0) & D_TRAPPED) {
-        svl.level.locations[sx][sy].flags = (D_LOCKED) & 31;
+    if ((svl.level.locations[sx][sy].flags | 0) & D.TRAPPED) {
+        svl.level.locations[sx][sy].flags = (D.LOCKED) & 31;
     }
-    if ((svl.level.locations[sx][sy].flags | 0) === D_LOCKED) {
+    if ((svl.level.locations[sx][sy].flags | 0) === D.LOCKED) {
         m = sx;
         n = sy;
         if (inside_shop($c.i16(sx + 1 | 0), $c.i16(sy))) {

@@ -18,7 +18,7 @@ import { mcalcmove } from './mon.js';
 import { FEMALE, MALE } from './monflag.h.js';
 import { mons } from './monst.js';
 import { MAX_NUM_WORMS } from './monst.h.js';
-import { PM_LONG_WORM, PM_LONG_WORM_TAIL } from './monsters.h.js';
+import { PM } from './monsters.h.js';
 import { NON_PM, NORMAL_SPEED, NUMMONS } from './permonst.h.js';
 import { You, impossible, pline } from './pline.js';
 import { HALLUC, HALLUC_RES } from './prop.h.js';
@@ -159,7 +159,7 @@ export async function wormgone(worm) {   // worm.c:308
     await toss_wsegs(wtails[wnum], TRUE);
     $t1 = wtails[wnum] = null, wheads[wnum] = $t1;
     wgrowtime[wnum] = 0;
-    if ($c.peq(worm.data, $c.relem(mons, PM_LONG_WORM)) && has_mcorpsenm(worm)) {
+    if ($c.peq(worm.data, $c.relem(mons, PM.LONG_WORM)) && has_mcorpsenm(worm)) {
         worm.mextra.mcorpsenm = NON_PM;
     }
 }
@@ -257,7 +257,7 @@ export async function see_wsegs(worm) {   // worm.c:487
 export async function detect_wsegs(worm, use_detection_glyph) {   // worm.c:503
     let num = 0, curr = null, what_tail = 0;
     curr = wtails[worm.wormno];
-    what_tail = u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) : PM_LONG_WORM_TAIL;
+    what_tail = u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) : PM.LONG_WORM_TAIL;
     while (!$c.peq(curr, wheads[worm.wormno])) {
         num = use_detection_glyph ? detected_monnum_to_glyph(what_tail, worm.female | 0 ? FEMALE : MALE) : worm.mtame ? petnum_to_glyph(what_tail, worm.female | 0 ? FEMALE : MALE) : monnum_to_glyph(what_tail, worm.female | 0 ? FEMALE : MALE);
         await show_glyph(curr.wx, curr.wy, num);

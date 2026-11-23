@@ -2,20 +2,21 @@
 import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
-import { AM_LAWFUL, AM_MASK, AM_NONE, A_LAWFUL, A_NONE } from './align.h.js';
+import { AM } from './align.h.js';
+import { A } from './attrib.h.js';
 import { svm } from './decl.js';
 
 export function ALIGNLIM() {
     return $c.add64(10, $c.div64(svm.moves, 200));
 }
 export function Amask2align(x) {
-    return $c.i8((x & AM_MASK) >>> 0 === 0 ? A_NONE : (x & AM_MASK) >>> 0 === AM_LAWFUL ? A_LAWFUL : ((x & AM_MASK) >>> 0 | 0) - 2 | 0);
+    return $c.i8((x & AM.MASK) >>> 0 === 0 ? A.NONE : (x & AM.MASK) >>> 0 === AM.LAWFUL ? A.LAWFUL : ((x & AM.MASK) >>> 0 | 0) - 2 | 0);
 }
 export function Align2amask(x) {
-    return (x === A_NONE ? AM_NONE : x === A_LAWFUL ? AM_LAWFUL : x + 2 | 0) >>> 0;
+    return (x === A.NONE ? AM.NONE : x === A.LAWFUL ? AM.LAWFUL : x + 2 | 0) >>> 0;
 }
 export function Amask2msa(x) {
-    return (x & AM_MASK) >>> 0 === 4 ? 3 : (x & AM_MASK) >>> 0;
+    return (x & AM.MASK) >>> 0 === 4 ? 3 : (x & AM.MASK) >>> 0;
 }
 export function Msa2amask(x) {
     return x === 3 ? 4 : x;

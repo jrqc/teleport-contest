@@ -2,22 +2,22 @@
 import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
-import { A_NONE } from './align.h.js';
 import { is_art, mk_artifact } from './artifact.js';
-import { ART_MAGICBANE } from './artilist.h.js';
+import { ART } from './artilist.h.js';
+import { A } from './attrib.h.js';
 import { rank_of } from './botl.js';
 import { cg, gu, svl, u } from './decl.js';
 import { WEAPON_CLASS } from './defsym.h.js';
 import { christen_monst } from './do_name.js';
 import { In_endgame } from './dungeon.macros.js';
 import { COLNO, FALSE, ROWNO, TRUE } from './global.h.js';
-import { MM_NOMSG, NO_MM_FLAGS, RLOC_ERR, RLOC_NOMSG } from './hack.h.js';
+import { MM, NO, RLOC } from './hack.h.js';
 import { makemon, mkmonmoney, mongets, set_malign } from './makemon.js';
 import { bless, curse, mkobj, mksobj, weight } from './mkobj.js';
 import { set_mon_data } from './mondata.js';
 import { is_female, is_mplayer } from './mondata.macros.js';
 import { mons } from './monst.js';
-import { PM_ARCHEOLOGIST, PM_BARBARIAN, PM_CAVE_DWELLER, PM_CLERIC, PM_HEALER, PM_KNIGHT, PM_MONK, PM_RANGER, PM_ROGUE, PM_SAMURAI, PM_TOURIST, PM_VALKYRIE, PM_WIZARD } from './monsters.h.js';
+import { PM } from './monsters.h.js';
 import { rnd_defensive_item, rnd_misc_item, rnd_offensive_item } from './muse.js';
 import { RANDOM_CLASS } from './objclass.h.js';
 import { objects } from './objects.js';
@@ -26,7 +26,7 @@ import { rnd_class } from './objnam.js';
 import { impossible, verbalize } from './pline.js';
 import { MON_AT } from './rm.macros.js';
 import { d, rn2, rnd } from './rnd.js';
-import { P_SPEAR } from './skills.h.js';
+import { P } from './skills.h.js';
 import { mpickobj } from './steal.js';
 import { goodpos, rloc } from './teleport.js';
 import { monmightthrowwep } from './weapon.js';
@@ -102,12 +102,12 @@ export async function mk_mplayer(ptr, x, y, special) {   // mplayer.c:118
         return null;
     }
     if (MON_AT(x, y)) {
-        await rloc(svl.level.monsters[x][y], RLOC_ERR | RLOC_NOMSG);
+        await rloc(svl.level.monsters[x][y], RLOC.ERR | RLOC.NOMSG);
     }
     if (!In_endgame(u.uz)) {
         special = FALSE;
     }
-    if ((mtmp = await makemon(ptr, x, y, $c.u32(special ? MM_NOMSG : NO_MM_FLAGS))) !== null) {
+    if ((mtmp = await makemon(ptr, x, y, $c.u32(special ? MM.NOMSG : NO.MM_FLAGS))) !== null) {
         $t1 = $c.u8(special ? rn2(16) + 15 | 0 : rnd(16)), mtmp.m_lev = $t1;
         $t3 = ($t2 = d(mtmp.m_lev, 10) + (special ? 30 + rnd(30) | 0 : 30) | 0, mtmp.mhpmax = $t2), mtmp.mhp = $t3;
         if (special) {
@@ -123,12 +123,12 @@ export async function mk_mplayer(ptr, x, y, special) {   // mplayer.c:118
         helm = $c.i16(!rn2(8) ? STRANGE_OBJECT : rnd_class(ELVEN_LEATHER_HELM, HELM_OF_TELEPATHY));
         shield = $c.i16(!rn2(8) ? STRANGE_OBJECT : rnd_class(ELVEN_SHIELD, SHIELD_OF_REFLECTION));
         switch (ptr.pmidx) {
-            case PM_ARCHEOLOGIST:
+            case PM.ARCHEOLOGIST:
                 if (rn2(2)) {
                     weapon = BULLWHIP;
                 }
                 break;
-            case PM_BARBARIAN:
+            case PM.BARBARIAN:
                 if (rn2(2)) {
                     weapon = $c.i16(rn2(2) ? TWO_HANDED_SWORD : BATTLE_AXE);
                     shield = STRANGE_OBJECT;
@@ -140,7 +140,7 @@ export async function mk_mplayer(ptr, x, y, special) {   // mplayer.c:118
                     helm = STRANGE_OBJECT;
                 }
                 break;
-            case PM_CAVE_DWELLER:
+            case PM.CAVE_DWELLER:
                 if (rn2(4)) {
                     weapon = MACE;
                 } else if (rn2(2)) {
@@ -150,7 +150,7 @@ export async function mk_mplayer(ptr, x, y, special) {   // mplayer.c:118
                     helm = STRANGE_OBJECT;
                 }
                 break;
-            case PM_HEALER:
+            case PM.HEALER:
                 if (rn2(4)) {
                     weapon = QUARTERSTAFF;
                 } else if (rn2(2)) {
@@ -163,7 +163,7 @@ export async function mk_mplayer(ptr, x, y, special) {   // mplayer.c:118
                     shield = STRANGE_OBJECT;
                 }
                 break;
-            case PM_KNIGHT:
+            case PM.KNIGHT:
                 if (rn2(4)) {
                     weapon = LONG_SWORD;
                 }
@@ -171,7 +171,7 @@ export async function mk_mplayer(ptr, x, y, special) {   // mplayer.c:118
                     armor = $c.i16(rnd_class(PLATE_MAIL, CHAIN_MAIL));
                 }
                 break;
-            case PM_MONK:
+            case PM.MONK:
                 weapon = $c.i16(!rn2(3) ? SHURIKEN : STRANGE_OBJECT);
                 armor = STRANGE_OBJECT;
                 cloak = ROBE;
@@ -179,7 +179,7 @@ export async function mk_mplayer(ptr, x, y, special) {   // mplayer.c:118
                     shield = STRANGE_OBJECT;
                 }
                 break;
-            case PM_CLERIC:
+            case PM.CLERIC:
                 if (rn2(2)) {
                     weapon = MACE;
                 }
@@ -196,24 +196,24 @@ export async function mk_mplayer(ptr, x, y, special) {   // mplayer.c:118
                     shield = STRANGE_OBJECT;
                 }
                 break;
-            case PM_RANGER:
+            case PM.RANGER:
                 if (rn2(2)) {
                     weapon = ELVEN_DAGGER;
                 }
                 break;
-            case PM_ROGUE:
+            case PM.ROGUE:
                 if (rn2(2)) {
                     weapon = $c.i16(rn2(2) ? SHORT_SWORD : ORCISH_DAGGER);
                 }
                 break;
-            case PM_SAMURAI:
+            case PM.SAMURAI:
                 if (rn2(2)) {
                     weapon = KATANA;
                 }
                 break;
-            case PM_TOURIST:
+            case PM.TOURIST:
                 break;
-            case PM_VALKYRIE:
+            case PM.VALKYRIE:
                 if (rn2(2)) {
                     weapon = WAR_HAMMER;
                 }
@@ -221,7 +221,7 @@ export async function mk_mplayer(ptr, x, y, special) {   // mplayer.c:118
                     armor = $c.i16(rnd_class(PLATE_MAIL, CHAIN_MAIL));
                 }
                 break;
-            case PM_WIZARD:
+            case PM.WIZARD:
                 if (rn2(4)) {
                     weapon = $c.i16(rn2(2) ? QUARTERSTAFF : ATHAME);
                 }
@@ -249,13 +249,13 @@ export async function mk_mplayer(ptr, x, y, special) {   // mplayer.c:118
                 otmp.greased = (1) & 1;
             }
             if (special && rn2(2)) {
-                otmp = await mk_artifact(otmp, A_NONE, 99, FALSE);
+                otmp = await mk_artifact(otmp, A.NONE, 99, FALSE);
             }
             if (objects[otmp.otyp].oc_merge | 0 && !otmp.oartifact && monmightthrowwep(otmp)) {
-                $t6 = rn2(otmp.oclass === WEAPON_CLASS && objects[otmp.otyp].oc_subtyp === P_SPEAR ? 4 : 8), otmp.quan = $c.add64(otmp.quan, $t6);
+                $t6 = rn2(otmp.oclass === WEAPON_CLASS && objects[otmp.otyp].oc_subtyp === P.SPEAR ? 4 : 8), otmp.quan = $c.add64(otmp.quan, $t6);
             }
             $t7 = await weight(otmp) >>> 0, otmp.owt = $t7;
-            if (is_art(otmp, ART_MAGICBANE)) {
+            if (is_art(otmp, ART.MAGICBANE)) {
                 $t8 = $c.i8(rnd(4)), otmp.spe = $t8;
             }
             await mpickobj(mtmp, otmp);
@@ -307,7 +307,7 @@ export async function create_mplayers(num, special) {   // mplayer.c:327
     fakemon.$copyFrom(cg.zeromonst);
     while (num) {
         tryct = 0;
-        pm = rn2(PM_WIZARD - PM_ARCHEOLOGIST + 1) + PM_ARCHEOLOGIST | 0;
+        pm = rn2(PM.WIZARD - PM.ARCHEOLOGIST + 1) + PM.ARCHEOLOGIST | 0;
         set_mon_data(fakemon, $c.relem(mons, pm));
         do {
             x = rn2(COLNO - 4) + 2 | 0;

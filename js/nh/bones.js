@@ -8,7 +8,7 @@ import { artifact_exists, artifact_light, exist_artifact } from './artifact.js';
 import { yyyymmddhhmmss } from './calendar.js';
 import { isok, yn_function } from './cmd.js';
 import { flags, gb, gf, gi, gs, gu, iflags, program_state, svd, svl, svn, svp, svr, u, ynchars } from './decl.js';
-import { FOOD_CLASS, S_MUMMY } from './defsym.h.js';
+import { FOOD_CLASS, S } from './defsym.h.js';
 import { newsym } from './display.js';
 import { GLYPH_UNEXPLORED } from './display.h.js';
 import { obj_no_longer_held } from './do.js';
@@ -20,7 +20,7 @@ import { close_nhfile, commit_bonesfile, compress_bonesfile, create_bonesfile, d
 import { discover, wizard } from './flag.macros.js';
 import { COLNO, FALSE, ROWNO, TRUE } from './global.h.js';
 import { in_rooms } from './hack.js';
-import { DEFUNCT_MONSTER, DISMOUNT_BONES, MM_NONAME, NO_MINVENT, NUM_RACES, NUM_ROLES, ONAME_BONES, SF_UPTODATE, WRITING } from './hack.h.js';
+import { DEFUNCT_MONSTER, DISMOUNT, MM, NO, NUM, ONAME_BONES, SF, WRITING } from './hack.h.js';
 import { pline1 } from './hack.macros.js';
 import { obj_is_burning } from './light.js';
 import { makemon, mongets, newmextra } from './makemon.js';
@@ -28,16 +28,16 @@ import { EBONES, has_ebones, has_mgivenname } from './mextra.macros.js';
 import { add_to_container, add_to_minv, curse, dealloc_obj, free_omonst, mk_named_object, obj_attach_mid, obj_extract_self, place_object, set_corpsenm, weight } from './mkobj.js';
 import { DELPHI, ROOMOFFSET, SHOPBASE } from './mkroom.h.js';
 import { can_carry, dmonsfree, iter_mons, mongone } from './mon.js';
-import { AT_WEAP } from './monattk.h.js';
+import { AT } from './monattk.h.js';
 import { attacktype, give_u_to_m_resistances } from './mondata.js';
 import { is_undead, likes_gems, likes_gold, likes_magic, unique_corpstat } from './mondata.macros.js';
-import { M2_COLLECT, MS_LEADER, MS_NEMESIS, NEUTRAL } from './monflag.h.js';
+import { M2, MS, NEUTRAL } from './monflag.h.js';
 import { mons } from './monst.js';
-import { M_SEEN_NOTHING } from './monst.h.js';
+import { M_SEEN } from './monst.h.js';
 import { is_Vlad, ismnum } from './monst.macros.js';
-import { PM_DOPPELGANGER, PM_GHOST, PM_MEDUSA, PM_ORACLE } from './monsters.h.js';
+import { PM } from './monsters.h.js';
 import { m_carrying } from './mthrowu.js';
-import { LOST_NONE, OBJ_CONTAINED, OBJ_FLOOR } from './obj.h.js';
+import { LOST, OBJ } from './obj.h.js';
 import { has_omonst, has_oname, is_mines_prize, is_soko_prize } from './obj.macros.js';
 import { objects } from './objects.js';
 import { AMULET_OF_YENDOR, BELL, BELL_OF_OPENING, BOOMERANG, BOW, CANDELABRUM_OF_INVOCATION, CORPSE, EGG, ELVEN_BOW, FAKE_AMULET_OF_YENDOR, MUMMY_WRAPPING, ORCISH_BOW, SCR_MAIL, SLIME_MOLD, SPE_BLANK_PAPER, SPE_BOOK_OF_THE_DEAD, SPE_NOVEL, STATUE, TIN, WAX_CANDLE, YUMI } from './objects.h.js';
@@ -106,10 +106,10 @@ async function resetobjs(ochain, restore) {   // bones.c:51
                 sanitize_name(otmp.oextra.oname);
             }
             if (otmp.oclass === FOOD_CLASS && otmp.oeaten) {
-                for (top = otmp; top.where === OBJ_CONTAINED; top = top.v.v_ocontainer) {
+                for (top = otmp; top.where === OBJ.CONTAINED; top = top.v.v_ocontainer) {
                     continue;
                 }
-                $t1 = (top.where === OBJ_FLOOR && get_obj_location(top, new $c.Ptr(ox, 0), new $c.Ptr(oy, 0), 0) && inside_shop(ox[0], oy[0]) && (p = in_rooms(ox[0], oy[0], SHOPBASE)).get(0) && tended_shop($c.relem(svr.rooms, p.get(0) - ROOMOFFSET | 0)) ? 1 : 0) >>> 0, otmp.no_charge = ($t1) & 1;
+                $t1 = (top.where === OBJ.FLOOR && get_obj_location(top, new $c.Ptr(ox, 0), new $c.Ptr(oy, 0), 0) && inside_shop(ox[0], oy[0]) && (p = in_rooms(ox[0], oy[0], SHOPBASE)).get(0) && tended_shop($c.relem(svr.rooms, p.get(0) - ROOMOFFSET | 0)) ? 1 : 0) >>> 0, otmp.no_charge = ($t1) & 1;
             }
         } else {
             if (objects[otmp.otyp].oc_uses_known) {
@@ -122,7 +122,7 @@ async function resetobjs(ochain, restore) {   // bones.c:51
             otmp.tknown = (0) & 1;
             otmp.invlet = 0;
             otmp.no_charge = (0) & 1;
-            otmp.how_lost = (LOST_NONE) & 7;
+            otmp.how_lost = (LOST.NONE) & 7;
             if (has_oname(otmp) && !(otmp.oartifact || otmp.otyp === STATUE || otmp.otyp === SPE_NOVEL || otmp.otyp === CORPSE && otmp.corpsenm >= SPECIAL_PM)) {
                 free_oname(otmp);
             }
@@ -142,7 +142,7 @@ async function resetobjs(ochain, restore) {   // bones.c:51
                 mnum[0] = otmp.corpsenm;
                 if (has_omonst(otmp) && cant_revive(new $c.Ptr(mnum, 0), FALSE, null)) {
                     free_omonst(otmp);
-                    if (mnum[0] === PM_DOPPELGANGER && otmp.otyp === CORPSE) {
+                    if (mnum[0] === PM.DOPPELGANGER && otmp.otyp === CORPSE) {
                         await set_corpsenm(otmp, mnum[0]);
                     }
                 }
@@ -203,7 +203,7 @@ async function give_to_nearby_mon(otmp, x, y) {   // bones.c:226
             if (!(mtmp = svl.level.monsters[xx][yy])) {
                 continue;
             }
-            if (!(likes_gold(mtmp.data) || likes_gems(mtmp.data) || ($c.andu64(mtmp.data.mflags2, M2_COLLECT) !== 0 || attacktype(mtmp.data, AT_WEAP)) || likes_magic(mtmp.data))) {
+            if (!(likes_gold(mtmp.data) || likes_gems(mtmp.data) || ($c.andu64(mtmp.data.mflags2, M2.COLLECT) !== 0 || attacktype(mtmp.data, AT.WEAP)) || likes_magic(mtmp.data))) {
                 continue;
             }
             nmon = nmon + 1 | 0;
@@ -310,7 +310,7 @@ export function can_make_bones() {   // bones.c:356
 async function remove_mon_from_bones(mtmp) {   // bones.c:390
     let mptr = null;
     mptr = mtmp.data;
-    if (mtmp.iswiz | 0 || $c.peq(mptr, $c.relem(mons, PM_MEDUSA)) || mptr.msound === MS_NEMESIS || mptr.msound === MS_LEADER || is_Vlad(mtmp) || $c.peq(mptr, $c.relem(mons, PM_ORACLE)) && !await fixuporacle(mtmp)) {
+    if (mtmp.iswiz | 0 || $c.peq(mptr, $c.relem(mons, PM.MEDUSA)) || mptr.msound === MS.NEMESIS || mptr.msound === MS.LEADER || is_Vlad(mtmp) || $c.peq(mptr, $c.relem(mons, PM.ORACLE)) && !await fixuporacle(mtmp)) {
         await mongone(mtmp);
     }
 }
@@ -339,7 +339,7 @@ export async function savebones(how, when, corpse) {   // bones.c:403
         await unpunish();
     }
     if (u.usteed) {
-        await dismount_steed(DISMOUNT_BONES);
+        await dismount_steed(DISMOUNT.BONES);
     }
     await iter_mons(remove_mon_from_bones);
     await dmonsfree();
@@ -350,7 +350,7 @@ export async function savebones(how, when, corpse) {   // bones.c:403
     set_ghostly_objlist(gi.invent);
     if (ismnum(u.ugrave_arise)) {
         gi.in_mklev = TRUE;
-        mtmp = await makemon($c.relem(mons, u.ugrave_arise), u.ux, u.uy, NO_MINVENT);
+        mtmp = await makemon($c.relem(mons, u.ugrave_arise), u.ux, u.uy, NO.MINVENT);
         gi.in_mklev = FALSE;
         if (!mtmp) {
             await drop_upon_death(null, null, u.ux, u.uy);
@@ -361,7 +361,7 @@ export async function savebones(how, when, corpse) {   // bones.c:403
         mtmp = await christen_monst(mtmp, new $c.Ptr(svp.plname, 0));
         await newsym(u.ux, u.uy);
         await drop_upon_death(mtmp, null, u.ux, u.uy);
-        if (mtmp.data.mlet === S_MUMMY && !m_carrying(mtmp, MUMMY_WRAPPING)) {
+        if (mtmp.data.mlet === S.MUMMY && !m_carrying(mtmp, MUMMY_WRAPPING)) {
             await mongets(mtmp, MUMMY_WRAPPING);
         }
         await m_dowear(mtmp, TRUE);
@@ -375,7 +375,7 @@ export async function savebones(how, when, corpse) {   // bones.c:403
     } else {
         await drop_upon_death(null, null, u.ux, u.uy);
         gi.in_mklev = TRUE;
-        mtmp = await makemon($c.relem(mons, PM_GHOST), u.ux, u.uy, MM_NONAME);
+        mtmp = await makemon($c.relem(mons, PM.GHOST), u.ux, u.uy, MM.NONAME);
         gi.in_mklev = FALSE;
         if (!mtmp) {
             return;
@@ -394,13 +394,13 @@ export async function savebones(how, when, corpse) {   // bones.c:403
             await newebones(mtmp);
         }
         if (has_ebones(mtmp)) {
-            for (i = 0; i <= NUM_ROLES; i = i + 1 | 0) {
+            for (i = 0; i <= NUM.ROLES; i = i + 1 | 0) {
                 if (!$c.strcmp(gu.urole.name.m, roles[i].name.m)) {
                     mtmp.mextra.ebones.role = $c.u8(i);
                     break;
                 }
             }
-            for (i = 0; i <= NUM_RACES; i = i + 1 | 0) {
+            for (i = 0; i <= NUM.RACES; i = i + 1 | 0) {
                 if (!$c.strcmp(gu.urace.noun, races[i].noun)) {
                     mtmp.mextra.ebones.race = $c.u8(i);
                     break;
@@ -422,7 +422,7 @@ export async function savebones(how, when, corpse) {   // bones.c:403
         if (mtmp.mtame) {
             $t2 = $c.i8(mtmp.mpeaceful = (0) & 1), mtmp.mtame = $t2;
         }
-        mtmp.seen_resistance = M_SEEN_NOTHING;
+        mtmp.seen_resistance = M_SEEN.NOTHING;
     }
     for (ttmp = gf.ftrap; ttmp; ttmp = ttmp.ntrap) {
         ttmp.madeby_u = (0) & 1;
@@ -506,7 +506,7 @@ export async function getbones() {   // bones.c:630
         }
     }
     program_state.reading_bonesfile = 1;
-    if (await validate(nhfp, new $c.Ptr(gb.bones, 0), FALSE) !== SF_UPTODATE) {
+    if (await validate(nhfp, new $c.Ptr(gb.bones, 0), FALSE) !== SF.UPTODATE) {
         if (!wizard()) {
             await pline($c.lit("Discarding unusable bones; no need to panic..."));
         }

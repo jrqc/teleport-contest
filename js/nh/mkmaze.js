@@ -7,19 +7,19 @@ import { lift_covet_and_placebc, unplacebc_and_covet_placebc } from './ball.js';
 import { isok } from './cmd.js';
 import { is_ice, is_pool } from './dbridge.js';
 import { gb, ge, gf, gi, gl, gn, gr, gu, gv, gw, gx, gy, iflags, program_state, svb, svd, sve, svi, svl, svn, svr, svu, svx, svy, u } from './decl.js';
-import { FOOD_CLASS, GEM_CLASS, RING_CLASS, S_air, S_altar, S_arrow_trap, S_cloud, S_digbeam, S_goodpos, S_grave, S_ndoor, S_stone, S_trwall, S_vwall, S_water } from './defsym.h.js';
+import { FOOD_CLASS, GEM_CLASS, RING_CLASS, S } from './defsym.h.js';
 import { newsym } from './display.js';
-import { GLYPH_CMAP_A_OFF, GLYPH_CMAP_B_OFF, GLYPH_CMAP_C_OFF, GLYPH_CMAP_GEH_OFF, GLYPH_CMAP_KNOX_OFF, GLYPH_CMAP_MAIN_OFF, GLYPH_CMAP_MINES_OFF, GLYPH_CMAP_SOKO_OFF, GLYPH_CMAP_STONE_OFF, NO_GLYPH } from './display.h.js';
+import { GLYPH, NO_GLYPH } from './display.h.js';
 import { christen_monst, christen_orc, new_oname, rndorcname } from './do_name.js';
 import { migrate_to_level } from './dog.js';
 import { In_hell, In_mines, In_quest, Invocation_lev, Is_branchlev, Is_special, depth, dunlev, dunlevs_in_dungeon, find_level, get_level, ledger_no, on_level, u_on_newpos } from './dungeon.js';
-import { LR_BRANCH, LR_DOWNSTAIR, LR_DOWNTELE, LR_PORTAL, LR_TELE, LR_UPSTAIR, LR_UPTELE, MIGR_LEFTOVERS, MIGR_RANDOM } from './dungeon.h.js';
+import { LR, MIGR } from './dungeon.h.js';
 import { within_bounded_area } from './dungeon.macros.js';
 import { panic } from './end.js';
 import { debugcore } from './files.js';
 import { wizard } from './flag.macros.js';
 import { COLNO, FALSE, ROWNO, TRUE } from './global.h.js';
-import { CONS_HERO, CONS_MON, CONS_OBJ, CONS_TRAP, CORPSTAT_NONE, MKTRAP_MAZEFLAG, MM_NONAME, NO_MM_FLAGS, RLOC_ERR, RLOC_NOMSG } from './hack.h.js';
+import { CONS, CORPSTAT, MKTRAP, MM, NO, RLOC } from './hack.h.js';
 import { distu, release_data, update_file } from './hack.macros.js';
 import { distmin, nh_snprintf, sgn, upstart } from './hacklib.js';
 import { stackobj } from './invent.js';
@@ -31,21 +31,21 @@ import { somex, somey } from './mkroom.js';
 import { dmonsfree, elemental_clog, m_into_limbo, mnearto, mnexto } from './mon.js';
 import { poly_when_stoned } from './mondata.js';
 import { is_orc } from './mondata.macros.js';
-import { M1_SWIM, M2_ORC, MR_STONE } from './monflag.h.js';
+import { M1, M2, MR } from './monflag.h.js';
 import { mons } from './monst.js';
-import { MON_BUBBLEMOVE } from './monst.h.js';
+import { MON } from './monst.h.js';
 import { DEADMONSTER } from './monst.macros.js';
-import { PM_CLERIC, PM_MINOTAUR, PM_ORC, PM_ORC_CAPTAIN, PM_ORC_SHAMAN } from './monsters.h.js';
+import { PM } from './monsters.h.js';
 import { RANDOM_CLASS } from './objclass.h.js';
 import { objects } from './objects.js';
 import { BOULDER, CORPSE, C_RATION, EGG, GAUNTLETS_OF_DEXTERITY, GOLD_PIECE, K_RATION, LEATHER_GLOVES, LEMBAS_WAFER, LONG_SWORD, ROCK, SILVER_SABER, SKELETON_KEY, SLIME_MOLD, STATUE, STRANGE_OBJECT, TALLOW_CANDLE, TIN, TRIPE_RATION, WAX_CANDLE } from './objects.h.js';
 import { shiny_obj } from './objnam.js';
 import { fruitadd } from './options.js';
 import { Norep, impossible, pline } from './pline.js';
-import { SWIMMING } from './prop.h.js';
+import { SWIMMING, W } from './prop.h.js';
 import { create_gas_cloud } from './region.js';
 import { clear_heros_fault } from './region.macros.js';
-import { AIR, BLCORNER, BRCORNER, CLOUD, CORR, CROSSWALL, DBWALL, DOOR, HWALL, ICE, IRONBARS, LAVAPOOL, LAVAWALL, MAX_TYPE, POOL, ROOM, SDOOR, SET_LIT_NOCHANGE, SET_LIT_RANDOM, STONE, TDWALL, TLCORNER, TLWALL, TRCORNER, TRWALL, TUWALL, VWALL, WATER, W_NONDIGGABLE, W_NONPASSWALL } from './rm.h.js';
+import { AIR, BLCORNER, BRCORNER, CLOUD, CORR, CROSSWALL, DBWALL, DOOR, HWALL, ICE, IRONBARS, LAVAPOOL, LAVAWALL, MAX_TYPE, POOL, ROOM, SDOOR, SET_LIT, STONE, TDWALL, TLCORNER, TLWALL, TRCORNER, TRWALL, TUWALL, VWALL, WATER } from './rm.h.js';
 import { CAN_OVERWRITE_TERRAIN, IS_DOOR, IS_FOUNTAIN, IS_LAVA, IS_SINK, IS_WALL, MON_AT, OBJ_AT, remove_monster } from './rm.macros.js';
 import { rn2, rnd } from './rnd.js';
 import { sfi_bubble, sfi_int, sfo_bubble, sfo_int } from './sfbase.js';
@@ -132,10 +132,10 @@ export async function set_levltyp_lit(x, y, typ, lit) {   // mkmaze.c:125
     let ret = 0;
     ret = await set_levltyp(x, y, typ);
     if (ret && isok(x, y)) {
-        if (lit !== SET_LIT_NOCHANGE) {
+        if (lit !== SET_LIT.NOCHANGE) {
             if (IS_LAVA(typ)) {
                 lit = 1;
-            } else if (lit === SET_LIT_RANDOM) {
+            } else if (lit === SET_LIT.RANDOM) {
                 lit = $c.i8(rn2(2));
             }
             svl.level.locations[x][y].lit = (lit >>> 0) & 1;
@@ -270,7 +270,7 @@ export function is_exclusion_zone(type, x, y) {   // mkmaze.c:317
     let ez = null;
     ez = sve.exclusion_zones;
     while (ez) {
-        if ((type === LR_DOWNTELE && (ez.zonetype === LR_DOWNTELE || ez.zonetype === LR_TELE) || type === LR_UPTELE && (ez.zonetype === LR_UPTELE || ez.zonetype === LR_TELE) || type === ez.zonetype) && (x >= ez.lx && x <= ez.hx && y >= ez.ly && y <= ez.hy)) {
+        if ((type === LR.DOWNTELE && (ez.zonetype === LR.DOWNTELE || ez.zonetype === LR.TELE) || type === LR.UPTELE && (ez.zonetype === LR.UPTELE || ez.zonetype === LR.TELE) || type === ez.zonetype) && (x >= ez.lx && x <= ez.hx && y >= ez.ly && y <= ez.hy)) {
             return TRUE;
         }
         ez = ez.next;
@@ -283,7 +283,7 @@ export function bad_location(x, y, nlx, nly, nhx, nhy) {   // mkmaze.c:341
 export async function place_lregion(lx, ly, hx, hy, nlx, nly, nhx, nhy, rtype, lev) {   // mkmaze.c:356
     let trycnt = 0, oneshot = 0, x = 0, y = 0;
     if (!lx) {
-        if (rtype === LR_BRANCH && svn.nroom) {
+        if (rtype === LR.BRANCH && svn.nroom) {
             await place_branch(Is_branchlev(u.uz), 0, 0);
             return;
         }
@@ -340,12 +340,12 @@ async function put_lregion_here(x, y, nlx, nly, nhx, nhy, rtype, oneshot, lev) {
         }
     }
     switch (rtype) {
-        case LR_TELE:
-        case LR_UPTELE:
-        case LR_DOWNTELE:
+        case LR.TELE:
+        case LR.UPTELE:
+        case LR.DOWNTELE:
             if ((mtmp = svl.level.monsters[x][y]) !== null) {
                 if (oneshot) {
-                    if (!await rloc(mtmp, RLOC_NOMSG)) {
+                    if (!await rloc(mtmp, RLOC.NOMSG)) {
                         await m_into_limbo(mtmp);
                     }
                 } else {
@@ -354,14 +354,14 @@ async function put_lregion_here(x, y, nlx, nly, nhx, nhy, rtype, oneshot, lev) {
             }
             await u_on_newpos(x, y);
             break;
-        case LR_PORTAL:
+        case LR.PORTAL:
             await mkportal(x, y, lev.dnum, lev.dlevel);
             break;
-        case LR_DOWNSTAIR:
-        case LR_UPSTAIR:
+        case LR.DOWNSTAIR:
+        case LR.UPSTAIR:
             await mkstairs(x, y, $c.i8(rtype), null, FALSE);
             break;
-        case LR_BRANCH:
+        case LR.BRANCH:
             await place_branch(Is_branchlev(u.uz), x, y);
             break;
     }
@@ -371,7 +371,7 @@ async function baalz_fixup() {   // mkmaze.c:475
     let mtmp = null, x = 0, y = 0, lastx = 0, lasty = 0, $t1, $t2, $t3, $t4;
     y = 10;
     for (lastx = x = 0; x < COLNO; x = x + 1 | 0) {
-        if (((svl.level.locations[x][y].flags | 0) & W_NONDIGGABLE) !== 0) {
+        if (((svl.level.locations[x][y].flags | 0) & W.NONDIGGABLE) !== 0) {
             if (!lastx) {
                 gb.bughack.inarea.x1 = $c.i16(x + 1 | 0);
             }
@@ -381,7 +381,7 @@ async function baalz_fixup() {   // mkmaze.c:475
     gb.bughack.inarea.x2 = $c.i16((lastx > gb.bughack.inarea.x1 ? lastx : x) - 1 | 0);
     x = gb.bughack.inarea.x1;
     for (lasty = y = 0; y < ROWNO; y = y + 1 | 0) {
-        if (((svl.level.locations[x][y].flags | 0) & W_NONDIGGABLE) !== 0) {
+        if (((svl.level.locations[x][y].flags | 0) & W.NONDIGGABLE) !== 0) {
             if (!lasty) {
                 gb.bughack.inarea.y1 = $c.i16(y + 1 | 0);
             }
@@ -399,15 +399,15 @@ async function baalz_fixup() {   // mkmaze.c:475
                     gb.bughack.delarea.x2 = $c.i16(x), gb.bughack.delarea.y2 = $c.i16(y);
                 }
             } else if (svl.level.locations[x][y].typ === IRONBARS) {
-                if (isok($c.i16(x - 1 | 0), $c.i16(y)) && ((svl.level.locations[x - 1 | 0][y].flags | 0) & W_NONDIGGABLE) !== 0) {
-                    svl.level.locations[x - 1 | 0][y].flags = (((svl.level.locations[x - 1 | 0][y].flags | 0) & ~W_NONDIGGABLE) >>> 0) & 31;
+                if (isok($c.i16(x - 1 | 0), $c.i16(y)) && ((svl.level.locations[x - 1 | 0][y].flags | 0) & W.NONDIGGABLE) !== 0) {
+                    svl.level.locations[x - 1 | 0][y].flags = (((svl.level.locations[x - 1 | 0][y].flags | 0) & ~W.NONDIGGABLE) >>> 0) & 31;
                     if (isok($c.i16(x - 2 | 0), $c.i16(y))) {
-                        svl.level.locations[x - 2 | 0][y].flags = (((svl.level.locations[x - 2 | 0][y].flags | 0) & ~W_NONDIGGABLE) >>> 0) & 31;
+                        svl.level.locations[x - 2 | 0][y].flags = (((svl.level.locations[x - 2 | 0][y].flags | 0) & ~W.NONDIGGABLE) >>> 0) & 31;
                     }
-                } else if (isok($c.i16(x + 1 | 0), $c.i16(y)) && ((svl.level.locations[x + 1 | 0][y].flags | 0) & W_NONDIGGABLE) !== 0) {
-                    svl.level.locations[x + 1 | 0][y].flags = (((svl.level.locations[x + 1 | 0][y].flags | 0) & ~W_NONDIGGABLE) >>> 0) & 31;
+                } else if (isok($c.i16(x + 1 | 0), $c.i16(y)) && ((svl.level.locations[x + 1 | 0][y].flags | 0) & W.NONDIGGABLE) !== 0) {
+                    svl.level.locations[x + 1 | 0][y].flags = (((svl.level.locations[x + 1 | 0][y].flags | 0) & ~W.NONDIGGABLE) >>> 0) & 31;
                     if (isok($c.i16(x + 2 | 0), $c.i16(y))) {
-                        svl.level.locations[x + 2 | 0][y].flags = (((svl.level.locations[x + 2 | 0][y].flags | 0) & ~W_NONDIGGABLE) >>> 0) & 31;
+                        svl.level.locations[x + 2 | 0][y].flags = (((svl.level.locations[x + 2 | 0][y].flags | 0) & ~W.NONDIGGABLE) >>> 0) & 31;
                     }
                 }
             }
@@ -419,7 +419,7 @@ async function baalz_fixup() {   // mkmaze.c:475
         svl.level.locations[x][y].typ = $c.i8(svl.level.locations[x][y].typ === TLWALL ? BRCORNER : BLCORNER);
         svl.level.locations[x][y + 1 | 0].typ = HWALL;
         if ((mtmp = svl.level.monsters[x][y]) !== null) {
-            await rloc(mtmp, RLOC_ERR | RLOC_NOMSG);
+            await rloc(mtmp, RLOC.ERR | RLOC.NOMSG);
         }
     }
     x = gb.bughack.delarea.x2, y = gb.bughack.delarea.y2;
@@ -427,7 +427,7 @@ async function baalz_fixup() {   // mkmaze.c:475
         svl.level.locations[x][y].typ = $c.i8(svl.level.locations[x][y].typ === TLWALL ? TRCORNER : TLCORNER);
         svl.level.locations[x][y - 1 | 0].typ = HWALL;
         if ((mtmp = svl.level.monsters[x][y]) !== null) {
-            await rloc(mtmp, RLOC_ERR | RLOC_NOMSG);
+            await rloc(mtmp, RLOC.ERR | RLOC.NOMSG);
         }
     }
     $t1 = gb.bughack.delarea.x1 = COLNO, gb.bughack.inarea.x1 = $t1;
@@ -446,10 +446,10 @@ export async function fixup_special() {   // mkmaze.c:570
     for (x = 0; x < gn.num_lregions; x = x + 1 | 0, r = $c.radd(r, 1)) {
         S1: for (;;) {
             switch ($goto !== null ? $goto : r.rtype) {
-                case LR_BRANCH:
+                case LR.BRANCH:
                     added_branch = TRUE;
                     $goto = "place_it"; continue S1;
-                case LR_PORTAL:
+                case LR.PORTAL:
                     if (r.rname.str.get(0) >= 48 && r.rname.str.get(0) <= 57) {
                         lev.$copyFrom(u.uz);
                         $t1 = $c.i16($c.atoi(r.rname.str)), lev.dlevel = $t1;
@@ -457,16 +457,16 @@ export async function fixup_special() {   // mkmaze.c:570
                         sp = find_level(r.rname.str);
                         lev.$copyFrom(sp.dlevel);
                     }
-                case LR_UPSTAIR:
-                case LR_DOWNSTAIR:
+                case LR.UPSTAIR:
+                case LR.DOWNSTAIR:
                 case "place_it":
                     $goto = null;   // place_it:
                     await place_lregion(r.inarea.x1, r.inarea.y1, r.inarea.x2, r.inarea.y2, r.delarea.x1, r.delarea.y1, r.delarea.x2, r.delarea.y2, r.rtype, lev);
                     break;
-                case LR_TELE:
-                case LR_UPTELE:
-                case LR_DOWNTELE:
-                    if (r.rtype === LR_TELE || r.rtype === LR_UPTELE) {
+                case LR.TELE:
+                case LR.UPTELE:
+                case LR.DOWNTELE:
+                    if (r.rtype === LR.TELE || r.rtype === LR.UPTELE) {
                         svu.updest.lx = r.inarea.x1;
                         svu.updest.ly = r.inarea.y1;
                         svu.updest.hx = r.inarea.x2;
@@ -476,7 +476,7 @@ export async function fixup_special() {   // mkmaze.c:570
                         svu.updest.nhx = r.delarea.x2;
                         svu.updest.nhy = r.delarea.y2;
                     }
-                    if (r.rtype === LR_TELE || r.rtype === LR_DOWNTELE) {
+                    if (r.rtype === LR.TELE || r.rtype === LR.DOWNTELE) {
                         svd.dndest.lx = r.inarea.x1;
                         svd.dndest.ly = r.inarea.y1;
                         svd.dndest.hx = r.inarea.x2;
@@ -495,7 +495,7 @@ export async function fixup_special() {   // mkmaze.c:570
         }
     }
     if (!added_branch && Is_branchlev(u.uz)) {
-        await place_lregion(0, 0, 0, 0, 0, 0, 0, 0, LR_BRANCH, null);
+        await place_lregion(0, 0, 0, 0, 0, 0, 0, 0, LR.BRANCH, null);
     }
     if ((svd.dungeon_topology.d_medusa_level.dlevel || svd.dungeon_topology.d_medusa_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_medusa_level)) {
         croom = $c.relem(svr.rooms, 0);
@@ -505,7 +505,7 @@ export async function fixup_special() {   // mkmaze.c:570
             if (goodpos($c.i16(x), $c.i16(y), null, 0)) {
                 tryct2 = 0;
                 otmp = await mk_tt_object(STATUE, $c.i16(x), $c.i16(y));
-                while ((tryct2 = tryct2 + 1 | 0) < 100 && otmp && (poly_when_stoned($c.relem(mons, otmp.corpsenm)) || ($c.relem(mons, otmp.corpsenm).mresists & MR_STONE) !== 0)) {
+                while ((tryct2 = tryct2 + 1 | 0) < 100 && otmp && (poly_when_stoned($c.relem(mons, otmp.corpsenm)) || ($c.relem(mons, otmp.corpsenm).mresists & MR.STONE) !== 0)) {
                     await set_corpsenm(otmp, await rndmonnum());
                 }
             }
@@ -513,15 +513,15 @@ export async function fixup_special() {   // mkmaze.c:570
         if (rn2(2)) {
             otmp = await mk_tt_object(STATUE, $c.i16(somex(croom)), $c.i16(somey(croom)));
         } else {
-            otmp = await mkcorpstat(STATUE, null, null, $c.i16(somex(croom)), $c.i16(somey(croom)), CORPSTAT_NONE);
+            otmp = await mkcorpstat(STATUE, null, null, $c.i16(somex(croom)), $c.i16(somey(croom)), CORPSTAT.NONE);
         }
         if (otmp) {
             tryct = 0;
-            while ((tryct = tryct + 1 | 0) < 100 && (($c.relem(mons, otmp.corpsenm).mresists & MR_STONE) !== 0 || poly_when_stoned($c.relem(mons, otmp.corpsenm)))) {
+            while ((tryct = tryct + 1 | 0) < 100 && (($c.relem(mons, otmp.corpsenm).mresists & MR.STONE) !== 0 || poly_when_stoned($c.relem(mons, otmp.corpsenm)))) {
                 await set_corpsenm(otmp, await rndmonnum());
             }
         }
-    } else if (gu.urole.mnum === PM_CLERIC && In_quest(u.uz)) {
+    } else if (gu.urole.mnum === PM.CLERIC && In_quest(u.uz)) {
         svl.level.flags.graveyard = (1) & 1;
     } else if ((svd.dungeon_topology.d_stronghold_level.dlevel || svd.dungeon_topology.d_stronghold_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_stronghold_level)) {
         svl.level.flags.graveyard = (1) & 1;
@@ -551,7 +551,7 @@ async function migrate_orc(mtmp, mflags) {   // mkmaze.c:717
         if (!rn2(40)) {
             nlev = nlev - 1 | 0;
         }
-        mtmp.migflags = $c.or64(mtmp.migflags, MIGR_LEFTOVERS);
+        mtmp.migflags = $c.or64(mtmp.migflags, MIGR.LEFTOVERS);
     } else {
         nlev = rn2((max_depth - cur_depth | 0) + 1 | 0) + cur_depth | 0;
         if (nlev === cur_depth) {
@@ -560,14 +560,14 @@ async function migrate_orc(mtmp, mflags) {   // mkmaze.c:717
         if (nlev > max_depth) {
             nlev = max_depth;
         }
-        mtmp.migflags = $c.and64(mtmp.migflags, ~MIGR_LEFTOVERS);
+        mtmp.migflags = $c.and64(mtmp.migflags, ~MIGR.LEFTOVERS);
     }
     await get_level(dest, nlev);
-    await migrate_to_level(mtmp, ledger_no(dest), MIGR_RANDOM, null);
+    await migrate_to_level(mtmp, ledger_no(dest), MIGR.RANDOM, null);
 }
 async function shiny_orc_stuff(mtmp) {   // mkmaze.c:748
     let gemprob = 0, goldprob = 0, otyp = 0, otmp = null, is_captain = 0, $t1, $t2;
-    is_captain = $c.i8($c.peq(mtmp.data, $c.relem(mons, PM_ORC_CAPTAIN)) ? 1 : 0);
+    is_captain = $c.i8($c.peq(mtmp.data, $c.relem(mons, PM.ORC_CAPTAIN)) ? 1 : 0);
     goldprob = is_captain ? 600 : 300;
     gemprob = $c.div32(goldprob, 4);
     if (rn2(1000) < goldprob) {
@@ -595,7 +595,7 @@ async function shiny_orc_stuff(mtmp) {   // mkmaze.c:748
 }
 async function migr_booty_item(otyp, gang) {   // mkmaze.c:780
     let otmp = null, $t1, $t2, $t3;
-    otmp = await mksobj_migr_to_species(otyp, M2_ORC, TRUE, FALSE);
+    otmp = await mksobj_migr_to_species(otyp, M2.ORC, TRUE, FALSE);
     if (otmp && gang) {
         await new_oname(otmp, await Strlen_(gang, $c.lit("migr_booty_item"), 786) + 1 >>> 0 | 0);
         $c.__builtin___strcpy_chk(otmp.oextra.oname, gang, -1);
@@ -629,7 +629,7 @@ async function stolen_booty() {   // mkmaze.c:799
         }
     }
     await migr_booty_item(rn2(2) ? LONG_SWORD : SILVER_SABER, gang);
-    mtmp = await makemon($c.relem(mons, PM_ORC_CAPTAIN), 0, 0, MM_NONAME);
+    mtmp = await makemon($c.relem(mons, PM.ORC_CAPTAIN), 0, 0, MM.NONAME);
     if (mtmp) {
         mtmp = await christen_monst(mtmp, upstart(gang));
         mtmp.mpeaceful = (0) & 1;
@@ -642,15 +642,15 @@ async function stolen_booty() {   // mkmaze.c:799
             continue;
         }
         if (is_orc(mtmp.data) && !has_mgivenname(mtmp) && rn2(10)) {
-            if (!$c.peq(mtmp.data, $c.relem(mons, PM_ORC_CAPTAIN))) {
+            if (!$c.peq(mtmp.data, $c.relem(mons, PM.ORC_CAPTAIN))) {
                 mtmp = await christen_orc(mtmp, upstart(gang), $c.lit(""));
             }
         }
     }
     cnt = rn2(10) + 5 | 0;
     for (i = 0; i < cnt; i = i + 1 | 0) {
-        mtyp = rn2(PM_ORC_SHAMAN - PM_ORC + 1) + PM_ORC | 0;
-        mtmp = await makemon($c.relem(mons, mtyp), 0, 0, MM_NONAME);
+        mtyp = rn2(PM.ORC_SHAMAN - PM.ORC + 1) + PM.ORC | 0;
+        mtmp = await makemon($c.relem(mons, mtyp), 0, 0, MM.NONAME);
         if (mtmp) {
             await shiny_orc_stuff(mtmp);
             await migrate_orc(mtmp, 0);
@@ -880,18 +880,18 @@ async function populate_maze() {   // mkmaze.c:1097
     }
     for (i = rn2(3); i; i = i - 1 | 0) {
         await mazexy(mm);
-        await makemon($c.relem(mons, PM_MINOTAUR), mm.x, mm.y, NO_MM_FLAGS);
+        await makemon($c.relem(mons, PM.MINOTAUR), mm.x, mm.y, NO.MM_FLAGS);
     }
     for (i = rn2(5) + 7 | 0; i; i = i - 1 | 0) {
         await mazexy(mm);
-        await makemon(null, mm.x, mm.y, NO_MM_FLAGS);
+        await makemon(null, mm.x, mm.y, NO.MM_FLAGS);
     }
     for (i = rn2(6) + 7 | 0; i; i = i - 1 | 0) {
         await mazexy(mm);
         await mkgold(0, mm.x, mm.y);
     }
     for (i = rn2(6) + 7 | 0; i; i = i - 1 | 0) {
-        await mktrap(0, MKTRAP_MAZEFLAG, null, null);
+        await mktrap(0, MKTRAP.MAZEFLAG, null, null);
     }
 }
 export async function makemaz(s) {   // mkmaze.c:1127
@@ -1138,10 +1138,10 @@ export function bound_digging() {   // mkmaze.c:1441
         for (y = 0; y < ROWNO; y = $c.i16(y + 1)) {
             if (svl.level.locations[x][y].typ <= DBWALL) {
                 if (y <= ymin[0] || y >= ymax[0] || x <= xmin[0] || x >= xmax[0]) {
-                    svl.level.locations[x][y].flags = ((svl.level.locations[x][y].flags | 0 | W_NONDIGGABLE) >>> 0) & 31;
+                    svl.level.locations[x][y].flags = ((svl.level.locations[x][y].flags | 0 | W.NONDIGGABLE) >>> 0) & 31;
                 }
                 if (y < ymin[0] || y > ymax[0] || x < xmin[0] || x > xmax[0]) {
-                    svl.level.locations[x][y].flags = ((svl.level.locations[x][y].flags | 0 | W_NONPASSWALL) >>> 0) & 31;
+                    svl.level.locations[x][y].flags = ((svl.level.locations[x][y].flags | 0 | W.NONPASSWALL) >>> 0) & 31;
                 }
             }
         }
@@ -1229,7 +1229,7 @@ export async function movebubbles() {   // mkmaze.c:1539
                             cons = $c.asRec(await alloc(24), $T.container, 24);
                             cons.x = x;
                             cons.y = y;
-                            cons.what = CONS_OBJ;
+                            cons.what = CONS.OBJ;
                             cons.list = olist;
                             cons.next = b.cons;
                             b.cons = cons;
@@ -1239,7 +1239,7 @@ export async function movebubbles() {   // mkmaze.c:1539
                             cons = $c.asRec(await alloc(24), $T.container, 24);
                             cons.x = x;
                             cons.y = y;
-                            cons.what = CONS_MON;
+                            cons.what = CONS.MON;
                             cons.list = mon;
                             cons.next = b.cons;
                             b.cons = cons;
@@ -1250,13 +1250,13 @@ export async function movebubbles() {   // mkmaze.c:1539
                             }
                             await newsym(x, y);
                             $t2 = mon.my = 0, mon.mx = $t2;
-                            mon.mstate = $c.or64(mon.mstate, MON_BUBBLEMOVE);
+                            mon.mstate = $c.or64(mon.mstate, MON.BUBBLEMOVE);
                         }
                         if (!u.uswallow && u_at(x, y)) {
                             cons = $c.asRec(await alloc(24), $T.container, 24);
                             cons.x = x;
                             cons.y = y;
-                            cons.what = CONS_HERO;
+                            cons.what = CONS.HERO;
                             cons.list = null;
                             cons.next = b.cons;
                             b.cons = cons;
@@ -1266,7 +1266,7 @@ export async function movebubbles() {   // mkmaze.c:1539
                             cons = $c.asRec(await alloc(24), $T.container, 24);
                             cons.x = x;
                             cons.y = y;
-                            cons.what = CONS_TRAP;
+                            cons.what = CONS.TRAP;
                             cons.list = btrap;
                             cons.next = b.cons;
                             b.cons = cons;
@@ -1307,7 +1307,7 @@ export async function movebubbles() {   // mkmaze.c:1539
 export async function water_friction() {   // mkmaze.c:1689
     let x = 0, y = 0, dx = 0, dy = 0, eff = 0;
     eff = FALSE;
-    if ((u.uprops[SWIMMING].intrinsic || u.uprops[SWIMMING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_SWIM) !== 0) && rn2(4)) {
+    if ((u.uprops[SWIMMING].intrinsic || u.uprops[SWIMMING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.SWIM) !== 0) && rn2(4)) {
         return;
     }
     if (u.dx && !rn2(!u.dy ? 3 : 6)) {
@@ -1406,7 +1406,7 @@ async function setup_waterlevel() {   // mkmaze.c:1812
     svx.xmax = svx.xmax < COLNO - 1 - 1 ? svx.xmax : COLNO - 1 - 1;
     svy.ymax = 20;
     svy.ymax = svy.ymax < ROWNO - 1 ? svy.ymax : ROWNO - 1;
-    glyph = ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S_water : S_air) === S_stone ? GLYPH_CMAP_STONE_OFF : ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S_water : S_air) <= S_trwall ? (((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S_water : S_air) - S_vwall | 0) + (In_mines(u.uz) ? GLYPH_CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH_CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH_CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH_CMAP_SOKO_OFF : GLYPH_CMAP_MAIN_OFF) | 0 : ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S_water : S_air) < S_altar ? (((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S_water : S_air) - S_ndoor | 0) + GLYPH_CMAP_A_OFF | 0 : ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S_water : S_air) === S_altar ? 4008 : ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S_water : S_air) < S_arrow_trap + MAXTCHARS ? (((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S_water : S_air) - S_grave | 0) + GLYPH_CMAP_B_OFF | 0 : ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S_water : S_air) <= S_goodpos ? (((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S_water : S_air) - S_digbeam | 0) + GLYPH_CMAP_C_OFF | 0 : NO_GLYPH;
+    glyph = ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S.water : S.air) === S.stone ? GLYPH.CMAP_STONE_OFF : ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S.water : S.air) <= S.trwall ? (((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S.water : S.air) - S.vwall | 0) + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) | 0 : ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S.water : S.air) < S.altar ? (((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S.water : S.air) - S.ndoor | 0) + GLYPH.CMAP_A_OFF | 0 : ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S.water : S.air) === S.altar ? 4008 : ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S.water : S.air) < S.arrow_trap + MAXTCHARS ? (((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S.water : S.air) - S.grave | 0) + GLYPH.CMAP_B_OFF | 0 : ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S.water : S.air) <= S.goodpos ? (((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? S.water : S.air) - S.digbeam | 0) + GLYPH.CMAP_C_OFF | 0 : NO_GLYPH;
     typ = (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? WATER : AIR;
     for (x = 1; x <= COLNO - 1; x = $c.i16(x + 1)) {
         for (y = 0; y <= ROWNO - 1; y = $c.i16(y + 1)) {
@@ -1559,7 +1559,7 @@ async function mv_bubble(b, dx, dy, ini) {   // mkmaze.c:1952
             cons.x = $c.i16(cons.x + dx | 0);
             cons.y = $c.i16(cons.y + dy | 0);
             switch (cons.what) {
-                case CONS_OBJ:
+                case CONS.OBJ:
                     {
                         for (olist = $c.asRec(cons.list, $T.obj, 112); olist; olist = otmp) {
                             otmp = olist.v.v_nexthere;
@@ -1568,15 +1568,15 @@ async function mv_bubble(b, dx, dy, ini) {   // mkmaze.c:1952
                         }
                         break;
                     }
-                case CONS_MON:
+                case CONS.MON:
                     {
                         mon = $c.asRec(cons.list, $T.monst, 192);
-                        if (!await mnearto(mon, cons.x, cons.y, TRUE, RLOC_NOMSG)) {
+                        if (!await mnearto(mon, cons.x, cons.y, TRUE, RLOC.NOMSG)) {
                             await elemental_clog(mon);
                         }
                         break;
                     }
-                case CONS_HERO:
+                case CONS.HERO:
                     {
                         mtmp = svl.level.monsters[cons.x][cons.y];
                         ux0 = u.ux;
@@ -1584,11 +1584,11 @@ async function mv_bubble(b, dx, dy, ini) {   // mkmaze.c:1952
                         await u_on_newpos(cons.x, cons.y);
                         await newsym($c.i16(ux0), $c.i16(uy0));
                         if (mtmp) {
-                            await mnexto(mtmp, RLOC_NOMSG);
+                            await mnexto(mtmp, RLOC.NOMSG);
                         }
                         break;
                     }
-                case CONS_TRAP:
+                case CONS.TRAP:
                     {
                         btrap = $c.asRec(cons.list, $T.trap, 32);
                         btrap.tx = cons.x;
@@ -1659,7 +1659,7 @@ export function $init() {
         CROSSWALL
     ]);
     movebubbles$water_pos.$copyFrom(new $T.rm());
-    movebubbles$water_pos.glyph = S_water - S_grave + GLYPH_CMAP_B_OFF;
+    movebubbles$water_pos.glyph = S.water - S.grave + GLYPH.CMAP_B_OFF;
     movebubbles$water_pos.typ = WATER;
     movebubbles$water_pos.seenv = 0;
     movebubbles$water_pos.flags = (0) & 31;
@@ -1670,7 +1670,7 @@ export function $init() {
     movebubbles$water_pos.edge = (0) & 1;
     movebubbles$water_pos.candig = (0) & 1;
     movebubbles$air_pos.$copyFrom(new $T.rm());
-    movebubbles$air_pos.glyph = S_cloud - S_grave + GLYPH_CMAP_B_OFF;
+    movebubbles$air_pos.glyph = S.cloud - S.grave + GLYPH.CMAP_B_OFF;
     movebubbles$air_pos.typ = AIR;
     movebubbles$air_pos.seenv = 0;
     movebubbles$air_pos.flags = (0) & 31;

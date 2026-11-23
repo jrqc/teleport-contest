@@ -10,17 +10,17 @@ import { oname } from './do_name.js';
 import { nh_terminate } from './end.js';
 import { debugcore } from './files.js';
 import { FALSE, ROWNO, TRUE } from './global.h.js';
-import { NO_MM_FLAGS, ONAME_NO_FLAGS } from './hack.h.js';
+import { NO, ONAME_NO_FLAGS } from './hack.h.js';
 import { dist2 } from './hacklib.js';
 import { hold_another_object } from './invent.js';
 import { nhUse } from './lint.macros.js';
-import { MSG_MAIL, MSG_OTHER } from './mail.h.js';
+import { MSG } from './mail.h.js';
 import { makemon } from './makemon.js';
 import { mksobj, new_omailcmd } from './mkobj.js';
 import { mongone } from './mon.js';
 import { accessible } from './monmove.js';
 import { mons } from './monst.js';
-import { PM_MAIL_DAEMON } from './monsters.h.js';
+import { PM } from './monsters.h.js';
 import { SCR_MAIL } from './objects.h.js';
 import { nh_getenv } from './options.js';
 import { pline, verbalize } from './pline.js';
@@ -145,7 +145,7 @@ async function md_stop(stopp, startp) {   // mail.c:248
             }
         }
     }
-    if (min_distance < 0 && !await enexto(stopp, u.ux, u.uy, $c.relem(mons, PM_MAIL_DAEMON))) {
+    if (min_distance < 0 && !await enexto(stopp, u.ux, u.uy, $c.relem(mons, PM.MAIL_DAEMON))) {
         return FALSE;
     }
     return TRUE;
@@ -238,7 +238,7 @@ async function newmail(info) {   // mail.c:399
         if (!await md_start(start) || !await md_stop(stop, start)) {
             break give_up$;
         }
-        if (!(md = await makemon($c.relem(mons, PM_MAIL_DAEMON), start.x, start.y, NO_MM_FLAGS))) {
+        if (!(md = await makemon($c.relem(mons, PM.MAIL_DAEMON), start.x, start.y, NO.MM_FLAGS))) {
             break give_up$;
         }
         go_back$: {
@@ -275,7 +275,7 @@ async function newmail(info) {   // mail.c:399
         }
         await mongone(md);
     }
-    if (!message_seen && info.message_typ === MSG_OTHER) {
+    if (!message_seen && info.message_typ === MSG.OTHER) {
         await pline($c.lit("Hark!  \"%s.\""), info.display_txt);
     }
 }
@@ -325,7 +325,7 @@ export function $init() {
         $c.lit("Pardon me!")
     ]);
     ckmailstatus$deliver.$copyFrom(new $T.mail_info());
-    ckmailstatus$deliver.message_typ = MSG_MAIL;
+    ckmailstatus$deliver.message_typ = MSG.MAIL;
     ckmailstatus$deliver.display_txt = $c.lit("I have some mail for you");
     ckmailstatus$deliver.object_nam = null;
     ckmailstatus$deliver.response_cmd = null;

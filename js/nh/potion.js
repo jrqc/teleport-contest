@@ -2,12 +2,11 @@
 import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
-import { A_CHAOTIC, A_LAWFUL } from './align.h.js';
 import { unfixable_trouble_count } from './apply.js';
 import { Sting_effects, permapoisoned, undiscovered_artifact } from './artifact.js';
-import { ART_EYES_OF_THE_OVERWORLD } from './artilist.h.js';
+import { ART } from './artilist.h.js';
 import { acurr, adjattrib, exercise, poisontell } from './attrib.js';
-import { A_CON, A_DEX, A_INT, A_MAX, A_STR, A_WIS } from './attrib.h.js';
+import { A } from './attrib.h.js';
 import { set_bc } from './ball.js';
 import { cmdq_peek, yn_function } from './cmd.js';
 import { is_pool } from './dbridge.js';
@@ -15,7 +14,7 @@ import { c_color_names, c_common_strings, cg, disp, flags, gm, gn, gp, gu, gv, g
 import { COIN_CLASS, POTION_CLASS, SPBOOK_CLASS, WEAPON_CLASS } from './defsym.h.js';
 import { monster_detect, object_detect } from './detect.js';
 import { canseemon, glyph_at, map_invisible, newsym, see_monsters, see_objects, see_traps, sensemon, set_mimic_blocking, swallowed, tmp_at, unmap_object } from './display.js';
-import { DISP_ALWAYS, DISP_END, EXPL_FIERY, GLYPH_INVISIBLE } from './display.h.js';
+import { DISP_ALWAYS, DISP_END, EXPL, GLYPH_INVISIBLE } from './display.h.js';
 import { canspotmon } from './display.macros.js';
 import { doup, goto_level, heal_legs, trycall } from './do.js';
 import { Monnam, a_monnam, docall, hcolor, hliquid, mon_nam, rndmonnam, x_monnam } from './do_name.js';
@@ -27,11 +26,11 @@ import { dealloc_killer, delayed_killer, find_delayed_killer } from './end.js';
 import { can_reach_floor } from './engrave.js';
 import { more_experienced, pluslvl, rndexp } from './exper.js';
 import { explode, explode_oil } from './explode.js';
-import { PLNMSG_OBJ_GLOWS } from './flag.h.js';
+import { PLNMSG } from './flag.h.js';
 import { dipfountain, dipsink, drinkfountain, drinksink, floating_above, wash_hands } from './fountain.js';
-import { COLNO, FALSE, LL_CONDUCT, ROWNO, TRUE } from './global.h.js';
+import { COLNO, FALSE, LL, ROWNO, TRUE } from './global.h.js';
 import { in_rooms, losehp, near_capacity, nomul, spoteffects } from './hack.js';
-import { ARTICLE_THE, BOLT_LIM, COST_NUTRLZ, COST_UNBLSS, COST_UNCURS, CQ_CANNED, ECMD_CANCEL, ECMD_FAIL, ECMD_OK, ECMD_TIME, ENL_GAMEINPROGRESS, EYE, FACE, FOOT, GETOBJ_DOWNPLAY, GETOBJ_EXCLUDE, GETOBJ_EXCLUDE_INACCESS, GETOBJ_EXCLUDE_NONINVENT, GETOBJ_NOFLAGS, GETOBJ_PROMPT, GETOBJ_SUGGEST, HAND, HEAD, KILLED_BY, KILLED_BY_AN, LEG, MAGICENLIGHTENMENT, MM_NOMSG, NOTELL, POLY_CONTROLLED, POLY_LOW_CTRL, POLY_NOFLAGS, SUPPRESS_IT, SUPPRESS_SADDLE } from './hack.h.js';
+import { ARTICLE, BOLT_LIM, COST, CQ_CANNED, ECMD, ENL, EYE, FACE, FOOT, GETOBJ, GETOBJ_PROMPT, HAND, HEAD, KILLED, LEG, MAGICENLIGHTENMENT, MM, NOTELL, POLY, SUPPRESS } from './hack.h.js';
 import { Maybe_Half_Phys, pline1, y_n } from './hack.macros.js';
 import { dist2, nh_snprintf, s_suffix, upstart } from './hacklib.js';
 import { enlightenment } from './insight.js';
@@ -43,17 +42,17 @@ import { cloneu } from './mhitu.js';
 import { bcsign, bless, costly_alteration, curse, dealloc_obj, fixup_oil, mkobj, mksobj, obj_extract_self, splitobj, unbless, uncurse } from './mkobj.js';
 import { SHOPBASE } from './mkroom.h.js';
 import { healmon, killed, mongone, monkilled, wake_nearto, wakeup } from './mon.js';
-import { AD_ACID, AD_DISE, AD_PEST } from './monattk.h.js';
+import { AD } from './monattk.h.js';
 import { dmgtype, mon_hates_blessings, monstseesu, monstunseesu, stagger } from './mondata.js';
 import { breathless, eyecount, has_head, haseyes, is_human, is_silent, is_swimmer, is_were, likes_fire } from './mondata.macros.js';
 import { G_GONE, NEUTRAL } from './monflag.h.js';
 import { mons } from './monst.js';
-import { M_AP_MONSTER, M_AP_NOTHING, M_SEEN_SLEEP } from './monst.h.js';
+import { M_AP, M_SEEN } from './monst.h.js';
 import { DEADMONSTER, U_AP_TYPE, is_vampshifter, ismnum, mon_perma_blind, resists_acid, resists_poison } from './monst.macros.js';
-import { PM_DJINNI, PM_GHOST, PM_GREEN_SLIME, PM_GREMLIN, PM_HEALER, PM_IRON_GOLEM, PM_LICHEN, PM_PESTILENCE } from './monsters.h.js';
+import { PM } from './monsters.h.js';
 import { mcureblindness } from './muse.js';
 import { discover_object, objdescr_is, observe_object } from './o_init.js';
-import { EF_GREASE, ERODE_CORRODE, ER_DESTROYED, ER_NOTHING, POTHIT_HERO_THROW, POTHIT_OTHER_THROW } from './obj.h.js';
+import { EF, ER, ERODE, POTHIT } from './obj.h.js';
 import { carried, is_ammo, is_plural, is_poisonable, is_weptool, pair_of } from './obj.macros.js';
 import { is_corrodeable, is_rustprone } from './objclass.macros.js';
 import { obj_descr, objects } from './objects.js';
@@ -63,13 +62,13 @@ import { waterbody_name } from './pager.js';
 import { NON_PM } from './permonst.h.js';
 import { You, You_feel, Your, impossible, livelog_printf, pline, pline_The, verbalize } from './pline.js';
 import { body_part, float_vs_flight, polyself } from './polyself.js';
-import { BLINDED, CONFUSION, DEAF, DETECT_MONSTERS, FAST, FROMOUTSIDE, GLIB, HALF_PHDAM, HALLUC, HALLUC_RES, INTRINSIC, INVIS, I_SPECIAL, LEVITATION, POISON_RES, SEE_INVIS, SICK, SLIMED, STONED, STUNNED, TIMEOUT, VOMITING, WARN_OF_MON, W_SADDLE, W_WEP } from './prop.h.js';
+import { BLINDED, CONFUSION, DEAF, DETECT_MONSTERS, FAST, FROMOUTSIDE, GLIB, HALF_PHDAM, HALLUC, HALLUC_RES, INTRINSIC, INVIS, I_SPECIAL, LEVITATION, POISON_RES, SEE_INVIS, SICK, SLIMED, STONED, STUNNED, TIMEOUT, VOMITING, W, WARN_OF_MON } from './prop.h.js';
 import { FOUNTAIN, SINK } from './rm.h.js';
 import { IS_FOUNTAIN, IS_SINK, MON_AT } from './rm.macros.js';
 import { d, rn2, rnd, rnl } from './rnd.js';
 import { genders } from './role.js';
 import { alter_cost, check_unpaid, obfree, shop_keeper, stolen_value, subfrombill } from './shk.js';
-import { P_BASIC, P_RIDING } from './skills.h.js';
+import { P } from './skills.h.js';
 import { stairway_at } from './stairs.js';
 import { remove_worn_item } from './steal.js';
 import { rider_cant_reach } from './steed.js';
@@ -189,9 +188,9 @@ export async function make_sick(xtime, cause, talk, type) {   // potion.c:137
     }
     kptr = find_delayed_killer(SICK);
     if (Sick()) {
-        await exercise(A_CON, FALSE);
+        await exercise(A.CON, FALSE);
         if (xtime || !old || !kptr) {
-            kpfx = cause && !$c.strcmp(cause, $c.lit("#wizintrinsic")) ? KILLED_BY : KILLED_BY_AN;
+            kpfx = cause && !$c.strcmp(cause, $c.lit("#wizintrinsic")) ? KILLED.BY : KILLED.BY_AN;
             await delayed_killer(SICK, kpfx, cause);
         }
     } else {
@@ -210,8 +209,8 @@ export async function make_slimed(xtime, msg) {   // potion.c:195
     }
     if (!Slimed()) {
         await dealloc_killer(find_delayed_killer(SLIMED));
-        if (U_AP_TYPE() === M_AP_MONSTER && gy.youmonst.mappearance === PM_GREEN_SLIME) {
-            gy.youmonst.m_ap_type = M_AP_NOTHING;
+        if (U_AP_TYPE() === M_AP.MONSTER && gy.youmonst.mappearance === PM.GREEN_SLIME) {
+            gy.youmonst.m_ap_type = M_AP.NOTHING;
             gy.youmonst.mappearance = 0;
         }
     }
@@ -312,7 +311,7 @@ export async function make_blinded(xtime, talk) {   // potion.c:261
 }
 export async function toggle_blindness() {   // potion.c:336
     let Stinging = 0;
-    Stinging = $c.i8($G.uwep && $c.and64(u.uprops[WARN_OF_MON].extrinsic, W_WEP) !== 0 ? 1 : 0);
+    Stinging = $c.i8($G.uwep && $c.and64(u.uprops[WARN_OF_MON].extrinsic, W.WEP) !== 0 ? 1 : 0);
     disp.botl = TRUE;
     gv.vision_full_recalc = 1;
     await vision_recalc(0);
@@ -408,7 +407,7 @@ export async function self_invis_message() {   // potion.c:471
 }
 async function ghost_from_bottle() {   // potion.c:481
     let mtmp = null;
-    mtmp = await makemon($c.relem(mons, PM_GHOST), u.ux, u.uy, MM_NOMSG);
+    mtmp = await makemon($c.relem(mons, PM.GHOST), u.ux, u.uy, MM.NOMSG);
     if (!mtmp) {
         await pline($c.lit("This bottle turns out to be empty."));
         return;
@@ -427,46 +426,46 @@ async function ghost_from_bottle() {   // potion.c:481
 }
 function drink_ok(obj) {   // potion.c:505
     if (!obj) {
-        return drink_ok_extra ? GETOBJ_EXCLUDE_NONINVENT : GETOBJ_EXCLUDE;
+        return drink_ok_extra ? GETOBJ.EXCLUDE_NONINVENT : GETOBJ.EXCLUDE;
     }
     if (obj.oclass === POTION_CLASS) {
-        return GETOBJ_SUGGEST;
+        return GETOBJ.SUGGEST;
     }
-    return GETOBJ_EXCLUDE;
+    return GETOBJ.EXCLUDE;
 }
 export async function dodrink() {   // potion.c:526
     let otmp = null;
     if (Strangled()) {
         await pline($c.lit("If you can't breathe air, how can you drink liquid?"));
-        return ECMD_OK;
+        return ECMD.OK;
     }
     drink_ok_extra = 0;
     if (!iflags.menu_requested) {
         if (svl.level.locations[u.ux][u.uy].typ === FOUNTAIN && can_reach_floor(FALSE)) {
             if (await yn_function($c.lit("Drink from the fountain?"), new $c.Ptr(ynchars, 0), 110, TRUE) === 121) {
                 await drinkfountain();
-                return ECMD_TIME;
+                return ECMD.TIME;
             }
             drink_ok_extra = drink_ok_extra + 1 | 0;
         }
         if (svl.level.locations[u.ux][u.uy].typ === SINK && can_reach_floor(FALSE)) {
             if (await yn_function($c.lit("Drink from the sink?"), new $c.Ptr(ynchars, 0), 110, TRUE) === 121) {
                 await drinksink();
-                return ECMD_TIME;
+                return ECMD.TIME;
             }
             drink_ok_extra = drink_ok_extra + 1 | 0;
         }
         if ((u.uinwater | 0) && !u.uswallow) {
             if (await yn_function($c.lit("Drink the water around you?"), new $c.Ptr(ynchars, 0), 110, TRUE) === 121) {
                 await pline($c.lit("Do you know what lives in this water?"));
-                return ECMD_TIME;
+                return ECMD.TIME;
             }
             drink_ok_extra = drink_ok_extra + 1 | 0;
         }
     }
-    otmp = await getobj($c.lit("drink"), drink_ok, GETOBJ_NOFLAGS);
+    otmp = await getobj($c.lit("drink"), drink_ok, GETOBJ.NOFLAGS);
     if (!otmp) {
-        return ECMD_CANCEL;
+        return ECMD.CANCEL;
     }
     if (otmp.owornmask) {
         if (otmp.quan > 1) {
@@ -477,14 +476,14 @@ export async function dodrink() {   // potion.c:526
         }
     }
     otmp.in_use = (TRUE) & 1;
-    if (await objdescr_is(otmp, $c.lit("milky")) && !(svm.mvitals[PM_GHOST].mvflags & G_GONE) && !rn2(13 + Math.imul(2, svm.mvitals[PM_GHOST].born) | 0)) {
+    if (await objdescr_is(otmp, $c.lit("milky")) && !(svm.mvitals[PM.GHOST].mvflags & G_GONE) && !rn2(13 + Math.imul(2, svm.mvitals[PM.GHOST].born) | 0)) {
         await ghost_from_bottle();
         await useup(otmp);
-        return ECMD_TIME;
-    } else if (await objdescr_is(otmp, $c.lit("smoky")) && !(svm.mvitals[PM_DJINNI].mvflags & G_GONE) && !rn2(13 + Math.imul(2, svm.mvitals[PM_DJINNI].born) | 0)) {
+        return ECMD.TIME;
+    } else if (await objdescr_is(otmp, $c.lit("smoky")) && !(svm.mvitals[PM.DJINNI].mvflags & G_GONE) && !rn2(13 + Math.imul(2, svm.mvitals[PM.DJINNI].born) | 0)) {
         await djinni_from_bottle(otmp);
         await useup(otmp);
-        return ECMD_TIME;
+        return ECMD.TIME;
     }
     return await dopotion(otmp);
 }
@@ -493,7 +492,7 @@ export async function dopotion(otmp) {   // potion.c:618
     otmp.in_use = (TRUE) & 1;
     $t1 = gp.potion_unkn = 0, gp.potion_nothing = $t1;
     if ((retval = await peffects(otmp)) >= 0) {
-        return retval ? ECMD_TIME : ECMD_OK;
+        return retval ? ECMD.TIME : ECMD.OK;
     }
     if (gp.potion_nothing) {
         gp.potion_unkn = gp.potion_unkn + 1 | 0;
@@ -508,7 +507,7 @@ export async function dopotion(otmp) {   // potion.c:618
         }
     }
     await useup(otmp);
-    return ECMD_TIME;
+    return ECMD.TIME;
 }
 async function peffect_restore_ability(otmp) {   // potion.c:646
     let i = 0, ii = 0, lim = 0;
@@ -518,8 +517,8 @@ async function peffect_restore_ability(otmp) {   // potion.c:646
         return;
     } else {
         await pline($c.lit("Wow!  This makes you feel %s!"), !otmp.blessed ? $c.lit("good") : unfixable_trouble_count(FALSE) ? $c.lit("better") : $c.lit("great"));
-        i = rn2(A_MAX);
-        for (ii = 0; ii < A_MAX; ii = ii + 1 | 0) {
+        i = rn2(A.MAX);
+        for (ii = 0; ii < A.MAX; ii = ii + 1 | 0) {
             lim = u.amax.a[i];
             if (u.acurr.a[i] < lim) {
                 u.acurr.a[i] = $c.i8(lim);
@@ -529,7 +528,7 @@ async function peffect_restore_ability(otmp) {   // potion.c:646
                     break;
                 }
             }
-            if ((i = i + 1 | 0) >= A_MAX) {
+            if ((i = i + 1 | 0) >= A.MAX) {
                 i = 0;
             }
         }
@@ -551,9 +550,9 @@ async function peffect_hallucination(otmp) {   // potion.c:696
     if (otmp.blessed | 0 && !rn2(3) || !otmp.cursed && !rn2(6)) {
         await You($c.lit("perceive yourself..."));
         await display_nhwindow()($G.WIN_MESSAGE, FALSE);
-        await enlightenment(MAGICENLIGHTENMENT, ENL_GAMEINPROGRESS);
+        await enlightenment(MAGICENLIGHTENMENT, ENL.GAMEINPROGRESS);
         await Your($c.lit("awareness re-normalizes."));
-        await exercise(A_WIS, TRUE);
+        await exercise(A.WIS, TRUE);
     }
 }
 async function peffect_water(otmp) {   // potion.c:717
@@ -565,10 +564,10 @@ async function peffect_water(otmp) {   // potion.c:717
         return;
     }
     gp.potion_unkn = gp.potion_unkn + 1 | 0;
-    if (mon_hates_blessings(gy.youmonst) || u.ualign.type === A_CHAOTIC) {
+    if (mon_hates_blessings(gy.youmonst) || u.ualign.type === A.CHAOTIC) {
         if (otmp.blessed) {
             await pline($c.lit("This burns like %s!"), hliquid($c.lit("acid")));
-            await exercise(A_CON, FALSE);
+            await exercise(A.CON, FALSE);
             if (ismnum(u.ulycn)) {
                 await Your($c.lit("affinity to %s disappears!"), await makeplural(mons[u.ulycn].pmnames[NEUTRAL]));
                 if ($c.peq(gy.youmonst.data, $c.relem(mons, u.ulycn))) {
@@ -576,35 +575,35 @@ async function peffect_water(otmp) {   // potion.c:717
                 }
                 await set_ulycn(NON_PM);
             }
-            await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(d(2, 6) + 1 | 0, 2) : d(2, 6), $c.lit("potion of holy water"), KILLED_BY_AN);
+            await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(d(2, 6) + 1 | 0, 2) : d(2, 6), $c.lit("potion of holy water"), KILLED.BY_AN);
         } else if (otmp.cursed) {
             await You_feel($c.lit("quite proud of yourself."));
             await healup(d(2, 6), 0, 0, 0);
             if (ismnum(u.ulycn) && !Upolyd()) {
                 await you_were();
             }
-            await exercise(A_CON, TRUE);
+            await exercise(A.CON, TRUE);
         }
     } else {
         if (otmp.blessed) {
             await You_feel($c.lit("full of awe."));
             await make_sick(0, null, TRUE, SICK_ALL);
-            await exercise(A_WIS, TRUE);
-            await exercise(A_CON, TRUE);
+            await exercise(A.WIS, TRUE);
+            await exercise(A.CON, TRUE);
             if (ismnum(u.ulycn)) {
                 await you_unwere(TRUE);
             }
         } else {
-            if (u.ualign.type === A_LAWFUL) {
+            if (u.ualign.type === A.LAWFUL) {
                 await pline($c.lit("This burns like %s!"), hliquid($c.lit("acid")));
-                await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(d(2, 6) + 1 | 0, 2) : d(2, 6), $c.lit("potion of unholy water"), KILLED_BY_AN);
+                await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(d(2, 6) + 1 | 0, 2) : d(2, 6), $c.lit("potion of unholy water"), KILLED.BY_AN);
             } else {
                 await You_feel($c.lit("full of dread."));
             }
             if (ismnum(u.ulycn) && !Upolyd()) {
                 await you_were();
             }
-            await exercise(A_CON, FALSE);
+            await exercise(A.CON, FALSE);
         }
     }
 }
@@ -620,7 +619,7 @@ async function peffect_booze(otmp) {   // potion.c:771
     }
     $t1 = Math.imul(10, 2 + bcsign(otmp) | 0), u.uhunger = u.uhunger + $t1 | 0;
     await newuhs(FALSE);
-    await exercise(A_WIS, FALSE);
+    await exercise(A.WIS, FALSE);
     if (otmp.cursed) {
         await You($c.lit("pass out."));
         $t2 = -rnd(15) | 0, gm.multi = $t2;
@@ -631,11 +630,11 @@ async function peffect_enlightenment(otmp) {   // potion.c:795
     if (otmp.cursed) {
         gp.potion_unkn = gp.potion_unkn + 1 | 0;
         await You($c.lit("have an uneasy feeling..."));
-        await exercise(A_WIS, FALSE);
+        await exercise(A.WIS, FALSE);
     } else {
         if (otmp.blessed) {
-            await adjattrib(A_INT, 1, FALSE);
-            await adjattrib(A_WIS, 1, FALSE);
+            await adjattrib(A.INT, 1, FALSE);
+            await adjattrib(A.WIS, 1, FALSE);
         }
         await do_enlightenment_effect();
     }
@@ -709,16 +708,16 @@ async function peffect_paralysis(otmp) {   // potion.c:881
         nomul(-(rn2(10) + (25 - Math.imul(12, bcsign(otmp)) | 0) | 0) | 0);
         gm.multi_reason = $c.lit("frozen by a potion");
         gn.nomovemsg = c_common_strings.c_You_can_move_again;
-        await exercise(A_DEX, FALSE);
+        await exercise(A.DEX, FALSE);
     }
 }
 async function peffect_sleeping(otmp) {   // potion.c:901
     if (Sleep_resistance() || Free_action()) {
-        monstseesu(M_SEEN_SLEEP);
+        monstseesu(M_SEEN.SLEEP);
         await You($c.lit("yawn."));
     } else {
         await You($c.lit("suddenly fall asleep!"));
-        monstunseesu(M_SEEN_SLEEP);
+        monstunseesu(M_SEEN.SLEEP);
         await fall_asleep(-(rn2(10) + (25 - Math.imul(12, bcsign(otmp)) | 0) | 0) | 0, TRUE);
     }
 }
@@ -759,14 +758,14 @@ async function peffect_monster_detection(otmp) {   // potion.c:914
     if (await monster_detect(otmp, 0)) {
         return 1;
     }
-    await exercise(A_WIS, TRUE);
+    await exercise(A.WIS, TRUE);
     return 0;
 }
 async function peffect_object_detection(otmp) {   // potion.c:955
     if (await object_detect(otmp, 0)) {
         return 1;
     }
-    await exercise(A_WIS, TRUE);
+    await exercise(A.WIS, TRUE);
     return 0;
 }
 async function peffect_sickness(otmp) {   // potion.c:964
@@ -774,17 +773,17 @@ async function peffect_sickness(otmp) {   // potion.c:964
     await pline($c.lit("Yecch!  This stuff tastes like poison."));
     if (otmp.blessed) {
         await pline($c.lit("(But in fact it was mildly stale %s.)"), await fruitname(TRUE));
-        if (!(gu.urole.mnum === PM_HEALER)) {
-            await losehp(1, $c.lit("mildly contaminated potion"), KILLED_BY_AN);
+        if (!(gu.urole.mnum === PM.HEALER)) {
+            await losehp(1, $c.lit("mildly contaminated potion"), KILLED.BY_AN);
         }
     } else {
         if (Poison_resistance()) {
             await pline($c.lit("(But in fact it was biologically contaminated %s.)"), await fruitname(TRUE));
         }
-        if (gu.urole.mnum === PM_HEALER) {
+        if (gu.urole.mnum === PM.HEALER) {
             await pline($c.lit("Fortunately, you have been immunized."));
         } else {
-            typ = rn2(A_MAX);
+            typ = rn2(A.MAX);
             $c.__builtin___sprintf_chk(new $c.Ptr(contaminant, 0), 0, 256, $c.lit("%s%s"), u.uprops[POISON_RES].intrinsic || u.uprops[POISON_RES].extrinsic ? $c.lit("mildly ") : $c.lit(""), otmp.corpsenm ? $c.lit("contaminated tap water") : $c.lit("contaminated potion"));
             if (!Fixed_abil()) {
                 await poisontell(typ, FALSE);
@@ -792,14 +791,14 @@ async function peffect_sickness(otmp) {   // potion.c:964
             }
             if (!Poison_resistance()) {
                 if (otmp.corpsenm) {
-                    await losehp(rnd(10) + Math.imul(5, !!otmp.cursed ? 1 : 0) | 0, new $c.Ptr(contaminant, 0), KILLED_BY);
+                    await losehp(rnd(10) + Math.imul(5, !!otmp.cursed ? 1 : 0) | 0, new $c.Ptr(contaminant, 0), KILLED.BY);
                 } else {
-                    await losehp(rnd(10) + Math.imul(5, !!otmp.cursed ? 1 : 0) | 0, new $c.Ptr(contaminant, 0), KILLED_BY_AN);
+                    await losehp(rnd(10) + Math.imul(5, !!otmp.cursed ? 1 : 0) | 0, new $c.Ptr(contaminant, 0), KILLED.BY_AN);
                 }
             } else {
-                await losehp(1 + rn2(2) | 0, new $c.Ptr(contaminant, 0), $c.i8(otmp.corpsenm ? KILLED_BY : KILLED_BY_AN));
+                await losehp(1 + rn2(2) | 0, new $c.Ptr(contaminant, 0), $c.i8(otmp.corpsenm ? KILLED.BY : KILLED.BY_AN));
             }
-            await exercise(A_CON, FALSE);
+            await exercise(A.CON, FALSE);
         }
     }
     if (Hallucination()) {
@@ -829,8 +828,8 @@ async function peffect_gain_ability(otmp) {   // potion.c:1030
         gp.potion_nothing = gp.potion_nothing + 1 | 0;
     } else {
         i = -1;
-        for (ii = A_MAX; ii > 0; ii = ii - 1 | 0) {
-            i = otmp.blessed | 0 ? i + 1 | 0 : rn2(A_MAX);
+        for (ii = A.MAX; ii > 0; ii = ii - 1 | 0) {
+            i = otmp.blessed | 0 ? i + 1 | 0 : rn2(A.MAX);
             itmp = otmp.blessed | 0 || ii === 1 ? 0 : -1;
             if (await adjattrib(i, 1, itmp) && !otmp.blessed) {
                 break;
@@ -889,14 +888,14 @@ async function peffect_gain_level(otmp) {   // potion.c:1083
 async function peffect_healing(otmp) {   // potion.c:1119
     await You_feel($c.lit("better."));
     await healup(8 + d(4 + Math.imul(2, bcsign(otmp)) | 0, 4) | 0, !otmp.cursed ? 1 : 0, $c.i8(!!otmp.blessed ? 1 : 0), $c.i8(!otmp.cursed ? 1 : 0));
-    await exercise(A_CON, TRUE);
+    await exercise(A.CON, TRUE);
 }
 async function peffect_extra_healing(otmp) {   // potion.c:1128
     await You_feel($c.lit("much better."));
     await healup(16 + d(4 + Math.imul(2, bcsign(otmp)) | 0, 8) | 0, otmp.blessed | 0 ? 5 : !otmp.cursed ? 2 : 0, $c.i8(!otmp.cursed ? 1 : 0), TRUE);
     await make_hallucinated(0, TRUE, 0);
-    await exercise(A_CON, TRUE);
-    await exercise(A_STR, TRUE);
+    await exercise(A.CON, TRUE);
+    await exercise(A.STR, TRUE);
     if (Wounded_legs() && (otmp.blessed | 0 && !u.usteed)) {
         await heal_legs(0);
     }
@@ -909,8 +908,8 @@ async function peffect_full_healing(otmp) {   // potion.c:1144
         await pluslvl(FALSE);
     }
     await make_hallucinated(0, TRUE, 0);
-    await exercise(A_STR, TRUE);
-    await exercise(A_CON, TRUE);
+    await exercise(A.STR, TRUE);
+    await exercise(A.CON, TRUE);
     if (Wounded_legs() && (otmp.blessed | 0 || !otmp.cursed && !u.usteed)) {
         await heal_legs(0);
     }
@@ -932,7 +931,7 @@ async function peffect_levitation(otmp) {   // potion.c:1165
         } else if (has_ceiling(u.uz)) {
             dmg = rnd(!$G.uarmh ? 10 : !hard_helmet($G.uarmh) ? 6 : 3);
             await You($c.lit("hit your %s on the %s."), await body_part(HEAD), ceiling(u.ux, u.uy));
-            await losehp(Maybe_Half_Phys(dmg), $c.lit("colliding with the ceiling"), KILLED_BY);
+            await losehp(Maybe_Half_Phys(dmg), $c.lit("colliding with the ceiling"), KILLED.BY);
             gp.potion_nothing = 0;
         }
     } else if (otmp.blessed) {
@@ -970,7 +969,7 @@ async function peffect_gain_energy(otmp) {   // potion.c:1224
         u.uen = 0;
     }
     disp.botl = TRUE;
-    await exercise(A_WIS, TRUE);
+    await exercise(A.WIS, TRUE);
 }
 async function peffect_oil(otmp) {   // potion.c:1260
     let good_for_you = 0, vulnerable = 0;
@@ -982,7 +981,7 @@ async function peffect_oil(otmp) {   // potion.c:1260
         } else {
             await You($c.lit("burn your %s."), await body_part(FACE));
             vulnerable = $c.i8(!Fire_resistance() || Cold_resistance() ? 1 : 0);
-            await losehp(d(vulnerable ? 4 : 2, 4), $c.lit("quaffing a burning potion of oil"), KILLED_BY);
+            await losehp(d(vulnerable ? 4 : 2, 4), $c.lit("quaffing a burning potion of oil"), KILLED.BY);
         }
         await burn_away_slime();
     } else if (otmp.cursed) {
@@ -990,7 +989,7 @@ async function peffect_oil(otmp) {   // potion.c:1260
     } else {
         await pline($c.lit("That was smooth!"));
     }
-    await exercise(A_WIS, good_for_you);
+    await exercise(A.WIS, good_for_you);
 }
 async function peffect_acid(otmp) {   // potion.c:1297
     let dmg = 0;
@@ -999,8 +998,8 @@ async function peffect_acid(otmp) {   // potion.c:1297
     } else {
         await pline($c.lit("This burns%s!"), otmp.blessed | 0 ? $c.lit(" a little") : otmp.cursed | 0 ? $c.lit(" a lot") : $c.lit(" like acid"));
         dmg = d(otmp.cursed | 0 ? 2 : 1, otmp.blessed | 0 ? 4 : 8);
-        await losehp(Maybe_Half_Phys(dmg), $c.lit("potion of acid"), KILLED_BY_AN);
-        await exercise(A_CON, FALSE);
+        await losehp(Maybe_Half_Phys(dmg), $c.lit("potion of acid"), KILLED.BY_AN);
+        await exercise(A.CON, FALSE);
     }
     if (Stoned()) {
         await fix_petrification();
@@ -1012,9 +1011,9 @@ async function peffect_polymorph(otmp) {   // potion.c:1318
     await You_feel($c.lit("a little %s."), Hallucination() ? $c.lit("normal") : $c.lit("strange"));
     if (!Unchanging()) {
         if (!otmp.blessed || u.umonnum !== u.umonster) {
-            await polyself(POLY_NOFLAGS);
+            await polyself(POLY.NOFLAGS);
         } else {
-            await polyself(POLY_CONTROLLED | POLY_LOW_CTRL);
+            await polyself(POLY.CONTROLLED | POLY.LOW_CTRL);
             if (u.mtimedone && u.umonnum !== u.umonster) {
                 $t1 = u.mtimedone < (rn2(15) + 10 | 0) ? u.mtimedone : rn2(15) + 10 | 0, u.mtimedone = $t1;
             }
@@ -1180,7 +1179,7 @@ async function H2Opotion_dip(potion, targobj, useeit, objphrase) {   // potion.c
         if (targobj.cursed) {
             func = uncurse;
             glowcolor = c_color_names.c_amber;
-            costchange = COST_UNCURS;
+            costchange = COST.UNCURS;
         } else if (!targobj.blessed) {
             func = bless;
             glowcolor = c_color_names.c_light_blue;
@@ -1191,7 +1190,7 @@ async function H2Opotion_dip(potion, targobj, useeit, objphrase) {   // potion.c
         if (targobj.blessed) {
             func = unbless;
             glowcolor = $c.lit("brown");
-            costchange = COST_UNBLSS;
+            costchange = COST.UNBLSS;
         } else if (!targobj.cursed) {
             func = curse;
             glowcolor = c_color_names.c_black;
@@ -1201,7 +1200,7 @@ async function H2Opotion_dip(potion, targobj, useeit, objphrase) {   // potion.c
     } else {
         if (carried(targobj)) {
             gm.mentioned_water = FALSE;
-            if (await water_damage(targobj, null, TRUE) !== ER_NOTHING) {
+            if (await water_damage(targobj, null, TRUE) !== ER.NOTHING) {
                 res = TRUE;
             }
             if (gm.mentioned_water) {
@@ -1218,7 +1217,7 @@ async function H2Opotion_dip(potion, targobj, useeit, objphrase) {   // potion.c
             } else {
                 await pline($c.lit("%s %s."), objphrase, glowcolor);
             }
-            iflags.last_msg = PLNMSG_OBJ_GLOWS;
+            iflags.last_msg = PLNMSG.OBJ_GLOWS;
             targobj.bknown = ((!Hallucination() ? 1 : 0) >>> 0) & 1;
         } else {
             if (!potion.bknown || !potion.dknown) {
@@ -1258,15 +1257,15 @@ export async function potionhit(mon, obj, how) {   // potion.c:1625
     isyou = $c.i8($c.peq(mon, gy.youmonst) ? 1 : 0);
     saddle = null;
     hit_saddle = FALSE;
-    your_fault = $c.i8(how <= POTHIT_HERO_THROW ? 1 : 0);
+    your_fault = $c.i8(how <= POTHIT.HERO_THROW ? 1 : 0);
     if (isyou) {
         tx = u.ux, ty = u.uy;
         distance = 0;
         await pline_The($c.lit("%s crashes on your %s and breaks into shards."), botlnam, await body_part(HEAD));
-        await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(rnd(2) + 1 | 0, 2) : rnd(2), how === POTHIT_OTHER_THROW ? $c.lit("propelled potion") : $c.lit("thrown potion"), KILLED_BY_AN);
+        await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(rnd(2) + 1 | 0, 2) : rnd(2), how === POTHIT.OTHER_THROW ? $c.lit("propelled potion") : $c.lit("thrown potion"), KILLED.BY_AN);
     } else {
         tx = mon.mx, ty = mon.my;
-        if ($c.and64(mon.misc_worn_check, W_SADDLE) && (saddle = await which_armor(mon, W_SADDLE)) && (!rn2(10) || obj.otyp === POT_WATER && (rnl(10) > 7 && obj.cursed | 0 || rnl(10) < 4 && obj.blessed | 0 || !rn2(3)))) {
+        if ($c.and64(mon.misc_worn_check, W.SADDLE) && (saddle = await which_armor(mon, W.SADDLE)) && (!rn2(10) || obj.otyp === POT_WATER && (rnl(10) > 7 && obj.cursed | 0 || rnl(10) < 4 && obj.blessed | 0 || !rn2(3)))) {
             hit_saddle = TRUE;
         }
         distance = dist2($c.i16(tx), $c.i16(ty), u.ux, u.uy);
@@ -1275,7 +1274,7 @@ export async function potionhit(mon, obj, how) {   // potion.c:1625
         } else {
             mnam = await mon_nam(mon);
             if (hit_saddle && saddle) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s saddle"), s_suffix(await x_monnam(mon, ARTICLE_THE, null, SUPPRESS_IT | SUPPRESS_SADDLE, FALSE)));
+                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s saddle"), s_suffix(await x_monnam(mon, ARTICLE.THE, null, SUPPRESS.IT | SUPPRESS.SADDLE, FALSE)));
             } else if (has_head(mon.data)) {
                 $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s %s"), s_suffix(mnam), gn.notonhead ? $c.lit("body") : $c.lit("head"));
             } else {
@@ -1300,21 +1299,21 @@ export async function potionhit(mon, obj, how) {   // potion.c:1625
             case POT_POLYMORPH:
                 await You_feel($c.lit("a little %s."), Hallucination() ? $c.lit("normal") : $c.lit("strange"));
                 if (!Unchanging() && !Antimagic()) {
-                    await polyself(POLY_NOFLAGS);
+                    await polyself(POLY.NOFLAGS);
                 }
                 break;
             case POT_ACID:
                 if (!Acid_resistance()) {
                     await pline($c.lit("This burns%s!"), obj.blessed | 0 ? $c.lit(" a little") : obj.cursed | 0 ? $c.lit(" a lot") : $c.lit(""));
                     dmg = d(obj.cursed | 0 ? 2 : 1, obj.blessed | 0 ? 4 : 8);
-                    await losehp(Maybe_Half_Phys(dmg), $c.lit("potion of acid"), KILLED_BY_AN);
+                    await losehp(Maybe_Half_Phys(dmg), $c.lit("potion of acid"), KILLED.BY_AN);
                 }
                 break;
         }
     } else if (hit_saddle && saddle) {
         affected = FALSE;
         useeit = $c.i8(!Blind() && canseemon(mon) && cansee(tx, ty) ? 1 : 0);
-        mnam$2 = await x_monnam(mon, ARTICLE_THE, null, SUPPRESS_IT | SUPPRESS_SADDLE, FALSE);
+        mnam$2 = await x_monnam(mon, ARTICLE.THE, null, SUPPRESS.IT | SUPPRESS.SADDLE, FALSE);
         $c.__builtin___sprintf_chk(new $c.Ptr(buf$2, 0), 0, 256, $c.lit("%s"), upstart(s_suffix(mnam$2)));
         switch (obj.otyp) {
             case POT_WATER:
@@ -1342,7 +1341,7 @@ export async function potionhit(mon, obj, how) {   // potion.c:1625
                     if (obj.blessed) {
                         cureblind = TRUE;
                     }
-                    if ($c.peq(mon.data, $c.relem(mons, PM_PESTILENCE))) {
+                    if ($c.peq(mon.data, $c.relem(mons, PM.PESTILENCE))) {
                         $goto = "do_illness"; continue S1;
                     }
                 case POT_RESTORE_ABILITY:
@@ -1361,10 +1360,10 @@ export async function potionhit(mon, obj, how) {   // potion.c:1625
                     }
                     break;
                 case POT_SICKNESS:
-                    if ($c.peq(mon.data, $c.relem(mons, PM_PESTILENCE))) {
+                    if ($c.peq(mon.data, $c.relem(mons, PM.PESTILENCE))) {
                         $goto = "do_healing"; continue S1;
                     }
-                    if (dmgtype(mon.data, AD_DISE) || dmgtype(mon.data, AD_PEST) || await resists_poison(mon)) {
+                    if (dmgtype(mon.data, AD.DISE) || dmgtype(mon.data, AD.PEST) || await resists_poison(mon)) {
                         if (canseemon(mon)) {
                             await pline($c.lit("%s looks unharmed."), await Monnam(mon));
                         }
@@ -1448,10 +1447,10 @@ export async function potionhit(mon, obj, how) {   // potion.c:1625
                                 await new_were(mon);
                             }
                         }
-                    } else if ($c.peq(mon.data, $c.relem(mons, PM_GREMLIN))) {
+                    } else if ($c.peq(mon.data, $c.relem(mons, PM.GREMLIN))) {
                         angermon = FALSE;
                         await split_mon(mon, null);
-                    } else if ($c.peq(mon.data, $c.relem(mons, PM_IRON_GOLEM))) {
+                    } else if ($c.peq(mon.data, $c.relem(mons, PM.IRON_GOLEM))) {
                         if (canseemon(mon)) {
                             await pline($c.lit("%s rusts."), await Monnam(mon));
                         }
@@ -1477,7 +1476,7 @@ export async function potionhit(mon, obj, how) {   // potion.c:1625
                             if (your_fault) {
                                 await killed(mon);
                             } else {
-                                await monkilled(mon, $c.lit(""), AD_ACID);
+                                await monkilled(mon, $c.lit(""), AD.ACID);
                             }
                         }
                     }
@@ -1496,7 +1495,7 @@ export async function potionhit(mon, obj, how) {   // potion.c:1625
             }
         }
     }
-    if ((distance === 0 || distance < 3 && !rn2($c.div32(1 + acurr(A_DEX) | 0, 2))) && (!breathless(gy.youmonst.data) || haseyes(gy.youmonst.data))) {
+    if ((distance === 0 || distance < 3 && !rn2($c.div32(1 + acurr(A.DEX) | 0, 2))) && (!breathless(gy.youmonst.data) || haseyes(gy.youmonst.data))) {
         await potionbreathe(obj);
     } else if (obj.dknown | 0 && cansee(tx, ty)) {
         await trycall(obj);
@@ -1537,14 +1536,14 @@ export async function potionbreathe(obj) {   // potion.c:1932
                 }
                 break;
             } else {
-                i = rn2(A_MAX);
-                for (isdone = ii = 0; !isdone && ii < A_MAX; ii = ii + 1 | 0) {
+                i = rn2(A.MAX);
+                for (isdone = ii = 0; !isdone && ii < A.MAX; ii = ii + 1 | 0) {
                     if (u.acurr.a[i] < u.amax.a[i]) {
                         u.acurr.a[i] = $c.i8(u.acurr.a[i] + 1);
                         isdone = !obj.blessed ? 1 : 0;
                         disp.botl = TRUE;
                     }
-                    if ((i = i + 1 | 0) >= A_MAX) {
+                    if ((i = i + 1 | 0) >= A.MAX) {
                         i = 0;
                     }
                 }
@@ -1582,10 +1581,10 @@ export async function potionbreathe(obj) {   // potion.c:1932
                 await make_blinded(0, $c.i8(!u.ucreamed ? 1 : 0));
                 await make_deaf(0, TRUE);
             }
-            await exercise(A_CON, TRUE);
+            await exercise(A.CON, TRUE);
             break;
         case POT_SICKNESS:
-            if (!(gu.urole.mnum === PM_HEALER)) {
+            if (!(gu.urole.mnum === PM.HEALER)) {
                 if (Upolyd()) {
                     if (u.mh <= 5) {
                         u.mh = 1;
@@ -1600,7 +1599,7 @@ export async function potionbreathe(obj) {   // potion.c:1932
                     }
                 }
                 disp.botl = TRUE;
-                await exercise(A_CON, FALSE);
+                await exercise(A.CON, FALSE);
             }
             break;
         case POT_HALLUCINATION:
@@ -1626,7 +1625,7 @@ export async function potionbreathe(obj) {   // potion.c:1932
                 nomul(-rnd(5) | 0);
                 gm.multi_reason = $c.lit("frozen by a potion");
                 gn.nomovemsg = c_common_strings.c_You_can_move_again;
-                await exercise(A_DEX, FALSE);
+                await exercise(A.DEX, FALSE);
             } else {
                 await You($c.lit("stiffen momentarily."));
             }
@@ -1638,10 +1637,10 @@ export async function potionbreathe(obj) {   // potion.c:1932
                 nomul(-rnd(5) | 0);
                 gm.multi_reason = $c.lit("sleeping off a magical draught");
                 gn.nomovemsg = c_common_strings.c_You_can_move_again;
-                await exercise(A_DEX, FALSE);
+                await exercise(A.DEX, FALSE);
             } else {
                 await You($c.lit("yawn."));
-                monstseesu(M_SEEN_SLEEP);
+                monstseesu(M_SEEN.SLEEP);
             }
             break;
         case POT_SPEED:
@@ -1649,7 +1648,7 @@ export async function potionbreathe(obj) {   // potion.c:1932
                 await Your($c.lit("knees seem more flexible now."));
             }
             incr_itimeout(new $c.FieldRef(u.uprops[FAST], "intrinsic", "i64"), rnd(5));
-            await exercise(A_DEX, TRUE);
+            await exercise(A.DEX, TRUE);
             break;
         case POT_BLINDNESS:
             if (!Blind() && !Unaware()) {
@@ -1662,7 +1661,7 @@ export async function potionbreathe(obj) {   // potion.c:1932
             }
             break;
         case POT_WATER:
-            if (u.umonnum === PM_GREMLIN) {
+            if (u.umonnum === PM.GREMLIN) {
                 await split_mon(gy.youmonst, null);
             } else if (ismnum(u.ulycn)) {
                 if (obj.blessed | 0 && $c.peq(gy.youmonst.data, $c.relem(mons, u.ulycn))) {
@@ -1674,7 +1673,7 @@ export async function potionbreathe(obj) {   // potion.c:1932
             break;
         case POT_ACID:
         case POT_POLYMORPH:
-            await exercise(A_CON, FALSE);
+            await exercise(A.CON, FALSE);
             break;
     }
     if (!already_in_use) {
@@ -1769,19 +1768,19 @@ function mixtype(o1, o2) {   // potion.c:2122
 }
 async function dip_ok(obj) {   // potion.c:2214
     if (!obj) {
-        return GETOBJ_DOWNPLAY;
+        return GETOBJ.DOWNPLAY;
     }
     if (obj.oclass === COIN_CLASS) {
-        return GETOBJ_EXCLUDE;
+        return GETOBJ.EXCLUDE;
     }
     if (await inaccessible_equipment(obj, null, FALSE)) {
-        return GETOBJ_EXCLUDE_INACCESS;
+        return GETOBJ.EXCLUDE_INACCESS;
     }
-    return GETOBJ_SUGGEST;
+    return GETOBJ.SUGGEST;
 }
 async function dip_hands_ok(obj) {   // potion.c:2231
     if (!obj && (Glib() && can_reach_floor(FALSE))) {
-        return GETOBJ_SUGGEST;
+        return GETOBJ.SUGGEST;
     }
     return await dip_ok(obj);
 }
@@ -1808,10 +1807,10 @@ export async function dodip() {   // potion.c:2267
     at_here = $c.i8(!iflags.menu_requested && (at_pool || at_fountain || at_sink) ? 1 : 0);
     obj = await getobj($c.lit("dip"), at_here ? dip_hands_ok : dip_ok, GETOBJ_PROMPT);
     if (!obj) {
-        return ECMD_CANCEL;
+        return ECMD.CANCEL;
     }
     if (await inaccessible_equipment(obj, $c.lit("dip"), FALSE)) {
-        return ECMD_OK;
+        return ECMD.OK;
     }
     is_hands = $c.i8($c.peq(obj, hands_obj) ? 1 : 0);
     shortestname = is_hands || is_plural(obj) || pair_of(obj) ? $c.lit("them") : $c.lit("it");
@@ -1830,7 +1829,7 @@ export async function dodip() {   // potion.c:2267
                     obj.pickup_prev = (0) & 1;
                 }
                 await dipfountain(obj);
-                return ECMD_TIME;
+                return ECMD.TIME;
             }
             drink_ok_extra = drink_ok_extra + 1 | 0;
         } else if (at_sink) {
@@ -1840,7 +1839,7 @@ export async function dodip() {   // potion.c:2267
                     obj.pickup_prev = (0) & 1;
                 }
                 await dipsink(obj);
-                return ECMD_TIME;
+                return ECMD.TIME;
             }
             drink_ok_extra = drink_ok_extra + 1 | 0;
         } else if (at_pool) {
@@ -1849,7 +1848,7 @@ export async function dodip() {   // potion.c:2267
             if (await y_n(new $c.Ptr(qbuf, 0)) === 121) {
                 if (Levitation()) {
                     await floating_above(pooltype);
-                } else if (u.usteed && !is_swimmer(u.usteed.data) && u.weapon_skills[P_RIDING].skill < P_BASIC) {
+                } else if (u.usteed && !is_swimmer(u.usteed.data) && u.weapon_skills[P.RIDING].skill < P.BASIC) {
                     await rider_cant_reach();
                 } else if (is_hands || $c.peq(obj, $G.uarmg)) {
                     if (!is_hands) {
@@ -1861,19 +1860,19 @@ export async function dodip() {   // potion.c:2267
                     if (obj.otyp === POT_ACID) {
                         obj.in_use = (1) & 1;
                     }
-                    if (await water_damage(obj, null, TRUE) !== ER_DESTROYED && obj.in_use | 0) {
+                    if (await water_damage(obj, null, TRUE) !== ER.DESTROYED && obj.in_use | 0) {
                         await useup(obj);
                     }
                 }
-                return ECMD_TIME;
+                return ECMD.TIME;
             }
             drink_ok_extra = drink_ok_extra + 1 | 0;
         }
     }
     nh_snprintf($c.lit("dodip"), 2367, new $c.Ptr(qbuf, 0), 128, $c.lit("dip %s into"), flags.verbose ? new $c.Ptr(obuf, 0) : shortestname);
-    potion = await getobj(new $c.Ptr(qbuf, 0), drink_ok, GETOBJ_NOFLAGS);
+    potion = await getobj(new $c.Ptr(qbuf, 0), drink_ok, GETOBJ.NOFLAGS);
     if (!potion) {
-        return ECMD_CANCEL;
+        return ECMD.CANCEL;
     }
     return await potion_dip(obj, potion);
 }
@@ -1881,20 +1880,20 @@ export async function dip_into() {   // potion.c:2379
     let obj = null, potion = null, qbuf = new Int8Array(128);
     if (!cmdq_peek(CQ_CANNED)) {
         await impossible($c.lit("dip_into: where is potion?"));
-        return ECMD_FAIL;
+        return ECMD.FAIL;
     }
     drink_ok_extra = 0;
-    potion = await getobj($c.lit("dip"), drink_ok, GETOBJ_NOFLAGS);
+    potion = await getobj($c.lit("dip"), drink_ok, GETOBJ.NOFLAGS);
     if (!potion || potion.oclass !== POTION_CLASS) {
-        return ECMD_CANCEL;
+        return ECMD.CANCEL;
     }
-    nh_snprintf($c.lit("dip_into"), 2398, new $c.Ptr(qbuf, 0), 128, $c.lit("dip into %s%s"), potion.quan !== 1 || potion.oartifact === ART_EYES_OF_THE_OVERWORLD && !undiscovered_artifact(ART_EYES_OF_THE_OVERWORLD) ? $c.lit("one of ") : $c.lit(""), await thesimpleoname(potion));
+    nh_snprintf($c.lit("dip_into"), 2398, new $c.Ptr(qbuf, 0), 128, $c.lit("dip into %s%s"), potion.quan !== 1 || potion.oartifact === ART.EYES_OF_THE_OVERWORLD && !undiscovered_artifact(ART.EYES_OF_THE_OVERWORLD) ? $c.lit("one of ") : $c.lit(""), await thesimpleoname(potion));
     obj = await getobj(new $c.Ptr(qbuf, 0), dip_ok, GETOBJ_PROMPT);
     if (!obj) {
-        return ECMD_CANCEL;
+        return ECMD.CANCEL;
     }
     if (await inaccessible_equipment(obj, $c.lit("dip"), FALSE)) {
-        return ECMD_OK;
+        return ECMD.OK;
     }
     return await potion_dip(obj, potion);
 }
@@ -1909,12 +1908,12 @@ async function dip_potion_explosion(obj, dmg) {   // potion.c:2417
         obj.in_use = (1) & 1;
         await pline($c.lit("%sThey explode!"), !Deaf() ? $c.lit("BOOM!  ") : $c.lit(""));
         await wake_nearto(u.ux, u.uy, (BOLT_LIM + 1) * (BOLT_LIM + 1));
-        await exercise(A_STR, FALSE);
+        await exercise(A.STR, FALSE);
         if (!breathless(gy.youmonst.data) || haseyes(gy.youmonst.data)) {
             await potionbreathe(obj);
         }
         await useupall(obj);
-        await losehp(dmg, $c.lit("alchemic blast"), KILLED_BY_AN);
+        await losehp(dmg, $c.lit("alchemic blast"), KILLED.BY_AN);
         return TRUE;
     }
     return FALSE;
@@ -1923,11 +1922,11 @@ async function potion_dip(obj, potion) {   // potion.c:2442
     let singlepotion = null, qbuf = new Int8Array(128), mixture = 0, useeit = 0, obj_glows = null, save_otyp = 0, amt = 0, magic = 0, otmp = null, buf = new Int8Array(256), wisx = 0, oldbuf = new Int8Array(256), newbuf = new Int8Array(256), old_otyp = 0, old_dknown = 0, more_than_one = 0, fakeobj = new $T.obj(), $t1, $t2, $t3, $t4;
     if ($c.peq(potion, obj) && potion.quan === 1) {
         await pline($c.lit("That is a potion bottle, not a Klein bottle!"));
-        return ECMD_OK;
+        return ECMD.OK;
     }
     if ($c.peq(obj, hands_obj)) {
         await You($c.lit("can't fit your %s into the mouth of the bottle!"), await body_part(HAND));
-        return ECMD_OK;
+        return ECMD.OK;
     }
     obj.pickup_prev = (0) & 1;
     potion.in_use = (TRUE) & 1;
@@ -1936,7 +1935,7 @@ async function potion_dip(obj, potion) {   // potion.c:2442
         obj_glows = await Yobjnam2(obj, $c.lit("glow"));
         if (await H2Opotion_dip(potion, obj, useeit, obj_glows)) {
             await poof(potion);
-            return ECMD_TIME;
+            return ECMD.TIME;
         }
     } else if (obj.otyp === POT_POLYMORPH || potion.otyp === POT_POLYMORPH) {
         if (obj_unpolyable(obj.otyp === POT_POLYMORPH ? potion : obj)) {
@@ -1944,25 +1943,25 @@ async function potion_dip(obj, potion) {   // potion.c:2442
         } else {
             save_otyp = obj.otyp;
             if (!($t1 = u.uconduct.polypiles, u.uconduct.polypiles = $c.add64($t1, 1), $t1)) {
-                await livelog_printf(LL_CONDUCT, $c.lit("polymorphed %s first item"), genders[flags.female ? 1 : 0].his);
+                await livelog_printf(LL.CONDUCT, $c.lit("polymorphed %s first item"), genders[flags.female ? 1 : 0].his);
             }
             obj = await poly_obj(obj, STRANGE_OBJECT);
             if (!obj) {
                 await discover_object(POT_POLYMORPH, TRUE, TRUE, TRUE);
-                return ECMD_TIME;
+                return ECMD.TIME;
             } else if (obj.otyp !== save_otyp) {
                 await discover_object(POT_POLYMORPH, TRUE, TRUE, TRUE);
                 await useup(potion);
                 await prinv(null, obj, 0);
-                return ECMD_TIME;
+                return ECMD.TIME;
             } else {
                 await pline($c.lit("%s"), c_common_strings.c_nothing_seems_to_happen);
                 await poof(potion);
-                return ECMD_TIME;
+                return ECMD.TIME;
             }
         }
         potion.in_use = (FALSE) & 1;
-        return ECMD_TIME;
+        return ECMD.TIME;
     } else if (obj.oclass === POTION_CLASS && obj.otyp !== potion.otyp) {
         amt = $c.i32(obj.quan);
         mixture = mixtype(obj, potion);
@@ -1984,7 +1983,7 @@ async function potion_dip(obj, potion) {   // potion.c:2442
         await pline($c.lit("%s %s %s with %s%s..."), new $c.Ptr(qbuf, 0), await simpleonames(obj), await otense(obj, $c.lit("mix")), potion.quan > 1 ? $c.lit("one of ") : $c.lit(""), await thesimpleoname(potion));
         await useup(potion);
         if (await dip_potion_explosion(obj, amt + rnd(9) | 0)) {
-            return ECMD_TIME;
+            return ECMD.TIME;
         }
         $t3 = ($t2 = obj.bknown = (0) & 1, obj.cursed = ($t2) & 1), obj.blessed = ($t3) & 1;
         if (Blind() || Hallucination()) {
@@ -2012,7 +2011,7 @@ async function potion_dip(obj, potion) {   // potion.c:2442
                 default:
                     await useupall(obj);
                     await pline_The($c.lit("mixture %sevaporates."), !Blind() ? $c.lit("glows brightly and ") : $c.lit(""));
-                    return ECMD_TIME;
+                    return ECMD.TIME;
             }
         }
         obj.oeroded = ((obj.otyp !== POT_WATER ? 1 : 0) >>> 0) & 3;
@@ -2023,20 +2022,20 @@ async function potion_dip(obj, potion) {   // potion.c:2442
         }
         await freeinv(obj);
         await hold_potion(obj, $c.lit("You drop %s!"), await doname(obj), null);
-        return ECMD_TIME;
+        return ECMD.TIME;
     }
-    if (potion.otyp === POT_ACID && obj.otyp === CORPSE && obj.corpsenm === PM_LICHEN) {
+    if (potion.otyp === POT_ACID && obj.otyp === CORPSE && obj.corpsenm === PM.LICHEN) {
         await pline($c.lit("%s %s %s around the edges."), await The(await cxname(obj)), await otense(obj, $c.lit("turn")), Blind() ? $c.lit("wrinkled") : potion.oeroded | 0 ? hcolor(c_color_names.c_orange) : hcolor(c_color_names.c_red));
         potion.in_use = (FALSE) & 1;
         if (potion.dknown) {
             await trycall(potion);
         }
-        return ECMD_TIME;
+        return ECMD.TIME;
     }
     if (potion.otyp === POT_WATER && obj.otyp === TOWEL) {
         await pline_The($c.lit("towel soaks it up!"));
         await poof(potion);
-        return ECMD_TIME;
+        return ECMD.TIME;
     }
     if (is_poisonable(obj)) {
         if (potion.otyp === POT_SICKNESS && !obj.otrapped) {
@@ -2048,18 +2047,18 @@ async function potion_dip(obj, potion) {   // potion.c:2442
             await pline($c.lit("%s forms a coating on %s."), new $c.Ptr(buf, 0), await the(await xname(obj)));
             obj.otrapped = (TRUE) & 1;
             await poof(potion);
-            return ECMD_TIME;
+            return ECMD.TIME;
         } else if (obj.otrapped | 0 && !permapoisoned(obj) && (potion.otyp === POT_HEALING || potion.otyp === POT_EXTRA_HEALING || potion.otyp === POT_FULL_HEALING)) {
             await pline($c.lit("A coating wears off %s."), await the(await xname(obj)));
             obj.otrapped = (0) & 1;
             await poof(potion);
-            return ECMD_TIME;
+            return ECMD.TIME;
         }
     }
     if (potion.otyp === POT_ACID) {
-        if (await erode_obj(obj, null, ERODE_CORRODE, EF_GREASE) !== ER_NOTHING) {
+        if (await erode_obj(obj, null, ERODE.CORRODE, EF.GREASE) !== ER.NOTHING) {
             await poof(potion);
-            return ECMD_TIME;
+            return ECMD.TIME;
         }
     }
     more_dips$: {
@@ -2088,20 +2087,20 @@ async function potion_dip(obj, potion) {   // potion.c:2442
                 }
                 wisx = TRUE;
             }
-            await exercise(A_WIS, wisx);
+            await exercise(A.WIS, wisx);
             if (potion.dknown) {
                 await discover_object(potion.otyp, TRUE, TRUE, TRUE);
             }
             await useup(potion);
-            return ECMD_TIME;
+            return ECMD.TIME;
         }
     }
     if ((obj.otyp === OIL_LAMP || obj.otyp === MAGIC_LAMP) && potion.otyp === POT_OIL) {
         if (obj.lamplit | 0 || potion.lamplit | 0) {
             await useup(potion);
-            await explode(u.ux, u.uy, 11, d(6, 6), 0, EXPL_FIERY);
-            await exercise(A_WIS, FALSE);
-            return ECMD_TIME;
+            await explode(u.ux, u.uy, 11, d(6, 6), 0, EXPL.FIERY);
+            await exercise(A.WIS, FALSE);
+            return ECMD.TIME;
         }
         if (obj.otyp === MAGIC_LAMP && obj.spe === 0) {
             obj.otyp = OIL_LAMP;
@@ -2118,14 +2117,14 @@ async function potion_dip(obj, potion) {   // potion.c:2442
                 obj.age = 1500;
             }
             await useup(potion);
-            await exercise(A_WIS, TRUE);
+            await exercise(A.WIS, TRUE);
         }
         if (potion.dknown) {
             await discover_object(POT_OIL, TRUE, TRUE, TRUE);
         }
         obj.spe = 1;
         await update_inventory();
-        return ECMD_TIME;
+        return ECMD.TIME;
     }
     potion.in_use = (FALSE) & 1;
     if ((obj.otyp === UNICORN_HORN || obj.otyp === AMETHYST) && (mixture = mixtype(obj, potion)) !== STRANGE_OBJECT) {
@@ -2142,7 +2141,7 @@ async function potion_dip(obj, potion) {   // potion.c:2442
         } else {
             singlepotion = potion;
         }
-        await costly_alteration(singlepotion, COST_NUTRLZ);
+        await costly_alteration(singlepotion, COST.NUTRLZ);
         singlepotion.otyp = mixture;
         singlepotion.blessed = (0) & 1;
         if (mixture === POT_WATER) {
@@ -2176,10 +2175,10 @@ async function potion_dip(obj, potion) {   // potion.c:2442
             }
         }
         await hold_potion(singlepotion, $c.lit("You juggle and drop %s!"), await doname(singlepotion), null);
-        return ECMD_TIME;
+        return ECMD.TIME;
     }
     await pline($c.lit("Interesting..."));
-    return ECMD_TIME;
+    return ECMD.TIME;
 }
 export async function mongrantswish(monp) {   // potion.c:2796
     let mon = null, mx = 0, my = 0, glyph = 0;
@@ -2196,7 +2195,7 @@ export async function mongrantswish(monp) {   // potion.c:2796
 }
 export async function djinni_from_bottle(obj) {   // potion.c:2815
     let mtmp = [null], chance = 0;
-    if (!(mtmp[0] = await makemon($c.relem(mons, PM_DJINNI), u.ux, u.uy, MM_NOMSG))) {
+    if (!(mtmp[0] = await makemon($c.relem(mons, PM.DJINNI), u.ux, u.uy, MM.NOMSG))) {
         await pline($c.lit("It turns out to be empty."));
         return;
     }
@@ -2280,7 +2279,7 @@ export async function speed_up(duration) {   // potion.c:2919
     } else {
         await Your($c.lit("%s get new energy."), await makeplural(await body_part(LEG)));
     }
-    await exercise(A_DEX, TRUE);
+    await exercise(A.DEX, TRUE);
     incr_itimeout(new $c.FieldRef(u.uprops[FAST], "intrinsic", "i64"), $c.i32(duration));
 }
 

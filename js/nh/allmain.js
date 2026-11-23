@@ -5,7 +5,7 @@ import { $G } from './globals.js';
 import { check_leash, next_to_u } from './apply.js';
 import { init_artifacts, mkot_trap_warn } from './artifact.js';
 import { acurr, change_luck, exerchk } from './attrib.js';
-import { A_CON, A_DEX, A_INT, A_WIS } from './attrib.h.js';
+import { A } from './attrib.h.js';
 import { ACURR } from './attrib.macros.js';
 import { bot, status_eval_next_unhilite, status_initialize, timebot } from './botl.js';
 import { VIA_WINDOWPORT } from './botl.macros.js';
@@ -13,7 +13,7 @@ import { friday_13th, getnow, night, phase_of_the_moon } from './calendar.js';
 import { cmdq_clear, dolookaround, end_of_input, enter_explore_mode, rhack } from './cmd.js';
 import { is_pool } from './dbridge.js';
 import { a11y, decl_globals_init, disp, flags, gc, gd, gh, gi, gl, gm, go, gu, gv, gw, gy, iflags, nhcb_counts, nhcb_name, program_state, program_state_init, svc, svd, svl, svm, svp, u, urealtime } from './decl.js';
-import { S_EEL } from './defsym.h.js';
+import { S } from './defsym.h.js';
 import { do_vicinity_map, dosearch0, warnreveal } from './detect.js';
 import { clear_glyph_buffer, curs_on_u, docrt, flush_screen, reset_glyphmap, see_monsters, see_objects, see_traps, swallowed, under_ground, under_water } from './display.js';
 import { gm_newgame } from './display.h.js';
@@ -27,12 +27,12 @@ import { gethungry, maybe_finished_meal, reset_eat } from './eat.js';
 import { done, done1 } from './end.js';
 import { read_engr_at, u_wipe_engr } from './engrave.js';
 import { read_wizkit } from './files.js';
-import { FULL_MOON, NEW_MOON, RUN_TPORT, fuzzer_impossible_panic } from './flag.h.js';
+import { FULL_MOON, NEW_MOON, RUN, fuzzer_impossible_panic } from './flag.h.js';
 import { wizard } from './flag.macros.js';
-import { COLNO, FALSE, LL_ACHIEVE, MAXULEV, NHLpa_panic, TRUE } from './global.h.js';
+import { COLNO, FALSE, LL, MAXULEV, NHLpa, TRUE } from './global.h.js';
 import { maybe_shuffle_customizations } from './glyphs.js';
 import { check_special_room, domove, end_running, lookaround, monster_nearby, near_capacity, nomul, notice_all_mons, overexert_hp, pooleffects, runmode_delay_output, unmul } from './hack.js';
-import { CQ_CANNED, CQ_REPEAT, ESCAPED, EXT_ENCUMBER, HVY_ENCUMBER, MOD_ENCUMBER, NHCB_END_TURN, NHCORE_MOVELOOP_TURN, NHCORE_RESTORE_OLD_GAME, NHCORE_START_NEW_GAME, NO_MM_FLAGS, POLY_NOFLAGS, RLOC_NOMSG, SLT_ENCUMBER, UNENCUMBERED } from './hack.h.js';
+import { CQ_CANNED, CQ_REPEAT, ESCAPED, EXT_ENCUMBER, HVY_ENCUMBER, MOD_ENCUMBER, NHCB, NHCORE, NO, POLY, RLOC, SLT_ENCUMBER, UNENCUMBERED } from './hack.h.js';
 import { eos } from './hacklib.js';
 import { align_str } from './insight.js';
 import { reroll_menu, update_inventory } from './invent.js';
@@ -44,11 +44,11 @@ import { mklev } from './mklev.js';
 import { fumaroles, movebubbles } from './mkmaze.js';
 import { clear_splitobjs, dobjsfree } from './mkobj.js';
 import { mcalcdistress, mcalcmove, mnexto, movemon, see_nearby_monsters } from './mon.js';
-import { G_NOCORPSE, M1_BREATHLESS } from './monflag.h.js';
+import { G_NOCORPSE, M1 } from './monflag.h.js';
 import { m_everyturn_effect } from './monmove.js';
 import { mons, monst_globals_init } from './monst.js';
 import { ismnum } from './monst.macros.js';
-import { PM_WIZARD } from './monsters.h.js';
+import { PM } from './monsters.h.js';
 import { l_nhcore_call, l_nhcore_init, nhl_pcall_handle } from './nhlua.js';
 import { init_objects } from './o_init.js';
 import { objects_globals_init } from './objects.js';
@@ -80,11 +80,11 @@ import { vision_recalc, vision_reset } from './vision.js';
 import { you_were } from './were.js';
 import { adjust_menu_promptstyle } from './windows.js';
 import { cliparound, create_nhwindow, display_file, display_nhwindow, end_menu, get_nh_event, start_menu } from './winprocs.macros.js';
-import { MENU_BEHAVE_STANDARD, NHW_MAP, NHW_MENU, NHW_MESSAGE, NHW_STATUS, WIN_ERR } from './wintype.h.js';
+import { MENU, NHW, WIN_ERR } from './wintype.h.js';
 import { amulet, intervene } from './wizard.js';
 import { sanity_check } from './wizcmds.js';
 import { clear_bypasses } from './worn.js';
-import { A_CURRENT, A_ORIGINAL, ROLE_FEMALE, ROLE_GENDMASK, ROLE_MALE, TT_LAVA, UTOTYPE_NONE } from './you.h.js';
+import { ROLE_FEMALE, ROLE_GENDMASK, ROLE_MALE, TT, UTOTYPE } from './you.h.js';
 import { Upolyd } from './you.macros.js';
 import { BClairvoyant, Blind, Clairvoyant, EMagical_breathing, Energy_regeneration, Fast, Glib, Half_physical_damage, Hallucination, Polymorph, Regeneration, Searching, Sleepy, Teleportation, Unblind_telepat, Unchanging, Underwater, Very_fast, Warn_of_mon, Warning } from './youprop.macros.js';
 import { makewish } from './zap.js';
@@ -190,7 +190,7 @@ function u_calc_moveamt(wtcap) {   // allmain.c:114
 }
 async function maybe_generate_rnd_mon() {   // allmain.c:162
     if (!rn2(u.uevent.udemigod | 0 ? 25 : depth(u.uz) > depth(svd.dungeon_topology.d_stronghold_level) ? 50 : 70)) {
-        await makemon(null, 0, 0, NO_MM_FLAGS);
+        await makemon(null, 0, 0, NO.MM_FLAGS);
     }
 }
 export async function moveloop_core() {   // allmain.c:177
@@ -245,7 +245,7 @@ export async function moveloop_core() {   // allmain.c:177
                 if (flags.time && !svc.context.run) {
                     disp.time_botl = TRUE;
                 }
-                await l_nhcore_call(NHCORE_MOVELOOP_TURN);
+                await l_nhcore_call(NHCORE.MOVELOOP_TURN);
                 if (Glib()) {
                     await glibr();
                 }
@@ -256,7 +256,7 @@ export async function moveloop_core() {   // allmain.c:177
                 }
                 if (u.uinvulnerable) {
                     mvl_wtcap = UNENCUMBERED;
-                } else if (!Upolyd() ? u.uhp < u.uhpmax : u.mh < u.mhmax || gy.youmonst.data.mlet === S_EEL) {
+                } else if (!Upolyd() ? u.uhp < u.uhpmax : u.mh < u.mhmax || gy.youmonst.data.mlet === S.EEL) {
                     await regen_hp(mvl_wtcap);
                 }
                 if (mvl_wtcap > MOD_ENCUMBER && u.umoved) {
@@ -290,7 +290,7 @@ export async function moveloop_core() {   // allmain.c:177
                         if (gm.multi >= 0) {
                             await stop_occupation();
                             if (mvl_change === 1) {
-                                await polyself(POLY_NOFLAGS);
+                                await polyself(POLY.NOFLAGS);
                             } else {
                                 await you_were();
                             }
@@ -317,7 +317,7 @@ export async function moveloop_core() {   // allmain.c:177
                 if (u.uhave.amulet) {
                     await amulet();
                 }
-                if (!rn2(40 + Math.imul(acurr(A_DEX), 3) | 0)) {
+                if (!rn2(40 + Math.imul(acurr(A.DEX), 3) | 0)) {
                     await u_wipe_engr(rnd(3));
                 }
                 if (u.uevent.udemigod | 0 && !u.uinvulnerable) {
@@ -356,7 +356,7 @@ export async function moveloop_core() {   // allmain.c:177
             }
             $t3 = $c.add64(svm.moves, rn2(31) + 15 | 0), svc.context.seer_turn = $t3;
         }
-        if (u.utrap && u.utraptype === TT_LAVA) {
+        if (u.utrap && u.utraptype === TT.LAVA) {
             await sink_into_lava();
         } else if (!u.umoved) {
             await pooleffects(FALSE);
@@ -440,16 +440,16 @@ export async function moveloop_core() {   // allmain.c:177
         await vision_recalc(0);
     }
     await cliparound()(u.ux, u.uy);
-    if ((!svc.context.run || flags.runmode === RUN_TPORT) && (gm.multi && (!svc.context.travel ? !$c.rem64(gm.multi, 7) : !$c.rem64(svm.moves, 7)))) {
+    if ((!svc.context.run || flags.runmode === RUN.TPORT) && (gm.multi && (!svc.context.travel ? !$c.rem64(gm.multi, 7) : !$c.rem64(svm.moves, 7)))) {
         if (flags.time && svc.context.run) {
             disp.botl = TRUE;
         }
         await display_nhwindow()($G.WIN_MAP, FALSE);
     }
-    if (gl.luacore && nhcb_counts[NHCB_END_TURN]) {
+    if (gl.luacore && nhcb_counts[NHCB.END_TURN]) {
         await lua_getglobal(gl.luacore, $c.lit("nh_callback_run"));
-        await lua_pushstring(gl.luacore, nhcb_name[NHCB_END_TURN]);
-        await nhl_pcall_handle(gl.luacore, 1, 0, $c.lit("moveloop_core"), NHLpa_panic);
+        await lua_pushstring(gl.luacore, nhcb_name[NHCB.END_TURN]);
+        await nhl_pcall_handle(gl.luacore, 1, 0, $c.lit("moveloop_core"), NHLpa.panic);
         await lua_settop(gl.luacore, 0);
     }
 }
@@ -462,7 +462,7 @@ async function maybe_do_tutorial() {   // allmain.c:567
     if (await ask_do_tutorial()) {
         assign_level(u.ucamefrom, u.uz);
         iflags.nofollowers = TRUE;
-        await schedule_goto(sp.dlevel, UTOTYPE_NONE, $c.lit("Entering the tutorial."), null);
+        await schedule_goto(sp.dlevel, UTOTYPE.NONE, $c.lit("Entering the tutorial."), null);
         await deferred_goto();
         await vision_recalc(0);
         await docrt();
@@ -480,8 +480,8 @@ export async function moveloop(resuming) {   // allmain.c:587
 }
 async function regen_pw(wtcap) {   // allmain.c:600
     let upper = 0, $t1;
-    if (u.uen < u.uenmax && (wtcap < MOD_ENCUMBER && !$c.rem64(svm.moves, $c.div32(Math.imul(MAXULEV + 8 - u.ulevel | 0, gu.urole.mnum === PM_WIZARD ? 3 : 4), 6)) || Energy_regeneration())) {
-        upper = $c.div32(ACURR(A_WIS) + ACURR(A_INT) | 0, 15) + 1 | 0;
+    if (u.uen < u.uenmax && (wtcap < MOD_ENCUMBER && !$c.rem64(svm.moves, $c.div32(Math.imul(MAXULEV + 8 - u.ulevel | 0, gu.urole.mnum === PM.WIZARD ? 3 : 4), 6)) || Energy_regeneration())) {
+        upper = $c.div32(ACURR(A.WIS) + ACURR(A.INT) | 0, 15) + 1 | 0;
         if (EMagical_breathing()) {
             upper = upper + 2 | 0;
         }
@@ -503,7 +503,7 @@ async function regen_hp(wtcap) {   // allmain.c:625
     if (Upolyd()) {
         if (u.mh < 1) {
             await rehumanize();
-        } else if (gy.youmonst.data.mlet === S_EEL && !is_pool(u.ux, u.uy) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) && !(u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1_BREATHLESS) !== 0)) {
+        } else if (gy.youmonst.data.mlet === S.EEL && !is_pool(u.ux, u.uy) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) && !(u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.BREATHLESS) !== 0)) {
             if (u.mh > 1 && !Regeneration() && rn2(u.mh) > rn2(8) && (!Half_physical_damage() || !$c.rem64(svm.moves, 2))) {
                 heal = -1;
             }
@@ -519,7 +519,7 @@ async function regen_hp(wtcap) {   // allmain.c:625
         }
     } else {
         if (u.uhp < u.uhpmax && (encumbrance_ok || U_CAN_REGEN())) {
-            heal = (u.ulevel + ACURR(A_CON) | 0) > rn2(100) ? 1 : 0;
+            heal = (u.ulevel + ACURR(A.CON) | 0) > rn2(100) ? 1 : 0;
             if (U_CAN_REGEN()) {
                 heal = heal + 1 | 0;
             }
@@ -555,19 +555,19 @@ export async function stop_occupation() {   // allmain.c:684
 }
 export async function init_sound_disp_gamewindows() {   // allmain.c:699
     let menu_behavior = 0;
-    menu_behavior = MENU_BEHAVE_STANDARD;
+    menu_behavior = MENU.BEHAVE_STANDARD;
     await activate_chosen_soundlib();
     if (iflags.wc_splash_screen && !flags.randomall) {
     } else {
     }
-    $G.WIN_MESSAGE = await create_nhwindow()(NHW_MESSAGE);
+    $G.WIN_MESSAGE = await create_nhwindow()(NHW.MESSAGE);
     if (VIA_WINDOWPORT()) {
         await status_initialize(FALSE);
     } else {
-        $G.WIN_STATUS = await create_nhwindow()(NHW_STATUS);
+        $G.WIN_STATUS = await create_nhwindow()(NHW.STATUS);
     }
-    $G.WIN_MAP = await create_nhwindow()(NHW_MAP);
-    $G.WIN_INVEN = await create_nhwindow()(NHW_MENU);
+    $G.WIN_MAP = await create_nhwindow()(NHW.MAP);
+    $G.WIN_INVEN = await create_nhwindow()(NHW.MENU);
     if ($G.WIN_INVEN !== WIN_ERR) {
         adjust_menu_promptstyle($G.WIN_INVEN, iflags.menu_headings);
     }
@@ -608,7 +608,7 @@ export async function newgame() {   // allmain.c:766
     vision_reset();
     await check_special_room(FALSE);
     if (MON_AT(u.ux, u.uy)) {
-        await mnexto(svl.level.monsters[u.ux][u.uy], RLOC_NOMSG);
+        await mnexto(svl.level.monsters[u.ux][u.uy], RLOC.NOMSG);
     }
     await makedog();
     await u_init_inventory_attrs();
@@ -648,8 +648,8 @@ export async function newgame() {   // allmain.c:766
 export async function welcome(new_game) {   // allmain.c:854
     let buf = new Int8Array(256), currentgend = 0, adrift = 0;
     currentgend = $c.i8(Upolyd() ? u.mfemale | 0 : flags.female);
-    adrift = $c.i8(u.ualign.type !== u.ualignbase[A_CURRENT] ? 1 : 0);
-    await l_nhcore_call(new_game ? NHCORE_START_NEW_GAME : NHCORE_RESTORE_OLD_GAME);
+    adrift = $c.i8(u.ualign.type !== u.ualignbase[A.CURRENT] ? 1 : 0);
+    await l_nhcore_call(new_game ? NHCORE.START_NEW_GAME : NHCORE.RESTORE_OLD_GAME);
     if (!new_game && Upolyd() && ugenocided()) {
         await pline($c.lit("You're back, but you still feel %s inside."), udeadinside());
         return;
@@ -658,8 +658,8 @@ export async function welcome(new_game) {   // allmain.c:854
         await pline($c.lit("NetHack is filmed in front of an undead studio audience."));
     }
     new $c.Ptr(buf, 0).set(0, 0);
-    if (new_game || u.ualignbase[A_ORIGINAL] !== u.ualignbase[A_CURRENT] || adrift) {
-        $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" %s%s"), adrift ? $c.lit("adrift ") : $c.lit(""), adrift ? align_str(u.ualign.type) : align_str(u.ualignbase[A_CURRENT]));
+    if (new_game || u.ualignbase[A.ORIGINAL] !== u.ualignbase[A.CURRENT] || adrift) {
+        $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" %s%s"), adrift ? $c.lit("adrift ") : $c.lit(""), adrift ? align_str(u.ualign.type) : align_str(u.ualignbase[A.CURRENT]));
     }
     if (!gu.urole.name.f && (new_game ? (gu.urole.allow & ROLE_GENDMASK) === (ROLE_MALE | ROLE_FEMALE) : currentgend !== flags.initgend)) {
         $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" %s"), genders[currentgend].adj);
@@ -667,7 +667,7 @@ export async function welcome(new_game) {   // allmain.c:854
     $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" %s %s"), gu.urace.adj, currentgend && gu.urole.name.f ? gu.urole.name.f : gu.urole.name.m);
     await pline(new_game ? $c.lit("%s %s, welcome to NetHack!  You are a%s.") : $c.lit("%s %s, the%s, welcome back to NetHack!"), Hello(null), new $c.Ptr(svp.plname, 0), new $c.Ptr(buf, 0));
     if (new_game) {
-        await livelog_printf(LL_ACHIEVE, $c.lit("%s the%s entered the dungeon"), new $c.Ptr(svp.plname, 0), new $c.Ptr(buf, 0));
+        await livelog_printf(LL.ACHIEVE, $c.lit("%s the%s entered the dungeon"), new $c.Ptr(svp.plname, 0), new $c.Ptr(buf, 0));
     } else {
         await hellish_smoke_mesg();
         await print_level_annotation();

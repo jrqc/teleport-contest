@@ -9,10 +9,10 @@ import { a11y, flags, ge, gg, gp, gs, gv, gy, iflags, program_state, svm, u, ync
 import { flush_screen } from './display.js';
 import { nh_terminate, panic } from './end.js';
 import { livelog_add, paniclog } from './files.js';
-import { PLNMSG_UNKNOWN, fuzzer_impossible_panic } from './flag.h.js';
+import { PLNMSG, fuzzer_impossible_panic } from './flag.h.js';
 import { coord_desc } from './getpos.js';
 import { BUFSZ, FALSE, TRUE } from './global.h.js';
-import { MSGTYP_NOREP, MSGTYP_NORMAL, MSGTYP_NOSHOW, MSGTYP_STOP, NO_CURS_ON_U, OVERRIDE_MSGTYPE, PLINE_NOREPEAT, PLINE_VERBALIZE, SUPPRESS_HISTORY, URGENT_MESSAGE } from './hack.h.js';
+import { MSGTYP, NO_CURS_ON_U, OVERRIDE_MSGTYPE, PLINE_NOREPEAT, PLINE_VERBALIZE, SUPPRESS_HISTORY, URGENT_MESSAGE } from './hack.h.js';
 import { strNsubst } from './hacklib.js';
 import { msgtype_type } from './options.js';
 import { submit_web_report } from './report.js';
@@ -21,7 +21,7 @@ import { vision_recalc } from './vision.js';
 import { windowprocs } from './windows.js';
 import { WC2_SUPPRESS_HIST, WC2_URGENT_MESG } from './winprocs.h.js';
 import { display_nhwindow, putstr, raw_print } from './winprocs.macros.js';
-import { ATR_NOHISTORY, ATR_NONE, ATR_URGENT } from './wintype.h.js';
+import { ATR } from './wintype.h.js';
 import { Blind, Deaf, Unaware, Underwater } from './youprop.macros.js';
 
 let vpline$in_pline = 0;   // static in vpline()
@@ -54,15 +54,15 @@ export function dumplogfreemessages() {   // pline.c:52
 }
 async function putmesg(line) {   // pline.c:65
     let attr = 0;
-    attr = ATR_NONE;
+    attr = ATR.NONE;
     if (iflags.debug_prevent_pline) {
         return;
     }
     if ((gp.pline_flags & URGENT_MESSAGE) >>> 0 !== 0 && $c.andu64(windowprocs.wincap2, WC2_URGENT_MESG) !== 0) {
-        attr = attr | ATR_URGENT;
+        attr = attr | ATR.URGENT;
     }
     if ((gp.pline_flags & SUPPRESS_HISTORY) >>> 0 !== 0 && $c.andu64(windowprocs.wincap2, WC2_SUPPRESS_HIST) !== 0) {
-        attr = attr | ATR_NOHISTORY;
+        attr = attr | ATR.NOHISTORY;
     }
     await putstr()($G.WIN_MESSAGE, attr, line);
 }
@@ -152,20 +152,20 @@ async function vpline(line, the_args) {   // pline.c:153
         pbuf[BUFSZ - 1] = 0;
         line = new $c.Ptr(pbuf, 0);
     }
-    msgtyp = MSGTYP_NORMAL;
+    msgtyp = MSGTYP.NORMAL;
     if ((gp.pline_flags & SUPPRESS_HISTORY) >>> 0 === 0) {
         await dumplogmsg(line);
     }
     pline_done$: {
         if (($t4 = vpline$in_pline, vpline$in_pline = $t4 + 1 | 0, $t4) || !iflags.window_inited) {
             await raw_print()(line);
-            iflags.last_msg = PLNMSG_UNKNOWN;
+            iflags.last_msg = PLNMSG.UNKNOWN;
             break pline_done$;
         }
         no_repeat = $c.i8((gp.pline_flags & PLINE_NOREPEAT) >>> 0 ? TRUE : FALSE);
         if ((gp.pline_flags & OVERRIDE_MSGTYPE) >>> 0 === 0) {
             msgtyp = msgtype_type(line, no_repeat);
-            if ((gp.pline_flags & URGENT_MESSAGE) >>> 0 === 0 && (msgtyp === MSGTYP_NOSHOW || msgtyp === MSGTYP_NOREP && !$c.strcmp(line, new $c.Ptr(gp.prevmsg, 0)))) {
+            if ((gp.pline_flags & URGENT_MESSAGE) >>> 0 === 0 && (msgtyp === MSGTYP.NOSHOW || msgtyp === MSGTYP.NOREP && !$c.strcmp(line, new $c.Ptr(gp.prevmsg, 0)))) {
                 break pline_done$;
             }
         }
@@ -180,9 +180,9 @@ async function vpline(line, the_args) {   // pline.c:153
         }
         await putmesg(line);
         await execplinehandler(line);
-        iflags.last_msg = PLNMSG_UNKNOWN;
+        iflags.last_msg = PLNMSG.UNKNOWN;
         $c.__builtin___strncpy_chk(new $c.Ptr(gp.prevmsg, 0), line, BUFSZ, 256), gp.prevmsg[BUFSZ - 1] = 0;
-        if (msgtyp === MSGTYP_STOP) {
+        if (msgtyp === MSGTYP.STOP) {
             await display_nhwindow()($G.WIN_MESSAGE, TRUE);
         }
     }

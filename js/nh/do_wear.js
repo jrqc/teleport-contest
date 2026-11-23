@@ -2,11 +2,11 @@
 import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
-import { A_CG_HELM_OFF, A_CG_HELM_ON, A_CHAOTIC, A_LAWFUL, A_NEUTRAL } from './align.h.js';
+import { A_CG } from './align.h.js';
 import { stop_occupation } from './allmain.js';
 import { artifact_light, retouch_object } from './artifact.js';
 import { change_luck, extremeattr, uchangealign } from './attrib.js';
-import { A_CHA, A_CON, A_DEX, A_INT, A_STR, A_WIS } from './attrib.h.js';
+import { A } from './attrib.h.js';
 import { ACURR } from './attrib.macros.js';
 import { set_bc } from './ball.js';
 import { condtests } from './botl.js';
@@ -15,7 +15,7 @@ import { cmdq_clear, cmdq_peek, cmdq_pop, paranoid_ynq, set_occupation, yn_funct
 import { CONTEXTVERBSZ } from './context.h.js';
 import { is_lava, is_pool, is_pool_or_lava } from './dbridge.js';
 import { c_color_names, c_common_strings, cg, disp, flags, ga, gi, gm, gn, gu, gw, gy, iflags, program_state, rightleftchars, svc, svd, u } from './decl.js';
-import { AMULET_CLASS, ARMOR_CLASS, RING_CLASS, S_CENTAUR, WEAPON_CLASS } from './defsym.h.js';
+import { AMULET_CLASS, ARMOR_CLASS, RING_CLASS, S, WEAPON_CLASS } from './defsym.h.js';
 import { newsym, see_monsters, set_mimic_blocking } from './display.js';
 import { canletgo, dropx, trycall } from './do.js';
 import { hcolor, hliquid, obj_pmname, x_monnam } from './do_name.js';
@@ -24,7 +24,7 @@ import { panic } from './end.js';
 import { ParanoidRemove } from './flag.macros.js';
 import { FALSE, TRUE } from './global.h.js';
 import { nomul, spoteffects, unmul } from './hack.js';
-import { ALL_FINISHED, ALL_TYPES, ALL_TYPES_SELECTED, ARTICLE_YOUR, BUCX_TYPES, CMDQ_KEY, CQ_CANNED, CXN_ARTICLE, ECMD_CANCEL, ECMD_FAIL, ECMD_OK, ECMD_TIME, FACE, FINGER, FOOT, GETOBJ_DOWNPLAY, GETOBJ_EXCLUDE, GETOBJ_EXCLUDE_INACCESS, GETOBJ_NOFLAGS, GETOBJ_SUGGEST, HAND, HEAD, INVORDER_SORT, LEG, MENU_COMBINATION, MENU_FULL, MENU_TRADITIONAL, NECK, SIGNAL_NOMENU, SUPPRESS_HALLUCINATION, SUPPRESS_SADDLE, UNPAID_TYPES, USE_INVLET, WORN_TYPES, st_corpse, st_petrifies } from './hack.h.js';
+import { ALL_FINISHED, ALL_TYPES, ALL_TYPES_SELECTED, ARTICLE, BUCX_TYPES, CMDQ, CQ_CANNED, CXN, ECMD, FACE, FINGER, FOOT, GETOBJ, HAND, HEAD, INVORDER_SORT, LEG, NECK, SIGNAL, SUPPRESS, UNPAID_TYPES, USE_INVLET, WORN_TYPES, st_corpse, st_petrifies } from './hack.h.js';
 import { makeknown } from './hack.macros.js';
 import { nh_snprintf, sgn, strsubst } from './hacklib.js';
 import { carrying_stoning_corpse, getobj, ggetobj, is_worn, prinv, silly_thing, update_inventory, useup, wearing_armor } from './invent.js';
@@ -34,11 +34,11 @@ import { curse, is_flammable, is_rottable, set_bknown } from './mkobj.js';
 import { rescham, restartcham } from './mon.js';
 import { breakarm, can_be_strangled, num_horns, sliparm } from './mondata.js';
 import { cant_drown, has_head, humanoid, is_clinger, nohands, nolimbs, slithy, touch_petrifies, verysmall } from './mondata.macros.js';
-import { M1_BREATHLESS, M1_FLY, M1_HUMANOID, M1_SWIM, MZ_SMALL } from './monflag.h.js';
+import { M1, MZ } from './monflag.h.js';
 import { mons } from './monst.js';
-import { PM_ARCHEOLOGIST, PM_CLERIC, PM_WIZARD } from './monsters.h.js';
+import { PM } from './monsters.h.js';
 import { discover_object, observe_object } from './o_init.js';
-import { EF_DESTROY, EF_PAY, ERODE_BURN, ERODE_CORRODE, ERODE_CRACK, ERODE_NONE, ERODE_ROT, ERODE_RUST, ER_DESTROYED, ER_NOTHING } from './obj.h.js';
+import { EF, ER, ERODE } from './obj.h.js';
 import { WrappingAllowed, bimanual, is_boots, is_cloak, is_flimsy, is_gloves, is_helmet, is_shield, is_shirt, is_suit, is_sword } from './obj.macros.js';
 import { ARM_BOOTS, ARM_CLOAK, ARM_GLOVES, ARM_HELM, ARM_SHIELD, ARM_SHIRT, ARM_SUIT } from './objclass.h.js';
 import { is_corrodeable, is_crackable, is_damageable, is_metallic, is_rustprone } from './objclass.macros.js';
@@ -49,19 +49,19 @@ import { add_valid_menu_class, encumber_msg, is_worn_by_type, menu_class_present
 import { There, You, You_cant, You_feel, Your, impossible, pline, pline_The, urgent_pline } from './pline.js';
 import { body_part, change_sex, float_vs_flight, livelog_newform, poly_gender } from './polyself.js';
 import { incr_itimeout, make_glib, make_hallucinated, make_slimed, self_invis_message, toggle_blindness } from './potion.js';
-import { ACID_RES, DISPLACED, DRAIN_RES, FAST, FLYING, FREE_ACTION, FROMOUTSIDE, FUMBLING, GLIB, INFRAVISION, INTRINSIC, I_SPECIAL, LEVITATION, MAGICAL_BREATHING, PROTECTION, SICK_RES, SLEEPY, SLOW_DIGESTION, STEALTH, STONE_RES, STRANGLED, SWIMMING, TIMEOUT, W_ACCESSORY, W_AMUL, W_ARM, W_ARMC, W_ARMF, W_ARMG, W_ARMH, W_ARMOR, W_ARMS, W_ARMU, W_QUIVER, W_RING, W_RINGL, W_RINGR, W_SWAPWEP, W_TOOL, W_WEAPONS, W_WEP } from './prop.h.js';
+import { ACID_RES, DISPLACED, DRAIN_RES, FAST, FLYING, FREE_ACTION, FROMOUTSIDE, FUMBLING, GLIB, INFRAVISION, INTRINSIC, I_SPECIAL, LEVITATION, MAGICAL_BREATHING, PROTECTION, SICK_RES, SLEEPY, SLOW_DIGESTION, STEALTH, STONE_RES, STRANGLED, SWIMMING, TIMEOUT, W, W_ACCESSORY, W_ARMOR, W_RING, W_WEAPONS } from './prop.h.js';
 import { region_danger } from './region.js';
 import { rn2, rnd } from './rnd.js';
 import { shk_your } from './shk.js';
-import { P_SABER, P_SHORT_SWORD } from './skills.h.js';
+import { P } from './skills.h.js';
 import { remove_worn_item } from './steal.js';
 import { begin_burn, end_burn } from './timeout.js';
 import { drown, erode_obj, float_down, float_up, instapetrify, selftouch } from './trap.js';
 import { weapon_descr } from './weapon.js';
 import { empty_handed, setuqwep, setuswapwep, setuwep, welded } from './wield.js';
-import { PICK_ANY } from './wintype.h.js';
+import { MENU, PICK } from './wintype.h.js';
 import { racial_exception, setnotworn, setworn, which_armor } from './worn.js';
-import { AC_MAX, A_CURRENT, A_ORIGINAL, TT_BEARTRAP, TT_BURIEDBALL, TT_INFLOOR, TT_LAVA } from './you.h.js';
+import { AC_MAX, TT } from './you.h.js';
 import { RING_ON_PRIMARY, ULEFTY, URIGHTY, Upolyd } from './you.macros.js';
 import { BInvis, BStealth, Blind, Blind_telepat, Detect_monsters, EInvis, ESleepy, Fast, Glib, HFast, HInvis, HLevitation, HSee_invisible, HStealth, Hallucination, Invis, Invisible, Levitation, Protection_from_shape_changers, Punished, See_invisible, Slimed, Stone_resistance, Strangled, Unblind_telepat, Unchanging, Underwater, Very_fast } from './youprop.macros.js';
 import { obj_resists } from './zap.js';
@@ -95,7 +95,7 @@ export async function off_msg(otmp) {   // do_wear.c:68
 }
 async function on_msg(otmp) {   // do_wear.c:76
     let how = new Int8Array(256), otmp_name = null;
-    if ($c.and64(otmp.owornmask, W_RING | W_AMUL) !== 0 || $c.and64(otmp.owornmask, W_TOOL) !== 0 && !flags.verbose) {
+    if ($c.and64(otmp.owornmask, W_RING | W.AMUL) !== 0 || $c.and64(otmp.owornmask, W.TOOL) !== 0 && !flags.verbose) {
         await prinv($c.asArr(null, Int8Array), otmp, 0);
         return;
     }
@@ -122,14 +122,14 @@ async function toggle_stealth(obj, oldprop, on) {   // do_wear.c:107
         if (on) {
             if (!is_boots(obj)) {
                 await You($c.lit("move very quietly."));
-            } else if (Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked) {
+            } else if (Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) {
                 await You($c.lit("float imperceptibly."));
             } else {
                 await You($c.lit("walk very quietly."));
             }
         } else {
             riding = $c.i8(!$c.peq(u.usteed, $c.asRec(null, $T.monst, 192)) ? 1 : 0);
-            await You($c.lit("%s%s are noisy."), riding ? $c.lit("and ") : $c.lit("sure"), riding ? await x_monnam(u.usteed, ARTICLE_YOUR, $c.asArr(null, Int8Array), SUPPRESS_SADDLE | SUPPRESS_HALLUCINATION, FALSE) : $c.lit(""));
+            await You($c.lit("%s%s are noisy."), riding ? $c.lit("and ") : $c.lit("sure"), riding ? await x_monnam(u.usteed, ARTICLE.YOUR, $c.asArr(null, Int8Array), SUPPRESS.SADDLE | SUPPRESS.HALLUCINATION, FALSE) : $c.lit(""));
         }
     }
 }
@@ -146,7 +146,7 @@ export async function toggle_displacement(obj, oldprop, on) {   // do_wear.c:148
 }
 export async function Boots_on() {   // do_wear.c:187
     let oldprop = 0;
-    oldprop = $c.and64(u.uprops[objects[$G.uarmf.otyp].oc_oprop].extrinsic, ~W_ARMF);
+    oldprop = $c.and64(u.uprops[objects[$G.uarmf.otyp].oc_oprop].extrinsic, ~W.ARMF);
     switch ($G.uarmf.otyp) {
         case LOW_BOOTS:
         case IRON_SHOES:
@@ -205,9 +205,9 @@ export async function Boots_off() {   // do_wear.c:262
     let otmp = null, otyp = 0, oldprop = 0, $t1;
     otmp = $G.uarmf;
     otyp = otmp.otyp;
-    oldprop = $c.and64(u.uprops[objects[otyp].oc_oprop].extrinsic, ~W_ARMF);
-    svc.context.takeoff.mask = $c.and64(svc.context.takeoff.mask, ~W_ARMF);
-    await setworn(null, W_ARMF);
+    oldprop = $c.and64(u.uprops[objects[otyp].oc_oprop].extrinsic, ~W.ARMF);
+    svc.context.takeoff.mask = $c.and64(svc.context.takeoff.mask, ~W.ARMF);
+    await setworn(null, W.ARMF);
     switch (otyp) {
         case SPEED_BOOTS:
             if (!Very_fast() && !svc.context.takeoff.cancelled_don) {
@@ -216,7 +216,7 @@ export async function Boots_off() {   // do_wear.c:262
             }
             break;
         case WATER_WALKING_BOOTS:
-            if ((is_pool(u.ux, u.uy) || is_lava(u.ux, u.uy)) && !Levitation() && !((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked) && !(is_clinger(gy.youmonst.data) && has_ceiling(u.uz)) && !svc.context.takeoff.cancelled_don && !iflags.in_lava_effects) {
+            if ((is_pool(u.ux, u.uy) || is_lava(u.ux, u.uy)) && !Levitation() && !((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) && !(is_clinger(gy.youmonst.data) && has_ceiling(u.uz)) && !svc.context.takeoff.cancelled_don && !iflags.in_lava_effects) {
                 await makeknown(otyp);
                 await spoteffects(TRUE);
             }
@@ -253,7 +253,7 @@ export async function Boots_off() {   // do_wear.c:262
 }
 async function Cloak_on() {   // do_wear.c:326
     let oldprop = 0;
-    oldprop = $c.and64(u.uprops[objects[$G.uarmc.otyp].oc_oprop].extrinsic, ~W_ARMC);
+    oldprop = $c.and64(u.uprops[objects[$G.uarmc.otyp].oc_oprop].extrinsic, ~W.ARMC);
     switch ($G.uarmc.otyp) {
         case ORCISH_CLOAK:
         case DWARVISH_CLOAK:
@@ -287,7 +287,7 @@ async function Cloak_on() {   // do_wear.c:326
             await pline($c.lit("%s very tightly."), await Tobjnam($G.uarmc, $c.lit("fit")));
             break;
         case ALCHEMY_SMOCK:
-            u.uprops[ACID_RES].extrinsic = $c.or64(u.uprops[ACID_RES].extrinsic, W_ARMC);
+            u.uprops[ACID_RES].extrinsic = $c.or64(u.uprops[ACID_RES].extrinsic, W.ARMC);
             break;
         default:
             await impossible(new $c.Ptr(unknown_type, 0), new $c.Ptr(c_cloak, 0), $G.uarmc.otyp);
@@ -302,9 +302,9 @@ export async function Cloak_off() {   // do_wear.c:383
     let otmp = null, otyp = 0, oldprop = 0;
     otmp = $G.uarmc;
     otyp = otmp.otyp;
-    oldprop = $c.and64(u.uprops[objects[otyp].oc_oprop].extrinsic, ~W_ARMC);
-    svc.context.takeoff.mask = $c.and64(svc.context.takeoff.mask, ~W_ARMC);
-    await setworn(null, W_ARMC);
+    oldprop = $c.and64(u.uprops[objects[otyp].oc_oprop].extrinsic, ~W.ARMC);
+    svc.context.takeoff.mask = $c.and64(svc.context.takeoff.mask, ~W.ARMC);
+    await setworn(null, W.ARMC);
     switch (otyp) {
         case ORCISH_CLOAK:
         case DWARVISH_CLOAK:
@@ -334,7 +334,7 @@ export async function Cloak_off() {   // do_wear.c:383
             }
             break;
         case ALCHEMY_SMOCK:
-            u.uprops[ACID_RES].extrinsic = $c.and64(u.uprops[ACID_RES].extrinsic, ~W_ARMC);
+            u.uprops[ACID_RES].extrinsic = $c.and64(u.uprops[ACID_RES].extrinsic, ~W.ARMC);
             break;
         default:
             await impossible(new $c.Ptr(unknown_type, 0), new $c.Ptr(c_cloak, 0), otyp);
@@ -344,7 +344,7 @@ export async function Cloak_off() {   // do_wear.c:383
 async function Helmet_on() {   // do_wear.c:434
     switch ($G.uarmh.otyp) {
         case FEDORA:
-            if (gu.urole.mnum === PM_ARCHEOLOGIST) {
+            if (gu.urole.mnum === PM.ARCHEOLOGIST) {
                 change_luck(1);
             }
             break;
@@ -362,13 +362,13 @@ async function Helmet_on() {   // do_wear.c:434
             await adj_abon($G.uarmh, $G.uarmh.spe);
             break;
         case CORNUTHAUM:
-            u.abon.a[A_CHA] = $c.i8(u.abon.a[A_CHA] + (gu.urole.mnum === PM_WIZARD ? 1 : -1) | 0);
+            u.abon.a[A.CHA] = $c.i8(u.abon.a[A.CHA] + (gu.urole.mnum === PM.WIZARD ? 1 : -1) | 0);
             disp.botl = TRUE;
             await discover_object($G.uarmh.otyp, TRUE, TRUE, TRUE);
             break;
         case HELM_OF_OPPOSITE_ALIGNMENT:
             $G.uarmh.known = (1) & 1;
-            await uchangealign(u.ualign.type !== A_NEUTRAL ? -u.ualign.type | 0 : $c.remu32($G.uarmh.o_id, 2) ? A_CHAOTIC : A_LAWFUL, A_CG_HELM_ON);
+            await uchangealign(u.ualign.type !== A.NEUTRAL ? -u.ualign.type | 0 : $c.remu32($G.uarmh.o_id, 2) ? A.CHAOTIC : A.LAWFUL, A_CG.HELM_ON);
         case DUNCE_CAP:
             if ($G.uarmh && !$G.uarmh.cursed) {
                 if (Blind()) {
@@ -379,7 +379,7 @@ async function Helmet_on() {   // do_wear.c:434
                 await curse($G.uarmh);
                 if (Blind()) {
                     await set_bknown($G.uarmh, 0);
-                } else if (gu.urole.mnum === PM_CLERIC) {
+                } else if (gu.urole.mnum === PM.CLERIC) {
                     await set_bknown($G.uarmh, 1);
                 } else if ($G.uarmh.bknown) {
                     await update_inventory();
@@ -389,7 +389,7 @@ async function Helmet_on() {   // do_wear.c:434
             if (Hallucination()) {
                 await pline($c.lit("My brain hurts!"));
             } else if ($G.uarmh && $G.uarmh.otyp === DUNCE_CAP) {
-                await You_feel($c.lit("%s."), ACURR(A_INT) <= ((u.acurr.a[A_INT] + u.abon.a[A_INT] | 0) + u.atemp.a[A_INT] | 0) ? $c.lit("like sitting in a corner") : $c.lit("giddy"));
+                await You_feel($c.lit("%s."), ACURR(A.INT) <= ((u.acurr.a[A.INT] + u.abon.a[A.INT] | 0) + u.atemp.a[A.INT] | 0) ? $c.lit("like sitting in a corner") : $c.lit("giddy"));
             } else {
                 await discover_object(HELM_OF_OPPOSITE_ALIGNMENT, TRUE, TRUE, TRUE);
             }
@@ -404,10 +404,10 @@ async function Helmet_on() {   // do_wear.c:434
     return 0;
 }
 export async function Helmet_off() {   // do_wear.c:518
-    svc.context.takeoff.mask = $c.and64(svc.context.takeoff.mask, ~W_ARMH);
+    svc.context.takeoff.mask = $c.and64(svc.context.takeoff.mask, ~W.ARMH);
     switch ($G.uarmh.otyp) {
         case FEDORA:
-            if (gu.urole.mnum === PM_ARCHEOLOGIST) {
+            if (gu.urole.mnum === PM.ARCHEOLOGIST) {
                 change_luck(-1);
             }
             break;
@@ -422,13 +422,13 @@ export async function Helmet_off() {   // do_wear.c:518
             break;
         case CORNUTHAUM:
             if (!svc.context.takeoff.cancelled_don) {
-                u.abon.a[A_CHA] = $c.i8(u.abon.a[A_CHA] + (gu.urole.mnum === PM_WIZARD ? -1 : 1) | 0);
+                u.abon.a[A.CHA] = $c.i8(u.abon.a[A.CHA] + (gu.urole.mnum === PM.WIZARD ? -1 : 1) | 0);
                 disp.botl = TRUE;
             }
             break;
         case HELM_OF_TELEPATHY:
         case HELM_OF_CAUTION:
-            await setworn(null, W_ARMH);
+            await setworn(null, W.ARMH);
             await see_monsters();
             return 0;
         case HELM_OF_BRILLIANCE:
@@ -437,12 +437,12 @@ export async function Helmet_off() {   // do_wear.c:518
             }
             break;
         case HELM_OF_OPPOSITE_ALIGNMENT:
-            await uchangealign(u.ualignbase[A_CURRENT], A_CG_HELM_OFF);
+            await uchangealign(u.ualignbase[A.CURRENT], A_CG.HELM_OFF);
             break;
         default:
             await impossible(new $c.Ptr(unknown_type, 0), new $c.Ptr(c_helmet, 0), $G.uarmh.otyp);
     }
-    await setworn(null, W_ARMH);
+    await setworn(null, W.ARMH);
     svc.context.takeoff.cancelled_don = FALSE;
     return 0;
 }
@@ -454,7 +454,7 @@ export function hard_helmet(obj) {   // do_wear.c:568
 }
 async function Gloves_on() {   // do_wear.c:576
     let oldprop = 0;
-    oldprop = $c.and64(u.uprops[objects[$G.uarmg.otyp].oc_oprop].extrinsic, ~W_ARMG);
+    oldprop = $c.and64(u.uprops[objects[$G.uarmg.otyp].oc_oprop].extrinsic, ~W.ARMG);
     switch ($G.uarmg.otyp) {
         case LEATHER_GLOVES:
             break;
@@ -488,7 +488,7 @@ export async function wielding_corpse(obj, how, voluntary) {   // do_wear.c:608
         return;
     }
     if (touch_petrifies($c.relem(mons, obj.corpsenm)) && !Stone_resistance()) {
-        await You($c.lit("%s %s in your bare %s."), how && is_gloves(how) ? $c.lit("now wield") : $c.lit("are wielding"), await corpse_xname(obj, null, CXN_ARTICLE), await makeplural(await body_part(HAND)));
+        await You($c.lit("%s %s in your bare %s."), how && is_gloves(how) ? $c.lit("now wield") : $c.lit("are wielding"), await corpse_xname(obj, null, CXN.ARTICLE), await makeplural(await body_part(HAND)));
         if (how) {
             $c.__builtin___sprintf_chk(new $c.Ptr(hbuf, 0), 0, 256, $c.lit("%s %s"), voluntary ? $c.lit("removing") : $c.lit("losing"), how.oclass === ARMOR_CLASS && objects[how.otyp].oc_subtyp === ARM_GLOVES ? gloves_simple_name(how) : strsubst(await simpleonames(how), $c.lit("set of "), $c.lit("")));
         } else {
@@ -504,9 +504,9 @@ export async function wielding_corpse(obj, how, voluntary) {   // do_wear.c:608
 export async function Gloves_off() {   // do_wear.c:646
     let gloves = null, oldprop = 0, on_purpose = 0, $t1;
     gloves = $G.uarmg;
-    oldprop = $c.and64(u.uprops[objects[$G.uarmg.otyp].oc_oprop].extrinsic, ~W_ARMG);
+    oldprop = $c.and64(u.uprops[objects[$G.uarmg.otyp].oc_oprop].extrinsic, ~W.ARMG);
     on_purpose = $c.i8(!svc.context.mon_moving && !$G.uarmg.in_use ? 1 : 0);
-    svc.context.takeoff.mask = $c.and64(svc.context.takeoff.mask, ~W_ARMG);
+    svc.context.takeoff.mask = $c.and64(svc.context.takeoff.mask, ~W.ARMG);
     switch ($G.uarmg.otyp) {
         case LEATHER_GLOVES:
             break;
@@ -527,7 +527,7 @@ export async function Gloves_off() {   // do_wear.c:646
         default:
             await impossible(new $c.Ptr(unknown_type, 0), new $c.Ptr(c_gloves, 0), $G.uarmg.otyp);
     }
-    await setworn(null, W_ARMG);
+    await setworn(null, W.ARMG);
     svc.context.takeoff.cancelled_don = FALSE;
     await encumber_msg();
     if (Glib()) {
@@ -566,7 +566,7 @@ async function Shield_on() {   // do_wear.c:705
     return 0;
 }
 export async function Shield_off() {   // do_wear.c:733
-    svc.context.takeoff.mask = $c.and64(svc.context.takeoff.mask, ~W_ARMS);
+    svc.context.takeoff.mask = $c.and64(svc.context.takeoff.mask, ~W.ARMS);
     switch ($G.uarms.otyp) {
         case SMALL_SHIELD:
         case SHIELD_OF_DRAIN_RESISTANCE:
@@ -581,7 +581,7 @@ export async function Shield_off() {   // do_wear.c:733
         default:
             await impossible(new $c.Ptr(unknown_type, 0), new $c.Ptr(c_shield, 0), $G.uarms.otyp);
     }
-    await setworn(null, W_ARMS);
+    await setworn(null, W.ARMS);
     return 0;
 }
 async function Shirt_on() {   // do_wear.c:759
@@ -599,7 +599,7 @@ async function Shirt_on() {   // do_wear.c:759
     return 0;
 }
 export async function Shirt_off() {   // do_wear.c:778
-    svc.context.takeoff.mask = $c.and64(svc.context.takeoff.mask, ~W_ARMU);
+    svc.context.takeoff.mask = $c.and64(svc.context.takeoff.mask, ~W.ARMU);
     switch ($G.uarmu.otyp) {
         case HAWAIIAN_SHIRT:
         case T_SHIRT:
@@ -607,7 +607,7 @@ export async function Shirt_off() {   // do_wear.c:778
         default:
             await impossible(new $c.Ptr(unknown_type, 0), new $c.Ptr(c_shirt, 0), $G.uarmu.otyp);
     }
-    await setworn(null, W_ARMU);
+    await setworn(null, W.ARMU);
     return 0;
 }
 async function dragon_armor_handling(otmp, puton, on_purpose) {   // do_wear.c:798
@@ -618,9 +618,9 @@ async function dragon_armor_handling(otmp, puton, on_purpose) {   // do_wear.c:7
         case BLACK_DRAGON_SCALES:
         case BLACK_DRAGON_SCALE_MAIL:
             if (puton) {
-                u.uprops[DRAIN_RES].extrinsic = $c.or64(u.uprops[DRAIN_RES].extrinsic, W_ARM);
+                u.uprops[DRAIN_RES].extrinsic = $c.or64(u.uprops[DRAIN_RES].extrinsic, W.ARM);
             } else {
-                u.uprops[DRAIN_RES].extrinsic = $c.and64(u.uprops[DRAIN_RES].extrinsic, ~W_ARM);
+                u.uprops[DRAIN_RES].extrinsic = $c.and64(u.uprops[DRAIN_RES].extrinsic, ~W.ARM);
             }
             break;
         case BLUE_DRAGON_SCALES:
@@ -629,9 +629,9 @@ async function dragon_armor_handling(otmp, puton, on_purpose) {   // do_wear.c:7
                 if (!Very_fast()) {
                     await You($c.lit("speed up%s."), Fast() ? $c.lit(" a bit more") : $c.lit(""));
                 }
-                u.uprops[FAST].extrinsic = $c.or64(u.uprops[FAST].extrinsic, W_ARM);
+                u.uprops[FAST].extrinsic = $c.or64(u.uprops[FAST].extrinsic, W.ARM);
             } else {
-                u.uprops[FAST].extrinsic = $c.and64(u.uprops[FAST].extrinsic, ~W_ARM);
+                u.uprops[FAST].extrinsic = $c.and64(u.uprops[FAST].extrinsic, ~W.ARM);
                 if (!Very_fast() && !svc.context.takeoff.cancelled_don) {
                     await You($c.lit("slow down."));
                 }
@@ -640,38 +640,38 @@ async function dragon_armor_handling(otmp, puton, on_purpose) {   // do_wear.c:7
         case GREEN_DRAGON_SCALES:
         case GREEN_DRAGON_SCALE_MAIL:
             if (puton) {
-                u.uprops[SICK_RES].extrinsic = $c.or64(u.uprops[SICK_RES].extrinsic, W_ARM);
+                u.uprops[SICK_RES].extrinsic = $c.or64(u.uprops[SICK_RES].extrinsic, W.ARM);
             } else {
-                u.uprops[SICK_RES].extrinsic = $c.and64(u.uprops[SICK_RES].extrinsic, ~W_ARM);
+                u.uprops[SICK_RES].extrinsic = $c.and64(u.uprops[SICK_RES].extrinsic, ~W.ARM);
             }
             break;
         case RED_DRAGON_SCALES:
         case RED_DRAGON_SCALE_MAIL:
             if (puton) {
-                u.uprops[INFRAVISION].extrinsic = $c.or64(u.uprops[INFRAVISION].extrinsic, W_ARM);
+                u.uprops[INFRAVISION].extrinsic = $c.or64(u.uprops[INFRAVISION].extrinsic, W.ARM);
             } else {
-                u.uprops[INFRAVISION].extrinsic = $c.and64(u.uprops[INFRAVISION].extrinsic, ~W_ARM);
+                u.uprops[INFRAVISION].extrinsic = $c.and64(u.uprops[INFRAVISION].extrinsic, ~W.ARM);
             }
             await see_monsters();
             break;
         case GOLD_DRAGON_SCALES:
         case GOLD_DRAGON_SCALE_MAIL:
-            await make_hallucinated(!puton ? 1 : 0, $c.i8(program_state.restoring ? FALSE : TRUE), W_ARM);
+            await make_hallucinated(!puton ? 1 : 0, $c.i8(program_state.restoring ? FALSE : TRUE), W.ARM);
             break;
         case ORANGE_DRAGON_SCALES:
         case ORANGE_DRAGON_SCALE_MAIL:
             if (puton) {
-                u.uprops[FREE_ACTION].extrinsic = $c.or64(u.uprops[FREE_ACTION].extrinsic, W_ARM);
+                u.uprops[FREE_ACTION].extrinsic = $c.or64(u.uprops[FREE_ACTION].extrinsic, W.ARM);
             } else {
-                u.uprops[FREE_ACTION].extrinsic = $c.and64(u.uprops[FREE_ACTION].extrinsic, ~W_ARM);
+                u.uprops[FREE_ACTION].extrinsic = $c.and64(u.uprops[FREE_ACTION].extrinsic, ~W.ARM);
             }
             break;
         case YELLOW_DRAGON_SCALES:
         case YELLOW_DRAGON_SCALE_MAIL:
             if (puton) {
-                u.uprops[STONE_RES].extrinsic = $c.or64(u.uprops[STONE_RES].extrinsic, W_ARM);
+                u.uprops[STONE_RES].extrinsic = $c.or64(u.uprops[STONE_RES].extrinsic, W.ARM);
             } else {
-                u.uprops[STONE_RES].extrinsic = $c.and64(u.uprops[STONE_RES].extrinsic, ~W_ARM);
+                u.uprops[STONE_RES].extrinsic = $c.and64(u.uprops[STONE_RES].extrinsic, ~W.ARM);
                 await wielding_corpse($G.uwep, otmp, on_purpose);
                 await wielding_corpse($G.uswapwep, otmp, on_purpose);
             }
@@ -679,9 +679,9 @@ async function dragon_armor_handling(otmp, puton, on_purpose) {   // do_wear.c:7
         case WHITE_DRAGON_SCALES:
         case WHITE_DRAGON_SCALE_MAIL:
             if (puton) {
-                u.uprops[SLOW_DIGESTION].extrinsic = $c.or64(u.uprops[SLOW_DIGESTION].extrinsic, W_ARM);
+                u.uprops[SLOW_DIGESTION].extrinsic = $c.or64(u.uprops[SLOW_DIGESTION].extrinsic, W.ARM);
             } else {
-                u.uprops[SLOW_DIGESTION].extrinsic = $c.and64(u.uprops[SLOW_DIGESTION].extrinsic, ~W_ARM);
+                u.uprops[SLOW_DIGESTION].extrinsic = $c.and64(u.uprops[SLOW_DIGESTION].extrinsic, ~W.ARM);
             }
             break;
         default:
@@ -709,8 +709,8 @@ export async function Armor_off() {   // do_wear.c:909
     let otmp = null, was_arti_light = 0;
     otmp = $G.uarm;
     was_arti_light = $c.i8(otmp && otmp.lamplit | 0 && artifact_light(otmp) ? 1 : 0);
-    svc.context.takeoff.mask = $c.and64(svc.context.takeoff.mask, ~W_ARM);
-    await setworn(null, W_ARM);
+    svc.context.takeoff.mask = $c.and64(svc.context.takeoff.mask, ~W.ARM);
+    await setworn(null, W.ARM);
     svc.context.takeoff.cancelled_don = FALSE;
     if (was_arti_light && !artifact_light(otmp)) {
         await end_burn(otmp, FALSE);
@@ -725,7 +725,7 @@ export async function Armor_gone() {   // do_wear.c:939
     let otmp = null, was_arti_light = 0;
     otmp = $G.uarm;
     was_arti_light = $c.i8(otmp && otmp.lamplit | 0 && artifact_light(otmp) ? 1 : 0);
-    svc.context.takeoff.mask = $c.and64(svc.context.takeoff.mask, ~W_ARM);
+    svc.context.takeoff.mask = $c.and64(svc.context.takeoff.mask, ~W.ARM);
     await setnotworn($G.uarm);
     svc.context.takeoff.cancelled_don = FALSE;
     if (was_arti_light && !artifact_light(otmp)) {
@@ -741,7 +741,7 @@ async function Amulet_on(amul) {   // do_wear.c:963
     let on_msg_done = 0, was_in_poison_gas = 0, call_it = 0, new_sex = 0, orig_sex = 0, newnap = 0, oldnap = 0, already_flying = 0;
     on_msg_done = FALSE;
     await remove_worn_item(amul, FALSE);
-    await setworn(amul, W_AMUL);
+    await setworn(amul, W.AMUL);
     switch ($G.uamul.otyp) {
         case AMULET_OF_ESP:
         case AMULET_OF_LIFE_SAVING:
@@ -751,9 +751,9 @@ async function Amulet_on(amul) {   // do_wear.c:963
             break;
         case AMULET_OF_MAGICAL_BREATHING:
             {
-                u.uprops[MAGICAL_BREATHING].extrinsic = $c.and64(u.uprops[MAGICAL_BREATHING].extrinsic, ~W_AMUL);
+                u.uprops[MAGICAL_BREATHING].extrinsic = $c.and64(u.uprops[MAGICAL_BREATHING].extrinsic, ~W.AMUL);
                 was_in_poison_gas = region_danger();
-                u.uprops[MAGICAL_BREATHING].extrinsic = $c.or64(u.uprops[MAGICAL_BREATHING].extrinsic, W_AMUL);
+                u.uprops[MAGICAL_BREATHING].extrinsic = $c.or64(u.uprops[MAGICAL_BREATHING].extrinsic, W.AMUL);
                 if (was_in_poison_gas) {
                     await discover_object(AMULET_OF_MAGICAL_BREATHING, TRUE, TRUE, TRUE);
                     await on_msg($G.uamul);
@@ -817,10 +817,10 @@ async function Amulet_on(amul) {   // do_wear.c:963
             }
         case AMULET_OF_FLYING:
             float_vs_flight();
-            if ((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked) {
-                u.uprops[FLYING].extrinsic = $c.and64(u.uprops[FLYING].extrinsic, ~W_AMUL);
-                already_flying = $c.i8(!!((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked) ? 1 : 0);
-                u.uprops[FLYING].extrinsic = $c.or64(u.uprops[FLYING].extrinsic, W_AMUL);
+            if ((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) {
+                u.uprops[FLYING].extrinsic = $c.and64(u.uprops[FLYING].extrinsic, ~W.AMUL);
+                already_flying = $c.i8(!!((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) ? 1 : 0);
+                u.uprops[FLYING].extrinsic = $c.or64(u.uprops[FLYING].extrinsic, W.AMUL);
                 if (!already_flying) {
                     await discover_object(AMULET_OF_FLYING, TRUE, TRUE, TRUE);
                     await on_msg($G.uamul);
@@ -846,10 +846,10 @@ export async function Amulet_off() {   // do_wear.c:1090
     amul = $G.uamul;
     mkn = FALSE;
     early_off_msg = FALSE;
-    svc.context.takeoff.mask = $c.and64(svc.context.takeoff.mask, ~W_AMUL);
+    svc.context.takeoff.mask = $c.and64(svc.context.takeoff.mask, ~W.AMUL);
     switch ($G.uamul.otyp) {
         case AMULET_OF_ESP:
-            await setworn(null, W_AMUL);
+            await setworn(null, W.AMUL);
             await off_msg(amul);
             early_off_msg = TRUE;
             await see_monsters();
@@ -862,11 +862,11 @@ export async function Amulet_off() {   // do_wear.c:1090
         case FAKE_AMULET_OF_YENDOR:
             break;
         case AMULET_OF_MAGICAL_BREATHING:
-            await setworn(null, W_AMUL);
+            await setworn(null, W.AMUL);
             await off_msg(amul);
             early_off_msg = TRUE;
             if (Underwater()) {
-                if (!cant_drown(gy.youmonst.data) && !(u.uprops[SWIMMING].intrinsic || u.uprops[SWIMMING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_SWIM) !== 0)) {
+                if (!cant_drown(gy.youmonst.data) && !(u.uprops[SWIMMING].intrinsic || u.uprops[SWIMMING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.SWIM) !== 0)) {
                     await You($c.lit("suddenly inhale an unhealthy amount of %s!"), hliquid($c.lit("water")));
                     mkn = TRUE;
                     await drown();
@@ -878,13 +878,13 @@ export async function Amulet_off() {   // do_wear.c:1090
             }
             break;
         case AMULET_OF_STRANGULATION:
-            await setworn(null, W_AMUL);
+            await setworn(null, W.AMUL);
             await off_msg(amul);
             early_off_msg = TRUE;
             if (Strangled()) {
                 u.uprops[STRANGLED].intrinsic = 0;
                 disp.botl = TRUE;
-                if (u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1_BREATHLESS) !== 0) {
+                if (u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.BREATHLESS) !== 0) {
                     await Your($c.lit("%s is no longer constricted!"), await body_part(NECK));
                 } else {
                     await You($c.lit("can breathe more easily!"));
@@ -893,19 +893,19 @@ export async function Amulet_off() {   // do_wear.c:1090
             }
             break;
         case AMULET_OF_RESTFUL_SLEEP:
-            await setworn(null, W_AMUL);
+            await setworn(null, W.AMUL);
             if (!ESleepy() && !$c.and64(u.uprops[SLEEPY].intrinsic, ~TIMEOUT)) {
                 u.uprops[SLEEPY].intrinsic = $c.and64(u.uprops[SLEEPY].intrinsic, ~TIMEOUT);
             }
             break;
         case AMULET_OF_FLYING:
             {
-                was_flying = $c.i8(!!((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked) ? 1 : 0);
-                await setworn(null, W_AMUL);
+                was_flying = $c.i8(!!((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) ? 1 : 0);
+                await setworn(null, W.AMUL);
                 await off_msg(amul);
                 early_off_msg = TRUE;
                 float_vs_flight();
-                if (was_flying && !((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked)) {
+                if (was_flying && !((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked)) {
                     disp.botl = TRUE;
                     await You($c.lit("%s."), is_pool_or_lava(u.ux, u.uy) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) || (svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) ? $c.lit("stop flying") : $c.lit("land"));
                     mkn = TRUE;
@@ -919,7 +919,7 @@ export async function Amulet_off() {   // do_wear.c:1090
         case AMULET_OF_YENDOR:
             break;
     }
-    await setworn(null, W_AMUL);
+    await setworn(null, W.AMUL);
     if (!early_off_msg) {
         await off_msg(amul);
     }
@@ -1022,13 +1022,13 @@ export async function Ring_on(obj) {   // do_wear.c:1242
             }
             break;
         case RIN_GAIN_STRENGTH:
-            await adjust_attrib(obj, A_STR, obj.spe);
+            await adjust_attrib(obj, A.STR, obj.spe);
             break;
         case RIN_GAIN_CONSTITUTION:
-            await adjust_attrib(obj, A_CON, obj.spe);
+            await adjust_attrib(obj, A.CON, obj.spe);
             break;
         case RIN_ADORNMENT:
-            await adjust_attrib(obj, A_CHA, obj.spe);
+            await adjust_attrib(obj, A.CHA, obj.spe);
             break;
         case RIN_INCREASE_ACCURACY:
             u.uhitinc = $c.i8(u.uhitinc + obj.spe | 0);
@@ -1114,13 +1114,13 @@ async function Ring_off_or_gone(obj, gone) {   // do_wear.c:1347
             }
             break;
         case RIN_GAIN_STRENGTH:
-            await adjust_attrib(obj, A_STR, -obj.spe | 0);
+            await adjust_attrib(obj, A.STR, -obj.spe | 0);
             break;
         case RIN_GAIN_CONSTITUTION:
-            await adjust_attrib(obj, A_CON, -obj.spe | 0);
+            await adjust_attrib(obj, A.CON, -obj.spe | 0);
             break;
         case RIN_ADORNMENT:
-            await adjust_attrib(obj, A_CHA, -obj.spe | 0);
+            await adjust_attrib(obj, A.CHA, -obj.spe | 0);
             break;
         case RIN_INCREASE_ACCURACY:
             u.uhitinc = $c.i8(u.uhitinc - obj.spe | 0);
@@ -1153,7 +1153,7 @@ export async function Blindf_on(otmp) {   // do_wear.c:1461
     already_blind = $c.i8(Blind());
     changed = FALSE;
     await remove_worn_item(otmp, FALSE);
-    await setworn(otmp, W_TOOL);
+    await setworn(otmp, W.TOOL);
     await on_msg(otmp);
     if (Blind() && !already_blind) {
         changed = TRUE;
@@ -1188,7 +1188,7 @@ export async function Blindf_off(otmp) {   // do_wear.c:1495
         await impossible($c.lit("Blindf_off without eyewear?"));
         return;
     }
-    svc.context.takeoff.mask = $c.and64(svc.context.takeoff.mask, ~W_TOOL);
+    svc.context.takeoff.mask = $c.and64(svc.context.takeoff.mask, ~W.TOOL);
     await setworn(null, otmp.owornmask);
     if (!nooffmsg) {
         await off_msg(otmp);
@@ -1279,33 +1279,33 @@ export function doffing(otmp) {   // do_wear.c:1603
     what = svc.context.takeoff.what;
     result = FALSE;
     if ($c.peq(otmp, $G.uarm)) {
-        result = $c.i8(ga.afternmv === Armor_off || what === W_ARM ? 1 : 0);
+        result = $c.i8(ga.afternmv === Armor_off || what === W.ARM ? 1 : 0);
     } else if ($c.peq(otmp, $G.uarmu)) {
-        result = $c.i8(ga.afternmv === Shirt_off || what === W_ARMU ? 1 : 0);
+        result = $c.i8(ga.afternmv === Shirt_off || what === W.ARMU ? 1 : 0);
     } else if ($c.peq(otmp, $G.uarmc)) {
-        result = $c.i8(ga.afternmv === Cloak_off || what === W_ARMC ? 1 : 0);
+        result = $c.i8(ga.afternmv === Cloak_off || what === W.ARMC ? 1 : 0);
     } else if ($c.peq(otmp, $G.uarmf)) {
-        result = $c.i8(ga.afternmv === Boots_off || what === W_ARMF ? 1 : 0);
+        result = $c.i8(ga.afternmv === Boots_off || what === W.ARMF ? 1 : 0);
     } else if ($c.peq(otmp, $G.uarmh)) {
-        result = $c.i8(ga.afternmv === Helmet_off || what === W_ARMH ? 1 : 0);
+        result = $c.i8(ga.afternmv === Helmet_off || what === W.ARMH ? 1 : 0);
     } else if ($c.peq(otmp, $G.uarmg)) {
-        result = $c.i8(ga.afternmv === Gloves_off || what === W_ARMG ? 1 : 0);
+        result = $c.i8(ga.afternmv === Gloves_off || what === W.ARMG ? 1 : 0);
     } else if ($c.peq(otmp, $G.uarms)) {
-        result = $c.i8(ga.afternmv === Shield_off || what === W_ARMS ? 1 : 0);
+        result = $c.i8(ga.afternmv === Shield_off || what === W.ARMS ? 1 : 0);
     } else if ($c.peq(otmp, $G.uamul)) {
-        result = $c.i8(what === W_AMUL ? 1 : 0);
+        result = $c.i8(what === W.AMUL ? 1 : 0);
     } else if ($c.peq(otmp, $G.uleft)) {
-        result = $c.i8(what === W_RINGL ? 1 : 0);
+        result = $c.i8(what === W.RINGL ? 1 : 0);
     } else if ($c.peq(otmp, $G.uright)) {
-        result = $c.i8(what === W_RINGR ? 1 : 0);
+        result = $c.i8(what === W.RINGR ? 1 : 0);
     } else if ($c.peq(otmp, $G.ublindf)) {
-        result = $c.i8(what === W_TOOL ? 1 : 0);
+        result = $c.i8(what === W.TOOL ? 1 : 0);
     } else if ($c.peq(otmp, $G.uwep)) {
-        result = $c.i8(what === W_WEP ? 1 : 0);
+        result = $c.i8(what === W.WEP ? 1 : 0);
     } else if ($c.peq(otmp, $G.uswapwep)) {
-        result = $c.i8(what === W_SWAPWEP ? 1 : 0);
+        result = $c.i8(what === W.SWAPWEP ? 1 : 0);
     } else if ($c.peq(otmp, $G.uquiver)) {
-        result = $c.i8(what === W_QUIVER ? 1 : 0);
+        result = $c.i8(what === W.QUIVER ? 1 : 0);
     }
     return result;
 }
@@ -1435,7 +1435,7 @@ async function armor_or_accessory_off(obj) {   // do_wear.c:1771
     let why = new Int8Array(128), what = new Int8Array(128), $t1;
     if (!$c.and64(obj.owornmask, W_ARMOR | W_ACCESSORY)) {
         await You($c.lit("are not wearing that."));
-        return ECMD_OK;
+        return ECMD.OK;
     }
     if ($c.peq(obj, $G.uskin) || $c.peq(obj, $G.uarm) && $G.uarmc || $c.peq(obj, $G.uarmu) && ($G.uarmc || $G.uarm)) {
         $t1 = what[0] = 0, why[0] = $t1;
@@ -1454,12 +1454,12 @@ async function armor_or_accessory_off(obj) {   // do_wear.c:1771
             $c.__builtin___strcpy_chk(new $c.Ptr(why, 0), $c.lit("; it's embedded"), 128);
         }
         await You_cant($c.lit("take that off%s."), new $c.Ptr(why, 0));
-        return ECMD_OK;
+        return ECMD.OK;
     }
     reset_remarm();
     await select_off(obj);
     if (!svc.context.takeoff.mask) {
-        return ECMD_OK;
+        return ECMD.OK;
     }
     reset_remarm();
     if ($c.and64(obj.owornmask, W_ARMOR)) {
@@ -1477,7 +1477,7 @@ async function armor_or_accessory_off(obj) {   // do_wear.c:1771
             await remove_worn_item(obj, FALSE);
         }
     }
-    return ECMD_TIME;
+    return ECMD.TIME;
 }
 export async function dotakeoff() {   // do_wear.c:1833
     let otmp = [null];
@@ -1489,13 +1489,13 @@ export async function dotakeoff() {   // do_wear.c:1833
         } else {
             await pline($c.lit("Not wearing any armor or accessories."));
         }
-        return ECMD_OK;
+        return ECMD.OK;
     }
     if (Narmorpieces !== 1 || ParanoidRemove() || gi.item_action_in_progress) {
-        otmp[0] = await getobj($c.lit("take off"), takeoff_ok, GETOBJ_NOFLAGS);
+        otmp[0] = await getobj($c.lit("take off"), takeoff_ok, GETOBJ.NOFLAGS);
     }
     if (!otmp[0]) {
-        return ECMD_CANCEL;
+        return ECMD.CANCEL;
     }
     return await armor_or_accessory_off(otmp[0]);
 }
@@ -1512,13 +1512,13 @@ export async function doremring() {   // do_wear.c:1874
     count_worn_stuff(new $c.Ptr(otmp, 0), TRUE);
     if (!Naccessories && !Narmorpieces) {
         await pline($c.lit("Not wearing any accessories or armor."));
-        return ECMD_OK;
+        return ECMD.OK;
     }
     if (Naccessories !== 1 || ParanoidRemove() || cmdq_peek(CQ_CANNED)) {
-        otmp[0] = await getobj($c.lit("remove"), remove_ok, GETOBJ_NOFLAGS);
+        otmp[0] = await getobj($c.lit("remove"), remove_ok, GETOBJ.NOFLAGS);
     }
     if (!otmp[0]) {
-        return ECMD_CANCEL;
+        return ECMD.CANCEL;
     }
     return await armor_or_accessory_off(otmp[0]);
 }
@@ -1530,7 +1530,7 @@ export async function cursed(otmp) {   // do_wear.c:1893
     }
     if ($c.peq(otmp, $G.uwep) ? await welded(otmp) : otmp.cursed | 0) {
         use_plural = $c.i8(is_boots(otmp) || is_gloves(otmp) || otmp.otyp === LENSES || otmp.quan > 1 ? 1 : 0);
-        if (Glib() && otmp.bknown | 0 && ($G.uarmg ? $c.peq(otmp, $G.uwep) : $c.and64(otmp.owornmask, W_WEP | W_RING) !== 0)) {
+        if (Glib() && otmp.bknown | 0 && ($G.uarmg ? $c.peq(otmp, $G.uwep) : $c.and64(otmp.owornmask, W.WEP | W_RING) !== 0)) {
             await pline($c.lit("Despite your slippery %s, you can't."), await fingers_or_gloves(TRUE));
         } else {
             await You($c.lit("can't.  %s cursed."), use_plural ? $c.lit("They are") : $c.lit("It is"));
@@ -1635,7 +1635,7 @@ export async function canwearobj(otmp, mask, noisy) {   // do_wear.c:2030
         return 0;
     }
     which = is_cloak(otmp) ? new $c.Ptr(c_cloak, 0) : is_shirt(otmp) ? new $c.Ptr(c_shirt, 0) : is_suit(otmp) ? new $c.Ptr(c_suit, 0) : null;
-    if (which && (breakarm(gy.youmonst.data) || sliparm(gy.youmonst.data)) && (!$c.peq(which, new $c.Ptr(c_cloak, 0)) || (otmp.otyp !== MUMMY_WRAPPING ? gy.youmonst.data.msize !== MZ_SMALL : !WrappingAllowed(gy.youmonst.data))) && racial_exception(gy.youmonst, otmp) < 1) {
+    if (which && (breakarm(gy.youmonst.data) || sliparm(gy.youmonst.data)) && (!$c.peq(which, new $c.Ptr(c_cloak, 0)) || (otmp.otyp !== MUMMY_WRAPPING ? gy.youmonst.data.msize !== MZ.SMALL : !WrappingAllowed(gy.youmonst.data))) && racial_exception(gy.youmonst, otmp) < 1) {
         if (noisy) {
             await pline_The($c.lit("%s will not fit on your body."), which);
         }
@@ -1664,7 +1664,7 @@ export async function canwearobj(otmp, mask, noisy) {   // do_wear.c:2030
             }
             err = err + 1 | 0;
         } else {
-            mask.set(0, W_ARMH);
+            mask.set(0, W.ARMH);
         }
     } else if (is_shield(otmp)) {
         if ($G.uarms) {
@@ -1683,7 +1683,7 @@ export async function canwearobj(otmp, mask, noisy) {   // do_wear.c:2030
             }
             err = err + 1 | 0;
         } else {
-            mask.set(0, W_ARMS);
+            mask.set(0, W.ARMS);
         }
     } else if (is_boots(otmp)) {
         if ($G.uarmf) {
@@ -1696,17 +1696,17 @@ export async function canwearobj(otmp, mask, noisy) {   // do_wear.c:2030
                 await You($c.lit("have no feet..."));
             }
             err = err + 1 | 0;
-        } else if (Upolyd() && gy.youmonst.data.mlet === S_CENTAUR) {
+        } else if (Upolyd() && gy.youmonst.data.mlet === S.CENTAUR) {
             if (noisy) {
                 await You($c.lit("have too many hooves to wear %s."), new $c.Ptr(c_boots, 0));
             }
             err = err + 1 | 0;
-        } else if (u.utrap && (u.utraptype === TT_BEARTRAP || u.utraptype === TT_INFLOOR || u.utraptype === TT_LAVA || u.utraptype === TT_BURIEDBALL)) {
-            if (u.utraptype === TT_BEARTRAP) {
+        } else if (u.utrap && (u.utraptype === TT.BEARTRAP || u.utraptype === TT.INFLOOR || u.utraptype === TT.LAVA || u.utraptype === TT.BURIEDBALL)) {
+            if (u.utraptype === TT.BEARTRAP) {
                 if (noisy) {
                     await Your($c.lit("%s is trapped!"), await body_part(FOOT));
                 }
-            } else if (u.utraptype === TT_INFLOOR || u.utraptype === TT_LAVA) {
+            } else if (u.utraptype === TT.INFLOOR || u.utraptype === TT.LAVA) {
                 if (noisy) {
                     await Your($c.lit("%s are stuck in the %s!"), await makeplural(await body_part(FOOT)), surface(u.ux, u.uy));
                 }
@@ -1717,7 +1717,7 @@ export async function canwearobj(otmp, mask, noisy) {   // do_wear.c:2030
             }
             err = err + 1 | 0;
         } else {
-            mask.set(0, W_ARMF);
+            mask.set(0, W.ARMF);
         }
     } else if (is_gloves(otmp)) {
         if ($G.uarmg) {
@@ -1736,7 +1736,7 @@ export async function canwearobj(otmp, mask, noisy) {   // do_wear.c:2030
             }
             err = err + 1 | 0;
         } else {
-            mask.set(0, W_ARMG);
+            mask.set(0, W.ARMG);
         }
     } else if (is_shirt(otmp)) {
         if ($G.uarm || $G.uarmc || $G.uarmu) {
@@ -1751,7 +1751,7 @@ export async function canwearobj(otmp, mask, noisy) {   // do_wear.c:2030
             }
             err = err + 1 | 0;
         } else {
-            mask.set(0, W_ARMU);
+            mask.set(0, W.ARMU);
         }
     } else if (is_cloak(otmp)) {
         if ($G.uarmc) {
@@ -1760,7 +1760,7 @@ export async function canwearobj(otmp, mask, noisy) {   // do_wear.c:2030
             }
             err = err + 1 | 0;
         } else {
-            mask.set(0, W_ARMC);
+            mask.set(0, W.ARMC);
         }
     } else if (is_suit(otmp)) {
         if ($G.uarmc) {
@@ -1774,7 +1774,7 @@ export async function canwearobj(otmp, mask, noisy) {   // do_wear.c:2030
             }
             err = err + 1 | 0;
         } else {
-            mask.set(0, W_ARM);
+            mask.set(0, W.ARM);
         }
     } else {
         if (noisy) {
@@ -1790,7 +1790,7 @@ async function accessory_or_armor_on(obj$in) {   // do_wear.c:2209
     mask[0] = 0;
     if ($c.and64(obj[0].owornmask, W_ACCESSORY | W_ARMOR)) {
         await already_wearing(new $c.Ptr(c_that_, 0));
-        return ECMD_OK;
+        return ECMD.OK;
     }
     armor = $c.i8(obj[0].oclass === ARMOR_CLASS ? 1 : 0);
     ring = $c.i8(obj[0].oclass === RING_CLASS || obj[0].otyp === MEAT_RING ? 1 : 0);
@@ -1798,10 +1798,10 @@ async function accessory_or_armor_on(obj$in) {   // do_wear.c:2209
     eyewear = $c.i8(obj[0].otyp === BLINDFOLD || obj[0].otyp === TOWEL || obj[0].otyp === LENSES ? 1 : 0);
     if (armor) {
         if (!await canwearobj(obj[0], new $c.Ptr(mask, 0), TRUE)) {
-            return ECMD_OK;
+            return ECMD.OK;
         }
         if (obj[0].otyp === HELM_OF_OPPOSITE_ALIGNMENT && svd.dungeon_topology.d_qstart_level.dnum === u.uz.dnum) {
-            if (u.ualignbase[A_CURRENT] === u.ualignbase[A_ORIGINAL]) {
+            if (u.ualignbase[A.CURRENT] === u.ualignbase[A.ORIGINAL]) {
                 await You($c.lit("narrowly avoid losing all chance at your goal."));
             } else {
                 await You($c.lit("are suddenly overcome with shame and change your mind."));
@@ -1809,72 +1809,72 @@ async function accessory_or_armor_on(obj$in) {   // do_wear.c:2209
             u.ublessed = 0;
             await discover_object(obj[0].otyp, TRUE, TRUE, TRUE);
             disp.botl = TRUE;
-            return ECMD_TIME;
+            return ECMD.TIME;
         }
     } else {
         if (ring) {
             res = 0;
             if (nolimbs(gy.youmonst.data)) {
                 await You($c.lit("cannot make the ring stick to your body."));
-                return ECMD_OK;
+                return ECMD.OK;
             }
             if ($G.uleft && $G.uright) {
                 await There($c.lit("are no more %s%s to fill."), humanoid(gy.youmonst.data) ? $c.lit("ring-") : $c.lit(""), await fingers_or_gloves(FALSE));
-                return ECMD_OK;
+                return ECMD.OK;
             }
             if ($G.uleft) {
-                mask[0] = W_RINGR;
+                mask[0] = W.RINGR;
             } else if ($G.uright) {
-                mask[0] = W_RINGL;
+                mask[0] = W.RINGL;
             } else {
                 do {
-                    $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("Which %s%s, Right or Left?"), $c.andu64(gy.youmonst.data.mflags1, M1_HUMANOID) !== 0 ? $c.lit("ring-") : $c.lit(""), await body_part(FINGER));
+                    $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("Which %s%s, Right or Left?"), $c.andu64(gy.youmonst.data.mflags1, M1.HUMANOID) !== 0 ? $c.lit("ring-") : $c.lit(""), await body_part(FINGER));
                     answer = await yn_function(new $c.Ptr(qbuf, 0), new $c.Ptr(rightleftchars, 0), 0, TRUE);
                     switch (answer) {
                         case 0:
                         case 27:
-                            return ECMD_OK;
+                            return ECMD.OK;
                         case 108:
                         case 76:
-                            mask[0] = W_RINGL;
+                            mask[0] = W.RINGL;
                             break;
                         case 114:
                         case 82:
-                            mask[0] = W_RINGR;
+                            mask[0] = W.RINGR;
                             break;
                     }
                 } while (!mask[0]);
             }
             if ($G.uarmg && Glib()) {
                 await Your($c.lit("%s are too slippery to remove, so you cannot put on the ring."), gloves_simple_name($G.uarmg));
-                return ECMD_TIME;
+                return ECMD.TIME;
             }
             if ($G.uarmg && $G.uarmg.cursed | 0) {
                 res = !$G.uarmg.bknown ? 1 : 0;
                 await set_bknown($G.uarmg, 1);
                 await You($c.lit("cannot remove your %s to put on the ring."), new $c.Ptr(c_gloves, 0));
-                return res ? ECMD_TIME : ECMD_OK;
+                return res ? ECMD.TIME : ECMD.OK;
             }
             if ($G.uwep) {
                 res = !$G.uwep.bknown ? 1 : 0;
-                if ((mask[0] === W_RINGR && URIGHTY() || mask[0] === W_RINGL && ULEFTY() || bimanual($G.uwep)) && await welded($G.uwep)) {
+                if ((mask[0] === W.RINGR && URIGHTY() || mask[0] === W.RINGL && ULEFTY() || bimanual($G.uwep)) && await welded($G.uwep)) {
                     hand = await body_part(HAND);
                     if (bimanual($G.uwep)) {
                         hand = await makeplural(hand);
                     }
                     await You($c.lit("cannot free your weapon %s to put on the ring."), hand);
-                    return res ? ECMD_TIME : ECMD_OK;
+                    return res ? ECMD.TIME : ECMD.OK;
                 }
             }
         } else if (amulet) {
             if ($G.uamul) {
                 await already_wearing($c.lit("an amulet"));
-                return ECMD_OK;
+                return ECMD.OK;
             }
         } else if (eyewear) {
             if (!has_head(gy.youmonst.data)) {
                 await You($c.lit("have no head to wear %s on."), await ansimpleoname(obj[0]));
-                return ECMD_OK;
+                return ECMD.OK;
             }
             if ($G.ublindf) {
                 if ($G.ublindf.otyp === TOWEL) {
@@ -1894,15 +1894,15 @@ async function accessory_or_armor_on(obj$in) {   // do_wear.c:2209
                 } else {
                     await already_wearing(c_common_strings.c_something);
                 }
-                return ECMD_OK;
+                return ECMD.OK;
             }
         } else {
             await You_cant($c.lit("wear that!"));
-            return ECMD_OK;
+            return ECMD.OK;
         }
     }
     if (!await retouch_object(new $c.Ptr(obj, 0), FALSE)) {
-        return ECMD_TIME;
+        return ECMD.TIME;
     }
     if (armor) {
         if ($c.and64(obj[0].owornmask, W_WEAPONS)) {
@@ -1952,29 +1952,29 @@ async function accessory_or_armor_on(obj$in) {   // do_wear.c:2209
             await impossible($c.lit("putting on unexpected type of accessory: %s"), await safe_typename(obj[0].otyp));
         }
     }
-    return ECMD_TIME;
+    return ECMD.TIME;
 }
 export async function dowear() {   // do_wear.c:2432
     let otmp = null;
     if (verysmall(gy.youmonst.data) || nohands(gy.youmonst.data)) {
         await pline($c.lit("Don't even bother."));
-        return ECMD_OK;
+        return ECMD.OK;
     }
     if ($G.uarm && $G.uarmu && $G.uarmc && $G.uarmh && $G.uarms && $G.uarmg && $G.uarmf && $G.uleft && $G.uright && $G.uamul && $G.ublindf) {
         await You($c.lit("are already wearing a full complement of armor."));
-        return ECMD_OK;
+        return ECMD.OK;
     }
-    otmp = await getobj($c.lit("wear"), wear_ok, GETOBJ_NOFLAGS);
-    return otmp ? await accessory_or_armor_on(otmp) : ECMD_CANCEL;
+    otmp = await getobj($c.lit("wear"), wear_ok, GETOBJ.NOFLAGS);
+    return otmp ? await accessory_or_armor_on(otmp) : ECMD.CANCEL;
 }
 export async function doputon() {   // do_wear.c:2454
     let otmp = null;
     if ($G.uleft && $G.uright && $G.uamul && $G.ublindf && $G.uarm && $G.uarmu && $G.uarmc && $G.uarmh && $G.uarms && $G.uarmg && $G.uarmf) {
         await Your($c.lit("%s%s are full, and you're already wearing an amulet and %s."), humanoid(gy.youmonst.data) ? $c.lit("ring-") : $c.lit(""), await fingers_or_gloves(FALSE), $G.ublindf.otyp === LENSES ? $c.lit("some lenses") : $c.lit("a blindfold"));
-        return ECMD_OK;
+        return ECMD.OK;
     }
-    otmp = await getobj($c.lit("put on"), puton_ok, GETOBJ_NOFLAGS);
-    return otmp ? await accessory_or_armor_on(otmp) : ECMD_CANCEL;
+    otmp = await getobj($c.lit("put on"), puton_ok, GETOBJ.NOFLAGS);
+    return otmp ? await accessory_or_armor_on(otmp) : ECMD.CANCEL;
 }
 export function find_ac() {   // do_wear.c:2473
     let uac = 0;
@@ -2093,26 +2093,26 @@ export async function glibr() {   // do_wear.c:2528
 }
 export async function some_armor(victim) {   // do_wear.c:2630
     let otmph = null, otmp = null;
-    otmph = $c.peq(victim, gy.youmonst) ? $G.uarmc : await which_armor(victim, W_ARMC);
+    otmph = $c.peq(victim, gy.youmonst) ? $G.uarmc : await which_armor(victim, W.ARMC);
     if (!otmph) {
-        otmph = $c.peq(victim, gy.youmonst) ? $G.uarm : await which_armor(victim, W_ARM);
+        otmph = $c.peq(victim, gy.youmonst) ? $G.uarm : await which_armor(victim, W.ARM);
     }
     if (!otmph) {
-        otmph = $c.peq(victim, gy.youmonst) ? $G.uarmu : await which_armor(victim, W_ARMU);
+        otmph = $c.peq(victim, gy.youmonst) ? $G.uarmu : await which_armor(victim, W.ARMU);
     }
-    otmp = $c.peq(victim, gy.youmonst) ? $G.uarmh : await which_armor(victim, W_ARMH);
+    otmp = $c.peq(victim, gy.youmonst) ? $G.uarmh : await which_armor(victim, W.ARMH);
     if (otmp && (!otmph || !rn2(4))) {
         otmph = otmp;
     }
-    otmp = $c.peq(victim, gy.youmonst) ? $G.uarmg : await which_armor(victim, W_ARMG);
+    otmp = $c.peq(victim, gy.youmonst) ? $G.uarmg : await which_armor(victim, W.ARMG);
     if (otmp && (!otmph || !rn2(4))) {
         otmph = otmp;
     }
-    otmp = $c.peq(victim, gy.youmonst) ? $G.uarmf : await which_armor(victim, W_ARMF);
+    otmp = $c.peq(victim, gy.youmonst) ? $G.uarmf : await which_armor(victim, W.ARMF);
     if (otmp && (!otmph || !rn2(4))) {
         otmph = otmp;
     }
-    otmp = $c.peq(victim, gy.youmonst) ? $G.uarms : await which_armor(victim, W_ARMS);
+    otmp = $c.peq(victim, gy.youmonst) ? $G.uarms : await which_armor(victim, W.ARMS);
     if (otmp && (!otmph || !rn2(4))) {
         otmph = otmp;
     }
@@ -2188,10 +2188,10 @@ async function select_off(otmp) {   // do_wear.c:2696
         }
     }
     if ($c.peq(otmp, $G.uarmf)) {
-        if (u.utrap && u.utraptype === TT_BEARTRAP) {
+        if (u.utrap && u.utraptype === TT.BEARTRAP) {
             await pline_The($c.lit("bear trap prevents you from pulling your %s out."), await body_part(FOOT));
             return 0;
-        } else if (u.utrap && u.utraptype === TT_INFLOOR) {
+        } else if (u.utrap && u.utraptype === TT.INFLOOR) {
             await You($c.lit("are stuck in the %s, and cannot pull your %s out."), surface(u.ux, u.uy), await makeplural(await body_part(FOOT)));
             return 0;
         }
@@ -2205,7 +2205,7 @@ async function select_off(otmp) {   // do_wear.c:2696
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("remove your %s"), new $c.Ptr(c_suit, 0));
             why = $G.uarm;
         } else if (await welded($G.uwep) && bimanual($G.uwep)) {
-            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("release your %s"), $G.uwep.oclass === WEAPON_CLASS && objects[$G.uwep.otyp].oc_subtyp >= P_SHORT_SWORD && objects[$G.uwep.otyp].oc_subtyp <= P_SABER ? new $c.Ptr(c_sword, 0) : $G.uwep.otyp === BATTLE_AXE ? new $c.Ptr(c_axe, 0) : new $c.Ptr(c_weapon, 0));
+            $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("release your %s"), $G.uwep.oclass === WEAPON_CLASS && objects[$G.uwep.otyp].oc_subtyp >= P.SHORT_SWORD && objects[$G.uwep.otyp].oc_subtyp <= P.SABER ? new $c.Ptr(c_sword, 0) : $G.uwep.otyp === BATTLE_AXE ? new $c.Ptr(c_axe, 0) : new $c.Ptr(c_weapon, 0));
             why = $G.uwep;
         }
         if (why) {
@@ -2221,33 +2221,33 @@ async function select_off(otmp) {   // do_wear.c:2696
         }
     }
     if ($c.peq(otmp, $G.uarm)) {
-        svc.context.takeoff.mask = $c.or64(svc.context.takeoff.mask, W_ARM);
+        svc.context.takeoff.mask = $c.or64(svc.context.takeoff.mask, W.ARM);
     } else if ($c.peq(otmp, $G.uarmc)) {
-        svc.context.takeoff.mask = $c.or64(svc.context.takeoff.mask, W_ARMC);
+        svc.context.takeoff.mask = $c.or64(svc.context.takeoff.mask, W.ARMC);
     } else if ($c.peq(otmp, $G.uarmf)) {
-        svc.context.takeoff.mask = $c.or64(svc.context.takeoff.mask, W_ARMF);
+        svc.context.takeoff.mask = $c.or64(svc.context.takeoff.mask, W.ARMF);
     } else if ($c.peq(otmp, $G.uarmg)) {
-        svc.context.takeoff.mask = $c.or64(svc.context.takeoff.mask, W_ARMG);
+        svc.context.takeoff.mask = $c.or64(svc.context.takeoff.mask, W.ARMG);
     } else if ($c.peq(otmp, $G.uarmh)) {
-        svc.context.takeoff.mask = $c.or64(svc.context.takeoff.mask, W_ARMH);
+        svc.context.takeoff.mask = $c.or64(svc.context.takeoff.mask, W.ARMH);
     } else if ($c.peq(otmp, $G.uarms)) {
-        svc.context.takeoff.mask = $c.or64(svc.context.takeoff.mask, W_ARMS);
+        svc.context.takeoff.mask = $c.or64(svc.context.takeoff.mask, W.ARMS);
     } else if ($c.peq(otmp, $G.uarmu)) {
-        svc.context.takeoff.mask = $c.or64(svc.context.takeoff.mask, W_ARMU);
+        svc.context.takeoff.mask = $c.or64(svc.context.takeoff.mask, W.ARMU);
     } else if ($c.peq(otmp, $G.uleft)) {
-        svc.context.takeoff.mask = $c.or64(svc.context.takeoff.mask, W_RINGL);
+        svc.context.takeoff.mask = $c.or64(svc.context.takeoff.mask, W.RINGL);
     } else if ($c.peq(otmp, $G.uright)) {
-        svc.context.takeoff.mask = $c.or64(svc.context.takeoff.mask, W_RINGR);
+        svc.context.takeoff.mask = $c.or64(svc.context.takeoff.mask, W.RINGR);
     } else if ($c.peq(otmp, $G.uamul)) {
-        svc.context.takeoff.mask = $c.or64(svc.context.takeoff.mask, W_AMUL);
+        svc.context.takeoff.mask = $c.or64(svc.context.takeoff.mask, W.AMUL);
     } else if ($c.peq(otmp, $G.ublindf)) {
-        svc.context.takeoff.mask = $c.or64(svc.context.takeoff.mask, W_TOOL);
+        svc.context.takeoff.mask = $c.or64(svc.context.takeoff.mask, W.TOOL);
     } else if ($c.peq(otmp, $G.uwep)) {
-        svc.context.takeoff.mask = $c.or64(svc.context.takeoff.mask, W_WEP);
+        svc.context.takeoff.mask = $c.or64(svc.context.takeoff.mask, W.WEP);
     } else if ($c.peq(otmp, $G.uswapwep)) {
-        svc.context.takeoff.mask = $c.or64(svc.context.takeoff.mask, W_SWAPWEP);
+        svc.context.takeoff.mask = $c.or64(svc.context.takeoff.mask, W.SWAPWEP);
     } else if ($c.peq(otmp, $G.uquiver)) {
-        svc.context.takeoff.mask = $c.or64(svc.context.takeoff.mask, W_QUIVER);
+        svc.context.takeoff.mask = $c.or64(svc.context.takeoff.mask, W.QUIVER);
     } else {
         await impossible($c.lit("select_off: %s???"), await doname(otmp));
     }
@@ -2259,7 +2259,7 @@ async function do_takeoff() {   // do_wear.c:2824
     was_twoweap = u.twoweap;
     doff = svc.context.takeoff;
     svc.context.takeoff.mask = $c.or64(svc.context.takeoff.mask, I_SPECIAL);
-    if (doff.what === W_WEP) {
+    if (doff.what === W.WEP) {
         if (!await cursed($G.uwep)) {
             await setuwep(null);
             if (was_twoweap) {
@@ -2268,63 +2268,63 @@ async function do_takeoff() {   // do_wear.c:2824
                 await You($c.lit("are %s."), empty_handed());
             }
         }
-    } else if (doff.what === W_SWAPWEP) {
+    } else if (doff.what === W.SWAPWEP) {
         await setuswapwep(null);
         await You($c.lit("%sno longer %s."), was_twoweap ? $c.lit("are ") : $c.lit(""), was_twoweap ? $c.lit("wielding two weapons at once") : $c.lit("have a second weapon readied"));
-    } else if (doff.what === W_QUIVER) {
+    } else if (doff.what === W.QUIVER) {
         await setuqwep(null);
         await You($c.lit("no longer have ammunition readied."));
-    } else if (doff.what === W_ARM) {
+    } else if (doff.what === W.ARM) {
         otmp = $G.uarm;
         if (!await cursed(otmp)) {
             await Armor_off();
         }
-    } else if (doff.what === W_ARMC) {
+    } else if (doff.what === W.ARMC) {
         otmp = $G.uarmc;
         if (!await cursed(otmp)) {
             await Cloak_off();
         }
-    } else if (doff.what === W_ARMF) {
+    } else if (doff.what === W.ARMF) {
         otmp = $G.uarmf;
         if (!await cursed(otmp)) {
             await Boots_off();
         }
-    } else if (doff.what === W_ARMG) {
+    } else if (doff.what === W.ARMG) {
         otmp = $G.uarmg;
         if (!await cursed(otmp)) {
             await Gloves_off();
         }
-    } else if (doff.what === W_ARMH) {
+    } else if (doff.what === W.ARMH) {
         otmp = $G.uarmh;
         if (!await cursed(otmp)) {
             await Helmet_off();
         }
-    } else if (doff.what === W_ARMS) {
+    } else if (doff.what === W.ARMS) {
         otmp = $G.uarms;
         if (!await cursed(otmp)) {
             await Shield_off();
         }
-    } else if (doff.what === W_ARMU) {
+    } else if (doff.what === W.ARMU) {
         otmp = $G.uarmu;
         if (!await cursed(otmp)) {
             await Shirt_off();
         }
-    } else if (doff.what === W_AMUL) {
+    } else if (doff.what === W.AMUL) {
         otmp = $G.uamul;
         if (!await cursed(otmp)) {
             await Amulet_off();
         }
-    } else if (doff.what === W_RINGL) {
+    } else if (doff.what === W.RINGL) {
         otmp = $G.uleft;
         if (!await cursed(otmp)) {
             await Ring_off($G.uleft);
         }
-    } else if (doff.what === W_RINGR) {
+    } else if (doff.what === W.RINGR) {
         otmp = $G.uright;
         if (!await cursed(otmp)) {
             await Ring_off($G.uright);
         }
-    } else if (doff.what === W_TOOL) {
+    } else if (doff.what === W.TOOL) {
         if (!await cursed($G.ublindf)) {
             await Blindf_off($G.ublindf);
         }
@@ -2359,28 +2359,28 @@ async function take_off() {   // do_wear.c:2900
     if (doff.what === 0) {
         await You($c.lit("finish %s."), new $c.Ptr(doff.disrobing, 0));
         return 0;
-    } else if (doff.what === W_WEP) {
+    } else if (doff.what === W.WEP) {
         doff.delay = 1;
-    } else if (doff.what === W_SWAPWEP) {
+    } else if (doff.what === W.SWAPWEP) {
         doff.delay = 1;
-    } else if (doff.what === W_QUIVER) {
+    } else if (doff.what === W.QUIVER) {
         doff.delay = 1;
-    } else if (doff.what === W_ARM) {
+    } else if (doff.what === W.ARM) {
         otmp = $G.uarm;
         if ($G.uarmc) {
             doff.delay = doff.delay + (Math.imul(2, objects[$G.uarmc.otyp].oc_delay) + 1 | 0) | 0;
         }
-    } else if (doff.what === W_ARMC) {
+    } else if (doff.what === W.ARMC) {
         otmp = $G.uarmc;
-    } else if (doff.what === W_ARMF) {
+    } else if (doff.what === W.ARMF) {
         otmp = $G.uarmf;
-    } else if (doff.what === W_ARMG) {
+    } else if (doff.what === W.ARMG) {
         otmp = $G.uarmg;
-    } else if (doff.what === W_ARMH) {
+    } else if (doff.what === W.ARMH) {
         otmp = $G.uarmh;
-    } else if (doff.what === W_ARMS) {
+    } else if (doff.what === W.ARMS) {
         otmp = $G.uarms;
-    } else if (doff.what === W_ARMU) {
+    } else if (doff.what === W.ARMU) {
         otmp = $G.uarmu;
         if ($G.uarm) {
             doff.delay = doff.delay + Math.imul(2, objects[$G.uarm.otyp].oc_delay) | 0;
@@ -2388,13 +2388,13 @@ async function take_off() {   // do_wear.c:2900
         if ($G.uarmc) {
             doff.delay = doff.delay + (Math.imul(2, objects[$G.uarmc.otyp].oc_delay) + 1 | 0) | 0;
         }
-    } else if (doff.what === W_AMUL) {
+    } else if (doff.what === W.AMUL) {
         doff.delay = 1;
-    } else if (doff.what === W_RINGL) {
+    } else if (doff.what === W.RINGL) {
         doff.delay = 1;
-    } else if (doff.what === W_RINGR) {
+    } else if (doff.what === W.RINGR) {
         doff.delay = 1;
-    } else if (doff.what === W_TOOL) {
+    } else if (doff.what === W.TOOL) {
         doff.delay = 1;
     } else {
         await impossible($c.lit("take_off: taking off %lx"), doff.what);
@@ -2429,20 +2429,20 @@ export async function doddoremarm() {   // do_wear.c:3022
     if (svc.context.takeoff.what || svc.context.takeoff.mask) {
         await You($c.lit("continue %s."), new $c.Ptr(svc.context.takeoff.disrobing, 0));
         set_occupation(take_off, new $c.Ptr(svc.context.takeoff.disrobing, 0), 0);
-        return ECMD_OK;
+        return ECMD.OK;
     } else if (!$G.uwep && !$G.uswapwep && !$G.uquiver && !$G.uamul && !$G.ublindf && !$G.uleft && !$G.uright && !wearing_armor()) {
         await You($c.lit("are not wearing anything."));
-        return ECMD_OK;
+        return ECMD.OK;
     }
     add_valid_menu_class(0);
-    if (flags.menu_style !== MENU_TRADITIONAL || (result = await ggetobj($c.lit("take off"), select_off, 0, FALSE, null)) < -1) {
+    if (flags.menu_style !== MENU.TRADITIONAL || (result = await ggetobj($c.lit("take off"), select_off, 0, FALSE, null)) < -1) {
         await menu_remarm(result);
     }
     if (svc.context.takeoff.mask) {
         $c.__builtin___strncpy_chk(new $c.Ptr(svc.context.takeoff.disrobing, 0), $c.and64(svc.context.takeoff.mask, ~W_WEAPONS) !== 0 ? $c.lit("disrobing") : $c.lit("disarming"), CONTEXTVERBSZ, 31);
         await take_off();
     }
-    return ECMD_OK;
+    return ECMD.OK;
 }
 export async function remarm_swapwep() {   // do_wear.c:3062
     let cq = new $T._cmd_queue(), cmdq = null, oldbknown = 0, $t1;
@@ -2450,17 +2450,17 @@ export async function remarm_swapwep() {   // do_wear.c:3062
         cq.$copyFrom(cmdq);
         $c.free(cmdq);
     } else {
-        cq.typ = CMDQ_KEY;
+        cq.typ = CMDQ.KEY;
         cq.key = 0;
     }
-    if (cq.typ !== CMDQ_KEY || cq.key !== 45 || !$G.uswapwep) {
-        return ECMD_FAIL;
+    if (cq.typ !== CMDQ.KEY || cq.key !== 45 || !$G.uswapwep) {
+        return ECMD.FAIL;
     }
     oldbknown = $G.uswapwep.bknown;
     reset_remarm();
-    $t1 = svc.context.takeoff.mask = W_SWAPWEP, svc.context.takeoff.what = $t1;
+    $t1 = svc.context.takeoff.mask = W.SWAPWEP, svc.context.takeoff.what = $t1;
     await do_takeoff();
-    return !$G.uswapwep || $G.uswapwep.bknown !== oldbknown ? ECMD_TIME : ECMD_OK;
+    return !$G.uswapwep || $G.uswapwep.bknown !== oldbknown ? ECMD.TIME : ECMD.OK;
 }
 async function menu_remarm(retry) {   // do_wear.c:3090
     let n = 0, i = 0, pick_list = [null], all_worn_categories = 0, ggofeedback = Uint32Array.of(0);
@@ -2468,9 +2468,9 @@ async function menu_remarm(retry) {   // do_wear.c:3090
     all_worn_categories = TRUE;
     if (retry) {
         all_worn_categories = $c.i8(retry === -2 ? 1 : 0);
-    } else if (flags.menu_style === MENU_FULL) {
+    } else if (flags.menu_style === MENU.FULL) {
         all_worn_categories = FALSE;
-        n = await query_category($c.lit("What type of things do you want to take off?"), gi.invent, WORN_TYPES | ALL_TYPES | UNPAID_TYPES | BUCX_TYPES, new $c.Ptr(pick_list, 0), PICK_ANY);
+        n = await query_category($c.lit("What type of things do you want to take off?"), gi.invent, WORN_TYPES | ALL_TYPES | UNPAID_TYPES | BUCX_TYPES, new $c.Ptr(pick_list, 0), PICK.ANY);
         if (!n) {
             return 0;
         }
@@ -2482,7 +2482,7 @@ async function menu_remarm(retry) {   // do_wear.c:3090
             }
         }
         $c.free(pick_list[0]);
-    } else if (flags.menu_style === MENU_COMBINATION) {
+    } else if (flags.menu_style === MENU.COMBINATION) {
         ggofeedback[0] = 0;
         i = await ggetobj($c.lit("take off"), select_off, 0, TRUE, new $c.Ptr(ggofeedback, 0));
         if ((ggofeedback[0] & ALL_FINISHED) >>> 0) {
@@ -2493,13 +2493,13 @@ async function menu_remarm(retry) {   // do_wear.c:3090
     if (menu_class_present(117) || menu_class_present(66) || menu_class_present(85) || menu_class_present(67) || menu_class_present(88)) {
         all_worn_categories = FALSE;
     }
-    n = await query_objlist($c.lit("What do you want to take off?"), new $c.FieldRef(gi, "invent", "ptr"), SIGNAL_NOMENU | USE_INVLET | INVORDER_SORT, new $c.Ptr(pick_list, 0), PICK_ANY, all_worn_categories ? is_worn : is_worn_by_type);
+    n = await query_objlist($c.lit("What do you want to take off?"), new $c.FieldRef(gi, "invent", "ptr"), SIGNAL.NOMENU | USE_INVLET | INVORDER_SORT, new $c.Ptr(pick_list, 0), PICK.ANY, all_worn_categories ? is_worn : is_worn_by_type);
     if (n > 0) {
         for (i = 0; i < n; i = i + 1 | 0) {
             await select_off($c.radd(pick_list[0], i).item.a_obj);
         }
         $c.free(pick_list[0]);
-    } else if (n < 0 && flags.menu_style !== MENU_COMBINATION) {
+    } else if (n < 0 && flags.menu_style !== MENU.COMBINATION) {
         await There($c.lit("is nothing else you can remove or unwield."));
     }
     return 0;
@@ -2579,17 +2579,17 @@ export async function disintegrate_arm(atmp) {   // do_wear.c:3201
 }
 function obj_erode_type(otmp) {   // do_wear.c:3260
     if (is_flammable(otmp)) {
-        return ERODE_BURN;
+        return ERODE.BURN;
     } else if (is_rustprone(otmp)) {
-        return ERODE_RUST;
+        return ERODE.RUST;
     } else if (is_crackable(otmp)) {
-        return ERODE_CRACK;
+        return ERODE.CRACK;
     } else if (is_rottable(otmp)) {
-        return ERODE_ROT;
+        return ERODE.ROT;
     } else if (is_corrodeable(otmp)) {
-        return ERODE_CORRODE;
+        return ERODE.CORRODE;
     }
-    return ERODE_NONE;
+    return ERODE.NONE;
 }
 export async function destroy_arm() {   // do_wear.c:3278
     let armors = $c.nulls(7), otmp = null, i = 0, idx = 0, hits = 0, ret = 0, erosion = 0, r = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7;
@@ -2626,12 +2626,12 @@ export async function destroy_arm() {   // do_wear.c:3278
         otmp = armors[rn2(idx)];
         if (erosion_matters(otmp) && is_damageable(otmp) && !otmp.oerodeproof) {
             erosion = obj_erode_type(otmp);
-            if (erosion !== ERODE_NONE) {
-                r = await erode_obj(otmp, await xname(otmp), erosion, EF_PAY | EF_DESTROY);
-                if (r !== ER_NOTHING) {
+            if (erosion !== ERODE.NONE) {
+                r = await erode_obj(otmp, await xname(otmp), erosion, EF.PAY | EF.DESTROY);
+                if (r !== ER.NOTHING) {
                     ret = 1;
                 }
-                if (r === ER_DESTROYED) {
+                if (r === ER.DESTROYED) {
                     break;
                 }
             }
@@ -2646,15 +2646,15 @@ export async function adj_abon(otmp, delta) {   // do_wear.c:3319
     if ($G.uarmg && $c.peq($G.uarmg, otmp) && otmp.otyp === GAUNTLETS_OF_DEXTERITY) {
         if (delta) {
             await discover_object($G.uarmg.otyp, TRUE, TRUE, TRUE);
-            u.abon.a[A_DEX] = $c.i8(u.abon.a[A_DEX] + delta | 0);
+            u.abon.a[A.DEX] = $c.i8(u.abon.a[A.DEX] + delta | 0);
         }
         disp.botl = TRUE;
     }
     if ($G.uarmh && $c.peq($G.uarmh, otmp) && otmp.otyp === HELM_OF_BRILLIANCE) {
         if (delta) {
             await discover_object($G.uarmh.otyp, TRUE, TRUE, TRUE);
-            u.abon.a[A_INT] = $c.i8(u.abon.a[A_INT] + delta | 0);
-            u.abon.a[A_WIS] = $c.i8(u.abon.a[A_WIS] + delta | 0);
+            u.abon.a[A.INT] = $c.i8(u.abon.a[A.INT] + delta | 0);
+            u.abon.a[A.WIS] = $c.i8(u.abon.a[A.WIS] + delta | 0);
         }
         disp.botl = TRUE;
     }
@@ -2702,29 +2702,29 @@ async function equip_ok(obj, removing, accessory) {   // do_wear.c:3404
     let is_worn = 0, dummymask = [0];
     dummymask[0] = 0;
     if (!obj) {
-        return GETOBJ_EXCLUDE;
+        return GETOBJ.EXCLUDE;
     }
     is_worn = $c.i8($c.and64(obj.owornmask, W_ARMOR | W_ACCESSORY) !== 0 ? 1 : 0);
     if (removing ^ is_worn) {
-        return GETOBJ_EXCLUDE_INACCESS;
+        return GETOBJ.EXCLUDE_INACCESS;
     }
     if (obj.oclass !== ARMOR_CLASS && obj.oclass !== RING_CLASS && obj.oclass !== AMULET_CLASS) {
         if (obj.otyp !== MEAT_RING && obj.otyp !== BLINDFOLD && obj.otyp !== TOWEL && obj.otyp !== LENSES) {
-            return GETOBJ_EXCLUDE;
+            return GETOBJ.EXCLUDE;
         }
     }
     if (accessory ^ (obj.oclass !== ARMOR_CLASS ? 1 : 0)) {
-        return GETOBJ_DOWNPLAY;
+        return GETOBJ.DOWNPLAY;
     }
     if (obj.oclass === ARMOR_CLASS && !removing && !await canwearobj(obj, new $c.Ptr(dummymask, 0), FALSE)) {
-        return GETOBJ_DOWNPLAY;
+        return GETOBJ.DOWNPLAY;
     }
     if (removing && !gi.item_action_in_progress) {
         if (await inaccessible_equipment(obj, null, $c.i8(obj.oclass === RING_CLASS ? 1 : 0))) {
-            return GETOBJ_EXCLUDE_INACCESS;
+            return GETOBJ.EXCLUDE_INACCESS;
         }
     }
-    return GETOBJ_SUGGEST;
+    return GETOBJ.SUGGEST;
 }
 async function puton_ok(obj) {   // do_wear.c:3451
     return await equip_ok(obj, FALSE, TRUE);
@@ -2740,9 +2740,9 @@ async function takeoff_ok(obj) {   // do_wear.c:3472
 }
 export function any_worn_armor_ok(obj) {   // do_wear.c:3480
     if (obj && $c.and64(obj.owornmask, W_ARMOR)) {
-        return GETOBJ_SUGGEST;
+        return GETOBJ.SUGGEST;
     }
-    return GETOBJ_EXCLUDE;
+    return GETOBJ.EXCLUDE;
 }
 export function count_worn_armor() {   // do_wear.c:3489
     let ret = 0;
@@ -2802,20 +2802,20 @@ export function $init() {
     c_that_.set([116, 104, 97, 116]);   // "that"
     takeoff_order.fill(0);
     $c.init(takeoff_order, [
-        W_TOOL,
-        W_WEP,
-        W_ARMS,
-        W_ARMG,
-        W_RINGL,
-        W_RINGR,
-        W_ARMC,
-        W_ARMH,
-        W_AMUL,
-        W_ARM,
-        W_ARMU,
-        W_ARMF,
-        W_SWAPWEP,
-        W_QUIVER,
+        W.TOOL,
+        W.WEP,
+        W.ARMS,
+        W.ARMG,
+        W.RINGL,
+        W.RINGR,
+        W.ARMC,
+        W.ARMH,
+        W.AMUL,
+        W.ARM,
+        W.ARMU,
+        W.ARMF,
+        W.SWAPWEP,
+        W.QUIVER,
         0
     ]);
     Narmorpieces = 0;

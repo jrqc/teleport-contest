@@ -3,43 +3,43 @@ import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
 import { spec_ability } from './artifact.js';
-import { SPFX_SEARCH } from './artifact.h.js';
+import { SPFX } from './artifact.h.js';
 import { acurr, exercise } from './attrib.js';
-import { A_INT, A_WIS } from './attrib.h.js';
+import { A } from './attrib.h.js';
 import { ACURR } from './attrib.macros.js';
 import { isok, yn_function } from './cmd.js';
 import { find_drawbridge, is_pool, open_drawbridge } from './dbridge.js';
 import { c_common_strings, cg, flags, ga, gd, gf, gi, gk, gm, gn, gs, gu, gv, gy, iflags, quitchars, svd, svl, u } from './decl.js';
-import { COIN_CLASS, DEF_MIMIC, DEF_MIMIC_DEF, FOOD_CLASS, POTION_CLASS, ROCK_CLASS, SCROLL_CLASS, SPBOOK_CLASS, S_EEL, S_GHOST, S_WORM_TAIL, S_altar, S_arrow_trap, S_cloud, S_digbeam, S_goodpos, S_grave, S_hcdoor, S_ndoor, S_poisoncloud, S_stone, S_tree, S_trwall, S_vcdoor, S_vwall } from './defsym.h.js';
+import { COIN_CLASS, DEF, FOOD_CLASS, POTION_CLASS, ROCK_CLASS, S, SCROLL_CLASS, SPBOOK_CLASS } from './defsym.h.js';
 import { back_to_glyph, cls, docrt, feel_location, feel_newsym, flash_glyph_at, flush_screen, glyph_at, magic_map_background, map_background, map_engraving, map_invisible, map_object, map_trap, mon_visible, newsym, see_monsters, sensemon, show_glyph, under_ground, under_water, unmap_invisible, unmap_object, warning_of, xy_set_wall_state } from './display.js';
-import { GLYPH_BODY_OFF, GLYPH_BODY_PILETOP_OFF, GLYPH_CMAP_A_OFF, GLYPH_CMAP_B_OFF, GLYPH_CMAP_C_OFF, GLYPH_CMAP_GEH_OFF, GLYPH_CMAP_KNOX_OFF, GLYPH_CMAP_MAIN_OFF, GLYPH_CMAP_MINES_OFF, GLYPH_CMAP_SOKO_OFF, GLYPH_CMAP_STONE_OFF, GLYPH_DETECT_FEM_OFF, GLYPH_DETECT_MALE_OFF, GLYPH_INVISIBLE, GLYPH_MON_FEM_OFF, GLYPH_MON_MALE_OFF, GLYPH_NOTHING, GLYPH_OBJ_OFF, GLYPH_OBJ_PILETOP_OFF, GLYPH_PET_FEM_OFF, GLYPH_PET_MALE_OFF, GLYPH_RIDDEN_FEM_OFF, GLYPH_RIDDEN_MALE_OFF, GLYPH_STATUE_FEM_OFF, GLYPH_STATUE_FEM_PILETOP_OFF, GLYPH_STATUE_MALE_OFF, GLYPH_STATUE_MALE_PILETOP_OFF, GLYPH_TRAP_OFF, GLYPH_UNEXPLORED, NO_GLYPH } from './display.h.js';
+import { GLYPH, GLYPH_INVISIBLE, GLYPH_NOTHING, GLYPH_TRAP_OFF, GLYPH_UNEXPLORED, NO_GLYPH } from './display.h.js';
 import { canspotmon, covers_objects, glyph_is_cmap, glyph_is_invisible, glyph_is_monster, glyph_is_object, glyph_is_swallow, glyph_is_trap, glyph_is_unexplored, glyph_is_warning, glyph_to_mon, glyph_to_obj } from './display.macros.js';
 import { cmd_safety_prevention } from './do.js';
 import { Monnam, a_monnam, hcolor, x_monnam, y_monnam } from './do_name.js';
 import { def_char_is_furniture, def_char_to_monclass, def_char_to_objclass, def_monsyms, def_oc_syms } from './drawing.js';
 import { In_hell, In_mines, depth, on_level, room_discovered } from './dungeon.js';
 import { engr_at } from './engrave.js';
-import { TER_DETECT, TER_FULL, TER_MAP, TER_MON, TER_OBJ, TER_TRP } from './flag.h.js';
+import { TER } from './flag.h.js';
 import { getpos } from './getpos.js';
 import { COLNO, FALSE, ROWNO, TRUE } from './global.h.js';
 import { glyph_to_cmap } from './glyphs.js';
 import { losehp, money_cnt, nomul } from './hack.js';
-import { ARTICLE_THE, ARTICLE_YOUR, BOLT_LIM, ECMD_OK, ECMD_TIME, FOOT, KILLED_BY_AN, NOSE, NO_PART, SUPPRESS_SADDLE, SYM_OFF_X, TOE } from './hack.h.js';
+import { ARTICLE, BOLT_LIM, ECMD, FOOT, KILLED, NOSE, NO_PART, SUPPRESS, SYM_OFF_X, TOE } from './hack.h.js';
 import { dist2, eos, s_suffix } from './hacklib.js';
 import { consume_obj_charge, currency, sobj_at, useup } from './invent.js';
 import { has_mcorpsenm } from './mextra.macros.js';
 import { expels } from './mhitu.js';
 import { ROOMOFFSET } from './mkroom.h.js';
 import { seemimic, wake_nearto } from './mon.js';
-import { AD_DGST, AT_ENGL } from './monattk.h.js';
+import { AD, AT } from './monattk.h.js';
 import { dmgtype_fromattack, resists_blnd } from './mondata.js';
 import { hides_under, is_hider } from './mondata.macros.js';
 import { MALE } from './monflag.h.js';
 import { closed_door } from './monmove.js';
 import { mons } from './monst.js';
-import { M_AP_FURNITURE, M_AP_NOTHING, M_AP_OBJECT, M_AP_TYPMASK } from './monst.h.js';
+import { M_AP } from './monst.h.js';
 import { DEADMONSTER, M_AP_TYPE, helpless } from './monst.macros.js';
-import { PM_GOLD_GOLEM, PM_LONG_WORM, PM_LONG_WORM_TAIL, PM_TENGU } from './monsters.h.js';
+import { PM } from './monsters.h.js';
 import { discover_object, observe_object } from './o_init.js';
 import { BURIED_TOO, CONTAINED_TOO } from './obj.h.js';
 import { Has_contents, Is_box, SchroedingersBox } from './obj.macros.js';
@@ -51,14 +51,14 @@ import { NUMMONS } from './permonst.h.js';
 import { Norep, There, You, You_feel, You_see, Your, impossible, pline, pline_The, set_msg_xy } from './pline.js';
 import { body_part, poly_gender } from './polyself.js';
 import { make_blinded, make_confused, make_hallucinated, strange_feeling } from './potion.js';
-import { CONFUSION, DETECT_MONSTERS, HALF_PHDAM, HALLUC, HALLUC_RES, I_SPECIAL, STUNNED, TIMEOUT } from './prop.h.js';
+import { CONFUSION, DETECT_MONSTERS, HALF_PHDAM, HALLUC, HALLUC_RES, I_SPECIAL, STUNNED, TIMEOUT, W } from './prop.h.js';
 import { is_quest_artifact } from './questpgr.js';
 import { visible_region_at } from './region.js';
-import { ALTAR, CORR, DBWALL, DOOR, D_BROKEN, D_CLOSED, D_ISOPEN, D_LOCKED, D_NODOOR, D_TRAPPED, LAVAPOOL, LAVAWALL, SCORR, SDOOR, STAIRS, STONE, SVALL, WM_MASK, W_NONDIGGABLE, W_NONPASSWALL } from './rm.h.js';
+import { ALTAR, CORR, D, DBWALL, DOOR, LAVAPOOL, LAVAWALL, SCORR, SDOOR, STAIRS, STONE, SVALL, WM_MASK } from './rm.h.js';
 import { IS_DOOR, IS_FURNITURE, OBJ_AT } from './rm.macros.js';
 import { rn2, rn2_on_display_rng, rnd, rnl } from './rnd.js';
 import { findgold } from './steal.js';
-import { MAXMCLASSES, MAXTCHARS, SYM_BOULDER } from './sym.h.js';
+import { MAXMCLASSES, MAXTCHARS, SYM } from './sym.h.js';
 import { is_cmap_furniture } from './sym.macros.js';
 import { activate_statue_trap, b_trapped, openfallingtrap, openholdingtrap, t_at, trapname } from './trap.js';
 import { BEAR_TRAP, STATUE_TRAP, TRAPPED_CHEST, TRAPPED_DOOR } from './trap.h.js';
@@ -115,9 +115,9 @@ async function browse_map(ter_typ, ter_explain) {   // detect.c:106
 }
 async function map_monst(mtmp, showtail) {   // detect.c:122
     let glyph = 0;
-    glyph = def_monsyms[mtmp.data.mlet].sym === 32 ? (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) : mtmp.data.pmidx) + ((mtmp.female | 0) === 0 ? GLYPH_DETECT_MALE_OFF : GLYPH_DETECT_FEM_OFF) | 0 : mtmp.mtame ? (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) : mtmp.data.pmidx) + ((mtmp.female | 0) === 0 ? GLYPH_PET_MALE_OFF : GLYPH_PET_FEM_OFF) | 0 : (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) : mtmp.data.pmidx) + ((mtmp.female | 0) === 0 ? GLYPH_MON_MALE_OFF : GLYPH_MON_FEM_OFF) | 0;
+    glyph = def_monsyms[mtmp.data.mlet].sym === 32 ? (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) : mtmp.data.pmidx) + ((mtmp.female | 0) === 0 ? GLYPH.DETECT_MALE_OFF : GLYPH.DETECT_FEM_OFF) | 0 : mtmp.mtame ? (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) : mtmp.data.pmidx) + ((mtmp.female | 0) === 0 ? GLYPH.PET_MALE_OFF : GLYPH.PET_FEM_OFF) | 0 : (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) : mtmp.data.pmidx) + ((mtmp.female | 0) === 0 ? GLYPH.MON_MALE_OFF : GLYPH.MON_FEM_OFF) | 0;
     await show_glyph(mtmp.mx, mtmp.my, glyph);
-    if (showtail && $c.peq(mtmp.data, $c.relem(mons, PM_LONG_WORM))) {
+    if (showtail && $c.peq(mtmp.data, $c.relem(mons, PM.LONG_WORM))) {
         await detect_wsegs(mtmp, 0);
     }
 }
@@ -167,7 +167,7 @@ export function trapped_door_at(ttyp, x, y) {   // detect.c:182
     if (!IS_DOOR(lev.typ)) {
         return FALSE;
     }
-    if (((lev.flags | 0) & (D_NODOOR | D_BROKEN | D_ISOPEN)) !== 0 && trapped_chest_at(ttyp, x, y)) {
+    if (((lev.flags | 0) & (D.NODOOR | D.BROKEN | D.ISOPEN)) !== 0 && trapped_chest_at(ttyp, x, y)) {
         return FALSE;
     }
     return TRUE;
@@ -272,14 +272,14 @@ export async function gold_detect(sobj) {   // detect.c:335
     temp = null;
     ugold = FALSE;
     steedgold = FALSE;
-    ter_typ = TER_DETECT | TER_OBJ;
+    ter_typ = TER.DETECT | TER.OBJ;
     $t1 = stale = await clear_stale_map(COIN_CLASS, (sobj.blessed | 0 ? GOLD : 0) >>> 0), gk.known = $t1;
     outgoldmap$: {
         for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
             if (DEADMONSTER(mtmp) || mtmp.isgd | 0 && !mtmp.mx) {
                 continue;
             }
-            if (findgold(mtmp.minvent) || mtmp.data.pmidx === PM_GOLD_GOLEM) {
+            if (findgold(mtmp.minvent) || mtmp.data.pmidx === PM.GOLD_GOLEM) {
                 if ($c.peq(mtmp, u.usteed)) {
                     steedgold = TRUE;
                 } else {
@@ -313,12 +313,12 @@ export async function gold_detect(sobj) {   // detect.c:335
             }
         }
         if (!gk.known) {
-            if ($c.peq(gy.youmonst.data, $c.relem(mons, PM_GOLD_GOLEM))) {
+            if ($c.peq(gy.youmonst.data, $c.relem(mons, PM.GOLD_GOLEM))) {
                 $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("You feel like a million %s!"), await currency(2));
             } else if (money_cnt(gi.invent) || hidden_gold(TRUE)) {
                 $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("You feel worried about your future financial situation."), 256);
             } else if (steedgold) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("You feel interested in %s financial situation."), s_suffix(await x_monnam(u.usteed, u.usteed.mtame ? ARTICLE_YOUR : ARTICLE_THE, null, SUPPRESS_SADDLE, FALSE)));
+                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("You feel interested in %s financial situation."), s_suffix(await x_monnam(u.usteed, u.usteed.mtame ? ARTICLE.YOUR : ARTICLE.THE, null, SUPPRESS.SADDLE, FALSE)));
             } else {
                 $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("You feel materially poor."), 256);
             }
@@ -356,7 +356,7 @@ export async function gold_detect(sobj) {   // detect.c:335
             continue;
         }
         temp = null;
-        if (findgold(mtmp.minvent) || mtmp.data.pmidx === PM_GOLD_GOLEM) {
+        if (findgold(mtmp.minvent) || mtmp.data.pmidx === PM.GOLD_GOLEM) {
             gold.$copyFrom(cg.zeroobj);
             gold.otyp = GOLD_PIECE;
             $t2 = rnd(10), gold.quan = $t2;
@@ -385,10 +385,10 @@ export async function gold_detect(sobj) {   // detect.c:335
     }
     if (!ugold) {
         await newsym(u.ux, u.uy);
-        ter_typ = (ter_typ >>> 0 | TER_MON) >>> 0 | 0;
+        ter_typ = (ter_typ >>> 0 | TER.MON) >>> 0 | 0;
     }
     await You_feel($c.lit("very greedy, and sense gold!"));
-    await exercise(A_WIS, TRUE);
+    await exercise(A.WIS, TRUE);
     await browse_map(ter_typ >>> 0, $c.lit("gold"));
     await map_redisplay();
     return 0;
@@ -462,7 +462,7 @@ export async function food_detect(sobj) {   // detect.c:479
             u.uedibility = (1) & 1;
         }
     } else {
-        ter_typ = TER_DETECT | TER_OBJ;
+        ter_typ = TER.DETECT | TER.OBJ;
         gk.known = TRUE;
         await cls();
         unconstrain_map();
@@ -490,7 +490,7 @@ export async function food_detect(sobj) {   // detect.c:479
         }
         if (!ctu) {
             await newsym(u.ux, u.uy);
-            ter_typ = (ter_typ >>> 0 | TER_MON) >>> 0 | 0;
+            ter_typ = (ter_typ >>> 0 | TER.MON) >>> 0 | 0;
         }
         if (sobj) {
             if (sobj.blessed) {
@@ -502,7 +502,7 @@ export async function food_detect(sobj) {   // detect.c:479
         } else {
             await You($c.lit("sense %s."), what);
         }
-        await exercise(A_WIS, TRUE);
+        await exercise(A.WIS, TRUE);
         await browse_map(ter_typ >>> 0, $c.lit("food"));
         await map_redisplay();
     }
@@ -516,13 +516,13 @@ export async function object_detect(detector, class_) {   // detect.c:603
     ctu = 0;
     otmp = null;
     boulder = 0;
-    ter_typ = TER_DETECT | TER_OBJ;
+    ter_typ = TER.DETECT | TER.OBJ;
     if (class_ < 0 || class_ >= MAXOCLASSES) {
         await impossible($c.lit("object_detect:  illegal class %d"), class_);
         class_ = 0;
     }
     sym = class_ ? def_oc_syms[class_].sym : 0;
-    if (sym && sym === gs.showsyms[SYM_BOULDER + SYM_OFF_X]) {
+    if (sym && sym === gs.showsyms[SYM.BOULDER + SYM_OFF_X]) {
         boulder = ROCK_CLASS;
     }
     if (Hallucination() || u.uprops[CONFUSION].intrinsic && class_ === SCROLL_CLASS) {
@@ -577,7 +577,7 @@ export async function object_detect(detector, class_) {   // detect.c:603
                 await observe_recursively(obj);
             }
         }
-        if (is_cursed && M_AP_TYPE(mtmp) === M_AP_OBJECT && (!class_ || class_ === objects[mtmp.mappearance].oc_class) || findgold(mtmp.minvent) && (!class_ || class_ === COIN_CLASS)) {
+        if (is_cursed && M_AP_TYPE(mtmp) === M_AP.OBJECT && (!class_ || class_ === objects[mtmp.mappearance].oc_class) || findgold(mtmp.minvent) && (!class_ || class_ === COIN_CLASS)) {
             ct = ct + 1 | 0;
             break;
         }
@@ -640,13 +640,13 @@ export async function object_detect(detector, class_) {   // detect.c:603
                 break;
             }
         }
-        if (is_cursed && M_AP_TYPE(mtmp) === M_AP_OBJECT && (!class_ || class_ === objects[mtmp.mappearance].oc_class)) {
+        if (is_cursed && M_AP_TYPE(mtmp) === M_AP.OBJECT && (!class_ || class_ === objects[mtmp.mappearance].oc_class)) {
             temp.$copyFrom(cg.zeroobj);
             temp.otyp = $c.i16(mtmp.mappearance);
             temp.quan = 1;
             temp.ox = mtmp.mx;
             temp.oy = mtmp.my;
-            temp.corpsenm = has_mcorpsenm(mtmp) ? mtmp.mextra.mcorpsenm : PM_TENGU;
+            temp.corpsenm = has_mcorpsenm(mtmp) ? mtmp.mextra.mcorpsenm : PM.TENGU;
             await map_object(temp, 1);
         } else if (findgold(mtmp.minvent) && (!class_ || class_ === COIN_CLASS)) {
             gold.$copyFrom(cg.zeroobj);
@@ -657,9 +657,9 @@ export async function object_detect(detector, class_) {   // detect.c:603
             await map_object(gold, 1);
         }
     }
-    if (!(glyph_at(u.ux, u.uy) === GLYPH_OBJ_OFF || glyph_at(u.ux, u.uy) >= GLYPH_OBJ_OFF + FIRST_OBJECT - 1 && glyph_at(u.ux, u.uy) < GLYPH_OBJ_OFF + NUM_OBJECTS || (glyph_at(u.ux, u.uy) === GLYPH_OBJ_PILETOP_OFF || glyph_at(u.ux, u.uy) > GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT - 1 && glyph_at(u.ux, u.uy) < GLYPH_OBJ_PILETOP_OFF + NUM_OBJECTS) || (glyph_at(u.ux, u.uy) > GLYPH_OBJ_OFF && glyph_at(u.ux, u.uy) < GLYPH_OBJ_OFF + FIRST_OBJECT - 1 || glyph_at(u.ux, u.uy) > GLYPH_OBJ_PILETOP_OFF && glyph_at(u.ux, u.uy) < GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT - 1) || (glyph_at(u.ux, u.uy) >= GLYPH_STATUE_MALE_OFF && glyph_at(u.ux, u.uy) < GLYPH_STATUE_MALE_OFF + NUMMONS || glyph_at(u.ux, u.uy) >= GLYPH_STATUE_MALE_PILETOP_OFF && glyph_at(u.ux, u.uy) < GLYPH_STATUE_MALE_PILETOP_OFF + NUMMONS || (glyph_at(u.ux, u.uy) >= GLYPH_STATUE_FEM_OFF && glyph_at(u.ux, u.uy) < GLYPH_STATUE_FEM_OFF + NUMMONS || glyph_at(u.ux, u.uy) >= GLYPH_STATUE_FEM_PILETOP_OFF && glyph_at(u.ux, u.uy) < GLYPH_STATUE_FEM_PILETOP_OFF + NUMMONS)) || (glyph_at(u.ux, u.uy) >= GLYPH_BODY_OFF && glyph_at(u.ux, u.uy) < GLYPH_BODY_OFF + NUMMONS || glyph_at(u.ux, u.uy) >= GLYPH_BODY_PILETOP_OFF && glyph_at(u.ux, u.uy) < GLYPH_BODY_PILETOP_OFF + NUMMONS))) {
+    if (!(glyph_at(u.ux, u.uy) === GLYPH.OBJ_OFF || glyph_at(u.ux, u.uy) >= GLYPH.OBJ_OFF + FIRST_OBJECT - 1 && glyph_at(u.ux, u.uy) < GLYPH.OBJ_OFF + NUM_OBJECTS || (glyph_at(u.ux, u.uy) === GLYPH.OBJ_PILETOP_OFF || glyph_at(u.ux, u.uy) > GLYPH.OBJ_PILETOP_OFF + FIRST_OBJECT - 1 && glyph_at(u.ux, u.uy) < GLYPH.OBJ_PILETOP_OFF + NUM_OBJECTS) || (glyph_at(u.ux, u.uy) > GLYPH.OBJ_OFF && glyph_at(u.ux, u.uy) < GLYPH.OBJ_OFF + FIRST_OBJECT - 1 || glyph_at(u.ux, u.uy) > GLYPH.OBJ_PILETOP_OFF && glyph_at(u.ux, u.uy) < GLYPH.OBJ_PILETOP_OFF + FIRST_OBJECT - 1) || (glyph_at(u.ux, u.uy) >= GLYPH.STATUE_MALE_OFF && glyph_at(u.ux, u.uy) < GLYPH.STATUE_MALE_OFF + NUMMONS || glyph_at(u.ux, u.uy) >= GLYPH.STATUE_MALE_PILETOP_OFF && glyph_at(u.ux, u.uy) < GLYPH.STATUE_MALE_PILETOP_OFF + NUMMONS || (glyph_at(u.ux, u.uy) >= GLYPH.STATUE_FEM_OFF && glyph_at(u.ux, u.uy) < GLYPH.STATUE_FEM_OFF + NUMMONS || glyph_at(u.ux, u.uy) >= GLYPH.STATUE_FEM_PILETOP_OFF && glyph_at(u.ux, u.uy) < GLYPH.STATUE_FEM_PILETOP_OFF + NUMMONS)) || (glyph_at(u.ux, u.uy) >= GLYPH.BODY_OFF && glyph_at(u.ux, u.uy) < GLYPH.BODY_OFF + NUMMONS || glyph_at(u.ux, u.uy) >= GLYPH.BODY_PILETOP_OFF && glyph_at(u.ux, u.uy) < GLYPH.BODY_PILETOP_OFF + NUMMONS))) {
         await newsym(u.ux, u.uy);
-        ter_typ = (ter_typ >>> 0 | TER_MON) >>> 0 | 0;
+        ter_typ = (ter_typ >>> 0 | TER.MON) >>> 0 | 0;
     }
     await You($c.lit("detect the %s of %s."), ct ? $c.lit("presence") : $c.lit("absence"), new $c.Ptr(stuff, 0));
     if (!ct) {
@@ -694,7 +694,7 @@ export async function monster_detect(otmp, mclass) {   // detect.c:798
             if (DEADMONSTER(mtmp) || mtmp.isgd | 0 && !mtmp.mx) {
                 continue;
             }
-            if (!mclass || mtmp.data.mlet === mclass || $c.peq(mtmp.data, $c.relem(mons, PM_LONG_WORM)) && mclass === S_WORM_TAIL) {
+            if (!mclass || mtmp.data.mlet === mclass || $c.peq(mtmp.data, $c.relem(mons, PM.LONG_WORM)) && mclass === S.WORM_TAIL) {
                 await map_monst(mtmp, TRUE);
             }
             if (otmp && otmp.cursed | 0 && helpless(mtmp)) {
@@ -704,7 +704,7 @@ export async function monster_detect(otmp, mclass) {   // detect.c:798
             }
         }
         if (!swallowed) {
-            await show_glyph(u.ux, u.uy, u.usteed && mon_visible(u.usteed) ? (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) : u.usteed.data.pmidx) + ((u.usteed.female | 0) === 0 ? GLYPH_RIDDEN_MALE_OFF : GLYPH_RIDDEN_FEM_OFF) | 0 : (gy.youmonst.m_ap_type & M_AP_TYPMASK) === M_AP_NOTHING ? (u.umonnum !== u.umonster || !flags.showrace ? u.umonnum : gu.urace.mnum) + (((u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female) ? 1 : 0) === MALE ? GLYPH_MON_MALE_OFF : GLYPH_MON_FEM_OFF) | 0 : (gy.youmonst.m_ap_type & M_AP_TYPMASK) === M_AP_FURNITURE ? (gy.youmonst.mappearance | 0) === S_stone ? GLYPH_CMAP_STONE_OFF : (gy.youmonst.mappearance | 0) <= S_trwall ? ((gy.youmonst.mappearance | 0) - S_vwall | 0) + (In_mines(u.uz) ? GLYPH_CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH_CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH_CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH_CMAP_SOKO_OFF : GLYPH_CMAP_MAIN_OFF) | 0 : (gy.youmonst.mappearance | 0) < S_altar ? ((gy.youmonst.mappearance | 0) - S_ndoor | 0) + GLYPH_CMAP_A_OFF | 0 : (gy.youmonst.mappearance | 0) === S_altar ? 4008 : (gy.youmonst.mappearance | 0) < S_arrow_trap + MAXTCHARS ? ((gy.youmonst.mappearance | 0) - S_grave | 0) + GLYPH_CMAP_B_OFF | 0 : (gy.youmonst.mappearance | 0) <= S_goodpos ? ((gy.youmonst.mappearance | 0) - S_digbeam | 0) + GLYPH_CMAP_C_OFF | 0 : NO_GLYPH : (gy.youmonst.m_ap_type & M_AP_TYPMASK) === M_AP_OBJECT ? (gy.youmonst.mappearance | 0) + GLYPH_OBJ_OFF | 0 : (gy.youmonst.mappearance | 0) + (((u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female) ? 1 : 0) === MALE ? GLYPH_MON_MALE_OFF : GLYPH_MON_FEM_OFF) | 0);
+            await show_glyph(u.ux, u.uy, u.usteed && mon_visible(u.usteed) ? (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) : u.usteed.data.pmidx) + ((u.usteed.female | 0) === 0 ? GLYPH.RIDDEN_MALE_OFF : GLYPH.RIDDEN_FEM_OFF) | 0 : (gy.youmonst.m_ap_type & M_AP.TYPMASK) === M_AP.NOTHING ? (u.umonnum !== u.umonster || !flags.showrace ? u.umonnum : gu.urace.mnum) + (((u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female) ? 1 : 0) === MALE ? GLYPH.MON_MALE_OFF : GLYPH.MON_FEM_OFF) | 0 : (gy.youmonst.m_ap_type & M_AP.TYPMASK) === M_AP.FURNITURE ? (gy.youmonst.mappearance | 0) === S.stone ? GLYPH.CMAP_STONE_OFF : (gy.youmonst.mappearance | 0) <= S.trwall ? ((gy.youmonst.mappearance | 0) - S.vwall | 0) + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) | 0 : (gy.youmonst.mappearance | 0) < S.altar ? ((gy.youmonst.mappearance | 0) - S.ndoor | 0) + GLYPH.CMAP_A_OFF | 0 : (gy.youmonst.mappearance | 0) === S.altar ? 4008 : (gy.youmonst.mappearance | 0) < S.arrow_trap + MAXTCHARS ? ((gy.youmonst.mappearance | 0) - S.grave | 0) + GLYPH.CMAP_B_OFF | 0 : (gy.youmonst.mappearance | 0) <= S.goodpos ? ((gy.youmonst.mappearance | 0) - S.digbeam | 0) + GLYPH.CMAP_C_OFF | 0 : NO_GLYPH : (gy.youmonst.m_ap_type & M_AP.TYPMASK) === M_AP.OBJECT ? (gy.youmonst.mappearance | 0) + GLYPH.OBJ_OFF | 0 : (gy.youmonst.mappearance | 0) + (((u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female) ? 1 : 0) === MALE ? GLYPH.MON_MALE_OFF : GLYPH.MON_FEM_OFF) | 0);
         }
         await You($c.lit("sense the presence of monsters."));
         if (woken) {
@@ -714,7 +714,7 @@ export async function monster_detect(otmp, mclass) {   // detect.c:798
             await display_nhwindow()($G.WIN_MAP, TRUE);
         } else {
             u.uprops[DETECT_MONSTERS].extrinsic = $c.or64(u.uprops[DETECT_MONSTERS].extrinsic, I_SPECIAL);
-            await browse_map(TER_DETECT | TER_MON, $c.lit("monster of interest"));
+            await browse_map(TER.DETECT | TER.MON, $c.lit("monster of interest"));
             u.uprops[DETECT_MONSTERS].extrinsic = $c.and64(u.uprops[DETECT_MONSTERS].extrinsic, ~I_SPECIAL);
         }
         await map_redisplay();
@@ -750,7 +750,7 @@ async function detect_obj_traps(objlist, show_them, how, ft) {   // detect.c:907
     let otmp = null, x = Int16Array.of(0), y = Int16Array.of(0), trapglyph = 0, result = 0;
     result = OTRAP_NONE;
     dummytrap.ttyp = (TRAPPED_CHEST) & 31;
-    trapglyph = ft ? ((S_arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) === S_stone ? GLYPH_CMAP_STONE_OFF : ((S_arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) <= S_trwall ? (((S_arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) - S_vwall | 0) + (In_mines(u.uz) ? GLYPH_CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH_CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH_CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH_CMAP_SOKO_OFF : GLYPH_CMAP_MAIN_OFF) | 0 : ((S_arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) < S_altar ? (((S_arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) - S_ndoor | 0) + GLYPH_CMAP_A_OFF | 0 : ((S_arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) === S_altar ? 4008 : ((S_arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) < S_arrow_trap + MAXTCHARS ? (((S_arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) - S_grave | 0) + GLYPH_CMAP_B_OFF | 0 : ((S_arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) <= S_goodpos ? (((S_arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) - S_digbeam | 0) + GLYPH_CMAP_C_OFF | 0 : NO_GLYPH : GLYPH_NOTHING;
+    trapglyph = ft ? ((S.arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) === S.stone ? GLYPH.CMAP_STONE_OFF : ((S.arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) <= S.trwall ? (((S.arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) - S.vwall | 0) + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) | 0 : ((S.arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) < S.altar ? (((S.arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) - S.ndoor | 0) + GLYPH.CMAP_A_OFF | 0 : ((S.arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) === S.altar ? 4008 : ((S.arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) < S.arrow_trap + MAXTCHARS ? (((S.arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) - S.grave | 0) + GLYPH.CMAP_B_OFF | 0 : ((S.arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) <= S.goodpos ? (((S.arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) - S.digbeam | 0) + GLYPH.CMAP_C_OFF | 0 : NO_GLYPH : GLYPH_NOTHING;
     for (otmp = objlist; otmp; otmp = otmp.nobj) {
         x[0] = y[0] = 0;
         if (Is_box(otmp) && otmp.otrapped | 0 || Has_contents(otmp)) {
@@ -782,7 +782,7 @@ async function detect_obj_traps(objlist, show_them, how, ft) {   // detect.c:907
 }
 async function display_trap_map(cursed_src) {   // detect.c:956
     let mon = null, ttmp = null, door = 0, glyph = 0, ter_typ = 0, cc = new $T.nhcoord();
-    ter_typ = (TER_DETECT | (cursed_src ? TER_OBJ : TER_TRP)) >>> 0 | 0;
+    ter_typ = (TER.DETECT | (cursed_src ? TER.OBJ : TER.TRP)) >>> 0 | 0;
     await cls();
     unconstrain_map();
     await detect_obj_traps(svl.level.buriedobjlist, TRUE, cursed_src, null);
@@ -803,7 +803,7 @@ async function display_trap_map(cursed_src) {   // detect.c:956
         if (svl.level.locations[cc.x][cc.y].typ === SDOOR) {
             continue;
         }
-        if ((svl.level.locations[cc.x][cc.y].flags | 0) & D_TRAPPED) {
+        if ((svl.level.locations[cc.x][cc.y].flags | 0) & D.TRAPPED) {
             dummytrap.tx = cc.x, dummytrap.ty = cc.y;
             await sense_trap(dummytrap, cc.x, cc.y, cursed_src);
         }
@@ -811,7 +811,7 @@ async function display_trap_map(cursed_src) {   // detect.c:956
     glyph = glyph_at(u.ux, u.uy);
     if (!(glyph_is_trap(glyph) || glyph_is_object(glyph))) {
         await newsym(u.ux, u.uy);
-        ter_typ = (ter_typ >>> 0 | TER_MON) >>> 0 | 0;
+        ter_typ = (ter_typ >>> 0 | TER.MON) >>> 0 | 0;
     }
     await You_feel($c.lit("%s."), cursed_src ? $c.lit("very greedy") : $c.lit("entrapped"));
     await browse_map(ter_typ >>> 0, cursed_src ? $c.lit("gold") : $c.lit("trap of interest"));
@@ -865,7 +865,7 @@ export async function trap_detect(sobj) {   // detect.c:1011
         if (svl.level.locations[cc.x][cc.y].typ === SDOOR) {
             continue;
         }
-        if ((svl.level.locations[cc.x][cc.y].flags | 0) & D_TRAPPED) {
+        if ((svl.level.locations[cc.x][cc.y].flags | 0) & D.TRAPPED) {
             if (cc.x !== u.ux || cc.y !== u.uy) {
                 await display_trap_map(cursed_src);
                 return 0;
@@ -895,7 +895,7 @@ async function furniture_detect() {   // detect.c:1091
                 await magic_map_background(x, y, 1);
             } else if (is_cmap_furniture(sym)) {
                 found = found + 1 | 0;
-                if ((mon = svl.level.monsters[x][y]) !== null && M_AP_TYPE(mon) === M_AP_FURNITURE) {
+                if ((mon = svl.level.monsters[x][y]) !== null && M_AP_TYPE(mon) === M_AP.FURNITURE) {
                     await seemimic(mon);
                 }
                 if (!mon || !canspotmon(mon)) {
@@ -915,7 +915,7 @@ async function furniture_detect() {   // detect.c:1091
     if (!revealed) {
         await display_nhwindow()($G.WIN_MAP, TRUE);
     } else {
-        await browse_map(TER_DETECT | TER_MAP | TER_TRP | TER_OBJ | TER_MON, $c.lit("location"));
+        await browse_map(TER.DETECT | TER.MAP | TER.TRP | TER.OBJ | TER.MON, $c.lit("location"));
     }
     await map_redisplay();
     return 0;
@@ -982,8 +982,8 @@ export async function use_crystal_ball(optr) {   // detect.c:1206
                 return;
             }
             oops = is_quest_artifact(obj) ? 8 : obj.blessed | 0 ? 16 : 20;
-            if (charged && (obj.cursed | 0 || rnd(oops) > ACURR(A_INT))) {
-                impair = rnd(100 - Math.imul(3, acurr(A_INT)) | 0);
+            if (charged && (obj.cursed | 0 || rnd(oops) > ACURR(A.INT))) {
+                impair = rnd(100 - Math.imul(3, acurr(A.INT)) | 0);
                 switch (rnd(obj.oartifact || obj.blessed | 0 ? 4 : 5)) {
                     case 1:
                         await pline($c.lit("%s too much to comprehend!"), await Tobjnam(obj, $c.lit("are")));
@@ -1012,7 +1012,7 @@ export async function use_crystal_ball(optr) {   // detect.c:1206
                         await pline($c.lit("%s!"), await Tobjnam(obj, $c.lit("explode")));
                         await useup(obj);
                         $t1 = obj = null, optr.set(0, $t1);
-                        await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(rnd(30) + 1 | 0, 2) : rnd(30), $c.lit("exploding crystal ball"), KILLED_BY_AN);
+                        await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(rnd(30) + 1 | 0, 2) : rnd(30), $c.lit("exploding crystal ball"), KILLED.BY_AN);
                         break;
                 }
                 if (obj) {
@@ -1058,7 +1058,7 @@ export async function use_crystal_ball(optr) {   // detect.c:1206
                 await You($c.lit("may look for an object, monster, or special map symbol."));
             }
             ch = await yn_function($c.lit("What do you look for?"), null, 0, TRUE);
-            if (ch !== def_monsyms[S_GHOST].sym && $c.strchr(new $c.Ptr(quitchars, 0), ch)) {
+            if (ch !== def_monsyms[S.GHOST].sym && $c.strchr(new $c.Ptr(quitchars, 0), ch)) {
                 if (flags.verbose) {
                     await pline($c.lit("%s"), c_common_strings.c_Never_mind);
                 }
@@ -1089,8 +1089,8 @@ export async function use_crystal_ball(optr) {   // detect.c:1206
                 ret = 0;
                 await discover_object(CRYSTAL_BALL, TRUE, TRUE, TRUE);
                 await consume_obj_charge(obj, TRUE);
-                if (ch === DEF_MIMIC_DEF) {
-                    ch = DEF_MIMIC;
+                if (ch === DEF.MIMIC_DEF) {
+                    ch = DEF.MIMIC;
                 }
                 if (def_char_is_furniture(ch) >= 0) {
                     ret = await furniture_detect();
@@ -1098,7 +1098,7 @@ export async function use_crystal_ball(optr) {   // detect.c:1206
                     ret = await object_detect(null, class_);
                 } else if ((class_ = def_char_to_monclass(ch)) !== MAXMCLASSES) {
                     ret = await monster_detect(null, class_);
-                } else if (gs.showsyms[SYM_BOULDER + SYM_OFF_X] && ch === gs.showsyms[SYM_BOULDER + SYM_OFF_X]) {
+                } else if (gs.showsyms[SYM.BOULDER + SYM_OFF_X] && ch === gs.showsyms[SYM.BOULDER + SYM_OFF_X]) {
                     ret = await object_detect(null, ROCK_CLASS);
                 } else if (ch === 94) {
                     ret = await trap_detect(null);
@@ -1164,12 +1164,12 @@ export async function do_mapping() {   // detect.c:1422
     }
     if (!svl.level.flags.hero_memory || unconstrained) {
         await flush_screen(1);
-        await browse_map(TER_DETECT | TER_MAP | TER_TRP | TER_OBJ, $c.lit("anything of interest"));
+        await browse_map(TER.DETECT | TER.MAP | TER.TRP | TER.OBJ, $c.lit("anything of interest"));
         await map_redisplay();
     } else {
         reconstrain_map();
     }
-    await exercise(A_WIS, TRUE);
+    await exercise(A.WIS, TRUE);
 }
 export async function do_vicinity_map(sobj) {   // detect.c:1448
     let zx = 0, zy = 0, mtmp = null, otmp = null, save_EDetect_mons = 0, save_viz_uyux = 0, unconstrained = 0, refresh = 0, mdetected = 0, odetected = 0, extended = 0, random_farsight = 0, newglyph = 0, oldglyph = 0, lo_y = 0, hi_y = 0, lo_x = 0, hi_x = 0, ter_typ = 0;
@@ -1182,7 +1182,7 @@ export async function do_vicinity_map(sobj) {   // detect.c:1448
     hi_y = (u.uy + 6 | 0) >= ROWNO ? ROWNO - 1 : u.uy + 6 | 0;
     lo_x = (u.ux - 9 | 0) < 1 ? 1 : u.ux - 9 | 0;
     hi_x = (u.ux + 10 | 0) >= COLNO ? COLNO - 1 : u.ux + 10 | 0;
-    ter_typ = TER_DETECT | TER_MAP | TER_TRP | TER_OBJ;
+    ter_typ = TER.DETECT | TER.MAP | TER.TRP | TER.OBJ;
     save_viz_uyux = $c.i8(gv.viz_array.get(u.uy).get(u.ux));
     if (u.uswallow) {
         gv.viz_array.get(u.uy).set(u.ux, $c.u8(gv.viz_array.get(u.uy).get(u.ux) | IN_SIGHT));
@@ -1224,8 +1224,8 @@ export async function do_vicinity_map(sobj) {   // detect.c:1448
     if (!svl.level.flags.hero_memory || unconstrained || mdetected || odetected) {
         await flush_screen(1);
         await You($c.lit("sense your surroundings."));
-        if (extended || (glyph_at(u.ux, u.uy) >= GLYPH_MON_MALE_OFF && glyph_at(u.ux, u.uy) < GLYPH_MON_MALE_OFF + NUMMONS || glyph_at(u.ux, u.uy) >= GLYPH_MON_FEM_OFF && glyph_at(u.ux, u.uy) < GLYPH_MON_FEM_OFF + NUMMONS || (glyph_at(u.ux, u.uy) >= GLYPH_PET_MALE_OFF && glyph_at(u.ux, u.uy) < GLYPH_PET_MALE_OFF + NUMMONS || glyph_at(u.ux, u.uy) >= GLYPH_PET_FEM_OFF && glyph_at(u.ux, u.uy) < GLYPH_PET_FEM_OFF + NUMMONS) || (glyph_at(u.ux, u.uy) >= GLYPH_RIDDEN_MALE_OFF && glyph_at(u.ux, u.uy) < GLYPH_RIDDEN_MALE_OFF + NUMMONS || glyph_at(u.ux, u.uy) >= GLYPH_RIDDEN_FEM_OFF && glyph_at(u.ux, u.uy) < GLYPH_RIDDEN_FEM_OFF + NUMMONS) || (glyph_at(u.ux, u.uy) >= GLYPH_DETECT_MALE_OFF && glyph_at(u.ux, u.uy) < GLYPH_DETECT_MALE_OFF + NUMMONS || glyph_at(u.ux, u.uy) >= GLYPH_DETECT_FEM_OFF && glyph_at(u.ux, u.uy) < GLYPH_DETECT_FEM_OFF + NUMMONS))) {
-            ter_typ = (ter_typ >>> 0 | TER_MON) >>> 0 | 0;
+        if (extended || (glyph_at(u.ux, u.uy) >= GLYPH.MON_MALE_OFF && glyph_at(u.ux, u.uy) < GLYPH.MON_MALE_OFF + NUMMONS || glyph_at(u.ux, u.uy) >= GLYPH.MON_FEM_OFF && glyph_at(u.ux, u.uy) < GLYPH.MON_FEM_OFF + NUMMONS || (glyph_at(u.ux, u.uy) >= GLYPH.PET_MALE_OFF && glyph_at(u.ux, u.uy) < GLYPH.PET_MALE_OFF + NUMMONS || glyph_at(u.ux, u.uy) >= GLYPH.PET_FEM_OFF && glyph_at(u.ux, u.uy) < GLYPH.PET_FEM_OFF + NUMMONS) || (glyph_at(u.ux, u.uy) >= GLYPH.RIDDEN_MALE_OFF && glyph_at(u.ux, u.uy) < GLYPH.RIDDEN_MALE_OFF + NUMMONS || glyph_at(u.ux, u.uy) >= GLYPH.RIDDEN_FEM_OFF && glyph_at(u.ux, u.uy) < GLYPH.RIDDEN_FEM_OFF + NUMMONS) || (glyph_at(u.ux, u.uy) >= GLYPH.DETECT_MALE_OFF && glyph_at(u.ux, u.uy) < GLYPH.DETECT_MALE_OFF + NUMMONS || glyph_at(u.ux, u.uy) >= GLYPH.DETECT_FEM_OFF && glyph_at(u.ux, u.uy) < GLYPH.DETECT_FEM_OFF + NUMMONS))) {
+            ter_typ = (ter_typ >>> 0 | TER.MON) >>> 0 | 0;
         }
         await browse_map(ter_typ >>> 0, $c.lit("anything of interest"));
         refresh = TRUE;
@@ -1239,7 +1239,7 @@ export async function do_vicinity_map(sobj) {   // detect.c:1448
                 continue;
             }
             newglyph = glyph_at($c.i16(zx), $c.i16(zy));
-            if (glyph_is_monster(newglyph) && glyph_to_mon(newglyph) !== PM_LONG_WORM_TAIL) {
+            if (glyph_is_monster(newglyph) && glyph_to_mon(newglyph) !== PM.LONG_WORM_TAIL) {
                 if ((mtmp = svl.level.monsters[zx][zy]) === null || !canspotmon(mtmp)) {
                     await map_invisible($c.i16(zx), $c.i16(zy));
                 }
@@ -1255,10 +1255,10 @@ export function cvt_sdoor_to_door(lev) {   // detect.c:1589
     let newmask = 0;
     newmask = (lev.flags | 0) & ~WM_MASK;
     if ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level)) {
-        newmask = D_NODOOR;
+        newmask = D.NODOOR;
     } else {
-        if (!(newmask & D_LOCKED)) {
-            newmask = newmask | D_CLOSED;
+        if (!(newmask & D.LOCKED)) {
+            newmask = newmask | D.CLOSED;
         }
     }
     lev.typ = DOOR;
@@ -1291,8 +1291,8 @@ async function findone(zx, zy, whatfound) {   // detect.c:1639
     found_p.ft_cc.x = zx;
     found_p.ft_cc.y = zy;
     if (lev.typ === SDOOR) {
-        sym = $c.u8(lev.horizontal | 0 ? S_hcdoor : S_vcdoor);
-        await flash_glyph_at(zx, zy, sym === S_stone ? GLYPH_CMAP_STONE_OFF : sym <= S_trwall ? (sym - S_vwall | 0) + (In_mines(u.uz) ? GLYPH_CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH_CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH_CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH_CMAP_SOKO_OFF : GLYPH_CMAP_MAIN_OFF) | 0 : sym < S_altar ? (sym - S_ndoor | 0) + GLYPH_CMAP_A_OFF | 0 : sym === S_altar ? 4008 : sym < S_arrow_trap + MAXTCHARS ? (sym - S_grave | 0) + GLYPH_CMAP_B_OFF | 0 : sym <= S_goodpos ? (sym - S_digbeam | 0) + GLYPH_CMAP_C_OFF | 0 : NO_GLYPH, FOUND_FLASH_COUNT);
+        sym = $c.u8(lev.horizontal | 0 ? S.hcdoor : S.vcdoor);
+        await flash_glyph_at(zx, zy, sym === S.stone ? GLYPH.CMAP_STONE_OFF : sym <= S.trwall ? (sym - S.vwall | 0) + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) | 0 : sym < S.altar ? (sym - S.ndoor | 0) + GLYPH.CMAP_A_OFF | 0 : sym === S.altar ? 4008 : sym < S.arrow_trap + MAXTCHARS ? (sym - S.grave | 0) + GLYPH.CMAP_B_OFF | 0 : sym <= S.goodpos ? (sym - S.digbeam | 0) + GLYPH.CMAP_C_OFF | 0 : NO_GLYPH, FOUND_FLASH_COUNT);
         cvt_sdoor_to_door(lev);
         recalc_block_point(zx, zy);
         await magic_map_background(zx, zy, 0);
@@ -1307,19 +1307,19 @@ async function findone(zx, zy, whatfound) {   // detect.c:1639
         found_p.num_scorrs = $c.u8(found_p.num_scorrs + 1);
     }
     if (ttmp && !ttmp.tseen && (ttmp.ttyp | 0) !== STATUE_TRAP) {
-        await flash_glyph_at(zx, zy, ((S_arrow_trap + (ttmp.ttyp | 0) | 0) - 1 | 0) === S_stone ? GLYPH_CMAP_STONE_OFF : ((S_arrow_trap + (ttmp.ttyp | 0) | 0) - 1 | 0) <= S_trwall ? (((S_arrow_trap + (ttmp.ttyp | 0) | 0) - 1 | 0) - S_vwall | 0) + (In_mines(u.uz) ? GLYPH_CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH_CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH_CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH_CMAP_SOKO_OFF : GLYPH_CMAP_MAIN_OFF) | 0 : ((S_arrow_trap + (ttmp.ttyp | 0) | 0) - 1 | 0) < S_altar ? (((S_arrow_trap + (ttmp.ttyp | 0) | 0) - 1 | 0) - S_ndoor | 0) + GLYPH_CMAP_A_OFF | 0 : ((S_arrow_trap + (ttmp.ttyp | 0) | 0) - 1 | 0) === S_altar ? 4008 : ((S_arrow_trap + (ttmp.ttyp | 0) | 0) - 1 | 0) < S_arrow_trap + MAXTCHARS ? (((S_arrow_trap + (ttmp.ttyp | 0) | 0) - 1 | 0) - S_grave | 0) + GLYPH_CMAP_B_OFF | 0 : ((S_arrow_trap + (ttmp.ttyp | 0) | 0) - 1 | 0) <= S_goodpos ? (((S_arrow_trap + (ttmp.ttyp | 0) | 0) - 1 | 0) - S_digbeam | 0) + GLYPH_CMAP_C_OFF | 0 : NO_GLYPH, FOUND_FLASH_COUNT);
+        await flash_glyph_at(zx, zy, ((S.arrow_trap + (ttmp.ttyp | 0) | 0) - 1 | 0) === S.stone ? GLYPH.CMAP_STONE_OFF : ((S.arrow_trap + (ttmp.ttyp | 0) | 0) - 1 | 0) <= S.trwall ? (((S.arrow_trap + (ttmp.ttyp | 0) | 0) - 1 | 0) - S.vwall | 0) + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) | 0 : ((S.arrow_trap + (ttmp.ttyp | 0) | 0) - 1 | 0) < S.altar ? (((S.arrow_trap + (ttmp.ttyp | 0) | 0) - 1 | 0) - S.ndoor | 0) + GLYPH.CMAP_A_OFF | 0 : ((S.arrow_trap + (ttmp.ttyp | 0) | 0) - 1 | 0) === S.altar ? 4008 : ((S.arrow_trap + (ttmp.ttyp | 0) | 0) - 1 | 0) < S.arrow_trap + MAXTCHARS ? (((S.arrow_trap + (ttmp.ttyp | 0) | 0) - 1 | 0) - S.grave | 0) + GLYPH.CMAP_B_OFF | 0 : ((S.arrow_trap + (ttmp.ttyp | 0) | 0) - 1 | 0) <= S.goodpos ? (((S.arrow_trap + (ttmp.ttyp | 0) | 0) - 1 | 0) - S.digbeam | 0) + GLYPH.CMAP_C_OFF | 0 : NO_GLYPH, FOUND_FLASH_COUNT);
         ttmp.tseen = (1) & 1;
         await sense_trap(ttmp, zx, zy, 0);
-        await foundone(zx, zy, ((S_arrow_trap + (ttmp.ttyp | 0) | 0) - 1 | 0) === S_stone ? GLYPH_CMAP_STONE_OFF : ((S_arrow_trap + (ttmp.ttyp | 0) | 0) - 1 | 0) <= S_trwall ? (((S_arrow_trap + (ttmp.ttyp | 0) | 0) - 1 | 0) - S_vwall | 0) + (In_mines(u.uz) ? GLYPH_CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH_CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH_CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH_CMAP_SOKO_OFF : GLYPH_CMAP_MAIN_OFF) | 0 : ((S_arrow_trap + (ttmp.ttyp | 0) | 0) - 1 | 0) < S_altar ? (((S_arrow_trap + (ttmp.ttyp | 0) | 0) - 1 | 0) - S_ndoor | 0) + GLYPH_CMAP_A_OFF | 0 : ((S_arrow_trap + (ttmp.ttyp | 0) | 0) - 1 | 0) === S_altar ? 4008 : ((S_arrow_trap + (ttmp.ttyp | 0) | 0) - 1 | 0) < S_arrow_trap + MAXTCHARS ? (((S_arrow_trap + (ttmp.ttyp | 0) | 0) - 1 | 0) - S_grave | 0) + GLYPH_CMAP_B_OFF | 0 : ((S_arrow_trap + (ttmp.ttyp | 0) | 0) - 1 | 0) <= S_goodpos ? (((S_arrow_trap + (ttmp.ttyp | 0) | 0) - 1 | 0) - S_digbeam | 0) + GLYPH_CMAP_C_OFF | 0 : NO_GLYPH);
+        await foundone(zx, zy, ((S.arrow_trap + (ttmp.ttyp | 0) | 0) - 1 | 0) === S.stone ? GLYPH.CMAP_STONE_OFF : ((S.arrow_trap + (ttmp.ttyp | 0) | 0) - 1 | 0) <= S.trwall ? (((S.arrow_trap + (ttmp.ttyp | 0) | 0) - 1 | 0) - S.vwall | 0) + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) | 0 : ((S.arrow_trap + (ttmp.ttyp | 0) | 0) - 1 | 0) < S.altar ? (((S.arrow_trap + (ttmp.ttyp | 0) | 0) - 1 | 0) - S.ndoor | 0) + GLYPH.CMAP_A_OFF | 0 : ((S.arrow_trap + (ttmp.ttyp | 0) | 0) - 1 | 0) === S.altar ? 4008 : ((S.arrow_trap + (ttmp.ttyp | 0) | 0) - 1 | 0) < S.arrow_trap + MAXTCHARS ? (((S.arrow_trap + (ttmp.ttyp | 0) | 0) - 1 | 0) - S.grave | 0) + GLYPH.CMAP_B_OFF | 0 : ((S.arrow_trap + (ttmp.ttyp | 0) | 0) - 1 | 0) <= S.goodpos ? (((S.arrow_trap + (ttmp.ttyp | 0) | 0) - 1 | 0) - S.digbeam | 0) + GLYPH.CMAP_C_OFF | 0 : NO_GLYPH);
         found_p.num_traps = $c.u8(found_p.num_traps + 1);
     }
-    if (closed_door(zx, zy) && ((lev.flags | 0) & D_TRAPPED) !== 0) {
+    if (closed_door(zx, zy) && ((lev.flags | 0) & D.TRAPPED) !== 0) {
         dummytrap.ttyp = (TRAPPED_DOOR) & 31;
         dummytrap.tx = zx, dummytrap.ty = zy;
-        await flash_glyph_at(zx, zy, ((S_arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) === S_stone ? GLYPH_CMAP_STONE_OFF : ((S_arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) <= S_trwall ? (((S_arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) - S_vwall | 0) + (In_mines(u.uz) ? GLYPH_CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH_CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH_CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH_CMAP_SOKO_OFF : GLYPH_CMAP_MAIN_OFF) | 0 : ((S_arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) < S_altar ? (((S_arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) - S_ndoor | 0) + GLYPH_CMAP_A_OFF | 0 : ((S_arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) === S_altar ? 4008 : ((S_arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) < S_arrow_trap + MAXTCHARS ? (((S_arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) - S_grave | 0) + GLYPH_CMAP_B_OFF | 0 : ((S_arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) <= S_goodpos ? (((S_arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) - S_digbeam | 0) + GLYPH_CMAP_C_OFF | 0 : NO_GLYPH, FOUND_FLASH_COUNT);
+        await flash_glyph_at(zx, zy, ((S.arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) === S.stone ? GLYPH.CMAP_STONE_OFF : ((S.arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) <= S.trwall ? (((S.arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) - S.vwall | 0) + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) | 0 : ((S.arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) < S.altar ? (((S.arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) - S.ndoor | 0) + GLYPH.CMAP_A_OFF | 0 : ((S.arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) === S.altar ? 4008 : ((S.arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) < S.arrow_trap + MAXTCHARS ? (((S.arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) - S.grave | 0) + GLYPH.CMAP_B_OFF | 0 : ((S.arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) <= S.goodpos ? (((S.arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) - S.digbeam | 0) + GLYPH.CMAP_C_OFF | 0 : NO_GLYPH, FOUND_FLASH_COUNT);
         dummytrap.tseen = (1) & 1;
         await sense_trap(dummytrap, zx, zy, 0);
-        await foundone(zx, zy, ((S_arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) === S_stone ? GLYPH_CMAP_STONE_OFF : ((S_arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) <= S_trwall ? (((S_arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) - S_vwall | 0) + (In_mines(u.uz) ? GLYPH_CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH_CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH_CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH_CMAP_SOKO_OFF : GLYPH_CMAP_MAIN_OFF) | 0 : ((S_arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) < S_altar ? (((S_arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) - S_ndoor | 0) + GLYPH_CMAP_A_OFF | 0 : ((S_arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) === S_altar ? 4008 : ((S_arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) < S_arrow_trap + MAXTCHARS ? (((S_arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) - S_grave | 0) + GLYPH_CMAP_B_OFF | 0 : ((S_arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) <= S_goodpos ? (((S_arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) - S_digbeam | 0) + GLYPH_CMAP_C_OFF | 0 : NO_GLYPH);
+        await foundone(zx, zy, ((S.arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) === S.stone ? GLYPH.CMAP_STONE_OFF : ((S.arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) <= S.trwall ? (((S.arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) - S.vwall | 0) + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) | 0 : ((S.arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) < S.altar ? (((S.arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) - S.ndoor | 0) + GLYPH.CMAP_A_OFF | 0 : ((S.arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) === S.altar ? 4008 : ((S.arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) < S.arrow_trap + MAXTCHARS ? (((S.arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) - S.grave | 0) + GLYPH.CMAP_B_OFF | 0 : ((S.arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) <= S.goodpos ? (((S.arrow_trap + (dummytrap.ttyp | 0) | 0) - 1 | 0) - S.digbeam | 0) + GLYPH.CMAP_C_OFF | 0 : NO_GLYPH);
         found_p.num_traps = $c.u8(found_p.num_traps + 1);
     }
     await detect_obj_traps(svl.level.buriedobjlist, TRUE, 0, found_p);
@@ -1332,11 +1332,11 @@ async function findone(zx, zy, whatfound) {   // detect.c:1639
     }
     if (mtmp && (!canspotmon(mtmp) || mtmp.mundetected | 0 || M_AP_TYPE(mtmp))) {
         if (M_AP_TYPE(mtmp)) {
-            await flash_glyph_at(zx, zy, (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) : mtmp.data.pmidx) + ((mtmp.female | 0) === 0 ? GLYPH_MON_MALE_OFF : GLYPH_MON_FEM_OFF) | 0, FOUND_FLASH_COUNT);
+            await flash_glyph_at(zx, zy, (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) : mtmp.data.pmidx) + ((mtmp.female | 0) === 0 ? GLYPH.MON_MALE_OFF : GLYPH.MON_FEM_OFF) | 0, FOUND_FLASH_COUNT);
             await seemimic(mtmp);
             found_p.num_mons = $c.u8(found_p.num_mons + 1);
-        } else if (mtmp.mundetected | 0 && (is_hider(mtmp.data) || hides_under(mtmp.data) || mtmp.data.mlet === S_EEL)) {
-            await flash_glyph_at(zx, zy, (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) : mtmp.data.pmidx) + ((mtmp.female | 0) === 0 ? GLYPH_MON_MALE_OFF : GLYPH_MON_FEM_OFF) | 0, FOUND_FLASH_COUNT);
+        } else if (mtmp.mundetected | 0 && (is_hider(mtmp.data) || hides_under(mtmp.data) || mtmp.data.mlet === S.EEL)) {
+            await flash_glyph_at(zx, zy, (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) : mtmp.data.pmidx) + ((mtmp.female | 0) === 0 ? GLYPH.MON_MALE_OFF : GLYPH.MON_FEM_OFF) | 0, FOUND_FLASH_COUNT);
             mtmp.mundetected = (0) & 1;
             await newsym(zx, zy);
             found_p.num_mons = $c.u8(found_p.num_mons + 1);
@@ -1368,20 +1368,20 @@ async function openone(zx$in, zy$in, num) {   // detect.c:1729
             }
         }
     }
-    if (svl.level.locations[zx[0]][zy[0]].typ === SDOOR || svl.level.locations[zx[0]][zy[0]].typ === DOOR && (svl.level.locations[zx[0]][zy[0]].flags | 0) & (D_CLOSED | D_LOCKED)) {
+    if (svl.level.locations[zx[0]][zy[0]].typ === SDOOR || svl.level.locations[zx[0]][zy[0]].typ === DOOR && (svl.level.locations[zx[0]][zy[0]].flags | 0) & (D.CLOSED | D.LOCKED)) {
         if (svl.level.locations[zx[0]][zy[0]].typ === SDOOR) {
             cvt_sdoor_to_door($c.relem(svl.level.locations[zx[0]], zy[0]));
         }
-        if ((svl.level.locations[zx[0]][zy[0]].flags | 0) & D_TRAPPED) {
+        if ((svl.level.locations[zx[0]][zy[0]].flags | 0) & D.TRAPPED) {
             if (dist2(zx[0], zy[0], u.ux, u.uy) < 3) {
                 await b_trapped($c.lit("door"), NO_PART);
             } else {
                 await Norep($c.lit("You %s an explosion!"), cansee(zx[0], zy[0]) ? $c.lit("see") : !Deaf() ? $c.lit("hear") : $c.lit("feel the shock of"));
             }
             await wake_nearto(zx[0], zy[0], 121);
-            svl.level.locations[zx[0]][zy[0]].flags = (D_NODOOR) & 31;
+            svl.level.locations[zx[0]][zy[0]].flags = (D.NODOOR) & 31;
         } else {
-            svl.level.locations[zx[0]][zy[0]].flags = (D_ISOPEN) & 31;
+            svl.level.locations[zx[0]][zy[0]].flags = (D.ISOPEN) & 31;
         }
         unblock_point(zx[0], zy[0]);
         await newsym(zx[0], zy[0]);
@@ -1484,7 +1484,7 @@ export async function openit() {   // detect.c:1902
     let num = Int32Array.of(0);
     num[0] = 0;
     if (u.uswallow) {
-        if (dmgtype_fromattack(u.ustuck.data, AD_DGST, AT_ENGL) !== null) {
+        if (dmgtype_fromattack(u.ustuck.data, AD.DGST, AT.ENGL) !== null) {
             if (Blind()) {
                 await pline($c.lit("Its mouth opens!"));
             } else {
@@ -1504,12 +1504,12 @@ export async function find_trap(trap) {   // detect.c:1935
     let cleared = 0;
     cleared = FALSE;
     trap.tseen = (1) & 1;
-    await exercise(A_WIS, TRUE);
+    await exercise(A.WIS, TRUE);
     await feel_newsym(trap.tx, trap.ty);
-    if (Hallucination() || svl.level.locations[trap.tx][trap.ty].glyph !== (((S_arrow_trap + (trap.ttyp | 0) | 0) - 1 | 0) === S_stone ? GLYPH_CMAP_STONE_OFF : ((S_arrow_trap + (trap.ttyp | 0) | 0) - 1 | 0) <= S_trwall ? (((S_arrow_trap + (trap.ttyp | 0) | 0) - 1 | 0) - S_vwall | 0) + (In_mines(u.uz) ? GLYPH_CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH_CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH_CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH_CMAP_SOKO_OFF : GLYPH_CMAP_MAIN_OFF) | 0 : ((S_arrow_trap + (trap.ttyp | 0) | 0) - 1 | 0) < S_altar ? (((S_arrow_trap + (trap.ttyp | 0) | 0) - 1 | 0) - S_ndoor | 0) + GLYPH_CMAP_A_OFF | 0 : ((S_arrow_trap + (trap.ttyp | 0) | 0) - 1 | 0) === S_altar ? 4008 : ((S_arrow_trap + (trap.ttyp | 0) | 0) - 1 | 0) < S_arrow_trap + MAXTCHARS ? (((S_arrow_trap + (trap.ttyp | 0) | 0) - 1 | 0) - S_grave | 0) + GLYPH_CMAP_B_OFF | 0 : ((S_arrow_trap + (trap.ttyp | 0) | 0) - 1 | 0) <= S_goodpos ? (((S_arrow_trap + (trap.ttyp | 0) | 0) - 1 | 0) - S_digbeam | 0) + GLYPH_CMAP_C_OFF | 0 : NO_GLYPH)) {
+    if (Hallucination() || svl.level.locations[trap.tx][trap.ty].glyph !== (((S.arrow_trap + (trap.ttyp | 0) | 0) - 1 | 0) === S.stone ? GLYPH.CMAP_STONE_OFF : ((S.arrow_trap + (trap.ttyp | 0) | 0) - 1 | 0) <= S.trwall ? (((S.arrow_trap + (trap.ttyp | 0) | 0) - 1 | 0) - S.vwall | 0) + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) | 0 : ((S.arrow_trap + (trap.ttyp | 0) | 0) - 1 | 0) < S.altar ? (((S.arrow_trap + (trap.ttyp | 0) | 0) - 1 | 0) - S.ndoor | 0) + GLYPH.CMAP_A_OFF | 0 : ((S.arrow_trap + (trap.ttyp | 0) | 0) - 1 | 0) === S.altar ? 4008 : ((S.arrow_trap + (trap.ttyp | 0) | 0) - 1 | 0) < S.arrow_trap + MAXTCHARS ? (((S.arrow_trap + (trap.ttyp | 0) | 0) - 1 | 0) - S.grave | 0) + GLYPH.CMAP_B_OFF | 0 : ((S.arrow_trap + (trap.ttyp | 0) | 0) - 1 | 0) <= S.goodpos ? (((S.arrow_trap + (trap.ttyp | 0) | 0) - 1 | 0) - S.digbeam | 0) + GLYPH.CMAP_C_OFF | 0 : NO_GLYPH)) {
         await cls();
         await map_trap(trap, 1);
-        await show_glyph(u.ux, u.uy, u.usteed && mon_visible(u.usteed) ? (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) : u.usteed.data.pmidx) + ((u.usteed.female | 0) === 0 ? GLYPH_RIDDEN_MALE_OFF : GLYPH_RIDDEN_FEM_OFF) | 0 : (gy.youmonst.m_ap_type & M_AP_TYPMASK) === M_AP_NOTHING ? (u.umonnum !== u.umonster || !flags.showrace ? u.umonnum : gu.urace.mnum) + (((u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female) ? 1 : 0) === MALE ? GLYPH_MON_MALE_OFF : GLYPH_MON_FEM_OFF) | 0 : (gy.youmonst.m_ap_type & M_AP_TYPMASK) === M_AP_FURNITURE ? (gy.youmonst.mappearance | 0) === S_stone ? GLYPH_CMAP_STONE_OFF : (gy.youmonst.mappearance | 0) <= S_trwall ? ((gy.youmonst.mappearance | 0) - S_vwall | 0) + (In_mines(u.uz) ? GLYPH_CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH_CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH_CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH_CMAP_SOKO_OFF : GLYPH_CMAP_MAIN_OFF) | 0 : (gy.youmonst.mappearance | 0) < S_altar ? ((gy.youmonst.mappearance | 0) - S_ndoor | 0) + GLYPH_CMAP_A_OFF | 0 : (gy.youmonst.mappearance | 0) === S_altar ? 4008 : (gy.youmonst.mappearance | 0) < S_arrow_trap + MAXTCHARS ? ((gy.youmonst.mappearance | 0) - S_grave | 0) + GLYPH_CMAP_B_OFF | 0 : (gy.youmonst.mappearance | 0) <= S_goodpos ? ((gy.youmonst.mappearance | 0) - S_digbeam | 0) + GLYPH_CMAP_C_OFF | 0 : NO_GLYPH : (gy.youmonst.m_ap_type & M_AP_TYPMASK) === M_AP_OBJECT ? (gy.youmonst.mappearance | 0) + GLYPH_OBJ_OFF | 0 : (gy.youmonst.mappearance | 0) + (((u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female) ? 1 : 0) === MALE ? GLYPH_MON_MALE_OFF : GLYPH_MON_FEM_OFF) | 0);
+        await show_glyph(u.ux, u.uy, u.usteed && mon_visible(u.usteed) ? (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) : u.usteed.data.pmidx) + ((u.usteed.female | 0) === 0 ? GLYPH.RIDDEN_MALE_OFF : GLYPH.RIDDEN_FEM_OFF) | 0 : (gy.youmonst.m_ap_type & M_AP.TYPMASK) === M_AP.NOTHING ? (u.umonnum !== u.umonster || !flags.showrace ? u.umonnum : gu.urace.mnum) + (((u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female) ? 1 : 0) === MALE ? GLYPH.MON_MALE_OFF : GLYPH.MON_FEM_OFF) | 0 : (gy.youmonst.m_ap_type & M_AP.TYPMASK) === M_AP.FURNITURE ? (gy.youmonst.mappearance | 0) === S.stone ? GLYPH.CMAP_STONE_OFF : (gy.youmonst.mappearance | 0) <= S.trwall ? ((gy.youmonst.mappearance | 0) - S.vwall | 0) + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) | 0 : (gy.youmonst.mappearance | 0) < S.altar ? ((gy.youmonst.mappearance | 0) - S.ndoor | 0) + GLYPH.CMAP_A_OFF | 0 : (gy.youmonst.mappearance | 0) === S.altar ? 4008 : (gy.youmonst.mappearance | 0) < S.arrow_trap + MAXTCHARS ? ((gy.youmonst.mappearance | 0) - S.grave | 0) + GLYPH.CMAP_B_OFF | 0 : (gy.youmonst.mappearance | 0) <= S.goodpos ? ((gy.youmonst.mappearance | 0) - S.digbeam | 0) + GLYPH.CMAP_C_OFF | 0 : NO_GLYPH : (gy.youmonst.m_ap_type & M_AP.TYPMASK) === M_AP.OBJECT ? (gy.youmonst.mappearance | 0) + GLYPH.OBJ_OFF | 0 : (gy.youmonst.mappearance | 0) + (((u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female) ? 1 : 0) === MALE ? GLYPH.MON_MALE_OFF : GLYPH.MON_FEM_OFF) | 0);
         cleared = TRUE;
     }
     set_msg_xy(trap.tx, trap.ty);
@@ -1532,7 +1532,7 @@ async function mfind0(mtmp, via_warning) {   // detect.c:1965
         found_something = TRUE;
     } else {
         found_something = $c.i8(!canspotmon(mtmp) ? 1 : 0);
-        if (mtmp.mundetected | 0 && (is_hider(mtmp.data) || hides_under(mtmp.data) || mtmp.data.mlet === S_EEL)) {
+        if (mtmp.mundetected | 0 && (is_hider(mtmp.data) || hides_under(mtmp.data) || mtmp.data.mlet === S.EEL)) {
             if (via_warning && found_something) {
                 set_msg_xy(x, y);
                 await Your($c.lit("danger sense causes you to take a second %s."), Blind() ? $c.lit("to check nearby") : $c.lit("look close by"));
@@ -1547,7 +1547,7 @@ async function mfind0(mtmp, via_warning) {   // detect.c:1965
         if (!canspotmon(mtmp) && svl.level.locations[x][y].glyph === GLYPH_INVISIBLE) {
             return -1;
         }
-        await exercise(A_WIS, TRUE);
+        await exercise(A.WIS, TRUE);
         if (!canspotmon(mtmp)) {
             await map_invisible(x, y);
             set_msg_xy(x, y);
@@ -1567,7 +1567,7 @@ export async function dosearch0(aflag) {   // detect.c:2016
             await Norep($c.lit("What are you looking for?  The exit?"));
         }
     } else {
-        fund = $G.uwep && $G.uwep.oartifact && spec_ability($G.uwep, SPFX_SEARCH) ? $G.uwep.spe : 0;
+        fund = $G.uwep && $G.uwep.oartifact && spec_ability($G.uwep, SPFX.SEARCH) ? $G.uwep.spe : 0;
         if ($G.ublindf && $G.ublindf.otyp === LENSES && !Blind()) {
             fund = fund + 2 | 0;
         }
@@ -1591,7 +1591,7 @@ export async function dosearch0(aflag) {   // detect.c:2016
                     }
                     cvt_sdoor_to_door($c.relem(svl.level.locations[x], y));
                     recalc_block_point(x, y);
-                    await exercise(A_WIS, TRUE);
+                    await exercise(A.WIS, TRUE);
                     nomul(0);
                     await feel_location(x, y);
                     set_msg_xy(x, y);
@@ -1602,7 +1602,7 @@ export async function dosearch0(aflag) {   // detect.c:2016
                     }
                     svl.level.locations[x][y].typ = CORR;
                     unblock_point(x, y);
-                    await exercise(A_WIS, TRUE);
+                    await exercise(A.WIS, TRUE);
                     nomul(0);
                     await feel_newsym(x, y);
                     set_msg_xy(x, y);
@@ -1623,7 +1623,7 @@ export async function dosearch0(aflag) {   // detect.c:2016
                         nomul(0);
                         if ((trap.ttyp | 0) === STATUE_TRAP) {
                             if (await activate_statue_trap(trap, x, y, FALSE)) {
-                                await exercise(A_WIS, TRUE);
+                                await exercise(A.WIS, TRUE);
                             }
                             return 1;
                         } else {
@@ -1638,9 +1638,9 @@ export async function dosearch0(aflag) {   // detect.c:2016
 }
 export async function dosearch() {   // detect.c:2097
     if (await cmd_safety_prevention($c.lit("Searching"), $c.lit("another search"), $c.lit("You already found a monster."), new $c.FieldRef(ga, "already_found_flag", "i32"))) {
-        return ECMD_OK;
+        return ECMD.OK;
     }
-    return await dosearch0(0) ? ECMD_TIME : ECMD_OK;
+    return await dosearch0(0) ? ECMD.TIME : ECMD.OK;
 }
 export async function warnreveal() {   // detect.c:2107
     let x = 0, y = 0, mtmp = null;
@@ -1656,7 +1656,7 @@ export async function warnreveal() {   // detect.c:2107
     }
 }
 function skip_premap_detect(x, y) {   // detect.c:2124
-    if (svl.level.locations[x][y].typ === STONE && ((svl.level.locations[x][y].flags | 0) & (W_NONDIGGABLE | W_NONPASSWALL)) !== 0) {
+    if (svl.level.locations[x][y].typ === STONE && ((svl.level.locations[x][y].flags | 0) & (W.NONDIGGABLE | W.NONPASSWALL)) !== 0) {
         return TRUE;
     }
     return FALSE;
@@ -1686,10 +1686,10 @@ export async function premap_detect() {   // detect.c:2134
 }
 async function reveal_terrain_getglyph(x, y, swallowed, default_glyph, which_subset) {   // detect.c:2167
     let t = null, mtmp = null, glyph = 0, levl_glyph = 0, seenv = 0, keep_traps = 0, keep_objs = 0, keep_mons = 0, full = 0, cmaptmp = 0, reg = null, was_mon = 0, save_spot = new $T.rm();
-    keep_traps = $c.i8((which_subset & TER_TRP) >>> 0 !== 0 ? 1 : 0);
-    keep_objs = $c.i8((which_subset & TER_OBJ) >>> 0 !== 0 ? 1 : 0);
-    keep_mons = $c.i8((which_subset & TER_MON) >>> 0 !== 0 ? 1 : 0);
-    full = $c.i8((which_subset & TER_FULL) >>> 0 !== 0 ? 1 : 0);
+    keep_traps = $c.i8((which_subset & TER.TRP) >>> 0 !== 0 ? 1 : 0);
+    keep_objs = $c.i8((which_subset & TER.OBJ) >>> 0 !== 0 ? 1 : 0);
+    keep_mons = $c.i8((which_subset & TER.MON) >>> 0 !== 0 ? 1 : 0);
+    full = $c.i8((which_subset & TER.FULL) >>> 0 !== 0 ? 1 : 0);
     seenv = $c.u8(full || svl.level.flags.hero_memory | 0 ? svl.level.locations[x][y].seenv : cansee(x, y) ? SVALL : 0);
     if (full) {
         svl.level.locations[x][y].seenv = SVALL;
@@ -1702,27 +1702,27 @@ async function reveal_terrain_getglyph(x, y, swallowed, default_glyph, which_sub
         levl_glyph = svl.level.flags.hero_memory | 0 ? svl.level.locations[x][y].glyph : seenv ? await back_to_glyph(x, y) : default_glyph;
         glyph = !swallowed ? glyph_at(x, y) : levl_glyph;
         if (keep_mons && u_at(x, y) && swallowed) {
-            glyph = (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) : u.ustuck.data.pmidx) + ((u.ustuck.female | 0) === 0 ? GLYPH_MON_MALE_OFF : GLYPH_MON_FEM_OFF) | 0;
+            glyph = (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) : u.ustuck.data.pmidx) + ((u.ustuck.female | 0) === 0 ? GLYPH.MON_MALE_OFF : GLYPH.MON_FEM_OFF) | 0;
         } else if (!keep_mons && (glyph_is_monster(glyph) || glyph_is_warning(glyph)) || glyph_is_swallow(glyph)) {
             glyph = levl_glyph;
             was_mon = TRUE;
         }
         if ((!keep_objs && glyph_is_object(glyph) || glyph_is_invisible(glyph)) && keep_traps && !(is_pool(x, y) && !u.uinwater || svl.level.locations[x][y].typ === LAVAPOOL || svl.level.locations[x][y].typ === LAVAWALL)) {
             if ((t = t_at(x, y)) !== null && t.tseen | 0) {
-                glyph = ((S_arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) === S_stone ? GLYPH_CMAP_STONE_OFF : ((S_arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) <= S_trwall ? (((S_arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) - S_vwall | 0) + (In_mines(u.uz) ? GLYPH_CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH_CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH_CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH_CMAP_SOKO_OFF : GLYPH_CMAP_MAIN_OFF) | 0 : ((S_arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) < S_altar ? (((S_arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) - S_ndoor | 0) + GLYPH_CMAP_A_OFF | 0 : ((S_arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) === S_altar ? 4008 : ((S_arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) < S_arrow_trap + MAXTCHARS ? (((S_arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) - S_grave | 0) + GLYPH_CMAP_B_OFF | 0 : ((S_arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) <= S_goodpos ? (((S_arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) - S_digbeam | 0) + GLYPH_CMAP_C_OFF | 0 : NO_GLYPH;
+                glyph = ((S.arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) === S.stone ? GLYPH.CMAP_STONE_OFF : ((S.arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) <= S.trwall ? (((S.arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) - S.vwall | 0) + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) | 0 : ((S.arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) < S.altar ? (((S.arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) - S.ndoor | 0) + GLYPH.CMAP_A_OFF | 0 : ((S.arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) === S.altar ? 4008 : ((S.arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) < S.arrow_trap + MAXTCHARS ? (((S.arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) - S.grave | 0) + GLYPH.CMAP_B_OFF | 0 : ((S.arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) <= S.goodpos ? (((S.arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) - S.digbeam | 0) + GLYPH.CMAP_C_OFF | 0 : NO_GLYPH;
             }
         }
-        if (!keep_objs && glyph_is_object(glyph) || !keep_traps && (glyph_is_trap(glyph) || reg && (glyph >= GLYPH_CMAP_STONE_OFF && glyph < GLYPH_CMAP_C_OFF + (S_goodpos - S_digbeam + 1) && ((cmaptmp = glyph_to_cmap(glyph)) === S_cloud || cmaptmp === S_poisoncloud))) || reg && was_mon || glyph_is_invisible(glyph)) {
+        if (!keep_objs && glyph_is_object(glyph) || !keep_traps && (glyph_is_trap(glyph) || reg && (glyph >= GLYPH.CMAP_STONE_OFF && glyph < GLYPH.CMAP_C_OFF + (S.goodpos - S.digbeam + 1) && ((cmaptmp = glyph_to_cmap(glyph)) === S.cloud || cmaptmp === S.poisoncloud))) || reg && was_mon || glyph_is_invisible(glyph)) {
             if (!seenv) {
                 glyph = !reg ? default_glyph : GLYPH_UNEXPLORED;
-            } else if (keep_traps && reg && (glyph >= GLYPH_CMAP_STONE_OFF && glyph < GLYPH_CMAP_C_OFF + (S_goodpos - S_digbeam + 1) && ((cmaptmp = glyph_to_cmap(glyph)) === S_cloud || cmaptmp === S_poisoncloud) || was_mon)) {
+            } else if (keep_traps && reg && (glyph >= GLYPH.CMAP_STONE_OFF && glyph < GLYPH.CMAP_C_OFF + (S.goodpos - S.digbeam + 1) && ((cmaptmp = glyph_to_cmap(glyph)) === S.cloud || cmaptmp === S.poisoncloud) || was_mon)) {
                 t = t_at(x, y);
-                glyph = t && t.tseen | 0 ? ((S_arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) === S_stone ? GLYPH_CMAP_STONE_OFF : ((S_arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) <= S_trwall ? (((S_arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) - S_vwall | 0) + (In_mines(u.uz) ? GLYPH_CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH_CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH_CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH_CMAP_SOKO_OFF : GLYPH_CMAP_MAIN_OFF) | 0 : ((S_arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) < S_altar ? (((S_arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) - S_ndoor | 0) + GLYPH_CMAP_A_OFF | 0 : ((S_arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) === S_altar ? 4008 : ((S_arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) < S_arrow_trap + MAXTCHARS ? (((S_arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) - S_grave | 0) + GLYPH_CMAP_B_OFF | 0 : ((S_arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) <= S_goodpos ? (((S_arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) - S_digbeam | 0) + GLYPH_CMAP_C_OFF | 0 : NO_GLYPH : reg.glyph;
+                glyph = t && t.tseen | 0 ? ((S.arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) === S.stone ? GLYPH.CMAP_STONE_OFF : ((S.arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) <= S.trwall ? (((S.arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) - S.vwall | 0) + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) | 0 : ((S.arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) < S.altar ? (((S.arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) - S.ndoor | 0) + GLYPH.CMAP_A_OFF | 0 : ((S.arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) === S.altar ? 4008 : ((S.arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) < S.arrow_trap + MAXTCHARS ? (((S.arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) - S.grave | 0) + GLYPH.CMAP_B_OFF | 0 : ((S.arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) <= S.goodpos ? (((S.arrow_trap + (t.ttyp | 0) | 0) - 1 | 0) - S.digbeam | 0) + GLYPH.CMAP_C_OFF | 0 : NO_GLYPH : reg.glyph;
             } else if (svl.lastseentyp[x][y] === svl.level.locations[x][y].typ) {
                 glyph = await back_to_glyph(x, y);
             } else {
-                if ((mtmp = svl.level.monsters[x][y]) !== null && M_AP_TYPE(mtmp) === M_AP_FURNITURE) {
-                    glyph = (mtmp.mappearance === S_stone ? GLYPH_CMAP_STONE_OFF : mtmp.mappearance <= S_trwall ? (mtmp.mappearance - S_vwall >>> 0) + ((In_mines(u.uz) ? GLYPH_CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH_CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH_CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH_CMAP_SOKO_OFF : GLYPH_CMAP_MAIN_OFF) >>> 0) >>> 0 : mtmp.mappearance < S_altar ? (mtmp.mappearance - S_ndoor >>> 0) + GLYPH_CMAP_A_OFF >>> 0 : mtmp.mappearance === S_altar ? 4008 : mtmp.mappearance < S_arrow_trap + MAXTCHARS ? (mtmp.mappearance - S_grave >>> 0) + GLYPH_CMAP_B_OFF >>> 0 : mtmp.mappearance <= S_goodpos ? (mtmp.mappearance - S_digbeam >>> 0) + GLYPH_CMAP_C_OFF >>> 0 : NO_GLYPH) | 0;
+                if ((mtmp = svl.level.monsters[x][y]) !== null && M_AP_TYPE(mtmp) === M_AP.FURNITURE) {
+                    glyph = (mtmp.mappearance === S.stone ? GLYPH.CMAP_STONE_OFF : mtmp.mappearance <= S.trwall ? (mtmp.mappearance - S.vwall >>> 0) + ((In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) >>> 0) >>> 0 : mtmp.mappearance < S.altar ? (mtmp.mappearance - S.ndoor >>> 0) + GLYPH.CMAP_A_OFF >>> 0 : mtmp.mappearance === S.altar ? 4008 : mtmp.mappearance < S.arrow_trap + MAXTCHARS ? (mtmp.mappearance - S.grave >>> 0) + GLYPH.CMAP_B_OFF >>> 0 : mtmp.mappearance <= S.goodpos ? (mtmp.mappearance - S.digbeam >>> 0) + GLYPH.CMAP_C_OFF >>> 0 : NO_GLYPH) | 0;
                 } else {
                     save_spot.$copyFrom(svl.level.locations[x][y]);
                     svl.level.locations[x][y].typ = svl.lastseentyp[x][y];
@@ -1744,19 +1744,19 @@ async function reveal_terrain_getglyph(x, y, swallowed, default_glyph, which_sub
 }
 export async function reveal_terrain(which_subset) {   // detect.c:2356
     let full = 0, x = 0, y = 0, glyph = 0, default_glyph = 0, buf = new Int8Array(256), keep_traps = 0, keep_objs = 0, keep_mons = 0, swallowed = 0, default_sym = 0;
-    full = $c.i8((which_subset & TER_FULL) >>> 0 !== 0 ? 1 : 0);
+    full = $c.i8((which_subset & TER.FULL) >>> 0 !== 0 ? 1 : 0);
     if ((Hallucination() || u.uprops[STUNNED].intrinsic || u.uprops[CONFUSION].intrinsic) && !full) {
         await You($c.lit("are too disoriented for this."));
     } else {
-        keep_traps = $c.i8((which_subset & TER_TRP) >>> 0 !== 0 ? 1 : 0);
-        keep_objs = $c.i8((which_subset & TER_OBJ) >>> 0 !== 0 ? 1 : 0);
-        keep_mons = $c.i8((which_subset & TER_MON) >>> 0 !== 0 ? 1 : 0);
+        keep_traps = $c.i8((which_subset & TER.TRP) >>> 0 !== 0 ? 1 : 0);
+        keep_objs = $c.i8((which_subset & TER.OBJ) >>> 0 !== 0 ? 1 : 0);
+        keep_mons = $c.i8((which_subset & TER.MON) >>> 0 !== 0 ? 1 : 0);
         swallowed = u.uswallow;
-        default_sym = $c.u8(svl.level.flags.arboreal | 0 ? S_tree : S_stone);
+        default_sym = $c.u8(svl.level.flags.arboreal | 0 ? S.tree : S.stone);
         if (unconstrain_map()) {
             await docrt();
         }
-        default_glyph = default_sym === S_stone ? GLYPH_CMAP_STONE_OFF : default_sym <= S_trwall ? (default_sym - S_vwall | 0) + (In_mines(u.uz) ? GLYPH_CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH_CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH_CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH_CMAP_SOKO_OFF : GLYPH_CMAP_MAIN_OFF) | 0 : default_sym < S_altar ? (default_sym - S_ndoor | 0) + GLYPH_CMAP_A_OFF | 0 : default_sym === S_altar ? 4008 : default_sym < S_arrow_trap + MAXTCHARS ? (default_sym - S_grave | 0) + GLYPH_CMAP_B_OFF | 0 : default_sym <= S_goodpos ? (default_sym - S_digbeam | 0) + GLYPH_CMAP_C_OFF | 0 : NO_GLYPH;
+        default_glyph = default_sym === S.stone ? GLYPH.CMAP_STONE_OFF : default_sym <= S.trwall ? (default_sym - S.vwall | 0) + (In_mines(u.uz) ? GLYPH.CMAP_MINES_OFF : In_hell(u.uz) ? GLYPH.CMAP_GEH_OFF : (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) ? GLYPH.CMAP_KNOX_OFF : u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum ? GLYPH.CMAP_SOKO_OFF : GLYPH.CMAP_MAIN_OFF) | 0 : default_sym < S.altar ? (default_sym - S.ndoor | 0) + GLYPH.CMAP_A_OFF | 0 : default_sym === S.altar ? 4008 : default_sym < S.arrow_trap + MAXTCHARS ? (default_sym - S.grave | 0) + GLYPH.CMAP_B_OFF | 0 : default_sym <= S.goodpos ? (default_sym - S.digbeam | 0) + GLYPH.CMAP_C_OFF | 0 : NO_GLYPH;
         for (x = 1; x < COLNO; x = $c.i16(x + 1)) {
             for (y = 0; y < ROWNO; y = $c.i16(y + 1)) {
                 glyph = await reveal_terrain_getglyph(x, y, swallowed, default_glyph, which_subset);
@@ -1779,7 +1779,7 @@ export async function reveal_terrain(which_subset) {   // detect.c:2356
             }
         }
         await pline($c.lit("Showing %s only..."), new $c.Ptr(buf, 0));
-        which_subset = (which_subset | TER_MAP) >>> 0;
+        which_subset = (which_subset | TER.MAP) >>> 0;
         await browse_map(which_subset, $c.lit("anything of interest"));
         await map_redisplay();
     }

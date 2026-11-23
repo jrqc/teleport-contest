@@ -4,16 +4,16 @@ import * as $T from './types.js';
 import { $G } from './globals.js';
 import { alloc, dupstr } from './alloc.js';
 import { exercise } from './attrib.js';
-import { A_WIS } from './attrib.h.js';
+import { A } from './attrib.h.js';
 import { disp, gf, gi, gm, go, gt, iflags, program_state, svo, u } from './decl.js';
 import { Monnam, bogon_codes, bogon_is_pname } from './do_name.js';
 import { is_fainted } from './eat.js';
 import { more_experienced, newexplevel } from './exper.js';
 import { debugcore } from './files.js';
 import { wizard } from './flag.macros.js';
-import { COLNO, FALSE, MD_PAD_RUMORS, TRUE } from './global.h.js';
+import { COLNO, FALSE, MD_PAD, TRUE } from './global.h.js';
 import { money_cnt } from './hack.js';
-import { BY_COOKIE, BY_ORACLE, BY_PAPER, ECMD_OK, ECMD_TIME } from './hack.h.js';
+import { BY, ECMD } from './hack.h.js';
 import { pline1, release_data, update_file, verbalize1, y_n, ynq } from './hack.macros.js';
 import { eos, lowc, xcrypt } from './hacklib.js';
 import { record_achievement } from './insight.js';
@@ -27,8 +27,8 @@ import { rn2, rnd } from './rnd.js';
 import { sfi_ulong, sfi_unsigned, sfo_ulong, sfo_unsigned } from './sfbase.js';
 import { money2mon } from './shk.js';
 import { create_nhwindow, destroy_nhwindow, display_nhwindow, putstr } from './winprocs.macros.js';
-import { NHW_TEXT, WIN_ERR } from './wintype.h.js';
-import { ACH_ORCL } from './you.h.js';
+import { NHW, WIN_ERR } from './wintype.h.js';
+import { ACH } from './you.h.js';
 import { Blind } from './youprop.macros.js';
 
 const init_rumors$rumors_header = new Int8Array(31);   // static in init_rumors()
@@ -96,13 +96,13 @@ export async function getrumor(truth, rumor_buf, exclude_cookie) {   // rumors.c
                     await impossible($c.lit("strange truth value for rumor"));
                     return $c.__builtin___strcpy_chk(rumor_buf, $c.lit("Oops..."), -1);
             }
-            $c.__builtin___strcpy_chk(rumor_buf, await get_rnd_line(rumors, new $c.Ptr(line, 0), 256, rn2, beginning, ending, MD_PAD_RUMORS), -1);
+            $c.__builtin___strcpy_chk(rumor_buf, await get_rnd_line(rumors, new $c.Ptr(line, 0), 256, rn2, beginning, ending, MD_PAD.RUMORS), -1);
         } while (($t1 = count, count = $t1 + 1 | 0, $t1) < 50 && exclude_cookie && !$c.strncmp(rumor_buf, getrumor$cookie_marker, $c.u64(marklen)));
         $c.fclose(rumors);
         if (count >= 50) {
             await impossible($c.lit("Can't find non-cookie rumor?"));
         } else if (!gi.in_mklev) {
-            await exercise(A_WIS, $c.i8(adjtruth > 0 ? 1 : 0));
+            await exercise(A.WIS, $c.i8(adjtruth > 0 ? 1 : 0));
         }
     } else {
         await couldnt_open_file($c.lit("rumors"));
@@ -136,7 +136,7 @@ export async function rumor_check() {   // rumors.c:196
                         $goto = "no_rumors"; continue D1;
                     }
                 }
-                tmpwin[0] = await create_nhwindow()(NHW_TEXT);
+                tmpwin[0] = await create_nhwindow()(NHW.TEXT);
                 $c.__builtin___sprintf_chk(new $c.Ptr(rumor_buf, 0), 0, 256, $c.lit("T start=%06ld (%06lx), end=%06ld (%06lx), size=%06ld (%06lx)"), $c.i64(gt.true_rumor_start), gt.true_rumor_start, gt.true_rumor_end, $c.u64(gt.true_rumor_end), gt.true_rumor_size, $c.u64(gt.true_rumor_size));
                 await putstr()(tmpwin[0], 0, new $c.Ptr(rumor_buf, 0));
                 $c.__builtin___sprintf_chk(new $c.Ptr(rumor_buf, 0), 0, 256, $c.lit("F start=%06ld (%06lx), end=%06ld (%06lx), size=%06ld (%06lx)"), $c.i64(gf.false_rumor_start), gf.false_rumor_start, gf.false_rumor_end, $c.u64(gf.false_rumor_end), gf.false_rumor_size, $c.u64(gf.false_rumor_size));
@@ -203,7 +203,7 @@ async function others_check(ftype, fname, winptr) {   // rumors.c:308
     if (fh) {
         closeit$: {
             if (tmpwin === WIN_ERR) {
-                $t1 = tmpwin = await create_nhwindow()(NHW_TEXT), winptr.set(0, $t1);
+                $t1 = tmpwin = await create_nhwindow()(NHW.TEXT), winptr.set(0, $t1);
                 if (tmpwin === WIN_ERR) {
                     await impossible(new $c.Ptr(others_check$errfmt, 0), fname, $c.lit("can't create temporary window"));
                     break closeit$;
@@ -325,12 +325,12 @@ export async function get_rnd_text(fname, buf, rng, padlength) {   // rumors.c:4
 }
 export async function outrumor(truth, mechanism) {   // rumors.c:529
     let line = null, buf = new Int8Array(256), reading = 0;
-    reading = $c.i8(mechanism === BY_COOKIE || mechanism === BY_PAPER ? 1 : 0);
+    reading = $c.i8(mechanism === BY.COOKIE || mechanism === BY.PAPER ? 1 : 0);
     if (reading) {
-        if (is_fainted() && mechanism === BY_COOKIE) {
+        if (is_fainted() && mechanism === BY.COOKIE) {
             return;
         } else if (Blind()) {
-            if (mechanism === BY_COOKIE) {
+            if (mechanism === BY.COOKIE) {
                 await pline(new $c.Ptr(outrumor$fortune_msg, 0));
             }
             await pline($c.lit("What a pity that you cannot read it!"));
@@ -342,13 +342,13 @@ export async function outrumor(truth, mechanism) {   // rumors.c:529
         line = $c.lit("NetHack rumors file closed for renovation.");
     }
     switch (mechanism) {
-        case BY_ORACLE:
+        case BY.ORACLE:
             await pline($c.lit("True to her word, the Oracle %ssays: "), !rn2(4) ? $c.lit("offhandedly ") : !rn2(3) ? $c.lit("casually ") : rn2(2) ? $c.lit("nonchalantly ") : $c.lit(""));
             await verbalize1(line);
             return;
-        case BY_COOKIE:
+        case BY.COOKIE:
             await pline(new $c.Ptr(outrumor$fortune_msg, 0));
-        case BY_PAPER:
+        case BY.PAPER:
             await pline($c.lit("It reads:"));
             break;
     }
@@ -423,7 +423,7 @@ export async function outoracle(special, delphi) {   // rumors.c:640
             if (!special) {
                 $t1 = svo.oracle_loc.get(svo.oracle_cnt = svo.oracle_cnt - 1 >>> 0), svo.oracle_loc.set(oracle_idx, $t1);
             }
-            tmpwin = await create_nhwindow()(NHW_TEXT);
+            tmpwin = await create_nhwindow()(NHW.TEXT);
             if (delphi) {
                 await putstr()(tmpwin, 0, special ? $c.lit("The Oracle scornfully takes all your gold and says:") : $c.lit("The Oracle meditates for a moment and then intones:"));
             } else {
@@ -453,33 +453,33 @@ export async function doconsult(oracl) {   // rumors.c:696
     umoney = money_cnt(gi.invent);
     if (!oracl) {
         await There($c.lit("is no one here to consult."));
-        return ECMD_OK;
+        return ECMD.OK;
     } else if (!oracl.mpeaceful) {
         await pline($c.lit("%s is in no mood for consultations."), await Monnam(oracl));
-        return ECMD_OK;
+        return ECMD.OK;
     } else if (!umoney) {
         await You($c.lit("have no gold."));
-        return ECMD_OK;
+        return ECMD.OK;
     }
     $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("\"Wilt thou settle for a minor consultation?\" (%d %s)"), minor_cost, await currency(minor_cost));
     switch (await ynq(new $c.Ptr(qbuf, 0))) {
         default:
         case 113:
-            return ECMD_OK;
+            return ECMD.OK;
         case 121:
             if (umoney < minor_cost) {
                 await You($c.lit("don't even have enough gold for that!"));
-                return ECMD_OK;
+                return ECMD.OK;
             }
             u_pay = minor_cost;
             break;
         case 110:
             if (umoney <= minor_cost || (svo.oracle_cnt === 1 || go.oracle_flg < 0)) {
-                return ECMD_OK;
+                return ECMD.OK;
             }
             $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("\"Then dost thou desire a major one?\" (%d %s)"), major_cost, await currency(major_cost));
             if (await y_n(new $c.Ptr(qbuf, 0)) !== 121) {
-                return ECMD_OK;
+                return ECMD.OK;
             }
             u_pay = umoney < major_cost ? $c.i32(umoney) : major_cost;
             break;
@@ -487,11 +487,11 @@ export async function doconsult(oracl) {   // rumors.c:696
     await money2mon(oracl, u_pay);
     disp.botl = TRUE;
     if (!u.uevent.major_oracle && !u.uevent.minor_oracle) {
-        await record_achievement(ACH_ORCL);
+        await record_achievement(ACH.ORCL);
     }
     add_xpts = 0;
     if (u_pay === minor_cost) {
-        await outrumor(1, BY_ORACLE);
+        await outrumor(1, BY.ORACLE);
         if (!u.uevent.minor_oracle) {
             add_xpts = $c.div32(u_pay, u.uevent.major_oracle | 0 ? 25 : 10);
         }
@@ -503,13 +503,13 @@ export async function doconsult(oracl) {   // rumors.c:696
             add_xpts = $c.div32(u_pay, u.uevent.minor_oracle | 0 ? 25 : 10);
         }
         u.uevent.major_oracle = (TRUE) & 1;
-        await exercise(A_WIS, $c.i8(!cheapskate ? 1 : 0));
+        await exercise(A.WIS, $c.i8(!cheapskate ? 1 : 0));
     }
     if (add_xpts) {
         await more_experienced(add_xpts, $c.div32(u_pay, 50));
         await newexplevel();
     }
-    return ECMD_TIME;
+    return ECMD.TIME;
 }
 async function couldnt_open_file(filename) {   // rumors.c:770
     let save_something = 0;
@@ -598,7 +598,7 @@ async function init_CapMons() {   // rumors.c:829
         }
     }
     if (wizard() && debugcore($c.lit("CapMons"), FALSE)) {
-        tmpwin = await create_nhwindow()(NHW_TEXT);
+        tmpwin = await create_nhwindow()(NHW.TEXT);
         await putstr()(tmpwin, 0, $c.lit("Capitalized monster type names normally preceded by \"the\":"));
         for (i = 0; i < CapMonSiz - 1 >>> 0; i = i + 1 >>> 0) {
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("  %.77s"), CapMons.get(i));

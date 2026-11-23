@@ -9,10 +9,10 @@ import { panic } from './end.js';
 import { TRUE } from './global.h.js';
 import { COUNTING, FREEING, N_DIRS, WRITING } from './hack.h.js';
 import { dist2, online2 } from './hacklib.js';
-import { AD_MAGM, AD_SPC2 } from './monattk.h.js';
-import { PM_GRID_BUG } from './monsters.h.js';
+import { AD } from './monattk.h.js';
+import { PM } from './monsters.h.js';
 import { discover_object } from './o_init.js';
-import { OBJ_FREE } from './obj.h.js';
+import { OBJ } from './obj.h.js';
 import { You, You_hear, pline, verbalize } from './pline.js';
 import { HALF_PHDAM, WARN_OF_MON } from './prop.h.js';
 
@@ -80,19 +80,19 @@ export async function ynNaq(query) {
     return await yn_function(query, new $c.Ptr(ynNaqchars, 0), 121, TRUE);
 }
 export function BALL_IN_MON() {
-    return u.uswallow | 0 && $G.uball && $G.uball.where === OBJ_FREE ? 1 : 0;
+    return u.uswallow | 0 && $G.uball && $G.uball.where === OBJ.FREE ? 1 : 0;
 }
 export function CHAIN_IN_MON() {
-    return u.uswallow | 0 && $G.uchain && $G.uchain.where === OBJ_FREE ? 1 : 0;
+    return u.uswallow | 0 && $G.uchain && $G.uchain.where === OBJ.FREE ? 1 : 0;
 }
 export function NODIAG(monnum) {
-    return monnum === PM_GRID_BUG ? 1 : 0;
+    return monnum === PM.GRID_BUG ? 1 : 0;
 }
 export function BZ_VALID_ADTYP(adtyp) {
-    return adtyp >= AD_MAGM && adtyp <= AD_SPC2 ? 1 : 0;
+    return adtyp >= AD.MAGM && adtyp <= AD.SPC2 ? 1 : 0;
 }
 export function BZ_OFS_AD(adtyp) {
-    return $c.rem32($c.abs(adtyp - AD_MAGM | 0), 10);
+    return $c.rem32($c.abs(adtyp - AD.MAGM | 0), 10);
 }
 export function BZ_U_WAND(bztyp) {
     return 0 + bztyp | 0;

@@ -3,22 +3,22 @@ import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
 import { adjabil, minuhpmax, newhp, setuhpmax } from './attrib.js';
-import { A_WIS } from './attrib.h.js';
+import { A } from './attrib.h.js';
 import { ACURR } from './attrib.macros.js';
 import { exp_percent_changing, xlev_to_rank } from './botl.js';
 import { disp, flags, gu, gy, svk, u } from './decl.js';
-import { S_EEL } from './defsym.h.js';
+import { S } from './defsym.h.js';
 import { done } from './end.js';
-import { FALSE, LARGEST_INT, LL_MINORAC, MAXULEV, TRUE } from './global.h.js';
-import { DIED, KILLED_BY } from './hack.h.js';
+import { FALSE, LARGEST_INT, LL, MAXULEV, TRUE } from './global.h.js';
+import { DIED, KILLED } from './hack.h.js';
 import { achieve_rank, count_achievements, record_achievement } from './insight.js';
 import { monhp_per_lvl } from './makemon.js';
-import { AD_BLND, AD_DRLI, AD_PHYS, AD_SLIM, AD_STON, AD_WRAP, AT_BUTT, AT_MAGC, AT_WEAP } from './monattk.h.js';
+import { AD, AT } from './monattk.h.js';
 import { resists_drli } from './mondata.js';
 import { extra_nasty } from './mondata.macros.js';
-import { M1_AMPHIBIOUS } from './monflag.h.js';
+import { M1 } from './monflag.h.js';
 import { mons } from './monst.js';
-import { PM_BARBARIAN, PM_CLERIC, PM_HEALER, PM_KNIGHT, PM_MAIL_DAEMON, PM_VALKYRIE, PM_WIZARD } from './monsters.h.js';
+import { PM } from './monsters.h.js';
 import { NATTK, NORMAL_SPEED } from './permonst.h.js';
 import { You_feel, livelog_printf, pline } from './pline.js';
 import { rehumanize } from './polyself.js';
@@ -42,14 +42,14 @@ export function newuexp(lev) {   // exper.c:14
 }
 function enermod(en) {   // exper.c:26
     switch (gu.urole.mnum) {
-        case PM_CLERIC:
-        case PM_WIZARD:
+        case PM.CLERIC:
+        case PM.WIZARD:
             return Math.imul(2, en);
-        case PM_HEALER:
-        case PM_KNIGHT:
+        case PM.HEALER:
+        case PM.KNIGHT:
             return $c.div32(Math.imul(3, en), 2);
-        case PM_BARBARIAN:
-        case PM_VALKYRIE:
+        case PM.BARBARIAN:
+        case PM.VALKYRIE:
             return $c.div32(Math.imul(3, en), 4);
         default:
             return en;
@@ -67,7 +67,7 @@ export function newpw() {   // exper.c:45
             en = en + rnd(gu.urace.enadv.inrnd) | 0;
         }
     } else {
-        enrnd = $c.div32(ACURR(A_WIS), 2);
+        enrnd = $c.div32(ACURR(A.WIS), 2);
         if (u.ulevel < gu.urole.xlev) {
             enrnd = enrnd + (gu.urole.enadv.lornd + gu.urace.enadv.lornd | 0) | 0;
             enfix = gu.urole.enadv.lofix + gu.urace.enadv.lofix | 0;
@@ -103,10 +103,10 @@ export function experience(mtmp, nk) {   // exper.c:85
     }
     for (i = 0; i < NATTK; i = i + 1 | 0) {
         tmp2 = ptr.mattk[i].aatyp;
-        if (tmp2 > AT_BUTT) {
-            if (tmp2 === AT_WEAP) {
+        if (tmp2 > AT.BUTT) {
+            if (tmp2 === AT.WEAP) {
                 tmp = tmp + 5 | 0;
-            } else if (tmp2 === AT_MAGC) {
+            } else if (tmp2 === AT.MAGC) {
                 tmp = tmp + 10 | 0;
             } else {
                 tmp = tmp + 3 | 0;
@@ -115,17 +115,17 @@ export function experience(mtmp, nk) {   // exper.c:85
     }
     for (i = 0; i < NATTK; i = i + 1 | 0) {
         tmp2 = ptr.mattk[i].adtyp;
-        if (tmp2 > AD_PHYS && tmp2 < AD_BLND) {
+        if (tmp2 > AD.PHYS && tmp2 < AD.BLND) {
             tmp = tmp + Math.imul(2, mtmp.m_lev) | 0;
-        } else if (tmp2 === AD_DRLI || tmp2 === AD_STON || tmp2 === AD_SLIM) {
+        } else if (tmp2 === AD.DRLI || tmp2 === AD.STON || tmp2 === AD.SLIM) {
             tmp = tmp + 50 | 0;
-        } else if (tmp2 !== AD_PHYS) {
+        } else if (tmp2 !== AD.PHYS) {
             tmp = tmp + mtmp.m_lev | 0;
         }
         if (Math.imul(ptr.mattk[i].damd, ptr.mattk[i].damn) > 23) {
             tmp = tmp + mtmp.m_lev | 0;
         }
-        if (tmp2 === AD_WRAP && ptr.mlet === S_EEL && !(u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1_AMPHIBIOUS) !== 0)) {
+        if (tmp2 === AD.WRAP && ptr.mlet === S.EEL && !(u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1.AMPHIBIOUS) !== 0)) {
             tmp = tmp + 1000 | 0;
         }
     }
@@ -135,7 +135,7 @@ export function experience(mtmp, nk) {   // exper.c:85
     if (mtmp.m_lev > 8) {
         tmp = tmp + 50 | 0;
     }
-    if ($c.peq(mtmp.data, $c.relem(mons, PM_MAIL_DAEMON))) {
+    if ($c.peq(mtmp.data, $c.relem(mons, PM.MAIL_DAEMON))) {
         tmp = 1;
     }
     if (mtmp.mrevived | 0 || mtmp.mcloned | 0) {
@@ -174,7 +174,7 @@ export async function more_experienced(exper, rexp) {   // exper.c:169
     if (newrexp !== oldrexp) {
         u.urexp = newrexp;
     }
-    if (u.urexp >= (gu.urole.mnum === PM_WIZARD ? 1000 : 2000)) {
+    if (u.urexp >= (gu.urole.mnum === PM.WIZARD ? 1000 : 2000)) {
         flags.beginner = FALSE;
     }
 }
@@ -191,10 +191,10 @@ export async function losexp(drainer) {   // exper.c:207
     if (u.ulevel > 1) {
         u.ulevel = u.ulevel - 1 | 0;
         await adjabil(u.ulevel + 1 | 0, u.ulevel);
-        await livelog_printf(LL_MINORAC, $c.lit("lost experience level %d"), u.ulevel + 1 | 0);
+        await livelog_printf(LL.MINORAC, $c.lit("lost experience level %d"), u.ulevel + 1 | 0);
     } else {
         if (drainer) {
-            svk.killer.format = KILLED_BY;
+            svk.killer.format = KILLED.BY;
             if (!$c.peq(new $c.Ptr(svk.killer.name, 0), drainer)) {
                 $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), drainer, 256);
             }
@@ -204,7 +204,7 @@ export async function losexp(drainer) {   // exper.c:207
             return;
         }
         u.uexp = 0;
-        await livelog_printf(LL_MINORAC, $c.lit("lost all experience"));
+        await livelog_printf(LL.MINORAC, $c.lit("lost all experience"));
     }
     (!(u.ulevel >= 0 && u.ulevel < MAXULEV) ? 1 : 0) ? $c.__assert_rtn($c.lit("losexp"), $c.lit("exper.c"), 247, $c.lit("u.ulevel >= 0 && u.ulevel < MAXULEV")) : 0;
     olduhpmax = u.uhpmax;
@@ -293,7 +293,7 @@ export async function pluslvl(incr) {   // exper.c:307
             await record_achievement(achieve_rank(newrank));
         }
         if (count_achievements() === old_ach_cnt) {
-            await livelog_printf(LL_MINORAC, $c.lit("%sgained experience level %d"), u.ulevel <= u.ulevelpeak ? $c.lit("re") : $c.lit(""), u.ulevel);
+            await livelog_printf(LL.MINORAC, $c.lit("%sgained experience level %d"), u.ulevel <= u.ulevelpeak ? $c.lit("re") : $c.lit(""), u.ulevel);
         }
         if (u.ulevel > u.ulevelpeak) {
             u.ulevelpeak = u.ulevel;

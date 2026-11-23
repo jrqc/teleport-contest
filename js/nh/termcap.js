@@ -3,8 +3,8 @@ import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
 import { alloc, dupstr } from './alloc.js';
-import { HL_BLINK, HL_BOLD, HL_DIM, HL_ULINE } from './botl.h.js';
-import { BRIGHT, CLR_BLACK, CLR_BLUE, CLR_BRIGHT_BLUE, CLR_BRIGHT_CYAN, CLR_BRIGHT_GREEN, CLR_BRIGHT_MAGENTA, CLR_BROWN, CLR_CYAN, CLR_GRAY, CLR_GREEN, CLR_MAGENTA, CLR_MAX, CLR_ORANGE, CLR_RED, CLR_WHITE, CLR_YELLOW, NO_COLOR } from './color.h.js';
+import { HL } from './botl.h.js';
+import { BRIGHT, CLR, NO_COLOR } from './color.h.js';
 import { flags, gc, gs, gt, iflags } from './decl.js';
 import { AE, AS, CO, LI } from './decl.macros.js';
 import { BUFSZ, COLNO, ROWNO } from './global.h.js';
@@ -14,7 +14,7 @@ import { H_DEC } from './sym.h.js';
 import { nh_CD, nh_CM, nh_HE, nh_HI, nh_ND, nh_UE, nh_US } from './tcap.macros.js';
 import { error, tty_utf8graphics_fixup } from './unixtty.js';
 import { erase_tty_screen, setclipped, tty_curs, tty_raw_print, tty_wait_synch } from './wintty.js';
-import { ATR_BLINK, ATR_BOLD, ATR_DIM, ATR_INVERSE, ATR_ITALIC, ATR_ULINE } from './wintype.h.js';
+import { ATR } from './wintype.h.js';
 
 const tty_decgraphics_termcap_fixup$ctrlN = new Int8Array(2);   // static in tty_decgraphics_termcap_fixup()
 const tty_decgraphics_termcap_fixup$ctrlO = new Int8Array(2);   // static in tty_decgraphics_termcap_fixup()
@@ -386,13 +386,13 @@ export function nomux_putch(ch) {   // termcap.c:755
 }
 export function nomux_set_attr(attr) {   // termcap.c:768
     switch (attr) {
-        case ATR_INVERSE:
+        case ATR.INVERSE:
             nomux_attr_cur = $c.u8(nomux_attr_cur | 1);
             break;
-        case ATR_BOLD:
+        case ATR.BOLD:
             nomux_attr_cur = $c.u8(nomux_attr_cur | 2);
             break;
-        case ATR_ULINE:
+        case ATR.ULINE:
             nomux_attr_cur = $c.u8(nomux_attr_cur | 4);
             break;
     }
@@ -401,7 +401,7 @@ export function nomux_end_attr() {   // termcap.c:775
     nomux_attr_cur = 0;
 }
 export function nomux_set_fg(color) {   // termcap.c:776
-    if (color === CLR_BLACK && iflags.wc2_darkgray) {
+    if (color === CLR.BLACK && iflags.wc2_darkgray) {
         color = 8;
     }
     nomux_fg_cur = $c.u8(color < 0 || color >= 16 ? 7 : $c.u8(color));
@@ -668,22 +668,22 @@ async function init_hilite() {   // termcap.c:1300
     iflags.colorcount = colors >>> 0;
     md_len = 0;
     if (colors < 8 || !MD || !MD.get(0) || (setf = $c.tgetstr(nhStr($c.lit("AF")), null)) === null && (setf = $c.tgetstr(nhStr($c.lit("Sf")), null)) === null) {
-        hilites[CLR_BLACK] = tc_lcl_data.tc_HI;
-        hilites[CLR_RED] = tc_lcl_data.tc_HI;
-        hilites[CLR_GREEN] = tc_lcl_data.tc_HI;
-        hilites[CLR_BROWN] = tc_lcl_data.tc_HI;
-        hilites[CLR_BLUE] = tc_lcl_data.tc_HI;
-        hilites[CLR_MAGENTA] = tc_lcl_data.tc_HI;
-        hilites[CLR_CYAN] = tc_lcl_data.tc_HI;
-        hilites[CLR_GRAY] = new $c.Ptr(nilstring, 0);
+        hilites[CLR.BLACK] = tc_lcl_data.tc_HI;
+        hilites[CLR.RED] = tc_lcl_data.tc_HI;
+        hilites[CLR.GREEN] = tc_lcl_data.tc_HI;
+        hilites[CLR.BROWN] = tc_lcl_data.tc_HI;
+        hilites[CLR.BLUE] = tc_lcl_data.tc_HI;
+        hilites[CLR.MAGENTA] = tc_lcl_data.tc_HI;
+        hilites[CLR.CYAN] = tc_lcl_data.tc_HI;
+        hilites[CLR.GRAY] = new $c.Ptr(nilstring, 0);
         hilites[NO_COLOR] = new $c.Ptr(nilstring, 0);
-        hilites[CLR_ORANGE] = tc_lcl_data.tc_HI;
-        hilites[CLR_BRIGHT_GREEN] = tc_lcl_data.tc_HI;
-        hilites[CLR_YELLOW] = tc_lcl_data.tc_HI;
-        hilites[CLR_BRIGHT_BLUE] = tc_lcl_data.tc_HI;
-        hilites[CLR_BRIGHT_MAGENTA] = tc_lcl_data.tc_HI;
-        hilites[CLR_BRIGHT_CYAN] = tc_lcl_data.tc_HI;
-        hilites[CLR_WHITE] = tc_lcl_data.tc_HI;
+        hilites[CLR.ORANGE] = tc_lcl_data.tc_HI;
+        hilites[CLR.BRIGHT_GREEN] = tc_lcl_data.tc_HI;
+        hilites[CLR.YELLOW] = tc_lcl_data.tc_HI;
+        hilites[CLR.BRIGHT_BLUE] = tc_lcl_data.tc_HI;
+        hilites[CLR.BRIGHT_MAGENTA] = tc_lcl_data.tc_HI;
+        hilites[CLR.BRIGHT_CYAN] = tc_lcl_data.tc_HI;
+        hilites[CLR.WHITE] = tc_lcl_data.tc_HI;
         return;
     }
     if (colors >= 16) {
@@ -708,94 +708,94 @@ async function init_hilite() {   // termcap.c:1300
     }
     if (colors >= 16) {
         scratch = $c.tparm(setf, 7 | BRIGHT);
-        $t4 = await dupstr(scratch), hilites[CLR_WHITE] = $t4;
+        $t4 = await dupstr(scratch), hilites[CLR.WHITE] = $t4;
     } else {
         scratch = $c.tparm(setf, 7);
-        $t5 = $c.asArr(await alloc($c.u32($c.addu64($c.addu64($c.strlen(scratch), $c.u64(md_len)), 1))), Int8Array), hilites[CLR_WHITE] = $t5;
-        $c.__builtin___strcpy_chk(hilites[CLR_WHITE], MD, -1);
-        $c.__builtin___strcat_chk(hilites[CLR_WHITE], scratch, -1);
+        $t5 = $c.asArr(await alloc($c.u32($c.addu64($c.addu64($c.strlen(scratch), $c.u64(md_len)), 1))), Int8Array), hilites[CLR.WHITE] = $t5;
+        $c.__builtin___strcpy_chk(hilites[CLR.WHITE], MD, -1);
+        $c.__builtin___strcat_chk(hilites[CLR.WHITE], scratch, -1);
     }
-    hilites[CLR_GRAY] = new $c.Ptr(nilstring, 0);
+    hilites[CLR.GRAY] = new $c.Ptr(nilstring, 0);
     hilites[NO_COLOR] = new $c.Ptr(nilstring, 0);
     if (iflags.wc2_darkgray) {
         if (colors >= 16) {
             scratch = $c.tparm(setf, 0 | BRIGHT);
-            $t6 = await dupstr(scratch), hilites[CLR_BLACK] = $t6;
+            $t6 = await dupstr(scratch), hilites[CLR.BLACK] = $t6;
         } else {
             scratch = $c.tparm(setf, 0);
-            $t7 = $c.asArr(await alloc($c.u32($c.addu64($c.addu64($c.strlen(scratch), $c.u64(md_len)), 1))), Int8Array), hilites[CLR_BLACK] = $t7;
-            $c.__builtin___strcpy_chk(hilites[CLR_BLACK], MD, -1);
-            $c.__builtin___strcat_chk(hilites[CLR_BLACK], scratch, -1);
+            $t7 = $c.asArr(await alloc($c.u32($c.addu64($c.addu64($c.strlen(scratch), $c.u64(md_len)), 1))), Int8Array), hilites[CLR.BLACK] = $t7;
+            $c.__builtin___strcpy_chk(hilites[CLR.BLACK], MD, -1);
+            $c.__builtin___strcat_chk(hilites[CLR.BLACK], scratch, -1);
         }
     } else {
-        hilites[CLR_BLACK] = hilites[CLR_BLUE];
+        hilites[CLR.BLACK] = hilites[CLR.BLUE];
     }
 }
 function kill_hilite() {   // termcap.c:1400
     let c = 0;
-    if ($c.peq(hilites[CLR_BLACK], tc_lcl_data.tc_HI)) {
+    if ($c.peq(hilites[CLR.BLACK], tc_lcl_data.tc_HI)) {
         return;
     }
-    if (hilites[CLR_BLACK]) {
-        if (!$c.peq(hilites[CLR_BLACK], hilites[CLR_BLUE])) {
-            $c.free(hilites[CLR_BLACK]), hilites[CLR_BLACK] = null;
+    if (hilites[CLR.BLACK]) {
+        if (!$c.peq(hilites[CLR.BLACK], hilites[CLR.BLUE])) {
+            $c.free(hilites[CLR.BLACK]), hilites[CLR.BLACK] = null;
         }
     }
     if ($c.tgetnum(nhStr($c.lit("Co"))) >= 16) {
-        if (hilites[CLR_BLUE]) {
-            $c.free(hilites[CLR_BLUE]);
+        if (hilites[CLR.BLUE]) {
+            $c.free(hilites[CLR.BLUE]);
         }
-        if (hilites[CLR_GREEN]) {
-            $c.free(hilites[CLR_GREEN]);
+        if (hilites[CLR.GREEN]) {
+            $c.free(hilites[CLR.GREEN]);
         }
-        if (hilites[CLR_CYAN]) {
-            $c.free(hilites[CLR_CYAN]);
+        if (hilites[CLR.CYAN]) {
+            $c.free(hilites[CLR.CYAN]);
         }
-        if (hilites[CLR_MAGENTA]) {
-            $c.free(hilites[CLR_MAGENTA]);
+        if (hilites[CLR.MAGENTA]) {
+            $c.free(hilites[CLR.MAGENTA]);
         }
-        if (hilites[CLR_RED]) {
-            $c.free(hilites[CLR_RED]);
+        if (hilites[CLR.RED]) {
+            $c.free(hilites[CLR.RED]);
         }
-        if (hilites[CLR_BROWN]) {
-            $c.free(hilites[CLR_BROWN]);
+        if (hilites[CLR.BROWN]) {
+            $c.free(hilites[CLR.BROWN]);
         }
     } else {
     }
-    if (hilites[CLR_BRIGHT_BLUE]) {
-        $c.free(hilites[CLR_BRIGHT_BLUE]);
+    if (hilites[CLR.BRIGHT_BLUE]) {
+        $c.free(hilites[CLR.BRIGHT_BLUE]);
     }
-    if (hilites[CLR_BRIGHT_GREEN]) {
-        $c.free(hilites[CLR_BRIGHT_GREEN]);
+    if (hilites[CLR.BRIGHT_GREEN]) {
+        $c.free(hilites[CLR.BRIGHT_GREEN]);
     }
-    if (hilites[CLR_BRIGHT_CYAN]) {
-        $c.free(hilites[CLR_BRIGHT_CYAN]);
+    if (hilites[CLR.BRIGHT_CYAN]) {
+        $c.free(hilites[CLR.BRIGHT_CYAN]);
     }
-    if (hilites[CLR_BRIGHT_MAGENTA]) {
-        $c.free(hilites[CLR_BRIGHT_MAGENTA]);
+    if (hilites[CLR.BRIGHT_MAGENTA]) {
+        $c.free(hilites[CLR.BRIGHT_MAGENTA]);
     }
-    if (hilites[CLR_ORANGE]) {
-        $c.free(hilites[CLR_ORANGE]);
+    if (hilites[CLR.ORANGE]) {
+        $c.free(hilites[CLR.ORANGE]);
     }
-    if (hilites[CLR_YELLOW]) {
-        $c.free(hilites[CLR_YELLOW]);
+    if (hilites[CLR.YELLOW]) {
+        $c.free(hilites[CLR.YELLOW]);
     }
-    if (hilites[CLR_WHITE]) {
-        $c.free(hilites[CLR_WHITE]);
+    if (hilites[CLR.WHITE]) {
+        $c.free(hilites[CLR.WHITE]);
     }
-    for (c = 0; c < CLR_MAX; c = c + 1 | 0) {
+    for (c = 0; c < CLR.MAX; c = c + 1 | 0) {
         hilites[c] = null;
     }
 }
 function s_atr2str(n) {   // termcap.c:1702
     switch (n) {
-        case ATR_ITALIC:
+        case ATR.ITALIC:
             if (ZH && ZH.get(0)) {
                 return ZH;
             }
-        case ATR_BLINK:
-        case ATR_ULINE:
-            if (n === ATR_BLINK) {
+        case ATR.BLINK:
+        case ATR.ULINE:
+            if (n === ATR.BLINK) {
                 if (MB && MB.get(0)) {
                     return MB;
                 }
@@ -804,7 +804,7 @@ function s_atr2str(n) {   // termcap.c:1702
                     return tc_lcl_data.tc_US;
                 }
             }
-        case ATR_BOLD:
+        case ATR.BOLD:
             if (MD && MD.get(0)) {
                 return MD;
             }
@@ -812,12 +812,12 @@ function s_atr2str(n) {   // termcap.c:1702
                 return tc_lcl_data.tc_HI;
             }
             break;
-        case ATR_INVERSE:
+        case ATR.INVERSE:
             if (MR && MR.get(0)) {
                 return MR;
             }
             break;
-        case ATR_DIM:
+        case ATR.DIM:
             if (MH && MH.get(0)) {
                 return MH;
             }
@@ -827,21 +827,21 @@ function s_atr2str(n) {   // termcap.c:1702
 }
 function e_atr2str(n) {   // termcap.c:1741
     switch (n) {
-        case ATR_ITALIC:
+        case ATR.ITALIC:
             if (ZR && ZR.get(0) && ZH && ZH.get(0)) {
                 return ZR;
             }
-        case ATR_ULINE:
+        case ATR.ULINE:
             if (nh_UE() && tc_lcl_data.tc_UE.get(0)) {
                 return tc_lcl_data.tc_UE;
             }
-        case ATR_BOLD:
-        case ATR_BLINK:
+        case ATR.BOLD:
+        case ATR.BLINK:
             if (nh_HE() && tc_lcl_data.tc_HE.get(0)) {
                 return tc_lcl_data.tc_HE;
             }
-        case ATR_DIM:
-        case ATR_INVERSE:
+        case ATR.DIM:
+        case ATR.INVERSE:
             if (ME && ME.get(0)) {
                 return ME;
             }
@@ -850,16 +850,16 @@ function e_atr2str(n) {   // termcap.c:1741
     return new $c.Ptr(nulstr, 0);
 }
 export function term_attr_fixup(msk) {   // termcap.c:1773
-    if (msk & HL_ULINE && (!nh_US() || !tc_lcl_data.tc_US.get(0))) {
-        msk = msk | HL_BOLD;
-        msk = msk & ~HL_ULINE;
+    if (msk & HL.ULINE && (!nh_US() || !tc_lcl_data.tc_US.get(0))) {
+        msk = msk | HL.BOLD;
+        msk = msk & ~HL.ULINE;
     }
-    if (msk & HL_BLINK && (!MB || !MB.get(0))) {
-        msk = msk | HL_BOLD;
-        msk = msk & ~HL_BLINK;
+    if (msk & HL.BLINK && (!MB || !MB.get(0))) {
+        msk = msk | HL.BOLD;
+        msk = msk & ~HL.BLINK;
     }
-    if (msk & HL_DIM && (!MH || !MH.get(0))) {
-        msk = msk & ~HL_DIM;
+    if (msk & HL.DIM && (!MH || !MH.get(0))) {
+        msk = msk & ~HL.DIM;
     }
     return msk;
 }
@@ -906,7 +906,7 @@ export function term_start_color(color) {   // termcap.c:1852
     nomux_set_fg(color);
     if (color === NO_COLOR) {
         xputs(tc_lcl_data.tc_HE);
-    } else if (color < CLR_MAX && hilites[color] && hilites[color].get(0)) {
+    } else if (color < CLR.MAX && hilites[color] && hilites[color].get(0)) {
         xputs(hilites[color]);
     }
 }
@@ -1025,12 +1025,12 @@ export function $init() {
         ti_map[$i0].$copyFrom(new $T.anon_termcap_1284());
     }
     $c.init(ti_map, [
-        { ti_color: 1, nh_color: CLR_RED, nh_bright_color: CLR_ORANGE },
-        { ti_color: 2, nh_color: CLR_GREEN, nh_bright_color: CLR_BRIGHT_GREEN },
-        { ti_color: 3, nh_color: CLR_BROWN, nh_bright_color: CLR_YELLOW },
-        { ti_color: 4, nh_color: CLR_BLUE, nh_bright_color: CLR_BRIGHT_BLUE },
-        { ti_color: 5, nh_color: CLR_MAGENTA, nh_bright_color: CLR_BRIGHT_MAGENTA },
-        { ti_color: 6, nh_color: CLR_CYAN, nh_bright_color: CLR_BRIGHT_CYAN }
+        { ti_color: 1, nh_color: CLR.RED, nh_bright_color: CLR.ORANGE },
+        { ti_color: 2, nh_color: CLR.GREEN, nh_bright_color: CLR.BRIGHT_GREEN },
+        { ti_color: 3, nh_color: CLR.BROWN, nh_bright_color: CLR.YELLOW },
+        { ti_color: 4, nh_color: CLR.BLUE, nh_bright_color: CLR.BRIGHT_BLUE },
+        { ti_color: 5, nh_color: CLR.MAGENTA, nh_bright_color: CLR.BRIGHT_MAGENTA },
+        { ti_color: 6, nh_color: CLR.CYAN, nh_bright_color: CLR.BRIGHT_CYAN }
     ]);
     nilstring.fill(0);
     nulstr.fill(0);

@@ -5,7 +5,7 @@ import { $G } from './globals.js';
 import { dupstr } from './alloc.js';
 import { gc } from './decl.js';
 import { panic } from './end.js';
-import { LL_NONE } from './global.h.js';
+import { LL } from './global.h.js';
 import { historical } from './hack.h.js';
 
 export const sysopt = new $T.sysopt_s();
@@ -30,7 +30,7 @@ export async function sys_early_init() {   // sys.c:21
     sysopt.msghandler = null;
     sysopt.maxplayers = 0;
     sysopt.bones_pools = 0;
-    sysopt.livelog = LL_NONE;
+    sysopt.livelog = LL.NONE;
     sysopt.persmax = 3;
     sysopt.entrymax = 100;
     sysopt.pointsmin = 1;

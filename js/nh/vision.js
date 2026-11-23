@@ -5,7 +5,7 @@ import { $G } from './globals.js';
 import { isok } from './cmd.js';
 import { is_moat, is_pool } from './dbridge.js';
 import { gi, gs, gv, iflags, program_state, svd, svl, svr, u } from './decl.js';
-import { S_hcdoor, S_ndoor, S_tree, S_vcdoor } from './defsym.h.js';
+import { S } from './defsym.h.js';
 import { detecting } from './detect.js';
 import { canseemon, mon_visible, newsym, see_with_infrared, seenv_matrix, tp_sensemon } from './display.js';
 import { on_level } from './dungeon.js';
@@ -18,15 +18,15 @@ import { MATCH_WARN_OF_MON, max, min } from './hack.macros.js';
 import { dist2 } from './hacklib.js';
 import { do_light_sources } from './light.js';
 import { ROOMOFFSET } from './mkroom.h.js';
-import { M_AP_FURNITURE, M_AP_OBJECT, M_AP_TYPMASK } from './monst.h.js';
+import { M_AP } from './monst.h.js';
 import { BOULDER } from './objects.h.js';
 import { visible_region_at } from './region.js';
-import { CLOUD, DOOR, D_CLOSED, D_LOCKED, D_TRAPPED, LAVAWALL, SDOOR, SVALL, TREE } from './rm.h.js';
+import { CLOUD, D, DOOR, LAVAWALL, SDOOR, SVALL, TREE } from './rm.h.js';
 import { IS_DOOR, IS_OBSTRUCTED, IS_WALL, IS_WATERWALL } from './rm.macros.js';
-import { COULD_SEE, IN_SIGHT, MAX_RADIUS, MONSEEN_DETECT, MONSEEN_INFRAVIS, MONSEEN_NORMAL, MONSEEN_SEEINVIS, MONSEEN_TELEPAT, MONSEEN_WARNMON, MONSEEN_XRAYVIS, TEMP_LIT } from './vision.h.js';
+import { COULD_SEE, IN_SIGHT, MAX_RADIUS, MONSEEN, TEMP_LIT } from './vision.h.js';
 import { cansee, circle_ptr, couldsee } from './vision.macros.js';
 import { worm_known } from './worm.js';
-import { TT_PIT } from './you.h.js';
+import { TT } from './you.h.js';
 import { Blind, Detect_monsters, See_invisible } from './youprop.macros.js';
 
 const vision_recalc$colbump = new Int16Array(81);   // static in vision_recalc()
@@ -76,7 +76,7 @@ export function does_block(x, y, lev) {   // vision.c:153
     if (gs.seethru === 0) {
         $t1 = wizard() && debugcore($c.lit("seethru"), FALSE) ? 1 : -1, gs.seethru = $t1;
     }
-    if (IS_OBSTRUCTED(lev.typ) || lev.typ === TREE || IS_DOOR(lev.typ) && (lev.flags | 0) & (D_CLOSED | D_LOCKED | D_TRAPPED)) {
+    if (IS_OBSTRUCTED(lev.typ) || lev.typ === TREE || IS_DOOR(lev.typ) && (lev.flags | 0) & (D.CLOSED | D.LOCKED | D.TRAPPED)) {
         return 1;
     }
     if (gs.seethru !== 1) {
@@ -89,7 +89,7 @@ export function does_block(x, y, lev) {   // vision.c:153
             return 1;
         }
     }
-    if ((mon = svl.level.monsters[x][y]) && (!mon.minvis || See_invisible()) && ((mon.m_ap_type & M_AP_TYPMASK) === M_AP_OBJECT && mon.mappearance === BOULDER || (mon.m_ap_type & M_AP_TYPMASK) === M_AP_FURNITURE && (mon.mappearance === S_hcdoor || mon.mappearance === S_vcdoor || mon.mappearance < S_ndoor || mon.mappearance === S_tree))) {
+    if ((mon = svl.level.monsters[x][y]) && (!mon.minvis || See_invisible()) && ((mon.m_ap_type & M_AP.TYPMASK) === M_AP.OBJECT && mon.mappearance === BOULDER || (mon.m_ap_type & M_AP.TYPMASK) === M_AP.FURNITURE && (mon.mappearance === S.hcdoor || mon.mappearance === S.vcdoor || mon.mappearance < S.ndoor || mon.mappearance === S.tree))) {
         return 1;
     }
     if (gs.seethru !== 1) {
@@ -243,7 +243,7 @@ export async function vision_recalc(control) {   // vision.c:512
                         next_array[0].get(row).set(col, IN_SIGHT | COULD_SEE);
                     }
                 }
-            } else if (u.utrap && u.utraptype === TT_PIT) {
+            } else if (u.utrap && u.utraptype === TT.PIT) {
                 for (row = u.uy - 1 | 0; row <= (u.uy + 1 | 0); row = row + 1 | 0) {
                     if (row < 0) {
                         continue;
@@ -1427,25 +1427,25 @@ export function howmonseen(mon) {   // vision.c:2152
     xraydist = u.xray_range < 0 ? -1 : Math.imul(u.xray_range, u.xray_range);
     how_seen = 0;
     if ((mon.wormno | 0 ? worm_known(mon) : cansee(mon.mx, mon.my) && couldsee(mon.mx, mon.my)) && mon_visible(mon) && !mon.minvis) {
-        how_seen = (how_seen | MONSEEN_NORMAL) >>> 0;
+        how_seen = (how_seen | MONSEEN.NORMAL) >>> 0;
     }
     if (useemon && mon.minvis | 0) {
-        how_seen = (how_seen | MONSEEN_SEEINVIS) >>> 0;
+        how_seen = (how_seen | MONSEEN.SEEINVIS) >>> 0;
     }
     if ((!mon.minvis || See_invisible()) && see_with_infrared(mon)) {
-        how_seen = (how_seen | MONSEEN_INFRAVIS) >>> 0;
+        how_seen = (how_seen | MONSEEN.INFRAVIS) >>> 0;
     }
     if (tp_sensemon(mon)) {
-        how_seen = (how_seen | MONSEEN_TELEPAT) >>> 0;
+        how_seen = (how_seen | MONSEEN.TELEPAT) >>> 0;
     }
     if (useemon && xraydist > 0 && dist2(mon.mx, mon.my, u.ux, u.uy) <= xraydist) {
-        how_seen = (how_seen | MONSEEN_XRAYVIS) >>> 0;
+        how_seen = (how_seen | MONSEEN.XRAYVIS) >>> 0;
     }
     if (Detect_monsters()) {
-        how_seen = (how_seen | MONSEEN_DETECT) >>> 0;
+        how_seen = (how_seen | MONSEEN.DETECT) >>> 0;
     }
     if (MATCH_WARN_OF_MON(mon)) {
-        how_seen = (how_seen | MONSEEN_WARNMON) >>> 0;
+        how_seen = (how_seen | MONSEEN.WARNMON) >>> 0;
     }
     return how_seen;
 }

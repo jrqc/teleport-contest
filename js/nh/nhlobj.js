@@ -10,17 +10,17 @@ import { newsym } from './display.js';
 import { def_char_to_objclass, def_oc_syms } from './drawing.js';
 import { FALSE, TRUE } from './global.h.js';
 import { obj_to_any } from './hack.js';
-import { CORPSTAT_FEMALE, CORPSTAT_HISTORIC, CORPSTAT_MALE } from './hack.h.js';
+import { CORPSTAT } from './hack.h.js';
 import { addinv } from './invent.js';
 import { LUAL_NUMSIZES } from './lauxlib.h.js';
-import { LUA_REGISTRYINDEX, LUA_TNUMBER, LUA_TSTRING, LUA_TTABLE, LUA_TUSERDATA, LUA_VERSION_NUM } from './lua.h.js';
+import { LUA, LUA_REGISTRYINDEX } from './lua.h.js';
 import { lua_newtable, lua_newuserdata } from './lua.macros.js';
 import { luaL_checkinteger, luaL_checklstring, luaL_checktype, luaL_checkudata, luaL_checkversion_, luaL_newmetatable, luaL_setfuncs, lua_createtable, lua_getfield, lua_gettop, lua_pushboolean, lua_pushinteger, lua_pushvalue, lua_setfield, lua_setglobal, lua_setmetatable, lua_settop, lua_toboolean, lua_tointegerx, lua_type } from './luabridge.js';
 import { add_to_container, dealloc_obj, mkobj, mksobj, obj_extract_self, place_object, weight } from './mkobj.js';
 import { NEUTRAL } from './monflag.h.js';
 import { mons } from './monst.js';
 import { nhl_add_table_entry_char, nhl_add_table_entry_int, nhl_add_table_entry_str, nhl_error, nhl_get_timertype } from './nhlua.js';
-import { OBJ_CONTAINED, OBJ_FLOOR, OBJ_FREE, OBJ_INVENT, OBJ_LUAFREE } from './obj.h.js';
+import { OBJ } from './obj.h.js';
 import { Has_contents, Is_container, has_oname, is_poisonable } from './obj.macros.js';
 import { MAXOCLASSES, RANDOM_CLASS } from './objclass.h.js';
 import { obj_descr, objects } from './objects.js';
@@ -29,14 +29,14 @@ import { readobjnam } from './objnam.js';
 import { NON_PM } from './permonst.h.js';
 import { cvt_to_abscoord, get_table_objclass, get_table_objtype } from './sp_lev.js';
 import { obj_has_timer, obj_stop_timers, peek_timer, start_timer, stop_timer } from './timeout.js';
-import { TIMER_OBJECT } from './timeout.h.js';
+import { TIMER } from './timeout.h.js';
 import { timer_is_obj } from './timeout.macros.js';
 
 const l_obj_methods = $c.recArray($T.luaL_Reg, 16);
 const l_obj_meta = $c.recArray($T.luaL_Reg, 2);
 async function l_obj_check(L, indx) {   // nhlobj.c:35
     let lo = null;
-    await luaL_checktype(L, indx, LUA_TUSERDATA);
+    await luaL_checktype(L, indx, LUA.TUSERDATA);
     lo = $c.asRec(await luaL_checkudata(L, indx, $c.lit("obj")), $T._lua_obj, 16);
     if (!lo) {
         await nhl_error(L, $c.lit("Obj error"));
@@ -50,14 +50,14 @@ async function l_obj_gc(L) {   // nhlobj.c:47
         if (obj.lua_ref_cnt > 0) {
             obj.lua_ref_cnt = obj.lua_ref_cnt - 1 >>> 0;
         }
-        if (!obj.lua_ref_cnt && (obj.where === OBJ_FREE || obj.where === OBJ_LUAFREE)) {
+        if (!obj.lua_ref_cnt && (obj.where === OBJ.FREE || obj.where === OBJ.LUAFREE)) {
             if (Has_contents(obj)) {
                 while ((otmp = obj.cobj) !== null) {
                     await obj_extract_self(otmp);
                     await dealloc_obj(otmp);
                 }
             }
-            obj.where = OBJ_FREE;
+            obj.where = OBJ.FREE;
             await dealloc_obj(obj), obj = null;
         }
         lo.obj = null;
@@ -109,7 +109,7 @@ async function l_obj_add_to_container(L) {   // nhlobj.c:114
 export async function nhl_obj_u_giveobj(L) {   // nhlobj.c:142
     let lo = null, otmp = null, refs = 0;
     lo = await l_obj_check(L, 1);
-    if (!lobj_is_ok(lo) || lo.obj.where === OBJ_INVENT) {
+    if (!lobj_is_ok(lo) || lo.obj.where === OBJ.INVENT) {
         return 0;
     }
     refs = lo.obj.lua_ref_cnt | 0;
@@ -129,9 +129,9 @@ async function l_obj_objects_to_table(L) {   // nhlobj.c:171
         await nhl_error(L, $c.lit("l_obj_objects_to_table: Wrong args"));
         return 0;
     }
-    if (lua_type(L, 1) === LUA_TNUMBER) {
+    if (lua_type(L, 1) === LUA.TNUMBER) {
         otyp = $c.i32(await luaL_checkinteger(L, 1));
-    } else if (lua_type(L, 1) === LUA_TUSERDATA) {
+    } else if (lua_type(L, 1) === LUA.TUSERDATA) {
         lo = await l_obj_check(L, 1);
         if (lo && lo.obj) {
             otyp = lo.obj.otyp;
@@ -182,7 +182,7 @@ async function l_obj_to_table(L) {   // nhlobj.c:247
     lo = await l_obj_check(L, 1);
     obj = lo.obj;
     await lua_newtable(L);
-    if (!obj || obj.where === OBJ_LUAFREE) {
+    if (!obj || obj.where === OBJ.LUAFREE) {
         await nhl_add_table_entry_int(L, $c.lit("NO_OBJ"), 1);
         return 1;
     }
@@ -202,11 +202,11 @@ async function l_obj_to_table(L) {   // nhlobj.c:247
     await nhl_add_table_entry_int(L, $c.lit("quan"), obj.quan);
     await nhl_add_table_entry_int(L, $c.lit("spe"), obj.spe);
     if (obj.otyp === STATUE) {
-        await nhl_add_table_entry_int(L, $c.lit("historic"), (obj.spe & CORPSTAT_HISTORIC) !== 0 ? 1 : 0);
+        await nhl_add_table_entry_int(L, $c.lit("historic"), (obj.spe & CORPSTAT.HISTORIC) !== 0 ? 1 : 0);
     }
     if (obj.otyp === CORPSE || obj.otyp === STATUE) {
-        await nhl_add_table_entry_int(L, $c.lit("male"), (obj.spe & CORPSTAT_MALE) !== 0 ? 1 : 0);
-        await nhl_add_table_entry_int(L, $c.lit("female"), (obj.spe & CORPSTAT_FEMALE) !== 0 ? 1 : 0);
+        await nhl_add_table_entry_int(L, $c.lit("male"), (obj.spe & CORPSTAT.MALE) !== 0 ? 1 : 0);
+        await nhl_add_table_entry_int(L, $c.lit("female"), (obj.spe & CORPSTAT.FEMALE) !== 0 ? 1 : 0);
     }
     await nhl_add_table_entry_char(L, $c.lit("oclass"), def_oc_syms[$c.u8(obj.oclass)].sym);
     await nhl_add_table_entry_char(L, $c.lit("invlet"), obj.invlet);
@@ -261,7 +261,7 @@ async function l_obj_to_table(L) {   // nhlobj.c:247
 async function l_obj_new_readobjnam(L) {   // nhlobj.c:350
     let argc = 0, buf = new Int8Array(256), otmp = null, id = 0, class_ = 0, otmp$2 = null;
     argc = lua_gettop(L);
-    if (argc === 1 && lua_type(L, 1) === LUA_TSTRING) {
+    if (argc === 1 && lua_type(L, 1) === LUA.TSTRING) {
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s"), await luaL_checklstring(L, 1, null));
         await lua_settop(L, -2);
         if ($c.peq(otmp = await readobjnam(new $c.Ptr(buf, 0), null), hands_obj)) {
@@ -269,7 +269,7 @@ async function l_obj_new_readobjnam(L) {   // nhlobj.c:350
         }
         await l_obj_push(L, otmp);
         return 1;
-    } else if (argc === 1 && lua_type(L, 1) === LUA_TTABLE) {
+    } else if (argc === 1 && lua_type(L, 1) === LUA.TTABLE) {
         id = $c.i16(await get_table_objtype(L));
         class_ = $c.i16(await get_table_objclass(L));
         if (id >= FIRST_OBJECT) {
@@ -334,7 +334,7 @@ async function l_obj_nextobj(L) {   // nhlobj.c:445
             use_nexthere = $c.i8(lua_toboolean(L, 2));
         }
         if (lo && lo.obj) {
-            await l_obj_push(L, use_nexthere && lo.obj.where === OBJ_FLOOR ? lo.obj.v.v_nexthere : lo.obj.nobj);
+            await l_obj_push(L, use_nexthere && lo.obj.where === OBJ.FLOOR ? lo.obj.v.v_nexthere : lo.obj.nobj);
         }
     }
     return 1;
@@ -342,7 +342,7 @@ async function l_obj_nextobj(L) {   // nhlobj.c:445
 async function l_obj_container(L) {   // nhlobj.c:469
     let lo = null;
     lo = await l_obj_check(L, 1);
-    if (lo && lo.obj && lo.obj.where === OBJ_CONTAINED) {
+    if (lo && lo.obj && lo.obj.where === OBJ.CONTAINED) {
         await l_obj_push(L, lo.obj.v.v_ocontainer);
     } else {
         await l_obj_push(L, null);
@@ -426,7 +426,7 @@ async function l_obj_timer_start(L) {   // nhlobj.c:579
             if (obj_has_timer(lo.obj, timertype)) {
                 await stop_timer(timertype, obj_to_any(lo.obj));
             }
-            await start_timer(when, TIMER_OBJECT, timertype, obj_to_any(lo.obj));
+            await start_timer(when, TIMER.OBJECT, timertype, obj_to_any(lo.obj));
         }
     } else {
         await nhl_error(L, $c.lit("l_obj_timer_start: Wrong args"));
@@ -459,19 +459,19 @@ async function l_obj_bury(L) {   // nhlobj.c:603
     return 1;
 }
 export async function l_obj_register(L) {   // nhlobj.c:654
-    await luaL_checkversion_(L, LUA_VERSION_NUM, LUAL_NUMSIZES), await lua_createtable(L, 0, 15), await luaL_setfuncs(L, $c.relem(l_obj_methods, 0), 0);
+    await luaL_checkversion_(L, LUA.VERSION_NUM, LUAL_NUMSIZES), await lua_createtable(L, 0, 15), await luaL_setfuncs(L, $c.relem(l_obj_methods, 0), 0);
     await luaL_newmetatable(L, $c.lit("obj"));
     await luaL_setfuncs(L, $c.relem(l_obj_meta, 0), 0);
     lua_pushvalue(L, -2);
     await lua_setfield(L, -2, $c.lit("__index"));
-    await luaL_checkversion_(L, LUA_VERSION_NUM, LUAL_NUMSIZES), await lua_createtable(L, 0, 1), await luaL_setfuncs(L, $c.relem(l_obj_meta, 0), 0);
+    await luaL_checkversion_(L, LUA.VERSION_NUM, LUAL_NUMSIZES), await lua_createtable(L, 0, 1), await luaL_setfuncs(L, $c.relem(l_obj_meta, 0), 0);
     await lua_setfield(L, -2, $c.lit("__metatable"));
     await lua_settop(L, -2);
     await lua_setglobal(L, $c.lit("obj"));
     return 0;
 }
 function lobj_is_ok(lo) {
-    return lo && lo.obj && lo.obj.where !== OBJ_LUAFREE ? 1 : 0;
+    return lo && lo.obj && lo.obj.where !== OBJ.LUAFREE ? 1 : 0;
 }
 
 export function $init() {

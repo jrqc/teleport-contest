@@ -2,17 +2,18 @@
 import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
-import { AM_SHRINE, A_NONE } from './align.h.js';
+import { AM } from './align.h.js';
+import { A } from './attrib.h.js';
 import { isok } from './cmd.js';
 import { gn, gs, svd, svl, svm, svn, svr, u } from './decl.js';
-import { FOOD_CLASS, SPBOOK_CLASS, S_CENTAUR, S_DEMON, S_DRAGON, S_FUNGUS, S_GIANT, S_GNOME, S_KOBOLD, S_ORC, S_TROLL, S_VAMPIRE, S_ZOMBIE, S_air, S_altar, S_bars, S_blcorn, S_brcorn, S_cloud, S_corr, S_crwall, S_darkroom, S_dnladder, S_dnstair, S_fountain, S_grave, S_hcdbridge, S_hcdoor, S_hodbridge, S_hodoor, S_hwall, S_ice, S_lava, S_lavawall, S_litcorr, S_ndoor, S_pool, S_room, S_sink, S_stone, S_tdwall, S_throne, S_tlcorn, S_tlwall, S_trcorn, S_tree, S_trwall, S_tuwall, S_upladder, S_upstair, S_vcdbridge, S_vcdoor, S_vodbridge, S_vodoor, S_vwall, S_water, WAND_CLASS } from './defsym.h.js';
+import { FOOD_CLASS, S, SPBOOK_CLASS, WAND_CLASS } from './defsym.h.js';
 import { def_oc_syms } from './drawing.js';
 import { induced_align, level_difficulty } from './dungeon.js';
 import { In_endgame, Inhell } from './dungeon.macros.js';
 import { del_engr_at, make_grave } from './engrave.js';
 import { wizard } from './flag.macros.js';
 import { FALSE, TRUE } from './global.h.js';
-import { MM_ASLEEP, MM_NOGRP, NO_MM_FLAGS } from './hack.h.js';
+import { MM, NO } from './hack.h.js';
 import { max, min } from './hack.macros.js';
 import { dist2, distmin } from './hacklib.js';
 import { sobj_at } from './invent.js';
@@ -20,10 +21,10 @@ import { makemon, mkclass, mongets, set_malign } from './makemon.js';
 import { ndemon } from './minion.js';
 import { occupied, topologize } from './mklev.js';
 import { add_to_container, mk_tt_object, mkgold, mkobj, mkobj_at, mksobj, mksobj_at, weight } from './mkobj.js';
-import { ANTHOLE, ANY_SHOP, ANY_TYPE, BARRACKS, BEEHIVE, COCKNEST, COURT, FILL_NORMAL, FODDERSHOP, LEPREHALL, MORGUE, OROOM, ROOMOFFSET, SHOPBASE, SWAMP, TEMPLE, ZOO } from './mkroom.h.js';
+import { ANTHOLE, BARRACKS, BEEHIVE, COCKNEST, COURT, FILL_NORMAL, FODDERSHOP, LEPREHALL, MORGUE, OROOM, ROOMOFFSET, SHOPBASE, SWAMP, TEMPLE, ZOO } from './mkroom.h.js';
 import { G_GONE } from './monflag.h.js';
 import { mons } from './monst.js';
-import { PM_BUGBEAR, PM_CAPTAIN, PM_COCKATRICE, PM_DWARF_RULER, PM_ELECTRIC_EEL, PM_ELVEN_MONARCH, PM_FIRE_ANT, PM_GHOST, PM_GIANT_ANT, PM_GIANT_EEL, PM_GNOME_RULER, PM_HOBGOBLIN, PM_KILLER_BEE, PM_LEPRECHAUN, PM_LIEUTENANT, PM_OGRE_TYRANT, PM_PIRANHA, PM_QUEEN_BEE, PM_SERGEANT, PM_SOLDIER, PM_SOLDIER_ANT, PM_WRAITH } from './monsters.h.js';
+import { PM } from './monsters.h.js';
 import { RANDOM_CLASS } from './objclass.h.js';
 import { CHEST, CORPSE, GOLD_PIECE, LARGE_BOX, LUMP_OF_ROYAL_JELLY, MACE, STATUE } from './objects.h.js';
 import { nh_getenv } from './options.js';
@@ -37,6 +38,7 @@ import { sfi_int, sfi_mkroom, sfo_int, sfo_mkroom } from './sfbase.js';
 import { shtypes } from './shknam.js';
 import { enexto } from './teleport.js';
 import { t_at } from './trap.js';
+import { ANY } from './wintype.h.js';
 import { revive } from './zap.js';
 
 const shrine_pos$buf = new $T.nhcoord();   // static in shrine_pos()
@@ -227,8 +229,8 @@ function mkzoo(type) {   // mkroom.c:244
 async function mk_zoo_thronemon(x, y) {   // mkroom.c:257
     let i = 0, pm = 0, mon = null;
     i = rnd(await level_difficulty());
-    pm = i > 9 ? PM_OGRE_TYRANT : i > 5 ? PM_ELVEN_MONARCH : i > 2 ? PM_DWARF_RULER : PM_GNOME_RULER;
-    mon = await makemon($c.relem(mons, pm), x, y, NO_MM_FLAGS);
+    pm = i > 9 ? PM.OGRE_TYRANT : i > 5 ? PM.ELVEN_MONARCH : i > 2 ? PM.DWARF_RULER : PM.GNOME_RULER;
+    mon = await makemon($c.relem(mons, pm), x, y, NO.MM_FLAGS);
     if (mon) {
         mon.msleeping = (1) & 1;
         mon.mpeaceful = (0) & 1;
@@ -296,7 +298,7 @@ export async function fill_zoo(sroom) {   // mkroom.c:276
             if (type === COURT && svl.level.locations[sx][sy].typ === THRONE) {
                 continue;
             }
-            mon = await makemon(type === COURT ? await courtmon() : type === BARRACKS ? await squadmon() : type === MORGUE ? await morguemon() : type === BEEHIVE ? sx === tx && sy === ty ? $c.relem(mons, PM_QUEEN_BEE) : $c.relem(mons, PM_KILLER_BEE) : type === LEPREHALL ? $c.relem(mons, PM_LEPRECHAUN) : type === COCKNEST ? $c.relem(mons, PM_COCKATRICE) : type === ANTHOLE ? await antholemon() : null, $c.i16(sx), $c.i16(sy), MM_ASLEEP | MM_NOGRP);
+            mon = await makemon(type === COURT ? await courtmon() : type === BARRACKS ? await squadmon() : type === MORGUE ? await morguemon() : type === BEEHIVE ? sx === tx && sy === ty ? $c.relem(mons, PM.QUEEN_BEE) : $c.relem(mons, PM.KILLER_BEE) : type === LEPREHALL ? $c.relem(mons, PM.LEPRECHAUN) : type === COCKNEST ? $c.relem(mons, PM.COCKATRICE) : type === ANTHOLE ? await antholemon() : null, $c.i16(sx), $c.i16(sy), MM.ASLEEP | MM.NOGRP);
             if (mon) {
                 mon.msleeping = (1) & 1;
                 if (type === COURT && mon.mpeaceful | 0) {
@@ -408,18 +410,18 @@ async function morguemon() {   // mkroom.c:478
     hd = rn2(await level_difficulty());
     if (hd > 10 && i < 10) {
         if (Inhell() || In_endgame(u.uz)) {
-            return await mkclass(S_DEMON, 0);
+            return await mkclass(S.DEMON, 0);
         } else {
-            ndemon_res = await ndemon(A_NONE);
+            ndemon_res = await ndemon(A.NONE);
             if (ndemon_res !== NON_PM) {
                 return $c.relem(mons, ndemon_res);
             }
         }
     }
     if (hd > 8 && i > 85) {
-        return await mkclass(S_VAMPIRE, 0);
+        return await mkclass(S.VAMPIRE, 0);
     }
-    return i < 20 ? $c.relem(mons, PM_GHOST) : i < 40 ? $c.relem(mons, PM_WRAITH) : await mkclass(S_ZOMBIE, 0);
+    return i < 20 ? $c.relem(mons, PM.GHOST) : i < 40 ? $c.relem(mons, PM.WRAITH) : await mkclass(S.ZOMBIE, 0);
 }
 export async function antholemon() {   // mkroom.c:502
     let mtyp = 0, indx = 0, trycnt = 0;
@@ -429,13 +431,13 @@ export async function antholemon() {   // mkroom.c:502
     do {
         switch ($c.rem32(indx + trycnt | 0, 3)) {
             case 0:
-                mtyp = PM_SOLDIER_ANT;
+                mtyp = PM.SOLDIER_ANT;
                 break;
             case 1:
-                mtyp = PM_FIRE_ANT;
+                mtyp = PM.FIRE_ANT;
                 break;
             default:
-                mtyp = PM_GIANT_ANT;
+                mtyp = PM.GIANT_ANT;
                 break;
         }
     } while ((trycnt = trycnt + 1 | 0) < 3 && svm.mvitals[mtyp].mvflags & G_GONE);
@@ -461,11 +463,11 @@ async function mkswamp() {   // mkroom.c:530
                         await del_engr_at(sx, sy);
                         svl.level.locations[sx][sy].typ = POOL;
                         if (!eelct || !rn2(4)) {
-                            await makemon(rn2(5) ? $c.relem(mons, PM_GIANT_EEL) : rn2(2) ? $c.relem(mons, PM_PIRANHA) : $c.relem(mons, PM_ELECTRIC_EEL), sx, sy, NO_MM_FLAGS);
+                            await makemon(rn2(5) ? $c.relem(mons, PM.GIANT_EEL) : rn2(2) ? $c.relem(mons, PM.PIRANHA) : $c.relem(mons, PM.ELECTRIC_EEL), sx, sy, NO.MM_FLAGS);
                             eelct = eelct + 1 | 0;
                         }
                     } else if (!rn2(4)) {
-                        await makemon(await mkclass(S_FUNGUS, 0), sx, sy, NO_MM_FLAGS);
+                        await makemon(await mkclass(S.FUNGUS, 0), sx, sy, NO.MM_FLAGS);
                     }
                 }
             }
@@ -499,7 +501,7 @@ async function mktemple() {   // mkroom.c:598
     lev.typ = ALTAR;
     $t1 = induced_align(80), lev.flags = ($t1) & 31;
     await priestini(u.uz, sroom, shrine_spot.x, shrine_spot.y, FALSE);
-    lev.flags = ((lev.flags | 0 | AM_SHRINE) >>> 0) & 31;
+    lev.flags = ((lev.flags | 0 | AM.SHRINE) >>> 0) & 31;
     svl.level.flags.has_temple = (1) & 1;
 }
 export function nexttodoor(sx, sy) {   // mkroom.c:623
@@ -610,12 +612,12 @@ export function somexyspace(croom, c) {   // mkroom.c:744
 export function search_special(type) {   // mkroom.c:765
     let croom = null;
     for (croom = $c.relem(svr.rooms, 0); croom.hx >= 0; croom = $c.radd(croom, 1)) {
-        if (type === ANY_TYPE && croom.rtype !== OROOM || type === ANY_SHOP && croom.rtype >= SHOPBASE || croom.rtype === type) {
+        if (type === ANY.TYPE && croom.rtype !== OROOM || type === ANY.SHOP && croom.rtype >= SHOPBASE || croom.rtype === type) {
             return croom;
         }
     }
     for (croom = $c.radd(gs.subrooms, 0); croom.hx >= 0; croom = $c.radd(croom, 1)) {
-        if (type === ANY_TYPE && croom.rtype !== OROOM || type === ANY_SHOP && croom.rtype >= SHOPBASE || croom.rtype === type) {
+        if (type === ANY.TYPE && croom.rtype !== OROOM || type === ANY.SHOP && croom.rtype >= SHOPBASE || croom.rtype === type) {
             return croom;
         }
     }
@@ -625,23 +627,23 @@ export async function courtmon() {   // mkroom.c:783
     let i = 0;
     i = rn2(60) + rn2(Math.imul(3, await level_difficulty())) | 0;
     if (i > 100) {
-        return await mkclass(S_DRAGON, 0);
+        return await mkclass(S.DRAGON, 0);
     } else if (i > 95) {
-        return await mkclass(S_GIANT, 0);
+        return await mkclass(S.GIANT, 0);
     } else if (i > 85) {
-        return await mkclass(S_TROLL, 0);
+        return await mkclass(S.TROLL, 0);
     } else if (i > 75) {
-        return await mkclass(S_CENTAUR, 0);
+        return await mkclass(S.CENTAUR, 0);
     } else if (i > 60) {
-        return await mkclass(S_ORC, 0);
+        return await mkclass(S.ORC, 0);
     } else if (i > 45) {
-        return $c.relem(mons, PM_BUGBEAR);
+        return $c.relem(mons, PM.BUGBEAR);
     } else if (i > 30) {
-        return $c.relem(mons, PM_HOBGOBLIN);
+        return $c.relem(mons, PM.HOBGOBLIN);
     } else if (i > 15) {
-        return await mkclass(S_GNOME, 0);
+        return await mkclass(S.GNOME, 0);
     } else {
-        return await mkclass(S_KOBOLD, 0);
+        return await mkclass(S.KOBOLD, 0);
     }
 }
 async function squadmon() {   // mkroom.c:817
@@ -702,113 +704,113 @@ export function cmap_to_type(sym) {   // mkroom.c:912
     let typ = 0;
     typ = STONE;
     switch (sym) {
-        case S_stone:
+        case S.stone:
             typ = STONE;
             break;
-        case S_vwall:
+        case S.vwall:
             typ = VWALL;
             break;
-        case S_hwall:
+        case S.hwall:
             typ = HWALL;
             break;
-        case S_tlcorn:
+        case S.tlcorn:
             typ = TLCORNER;
             break;
-        case S_trcorn:
+        case S.trcorn:
             typ = TRCORNER;
             break;
-        case S_blcorn:
+        case S.blcorn:
             typ = BLCORNER;
             break;
-        case S_brcorn:
+        case S.brcorn:
             typ = BRCORNER;
             break;
-        case S_crwall:
+        case S.crwall:
             typ = CROSSWALL;
             break;
-        case S_tuwall:
+        case S.tuwall:
             typ = TUWALL;
             break;
-        case S_tdwall:
+        case S.tdwall:
             typ = TDWALL;
             break;
-        case S_tlwall:
+        case S.tlwall:
             typ = TLWALL;
             break;
-        case S_trwall:
+        case S.trwall:
             typ = TRWALL;
             break;
-        case S_ndoor:
-        case S_vodoor:
-        case S_hodoor:
-        case S_vcdoor:
-        case S_hcdoor:
+        case S.ndoor:
+        case S.vodoor:
+        case S.hodoor:
+        case S.vcdoor:
+        case S.hcdoor:
             typ = DOOR;
             break;
-        case S_bars:
+        case S.bars:
             typ = IRONBARS;
             break;
-        case S_tree:
+        case S.tree:
             typ = TREE;
             break;
-        case S_room:
-        case S_darkroom:
+        case S.room:
+        case S.darkroom:
             typ = ROOM;
             break;
-        case S_corr:
-        case S_litcorr:
+        case S.corr:
+        case S.litcorr:
             typ = CORR;
             break;
-        case S_upstair:
-        case S_dnstair:
+        case S.upstair:
+        case S.dnstair:
             typ = STAIRS;
             break;
-        case S_upladder:
-        case S_dnladder:
+        case S.upladder:
+        case S.dnladder:
             typ = LADDER;
             break;
-        case S_altar:
+        case S.altar:
             typ = ALTAR;
             break;
-        case S_grave:
+        case S.grave:
             typ = GRAVE;
             break;
-        case S_throne:
+        case S.throne:
             typ = THRONE;
             break;
-        case S_sink:
+        case S.sink:
             typ = SINK;
             break;
-        case S_fountain:
+        case S.fountain:
             typ = FOUNTAIN;
             break;
-        case S_pool:
+        case S.pool:
             typ = POOL;
             break;
-        case S_ice:
+        case S.ice:
             typ = ICE;
             break;
-        case S_lava:
+        case S.lava:
             typ = LAVAPOOL;
             break;
-        case S_vodbridge:
-        case S_hodbridge:
+        case S.vodbridge:
+        case S.hodbridge:
             typ = DRAWBRIDGE_DOWN;
             break;
-        case S_vcdbridge:
-        case S_hcdbridge:
+        case S.vcdbridge:
+        case S.hcdbridge:
             typ = DBWALL;
             break;
-        case S_air:
+        case S.air:
             typ = AIR;
             break;
-        case S_cloud:
+        case S.cloud:
             typ = CLOUD;
             break;
-        case S_water:
+        case S.water:
             typ = WATER;
             break;
-        case S_lavawall:
+        case S.lavawall:
             typ = LAVAWALL;
             break;
         default:
@@ -863,10 +865,10 @@ export function $init() {
         squadprob[$i0].$copyFrom(new $T.anon_mkroom_807());
     }
     $c.init(squadprob, [
-        { pm: PM_SOLDIER, prob: 80 },
-        { pm: PM_SERGEANT, prob: 15 },
-        { pm: PM_LIEUTENANT, prob: 4 },
-        { pm: PM_CAPTAIN, prob: 1 }
+        { pm: PM.SOLDIER, prob: 80 },
+        { pm: PM.SERGEANT, prob: 15 },
+        { pm: PM.LIEUTENANT, prob: 4 },
+        { pm: PM.CAPTAIN, prob: 1 }
     ]);
     shrine_pos$buf.$copyFrom(new $T.nhcoord());
 }

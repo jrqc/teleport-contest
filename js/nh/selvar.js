@@ -11,9 +11,10 @@ import { COLNO, FALSE, ROWNO, TRUE } from './global.h.js';
 import { dist2 } from './hacklib.js';
 import { ROOMOFFSET } from './mkroom.h.js';
 import { impossible } from './pline.js';
+import { W } from './prop.h.js';
 import { rn2 } from './rnd.js';
 import { match_maptyps, random_wdir } from './sp_lev.js';
-import { SEL_GRADIENT_RADIAL, SEL_GRADIENT_SQUARE, W_EAST, W_NORTH, W_RANDOM, W_SOUTH, W_WEST } from './sp_lev.h.js';
+import { SEL_GRADIENT } from './sp_lev.h.js';
 
 const SEL_FLOOD_STACK = 1680;
 
@@ -276,13 +277,13 @@ export async function selection_do_grow(ov, dir) {   // selvar.c:321
         return;
     }
     tmp = await selection_new();
-    if (dir === W_RANDOM) {
+    if (dir === W.RANDOM) {
         dir = random_wdir();
     }
     selection_getbounds(ov, rect);
     for (x = $c.i16(0 > (rect.lx - 1 | 0) ? 0 : rect.lx - 1 | 0); x <= (COLNO - 1 < (rect.hx + 1 | 0) ? COLNO - 1 : rect.hx + 1 | 0); x = $c.i16(x + 1)) {
         for (y = $c.i16(0 > (rect.ly - 1 | 0) ? 0 : rect.ly - 1 | 0); y <= (ROWNO - 1 < (rect.hy + 1 | 0) ? ROWNO - 1 : rect.hy + 1 | 0); y = $c.i16(y + 1)) {
-            if (dir & W_WEST && selection_getpoint($c.i16(x + 1 | 0), y, ov) || (dir & (W_WEST | W_NORTH)) === (W_WEST | W_NORTH) && selection_getpoint($c.i16(x + 1 | 0), $c.i16(y + 1 | 0), ov) || dir & W_NORTH && selection_getpoint(x, $c.i16(y + 1 | 0), ov) || (dir & (W_NORTH | W_EAST)) === (W_NORTH | W_EAST) && selection_getpoint($c.i16(x - 1 | 0), $c.i16(y + 1 | 0), ov) || dir & W_EAST && selection_getpoint($c.i16(x - 1 | 0), y, ov) || (dir & (W_EAST | W_SOUTH)) === (W_EAST | W_SOUTH) && selection_getpoint($c.i16(x - 1 | 0), $c.i16(y - 1 | 0), ov) || dir & W_SOUTH && selection_getpoint(x, $c.i16(y - 1 | 0), ov) || (dir & (W_SOUTH | W_WEST)) === (W_SOUTH | W_WEST) && selection_getpoint($c.i16(x + 1 | 0), $c.i16(y - 1 | 0), ov)) {
+            if (dir & W.WEST && selection_getpoint($c.i16(x + 1 | 0), y, ov) || (dir & (W.WEST | W.NORTH)) === (W.WEST | W.NORTH) && selection_getpoint($c.i16(x + 1 | 0), $c.i16(y + 1 | 0), ov) || dir & W.NORTH && selection_getpoint(x, $c.i16(y + 1 | 0), ov) || (dir & (W.NORTH | W.EAST)) === (W.NORTH | W.EAST) && selection_getpoint($c.i16(x - 1 | 0), $c.i16(y + 1 | 0), ov) || dir & W.EAST && selection_getpoint($c.i16(x - 1 | 0), y, ov) || (dir & (W.EAST | W.SOUTH)) === (W.EAST | W.SOUTH) && selection_getpoint($c.i16(x - 1 | 0), $c.i16(y - 1 | 0), ov) || dir & W.SOUTH && selection_getpoint(x, $c.i16(y - 1 | 0), ov) || (dir & (W.SOUTH | W.WEST)) === (W.SOUTH | W.WEST) && selection_getpoint($c.i16(x + 1 | 0), $c.i16(y - 1 | 0), ov)) {
                 selection_setpoint(x, y, tmp, 1);
             }
         }
@@ -568,7 +569,7 @@ export async function selection_do_gradient(ov, x, y, x2, y2, gtyp, mind, maxd) 
     switch (gtyp) {
         default:
             await impossible($c.lit("Unrecognized gradient type! Defaulting to radial..."));
-        case SEL_GRADIENT_RADIAL:
+        case SEL_GRADIENT.RADIAL:
             {
                 for (dx = 0; dx < COLNO; dx = $c.add64(dx, 1)) {
                     for (dy = 0; dy < ROWNO; dy = $c.add64(dy, 1)) {
@@ -580,7 +581,7 @@ export async function selection_do_gradient(ov, x, y, x2, y2, gtyp, mind, maxd) 
                 }
                 break;
             }
-        case SEL_GRADIENT_SQUARE:
+        case SEL_GRADIENT.SQUARE:
             {
                 for (dx = 0; dx < COLNO; dx = $c.add64(dx, 1)) {
                     for (dy = 0; dy < ROWNO; dy = $c.add64(dy, 1)) {

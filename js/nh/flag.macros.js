@@ -3,7 +3,7 @@ import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
 import { flags } from './decl.js';
-import { PARANOID_AUTOALL, PARANOID_BONES, PARANOID_BREAKWAND, PARANOID_CONFIRM, PARANOID_DIE, PARANOID_EATING, PARANOID_HIT, PARANOID_PRAY, PARANOID_QUIT, PARANOID_REMOVE, PARANOID_SWIM, PARANOID_TRAP, PARANOID_WERECHANGE } from './flag.h.js';
+import { PARANOID } from './flag.h.js';
 
 export function wizard() {
     return flags.debug;
@@ -12,41 +12,41 @@ export function discover() {
     return flags.explore;
 }
 export function ParanoidConfirm() {
-    return (flags.paranoia_bits & PARANOID_CONFIRM) >>> 0 !== 0 ? 1 : 0;
+    return (flags.paranoia_bits & PARANOID.CONFIRM) >>> 0 !== 0 ? 1 : 0;
 }
 export function ParanoidQuit() {
-    return (flags.paranoia_bits & PARANOID_QUIT) >>> 0 !== 0 ? 1 : 0;
+    return (flags.paranoia_bits & PARANOID.QUIT) >>> 0 !== 0 ? 1 : 0;
 }
 export function ParanoidDie() {
-    return (flags.paranoia_bits & PARANOID_DIE) >>> 0 !== 0 ? 1 : 0;
+    return (flags.paranoia_bits & PARANOID.DIE) >>> 0 !== 0 ? 1 : 0;
 }
 export function ParanoidBones() {
-    return (flags.paranoia_bits & PARANOID_BONES) >>> 0 !== 0 ? 1 : 0;
+    return (flags.paranoia_bits & PARANOID.BONES) >>> 0 !== 0 ? 1 : 0;
 }
 export function ParanoidHit() {
-    return (flags.paranoia_bits & PARANOID_HIT) >>> 0 !== 0 ? 1 : 0;
+    return (flags.paranoia_bits & PARANOID.HIT) >>> 0 !== 0 ? 1 : 0;
 }
 export function ParanoidPray() {
-    return (flags.paranoia_bits & PARANOID_PRAY) >>> 0 !== 0 ? 1 : 0;
+    return (flags.paranoia_bits & PARANOID.PRAY) >>> 0 !== 0 ? 1 : 0;
 }
 export function ParanoidRemove() {
-    return (flags.paranoia_bits & PARANOID_REMOVE) >>> 0 !== 0 ? 1 : 0;
+    return (flags.paranoia_bits & PARANOID.REMOVE) >>> 0 !== 0 ? 1 : 0;
 }
 export function ParanoidBreakwand() {
-    return (flags.paranoia_bits & PARANOID_BREAKWAND) >>> 0 !== 0 ? 1 : 0;
+    return (flags.paranoia_bits & PARANOID.BREAKWAND) >>> 0 !== 0 ? 1 : 0;
 }
 export function ParanoidWerechange() {
-    return (flags.paranoia_bits & PARANOID_WERECHANGE) >>> 0 !== 0 ? 1 : 0;
+    return (flags.paranoia_bits & PARANOID.WERECHANGE) >>> 0 !== 0 ? 1 : 0;
 }
 export function ParanoidEating() {
-    return (flags.paranoia_bits & PARANOID_EATING) >>> 0 !== 0 ? 1 : 0;
+    return (flags.paranoia_bits & PARANOID.EATING) >>> 0 !== 0 ? 1 : 0;
 }
 export function ParanoidSwim() {
-    return (flags.paranoia_bits & PARANOID_SWIM) >>> 0 !== 0 ? 1 : 0;
+    return (flags.paranoia_bits & PARANOID.SWIM) >>> 0 !== 0 ? 1 : 0;
 }
 export function ParanoidTrap() {
-    return (flags.paranoia_bits & PARANOID_TRAP) >>> 0 !== 0 ? 1 : 0;
+    return (flags.paranoia_bits & PARANOID.TRAP) >>> 0 !== 0 ? 1 : 0;
 }
 export function ParanoidAutoAll() {
-    return (flags.paranoia_bits & PARANOID_AUTOALL) >>> 0 !== 0 ? 1 : 0;
+    return (flags.paranoia_bits & PARANOID.AUTOALL) >>> 0 !== 0 ? 1 : 0;
 }

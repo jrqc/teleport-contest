@@ -3,15 +3,15 @@ import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
 import { artifact_light, is_art, shade_glare, spec_abon, spec_dbon, touch_artifact } from './artifact.js';
-import { ART_SNICKERSNEE } from './artilist.h.js';
-import { A_DEX, A_STR } from './attrib.h.js';
+import { ART } from './artilist.h.js';
+import { A } from './attrib.h.js';
 import { ACURR } from './attrib.macros.js';
 import { yn_function } from './cmd.js';
 import { NO_COLOR } from './color.h.js';
-import { TIP_ENHANCE } from './context.h.js';
+import { TIP } from './context.h.js';
 import { is_pool } from './dbridge.js';
 import { cg, gi, gp, gu, gy, hands_obj, iflags, svc, u, ynchars } from './decl.js';
-import { BALL_CLASS, CHAIN_CLASS, GEM_CLASS, S_DRAGON, S_EEL, S_GIANT, S_JABBERWOCK, S_KOP, S_NAGA, S_SNAKE, S_XORN, TOOL_CLASS, WEAPON_CLASS } from './defsym.h.js';
+import { BALL_CLASS, CHAIN_CLASS, GEM_CLASS, S, TOOL_CLASS, WEAPON_CLASS } from './defsym.h.js';
 import { canseemon, newsym, nul_glyphinfo } from './display.js';
 import { flooreffects } from './do.js';
 import { Monnam, mon_nam } from './do_name.js';
@@ -20,7 +20,7 @@ import { panic } from './end.js';
 import { wizard } from './flag.macros.js';
 import { FALSE, MAXULEV, TRUE } from './global.h.js';
 import { handle_tip } from './hack.js';
-import { ECMD_OK, HAND } from './hack.h.js';
+import { ECMD, HAND } from './hack.h.js';
 import { plur } from './hack.macros.js';
 import { dist2, eos, nh_snprintf, s_suffix } from './hacklib.js';
 import { stackobj, update_inventory } from './invent.js';
@@ -28,13 +28,13 @@ import { arti_light_description } from './light.js';
 import { adj_lev } from './makemon.js';
 import { obj_extract_self, place_object } from './mkobj.js';
 import { can_touch_safely } from './mon.js';
-import { AT_WEAP } from './monattk.h.js';
+import { AT } from './monattk.h.js';
 import { attacktype, mon_hates_blessings, mon_hates_silver, pronoun_gender } from './mondata.js';
 import { bigmonst, hates_light, is_animal, is_giant, is_swimmer, is_wooden, likes_gems, mindless, passes_walls, strongmonst, thick_skinned, throws_rocks, touch_petrifies } from './mondata.macros.js';
 import { mons } from './monst.js';
-import { NEED_AXE, NEED_HTH_WEAPON, NEED_PICK_AXE, NEED_PICK_OR_AXE, NEED_RANGED_WEAPON, NEED_WEAPON, NO_WEAPON_WANTED } from './monst.h.js';
+import { NEED, NO_WEAPON_WANTED } from './monst.h.js';
 import { MON_NOWEP, resists_ston } from './monst.macros.js';
-import { PM_BALROG, PM_CLERIC, PM_HEALER, PM_MONK, PM_PONY, PM_SAMURAI, PM_SHADE, PM_WIZARD } from './monsters.h.js';
+import { PM } from './monsters.h.js';
 import { m_carrying } from './mthrowu.js';
 import { bimanual, carried, greatest_erosion, is_ammo, is_axe, is_graystone, is_pick, is_plural, is_spear, is_weptool, is_wet_towel, mcarried } from './obj.macros.js';
 import { LEATHER, SILVER } from './objclass.h.js';
@@ -44,22 +44,22 @@ import { The, Tobjnam, Yname2, Yobjnam2, distant_name, doname, makeplural, makes
 import { NON_PM } from './permonst.h.js';
 import { You, You_feel, Your, impossible, pline, pline_mon } from './pline.js';
 import { mbodypart } from './polyself.js';
-import { W_ARM, W_ARMC, W_ARMG, W_ARMS, W_ARMU, W_RINGL, W_RINGR, W_WEP } from './prop.h.js';
+import { W } from './prop.h.js';
 import { d, rn2, rnd } from './rnd.js';
 import { genders } from './role.js';
-import { P_ATTACK_SPELL, P_BARE_HANDED_COMBAT, P_BASIC, P_BOW, P_CLERIC_SPELL, P_CROSSBOW, P_ENCHANTMENT_SPELL, P_EXPERT, P_FIRST_H_TO_H, P_FIRST_SPELL, P_FIRST_WEAPON, P_FLAIL, P_GRAND_MASTER, P_HEALING_SPELL, P_ISRESTRICTED, P_LAST_H_TO_H, P_LAST_SPELL, P_LAST_WEAPON, P_MASTER, P_NONE, P_NUM_SKILLS, P_PICK_AXE, P_RIDING, P_SKILLED, P_SKILL_LIMIT, P_SLING, P_TWO_WEAPON_COMBAT, P_UNSKILLED } from './skills.h.js';
+import { P, P_FIRST_H_TO_H, P_FIRST_SPELL, P_FIRST_WEAPON, P_LAST_H_TO_H, P_LAST_SPELL, P_LAST_WEAPON, P_SKILL_LIMIT } from './skills.h.js';
 import { P_RESTRICTED } from './skills.macros.js';
 import { skill_based_spellbook_id, spell_skilltype } from './spell.js';
 import { Strlen_ } from './strutil.js';
 import { begin_burn, end_burn } from './timeout.js';
 import { cansee, couldsee } from './vision.macros.js';
-import { WT_IRON_BALL_INCR } from './weight.h.js';
+import { WT } from './weight.h.js';
 import { mwelded } from './wield.js';
 import { add_menu, add_menu_heading, add_menu_str, select_menu } from './windows.js';
 import { create_nhwindow, destroy_nhwindow, end_menu, start_menu } from './winprocs.macros.js';
-import { ATR_NONE, MENU_BEHAVE_STANDARD, MENU_ITEMFLAGS_NONE, NHW_MENU, PICK_NONE, PICK_ONE } from './wintype.h.js';
+import { ATR, MENU, NHW, PICK } from './wintype.h.js';
 import { bypass_obj, which_armor } from './worn.js';
-import { PRONOUN_HALLU } from './you.h.js';
+import { PRONOUN } from './you.h.js';
 import { Upolyd } from './you.macros.js';
 
 const PN_BARE_HANDED = (-1);
@@ -89,38 +89,38 @@ const arwep = $c.recArray($T.throw_and_return_weapon, 1);
 const hwep = new Int16Array(45);
 const skill_ranges = $c.recArray($T.skill_range, 3);
 async function give_may_advance_msg(skill) {   // weapon.c:76
-    await You_feel($c.lit("more confident in your %sskills."), skill === P_NONE ? $c.lit("") : skill <= P_LAST_WEAPON ? $c.lit("weapon ") : skill <= P_LAST_SPELL ? $c.lit("spell casting ") : $c.lit("fighting "));
-    await handle_tip(TIP_ENHANCE);
+    await You_feel($c.lit("more confident in your %sskills."), skill === P.NONE ? $c.lit("") : skill <= P_LAST_WEAPON ? $c.lit("weapon ") : skill <= P_LAST_SPELL ? $c.lit("spell casting ") : $c.lit("fighting "));
+    await handle_tip(TIP.ENHANCE);
 }
 export async function weapon_descr(obj) {   // weapon.c:90
     let skill = 0, descr = null;
     skill = weapon_type(obj);
-    descr = skill_names_indices[skill] > 0 ? obj_descr[objects[skill_names_indices[skill]].oc_name_idx].oc_name : skill === P_BARE_HANDED_COMBAT ? barehands_or_martial[gu.urole.mnum === PM_SAMURAI || gu.urole.mnum === PM_MONK ? 1 : 0] : odd_skill_names[-skill_names_indices[skill] | 0];
+    descr = skill_names_indices[skill] > 0 ? obj_descr[objects[skill_names_indices[skill]].oc_name_idx].oc_name : skill === P.BARE_HANDED_COMBAT ? barehands_or_martial[gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK ? 1 : 0] : odd_skill_names[-skill_names_indices[skill] | 0];
     switch (skill) {
-        case P_NONE:
+        case P.NONE:
             descr = obj.otyp === CORPSE || obj.otyp === TIN || obj.otyp === EGG || obj.otyp === STATUE || obj.otyp === BOULDER || obj.otyp === TOWEL || obj.otyp === TIN_OPENER ? obj_descr[objects[obj.otyp].oc_name_idx].oc_name : obj.globby | 0 ? $c.lit("glob") : def_oc_syms[obj.oclass].name;
             break;
-        case P_SLING:
+        case P.SLING:
             if (is_ammo(obj)) {
                 descr = obj.otyp === ROCK || is_graystone(obj) ? $c.lit("stone") : obj.oclass === GEM_CLASS ? $c.lit("gem") : def_oc_syms[obj.oclass].name;
             }
             break;
-        case P_BOW:
+        case P.BOW:
             if (is_ammo(obj)) {
                 descr = $c.lit("arrow");
             }
             break;
-        case P_CROSSBOW:
+        case P.CROSSBOW:
             if (is_ammo(obj)) {
                 descr = $c.lit("bolt");
             }
             break;
-        case P_FLAIL:
+        case P.FLAIL:
             if (obj.otyp === GRAPPLING_HOOK) {
                 descr = $c.lit("hook");
             }
             break;
-        case P_PICK_AXE:
+        case P.PICK_AXE:
             if (obj.otyp === DWARVISH_MATTOCK) {
                 descr = $c.lit("mattock");
             }
@@ -148,7 +148,7 @@ export async function hitval(otmp, mon) {   // weapon.c:149
     if (otmp.otyp === TRIDENT && is_swimmer(ptr)) {
         if (is_pool(mon.mx, mon.my)) {
             tmp = tmp + 4 | 0;
-        } else if (ptr.mlet === S_EEL || ptr.mlet === S_SNAKE) {
+        } else if (ptr.mlet === S.EEL || ptr.mlet === S.SNAKE) {
             tmp = tmp + 2 | 0;
         }
     }
@@ -246,13 +246,13 @@ export async function dmgval(otmp, mon) {   // weapon.c:216
     if ((objects[otyp].oc_material | 0) <= LEATHER && thick_skinned(ptr)) {
         tmp = 0;
     }
-    if ($c.peq(ptr, $c.relem(mons, PM_SHADE)) && !shade_glare(otmp)) {
+    if ($c.peq(ptr, $c.relem(mons, PM.SHADE)) && !shade_glare(otmp)) {
         tmp = 0;
     }
     if (otyp === HEAVY_IRON_BALL && tmp > 0) {
         wt = objects[HEAVY_IRON_BALL].oc_weight | 0;
         if ((otmp.owt | 0) > wt) {
-            wt = $c.div32((otmp.owt | 0) - wt | 0, WT_IRON_BALL_INCR);
+            wt = $c.div32((otmp.owt | 0) - wt | 0, WT.IRON_BALL_INCR);
             tmp = tmp + rnd(Math.imul(4, wt)) | 0;
             if (tmp > 25) {
                 tmp = 25;
@@ -288,23 +288,23 @@ export async function dmgval(otmp, mon) {   // weapon.c:216
 }
 export async function special_dmgval(magr, mdef, armask, silverhit_p) {   // weapon.c:361
     let obj = null, left_ring = 0, right_ring = 0, silverhit = 0, bonus = 0;
-    left_ring = $c.i8($c.and64(armask, W_RINGL) ? TRUE : FALSE);
-    right_ring = $c.i8($c.and64(armask, W_RINGR) ? TRUE : FALSE);
+    left_ring = $c.i8($c.and64(armask, W.RINGL) ? TRUE : FALSE);
+    right_ring = $c.i8($c.and64(armask, W.RINGR) ? TRUE : FALSE);
     silverhit = 0;
     bonus = 0;
     obj = null;
-    if ($c.and64(armask, W_ARMC | W_ARM | W_ARMU)) {
-        if ($c.and64(armask, W_ARMC) !== 0 && (obj = await which_armor(magr, W_ARMC)) !== null) {
-            armask = W_ARMC;
-        } else if ($c.and64(armask, W_ARM) !== 0 && (obj = await which_armor(magr, W_ARM)) !== null) {
-            armask = W_ARM;
-        } else if ($c.and64(armask, W_ARMU) !== 0 && (obj = await which_armor(magr, W_ARMU)) !== null) {
-            armask = W_ARMU;
+    if ($c.and64(armask, W.ARMC | W.ARM | W.ARMU)) {
+        if ($c.and64(armask, W.ARMC) !== 0 && (obj = await which_armor(magr, W.ARMC)) !== null) {
+            armask = W.ARMC;
+        } else if ($c.and64(armask, W.ARM) !== 0 && (obj = await which_armor(magr, W.ARM)) !== null) {
+            armask = W.ARM;
+        } else if ($c.and64(armask, W.ARMU) !== 0 && (obj = await which_armor(magr, W.ARMU)) !== null) {
+            armask = W.ARMU;
         } else {
             armask = 0;
         }
-    } else if ($c.and64(armask, W_ARMG | W_RINGL | W_RINGR)) {
-        armask = (obj = await which_armor(magr, W_ARMG)) !== null ? W_ARMG : 0;
+    } else if ($c.and64(armask, W.ARMG | W.RINGL | W.RINGR)) {
+        armask = (obj = await which_armor(magr, W.ARMG)) !== null ? W.ARMG : 0;
     } else {
         obj = await which_armor(magr, armask);
     }
@@ -320,15 +320,15 @@ export async function special_dmgval(magr, mdef, armask, silverhit_p) {   // wea
         if (left_ring && $G.uleft) {
             if ((objects[$G.uleft.otyp].oc_material | 0) === SILVER && mon_hates_silver(mdef)) {
                 bonus = bonus + rnd(20) | 0;
-                silverhit = $c.or64(silverhit, W_RINGL);
+                silverhit = $c.or64(silverhit, W.RINGL);
             }
         }
         if (right_ring && $G.uright) {
             if ((objects[$G.uright.otyp].oc_material | 0) === SILVER && mon_hates_silver(mdef)) {
-                if (!$c.and64(silverhit, W_RINGL)) {
+                if (!$c.and64(silverhit, W.RINGL)) {
                     bonus = bonus + rnd(20) | 0;
                 }
-                silverhit = $c.or64(silverhit, W_RINGR);
+                silverhit = $c.or64(silverhit, W.RINGR);
             }
         }
     }
@@ -339,16 +339,16 @@ export async function special_dmgval(magr, mdef, armask, silverhit_p) {   // wea
 }
 export async function silver_sears(magr, mdef, silverhit) {   // weapon.c:436
     let rings = new Int8Array(20), ltyp = 0, rtyp = 0, both = 0, l_dknown = 0, r_dknown = 0, l_ag = 0, r_ag = 0;
-    ltyp = $G.uleft && $c.and64(silverhit, W_RINGL) !== 0 ? $G.uleft.otyp : STRANGE_OBJECT;
-    rtyp = $G.uright && $c.and64(silverhit, W_RINGR) !== 0 ? $G.uright.otyp : STRANGE_OBJECT;
+    ltyp = $G.uleft && $c.and64(silverhit, W.RINGL) !== 0 ? $G.uleft.otyp : STRANGE_OBJECT;
+    rtyp = $G.uright && $c.and64(silverhit, W.RINGR) !== 0 ? $G.uright.otyp : STRANGE_OBJECT;
     l_dknown = $c.i8($G.uleft && $G.uleft.dknown | 0 ? 1 : 0);
     r_dknown = $c.i8($G.uright && $G.uright.dknown | 0 ? 1 : 0);
     l_ag = $c.i8((objects[ltyp].oc_material | 0) === SILVER && l_dknown ? 1 : 0);
     r_ag = $c.i8((objects[rtyp].oc_material | 0) === SILVER && r_dknown ? 1 : 0);
-    if ($c.and64(silverhit, W_RINGL | W_RINGR) !== 0) {
+    if ($c.and64(silverhit, W.RINGL | W.RINGR) !== 0) {
         both = $c.i8(ltyp === rtyp && l_dknown === r_dknown || l_ag && r_ag ? 1 : 0);
         $c.__builtin___sprintf_chk(new $c.Ptr(rings, 0), 0, 20, $c.lit("ring%s"), both ? $c.lit("s") : $c.lit(""));
-        await Your($c.lit("%s%s %s %s!"), l_ag || r_ag ? $c.lit("silver ") : both ? $c.lit("") : $c.and64(silverhit, W_RINGL) !== 0 ? $c.lit("left ") : $c.lit("right "), new $c.Ptr(rings, 0), await vtense(new $c.Ptr(rings, 0), $c.lit("sear")), await mon_nam(mdef));
+        await Your($c.lit("%s%s %s %s!"), l_ag || r_ag ? $c.lit("silver ") : both ? $c.lit("") : $c.and64(silverhit, W.RINGL) !== 0 ? $c.lit("left ") : $c.lit("right "), new $c.Ptr(rings, 0), await vtense(new $c.Ptr(rings, 0), $c.lit("sear")), await mon_nam(mdef));
     }
 }
 async function oselect(mtmp, type) {   // weapon.c:476
@@ -385,7 +385,7 @@ export async function select_rwep(mtmp) {   // weapon.c:533
             return otmp;
         }
     } while (0);
-    if (mlet === S_KOP) {
+    if (mlet === S.KOP) {
         do {
             if ((otmp = await oselect(mtmp, CREAM_PIE)) !== null) {
                 return otmp;
@@ -402,12 +402,12 @@ export async function select_rwep(mtmp) {   // weapon.c:533
     mwep = mtmp.mw;
     mweponly = $c.i8(mwelded(mwep) && mtmp.weapon_check === NO_WEAPON_WANTED ? 1 : 0);
     if (dist2(mtmp.mx, mtmp.my, mtmp.mux, mtmp.muy) <= 13 && couldsee(mtmp.mx, mtmp.my)) {
-        if (is_art(mwep, ART_SNICKERSNEE)) {
+        if (is_art(mwep, ART.SNICKERSNEE)) {
             gp.propellor = mwep;
             return mwep;
         }
         for (i = 0; i < 13; i = i + 1 | 0) {
-            if ((strongmonst(mtmp.data) && $c.and64(mtmp.misc_worn_check, W_ARMS) === 0 || !objects[pwep[i]].oc_big) && ((objects[pwep[i]].oc_material | 0) !== SILVER || !mon_hates_silver(mtmp))) {
+            if ((strongmonst(mtmp.data) && $c.and64(mtmp.misc_worn_check, W.ARMS) === 0 || !objects[pwep[i]].oc_big) && ((objects[pwep[i]].oc_material | 0) !== SILVER || !mon_hates_silver(mtmp))) {
                 if ((otmp = await oselect(mtmp, pwep[i])) !== null && ($c.peq(otmp, mwep) || !mweponly)) {
                     gp.propellor = otmp;
                     return otmp;
@@ -418,7 +418,7 @@ export async function select_rwep(mtmp) {   // weapon.c:533
     for (i = 0; i < 1; i = i + 1 | 0) {
         arw = $c.relem(arwep, i);
         if (!mindless(mtmp.data) && !is_animal(mtmp.data) && !mweponly && dist2(mtmp.mx, mtmp.my, mtmp.mux, mtmp.muy) <= arw.range && couldsee(mtmp.mx, mtmp.my)) {
-            if (($c.and64(mtmp.misc_worn_check, W_ARMS) === 0 || !objects[arw.otyp].oc_big) && ((objects[arw.otyp].oc_material | 0) !== SILVER || !mon_hates_silver(mtmp))) {
+            if (($c.and64(mtmp.misc_worn_check, W.ARMS) === 0 || !objects[arw.otyp].oc_big) && ((objects[arw.otyp].oc_material | 0) !== SILVER || !mon_hates_silver(mtmp))) {
                 if ((otmp = await oselect(mtmp, arw.otyp)) !== null && ($c.peq(otmp, mwep) || !mweponly)) {
                     gp.propellor = otmp;
                     return otmp;
@@ -439,7 +439,7 @@ export async function select_rwep(mtmp) {   // weapon.c:533
         prop = objects[rwep[i]].oc_subtyp;
         if (prop < 0) {
             switch (-prop | 0) {
-                case P_BOW:
+                case P.BOW:
                     $t2 = await oselect(mtmp, YUMI), gp.propellor = $t2;
                     if (!gp.propellor) {
                         $t3 = await oselect(mtmp, ELVEN_BOW), gp.propellor = $t3;
@@ -451,10 +451,10 @@ export async function select_rwep(mtmp) {   // weapon.c:533
                         $t5 = await oselect(mtmp, ORCISH_BOW), gp.propellor = $t5;
                     }
                     break;
-                case P_SLING:
+                case P.SLING:
                     $t6 = await oselect(mtmp, SLING), gp.propellor = $t6;
                     break;
-                case P_CROSSBOW:
+                case P.CROSSBOW:
                     $t7 = await oselect(mtmp, CROSSBOW), gp.propellor = $t7;
             }
             if ((otmp = mtmp.mw) && mwelded(otmp) && !$c.peq(otmp, gp.propellor) && mtmp.weapon_check === NO_WEAPON_WANTED) {
@@ -489,7 +489,7 @@ export function monmightthrowwep(obj) {   // weapon.c:680
 export async function select_hwep(mtmp) {   // weapon.c:705
     let otmp = null, i = 0, strong = 0, wearing_shield = 0;
     strong = $c.i8(strongmonst(mtmp.data));
-    wearing_shield = $c.i8($c.and64(mtmp.misc_worn_check, W_ARMS) !== 0 ? 1 : 0);
+    wearing_shield = $c.i8($c.and64(mtmp.misc_worn_check, W.ARMS) !== 0 ? 1 : 0);
     for (otmp = mtmp.minvent; otmp; otmp = otmp.nobj) {
         if (otmp.oclass === WEAPON_CLASS && otmp.oartifact && await touch_artifact(otmp, mtmp) && (strong && !wearing_shield || !objects[otmp.otyp].oc_big)) {
             return otmp;
@@ -501,7 +501,7 @@ export async function select_hwep(mtmp) {   // weapon.c:705
                 return otmp;
             }
         } while (0);
-    } else if ($c.peq(mtmp.data, $c.relem(mons, PM_BALROG)) && $G.uwep) {
+    } else if ($c.peq(mtmp.data, $c.relem(mons, PM.BALROG)) && $G.uwep) {
         do {
             if ((otmp = await oselect(mtmp, BULLWHIP)) !== null) {
                 return otmp;
@@ -509,7 +509,7 @@ export async function select_hwep(mtmp) {   // weapon.c:705
         } while (0);
     }
     for (i = 0; i < 45; i = i + 1 | 0) {
-        if (hwep[i] === CORPSE && !$c.and64(mtmp.misc_worn_check, W_ARMG) && !await resists_ston(mtmp)) {
+        if (hwep[i] === CORPSE && !$c.and64(mtmp.misc_worn_check, W.ARMG) && !await resists_ston(mtmp)) {
             continue;
         }
         if ((strong && !wearing_shield || !objects[hwep[i]].oc_big) && ((objects[hwep[i]].oc_material | 0) !== SILVER || !mon_hates_silver(mtmp))) {
@@ -534,10 +534,10 @@ export async function possibly_unwield(mon, polyspot) {   // weapon.c:747
     }
     if (!obj) {
         MON_NOWEP(mon);
-        mon.weapon_check = NEED_WEAPON;
+        mon.weapon_check = NEED.WEAPON;
         return;
     }
-    if (!attacktype(mon.data, AT_WEAP)) {
+    if (!attacktype(mon.data, AT.WEAP)) {
         await setmnotwielded(mon, mw_tmp);
         mon.weapon_check = NO_WEAPON_WANTED;
         if (cansee(mon.mx, mon.my)) {
@@ -555,7 +555,7 @@ export async function possibly_unwield(mon, polyspot) {   // weapon.c:747
         return;
     }
     if (!(mwelded(mw_tmp) && mon.weapon_check === NO_WEAPON_WANTED)) {
-        mon.weapon_check = NEED_WEAPON;
+        mon.weapon_check = NEED.WEAPON;
     }
     return;
 }
@@ -566,33 +566,33 @@ export async function mon_wield_item(mon) {   // weapon.c:801
         return 0;
     }
     switch (mon.weapon_check) {
-        case NEED_HTH_WEAPON:
+        case NEED.HTH_WEAPON:
             obj = await select_hwep(mon);
             break;
-        case NEED_RANGED_WEAPON:
+        case NEED.RANGED_WEAPON:
             await select_rwep(mon);
             obj = gp.propellor;
             break;
-        case NEED_PICK_AXE:
+        case NEED.PICK_AXE:
             obj = m_carrying(mon, PICK_AXE);
-            if (!obj && !await which_armor(mon, W_ARMS)) {
+            if (!obj && !await which_armor(mon, W.ARMS)) {
                 obj = m_carrying(mon, DWARVISH_MATTOCK);
             }
             exclaim = FALSE;
             break;
-        case NEED_AXE:
+        case NEED.AXE:
             obj = m_carrying(mon, BATTLE_AXE);
-            if (!obj || await which_armor(mon, W_ARMS)) {
+            if (!obj || await which_armor(mon, W.ARMS)) {
                 obj = m_carrying(mon, AXE);
             }
             exclaim = FALSE;
             break;
-        case NEED_PICK_OR_AXE:
+        case NEED.PICK_OR_AXE:
             obj = m_carrying(mon, DWARVISH_MATTOCK);
             if (!obj) {
                 obj = m_carrying(mon, BATTLE_AXE);
             }
-            if (!obj || await which_armor(mon, W_ARMS)) {
+            if (!obj || await which_armor(mon, W.ARMS)) {
                 obj = m_carrying(mon, PICK_AXE);
                 if (!obj) {
                     obj = m_carrying(mon, AXE);
@@ -607,7 +607,7 @@ export async function mon_wield_item(mon) {   // weapon.c:801
     if (obj && !$c.peq(obj, hands_obj)) {
         mw_tmp = mon.mw;
         if (mw_tmp && mw_tmp.otyp === obj.otyp) {
-            mon.weapon_check = NEED_WEAPON;
+            mon.weapon_check = NEED.WEAPON;
             return 0;
         }
         if (mw_tmp && mwelded(mw_tmp)) {
@@ -616,7 +616,7 @@ export async function mon_wield_item(mon) {   // weapon.c:801
                 if (bimanual(mw_tmp)) {
                     mon_hand = await makeplural(mon_hand);
                 }
-                $c.__builtin___sprintf_chk(new $c.Ptr(welded_buf, 0), 0, 256, $c.lit("%s welded to %s %s"), await otense(mw_tmp, $c.lit("are")), genders[pronoun_gender(mon, PRONOUN_HALLU)].his, mon_hand);
+                $c.__builtin___sprintf_chk(new $c.Ptr(welded_buf, 0), 0, 256, $c.lit("%s welded to %s %s"), await otense(mw_tmp, $c.lit("are")), genders[pronoun_gender(mon, PRONOUN.HALLU)].his, mon_hand);
                 if (obj.otyp === PICK_AXE) {
                     await pline($c.lit("Since %s weapon%s %s,"), s_suffix(await mon_nam(mon)), plur(mw_tmp.quan), new $c.Ptr(welded_buf, 0));
                     await pline($c.lit("%s cannot wield that %s."), await mon_nam(mon), await xname(obj));
@@ -631,15 +631,15 @@ export async function mon_wield_item(mon) {   // weapon.c:801
         }
         mon.mw = obj;
         await setmnotwielded(mon, mw_tmp);
-        mon.weapon_check = NEED_WEAPON;
+        mon.weapon_check = NEED.WEAPON;
         if (canseemon(mon)) {
             await pline_mon(mon, $c.lit("%s wields %s%c"), await Monnam(mon), await doname(obj), exclaim ? 33 : 46);
             if ((arw = autoreturn_weapon(obj)) !== null && (arw.tethered | 0) !== 0) {
                 await pline_mon(mon, $c.lit("%s secures the tether on %s."), await Monnam(mon), await the(await xname(obj)));
             }
-            obj.owornmask = $c.or64(obj.owornmask, W_WEP);
+            obj.owornmask = $c.or64(obj.owornmask, W.WEP);
             newly_welded = mwelded(obj);
-            obj.owornmask = $c.and64(obj.owornmask, ~W_WEP);
+            obj.owornmask = $c.and64(obj.owornmask, ~W.WEP);
             if (newly_welded) {
                 mon_hand$2 = await mbodypart(mon, HAND);
                 if (bimanual(obj)) {
@@ -657,10 +657,10 @@ export async function mon_wield_item(mon) {   // weapon.c:801
                 await pline($c.lit("Light begins shining %s."), dist2(mon.mx, mon.my, u.ux, u.uy) <= 25 ? $c.lit("nearby") : $c.lit("in the distance"));
             }
         }
-        obj.owornmask = W_WEP;
+        obj.owornmask = W.WEP;
         return 1;
     }
-    mon.weapon_check = NEED_WEAPON;
+    mon.weapon_check = NEED.WEAPON;
     return 0;
 }
 export async function mwepgone(mon) {   // weapon.c:938
@@ -668,13 +668,13 @@ export async function mwepgone(mon) {   // weapon.c:938
     mwep = mon.mw;
     if (mwep) {
         await setmnotwielded(mon, mwep);
-        mon.weapon_check = NEED_WEAPON;
+        mon.weapon_check = NEED.WEAPON;
     }
 }
 export async function abon() {   // weapon.c:950
     let sbon = 0, str = 0, dex = 0;
-    str = ACURR(A_STR);
-    dex = ACURR(A_DEX);
+    str = ACURR(A.STR);
+    dex = ACURR(A.DEX);
     if (Upolyd()) {
         return await adj_lev($c.relem(mons, u.umonnum)) - 3 | 0;
     }
@@ -706,7 +706,7 @@ export async function abon() {   // weapon.c:950
 }
 export function dbon() {   // weapon.c:993
     let str = 0;
-    str = ACURR(A_STR);
+    str = ACURR(A.STR);
     if (Upolyd()) {
         return 0;
     }
@@ -774,22 +774,22 @@ export async function dry_a_towel(obj, amt, verbose) {   // weapon.c:1067
 export function skill_level_name(skill, buf) {   // weapon.c:1092
     let ptr = null;
     switch (u.weapon_skills[skill].skill) {
-        case P_UNSKILLED:
+        case P.UNSKILLED:
             ptr = $c.lit("Unskilled");
             break;
-        case P_BASIC:
+        case P.BASIC:
             ptr = $c.lit("Basic");
             break;
-        case P_SKILLED:
+        case P.SKILLED:
             ptr = $c.lit("Skilled");
             break;
-        case P_EXPERT:
+        case P.EXPERT:
             ptr = $c.lit("Expert");
             break;
-        case P_MASTER:
+        case P.MASTER:
             ptr = $c.lit("Master");
             break;
-        case P_GRAND_MASTER:
+        case P.GRAND_MASTER:
             ptr = $c.lit("Grand Master");
             break;
         default:
@@ -800,12 +800,12 @@ export function skill_level_name(skill, buf) {   // weapon.c:1092
     return buf;
 }
 export function skill_name(skill) {   // weapon.c:1125
-    return skill_names_indices[skill] > 0 ? obj_descr[objects[skill_names_indices[skill]].oc_name_idx].oc_name : skill === P_BARE_HANDED_COMBAT ? barehands_or_martial[gu.urole.mnum === PM_SAMURAI || gu.urole.mnum === PM_MONK ? 1 : 0] : odd_skill_names[-skill_names_indices[skill] | 0];
+    return skill_names_indices[skill] > 0 ? obj_descr[objects[skill_names_indices[skill]].oc_name_idx].oc_name : skill === P.BARE_HANDED_COMBAT ? barehands_or_martial[gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK ? 1 : 0] : odd_skill_names[-skill_names_indices[skill] | 0];
 }
 function slots_required(skill) {   // weapon.c:1132
     let tmp = 0;
     tmp = u.weapon_skills[skill].skill;
-    if (skill <= P_LAST_WEAPON || skill === P_TWO_WEAPON_COMBAT) {
+    if (skill <= P_LAST_WEAPON || skill === P.TWO_WEAPON_COMBAT) {
         return tmp;
     }
     return $c.div32(tmp + 1 | 0, 2);
@@ -836,7 +836,7 @@ async function skill_advance(skill) {   // weapon.c:1198
     $t1 = slots_required(skill), u.weapon_slots = u.weapon_slots - $t1 | 0;
     u.weapon_skills[skill].skill = $c.i16(u.weapon_skills[skill].skill + 1);
     u.skill_record[($t2 = u.skills_advanced, u.skills_advanced = $t2 + 1 | 0, $t2)] = $c.i16(skill);
-    await You($c.lit("are now %s skilled in %s."), u.weapon_skills[skill].skill >= u.weapon_skills[skill].max_skill ? $c.lit("most") : $c.lit("more"), skill_names_indices[skill] > 0 ? obj_descr[objects[skill_names_indices[skill]].oc_name_idx].oc_name : skill === P_BARE_HANDED_COMBAT ? barehands_or_martial[gu.urole.mnum === PM_SAMURAI || gu.urole.mnum === PM_MONK ? 1 : 0] : odd_skill_names[-skill_names_indices[skill] | 0]);
+    await You($c.lit("are now %s skilled in %s."), u.weapon_skills[skill].skill >= u.weapon_skills[skill].max_skill ? $c.lit("most") : $c.lit("more"), skill_names_indices[skill] > 0 ? obj_descr[objects[skill_names_indices[skill]].oc_name_idx].oc_name : skill === P.BARE_HANDED_COMBAT ? barehands_or_martial[gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK ? 1 : 0] : odd_skill_names[-skill_names_indices[skill] | 0]);
     if (skill >= P_FIRST_SPELL && skill <= P_LAST_SPELL) {
         await skill_based_spellbook_id();
     }
@@ -844,11 +844,11 @@ async function skill_advance(skill) {   // weapon.c:1198
 export async function add_skills_to_menu(win, selectable, speedy) {   // weapon.c:1229
     let pass = 0, i = 0, len = 0, longest = 0, any = new $T.any(), buf = new Int8Array(256), sklnambuf = new Int8Array(256), prefix = null, clr = 0, $t1;
     clr = NO_COLOR;
-    for (longest = 0, i = 0; i < P_NUM_SKILLS; i = i + 1 | 0) {
+    for (longest = 0, i = 0; i < P.NUM_SKILLS; i = i + 1 | 0) {
         if (P_RESTRICTED(i)) {
             continue;
         }
-        if ((len = await Strlen_(skill_names_indices[i] > 0 ? obj_descr[objects[skill_names_indices[i]].oc_name_idx].oc_name : i === P_BARE_HANDED_COMBAT ? barehands_or_martial[gu.urole.mnum === PM_SAMURAI || gu.urole.mnum === PM_MONK ? 1 : 0] : odd_skill_names[-skill_names_indices[i] | 0], $c.lit("add_skills_to_menu"), 1241) | 0) > longest) {
+        if ((len = await Strlen_(skill_names_indices[i] > 0 ? obj_descr[objects[skill_names_indices[i]].oc_name_idx].oc_name : i === P.BARE_HANDED_COMBAT ? barehands_or_martial[gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK ? 1 : 0] : odd_skill_names[-skill_names_indices[i] | 0], $c.lit("add_skills_to_menu"), 1241) | 0) > longest) {
             longest = len;
         }
     }
@@ -875,42 +875,42 @@ export async function add_skills_to_menu(win, selectable, speedy) {   // weapon.
             skill_level_name(i, new $c.Ptr(sklnambuf, 0));
             if (wizard()) {
                 if (!iflags.menu_tab_sep) {
-                    nh_snprintf($c.lit("add_skills_to_menu"), 1282, new $c.Ptr(buf, 0), 256, $c.lit(" %s%-*s %-12s %5d(%4d)"), prefix, longest, skill_names_indices[i] > 0 ? obj_descr[objects[skill_names_indices[i]].oc_name_idx].oc_name : i === P_BARE_HANDED_COMBAT ? barehands_or_martial[gu.urole.mnum === PM_SAMURAI || gu.urole.mnum === PM_MONK ? 1 : 0] : odd_skill_names[-skill_names_indices[i] | 0], new $c.Ptr(sklnambuf, 0), u.weapon_skills[i].advance, Math.imul(Math.imul(u.weapon_skills[i].skill, u.weapon_skills[i].skill), 20));
+                    nh_snprintf($c.lit("add_skills_to_menu"), 1282, new $c.Ptr(buf, 0), 256, $c.lit(" %s%-*s %-12s %5d(%4d)"), prefix, longest, skill_names_indices[i] > 0 ? obj_descr[objects[skill_names_indices[i]].oc_name_idx].oc_name : i === P.BARE_HANDED_COMBAT ? barehands_or_martial[gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK ? 1 : 0] : odd_skill_names[-skill_names_indices[i] | 0], new $c.Ptr(sklnambuf, 0), u.weapon_skills[i].advance, Math.imul(Math.imul(u.weapon_skills[i].skill, u.weapon_skills[i].skill), 20));
                 } else {
-                    nh_snprintf($c.lit("add_skills_to_menu"), 1287, new $c.Ptr(buf, 0), 256, $c.lit(" %s%s\t%s\t%5d(%4d)"), prefix, skill_names_indices[i] > 0 ? obj_descr[objects[skill_names_indices[i]].oc_name_idx].oc_name : i === P_BARE_HANDED_COMBAT ? barehands_or_martial[gu.urole.mnum === PM_SAMURAI || gu.urole.mnum === PM_MONK ? 1 : 0] : odd_skill_names[-skill_names_indices[i] | 0], new $c.Ptr(sklnambuf, 0), u.weapon_skills[i].advance, Math.imul(Math.imul(u.weapon_skills[i].skill, u.weapon_skills[i].skill), 20));
+                    nh_snprintf($c.lit("add_skills_to_menu"), 1287, new $c.Ptr(buf, 0), 256, $c.lit(" %s%s\t%s\t%5d(%4d)"), prefix, skill_names_indices[i] > 0 ? obj_descr[objects[skill_names_indices[i]].oc_name_idx].oc_name : i === P.BARE_HANDED_COMBAT ? barehands_or_martial[gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK ? 1 : 0] : odd_skill_names[-skill_names_indices[i] | 0], new $c.Ptr(sklnambuf, 0), u.weapon_skills[i].advance, Math.imul(Math.imul(u.weapon_skills[i].skill, u.weapon_skills[i].skill), 20));
                 }
             } else {
                 if (!iflags.menu_tab_sep) {
-                    nh_snprintf($c.lit("add_skills_to_menu"), 1292, new $c.Ptr(buf, 0), 256, $c.lit(" %s %-*s [%s]"), prefix, longest, skill_names_indices[i] > 0 ? obj_descr[objects[skill_names_indices[i]].oc_name_idx].oc_name : i === P_BARE_HANDED_COMBAT ? barehands_or_martial[gu.urole.mnum === PM_SAMURAI || gu.urole.mnum === PM_MONK ? 1 : 0] : odd_skill_names[-skill_names_indices[i] | 0], new $c.Ptr(sklnambuf, 0));
+                    nh_snprintf($c.lit("add_skills_to_menu"), 1292, new $c.Ptr(buf, 0), 256, $c.lit(" %s %-*s [%s]"), prefix, longest, skill_names_indices[i] > 0 ? obj_descr[objects[skill_names_indices[i]].oc_name_idx].oc_name : i === P.BARE_HANDED_COMBAT ? barehands_or_martial[gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK ? 1 : 0] : odd_skill_names[-skill_names_indices[i] | 0], new $c.Ptr(sklnambuf, 0));
                 } else {
-                    nh_snprintf($c.lit("add_skills_to_menu"), 1296, new $c.Ptr(buf, 0), 256, $c.lit(" %s%s\t[%s]"), prefix, skill_names_indices[i] > 0 ? obj_descr[objects[skill_names_indices[i]].oc_name_idx].oc_name : i === P_BARE_HANDED_COMBAT ? barehands_or_martial[gu.urole.mnum === PM_SAMURAI || gu.urole.mnum === PM_MONK ? 1 : 0] : odd_skill_names[-skill_names_indices[i] | 0], new $c.Ptr(sklnambuf, 0));
+                    nh_snprintf($c.lit("add_skills_to_menu"), 1296, new $c.Ptr(buf, 0), 256, $c.lit(" %s%s\t[%s]"), prefix, skill_names_indices[i] > 0 ? obj_descr[objects[skill_names_indices[i]].oc_name_idx].oc_name : i === P.BARE_HANDED_COMBAT ? barehands_or_martial[gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK ? 1 : 0] : odd_skill_names[-skill_names_indices[i] | 0], new $c.Ptr(sklnambuf, 0));
                 }
             }
             $t1 = selectable && can_advance(i, speedy) ? i + 1 | 0 : 0, any.a_int = $t1;
-            await add_menu(win, nul_glyphinfo, any, 0, 0, ATR_NONE, clr, new $c.Ptr(buf, 0), MENU_ITEMFLAGS_NONE);
+            await add_menu(win, nul_glyphinfo, any, 0, 0, ATR.NONE, clr, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
         }
     }
 }
 export async function show_skills() {   // weapon.c:1306
     let win = 0, selected = [null];
     await pline($c.lit("Skills:"));
-    win = await create_nhwindow()(NHW_MENU);
-    await start_menu()(win, MENU_BEHAVE_STANDARD);
+    win = await create_nhwindow()(NHW.MENU);
+    await start_menu()(win, MENU.BEHAVE_STANDARD);
     await add_skills_to_menu(win, FALSE, FALSE);
     await end_menu()(win, $c.lit(""));
-    await select_menu(win, PICK_NONE, new $c.Ptr(selected, 0));
+    await select_menu(win, PICK.NONE, new $c.Ptr(selected, 0));
     await destroy_nhwindow()(win);
 }
 export async function enhance_weapon_skill() {   // weapon.c:1329
     let i = 0, n = 0, to_advance = 0, eventually_advance = 0, maxxed_cnt = 0, buf = new Int8Array(256), selected = [null], win = 0, speedy = 0;
     speedy = FALSE;
-    svc.context.tips = $c.oru64(svc.context.tips, 1 << TIP_ENHANCE);
+    svc.context.tips = $c.oru64(svc.context.tips, 1 << TIP.ENHANCE);
     if (wizard() && await yn_function($c.lit("Advance skills without practice?"), new $c.Ptr(ynchars, 0), 110, TRUE) === 121) {
         speedy = TRUE;
     }
     do {
         to_advance = eventually_advance = maxxed_cnt = 0;
-        for (i = 0; i < P_NUM_SKILLS; i = i + 1 | 0) {
+        for (i = 0; i < P.NUM_SKILLS; i = i + 1 | 0) {
             if (P_RESTRICTED(i)) {
                 continue;
             }
@@ -922,8 +922,8 @@ export async function enhance_weapon_skill() {   // weapon.c:1329
                 maxxed_cnt = maxxed_cnt + 1 | 0;
             }
         }
-        win = await create_nhwindow()(NHW_MENU);
-        await start_menu()(win, MENU_BEHAVE_STANDARD);
+        win = await create_nhwindow()(NHW.MENU);
+        await start_menu()(win, MENU.BEHAVE_STANDARD);
         if (eventually_advance > 0 || maxxed_cnt > 0) {
             if (eventually_advance > 0) {
                 $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("(Skill%s flagged by \"*\" may be enhanced %s.)"), eventually_advance === 1 ? $c.lit("") : $c.lit("s"), u.ulevel < MAXULEV ? $c.lit("when you're more experienced") : $c.lit("if skill slots become available"));
@@ -941,13 +941,13 @@ export async function enhance_weapon_skill() {   // weapon.c:1329
             $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit("  (%d slot%s available)"), u.weapon_slots, u.weapon_slots === 1 ? $c.lit("") : $c.lit("s"));
         }
         await end_menu()(win, new $c.Ptr(buf, 0));
-        n = await select_menu(win, to_advance ? PICK_ONE : PICK_NONE, new $c.Ptr(selected, 0));
+        n = await select_menu(win, to_advance ? PICK.ONE : PICK.NONE, new $c.Ptr(selected, 0));
         await destroy_nhwindow()(win);
         if (n > 0) {
             n = $c.radd(selected[0], 0).item.a_int - 1 | 0;
             $c.free(selected[0]);
             await skill_advance(n);
-            for (n = i = 0; i < P_NUM_SKILLS; i = i + 1 | 0) {
+            for (n = i = 0; i < P.NUM_SKILLS; i = i + 1 | 0) {
                 if (can_advance(i, speedy)) {
                     if (!speedy) {
                         await You_feel($c.lit("you could be more dangerous!"));
@@ -958,18 +958,18 @@ export async function enhance_weapon_skill() {   // weapon.c:1329
             }
         }
     } while (speedy && n > 0);
-    return ECMD_OK;
+    return ECMD.OK;
 }
 export function unrestrict_weapon_skill(skill) {   // weapon.c:1414
-    if (skill < P_NUM_SKILLS && P_RESTRICTED(skill)) {
-        u.weapon_skills[skill].skill = P_UNSKILLED;
-        u.weapon_skills[skill].max_skill = P_BASIC;
+    if (skill < P.NUM_SKILLS && P_RESTRICTED(skill)) {
+        u.weapon_skills[skill].skill = P.UNSKILLED;
+        u.weapon_skills[skill].max_skill = P.BASIC;
         u.weapon_skills[skill].advance = 0;
     }
 }
 export async function use_skill(skill, degree) {   // weapon.c:1424
     let advance_before = 0;
-    if (skill !== P_NONE && !P_RESTRICTED(skill)) {
+    if (skill !== P.NONE && !P_RESTRICTED(skill)) {
         advance_before = can_advance(skill, FALSE);
         u.weapon_skills[skill].advance = $c.u16(u.weapon_skills[skill].advance + degree | 0);
         if (!advance_before && can_advance(skill, FALSE)) {
@@ -979,19 +979,19 @@ export async function use_skill(skill, degree) {   // weapon.c:1424
 }
 export async function add_weapon_skill(n) {   // weapon.c:1437
     let i = 0, before = 0, after = 0;
-    for (i = 0, before = 0; i < P_NUM_SKILLS; i = i + 1 | 0) {
+    for (i = 0, before = 0; i < P.NUM_SKILLS; i = i + 1 | 0) {
         if (can_advance(i, FALSE)) {
             before = before + 1 | 0;
         }
     }
     u.weapon_slots = u.weapon_slots + n | 0;
-    for (i = 0, after = 0; i < P_NUM_SKILLS; i = i + 1 | 0) {
+    for (i = 0, after = 0; i < P.NUM_SKILLS; i = i + 1 | 0) {
         if (can_advance(i, FALSE)) {
             after = after + 1 | 0;
         }
     }
     if (before < after) {
-        await give_may_advance_msg(P_NONE);
+        await give_may_advance_msg(P.NONE);
     }
 }
 export async function lose_weapon_skill(n) {   // weapon.c:1453
@@ -1001,7 +1001,7 @@ export async function lose_weapon_skill(n) {   // weapon.c:1453
             u.weapon_slots = u.weapon_slots - 1 | 0;
         } else if (u.skills_advanced) {
             skill = u.skill_record[u.skills_advanced = u.skills_advanced - 1 | 0];
-            if (u.weapon_skills[skill].skill <= P_UNSKILLED) {
+            if (u.weapon_skills[skill].skill <= P.UNSKILLED) {
                 await panic($c.lit("lose_weapon_skill (%d)"), skill);
             }
             u.weapon_skills[skill].skill = $c.i16(u.weapon_skills[skill].skill - 1);
@@ -1021,7 +1021,7 @@ export async function drain_weapon_skill(n) {   // weapon.c:1476
                 u.skill_record[i] = u.skill_record[i + 1 | 0];
             }
             u.skills_advanced = u.skills_advanced - 1 | 0;
-            if (u.weapon_skills[skill].skill <= P_UNSKILLED) {
+            if (u.weapon_skills[skill].skill <= P.UNSKILLED) {
                 await panic($c.lit("drain_weapon_skill (%d)"), skill);
             }
             u.weapon_skills[skill].skill = $c.i16(u.weapon_skills[skill].skill - 1);
@@ -1033,26 +1033,26 @@ export async function drain_weapon_skill(n) {   // weapon.c:1476
             }
         }
     }
-    for (skill = 0; skill < P_NUM_SKILLS; skill = skill + 1 | 0) {
+    for (skill = 0; skill < P.NUM_SKILLS; skill = skill + 1 | 0) {
         if (tmpskills[skill]) {
-            await You($c.lit("forget %syour training in %s."), u.weapon_skills[skill].skill >= P_BASIC ? $c.lit("some of ") : $c.lit(""), skill_names_indices[skill] > 0 ? obj_descr[objects[skill_names_indices[skill]].oc_name_idx].oc_name : skill === P_BARE_HANDED_COMBAT ? barehands_or_martial[gu.urole.mnum === PM_SAMURAI || gu.urole.mnum === PM_MONK ? 1 : 0] : odd_skill_names[-skill_names_indices[skill] | 0]);
+            await You($c.lit("forget %syour training in %s."), u.weapon_skills[skill].skill >= P.BASIC ? $c.lit("some of ") : $c.lit(""), skill_names_indices[skill] > 0 ? obj_descr[objects[skill_names_indices[skill]].oc_name_idx].oc_name : skill === P.BARE_HANDED_COMBAT ? barehands_or_martial[gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK ? 1 : 0] : odd_skill_names[-skill_names_indices[skill] | 0]);
         }
     }
 }
 export function weapon_type(obj) {   // weapon.c:1517
     let type = 0;
     if (!obj) {
-        return P_BARE_HANDED_COMBAT;
+        return P.BARE_HANDED_COMBAT;
     }
     if (obj.oclass !== WEAPON_CLASS && obj.oclass !== TOOL_CLASS && obj.oclass !== GEM_CLASS) {
-        return P_NONE;
+        return P.NONE;
     }
     type = objects[obj.otyp].oc_subtyp;
     return type < 0 ? -type | 0 : type;
 }
 export function uwep_skill_type() {   // weapon.c:1532
     if (u.twoweap) {
-        return P_TWO_WEAPON_COMBAT;
+        return P.TWO_WEAPON_COMBAT;
     }
     return weapon_type($G.uwep);
 }
@@ -1060,66 +1060,66 @@ export async function weapon_hit_bonus(weapon) {   // weapon.c:1545
     let type = 0, wep_type = 0, skill = 0, bonus = 0;
     bonus = 0;
     wep_type = weapon_type(weapon);
-    type = u.twoweap && ($c.peq(weapon, $G.uwep) || $c.peq(weapon, $G.uswapwep)) ? P_TWO_WEAPON_COMBAT : wep_type;
-    if (type === P_NONE) {
+    type = u.twoweap && ($c.peq(weapon, $G.uwep) || $c.peq(weapon, $G.uswapwep)) ? P.TWO_WEAPON_COMBAT : wep_type;
+    if (type === P.NONE) {
         bonus = 0;
     } else if (type <= P_LAST_WEAPON) {
         switch (u.weapon_skills[type].skill) {
             default:
                 await impossible(new $c.Ptr(weapon_hit_bonus$bad_skill, 0), u.weapon_skills[type].skill);
-            case P_ISRESTRICTED:
-            case P_UNSKILLED:
+            case P.ISRESTRICTED:
+            case P.UNSKILLED:
                 bonus = -4;
                 break;
-            case P_BASIC:
+            case P.BASIC:
                 bonus = 0;
                 break;
-            case P_SKILLED:
+            case P.SKILLED:
                 bonus = 2;
                 break;
-            case P_EXPERT:
+            case P.EXPERT:
                 bonus = 3;
                 break;
         }
-    } else if (type === P_TWO_WEAPON_COMBAT) {
-        skill = u.weapon_skills[P_TWO_WEAPON_COMBAT].skill;
+    } else if (type === P.TWO_WEAPON_COMBAT) {
+        skill = u.weapon_skills[P.TWO_WEAPON_COMBAT].skill;
         if (u.weapon_skills[wep_type].skill < skill) {
             skill = u.weapon_skills[wep_type].skill;
         }
         switch (skill) {
             default:
                 await impossible(new $c.Ptr(weapon_hit_bonus$bad_skill, 0), skill);
-            case P_ISRESTRICTED:
-            case P_UNSKILLED:
+            case P.ISRESTRICTED:
+            case P.UNSKILLED:
                 bonus = -9;
                 break;
-            case P_BASIC:
+            case P.BASIC:
                 bonus = -7;
                 break;
-            case P_SKILLED:
+            case P.SKILLED:
                 bonus = -5;
                 break;
-            case P_EXPERT:
+            case P.EXPERT:
                 bonus = -3;
                 break;
         }
-    } else if (type === P_BARE_HANDED_COMBAT) {
+    } else if (type === P.BARE_HANDED_COMBAT) {
         bonus = u.weapon_skills[type].skill;
-        bonus = (bonus > P_UNSKILLED ? bonus : P_UNSKILLED) - 1 | 0;
-        bonus = $c.div32(Math.imul(bonus + 2 | 0, gu.urole.mnum === PM_SAMURAI || gu.urole.mnum === PM_MONK ? 2 : 1), 2);
+        bonus = (bonus > P.UNSKILLED ? bonus : P.UNSKILLED) - 1 | 0;
+        bonus = $c.div32(Math.imul(bonus + 2 | 0, gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK ? 2 : 1), 2);
     }
     if (u.usteed) {
-        switch (u.weapon_skills[P_RIDING].skill) {
-            case P_ISRESTRICTED:
-            case P_UNSKILLED:
+        switch (u.weapon_skills[P.RIDING].skill) {
+            case P.ISRESTRICTED:
+            case P.UNSKILLED:
                 bonus = bonus - 2 | 0;
                 break;
-            case P_BASIC:
+            case P.BASIC:
                 bonus = bonus - 1 | 0;
                 break;
-            case P_SKILLED:
+            case P.SKILLED:
                 break;
-            case P_EXPERT:
+            case P.EXPERT:
                 break;
         }
         if (u.twoweap) {
@@ -1132,64 +1132,64 @@ export async function weapon_dam_bonus(weapon) {   // weapon.c:1644
     let type = 0, wep_type = 0, skill = 0, bonus = 0;
     bonus = 0;
     wep_type = weapon_type(weapon);
-    type = u.twoweap && ($c.peq(weapon, $G.uwep) || $c.peq(weapon, $G.uswapwep)) ? P_TWO_WEAPON_COMBAT : wep_type;
-    if (type === P_NONE) {
+    type = u.twoweap && ($c.peq(weapon, $G.uwep) || $c.peq(weapon, $G.uswapwep)) ? P.TWO_WEAPON_COMBAT : wep_type;
+    if (type === P.NONE) {
         bonus = 0;
     } else if (type <= P_LAST_WEAPON) {
         switch (u.weapon_skills[type].skill) {
             default:
                 await impossible($c.lit("weapon_dam_bonus: bad skill %d"), u.weapon_skills[type].skill);
-            case P_ISRESTRICTED:
-            case P_UNSKILLED:
+            case P.ISRESTRICTED:
+            case P.UNSKILLED:
                 bonus = -2;
                 break;
-            case P_BASIC:
+            case P.BASIC:
                 bonus = 0;
                 break;
-            case P_SKILLED:
+            case P.SKILLED:
                 bonus = 1;
                 break;
-            case P_EXPERT:
+            case P.EXPERT:
                 bonus = 2;
                 break;
         }
-    } else if (type === P_TWO_WEAPON_COMBAT) {
-        skill = u.weapon_skills[P_TWO_WEAPON_COMBAT].skill;
+    } else if (type === P.TWO_WEAPON_COMBAT) {
+        skill = u.weapon_skills[P.TWO_WEAPON_COMBAT].skill;
         if (u.weapon_skills[wep_type].skill < skill) {
             skill = u.weapon_skills[wep_type].skill;
         }
         switch (skill) {
             default:
-            case P_ISRESTRICTED:
-            case P_UNSKILLED:
+            case P.ISRESTRICTED:
+            case P.UNSKILLED:
                 bonus = -3;
                 break;
-            case P_BASIC:
+            case P.BASIC:
                 bonus = -1;
                 break;
-            case P_SKILLED:
+            case P.SKILLED:
                 bonus = 0;
                 break;
-            case P_EXPERT:
+            case P.EXPERT:
                 bonus = 1;
                 break;
         }
-    } else if (type === P_BARE_HANDED_COMBAT) {
+    } else if (type === P.BARE_HANDED_COMBAT) {
         bonus = u.weapon_skills[type].skill;
-        bonus = (bonus > P_UNSKILLED ? bonus : P_UNSKILLED) - 1 | 0;
-        bonus = $c.div32(Math.imul(bonus + 1 | 0, gu.urole.mnum === PM_SAMURAI || gu.urole.mnum === PM_MONK ? 3 : 1), 2);
+        bonus = (bonus > P.UNSKILLED ? bonus : P.UNSKILLED) - 1 | 0;
+        bonus = $c.div32(Math.imul(bonus + 1 | 0, gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK ? 3 : 1), 2);
     }
-    if (u.usteed && type !== P_TWO_WEAPON_COMBAT) {
-        switch (u.weapon_skills[P_RIDING].skill) {
-            case P_ISRESTRICTED:
-            case P_UNSKILLED:
+    if (u.usteed && type !== P.TWO_WEAPON_COMBAT) {
+        switch (u.weapon_skills[P.RIDING].skill) {
+            case P.ISRESTRICTED:
+            case P.UNSKILLED:
                 break;
-            case P_BASIC:
+            case P.BASIC:
                 break;
-            case P_SKILLED:
+            case P.SKILLED:
                 bonus = bonus + 1 | 0;
                 break;
-            case P_EXPERT:
+            case P.EXPERT:
                 bonus = bonus + 2 | 0;
                 break;
         }
@@ -1198,9 +1198,9 @@ export async function weapon_dam_bonus(weapon) {   // weapon.c:1644
 }
 export async function skill_init(class_skill) {   // weapon.c:1738
     let obj = null, skmax = 0, skill = 0;
-    for (skill = 0; skill < P_NUM_SKILLS; skill = skill + 1 | 0) {
-        u.weapon_skills[skill].skill = P_ISRESTRICTED;
-        u.weapon_skills[skill].max_skill = P_ISRESTRICTED;
+    for (skill = 0; skill < P.NUM_SKILLS; skill = skill + 1 | 0) {
+        u.weapon_skills[skill].skill = P.ISRESTRICTED;
+        u.weapon_skills[skill].max_skill = P.ISRESTRICTED;
         u.weapon_skills[skill].advance = 0;
     }
     for (obj = gi.invent; obj; obj = obj.nobj) {
@@ -1208,36 +1208,36 @@ export async function skill_init(class_skill) {   // weapon.c:1738
             continue;
         }
         skill = weapon_type(obj);
-        if (skill !== P_NONE) {
-            u.weapon_skills[skill].skill = P_BASIC;
+        if (skill !== P.NONE) {
+            u.weapon_skills[skill].skill = P.BASIC;
         }
     }
-    if (gu.urole.mnum === PM_HEALER || gu.urole.mnum === PM_MONK) {
-        u.weapon_skills[P_HEALING_SPELL].skill = P_BASIC;
-    } else if (gu.urole.mnum === PM_CLERIC) {
-        u.weapon_skills[P_CLERIC_SPELL].skill = P_BASIC;
-    } else if (gu.urole.mnum === PM_WIZARD) {
-        u.weapon_skills[P_ATTACK_SPELL].skill = P_BASIC;
-        u.weapon_skills[P_ENCHANTMENT_SPELL].skill = P_BASIC;
+    if (gu.urole.mnum === PM.HEALER || gu.urole.mnum === PM.MONK) {
+        u.weapon_skills[P.HEALING_SPELL].skill = P.BASIC;
+    } else if (gu.urole.mnum === PM.CLERIC) {
+        u.weapon_skills[P.CLERIC_SPELL].skill = P.BASIC;
+    } else if (gu.urole.mnum === PM.WIZARD) {
+        u.weapon_skills[P.ATTACK_SPELL].skill = P.BASIC;
+        u.weapon_skills[P.ENCHANTMENT_SPELL].skill = P.BASIC;
     }
-    for (; class_skill.skill !== P_NONE; class_skill = $c.radd(class_skill, 1)) {
+    for (; class_skill.skill !== P.NONE; class_skill = $c.radd(class_skill, 1)) {
         skmax = class_skill.skmax;
         skill = class_skill.skill;
         u.weapon_skills[skill].max_skill = $c.i16(skmax);
-        if (u.weapon_skills[skill].skill === P_ISRESTRICTED) {
-            u.weapon_skills[skill].skill = P_UNSKILLED;
+        if (u.weapon_skills[skill].skill === P.ISRESTRICTED) {
+            u.weapon_skills[skill].skill = P.UNSKILLED;
         }
     }
-    if (u.weapon_skills[P_BARE_HANDED_COMBAT].max_skill > P_EXPERT) {
-        u.weapon_skills[P_BARE_HANDED_COMBAT].skill = P_BASIC;
+    if (u.weapon_skills[P.BARE_HANDED_COMBAT].max_skill > P.EXPERT) {
+        u.weapon_skills[P.BARE_HANDED_COMBAT].skill = P.BASIC;
     }
-    if (gu.urole.petnum === PM_PONY) {
-        u.weapon_skills[P_RIDING].skill = P_BASIC;
+    if (gu.urole.petnum === PM.PONY) {
+        u.weapon_skills[P.RIDING].skill = P.BASIC;
     }
-    for (skill = 0; skill < P_NUM_SKILLS; skill = skill + 1 | 0) {
+    for (skill = 0; skill < P.NUM_SKILLS; skill = skill + 1 | 0) {
         if (!P_RESTRICTED(skill)) {
             if (u.weapon_skills[skill].max_skill < u.weapon_skills[skill].skill) {
-                await impossible($c.lit("skill_init: curr > max: %s"), skill_names_indices[skill] > 0 ? obj_descr[objects[skill_names_indices[skill]].oc_name_idx].oc_name : skill === P_BARE_HANDED_COMBAT ? barehands_or_martial[gu.urole.mnum === PM_SAMURAI || gu.urole.mnum === PM_MONK ? 1 : 0] : odd_skill_names[-skill_names_indices[skill] | 0]);
+                await impossible($c.lit("skill_init: curr > max: %s"), skill_names_indices[skill] > 0 ? obj_descr[objects[skill_names_indices[skill]].oc_name_idx].oc_name : skill === P.BARE_HANDED_COMBAT ? barehands_or_martial[gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK ? 1 : 0] : odd_skill_names[-skill_names_indices[skill] | 0]);
                 u.weapon_skills[skill].max_skill = u.weapon_skills[skill].skill;
             }
             u.weapon_skills[skill].advance = $c.u16(Math.imul(Math.imul(u.weapon_skills[skill].skill - 1 | 0, u.weapon_skills[skill].skill - 1 | 0), 20));
@@ -1261,7 +1261,7 @@ export async function setmnotwielded(mon, obj) {   // weapon.c:1814
     if ($c.peq(mon.mw, obj)) {
         MON_NOWEP(mon);
     }
-    obj.owornmask = $c.and64(obj.owornmask, ~W_WEP);
+    obj.owornmask = $c.and64(obj.owornmask, ~W.WEP);
 }
 
 export function $init() {
@@ -1331,11 +1331,11 @@ export function $init() {
     ]);
     kebabable.fill(0);
     $c.init(kebabable, [
-        S_XORN,
-        S_DRAGON,
-        S_JABBERWOCK,
-        S_NAGA,
-        S_GIANT,
+        S.XORN,
+        S.DRAGON,
+        S.JABBERWOCK,
+        S.NAGA,
+        S.GIANT,
         0
     ]);
     rwep.fill(0);

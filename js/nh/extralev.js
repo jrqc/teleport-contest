@@ -5,7 +5,7 @@ import { $G } from './globals.js';
 import { gr, gs, svl, svn, svr } from './decl.js';
 import { christen_monst, roguename } from './do_name.js';
 import { FALSE, TRUE } from './global.h.js';
-import { NO_MM_FLAGS } from './hack.h.js';
+import { NO } from './hack.h.js';
 import { max, min } from './hack.macros.js';
 import { nhUse } from './lint.macros.js';
 import { makemon } from './makemon.js';
@@ -14,10 +14,10 @@ import { curse, mksobj_at, weight } from './mkobj.js';
 import { somex, somey } from './mkroom.js';
 import { OROOM } from './mkroom.h.js';
 import { mons } from './monst.js';
-import { PM_GHOST } from './monsters.h.js';
+import { PM } from './monsters.h.js';
 import { ARROW, BOW, FAKE_AMULET_OF_YENDOR, FOOD_RATION, MACE, PLATE_MAIL, RING_MAIL, TWO_HANDED_SWORD } from './objects.h.js';
 import { impossible } from './pline.js';
-import { CORR, DBWALL, D_NODOOR, SCORR } from './rm.h.js';
+import { CORR, D, DBWALL, SCORR } from './rm.h.js';
 import { rn2, rnd } from './rnd.js';
 
 const XL_UP = 1;
@@ -69,7 +69,7 @@ async function roguecorr(x, y, dir) {   // extralev.c:45
                 await impossible($c.lit("down: no wall at %d,%d?"), fromx, fromy);
             }
             await dodoor(fromx, fromy, $c.relem(svr.rooms, gr.r[x][y].nroom));
-            svl.level.locations[fromx][fromy].flags = (D_NODOOR) & 31;
+            svl.level.locations[fromx][fromy].flags = (D.NODOOR) & 31;
             fromy = $c.i16(fromy + 1);
         }
         if (y >= 2) {
@@ -92,7 +92,7 @@ async function roguecorr(x, y, dir) {   // extralev.c:45
                 await impossible($c.lit("up: no wall at %d,%d?"), tox, toy);
             }
             await dodoor(tox, toy, $c.relem(svr.rooms, gr.r[x][y].nroom));
-            svl.level.locations[tox][toy].flags = (D_NODOOR) & 31;
+            svl.level.locations[tox][toy].flags = (D.NODOOR) & 31;
             toy = $c.i16(toy - 1);
         }
         roguejoin(fromx, fromy, tox, toy, FALSE);
@@ -113,7 +113,7 @@ async function roguecorr(x, y, dir) {   // extralev.c:45
                 await impossible($c.lit("down: no wall at %d,%d?"), fromx, fromy);
             }
             await dodoor(fromx, fromy, $c.relem(svr.rooms, gr.r[x][y].nroom));
-            svl.level.locations[fromx][fromy].flags = (D_NODOOR) & 31;
+            svl.level.locations[fromx][fromy].flags = (D.NODOOR) & 31;
             fromx = $c.i16(fromx + 1);
         }
         if (x >= 2) {
@@ -136,7 +136,7 @@ async function roguecorr(x, y, dir) {   // extralev.c:45
                 await impossible($c.lit("left: no wall at %d,%d?"), tox, toy);
             }
             await dodoor(tox, toy, $c.relem(svr.rooms, gr.r[x][y].nroom));
-            svl.level.locations[tox][toy].flags = (D_NODOOR) & 31;
+            svl.level.locations[tox][toy].flags = (D.NODOOR) & 31;
             tox = $c.i16(tox - 1);
         }
         roguejoin(fromx, fromy, tox, toy, TRUE);
@@ -257,7 +257,7 @@ export async function makerogueghost() {   // extralev.c:288
     croom = $c.relem(svr.rooms, rn2(svn.nroom));
     x = $c.i16(somex(croom));
     y = $c.i16(somey(croom));
-    if (!(ghost = await makemon($c.relem(mons, PM_GHOST), x, y, NO_MM_FLAGS))) {
+    if (!(ghost = await makemon($c.relem(mons, PM.GHOST), x, y, NO.MM_FLAGS))) {
         return;
     }
     ghost.msleeping = (1) & 1;

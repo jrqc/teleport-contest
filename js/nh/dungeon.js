@@ -2,7 +2,7 @@
 import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
-import { AM_CHAOTIC, AM_LAWFUL, AM_NEUTRAL, MSA_NONE } from './align.h.js';
+import { AM, MSA_NONE } from './align.h.js';
 import { Align2amask, Amask2align, Amask2msa, Msa2amask } from './align.macros.js';
 import { alloc, dupstr } from './alloc.js';
 import { describe_level } from './botl.js';
@@ -10,33 +10,33 @@ import { isok } from './cmd.js';
 import { NO_COLOR } from './color.h.js';
 import { db_under_typ, is_drawbridge_wall, is_ice, is_lava, is_pool } from './dbridge.js';
 import { cg, emptystr, gf, gu, iflags, svb, svd, sve, svi, svl, svm, svn, svq, svr, svs, svt, svu, u, vowels } from './decl.js';
-import { BRANCH_LIMIT, D_ALIGN_MASK, D_ALIGN_NONE, HELLISH, LEV_LIMIT, MAZELIKE, ROGUELIKE, TBR_NO_DOWN, TBR_NO_UP, TBR_PORTAL, TBR_STAIR, TOWN, UNCONNECTED } from './dgn_file.h.js';
+import { BRANCH_LIMIT, D_ALIGN, HELLISH, LEV_LIMIT, MAZELIKE, ROGUELIKE, TBR, TOWN, UNCONNECTED } from './dgn_file.h.js';
 import { canseemon, map_location, nul_glyphinfo, see_nearby_objects } from './display.js';
 import { goto_level } from './do.js';
 import { hliquid } from './do_name.js';
-import { BR_NO_END1, BR_NO_END2, BR_PORTAL, BR_STAIR, LR_DOWNTELE, LR_UPTELE, VISITED } from './dungeon.h.js';
+import { BR, BR_NO_END1, BR_NO_END2, LR, VISITED } from './dungeon.h.js';
 import { In_endgame, In_sokoban, In_tutorial } from './dungeon.macros.js';
 import { done, panic } from './end.js';
 import { debugcore } from './files.js';
 import { wizard } from './flag.macros.js';
-import { COLNO, FALSE, MAXDUNGEON, MAXLEVEL, MAXNROFROOMS, NHL_SB_SAFE, ROWNO, TRUE } from './global.h.js';
+import { COLNO, FALSE, MAXDUNGEON, MAXLEVEL, MAXNROFROOMS, NHL_SB, ROWNO, TRUE } from './global.h.js';
 import { strcmpi } from './global.macros.js';
 import { in_rooms, switch_terrain } from './hack.js';
-import { ASCENDED, ECMD_OK, ESCAPED, FOOT, MAXLINFO } from './hack.h.js';
+import { ASCENDED, ECMD, ESCAPED, FOOT, MAXLINFO } from './hack.h.js';
 import { panic1, update_file } from './hack.macros.js';
 import { eos, highc, mungspaces, nh_snprintf, strncmpi, strstri, strsubst, trimspaces } from './hacklib.js';
-import { LUA_TNIL, LUA_TSTRING, LUA_TTABLE } from './lua.h.js';
+import { LUA } from './lua.h.js';
 import { luaL_checkoption, lua_getfield, lua_getglobal, lua_gettable, lua_gettop, lua_len, lua_next, lua_pushinteger, lua_pushnil, lua_settop, lua_tointegerx, lua_type } from './luabridge.js';
 import { place_lregion } from './mkmaze.js';
 import { cmap_to_type } from './mkroom.js';
 import { DELPHI, ROOMOFFSET, SHOPBASE, TEMPLE, VAULT } from './mkroom.h.js';
-import { AD_DGST, AD_WRAP, AT_ENGL } from './monattk.h.js';
+import { AD, AT } from './monattk.h.js';
 import { dmgtype_fromattack } from './mondata.js';
 import { is_animal } from './mondata.macros.js';
-import { M1_FLY } from './monflag.h.js';
-import { M_AP_FURNITURE } from './monst.h.js';
+import { M1 } from './monflag.h.js';
+import { M_AP } from './monst.h.js';
 import { M_AP_TYPE } from './monst.macros.js';
-import { PM_DWARF } from './monsters.h.js';
+import { PM } from './monsters.h.js';
 import { get_table_int, get_table_int_opt, get_table_option, get_table_str, get_table_str_opt, nhl_done, nhl_init, nhl_loadlua } from './nhlua.js';
 import { an, makeplural } from './objnam.js';
 import { You, impossible, pline } from './pline.js';
@@ -58,7 +58,7 @@ import { formatkiller } from './topten.js';
 import { MAGIC_PORTAL, VIBRATING_SQUARE } from './trap.h.js';
 import { add_menu, add_menu_heading, add_menu_str, getlin, select_menu } from './windows.js';
 import { clear_nhwindow, cliparound, create_nhwindow, destroy_nhwindow, display_nhwindow, end_menu, putstr, start_menu } from './winprocs.macros.js';
-import { ATR_NONE, MENU_BEHAVE_STANDARD, MENU_ITEMFLAGS_NONE, NHW_MENU, PICK_NONE, PICK_ONE } from './wintype.h.js';
+import { ATR, MENU, NHW, PICK } from './wintype.h.js';
 import { Upolyd, u_at } from './you.macros.js';
 import { Blind, EAggravate_monster, Hallucination, Levitation, Underwater } from './youprop.macros.js';
 
@@ -93,7 +93,7 @@ async function dumpit() {   // dungeon.c:91
     }
     $c.fprintf($c.__stderrp, $c.lit("\nBranches:\n"));
     for (br = svb.branches; br; br = br.next) {
-        $c.fprintf($c.__stderrp, $c.lit("%d: %s, end1 %d %d, end2 %d %d, %s\n"), br.id, br.type === BR_STAIR ? $c.lit("stair") : br.type === BR_NO_END1 ? $c.lit("no end1") : br.type === BR_NO_END2 ? $c.lit("no end2") : br.type === BR_PORTAL ? $c.lit("portal") : $c.lit("unknown"), br.end1.dnum, br.end1.dlevel, br.end2.dnum, br.end2.dlevel, br.end1_up ? $c.lit("end1 up") : $c.lit("end1 down"));
+        $c.fprintf($c.__stderrp, $c.lit("%d: %s, end1 %d %d, end2 %d %d, %s\n"), br.id, br.type === BR.STAIR ? $c.lit("stair") : br.type === BR_NO_END1 ? $c.lit("no end1") : br.type === BR_NO_END2 ? $c.lit("no end2") : br.type === BR.PORTAL ? $c.lit("portal") : $c.lit("unknown"), br.end1.dnum, br.end1.dlevel, br.end2.dnum, br.end2.dlevel, br.end1_up ? $c.lit("end1 up") : $c.lit("end1 down"));
     }
     await $c.getchar$async();
     $c.fprintf($c.__stderrp, $c.lit("\nDone\n"));
@@ -289,17 +289,17 @@ async function parent_dlevel(s, pd) {   // dungeon.c:415
 }
 async function correct_branch_type(tbr) {   // dungeon.c:440
     switch (tbr.type) {
-        case TBR_STAIR:
-            return BR_STAIR;
-        case TBR_NO_UP:
+        case TBR.STAIR:
+            return BR.STAIR;
+        case TBR.NO_UP:
             return tbr.up ? BR_NO_END1 : BR_NO_END2;
-        case TBR_NO_DOWN:
+        case TBR.NO_DOWN:
             return tbr.up ? BR_NO_END2 : BR_NO_END1;
-        case TBR_PORTAL:
-            return BR_PORTAL;
+        case TBR.PORTAL:
+            return BR.PORTAL;
     }
     await impossible($c.lit("correct_branch_type: unknown branch type"));
-    return BR_STAIR;
+    return BR.STAIR;
 }
 export async function insert_branch(new_branch, extract_first) {   // dungeon.c:463
     let curr = null, prev = null, new_val = 0, curr_val = 0, prev_val = 0;
@@ -386,9 +386,9 @@ async function init_level(dgn, proto_index, pd) {   // dungeon.c:566
     new_level.flags.hellish = ((!!(tlevel.flags & HELLISH) ? 1 : 0) >>> 0) & 1;
     new_level.flags.maze_like = ((!!(tlevel.flags & MAZELIKE) ? 1 : 0) >>> 0) & 1;
     new_level.flags.rogue_like = ((!!(tlevel.flags & ROGUELIKE) ? 1 : 0) >>> 0) & 1;
-    new_level.flags.align = ((tlevel.flags & D_ALIGN_MASK) >> 4 >>> 0) & 7;
+    new_level.flags.align = ((tlevel.flags & D_ALIGN.MASK) >> 4 >>> 0) & 7;
     if (!new_level.flags.align) {
-        new_level.flags.align = ((pd.tmpdungeon[dgn].flags & D_ALIGN_MASK) >> 4 >>> 0) & 7;
+        new_level.flags.align = ((pd.tmpdungeon[dgn].flags & D_ALIGN.MASK) >> 4 >>> 0) & 7;
     }
     new_level.rndlevs = $c.u8(tlevel.rndlevs);
     new_level.next = null;
@@ -444,23 +444,23 @@ async function get_dgn_flags(L) {   // dungeon.c:744
     let dgn_flags = 0, f = 0, nflags = 0;
     dgn_flags = 0;
     await lua_getfield(L, -1, $c.lit("flags"));
-    if (lua_type(L, -1) === LUA_TTABLE) {
+    if (lua_type(L, -1) === LUA.TTABLE) {
         await lua_len(L, -1);
         nflags = $c.i32(lua_tointegerx(L, -1, null));
         await lua_settop(L, -2);
         for (f = 0; f < nflags; f = f + 1 | 0) {
             lua_pushinteger(L, f + 1 | 0);
             await lua_gettable(L, -2);
-            if (lua_type(L, -1) === LUA_TSTRING) {
+            if (lua_type(L, -1) === LUA.TSTRING) {
                 dgn_flags = dgn_flags | get_dgn_flags$flagstrs2i[await luaL_checkoption(L, -1, null, new $c.Ptr(get_dgn_flags$flagstrs, 0))];
                 await lua_settop(L, -2);
             } else {
                 await impossible($c.lit("flags[%i] is not a string"), f);
             }
         }
-    } else if (lua_type(L, -1) === LUA_TSTRING) {
+    } else if (lua_type(L, -1) === LUA.TSTRING) {
         dgn_flags = dgn_flags | get_dgn_flags$flagstrs2i[await luaL_checkoption(L, -1, null, new $c.Ptr(get_dgn_flags$flagstrs, 0))];
-    } else if (lua_type(L, -1) !== LUA_TNIL) {
+    } else if (lua_type(L, -1) !== LUA.TNIL) {
         await impossible($c.lit("flags is not an array or string"));
     }
     await lua_settop(L, -2);
@@ -480,7 +480,7 @@ async function init_dungeon_levels(L, pd, dngidx) {   // dungeon.c:797
     for (f = 0; f < nlevels; f = f + 1 | 0) {
         lua_pushinteger(L, f + 1 | 0);
         await lua_gettable(L, -2);
-        if (lua_type(L, -1) === LUA_TTABLE) {
+        if (lua_type(L, -1) === LUA.TTABLE) {
             lvl_name = await get_table_str(L, $c.lit("name"));
             lvl_bonetag = await get_table_str_opt(L, $c.lit("bonetag"), new $c.Ptr(emptystr, 0));
             lvl_chain = await get_table_str_opt(L, $c.lit("chainlevel"), null);
@@ -552,7 +552,7 @@ async function init_dungeon_branches(L, pd, dngidx) {   // dungeon.c:867
     for (f = 0; f < nbranches; f = f + 1 | 0) {
         lua_pushinteger(L, f + 1 | 0);
         await lua_gettable(L, -2);
-        if (lua_type(L, -1) === LUA_TTABLE) {
+        if (lua_type(L, -1) === LUA.TTABLE) {
             br_name = await get_table_str(L, $c.lit("name"));
             br_chain = await get_table_str_opt(L, $c.lit("chainlevel"), null);
             br_base = await get_table_int(L, $c.lit("base"));
@@ -629,7 +629,7 @@ async function init_dungeon_set_depth(pd, dngidx) {   // dungeon.c:960
         from_depth = depth(br.end1);
         from_up = br.end1_up;
     }
-    svd.dungeons[dngidx].depth_start = (from_depth + (br.type === BR_PORTAL ? 0 : from_up ? -1 : 1) | 0) - (svd.dungeons[dngidx].entry_lev - 1 | 0) | 0;
+    svd.dungeons[dngidx].depth_start = (from_depth + (br.type === BR.PORTAL ? 0 : from_up ? -1 : 1) | 0) - (svd.dungeons[dngidx].entry_lev - 1 | 0) | 0;
 }
 async function init_dungeon_dungeons(L, pd, dngidx) {   // dungeon.c:997
     let dgn_name = null, dgn_bonetag = null, dgn_protoname = null, dgn_fill = null, dgn_themerms = null, dgn_base = 0, dgn_range = 0, dgn_align = 0, dgn_entry = 0, dgn_chance = 0, dgn_flags = 0, save_plnmsg = 0, save_plnmsg$2 = 0, $t1;
@@ -668,16 +668,16 @@ async function init_dungeon_dungeons(L, pd, dngidx) {   // dungeon.c:997
         return FALSE;
     }
     await lua_getfield(L, -1, $c.lit("levels"));
-    if (lua_type(L, -1) === LUA_TTABLE) {
+    if (lua_type(L, -1) === LUA.TTABLE) {
         await init_dungeon_levels(L, pd, dngidx);
-    } else if (lua_type(L, -1) !== LUA_TNIL) {
+    } else if (lua_type(L, -1) !== LUA.TNIL) {
         await panic($c.lit("dungeon[%i].levels is not an array of hashes"), dngidx);
     }
     await lua_settop(L, -2);
     await lua_getfield(L, -1, $c.lit("branches"));
-    if (lua_type(L, -1) === LUA_TTABLE) {
+    if (lua_type(L, -1) === LUA.TTABLE) {
         await init_dungeon_branches(L, pd, dngidx);
-    } else if (lua_type(L, -1) !== LUA_TNIL) {
+    } else if (lua_type(L, -1) !== LUA.TNIL) {
         await panic($c.lit("dungeon[%i].branches is not an array of hashes"), dngidx);
     }
     await lua_settop(L, -2);
@@ -787,7 +787,7 @@ export async function init_dungeons() {   // dungeon.c:1205
     let L = null, i = 0, cl = 0, pd = new $T.proto_dungeon(), tidx = 0, sbi = new $T.nhl_sandbox_info(), tbuf = new Int8Array(256), save_plnmsg = 0, $t1, $t2;
     cl = 0;
     sbi.$copyFrom(new $T.nhl_sandbox_info());
-    sbi.flags = NHL_SB_SAFE;
+    sbi.flags = NHL_SB.SAFE;
     sbi.memlimit = 1048576;
     sbi.steps = 0;
     sbi.perpcall = 1048576;
@@ -808,7 +808,7 @@ export async function init_dungeons() {   // dungeon.c:1205
     svs.sp_levchn = null;
     await lua_settop(L, 0);
     await lua_getglobal(L, $c.lit("dungeon"));
-    if (!(lua_type(L, -1) === LUA_TTABLE)) {
+    if (!(lua_type(L, -1) === LUA.TTABLE)) {
         await panic($c.lit("dungeon is not a lua table"));
     }
     await lua_len(L, -1);
@@ -824,7 +824,7 @@ export async function init_dungeons() {   // dungeon.c:1205
     lua_pushnil(L);
     i = 0;
     while (await lua_next(L, tidx) !== 0) {
-        if (!(lua_type(L, -1) === LUA_TTABLE)) {
+        if (!(lua_type(L, -1) === LUA.TTABLE)) {
             await panic($c.lit("dungeon[%i] is not a lua table"), i);
         }
         if (await init_dungeon_dungeons(L, pd, i)) {
@@ -976,10 +976,10 @@ export async function prev_level(at_stairs) {   // dungeon.c:1518
 }
 async function earth_sense() {   // dungeon.c:1548
     let otmp = null;
-    if (!(gu.urace.mnum === PM_DWARF)) {
+    if (!(gu.urace.mnum === PM.DWARF)) {
         return;
     }
-    if (u.usteed || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked || Levitation() || Upolyd()) {
+    if (u.usteed || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked || Levitation() || Upolyd()) {
         return;
     }
     if (svl.level.locations[u.ux][u.uy].typ !== CORR && svl.level.locations[u.ux][u.uy].typ !== ROOM) {
@@ -1021,11 +1021,11 @@ export async function u_on_rndspot(upflag) {   // dungeon.c:1605
     up = upflag & 1;
     was_in_W_tower = upflag & 2;
     if (was_in_W_tower && On_W_tower_level(u.uz)) {
-        await place_lregion(svd.dndest.nlx, svd.dndest.nly, svd.dndest.nhx, svd.dndest.nhy, 0, 0, 0, 0, LR_DOWNTELE, null);
+        await place_lregion(svd.dndest.nlx, svd.dndest.nly, svd.dndest.nhx, svd.dndest.nhy, 0, 0, 0, 0, LR.DOWNTELE, null);
     } else if (up) {
-        await place_lregion(svu.updest.lx, svu.updest.ly, svu.updest.hx, svu.updest.hy, svu.updest.nlx, svu.updest.nly, svu.updest.nhx, svu.updest.nhy, LR_UPTELE, null);
+        await place_lregion(svu.updest.lx, svu.updest.ly, svu.updest.hx, svu.updest.hy, svu.updest.nlx, svu.updest.nly, svu.updest.nhx, svu.updest.nhy, LR.UPTELE, null);
     } else {
-        await place_lregion(svd.dndest.lx, svd.dndest.ly, svd.dndest.hx, svd.dndest.hy, svd.dndest.nlx, svd.dndest.nly, svd.dndest.nhx, svd.dndest.nhy, LR_DOWNTELE, null);
+        await place_lregion(svd.dndest.lx, svd.dndest.ly, svd.dndest.hx, svd.dndest.hy, svd.dndest.nlx, svd.dndest.nly, svd.dndest.nhx, svd.dndest.nhy, LR.DOWNTELE, null);
     }
     await switch_terrain();
 }
@@ -1089,7 +1089,7 @@ export function surface(x, y) {   // dungeon.c:1750
     lev = $c.relem(svl.level.locations[x], y);
     levtyp = SURFACE_AT(x, y);
     if (u_at(x, y) && u.uswallow | 0 && is_animal(u.ustuck.data)) {
-        return dmgtype_fromattack(u.ustuck.data, AD_DGST, AT_ENGL) !== null ? $c.lit("maw") : dmgtype_fromattack(u.ustuck.data, AD_WRAP, AT_ENGL) !== null ? $c.lit("husk") : $c.lit("nonesuch");
+        return dmgtype_fromattack(u.ustuck.data, AD.DGST, AT.ENGL) !== null ? $c.lit("maw") : dmgtype_fromattack(u.ustuck.data, AD.WRAP, AT.ENGL) !== null ? $c.lit("husk") : $c.lit("nonesuch");
     } else if (IS_AIR(levtyp)) {
         return (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? $c.lit("air bubble") : levtyp === CLOUD ? $c.lit("cloud") : $c.lit("air");
     } else if (is_pool(x, y)) {
@@ -1342,7 +1342,7 @@ async function tport_menu(win, entry, lchoices, lvl_p, cannotreach) {   // dunge
     } else {
         any.a_int = lchoices.idx + 1 | 0;
     }
-    await add_menu(win, nul_glyphinfo, any, lchoices.menuletter, 0, ATR_NONE, clr, entry, MENU_ITEMFLAGS_NONE);
+    await add_menu(win, nul_glyphinfo, any, lchoices.menuletter, 0, ATR.NONE, clr, entry, MENU.ITEMFLAGS_NONE);
     if (lchoices.menuletter === 122) {
         lchoices.menuletter = 65;
     } else {
@@ -1353,13 +1353,13 @@ async function tport_menu(win, entry, lchoices, lvl_p, cannotreach) {   // dunge
 }
 function br_string(type) {   // dungeon.c:2240
     switch (type) {
-        case BR_PORTAL:
+        case BR.PORTAL:
             return $c.lit("Portal");
         case BR_NO_END1:
             return $c.lit("Connection");
         case BR_NO_END2:
             return $c.lit("One way stair");
-        case BR_STAIR:
+        case BR.STAIR:
             return $c.lit("Stair");
     }
     return $c.lit(" (unknown)");
@@ -1382,9 +1382,9 @@ async function print_branch(win, dnum, lower_bound, upper_bound, bymenu, lchoice
 }
 export async function print_dungeon(bymenu, rlev, rdgn) {   // dungeon.c:2290
     let i = 0, last_level = 0, nlev = 0, buf = new Int8Array(256), descr = null, first = 0, unplaced = 0, slev = null, dptr = null, br = null, lchoices = new $T.lchoice(), win = 0, n = 0, selected = [null], idx = 0, trap = null;
-    win = await create_nhwindow()(NHW_MENU);
+    win = await create_nhwindow()(NHW.MENU);
     if (bymenu) {
-        await start_menu()(win, MENU_BEHAVE_STANDARD);
+        await start_menu()(win, MENU.BEHAVE_STANDARD);
         lchoices.idx = 0;
         lchoices.menuletter = 97;
     }
@@ -1432,7 +1432,7 @@ export async function print_dungeon(bymenu, rlev, rdgn) {   // dungeon.c:2290
     }
     if (bymenu) {
         await end_menu()(win, $c.lit("Level teleport to where:"));
-        n = await select_menu(win, PICK_ONE, new $c.Ptr(selected, 0));
+        n = await select_menu(win, PICK.ONE, new $c.Ptr(selected, 0));
         await destroy_nhwindow()(win);
         if (n > 0) {
             idx = $c.radd(selected[0], 0).item.a_int - 1 | 0;
@@ -1562,7 +1562,7 @@ export async function donamelevel() {   // dungeon.c:2571
         return await dooverview();
     }
     await query_annotation(null);
-    return ECMD_OK;
+    return ECMD.OK;
 }
 export function free_exclusions() {   // dungeon.c:2582
     let ez = null, nxtez = null;
@@ -1791,7 +1791,7 @@ export function update_lastseentyp(x, y) {   // dungeon.c:2927
     if (ltyp === DRAWBRIDGE_UP) {
         ltyp = db_under_typ(svl.level.locations[x][y].flags | 0);
     }
-    if ((mtmp = svl.level.monsters[x][y]) !== null && M_AP_TYPE(mtmp) === M_AP_FURNITURE && canseemon(mtmp)) {
+    if ((mtmp = svl.level.monsters[x][y]) !== null && M_AP_TYPE(mtmp) === M_AP.FURNITURE && canseemon(mtmp)) {
         ltyp = cmap_to_type(mtmp.mappearance | 0);
     }
     svl.lastseentyp[x][y] = $c.i8(ltyp);
@@ -2002,14 +2002,14 @@ export async function room_discovered(roomno) {   // dungeon.c:3282
 export async function dooverview() {   // dungeon.c:3294
     await show_overview(iflags.menu_requested ? -1 : 0, 0);
     iflags.menu_requested = FALSE;
-    return ECMD_OK;
+    return ECMD.OK;
 }
 export async function show_overview(why, reason) {   // dungeon.c:3305
     let win = 0, lastdun = Int32Array.of(0), selected = [null], n = 0, ledger = 0, lev = new $T.d_level(), $t1, $t2;
     lastdun[0] = -1;
     await recalc_mapseen();
-    win = await create_nhwindow()(NHW_MENU);
-    await start_menu()(win, MENU_BEHAVE_STANDARD);
+    win = await create_nhwindow()(NHW.MENU);
+    await start_menu()(win, MENU.BEHAVE_STANDARD);
     if (In_endgame(u.uz)) {
         await traverse_mapseenchn(1, win, why, reason, new $c.Ptr(lastdun, 0));
     }
@@ -2017,7 +2017,7 @@ export async function show_overview(why, reason) {   // dungeon.c:3305
         await traverse_mapseenchn(0, win, why, reason, new $c.Ptr(lastdun, 0));
     }
     await end_menu()(win, null);
-    n = await select_menu(win, why !== -1 ? PICK_NONE : PICK_ONE, new $c.Ptr(selected, 0));
+    n = await select_menu(win, why !== -1 ? PICK.NONE : PICK.ONE, new $c.Ptr(selected, 0));
     if (n > 0) {
         ledger = $c.radd(selected[0], 0).item.a_int - 1 | 0;
         $t1 = await ledger_to_dnum($c.i16(ledger)), lev.dnum = $t1;
@@ -2057,13 +2057,13 @@ function br_string2(br) {   // dungeon.c:3388
     let closed_portal = 0;
     closed_portal = $c.i8(br.end2.dnum === svd.dungeon_topology.d_quest_dnum && u.uevent.qexpelled | 0 ? 1 : 0);
     switch (br.type) {
-        case BR_PORTAL:
+        case BR.PORTAL:
             return closed_portal ? $c.lit("Sealed portal") : $c.lit("Portal");
         case BR_NO_END1:
             return $c.lit("Connection");
         case BR_NO_END2:
             return br.end1_up ? $c.lit("One way stairs up") : $c.lit("One way stairs down");
-        case BR_STAIR:
+        case BR.STAIR:
             return br.end1_up ? $c.lit("Stairs up") : $c.lit("Stairs down");
     }
     return $c.lit("(unknown)");
@@ -2162,7 +2162,7 @@ async function print_mapseen(win, mptr, final, how, printdun) {   // dungeon.c:3
     if (final === -1) {
         $t1 = ledger_no(mptr.lev) + 1 | 0, any.a_int = $t1;
     }
-    await add_menu(win, nul_glyphinfo, any, 0, 0, ATR_NONE, NO_COLOR, new $c.Ptr(buf, 0), MENU_ITEMFLAGS_NONE);
+    await add_menu(win, nul_glyphinfo, any, 0, 0, ATR.NONE, NO_COLOR, new $c.Ptr(buf, 0), MENU.ITEMFLAGS_NONE);
     if (mptr.flags.forgot) {
         return;
     }
@@ -2371,12 +2371,12 @@ export function $init() {
     ]);
     get_dgn_align$dgnaligns2i.fill(0);
     $c.init(get_dgn_align$dgnaligns2i, [
-        D_ALIGN_NONE,
-        D_ALIGN_NONE,
-        AM_LAWFUL << 4,
-        AM_NEUTRAL << 4,
-        AM_CHAOTIC << 4,
-        D_ALIGN_NONE
+        D_ALIGN.NONE,
+        D_ALIGN.NONE,
+        AM.LAWFUL << 4,
+        AM.NEUTRAL << 4,
+        AM.CHAOTIC << 4,
+        D_ALIGN.NONE
     ]);
     init_dungeon_branches$brdirstr.fill(null);
     $c.init(init_dungeon_branches$brdirstr, [
@@ -2400,10 +2400,10 @@ export function $init() {
     ]);
     init_dungeon_branches$brtypes2i.fill(0);
     $c.init(init_dungeon_branches$brtypes2i, [
-        TBR_STAIR,
-        TBR_PORTAL,
-        TBR_NO_DOWN,
-        TBR_NO_UP,
-        TBR_STAIR
+        TBR.STAIR,
+        TBR.PORTAL,
+        TBR.NO_DOWN,
+        TBR.NO_UP,
+        TBR.STAIR
     ]);
 }

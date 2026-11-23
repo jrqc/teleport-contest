@@ -4,11 +4,11 @@ import * as $T from './types.js';
 import { $G } from './globals.js';
 import { gm, gy, u } from './decl.js';
 import { is_fainted } from './eat.js';
-import { AD_DISE } from './monattk.h.js';
+import { AD } from './monattk.h.js';
 import { defended, hates_silver } from './mondata.js';
 import { TOWEL } from './objects.h.js';
 import { LOW_PM } from './permonst.h.js';
-import { ACID_RES, ADORNED, AGGRAVATE_MONSTER, ANTIMAGIC, BLINDED, BLND_RES, CLAIRVOYANT, COLD_RES, CONFLICT, CONFUSION, DEAF, DETECT_MONSTERS, DISINT_RES, DISPLACED, DRAIN_RES, ENERGY_REGENERATION, FAST, FIRE_RES, FIXED_ABIL, FLYING, FREE_ACTION, FROMOUTSIDE, FUMBLING, GLIB, HALF_PHDAM, HALF_SPDAM, HALLUC, HALLUC_RES, HUNGER, INFRAVISION, INTRINSIC, INVIS, INVULNERABLE, I_SPECIAL, JUMPING, LEVITATION, LIFESAVED, MAGICAL_BREATHING, PASSES_WALLS, POISON_RES, POLYMORPH, POLYMORPH_CONTROL, PROTECTION, PROT_FROM_SHAPE_CHANGERS, REFLECTING, REGENERATION, SEARCHING, SEE_INVIS, SHOCK_RES, SICK, SICK_RES, SLEEPY, SLEEP_RES, SLIMED, SLOW_DIGESTION, STEALTH, STONED, STONE_RES, STRANGLED, STUNNED, TELEPAT, TELEPORT, TELEPORT_CONTROL, TIMEOUT, UNCHANGING, VOMITING, WARNING, WARN_OF_MON, WARN_UNDEAD, WOUNDED_LEGS, W_ARTI } from './prop.h.js';
+import { ACID_RES, ADORNED, AGGRAVATE_MONSTER, ANTIMAGIC, BLINDED, BLND_RES, CLAIRVOYANT, COLD_RES, CONFLICT, CONFUSION, DEAF, DETECT_MONSTERS, DISINT_RES, DISPLACED, DRAIN_RES, ENERGY_REGENERATION, FAST, FIRE_RES, FIXED_ABIL, FLYING, FREE_ACTION, FROMOUTSIDE, FUMBLING, GLIB, HALF_PHDAM, HALF_SPDAM, HALLUC, HALLUC_RES, HUNGER, INFRAVISION, INTRINSIC, INVIS, INVULNERABLE, I_SPECIAL, JUMPING, LEVITATION, LIFESAVED, MAGICAL_BREATHING, PASSES_WALLS, POISON_RES, POLYMORPH, POLYMORPH_CONTROL, PROTECTION, PROT_FROM_SHAPE_CHANGERS, REFLECTING, REGENERATION, SEARCHING, SEE_INVIS, SHOCK_RES, SICK, SICK_RES, SLEEPY, SLEEP_RES, SLIMED, SLOW_DIGESTION, STEALTH, STONED, STONE_RES, STRANGLED, STUNNED, TELEPAT, TELEPORT, TELEPORT_CONTROL, TIMEOUT, UNCHANGING, VOMITING, W, WARNING, WARN_OF_MON, WARN_UNDEAD, WOUNDED_LEGS } from './prop.h.js';
 import { unconscious } from './trap.js';
 
 export function Fire_resistance() {
@@ -42,7 +42,7 @@ export function Stone_resistance() {
     return u.uprops[STONE_RES].intrinsic || u.uprops[STONE_RES].extrinsic ? 1 : 0;
 }
 export async function Sick_resistance() {
-    return u.uprops[SICK_RES].intrinsic || u.uprops[SICK_RES].extrinsic || await defended(gy.youmonst, AD_DISE) ? 1 : 0;
+    return u.uprops[SICK_RES].intrinsic || u.uprops[SICK_RES].extrinsic || await defended(gy.youmonst, AD.DISE) ? 1 : 0;
 }
 export function Invulnerable() {
     return u.uprops[INVULNERABLE].intrinsic;
@@ -249,7 +249,7 @@ export function Levitation() {
     return (u.uprops[LEVITATION].intrinsic || u.uprops[LEVITATION].extrinsic) && !u.uprops[LEVITATION].blocked ? 1 : 0;
 }
 export function Lev_at_will() {
-    return ($c.and64(u.uprops[LEVITATION].intrinsic, I_SPECIAL) !== 0 || $c.and64(u.uprops[LEVITATION].extrinsic, W_ARTI) !== 0) && $c.and64(u.uprops[LEVITATION].intrinsic, ~(I_SPECIAL | TIMEOUT)) === 0 && $c.and64(u.uprops[LEVITATION].extrinsic, ~W_ARTI) === 0 ? 1 : 0;
+    return ($c.and64(u.uprops[LEVITATION].intrinsic, I_SPECIAL) !== 0 || $c.and64(u.uprops[LEVITATION].extrinsic, W.ARTI) !== 0) && $c.and64(u.uprops[LEVITATION].intrinsic, ~(I_SPECIAL | TIMEOUT)) === 0 && $c.and64(u.uprops[LEVITATION].extrinsic, ~W.ARTI) === 0 ? 1 : 0;
 }
 export function HFlying() {
     return u.uprops[FLYING].intrinsic;

@@ -6,7 +6,7 @@ import { stop_occupation } from './allmain.js';
 import { o_unleash } from './apply.js';
 import { touch_artifact } from './artifact.js';
 import { disp, flags, ga, gi, gk, gm, gn, go, gs, gt, gy, iflags, svl, u } from './decl.js';
-import { AMULET_CLASS, ARMOR_CLASS, COIN_CLASS, FOOD_CLASS, RING_CLASS, ROCK_CLASS, S_NYMPH, TOOL_CLASS } from './defsym.h.js';
+import { AMULET_CLASS, ARMOR_CLASS, COIN_CLASS, FOOD_CLASS, RING_CLASS, ROCK_CLASS, S, TOOL_CLASS } from './defsym.h.js';
 import { canseemon, newsym } from './display.js';
 import { canspotmon } from './display.macros.js';
 import { flooreffects } from './do.js';
@@ -15,10 +15,10 @@ import { Amulet_off, Armor_off, Blindf_off, Boots_off, Cloak_off, Gloves_off, He
 import { droppables } from './dogmove.js';
 import { is_fainted, maybe_finished_meal } from './eat.js';
 import { debugcore } from './files.js';
-import { PLNMSG_MON_TAKES_OFF_ITEM } from './flag.h.js';
+import { PLNMSG } from './flag.h.js';
 import { FALSE, LARGEST_INT, TRUE } from './global.h.js';
 import { in_rooms, inv_cnt, money_cnt, nomul } from './hack.js';
-import { FOOT, HAND, RLOC_MSG } from './hack.h.js';
+import { FOOT, HAND, RLOC } from './hack.h.js';
 import { min } from './hack.macros.js';
 import { copynchars, dist2, s_suffix, strstri, strsubst, upstart } from './hacklib.js';
 import { carry_obj_effects, count_unpaid, freeinv, g_at, stackobj } from './invent.js';
@@ -26,14 +26,14 @@ import { obj_sheds_light, snuff_light_source } from './light.js';
 import { add_to_minv, obj_extract_self, place_object, splitobj, unknow_object } from './mkobj.js';
 import { SHOPBASE } from './mkroom.h.js';
 import { can_carry, monnear } from './mon.js';
-import { AD_SITM, AT_ENGL } from './monattk.h.js';
+import { AD, AT } from './monattk.h.js';
 import { attacktype, dmgtype } from './mondata.js';
 import { can_teleport, is_animal, slithy, throws_rocks, touch_petrifies } from './mondata.macros.js';
-import { M1_FLY } from './monflag.h.js';
+import { M1 } from './monflag.h.js';
 import { monflee } from './monmove.js';
 import { mons } from './monst.js';
 import { DEADMONSTER, engulfing_u } from './monst.macros.js';
-import { LOST_DROPPED, LOST_NONE, LOST_STOLEN, LOST_THROWN, OBJ_DELETED, OBJ_FLOOR } from './obj.h.js';
+import { LOST, OBJ } from './obj.h.js';
 import { Has_contents, any_quest_artifact, bimanual, carried } from './obj.macros.js';
 import { objects } from './objects.js';
 import { AMULET_OF_YENDOR, BELL, BELL_OF_OPENING, BOULDER, CANDELABRUM_OF_INVOCATION, CORPSE, FAKE_AMULET_OF_YENDOR, GOLD_PIECE, LEASH, SPE_BOOK_OF_THE_DEAD } from './objects.h.js';
@@ -41,7 +41,7 @@ import { Tobjnam, armor_simple_name, distant_name, doname, makeplural, otense, s
 import { encumber_msg } from './pickup.js';
 import { You, Your, impossible, pline, pline_mon, urgent_pline } from './pline.js';
 import { body_part, mbodypart, skinback } from './polyself.js';
-import { ADORNED, FLYING, W_ACCESSORY, W_AMUL, W_ARMG, W_ARMOR, W_BALL, W_CHAIN, W_RING, W_RINGL, W_RINGR, W_SADDLE, W_TOOL, W_WEAPONS } from './prop.h.js';
+import { ADORNED, FLYING, W, W_ACCESSORY, W_ARMOR, W_RING, W_WEAPONS } from './prop.h.js';
 import { is_quest_artifact } from './questpgr.js';
 import { unpunish } from './read.js';
 import { rn2, rnd } from './rnd.js';
@@ -51,7 +51,7 @@ import { minstapetrify, openholdingtrap, unconscious } from './trap.js';
 import { cansee } from './vision.macros.js';
 import { uqwepgone, uswapwepgone, uwepgone, welded } from './wield.js';
 import { extract_from_minvent, setnotworn, setworn, update_mon_extrinsics } from './worn.js';
-import { TT_BURIEDBALL } from './you.h.js';
+import { TT } from './you.h.js';
 import { RING_ON_PRIMARY, RING_ON_SECONDARY } from './you.macros.js';
 import { Blind, Conflict, Levitation, Punished } from './youprop.macros.js';
 import { obj_resists } from './zap.js';
@@ -110,10 +110,10 @@ export async function stealgold(mtmp) {   // steal.c:58
         if (!$c.strncmp(what, $c.lit("rear "), 5)) {
             what = what.add(5);
         }
-        await pline($c.lit("%s quickly snatches some gold from %s %s %s!"), await Monnam(mtmp), Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked ? $c.lit("beneath") : $c.lit("between"), whose, what);
+        await pline($c.lit("%s quickly snatches some gold from %s %s %s!"), await Monnam(mtmp), Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked ? $c.lit("beneath") : $c.lit("between"), whose, what);
         if (!ygold || !rn2(5)) {
             if (!await tele_restrict(mtmp)) {
-                await rloc(mtmp, RLOC_MSG);
+                await rloc(mtmp, RLOC.MSG);
             }
             await monflee(mtmp, 0, FALSE, FALSE);
         }
@@ -130,7 +130,7 @@ export async function stealgold(mtmp) {   // steal.c:58
         await add_to_minv(mtmp, ygold);
         await Your($c.lit("purse feels lighter."));
         if (!await tele_restrict(mtmp)) {
-            await rloc(mtmp, RLOC_MSG);
+            await rloc(mtmp, RLOC.MSG);
         }
         await monflee(mtmp, 0, FALSE, FALSE);
         disp.botl = TRUE;
@@ -177,7 +177,7 @@ async function stealarm() {   // steal.c:165
                             await impossible($c.lit("stealarm(): dead monster stealing"));
                             break botm$;
                         }
-                        if (!dmgtype(mtmp.data, AD_SITM) || dist2(mtmp.mx, mtmp.my, u.ux, u.uy) > 2) {
+                        if (!dmgtype(mtmp.data, AD.SITM) || dist2(mtmp.mx, mtmp.my, u.ux, u.uy) > 2) {
                             break botm$;
                         }
                         if (otmp.unpaid) {
@@ -188,7 +188,7 @@ async function stealarm() {   // steal.c:165
                         await mpickobj(mtmp, otmp);
                         await monflee(mtmp, 0, FALSE, FALSE);
                         if (!await tele_restrict(mtmp)) {
-                            await rloc(mtmp, RLOC_MSG);
+                            await rloc(mtmp, RLOC.MSG);
                         }
                         break;
                     }
@@ -232,11 +232,11 @@ export async function remove_worn_item(obj, unchain_ball) {   // steal.c:213
         } else {
             await setworn(null, $c.and64(obj.owornmask, W_ARMOR));
         }
-    } else if ($c.and64(obj.owornmask, W_AMUL)) {
+    } else if ($c.and64(obj.owornmask, W.AMUL)) {
         await Amulet_off();
     } else if ($c.and64(obj.owornmask, W_RING)) {
         await Ring_gone(obj);
-    } else if ($c.and64(obj.owornmask, W_TOOL)) {
+    } else if ($c.and64(obj.owornmask, W.TOOL)) {
         await Blindf_off(obj);
     } else if ($c.and64(obj.owornmask, W_WEAPONS)) {
         if ($c.peq(obj, $G.uwep)) {
@@ -249,14 +249,14 @@ export async function remove_worn_item(obj, unchain_ball) {   // steal.c:213
             await uqwepgone();
         }
     }
-    if ($c.and64(obj.owornmask, W_BALL | W_CHAIN)) {
+    if ($c.and64(obj.owornmask, W.BALL | W.CHAIN)) {
         if (unchain_ball) {
             await unpunish();
         }
     } else if (obj.owornmask) {
         await setnotworn(obj);
     }
-    if (obj.where === OBJ_DELETED) {
+    if (obj.where === OBJ.DELETED) {
         do {
             if (debugcore($c.lit("steal.c"), TRUE)) {
                 save_plnmsg = iflags.last_msg;
@@ -282,7 +282,7 @@ async function worn_item_removal(mon, obj) {   // steal.c:294
     }
     verb = $c.and64(obj.owornmask, W_WEAPONS) !== 0 ? $c.lit("disarms") : $c.and64(obj.owornmask, W_ACCESSORY) !== 0 ? $c.lit("removes") : $c.lit("takes off");
     await pline($c.lit("%s %s %s."), await Some_Monnam(mon), verb, new $c.Ptr(objbuf, 0));
-    iflags.last_msg = PLNMSG_MON_TAKES_OFF_ITEM;
+    iflags.last_msg = PLNMSG.MON_TAKES_OFF_ITEM;
     await remove_worn_item(obj, TRUE);
 }
 export async function steal(mtmp, objnambuf) {   // steal.c:343
@@ -310,9 +310,9 @@ export async function steal(mtmp, objnambuf) {   // steal.c:343
             if ($goto === "nothing_to_steal" || (!icnt || icnt === 1 && $G.uskin)) {
                 $goto = null;   // nothing_to_steal:
                 if (Punished() && !monkey_business && rn2(4)) {
-                    (!(!$c.peq($G.uball, $c.asRec(null, $T.obj, 112)) && $G.uball.where === OBJ_FLOOR) ? 1 : 0) ? $c.__assert_rtn($c.lit("steal"), $c.lit("steal.c"), 381, $c.lit("uball != NULL && uball->where == OBJ_FLOOR")) : 0;
+                    (!(!$c.peq($G.uball, $c.asRec(null, $T.obj, 112)) && $G.uball.where === OBJ.FLOOR) ? 1 : 0) ? $c.__assert_rtn($c.lit("steal"), $c.lit("steal.c"), 381, $c.lit("uball != NULL && uball->where == OBJ_FLOOR")) : 0;
                     await worn_item_removal(mtmp, $G.uchain);
-                } else if (u.utrap && u.utraptype === TT_BURIEDBALL && !monkey_business && !rn2(4)) {
+                } else if (u.utrap && u.utraptype === TT.BURIEDBALL && !monkey_business && !rn2(4)) {
                     await pline($c.lit("%s takes off your unseen chain."), new $c.Ptr(Monnambuf, 0));
                     await openholdingtrap(gy.youmonst, new $c.Ptr(dummy, 0));
                 } else if (Blind()) {
@@ -325,10 +325,10 @@ export async function steal(mtmp, objnambuf) {   // steal.c:343
                 return 1;
             }
             if (monkey_business || $G.uarmg) {
-            } else if ($c.and64(u.uprops[ADORNED].extrinsic, W_RINGL)) {
+            } else if ($c.and64(u.uprops[ADORNED].extrinsic, W.RINGL)) {
                 otmp = $G.uleft;
                 $goto = "gotobj"; continue D1;
-            } else if ($c.and64(u.uprops[ADORNED].extrinsic, W_RINGR)) {
+            } else if ($c.and64(u.uprops[ADORNED].extrinsic, W.RINGR)) {
                 otmp = $G.uright;
                 $goto = "gotobj"; continue D1;
             }
@@ -485,15 +485,15 @@ export async function steal(mtmp, objnambuf) {   // steal.c:343
                 await subfrombill(otmp, await shop_keeper(new $c.Ptr(u.ushops, 0).get(0)));
             }
             await freeinv(otmp);
-            if (iflags.last_msg === PLNMSG_MON_TAKES_OFF_ITEM && mtmp.data.mlet === S_NYMPH) {
+            if (iflags.last_msg === PLNMSG.MON_TAKES_OFF_ITEM && mtmp.data.mlet === S.NYMPH) {
                 named = named + 1 | 0;
             }
             await urgent_pline($c.lit("%s stole %s."), named ? $c.lit("She") : new $c.Ptr(Monnambuf, 0), await doname(otmp));
             await encumber_msg();
             could_petrify = otmp.otyp === CORPSE && touch_petrifies($c.relem(mons, otmp.corpsenm)) ? 1 : 0;
-            otmp.how_lost = (LOST_STOLEN) & 7;
+            otmp.how_lost = (LOST.STOLEN) & 7;
             await mpickobj(mtmp, otmp);
-            if (could_petrify && !$c.and64(mtmp.misc_worn_check, W_ARMG)) {
+            if (could_petrify && !$c.and64(mtmp.misc_worn_check, W.ARMG)) {
                 await minstapetrify(mtmp, TRUE);
                 return -1;
             }
@@ -520,7 +520,7 @@ export async function mpickobj(mtmp, otmp) {   // steal.c:618
     if (otmp.unpaid | 0 || Has_contents(otmp) && count_unpaid(otmp.cobj)) {
         await subfrombill(otmp, await find_objowner(otmp, otmp.ox, otmp.oy));
     }
-    if (obj_sheds_light(otmp) && attacktype(mtmp.data, AT_ENGL)) {
+    if (obj_sheds_light(otmp) && attacktype(mtmp.data, AT.ENGL)) {
         if (engulfing_u(mtmp) && !Blind()) {
             await pline($c.lit("%s out."), await Tobjnam(otmp, $c.lit("go")));
         }
@@ -531,10 +531,10 @@ export async function mpickobj(mtmp, otmp) {   // steal.c:618
         if (!canseemon(mtmp) && !$c.peq(mtmp, u.ustuck)) {
             unknow_object(otmp);
         }
-        if ((otmp.how_lost | 0) === LOST_THROWN) {
-            otmp.how_lost = (LOST_STOLEN) & 7;
-        } else if ((otmp.how_lost | 0) === LOST_DROPPED) {
-            otmp.how_lost = (LOST_NONE) & 7;
+        if ((otmp.how_lost | 0) === LOST.THROWN) {
+            otmp.how_lost = (LOST.STOLEN) & 7;
+        } else if ((otmp.how_lost | 0) === LOST.DROPPED) {
+            otmp.how_lost = (LOST.NONE) & 7;
         }
     }
     await carry_obj_effects(otmp);
@@ -618,7 +618,7 @@ export async function stealamulet(mtmp) {   // steal.c:689
         await mpickobj(mtmp, otmp);
         await pline($c.lit("%s steals %s!"), await Some_Monnam(mtmp), new $c.Ptr(buf, 0));
         if (can_teleport(mtmp.data) && !await tele_restrict(mtmp)) {
-            await rloc(mtmp, RLOC_MSG);
+            await rloc(mtmp, RLOC.MSG);
         }
         await encumber_msg();
     }
@@ -660,7 +660,7 @@ export async function mdrop_obj(mon, obj, verbosely) {   // steal.c:814
     unwornmask = obj.owornmask;
     obj_name = await distant_name(obj, doname);
     await extract_from_minvent(mon, obj, FALSE, TRUE);
-    if (unwornmask && mon.mtame && $c.and64(unwornmask, W_SADDLE) !== 0 && !obj.unpaid && await costly_spot(omx, omy) && $c.strchr(in_rooms(u.ux, u.uy, SHOPBASE), svl.level.locations[omx][omy].roomno | 0)) {
+    if (unwornmask && mon.mtame && $c.and64(unwornmask, W.SADDLE) !== 0 && !obj.unpaid && await costly_spot(omx, omy) && $c.strchr(in_rooms(u.ux, u.uy, SHOPBASE), svl.level.locations[omx][omy].roomno | 0)) {
         obj.no_charge = (1) & 1;
     }
     if (verbosely && cansee(omx, omy)) {

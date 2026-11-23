@@ -9,8 +9,8 @@ import { add_menu_coloring } from './coloratt.js';
 import { flags, gc, gd, gn, go, gw, iflags, program_state, svp } from './decl.js';
 import { build_english_list } from './end.js';
 import { debugcore, do_deferred_showpaths, fqname } from './files.js';
-import { BUFSZ, FALSE, PL_NSIZ, PL_PSIZ, TRUE, environ_opt, rc_file_opt, set_in_config, set_in_sysconf } from './global.h.js';
-import { ECMD_OK, SYM_OFF_X, SYSCONFPREFIX, WIZKIT_MAX } from './hack.h.js';
+import { BUFSZ, FALSE, PL, TRUE, environ_opt, rc_file_opt, set_in_config, set_in_sysconf } from './global.h.js';
+import { ECMD, SYM_OFF_X, SYSCONFPREFIX, WIZKIT_MAX } from './hack.h.js';
 import { plur } from './hack.macros.js';
 import { c_eos, eos, mungspaces, nh_snprintf, trimspaces } from './hacklib.js';
 import { nhUse } from './lint.macros.js';
@@ -23,7 +23,7 @@ import { pline, raw_printf } from './pline.js';
 import { rn2 } from './rnd.js';
 import { str2role } from './role.js';
 import { strbuf_empty, strbuf_init } from './strutil.js';
-import { PRIMARYSET, ROGUESET, SYM_BOULDER, WARNCOUNT } from './sym.h.js';
+import { PRIMARYSET, ROGUESET, SYM, WARNCOUNT } from './sym.h.js';
 import { parsesymbols, switch_symbols } from './symbols.js';
 import { sysopt, sysopt_seduce_set } from './sys.js';
 import { file_exists } from './unixunix.js';
@@ -47,7 +47,7 @@ export async function do_write_config_file() {   // cfgfiles.c:169
     let fp = null, tmp = new Int8Array(256), len = 0, wrote = 0, buf = new $T.strbuf();
     if (!configfile[0]) {
         await pline($c.lit("Strange, could not figure out config file name."));
-        return ECMD_OK;
+        return ECMD.OK;
     }
     if (flags.suppress_alert < 50790400) {
         await pline($c.lit("Warning: saveoptions is highly experimental!"));
@@ -59,7 +59,7 @@ export async function do_write_config_file() {   // cfgfiles.c:169
     }
     $c.__builtin___sprintf_chk(new $c.Ptr(tmp, 0), 0, 256, $c.lit("Overwrite config file %.*s?"), 226, new $c.Ptr(configfile, 0));
     if (!await paranoid_query(TRUE, new $c.Ptr(tmp, 0))) {
-        return ECMD_OK;
+        return ECMD.OK;
     }
     fp = $c.fopen(new $c.Ptr(configfile, 0), $c.lit("w"));
     if (fp) {
@@ -73,7 +73,7 @@ export async function do_write_config_file() {   // cfgfiles.c:169
             await pline($c.lit("An error occurred, wrote only partial data (%zu/%zu)."), wrote, len);
         }
     }
-    return ECMD_OK;
+    return ECMD.OK;
 }
 export function set_configfile_name(fname) {   // cfgfiles.c:216
     $c.__builtin___strncpy_chk(new $c.Ptr(configfile, 0), fname, 255, 256);
@@ -369,7 +369,7 @@ function cnf_line_TROUBLEDIR(bufp) {   // cfgfiles.c:750
     return TRUE;
 }
 function cnf_line_NAME(bufp) {   // cfgfiles.c:761
-    $c.__builtin___strncpy_chk(new $c.Ptr(svp.plname, 0), bufp, PL_NSIZ - 1, 32);
+    $c.__builtin___strncpy_chk(new $c.Ptr(svp.plname, 0), bufp, PL.NSIZ - 1, 32);
     return TRUE;
 }
 async function cnf_line_ROLE(bufp) {   // cfgfiles.c:768
@@ -380,11 +380,11 @@ async function cnf_line_ROLE(bufp) {   // cfgfiles.c:768
     return TRUE;
 }
 function cnf_line_dogname(bufp) {   // cfgfiles.c:778
-    $c.__builtin___strncpy_chk(new $c.Ptr(gd.dogname, 0), bufp, PL_PSIZ - 1, 63);
+    $c.__builtin___strncpy_chk(new $c.Ptr(gd.dogname, 0), bufp, PL.PSIZ - 1, 63);
     return TRUE;
 }
 function cnf_line_catname(bufp) {   // cfgfiles.c:785
-    $c.__builtin___strncpy_chk(new $c.Ptr(gc.catname, 0), bufp, PL_PSIZ - 1, 63);
+    $c.__builtin___strncpy_chk(new $c.Ptr(gc.catname, 0), bufp, PL.PSIZ - 1, 63);
     return TRUE;
 }
 async function cnf_line_WIZARDS(bufp) {   // cfgfiles.c:795
@@ -638,7 +638,7 @@ async function cnf_line_PORTABLE_DEVICE_PATHS(bufp) {   // cfgfiles.c:1134
     return TRUE;
 }
 async function cnf_line_BOULDER(bufp) {   // cfgfiles.c:1156
-    await get_uchars(bufp, new $c.Ptr(go.ov_primary_syms, SYM_BOULDER + SYM_OFF_X), TRUE, 1, $c.lit("BOULDER"));
+    await get_uchars(bufp, new $c.Ptr(go.ov_primary_syms, SYM.BOULDER + SYM_OFF_X), TRUE, 1, $c.lit("BOULDER"));
     return TRUE;
 }
 async function cnf_line_MENUCOLOR(bufp) {   // cfgfiles.c:1164

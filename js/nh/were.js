@@ -12,7 +12,7 @@ import { FULL_MOON } from './flag.h.js';
 import { ParanoidWerechange } from './flag.macros.js';
 import { FALSE, TRUE } from './global.h.js';
 import { monster_nearby } from './hack.js';
-import { NO_MM_FLAGS } from './hack.h.js';
+import { NO } from './hack.h.js';
 import { makemon } from './makemon.js';
 import { healmon, monnear, wake_nearto } from './mon.js';
 import { set_mon_data } from './mondata.js';
@@ -21,7 +21,7 @@ import { NEUTRAL } from './monflag.h.js';
 import { monflee, onscary } from './monmove.js';
 import { mons } from './monst.js';
 import { helpless } from './monst.macros.js';
-import { PM_COYOTE, PM_FOX, PM_GIANT_RAT, PM_HUMAN_WEREJACKAL, PM_HUMAN_WERERAT, PM_HUMAN_WEREWOLF, PM_JACKAL, PM_RABID_RAT, PM_SEWER_RAT, PM_WARG, PM_WEREJACKAL, PM_WERERAT, PM_WEREWOLF, PM_WINTER_WOLF, PM_WINTER_WOLF_CUB, PM_WOLF } from './monsters.h.js';
+import { PM } from './monsters.h.js';
 import { an } from './objnam.js';
 import { LOW_PM, NON_PM } from './permonst.h.js';
 import { You_feel, You_hear, impossible, pline } from './pline.js';
@@ -43,10 +43,10 @@ export async function were_change(mon) {   // were.c:9
             gw.were_changes = $c.add64(gw.were_changes, 1);
             if (!Deaf() && !canseemon(mon)) {
                 switch (mon.data.pmidx) {
-                    case PM_WEREWOLF:
+                    case PM.WEREWOLF:
                         howler = $c.lit("wolf");
                         break;
-                    case PM_WEREJACKAL:
+                    case PM.WEREJACKAL:
                         howler = $c.lit("jackal");
                         break;
                     default:
@@ -66,40 +66,40 @@ export async function were_change(mon) {   // were.c:9
 }
 export function counter_were(pm) {   // were.c:48
     switch (pm) {
-        case PM_WEREWOLF:
-            return PM_HUMAN_WEREWOLF;
-        case PM_HUMAN_WEREWOLF:
-            return PM_WEREWOLF;
-        case PM_WEREJACKAL:
-            return PM_HUMAN_WEREJACKAL;
-        case PM_HUMAN_WEREJACKAL:
-            return PM_WEREJACKAL;
-        case PM_WERERAT:
-            return PM_HUMAN_WERERAT;
-        case PM_HUMAN_WERERAT:
-            return PM_WERERAT;
+        case PM.WEREWOLF:
+            return PM.HUMAN_WEREWOLF;
+        case PM.HUMAN_WEREWOLF:
+            return PM.WEREWOLF;
+        case PM.WEREJACKAL:
+            return PM.HUMAN_WEREJACKAL;
+        case PM.HUMAN_WEREJACKAL:
+            return PM.WEREJACKAL;
+        case PM.WERERAT:
+            return PM.HUMAN_WERERAT;
+        case PM.HUMAN_WERERAT:
+            return PM.WERERAT;
         default:
             return NON_PM;
     }
 }
 export function were_beastie(pm) {   // were.c:70
     switch (pm) {
-        case PM_WERERAT:
-        case PM_SEWER_RAT:
-        case PM_GIANT_RAT:
-        case PM_RABID_RAT:
-            return PM_WERERAT;
-        case PM_WEREJACKAL:
-        case PM_JACKAL:
-        case PM_FOX:
-        case PM_COYOTE:
-            return PM_WEREJACKAL;
-        case PM_WEREWOLF:
-        case PM_WOLF:
-        case PM_WARG:
-        case PM_WINTER_WOLF:
-        case PM_WINTER_WOLF_CUB:
-            return PM_WEREWOLF;
+        case PM.WERERAT:
+        case PM.SEWER_RAT:
+        case PM.GIANT_RAT:
+        case PM.RABID_RAT:
+            return PM.WERERAT;
+        case PM.WEREJACKAL:
+        case PM.JACKAL:
+        case PM.FOX:
+        case PM.COYOTE:
+            return PM.WEREJACKAL;
+        case PM.WEREWOLF:
+        case PM.WOLF:
+        case PM.WARG:
+        case PM.WINTER_WOLF:
+        case PM.WINTER_WOLF_CUB:
+            return PM.WEREWOLF;
         default:
             break;
     }
@@ -142,23 +142,23 @@ export async function were_summon(ptr, yours, visible, genbuf) {   // were.c:142
     }
     L1: for (i = rnd(5); i > 0; i = i - 1 | 0) {
         switch (pm) {
-            case PM_WERERAT:
-            case PM_HUMAN_WERERAT:
-                typ = rn2(3) ? PM_SEWER_RAT : rn2(3) ? PM_GIANT_RAT : PM_RABID_RAT;
+            case PM.WERERAT:
+            case PM.HUMAN_WERERAT:
+                typ = rn2(3) ? PM.SEWER_RAT : rn2(3) ? PM.GIANT_RAT : PM.RABID_RAT;
                 if (genbuf) {
                     $c.__builtin___strcpy_chk(genbuf, $c.lit("rat"), -1);
                 }
                 break;
-            case PM_WEREJACKAL:
-            case PM_HUMAN_WEREJACKAL:
-                typ = rn2(7) ? PM_JACKAL : rn2(3) ? PM_COYOTE : PM_FOX;
+            case PM.WEREJACKAL:
+            case PM.HUMAN_WEREJACKAL:
+                typ = rn2(7) ? PM.JACKAL : rn2(3) ? PM.COYOTE : PM.FOX;
                 if (genbuf) {
                     $c.__builtin___strcpy_chk(genbuf, $c.lit("jackal"), -1);
                 }
                 break;
-            case PM_WEREWOLF:
-            case PM_HUMAN_WEREWOLF:
-                typ = rn2(5) ? PM_WOLF : rn2(2) ? PM_WARG : PM_WINTER_WOLF;
+            case PM.WEREWOLF:
+            case PM.HUMAN_WEREWOLF:
+                typ = rn2(5) ? PM.WOLF : rn2(2) ? PM.WARG : PM.WINTER_WOLF;
                 if (genbuf) {
                     $c.__builtin___strcpy_chk(genbuf, $c.lit("wolf"), -1);
                 }
@@ -166,7 +166,7 @@ export async function were_summon(ptr, yours, visible, genbuf) {   // were.c:142
             default:
                 continue L1;
         }
-        mtmp = await makemon($c.relem(mons, typ), u.ux, u.uy, NO_MM_FLAGS);
+        mtmp = await makemon($c.relem(mons, typ), u.ux, u.uy, NO.MM_FLAGS);
         if (mtmp) {
             total = total + 1 | 0;
             if (canseemon(mtmp)) {

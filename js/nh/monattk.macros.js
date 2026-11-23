@@ -2,8 +2,8 @@
 import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
-import { AT_BREA, AT_GAZE, AT_MAGC, AT_SPIT } from './monattk.h.js';
+import { AT } from './monattk.h.js';
 
 export function DISTANCE_ATTK_TYPE(atyp) {
-    return atyp === AT_SPIT || atyp === AT_BREA || atyp === AT_MAGC || atyp === AT_GAZE ? 1 : 0;
+    return atyp === AT.SPIT || atyp === AT.BREA || atyp === AT.MAGC || atyp === AT.GAZE ? 1 : 0;
 }

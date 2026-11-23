@@ -11,7 +11,7 @@ import { add_room } from './mklev.js';
 import { somexy } from './mkroom.js';
 import { NO_ROOM, OROOM, ROOMOFFSET, SHARED } from './mkroom.h.js';
 import { impossible } from './pline.js';
-import { DBWALL, DOOR, ICE, ICED_MOAT, ICED_POOL, LAVAPOOL, ROOM, SDOOR, TREE } from './rm.h.js';
+import { DBWALL, DOOR, ICE, ICED, LAVAPOOL, ROOM, SDOOR, TREE } from './rm.h.js';
 import { IS_OBSTRUCTED } from './rm.macros.js';
 import { rn2, rnd } from './rnd.js';
 import { dig_corridor, wallify_map } from './sp_lev.js';
@@ -284,7 +284,7 @@ function finish_map(fg_typ, bg_typ, lit, walled, icedpools) {   // mkmap.c:331
             if (svl.level.locations[x][y].typ === LAVAPOOL) {
                 svl.level.locations[x][y].lit = (TRUE) & 1;
             } else if (svl.level.locations[x][y].typ === ICE) {
-                svl.level.locations[x][y].flags = ((icedpools ? ICED_POOL : ICED_MOAT) >>> 0) & 31;
+                svl.level.locations[x][y].flags = ((icedpools ? ICED.POOL : ICED.MOAT) >>> 0) & 31;
             }
         }
     }

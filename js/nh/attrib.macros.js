@@ -3,7 +3,7 @@ import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
 import { acurr, acurrstr } from './attrib.js';
-import { A_STR } from './attrib.h.js';
+import { A } from './attrib.h.js';
 import { gu, u } from './decl.js';
 import { uasmon_maxStr } from './polyself.js';
 
@@ -17,5 +17,5 @@ export function ATEMP(x) {
     return u.atemp.a[x];
 }
 export function ATTRMAX(x) {
-    return x === A_STR && u.umonnum !== u.umonster ? uasmon_maxStr() : gu.urace.attrmax[x];
+    return x === A.STR && u.umonnum !== u.umonster ? uasmon_maxStr() : gu.urace.attrmax[x];
 }
