@@ -60,7 +60,9 @@ export class Program {
         // table both ways and compares them (tools/tablecheck.mjs)
         this.tableLiterals = opts.tableLiterals !== false;
         this.constNamespaces = opts.constNamespaces !== false;
-        this.comments = opts.comments !== false;   // P4: C comments and notices   // P2c: PM.ANGEL
+        this.comments = opts.comments !== false;   // P4: C comments and notices
+        this.jsdoc = opts.jsdoc !== false;         // JSDoc from the C signatures
+        this.docKeys = []; this.docIdx = new Map();   // P2c: PM.ANGEL
         this.nsNames = new Set();
         this.macroUses = new Set();   // macros invoked in object-world function code (namespaces.mjs)
         this.expanded = new Set();    // identifiers object-world TUs expand as macros (namespaces.mjs)
@@ -403,9 +405,25 @@ export class Program {
         const errors = [];
         const results = [];
         for (const tu of tus) { const r = this.emitTU(tu); results.push(r); errors.push(...r.errors); }
-        for (const [k, v] of this.resolveTUs(results)) files.set(k, v);
-        for (const [k, v] of this.finish()) files.set(k, v);
+        const fin = this.finish();
+        for (const [k, v] of this.resolveTUs(results)) files.set(k, this.resolveDocTypes(v, fin.get('types.js')));
+        for (const [k, v] of fin) files.set(k, v);
         return { files, errors };
+    }
+    /** JSDoc: a placeholder for record `key`'s class (docType), resolved once types.js is known (resolveDocTypes). */
+    docRecord(key, nullable) {
+        let i = this.docIdx.get(key);
+        if (i === undefined) { i = this.docKeys.length; this.docKeys.push(key); this.docIdx.set(key, i); }
+        return `\u0003${i}${nullable ? '?' : ''}\u0003`;
+    }
+    /** The record placeholders of `code`: `$T.<class>` (`| null` for a pointer) where types.js defines the class, else '*'. */
+    resolveDocTypes(code, typesText) {
+        if (!code.includes('\u0003')) return code;
+        if (!this.docClasses) this.docClasses = new Set([...String(typesText || '').matchAll(/^export class ([\w$]+)/gm)].map((m) => m[1]));
+        return code.replace(/\u0003(\d+)(\?)?\u0003/g, (_, i, q) => {
+            const n = this.classNames.get(this.docKeys[Number(i)]);
+            return n && this.docClasses.has(n) ? `$T.${n}${q ? ' | null' : ''}` : '*';
+        });
     }
     /** Whether a constant or macro named `name` would collide with a C name the generated code uses. */
     macroNameTaken(tu, name) {

@@ -172,6 +172,9 @@ const FORTIFY_DROP = {
 // the sub-statement that ends a statement's head (an index into its children; -1: the last)
 const HEADED = { IfStmt: 1, WhileStmt: -1, ForStmt: -1, SwitchStmt: -1 };
 
+/** A C type as a JSDoc description: one line, no comment terminator. */
+const cTypeText = (s) => String(s || '').replace(/\s+/g, ' ').replace(/\*\//g, '* /').trim();
+
 export class TUEmitter {
     /**
      * @param tu { root, scope, file (repo-relative .c), dir (TU directory), src (absolute .c path) }
@@ -696,6 +699,7 @@ export class TUEmitter {
         const pnames = ps.map((p) => (p.boxed || (p.t.k === 'rec') ? `${p.name}$in` : p.name));
         if (this.fn.isVariadic) pnames.push('...$va');
         const asyncKw = this.fn.isAsync ? 'async ' : '';
+        lines.push(...this.jsdoc(f, ps, pnames));
         lines.push(`${exp}${asyncKw}function ${jsName(f.name)}(${pnames.join(', ')}) {   // ${pos}`);
         // parameter boxing / struct copies
         for (const p of ps) {
@@ -719,6 +723,44 @@ export class TUEmitter {
         lines.push('}');
         this.fn = null;
         return lines.join('\n');
+    }
+    /**
+     * JSDoc for a function from its C signature (readability step "JSDoc"; comments only):
+     * each parameter's JS type, with the C type as its description, and the return type.
+     */
+    jsdoc(f, ps, pnames) {
+        if (this.prog.jsdoc === false) return [];
+        const out = [];
+        ps.forEach((p, i) => out.push(` * @param {${this.docType(p.t)}} ${pnames[i]} ${cTypeText(p.decl.type.qualType)}`));
+        if (this.fn.isVariadic) out.push(' * @param {...*} $va the C variable arguments (...)');
+        const ft = this.T(f);
+        const ret = ft.k === 'fn' ? this.S.resolve(ft.ret) : null;
+        const rt = ret && ret.k !== 'void' ? this.docType(ret) : null;
+        const rc = cTypeText((f.type.qualType || '').replace(/\s*\(.*$/s, ''));
+        if (this.fn.isAsync) out.push(` * @returns {Promise<${rt || 'void'}>}${rt ? ` ${rc}` : ''}`);
+        else if (rt) out.push(` * @returns {${rt}} ${rc}`);
+        return out.length ? ['/**', ...out, ' */'] : [];
+    }
+    /** The JS type of a C type's values, as JSDoc writes it. */
+    docType(t) {
+        t = this.S.resolve(t);
+        // a record's class name, without registering the class (a record incomplete here, lua_State in nhlua.c, is '*')
+        // a record's class: a placeholder resolved once types.js is known (program.mjs resolveDocTypes)
+        const rc = (key, nullable) => this.prog.docRecord(key, nullable);
+        switch (t.k) {
+        case 'int': return t.size === 8 ? 'number | bigint' : 'number';
+        case 'float': return 'number';
+        case 'rec': return rc(t.key, false);
+        case 'fn': return 'Function | null';
+        case 'ptr': {
+            const to = this.S.resolve(t.to);
+            if (to.k === 'rec') return rc(to.key, true);
+            if (to.k === 'int' && to.size === 1) return '$c.Ptr | null';
+            if (to.k === 'fn') return 'Function | null';
+            return '*';
+        }
+        default: return '*';
+        }
     }
     box(t, v) {
         const ta = typedArrayOf(t);

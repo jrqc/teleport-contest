@@ -213,6 +213,7 @@ export class HeapEmitter extends TUEmitter {
         const exp = f.storageClass === 'static' ? '' : 'export ';
         const pnames = ps.map((p) => (p.frame ? `${p.name}$in` : p.name));
         if (this.fn.isVariadic) pnames.push('...$va');
+        lines.push(...this.jsdoc(f, ps, pnames));
         lines.push(`${exp}${this.fn.isAsync ? 'async ' : ''}function ${jsName(f.name)}(${pnames.join(', ')}) {   // ${this.posOf(f)}`);
         const decls = [];
         for (const v of this.fn.vars) if (!v.frame) decls.push(`${v.name} = ${v.isVa ? 'null' : this.hzero(v.t)}`);
@@ -229,6 +230,12 @@ export class HeapEmitter extends TUEmitter {
         lines.push('}');
         this.fn = null;
         return lines.join('\n');
+    }
+    /** Heap world: pointers, records and arrays are addresses (numbers). */
+    docType(t) {
+        t = this.S.resolve(t);
+        if (t.k === 'int') return t.size === 8 ? 'number | bigint' : 'number';
+        return 'number';
     }
     hzero(t) { t = this.S.resolve(t); return t.k === 'int' && t.size === 8 ? '0' : '0'; }
     frameAddr(v) { return v.off ? E(`$fp + ${v.off}`, PREC.add) : E('$fp'); }

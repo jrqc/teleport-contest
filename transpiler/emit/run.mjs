@@ -78,8 +78,10 @@ for (const e of [...db, ...luaDb]) {
 if (!only.size) writeFileSync(path.join(ROOT, 'transpiler/out/const-tus.json'), JSON.stringify(Object.fromEntries([...prog.constTUs].sort()), null, 1) + '\n');
 // readability plan P3: macro sites are resolved once every TU is emitted
 const finalCode = prog.resolveTUs(results);
-perTu.forEach((t, i) => { const code = finalCode.get(results[i].path); writeFileSync(path.join(out, results[i].path), code); t.lines = code.split('\n').length; });
-for (const [f, text] of prog.finish()) writeFileSync(path.join(out, f), text);
+const fin = prog.finish();
+// JSDoc record types name the classes types.js defines (program.mjs resolveDocTypes)
+perTu.forEach((t, i) => { const code = prog.resolveDocTypes(finalCode.get(results[i].path), fin.get('types.js')); writeFileSync(path.join(out, results[i].path), code); t.lines = code.split('\n').length; });
+for (const [f, text] of fin) writeFileSync(path.join(out, f), text);
 process.stderr.write(` emit ${((Date.now() - t0) / 1000).toFixed(0)}s\n`);
 // syntax check
 const bad = [];
