@@ -63,10 +63,9 @@ const gloc_filtertxt = $c.nulls(3);
  * @returns {Promise<void>}
  */
 export async function getpos_sethilite(gp_hilitef, gp_getvalidf) {   // getpos.c:41
-    let old_getvalid = null, old_map_frame_color = 0, sel = null;
-    old_getvalid = getpos_getvalid;
-    old_map_frame_color = gw.wsettings.map_frame_color;
-    sel = await selection_new();
+    const old_getvalid = getpos_getvalid;
+    const old_map_frame_color = gw.wsettings.map_frame_color;
+    const sel = await selection_new();
     defaultHiliteState = iflags.bgcolors ? HiliteBackground : HiliteNormalMap;
     if (gp_getvalidf !== old_getvalid) {
         getpos_hilite_state = defaultHiliteState;
@@ -142,9 +141,9 @@ async function getpos_getvalids_selection(sel, validf) {   // getpos.c:102
  * @returns {Promise<void>}
  */
 async function getpos_help_keyxhelp(tmpwin, k1, k2, gloc) {   // getpos.c:137
-    let sbuf = new Int8Array(256), fbuf = new Int8Array(128), move_cursor_to = null, filtertxt = null;
-    move_cursor_to = $c.lit("move the cursor to ");
-    filtertxt = gloc_filtertxt[iflags.getloc_filter];
+    let sbuf = new Int8Array(256), fbuf = new Int8Array(128);
+    let move_cursor_to = $c.lit("move the cursor to ");
+    let filtertxt = gloc_filtertxt[iflags.getloc_filter];
     if (gloc === GLOC.EXPLORE) {
         /* default of "move to unexplored location" is inaccurate
            because the position will be one spot short of that */
@@ -266,15 +265,14 @@ async function getpos_help(force, goal) {   // getpos.c:167
  * @returns {number} int
  */
 function cmp_coord_distu(a, b) {   // getpos.c:312
-    let c1 = null, c2 = null, dx = 0, dy = 0, dist_1 = 0, dist_2 = 0;
-    c1 = $c.asRec(a, $T.nhcoord, 4);
-    c2 = $c.asRec(b, $T.nhcoord, 4);
-    dx = u.ux - c1.x;
-    dy = u.uy - c1.y;
-    dist_1 = $c.abs(dx) > $c.abs(dy) ? $c.abs(dx) : $c.abs(dy);
+    const c1 = $c.asRec(a, $T.nhcoord, 4);
+    const c2 = $c.asRec(b, $T.nhcoord, 4);
+    let dx = u.ux - c1.x;
+    let dy = u.uy - c1.y;
+    const dist_1 = $c.abs(dx) > $c.abs(dy) ? $c.abs(dx) : $c.abs(dy);
     dx = u.ux - c2.x;
     dy = u.uy - c2.y;
-    dist_2 = $c.abs(dx) > $c.abs(dy) ? $c.abs(dx) : $c.abs(dy);
+    const dist_2 = $c.abs(dx) > $c.abs(dy) ? $c.abs(dx) : $c.abs(dy);
     if (dist_1 === dist_2) {
         return c1.y !== c2.y ? c1.y - c2.y : c1.x - c2.x;
     }
@@ -285,11 +283,10 @@ function cmp_coord_distu(a, b) {   // getpos.c:312
  * @returns {number} int
  */
 function gloc_filter_classify_glyph(glyph) {   // getpos.c:341
-    let c = 0;
     if (!glyph_is_cmap(glyph)) {
         return 0;
     }
-    c = glyph_to_cmap(glyph);
+    const c = glyph_to_cmap(glyph);
     if (is_cmap_room(c) || is_cmap_furniture(c)) {
         return 1;
     } else if (is_cmap_wall(c) || c === S.tree) {
@@ -309,8 +306,7 @@ function gloc_filter_classify_glyph(glyph) {   // getpos.c:341
  * @returns {Promise<number>} int
  */
 async function gloc_filter_floodfill_matcharea(x, y) {   // getpos.c:364
-    let glyph = 0;
-    glyph = await back_to_glyph(x, y);
+    const glyph = await back_to_glyph(x, y);
     if (!svl.level.locations[x][y].seenv) {
         return FALSE;
     }
@@ -367,12 +363,11 @@ function gloc_filter_done() {   // getpos.c:412
  * @returns {number} boolean
  */
 function known_vibrating_square_at(x, y) {   // getpos.c:422
-    let ttmp = null;
     /* note: this only acknowledges the genuine vibrating square, not
        fake ones produced by wizard mode wishing for traps which could
        possibly be transfered to normal play via bones file */
     if (invocation_pos(x, y)) {
-        ttmp = t_at(x, y);
+        const ttmp = t_at(x, y);
         return ttmp && ttmp.ttyp === VIBRATING_SQUARE && ttmp.tseen ? 1 : 0;
     }
     return FALSE;
@@ -384,15 +379,14 @@ function known_vibrating_square_at(x, y) {   // getpos.c:422
  * @returns {Promise<number>} boolean
  */
 export async function gather_locs_interesting(x, y, gloc) {   // getpos.c:438
-    let glyph = 0, sym = 0;
     if (iflags.getloc_filter === GFILTER_VIEW && !cansee(x, y)) {
         return FALSE;
     }
     if (iflags.getloc_filter === GFILTER_AREA && !GLOC_SAME_AREA(x, y) && !(isok($c.i16(x - 1), y) && selection_getpoint($c.i16(x - 1), y, gg.gloc_filter_map)) && !(isok(x, $c.i16(y - 1)) && selection_getpoint(x, $c.i16(y - 1), gg.gloc_filter_map)) && !(isok($c.i16(x + 1), y) && selection_getpoint($c.i16(x + 1), y, gg.gloc_filter_map)) && !(isok(x, $c.i16(y + 1)) && selection_getpoint(x, $c.i16(y + 1), gg.gloc_filter_map))) {
         return FALSE;
     }
-    glyph = glyph_at(x, y);
-    sym = glyph_is_cmap(glyph) ? glyph_to_cmap(glyph) : -1;
+    const glyph = glyph_at(x, y);
+    const sym = glyph_is_cmap(glyph) ? glyph_to_cmap(glyph) : -1;
     switch (gloc) {
         default:
         case GLOC.MONS:
@@ -545,8 +539,8 @@ export function coord_desc(x, y, outbuf, cmode) {   // getpos.c:595
  * @returns {Promise<void>}
  */
 export async function auto_describe(cx, cy) {   // getpos.c:640
-    let cc = new $T.nhcoord(), sym = 0, tmpbuf = new Int8Array(256), firstmatch = [null];
-    sym = 0;
+    let cc = new $T.nhcoord(), tmpbuf = new Int8Array(256), firstmatch = [null];
+    const sym = 0;
     firstmatch[0] = $c.lit("unknown");
     cc.x = cx;
     cc.y = cy;
@@ -563,11 +557,11 @@ export async function auto_describe(cx, cy) {   // getpos.c:640
  * @returns {Promise<number>} boolean
  */
 export async function getpos_menu(ccp, gloc) {   // getpos.c:665
-    let garr = [null], gcount = Int32Array.of(0), tmpwin = 0, any = new $T.any(), i = 0, pick_cnt = 0, picks = [null], tmpbuf = new Int8Array(256), clr = 0, fullbuf = new Int8Array(256), tmpcc = new $T.nhcoord(), firstmatch = [null], sym = 0;
+    let garr = [null], gcount = Int32Array.of(0), any = new $T.any(), i = 0, picks = [null], tmpbuf = new Int8Array(256), fullbuf = new Int8Array(256), tmpcc = new $T.nhcoord(), firstmatch = [null];
     garr[0] = null;
     gcount[0] = 0;
     picks[0] = null;
-    clr = NO_COLOR;
+    const clr = NO_COLOR;
     await gather_locs(new $c.Ptr(garr, 0), new $c.Ptr(gcount, 0), gloc);
     if (gcount[0] < 2) {
         /* gcount always includes the hero */
@@ -575,13 +569,13 @@ export async function getpos_menu(ccp, gloc) {   // getpos.c:665
         await You($c.lit("cannot %s %s."), iflags.getloc_filter === GFILTER_VIEW ? $c.lit("see") : $c.lit("detect"), gloc_descr[gloc][0]);
         return FALSE;
     }
-    tmpwin = await create_nhwindow()(NHW.MENU);
+    const tmpwin = await create_nhwindow()(NHW.MENU);
     await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     /* gather_locs returns array[0] == you. skip it. */
     for (i = 1; i < gcount[0]; i = i + 1 | 0) {
         firstmatch[0] = $c.lit("unknown");
-        sym = 0;
+        const sym = 0;
         any.a_int = i + 1 | 0;
         tmpcc.x = $c.radd(garr[0], i).x;
         tmpcc.y = $c.radd(garr[0], i).y;
@@ -593,7 +587,7 @@ export async function getpos_menu(ccp, gloc) {   // getpos.c:665
     }
     $c.sprintf(new $c.Ptr(tmpbuf, 0), $c.lit("Pick %s%s%s"), await an(gloc_descr[gloc][1]), gloc_filtertxt[iflags.getloc_filter], iflags.getloc_travelmode ? $c.lit(" for travel destination") : $c.lit(""));
     await end_menu()(tmpwin, new $c.Ptr(tmpbuf, 0));
-    pick_cnt = await select_menu(tmpwin, PICK.ONE, new $c.Ptr(picks, 0));
+    const pick_cnt = await select_menu(tmpwin, PICK.ONE, new $c.Ptr(picks, 0));
     await destroy_nhwindow()(tmpwin);
     if (pick_cnt > 0) {
         ccp.x = $c.radd(garr[0], picks[0].item.a_int - 1 | 0).x;

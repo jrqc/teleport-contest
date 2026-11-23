@@ -131,10 +131,10 @@ function veggy_item(obj, otyp) {   // shknam.c:380
  * @returns {Promise<number>} int
  */
 async function shkveg() {   // shknam.c:408
-    let i = 0, j = 0, maxprob = 0, prob = 0, oclass = 0, ok = new Int32Array(481), $t1;
-    oclass = FOOD_CLASS;
+    let i = 0, maxprob = 0, ok = new Int32Array(481), $t1;
+    const oclass = FOOD_CLASS;
     $c.memset(new $c.Ptr(ok, 0), 0, 1924);   /* lint suppression */
-    j = maxprob = 0;
+    let j = maxprob = 0;
     for (i = svb.bases[oclass]; i < NUM_OBJECTS; i = i + 1 | 0) {
         if (objects[i].oc_class !== oclass) {
             break;
@@ -147,7 +147,7 @@ async function shkveg() {   // shknam.c:408
     if (maxprob < 1) {
         await panic($c.lit("shkveg no veggy objects"));
     }
-    prob = rnd(maxprob);
+    let prob = rnd(maxprob);
     j = 0;
     i = ok[0];
     while ((prob = prob - objects[i].oc_prob | 0) > 0) {
@@ -166,8 +166,7 @@ async function shkveg() {   // shknam.c:408
  * @returns {Promise<void>}
  */
 async function mkveggy_at(sx, sy) {   // shknam.c:443
-    let obj = null;
-    obj = await mksobj_at(await shkveg(), $c.i16(sx), $c.i16(sy), TRUE, TRUE);
+    const obj = await mksobj_at(await shkveg(), $c.i16(sx), $c.i16(sy), TRUE, TRUE);
     if (obj && obj.otyp === TIN) {
         set_tin_variety(obj, HEALTHY_TIN);
     }
@@ -182,10 +181,10 @@ async function mkveggy_at(sx, sy) {   // shknam.c:443
  * @returns {Promise<void>}
  */
 async function mkshobj_at(shp, sx, sy, mkspecl) {   // shknam.c:454
-    let mtmp = null, ptr = null, atype = 0, novel = null;
+    let mtmp = null, ptr = null;
     /* 3.6 tribute */
     if (mkspecl && (!$c.strcmp(shp.name, $c.lit("rare books")) || !$c.strcmp(shp.name, $c.lit("second-hand bookstore")))) {
-        novel = await mksobj_at(SPE_NOVEL, $c.i16(sx), $c.i16(sy), FALSE, FALSE);
+        const novel = await mksobj_at(SPE_NOVEL, $c.i16(sx), $c.i16(sy), FALSE, FALSE);
         if (novel) {
             svc.context.tribute.bookstock = (TRUE) & 1;
         }
@@ -194,7 +193,7 @@ async function mkshobj_at(shp, sx, sy, mkspecl) {   // shknam.c:454
     if (rn2(100) < depth(u.uz) && !MON_AT(sx, sy) && (ptr = await mkclass(S.MIMIC, 0)) !== null && (mtmp = await makemon(ptr, $c.i16(sx), $c.i16(sy), NO.MM_FLAGS)) !== null) {
         /* nothing */
     } else {
-        atype = get_shop_item($c.i32($c.rdiff(shp, shtypes[0])));
+        const atype = get_shop_item($c.i32($c.rdiff(shp, shtypes[0])));
         if (atype === VEGETARIAN_CLASS) {
             await mkveggy_at(sx, sy);
         } else if (atype < 0) {
@@ -210,9 +209,9 @@ async function mkshobj_at(shp, sx, sy, mkspecl) {   // shknam.c:454
  * @param {*} nlp const char *const *
  */
 function nameshk(shk, nlp) {   // shknam.c:487
-    let i = 0, trycnt = 0, names_avail = 0, shname = null, mtmp = null, name_wanted = 0, sptr = null, nseed = 0;
-    shname = null;
-    name_wanted = shk.m_id | 0;
+    let i = 0, trycnt = 0, names_avail = 0, mtmp = null, sptr = null;
+    let shname = null;
+    let name_wanted = shk.m_id | 0;
     if ($c.peq(nlp, new $c.Ptr(shklight, 0)) && In_mines(u.uz) && (sptr = Is_special(u.uz)) !== null && sptr.flags.town) {
         /* special-case minetown lighting shk */
         shname = $c.lit("+Izchak");
@@ -222,7 +221,7 @@ function nameshk(shk, nlp) {   // shknam.c:487
            and restore support which would be necessary for randomization;
            try not to make too many assumptions about time_t's internals;
            use ledger_no rather than depth to keep minetown distinct. */
-        nseed = $c.i32($c.div64($G.ubirthday, 257));
+        const nseed = $c.i32($c.div64($G.ubirthday, 257));
         name_wanted = name_wanted + ((ledger_no(u.uz) + $c.rem32(nseed, 13) | 0) - $c.rem32(nseed, 5) | 0) | 0;
         if (name_wanted < 0) {
             name_wanted = name_wanted + 18 | 0;
@@ -311,14 +310,14 @@ export function free_eshk(mtmp) {   // shknam.c:569
  * @returns {number} int
  */
 function good_shopdoor(sroom, sx, sy) {   // shknam.c:582
-    let i = 0, di = 0, rmno = 0;
+    let i = 0;
     for (i = 0; i < sroom.doorct; i = i + 1 | 0) {
-        di = sroom.fdoor + i | 0;
+        const di = sroom.fdoor + i | 0;
         sx.set(0, $c.radd(svd.doors, di).x);
         sy.set(0, $c.radd(svd.doors, di).y);
         /* check that the shopkeeper placement is sane */
         if (sroom.irregular) {
-            rmno = $c.i32($c.add64($c.rdiff(sroom, svr.rooms[0]), ROOMOFFSET));
+            const rmno = $c.i32($c.add64($c.rdiff(sroom, svr.rooms[0]), ROOMOFFSET));
             if (isok($c.i16(sx.get(0) - 1), sy.get(0)) && !svl.level.locations[sx.get(0) - 1][sy.get(0)].edge && svl.level.locations[sx.get(0) - 1][sy.get(0)].roomno === rmno) {
                 sx.set(0, $c.i16(sx.get(0) - 1));
             } else if (isok($c.i16(sx.get(0) + 1), sy.get(0)) && !svl.level.locations[sx.get(0) + 1][sy.get(0)].edge && svl.level.locations[sx.get(0) + 1][sy.get(0)].roomno === rmno) {
@@ -352,14 +351,14 @@ function good_shopdoor(sroom, sx, sy) {   // shknam.c:582
  * @returns {Promise<number>} int
  */
 async function shkinit(shp, sroom) {   // shknam.c:628
-    let sh = 0, sx = Int16Array.of(0), sy = Int16Array.of(0), shk = null, eshkp = null, j = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8;
+    let sx = Int16Array.of(0), sy = Int16Array.of(0), shk = null, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8;
     /* place the shopkeeper in the given room */
-    sh = good_shopdoor(sroom, new $c.Ptr(sx, 0), new $c.Ptr(sy, 0));
+    let sh = good_shopdoor(sroom, new $c.Ptr(sx, 0), new $c.Ptr(sy, 0));
     if (sh < 0) {
         /* Said to happen sometimes, but I have never seen it. */
         /* Supposedly fixed by fdoor change in mklev.c */
         if (wizard()) {
-            j = sroom.doorct;
+            let j = sroom.doorct;
             await impossible($c.lit("Where is shopdoor?"));
             await pline($c.lit("Room at (%d,%d),(%d,%d)."), sroom.lx, sroom.ly, sroom.hx, sroom.hy);
             await pline($c.lit("doormax=%d doorct=%d fdoor=%d"), gd.doorindex, sroom.doorct, sh);
@@ -378,7 +377,7 @@ async function shkinit(shp, sroom) {   // shknam.c:628
     if (!(shk = await makemon(mons[PM.SHOPKEEPER], sx[0], sy[0], MM.ESHK))) {
         return -1;
     }
-    eshkp = shk.mextra.eshk;   /* makemon(...,MM_ESHK) allocates this */
+    const eshkp = shk.mextra.eshk;   /* makemon(...,MM_ESHK) allocates this */
     $t2 = shk.mpeaceful = 1, shk.isshk = ($t2) & 1;
     set_malign(shk);
     shk.msleeping = 0;
@@ -434,24 +433,24 @@ function stock_room_goodpos(sroom, rmno, sh, sx, sy) {   // shknam.c:695
  * @returns {Promise<void>}
  */
 export async function stock_room(shp_indx, sroom) {   // shknam.c:718
-    let sx = 0, sy = 0, sh = 0, stockcount = 0, specialspot = 0, buf = new Int8Array(256), rmno = 0, shp = null, m = 0, n = 0, mtmp = null, $t1;
+    let sh = 0, buf = new Int8Array(256), $t1;
     /*
      * Someday soon we'll dispatch on the shdist field of shclass to do
      * different placements in this routine. Currently it only supports
      * shop-style placement (all squares except a row nearest the first
      * door get objects).
      */
-    stockcount = 0;
-    specialspot = 0;
-    rmno = $c.i32($c.add64($c.rdiff(sroom, svr.rooms[0]), ROOMOFFSET));
-    shp = $c.relem(shtypes, shp_indx);
+    let stockcount = 0;
+    let specialspot = 0;
+    const rmno = $c.i32($c.add64($c.rdiff(sroom, svr.rooms[0]), ROOMOFFSET));
+    const shp = $c.relem(shtypes, shp_indx);
     /* first, try to place a shopkeeper in the room */
     if ((sh = await shkinit(shp, sroom)) < 0) {
         return;
     }
     /* make sure no doorways without doors, and no trapped doors, in shops */
-    sx = $c.radd(svd.doors, sroom.fdoor).x;
-    sy = $c.radd(svd.doors, sroom.fdoor).y;
+    let sx = $c.radd(svd.doors, sroom.fdoor).x;
+    let sy = $c.radd(svd.doors, sroom.fdoor).y;
     if (svl.level.locations[sx][sy].flags === D.NODOOR) {
         svl.level.locations[sx][sy].flags = (D.ISOPEN) & 31;
         await newsym($c.i16(sx), $c.i16(sy));
@@ -464,8 +463,8 @@ export async function stock_room(shp_indx, sroom) {   // shknam.c:718
         svl.level.locations[sx][sy].flags = (D.LOCKED) & 31;
     }
     if (svl.level.locations[sx][sy].flags === D.LOCKED) {
-        m = sx;
-        n = sy;
+        let m = sx;
+        let n = sy;
         if (inside_shop($c.i16(sx + 1 | 0), $c.i16(sy))) {
             m = m - 1 | 0;
         } else if (inside_shop($c.i16(sx - 1 | 0), $c.i16(sy))) {
@@ -511,7 +510,7 @@ export async function stock_room(shp_indx, sroom) {   // shknam.c:718
      */
     /* Hack for Orcus's level: it's a ghost town, get rid of shopkeepers */
     if (on_level(u.uz, svd.dungeon_topology.d_orcus_level)) {
-        mtmp = await shop_keeper($c.i8(rmno));
+        const mtmp = await shop_keeper($c.i8(rmno));
         await mongone(mtmp);
     }
     svl.level.flags.has_shop = (TRUE) & 1;
@@ -523,9 +522,9 @@ export async function stock_room(shp_indx, sroom) {   // shknam.c:718
  * @returns {number} boolean
  */
 export function saleable(shkp, obj) {   // shknam.c:805
-    let i = 0, shp_indx = 0, shp = null;
-    shp_indx = shkp.mextra.eshk.shoptype - SHOPBASE | 0;
-    shp = $c.relem(shtypes, shp_indx);
+    let i = 0;
+    const shp_indx = shkp.mextra.eshk.shoptype - SHOPBASE | 0;
+    const shp = $c.relem(shtypes, shp_indx);
     if (shp.symb === RANDOM_CLASS) {
         return TRUE;
     }
@@ -549,8 +548,8 @@ export function saleable(shkp, obj) {   // shknam.c:805
  * @returns {number} int
  */
 export function get_shop_item(type) {   // shknam.c:829
-    let shp = null, i = 0, j = 0;
-    shp = $c.radd(shtypes[0], type);
+    let i = 0, j = 0;
+    const shp = $c.radd(shtypes[0], type);
     /* select an appropriate object type at random */
     for (j = rnd(100), i = 0; (j = j - shp.iprobs[i].iprob | 0) > 0; i = i + 1 | 0) {
         continue;
@@ -563,8 +562,8 @@ export function get_shop_item(type) {   // shknam.c:829
  * @returns {Promise<$c.Ptr | null>} char *
  */
 export async function Shknam(mtmp) {   // shknam.c:843
-    let nam = null, $t1;
-    nam = await shkname(mtmp);
+    let $t1;
+    const nam = await shkname(mtmp);
     /* 'nam[]' is almost certainly already capitalized, but be sure */
     $t1 = highc(nam.get(0)), nam.set(0, $t1);
     return nam;
@@ -577,18 +576,18 @@ export async function Shknam(mtmp) {   // shknam.c:843
  * @returns {Promise<$c.Ptr | null>} char *
  */
 export async function shkname(mtmp) {   // shknam.c:856
-    let nam = null, save_isshk = 0, shknm = null, nlp = null, num = 0;
-    save_isshk = mtmp.isshk;
+    let num = 0;
+    const save_isshk = mtmp.isshk;
     mtmp.isshk = 0;   /* don't want mon_nam() calling shkname() */
     /* get a modifiable name buffer along with fallback result */
-    nam = await noit_mon_nam(mtmp);
+    const nam = await noit_mon_nam(mtmp);
     mtmp.isshk = (save_isshk) & 1;
     if (!mtmp.isshk) {
         await impossible($c.lit("shkname: \"%s\" is not a shopkeeper."), nam);
     } else if (!has_eshk(mtmp)) {
         await panic($c.lit("shkname: shopkeeper \"%s\" lacks 'eshk' data."), nam);
     } else {
-        shknm = new $c.Ptr(mtmp.mextra.eshk.shknam, 0);
+        let shknm = new $c.Ptr(mtmp.mextra.eshk.shknam, 0);
         if (Hallucination() && !program_state.gameover) {
             /* count the number of non-unique shop types;
                pick one randomly, ignoring shop generation probabilities;
@@ -599,7 +598,7 @@ export async function shkname(mtmp) {   // shknam.c:856
                 }
             }
             if (num > 0) {
-                nlp = shtypes[rn2(num)].shknms;
+                const nlp = shtypes[rn2(num)].shknms;
                 for (num = 0; nlp.get(num); num = num + 1 | 0) {
                     continue;
                 }
@@ -621,8 +620,7 @@ export async function shkname(mtmp) {   // shknam.c:856
  * @returns {number} boolean
  */
 export function shkname_is_pname(mtmp) {   // shknam.c:900
-    let shknm = null;
-    shknm = new $c.Ptr(mtmp.mextra.eshk.shknam, 0);
+    const shknm = new $c.Ptr(mtmp.mextra.eshk.shknam, 0);
     return shknm.get(0) === 45 || shknm.get(0) === 43 || shknm.get(0) === 61 ? 1 : 0;
 }
 /**
@@ -631,7 +629,6 @@ export function shkname_is_pname(mtmp) {   // shknam.c:900
  * @returns {number} boolean
  */
 export function is_izchak(shkp, override_hallucination) {   // shknam.c:908
-    let shknm = null;
     if (Hallucination() && !override_hallucination) {
         return FALSE;
     }
@@ -642,7 +639,7 @@ export function is_izchak(shkp, override_hallucination) {   // shknam.c:908
     if (!in_town(shkp.mx, shkp.my)) {
         return FALSE;
     }
-    shknm = new $c.Ptr(shkp.mextra.eshk.shknam, 0);
+    let shknm = new $c.Ptr(shkp.mextra.eshk.shknam, 0);
     /* skip "+" prefix */
     if (!letter(shknm.get(0))) {
         shknm = shknm.add(1);

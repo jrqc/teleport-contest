@@ -118,13 +118,13 @@ async function knows_object(obj, override_pauper) {   // u_init.c:575
  * @returns {Promise<void>}
  */
 async function knows_class(sym) {   // u_init.c:586
-    let odummy = new $T.obj(), o = null, ct = 0;
+    let odummy = new $T.obj(), ct = 0;
     if (u.uroleplay.pauper) {
         return;
     }
     odummy.$copyFrom(cg.zeroobj);
     odummy.oclass = sym;
-    o = odummy;   /* for use in various obj.h macros */
+    const o = odummy;   /* for use in various obj.h macros */
     /*
      * Note:  the exceptions here can be bypassed if necessary by
      *        calling knows_object() directly.  So an elven ranger,
@@ -417,8 +417,8 @@ async function u_init_race() {   // u_init.c:792
  * @returns {Promise<void>}
  */
 async function pauper_reinit() {   // u_init.c:870
-    let skill = 0, preknown = 0;
-    preknown = STRANGE_OBJECT;
+    let skill = 0;
+    let preknown = STRANGE_OBJECT;
     if (!u.uroleplay.pauper) {
         return;
     }
@@ -612,9 +612,8 @@ async function skills_for_role() {   // u_init.c:1037
  * @returns {Promise<number>} boolean
  */
 async function restricted_spell_discipline(otyp) {   // u_init.c:1091
-    let skills = null, this_skill = 0;
-    skills = await skills_for_role();
-    this_skill = spell_skilltype(otyp);
+    let skills = await skills_for_role();
+    const this_skill = spell_skilltype(otyp);
     while (skills && skills.skill !== P.NONE) {
         if (skills.skill === this_skill) {
             return FALSE;
@@ -641,8 +640,7 @@ function trquan(trop) {   // u_init.c:1106
  * @returns {Promise<$T.obj | null>} struct obj *
  */
 async function ini_inv_mkobj_filter(oclass, got_level1_spellbook) {   // u_init.c:1115
-    let obj = null, otyp = 0, trycnt = 0;
-    trycnt = 0;
+    let trycnt = 0;
     /*
      * For random objects, do not create certain overly powerful
      * items: wand of wishing, ring of levitation, or the
@@ -653,8 +651,8 @@ async function ini_inv_mkobj_filter(oclass, got_level1_spellbook) {   // u_init.
      * one will immediately read it and use the iron ball as a
      * weapon.)
      */
-    obj = await mkobj(oclass, FALSE);
-    otyp = obj.otyp;
+    let obj = await mkobj(oclass, FALSE);
+    let otyp = obj.otyp;
     /* 'useless' items */
     /* orcs start with poison resistance */
     /* Monks don't use weapons */
@@ -687,7 +685,7 @@ async function ini_inv_mkobj_filter(oclass, got_level1_spellbook) {   // u_init.
  * @returns {Promise<number>} short
  */
 async function ini_inv_obj_substitution(trop, obj) {   // u_init.c:1179
-    let i = 0, save_plnmsg = 0;
+    let i = 0;
     if (gu.urace.mnum !== PM.HUMAN) {
         /* substitute race-specific items; this used to be in
            the 'if (otyp != UNDEF_TYP) { }' block above, but then
@@ -697,7 +695,7 @@ async function ini_inv_obj_substitution(trop, obj) {   // u_init.c:1179
             if (inv_subs[i].race_pm === gu.urace.mnum && obj.otyp === inv_subs[i].item_otyp) {
                 do {
                     if (debugcore($c.lit("u_init.c"), TRUE)) {
-                        save_plnmsg = iflags.last_msg;
+                        const save_plnmsg = iflags.last_msg;
                         await pline($c.lit("ini_inv: substituting %s for %s%s"), obj_descr[objects[inv_subs[i].subs_otyp].oc_name_idx].oc_name, trop.trotyp === UNDEF_TYP ? $c.lit("random ") : $c.lit(""), obj_descr[objects[obj.otyp].oc_name_idx].oc_name);
                         iflags.last_msg = save_plnmsg;
                     }
@@ -717,8 +715,8 @@ async function ini_inv_obj_substitution(trop, obj) {   // u_init.c:1179
  * @returns {Promise<number>} boolean
  */
 async function ini_inv_adjust_obj(trop, obj) {   // u_init.c:1205
-    let stop = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7;
-    stop = FALSE;
+    let $t1, $t2, $t3, $t4, $t5, $t6, $t7;
+    let stop = FALSE;
     if (trop.trclass === COIN_CLASS) {
         /* no "blessed" or "identified" money */
         obj.quan = u.umoney0;
@@ -816,14 +814,14 @@ async function ini_inv_use_obj(obj) {   // u_init.c:1251
  * @returns {Promise<void>}
  */
 async function ini_inv(trop) {   // u_init.c:1298
-    let obj = null, otyp = 0, got_sp1 = 0, quan = 0;
-    got_sp1 = FALSE;   /* got a level 1 spellbook? */
+    let obj = null;
+    let got_sp1 = FALSE;   /* got a level 1 spellbook? */
     if (u.uroleplay.pauper) {   /* pauper gets no items */
         return;
     }
-    quan = trquan(trop);
+    let quan = trquan(trop);
     while (trop.trclass) {
-        otyp = trop.trotyp;
+        let otyp = trop.trotyp;
         if (otyp !== UNDEF_TYP) {
             obj = await mksobj(otyp, TRUE, FALSE);
         } else {

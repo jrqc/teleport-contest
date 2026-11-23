@@ -59,11 +59,11 @@ export function free_rect() {   // rect.c:45
  * @returns {number} int
  */
 export function get_rect_ind(r) {   // rect.c:60
-    let rectp = null, lx = 0, ly = 0, hx = 0, hy = 0, i = 0;
-    lx = r.lx;
-    ly = r.ly;
-    hx = r.hx;
-    hy = r.hy;
+    let rectp = null, i = 0;
+    const lx = r.lx;
+    const ly = r.ly;
+    const hx = r.hx;
+    const hy = r.hy;
     for (i = 0, rectp = $c.radd(rect, 0); i < rect_cnt; i = i + 1 | 0, rectp = $c.radd(rectp, 1)) {
         if (lx === rectp.lx && ly === rectp.ly && hx === rectp.hx && hy === rectp.hy) {
             return i;
@@ -79,11 +79,11 @@ export function get_rect_ind(r) {   // rect.c:60
  * @returns {$T.nhrect | null} NhRect *
  */
 export function get_rect(r) {   // rect.c:82
-    let rectp = null, lx = 0, ly = 0, hx = 0, hy = 0, i = 0;
-    lx = r.lx;
-    ly = r.ly;
-    hx = r.hx;
-    hy = r.hy;
+    let rectp = null, i = 0;
+    const lx = r.lx;
+    const ly = r.ly;
+    const hx = r.hx;
+    const hy = r.hy;
     for (i = 0, rectp = $c.radd(rect, 0); i < rect_cnt; i = i + 1 | 0, rectp = $c.radd(rectp, 1)) {
         if (lx >= rectp.lx && ly >= rectp.ly && hx <= rectp.hx && hy <= rectp.hy) {
             return rectp;
@@ -145,8 +145,7 @@ export function rect_bounds(r1$in, r2$in, r3) {   // rect.c:134
  * @param {$T.nhrect | null} r NhRect *
  */
 export function remove_rect(r) {   // rect.c:147
-    let ind = 0;
-    ind = get_rect_ind(r);
+    const ind = get_rect_ind(r);
     if (ind >= 0) {
         $c.radd(rect, ind).$copyFrom($c.radd(rect, rect_cnt = rect_cnt - 1 | 0));
     }

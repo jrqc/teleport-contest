@@ -104,10 +104,10 @@ export function free_egd(mtmp) {   // vault.c:35
  * @returns {Promise<number>} boolean
  */
 async function clear_fcorr(grd, forceshow) {   // vault.c:48
-    let fcx = 0, fcy = 0, fcbeg = 0, mtmp = null, sawcorridor = 0, silently = 0, egrd = null, trap = null, lev = null;
-    sawcorridor = FALSE;
-    silently = program_state.stopprint ? TRUE : FALSE;
-    egrd = grd.mextra.egd;
+    let fcbeg = 0, mtmp = null, trap = null;
+    let sawcorridor = FALSE;
+    const silently = program_state.stopprint ? TRUE : FALSE;
+    const egrd = grd.mextra.egd;
     if (!on_level(egrd.gdlevel, u.uz)) {
         return TRUE;
     }
@@ -115,8 +115,8 @@ async function clear_fcorr(grd, forceshow) {   // vault.c:48
        coordinate <0,0>), until temporary corridor from vault back to
        civilization has been removed */
     while ((fcbeg = $c.i16(egrd.fcbeg)) < egrd.fcend) {
-        fcx = egrd.fakecorr[fcbeg].fx;
-        fcy = egrd.fakecorr[fcbeg].fy;
+        const fcx = egrd.fakecorr[fcbeg].fx;
+        const fcy = egrd.fakecorr[fcbeg].fy;
         if ((DEADMONSTER(grd) || !in_fcorridor(grd, u.ux, u.uy)) && egrd.gddone) {
             forceshow = TRUE;
         }
@@ -135,7 +135,7 @@ async function clear_fcorr(grd, forceshow) {   // vault.c:48
                 }
             }
         }
-        lev = $c.relem(svl.level.locations[fcx], fcy);
+        const lev = $c.relem(svl.level.locations[fcx], fcy);
         if (lev.typ === CORR && cansee(fcx, fcy)) {
             sawcorridor = TRUE;
         }
@@ -179,13 +179,13 @@ async function clear_fcorr(grd, forceshow) {   // vault.c:48
  * @param {number} y coordxy
  */
 function blackout(x, y) {   // vault.c:123
-    let lev = null, i = 0, j = 0, $t1;
+    let i = 0, j = 0, $t1;
     for (i = x - 1; i <= x + 1; i = i + 1 | 0) {
         for (j = y - 1; j <= y + 1; j = j + 1 | 0) {
             if (!isok($c.i16(i), $c.i16(j))) {
                 continue;
             }
-            lev = $c.relem(svl.level.locations[i], j);
+            const lev = $c.relem(svl.level.locations[i], j);
             /* [possible bug: when (i != x || j != y), perhaps we ought
                to check whether the spot on the far side is lit instead
                of doing a blanket blackout of adjacent locations] */
@@ -237,8 +237,7 @@ async function parkguard(grd) {   // vault.c:155
  * @returns {Promise<number>} boolean
  */
 export async function grddead(grd) {   // vault.c:175
-    let dispose = 0;
-    dispose = await clear_fcorr(grd, TRUE);
+    let dispose = await clear_fcorr(grd, TRUE);
     if (!dispose) {
         /* destroy guard's gold; drop any other inventory */
         await relobj(grd, 0, FALSE);
@@ -258,8 +257,8 @@ export async function grddead(grd) {   // vault.c:175
  * @returns {number} boolean
  */
 function in_fcorridor(grd, x, y) {   // vault.c:192
-    let fci = 0, egrd = null;
-    egrd = grd.mextra.egd;
+    let fci = 0;
+    const egrd = grd.mextra.egd;
     for (fci = egrd.fcbeg; fci < egrd.fcend; fci = fci + 1 | 0) {
         if (x === egrd.fakecorr[fci].fx && y === egrd.fakecorr[fci].fy) {
             return TRUE;
@@ -394,8 +393,8 @@ async function find_guard_dest(guard, rx, ry) {   // vault.c:281
  * @returns {Promise<void>}
  */
 export async function invault() {   // vault.c:317
-    let guard = null, otmp = null, spotted = 0, trycount = 0, vaultroom = 0, vgdeathcount = 0, buf = new Int8Array(256), x = 0, y = 0, gdx = 0, gdy = 0, typ = 0, rx = Int16Array.of(0), ry = Int16Array.of(0), umoney = 0, dx = 0, dy = 0, func = null, bname = null, bcnt = 0, vlt = 0, lowx = 0, hix = 0, lowy = 0, hiy = 0;
-    vaultroom = vault_occupied(new $c.Ptr(u.urooms, 0));
+    let otmp = null, buf = new Int8Array(256), gdx = 0, gdy = 0, rx = Int16Array.of(0), ry = Int16Array.of(0);
+    let vaultroom = vault_occupied(new $c.Ptr(u.urooms, 0));
     if (!vaultroom) {
         u.uinvault = 0;
         return;
@@ -403,14 +402,14 @@ export async function invault() {   // vault.c:317
     /* after a couple of guards don't come back from their trips to
        the vault, future guards become more reluctant to turn up (even
        if summoned via whistle) */
-    vgdeathcount = svm.mvitals[PM.GUARD].died;
+    const vgdeathcount = svm.mvitals[PM.GUARD].died;
     if (vgdeathcount < 2 || vgdeathcount < 50 && !rn2(Math.imul(vgdeathcount, vgdeathcount))) {
         u.uinvault = u.uinvault + 1 | 0;
     }
     if (u.uinvault < VAULT_GUARD_TIME || $c.rem32(u.uinvault, 15) !== 0) {
         return;
     }
-    guard = await findgd();
+    let guard = await findgd();
     if (!guard) {
         /* if time ok and no guard now. */
         /* first find the goal for the guard */
@@ -420,8 +419,8 @@ export async function invault() {   // vault.c:317
         gdx = rx[0], gdy = ry[0];
         vaultroom = vaultroom - ROOMOFFSET | 0;
         /* next find a good place for a door in the wall */
-        x = u.ux;
-        y = u.uy;
+        let x = u.ux;
+        let y = u.uy;
         if (svl.level.locations[x][y].typ !== ROOM) {
             /* player dug a door and is in it */
             if (svl.level.locations[x + 1 | 0][y].typ === ROOM) {
@@ -447,8 +446,8 @@ export async function invault() {   // vault.c:317
             }
         }
         while (svl.level.locations[x][y].typ === ROOM) {
-            dx = gdx > x ? 1 : gdx < x ? -1 : 0;
-            dy = gdy > y ? 1 : gdy < y ? -1 : 0;
+            const dx = gdx > x ? 1 : gdx < x ? -1 : 0;
+            const dy = gdy > y ? 1 : gdy < y ? -1 : 0;
             if ($c.abs(gdx - x | 0) >= $c.abs(gdy - y | 0)) {
                 x = x + dx | 0;
             } else {
@@ -490,18 +489,18 @@ export async function invault() {   // vault.c:317
            otherwise the hero wouldn't be able to push one to follow the
            guard out of the vault because that guard would be in its way */
         if ((otmp = sobj_at(BOULDER, guard.mx, guard.my)) !== null) {
-            bname = await simpleonames(otmp);
-            bcnt = 0;
+            const bname = await simpleonames(otmp);
+            let bcnt = 0;
             do {
                 bcnt = bcnt + 1 | 0;
                 await fracture_rock(otmp);
                 otmp = sobj_at(BOULDER, guard.mx, guard.my);
             } while (otmp);
             /* You_hear() will handle Deaf/!Deaf */
-            func = !Blind() ? You_see : You_hear;
+            const func = !Blind() ? You_see : You_hear;
             await func($c.lit("%s shatter."), bcnt === 1 ? await an(bname) : await makeplural(bname));
         }
-        spotted = canspotmon(guard);
+        const spotted = canspotmon(guard);
         if (spotted) {
             await pline($c.lit("Suddenly one of the Vault's %s enters!"), await makeplural(pmname(guard.data, Mgender(guard))));
             await newsym(guard.mx, guard.my);
@@ -552,7 +551,7 @@ export async function invault() {   // vault.c:317
             await unmul(null);
         }
         buf[0] = 0;
-        trycount = 5;
+        let trycount = 5;
         do {
             await getlin(Deaf() ? $c.lit("You are required to supply your name. -") : $c.lit("\"Hello stranger, who are you?\" -"), new $c.Ptr(buf, 0));
             mungspaces(new $c.Ptr(buf, 0));
@@ -594,7 +593,7 @@ export async function invault() {   // vault.c:317
         } else {
             await verbalize($c.lit("I don't know you."));
         }
-        umoney = money_cnt(gi.invent);
+        const umoney = money_cnt(gi.invent);
         if (!umoney && !hidden_gold(TRUE)) {
             if (Deaf()) {
                 await pline($c.lit("%s stomps%s."), await noit_Monnam(guard), (u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked ? $c.lit("") : $c.lit(" and beckons"));
@@ -626,16 +625,16 @@ export async function invault() {   // vault.c:317
         guard.mextra.egd.fcbeg = 0;
         guard.mextra.egd.fakecorr[0].fx = $c.i16(x);
         guard.mextra.egd.fakecorr[0].fy = $c.i16(y);
-        typ = svl.level.locations[x][y].typ;
+        let typ = svl.level.locations[x][y].typ;
         if (!IS_WALL(typ)) {
             /* guard arriving at non-wall implies a door; vault wall was
                dug into an empty doorway (which could subsequently have
                been plugged with an intact door by use of locking magic) */
-            vlt = guard.mextra.egd.vroom;
-            lowx = svr.rooms[vlt].lx;
-            hix = svr.rooms[vlt].hx;
-            lowy = svr.rooms[vlt].ly;
-            hiy = svr.rooms[vlt].hy;
+            const vlt = guard.mextra.egd.vroom;
+            const lowx = svr.rooms[vlt].lx;
+            const hix = svr.rooms[vlt].hx;
+            const lowy = svr.rooms[vlt].ly;
+            const hiy = svr.rooms[vlt].hy;
             if (x === lowx - 1 && y === lowy - 1) {
                 typ = TLCORNER;
             } else if (x === hix + 1 && y === lowy - 1) {
@@ -672,11 +671,10 @@ export async function invault() {   // vault.c:317
  * @returns {Promise<void>}
  */
 async function move_gold(gold, vroom) {   // vault.c:632
-    let nx = 0, ny = 0;
     await remove_object(gold);
     await newsym(gold.ox, gold.oy);
-    nx = $c.i16(svr.rooms[vroom].lx + rn2(2) | 0);
-    ny = $c.i16(svr.rooms[vroom].ly + rn2(2) | 0);
+    const nx = $c.i16(svr.rooms[vroom].lx + rn2(2) | 0);
+    const ny = $c.i16(svr.rooms[vroom].ly + rn2(2) | 0);
     await place_object(gold, nx, ny);
     await stackobj(gold);
     await newsym(nx, ny);
@@ -686,14 +684,14 @@ async function move_gold(gold, vroom) {   // vault.c:632
  * @returns {Promise<void>}
  */
 async function wallify_vault(grd) {   // vault.c:646
-    let typ = 0, x = 0, y = 0, vlt = 0, tmp_viz = 0, lox = 0, hix = 0, loy = 0, hiy = 0, mon = null, gold = null, rocks = null, trap = null, fixed = 0, movedgold = 0;
-    vlt = grd.mextra.egd.vroom;
-    lox = $c.i16(svr.rooms[vlt].lx - 1);
-    hix = $c.i16(svr.rooms[vlt].hx + 1);
-    loy = $c.i16(svr.rooms[vlt].ly - 1);
-    hiy = $c.i16(svr.rooms[vlt].hy + 1);
-    fixed = FALSE;
-    movedgold = FALSE;
+    let typ = 0, x = 0, y = 0, mon = null, gold = null, rocks = null, trap = null;
+    const vlt = grd.mextra.egd.vroom;
+    const lox = $c.i16(svr.rooms[vlt].lx - 1);
+    const hix = $c.i16(svr.rooms[vlt].hx + 1);
+    const loy = $c.i16(svr.rooms[vlt].ly - 1);
+    const hiy = $c.i16(svr.rooms[vlt].hy + 1);
+    let fixed = FALSE;
+    let movedgold = FALSE;
     for (x = lox; x <= hix; x = $c.i16(x + 1)) {
         for (y = loy; y <= hiy; y = $c.i16(y + 1)) {
             /* if not on the room boundary, skip ahead */
@@ -743,7 +741,7 @@ async function wallify_vault(grd) {   // vault.c:646
                  * hack: player knows walls are restored because of the
                  * message, below, so show this on the screen.
                  */
-                tmp_viz = $c.i8(gv.viz_array.get(y).get(x));
+                const tmp_viz = $c.i8(gv.viz_array.get(y).get(x));
                 gv.viz_array.get(y).set(x, IN_SIGHT | COULD_SEE);
                 await newsym(x, y);
                 gv.viz_array.get(y).set(x, $c.u8(tmp_viz));
@@ -773,8 +771,7 @@ async function wallify_vault(grd) {   // vault.c:646
  * @returns {Promise<void>}
  */
 async function gd_mv_monaway(grd, nx, ny) {   // vault.c:734
-    let mtmp = null;
-    mtmp = svl.level.monsters[nx][ny];
+    const mtmp = svl.level.monsters[nx][ny];
     if (mtmp && !$c.peq(mtmp, grd)) {
         if (!Deaf()) {
             await verbalize($c.lit("Out of my way, scum!"));
@@ -794,25 +791,25 @@ async function gd_mv_monaway(grd, nx, ny) {   // vault.c:734
  * @returns {Promise<void>}
  */
 async function gd_pick_corridor_gold(grd, goldx, goldy) {   // vault.c:752
-    let gold = null, newcc = new $T.nhcoord(), bestcc = new $T.nhcoord(), gdelta = 0, newdelta = 0, bestdelta = 0, tryct = 0, guardx = 0, guardy = 0, under_u = 0, see_it = 0;
-    guardx = grd.mx;
-    guardy = grd.my;
-    under_u = u_at(goldx, goldy);
-    see_it = cansee(goldx, goldy);
+    let newcc = new $T.nhcoord(), bestcc = new $T.nhcoord(), newdelta = 0;
+    const guardx = grd.mx;
+    const guardy = grd.my;
+    const under_u = u_at(goldx, goldy);
+    const see_it = cansee(goldx, goldy);
     if (under_u) {
         /* Grab the gold from between the hero's feet.
            If guard is two or more steps away; bring him closer first. */
-        gold = g_at($c.i16(goldx), $c.i16(goldy));
+        const gold = g_at($c.i16(goldx), $c.i16(goldy));
         if (!gold) {
             await impossible($c.lit("vault guard: no gold at hero's feet?"));
             return;
         }
-        gdelta = dist2($c.i16(guardx), $c.i16(guardy), u.ux, u.uy);
+        const gdelta = dist2($c.i16(guardx), $c.i16(guardy), u.ux, u.uy);
         if (gdelta > 2 && see_it) {
             /* skip if player won't see it */
-            bestdelta = gdelta;
+            let bestdelta = gdelta;
             bestcc.x = $c.i16(guardx), bestcc.y = $c.i16(guardy);
-            tryct = 9;
+            let tryct = 9;
             do {
                 /* pick an available spot nearest the hero and also try
                    to find the one meeting that criterium which is nearest
@@ -870,7 +867,7 @@ async function gd_pick_corridor_gold(grd, goldx, goldy) {   // vault.c:752
  * @returns {Promise<number>} int
  */
 async function gd_move_cleanup(grd, semi_dead, disappear_msg_seen) {   // vault.c:836
-    let x = 0, y = 0, see_guard = 0, save_plnmsg = 0;
+    let x = 0, y = 0;
     /*
      * The following is a kludge.  We need to keep the guard around in
      * order to be able to make the fake corridor disappear as the
@@ -880,13 +877,13 @@ async function gd_move_cleanup(grd, semi_dead, disappear_msg_seen) {   // vault.
      * At the end of the process, the guard is killed in restfakecorr().
      */
     x = grd.mx, y = grd.my;
-    see_guard = canspotmon(grd);
+    const see_guard = canspotmon(grd);
     await parkguard(grd);   /* move to <0,0> */
     await wallify_vault(grd);
     await restfakecorr(grd);
     do {
         if (debugcore($c.lit("vault.c"), TRUE)) {
-            save_plnmsg = iflags.last_msg;
+            const save_plnmsg = iflags.last_msg;
             await pline($c.lit("gd_move_cleanup: %scleanup%s"), grd.isgd ? $c.lit("") : $c.lit("final "), grd.isgd ? $c.lit(" attempt") : $c.lit(""));
             iflags.last_msg = save_plnmsg;
         }
@@ -1291,8 +1288,8 @@ export async function paygd(silently) {   // vault.c:1205
  * @returns {number | bigint} long
  */
 export function hidden_gold(even_if_unknown) {   // vault.c:1257
-    let value = 0, obj = null;
-    value = 0;
+    let obj = null;
+    let value = 0;
     for (obj = gi.invent; obj; obj = obj.nobj) {
         if (Has_contents(obj) && (obj.cknown || even_if_unknown)) {
             value = $c.add64(value, contained_gold(obj, even_if_unknown));
@@ -1313,8 +1310,7 @@ export async function gd_sound() {   // vault.c:1272
  * @returns {Promise<void>}
  */
 export async function vault_gd_watching(activity) {   // vault.c:1278
-    let guard = null;
-    guard = await findgd();
+    const guard = await findgd();
     if (guard && guard.mx && guard.mcansee && ((!((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked) || $c.andu64(guard.data.mflags1, M1.SEE_INVIS) !== 0) && !u.uinwater && (gv.viz_array.get(guard.my).get(guard.mx) & COULD_SEE) !== 0)) {
         if (activity === GD.EATGOLD || activity === GD.DESTROYGOLD) {
             guard.mextra.egd.witness = (activity) & 3;

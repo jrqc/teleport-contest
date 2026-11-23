@@ -383,10 +383,10 @@ export async function dowrite(pen) {   // write.c:74
  * @returns {$c.Ptr | null} char *
  */
 function new_book_description(booktype, outbuf) {   // write.c:395
-    let descr = null, comp_p = null;
+    let comp_p = null;
     /* subset of description strings from objects.c; if it grows
        much, we may need to add a new flag field to objects[] instead */
-    descr = obj_descr[objects[booktype].oc_descr_idx].oc_descr;
+    const descr = obj_descr[objects[booktype].oc_descr_idx].oc_descr;
     for (comp_p = new $c.Ptr(new_book_description$compositions, 0); comp_p.get(0); comp_p = comp_p.add(1)) {
         if (!strncmpi(descr, comp_p.get(0), -1)) {
             break;

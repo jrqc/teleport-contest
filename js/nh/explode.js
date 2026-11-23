@@ -77,11 +77,10 @@ const explosion = $c.matrix(Int32Array, [3, 3]);
  * @returns {Promise<number>} int
  */
 async function explosionmask(m, adtyp, olet) {   // explode.c:26
-    let res = 0;
     /* target monster (might be youmonst) */
     /* damage type */
     /* object class (only matters for AD_DISN) */
-    res = EXPL_NONE;
+    let res = EXPL_NONE;
     if ($c.peq(m, gy.youmonst)) {
         switch (adtyp) {
             case AD.PHYS:
@@ -180,7 +179,6 @@ async function explosionmask(m, adtyp, olet) {   // explode.c:26
  */
 async function engulfer_explosion_msg(adtyp, olet) {   // explode.c:118
     let adj = null;
-    adj = null;
     if (dmgtype_fromattack(u.ustuck.data, AD.DGST, AT.ENGL) !== null) {
         switch (adtyp) {
             case AD.FIRE:
@@ -268,25 +266,25 @@ async function engulfer_explosion_msg(adtyp, olet) {   // explode.c:118
  * @returns {Promise<void>}
  */
 export async function explode(x, y, type, dam, olet, expltype) {   // explode.c:199
-    let i = 0, j = 0, k = 0, damu = 0, starting = 0, visible = 0, any_shield = 0, uhurt = 0, str = null, mtmp = null, mdef = null, adtyp = 0, explmask = $c.matrix(Int32Array, [3, 3]), xx = 0, yy = 0, shopdamage = Int8Array.of(0), generic = 0, do_hallu = 0, inside_engulfer = 0, grabbed = 0, grabbing = 0, grabxy = new $T.nhcoord(), hallu_buf = new Int8Array(256), killr_buf = new Int8Array(256), exploding_wand_typ = 0, you_exploding = 0, didmsg = 0, adstr = null, itemdmg = 0, tryct = 0, mdam = 0, xkflg = 0, $t1, $t2, $t3, $t4;
+    let i = 0, j = 0, k = 0, visible = 0, mtmp = null, adtyp = 0, explmask = $c.matrix(Int32Array, [3, 3]), xx = 0, yy = 0, shopdamage = Int8Array.of(0), grabbing = 0, grabxy = new $T.nhcoord(), hallu_buf = new Int8Array(256), killr_buf = new Int8Array(256), $t1, $t2, $t3, $t4;
     /* explosion's location;
      * adjacent spots are also affected */
     /* same as in zap.c; -(wand typ) for some WAND_CLASS */
     /* damage amount */
     /* object class or BURNING_OIL or MON_EXPLODE */
     /* explosion type: controls color of explosion glyphs */
-    damu = dam;
-    starting = 1;
-    uhurt = 0;   /* 0=unhurt, 1=items damaged, 2=you and items damaged */
-    str = null;
-    mdef = null;
+    let damu = dam;
+    let starting = 1;
+    let uhurt = 0;   /* 0=unhurt, 1=items damaged, 2=you and items damaged */
+    let str = null;
+    let mdef = null;
     /* 0=normal explosion, 1=do shieldeff, 2=do nothing */
     shopdamage[0] = FALSE;
-    generic = FALSE;
-    do_hallu = FALSE;
-    exploding_wand_typ = 0;
-    you_exploding = olet === MON_EXPLODE && type >= 0 ? 1 : 0;
-    didmsg = FALSE;
+    let generic = FALSE;
+    let do_hallu = FALSE;
+    let exploding_wand_typ = 0;
+    const you_exploding = olet === MON_EXPLODE && type >= 0 ? 1 : 0;
+    let didmsg = FALSE;
     if (olet === WAND_CLASS) {
         /* retributive strike */
         /* 'type' is passed as (wand's object type * -1); save
@@ -336,10 +334,10 @@ export async function explode(x, y, type, dam, olet, expltype) {   // explode.c:
     }
     /* if hero is engulfed and caused the explosion, only hero and
        engulfer will be affected */
-    inside_engulfer = u.uswallow && type >= 0 ? 1 : 0;
+    const inside_engulfer = u.uswallow && type >= 0 ? 1 : 0;
     /* held but not engulfed implies holder is reaching into second spot
        so might get hit by double damage */
-    grabbed = grabbing = FALSE;
+    let grabbed = grabbing = FALSE;
     if (u.ustuck && !u.uswallow) {
         if (Upolyd() && sticks(gy.youmonst.data)) {
             grabbing = TRUE;
@@ -375,7 +373,7 @@ export async function explode(x, y, type, dam, olet, expltype) {   // explode.c:
     } else {
         /* If str is e.g. "flaming sphere's explosion" from above, we want to
          * still assign adtyp appropriately, but not replace str. */
-        adstr = null;
+        let adstr = null;
         switch ($c.rem32($c.abs(type), 10)) {
             case 0:
                 adstr = $c.lit("magical blast");
@@ -414,7 +412,7 @@ export async function explode(x, y, type, dam, olet, expltype) {   // explode.c:
             str = adstr;
         }
     }
-    any_shield = visible = FALSE;
+    let any_shield = visible = FALSE;
     for (i = 0; i < 3; i = i + 1 | 0) {
         for (j = 0; j < 3; j = j + 1 | 0) {
             xx = $c.i16((x + i | 0) - 1 | 0);
@@ -520,7 +518,7 @@ export async function explode(x, y, type, dam, olet, expltype) {   // explode.c:
     if (dam) {
         for (i = 0; i < 3; i = i + 1 | 0) {
             for (j = 0; j < 3; j = j + 1 | 0) {
-                itemdmg = 0;
+                let itemdmg = 0;
                 if (explmask[i][j] === EXPL_SKIP) {
                     continue;
                 }
@@ -552,7 +550,7 @@ export async function explode(x, y, type, dam, olet, expltype) {   // explode.c:
                     continue;
                 }
                 if (do_hallu) {
-                    tryct = 0;
+                    let tryct = 0;
                     /* replace "gas spore" with a different description
                        for each target (we can't distinguish personal names
                        like "Barney" here in order to suppress "the" below,
@@ -590,7 +588,7 @@ export async function explode(x, y, type, dam, olet, expltype) {   // explode.c:
                      * get out the message before doing the damage, and 2) we
                      * can call mondied, not killed, if it's not your blast.
                      */
-                    mdam = dam;
+                    let mdam = dam;
                     if (await resist(mtmp, olet, 0, FALSE)) {
                         /* inside_engulfer: <xx,yy> == <u.ux,u.uy> */
                         if (cansee(xx, yy) || inside_engulfer) {
@@ -616,7 +614,7 @@ export async function explode(x, y, type, dam, olet, expltype) {   // explode.c:
                     mtmp.mhp = mtmp.mhp - (mdam + itemdmg | 0) | 0;
                 }
                 if (DEADMONSTER(mtmp)) {
-                    xkflg = adtyp === AD.FIRE && completelyburns(mtmp.data) ? XKILL.NOCORPSE : 0;
+                    const xkflg = adtyp === AD.FIRE && completelyburns(mtmp.data) ? XKILL.NOCORPSE : 0;
                     if (!svc.context.mon_moving) {
                         await xkilled(mtmp, XKILL.GIVEMSG | xkflg);
                     } else if (mdef && $c.peq(mtmp, mdef)) {
@@ -763,27 +761,27 @@ export async function explode(x, y, type, dam, olet, expltype) {   // explode.c:
  * @returns {Promise<number | bigint>} long
  */
 export async function scatter(sx, sy, blastforce, scflags, obj) {   // explode.c:721
-    let otmp = null, tmp = 0, farthest = 0, typ = 0, qtmp = 0, used_up = 0, individual_object = 0, shop_origin = 0, lostgoods = 0, mtmp = null, shkp = null, stmp = null, stmp2 = null, schain = null, total = 0, waschain = 0, trap = null, dam = 0, hitvalu = 0, hitu = 0, x = 0, y = 0, obj_left_shop = 0, $t1, $t2, $t3;
+    let otmp = null, typ = 0, mtmp = null, stmp = null, trap = null, $t1, $t2, $t3;
     /* location of objects to scatter */
     /* force behind the scattering */
     /* only scatter this obj */
-    farthest = 0;
-    individual_object = obj ? TRUE : FALSE;
-    lostgoods = FALSE;
-    shkp = null;
-    stmp2 = null;
-    schain = null;
-    total = 0;
+    let farthest = 0;
+    const individual_object = obj ? TRUE : FALSE;
+    let lostgoods = FALSE;
+    let shkp = null;
+    let stmp2 = null;
+    let schain = null;
+    let total = 0;
     if (individual_object && (obj.ox !== sx || obj.oy !== sy)) {
         await impossible($c.lit("scattered object <%d,%d> not at scatter site <%d,%d>"), obj.ox, obj.oy, sx, sy);
     }
-    shop_origin = (shkp = await shop_keeper(in_rooms(sx, sy, SHOPBASE).get(0))) !== null && await costly_spot(sx, sy) ? 1 : 0;
+    const shop_origin = (shkp = await shop_keeper(in_rooms(sx, sy, SHOPBASE).get(0))) !== null && await costly_spot(sx, sy) ? 1 : 0;
     if (shop_origin) {
         await credit_report(shkp, 0, TRUE);   /* establish baseline, without msgs */
     }
     while ((otmp = individual_object ? obj : svl.level.objects[sx][sy]) !== null) {
         if ($c.peq(otmp, $G.uball) || $c.peq(otmp, $G.uchain)) {
-            waschain = $c.peq(otmp, $G.uchain) ? 1 : 0;
+            const waschain = $c.peq(otmp, $G.uchain) ? 1 : 0;
             await pline_The($c.lit("chain shatters!"));
             await unpunish();
             if (waschain) {
@@ -791,7 +789,7 @@ export async function scatter(sx, sy, blastforce, scflags, obj) {   // explode.c
             }
         }
         if (otmp.quan > 1) {
-            qtmp = $c.sub64(otmp.quan, 1);
+            let qtmp = $c.sub64(otmp.quan, 1);
             if (qtmp > LARGEST_INT) {
                 qtmp = LARGEST_INT;
             }
@@ -801,7 +799,7 @@ export async function scatter(sx, sy, blastforce, scflags, obj) {   // explode.c
             obj = null;   /* all used */
         }
         await obj_extract_self(otmp);
-        used_up = FALSE;
+        let used_up = FALSE;
         /* 9 in 10 chance of fracturing boulders or statues */
         if ((scflags & MAY.FRACTURE) >>> 0 !== 0 && (otmp.otyp === BOULDER || otmp.otyp === STATUE) && rn2(10)) {
             if (otmp.otyp === BOULDER) {
@@ -843,7 +841,7 @@ export async function scatter(sx, sy, blastforce, scflags, obj) {   // explode.c
             stmp.obj = otmp;
             stmp.ox = sx;
             stmp.oy = sy;
-            tmp = rn2(N_DIRS);   /* get the direction */
+            let tmp = rn2(N_DIRS);   /* get the direction */
             stmp.dx = xdir[tmp];
             stmp.dy = ydir[tmp];
             tmp = (blastforce >>> 0) - $c.divu32(otmp.owt, 40) >>> 0 | 0;
@@ -895,12 +893,12 @@ export async function scatter(sx, sy, blastforce, scflags, obj) {   // explode.c
                         if (gm.multi) {
                             nomul(0);
                         }
-                        dam = await dmgval(stmp.obj, gy.youmonst);
-                        hitvalu = 8 + stmp.obj.spe;
+                        const dam = await dmgval(stmp.obj, gy.youmonst);
+                        let hitvalu = 8 + stmp.obj.spe;
                         if (bigmonst(gy.youmonst.data)) {
                             hitvalu = hitvalu + 1 | 0;
                         }
-                        hitu = await thitu(hitvalu, Maybe_Half_Phys(dam), new $c.FieldRef(stmp, "obj", "ptr"), null);
+                        const hitu = await thitu(hitvalu, Maybe_Half_Phys(dam), new $c.FieldRef(stmp, "obj", "ptr"), null);
                         if (!stmp.obj) {
                             stmp.stopped = TRUE;
                         }
@@ -925,10 +923,10 @@ export async function scatter(sx, sy, blastforce, scflags, obj) {   // explode.c
         }
     }
     for (stmp = schain; stmp; stmp = stmp2) {
-        obj_left_shop = FALSE;
+        let obj_left_shop = FALSE;
         stmp2 = stmp.next;
-        x = stmp.ox;
-        y = stmp.oy;
+        const x = stmp.ox;
+        const y = stmp.oy;
         if (stmp.obj) {
             if (x !== sx || y !== sy) {
                 total = $c.add64(total, stmp.obj.quan);
@@ -992,8 +990,7 @@ export async function scatter(sx, sy, blastforce, scflags, obj) {   // explode.c
  * @returns {Promise<void>}
  */
 export async function splatter_burning_oil(x, y, diluted_oil) {   // explode.c:962
-    let dmg = 0;
-    dmg = d(diluted_oil ? 3 : 4, 4);
+    const dmg = d(diluted_oil ? 3 : 4, 4);
     /* ZT_SPELL(ZT_FIRE) = ZT_SPELL(AD_FIRE-1) = 10+(2-1) = 11 */
     /* value kludge, see zap.c */
     await explode(x, y, ZT_SPELL_O_FIRE, dmg, BURNING_OIL, EXPL.FIERY);
@@ -1007,8 +1004,7 @@ export async function splatter_burning_oil(x, y, diluted_oil) {   // explode.c:9
  * @returns {Promise<void>}
  */
 export async function explode_oil(obj, x, y) {   // explode.c:974
-    let diluted_oil = 0;
-    diluted_oil = obj.oeroded;
+    const diluted_oil = obj.oeroded;
     if (!obj.lamplit) {
         await impossible($c.lit("exploding unlit oil"));
     }

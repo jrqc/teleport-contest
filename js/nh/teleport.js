@@ -177,13 +177,12 @@ function goodpos_onscary(x, y, mptr) {   // teleport.c:53
  * @returns {number} boolean
  */
 export function goodpos(x, y, mtmp, gpflags) {   // teleport.c:86
-    let mdat = null, ignorewater = 0, ignorelava = 0, checkscary = 0, allow_u = 0, avoid_monpos = 0, mtmp2 = null;
-    mdat = null;
-    ignorewater = $c.and64(gpflags, MM.IGNOREWATER) !== 0 ? 1 : 0;
-    ignorelava = $c.and64(gpflags, MM.IGNORELAVA) !== 0 ? 1 : 0;
-    checkscary = $c.and64(gpflags, GP.CHECKSCARY) !== 0 ? 1 : 0;
-    allow_u = $c.and64(gpflags, GP.ALLOW_U) !== 0 ? 1 : 0;
-    avoid_monpos = $c.and64(gpflags, GP.AVOID_MONPOS) !== 0 ? 1 : 0;
+    let mdat = null;
+    const ignorewater = $c.and64(gpflags, MM.IGNOREWATER) !== 0 ? 1 : 0;
+    const ignorelava = $c.and64(gpflags, MM.IGNORELAVA) !== 0 ? 1 : 0;
+    const checkscary = $c.and64(gpflags, GP.CHECKSCARY) !== 0 ? 1 : 0;
+    const allow_u = $c.and64(gpflags, GP.ALLOW_U) !== 0 ? 1 : 0;
+    const avoid_monpos = $c.and64(gpflags, GP.AVOID_MONPOS) !== 0 ? 1 : 0;
     if (!isok(x, y)) {
         return FALSE;
     }
@@ -202,7 +201,7 @@ export function goodpos(x, y, mtmp, gpflags) {   // teleport.c:86
         return FALSE;
     }
     if (mtmp) {
-        mtmp2 = svl.level.monsters[x][y];
+        const mtmp2 = svl.level.monsters[x][y];
         /* Be careful with long worms.  A monster may be placed back in
          * its own location.  Normally, if m_at() returns the same monster
          * that we're trying to place, the monster is being placed in its
@@ -303,7 +302,7 @@ export async function enexto_gpflags(cc, xx, yy, mdat, entflags) {   // teleport
  * @returns {Promise<number>} boolean
  */
 export async function enexto_core(cc, xx, yy, mdat, entflags) {   // teleport.c:219
-    let candy = $c.recArray($T.nhcoord, 1659), i = 0, nearcandyct = 0, allcandyct = 0, fakemon = new $T.monst(), allow_xx_yy = 0, save_plnmsg = 0, save_plnmsg$2 = 0;
+    let candy = $c.recArray($T.nhcoord, 1659), i = 0, fakemon = new $T.monst();
     /* output; <cc.x,cc.y> as close as feasible to <xx,yy> */
     /* input coordinates */
     /* type of monster; affects whether water or
@@ -311,14 +310,14 @@ export async function enexto_core(cc, xx, yy, mdat, entflags) {   // teleport.c:
     /* flags for goodpos() */
     /* enough room for every location */
     /* dummy monster */
-    allow_xx_yy = $c.and64(entflags, GP_ALLOW_XY) !== 0 ? 1 : 0;
+    const allow_xx_yy = $c.and64(entflags, GP_ALLOW_XY) !== 0 ? 1 : 0;
     /* note: GP_ALLOW_XY isn't used by goodpos(); old enext_core() used to
        mask it off to hide it from goodpos but that isn't required and we
        want to keep it in case the debugpline4() gets called */
     if (!mdat) {
         do {
             if (debugcore($c.lit("teleport.c"), TRUE)) {
-                save_plnmsg = iflags.last_msg;
+                const save_plnmsg = iflags.last_msg;
                 await pline($c.lit("enexto() called with null mdat"));
                 iflags.last_msg = save_plnmsg;
             }
@@ -331,7 +330,7 @@ export async function enexto_core(cc, xx, yy, mdat, entflags) {   // teleport.c:
     /* gather candidate coordinates within 3 steps, those 1 step away in
        random order first, then those 2 steps away in random order, then 3;
        this will usually find a good spot without scanning the whole map */
-    nearcandyct = await collect_coords(candy[0], xx, yy, 3, CC_NO_FLAGS, null);
+    const nearcandyct = await collect_coords(candy[0], xx, yy, 3, CC_NO_FLAGS, null);
     for (i = 0; i < nearcandyct; i = i + 1 | 0) {
         cc.$copyFrom(candy[i]);
         if (goodpos(cc.x, cc.y, fakemon, entflags)) {
@@ -341,7 +340,7 @@ export async function enexto_core(cc, xx, yy, mdat, entflags) {   // teleport.c:
     /* didn't find a spot; gather coordinates for the whole map except
        for <xx,yy> itself, ordered in expanding distance from <xx,yy>
        (subsets of equal distance grouped together with order randomized) */
-    allcandyct = await collect_coords(candy[0], xx, yy, 0, CC_NO_FLAGS, null);
+    const allcandyct = await collect_coords(candy[0], xx, yy, 0, CC_NO_FLAGS, null);
     /* skip first 'nearcandyct' spots, they have already been rejected;
        they will occur in different random order but same overall total */
     for (i = nearcandyct; i < allcandyct; i = i + 1 | 0) {
@@ -358,7 +357,7 @@ export async function enexto_core(cc, xx, yy, mdat, entflags) {   // teleport.c:
     /* failed to find any acceptable spot */
     do {
         if (debugcore($c.lit("teleport.c"), TRUE)) {
-            save_plnmsg$2 = iflags.last_msg;
+            const save_plnmsg$2 = iflags.last_msg;
             await pline($c.lit("enexto(\"%s\",%d,%d,0x%08lx) failed"), mdat.pmnames[NEUTRAL], xx, yy, entflags);
             iflags.last_msg = save_plnmsg$2;
         }
@@ -430,11 +429,10 @@ function tele_jump_ok(x1, y1, x2, y2) {   // teleport.c:386
  * @returns {Promise<number>} boolean
  */
 async function teleok(x, y, trapok) {   // teleport.c:420
-    let trap = null;
     if (!trapok) {
         /* allow teleportation onto vibrating square, it's not a real trap;
            also allow pits and holes if levitating or flying */
-        trap = t_at(x, y);
+        const trap = t_at(x, y);
         if (!trap) {
             trapok = TRUE;
         } else if (trap.ttyp === VIBRATING_SQUARE) {
@@ -464,16 +462,16 @@ async function teleok(x, y, trapok) {   // teleport.c:420
  * @returns {Promise<void>}
  */
 export async function teleds(nux, nuy, teleds_flags) {   // teleport.c:448
-    let was_swallowed = 0, ball_active = 0, ball_still_in_range = 0, allow_drag = 0, is_teleport = 0, vault_guard = null, bc_control = Int32Array.of(0), ballx = Int16Array.of(0), bally = Int16Array.of(0), chainx = Int16Array.of(0), chainy = Int16Array.of(0), cause_delay = Int8Array.of(0), save_urooms = new Int8Array(5);
-    ball_still_in_range = FALSE;
-    allow_drag = (teleds_flags & TELEDS.ALLOW_DRAG) !== 0 ? 1 : 0;
-    is_teleport = (teleds_flags & TELEDS.TELEPORT) !== 0 ? 1 : 0;
-    vault_guard = vault_occupied(new $c.Ptr(u.urooms, 0)) ? await findgd() : null;
+    let bc_control = Int32Array.of(0), ballx = Int16Array.of(0), bally = Int16Array.of(0), chainx = Int16Array.of(0), chainy = Int16Array.of(0), cause_delay = Int8Array.of(0), save_urooms = new Int8Array(5);
+    let ball_still_in_range = FALSE;
+    let allow_drag = (teleds_flags & TELEDS.ALLOW_DRAG) !== 0 ? 1 : 0;
+    const is_teleport = (teleds_flags & TELEDS.TELEPORT) !== 0 ? 1 : 0;
+    const vault_guard = vault_occupied(new $c.Ptr(u.urooms, 0)) ? await findgd() : null;
     if (u.utraptype === TT.BURIEDBALL) {
         /* unearth it */
         await buried_ball_to_punishment();
     }
-    ball_active = Punished() && $G.uball.where !== OBJ.FREE ? 1 : 0;
+    let ball_active = Punished() && $G.uball.where !== OBJ.FREE ? 1 : 0;
     if (!ball_active || near_capacity() > SLT_ENCUMBER || distmin(u.ux, u.uy, nux, nuy) > 1) {
         allow_drag = FALSE;
     }
@@ -500,7 +498,7 @@ export async function teleds(nux, nuy, teleds_flags) {   // teleport.c:448
         }
     }
     await reset_utrap(FALSE);
-    was_swallowed = u.uswallow;   /* set_ustuck(Null) clears uswallow */
+    const was_swallowed = u.uswallow;   /* set_ustuck(Null) clears uswallow */
     await set_ustuck(null);
     u.ux0 = u.ux;
     u.uy0 = u.uy;
@@ -600,7 +598,7 @@ export async function teleds(nux, nuy, teleds_flags) {   // teleport.c:448
  * @returns {Promise<number>} int
  */
 export async function collect_coords(ccc, cx, cy, maxradius, cc_flags, filter) {   // teleport.c:578
-    let x = 0, y = 0, lox = 0, hix = 0, loy = 0, hiy = 0, radius = 0, rowrange = 0, colrange = 0, k = 0, n = 0, cc = new $T.nhcoord(), passcc = null, newpass = 0, passend = 0, include_cxcy = 0, scramble = 0, ring_pairs = 0, skip_mons = 0, skip_inaccessible = 0, result = 0, save_plnmsg = 0, $t1;
+    let x = 0, y = 0, lox = 0, hix = 0, loy = 0, hiy = 0, radius = 0, cc = new $T.nhcoord(), newpass = 0, passend = 0, $t1;
     /* pointer to array of at least size ROWNO*(COLNO-1) */
     /* center point, not necessarily <u.ux,u.uy> */
     /* how far from center to go collecting spots;
@@ -613,22 +611,22 @@ export async function collect_coords(ccc, cx, cy, maxradius, cc_flags, filter) {
      * skip_mons: reject occupied spots;
      * skip_inaccs: reject !ZAP_POS() spots */
     /* if Null, no filtering */
-    n = 0;
-    passcc = null;
+    let n = 0;
+    let passcc = null;
     /* is <cx,cy> a candidate? */
     /* flag is negative; turn local variable into positive */
     /* if scrambling, shuffle rings 1+2, 3+4, &c together */
     /* exclude locations containing monsters from output */
     /* exclude !ZAP_POS() locations from output; allows pools+lava */
-    include_cxcy = (cc_flags & CC.INCL_CENTER) >>> 0 !== 0 ? 1 : 0;
-    scramble = (cc_flags & CC.UNSHUFFLED) >>> 0 === 0 ? 1 : 0;
-    ring_pairs = scramble && (cc_flags & CC.RING_PAIRS) >>> 0 !== 0 ? 1 : 0;
-    skip_mons = (cc_flags & CC.SKIP_MONS) >>> 0 !== 0 ? 1 : 0;
-    skip_inaccessible = (cc_flags & CC_SKIP_INACCS) >>> 0 !== 0 ? 1 : 0;
-    result = 0;
-    rowrange = cy < 10 ? ROWNO - 1 - cy : cy;
-    colrange = cx < 40 ? COLNO - 1 - cx : cx;
-    k = max(rowrange, colrange);
+    const include_cxcy = (cc_flags & CC.INCL_CENTER) >>> 0 !== 0 ? 1 : 0;
+    const scramble = (cc_flags & CC.UNSHUFFLED) >>> 0 === 0 ? 1 : 0;
+    const ring_pairs = scramble && (cc_flags & CC.RING_PAIRS) >>> 0 !== 0 ? 1 : 0;
+    const skip_mons = (cc_flags & CC.SKIP_MONS) >>> 0 !== 0 ? 1 : 0;
+    const skip_inaccessible = (cc_flags & CC_SKIP_INACCS) >>> 0 !== 0 ? 1 : 0;
+    let result = 0;
+    const rowrange = cy < 10 ? ROWNO - 1 - cy : cy;
+    const colrange = cx < 40 ? COLNO - 1 - cx : cx;
+    let k = max(rowrange, colrange);
     /* if no radius limit has been specified, cover the whole map */
     if (!maxradius) {
         maxradius = k;
@@ -740,7 +738,7 @@ export async function collect_coords(ccc, cx, cy, maxradius, cc_flags, filter) {
     }   /* radius loop */
     do {
         if (debugcore($c.lit("teleport.c"), TRUE)) {
-            save_plnmsg = iflags.last_msg;
+            const save_plnmsg = iflags.last_msg;
             await pline($c.lit("collect_coords(,%d,%d,%d,,)=%d"), cx, cy, maxradius, result);
             iflags.last_msg = save_plnmsg;
         }
@@ -753,7 +751,7 @@ export async function collect_coords(ccc, cx, cy, maxradius, cc_flags, filter) {
  * @returns {Promise<number>} boolean
  */
 export async function safe_teleds(teleds_flags) {   // teleport.c:717
-    let nux = 0, nuy = 0, cc_flags = 0, candy = $c.recArray($T.nhcoord, 1659), backupspot = new $T.nhcoord(), tcnt = 0, candycount = 0, $t1;
+    let nux = 0, nuy = 0, candy = $c.recArray($T.nhcoord, 1659), backupspot = new $T.nhcoord(), tcnt = 0, $t1;
     /*
      * This used to try random locations up to 400 times, with first 200
      * tries disallowing trap locations and remaining 200 accepting such.
@@ -776,11 +774,11 @@ export async function safe_teleds(teleds_flags) {   // teleport.c:717
     }
     /* get a shuffled list of candidate locations, starting with spots
        1 or 2 steps from hero, then 3 or 4 steps, then 5 or 6, on up */
-    cc_flags = CC.RING_PAIRS | CC.SKIP_MONS;
+    let cc_flags = CC.RING_PAIRS | CC.SKIP_MONS;
     if (!Passes_walls()) {
         cc_flags = (cc_flags | CC_SKIP_INACCS) >>> 0;
     }
-    candycount = await collect_coords(candy[0], u.ux, u.uy, 0, cc_flags, null);
+    const candycount = await collect_coords(candy[0], u.ux, u.uy, 0, cc_flags, null);
     $t1 = backupspot.y = 0, backupspot.x = $t1;
     /* skip trap locations via teleok(,,FALSE) but remember first
        encountered trap spot that is acceptable to teleok(,,TRUE) */
@@ -805,8 +803,8 @@ export async function safe_teleds(teleds_flags) {   // teleport.c:717
  * @returns {Promise<void>}
  */
 async function vault_tele() {   // teleport.c:773
-    let croom = null, c = new $T.nhcoord();
-    croom = search_special(VAULT);
+    let c = new $T.nhcoord();
+    const croom = search_special(VAULT);
     if (croom && somexyspace(croom, c) && await teleok(c.x, c.y, FALSE)) {
         await teleds(c.x, c.y, TELEDS.TELEPORT);
         return;
@@ -860,9 +858,9 @@ export async function teleport_pet(mtmp, force_it) {   // teleport.c:786
  * @returns {Promise<void>}
  */
 export async function tele_to_rnd_pet() {   // teleport.c:814
-    let mtmp = null, pet = null, cnt = 0, tx = 0, ty = 0;
-    pet = null;
-    cnt = 0;
+    let mtmp = null;
+    let pet = null;
+    let cnt = 0;
     if (await noteleport_level(gy.youmonst)) {
         await impossible($c.lit("%s"), $c.lit("attempt to teleport hero to be near a pet on no-teleport level"));
         return;
@@ -876,8 +874,8 @@ export async function tele_to_rnd_pet() {   // teleport.c:814
         }
     }
     if (pet && !(dist2(pet.mx, pet.my, u.ux, u.uy) <= 2)) {
-        tx = $c.i16((pet.mx + rn2(3) | 0) - 1 | 0);
-        ty = $c.i16((pet.my + rn2(3) | 0) - 1 | 0);
+        const tx = $c.i16((pet.mx + rn2(3) | 0) - 1 | 0);
+        const ty = $c.i16((pet.my + rn2(3) | 0) - 1 | 0);
         if (isok(tx, ty) && await teleok(tx, ty, FALSE)) {
             await teleds(tx, ty, TELEDS.TELEPORT);
         }
@@ -966,14 +964,14 @@ export async function scrolltele(scroll) {   // teleport.c:849
  * @returns {Promise<number>} int
  */
 export async function dotelecmd() {   // teleport.c:919
-    let save_HTele = 0, save_ETele = 0, res = 0, added = 0, hidden = 0, ignore_restrictions = 0, picks = [null], any = new $T.any(), win = 0, i = 0, tmode = 0, clr = 0, $t1, $t2;
-    ignore_restrictions = FALSE;
+    let save_HTele = 0, save_ETele = 0, hidden = 0, picks = [null], any = new $T.any(), i = 0, tmode = 0, $t1, $t2;
+    let ignore_restrictions = FALSE;
     /* also defined in spell.c */
     /* normal mode; ignore 'm' prefix if it was given */
     if (!wizard()) {
         return await dotele(FALSE) ? ECMD.TIME : ECMD.OK;
     }
-    added = hidden = NOOP_SPELL;
+    let added = hidden = NOOP_SPELL;
     save_HTele = u.uprops[TELEPORT].intrinsic, save_ETele = u.uprops[TELEPORT].extrinsic;
     if (!iflags.menu_requested) {
         ignore_restrictions = TRUE;
@@ -995,8 +993,8 @@ export async function dotelecmd() {   // teleport.c:919
          * (or poly-form) requirement which might make normal ^T fail.
          */
         picks[0] = null;
-        clr = NO_COLOR;
-        win = await create_nhwindow()(NHW.MENU);
+        const clr = NO_COLOR;
+        const win = await create_nhwindow()(NHW.MENU);
         await start_menu()(win, MENU.BEHAVE_STANDARD);
         any.$copyFrom(cg.zeroany);
         for (i = 0; i < 4; i = i + 1 | 0) {
@@ -1041,7 +1039,7 @@ export async function dotelecmd() {   // teleport.c:919
     /* if dotele() can be fatal, final disclosure might lie about
        intrinsic teleportation; we should be able to live with that
        since the menu finagling is only applicable in wizard mode */
-    res = await dotele(ignore_restrictions);
+    const res = await dotele(ignore_restrictions);
     u.uprops[TELEPORT].intrinsic = save_HTele;
     u.uprops[TELEPORT].extrinsic = save_ETele;
     if (added !== NOOP_SPELL || hidden !== NOOP_SPELL) {   /* can't both be non-NOOP so addition will yield the non-NOOP one */
@@ -1054,10 +1052,10 @@ export async function dotelecmd() {   // teleport.c:919
  * @returns {Promise<number>} int
  */
 export async function dotele(break_the_rules) {   // teleport.c:1034
-    let trap = null, cantdoit = null, trap_once = 0, castit = 0, energy = 0, knownsp = 0, $t1;
+    let $t1;
     /* True: wizard mode ^T */
-    trap_once = FALSE;
-    trap = t_at(u.ux, u.uy);
+    let trap_once = FALSE;
+    let trap = t_at(u.ux, u.uy);
     if (trap && !trap.tseen) {
         trap = null;
     }
@@ -1090,11 +1088,11 @@ export async function dotele(break_the_rules) {   // teleport.c:1034
         }
     }
     if (!trap && !break_the_rules) {
-        castit = FALSE;
-        energy = 0;
+        let castit = FALSE;
+        let energy = 0;
         if (!Teleportation() || u.ulevel < (gu.urole.mnum === PM.WIZARD ? 8 : 12) && !can_teleport(gy.youmonst.data)) {
             /* Try to use teleport away spell. */
-            knownsp = known_spell(SPE_TELEPORT_AWAY);
+            const knownsp = known_spell(SPE_TELEPORT_AWAY);
             /* casting isn't inhibited by being Stunned (...it ought to be) */
             castit = knownsp >= spe_Fresh && !u.uprops[CONFUSION].intrinsic ? 1 : 0;
             if (!castit && !break_the_rules) {
@@ -1102,7 +1100,7 @@ export async function dotele(break_the_rules) {   // teleport.c:1034
                 return 0;
             }
         }
-        cantdoit = null;
+        let cantdoit = null;
         /* 3.6.2: the magic numbers for hunger, strength, and energy
            have been changed to match the ones used in spelleffects().
            Also, failing these tests used to return 1 and use a move
@@ -1433,8 +1431,8 @@ export async function level_tele() {   // teleport.c:1165
  * @returns {Promise<void>}
  */
 export async function domagicportal(ttmp) {   // teleport.c:1444
-    let target_level = new $T.d_level(), totype = 0, stunmsg = null;
-    stunmsg = null;
+    let target_level = new $T.d_level(), totype = 0;
+    let stunmsg = null;
     if (u.utrap && u.utraptype === TT.BURIEDBALL) {
         await buried_ball_to_punishment();
     }
@@ -1474,7 +1472,7 @@ export async function domagicportal(ttmp) {   // teleport.c:1444
  * @returns {Promise<void>}
  */
 export async function tele_trap(trap) {   // teleport.c:1492
-    let cc = new $T.nhcoord(), mtmp = null;
+    let cc = new $T.nhcoord();
     /* a fixed-destination teleport trap could theoretically place hero onto a
      * second teleport trap; prevent the recursive call from spoteffects() from
      * triggering the trap at the destination */
@@ -1494,7 +1492,7 @@ export async function tele_trap(trap) {   // teleport.c:1492
         await newsym(u.ux, u.uy);   /* get rid of trap symbol */
         await vault_tele();
     } else if (isok(trap.launch.x, trap.launch.y)) {
-        mtmp = svl.level.monsters[trap.launch.x][trap.launch.y];
+        let mtmp = svl.level.monsters[trap.launch.x][trap.launch.y];
         settrack();
         if (mtmp) {
             if (!await enexto(cc, mtmp.mx, mtmp.my, mtmp.data)) {
@@ -1520,8 +1518,8 @@ export async function tele_trap(trap) {   // teleport.c:1492
  * @returns {Promise<void>}
  */
 export async function level_tele_trap(trap, trflags) {   // teleport.c:1538
-    let verbbuf = new Int8Array(256), intentional = 0;
-    intentional = FALSE;
+    let verbbuf = new Int8Array(256);
+    let intentional = FALSE;
     if ((trflags & (VIASITTING | FORCETRAP)) >>> 0 !== 0) {
         $c.strcpy(new $c.Ptr(verbbuf, 0), $c.lit("trigger"));   /* follows "You sit down." */
         intentional = TRUE;
@@ -1560,7 +1558,6 @@ export async function level_tele_trap(trap, trflags) {   // teleport.c:1538
  * @returns {number} boolean
  */
 function rloc_pos_ok(x, y, mtmp) {   // teleport.c:1575
-    let xx = 0, yy = 0;
     /* coordinates of candidate location */
     if (!goodpos(x, y, mtmp, GP.CHECKSCARY)) {
         return FALSE;
@@ -1572,8 +1569,8 @@ function rloc_pos_ok(x, y, mtmp) {   // teleport.c:1575
      * rather than row:  bit #0 set => moving upwards; bit #1 set =>
      * inside the Wizard's tower.
      */
-    xx = mtmp.mx;
-    yy = mtmp.my;
+    const xx = mtmp.mx;
+    const yy = mtmp.my;
     if (!xx) {
         /* no current location (migrating monster arrival) */
         if (svd.dndest.nlx && On_W_tower_level(u.uz)) {
@@ -1624,15 +1621,15 @@ function rloc_pos_ok(x, y, mtmp) {   // teleport.c:1575
  * @returns {Promise<void>}
  */
 async function rloc_to_core(mtmp, x, y, rlocflags) {   // teleport.c:1645
-    let oldx = 0, oldy = 0, resident_shk = 0, preventmsg = 0, vanishmsg = 0, appearmsg = 0, domsg = 0, telemsg = 0, du = 0, olddu = 0, next = null, nearu = null, otmp = null, shkp = null, peaceful = 0;
-    oldx = mtmp.mx;
-    oldy = mtmp.my;
-    resident_shk = mtmp.isshk && inhishop(mtmp) ? 1 : 0;
-    preventmsg = (rlocflags & RLOC.NOMSG) >>> 0 !== 0 ? 1 : 0;
-    vanishmsg = (rlocflags & RLOC.MSG) >>> 0 !== 0 ? 1 : 0;
-    appearmsg = $c.andu64(mtmp.mstrategy, 2147483648) !== 0 ? 1 : 0;
-    domsg = !gi.in_mklev && (vanishmsg || appearmsg) && !preventmsg ? 1 : 0;
-    telemsg = FALSE;
+    let olddu = 0, otmp = null;
+    const oldx = mtmp.mx;
+    const oldy = mtmp.my;
+    const resident_shk = mtmp.isshk && inhishop(mtmp) ? 1 : 0;
+    const preventmsg = (rlocflags & RLOC.NOMSG) >>> 0 !== 0 ? 1 : 0;
+    const vanishmsg = (rlocflags & RLOC.MSG) >>> 0 !== 0 ? 1 : 0;
+    let appearmsg = $c.andu64(mtmp.mstrategy, 2147483648) !== 0 ? 1 : 0;
+    const domsg = !gi.in_mklev && (vanishmsg || appearmsg) && !preventmsg ? 1 : 0;
+    let telemsg = FALSE;
     if (x === mtmp.mx && y === mtmp.my && $c.peq(svl.level.monsters[x][y], mtmp)) {
         return;   /* that was easy */
     }
@@ -1676,10 +1673,10 @@ async function rloc_to_core(mtmp, x, y, rlocflags) {   // teleport.c:1645
     await newsym(x, y);   /* update new location */
     set_apparxy(mtmp);   /* orient monster */
     if (domsg && (canspotmon(mtmp) || appearmsg || $c.peq(mtmp, u.ustuck))) {
-        du = distu(x, y);
+        const du = distu(x, y);
         /* next2u() */
-        next = du <= 2 ? $c.lit(" next to you") : null;
-        nearu = du <= BOLT_LIM * BOLT_LIM ? $c.lit(" close by") : null;
+        const next = du <= 2 ? $c.lit(" next to you") : null;
+        const nearu = du <= BOLT_LIM * BOLT_LIM ? $c.lit(" close by") : null;
         set_msg_xy(x, y);
         mtmp.mstrategy = $c.andu64(mtmp.mstrategy, 18446744071562067967n);   /* one chance only */
         if ($c.peq(mtmp, u.ustuck) && !(u.ux0 === u.ux && u.uy0 === u.uy)) {
@@ -1711,8 +1708,8 @@ async function rloc_to_core(mtmp, x, y, rlocflags) {   // teleport.c:1645
        mtmp teleports from one shop into another, no_charge status sticks
        and an item on the first shk's bill stays there */
     if (mtmp.minvent && !await costly_spot(x, y)) {
-        shkp = await find_objowner(mtmp.minvent, oldx, oldy);
-        peaceful = !shkp || shkp.mpeaceful ? 1 : 0;
+        const shkp = await find_objowner(mtmp.minvent, oldx, oldy);
+        const peaceful = !shkp || shkp.mpeaceful ? 1 : 0;
         for (otmp = mtmp.minvent; otmp; otmp = otmp.nobj) {
             if (otmp.no_charge) {
                 otmp.no_charge = 0;
@@ -1755,8 +1752,7 @@ export async function rloc_to_flag(mtmp, x, y, rlocflags) {   // teleport.c:1777
  * @returns {$T.stairway | null} stairway *
  */
 function stairway_find_forwiz(isladder, up) {   // teleport.c:1786
-    let stway = null;
-    stway = gs.stairs;
+    let stway = gs.stairs;
     while (stway && !(stway.isladder === isladder && stway.up === up && stway.tolev.dnum === u.uz.dnum)) {
         stway = stway.next;
     }
@@ -1902,8 +1898,8 @@ export async function control_mon_tele(mon, cc_p, rlocflags, via_rloc) {   // te
  * @returns {Promise<void>}
  */
 async function mvault_tele(mtmp) {   // teleport.c:1937
-    let croom = null, c = new $T.nhcoord();
-    croom = search_special(VAULT);
+    let c = new $T.nhcoord();
+    const croom = search_special(VAULT);
     if (croom && somexyspace(croom, c) && goodpos(c.x, c.y, mtmp, 0)) {
         await rloc_to(mtmp, c.x, c.y);
         return;
@@ -1930,7 +1926,6 @@ export async function tele_restrict(mon) {   // teleport.c:1950
  * @returns {Promise<void>}
  */
 export async function mtele_trap(mtmp, trap, in_sight) {   // teleport.c:1962
-    let monname = null;
     /* don't print feedback here: a monster stepping on a trap and not
        teleporting from it isn't visible */
     if (await noteleport_level(mtmp)) {
@@ -1938,7 +1933,7 @@ export async function mtele_trap(mtmp, trap, in_sight) {   // teleport.c:1962
     }
     if (await teleport_pet(mtmp, FALSE)) {
         /* save name with pre-movement visibility */
-        monname = await Monnam(mtmp);
+        const monname = await Monnam(mtmp);
         /* Note: don't remove the trap if a vault.  Other-
          * wise the monster will be stuck there, since
          * the guard isn't going to come for it...
@@ -1975,13 +1970,13 @@ export async function mtele_trap(mtmp, trap, in_sight) {   // teleport.c:1962
  * @returns {Promise<number>} int
  */
 export async function mlevel_tele_trap(mtmp, trap, force_it, in_sight) {   // teleport.c:2006
-    let tt = 0, tolevel = new $T.d_level(), migrate_typ = 0, nlev = 0;
-    tt = trap ? trap.ttyp : NO_TRAP;
+    let tolevel = new $T.d_level();
+    const tt = trap ? trap.ttyp : NO_TRAP;
     if ($c.peq(mtmp, u.ustuck)) {   /* probably a vortex */
         return Trap.Effect_Finished;   /* temporary? kludge */
     }
     if (await teleport_pet(mtmp, force_it)) {
-        migrate_typ = MIGR.RANDOM;
+        let migrate_typ = MIGR.RANDOM;
         if (is_hole(tt)) {
             if ((svd.dungeon_topology.d_stronghold_level.dlevel || svd.dungeon_topology.d_stronghold_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_stronghold_level)) {
                 assign_level(tolevel, svd.dungeon_topology.d_valley_level);
@@ -2023,7 +2018,7 @@ export async function mlevel_tele_trap(mtmp, trap, force_it, in_sight) {   // te
                    the hero and then revisited */
                 assign_level(tolevel, u.uz);
             } else {
-                nlev = random_teleport_level();
+                const nlev = random_teleport_level();
                 if (nlev === depth(u.uz)) {
                     if (in_sight) {
                         await pline_mon(mtmp, $c.lit("%s shudders for a moment."), await Monnam(mtmp));
@@ -2056,17 +2051,17 @@ export async function mlevel_tele_trap(mtmp, trap, force_it, in_sight) {   // te
  * @returns {Promise<number>} boolean
  */
 export async function rloco(obj) {   // teleport.c:2102
-    let tx = 0, ty = 0, otx = 0, oty = 0, restricted_fall = 0, try_limit = 0, shkp = null, objinshop = 0, onboundary = 0, h = 0, oo = 0, hinshop = 0;
-    try_limit = 4000;
+    let tx = 0, ty = 0;
+    let try_limit = 4000;
     if (obj.otyp === CORPSE && is_rider($c.relem(mons, obj.corpsenm))) {
         if (await revive_corpse(obj)) {
             return FALSE;
         }
     }
     await obj_extract_self(obj);
-    otx = obj.ox;
-    oty = obj.oy;
-    restricted_fall = otx === 0 && svd.dndest.lx ? 1 : 0;
+    const otx = obj.ox;
+    const oty = obj.oy;
+    const restricted_fall = otx === 0 && svd.dndest.lx ? 1 : 0;
     do {
         tx = $c.i16(rn2(COLNO - 3) + 2 | 0);
         ty = $c.i16(rn2(ROWNO));
@@ -2086,9 +2081,9 @@ export async function rloco(obj) {   // teleport.c:2102
     } else if (otx === 0 && oty === 0) {
         /* fell through a trap door; no update of old loc needed */
     } else {
-        shkp = await find_objowner(obj, otx, oty);
-        objinshop = shkp && await costly_spot(otx, oty) ? 1 : 0;
-        onboundary = shkp && costly_adjacent(shkp, otx, oty) ? 1 : 0;
+        const shkp = await find_objowner(obj, otx, oty);
+        const objinshop = shkp && await costly_spot(otx, oty) ? 1 : 0;
+        const onboundary = shkp && costly_adjacent(shkp, otx, oty) ? 1 : 0;
         /*
          * If object starts inside shop or is unpaid and on shop boundary:
          * if hero is outside the shop, treat this as theft;
@@ -2098,9 +2093,9 @@ export async function rloco(obj) {   // teleport.c:2102
          * Billing routines deal with obj->no_charge.
          */
         if (objinshop || obj.unpaid && onboundary) {
-            h = in_rooms(u.ux, u.uy, SHOPBASE).get(0);
-            oo = in_rooms(otx, oty, 0).get(0);
-            hinshop = h && $c.strchr(in_rooms(shkp.mx, shkp.my, 0), h) ? 1 : 0;
+            const h = in_rooms(u.ux, u.uy, SHOPBASE).get(0);
+            const oo = in_rooms(otx, oty, 0).get(0);
+            const hinshop = h && $c.strchr(in_rooms(shkp.mx, shkp.my, 0), h) ? 1 : 0;
             /* verify that it's the same shop */
             if (hinshop && await costly_spot(tx, ty) && oo && $c.strchr(in_rooms(tx, ty, 0), oo)) {
                 if (obj.unpaid) {
@@ -2126,8 +2121,8 @@ export async function rloco(obj) {   // teleport.c:2102
  * @returns {number} int
  */
 export function random_teleport_level() {   // teleport.c:2191
-    let nlev = 0, max_depth = 0, min_depth = 0, cur_depth = 0, bottom = 0, qlocate_depth = 0;
-    cur_depth = depth(u.uz);
+    let max_depth = 0, min_depth = 0;
+    const cur_depth = depth(u.uz);
     /* [the endgame case can only occur in wizard mode] */
     if (!rn2(5) || single_level_branch(u.uz) || In_endgame(u.uz)) {
         return cur_depth;
@@ -2152,8 +2147,8 @@ export function random_teleport_level() {   // teleport.c:2191
      * Also prevent monsters reaching the Sanctum prior to invocation.
      */
     if (In_quest(u.uz)) {
-        bottom = dunlevs_in_dungeon(u.uz);
-        qlocate_depth = svd.dungeon_topology.d_qlocate_level.dlevel;
+        let bottom = dunlevs_in_dungeon(u.uz);
+        const qlocate_depth = svd.dungeon_topology.d_qlocate_level.dlevel;
         /* if hero hasn't reached the middle locate level yet,
            no one can randomly teleport past it */
         if (svd.dungeons[u.uz.dnum].dunlev_ureached < qlocate_depth) {
@@ -2171,7 +2166,7 @@ export function random_teleport_level() {   // teleport.c:2191
     }
     /* Get a random value relative to the current dungeon */
     /* Range is 1 to current+3, current not counting */
-    nlev = rn2((cur_depth + 3 | 0) - min_depth | 0) + min_depth | 0;
+    let nlev = rn2((cur_depth + 3 | 0) - min_depth | 0) + min_depth | 0;
     if (nlev >= cur_depth) {
         nlev = nlev + 1 | 0;
     }

@@ -183,7 +183,6 @@ async function moveloop_preamble(resuming) {   // allmain.c:48
  */
 function u_calc_moveamt(wtcap) {   // allmain.c:114
     let moveamt = 0;
-    moveamt = 0;
     /* calculate how much time passed. */
     if (u.usteed && u.umoved) {
         /* your speed doesn't augment steed's speed */
@@ -240,8 +239,8 @@ async function maybe_generate_rnd_mon() {   // allmain.c:162
  * @returns {Promise<void>}
  */
 export async function moveloop_core() {   // allmain.c:177
-    let monscanmove = 0, mtmp = null, old_ux = 0, old_uy = 0, $t1, $t2, $t3;
-    monscanmove = FALSE;
+    let mtmp = null, $t1, $t2, $t3;
+    let monscanmove = FALSE;
     if (program_state.done_hup) {
         await end_of_input();
     }
@@ -349,8 +348,8 @@ export async function moveloop_core() {   // allmain.c:177
                 await regen_pw(mvl_wtcap);
                 if (!u.uinvulnerable) {
                     if (Teleportation() && !rn2(85)) {
-                        old_ux = u.ux;
-                        old_uy = u.uy;
+                        const old_ux = u.ux;
+                        const old_uy = u.uy;
                         await tele();
                         if (u.ux !== old_ux || u.uy !== old_uy) {
                             if (!await next_to_u()) {
@@ -584,8 +583,7 @@ export async function moveloop_core() {   // allmain.c:177
  * @returns {Promise<void>}
  */
 async function maybe_do_tutorial() {   // allmain.c:567
-    let sp = null;
-    sp = find_level($c.lit("tut-1"));
+    const sp = find_level($c.lit("tut-1"));
     if (!sp) {
         return;
     }
@@ -617,9 +615,9 @@ export async function moveloop(resuming) {   // allmain.c:587
  * @returns {Promise<void>}
  */
 async function regen_pw(wtcap) {   // allmain.c:600
-    let upper = 0, $t1;
+    let $t1;
     if (u.uen < u.uenmax && (wtcap < MOD_ENCUMBER && !$c.rem64(svm.moves, $c.div32(Math.imul(MAXULEV + 8 - u.ulevel | 0, gu.urole.mnum === PM.WIZARD ? 3 : 4), 6)) || Energy_regeneration())) {
-        upper = $c.div32(ACURR(A.WIS) + ACURR(A.INT), 15) + 1 | 0;
+        let upper = $c.div32(ACURR(A.WIS) + ACURR(A.INT), 15) + 1 | 0;
         if (EMagical_breathing()) {
             upper = upper + 2 | 0;
         }
@@ -639,10 +637,9 @@ async function regen_pw(wtcap) {   // allmain.c:600
  * @returns {Promise<void>}
  */
 async function regen_hp(wtcap) {   // allmain.c:625
-    let heal = 0, reached_full = 0, encumbrance_ok = 0;
-    heal = 0;
-    reached_full = FALSE;
-    encumbrance_ok = wtcap < MOD_ENCUMBER || !u.umoved ? 1 : 0;
+    let heal = 0;
+    let reached_full = FALSE;
+    const encumbrance_ok = wtcap < MOD_ENCUMBER || !u.umoved ? 1 : 0;
     if (Upolyd()) {
         if (u.mh < 1) {
             /* shouldn't happen... */
@@ -712,8 +709,7 @@ export async function stop_occupation() {   // allmain.c:684
  * @returns {Promise<void>}
  */
 export async function init_sound_disp_gamewindows() {   // allmain.c:699
-    let menu_behavior = 0;
-    menu_behavior = MENU.BEHAVE_STANDARD;
+    const menu_behavior = MENU.BEHAVE_STANDARD;
     await activate_chosen_soundlib();
     if (iflags.wc_splash_screen && !flags.randomall) {
         /* ToDo: new splash screen invocation will go here */
@@ -836,10 +832,10 @@ export async function newgame() {   // allmain.c:766
  * @returns {Promise<void>}
  */
 export async function welcome(new_game) {   // allmain.c:854
-    let buf = new Int8Array(256), currentgend = 0, adrift = 0;
+    let buf = new Int8Array(256);
     /* false => restoring an old game */
-    currentgend = Upolyd() ? u.mfemale : flags.female;
-    adrift = u.ualign.type !== u.ualignbase[A.CURRENT] ? 1 : 0;
+    const currentgend = Upolyd() ? u.mfemale : flags.female;
+    const adrift = u.ualign.type !== u.ualignbase[A.CURRENT] ? 1 : 0;
     await l_nhcore_call(new_game ? NHCORE.START_NEW_GAME : NHCORE.RESTORE_OLD_GAME);
     /* skip "welcome back" if restoring a doomed character */
     if (!new_game && Upolyd() && ugenocided()) {

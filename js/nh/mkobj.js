@@ -116,8 +116,7 @@ function init_oextra(oex) {   // mkobj.c:80
  * @returns {Promise<$T.oextra | null>} struct oextra *
  */
 export async function newoextra() {   // mkobj.c:86
-    let oextra = null;
-    oextra = $c.asRec(await alloc(32), $T.oextra, 32);
+    const oextra = $c.asRec(await alloc(32), $T.oextra, 32);
     init_oextra(oextra);
     return oextra;
 }
@@ -125,8 +124,7 @@ export async function newoextra() {   // mkobj.c:86
  * @param {$T.obj | null} o struct obj *
  */
 export function dealloc_oextra(o) {   // mkobj.c:96
-    let x = null;
-    x = o.oextra;
+    const x = o.oextra;
     if (x) {
         if (x.oname) {
             $c.free(x.oname), x.oname = null;
@@ -146,12 +144,12 @@ export function dealloc_oextra(o) {   // mkobj.c:96
  * @returns {Promise<void>}
  */
 export async function newomonst(otmp) {   // mkobj.c:114
-    let m = null, $t1;
+    let $t1;
     if (!otmp.oextra) {
         $t1 = await newoextra(), otmp.oextra = $t1;
     }
     if (!OMONST(otmp)) {
-        m = await newmonst();
+        const m = await newmonst();
         m.$copyFrom(cg.zeromonst);
         otmp.oextra.omonst = m;
     }
@@ -160,9 +158,8 @@ export async function newomonst(otmp) {   // mkobj.c:114
  * @param {$T.obj | null} otmp struct obj *
  */
 export function free_omonst(otmp) {   // mkobj.c:128
-    let m = null;
     if (otmp.oextra) {
-        m = otmp.oextra.omonst;
+        const m = otmp.oextra.omonst;
         if (m) {
             if (m.mextra) {
                 dealloc_mextra(m);
@@ -277,8 +274,7 @@ function mkobj_erosions(otmp) {   // mkobj.c:196
  * @returns {Promise<$T.obj | null>} struct obj *
  */
 export async function mkobj_at(let_, x, y, artif) {   // mkobj.c:227
-    let otmp = null;
-    otmp = await mkobj(let_, artif);
+    const otmp = await mkobj(let_, artif);
     await place_object(otmp, x, y);
     return otmp;
 }
@@ -292,8 +288,7 @@ export async function mkobj_at(let_, x, y, artif) {   // mkobj.c:227
  * @returns {Promise<$T.obj | null>} struct obj *
  */
 export async function mksobj_at(otyp, x, y, init, artif) {   // mkobj.c:238
-    let otmp = null;
-    otmp = await mksobj(otyp, init, artif);
+    const otmp = await mksobj(otyp, init, artif);
     await place_object(otmp, x, y);
     return otmp;
 }
@@ -306,8 +301,7 @@ export async function mksobj_at(otyp, x, y, init, artif) {   // mkobj.c:238
  * @returns {Promise<$T.obj | null>} struct obj *
  */
 export async function mksobj_migr_to_species(otyp, mflags2, init, artif) {   // mkobj.c:253
-    let otmp = null;
-    otmp = await mksobj(otyp, init, artif);
+    const otmp = await mksobj(otyp, init, artif);
     await add_to_migration(otmp);
     otmp.owornmask = MIGR.TO_SPECIES;
     otmp.corpsenm = mflags2 | 0;
@@ -321,9 +315,9 @@ export async function mksobj_migr_to_species(otyp, mflags2, init, artif) {   // 
  * @returns {Promise<$T.obj | null>} struct obj *
  */
 export async function mkobj(oclass, artif) {   // mkobj.c:270
-    let tprob = 0, i = 0, prob = 0, iprobs = null;
+    let tprob = 0, i = 0;
     if (oclass === RANDOM_CLASS) {
-        iprobs = (svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? rogueprobs[0] : Inhell() ? hellprobs[0] : mkobjprobs[0];
+        let iprobs = (svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? rogueprobs[0] : Inhell() ? hellprobs[0] : mkobjprobs[0];
         for (tprob = rnd(100); (tprob = tprob - iprobs.iprob | 0) > 0; iprobs = $c.radd(iprobs, 1)) {
             continue;
         }
@@ -333,7 +327,7 @@ export async function mkobj(oclass, artif) {   // mkobj.c:270
         i = rnd_class(svb.bases[SPBOOK_CLASS], SPE_BLANK_PAPER);
         oclass = SPBOOK_CLASS;   /* for sanity check below */
     } else {
-        prob = rnd(go.oclass_prob_totals[oclass]);
+        let prob = rnd(go.oclass_prob_totals[oclass]);
         i = svb.bases[oclass];
         while ((prob = prob - objects[i].oc_prob | 0) > 0) {
             i = i + 1 | 0;
@@ -350,7 +344,7 @@ export async function mkobj(oclass, artif) {   // mkobj.c:270
  * @returns {Promise<void>}
  */
 async function mkbox_cnts(box) {   // mkobj.c:304
-    let n = 0, otmp = null, tprob = 0, iprobs = null, $t1, $t2, $t3, $t4, $t5, $t6;
+    let n = 0, otmp = null, tprob = 0, $t1, $t2, $t3, $t4, $t5, $t6;
     box.cobj = null;
     switch (box.otyp) {
         case ICE_BOX:
@@ -390,7 +384,7 @@ async function mkbox_cnts(box) {   // mkobj.c:304
                 await stop_timer(SHRINK_GLOB, obj_to_any(otmp));
             }
         } else {
-            iprobs = boxiprobs[0];
+            let iprobs = boxiprobs[0];
             for (tprob = rnd(100); (tprob = tprob - iprobs.iprob | 0) > 0; iprobs = $c.radd(iprobs, 1)) {
             }
             if (!(otmp = await mkobj(iprobs.iclass, FALSE))) {
@@ -440,14 +434,14 @@ export async function rndmonnum() {   // mkobj.c:388
  * @returns {Promise<number>} int
  */
 export async function rndmonnum_adj(minadj, maxadj) {   // mkobj.c:395
-    let ptr = null, i = 0, excludeflags = 0;
+    let i = 0;
     /* Plan A: get a level-appropriate common monster */
-    ptr = await rndmonst_adj(minadj, maxadj);
+    let ptr = await rndmonst_adj(minadj, maxadj);
     if (ptr) {
         return ptr.pmidx;
     }
     /* Plan B: get any common monster */
-    excludeflags = G_UNIQ | G_NOGEN | (Inhell() ? G_NOHELL : G_HELL);
+    const excludeflags = G_UNIQ | G_NOGEN | (Inhell() ? G_NOHELL : G_HELL);
     do {
         i = rn2(SPECIAL_PM - LOW_PM) + LOW_PM;
         ptr = $c.relem(mons, i);
@@ -504,12 +498,12 @@ export async function copy_oextra(obj2, obj1) {   // mkobj.c:417
  * @returns {Promise<$T.obj | null>} struct obj *
  */
 export async function splitobj(obj, num) {   // mkobj.c:457
-    let otmp = null, $t1, $t2, $t3;
+    let $t1, $t2, $t3;
     /* can't split containers */
     if (obj.cobj || num <= 0 || obj.quan <= num) {
         await panic($c.lit("splitobj [cobj=%s num=%ld quan=%ld]"), obj.cobj ? $c.lit("non-empty container") : $c.lit("(null)"), num, obj.quan);
     }
-    otmp = await newobj();
+    const otmp = await newobj();
     otmp.$copyFrom(obj);   /* copies whole structure */
     otmp.oextra = null;
     $t1 = nextoid(obj, otmp), otmp.o_id = $t1;
@@ -559,8 +553,8 @@ export async function splitobj(obj, num) {   // mkobj.c:457
  * @returns {number} unsigned int
  */
 export function next_ident() {   // mkobj.c:509
-    let res = 0, $t1, $t2;
-    res = svc.context.ident;
+    let $t1, $t2;
+    const res = svc.context.ident;
     /* +rnd(2): originally just +1; changed to rnd() to avoid potential
        exploit of player using #adjust to split an object stack in a manner
        that makes most recent ident%2 known; since #adjust takes no time,
@@ -587,10 +581,10 @@ export function next_ident() {   // mkobj.c:509
  * @returns {number} unsigned int
  */
 function nextoid(oldobj, newobj) {   // mkobj.c:536
-    let olddif = 0, newdif = 0, trylimit = 0, oid = 0;
-    trylimit = 256;   /* limit of 4 suffices at present */
-    oid = svc.context.ident - 1 >>> 0;   /* loop increment will reverse -1 */
-    olddif = oid_price_adjustment(oldobj, oldobj.o_id);
+    let newdif = 0;
+    let trylimit = 256;   /* limit of 4 suffices at present */
+    let oid = svc.context.ident - 1 >>> 0;   /* loop increment will reverse -1 */
+    const olddif = oid_price_adjustment(oldobj, oldobj.o_id);
     do {
         oid = oid + 1 >>> 0;
         if (!oid) {   /* avoid using 0 (in case value wrapped) */
@@ -609,11 +603,11 @@ function nextoid(oldobj, newobj) {   // mkobj.c:536
  * @returns {Promise<$T.obj | null>} struct obj *
  */
 export async function unsplitobj(obj) {   // mkobj.c:556
-    let target_oid = 0, oparent = [null], ochild = [null], list = null;
-    target_oid = 0;
+    let oparent = [null], ochild = [null];
+    let target_oid = 0;
     oparent[0] = null;
     ochild[0] = null;
-    list = null;
+    let list = null;
     /*
      * We don't operate on floor objects (we're following o->nobj rather
      * than o->nexthere), on free objects (don't know which list to use when
@@ -743,10 +737,9 @@ export async function replace_object(obj, otmp) {   // mkobj.c:641
  * @returns {$T.obj | null} struct obj *
  */
 export function unknwn_contnr_contents(obj) {   // mkobj.c:684
-    let result = null, parent = null;
-    result = null;
+    let result = null;
     while (obj.where === OBJ.CONTAINED) {
-        parent = obj.v.v_ocontainer;
+        const parent = obj.v.v_ocontainer;
         if (!parent.cknown) {
             result = parent;
         }
@@ -773,13 +766,13 @@ export function unknwn_contnr_contents(obj) {   // mkobj.c:684
  * @returns {Promise<void>}
  */
 export async function bill_dummy_object(otmp) {   // mkobj.c:712
-    let dummy = null, cost = 0, $t1;
-    cost = 0;
+    let $t1;
+    let cost = 0;
     if (otmp.unpaid) {
         cost = await unpaid_cost(otmp, COST.SINGLEOBJ);
         await subfrombill(otmp, await shop_keeper(new $c.Ptr(u.ushops, 0).get(0)));
     }
-    dummy = await newobj();
+    const dummy = await newobj();
     dummy.$copyFrom(otmp);
     dummy.oextra = null;
     dummy.where = OBJ.FREE;
@@ -809,14 +802,14 @@ export async function bill_dummy_object(otmp) {   // mkobj.c:712
  * @returns {Promise<void>}
  */
 export async function costly_alteration(obj, alter_type) {   // mkobj.c:752
-    let ox = Int16Array.of(0), oy = Int16Array.of(0), objroom = 0, learn_bknown = 0, those = null, them = null, shkp = [null];
+    let ox = Int16Array.of(0), oy = Int16Array.of(0), those = null, them = null, shkp = [null];
     shkp[0] = null;
     if (alter_type < 0 || alter_type >= 20) {
         await impossible($c.lit("invalid alteration type (%d)"), alter_type);
         alter_type = 0;
     }
     ox[0] = oy[0] = 0;   /* lint suppression */
-    objroom = 0;   /* ditto */
+    let objroom = 0;   /* ditto */
     if (carried(obj) || obj.where === OBJ.FREE) {
         /* OBJ_FREE catches obj_no_longer_held()'s transformation
            of crysknife back into worm tooth; the object has been
@@ -849,7 +842,7 @@ export async function costly_alteration(obj, alter_type) {   // mkobj.c:752
     /* when shopkeeper describes the object as being uncursed or unblessed
        hero will know that it is now uncursed; will also make the feedback
        from `I x' after bill_dummy_object() be more specific for this item */
-    learn_bknown = alter_type === COST.UNCURS || alter_type === COST.UNBLSS ? 1 : 0;
+    const learn_bknown = alter_type === COST.UNCURS || alter_type === COST.UNBLSS ? 1 : 0;
     switch (obj.where) {
         case OBJ.FREE:
         case OBJ.INVENT:
@@ -920,9 +913,9 @@ export function unknow_object(obj) {   // mkobj.c:854
  * @returns {Promise<void>}
  */
 async function mksobj_init(obj, artif) {   // mkobj.c:869
-    let mndx = 0, tryct = 0, otmp = null, let_ = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12, $t13, $t14, $t15, $t16, $t17, $t18, $t19, $t20, $t21, $t22, $t23, $t24, $t25, $t26, $t27, $t28, $t29, $t30;
-    otmp = obj.get(0);
-    let_ = objects[otmp.otyp].oc_class;
+    let mndx = 0, tryct = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12, $t13, $t14, $t15, $t16, $t17, $t18, $t19, $t20, $t21, $t22, $t23, $t24, $t25, $t26, $t27, $t28, $t29, $t30;
+    let otmp = obj.get(0);
+    const let_ = objects[otmp.otyp].oc_class;
     switch (let_) {
         case WEAPON_CLASS:
             $t1 = is_multigen(otmp) ? rn2(6) + 6 | 0 : 1, otmp.quan = $t1;
@@ -1222,8 +1215,8 @@ async function mksobj_init(obj, artif) {   // mkobj.c:869
  * @returns {Promise<$T.obj | null>} struct obj *
  */
 export async function mksobj(otyp, init, artif) {   // mkobj.c:1179
-    let otmp = [null], let_ = 0, ptr = null, $t1, $t2, $t3, $t4, $t5;
-    let_ = objects[otyp].oc_class;
+    let otmp = [null], $t1, $t2, $t3, $t4, $t5;
+    const let_ = objects[otyp].oc_class;
     otmp[0] = await newobj();
     otmp[0].$copyFrom(cg.zeroobj);
     otmp[0].age = svm.moves > 1 ? svm.moves : 1;
@@ -1255,7 +1248,7 @@ export async function mksobj(otyp, init, artif) {   // mkobj.c:1179
                 $t3 = await rndmonnum(), otmp[0].corpsenm = $t3;
             }
             if (otmp[0].corpsenm !== NON_PM) {
-                ptr = $c.relem(mons, otmp[0].corpsenm);
+                const ptr = $c.relem(mons, otmp[0].corpsenm);
                 $t4 = is_neuter(ptr) ? CORPSTAT.NEUTER : is_female(ptr) ? CORPSTAT.FEMALE : is_male(ptr) ? CORPSTAT.MALE : rn2(2) ? CORPSTAT.FEMALE : CORPSTAT.MALE, otmp[0].spe = $t4;
             }
         case EGG:
@@ -1299,8 +1292,7 @@ export async function mksobj(otyp, init, artif) {   // mkobj.c:1179
  * @returns {number} boolean
  */
 export function stone_object_type(mappearance) {   // mkobj.c:1264
-    let otyp = 0;
-    otyp = mappearance | 0;
+    const otyp = mappearance | 0;
     /* we exclude wands, rings, and gems even though some qualify as stone;
        there aren't any weapons or armor classified as made out of stone */
     return otyp === BOULDER || otyp === STATUE || otyp === FIGURINE ? 1 : 0;
@@ -1312,8 +1304,7 @@ export function stone_object_type(mappearance) {   // mkobj.c:1264
  * @returns {number} boolean
  */
 export function stone_furniture_type(mappearance) {   // mkobj.c:1276
-    let sym = 0;
-    sym = mappearance | 0;
+    const sym = mappearance | 0;
     switch (sym) {
         case S.upstair:
         case S.dnstair:
@@ -1358,9 +1349,9 @@ export function stone_furniture_type(mappearance) {   // mkobj.c:1276
  * @returns {Promise<void>}
  */
 export async function set_corpsenm(obj, id) {   // mkobj.c:1318
-    let old_id = 0, when = 0, $t1, $t2, $t3;
-    old_id = obj.corpsenm;
-    when = 0;
+    let $t1, $t2, $t3;
+    const old_id = obj.corpsenm;
+    let when = 0;
     if (obj.timed) {
         if (obj.otyp === EGG) {
             when = await stop_timer(HATCH_EGG, obj_to_any(obj));
@@ -1411,8 +1402,8 @@ export async function set_corpsenm(obj, id) {   // mkobj.c:1318
  * @returns {number | bigint} long
  */
 export function rider_revival_time(body, retry) {   // mkobj.c:1371
-    let when = 0, minturn = 0;
-    minturn = retry ? 3 : body.corpsenm === PM.DEATH ? 6 : 12;
+    let when = 0;
+    const minturn = retry ? 3 : body.corpsenm === PM.DEATH ? 6 : 12;
     /* Riders have a 1/3 chance per turn of reviving after 12, 6, or 3 turns.
        Always revive by 67. */
     for (when = minturn; when < 67; when = $c.add64(when, 1)) {
@@ -1431,7 +1422,7 @@ export function rider_revival_time(body, retry) {   // mkobj.c:1371
  * @returns {Promise<void>}
  */
 export async function start_corpse_timeout(body) {   // mkobj.c:1389
-    let when = 0, age = 0, rot_adjust = 0, action = 0;
+    let when = 0;
     /* rot away when this old */
     /* age of corpse          */
     /*
@@ -1443,9 +1434,9 @@ export async function start_corpse_timeout(body) {   // mkobj.c:1389
     if (body.corpsenm === PM.LIZARD || body.corpsenm === PM.LICHEN) {
         return;
     }
-    action = ROT_CORPSE;   /* default action: rot away */
-    rot_adjust = gi.in_mklev ? 25 : 10;   /* give some variation */
-    age = $c.sub64(svm.moves > 1 ? svm.moves : 1, body.age);
+    let action = ROT_CORPSE;   /* default action: rot away */
+    const rot_adjust = gi.in_mklev ? 25 : 10;   /* give some variation */
+    let age = $c.sub64(svm.moves > 1 ? svm.moves : 1, body.age);
     if (age > ROT_AGE) {
         when = rot_adjust;
     } else {
@@ -1476,8 +1467,8 @@ export async function start_corpse_timeout(body) {   // mkobj.c:1389
  * @returns {number} int
  */
 function item_on_ice(item) {   // mkobj.c:1443
-    let otmp = null, ox = Int16Array.of(0), oy = Int16Array.of(0);
-    otmp = item;
+    let ox = Int16Array.of(0), oy = Int16Array.of(0);
+    let otmp = item;
     /* if in a container, it might be nested so find outermost one since
        that's the item whose location needs to be checked */
     while (otmp.where === OBJ.CONTAINED) {
@@ -1537,20 +1528,20 @@ export async function start_glob_timeout(obj, when) {   // mkobj.c:1473
  * @returns {Promise<void>}
  */
 export async function shrink_glob(arg, expire_time) {   // mkobj.c:1500
-    let globnambuf = new Int8Array(256), obj = null, globloc = 0, ininv = 0, shrink = 0, gone = 0, updinv = 0, contnr = null, topcontnr = null, old_top_owt = 0, delta = 0, moddelta = 0, basewt = 0, msgwt = 0, ox = Int16Array.of(0), oy = Int16Array.of(0), seeit = 0;
+    let globnambuf = new Int8Array(256), ox = Int16Array.of(0), oy = Int16Array.of(0);
     /* glob (in arg->a_obj) */
     /* turn the timer should have gone off; if less than
      * current 'moves', we're making up for lost time
      * after leaving and then returning to this level */
-    obj = arg.a_obj;
-    globloc = item_on_ice(obj);
-    ininv = obj.where === OBJ.INVENT ? 1 : 0;
-    shrink = FALSE;
-    gone = FALSE;
-    updinv = FALSE;
-    contnr = obj.where === OBJ.CONTAINED ? obj.v.v_ocontainer : null;
-    topcontnr = null;
-    old_top_owt = 0;
+    const obj = arg.a_obj;
+    const globloc = item_on_ice(obj);
+    const ininv = obj.where === OBJ.INVENT ? 1 : 0;
+    let shrink = FALSE;
+    let gone = FALSE;
+    let updinv = FALSE;
+    const contnr = obj.where === OBJ.CONTAINED ? obj.v.v_ocontainer : null;
+    let topcontnr = null;
+    let old_top_owt = 0;
     if (!obj.globby) {
         await impossible($c.lit("shrink_glob for non-glob [%d: %s]?"), obj.otyp, await simpleonames(obj));
         return;   /* old timer is gone, don't start a new one */
@@ -1564,8 +1555,8 @@ export async function shrink_glob(arg, expire_time) {   // mkobj.c:1500
     if (expire_time < svm.moves && globloc !== BURIED_UNDER_ICE) {
         /* number of units of weight to remove */
         /* leftover amount to use for new timer */
-        delta = $c.div64($c.add64($c.sub64(svm.moves, expire_time), 24), 25);
-        moddelta = $c.sub64(25, $c.rem64(delta, 25));
+        let delta = $c.div64($c.add64($c.sub64(svm.moves, expire_time), 24), 25);
+        const moddelta = $c.sub64(25, $c.rem64(delta, 25));
         if (globloc === SET_ON_ICE) {
             delta = $c.div64($c.add64(delta, 2), 3);
         }
@@ -1619,8 +1610,8 @@ export async function shrink_glob(arg, expire_time) {   // mkobj.c:1500
            when going from 20 to 19 and from 10 to 9; a different message
            is given for going from 1 to 0 (gone) */
         /* 20 */
-        basewt = objects[obj.otyp].oc_weight;
-        msgwt = $c.divu32((basewt > 1 ? basewt : 1) + 1 >>> 0, 2);   /* 10 */
+        const basewt = objects[obj.otyp].oc_weight;
+        const msgwt = $c.divu32((basewt > 1 ? basewt : 1) + 1 >>> 0, 2);   /* 10 */
         shrink = $c.remu32(obj.owt, msgwt) === 0 ? 1 : 0;
         obj.owt = obj.owt - 1 >>> 0;
         /* if glob is partly eaten, reduce the amount still available (but
@@ -1674,7 +1665,7 @@ export async function shrink_glob(arg, expire_time) {   // mkobj.c:1500
         ox[0] = 0;
         oy[0] = 0;
         /* check location for visibility before destroying obj */
-        seeit = obj.where === OBJ.FLOOR && get_obj_location(obj, new $c.Ptr(ox, 0), new $c.Ptr(oy, 0), 0) && cansee(ox[0], oy[0]) ? 1 : 0;
+        const seeit = obj.where === OBJ.FLOOR && get_obj_location(obj, new $c.Ptr(ox, 0), new $c.Ptr(oy, 0), 0) && cansee(ox[0], oy[0]) ? 1 : 0;
         /* weight has been reduced to 0 so destroy the glob */
         await shrinking_glob_gone(obj);
         if (seeit) {
@@ -1700,8 +1691,7 @@ export async function shrink_glob(arg, expire_time) {   // mkobj.c:1500
  * @returns {Promise<void>}
  */
 async function shrinking_glob_gone(obj) {   // mkobj.c:1673
-    let owhere = 0;
-    owhere = obj.where;
+    const owhere = obj.where;
     if (owhere === OBJ.INVENT) {
         if (obj.owornmask) {
             await remove_worn_item(obj, FALSE);
@@ -1735,9 +1725,9 @@ async function shrinking_glob_gone(obj) {   // mkobj.c:1673
  * @returns {Promise<void>}
  */
 export async function maybe_adjust_light(obj, old_range) {   // mkobj.c:1704
-    let buf = new Int8Array(256), ox = Int16Array.of(0), oy = Int16Array.of(0), new_range = 0, delta = 0;
-    new_range = arti_light_radius(obj);
-    delta = new_range - old_range | 0;
+    let buf = new Int8Array(256), ox = Int16Array.of(0), oy = Int16Array.of(0);
+    const new_range = arti_light_radius(obj);
+    const delta = new_range - old_range | 0;
     /* radius of light emitting artifact varies by curse/bless state
        so will change after blessing or cursing */
     if (delta) {
@@ -1773,8 +1763,8 @@ export async function maybe_adjust_light(obj, old_range) {   // mkobj.c:1704
  * @returns {Promise<void>}
  */
 export async function bless(otmp) {   // mkobj.c:1745
-    let old_light = 0, $t1;
-    old_light = 0;
+    let $t1;
+    let old_light = 0;
     if (otmp.oclass === COIN_CLASS) {
         return;
     }
@@ -1800,8 +1790,8 @@ export async function bless(otmp) {   // mkobj.c:1745
  * @returns {Promise<void>}
  */
 export async function unbless(otmp) {   // mkobj.c:1767
-    let old_light = 0, $t1;
-    old_light = 0;
+    let $t1;
+    let old_light = 0;
     if (otmp.lamplit) {
         old_light = arti_light_radius(otmp);
     }
@@ -1820,15 +1810,15 @@ export async function unbless(otmp) {   // mkobj.c:1767
  * @returns {Promise<void>}
  */
 export async function curse(otmp) {   // mkobj.c:1783
-    let already_cursed = 0, old_light = 0, $t1;
-    old_light = 0;
+    let $t1;
+    let old_light = 0;
     if (otmp.oclass === COIN_CLASS) {
         return;
     }
     if (otmp.lamplit) {
         old_light = arti_light_radius(otmp);
     }
-    already_cursed = otmp.cursed;
+    const already_cursed = otmp.cursed;
     otmp.blessed = 0;
     otmp.cursed = 1;
     /* welded two-handed weapon interferes with some armor removal */
@@ -1865,8 +1855,8 @@ export async function curse(otmp) {   // mkobj.c:1783
  * @returns {Promise<void>}
  */
 export async function uncurse(otmp) {   // mkobj.c:1822
-    let old_light = 0, $t1;
-    old_light = 0;
+    let $t1;
+    let old_light = 0;
     if (otmp.lamplit) {
         old_light = arti_light_radius(otmp);
     }
@@ -1940,8 +1930,8 @@ export async function set_bknown(obj, onoff) {   // mkobj.c:1864
  * @returns {Promise<number>} int
  */
 export async function weight(obj) {   // mkobj.c:1888
-    let wt = 0, contents = null, cwt = 0, msize = 0, minwt = 0, long_wt = 0;
-    wt = objects[obj.otyp].oc_weight | 0;   /* weight of 1 'otyp' */
+    let contents = null;
+    let wt = objects[obj.otyp].oc_weight | 0;   /* weight of 1 'otyp' */
     if (obj.quan < 1) {
         await impossible($c.lit("Calculating weight of %ld %s?"), obj.quan, await simpleonames(obj));
         return 0;
@@ -1963,8 +1953,8 @@ export async function weight(obj) {   // mkobj.c:1888
     if (Is_container(obj) || obj.otyp === STATUE) {
         if (obj.otyp === STATUE && ismnum(obj.corpsenm)) {
             /* 0..7 */
-            msize = mons[obj.corpsenm].msize;
-            minwt = Math.imul((msize + msize | 0) + 1 | 0, 100);
+            const msize = mons[obj.corpsenm].msize;
+            const minwt = Math.imul((msize + msize | 0) + 1 | 0, 100);
             /* default statue weight is 1.5 times corpse weight */
             wt = $c.div32(Math.imul(3, mons[obj.corpsenm].cwt | 0), 2);
             /* some monsters that never leave a corpse when they die have
@@ -1979,7 +1969,7 @@ export async function weight(obj) {   // mkobj.c:1888
             /* this has no effect because statues don't stack */
             wt = Math.imul(wt, $c.i32(obj.quan));
         }
-        cwt = 0;   /* contents weight */
+        let cwt = 0;   /* contents weight */
         for (contents = obj.cobj; contents; contents = contents.nobj) {
             cwt = cwt + await weight(contents) | 0;
         }
@@ -2003,7 +1993,7 @@ export async function weight(obj) {   // mkobj.c:1888
         return wt + cwt | 0;
     }
     if (obj.otyp === CORPSE && ismnum(obj.corpsenm)) {
-        long_wt = $c.mul64(obj.quan, mons[obj.corpsenm].cwt);
+        const long_wt = $c.mul64(obj.quan, mons[obj.corpsenm].cwt);
         wt = long_wt > LARGEST_INT ? LARGEST_INT : $c.i32(long_wt);
         if (obj.oeaten) {
             wt = await eaten_stat(wt, obj);
@@ -2053,10 +2043,10 @@ export function is_treefruit(otmp) {   // mkobj.c:1991
  * @returns {Promise<$T.obj | null>} struct obj *
  */
 export async function mkgold(amount, x, y) {   // mkobj.c:2003
-    let gold = null, mul = 0, $t1;
-    gold = g_at(x, y);
+    let $t1;
+    let gold = g_at(x, y);
     if (amount <= 0) {
-        mul = rnd($c.div32(30, 12 - depth(u.uz) > 2 ? 12 - depth(u.uz) : 2));
+        const mul = rnd($c.div32(30, 12 - depth(u.uz) > 2 ? 12 - depth(u.uz) : 2));
         amount = $c.add64(1, $c.mul64(rnd(await level_difficulty() + 2), mul));
     }
     if (gold) {
@@ -2121,12 +2111,12 @@ export function fixup_oil(potion, source) {   // mkobj.c:2025
  * @returns {Promise<$T.obj | null>} struct obj *
  */
 export async function mkcorpstat(objtype, mtmp, ptr, x, y, corpstatflags) {   // mkobj.c:2067
-    let otmp = null, init = 0, old_corpsenm = 0, $t1;
+    let otmp = null, $t1;
     /* CORPSE or STATUE */
     /* dead monster, might be Null */
     /* if non-Null, overrides mtmp->mndx */
     /* where to place corpse; <0,0> => random */
-    init = (corpstatflags & CORPSTAT.INIT) >>> 0 !== 0 ? 1 : 0;
+    const init = (corpstatflags & CORPSTAT.INIT) >>> 0 !== 0 ? 1 : 0;
     if (objtype !== CORPSE && objtype !== STATUE) {
         await impossible($c.lit("making corpstat type %d"), objtype);
     }
@@ -2156,7 +2146,7 @@ export async function mkcorpstat(objtype, mtmp, ptr, x, y, corpstatflags) {   //
     /* when 'ptr' is non-null it comes from our caller or from 'mtmp';
        override mkobjs()'s initialization of a random monster type */
     if (ptr) {
-        old_corpsenm = otmp.corpsenm;
+        const old_corpsenm = otmp.corpsenm;
         otmp.corpsenm = ptr.pmidx;
         $t1 = await weight(otmp) >>> 0, otmp.owt = $t1;
         if (otmp.otyp === CORPSE && (gz.zombify || (old_corpsenm === PM.LIZARD || old_corpsenm === PM.LICHEN || (mons[old_corpsenm].mlet === S.TROLL || ($c.relem(mons, old_corpsenm) === mons[PM.DEATH] || $c.relem(mons, old_corpsenm) === mons[PM.FAMINE] || $c.relem(mons, old_corpsenm) === mons[PM.PESTILENCE]))) || (otmp.corpsenm === PM.LIZARD || otmp.corpsenm === PM.LICHEN || (mons[otmp.corpsenm].mlet === S.TROLL || ($c.relem(mons, otmp.corpsenm) === mons[PM.DEATH] || $c.relem(mons, otmp.corpsenm) === mons[PM.FAMINE] || $c.relem(mons, otmp.corpsenm) === mons[PM.PESTILENCE]))))) {
@@ -2179,8 +2169,8 @@ export async function mkcorpstat(objtype, mtmp, ptr, x, y, corpstatflags) {   //
  * @returns {Promise<number>} int
  */
 export async function corpse_revive_type(obj) {   // mkobj.c:2129
-    let revivetype = 0, mtmp = null;
-    revivetype = obj.corpsenm;
+    let mtmp = null;
+    let revivetype = obj.corpsenm;
     if (has_omonst(obj) && (mtmp = await get_mtraits(obj, FALSE)) !== null) {
         /* mtmp is a temporary pointer to a monster's stored
         attributes, not a real monster */
@@ -2211,7 +2201,6 @@ export async function obj_attach_mid(obj, mid) {   // mkobj.c:2147
  * @returns {Promise<$T.obj | null>} struct obj *
  */
 async function save_mtraits(obj, mtmp) {   // mkobj.c:2157
-    let baselevel = 0, mtmp2 = null;
     if (mtmp.ispriest) {
         await forget_temple_entry(mtmp);   /* EPRI() */
     }
@@ -2219,8 +2208,8 @@ async function save_mtraits(obj, mtmp) {   // mkobj.c:2157
         await newomonst(obj);
     }
     if (has_omonst(obj)) {
-        baselevel = mtmp.data.mlevel;   /* mtmp->data is valid ptr */
-        mtmp2 = obj.oextra.omonst;
+        const baselevel = mtmp.data.mlevel;   /* mtmp->data is valid ptr */
+        const mtmp2 = obj.oextra.omonst;
         mtmp2.$copyFrom(mtmp);
         mtmp2.mextra = null;
         mtmp2.mnum = $c.i16(mtmp.data.pmidx);
@@ -2263,9 +2252,8 @@ async function save_mtraits(obj, mtmp) {   // mkobj.c:2157
  * @returns {Promise<$T.monst | null>} struct monst *
  */
 export async function get_mtraits(obj, copyof) {   // mkobj.c:2201
-    let mtmp = null, mnew = null;
-    mtmp = null;
-    mnew = null;
+    let mtmp = null;
+    let mnew = null;
     if (has_omonst(obj)) {
         mtmp = obj.oextra.omonst;
     }
@@ -2294,15 +2282,14 @@ export async function get_mtraits(obj, copyof) {   // mkobj.c:2201
  * @returns {Promise<$T.obj | null>} struct obj *
  */
 export async function mk_tt_object(objtype, x, y) {   // mkobj.c:2227
-    let otmp = null, initialize_it = 0, pm = 0;
     /* CORPSE or STATUE */
     /* player statues never contain books */
-    initialize_it = objtype !== STATUE ? 1 : 0;
-    otmp = await mksobj_at(objtype, x, y, initialize_it, FALSE);
+    const initialize_it = objtype !== STATUE ? 1 : 0;
+    const otmp = await mksobj_at(objtype, x, y, initialize_it, FALSE);
     /* tt_oname() will return null if the scoreboard is empty, which in
        turn leaves the random corpsenm value; force it to match a player */
     if (!await tt_oname(otmp)) {
-        pm = rn2(PM.WIZARD - PM.ARCHEOLOGIST + 1) + PM.ARCHEOLOGIST | 0;
+        const pm = rn2(PM.WIZARD - PM.ARCHEOLOGIST + 1) + PM.ARCHEOLOGIST | 0;
         /* update weight for either, force timer sanity for corpses */
         await set_corpsenm(otmp, pm);
     }
@@ -2319,10 +2306,9 @@ export async function mk_tt_object(objtype, x, y) {   // mkobj.c:2227
  * @returns {Promise<$T.obj | null>} struct obj *
  */
 export async function mk_named_object(objtype, ptr, x, y, nm) {   // mkobj.c:2253
-    let otmp = null, corpstatflags = 0;
     /* CORPSE or STATUE */
-    corpstatflags = objtype !== STATUE ? CORPSTAT.INIT : CORPSTAT.NONE;
-    otmp = await mkcorpstat(objtype, null, ptr, x, y, corpstatflags);
+    const corpstatflags = objtype !== STATUE ? CORPSTAT.INIT : CORPSTAT.NONE;
+    let otmp = await mkcorpstat(objtype, null, ptr, x, y, corpstatflags);
     if (nm) {
         otmp = await oname(otmp, nm, ONAME_NO_FLAGS);
     }
@@ -2333,9 +2319,8 @@ export async function mk_named_object(objtype, ptr, x, y, nm) {   // mkobj.c:225
  * @returns {number} boolean
  */
 export function is_flammable(otmp) {   // mkobj.c:2270
-    let otyp = 0, omat = 0;
-    otyp = otmp.otyp;
-    omat = objects[otyp].oc_material;
+    const otyp = otmp.otyp;
+    const omat = objects[otyp].oc_material;
     /* Candles can be burned, but they're not flammable in the sense that
      * they can't get fire damage and it makes no sense for them to be
      * fireproofed.
@@ -2353,8 +2338,7 @@ export function is_flammable(otmp) {   // mkobj.c:2270
  * @returns {number} boolean
  */
 export function is_rottable(otmp) {   // mkobj.c:2289
-    let otyp = 0;
-    otyp = otmp.otyp;
+    const otyp = otmp.otyp;
     return objects[otyp].oc_material <= WOOD && objects[otyp].oc_material !== LIQUID || objects[otyp].oc_material === DRAGON_HIDE ? 1 : 0;
 }
 /*
@@ -2369,10 +2353,9 @@ export function is_rottable(otmp) {   // mkobj.c:2289
  * @returns {Promise<void>}
  */
 export async function place_object(otmp, x, y) {   // mkobj.c:2305
-    let otmp2 = null, func = null;
     if (!isok(x, y)) {
         /* validate location */
-        func = x < 0 || y < 0 || x > COLNO - 1 || y > ROWNO - 1 ? panic : impossible;
+        const func = x < 0 || y < 0 || x > COLNO - 1 || y > ROWNO - 1 ? panic : impossible;
         await func($c.lit("place_object: \"%s\" [%d] off map <%d,%d>"), await safe_typename(otmp.otyp), otmp.where, x, y);
         /* we'll only get to here if we've issued a warning (and fuzzer
            is not running since it escalates impossible to panic), so
@@ -2384,7 +2367,7 @@ export async function place_object(otmp, x, y) {   // mkobj.c:2305
         await panic($c.lit("place_object: obj \"%s\" [%d] not free"), await safe_typename(otmp.otyp), otmp.where);
     }
     (!(x >= 0 && x < COLNO && y >= 0 && y < ROWNO) ? 1 : 0) ? $c.__assert_rtn($c.lit("place_object"), $c.lit("mkobj.c"), 2327, $c.lit("x >= 0 && x < COLNO && y >= 0 && y < ROWNO")) : 0;
-    otmp2 = svl.level.objects[x][y];
+    let otmp2 = svl.level.objects[x][y];
     await obj_no_longer_held(otmp);
     if (otmp.otyp === BOULDER) {
         if (!otmp2 || otmp2.otyp !== BOULDER) {
@@ -2429,8 +2412,8 @@ export async function place_object(otmp, x, y) {   // mkobj.c:2305
  * @returns {Promise<void>}
  */
 export async function recreate_pile_at(x, y) {   // mkobj.c:2371
-    let otmp = null, next_obj = null, reversed = null;
-    reversed = null;
+    let otmp = null, next_obj = null;
+    let reversed = null;
     /* remove all objects at <x,y>, saving a reversed temporary list */
     for (otmp = svl.level.objects[x][y]; otmp; otmp = next_obj) {
         next_obj = otmp.v.v_nexthere;
@@ -2485,22 +2468,21 @@ export async function obj_ice_effects(x, y, do_buried) {   // mkobj.c:2397
  * @returns {Promise<number | bigint>} long
  */
 export async function peek_at_iced_corpse_age(otmp) {   // mkobj.c:2423
-    let age = 0, retval = 0, save_plnmsg = 0, save_plnmsg$2 = 0;
-    retval = otmp.age;
+    let retval = otmp.age;
     if (otmp.otyp === CORPSE && otmp.recharged) {
         /* Adjust the age; must be same as obj_timer_checks() for off ice*/
-        age = $c.sub64(svm.moves, otmp.age);
+        const age = $c.sub64(svm.moves, otmp.age);
         retval = $c.add64(retval, $c.div64($c.mul64(age, ROT_ICE_ADJUSTMENT - 1), ROT_ICE_ADJUSTMENT));
         do {
             if (debugcore($c.lit("mkobj.c"), TRUE)) {
-                save_plnmsg = iflags.last_msg;
+                const save_plnmsg = iflags.last_msg;
                 await pline($c.lit("The %s age has ice modifications: otmp->age = %ld, returning %ld."), s_suffix(await doname(otmp)), otmp.age, retval);
                 iflags.last_msg = save_plnmsg;
             }
         } while (0);
         do {
             if (debugcore($c.lit("mkobj.c"), TRUE)) {
-                save_plnmsg$2 = iflags.last_msg;
+                const save_plnmsg$2 = iflags.last_msg;
                 await pline($c.lit("Effective age of corpse: %ld."), $c.sub64(svm.moves, retval));
                 iflags.last_msg = save_plnmsg$2;
             }
@@ -2516,13 +2498,12 @@ export async function peek_at_iced_corpse_age(otmp) {   // mkobj.c:2423
  * @returns {Promise<void>}
  */
 async function obj_timer_checks(otmp, x, y, force) {   // mkobj.c:2440
-    let tleft = 0, action = 0, restart_timer = 0, on_floor = 0, buried = 0, age = 0, save_plnmsg = 0, age$2 = 0, save_plnmsg$2 = 0;
     /* 0 = no force so do checks, <0 = force off, >0 force on */
-    tleft = 0;
-    action = ROT_CORPSE;
-    restart_timer = FALSE;
-    on_floor = otmp.where === OBJ.FLOOR ? 1 : 0;
-    buried = otmp.where === OBJ.BURIED ? 1 : 0;
+    let tleft = 0;
+    let action = ROT_CORPSE;
+    let restart_timer = FALSE;
+    const on_floor = otmp.where === OBJ.FLOOR ? 1 : 0;
+    const buried = otmp.where === OBJ.BURIED ? 1 : 0;
     /* Check for corpses just placed on or in ice */
     if (otmp.otyp === CORPSE && (on_floor || buried) && is_ice(x, y)) {
         tleft = await stop_timer(action, obj_to_any(otmp));
@@ -2535,7 +2516,7 @@ async function obj_timer_checks(otmp, x, y, force) {   // mkobj.c:2440
             otmp.recharged = 1;
             do {
                 if (debugcore($c.lit("mkobj.c"), TRUE)) {
-                    save_plnmsg = iflags.last_msg;
+                    const save_plnmsg = iflags.last_msg;
                     await pline($c.lit("%s is now on ice at <%d,%d>."), await The(await xname(otmp)), x, y);
                     iflags.last_msg = save_plnmsg;
                 }
@@ -2548,7 +2529,7 @@ async function obj_timer_checks(otmp, x, y, force) {   // mkobj.c:2440
                later calculations behave as if it had been on ice during
                that time (longwinded way of saying this is the inverse
                of removing it from the ice and of peeking at its age). */
-            age = $c.sub64(svm.moves, otmp.age);
+            const age = $c.sub64(svm.moves, otmp.age);
             otmp.age = $c.sub64(svm.moves, $c.mul64(age, ROT_ICE_ADJUSTMENT));
         }
         /* Check for corpses coming off ice */
@@ -2562,7 +2543,7 @@ async function obj_timer_checks(otmp, x, y, force) {   // mkobj.c:2440
             otmp.recharged = 0;
             do {
                 if (debugcore($c.lit("mkobj.c"), TRUE)) {
-                    save_plnmsg$2 = iflags.last_msg;
+                    const save_plnmsg$2 = iflags.last_msg;
                     await pline($c.lit("%s is no longer on ice at <%d,%d>."), await The(await xname(otmp)), x, y);
                     iflags.last_msg = save_plnmsg$2;
                 }
@@ -2571,7 +2552,7 @@ async function obj_timer_checks(otmp, x, y, force) {   // mkobj.c:2440
             tleft = $c.div64(tleft, ROT_ICE_ADJUSTMENT);
             restart_timer = TRUE;
             /* Adjust the age */
-            age$2 = $c.sub64(svm.moves, otmp.age);
+            const age$2 = $c.sub64(svm.moves, otmp.age);
             otmp.age = $c.add64(otmp.age, $c.div64($c.mul64(age$2, ROT_ICE_ADJUSTMENT - 1), ROT_ICE_ADJUSTMENT));
         }
     }
@@ -2585,9 +2566,8 @@ async function obj_timer_checks(otmp, x, y, force) {   // mkobj.c:2440
  * @returns {Promise<void>}
  */
 export async function remove_object(otmp) {   // mkobj.c:2508
-    let x = 0, y = 0;
-    x = otmp.ox;
-    y = otmp.oy;
+    const x = otmp.ox;
+    const y = otmp.oy;
     if (otmp.where !== OBJ.FLOOR) {
         await panic($c.lit("remove_object: obj where=%d, not on floor"), otmp.where);
     }
@@ -2681,8 +2661,8 @@ export async function obj_extract_self(obj) {   // mkobj.c:2557
  * @returns {Promise<void>}
  */
 export async function extract_nobj(obj, head_ptr) {   // mkobj.c:2596
-    let curr = null, prev = null;
-    curr = head_ptr.get(0);
+    let prev = null;
+    let curr = head_ptr.get(0);
     for (prev = null; curr; prev = curr, curr = curr.nobj) {
         if ($c.peq(curr, obj)) {
             if (prev) {
@@ -2711,8 +2691,8 @@ export async function extract_nobj(obj, head_ptr) {   // mkobj.c:2596
  * @returns {Promise<void>}
  */
 export async function extract_nexthere(obj, head_ptr) {   // mkobj.c:2623
-    let curr = null, prev = null;
-    curr = head_ptr.get(0);
+    let prev = null;
+    let curr = head_ptr.get(0);
     for (prev = null; curr; prev = curr, curr = curr.v.v_nexthere) {
         if ($c.peq(curr, obj)) {
             if (prev) {
@@ -2934,9 +2914,8 @@ function dealloc_obj_real(obj) {   // mkobj.c:2815
  * @returns {Promise<void>}
  */
 export async function dobjsfree() {   // mkobj.c:2831
-    let otmp = null;
     while (go.objs_deleted) {
-        otmp = go.objs_deleted;
+        const otmp = go.objs_deleted;
         go.objs_deleted = otmp.nobj;
         if (otmp.where !== OBJ.DELETED) {
             await panic($c.lit("dobjsfree: obj where=%d, not OBJ_DELETED"), otmp.where);
@@ -2953,10 +2932,10 @@ export async function dobjsfree() {   // mkobj.c:2831
  * @returns {Promise<number>} int
  */
 export async function hornoplenty(horn, tipping, targetbox) {   // mkobj.c:2847
-    let objcount = 0, obj = null, what = null, $t1, $t2, $t3;
+    let obj = null, what = null, $t1, $t2, $t3;
     /* caller emptying entire contents; affects shop mesgs */
     /* if non-Null, container to tip into */
-    objcount = 0;
+    let objcount = 0;
     if (!horn || horn.otyp !== HORN_OF_PLENTY) {
         await impossible($c.lit("bad horn o' plenty"));
     } else if (horn.spe < 1) {
@@ -3037,15 +3016,15 @@ export async function hornoplenty(horn, tipping, targetbox) {   // mkobj.c:2847
  * @returns {Promise<void>}
  */
 export async function obj_sanity_check() {   // mkobj.c:2949
-    let x = 0, y = 0, obj = null, otop = null, prevo = null, at_fmt = new Int8Array(256);
+    let x = 0, y = 0, obj = null, at_fmt = new Int8Array(256);
     await objlist_sanity(svl.level.objlist, OBJ.FLOOR, $c.lit("floor sanity"));
     /* check that the map's record of floor objects is consistent;
        those objects should have already been sanity checked via
        the floor list so container contents are skipped here */
     for (x = 0; x < COLNO; x = $c.i16(x + 1)) {
         for (y = 0; y < ROWNO; y = $c.i16(y + 1)) {
-            otop = svl.level.objects[x][y];
-            prevo = null;
+            const otop = svl.level.objects[x][y];
+            let prevo = null;
             for (obj = otop; obj; prevo = obj, obj = prevo.v.v_nexthere) {
                 /* <ox,oy> should match <x,y>; <0,*> should always be empty */
                 if (obj.where !== OBJ.FLOOR || x === 0 || obj.ox !== x || obj.oy !== y) {
@@ -3106,7 +3085,7 @@ export async function obj_sanity_check() {   // mkobj.c:2949
  * @returns {Promise<void>}
  */
 async function objlist_sanity(objlist, wheretype, mesg) {   // mkobj.c:3032
-    let obj = null, lostbuf = new Int8Array(40), maskbuf = new Int8Array(40), bc_ok = 0, buf = new Int8Array(256), mtmp = null, mtmp2 = null;
+    let obj = null, lostbuf = new Int8Array(40), maskbuf = new Int8Array(40), buf = new Int8Array(256);
     for (obj = objlist; obj; obj = obj.nobj) {
         if (obj.where !== wheretype) {
             await insane_object(obj, new $c.Ptr(ofmt0, 0), mesg, null);
@@ -3126,7 +3105,7 @@ async function objlist_sanity(objlist, wheretype, mesg) {   // mkobj.c:3032
             await shop_obj_sanity(obj, mesg);
         }
         if (obj.owornmask) {
-            bc_ok = FALSE;
+            let bc_ok = FALSE;
             switch (obj.where) {
                 case OBJ.INVENT:
                 case OBJ.MINVENT:
@@ -3152,7 +3131,7 @@ async function objlist_sanity(objlist, wheretype, mesg) {   // mkobj.c:3032
             }
         }
         if (obj.otyp === LEASH && obj.corpsenm) {
-            mtmp = find_mid(obj.corpsenm >>> 0, FM.FMON);
+            const mtmp = find_mid(obj.corpsenm >>> 0, FM.FMON);
             if (obj.where === OBJ.INVENT) {
                 if (!mtmp) {
                     /* found leash with phantom mon */
@@ -3169,7 +3148,7 @@ async function objlist_sanity(objlist, wheretype, mesg) {   // mkobj.c:3032
                    obj->leashmon does, so obj->leashmon and consequently 'mtmp'
                    might be inaccurate for any leash found on migrating_objs */
             } else if (obj.where !== OBJ.MIGRATING) {
-                mtmp2 = obj.where === OBJ.MINVENT ? obj.v.v_ocarry : null;
+                const mtmp2 = obj.where === OBJ.MINVENT ? obj.v.v_ocarry : null;
                 if (mtmp) {
                     /* found monst leashed by non-invent leash */
                     $c.sprintf(new $c.Ptr(buf, 0), $c.lit("leashmon:%u %s leashed by %s leash,"), obj.corpsenm >>> 0, mon_pmname(mtmp), where_name(obj));
@@ -3199,11 +3178,11 @@ async function objlist_sanity(objlist, wheretype, mesg) {   // mkobj.c:3032
  * @returns {Promise<void>}
  */
 async function shop_obj_sanity(obj, mesg) {   // mkobj.c:3134
-    let otop = null, shkp = null, why = null, costly = 0, costlytoo = 0, x = Int16Array.of(0), y = Int16Array.of(0);
+    let x = Int16Array.of(0), y = Int16Array.of(0);
     x[0] = 0;
     y[0] = 0;
     /* if contained, get top-most container; we needs its location */
-    otop = obj;
+    let otop = obj;
     while (otop.where === OBJ.CONTAINED) {
         otop = otop.v.v_ocontainer;
     }
@@ -3214,13 +3193,13 @@ async function shop_obj_sanity(obj, mesg) {   // mkobj.c:3134
     get_obj_location(otop, new $c.Ptr(x, 0), new $c.Ptr(y, 0), BURIED_TOO);
     /* these will always be needed for the normal case, so don't bother
        waiting until we find an insanity to fetch them */
-    shkp = await find_objowner(obj, x[0], y[0]);
+    const shkp = await find_objowner(obj, x[0], y[0]);
     if (shkp && obj.where === OBJ.ONBILL) {
         x[0] = shkp.mx, y[0] = shkp.my;
     }
-    costly = await costly_spot(x[0], y[0]);
-    costlytoo = costly_adjacent(shkp, x[0], y[0]);
-    why = null;
+    const costly = await costly_spot(x[0], y[0]);
+    const costlytoo = costly_adjacent(shkp, x[0], y[0]);
+    let why = null;
     if (obj.no_charge && obj.unpaid) {
         why = $c.lit("%s obj both unpaid and no_charge! %s %s: %s");
     } else if (obj.unpaid) {
@@ -3266,12 +3245,12 @@ async function shop_obj_sanity(obj, mesg) {   // mkobj.c:3134
  * @returns {Promise<void>}
  */
 async function mon_obj_sanity(monlist, mesg) {   // mkobj.c:3204
-    let mon = null, obj = null, mwep = null;
+    let mon = null, obj = null;
     for (mon = monlist; mon; mon = mon.nmon) {
         if (DEADMONSTER(mon)) {
             continue;
         }
-        mwep = mon.mw;   /* mon->mw */
+        let mwep = mon.mw;   /* mon->mw */
         if (mwep) {
             if (!mcarried(mwep)) {
                 await insane_object(mwep, new $c.Ptr(mfmt1, 0), mesg, mon);
@@ -3316,17 +3295,17 @@ async function mon_obj_sanity(monlist, mesg) {   // mkobj.c:3204
  * @returns {Promise<void>}
  */
 async function insane_obj_bits(obj, mon) {   // mkobj.c:3249
-    let o_in_use = 0, o_bypass = 0, o_nomerge = 0, o_boulder = 0, infobuf = new Int8Array(128);
+    let infobuf = new Int8Array(128);
     if (obj.where === OBJ.DELETED) {
         return;   /* skip bit checking for deleted objects */
     }
-    o_in_use = obj.in_use;
-    o_bypass = obj.bypass;
+    const o_in_use = obj.in_use;
+    const o_bypass = obj.bypass;
     /* having obj->nomerge be set might be intentional */
-    o_nomerge = obj.nomerge && !nomerge_exception(obj) ? 1 : 0;
+    const o_nomerge = obj.nomerge && !nomerge_exception(obj) ? 1 : 0;
     /* next_boulder is only for object name formatting when pushing
        boulders and should be reset by time of next sanity check */
-    o_boulder = obj.otyp === BOULDER && obj.corpsenm ? 1 : 0;
+    const o_boulder = obj.otyp === BOULDER && obj.corpsenm ? 1 : 0;
     if (o_in_use || o_bypass || o_nomerge || o_boulder) {
         $c.sprintf(new $c.Ptr(infobuf, 0), $c.lit("flagged%s%s%s%s"), o_in_use ? $c.lit(" in_use") : $c.lit(""), o_bypass ? $c.lit(" bypass") : $c.lit(""), o_nomerge ? $c.lit(" nomerge") : $c.lit(""), o_boulder ? $c.lit(" nxtbldr") : $c.lit(""));
         await insane_object(obj, new $c.Ptr(ofmt0, 0), new $c.Ptr(infobuf, 0), mon);
@@ -3350,12 +3329,11 @@ function nomerge_exception(obj) {   // mkobj.c:3278
  * @returns {$c.Ptr | null} const char *
  */
 function where_name(obj) {   // mkobj.c:3296
-    let where = 0;
     /* big enough to handle rogue 64-bit int */
     if (!obj) {
         return $c.lit("nowhere");
     }
-    where = obj.where;
+    const where = obj.where;
     if (where < 0 || where >= NOBJ_STATES || !obj_state_names[where]) {
         $c.sprintf(new $c.Ptr(where_name$unknown, 0), $c.lit("unknown[%d]"), where);
         return new $c.Ptr(where_name$unknown, 0);
@@ -3370,8 +3348,8 @@ function where_name(obj) {   // mkobj.c:3296
  * @returns {Promise<void>}
  */
 async function insane_object(obj, fmt, mesg, mon) {   // mkobj.c:3314
-    let objnm = null, monnm = null, altfmt = new Int8Array(256);
-    objnm = monnm = $c.lit("null!");
+    let monnm = null, altfmt = new Int8Array(256);
+    let objnm = monnm = $c.lit("null!");
     if (obj) {
         iflags.override_ID = iflags.override_ID + 1 | 0;
         objnm = await doname(obj);
@@ -3492,13 +3470,13 @@ async function check_glob(obj, mesg) {   // mkobj.c:3420
  * @returns {Promise<void>}
  */
 async function sanity_check_worn(obj) {   // mkobj.c:3447
-    let maskbuf = new Int8Array(60), what = null, owornmask = 0, allmask = 0, embedded = 0, i = 0, n = 0, oclassname = new Int8Array(30), mon = null;
-    allmask = 0;
-    embedded = FALSE;
-    n = 0;
+    let maskbuf = new Int8Array(60), what = null, i = 0, oclassname = new Int8Array(30);
+    let allmask = 0;
+    let embedded = FALSE;
+    let n = 0;
     /* use owornmask for testing and bit twiddling, but use original
        obj->owornmask for printing */
-    owornmask = $c.u64(obj.owornmask);
+    let owornmask = $c.u64(obj.owornmask);
     /* figure out how many bits are set, and also which are viable */
     for (i = 0; sanity_check_worn$wearbits[i]; i = i + 1 | 0) {
         if ($c.andu64(owornmask, sanity_check_worn$wearbits[i]) !== 0) {
@@ -3676,7 +3654,7 @@ async function sanity_check_worn(obj) {   // mkobj.c:3447
             }
         }
         if (what) {
-            mon = mcarried(obj) ? obj.v.v_ocarry : null;
+            const mon = mcarried(obj) ? obj.v.v_ocarry : null;
             /* if we've found a potion worn in the amulet slot,
                this yields "worn (potion amulet)" */
             $c.strcpy(new $c.Ptr(oclassname, 0), def_oc_syms[$c.u8(obj.oclass)].name);
@@ -3717,10 +3695,10 @@ export async function obj_nexto(otmp) {   // mkobj.c:3643
  * @returns {Promise<$T.obj | null>} struct obj *
  */
 export async function obj_nexto_xy(obj, x, y, recurs) {   // mkobj.c:3661
-    let otmp = null, fx = 0, fy = 0, ex = 0, ey = 0, otyp = 0, dx = 0, dy = 0;
-    otyp = obj.otyp;
+    let fx = 0, fy = 0;
+    const otyp = obj.otyp;
     /* check under our "feet" first */
-    otmp = sobj_at(otyp, x, y);
+    let otmp = sobj_at(otyp, x, y);
     while (otmp) {
         /* don't be clever and find ourselves */
         if (!$c.peq(otmp, obj) && await mergable(otmp, obj)) {
@@ -3732,10 +3710,10 @@ export async function obj_nexto_xy(obj, x, y, recurs) {   // mkobj.c:3661
         return null;
     }
     /* search in a random order */
-    dx = rn2(2) ? -1 : 1;
-    dy = rn2(2) ? -1 : 1;
-    ex = x - dx;
-    ey = y - dy;
+    const dx = rn2(2) ? -1 : 1;
+    const dy = rn2(2) ? -1 : 1;
+    const ex = x - dx;
+    const ey = y - dy;
     for (fx = ex; $c.abs(fx - ex | 0) < 3; fx = fx + dx | 0) {
         for (fy = ey; $c.abs(fy - ey | 0) < 3; fy = fy + dy | 0) {
             /* 0, 0 was checked above */
@@ -3758,11 +3736,11 @@ export async function obj_nexto_xy(obj, x, y, recurs) {   // mkobj.c:3661
  * @returns {Promise<$T.obj | null>} struct obj *
  */
 export async function obj_absorb(obj1, obj2) {   // mkobj.c:3702
-    let otmp1 = null, otmp2 = null, o1wt = 0, o2wt = 0, agetmp = 0, tm1 = 0, tm2 = 0, $t1, $t2, $t3, $t4;
+    let $t1, $t2, $t3, $t4;
     /* don't let people dumb it up */
     if (obj1 && obj2) {
-        otmp1 = obj1.get(0);
-        otmp2 = obj2.get(0);
+        const otmp1 = obj1.get(0);
+        const otmp2 = obj2.get(0);
         if (otmp1 && otmp2 && !$c.peq(otmp1, otmp2)) {
             await globby_bill_fixup(otmp1, otmp2);
             if (otmp1.bknown !== otmp2.bknown) {
@@ -3777,11 +3755,11 @@ export async function obj_absorb(obj1, obj2) {   // mkobj.c:3702
             if (otmp1.oeroded || otmp2.oeroded) {
                 $t4 = otmp2.oeroded = 1, otmp1.oeroded = ($t4) & 3;
             }
-            o1wt = (otmp1.oeaten ? otmp1.oeaten : otmp1.owt) | 0;
-            o2wt = (otmp2.oeaten ? otmp2.oeaten : otmp2.owt) | 0;
+            const o1wt = (otmp1.oeaten ? otmp1.oeaten : otmp1.owt) | 0;
+            const o2wt = (otmp2.oeaten ? otmp2.oeaten : otmp2.owt) | 0;
             /* averaging the relative ages is less likely to overflow
                than averaging the absolute ages directly */
-            agetmp = $c.div64($c.add64($c.mul64($c.sub64(svm.moves, otmp1.age), o1wt), $c.mul64($c.sub64(svm.moves, otmp2.age), o2wt)), o1wt + o2wt | 0);
+            const agetmp = $c.div64($c.add64($c.mul64($c.sub64(svm.moves, otmp1.age), o1wt), $c.mul64($c.sub64(svm.moves, otmp2.age), o2wt)), o1wt + o2wt | 0);
             /* convert relative age back to absolute age */
             otmp1.age = $c.sub64(svm.moves, agetmp);
             otmp1.owt = otmp1.owt + (o2wt >>> 0) >>> 0;
@@ -3792,8 +3770,8 @@ export async function obj_absorb(obj1, obj2) {   // mkobj.c:3702
             if (otmp1.globby && otmp2.globby) {
                 /* average (not weighted, no pun intended) the two globs'
                    shrink timers and use that to give otmp1 a new timer */
-                tm1 = await stop_timer(SHRINK_GLOB, obj_to_any(otmp1));
-                tm2 = await stop_timer(SHRINK_GLOB, obj_to_any(otmp2));
+                let tm1 = await stop_timer(SHRINK_GLOB, obj_to_any(otmp1));
+                const tm2 = await stop_timer(SHRINK_GLOB, obj_to_any(otmp2));
                 tm1 = $c.div64($c.add64($c.add64(tm1 ? tm1 : 25, tm2 ? tm2 : 25), 1), 2);
                 await start_glob_timeout(otmp1, tm1);
             }
@@ -3824,14 +3802,14 @@ export async function obj_absorb(obj1, obj2) {   // mkobj.c:3702
  * @returns {Promise<$T.obj | null>} struct obj *
  */
 export async function obj_meld(obj1, obj2) {   // mkobj.c:3768
-    let otmp1 = null, otmp2 = null, result = null, ox = 0, oy = 0;
-    result = null;
+    let oy = 0;
+    let result = null;
     /* coordinates for the glob that goes away */
     if (obj1 && obj2) {
-        otmp1 = obj1.get(0);
-        otmp2 = obj2.get(0);
+        const otmp1 = obj1.get(0);
+        const otmp2 = obj2.get(0);
         if (otmp1 && otmp2 && !$c.peq(otmp1, otmp2)) {
-            ox = oy = 0;
+            let ox = oy = 0;
             /*
              * FIXME?
              *  If one of the objects is free because it's being dropped,
@@ -3877,10 +3855,9 @@ export async function obj_meld(obj1, obj2) {   // mkobj.c:3768
  * @returns {Promise<void>}
  */
 export async function pudding_merge_message(otmp, otmp2) {   // mkobj.c:3818
-    let visible = 0, onfloor = 0, inpack = 0, adj = 0;
-    visible = cansee(otmp.ox, otmp.oy) || cansee(otmp2.ox, otmp2.oy) ? 1 : 0;
-    onfloor = otmp.where === OBJ.FLOOR || otmp2.where === OBJ.FLOOR ? 1 : 0;
-    inpack = carried(otmp) || carried(otmp2) ? 1 : 0;
+    const visible = cansee(otmp.ox, otmp.oy) || cansee(otmp2.ox, otmp2.oy) ? 1 : 0;
+    const onfloor = otmp.where === OBJ.FLOOR || otmp2.where === OBJ.FLOOR ? 1 : 0;
+    const inpack = carried(otmp) || carried(otmp2) ? 1 : 0;
     /* the player will know something happened inside his own inventory */
     if (!Blind() && visible || inpack) {
         if (Hallucination()) {
@@ -3893,7 +3870,7 @@ export async function pudding_merge_message(otmp, otmp2) {   // mkobj.c:3818
              * they'll be out of our view (minvent or container)
              * so don't actually show anything */
         } else if (onfloor || inpack) {
-            adj = (otmp.ox !== u.ux || otmp.oy !== u.uy) && (otmp2.ox !== u.ux || otmp2.oy !== u.uy) ? 1 : 0;
+            const adj = (otmp.ox !== u.ux || otmp.oy !== u.uy) && (otmp2.ox !== u.ux || otmp2.oy !== u.uy) ? 1 : 0;
             await pline($c.lit("The %s%s coalesce%s."), onfloor && adj ? $c.lit("adjacent ") : $c.lit(""), await makeplural(await obj_typename(otmp.otyp)), inpack ? $c.lit(" inside your pack") : $c.lit(""));
         }
     } else {

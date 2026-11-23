@@ -93,7 +93,7 @@ const item_naming_classification$Recall = new Int8Array(19);   // static in item
  * @returns {Promise<number>} boolean
  */
 async function item_naming_classification(obj, onamebuf, ocallbuf) {   // iactions.c:46
-    let callname = null, $t1;
+    let $t1;
     /* "re-call" seems a bit weird, but "recall" and
        "rename" don't fit for changing a type name */
     $t1 = ocallbuf.set(0, 0), onamebuf.set(0, $t1);
@@ -102,7 +102,7 @@ async function item_naming_classification(obj, onamebuf, ocallbuf) {   // iactio
         /*"these",*/
     }
     if (call_ok(obj) === GETOBJ.SUGGEST) {
-        callname = await simpleonames(obj);
+        let callname = await simpleonames(obj);
         /* prefix known unique item with "the", make all other types plural */
         if (the_unique_obj(obj)) {   /* treats unID'd fake amulets as if real */
             callname = await the(callname);
@@ -120,9 +120,8 @@ async function item_naming_classification(obj, onamebuf, ocallbuf) {   // iactio
  * @returns {Promise<number>} int
  */
 async function item_reading_classification(obj, outbuf) {   // iactions.c:86
-    let otyp = 0, res = 0, magic = null, novel = 0, blank = 0, tome = 0;
-    otyp = obj.otyp;
-    res = IA.READ_OBJ;
+    const otyp = obj.otyp;
+    let res = IA.READ_OBJ;
     outbuf.set(0, 0);
     if (otyp === FORTUNE_COOKIE) {
         $c.strcpy(outbuf, $c.lit("Read the message inside this cookie"));
@@ -133,12 +132,12 @@ async function item_reading_classification(obj, outbuf) {   // iactions.c:86
     } else if (otyp === HAWAIIAN_SHIRT) {
         $c.strcpy(outbuf, $c.lit("Look at the pattern on the shirt"));
     } else if (obj.oclass === SCROLL_CLASS) {
-        magic = obj.dknown && otyp !== SCR_MAIL && (otyp !== SCR_BLANK_PAPER || !objects[otyp].oc_name_known) ? $c.lit(" to activate its magic") : $c.lit("");
+        const magic = obj.dknown && otyp !== SCR_MAIL && (otyp !== SCR_BLANK_PAPER || !objects[otyp].oc_name_known) ? $c.lit(" to activate its magic") : $c.lit("");
         $c.sprintf(outbuf, $c.lit("Read this scroll%s"), magic);
     } else if (obj.oclass === SPBOOK_CLASS) {
-        novel = otyp === SPE_NOVEL ? 1 : 0;
-        blank = otyp === SPE_BLANK_PAPER && objects[otyp].oc_name_known ? 1 : 0;
-        tome = otyp === SPE_BOOK_OF_THE_DEAD && objects[otyp].oc_name_known ? 1 : 0;
+        const novel = otyp === SPE_NOVEL ? 1 : 0;
+        const blank = otyp === SPE_BLANK_PAPER && objects[otyp].oc_name_known ? 1 : 0;
+        const tome = otyp === SPE_BOOK_OF_THE_DEAD && objects[otyp].oc_name_known ? 1 : 0;
         $c.sprintf(outbuf, $c.lit("%s this %s"), novel || blank ? $c.lit("Read") : tome ? $c.lit("Examine") : $c.lit("Study"), novel ? await simpleonames(obj) : tome ? $c.lit("tome") : $c.lit("spellbook"));
         /* "novel" or "paperback book" */
     } else {
@@ -154,8 +153,8 @@ async function item_reading_classification(obj, outbuf) {   // iactions.c:86
  * @returns {Promise<void>}
  */
 async function ia_addmenu(win, act, let_, txt) {   // iactions.c:127
-    let any = new $T.any(), clr = 0;
-    clr = NO_COLOR;
+    let any = new $T.any();
+    const clr = NO_COLOR;
     any.$copyFrom(cg.zeroany);
     any.a_int = act;
     await add_menu(win, nul_glyphinfo, any, let_, 0, ATR.NONE, clr, txt, MENU.ITEMFLAGS_NONE);
@@ -303,19 +302,19 @@ async function itemactions_pushkeys(otmp, act) {   // iactions.c:140
  * @returns {Promise<number>} int
  */
 export async function itemactions(otmp) {   // iactions.c:278
-    let n = 0, act = 0, win = 0, buf = new Int8Array(256), buf2 = new Int8Array(256), selected = [null], mtmp = null, light = null, already_worn = 0, verb = null, action = null, which = null, what = null, multiple = 0, s = null, o = null, shoot = 0, shoot$2 = 0, Wmask = 0, o$2 = null;
-    act = IA.NONE;
-    light = otmp.lamplit ? $c.lit("Extinguish") : $c.lit("Light");
-    already_worn = $c.and64(otmp.owornmask, W_ARMOR | W_ACCESSORY) !== 0 ? 1 : 0;
-    win = await create_nhwindow()(NHW.MENU);
+    let buf = new Int8Array(256), buf2 = new Int8Array(256), selected = [null], mtmp = null;
+    let act = IA.NONE;
+    const light = otmp.lamplit ? $c.lit("Extinguish") : $c.lit("Light");
+    const already_worn = $c.and64(otmp.owornmask, W_ARMOR | W_ACCESSORY) !== 0 ? 1 : 0;
+    const win = await create_nhwindow()(NHW.MENU);
     await start_menu()(win, MENU.BEHAVE_STANDARD);
     /* -: unwield; picking current weapon offers an opportunity for 'w-'
        to wield bare/gloved hands; likewise for 'Q-' with quivered item(s) */
     if ($c.peq(otmp, $G.uwep) || $c.peq(otmp, $G.uswapwep) || $c.peq(otmp, $G.uquiver)) {
-        verb = $c.peq(otmp, $G.uquiver) ? $c.lit("Quiver") : $c.lit("Wield");
-        action = $c.peq(otmp, $G.uquiver) ? $c.lit("un-ready") : $c.lit("un-wield");
-        which = is_plural(otmp) ? $c.lit("these") : $c.lit("this");
-        what = otmp.oclass === WEAPON_CLASS || is_weptool(otmp) ? $c.lit("weapon") : $c.lit("item");
+        const verb = $c.peq(otmp, $G.uquiver) ? $c.lit("Quiver") : $c.lit("Wield");
+        const action = $c.peq(otmp, $G.uquiver) ? $c.lit("un-ready") : $c.lit("un-wield");
+        const which = is_plural(otmp) ? $c.lit("these") : $c.lit("this");
+        const what = otmp.oclass === WEAPON_CLASS || is_weptool(otmp) ? $c.lit("weapon") : $c.lit("item");
         /*
          * TODO: if uwep is ammo, tell player that to shoot instead of toss,
          *       the corresponding launcher must be wielded;
@@ -360,9 +359,9 @@ export async function itemactions(otmp) {   // iactions.c:278
         $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s the candelabrum"), light);
         await ia_addmenu(win, IA.APPLY_OBJ, 97, new $c.Ptr(buf, 0));
     } else if (otmp.otyp === WAX_CANDLE || otmp.otyp === TALLOW_CANDLE) {
-        multiple = otmp.quan === 1 ? FALSE : TRUE;
-        s = multiple ? $c.lit("these") : $c.lit("this");
-        o = carrying(CANDELABRUM_OF_INVOCATION);
+        const multiple = otmp.quan === 1 ? FALSE : TRUE;
+        const s = multiple ? $c.lit("these") : $c.lit("this");
+        const o = carrying(CANDELABRUM_OF_INVOCATION);
         if (o && o.spe < 7) {
             $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Attach %s to your candelabrum, or %s %s"), s, !otmp.lamplit ? $c.lit("light") : $c.lit("extinguish"), multiple ? $c.lit("them") : $c.lit("it"));
         } else {
@@ -438,7 +437,7 @@ export async function itemactions(otmp) {   // iactions.c:278
     }
     /* f: fire quivered ammo */
     if ($c.peq(otmp, $G.uquiver)) {
-        shoot = ammo_and_launcher(otmp, $G.uwep);
+        const shoot = ammo_and_launcher(otmp, $G.uwep);
         /* FIXME: see the multi-shot FIXME about "one of" for 't: throw' */
         $c.sprintf(new $c.Ptr(buf, 0), $c.lit("%s %s"), shoot ? $c.lit("Shoot") : $c.lit("Throw"), otmp.quan > 1 ? $c.lit("one of these") : $c.lit("this"));
         if (shoot) {
@@ -530,7 +529,7 @@ export async function itemactions(otmp) {   // iactions.c:278
     }
     /* t: throw item */
     if (!already_worn) {
-        shoot$2 = ammo_and_launcher(otmp, $G.uwep);
+        const shoot$2 = ammo_and_launcher(otmp, $G.uwep);
         /*
          * FIXME:
          *  'one of these' should be changed to 'some of these' when there
@@ -586,8 +585,8 @@ export async function itemactions(otmp) {   // iactions.c:278
                isn't populated, or "W - [already wearing <simple-armor>]";
                for the latter, picking 'W' will fail but we don't want to
                omit 'W' in this situation */
-            Wmask = armcat_to_wornmask(objects[otmp.otyp].oc_subtyp);
-            o$2 = wearmask_to_obj(Wmask);
+            const Wmask = armcat_to_wornmask(objects[otmp.otyp].oc_subtyp);
+            const o$2 = wearmask_to_obj(Wmask);
             if (!o$2) {
                 $c.strcpy(new $c.Ptr(buf, 0), $c.lit("Wear this armor"));
             } else {
@@ -626,7 +625,7 @@ export async function itemactions(otmp) {   // iactions.c:278
     }
     $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Do what with %s?"), await the(await cxname(otmp)));
     await end_menu()(win, new $c.Ptr(buf, 0));
-    n = await select_menu(win, PICK.ONE, new $c.Ptr(selected, 0));
+    const n = await select_menu(win, PICK.ONE, new $c.Ptr(selected, 0));
     if (n > 0) {
         act = $c.radd(selected[0], 0).item.a_int;
         $c.free(selected[0]);

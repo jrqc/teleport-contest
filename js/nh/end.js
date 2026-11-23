@@ -129,8 +129,7 @@ export async function done1(sig_unused) {   // end.c:69
  * @returns {Promise<number>} int
  */
 export async function done2() {   // end.c:91
-    let abandon_tutorial = 0, c = 0;
-    abandon_tutorial = 0;
+    let abandon_tutorial = 0;
     if (In_tutorial(u.uz) && await yn_function($c.lit("Switch from the tutorial back to regular play?"), new $c.Ptr(ynchars, 0), 110, 1) === 121) {
         abandon_tutorial = 1;
     }
@@ -153,7 +152,7 @@ export async function done2() {   // end.c:91
     }
     if (wizard()) {
         /* sys/vms/vmsmisc.c, vmsunix.c */
-        c = await yn_function($c.lit("Dump core?"), new $c.Ptr(ynqchars, 0), 113, 1);
+        const c = await yn_function($c.lit("Dump core?"), new $c.Ptr(ynqchars, 0), 113, 1);
         if (c === 121) {
             $c.signal(2, done1);
             if (soundprocs.sound_exit_nhsound) {
@@ -200,12 +199,12 @@ async function done_hangup(sig) {   // end.c:170
  * @returns {Promise<void>}
  */
 export async function done_in_by(mtmp, how) {   // end.c:186
-    let buf = new Int8Array(256), mptr = null, champtr = null, distorted = 0, mimicker = 0, imitator = 0, shape = new Int8Array(256), realnm = null, fakenm = null, alt = 0, shknm = null, honorific = null, reasondummy = Int8Array.of(0), p = null, reasonmid = Uint32Array.of(0);
-    mptr = mtmp.data;
-    champtr = ismnum(mtmp.cham) ? $c.relem(mons, mtmp.cham) : mptr;
-    distorted = Hallucination() && canspotmon(mtmp) ? 1 : 0;
-    mimicker = M_AP_TYPE(mtmp) === M_AP.MONSTER ? 1 : 0;
-    imitator = !$c.peq(mptr, champtr) || mimicker ? 1 : 0;
+    let buf = new Int8Array(256), shape = new Int8Array(256), reasondummy = Int8Array.of(0), p = null, reasonmid = Uint32Array.of(0);
+    let mptr = mtmp.data;
+    const champtr = ismnum(mtmp.cham) ? $c.relem(mons, mtmp.cham) : mptr;
+    const distorted = Hallucination() && canspotmon(mtmp) ? 1 : 0;
+    const mimicker = M_AP_TYPE(mtmp) === M_AP.MONSTER ? 1 : 0;
+    const imitator = !$c.peq(mptr, champtr) || mimicker ? 1 : 0;
     await You(how === STONING ? $c.lit("turn to stone...") : $c.lit("die..."));
     await mark_synch()();   /* flush buffered screen output */
     buf[0] = 0;
@@ -232,9 +231,9 @@ export async function done_in_by(mtmp, how) {   // end.c:186
         $c.strcat(new $c.Ptr(buf, 0), $c.lit("hallucinogen-distorted "));
     }
     if (imitator) {
-        realnm = pmname(champtr, Mgender(mtmp));
-        fakenm = pmname(mptr, Mgender(mtmp));
-        alt = is_vampshifter(mtmp);
+        const realnm = pmname(champtr, Mgender(mtmp));
+        let fakenm = pmname(mptr, Mgender(mtmp));
+        const alt = is_vampshifter(mtmp);
         if (mimicker) {
             /* realnm is already correct because champtr==mptr;
                set up fake mptr for type_is_pname/the_unique_pm */
@@ -266,8 +265,8 @@ export async function done_in_by(mtmp, how) {   // end.c:186
             $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit(" of %s"), mtmp.mextra.mgivenname);
         }
     } else if (mtmp.isshk) {
-        shknm = await shkname(mtmp);
-        honorific = shkname_is_pname(mtmp) ? $c.lit("") : mtmp.female ? $c.lit("Ms. ") : $c.lit("Mr. ");
+        const shknm = await shkname(mtmp);
+        const honorific = shkname_is_pname(mtmp) ? $c.lit("") : mtmp.female ? $c.lit("Ms. ") : $c.lit("Mr. ");
         $c.sprintf(eos(new $c.Ptr(buf, 0)), $c.lit("%s%s, the shopkeeper"), honorific, shknm);
         svk.killer.format = KILLED.BY;
     } else if (mtmp.ispriest || mtmp.isminion) {
@@ -366,7 +365,7 @@ function fixup_death(how) {   // end.c:367
  * @returns {Promise<void>}
  */
 export async function panic(str, ...$va) {   // end.c:395
-    let the_args = null, buf = new Int8Array(256), maybe_rebuild = null, $t1;
+    let the_args = null, buf = new Int8Array(256), $t1;
     {
         the_args = new $c.VaList($va);
         if ($t1 = program_state.panicking, program_state.panicking = $t1 + 1 | 0, $t1) {
@@ -385,7 +384,7 @@ export async function panic(str, ...$va) {   // end.c:395
         await raw_print()(program_state.gameover ? $c.lit("Postgame wrapup disrupted.") : !program_state.something_worth_saving ? $c.lit("Program initialization has failed.") : $c.lit("Suddenly, the dungeon collapses."));
         /* !NOTIFY_NETHACK_BUGS */
         if (!wizard()) {
-            maybe_rebuild = !program_state.something_worth_saving ? $c.lit(".") : $c.lit("\nand it may be possible to rebuild.");
+            const maybe_rebuild = !program_state.something_worth_saving ? $c.lit(".") : $c.lit("\nand it may be possible to rebuild.");
             // XXX this may need an update if defined(CRASHREPORT) TBD
             if (sysopt.support) {
                 await raw_printf($c.lit("To report this error, %s%s"), sysopt.support, maybe_rebuild);
@@ -423,16 +422,16 @@ export async function panic(str, ...$va) {   // end.c:395
  * @returns {Promise<number>} boolean
  */
 async function should_query_disclose_option(category, defquery) {   // end.c:477
-    let idx = 0, disclose = 0, dop = null;
+    let dop = null;
     defquery.set(0, 110);
     if ((dop = $c.strchr(new $c.Ptr(disclosure_options, 0), category)) !== null) {
-        idx = $c.i32($c.pdiff(dop, new $c.Ptr(disclosure_options, 0)));
+        const idx = $c.i32($c.pdiff(dop, new $c.Ptr(disclosure_options, 0)));
         if (idx < 0 || idx >= NUM_DISCLOSURE_OPTIONS) {
             await impossible($c.lit("should_query_disclose_option: bad disclosure index %d %c"), idx, category);
             defquery.set(0, DISCLOSE_PROMPT_DEFAULT_YES);
             return 1;
         }
-        disclose = flags.end_disclose[idx];
+        const disclose = flags.end_disclose[idx];
         if (disclose === 43) {
             defquery.set(0, 121);
             return 0;
@@ -489,9 +488,9 @@ function dump_everything(how, when) {   // end.c:543
  * @returns {Promise<void>}
  */
 async function disclose(how, taken) {   // end.c:620
-    let c = 0, defquery = Int8Array.of(0), qbuf = new Int8Array(128), ask = 0, acnt = 0;
-    c = 0;
-    ask = 0;
+    let defquery = Int8Array.of(0), qbuf = new Int8Array(128);
+    let c = 0;
+    let ask = 0;
     if (gi.invent && !program_state.stopprint) {
         if (taken) {
             $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("Do you want to see what you had when you %s?"), how === QUIT ? $c.lit("quit") : $c.lit("died"));
@@ -531,7 +530,7 @@ async function disclose(how, taken) {   // end.c:620
     }
     if (!program_state.stopprint) {
         if (await should_query_disclose_option(99, new $c.Ptr(defquery, 0))) {
-            acnt = count_achievements();
+            const acnt = count_achievements();
             $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("Do you want to see your conduct%s?"), acnt > 0 ? $c.lit(" and achievements") : $c.lit(""));
             /* this was distinguishing between one achievement and
                multiple achievements, but "conduct and achievement"
@@ -567,14 +566,13 @@ async function disclose(how, taken) {   // end.c:620
  * @returns {Promise<void>}
  */
 async function savelife(how) {   // end.c:705
-    let uhpmin = 0, givehp = 0;
-    givehp = 50 + Math.imul(10, $c.div32(ACURR(A.CON), 2)) | 0;
+    const givehp = 50 + Math.imul(10, $c.div32(ACURR(A.CON), 2)) | 0;
     /* life-drain/level-loss to experience level 0 kills without actually
        reducing ulevel below 1, but include this for bulletproofing */
     if (u.ulevel < 1) {
         u.ulevel = 1;
     }
-    uhpmin = minuhpmax(10);
+    const uhpmin = minuhpmax(10);
     if (u.uhpmax < uhpmin) {
         setuhpmax(uhpmin, 1);
     }
@@ -754,12 +752,12 @@ export async function done_object_cleanup() {   // end.c:852
  * @returns {Promise<void>}
  */
 async function artifact_score(list, counting, endwin) {   // end.c:908
-    let pbuf = new Int8Array(256), otmp = null, value = 0, points = 0, $t1, $t2, $t3;
+    let pbuf = new Int8Array(256), otmp = null, $t1, $t2, $t3;
     /* true => add up points; false => display them */
     for (otmp = list; otmp; otmp = otmp.nobj) {
         if (otmp.oartifact || otmp.otyp === BELL_OF_OPENING || otmp.otyp === SPE_BOOK_OF_THE_DEAD || otmp.otyp === CANDELABRUM_OF_INVOCATION) {
-            value = arti_cost(otmp);   /* zorkmid value */
-            points = $c.div64($c.mul64(value, 5), 2);   /* score value */
+            const value = arti_cost(otmp);   /* zorkmid value */
+            const points = $c.div64($c.mul64(value, 5), 2);   /* score value */
             if (counting) {
                 u.urexp = nowrap_add(u.urexp, points);
             } else {
@@ -783,7 +781,7 @@ async function artifact_score(list, counting, endwin) {   // end.c:908
  * @returns {Promise<number>} boolean
  */
 async function fuzzer_savelife(how) {   // end.c:946
-    let potion = null, propidx = 0, proptim = 0, remedies = 0, $t1;
+    let potion = null, propidx = 0, proptim = 0, $t1;
     /*
      * Some debugging code pulled out of done() to unclutter it.
      * 'done_seq' is maintained in done().
@@ -795,7 +793,7 @@ async function fuzzer_savelife(how) {   // end.c:946
            hero vulnerable to repeat deaths (often by becoming surrounded
            while being too encumbered to do anything) */
         if (!rn2(gd.done_seq > $c.add64(gh.hero_seq, 2) ? 2 : 10)) {
-            remedies = 0;
+            let remedies = 0;
             /* get rid of temporary potion with obfree() rather than useup()
                because it doesn't get entered into inventory */
             if (ismnum(u.ulycn) && !rn2(3)) {
@@ -854,8 +852,8 @@ async function fuzzer_savelife(how) {   // end.c:946
  * @returns {Promise<void>}
  */
 export async function done(how) {   // end.c:1021
-    let survive = 0, killbuf = new Int8Array(256), $t1, $t2, $t3, $t4;
-    survive = 0;
+    let killbuf = new Int8Array(256), $t1, $t2, $t3, $t4;
+    let survive = 0;
     if (how === TRICKED) {
         if (svk.killer.name[0]) {
             paniclog($c.lit("trickery"), new $c.Ptr(svk.killer.name, 0));
@@ -958,10 +956,10 @@ export async function done(how) {   // end.c:1021
  * @returns {Promise<void>}
  */
 async function really_done(how) {   // end.c:1132
-    let taken = 0, pbuf = new Int8Array(256), endwin = 0, bones_ok = 0, have_windows = 0, corpse = null, endtime = 0, umoney = 0, tmp = 0, silently = 0, obj = null, nextobj = null, mnum = 0, was_already_grave = 0, deepest = 0, mtmp = null, otmp = null, val = null, i = 0, mhp = 0, m_lev = 0, typ = 0, count = 0, where = null, $t1, $t2, $t3, $t4, $t5, $t6, $t7;
-    endwin = WIN_ERR;
-    have_windows = iflags.window_inited;
-    corpse = null;
+    let taken = 0, pbuf = new Int8Array(256), endtime = 0, umoney = 0, tmp = 0, obj = null, nextobj = null, val = null, i = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7;
+    let endwin = WIN_ERR;
+    let have_windows = iflags.window_inited;
+    let corpse = null;
     /*
      *  The game is now over...
      */
@@ -1016,7 +1014,7 @@ async function really_done(how) {   // end.c:1132
     $c.signal(3, done_intr);
     sethanguphandler(done_hangup);
     /* NO_SIGNAL */
-    bones_ok = how < GENOCIDED && can_make_bones() ? 1 : 0;
+    const bones_ok = how < GENOCIDED && can_make_bones() ? 1 : 0;
     if (bones_ok && launch_in_progress()) {
         await force_launch_placement();
     }
@@ -1047,7 +1045,7 @@ async function really_done(how) {   // end.c:1132
     }
     fixup_death(how);   /* actually, fixup gm.multi_reason */
     if (how !== PANICKED) {
-        silently = program_state.stopprint ? 1 : 0;
+        const silently = program_state.stopprint ? 1 : 0;
         /* these affect score and/or bones, but avoid them during panic */
         taken = await paybill(how === ESCAPED ? -1 : how !== QUIT ? 1 : 0, silently);
         await paygd(silently);
@@ -1117,8 +1115,8 @@ async function really_done(how) {   // end.c:1132
     if (bones_ok && u.ugrave_arise === NON_PM && !(svm.mvitals[u.umonnum].mvflags & G_NOCORPSE)) {
         /* Base corpse on race when not poly'd since original u.umonnum
            is based on role, and all role monsters are human. */
-        mnum = !Upolyd() ? gu.urace.mnum : u.umonnum;
-        was_already_grave = svl.level.locations[u.ux][u.uy].typ === GRAVE ? 1 : 0;
+        const mnum = !Upolyd() ? gu.urace.mnum : u.umonnum;
+        const was_already_grave = svl.level.locations[u.ux][u.uy].typ === GRAVE ? 1 : 0;
         corpse = await mk_named_object(CORPSE, $c.relem(mons, mnum), u.ux, u.uy, new $c.Ptr(svp.plname, 0));
         $c.sprintf(new $c.Ptr(pbuf, 0), $c.lit("%s, "), new $c.Ptr(svp.plname, 0));
         await formatkiller(eos(new $c.Ptr(pbuf, 0)), $c.u32($c.subu64(256, await Strlen_(new $c.Ptr(pbuf, 0), $c.lit("really_done"), 1317))), how, 1);
@@ -1130,7 +1128,7 @@ async function really_done(how) {   // end.c:1132
     pbuf[0] = 0;   /* clear grave text; also lint suppression */
     /* calculate score, before creating bones [container gold] */
     {
-        deepest = deepest_lev_reached(0);
+        const deepest = deepest_lev_reached(0);
         umoney = money_cnt(gi.invent);
         tmp = u.umoney0;
         umoney = $c.add64(umoney, hidden_gold(1));   /* accumulate gold from containers */
@@ -1230,7 +1228,7 @@ async function really_done(how) {   // end.c:1132
         /* count the points for artifacts */
         await artifact_score(gi.invent, 1, endwin);
         gv.viz_array.get(0).set(0, $c.u8(gv.viz_array.get(0).get(0) | IN_SIGHT));   /* need visibility for naming */
-        mtmp = gm.mydogs;
+        let mtmp = gm.mydogs;
         $c.strcpy(new $c.Ptr(pbuf, 0), $c.lit("You"));
         if (mtmp || Schroedingers_cat) {
             while (mtmp) {
@@ -1243,8 +1241,8 @@ async function really_done(how) {   // end.c:1132
             /* [it might be more robust to create a housecat and add it to
                gm.mydogs; it doesn't have to be placed on the map for that] */
             if (Schroedingers_cat) {
-                m_lev = await adj_lev(mons[PM.HOUSECAT]);
-                mhp = d(m_lev, 8);
+                const m_lev = await adj_lev(mons[PM.HOUSECAT]);
+                const mhp = d(m_lev, 8);
                 u.urexp = nowrap_add(u.urexp, mhp);
                 $c.strcat(eos(new $c.Ptr(pbuf, 0)), $c.lit(" and Schroedinger's cat"));
             }
@@ -1262,13 +1260,13 @@ async function really_done(how) {   // end.c:1132
         for (val = gv.valuables[0]; val.list; val = $c.radd(val, 1)) {
             sort_valuables(val.list, val.size);
             for (i = 0; i < val.size && !program_state.stopprint; i = i + 1 | 0) {
-                typ = $c.radd(val.list, i).typ;
-                count = $c.radd(val.list, i).count;
+                const typ = $c.radd(val.list, i).typ;
+                const count = $c.radd(val.list, i).count;
                 if (count === 0) {
                     continue;
                 }
                 if (objects[typ].oc_class !== GEM_CLASS || typ <= LAST_REAL_GEM) {
-                    otmp = await mksobj(typ, 0, 0);
+                    const otmp = await mksobj(typ, 0, 0);
                     await discover_object(otmp.otyp, 1, 1, 0);
                     otmp.dknown = 1;   /* seen it (blindness fix) */
                     /* observe_object not necessary after discover_object */
@@ -1293,7 +1291,7 @@ async function really_done(how) {   // end.c:1132
             $c.sprintf(new $c.Ptr(pbuf, 0), $c.lit("You %s beyond the confines of the dungeon"), u.uz.dlevel < 0 ? $c.lit("passed away") : ends[how]);
         } else {
             /* more conventional demise */
-            where = new $c.Ptr(svd.dungeons[u.uz.dnum].dname, 0);
+            let where = new $c.Ptr(svd.dungeons[u.uz.dnum].dname, 0);
             if ((svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level)) {
                 where = $c.lit("The Astral Plane");
             }
@@ -1359,8 +1357,8 @@ async function really_done(how) {   // end.c:1132
  * @returns {Promise<void>}
  */
 export async function container_contents(list, identified, all_containers, reportempty) {   // end.c:1596
-    let box = null, obj = null, buf = new Int8Array(256), cat = 0, dumping = 0, tmpwin = 0, sortedcobj = [null], srtc = null, sortflags = 0, $t1, $t2, $t3, $t4;
-    dumping = iflags.in_dumplog;
+    let box = null, obj = null, buf = new Int8Array(256), sortedcobj = [null], srtc = null, $t1, $t2, $t3, $t4;
+    const dumping = iflags.in_dumplog;
     for (box = list; box; box = box.nobj) {
         if (Is_container(box) || box.otyp === STATUE) {
             if (!box.cknown || identified && !box.lknown) {
@@ -1373,14 +1371,14 @@ export async function container_contents(list, identified, all_containers, repor
             if (box.otyp === BAG_OF_TRICKS) {
                 continue;   /* wrong type of container */
             } else if (box.cobj) {
-                tmpwin = await create_nhwindow()(NHW.MENU);
+                const tmpwin = await create_nhwindow()(NHW.MENU);
                 /* at this stage, the SchroedingerBox() flag is only set
                    if the cat inside the box is alive; the box actually
                    contains a cat corpse that we'll pretend is not there;
                    for dead cat, the flag will be clear and there'll be
                    a cat corpse inside the box; either way, inventory
                    reports the box as containing "1 item" */
-                cat = SchroedingersBox(box);
+                const cat = SchroedingersBox(box);
                 $c.sprintf(new $c.Ptr(buf, 0), $c.lit("Contents of %s:"), await the(await xname(box)));
                 await putstr()(tmpwin, 0, new $c.Ptr(buf, 0));
                 if (!dumping) {
@@ -1388,7 +1386,7 @@ export async function container_contents(list, identified, all_containers, repor
                 }
                 $t1 = buf[1] = 32, buf[0] = $t1;   /* two leading spaces */
                 if (box.cobj && !cat) {
-                    sortflags = (flags.sortloot === 108 || flags.sortloot === 102 ? SORTLOOT.LOOT : 0) | (flags.sortpack ? SORTLOOT.PACK : 0);
+                    const sortflags = (flags.sortloot === 108 || flags.sortloot === 102 ? SORTLOOT.LOOT : 0) | (flags.sortpack ? SORTLOOT.PACK : 0);
                     sortedcobj[0] = await sortloot(new $c.FieldRef(box, "cobj", "ptr"), sortflags, 0, null);
                     for (srtc = sortedcobj[0]; (obj = srtc.obj) !== null; srtc = $c.radd(srtc, 1)) {
                         if (identified) {
@@ -1466,8 +1464,7 @@ export async function nh_terminate(status) {   // end.c:1676
  * @returns {Promise<void>}
  */
 export async function delayed_killer(id, format, killername) {   // end.c:1721
-    let k = null;
-    k = find_delayed_killer(id);
+    let k = find_delayed_killer(id);
     if (!k) {
         /* no match, add a new delayed killer to the list */
         k = $c.asRec(await alloc(272), $T.kinfo, 272);
@@ -1498,8 +1495,8 @@ export function find_delayed_killer(id) {   // end.c:1740
  * @returns {Promise<void>}
  */
 export async function dealloc_killer(kptr) {   // end.c:1752
-    let prev = null, k = null, save_plnmsg = 0;
-    prev = svk.killer;
+    let k = null;
+    let prev = svk.killer;
     if (kptr === null) {
         return;
     }
@@ -1516,7 +1513,7 @@ export async function dealloc_killer(kptr) {   // end.c:1752
         $c.free(k);
         do {
             if (debugcore($c.lit("end.c"), 1)) {
-                save_plnmsg = iflags.last_msg;
+                const save_plnmsg = iflags.last_msg;
                 await pline($c.lit("freed delayed killer #%d"), kptr.id);
                 iflags.last_msg = save_plnmsg;
             }
@@ -1562,7 +1559,6 @@ export async function restore_killers(nhfp) {   // end.c:1794
  */
 function wordcount(p) {   // end.c:1807
     let words = 0;
-    words = 0;
     while (p.get(0)) {
         while (p.get(0) && $c.isspace($c.u8(p.get(0)))) {
             p = p.add(1);
@@ -1581,8 +1577,8 @@ function wordcount(p) {   // end.c:1807
  * @param {$c.Ptr | null} out char *
  */
 function bel_copy1(inp, out) {   // end.c:1823
-    let in_ = null, $t1, $t2, $t3, $t4;
-    in_ = inp.get(0);
+    let $t1, $t2, $t3, $t4;
+    let in_ = inp.get(0);
     out = out.add($c.idx($c.strlen(out)));   /* eos() */
     while (in_.get(0) && $c.isspace($c.u8(in_.get(0)))) {
         in_ = in_.add(1);
@@ -1598,15 +1594,15 @@ function bel_copy1(inp, out) {   // end.c:1823
  * @returns {Promise<$c.Ptr | null>} char *
  */
 export async function build_english_list(in_) {   // end.c:1837
-    let out = null, p = [null], len = 0, words = 0;
+    let p = [null];
     p[0] = in_;
-    len = $c.i32($c.strlen(p[0]));
-    words = wordcount(p[0]);
+    let len = $c.i32($c.strlen(p[0]));
+    let words = wordcount(p[0]);
     /* +3: " or " - " "; +(words - 1): (N-1)*(", " - " ") */
     if (words > 1) {
         len = len + (3 + (words - 1 | 0) | 0) | 0;
     }
-    out = $c.asArr(await alloc((len + 1 | 0) >>> 0), Int8Array);
+    const out = $c.asArr(await alloc((len + 1 | 0) >>> 0), Int8Array);
     out.set(0, 0);   /* bel_copy1() appends */
     switch (words) {
         case 0:
@@ -1651,9 +1647,8 @@ export async function build_english_list(in_) {   // end.c:1837
  * @returns {Promise<void>}
  */
 export async function NH_abort(why) {   // end.c:1910
-    let gdb_prio = 0, libc_prio = 0;
-    gdb_prio = sysopt.panictrace_gdb;
-    libc_prio = sysopt.panictrace_libc;
+    let gdb_prio = sysopt.panictrace_gdb;
+    const libc_prio = sysopt.panictrace_libc;
     /* don't execute this code recursively if a second abort is requested
        while this routine or the code it calls is executing */
     if (NH_abort$aborting) {

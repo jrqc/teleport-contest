@@ -77,8 +77,7 @@ const dipfountain$lady = new Int8Array(17);   // static in dipfountain()
  * @returns {Promise<void>}
  */
 export async function floating_above(what) {   // fountain.c:21
-    let umsg = null;
-    umsg = $c.lit("are floating high above the %s.");
+    let umsg = $c.lit("are floating high above the %s.");
     if (u.utrap && (u.utraptype === TT.INFLOOR || u.utraptype === TT.LAVA)) {
         /* when stuck in floor (not possible at fountain or sink location,
            so must be attempting to move down), override the usual message */
@@ -92,8 +91,8 @@ export async function floating_above(what) {   // fountain.c:21
  * @returns {Promise<void>}
  */
 async function dowatersnakes() {   // fountain.c:38
-    let num = 0, mtmp = null, $t1;
-    num = rn2(5) + 2 | 0;
+    let mtmp = null, $t1;
+    let num = rn2(5) + 2 | 0;
     if (!(svm.mvitals[PM.WATER_MOCCASIN].mvflags & G_GONE)) {
         if (!Blind()) {
             await pline($c.lit("An endless stream of %s pours forth!"), Hallucination() ? await makeplural(await rndmonnam(null)) : $c.lit("snakes"));
@@ -242,12 +241,11 @@ async function watchman_warn_fountain(mtmp) {   // fountain.c:179
  * @returns {Promise<void>}
  */
 export async function dryup(x, y, isyou) {   // fountain.c:201
-    let mtmp = null, glyph = 0;
     if (svl.level.locations[x][y].typ === FOUNTAIN && (!rn2(3) || FOUNTAIN_IS_WARNED(x, y))) {
         if (isyou && in_town(x, y) && !FOUNTAIN_IS_WARNED(x, y)) {
             svl.level.locations[x][y].flags = ((svl.level.locations[x][y].flags | 0 | F_WARNED) >>> 0) & 31;
             /* Warn about future fountain use. */
-            mtmp = await get_iter_mons(watchman_warn_fountain);
+            const mtmp = await get_iter_mons(watchman_warn_fountain);
             /* You can see or hear this effect */
             if (!mtmp) {
                 await pline_The($c.lit("flow reduces to a trickle."));
@@ -263,7 +261,7 @@ export async function dryup(x, y, isyou) {   // fountain.c:201
            being created and unblock_point() when going away, then this
            glyph hackery wouldn't be necessary */
         if (cansee(x, y)) {
-            glyph = glyph_at(x, y);
+            const glyph = glyph_at(x, y);
             if (!glyph_is_cmap(glyph) || glyph_to_cmap(glyph) !== S.cloud) {
                 await pline_The($c.lit("fountain dries up!"));
             }
@@ -285,16 +283,16 @@ export async function dryup(x, y, isyou) {   // fountain.c:201
  * @returns {Promise<void>}
  */
 export async function drinkfountain() {   // fountain.c:243
-    let mgkftn = 0, fate = 0, i = 0, ii = 0, littleluck = 0, obj = null, nextobj = null, buc_changed = 0, mtmp = null, $t1;
+    let ii = 0, obj = null, nextobj = null, mtmp = null, $t1;
     /* What happens when you drink from a fountain? */
-    mgkftn = svl.level.locations[u.ux][u.uy].horizontal === 1 ? 1 : 0;
-    fate = rnd(30);
+    const mgkftn = svl.level.locations[u.ux][u.uy].horizontal === 1 ? 1 : 0;
+    const fate = rnd(30);
     if (Levitation()) {
         await floating_above($c.lit("fountain"));
         return;
     }
     if (mgkftn && u.uluck >= 0 && fate >= 10) {
-        littleluck = u.uluck < 4 ? 1 : 0;
+        const littleluck = u.uluck < 4 ? 1 : 0;
         await pline($c.lit("Wow!  This makes you feel great!"));
         /* blessed restore ability */
         for (ii = 0; ii < A.MAX; ii = ii + 1 | 0) {
@@ -304,7 +302,7 @@ export async function drinkfountain() {   // fountain.c:243
             }
         }
         /* gain ability, blessed if "natural" luck is high */
-        i = rn2(A.MAX);   /* start at a random attribute */
+        let i = rn2(A.MAX);   /* start at a random attribute */
         for (ii = 0; ii < A.MAX; ii = ii + 1 | 0) {
             if (await adjattrib(i, 1, littleluck ? -1 : 0) && littleluck) {
                 break;
@@ -364,7 +362,7 @@ export async function drinkfountain() {   // fountain.c:243
             case 24:
                 {
                     /* Maybe curse some items */
-                    buc_changed = 0;
+                    let buc_changed = 0;
                     await pline($c.lit("This water's no good!"));
                     await morehungry(rn2(20) + 11 | 0);
                     await exercise(A.CON, FALSE);
@@ -445,9 +443,9 @@ export async function drinkfountain() {   // fountain.c:243
  * @returns {Promise<void>}
  */
 export async function dipfountain(obj) {   // fountain.c:394
-    let er = 0, is_hands = 0, money = 0, otmp = null, nextobj = null, denomination = 0, coin_loss = 0, $t1;
-    er = ER.NOTHING;
-    is_hands = $c.peq(obj, hands_obj) ? 1 : 0;
+    let otmp = null, nextobj = null, $t1;
+    let er = ER.NOTHING;
+    const is_hands = $c.peq(obj, hands_obj) ? 1 : 0;
     if (Levitation()) {
         await floating_above($c.lit("fountain"));
         return;
@@ -550,7 +548,7 @@ export async function dipfountain(obj) {   // fountain.c:394
             /* Strange feeling */
             await pline($c.lit("An urge to take a bath overwhelms you."));
             {
-                money = money_cnt(gi.invent);
+                let money = money_cnt(gi.invent);
                 if (money > 10) {
                     /* Amount to lose.  Might get rounded up as fountains don't
                      * pay change... */
@@ -558,8 +556,8 @@ export async function dipfountain(obj) {   // fountain.c:394
                     for (otmp = gi.invent; otmp && money > 0; otmp = nextobj) {
                         nextobj = otmp.nobj;
                         if (otmp.oclass === COIN_CLASS) {
-                            denomination = objects[otmp.otyp].oc_cost;
-                            coin_loss = $c.div64($c.sub64($c.add64(money, denomination), 1), denomination);
+                            const denomination = objects[otmp.otyp].oc_cost;
+                            let coin_loss = $c.div64($c.sub64($c.add64(money, denomination), 1), denomination);
                             coin_loss = min(coin_loss, otmp.quan);
                             otmp.quan = $c.sub64(otmp.quan, coin_loss);
                             money = $c.sub64(money, $c.mul64(coin_loss, denomination));
@@ -604,10 +602,9 @@ export async function dipfountain(obj) {   // fountain.c:394
  * @returns {Promise<number>} int
  */
 export async function wash_hands() {   // fountain.c:558
-    let hands = null, res = 0, was_glib = 0;
-    hands = await makeplural(await body_part(HAND));
-    res = ER.NOTHING;
-    was_glib = !!Glib() ? 1 : 0;
+    const hands = await makeplural(await body_part(HAND));
+    let res = ER.NOTHING;
+    const was_glib = !!Glib() ? 1 : 0;
     await You($c.lit("wash your %s%s in the %s."), $G.uarmg ? $c.lit("gloved ") : $c.lit(""), hands, hliquid($c.lit("water")));
     if (Glib()) {
         await make_glib(0);
@@ -645,7 +642,7 @@ export async function breaksink(x, y) {   // fountain.c:581
  * @returns {Promise<void>}
  */
 export async function drinksink() {   // fountain.c:595
-    let otmp = null, mtmp = null, $t1;
+    let otmp = null, $t1;
     if (Levitation()) {
         await floating_above($c.lit("sink"));
         return;
@@ -672,7 +669,7 @@ export async function drinksink() {   // fountain.c:595
             if (svm.mvitals[PM.SEWER_RAT].mvflags & G_GONE) {
                 await pline_The($c.lit("sink seems quite dirty."));
             } else {
-                mtmp = await makemon(mons[PM.SEWER_RAT], u.ux, u.uy, MM.NOMSG);
+                const mtmp = await makemon(mons[PM.SEWER_RAT], u.ux, u.uy, MM.NOMSG);
                 if (mtmp) {
                     await pline($c.lit("Eek!  There's %s in the sink!"), Blind() || !canspotmon(mtmp) ? $c.lit("something squirmy") : await a_monnam(mtmp));
                 }
@@ -761,10 +758,9 @@ export async function drinksink() {   // fountain.c:595
  * @returns {Promise<void>}
  */
 export async function dipsink(obj) {   // fountain.c:716
-    let try_call = 0, not_looted_yet = 0, is_hands = 0;
-    try_call = FALSE;
-    not_looted_yet = (svl.level.locations[u.ux][u.uy].flags & S.LRING) === 0 ? 1 : 0;
-    is_hands = $c.peq(obj, hands_obj) || $G.uarmg && $c.peq(obj, $G.uarmg) ? 1 : 0;
+    let try_call = FALSE;
+    const not_looted_yet = (svl.level.locations[u.ux][u.uy].flags & S.LRING) === 0 ? 1 : 0;
+    const is_hands = $c.peq(obj, hands_obj) || $G.uarmg && $c.peq(obj, $G.uarmg) ? 1 : 0;
     if (!rn2(not_looted_yet ? 25 : 15)) {
         /* can't rely on using sink for unlimited scroll blanking; however,
            since sink will be converted into a fountain, hero can dip again */

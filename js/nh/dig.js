@@ -134,11 +134,11 @@ function rm_waslit() {   // dig.c:30
  * @returns {Promise<void>}
  */
 async function mkcavepos(x, y, dist, waslit, rockit) {   // dig.c:48
-    let lev = null, mtmp = null;
+    let mtmp = null;
     if (!isok(x, y)) {
         return;
     }
-    lev = $c.relem(svl.level.locations[x], y);
+    const lev = $c.relem(svl.level.locations[x], y);
     if (rockit) {
         if (IS_OBSTRUCTED(lev.typ)) {
             return;
@@ -178,12 +178,12 @@ async function mkcavepos(x, y, dist, waslit, rockit) {   // dig.c:48
  * @returns {Promise<void>}
  */
 async function mkcavearea(rockit) {   // dig.c:88
-    let dist = 0, xmin = 0, xmax = 0, ymin = 0, ymax = 0, i = 0, waslit = 0;
-    xmin = u.ux;
-    xmax = u.ux;
-    ymin = u.uy;
-    ymax = u.uy;
-    waslit = rm_waslit();
+    let dist = 0, i = 0;
+    let xmin = u.ux;
+    let xmax = u.ux;
+    let ymin = u.uy;
+    let ymax = u.uy;
+    const waslit = rm_waslit();
     if (rockit) {
         await pline($c.lit("Crash!  The ceiling collapses around you!"));
     } else {
@@ -228,10 +228,9 @@ async function mkcavearea(rockit) {   // dig.c:88
  * @returns {number} boolean
  */
 function pick_can_reach(pick, x, y) {   // dig.c:141
-    let t = null, target_in_pit = 0;
-    t = t_at(x, y);
+    const t = t_at(x, y);
     /* tseen: pit only affects item positioning when it is known */
-    target_in_pit = t && is_pit(t.ttyp) && t.tseen ? 1 : 0;
+    const target_in_pit = t && is_pit(t.ttyp) && t.tseen ? 1 : 0;
     /* if hero is in a pit, pick can only reach if the statue is too and
        the two pits are conjoined or the statue isn't and pick is two-handed;
        this applies to hero in pit trying to reach an adjcacent boulder too */
@@ -260,11 +259,10 @@ function pick_can_reach(pick, x, y) {   // dig.c:141
  * @returns {number} int
  */
 export function dig_typ(otmp, x, y) {   // dig.c:169
-    let ltyp = 0;
     if (!isok(x, y) || !otmp || !is_pick(otmp) && !is_axe(otmp)) {
         return DIGTYP.UNDIGGABLE;
     }
-    ltyp = svl.level.locations[x][y].typ;
+    const ltyp = svl.level.locations[x][y].typ;
     if (is_axe(otmp)) {
         /* axe vs tree */
         return closed_door(x, y) ? DIGTYP.DOOR : IS_TREE(ltyp) ? DIGTYP.TREE : DIGTYP.UNDIGGABLE;
@@ -289,10 +287,9 @@ export function is_digging() {   // dig.c:195
  * @returns {number} enum digcheck_result
  */
 export function dig_check(madeby, x, y) {   // dig.c:207
-    let ttmp = null, stway = null;
-    ttmp = t_at(x, y);
+    const ttmp = t_at(x, y);
     if (On_stairs(x, y)) {
-        stway = stairway_at(x, y);
+        const stway = stairway_at(x, y);
         if (stway.isladder) {
             return DIGCHECK.FAIL_ONLADDER;
         } else {
@@ -338,8 +335,7 @@ export function dig_check(madeby, x, y) {   // dig.c:207
  * @returns {Promise<void>}
  */
 export async function digcheck_fail_message(digresult, madeby, x, y) {   // dig.c:255
-    let verb = null;
-    verb = $c.peq(madeby, BY_YOU()) && $G.uwep && is_axe($G.uwep) ? $c.lit("chop") : $c.lit("dig in");
+    const verb = $c.peq(madeby, BY_YOU()) && $G.uwep && is_axe($G.uwep) ? $c.lit("chop") : $c.lit("dig in");
     if (digresult < DIGCHECK.FAILED) {
         return;
     }
@@ -626,8 +622,8 @@ async function dig() {   // dig.c:300
  * @returns {Promise<number>} boolean
  */
 async function furniture_handled(x, y, madeby_u) {   // dig.c:571
-    let lev = null, bx = Int16Array.of(0), by = Int16Array.of(0);
-    lev = $c.relem(svl.level.locations[x], y);
+    let bx = Int16Array.of(0), by = Int16Array.of(0);
+    const lev = $c.relem(svl.level.locations[x], y);
     if (IS_FOUNTAIN(lev.typ)) {
         await dogushforth(FALSE);
         svl.level.locations[x][y].flags = ((svl.level.locations[x][y].flags | 0 | F_WARNED) >>> 0) & 31;   /* force dryup */
@@ -663,15 +659,15 @@ export function holetime() {   // dig.c:597
  * @returns {number} schar
  */
 export function fillholetyp(x, y, fill_if_any) {   // dig.c:606
-    let x1 = 0, y1 = 0, lo_x = 0, hi_x = 0, lo_y = 0, hi_y = 0, pool_cnt = 0, moat_cnt = 0, lava_cnt = 0;
+    let x1 = 0, y1 = 0;
     /* force filling if it exists at all */
-    lo_x = $c.i16(1 > x - 1 ? 1 : x - 1);
-    hi_x = $c.i16(x + 1 < COLNO - 1 ? x + 1 : COLNO - 1);
-    lo_y = $c.i16(0 > y - 1 ? 0 : y - 1);
-    hi_y = $c.i16(y + 1 < ROWNO - 1 ? y + 1 : ROWNO - 1);
-    pool_cnt = 0;
-    moat_cnt = 0;
-    lava_cnt = 0;
+    const lo_x = $c.i16(1 > x - 1 ? 1 : x - 1);
+    const hi_x = $c.i16(x + 1 < COLNO - 1 ? x + 1 : COLNO - 1);
+    const lo_y = $c.i16(0 > y - 1 ? 0 : y - 1);
+    const hi_y = $c.i16(y + 1 < ROWNO - 1 ? y + 1 : ROWNO - 1);
+    let pool_cnt = 0;
+    let moat_cnt = 0;
+    let lava_cnt = 0;
     for (x1 = lo_x; x1 <= hi_x; x1 = $c.i16(x1 + 1)) {
         for (y1 = lo_y; y1 <= hi_y; y1 = $c.i16(y1 + 1)) {
             if (is_moat(x1, y1)) {
@@ -706,16 +702,16 @@ export function fillholetyp(x, y, fill_if_any) {   // dig.c:606
  * @returns {Promise<void>}
  */
 export async function digactualhole(x, y, madeby, ttyp) {   // dig.c:640
-    let oldobjs = null, newobjs = null, ttmp = null, surface_type = null, tname = null, in_thru = null, furniture = new Int8Array(256), lev = null, mtmp = null, madeby_u = 0, madeby_obj = 0, heros_fault = 0, shopdoor = 0, at_u = 0, wont_fall = 0, old_typ = 0, old_aligntyp = 0, newlevel = new $T.d_level(), tolevel = new $T.d_level();
-    lev = $c.relem(svl.level.locations[x], y);
-    mtmp = svl.level.monsters[x][y];   /* may be madeby */
+    let surface_type = null, furniture = new Int8Array(256), newlevel = new $T.d_level(), tolevel = new $T.d_level();
+    const lev = $c.relem(svl.level.locations[x], y);
+    const mtmp = svl.level.monsters[x][y];   /* may be madeby */
     /* BY_OBJECT means the hero broke a wand, so blame her for it */
-    madeby_u = $c.peq(madeby, BY_YOU()) ? 1 : 0;
-    madeby_obj = $c.peq(madeby, null) ? 1 : 0;
-    heros_fault = madeby_u || madeby_obj ? 1 : 0;
-    at_u = u_at(x, y);
-    wont_fall = Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked ? 1 : 0;
-    old_aligntyp = A.NONE;
+    const madeby_u = $c.peq(madeby, BY_YOU()) ? 1 : 0;
+    const madeby_obj = $c.peq(madeby, null) ? 1 : 0;
+    const heros_fault = madeby_u || madeby_obj ? 1 : 0;
+    const at_u = u_at(x, y);
+    let wont_fall = Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked ? 1 : 0;
+    let old_aligntyp = A.NONE;
     if (at_u && u.utrap) {
         if (u.utraptype === TT.BURIEDBALL) {
             await buried_ball_to_punishment();
@@ -732,7 +728,7 @@ export async function digactualhole(x, y, madeby, ttyp) {   // dig.c:640
     }
     /* maketrap() might change terrain type but we deliver messages after
        that, so prepare in advance */
-    old_typ = lev.typ;
+    const old_typ = lev.typ;
     furniture[0] = 0;
     if (IS_FURNITURE(lev.typ)) {
         /* should mirror the word used by surface() for normal floor */
@@ -746,13 +742,13 @@ export async function digactualhole(x, y, madeby, ttyp) {   // dig.c:640
     } else {
         surface_type = surface(x, y);
     }
-    shopdoor = IS_DOOR(lev.typ) && in_rooms(x, y, SHOPBASE).get(0) ? 1 : 0;
-    oldobjs = svl.level.objects[x][y];
-    ttmp = await maketrap(x, y, ttyp);
+    const shopdoor = IS_DOOR(lev.typ) && in_rooms(x, y, SHOPBASE).get(0) ? 1 : 0;
+    const oldobjs = svl.level.objects[x][y];
+    const ttmp = await maketrap(x, y, ttyp);
     if (!ttmp) {
         return;
     }
-    newobjs = svl.level.objects[x][y];
+    const newobjs = svl.level.objects[x][y];
     ttmp.madeby_u = (heros_fault >>> 0) & 1;
     ttmp.tseen = 0;
     if (cansee(x, y)) {
@@ -760,8 +756,8 @@ export async function digactualhole(x, y, madeby, ttyp) {   // dig.c:640
     } else if (madeby_u) {
         await feeltrap(ttmp);
     }
-    tname = trapname(ttyp, TRUE);
-    in_thru = ttyp === HOLE ? $c.lit("through") : $c.lit("in");
+    const tname = trapname(ttyp, TRUE);
+    const in_thru = ttyp === HOLE ? $c.lit("through") : $c.lit("in");
     if (madeby_u) {
         if (x !== u.ux || y !== u.uy) {
             await You($c.lit("dig an adjacent %s."), tname);
@@ -912,8 +908,8 @@ export async function digactualhole(x, y, madeby, ttyp) {   // dig.c:640
  * @returns {Promise<void>}
  */
 export async function liquid_flow(x, y, typ, ttmp, fillmsg) {   // dig.c:838
-    let objchain = null, mon = null, u_spot = 0;
-    u_spot = u_at(x, y);
+    let objchain = null, mon = null;
+    const u_spot = u_at(x, y);
     /* caller should have changed levl[x][y].typ to POOL, MOAT, or LAVA */
     if (!is_pool_or_lava(x, y)) {
         if (iflags.sanity_check) {
@@ -953,8 +949,8 @@ export async function liquid_flow(x, y, typ, ttmp, fillmsg) {   // dig.c:838
  * @returns {Promise<number>} boolean
  */
 export async function dighole(pit_only, by_magic, cc) {   // dig.c:885
-    let ttmp = null, lev = null, boulder_here = null, typ = 0, old_typ = 0, dig_x = 0, dig_y = 0, nohole = 0, retval = 0, dig_check_result = 0, x = Int16Array.of(0), y = Int16Array.of(0), otyp = 0;
-    retval = FALSE;
+    let boulder_here = null, typ = 0, dig_x = 0, dig_y = 0, x = Int16Array.of(0), y = Int16Array.of(0);
+    let retval = FALSE;
     if (!cc) {
         dig_x = u.ux;
         dig_y = u.uy;
@@ -965,12 +961,12 @@ export async function dighole(pit_only, by_magic, cc) {   // dig.c:885
             return FALSE;
         }
     }
-    ttmp = t_at(dig_x, dig_y);
-    lev = $c.relem(svl.level.locations[dig_x], dig_y);
-    dig_check_result = dig_check(BY_YOU(), dig_x, dig_y);
+    const ttmp = t_at(dig_x, dig_y);
+    const lev = $c.relem(svl.level.locations[dig_x], dig_y);
+    const dig_check_result = dig_check(BY_YOU(), dig_x, dig_y);
     /* nohole = (!Can_dig_down(&u.uz) && !lev->candig); */
-    nohole = dig_check_result === DIGCHECK.FAIL_CANTDIG || dig_check_result === DIGCHECK.FAIL_TOOHARD ? 1 : 0;
-    old_typ = lev.typ;
+    const nohole = dig_check_result === DIGCHECK.FAIL_CANTDIG || dig_check_result === DIGCHECK.FAIL_TOOHARD ? 1 : 0;
+    const old_typ = lev.typ;
     if (ttmp && (undestroyable_trap(ttmp.ttyp) || nohole) || IS_OBSTRUCTED(old_typ) && old_typ !== SDOOR && (lev.flags & W.NONDIGGABLE) !== 0) {
         await pline_The($c.lit("%s %shere is too hard to dig in."), surface(dig_x, dig_y), dig_x !== u.ux || dig_y !== u.uy ? $c.lit("t") : $c.lit(""));
     } else if (ttmp && is_magical_trap(ttmp.ttyp)) {
@@ -1045,7 +1041,7 @@ export async function dighole(pit_only, by_magic, cc) {   // dig.c:885
         } else {
             /* magical digging disarms settable traps */
             if (by_magic && ttmp && (ttmp.ttyp === LANDMINE || ttmp.ttyp === BEAR_TRAP)) {
-                otyp = ttmp.ttyp === LANDMINE ? LAND_MINE : BEARTRAP;
+                const otyp = ttmp.ttyp === LANDMINE ? LAND_MINE : BEARTRAP;
                 /* convert trap into buried object (deletes trap) */
                 await cnv_trap_obj(otyp, 1, ttmp, TRUE);
             }
@@ -1066,7 +1062,7 @@ export async function dighole(pit_only, by_magic, cc) {   // dig.c:885
  * @returns {Promise<void>}
  */
 async function dig_up_grave(cc) {   // dig.c:1027
-    let otmp = null, what_happens = 0, dig_x = 0, dig_y = 0;
+    let otmp = null, dig_x = 0, dig_y = 0;
     if (!cc) {
         dig_x = u.ux;
         dig_y = u.uy;
@@ -1092,7 +1088,7 @@ async function dig_up_grave(cc) {   // dig.c:1027
         await You($c.lit("have violated the sanctity of this grave!"));
     }
     /* -1: force default case for empty grave */
-    what_happens = svl.level.locations[dig_x][dig_y].flags ? -1 : rn2(5);
+    const what_happens = svl.level.locations[dig_x][dig_y].flags ? -1 : rn2(5);
     switch (what_happens) {
         case 0:
         case 1:
@@ -1130,8 +1126,8 @@ async function dig_up_grave(cc) {   // dig.c:1027
  * @returns {Promise<number>} int
  */
 export async function use_pick_axe(obj) {   // dig.c:1092
-    let verb = null, dsp = null, dirsyms = new Int8Array(12), qbuf = new Int8Array(256), ispick = 0, rx = 0, ry = 0, downok = 0, res = 0, dir = 0, dirch = 0, $t1;
-    res = ECMD.OK;
+    let dirsyms = new Int8Array(12), qbuf = new Int8Array(256), dir = 0, $t1;
+    const res = ECMD.OK;
     /* Check tool */
     if (!$c.peq(obj, $G.uwep)) {
         if (await wield_tool(obj, $c.lit("swing"))) {
@@ -1142,8 +1138,8 @@ export async function use_pick_axe(obj) {   // dig.c:1092
         }
         return ECMD.OK;
     }
-    ispick = is_pick(obj);
-    verb = ispick ? $c.lit("dig") : $c.lit("chop");
+    const ispick = is_pick(obj);
+    const verb = ispick ? $c.lit("dig") : $c.lit("chop");
     if (u.utrap && u.utraptype === TT.WEB) {
         /* res==0 => no prior message;
            res==1 => just got "You now wield a pick-axe." message */
@@ -1151,10 +1147,10 @@ export async function use_pick_axe(obj) {   // dig.c:1092
         return res;
     }
     /* construct list of directions to show player for likely choices */
-    downok = !!can_reach_floor(FALSE) ? 1 : 0;
-    dsp = new $c.Ptr(dirsyms, 0);
+    const downok = !!can_reach_floor(FALSE) ? 1 : 0;
+    let dsp = new $c.Ptr(dirsyms, 0);
     for (dir = 0; dir < N_DIRS_Z; dir = dir + 1 | 0) {
-        dirch = await cmd_from_dir(dir, MV.WALK);
+        const dirch = await cmd_from_dir(dir, MV.WALK);
         /* filter out useless directions */
         if (u.uswallow) {
             /* all directions are viable when swallowed */
@@ -1163,8 +1159,8 @@ export async function use_pick_axe(obj) {   // dig.c:1092
             if (!dxdy_moveok()) {
                 continue;   /* handle NODIAG */
             }
-            rx = u.ux + u.dx | 0;
-            ry = u.uy + u.dy | 0;
+            const rx = u.ux + u.dx | 0;
+            const ry = u.uy + u.dy | 0;
             if (!isok($c.i16(rx), $c.i16(ry)) || dig_typ(obj, $c.i16(rx), $c.i16(ry)) === DIGTYP.UNDIGGABLE) {
                 continue;
             }
@@ -1196,9 +1192,9 @@ export async function use_pick_axe(obj) {   // dig.c:1092
  * @returns {Promise<number>} int
  */
 export async function use_pick_axe2(obj) {   // dig.c:1162
-    let rx = 0, ry = 0, lev = null, trap = null, trap_with_u = null, dig_target = 0, ispick = 0, verbing = null, buf = new Int8Array(256), dam = 0, boulder = null, what = null, vibrate = 0, idx = 0, adjidx = 0, $t1;
-    ispick = is_pick(obj);
-    verbing = ispick ? $c.lit("digging") : $c.lit("chopping");
+    let trap = null, trap_with_u = null, buf = new Int8Array(256), boulder = null, $t1;
+    const ispick = is_pick(obj);
+    const verbing = ispick ? $c.lit("digging") : $c.lit("chopping");
     if (u.uswallow && await do_attack(u.ustuck)) {
         /* return 1 */
     } else if (Underwater()) {
@@ -1210,7 +1206,7 @@ export async function use_pick_axe2(obj) {   // dig.c:1162
             await You_cant($c.lit("reach the %s."), ceiling(u.ux, u.uy));
         }
     } else if (!u.dx && !u.dy && !u.dz) {
-        dam = (rnd(2) + dbon() | 0) + obj.spe | 0;
+        let dam = (rnd(2) + dbon() | 0) + obj.spe | 0;
         if (dam <= 0) {
             dam = 1;
         }
@@ -1221,17 +1217,17 @@ export async function use_pick_axe2(obj) {   // dig.c:1162
         return ECMD.TIME;
     } else if (u.dz === 0) {
         confdir(FALSE);
-        rx = $c.i16(u.ux + u.dx | 0);
-        ry = $c.i16(u.uy + u.dy | 0);
+        const rx = $c.i16(u.ux + u.dx | 0);
+        const ry = $c.i16(u.uy + u.dy | 0);
         if (!isok(rx, ry)) {
             await pline($c.lit("Clash!"));
             return ECMD.TIME;
         }
-        lev = $c.relem(svl.level.locations[rx], ry);
+        const lev = $c.relem(svl.level.locations[rx], ry);
         if (MON_AT(rx, ry) && await do_attack(svl.level.monsters[rx][ry])) {
             return ECMD.TIME;
         }
-        dig_target = dig_typ(obj, rx, ry);
+        const dig_target = dig_typ(obj, rx, ry);
         if (dig_target === DIGTYP.UNDIGGABLE) {
             /* ACCESSIBLE or POOL */
             trap = t_at(rx, ry);
@@ -1261,9 +1257,9 @@ export async function use_pick_axe2(obj) {   // dig.c:1162
             } else if ((boulder = sobj_at(BOULDER, rx, ry)) !== null || sobj_at(STATUE, rx, ry)) {
                 /* if both boulders and statues are present, the topmost
                    boulder will be shown on the map so treat it as target */
-                what = boulder ? $c.lit("boulder") : $c.lit("statue");
+                const what = boulder ? $c.lit("boulder") : $c.lit("statue");
                 if (!ispick) {
-                    vibrate = !rn2(3) ? 1 : 0;
+                    const vibrate = !rn2(3) ? 1 : 0;
                     await pline($c.lit("Sparks fly as you whack the %s.%s"), what, vibrate ? $c.lit("  The axe-handle vibrates violently!") : $c.lit(""));
                     if (vibrate) {
                         await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? 1 : 2, $c.lit("axing a hard object"), KILLED.BY);
@@ -1276,9 +1272,9 @@ export async function use_pick_axe2(obj) {   // dig.c:1162
                     await You_cant($c.lit("reach the %s."), what);
                 }
             } else if (u.utrap && u.utraptype === TT.PIT && trap && (trap_with_u = t_at(u.ux, u.uy)) && is_pit(trap.ttyp) && !conjoined_pits(trap, trap_with_u, FALSE)) {
-                idx = xytodir(u.dx, u.dy);
+                const idx = xytodir(u.dx, u.dy);
                 if (idx !== DIR.ERR) {
-                    adjidx = DIR_180(idx);
+                    const adjidx = DIR_180(idx);
                     trap_with_u.vl.v_conjoined = $c.u8(trap_with_u.vl.v_conjoined | 1 << idx);
                     trap.vl.v_conjoined = $c.u8(trap.vl.v_conjoined | 1 << adjidx);
                     await You($c.lit("clear some debris from between the pits."));
@@ -1377,8 +1373,8 @@ function watchman_canseeu(mtmp) {   // dig.c:1362
  * @returns {Promise<void>}
  */
 export async function watch_dig(mtmp, x, y, zap) {   // dig.c:1377
-    let lev = null, str = null;
-    lev = $c.relem(svl.level.locations[x], y);
+    let str = null;
+    const lev = $c.relem(svl.level.locations[x], y);
     if (in_town(x, y) && (closed_door(x, y) || lev.typ === SDOOR || IS_WALL(lev.typ) || IS_FOUNTAIN(lev.typ) || IS_TREE(lev.typ))) {
         if (!mtmp) {
             mtmp = await get_iter_mons(watchman_canseeu);
@@ -1412,9 +1408,8 @@ export async function watch_dig(mtmp, x, y, zap) {   // dig.c:1377
  * @returns {Promise<number>} boolean
  */
 export async function mdig_tunnel(mtmp) {   // dig.c:1414
-    let here = null, sawit = 0, seeit = 0, trapped = 0, pile = 0;
-    pile = rnd(12);
-    here = $c.relem(svl.level.locations[mtmp.mx], mtmp.my);
+    const pile = rnd(12);
+    const here = $c.relem(svl.level.locations[mtmp.mx], mtmp.my);
     if (here.typ === SDOOR) {
         cvt_sdoor_to_door(here);   /* ->typ = DOOR */
     }
@@ -1424,13 +1419,13 @@ export async function mdig_tunnel(mtmp) {   // dig.c:1414
             await add_damage(mtmp.mx, mtmp.my, 0);
         }
         /* sawit: closed door location is more visible than an open one */
-        sawit = $c.i8(canseemon(mtmp));   /* before door state change and unblock_pt */
-        trapped = here.flags & D.TRAPPED ? TRUE : FALSE;
+        const sawit = $c.i8(canseemon(mtmp));   /* before door state change and unblock_pt */
+        const trapped = here.flags & D.TRAPPED ? TRUE : FALSE;
         here.flags = (trapped ? D.NODOOR : D.BROKEN) & 31;
         recalc_block_point(mtmp.mx, mtmp.my);   /* vision */
         await newsym(mtmp.mx, mtmp.my);
         if (trapped) {
-            seeit = $c.i8(canseemon(mtmp));
+            const seeit = $c.i8(canseemon(mtmp));
             if (await mb_trapped(mtmp, sawit || seeit ? 1 : 0)) {
                 /* mtmp is killed */
                 await newsym(mtmp.mx, mtmp.my);
@@ -1499,7 +1494,6 @@ export async function mdig_tunnel(mtmp) {   // dig.c:1414
  * @returns {Promise<void>}
  */
 export async function draft_message(unexpected) {   // dig.c:1504
-    let dridx = 0;
     /*
      * [Bug or TODO?  Have caller pass coordinates and use the travel
      * mechanism to determine whether there is a path between
@@ -1522,7 +1516,7 @@ export async function draft_message(unexpected) {   // dig.c:1504
             /* "marching" is deliberately ambiguous; it might mean drills
                 after entering military service or mean engaging in protests */
             /* Lawful: 0..1, Neutral: 1..2, Chaotic: 2..3 */
-            dridx = rn2(2) + (1 - sgn(u.ualign.type) | 0) | 0;
+            let dridx = rn2(2) + (1 - sgn(u.ualign.type) | 0) | 0;
             if (u.ualign.record < STRIDENT) {   /* L: +(0..2), N: +(-1..1), C: +(-2..0); all: 0..3 */
                 dridx = dridx + (rn2(3) + (sgn(u.ualign.type) - 1 | 0) | 0) | 0;
             }
@@ -1535,13 +1529,13 @@ export async function draft_message(unexpected) {   // dig.c:1504
  * @returns {Promise<void>}
  */
 export async function zap_dig() {   // dig.c:1548
-    let room = null, mtmp = null, otmp = null, trap_with_u = null, zx = 0, zy = 0, flow_x = 0, flow_y = 0, diridx = 0, digdepth = 0, shopdoor = 0, shopwall = 0, maze_dig = 0, pitdig = 0, pitflow = 0, dmg = 0, stway = null, cc = new $T.nhcoord(), adjpit = null, buf = new Int8Array(256), adjidx = 0, ttmp = null, filltyp = 0;
-    trap_with_u = null;
-    flow_x = -1;
-    flow_y = -1;
-    diridx = 8;
-    pitdig = FALSE;
-    pitflow = FALSE;
+    let shopwall = 0, cc = new $T.nhcoord(), buf = new Int8Array(256);
+    let trap_with_u = null;
+    let flow_x = -1;
+    let flow_y = -1;
+    let diridx = 8;
+    let pitdig = FALSE;
+    let pitflow = FALSE;
     /*
      * Original effect (approximately):
      * from CORR: dig until we pierce a wall
@@ -1552,7 +1546,7 @@ export async function zap_dig() {   // dig.c:1548
      * 3.6.0: from a PIT: dig one adjacent pit.
      */
     if (u.uswallow) {
-        mtmp = u.ustuck;
+        const mtmp = u.ustuck;
         if (!is_whirly(mtmp.data)) {
             if (dmgtype_fromattack(mtmp.data, AD.DGST, AT.ENGL) !== null) {
                 await You($c.lit("pierce %s %s wall!"), s_suffix(await mon_nam(mtmp)), await mbodypart(mtmp, STOMACH));
@@ -1570,14 +1564,14 @@ export async function zap_dig() {   // dig.c:1548
         if (!((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level)) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) && !Underwater()) {
             if (u.dz < 0 || On_stairs(u.ux, u.uy)) {
                 if (On_stairs(u.ux, u.uy)) {
-                    stway = stairway_at(u.ux, u.uy);
+                    const stway = stairway_at(u.ux, u.uy);
                     await pline_The($c.lit("beam bounces off the %s and hits the %s."), stway.isladder ? $c.lit("ladder") : $c.lit("stairs"), ceiling(u.ux, u.uy));
                 }
                 await You($c.lit("loosen a rock from the %s."), ceiling(u.ux, u.uy));
                 await pline($c.lit("It falls on your %s!"), await body_part(HEAD));
-                dmg = rnd(hard_helmet($G.uarmh) ? 2 : 6);
+                const dmg = rnd(hard_helmet($G.uarmh) ? 2 : 6);
                 await losehp(Maybe_Half_Phys(dmg), $c.lit("falling rock"), KILLED.BY_AN);
-                otmp = await mksobj_at(ROCK, u.ux, u.uy, FALSE, FALSE);
+                const otmp = await mksobj_at(ROCK, u.ux, u.uy, FALSE, FALSE);
                 if (otmp) {
                     await xname(otmp);   /* set dknown, maybe bknown */
                     await stackobj(otmp);
@@ -1591,26 +1585,26 @@ export async function zap_dig() {   // dig.c:1548
         return;
     }   /* up or down */
     /* normal case: digging across the level */
-    shopdoor = shopwall = FALSE;
-    maze_dig = svl.level.flags.is_maze_lev && !((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_earth_level)) ? 1 : 0;
-    zx = $c.i16(u.ux + u.dx | 0);
-    zy = $c.i16(u.uy + u.dy | 0);
+    let shopdoor = shopwall = FALSE;
+    const maze_dig = svl.level.flags.is_maze_lev && !((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_earth_level)) ? 1 : 0;
+    let zx = $c.i16(u.ux + u.dx | 0);
+    let zy = $c.i16(u.uy + u.dy | 0);
     if (u.utrap && u.utraptype === TT.PIT && (trap_with_u = t_at(u.ux, u.uy))) {
         pitdig = TRUE;
         diridx = xytodir(u.dx, u.dy);
     }
-    digdepth = rn2(18) + 8 | 0;
+    let digdepth = rn2(18) + 8 | 0;
     await tmp_at(DISP_BEAM, 4083);
     while ((digdepth = digdepth - 1 | 0) >= 0) {
         if (!isok(zx, zy)) {
             break;
         }
-        room = $c.relem(svl.level.locations[zx], zy);
+        const room = $c.relem(svl.level.locations[zx], zy);
         await tmp_at(zx, zy);
         await nh_delay_output()();   /* wait a little bit */
         if (pitdig) {
             /* we are already in a pit if this is true */
-            adjpit = t_at(zx, zy);
+            let adjpit = t_at(zx, zy);
             if (diridx !== DIR.ERR && !conjoined_pits(adjpit, trap_with_u, FALSE)) {
                 digdepth = 0;   /* limited to the adjacent location only */
                 nhUse(digdepth);
@@ -1628,7 +1622,7 @@ export async function zap_dig() {   // dig.c:1548
                     }
                 }
                 if (adjpit && is_pit(adjpit.ttyp)) {
-                    adjidx = DIR_180(diridx);
+                    const adjidx = DIR_180(diridx);
                     trap_with_u.vl.v_conjoined = $c.u8(trap_with_u.vl.v_conjoined | 1 << diridx);
                     adjpit.vl.v_conjoined = $c.u8(adjpit.vl.v_conjoined | 1 << adjidx);
                     flow_x = zx;
@@ -1721,9 +1715,9 @@ export async function zap_dig() {   // dig.c:1548
     }   /* while */
     await tmp_at(DISP_END, 0);   /* closing call */
     if (pitflow && isok(flow_x, flow_y)) {
-        ttmp = t_at(flow_x, flow_y);
+        const ttmp = t_at(flow_x, flow_y);
         if (ttmp && is_pit(ttmp.ttyp)) {
-            filltyp = fillholetyp(ttmp.tx, ttmp.ty, TRUE);
+            const filltyp = fillholetyp(ttmp.tx, ttmp.ty, TRUE);
             if (filltyp !== ROOM) {
                 await pit_flow(ttmp, filltyp);
             }
@@ -1746,8 +1740,8 @@ export async function zap_dig() {   // dig.c:1548
  * @returns {number} int
  */
 function adj_pit_checks(cc, msg) {   // dig.c:1763
-    let ltyp = 0, room = null, foundation_msg = null, supporting = null;
-    foundation_msg = $c.lit("The foundation is too hard to dig through from this angle.");
+    let ltyp = 0;
+    const foundation_msg = $c.lit("The foundation is too hard to dig through from this angle.");
     if (!cc) {
         return FALSE;
     }
@@ -1755,7 +1749,7 @@ function adj_pit_checks(cc, msg) {   // dig.c:1763
         return FALSE;
     }
     msg.set(0, 0);
-    room = $c.relem(svl.level.locations[cc.x], cc.y);
+    const room = $c.relem(svl.level.locations[cc.x], cc.y);
     ltyp = room.typ, room.flags = 0;
     if (is_pool(cc.x, cc.y) || is_lava(cc.x, cc.y)) {
         /* this is handled by the caller after we return FALSE */
@@ -1790,7 +1784,7 @@ function adj_pit_checks(cc, msg) {   // dig.c:1763
         $c.strcpy(msg, $c.lit("The ladder is unaffected."));
         return FALSE;
     } else {
-        supporting = null;
+        let supporting = null;
         if (IS_FOUNTAIN(ltyp)) {
             supporting = $c.lit("fountain");
         } else if (IS_THRONE(ltyp)) {
@@ -1819,7 +1813,7 @@ function adj_pit_checks(cc, msg) {   // dig.c:1763
  * @returns {Promise<void>}
  */
 async function pit_flow(trap, filltyp) {   // dig.c:1844
-    let t = new $T.trap(), idx = 0, x = 0, y = 0, t2 = null;
+    let t = new $T.trap(), idx = 0;
     /*
      * FIXME?
      *  liquid_flow() -> pooleffects() -> {drown(),lava_effects()}
@@ -1832,9 +1826,9 @@ async function pit_flow(trap, filltyp) {   // dig.c:1844
         await liquid_flow(t.tx, t.ty, filltyp, trap, t.tx === u.ux && t.ty === u.uy ? $c.lit("Suddenly %s flows in from the adjacent pit!") : null);
         for (idx = 0; idx < N_DIRS; idx = idx + 1 | 0) {
             if (t.vl.v_conjoined & 1 << idx) {
-                x = $c.i16(t.tx + xdir[idx]);
-                y = $c.i16(t.ty + ydir[idx]);
-                t2 = t_at(x, y);
+                const x = $c.i16(t.tx + xdir[idx]);
+                const y = $c.i16(t.ty + ydir[idx]);
+                const t2 = t_at(x, y);
                 /* cannot do this back-check; liquid_flow()
                  * called deltrap() which cleaned up the
                  * conjoined fields on both pits.
@@ -1850,9 +1844,9 @@ async function pit_flow(trap, filltyp) {   // dig.c:1844
  * @returns {$T.obj | null} struct obj *
  */
 export function buried_ball(cc) {   // dig.c:1885
-    let odist = 0, bdist = 0, otmp = null, ball = null;
-    bdist = COLNO;
-    ball = null;
+    let otmp = null;
+    let bdist = COLNO;
+    let ball = null;
     /* FIXME:
      *  This is just approximate; if multiple buried balls meet the
      *  criterium (within 2 steps of tethered hero's present location)
@@ -1882,7 +1876,7 @@ export function buried_ball(cc) {   // dig.c:1885
              *  1 2 5
              *  0 1 4
              */
-            odist = dist2(otmp.ox, otmp.oy, cc.x, cc.y);
+            const odist = dist2(otmp.ox, otmp.oy, cc.x, cc.y);
             if (odist <= 8 && (!ball || odist < bdist)) {
                 /* remember nearest buried ball but keep checking others */
                 ball = otmp;
@@ -1901,10 +1895,10 @@ export function buried_ball(cc) {   // dig.c:1885
  * @returns {Promise<void>}
  */
 export async function buried_ball_to_punishment() {   // dig.c:1935
-    let cc = new $T.nhcoord(), ball = null;
+    let cc = new $T.nhcoord();
     cc.x = u.ux;
     cc.y = u.uy;
-    ball = buried_ball(cc);
+    const ball = buried_ball(cc);
     if (ball) {
         await obj_extract_self(ball);
         /* rusting buried metallic objects is not implemented yet */
@@ -1918,10 +1912,10 @@ export async function buried_ball_to_punishment() {   // dig.c:1935
  * @returns {Promise<void>}
  */
 export async function buried_ball_to_freedom() {   // dig.c:1958
-    let cc = new $T.nhcoord(), ball = null;
+    let cc = new $T.nhcoord();
     cc.x = u.ux;
     cc.y = u.uy;
-    ball = buried_ball(cc);
+    const ball = buried_ball(cc);
     if (ball) {
         await obj_extract_self(ball);
         /* rusting buried metallic objects is not implemented yet */
@@ -1940,10 +1934,9 @@ export async function buried_ball_to_freedom() {   // dig.c:1958
  * @returns {Promise<$T.obj | null>} struct obj *
  */
 export async function bury_an_obj(otmp, dealloced) {   // dig.c:1984
-    let otmp2 = null, under_ice = 0, save_plnmsg = 0;
     do {
         if (debugcore($c.lit("dig.c"), TRUE)) {
-            save_plnmsg = iflags.last_msg;
+            const save_plnmsg = iflags.last_msg;
             await pline($c.lit("bury_an_obj: %s"), await xname(otmp));
             iflags.last_msg = save_plnmsg;
         }
@@ -1957,7 +1950,7 @@ export async function bury_an_obj(otmp, dealloced) {   // dig.c:1984
         await pline_The($c.lit("iron ball gets buried!"));
     }
     /* after unpunish(), or might get deallocated chain */
-    otmp2 = otmp.v.v_nexthere;
+    const otmp2 = otmp.v.v_nexthere;
     /*
      * obj_resists(,0,0) prevents Rider corpses from being buried.
      * It also prevents The Amulet and invocation tools from being
@@ -1976,7 +1969,7 @@ export async function bury_an_obj(otmp, dealloced) {   // dig.c:1984
         await end_burn(otmp, TRUE);
     }
     await obj_extract_self(otmp);
-    under_ice = is_ice(otmp.ox, otmp.oy);
+    const under_ice = is_ice(otmp.ox, otmp.oy);
     if (otmp.otyp === ROCK && !under_ice || otmp.otyp === BOULDER) {
         /* merges into burying material; boulder removal is for #wizbury */
         if (dealloced) {
@@ -2004,13 +1997,13 @@ export async function bury_an_obj(otmp, dealloced) {   // dig.c:1984
  * @returns {Promise<void>}
  */
 export async function bury_objs(x, y) {   // dig.c:2050
-    let otmp = null, otmp2 = null, shkp = null, loss = 0, costly = 0, save_plnmsg = 0;
-    loss = 0;
-    costly = (shkp = await shop_keeper(in_rooms($c.i16(x), $c.i16(y), SHOPBASE).get(0))) && await costly_spot($c.i16(x), $c.i16(y)) ? 1 : 0;
+    let otmp = null, otmp2 = null, shkp = null;
+    let loss = 0;
+    const costly = (shkp = await shop_keeper(in_rooms($c.i16(x), $c.i16(y), SHOPBASE).get(0))) && await costly_spot($c.i16(x), $c.i16(y)) ? 1 : 0;
     if (svl.level.objects[x][y] !== null) {
         do {
             if (debugcore($c.lit("dig.c"), TRUE)) {
-                save_plnmsg = iflags.last_msg;
+                const save_plnmsg = iflags.last_msg;
                 await pline($c.lit("bury_objs: at <%d,%d>"), x, y);
                 iflags.last_msg = save_plnmsg;
             }
@@ -2041,17 +2034,17 @@ export async function bury_objs(x, y) {   // dig.c:2050
  * @returns {Promise<void>}
  */
 export async function unearth_objs(x, y) {   // dig.c:2086
-    let otmp = null, otmp2 = null, bball = null, cc = new $T.nhcoord(), save_plnmsg = 0;
+    let otmp = null, otmp2 = null, cc = new $T.nhcoord();
     do {
         if (debugcore($c.lit("dig.c"), TRUE)) {
-            save_plnmsg = iflags.last_msg;
+            const save_plnmsg = iflags.last_msg;
             await pline($c.lit("unearth_objs: at <%d,%d>"), x, y);
             iflags.last_msg = save_plnmsg;
         }
     } while (0);
     cc.x = $c.i16(x);
     cc.y = $c.i16(y);
-    bball = buried_ball(cc);
+    const bball = buried_ball(cc);
     for (otmp = svl.level.buriedobjlist; otmp; otmp = otmp2) {
         otmp2 = otmp.nobj;
         if (otmp.ox === x && otmp.oy === y) {
@@ -2086,8 +2079,7 @@ export async function unearth_objs(x, y) {   // dig.c:2086
  * @returns {Promise<void>}
  */
 export async function rot_organic(arg, timeout) {   // dig.c:2125
-    let obj = null;
-    obj = arg.a_obj;
+    const obj = arg.a_obj;
     while (Has_contents(obj)) {
         /* We don't need to place contained object on the floor
            first, but we do need to update its map coordinates. */
@@ -2109,18 +2101,17 @@ export async function rot_organic(arg, timeout) {   // dig.c:2125
  * @returns {Promise<void>}
  */
 export async function rot_corpse(arg, timeout) {   // dig.c:2146
-    let x = 0, y = 0, obj = null, on_floor = 0, in_invent = 0, cname = null, mtmp = null;
-    x = 0;
-    y = 0;
-    obj = arg.a_obj;
-    on_floor = obj.where === OBJ.FLOOR ? 1 : 0;
-    in_invent = obj.where === OBJ.INVENT ? 1 : 0;
+    let x = 0;
+    let y = 0;
+    const obj = arg.a_obj;
+    const on_floor = obj.where === OBJ.FLOOR ? 1 : 0;
+    const in_invent = obj.where === OBJ.INVENT ? 1 : 0;
     if (on_floor) {
         x = obj.ox;
         y = obj.oy;
     } else if (in_invent) {
         if (flags.verbose) {
-            cname = await corpse_xname(obj, null, CXN.NO_PFX);
+            const cname = await corpse_xname(obj, null, CXN.NO_PFX);
             await Your($c.lit("%s%s %s away%c"), $c.peq(obj, $G.uwep) ? $c.lit("wielded ") : $c.lit(""), cname, await otense(obj, $c.lit("rot")), $c.peq(obj, $G.uwep) ? 33 : 46);
         }
         if (obj.owornmask) {
@@ -2138,7 +2129,7 @@ export async function rot_corpse(arg, timeout) {   // dig.c:2146
     }
     await rot_organic(arg, timeout);
     if (on_floor) {
-        mtmp = svl.level.monsters[x][y];
+        const mtmp = svl.level.monsters[x][y];
         /* a hiding monster may be exposed */
         if (mtmp && !OBJ_AT(x, y) && mtmp.mundetected && hides_under(mtmp.data)) {
             mtmp.mundetected = 0;
@@ -2159,9 +2150,9 @@ export async function rot_corpse(arg, timeout) {   // dig.c:2146
  * @returns {Promise<number>} int
  */
 export async function wiz_debug_cmd_bury() {   // dig.c:2288
-    let otmp = null, x = 0, y = 0, before = 0, after = 0, diff = 0;
-    before = 0;
-    after = 0;
+    let otmp = null, x = 0, y = 0;
+    let before = 0;
+    let after = 0;
     for (x = u.ux - 1; x <= u.ux + 1; x = x + 1 | 0) {
         for (y = u.uy - 1; y <= u.uy + 1; y = y + 1 | 0) {
             if (!isok($c.i16(x), $c.i16(y))) {
@@ -2176,7 +2167,7 @@ export async function wiz_debug_cmd_bury() {   // dig.c:2288
             }
         }
     }
-    diff = before - after | 0;
+    const diff = before - after | 0;
     if (before === 0) {   /* there was nothing here */
         await pline($c.lit("No objects here or adjacent to bury."));
     } else if (diff === 0) {

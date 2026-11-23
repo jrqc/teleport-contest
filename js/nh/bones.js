@@ -93,8 +93,7 @@ function no_bones_level(lev) {   // bones.c:18
  * @param {number} id int
  */
 function goodfruit(id) {   // bones.c:42
-    let f = null;
-    f = fruit_from_indx(-id | 0);
+    const f = fruit_from_indx(-id | 0);
     if (f) {
         f.fid = id;
     }
@@ -237,14 +236,13 @@ async function resetobjs(ochain, restore) {   // bones.c:51
  * @param {$c.Ptr | null} namebuf char *
  */
 export function sanitize_name(namebuf) {   // bones.c:198
-    let c = 0, strip_8th_bit = 0;
-    strip_8th_bit = windowprocs.wp_id === wp_tty && !iflags.wc_eight_bit_input ? 1 : 0;
+    const strip_8th_bit = windowprocs.wp_id === wp_tty && !iflags.wc_eight_bit_input ? 1 : 0;
     /* it's tempting to skip this for single-user platforms, since
        only the current player could have left these bones--except
        things like "hearse" and other bones exchange schemes make
        that assumption false */
     while (namebuf.get(0)) {
-        c = namebuf.get(0) & 127;
+        const c = namebuf.get(0) & 127;
         if (c < 32 || c === 127) {
             /* non-printable or undesirable */
             namebuf.set(0, 46);
@@ -267,9 +265,9 @@ export function sanitize_name(namebuf) {   // bones.c:198
  * @returns {Promise<void>}
  */
 async function give_to_nearby_mon(otmp, x, y) {   // bones.c:226
-    let mtmp = null, selected = null, nmon = 0, xx = 0, yy = 0;
-    selected = null;
-    nmon = 0;
+    let mtmp = null, xx = 0, yy = 0;
+    let selected = null;
+    let nmon = 0;
     for (xx = x - 1; xx <= x + 1; xx = xx + 1 | 0) {
         for (yy = y - 1; yy <= y + 1; yy = yy + 1 | 0) {
             if (!isok($c.i16(xx), $c.i16(yy))) {
@@ -358,7 +356,7 @@ export async function drop_upon_death(mtmp, cont, x, y) {   // bones.c:259
  * @returns {Promise<number>} boolean
  */
 async function fixuporacle(oracle) {   // bones.c:308
-    let cc = new $T.nhcoord(), ridx = 0, o_ridx = 0;
+    let cc = new $T.nhcoord(), ridx = 0;
     /* oracle doesn't move, but knight's joust or monk's staggering blow
        could push her onto a hole in the floor; at present, traps don't
        activate in such situation hence she won't fall to another level;
@@ -367,7 +365,7 @@ async function fixuporacle(oracle) {   // bones.c:308
         return FALSE;
     }
     oracle.mpeaceful = 1;   /* for behavior toward next character */
-    o_ridx = svl.level.locations[oracle.mx][oracle.my].roomno - ROOMOFFSET;
+    let o_ridx = svl.level.locations[oracle.mx][oracle.my].roomno - ROOMOFFSET;
     if (o_ridx >= 0 && svr.rooms[o_ridx].rtype === DELPHI) {
         return TRUE;   /* no fixup needed */
     }
@@ -445,8 +443,7 @@ export function can_make_bones() {   // bones.c:356
  * @returns {Promise<void>}
  */
 async function remove_mon_from_bones(mtmp) {   // bones.c:390
-    let mptr = null;
-    mptr = mtmp.data;
+    const mptr = mtmp.data;
     /* mptr == &mons[VLAD_THE_IMPALER] || cham == VLAD */
     if (mtmp.iswiz || mptr === mons[PM.MEDUSA] || mptr.msound === MS.NEMESIS || mptr.msound === MS.LEADER || is_Vlad(mtmp) || mptr === mons[PM.ORACLE] && !await fixuporacle(mtmp)) {
         await mongone(mtmp);
@@ -674,8 +671,8 @@ export async function savebones(how, when, corpse) {   // bones.c:403
  * @returns {Promise<number>} int
  */
 export async function getbones() {   // bones.c:630
-    let ok = 0, nhfp = null, c = Int8Array.of(0), bonesid = [null], oldbonesid = new Int8Array(40), ancestor_nhuuid = new Int8Array(37), save_plnmsg = 0, errbuf = new Int8Array(256), mtmp = null, save_plnmsg$2 = 0;
-    nhfp = null;
+    let ok = 0, c = Int8Array.of(0), bonesid = [null], oldbonesid = new Int8Array(40), ancestor_nhuuid = new Int8Array(37), errbuf = new Int8Array(256), mtmp = null;
+    let nhfp = null;
     c[0] = 0;
     oldbonesid.fill(0);
     oldbonesid[0] = 0;   /* was [10]; more should be safer */
@@ -731,7 +728,7 @@ export async function getbones() {   // bones.c:630
             if (wizard()) {
                 do {
                     if (debugcore($c.lit("bones.c"), TRUE)) {
-                        save_plnmsg = iflags.last_msg;
+                        const save_plnmsg = iflags.last_msg;
                         await pline($c.lit("Abandoning bones , %u > %u."), c[0] >>> 0, 40);
                         iflags.last_msg = save_plnmsg;
                     }
@@ -768,7 +765,7 @@ export async function getbones() {   // bones.c:630
                     if (wizard()) {
                         do {
                             if (debugcore($c.lit("bones.c"), TRUE)) {
-                                save_plnmsg$2 = iflags.last_msg;
+                                const save_plnmsg$2 = iflags.last_msg;
                                 await pline($c.lit("Removing defunct monster %s from bones."), mtmp.data.pmnames[NEUTRAL]);
                                 iflags.last_msg = save_plnmsg$2;
                             }
@@ -813,12 +810,12 @@ export async function getbones() {   // bones.c:630
  * @returns {number} boolean
  */
 export function bones_include_name(name) {   // bones.c:762
-    let bp = null, len = 0, buf = new Int8Array(256);
+    let bp = null, buf = new Int8Array(256);
     /* prepare buffer by appending terminal hyphen to name, to avoid partial
      * matches producing false positives */
     $c.strcpy(new $c.Ptr(buf, 0), name);
     $c.strcat(new $c.Ptr(buf, 0), $c.lit("-"));
-    len = $c.strlen(new $c.Ptr(buf, 0));
+    const len = $c.strlen(new $c.Ptr(buf, 0));
     for (bp = svl.level.bonesinfo; bp; bp = bp.next) {
         if (!$c.strncmp(new $c.Ptr(bp.who, 0), new $c.Ptr(buf, 0), len)) {
             return TRUE;

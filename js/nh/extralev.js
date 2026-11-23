@@ -170,9 +170,9 @@ async function roguecorr(x, y, dir) {   // extralev.c:45
  * @param {number} y coordxy
  */
 function miniwalk(x, y) {   // extralev.c:139
-    let q = 0, dir = 0, dirs = new Int32Array(4), $t1, $t2, $t3, $t4;
+    let dirs = new Int32Array(4), $t1, $t2, $t3, $t4;
     while (1) {
-        q = 0;
+        let q = 0;
         if (x > 0 && !(gr.r[x][y].doortable & XL_LEFT) && (!gr.r[x - 1][y].doortable || !rn2(10))) {
             dirs[($t1 = q, q = $t1 + 1 | 0, $t1)] = 0;
         }
@@ -191,7 +191,7 @@ function miniwalk(x, y) {   // extralev.c:139
         if (!q) {
             return;
         }
-        dir = dirs[rn2(q)];
+        const dir = dirs[rn2(q)];
         switch (dir) {
             case 0:
                 /* Move in direction */
@@ -222,7 +222,7 @@ function miniwalk(x, y) {   // extralev.c:139
  * @returns {Promise<void>}
  */
 export async function makeroguerooms() {   // extralev.c:193
-    let x = 0, y = 0, lowx = 0, lowy = 0, hix = 0, hiy = 0, $t1, $t2, $t3, $t4, $t5, $t6;
+    let x = 0, y = 0, $t1, $t2, $t3, $t4, $t5, $t6;
     /* Rogue levels are structured 3 by 3, with each section containing
      * a room or an intersection.  The minimum width is 2 each way.
      * One difference between these and "real" Rogue levels: real Rogue
@@ -272,10 +272,10 @@ export async function makeroguerooms() {   // extralev.c:193
                 /* Make a room */
                 gr.r[x][y].nroom = svn.nroom;
                 gs.smeq[svn.nroom] = svn.nroom;
-                lowx = $c.i16(1 + Math.imul(26, x) + gr.r[x][y].rlx);
-                lowy = $c.i16(Math.imul(7, y) + gr.r[x][y].rly);
-                hix = $c.i16(1 + Math.imul(26, x) + gr.r[x][y].rlx + gr.r[x][y].dx - 1);
-                hiy = $c.i16(Math.imul(7, y) + gr.r[x][y].rly + gr.r[x][y].dy - 1);
+                const lowx = $c.i16(1 + Math.imul(26, x) + gr.r[x][y].rlx);
+                const lowy = $c.i16(Math.imul(7, y) + gr.r[x][y].rly);
+                const hix = $c.i16(1 + Math.imul(26, x) + gr.r[x][y].rlx + gr.r[x][y].dx - 1);
+                const hiy = $c.i16(Math.imul(7, y) + gr.r[x][y].rly + gr.r[x][y].dy - 1);
                 /* Strictly speaking, it should be lit only if above
                  * level 10, but since Rogue rooms are only
                  * encountered below level 10, use !rn2(7).
@@ -317,13 +317,13 @@ export function corr(x, y) {   // extralev.c:278
  * @returns {Promise<void>}
  */
 export async function makerogueghost() {   // extralev.c:288
-    let ghost = null, ghostobj = null, croom = null, x = 0, y = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8;
+    let ghost = null, ghostobj = null, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8;
     if (!svn.nroom) {
         return;   /* Should never happen */
     }
-    croom = $c.relem(svr.rooms, rn2(svn.nroom));
-    x = $c.i16(somex(croom));
-    y = $c.i16(somey(croom));
+    const croom = $c.relem(svr.rooms, rn2(svn.nroom));
+    const x = $c.i16(somex(croom));
+    const y = $c.i16(somey(croom));
     if (!(ghost = await makemon(mons[PM.GHOST], x, y, NO.MM_FLAGS))) {
         return;
     }

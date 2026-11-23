@@ -112,10 +112,9 @@ const gem_accept$addluck = new Int8Array(12);   // static in gem_accept()
  * @returns {number} int
  */
 export function multishot_class_bonus(pm, ammo, launcher) {   // dothrow.c:39
-    let multishot = 0, skill = 0;
     /* can be NULL */
-    multishot = 0;
-    skill = objects[ammo.otyp].oc_subtyp;
+    let multishot = 0;
+    const skill = objects[ammo.otyp].oc_subtyp;
     switch (pm) {
         case PM.CAVE_DWELLER:
             /* give bonus for low-tech gear */
@@ -408,7 +407,7 @@ async function throw_ok(obj) {   // dothrow.c:317
  * @returns {Promise<number>} int
  */
 export async function dothrow() {   // dothrow.c:352
-    let obj = null, shotlimit = Int32Array.of(0);
+    let shotlimit = Int32Array.of(0);
     /*
      * Since some characters shoot multiple missiles at one time,
      * allow user to specify a count prefix for 'f' or 't' to limit
@@ -423,7 +422,7 @@ export async function dothrow() {   // dothrow.c:352
     if (!await ok_to_throw(new $c.Ptr(shotlimit, 0))) {
         return ECMD.OK;
     }
-    obj = await getobj($c.lit("throw"), throw_ok, GETOBJ_PROMPT | GETOBJ.ALLOWCNT);
+    const obj = await getobj($c.lit("throw"), throw_ok, GETOBJ_PROMPT | GETOBJ.ALLOWCNT);
     /* it is also possible to throw food */
     /* (or jewels, or iron balls... ) */
     return obj ? await throw_obj(obj, shotlimit[0]) : ECMD.CANCEL;
@@ -434,11 +433,11 @@ export async function dothrow() {   // dothrow.c:352
  * @returns {Promise<void>}
  */
 async function autoquiver() {   // dothrow.c:381
-    let otmp = null, oammo = null, omissile = null, omisc = null, altammo = null;
-    oammo = null;
-    omissile = null;
-    omisc = null;
-    altammo = null;
+    let otmp = null;
+    let oammo = null;
+    let omissile = null;
+    let omisc = null;
+    let altammo = null;
     if ($G.uquiver) {
         return;
     }
@@ -524,12 +523,12 @@ function find_launcher(ammo) {   // dothrow.c:447
  * @returns {Promise<number>} int
  */
 export async function dofire() {   // dothrow.c:469
-    let shotlimit = Int32Array.of(0), obj = null, uwep_Throw_and_Return = 0, skip_fireassist = 0, altres = 0, res = 0, olauncher = null;
+    let shotlimit = Int32Array.of(0), olauncher = null;
     /* AutoReturn() verifies Valkyrie if weapon is Mjollnir, but it relies
        on its caller to make sure hero is strong enough to throw that */
-    uwep_Throw_and_Return = $G.uwep && ($c.and64($G.uwep.owornmask, W.WEP) !== 0 && ($G.uwep.otyp === AKLYS || $G.uwep.oartifact === ART.MJOLLNIR && gu.urole.mnum === PM.VALKYRIE) || $G.uwep.otyp === BOOMERANG) && ($G.uwep.oartifact !== ART.MJOLLNIR || ACURR(A.STR) >= 125) ? 1 : 0;
-    skip_fireassist = FALSE;
-    res = ECMD.OK;
+    const uwep_Throw_and_Return = $G.uwep && ($c.and64($G.uwep.owornmask, W.WEP) !== 0 && ($G.uwep.otyp === AKLYS || $G.uwep.oartifact === ART.MJOLLNIR && gu.urole.mnum === PM.VALKYRIE) || $G.uwep.otyp === BOOMERANG) && ($G.uwep.oartifact !== ART.MJOLLNIR || ACURR(A.STR) >= 125) ? 1 : 0;
+    let skip_fireassist = FALSE;
+    let res = ECMD.OK;
     /*
      * Same as dothrow(), except we use quivered missile instead
      * of asking what to throw/shoot.  [Note: with the advent of
@@ -550,7 +549,7 @@ export async function dofire() {   // dothrow.c:469
     if (!await ok_to_throw(new $c.Ptr(shotlimit, 0))) {
         return ECMD.OK;
     }
-    obj = $G.uquiver;
+    let obj = $G.uquiver;
     /* if wielding a throw-and-return weapon, throw it if quiver is empty
        or has ammo rather than missiles [since the throw/return weapon is
        wielded, the ammo's launcher isn't; the ammo-only policy avoids
@@ -623,7 +622,7 @@ export async function dofire() {   // dothrow.c:469
             return res;
         }
     }
-    altres = obj ? await throw_obj(obj, shotlimit[0]) : ECMD.CANCEL;
+    const altres = obj ? await throw_obj(obj, shotlimit[0]) : ECMD.CANCEL;
     /* fire can take time by filling quiver (if that causes something which
        was wielded to be unwielded) even if the throw itself gets cancelled */
     return res === ECMD.TIME ? res : altres;
@@ -649,7 +648,6 @@ export async function endmultishot(verbose) {   // dothrow.c:590
  * @returns {Promise<void>}
  */
 export async function hitfloor(obj, verbosely) {   // dothrow.c:606
-    let verb = null, surf = null, t = null;
     /* usually True; False if caller has given drop mesg */
     if (svl.level.locations[u.ux][u.uy].typ === AIR || svl.level.locations[u.ux][u.uy].typ === CLOUD || svl.level.locations[u.ux][u.uy].typ >= POOL && svl.level.locations[u.ux][u.uy].typ <= DRAWBRIDGE_UP || u.uinwater || u.uswallow) {
         await dropy(obj);
@@ -658,9 +656,9 @@ export async function hitfloor(obj, verbosely) {   // dothrow.c:606
     if (svl.level.locations[u.ux][u.uy].typ === ALTAR) {
         await doaltarobj(obj);
     } else if (verbosely) {
-        verb = obj.otyp === WAN_STRIKING ? $c.lit("strike") : $c.lit("hit");
-        surf = surface(u.ux, u.uy);
-        t = t_at(u.ux, u.uy);
+        const verb = obj.otyp === WAN_STRIKING ? $c.lit("strike") : $c.lit("hit");
+        let surf = surface(u.ux, u.uy);
+        const t = t_at(u.ux, u.uy);
         /* describe something that might keep the object where it is
            or precede next message stating that it falls */
         if (t && t.tseen) {
@@ -703,8 +701,8 @@ export async function hitfloor(obj, verbosely) {   // dothrow.c:606
  * @returns {Promise<number>} boolean
  */
 export async function walk_path(src_cc, dest_cc, check_proc, arg) {   // dothrow.c:656
-    let err = 0, x = 0, y = 0, dx = 0, dy = 0, x_change = 0, y_change = 0, i = 0, prev_x = 0, prev_y = 0, keep_going = 0, $t1, $t2;
-    keep_going = TRUE;
+    let err = 0, x = 0, y = 0, x_change = 0, y_change = 0, $t1, $t2;
+    let keep_going = TRUE;
     /* Use Bresenham's Line Algorithm to walk from src to dest.
      *
      * This should be replaced with a more versatile algorithm
@@ -721,10 +719,10 @@ export async function walk_path(src_cc, dest_cc, check_proc, arg) {   // dothrow
      * need to work more like 'travel', distinguishing between
      * testing a possible move and actually attempting that move.
      */
-    dx = $c.i16(dest_cc.x - src_cc.x);
-    dy = $c.i16(dest_cc.y - src_cc.y);
-    prev_x = x = src_cc.x;
-    prev_y = y = src_cc.y;
+    let dx = $c.i16(dest_cc.x - src_cc.x);
+    let dy = $c.i16(dest_cc.y - src_cc.y);
+    let prev_x = x = src_cc.x;
+    let prev_y = y = src_cc.y;
     if (dx < 0) {
         x_change = -1;
         dx = $c.i16(-dx | 0);
@@ -737,7 +735,7 @@ export async function walk_path(src_cc, dest_cc, check_proc, arg) {   // dothrow
     } else {
         y_change = 1;
     }
-    i = $c.i16(err = 0);
+    let i = $c.i16(err = 0);
     if (dx < dy) {
         while (($t1 = i, i = $c.i16($t1 + 1), $t1) < dy) {
             prev_x = x;
@@ -787,11 +785,10 @@ export async function walk_path(src_cc, dest_cc, check_proc, arg) {   // dothrow
  * @returns {Promise<number>} boolean
  */
 export async function hurtle_jump(arg, x, y) {   // dothrow.c:742
-    let res = 0, save_EWwalking = 0;
-    save_EWwalking = u.uprops[WWALKING].extrinsic;
+    const save_EWwalking = u.uprops[WWALKING].extrinsic;
     /* prevent jumping over water from being placed in that water */
     u.uprops[WWALKING].extrinsic = $c.or64(u.uprops[WWALKING].extrinsic, I_SPECIAL);
-    res = await hurtle_step(arg, x, y);
+    const res = await hurtle_step(arg, x, y);
     u.uprops[WWALKING].extrinsic = save_EWwalking;
     return res;
 }
@@ -820,10 +817,10 @@ export async function hurtle_jump(arg, x, y) {   // dothrow.c:742
  * @returns {Promise<number>} boolean
  */
 export async function hurtle_step(arg, x, y) {   // dothrow.c:773
-    let ox = 0, oy = 0, range = null, obj = null, mon = null, may_pass = 0, via_jumping = 0, stopping_short = 0, ttmp = null, lev = null, ltyp = 0, dmg = 0, why = null, diagonal = 0, open_door = 0, odoor_diag = 0, too_much = 0, mnam = null, glyph = 0, bc_control = Int32Array.of(0), ballx = Int16Array.of(0), bally = Int16Array.of(0), chainx = Int16Array.of(0), chainy = Int16Array.of(0), cause_delay = Int8Array.of(0);
-    range = $c.asArr(arg, Int32Array);
-    may_pass = TRUE;
-    dmg = 0;
+    let obj = null, mon = null, ttmp = null, bc_control = Int32Array.of(0), ballx = Int16Array.of(0), bally = Int16Array.of(0), chainx = Int16Array.of(0), chainy = Int16Array.of(0), cause_delay = Int8Array.of(0);
+    const range = $c.asArr(arg, Int32Array);
+    let may_pass = TRUE;
+    let dmg = 0;
     if (!isok(x, y)) {
         await You_feel($c.lit("the spirits holding you back."));
         return FALSE;
@@ -832,15 +829,15 @@ export async function hurtle_step(arg, x, y) {   // dothrow.c:773
     } else if (range.get(0) === 0) {
         return FALSE;   /* previous step wants to stop now */
     }
-    via_jumping = $c.and64(u.uprops[WWALKING].extrinsic, I_SPECIAL) !== 0 ? 1 : 0;
-    stopping_short = via_jumping && range.get(0) < 2 ? 1 : 0;
-    lev = $c.relem(svl.level.locations[x], y);
-    ltyp = lev.typ;
+    const via_jumping = $c.and64(u.uprops[WWALKING].extrinsic, I_SPECIAL) !== 0 ? 1 : 0;
+    const stopping_short = via_jumping && range.get(0) < 2 ? 1 : 0;
+    const lev = $c.relem(svl.level.locations[x], y);
+    const ltyp = lev.typ;
     if (!Passes_walls() || !(may_pass = may_passwall(x, y))) {
-        why = null;
-        diagonal = u.ux - x !== 0 && u.uy - y !== 0 ? 1 : 0;
-        open_door = IS_DOOR(ltyp) && (lev.flags & D.ISOPEN) !== 0 ? 1 : 0;
-        odoor_diag = open_door && diagonal ? 1 : 0;
+        let why = null;
+        const diagonal = u.ux - x !== 0 && u.uy - y !== 0 ? 1 : 0;
+        const open_door = IS_DOOR(ltyp) && (lev.flags & D.ISOPEN) !== 0 ? 1 : 0;
+        const odoor_diag = open_door && diagonal ? 1 : 0;
         if (svl.level.locations[x][y].typ < POOL || closed_door(x, y) || odoor_diag) {
             why = IS_TREE(ltyp) ? $c.lit("bumping into a tree") : IS_OBSTRUCTED(ltyp) ? $c.lit("bumping into a wall") : odoor_diag ? $c.lit("bumping into a door frame") : $c.lit("bumping into a closed door");
             if (odoor_diag) {
@@ -858,7 +855,7 @@ export async function hurtle_step(arg, x, y) {   // dothrow.c:773
             why = $c.lit("touching the edge of the universe");
             await You($c.lit("smack into something!"));
         } else if (diagonal && bad_rock(gy.youmonst.data, u.ux, y) && bad_rock(gy.youmonst.data, x, u.uy)) {
-            too_much = gi.invent && (inv_weight() + weight_cap() | 0) > WT.TOOMUCH_DIAGONAL ? 1 : 0;
+            const too_much = gi.invent && (inv_weight() + weight_cap() | 0) > WT.TOOMUCH_DIAGONAL ? 1 : 0;
             if (bigmonst(gy.youmonst.data) || too_much) {
                 why = $c.lit("wedging into a narrow crevice");
                 await You($c.lit("%sget forcefully wedged into a crevice."), too_much ? $c.lit("and all your belongings ") : $c.lit(""));
@@ -876,11 +873,11 @@ export async function hurtle_step(arg, x, y) {   // dothrow.c:773
      * for that, we need to know that the range is not exhausted
      * and also that the next spot doesn't contain an obstacle */
     if ((mon = svl.level.monsters[x][y]) !== null) {
-        glyph = glyph_at(x, y);
+        const glyph = glyph_at(x, y);
         mon.mundetected = 0;   /* wakeup() will handle mimic */
         /* after unhiding; combination of a_monnam() and some_mon_nam();
            yields "someone" or "something" instead of "it" for unseen mon */
-        mnam = await x_monnam(mon, ARTICLE.A, null, (has_mgivenname(mon) ? SUPPRESS.SADDLE : 0) | AUGMENT_IT, FALSE);
+        const mnam = await x_monnam(mon, ARTICLE.A, null, (has_mgivenname(mon) ? SUPPRESS.SADDLE : 0) | AUGMENT_IT, FALSE);
         if (!glyph_is_monster(glyph) && !glyph_is_invisible(glyph)) {
             await You($c.lit("find %s by bumping into %s."), mnam, genders[pronoun_gender(mon, PRONOUN.NO_IT | PRONOUN.HALLU)].him);
         } else {
@@ -916,8 +913,8 @@ export async function hurtle_step(arg, x, y) {   // dothrow.c:773
             await move_bc(0, bc_control[0], ballx[0], bally[0], chainx[0], chainy[0]);
         }
     }
-    ox = u.ux;
-    oy = u.uy;
+    const ox = u.ux;
+    const oy = u.uy;
     await u_on_newpos(x, y);   /* set u.<ux,uy>, u.usteed-><mx,my>; cliparound(); */
     await newsym(ox, oy);   /* update old position */
     await vision_recalc(1);   /* update for new position */
@@ -1013,8 +1010,8 @@ export function will_hurtle(mon, x, y) {   // dothrow.c:977
  * @returns {Promise<number>} boolean
  */
 async function mhurtle_step(arg, x, y) {   // dothrow.c:992
-    let mon = null, mtmp = null, res = 0;
-    mon = $c.asRec(arg, $T.monst, 192);
+    let mtmp = null;
+    const mon = $c.asRec(arg, $T.monst, 192);
     if (!isok(x, y)) {
         return FALSE;
     }
@@ -1037,7 +1034,7 @@ async function mhurtle_step(arg, x, y) {   // dothrow.c:992
         if (is_waterwall(x, y)) {
             return FALSE;
         }
-        res = await mintrap(mon, HURTLING);
+        const res = await mintrap(mon, HURTLING);
         if (res === Trap.Killed_Mon || res === Trap.Caught_Mon || res === Trap.Moved_Mon) {
             return FALSE;
         }
@@ -1198,12 +1195,11 @@ export async function mhurtle(mon, dx, dy, range) {   // dothrow.c:1130
  * @returns {Promise<void>}
  */
 async function check_shop_obj(obj, x, y, broken) {   // dothrow.c:1181
-    let costly_xy = 0, shkp = null, oshops = null, gtg = 0;
-    shkp = await shop_keeper(new $c.Ptr(u.ushops, 0).get(0));
+    const shkp = await shop_keeper(new $c.Ptr(u.ushops, 0).get(0));
     if (!shkp) {
         return;
     }
-    costly_xy = await costly_spot(x, y);
+    const costly_xy = await costly_spot(x, y);
     if (broken || !costly_xy || in_rooms(x, y, SHOPBASE).get(0) !== new $c.Ptr(u.ushops, 0).get(0)) {
         /* thrown out of a shop or into a different shop */
         if (is_unpaid(obj)) {
@@ -1213,12 +1209,12 @@ async function check_shop_obj(obj, x, y, broken) {   // dothrow.c:1181
             obj.no_charge = 1;
         }
     } else if (costly_xy) {
-        oshops = in_rooms(x, y, SHOPBASE);
+        const oshops = in_rooms(x, y, SHOPBASE);
         /* ushops0: in case we threw while levitating and recoiled
            out of shop (most likely to the shk's spot in front of door) */
         if (oshops.get(0) === new $c.Ptr(u.ushops, 0).get(0) || oshops.get(0) === new $c.Ptr(u.ushops0, 0).get(0)) {
             if (is_unpaid(obj)) {
-                gtg = Has_contents(obj) ? contained_gold(obj, TRUE) : 0;
+                const gtg = Has_contents(obj) ? contained_gold(obj, TRUE) : 0;
                 await subfrombill(obj, shkp);
                 if (gtg > 0) {
                     await donate_gold(gtg, shkp, TRUE);
@@ -1237,8 +1233,7 @@ async function check_shop_obj(obj, x, y, broken) {   // dothrow.c:1181
  * @returns {number} boolean
  */
 export function harmless_missile(obj) {   // dothrow.c:1220
-    let otyp = 0;
-    otyp = obj.otyp;
+    const otyp = obj.otyp;
     /* this list is fairly arbitrary */
     switch (otyp) {
         case SLING:
@@ -1470,11 +1465,11 @@ export function throwing_weapon(obj) {   // dothrow.c:1430
  * @returns {Promise<void>}
  */
 async function sho_obj_return_to_u(obj) {   // dothrow.c:1442
-    let x = 0, y = 0, $t1;
+    let $t1;
     /* might already be our location (bounced off a wall) */
     if ((u.dx || u.dy) && (gb.bhitpos.x !== u.ux || gb.bhitpos.y !== u.uy)) {
-        x = gb.bhitpos.x - u.dx | 0;
-        y = gb.bhitpos.y - u.dy | 0;
+        let x = gb.bhitpos.x - u.dx | 0;
+        let y = gb.bhitpos.y - u.dy | 0;
         await tmp_at(DISP_FLASH, $c.i16(obj.otyp === STATUE ? u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) + (!rn2_on_display_rng(2) ? GLYPH.MON_MALE_OFF : GLYPH.MON_FEM_OFF) | 0 : obj.corpsenm + ((obj.spe & CORPSTAT.GENDER) === CORPSTAT.FEMALE ? obj.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[obj.ox][obj.oy].v.v_nexthere) !== null && (obj.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.STATUE_FEM_PILETOP_OFF : GLYPH.STATUE_FEM_OFF : obj.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[obj.ox][obj.oy].v.v_nexthere) !== null && (obj.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.STATUE_MALE_PILETOP_OFF : GLYPH.STATUE_MALE_OFF) | 0 : u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? ($t1 = await rn2_on_display_rng(NUM_OBJECTS - FIRST_OBJECT) + FIRST_OBJECT | 0, go.otg_temp = $t1) === CORPSE ? await rn2_on_display_rng(NUMMONS) + GLYPH.BODY_OFF | 0 : go.otg_temp + GLYPH.OBJ_OFF | 0 : obj.otyp === CORPSE ? obj.corpsenm + (obj.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[obj.ox][obj.oy].v.v_nexthere) !== null && (obj.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.BODY_PILETOP_OFF : GLYPH.BODY_OFF) | 0 : !obj.dknown && (obj.oclass === POTION_CLASS || obj.otyp >= FIRST_REAL_GEM && obj.otyp <= LAST_GLASS_GEM || obj.otyp >= FIRST_SPELL && obj.otyp <= LAST_SPELL) ? obj.oclass + (obj.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[obj.ox][obj.oy].v.v_nexthere) !== null && (obj.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.OBJ_PILETOP_OFF : GLYPH.OBJ_OFF) : obj.otyp + (obj.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[obj.ox][obj.oy].v.v_nexthere) !== null && (obj.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.OBJ_PILETOP_OFF : GLYPH.OBJ_OFF)));
         while (isok($c.i16(x), $c.i16(y)) && (x !== u.ux || y !== u.uy)) {
             await tmp_at($c.i16(x), $c.i16(y));
@@ -1516,14 +1511,13 @@ async function swallowit(obj) {   // dothrow.c:1468
  * @returns {Promise<number>} boolean
  */
 export async function throwit_mon_hit(obj, mon) {   // dothrow.c:1482
-    let obj_gone = 0;
     if (mon) {
         if (mon.isshk && obj.where === OBJ.MINVENT && $c.peq(obj.v.v_ocarry, mon)) {
             return TRUE;
         }
         await snuff_candle(obj);
         gn.notonhead = gb.bhitpos.x !== mon.mx || gb.bhitpos.y !== mon.my ? 1 : 0;
-        obj_gone = $c.i8(await thitmonst(mon, obj));
+        const obj_gone = $c.i8(await thitmonst(mon, obj));
         /* Monster may have been tamed; this frees old mon [obsolete] */
         mon = svl.level.monsters[gb.bhitpos.x][gb.bhitpos.y];
         /* [perhaps this should be moved into thitmonst or hmon] */
@@ -1546,17 +1540,17 @@ export async function throwit_mon_hit(obj, mon) {   // dothrow.c:1482
  */
 export async function throwit(obj$in, wep_mask, twoweap, oldslot) {   // dothrow.c:1510
     const obj = [obj$in];
-    let mon = null, range = 0, urange = 0, arw = null, crossbowing = 0, impaired = 0, tethered_weapon = 0, slipok = 0, dmg = Int32Array.of(0), $t1, $t2, $t3, $t4, $t5, $t6, $t7;
+    let mon = null, range = 0, dmg = Int32Array.of(0), $t1, $t2, $t3, $t4, $t5, $t6, $t7;
     /* used to re-equip returning boomerang */
     /* used to restore twoweapon mode if
      * wielded weapon returns */
     /* for thrown-and-return used with !fixinv */
-    arw = autoreturn_weapon(obj[0]);
-    impaired = u.uprops[CONFUSION].intrinsic || u.uprops[STUNNED].intrinsic || Blind() || Hallucination() || Fumbling() ? 1 : 0;
-    tethered_weapon = arw && arw.tethered && $c.and64(wep_mask, W.WEP) !== 0 ? 1 : 0;
+    const arw = autoreturn_weapon(obj[0]);
+    let impaired = u.uprops[CONFUSION].intrinsic || u.uprops[STUNNED].intrinsic || Blind() || Hallucination() || Fumbling() ? 1 : 0;
+    const tethered_weapon = arw && arw.tethered && $c.and64(wep_mask, W.WEP) !== 0 ? 1 : 0;
     gn.notonhead = FALSE;   /* reset potentially stale value */
     if ((obj[0].cursed || obj[0].greased) && (u.dx || u.dy) && !rn2(7)) {
-        slipok = TRUE;
+        let slipok = TRUE;
         if (ammo_and_launcher(obj[0], $G.uwep)) {
             await pline($c.lit("%s!"), await Tobjnam(obj[0], $c.lit("misfire")));
         } else {
@@ -1632,8 +1626,8 @@ export async function throwit(obj$in, wep_mask, twoweap, oldslot) {   // dothrow
         }
     } else {
         /* crossbow range is independent of strength */
-        crossbowing = ammo_and_launcher(obj[0], $G.uwep) && weapon_type($G.uwep) === P.CROSSBOW ? 1 : 0;
-        urange = $c.div32(crossbowing ? 18 : ACURRSTR(), 2);
+        const crossbowing = ammo_and_launcher(obj[0], $G.uwep) && weapon_type($G.uwep) === P.CROSSBOW ? 1 : 0;
+        let urange = $c.div32(crossbowing ? 18 : ACURRSTR(), 2);
         /* balls are easy to throw or at least roll;
          * also, this insures the maximum range of a ball is greater
          * than 1, so the effects from throwing attached balls are
@@ -1867,12 +1861,11 @@ export async function throwit(obj$in, wep_mask, twoweap, oldslot) {   // dothrow
  * @returns {Promise<$T.obj | null>} struct obj *
  */
 async function return_throw_to_inv(obj, wep_mask, twoweap, oldslot) {   // dothrow.c:1855
-    let otmp = null;
     /* object to add to invent */
     /* its owornmask before it was removed from invent */
     /* True if hero was dual-wielding before removal */
     /* following item in invent in case of '!fixinv' */
-    otmp = null;
+    let otmp = null;
     /* if 'obj' is from a stack split, we can put it back by undoing split
        so there's no chance of merging with some other compatible stack */
     if (obj.o_id === svc.context.objsplit.parent_oid || obj.o_id === svc.context.objsplit.child_oid) {
@@ -1925,7 +1918,6 @@ async function return_throw_to_inv(obj, wep_mask, twoweap, oldslot) {   // dothr
  */
 export async function omon_adj(mon, obj, mon_notices) {   // dothrow.c:1913
     let tmp = 0;
-    tmp = 0;
     /* size of target affects the chance of hitting */
     tmp = tmp + (mon.data.msize - MZ.MEDIUM) | 0;   /* -2..+5 */
     /* sleeping target is more likely to be hit */
@@ -1966,8 +1958,7 @@ export async function omon_adj(mon, obj, mon_notices) {   // dothrow.c:1913
  * @returns {Promise<void>}
  */
 async function tmiss(obj, mon, maybe_wakeup) {   // dothrow.c:1951
-    let missile = null;
-    missile = await mshot_xname(obj);
+    const missile = await mshot_xname(obj);
     /* If the target can't be seen or doesn't look like a valid target,
        avoid "the arrow misses it," or worse, "the arrows misses the mimic."
        An attentive player will still notice that this is different from
@@ -1989,7 +1980,6 @@ async function tmiss(obj, mon, maybe_wakeup) {   // dothrow.c:1951
  * @returns {number} boolean
  */
 export function should_mulch_missile(obj) {   // dothrow.c:1976
-    let broken = 0, chance = 0;
     /* only ammo (excluding magic stones) or missiles will break */
     if (!obj || !(is_ammo(obj) || is_missile(obj)) || obj.otyp === BOOMERANG || objects[obj.otyp].oc_magic) {
         return FALSE;
@@ -1997,8 +1987,8 @@ export function should_mulch_missile(obj) {   // dothrow.c:1976
     /* we had been breaking 2/3 of everything unconditionally.  we still don't
        want anything to survive unconditionally, but we need ammo to stay
        around longer on average. */
-    chance = 3 + greatest_erosion(obj) - obj.spe;
-    broken = $c.i8(chance > 1 ? rn2(chance) : !rn2(4) ? 1 : 0);
+    const chance = 3 + greatest_erosion(obj) - obj.spe;
+    let broken = $c.i8(chance > 1 ? rn2(chance) : !rn2(4) ? 1 : 0);
     if (obj.blessed && (svc.context.mon_moving ? !rn2(3) : !rnl(4))) {
         broken = FALSE;
     }
@@ -2020,13 +2010,13 @@ export function should_mulch_missile(obj) {   // dothrow.c:1976
  * @returns {Promise<number>} int
  */
 export async function thitmonst(mon, obj) {   // dothrow.c:2011
-    let tmp = 0, disttmp = 0, otyp = 0, hmode = 0, guaranteed_hit = 0, dieroll = 0, next2u = 0, wasthrown = 0, chopper = 0, was_swallowed = 0, trail = new Int8Array(256), monname = null, md = null;
+    let trail = new Int8Array(256);
     /* gt.thrownobj or gk.kickedobj or uwep */
     /* Base chance to hit */
     /* distance modifier */
-    otyp = obj.otyp;
-    guaranteed_hit = engulfing_u(mon);
-    hmode = $c.peq(obj, $G.uwep) ? HMON.APPLIED : $c.peq(obj, gk.kickedobj) ? HMON.KICKED : HMON.THROWN;
+    const otyp = obj.otyp;
+    const guaranteed_hit = engulfing_u(mon);
+    const hmode = $c.peq(obj, $G.uwep) ? HMON.APPLIED : $c.peq(obj, gk.kickedobj) ? HMON.KICKED : HMON.THROWN;
     /* Differences from melee weapons:
      *
      * Dex still gives a bonus, but strength does not.
@@ -2038,7 +2028,7 @@ export async function thitmonst(mon, obj) {   // dothrow.c:2011
      * Certain items which don't in themselves do damage ignore 'tmp'.
      * Distance and monster size affect chance to hit.
      */
-    tmp = ((-1 + Luck() + find_mac(mon) | 0) + u.uhitinc | 0) + (u.umonnum !== u.umonster ? gy.youmonst.data.mlevel : u.ulevel) | 0;
+    let tmp = ((-1 + Luck() + find_mac(mon) | 0) + u.uhitinc | 0) + (u.umonnum !== u.umonster ? gy.youmonst.data.mlevel : u.ulevel) | 0;
     if (ACURR(A.DEX) < 4) {
         tmp = tmp - 3 | 0;
     } else if (ACURR(A.DEX) < 6) {
@@ -2052,7 +2042,7 @@ export async function thitmonst(mon, obj) {   // dothrow.c:2011
      * Polearms get a distance penalty even when wielded; it's
      * hard to hit at a distance.
      */
-    disttmp = 3 - distmin(u.ux, u.uy, mon.mx, mon.my) | 0;
+    let disttmp = 3 - distmin(u.ux, u.uy, mon.mx, mon.my) | 0;
     if (disttmp < -4) {
         disttmp = -4;
     }
@@ -2129,7 +2119,7 @@ export async function thitmonst(mon, obj) {   // dothrow.c:2011
             } else {
                 /* under normal circumstances, leader will say something and
                    then return the item to the hero */
-                next2u = monnear(mon, u.ux, u.uy);
+                const next2u = monnear(mon, u.ux, u.uy);
                 await finish_quest(obj);   /* acknowledge quest completion */
                 await pline($c.lit("%s %s %s back to you."), await Some_Monnam(mon), next2u ? $c.lit("hands") : $c.lit("tosses"), await the(await xname(obj)));
                 if (!next2u) {
@@ -2143,7 +2133,7 @@ export async function thitmonst(mon, obj) {   // dothrow.c:2011
         }
         return 0;
     }
-    dieroll = rnd(20);
+    const dieroll = rnd(20);
     if (obj.oclass === WEAPON_CLASS || is_weptool(obj) || obj.oclass === GEM_CLASS) {
         if (hmode === HMON.KICKED) {
             /* throwing adjustments and weapon skill bonus don't apply */
@@ -2184,8 +2174,8 @@ export async function thitmonst(mon, obj) {   // dothrow.c:2011
         }
         if (tmp >= dieroll) {
             /* remember weapon attribute; hmon() might destroy obj */
-            wasthrown = gt.thrownobj !== null ? 1 : 0;
-            chopper = is_axe(obj);
+            const wasthrown = gt.thrownobj !== null ? 1 : 0;
+            const chopper = is_axe(obj);
             /* attack hits mon */
             if (hmode === HMON.APPLIED) {
                 /* ranged hit with wielded polearm */
@@ -2228,7 +2218,7 @@ export async function thitmonst(mon, obj) {   // dothrow.c:2011
     } else if (otyp === HEAVY_IRON_BALL) {
         await exercise(A.STR, TRUE);
         if (tmp >= dieroll) {
-            was_swallowed = guaranteed_hit;
+            const was_swallowed = guaranteed_hit;
             await exercise(A.DEX, TRUE);
             if (!await hmon(mon, obj, hmode, dieroll)) {
                 /* mon killed */
@@ -2262,7 +2252,7 @@ export async function thitmonst(mon, obj) {   // dothrow.c:2011
             mon.mstrategy = $c.andu64(mon.mstrategy, 18446744072904245247n);
         }
     } else if (guaranteed_hit) {
-        md = u.ustuck.data;
+        const md = u.ustuck.data;
         /* this assumes that guaranteed_hit is due to swallowing */
         await wakeup(mon, TRUE);
         if (obj.otyp === CORPSE && touch_petrifies($c.relem(mons, obj.corpsenm))) {
@@ -2276,7 +2266,7 @@ export async function thitmonst(mon, obj) {   // dothrow.c:2011
             }
         }
         $c.strcpy(new $c.Ptr(trail, 0), dmgtype_fromattack(md, AD.DGST, AT.ENGL) !== null ? $c.lit(" entrails") : md.mlet === S.VORTEX || md === mons[PM.AIR_ELEMENTAL] ? $c.lit(" currents") : $c.lit(""));
-        monname = await mon_nam(mon);
+        let monname = await mon_nam(mon);
         if (new $c.Ptr(trail, 0).get(0)) {
             monname = s_suffix(monname);
         }
@@ -2396,13 +2386,12 @@ async function gem_accept(mon, obj) {   // dothrow.c:2309
  * @returns {Promise<number>} int
  */
 export async function hero_breaks(obj, x, y, breakflags) {   // dothrow.c:2417
-    let from_invent = 0, in_view = 0, brk = 0;
     /* object location (ox, oy may not be right) */
     /* from_invent: thrown or dropped by player; maybe on shop bill;
        by-hero is implicit so callers don't need to specify BRK_BY_HERO */
-    from_invent = (breakflags & BRK.FROM_INV) >>> 0 !== 0 ? 1 : 0;
-    in_view = Blind() ? FALSE : from_invent || cansee(x, y) ? 1 : 0;
-    brk = (breakflags & BRK_KNOWN_OUTCOME) >>> 0;
+    const from_invent = (breakflags & BRK.FROM_INV) >>> 0 !== 0 ? 1 : 0;
+    const in_view = Blind() ? FALSE : from_invent || cansee(x, y) ? 1 : 0;
+    let brk = (breakflags & BRK_KNOWN_OUTCOME) >>> 0;
     /* only call breaktest if caller hasn't already specified the outcome */
     if (!brk) {
         brk = breaktest(obj) ? BRK.KNOWN2BREAK : BRK.KNOWN2NOTBREAK;
@@ -2425,9 +2414,8 @@ export async function hero_breaks(obj, x, y, breakflags) {   // dothrow.c:2417
  * @returns {Promise<number>} int
  */
 export async function breaks(obj, x, y) {   // dothrow.c:2444
-    let in_view = 0;
     /* object location (ox, oy may not be right) */
-    in_view = Blind() ? FALSE : cansee(x, y);
+    const in_view = Blind() ? FALSE : cansee(x, y);
     if (!breaktest(obj)) {
         return 0;
     }
@@ -2466,11 +2454,10 @@ export async function release_camera_demon(obj, x, y) {   // dothrow.c:2457
  * @returns {Promise<number>} int
  */
 export async function breakobj(obj, x, y, hero_caused, from_invent) {   // dothrow.c:2480
-    let fracture = 0, explosion = 0, eyes = null, o_shop = null, shkp = null, eshkp = null;
     /* object location (ox, oy may not be right) */
     /* is this the hero's fault? */
-    fracture = FALSE;
-    explosion = FALSE;
+    let fracture = FALSE;
+    let explosion = FALSE;
     if (is_crackable(obj)) {   /* if erodeproof, erode_obj() will say so */
         return await erode_obj(obj, await armor_simple_name(obj), ERODE.CRACK, EF.DESTROY | EF.VERBOSE) === ER.DESTROYED ? 1 : 0;
     }
@@ -2493,7 +2480,7 @@ export async function breakobj(obj, x, y, hero_caused, from_invent) {   // dothr
                             /* [what about "familiar odor" when known?] */
                             await You($c.lit("smell a peculiar odor..."));
                         } else {
-                            eyes = await body_part(EYE);
+                            let eyes = await body_part(EYE);
                             if (eyecount(gy.youmonst.data) !== 1) {
                                 eyes = await makeplural(eyes);
                             }
@@ -2533,11 +2520,11 @@ export async function breakobj(obj, x, y, hero_caused, from_invent) {   // dothr
             }
         } else if (!obj.no_charge && await costly_spot(x, y)) {
             /* it is assumed that the obj is a floor-object */
-            o_shop = in_rooms(x, y, SHOPBASE);
-            shkp = await shop_keeper(o_shop.get(0));
+            const o_shop = in_rooms(x, y, SHOPBASE);
+            const shkp = await shop_keeper(o_shop.get(0));
             if (shkp) {
                 /* (implies *o_shop != '\0') */
-                eshkp = shkp.mextra.eshk;
+                const eshkp = shkp.mextra.eshk;
                 /* base shk actions on her peacefulness at start of
                    this turn, so that "simultaneous" multiple breakage
                    isn't drastically worse than single breakage */
@@ -2571,8 +2558,7 @@ export async function breakobj(obj, x, y, hero_caused, from_invent) {   // dothr
  * @returns {number} boolean
  */
 export function breaktest(obj) {   // dothrow.c:2582
-    let nonbreakchance = 0;
-    nonbreakchance = 1;   /* chance for non-artifacts to resist */
+    let nonbreakchance = 1;   /* chance for non-artifacts to resist */
     /* this may need to be changed if actual glass armor gets added someday;
        for now, it affects crystal plate mail and helm of brilliance;
        either of them will have to be cracked 4 times before breaking */
@@ -2605,11 +2591,10 @@ export function breaktest(obj) {   // dothrow.c:2582
  * @returns {Promise<void>}
  */
 async function breakmsg(obj, in_view) {   // dothrow.c:2612
-    let to_pieces = null;
     if (is_crackable(obj)) {   /* breakobj() will call erode_obj() for message */
         return;
     }
-    to_pieces = $c.lit("");
+    let to_pieces = $c.lit("");
     switch (obj.oclass === POTION_CLASS ? POT_WATER : obj.otyp) {
         default:
             /* glass or crystal wand */
@@ -2652,7 +2637,6 @@ async function breakmsg(obj, in_view) {   // dothrow.c:2612
  */
 async function throw_gold(obj$in) {   // dothrow.c:2656
     const obj = [obj$in];
-    let range = 0, odx = 0, ody = 0, mon = null, swallower = null;
     if (!u.dx && !u.dy && !u.dz) {
         await You($c.lit("cannot throw gold at yourself."));
         /* If we tried to throw part of a stack, force it to merge back
@@ -2664,7 +2648,7 @@ async function throw_gold(obj$in) {   // dothrow.c:2656
     }
     await freeinv(obj[0]);
     if (u.uswallow) {
-        swallower = await mon_nam(u.ustuck);
+        let swallower = await mon_nam(u.ustuck);
         if (dmgtype_fromattack(u.ustuck.data, AD.DGST, AT.ENGL) !== null) {   /* note: s_suffix() returns a modifiable buffer */
             swallower = $c.strcat(s_suffix(swallower), $c.lit(" entrails"));
         }
@@ -2684,15 +2668,15 @@ async function throw_gold(obj$in) {   // dothrow.c:2656
         gb.bhitpos.y = u.uy;
     } else {
         /* consistent with range for normal objects */
-        range = ($c.div32(ACURRSTR(), 2) >>> 0) - $c.divu32(obj[0].owt, 40) >>> 0 | 0;
+        const range = ($c.div32(ACURRSTR(), 2) >>> 0) - $c.divu32(obj[0].owt, 40) >>> 0 | 0;
         /* see if the gold has a place to move into */
-        odx = u.ux + u.dx | 0;
-        ody = u.uy + u.dy | 0;
+        const odx = u.ux + u.dx | 0;
+        const ody = u.uy + u.dy | 0;
         if (!isok($c.i16(odx), $c.i16(ody)) || !(svl.level.locations[odx][ody].typ >= POOL) || closed_door($c.i16(odx), $c.i16(ody))) {
             gb.bhitpos.x = u.ux;
             gb.bhitpos.y = u.uy;
         } else {
-            mon = await bhit(u.dx, u.dy, range, THROWN_WEAPON, null, null, new $c.Ptr(obj, 0));
+            const mon = await bhit(u.dx, u.dy, range, THROWN_WEAPON, null, null, new $c.Ptr(obj, 0));
             if (!obj[0]) {
                 return ECMD.TIME;   /* object is gone */
             }

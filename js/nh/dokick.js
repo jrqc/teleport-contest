@@ -99,10 +99,9 @@ const kick_passes_thru = new Int8Array(31);
  * @returns {Promise<void>}
  */
 async function kickdmg(mon, clumsy) {   // dokick.c:34
-    let mdx = 0, mdy = 0, dmg = 0, specialdmg = 0, kick_skill = 0, trapkilled = 0;
-    dmg = $c.div32(ACURRSTR() + ACURR(A.DEX) + ACURR(A.CON), 15);
-    kick_skill = P.NONE;
-    trapkilled = FALSE;
+    let dmg = $c.div32(ACURRSTR() + ACURR(A.DEX) + ACURR(A.CON), 15);
+    let kick_skill = P.NONE;
+    let trapkilled = FALSE;
     if ($G.uarmf && $G.uarmf.otyp === KICKING_BOOTS) {
         dmg = dmg + 5 | 0;
     }
@@ -118,7 +117,7 @@ async function kickdmg(mon, clumsy) {   // dokick.c:34
     if (mon.data === mons[PM.SHADE]) {
         dmg = 0;
     }
-    specialdmg = await special_dmgval(gy.youmonst, mon, W.ARMF, null);
+    const specialdmg = await special_dmgval(gy.youmonst, mon, W.ARMF, null);
     if (mon.data === mons[PM.SHADE] && !specialdmg) {
         await pline_The($c.lit("%s."), new $c.Ptr(kick_passes_thru, 0));
         /* doesn't exercise skill or abuse alignment or frighten pet,
@@ -160,8 +159,8 @@ async function kickdmg(mon, clumsy) {   // dokick.c:34
     }
     if (!DEADMONSTER(mon) && (gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || gy.youmonst.data === mons[PM.SASQUATCH] || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS) && !bigmonst(mon.data) && !rn2(3) && mon.mcanmove && !$c.peq(mon, u.ustuck) && !mon.mtrapped) {
         /* see if the monster has a place to move into */
-        mdx = mon.mx + u.dx | 0;
-        mdy = mon.my + u.dy | 0;
+        const mdx = mon.mx + u.dx | 0;
+        const mdy = mon.my + u.dy | 0;
         /* TODO: replace with mhurtle? */
         if (goodpos($c.i16(mdx), $c.i16(mdy), mon, 0)) {
             await pline($c.lit("%s reels from the blow."), await Monnam(mon));
@@ -193,9 +192,8 @@ async function kickdmg(mon, clumsy) {   // dokick.c:34
  * @returns {Promise<number>} boolean
  */
 async function maybe_kick_monster(mon, x, y) {   // dokick.c:126
-    let save_forcefight = 0;
     if (mon) {
-        save_forcefight = svc.context.forcefight;
+        const save_forcefight = svc.context.forcefight;
         gb.bhitpos.x = x;
         gb.bhitpos.y = y;
         if (!mon.mpeaceful || !canspotmon(mon)) {
@@ -344,8 +342,8 @@ async function kick_monster(mon, x, y) {   // dokick.c:146
  * @returns {Promise<number>} boolean
  */
 export async function ghitm(mtmp, gold) {   // dokick.c:295
-    let msg_given = 0, was_sleeping = 0, umoney = 0, value = 0, robbed = 0, was_angry = 0, goldreqd = 0;
-    msg_given = FALSE;
+    let umoney = 0;
+    let msg_given = FALSE;
     if (!likes_gold(mtmp.data) && !mtmp.isshk && !mtmp.ispriest && !mtmp.isgd && !is_mercenary(mtmp.data)) {
         await wakeup(mtmp, TRUE);
     } else if (!mtmp.mcanmove) {
@@ -355,8 +353,8 @@ export async function ghitm(mtmp, gold) {   // dokick.c:295
             msg_given = TRUE;
         }
     } else {
-        was_sleeping = mtmp.msleeping;
-        value = $c.mul64(gold.quan, objects[gold.otyp].oc_cost);
+        const was_sleeping = mtmp.msleeping;
+        const value = $c.mul64(gold.quan, objects[gold.otyp].oc_cost);
         mtmp.msleeping = 0;
         /* end indeterminate sleep (won't get here
          * for temporary--counted--sleep since that
@@ -372,7 +370,7 @@ export async function ghitm(mtmp, gold) {   // dokick.c:295
         await mpickobj(mtmp, gold);
         gold = null;   /* obj has been freed */
         if (mtmp.isshk) {
-            robbed = mtmp.mextra.eshk.robbed;
+            let robbed = mtmp.mextra.eshk.robbed;
             if (robbed) {
                 robbed = $c.sub64(robbed, value);
                 if (robbed < 0) {
@@ -406,8 +404,8 @@ export async function ghitm(mtmp, gold) {   // dokick.c:295
                killed by throwing his/her gold when losing. */
             await verbalize(umoney ? $c.lit("Drop the rest and follow me.") : hidden_gold(TRUE) ? $c.lit("You still have hidden gold.  Drop it now.") : mtmp.mpeaceful ? $c.lit("I'll take care of that; please move along.") : $c.lit("I'll take that; now get moving."));
         } else if (is_mercenary(mtmp.data)) {
-            was_angry = !mtmp.mpeaceful ? 1 : 0;
-            goldreqd = 0;
+            const was_angry = !mtmp.mpeaceful ? 1 : 0;
+            let goldreqd = 0;
             if (mtmp.data === mons[PM.SOLDIER]) {
                 goldreqd = 100;
             } else if (mtmp.data === mons[PM.SERGEANT]) {
@@ -453,21 +451,21 @@ export async function ghitm(mtmp, gold) {   // dokick.c:295
  * @returns {Promise<void>}
  */
 export async function container_impact_dmg(obj, x, y) {   // dokick.c:412
-    let shkp = null, otmp = null, otmp2 = null, loss = 0, costly = 0, insider = 0, frominv = 0, wchange = 0, result = null, $t1;
+    let shkp = null, otmp = null, otmp2 = null, $t1;
     /* coordinates where object was */
     /* before the impact, not after */
-    loss = 0;
-    wchange = FALSE;
+    let loss = 0;
+    let wchange = FALSE;
     /* only consider normal containers */
     if (!Is_container(obj) || !Has_contents(obj) || Is_mbag(obj)) {
         return;
     }
-    costly = (shkp = await shop_keeper(in_rooms(x, y, SHOPBASE).get(0))) && await costly_spot(x, y) ? 1 : 0;
-    insider = new $c.Ptr(u.ushops, 0).get(0) && inside_shop(u.ux, u.uy) && in_rooms(x, y, SHOPBASE).get(0) === new $c.Ptr(u.ushops, 0).get(0) ? 1 : 0;
+    const costly = (shkp = await shop_keeper(in_rooms(x, y, SHOPBASE).get(0))) && await costly_spot(x, y) ? 1 : 0;
+    const insider = new $c.Ptr(u.ushops, 0).get(0) && inside_shop(u.ux, u.uy) && in_rooms(x, y, SHOPBASE).get(0) === new $c.Ptr(u.ushops, 0).get(0) ? 1 : 0;
     /* if dropped or thrown, shop ownership flags are set on this obj */
-    frominv = !$c.peq(obj, gk.kickedobj) ? 1 : 0;
+    const frominv = !$c.peq(obj, gk.kickedobj) ? 1 : 0;
     for (otmp = obj.cobj; otmp; otmp = otmp2) {
-        result = null;
+        let result = null;
         otmp2 = otmp.nobj;
         if (objects[otmp.otyp].oc_material === GLASS && otmp.oclass !== GEM_CLASS && !obj_resists(otmp, 33, 100)) {
             result = $c.lit("shatter");
@@ -525,7 +523,6 @@ export async function container_impact_dmg(obj, x, y) {   // dokick.c:412
  */
 async function kick_object(x, y, kickobjnam) {   // dokick.c:489
     let res = 0;
-    res = 0;
     kickobjnam.set(0, 0);
     /* if a pile, the "top" object gets kicked */
     gk.kickedobj = svl.level.objects[x][y];
@@ -545,9 +542,9 @@ async function kick_object(x, y, kickobjnam) {   // dokick.c:489
  * @returns {Promise<number>} int
  */
 async function really_kick_object(x, y) {   // dokick.c:508
-    let range = 0, mon = null, shkp = null, trap = null, bhitroom = 0, costly = 0, isgold = 0, slide = 0, k_owt = 0, save_quan = 0, otrp = 0, gtg = 0, $t1;
-    shkp = null;
-    slide = FALSE;
+    let range = 0, trap = null, $t1;
+    let shkp = null;
+    let slide = FALSE;
     /* gk.kickedobj should always be set due to conditions of call */
     if (!gk.kickedobj || gk.kickedobj.otyp === BOULDER || $c.peq(gk.kickedobj, $G.uball) || $c.peq(gk.kickedobj, $G.uchain)) {
         return 0;
@@ -579,14 +576,14 @@ async function really_kick_object(x, y) {   // dokick.c:508
             await instapetrify(new $c.Ptr(svk.killer.name, 0));
         }
     }
-    isgold = gk.kickedobj.oclass === COIN_CLASS ? 1 : 0;
+    const isgold = gk.kickedobj.oclass === COIN_CLASS ? 1 : 0;
     {
-        k_owt = gk.kickedobj.owt | 0;
+        let k_owt = gk.kickedobj.owt | 0;
         /* for non-gold stack, 1 item will be split off below (unless an
            early return occurs, so we aren't moving the split to here);
            calculate the range for that 1 rather than for the whole stack */
         if (gk.kickedobj.quan > 1 && !isgold) {
-            save_quan = gk.kickedobj.quan;
+            const save_quan = gk.kickedobj.quan;
             gk.kickedobj.quan = 1;
             k_owt = await weight(gk.kickedobj);
             gk.kickedobj.quan = save_quan;
@@ -624,7 +621,7 @@ async function really_kick_object(x, y) {   // dokick.c:508
        was set but that optimization could result in no_charge staying set
        for objects kicked out of the shop */
     shkp = await find_objowner(gk.kickedobj, x, y);
-    costly = shkp && (await costly_spot(x, y) || costly_adjacent(shkp, x, y) && gk.kickedobj.unpaid) ? 1 : 0;
+    let costly = shkp && (await costly_spot(x, y) || costly_adjacent(shkp, x, y) && gk.kickedobj.unpaid) ? 1 : 0;
     /* 5.0: give feedback about the item being kicked; some follow-on
        messages refer to "it" */
     await Norep($c.lit("You kick %s."), !isgold ? await singular(gk.kickedobj, doname) : await doname(gk.kickedobj));
@@ -662,7 +659,7 @@ async function really_kick_object(x, y) {   // dokick.c:508
     }
     /* a box gets a chance of breaking open here */
     if (Is_box(gk.kickedobj)) {
-        otrp = gk.kickedobj.otrapped;
+        const otrp = gk.kickedobj.otrapped;
         if (range < 2) {
             await pline($c.lit("THUD!"));
         }
@@ -739,7 +736,7 @@ async function really_kick_object(x, y) {   // dokick.c:508
     await obj_extract_self(gk.kickedobj);
     await snuff_candle(gk.kickedobj);
     await newsym(x, y);
-    mon = await bhit(u.dx, u.dy, range, KICKED_WEAPON, null, null, new $c.FieldRef(gk, "kickedobj", "ptr"));
+    const mon = await bhit(u.dx, u.dy, range, KICKED_WEAPON, null, null, new $c.FieldRef(gk, "kickedobj", "ptr"));
     if (!gk.kickedobj) {
         return 1;   /* object broken */
     }
@@ -758,7 +755,7 @@ async function really_kick_object(x, y) {   // dokick.c:508
     if (gk.kickedobj.where === OBJ.MIGRATING) {
         return 1;
     }
-    bhitroom = in_rooms(gb.bhitpos.x, gb.bhitpos.y, SHOPBASE).get(0);
+    const bhitroom = in_rooms(gb.bhitpos.x, gb.bhitpos.y, SHOPBASE).get(0);
     /* if obj is marked no_charge, stolen_value() won't blame hero for
        theft but will clear that flag */
     if (costly && (!await costly_spot(gb.bhitpos.x, gb.bhitpos.y) || in_rooms(x, y, SHOPBASE).get(0) !== bhitroom)) {
@@ -774,7 +771,7 @@ async function really_kick_object(x, y) {   // dokick.c:508
         return 1;
     }
     if (costly) {
-        gtg = 0;
+        let gtg = 0;
         /* costly + landed outside shop handled above; must be inside shop */
         if (gk.kickedobj.unpaid) {
             await subfrombill(gk.kickedobj, shkp);
@@ -894,7 +891,7 @@ async function kick_dumb(x, y) {   // dokick.c:864
 async function kick_ouch(x$in, y$in, kickobjnam) {   // dokick.c:881
     const x = Int16Array.of(x$in);
     const y = Int16Array.of(y$in);
-    let dmg = 0, buf = new Int8Array(256);
+    let buf = new Int8Array(256);
     await pline($c.lit("Ouch!  That hurts!"));
     await exercise(A.DEX, FALSE);
     await exercise(A.STR, FALSE);
@@ -913,7 +910,7 @@ async function kick_ouch(x$in, y$in, kickobjnam) {   // dokick.c:881
     if (!rn2(3)) {
         await set_wounded_legs(W.RINGR, 5 + rnd(5) | 0);
     }
-    dmg = rnd(acurr(A.CON) > 15 ? 3 : 5);
+    const dmg = rnd(acurr(A.CON) > 15 ? 3 : 5);
     await losehp(Maybe_Half_Phys(dmg), kickstr(new $c.Ptr(buf, 0), kickobjnam), KILLED.BY);
     if ((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || Levitation()) {
         await hurtle(-u.dx | 0, -u.dy | 0, rn2(2) + 4 | 0, TRUE);   /* assume it's heavy */
@@ -927,7 +924,6 @@ async function kick_ouch(x$in, y$in, kickobjnam) {   // dokick.c:881
  * @returns {Promise<void>}
  */
 async function kick_door(x, y, avrg_attrib) {   // dokick.c:910
-    let doorbuster = 0, shopdoor = 0;
     if (gm.maploc.flags === D.ISOPEN || gm.maploc.flags === D.BROKEN || gm.maploc.flags === D.NODOOR) {
         await kick_dumb(x, y);
         return;   /* uses a turn */
@@ -938,10 +934,10 @@ async function kick_door(x, y, avrg_attrib) {   // dokick.c:910
         return;
     }
     await exercise(A.DEX, TRUE);
-    doorbuster = Upolyd() && is_giant(gy.youmonst.data) ? 1 : 0;
+    const doorbuster = Upolyd() && is_giant(gy.youmonst.data) ? 1 : 0;
     /* door is known to be CLOSED or LOCKED */
     if (doorbuster || rnl(35) < (avrg_attrib + (!(gu.urole.mnum === PM.SAMURAI || gu.urole.mnum === PM.MONK || gy.youmonst.data === mons[PM.SASQUATCH] || $G.uarmf && $G.uarmf.otyp === KICKING_BOOTS) ? 0 : ACURR(A.DEX)) | 0)) {
-        shopdoor = in_rooms(x, y, SHOPBASE).get(0) ? TRUE : FALSE;
+        const shopdoor = in_rooms(x, y, SHOPBASE).get(0) ? TRUE : FALSE;
         /* break the door */
         if (gm.maploc.flags & D.TRAPPED) {
             if (flags.verbose) {
@@ -990,7 +986,7 @@ async function kick_door(x, y, avrg_attrib) {   // dokick.c:910
  * @returns {Promise<number>} int
  */
 async function kick_nondoor(x, y, avrg_attrib) {   // dokick.c:974
-    let i = 0, treefruit = null, nfruit = 0, nfall = 0, frtype = 0, cnt = 0, made = 0, mm = new $T.nhcoord(), gend = 0, $t1, $t2, $t3;
+    let treefruit = null, mm = new $T.nhcoord(), $t1, $t2, $t3;
     if (gm.maploc.typ === SDOOR) {
         if (!Levitation() && rn2(30) < avrg_attrib) {
             cvt_sdoor_to_door(gm.maploc);   /* ->typ = DOOR */
@@ -1046,7 +1042,7 @@ async function kick_nondoor(x, y, avrg_attrib) {   // dokick.c:974
             return ECMD.TIME;
         } else if (Luck() > 0 && !rn2(3) && !gm.maploc.flags) {
             await mkgold(rn2(201) + 300 | 0, x, y);
-            i = Luck() + 1;
+            let i = Luck() + 1;
             if (i > 6) {
                 i = 6;
             }
@@ -1155,8 +1151,8 @@ async function kick_nondoor(x, y, avrg_attrib) {   // dokick.c:974
             return ECMD.TIME;
         }
         if (rn2(15) && !(gm.maploc.flags & TREE_LOOTED) && (treefruit = await rnd_treefruit_at(x, y))) {
-            nfruit = $c.sub64(8, rnl(7));
-            frtype = treefruit.otyp;
+            const nfruit = $c.sub64(8, rnl(7));
+            const frtype = treefruit.otyp;
             treefruit.quan = nfruit;
             $t2 = await weight(treefruit) >>> 0, treefruit.owt = $t2;
             if (is_plural(treefruit)) {
@@ -1164,7 +1160,7 @@ async function kick_nondoor(x, y, avrg_attrib) {   // dokick.c:974
             } else {
                 await pline($c.lit("%s falls from the tree!"), await An(await xname(treefruit)));
             }
-            nfall = await scatter(x, y, 2, MAY_HIT, treefruit);
+            const nfall = await scatter(x, y, 2, MAY_HIT, treefruit);
             if (nfall !== nfruit) {
                 /* scatter left some in the tree, but treefruit
                  * may not refer to the correct object */
@@ -1179,8 +1175,8 @@ async function kick_nondoor(x, y, avrg_attrib) {   // dokick.c:974
             gm.maploc.flags = ((gm.maploc.flags | 0 | TREE_LOOTED) >>> 0) & 31;
             return ECMD.TIME;
         } else if (!(gm.maploc.flags & TREE_SWARM)) {
-            cnt = rnl(4) + 2 | 0;
-            made = 0;
+            let cnt = rnl(4) + 2 | 0;
+            let made = 0;
             mm.x = x;
             mm.y = y;
             while ($t3 = cnt, cnt = $t3 - 1 | 0, $t3) {
@@ -1200,7 +1196,7 @@ async function kick_nondoor(x, y, avrg_attrib) {   // dokick.c:974
         return ECMD.TIME;
     }
     if (IS_SINK(gm.maploc.typ)) {
-        gend = poly_gender();
+        const gend = poly_gender();
         if (Levitation()) {
             await kick_dumb(x, y);
             return ECMD.TIME;
@@ -1258,9 +1254,9 @@ async function kick_nondoor(x, y, avrg_attrib) {   // dokick.c:974
  * @returns {Promise<number>} int
  */
 export async function dokick() {   // dokick.c:1257
-    let x = 0, y = 0, avrg_attrib = 0, glyph = 0, oldglyph = 0, mtmp = null, no_kick = 0, xx = 0, yy = 0, mdat = null, range = 0, kickobjnam = new Int8Array(256);
-    oldglyph = -1;
-    no_kick = FALSE;
+    let avrg_attrib = 0, kickobjnam = new Int8Array(256);
+    let oldglyph = -1;
+    let no_kick = FALSE;
     if (nolimbs(gy.youmonst.data) || slithy(gy.youmonst.data)) {
         await You($c.lit("have no legs to kick with."));
         no_kick = TRUE;
@@ -1319,8 +1315,8 @@ export async function dokick() {   // dokick.c:1257
     if (!u.dx && !u.dy) {
         return ECMD.CANCEL;
     }
-    x = $c.i16(u.ux + u.dx | 0);
-    y = $c.i16(u.uy + u.dy | 0);
+    const x = $c.i16(u.ux + u.dx | 0);
+    const y = $c.i16(u.uy + u.dy | 0);
     gk.kickedloc.x = x, gk.kickedloc.y = y;
     /* KMH -- Kicking boots always succeed */
     if ($G.uarmf && $G.uarmf.otyp === KICKING_BOOTS) {
@@ -1350,8 +1346,8 @@ export async function dokick() {   // dokick.c:1257
         return ECMD.TIME;
     }
     if (Levitation()) {
-        xx = $c.i16(u.ux - u.dx | 0);
-        yy = $c.i16(u.uy - u.dy | 0);
+        const xx = $c.i16(u.ux - u.dx | 0);
+        const yy = $c.i16(u.uy - u.dy | 0);
         /* doors can be opened while levitating, so they must be
          * reachable for bracing purposes
          * Possible extension: allow bracing against stuff on the side?
@@ -1361,7 +1357,7 @@ export async function dokick() {   // dokick.c:1257
             return ECMD.OK;
         }
     }
-    mtmp = isok(x, y) ? svl.level.monsters[x][y] : null;
+    const mtmp = isok(x, y) ? svl.level.monsters[x][y] : null;
     /* might not kick monster if it is hidden and becomes revealed,
        if it is peaceful and player declines to attack, or if the
        hero passes out due to encumbrance with low hp; svc.context.move
@@ -1394,9 +1390,9 @@ export async function dokick() {   // dokick.c:1257
      */
     if (mtmp) {
         /* save mtmp->data (for recoil) in case mtmp gets killed */
-        mdat = mtmp.data;
+        const mdat = mtmp.data;
         await kick_monster(mtmp, x, y);
-        glyph = glyph_at(x, y);
+        const glyph = glyph_at(x, y);
         /* see comment in attack_checks() */
         if (DEADMONSTER(mtmp)) {
             /* DEADMONSTER() */
@@ -1413,7 +1409,7 @@ export async function dokick() {   // dokick.c:1257
         }
         /* recoil if floating */
         if (((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || Levitation()) && svc.context.move) {
-            range = (gy.youmonst.data.cwt | 0) + (weight_cap() + inv_weight() | 0) | 0;
+            let range = (gy.youmonst.data.cwt | 0) + (weight_cap() + inv_weight() | 0) | 0;
             if (range < 1) {
                 range = 1;   /* divide by zero avoidance */
             }
@@ -1456,8 +1452,8 @@ export async function dokick() {   // dokick.c:1257
  * @param {number} y coordxy
  */
 function drop_to(cc, loc, x, y) {   // dokick.c:1473
-    let stway = null, $t1, $t2;
-    stway = stairway_at(x, y);
+    let $t1, $t2;
+    const stway = stairway_at(x, y);
     /* cover all the MIGR_xxx choices generated by down_gate() */
     switch (loc) {
         case MIGR.RANDOM:
@@ -1498,14 +1494,14 @@ function drop_to(cc, loc, x, y) {   // dokick.c:1473
  * @returns {Promise<void>}
  */
 export async function impact_drop(missile, x, y, dlev) {   // dokick.c:1511
-    let toloc = 0, obj = null, obj2 = null, shkp = null, oct = 0, dct = 0, price = 0, debit = 0, robbed = 0, angry = 0, costly = 0, isrock = 0, cc = new $T.nhcoord(), what = null, amt = 0;
+    let obj = null, obj2 = null, dct = 0, debit = 0, robbed = 0, cc = new $T.nhcoord();
     /* caused impact, won't drop itself */
     /* location affected */
     /* if !0 send to dlev near player */
     if (!OBJ_AT(x, y)) {
         return;
     }
-    toloc = await down_gate(x, y);
+    let toloc = await down_gate(x, y);
     drop_to(cc, toloc, x, y);
     if (!cc.y) {
         return;
@@ -1517,10 +1513,10 @@ export async function impact_drop(missile, x, y, dlev) {   // dokick.c:1511
         toloc = MIGR.WITH_HERO;
         cc.y = dlev;
     }
-    costly = await costly_spot(x, y);
-    price = debit = robbed = 0;
-    angry = FALSE;
-    shkp = null;
+    const costly = await costly_spot(x, y);
+    let price = debit = robbed = 0;
+    let angry = FALSE;
+    let shkp = null;
     /* if 'costly', we must keep a record of ESHK(shkp) before
      * it undergoes changes through the calls to stolen_value.
      * the angry bit must be reset, if needed, in this fn, since
@@ -1534,8 +1530,8 @@ export async function impact_drop(missile, x, y, dlev) {   // dokick.c:1511
             angry = !shkp.mpeaceful ? 1 : 0;
         }
     }
-    isrock = missile && missile.otyp === ROCK ? 1 : 0;
-    oct = dct = 0;
+    const isrock = missile && missile.otyp === ROCK ? 1 : 0;
+    let oct = dct = 0;
     for (obj = svl.level.objects[x][y]; obj; obj = obj2) {
         obj2 = obj.v.v_nexthere;
         if ($c.peq(obj, missile)) {
@@ -1570,7 +1566,7 @@ export async function impact_drop(missile, x, y, dlev) {   // dokick.c:1511
     }
     if (dct && cansee(x, y)) {
         /* at least one object fell */
-        what = dct === 1 ? $c.lit("object falls") : $c.lit("objects fall");
+        const what = dct === 1 ? $c.lit("object falls") : $c.lit("objects fall");
         if (missile) {
             await pline($c.lit("From the impact, %sother %s."), dct === oct ? $c.lit("the ") : dct === 1 ? $c.lit("an") : $c.lit(""), what);
         } else if (oct === dct) {
@@ -1599,7 +1595,7 @@ export async function impact_drop(missile, x, y, dlev) {   // dokick.c:1511
             return;
         }
         if (shkp.mextra.eshk.debit > debit) {
-            amt = $c.sub64(shkp.mextra.eshk.debit, debit);
+            const amt = $c.sub64(shkp.mextra.eshk.debit, debit);
             await You($c.lit("owe %s %ld %s for goods lost."), await shkname(shkp), amt, await currency(amt));
         }
     }
@@ -1616,10 +1612,10 @@ export async function impact_drop(missile, x, y, dlev) {   // dokick.c:1511
  * @returns {Promise<number>} boolean
  */
 export async function ship_object(otmp, x, y, shop_floor_obj) {   // dokick.c:1639
-    let toloc = 0, ox = 0, oy = 0, cc = new $T.nhcoord(), obj = null, t = null, nodrop = 0, unpaid = 0, container = 0, impact = 0, chainthere = 0, n = 0, result = null;
-    impact = FALSE;
-    chainthere = FALSE;
-    n = 0;
+    let toloc = 0, cc = new $T.nhcoord(), obj = null, t = null, result = null;
+    let impact = FALSE;
+    let chainthere = FALSE;
+    let n = 0;
     if (!otmp) {
         return FALSE;
     }
@@ -1632,9 +1628,9 @@ export async function ship_object(otmp, x, y, shop_floor_obj) {   // dokick.c:16
     }
     /* objects other than attached iron ball always fall down ladder,
        but have a chance of staying otherwise */
-    nodrop = $c.peq(otmp, $G.uball) || $c.peq(otmp, $G.uchain) || toloc !== MIGR.LADDER_UP && rn2(3) ? 1 : 0;
-    container = Has_contents(otmp);
-    unpaid = is_unpaid(otmp);
+    const nodrop = $c.peq(otmp, $G.uball) || $c.peq(otmp, $G.uchain) || toloc !== MIGR.LADDER_UP && rn2(3) ? 1 : 0;
+    const container = Has_contents(otmp);
+    const unpaid = is_unpaid(otmp);
     if (OBJ_AT(x, y)) {
         for (obj = svl.level.objects[x][y]; obj; obj = obj.v.v_nexthere) {
             if ($c.peq(obj, $G.uchain)) {
@@ -1669,8 +1665,8 @@ export async function ship_object(otmp, x, y, shop_floor_obj) {   // dokick.c:16
         if (unpaid) {
             await stolen_value(otmp, u.ux, u.uy, TRUE, FALSE);
         } else {
-            ox = otmp.ox;
-            oy = otmp.oy;
+            const ox = otmp.ox;
+            const oy = otmp.oy;
             await stolen_value(otmp, ox, oy, await costly_spot(u.ux, u.uy) && $c.strchr(new $c.Ptr(u.urooms, 0), in_rooms(ox, oy, SHOPBASE).get(0)) ? 1 : 0, FALSE);
         }
         /* set otmp->no_charge to 0 */
@@ -1734,20 +1730,20 @@ export async function ship_object(otmp, x, y, shop_floor_obj) {   // dokick.c:16
  * @returns {Promise<void>}
  */
 export async function obj_delivery(near_hero) {   // dokick.c:1769
-    let otmp = null, otmp2 = null, nx = 0, ny = 0, where = 0, nobreak = 0, noscatter = 0, stway = null, fromdlev = new $T.d_level(), isladder = 0, $t1;
-    nx = 0;
-    ny = 0;
+    let otmp = null, otmp2 = null, stway = null, fromdlev = new $T.d_level(), $t1;
+    let nx = 0;
+    let ny = 0;
     for (otmp = gm.migrating_objs; otmp; otmp = otmp2) {
         otmp2 = otmp.nobj;
         if (otmp.ox !== u.uz.dnum || otmp.oy !== u.uz.dlevel) {
             continue;
         }
-        where = $c.i32($c.and64(otmp.owornmask, 32767));   /* destination code */
+        let where = $c.i32($c.and64(otmp.owornmask, 32767));   /* destination code */
         if ((where & MIGR.TO_SPECIES) !== 0) {
             continue;
         }
-        nobreak = (where & MIGR.NOBREAK) !== 0 ? 1 : 0;
-        noscatter = (where & MIGR.WITH_HERO) !== 0 ? 1 : 0;
+        const nobreak = (where & MIGR.NOBREAK) !== 0 ? 1 : 0;
+        const noscatter = (where & MIGR.WITH_HERO) !== 0 ? 1 : 0;
         where = where & ~(MIGR.NOBREAK | MIGR.NOSCATTER);
         if ((!near_hero ? 1 : 0) ^ (where === MIGR.WITH_HERO ? 1 : 0)) {
             continue;
@@ -1756,7 +1752,7 @@ export async function obj_delivery(near_hero) {   // dokick.c:1769
         otmp.owornmask = 0;
         fromdlev.dnum = otmp.omigr_from_dnum;
         fromdlev.dlevel = otmp.omigr_from_dlevel;
-        isladder = FALSE;
+        let isladder = FALSE;
         switch (where) {
             case MIGR.LADDER_UP:
                 isladder = TRUE;
@@ -1816,9 +1812,9 @@ export async function obj_delivery(near_hero) {   // dokick.c:1769
  * @returns {Promise<void>}
  */
 export async function deliver_obj_to_mon(mtmp, cnt, deliverflags) {   // dokick.c:1854
-    let otmp = null, otmp2 = null, where = 0, maxobj = 0, at_crime_scene = 0, $t1;
-    maxobj = 1;
-    at_crime_scene = In_mines(u.uz);
+    let otmp = null, otmp2 = null, $t1;
+    let maxobj = 1;
+    const at_crime_scene = In_mines(u.uz);
     if ($c.andu64(deliverflags, DF.RANDOM) && cnt > 1) {
         maxobj = rnd(cnt);
     } else if ($c.andu64(deliverflags, DF.ALL)) {
@@ -1829,7 +1825,7 @@ export async function deliver_obj_to_mon(mtmp, cnt, deliverflags) {   // dokick.
     cnt = 0;
     for (otmp = gm.migrating_objs; otmp; otmp = otmp2) {
         otmp2 = otmp.nobj;
-        where = $c.i32($c.and64(otmp.owornmask, 32767));   /* destination code */
+        const where = $c.i32($c.and64(otmp.owornmask, 32767));   /* destination code */
         if ((where & MIGR.TO_SPECIES) === 0) {
             continue;
         }
@@ -1867,8 +1863,8 @@ export async function deliver_obj_to_mon(mtmp, cnt, deliverflags) {   // dokick.
  * @returns {Promise<void>}
  */
 async function otransit_msg(otmp, nodrop, chainthere, num) {   // dokick.c:1909
-    let optr = null, obuf = new Int8Array(256), xbuf = new Int8Array(256);
-    optr = null;
+    let obuf = new Int8Array(256), xbuf = new Int8Array(256);
+    let optr = null;
     if (otmp.otyp === CORPSE) {
         /* Tobjnam() calls xname() and would yield "The corpse";
            we want more specific "The newt corpse" or "Medusa's corpse" */
@@ -1904,8 +1900,8 @@ async function otransit_msg(otmp, nodrop, chainthere, num) {   // dokick.c:1909
  * @returns {Promise<number>} schar
  */
 export async function down_gate(x, y) {   // dokick.c:1943
-    let ttmp = null, stway = null;
-    stway = stairway_at(x, y);
+    let ttmp = null;
+    const stway = stairway_at(x, y);
     gg.gate_str = null;
     /* this matches the player restriction in goto_level() */
     if (on_level(u.uz, svd.dungeon_topology.d_qstart_level) && !await ok_to_quest()) {

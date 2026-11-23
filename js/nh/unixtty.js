@@ -128,10 +128,10 @@ export async function settty(s) {   // unixtty.c:247
     settty_needed = 0;
 }
 export function setftty() {   // unixtty.c:267
-    let ef = 0, cf = 0, change = 0, $t1, $t2, $t3, $t4, $t5, $t6;
-    change = 0;
-    ef = 0;   /* desired value of flags & ECHO */
-    cf = 0;   /* desired value of flags & CBREAK */
+    let $t1, $t2, $t3, $t4, $t5, $t6;
+    let change = 0;
+    const ef = 0;   /* desired value of flags & ECHO */
+    const cf = 0;   /* desired value of flags & CBREAK */
     iflags.cbreak = ON;
     iflags.echo = OFF;
     /* Should use (ECHO|CRMOD) here instead of ECHO */

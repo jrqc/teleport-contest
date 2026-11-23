@@ -237,16 +237,15 @@ export function inhistemple(priest) {   // priest.c:161
  * @returns {Promise<number>} int
  */
 export async function pri_move(priest) {   // priest.c:177
-    let ggx = 0, ggy = 0, omx = 0, omy = 0, temple = 0, avoid = 0;
-    avoid = TRUE;
-    omx = priest.mx;
-    omy = priest.my;
+    let avoid = TRUE;
+    const omx = priest.mx;
+    const omy = priest.my;
     if (!histemple_at(priest, omx, omy)) {
         return -1;
     }
-    temple = priest.mextra.epri.shroom;
-    ggx = priest.mextra.epri.shrpos.x;
-    ggy = priest.mextra.epri.shrpos.y;
+    const temple = priest.mextra.epri.shroom;
+    let ggx = priest.mextra.epri.shrpos.x;
+    let ggy = priest.mextra.epri.shrpos.y;
     ggx = $c.i16(ggx + (rn2(3) + -1 | 0) | 0);   /* mill around the altar */
     ggy = $c.i16(ggy + (rn2(3) + -1 | 0) | 0);
     if (!priest.mpeaceful || Conflict() && !resist_conflict(priest)) {
@@ -279,12 +278,12 @@ export async function pri_move(priest) {   // priest.c:177
  * @returns {Promise<void>}
  */
 export async function priestini(lvl, sroom, sx, sy, sanctum) {   // priest.c:220
-    let priest = null, otmp = null, cnt = 0, px = 0, py = 0, i = 0, si = 0, prim = null;
+    let otmp = null, cnt = 0, i = 0;
     /* is it the seat of the high priest? */
-    px = 0;
-    py = 0;
-    si = rn2(N_DIRS);
-    prim = $c.relem(mons, sanctum ? PM.HIGH_CLERIC : PM.ALIGNED_CLERIC);
+    let px = 0;
+    let py = 0;
+    const si = rn2(N_DIRS);
+    const prim = $c.relem(mons, sanctum ? PM.HIGH_CLERIC : PM.ALIGNED_CLERIC);
     for (i = 0; i < N_DIRS; i = i + 1 | 0) {
         px = sx + xdir[DIR_CLAMP(i + si | 0)] | 0;
         py = sy + ydir[DIR_CLAMP(i + si | 0)] | 0;
@@ -298,7 +297,7 @@ export async function priestini(lvl, sroom, sx, sy, sanctum) {   // priest.c:220
     if (MON_AT(px, py)) {
         await rloc(svl.level.monsters[px][py], RLOC.NOMSG);   /* insurance */
     }
-    priest = await makemon(prim, $c.i16(px), $c.i16(py), MM.EPRI);
+    const priest = await makemon(prim, $c.i16(px), $c.i16(py), MM.EPRI);
     if (priest) {
         priest.mextra.epri.shroom = $c.i8($c.add64($c.rdiff(sroom, svr.rooms[0]), ROOMOFFSET));
         priest.mextra.epri.shralign = (svl.level.locations[sx][sy].flags & AM.MASK) === 0 ? A.NONE : (svl.level.locations[sx][sy].flags & AM.MASK) === AM.LAWFUL ? A.LAWFUL : (svl.level.locations[sx][sy].flags & AM.MASK) - 2;
@@ -335,8 +334,7 @@ export async function priestini(lvl, sroom, sx, sy, sanctum) {   // priest.c:220
  * @returns {number} aligntyp
  */
 export function mon_aligntyp(mon) {   // priest.c:280
-    let algn = 0;
-    algn = mon.ispriest ? mon.mextra.epri.shralign : mon.isminion ? mon.mextra.emin.min_align : mon.data.maligntyp;
+    const algn = mon.ispriest ? mon.mextra.epri.shralign : mon.isminion ? mon.mextra.emin.min_align : mon.data.maligntyp;
     if (algn === A.NONE) {
         return A.NONE;   /* negative but differs from chaotic */
     }
@@ -360,13 +358,13 @@ export function mon_aligntyp(mon) {   // priest.c:280
  * @returns {Promise<$c.Ptr | null>} char *
  */
 export async function priestname(mon, article, reveal_high_priest, pname) {   // priest.c:302
-    let do_hallu = 0, aligned_priest = 0, high_priest = 0, whatcode = Int8Array.of(0), what = null;
+    let whatcode = Int8Array.of(0);
     /* caller-supplied output buffer */
-    do_hallu = Hallucination();
-    aligned_priest = mon.data === mons[PM.ALIGNED_CLERIC] ? 1 : 0;
-    high_priest = mon.data === mons[PM.HIGH_CLERIC] ? 1 : 0;
+    const do_hallu = Hallucination();
+    const aligned_priest = mon.data === mons[PM.ALIGNED_CLERIC] ? 1 : 0;
+    const high_priest = mon.data === mons[PM.HIGH_CLERIC] ? 1 : 0;
     whatcode[0] = 0;
-    what = do_hallu ? await rndmonnam(new $c.Ptr(whatcode, 0)) : mon_pmname(mon);
+    let what = do_hallu ? await rndmonnam(new $c.Ptr(whatcode, 0)) : mon_pmname(mon);
     if (!mon.ispriest && !mon.isminion) {   /* should never happen...  */
         return $c.strcpy(pname, what);   /* caller must be confused */
     }
@@ -434,12 +432,11 @@ export function p_coaligned(priest) {   // priest.c:370
  * @returns {number} boolean
  */
 function has_shrine(pri) {   // priest.c:376
-    let lev = null, epri_p = null;
     if (!pri || !pri.ispriest) {
         return FALSE;
     }
-    epri_p = pri.mextra.epri;
-    lev = $c.relem(svl.level.locations[epri_p.shrpos.x], epri_p.shrpos.y);
+    const epri_p = pri.mextra.epri;
+    const lev = $c.relem(svl.level.locations[epri_p.shrpos.x], epri_p.shrpos.y);
     if (!IS_ALTAR(lev.typ) || !(lev.flags & AM.SHRINE)) {
         return FALSE;
     }
@@ -467,7 +464,7 @@ export function findpriest(roomno) {   // priest.c:392
  * @returns {Promise<void>}
  */
 export async function intemple(roomno) {   // priest.c:410
-    let priest = null, mtmp = null, epri_p = null, shrined = 0, sanctum = 0, can_speak = 0, this_time = null, other_time = null, msg1 = null, msg2 = null, buf = new Int8Array(256), save_priest = 0, ngen = 0, $t1, $t2, $t3;
+    let priest = null, mtmp = null, this_time = null, other_time = null, msg2 = null, buf = new Int8Array(256), $t1, $t2, $t3;
     /* don't do anything if hero is already in the room */
     if (temple_occupied(new $c.Ptr(u.urooms0, 0))) {
         return;
@@ -475,12 +472,12 @@ export async function intemple(roomno) {   // priest.c:410
     if ((priest = findpriest($c.i8(roomno))) !== null) {
         /* tended */
         await record_achievement(ACH.TMPL);
-        epri_p = priest.mextra.epri;
-        shrined = has_shrine(priest);
-        sanctum = priest.data === mons[PM.HIGH_CLERIC] && ((svd.dungeon_topology.d_sanctum_level.dlevel || svd.dungeon_topology.d_sanctum_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_sanctum_level) || In_endgame(u.uz)) ? 1 : 0;
-        can_speak = !helpless(priest) ? 1 : 0;
+        const epri_p = priest.mextra.epri;
+        const shrined = has_shrine(priest);
+        const sanctum = priest.data === mons[PM.HIGH_CLERIC] && ((svd.dungeon_topology.d_sanctum_level.dlevel || svd.dungeon_topology.d_sanctum_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_sanctum_level) || In_endgame(u.uz)) ? 1 : 0;
+        const can_speak = !helpless(priest) ? 1 : 0;
         if (can_speak && !Deaf() && svm.moves >= epri_p.intone_time) {
-            save_priest = priest.ispriest;
+            const save_priest = priest.ispriest;
             /* don't reveal the altar's owner upon temple entry in
                the endgame; for the Sanctum, the next message names
                Moloch so suppress the "of Moloch" for him here too */
@@ -494,7 +491,7 @@ export async function intemple(roomno) {   // priest.c:410
                we've just given its "priest intones" introduction */
             epri_p.enter_time = 0;
         }
-        msg1 = msg2 = null;
+        let msg1 = msg2 = null;
         if (sanctum && ((svd.dungeon_topology.d_sanctum_level.dlevel || svd.dungeon_topology.d_sanctum_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_sanctum_level))) {
             if (priest.mpeaceful) {
                 /* first time inside */
@@ -565,7 +562,7 @@ export async function intemple(roomno) {   // priest.c:410
            EPRI(priest)->eerie_time available to
            make sure we give one the first time */
         if (!rn2(5) && (mtmp = await makemon(mons[PM.GHOST], u.ux, u.uy, MM.NOMSG)) !== null) {
-            ngen = svm.mvitals[PM.GHOST].born;
+            const ngen = svm.mvitals[PM.GHOST].born;
             if (canspotmon(mtmp)) {
                 await pline($c.lit("A%s ghost appears next to you%c"), ngen < 5 ? $c.lit("n enormous") : $c.lit(""), ngen < 10 ? 33 : 46);
             } else {
@@ -589,8 +586,8 @@ export async function intemple(roomno) {   // priest.c:410
  * @returns {Promise<void>}
  */
 export async function forget_temple_entry(priest) {   // priest.c:545
-    let epri_p = null, $t1, $t2, $t3;
-    epri_p = priest.ispriest ? priest.mextra.epri : null;
+    let $t1, $t2, $t3;
+    const epri_p = priest.ispriest ? priest.mextra.epri : null;
     if (!epri_p) {
         await impossible($c.lit("attempting to manipulate shrine data for non-priest?"));
         return;
@@ -602,10 +599,10 @@ export async function forget_temple_entry(priest) {   // priest.c:545
  * @returns {Promise<void>}
  */
 export async function priest_talk(priest) {   // priest.c:558
-    let coaligned = 0, strayed = 0, cheapskate = null, pmoney = 0, bits = null, offer = 0, suggested = 0, quan = 0, buf = new Int8Array(256), orig_ublessed = 0, $t1, $t2, $t3;
-    coaligned = p_coaligned(priest);
-    strayed = u.ualign.record < 0 ? 1 : 0;
-    cheapskate = null;
+    let offer = 0, buf = new Int8Array(256), $t1, $t2, $t3;
+    const coaligned = p_coaligned(priest);
+    const strayed = u.ualign.record < 0 ? 1 : 0;
+    let cheapskate = null;
     if (EPRI(priest)) {
         cheapskate = new $c.FieldRef(priest.mextra.epri, "cheapskate_count", "u32");
     }
@@ -642,9 +639,9 @@ export async function priest_talk(priest) {   // priest.c:558
     }
     if (!money_cnt(gi.invent)) {
         if (coaligned && !strayed) {
-            pmoney = money_cnt(priest.minvent);
+            const pmoney = money_cnt(priest.minvent);
             if (pmoney > 0) {
-                bits = u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await currency(pmoney) : pmoney === 1 ? $c.lit("bit") : $c.lit("bits");
+                const bits = u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await currency(pmoney) : pmoney === 1 ? $c.lit("bit") : $c.lit("bits");
                 /* Note: two bits is actually 25 cents.  Hmm. */
                 await pline($c.lit("%s gives you %s%s for an ale."), await Monnam(priest), pmoney === 1 ? $c.lit("one ") : $c.lit("two "), bits);
                 await money2u(priest, pmoney > 1 ? 2 : 1);
@@ -663,8 +660,8 @@ export async function priest_talk(priest) {   // priest.c:558
            you need to donate more but get a greater effect; and if you
            cheapskate out to rerandomize the donation amounts they will be
            higher next time */
-        suggested = Math.imul((u.ulevelpeak ? u.ulevelpeak : 1) >>> 0, (rn2(101) >>> 0) + (150 + (Math.imul(cheapskate ? cheapskate.get(0) : 0, 40) >>> 0) >>> 0) >>> 0) >>> 0;
-        quan = $c.div64(money_cnt(gi.invent), $c.mul64(suggested, 3));
+        const suggested = Math.imul((u.ulevelpeak ? u.ulevelpeak : 1) >>> 0, (rn2(101) >>> 0) + (150 + (Math.imul(cheapskate ? cheapskate.get(0) : 0, 40) >>> 0) >>> 0) >>> 0) >>> 0;
+        let quan = $c.div64(money_cnt(gi.invent), $c.mul64(suggested, 3));
         if (quan < 1) {
             quan = 1;
         }
@@ -703,7 +700,7 @@ export async function priest_talk(priest) {   // priest.c:558
             await verbalize($c.lit("I bestow upon thee a blessing."));
             incr_itimeout(new $c.FieldRef(u.uprops[CLAIRVOYANT], "intrinsic", "i64"), $c.i32($c.add64(rn2($c.i32($c.div64($c.mul64(500, offer), suggested))), $c.div64($c.mul64(500, offer), suggested))));
         } else if (offer < $c.mul64($c.mul64(suggested, quan), 3)) {
-            orig_ublessed = u.ublessed;
+            let orig_ublessed = u.ublessed;
             /* u.ublessed is only active when Protection is enabled via
                something other than worn gear (theft by gremlin clears the
                intrinsic but not its former magnitude, making it
@@ -748,8 +745,8 @@ export async function priest_talk(priest) {   // priest.c:558
  * @returns {Promise<$T.monst | null>} struct monst *
  */
 export async function mk_roamer(ptr, alignment, x, y, peaceful) {   // priest.c:724
-    let roamer = null, coaligned = 0;
-    coaligned = u.ualign.type === alignment ? 1 : 0;
+    let roamer = null;
+    const coaligned = u.ualign.type === alignment ? 1 : 0;
     /* this was due to permonst's pxlth field which is now gone */
     if (MON_AT(x, y)) {
         await rloc(svl.level.monsters[x][y], RLOC.NOMSG);   /* insurance */
@@ -818,14 +815,14 @@ export function in_your_sanctuary(mon, x, y) {   // priest.c:771
  * @returns {Promise<void>}
  */
 export async function ghod_hitsu(priest) {   // priest.c:796
-    let troom = null, oldbuzzer = null, oldcurrwand = null, x = 0, y = 0, ax = 0, ay = 0, roomno = 0;
-    roomno = temple_occupied(new $c.Ptr(u.urooms, 0));
+    let x = 0, y = 0;
+    const roomno = temple_occupied(new $c.Ptr(u.urooms, 0));
     if (!roomno || !has_shrine(priest)) {
         return;
     }
-    ax = x = priest.mextra.epri.shrpos.x;
-    ay = y = priest.mextra.epri.shrpos.y;
-    troom = $c.relem(svr.rooms, roomno - ROOMOFFSET | 0);
+    const ax = x = priest.mextra.epri.shrpos.x;
+    const ay = y = priest.mextra.epri.shrpos.y;
+    const troom = $c.relem(svr.rooms, roomno - ROOMOFFSET | 0);
     if (u_at(x, y) || !linedup(u.ux, u.uy, x, y, 1)) {
         if (svl.level.locations[u.ux][u.uy].typ === DOOR) {
             if (u.ux === troom.lx - 1) {
@@ -877,9 +874,9 @@ export async function ghod_hitsu(priest) {   // priest.c:796
             break;
     }
     /* bolt of lightning cast by unspecified monster */
-    oldcurrwand = gc.current_wand;
+    const oldcurrwand = gc.current_wand;
     gc.current_wand = null;
-    oldbuzzer = gb.buzzer;
+    const oldbuzzer = gb.buzzer;
     gb.buzzer = null;
     await buzz(-10 - $c.rem32($c.abs(AD.ELEC - AD.MAGM), 10) | 0, 6, x, y, sgn(gt.tbx), sgn(gt.tby));
     gb.buzzer = oldbuzzer;
@@ -890,9 +887,9 @@ export async function ghod_hitsu(priest) {   // priest.c:796
  * @returns {Promise<void>}
  */
 export async function angry_priest() {   // priest.c:877
-    let priest = null, lev = null, eprip = null;
+    let priest = null;
     if ((priest = findpriest(temple_occupied(new $c.Ptr(u.urooms, 0)))) !== null) {
-        eprip = priest.mextra.epri;
+        const eprip = priest.mextra.epri;
         await wakeup(priest, FALSE);
         await setmangry(priest, FALSE);
         /*
@@ -902,7 +899,7 @@ export async function angry_priest() {   // priest.c:877
          * a fresh corpse nearby, the priest ought to have an
          * opportunity to try converting it back; maybe someday...)
          */
-        lev = $c.relem(svl.level.locations[eprip.shrpos.x], eprip.shrpos.y);
+        const lev = $c.relem(svl.level.locations[eprip.shrpos.x], eprip.shrpos.y);
         if (!IS_ALTAR(lev.typ) || ((lev.flags & AM.MASK & AM.MASK) === 0 ? A.NONE : (lev.flags & AM.MASK & AM.MASK) === AM.LAWFUL ? A.LAWFUL : (lev.flags & AM.MASK & AM.MASK) - 2) !== eprip.shralign) {
             if (!EMIN(priest)) {
                 await newemin(priest);

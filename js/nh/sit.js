@@ -77,8 +77,8 @@ const rndcurse$mal_aura = new Int8Array(35);   // static in rndcurse()
  * @returns {Promise<void>}
  */
 export async function take_gold() {   // sit.c:14
-    let otmp = null, nobj = null, lost_money = 0;
-    lost_money = 0;
+    let otmp = null, nobj = null;
+    let lost_money = 0;
     for (otmp = gi.invent; otmp; otmp = nobj) {
         nobj = otmp.nobj;
         if (otmp.oclass === COIN_CLASS) {
@@ -99,13 +99,13 @@ export async function take_gold() {   // sit.c:14
  * @returns {Promise<void>}
  */
 async function throne_sit_effect() {   // sit.c:39
-    let tx = 0, ty = 0, special_throne = 0, effect = 0, buf = new Int8Array(256), which = 0, cnt = 0, num_of_eyes = 0, eye = null, $t1;
-    tx = u.ux;
-    ty = u.uy;
-    special_throne = !!In_V_tower(u.uz) ? 1 : 0;
+    let buf = new Int8Array(256), $t1;
+    const tx = u.ux;
+    const ty = u.uy;
+    const special_throne = !!In_V_tower(u.uz) ? 1 : 0;
     if (rnd(6) > 4) {
         /* [why so convoluted? it's the same as '!rn2(3)'] */
-        effect = rnd(13);
+        let effect = rnd(13);
         if (wizard() && !iflags.debug_fuzzer) {
             buf[0] = 0;
             await getlin($c.lit("Throne sit effect (1..13) [0=random]"), new $c.Ptr(buf, 0));
@@ -113,7 +113,7 @@ async function throne_sit_effect() {   // sit.c:39
                 await pline($c.lit("%s"), c_common_strings.c_Never_mind);
                 return;   /* caller will still cause a move to elapse */
             }
-            which = $c.atoi(new $c.Ptr(buf, 0));
+            const which = $c.atoi(new $c.Ptr(buf, 0));
             if (which >= 1 && which <= 13) {
                 effect = which;
             }
@@ -169,7 +169,7 @@ async function throne_sit_effect() {   // sit.c:39
                 break;
             case 7:
                 {
-                    cnt = rnd(10);
+                    let cnt = rnd(10);
                     /* Magical voice not affected by deafness */
                     await pline($c.lit("A voice echoes:"));
                     await verbalize($c.lit("Thine audience hath been summoned, %s!"), flags.female ? $c.lit("Dame") : $c.lit("Sire"));
@@ -209,8 +209,8 @@ async function throne_sit_effect() {   // sit.c:39
                     if (!Blind()) {
                         await Your($c.lit("vision becomes clear."));
                     } else {
-                        num_of_eyes = eyecount(gy.youmonst.data);
-                        eye = await body_part(EYE);
+                        const num_of_eyes = eyecount(gy.youmonst.data);
+                        let eye = await body_part(EYE);
                         /* note: 1 eye case won't actually happen--can't
                            sit on throne when poly'd into always-levitating
                            floating eye and can't polymorph into Cyclops */
@@ -288,9 +288,9 @@ async function throne_sit_effect() {   // sit.c:39
  * @returns {Promise<void>}
  */
 async function special_throne_effect(effect) {   // sit.c:238
-    let tx = 0, ty = 0, otmp = null, vs_level = new $T.d_level(), fake_spellbook = new $T.obj(), save_confusion = 0, ability = 0;
-    tx = u.ux;
-    ty = u.uy;
+    let otmp = null, vs_level = new $T.d_level(), fake_spellbook = new $T.obj(), ability = 0;
+    const tx = u.ux;
+    const ty = u.uy;
     switch (effect) {
         case 1:
         case 2:
@@ -362,7 +362,7 @@ async function special_throne_effect(effect) {   // sit.c:238
         case 10:
             {
                 /* confused blessed remove curse effect */
-                save_confusion = u.uprops[CONFUSION].intrinsic;
+                const save_confusion = u.uprops[CONFUSION].intrinsic;
                 fake_spellbook.$copyFrom(cg.zeroobj);
                 fake_spellbook.otyp = SPE_REMOVE_CURSE;
                 fake_spellbook.oclass = SPBOOK_CLASS;
@@ -405,7 +405,7 @@ async function special_throne_effect(effect) {   // sit.c:238
  * @returns {Promise<number>} int
  */
 async function lay_an_egg() {   // sit.c:358
-    let uegg = null, $t1;
+    let $t1;
     if (!flags.female) {
         await pline($c.lit("%s can't lay eggs!"), Hallucination() ? $c.lit("You may think you are a platypus, but a male still") : $c.lit("Males"));
         return ECMD.OK;
@@ -422,7 +422,7 @@ async function lay_an_egg() {   // sit.c:358
             return ECMD.OK;
         }
     }
-    uegg = await mksobj(EGG, FALSE, FALSE);
+    const uegg = await mksobj(EGG, FALSE, FALSE);
     uegg.spe = 1;
     uegg.quan = 1;
     $t1 = await weight(uegg) >>> 0, uegg.owt = $t1;
@@ -612,8 +612,8 @@ export async function dosit() {   // sit.c:400
  * @returns {Promise<void>}
  */
 export async function rndcurse() {   // sit.c:569
-    let nobj = 0, cnt = 0, onum = 0, otmp = null;
-    nobj = 0;
+    let otmp = null;
+    let nobj = 0;
     if (u_wield_art(ART.MAGICBANE) && rn2(20)) {
         await You(new $c.Ptr(rndcurse$mal_aura, 0), $c.lit("the magic-absorbing blade"));
         return;
@@ -629,10 +629,10 @@ export async function rndcurse() {   // sit.c:569
         }
         nobj = nobj + 1 | 0;
     }
-    cnt = rnd($c.div32(6, (!!(u.uprops[ANTIMAGIC].intrinsic || u.uprops[ANTIMAGIC].extrinsic) ? 1 : 0) + (!!(u.uprops[HALF_SPDAM].intrinsic || u.uprops[HALF_SPDAM].extrinsic) ? 1 : 0) + 1));
+    let cnt = rnd($c.div32(6, (!!(u.uprops[ANTIMAGIC].intrinsic || u.uprops[ANTIMAGIC].extrinsic) ? 1 : 0) + (!!(u.uprops[HALF_SPDAM].intrinsic || u.uprops[HALF_SPDAM].extrinsic) ? 1 : 0) + 1));
     if (nobj) {
         for (; cnt > 0; cnt = cnt - 1 | 0) {
-            onum = rnd(nobj);
+            let onum = rnd(nobj);
             for (otmp = gi.invent; otmp; otmp = otmp.nobj) {
                 /* as above */
                 if (otmp.oclass === COIN_CLASS) {
@@ -683,7 +683,6 @@ export async function rndcurse() {   // sit.c:569
  */
 export async function attrcurse() {   // sit.c:644
     let ret = 0;
-    ret = 0;
     switch (rnd(11)) {
         case 1:
             if ($c.and64(u.uprops[FIRE_RES].intrinsic, INTRINSIC)) {

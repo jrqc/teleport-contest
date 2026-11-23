@@ -182,7 +182,7 @@ export function does_block(x, y, lev) {   // vision.c:153
  * level and the level monsters and objects are in place.
  */
 export function vision_reset() {   // vision.c:211
-    let y = 0, x = 0, i = 0, dig_left = 0, block = 0, lev = null;
+    let y = 0, x = 0, i = 0;
     /* Start out with cs0 as our current array */
     gv.viz_array = new $c.Ptr(cs_rows0, 0);
     gv.viz_rmin = new $c.Ptr(cs_rmin0, 0);
@@ -192,9 +192,9 @@ export function vision_reset() {   // vision.c:211
     $c.memset(new $c.Ptr(viz_clear, 0), 0, 1680);
     /* Dig the level */
     for (y = 0; y < ROWNO; y = y + 1 | 0) {
-        dig_left = 0;
-        block = TRUE;   /* location (0,y) is always stone; it's !isok() */
-        lev = $c.relem(svl.level.locations[1], y);
+        let dig_left = 0;
+        let block = TRUE;   /* location (0,y) is always stone; it's !isok() */
+        let lev = $c.relem(svl.level.locations[1], y);
         for (x = 1; x < COLNO; x = x + 1 | 0, lev = $c.radd(lev, ROWNO)) {
             if (block !== (IS_OBSTRUCTED(lev.typ) || does_block(x, y, lev) ? 1 : 0)) {
                 if (block) {
@@ -243,7 +243,7 @@ export function vision_reset() {   // vision.c:211
  * @param {*} rmax coordxy **
  */
 function get_unused_cs(rows, rmin, rmax) {   // vision.c:274
-    let row = 0, nrmin = null, nrmax = null, $t1, $t2;
+    let row = 0, $t1, $t2;
     if ($c.peq(gv.viz_array, new $c.Ptr(cs_rows0, 0))) {
         rows.set(0, new $c.Ptr(cs_rows1, 0));
         rmin.set(0, new $c.Ptr(cs_rmin1, 0));
@@ -254,8 +254,8 @@ function get_unused_cs(rows, rmin, rmax) {   // vision.c:274
         rmax.set(0, new $c.Ptr(cs_rmax0, 0));
     }
     /* return an initialized, unused work area */
-    nrmin = rmin.get(0);
-    nrmax = rmax.get(0);
+    let nrmin = rmin.get(0);
+    let nrmax = rmax.get(0);
     $c.memset(rows.get(0).get(0), 0, 1680);
     /* see nothing */
     for (row = 0; row < ROWNO; row = row + 1 | 0) {
@@ -283,8 +283,8 @@ function get_unused_cs(rows, rmin, rmax) {   // vision.c:274
  * @returns {Promise<void>}
  */
 async function rogue_vision(next, rmin, rmax) {   // vision.c:314
-    let rnum = 0, start = 0, stop = 0, in_door = 0, xhi = 0, xlo = 0, yhi = 0, ylo = 0, zx = 0, zy = 0, $t1, $t2;
-    rnum = svl.level.locations[u.ux][u.uy].roomno - ROOMOFFSET;   /* no SHARED... */
+    let start = 0, stop = 0, zx = 0, zy = 0, $t1, $t2;
+    const rnum = svl.level.locations[u.ux][u.uy].roomno - ROOMOFFSET;   /* no SHARED... */
     /* If in a lit room, we are able to see to its boundaries. */
     /* If dark, set COULD_SEE so various spells work -dlc */
     if (rnum >= 0) {
@@ -301,12 +301,12 @@ async function rogue_vision(next, rmin, rmax) {   // vision.c:314
             }
         }
     }
-    in_door = svl.level.locations[u.ux][u.uy].typ === DOOR ? 1 : 0;
+    const in_door = svl.level.locations[u.ux][u.uy].typ === DOOR ? 1 : 0;
     /* Can always see adjacent. */
-    ylo = u.uy - 1 > 0 ? u.uy - 1 : 0;
-    yhi = u.uy + 1 < ROWNO - 1 ? u.uy + 1 : ROWNO - 1;
-    xlo = u.ux - 1 > 1 ? u.ux - 1 : 1;
-    xhi = u.ux + 1 < COLNO - 1 ? u.ux + 1 : COLNO - 1;
+    const ylo = u.uy - 1 > 0 ? u.uy - 1 : 0;
+    const yhi = u.uy + 1 < ROWNO - 1 ? u.uy + 1 : ROWNO - 1;
+    const xlo = u.ux - 1 > 1 ? u.ux - 1 : 1;
+    const xhi = u.ux + 1 < COLNO - 1 ? u.ux + 1 : COLNO - 1;
     for (zy = ylo; zy <= yhi; zy = zy + 1 | 0) {
         if (xlo < rmin.get(zy)) {
             rmin.set(zy, $c.i16(xlo));
@@ -2033,7 +2033,7 @@ async function left_side(row, left_mark, right, limits) {   // vision.c:1858
  * @returns {Promise<void>}
  */
 async function view_from(srow, scol, loc_cs_rows, left_most, right_most, range, func, arg) {   // vision.c:2002
-    let i = 0, rowp = null, nrow = 0, left = 0, right = 0, limits = null;
+    let i = 0, nrow = 0, left = 0, right = 0, limits = null;
     /* loop counter */
     /* optimization for setting could_see */
     /* the next row */
@@ -2082,7 +2082,7 @@ async function view_from(srow, scol, loc_cs_rows, left_most, right_most, range, 
         }
     } else {
         /* Row pointer optimization. */
-        rowp = cs_rows.get(srow);
+        const rowp = cs_rows.get(srow);
         /* We know that we can see our row. */
         for (i = left; i <= right; i = i + 1 | 0) {
             do {
@@ -2140,21 +2140,21 @@ async function view_from(srow, scol, loc_cs_rows, left_most, right_most, range, 
  * @returns {Promise<void>}
  */
 export async function do_clear_area(scol, srow, range, func, arg) {   // vision.c:2107
-    let x = 0, y = 0, min_x = 0, max_x = 0, max_y = 0, offset = 0, limits = null, override_vision = 0;
+    let x = 0, y = 0, min_x = 0, max_x = 0, max_y = 0;
     /* If not centered on hero, do the hard work of figuring the area */
     if (scol !== u.ux || srow !== u.uy) {
         await view_from(srow, scol, null, null, null, range, func, arg);
     } else {
         /* vision doesn't pass through water or clouds, detection should
            [this probably ought to be an arg supplied by our caller...] */
-        override_vision = detecting(func) && ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) || (svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level)) ? 1 : 0;
+        const override_vision = detecting(func) && ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) || (svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level)) ? 1 : 0;
         if (range > MAX_RADIUS || range < 1) {
             await panic($c.lit("do_clear_area:  illegal range %d"), range);
         }
         if (gv.vision_full_recalc) {
             await vision_recalc(0);   /* recalc vision if dirty */
         }
-        limits = circle_ptr(range);
+        const limits = circle_ptr(range);
         if ((max_y = srow + range | 0) >= ROWNO) {
             max_y = ROWNO - 1;
         }
@@ -2162,7 +2162,7 @@ export async function do_clear_area(scol, srow, range, func, arg) {   // vision.
             y = 0;
         }
         for (; y <= max_y; y = y + 1 | 0) {
-            offset = limits.get(v_abs(y - srow | 0));
+            const offset = limits.get(v_abs(y - srow | 0));
             if ((min_x = scol - offset | 0) < 1) {
                 min_x = 1;
             }
@@ -2183,10 +2183,9 @@ export async function do_clear_area(scol, srow, range, func, arg) {   // vision.
  * @returns {number} unsigned int
  */
 export function howmonseen(mon) {   // vision.c:2152
-    let useemon = 0, xraydist = 0, how_seen = 0;
-    useemon = $c.i8(canseemon(mon));
-    xraydist = u.xray_range < 0 ? -1 : Math.imul(u.xray_range, u.xray_range);
-    how_seen = 0;   /* result */
+    const useemon = $c.i8(canseemon(mon));
+    const xraydist = u.xray_range < 0 ? -1 : Math.imul(u.xray_range, u.xray_range);
+    let how_seen = 0;   /* result */
     /* assert(mon != NULL) */
     /* normal vision;
        cansee is true for both normal and astral vision,

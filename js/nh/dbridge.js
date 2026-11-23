@@ -80,11 +80,10 @@ export function is_waterwall(x, y) {   // dbridge.c:38
  * @returns {number} boolean
  */
 export function is_pool(x, y) {   // dbridge.c:46
-    let ltyp = 0;
     if (!isok(x, y)) {
         return FALSE;
     }
-    ltyp = svl.level.locations[x][y].typ;
+    const ltyp = svl.level.locations[x][y].typ;
     /* The ltyp == MOAT is not redundant with is_moat, because the
      * Juiblex level does not have moats, although it has MOATs. There
      * is probably a better way to express this. */
@@ -99,11 +98,10 @@ export function is_pool(x, y) {   // dbridge.c:46
  * @returns {number} boolean
  */
 export function is_lava(x, y) {   // dbridge.c:62
-    let ltyp = 0;
     if (!isok(x, y)) {
         return FALSE;
     }
-    ltyp = svl.level.locations[x][y].typ;
+    const ltyp = svl.level.locations[x][y].typ;
     if (ltyp === LAVAPOOL || ltyp === LAVAWALL || ltyp === DRAWBRIDGE_UP && (svl.level.locations[x][y].flags & DB.UNDER) === DB.LAVA) {
         return TRUE;
     }
@@ -127,11 +125,10 @@ export function is_pool_or_lava(x, y) {   // dbridge.c:77
  * @returns {number} boolean
  */
 export function is_ice(x, y) {   // dbridge.c:86
-    let ltyp = 0;
     if (!isok(x, y)) {
         return FALSE;
     }
-    ltyp = svl.level.locations[x][y].typ;
+    const ltyp = svl.level.locations[x][y].typ;
     if (ltyp === ICE || ltyp === DRAWBRIDGE_UP && (svl.level.locations[x][y].flags & DB.UNDER) === DB.ICE) {
         return TRUE;
     }
@@ -143,11 +140,10 @@ export function is_ice(x, y) {   // dbridge.c:86
  * @returns {number} boolean
  */
 export function is_moat(x, y) {   // dbridge.c:100
-    let ltyp = 0;
     if (!isok(x, y)) {
         return FALSE;
     }
-    ltyp = svl.level.locations[x][y].typ;
+    const ltyp = svl.level.locations[x][y].typ;
     if (!((svd.dungeon_topology.d_juiblex_level.dlevel || svd.dungeon_topology.d_juiblex_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_juiblex_level)) && (ltyp === MOAT || ltyp === DRAWBRIDGE_UP && (svl.level.locations[x][y].flags & DB.UNDER) === DB.MOAT)) {
         return TRUE;
     }
@@ -181,11 +177,10 @@ export function db_under_typ(mask) {   // dbridge.c:116
  * @returns {number} int
  */
 export function is_drawbridge_wall(x, y) {   // dbridge.c:137
-    let lev = null;
     if (!isok(x, y)) {
         return -1;
     }
-    lev = $c.relem(svl.level.locations[x], y);
+    const lev = $c.relem(svl.level.locations[x], y);
     if (lev.typ !== DOOR && lev.typ !== DBWALL) {
         return -1;
     }
@@ -226,11 +221,10 @@ export function is_db_wall(x, y) {   // dbridge.c:170
  * @returns {number} boolean
  */
 export function find_drawbridge(x, y) {   // dbridge.c:180
-    let dir = 0;
     if (svl.level.locations[x.get(0)][y.get(0)].typ === DRAWBRIDGE_UP || svl.level.locations[x.get(0)][y.get(0)].typ === DRAWBRIDGE_DOWN) {
         return TRUE;
     }
-    dir = is_drawbridge_wall(x.get(0), y.get(0));
+    const dir = is_drawbridge_wall(x.get(0), y.get(0));
     if (dir >= 0) {
         switch (dir) {
             case DB.NORTH:
@@ -286,10 +280,10 @@ function get_wall_for_db(x, y) {   // dbridge.c:211
  * @returns {Promise<number>} boolean
  */
 export async function create_drawbridge(x, y, dir, flag) {   // dbridge.c:235
-    let x2 = 0, y2 = 0, horiz = 0, lava = 0;
-    lava = svl.level.locations[x][y].typ === LAVAPOOL ? 1 : 0;   /* assume initialized map */
-    x2 = x;
-    y2 = y;
+    let horiz = 0;
+    const lava = svl.level.locations[x][y].typ === LAVAPOOL ? 1 : 0;   /* assume initialized map */
+    let x2 = x;
+    let y2 = y;
     switch (dir) {
         case DB.NORTH:
             horiz = TRUE;
@@ -339,7 +333,7 @@ export async function create_drawbridge(x, y, dir, flag) {   // dbridge.c:235
  * @returns {Promise<$T.entity | null>} struct entity *
  */
 async function e_at(x, y) {   // dbridge.c:286
-    let entitycnt = 0, save_plnmsg = 0;
+    let entitycnt = 0;
     for (entitycnt = 0; entitycnt < ENTITIES; entitycnt = entitycnt + 1 | 0) {
         if (go.occupants[entitycnt].edata && go.occupants[entitycnt].ex === x && go.occupants[entitycnt].ey === y) {
             break;
@@ -347,7 +341,7 @@ async function e_at(x, y) {   // dbridge.c:286
     }
     do {
         if (debugcore($c.lit("dbridge.c"), TRUE)) {
-            save_plnmsg = iflags.last_msg;
+            const save_plnmsg = iflags.last_msg;
             await pline($c.lit("entitycnt = %d"), entitycnt);
             iflags.last_msg = save_plnmsg;
         }
@@ -466,7 +460,7 @@ function e_survives_at(etmp, x, y) {   // dbridge.c:380
  * @returns {Promise<void>}
  */
 async function e_died(etmp, xkill_flags, how) {   // dbridge.c:402
-    let xy = new $T.nhcoord(), entitycnt = 0, seeit = 0;
+    let xy = new $T.nhcoord(), entitycnt = 0;
     if (is_u(etmp)) {
         if (how === DROWNING) {
             svk.killer.name[0] = 0;   /* drown() sets its own killer */
@@ -507,7 +501,7 @@ async function e_died(etmp, xkill_flags, how) {   // dbridge.c:402
         /* if etmp gets life-saved, kill it again; otherwise we might end up
            trying to place another monster (probably a xorn) on same spot */
         if (!DEADMONSTER(etmp.emon)) {
-            seeit = canseemon(etmp.emon) || sensemon(etmp.emon) ? 1 : 0;
+            const seeit = canseemon(etmp.emon) || sensemon(etmp.emon) ? 1 : 0;
             xkill_flags = xkill_flags | (XKILL.NOMSG | XKILL.NOCONDUCT);
             if (svc.context.mon_moving) {
                 await monkilled(etmp.emon, $c.lit(""), mk_corpse(xkill_flags));
@@ -551,11 +545,11 @@ function automiss(etmp) {   // dbridge.c:486
  * @returns {Promise<number>} boolean
  */
 async function e_missed(etmp, chunks) {   // dbridge.c:496
-    let misses = 0, save_plnmsg = 0, save_plnmsg$2 = 0;
+    let misses = 0;
     if (chunks) {
         do {
             if (debugcore($c.lit("dbridge.c"), TRUE)) {
-                save_plnmsg = iflags.last_msg;
+                const save_plnmsg = iflags.last_msg;
                 await pline($c.lit("Do chunks miss?"));
                 iflags.last_msg = save_plnmsg;
             }
@@ -578,7 +572,7 @@ async function e_missed(etmp, chunks) {   // dbridge.c:496
     }
     do {
         if (debugcore($c.lit("dbridge.c"), TRUE)) {
-            save_plnmsg$2 = iflags.last_msg;
+            const save_plnmsg$2 = iflags.last_msg;
             await pline($c.lit("Miss chance = %d (out of 8)"), misses);
             iflags.last_msg = save_plnmsg$2;
         }
@@ -593,8 +587,7 @@ async function e_missed(etmp, chunks) {   // dbridge.c:496
  * @returns {Promise<number>} boolean
  */
 async function e_jumps(etmp) {   // dbridge.c:531
-    let tmp = 0, save_plnmsg = 0;
-    tmp = 4;   /* out of 10 */
+    let tmp = 4;   /* out of 10 */
     if (is_u(etmp) ? Unaware() || Fumbling() : helpless(etmp.emon) || !etmp.edata.mmove || etmp.emon.wormno) {
         return FALSE;
     }
@@ -609,7 +602,7 @@ async function e_jumps(etmp) {   // dbridge.c:531
     }
     do {
         if (debugcore($c.lit("dbridge.c"), TRUE)) {
-            save_plnmsg = iflags.last_msg;
+            const save_plnmsg = iflags.last_msg;
             await pline($c.lit("%s to jump (%d chances in 10)"), await E_phrase(etmp, $c.lit("try")), tmp);
             iflags.last_msg = save_plnmsg;
         }
@@ -621,17 +614,17 @@ async function e_jumps(etmp) {   // dbridge.c:531
  * @returns {Promise<void>}
  */
 async function do_entity(etmp) {   // dbridge.c:554
-    let newx = Int16Array.of(0), newy = Int16Array.of(0), oldx = 0, oldy = 0, at_portcullis = 0, must_jump = 0, relocates = 0, e_inview = 0, crm = null, save_plnmsg = 0, save_plnmsg$2 = 0, save_plnmsg$3 = 0, save_plnmsg$4 = 0, save_plnmsg$5 = 0, save_plnmsg$6 = 0, other = null, save_plnmsg$7 = 0, save_plnmsg$8 = 0, save_plnmsg$9 = 0, save_plnmsg$10 = 0, save_plnmsg$11 = 0, save_plnmsg$12 = 0, save_plnmsg$13 = 0, save_plnmsg$14 = 0, save_plnmsg$15 = 0, save_plnmsg$16 = 0, save_plnmsg$17 = 0, lava = 0;
-    must_jump = FALSE;
-    relocates = FALSE;
+    let newx = Int16Array.of(0), newy = Int16Array.of(0);
+    let must_jump = FALSE;
+    let relocates = FALSE;
     if (!etmp.edata) {
         return;
     }
-    e_inview = e_canseemon(etmp);
-    oldx = $c.i16(etmp.ex);
-    oldy = $c.i16(etmp.ey);
-    at_portcullis = is_db_wall(oldx, oldy);
-    crm = $c.relem(svl.level.locations[oldx], oldy);
+    let e_inview = e_canseemon(etmp);
+    const oldx = $c.i16(etmp.ex);
+    const oldy = $c.i16(etmp.ey);
+    const at_portcullis = is_db_wall(oldx, oldy);
+    const crm = $c.relem(svl.level.locations[oldx], oldy);
     if (automiss(etmp) && e_survives_at(etmp, oldx, oldy)) {
         if (e_inview && (at_portcullis || IS_DRAWBRIDGE(crm.typ))) {
             await pline_The($c.lit("%s passes through %s!"), at_portcullis ? $c.lit("portcullis") : $c.lit("drawbridge"), await e_nam(etmp));
@@ -647,7 +640,7 @@ async function do_entity(etmp) {   // dbridge.c:554
         } else {
             do {
                 if (debugcore($c.lit("dbridge.c"), TRUE)) {
-                    save_plnmsg = iflags.last_msg;
+                    const save_plnmsg = iflags.last_msg;
                     await pline($c.lit("The drawbridge misses %s!"), await e_nam(etmp));
                     iflags.last_msg = save_plnmsg;
                 }
@@ -658,7 +651,7 @@ async function do_entity(etmp) {   // dbridge.c:554
         } else {
             do {
                 if (debugcore($c.lit("dbridge.c"), TRUE)) {
-                    save_plnmsg$2 = iflags.last_msg;
+                    const save_plnmsg$2 = iflags.last_msg;
                     await pline($c.lit("Mon can't survive here"));
                     iflags.last_msg = save_plnmsg$2;
                 }
@@ -687,7 +680,7 @@ async function do_entity(etmp) {   // dbridge.c:554
                 relocates = TRUE;
                 do {
                     if (debugcore($c.lit("dbridge.c"), TRUE)) {
-                        save_plnmsg$3 = iflags.last_msg;
+                        const save_plnmsg$3 = iflags.last_msg;
                         await pline($c.lit("Jump succeeds!"));
                         iflags.last_msg = save_plnmsg$3;
                     }
@@ -707,7 +700,7 @@ async function do_entity(etmp) {   // dbridge.c:554
             relocates = !await e_jumps(etmp) ? 1 : 0;
             do {
                 if (debugcore($c.lit("dbridge.c"), TRUE)) {
-                    save_plnmsg$4 = iflags.last_msg;
+                    const save_plnmsg$4 = iflags.last_msg;
                     await pline($c.lit("Jump %s!"), relocates ? $c.lit("fails") : $c.lit("succeeds"));
                     iflags.last_msg = save_plnmsg$4;
                 }
@@ -723,7 +716,7 @@ async function do_entity(etmp) {   // dbridge.c:554
      */
     do {
         if (debugcore($c.lit("dbridge.c"), TRUE)) {
-            save_plnmsg$5 = iflags.last_msg;
+            const save_plnmsg$5 = iflags.last_msg;
             await pline($c.lit("Doing relocation."));
             iflags.last_msg = save_plnmsg$5;
         }
@@ -736,7 +729,7 @@ async function do_entity(etmp) {   // dbridge.c:554
     }
     do {
         if (debugcore($c.lit("dbridge.c"), TRUE)) {
-            save_plnmsg$6 = iflags.last_msg;
+            const save_plnmsg$6 = iflags.last_msg;
             await pline($c.lit("Checking new square for occupancy."));
             iflags.last_msg = save_plnmsg$6;
         }
@@ -748,10 +741,10 @@ async function do_entity(etmp) {   // dbridge.c:554
          * first whether the other entity is staying put.  Clean up if
          * we happen to move/die in recursion.
          */
-        other = await e_at(newx[0], newy[0]);
+        const other = await e_at(newx[0], newy[0]);
         do {
             if (debugcore($c.lit("dbridge.c"), TRUE)) {
-                save_plnmsg$7 = iflags.last_msg;
+                const save_plnmsg$7 = iflags.last_msg;
                 await pline($c.lit("New square is occupied by %s"), await e_nam(other));
                 iflags.last_msg = save_plnmsg$7;
             }
@@ -760,7 +753,7 @@ async function do_entity(etmp) {   // dbridge.c:554
             relocates = FALSE;   /* "other" won't budge */
             do {
                 if (debugcore($c.lit("dbridge.c"), TRUE)) {
-                    save_plnmsg$8 = iflags.last_msg;
+                    const save_plnmsg$8 = iflags.last_msg;
                     await pline($c.lit("%s suicide."), await E_phrase(etmp, $c.lit("commit")));
                     iflags.last_msg = save_plnmsg$8;
                 }
@@ -768,7 +761,7 @@ async function do_entity(etmp) {   // dbridge.c:554
         } else {
             do {
                 if (debugcore($c.lit("dbridge.c"), TRUE)) {
-                    save_plnmsg$9 = iflags.last_msg;
+                    const save_plnmsg$9 = iflags.last_msg;
                     await pline($c.lit("Handling %s"), await e_nam(other));
                     iflags.last_msg = save_plnmsg$9;
                 }
@@ -778,7 +771,7 @@ async function do_entity(etmp) {   // dbridge.c:554
             }
             do {
                 if (debugcore($c.lit("dbridge.c"), TRUE)) {
-                    save_plnmsg$10 = iflags.last_msg;
+                    const save_plnmsg$10 = iflags.last_msg;
                     await pline($c.lit("Checking existence of %s"), await e_nam(etmp));
                     iflags.last_msg = save_plnmsg$10;
                 }
@@ -786,7 +779,7 @@ async function do_entity(etmp) {   // dbridge.c:554
             if (!$c.peq(await e_at(oldx, oldy), etmp)) {
                 do {
                     if (debugcore($c.lit("dbridge.c"), TRUE)) {
-                        save_plnmsg$11 = iflags.last_msg;
+                        const save_plnmsg$11 = iflags.last_msg;
                         await pline($c.lit("%s moved or died in recursion somewhere"), await E_phrase(etmp, $c.lit("have")));
                         iflags.last_msg = save_plnmsg$11;
                     }
@@ -799,7 +792,7 @@ async function do_entity(etmp) {   // dbridge.c:554
         /* if e_at() entity = worm tail */
         do {
             if (debugcore($c.lit("dbridge.c"), TRUE)) {
-                save_plnmsg$12 = iflags.last_msg;
+                const save_plnmsg$12 = iflags.last_msg;
                 await pline($c.lit("Moving %s"), await e_nam(etmp));
                 iflags.last_msg = save_plnmsg$12;
             }
@@ -818,7 +811,7 @@ async function do_entity(etmp) {   // dbridge.c:554
     }
     do {
         if (debugcore($c.lit("dbridge.c"), TRUE)) {
-            save_plnmsg$13 = iflags.last_msg;
+            const save_plnmsg$13 = iflags.last_msg;
             await pline($c.lit("Final disposition of %s"), await e_nam(etmp));
             iflags.last_msg = save_plnmsg$13;
         }
@@ -826,7 +819,7 @@ async function do_entity(etmp) {   // dbridge.c:554
     if (is_db_wall($c.i16(etmp.ex), $c.i16(etmp.ey))) {
         do {
             if (debugcore($c.lit("dbridge.c"), TRUE)) {
-                save_plnmsg$14 = iflags.last_msg;
+                const save_plnmsg$14 = iflags.last_msg;
                 await pline($c.lit("%s in portcullis chamber"), await E_phrase(etmp, $c.lit("are")));
                 iflags.last_msg = save_plnmsg$14;
             }
@@ -851,7 +844,7 @@ async function do_entity(etmp) {   // dbridge.c:554
         }
         do {
             if (debugcore($c.lit("dbridge.c"), TRUE)) {
-                save_plnmsg$15 = iflags.last_msg;
+                const save_plnmsg$15 = iflags.last_msg;
                 await pline($c.lit("%s in here"), await E_phrase(etmp, $c.lit("survive")));
                 iflags.last_msg = save_plnmsg$15;
             }
@@ -859,7 +852,7 @@ async function do_entity(etmp) {   // dbridge.c:554
     } else {
         do {
             if (debugcore($c.lit("dbridge.c"), TRUE)) {
-                save_plnmsg$16 = iflags.last_msg;
+                const save_plnmsg$16 = iflags.last_msg;
                 await pline($c.lit("%s on drawbridge square"), await E_phrase(etmp, $c.lit("are")));
                 iflags.last_msg = save_plnmsg$16;
             }
@@ -877,7 +870,7 @@ async function do_entity(etmp) {   // dbridge.c:554
         }
         do {
             if (debugcore($c.lit("dbridge.c"), TRUE)) {
-                save_plnmsg$17 = iflags.last_msg;
+                const save_plnmsg$17 = iflags.last_msg;
                 await pline($c.lit("%s cannot survive on the drawbridge square"), await E_phrase(etmp, null));
                 iflags.last_msg = save_plnmsg$17;
             }
@@ -885,7 +878,7 @@ async function do_entity(etmp) {   // dbridge.c:554
         if (is_pool($c.i16(etmp.ex), $c.i16(etmp.ey)) || is_lava($c.i16(etmp.ex), $c.i16(etmp.ey))) {
             if (e_inview && !is_u(etmp)) {
                 /* drown() will supply msgs if nec. */
-                lava = is_lava($c.i16(etmp.ex), $c.i16(etmp.ey));
+                const lava = is_lava($c.i16(etmp.ex), $c.i16(etmp.ey));
                 if (Hallucination()) {
                     await pline($c.lit("%s the %s and disappears."), await E_phrase(etmp, $c.lit("drink")), lava ? $c.lit("lava") : $c.lit("moat"));
                 } else {
@@ -916,8 +909,8 @@ function nokiller() {   // dbridge.c:763
  * @returns {Promise<void>}
  */
 export async function close_drawbridge(x, y) {   // dbridge.c:775
-    let lev1 = null, lev2 = null, t = null, x2 = Int16Array.of(0), y2 = Int16Array.of(0);
-    lev1 = $c.relem(svl.level.locations[x], y);
+    let t = null, x2 = Int16Array.of(0), y2 = Int16Array.of(0);
+    const lev1 = $c.relem(svl.level.locations[x], y);
     if (lev1.typ !== DRAWBRIDGE_DOWN) {
         return;
     }
@@ -931,7 +924,7 @@ export async function close_drawbridge(x, y) {   // dbridge.c:775
         await You_hear($c.lit("chains rattling and gears turning."));
     }
     lev1.typ = DRAWBRIDGE_UP;
-    lev2 = $c.relem(svl.level.locations[x2[0]], y2[0]);
+    const lev2 = $c.relem(svl.level.locations[x2[0]], y2[0]);
     lev2.typ = DBWALL;
     switch (lev1.flags & DB.DIR) {
         case DB.NORTH:
@@ -978,8 +971,8 @@ export async function close_drawbridge(x, y) {   // dbridge.c:775
  * @returns {Promise<void>}
  */
 export async function open_drawbridge(x, y) {   // dbridge.c:840
-    let lev1 = null, lev2 = null, t = null, x2 = Int16Array.of(0), y2 = Int16Array.of(0);
-    lev1 = $c.relem(svl.level.locations[x], y);
+    let t = null, x2 = Int16Array.of(0), y2 = Int16Array.of(0);
+    const lev1 = $c.relem(svl.level.locations[x], y);
     if (lev1.typ !== DRAWBRIDGE_UP) {
         return;
     }
@@ -993,7 +986,7 @@ export async function open_drawbridge(x, y) {   // dbridge.c:840
         await You_hear($c.lit("gears turning and chains rattling."));
     }
     lev1.typ = DRAWBRIDGE_DOWN;
-    lev2 = $c.relem(svl.level.locations[x2[0]], y2[0]);
+    const lev2 = $c.relem(svl.level.locations[x2[0]], y2[0]);
     lev2.typ = DOOR;
     lev2.flags = (D.NODOOR) & 31;
     set_entity(x, y, go.occupants[0]);
@@ -1028,19 +1021,19 @@ export async function open_drawbridge(x, y) {   // dbridge.c:840
  * @returns {Promise<void>}
  */
 export async function destroy_drawbridge(x, y) {   // dbridge.c:888
-    let lev1 = null, lev2 = null, t = null, otmp = null, x2 = Int16Array.of(0), y2 = Int16Array.of(0), i = 0, e_inview = 0, etmp1 = null, etmp2 = null, otmp2 = null, lava = 0, save_plnmsg = 0, save_plnmsg$2 = 0;
-    etmp1 = go.occupants[0];
-    etmp2 = go.occupants[1];
-    lev1 = $c.relem(svl.level.locations[x], y);
+    let t = null, x2 = Int16Array.of(0), y2 = Int16Array.of(0), i = 0, e_inview = 0, otmp2 = null;
+    const etmp1 = go.occupants[0];
+    const etmp2 = go.occupants[1];
+    const lev1 = $c.relem(svl.level.locations[x], y);
     if (!IS_DRAWBRIDGE(lev1.typ)) {
         return;
     }
     x2[0] = x;
     y2[0] = y;
     get_wall_for_db(new $c.Ptr(x2, 0), new $c.Ptr(y2, 0));
-    lev2 = $c.relem(svl.level.locations[x2[0]], y2[0]);
+    const lev2 = $c.relem(svl.level.locations[x2[0]], y2[0]);
     if ((lev1.flags & DB.UNDER) === DB.MOAT || (lev1.flags & DB.UNDER) === DB.LAVA) {
-        lava = (lev1.flags & DB.UNDER) === DB.LAVA ? 1 : 0;
+        const lava = (lev1.flags & DB.UNDER) === DB.LAVA ? 1 : 0;
         /* Deaf-aware */
         if (lev1.typ === DRAWBRIDGE_UP) {
             if (cansee(x2[0], y2[0]) || u_at(x2[0], y2[0])) {
@@ -1088,7 +1081,7 @@ export async function destroy_drawbridge(x, y) {   // dbridge.c:888
         /* doesn't matter if we happen to pick <x,y2> or <x2,y>;
            since drawbridges are never placed diagonally, those
            pairings will always match one of <x,y> or <x2,y2> */
-        otmp = await mksobj_at(IRON_CHAIN, rn2(2) ? x : x2[0], rn2(2) ? y : y2[0], TRUE, FALSE);
+        const otmp = await mksobj_at(IRON_CHAIN, rn2(2) ? x : x2[0], rn2(2) ? y : y2[0], TRUE, FALSE);
         /* a force of 5 here would yield a radius of 2 for
            iron chain; anything less produces a radius of 1 */
         await scatter(otmp.ox, otmp.oy, 1, MAY_HIT, otmp);
@@ -1120,7 +1113,7 @@ export async function destroy_drawbridge(x, y) {   // dbridge.c:888
         if (await e_missed(etmp1, TRUE)) {
             do {
                 if (debugcore($c.lit("dbridge.c"), TRUE)) {
-                    save_plnmsg = iflags.last_msg;
+                    const save_plnmsg = iflags.last_msg;
                     await pline($c.lit("%s spared!"), await E_phrase(etmp1, $c.lit("are")));
                     iflags.last_msg = save_plnmsg;
                 }
@@ -1144,7 +1137,7 @@ export async function destroy_drawbridge(x, y) {   // dbridge.c:888
                 } else {
                     do {
                         if (debugcore($c.lit("dbridge.c"), TRUE)) {
-                            save_plnmsg$2 = iflags.last_msg;
+                            const save_plnmsg$2 = iflags.last_msg;
                             await pline($c.lit("%s from shrapnel"), await E_phrase(etmp1, $c.lit("die")));
                             iflags.last_msg = save_plnmsg$2;
                         }

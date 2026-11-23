@@ -185,12 +185,12 @@ async function lopt(arg, lflags, optname, origarg, argc_p, argv_p) {   // earlya
  * @param {*} av_p char ***
  */
 function consume_arg(ndx, ac_p, av_p) {   // earlyarg.c:149
-    let gone = null, av = null, i = 0, ac = 0;
-    av = av_p.get(0);
-    ac = ac_p.get(0);
+    let i = 0;
+    const av = av_p.get(0);
+    const ac = ac_p.get(0);
     /* "-one -two -three -four" -> "-two -three -four -one" */
     if (ac > 2) {
-        gone = av.get(ndx);
+        const gone = av.get(ndx);
         for (i = ndx + 1 | 0; i < ac; i = i + 1 | 0) {
             av.set(i - 1 | 0, av.get(i));
         }
@@ -222,9 +222,9 @@ function consume_two_args(ndx, ac_p, av_p) {   // earlyarg.c:166
  * @returns {Promise<void>}
  */
 export async function early_options(argc_p, argv_p, hackdir_p) {   // earlyarg.c:180
-    let argv = [null], arg = null, origarg = null, argc = Int32Array.of(0), oldargc = 0, ndx = 0, consumed = 0, $t1, $t2;
-    ndx = 0;
-    consumed = 0;
+    let argv = [null], origarg = null, argc = Int32Array.of(0), oldargc = 0, $t1, $t2;
+    let ndx = 0;
+    let consumed = 0;
     if (await argcheck(argc_p.get(0), argv_p.get(0), ARG.DUMPGLYPHIDS) === 2) {
         await opt_terminate();
     }
@@ -245,7 +245,7 @@ export async function early_options(argc_p, argv_p, hackdir_p) {   // earlyarg.c
         consumed = 0;
         argc[0] = argc_p.get(0) - ndx | 0;
         argv[0] = argv_p.get(0).add(ndx);
-        arg = origarg = argv[0].get(0);
+        let arg = origarg = argv[0].get(0);
         /* skip any args intended for deferred options */
         if (arg.get(0) !== 45) {
             continue;
@@ -441,10 +441,10 @@ async function scores_only(argc, argv, dir) {   // earlyarg.c:406
  * @returns {Promise<number>} int
  */
 export async function argcheck(argc, argv, e_arg) {   // earlyarg.c:450
-    let i = 0, idx = 0, match = 0, userea = null, dashdash = null, extended_opt = null, cpy_extended_opt = null, insert_into_pastebuf = 0;
-    match = FALSE;
-    userea = null;
-    dashdash = $c.lit("");
+    let i = 0, idx = 0;
+    let match = FALSE;
+    let userea = null;
+    let dashdash = $c.lit("");
     for (idx = 0; idx < 8; idx = idx + 1 | 0) {
         if (earlyopts[idx].e === e_arg) {
             break;
@@ -469,21 +469,21 @@ export async function argcheck(argc, argv, e_arg) {   // earlyarg.c:450
         }
     }
     if (match) {
-        extended_opt = $c.strchr(userea, 58);
+        let extended_opt = $c.strchr(userea, 58);
         if (!extended_opt) {
             extended_opt = $c.strchr(userea, 61);
         }
         switch (e_arg) {
             case ARG.DEBUG:
                 if (extended_opt) {
-                    cpy_extended_opt = await dupstr(extended_opt);
+                    const cpy_extended_opt = await dupstr(extended_opt);
                     debug_fields(cpy_extended_opt.add(1));
                     $c.free(cpy_extended_opt);
                 }
                 return 1;
             case ARG.VERSION:
                 {
-                    insert_into_pastebuf = FALSE;
+                    let insert_into_pastebuf = FALSE;
                     if (extended_opt) {
                         extended_opt = extended_opt.add(1);
                         /* Deprecated in favor of "copy" - remove no later
@@ -549,8 +549,8 @@ export async function argcheck(argc, argv, e_arg) {   // earlyarg.c:450
  * @param {$c.Ptr | null} opts char *
  */
 function debug_fields(opts) {   // earlyarg.c:576
-    let op = null, negated = 0, $t1;
-    negated = FALSE;
+    let op = null, $t1;
+    let negated = FALSE;
     while ((op = $c.strchr(opts, 44)) !== null) {
         ($t1 = op, op = $t1.add(1), $t1).set(0, 0);
         /* recurse */
@@ -594,13 +594,13 @@ function debug_fields(opts) {   // earlyarg.c:576
  * @returns {Promise<void>}
  */
 async function dump_enums() {   // earlyarg.c:706
-    let nmprefix = null, i = 0, j = 0, nmwidth = 0, comment = new Int8Array(256);
+    let i = 0, j = 0, comment = new Int8Array(256);
     /* 0 = dump numerically only, 1 = add 'char' comment */
     for (i = 0; i < 11 /* NUM_ENUM_DUMPS */; i = i + 1 | 0) {
         await raw_printf($c.lit("enum %s = {"), dump_enums$edmp[i].title);
         for (j = 0; j < dump_enums$edmp[i].szd; j = j + 1 | 0) {
-            nmprefix = j >= (dump_enums$edmp[i].szd - dump_enums$edmp[i].unprefixed_count | 0) ? $c.lit("") : dump_enums$edmp[i].pfx;   /* "" or "PM_" */
-            nmwidth = 27 - $c.i32($c.strlen(nmprefix)) | 0;   /* 27 or 24 */
+            const nmprefix = j >= (dump_enums$edmp[i].szd - dump_enums$edmp[i].unprefixed_count | 0) ? $c.lit("") : dump_enums$edmp[i].pfx;   /* "" or "PM_" */
+            const nmwidth = 27 - $c.i32($c.strlen(nmprefix)) | 0;   /* 27 or 24 */
             if (dump_enums$edmp[i].dumpflgs > 0) {
                 nh_snprintf($c.lit("dump_enums"), 788, new $c.Ptr(comment, 0), 256, $c.lit("    /* '%c' */"), $c.radd(dump_enums$ed[i], j).val >= 32 && $c.radd(dump_enums$ed[i], j).val <= 126 ? $c.radd(dump_enums$ed[i], j).val : 32);
             } else {

@@ -109,13 +109,12 @@ const magical = new Int8Array(7);
  * @returns {Promise<void>}
  */
 async function msg_mon_movement(mtmp, omx, omy) {   // monmove.c:33
-    let nix = 0, niy = 0, n2u = 0, close = 0, closer = 0;
     if (a11y.mon_movement && canspotmon(mtmp) && mtmp.mspotted) {
-        nix = mtmp.mx;
-        niy = mtmp.my;
-        n2u = dist2(nix, niy, u.ux, u.uy) <= 2 ? 1 : 0;
-        close = !n2u && distu(nix, niy) <= BOLT_LIM * BOLT_LIM ? 1 : 0;
-        closer = !n2u && distu(nix, niy) <= distu(omx, omy) ? 1 : 0;
+        const nix = mtmp.mx;
+        const niy = mtmp.my;
+        const n2u = dist2(nix, niy, u.ux, u.uy) <= 2 ? 1 : 0;
+        const close = !n2u && distu(nix, niy) <= BOLT_LIM * BOLT_LIM ? 1 : 0;
+        const closer = !n2u && distu(nix, niy) <= distu(omx, omy) ? 1 : 0;
         await pline_xy(nix, niy, $c.lit("%s %s%s."), await Monnam(mtmp), await vtense(null, locomotion(mtmp.data, $c.lit("move"))), n2u ? $c.lit(" next to you") : close && closer ? $c.lit(" closer") : close && !closer ? $c.lit(" further away") : $c.lit(" in the distance"));
     }
 }
@@ -278,16 +277,15 @@ async function watch_on_duty(mtmp) {   // monmove.c:176
  * @returns {Promise<number>} int
  */
 export async function dochugw(mtmp, chug) {   // monmove.c:204
-    let x = 0, y = 0, already_saw_mon = 0, rd = 0;
     /* True: monster is moving;
      * False: monster was just created or has teleported
      * so perform stop-what-you're-doing-if-close-enough-
      * to-be-a-threat check but don't move mtmp */
-    x = mtmp.mx;
-    y = mtmp.my;   /* 'mtmp's location before dochug() */
+    const x = mtmp.mx;
+    const y = mtmp.my;   /* 'mtmp's location before dochug() */
     /* skip canspotmon() if occupation is Null */
-    already_saw_mon = chug && go.occupation ? canspotmon(mtmp) : 0;
-    rd = chug ? await dochug(mtmp) : 0;
+    const already_saw_mon = chug && go.occupation ? canspotmon(mtmp) : 0;
+    const rd = chug ? await dochug(mtmp) : 0;
     /*
      * A similar check is in monster_nearby() in hack.c.
      * [The two checks have a lot of differences and chances are high
@@ -311,11 +309,11 @@ export async function dochugw(mtmp, chug) {   // monmove.c:204
  * @returns {number} boolean
  */
 export function onscary(x, y, mtmp) {   // monmove.c:241
-    let ep = null, auditory_scare = 0, magical_scare = 0;
+    let ep = null;
     /* <0,0> is used by musical scaring;
      * it doesn't care about scrolls or engravings or dungeon branch */
-    auditory_scare = x === 0 && y === 0 ? 1 : 0;
-    magical_scare = !auditory_scare ? 1 : 0;
+    const auditory_scare = x === 0 && y === 0 ? 1 : 0;
+    const magical_scare = !auditory_scare ? 1 : 0;
     /* creatures who are directly resistant to any type of scaring:
      * Rodney, lawful minions, Angels, the Riders */
     if (mtmp.iswiz || $c.andu64(mtmp.data.mflags2, M2.MINION) !== 0 && mon_aligntyp(mtmp) === A.LAWFUL || mtmp.data === mons[PM.ANGEL] || is_rider(mtmp.data)) {
@@ -432,7 +430,6 @@ async function release_hero(mon) {   // monmove.c:362
  */
 export function find_pmmonst(pm) {   // monmove.c:375
     let mtmp = null;
-    mtmp = null;
     if ((svm.mvitals[pm].mvflags & G_GENOD) === 0) {
         for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
             if (DEADMONSTER(mtmp)) {
@@ -454,11 +451,10 @@ export function find_pmmonst(pm) {   // monmove.c:375
  * @returns {Promise<number>} int
  */
 export async function bee_eat_jelly(mon, obj) {   // monmove.c:394
-    let m_delay = 0, mtmp = null;
-    mtmp = find_pmmonst(PM.QUEEN_BEE);
+    const mtmp = find_pmmonst(PM.QUEEN_BEE);
     /* if there's no queen on the level, eat the royal jelly and become one */
     if (!mtmp) {
-        m_delay = obj.blessed ? 3 : !obj.cursed ? 5 : 7;
+        const m_delay = obj.blessed ? 3 : !obj.cursed ? 5 : 7;
         if (obj.quan > 1) {
             obj = await splitobj(obj, 1);
         }
@@ -486,8 +482,8 @@ export async function bee_eat_jelly(mon, obj) {   // monmove.c:394
  * @returns {Promise<number>} int
  */
 async function gelcube_digests(mtmp) {   // monmove.c:424
-    let otmp = null, $t1;
-    otmp = mtmp.minvent;
+    let $t1;
+    let otmp = mtmp.minvent;
     if (mtmp.meating || !mtmp.minvent) {
         return -1;
     }
@@ -520,7 +516,7 @@ async function gelcube_digests(mtmp) {   // monmove.c:424
  * @returns {Promise<void>}
  */
 export async function monflee(mtmp, fleetime, first, fleemsg) {   // monmove.c:462
-    let lsrc = null, $t1;
+    let $t1;
     /* shouldn't happen; maybe warrants impossible()? */
     if (DEADMONSTER(mtmp)) {
         return;
@@ -555,7 +551,7 @@ export async function monflee(mtmp, fleetime, first, fleemsg) {   // monmove.c:4
                        (Sunsword) or uarm (gold dragon scales/mail) or both;
                        TODO? check for both and describe the one which is
                        emitting light with a bigger radius */
-                    lsrc = $G.uwep && artifact_light($G.uwep) ? await bare_artifactname($G.uwep) : $G.uarm && artifact_light($G.uarm) ? await yname($G.uarm) : $c.lit("[its imagination?]");
+                    const lsrc = $G.uwep && artifact_light($G.uwep) ? await bare_artifactname($G.uwep) : $G.uarm && artifact_light($G.uarm) ? await yname($G.uarm) : $c.lit("[its imagination?]");
                     await pline_mon(mtmp, $c.lit("%s flees from the painful light of %s."), await Monnam(mtmp), lsrc);
                 } else {
                     await verbalize($c.lit("Bright light!"));
@@ -581,10 +577,10 @@ export async function monflee(mtmp, fleetime, first, fleemsg) {   // monmove.c:4
  * @returns {Promise<void>}
  */
 async function distfleeck(mtmp, inrange, nearby, scared) {   // monmove.c:533
-    let seescaryx = 0, seescaryy = 0, sawscary = 0, bravegremlin = 0, $t1, $t2;
+    let seescaryx = 0, seescaryy = 0, $t1, $t2;
     /* output */
-    sawscary = FALSE;
-    bravegremlin = rn2(5) === 0 ? 1 : 0;
+    let sawscary = FALSE;
+    const bravegremlin = rn2(5) === 0 ? 1 : 0;
     $t1 = dist2(mtmp.mx, mtmp.my, mtmp.mux, mtmp.muy) <= BOLT_LIM * BOLT_LIM ? 1 : 0, inrange.set(0, $t1);
     $t2 = inrange.get(0) && monnear(mtmp, mtmp.mux, mtmp.muy) ? 1 : 0, nearby.set(0, $t2);
     /* Note: if your image is displaced, the monster sees the Elbereth
@@ -625,8 +621,8 @@ function m_arrival(mon) {   // monmove.c:574
  * @returns {Promise<void>}
  */
 async function mind_blast(mtmp) {   // monmove.c:583
-    let m2 = null, nmon = null, dmg = 0, m_sen = 0, $t1;
-    nmon = null;
+    let m2 = null, $t1;
+    let nmon = null;
     if (canseemon(mtmp)) {
         await pline_mon(mtmp, $c.lit("%s concentrates."), await Monnam(mtmp));
     }
@@ -638,7 +634,7 @@ async function mind_blast(mtmp) {   // monmove.c:583
     if (mtmp.mpeaceful && (!Conflict() || resist_conflict(mtmp))) {
         await pline($c.lit("It feels quite soothing."));
     } else if (!u.uinvulnerable) {
-        m_sen = $c.i8(sensemon(mtmp));
+        const m_sen = $c.i8(sensemon(mtmp));
         if (m_sen || Blind_telepat() && rn2(2) || !rn2(10)) {
             /* hiding monsters are brought out of hiding when hit by
                 a psychic blast, so do the same for hiding poly'd hero */
@@ -653,7 +649,7 @@ async function mind_blast(mtmp) {   // monmove.c:583
                 await newsym(u.ux, u.uy);
             }
             await pline($c.lit("It locks on to your %s!"), m_sen ? $c.lit("telepathy") : Blind_telepat() ? $c.lit("latent telepathy") : $c.lit("mind"));   /* note: hero is never mindless */
-            dmg = rnd(15);
+            let dmg = rnd(15);
             if (Half_spell_damage()) {
                 dmg = $c.div32(dmg + 1 | 0, 2);
             }
@@ -694,10 +690,9 @@ async function mind_blast(mtmp) {   // monmove.c:583
  * @returns {Promise<void>}
  */
 export async function m_everyturn_effect(mtmp) {   // monmove.c:650
-    let is_u = 0, x = 0, y = 0;
-    is_u = $c.peq(mtmp, gy.youmonst) ? TRUE : FALSE;
-    x = is_u ? u.ux : mtmp.mx;
-    y = is_u ? u.uy : mtmp.my;
+    const is_u = $c.peq(mtmp, gy.youmonst) ? TRUE : FALSE;
+    const x = is_u ? u.ux : mtmp.mx;
+    const y = is_u ? u.uy : mtmp.my;
     if (mtmp.data === mons[PM.FOG_CLOUD]) {
         /* don't leave a vapor cloud if some other gas cloud is already
            present, or when flowing under closed doors so that visibility
@@ -718,10 +713,9 @@ export async function m_everyturn_effect(mtmp) {   // monmove.c:650
  * @returns {Promise<void>}
  */
 export async function m_postmove_effect(mtmp) {   // monmove.c:672
-    let is_u = 0, x = 0, y = 0;
-    is_u = $c.peq(mtmp, gy.youmonst) ? TRUE : FALSE;
-    x = is_u ? u.ux0 : mtmp.mx;
-    y = is_u ? u.uy0 : mtmp.my;
+    const is_u = $c.peq(mtmp, gy.youmonst) ? TRUE : FALSE;
+    const x = is_u ? u.ux0 : mtmp.mx;
+    const y = is_u ? u.uy0 : mtmp.my;
     /* Hezrous create clouds of stench. This does not cost a move. */
     if (mtmp.data === mons[PM.HEZROU]) {   /* stench */
         await create_gas_cloud(x, y, 1, 8);
@@ -738,13 +732,13 @@ export async function m_postmove_effect(mtmp) {   // monmove.c:672
  * @returns {Promise<number>} int
  */
 export async function dochug(mtmp) {   // monmove.c:690
-    let mdat = null, status = 0, inrange = Int32Array.of(0), nearby = Int32Array.of(0), scared = Int32Array.of(0), res = 0, otmp = null, panicattk = 0, mw_tmp = null, a = null, $t1;
-    status = MMOVE.NOTHING;
-    panicattk = FALSE;
+    let inrange = Int32Array.of(0), nearby = Int32Array.of(0), scared = Int32Array.of(0), res = 0, otmp = null, a = null, $t1;
+    let status = MMOVE.NOTHING;
+    let panicattk = FALSE;
     /*
      * PHASE ONE: Pre-movement adjustments
      */
-    mdat = mtmp.data;
+    const mdat = mtmp.data;
     if ($c.andu64(mtmp.mstrategy, STRAT.ARRIVE)) {
         res = m_arrival(mtmp);
         if (res >= 0) {
@@ -880,7 +874,7 @@ export async function dochug(mtmp) {   // monmove.c:690
          * This may cost the monster an attack, but keeps the monster
          * from switching back and forth if carrying both.
          */
-        mw_tmp = mtmp.mw;
+        const mw_tmp = mtmp.mw;
         if (!(scared[0] && mw_tmp && is_pick(mw_tmp)) && mtmp.weapon_check === NEED.WEAPON && !(mtmp.mtrapped && !nearby[0] && await select_rwep(mtmp))) {
             mtmp.weapon_check = NEED.HTH_WEAPON;
             if (await mon_wield_item(mtmp) !== 0) {
@@ -1017,8 +1011,7 @@ export async function dochug(mtmp) {   // monmove.c:690
  * @returns {Promise<number>} boolean
  */
 export async function mon_would_take_item(mtmp, otmp) {   // monmove.c:999
-    let pctload = 0;
-    pctload = $c.div32(Math.imul(curr_mon_load(mtmp), 100), max_mon_load(mtmp));
+    const pctload = $c.div32(Math.imul(curr_mon_load(mtmp), 100), max_mon_load(mtmp));
     if ($c.peq(otmp, $G.uball) || $c.peq(otmp, $G.uchain)) {
         return FALSE;
     }
@@ -1094,14 +1087,14 @@ export async function itsstuck(mtmp) {   // monmove.c:1053
  * @returns {number} boolean
  */
 export function should_displace(mtmp, data, ggx, ggy) {   // monmove.c:1070
-    let shortest_with_displacing = 0, shortest_without_displacing = 0, count_without_displacing = 0, i = 0, nx = 0, ny = 0, ndist = 0;
-    shortest_with_displacing = -1;
-    shortest_without_displacing = -1;
-    count_without_displacing = 0;
+    let i = 0;
+    let shortest_with_displacing = -1;
+    let shortest_without_displacing = -1;
+    let count_without_displacing = 0;
     for (i = 0; i < data.cnt; i = i + 1 | 0) {
-        nx = data.poss[i].x;
-        ny = data.poss[i].y;
-        ndist = dist2($c.i16(nx), $c.i16(ny), ggx, ggy);
+        const nx = data.poss[i].x;
+        const ny = data.poss[i].y;
+        const ndist = dist2($c.i16(nx), $c.i16(ny), ggx, ggy);
         if (MON_AT(nx, ny) && $c.and64(data.info[i], ALLOW.MDISP) && !$c.and64(data.info[i], ALLOW.M) && !undesirable_disp(mtmp, $c.i16(nx), $c.i16(ny))) {
             if (shortest_with_displacing === -1 || ndist < shortest_with_displacing) {
                 shortest_with_displacing = ndist;
@@ -1127,9 +1120,8 @@ export function should_displace(mtmp, data, ggx, ggy) {   // monmove.c:1070
  * @returns {Promise<number>} boolean
  */
 export async function m_digweapon_check(mtmp, nix, niy) {   // monmove.c:1108
-    let can_tunnel = 0, mw_tmp = null;
-    can_tunnel = FALSE;
-    mw_tmp = mtmp.mw;
+    let can_tunnel = FALSE;
+    const mw_tmp = mtmp.mw;
     if (!((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level))) {
         can_tunnel = tunnels(mtmp.data);
     }
@@ -1196,13 +1188,13 @@ async function leppie_stash(mtmp) {   // monmove.c:1154
  * @returns {number} int
  */
 function m_balks_at_approaching(oldappr, mtmp, pdistmin, pdistmax) {   // monmove.c:1181
-    let mwep = null, x = 0, y = 0, ux = 0, uy = 0, edist = 0, arw = null;
-    mwep = mtmp.mw;
-    x = mtmp.mx;
-    y = mtmp.my;
-    ux = mtmp.mux;
-    uy = mtmp.muy;
-    edist = dist2(x, y, ux, uy);
+    let arw = null;
+    const mwep = mtmp.mw;
+    const x = mtmp.mx;
+    const y = mtmp.my;
+    const ux = mtmp.mux;
+    const uy = mtmp.muy;
+    const edist = dist2(x, y, ux, uy);
     if (pdistmin) {
         pdistmin.set(0, 0);
     }
@@ -1266,14 +1258,13 @@ function count_webbing_walls(x, y) {   // monmove.c:1244
  * @returns {number} boolean
  */
 function soko_allow_web(mon) {   // monmove.c:1252
-    let stway = null;
     /* for a non-Sokoban level or a solved Sokoban level, no restriction */
     if (!Sokoban()) {
         return TRUE;
     }
     /* not-yet-solved Sokoban level:  allow web only when spinner can see
        the stairs up [we really want 'is in same chamber as stairs up'] */
-    stway = stairway_find_dir(TRUE);   /* stairs up */
+    const stway = stairway_find_dir(TRUE);   /* stairs up */
     if (stway && clear_path(mon.mx, mon.my, stway.sx, stway.sy)) {
         return TRUE;
     }
@@ -1285,9 +1276,9 @@ function soko_allow_web(mon) {   // monmove.c:1252
  * @returns {Promise<void>}
  */
 async function maybe_spin_web(mtmp) {   // monmove.c:1269
-    let trap = null, prob = 0, mbuf = new Int8Array(256), $t1;
+    let trap = null, mbuf = new Int8Array(256), $t1;
     if (webmaker(mtmp.data) && !helpless(mtmp) && !mtmp.mspec_used && !t_at(mtmp.mx, mtmp.my) && soko_allow_web(mtmp)) {
-        prob = Math.imul(mtmp.data === mons[PM.GIANT_SPIDER] ? 15 : 5, count_webbing_walls(mtmp.mx, mtmp.my) + 1 | 0) - Math.imul(3, count_traps(WEB)) | 0;
+        const prob = Math.imul(mtmp.data === mons[PM.GIANT_SPIDER] ? 15 : 5, count_webbing_walls(mtmp.mx, mtmp.my) + 1 | 0) - Math.imul(3, count_traps(WEB)) | 0;
         if (rn2(1000) < prob && (trap = await maketrap(mtmp.mx, mtmp.my, WEB)) !== null) {
             $t1 = d(4, 4), mtmp.mspec_used = $t1;   /* 4..16 */
             if (cansee(mtmp.mx, mtmp.my)) {
@@ -1461,9 +1452,9 @@ async function m_search_items(mtmp, ggx, ggy, mmoved, appr) {   // monmove.c:133
  * @returns {Promise<number>} int
  */
 async function postmov(mtmp, ptr, omx, omy, mmoved, seenflgs, can_tunnel, can_unlock, can_open) {   // monmove.c:1455
-    let nix = 0, niy = 0, etmp = 0, trapret = 0, canseeit = 0, didseeit = 0, here = null, btrapped = 0, mask = 0;
-    canseeit = cansee(mtmp.mx, mtmp.my);
-    didseeit = canseeit;
+    let nix = 0, niy = 0, etmp = 0;
+    let canseeit = cansee(mtmp.mx, mtmp.my);
+    const didseeit = canseeit;
     await notice_mon(mtmp);
     if (mmoved === MMOVE.MOVED) {
         nix = mtmp.mx, niy = mtmp.my;
@@ -1497,7 +1488,7 @@ async function postmov(mtmp, ptr, omx, omy, mmoved, seenflgs, can_tunnel, can_un
             }
         }
         await newsym(omx, omy);   /* update the old position */
-        trapret = await mintrap(mtmp, NO_TRAP_FLAGS);
+        const trapret = await mintrap(mtmp, NO_TRAP_FLAGS);
         if (trapret === Trap.Killed_Mon || trapret === Trap.Moved_Mon) {
             if (mtmp.mx) {
                 await newsym(mtmp.mx, mtmp.my);
@@ -1511,8 +1502,8 @@ async function postmov(mtmp, ptr, omx, omy, mmoved, seenflgs, can_tunnel, can_un
         /* doesn't need to open doors */
         if (svl.level.locations[mtmp.mx][mtmp.my].typ === DOOR && !passes_walls(ptr) && !can_tunnel) {
             /* taken care of below */
-            here = $c.relem(svl.level.locations[mtmp.mx], mtmp.my);
-            btrapped = (here.flags & D.TRAPPED) !== 0 ? 1 : 0;
+            const here = $c.relem(svl.level.locations[mtmp.mx], mtmp.my);
+            let btrapped = (here.flags & D.TRAPPED) !== 0 ? 1 : 0;
             /* used after monster 'who' has been moved to closed door spot 'where'
                which will now be changed to door state 'what' with map update */
             /* update cached value since it might change */
@@ -1581,7 +1572,7 @@ async function postmov(mtmp, ptr, omx, omy, mmoved, seenflgs, can_tunnel, can_un
                 }
             } else if ((here.flags & (D.LOCKED | D.CLOSED)) !== 0) {
                 /* mfndpos guarantees this must be a doorbuster */
-                mask = btrapped || (here.flags & D.LOCKED) !== 0 && !rn2(2) ? D.NODOOR : D.BROKEN;
+                const mask = btrapped || (here.flags & D.LOCKED) !== 0 && !rn2(2) ? D.NODOOR : D.BROKEN;
                 do {
                     here.flags = (mask) & 31;
                     await newsym(mtmp.mx, mtmp.my);
@@ -2021,9 +2012,8 @@ export async function m_move(mtmp, after) {   // monmove.c:1715
  * @returns {Promise<number>} int
  */
 export async function m_move_aggress(mtmp, x, y) {   // monmove.c:2088
-    let mtmp2 = null, mstatus = 0;
-    mstatus = 0;   /* M_ATTK_MISS */
-    mtmp2 = svl.level.monsters[x][y];
+    let mstatus = 0;   /* M_ATTK_MISS */
+    const mtmp2 = svl.level.monsters[x][y];
     if (mtmp2) {
         gb.bhitpos.x = x, gb.bhitpos.y = y;
         gn.notonhead = x !== mtmp2.mx || y !== mtmp2.my ? 1 : 0;
@@ -2054,7 +2044,7 @@ export async function m_move_aggress(mtmp, x, y) {   // monmove.c:2088
  * @returns {number} boolean
  */
 export function can_hide_under_obj(obj) {   // monmove.c:2121
-    let t = null, coinquan = 0;
+    let t = null;
     /* uncomment '#define NO_HIDING_UNDER_STATUES' to prevent hiding under
      * statues; that was introduced to avoid nullifying statue traps but
      * isn't needed now that hiding at any non-pit trap site is disallowed */
@@ -2070,7 +2060,7 @@ export function can_hide_under_obj(obj) {   // monmove.c:2121
     /* can't hide under small amount of coins unless non-coins are also
        present; we expect coins to be a single stack but don't assume that */
     if (obj.oclass === COIN_CLASS) {
-        coinquan = 0;
+        let coinquan = 0;
         do {
             /* 10 coins is arbitrary amount considered enough to hide under */
             if ((coinquan = $c.add64(coinquan, obj.quan)) >= 10) {
@@ -2121,9 +2111,8 @@ export function closed_door(x, y) {   // monmove.c:2181
  * @returns {number} boolean
  */
 export function accessible(x, y) {   // monmove.c:2188
-    let levtyp = 0;
     /* use underlying terrain in front of closed drawbridge */
-    levtyp = SURFACE_AT(x, y);
+    const levtyp = SURFACE_AT(x, y);
     return ACCESSIBLE(levtyp) && !closed_door(x, y) ? 1 : 0;
 }
 /* decide where the monster thinks you are standing */
@@ -2131,10 +2120,10 @@ export function accessible(x, y) {   // monmove.c:2188
  * @param {$T.monst | null} mtmp struct monst *
  */
 export function set_apparxy(mtmp) {   // monmove.c:2198
-    let notseen = 0, notthere = 0, gotu = 0, displ = 0, mx = 0, my = 0, umoney = 0, try_cnt = 0;
-    mx = mtmp.mux;
-    my = mtmp.muy;
-    umoney = money_cnt(gi.invent);
+    let displ = 0;
+    let mx = mtmp.mux;
+    let my = mtmp.muy;
+    const umoney = money_cnt(gi.invent);
     /*
      * do cheapest and/or most likely tests first
      */
@@ -2145,8 +2134,8 @@ export function set_apparxy(mtmp) {   // monmove.c:2198
         mtmp.muy = u.uy;
         return;
     }
-    notseen = !mtmp.mcansee || Invis() && !perceives(mtmp.data) ? 1 : 0;
-    notthere = Displaced() && mtmp.data !== mons[PM.DISPLACER_BEAST] ? 1 : 0;
+    const notseen = !mtmp.mcansee || Invis() && !perceives(mtmp.data) ? 1 : 0;
+    const notthere = Displaced() && mtmp.data !== mons[PM.DISPLACER_BEAST] ? 1 : 0;
     /* add cases as required.  eg. Displacement ... */
     if (Underwater()) {
         displ = 1;
@@ -2166,9 +2155,9 @@ export function set_apparxy(mtmp) {   // monmove.c:2198
     }
     /* without something like the following, invisibility and displacement
        are too powerful */
-    gotu = notseen ? !rn2(3) ? 1 : 0 : notthere ? !rn2(4) ? 1 : 0 : FALSE;
+    const gotu = notseen ? !rn2(3) ? 1 : 0 : notthere ? !rn2(4) ? 1 : 0 : FALSE;
     if (!gotu) {
-        try_cnt = 0;
+        let try_cnt = 0;
         do {
             if ((try_cnt = try_cnt + 1 | 0) > 200) {
                 mx = u.ux;
@@ -2200,11 +2189,10 @@ export function set_apparxy(mtmp) {   // monmove.c:2198
  * @returns {number} boolean
  */
 export function undesirable_disp(mtmp, x, y) {   // monmove.c:2277
-    let is_pet = 0, trap = null;
     /* barging creature */
     /* spot 'mtmp' is considering moving to */
-    is_pet = mtmp.mtame && !mtmp.isminion ? 1 : 0;
-    trap = t_at(x, y);
+    const is_pet = mtmp.mtame && !mtmp.isminion ? 1 : 0;
+    const trap = t_at(x, y);
     if (is_pet) {
         /* Pets avoid a trap if you've seen it usually. */
         if (trap && trap.tseen && rn2(40)) {
@@ -2240,14 +2228,14 @@ export function undesirable_disp(mtmp, x, y) {   // monmove.c:2277
  * @returns {number} boolean
  */
 function stuff_prevents_passage(mtmp) {   // monmove.c:2319
-    let chain = null, obj = null, typ = 0;
+    let chain = null, obj = null;
     if ($c.peq(mtmp, gy.youmonst)) {
         chain = gi.invent;
     } else {
         chain = mtmp.minvent;
     }
     for (obj = chain; obj; obj = obj.nobj) {
-        typ = obj.otyp;
+        const typ = obj.otyp;
         if (typ === COIN_CLASS && obj.quan > 100) {
             return TRUE;
         }
@@ -2292,7 +2280,6 @@ export function can_fog(mtmp) {   // monmove.c:2365
  */
 async function vamp_shift(mon, ptr, domsg) {   // monmove.c:2377
     let reslt = 0;
-    reslt = 0;
     if ($c.peq(mon.data, ptr)) {
         /* already right shape */
         reslt = 1;

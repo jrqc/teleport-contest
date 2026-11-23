@@ -153,11 +153,11 @@ const use_misc$MissingMiscellaneousItem = new Int8Array(16);   // static in use_
  * @returns {Promise<number>} int
  */
 async function precheck(mon, obj) {   // muse.c:59
-    let vis = 0, cc = new $T.nhcoord(), mtmp = null, dam = 0, range = 0, $t1, $t2;
+    let cc = new $T.nhcoord(), mtmp = null, $t1, $t2;
     if (!obj) {
         return 0;
     }
-    vis = cansee(mon.mx, mon.my);
+    const vis = cansee(mon.mx, mon.my);
     if (obj.oclass === POTION_CLASS) {
         if (await objdescr_is(obj, $c.lit("milky"))) {
             if (!(svm.mvitals[PM.GHOST].mvflags & G_GONE) && !rn2(13 + 2 * svm.mvitals[PM.GHOST].born)) {
@@ -215,7 +215,7 @@ async function precheck(mon, obj) {   // muse.c:59
         }
     }
     if (obj.oclass === WAND_CLASS && obj.cursed && !rn2(WAND.BACKFIRE_CHANCE)) {
-        dam = d(obj.spe + 2, 6);
+        const dam = d(obj.spe + 2, 6);
         /* 3.6.1: no Deaf filter; 'if' message doesn't warrant it, 'else'
            message doesn't need it since You_hear() has one of its own */
         if (vis) {
@@ -223,7 +223,7 @@ async function precheck(mon, obj) {   // muse.c:59
         } else {
             /* same near/far threshold as mzapwand() */
             /* 9 or 5 */
-            range = couldsee(mon.mx, mon.my) ? BOLT_LIM + 1 : BOLT_LIM - 3;
+            const range = couldsee(mon.mx, mon.my) ? BOLT_LIM + 1 : BOLT_LIM - 3;
             await You_hear($c.lit("a zap and an explosion %s."), dist2(mon.mx, mon.my, u.ux, u.uy) <= Math.imul(range, range) ? $c.lit("nearby") : $c.lit("in the distance"));
         }
         await m_useup(mon, obj);
@@ -246,14 +246,13 @@ async function precheck(mon, obj) {   // muse.c:59
  * @returns {Promise<void>}
  */
 async function mzapwand(mtmp, otmp, self) {   // muse.c:165
-    let range = 0;
     if (otmp.spe < 1) {
         await impossible($c.lit("Mon zapping wand with %d charges?"), otmp.spe);
         return;
     }
     if (!canseemon(mtmp)) {
         /* 9 or 5 */
-        range = couldsee(mtmp.mx, mtmp.my) ? BOLT_LIM + 1 : BOLT_LIM - 3;
+        const range = couldsee(mtmp.mx, mtmp.my) ? BOLT_LIM + 1 : BOLT_LIM - 3;
         await You_hear($c.lit("a %s zap."), dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= Math.imul(range, range) ? $c.lit("nearby") : $c.lit("distant"));
         unknow_object(otmp);   /* hero loses info when unseen obj is used */
     } else if (self) {
@@ -272,10 +271,10 @@ async function mzapwand(mtmp, otmp, self) {   // muse.c:165
  * @returns {Promise<void>}
  */
 async function mplayhorn(mtmp, otmp, self) {   // muse.c:195
-    let objnamp = null, objbuf = new Int8Array(256), range = 0;
+    let objnamp = null, objbuf = new Int8Array(256);
     if (!canseemon(mtmp)) {
         /* 9 or 5 */
-        range = couldsee(mtmp.mx, mtmp.my) ? BOLT_LIM + 1 : BOLT_LIM - 3;
+        const range = couldsee(mtmp.mx, mtmp.my) ? BOLT_LIM + 1 : BOLT_LIM - 3;
         await You_hear($c.lit("a horn being played %s."), dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= Math.imul(range, range) ? $c.lit("nearby") : $c.lit("in the distance"));
         unknow_object(otmp);   /* hero loses info when unseen obj is used */
     } else if (self) {
@@ -310,9 +309,9 @@ async function mplayhorn(mtmp, otmp, self) {   // muse.c:195
  * @returns {Promise<void>}
  */
 async function mreadmsg(mtmp, otmp) {   // muse.c:238
-    let onambuf = new Int8Array(256), vismon = 0, tpindicator = 0, blindbuf = new Int8Array(256), similar = 0, uniqmon = 0, recognize = 0, mflags = 0;
-    vismon = $c.i8(canseemon(mtmp));
-    tpindicator = !vismon && sensemon(mtmp) ? 1 : 0;
+    let onambuf = new Int8Array(256), blindbuf = new Int8Array(256);
+    const vismon = $c.i8(canseemon(mtmp));
+    let tpindicator = !vismon && sensemon(mtmp) ? 1 : 0;
     if (!vismon && Deaf()) {
         return;   /* no feedback */
     }
@@ -325,13 +324,13 @@ async function mreadmsg(mtmp, otmp) {   // muse.c:238
         /* !Deaf, otherwise we wouldn't reach here */
         /* shopkeepers aren't unique monsters but since
            they have distinct names, treat them as such */
-        similar = same_race(gy.youmonst.data, mtmp.data);
-        uniqmon = (mtmp.data.geno & G_UNIQ) !== 0 || mtmp.isshk ? 1 : 0;
-        recognize = !Hallucination() && (mtmp.meverseen || similar && !uniqmon) ? 1 : 0;
+        const similar = same_race(gy.youmonst.data, mtmp.data);
+        const uniqmon = (mtmp.data.geno & G_UNIQ) !== 0 || mtmp.isshk ? 1 : 0;
+        const recognize = !Hallucination() && (mtmp.meverseen || similar && !uniqmon) ? 1 : 0;
         /* describe unseen monster accurately when not hallucinating if it
            has ever been seen or is the same race as the hero (not yet seen
            unique monsters excepted) */
-        mflags = SUPPRESS.INVISIBLE | SUPPRESS.SADDLE | (recognize ? SUPPRESS.IT : AUGMENT_IT);
+        const mflags = SUPPRESS.INVISIBLE | SUPPRESS.SADDLE | (recognize ? SUPPRESS.IT : AUGMENT_IT);
         if (sensemon(mtmp)) {
             tpindicator = TRUE;
         } else if (couldsee(mtmp.mx, mtmp.my) && dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 100) {
@@ -406,9 +405,9 @@ function m_use_healing(mtmp) {   // muse.c:337
  * @returns {number} boolean
  */
 function m_sees_sleepy_soldier(mtmp) {   // muse.c:361
-    let x = 0, y = 0, xx = 0, yy = 0, mon = null;
-    x = mtmp.mx;
-    y = mtmp.my;
+    let xx = 0, yy = 0, mon = null;
+    const x = mtmp.mx;
+    const y = mtmp.my;
     /* Distance is arbitrary.  What we really want to do is
      * have the soldier play the bugle when it sees or
      * remembers soldiers nearby...
@@ -810,8 +809,7 @@ export async function find_defensive(mtmp, tryescape) {   // muse.c:441
  * @returns {Promise<void>}
  */
 async function reveal_trap(t, seeit) {   // muse.c:757
-    let lev = null;
-    lev = $c.relem(svl.level.locations[t.tx], t.ty);
+    const lev = $c.relem(svl.level.locations[t.tx], t.ty);
     if (lev.typ === SCORR) {
         lev.typ = CORR, lev.flags = 0;   /* set_levltyp(,,CORR) */
         unblock_point(t.tx, t.ty);
@@ -854,17 +852,17 @@ async function mon_escape(mtmp, vismon) {   // muse.c:780
  * @returns {Promise<number>} int
  */
 export async function use_defensive(mtmp) {   // muse.c:796
-    let i = 0, fleetim = 0, otmp = null, vis = 0, vismon = 0, oseen = 0, t = null, stway = null, obj_is_cursed = 0, nlev = 0, flev = new $T.d_level(), cc = new $T.nhcoord(), mon = null, pm = null, cc$2 = new $T.nhcoord(), pm$2 = null, fish = null, cnt = 0, mon$2 = null, known = 0, $t1, $t2;
-    otmp = gm.m.defensive;
+    let i = 0, t = null, stway = null, flev = new $T.d_level(), cc = new $T.nhcoord(), cc$2 = new $T.nhcoord(), $t1, $t2;
+    let otmp = gm.m.defensive;
     if ((i = await precheck(mtmp, otmp)) !== 0) {
         return i;
     }
-    vis = cansee(mtmp.mx, mtmp.my);
-    vismon = $c.i8(canseemon(mtmp));
-    oseen = otmp && vismon ? 1 : 0;
+    const vis = cansee(mtmp.mx, mtmp.my);
+    const vismon = $c.i8(canseemon(mtmp));
+    const oseen = otmp && vismon ? 1 : 0;
     /* when using defensive choice to run away, we want monster to avoid
        rushing right straight back; don't override if already scared */
-    fleetim = !mtmp.mflee ? 33 - $c.div32(Math.imul(30, mtmp.mhp), mtmp.mhpmax) | 0 : 0;
+    const fleetim = !mtmp.mflee ? 33 - $c.div32(Math.imul(30, mtmp.mhp), mtmp.mhpmax) | 0 : 0;
     switch (gm.m.has_defense) {
         case MUSE_UNICORN_HORN:
             /* unlike most defensive cases, unicorn horn object is optional */
@@ -929,7 +927,7 @@ export async function use_defensive(mtmp) {   // muse.c:796
                 if (!otmp) {
                     await panic(new $c.Ptr(use_defensive$MissingDefensiveItem, 0), $c.lit("scroll of teleportation"));
                 }
-                obj_is_cursed = otmp.cursed;
+                const obj_is_cursed = otmp.cursed;
                 if (mtmp.isshk || mtmp.isgd || mtmp.ispriest) {
                     return 2;
                 }
@@ -948,7 +946,7 @@ export async function use_defensive(mtmp) {   // muse.c:796
                 iflags.last_msg = PLNMSG.enum;
                 await mreadmsg(mtmp, otmp);   /* sets otmp->dknown if !Blind or !Deaf */
                 if (obj_is_cursed || mtmp.mconf) {
-                    nlev = random_teleport_level();
+                    const nlev = random_teleport_level();
                     if (mon_has_amulet(mtmp) || In_endgame(u.uz)) {
                         if (vismon) {
                             await pline_mon(mtmp, $c.lit("%s seems very disoriented for a moment."), await Monnam(mtmp));
@@ -1035,7 +1033,7 @@ export async function use_defensive(mtmp) {   // muse.c:796
         case MUSE_WAN_CREATE_MONSTER:
             {
                 /* pm: 0 => random, eel => aquatic, croc => amphibious */
-                pm = !is_pool(mtmp.mx, mtmp.my) ? null : $c.relem(mons, u.uinwater ? PM.GIANT_EEL : PM.CROCODILE);
+                const pm = !is_pool(mtmp.mx, mtmp.my) ? null : $c.relem(mons, u.uinwater ? PM.GIANT_EEL : PM.CROCODILE);
                 if (!otmp) {
                     await panic(new $c.Ptr(use_defensive$MissingDefensiveItem, 0), $c.lit("wand of create monster"));
                 }
@@ -1043,7 +1041,7 @@ export async function use_defensive(mtmp) {   // muse.c:796
                     return 0;
                 }
                 await mzapwand(mtmp, otmp, FALSE);
-                mon = await makemon(null, cc.x, cc.y, NO.MM_FLAGS);
+                const mon = await makemon(null, cc.x, cc.y, NO.MM_FLAGS);
                 if (mon && canspotmon(mon) && oseen) {
                     await discover_object(WAN_CREATE_MONSTER, TRUE, TRUE, TRUE);
                 }
@@ -1051,10 +1049,10 @@ export async function use_defensive(mtmp) {   // muse.c:796
             }
         case MUSE_SCR_CREATE_MONSTER:
             {
-                pm$2 = null;
-                fish = null;
-                cnt = 1;
-                known = FALSE;
+                let pm$2 = null;
+                let fish = null;
+                let cnt = 1;
+                let known = FALSE;
                 if (!otmp) {
                     await panic(new $c.Ptr(use_defensive$MissingDefensiveItem, 0), $c.lit("scroll of create monster"));
                 }
@@ -1076,7 +1074,7 @@ export async function use_defensive(mtmp) {   // muse.c:796
                     if (!await enexto(cc$2, mtmp.mx, mtmp.my, fish)) {
                         break;
                     }
-                    mon$2 = await makemon(pm$2, cc$2.x, cc$2.y, NO.MM_FLAGS);
+                    const mon$2 = await makemon(pm$2, cc$2.x, cc$2.y, NO.MM_FLAGS);
                     if (mon$2 && canspotmon(mon$2)) {
                         known = TRUE;
                     }
@@ -1374,11 +1372,10 @@ function linedup_chk_corpse(x, y) {   // muse.c:1294
  * @returns {Promise<void>}
  */
 async function m_use_undead_turning(mtmp, obj) {   // muse.c:1300
-    let ax = 0, ay = 0, bx = 0, by = 0;
-    ax = $c.i16(u.ux + Math.imul(sgn(mtmp.mux - mtmp.mx), 3) | 0);
-    ay = $c.i16(u.uy + Math.imul(sgn(mtmp.muy - mtmp.my), 3) | 0);
-    bx = mtmp.mx;
-    by = mtmp.my;
+    const ax = $c.i16(u.ux + Math.imul(sgn(mtmp.mux - mtmp.mx), 3) | 0);
+    const ay = $c.i16(u.uy + Math.imul(sgn(mtmp.muy - mtmp.my), 3) | 0);
+    const bx = mtmp.mx;
+    const by = mtmp.my;
     if (!(obj.otyp === WAN_UNDEAD_TURNING && obj.spe > 0)) {
         return;
     }
@@ -1418,14 +1415,14 @@ async function m_use_undead_turning(mtmp, obj) {   // muse.c:1300
  * @returns {number} boolean
  */
 function hero_behind_chokepoint(mtmp) {   // muse.c:1344
-    let dx = 0, dy = 0, x = 0, y = 0, dir = 0, dir_l = 0, dir_r = 0, c1 = new $T.nhcoord(), c2 = new $T.nhcoord();
-    dx = $c.i16(sgn(mtmp.mx - mtmp.mux));
-    dy = $c.i16(sgn(mtmp.my - mtmp.muy));
-    x = $c.i16(mtmp.mux + dx);
-    y = $c.i16(mtmp.muy + dy);
-    dir = xytodir(dx, dy);
-    dir_l = $c.rem32($c.rem32(dir + 6 | 0, N_DIRS) + N_DIRS | 0, N_DIRS);
-    dir_r = $c.rem32($c.rem32(dir + 2 | 0, N_DIRS) + N_DIRS | 0, N_DIRS);
+    let c1 = new $T.nhcoord(), c2 = new $T.nhcoord();
+    const dx = $c.i16(sgn(mtmp.mx - mtmp.mux));
+    const dy = $c.i16(sgn(mtmp.my - mtmp.muy));
+    const x = $c.i16(mtmp.mux + dx);
+    const y = $c.i16(mtmp.muy + dy);
+    const dir = xytodir(dx, dy);
+    const dir_l = $c.rem32($c.rem32(dir + 6 | 0, N_DIRS) + N_DIRS | 0, N_DIRS);
+    const dir_r = $c.rem32($c.rem32(dir + 2 | 0, N_DIRS) + N_DIRS | 0, N_DIRS);
     dirtocoord(c1, dir_l);
     dirtocoord(c2, dir_r);
     c1.x = $c.i16(c1.x + x | 0), c2.x = $c.i16(c2.x + x | 0);
@@ -1441,14 +1438,14 @@ function hero_behind_chokepoint(mtmp) {   // muse.c:1344
  * @returns {number} boolean
  */
 function mon_has_friends(mtmp) {   // muse.c:1371
-    let dx = 0, dy = 0, mon2 = null, x = 0, y = 0;
+    let dx = 0, dy = 0, mon2 = null;
     if (mtmp.mtame || mtmp.mpeaceful) {
         return FALSE;
     }
     for (dx = -1; dx <= 1; dx = $c.i16(dx + 1)) {
         for (dy = -1; dy <= 1; dy = $c.i16(dy + 1)) {
-            x = $c.i16(mtmp.mx + dx);
-            y = $c.i16(mtmp.my + dy);
+            const x = $c.i16(mtmp.mx + dx);
+            const y = $c.i16(mtmp.my + dy);
             if (isok(x, y) && (mon2 = svl.level.monsters[x][y]) !== null && !$c.peq(mon2, mtmp) && !mon2.mtame && !mon2.mpeaceful) {
                 return TRUE;
             }
@@ -1489,7 +1486,7 @@ async function mon_likes_objpile_at(mtmp, x, y) {   // muse.c:1395
  * @returns {Promise<number>} boolean
  */
 export async function find_offensive(mtmp) {   // muse.c:1421
-    let obj = null, mtmp_helmet = null, reflection_skip = 0;
+    let obj = null;
     gm.m.offensive = null;
     gm.m.has_offense = 0;
     if (mtmp.mpeaceful || is_animal(mtmp.data) || mindless(mtmp.data) || nohands(mtmp.data)) {
@@ -1508,8 +1505,8 @@ export async function find_offensive(mtmp) {   // muse.c:1421
     if (!lined_up(mtmp)) {
         return FALSE;
     }
-    reflection_skip = $c.andu64(mtmp.seen_resistance, M_SEEN.REFL) !== 0 || monnear(mtmp, mtmp.mux, mtmp.muy) ? 1 : 0;
-    mtmp_helmet = await which_armor(mtmp, W.ARMH);
+    const reflection_skip = $c.andu64(mtmp.seen_resistance, M_SEEN.REFL) !== 0 || monnear(mtmp, mtmp.mux, mtmp.muy) ? 1 : 0;
+    const mtmp_helmet = await which_armor(mtmp, W.ARMH);
     /* this picks the last viable item rather than prioritizing choices */
     for (obj = mtmp.minvent; obj; obj = obj.nobj) {
         if (!reflection_skip) {
@@ -1660,10 +1657,10 @@ export async function find_offensive(mtmp) {   // muse.c:1421
  * @returns {Promise<number>} int
  */
 async function mbhitm(mtmp, otmp) {   // muse.c:1597
-    let tmp = 0, reveal_invis = 0, learnit = 0, hits_you = 0, wake = 0;
-    reveal_invis = FALSE;
-    learnit = FALSE;
-    hits_you = $c.peq(mtmp, gy.youmonst) ? 1 : 0;
+    let tmp = 0;
+    let reveal_invis = FALSE;
+    let learnit = FALSE;
+    const hits_you = $c.peq(mtmp, gy.youmonst) ? 1 : 0;
     if (!hits_you && otmp.otyp !== WAN_UNDEAD_TURNING) {
         mtmp.msleeping = 0;
         if (mtmp.m_ap_type) {
@@ -1737,7 +1734,7 @@ async function mbhitm(mtmp, otmp) {   // muse.c:1597
                 await unturn_you();
                 learnit = gz.zap_oseen;
             } else {
-                wake = FALSE;
+                let wake = FALSE;
                 if (await unturn_dead(mtmp)) {   /* affects mtmp's invent, not mtmp */
                     wake = TRUE;
                 }
@@ -1777,8 +1774,8 @@ async function mbhitm(mtmp, otmp) {   // muse.c:1597
  * @returns {Promise<number>} boolean
  */
 async function fhito_loc(obj, tx, ty, fhito) {   // muse.c:1707
-    let otmp = null, next_obj = null, hitanything = 0;
-    hitanything = 0;
+    let otmp = null, next_obj = null;
+    let hitanything = 0;
     if (!fhito || !OBJ_AT(tx, ty)) {
         return FALSE;
     }
@@ -1805,22 +1802,22 @@ async function fhito_loc(obj, tx, ty, fhito) {   // muse.c:1707
  * @returns {Promise<void>}
  */
 async function mbhit(mon, range, fhitm, fhito, obj) {   // muse.c:1734
-    let mtmp = null, ltyp = 0, ddx = 0, ddy = 0, otyp = 0, x = 0, y = 0, dbx = Int16Array.of(0), dby = Int16Array.of(0), $t1;
+    let mtmp = null, dbx = Int16Array.of(0), dby = Int16Array.of(0), $t1;
     /* monster shooting the wand */
     /* direction and range */
     /* must be non-Null */
     /* fns called when mon/obj hit */
     /* 2nd arg to fhitm/fhito */
-    otyp = obj.otyp;
+    const otyp = obj.otyp;
     gb.bhitpos.x = mon.mx;
     gb.bhitpos.y = mon.my;
-    ddx = sgn(mon.mux - mon.mx);
-    ddy = sgn(mon.muy - mon.my);
+    const ddx = sgn(mon.mux - mon.mx);
+    const ddy = sgn(mon.muy - mon.my);
     while (($t1 = range, range = $t1 - 1 | 0, $t1) > 0) {
         gb.bhitpos.x = $c.i16(gb.bhitpos.x + ddx | 0);
         gb.bhitpos.y = $c.i16(gb.bhitpos.y + ddy | 0);
-        x = gb.bhitpos.x;
-        y = gb.bhitpos.y;
+        const x = gb.bhitpos.x;
+        const y = gb.bhitpos.y;
         if (!isok(x, y)) {
             gb.bhitpos.x = $c.i16(gb.bhitpos.x - ddx | 0);
             gb.bhitpos.y = $c.i16(gb.bhitpos.y - ddy | 0);
@@ -1839,7 +1836,7 @@ async function mbhit(mon, range, fhitm, fhito, obj) {   // muse.c:1734
         if (await fhito_loc(obj, gb.bhitpos.x, gb.bhitpos.y, fhito)) {
             range = range - 1 | 0;
         }
-        ltyp = $c.u8(svl.level.locations[gb.bhitpos.x][gb.bhitpos.y].typ);
+        const ltyp = $c.u8(svl.level.locations[gb.bhitpos.x][gb.bhitpos.y].typ);
         dbx[0] = x, dby[0] = y;
         /* if levl[x][y].typ is DRAWBRIDGE_UP then the zap is passing
            over the moat in front of a closed drawbridge and doesn't
@@ -1896,17 +1893,17 @@ async function buzz_force_miss(type, nd, sx, sy, dx, dy) {   // muse.c:1815
  * @returns {Promise<number>} int
  */
 export async function use_offensive(mtmp) {   // muse.c:1824
-    let i = 0, otmp = null, oseen = 0, buzzfn = null, x = 0, y = 0, confused = 0, mmx = 0, mmy = 0, is_cursed = 0, is_blessed = 0;
-    otmp = gm.m.offensive;
+    let i = 0, x = 0, y = 0;
+    const otmp = gm.m.offensive;
     /* if a monster has never used an attack wand before, it takes them some
        time to get used to holding that much power, so the first shot always
        misses */
-    buzzfn = mtmp.mwandexp ? buzz : buzz_force_miss;
+    const buzzfn = mtmp.mwandexp ? buzz : buzz_force_miss;
     /* offensive potions are not drunk, they're thrown */
     if (otmp.oclass !== POTION_CLASS && (i = await precheck(mtmp, otmp)) !== 0) {
         return i;
     }
-    oseen = $c.i8(canseemon(mtmp));
+    const oseen = $c.i8(canseemon(mtmp));
     switch (gm.m.has_offense) {
         case MUSE_WAN_DEATH:
         case MUSE_WAN_SLEEP:
@@ -1958,11 +1955,11 @@ export async function use_offensive(mtmp) {   // muse.c:1824
             {
                 /* TODO: handle steeds */
                 /* don't use monster fields after killing it */
-                confused = mtmp.mconf ? TRUE : FALSE;
-                mmx = mtmp.mx;
-                mmy = mtmp.my;
-                is_cursed = otmp.cursed;
-                is_blessed = otmp.blessed;
+                const confused = mtmp.mconf ? TRUE : FALSE;
+                const mmx = mtmp.mx;
+                const mmy = mtmp.my;
+                const is_cursed = otmp.cursed;
+                const is_blessed = otmp.blessed;
                 await mreadmsg(mtmp, otmp);
                 /* Identify the scroll */
                 if (canspotmon(mtmp)) {
@@ -2044,9 +2041,8 @@ export async function use_offensive(mtmp) {   // muse.c:1824
  * @returns {Promise<number>} int
  */
 export async function rnd_offensive_item(mtmp) {   // muse.c:2035
-    let pm = null, difficulty = 0, mtmp_helmet = null;
-    pm = mtmp.data;
-    difficulty = mons[pm.pmidx].difficulty;
+    const pm = mtmp.data;
+    const difficulty = mons[pm.pmidx].difficulty;
     if (is_animal(pm) || attacktype(pm, AT.EXPL) || mindless(mtmp.data) || pm.mlet === S.GHOST || pm.mlet === S.KOP) {
         return 0;
     }
@@ -2056,7 +2052,7 @@ export async function rnd_offensive_item(mtmp) {   // muse.c:2035
     switch (rn2(9 - (difficulty < 4 ? 1 : 0) + 4 * (difficulty > 6 ? 1 : 0))) {
         case 0:
             {
-                mtmp_helmet = await which_armor(mtmp, W.ARMH);
+                const mtmp_helmet = await which_armor(mtmp, W.ARMH);
                 if (hard_helmet(mtmp_helmet) || amorphous(pm) || passes_walls(pm) || noncorporeal(pm) || unsolid(pm)) {
                     return SCR_EARTH;
                 }
@@ -2094,13 +2090,13 @@ export async function rnd_offensive_item(mtmp) {   // muse.c:2035
  * @returns {Promise<number>} boolean
  */
 export async function find_misc(mtmp) {   // muse.c:2095
-    let obj = null, mdat = null, x = 0, y = 0, t = null, xx = 0, yy = 0, pmidx = 0, immobile = 0, stuck = 0, ignore_boulders = 0, diag_ok = 0;
-    mdat = mtmp.data;
-    x = mtmp.mx;
-    y = mtmp.my;
-    pmidx = NON_PM;
-    immobile = mdat.mmove === 0 ? 1 : 0;
-    stuck = $c.peq(mtmp, u.ustuck) ? 1 : 0;
+    let obj = null, t = null, xx = 0, yy = 0;
+    const mdat = mtmp.data;
+    const x = mtmp.mx;
+    const y = mtmp.my;
+    let pmidx = NON_PM;
+    const immobile = mdat.mmove === 0 ? 1 : 0;
+    const stuck = $c.peq(mtmp, u.ustuck) ? 1 : 0;
     gm.m.misc = null;
     gm.m.has_misc = 0;
     if (is_animal(mdat) || mindless(mdat)) {
@@ -2117,8 +2113,8 @@ export async function find_misc(mtmp) {   // muse.c:2095
         return FALSE;
     }
     if (!stuck && !immobile && !mtmp.mtrapped && mtmp.cham === NON_PM && mons[pmidx = mdat.pmidx].difficulty < 6) {
-        ignore_boulders = verysmall(mdat) || throws_rocks(mdat) || passes_walls(mdat) ? 1 : 0;
-        diag_ok = !NODIAG(pmidx) ? 1 : 0;
+        const ignore_boulders = verysmall(mdat) || throws_rocks(mdat) || passes_walls(mdat) ? 1 : 0;
+        const diag_ok = !NODIAG(pmidx) ? 1 : 0;
         for (xx = $c.i16(x - 1); xx <= x + 1; xx = $c.i16(xx + 1)) {
             for (yy = $c.i16(y - 1); yy <= y + 1; yy = $c.i16(yy + 1)) {
                 if (isok(xx, yy) && !u_at(xx, yy) && (diag_ok || xx === x || yy === y) && (xx === x && yy === y || !svl.level.monsters[xx][yy])) {
@@ -2257,8 +2253,8 @@ async function muse_newcham_mon(mon) {   // muse.c:2250
  * @returns {Promise<number>} int
  */
 async function mloot_container(mon, container, vismon) {   // muse.c:2264
-    let contnr_nam = new Int8Array(256), mpronounbuf = new Int8Array(20), nearby = 0, takeout_indx = 0, takeout_count = 0, howfar = 0, res = 0, xobj = null, nitems = 0, already_nomerge = 0, just_xobj = 0, $t1, $t2;
-    res = 0;
+    let contnr_nam = new Int8Array(256), mpronounbuf = new Int8Array(20), takeout_indx = 0, takeout_count = 0, xobj = null, $t1, $t2;
+    let res = 0;
     if (!container || !Has_contents(container) || container.olocked) {
         return res;   /* 0 */
     }
@@ -2287,8 +2283,8 @@ async function mloot_container(mon, container, vismon) {   // muse.c:2264
             takeout_count = 4;
             break;
     }
-    howfar = dist2(mon.mx, mon.my, u.ux, u.uy);
-    nearby = howfar <= 49 ? 1 : 0;
+    const howfar = dist2(mon.mx, mon.my, u.ux, u.uy);
+    const nearby = howfar <= 49 ? 1 : 0;
     $t1 = mpronounbuf[0] = 0, contnr_nam[0] = $t1;
     if (vismon) {
         /* do this once so that when hallucinating it won't change
@@ -2302,7 +2298,7 @@ async function mloot_container(mon, container, vismon) {   // muse.c:2264
         /* TODO?
          *  Monster ought to prioritize on something it wants to use.
          */
-        nitems = 0;
+        let nitems = 0;
         for (xobj = container.cobj; xobj !== null; xobj = xobj.nobj) {
             nitems = nitems + 1 | 0;
         }
@@ -2356,8 +2352,8 @@ async function mloot_container(mon, container, vismon) {   // muse.c:2264
             /* couldn't carry xobj separately so put back inside */
             /* an achievement prize (castle's wand?) might already be
                marked nomerge (when it hasn't been in invent yet) */
-            already_nomerge = xobj.nomerge !== 0 ? 1 : 0;
-            just_xobj = !Has_contents(container) ? 1 : 0;
+            const already_nomerge = xobj.nomerge !== 0 ? 1 : 0;
+            const just_xobj = !Has_contents(container) ? 1 : 0;
             /* this doesn't restore the original contents ordering
                [shouldn't be a problem; even though this item didn't
                give the rummage message, that's what mon was doing] */
@@ -2652,9 +2648,8 @@ async function you_aggravate(mtmp) {   // muse.c:2631
  * @returns {number} int
  */
 export function rnd_misc_item(mtmp) {   // muse.c:2654
-    let pm = null, difficulty = 0;
-    pm = mtmp.data;
-    difficulty = mons[pm.pmidx].difficulty;
+    const pm = mtmp.data;
+    const difficulty = mons[pm.pmidx].difficulty;
     if (is_animal(pm) || attacktype(pm, AT.EXPL) || mindless(mtmp.data) || pm.mlet === S.GHOST || pm.mlet === S.KOP) {
         return 0;
     }
@@ -2692,8 +2687,7 @@ export function rnd_misc_item(mtmp) {   // muse.c:2654
  * @returns {Promise<number>} boolean
  */
 export async function searches_for_item(mon, obj) {   // muse.c:2706
-    let typ = 0;
-    typ = obj.otyp;
+    const typ = obj.otyp;
     /* don't let monsters interact with protected items on the floor */
     if (obj.where === OBJ.FLOOR && (obj.ox === mon.mx && obj.oy === mon.my) && onscary(obj.ox, obj.oy, mon)) {
         return FALSE;
@@ -2782,8 +2776,7 @@ export async function searches_for_item(mon, obj) {   // muse.c:2706
  * @returns {Promise<number>} boolean
  */
 export async function mon_reflects(mon, str) {   // muse.c:2797
-    let orefl = null;
-    orefl = await which_armor(mon, W.ARMS);
+    let orefl = await which_armor(mon, W.ARMS);
     if (orefl && orefl.otyp === SHIELD_OF_REFLECTION) {
         if (str) {
             await pline(str, s_suffix(await mon_nam(mon)), $c.lit("shield"));
@@ -2876,7 +2869,7 @@ export async function mcureblindness(mon, verbos) {   // muse.c:2872
  * @returns {Promise<number>} boolean
  */
 export async function munstone(mon, by_you) {   // muse.c:2884
-    let obj = null, tinok = 0;
+    let obj = null;
     if (await resists_ston(mon)) {
         return FALSE;
     }
@@ -2884,7 +2877,7 @@ export async function munstone(mon, by_you) {   // muse.c:2884
         return FALSE;
     }
     mon.mstrategy = $c.andu64(mon.mstrategy, 18446744073172680703n);
-    tinok = mcould_eat_tin(mon);
+    const tinok = mcould_eat_tin(mon);
     for (obj = mon.minvent; obj; obj = obj.nobj) {
         if (cures_stoning(mon, obj, tinok)) {
             await mon_consume_unstone(mon, obj, by_you, TRUE);
@@ -2901,21 +2894,21 @@ export async function munstone(mon, by_you) {   // muse.c:2884
  * @returns {Promise<void>}
  */
 async function mon_consume_unstone(mon, obj, by_you, stoning) {   // muse.c:2906
-    let vis = 0, tinned = 0, food = 0, acid = 0, lizard = 0, nutrit = 0, save_quan = 0, edog = null, $t1;
+    let $t1;
     /* T: stop petrification, F: cure stun && confusion */
-    vis = $c.i8(canseemon(mon));
-    tinned = obj.otyp === TIN ? 1 : 0;
-    food = obj.otyp === CORPSE || tinned ? 1 : 0;
-    acid = obj.otyp === POT_ACID || food && acidic($c.relem(mons, obj.corpsenm)) ? 1 : 0;
-    lizard = food && obj.corpsenm === PM.LIZARD ? 1 : 0;
-    nutrit = food ? await dog_nutrition(mon, obj) : 0;   /* also sets meating */
+    const vis = $c.i8(canseemon(mon));
+    const tinned = obj.otyp === TIN ? 1 : 0;
+    const food = obj.otyp === CORPSE || tinned ? 1 : 0;
+    const acid = obj.otyp === POT_ACID || food && acidic($c.relem(mons, obj.corpsenm)) ? 1 : 0;
+    const lizard = food && obj.corpsenm === PM.LIZARD ? 1 : 0;
+    const nutrit = food ? await dog_nutrition(mon, obj) : 0;   /* also sets meating */
     /* give a "<mon> is slowing down" message and also remove
        intrinsic speed (comparable to similar effect on the hero) */
     if (stoning) {
         await mon_adjust_speed(mon, -3, null);
     }
     if (vis) {
-        save_quan = obj.quan;
+        const save_quan = obj.quan;
         obj.quan = 1;
         await pline_mon(mon, $c.lit("%s %s %s."), await Monnam(mon), obj.oclass === POTION_CLASS ? $c.lit("quaffs") : obj.otyp === TIN ? $c.lit("opens and eats the contents of") : $c.lit("eats"), await distant_name(obj, doname));
         obj.quan = save_quan;
@@ -2957,7 +2950,7 @@ async function mon_consume_unstone(mon, obj, by_you, stoning) {   // muse.c:2906
         }
     }
     if (mon.mtame && !mon.isminion && nutrit > 0) {
-        edog = mon.mextra.edog;
+        const edog = mon.mextra.edog;
         if (edog.hungrytime < svm.moves) {
             edog.hungrytime = svm.moves;
         }
@@ -2996,14 +2989,14 @@ function cures_stoning(mon, obj, tinok) {   // muse.c:2985
  * @returns {number} boolean
  */
 function mcould_eat_tin(mon) {   // muse.c:3001
-    let obj = null, mwep = null, welded_wep = 0;
+    let obj = null;
     /* monkeys who manage to steal tins can't open and eat them
        even if they happen to also have the appropriate tool */
     if (is_animal(mon.data)) {
         return FALSE;
     }
-    mwep = mon.mw;
-    welded_wep = mwep && mwelded(mwep) ? 1 : 0;
+    const mwep = mon.mw;
+    const welded_wep = mwep && mwelded(mwep) ? 1 : 0;
     /* this is different from the player; tin opener or dagger doesn't
        have to be wielded, and knife can be used instead of dagger */
     for (obj = mon.minvent; obj; obj = obj.nobj) {
@@ -3024,8 +3017,8 @@ function mcould_eat_tin(mon) {   // muse.c:3001
  * @returns {Promise<number>} boolean
  */
 export async function munslime(mon, by_you) {   // muse.c:3031
-    let obj = null, odummy = new $T.obj(), mptr = null, t = null, xy = $c.matrix(Int16Array, [2, 8]), x = 0, y = 0, idx = 0, ridx = 0, nxy = 0;
-    mptr = mon.data;
+    let obj = null, odummy = new $T.obj(), t = null, xy = $c.matrix(Int16Array, [2, 8]), x = 0, y = 0, idx = 0;
+    const mptr = mon.data;
     /*
      * muse_unslime() gives "mon starts turning green", "mon zaps
      * itself with a wand of fire", and "mon's slime burns away"
@@ -3056,7 +3049,7 @@ export async function munslime(mon, by_you) {   // muse.c:3031
             }
         }
         if (((t = t_at(mon.mx, mon.my)) === null || t.ttyp !== FIRE_TRAP) && mptr.mmove && !mon.mtrapped) {
-            nxy = 0;
+            let nxy = 0;
             for (x = $c.i16(mon.mx - 1); x <= mon.mx + 1; x = $c.i16(x + 1)) {
                 for (y = $c.i16(mon.my - 1); y <= mon.my + 1; y = $c.i16(y + 1)) {
                     if (isok(x, y) && accessible(x, y) && !m_at(x, y) && (x !== u.ux || y !== u.uy)) {
@@ -3066,7 +3059,7 @@ export async function munslime(mon, by_you) {   // muse.c:3031
                 }
             }
             for (idx = 0; idx < nxy; idx = $c.i16(idx + 1)) {
-                ridx = $c.i16(rn2(nxy - idx) + idx | 0);
+                const ridx = $c.i16(rn2(nxy - idx) + idx | 0);
                 if (ridx !== idx) {
                     x = xy[0][idx];
                     xy[0][idx] = xy[0][ridx];
@@ -3095,20 +3088,20 @@ export async function munslime(mon, by_you) {   // muse.c:3031
  * @returns {Promise<number>} boolean
  */
 async function muse_unslime(mon, obj, trap, by_you) {   // muse.c:3104
-    let odummyp = [null], otyp = 0, dmg = 0, vis = 0, res = 0, Mnam = null, Pronoun = new Int8Array(40), was_lit = 0, saw_lit = 0, $t1;
+    let odummyp = [null], Pronoun = new Int8Array(40), $t1;
     /* true: if mon kills itself, hero gets credit/blame */
     /* [by_you not honored if 'mon' triggers fire trap]. */
-    otyp = obj.otyp;
-    dmg = 0;
-    vis = $c.i8(canseemon(mon));
-    res = TRUE;
+    const otyp = obj.otyp;
+    let dmg = 0;
+    let vis = $c.i8(canseemon(mon));
+    let res = TRUE;
     if (vis) {
         await pline_mon(mon, $c.lit("%s starts turning %s."), await Monnam(mon), green_mon(mon) ? $c.lit("into ooze") : hcolor(c_color_names.c_green));
     }
     /* -4 => sliming, causes quiet loss of enhanced speed */
     await mon_adjust_speed(mon, -4, null);
     if (trap) {
-        Mnam = vis ? await Monnam(mon) : null;
+        const Mnam = vis ? await Monnam(mon) : null;
         if (mon.mx === trap.tx && mon.my === trap.ty) {
             if (vis) {
                 await pline($c.lit("%s triggers %s fire trap!"), Mnam, trap.tseen ? $c.lit("the") : $c.lit("a"));
@@ -3157,8 +3150,8 @@ async function muse_unslime(mon, obj, trap, by_you) {   // muse.c:3104
             dmg = 0;   /* damage has been applied by explode() */
         }
     } else if (otyp === POT_OIL) {
-        was_lit = obj.lamplit ? TRUE : FALSE;
-        saw_lit = FALSE;
+        const was_lit = obj.lamplit ? TRUE : FALSE;
+        let saw_lit = FALSE;
         /*
          * If not already lit, requires two actions.  We cheat and let
          * monster do both rather than render the potion unusable.
@@ -3263,8 +3256,7 @@ function cures_sliming(mon, obj) {   // muse.c:3246
  * @returns {number} boolean
  */
 function green_mon(mon) {   // muse.c:3269
-    let ptr = null;
-    ptr = mon.data;
+    const ptr = mon.data;
     if (Hallucination()) {
         return FALSE;
     }

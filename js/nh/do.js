@@ -125,11 +125,10 @@ const dowipe$buf = new Int8Array(39);   // static in dowipe()
  * @returns {Promise<number>} int
  */
 export async function dodrop() {   // do.c:29
-    let result = 0;
     if (new $c.Ptr(u.ushops, 0).get(0)) {
         sellobj_state(SELL.DELIBERATE);
     }
-    result = await drop(await getobj($c.lit("drop"), any_obj_ok, GETOBJ_PROMPT | GETOBJ.ALLOWCNT));
+    const result = await drop(await getobj($c.lit("drop"), any_obj_ok, GETOBJ_PROMPT | GETOBJ.ALLOWCNT));
     if (new $c.Ptr(u.ushops, 0).get(0)) {
         sellobj_state(SELL.NORMAL);
     }
@@ -150,22 +149,22 @@ export async function dodrop() {   // do.c:29
  * @returns {Promise<number>} boolean
  */
 export async function boulder_hits_pool(otmp, rx, ry, pushing) {   // do.c:50
-    let lava = 0, fills_up = 0, what = null, ltyp = 0, chance = 0, mtmp = null, ttmp = null, whobuf = new Int8Array(256), dmg = 0;
+    let mtmp = null, whobuf = new Int8Array(256);
     /* the object falling into a pool or water or lava */
     /* coordinates of the pool */
     /* for a boulder, whether or not it is being pushed */
     if (!otmp || otmp.otyp !== BOULDER) {
         await impossible($c.lit("Not a boulder?"));
     } else if (is_pool_or_lava(rx, ry)) {
-        lava = is_lava(rx, ry);
-        what = waterbody_name(rx, ry);
-        ltyp = svl.level.locations[rx][ry].typ;
-        chance = rn2(10);   /* water: 90%; lava: 10% */
+        const lava = is_lava(rx, ry);
+        const what = waterbody_name(rx, ry);
+        const ltyp = svl.level.locations[rx][ry].typ;
+        const chance = rn2(10);   /* water: 90%; lava: 10% */
         /* chance for boulder to fill pool:  Plane of Water==0%,
            lava 10%, wall of water==50%, other water==90% */
-        fills_up = (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? FALSE : IS_WATERWALL(ltyp) ? chance < 5 ? 1 : 0 : lava ? chance === 0 ? 1 : 0 : chance !== 0 ? 1 : 0;
+        const fills_up = (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? FALSE : IS_WATERWALL(ltyp) ? chance < 5 ? 1 : 0 : lava ? chance === 0 ? 1 : 0 : chance !== 0 ? 1 : 0;
         if (fills_up) {
-            ttmp = t_at(rx, ry);
+            const ttmp = t_at(rx, ry);
             if (ltyp === DRAWBRIDGE_UP) {
                 svl.level.locations[rx][ry].flags = (((svl.level.locations[rx][ry].flags | 0) & ~DB.UNDER) >>> 0) & 31;   /* clear lava */
                 svl.level.locations[rx][ry].flags = ((svl.level.locations[rx][ry].flags | 0 | DB.FLOOR) >>> 0) & 31;
@@ -222,7 +221,7 @@ export async function boulder_hits_pool(otmp, rx, ry, pushing) {   // do.c:50
             } else if (lava && dist2(rx, ry, u.ux, u.uy) <= 2) {
                 await You($c.lit("are hit by molten %s%c"), hliquid($c.lit("lava")), Fire_resistance() ? 46 : 33);
                 await burn_away_slime();
-                dmg = d(u.uprops[FIRE_RES].intrinsic || u.uprops[FIRE_RES].extrinsic ? 1 : 3, 6);
+                const dmg = d(u.uprops[FIRE_RES].intrinsic || u.uprops[FIRE_RES].extrinsic ? 1 : 3, 6);
                 /* lava damage */
                 await losehp(Maybe_Half_Phys(dmg), $c.lit("molten lava"), KILLED.BY);
             } else if (!fills_up && flags.verbose && (pushing ? !Blind() : cansee(rx, ry))) {
@@ -470,12 +469,12 @@ export async function trycall(obj) {   // do.c:395
  * @returns {Promise<void>}
  */
 export async function polymorph_sink() {   // do.c:404
-    let sym = 0, sinklooted = 0, algn = 0, $t1;
-    sym = S.sink;
+    let algn = 0, $t1;
+    let sym = S.sink;
     if (svl.level.locations[u.ux][u.uy].typ !== SINK) {
         return;
     }
-    sinklooted = svl.level.locations[u.ux][u.uy].flags !== 0 ? 1 : 0;
+    const sinklooted = svl.level.locations[u.ux][u.uy].flags !== 0 ? 1 : 0;
     /* svl.level.flags.nsinks--; // set_levltyp() will update this */
     svl.level.locations[u.ux][u.uy].flags = 0;
     switch (rn2(4)) {
@@ -527,20 +526,19 @@ export async function polymorph_sink() {   // do.c:404
  * @returns {Promise<number>} boolean
  */
 async function teleport_sink() {   // do.c:460
-    let cx = 0, cy = 0, alreadylooted = 0, trycnt = 0;
-    trycnt = 0;
+    let trycnt = 0;
     do {
         /* this isn't incorrect but it is extremely unlikely that spots
          * on the level's edge will be ROOM so picking such wastes tries */
         /* 1..COLNO-1 */
         /* 0..ROWNO-1 */
         /* use this instead */
-        cx = $c.i16(1 + rnd(COLNO - 1 - 2) | 0);   /* 2..COLNO-2 */
-        cy = $c.i16(1 + rn2(ROWNO - 2) | 0);   /* 1..ROWNO-2 */
+        const cx = $c.i16(1 + rnd(COLNO - 1 - 2) | 0);   /* 2..COLNO-2 */
+        const cy = $c.i16(1 + rn2(ROWNO - 2) | 0);   /* 1..ROWNO-2 */
         if (svl.level.locations[cx][cy].typ === ROOM && !t_at(cx, cy) && !engr_at(cx, cy) && (!cansee(cx, cy) || distu(cx, cy) > 9)) {
             /* this ends up having set_levltyp() count all sinks and
                fountains on the level twice but that is not a problem */
-            alreadylooted = svl.level.locations[u.ux][u.uy].flags;
+            const alreadylooted = svl.level.locations[u.ux][u.uy].flags;
             /* remove old sink */
             await set_levltyp(u.ux, u.uy, ROOM);   /* was SINK so updates nsinks */
             svl.level.locations[u.ux][u.uy].flags = 0;
@@ -720,7 +718,6 @@ async function dosinkring(obj) {   // do.c:498
  * @returns {Promise<number>} boolean
  */
 export async function canletgo(obj, word) {   // do.c:665
-    let hand = null;
     if ($c.and64(obj.owornmask, W_ARMOR | W_ACCESSORY)) {
         if (word.get(0)) {
             await Norep($c.lit("You cannot %s %s you are wearing."), word, c_common_strings.c_something);
@@ -731,7 +728,7 @@ export async function canletgo(obj, word) {   // do.c:665
         /* no weldmsg(), so uwep->bknown might become set silently
            if word is "" */
         if (word.get(0)) {
-            hand = await body_part(HAND);
+            let hand = await body_part(HAND);
             if (bimanual($G.uwep)) {
                 hand = await makeplural(hand);
             }
@@ -773,7 +770,7 @@ export async function canletgo(obj, word) {   // do.c:665
  * @returns {Promise<number>} int
  */
 async function drop(obj) {   // do.c:714
-    let onam_p = null, mnam_p = null, monbuf = new Int8Array(256), levhack = 0;
+    let monbuf = new Int8Array(256);
     if (!obj) {
         return ECMD.FAIL;
     }
@@ -799,13 +796,13 @@ async function drop(obj) {   // do.c:714
     if (u.uswallow) {
         /* barrier between you and the floor */
         if (flags.verbose) {
-            mnam_p = await mon_nam(u.ustuck);
+            let mnam_p = await mon_nam(u.ustuck);
             /* doname can call s_suffix, reusing its buffer */
             if (dmgtype_fromattack(u.ustuck.data, AD.DGST, AT.ENGL) !== null) {
                 $c.sprintf(new $c.Ptr(monbuf, 0), $c.lit("%s %s"), s_suffix(mnam_p), await mbodypart(u.ustuck, STOMACH));
                 mnam_p = new $c.Ptr(monbuf, 0);
             }
-            onam_p = is_unpaid(obj) ? await yobjnam(obj, null) : await doname(obj);
+            const onam_p = is_unpaid(obj) ? await yobjnam(obj, null) : await doname(obj);
             await You($c.lit("drop %s into %s."), onam_p, mnam_p);
         }
     } else {
@@ -817,7 +814,7 @@ async function drop(obj) {   // do.c:714
             /* we might be levitating due to #invoke Heart of Ahriman;
                if so, levitation would end during call to freeinv()
                and we want hitfloor() to happen before float_down() */
-            levhack = finesse_ahriman(obj);
+            const levhack = finesse_ahriman(obj);
             if (levhack) {
                 u.uprops[LEVITATION].extrinsic = W.ART;   /* other than W_ARTI */
             }
@@ -925,15 +922,14 @@ export async function dropz(obj, with_impact) {   // do.c:807
  * @returns {Promise<number>} boolean
  */
 async function engulfer_digests_food(obj) {   // do.c:849
-    let could_petrify = 0, could_poly = 0, could_slime = 0, could_grow = 0, could_heal = 0;
     /* animal swallower (purple worn) eats any
        corpse, glob, or meat <item> but not other types of food */
     if (dmgtype_fromattack(u.ustuck.data, AD.DGST, AT.ENGL) !== null && (obj.otyp === CORPSE || obj.globby || obj.otyp === MEATBALL || obj.otyp === ENORMOUS_MEATBALL || obj.otyp === MEAT_RING || obj.otyp === MEAT_STICK)) {
-        could_petrify = FALSE;
-        could_poly = FALSE;
-        could_slime = FALSE;
-        could_grow = FALSE;
-        could_heal = FALSE;
+        let could_petrify = FALSE;
+        let could_poly = FALSE;
+        let could_slime = FALSE;
+        let could_grow = FALSE;
+        let could_heal = FALSE;
         if (obj.otyp === CORPSE) {
             could_petrify = touch_petrifies($c.relem(mons, obj.corpsenm));
             could_poly = polyfood(obj);
@@ -999,8 +995,7 @@ export async function obj_no_longer_held(obj) {   // do.c:893
  * @returns {Promise<number>} int
  */
 export async function doddrop() {   // do.c:924
-    let result = 0;
-    result = ECMD.OK;
+    let result = ECMD.OK;
     if (!gi.invent) {
         await You($c.lit("have nothing to drop."));
         return ECMD.OK;
@@ -1185,13 +1180,12 @@ async function menu_drop(retry) {   // do.c:981
  * @returns {Promise<number>} boolean
  */
 async function u_stuck_cannot_go(updn) {   // do.c:1110
-    let mtmp = null;
     if (u.ustuck) {
         if (u.uswallow || !sticks(gy.youmonst.data)) {
             await You($c.lit("are %s, and cannot go %s."), !u.uswallow ? $c.lit("being held") : dmgtype_fromattack(u.ustuck.data, AD.DGST, AT.ENGL) !== null ? $c.lit("swallowed") : $c.lit("engulfed"), updn);
             return TRUE;
         } else {
-            mtmp = u.ustuck;
+            const mtmp = u.ustuck;
             await set_ustuck(null);
             await You($c.lit("release %s."), await mon_nam(mtmp));
         }
@@ -1203,8 +1197,8 @@ async function u_stuck_cannot_go(updn) {   // do.c:1110
  * @returns {Promise<number>} int
  */
 export async function dodown() {   // do.c:1131
-    let trap = null, stway = null, stairs_down = 0, ladder_down = 0, obj = null, glyph_at_uxuy = 0, down_or_thru = null, actn = null, qbuf = new Int8Array(128), tdst = new $T.d_level(), $t1;
-    trap = null;
+    let stway = null, ladder_down = 0, obj = null, qbuf = new Int8Array(128), tdst = new $T.d_level(), $t1;
+    let trap = null;
     set_move_cmd(DIR.DOWN, 0);
     if (await u_rooted()) {
         return ECMD.TIME;
@@ -1212,7 +1206,7 @@ export async function dodown() {   // do.c:1131
     if (await stucksteed(TRUE)) {
         return ECMD.OK;
     }
-    stairs_down = ladder_down = FALSE;
+    let stairs_down = ladder_down = FALSE;
     if ((stway = stairway_at(u.ux, u.uy)) !== null && !stway.up) {
         stairs_down = !stway.isladder ? 1 : 0;
         ladder_down = !stairs_down ? 1 : 0;
@@ -1244,7 +1238,7 @@ export async function dodown() {   // do.c:1131
         } else if (Blind()) {
             /* glyph_to_cmap() is a macro which expands its argument many
                times; use this to do part of its work just once */
-            glyph_at_uxuy = svl.level.locations[u.ux][u.uy].glyph;
+            const glyph_at_uxuy = svl.level.locations[u.ux][u.uy].glyph;
             /* Avoid alerting player to an unknown stair or ladder.
              * Changes the message for a covered, known staircase
              * too; staircase knowledge is not stored anywhere.
@@ -1314,8 +1308,8 @@ export async function dodown() {   // do.c:1131
         return ECMD.OK;
     }
     if (trap) {
-        down_or_thru = trap.ttyp === HOLE ? $c.lit("down") : $c.lit("through");
-        actn = u_locomotion($c.lit("jump"));
+        const down_or_thru = trap.ttyp === HOLE ? $c.lit("down") : $c.lit("through");
+        let actn = u_locomotion($c.lit("jump"));
         if (gy.youmonst.data.msize >= MZ.HUGE) {
             await You($c.lit("don't fit %s easily."), down_or_thru);
             $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("Try to squeeze %s?"), down_or_thru);
@@ -1351,8 +1345,7 @@ export async function dodown() {   // do.c:1131
  * @returns {Promise<number>} int
  */
 export async function doup() {   // do.c:1298
-    let stway = null;
-    stway = stairway_at(u.ux, u.uy);
+    const stway = stairway_at(u.ux, u.uy);
     set_move_cmd(DIR.UP, 0);
     if (await u_rooted()) {
         return ECMD.TIME;
@@ -1399,11 +1392,11 @@ export async function doup() {   // do.c:1298
  * @returns {Promise<$T.nh_file | null>} NHFILE *
  */
 async function currentlevel_rewrite() {   // do.c:1348
-    let nhfp = null, whynot = new Int8Array(256);
+    let whynot = new Int8Array(256);
     /* since level change might be a bit slow, flush any buffered screen
      *  output (like "you fall through a trap door") */
     await mark_synch()();
-    nhfp = await create_levelfile(ledger_no(u.uz), new $c.Ptr(whynot, 0));
+    const nhfp = await create_levelfile(ledger_no(u.uz), new $c.Ptr(whynot, 0));
     if (!nhfp) {
         /*
          * This is not quite impossible: e.g., we may have
@@ -1421,11 +1414,10 @@ async function currentlevel_rewrite() {   // do.c:1348
  * @returns {Promise<void>}
  */
 export async function save_currentstate() {   // do.c:1375
-    let nhfp = null;
     program_state.in_checkpoint = program_state.in_checkpoint + 1 | 0;
     if (flags.ins_chkpt) {
         /* write out just-attained level, with pets and everything */
-        nhfp = await currentlevel_rewrite();
+        const nhfp = await currentlevel_rewrite();
         if (!nhfp) {
             return;
         }
@@ -1488,8 +1480,8 @@ export async function u_collide_m(mtmp) {   // do.c:1412
  * @returns {Promise<void>}
  */
 async function familiar_level_msg() {   // do.c:1448
-    let mesg = null, buf = new Int8Array(256), which = 0;
-    which = rn2(4);
+    let mesg = null, buf = new Int8Array(256);
+    const which = rn2(4);
     if (Hallucination()) {
         mesg = familiar_level_msg$halu_fam_msgs[which];
     } else {
@@ -1511,20 +1503,20 @@ async function familiar_level_msg() {   // do.c:1448
  * @returns {Promise<void>}
  */
 export async function goto_level(newlevel, at_stairs, falling, portal) {   // do.c:1479
-    let l_idx = 0, save_mode = 0, nhfp = null, new_ledger = 0, cant_go_back = 0, great_effort = 0, up = 0, newdungeon = 0, leaving_tutorial = 0, was_in_W_tower = 0, familiar = 0, new_ = 0, mtmp = null, whynot = new Int8Array(256), dist = 0, do_fall_dmg = 0, prev_temperature = 0, odds = 0, diff = 0, ttrap = null, stway = null, stway$2 = null, dloc = new Int8Array(128), major = 0, dmg = 0, $t1, $t2, $t3, $t4, $t5;
+    let l_idx = 0, mtmp = null, whynot = new Int8Array(256), ttrap = null, dloc = new Int8Array(128), $t1, $t2, $t3, $t4, $t5;
     /* destination */
     /* True if arriving via stairs/ladder */
     /* when falling to level, objects might tag along */
     /* True if arriving via magic portal */
-    up = depth(newlevel) < depth(u.uz) ? 1 : 0;
-    newdungeon = u.uz.dnum !== newlevel.dnum ? 1 : 0;
-    leaving_tutorial = FALSE;
-    was_in_W_tower = await In_W_tower(u.ux, u.uy, u.uz);
-    familiar = FALSE;
-    new_ = FALSE;   /* made a new level? */
-    dist = depth(newlevel) - depth(u.uz);
-    do_fall_dmg = FALSE;
-    prev_temperature = svl.level.flags.temperature;
+    let up = depth(newlevel) < depth(u.uz) ? 1 : 0;
+    const newdungeon = u.uz.dnum !== newlevel.dnum ? 1 : 0;
+    let leaving_tutorial = FALSE;
+    const was_in_W_tower = await In_W_tower(u.ux, u.uy, u.uz);
+    let familiar = FALSE;
+    let new_ = FALSE;   /* made a new level? */
+    const dist = depth(newlevel) - depth(u.uz);
+    let do_fall_dmg = FALSE;
+    const prev_temperature = svl.level.flags.temperature;
     if (dunlev(newlevel) > dunlevs_in_dungeon(newlevel)) {
         $t1 = dunlevs_in_dungeon(newlevel), newlevel.dlevel = $t1;
     }
@@ -1545,7 +1537,7 @@ export async function goto_level(newlevel, at_stairs, falling, portal) {   // do
             leaving_tutorial = TRUE;
         }
     }
-    new_ledger = ledger_no(newlevel);
+    let new_ledger = ledger_no(newlevel);
     if (new_ledger <= 0) {
         await done(ESCAPED);   /* in fact < 0 is impossible */
     }
@@ -1572,8 +1564,8 @@ export async function goto_level(newlevel, at_stairs, falling, portal) {   // do
     if (Inhell() && up && u.uhave.amulet && !newdungeon && !portal && dunlev(u.uz) < dunlevs_in_dungeon(u.uz) - 3) {
         if (!rn2(4 + svc.context.mysteryforce | 0)) {
             /* 2..4 */
-            odds = 3 + u.ualign.type;
-            diff = odds <= 1 ? 0 : rn2(odds);   /* paranoia */
+            const odds = 3 + u.ualign.type;
+            let diff = odds <= 1 ? 0 : rn2(odds);   /* paranoia */
             if (diff !== 0) {
                 assign_rnd_level(newlevel, u.uz, diff);
                 /* assign_rnd_level() may have used a value less than diff */
@@ -1621,7 +1613,7 @@ export async function goto_level(newlevel, at_stairs, falling, portal) {   // do
     if (u.utrap && u.utraptype === TT.BURIEDBALL) {
         await buried_ball_to_punishment();   /* (before we save/leave old level) */
     }
-    nhfp = await currentlevel_rewrite();
+    let nhfp = await currentlevel_rewrite();
     if (!nhfp) {
         return;
     }
@@ -1664,7 +1656,7 @@ export async function goto_level(newlevel, at_stairs, falling, portal) {   // do
      * for the level being left, to recover dynamic memory in use and
      * to avoid dangling timers and light sources.
      */
-    cant_go_back = newdungeon && In_endgame(newlevel) || leaving_tutorial ? 1 : 0;
+    const cant_go_back = newdungeon && In_endgame(newlevel) || leaving_tutorial ? 1 : 0;
     if (!cant_go_back) {
         await update_mlstmv();   /* current monsters are becoming inactive */
         if (nhfp.structlevel) {
@@ -1673,7 +1665,7 @@ export async function goto_level(newlevel, at_stairs, falling, portal) {   // do
     } else {
         await free_luathemes(leaving_tutorial ? tut_themes : most_themes);
     }
-    save_mode = nhfp.mode;
+    const save_mode = nhfp.mode;
     nhfp.mode = cant_go_back ? FREEING : WRITING | FREEING;
     await savelev(nhfp, $c.i8(ledger_no(u.uz)));
     nhfp.mode = save_mode;
@@ -1776,7 +1768,7 @@ export async function goto_level(newlevel, at_stairs, falling, portal) {   // do
         }
     } else if (at_stairs && !In_endgame(u.uz)) {
         if (up) {
-            stway = stairway_find_from(u.uz0, ga.at_ladder);
+            const stway = stairway_find_from(u.uz0, ga.at_ladder);
             if (stway) {
                 await u_on_newpos(stway.sx, stway.sy);
                 stway.u_traversed = TRUE;
@@ -1787,13 +1779,13 @@ export async function goto_level(newlevel, at_stairs, falling, portal) {   // do
             }
             /* you climb up the {stairs|ladder};
                fly up the stairs; fly up along the ladder */
-            great_effort = Punished() && !Levitation() ? 1 : 0;
+            const great_effort = Punished() && !Levitation() ? 1 : 0;
             if (flags.verbose || great_effort) {
                 await pline($c.lit("%s %s up%s the %s."), great_effort ? $c.lit("With great effort, you") : $c.lit("You"), u_locomotion($c.lit("climb")), (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked && ga.at_ladder ? $c.lit(" along") : $c.lit(""), ga.at_ladder ? $c.lit("ladder") : $c.lit("stairs"));
             }
         } else {
             /* down */
-            stway$2 = stairway_find_from(u.uz0, ga.at_ladder);
+            const stway$2 = stairway_find_from(u.uz0, ga.at_ladder);
             if (stway$2) {
                 await u_on_newpos(stway$2.sx, stway$2.sy);
                 stway$2.u_traversed = TRUE;
@@ -1975,7 +1967,7 @@ export async function goto_level(newlevel, at_stairs, falling, portal) {   // do
            whether level 5 is the end or there's another level (ESP reveals
            the same thing, but is part of normal game play as opposed to
            #chronicle leaking information that hero hasn't discovered yet) */
-        major = In_endgame(u.uz) && !((svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level)) || In_quest(u.uz) ? 1 : 0;
+        const major = In_endgame(u.uz) && !((svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level)) || In_quest(u.uz) ? 1 : 0;
         describe_level(new $c.Ptr(dloc, 0), 2);
         await livelog_printf(major ? LL.ACHIEVE : LL.DEBUG, $c.lit("entered %s"), new $c.Ptr(dloc, 0));
         if (gu.urole.mnum === PM.TOURIST) {
@@ -2007,7 +1999,7 @@ export async function goto_level(newlevel, at_stairs, falling, portal) {   // do
     }
     /* fall damage? */
     if (do_fall_dmg) {
-        dmg = d(dist > 1 ? dist : 1, 6);
+        let dmg = d(dist > 1 ? dist : 1, 6);
         dmg = Maybe_Half_Phys(dmg);
         await losehp(dmg, $c.lit("falling down a mine shaft"), KILLED.BY);
     }
@@ -2091,9 +2083,9 @@ export async function schedule_goto(tolev, utotype_flags, pre_msg, post_msg) {  
  * @returns {Promise<void>}
  */
 export async function deferred_goto() {   // do.c:2075
-    let dest = new $T.d_level(), oldlev = new $T.d_level(), typmask = 0, t = null;
+    let dest = new $T.d_level(), oldlev = new $T.d_level();
     if (!on_level(u.uz, u.utolev)) {
-        typmask = u.utotype;   /* save it; goto_level zeroes u.utotype */
+        const typmask = u.utotype;   /* save it; goto_level zeroes u.utotype */
         assign_level(dest, u.utolev);
         assign_level(oldlev, u.uz);
         if (gd.dfr_pre_msg) {
@@ -2102,7 +2094,7 @@ export async function deferred_goto() {   // do.c:2075
         await goto_level(dest, !!(typmask & UTOTYPE.ATSTAIRS) ? 1 : 0, !!(typmask & UTOTYPE.FALLING) ? 1 : 0, !!(typmask & UTOTYPE.PORTAL) ? 1 : 0);
         if (typmask & UTOTYPE.RMPORTAL) {
             /* remove portal */
-            t = t_at(u.ux, u.uy);
+            const t = t_at(u.ux, u.uy);
             if (t) {
                 await deltrap(t);
                 await newsym(u.ux, u.uy);
@@ -2129,29 +2121,29 @@ export async function deferred_goto() {   // do.c:2075
  * @returns {Promise<number>} boolean
  */
 export async function revive_corpse(corpse) {   // do.c:2111
-    let mtmp = null, mcarry = null, is_uwep = 0, chewed = 0, where = 0, cname = new Int8Array(256), container = null, container_where = Int32Array.of(0), montype = 0, is_zomb = 0, corpsex = Int16Array.of(0), corpsey = Int16Array.of(0), mtmp2 = null, effect = null, sackname = new Int8Array(256), mnam = null, ttmp = null;
-    container = null;
+    let cname = new Int8Array(256), container_where = Int32Array.of(0), corpsex = Int16Array.of(0), corpsey = Int16Array.of(0), sackname = new Int8Array(256);
+    let container = null;
     container_where[0] = 0;
-    where = corpse.where;
-    montype = corpse.corpsenm;
+    const where = corpse.where;
+    const montype = corpse.corpsenm;
     /* treat buried auto-reviver (troll, Rider?) like a zombie
        so that it can dig itself out of the ground if it revives */
-    is_zomb = mons[montype].mlet === S.ZOMBIE || where === OBJ.BURIED && is_reviver($c.relem(mons, montype)) ? 1 : 0;
-    is_uwep = $c.peq(corpse, $G.uwep) ? 1 : 0;
-    chewed = corpse.oeaten !== 0 ? 1 : 0;
+    const is_zomb = mons[montype].mlet === S.ZOMBIE || where === OBJ.BURIED && is_reviver($c.relem(mons, montype)) ? 1 : 0;
+    const is_uwep = $c.peq(corpse, $G.uwep) ? 1 : 0;
+    const chewed = corpse.oeaten !== 0 ? 1 : 0;
     $c.strcpy(new $c.Ptr(cname, 0), await corpse_xname(corpse, chewed ? $c.lit("bite-covered") : null, CXN.SINGULAR));
-    mcarry = where === OBJ.MINVENT ? corpse.v.v_ocarry : null;
+    let mcarry = where === OBJ.MINVENT ? corpse.v.v_ocarry : null;
     /* mcarry is NULL for (where == OBJ_BURIED and OBJ_CONTAINED) now */
     get_obj_location(corpse, new $c.Ptr(corpsex, 0), new $c.Ptr(corpsey, 0), CONTAINED_TOO | BURIED_TOO);
     if (where === OBJ.CONTAINED) {
         container = corpse.v.v_ocontainer;
-        mtmp2 = get_container_location(container, new $c.Ptr(container_where, 0), null);
+        const mtmp2 = get_container_location(container, new $c.Ptr(container_where, 0), null);
         /* container_where is outermost container's location even if nested */
         if (container_where[0] === OBJ.MINVENT && mtmp2) {
             mcarry = mtmp2;
         }
     }
-    mtmp = await revive(corpse, FALSE);   /* corpse is gone if successful */
+    const mtmp = await revive(corpse, FALSE);   /* corpse is gone if successful */
     if (mtmp) {
         switch (where) {
             case OBJ.INVENT:
@@ -2163,7 +2155,7 @@ export async function revive_corpse(corpse) {   // do.c:2111
                 break;
             case OBJ.FLOOR:
                 if (cansee(corpsex[0], corpsey[0]) || canseemon(mtmp)) {
-                    effect = $c.lit("");
+                    let effect = $c.lit("");
                     if (mtmp.data === mons[PM.DEATH]) {
                         effect = $c.lit(" in a whirl of spectral skulls");
                     } else if (mtmp.data === mons[PM.PESTILENCE]) {
@@ -2193,7 +2185,7 @@ export async function revive_corpse(corpse) {   // do.c:2111
                     /* Could use x_monnam(..., AUGMENT_IT) but that'd say "someone"
                        for humanoid monsters, which seems like a distinction the hero
                        doesn't have knowledge to make here. */
-                    mnam = canspotmon(mtmp) ? await Amonnam(mtmp) : c_common_strings.c_Something;
+                    const mnam = canspotmon(mtmp) ? await Amonnam(mtmp) : c_common_strings.c_Something;
                     if (!container) {
                         await impossible($c.lit("reviving corpse from non-existent container"));
                     } else if (mcarry && canseemon(mcarry)) {
@@ -2211,7 +2203,7 @@ export async function revive_corpse(corpse) {   // do.c:2111
                 if (is_zomb) {
                     await maketrap(mtmp.mx, mtmp.my, PIT);
                     if (cansee(mtmp.mx, mtmp.my)) {
-                        ttmp = t_at(mtmp.mx, mtmp.my);
+                        const ttmp = t_at(mtmp.mx, mtmp.my);
                         if (ttmp) {
                             ttmp.tseen = (TRUE) & 1;
                         }
@@ -2241,14 +2233,14 @@ export async function revive_corpse(corpse) {   // do.c:2111
  * @returns {Promise<void>}
  */
 export async function revive_mon(arg, timeout) {   // do.c:2251
-    let body = null, mptr = null, mtmp = null, x = Int16Array.of(0), y = Int16Array.of(0), notice_it = 0, monname = null, when = 0, action = 0;
-    body = arg.a_obj;
-    mptr = $c.relem(mons, body.corpsenm);
+    let mtmp = null, x = Int16Array.of(0), y = Int16Array.of(0), when = 0, action = 0;
+    const body = arg.a_obj;
+    const mptr = $c.relem(mons, body.corpsenm);
     /* corpse will revive somewhere else if there is a monster in the way;
        Riders get a chance to try to bump the obstacle out of their way */
     if (is_displacer(mptr) && body.where === OBJ.FLOOR && get_obj_location(body, new $c.Ptr(x, 0), new $c.Ptr(y, 0), 0) && (mtmp = svl.level.monsters[x[0]][y[0]]) !== null && svl.level.flags.stasis_until < svm.moves) {
-        notice_it = $c.i8(canseemon(mtmp));   /* before rloc() */
-        monname = await Monnam(mtmp);
+        const notice_it = $c.i8(canseemon(mtmp));   /* before rloc() */
+        const monname = await Monnam(mtmp);
         if (await rloc(mtmp, RLOC.NOMSG)) {
             if (notice_it && !canseemon(mtmp)) {
                 await pline($c.lit("%s vanishes."), monname);
@@ -2288,9 +2280,8 @@ export async function revive_mon(arg, timeout) {   // do.c:2251
  * @returns {Promise<void>}
  */
 export async function zombify_mon(arg, timeout) {   // do.c:2299
-    let body = null, zmon = 0;
-    body = arg.a_obj;
-    zmon = zombie_form($c.relem(mons, body.corpsenm));
+    const body = arg.a_obj;
+    const zmon = zombie_form($c.relem(mons, body.corpsenm));
     if (zmon !== NON_PM && !(svm.mvitals[zmon].mvflags & G_GENOD)) {
         if (has_omid(body)) {
             free_omid(body);
@@ -2351,9 +2342,8 @@ export async function donull() {   // do.c:2351
  * @returns {Promise<number>} int
  */
 async function wipeoff() {   // do.c:2361
-    let udelta = 0, ldelta = 0;
-    udelta = u.ucreamed;
-    ldelta = BlindedTimeout();
+    let udelta = u.ucreamed;
+    let ldelta = BlindedTimeout();
     if (udelta > 4) {
         udelta = 4;
     }
@@ -2399,13 +2389,12 @@ export async function dowipe() {   // do.c:2390
  * @returns {Promise<void>}
  */
 export async function legs_in_no_shape(for_what, by_steed) {   // do.c:2408
-    let wl = 0, bp = null;
     /* jumping, kicking, riding */
     if (by_steed && u.usteed) {
         await pline($c.lit("%s is in no shape for %s."), await Monnam(u.usteed), for_what);
     } else {
-        wl = $c.and64(u.uprops[WOUNDED_LEGS].extrinsic, BOTH_SIDES);
-        bp = await body_part(LEG);
+        const wl = $c.and64(u.uprops[WOUNDED_LEGS].extrinsic, BOTH_SIDES);
+        let bp = await body_part(LEG);
         if (wl === BOTH_SIDES) {
             bp = await makeplural(bp);
         }
@@ -2443,7 +2432,7 @@ export async function set_wounded_legs(side, timex) {   // do.c:2426
  * @returns {Promise<void>}
  */
 export async function heal_legs(how) {   // do.c:2449
-    let legs = null, $t1;
+    let $t1;
     /* 0: ordinary, 1: dismounting steed, 2: limbs turn to stone */
     if (Wounded_legs()) {
         disp.botl = TRUE;
@@ -2455,7 +2444,7 @@ export async function heal_legs(how) {   // do.c:2449
            before the final stages and that calls us (how==2) to cure
            wounded legs, but we want to suppress the feel better message */
         if (!u.usteed && how !== 2) {
-            legs = await body_part(LEG);
+            let legs = await body_part(LEG);
             if ($c.and64(u.uprops[WOUNDED_LEGS].extrinsic, BOTH_SIDES) === BOTH_SIDES) {
                 legs = await makeplural(legs);
             }

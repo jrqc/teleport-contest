@@ -82,14 +82,13 @@ export async function ballrelease(showmsg) {   // ball.c:23
  * @returns {Promise<void>}
  */
 export async function ballfall() {   // ball.c:43
-    let gets_hit = 0, dmg = 0;
     if (!$G.uball || $G.uball && carried($G.uball) && await welded($G.uball)) {
         return;
     }
-    gets_hit = ($G.uball.ox !== u.ux || $G.uball.oy !== u.uy) && ($c.peq($G.uwep, $G.uball) ? FALSE : $c.i8(rn2(5))) ? 1 : 0;
+    const gets_hit = ($G.uball.ox !== u.ux || $G.uball.oy !== u.uy) && ($c.peq($G.uwep, $G.uball) ? FALSE : $c.i8(rn2(5))) ? 1 : 0;
     await ballrelease(TRUE);
     if (gets_hit) {
-        dmg = rn2(7) + 25 | 0;
+        let dmg = rn2(7) + 25 | 0;
         await pline_The($c.lit("iron ball falls on your %s."), await body_part(HEAD));
         if ($G.uarmh) {
             if (hard_helmet($G.uarmh)) {
@@ -212,8 +211,7 @@ async function unplacebc_core() {   // ball.c:147
  * @returns {number} boolean
  */
 function check_restriction(restriction) {   // ball.c:180
-    let ret = 0;
-    ret = FALSE;
+    let ret = FALSE;
     if (!bcrestriction || restriction === override_restriction) {
         ret = TRUE;
     } else {
@@ -249,7 +247,6 @@ export async function unplacebc() {   // ball.c:212
  */
 export async function unplacebc_and_covet_placebc() {   // ball.c:222
     let restriction = 0;
-    restriction = 0;
     if (bcrestriction) {
         await impossible($c.lit("unplacebc_and_covet_placebc denied, already restricted"));
     } else {
@@ -308,8 +305,8 @@ async function bc_order() {   // ball.c:354
  * @returns {Promise<void>}
  */
 export async function set_bc(already_blind) {   // ball.c:380
-    let ball_on_floor = 0, $t1, $t2;
-    ball_on_floor = !carried($G.uball) ? 1 : 0;
+    let $t1, $t2;
+    const ball_on_floor = !carried($G.uball) ? 1 : 0;
     $t1 = await bc_order(), u.bc_order = $t1;   /* get the order */
     u.bc_felt = ball_on_floor ? BC.BALL | BC.CHAIN : BC.CHAIN;   /* felt */
     if (already_blind || u.uswallow) {
@@ -369,7 +366,7 @@ export async function set_bc(already_blind) {   // ball.c:380
  * @returns {Promise<void>}
  */
 export async function move_bc(before, control, ballx, bally, chainx, chainy) {   // ball.c:437
-    let on_floor = 0, $t1, $t2;
+    let $t1, $t2;
     if (Blind()) {
         /*
          *  The hero is blind.  Time to work hard.  The ball and chain that
@@ -459,7 +456,7 @@ export async function move_bc(before, control, ballx, bally, chainx, chainy) {  
                 await newsym($G.uball.ox, $G.uball.oy);
             }
         } else {
-            on_floor = !carried($G.uball) ? 1 : 0;
+            const on_floor = !carried($G.uball) ? 1 : 0;
             if (control & BC.CHAIN || !control && u.bc_order === BCPOS_CHAIN) {
                 /* If the chain moved or nothing moved & chain on top. */
                 if (on_floor) {
@@ -876,9 +873,9 @@ export async function drop_ball(x, y) {   // ball.c:882
  * @returns {Promise<void>}
  */
 async function litter() {   // ball.c:965
-    let otmp = null, nextobj = null, capacity = 0;
-    nextobj = null;
-    capacity = weight_cap();
+    let otmp = null;
+    let nextobj = null;
+    const capacity = weight_cap();
     for (otmp = gi.invent; otmp; otmp = nextobj) {
         nextobj = otmp.nobj;
         if (!$c.peq(otmp, $G.uball) && rnd(capacity) <= (otmp.owt | 0)) {
@@ -895,8 +892,7 @@ async function litter() {   // ball.c:965
  * @returns {Promise<void>}
  */
 export async function drag_down() {   // ball.c:986
-    let forward = 0, dragchance = 0;
-    dragchance = 3;
+    let dragchance = 3;
     /*
      *  Assume that the ball falls forward if:
      *
@@ -905,7 +901,7 @@ export async function drag_down() {   // ball.c:986
      *     not wielding any weapon), or
      *  c) (perhaps) it falls forward out of his non-weapon hand
      */
-    forward = carried($G.uball) && ($c.peq($G.uwep, $G.uball) || !$G.uwep || !rn2(3)) ? 1 : 0;
+    const forward = carried($G.uball) && ($c.peq($G.uwep, $G.uball) || !$G.uwep || !rn2(3)) ? 1 : 0;
     if (carried($G.uball) && !await welded($G.uball)) {
         await You($c.lit("lose your grip on the iron ball."));
     }
@@ -937,7 +933,7 @@ export async function drag_down() {   // ball.c:986
  * @returns {Promise<void>}
  */
 export async function bc_sanity_check() {   // ball.c:1034
-    let otyp = 0, freeball = 0, freechain = 0, onam = null, bx = 0, by = 0, cx = 0, cy = 0, bdx = 0, bdy = 0, cdx = 0, cdy = 0;
+    let otyp = 0, onam = null, bx = 0, by = 0, cx = 0, cy = 0, bdx = 0, bdy = 0, cdx = 0, cdy = 0;
     if (Punished() && (!$G.uball || !$G.uchain)) {
         await impossible($c.lit("Punished without %s%s%s?"), !$G.uball ? $c.lit("iron ball") : $c.lit(""), !$G.uball && !$G.uchain ? $c.lit(" and ") : $c.lit(""), !$G.uchain ? $c.lit("attached chain") : $c.lit(""));
     } else if (!Punished() && ($G.uball || $G.uchain)) {
@@ -946,9 +942,9 @@ export async function bc_sanity_check() {   // ball.c:1034
     /* ball is free when swallowed, when changing levels or during air bubble
        management on Plane of Water (both of which start and end in between
        sanity checking cycles, so shouldn't be relevant), other times? */
-    freechain = !$G.uchain || $G.uchain.where === OBJ.FREE ? 1 : 0;
+    const freechain = !$G.uchain || $G.uchain.where === OBJ.FREE ? 1 : 0;
     /* lie to simplify the testing logic */
-    freeball = !$G.uball || $G.uball.where === OBJ.FREE || freechain && $G.uball.where === OBJ.INVENT ? 1 : 0;
+    const freeball = !$G.uball || $G.uball.where === OBJ.FREE || freechain && $G.uball.where === OBJ.INVENT ? 1 : 0;
     if ($G.uball && ($G.uball.otyp !== HEAVY_IRON_BALL || $G.uball.where !== OBJ.FLOOR && $G.uball.where !== OBJ.INVENT && $G.uball.where !== OBJ.FREE || freeball ^ freechain || $c.and64($G.uball.owornmask, W.BALL) === 0 || $c.and64($G.uball.owornmask, ~(W.BALL | W_WEAPONS)) !== 0)) {
         otyp = $G.uball.otyp;
         onam = await safe_typename(otyp);

@@ -64,8 +64,7 @@ const squadprob = $c.recArray($T.anon_mkroom_807, 4);
  * @returns {number} boolean
  */
 function isbig(sroom) {   // mkroom.c:42
-    let area = 0;
-    area = Math.imul(sroom.hx - sroom.lx + 1, sroom.hy - sroom.ly + 1);
+    const area = Math.imul(sroom.hx - sroom.lx + 1, sroom.hy - sroom.ly + 1);
     return area > 20 ? 1 : 0;
 }
 /* make and stock a room of a given type */
@@ -242,8 +241,8 @@ async function mkshop() {   // mkroom.c:95
  * @returns {$T.mkroom | null} struct mkroom *
  */
 function pick_room(strict) {   // mkroom.c:220
-    let sroom = null, i = 0, $t1;
-    i = svn.nroom;
+    let sroom = null, $t1;
+    let i = svn.nroom;
     for (sroom = $c.relem(svr.rooms, rn2(svn.nroom)); $t1 = i, i = $t1 - 1 | 0, $t1; sroom = $c.radd(sroom, 1)) {
         if ($c.peq(sroom, $c.relem(svr.rooms, svn.nroom))) {
             sroom = svr.rooms[0];
@@ -285,10 +284,9 @@ function mkzoo(type) {   // mkroom.c:244
  * @returns {Promise<void>}
  */
 async function mk_zoo_thronemon(x, y) {   // mkroom.c:257
-    let i = 0, pm = 0, mon = null;
-    i = rnd(await level_difficulty());
-    pm = i > 9 ? PM.OGRE_TYRANT : i > 5 ? PM.ELVEN_MONARCH : i > 2 ? PM.DWARF_RULER : PM.GNOME_RULER;
-    mon = await makemon($c.relem(mons, pm), x, y, NO.MM_FLAGS);
+    const i = rnd(await level_difficulty());
+    const pm = i > 9 ? PM.OGRE_TYRANT : i > 5 ? PM.ELVEN_MONARCH : i > 2 ? PM.DWARF_RULER : PM.GNOME_RULER;
+    const mon = await makemon($c.relem(mons, pm), x, y, NO.MM_FLAGS);
     if (mon) {
         mon.msleeping = 1;
         mon.mpeaceful = 0;
@@ -470,10 +468,10 @@ export async function fill_zoo(sroom) {   // mkroom.c:276
  * @returns {Promise<void>}
  */
 export async function mkundead(mm, revive_corpses, mm_flags) {   // mkroom.c:456
-    let cnt = 0, mdat = null, otmp = null, cc = new $T.nhcoord(), $t1;
-    cnt = $c.div32(await level_difficulty() + 1, 10) + rnd(5) | 0;
+    let otmp = null, cc = new $T.nhcoord(), $t1;
+    let cnt = $c.div32(await level_difficulty() + 1, 10) + rnd(5) | 0;
     while ($t1 = cnt, cnt = $t1 - 1 | 0, $t1) {
-        mdat = await morguemon();
+        const mdat = await morguemon();
         if (mdat && await enexto(cc, mm.x, mm.y, mdat) && (!revive_corpses || !(otmp = sobj_at(CORPSE, cc.x, cc.y)) || !await revive(otmp, FALSE))) {
             await makemon(mdat, cc.x, cc.y, mm_flags >>> 0);
         }
@@ -484,14 +482,13 @@ export async function mkundead(mm, revive_corpses, mm_flags) {   // mkroom.c:456
  * @returns {Promise<$T.permonst | null>} struct permonst *
  */
 async function morguemon() {   // mkroom.c:478
-    let i = 0, hd = 0, ndemon_res = 0;
-    i = rn2(100);
-    hd = rn2(await level_difficulty());
+    const i = rn2(100);
+    const hd = rn2(await level_difficulty());
     if (hd > 10 && i < 10) {
         if (Inhell() || In_endgame(u.uz)) {
             return await mkclass(S.DEMON, 0);
         } else {
-            ndemon_res = await ndemon(A.NONE);
+            const ndemon_res = await ndemon(A.NONE);
             if (ndemon_res !== NON_PM) {
                 return $c.relem(mons, ndemon_res);
             }
@@ -507,10 +504,10 @@ async function morguemon() {   // mkroom.c:478
  * @returns {Promise<$T.permonst | null>} struct permonst *
  */
 export async function antholemon() {   // mkroom.c:502
-    let mtyp = 0, indx = 0, trycnt = 0;
-    trycnt = 0;
+    let mtyp = 0;
+    let trycnt = 0;
     /* casts are for dealing with time_t */
-    indx = $c.i32($c.rem64($G.ubirthday, 3));
+    let indx = $c.i32($c.rem64($G.ubirthday, 3));
     indx = indx + await level_difficulty() | 0;
     /* Same monsters within a level, different ones between levels */
     do {
@@ -533,16 +530,16 @@ export async function antholemon() {   // mkroom.c:502
  * @returns {Promise<void>}
  */
 async function mkswamp() {   // mkroom.c:530
-    let sroom = null, i = 0, eelct = 0, sx = 0, sy = 0, rmno = 0;
+    let i = 0, sx = 0, sy = 0;
     /* Michiel Huisjes & Fred de Wilde */
-    eelct = 0;
+    let eelct = 0;
     for (i = 0; i < 5; i = i + 1 | 0) {
         /* turn up to 5 rooms swampy */
-        sroom = $c.relem(svr.rooms, rn2(svn.nroom));
+        const sroom = $c.relem(svr.rooms, rn2(svn.nroom));
         if (sroom.hx < 0 || sroom.rtype !== OROOM || has_upstairs(sroom) || has_dnstairs(sroom)) {
             continue;
         }
-        rmno = $c.i32($c.rdiff(sroom, svr.rooms[0])) + ROOMOFFSET | 0;
+        const rmno = $c.i32($c.rdiff(sroom, svr.rooms[0])) + ROOMOFFSET | 0;
         /* satisfied; make a swamp */
         sroom.rtype = SWAMP;
         for (sx = sroom.lx; sx <= sroom.hx; sx = $c.i16(sx + 1)) {
@@ -573,12 +570,11 @@ async function mkswamp() {   // mkroom.c:530
  * @returns {$T.nhcoord | null} coord *
  */
 function shrine_pos(roomno) {   // mkroom.c:577
-    let delta = 0, troom = null;
-    troom = $c.relem(svr.rooms, roomno - ROOMOFFSET | 0);
+    const troom = $c.relem(svr.rooms, roomno - ROOMOFFSET | 0);
     /* if width and height are odd, placement will be the exact center;
        if either or both are even, center point is a hypothetical spot
        between map locations and placement will be adjacent to that */
-    delta = troom.hx - troom.lx;
+    let delta = troom.hx - troom.lx;
     shrine_pos$buf.x = $c.i16(troom.lx + $c.div32(delta, 2) | 0);
     if ($c.rem32(delta, 2) && rn2(2)) {
         shrine_pos$buf.x = $c.i16(shrine_pos$buf.x + 1);
@@ -594,7 +590,7 @@ function shrine_pos(roomno) {   // mkroom.c:577
  * @returns {Promise<void>}
  */
 async function mktemple() {   // mkroom.c:598
-    let sroom = null, shrine_spot = null, lev = null, $t1;
+    let sroom = null, $t1;
     if (!(sroom = pick_room(TRUE))) {
         return;
     }
@@ -604,8 +600,8 @@ async function mktemple() {   // mkroom.c:598
      * In temples, shrines are blessed altars
      * located in the center of the room
      */
-    shrine_spot = shrine_pos($c.i32($c.add64($c.rdiff(sroom, svr.rooms[0]), ROOMOFFSET)));
-    lev = $c.relem(svl.level.locations[shrine_spot.x], shrine_spot.y);
+    const shrine_spot = shrine_pos($c.i32($c.add64($c.rdiff(sroom, svr.rooms[0]), ROOMOFFSET)));
+    const lev = $c.relem(svl.level.locations[shrine_spot.x], shrine_spot.y);
     lev.typ = ALTAR;
     $t1 = induced_align(80), lev.flags = ($t1) & 31;
     await priestini(u.uz, sroom, shrine_spot.x, shrine_spot.y, FALSE);
@@ -618,13 +614,13 @@ async function mktemple() {   // mkroom.c:598
  * @returns {number} boolean
  */
 export function nexttodoor(sx, sy) {   // mkroom.c:623
-    let dx = 0, dy = 0, lev = null;
+    let dx = 0, dy = 0;
     for (dx = -1; dx <= 1; dx = dx + 1 | 0) {
         for (dy = -1; dy <= 1; dy = dy + 1 | 0) {
             if (!isok($c.i16(sx + dx | 0), $c.i16(sy + dy | 0))) {
                 continue;
             }
-            lev = $c.relem(svl.level.locations[sx + dx | 0], sy + dy | 0);
+            const lev = $c.relem(svl.level.locations[sx + dx | 0], sy + dy | 0);
             if (IS_DOOR(lev.typ) || lev.typ === SDOOR) {
                 return TRUE;
             }
@@ -637,8 +633,7 @@ export function nexttodoor(sx, sy) {   // mkroom.c:623
  * @returns {number} boolean
  */
 export function has_dnstairs(sroom) {   // mkroom.c:640
-    let stway = null;
-    stway = gs.stairs;
+    let stway = gs.stairs;
     while (stway) {
         if (!stway.up && inside_room(sroom, stway.sx, stway.sy)) {
             return TRUE;
@@ -652,8 +647,7 @@ export function has_dnstairs(sroom) {   // mkroom.c:640
  * @returns {number} boolean
  */
 export function has_upstairs(sroom) {   // mkroom.c:653
-    let stway = null;
-    stway = gs.stairs;
+    let stway = gs.stairs;
     while (stway) {
         if (stway.up && inside_room(sroom, stway.sx, stway.sy)) {
             return TRUE;
@@ -683,9 +677,8 @@ export function somey(croom) {   // mkroom.c:672
  * @returns {number} boolean
  */
 export function inside_room(croom, x, y) {   // mkroom.c:678
-    let i = 0;
     if (croom.irregular) {
-        i = $c.i32($c.add64($c.rdiff(croom, svr.rooms[0]), ROOMOFFSET));
+        const i = $c.i32($c.add64($c.rdiff(croom, svr.rooms[0]), ROOMOFFSET));
         return !svl.level.locations[x][y].edge && svl.level.locations[x][y].roomno === i ? 1 : 0;
     }
     return x >= croom.lx - 1 && x <= croom.hx + 1 && y >= croom.ly - 1 && y <= croom.hy + 1 ? 1 : 0;
@@ -754,8 +747,8 @@ export function somexy(croom, c) {   // mkroom.c:694
  * @returns {number} boolean
  */
 export function somexyspace(croom, c) {   // mkroom.c:744
-    let trycnt = 0, okay = 0, $t1;
-    trycnt = 0;
+    let okay = 0, $t1;
+    let trycnt = 0;
     do {
         okay = somexy(croom, c) && isok(c.x, c.y) && !occupied(c.x, c.y) && (svl.level.locations[c.x][c.y].typ === ROOM || svl.level.locations[c.x][c.y].typ === CORR || svl.level.locations[c.x][c.y].typ === ICE) ? 1 : 0;
     } while (($t1 = trycnt, trycnt = $t1 + 1 | 0, $t1) < 100 && !okay);
@@ -789,8 +782,7 @@ export function search_special(type) {   // mkroom.c:765
  * @returns {Promise<$T.permonst | null>} struct permonst *
  */
 export async function courtmon() {   // mkroom.c:783
-    let i = 0;
-    i = rn2(60) + rn2(Math.imul(3, await level_difficulty())) | 0;
+    const i = rn2(60) + rn2(Math.imul(3, await level_difficulty())) | 0;
     if (i > 100) {
         return await mkclass(S.DRAGON, 0);
     } else if (i > 95) {
@@ -912,8 +904,7 @@ export async function rest_rooms(nhfp) {   // mkroom.c:893
  * @returns {number} int
  */
 export function cmap_to_type(sym) {   // mkroom.c:912
-    let typ = 0;
-    typ = STONE;   /* catchall */
+    let typ = STONE;   /* catchall */
     switch (sym) {
         case S.stone:
             typ = STONE;
@@ -1057,12 +1048,12 @@ export function cmap_to_type(sym) {   // mkroom.c:912
  * @returns {Promise<number>} boolean
  */
 async function invalid_shop_shape(sroom) {   // mkroom.c:1050
-    let x = 0, y = 0, doorx = 0, doory = 0, insidex = 0, insidey = 0, insidect = 0;
-    doorx = $c.radd(svd.doors, sroom.fdoor).x;
-    doory = $c.radd(svd.doors, sroom.fdoor).y;
-    insidex = 0;
-    insidey = 0;
-    insidect = 0;
+    let x = 0, y = 0;
+    const doorx = $c.radd(svd.doors, sroom.fdoor).x;
+    const doory = $c.radd(svd.doors, sroom.fdoor).y;
+    let insidex = 0;
+    let insidey = 0;
+    let insidect = 0;
     /* First, identify squares inside the room and next to the door. */
     for (x = $c.i16(max(doorx - 1, sroom.lx)); x <= min(doorx + 1, sroom.hx); x = $c.i16(x + 1)) {
         for (y = $c.i16(max(doory - 1, sroom.ly)); y <= min(doory + 1, sroom.hy); y = $c.i16(y + 1)) {

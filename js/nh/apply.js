@@ -139,8 +139,7 @@ const cant_reach = new Int8Array(33);
  */
 export async function do_blinding_ray(obj$in) {   // apply.c:61
     const obj = [obj$in];
-    let mtmp = null;
-    mtmp = await bhit(u.dx, u.dy, COLNO, FLASHED_LIGHT, null, null, new $c.Ptr(obj, 0));
+    const mtmp = await bhit(u.dx, u.dy, COLNO, FLASHED_LIGHT, null, null, new $c.Ptr(obj, 0));
     obj[0].ox = u.ux, obj[0].oy = u.uy;   /* flash_hits_mon() wants this */
     if (mtmp) {
         await flash_hits_mon(mtmp, obj[0]);
@@ -188,8 +187,8 @@ async function use_camera(obj) {   // apply.c:79
  * @returns {Promise<number>} int
  */
 async function use_towel(obj) {   // apply.c:112
-    let drying_feedback = 0, old = 0, what = null, saved_ublindf = null, $t1;
-    drying_feedback = $c.peq(obj, $G.uwep) ? 1 : 0;
+    let old = 0, $t1;
+    const drying_feedback = $c.peq(obj, $G.uwep) ? 1 : 0;
     if (!await freehand()) {
         await You($c.lit("have no free %s!"), await body_part(HAND));
         return ECMD.OK;
@@ -213,11 +212,11 @@ async function use_towel(obj) {   // apply.c:112
                     await pline($c.lit("Yecch!  Your %s %s gunk on it!"), await body_part(FACE), old ? $c.lit("has more") : $c.lit("now has"));
                     await make_blinded($c.sub64($c.add64(BlindedTimeout(), u.ucreamed), old), TRUE);
                 } else {
-                    what = $G.ublindf.otyp === LENSES ? $c.lit("lenses") : obj.otyp === $G.ublindf.otyp ? $c.lit("other towel") : $c.lit("blindfold");
+                    const what = $G.ublindf.otyp === LENSES ? $c.lit("lenses") : obj.otyp === $G.ublindf.otyp ? $c.lit("other towel") : $c.lit("blindfold");
                     if ($G.ublindf.cursed) {
                         await You($c.lit("push your %s %s."), what, rn2(2) ? $c.lit("cock-eyed") : $c.lit("crooked"));
                     } else {
-                        saved_ublindf = $G.ublindf;
+                        const saved_ublindf = $G.ublindf;
                         await You($c.lit("push your %s off."), what);
                         await Blindf_off($G.ublindf);
                         await dropx(saved_ublindf);
@@ -266,9 +265,9 @@ async function use_towel(obj) {   // apply.c:112
  * @returns {Promise<number>} boolean
  */
 async function its_dead(rx, ry, resp) {   // apply.c:198
-    let buf = new Int8Array(256), more_corpses = 0, mptr = null, corpse = null, statue = null, gndr = 0, mtmp = null, here = 0, one = 0, reviver = 0, visglyph = 0, corpseglyph = 0, what = null, how = null, ttmp = null, $t1, $t2;
-    corpse = sobj_at(CORPSE, rx, ry);
-    statue = sobj_at(STATUE, rx, ry);
+    let buf = new Int8Array(256), mptr = null, what = null, $t1, $t2;
+    let corpse = sobj_at(CORPSE, rx, ry);
+    let statue = sobj_at(STATUE, rx, ry);
     if (!can_reach_floor(TRUE)) {
         /* levitation or unskilled riding */
         corpse = null;   /* can't reach corpse on floor */
@@ -286,7 +285,7 @@ async function its_dead(rx, ry, resp) {   // apply.c:198
             statue = null;   /* corpse precedes statue; ignore statue */
         }
     }
-    more_corpses = corpse && nxtobj(corpse, CORPSE, TRUE) ? 1 : 0;
+    const more_corpses = corpse && nxtobj(corpse, CORPSE, TRUE) ? 1 : 0;
     /* additional stethoscope messages from jyoung@apanix.apana.org.au */
     if (!corpse && !statue) {
         /* nothing to do */
@@ -295,8 +294,8 @@ async function its_dead(rx, ry, resp) {   // apply.c:198
             /* it's a statue */
             $c.strcpy(new $c.Ptr(buf, 0), $c.lit("You're both stoned"));
         } else if (corpse.quan === 1 && !more_corpses) {
-            gndr = 2;   /* neuter: "it" */
-            mtmp = await get_mtraits(corpse, FALSE);
+            let gndr = 2;   /* neuter: "it" */
+            const mtmp = await get_mtraits(corpse, FALSE);
             /* (most corpses don't retain the monster's sex, so
                we're usually forced to use generic pronoun here) */
             if (mtmp) {
@@ -321,11 +320,11 @@ async function its_dead(rx, ry, resp) {   // apply.c:198
         resp.set(0, ECMD.TIME);
         return TRUE;
     } else if (corpse) {
-        here = u_at(rx, ry);
-        one = corpse.quan === 1 && !more_corpses ? 1 : 0;
-        reviver = FALSE;
-        visglyph = glyph_at(rx, ry);
-        corpseglyph = corpse.otyp === STATUE ? u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2(NUMMONS) + (!rn2(2) ? GLYPH.MON_MALE_OFF : GLYPH.MON_FEM_OFF) | 0 : corpse.corpsenm + ((corpse.spe & CORPSTAT.GENDER) === CORPSTAT.FEMALE ? corpse.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[corpse.ox][corpse.oy].v.v_nexthere) !== null && (corpse.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.STATUE_FEM_PILETOP_OFF : GLYPH.STATUE_FEM_OFF : corpse.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[corpse.ox][corpse.oy].v.v_nexthere) !== null && (corpse.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.STATUE_MALE_PILETOP_OFF : GLYPH.STATUE_MALE_OFF) | 0 : u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? ($t2 = await rn2(NUM_OBJECTS - FIRST_OBJECT) + FIRST_OBJECT | 0, go.otg_temp = $t2) === CORPSE ? await rn2(NUMMONS) + GLYPH.BODY_OFF | 0 : go.otg_temp + GLYPH.OBJ_OFF | 0 : corpse.otyp === CORPSE ? corpse.corpsenm + (corpse.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[corpse.ox][corpse.oy].v.v_nexthere) !== null && (corpse.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.BODY_PILETOP_OFF : GLYPH.BODY_OFF) | 0 : !corpse.dknown && (corpse.oclass === POTION_CLASS || corpse.otyp >= FIRST_REAL_GEM && corpse.otyp <= LAST_GLASS_GEM || corpse.otyp >= FIRST_SPELL && corpse.otyp <= LAST_SPELL) ? corpse.oclass + (corpse.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[corpse.ox][corpse.oy].v.v_nexthere) !== null && (corpse.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.OBJ_PILETOP_OFF : GLYPH.OBJ_OFF) : corpse.otyp + (corpse.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[corpse.ox][corpse.oy].v.v_nexthere) !== null && (corpse.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.OBJ_PILETOP_OFF : GLYPH.OBJ_OFF);
+        const here = u_at(rx, ry);
+        const one = corpse.quan === 1 && !more_corpses ? 1 : 0;
+        let reviver = FALSE;
+        const visglyph = glyph_at(rx, ry);
+        const corpseglyph = corpse.otyp === STATUE ? u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2(NUMMONS) + (!rn2(2) ? GLYPH.MON_MALE_OFF : GLYPH.MON_FEM_OFF) | 0 : corpse.corpsenm + ((corpse.spe & CORPSTAT.GENDER) === CORPSTAT.FEMALE ? corpse.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[corpse.ox][corpse.oy].v.v_nexthere) !== null && (corpse.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.STATUE_FEM_PILETOP_OFF : GLYPH.STATUE_FEM_OFF : corpse.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[corpse.ox][corpse.oy].v.v_nexthere) !== null && (corpse.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.STATUE_MALE_PILETOP_OFF : GLYPH.STATUE_MALE_OFF) | 0 : u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? ($t2 = await rn2(NUM_OBJECTS - FIRST_OBJECT) + FIRST_OBJECT | 0, go.otg_temp = $t2) === CORPSE ? await rn2(NUMMONS) + GLYPH.BODY_OFF | 0 : go.otg_temp + GLYPH.OBJ_OFF | 0 : corpse.otyp === CORPSE ? corpse.corpsenm + (corpse.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[corpse.ox][corpse.oy].v.v_nexthere) !== null && (corpse.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.BODY_PILETOP_OFF : GLYPH.BODY_OFF) | 0 : !corpse.dknown && (corpse.oclass === POTION_CLASS || corpse.otyp >= FIRST_REAL_GEM && corpse.otyp <= LAST_GLASS_GEM || corpse.otyp >= FIRST_SPELL && corpse.otyp <= LAST_SPELL) ? corpse.oclass + (corpse.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[corpse.ox][corpse.oy].v.v_nexthere) !== null && (corpse.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.OBJ_PILETOP_OFF : GLYPH.OBJ_OFF) : corpse.otyp + (corpse.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[corpse.ox][corpse.oy].v.v_nexthere) !== null && (corpse.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.OBJ_PILETOP_OFF : GLYPH.OBJ_OFF);
         if (Blind() && visglyph !== corpseglyph) {
             await map_object(corpse, TRUE);
         }
@@ -354,9 +353,9 @@ async function its_dead(rx, ry, resp) {   // apply.c:198
                 what = await The(what);
             }
         }
-        how = $c.lit("fine");
+        let how = $c.lit("fine");
         if (gu.urole.mnum === PM.HEALER) {
-            ttmp = t_at(rx, ry);
+            const ttmp = t_at(rx, ry);
             if (ttmp && ttmp.ttyp === STATUE_TRAP) {
                 how = $c.lit("extraordinary");
             } else if (Has_contents(statue)) {
@@ -377,8 +376,8 @@ async function its_dead(rx, ry, resp) {   // apply.c:198
  * @returns {Promise<number>} int
  */
 async function use_stethoscope(obj) {   // apply.c:318
-    let mtmp = null, lev = null, res = Int32Array.of(0), rx = 0, ry = 0, interference = 0, mnm = null, what = null, use_plural = 0, dummyobj = new $T.obj(), odummy = null;
-    interference = u.uswallow && is_whirly(u.ustuck.data) && !rn2(gu.urole.mnum === PM.HEALER ? 10 : 3) ? 1 : 0;
+    let mtmp = null, res = Int32Array.of(0), dummyobj = new $T.obj(), odummy = null;
+    const interference = u.uswallow && is_whirly(u.ustuck.data) && !rn2(gu.urole.mnum === PM.HEALER ? 10 : 3) ? 1 : 0;
     if (nohands(gy.youmonst.data)) {
         await You($c.lit("have no hands!"));   /* not `body_part(HAND)' */
         return ECMD.OK;
@@ -433,14 +432,14 @@ async function use_stethoscope(obj) {   // apply.c:318
         await ustatusline();
         return res[0];
     }
-    rx = $c.i16(u.ux + u.dx | 0);
-    ry = $c.i16(u.uy + u.dy | 0);
+    const rx = $c.i16(u.ux + u.dx | 0);
+    const ry = $c.i16(u.uy + u.dy | 0);
     if (!isok(rx, ry)) {
         await You_hear($c.lit("a faint typing noise."));
         return ECMD.OK;
     }
     if ((mtmp = svl.level.monsters[rx][ry]) !== null) {
-        mnm = await x_monnam(mtmp, ARTICLE.A, null, SUPPRESS.IT | SUPPRESS.INVISIBLE, FALSE);
+        const mnm = await x_monnam(mtmp, ARTICLE.A, null, SUPPRESS.IT | SUPPRESS.INVISIBLE, FALSE);
         /* gb.bhitpos needed by mstatusline() iff mtmp is a long worm */
         gb.bhitpos.x = rx, gb.bhitpos.y = ry;
         gn.notonhead = mtmp.mx !== rx || mtmp.my !== ry ? 1 : 0;
@@ -451,8 +450,8 @@ async function use_stethoscope(obj) {   // apply.c:318
             mtmp.mundetected = 0;
             await newsym(mtmp.mx, mtmp.my);
         } else if (mtmp.mappearance) {
-            what = $c.lit("thing");
-            use_plural = FALSE;
+            let what = $c.lit("thing");
+            let use_plural = FALSE;
             switch (M_AP_TYPE(mtmp)) {
                 case M_AP.OBJECT:
                     /* FIXME?
@@ -492,7 +491,7 @@ async function use_stethoscope(obj) {   // apply.c:318
     if (await unmap_invisible(rx, ry)) {
         await pline_The($c.lit("invisible monster must have moved."));
     }
-    lev = $c.relem(svl.level.locations[rx], ry);
+    const lev = $c.relem(svl.level.locations[rx], ry);
     switch (lev.typ) {
         case SDOOR:
             await You_hear(new $c.Ptr(hollow_str, 0), $c.lit("door"));
@@ -558,13 +557,13 @@ async function use_magic_whistle(obj) {   // apply.c:495
  * @returns {Promise<void>}
  */
 async function magic_whistled(obj) {   // apply.c:518
-    let mtmp = null, nextmon = null, buf = new Int8Array(256), mnam = null, shiftbuf = new Int8Array(272), appearbuf = new Int8Array(264), disappearbuf = new Int8Array(267), oseen = 0, nseen = 0, already_discovered = 0, omx = 0, omy = 0, shift = 0, appear = 0, disappear = 0, trapped = 0, $t1, $t2;
-    mnam = null;
-    already_discovered = objects[obj.otyp].oc_name_known !== 0 ? 1 : 0;
-    shift = 0;
-    appear = 0;
-    disappear = 0;
-    trapped = 0;
+    let mtmp = null, nextmon = null, buf = new Int8Array(256), shiftbuf = new Int8Array(272), appearbuf = new Int8Array(264), disappearbuf = new Int8Array(267), omx = 0, omy = 0, $t1, $t2;
+    let mnam = null;
+    const already_discovered = objects[obj.otyp].oc_name_known !== 0 ? 1 : 0;
+    let shift = 0;
+    let appear = 0;
+    let disappear = 0;
+    let trapped = 0;
     /* stasis prevents magic-whistling */
     if (svl.level.flags.stasis_until >= svm.moves) {
         return;
@@ -589,7 +588,7 @@ async function magic_whistled(obj) {   // apply.c:518
             mtmp.mtrapped = 0;
             await fill_pit(mtmp.mx, mtmp.my);
         }
-        oseen = canspotmon(mtmp);   /* old 'seen' status */
+        const oseen = canspotmon(mtmp);   /* old 'seen' status */
         if (oseen) {   /* get name in case it's one we'll remember */
             mnam = await y_monnam(mtmp);   /* before mnexto(); it might disappear */
         }
@@ -631,7 +630,7 @@ async function magic_whistled(obj) {   // apply.c:518
             /* dying while seen would have issued a message and not get here;
                being sent to an unseen location and dying there should be
                included in the disappeared case */
-            nseen = DEADMONSTER(mtmp) ? FALSE : canspotmon(mtmp);
+            const nseen = DEADMONSTER(mtmp) ? FALSE : canspotmon(mtmp);
             if (nseen) {
                 mnam = await y_monnam(mtmp);
                 if (oseen) {
@@ -733,8 +732,8 @@ export function um_dist(x, y, n) {   // apply.c:692
  * @returns {number} int
  */
 export function number_leashed() {   // apply.c:698
-    let i = 0, obj = null;
-    i = 0;
+    let obj = null;
+    let i = 0;
     for (obj = gi.invent; obj; obj = obj.nobj) {
         if (obj.otyp === LEASH && obj.corpsenm !== 0) {
             i = i + 1 | 0;
@@ -848,7 +847,7 @@ async function use_leash(obj) {   // apply.c:769
  * @returns {Promise<void>}
  */
 async function use_leash_core(obj, mtmp, cc, spotmon) {   // apply.c:821
-    let lmonbuf = new Int8Array(256), lmonnam = null;
+    let lmonbuf = new Int8Array(256);
     if (!spotmon && !(svl.level.locations[cc.x][cc.y].glyph === GLYPH_INVISIBLE)) {
         /* for the unleash case, we don't verify whether this unseen
            monster is the creature attached to the current leash */
@@ -867,7 +866,7 @@ async function use_leash_core(obj, mtmp, cc, spotmon) {   // apply.c:821
         } else if (nolimbs(mtmp.data) && !has_head(mtmp.data)) {
             await pline($c.lit("%s has no extremities the leash would fit."), await Monnam(mtmp));
         } else if (!leashable(mtmp)) {
-            lmonnam = await l_monnam(mtmp);
+            let lmonnam = await l_monnam(mtmp);
             if (cc.x !== mtmp.mx || cc.y !== mtmp.my) {
                 $c.sprintf(new $c.Ptr(lmonbuf, 0), $c.lit("%s tail"), s_suffix(lmonnam));
                 lmonnam = new $c.Ptr(lmonbuf, 0);
@@ -914,13 +913,12 @@ export function get_mleash(mtmp) {   // apply.c:880
  * @returns {Promise<number>} boolean
  */
 async function mleashed_next2u(mtmp) {   // apply.c:891
-    let otmp = null;
     if (mtmp.mleashed) {
         if (!(dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 2)) {
             await mnexto(mtmp, RLOC.NOMSG);
         }
         if (!(dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 2)) {
-            otmp = get_mleash(mtmp);
+            const otmp = get_mleash(mtmp);
             if (!otmp) {
                 await impossible($c.lit("leashed-unleashed mon?"));
                 return TRUE;
@@ -955,12 +953,12 @@ export async function next_to_u() {   // apply.c:919
  * @returns {Promise<void>}
  */
 export async function check_leash(x, y) {   // apply.c:931
-    let otmp = null, mtmp = null, save_pacifism = 0, $t1;
+    let otmp = null, $t1;
     for (otmp = gi.invent; otmp; otmp = otmp.nobj) {
         if (otmp.otyp !== LEASH || otmp.corpsenm === 0) {
             continue;
         }
-        mtmp = find_mid(otmp.corpsenm >>> 0, FM.FMON);
+        const mtmp = find_mid(otmp.corpsenm >>> 0, FM.FMON);
         if (!mtmp) {
             await impossible($c.lit("leash in use isn't attached to anything?"));
             otmp.corpsenm = 0;
@@ -971,7 +969,7 @@ export async function check_leash(x, y) {   // apply.c:931
                 /* still close enough */
             } else if (otmp.cursed && !breathless(mtmp.data)) {
                 if (um_dist(mtmp.mx, mtmp.my, 5) || ($t1 = rnd(2), mtmp.mhp = mtmp.mhp - $t1 | 0) <= 0) {
-                    save_pacifism = u.uconduct.killer;
+                    const save_pacifism = u.uconduct.killer;
                     await Your($c.lit("leash chokes %s to death!"), await mon_nam(mtmp));
                     /* hero might not have intended to kill pet, but
                        that's the result of his actions; gain experience,
@@ -1019,12 +1017,11 @@ export async function check_leash(x, y) {   // apply.c:931
  * @returns {$c.Ptr | null} const char *
  */
 export function beautiful() {   // apply.c:997
-    let res = null, cha = 0;
-    cha = ACURR(A.CHA);
+    const cha = ACURR(A.CHA);
     /* don't bother complaining about the sexism; NetHack is not real life */
     /* 25 is the maximum possible */
     /* note: not "splendiferous" */
-    res = cha >= 25 ? $c.lit("sublime") : cha >= 19 ? $c.lit("splendorous") : cha >= 16 ? poly_gender() === 1 ? $c.lit("beautiful") : $c.lit("handsome") : cha >= 14 ? poly_gender() === 1 ? $c.lit("winsome") : $c.lit("amiable") : cha >= 11 ? $c.lit("cute") : cha >= 9 ? $c.lit("plain") : cha >= 6 ? $c.lit("homely") : cha >= 4 ? $c.lit("ugly") : $c.lit("hideous");   /* 3 is the minimum possible */
+    const res = cha >= 25 ? $c.lit("sublime") : cha >= 19 ? $c.lit("splendorous") : cha >= 16 ? poly_gender() === 1 ? $c.lit("beautiful") : $c.lit("handsome") : cha >= 14 ? poly_gender() === 1 ? $c.lit("winsome") : $c.lit("amiable") : cha >= 11 ? $c.lit("cute") : cha >= 9 ? $c.lit("plain") : cha >= 6 ? $c.lit("homely") : cha >= 4 ? $c.lit("ugly") : $c.lit("hideous");   /* 3 is the minimum possible */
     return res;
 }
 /**
@@ -1033,14 +1030,14 @@ export function beautiful() {   // apply.c:997
  */
 async function use_mirror(obj$in) {   // apply.c:1018
     const obj = [obj$in];
-    let mirror = null, uvisage = null, mtmp = null, how_seen = 0, mlet = 0, vis = 0, invis_mirror = 0, useeit = 0, monable = 0, tmp = 0, buf = new Int8Array(256), do_react = 0;
+    let buf = new Int8Array(256);
     if (!await getdir(null)) {
         return ECMD.CANCEL;
     }
-    invis_mirror = Invis();
-    useeit = !Blind() && (!invis_mirror || See_invisible()) ? 1 : 0;
-    uvisage = beautiful();
-    mirror = await simpleonames(obj[0]);   /* "mirror" or "looking glass" */
+    const invis_mirror = Invis();
+    const useeit = !Blind() && (!invis_mirror || See_invisible()) ? 1 : 0;
+    const uvisage = beautiful();
+    const mirror = await simpleonames(obj[0]);   /* "mirror" or "looking glass" */
     if (obj[0].cursed && !rn2(2)) {
         if (!Blind()) {
             await pline_The($c.lit("%s fogs up and doesn't reflect!"), mirror);
@@ -1105,19 +1102,19 @@ async function use_mirror(obj$in) {   // apply.c:1018
         }
         return ECMD.TIME;
     }
-    mtmp = await bhit(u.dx, u.dy, COLNO, INVIS_BEAM, null, null, new $c.Ptr(obj, 0));
+    const mtmp = await bhit(u.dx, u.dy, COLNO, INVIS_BEAM, null, null, new $c.Ptr(obj, 0));
     if (!mtmp || !haseyes(mtmp.data) || gn.notonhead) {
         return ECMD.TIME;
     }
     /* couldsee(mtmp->mx, mtmp->my) is implied by the fact that bhit()
        targeted it, so we can ignore possibility of X-ray vision */
-    vis = $c.i8(canseemon(mtmp));
+    const vis = $c.i8(canseemon(mtmp));
     /* ways to directly see monster (excludes X-ray vision, telepathy,
        extended detection, type-specific warning) */
-    how_seen = vis ? howmonseen(mtmp) : 0;
+    const how_seen = vis ? howmonseen(mtmp) : 0;
     /* whether monster is able to use its vision-based capabilities */
-    monable = !mtmp.mcan && (!mtmp.minvis || perceives(mtmp.data)) ? 1 : 0;
-    mlet = mtmp.data.mlet;
+    const monable = !mtmp.mcan && (!mtmp.minvis || perceives(mtmp.data)) ? 1 : 0;
+    const mlet = mtmp.data.mlet;
     if (mtmp.msleeping) {
         if (vis) {
             await pline($c.lit("%s is too tired to look at your %s."), await Monnam(mtmp), mirror);
@@ -1150,7 +1147,7 @@ async function use_mirror(obj$in) {   // apply.c:1018
         gs.stoned = TRUE;
         await killed(mtmp);
     } else if (monable && mtmp.data === mons[PM.FLOATING_EYE]) {
-        tmp = d(mtmp.m_lev, mtmp.data.mattk[0].damd);
+        let tmp = d(mtmp.m_lev, mtmp.data.mattk[0].damd);
         if (!rn2(4)) {
             tmp = 120;
         }
@@ -1181,7 +1178,7 @@ async function use_mirror(obj$in) {   // apply.c:1018
             await rloc(mtmp, RLOC.MSG);
         }
     } else if (!is_unicorn(mtmp.data) && !humanoid(mtmp.data) && !is_demon(mtmp.data) && (!mtmp.minvis || perceives(mtmp.data)) && rn2(5)) {
-        do_react = TRUE;
+        let do_react = TRUE;
         if (mtmp.mfrozen) {
             if (vis) {
                 await You($c.lit("discern no obvious reaction from %s."), await mon_nam(mtmp));
@@ -1212,12 +1209,12 @@ async function use_mirror(obj$in) {   // apply.c:1018
  * @returns {Promise<void>}
  */
 async function use_bell(optr) {   // apply.c:1202
-    let obj = null, mtmp = null, wakem = 0, learno = 0, ordinary = 0, invoking = 0, mm = new $T.nhcoord(), res = 0;
-    obj = optr.get(0);
-    wakem = FALSE;
-    learno = FALSE;
-    ordinary = obj.otyp !== BELL_OF_OPENING || !obj.spe ? 1 : 0;
-    invoking = obj.otyp === BELL_OF_OPENING && invocation_pos(u.ux, u.uy) && !On_stairs(u.ux, u.uy) ? 1 : 0;
+    let mtmp = null, mm = new $T.nhcoord();
+    const obj = optr.get(0);
+    let wakem = FALSE;
+    let learno = FALSE;
+    const ordinary = obj.otyp !== BELL_OF_OPENING || !obj.spe ? 1 : 0;
+    const invoking = obj.otyp === BELL_OF_OPENING && invocation_pos(u.ux, u.uy) && !On_stairs(u.ux, u.uy) ? 1 : 0;
     await You($c.lit("ring %s."), await the(await xname(obj)));
     if (Underwater() || u.uswallow && ordinary) {
         await pline($c.lit("But the sound is muffled."));
@@ -1270,7 +1267,7 @@ async function use_bell(optr) {   // apply.c:1202
             learno = TRUE;
             wakem = TRUE;
         } else if (obj.blessed) {
-            res = 0;
+            let res = 0;
             if ($G.uchain) {
                 await unpunish();
                 res = 1;
@@ -1314,8 +1311,8 @@ async function use_bell(optr) {   // apply.c:1202
  * @returns {Promise<void>}
  */
 async function use_candelabrum(obj) {   // apply.c:1319
-    let s = null, otmp = null;
-    s = obj.spe !== 1 ? $c.lit("candles") : $c.lit("candle");
+    let otmp = null;
+    const s = obj.spe !== 1 ? $c.lit("candles") : $c.lit("candle");
     if (obj.lamplit) {
         await You($c.lit("snuff the %s."), s);
         await end_burn(obj, TRUE);
@@ -1381,15 +1378,15 @@ async function use_candelabrum(obj) {   // apply.c:1319
  * @returns {Promise<void>}
  */
 async function use_candle(optr) {   // apply.c:1387
-    let obj = null, otmp = null, s = null, qbuf = new Int8Array(128), qsfx = new Int8Array(128), q = null, was_lamplit = 0, shkp = null, $t1;
-    obj = optr.get(0);
-    s = obj.quan !== 1 ? $c.lit("candles") : $c.lit("candle");
+    let qbuf = new Int8Array(128), qsfx = new Int8Array(128), q = null, $t1;
+    let obj = optr.get(0);
+    let s = obj.quan !== 1 ? $c.lit("candles") : $c.lit("candle");
     if (u.uswallow) {
         await You(new $c.Ptr(no_elbow_room, 0));
         return;
     }
     /* obj is the candle; otmp is the candelabrum */
-    otmp = carrying(CANDELABRUM_OF_INVOCATION);
+    const otmp = carrying(CANDELABRUM_OF_INVOCATION);
     if (!otmp || otmp.spe === 7) {
         await use_lamp(obj);
         return;
@@ -1419,7 +1416,7 @@ async function use_candle(optr) {   // apply.c:1387
            of fuel in it while it's lit, because the fuel is measured
            by the timer. So to get accurate age updating, we need to
            end the burn temporarily while attaching the candle. */
-        was_lamplit = obj.lamplit;
+        const was_lamplit = obj.lamplit;
         if (was_lamplit) {
             await end_burn(obj, TRUE);
         }
@@ -1434,7 +1431,7 @@ async function use_candle(optr) {   // apply.c:1387
             await pline($c.lit("%s out."), obj.quan > 1 ? $c.lit("They go") : $c.lit("It goes"));
         }
         if (obj.unpaid) {
-            shkp = await shop_keeper(in_rooms(u.ux, u.uy, SHOPBASE).get(0));
+            const shkp = await shop_keeper(in_rooms(u.ux, u.uy, SHOPBASE).get(0));
             await verbalize($c.lit("You %s %s, you bought %s!"), otmp.lamplit ? $c.lit("burn") : $c.lit("use"), obj.quan > 1 ? $c.lit("them") : $c.lit("it"), obj.quan > 1 ? $c.lit("them") : $c.lit("it"));
         }
         if (obj.quan < 7 && otmp.spe === 7) {
@@ -1458,10 +1455,10 @@ async function use_candle(optr) {   // apply.c:1387
  * @returns {Promise<number>} boolean
  */
 export async function snuff_candle(otmp) {   // apply.c:1472
-    let candle = 0, buf = new Int8Array(256), x = Int16Array.of(0), y = Int16Array.of(0), many = 0;
-    candle = Is_candle(otmp);
+    let buf = new Int8Array(256), x = Int16Array.of(0), y = Int16Array.of(0);
+    const candle = Is_candle(otmp);
     if ((candle || otmp.otyp === CANDELABRUM_OF_INVOCATION) && otmp.lamplit) {
-        many = candle ? otmp.quan > 1 ? 1 : 0 : otmp.spe > 1 ? 1 : 0;
+        const many = candle ? otmp.quan > 1 ? 1 : 0 : otmp.spe > 1 ? 1 : 0;
         get_obj_location(otmp, new $c.Ptr(x, 0), new $c.Ptr(y, 0), 0);
         if (otmp.where === OBJ.MINVENT ? cansee(x[0], y[0]) : !Blind()) {
             await pline($c.lit("%s%scandle%s flame%s extinguished."), await Shk_Your(new $c.Ptr(buf, 0), otmp), candle ? $c.lit("") : $c.lit("candelabrum's "), many ? $c.lit("s'") : $c.lit("'s"), many ? $c.lit("s are") : $c.lit(" is"));
@@ -1501,16 +1498,16 @@ export async function snuff_lit(obj) {   // apply.c:1497
  * @returns {Promise<number>} boolean
  */
 export async function splash_lit(obj) {   // apply.c:1518
-    let result = 0, dunk = 0, mtmp = null, useeit = 0, uhearit = 0, snuff = 0, x = Int16Array.of(0), y = Int16Array.of(0);
-    dunk = FALSE;
+    let mtmp = null, x = Int16Array.of(0), y = Int16Array.of(0);
+    let dunk = FALSE;
     /* lantern won't be extinguished by a rust trap or rust monster attack
        but will be if submerged or placed into a container or swallowed by
        a monster (for mobile light source handling, not because it ought
        to stop being lit in all those situations...) */
     if (obj.lamplit && obj.otyp === BRASS_LANTERN) {
-        useeit = FALSE;
-        uhearit = FALSE;
-        snuff = TRUE;
+        let useeit = FALSE;
+        let uhearit = FALSE;
+        let snuff = TRUE;
         if (obj.where === OBJ.INVENT) {
             useeit = !Blind() ? 1 : 0;
             uhearit = !Deaf() ? 1 : 0;
@@ -1536,7 +1533,7 @@ export async function splash_lit(obj) {   // apply.c:1518
             return FALSE;
         }
     }
-    result = await snuff_lit(obj);
+    const result = await snuff_lit(obj);
     /* this is simpler when we wait until after lantern has been snuffed */
     if (dunk) {
         /* drain some of the battery but don't short it out entirely */
@@ -1551,7 +1548,7 @@ export async function splash_lit(obj) {   // apply.c:1518
  * @returns {Promise<number>} boolean
  */
 export async function catch_lit(obj) {   // apply.c:1577
-    let x = Int16Array.of(0), y = Int16Array.of(0), shkp = null;
+    let x = Int16Array.of(0), y = Int16Array.of(0);
     if (!obj.lamplit && ignitable(obj) && get_obj_location(obj, new $c.Ptr(x, 0), new $c.Ptr(y, 0), 0)) {
         /* spe==0 => no djinni inside */
         /* spe==0 => no candles attached */
@@ -1579,7 +1576,7 @@ export async function catch_lit(obj) {   // apply.c:1577
             await discover_object(obj.otyp, TRUE, TRUE, TRUE);
         }
         if (carried(obj) && obj.unpaid && await costly_spot(u.ux, u.uy)) {
-            shkp = await shop_keeper(in_rooms(u.ux, u.uy, SHOPBASE).get(0));
+            const shkp = await shop_keeper(in_rooms(u.ux, u.uy, SHOPBASE).get(0));
             /* if it catches while you have it, then it's your tough luck */
             await check_unpaid(obj);
             await verbalize($c.lit("That's in addition to the cost of %s %s, of course."), await yname(obj), obj.quan === 1 ? $c.lit("itself") : $c.lit("themselves"));
@@ -1596,8 +1593,8 @@ export async function catch_lit(obj) {   // apply.c:1577
  * @returns {Promise<void>}
  */
 async function use_lamp(obj) {   // apply.c:1628
-    let buf = new Int8Array(256), lamp = null, ithem = null, shkp = null;
-    lamp = obj.otyp === OIL_LAMP || obj.otyp === MAGIC_LAMP ? $c.lit("lamp") : obj.otyp === BRASS_LANTERN ? $c.lit("lantern") : null;
+    let buf = new Int8Array(256);
+    const lamp = obj.otyp === OIL_LAMP || obj.otyp === MAGIC_LAMP ? $c.lit("lamp") : obj.otyp === BRASS_LANTERN ? $c.lit("lantern") : null;
     /*
      * When blind, lamps' and candles' on/off state can be distinguished
      * by heat.  For brass lantern assume that there is an on/off switch
@@ -1647,8 +1644,8 @@ async function use_lamp(obj) {   // apply.c:1628
             /* candle(s) */
             await pline($c.lit("%s flame%s %s%s"), s_suffix(await Yname2(obj)), plur(obj.quan), await otense(obj, $c.lit("burn")), Blind() ? $c.lit(".") : $c.lit(" brightly!"));
             if (obj.unpaid && await costly_spot(u.ux, u.uy) && obj.age === $c.mul64(20, objects[obj.otyp].oc_cost)) {
-                ithem = obj.quan > 1 ? $c.lit("them") : $c.lit("it");
-                shkp = await shop_keeper(in_rooms(u.ux, u.uy, SHOPBASE).get(0));
+                const ithem = obj.quan > 1 ? $c.lit("them") : $c.lit("it");
+                const shkp = await shop_keeper(in_rooms(u.ux, u.uy, SHOPBASE).get(0));
                 await verbalize($c.lit("You burn %s, you bought %s!"), ithem, ithem);
                 await bill_dummy_object(obj);
             }
@@ -1661,8 +1658,8 @@ async function use_lamp(obj) {   // apply.c:1628
  * @returns {Promise<void>}
  */
 async function light_cocktail(optr) {   // apply.c:1703
-    let obj = null, buf = new Int8Array(256), split1off = 0, shkp = null, $t1;
-    obj = optr.get(0);   /* obj is a potion of oil */
+    let buf = new Int8Array(256), $t1;
+    let obj = optr.get(0);   /* obj is a potion of oil */
     if (u.uswallow) {
         await You(new $c.Ptr(no_elbow_room, 0));
         return;
@@ -1686,13 +1683,13 @@ async function light_cocktail(optr) {   // apply.c:1703
         await There($c.lit("is not enough oxygen to sustain a fire."));
         return;
     }
-    split1off = obj.quan > 1 ? 1 : 0;
+    const split1off = obj.quan > 1 ? 1 : 0;
     if (split1off) {
         obj = await splitobj(obj, 1);
     }
     await You($c.lit("light %spotion.%s"), await shk_your(new $c.Ptr(buf, 0), obj), Blind() ? $c.lit("") : $c.lit("  It gives off a dim light."));
     if (obj.unpaid && await costly_spot(u.ux, u.uy)) {
-        shkp = await shop_keeper(in_rooms(u.ux, u.uy, SHOPBASE).get(0));
+        const shkp = await shop_keeper(in_rooms(u.ux, u.uy, SHOPBASE).get(0));
         /* Normally, we shouldn't both partially and fully charge
          * for an item, but (Yendorian Fuel) Taxes are inevitable...
          */
@@ -1807,9 +1804,8 @@ export async function dojump() {   // apply.c:1847
  * @returns {number} boolean
  */
 function check_jump(arg, x, y) {   // apply.c:1862
-    let traj = 0, lev = null;
-    traj = $c.asArr(arg, Int32Array).get(0);
-    lev = $c.relem(svl.level.locations[x], y);
+    const traj = $c.asArr(arg, Int32Array).get(0);
+    const lev = $c.relem(svl.level.locations[x], y);
     if (Passes_walls()) {
         return TRUE;
     }
@@ -1845,7 +1841,7 @@ function check_jump(arg, x, y) {   // apply.c:1862
  * @returns {Promise<number>} boolean
  */
 async function is_valid_jump_pos(x, y, magic, showmsg) {   // apply.c:1893
-    let uc = new $T.nhcoord(), tc = new $T.nhcoord(), lev = null, diag = 0, traj = Int32Array.of(0), dx = 0, dy = 0, ax = 0, ay = 0;
+    let uc = new $T.nhcoord(), tc = new $T.nhcoord(), traj = Int32Array.of(0);
     if (!magic && !$c.and64(u.uprops[JUMPING].intrinsic, ~INTRINSIC) && !EJumping() && distu(x, y) !== 5) {
         /* The Knight jumping restriction still applies when riding a
          * horse.  After all, what shape is the knight piece in chess?
@@ -1870,17 +1866,17 @@ async function is_valid_jump_pos(x, y, magic, showmsg) {   // apply.c:1893
         }
         return FALSE;
     } else {
-        lev = $c.relem(svl.level.locations[u.ux], u.uy);
+        const lev = $c.relem(svl.level.locations[u.ux], u.uy);
         /* we want to categorize trajectory for use in determining
            passage through doorways: horizontal, vertical, or diagonal;
            since knight's jump and other irregular directions are
            possible, we flatten those out to simplify door checks */
-        dx = $c.i16(x - u.ux);
-        dy = $c.i16(y - u.uy);
-        ax = $c.i16($c.abs(dx));
-        ay = $c.i16($c.abs(dy));
+        const dx = $c.i16(x - u.ux);
+        const dy = $c.i16(y - u.uy);
+        let ax = $c.i16($c.abs(dx));
+        let ay = $c.i16($c.abs(dy));
         /* diag: any non-orthogonal destination classified as diagonal */
-        diag = magic || Passes_walls() || !dx && !dy ? jAny : !dy ? jHorz : !dx ? jVert : jDiag;
+        const diag = magic || Passes_walls() || !dx && !dy ? jAny : !dy ? jHorz : !dx ? jVert : jDiag;
         /* traj: flatten out the trajectory => some diagonals re-classified */
         if (ax >= Math.imul(2, ay)) {
             ay = 0;
@@ -1922,14 +1918,14 @@ async function get_valid_jump_position(x, y) {   // apply.c:1959
  * @returns {Promise<void>}
  */
 async function display_jump_positions(on_off) {   // apply.c:1967
-    let x = 0, y = 0, dx = 0, dy = 0;
+    let dx = 0, dy = 0;
     if (on_off) {
         /* on */
         await tmp_at(DISP_BEAM, 4092);
         for (dx = -4; dx <= 4; dx = $c.i16(dx + 1)) {
             for (dy = -4; dy <= 4; dy = $c.i16(dy + 1)) {
-                x = $c.i16(dx + u.ux);
-                y = $c.i16(dy + u.uy);
+                const x = $c.i16(dx + u.ux);
+                const y = $c.i16(dy + u.uy);
                 if (await get_valid_jump_position(x, y) && !u_at(x, y)) {
                     await tmp_at(x, y);
                 }
@@ -1945,7 +1941,7 @@ async function display_jump_positions(on_off) {   // apply.c:1967
  * @returns {Promise<number>} int
  */
 export async function jump(magic) {   // apply.c:1988
-    let cc = new $T.nhcoord(), mtmp = null, uc = new $T.nhcoord(), side = 0, range = Int32Array.of(0), temp = 0, wastrapped = 0, t = null;
+    let cc = new $T.nhcoord(), uc = new $T.nhcoord(), side = 0, range = Int32Array.of(0), t = null;
     /* 0=Physical, otherwise skill level */
     /* attempt "jumping" spell if hero has no innate jumping ability */
     if (!magic && !Jumping() && known_spell(SPE_JUMPING) >= spe_Fresh) {
@@ -1979,7 +1975,7 @@ export async function jump(magic) {   // apply.c:1988
         return ECMD.OK;
     } else if (u.ustuck) {
         if (u.ustuck.mtame && !Conflict() && !u.ustuck.mconf) {
-            mtmp = u.ustuck;
+            const mtmp = u.ustuck;
             await set_ustuck(null);
             await You($c.lit("pull free from %s."), await mon_nam(mtmp));
             return ECMD.TIME;
@@ -2024,7 +2020,7 @@ export async function jump(magic) {   // apply.c:1988
         await pline($c.lit("%s isn't capable of jumping in place."), await YMonnam(u.usteed));
         return ECMD.FAIL;
     } else {
-        wastrapped = FALSE;
+        let wastrapped = FALSE;
         if (u.utrap) {
             wastrapped = TRUE;
             switch (u.utraptype) {
@@ -2088,7 +2084,7 @@ export async function jump(magic) {   // apply.c:1988
         if (range[0] < 0) {
             range[0] = -range[0] | 0;
         }
-        temp = cc.y - uc.y;
+        let temp = cc.y - uc.y;
         if (temp < 0) {
             temp = -temp | 0;
         }
@@ -2126,7 +2122,7 @@ export function tinnable(corpse) {   // apply.c:2167
  * @returns {Promise<void>}
  */
 async function use_tinning_kit(obj) {   // apply.c:2177
-    let corpse = null, can = null, mptr = null, kbuf = new Int8Array(256), corpse_name = null, shkp = null, shkp$2 = null, $t1;
+    let corpse = null, can = null, kbuf = new Int8Array(256), $t1;
     /* This takes only 1 move.  If this is to be changed to take many
      * moves, we've got to deal with decaying corpses...
      */
@@ -2141,9 +2137,9 @@ async function use_tinning_kit(obj) {   // apply.c:2177
         await You($c.lit("cannot tin %s which is partly eaten."), c_common_strings.c_something);
         return;
     }
-    mptr = $c.relem(mons, corpse.corpsenm);
+    const mptr = $c.relem(mons, corpse.corpsenm);
     if (touch_petrifies(mptr) && !Stone_resistance() && !$G.uarmg) {
-        corpse_name = await an(await cxname(corpse));
+        const corpse_name = await an(await cxname(corpse));
         if (poly_when_stoned(gy.youmonst.data)) {
             await You($c.lit("tin %s without wearing gloves."), corpse_name);
             kbuf[0] = 0;
@@ -2176,13 +2172,13 @@ async function use_tinning_kit(obj) {   // apply.c:2177
         set_tin_variety(can, HOMEMADE_TIN);
         if (carried(corpse)) {
             if (corpse.unpaid) {
-                shkp = await shop_keeper(in_rooms(u.ux, u.uy, SHOPBASE).get(0));
+                const shkp = await shop_keeper(in_rooms(u.ux, u.uy, SHOPBASE).get(0));
                 await verbalize(new $c.Ptr(use_tinning_kit$you_buy_it, 0));
             }
             await useup(corpse);
         } else {
             if (await costly_spot(corpse.ox, corpse.oy) && !corpse.no_charge) {
-                shkp$2 = await shop_keeper(in_rooms(corpse.ox, corpse.oy, SHOPBASE).get(0));
+                const shkp$2 = await shop_keeper(in_rooms(corpse.ox, corpse.oy, SHOPBASE).get(0));
                 await verbalize(new $c.Ptr(use_tinning_kit$you_buy_it, 0));
             }
             await useupf(corpse, 1);
@@ -2197,11 +2193,11 @@ async function use_tinning_kit(obj) {   // apply.c:2177
  * @returns {Promise<void>}
  */
 export async function use_unicorn_horn(optr) {   // apply.c:2259
-    let idx = 0, val = 0, val_limit = 0, trouble_count = 0, unfixable_trbl = 0, did_prop = 0, trouble_list = new Int32Array(7), obj = null, lcount = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12, $t13, $t14;
+    let val = 0, unfixable_trbl = 0, did_prop = 0, trouble_list = new Int32Array(7), $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12, $t13, $t14;
     /* number of properties we're dealing with */
-    obj = optr ? optr.get(0) : null;
+    const obj = optr ? optr.get(0) : null;
     if (obj && obj.cursed) {
-        lcount = rn2(90) + 10 | 0;
+        const lcount = rn2(90) + 10 | 0;
         switch ($c.div32(rn2(13), 2)) {
             case 0:
                 /* case 6 is half as likely as the others */
@@ -2238,7 +2234,7 @@ export async function use_unicorn_horn(optr) {   // apply.c:2259
         }
         return;
     }
-    trouble_count = unfixable_trbl = did_prop = 0;
+    let trouble_count = unfixable_trbl = did_prop = 0;
     /* collect property troubles */
     if (u.uprops[SICK].intrinsic && !$c.and64(u.uprops[SICK].intrinsic, ~TIMEOUT) ? $c.and64(u.uprops[SICK].intrinsic, TIMEOUT) : 0) {
         trouble_list[($t2 = trouble_count, trouble_count = $t2 + 1 | 0, $t2)] = SICK;
@@ -2273,13 +2269,13 @@ export async function use_unicorn_horn(optr) {   // apply.c:2259
      *   blessed:  22.7%  22.7%  19.5%  15.4%  10.7%   5.7%   2.6%   0.8%
      *  uncursed:  35.4%  35.4%  22.9%   6.3%    0      0      0      0
      */
-    val_limit = rn2(d(2, obj && obj.blessed ? 4 : 2));
+    let val_limit = rn2(d(2, obj && obj.blessed ? 4 : 2));
     if (val_limit > trouble_count) {
         val_limit = trouble_count;
     }
     /* fix [some of] the troubles */
     for (val = 0; val < val_limit; val = val + 1 | 0) {
-        idx = trouble_list[val];
+        const idx = trouble_list[val];
         switch (idx) {
             case SICK:
                 await make_sick(0, null, TRUE, SICK_ALL);
@@ -2329,16 +2325,16 @@ export async function use_unicorn_horn(optr) {   // apply.c:2259
  * @returns {Promise<void>}
  */
 export async function fig_transform(arg, timeout) {   // apply.c:2398
-    let figurine = null, mtmp = null, cc = new $T.nhcoord(), cansee_spot = 0, silent = 0, okay_spot = 0, redraw = 0, suppress_see = 0, monnambuf = new Int8Array(256), carriedby = new Int8Array(256), and_vanish = new Int8Array(256), mshelter = null, mon = null;
-    figurine = arg.a_obj;
-    redraw = FALSE;
-    suppress_see = FALSE;
+    let cc = new $T.nhcoord(), monnambuf = new Int8Array(256), carriedby = new Int8Array(256), and_vanish = new Int8Array(256);
+    const figurine = arg.a_obj;
+    let redraw = FALSE;
+    let suppress_see = FALSE;
     if (!figurine) {
         await impossible($c.lit("null figurine in fig_transform()"));
         return;
     }
-    silent = timeout !== svm.moves ? 1 : 0;   /* happened while away */
-    okay_spot = get_obj_location(figurine, new $c.FieldRef(cc, "x", "i16"), new $c.FieldRef(cc, "y", "i16"), 0);
+    const silent = timeout !== svm.moves ? 1 : 0;   /* happened while away */
+    let okay_spot = get_obj_location(figurine, new $c.FieldRef(cc, "x", "i16"), new $c.FieldRef(cc, "y", "i16"), 0);
     if (figurine.where === OBJ.INVENT || figurine.where === OBJ.MINVENT) {
         okay_spot = await enexto(cc, cc.x, cc.y, $c.relem(mons, figurine.corpsenm));
     }
@@ -2347,10 +2343,10 @@ export async function fig_transform(arg, timeout) {   // apply.c:2398
         await start_timer(rnd(5000), TIMER.OBJECT, FIG_TRANSFORM, obj_to_any(figurine));
         return;
     }
-    cansee_spot = cansee(cc.x, cc.y);
-    mtmp = await make_familiar(figurine, cc.x, cc.y, TRUE);
+    const cansee_spot = cansee(cc.x, cc.y);
+    const mtmp = await make_familiar(figurine, cc.x, cc.y, TRUE);
     if (mtmp) {
-        mshelter = svl.level.objects[mtmp.mx][mtmp.my];
+        const mshelter = svl.level.objects[mtmp.mx][mtmp.my];
         /* [m_monnam() yields accurate mon type, overriding hallucination] */
         $c.sprintf(new $c.Ptr(monnambuf, 0), $c.lit("%s"), await an(await m_monnam(mtmp)));
         and_vanish[0] = 0;
@@ -2387,7 +2383,7 @@ export async function fig_transform(arg, timeout) {   // apply.c:2398
                 break;
             case OBJ.MINVENT:
                 if (cansee_spot && !silent && !suppress_see) {
-                    mon = figurine.v.v_ocarry;
+                    const mon = figurine.v.v_ocarry;
                     /* figurine carrying monster might be invisible */
                     if (canseemon(figurine.v.v_ocarry) && (!mon.wormno || cansee(mon.mx, mon.my))) {
                         $c.sprintf(new $c.Ptr(carriedby, 0), $c.lit("%s pack"), s_suffix(await a_monnam(mon)));
@@ -2422,15 +2418,14 @@ export async function fig_transform(arg, timeout) {   // apply.c:2398
  * @returns {Promise<number>} boolean
  */
 async function figurine_location_checks(obj, cc, quietly) {   // apply.c:2511
-    let x = 0, y = 0;
     if (carried(obj) && u.uswallow) {
         if (!quietly) {
             await You($c.lit("don't have enough room in here."));
         }
         return FALSE;
     }
-    x = cc ? cc.x : u.ux;
-    y = cc ? cc.y : u.uy;
+    const x = cc ? cc.x : u.ux;
+    const y = cc ? cc.y : u.uy;
     if (!isok(x, y)) {
         if (!quietly) {
             await You($c.lit("cannot put the figurine there."));
@@ -2456,8 +2451,8 @@ async function figurine_location_checks(obj, cc, quietly) {   // apply.c:2511
  * @returns {Promise<number>} int
  */
 async function use_figurine(optr) {   // apply.c:2544
-    let obj = null, x = 0, y = 0, cc = new $T.nhcoord(), $t1;
-    obj = optr.get(0);
+    let cc = new $T.nhcoord(), $t1;
+    const obj = optr.get(0);
     if (u.uswallow) {
         /* can't activate a figurine while swallowed */
         if (!await figurine_location_checks(obj, null, FALSE)) {
@@ -2468,8 +2463,8 @@ async function use_figurine(optr) {   // apply.c:2544
         $t1 = $c.i8(gm.multi = 0), svc.context.move = $t1;
         return ECMD.CANCEL;
     }
-    x = $c.i16(u.ux + u.dx | 0);
-    y = $c.i16(u.uy + u.dy | 0);
+    const x = $c.i16(u.ux + u.dx | 0);
+    const y = $c.i16(u.uy + u.dy | 0);
     cc.x = x;
     cc.y = y;
     /* Passing FALSE arg here will result in messages displayed */
@@ -2512,7 +2507,6 @@ async function grease_ok(obj) {   // apply.c:2585
  * @returns {Promise<number>} int
  */
 async function use_grease(obj) {   // apply.c:2604
-    let otmp = null, oldglib = 0;
     if (Glib()) {
         await pline($c.lit("%s from your %s."), await Tobjnam(obj, $c.lit("slip")), await fingers_or_gloves(FALSE));
         await dropx(obj);
@@ -2525,7 +2519,7 @@ async function use_grease(obj) {   // apply.c:2604
             await dropx(obj);
             return ECMD.TIME;
         }
-        otmp = await getobj($c.lit("grease"), grease_ok, GETOBJ_PROMPT);
+        const otmp = await getobj($c.lit("grease"), grease_ok, GETOBJ_PROMPT);
         if (!otmp) {
             return ECMD.CANCEL;
         }
@@ -2533,7 +2527,7 @@ async function use_grease(obj) {   // apply.c:2604
             return ECMD.OK;
         }
         await consume_obj_charge(obj, TRUE);
-        oldglib = $c.i32($c.and64(u.uprops[GLIB].intrinsic, TIMEOUT));
+        const oldglib = $c.i32($c.and64(u.uprops[GLIB].intrinsic, TIMEOUT));
         if (!$c.peq(otmp, hands_obj)) {
             await You($c.lit("cover %s with a thick layer of grease."), await yname(otmp));
             otmp.greased = 1;
@@ -2582,12 +2576,12 @@ function touchstone_ok(obj) {   // apply.c:2658
  * @returns {Promise<number>} int
  */
 async function use_stone(tstone) {   // apply.c:2680
-    let obj = null, do_scratch = 0, streak_color = null, stonebuf = new Int8Array(128), oclass = 0, known = 0;
+    let obj = null, stonebuf = new Int8Array(128);
     /* in case it was acquired while blinded */
     if (!Blind()) {
         await observe_object(tstone);
     }
-    known = tstone.otyp === TOUCHSTONE && tstone.dknown && objects[TOUCHSTONE].oc_name_known ? 1 : 0;
+    const known = tstone.otyp === TOUCHSTONE && tstone.dknown && objects[TOUCHSTONE].oc_name_known ? 1 : 0;
     $c.sprintf(new $c.Ptr(stonebuf, 0), $c.lit("rub on the stone%s"), tstone.quan === 1 ? $c.lit("") : $c.lit("s"));
     /* when the touchstone is fully known, don't bother listing extra
        junk as likely candidates for rubbing */
@@ -2616,9 +2610,9 @@ async function use_stone(tstone) {   // apply.c:2680
         await pline($c.lit("Oh wow, man: Fractals!"));
         return ECMD.TIME;
     }
-    do_scratch = FALSE;
-    streak_color = null;
-    oclass = obj.oclass;
+    let do_scratch = FALSE;
+    let streak_color = null;
+    let oclass = obj.oclass;
     /* prevent non-gemstone rings from being treated like gems */
     if (oclass === RING_CLASS && objects[obj.otyp].oc_material !== GEMSTONE && objects[obj.otyp].oc_material !== MINERAL) {
         oclass = RANDOM_CLASS;   /* something that's neither gem nor ring */
@@ -2702,10 +2696,10 @@ export function reset_trapset() {   // apply.c:2813
  * @returns {Promise<void>}
  */
 async function use_trap(otmp) {   // apply.c:2821
-    let ttyp = 0, tmp = 0, what = null, buf = new Int8Array(256), levtyp = 0, occutext = null, stway = null, chance = 0;
-    what = null;
-    levtyp = svl.level.locations[u.ux][u.uy].typ;
-    occutext = $c.lit("setting the trap");
+    let buf = new Int8Array(256), chance = 0;
+    let what = null;
+    const levtyp = svl.level.locations[u.ux][u.uy].typ;
+    const occutext = $c.lit("setting the trap");
     if (nohands(gy.youmonst.data)) {
         what = $c.lit("without hands");
     } else if (u.uprops[STUNNED].intrinsic) {
@@ -2721,7 +2715,7 @@ async function use_trap(otmp) {   // apply.c:2821
     } else if (is_lava(u.ux, u.uy)) {
         what = $c.lit("in lava");
     } else if (On_stairs(u.ux, u.uy)) {
-        stway = stairway_at(u.ux, u.uy);
+        const stway = stairway_at(u.ux, u.uy);
         what = stway.isladder ? $c.lit("on the ladder") : $c.lit("on the stairs");
     } else if (IS_FURNITURE(levtyp) || IS_OBSTRUCTED(levtyp) || closed_door(u.ux, u.uy) || t_at(u.ux, u.uy)) {
         what = $c.lit("here");
@@ -2733,7 +2727,7 @@ async function use_trap(otmp) {   // apply.c:2821
         reset_trapset();
         return;
     }
-    ttyp = otmp.otyp === LAND_MINE ? LANDMINE : BEAR_TRAP;
+    const ttyp = otmp.otyp === LAND_MINE ? LANDMINE : BEAR_TRAP;
     if ($c.peq(otmp, gt.trapinfo.tobj) && (gt.trapinfo.tx === u.ux && gt.trapinfo.ty === u.uy)) {
         await You($c.lit("resume setting %s%s."), await shk_your(new $c.Ptr(buf, 0), otmp), trapname(ttyp, FALSE));
         set_occupation(set_trap, occutext, 0);
@@ -2741,7 +2735,7 @@ async function use_trap(otmp) {   // apply.c:2821
     }
     gt.trapinfo.tobj = otmp;
     gt.trapinfo.tx = u.ux, gt.trapinfo.ty = u.uy;
-    tmp = ACURR(A.DEX);
+    let tmp = ACURR(A.DEX);
     gt.trapinfo.time_needed = tmp > 17 ? 2 : tmp > 12 ? 3 : tmp > 7 ? 4 : 5;
     if (Blind()) {
         gt.trapinfo.time_needed = Math.imul(gt.trapinfo.time_needed, 2);
@@ -2791,8 +2785,7 @@ async function use_trap(otmp) {   // apply.c:2821
  * @returns {Promise<number>} int
  */
 async function set_trap() {   // apply.c:2916
-    let otmp = null, ttmp = null, ttyp = 0;
-    otmp = gt.trapinfo.tobj;
+    const otmp = gt.trapinfo.tobj;
     if (!otmp || !carried(otmp) || !(gt.trapinfo.tx === u.ux && gt.trapinfo.ty === u.uy)) {
         /* trap object might have been stolen or hero teleported */
         reset_trapset();
@@ -2801,8 +2794,8 @@ async function set_trap() {   // apply.c:2916
     if ((gt.trapinfo.time_needed = gt.trapinfo.time_needed - 1 | 0) > 0) {
         return 1;   /* still busy */
     }
-    ttyp = otmp.otyp === LAND_MINE ? LANDMINE : BEAR_TRAP;
-    ttmp = await maketrap(u.ux, u.uy, ttyp);
+    const ttyp = otmp.otyp === LAND_MINE ? LANDMINE : BEAR_TRAP;
+    const ttmp = await maketrap(u.ux, u.uy, ttyp);
     if (ttmp) {
         ttmp.madeby_u = 1;
         await feeltrap(ttmp);
@@ -3109,12 +3102,12 @@ export async function use_whip(obj) {   // apply.c:2955
  * @returns {number} boolean
  */
 function find_poleable_mon(pos) {   // apply.c:3284
-    let mtmp = null, mpos = new $T.nhcoord(), impaired = 0, x = 0, y = 0, lo_x = 0, hi_x = 0, lo_y = 0, hi_y = 0, rt = 0, glyph = 0;
+    let mtmp = null, mpos = new $T.nhcoord(), x = 0, y = 0, lo_x = 0, hi_x = 0, lo_y = 0, hi_y = 0;
     mpos.$copyFrom(new $T.nhcoord());
     mpos.x = 0;
     mpos.y = 0;   /* no candidate location yet */
-    impaired = u.uprops[CONFUSION].intrinsic || u.uprops[STUNNED].intrinsic || Hallucination() ? 1 : 0;
-    rt = $c.i16(isqrt(gp.polearm_range_max));
+    const impaired = u.uprops[CONFUSION].intrinsic || u.uprops[STUNNED].intrinsic || Hallucination() ? 1 : 0;
+    const rt = $c.i16(isqrt(gp.polearm_range_max));
     lo_x = $c.i16(u.ux - rt > 1 ? u.ux - rt : 1), hi_x = $c.i16(u.ux + rt < COLNO - 1 ? u.ux + rt : COLNO - 1);
     lo_y = $c.i16(u.uy - rt > 0 ? u.uy - rt : 0), hi_y = $c.i16(u.uy + rt < ROWNO - 1 ? u.uy + rt : ROWNO - 1);
     for (x = lo_x; x <= hi_x; x = $c.i16(x + 1)) {
@@ -3122,7 +3115,7 @@ function find_poleable_mon(pos) {   // apply.c:3284
             if (!get_valid_polearm_position(x, y)) {
                 continue;
             }
-            glyph = glyph_at(x, y);
+            const glyph = glyph_at(x, y);
             if (!impaired && glyph_is_monster(glyph) && (mtmp = svl.level.monsters[x][y]) !== null && (mtmp.mtame || mtmp.mpeaceful && flags.confirm)) {
                 continue;
             }
@@ -3146,8 +3139,7 @@ function find_poleable_mon(pos) {   // apply.c:3284
  * @returns {number} boolean
  */
 function get_valid_polearm_position(x, y) {   // apply.c:3321
-    let glyph = 0;
-    glyph = glyph_at(x, y);
+    const glyph = glyph_at(x, y);
     return isok(x, y) && distu(x, y) >= gp.polearm_range_min && distu(x, y) <= gp.polearm_range_max && (cansee(x, y) || couldsee(x, y) && glyph_is_poleable(glyph)) ? 1 : 0;
 }
 /**
@@ -3155,14 +3147,14 @@ function get_valid_polearm_position(x, y) {   // apply.c:3321
  * @returns {Promise<void>}
  */
 async function display_polearm_positions(on_off) {   // apply.c:3334
-    let x = 0, y = 0, dx = 0, dy = 0;
+    let dx = 0, dy = 0;
     if (on_off) {
         /* on */
         await tmp_at(DISP_BEAM, 4092);
         for (dx = -3; dx <= 3; dx = $c.i16(dx + 1)) {
             for (dy = -3; dy <= 3; dy = $c.i16(dy + 1)) {
-                x = $c.i16(dx + u.ux);
-                y = $c.i16(dy + u.uy);
+                const x = $c.i16(dx + u.ux);
+                const y = $c.i16(dy + u.uy);
                 if (get_valid_polearm_position(x, y)) {
                     await tmp_at(x, y);
                 }
@@ -3193,8 +3185,7 @@ async function display_polearm_positions(on_off) {   // apply.c:3334
  * @param {*} max_range int *
  */
 function calc_pole_range(min_range, max_range) {   // apply.c:3371
-    let typ = 0;
-    typ = uwep_skill_type();
+    const typ = uwep_skill_type();
     min_range.set(0, 4);
     if (typ === P.NONE || u.weapon_skills[typ].skill <= P.BASIC) {
         max_range.set(0, 4);
@@ -3212,8 +3203,8 @@ function calc_pole_range(min_range, max_range) {   // apply.c:3371
  * @returns {number} boolean
  */
 export function could_pole_mon() {   // apply.c:3391
-    let min_range = Int32Array.of(0), max_range = Int32Array.of(0), cc = new $T.nhcoord(), hitm = null;
-    hitm = svc.context.polearm.hitmon;
+    let min_range = Int32Array.of(0), max_range = Int32Array.of(0), cc = new $T.nhcoord();
+    const hitm = svc.context.polearm.hitmon;
     if (!$G.uwep || !(($G.uwep.oclass === WEAPON_CLASS || $G.uwep.oclass === TOOL_CLASS) && (objects[$G.uwep.otyp].oc_subtyp === P.POLEARMS || objects[$G.uwep.otyp].oc_subtyp === P.LANCE || is_art($G.uwep, ART.SNICKERSNEE)))) {
         return FALSE;
     }
@@ -3247,12 +3238,12 @@ function snickersnee_used_dist_attk(obj) {   // apply.c:3416
  * @returns {Promise<number>} int
  */
 export async function use_pole(obj, autohit) {   // apply.c:3426
-    let thump = new Int8Array(49), res = 0, max_range = Int32Array.of(0), min_range = Int32Array.of(0), glyph = 0, cc = new $T.nhcoord(), mtmp = null, hitm = null, freehit = 0, t = null;
+    let thump = new Int8Array(49), max_range = Int32Array.of(0), min_range = Int32Array.of(0), cc = new $T.nhcoord(), mtmp = null;
     thump.fill(0);
     thump.set([84, 104, 117, 109, 112, 33, 32, 32, 89, 111, 117, 114, 32, 98, 108, 111, 119, 32, 98, 111, 117, 110, 99, 101, 115, 32, 104, 97, 114, 109, 108, 101, 115, 115, 108, 121, 32, 111, 102, 102, 32, 116, 104, 101, 32, 37, 115, 46]);   // "Thump!  Your blow bounces harmlessly off the %s."
-    res = ECMD.OK;
-    hitm = svc.context.polearm.hitmon;
-    freehit = FALSE;
+    const res = ECMD.OK;
+    const hitm = svc.context.polearm.hitmon;
+    let freehit = FALSE;
     /* Are you allowed to use the pole? */
     if (u.uswallow) {
         await pline(new $c.Ptr(not_enough_room, 0));
@@ -3284,7 +3275,7 @@ export async function use_pole(obj, autohit) {   // apply.c:3426
             return res | ECMD.CANCEL;
         }
     }
-    glyph = glyph_at(cc.x, cc.y);
+    const glyph = glyph_at(cc.x, cc.y);
     if (dist2(cc.x, cc.y, u.ux, u.uy) > max_range[0]) {
         await pline($c.lit("Too far!"));
         return ECMD.FAIL;
@@ -3336,7 +3327,7 @@ export async function use_pole(obj, autohit) {   // apply.c:3426
         await thitmonst(mtmp, $G.uwep);
     } else if (glyph_is_statue(glyph) && sobj_at(STATUE, gb.bhitpos.x, gb.bhitpos.y)) {
         /* might be hallucinatory */
-        t = t_at(gb.bhitpos.x, gb.bhitpos.y);
+        const t = t_at(gb.bhitpos.x, gb.bhitpos.y);
         if (t && t.ttyp === STATUE_TRAP && await activate_statue_trap(t, t.tx, t.ty, FALSE)) {
             /* feedback has been give by animate_statue() */
         } else {
@@ -3370,10 +3361,9 @@ export async function use_pole(obj, autohit) {   // apply.c:3426
  * @returns {Promise<number>} int
  */
 async function use_cream_pie(obj) {   // apply.c:3568
-    let wasblind = 0, wascreamed = 0, several = 0, blindinc = 0;
-    wasblind = Blind();
-    wascreamed = $c.i8(u.ucreamed);
-    several = FALSE;
+    const wasblind = Blind();
+    const wascreamed = $c.i8(u.ucreamed);
+    let several = FALSE;
     if (obj.quan > 1) {
         several = TRUE;
         obj = await splitobj(obj, 1);
@@ -3384,7 +3374,7 @@ async function use_cream_pie(obj) {   // apply.c:3568
         await You($c.lit("immerse your %s in %s%s."), await body_part(FACE), several ? $c.lit("one of ") : $c.lit(""), several ? await makeplural(await the(await xname(obj))) : await the(await xname(obj)));
     }
     if (await can_blnd(null, gy.youmonst, AT.WEAP, obj)) {
-        blindinc = rnd(25);
+        const blindinc = rnd(25);
         u.ucreamed = u.ucreamed + (blindinc >>> 0) >>> 0;
         await make_blinded($c.add64(BlindedTimeout(), blindinc), FALSE);
         if (!Blind() || Blind() && wasblind) {
@@ -3484,9 +3474,8 @@ async function use_royal_jelly(optr) {   // apply.c:3616
  * @returns {number} int
  */
 function grapple_range() {   // apply.c:3686
-    let typ = 0, max_range = 0;
-    typ = uwep_skill_type();
-    max_range = 4;
+    const typ = uwep_skill_type();
+    let max_range = 4;
     if (typ === P.NONE || u.weapon_skills[typ].skill <= P.BASIC) {
         max_range = 4;
     } else if (u.weapon_skills[typ].skill === P.SKILLED) {
@@ -3509,14 +3498,14 @@ function can_grapple_location(x, y) {   // apply.c:3701
  * @returns {Promise<void>}
  */
 async function display_grapple_positions(on_off) {   // apply.c:3707
-    let x = 0, y = 0, dx = 0, dy = 0;
+    let dx = 0, dy = 0;
     if (on_off) {
         /* on */
         await tmp_at(DISP_BEAM, 4092);
         for (dx = -3; dx <= 3; dx = $c.i16(dx + 1)) {
             for (dy = -3; dy <= 3; dy = $c.i16(dy + 1)) {
-                x = $c.i16(dx + u.ux);
-                y = $c.i16(dy + u.uy);
+                const x = $c.i16(dx + u.ux);
+                const y = $c.i16(dy + u.uy);
                 if (can_grapple_location(x, y) && !u_at(x, y)) {
                     await tmp_at(x, y);
                 }
@@ -3532,8 +3521,8 @@ async function display_grapple_positions(on_off) {   // apply.c:3707
  * @returns {Promise<number>} int
  */
 async function use_grapple(obj) {   // apply.c:3729
-    let res = 0, typ = 0, tohit = 0, save_confirm = 0, cc = new $T.nhcoord(), mtmp = null, otmp = null, tmpwin = 0, any = new $T.any(), buf = new Int8Array(256), selected = [null], clr = 0;
-    res = ECMD.OK;
+    let save_confirm = 0, cc = new $T.nhcoord(), mtmp = null, otmp = null, any = new $T.any(), buf = new Int8Array(256), selected = [null];
+    const res = ECMD.OK;
     /* Are you allowed to use the hook? */
     if (u.uswallow) {
         await pline(new $c.Ptr(not_enough_room, 0));
@@ -3558,7 +3547,7 @@ async function use_grapple(obj) {   // apply.c:3729
         return res | ECMD.CANCEL;
     }
     /* Calculate range; unlike use_pole(), there's no minimum for range */
-    typ = uwep_skill_type();
+    const typ = uwep_skill_type();
     if (dist2(cc.x, cc.y, u.ux, u.uy) > grapple_range()) {
         await pline($c.lit("Too far!"));
         return res;
@@ -3571,10 +3560,10 @@ async function use_grapple(obj) {   // apply.c:3729
         return res;
     }
     /* What do you want to hit? */
-    tohit = rn2(5);
+    let tohit = rn2(5);
     if (typ !== P.NONE && u.weapon_skills[typ].skill >= P.SKILLED) {
-        tmpwin = await create_nhwindow()(NHW.MENU);
-        clr = NO_COLOR;
+        const tmpwin = await create_nhwindow()(NHW.MENU);
+        const clr = NO_COLOR;
         any.$copyFrom(cg.zeroany);   /* set all bits to zero */
         any.a_int = 1;   /* use index+1 (can't use 0) as identifier */
         await start_menu()(tmpwin, MENU.BEHAVE_STANDARD);
@@ -3667,8 +3656,7 @@ async function use_grapple(obj) {   // apply.c:3729
  * @returns {Promise<void>}
  */
 async function discard_broken_wand() {   // apply.c:3876
-    let obj = null;
-    obj = gc.current_wand;   /* [see dozap() and destroy_items()] */
+    const obj = gc.current_wand;   /* [see dozap() and destroy_items()] */
     gc.current_wand = null;
     if (obj) {
         await delobj(obj);
@@ -3705,10 +3693,10 @@ export async function maybe_dunk_boulders(x, y) {   // apply.c:3897
  * @returns {Promise<number>} int
  */
 async function do_break_wand(obj) {   // apply.c:3909
-    let i = 0, x = 0, y = 0, mon = null, dmg = 0, damage = 0, affects_objects = 0, shop_damage = 0, fillmsg = 0, confirm = new Int8Array(128), buf = new Int8Array(256), is_fragile = 0, typ = 0, dcres = 0, $t1, $t2, $t3;
-    shop_damage = FALSE;
-    fillmsg = FALSE;
-    is_fragile = await objdescr_is(obj, $c.lit("balsa")) || await objdescr_is(obj, $c.lit("glass")) ? 1 : 0;
+    let i = 0, x = 0, y = 0, mon = null, confirm = new Int8Array(128), buf = new Int8Array(256), $t1, $t2, $t3;
+    let shop_damage = FALSE;
+    let fillmsg = FALSE;
+    const is_fragile = await objdescr_is(obj, $c.lit("balsa")) || await objdescr_is(obj, $c.lit("glass")) ? 1 : 0;
     if (nohands(gy.youmonst.data)) {
         await You_cant($c.lit("break %s without hands!"), await yname(obj));
         return ECMD.OK;
@@ -3750,8 +3738,8 @@ async function do_break_wand(obj) {   // apply.c:3909
     }
     obj.ox = u.ux;
     obj.oy = u.uy;
-    dmg = Math.imul(obj.spe, 4);
-    affects_objects = FALSE;
+    let dmg = Math.imul(obj.spe, 4);
+    let affects_objects = FALSE;
     switch (obj.otyp) {
         case WAN_OPENING:
             if (u.ustuck) {
@@ -3816,7 +3804,7 @@ async function do_break_wand(obj) {   // apply.c:3909
             continue;
         }
         if (obj.otyp === WAN_DIGGING) {
-            dcres = dig_check(null, x, y);
+            const dcres = dig_check(null, x, y);
             if (dcres < DIGCHECK.FAILED || dcres === DIGCHECK.FAIL_BOULDER) {
                 if (svl.level.locations[x][y].typ && svl.level.locations[x][y].typ <= DBWALL || svl.level.locations[x][y].typ === DOOR) {
                     /* normally, pits and holes don't anger guards, but they
@@ -3834,7 +3822,7 @@ async function do_break_wand(obj) {   // apply.c:3909
                  * Adjust corresponding code in music.c for
                  * drum of earthquake if you alter this sequence.
                  */
-                typ = fillholetyp(x, y, FALSE);
+                const typ = fillholetyp(x, y, FALSE);
                 if (typ !== ROOM) {
                     svl.level.locations[x][y].typ = typ, svl.level.locations[x][y].flags = 0;
                     await liquid_flow(x, y, typ, t_at(x, y), fillmsg ? null : $c.lit("Some holes are quickly filled with %s!"));
@@ -3890,7 +3878,7 @@ async function do_break_wand(obj) {   // apply.c:3909
                     await bot();   /* potion effects */
                 }
             }
-            damage = await zapyourself(obj, FALSE);
+            const damage = await zapyourself(obj, FALSE);
             if (damage) {
                 $c.sprintf(new $c.Ptr(buf, 0), $c.lit("killed %sself by breaking a wand"), genders[flags.female ? 1 : 0].him);
                 await losehp(Maybe_Half_Phys(damage), new $c.Ptr(buf, 0), NO_KILLER_PREFIX);
@@ -3976,8 +3964,8 @@ function apply_ok(obj) {   // apply.c:4151
  * @returns {Promise<number>} int
  */
 export async function doapply() {   // apply.c:4214
-    let obj = [null], res = 0;
-    res = ECMD.TIME;
+    let obj = [null];
+    let res = ECMD.TIME;
     if (nohands(gy.youmonst.data)) {
         await You($c.lit("aren't able to use or apply tools in your current form."));
         return ECMD.OK;
@@ -4194,7 +4182,6 @@ export async function doapply() {   // apply.c:4214
  */
 export function unfixable_trouble_count(is_horn) {   // apply.c:4431
     let unfixable_trbl = 0;
-    unfixable_trbl = 0;
     if (Stoned()) {
         unfixable_trbl = unfixable_trbl + 1 | 0;
     }
@@ -4245,7 +4232,6 @@ export function unfixable_trouble_count(is_horn) {   // apply.c:4431
  * @returns {Promise<number>} int
  */
 async function flip_through_book(obj) {   // apply.c:4473
-    let findx = 0;
     if (Underwater()) {
         await You($c.lit("don't want to get the pages even more soggy, do you?"));
         return ECMD.OK;
@@ -4271,7 +4257,7 @@ async function flip_through_book(obj) {   // apply.c:4473
     } else if (obj.otyp === SPE_NOVEL) {
         await pline($c.lit("This looks like it might be interesting to read."));
     } else {
-        findx = obj.usecount < MAX_SPELL_STUDY ? obj.usecount : MAX_SPELL_STUDY;
+        const findx = obj.usecount < MAX_SPELL_STUDY ? obj.usecount : MAX_SPELL_STUDY;
         await pline($c.lit("The%s ink in this spellbook is %s."), objects[obj.otyp].oc_magic ? $c.lit(" magical") : $c.lit(""), flip_through_book$fadeness[findx]);
     }
     return ECMD.TIME;
@@ -4281,9 +4267,8 @@ async function flip_through_book(obj) {   // apply.c:4473
  * @returns {Promise<number>} int
  */
 async function flip_coin(obj) {   // apply.c:4527
-    let otmp = null, lose_coin = 0;
-    otmp = obj;
-    lose_coin = FALSE;
+    let otmp = obj;
+    let lose_coin = FALSE;
     await You($c.lit("flip %s."), await an(await singular(obj, xname)));
     if (Underwater()) {
         await pline($c.lit("It tumbles away."));

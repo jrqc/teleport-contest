@@ -113,8 +113,7 @@ const soundlib_choices = $c.recArray($T.sound_choices, 1);
  * @returns {number} int
  */
 function mon_in_room(mon, rmtyp) {   // sounds.c:20
-    let rno = 0;
-    rno = svl.level.locations[mon.mx][mon.my].roomno;
+    const rno = svl.level.locations[mon.mx][mon.my].roomno;
     if (rno >= ROOMOFFSET) {
         return svr.rooms[rno - ROOMOFFSET | 0].rtype === rmtyp ? 1 : 0;
     }
@@ -125,9 +124,8 @@ function mon_in_room(mon, rmtyp) {   // sounds.c:20
  * @returns {Promise<number>} boolean
  */
 async function throne_mon_sound(mtmp) {   // sounds.c:30
-    let which = 0;
     if ((mtmp.msleeping || is_lord(mtmp.data) || is_prince(mtmp.data)) && !is_animal(mtmp.data) && mon_in_room(mtmp, COURT)) {
-        which = rn2(3) + (Hallucination() ? 1 : 0) | 0;
+        const which = rn2(3) + (Hallucination() ? 1 : 0) | 0;
         if (which !== 2) {
             if (which === 0) {
             } else if (which === 1) {
@@ -145,9 +143,8 @@ async function throne_mon_sound(mtmp) {   // sounds.c:30
  * @returns {Promise<number>} boolean
  */
 async function beehive_mon_sound(mtmp) {   // sounds.c:62
-    let hallu = 0;
     if (mtmp.data.mlet === S.ANT && is_flyer(mtmp.data) && mon_in_room(mtmp, BEEHIVE)) {
-        hallu = Hallucination() ? 1 : 0;
+        const hallu = Hallucination() ? 1 : 0;
         switch (rn2(2) + hallu | 0) {
             case 0:
                 await You_hear($c.lit("a low buzzing."));
@@ -168,10 +165,9 @@ async function beehive_mon_sound(mtmp) {   // sounds.c:62
  * @returns {Promise<number>} boolean
  */
 async function morgue_mon_sound(mtmp) {   // sounds.c:89
-    let hallu = 0, hair = null;
     if ((is_undead(mtmp.data) || is_vampshifter(mtmp)) && mon_in_room(mtmp, MORGUE)) {
-        hallu = Hallucination() ? 1 : 0;
-        hair = await body_part(HAIR);   /* hair/fur/scales */
+        const hallu = Hallucination() ? 1 : 0;
+        const hair = await body_part(HAIR);   /* hair/fur/scales */
         switch (rn2(2) + hallu | 0) {
             case 0:
                 await You($c.lit("suddenly realize it is unnaturally quiet."));
@@ -192,10 +188,9 @@ async function morgue_mon_sound(mtmp) {   // sounds.c:89
  * @returns {Promise<number>} boolean
  */
 async function zoo_mon_sound(mtmp) {   // sounds.c:115
-    let hallu = 0, selection = 0;
     if ((mtmp.msleeping || is_animal(mtmp.data)) && mon_in_room(mtmp, ZOO)) {
-        hallu = Hallucination() ? 1 : 0;
-        selection = rn2(2) + hallu | 0;
+        const hallu = Hallucination() ? 1 : 0;
+        const selection = rn2(2) + hallu | 0;
         await You_hear($c.lit("%s"), zoo_mon_sound$zoo_msg[selection]);
         return TRUE;
     }
@@ -206,7 +201,7 @@ async function zoo_mon_sound(mtmp) {   // sounds.c:115
  * @returns {Promise<number>} boolean
  */
 async function temple_priest_sound(mtmp) {   // sounds.c:131
-    let msg = null, hallu = 0, trycount = 0, ax = 0, ay = 0, speechless = 0, in_sight = 0;
+    let msg = null;
     /* priest must be active */
     /* hero must be outside this temple */
     if (mtmp.ispriest && inhistemple(mtmp) && !helpless(mtmp) && temple_occupied(new $c.Ptr(u.urooms, 0)) !== mtmp.mextra.epri.shroom) {
@@ -218,12 +213,12 @@ async function temple_priest_sound(mtmp) {   // sounds.c:131
            priest and the altar must not be directly visible (we don't
            care if telepathy or extended detection reveals that the
            priest is not currently standing on the altar; he's mobile). */
-        hallu = Hallucination() ? 1 : 0;
-        trycount = 0;
-        ax = mtmp.mextra.epri.shrpos.x;
-        ay = mtmp.mextra.epri.shrpos.y;
-        speechless = mtmp.data.msound <= MS.ANIMAL ? 1 : 0;
-        in_sight = canseemon(mtmp) || cansee(ax, ay) ? 1 : 0;
+        const hallu = Hallucination() ? 1 : 0;
+        let trycount = 0;
+        const ax = mtmp.mextra.epri.shrpos.x;
+        const ay = mtmp.mextra.epri.shrpos.y;
+        const speechless = mtmp.data.msound <= MS.ANIMAL ? 1 : 0;
+        const in_sight = canseemon(mtmp) || cansee(ax, ay) ? 1 : 0;
         do {
             msg = temple_priest_sound$temple_msg[rn2(3 + hallu | 0)];
             if ($c.strchr(msg, 42) && speechless) {
@@ -251,13 +246,12 @@ async function temple_priest_sound(mtmp) {   // sounds.c:131
  * @returns {Promise<number>} boolean
  */
 async function oracle_sound(mtmp) {   // sounds.c:181
-    let hallu = 0;
     if (mtmp.data !== mons[PM.ORACLE]) {
         return FALSE;
     }
     /* and don't produce silly effects when she's clearly visible */
     if (Hallucination() || !canseemon(mtmp)) {
-        hallu = Hallucination() ? 1 : 0;
+        const hallu = Hallucination() ? 1 : 0;
         await You_hear($c.lit("%s"), oracle_sound$ora_msg[rn2(3) + Math.imul(hallu, 2) | 0]);
     }
     return TRUE;
@@ -266,11 +260,11 @@ async function oracle_sound(mtmp) {   // sounds.c:181
  * @returns {Promise<void>}
  */
 export async function dosounds() {   // sounds.c:202
-    let sroom = null, hallu = 0, vx = 0, vy = 0, mtmp = null, gold_in_vault = 0, count = 0;
+    let sroom = null, vx = 0, vy = 0, mtmp = null;
     if (Deaf() || !flags.acoustics || u.uswallow || Underwater()) {
         return;
     }
-    hallu = Hallucination() ? 1 : 0;
+    const hallu = Hallucination() ? 1 : 0;
     if (svl.level.flags.nfountains && !rn2(400)) {
         await You_hear($c.lit("%s"), dosounds$fountain_msg[rn2(3) + hallu | 0]);
     }
@@ -296,7 +290,7 @@ export async function dosounds() {   // sounds.c:202
             switch (rn2(2) + hallu | 0) {
                 case 1:
                     {
-                        gold_in_vault = FALSE;
+                        let gold_in_vault = FALSE;
                         for (vx = sroom.lx; vx <= sroom.hx; vx = vx + 1 | 0) {
                             for (vy = sroom.ly; vy <= sroom.hy; vy = vy + 1 | 0) {
                                 if (g_at($c.i16(vx), $c.i16(vy))) {
@@ -335,7 +329,7 @@ export async function dosounds() {   // sounds.c:202
         }
     }
     if (svl.level.flags.has_barracks && !rn2(200)) {
-        count = 0;
+        let count = 0;
         for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
             if (DEADMONSTER(mtmp)) {
                 continue;
@@ -433,7 +427,6 @@ export function growl_sound(mtmp) {   // sounds.c:351
  */
 export async function growl(mtmp) {   // sounds.c:402
     let growl_verb = null;
-    growl_verb = null;
     if (helpless(mtmp) || mtmp.data.msound === MS.SILENT) {
         return;
     }
@@ -460,9 +453,8 @@ export async function growl(mtmp) {   // sounds.c:402
  * @returns {Promise<void>}
  */
 export async function yelp(mtmp) {   // sounds.c:427
-    let yelp_verb = null, se = 0;
-    yelp_verb = null;
-    se = se_yelp;
+    let yelp_verb = null;
+    let se = se_yelp;
     if (helpless(mtmp) || !mtmp.data.msound) {
         return;
     }
@@ -513,9 +505,8 @@ export async function yelp(mtmp) {   // sounds.c:427
  * @returns {Promise<void>}
  */
 export async function whimper(mtmp) {   // sounds.c:479
-    let whimper_verb = null, se = 0;
-    whimper_verb = null;
-    se = se_canine_whine;
+    let whimper_verb = null;
+    let se = se_canine_whine;
     if (helpless(mtmp) || !mtmp.data.msound) {
         return;
     }
@@ -582,10 +573,9 @@ export async function beg(mtmp) {   // sounds.c:519
  * @returns {$c.Ptr | null} const char *
  */
 export function maybe_gasp(mon) {   // sounds.c:546
-    let mptr = null, msound = 0, dogasp = 0;
-    mptr = mon.data;
-    msound = mptr.msound;
-    dogasp = FALSE;
+    const mptr = mon.data;
+    let msound = mptr.msound;
+    let dogasp = FALSE;
     /* other roles' guardians and cross-aligned priests don't gasp */
     if (msound === MS.GUARDIAN && !$c.peq(mptr, $c.relem(mons, gu.urole.guardnum)) || msound === MS.PRIEST && !p_coaligned(mon)) {
         msound = MS.SILENT;
@@ -667,9 +657,8 @@ export function maybe_gasp(mon) {   // sounds.c:546
  * @returns {$c.Ptr | null} const char *
  */
 export function cry_sound(mtmp) {   // sounds.c:617
-    let ret = null, ptr = null;
-    ret = null;
-    ptr = mtmp.data;
+    let ret = null;
+    const ptr = mtmp.data;
     /* a relatively small subset of MS_ sound values are used by oviparous
        species so we don't try to supply something for every MS_ type */
     switch (ptr.msound) {
@@ -719,7 +708,6 @@ export function cry_sound(mtmp) {   // sounds.c:617
  * @returns {number} boolean
  */
 function mon_is_gecko(mon) {   // sounds.c:659
-    let glyph = 0;
     /* return True if it is actually a gecko */
     if (mon.data === mons[PM.GECKO]) {
         return TRUE;
@@ -731,7 +719,7 @@ function mon_is_gecko(mon) {   // sounds.c:659
     }
     /* result depends upon whether map spot shows a gecko, which will
        be due to hallucination or to mimickery since mon isn't one */
-    glyph = glyph_at(mon.mx, mon.my);
+    const glyph = glyph_at(mon.mx, mon.my);
     return glyph_to_mon(glyph) === PM.GECKO ? 1 : 0;
 }
 /**
@@ -739,16 +727,16 @@ function mon_is_gecko(mon) {   // sounds.c:659
  * @returns {Promise<number>} int
  */
 export async function domonnoise(mtmp) {   // sounds.c:679
-    let verbuf = new Int8Array(256), pline_msg = null, verbl_msg = null, verbl_msg_mcan = null, ptr = null, msound = 0, gnomeplan = 0, isnight = 0, kindred = 0, nightchild = 0, racenoun = null, vampindex = 0, t = null, swval = 0, tribtitle = null, book = null, ms_Death = 0, tmpbuf = new Int8Array(256);
+    let verbuf = new Int8Array(256), swval = 0, tribtitle = null, tmpbuf = new Int8Array(256);
     /* check calls to this */
     /* Monnam(mtmp) will be prepended */
     /* verbalize() */
-    pline_msg = null;
-    verbl_msg = null;
-    verbl_msg_mcan = null;   /* verbalize() if cancelled */
-    ptr = mtmp.data;
-    msound = ptr.msound;
-    gnomeplan = 0;
+    let pline_msg = null;
+    let verbl_msg = null;
+    let verbl_msg_mcan = null;   /* verbalize() if cancelled */
+    const ptr = mtmp.data;
+    let msound = ptr.msound;
+    let gnomeplan = 0;
     /* presumably nearness and sleep checks have already been made */
     if (Deaf()) {
         return ECMD.OK;
@@ -810,10 +798,10 @@ export async function domonnoise(mtmp) {   // sounds.c:679
             {
                 /* vampire messages are varied by tameness, peacefulness, and time of
                    night */
-                isnight = $c.i8(night());
-                kindred = Upolyd() && (u.umonnum === PM.VAMPIRE || u.umonnum === PM.VAMPIRE_LEADER) ? 1 : 0;
-                nightchild = Upolyd() && (u.umonnum === PM.WOLF || u.umonnum === PM.WINTER_WOLF || u.umonnum === PM.WINTER_WOLF_CUB) ? 1 : 0;
-                racenoun = flags.female && gu.urace.individual.f ? gu.urace.individual.f : gu.urace.individual.m ? gu.urace.individual.m : gu.urace.noun;
+                const isnight = $c.i8(night());
+                const kindred = Upolyd() && (u.umonnum === PM.VAMPIRE || u.umonnum === PM.VAMPIRE_LEADER) ? 1 : 0;
+                const nightchild = Upolyd() && (u.umonnum === PM.WOLF || u.umonnum === PM.WINTER_WOLF || u.umonnum === PM.WINTER_WOLF_CUB) ? 1 : 0;
+                const racenoun = flags.female && gu.urace.individual.f ? gu.urace.individual.f : gu.urace.individual.m ? gu.urace.individual.m : gu.urace.noun;
                 if (mtmp.mtame) {
                     if (kindred) {
                         $c.sprintf(new $c.Ptr(verbuf, 0), $c.lit("Good %s to you Master%s"), isnight ? $c.lit("evening") : $c.lit("day"), isnight ? $c.lit("!") : $c.lit(".  Why do we not rest?"));
@@ -841,7 +829,7 @@ export async function domonnoise(mtmp) {   // sounds.c:679
                         $c.sprintf(new $c.Ptr(verbuf, 0), $c.lit("%s!  Your silver sheen does not frighten me!"), gy.youmonst.data === mons[PM.SILVER_DRAGON] ? $c.lit("Fool") : $c.lit("Young Fool"));
                         verbl_msg = new $c.Ptr(verbuf, 0);
                     } else {
-                        vampindex = rn2(2);
+                        const vampindex = rn2(2);
                         if (vampindex === 0) {
                             $c.sprintf(new $c.Ptr(verbuf, 0), domonnoise$vampmsg[vampindex], await body_part(BLOOD));
                             verbl_msg = new $c.Ptr(verbuf, 0);
@@ -1040,7 +1028,7 @@ export async function domonnoise(mtmp) {   // sounds.c:679
             } else if (!mtmp.mcansee) {
                 verbl_msg = $c.lit("I can't see!");
             } else if (mtmp.mtrapped) {
-                t = t_at(mtmp.mx, mtmp.my);
+                const t = t_at(mtmp.mx, mtmp.my);
                 if (t) {
                     t.tseen = 1;
                 }
@@ -1169,8 +1157,8 @@ export async function domonnoise(mtmp) {   // sounds.c:679
             }
         case MS.RIDER:
             {
-                book = null;
-                ms_Death = ptr === mons[PM.DEATH] ? 1 : 0;
+                let book = null;
+                const ms_Death = ptr === mons[PM.DEATH] ? 1 : 0;
                 /* 3.6 tribute */
                 if (ms_Death && !svc.context.tribute.Deathnotice && (book = u_have_novel()) !== null) {
                     if ((tribtitle = noveltitle(new $c.FieldRef(book, "corpsenm", "i32"))) !== null) {
@@ -1215,15 +1203,14 @@ export async function domonnoise(mtmp) {   // sounds.c:679
  * @returns {Promise<number>} int
  */
 export async function dotalk() {   // sounds.c:1248
-    let result = 0;
-    result = await dochat();
+    const result = await dochat();
     return result;
 }
 /**
  * @returns {Promise<number>} int
  */
 async function dochat() {   // sounds.c:1257
-    let mtmp = null, tx = 0, ty = 0, otmp = null, idx = 0, xresponse = null;
+    let otmp = null;
     if (is_silent(gy.youmonst.data)) {
         await pline($c.lit("As %s, you cannot speak."), await an(pmname(gy.youmonst.data, flags.female ? FEMALE : MALE)));
         return ECMD.OK;
@@ -1281,12 +1268,12 @@ async function dochat() {   // sounds.c:1257
         await pline($c.lit("Talking to yourself is a bad habit for a dungeoneer."));
         return ECMD.OK;
     }
-    tx = u.ux + u.dx | 0;
-    ty = u.uy + u.dy | 0;
+    const tx = u.ux + u.dx | 0;
+    const ty = u.uy + u.dy | 0;
     if (!isok($c.i16(tx), $c.i16(ty))) {
         return ECMD.OK;
     }
-    mtmp = svl.level.monsters[tx][ty];
+    const mtmp = svl.level.monsters[tx][ty];
     if (!mtmp || mtmp.mundetected) {
         if ((otmp = svl.level.objects[tx][ty]) !== null && otmp.otyp === STATUE) {
             /* Talking to a statue */
@@ -1306,7 +1293,7 @@ async function dochat() {   // sounds.c:1257
             } else if (!Hallucination()) {
                 await pline($c.lit("It's like talking to a wall."));
             } else {
-                idx = rn2(10);
+                let idx = rn2(10);
                 if (idx >= 8) {
                     idx = 7;
                 }
@@ -1337,7 +1324,7 @@ async function dochat() {   // sounds.c:1257
         return ECMD.OK;
     }
     if (Deaf()) {
-        xresponse = humanoid(gy.youmonst.data) ? $c.lit("falls on deaf ears") : $c.lit("is inaudible");
+        const xresponse = humanoid(gy.youmonst.data) ? $c.lit("falls on deaf ears") : $c.lit("is inaudible");
         await pline($c.lit("Any response%s%s %s."), canspotmon(mtmp) ? $c.lit(" from ") : $c.lit(""), canspotmon(mtmp) ? await mon_nam(mtmp) : $c.lit(""), xresponse);
         return ECMD.OK;
     }
@@ -1350,8 +1337,7 @@ async function dochat() {   // sounds.c:1257
  * @returns {$T.monst | null} struct monst *
  */
 function responsive_mon_at(x, y) {   // sounds.c:1413
-    let mtmp = null;
-    mtmp = isok($c.i16(x), $c.i16(y)) ? svl.level.monsters[x][y] : null;
+    let mtmp = isok($c.i16(x), $c.i16(y)) ? svl.level.monsters[x][y] : null;
     /* immobilized monst */
     /* blind monst */
     /* unseen hero */
@@ -1480,8 +1466,7 @@ export async function tiphat() {   // sounds.c:1427
  * @returns {Promise<void>}
  */
 export async function activate_chosen_soundlib() {   // sounds.c:1779
-    let idx = 0;
-    idx = gc.chosen_soundlib | 0;
+    const idx = gc.chosen_soundlib | 0;
     if (!(idx >= 0 && idx < 1)) {
         await panic($c.lit("activate_chosen_soundlib: invalid soundlib (%d)"), idx);
     }
@@ -1522,12 +1507,12 @@ export async function assign_soundlib(idx) {   // sounds.c:1798
  * @returns {Promise<void>}
  */
 export async function get_soundlib_name(dest, maxlen) {   // sounds.c:1864
-    let count = 0, idx = 0, src = null, $t1, $t2, $t3, $t4;
-    idx = ga.active_soundlib | 0;
+    let count = 0, $t1, $t2, $t3, $t4;
+    const idx = ga.active_soundlib | 0;
     if (!(idx >= 0 && idx < 1)) {
         await panic($c.lit("get_soundlib_name: invalid active_soundlib (%d)"), idx);
     }
-    src = soundlib_choices[idx].sndprocs.soundname;
+    let src = soundlib_choices[idx].sndprocs.soundname;
     for (count = 1; count < maxlen; count = count + 1 | 0) {
         if (src.get(0) === 44 || src.get(0) === 0) {
             break;   /*exit on \0 terminator*/
@@ -1541,9 +1526,9 @@ export async function get_soundlib_name(dest, maxlen) {   // sounds.c:1864
  * @returns {number} enum soundlib_ids
  */
 export function soundlib_id_from_opt(op) {   // sounds.c:1883
-    let idx = 0, defproc = null, sp = null;
-    defproc = nosound_procs;
-    sp = null;
+    let idx = 0;
+    const defproc = nosound_procs;
+    let sp = null;
     for (idx = 0; idx < 1; idx = idx + 1 | 0) {
         sp = soundlib_choices[idx].sndprocs;
         if (!$c.strcmp(sp.soundname, op)) {
@@ -1580,12 +1565,11 @@ export function soundlib_id_from_opt(op) {   // sounds.c:1883
  * @returns {$c.Ptr | null} char *
  */
 export function base_soundname_to_filename(basename, buf, bufsz, approach) {   // sounds.c:2084
-    let consumes = 0, baselen = 0, existinglen = 0, cp = null, needslash = 0;
-    consumes = 0;
-    baselen = 0;
-    existinglen = 0;
-    cp = buf;
-    needslash = TRUE;
+    let consumes = 0;
+    let baselen = 0;
+    let existinglen = 0;
+    let cp = buf;
+    let needslash = TRUE;
     if (!buf) {
         return null;
     }

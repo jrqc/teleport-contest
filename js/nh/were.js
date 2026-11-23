@@ -127,14 +127,13 @@ export function were_beastie(pm) {   // were.c:70
  * @returns {Promise<void>}
  */
 export async function new_were(mon) {   // were.c:96
-    let pm = 0;
     /* neither hero nor werecreature can change from human form to
        critter form if hero has Protection_from_shape_changers extrinsic;
        if already in critter form, always change to human form for that */
     if (Protection_from_shape_changers() && is_human(mon.data)) {
         return;
     }
-    pm = counter_were(mon.data.pmidx);
+    const pm = counter_were(mon.data.pmidx);
     if (pm < LOW_PM) {
         await impossible($c.lit("unknown lycanthrope %s."), mon.data.pmnames[NEUTRAL]);
         return;
@@ -170,10 +169,10 @@ export async function new_were(mon) {   // were.c:96
  * @returns {Promise<number>} int
  */
 export async function were_summon(ptr, yours, visible, genbuf) {   // were.c:142
-    let i = 0, typ = 0, pm = 0, mtmp = null, total = 0;
+    let i = 0, typ = 0;
     /* number of visible helpers created */
-    pm = ptr.pmidx;
-    total = 0;
+    const pm = ptr.pmidx;
+    let total = 0;
     visible.set(0, 0);
     if (Protection_from_shape_changers() && !yours) {
         return 0;
@@ -204,7 +203,7 @@ export async function were_summon(ptr, yours, visible, genbuf) {   // were.c:142
             default:
                 continue L1;
         }
-        mtmp = await makemon($c.relem(mons, typ), u.ux, u.uy, NO.MM_FLAGS);
+        const mtmp = await makemon($c.relem(mons, typ), u.ux, u.uy, NO.MM_FLAGS);
         if (mtmp) {
             total = total + 1 | 0;
             if (canseemon(mtmp)) {
@@ -221,8 +220,8 @@ export async function were_summon(ptr, yours, visible, genbuf) {   // were.c:142
  * @returns {Promise<void>}
  */
 export async function you_were() {   // were.c:192
-    let qbuf = new Int8Array(128), controllable_poly = 0;
-    controllable_poly = Polymorph_control() && !(u.uprops[STUNNED].intrinsic || Unaware()) ? 1 : 0;
+    let qbuf = new Int8Array(128);
+    const controllable_poly = Polymorph_control() && !(u.uprops[STUNNED].intrinsic || Unaware()) ? 1 : 0;
     if (Unchanging() || u.umonnum === u.ulycn) {
         return;
     }
@@ -243,8 +242,8 @@ export async function you_were() {   // were.c:192
  * @returns {Promise<void>}
  */
 export async function you_unwere(purify) {   // were.c:213
-    let controllable_poly = 0, $t1;
-    controllable_poly = Polymorph_control() && !(u.uprops[STUNNED].intrinsic || Unaware()) ? 1 : 0;
+    let $t1;
+    const controllable_poly = Polymorph_control() && !(u.uprops[STUNNED].intrinsic || Unaware()) ? 1 : 0;
     if (purify) {
         await You_feel($c.lit("purified."));
         await set_ulycn(NON_PM);   /* cure lycanthropy */

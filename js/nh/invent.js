@@ -296,14 +296,14 @@ function inuse_classify(sort_item, obj) {   // invent.c:70
  * @returns {Promise<void>}
  */
 export async function loot_classify(sort_item, obj) {   // invent.c:149
-    let classorder = null, p = null, k = 0, otyp = 0, oclass = 0, seen = 0, discovered = 0;
+    let classorder = null, k = 0, seen = 0;
     /* we may eventually make this a settable option to always use
        with sortloot instead of only when the 'sortpack' option isn't
        set; it is similar to sortpack's inv_order but items most
        likely to be picked up are moved to the front */
-    otyp = obj.otyp;
-    oclass = obj.oclass;
-    discovered = objects[otyp].oc_name_known ? TRUE : FALSE;
+    const otyp = obj.otyp;
+    const oclass = obj.oclass;
+    const discovered = objects[otyp].oc_name_known ? TRUE : FALSE;
     /*
      * For the value types assigned by this classification, sortloot()
      * will put lower valued ones before higher valued ones.
@@ -313,7 +313,7 @@ export async function loot_classify(sort_item, obj) {   // invent.c:149
     }
     /* class order */
     seen = obj.dknown ? TRUE : FALSE, classorder = flags.sortpack ? new $c.Ptr(flags.inv_order, 0) : new $c.Ptr(loot_classify$def_srt_order, 0);
-    p = $c.strchr(classorder, oclass);
+    const p = $c.strchr(classorder, oclass);
     if (p) {
         k = 1 + $c.i32($c.pdiff(p, classorder)) | 0;
     } else {
@@ -450,7 +450,7 @@ export async function loot_classify(sort_item, obj) {   // invent.c:149
  * @returns {Promise<$c.Ptr | null>} char *
  */
 async function loot_xname(obj) {   // invent.c:309
-    let saveo = new $T.obj(), save_debug = 0, res = null, save_oname = null;
+    let saveo = new $T.obj();
     /*
      * Deal with things that xname() includes as a prefix.  We don't
      * want such because they change alphabetical ordering.  First,
@@ -460,8 +460,8 @@ async function loot_xname(obj) {   // invent.c:309
     saveo.blessed = (obj.blessed) & 1, saveo.cursed = (obj.cursed) & 1;
     saveo.spe = obj.spe;
     saveo.owt = obj.owt;
-    save_oname = has_oname(obj) ? obj.oextra.oname : null;
-    save_debug = flags.debug;
+    const save_oname = has_oname(obj) ? obj.oextra.oname : null;
+    const save_debug = flags.debug;
     /* suppress "diluted" for potions and "holy/unholy" for water;
        sortloot() will deal with them using other criteria than name */
     if (obj.oclass === POTION_CLASS) {
@@ -492,7 +492,7 @@ async function loot_xname(obj) {   // invent.c:309
         program_state.something_worth_saving = 0;
         flags.debug = FALSE;
     }
-    res = await cxname_singular(obj);
+    const res = await cxname_singular(obj);
     if (save_debug) {
         flags.debug = TRUE;
         program_state.something_worth_saving = 1;
@@ -735,7 +735,7 @@ async function sortloot_cmp(vptr1, vptr2) {   // invent.c:403
  * @returns {Promise<$T.sortloot_item | null>} Loot *
  */
 export async function sortloot(olist, mode, by_nexthere, filterfunc) {   // invent.c:593
-    let sliarray = null, o = null, n = 0, i = 0, augment_filter = 0;
+    let sliarray = null, o = null, n = 0, i = 0;
     /* old version might have changed *olist, we don't */
     /* flags for sortloot_cmp() */
     /* T: traverse via obj->nexthere, F: via obj->nobj */
@@ -746,7 +746,7 @@ export async function sortloot(olist, mode, by_nexthere, filterfunc) {   // inve
     /* note: if there is a filter function, this might overallocate */
     sliarray = $c.asRec(await alloc($c.u32($c.mulu64(n + 1 >>> 0, 24))), $T.sortloot_item, 24);
     /* the 'keep cockatrice corpses' flag is overloaded with sort mode */
-    augment_filter = (mode & SORTLOOT.PETRIFY) >>> 0 ? TRUE : FALSE;
+    const augment_filter = (mode & SORTLOOT.PETRIFY) >>> 0 ? TRUE : FALSE;
     mode = (mode & 4294967263) >>> 0;   /* remove flag, leaving mode */
     /* populate aliarray[0..n-1] */
     for (i = 0, o = olist.get(0); o; o = by_nexthere ? o.v.v_nexthere : o.nobj) {
@@ -837,7 +837,7 @@ export function assigninvlet(otmp) {   // invent.c:694
 /* note: assumes ASCII; toggling a bit puts lowercase in front of uppercase */
 /* sort the inventory; used by addinv() and doorganize() */
 function reorder_invent() {   // invent.c:739
-    let otmp = null, prev = null, next = null, need_more_sorting = 0;
+    let otmp = null, prev = null, need_more_sorting = 0;
     do {
         /*
          * We expect at most one item to be out of order, so this
@@ -845,7 +845,7 @@ function reorder_invent() {   // invent.c:739
          */
         need_more_sorting = FALSE;
         for (otmp = gi.invent, prev = null; otmp; ) {
-            next = otmp.nobj;
+            const next = otmp.nobj;
             if (next && inv_rank(next) < inv_rank(otmp)) {
                 need_more_sorting = TRUE;
                 if (prev) {
@@ -872,7 +872,7 @@ function reorder_invent() {   // invent.c:739
  * @returns {Promise<$T.obj | null>} struct obj *
  */
 export async function merge_choice(objlist, obj) {   // invent.c:775
-    let shkp = null, save_nocharge = 0;
+    let shkp = null;
     if (!objlist) {   /* might be checking 'obj' against empty inventory */
         return null;
     }
@@ -882,7 +882,7 @@ export async function merge_choice(objlist, obj) {   // invent.c:775
     /* if this is an item on the shop floor, the attributes it will
        have when carried are different from what they are now; prevent
        that from eliciting an incorrect result from mergable() */
-    save_nocharge = obj.no_charge;
+    const save_nocharge = obj.no_charge;
     if ($c.peq(objlist, gi.invent) && obj.where === OBJ.FLOOR && (shkp = await shop_keeper(inside_shop(obj.ox, obj.oy))) !== null) {
         if (obj.no_charge) {
             obj.no_charge = 0;
@@ -914,10 +914,10 @@ export async function merge_choice(objlist, obj) {   // invent.c:775
  * @returns {Promise<number>} int
  */
 export async function merged(potmp, pobj) {   // invent.c:814
-    let otmp = null, obj = null, discovered = 0, wmask = 0, $t1, $t2, $t3;
-    otmp = potmp.get(0);
-    obj = pobj.get(0);
-    discovered = FALSE;
+    let $t1, $t2, $t3;
+    let otmp = potmp.get(0);
+    const obj = pobj.get(0);
+    let discovered = FALSE;
     if (await mergable(otmp, obj)) {
         /* Approximate age: we do it this way because if we were to
          * do it "accurately" (merge only when ages are identical)
@@ -981,7 +981,7 @@ export async function merged(potmp, pobj) {   // invent.c:814
         }
         /* fixup for `#adjust' merging wielded darts, daggers, &c */
         if (obj.owornmask && carried(otmp)) {
-            wmask = $c.or64(otmp.owornmask, obj.owornmask);
+            let wmask = $c.or64(otmp.owornmask, obj.owornmask);
             /* Both the items might be worn in competing slots;
                merger preference (regardless of which is which):
              primary weapon + alternate weapon -> primary weapon;
@@ -1270,10 +1270,9 @@ export async function addinv_before(obj, other_obj) {   // invent.c:1160
  * @returns {Promise<$T.obj | null>} struct obj *
  */
 export async function addinv_nomerge(obj) {   // invent.c:1169
-    let result = null, save_nomerge = 0;
-    save_nomerge = obj.nomerge;
+    const save_nomerge = obj.nomerge;
     obj.nomerge = 1;
-    result = await addinv(obj);
+    const result = await addinv(obj);
     obj.nomerge = (save_nomerge) & 1;
     return result;
 }
@@ -1552,7 +1551,6 @@ export async function delobj(obj) {   // invent.c:1430
  * @returns {Promise<void>}
  */
 export async function delobj_core(obj, force) {   // invent.c:1438
-    let update_map = 0;
     /* 'force==TRUE' used when reviving Rider corpses */
     /* obj_resists(obj,0,0) protects the Amulet, the invocation tools,
        and Rider corpses */
@@ -1565,7 +1563,7 @@ export async function delobj_core(obj, force) {   // invent.c:1438
         obj.in_use = 0;   /* in case caller has set this to 1 */
         return;
     }
-    update_map = obj.where === OBJ.FLOOR ? 1 : 0;
+    const update_map = obj.where === OBJ.FLOOR ? 1 : 0;
     await obj_extract_self(obj);
     if (update_map) {
         /* floor object's coordinates are always up to date */
@@ -1598,8 +1596,7 @@ export function sobj_at(otyp, x, y) {   // invent.c:1466
  * @returns {$T.obj | null} struct obj *
  */
 export function nxtobj(obj, type, by_nexthere) {   // invent.c:1479
-    let otmp = null;
-    otmp = obj;   /* start with the object after this one */
+    let otmp = obj;   /* start with the object after this one */
     do {
         otmp = !by_nexthere ? otmp.nobj : otmp.v.v_nexthere;
         if (!otmp) {
@@ -1641,8 +1638,7 @@ export function carrying_stoning_corpse() {   // invent.c:1508
  * @returns {Promise<$c.Ptr | null>} const char *
  */
 export async function currency(amount) {   // invent.c:1546
-    let res = null;
-    res = Hallucination() ? currencies[rn2(21)] : $c.lit("zorkmid");
+    let res = Hallucination() ? currencies[rn2(21)] : $c.lit("zorkmid");
     if (amount !== 1) {
         res = await makeplural(res);
     }
@@ -1652,8 +1648,8 @@ export async function currency(amount) {   // invent.c:1546
  * @returns {$T.obj | null} struct obj *
  */
 export function u_carried_gloves() {   // invent.c:1557
-    let otmp = null, gloves = null;
-    gloves = null;
+    let otmp = null;
+    let gloves = null;
     if ($G.uarmg) {
         gloves = $G.uarmg;
     } else {
@@ -1718,8 +1714,7 @@ export function obj_here(obj, x, y) {   // invent.c:1602
  * @returns {$T.obj | null} struct obj *
  */
 export function g_at(x, y) {   // invent.c:1613
-    let obj = null;
-    obj = svl.level.objects[x][y];
+    let obj = svl.level.objects[x][y];
     while (obj) {
         if (obj.oclass === COIN_CLASS) {
             return obj;
@@ -1733,13 +1728,13 @@ export function g_at(x, y) {   // invent.c:1613
  * @param {$c.Ptr | null} buf char *
  */
 function compactify(buf) {   // invent.c:1627
-    let i1 = 0, i2 = 0, ilet = 0, ilet1 = 0, ilet2 = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7;
-    i1 = 1;
-    i2 = 1;
-    ilet2 = buf.get(0);
-    ilet1 = buf.get(1);
+    let $t1, $t2, $t3, $t4, $t5, $t6, $t7;
+    let i1 = 1;
+    let i2 = 1;
+    let ilet2 = buf.get(0);
+    let ilet1 = buf.get(1);
     $t1 = buf.get(i1 = i1 + 1 | 0), $t2 = buf.add(i2 = i2 + 1 | 0), $t2.set(0, $t1);
-    ilet = buf.get(i1);
+    let ilet = buf.get(i1);
     while (ilet) {
         if (ilet === ilet1 + 1) {
             if (ilet1 === ilet2 + 1) {
@@ -1786,9 +1781,9 @@ function taking_off(action) {   // invent.c:1672
  * @returns {Promise<void>}
  */
 async function mime_action(word) {   // invent.c:1678
-    let buf = new Int8Array(256), bp = null, pfx = null, sfx = null;
+    let buf = new Int8Array(256), pfx = null, sfx = null;
     $c.strcpy(new $c.Ptr(buf, 0), word);
-    bp = pfx = sfx = null;
+    let bp = pfx = sfx = null;
     if ((bp = $c.strstr(new $c.Ptr(buf, 0), $c.lit(" on the "))) !== null) {
         /* rub on the stone[s] */
         bp.set(0, 0);
@@ -2290,10 +2285,10 @@ async function safeq_shortxprname(obj) {   // invent.c:2188
  * @returns {Promise<number>} int
  */
 export async function ggetobj(word, fn, mx, combo, resultflags) {   // invent.c:2202
-    let ckfn = null, ofilter = null, takeoff = 0, ident = 0, allflag = 0, m_seen = 0, itemcount = Int32Array.of(0), oletct = 0, iletct = 0, unpaid = 0, oc_of_sym = 0, sym = 0, ip = null, olets = new Int8Array(24), ilets = new Int8Array(29), extra_removeables = new Int8Array(4), buf = new Int8Array(256), qbuf = new Int8Array(128), ailets = new Int8Array(60), otmp = null, nextobj = null, cnt = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12;
+    let ident = 0, allflag = 0, m_seen = 0, itemcount = Int32Array.of(0), oletct = 0, sym = 0, olets = new Int8Array(24), ilets = new Int8Array(29), extra_removeables = new Int8Array(4), buf = new Int8Array(256), qbuf = new Int8Array(128), ailets = new Int8Array(60), otmp = null, nextobj = null, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12;
     /* combination menu flag */
-    ckfn = null;
-    ofilter = null;
+    let ckfn = null;
+    let ofilter = null;
     /* uwep,uswapwep,uquiver */
     buf.fill(0);
     buf[0] = 0;
@@ -2307,7 +2302,7 @@ export async function ggetobj(word, fn, mx, combo, resultflags) {   // invent.c:
     if (resultflags) {
         resultflags.set(0, 0);
     }
-    takeoff = ident = allflag = m_seen = FALSE;
+    let takeoff = ident = allflag = m_seen = FALSE;
     add_valid_menu_class(0);   /* reset */
     if (taking_off(word)) {
         takeoff = TRUE;
@@ -2316,8 +2311,8 @@ export async function ggetobj(word, fn, mx, combo, resultflags) {   // invent.c:
         ident = TRUE;
         ofilter = not_fully_identified;
     }
-    iletct = await collect_obj_classes(new $c.Ptr(ilets, 0), gi.invent, FALSE, ofilter, new $c.Ptr(itemcount, 0));
-    unpaid = count_unpaid(gi.invent);
+    let iletct = await collect_obj_classes(new $c.Ptr(ilets, 0), gi.invent, FALSE, ofilter, new $c.Ptr(itemcount, 0));
+    const unpaid = count_unpaid(gi.invent);
     if (ident && !iletct) {
         return -1;   /* no further identifications */
     } else if (gi.invent) {
@@ -2387,13 +2382,13 @@ export async function ggetobj(word, fn, mx, combo, resultflags) {   // invent.c:
             strkitten(new $c.Ptr(extra_removeables, 0), $G.uquiver.oclass);
         }
     }
-    ip = new $c.Ptr(buf, 0);
+    let ip = new $c.Ptr(buf, 0);
     olets[oletct = 0] = 0;
     while ((sym = ($t11 = ip, ip = $t11.add(1), $t11).get(0)) !== 0) {
         if (sym === 32) {
             continue;
         }
-        oc_of_sym = def_char_to_objclass(sym);
+        const oc_of_sym = def_char_to_objclass(sym);
         if (takeoff && oc_of_sym !== MAXOCLASSES) {
             if ($c.strchr(new $c.Ptr(extra_removeables, 0), oc_of_sym)) {
                 /* skip rest of takeoff checks */
@@ -2444,7 +2439,7 @@ export async function ggetobj(word, fn, mx, combo, resultflags) {   // invent.c:
     } else if (flags.menu_style !== MENU.TRADITIONAL && combo && !allflag) {
         return 0;
     } else {
-        cnt = await askchain(new $c.FieldRef(gi, "invent", "ptr"), new $c.Ptr(olets, 0), allflag, fn, ckfn, mx, word);
+        const cnt = await askchain(new $c.FieldRef(gi, "invent", "ptr"), new $c.Ptr(olets, 0), allflag, fn, ckfn, mx, word);
         /*
          * askchain() has already finished the job in this case
          * so set a special flag to convey that back to the caller
@@ -2650,9 +2645,9 @@ export async function askchain(objchn, olets, allflag, fn, ckfn, mx, word) {   /
  * @returns {Promise<number>} boolean
  */
 export async function reroll_menu() {   // invent.c:2552
-    let win = 0, any = new $T.any(), pick_list = [null], otmp = null, tmpglyph = 0, tmpglyphinfo = new $T.glyphinfo(), option = 0, buf = new Int8Array(256), $t1;
+    let any = new $T.any(), pick_list = [null], otmp = null, tmpglyphinfo = new $T.glyphinfo(), option = 0, buf = new Int8Array(256), $t1;
     pick_list[0] = null;
-    win = await create_nhwindow()(NHW.MENU);
+    const win = await create_nhwindow()(NHW.MENU);
     await start_menu()(win, MENU.BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     any.a_char = 110;
@@ -2664,7 +2659,7 @@ export async function reroll_menu() {   // invent.c:2552
     gd.distantname = gd.distantname + 1 | 0;   /* avoid adding items to discoveries */
     iflags.override_ID = iflags.override_ID + 1 | 0;   /* identify them */
     for (otmp = gi.invent; otmp; otmp = otmp.nobj) {
-        tmpglyph = otmp.otyp === STATUE ? u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) + (!rn2_on_display_rng(2) ? GLYPH.MON_MALE_OFF : GLYPH.MON_FEM_OFF) | 0 : otmp.corpsenm + ((otmp.spe & CORPSTAT.GENDER) === CORPSTAT.FEMALE ? otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.STATUE_FEM_PILETOP_OFF : GLYPH.STATUE_FEM_OFF : otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.STATUE_MALE_PILETOP_OFF : GLYPH.STATUE_MALE_OFF) | 0 : u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? ($t1 = await rn2_on_display_rng(NUM_OBJECTS - FIRST_OBJECT) + FIRST_OBJECT | 0, go.otg_temp = $t1) === CORPSE ? await rn2_on_display_rng(NUMMONS) + GLYPH.BODY_OFF | 0 : go.otg_temp + GLYPH.OBJ_OFF | 0 : otmp.otyp === CORPSE ? otmp.corpsenm + (otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.BODY_PILETOP_OFF : GLYPH.BODY_OFF) | 0 : !otmp.dknown && (otmp.oclass === POTION_CLASS || otmp.otyp >= FIRST_REAL_GEM && otmp.otyp <= LAST_GLASS_GEM || otmp.otyp >= FIRST_SPELL && otmp.otyp <= LAST_SPELL) ? otmp.oclass + (otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.OBJ_PILETOP_OFF : GLYPH.OBJ_OFF) : otmp.otyp + (otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.OBJ_PILETOP_OFF : GLYPH.OBJ_OFF);
+        const tmpglyph = otmp.otyp === STATUE ? u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) + (!rn2_on_display_rng(2) ? GLYPH.MON_MALE_OFF : GLYPH.MON_FEM_OFF) | 0 : otmp.corpsenm + ((otmp.spe & CORPSTAT.GENDER) === CORPSTAT.FEMALE ? otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.STATUE_FEM_PILETOP_OFF : GLYPH.STATUE_FEM_OFF : otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.STATUE_MALE_PILETOP_OFF : GLYPH.STATUE_MALE_OFF) | 0 : u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? ($t1 = await rn2_on_display_rng(NUM_OBJECTS - FIRST_OBJECT) + FIRST_OBJECT | 0, go.otg_temp = $t1) === CORPSE ? await rn2_on_display_rng(NUMMONS) + GLYPH.BODY_OFF | 0 : go.otg_temp + GLYPH.OBJ_OFF | 0 : otmp.otyp === CORPSE ? otmp.corpsenm + (otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.BODY_PILETOP_OFF : GLYPH.BODY_OFF) | 0 : !otmp.dknown && (otmp.oclass === POTION_CLASS || otmp.otyp >= FIRST_REAL_GEM && otmp.otyp <= LAST_GLASS_GEM || otmp.otyp >= FIRST_SPELL && otmp.otyp <= LAST_SPELL) ? otmp.oclass + (otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.OBJ_PILETOP_OFF : GLYPH.OBJ_OFF) : otmp.otyp + (otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.OBJ_PILETOP_OFF : GLYPH.OBJ_OFF);
         map_glyphinfo(0, 0, tmpglyph, 0, tmpglyphinfo);
         await add_menu(win, tmpglyphinfo, any, 0, 0, ATR.NONE, NO_COLOR, await doname(otmp), MENU.ITEMFLAGS_NONE);
     }
@@ -2742,13 +2737,13 @@ export async function identify(otmp) {   // invent.c:2651
  * @returns {Promise<void>}
  */
 async function menu_identify(id_limit) {   // invent.c:2660
-    let pick_list = [null], n = 0, i = 0, first = 0, tryct = 0, buf = new Int8Array(256);
-    first = 1;
-    tryct = 5;
+    let pick_list = [null], i = 0, buf = new Int8Array(256);
+    let first = 1;
+    let tryct = 5;
     /* assumptions:  id_limit > 0 and at least one unID'd item is present */
     while (id_limit) {
         $c.sprintf(new $c.Ptr(buf, 0), $c.lit("What would you like to identify %s?"), first ? $c.lit("first") : $c.lit("next"));
-        n = await query_objlist(new $c.Ptr(buf, 0), new $c.FieldRef(gi, "invent", "ptr"), SIGNAL.NOMENU | SIGNAL.ESCAPE | USE_INVLET | INVORDER_SORT, new $c.Ptr(pick_list, 0), PICK.ANY, not_fully_identified);
+        let n = await query_objlist(new $c.Ptr(buf, 0), new $c.FieldRef(gi, "invent", "ptr"), SIGNAL.NOMENU | SIGNAL.ESCAPE | USE_INVLET | INVORDER_SORT, new $c.Ptr(pick_list, 0), PICK.ANY, not_fully_identified);
         if (n > 0) {
             if (n > id_limit) {
                 n = id_limit;
@@ -2784,8 +2779,8 @@ async function menu_identify(id_limit) {   // invent.c:2660
  * @returns {number} int
  */
 export function count_unidentified(objchn) {   // invent.c:2698
-    let unid_cnt = 0, obj = null;
-    unid_cnt = 0;
+    let obj = null;
+    let unid_cnt = 0;
     for (obj = objchn; obj; obj = obj.nobj) {
         if (not_fully_identified(obj)) {
             unid_cnt = unid_cnt + 1 | 0;
@@ -2800,9 +2795,9 @@ export function count_unidentified(objchn) {   // invent.c:2698
  * @returns {Promise<void>}
  */
 export async function identify_pack(id_limit, learning_id) {   // invent.c:2711
-    let obj = null, n = 0, unid_cnt = 0;
+    let obj = null;
     /* T: just read unknown identify scroll */
-    unid_cnt = count_unidentified(gi.invent);
+    let unid_cnt = count_unidentified(gi.invent);
     if (!unid_cnt) {
         await You($c.lit("have already identified %s of your possessions."), !learning_id ? $c.lit("all") : $c.lit("the rest"));
     } else if (!id_limit || id_limit >= unid_cnt) {
@@ -2818,7 +2813,7 @@ export async function identify_pack(id_limit, learning_id) {   // invent.c:2711
         }
     } else {
         /* identify up to `id_limit' items */
-        n = 0;
+        let n = 0;
         if (flags.menu_style === MENU.TRADITIONAL) {
             do {
                 n = await ggetobj($c.lit("identify"), identify, id_limit, FALSE, null);
@@ -2839,8 +2834,8 @@ export async function identify_pack(id_limit, learning_id) {   // invent.c:2711
  * @returns {Promise<void>}
  */
 export async function learn_unseen_invent() {   // invent.c:2750
-    let otmp = null, invupdated = 0;
-    invupdated = FALSE;
+    let otmp = null;
+    let invupdated = FALSE;
     if (Blind()) {
         return;   /* sanity check */
     }
@@ -2870,7 +2865,6 @@ export async function learn_unseen_invent() {   // invent.c:2750
  * @returns {Promise<void>}
  */
 export async function update_inventory() {   // invent.c:2782
-    let save_suppress_price = 0;
     if (!program_state.in_moveloop) {   /* not covered by suppress_map_output */
         return;
     }
@@ -2892,7 +2886,7 @@ export async function update_inventory() {   // invent.c:2782
      * attempt in the shop code handled it for unpaid items but not for
      * paying for used-up shop items; that follows a different code path.)
      */
-    save_suppress_price = iflags.suppress_price;
+    const save_suppress_price = iflags.suppress_price;
     iflags.suppress_price = 0;
     await windowprocs.win_update_inventory(0);
     iflags.suppress_price = save_suppress_price;
@@ -2956,8 +2950,8 @@ function obj_to_let(obj) {   // invent.c:2861
  * @returns {Promise<void>}
  */
 export async function prinv(prefix, obj, quan) {   // invent.c:2875
-    let total_of = 0, totalbuf = new Int8Array(128);
-    total_of = quan && quan < obj.quan ? 1 : 0;
+    let totalbuf = new Int8Array(128);
+    const total_of = quan && quan < obj.quan ? 1 : 0;
     if (!prefix) {
         prefix = $c.lit("");
     }
@@ -2977,7 +2971,7 @@ export async function prinv(prefix, obj, quan) {   // invent.c:2875
  * @returns {Promise<$c.Ptr | null>} char *
  */
 export async function xprname(obj, txt, let_, dot, cost, quan) {   // invent.c:2895
-    let suffix = new Int8Array(80), sfxlen = 0, txtlen = 0, fmt = null, use_invlet = 0, savequan = 0;
+    let suffix = new Int8Array(80);
     /* text to print instead of obj */
     /* inventory letter */
     /* append period; (dot && cost => Iu) */
@@ -2985,8 +2979,8 @@ export async function xprname(obj, txt, let_, dot, cost, quan) {   // invent.c:2
     /* if non-0, print this quantity, not obj->quan */
     /* plenty of room for count and hallucinatory currency */
     /* signed int for %*s formatting */
-    use_invlet = flags.invlet_constant && !$c.peq(obj, $c.asRec(null, $T.obj, 112)) && let_ !== 62 && let_ !== 45 ? 1 : 0;
-    savequan = 0;
+    const use_invlet = flags.invlet_constant && !$c.peq(obj, $c.asRec(null, $T.obj, 112)) && let_ !== 62 && let_ !== 45 ? 1 : 0;
+    let savequan = 0;
     if (quan && obj) {
         savequan = obj.quan;
         obj.quan = quan;
@@ -2997,12 +2991,12 @@ export async function xprname(obj, txt, let_, dot, cost, quan) {   // invent.c:2
      *  *  Then obj == null and we are printing a total amount.
      *  >  Then the object is contained and doesn't have an inventory letter.
      */
-    fmt = $c.lit("%c - %.*s%s");
+    let fmt = $c.lit("%c - %.*s%s");
     if (!txt) {
         (!!$c.peq(obj, $c.asRec(null, $T.obj, 112)) ? 1 : 0) ? $c.__assert_rtn($c.lit("xprname"), $c.lit("invent.c"), 2923, $c.lit("obj != NULL")) : 0;
         txt = await doname(obj);
     }
-    txtlen = $c.i32($c.strlen(txt));
+    let txtlen = $c.i32($c.strlen(txt));
     if (cost !== 0 || let_ === 42) {
         /* if dot is true, we're doing Iu, otherwise Ix */
         if (dot && use_invlet) {
@@ -3022,7 +3016,7 @@ export async function xprname(obj, txt, let_, dot, cost, quan) {   // invent.c:2
         }
         $c.strcpy(new $c.Ptr(suffix, 0), dot ? $c.lit(".") : $c.lit(""));
     }
-    sfxlen = $c.i32($c.strlen(new $c.Ptr(suffix, 0)));
+    const sfxlen = $c.i32($c.strlen(new $c.Ptr(suffix, 0)));
     if (txtlen > (BUFSZ - 1 - (4 + sfxlen | 0) | 0)) {   /* 4: "c - " prefix */
         txtlen = BUFSZ - 1 - (4 + sfxlen | 0) | 0;
     }
@@ -3043,15 +3037,15 @@ export async function xprname(obj, txt, let_, dot, cost, quan) {   // invent.c:2
  * @returns {Promise<number>} int
  */
 async function dispinv_with_action(lets, use_inuse_ordering, alt_label) {   // invent.c:2964
-    let otmp = null, nextobj = null, save_accessories = null, c = 0, save_sortloot = 0, len = 0, menumode = 0, save_force_invmenu = 0;
+    let otmp = null, nextobj = null;
     /* list of invlet values to include */
     /* affects sortloot() and header labels */
     /* alternate value for in-use "Accessories" */
-    save_accessories = null;
-    save_sortloot = 0;
-    len = lets ? $c.u32($c.strlen(lets)) : 0;
-    menumode = len !== 1 || iflags.menu_requested ? TRUE : FALSE;
-    save_force_invmenu = iflags.force_invmenu;
+    let save_accessories = null;
+    let save_sortloot = 0;
+    const len = lets ? $c.u32($c.strlen(lets)) : 0;
+    const menumode = len !== 1 || iflags.menu_requested ? TRUE : FALSE;
+    const save_force_invmenu = iflags.force_invmenu;
     if (use_inuse_ordering) {
         save_accessories = inuse_headers[4];
         save_sortloot = flags.sortloot;
@@ -3061,7 +3055,7 @@ async function dispinv_with_action(lets, use_inuse_ordering, alt_label) {   // i
         }
     }
     iflags.force_invmenu = FALSE;
-    c = await display_inventory(lets, menumode);
+    const c = await display_inventory(lets, menumode);
     if (use_inuse_ordering) {
         flags.sortloot = save_sortloot;
         inuse_headers[4] = save_accessories;
@@ -3471,8 +3465,8 @@ async function display_pickinv(lets, xtra_choice, query, allowxtra, want_reply, 
  * @returns {Promise<number>} char
  */
 export async function display_inventory(lets, want_reply) {   // invent.c:3428
-    let cmdq = null, otmp = null;
-    cmdq = cmdq_pop();
+    let otmp = null;
+    const cmdq = cmdq_pop();
     if (cmdq) {
         if (cmdq.typ === CMDQ.KEY) {
             for (otmp = gi.invent; otmp; otmp = otmp.nobj) {
@@ -3504,20 +3498,20 @@ export async function repopulate_perminvent() {   // invent.c:3456
  * @returns {Promise<number>} char
  */
 async function display_used_invlets(avoidlet) {   // invent.c:3467
-    let otmp = null, ilet = 0, ret = 0, invlet = null, n = 0, classcount = 0, invdone = 0, tmpglyph = 0, tmpglyphinfo = new $T.glyphinfo(), win = 0, any = new $T.any(), selected = [null], clr = 0, $t1;
-    ret = 0;
-    invlet = new $c.Ptr(flags.inv_order, 0);
-    invdone = 0;
+    let otmp = null, tmpglyphinfo = new $T.glyphinfo(), any = new $T.any(), selected = [null], $t1;
+    let ret = 0;
+    let invlet = new $c.Ptr(flags.inv_order, 0);
+    let invdone = 0;
     tmpglyphinfo.$copyFrom(nul_glyphinfo);
-    clr = NO_COLOR;
+    const clr = NO_COLOR;
     if (gi.invent) {
-        win = await create_nhwindow()(NHW.MENU);
+        const win = await create_nhwindow()(NHW.MENU);
         await start_menu()(win, MENU.BEHAVE_STANDARD);
         while (!invdone) {
             any.$copyFrom(cg.zeroany);   /* set all bits to zero */
-            classcount = 0;
+            let classcount = 0;
             for (otmp = gi.invent; otmp; otmp = otmp.nobj) {
-                ilet = otmp.invlet;
+                const ilet = otmp.invlet;
                 if (ilet === avoidlet) {
                     continue;
                 }
@@ -3528,7 +3522,7 @@ async function display_used_invlets(avoidlet) {   // invent.c:3467
                         classcount = classcount + 1 | 0;
                     }
                     any.a_char = ilet;
-                    tmpglyph = otmp.otyp === STATUE ? u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) + (!rn2_on_display_rng(2) ? GLYPH.MON_MALE_OFF : GLYPH.MON_FEM_OFF) | 0 : otmp.corpsenm + ((otmp.spe & CORPSTAT.GENDER) === CORPSTAT.FEMALE ? otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.STATUE_FEM_PILETOP_OFF : GLYPH.STATUE_FEM_OFF : otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.STATUE_MALE_PILETOP_OFF : GLYPH.STATUE_MALE_OFF) | 0 : u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? ($t1 = await rn2_on_display_rng(NUM_OBJECTS - FIRST_OBJECT) + FIRST_OBJECT | 0, go.otg_temp = $t1) === CORPSE ? await rn2_on_display_rng(NUMMONS) + GLYPH.BODY_OFF | 0 : go.otg_temp + GLYPH.OBJ_OFF | 0 : otmp.otyp === CORPSE ? otmp.corpsenm + (otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.BODY_PILETOP_OFF : GLYPH.BODY_OFF) | 0 : !otmp.dknown && (otmp.oclass === POTION_CLASS || otmp.otyp >= FIRST_REAL_GEM && otmp.otyp <= LAST_GLASS_GEM || otmp.otyp >= FIRST_SPELL && otmp.otyp <= LAST_SPELL) ? otmp.oclass + (otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.OBJ_PILETOP_OFF : GLYPH.OBJ_OFF) : otmp.otyp + (otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.OBJ_PILETOP_OFF : GLYPH.OBJ_OFF);
+                    const tmpglyph = otmp.otyp === STATUE ? u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) + (!rn2_on_display_rng(2) ? GLYPH.MON_MALE_OFF : GLYPH.MON_FEM_OFF) | 0 : otmp.corpsenm + ((otmp.spe & CORPSTAT.GENDER) === CORPSTAT.FEMALE ? otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.STATUE_FEM_PILETOP_OFF : GLYPH.STATUE_FEM_OFF : otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.STATUE_MALE_PILETOP_OFF : GLYPH.STATUE_MALE_OFF) | 0 : u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? ($t1 = await rn2_on_display_rng(NUM_OBJECTS - FIRST_OBJECT) + FIRST_OBJECT | 0, go.otg_temp = $t1) === CORPSE ? await rn2_on_display_rng(NUMMONS) + GLYPH.BODY_OFF | 0 : go.otg_temp + GLYPH.OBJ_OFF | 0 : otmp.otyp === CORPSE ? otmp.corpsenm + (otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.BODY_PILETOP_OFF : GLYPH.BODY_OFF) | 0 : !otmp.dknown && (otmp.oclass === POTION_CLASS || otmp.otyp >= FIRST_REAL_GEM && otmp.otyp <= LAST_GLASS_GEM || otmp.otyp >= FIRST_SPELL && otmp.otyp <= LAST_SPELL) ? otmp.oclass + (otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.OBJ_PILETOP_OFF : GLYPH.OBJ_OFF) : otmp.otyp + (otmp.where === OBJ.FLOOR && (go.otg_otmp = svl.level.objects[otmp.ox][otmp.oy].v.v_nexthere) !== null && (otmp.otyp !== BOULDER || go.otg_otmp.otyp === BOULDER) ? GLYPH.OBJ_PILETOP_OFF : GLYPH.OBJ_OFF);
                     map_glyphinfo(0, 0, tmpglyph, 0, tmpglyphinfo);
                     await add_menu(win, tmpglyphinfo, any, ilet, 0, ATR.NONE, clr, await doname(otmp), MENU.ITEMFLAGS_NONE);
                 }
@@ -3539,7 +3533,7 @@ async function display_used_invlets(avoidlet) {   // invent.c:3467
             invdone = 1;
         }
         await end_menu()(win, $c.lit("Inventory letters used:"));
-        n = await select_menu(win, PICK.ONE, new $c.Ptr(selected, 0));
+        const n = await select_menu(win, PICK.ONE, new $c.Ptr(selected, 0));
         if (n > 0) {
             ret = $c.radd(selected[0], 0).item.a_char;
             $c.free(selected[0]);
@@ -3560,7 +3554,6 @@ async function display_used_invlets(avoidlet) {   // invent.c:3467
  */
 export function count_unpaid(list) {   // invent.c:3526
     let count = 0;
-    count = 0;
     while (list) {
         if (list.unpaid) {
             count = count + 1 | 0;
@@ -3587,7 +3580,6 @@ export function count_unpaid(list) {   // invent.c:3526
  */
 export async function count_buc(list, type, filterfunc) {   // invent.c:3548
     let count = 0;
-    count = 0;
     for (; list; list = list.nobj) {
         /* priests always know bless/curse state */
         if (gu.urole.mnum === PM.CLERIC) {
@@ -3672,7 +3664,7 @@ export function tally_BUCX(list, by_nexthere, bcp, ucp, ccp, xcp, ocp, jcp) {   
  * @returns {Promise<number | bigint>} long
  */
 export async function count_contents(container, nested, quantity, everything, newdrop) {   // invent.c:3620
-    let otmp = null, topc = null, shoppy = 0, count = 0, x = Int16Array.of(0), y = Int16Array.of(0);
+    let otmp = null, topc = null, x = Int16Array.of(0), y = Int16Array.of(0);
     /* include contents of any nested containers */
     /* count all vs count separate stacks        */
     /* all objects vs only unpaid objects        */
@@ -3680,8 +3672,8 @@ export async function count_contents(container, nested, quantity, everything, ne
      * been marked no_charge yet and shop-owned
      * items are still marked unpaid -- used
      * when asking the player whether to sell    */
-    shoppy = FALSE;
-    count = 0;
+    let shoppy = FALSE;
+    let count = 0;
     if (!everything && !newdrop) {
         for (topc = container; topc.where === OBJ.CONTAINED; topc = topc.v.v_ocontainer) {
             continue;
@@ -3707,13 +3699,13 @@ export async function count_contents(container, nested, quantity, everything, ne
  * @returns {Promise<void>}
  */
 async function dounpaid(count, floorcount, buriedcount) {   // invent.c:3654
-    let win = 0, otmp = null, marker = [null], contnr = null, ilet = 0, invlet = null, classcount = 0, num_so_far = 0, xtracount = 0, cost = 0, totcost = 0, contcost = 0, contbuf = new Int8Array(256), buf = new Int8Array(256), floorverb = null, where = null;
+    let marker = [null], contnr = null, cost = 0, contbuf = new Int8Array(256), buf = new Int8Array(256);
     /* unpaid items in inventory */
     /* unpaid items on floor (rare) */
     /* unpaid items under the floor (extremely rare) */
-    invlet = new $c.Ptr(flags.inv_order, 0);
-    otmp = marker[0] = contnr = null;
-    xtracount = floorcount + buriedcount | 0;
+    let invlet = new $c.Ptr(flags.inv_order, 0);
+    let otmp = marker[0] = contnr = null;
+    const xtracount = floorcount + buriedcount | 0;
     if (count === 1 && !xtracount) {
         otmp = find_unpaid(gi.invent, new $c.Ptr(marker, 0));
         contnr = unknwn_contnr_contents(otmp);
@@ -3726,16 +3718,16 @@ async function dounpaid(count, floorcount, buriedcount) {   // invent.c:3654
         iflags.suppress_price = iflags.suppress_price - 1 | 0;
         return;
     }
-    win = await create_nhwindow()(NHW.MENU);
-    totcost = 0;
-    num_so_far = 0;   /* count of # printed so far */
+    const win = await create_nhwindow()(NHW.MENU);
+    let totcost = 0;
+    let num_so_far = 0;   /* count of # printed so far */
     if (!flags.invlet_constant) {
         reassign();
     }
     do {
-        classcount = 0;
+        let classcount = 0;
         for (otmp = gi.invent; otmp; otmp = otmp.nobj) {
-            ilet = otmp.invlet;
+            const ilet = otmp.invlet;
             if (otmp.unpaid) {
                 if (!flags.sortpack || otmp.oclass === invlet.get(0)) {
                     if (flags.sortpack && !classcount) {
@@ -3763,7 +3755,7 @@ async function dounpaid(count, floorcount, buriedcount) {   // invent.c:3654
          */
         for (otmp = gi.invent; otmp; otmp = otmp.nobj) {
             if (Has_contents(otmp)) {
-                contcost = 0;
+                let contcost = 0;
                 marker[0] = null;   /* haven't found any */
                 while (find_unpaid(otmp.cobj, new $c.Ptr(marker, 0))) {
                     totcost = $c.add64(totcost, cost = await unpaid_cost(marker[0], COST.NOCONTENTS));
@@ -3798,8 +3790,8 @@ async function dounpaid(count, floorcount, buriedcount) {   // invent.c:3654
            too nit-picky to bother trying to handle here (even more
            extreme description-wise:  "under the floor beneath the
            door/doorway") */
-        floorverb = xtracount > 1 ? $c.lit("are") : $c.lit("is");
-        where = buriedcount === 0 ? $c.lit("on the floor") : floorcount === 0 ? $c.lit("under the floor") : $c.lit("on or under the floor");
+        const floorverb = xtracount > 1 ? $c.lit("are") : $c.lit("is");
+        const where = buriedcount === 0 ? $c.lit("on the floor") : floorcount === 0 ? $c.lit("under the floor") : $c.lit("on or under the floor");
         if (!count) {
             await You($c.lit("aren't carrying any unpaid items but there %s %d %s."), floorverb, xtracount, where);
         } else {
@@ -3819,8 +3811,7 @@ async function dounpaid(count, floorcount, buriedcount) {   // invent.c:3654
  * @returns {number} boolean
  */
 function this_type_only(obj) {   // invent.c:3793
-    let res = 0;
-    res = obj.oclass === gt.this_type ? 1 : 0;
+    let res = obj.oclass === gt.this_type ? 1 : 0;
     if (gt.this_type === 80) {
         res = obj.pickup_prev;
     } else if (obj.oclass === COIN_CLASS) {
@@ -4070,12 +4061,11 @@ export async function dotypeinv() {   // invent.c:3827
  * @returns {Promise<$c.Ptr | null>} const char *
  */
 export async function dfeature_at(x, y, buf) {   // invent.c:4037
-    let lev = null, ltyp = 0, cmap = 0, dfeature = null, stway = null;
-    lev = $c.relem(svl.level.locations[x], y);
-    ltyp = lev.typ;
-    cmap = -1;
-    dfeature = null;
-    stway = stairway_at(x, y);
+    const lev = $c.relem(svl.level.locations[x], y);
+    const ltyp = lev.typ;
+    let cmap = -1;
+    let dfeature = null;
+    const stway = stairway_at(x, y);
     if (IS_DOOR(ltyp)) {
         switch (lev.flags) {
             case D.NODOOR:
@@ -4139,19 +4129,19 @@ export async function dfeature_at(x, y, buf) {   // invent.c:4037
  * @returns {Promise<number>} int
  */
 export async function look_here(obj_cnt, lookhere_flags) {   // invent.c:4104
-    let otmp = null, trap = null, verb = null, dfeature = null, fbuf = new Int8Array(256), fbuf2 = new Int8Array(256), tmpwin = 0, skip_objects = 0, felt_cockatrice = 0, picked_some = 0, skip_dfeature = 0, mtmp = null, reg = null, regbuf = new Int8Array(128), drift = 0, cant_reach = 0, surf = null, where = null, onwhat = null, p = null, article = 0, buf = new Int8Array(256);
+    let otmp = null, trap = null, fbuf = new Int8Array(256), fbuf2 = new Int8Array(256), reg = null, regbuf = new Int8Array(128), p = null, buf = new Int8Array(256);
     /* obj_cnt > 0 implies that autopickup is in progress */
-    verb = Blind() ? $c.lit("feel") : $c.lit("see");
-    dfeature = null;
+    const verb = Blind() ? $c.lit("feel") : $c.lit("see");
+    let dfeature = null;
     /* skip 'dfeature' if caller used describe_decor() to show it */
-    felt_cockatrice = FALSE;
-    picked_some = (lookhere_flags & LOOKHERE.PICKED_SOME) >>> 0 !== 0 ? 1 : 0;
-    skip_dfeature = (lookhere_flags & LOOKHERE.SKIP_DFEATURE) >>> 0 !== 0 ? 1 : 0;
+    let felt_cockatrice = FALSE;
+    const picked_some = (lookhere_flags & LOOKHERE.PICKED_SOME) >>> 0 !== 0 ? 1 : 0;
+    let skip_dfeature = (lookhere_flags & LOOKHERE.SKIP_DFEATURE) >>> 0 !== 0 ? 1 : 0;
     /* default pile_limit is 5; a value of 0 means "never skip"
        (and 1 effectively forces "always skip") */
-    skip_objects = flags.pile_limit > 0 && obj_cnt >= flags.pile_limit ? 1 : 0;
+    const skip_objects = flags.pile_limit > 0 && obj_cnt >= flags.pile_limit ? 1 : 0;
     if (u.uswallow) {
-        mtmp = u.ustuck;
+        const mtmp = u.ustuck;
         /*
          * FIXME?
          *  Engulfer's inventory can include worn items (specific case is
@@ -4207,7 +4197,7 @@ export async function look_here(obj_cnt, lookhere_flags) {   // invent.c:4104
         dfeature = null;
     }
     if (Blind()) {
-        drift = (svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? 1 : 0;
+        const drift = (svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? 1 : 0;
         if (dfeature && !$c.strncmp(dfeature, $c.lit("altar "), 6)) {
             /* don't say "altar" twice, dfeature has more info */
             await You($c.lit("try to feel what is here."));
@@ -4222,10 +4212,10 @@ export async function look_here(obj_cnt, lookhere_flags) {   // invent.c:4104
             await You($c.lit("try to feel what is on it."));
             skip_dfeature = TRUE;   /* ice already described */
         } else {
-            cant_reach = !can_reach_floor(TRUE) ? 1 : 0;
-            surf = surface(u.ux, u.uy);
-            where = cant_reach ? $c.lit("lying beneath you") : $c.lit("lying here on the ");
-            onwhat = cant_reach ? $c.lit("") : surf;
+            const cant_reach = !can_reach_floor(TRUE) ? 1 : 0;
+            const surf = surface(u.ux, u.uy);
+            const where = cant_reach ? $c.lit("lying beneath you") : $c.lit("lying here on the ");
+            const onwhat = cant_reach ? $c.lit("") : surf;
             await You($c.lit("try to feel what is %s%s."), drift ? $c.lit("floating here") : where, drift ? $c.lit("") : onwhat);
             if (dfeature && !drift && !$c.strcmp(dfeature, surf)) {
                 skip_dfeature = TRUE;   /* terrain feature already identified */
@@ -4238,7 +4228,7 @@ export async function look_here(obj_cnt, lookhere_flags) {   // invent.c:4104
         }
     }
     if (dfeature && !skip_dfeature) {
-        article = 1;   /* 0 => none, 1 => a/an, 2 => the (not used here) */
+        let article = 1;   /* 0 => none, 1 => a/an, 2 => the (not used here) */
         /* "molten lava", "iron bars", and plain "ice" are handled as special
            cases in an() but probably shouldn't be; don't rely on that */
         /* ice while hallucinating */
@@ -4294,7 +4284,7 @@ export async function look_here(obj_cnt, lookhere_flags) {   // invent.c:4104
         }
     } else {
         await display_nhwindow()($G.WIN_MESSAGE, FALSE);
-        tmpwin = await create_nhwindow()(NHW.MENU);
+        const tmpwin = await create_nhwindow()(NHW.MENU);
         if (dfeature && !skip_dfeature) {
             await putstr()(tmpwin, 0, new $c.Ptr(fbuf, 0));
             await putstr()(tmpwin, 0, $c.lit(""));
@@ -4324,12 +4314,11 @@ export async function look_here(obj_cnt, lookhere_flags) {   // invent.c:4104
  * @returns {Promise<number>} int
  */
 export async function dolook() {   // invent.c:4319
-    let res = 0;
     /* don't let
        MSGTYPE={norep,noshow} "You see here"
        interfere with feedback from the look-here command */
     hide_unhide_msgtypes(TRUE, MSGTYP_MASK_REP_SHOW);
-    res = await look_here(0, LOOKHERE.NOFLAGS);
+    const res = await look_here(0, LOOKHERE.NOFLAGS);
     /* restore normal msgtype handling */
     hide_unhide_msgtypes(FALSE, MSGTYP_MASK_REP_SHOW);
     return res;
@@ -4389,11 +4378,10 @@ export async function stackobj(obj$in) {   // invent.c:4366
  * @returns {Promise<number>} boolean
  */
 export async function mergable(otmp, obj) {   // invent.c:4379
-    let objnamelth = 0, otmpnamelth = 0;
     /* potential 'into' stack */
     /* 'combine' stack */
-    objnamelth = 0;
-    otmpnamelth = 0;
+    let objnamelth = 0;
+    let otmpnamelth = 0;
     /* fail if already the same object, if different types, if either is
        explicitly marked to prevent merge, or if not mergable in general */
     if ($c.peq(obj, otmp) || obj.otyp !== otmp.otyp || obj.nomerge || otmp.nomerge || !objects[obj.otyp].oc_merge) {
@@ -4490,13 +4478,13 @@ export async function mergable(otmp, obj) {   // invent.c:4379
  * @returns {Promise<number>} int
  */
 export async function doprgold() {   // invent.c:4503
-    let umoney = 0, hmoney = 0, buf = new Int8Array(256), total = 0, dollarsign = new Int8Array(2);
+    let buf = new Int8Array(256), dollarsign = new Int8Array(2);
     /* Command takes containers into account. */
-    umoney = money_cnt(gi.invent);
+    const umoney = money_cnt(gi.invent);
     /* Only list the money you know about.  Guards and shopkeepers
        can somehow tell if there is any gold anywhere on your
        person, but you have no such preternatural gold-sense. */
-    hmoney = hidden_gold(FALSE);
+    const hmoney = hidden_gold(FALSE);
     if (flags.verbose) {
         if (!umoney) {
             $c.strcpy(new $c.Ptr(buf, 0), $c.lit("Your wallet is empty"));
@@ -4508,7 +4496,7 @@ export async function doprgold() {   // invent.c:4503
         }
         await pline($c.lit("%s."), new $c.Ptr(buf, 0));
     } else {
-        total = $c.add64(umoney, hmoney);
+        const total = $c.add64(umoney, hmoney);
         if (total) {
             await You($c.lit("are carrying a total of %ld %s."), total, await currency(total));
         } else {
@@ -4529,7 +4517,7 @@ export async function doprgold() {   // invent.c:4503
  * @returns {Promise<number>} int
  */
 export async function doprwep() {   // invent.c:4550
-    let lets = new Int8Array(4), ct = 0, $t1, $t2, $t3, $t4, $t5;
+    let lets = new Int8Array(4), $t1, $t2, $t3, $t4, $t5;
     if (!$G.uwep) {
         await You($c.lit("are %s."), empty_handed());
     } else if (!iflags.menu_requested) {
@@ -4539,7 +4527,7 @@ export async function doprwep() {   // invent.c:4550
         }
     } else {
         /* 4: uwep, uswapwep, uquiver, terminator */
-        ct = 0;
+        let ct = 0;
         /* obj_to_let() will assign letters to all of invent if necessary
            (for '!fixinv') so doesn't need to be repeated once called here */
         $t2 = obj_to_let($G.uwep), $t3 = new $c.Ptr(lets, ($t1 = ct, ct = $t1 + 1 | 0, $t1)), $t3.set(0, $t2);
@@ -4560,11 +4548,11 @@ export async function doprwep() {   // invent.c:4550
  * @returns {Promise<void>}
  */
 async function noarmor(report_uskin) {   // invent.c:4578
-    let p = null, uskinname = null, buf = new Int8Array(256);
+    let p = null, buf = new Int8Array(256);
     if (!$G.uskin || !report_uskin) {
         await You($c.lit("are not wearing any armor."));
     } else {
-        uskinname = $c.strcpy(new $c.Ptr(buf, 0), await simpleonames($G.uskin));
+        let uskinname = $c.strcpy(new $c.Ptr(buf, 0), await simpleonames($G.uskin));
         /* shorten "set of <color> dragon scales" to "<color> scales"
            and "<color> dragon scale mail" to "<color> scale mail" */
         if (!strncmpi(uskinname, $c.lit("set of "), 7)) {
@@ -4583,7 +4571,7 @@ async function noarmor(report_uskin) {   // invent.c:4578
  * @returns {Promise<number>} int
  */
 export async function doprarm() {   // invent.c:4601
-    let lets = new Int8Array(8), ct = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12, $t13, $t14, $t15, $t16, $t17, $t18, $t19, $t20, $t21;
+    let lets = new Int8Array(8), $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12, $t13, $t14, $t15, $t16, $t17, $t18, $t19, $t20, $t21;
     /*
      * Note:  players sometimes get here by pressing a function key which
      * transmits ''ESC [ <something>'' rather than by pressing '[';
@@ -4593,7 +4581,7 @@ export async function doprarm() {   // invent.c:4601
         await noarmor(TRUE);
     } else {
         /* 8: up to 7 pieces of armor plus terminator */
-        ct = 0;
+        let ct = 0;
         /* obj_to_let() will assign letters to all of invent if necessary
            (for '!fixinv') so doesn't need to be repeated once called, but
            each armor slot doesn't know whether any that precede have made
@@ -4629,13 +4617,13 @@ export async function doprarm() {   // invent.c:4601
  * @returns {Promise<number>} int
  */
 export async function doprring() {   // invent.c:4642
-    let lets = new Int8Array(3), use_inuse_mode = 0, ct = 0, $t1, $t2, $t3, $t4, $t5, $t6;
+    let lets = new Int8Array(3), $t1, $t2, $t3, $t4, $t5, $t6;
     if (!$G.uleft && !$G.uright) {
         await You($c.lit("are not wearing any rings."));
     } else {
         /* 3: uright, uleft, terminator */
-        use_inuse_mode = FALSE;
-        ct = 0;
+        let use_inuse_mode = FALSE;
+        let ct = 0;
         /* if either ring is a meat ring, switch to use_inuse_mode in order
            to label it/them as "Rings" rather than "Comestibles" */
         if ($G.uright) {
@@ -4703,8 +4691,8 @@ function tool_being_used(obj) {   // invent.c:4698
  * @returns {Promise<number>} int
  */
 export async function doprtool() {   // invent.c:4715
-    let otmp = null, ct = 0, lets = new Int8Array(53), $t1, $t2, $t3;
-    ct = 0;
+    let otmp = null, lets = new Int8Array(53), $t1, $t2, $t3;
+    let ct = 0;
     for (otmp = gi.invent; otmp; otmp = otmp.nobj) {
         if (tool_being_used(otmp)) {
             /* we could be carrying more than 52 items; theoretically they
@@ -4729,8 +4717,8 @@ export async function doprtool() {   // invent.c:4715
  * @returns {Promise<number>} int
  */
 export async function doprinuse() {   // invent.c:4740
-    let otmp = null, ct = 0;
-    ct = 0;
+    let otmp = null;
+    let ct = 0;
     /* no longer need to collect letters; sortloot() takes care of it, but
        still want to count far enough to know whether anything is in use */
     for (otmp = gi.invent; otmp; otmp = otmp.nobj) {
@@ -4755,8 +4743,8 @@ export async function doprinuse() {   // invent.c:4740
  * @returns {Promise<void>}
  */
 export async function useupf(obj, numused) {   // invent.c:4763
-    let otmp = null, at_u = 0;
-    at_u = obj.ox === u.ux && obj.oy === u.uy ? 1 : 0;
+    let otmp = null;
+    const at_u = obj.ox === u.ux && obj.oy === u.uy ? 1 : 0;
     /* burn_floor_objects() keeps an object pointer that it tries to
      * useupf() multiple times, so obj must survive if plural */
     if (obj.quan > numused) {
@@ -4783,10 +4771,10 @@ export async function useupf(obj, numused) {   // invent.c:4763
  * @returns {Promise<$c.Ptr | null>} char *
  */
 export async function let_to_name(let_, unpaid, showsym) {   // invent.c:4800
-    let ocsymfmt = null, invbuf_sympadding = 0, class_name = null, pos = null, oclass = 0, len = 0, bp = null, mlen = 0, $t1;
-    ocsymfmt = $c.lit("  ('%c')");
-    invbuf_sympadding = 8;   /* arbitrary */
-    oclass = let_ >= 1 && let_ < MAXOCLASSES ? let_ : 0;
+    let class_name = null, pos = null, $t1;
+    const ocsymfmt = $c.lit("  ('%c')");
+    const invbuf_sympadding = 8;   /* arbitrary */
+    const oclass = let_ >= 1 && let_ < MAXOCLASSES ? let_ : 0;
     if (oclass) {
         class_name = names[oclass];
     } else if ((pos = $c.strchr(new $c.Ptr(oth_symbols, 0), let_)) !== null) {
@@ -4794,7 +4782,7 @@ export async function let_to_name(let_, unpaid, showsym) {   // invent.c:4800
     } else {
         class_name = names[ILLOBJ_CLASS];
     }
-    len = $c.u32($c.addu64($c.addu64(await Strlen_(class_name, $c.lit("let_to_name"), 4816), unpaid ? 8 : 1), oclass ? await Strlen_(ocsymfmt, $c.lit("let_to_name"), 4817) + (invbuf_sympadding >>> 0) >>> 0 : 0));
+    const len = $c.u32($c.addu64($c.addu64(await Strlen_(class_name, $c.lit("let_to_name"), 4816), unpaid ? 8 : 1), oclass ? await Strlen_(ocsymfmt, $c.lit("let_to_name"), 4817) + (invbuf_sympadding >>> 0) >>> 0 : 0));
     if (len > gi.invbufsiz) {
         if (gi.invbuf) {
             $c.free(gi.invbuf);
@@ -4808,8 +4796,8 @@ export async function let_to_name(let_, unpaid, showsym) {   // invent.c:4800
         $c.strcpy(gi.invbuf, class_name);
     }
     if (oclass !== 0 && showsym) {
-        bp = eos(gi.invbuf);
-        mlen = (invbuf_sympadding >>> 0) - await Strlen_(class_name, $c.lit("let_to_name"), 4830) >>> 0 | 0;
+        let bp = eos(gi.invbuf);
+        let mlen = (invbuf_sympadding >>> 0) - await Strlen_(class_name, $c.lit("let_to_name"), 4830) >>> 0 | 0;
         while ((mlen = mlen - 1 | 0) > 0) {
             bp.set(0, 32);
             bp = bp.add(1);
@@ -4829,9 +4817,9 @@ export function free_invbuf() {   // invent.c:4845
 /* give consecutive letters to every item in inventory (for !fixinv mode);
    gold is always forced to '$' slot at head of list */
 export function reassign() {   // invent.c:4855
-    let i = 0, obj = null, prevobj = null, goldobj = null;
+    let i = 0, obj = null, goldobj = null;
     /* first, remove [first instance of] gold from invent, if present */
-    prevobj = goldobj = null;
+    let prevobj = goldobj = null;
     for (obj = gi.invent; obj; prevobj = obj, obj = obj.nobj) {
         if (obj.oclass === COIN_CLASS) {
             goldobj = obj;
@@ -4865,10 +4853,10 @@ export function reassign() {   // invent.c:4855
  * @returns {Promise<number>} boolean
  */
 export async function check_invent_gold(why) {   // invent.c:4889
-    let otmp = null, goldstacks = 0, wrongslot = 0;
+    let otmp = null;
     /* 'why' == caller in case of warning */
-    goldstacks = 0;
-    wrongslot = 0;
+    let goldstacks = 0;
+    let wrongslot = 0;
     /* there should be at most one stack of gold in invent, in slot '$' */
     for (otmp = gi.invent; otmp; otmp = otmp.nobj) {
         if (otmp.oclass === COIN_CLASS) {
@@ -4955,7 +4943,6 @@ function adjust_gold_ok(obj) {   // invent.c:4927
  * @returns {Promise<number>} int
  */
 export async function doorganize() {   // invent.c:4981
-    let adjust_filter = null, obj = null;
     /* inventory organizer by Del Lamb */
     /* when no invent, or just gold in '$' slot, there's nothing to adjust */
     if (!gi.invent || gi.invent.oclass === COIN_CLASS && gi.invent.invlet === GOLD_SYM && !gi.invent.nobj) {
@@ -4966,9 +4953,9 @@ export async function doorganize() {   // invent.c:4981
         reassign();
     }
     /* filter passed to getobj() depends upon gold sanity */
-    adjust_filter = await check_invent_gold($c.lit("adjust")) ? adjust_gold_ok : adjust_ok;
+    const adjust_filter = await check_invent_gold($c.lit("adjust")) ? adjust_gold_ok : adjust_ok;
     /* get object the user wants to organize (the 'from' slot) */
-    obj = await getobj($c.lit("adjust"), adjust_filter, GETOBJ_PROMPT | GETOBJ.ALLOWCNT);
+    const obj = await getobj($c.lit("adjust"), adjust_filter, GETOBJ_PROMPT | GETOBJ.ALLOWCNT);
     return await doorganize_core(obj);
 }
 /* alternate version of #adjust used by itemactions() for splitting */
@@ -4976,11 +4963,11 @@ export async function doorganize() {   // invent.c:4981
  * @returns {Promise<number>} int
  */
 export async function adjust_split() {   // invent.c:5008
-    let obj = null, splitamount = [0], let_ = 0, dig = 0;
+    let splitamount = [0];
     splitamount[0] = 0;
-    dig = 0;
+    let dig = 0;
     /* invlet should be queued so no getobj prompting is expected */
-    obj = await getobj($c.lit("split"), adjust_ok, GETOBJ.NOFLAGS);
+    let obj = await getobj($c.lit("split"), adjust_ok, GETOBJ.NOFLAGS);
     if (!obj || obj.quan < 2 || obj.otyp === GOLD_PIECE) {
         return ECMD.FAIL;   /* caller has set things up to avoid this */
     }
@@ -5004,7 +4991,7 @@ export async function adjust_split() {   // invent.c:5008
            add "Count: N" to message history if more than
            one digit gets entered or the original N is
            deleted and replaced with different digit */
-        let_ = await get_count(null, dig, 0, new $c.Ptr(splitamount, 0), GC.ECHOFIRST | GC_CONDHIST);
+        const let_ = await get_count(null, dig, 0, new $c.Ptr(splitamount, 0), GC.ECHOFIRST | GC_CONDHIST);
         /* \033 is in quitchars[] so we need to check for it separately
            in order to treat it as cancel rather than as accept */
         if (!let_ || let_ === 27 || !$c.strchr(new $c.Ptr(quitchars, 0), let_)) {
@@ -5261,8 +5248,8 @@ async function doorganize_core(obj$in) {   // invent.c:5068
  * @returns {Promise<void>}
  */
 async function invdisp_nothing(hdr, txt) {   // invent.c:5290
-    let win = 0, selected = [null];
-    win = await create_nhwindow()(NHW.MENU);
+    let selected = [null];
+    const win = await create_nhwindow()(NHW.MENU);
     await start_menu()(win, MENU.BEHAVE_STANDARD);
     await add_menu_heading(win, hdr);
     await add_menu_str(win, $c.lit(""));
@@ -5306,16 +5293,16 @@ function worn_wield_only(obj) {   // invent.c:5309
  * @returns {Promise<$T.obj | null>} struct obj *
  */
 export async function display_minventory(mon, dflags, title) {   // invent.c:5341
-    let ret = null, tmp = new Int8Array(128), n = 0, selected = [null], do_all = 0, incl_hero = 0, have_inv = 0, have_any = 0, pickings = 0;
+    let ret = null, tmp = new Int8Array(128), n = 0, selected = [null];
     /* monster whose minvent we're showing */
     /* control over what to display */
     /* menu title */
     selected[0] = null;
-    do_all = (dflags & MINV.ALL) !== 0 ? 1 : 0;
-    incl_hero = do_all && engulfing_u(mon) ? 1 : 0;
-    have_inv = mon.minvent !== null ? 1 : 0;
-    have_any = have_inv || incl_hero ? 1 : 0;
-    pickings = dflags & MINV.PICKMASK;
+    const do_all = (dflags & MINV.ALL) !== 0 ? 1 : 0;
+    const incl_hero = do_all && engulfing_u(mon) ? 1 : 0;
+    const have_inv = mon.minvent !== null ? 1 : 0;
+    const have_any = have_inv || incl_hero ? 1 : 0;
+    const pickings = dflags & MINV.PICKMASK;
     $c.sprintf(new $c.Ptr(tmp, 0), $c.lit("%s %s:"), s_suffix(await noit_Monnam(mon)), do_all ? $c.lit("possessions") : $c.lit("armament"));
     if (do_all ? have_any : mon.misc_worn_check || MON_WEP(mon)) {
         /* Fool the 'weapon in hand' routine into
@@ -5347,8 +5334,7 @@ export async function display_minventory(mon, dflags, title) {   // invent.c:534
  * @returns {Promise<$c.Ptr | null>} char *
  */
 async function cinv_doname(obj) {   // invent.c:5391
-    let result = null, p = null, q = null;
-    result = await doname(obj);
+    const result = await doname(obj);
     /*
      * If obj->tknown ever gets implemented, doname() will handle this.
      * Assumes that probing reveals the trap prior to calling us.  Since
@@ -5360,8 +5346,8 @@ async function cinv_doname(obj) {   // invent.c:5391
     if (obj.otrapped && $c.addu64($c.strlen(result), 9) <= QBUFSZ) {
         /* obj->lknown has been set before calling us so either "locked" or
            "unlocked" should always be present (for a trapped container) */
-        p = strstri(result, $c.lit(" locked"));
-        q = strstri(result, $c.lit(" unlocked"));
+        const p = strstri(result, $c.lit(" locked"));
+        const q = strstri(result, $c.lit(" unlocked"));
         if (p && (!q || $c.pcmp(p, q) < 0)) {
             strsubst(p, $c.lit(" locked "), $c.lit(" trapped locked "));
         } else if (q) {
@@ -5379,8 +5365,7 @@ async function cinv_doname(obj) {   // invent.c:5391
  * @returns {Promise<$c.Ptr | null>} char *
  */
 async function cinv_ansimpleoname(obj) {   // invent.c:5423
-    let result = null;
-    result = await ansimpleoname(obj);
+    const result = await ansimpleoname(obj);
     /* result is an obuf[] so we know this will always fit */
     if (obj.otrapped) {
         if ($c.strncmp(result, $c.lit("a "), 2)) {
@@ -5445,19 +5430,19 @@ function only_here(obj) {   // invent.c:5477
  * @returns {Promise<number>} int
  */
 export async function display_binventory(x, y, as_if_seen) {   // invent.c:5489
-    let obj = null, qbuf = new Int8Array(128), underwhat = null, selected = [null], n = 0, n2 = 0, real_liquid = null, seen_liquid = null, more_than_1 = 0, $t1;
-    underwhat = $c.lit("here");
+    let obj = null, qbuf = new Int8Array(128), selected = [null], n = 0, $t1;
+    let underwhat = $c.lit("here");
     selected[0] = null;
-    n2 = 0;
+    let n2 = 0;
     /* if hero is levitating or flying over water or lava, list any items
        below (the map won't be showing them); if hero is underwater, player
        should use the normal look_here command instead of probing (caller
        has already used bhitpile() which will have set dknown on all items) */
     if (is_pool_or_lava(x, y) && !Underwater() && (obj = svl.level.objects[x][y]) !== null) {
-        real_liquid = is_pool(x, y) ? $c.lit("water") : $c.lit("lava");
-        seen_liquid = hliquid(real_liquid);
+        const real_liquid = is_pool(x, y) ? $c.lit("water") : $c.lit("lava");
+        const seen_liquid = hliquid(real_liquid);
         if (!obj.v.v_nexthere) {
-            more_than_1 = is_plural(obj);
+            let more_than_1 = is_plural(obj);
             await There($c.lit("%s %s under the %s here."), more_than_1 ? $c.lit("are") : $c.lit("is"), await doname(obj), seen_liquid);
             n2 = 1;
             /* "pair of boots" is singular but "beneath it" sounds strange */
@@ -5501,13 +5486,12 @@ export async function display_binventory(x, y, as_if_seen) {   // invent.c:5489
  * @param {number} window winid
  */
 export function prepare_perminvent(window) {   // invent.c:5549
-    let wri = null, invmode = 0;
-    invmode = iflags.perminv_mode;
+    const invmode = iflags.perminv_mode;
     if (perminv_flags !== invmode) {
         wri_info.$copyFrom(zerowri);
         wri_info.fromcore.invmode = invmode >>> 0;
         /*  relay the mode settings to the window port */
-        wri = ctrl_nhwindow()(window, set_mode, wri_info);
+        const wri = ctrl_nhwindow()(window, set_mode, wri_info);
         perminv_flags = invmode;
         nhUse(wri);
     }
@@ -5516,7 +5500,6 @@ export function prepare_perminvent(window) {   // invent.c:5549
  * @returns {Promise<void>}
  */
 export async function sync_perminvent() {   // invent.c:5565
-    let wport_id = null;
     if ($G.WIN_INVEN === WIN_ERR) {
         if ((gc.core_invent_state || $c.and64(wri_info.tocore.tocore_flags, prohibited)) && !(in_perm_invent_toggled && gp.perm_invent_toggling_direction === toggling_on)) {
             return;
@@ -5564,7 +5547,7 @@ export async function sync_perminvent() {   // invent.c:5565
                     if ($G.WIN_INVEN !== WIN_ERR) {
                         await destroy_nhwindow()($G.WIN_INVEN), $G.WIN_INVEN = WIN_ERR;
                     }
-                    wport_id = windowprocs.wp_id === wp_tty ? $c.lit("tty perm_invent") : $c.lit("perm_invent");
+                    const wport_id = windowprocs.wp_id === wp_tty ? $c.lit("tty perm_invent") : $c.lit("perm_invent");
                     await pline($c.lit("%s could not be enabled."), wport_id);
                     await pline($c.lit("%s needs a terminal that is at least %dx%d, yours is %dx%d."), wport_id, sync_perminvent$wri.tocore.needrows, sync_perminvent$wri.tocore.needcols, sync_perminvent$wri.tocore.haverows, sync_perminvent$wri.tocore.havecols);
                     await wait_synch()();

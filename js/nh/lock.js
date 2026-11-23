@@ -214,10 +214,10 @@ async function picklock() {   // lock.c:68
  * @returns {Promise<void>}
  */
 export async function breakchestlock(box, destroyit) {   // lock.c:162
-    let hide_contents = null, otmp = null, shkp = null, costly = 0, peaceful_shk = 0, loss = 0;
+    let otmp = null;
     if (!destroyit) {
         /* bill for the box but not for its contents */
-        hide_contents = box.cobj;
+        const hide_contents = box.cobj;
         box.cobj = null;
         await costly_alteration(box, COST.BRKLCK);
         box.cobj = hide_contents;
@@ -226,10 +226,10 @@ export async function breakchestlock(box, destroyit) {   // lock.c:162
         box.lknown = 1;
     } else {
         /* #force has destroyed this box (at <u.ux,u.uy>) */
-        shkp = new $c.Ptr(u.ushops, 0).get(0) && await costly_spot(u.ux, u.uy) ? await shop_keeper(new $c.Ptr(u.ushops, 0).get(0)) : null;
-        costly = shkp !== null ? 1 : 0;
-        peaceful_shk = costly && shkp.mpeaceful ? 1 : 0;
-        loss = 0;
+        const shkp = new $c.Ptr(u.ushops, 0).get(0) && await costly_spot(u.ux, u.uy) ? await shop_keeper(new $c.Ptr(u.ushops, 0).get(0)) : null;
+        const costly = shkp !== null ? 1 : 0;
+        const peaceful_shk = costly && shkp.mpeaceful ? 1 : 0;
+        let loss = 0;
         await pline($c.lit("In fact, you've totally destroyed %s."), await the(await xname(box)));
         /* Put the contents on ground at the hero's feet. */
         while ((otmp = box.cobj) !== null) {
@@ -341,12 +341,12 @@ export function maybe_reset_pick(container) {   // lock.c:269
  * @returns {$T.obj | null} struct obj *
  */
 export function autokey(opening) {   // lock.c:289
-    let o = null, key = null, pick = null, card = null, akey = null, apick = null, acard = null;
+    let o = null, pick = null, card = null, apick = null, acard = null;
     /* True: key, pick, or card; False: key or pick */
     /* mundane item or regular artifact or own role's quest artifact */
-    key = pick = card = null;
+    let key = pick = card = null;
     /* other role's quest artifact (Rogue's Key or Tourist's Credit Card) */
-    akey = apick = acard = null;
+    let akey = apick = acard = null;
     for (o = gi.invent; o; o = o.nobj) {
         if (any_quest_artifact(o) && !is_quest_artifact(o)) {
             switch (o.otyp) {
@@ -420,21 +420,21 @@ export function autokey(opening) {   // lock.c:289
  * @returns {Promise<number>} int
  */
 export async function pick_lock(pick, rx, ry, container) {   // lock.c:358
-    let dummypick = new $T.obj(), picktyp = 0, c = 0, ch = 0, cc = new $T.nhcoord(), door = null, otmp = null, qbuf = new Int8Array(128), autounlock = 0, what = null, action = null, verb = null, qsfx = new Int8Array(128), it = 0, count = 0, mtmp = null, res = 0, oldglyph = 0, oldlastseentyp = 0, $t1, $t2;
+    let dummypick = new $T.obj(), c = 0, cc = new $T.nhcoord(), otmp = null, qbuf = new Int8Array(128), verb = null, qsfx = new Int8Array(128), $t1, $t2;
     /* coordinates of door/container, for autounlock:
      * doesn't prompt for direction if these are set */
     /* container, for autounlock */
-    autounlock = rx !== 0 || !$c.peq(container, $c.asRec(null, $T.obj, 112)) ? 1 : 0;
+    const autounlock = rx !== 0 || !$c.peq(container, $c.asRec(null, $T.obj, 112)) ? 1 : 0;
     /* 'pick' might be Null [called by do_loot_cont() for AUTOUNLOCK_UNTRAP] */
     if (!pick) {
         dummypick.$copyFrom(cg.zeroobj);
         pick = dummypick;   /* pick->otyp will be STRANGE_OBJECT */
     }
-    picktyp = pick.otyp;
+    const picktyp = pick.otyp;
     /* check whether we're resuming an interrupted previous attempt */
     if (gx.xlock.usedtime && picktyp === gx.xlock.picktyp) {
         if (nohands(gy.youmonst.data)) {
-            what = picktyp === LOCK_PICK ? $c.lit("pick") : $c.lit("key");
+            let what = picktyp === LOCK_PICK ? $c.lit("pick") : $c.lit("key");
             if (picktyp === CREDIT_CARD) {
                 what = $c.lit("card");
             }
@@ -446,7 +446,7 @@ export async function pick_lock(pick, rx, ry, container) {   // lock.c:358
             reset_pick();
             return PICKLOCK_LEARNED_SOMETHING;
         } else {
-            action = lock_action();
+            const action = lock_action();
             await You($c.lit("resume your attempt at %s."), action);
             $t1 = is_magic_key(gy.youmonst, pick), gx.xlock.magic_key = $t1;
             set_occupation(picklock, action, 0);
@@ -464,7 +464,7 @@ export async function pick_lock(pick, rx, ry, container) {   // lock.c:358
         await impossible($c.lit("picking lock with object %d?"), picktyp);
         return PICKLOCK_DID_NOTHING;
     }
-    ch = 0;   /* lint suppression */
+    let ch = 0;   /* lint suppression */
     if (rx !== 0) {
         /* autounlock; caller has provided coordinates */
         cc.x = rx;
@@ -485,7 +485,7 @@ export async function pick_lock(pick, rx, ry, container) {   // lock.c:358
             await pline_The($c.lit("%s has no lock."), hliquid($c.lit("water")));
             return PICKLOCK_LEARNED_SOMETHING;
         }
-        count = 0;
+        let count = 0;
         c = 110;   /* in case there are no boxes here */
         for (otmp = svl.level.objects[cc.x][cc.y]; otmp; otmp = otmp.v.v_nexthere) {
             /* autounlock on boxes: only the one that was just discovered to
@@ -499,7 +499,7 @@ export async function pick_lock(pick, rx, ry, container) {   // lock.c:358
                     await You_cant($c.lit("reach %s from up here."), await the(await xname(otmp)));
                     return PICKLOCK_LEARNED_SOMETHING;
                 }
-                it = 0;
+                let it = 0;
                 if (otmp.obroken) {
                     verb = $c.lit("fix");
                 } else if (!otmp.olocked) {
@@ -584,8 +584,8 @@ export async function pick_lock(pick, rx, ry, container) {   // lock.c:358
                #open command doesn't use a turn for similar situation */
             return PICKLOCK_DID_NOTHING;
         }
-        door = $c.relem(svl.level.locations[cc.x], cc.y);
-        mtmp = svl.level.monsters[cc.x][cc.y];
+        const door = $c.relem(svl.level.locations[cc.x], cc.y);
+        const mtmp = svl.level.monsters[cc.x][cc.y];
         if (mtmp && canseemon(mtmp) && M_AP_TYPE(mtmp) !== M_AP.FURNITURE && M_AP_TYPE(mtmp) !== M_AP.OBJECT) {
             if (picktyp === CREDIT_CARD && (mtmp.isshk || mtmp.data === mons[PM.ORACLE])) {
                 await verbalize($c.lit("No checks, no credit, no problem."));
@@ -601,9 +601,9 @@ export async function pick_lock(pick, rx, ry, container) {   // lock.c:358
             return PICKLOCK_LEARNED_SOMETHING;
         }
         if (!IS_DOOR(door.typ)) {
-            res = PICKLOCK_DID_NOTHING;
-            oldglyph = door.glyph;
-            oldlastseentyp = $c.i8(await update_mapseen_for(cc.x, cc.y));
+            let res = PICKLOCK_DID_NOTHING;
+            const oldglyph = door.glyph;
+            const oldlastseentyp = $c.i8(await update_mapseen_for(cc.x, cc.y));
             /* this is probably only relevant when blind */
             await feel_location(cc.x, cc.y);
             if (door.glyph !== oldglyph || svl.lastseentyp[cc.x][cc.y] !== oldlastseentyp) {
@@ -690,7 +690,7 @@ export function u_have_forceable_weapon() {   // lock.c:660
  * @returns {Promise<number>} int
  */
 export async function doforce() {   // lock.c:676
-    let otmp = null, c = 0, picktyp = 0, qbuf = new Int8Array(128), use_plural = 0;
+    let otmp = null, qbuf = new Int8Array(128);
     /*
      * TODO?
      *  allow force with edged weapon to be performed on doors.
@@ -700,7 +700,7 @@ export async function doforce() {   // lock.c:676
         return ECMD.OK;
     }
     if (!u_have_forceable_weapon()) {
-        use_plural = $G.uwep && $G.uwep.quan > 1 ? 1 : 0;
+        const use_plural = $G.uwep && $G.uwep.quan > 1 ? 1 : 0;
         await You_cant($c.lit("force anything %s weapon%s."), !$G.uwep ? $c.lit("when not wielding a") : $G.uwep.oclass !== WEAPON_CLASS && !is_weptool($G.uwep) ? use_plural ? $c.lit("without proper") : $c.lit("without a proper") : use_plural ? $c.lit("with those") : $c.lit("with that"), use_plural ? $c.lit("s") : $c.lit(""));
         return ECMD.OK;
     }
@@ -708,7 +708,7 @@ export async function doforce() {   // lock.c:676
         await cant_reach_floor(u.ux, u.uy, FALSE, TRUE, FALSE);
         return ECMD.OK;
     }
-    picktyp = is_blade($G.uwep) && !is_pick($G.uwep) ? 1 : 0;
+    const picktyp = is_blade($G.uwep) && !is_pick($G.uwep) ? 1 : 0;
     if (gx.xlock.usedtime && gx.xlock.box && picktyp === gx.xlock.picktyp) {
         await You($c.lit("resume your attempt to force the lock."));
         set_occupation(forcelock, $c.lit("forcing the lock"), 0);
@@ -730,7 +730,7 @@ export async function doforce() {   // lock.c:676
             }
             await safe_qbuf(new $c.Ptr(qbuf, 0), $c.lit("There is "), $c.lit(" here; force its lock?"), otmp, doname, ansimpleoname, $c.lit("a box"));
             otmp.lknown = 1;
-            c = await ynq(new $c.Ptr(qbuf, 0));
+            const c = await ynq(new $c.Ptr(qbuf, 0));
             if (c === 113) {
                 return ECMD.OK;
             }
@@ -784,13 +784,13 @@ export async function doopen() {   // lock.c:773
  * @returns {Promise<number>} int
  */
 export async function doopen_indir(x, y) {   // lock.c:780
-    let cc = new $T.nhcoord(), door = null, portcullis = 0, dirprompt = null, res = 0, oldglyph = 0, oldlastseentyp = 0, mesg = null, locked = 0, unlocktool = null;
-    res = ECMD.OK;
+    let cc = new $T.nhcoord(), mesg = null, unlocktool = null;
+    let res = ECMD.OK;
     if (nohands(gy.youmonst.data)) {
         await You_cant($c.lit("open anything -- you have no hands!"));
         return ECMD.OK;
     }
-    dirprompt = null;   /* have get_adjacent_loc() -> getdir() use default */
+    let dirprompt = null;   /* have get_adjacent_loc() -> getdir() use default */
     if (u.utrap && u.utraptype === TT.PIT && container_at(u.ux, u.uy, FALSE)) {
         dirprompt = $c.lit("Open where? [.>]");
     }
@@ -823,12 +823,12 @@ export async function doopen_indir(x, y) {   // lock.c:780
     if (u.uprops[CONFUSION].intrinsic || u.uprops[STUNNED].intrinsic) {
         res = ECMD.TIME;
     }
-    door = $c.relem(svl.level.locations[cc.x], cc.y);
-    portcullis = is_drawbridge_wall(cc.x, cc.y) >= 0 ? 1 : 0;
+    const door = $c.relem(svl.level.locations[cc.x], cc.y);
+    const portcullis = is_drawbridge_wall(cc.x, cc.y) >= 0 ? 1 : 0;
     /* this used to be 'if (Blind)' but using a key skips that so we do too */
     {
-        oldglyph = door.glyph;
-        oldlastseentyp = $c.i8(await update_mapseen_for(cc.x, cc.y));
+        const oldglyph = door.glyph;
+        const oldlastseentyp = $c.i8(await update_mapseen_for(cc.x, cc.y));
         await newsym(cc.x, cc.y);
         if (door.glyph !== oldglyph || svl.lastseentyp[cc.x][cc.y] !== oldlastseentyp) {
             res = ECMD.TIME;   /* learned something */
@@ -848,7 +848,7 @@ export async function doopen_indir(x, y) {   // lock.c:780
         return res;
     }
     if (!(door.flags & D.CLOSED)) {
-        locked = FALSE;
+        let locked = FALSE;
         switch (door.flags) {
             case D.BROKEN:
                 mesg = $c.lit(" is broken");
@@ -1049,9 +1049,8 @@ export async function doclose() {   // lock.c:957
  * @returns {Promise<number>} boolean
  */
 export async function boxlock(obj, otmp) {   // lock.c:1056
-    let res = 0;
     /* obj *is* a box */
-    res = 0;
+    let res = 0;
     switch (otmp.otyp) {
         case WAN_LOCKING:
         case SPE_WIZARD_LOCK:
@@ -1105,14 +1104,14 @@ export async function boxlock(obj, otmp) {   // lock.c:1056
  * @returns {Promise<number>} boolean
  */
 export async function doorlock(otmp, x, y) {   // lock.c:1103
-    let door = null, res = 0, loudness = 0, msg = null, dustcloud = null, quickly_dissipates = null, mysterywand = 0, vis = 0, sawit = 0, seeit = 0, mtmp = null;
-    door = $c.relem(svl.level.locations[x], y);
-    res = TRUE;
-    loudness = 0;
-    msg = null;
-    dustcloud = $c.lit("A cloud of dust");
-    quickly_dissipates = $c.lit("quickly dissipates");
-    mysterywand = otmp.oclass === WAND_CLASS && !otmp.dknown ? 1 : 0;
+    let sawit = 0, seeit = 0;
+    const door = $c.relem(svl.level.locations[x], y);
+    let res = TRUE;
+    let loudness = 0;
+    let msg = null;
+    const dustcloud = $c.lit("A cloud of dust");
+    const quickly_dissipates = $c.lit("quickly dissipates");
+    const mysterywand = otmp.oclass === WAND_CLASS && !otmp.dknown ? 1 : 0;
     if (door.typ === SDOOR) {
         switch (otmp.otyp) {
             case WAN_OPENING:
@@ -1139,7 +1138,7 @@ export async function doorlock(otmp, x, y) {   // lock.c:1103
         case WAN_LOCKING:
         case SPE_WIZARD_LOCK:
             if ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level)) {
-                vis = cansee(x, y);
+                const vis = cansee(x, y);
                 /* Can't have real locking in Rogue, so just hide doorway */
                 if (vis) {
                     await pline($c.lit("%s springs up in the older, more primitive doorway."), dustcloud);
@@ -1205,7 +1204,7 @@ export async function doorlock(otmp, x, y) {   // lock.c:1103
             if (door.flags & (D.LOCKED | D.CLOSED)) {
                 /* sawit: closed door location is more visible than open */
                 if (door.flags & D.TRAPPED) {
-                    mtmp = svl.level.monsters[x][y];
+                    const mtmp = svl.level.monsters[x][y];
                     sawit = $c.i8(mtmp ? canseemon(mtmp) : cansee(x, y));
                     door.flags = (D.NODOOR) & 31;
                     unblock_point(x, y);
@@ -1273,7 +1272,7 @@ export async function doorlock(otmp, x, y) {   // lock.c:1103
  * @returns {Promise<void>}
  */
 async function chest_shatter_msg(otmp) {   // lock.c:1276
-    let disposition = null, thing = null, save_HBlinded = 0, save_BBlinded = 0;
+    let disposition = null, save_HBlinded = 0, save_BBlinded = 0;
     if (otmp.oclass === POTION_CLASS) {
         await You($c.lit("%s %s shatter!"), Blind() ? $c.lit("hear") : $c.lit("see"), await an(bottlename()));
         if (!breathless(gy.youmonst.data) || haseyes(gy.youmonst.data)) {
@@ -1285,7 +1284,7 @@ async function chest_shatter_msg(otmp) {   // lock.c:1276
     /* which does _both_... */
     save_HBlinded = u.uprops[BLINDED].intrinsic, save_BBlinded = u.uprops[BLINDED].blocked;
     u.uprops[BLINDED].intrinsic = 1, u.uprops[BLINDED].blocked = 0;
-    thing = await singular(otmp, xname);
+    const thing = await singular(otmp, xname);
     u.uprops[BLINDED].intrinsic = save_HBlinded, u.uprops[BLINDED].blocked = save_BBlinded;
     switch (objects[otmp.otyp].oc_material) {
         case PAPER:

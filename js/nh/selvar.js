@@ -246,12 +246,12 @@ export function selection_not(s) {   // selvar.c:211
  * @returns {Promise<$T.selectionvar | null>} struct selectionvar *
  */
 export async function selection_filter_percent(ov, percent) {   // selvar.c:224
-    let x = 0, y = 0, ret = null, rect = new $T.nhrect();
+    let x = 0, y = 0, rect = new $T.nhrect();
     rect.$copyFrom(cg.zeroNhRect);
     if (!ov) {
         return null;
     }
-    ret = await selection_new();
+    const ret = await selection_new();
     selection_getbounds(ov, rect);
     for (x = rect.lx; x <= rect.hx; x = x + 1 | 0) {
         for (y = rect.ly; y <= rect.hy; y = y + 1 | 0) {
@@ -269,12 +269,12 @@ export async function selection_filter_percent(ov, percent) {   // selvar.c:224
  * @returns {Promise<$T.selectionvar | null>} struct selectionvar *
  */
 export async function selection_filter_mapchar(ov, typ, lit) {   // selvar.c:248
-    let x = 0, y = 0, ret = null, rect = new $T.nhrect();
+    let x = 0, y = 0, rect = new $T.nhrect();
     rect.$copyFrom(cg.zeroNhRect);
     if (!ov) {
         return null;
     }
-    ret = await selection_new();
+    const ret = await selection_new();
     selection_getbounds(ov, rect);
     for (x = rect.lx; x <= rect.hx; x = x + 1 | 0) {
         for (y = rect.ly; y <= rect.hy; y = y + 1 | 0) {
@@ -307,8 +307,8 @@ export async function selection_filter_mapchar(ov, typ, lit) {   // selvar.c:248
  * @returns {number} int
  */
 export function selection_rndcoord(ov, x, y, removeit) {   // selvar.c:284
-    let idx = 0, c = 0, dx = 0, dy = 0, rect = new $T.nhrect(), $t1;
-    idx = 0;
+    let dx = 0, dy = 0, rect = new $T.nhrect(), $t1;
+    let idx = 0;
     rect.$copyFrom(cg.zeroNhRect);
     selection_getbounds(ov, rect);
     for (dx = rect.lx; dx <= rect.hx; dx = dx + 1 | 0) {
@@ -319,7 +319,7 @@ export function selection_rndcoord(ov, x, y, removeit) {   // selvar.c:284
         }
     }
     if (idx) {
-        c = rn2(idx);
+        let c = rn2(idx);
         for (dx = rect.lx; dx <= rect.hx; dx = dx + 1 | 0) {
             for (dy = rect.ly; dy <= rect.hy; dy = dy + 1 | 0) {
                 if (selection_getpoint($c.i16(dx), $c.i16(dy), ov)) {
@@ -345,12 +345,12 @@ export function selection_rndcoord(ov, x, y, removeit) {   // selvar.c:284
  * @returns {Promise<void>}
  */
 export async function selection_do_grow(ov, dir) {   // selvar.c:321
-    let x = 0, y = 0, tmp = null, rect = new $T.nhrect();
+    let x = 0, y = 0, rect = new $T.nhrect();
     rect.$copyFrom(cg.zeroNhRect);
     if (!ov) {
         return;
     }
-    tmp = await selection_new();
+    const tmp = await selection_new();
     if (dir === W.RANDOM) {
         dir = random_wdir();
     }
@@ -392,9 +392,8 @@ export function set_selection_floodfillchk(f) {   // selvar.c:372
  * @returns {number} boolean
  */
 function sel_flood_havepoint(x, y, xs, ys, n) {   // selvar.c:379
-    let xx = 0, yy = 0;
-    xx = x;
-    yy = y;
+    const xx = x;
+    const yy = y;
     while (n > 0) {
         n = n - 1 | 0;
         if (xs.get(n) === xx && ys.get(n) === yy) {
@@ -411,9 +410,9 @@ function sel_flood_havepoint(x, y, xs, ys, n) {   // selvar.c:379
  * @returns {Promise<void>}
  */
 export async function selection_floodfill(ov, x, y, diagonals) {   // selvar.c:395
-    let tmp = null, idx = 0, dx = new Int16Array(1680), dy = new Int16Array(1680);
-    tmp = await selection_new();
-    idx = 0;
+    let dx = new Int16Array(1680), dy = new Int16Array(1680);
+    const tmp = await selection_new();
+    let idx = 0;
     if (selection_flood_check_func === null) {
         selection_free(tmp, TRUE);
         return;
@@ -554,21 +553,21 @@ export async function selection_floodfill(ov, x, y, diagonals) {   // selvar.c:3
  * @param {number} filled int
  */
 export function selection_do_ellipse(ov, xc, yc, a, b, filled) {   // selvar.c:456
-    let x = 0, y = 0, a2 = 0, b2 = 0, crit1 = 0, crit2 = 0, crit3 = 0, t = 0, dxt = 0, dyt = 0, d2xt = 0, d2yt = 0, width = 0, i = 0;
+    let i = 0;
     /* e(x,y) = b^2*x^2 + a^2*y^2 - a^2*b^2 */
-    x = 0;
-    y = b;
-    a2 = $c.mul64(a, a);
-    b2 = $c.mul64(b, b);
-    crit1 = $c.neg64($c.add64($c.add64($c.div64(a2, 4), $c.rem32(a, 2)), b2));
-    crit2 = $c.neg64($c.add64($c.add64($c.div64(b2, 4), $c.rem32(b, 2)), a2));
-    crit3 = $c.neg64($c.add64($c.div64(b2, 4), $c.rem32(b, 2)));
-    t = $c.mul64($c.neg64(a2), y);   /* e(x+1/2,y-1/2) - (a^2+b^2)/4 */
-    dxt = $c.mul64($c.mul64(2, b2), x);
-    dyt = $c.mul64($c.mul64(-2, a2), y);
-    d2xt = $c.mul64(2, b2);
-    d2yt = $c.mul64(2, a2);
-    width = 1;
+    let x = 0;
+    let y = b;
+    const a2 = $c.mul64(a, a);
+    const b2 = $c.mul64(b, b);
+    const crit1 = $c.neg64($c.add64($c.add64($c.div64(a2, 4), $c.rem32(a, 2)), b2));
+    const crit2 = $c.neg64($c.add64($c.add64($c.div64(b2, 4), $c.rem32(b, 2)), a2));
+    const crit3 = $c.neg64($c.add64($c.div64(b2, 4), $c.rem32(b, 2)));
+    let t = $c.mul64($c.neg64(a2), y);   /* e(x+1/2,y-1/2) - (a^2+b^2)/4 */
+    let dxt = $c.mul64($c.mul64(2, b2), x);
+    let dyt = $c.mul64($c.mul64(-2, a2), y);
+    const d2xt = $c.mul64(2, b2);
+    const d2yt = $c.mul64(2, a2);
+    let width = 1;
     if (!ov) {
         return;
     }
@@ -656,12 +655,11 @@ export function selection_do_ellipse(ov, xc, yc, a, b, filled) {   // selvar.c:4
  * @returns {number | bigint} long
  */
 function line_dist_coord(x1, y1, x2, y2, x3, y3) {   // selvar.c:542
-    let px = 0, py = 0, s = 0, x = 0, y = 0, dx = 0, dy = 0, distsq = 0, lu = 0;
-    px = $c.sub64(x2, x1);
-    py = $c.sub64(y2, y1);
-    s = $c.add64($c.mul64(px, px), $c.mul64(py, py));
-    distsq = 0;
-    lu = Math.fround(0);
+    const px = $c.sub64(x2, x1);
+    const py = $c.sub64(y2, y1);
+    const s = $c.add64($c.mul64(px, px), $c.mul64(py, py));
+    let distsq = 0;
+    let lu = Math.fround(0);
     if (x1 === x2 && y1 === y2) {
         return dist2($c.i16(x1), $c.i16(y1), $c.i16(x3), $c.i16(y3));
     }
@@ -671,10 +669,10 @@ function line_dist_coord(x1, y1, x2, y2, x3, y3) {   // selvar.c:542
     } else if (lu < Math.fround(0)) {
         lu = Math.fround(0);
     }
-    x = $c.dtoi64(Math.fround(Math.fround(Number(x1)) + Math.fround(lu * Math.fround(Number(px)))));
-    y = $c.dtoi64(Math.fround(Math.fround(Number(y1)) + Math.fround(lu * Math.fround(Number(py)))));
-    dx = $c.sub64(x, x3);
-    dy = $c.sub64(y, y3);
+    const x = $c.dtoi64(Math.fround(Math.fround(Number(x1)) + Math.fround(lu * Math.fround(Number(px)))));
+    const y = $c.dtoi64(Math.fround(Math.fround(Number(y1)) + Math.fround(lu * Math.fround(Number(py)))));
+    const dx = $c.sub64(x, x3);
+    const dy = $c.sub64(y, y3);
     distsq = $c.add64($c.mul64(dx, dx), $c.mul64(dy, dy));
     return distsq;
 }
@@ -691,13 +689,13 @@ function line_dist_coord(x1, y1, x2, y2, x3, y3) {   // selvar.c:542
  * @returns {Promise<void>}
  */
 export async function selection_do_gradient(ov, x, y, x2, y2, gtyp, mind, maxd) {   // selvar.c:570
-    let dx = 0, dy = 0, dofs = 0, tmp = 0, d0 = 0, d1 = 0, d2 = 0, d3 = 0, d4 = 0, d5 = 0, d0$2 = 0;
+    let dx = 0, dy = 0;
     if (mind > maxd) {
-        tmp = mind;
+        const tmp = mind;
         mind = maxd;
         maxd = tmp;
     }
-    dofs = $c.sub64($c.mul64(maxd, maxd), $c.mul64(mind, mind));
+    let dofs = $c.sub64($c.mul64(maxd, maxd), $c.mul64(mind, mind));
     if (dofs < 1) {
         dofs = 1;
     }
@@ -709,7 +707,7 @@ export async function selection_do_gradient(ov, x, y, x2, y2, gtyp, mind, maxd) 
             {
                 for (dx = 0; dx < COLNO; dx = $c.add64(dx, 1)) {
                     for (dy = 0; dy < ROWNO; dy = $c.add64(dy, 1)) {
-                        d0 = line_dist_coord(x, y, x2, y2, dx, dy);
+                        const d0 = line_dist_coord(x, y, x2, y2, dx, dy);
                         if (d0 <= $c.mul64(mind, mind) || d0 <= $c.mul64(maxd, maxd) && $c.sub64(d0, $c.mul64(mind, mind)) < rn2($c.i32(dofs))) {
                             selection_setpoint($c.i16(dx), $c.i16(dy), ov, 1);
                         }
@@ -721,12 +719,12 @@ export async function selection_do_gradient(ov, x, y, x2, y2, gtyp, mind, maxd) 
             {
                 for (dx = 0; dx < COLNO; dx = $c.add64(dx, 1)) {
                     for (dy = 0; dy < ROWNO; dy = $c.add64(dy, 1)) {
-                        d1 = line_dist_coord(x, y, x2, y2, x, dy);
-                        d2 = line_dist_coord(x, y, x2, y2, dx, y);
-                        d3 = line_dist_coord(x, y, x2, y2, x2, dy);
-                        d4 = line_dist_coord(x, y, x2, y2, dx, y2);
-                        d5 = line_dist_coord(x, y, x2, y2, dx, dy);
-                        d0$2 = d5 < ((d1 > d2 ? d1 : d2) < (d3 > d4 ? d3 : d4) ? d1 > d2 ? d1 : d2 : d3 > d4 ? d3 : d4) ? d5 : (d1 > d2 ? d1 : d2) < (d3 > d4 ? d3 : d4) ? d1 > d2 ? d1 : d2 : d3 > d4 ? d3 : d4;
+                        const d1 = line_dist_coord(x, y, x2, y2, x, dy);
+                        const d2 = line_dist_coord(x, y, x2, y2, dx, y);
+                        const d3 = line_dist_coord(x, y, x2, y2, x2, dy);
+                        const d4 = line_dist_coord(x, y, x2, y2, dx, y2);
+                        const d5 = line_dist_coord(x, y, x2, y2, dx, dy);
+                        const d0$2 = d5 < ((d1 > d2 ? d1 : d2) < (d3 > d4 ? d3 : d4) ? d1 > d2 ? d1 : d2 : d3 > d4 ? d3 : d4) ? d5 : (d1 > d2 ? d1 : d2) < (d3 > d4 ? d3 : d4) ? d1 > d2 ? d1 : d2 : d3 > d4 ? d3 : d4;
                         if (d0$2 <= $c.mul64(mind, mind) || d0$2 <= $c.mul64(maxd, maxd) && $c.sub64(d0$2, $c.mul64(mind, mind)) < rn2($c.i32(dofs))) {
                             selection_setpoint($c.i16(dx), $c.i16(dy), ov, 1);
                         }
@@ -803,7 +801,7 @@ export function selection_do_line(x1, y1, x2, y2, ov) {   // selvar.c:626
  * @param {$T.selectionvar | null} ov struct selectionvar *
  */
 export function selection_do_randline(x1, y1, x2, y2, rough, rec, ov) {   // selvar.c:683
-    let mx = 0, my = 0, dx = 0, dy = 0;
+    let mx = 0, my = 0;
     if (rec < 1 || x2 === x1 && y2 === y1) {
         return;
     }
@@ -815,8 +813,8 @@ export function selection_do_randline(x1, y1, x2, y2, rough, rec, ov) {   // sel
         my = $c.div32(y1 + y2, 2);
     } else {
         do {
-            dx = rn2(rough) - $c.div32(rough, 2) | 0;
-            dy = rn2(rough) - $c.div32(rough, 2) | 0;
+            const dx = rn2(rough) - $c.div32(rough, 2) | 0;
+            const dy = rn2(rough) - $c.div32(rough, 2) | 0;
             mx = $c.div32(x1 + x2, 2) + dx | 0;
             my = $c.div32(y1 + y2, 2) + dy | 0;
         } while (mx > COLNO - 1 || mx < 0 || my < 0 || my > ROWNO - 1);
@@ -876,11 +874,11 @@ export function selection_is_irregular(sel) {   // selvar.c:747
  * @returns {$c.Ptr | null} char *
  */
 export function selection_size_description(sel, buf) {   // selvar.c:764
-    let rect = new $T.nhrect(), dx = 0, dy = 0;
+    let rect = new $T.nhrect();
     rect.$copyFrom(cg.zeroNhRect);
     selection_getbounds(sel, rect);
-    dx = $c.i16(rect.hx - rect.lx + 1);
-    dy = $c.i16(rect.hy - rect.ly + 1);
+    const dx = $c.i16(rect.hx - rect.lx + 1);
+    const dy = $c.i16(rect.hy - rect.ly + 1);
     $c.sprintf(buf, $c.lit("%s %i by %i"), selection_is_irregular(sel) ? $c.lit("irregularly shaped") : dx === dy ? $c.lit("square") : $c.lit("rectangular"), dx, dy);
     return buf;
 }
@@ -889,15 +887,15 @@ export function selection_size_description(sel, buf) {   // selvar.c:764
  * @returns {Promise<$T.selectionvar | null>} struct selectionvar *
  */
 export async function selection_from_mkroom(croom) {   // selvar.c:781
-    let sel = null, x = 0, y = 0, rmno = 0;
-    sel = await selection_new();
+    let x = 0, y = 0;
+    const sel = await selection_new();
     if (!croom && gc.coder && gc.coder.croom) {
         croom = gc.coder.croom;
     }
     if (!croom) {
         return sel;
     }
-    rmno = $c.u32($c.add64($c.rdiff(croom, svr.rooms[0]), ROOMOFFSET));
+    const rmno = $c.u32($c.add64($c.rdiff(croom, svr.rooms[0]), ROOMOFFSET));
     for (y = croom.ly; y <= croom.hy; y = $c.i16(y + 1)) {
         for (x = croom.lx; x <= croom.hx; x = $c.i16(x + 1)) {
             if (isok(x, y) && !svl.level.locations[x][y].edge && svl.level.locations[x][y].roomno === rmno) {

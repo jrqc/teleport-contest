@@ -113,7 +113,7 @@ export async function off_msg(otmp) {   // do_wear.c:68
  * @returns {Promise<void>}
  */
 async function on_msg(otmp) {   // do_wear.c:76
-    let how = new Int8Array(256), otmp_name = null;
+    let how = new Int8Array(256);
     /* on_msg() for rings and amulets just shows add-to-invent feedback
        [after caller calls setworn(), for suffix: "(on {left|right} hand)"
        or "(being worn)"]; eyewear too unless giving verbose message below */
@@ -124,7 +124,7 @@ async function on_msg(otmp) {   // do_wear.c:76
     if (flags.verbose) {
         /* call xname() before obj_is_pname(); formatting obj's name
            might set obj->dknown and that affects the pname test */
-        otmp_name = await xname(otmp);
+        const otmp_name = await xname(otmp);
         how[0] = 0;
         if (otmp.otyp === TOWEL) {
             $c.sprintf(new $c.Ptr(how, 0), $c.lit(" around your %s"), await body_part(HEAD));
@@ -143,7 +143,6 @@ async function on_msg(otmp) {   // do_wear.c:76
  * @returns {Promise<void>}
  */
 async function toggle_stealth(obj, oldprop, on) {   // do_wear.c:107
-    let riding = 0;
     /* prop[].extrinsic, with obj->owornmask pre-stripped */
     if (on ? gi.initial_don : svc.context.takeoff.cancelled_don) {
         return;
@@ -167,7 +166,7 @@ async function toggle_stealth(obj, oldprop, on) {   // do_wear.c:107
                 await You($c.lit("walk very quietly."));
             }
         } else {
-            riding = !$c.peq(u.usteed, $c.asRec(null, $T.monst, 192)) ? 1 : 0;
+            const riding = !$c.peq(u.usteed, $c.asRec(null, $T.monst, 192)) ? 1 : 0;
             await You($c.lit("%s%s are noisy."), riding ? $c.lit("and ") : $c.lit("sure"), riding ? await x_monnam(u.usteed, ARTICLE.YOUR, $c.asArr(null, Int8Array), SUPPRESS.SADDLE | SUPPRESS.HALLUCINATION, FALSE) : $c.lit(""));
         }
     }
@@ -217,8 +216,7 @@ export async function toggle_displacement(obj, oldprop, on) {   // do_wear.c:148
  * @returns {Promise<number>} int
  */
 export async function Boots_on() {   // do_wear.c:187
-    let oldprop = 0;
-    oldprop = $c.and64(u.uprops[objects[$G.uarmf.otyp].oc_oprop].extrinsic, ~W.ARMF);
+    const oldprop = $c.and64(u.uprops[objects[$G.uarmf.otyp].oc_oprop].extrinsic, ~W.ARMF);
     switch ($G.uarmf.otyp) {
         case LOW_BOOTS:
         case IRON_SHOES:
@@ -294,10 +292,10 @@ export async function Boots_on() {   // do_wear.c:187
  * @returns {Promise<number>} int
  */
 export async function Boots_off() {   // do_wear.c:262
-    let otmp = null, otyp = 0, oldprop = 0, $t1;
-    otmp = $G.uarmf;
-    otyp = otmp.otyp;
-    oldprop = $c.and64(u.uprops[objects[otyp].oc_oprop].extrinsic, ~W.ARMF);
+    let $t1;
+    const otmp = $G.uarmf;
+    const otyp = otmp.otyp;
+    const oldprop = $c.and64(u.uprops[objects[otyp].oc_oprop].extrinsic, ~W.ARMF);
     svc.context.takeoff.mask = $c.and64(svc.context.takeoff.mask, ~W.ARMF);
     /* For levitation, float_down() returns if Levitation, so we
      * must do a setworn() _before_ the levitation case.
@@ -355,8 +353,7 @@ export async function Boots_off() {   // do_wear.c:262
  * @returns {Promise<number>} int
  */
 async function Cloak_on() {   // do_wear.c:326
-    let oldprop = 0;
-    oldprop = $c.and64(u.uprops[objects[$G.uarmc.otyp].oc_oprop].extrinsic, ~W.ARMC);
+    const oldprop = $c.and64(u.uprops[objects[$G.uarmc.otyp].oc_oprop].extrinsic, ~W.ARMC);
     switch ($G.uarmc.otyp) {
         case ORCISH_CLOAK:
         case DWARVISH_CLOAK:
@@ -410,10 +407,9 @@ async function Cloak_on() {   // do_wear.c:326
  * @returns {Promise<number>} int
  */
 export async function Cloak_off() {   // do_wear.c:383
-    let otmp = null, otyp = 0, oldprop = 0;
-    otmp = $G.uarmc;
-    otyp = otmp.otyp;
-    oldprop = $c.and64(u.uprops[objects[otyp].oc_oprop].extrinsic, ~W.ARMC);
+    const otmp = $G.uarmc;
+    const otyp = otmp.otyp;
+    const oldprop = $c.and64(u.uprops[objects[otyp].oc_oprop].extrinsic, ~W.ARMC);
     svc.context.takeoff.mask = $c.and64(svc.context.takeoff.mask, ~W.ARMC);
     /* For mummy wrapping, taking it off first resets `Invisible'. */
     await setworn(null, W.ARMC);
@@ -598,8 +594,7 @@ export function hard_helmet(obj) {   // do_wear.c:568
  * @returns {Promise<number>} int
  */
 async function Gloves_on() {   // do_wear.c:576
-    let oldprop = 0;
-    oldprop = $c.and64(u.uprops[objects[$G.uarmg.otyp].oc_oprop].extrinsic, ~W.ARMG);
+    const oldprop = $c.and64(u.uprops[objects[$G.uarmg.otyp].oc_oprop].extrinsic, ~W.ARMG);
     switch ($G.uarmg.otyp) {
         case LEATHER_GLOVES:
             break;
@@ -667,10 +662,10 @@ export async function wielding_corpse(obj, how, voluntary) {   // do_wear.c:608
  * @returns {Promise<number>} int
  */
 export async function Gloves_off() {   // do_wear.c:646
-    let gloves = null, oldprop = 0, on_purpose = 0, $t1;
-    gloves = $G.uarmg;   /* needed after uarmg has been set to Null */
-    oldprop = $c.and64(u.uprops[objects[$G.uarmg.otyp].oc_oprop].extrinsic, ~W.ARMG);
-    on_purpose = !svc.context.mon_moving && !$G.uarmg.in_use ? 1 : 0;
+    let $t1;
+    const gloves = $G.uarmg;   /* needed after uarmg has been set to Null */
+    const oldprop = $c.and64(u.uprops[objects[$G.uarmg.otyp].oc_oprop].extrinsic, ~W.ARMG);
+    const on_purpose = !svc.context.mon_moving && !$G.uarmg.in_use ? 1 : 0;
     svc.context.takeoff.mask = $c.and64(svc.context.takeoff.mask, ~W.ARMG);
     switch ($G.uarmg.otyp) {
         case LEATHER_GLOVES:
@@ -928,9 +923,8 @@ async function Armor_on() {   // do_wear.c:887
  * @returns {Promise<number>} int
  */
 export async function Armor_off() {   // do_wear.c:909
-    let otmp = null, was_arti_light = 0;
-    otmp = $G.uarm;
-    was_arti_light = otmp && otmp.lamplit && artifact_light(otmp) ? 1 : 0;
+    const otmp = $G.uarm;
+    const was_arti_light = otmp && otmp.lamplit && artifact_light(otmp) ? 1 : 0;
     svc.context.takeoff.mask = $c.and64(svc.context.takeoff.mask, ~W.ARM);
     await setworn(null, W.ARM);
     svc.context.takeoff.cancelled_don = FALSE;
@@ -957,9 +951,8 @@ export async function Armor_off() {   // do_wear.c:909
  * @returns {Promise<number>} int
  */
 export async function Armor_gone() {   // do_wear.c:939
-    let otmp = null, was_arti_light = 0;
-    otmp = $G.uarm;
-    was_arti_light = otmp && otmp.lamplit && artifact_light(otmp) ? 1 : 0;
+    const otmp = $G.uarm;
+    const was_arti_light = otmp && otmp.lamplit && artifact_light(otmp) ? 1 : 0;
     svc.context.takeoff.mask = $c.and64(svc.context.takeoff.mask, ~W.ARM);
     await setnotworn($G.uarm);
     svc.context.takeoff.cancelled_don = FALSE;
@@ -981,8 +974,7 @@ export async function Armor_gone() {   // do_wear.c:939
  * @returns {Promise<void>}
  */
 async function Amulet_on(amul) {   // do_wear.c:963
-    let on_msg_done = 0, was_in_poison_gas = 0, call_it = 0, new_sex = 0, orig_sex = 0, newnap = 0, oldnap = 0, already_flying = 0;
-    on_msg_done = FALSE;
+    let on_msg_done = FALSE;
     /* make sure amulet isn't wielded/alt-wielded/quivered, before wearing */
     await remove_worn_item(amul, FALSE);
     await setworn(amul, W.AMUL);
@@ -998,7 +990,7 @@ async function Amulet_on(amul) {   // do_wear.c:963
                 /* amulet is already on; we need to check hero's gas-cloud status
                    when it was off */
                 u.uprops[MAGICAL_BREATHING].extrinsic = $c.and64(u.uprops[MAGICAL_BREATHING].extrinsic, ~W.AMUL);
-                was_in_poison_gas = region_danger();
+                const was_in_poison_gas = region_danger();
                 u.uprops[MAGICAL_BREATHING].extrinsic = $c.or64(u.uprops[MAGICAL_BREATHING].extrinsic, W.AMUL);
                 if (was_in_poison_gas) {
                     await discover_object(AMULET_OF_MAGICAL_BREATHING, TRUE, TRUE, TRUE);
@@ -1017,15 +1009,15 @@ async function Amulet_on(amul) {   // do_wear.c:963
             break;
         case AMULET_OF_CHANGE:
             {
-                call_it = FALSE;
-                orig_sex = poly_gender();
+                let call_it = FALSE;
+                const orig_sex = poly_gender();
                 /* in normal play it's not possible to put on an amulet of change
                    while already wearing an amulet of unchanging, but in wizard
                    mode the Unchanging attribute can be set via #wizintrinsic */
                 if (!Unchanging()) {
                     await change_sex();
                 }
-                new_sex = poly_gender();
+                const new_sex = poly_gender();
                 if (new_sex !== orig_sex) {
                     await discover_object(AMULET_OF_CHANGE, TRUE, TRUE, TRUE);
                 }
@@ -1064,8 +1056,8 @@ async function Amulet_on(amul) {   // do_wear.c:963
             break;
         case AMULET_OF_RESTFUL_SLEEP:
             {
-                newnap = $c.add64(rnd(98), 2);
-                oldnap = $c.and64(u.uprops[SLEEPY].intrinsic, TIMEOUT);
+                const newnap = $c.add64(rnd(98), 2);
+                const oldnap = $c.and64(u.uprops[SLEEPY].intrinsic, TIMEOUT);
                 /* avoid clobbering FROMOUTSIDE bit, which might have
                    gotten set by previously eating one of these amulets */
                 if (newnap < oldnap || oldnap === 0) {
@@ -1080,7 +1072,7 @@ async function Amulet_on(amul) {   // do_wear.c:963
                 /* to determine whether this flight is new we have to muck
                    about in the Flying intrinsic (actually extrinsic) */
                 u.uprops[FLYING].extrinsic = $c.and64(u.uprops[FLYING].extrinsic, ~W.AMUL);
-                already_flying = !!((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) ? 1 : 0;
+                const already_flying = !!((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) ? 1 : 0;
                 u.uprops[FLYING].extrinsic = $c.or64(u.uprops[FLYING].extrinsic, W.AMUL);
                 if (!already_flying) {
                     await discover_object(AMULET_OF_FLYING, TRUE, TRUE, TRUE);
@@ -1106,10 +1098,9 @@ async function Amulet_on(amul) {   // do_wear.c:963
  * @returns {Promise<void>}
  */
 export async function Amulet_off() {   // do_wear.c:1090
-    let amul = null, mkn = 0, early_off_msg = 0, was_flying = 0;
-    amul = $G.uamul;   /* for off_msg() after setworn(NULL,W_AMUL) */
-    mkn = FALSE;
-    early_off_msg = FALSE;
+    const amul = $G.uamul;   /* for off_msg() after setworn(NULL,W_AMUL) */
+    let mkn = FALSE;
+    let early_off_msg = FALSE;
     svc.context.takeoff.mask = $c.and64(svc.context.takeoff.mask, ~W.AMUL);
     switch ($G.uamul.otyp) {
         case AMULET_OF_ESP:
@@ -1169,7 +1160,7 @@ export async function Amulet_off() {   // do_wear.c:1090
             break;
         case AMULET_OF_FLYING:
             {
-                was_flying = !!((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) ? 1 : 0;
+                const was_flying = !!((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) ? 1 : 0;
                 /* remove amulet 'early' to determine whether Flying changes;
                    also in case spoteffects() does something with the amulet */
                 await setworn(null, W.AMUL);
@@ -1206,8 +1197,7 @@ export async function Amulet_off() {   // do_wear.c:1090
  * @returns {Promise<void>}
  */
 async function learnring(ring, observed) {   // do_wear.c:1193
-    let ringtype = 0;
-    ringtype = ring.otyp;
+    const ringtype = ring.otyp;
     /* if effect was observable then we usually discover the type */
     if (observed) {
         /* if we already know the ring type which accomplishes this
@@ -1237,10 +1227,9 @@ async function learnring(ring, observed) {   // do_wear.c:1193
  * @returns {Promise<void>}
  */
 async function adjust_attrib(obj, which, val) {   // do_wear.c:1223
-    let old_attrib = 0, observable = 0;
-    old_attrib = ACURR(which);
+    const old_attrib = ACURR(which);
     u.abon.a[which] = $c.i8(u.abon.a[which] + val | 0);
-    observable = old_attrib !== ACURR(which) ? 1 : 0;
+    const observable = old_attrib !== ACURR(which) ? 1 : 0;
     /* if didn't change, usually means ring is +0 but might
         be because nonzero couldn't go below min or above max;
         learn +0 enchantment if attribute value is not stuck
@@ -1256,8 +1245,8 @@ async function adjust_attrib(obj, which, val) {   // do_wear.c:1223
  * @returns {Promise<void>}
  */
 export async function Ring_on(obj) {   // do_wear.c:1242
-    let oldprop = 0, observable = 0;
-    oldprop = u.uprops[objects[obj.otyp].oc_oprop].extrinsic;
+    let observable = 0;
+    let oldprop = u.uprops[objects[obj.otyp].oc_oprop].extrinsic;
     /* make sure ring isn't wielded; can't use remove_worn_item()
        here because it has already been set worn in a ring slot */
     if ($c.peq(obj, $G.uwep)) {
@@ -1364,8 +1353,8 @@ export async function Ring_on(obj) {   // do_wear.c:1242
  * @returns {Promise<void>}
  */
 async function Ring_off_or_gone(obj, gone) {   // do_wear.c:1347
-    let mask = 0, observable = 0;
-    mask = $c.and64(obj.owornmask, W_RING);
+    let observable = 0;
+    const mask = $c.and64(obj.owornmask, W_RING);
     svc.context.takeoff.mask = $c.and64(svc.context.takeoff.mask, $c.not64(mask));
     if (!$c.and64(u.uprops[objects[obj.otyp].oc_oprop].extrinsic, mask)) {
         await impossible($c.lit("Strange... I didn't know you had that ring."));
@@ -1483,9 +1472,8 @@ export async function Ring_gone(obj) {   // do_wear.c:1455
  * @returns {Promise<void>}
  */
 export async function Blindf_on(otmp) {   // do_wear.c:1461
-    let already_blind = 0, changed = 0;
-    already_blind = Blind();
-    changed = FALSE;
+    const already_blind = Blind();
+    let changed = FALSE;
     /* blindfold might be wielded; release it for wearing */
     await remove_worn_item(otmp, FALSE);
     await setworn(otmp, W.TOOL);
@@ -1521,10 +1509,9 @@ export async function Blindf_on(otmp) {   // do_wear.c:1461
  * @returns {Promise<void>}
  */
 export async function Blindf_off(otmp) {   // do_wear.c:1495
-    let was_blind = 0, changed = 0, nooffmsg = 0;
-    was_blind = Blind();
-    changed = FALSE;
-    nooffmsg = !otmp ? 1 : 0;
+    const was_blind = Blind();
+    let changed = FALSE;
+    const nooffmsg = !otmp ? 1 : 0;
     if (!otmp) {
         otmp = $G.ublindf;
     }
@@ -1614,8 +1601,7 @@ export async function set_wear(obj) {   // do_wear.c:1539
  * @returns {number} boolean
  */
 export function donning(otmp) {   // do_wear.c:1574
-    let result = 0;
-    result = FALSE;
+    let result = FALSE;
     /* 'W' (or 'P' used for armor) sets ga.afternmv */
     if (doffing(otmp)) {
         result = TRUE;
@@ -1644,9 +1630,8 @@ export function donning(otmp) {   // do_wear.c:1574
  * @returns {number} boolean
  */
 export function doffing(otmp) {   // do_wear.c:1603
-    let what = 0, result = 0;
-    what = svc.context.takeoff.what;
-    result = FALSE;
+    const what = svc.context.takeoff.what;
+    let result = FALSE;
     /* 'T' (or 'R' used for armor) sets ga.afternmv, 'A' sets takeoff.what */
     if ($c.peq(otmp, $G.uarm)) {
         result = ga.afternmv === Armor_off || what === W.ARM ? 1 : 0;
@@ -1723,9 +1708,9 @@ export function cancel_don() {   // do_wear.c:1664
  * @returns {Promise<number>} int
  */
 export async function stop_donning(stolenobj) {   // do_wear.c:1688
-    let buf = new Int8Array(256), otmp = null, putting_on = 0, result = 0;
+    let buf = new Int8Array(256), otmp = null;
     /* no mesg if stolenobj is already being doffed */
-    result = 0;
+    let result = 0;
     for (otmp = gi.invent; otmp; otmp = otmp.nobj) {
         if ($c.and64(otmp.owornmask, W_ARMOR) && donning(otmp)) {
             break;
@@ -1736,7 +1721,7 @@ export async function stop_donning(stolenobj) {   // do_wear.c:1688
         return 0;
     }
     /* donning() returns True when doffing too; doffing() is more specific */
-    putting_on = !doffing(otmp) ? 1 : 0;
+    const putting_on = !doffing(otmp) ? 1 : 0;
     /* cancel_don() looks at afternmv; it can also cancel doffing */
     cancel_don();
     /* don't want <armor>_on() or <armor>_off() being called
@@ -1764,10 +1749,9 @@ export async function stop_donning(stolenobj) {   // do_wear.c:1688
  * @param {number} accessorizing boolean
  */
 function count_worn_stuff(which, accessorizing) {   // do_wear.c:1733
-    let otmp = null;
     /* caller wants this when count is 1 */
     Narmorpieces = Naccessories = 0;
-    otmp = null;
+    let otmp = null;
     do {
         if ($G.uarmh) {
             Narmorpieces = Narmorpieces + 1 | 0;
@@ -1942,9 +1926,8 @@ export async function dotakeoff() {   // do_wear.c:1833
  * @returns {Promise<number>} int
  */
 export async function ia_dotakeoff() {   // do_wear.c:1862
-    let res = 0;
     gi.item_action_in_progress = TRUE;
-    res = await dotakeoff();
+    const res = await dotakeoff();
     gi.item_action_in_progress = FALSE;
     return res;
 }
@@ -1974,14 +1957,13 @@ export async function doremring() {   // do_wear.c:1874
  * @returns {Promise<number>} int
  */
 export async function cursed(otmp) {   // do_wear.c:1893
-    let use_plural = 0;
     if (!otmp) {
         await impossible($c.lit("cursed without otmp"));
         return 0;
     }
     /* Curses, like chickens, come home to roost. */
     if ($c.peq(otmp, $G.uwep) ? await welded(otmp) : otmp.cursed) {
-        use_plural = is_boots(otmp) || is_gloves(otmp) || otmp.otyp === LENSES || otmp.quan > 1 ? 1 : 0;
+        const use_plural = is_boots(otmp) || is_gloves(otmp) || otmp.otyp === LENSES || otmp.quan > 1 ? 1 : 0;
         /* might be trying again after applying grease to hands */
         /* for weapon, we'll only get here via 'A )' */
         if (Glib() && otmp.bknown && ($G.uarmg ? $c.peq(otmp, $G.uwep) : $c.and64(otmp.owornmask, W.WEP | W_RING) !== 0)) {
@@ -1999,9 +1981,9 @@ export async function cursed(otmp) {   // do_wear.c:1893
  * @returns {Promise<number>} int
  */
 export async function armoroff(otmp) {   // do_wear.c:1920
-    let delay = 0, what = null, $t1;
-    delay = -objects[otmp.otyp].oc_delay | 0;
-    what = null;
+    let $t1;
+    const delay = -objects[otmp.otyp].oc_delay | 0;
+    let what = null;
     if (await cursed(otmp)) {
         return 0;
     }
@@ -2112,8 +2094,7 @@ async function already_wearing2(cc1, cc2) {   // do_wear.c:2017
  * @returns {Promise<number>} int
  */
 export async function canwearobj(otmp, mask, noisy) {   // do_wear.c:2030
-    let err = 0, which = null;
-    err = 0;
+    let err = 0;
     /* this is the same check as for 'W' (dowear), but different message,
        in case we get here via 'P' (doputon) */
     if (verysmall(gy.youmonst.data) || nohands(gy.youmonst.data)) {
@@ -2122,7 +2103,7 @@ export async function canwearobj(otmp, mask, noisy) {   // do_wear.c:2030
         }
         return 0;
     }
-    which = is_cloak(otmp) ? new $c.Ptr(c_cloak, 0) : is_shirt(otmp) ? new $c.Ptr(c_shirt, 0) : is_suit(otmp) ? new $c.Ptr(c_suit, 0) : null;
+    const which = is_cloak(otmp) ? new $c.Ptr(c_cloak, 0) : is_shirt(otmp) ? new $c.Ptr(c_shirt, 0) : is_suit(otmp) ? new $c.Ptr(c_suit, 0) : null;
     /* same exception for cloaks as used in m_dowear() */
     if (which && (breakarm(gy.youmonst.data) || sliparm(gy.youmonst.data)) && (!$c.peq(which, new $c.Ptr(c_cloak, 0)) || (otmp.otyp !== MUMMY_WRAPPING ? gy.youmonst.data.msize !== MZ.SMALL : !WrappingAllowed(gy.youmonst.data))) && racial_exception(gy.youmonst, otmp) < 1) {
         if (noisy) {
@@ -2298,16 +2279,16 @@ export async function canwearobj(otmp, mask, noisy) {   // do_wear.c:2030
  */
 async function accessory_or_armor_on(obj$in) {   // do_wear.c:2209
     const obj = [obj$in];
-    let mask = [0], armor = 0, ring = 0, amulet = 0, eyewear = 0, answer = 0, qbuf = new Int8Array(128), res = 0, hand = null, delay = 0, $t1;
+    let mask = [0], qbuf = new Int8Array(128), $t1;
     mask[0] = 0;
     if ($c.and64(obj[0].owornmask, W_ACCESSORY | W_ARMOR)) {
         await already_wearing(new $c.Ptr(c_that_, 0));
         return ECMD.OK;
     }
-    armor = obj[0].oclass === ARMOR_CLASS ? 1 : 0;
-    ring = obj[0].oclass === RING_CLASS || obj[0].otyp === MEAT_RING ? 1 : 0;
-    amulet = obj[0].oclass === AMULET_CLASS ? 1 : 0;
-    eyewear = obj[0].otyp === BLINDFOLD || obj[0].otyp === TOWEL || obj[0].otyp === LENSES ? 1 : 0;
+    const armor = obj[0].oclass === ARMOR_CLASS ? 1 : 0;
+    const ring = obj[0].oclass === RING_CLASS || obj[0].otyp === MEAT_RING ? 1 : 0;
+    const amulet = obj[0].oclass === AMULET_CLASS ? 1 : 0;
+    const eyewear = obj[0].otyp === BLINDFOLD || obj[0].otyp === TOWEL || obj[0].otyp === LENSES ? 1 : 0;
     /* checks which are performed prior to actually touching the item */
     if (armor) {
         if (!await canwearobj(obj[0], new $c.Ptr(mask, 0), TRUE)) {
@@ -2337,7 +2318,7 @@ async function accessory_or_armor_on(obj$in) {   // do_wear.c:2209
          */
         /* accessory */
         if (ring) {
-            res = 0;
+            let res = 0;
             if (nolimbs(gy.youmonst.data)) {
                 await You($c.lit("cannot make the ring stick to your body."));
                 return ECMD.OK;
@@ -2353,7 +2334,7 @@ async function accessory_or_armor_on(obj$in) {   // do_wear.c:2209
             } else {
                 do {
                     $c.sprintf(new $c.Ptr(qbuf, 0), $c.lit("Which %s%s, Right or Left?"), $c.andu64(gy.youmonst.data.mflags1, M1.HUMANOID) !== 0 ? $c.lit("ring-") : $c.lit(""), await body_part(FINGER));
-                    answer = await yn_function(new $c.Ptr(qbuf, 0), new $c.Ptr(rightleftchars, 0), 0, TRUE);
+                    const answer = await yn_function(new $c.Ptr(qbuf, 0), new $c.Ptr(rightleftchars, 0), 0, TRUE);
                     switch (answer) {
                         case 0:
                         case 27:
@@ -2383,7 +2364,7 @@ async function accessory_or_armor_on(obj$in) {   // do_wear.c:2209
             if ($G.uwep) {
                 res = !$G.uwep.bknown ? 1 : 0;   /* check this before calling welded() */
                 if ((mask[0] === W.RINGR && URIGHTY() || mask[0] === W.RINGL && ULEFTY() || bimanual($G.uwep)) && await welded($G.uwep)) {
-                    hand = await body_part(HAND);
+                    let hand = await body_part(HAND);
                     /* welded will set bknown */
                     if (bimanual($G.uwep)) {
                         hand = await makeplural(hand);
@@ -2468,7 +2449,7 @@ async function accessory_or_armor_on(obj$in) {   // do_wear.c:2209
         } else {
             await panic($c.lit("wearing armor not worn as armor? [%08lx]"), obj[0].owornmask);
         }
-        delay = -objects[obj[0].otyp].oc_delay | 0;
+        const delay = -objects[obj[0].otyp].oc_delay | 0;
         if (delay) {
             nomul(delay);
             gm.multi_reason = $c.lit("dressing up");
@@ -2508,7 +2489,6 @@ async function accessory_or_armor_on(obj$in) {   // do_wear.c:2209
  * @returns {Promise<number>} int
  */
 export async function dowear() {   // do_wear.c:2432
-    let otmp = null;
     /* cantweararm() checks for suits of armor, not what we want here;
        verysmall() or nohands() checks for shields, gloves, etc... */
     if (verysmall(gy.youmonst.data) || nohands(gy.youmonst.data)) {
@@ -2520,7 +2500,7 @@ export async function dowear() {   // do_wear.c:2432
         await You($c.lit("are already wearing a full complement of armor."));
         return ECMD.OK;
     }
-    otmp = await getobj($c.lit("wear"), wear_ok, GETOBJ.NOFLAGS);
+    const otmp = await getobj($c.lit("wear"), wear_ok, GETOBJ.NOFLAGS);
     return otmp ? await accessory_or_armor_on(otmp) : ECMD.CANCEL;
 }
 /* the #puton command */
@@ -2528,19 +2508,17 @@ export async function dowear() {   // do_wear.c:2432
  * @returns {Promise<number>} int
  */
 export async function doputon() {   // do_wear.c:2454
-    let otmp = null;
     if ($G.uleft && $G.uright && $G.uamul && $G.ublindf && $G.uarm && $G.uarmu && $G.uarmc && $G.uarmh && $G.uarms && $G.uarmg && $G.uarmf) {
         /* 'P' message doesn't mention armor */
         await Your($c.lit("%s%s are full, and you're already wearing an amulet and %s."), humanoid(gy.youmonst.data) ? $c.lit("ring-") : $c.lit(""), await fingers_or_gloves(FALSE), $G.ublindf.otyp === LENSES ? $c.lit("some lenses") : $c.lit("a blindfold"));
         return ECMD.OK;
     }
-    otmp = await getobj($c.lit("put on"), puton_ok, GETOBJ.NOFLAGS);
+    const otmp = await getobj($c.lit("put on"), puton_ok, GETOBJ.NOFLAGS);
     return otmp ? await accessory_or_armor_on(otmp) : ECMD.CANCEL;
 }
 /* calculate current armor class */
 export function find_ac() {   // do_wear.c:2473
-    let uac = 0;
-    uac = mons[u.umonnum].ac;   /* base armor class for current form */
+    let uac = mons[u.umonnum].ac;   /* base armor class for current form */
     /* armor class from worn gear */
     if ($G.uarm) {
         uac = uac - (objects[$G.uarm.otyp].oc_oc1 + $G.uarm.spe - (($G.uarm.oeroded > $G.uarm.oeroded2 ? $G.uarm.oeroded : $G.uarm.oeroded2) < objects[$G.uarm.otyp].oc_oc1 ? $G.uarm.oeroded > $G.uarm.oeroded2 ? $G.uarm.oeroded : $G.uarm.oeroded2 : objects[$G.uarm.otyp].oc_oc1)) | 0;
@@ -2595,12 +2573,12 @@ export function find_ac() {   // do_wear.c:2473
  * @returns {Promise<void>}
  */
 export async function glibr() {   // do_wear.c:2528
-    let otmp = null, xfl = 0, leftfall = 0, rightfall = 0, wastwoweap = 0, otherwep = null, thiswep = null, which = null, hand = null, savequan = 0;
-    xfl = 0;
-    wastwoweap = FALSE;
-    otherwep = null;
-    leftfall = $G.uleft && !$G.uleft.cursed && (!$G.uwep || !(await welded($G.uwep) && ULEFTY()) || !bimanual($G.uwep)) ? 1 : 0;
-    rightfall = $G.uright && !$G.uright.cursed && (!$G.uwep || !(await welded($G.uwep) && URIGHTY()) || !bimanual($G.uwep)) ? 1 : 0;
+    let otmp = null, which = null, hand = null;
+    let xfl = 0;
+    let wastwoweap = FALSE;
+    let otherwep = null;
+    const leftfall = $G.uleft && !$G.uleft.cursed && (!$G.uwep || !(await welded($G.uwep) && ULEFTY()) || !bimanual($G.uwep)) ? 1 : 0;
+    const rightfall = $G.uright && !$G.uright.cursed && (!$G.uwep || !(await welded($G.uwep) && URIGHTY()) || !bimanual($G.uwep)) ? 1 : 0;
     /*
         leftfall = (uleft && !uleft->cursed
                     && (!uwep || !welded(uwep) || !bimanual(uwep)));
@@ -2647,9 +2625,9 @@ export async function glibr() {   // do_wear.c:2528
     }
     otmp = $G.uwep;
     if (otmp && otmp.otyp !== AKLYS && !await welded(otmp)) {
-        savequan = otmp.quan;
+        const savequan = otmp.quan;
         /* nice wording if both weapons are the same type */
-        thiswep = is_sword(otmp) ? new $c.Ptr(c_sword, 0) : await weapon_descr(otmp);
+        let thiswep = is_sword(otmp) ? new $c.Ptr(c_sword, 0) : await weapon_descr(otmp);
         if (otherwep && $c.strcmp(thiswep, await makesingular(otherwep))) {
             otherwep = null;
         }
@@ -2688,15 +2666,14 @@ export async function glibr() {   // do_wear.c:2528
  * @returns {Promise<$T.obj | null>} struct obj *
  */
 export async function some_armor(victim) {   // do_wear.c:2630
-    let otmph = null, otmp = null;
-    otmph = $c.peq(victim, gy.youmonst) ? $G.uarmc : await which_armor(victim, W.ARMC);
+    let otmph = $c.peq(victim, gy.youmonst) ? $G.uarmc : await which_armor(victim, W.ARMC);
     if (!otmph) {
         otmph = $c.peq(victim, gy.youmonst) ? $G.uarm : await which_armor(victim, W.ARM);
     }
     if (!otmph) {
         otmph = $c.peq(victim, gy.youmonst) ? $G.uarmu : await which_armor(victim, W.ARMU);
     }
-    otmp = $c.peq(victim, gy.youmonst) ? $G.uarmh : await which_armor(victim, W.ARMH);
+    let otmp = $c.peq(victim, gy.youmonst) ? $G.uarmh : await which_armor(victim, W.ARMH);
     if (otmp && (!otmph || !rn2(4))) {
         otmph = otmp;
     }
@@ -2880,10 +2857,9 @@ async function select_off(otmp) {   // do_wear.c:2696
  * @returns {Promise<$T.obj | null>} struct obj *
  */
 async function do_takeoff() {   // do_wear.c:2824
-    let otmp = null, was_twoweap = 0, doff = null;
-    otmp = null;
-    was_twoweap = u.twoweap;
-    doff = svc.context.takeoff;
+    let otmp = null;
+    const was_twoweap = u.twoweap;
+    const doff = svc.context.takeoff;
     svc.context.takeoff.mask = $c.or64(svc.context.takeoff.mask, I_SPECIAL);   /* set flag for cancel_doff() */
     if (doff.what === W.WEP) {
         if (!await cursed($G.uwep)) {
@@ -2965,8 +2941,8 @@ async function do_takeoff() {   // do_wear.c:2824
  * @returns {Promise<number>} int
  */
 async function take_off() {   // do_wear.c:2900
-    let i = 0, otmp = null, doff = null;
-    doff = svc.context.takeoff;
+    let i = 0, otmp = null;
+    const doff = svc.context.takeoff;
     if (doff.what) {
         if (doff.delay > 0) {
             doff.delay = doff.delay - 1 | 0;
@@ -3055,8 +3031,8 @@ async function take_off() {   // do_wear.c:2900
  * @returns {Promise<number>} boolean
  */
 async function better_not_take_that_off(otmp) {   // do_wear.c:2990
-    let corpse = null, buf = new Int8Array(256);
-    corpse = carrying_stoning_corpse();
+    let buf = new Int8Array(256);
+    const corpse = carrying_stoning_corpse();
     /* u_safe_from_fatal_corpse() with
        (st_corpse | st_petrifies | st_resists) instead of
        (st_corpse | st_petrifies)
@@ -3082,7 +3058,6 @@ export function reset_remarm() {   // do_wear.c:3014
  */
 export async function doddoremarm() {   // do_wear.c:3022
     let result = 0;
-    result = 0;
     if (svc.context.takeoff.what || svc.context.takeoff.mask) {
         await You($c.lit("continue %s."), new $c.Ptr(svc.context.takeoff.disrobing, 0));
         set_occupation(take_off, new $c.Ptr(svc.context.takeoff.disrobing, 0), 0);
@@ -3114,7 +3089,7 @@ export async function doddoremarm() {   // do_wear.c:3022
  * @returns {Promise<number>} int
  */
 export async function remarm_swapwep() {   // do_wear.c:3062
-    let cq = new $T._cmd_queue(), cmdq = null, oldbknown = 0, $t1;
+    let cq = new $T._cmd_queue(), cmdq = null, $t1;
     if ((cmdq = cmdq_pop()) !== null) {
         /* '-' uswapwep item-action picked from context-sensitive invent */
         cq.$copyFrom(cmdq);
@@ -3126,7 +3101,7 @@ export async function remarm_swapwep() {   // do_wear.c:3062
     if (cq.typ !== CMDQ.KEY || cq.key !== 45 || !$G.uswapwep) {
         return ECMD.FAIL;
     }
-    oldbknown = $G.uswapwep.bknown;
+    const oldbknown = $G.uswapwep.bknown;
     /* when deciding whether this command
      * has done something that takes time,
      * behave as if a cursed secondary weapon
@@ -3142,9 +3117,9 @@ export async function remarm_swapwep() {   // do_wear.c:3062
  * @returns {Promise<number>} int
  */
 async function menu_remarm(retry) {   // do_wear.c:3090
-    let n = 0, i = 0, pick_list = [null], all_worn_categories = 0, ggofeedback = Uint32Array.of(0);
-    i = 0;
-    all_worn_categories = TRUE;
+    let n = 0, pick_list = [null], ggofeedback = Uint32Array.of(0);
+    let i = 0;
+    let all_worn_categories = TRUE;
     if (retry) {
         all_worn_categories = retry === -2 ? 1 : 0;
     } else if (flags.menu_style === MENU.FULL) {
@@ -3191,8 +3166,8 @@ async function menu_remarm(retry) {   // do_wear.c:3090
  * @returns {Promise<void>}
  */
 async function wornarm_destroyed(wornarm) {   // do_wear.c:3144
-    let invobj = null, nextobj = null, wornoid = 0;
-    wornoid = wornarm.o_id;
+    let invobj = null, nextobj = null;
+    const wornoid = wornarm.o_id;
     /* cancel_don() resets 'afternmv' when appropriate but doesn't reset
        uarmc/uarm/&c so doing this now won't interfere with the tests in
        'if (wornarm==uarmc) ... else if (wornarm==uarm) ... else ...' */
@@ -3251,9 +3226,9 @@ function maybe_destroy_armor(armor, atmp, resisted) {   // do_wear.c:3189
  * @returns {Promise<number>} int
  */
 export async function disintegrate_arm(atmp) {   // do_wear.c:3201
-    let otmp = null, losing_gloves = 0, resisted = Int8Array.of(0), resistedc = Int8Array.of(0), resistedsuit = Int8Array.of(0), suit = null;
-    otmp = null;
-    losing_gloves = FALSE;
+    let resisted = Int8Array.of(0), resistedc = Int8Array.of(0), resistedsuit = Int8Array.of(0);
+    let otmp = null;
+    let losing_gloves = FALSE;
     resisted[0] = FALSE;
     resistedc[0] = FALSE;
     resistedsuit[0] = FALSE;
@@ -3268,7 +3243,7 @@ export async function disintegrate_arm(atmp) {   // do_wear.c:3201
         /* cloak/robe/apron/smock (ID'd apron)/wrapping */
         await urgent_pline($c.lit("Your %s crumbles and turns to dust!"), cloak_simple_name(otmp));
     } else if (!resistedc[0] && (otmp = maybe_destroy_armor($G.uarm, atmp, new $c.Ptr(resistedsuit, 0))) !== null) {
-        suit = suit_simple_name(otmp);
+        const suit = suit_simple_name(otmp);
         /* for gold DSM, we don't want Armor_gone() to report that it
            stops shining _after_ we've been told that it is destroyed */
         if (otmp.lamplit) {
@@ -3324,12 +3299,12 @@ function obj_erode_type(otmp) {   // do_wear.c:3260
  * @returns {Promise<number>} int
  */
 export async function destroy_arm() {   // do_wear.c:3278
-    let armors = $c.nulls(7), otmp = null, i = 0, idx = 0, hits = 0, ret = 0, erosion = 0, r = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7;
+    let armors = $c.nulls(7), i = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7;
     armors.fill(null);
     armors[0] = null;
-    idx = 0;
-    hits = rn2(4) + 1 | 0;
-    ret = 0;
+    let idx = 0;
+    const hits = rn2(4) + 1 | 0;
+    let ret = 0;
     /* gather worn armor; include non-erodeable ones */
     if ($G.uarm) {
         armors[($t1 = idx, idx = $t1 + 1 | 0, $t1)] = $G.uarm;
@@ -3356,11 +3331,11 @@ export async function destroy_arm() {   // do_wear.c:3278
         return 0;
     }
     for (i = 0; i < hits; i = i + 1 | 0) {
-        otmp = armors[rn2(idx)];
+        const otmp = armors[rn2(idx)];
         if (erosion_matters(otmp) && is_damageable(otmp) && !otmp.oerodeproof) {
-            erosion = obj_erode_type(otmp);
+            const erosion = obj_erode_type(otmp);
             if (erosion !== ERODE.NONE) {
-                r = await erode_obj(otmp, await xname(otmp), erosion, EF.PAY | EF.DESTROY);
+                const r = await erode_obj(otmp, await xname(otmp), erosion, EF.PAY | EF.DESTROY);
                 if (r !== ER.NOTHING) {
                     ret = 1;
                 }
@@ -3407,11 +3382,11 @@ export async function adj_abon(otmp, delta) {   // do_wear.c:3319
  * @returns {Promise<number>} boolean
  */
 export async function inaccessible_equipment(obj, verb, only_if_known_cursed) {   // do_wear.c:3342
-    let buf = new Int8Array(256), anycovering = 0, cloaktmp = new Int8Array(128), suittmp = new Int8Array(128), sameprefix = 0;
+    let buf = new Int8Array(256), cloaktmp = new Int8Array(128), suittmp = new Int8Array(128);
     /* "dip" or "grease", or null to avoid messages */
     /* ignore covering unless it is known to
      * be cursed */
-    anycovering = !only_if_known_cursed ? 1 : 0;   /* more comprehensible... */
+    const anycovering = !only_if_known_cursed ? 1 : 0;   /* more comprehensible... */
     if (!obj || !obj.owornmask) {
         return FALSE;   /* not inaccessible */
     }
@@ -3429,7 +3404,7 @@ export async function inaccessible_equipment(obj, verb, only_if_known_cursed) { 
             /* if sameprefix, use yname and xname to get "your cloak and suit"
                or "Manlobbi's cloak and suit"; otherwise, use yname and yname
                to get "your cloak and Manlobbi's suit" or vice versa */
-            sameprefix = $G.uarm && $G.uarmc && !$c.strcmp(await shk_your(new $c.Ptr(cloaktmp, 0), $G.uarmc), await shk_your(new $c.Ptr(suittmp, 0), $G.uarm)) ? 1 : 0;
+            const sameprefix = $G.uarm && $G.uarmc && !$c.strcmp(await shk_your(new $c.Ptr(cloaktmp, 0), $G.uarmc), await shk_your(new $c.Ptr(suittmp, 0), $G.uarm)) ? 1 : 0;
             new $c.Ptr(buf, 0).set(0, 0);
             if ($G.uarmc) {
                 $c.strcat(new $c.Ptr(buf, 0), await yname($G.uarmc));
@@ -3463,13 +3438,13 @@ export async function inaccessible_equipment(obj, verb, only_if_known_cursed) { 
  * @returns {Promise<number>} int
  */
 async function equip_ok(obj, removing, accessory) {   // do_wear.c:3404
-    let is_worn = 0, dummymask = [0];
+    let dummymask = [0];
     dummymask[0] = 0;
     if (!obj) {
         return GETOBJ.EXCLUDE;
     }
     /* ignore for putting on if already worn, or removing if not worn */
-    is_worn = $c.and64(obj.owornmask, W_ARMOR | W_ACCESSORY) !== 0 ? 1 : 0;
+    const is_worn = $c.and64(obj.owornmask, W_ARMOR | W_ACCESSORY) !== 0 ? 1 : 0;
     if (removing ^ is_worn) {
         return GETOBJ.EXCLUDE_INACCESS;
     }
@@ -3549,7 +3524,6 @@ export function any_worn_armor_ok(obj) {   // do_wear.c:3480
  */
 export function count_worn_armor() {   // do_wear.c:3489
     let ret = 0;
-    ret = 0;
     if ($G.uarm) {
         ret = ret + 1 | 0;
     }

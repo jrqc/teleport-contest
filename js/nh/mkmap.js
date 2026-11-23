@@ -44,12 +44,11 @@ function init_map(bg_typ) {   // mkmap.c:24
  * @param {number} fg_typ schar
  */
 function init_fill(bg_typ, fg_typ) {   // mkmap.c:37
-    let x = 0, y = 0, limit = 0, count = 0;
-    limit = 624;
-    count = 0;
+    const limit = 624;
+    let count = 0;
     while (count < limit) {
-        x = $c.i16(rn2(WIDTH - 1) + 2 | 0);
-        y = $c.i16(rnd(HEIGHT - 1));
+        const x = $c.i16(rn2(WIDTH - 1) + 2 | 0);
+        const y = $c.i16(rnd(HEIGHT - 1));
         if (svl.level.locations[x][y].typ === bg_typ) {
             svl.level.locations[x][y].typ = fg_typ;
             count = $c.add64(count, 1);
@@ -166,8 +165,8 @@ function pass_three(bg_typ, fg_typ) {   // mkmap.c:124
  * @param {number} anyroom boolean
  */
 export function flood_fill_rm(sx, sy, rmno, lit, anyroom) {   // mkmap.c:153
-    let i = 0, nx = 0, fg_typ = 0, ii = 0, jj = 0;
-    fg_typ = svl.level.locations[sx][sy].typ;
+    let i = 0, ii = 0, jj = 0;
+    const fg_typ = svl.level.locations[sx][sy].typ;
     /* back up to find leftmost uninitialized location */
     while (sx > 0 && (anyroom ? svl.level.locations[sx][sy].typ >= ROOM : svl.level.locations[sx][sy].typ === fg_typ) && svl.level.locations[sx][sy].roomno !== rmno) {
         sx = $c.i16(sx - 1);
@@ -203,7 +202,7 @@ export function flood_fill_rm(sx, sy, rmno, lit, anyroom) {   // mkmap.c:153
         }
         gn.n_loc_filled = gn.n_loc_filled + 1 | 0;
     }
-    nx = i;
+    const nx = i;
     if (isok(sx, $c.i16(sy - 1))) {
         for (i = sx; i < nx; i = $c.i16(i + 1)) {
             if (svl.level.locations[i][sy - 1].typ === fg_typ) {
@@ -387,9 +386,9 @@ function finish_map(fg_typ, bg_typ, lit, walled, icedpools) {   // mkmap.c:331
  * @returns {Promise<void>}
  */
 export async function remove_rooms(lx, ly, hx, hy) {   // mkmap.c:379
-    let i = 0, croom = null;
+    let i = 0;
     for (i = svn.nroom - 1 | 0; i >= 0; i = i - 1 | 0) {
-        croom = $c.relem(svr.rooms, i);
+        const croom = $c.relem(svr.rooms, i);
         if (croom.hx < lx || croom.lx >= hx || croom.hy < ly || croom.ly >= hy) {
             continue;   /* no overlap */
         }
@@ -417,16 +416,16 @@ export async function remove_rooms(lx, ly, hx, hy) {   // mkmap.c:379
  * @param {number} roomno unsigned int
  */
 function remove_room(roomno) {   // mkmap.c:412
-    let croom = null, maxroom = null, x = 0, y = 0, oroomno = 0;
-    croom = $c.relem(svr.rooms, roomno);
-    maxroom = $c.relem(svr.rooms, svn.nroom = svn.nroom - 1 | 0);
+    let x = 0, y = 0;
+    const croom = $c.relem(svr.rooms, roomno);
+    const maxroom = $c.relem(svr.rooms, svn.nroom = svn.nroom - 1 | 0);
     if (!$c.peq(croom, maxroom)) {
         /* since the order in the array only matters for making corridors,
          * copy the last room over the one being removed on the assumption
          * that corridors have already been dug. */
         croom.$copyFrom(maxroom);
         /* since maxroom moved, update affected level roomno values */
-        oroomno = (svn.nroom + ROOMOFFSET | 0) >>> 0;
+        const oroomno = (svn.nroom + ROOMOFFSET | 0) >>> 0;
         roomno = roomno + ROOMOFFSET >>> 0;
         for (x = croom.lx; x <= croom.hx; x = $c.i16(x + 1)) {
             for (y = croom.ly; y <= croom.hy; y = $c.i16(y + 1)) {
@@ -456,13 +455,13 @@ export function litstate_rnd(litstate) {   // mkmap.c:443
  * @returns {Promise<void>}
  */
 export async function mkmap(init_lev) {   // mkmap.c:451
-    let bg_typ = 0, fg_typ = 0, smooth = 0, join = 0, lit = 0, walled = 0, i = 0, $t1;
-    bg_typ = init_lev.bg;
-    fg_typ = init_lev.fg;
-    smooth = init_lev.smoothed;
-    join = init_lev.joined;
-    lit = init_lev.lit;
-    walled = init_lev.walled;
+    let i = 0, $t1;
+    const bg_typ = init_lev.bg;
+    const fg_typ = init_lev.fg;
+    const smooth = init_lev.smoothed;
+    const join = init_lev.joined;
+    let lit = init_lev.lit;
+    const walled = init_lev.walled;
     lit = litstate_rnd(lit);
     $t1 = $c.asArr(await alloc((WIDTH + 1) * HEIGHT), Int8Array), gn.new_locations = $t1;
     init_map(bg_typ);

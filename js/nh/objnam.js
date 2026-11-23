@@ -133,9 +133,8 @@ const spellings = $c.recArray($T.alt_spellings, 47);
  * @returns {Promise<$c.Ptr | null>} char *
  */
 async function strprepend(s, pref) {   // objnam.c:123
-    let star_s = 0, i = 0;
-    star_s = s.get(0);
-    i = $c.i32($c.strlen(pref));
+    const star_s = s.get(0);
+    const i = $c.i32($c.strlen(pref));
     if (i > PREFIX) {
         await impossible($c.lit("PREFIX too short (for %d)."), i);
         return s;
@@ -207,13 +206,12 @@ export function maybereleaseobuf(obuffer) {   // objnam.c:167
  * @returns {Promise<$c.Ptr | null>} char *
  */
 export async function obj_typename(otyp) {   // objnam.c:201
-    let buf = null, ocl = null, actualn = null, dn = null, un = null, nn = 0;
-    buf = nextobuf();
-    ocl = $c.relem(objects, otyp);
-    actualn = obj_descr[ocl.oc_name_idx].oc_name;
-    dn = obj_descr[ocl.oc_descr_idx].oc_descr;
-    un = ocl.oc_uname;
-    nn = ocl.oc_name_known;
+    const buf = nextobuf();
+    const ocl = $c.relem(objects, otyp);
+    let actualn = obj_descr[ocl.oc_name_idx].oc_name;
+    let dn = obj_descr[ocl.oc_descr_idx].oc_descr;
+    const un = ocl.oc_uname;
+    let nn = ocl.oc_name_known;
     if (gu.urole.mnum === PM.SAMURAI) {
         actualn = Japanese_item_name(otyp, actualn);
         if (otyp === WOODEN_HARP || otyp === MAGIC_HARP) {
@@ -315,10 +313,10 @@ export async function obj_typename(otyp) {   // objnam.c:201
  * @returns {Promise<$c.Ptr | null>} char *
  */
 export async function simple_typename(otyp) {   // objnam.c:298
-    let bufp = null, pp = null, save_uname = null;
-    save_uname = objects[otyp].oc_uname;
+    let pp = null;
+    const save_uname = objects[otyp].oc_uname;
     objects[otyp].oc_uname = null;   /* suppress any name given by user */
-    bufp = await obj_typename(otyp);
+    const bufp = await obj_typename(otyp);
     objects[otyp].oc_uname = save_uname;
     if ((pp = strstri(bufp, $c.lit(" ("))) !== null) {
         pp.set(0, 0);   /* strip the appended description */
@@ -331,15 +329,14 @@ export async function simple_typename(otyp) {   // objnam.c:298
  * @returns {Promise<$c.Ptr | null>} char *
  */
 export async function safe_typename(otyp) {   // objnam.c:312
-    let save_nameknown = 0, res = null;
-    res = null;
+    let res = null;
     if (otyp < STRANGE_OBJECT || otyp >= NUM_OBJECTS || !obj_descr[objects[otyp].oc_name_idx].oc_name) {
         res = nextobuf();
         $c.sprintf(res, $c.lit("glorkum[%d]"), otyp);
         await impossible($c.lit("safe_typename: %s"), res);
     } else {
         /* force it to be treated as fully discovered */
-        save_nameknown = objects[otyp].oc_name_known;
+        const save_nameknown = objects[otyp].oc_name_known;
         objects[otyp].oc_name_known = 1;
         res = await simple_typename(otyp);
         objects[otyp].oc_name_known = (save_nameknown) & 1;
@@ -369,7 +366,7 @@ export function obj_is_pname(obj) {   // objnam.c:333
  * @returns {Promise<$c.Ptr | null>} char *
  */
 export async function distant_name(obj, func) {   // objnam.c:347
-    let str = null, save_oid = 0, ox = Int16Array.of(0), oy = Int16Array.of(0), r = 0, neardist = 0;
+    let str = null, ox = Int16Array.of(0), oy = Int16Array.of(0);
     /* object to be formatted */
     /* formatting routine (usually xname or doname) */
     ox[0] = 0;
@@ -390,8 +387,8 @@ export async function distant_name(obj, func) {   // objnam.c:347
      * r==2 yields 6, functionally equivalent to 5, a knight's jump,
      * r==3, the xray range of the Eyes of the Overworld, yields 15.
      */
-    r = u.xray_range > 2 ? u.xray_range : 2;
-    neardist = Math.imul(Math.imul(r, r), 2) - r | 0;   /* same as r*r + r*(r-1) */
+    const r = u.xray_range > 2 ? u.xray_range : 2;
+    const neardist = Math.imul(Math.imul(r, r), 2) - r | 0;   /* same as r*r + r*(r-1) */
     /* setting o_id to 0 prevents xname() from adding T-shirt or apron
        slogan, Hawaiian shirt motif, or candy wrapper label when called
        with 'program_state.gameover' set; we want this suppression for
@@ -401,7 +398,7 @@ export async function distant_name(obj, func) {   // objnam.c:347
        disclosure] that propagates o_id rather than leave it 0, and
        against a potential extra chance to browse the map with getpos()
        during final disclosure (not currently implemented, nor planned) */
-    save_oid = obj.o_id;
+    const save_oid = obj.o_id;
     if (program_state.gameover) {
         obj.o_id = 0;
     }
@@ -433,10 +430,9 @@ export async function distant_name(obj, func) {   // objnam.c:347
  * @returns {Promise<$c.Ptr | null>} char *
  */
 export async function fruitname(juice) {   // objnam.c:414
-    let buf = null, fruit_nam = null;
     /* whether or not to append " juice" to the name */
-    buf = nextobuf();
-    fruit_nam = strstri(new $c.Ptr(svp.pl_fruit, 0), $c.lit(" of "));
+    const buf = nextobuf();
+    let fruit_nam = strstri(new $c.Ptr(svp.pl_fruit, 0), $c.lit(" of "));
     if (fruit_nam) {
         fruit_nam = fruit_nam.add(4);   /* skip past " of " */
     } else {
@@ -467,7 +463,7 @@ export function fruit_from_indx(indx) {   // objnam.c:431
  * @returns {Promise<$T.fruit | null>} struct fruit *
  */
 export async function fruit_from_name(fname, exact, highest_fid) {   // objnam.c:443
-    let f = null, tentativef = null, altfname = null, k = 0, fnamebuf = new Int8Array(256), p = null, fname_k = 0;
+    let f = null, tentativef = null, altfname = null, k = 0, fnamebuf = new Int8Array(256), p = null;
     /* False: prefix or exact match, True: exact match only */
     /* optional output; only valid if 'fname' isn't found */
     /*
@@ -509,7 +505,7 @@ export async function fruit_from_name(fname, exact, highest_fid) {   // objnam.c
         releaseobuf(altfname);
     }
     if (!f && !exact) {
-        fname_k = await Strlen_(fname, $c.lit("fruit_from_name"), 490);   /* length of assumed plural fname */
+        const fname_k = await Strlen_(fname, $c.lit("fruit_from_name"), 490);   /* length of assumed plural fname */
         tentativef = null;
         for (f = gf.ffruit; f; f = f.nextf) {
             k = await Strlen_(new $c.Ptr(f.fname, 0), $c.lit("fruit_from_name"), 494);
@@ -544,8 +540,8 @@ export async function fruit_from_name(fname, exact, highest_fid) {   // objnam.c
  * @returns {Promise<void>}
  */
 export async function reorder_fruit(forward) {   // objnam.c:523
-    let f = null, allfr = $c.nulls(128), i = 0, j = 0, k = 0;
-    k = 128;
+    let f = null, allfr = $c.nulls(128), i = 0, j = 0;
+    const k = 128;
     for (i = 0; i < k; i = i + 1 | 0) {
         allfr[i] = null;
     }
@@ -583,13 +579,12 @@ export async function reorder_fruit(forward) {   // objnam.c:523
  * @returns {Promise<void>}
  */
 async function xcalled(buf, siz, pfx, sfx) {   // objnam.c:558
-    let bufsiz = 0, pfxlen = 0;
     /* eos(obuf) or eos(&obuf[PREFIX]) */
     /* BUFSZ or BUFSZ-PREFIX */
     /* usually class string, sometimes more specific */
     /* user assigned type name */
-    bufsiz = (siz - 1 | 0) - $c.i32($c.strlen(buf)) | 0;
-    pfxlen = $c.i32($c.subu64($c.addu64($c.strlen(pfx), 9), 1));
+    const bufsiz = (siz - 1 | 0) - $c.i32($c.strlen(buf)) | 0;
+    const pfxlen = $c.i32($c.subu64($c.addu64($c.strlen(pfx), 9), 1));
     if (pfxlen > bufsiz) {
         await panic($c.lit("xcalled: not enough room for prefix (%d > %d)"), pfxlen, bufsiz);
     }
@@ -1099,8 +1094,8 @@ async function xname_flags(obj, cxn_flags) {   // objnam.c:581
  * @returns {Promise<$c.Ptr | null>} char *
  */
 async function minimal_xname(obj) {   // objnam.c:1038
-    let bufp = null, bareobj = new $T.obj(), saveobcls = new $T.objclass(), otyp = 0;
-    otyp = obj.otyp;
+    let bareobj = new $T.obj(), saveobcls = new $T.objclass();
+    const otyp = obj.otyp;
     /* suppress user-supplied name */
     saveobcls.oc_uname = objects[otyp].oc_uname;
     objects[otyp].oc_uname = null;
@@ -1132,7 +1127,7 @@ async function minimal_xname(obj) {   // objnam.c:1038
     if (obj.otyp === SLIME_MOLD) {
         bareobj.spe = obj.spe;
     }
-    bufp = await distant_name(bareobj, xname);
+    let bufp = await distant_name(bareobj, xname);
     /* undo forced setting of bareobj.blessed for cleric (priest[ess]);
        bufp is an obuf[] so a pointer into the middle of that is viable */
     if (!$c.strncmp(bufp, $c.lit("uncursed "), 9)) {
@@ -1148,8 +1143,8 @@ async function minimal_xname(obj) {   // objnam.c:1038
  * @returns {Promise<$c.Ptr | null>} char *
  */
 export async function mshot_xname(obj) {   // objnam.c:1090
-    let tmpbuf = new Int8Array(256), onm = null;
-    onm = await xname(obj);
+    let tmpbuf = new Int8Array(256);
+    let onm = await xname(obj);
     if (gm.m_shot.n > 1 && gm.m_shot.o === obj.otyp) {
         /* "the Nth arrow"; value will eventually be passed to an() or
            The(), both of which correctly handle this "the " prefix */
@@ -1164,8 +1159,7 @@ export async function mshot_xname(obj) {   // objnam.c:1090
  * @returns {number} boolean
  */
 export function the_unique_obj(obj) {   // objnam.c:1106
-    let known = 0;
-    known = obj.known || iflags.override_ID ? 1 : 0;
+    const known = obj.known || iflags.override_ID ? 1 : 0;
     if (!obj.dknown && !iflags.override_ID) {
         return FALSE;
     } else if (obj.otyp === FAKE_AMULET_OF_YENDOR && !known) {
@@ -1180,13 +1174,12 @@ export function the_unique_obj(obj) {   // objnam.c:1106
  * @returns {number} boolean
  */
 export function the_unique_pm(ptr) {   // objnam.c:1121
-    let uniq = 0;
     /* even though monsters with personal names are unique, we want to
        describe them as "Name" rather than "the Name" */
     if (type_is_pname(ptr)) {
         return FALSE;
     }
-    uniq = ptr.geno & G_UNIQ ? TRUE : FALSE;
+    let uniq = ptr.geno & G_UNIQ ? TRUE : FALSE;
     /* high priest is unique if it includes "of <deity>", otherwise not
        (caller needs to handle the 1st possibility; we assume the 2nd);
        worm tail should be irrelevant but is included for completeness */
@@ -1204,9 +1197,8 @@ export function the_unique_pm(ptr) {   // objnam.c:1121
  * @param {$c.Ptr | null} prefix char *
  */
 function add_erosion_words(obj, prefix) {   // objnam.c:1143
-    let iscrys = 0, rknown = 0;
-    iscrys = obj.otyp === CRYSKNIFE ? 1 : 0;
-    rknown = iflags.override_ID === 0 ? obj.rknown : TRUE;
+    const iscrys = obj.otyp === CRYSKNIFE ? 1 : 0;
+    const rknown = iflags.override_ID === 0 ? obj.rknown : TRUE;
     if (!is_damageable(obj) && !iscrys) {
         return;
     }
@@ -1899,23 +1891,23 @@ export function not_fully_identified(otmp) {   // objnam.c:1787
  * @returns {Promise<$c.Ptr | null>} char *
  */
 export async function corpse_xname(otmp, adjective, cxn_flags) {   // objnam.c:1824
-    let nambuf = null, omndx = 0, ignore_quan = 0, no_prefix = 0, the_prefix = 0, any_prefix = 0, omit_corpse = 0, possessive = 0, glob = 0, mnam = null, obufp = null, $t1;
+    let mnam = null, obufp = null, $t1;
     /* bitmask of CXN_xxx values */
-    omndx = otmp.corpsenm;
+    const omndx = otmp.corpsenm;
     /* suppress "the" from "the unique monster corpse" */
     /* include "the" for "the woodchuck corpse */
     /* include "an" for "an ogre corpse */
     /* leave off suffix (do_name() appends "corpse" itself) */
-    ignore_quan = (cxn_flags & CXN.SINGULAR) >>> 0 !== 0 ? 1 : 0;
-    no_prefix = (cxn_flags & CXN.NO_PFX) >>> 0 !== 0 ? 1 : 0;
-    the_prefix = (cxn_flags & CXN.PFX_THE) >>> 0 !== 0 ? 1 : 0;
-    any_prefix = (cxn_flags & CXN.ARTICLE) >>> 0 !== 0 ? 1 : 0;
-    omit_corpse = (cxn_flags & CXN.NOCORPSE) >>> 0 !== 0 ? 1 : 0;
-    possessive = FALSE;
-    glob = otmp.otyp !== CORPSE && otmp.globby ? 1 : 0;
+    const ignore_quan = (cxn_flags & CXN.SINGULAR) >>> 0 !== 0 ? 1 : 0;
+    let no_prefix = (cxn_flags & CXN.NO_PFX) >>> 0 !== 0 ? 1 : 0;
+    let the_prefix = (cxn_flags & CXN.PFX_THE) >>> 0 !== 0 ? 1 : 0;
+    let any_prefix = (cxn_flags & CXN.ARTICLE) >>> 0 !== 0 ? 1 : 0;
+    const omit_corpse = (cxn_flags & CXN.NOCORPSE) >>> 0 !== 0 ? 1 : 0;
+    let possessive = FALSE;
+    const glob = otmp.otyp !== CORPSE && otmp.globby ? 1 : 0;
     /* some callers [aobjnam()] rely on prefix area that xname() sets aside */
     $t1 = nextobuf(), gx.xnamep = $t1;
-    nambuf = gx.xnamep.add(PREFIX);
+    const nambuf = gx.xnamep.add(PREFIX);
     if (glob) {
         mnam = obj_descr[objects[otmp.otyp].oc_name_idx].oc_name;   /* "glob of <monster>" */
     } else if (omndx === NON_PM) {
@@ -2018,8 +2010,8 @@ export async function cxname_singular(obj) {   // objnam.c:1933
  * @returns {Promise<$c.Ptr | null>} char *
  */
 export async function killer_xname(obj) {   // objnam.c:1942
-    let save_obj = new $T.obj(), save_ocknown = 0, buf = null, save_ocuname = null, save_oname = null, $t1, $t2, $t3, $t4;
-    save_oname = null;
+    let save_obj = new $T.obj(), buf = null, $t1, $t2, $t3, $t4;
+    let save_oname = null;
     /* bypass object twiddling for artifacts */
     if (obj.oartifact) {
         return await bare_artifactname(obj);
@@ -2051,9 +2043,9 @@ export async function killer_xname(obj) {   // objnam.c:1942
         obj.oextra.oname = null;
     }
     /* temporarily identify the type of object */
-    save_ocknown = objects[obj.otyp].oc_name_known;
+    const save_ocknown = objects[obj.otyp].oc_name_known;
     objects[obj.otyp].oc_name_known = 1;
-    save_ocuname = objects[obj.otyp].oc_uname;
+    const save_ocuname = objects[obj.otyp].oc_uname;
     objects[obj.otyp].oc_uname = null;   /* avoid "foo called bar" */
     /* format the object */
     if (obj.otyp === CORPSE) {
@@ -2088,15 +2080,15 @@ export async function killer_xname(obj) {   // objnam.c:1942
  * @returns {Promise<$c.Ptr | null>} char *
  */
 export async function short_oname(obj, func, altfunc, lenlimit) {   // objnam.c:2009
-    let save_obj = new $T.obj(), unamebuf = new Int8Array(12), onamebuf = new Int8Array(12), save_oname = null, save_uname = null, outbuf = null, $t1, $t2, $t3;
+    let save_obj = new $T.obj(), unamebuf = new Int8Array(12), onamebuf = new Int8Array(12), $t1, $t2, $t3;
     /* main formatting routine */
     /* alternate for shortest result */
-    outbuf = await func(obj);
+    let outbuf = await func(obj);
     if ($c.u32($c.strlen(outbuf)) <= lenlimit) {
         return outbuf;
     }
     /* shorten called string to fairly small amount */
-    save_uname = objects[obj.otyp].oc_uname;
+    const save_uname = objects[obj.otyp].oc_uname;
     if (save_uname && $c.strlen(save_uname) >= 12) {
         $c.strncpy(new $c.Ptr(unamebuf, 0), save_uname, 8);
         $c.strcpy(new $c.Ptr(unamebuf, 0).add($c.idx(12)).add(-4), $c.lit("..."));
@@ -2109,7 +2101,7 @@ export async function short_oname(obj, func, altfunc, lenlimit) {   // objnam.c:
         }
     }
     /* shorten named string to fairly small amount */
-    save_oname = has_oname(obj) ? obj.oextra.oname : null;
+    const save_oname = has_oname(obj) ? obj.oextra.oname : null;
     if (save_oname && $c.strlen(save_oname) >= 12) {
         $c.strncpy(new $c.Ptr(onamebuf, 0), save_oname, 8);
         $c.strcpy(new $c.Ptr(onamebuf, 0).add($c.idx(12)).add(-4), $c.lit("..."));
@@ -2167,14 +2159,13 @@ export async function short_oname(obj, func, altfunc, lenlimit) {   // objnam.c:
  * @returns {Promise<$c.Ptr | null>} const char *
  */
 export async function singular(otmp, func) {   // objnam.c:2091
-    let savequan = 0, nam = null;
     /* using xname for corpses does not give the monster type */
     if (otmp.otyp === CORPSE && func === xname) {
         func = cxname;
     }
-    savequan = otmp.quan;
+    const savequan = otmp.quan;
     otmp.quan = 1;
-    nam = await func(otmp);
+    const nam = await func(otmp);
     otmp.quan = savequan;
     return nam;
 }
@@ -2185,9 +2176,8 @@ export async function singular(otmp, func) {   // objnam.c:2091
  * @returns {$c.Ptr | null} char *
  */
 export function just_an(outbuf, str) {   // objnam.c:2109
-    let c0 = 0;
     outbuf.set(0, 0);
-    c0 = lowc(str.get(0));
+    const c0 = lowc(str.get(0));
     if (!str.get(1) || str.get(1) === 32) {
         /* single letter; might be used for named fruit or a musical note */
         $c.strcpy(outbuf, $c.strchr($c.lit("aefhilmnosx"), c0) ? $c.lit("an ") : $c.lit("a "));
@@ -2215,8 +2205,7 @@ export function just_an(outbuf, str) {   // objnam.c:2109
  * @returns {Promise<$c.Ptr | null>} char *
  */
 export async function an(str) {   // objnam.c:2145
-    let buf = null;
-    buf = nextobuf();
+    const buf = nextobuf();
     if (!str || !str.get(0)) {
         await impossible($c.lit("Alphabet soup: 'an(%s)'."), str ? $c.lit("\"\"") : $c.lit("<null>"));
         return $c.strcpy(buf, $c.lit("an []"));
@@ -2229,8 +2218,8 @@ export async function an(str) {   // objnam.c:2145
  * @returns {Promise<$c.Ptr | null>} char *
  */
 export async function An(str) {   // objnam.c:2158
-    let tmp = null, $t1;
-    tmp = await an(str);
+    let $t1;
+    const tmp = await an(str);
     $t1 = highc(tmp.get(0)), tmp.set(0, $t1);
     return tmp;
 }
@@ -2243,9 +2232,9 @@ export async function An(str) {   // objnam.c:2158
  * @returns {Promise<$c.Ptr | null>} char *
  */
 export async function the(str) {   // objnam.c:2171
-    let aname = null, buf = null, insert_the = 0, named = null, called = null, tmp = null, l = 0, $t1;
-    buf = nextobuf();
-    insert_the = FALSE;
+    let aname = null, tmp = null, l = 0, $t1;
+    const buf = nextobuf();
+    let insert_the = FALSE;
     if (!str || !str.get(0)) {
         await impossible($c.lit("Alphabet soup: 'the(%s)'."), str ? $c.lit("\"\"") : $c.lit("<null>"));
         return $c.strcpy(buf, $c.lit("the []"));
@@ -2273,8 +2262,8 @@ export async function the(str) {   // objnam.c:2171
             /* has spaces */
             /* it needs an article if the name contains "of" */
             tmp = strstri(str, $c.lit(" of "));
-            named = strstri(str, $c.lit(" named "));
-            called = strstri(str, $c.lit(" called "));
+            let named = strstri(str, $c.lit(" named "));
+            const called = strstri(str, $c.lit(" called "));
             if (called && (!named || $c.pcmp(called, named) < 0)) {
                 named = called;
             }
@@ -2298,8 +2287,8 @@ export async function the(str) {   // objnam.c:2171
  * @returns {Promise<$c.Ptr | null>} char *
  */
 export async function The(str) {   // objnam.c:2234
-    let tmp = null, $t1;
-    tmp = await the(str);
+    let $t1;
+    const tmp = await the(str);
     $t1 = highc(tmp.get(0)), tmp.set(0, $t1);
     return tmp;
 }
@@ -2310,8 +2299,8 @@ export async function The(str) {   // objnam.c:2234
  * @returns {Promise<$c.Ptr | null>} char *
  */
 export async function aobjnam(otmp, verb) {   // objnam.c:2244
-    let prefix = new Int8Array(80), bp = null;
-    bp = await cxname(otmp);
+    let prefix = new Int8Array(80);
+    let bp = await cxname(otmp);
     if (otmp.quan !== 1) {
         $c.sprintf(new $c.Ptr(prefix, 0), $c.lit("%ld "), otmp.quan);
         bp = await strprepend(bp, new $c.Ptr(prefix, 0));
@@ -2329,13 +2318,12 @@ export async function aobjnam(otmp, verb) {   // objnam.c:2244
  * @returns {Promise<$c.Ptr | null>} char *
  */
 export async function yobjnam(obj, verb) {   // objnam.c:2262
-    let s = null, outbuf = null, space_left = 0;
-    s = await aobjnam(obj, verb);
+    let s = await aobjnam(obj, verb);
     /* leave off "your" for most of your artifacts, but prepend
      * "your" for unique objects and "foo of bar" quest artifacts */
     if (!carried(obj) || !obj_is_pname(obj) || obj.oartifact >= ART.ORB_OF_DETECTION) {
-        outbuf = await shk_your(nextobuf(), obj);
-        space_left = BUFSZ - 1 - await Strlen_(outbuf, $c.lit("yobjnam"), 2271) >>> 0 | 0;
+        const outbuf = await shk_your(nextobuf(), obj);
+        const space_left = BUFSZ - 1 - await Strlen_(outbuf, $c.lit("yobjnam"), 2271) >>> 0 | 0;
         s = $c.strncat(outbuf, s, $c.u64(space_left));
     }
     return s;
@@ -2347,8 +2335,8 @@ export async function yobjnam(obj, verb) {   // objnam.c:2262
  * @returns {Promise<$c.Ptr | null>} char *
  */
 export async function Yobjnam2(obj, verb) {   // objnam.c:2280
-    let s = null, $t1;
-    s = await yobjnam(obj, verb);
+    let $t1;
+    const s = await yobjnam(obj, verb);
     $t1 = highc(s.get(0)), s.set(0, $t1);
     return s;
 }
@@ -2359,8 +2347,7 @@ export async function Yobjnam2(obj, verb) {   // objnam.c:2280
  * @returns {Promise<$c.Ptr | null>} char *
  */
 export async function Tobjnam(otmp, verb) {   // objnam.c:2290
-    let bp = null;
-    bp = await The(await xname(otmp));
+    const bp = await The(await xname(otmp));
     if (verb) {
         $c.strcat(bp, $c.lit(" "));
         $c.strcat(bp, await otense(otmp, verb));
@@ -2373,8 +2360,8 @@ export async function Tobjnam(otmp, verb) {   // objnam.c:2290
  * @returns {Promise<$c.Ptr | null>} char *
  */
 export async function Doname2(obj) {   // objnam.c:2303
-    let s = null, $t1;
-    s = await doname(obj);
+    let $t1;
+    const s = await doname(obj);
     $t1 = highc(s.get(0)), s.set(0, $t1);
     return s;
 }
@@ -2384,9 +2371,8 @@ export async function Doname2(obj) {   // objnam.c:2303
  * @returns {Promise<$c.Ptr | null>} char *
  */
 export async function paydoname(obj) {   // objnam.c:2313
-    let p = null, save_cknown = 0, save_wizweight = 0;
-    save_cknown = obj.cknown;
-    save_wizweight = iflags.wizweight;
+    const save_cknown = obj.cknown;
+    const save_wizweight = iflags.wizweight;
     if (Has_contents(obj)) {
         obj.cknown = 0;
     }
@@ -2394,7 +2380,7 @@ export async function paydoname(obj) {   // objnam.c:2313
     iflags.wizweight = FALSE;
     /* suppress invent-style price; caller will add billing-style price */
     iflags.suppress_price = iflags.suppress_price + 1 | 0;
-    p = await doname_base(obj, 0);
+    let p = await doname_base(obj, 0);
     iflags.suppress_price = iflags.suppress_price - 1 | 0;
     iflags.wizweight = save_wizweight;
     if (Has_contents(obj)) {
@@ -2429,13 +2415,12 @@ export async function paydoname(obj) {   // objnam.c:2313
  * @returns {Promise<$c.Ptr | null>} char *
  */
 export async function yname(obj) {   // objnam.c:2359
-    let s = null, outbuf = null, space_left = 0;
-    s = await cxname(obj);
+    let s = await cxname(obj);
     /* leave off "your" for most of your artifacts, but prepend
      * "your" for unique objects and "foo of bar" quest artifacts */
     if (!carried(obj) || !obj_is_pname(obj) || obj.oartifact >= ART.ORB_OF_DETECTION) {
-        outbuf = await shk_your(nextobuf(), obj);
-        space_left = BUFSZ - 1 - await Strlen_(outbuf, $c.lit("yname"), 2368) >>> 0 | 0;
+        const outbuf = await shk_your(nextobuf(), obj);
+        const space_left = BUFSZ - 1 - await Strlen_(outbuf, $c.lit("yname"), 2368) >>> 0 | 0;
         s = $c.strncat(outbuf, s, $c.u64(space_left));
     }
     return s;
@@ -2446,8 +2431,8 @@ export async function yname(obj) {   // objnam.c:2359
  * @returns {Promise<$c.Ptr | null>} char *
  */
 export async function Yname2(obj) {   // objnam.c:2378
-    let s = null, $t1;
-    s = await yname(obj);
+    let $t1;
+    const s = await yname(obj);
     $t1 = highc(s.get(0)), s.set(0, $t1);
     return s;
 }
@@ -2460,10 +2445,9 @@ export async function Yname2(obj) {   // objnam.c:2378
  * @returns {Promise<$c.Ptr | null>} char *
  */
 export async function ysimple_name(obj) {   // objnam.c:2391
-    let outbuf = null, s = null, space_left = 0;
-    outbuf = nextobuf();
-    s = await shk_your(outbuf, obj);   /* assert( s == outbuf ); */
-    space_left = BUFSZ - 1 - await Strlen_(s, $c.lit("ysimple_name"), 2395) >>> 0 | 0;
+    const outbuf = nextobuf();
+    const s = await shk_your(outbuf, obj);   /* assert( s == outbuf ); */
+    const space_left = BUFSZ - 1 - await Strlen_(s, $c.lit("ysimple_name"), 2395) >>> 0 | 0;
     return $c.strncat(s, await minimal_xname(obj), $c.u64(space_left));
 }
 /* capitalized variant of ysimple_name() */
@@ -2472,8 +2456,8 @@ export async function ysimple_name(obj) {   // objnam.c:2391
  * @returns {Promise<$c.Ptr | null>} char *
  */
 export async function Ysimple_name2(obj) {   // objnam.c:2402
-    let s = null, $t1;
-    s = await ysimple_name(obj);
+    let $t1;
+    const s = await ysimple_name(obj);
     $t1 = highc(s.get(0)), s.set(0, $t1);
     return s;
 }
@@ -2498,8 +2482,8 @@ export async function Ysimple_name2(obj) {   // objnam.c:2402
  * @returns {Promise<$c.Ptr | null>} char *
  */
 export async function simpleonames(obj) {   // objnam.c:2428
-    let obufp = null, simpleoname = null;
-    simpleoname = await minimal_xname(obj);
+    let obufp = null;
+    const simpleoname = await minimal_xname(obj);
     if (obj.quan !== 1) {
         /* 'simpleoname' points to an obuf; makeplural() will allocate
            another one and only that one can be explicitly released for
@@ -2517,9 +2501,9 @@ export async function simpleonames(obj) {   // objnam.c:2428
  * @returns {Promise<$c.Ptr | null>} char *
  */
 export async function ansimpleoname(obj) {   // objnam.c:2446
-    let obufp = null, simpleoname = null, otyp = 0;
-    simpleoname = await simpleonames(obj);
-    otyp = obj.otyp;
+    let obufp = null;
+    const simpleoname = await simpleonames(obj);
+    let otyp = obj.otyp;
     /* prefix with "the" if a unique item, or a fake one imitating same,
        has been formatted with its actual name (we let minimal_xname() handle
        any `known' and `dknown' checking necessary) */
@@ -2546,10 +2530,9 @@ export async function ansimpleoname(obj) {   // objnam.c:2446
  * @returns {Promise<$c.Ptr | null>} char *
  */
 export async function thesimpleoname(obj) {   // objnam.c:2474
-    let obufp = null, simpleoname = null;
-    simpleoname = await simpleonames(obj);
+    const simpleoname = await simpleonames(obj);
     /* the() will allocate another obuf[]; we want to avoid using two */
-    obufp = await the(simpleoname);
+    const obufp = await the(simpleoname);
     $c.strcpy(simpleoname, obufp);
     releaseobuf(obufp);
     return simpleoname;
@@ -2563,9 +2546,8 @@ export async function thesimpleoname(obj) {   // objnam.c:2474
  * @returns {Promise<$c.Ptr | null>} char *
  */
 export async function actualoname(obj) {   // objnam.c:2490
-    let res = null;
     iflags.override_ID = TRUE;
-    res = await minimal_xname(obj);
+    const res = await minimal_xname(obj);
     iflags.override_ID = FALSE;
     return res;
 }
@@ -2594,7 +2576,6 @@ export async function bare_artifactname(obj) {   // objnam.c:2502
  * @returns {Promise<$c.Ptr | null>} char *
  */
 export async function otense(otmp, verb) {   // objnam.c:2531
-    let buf = null;
     /*
      * verb is given in plural (without trailing s).  Return as input
      * if the result of xname(otmp) would be plural.  Don't bother
@@ -2603,7 +2584,7 @@ export async function otense(otmp, verb) {   // objnam.c:2531
     if (!is_plural(otmp)) {
         return await vtense(null, verb);
     }
-    buf = nextobuf();
+    const buf = nextobuf();
     $c.strcpy(buf, verb);
     return buf;
 }
@@ -2700,11 +2681,11 @@ export async function vtense(subj, verb) {   // objnam.c:2563
  * @returns {Promise<number>} boolean
  */
 async function singplur_lookup(basestr, endstring, to_plural, alt_as_is) {   // objnam.c:2708
-    let sp = null, same = null, other = null, as = null, al = 0, baselen = 0;
+    let sp = null, as = null, al = 0;
     /* base string, pointer to eos(string) */
     /* true => makeplural, false => makesingular */
     /* another set like as_is[] */
-    baselen = await Strlen_(basestr, $c.lit("singplur_lookup"), 2716) | 0;
+    const baselen = await Strlen_(basestr, $c.lit("singplur_lookup"), 2716) | 0;
     for (as = new $c.Ptr(as_is, 0); as.get(0); as = as.add(1)) {
         al = $c.i32($c.strlen(as.get(0)));
         if (!($c.pcmp(endstring.add(-al), basestr) < 0 || strncmpi(endstring.add(-al), as.get(0), -1))) {
@@ -2753,13 +2734,13 @@ async function singplur_lookup(basestr, endstring, to_plural, alt_as_is) {   // 
     }
     for (sp = one_off[0]; sp.sing; sp = $c.radd(sp, 1)) {
         /* check whether endstring already matches */
-        same = to_plural ? sp.plur : sp.sing;
+        const same = to_plural ? sp.plur : sp.sing;
         al = $c.i32($c.strlen(same));
         if (!($c.pcmp(endstring.add(-al), basestr) < 0 || strncmpi(endstring.add(-al), same, -1))) {
             return TRUE;   /* use as-is */
         }
         /* check whether it matches the inverse; if so, transform it */
-        other = to_plural ? sp.sing : sp.plur;
+        const other = to_plural ? sp.sing : sp.plur;
         al = $c.i32($c.strlen(other));
         if (!($c.pcmp(endstring.add(-al), basestr) < 0 || strncmpi(endstring.add(-al), other, -1))) {
             strcasecpy(endstring.add(-al), same);
@@ -3110,15 +3091,15 @@ export async function makesingular(oldstr) {   // objnam.c:3037
  * @returns {number} boolean
  */
 function ch_ksound(basestr) {   // objnam.c:3168
-    let i = 0, al = 0, endstr = null;
+    let i = 0;
     /* these are some *ch words/suffixes that make a k-sound. They pluralize by
        adding 's' rather than 'es' */
     if (!basestr || $c.strlen(basestr) < 4) {
         return FALSE;
     }
-    endstr = eos(basestr);
+    const endstr = eos(basestr);
     for (i = 0; i < 19; i = i + 1 | 0) {
-        al = $c.i32($c.strlen(ch_ksound$ch_k[i]));
+        const al = $c.i32($c.strlen(ch_ksound$ch_k[i]));
         if (!($c.pcmp(endstr.add(-al), basestr) < 0 || strncmpi(endstr.add(-al), ch_ksound$ch_k[i], -1))) {
             return TRUE;
         }
@@ -3131,14 +3112,14 @@ function ch_ksound(basestr) {   // objnam.c:3168
  * @returns {number} boolean
  */
 function badman(basestr, to_plural) {   // objnam.c:3194
-    let i = 0, al = 0, endstr = null, spot = null;
+    let i = 0, al = 0, spot = null;
     /* True: makeplural, False: makesingular */
     /* these are all the prefixes for *man that don't have a *men plural */
     /* these are all the prefixes for *men that don't have a *man singular */
     if (!basestr || $c.strlen(basestr) < 4) {
         return FALSE;
     }
-    endstr = eos(basestr);
+    const endstr = eos(basestr);
     if (to_plural) {
         for (i = 0; i < 36; i = i + 1 | 0) {
             al = $c.i32($c.strlen(badman$no_men[i]));
@@ -3166,7 +3147,7 @@ function badman(basestr, to_plural) {   // objnam.c:3194
  * @returns {Promise<number>} boolean
  */
 async function wishymatch(u_str, o_str, retry_inverted) {   // objnam.c:3243
-    let p = null, buf = new Int8Array(256), u_of = null, o_of = null;
+    let p = null, buf = new Int8Array(256);
     /* from user, so might be variant spelling */
     /* from objects[], so is in canonical form */
     /* optional extra "of" handling */
@@ -3177,8 +3158,8 @@ async function wishymatch(u_str, o_str, retry_inverted) {   // objnam.c:3243
     if (retry_inverted) {
         /* when just one of the strings is in the form "foo of bar",
            convert it into "bar foo" and perform another comparison */
-        u_of = strstri(u_str, $c.lit(" of "));
-        o_of = strstri(o_str, $c.lit(" of "));
+        const u_of = strstri(u_str, $c.lit(" of "));
+        const o_of = strstri(o_str, $c.lit(" of "));
         if (u_of && !o_of) {
             $c.strcpy(new $c.Ptr(buf, 0), u_of.add(4));
             copynchars(eos($c.strcat(new $c.Ptr(buf, 0), $c.lit(" "))), u_str, $c.i32($c.pdiff(u_of, u_str)));
@@ -3262,9 +3243,9 @@ async function wishymatch(u_str, o_str, retry_inverted) {   // objnam.c:3243
  * @returns {number} short
  */
 function rnd_otyp_by_wpnskill(skill) {   // objnam.c:3432
-    let i = 0, n = 0, otyp = 0;
-    n = 0;
-    otyp = STRANGE_OBJECT;
+    let i = 0;
+    let n = 0;
+    let otyp = STRANGE_OBJECT;
     for (i = svb.bases[WEAPON_CLASS]; i < NUM_OBJECTS && objects[i].oc_class === WEAPON_CLASS; i = i + 1 | 0) {
         if (objects[i].oc_subtyp === skill) {
             n = n + 1 | 0;
@@ -3290,18 +3271,18 @@ function rnd_otyp_by_wpnskill(skill) {   // objnam.c:3432
  * @returns {Promise<number>} short
  */
 async function rnd_otyp_by_namedesc(name, oclass, xtra_prob) {   // objnam.c:3455
-    let i = 0, n = 0, validobjs = new Int16Array(481), zn = null, of = null, check_of = 0, lo = 0, hi = 0, minglob = 0, maxglob = 0, prob = 0, maxprob = 0, $t1;
+    let i = 0, validobjs = new Int16Array(481), zn = null, of = null, lo = 0, hi = 0, $t1;
     /* add to item's chance of being chosen; non-zero causes
      * 0% random generation items to also be considered */
-    n = 0;
-    maxprob = 0;
+    let n = 0;
+    let maxprob = 0;
     if (!name || !name.get(0)) {
         return STRANGE_OBJECT;
     }
     /* only skip "foo of" for "foo of bar" if target doesn't contain " of " */
-    check_of = strstri(name, $c.lit(" of ")) === null ? 1 : 0;
-    minglob = GLOB_OF_GRAY_OOZE;
-    maxglob = GLOB_OF_BLACK_PUDDING;
+    const check_of = strstri(name, $c.lit(" of ")) === null ? 1 : 0;
+    const minglob = GLOB_OF_GRAY_OOZE;
+    const maxglob = GLOB_OF_BLACK_PUDDING;
     $c.memset(new $c.Ptr(validobjs, 0), 0, 962);
     if (oclass) {
         lo = svb.bases[$c.u8(oclass)];
@@ -3342,7 +3323,7 @@ async function rnd_otyp_by_namedesc(name, oclass, xtra_prob) {   // objnam.c:345
         }
     }
     if (n > 0 && maxprob) {
-        prob = rn2(maxprob);
+        let prob = rn2(maxprob);
         for (i = 0; i < (n - 1 | 0); i = i + 1 | 0) {
             if ((prob = prob - (objects[validobjs[i]].oc_prob + xtra_prob | 0) | 0) < 0) {
                 break;
@@ -3365,7 +3346,6 @@ export async function shiny_obj(oclass) {   // objnam.c:3532
  */
 function set_wallprop_from_str(bp) {   // objnam.c:3539
     let wall_prop = 0;
-    wall_prop = 0;
     if ($c.strstr(bp, $c.lit("undiggable ")) || $c.strstr(bp, $c.lit("nondiggable "))) {
         wall_prop = wall_prop | W.NONDIGGABLE;
     }
@@ -3383,14 +3363,14 @@ function set_wallprop_from_str(bp) {   // objnam.c:3539
  * @returns {Promise<$T.obj | null>} struct obj *
  */
 async function wizterrainwish(d) {   // objnam.c:3554
-    let lev = null, madeterrain = 0, badterrain = 0, is_dbridge = 0, trap = 0, oldtyp = 0, ltyp = 0, x = 0, y = 0, bp = null, p = null, t = null, tname = null, save_prop = 0, new_water = null, icebuf = new Int8Array(40), al = 0, dbuf = new Int8Array(40), old_wall_info = 0, secret = 0, wall = 0, t$2 = null, $t1, $t2, $t3, $t4;
-    madeterrain = FALSE;
-    badterrain = FALSE;
-    x = u.ux;
-    y = u.uy;
-    bp = d.bp;
+    let trap = 0, ltyp = 0, t = null, icebuf = new Int8Array(40), al = 0, dbuf = new Int8Array(40), t$2 = null, $t1, $t2, $t3, $t4;
+    let madeterrain = FALSE;
+    let badterrain = FALSE;
+    const x = u.ux;
+    const y = u.uy;
+    const bp = d.bp;
     for (trap = NO_TRAP + 1; trap < TRAPNUM; trap = trap + 1 | 0) {
-        tname = trapname(trap, TRUE);
+        let tname = trapname(trap, TRUE);
         if (!str_start_is(bp, tname, TRUE)) {
             continue;
         }
@@ -3409,10 +3389,10 @@ async function wizterrainwish(d) {   // objnam.c:3554
     }
     /* furniture and terrain (use at your own risk; can clobber stairs
        or place furniture on existing traps which shouldn't be allowed) */
-    lev = $c.relem(svl.level.locations[x], y);
-    oldtyp = lev.typ >>> 0;
-    is_dbridge = oldtyp === DRAWBRIDGE_DOWN || oldtyp === DRAWBRIDGE_UP ? 1 : 0;
-    p = eos(bp);
+    const lev = $c.relem(svl.level.locations[x], y);
+    const oldtyp = lev.typ >>> 0;
+    const is_dbridge = oldtyp === DRAWBRIDGE_DOWN || oldtyp === DRAWBRIDGE_UP ? 1 : 0;
+    const p = eos(bp);
     if (!($c.pcmp(p.add(-8), bp) < 0 || strncmpi(p.add(-8), $c.lit("fountain"), -1))) {
         lev.typ = FOUNTAIN;
         if (oldtyp !== FOUNTAIN) {
@@ -3448,9 +3428,9 @@ async function wizterrainwish(d) {   // objnam.c:3554
         }
         await del_engr_at(x, y);
         if (!is_dbridge) {
-            save_prop = u.uprops[HALLUC_RES].extrinsic;
+            const save_prop = u.uprops[HALLUC_RES].extrinsic;
             u.uprops[HALLUC_RES].extrinsic = 1;
-            new_water = waterbody_name(x, y);
+            const new_water = waterbody_name(x, y);
             u.uprops[HALLUC_RES].extrinsic = save_prop;
             await pline($c.lit("%s."), await An(new_water));
             /* Must manually make kelp! */
@@ -3552,7 +3532,7 @@ async function wizterrainwish(d) {   // objnam.c:3554
         await del_engr_at(x, y);
         madeterrain = TRUE;
     } else if (!($c.pcmp(p.add(-4), bp) < 0 || strncmpi(p.add(-4), $c.lit("door"), -1)) || d.doorless && !($c.pcmp(p.add(-7), bp) < 0 || strncmpi(p.add(-7), $c.lit("doorway"), -1))) {
-        secret = !($c.pcmp(p.add(-11), bp) < 0 || strncmpi(p.add(-11), $c.lit("secret door"), -1)) ? 1 : 0;
+        const secret = !($c.pcmp(p.add(-11), bp) < 0 || strncmpi(p.add(-11), $c.lit("secret door"), -1)) ? 1 : 0;
         /* require door or wall so that the 'horizontal' flag will
            already have the correct value; player might choose to put
            DOOR on top of existing DOOR or SDOOR on top of existing SDOOR
@@ -3561,7 +3541,7 @@ async function wizterrainwish(d) {   // objnam.c:3554
            doorless doorway so will be acceptable here */
         if (lev.typ === DOOR || lev.typ === SDOOR || IS_WALL(lev.typ) && lev.typ !== DBWALL || lev.typ === IRONBARS) {
             /* remember previous wall info [is this right for iron bars?] */
-            old_wall_info = lev.typ !== DOOR ? lev.flags : 0;
+            const old_wall_info = lev.typ !== DOOR ? lev.flags : 0;
             /* set the new terrain type */
             lev.typ = secret ? SDOOR : DOOR;
             lev.flags = 0;   /* overlays 'flags' */
@@ -3632,7 +3612,7 @@ async function wizterrainwish(d) {   // objnam.c:3554
             badterrain = TRUE;
         }
     } else if (!($c.pcmp(p.add(-4), bp) < 0 || strncmpi(p.add(-4), $c.lit("wall"), -1)) && ($c.peq(bp, p.add(-4)) || p.get(-5) === 32)) {
-        wall = HWALL;
+        let wall = HWALL;
         if (isok(u.ux, $c.i16(u.uy - 1)) && (svl.level.locations[u.ux][u.uy - 1].typ && svl.level.locations[u.ux][u.uy - 1].typ <= DBWALL) || isok(u.ux, $c.i16(u.uy + 1)) && (svl.level.locations[u.ux][u.uy + 1].typ && svl.level.locations[u.ux][u.uy + 1].typ <= DBWALL)) {
             wall = VWALL;
         }
@@ -3762,10 +3742,10 @@ function readobjnam_init(bp, d) {   // objnam.c:3933
  * @returns {number} int
  */
 function readobjnam_preparse(d) {   // objnam.c:3966
-    let save_bp = null, more_l = 0, res = 0, l = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12, $t13, $t14, $t15, $t16, $t17, $t18, $t19, $t20, $t21, $t22, $t23, $t24, $t25, $t26, $t27, $t28, $t29, $t30, $t31;
-    save_bp = null;
-    more_l = 0;
-    res = 1;
+    let l = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12, $t13, $t14, $t15, $t16, $t17, $t18, $t19, $t20, $t21, $t22, $t23, $t24, $t25, $t26, $t27, $t28, $t29, $t30, $t31;
+    let save_bp = null;
+    let more_l = 0;
+    let res = 1;
     for (; ; ) {
         if (!d.bp || !d.bp.get(0)) {
             break;
@@ -3950,10 +3930,10 @@ function readobjnam_preparse(d) {   // objnam.c:3966
  * @param {$T._readobjnam_data | null} d struct _readobjnam_data *
  */
 function readobjnam_parse_charges(d) {   // objnam.c:4178
-    let keeptrailingchars = 0, idx = 0, pp = null, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8;
+    let $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8;
     if ($c.strlen(d.bp) > 1 && ($t1 = $c.strrchr(d.bp, 40), d.p = $t1) !== null) {
-        keeptrailingchars = TRUE;
-        idx = 0;
+        let keeptrailingchars = TRUE;
+        let idx = 0;
         if ($c.pcmp(d.p, d.bp) > 0 && d.p.get(-1) === 32) {
             idx = -1;
         }
@@ -3987,7 +3967,7 @@ function readobjnam_parse_charges(d) {   // objnam.c:4178
             }
         }
         if (keeptrailingchars) {
-            pp = eos(d.bp);
+            let pp = eos(d.bp);
             /* 'pp' points at 'pb's terminating '\0',
                'p' points at ')' and will be incremented past it */
             do {
@@ -4017,7 +3997,7 @@ function readobjnam_parse_charges(d) {   // objnam.c:4178
  * @returns {Promise<number>} int
  */
 async function readobjnam_postparse1(d) {   // objnam.c:4240
-    let i = 0, s = null, rest = [null], obp = null, sng = null, as = null, dbp = null, j = 0, k = 0, l = 0, amubuf = new Int8Array(256), beartrap = 0, zp = null, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12, $t13, $t14, $t15, $t16, $t17, $t18, $t19, $t20, $t21, $t22, $t23;
+    let i = 0, rest = [null], amubuf = new Int8Array(256), $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12, $t13, $t14, $t15, $t16, $t17, $t18, $t19, $t20, $t21, $t22, $t23;
     /* now we have the actual name, as delivered by xname, say
      *  green potions called whisky
      *  scrolls labeled "QWERTY"
@@ -4060,7 +4040,7 @@ async function readobjnam_postparse1(d) {   // objnam.c:4240
     /* real vs fake is only useful for wizard mode but we'll accept its
        parsing in normal play (result is never real Amulet for that case) */
     if (($t6 = strstri(d.bp, obj_descr[objects[AMULET_OF_YENDOR].oc_descr_idx].oc_descr), d.p = $t6) !== null && ($c.peq(d.p, d.bp) || d.p.get(-1) === 32)) {
-        s = d.bp;
+        let s = d.bp;
         /* "Amulet of Yendor" matches two items, name of real Amulet
            and description of fake one; player can explicitly specify
            "real" to disambiguate, but not specifying "fake" achieves
@@ -4177,7 +4157,7 @@ async function readobjnam_postparse1(d) {   // objnam.c:4240
         /* not the "mage" rank */
         rest[0] = null;
         if (d.mntmp < LOW_PM && $c.strlen(d.bp) > 2 && ($t16 = await name_to_monplus(d.bp, new $c.Ptr(rest, 0), new $c.FieldRef(d, "mgend", "i32")), d.mntmp = $t16) >= LOW_PM) {
-            obp = d.bp;
+            const obp = d.bp;
             /* 'rest' is a pointer past the matching portion; if that was
                an alternate name or a rank title rather than the canonical
                monster name we wouldn't otherwise know how much to skip */
@@ -4205,7 +4185,7 @@ async function readobjnam_postparse1(d) {   // objnam.c:4240
        "cloth" because it might yield a "cloth spellbook" rather than
        a "piece of cloth" cloak [maybe we should give random armor?] */
     if (d.bp.get(0) && strncmpi(d.bp, $c.lit("tricks"), -1) && strncmpi(d.bp, $c.lit("clothes"), -1)) {
-        sng = await makesingular(d.bp);
+        const sng = await makesingular(d.bp);
         if ($c.strcmp(d.bp, sng)) {
             if (d.cnt === 1) {
                 d.cnt = 2;
@@ -4215,7 +4195,7 @@ async function readobjnam_postparse1(d) {   // objnam.c:4240
     }
     /* Alternate spellings (pick-ax, silver sabre, &c) */
     {
-        as = spellings[0];
+        let as = spellings[0];
         while (as.sp) {
             if (await wishymatch(d.bp, as.sp, TRUE)) {
                 d.typ = as.ob;
@@ -4258,7 +4238,7 @@ async function readobjnam_postparse1(d) {   // objnam.c:4240
     }
     /* accept "paperback" or "paperback book", reject "paperback spellbook" */
     if (!strncmpi(d.bp, $c.lit("paperback"), 9)) {
-        dbp = d.bp.add(9);   /* just past "paperback" */
+        const dbp = d.bp.add(9);   /* just past "paperback" */
         if (!dbp.get(0) || !strncmpi(dbp, $c.lit(" book"), 5)) {
             d.typ = SPE_NOVEL;
             return 2;   /*goto typfnd;*/
@@ -4307,7 +4287,7 @@ async function readobjnam_postparse1(d) {   // objnam.c:4240
        Avoid false hits on, e.g., rings for "ring mail". */
     if (strncmpi(d.bp, $c.lit("enchant "), 8) && strncmpi(d.bp, $c.lit("destroy "), 8) && strncmpi(d.bp, $c.lit("detect food"), 11) && strncmpi(d.bp, $c.lit("food detection"), 14) && strncmpi(d.bp, $c.lit("ring mail"), 9) && strncmpi(d.bp, $c.lit("studded leather armor"), 21) && strncmpi(d.bp, $c.lit("leather armor"), 13) && strncmpi(d.bp, $c.lit("tooled horn"), 11) && strncmpi(d.bp, $c.lit("food ration"), 11) && strncmpi(d.bp, $c.lit("meat ring"), 9)) {
         for (i = 0; i < 13; i = i + 1 | 0) {
-            j = await Strlen_(wrp[i], $c.lit("readobjnam_postparse1"), 4568) | 0;
+            const j = await Strlen_(wrp[i], $c.lit("readobjnam_postparse1"), 4568) | 0;
             /* check for "<class> [ of ] something" */
             if (!strncmpi(d.bp, wrp[i], j)) {
                 d.oclass = wrpsym[i];
@@ -4345,12 +4325,12 @@ async function readobjnam_postparse1(d) {   // objnam.c:4240
                     }
                     /* check for "<shape> amulet"; strip off trailing
                        " amulet" for that w/o changing contents of d->bp */
-                    l = $c.i32($c.strlen(d.bp)) - j | 0;
+                    let l = $c.i32($c.strlen(d.bp)) - j | 0;
                     if (l > 0 && d.bp.get(l - 1 | 0) === 32) {
                         l = l - 1 | 0;
                     }
                     copynchars(new $c.Ptr(amubuf, 0), d.bp, l < 255 ? l : 255);
-                    k = await rnd_otyp_by_namedesc(new $c.Ptr(amubuf, 0), AMULET_CLASS, 0);
+                    const k = await rnd_otyp_by_namedesc(new $c.Ptr(amubuf, 0), AMULET_CLASS, 0);
                     if (k !== STRANGE_OBJECT) {
                         d.typ = k;
                         return 2;   /*goto typfnd;*/
@@ -4378,8 +4358,8 @@ async function readobjnam_postparse1(d) {   // objnam.c:4240
      * name or the object name.
      */
     if (wizard() && (!strncmpi(d.bp, $c.lit("bear"), 4) || !strncmpi(d.bp, $c.lit("land"), 4))) {
-        beartrap = lowc(d.bp.get(0)) === 98 ? 1 : 0;
-        zp = d.bp.add(4);   /* skip "bear"/"land" */
+        const beartrap = lowc(d.bp.get(0)) === 98 ? 1 : 0;
+        let zp = d.bp.add(4);   /* skip "bear"/"land" */
         if (zp.get(0) === 32) {
             zp = zp.add(1);   /* embedded space is optional */
         }
@@ -4406,7 +4386,7 @@ async function readobjnam_postparse1(d) {   // objnam.c:4240
  * @returns {number} int
  */
 function readobjnam_postparse2(d) {   // objnam.c:4666
-    let i = 0, s = null, tbuf = new Int8Array(256), $t1, $t2, $t3;
+    let i = 0, tbuf = new Int8Array(256), $t1, $t2, $t3;
     /* "grey stone" check must be before general "stone" */
     for (i = 0; i < 19; i = i + 1 | 0) {
         if (!strncmpi(d.bp, o_ranges[i].name, -1)) {
@@ -4422,7 +4402,7 @@ function readobjnam_postparse2(d) {   // objnam.c:4666
     } else if (!strncmpi(d.bp, $c.lit("looking glass"), -1)) {
         /* avoid false hit on "* glass" */
     } else if (!($c.pcmp(d.p.add(-6), d.bp) < 0 || strncmpi(d.p.add(-6), $c.lit(" glass"), -1)) || !strncmpi(d.bp, $c.lit("glass"), -1)) {
-        s = d.bp;
+        let s = d.bp;
         /* treat "broken glass" as a non-existent item; since "broken" is
            also a chest/box prefix it might have been stripped off above */
         if (d.broken || strstri(s, $c.lit("broken"))) {
@@ -4467,7 +4447,7 @@ function readobjnam_postparse2(d) {   // objnam.c:4666
  * @returns {Promise<number>} int
  */
 async function readobjnam_postparse3(d) {   // objnam.c:4727
-    let i = 0, zn = null, j = null, fp = null, l = 0, cntf = 0, blessedf = 0, iscursedf = 0, uncursedf = 0, halfeatenf = 0, f = null, ftyp = 0, objtyp = Int16Array.of(0), as = null, $t1, $t2, $t3, $t4, $t5;
+    let i = 0, zn = null, l = 0, iscursedf = 0, uncursedf = 0, halfeatenf = 0, f = null, objtyp = Int16Array.of(0), $t1, $t2, $t3, $t4, $t5;
     /* check real names of gems first */
     if (!d.oclass && d.actualn) {
         for (i = svb.bases[GEM_CLASS]; i <= LAST_REAL_GEM; i = i + 1 | 0) {
@@ -4488,7 +4468,7 @@ async function readobjnam_postparse3(d) {   // objnam.c:4727
     }
     d.typ = 0;
     if (d.actualn) {
-        j = Japanese_items[0];
+        let j = Japanese_items[0];
         while (j.item) {
             if (!strncmpi(d.actualn, j.name, -1)) {
                 d.typ = j.item;
@@ -4530,9 +4510,9 @@ async function readobjnam_postparse3(d) {   // objnam.c:4727
        that resulted in "grapefruit" matching "grape" if the latter came
        earlier than the former in the fruit list. */
     {
-        blessedf = iscursedf = uncursedf = halfeatenf = 0;
-        cntf = 0;
-        fp = new $c.Ptr(d.fruitbuf, 0);
+        let blessedf = iscursedf = uncursedf = halfeatenf = 0;
+        let cntf = 0;
+        let fp = new $c.Ptr(d.fruitbuf, 0);
         for (; ; ) {
             if (!fp || !fp.get(0)) {
                 break;
@@ -4563,7 +4543,7 @@ async function readobjnam_postparse3(d) {   // objnam.c:4727
         }
         for (f = gf.ffruit; f; f = f.nextf) {
             /* match type: 0=none, 1=exact, 2=singular, 3=plural */
-            ftyp = 0;
+            let ftyp = 0;
             if (!$c.strcmp(fp, new $c.Ptr(f.fname, 0))) {
                 ftyp = 1;
             } else if (!$c.strcmp(fp, await makesingular(new $c.Ptr(f.fname, 0)))) {
@@ -4603,7 +4583,7 @@ async function readobjnam_postparse3(d) {   // objnam.c:4727
     /* got a class, but not specific type;
        check alternate spellings of items with matching classes */
     if (d.oclass && !d.typ) {
-        as = spellings[0];
+        let as = spellings[0];
         while (as.sp) {
             if (objects[as.ob].oc_class === d.oclass && await wishymatch(d.bp, as.sp, TRUE)) {
                 d.typ = as.ob;
@@ -5113,8 +5093,8 @@ export async function readobjnam(bp, no_wish) {   // objnam.c:4910
  * @returns {number} int
  */
 export function rnd_class(first, last) {   // objnam.c:5403
-    let i = 0, x = 0, sum = 0;
-    sum = 0;
+    let i = 0;
+    let sum = 0;
     if (last > first) {
         for (i = first; i <= last; i = i + 1 | 0) {
             sum = sum + objects[i].oc_prob | 0;
@@ -5122,7 +5102,7 @@ export function rnd_class(first, last) {   // objnam.c:5403
         if (!sum) {   /* all zero, so equal probability */
             return rn2((last - first | 0) + 1 | 0) + first | 0;
         }
-        x = rnd(sum);
+        let x = rnd(sum);
         for (i = first; i <= last; i = i + 1 | 0) {
             if ((x = x - objects[i].oc_prob | 0) <= 0) {
                 return i;
@@ -5137,8 +5117,7 @@ export function rnd_class(first, last) {   // objnam.c:5403
  * @returns {$c.Ptr | null} const char *
  */
 export function Japanese_item_name(i, ordinaryname) {   // objnam.c:5422
-    let j = null;
-    j = Japanese_items[0];
+    let j = Japanese_items[0];
     while (j.item) {
         if (i === j.item) {
             return j.name;
@@ -5152,9 +5131,8 @@ export function Japanese_item_name(i, ordinaryname) {   // objnam.c:5422
  * @returns {Promise<$c.Ptr | null>} const char *
  */
 export async function armor_simple_name(armor) {   // objnam.c:5435
-    let result = null, armcat = 0;
-    result = null;
-    armcat = objects[armor.otyp].oc_subtyp >>> 0;
+    let result = null;
+    const armcat = objects[armor.otyp].oc_subtyp >>> 0;
     switch (armcat) {
         case ARM_SUIT:
             result = suit_simple_name(armor);
@@ -5189,15 +5167,14 @@ export async function armor_simple_name(armor) {   // objnam.c:5435
  * @returns {$c.Ptr | null} const char *
  */
 export function suit_simple_name(suit) {   // objnam.c:5471
-    let suitnm = null, esuitp = null;
     if (suit) {
         if (Is_dragon_mail(suit)) {
             return $c.lit("dragon mail");   /* <color> dragon scale mail */
         } else if (Is_dragon_scales(suit)) {
             return $c.lit("dragon scales");
         }
-        suitnm = obj_descr[objects[suit.otyp].oc_name_idx].oc_name;
-        esuitp = eos(suitnm);
+        const suitnm = obj_descr[objects[suit.otyp].oc_name_idx].oc_name;
+        const esuitp = eos(suitnm);
         if ($c.strlen(suitnm) > 5 && !$c.strcmp(esuitp.add(-5), $c.lit(" mail"))) {
             return $c.lit("mail");   /* most suits fall into this category */
         } else if ($c.strlen(suitnm) > 7 && !$c.strcmp(esuitp.add(-7), $c.lit(" jacket"))) {
@@ -5252,12 +5229,11 @@ export function helm_simple_name(helmet) {   // objnam.c:5513
  * @returns {$c.Ptr | null} const char *
  */
 export function gloves_simple_name(gloves) {   // objnam.c:5532
-    let otyp = 0, ocl = null, actualn = null, descrpn = null;
     if (gloves && gloves.dknown) {
-        otyp = gloves.otyp;
-        ocl = $c.relem(objects, otyp);
-        actualn = obj_descr[ocl.oc_name_idx].oc_name;
-        descrpn = obj_descr[ocl.oc_descr_idx].oc_descr;
+        const otyp = gloves.otyp;
+        const ocl = $c.relem(objects, otyp);
+        const actualn = obj_descr[ocl.oc_name_idx].oc_name;
+        const descrpn = obj_descr[ocl.oc_descr_idx].oc_descr;
         if (strstri(objects[otyp].oc_name_known ? actualn : descrpn, new $c.Ptr(gloves_simple_name$gauntlets, 0))) {
             return new $c.Ptr(gloves_simple_name$gauntlets, 0);
         }
@@ -5270,12 +5246,11 @@ export function gloves_simple_name(gloves) {   // objnam.c:5532
  * @returns {$c.Ptr | null} const char *
  */
 export function boots_simple_name(boots) {   // objnam.c:5551
-    let otyp = 0, ocl = null, actualn = null, descrpn = null;
     if (boots && boots.dknown) {
-        otyp = boots.otyp;
-        ocl = $c.relem(objects, otyp);
-        actualn = obj_descr[ocl.oc_name_idx].oc_name;
-        descrpn = obj_descr[ocl.oc_descr_idx].oc_descr;
+        const otyp = boots.otyp;
+        const ocl = $c.relem(objects, otyp);
+        const actualn = obj_descr[ocl.oc_name_idx].oc_name;
+        const descrpn = obj_descr[ocl.oc_descr_idx].oc_descr;
         if (strstri(descrpn, new $c.Ptr(boots_simple_name$shoes, 0)) || objects[otyp].oc_name_known && strstri(actualn, new $c.Ptr(boots_simple_name$shoes, 0))) {
             return new $c.Ptr(boots_simple_name$shoes, 0);
         }
@@ -5349,14 +5324,13 @@ export async function mimic_obj_name(mtmp) {   // objnam.c:5606
  * @returns {Promise<$c.Ptr | null>} char *
  */
 export async function safe_qbuf(qbuf, qprefix, qsuffix, obj, func, altfunc, lastR) {   // objnam.c:5624
-    let bufp = null, endp = null, len = 0, lenlimit = 0, len_qpfx = 0, len_qsfx = 0, len_lastR = 0;
     /* output buffer */
     /* convert size_t (or int for ancient systems) to ordinary unsigned */
-    len_qpfx = $c.u32(qprefix ? $c.strlen(qprefix) : 0);
-    len_qsfx = $c.u32(qsuffix ? $c.strlen(qsuffix) : 0);
-    len_lastR = $c.u32($c.strlen(lastR));
-    lenlimit = QBUFSZ - 1;
-    endp = qbuf.add(lenlimit);
+    const len_qpfx = $c.u32(qprefix ? $c.strlen(qprefix) : 0);
+    const len_qsfx = $c.u32(qsuffix ? $c.strlen(qsuffix) : 0);
+    const len_lastR = $c.u32($c.strlen(lastR));
+    const lenlimit = QBUFSZ - 1;
+    const endp = qbuf.add(lenlimit);
     (!!$c.peq(endp, $c.asArr(null, Int8Array)) ? 1 : 0) ? $c.__assert_rtn($c.lit("safe_qbuf"), $c.lit("objnam.c"), 5642, $c.lit("endp != NULL")) : 0;   /* workaround for static analyzer issue */
     /* sanity check, aimed mainly at paniclog (it's conceivable for
        the result of short_oname() to be shorter than the length of
@@ -5381,7 +5355,7 @@ export async function safe_qbuf(qbuf, qprefix, qsuffix, obj, func, altfunc, last
         /* no prefix; output buffer starts out empty */
         qbuf.set(0, 0);
     }
-    len = $c.u32($c.strlen(qbuf));
+    let len = $c.u32($c.strlen(qbuf));
     if ((len + len_lastR >>> 0) + len_qsfx >>> 0 > lenlimit) {
         /* too long; skip formatting, last resort output is truncated */
         if (len < lenlimit) {
@@ -5398,7 +5372,7 @@ export async function safe_qbuf(qbuf, qprefix, qsuffix, obj, func, altfunc, last
         /* suffix and last resort are guaranteed to fit */
         len = len + len_qsfx >>> 0;   /* include the pending suffix */
         /* format the object */
-        bufp = await short_oname(obj, func, altfunc, lenlimit - len >>> 0);
+        const bufp = await short_oname(obj, func, altfunc, lenlimit - len >>> 0);
         if ($c.addu64(len, $c.strlen(bufp)) <= lenlimit) {
             $c.strcat(qbuf, bufp);   /* formatted name fits */
         } else {

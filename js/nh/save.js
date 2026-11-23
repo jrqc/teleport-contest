@@ -269,10 +269,10 @@ export async function dosave0() {   // save.c:74
  * @returns {Promise<void>}
  */
 async function save_gamelog(nhfp) {   // save.c:237
-    let tmp = null, tmp2 = null, slen = Int32Array.of(0);
-    tmp = gg.gamelog;
+    let slen = Int32Array.of(0);
+    let tmp = gg.gamelog;
     while (tmp) {
-        tmp2 = tmp.next;
+        const tmp2 = tmp.next;
         if (nhfp.mode & (COUNTING | WRITING)) {
             slen[0] = await Strlen_(tmp.text, $c.lit("save_gamelog"), 245) | 0;
             await sfo_int(nhfp, new $c.Ptr(slen, 0), $c.lit("gamelog-length"));
@@ -464,8 +464,8 @@ export async function savestateinlock() {   // save.c:351
  * @returns {Promise<void>}
  */
 export async function savelev(nhfp, lev) {   // save.c:429
-    let set_uz_save = 0, $t1;
-    set_uz_save = gu.uz_save.dnum === 0 && gu.uz_save.dlevel === 0 ? 1 : 0;
+    let $t1;
+    const set_uz_save = gu.uz_save.dnum === 0 && gu.uz_save.dlevel === 0 ? 1 : 0;
     /* caller might have already set up gu.uz_save and zeroed u.uz;
        if not, we need to set it for save_bubbles(); caveat: if the
        player quits during character selection, u.uz won't be set yet
@@ -645,12 +645,12 @@ async function save_bubbles(nhfp, lev) {   // save.c:591
  * @returns {Promise<void>}
  */
 export async function savecemetery(nhfp, cemeteryaddr) {   // save.c:617
-    let thisbones = null, nextbones = null, flag = Int32Array.of(0);
+    let thisbones = null, flag = Int32Array.of(0);
     flag[0] = cemeteryaddr.get(0) ? 0 : -1;
     if (update_file(nhfp)) {
         await sfo_int(nhfp, new $c.Ptr(flag, 0), $c.lit("cemetery-cemetery_flag"));
     }
-    nextbones = cemeteryaddr.get(0);
+    let nextbones = cemeteryaddr.get(0);
     while ((thisbones = nextbones) !== null) {
         nextbones = thisbones.next;
         if (update_file(nhfp)) {
@@ -669,9 +669,9 @@ export async function savecemetery(nhfp, cemeteryaddr) {   // save.c:617
  * @returns {Promise<void>}
  */
 async function savedamage(nhfp) {   // save.c:640
-    let damageptr = null, tmp_dam = null, xl = Uint32Array.of(0);
+    let tmp_dam = null, xl = Uint32Array.of(0);
     xl[0] = 0;
-    damageptr = svl.level.damagelist;
+    let damageptr = svl.level.damagelist;
     for (tmp_dam = damageptr; tmp_dam; tmp_dam = tmp_dam.next) {
         xl[0] = xl[0] + 1 >>> 0;
     }
@@ -697,12 +697,12 @@ async function savedamage(nhfp) {   // save.c:640
  * @returns {Promise<void>}
  */
 async function save_stairs(nhfp) {   // save.c:665
-    let stway = null, buflen = Int32Array.of(0), use_relative = 0;
-    stway = gs.stairs;
+    let buflen = Int32Array.of(0);
+    let stway = gs.stairs;
     buflen[0] = 24;
     while (stway) {
         if (update_file(nhfp)) {
-            use_relative = program_state.restoring !== REST.GSTATE && stway.tolev.dnum === u.uz.dnum ? 1 : 0;
+            const use_relative = program_state.restoring !== REST.GSTATE && stway.tolev.dnum === u.uz.dnum ? 1 : 0;
             if (use_relative) {
                 /* make dlevel relative to current level */
                 stway.tolev.dlevel = $c.i16(stway.tolev.dlevel - u.uz.dlevel | 0);
@@ -797,12 +797,12 @@ async function saveobj(nhfp, otmp) {   // save.c:726
  * @returns {Promise<void>}
  */
 async function saveobjchn(nhfp, obj_p) {   // save.c:762
-    let otmp = null, otmp2 = null, is_invent = 0, minusone = Int32Array.of(0);
-    otmp = obj_p.get(0);
-    is_invent = otmp && $c.peq(otmp, gi.invent) ? 1 : 0;
+    let minusone = Int32Array.of(0);
+    let otmp = obj_p.get(0);
+    const is_invent = otmp && $c.peq(otmp, gi.invent) ? 1 : 0;
     minusone[0] = -1;
     while (otmp) {
-        otmp2 = otmp.nobj;
+        const otmp2 = otmp.nobj;
         if (update_file(nhfp)) {
             await saveobj(nhfp, otmp);
         }
@@ -925,10 +925,10 @@ async function savemon(nhfp, mtmp) {   // save.c:826
  * @returns {Promise<void>}
  */
 async function savemonchn(nhfp, mtmp) {   // save.c:884
-    let mtmp2 = null, minusone = Int32Array.of(0);
+    let minusone = Int32Array.of(0);
     minusone[0] = -1;
     while (mtmp) {
-        mtmp2 = mtmp.nmon;
+        const mtmp2 = mtmp.nmon;
         if (update_file(nhfp)) {
             mtmp.mnum = $c.i16(mtmp.data.pmidx);
             if (mtmp.ispriest) {
@@ -966,10 +966,9 @@ async function savemonchn(nhfp, mtmp) {   // save.c:884
  * @returns {Promise<void>}
  */
 async function savetrapchn(nhfp, trap) {   // save.c:920
-    let trap2 = null, use_relative = 0;
     while (trap) {
-        use_relative = program_state.restoring !== REST.GSTATE && trap.dst.dnum === u.uz.dnum ? 1 : 0;
-        trap2 = trap.ntrap;
+        const use_relative = program_state.restoring !== REST.GSTATE && trap.dst.dnum === u.uz.dnum ? 1 : 0;
+        const trap2 = trap.ntrap;
         if (use_relative) {
             trap.dst.dlevel = $c.i16(trap.dst.dlevel - u.uz.dlevel | 0);   /* make it relative */
         }
@@ -998,10 +997,9 @@ async function savetrapchn(nhfp, trap) {   // save.c:920
  * @returns {Promise<void>}
  */
 export async function savefruitchn(nhfp) {   // save.c:951
-    let f2 = null, f1 = null;
-    f1 = gf.ffruit;
+    let f1 = gf.ffruit;
     while (f1) {
-        f2 = f1.nextf;
+        const f2 = f1.nextf;
         if (f1.fid >= 0 && update_file(nhfp)) {
             await sfo_fruit(nhfp, f1, $c.lit("fruit"));
         }
@@ -1080,10 +1078,10 @@ export async function store_plname_in_file(nhfp) {   // save.c:999
  * @returns {Promise<void>}
  */
 async function save_msghistory(nhfp) {   // save.c:1030
-    let msg = null, msgcount = 0, minusone = Int32Array.of(0), msglen = Int32Array.of(0), init = 0, save_plnmsg = 0;
-    msgcount = 0;
+    let msg = null, minusone = Int32Array.of(0), msglen = Int32Array.of(0);
+    let msgcount = 0;
     minusone[0] = -1;
-    init = TRUE;
+    let init = TRUE;
     if (update_file(nhfp)) {
         /* ask window port for each message in sequence */
         while ((msg = await getmsghistory()(init)) !== null) {
@@ -1105,7 +1103,7 @@ async function save_msghistory(nhfp) {   // save.c:1030
     }
     do {
         if (debugcore($c.lit("save.c"), TRUE)) {
-            save_plnmsg = iflags.last_msg;
+            const save_plnmsg = iflags.last_msg;
             await pline($c.lit("Stored %d messages into savefile."), msgcount);
             iflags.last_msg = save_plnmsg;
         }
@@ -1117,8 +1115,7 @@ async function save_msghistory(nhfp) {   // save.c:1030
  * @returns {Promise<void>}
  */
 export async function free_dungeons() {   // save.c:1060
-    let tnhfp = null;
-    tnhfp = await get_freeing_nhfile();
+    const tnhfp = await get_freeing_nhfile();
     await savelevchn(tnhfp);
     await save_dungeon(tnhfp, FALSE, TRUE);
     await free_luathemes(all_themes);
@@ -1131,8 +1128,7 @@ export async function free_dungeons() {   // save.c:1060
  * @returns {Promise<void>}
  */
 export async function freedynamicdata() {   // save.c:1077
-    let tnhfp = null;
-    tnhfp = await get_freeing_nhfile();
+    let tnhfp = await get_freeing_nhfile();
     free_maildata();
     free_menu_coloring();
     free_invbuf();   /* let_to_name (invent.c) */

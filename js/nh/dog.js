@@ -120,10 +120,10 @@ export function free_edog(mtmp) {   // dog.c:35
  * @returns {Promise<void>}
  */
 export async function initedog(mtmp, everything) {   // dog.c:45
-    let edogp = null, minhungry = 0, minimumtame = 0, $t1;
-    edogp = mtmp.mextra.edog;
-    minhungry = $c.add64(svm.moves, 1000);
-    minimumtame = is_domestic(mtmp.data) ? 10 : 5;
+    let $t1;
+    const edogp = mtmp.mextra.edog;
+    const minhungry = $c.add64(svm.moves, 1000);
+    const minimumtame = is_domestic(mtmp.data) ? 10 : 5;
     mtmp.mtame = max(minimumtame, mtmp.mtame);
     mtmp.mpeaceful = 1;
     mtmp.mavenge = 0;
@@ -183,11 +183,10 @@ function pet_type() {   // dog.c:91
  * @returns {Promise<$T.permonst | null>} struct permonst *
  */
 async function pick_familiar_pm(otmp, quietly) {   // dog.c:104
-    let pm = null, mndx = 0, skill = 0, max = 0;
-    pm = null;
+    let pm = null;
     if (otmp) {
         /* figurine; otherwise spell */
-        mndx = otmp.corpsenm;
+        const mndx = otmp.corpsenm;
         (!(mndx >= LOW_PM && mndx < NUMMONS) ? 1 : 0) ? $c.__assert_rtn($c.lit("pick_familiar_pm"), $c.lit("dog.c"), 111, $c.lit("ismnum(mndx)")) : 0;
         pm = $c.relem(mons, mndx);
         /* activating a figurine provides one way to exceed the
@@ -204,8 +203,8 @@ async function pick_familiar_pm(otmp, quietly) {   // dog.c:104
     } else if (!rn2(3)) {
         pm = $c.relem(mons, pet_type());
     } else {
-        skill = spell_skilltype(SPE_CREATE_FAMILIAR);
-        max = Math.imul(3, u.weapon_skills[skill].skill);
+        const skill = spell_skilltype(SPE_CREATE_FAMILIAR);
+        const max = Math.imul(3, u.weapon_skills[skill].skill);
         pm = await rndmonst_adj(0, max);
         if (!pm && !quietly) {
             await There($c.lit("seems to be nothing available for a familiar."));
@@ -221,16 +220,16 @@ async function pick_familiar_pm(otmp, quietly) {   // dog.c:104
  * @returns {Promise<$T.monst | null>} struct monst *
  */
 export async function make_familiar(otmp, x, y, quietly) {   // dog.c:138
-    let pm = null, mtmp = null, chance = 0, trycnt = 0, reallytame = 0, mmflags = 0, cgend = 0;
-    mtmp = null;
-    trycnt = 100;
-    reallytame = TRUE;
+    let pm = null;
+    let mtmp = null;
+    let trycnt = 100;
+    let reallytame = TRUE;
     do {
         if (!(pm = await pick_familiar_pm(otmp, quietly))) {
             break;
         }
-        mmflags = MM.EDOG | MM.IGNOREWATER | NO.MINVENT | MM.NOMSG;
-        cgend = otmp ? otmp.spe & CORPSTAT.GENDER : 0;
+        let mmflags = MM.EDOG | MM.IGNOREWATER | NO.MINVENT | MM.NOMSG;
+        const cgend = otmp ? otmp.spe & CORPSTAT.GENDER : 0;
         mmflags = $c.u32($c.or64(mmflags, cgend === CORPSTAT.FEMALE ? MM.FEMALE : cgend === CORPSTAT.MALE ? MM.MALE : 0));
         mtmp = await makemon(pm, x, y, mmflags);
         if (otmp) {
@@ -262,7 +261,7 @@ export async function make_familiar(otmp, x, y, quietly) {   // dog.c:138
     }
     if (otmp) {
         /* figurine; resulting monster might not become a pet */
-        chance = rn2(10);   /* 0==tame, 1==peaceful, 2==hostile */
+        let chance = rn2(10);   /* 0==tame, 1==peaceful, 2==hostile */
         if (chance > 2) {
             chance = otmp.blessed ? 0 : !otmp.cursed ? 1 : 2;
         }
@@ -301,14 +300,14 @@ export async function make_familiar(otmp, x, y, quietly) {   // dog.c:138
  * @returns {Promise<$T.monst | null>} struct monst *
  */
 export async function makedog() {   // dog.c:219
-    let mtmp = null, petname = null, pettype = 0, $t1, $t2;
+    let $t1, $t2;
     if (gp.preferred_pet === 110) {
         /* static init yields 0 (PM_GIANT_ANT); fix that up now */
         svc.context.startingpet_typ = NON_PM;
         return null;
     }
-    pettype = ($t1 = pet_type(), svc.context.startingpet_typ = $t1);
-    petname = pettype === PM.LITTLE_DOG ? new $c.Ptr(gd.dogname, 0) : pettype === PM.KITTEN ? new $c.Ptr(gc.catname, 0) : pettype === PM.PONY ? new $c.Ptr(gh.horsename, 0) : $c.lit("");
+    const pettype = ($t1 = pet_type(), svc.context.startingpet_typ = $t1);
+    let petname = pettype === PM.LITTLE_DOG ? new $c.Ptr(gd.dogname, 0) : pettype === PM.KITTEN ? new $c.Ptr(gc.catname, 0) : pettype === PM.PONY ? new $c.Ptr(gh.horsename, 0) : $c.lit("");
     /* default pet names */
     if (!petname.get(0) && pettype === PM.LITTLE_DOG) {
         /* All of these names were for dogs. */
@@ -330,7 +329,7 @@ export async function makedog() {   // dog.c:219
        aren't affected because they don't have any initial inventory
        [if anybody adds stranger pets that are expected to have such,
        they'll need to modify this] */
-    mtmp = await makemon($c.relem(mons, pettype), u.ux, u.uy, MM.EDOG | NO.MINVENT);
+    let mtmp = await makemon($c.relem(mons, pettype), u.ux, u.uy, MM.EDOG | NO.MINVENT);
     if (!mtmp) {
         return null;   /* pets were genocided [how?] */
     }
@@ -376,8 +375,8 @@ export async function update_mlstmv() {   // dog.c:295
  * @returns {Promise<void>}
  */
 export async function losedogs() {   // dog.c:304
-    let mtmp = null, mprev = null, dismissKops = 0, xyloc = 0;
-    dismissKops = 0;
+    let mtmp = null, mprev = null, xyloc = 0;
+    let dismissKops = 0;
     failed_arrivals[0] = null;
     /*
      * First, scan gm.migrating_mons for shopkeepers who want to dismiss Kops,
@@ -489,15 +488,15 @@ export async function losedogs() {   // dog.c:304
  * @returns {Promise<void>}
  */
 export async function mon_arrive(mtmp, when) {   // dog.c:420
-    let t = null, xlocale = 0, ylocale = 0, xyloc = 0, xyflags = 0, wander = 0, num_segs = 0, failed_to_place = 0, stway = null, fromdlev = new $T.d_level(), nmv = 0, r = null, c = new $T.nhcoord(), i = 0, j = 0, $t1;
-    failed_to_place = FALSE;
+    let t = null, wander = 0, stway = null, fromdlev = new $T.d_level(), c = new $T.nhcoord(), $t1;
+    let failed_to_place = FALSE;
     mtmp.mstate = $c.or64(mtmp.mstate, MON.STILL_ARRIVING);
     mtmp.nmon = svl.level.monlist;
     svl.level.monlist = mtmp;
     if (mtmp.isshk) {
         set_residency(mtmp, FALSE);
     }
-    num_segs = mtmp.wormno;
+    const num_segs = mtmp.wormno;
     /* baby long worms have no tail so don't use is_longworm() */
     if (mtmp.data === mons[PM.LONG_WORM]) {
         $t1 = get_wormno() >>> 0, mtmp.wormno = ($t1) & 31;
@@ -513,10 +512,10 @@ export async function mon_arrive(mtmp, when) {   // dog.c:420
     mtmp.mstate = $c.and64(mtmp.mstate, ~(MON.MIGRATING | MON.LIMBO));
     /* make sure mnexto(rloc_to(set_apparxy())) doesn't use stale data */
     mtmp.mux = u.ux, mtmp.muy = u.uy;
-    xyloc = mtmp.mtrack[0].x;
-    xyflags = mtmp.mtrack[0].y;
-    xlocale = mtmp.mtrack[1].x;
-    ylocale = mtmp.mtrack[1].y;
+    let xyloc = mtmp.mtrack[0].x;
+    const xyflags = mtmp.mtrack[0].y;
+    let xlocale = mtmp.mtrack[1].x;
+    let ylocale = mtmp.mtrack[1].y;
     fromdlev.dnum = mtmp.mtrack[2].x;
     fromdlev.dlevel = mtmp.mtrack[2].y;
     mon_track_clear(mtmp);
@@ -553,7 +552,7 @@ export async function mon_arrive(mtmp, when) {   // dog.c:420
      */
     if (mtmp.mlstmv < $c.sub64(svm.moves, 1)) {
         /* heal monster for time spent in limbo */
-        nmv = $c.sub64($c.sub64(svm.moves, 1), mtmp.mlstmv);
+        const nmv = $c.sub64($c.sub64(svm.moves, 1), mtmp.mlstmv);
         await mon_catchup_elapsed_time(mtmp, nmv);
         /* let monster move a bit on new level (see placement code below) */
         wander = $c.i16(nmv < 8 ? nmv : 8);
@@ -642,7 +641,7 @@ export async function mon_arrive(mtmp, when) {   // dog.c:420
     if (xlocale && wander) {
         /* monster moved a bit; pick a nearby location */
         /* mnearto() deals w/stone, et al */
-        r = in_rooms(xlocale, ylocale, 0);
+        const r = in_rooms(xlocale, ylocale, 0);
         if (r && r.get(0)) {
             /* somexy() handles irregular rooms */
             if (somexy($c.relem(svr.rooms, r.get(0) - ROOMOFFSET), c)) {
@@ -652,8 +651,8 @@ export async function mon_arrive(mtmp, when) {   // dog.c:420
             }
         } else {
             /* not in a room */
-            i = 1 > xlocale - wander ? 1 : xlocale - wander;
-            j = COLNO - 1 < xlocale + wander ? COLNO - 1 : xlocale + wander;
+            let i = 1 > xlocale - wander ? 1 : xlocale - wander;
+            let j = COLNO - 1 < xlocale + wander ? COLNO - 1 : xlocale + wander;
             xlocale = $c.i16(rn2(j - i | 0) + i | 0);
             i = 0 > ylocale - wander ? 0 : ylocale - wander;
             j = ROWNO - 1 < ylocale + wander ? ROWNO - 1 : ylocale + wander;
@@ -684,9 +683,9 @@ export async function mon_arrive(mtmp, when) {   // dog.c:420
  * @returns {Promise<void>}
  */
 export async function mon_catchup_elapsed_time(mtmp, nmv) {   // dog.c:627
-    let imv = 0, wilder = 0, edog = null, $t1, $t2;
+    let $t1, $t2;
     /* number of moves */
-    imv = 0;   /* avoid zillions of casts and lint warnings */
+    let imv = 0;   /* avoid zillions of casts and lint warnings */
     if (nmv < 0) {
         /* crash likely... */
         await panic($c.lit("catchup from future time?"));
@@ -748,7 +747,7 @@ export async function mon_catchup_elapsed_time(mtmp, nmv) {   // dog.c:627
     }
     /* reduce tameness for every 150 moves you are separated */
     if (mtmp.mtame) {
-        wilder = $c.div32(imv + 75 | 0, 150);
+        const wilder = $c.div32(imv + 75 | 0, 150);
         if (mtmp.mtame > wilder) {
             mtmp.mtame = $c.i8(mtmp.mtame - wilder | 0);   /* less tame */
         } else if (mtmp.mtame > rn2(wilder)) {
@@ -761,7 +760,7 @@ export async function mon_catchup_elapsed_time(mtmp, nmv) {   // dog.c:627
      * of dying the next time we call dog_move()
      */
     if (mtmp.mtame && !mtmp.isminion && (carnivorous(mtmp.data) || herbivorous(mtmp.data))) {
-        edog = mtmp.mextra.edog;
+        const edog = mtmp.mextra.edog;
         if (svm.moves > $c.add64(edog.hungrytime, 500) && mtmp.mhp < 3 || svm.moves > $c.add64(edog.hungrytime, 750)) {
             $t2 = $c.i8(mtmp.mpeaceful = 0), mtmp.mtame = $t2;
         }
@@ -786,8 +785,8 @@ export async function mon_catchup_elapsed_time(mtmp, nmv) {   // dog.c:627
  * @returns {Promise<number>} int
  */
 async function mon_leave(mtmp) {   // dog.c:729
-    let obj = null, num_segs = 0, cnt = 0, mx = 0, my = 0;
-    num_segs = 0;   /* return value */
+    let obj = null;
+    let num_segs = 0;   /* return value */
     /* set minvent's obj->no_charge to 0 */
     for (obj = mtmp.minvent; obj; obj = obj.nobj) {
         if (Has_contents(obj)) {
@@ -803,9 +802,9 @@ async function mon_leave(mtmp) {   // dog.c:729
     /* if this is a long worm, handle its tail segments before mtmp itself;
        we pass possibly truncated segment count to caller via return value  */
     if (mtmp.wormno) {
-        cnt = count_wsegs(mtmp);
-        mx = mtmp.mx;
-        my = mtmp.my;
+        const cnt = count_wsegs(mtmp);
+        const mx = mtmp.mx;
+        const my = mtmp.my;
         /* since monst->wormno is overloaded to hold the number of
            tail segments during migration, a very long worm with
            more segments than can fit in that field gets truncated */
@@ -847,7 +846,7 @@ function keep_mon_accessible(mon) {   // dog.c:768
  * @returns {Promise<void>}
  */
 export async function keepdogs(pets_only) {   // dog.c:789
-    let mtmp = null, mtmp2 = null, num_segs = 0, stay_behind = 0, $t1;
+    let mtmp = null, mtmp2 = null, $t1;
     /* true for ascension or final escape */
     for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp2) {
         mtmp2 = mtmp.nmon;
@@ -875,7 +874,7 @@ export async function keepdogs(pets_only) {   // dog.c:789
            to avoid following */
         /* monster won't follow if it hasn't noticed you yet */
         if ((monnear(mtmp, u.ux, u.uy) && levl_follower(mtmp) || u.uhave.amulet && mtmp.iswiz) && (!helpless(mtmp) || $c.peq(mtmp, u.usteed)) && !$c.andu64(mtmp.mstrategy, STRAT.WAITFORU)) {
-            stay_behind = FALSE;
+            let stay_behind = FALSE;
             if (mtmp.mtrapped) {
                 await mintrap(mtmp, NO_TRAP_FLAGS);   /* try to escape */
             }
@@ -909,7 +908,7 @@ export async function keepdogs(pets_only) {   // dog.c:789
                 continue;
             }
             /* prepare to take mtmp off the map */
-            num_segs = await mon_leave(mtmp);
+            const num_segs = await mon_leave(mtmp);
             /* take off map and move mtmp from fmon list to mydogs */
             await relmon(mtmp, new $c.FieldRef(gm, "mydogs", "ptr"));   /* mtmp->mx,my retain current value */
             $t1 = mtmp.my = 0, mtmp.mx = $t1;   /* mx==0 implies migrating */
@@ -940,19 +939,19 @@ export async function keepdogs(pets_only) {   // dog.c:789
  * @returns {Promise<void>}
  */
 export async function migrate_to_level(mtmp, tolev, xyloc, cc) {   // dog.c:887
-    let new_lev = new $T.d_level(), xyflags = 0, mx = 0, my = 0, num_segs = 0, $t1, $t2, $t3;
+    let new_lev = new $T.d_level(), $t1, $t2, $t3;
     /* destination level */
     /* MIGR_xxx destination xy location: */
     /* optional destination coordinates */
-    mx = mtmp.mx;
-    my = mtmp.my;   /* <mx,my> needed below */
+    const mx = mtmp.mx;
+    const my = mtmp.my;   /* <mx,my> needed below */
     /* count of worm segments */
     if (mtmp.mleashed) {
         mtmp.mtame = $c.i8(mtmp.mtame - 1);
         await m_unleash(mtmp, TRUE);
     }
     /* prepare to take mtmp off the map */
-    num_segs = await mon_leave(mtmp);
+    const num_segs = await mon_leave(mtmp);
     /* take off map and move mtmp from fmon list to migrating_mons */
     await relmon(mtmp, new $c.FieldRef(gm, "migrating_mons", "ptr"));   /* mtmp->mx,my retain their value */
     mtmp.mstate = $c.or64(mtmp.mstate, MON.MIGRATING);
@@ -960,7 +959,7 @@ export async function migrate_to_level(mtmp, tolev, xyloc, cc) {   // dog.c:887
     $t2 = await ledger_to_dlev(tolev), new_lev.dlevel = $t2;
     /* overload mtmp->[mx,my], mtmp->[mux,muy], and mtmp->mtrack[] as
        destination codes */
-    xyflags = depth(new_lev) < depth(u.uz) ? 1 : 0;   /* 1 => up */
+    let xyflags = depth(new_lev) < depth(u.uz) ? 1 : 0;   /* 1 => up */
     if (await In_W_tower(mx, my, u.uz)) {
         xyflags = $c.i16(xyflags | 2);
     }
@@ -1045,10 +1044,10 @@ export async function discard_migrations() {   // dog.c:938
  * @returns {Promise<number>} int
  */
 export async function dogfood(mon, obj) {   // dog.c:995
-    let mptr = null, fptr = null, carni = 0, herbi = 0, starving = 0, mblind = 0, fx = 0, mtmp = null;
-    mptr = mon.data;
-    carni = carnivorous(mptr);
-    herbi = herbivorous(mptr);
+    let fptr = null, starving = 0, mblind = 0, fx = 0;
+    const mptr = mon.data;
+    const carni = carnivorous(mptr);
+    const herbi = herbivorous(mptr);
     if (obj.otrapped && !await resists_poison(mon)) {
         return POISON;
     }
@@ -1070,7 +1069,7 @@ export async function dogfood(mon, obj) {   // dog.c:995
                 return POISON;
             }
             if (obj.otyp === LUMP_OF_ROYAL_JELLY && mon.data === mons[PM.KILLER_BEE]) {
-                mtmp = find_pmmonst(PM.QUEEN_BEE);
+                const mtmp = find_pmmonst(PM.QUEEN_BEE);
                 /* if there's a queen bee on the level, don't eat royal jelly;
                    if there isn't, do eat it and grow into a queen */
                 return !mtmp ? DOGFOOD : TABU;
@@ -1179,9 +1178,9 @@ export async function dogfood(mon, obj) {   // dog.c:995
  * @returns {Promise<number>} boolean
  */
 export async function tamedog(mtmp, obj, givemsg) {   // dog.c:1143
-    let blessed_scroll = 0, tasty = 0, big_corpse = 0;
+    let tasty = 0;
     /* food or scroll/spell */
-    blessed_scroll = FALSE;
+    let blessed_scroll = FALSE;
     if (obj && (obj.oclass === SCROLL_CLASS || obj.oclass === SPBOOK_CLASS)) {
         blessed_scroll = obj.blessed ? TRUE : FALSE;
         /* the rest of this routine assumes 'obj' represents food */
@@ -1226,7 +1225,7 @@ export async function tamedog(mtmp, obj, givemsg) {   // dog.c:1143
         if (mtmp.mcanmove && !mtmp.mconf && !mtmp.meating && ((tasty = await dogfood(mtmp, obj)) === DOGFOOD || tasty <= ACCFOOD && mtmp.mextra.edog.hungrytime <= svm.moves)) {
             /* pet will "catch" and eat this thrown food */
             if (canseemon(mtmp)) {
-                big_corpse = obj.otyp === CORPSE && ismnum(obj.corpsenm) && mons[obj.corpsenm].msize > mtmp.data.msize ? 1 : 0;
+                const big_corpse = obj.otyp === CORPSE && ismnum(obj.corpsenm) && mons[obj.corpsenm].msize > mtmp.data.msize ? 1 : 0;
                 await pline_mon(mtmp, $c.lit("%s catches %s%s"), await Monnam(mtmp), await the(await xname(obj)), !big_corpse ? $c.lit(".") : $c.lit(", or vice versa!"));
             } else if (cansee(mtmp.mx, mtmp.my)) {
                 await pline($c.lit("%s."), await Tobjnam(obj, $c.lit("stop")));
@@ -1314,13 +1313,13 @@ export async function tamedog(mtmp, obj, givemsg) {   // dog.c:1143
  * @returns {Promise<void>}
  */
 export async function wary_dog(mtmp, was_dead) {   // dog.c:1292
-    let edog = null, quietly = 0, $t1, $t2, $t3, $t4;
-    quietly = was_dead;
+    let $t1, $t2, $t3, $t4;
+    const quietly = was_dead;
     await finish_meating(mtmp);
     if (!mtmp.mtame) {
         return;
     }
-    edog = !mtmp.isminion ? mtmp.mextra.edog : null;
+    const edog = !mtmp.isminion ? mtmp.mextra.edog : null;
     /* if monster was starving when it died, undo that now */
     if (edog && edog.mhpmax_penalty) {
         mtmp.mhpmax = mtmp.mhpmax + edog.mhpmax_penalty | 0;

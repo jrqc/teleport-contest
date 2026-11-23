@@ -164,17 +164,17 @@ async function put_monsters_to_sleep(distance) {   // music.c:85
  * @returns {Promise<void>}
  */
 async function charm_snakes(distance) {   // music.c:105
-    let mtmp = null, could_see_mon = 0, was_peaceful = 0;
+    let mtmp = null;
     for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
         if (DEADMONSTER(mtmp)) {
             continue;
         }
         if (mtmp.data.mlet === S.SNAKE && mtmp.mcanmove && dist2(mtmp.mx, mtmp.my, u.ux, u.uy) < distance) {
-            was_peaceful = mtmp.mpeaceful;
+            const was_peaceful = mtmp.mpeaceful;
             mtmp.mpeaceful = 1;
             mtmp.mavenge = 0;
             mtmp.mstrategy = $c.andu64(mtmp.mstrategy, 18446744072904245247n);
-            could_see_mon = canseemon(mtmp);
+            const could_see_mon = canseemon(mtmp);
             mtmp.mundetected = 0;
             await newsym(mtmp.mx, mtmp.my);
             if (canseemon(mtmp)) {
@@ -217,10 +217,10 @@ async function calm_nymphs(distance) {   // music.c:139
  * @returns {Promise<void>}
  */
 export async function awaken_soldiers(bugler) {   // music.c:162
-    let mtmp = null, distance = 0, distm = 0, $t1;
+    let mtmp = null, distm = 0, $t1;
     /* monster that played instrument */
     /* distance of affected non-soldier monsters to bugler */
-    distance = Math.imul($c.peq(bugler, gy.youmonst) ? u.ulevel : bugler.data.mlevel, 30);
+    const distance = Math.imul($c.peq(bugler, gy.youmonst) ? u.ulevel : bugler.data.mlevel, 30);
     for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
         if (DEADMONSTER(mtmp)) {
             continue;
@@ -277,13 +277,13 @@ async function charm_monsters(distance) {   // music.c:196
  * @returns {Promise<void>}
  */
 async function do_pit(x, y, tu_pit) {   // music.c:221
-    let mtmp = null, otmp = null, chasm = null, filltype = 0, m_already_trapped = 0, keepfooting = 0, $t1;
-    chasm = await maketrap(x, y, PIT);
+    let otmp = null, $t1;
+    let chasm = await maketrap(x, y, PIT);
     if (!chasm) {
         return;   /* no pit if portal at that location */
     }
     chasm.tseen = 1;
-    mtmp = svl.level.monsters[x][y];   /* (redundant?) */
+    const mtmp = svl.level.monsters[x][y];   /* (redundant?) */
     if ((otmp = sobj_at(BOULDER, x, y)) !== null) {
         if (cansee(x, y)) {
             await pline($c.lit("KADOOM!  The boulder falls into a chasm%s!"), u_at(x, y) ? $c.lit(" below you") : $c.lit(""));
@@ -298,7 +298,7 @@ async function do_pit(x, y, tu_pit) {   // music.c:221
     /* Let liquid flow into the newly created chasm.
        Adjust corresponding code in apply.c for exploding
        wand of digging if you alter this sequence. */
-    filltype = fillholetyp(x, y, FALSE);
+    const filltype = fillholetyp(x, y, FALSE);
     if (filltype !== ROOM) {
         await set_levltyp(x, y, filltype);   /* levl[x][y] = filltype; */
         await liquid_flow(x, y, filltype, chasm, null);
@@ -311,7 +311,7 @@ async function do_pit(x, y, tu_pit) {   // music.c:221
        new pit....  Note: if we get here, chasm is non-Null. */
     if (mtmp) {
         if (!is_flyer(mtmp.data) && !is_clinger(mtmp.data)) {
-            m_already_trapped = mtmp.mtrapped;
+            const m_already_trapped = mtmp.mtrapped;
             mtmp.mtrapped = 1;
             if (!m_already_trapped) {
                 /* suppress messages */
@@ -361,7 +361,7 @@ async function do_pit(x, y, tu_pit) {   // music.c:221
             await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(rnd(6) + 1 | 0, 2) : rnd(6), $c.lit("fell into a chasm"), NO_KILLER_PREFIX);
             await selftouch($c.lit("Falling, you"));
         } else if (u.utrap && u.utraptype === TT.PIT) {
-            keepfooting = !(Fumbling() && rn2(5)) && (!rnl(gu.urole.mnum === PM.ARCHEOLOGIST ? 3 : 9) || ACURR(A.DEX) > 7 && rn2(5)) ? 1 : 0;
+            const keepfooting = !(Fumbling() && rn2(5)) && (!rnl(gu.urole.mnum === PM.ARCHEOLOGIST ? 3 : 9) || ACURR(A.DEX) > 7 && rn2(5)) ? 1 : 0;
             await You($c.lit("are jostled around violently!"));
             set_utrap((rn2(6) + 2 | 0) >>> 0, TT.PIT);
             await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(rnd(keepfooting ? 2 : 4) + 1 | 0, 2) : rnd(keepfooting ? 2 : 4), $c.lit("hurt in a chasm"), NO_KILLER_PREFIX);
@@ -383,19 +383,19 @@ async function do_pit(x, y, tu_pit) {   // music.c:221
  * @returns {Promise<void>}
  */
 async function do_earthquake(force) {   // music.c:344
-    let x = 0, y = 0, mtmp = null, trap_at_u = null, start_x = 0, start_y = 0, end_x = 0, end_y = 0, amsk = 0, algn = 0, tu_pit = 0;
-    trap_at_u = t_at(u.ux, u.uy);
-    tu_pit = 0;
+    let x = 0, y = 0, mtmp = null, amsk = 0, algn = 0;
+    const trap_at_u = t_at(u.ux, u.uy);
+    let tu_pit = 0;
     if (trap_at_u) {
         tu_pit = is_pit(trap_at_u.ttyp);
     }
     if (force > 13) {   /* sanity precaution; maximum used is actually 10 */
         force = 13;
     }
-    start_x = u.ux - Math.imul(force, 2) | 0;
-    start_y = u.uy - Math.imul(force, 2) | 0;
-    end_x = u.ux + Math.imul(force, 2) | 0;
-    end_y = u.uy + Math.imul(force, 2) | 0;
+    let start_x = u.ux - Math.imul(force, 2) | 0;
+    let start_y = u.uy - Math.imul(force, 2) | 0;
+    let end_x = u.ux + Math.imul(force, 2) | 0;
+    let end_y = u.uy + Math.imul(force, 2) | 0;
     start_x = start_x > 1 ? start_x : 1;
     start_y = start_y > 0 ? start_y : 0;
     end_x = end_x < COLNO - 1 ? end_x : COLNO - 1;
@@ -543,9 +543,9 @@ function generic_lvl_desc() {   // music.c:478
  * @returns {Promise<number>} int
  */
 async function do_improvisation(instr) {   // music.c:503
-    let damage = 0, mode = 0, do_spec = 0, itmp = new $T.obj(), mundane = 0, same_old_song = Int8Array.of(0), buf = new Int8Array(256), type = 0;
-    do_spec = !(u.uprops[STUNNED].intrinsic || u.uprops[CONFUSION].intrinsic) ? 1 : 0;
-    mundane = FALSE;
+    let damage = 0, itmp = new $T.obj(), same_old_song = Int8Array.of(0), buf = new Int8Array(256);
+    let do_spec = !(u.uprops[STUNNED].intrinsic || u.uprops[CONFUSION].intrinsic) ? 1 : 0;
+    let mundane = FALSE;
     same_old_song[0] = FALSE;
     itmp.$copyFrom(instr);
     itmp.oextra = null;
@@ -559,7 +559,7 @@ async function do_improvisation(instr) {   // music.c:503
             mundane = TRUE;
         }
     }
-    mode = PLAY_NORMAL;
+    let mode = PLAY_NORMAL;
     if (u.uprops[STUNNED].intrinsic) {
         mode = mode | PLAY_STUNNED;
     }
@@ -655,7 +655,7 @@ async function do_improvisation(instr) {   // music.c:503
                     await losehp(damage, new $c.Ptr(buf, 0), KILLED.BY);   /* fire or frost damage */
                 }
             } else {
-                type = $c.rem32($c.abs((instr.otyp === FROST_HORN ? AD.COLD : AD.FIRE) - AD.MAGM), 10);
+                const type = $c.rem32($c.abs((instr.otyp === FROST_HORN ? AD.COLD : AD.FIRE) - AD.MAGM), 10);
                 if (!Blind()) {
                     await pline($c.lit("A %s blasts out of the horn!"), flash_str(type, FALSE));
                 }
@@ -752,13 +752,13 @@ async function do_improvisation(instr) {   // music.c:503
  * @returns {$c.Ptr | null} char *
  */
 function improvised_notes(same_as_last_time) {   // music.c:733
-    let i = 0, notecount = 0, $t1;
+    let i = 0, $t1;
     /* target buffer has to be in svc.context, otherwise saving game
      * between improvised recitals would not be able to maintain
      * the same_as_last_time context. */
     /* You can change your tune, usually */
     if (!(Unchanging() && svc.context.jingle[0] !== 0)) {
-        notecount = rnd(5);   /* 1 - 5 */
+        const notecount = rnd(5);   /* 1 - 5 */
         for (i = 0; i < notecount; i = i + 1 | 0) {
             $t1 = improvised_notes$notes[rn2(7)], svc.context.jingle[i] = $t1;
         }
@@ -913,8 +913,7 @@ export async function do_play_instrument(instr) {   // music.c:759
  * @returns {number} enum instruments
  */
 export function obj_to_instr(obj) {   // music.c:902
-    let ret_instr = 0;
-    ret_instr = ins_no_instrument;
+    const ret_instr = ins_no_instrument;
     return ret_instr;
 }
 

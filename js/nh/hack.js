@@ -175,10 +175,10 @@ export function obj_to_any(obj) {   // hack.c:97
  * @returns {Promise<number>} boolean
  */
 export async function revive_nasty(x, y, msg) {   // hack.c:105
-    let otmp = null, otmp2 = null, mtmp = null, cc = new $T.nhcoord(), revived = 0;
-    otmp = null;
-    otmp2 = null;
-    revived = FALSE;
+    let mtmp = null, cc = new $T.nhcoord();
+    let otmp = null;
+    let otmp2 = null;
+    let revived = FALSE;
     for (otmp = svl.level.objects[x][y]; otmp; otmp = otmp2) {
         otmp2 = otmp.v.v_nexthere;
         if (otmp.otyp === CORPSE && (is_rider($c.relem(mons, otmp.corpsenm)) || otmp.corpsenm === PM.WIZARD_OF_YENDOR)) {
@@ -240,7 +240,7 @@ function could_move_onto_boulder(sx, sy) {   // hack.c:145
  * @returns {Promise<void>}
  */
 async function dopush(sx, sy, rx, ry, otmp, costly) {   // hack.c:166
-    let shkp = null, what = null, givemesg = 0, easypush = 0;
+    let shkp = null;
     {
         /* give boulder pushing feedback if this is a different
            boulder than the last one pushed or if it's been at
@@ -251,10 +251,10 @@ async function dopush(sx, sy, rx, ry, otmp, costly) {   // hack.c:166
             gb.bldrpushtime = $c.add64(svm.moves, 1);
             gb.bldrpush_oid = otmp.o_id;
         }
-        givemesg = svm.moves > $c.add64(gb.bldrpushtime, 2) || svm.moves < gb.bldrpushtime ? 1 : 0;
-        what = givemesg ? await the(await xname(otmp)) : null;
+        const givemesg = svm.moves > $c.add64(gb.bldrpushtime, 2) || svm.moves < gb.bldrpushtime ? 1 : 0;
+        const what = givemesg ? await the(await xname(otmp)) : null;
         if (!u.usteed) {
-            easypush = throws_rocks(gy.youmonst.data);
+            const easypush = throws_rocks(gy.youmonst.data);
             if (givemesg) {
                 await pline($c.lit("With %s effort you move %s."), easypush ? $c.lit("little") : $c.lit("great"), what);
             }
@@ -310,8 +310,7 @@ async function dopush(sx, sy, rx, ry, otmp, costly) {   // hack.c:166
  * @returns {Promise<void>}
  */
 async function cannot_push_msg(otmp, sx, sy) {   // hack.c:247
-    let what = null;
-    what = await the(await xname(otmp));
+    const what = await the(await xname(otmp));
     if (u.usteed) {
         await pline($c.lit("%s tries to move %s, but cannot."), await YMonnam(u.usteed), what);
     } else {
@@ -328,15 +327,14 @@ async function cannot_push_msg(otmp, sx, sy) {   // hack.c:247
  * @returns {Promise<number>} int
  */
 async function cannot_push(otmp, sx, sy) {   // hack.c:262
-    let canpickup = 0, willpickup = 0;
     if (throws_rocks(gy.youmonst.data)) {
         /* similar exception as in can_lift():
            when poly'd into a giant, you can
            pick up a boulder if you have a free
            slot or into the overflow ('#') slot
            unless already carrying at least one */
-        canpickup = !Sokoban() && (inv_cnt(FALSE) < invlet_basic || !carrying(BOULDER)) ? 1 : 0;
-        willpickup = canpickup && (flags.pickup && !svc.context.nopick) && await autopick_testobj(otmp, TRUE) ? 1 : 0;
+        const canpickup = !Sokoban() && (inv_cnt(FALSE) < invlet_basic || !carrying(BOULDER)) ? 1 : 0;
+        const willpickup = canpickup && (flags.pickup && !svc.context.nopick) && await autopick_testobj(otmp, TRUE) ? 1 : 0;
         if (u.usteed && u.weapon_skills[P.RIDING].skill < P.BASIC) {
             await You($c.lit("aren't skilled enough to %s %s from %s."), willpickup ? $c.lit("pick up") : $c.lit("push aside"), await the(await xname(otmp)), await y_monnam(u.usteed));
         } else {
@@ -390,9 +388,9 @@ function moverock_done(sx, sy) {   // hack.c:327
  * @returns {Promise<number>} int
  */
 async function moverock() {   // hack.c:336
-    let sx = 0, sy = 0, ret = 0;
+    let sx = 0, sy = 0;
     sx = $c.i16(u.ux + u.dx | 0), sy = $c.i16(u.uy + u.dy | 0);   /* boulder starting position */
-    ret = await moverock_core(sx, sy);
+    const ret = await moverock_core(sx, sy);
     moverock_done(sx, sy);
     return ret;
 }
@@ -402,8 +400,8 @@ async function moverock() {   // hack.c:336
  * @returns {Promise<number>} int
  */
 async function moverock_core(sx, sy) {   // hack.c:348
-    let rx = 0, ry = 0, otmp = null, ttmp = null, mtmp = null, costly = 0, firstboulder = 0, oldglyph = 0, res = 0, deliver_part1 = 0, you_or_steed = new Int8Array(256), newlev = 0, dest = new $T.d_level(), tox = 0, toy = 0, $t1;
-    firstboulder = TRUE;
+    let otmp = null, res = 0, you_or_steed = new Int8Array(256), dest = new $T.d_level(), $t1;
+    let firstboulder = TRUE;
     L1: while ((otmp = sobj_at(BOULDER, sx, sy)) !== null) {
         if (Blind() && (glyph_at(sx, sy) >= GLYPH.BODY_OFF && glyph_at(sx, sy) < GLYPH.BODY_OFF + NUMMONS || glyph_at(sx, sy) >= GLYPH.BODY_PILETOP_OFF && glyph_at(sx, sy) < GLYPH.BODY_PILETOP_OFF + NUMMONS ? CORPSE : glyph_at(sx, sy) >= GLYPH.STATUE_MALE_OFF && glyph_at(sx, sy) < GLYPH.STATUE_MALE_OFF + NUMMONS || glyph_at(sx, sy) >= GLYPH.STATUE_MALE_PILETOP_OFF && glyph_at(sx, sy) < GLYPH.STATUE_MALE_PILETOP_OFF + NUMMONS || (glyph_at(sx, sy) >= GLYPH.STATUE_FEM_OFF && glyph_at(sx, sy) < GLYPH.STATUE_FEM_OFF + NUMMONS || glyph_at(sx, sy) >= GLYPH.STATUE_FEM_PILETOP_OFF && glyph_at(sx, sy) < GLYPH.STATUE_FEM_PILETOP_OFF + NUMMONS) ? STATUE : glyph_at(sx, sy) > GLYPH.OBJ_OFF && glyph_at(sx, sy) < GLYPH.OBJ_OFF + FIRST_OBJECT - 1 || glyph_at(sx, sy) > GLYPH.OBJ_PILETOP_OFF && glyph_at(sx, sy) < GLYPH.OBJ_PILETOP_OFF + FIRST_OBJECT - 1 ? glyph_at(sx, sy) - (glyph_at(sx, sy) > GLYPH.OBJ_PILETOP_OFF && glyph_at(sx, sy) < GLYPH.OBJ_PILETOP_OFF + FIRST_OBJECT - 1 ? GLYPH.OBJ_PILETOP_OFF : GLYPH.OBJ_OFF) | 0 : glyph_at(sx, sy) === GLYPH.OBJ_OFF || glyph_at(sx, sy) >= GLYPH.OBJ_OFF + FIRST_OBJECT - 1 && glyph_at(sx, sy) < GLYPH.OBJ_OFF + NUM_OBJECTS || (glyph_at(sx, sy) === GLYPH.OBJ_PILETOP_OFF || glyph_at(sx, sy) > GLYPH.OBJ_PILETOP_OFF + FIRST_OBJECT - 1 && glyph_at(sx, sy) < GLYPH.OBJ_PILETOP_OFF + NUM_OBJECTS) ? glyph_at(sx, sy) - (glyph_at(sx, sy) === GLYPH.OBJ_PILETOP_OFF || glyph_at(sx, sy) > GLYPH.OBJ_PILETOP_OFF + FIRST_OBJECT - 1 && glyph_at(sx, sy) < GLYPH.OBJ_PILETOP_OFF + NUM_OBJECTS ? GLYPH.OBJ_PILETOP_OFF : GLYPH.OBJ_OFF) | 0 : NUM_OBJECTS) !== BOULDER) {
             await pline($c.lit("That feels like a boulder."));
@@ -423,15 +421,15 @@ async function moverock_core(sx, sy) {   // hack.c:348
         if (!$c.peq(otmp, svl.level.objects[sx][sy])) {
             await movobj(otmp, sx, sy);
         }
-        rx = $c.i16(u.ux + Math.imul(2, u.dx) | 0);   /* boulder destination position */
-        ry = $c.i16(u.uy + Math.imul(2, u.dy) | 0);
+        const rx = $c.i16(u.ux + Math.imul(2, u.dx) | 0);   /* boulder destination position */
+        const ry = $c.i16(u.uy + Math.imul(2, u.dy) | 0);
         nomul(0);
         /* using m<dir> towards an adjacent boulder steps over/onto it if
            poly'd into a giant or squeezes under/beside it if small/light
            enough but is a no-op in other circumstances unless move attempt
            reveals an unseen boulder or lack of remembered, unseen monster */
         if (svc.context.nopick) {
-            oldglyph = glyph_at(sx, sy);   /* before feel_location() */
+            const oldglyph = glyph_at(sx, sy);   /* before feel_location() */
             await feel_location(sx, sy);   /* same for all 3 if/else-if/else cases */
             if (throws_rocks(gy.youmonst.data)) {
                 /* player has used 'm<dir>' to move, so step to boulder's
@@ -477,9 +475,9 @@ async function moverock_core(sx, sy) {   // hack.c:348
             return await cannot_push(otmp, sx, sy);
         }
         if (isok(rx, ry) && !(svl.level.locations[rx][ry].typ < POOL) && svl.level.locations[rx][ry].typ !== IRONBARS && (!(svl.level.locations[rx][ry].typ === DOOR) || !(u.dx && u.dy) || doorless_door(rx, ry)) && !sobj_at(BOULDER, rx, ry)) {
-            ttmp = t_at(rx, ry);
-            mtmp = svl.level.monsters[rx][ry];
-            costly = await costly_spot(sx, sy) && await shop_keeper(in_rooms(sx, sy, SHOPBASE).get(0)) ? 1 : 0;
+            const ttmp = t_at(rx, ry);
+            const mtmp = svl.level.monsters[rx][ry];
+            const costly = await costly_spot(sx, sy) && await shop_keeper(in_rooms(sx, sy, SHOPBASE).get(0)) ? 1 : 0;
             /* KMH -- Sokoban doesn't let you push boulders diagonally */
             if (Sokoban() && u.dx && u.dy) {
                 if (Blind()) {
@@ -492,7 +490,7 @@ async function moverock_core(sx, sy) {   // hack.c:348
                 return -1;
             }
             if (mtmp && !noncorporeal(mtmp.data) && (!mtmp.mtrapped || !(ttmp && is_pit(ttmp.ttyp)))) {
-                deliver_part1 = FALSE;
+                let deliver_part1 = FALSE;
                 if (Blind()) {
                     await feel_location(sx, sy);
                 }
@@ -521,7 +519,7 @@ async function moverock_core(sx, sy) {   // hack.c:348
             /* rumbling disturbs buried zombies */
             await disturb_buried_zombies(sx, sy);
             if (ttmp) {
-                newlev = 0;   /* lint suppression */
+                let newlev = 0;   /* lint suppression */
                 /* if a trap operates on the boulder, don't attempt
                    to move any others at this location; return -1
                    if another boulder is in hero's way, or 0 if he
@@ -611,8 +609,8 @@ async function moverock_core(sx, sy) {   // hack.c:348
                         return sobj_at(BOULDER, sx, sy) ? -1 : 0;
                     case ROLLING_BOULDER_TRAP:
                         {
-                            tox = rx;
-                            toy = ry;
+                            let tox = rx;
+                            let toy = ry;
                             /* the boulder continues until it reaches one of
                                the trap's launch spots or hits a wall / out-of-bounds */
                             while (isok($c.i16(tox + u.dx | 0), $c.i16(toy + u.dy | 0))) {
@@ -665,11 +663,11 @@ async function moverock_core(sx, sy) {   // hack.c:348
  * @returns {Promise<number>} int
  */
 export async function still_chewing(x, y) {   // hack.c:647
-    let lev = null, boulder = null, digtxt = null, dmgtxt = null, nut = 0, $t1, $t2;
-    lev = $c.relem(svl.level.locations[x], y);
-    boulder = sobj_at(BOULDER, x, y);
-    digtxt = null;
-    dmgtxt = null;
+    let $t1, $t2;
+    const lev = $c.relem(svl.level.locations[x], y);
+    const boulder = sobj_at(BOULDER, x, y);
+    let digtxt = null;
+    let dmgtxt = null;
     if (svc.context.digging.down) {   /* not continuing prev dig (w/ pick-axe) */
         $c.memset(svc.context.digging, 0, 32);
     }
@@ -746,7 +744,7 @@ export async function still_chewing(x, y) {   // hack.c:647
             /* should always be True here */
             /* arbitrary amount; unlike proper eating, nutrition is
                bestowed in a lump sum at the end */
-            nut = objects[HEAVY_IRON_BALL].oc_weight | 0;
+            const nut = objects[HEAVY_IRON_BALL].oc_weight | 0;
             /* lesshungry() requires that victual be set up, so skip it;
                morehungry() of a negative amount will increase nutrition
                without any possibility of choking to death on the meal;
@@ -810,27 +808,27 @@ export async function movobj(obj, ox, oy) {   // hack.c:825
  * @returns {Promise<void>}
  */
 async function dosinkfall() {   // hack.c:836
-    let obj = null, dmg = 0, lev_boots = 0, innate_lev = 0, blockd_lev = 0, ufall = 0, save_ELev = 0, save_HLev = 0, $t1;
+    let obj = null, $t1;
     /* to handle being chained to buried iron ball, trying to
        levitate but being blocked, then moving onto adjacent sink;
        no need to worry about being blocked by terrain because we
        couldn't be over a sink at the same time */
-    lev_boots = $G.uarmf && $G.uarmf.otyp === LEVITATION_BOOTS ? 1 : 0;
-    innate_lev = $c.and64(u.uprops[LEVITATION].intrinsic, FROMOUTSIDE | FROMFORM) !== 0 ? 1 : 0;
-    blockd_lev = u.uprops[LEVITATION].blocked === I_SPECIAL ? 1 : 0;
-    ufall = !innate_lev && !blockd_lev && !(HFlying() || EFlying()) ? 1 : 0;   /* BFlying */
+    let lev_boots = $G.uarmf && $G.uarmf.otyp === LEVITATION_BOOTS ? 1 : 0;
+    const innate_lev = $c.and64(u.uprops[LEVITATION].intrinsic, FROMOUTSIDE | FROMFORM) !== 0 ? 1 : 0;
+    const blockd_lev = u.uprops[LEVITATION].blocked === I_SPECIAL ? 1 : 0;
+    const ufall = !innate_lev && !blockd_lev && !(HFlying() || EFlying()) ? 1 : 0;   /* BFlying */
     if (!ufall) {
         await You(innate_lev || blockd_lev ? $c.lit("wobble unsteadily for a moment.") : $c.lit("gain control of your flight."));
     } else {
-        save_ELev = u.uprops[LEVITATION].extrinsic;
-        save_HLev = u.uprops[LEVITATION].intrinsic;
+        const save_ELev = u.uprops[LEVITATION].extrinsic;
+        const save_HLev = u.uprops[LEVITATION].intrinsic;
         /* fake removal of levitation in advance so that final
            disclosure will be right in case this turns out to
            be fatal; fortunately the fact that rings and boots
            are really still worn has no effect on bones data */
         $t1 = u.uprops[LEVITATION].intrinsic = 0, u.uprops[LEVITATION].extrinsic = $t1;
         await You($c.lit("crash to the floor!"));
-        dmg = rn2(8) + (25 - acurr(A.CON)) | 0;
+        const dmg = rn2(8) + (25 - acurr(A.CON)) | 0;
         await losehp(Maybe_Half_Phys(dmg), new $c.Ptr(dosinkfall$fell_on_sink, 0), NO_KILLER_PREFIX);
         await exercise(A.DEX, FALSE);
         await selftouch($c.lit("Falling, you"));
@@ -892,8 +890,7 @@ async function dosinkfall() {   // hack.c:836
  * @returns {number} boolean
  */
 export function may_dig(x, y) {   // hack.c:923
-    let lev = null;
-    lev = $c.relem(svl.level.locations[x], y);
+    const lev = $c.relem(svl.level.locations[x], y);
     return !((IS_STWALL(lev.typ) || IS_TREE(lev.typ)) && lev.flags & W.NONDIGGABLE) ? 1 : 0;
 }
 /**
@@ -922,8 +919,7 @@ export function bad_rock(mdat, x, y) {   // hack.c:939
  * @returns {number} int
  */
 export function cant_squeeze_thru(mon) {   // hack.c:953
-    let amt = 0, ptr = null;
-    ptr = mon.data;
+    const ptr = mon.data;
     if ($c.peq(mon, gy.youmonst) ? Passes_walls() : passes_walls(ptr)) {
         return 0;
     }
@@ -932,7 +928,7 @@ export function cant_squeeze_thru(mon) {   // hack.c:953
         return 1;
     }
     /* lugging too much junk? */
-    amt = $c.peq(mon, gy.youmonst) ? inv_weight() + weight_cap() | 0 : curr_mon_load(mon);
+    const amt = $c.peq(mon, gy.youmonst) ? inv_weight() + weight_cap() | 0 : curr_mon_load(mon);
     if (amt > WT.TOOMUCH_DIAGONAL) {
         return 2;
     }
@@ -1464,10 +1460,9 @@ async function findtravelpath(mode) {   // hack.c:1266
  * @returns {Promise<number>} boolean
  */
 export async function is_valid_travelpt(x, y) {   // hack.c:1526
-    let tx = 0, ty = 0, ret = 0, glyph = 0;
-    tx = u.tx;
-    ty = u.ty;
-    glyph = glyph_at(x, y);
+    const tx = u.tx;
+    const ty = u.ty;
+    const glyph = glyph_at(x, y);
     if (u_at(x, y)) {
         return TRUE;
     }
@@ -1476,7 +1471,7 @@ export async function is_valid_travelpt(x, y) {   // hack.c:1526
     }
     u.tx = x;
     u.ty = y;
-    ret = await findtravelpath(TRAVP_VALID);
+    const ret = await findtravelpath(TRAVP_VALID);
     u.tx = $c.i16(tx);
     u.ty = $c.i16(ty);
     return ret;
@@ -1652,9 +1647,8 @@ export async function u_rooted() {   // hack.c:1694
  * @returns {Promise<void>}
  */
 export async function notice_mon(mtmp) {   // hack.c:1708
-    let spot = 0;
     if (a11y.mon_notices && !a11y.mon_notices_blocked) {
-        spot = canspotmon(mtmp) && !(is_hider(mtmp.data) && (mtmp.mundetected || M_AP_TYPE(mtmp) === M_AP.FURNITURE || M_AP_TYPE(mtmp) === M_AP.OBJECT)) ? 1 : 0;
+        const spot = canspotmon(mtmp) && !(is_hider(mtmp.data) && (mtmp.mundetected || M_AP_TYPE(mtmp) === M_AP.FURNITURE || M_AP_TYPE(mtmp) === M_AP.OBJECT)) ? 1 : 0;
         if (spot && !mtmp.mspotted && !DEADMONSTER(mtmp)) {
             mtmp.mspotted = (TRUE) & 1;
             set_msg_xy(mtmp.mx, mtmp.my);
@@ -1670,9 +1664,8 @@ export async function notice_mon(mtmp) {   // hack.c:1708
  * @returns {number} int
  */
 function notice_mons_cmp(ptr1, ptr2) {   // hack.c:1735
-    let m1 = null, m2 = null;
-    m1 = $c.asArr(ptr1, 'ptr').get(0);
-    m2 = $c.asArr(ptr2, 'ptr').get(0);
+    const m1 = $c.asArr(ptr1, 'ptr').get(0);
+    const m2 = $c.asArr(ptr2, 'ptr').get(0);
     return dist2(m1.mx, m1.my, u.ux, u.uy) - dist2(m2.mx, m2.my, u.ux, u.uy) | 0;
 }
 /**
@@ -1680,11 +1673,11 @@ function notice_mons_cmp(ptr1, ptr2) {   // hack.c:1735
  * @returns {Promise<void>}
  */
 export async function notice_all_mons(reset) {   // hack.c:1744
-    let mtmp = null, arr = null, j = 0, i = 0, cnt = 0, $t1;
+    let mtmp = null, j = 0, $t1;
     if (a11y.mon_notices && !a11y.mon_notices_blocked) {
-        arr = null;
-        i = 0;
-        cnt = 0;
+        let arr = null;
+        let i = 0;
+        let cnt = 0;
         for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
             if (DEADMONSTER(mtmp)) {
                 continue;
@@ -1752,8 +1745,7 @@ export async function disturb_buried_zombies(x, y) {   // hack.c:1798
  * @returns {$c.Ptr | null} const char *
  */
 export function u_locomotion(def) {   // hack.c:1817
-    let capitalize = 0;
-    capitalize = def.get(0) === highc(def.get(0)) ? 1 : 0;
+    const capitalize = def.get(0) === highc(def.get(0)) ? 1 : 0;
     /* regular locomotion() takes a monster type rather than a specific
        monster, so can't tell whether it is operating on hero;
        its is_flyer() and is_floater() tests wouldn't work on hero except
@@ -1768,8 +1760,7 @@ export function u_locomotion(def) {   // hack.c:1817
  * @returns {number} schar
  */
 function u_simple_floortyp(x, y) {   // hack.c:1833
-    let u_in_air = 0;
-    u_in_air = Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked || !(!($c.andu64(gy.youmonst.data.mflags1, M1.FLY) !== 0) && !(gy.youmonst.data.mlet === S.EYE || gy.youmonst.data.mlet === S.LIGHT) && (!($c.andu64(gy.youmonst.data.mflags1, M1.CLING) !== 0) || !has_ceiling(u.uz))) ? 1 : 0;
+    const u_in_air = Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked || !(!($c.andu64(gy.youmonst.data.mflags1, M1.FLY) !== 0) && !(gy.youmonst.data.mlet === S.EYE || gy.youmonst.data.mlet === S.LIGHT) && (!($c.andu64(gy.youmonst.data.mflags1, M1.CLING) !== 0) || !has_ceiling(u.uz))) ? 1 : 0;
     if (is_waterwall(x, y)) {
         return WATER;   /* wall of water, fly/lev does not matter */
     }
@@ -1826,9 +1817,8 @@ export async function handle_tip(tip) {   // hack.c:1852
  * @returns {Promise<number>} boolean
  */
 async function swim_move_danger(x, y) {   // hack.c:1885
-    let newtyp = 0, liquid_wall = 0;
-    newtyp = u_simple_floortyp(x, y);
-    liquid_wall = IS_WATERWALL(newtyp) || newtyp === LAVAWALL ? 1 : 0;
+    const newtyp = u_simple_floortyp(x, y);
+    const liquid_wall = IS_WATERWALL(newtyp) || newtyp === LAVAWALL ? 1 : 0;
     if (Underwater() && (is_pool(x, y) || IS_WATERWALL(newtyp))) {
         return FALSE;
     }
@@ -1921,10 +1911,10 @@ async function domove_attackmon_at(mtmp, x, y, displaceu) {   // hack.c:1955
  * @returns {Promise<number>} boolean
  */
 async function domove_fight_ironbars(x, y) {   // hack.c:1996
-    let obj = [null], breakflags = 0;
+    let obj = [null];
     if (svc.context.forcefight && svl.level.locations[x][y].typ === IRONBARS && $G.uwep) {
         obj[0] = $G.uwep;
-        breakflags = BRK.BY_HERO | BRK.FROM_INV | BRK.MELEE;
+        let breakflags = BRK.BY_HERO | BRK.FROM_INV | BRK.MELEE;
         if (breaktest(obj[0])) {
             if (obj[0].quan > 1) {
                 obj[0] = await splitobj(obj[0], 1);
@@ -1948,29 +1938,29 @@ async function domove_fight_ironbars(x, y) {   // hack.c:1996
  * @returns {Promise<number>} boolean
  */
 async function domove_fight_web(x, y) {   // hack.c:2021
-    let trap = null, wtype = 0, wskill_minus_2 = 0, roll = 0, uwepstr = null, scndstr = null, uwepbuf = new Int8Array(256), scndbuf = new Int8Array(256), onewep = 0;
-    trap = t_at(x, y);
+    let uwepbuf = new Int8Array(256), scndbuf = new Int8Array(256);
+    const trap = t_at(x, y);
     if (svc.context.forcefight && trap && trap.ttyp === WEB && trap.tseen) {
         /* minus_2: restricted or unskilled: -1, basic: 0, skilled: 1,
            expert: 2, master: 3, grandmaster: 4 */
         /* higher value is worse for player; for weaponless, adjust the
            chance to succeed rather than maybe make two tries */
-        wtype = uwep_skill_type();
-        wskill_minus_2 = (u.weapon_skills[wtype].skill > P.UNSKILLED ? u.weapon_skills[wtype].skill : P.UNSKILLED) - 2;
-        roll = rn2($G.uwep ? 20 : 45 - Math.imul(5, wskill_minus_2) | 0);
+        const wtype = uwep_skill_type();
+        const wskill_minus_2 = (u.weapon_skills[wtype].skill > P.UNSKILLED ? u.weapon_skills[wtype].skill : P.UNSKILLED) - 2;
+        const roll = rn2($G.uwep ? 20 : 45 - Math.imul(5, wskill_minus_2) | 0);
         if ($G.uwep && (u_wield_art(ART.STING) || $G.uwep.oartifact && attacks(AD.FIRE, $G.uwep))) {
             /* guaranteed success */
             await pline($c.lit("%s %s through the web!"), await bare_artifactname($G.uwep), u_wield_art(ART.STING) ? $c.lit("cuts") : $c.lit("burns"));
             /* is_blade() includes daggers (which are classified as PIERCE)
                but doesn't include axes and slashing polearms */
         } else if ($G.uwep && !is_blade($G.uwep) && (!u.twoweap || !is_blade($G.uswapwep))) {
-            uwepstr = null;
-            scndstr = null;
+            let uwepstr = null;
+            let scndstr = null;
             /* when dual wielding, second weapon will only be mentioned
                if it has a different type description from primary */
             $c.strcpy(new $c.Ptr(uwepbuf, 0), await weapon_descr($G.uwep));
             $c.strcpy(new $c.Ptr(scndbuf, 0), u.twoweap ? await weapon_descr($G.uswapwep) : $c.lit(""));
-            onewep = !new $c.Ptr(scndbuf, 0).get(0) || !$c.strcmp(new $c.Ptr(uwepbuf, 0), new $c.Ptr(scndbuf, 0)) ? 1 : 0;
+            const onewep = !new $c.Ptr(scndbuf, 0).get(0) || !$c.strcmp(new $c.Ptr(uwepbuf, 0), new $c.Ptr(scndbuf, 0)) ? 1 : 0;
             if (!strncmpi(new $c.Ptr(uwepbuf, 0), $c.lit("armor"), -1) || !strncmpi(new $c.Ptr(uwepbuf, 0), $c.lit("food"), -1) || !strncmpi(new $c.Ptr(uwepbuf, 0), $c.lit("venom"), -1)) {
                 /* as-is */
                 /* non-weapon item wielded, of a type where an() would
@@ -2017,10 +2007,10 @@ async function domove_fight_web(x, y) {   // hack.c:2021
  * @returns {Promise<number>} boolean
  */
 async function domove_swap_with_pet(mtmp, x, y) {   // hack.c:2098
-    let trap = null, didnt_move = 0, u_with_boulder = 0, what = null, which = null, anbuf = new Int8Array(10), tmp = 0, mndx = 0, $t1;
+    let anbuf = new Int8Array(10), $t1;
     /* if it turns out we can't actually move */
-    didnt_move = FALSE;
-    u_with_boulder = sobj_at(BOULDER, u.ux, u.uy) !== null ? 1 : 0;
+    let didnt_move = FALSE;
+    const u_with_boulder = sobj_at(BOULDER, u.ux, u.uy) !== null ? 1 : 0;
     /* seemimic/newsym should be done before moving hero, otherwise
        the display code will draw the hero here before we possibly
        cancel the swap below (we can ignore steed mx,my here) */
@@ -2030,7 +2020,7 @@ async function domove_swap_with_pet(mtmp, x, y) {   // hack.c:2098
         await seemimic(mtmp);
     }
     u.ux = mtmp.mx, u.uy = mtmp.my;   /* resume swapping positions */
-    trap = mtmp.mtrapped ? t_at(mtmp.mx, mtmp.my) : null;
+    const trap = mtmp.mtrapped ? t_at(mtmp.mx, mtmp.my) : null;
     if (!trap) {
         mtmp.mtrapped = 0;
     }
@@ -2052,8 +2042,8 @@ async function domove_swap_with_pet(mtmp, x, y) {   // hack.c:2098
     } else if (mtmp.mpeaceful && mtmp.mtrapped) {
         /* all mtame are also mpeaceful, so this affects pets too */
         (!!$c.peq(trap, $c.asRec(null, $T.trap, 32)) ? 1 : 0) ? $c.__assert_rtn($c.lit("domove_swap_with_pet"), $c.lit("hack.c"), 2143, $c.lit("trap != NULL")) : 0;   /* implied by mtrapped */
-        what = trapname(trap.ttyp, FALSE);
-        which = $c.lit("that ");
+        const what = trapname(trap.ttyp, FALSE);
+        let which = $c.lit("that ");
         if (!trap.tseen) {
             await feeltrap(trap);   /* show on map once mtmp is out of the way */
             which = just_an(new $c.Ptr(anbuf, 0), what);   /* "a " or "an " */
@@ -2098,8 +2088,8 @@ async function domove_swap_with_pet(mtmp, x, y) {   // hack.c:2098
                     if (!($t1 = u.uconduct.killer, u.uconduct.killer = $c.add64($t1, 1), $t1)) {
                         await livelog_printf(LL.CONDUCT, $c.lit("killed for the first time"));
                     }
-                    mndx = mtmp.data.pmidx;
-                    tmp = experience(mtmp, svm.mvitals[mndx].died);
+                    const mndx = mtmp.data.pmidx;
+                    const tmp = experience(mtmp, svm.mvitals[mndx].died);
                     await more_experienced(tmp, 0);
                     await newexplevel();   /* will decide if you go up */
                 }
@@ -2248,9 +2238,9 @@ async function air_turbulence() {   // hack.c:2342
  * @returns {Promise<number>} boolean
  */
 async function water_turbulence(x, y) {   // hack.c:2365
-    let wtcap = 0, wtmod = 0;
+    let wtcap = 0;
     if (u.uinwater) {
-        wtmod = u.uprops[SWIMMING].intrinsic || u.uprops[SWIMMING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.SWIM) !== 0 ? MOD_ENCUMBER : SLT_ENCUMBER;
+        const wtmod = u.uprops[SWIMMING].intrinsic || u.uprops[SWIMMING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.SWIM) !== 0 ? MOD_ENCUMBER : SLT_ENCUMBER;
         await water_friction();
         if (!u.dx && !u.dy) {
             nomul(0);
@@ -2276,9 +2266,8 @@ async function water_turbulence(x, y) {   // hack.c:2365
  * @returns {Promise<void>}
  */
 async function slippery_ice_fumbling() {   // hack.c:2396
-    let recharged = 0, iceskater = null;
-    recharged = !Levitation() && is_ice(u.ux, u.uy) ? 1 : 0;
-    iceskater = u.usteed ? u.usteed : gy.youmonst;
+    let recharged = !Levitation() && is_ice(u.ux, u.uy) ? 1 : 0;
+    const iceskater = u.usteed ? u.usteed : gy.youmonst;
     if (recharged) {
         if ($G.uarmf && await objdescr_is($G.uarmf, $c.lit("snow boots")) || await resists_cold(iceskater) || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked || is_floater(iceskater.data) || is_clinger(iceskater.data) || is_whirly(iceskater.data)) {
             recharged = FALSE;
@@ -2305,9 +2294,9 @@ export function u_maybe_impaired() {   // hack.c:2418
  * @returns {number} boolean
  */
 function impaired_movement(x, y) {   // hack.c:2425
-    let tries = 0, $t1;
+    let $t1;
     if (u_maybe_impaired()) {
-        tries = 0;
+        let tries = 0;
         do {
             if (($t1 = tries, tries = $t1 + 1 | 0, $t1) > 50) {
                 nomul(0);
@@ -2346,8 +2335,7 @@ async function avoid_moving_on_trap(x, y, msg) {   // hack.c:2444
  * @returns {Promise<number>} boolean
  */
 async function avoid_moving_on_liquid(x, y, msg) {   // hack.c:2463
-    let in_air = 0;
-    in_air = Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked ? 1 : 0;
+    const in_air = Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked ? 1 : 0;
     /* don't stop if you're not on a transition between terrain types... */
     /* or you are using shift-dir running and the transition isn't
        dangerous... */
@@ -2373,8 +2361,7 @@ async function avoid_moving_on_liquid(x, y, msg) {   // hack.c:2463
  * @returns {Promise<number>} boolean
  */
 async function avoid_running_into_trap_or_liquid(x, y) {   // hack.c:2495
-    let would_stop = 0;
-    would_stop = svc.context.run >= 2 ? 1 : 0;
+    const would_stop = svc.context.run >= 2 ? 1 : 0;
     if (!svc.context.run) {
         return FALSE;
     }
@@ -2396,8 +2383,8 @@ async function avoid_running_into_trap_or_liquid(x, y) {   // hack.c:2495
  * @returns {Promise<number>} boolean
  */
 async function avoid_trap_andor_region(x, y) {   // hack.c:2515
-    let qbuf = new Int8Array(128), newreg = null, oldreg = null, trap = null, traptype = 0, into = 0;
-    trap = null;
+    let qbuf = new Int8Array(128), newreg = null, oldreg = null;
+    let trap = null;
     /* treat entering a visible gas cloud region like entering a trap;
        there could be a known trap as well as a region at the target spot;
        if so, ask about entring the region first; even though this could
@@ -2428,8 +2415,8 @@ async function avoid_trap_andor_region(x, y) {   // hack.c:2515
     /* Hallucination: all traps still show as ^, but the
        hero can't tell what they are, so treat as dangerous */
     if (ParanoidTrap() && !u.uprops[STUNNED].intrinsic && !u.uprops[CONFUSION].intrinsic && (!svc.context.nopick || svc.context.run) && (trap = t_at(x, y)) !== null && trap.tseen && await test_move(u.ux, u.uy, $c.i16(u.dx), $c.i16(u.dy), TEST.MOVE) && (await immune_to_trap(gy.youmonst, trap.ttyp) !== TRAP.CLEARLY_IMMUNE || Hallucination())) {
-        traptype = Hallucination() ? rnd(TRAPNUM - 1) : trap.ttyp;
-        into = into_vs_onto(traptype);
+        const traptype = Hallucination() ? rnd(TRAPNUM - 1) : trap.ttyp;
+        const into = into_vs_onto(traptype);
         nh_snprintf($c.lit("avoid_trap_andor_region"), 2570, new $c.Ptr(qbuf, 0), 128, $c.lit("Really %s %s that %s?"), u_locomotion($c.lit("step")), into ? $c.lit("into") : $c.lit("onto"), defsyms[(S.arrow_trap + traptype | 0) - 1 | 0].explanation);
         /* handled like paranoid_confirm:pray; when paranoid_confirm:trap
            isn't set, don't ask at all but if it is set (checked above),
@@ -2450,14 +2437,13 @@ async function avoid_trap_andor_region(x, y) {   // hack.c:2515
  * @returns {Promise<number>} boolean
  */
 async function move_out_of_bounds(x, y) {   // hack.c:2586
-    let dx = 0, dy = 0;
     if (!isok(x, y)) {
         if (svc.context.forcefight) {
             return await domove_fight_empty(x, y);
         }
         if (flags.mention_walls) {
-            dx = $c.i16(u.dx);
-            dy = $c.i16(u.dy);
+            let dx = $c.i16(u.dx);
+            let dy = $c.i16(u.dy);
             if (dx && dy) {
                 /* diagonal */
                 /* only as far as possible diagonally if in very
@@ -2556,9 +2542,8 @@ async function escape_from_sticky_mon(x, y) {   // hack.c:2639
  * @returns {Promise<void>}
  */
 export async function domove() {   // hack.c:2695
-    let ux1 = 0, uy1 = 0;
-    ux1 = u.ux;
-    uy1 = u.uy;
+    const ux1 = u.ux;
+    const uy1 = u.uy;
     gd.domove_succeeded = 0;
     await domove_core();
     /* gd.domove_succeeded is available to make assessments now */
@@ -2573,7 +2558,7 @@ export async function domove() {   // hack.c:2695
  * @returns {Promise<void>}
  */
 async function domove_core() {   // hack.c:2712
-    let mtmp = null, tmpr = null, x = Int16Array.of(0), y = Int16Array.of(0), glyph = 0, chainx = Int16Array.of(0), chainy = Int16Array.of(0), ballx = Int16Array.of(0), bally = Int16Array.of(0), bc_control = Int32Array.of(0), cause_delay = Int8Array.of(0), displaceu = Int8Array.of(0), moved = 0, noticed_it = 0, $t1;
+    let mtmp = null, x = Int16Array.of(0), y = Int16Array.of(0), chainx = Int16Array.of(0), chainy = Int16Array.of(0), ballx = Int16Array.of(0), bally = Int16Array.of(0), bc_control = Int32Array.of(0), cause_delay = Int8Array.of(0), displaceu = Int8Array.of(0), $t1;
     chainx[0] = 0;
     chainy[0] = 0;
     ballx[0] = 0;
@@ -2636,8 +2621,8 @@ async function domove_core() {   // hack.c:2712
     u.uy0 = u.uy;
     gb.bhitpos.x = x[0];
     gb.bhitpos.y = y[0];
-    tmpr = $c.relem(svl.level.locations[x[0]], y[0]);
-    glyph = glyph_at(x[0], y[0]);
+    const tmpr = $c.relem(svl.level.locations[x[0]], y[0]);
+    const glyph = glyph_at(x[0], y[0]);
     if (mtmp) {
         /* don't stop travel when displacing pets; if the
            displace fails for some reason, do_attack() in uhitm.c
@@ -2681,7 +2666,7 @@ async function domove_core() {   // hack.c:2712
         }
         if (u.utrap) {
             /* when u.utrap is True, displaceu is False */
-            moved = await trapmove(x[0], y[0], $c.asRec(null, $T.trap, 32));
+            const moved = await trapmove(x[0], y[0], $c.asRec(null, $T.trap, 32));
             if (!u.utrap) {
                 disp.botl = TRUE;
                 await reset_utrap(TRUE);   /* might resume levitation or flight */
@@ -2730,7 +2715,7 @@ async function domove_core() {   // hack.c:2712
     }
     if (mtmp) {
         if (displaceu[0]) {
-            noticed_it = canspotmon(mtmp) || glyph_is_invisible(glyph) || glyph_is_warning(glyph) ? 1 : 0;
+            const noticed_it = canspotmon(mtmp) || glyph_is_invisible(glyph) || glyph_is_warning(glyph) ? 1 : 0;
             svl.level.monsters[u.ux][u.uy] = null;
             await place_monster(mtmp, u.ux0, u.uy0);
             await newsym(u.ux, u.uy);
@@ -2870,8 +2855,7 @@ async function maybe_smudge_engr(x1, y1, x2, y2) {   // hack.c:3020
  * @returns {Promise<void>}
  */
 export async function overexert_hp() {   // hack.c:3035
-    let hp = null;
-    hp = !Upolyd() ? new $c.FieldRef(u, "uhp", "i32") : new $c.FieldRef(u, "mh", "i32");
+    const hp = !Upolyd() ? new $c.FieldRef(u, "uhp", "i32") : new $c.FieldRef(u, "mh", "i32");
     if (hp.get(0) > 1) {
         hp.set(0, hp.get(0) - 1 | 0);
         disp.botl = TRUE;
@@ -2899,10 +2883,10 @@ export async function overexertion() {   // hack.c:3051
  * @returns {Promise<void>}
  */
 export async function invocation_message() {   // hack.c:3064
-    let buf = new Int8Array(256), otmp = null;
+    let buf = new Int8Array(256);
     /* a special clue-msg when on the Invocation position */
     if (invocation_pos(u.ux, u.uy) && !On_stairs(u.ux, u.uy)) {
-        otmp = carrying(CANDELABRUM_OF_INVOCATION);
+        const otmp = carrying(CANDELABRUM_OF_INVOCATION);
         nomul(0);   /* stop running or travelling */
         if (u.usteed) {
             $c.sprintf(new $c.Ptr(buf, 0), $c.lit("beneath %s"), await y_monnam(u.usteed));
@@ -2921,9 +2905,8 @@ export async function invocation_message() {   // hack.c:3064
 /* for status: set up iflags.terrain_typ, an index into terrain_descrp[];
    some types need fixing up  */
 export function classify_terrain() {   // hack.c:3090
-    let lev = null, typ = 0;
-    lev = $c.relem(svl.level.locations[u.ux], u.uy);
-    typ = svl.lastseentyp[u.ux][u.uy];   /* lev->typ */
+    const lev = $c.relem(svl.level.locations[u.ux], u.uy);
+    let typ = svl.lastseentyp[u.ux][u.uy];   /* lev->typ */
     /*
      * If the terrain under the hero is different now from what it
      * was on the previous check, bring iflags.terrain_typ up to date
@@ -2999,11 +2982,10 @@ export function classify_terrain() {   // hack.c:3090
  * @returns {Promise<void>}
  */
 export async function switch_terrain() {   // hack.c:3178
-    let lev = null, blocklev = 0, was_levitating = 0, was_flying = 0;
-    lev = $c.relem(svl.level.locations[u.ux], u.uy);
-    blocklev = IS_OBSTRUCTED(lev.typ) || closed_door(u.ux, u.uy) || IS_WATERWALL(lev.typ) || lev.typ === LAVAWALL ? 1 : 0;
-    was_levitating = !!Levitation() ? 1 : 0;
-    was_flying = !!((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) ? 1 : 0;
+    const lev = $c.relem(svl.level.locations[u.ux], u.uy);
+    const blocklev = IS_OBSTRUCTED(lev.typ) || closed_door(u.ux, u.uy) || IS_WATERWALL(lev.typ) || lev.typ === LAVAWALL ? 1 : 0;
+    const was_levitating = !!Levitation() ? 1 : 0;
+    const was_flying = !!((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1.FLY) !== 0) && !u.uprops[FLYING].blocked) ? 1 : 0;
     if (blocklev) {
         /* called from spoteffects(), stop levitating but skip float_down() */
         if (Levitation()) {
@@ -3060,11 +3042,10 @@ export async function set_uinwater(in_out) {   // hack.c:3221
  * @returns {Promise<number>} boolean
  */
 export async function pooleffects(newspot) {   // hack.c:3233
-    let still_inwater = 0, was_underwater = 0;
     /* true if called by spoteffects */
     /* check for leaving water */
     if (u.uinwater) {
-        still_inwater = FALSE;   /* assume we're getting out */
+        let still_inwater = FALSE;   /* assume we're getting out */
         if (!is_pool(u.ux, u.uy)) {
             if ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) {
                 await You($c.lit("pop into an air bubble."));
@@ -3086,7 +3067,7 @@ export async function pooleffects(newspot) {   // hack.c:3233
             still_inwater = TRUE;
         }
         if (!still_inwater) {
-            was_underwater = Underwater() && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) ? 1 : 0;
+            const was_underwater = Underwater() && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) ? 1 : 0;
             await set_uinwater(0);   /* u.uinwater = 0; leave the water */
             if (was_underwater) {
                 /* restore vision */
@@ -3294,11 +3275,11 @@ function monstinroom(mdat, roomno) {   // hack.c:3466
  * @returns {number} boolean
  */
 function furniture_present(furniture, roomno) {   // hack.c:3482
-    let x = 0, y = 0, lx = 0, ly = 0, hx = 0, hy = 0, sroom = null;
-    sroom = $c.relem(svr.rooms, roomno);
+    let x = 0, y = 0, ly = 0, hy = 0;
+    const sroom = $c.relem(svr.rooms, roomno);
     ly = sroom.ly, hy = sroom.hy;
-    lx = sroom.lx;
-    hx = sroom.hx;
+    const lx = sroom.lx;
+    const hx = sroom.hx;
     /* the inside_room() check handles irregularly shaped rooms */
     for (y = ly; y <= hy; y = y + 1 | 0) {
         for (x = lx; x <= hx; x = x + 1 | 0) {
@@ -3316,9 +3297,9 @@ function furniture_present(furniture, roomno) {   // hack.c:3482
  * @returns {$c.Ptr | null} char *
  */
 export function in_rooms(x, y, typewanted) {   // hack.c:3498
-    let rno = 0, ptr = null, typefound = 0, min_x = 0, min_y = 0, max_x = 0, max_y_offset = 0, step = 0, lev = null;
-    rno = 0;
-    ptr = new $c.Ptr(in_rooms$buf, 4);
+    let typefound = 0, step = 0;
+    let rno = 0;
+    let ptr = new $c.Ptr(in_rooms$buf, 4);
     switch (rno = svl.level.locations[x][y].roomno) {
         case NO_ROOM:
             return ptr;
@@ -3335,15 +3316,15 @@ export function in_rooms(x, y, typewanted) {   // hack.c:3498
             }
             return ptr;
     }
-    min_x = x - 1;
-    max_x = x + 1;
+    let min_x = x - 1;
+    let max_x = x + 1;
     if (x < 1) {
         min_x = min_x + step | 0;
     } else if (x >= COLNO) {
         max_x = max_x - step | 0;
     }
-    min_y = y - 1;
-    max_y_offset = 2;
+    let min_y = y - 1;
+    let max_y_offset = 2;
     if (min_y < 0) {
         min_y = min_y + step | 0;
         max_y_offset = max_y_offset - step | 0;
@@ -3351,7 +3332,7 @@ export function in_rooms(x, y, typewanted) {   // hack.c:3498
         max_y_offset = max_y_offset - step | 0;
     }
     for (x = $c.i16(min_x); x <= max_x; x = $c.i16(x + step | 0)) {
-        lev = $c.relem(svl.level.locations[x], min_y);
+        const lev = $c.relem(svl.level.locations[x], min_y);
         y = 0;
         if ((rno = $c.radd(lev, y).roomno) >= ROOMOFFSET && !$c.strchr(ptr, rno) && (!typewanted || (typefound = svr.rooms[rno - ROOMOFFSET].rtype) === typewanted || typewanted === SHOPBASE && typefound > SHOPBASE)) {
             (ptr = ptr.add(-1)).set(0, rno);
@@ -3380,8 +3361,8 @@ export function in_rooms(x, y, typewanted) {   // hack.c:3498
  * @returns {number} boolean
  */
 export function in_town(x, y) {   // hack.c:3564
-    let sroom = null, has_subrooms = 0;
-    has_subrooms = FALSE;
+    let sroom = null;
+    let has_subrooms = FALSE;
     if (!svl.level.flags.has_town) {
         return FALSE;
     }
@@ -3403,7 +3384,7 @@ export function in_town(x, y) {   // hack.c:3564
  * @param {number} newlev boolean
  */
 function move_update(newlev) {   // hack.c:3588
-    let c = 0, ptr1 = null, ptr2 = null, ptr3 = null, ptr4 = null, $t1, $t2, $t3, $t4;
+    let ptr1 = null, ptr2 = null, ptr3 = null, ptr4 = null, $t1, $t2, $t3, $t4;
     $c.strcpy(new $c.Ptr(u.urooms0, 0), new $c.Ptr(u.urooms, 0));
     $c.strcpy(new $c.Ptr(u.ushops0, 0), new $c.Ptr(u.ushops, 0));
     if (newlev) {
@@ -3416,7 +3397,7 @@ function move_update(newlev) {   // hack.c:3588
     }
     $c.strcpy(new $c.Ptr(u.urooms, 0), in_rooms(u.ux, u.uy, 0));
     for (ptr1 = new $c.Ptr(u.urooms, 0), ptr2 = new $c.Ptr(u.uentered, 0), ptr3 = new $c.Ptr(u.ushops, 0), ptr4 = new $c.Ptr(u.ushops_entered, 0); ptr1.get(0); ptr1 = ptr1.add(1)) {
-        c = ptr1.get(0);
+        const c = ptr1.get(0);
         if (!$c.strchr(new $c.Ptr(u.urooms0, 0), c)) {
             ($t1 = ptr2, ptr2 = $t1.add(1), $t1).set(0, c);
         }
@@ -3442,7 +3423,7 @@ function move_update(newlev) {   // hack.c:3588
  * @returns {Promise<void>}
  */
 export async function check_special_room(newlev) {   // hack.c:3626
-    let mtmp = null, ptr = null, roomno = 0, rt = 0, msg_given = 0, run = null, oracle = null;
+    let mtmp = null, ptr = null;
     move_update(newlev);
     if (new $c.Ptr(u.ushops0, 0).get(0)) {
         await u_left_shop(new $c.Ptr(u.ushops_left, 0), newlev);
@@ -3471,9 +3452,9 @@ export async function check_special_room(newlev) {   // hack.c:3626
         await u_entered_shop(new $c.Ptr(u.ushops_entered, 0));
     }
     for (ptr = new $c.Ptr(u.uentered, 0); ptr.get(0); ptr = ptr.add(1)) {
-        roomno = ptr.get(0) - ROOMOFFSET;
-        rt = svr.rooms[roomno].rtype;
-        msg_given = TRUE;
+        const roomno = ptr.get(0) - ROOMOFFSET;
+        let rt = svr.rooms[roomno].rtype;
+        let msg_given = TRUE;
         /* Did we just enter some other special room? */
         /* vault.c insists that a vault remain a VAULT,
          * and temples should remain TEMPLEs,
@@ -3494,7 +3475,7 @@ export async function check_special_room(newlev) {   // hack.c:3626
                 break;
             case MORGUE:
                 if (midnight()) {
-                    run = u_locomotion($c.lit("Run"));
+                    const run = u_locomotion($c.lit("Run"));
                     await pline($c.lit("%s away!  %s away!"), run, run);
                 } else {
                     await You($c.lit("have an uncanny feeling..."));
@@ -3518,7 +3499,7 @@ export async function check_special_room(newlev) {   // hack.c:3626
                 break;
             case DELPHI:
                 {
-                    oracle = monstinroom(mons[PM.ORACLE], roomno);
+                    const oracle = monstinroom(mons[PM.ORACLE], roomno);
                     if (oracle) {
                         if (!oracle.mpeaceful) {
                             await verbalize($c.lit("You're in Delphi, %s."), new $c.Ptr(svp.plname, 0));
@@ -3596,7 +3577,6 @@ export async function check_special_room(newlev) {   // hack.c:3626
  * @returns {Promise<number>} int
  */
 async function pickup_checks() {   // hack.c:3788
-    let traphere = null, lev = null, surf = null;
     /* uswallow case added by GAN 01/29/87 */
     if (u.uswallow) {
         if (!u.ustuck.minvent) {
@@ -3630,7 +3610,7 @@ async function pickup_checks() {   // hack.c:3788
         }
     }
     if (!OBJ_AT(u.ux, u.uy)) {
-        lev = $c.relem(svl.level.locations[u.ux], u.uy);
+        const lev = $c.relem(svl.level.locations[u.ux], u.uy);
         if (IS_THRONE(lev.typ)) {
             await pline($c.lit("It must weigh%s a ton!"), lev.flags ? $c.lit(" almost") : $c.lit(""));
         } else if (IS_SINK(lev.typ)) {
@@ -3650,7 +3630,7 @@ async function pickup_checks() {   // hack.c:3788
         }
         return 0;
     }
-    traphere = t_at(u.ux, u.uy);
+    const traphere = t_at(u.ux, u.uy);
     if (!can_reach_floor(traphere && is_pit(traphere.ttyp) ? 1 : 0)) {
         /* if there's a hole here, any objects here clearly aren't at
            the bottom so only check for pits */
@@ -3661,7 +3641,7 @@ async function pickup_checks() {   // hack.c:3788
         } else if (Blind()) {
             await You($c.lit("cannot reach anything here."));
         } else {
-            surf = surface(u.ux, u.uy);
+            let surf = surface(u.ux, u.uy);
             if (traphere) {
                 if (traphere.ttyp === HOLE) {
                     surf = $c.lit("edge of the hole");
@@ -3680,8 +3660,8 @@ async function pickup_checks() {   // hack.c:3788
  * @returns {Promise<number>} int
  */
 export async function dopickup() {   // hack.c:3876
-    let count = 0, tmpcount = Int32Array.of(0), ret = 0;
-    count = $c.i32(gc.command_count);
+    let tmpcount = Int32Array.of(0), ret = 0;
+    const count = $c.i32(gc.command_count);
     gm.multi = 0;   /* always reset */
     if ((ret = await pickup_checks()) >= 0) {
         return ret ? ECMD.TIME : ECMD.OK;
@@ -3886,8 +3866,7 @@ export async function lookaround() {   // hack.c:3898
  * @returns {number} boolean
  */
 export function doorless_door(x, y) {   // hack.c:4063
-    let lev_p = null;
-    lev_p = $c.relem(svl.level.locations[x], y);
+    const lev_p = $c.relem(svl.level.locations[x], y);
     if (!IS_DOOR(lev_p.typ)) {
         return FALSE;
     }
@@ -4005,7 +3984,6 @@ export function nomul(nval) {   // hack.c:4161
  * @returns {Promise<void>}
  */
 export async function unmul(msg_override) {   // hack.c:4177
-    let f = null;
     disp.botl = TRUE;
     gm.multi = 0;   /* caller will usually have done this already */
     if (msg_override) {
@@ -4028,7 +4006,7 @@ export async function unmul(msg_override) {   // hack.c:4177
     u.usleep = 0;
     gm.multi_reason = null, gm.multireasonbuf[0] = 0;
     if (ga.afternmv) {
-        f = ga.afternmv;
+        const f = ga.afternmv;
         /* clear afternmv before calling it (to override the
            encumbrance hack for levitation--see weight_cap()) */
         ga.afternmv = null;
@@ -4039,13 +4017,13 @@ export async function unmul(msg_override) {   // hack.c:4177
  * @returns {Promise<void>}
  */
 async function maybe_wail() {   // hack.c:4211
-    let who = null, i = 0, powercnt = 0;
+    let i = 0, powercnt = 0;
     if (svm.moves <= $c.add64(gw.wailmsg, 50)) {
         return;
     }
     gw.wailmsg = svm.moves;
     if (gu.urole.mnum === PM.WIZARD || gu.urace.mnum === PM.ELF || gu.urole.mnum === PM.VALKYRIE) {
-        who = gu.urole.mnum === PM.WIZARD || gu.urole.mnum === PM.VALKYRIE ? gu.urole.name.m : $c.lit("Elf");
+        const who = gu.urole.mnum === PM.WIZARD || gu.urole.mnum === PM.VALKYRIE ? gu.urole.name.m : $c.lit("Elf");
         if (u.uhp === 1) {
             await pline($c.lit("%s is about to die."), who);
         } else {
@@ -4115,9 +4093,8 @@ export async function losehp(n, knam, k_format) {   // hack.c:4256
  * @returns {number} int
  */
 export function weight_cap() {   // hack.c:4295
-    let carrcap = 0, save_ELev = 0, save_BLev = 0;
-    save_ELev = u.uprops[LEVITATION].extrinsic;
-    save_BLev = u.uprops[LEVITATION].blocked;
+    const save_ELev = u.uprops[LEVITATION].extrinsic;
+    const save_BLev = u.uprops[LEVITATION].blocked;
     /* boots take multiple turns to wear but any properties they
        confer are enabled at the start rather than the end; that
        causes message sequencing issues for boots of levitation
@@ -4129,7 +4106,7 @@ export function weight_cap() {   // hack.c:4295
     /* levitation is blocked by being trapped in the floor, but it still
        functions enough in that situation to enhance carrying capacity */
     u.uprops[LEVITATION].blocked = $c.and64(u.uprops[LEVITATION].blocked, ~I_SPECIAL);
-    carrcap = Math.imul(WT.WEIGHTCAP_STRCON, ACURRSTR() + ACURR(A.CON)) + WT.WEIGHTCAP_SPARE;
+    let carrcap = Math.imul(WT.WEIGHTCAP_STRCON, ACURRSTR() + ACURR(A.CON)) + WT.WEIGHTCAP_SPARE;
     if (Upolyd()) {
         /* consistent with can_carry() in mon.c */
         if (gy.youmonst.data.mlet === S.NYMPH) {
@@ -4169,9 +4146,9 @@ export function weight_cap() {   // hack.c:4295
  * @returns {number} int
  */
 export function inv_weight() {   // hack.c:4351
-    let otmp = null, wt = 0, $t1;
-    otmp = gi.invent;
-    wt = 0;
+    let $t1;
+    let otmp = gi.invent;
+    let wt = 0;
     while (otmp) {
         if (otmp.oclass === COIN_CLASS) {
             wt = wt + $c.i32($c.div64($c.add64(otmp.quan, 50), 100)) | 0;
@@ -4192,15 +4169,14 @@ export function inv_weight() {   // hack.c:4351
  * @returns {number} int
  */
 export function calc_capacity(xtra_wt) {   // hack.c:4372
-    let cap = 0, wt = 0;
-    wt = inv_weight() + xtra_wt | 0;
+    const wt = inv_weight() + xtra_wt | 0;
     if (wt <= 0) {
         return UNENCUMBERED;
     }
     if (gw.wc <= 1) {
         return OVERLOADED;
     }
-    cap = $c.div32(Math.imul(wt, 2), gw.wc) + 1 | 0;
+    const cap = $c.div32(Math.imul(wt, 2), gw.wc) + 1 | 0;
     return cap < OVERLOADED ? cap : OVERLOADED;
 }
 /**
@@ -4213,8 +4189,7 @@ export function near_capacity() {   // hack.c:4385
  * @returns {number} int
  */
 export function max_capacity() {   // hack.c:4391
-    let wt = 0;
-    wt = inv_weight();
+    const wt = inv_weight();
     return wt - Math.imul(2, gw.wc) | 0;
 }
 /**
@@ -4236,12 +4211,12 @@ export async function check_capacity(str) {   // hack.c:4399
  * @returns {Promise<void>}
  */
 export async function dump_weights() {   // hack.c:4421
-    let i = 0, cnt = 0, nmwidth = 0, mcount = 0, ocount = 0, nmbuf = new Int8Array(256), nmbufbase = new Int8Array(256), num_entries = 0, cm = 0, oc_name = null, wt = 0, $t1, $t2;
-    cnt = 0;
-    nmwidth = 49;
-    mcount = NUMMONS;
-    ocount = NUM_OBJECTS;
-    num_entries = $c.u64(mcount + ocount | 0);
+    let i = 0, nmbuf = new Int8Array(256), nmbufbase = new Int8Array(256), $t1, $t2;
+    let cnt = 0;
+    const nmwidth = 49;
+    const mcount = NUMMONS;
+    const ocount = NUM_OBJECTS;
+    const num_entries = $c.u64(mcount + ocount | 0);
     weightlist = $c.asRec(await alloc($c.u32($c.mulu64(32, num_entries))), $T.weight_table_entry, 32);
     await decl_globals_init();
     await init_objects();
@@ -4252,15 +4227,15 @@ export async function dump_weights() {   // hack.c:4421
             $c.radd(weightlist, cnt).wtyp = 1;
             $c.radd(weightlist, cnt).unique = (mons[i].geno & G_UNIQ) !== 0 ? 1 : 0;
             nh_snprintf($c.lit("dump_weights"), 4439, new $c.Ptr(nmbuf, 0), 256, $c.lit("%07u"), $c.radd(weightlist, cnt).wt);
-            cm = await CapitalMon(mons[i].pmnames[NEUTRAL]);
+            const cm = await CapitalMon(mons[i].pmnames[NEUTRAL]);
             nh_snprintf($c.lit("dump_weights"), 4444, new $c.Ptr(nmbuf, 7), 249, $c.lit("%s%s"), $c.lit("the body of "), cm ? await the(mons[i].pmnames[NEUTRAL]) : $c.radd(weightlist, cnt).unique ? mons[i].pmnames[NEUTRAL] : await an(mons[i].pmnames[NEUTRAL]));
             $t1 = await dupstr(new $c.Ptr(nmbuf, 0)), $c.radd(weightlist, cnt).nm = $t1;
             cnt = cnt + 1 | 0;
         }
     }
     for (i = 0; i < ocount; i = i + 1 | 0) {
-        oc_name = i === SLIME_MOLD ? $c.lit("slime mold") : obj_descr[i].oc_name;
-        wt = objects[i].oc_weight | 0;
+        const oc_name = i === SLIME_MOLD ? $c.lit("slime mold") : obj_descr[i].oc_name;
+        const wt = objects[i].oc_weight | 0;
         if (wt && oc_name) {
             $c.radd(weightlist, cnt).idx = i;
             $c.radd(weightlist, cnt).wt = wt;
@@ -4292,9 +4267,8 @@ export async function dump_weights() {   // hack.c:4421
  * @returns {number} int
  */
 function cmp_weights(p1, p2) {   // hack.c:4486
-    let i1 = null, i2 = null;
-    i1 = $c.asRec(p1, $T.weight_table_entry, 32);
-    i2 = $c.asRec(p2, $T.weight_table_entry, 32);
+    const i1 = $c.asRec(p1, $T.weight_table_entry, 32);
+    const i2 = $c.asRec(p2, $T.weight_table_entry, 32);
     /* return (i1->wt - i2->wt); */
     return $c.strcmp(i1.nm, i2.nm);
 }
@@ -4303,9 +4277,8 @@ function cmp_weights(p1, p2) {   // hack.c:4486
  * @returns {number} int
  */
 export function inv_cnt(incl_gold) {   // hack.c:4496
-    let otmp = null, ct = 0;
-    otmp = gi.invent;
-    ct = 0;
+    let otmp = gi.invent;
+    let ct = 0;
     while (otmp) {
         if (incl_gold || otmp.invlet !== GOLD_SYM) {
             ct = ct + 1 | 0;
@@ -4338,9 +4311,8 @@ export function money_cnt(otmp) {   // hack.c:4514
  * @returns {Promise<void>}
  */
 export async function spot_checks(x, y, old_typ) {   // hack.c:4525
-    let new_typ = 0, db_ice_now = 0;
-    new_typ = svl.level.locations[x][y].typ;
-    db_ice_now = FALSE;
+    const new_typ = svl.level.locations[x][y].typ;
+    let db_ice_now = FALSE;
     switch (old_typ) {
         case DRAWBRIDGE_UP:
             db_ice_now = (svl.level.locations[x][y].flags & DB.UNDER) === DB.ICE ? 1 : 0;
@@ -4364,8 +4336,7 @@ export async function spot_checks(x, y, old_typ) {   // hack.c:4525
  * @returns {Promise<number>} int
  */
 export async function rounddiv(x, y) {   // hack.c:4551
-    let r = 0, m = 0, divsgn = 0;
-    divsgn = 1;
+    let divsgn = 1;
     if (y === 0) {
         await panic($c.lit("division by zero in rounddiv"));
     } else if (y < 0) {
@@ -4376,8 +4347,8 @@ export async function rounddiv(x, y) {   // hack.c:4551
         divsgn = -divsgn | 0;
         x = $c.neg64(x);
     }
-    r = $c.i32($c.div64(x, y));
-    m = $c.i32($c.rem64(x, y));
+    let r = $c.i32($c.div64(x, y));
+    const m = $c.i32($c.rem64(x, y));
     if (Math.imul(2, m) >= y) {
         r = r + 1 | 0;
     }
