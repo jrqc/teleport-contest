@@ -34,3 +34,4 @@ Date, change, score delta, root cause found. Scores from `node tools/score.mjs`
 | 2026-11-23 | JSDoc from the C signatures on every function (comments only) | 44/44 | 11405/11405 | 792838/792838 | churn unchanged; js/ unchanged after normalization; fuzz batch 990/990; playability 2.04-2.06 ms/move |
 | 2026-11-23 | === for pointers to a record array's own elements (469 peq, 835 relem calls gone) | 44/44 | 11405/11405 | 792838/792838 | churn unchanged; fuzz batch 990/990; playability 2.07 ms/move |
 | 2026-11-23 | P5: integer wrappers dropped where value ranges prove them unneeded (| 0 -5,043, $c.i8 -2,280, constant bit-field stores -1,023) | 44/44 | 11405/11405 | 792838/792838 | churn unchanged; fuzz batch 990/990; playability 2.09-2.16 ms/move |
+| 2026-11-23 | const locals, declared at first assignment (5,429 const, 3,721 late let) | 44/44 | 11405/11405 | 792838/792838 | churn unchanged; fuzz batch 990/990; playability 2.07-2.10 ms/move |

@@ -18,3 +18,4 @@ step to revert is the one pushed last before that run.
 | 2026-11-23 16:43 | `7f196ad` | Readability: fortify names |
 | 2026-11-23 17:37 | `eec068c` | Readability: JSDoc from C signatures |
 | 2026-11-23 18:22 | `e321f99` | Readability: === for pointers to record array elements |
+| 2026-11-23 19:17 | `38d287c` | Readability P5: wrapper reduction |
