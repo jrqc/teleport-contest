@@ -553,6 +553,7 @@ export class TUEmitter {
         const addrTaken = this.addressTaken(body);
         const declare = (d, isParam) => {
             let nm = jsName(d.name || 'p');
+            if (!this.heap && this.prog.nsNames.has(nm)) nm += '$';   // a local must not shadow a constant namespace (P2c)
             if (this.fn.names.has(nm)) { let i = 2; while (this.fn.names.has(`${nm}$${i}`)) i++; nm = `${nm}$${i}`; }
             this.fn.names.add(nm);
             const ty = this.T(d);
@@ -1527,8 +1528,10 @@ export class TUEmitter {
         const r = constExpr(n, ref);
         if (!r || !exact(r, v)) return null;
         for (const [js, b] of r.names) {
+            this.prog.noteConstFile(b.file, this.tu.file);
             if (b.macro) this.prog.useMacroConst(this, b);
-            if (b.file !== this.tu.file) this.prog.noteImport(this, headerModule(b.file), js);
+            if (b.nsm) { if (!b.nsm.local) this.prog.noteImport(this, headerModule(b.nsm.home), b.nsm.ns); }
+            else if (b.file !== this.tu.file) this.prog.noteImport(this, headerModule(b.file), js);
         }
         return E(r.c, r.p);
     }
@@ -1559,6 +1562,8 @@ export class TUEmitter {
         }
         const header = /\.h$/.test(bs._f);
         if (!header && bs._f !== this.tu.file) return null;
+        const nsm = this.prog.consts.ns && this.prog.consts.ns.of(bs._f, d.name);
+        if (nsm) return { js: `${nsm.ns}.${nsm.short}`, file: bs._f, v: c.v, header, nsm };   // defined in its namespace object (P2c)
         return { js: jsName(d.name), file: bs._f, v: c.v, header, macro: { name: d.name, text: c.text, offset: d.bodyStart } };
     }
     /** The binding of enum constant `name` (declaration id `id` in this TU), or null. */

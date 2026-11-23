@@ -77,6 +77,24 @@ export class ElemPtr {
     constructor(arr, idx) { this.__arr = arr; this.__idx = idx; return new Proxy(this, ELEM_TRAP); }
 }
 /**
+ * A C enum as a frozen namespace object (readability plan P2c), built in C order: a name
+ * alone is the previous entry's value + 1 (the first: 0), [name, value] gives the value,
+ * and a function value is called with the members defined so far.
+ * The signature gives editors the member names (TypeScript >= 5.0 infers them).
+ * @template {string} const K
+ * @param {ReadonlyArray<K | readonly [K, number | ((e: any) => number)]>} list
+ * @returns {Readonly<Record<K, number>>}
+ */
+export function cenum(list) {
+    const o = {};
+    let v = -1;
+    for (const x of list) {
+        if (typeof x === 'string') o[x] = ++v;
+        else o[x[0]] = v = typeof x[1] === 'function' ? x[1](o) : x[1];
+    }
+    return Object.freeze(o);
+}
+/**
  * Copy an initializer literal into a zeroed aggregate (generated tables: an array
  * literal mirroring the C initializer, readability plan P2c). An array literal sets
  * elements by index (undefined: left zero); a plain object sets the named fields,

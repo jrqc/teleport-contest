@@ -99,6 +99,9 @@ export class ConstTable {
         this.byFile = new Map();   // file -> Map(name -> { name, file, value, offset, init, prev, enumKey })
         this.fileOf = new Map();   // name -> file, or null when ambiguous
         this.bad = new Set();      // names that keep their number
+        this.enums = [];           // enum declarations in first-seen order: { file, offset, names }
+        this.enumSeen = new Set();
+        this.ns = null;            // Namespaces (namespaces.mjs), set once every TU's facts are in
     }
     /** Collect the file-scope enums of one TU (headers and the .c file). */
     addTU(tu) {
@@ -109,6 +112,15 @@ export class ConstTable {
         visit(tu.root);
     }
     addEnum(e, tu) {
+        const ms = kids(e).filter((c) => c.kind === 'EnumConstantDecl');
+        if (ms.length) {
+            const f0 = declFile(ms[0]);
+            const k = `${f0}\0${ms[0].name}`;
+            if (f0 && !path.isAbsolute(f0) && !this.enumSeen.has(k)) {
+                this.enumSeen.add(k);
+                this.enums.push({ file: f0, offset: (ms[0].loc && (ms[0].loc.expansionLoc || ms[0].loc).offset) ?? 0, names: ms.map((c) => c.name) });
+            }
+        }
         let prev = null, next = 0n;
         for (const c of kids(e)) {
             if (c.kind !== 'EnumConstantDecl') continue;
@@ -134,6 +146,8 @@ export class ConstTable {
         if (this.bad.has(name) || !file || this.fileOf.get(name) !== file) return null;
         const r = this.byFile.get(file) && this.byFile.get(file).get(name);
         if (!r || !Number.isSafeInteger(Number(r.value))) return null;
+        const m = this.ns && this.ns.of(file, name);
+        if (m) return { js: `${m.ns}.${m.short}`, file, v: Number(r.value), header: /\.h$/.test(file), nsm: m };
         return { js: jsName(name), file, v: Number(r.value), header: /\.h$/.test(file) };
     }
     /**
@@ -141,39 +155,93 @@ export class ConstTable {
      * `local` (a .c file): plain `const`, else `export const`.
      */
     definitions(file, jsName, local) {
-        const m = this.byFile.get(file);
-        if (!m) return { lines: [], entries: [], imports: new Map() };
+        const m = this.byFile.get(file) || new Map();
+        if (!m.size && !(this.ns && this.ns.homedIn(file).length)) return { lines: [], entries: [], imports: new Map() };
         const imports = new Map();
         const lines = [], entries = [];
         const kw = local ? 'const' : 'export const';
+        const ref = (atOffset) => (nm) => {
+            const b = this.binding(nm, this.fileOf.get(nm), jsName);
+            if (!b) return null;
+            if (b.nsm) {
+                // a namespace member: its object must be defined in this module before the use
+                // (a .c file may import a header's namespace)
+                const sp = this.ns.spaces.get(b.nsm.key);
+                if (sp.home === file) return sp.offset < atOffset ? b : null;
+                return local && !sp.local ? b : null;
+            }
+            // a constant defined later in the same file is not initialized yet (TDZ)
+            if (b.file === file && m.get(nm).offset >= atOffset) return null;
+            // header modules import nothing, so they cannot form an import cycle (an
+            // enum continued in another header, optlist.h in global.h, keeps the number)
+            if (!local && b.file !== file) return null;
+            return b;
+        };
+        const imp = (b) => {
+            if (b.nsm) { const sp = this.ns.spaces.get(b.nsm.key); if (sp.home !== file) addImp(imports, headerModule(sp.home), sp.ns); }
+            else if (b.file !== file) addImp(imports, headerModule(b.file), b.js);
+        };
         for (const r of [...m.values()].sort((a, b) => a.offset - b.offset || (a.name < b.name ? -1 : 1))) {
             if (this.bad.has(r.name) || this.fileOf.get(r.name) !== file || !Number.isSafeInteger(Number(r.value))) continue;
+            if (this.ns && this.ns.of(file, r.name)) continue;   // defined in its namespace object
             let text = null;
-            const ref = (nm) => {
-                const b = this.binding(nm, this.fileOf.get(nm), jsName);
-                if (!b) return null;
-                // a constant defined later in the same file is not initialized yet (TDZ)
-                if (b.file === file && m.get(nm).offset >= r.offset) return null;
-                // header modules import nothing, so they cannot form an import cycle (an
-                // enum continued in another header, optlist.h in global.h, keeps the number)
-                if (!local && b.file !== file) return null;
-                return b;
-            };
+            const rf = ref(r.offset);
             if (r.init) {
-                const x = constExpr(r.init, ref);
-                if (x && exact(x, r.value)) {
-                    text = x.c;
-                    for (const [js, b] of x.names) if (b.file !== file) addImp(imports, headerModule(b.file), js);
-                }
-            } else if (r.prev && ref(r.prev)) {
-                const b = ref(r.prev);
-                if (b.v + 1 === Number(r.value)) { text = `${b.js} + 1`; if (b.file !== file) addImp(imports, headerModule(b.file), b.js); }
+                const x = constExpr(r.init, rf);
+                if (x && exact(x, r.value)) { text = x.c; for (const [, b] of x.names) imp(b); }
+            } else if (r.prev && rf(r.prev)) {
+                const b = rf(r.prev);
+                if (b.v + 1 === Number(r.value)) { text = `${b.js} + 1`; imp(b); }
             } else if (r.value === 0n) text = '0';
             if (text === null) text = String(r.value);
             lines.push(`${kw} ${jsName(r.name)} = ${text};`);
             entries.push({ offset: r.offset, line: lines[lines.length - 1] });
         }
+        if (this.ns) for (const sp of this.ns.homedIn(file)) entries.push({ offset: sp.offset, line: this.namespaceText(sp, kw, jsName, ref, imp) });
         return { lines, entries, imports };
+    }
+    /**
+     * One namespace object (P2c). Enums: $c.cenum([...]) with C's implicit numbering (a name
+     * alone is the previous entry + 1, the first 0; [name, value] where C writes a value or
+     * the list leaves C's order; a value using earlier members of the same namespace is a
+     * function of the object). #define-only namespaces: a frozen object literal of the C values.
+     */
+    namespaceText(sp, kw, jsName, ref, imp) {
+        const out = [];
+        const enumy = sp.families.some((f) => f.kind === 'enum');
+        let prevRec = null, prevV = null;
+        for (const fam of sp.families) {
+            for (const mb of fam.members) {
+                if (!mb.short) { prevRec = null; continue; }
+                if (!enumy) { out.push(`    ${mb.short}: ${mb.text},`); continue; }
+                if (fam.kind === 'define') { out.push(`    ['${mb.short}', ${mb.text}],`); prevRec = null; prevV = mb.v; continue; }
+                const r = mb.rec;
+                const v = Number(r.value);
+                if (!r.init && prevRec && prevRec.name === r.prev && prevV + 1 === v) out.push(`    '${mb.short}',`);
+                else if (!r.init && prevRec === null && out.length === 0 && v === 0) out.push(`    '${mb.short}',`);
+                else {
+                    let text = String(r.value), usesE = false;
+                    if (r.init) {
+                        const base = ref(r.offset);
+                        const x = constExpr(r.init, (nm) => {
+                            const b = this.binding(nm, this.fileOf.get(nm), jsName);
+                            if (b && b.nsm && b.nsm.key === sp.key) {
+                                const o = this.byFile.get(b.file).get(nm);
+                                if (o && o.offset < r.offset && this.ns.of(b.file, nm)) { usesE = true; return { ...b, js: `e.${b.nsm.short}`, self: true }; }
+                                return null;
+                            }
+                            // a value outside the namespace: defined before the namespace object
+                            return base(nm) && (!b.nsm) && (b.file !== sp.home || this.byFile.get(b.file).get(nm).offset < sp.offset) ? b : null;
+                        });
+                        if (x && exact(x, r.value)) { text = x.c; for (const [, b] of x.names) if (!b.self) imp(b); } else usesE = false;
+                    }
+                    out.push(`    ['${mb.short}', ${usesE ? `(e) => ${text}` : text}],`);
+                }
+                prevRec = r; prevV = v;
+            }
+        }
+        if (out.length) out[out.length - 1] = out[out.length - 1].replace(/,$/, '');
+        return enumy ? `${kw} ${sp.ns} = $c.cenum([\n${out.join('\n')}\n]);` : `${kw} ${sp.ns} = Object.freeze({\n${out.join('\n')}\n});`;
     }
     headerFiles() { return [...this.byFile.keys()].filter((f) => /\.h$/.test(f)).sort(); }
 }

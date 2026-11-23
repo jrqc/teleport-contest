@@ -15,6 +15,7 @@ import { jsName, field } from './names.mjs';
 import { ROOT } from '../frontend/ast.mjs';
 import { AsyncSet, sigOf } from './asyncset.mjs';
 import { ConstTable, headerModule } from './consts.mjs';
+import { Namespaces, addExpanded } from './namespaces.mjs';
 
 const kids = (n) => n.inner || [];
 const hasBody = (n) => kids(n).some((c) => c.kind === 'CompoundStmt');
@@ -56,6 +57,11 @@ export class Program {
         // readability plan P2c: tables as literals; NH_TABLE_CHECK (a module URL) builds each
         // table both ways and compares them (tools/tablecheck.mjs)
         this.tableLiterals = opts.tableLiterals !== false;
+        this.constNamespaces = opts.constNamespaces !== false;   // P2c: PM.ANGEL
+        this.nsNames = new Set();
+        this.macroUses = new Set();   // macros invoked in object-world function code (namespaces.mjs)
+        this.expanded = new Set();    // identifiers object-world TUs expand as macros (namespaces.mjs)
+        this.constTUs = new Map();    // header -> first TU naming one of its constants
         this.tableCheck = process.env.NH_TABLE_CHECK || null;
         this.handMod = new Map(Object.entries(opts.handModules || {}));   // name -> module path from js/nh ('../hand/x')
         this.blockingCrt = new Set(['getchar']);   // runtime reads that wait for a key (async roots)   // annotation functions[].handwritten: the runtime defines them
@@ -84,6 +90,7 @@ export class Program {
     addFacts(tu) {
         this.async.addTU(tu);
         this.consts.addTU(tu);
+        if (!(this.isHeapFile || isHeapFile)(tu.file)) { addExpanded(tu.root, this.macroUses, true); addExpanded(tu.root, this.expanded, false); }
         tu.module = moduleName(tu.file);
         this.modules.push(tu.module);
         const heap = (this.isHeapFile || isHeapFile)(tu.file);
@@ -340,7 +347,16 @@ export class Program {
 
     // ---------- output ----------
     /** Emit one TU (after addFacts for all): { path, code, errors }. */
+    /** Readability plan P2c: the constant namespaces, once every TU's facts are in. */
+    namespaces() {
+        if (!this.consts.ns && this.constNamespaces !== false) {
+            this.consts.ns = new Namespaces(this.consts, (n) => this.fnDef.has(n) || this.varDef.has(n) || this.crt.has(n) || this.handwritten.has(n), this.macroUses, this.expanded);
+            this.nsNames = this.consts.ns.names;
+        }
+        return this.consts.ns;
+    }
     emitTU(tu) {
+        this.namespaces();
         tu.module = moduleName(tu.file);
         tu.addr = this.addrTakenIds(tu.root);
         const em = this.heapModules.has(tu.module) ? new HeapEmitter(tu, this) : new TUEmitter(tu, this);
@@ -387,10 +403,12 @@ export class Program {
     }
     /** Whether a constant or macro named `name` would collide with a C name the generated code uses. */
     macroNameTaken(tu, name) {
-        if (this.fnDef.has(name) || this.varDef.has(name) || this.crt.has(name) || this.handwritten.has(name) || this.consts.fileOf.has(name)) return true;
+        if (this.fnDef.has(name) || this.varDef.has(name) || this.crt.has(name) || this.handwritten.has(name) || this.consts.fileOf.has(name) || this.nsNames.has(name)) return true;
         tu._defs = tu._defs || this.localDefs(tu);
         return tu._defs.fn.has(name) || tu._defs.var.has(name) || tu.S.typedefs.has(name);
     }
+    /** The first TU that names a constant of `file` (tests/transpiler/consts.test.mjs compiles the header's constants in it). */
+    noteConstFile(file, tuFile) { if (!this.constTUs.has(file)) this.constTUs.set(file, tuFile); }
     /** A #define constant that emitted code names (namedConst). */
     useMacroConst(tu, b) {
         if (!this.macroConsts.has(b.file)) this.macroConsts.set(b.file, new Map());
@@ -408,7 +426,8 @@ export class Program {
     constModules() {
         const out = new Map();
         const byMod = new Map();
-        for (const f of [...new Set([...this.consts.headerFiles(), ...[...this.macroConsts.keys()].filter((x) => /\.h$/.test(x))])].sort()) {
+        const nsHomes = this.consts.ns ? [...this.consts.ns.spaces.values()].filter((x) => !x.local).map((x) => x.home) : [];
+        for (const f of [...new Set([...this.consts.headerFiles(), ...[...this.macroConsts.keys()].filter((x) => /\.h$/.test(x)), ...nsHomes])].sort()) {
             const mod = headerModule(f);
             if (byMod.has(mod)) throw new EmitError(`two headers named ${mod}: ${byMod.get(mod)} and ${f}`);
             byMod.set(mod, f);
@@ -423,7 +442,9 @@ export class Program {
             const { entries, imports } = this.consts.definitions(file, jsName, false);
             for (const x of (this.macroConsts.get(file) || new Map()).values()) entries.push({ offset: x.offset, line: `export const ${x.js} = ${x.text};` });
             const lines = entries.sort((a, b) => a.offset - b.offset).map((x) => x.line);
-            const head = [`// ${mod}.js: the constants (enum and #define) of ${path.relative(path.join(ROOT, 'tools/recorder-env/build/nethack-c/recorder'), path.resolve(ROOT, file))} (generated by transpiler/emit). Do not edit.`];
+            const head = [`// ${mod}.js: the constants (enum and #define) of ${path.relative(path.join(ROOT, 'tools/recorder-env/build/nethack-c/recorder'), path.resolve(ROOT, file))} (generated by transpiler/emit). Do not edit.`,
+                '// A C enum or #define family whose members share an upper-case prefix is a namespace (PM_ANGEL -> PM.ANGEL); every other constant keeps its C name.'];
+            if (lines.some((l) => l.includes('$c.cenum('))) head.push("import * as $c from '../crt/index.js';");
             for (const im of [...imports.keys()].sort()) { head.push(`import { ${[...imports.get(im)].sort().join(', ')} } from './${im}.js';`); todo.push(im); }
             out.set(`${mod}.js`, [...head, '', ...lines, ''].join('\n'));
         }

@@ -74,6 +74,8 @@ for (const e of [...db, ...luaDb]) {
     perTu.push({ file: tu.file, errors: r.errors.length });
     process.stderr.write(r.errors.length ? 'x' : '.');
 }
+// readability plan P2c: where each header's constants were named (tests/transpiler/consts.test.mjs)
+if (!only.size) writeFileSync(path.join(ROOT, 'transpiler/out/const-tus.json'), JSON.stringify(Object.fromEntries([...prog.constTUs].sort()), null, 1) + '\n');
 // readability plan P3: macro sites are resolved once every TU is emitted
 const finalCode = prog.resolveTUs(results);
 perTu.forEach((t, i) => { const code = finalCode.get(results[i].path); writeFileSync(path.join(out, results[i].path), code); t.lines = code.split('\n').length; });
