@@ -76,6 +76,38 @@ export class ElemPtr {
     // a Proxy: dereferencing a position outside the array traps instead of reading undefined
     constructor(arr, idx) { this.__arr = arr; this.__idx = idx; return new Proxy(this, ELEM_TRAP); }
 }
+/**
+ * Copy an initializer literal into a zeroed aggregate (generated tables: an array
+ * literal mirroring the C initializer, readability plan P2c). An array literal sets
+ * elements by index (undefined: left zero); a plain object sets the named fields,
+ * recursing into record and array fields; a string fills a char array (the bytes the
+ * C initializer copies); any other value is stored as is (the generated value already
+ * carries C's conversion to the field type).
+ */
+export function init(target, v) {
+    if (typeof v === 'string') { initString(target, v); return target; }
+    if (Array.isArray(v)) {
+        for (let i = 0; i < v.length; i++) {
+            const x = v[i];
+            if (x === undefined) continue;
+            if (isLit(x)) init(target[i], x);
+            else target[i] = x;
+        }
+        return target;
+    }
+    for (const k of Object.keys(v)) {
+        const x = v[k];
+        if (isLit(x)) init(target[k], x);
+        else target[k] = x;
+    }
+    return target;
+}
+const isLit = (x) => x !== null && typeof x === 'object' ? Array.isArray(x) || Object.getPrototypeOf(x) === Object.prototype : typeof x === 'string';
+function initString(target, s) {
+    if (!ArrayBuffer.isView(target)) throw new CTrap('string initializer for a non-char array');
+    const n = Math.min(s.length, target.length);
+    for (let i = 0; i < n; i++) target[i] = s.charCodeAt(i);
+}
 /** An array of n records of class T (zero-initialized), with back-references. */
 export function recArray(T, n) {
     const a = new Array(n);

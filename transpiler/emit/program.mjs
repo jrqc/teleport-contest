@@ -53,6 +53,10 @@ export class Program {
         this.crt = opts.crtNames;
         this.async = new AsyncSet({ roots: opts.asyncRoots, cut: opts.asyncCut });
         this.handwritten = new Set(opts.handwritten || []);
+        // readability plan P2c: tables as literals; NH_TABLE_CHECK (a module URL) builds each
+        // table both ways and compares them (tools/tablecheck.mjs)
+        this.tableLiterals = opts.tableLiterals !== false;
+        this.tableCheck = process.env.NH_TABLE_CHECK || null;
         this.handMod = new Map(Object.entries(opts.handModules || {}));   // name -> module path from js/nh ('../hand/x')
         this.blockingCrt = new Set(['getchar']);   // runtime reads that wait for a key (async roots)   // annotation functions[].handwritten: the runtime defines them
         this.asyncDone = false;

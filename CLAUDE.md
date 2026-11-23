@@ -440,7 +440,7 @@ The official judge's scores for this fork, from the leaderboard data
 Phase 1 freeze (2026-11-29 00:00 UTC), check it after every judge run (about every 2 hours)
 and add a row **only when the score or the scored commit changed**. The judge does not
 publish the commit it scored: the commit column is the latest commit on `origin/main` pushed
-before `lastScored`. Unmatched = maximum points − points (public + held-out). Screen % and
+before `lastScored`, from `results/PUSHES.md` (every push with its UTC time and step; append a row after each push). Unmatched = maximum points − points (public + held-out). Screen % and
 PRNG % are given as public / held-out, as the leaderboard reports them. Rank is by total
 points (public + held-out) within the `transpiled` category.
 

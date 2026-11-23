@@ -38,6 +38,7 @@ const RULES = [
     [/^tparm:/, 'INPUT', 'an invalid terminfo string (TERM is fixed: xterm-256color)'],
     [/^bridge:/, 'INTERNAL', 'the bridge descriptors are generated for every object/heap call (emit/bridge.mjs)'],
     [/^serialize: |^deserialize: |^sizeof of an unknown value|not an aggregate/, 'INTERNAL', 'serializer kinds come from the generated $fields tables'],
+    [/^string initializer for a non-char array/, 'INTERNAL', 'the emitter writes a string into $c.init only for a char-array field (tu.mjs litValue); tools/tablecheck.mjs compares every table with the per-element build'],
     [/^union cell:/, 'INTERNAL', 'cell member kinds: tests/crt/legal-c.test.mjs checks every generated union cell'],
     [/^not a handle|runtime returned a pointer outside the heap|struct return too large/, 'INTERNAL', 'heap-world calling convention'],
     [/getchar\(\) outside the async set|read\(\) from a standard stream|^read from /, 'INTERNAL', 'input arrives only through the async getchar (design 6)'],
