@@ -12,3 +12,4 @@ step to revert is the one pushed last before that run.
 | 2026-11-22 23:24 | `4f4680b` | Readability P1: RNG calls without caller tags |
 | 2026-11-23 00:45 | `a66176f` | Readability P2: named constants |
 | 2026-11-23 01:39 | `913bf50` | Readability P3: macros as functions |
+| 2026-11-23 04:05 | `fb50c24` | Readability P2c-1: tables as literals |
