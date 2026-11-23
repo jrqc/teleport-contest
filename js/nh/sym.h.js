@@ -14,6 +14,7 @@ export const SYM_PCHAR = 2;
 export const SYM_OC = 3;
 export const SYM_MON = 4;
 export const SYM_OTH = 5;
+export const MAXTCHARS = 25;
 export const MAXEXPCHARS = 9;
 export const SYM_NOTHING = 0;
 export const SYM_UNEXPLORED = 1;

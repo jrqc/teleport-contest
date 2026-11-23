@@ -2,33 +2,40 @@
 import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
-import { AM_CHAOTIC, AM_LAWFUL, AM_MASK, AM_NEUTRAL, AM_NONE, A_LAWFUL, A_NONE, MSA_NONE } from './align.h.js';
+import { AM_CHAOTIC, AM_LAWFUL, AM_NEUTRAL, MSA_NONE } from './align.h.js';
+import { Align2amask, Amask2align, Amask2msa, Msa2amask } from './align.macros.js';
 import { alloc, dupstr } from './alloc.js';
 import { describe_level } from './botl.js';
 import { isok } from './cmd.js';
 import { NO_COLOR } from './color.h.js';
 import { db_under_typ, is_drawbridge_wall, is_ice, is_lava, is_pool } from './dbridge.js';
-import { cg, emptystr, flags, gf, gu, iflags, svb, svd, sve, svi, svl, svm, svn, svq, svr, svs, svt, svu, u, vowels } from './decl.js';
+import { cg, emptystr, gf, gu, iflags, svb, svd, sve, svi, svl, svm, svn, svq, svr, svs, svt, svu, u, vowels } from './decl.js';
 import { BRANCH_LIMIT, D_ALIGN_MASK, D_ALIGN_NONE, HELLISH, LEV_LIMIT, MAZELIKE, ROGUELIKE, TBR_NO_DOWN, TBR_NO_UP, TBR_PORTAL, TBR_STAIR, TOWN, UNCONNECTED } from './dgn_file.h.js';
 import { canseemon, map_location, nul_glyphinfo, see_nearby_objects } from './display.js';
 import { goto_level } from './do.js';
 import { hliquid } from './do_name.js';
-import { BR_PORTAL, BR_STAIR, LR_DOWNTELE, LR_UPTELE, VISITED } from './dungeon.h.js';
+import { BR_NO_END1, BR_NO_END2, BR_PORTAL, BR_STAIR, LR_DOWNTELE, LR_UPTELE, VISITED } from './dungeon.h.js';
+import { In_endgame, In_sokoban, In_tutorial } from './dungeon.macros.js';
 import { done, panic } from './end.js';
 import { debugcore } from './files.js';
-import { COLNO, MAXDUNGEON, MAXLEVEL, MAXNROFROOMS, NHL_SB_SAFE, ROWNO } from './global.h.js';
+import { wizard } from './flag.macros.js';
+import { COLNO, FALSE, MAXDUNGEON, MAXLEVEL, MAXNROFROOMS, NHL_SB_SAFE, ROWNO, TRUE } from './global.h.js';
+import { strcmpi } from './global.macros.js';
 import { in_rooms, switch_terrain } from './hack.js';
-import { ASCENDED, COUNTING, ECMD_OK, ESCAPED, FOOT, WRITING } from './hack.h.js';
+import { ASCENDED, ECMD_OK, ESCAPED, FOOT, MAXLINFO } from './hack.h.js';
+import { panic1, update_file } from './hack.macros.js';
 import { eos, highc, mungspaces, nh_snprintf, strncmpi, strstri, strsubst, trimspaces } from './hacklib.js';
 import { LUA_TNIL, LUA_TSTRING, LUA_TTABLE } from './lua.h.js';
 import { luaL_checkoption, lua_getfield, lua_getglobal, lua_gettable, lua_gettop, lua_len, lua_next, lua_pushinteger, lua_pushnil, lua_settop, lua_tointegerx, lua_type } from './luabridge.js';
 import { place_lregion } from './mkmaze.js';
 import { cmap_to_type } from './mkroom.js';
-import { DELPHI, SHOPBASE, TEMPLE, VAULT } from './mkroom.h.js';
+import { DELPHI, ROOMOFFSET, SHOPBASE, TEMPLE, VAULT } from './mkroom.h.js';
 import { AD_DGST, AD_WRAP, AT_ENGL } from './monattk.h.js';
 import { dmgtype_fromattack } from './mondata.js';
-import { M1_ANIMAL, M1_FLY } from './monflag.h.js';
-import { M_AP_FURNITURE, M_AP_TYPMASK } from './monst.h.js';
+import { is_animal } from './mondata.macros.js';
+import { M1_FLY } from './monflag.h.js';
+import { M_AP_FURNITURE } from './monst.h.js';
+import { M_AP_TYPE } from './monst.macros.js';
 import { PM_DWARF } from './monsters.h.js';
 import { get_table_int, get_table_int_opt, get_table_option, get_table_str, get_table_str_opt, nhl_done, nhl_init, nhl_loadlua } from './nhlua.js';
 import { an, makeplural } from './objnam.js';
@@ -36,10 +43,11 @@ import { You, impossible, pline } from './pline.js';
 import { body_part } from './polyself.js';
 import { align_gname, altarmask_at } from './pray.js';
 import { findpriest, inhistemple } from './priest.js';
-import { AGGRAVATE_MONSTER, BLINDED, FLYING, HALLUC, HALLUC_RES, LEVITATION } from './prop.h.js';
+import { FLYING } from './prop.h.js';
 import { ldrname } from './questpgr.js';
 import { restcemetery } from './restore.js';
-import { AIR, ALTAR, CLOUD, CORR, DBWALL, DOOR, DRAWBRIDGE_DOWN, DRAWBRIDGE_UP, FOUNTAIN, GRAVE, MAX_TYPE, ROOM, SDOOR, SINK, THRONE, TREE } from './rm.h.js';
+import { ALTAR, CLOUD, CORR, DBWALL, DOOR, DRAWBRIDGE_DOWN, DRAWBRIDGE_UP, FOUNTAIN, GRAVE, MAX_TYPE, ROOM, SDOOR, SINK, SVALL, THRONE, TREE } from './rm.h.js';
+import { IS_AIR, IS_ALTAR, IS_DOOR, IS_FOUNTAIN, IS_GRAVE, IS_ROOM, IS_WALL, SURFACE_AT, Sokoban } from './rm.macros.js';
 import { rn2, rnd } from './rnd.js';
 import { savecemetery } from './save.js';
 import { sfi_branch, sfi_char, sfi_d_level, sfi_dgn_topology, sfi_dungeon, sfi_int, sfi_int16, sfi_linfo, sfi_mapseen_feat, sfi_mapseen_flags, sfi_mapseen_rooms, sfi_nhcoord, sfi_unsigned, sfi_xint16, sfo_branch, sfo_char, sfo_d_level, sfo_dgn_topology, sfo_dungeon, sfo_int, sfo_int16, sfo_linfo, sfo_mapseen_feat, sfo_mapseen_flags, sfo_mapseen_rooms, sfo_nhcoord, sfo_unsigned, sfo_xint16 } from './sfbase.js';
@@ -48,8 +56,11 @@ import { shtypes } from './shknam.js';
 import { On_stairs, stairway_at, stairway_find_special_dir } from './stairs.js';
 import { formatkiller } from './topten.js';
 import { MAGIC_PORTAL, VIBRATING_SQUARE } from './trap.h.js';
-import { add_menu, add_menu_heading, add_menu_str, getlin, select_menu, windowprocs } from './windows.js';
+import { add_menu, add_menu_heading, add_menu_str, getlin, select_menu } from './windows.js';
+import { clear_nhwindow, cliparound, create_nhwindow, destroy_nhwindow, display_nhwindow, end_menu, putstr, start_menu } from './winprocs.macros.js';
 import { ATR_NONE, MENU_BEHAVE_STANDARD, MENU_ITEMFLAGS_NONE, NHW_MENU, PICK_NONE, PICK_ONE } from './wintype.h.js';
+import { Upolyd, u_at } from './you.macros.js';
+import { Blind, EAggravate_monster, Hallucination, Levitation, Underwater } from './youprop.macros.js';
 
 let add_branch$branch_id = 0;   // static in add_branch()
 const get_dgn_flags$flagstrs = $c.nulls(6);   // static in get_dgn_flags()
@@ -63,7 +74,7 @@ const init_dungeon_branches$brtypes2i = new Int32Array(5);   // static in init_d
 const level_map = $c.recArray($T.level_map, 27);
 async function dumpit() {   // dungeon.c:91
     let i = 0, x = null, br = null;
-    if (!debugcore($c.lit("dungeon.c"), 0)) {
+    if (!debugcore($c.lit("dungeon.c"), FALSE)) {
         return;
     }
     for (i = 0; i < svn.n_dgns; i = i + 1 | 0) {
@@ -82,7 +93,7 @@ async function dumpit() {   // dungeon.c:91
     }
     $c.fprintf($c.__stderrp, $c.lit("\nBranches:\n"));
     for (br = svb.branches; br; br = br.next) {
-        $c.fprintf($c.__stderrp, $c.lit("%d: %s, end1 %d %d, end2 %d %d, %s\n"), br.id, br.type === BR_STAIR ? $c.lit("stair") : br.type === 1 ? $c.lit("no end1") : br.type === 2 ? $c.lit("no end2") : br.type === BR_PORTAL ? $c.lit("portal") : $c.lit("unknown"), br.end1.dnum, br.end1.dlevel, br.end2.dnum, br.end2.dlevel, br.end1_up ? $c.lit("end1 up") : $c.lit("end1 down"));
+        $c.fprintf($c.__stderrp, $c.lit("%d: %s, end1 %d %d, end2 %d %d, %s\n"), br.id, br.type === BR_STAIR ? $c.lit("stair") : br.type === BR_NO_END1 ? $c.lit("no end1") : br.type === BR_NO_END2 ? $c.lit("no end2") : br.type === BR_PORTAL ? $c.lit("portal") : $c.lit("unknown"), br.end1.dnum, br.end1.dlevel, br.end2.dnum, br.end2.dlevel, br.end1_up ? $c.lit("end1 up") : $c.lit("end1 down"));
     }
     await $c.getchar$async();
     $c.fprintf($c.__stderrp, $c.lit("\nDone\n"));
@@ -161,7 +172,7 @@ export async function restore_dungeon(nhfp) {   // dungeon.c:211
         last = curr;
     }
     await sfi_int(nhfp, new $c.Ptr(count, 0), $c.lit("level_info_count"));
-    if (count[0] >= MAXDUNGEON * MAXLEVEL) {
+    if (count[0] >= MAXLINFO) {
         await panic($c.lit("level information count larger (%d) than allocated size"), count[0]);
     }
     for (i = 0; i < count[0]; i = i + 1 | 0) {
@@ -214,7 +225,7 @@ async function find_branch(s, pd) {   // dungeon.c:311
     } else {
         for (br = svb.branches; br; br = br.next) {
             dnam = new $c.Ptr(svd.dungeons[br.end2.dnum].dname, 0);
-            if (!strncmpi(dnam, s, -1) || !strncmpi(dnam, $c.lit("The "), 4) && !strncmpi(dnam.add(4), s, -1)) {
+            if (!strcmpi(dnam, s) || !strncmpi(dnam, $c.lit("The "), 4) && !strncmpi(dnam.add(4), s, -1)) {
                 break;
             }
         }
@@ -281,9 +292,9 @@ async function correct_branch_type(tbr) {   // dungeon.c:440
         case TBR_STAIR:
             return BR_STAIR;
         case TBR_NO_UP:
-            return tbr.up ? 1 : 2;
+            return tbr.up ? BR_NO_END1 : BR_NO_END2;
         case TBR_NO_DOWN:
-            return tbr.up ? 2 : 1;
+            return tbr.up ? BR_NO_END2 : BR_NO_END1;
         case TBR_PORTAL:
             return BR_PORTAL;
     }
@@ -310,9 +321,9 @@ export async function insert_branch(new_branch, extract_first) {   // dungeon.c:
     new_branch.next = null;
     prev = null;
     prev_val = -1;
-    new_val = $c.add64($c.mul64($c.mul64($c.add64($c.mul64(new_branch.end1.dnum, MAXLEVEL + 1), new_branch.end1.dlevel), MAXDUNGEON + 1), MAXLEVEL + 1), $c.add64($c.mul64(new_branch.end2.dnum, MAXLEVEL + 1), new_branch.end2.dlevel));
+    new_val = branch_val(new_branch);
     for (curr = svb.branches; curr; prev_val = curr_val, prev = curr, curr = curr.next) {
-        curr_val = $c.add64($c.mul64($c.mul64($c.add64($c.mul64(curr.end1.dnum, MAXLEVEL + 1), curr.end1.dlevel), MAXDUNGEON + 1), MAXLEVEL + 1), $c.add64($c.mul64(curr.end2.dnum, MAXLEVEL + 1), curr.end2.dlevel));
+        curr_val = branch_val(curr);
         if (prev_val < new_val && new_val <= curr_val) {
             break;
         }
@@ -337,8 +348,8 @@ async function add_branch(dgn, child_entry_level, pd) {   // dungeon.c:514
     $t5 = await parent_dlevel(new $c.Ptr(svd.dungeons[dgn].dname, 0), pd), new_branch.end1.dlevel = $t5;
     new_branch.end2.dnum = $c.i16(dgn);
     new_branch.end2.dlevel = $c.i16(child_entry_level);
-    new_branch.end1_up = $c.i8(pd.tmpbranch[branch_num].up ? 1 : 0);
-    await insert_branch(new_branch, 0);
+    new_branch.end1_up = $c.i8(pd.tmpbranch[branch_num].up ? TRUE : FALSE);
+    await insert_branch(new_branch, FALSE);
     return new_branch;
 }
 function add_level(new_lev) {   // dungeon.c:545
@@ -362,7 +373,7 @@ async function init_level(dgn, proto_index, pd) {   // dungeon.c:566
     let new_level = null, tlevel = null, $t1;
     tlevel = $c.relem(pd.tmplevel, proto_index);
     pd.final_lev[proto_index] = null;
-    if (!flags.debug && tlevel.chance <= rn2(100)) {
+    if (!wizard() && tlevel.chance <= rn2(100)) {
         return;
     }
     $t1 = new_level = $c.asRec(await alloc(40), $T.s_level, 40), pd.final_lev[proto_index] = $t1;
@@ -386,15 +397,15 @@ async function possible_places(idx, map, pd) {   // dungeon.c:598
     let i = 0, start = Int32Array.of(0), count = 0, lev = null;
     lev = pd.final_lev[idx];
     for (i = 0; i <= MAXLEVEL; i = i + 1 | 0) {
-        map.set(i, 0);
+        map.set(i, FALSE);
     }
     count = await level_range(lev.dlevel.dnum, pd.tmplevel[idx].lev.base, pd.tmplevel[idx].lev.rand, pd.tmplevel[idx].chain, pd, new $c.Ptr(start, 0));
     for (i = start[0]; i < (start[0] + count | 0); i = i + 1 | 0) {
-        map.set(i, 1);
+        map.set(i, TRUE);
     }
     for (i = pd.start; i < idx; i = i + 1 | 0) {
         if (pd.final_lev[i] && map.get(pd.final_lev[i].dlevel.dlevel)) {
-            map.set(pd.final_lev[i].dlevel.dlevel, 0);
+            map.set(pd.final_lev[i].dlevel.dlevel, FALSE);
             count = count - 1 | 0;
         }
     }
@@ -413,7 +424,7 @@ async function pick_level(map, nth) {   // dungeon.c:632
 async function place_level(proto_index, pd) {   // dungeon.c:666
     let map = new Int8Array(33), lev = null, npossible = 0, $t1;
     if (proto_index === pd.n_levs) {
-        return 1;
+        return TRUE;
     }
     lev = pd.final_lev[proto_index];
     if (!lev) {
@@ -423,11 +434,11 @@ async function place_level(proto_index, pd) {   // dungeon.c:666
     for (; npossible; npossible = npossible - 1 | 0) {
         $t1 = await pick_level(new $c.Ptr(map, 0), rn2(npossible)), lev.dlevel.dlevel = $t1;
         if (await place_level(proto_index + 1 | 0, pd)) {
-            return 1;
+            return TRUE;
         }
-        map[lev.dlevel.dlevel] = 0;
+        map[lev.dlevel.dlevel] = FALSE;
     }
-    return 0;
+    return FALSE;
 }
 async function get_dgn_flags(L) {   // dungeon.c:744
     let dgn_flags = 0, f = 0, nflags = 0;
@@ -481,7 +492,7 @@ async function init_dungeon_levels(L, pd, dngidx) {   // dungeon.c:797
             lvl_flags = await get_dgn_flags(L);
             tmpl = $c.relem(pd.tmplevel, pd.n_levs + f | 0);
             do {
-                if (debugcore($c.lit("dungeon.c"), 1)) {
+                if (debugcore($c.lit("dungeon.c"), TRUE)) {
                     save_plnmsg = iflags.last_msg;
                     await pline($c.lit("LEVEL[%i]:%s,(%i,%i)"), f, lvl_name, lvl_base, lvl_range);
                     iflags.last_msg = save_plnmsg;
@@ -499,7 +510,7 @@ async function init_dungeon_levels(L, pd, dngidx) {   // dungeon.c:797
             tmpl.chain = -1;
             if (lvl_chain) {
                 do {
-                    if (debugcore($c.lit("dungeon.c"), 1)) {
+                    if (debugcore($c.lit("dungeon.c"), TRUE)) {
                         save_plnmsg$2 = iflags.last_msg;
                         await pline($c.lit("CHAINLEVEL: %s"), lvl_chain);
                         iflags.last_msg = save_plnmsg$2;
@@ -507,7 +518,7 @@ async function init_dungeon_levels(L, pd, dngidx) {   // dungeon.c:797
                 } while (0);
                 for (bi = 0; bi < (pd.n_levs + f | 0); bi = bi + 1 | 0) {
                     do {
-                        if (debugcore($c.lit("dungeon.c"), 1)) {
+                        if (debugcore($c.lit("dungeon.c"), TRUE)) {
                             save_plnmsg$3 = iflags.last_msg;
                             await pline($c.lit("checking(%i):%s"), bi, pd.tmplevel[bi].name);
                             iflags.last_msg = save_plnmsg$3;
@@ -550,7 +561,7 @@ async function init_dungeon_branches(L, pd, dngidx) {   // dungeon.c:867
             br_up = init_dungeon_branches$brdirstr2i[await get_table_option(L, $c.lit("direction"), $c.lit("down"), new $c.Ptr(init_dungeon_branches$brdirstr, 0))];
             tmpb = $c.relem(pd.tmpbranch, pd.n_brs + f | 0);
             do {
-                if (debugcore($c.lit("dungeon.c"), 1)) {
+                if (debugcore($c.lit("dungeon.c"), TRUE)) {
                     save_plnmsg = iflags.last_msg;
                     await pline($c.lit("BRANCH[%i]:%s,(%i,%i)"), f, br_name, br_base, br_range);
                     iflags.last_msg = save_plnmsg;
@@ -564,7 +575,7 @@ async function init_dungeon_branches(L, pd, dngidx) {   // dungeon.c:867
             tmpb.chain = -1;
             if (br_chain) {
                 do {
-                    if (debugcore($c.lit("dungeon.c"), 1)) {
+                    if (debugcore($c.lit("dungeon.c"), TRUE)) {
                         save_plnmsg$2 = iflags.last_msg;
                         await pline($c.lit("CHAINBRANCH:%s"), br_chain);
                         iflags.last_msg = save_plnmsg$2;
@@ -634,15 +645,15 @@ async function init_dungeon_dungeons(L, pd, dngidx) {   // dungeon.c:997
     dgn_fill = await get_table_str_opt(L, $c.lit("lvlfill"), new $c.Ptr(emptystr, 0));
     dgn_themerms = await get_table_str_opt(L, $c.lit("themerooms"), new $c.Ptr(emptystr, 0));
     do {
-        if (debugcore($c.lit("dungeon.c"), 1)) {
+        if (debugcore($c.lit("dungeon.c"), TRUE)) {
             save_plnmsg = iflags.last_msg;
             await pline($c.lit("DUNGEON[%i]: %s, base=(%i,%i)"), dngidx, dgn_name, dgn_base, dgn_range);
             iflags.last_msg = save_plnmsg;
         }
     } while (0);
-    if (!flags.debug && dgn_chance && dgn_chance <= rn2(100)) {
+    if (!wizard() && dgn_chance && dgn_chance <= rn2(100)) {
         do {
-            if (debugcore($c.lit("dungeon.c"), 1)) {
+            if (debugcore($c.lit("dungeon.c"), TRUE)) {
                 save_plnmsg$2 = iflags.last_msg;
                 await pline($c.lit("IGNORING %s"), dgn_name);
                 iflags.last_msg = save_plnmsg$2;
@@ -654,7 +665,7 @@ async function init_dungeon_dungeons(L, pd, dngidx) {   // dungeon.c:997
         $c.free(dgn_protoname);
         $c.free(dgn_fill);
         $c.free(dgn_themerms);
-        return 0;
+        return FALSE;
     }
     await lua_getfield(L, -1, $c.lit("levels"));
     if (lua_type(L, -1) === LUA_TTABLE) {
@@ -714,7 +725,7 @@ async function init_dungeon_dungeons(L, pd, dngidx) {   // dungeon.c:997
     if (svd.dungeons[dngidx].num_dunlevs > MAXLEVEL) {
         svd.dungeons[dngidx].num_dunlevs = MAXLEVEL;
     }
-    return 1;
+    return TRUE;
 }
 function init_castle_tune() {   // dungeon.c:1111
     let i = 0, $t1;
@@ -739,7 +750,7 @@ async function fixup_level_locations() {   // dungeon.c:1122
                 }
                 if (br) {
                     br.end1.dnum = $c.i16(svn.n_dgns);
-                    await insert_branch(br, 1);
+                    await insert_branch(br, TRUE);
                 }
             }
         }
@@ -789,10 +800,10 @@ export async function init_dungeons() {   // dungeon.c:1205
     if (!await nhl_loadlua(L, $c.lit("dungeon.lua"))) {
         $c.__builtin___sprintf_chk(new $c.Ptr(tbuf, 0), 0, 256, $c.lit("Cannot open dungeon description - \"%s"), $c.lit("dungeon.lua"));
         $c.__builtin___strcat_chk(new $c.Ptr(tbuf, 0), $c.lit("\" file!"), 256);
-        await panic($c.lit("%s"), new $c.Ptr(tbuf, 0));
+        await panic1(new $c.Ptr(tbuf, 0));
     }
     if (iflags.window_inited) {
-        await windowprocs.win_clear_nhwindow($G.WIN_MAP);
+        await clear_nhwindow()($G.WIN_MAP);
     }
     svs.sp_levchn = null;
     await lua_settop(L, 0);
@@ -834,7 +845,7 @@ export async function init_dungeons() {   // dungeon.c:1205
     }
     await lua_settop(L, -2);
     do {
-        if (debugcore($c.lit("dungeon.c"), 1)) {
+        if (debugcore($c.lit("dungeon.c"), TRUE)) {
             save_plnmsg = iflags.last_msg;
             await pline($c.lit("init_dungeon lua DONE (n_levs=%i, n_brs=%i)"), pd.n_levs, pd.n_brs);
             iflags.last_msg = save_plnmsg;
@@ -925,29 +936,29 @@ export async function builds_up(lev) {   // dungeon.c:1477
         }
     }
     await impossible($c.lit("builds_up: can't find branch for dungeon %d"), lev.dnum);
-    return 0;
+    return FALSE;
 }
 export async function next_level(at_stairs) {   // dungeon.c:1497
     let stway = null, newlevel = new $T.d_level();
     stway = stairway_at(u.ux, u.uy);
     if (at_stairs && stway) {
-        stway.u_traversed = 1;
+        stway.u_traversed = TRUE;
     }
     if (at_stairs && stway) {
         newlevel.dnum = stway.tolev.dnum;
         newlevel.dlevel = stway.tolev.dlevel;
-        await goto_level(newlevel, at_stairs, 0, 0);
+        await goto_level(newlevel, at_stairs, FALSE, FALSE);
     } else {
         newlevel.dnum = u.uz.dnum;
         newlevel.dlevel = $c.i16(u.uz.dlevel + 1 | 0);
-        await goto_level(newlevel, at_stairs, $c.i8(!at_stairs ? 1 : 0), 0);
+        await goto_level(newlevel, at_stairs, $c.i8(!at_stairs ? 1 : 0), FALSE);
     }
 }
 export async function prev_level(at_stairs) {   // dungeon.c:1518
     let stway = null, newlevel = new $T.d_level();
     stway = stairway_at(u.ux, u.uy);
     if (at_stairs && stway) {
-        stway.u_traversed = 1;
+        stway.u_traversed = TRUE;
     }
     if (at_stairs && stway && stway.tolev.dnum !== u.uz.dnum) {
         if (!u.uz.dnum && u.uz.dlevel === 1 && !u.uhave.amulet) {
@@ -955,12 +966,12 @@ export async function prev_level(at_stairs) {   // dungeon.c:1518
         } else {
             newlevel.dnum = stway.tolev.dnum;
             newlevel.dlevel = stway.tolev.dlevel;
-            await goto_level(newlevel, at_stairs, 0, 0);
+            await goto_level(newlevel, at_stairs, FALSE, FALSE);
         }
     } else {
         newlevel.dnum = u.uz.dnum;
         newlevel.dlevel = $c.i16(u.uz.dlevel - 1 | 0);
-        await goto_level(newlevel, at_stairs, 0, 0);
+        await goto_level(newlevel, at_stairs, FALSE, FALSE);
     }
 }
 async function earth_sense() {   // dungeon.c:1548
@@ -968,7 +979,7 @@ async function earth_sense() {   // dungeon.c:1548
     if (!(gu.urace.mnum === PM_DWARF)) {
         return;
     }
-    if (u.usteed || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked || (u.uprops[LEVITATION].intrinsic || u.uprops[LEVITATION].extrinsic) && !u.uprops[LEVITATION].blocked || u.umonnum !== u.umonster) {
+    if (u.usteed || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked || Levitation() || Upolyd()) {
         return;
     }
     if (svl.level.locations[u.ux][u.uy].typ !== CORR && svl.level.locations[u.ux][u.uy].typ !== ROOM) {
@@ -989,17 +1000,17 @@ export async function u_on_newpos(x, y) {   // dungeon.c:1568
     }
     u.ux = x;
     u.uy = y;
-    await windowprocs.win_cliparound(u.ux, u.uy);
+    await cliparound()(u.ux, u.uy);
     u.uundetected = (0) & 1;
     if (u.usteed) {
         u.usteed.mx = u.ux, u.usteed.my = u.uy;
     }
     if (!on_level(u.uz, u.uz0)) {
         u.ux0 = u.ux, u.uy0 = u.uy;
-        await map_location(u.ux, u.uy, 0);
+        await map_location(u.ux, u.uy, FALSE);
         iflags.terrain_typ = MAX_TYPE;
     } else {
-        if (!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked) && !(u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic)) && !u.uswallow) {
+        if (!Blind() && !Hallucination() && !u.uswallow) {
             await see_nearby_objects();
         }
     }
@@ -1029,23 +1040,23 @@ export function Can_fall_thru(lev) {   // dungeon.c:1662
 }
 export async function Can_rise_up(x, y, lev) {   // dungeon.c:1674
     let stway = null;
-    stway = stairway_find_special_dir(0);
-    if (lev.dnum === svd.dungeon_topology.d_astral_level.dnum || lev.dnum === svd.dungeon_topology.d_sokoban_dnum || (svd.dungeon_topology.d_wiz1_level.dlevel || svd.dungeon_topology.d_wiz1_level.dnum) && on_level(lev, svd.dungeon_topology.d_wiz1_level) && await In_W_tower(x, y, lev)) {
-        return 0;
+    stway = stairway_find_special_dir(FALSE);
+    if (In_endgame(lev) || In_sokoban(lev) || (svd.dungeon_topology.d_wiz1_level.dlevel || svd.dungeon_topology.d_wiz1_level.dnum) && on_level(lev, svd.dungeon_topology.d_wiz1_level) && await In_W_tower(x, y, lev)) {
+        return FALSE;
     }
     return $c.i8(lev.dlevel > 1 || svd.dungeons[lev.dnum].entry_lev === 1 && ledger_no(lev) !== 1 && stway && stway.up ? 1 : 0);
 }
 export function has_ceiling(lev) {   // dungeon.c:1690
-    if (lev.dnum === svd.dungeon_topology.d_astral_level.dnum && !((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(lev, svd.dungeon_topology.d_earth_level))) {
-        return 0;
+    if (In_endgame(lev) && !((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(lev, svd.dungeon_topology.d_earth_level))) {
+        return FALSE;
     }
-    return 1;
+    return TRUE;
 }
 export function avoid_ceiling(lev) {   // dungeon.c:1701
     if (In_quest(lev) || !has_ceiling(lev)) {
-        return 1;
+        return TRUE;
     }
-    return 0;
+    return FALSE;
 }
 export function ceiling(x, y) {   // dungeon.c:1714
     let lev = null, what = null;
@@ -1058,15 +1069,15 @@ export function ceiling(x, y) {   // dungeon.c:1714
         what = $c.lit("shop's ceiling");
     } else if ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) {
         what = $c.lit("water above");
-    } else if (lev.typ === AIR || lev.typ === CLOUD) {
+    } else if (IS_AIR(lev.typ)) {
         what = $c.lit("sky");
     } else if ((svd.dungeon_topology.d_fire_level.dlevel || svd.dungeon_topology.d_fire_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_fire_level)) {
         what = $c.lit("flames above");
     } else if (In_quest(u.uz)) {
         what = $c.lit("expanse above");
-    } else if (u.uinwater) {
+    } else if (Underwater()) {
         what = $c.lit("water's surface");
-    } else if (lev.typ >= ROOM && !((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_earth_level)) || lev.typ && lev.typ <= DBWALL || lev.typ === DOOR || lev.typ === SDOOR) {
+    } else if (IS_ROOM(lev.typ) && !((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_earth_level)) || IS_WALL(lev.typ) || IS_DOOR(lev.typ) || lev.typ === SDOOR) {
         what = $c.lit("ceiling");
     } else {
         what = $c.lit("rock cavern");
@@ -1076,32 +1087,32 @@ export function ceiling(x, y) {   // dungeon.c:1714
 export function surface(x, y) {   // dungeon.c:1750
     let lev = null, levtyp = 0;
     lev = $c.relem(svl.level.locations[x], y);
-    levtyp = svl.level.locations[x][y].typ === DRAWBRIDGE_UP ? db_under_typ(svl.level.locations[x][y].flags | 0) : svl.level.locations[x][y].typ;
-    if (x === u.ux && y === u.uy && u.uswallow | 0 && $c.andu64(u.ustuck.data.mflags1, M1_ANIMAL) !== 0) {
+    levtyp = SURFACE_AT(x, y);
+    if (u_at(x, y) && u.uswallow | 0 && is_animal(u.ustuck.data)) {
         return dmgtype_fromattack(u.ustuck.data, AD_DGST, AT_ENGL) !== null ? $c.lit("maw") : dmgtype_fromattack(u.ustuck.data, AD_WRAP, AT_ENGL) !== null ? $c.lit("husk") : $c.lit("nonesuch");
-    } else if (levtyp === AIR || levtyp === CLOUD) {
+    } else if (IS_AIR(levtyp)) {
         return (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? $c.lit("air bubble") : levtyp === CLOUD ? $c.lit("cloud") : $c.lit("air");
     } else if (is_pool(x, y)) {
-        return u.uinwater | 0 && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) ? $c.lit("bottom") : hliquid($c.lit("water"));
+        return (u.uinwater | 0) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) ? $c.lit("bottom") : hliquid($c.lit("water"));
     } else if (is_ice(x, y)) {
         return $c.lit("ice");
     } else if (is_lava(x, y)) {
         return hliquid($c.lit("lava"));
     } else if (lev.typ === DRAWBRIDGE_DOWN) {
         return $c.lit("bridge");
-    } else if (levtyp === ALTAR) {
+    } else if (IS_ALTAR(levtyp)) {
         return $c.lit("altar");
-    } else if (levtyp === GRAVE) {
+    } else if (IS_GRAVE(levtyp)) {
         return $c.lit("headstone");
-    } else if (levtyp === FOUNTAIN) {
+    } else if (IS_FOUNTAIN(levtyp)) {
         return $c.lit("fountain");
     } else if (On_stairs(x, y)) {
         return $c.lit("stairs");
-    } else if (levtyp && levtyp <= DBWALL || levtyp === SDOOR) {
+    } else if (IS_WALL(levtyp) || levtyp === SDOOR) {
         return $c.lit("wall");
-    } else if (levtyp === DOOR) {
+    } else if (IS_DOOR(levtyp)) {
         return $c.lit("doorway");
-    } else if (levtyp >= ROOM && !((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_earth_level))) {
+    } else if (IS_ROOM(levtyp) && !((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_earth_level))) {
         return $c.lit("floor");
     } else {
         return $c.lit("ground");
@@ -1155,7 +1166,7 @@ export async function dungeon_branch(s) {   // dungeon.c:1870
 export async function at_dgn_entrance(s) {   // dungeon.c:1897
     let br = null;
     br = await dungeon_branch(s);
-    return $c.i8(on_level(u.uz, br.end1) ? 1 : 0);
+    return $c.i8(on_level(u.uz, br.end1) ? TRUE : FALSE);
 }
 export function In_V_tower(lev) {   // dungeon.c:1907
     return $c.i8(lev.dnum === svd.dungeon_topology.d_tower_dnum ? 1 : 0);
@@ -1165,11 +1176,11 @@ export function On_W_tower_level(lev) {   // dungeon.c:1914
 }
 export async function In_W_tower(x, y, lev) {   // dungeon.c:1923
     if (!On_W_tower_level(lev)) {
-        return 0;
+        return FALSE;
     }
     if (!svd.dndest.nlx) {
         await impossible($c.lit("No boundary for Wizard's Tower?"));
-        return 0;
+        return FALSE;
     }
     return $c.i8(x >= svd.dndest.nlx && x <= svd.dndest.nhx && y >= svd.dndest.nly && y <= svd.dndest.nhy ? 1 : 0);
 }
@@ -1183,7 +1194,7 @@ export function find_hell(lev) {   // dungeon.c:1949
 export async function goto_hell(at_stairs, falling) {   // dungeon.c:1957
     let lev = new $T.d_level();
     find_hell(lev);
-    await goto_level(lev, at_stairs, falling, 0);
+    await goto_level(lev, at_stairs, falling, FALSE);
 }
 export function single_level_branch(lev) {   // dungeon.c:1967
     return $c.i8((svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(lev, svd.dungeon_topology.d_knox_level) ? 1 : 0);
@@ -1216,24 +1227,24 @@ export function induced_align(pct) {   // dungeon.c:1999
         }
     }
     al = $c.i8(rn2(3) - 1 | 0);
-    return (al === A_NONE ? AM_NONE : al === A_LAWFUL ? AM_LAWFUL : al + 2 | 0) >>> 0;
+    return Align2amask(al);
 }
 export function Invocation_lev(lev) {   // dungeon.c:2017
     return $c.i8(In_hell(lev) && lev.dlevel === (svd.dungeons[lev.dnum].num_dunlevs - 1 | 0) ? 1 : 0);
 }
 export async function level_difficulty() {   // dungeon.c:2027
     let res = 0;
-    if (u.uz.dnum === svd.dungeon_topology.d_astral_level.dnum) {
+    if (In_endgame(u.uz)) {
         res = $c.i16(depth(svd.dungeon_topology.d_sanctum_level) + $c.div32(u.ulevel, 2) | 0);
     } else if (u.uhave.amulet) {
-        res = deepest_lev_reached(0);
+        res = deepest_lev_reached(FALSE);
     } else {
         res = $c.i16(depth(u.uz));
         if (await builds_up(u.uz)) {
             res = $c.i16(res + Math.imul(2, (svd.dungeons[u.uz.dnum].entry_lev - u.uz.dlevel | 0) + 1 | 0) | 0);
         }
     }
-    if (u.uprops[AGGRAVATE_MONSTER].extrinsic) {
+    if (EAggravate_monster()) {
         res = $c.i16(res > 25 ? 50 : Math.imul(res, 2));
     }
     return res;
@@ -1267,7 +1278,7 @@ export async function lev_by_name(nam) {   // dungeon.c:2098
     }
     if (mseen || slev) {
         idx = ledger_no(dlev);
-        if ((dlev.dnum === u.uz.dnum || u.uz.dnum === svd.dungeon_topology.d_valley_level.dnum && dlev.dnum === svd.dungeon_topology.d_medusa_level.dnum || u.uz.dnum === svd.dungeon_topology.d_medusa_level.dnum && dlev.dnum === svd.dungeon_topology.d_valley_level.dnum) && (flags.debug || (svl.level_info[idx].flags & VISITED) === VISITED)) {
+        if ((dlev.dnum === u.uz.dnum || u.uz.dnum === svd.dungeon_topology.d_valley_level.dnum && dlev.dnum === svd.dungeon_topology.d_medusa_level.dnum || u.uz.dnum === svd.dungeon_topology.d_medusa_level.dnum && dlev.dnum === svd.dungeon_topology.d_valley_level.dnum) && (wizard() || (svl.level_info[idx].flags & VISITED) === VISITED)) {
             lev = depth(dlev);
         }
     } else {
@@ -1278,7 +1289,7 @@ export async function lev_by_name(nam) {   // dungeon.c:2098
         if (idx >= 0) {
             idxtoo = idx >> 8 & 255;
             idx = idx & 255;
-            if (flags.debug || (svl.level_info[idx].flags & VISITED) === VISITED && (svl.level_info[idxtoo].flags & VISITED) === VISITED) {
+            if (wizard() || (svl.level_info[idx].flags & VISITED) === VISITED && (svl.level_info[idxtoo].flags & VISITED) === VISITED) {
                 if (await ledger_to_dnum($c.i16(idxtoo)) === u.uz.dnum) {
                     idx = idxtoo;
                 }
@@ -1296,27 +1307,27 @@ function unplaced_floater(dptr) {   // dungeon.c:2175
     let br = null, idx = 0;
     idx = $c.i32($c.rdiff(dptr, $c.relem(svd.dungeons, 0)));
     if (idx !== svd.dungeon_topology.d_knox_level.dnum) {
-        return 0;
+        return FALSE;
     }
     for (br = svb.branches; br; br = br.next) {
         if (br.end1.dnum === svn.n_dgns && br.end2.dnum === idx) {
-            return 1;
+            return TRUE;
         }
     }
-    return 0;
+    return FALSE;
 }
 function unreachable_level(lvl_p, unplaced) {   // dungeon.c:2190
     let dummy = null;
     if (unplaced) {
-        return 1;
+        return TRUE;
     }
-    if (u.uz.dnum === svd.dungeon_topology.d_astral_level.dnum && !(lvl_p.dnum === svd.dungeon_topology.d_astral_level.dnum)) {
-        return 1;
+    if (In_endgame(u.uz) && !In_endgame(lvl_p)) {
+        return TRUE;
     }
     if ((dummy = find_level($c.lit("dummy"))) !== null && on_level(lvl_p, dummy.dlevel)) {
-        return 1;
+        return TRUE;
     }
-    return 0;
+    return FALSE;
 }
 async function tport_menu(win, entry, lchoices, lvl_p, cannotreach) {   // dungeon.c:2204
     let tmpbuf = new Int8Array(256), any = new $T.any(), clr = 0, $t1;
@@ -1344,9 +1355,9 @@ function br_string(type) {   // dungeon.c:2240
     switch (type) {
         case BR_PORTAL:
             return $c.lit("Portal");
-        case 1:
+        case BR_NO_END1:
             return $c.lit("Connection");
-        case 2:
+        case BR_NO_END2:
             return $c.lit("One way stair");
         case BR_STAIR:
             return $c.lit("Stair");
@@ -1362,23 +1373,23 @@ async function print_branch(win, dnum, lower_bound, upper_bound, bymenu, lchoice
         if (br.end1.dnum === dnum && lower_bound < br.end1.dlevel && br.end1.dlevel <= upper_bound) {
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%c %s to %s: %d"), bymenu ? chr_u_on_lvl(br.end1) : 32, br_string(br.type), new $c.Ptr(svd.dungeons[br.end2.dnum].dname, 0), depth(br.end1));
             if (bymenu) {
-                await tport_menu(win, new $c.Ptr(buf, 0), lchoices_p, br.end1, unreachable_level(br.end1, 0));
+                await tport_menu(win, new $c.Ptr(buf, 0), lchoices_p, br.end1, unreachable_level(br.end1, FALSE));
             } else {
-                await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
+                await putstr()(win, 0, new $c.Ptr(buf, 0));
             }
         }
     }
 }
 export async function print_dungeon(bymenu, rlev, rdgn) {   // dungeon.c:2290
     let i = 0, last_level = 0, nlev = 0, buf = new Int8Array(256), descr = null, first = 0, unplaced = 0, slev = null, dptr = null, br = null, lchoices = new $T.lchoice(), win = 0, n = 0, selected = [null], idx = 0, trap = null;
-    win = await windowprocs.win_create_nhwindow(NHW_MENU);
+    win = await create_nhwindow()(NHW_MENU);
     if (bymenu) {
-        await windowprocs.win_start_menu(win, MENU_BEHAVE_STANDARD);
+        await start_menu()(win, MENU_BEHAVE_STANDARD);
         lchoices.idx = 0;
         lchoices.menuletter = 97;
     }
     for (i = 0, dptr = $c.relem(svd.dungeons, 0); i < svn.n_dgns; i = i + 1 | 0, dptr = $c.radd(dptr, 1)) {
-        if (bymenu && u.uz.dnum === svd.dungeon_topology.d_astral_level.dnum && i !== svd.dungeon_topology.d_astral_level.dnum) {
+        if (bymenu && In_endgame(u.uz) && i !== svd.dungeon_topology.d_astral_level.dnum) {
             continue;
         }
         unplaced = unplaced_floater(dptr);
@@ -1399,7 +1410,7 @@ export async function print_dungeon(bymenu, rlev, rdgn) {   // dungeon.c:2290
         if (bymenu) {
             await add_menu_heading(win, new $c.Ptr(buf, 0));
         } else {
-            await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
+            await putstr()(win, 0, new $c.Ptr(buf, 0));
         }
         for (slev = svs.sp_levchn, last_level = 0; slev; slev = slev.next) {
             if (slev.dlevel.dnum !== i) {
@@ -1413,16 +1424,16 @@ export async function print_dungeon(bymenu, rlev, rdgn) {   // dungeon.c:2290
             if (bymenu) {
                 await tport_menu(win, new $c.Ptr(buf, 0), lchoices, slev.dlevel, unreachable_level(slev.dlevel, unplaced));
             } else {
-                await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
+                await putstr()(win, 0, new $c.Ptr(buf, 0));
             }
             last_level = slev.dlevel.dlevel;
         }
         await print_branch(win, i, last_level, MAXLEVEL, bymenu, lchoices);
     }
     if (bymenu) {
-        await windowprocs.win_end_menu(win, $c.lit("Level teleport to where:"));
+        await end_menu()(win, $c.lit("Level teleport to where:"));
         n = await select_menu(win, PICK_ONE, new $c.Ptr(selected, 0));
-        await windowprocs.win_destroy_nhwindow(win);
+        await destroy_nhwindow()(win);
         if (n > 0) {
             idx = $c.radd(selected[0], 0).item.a_int - 1 | 0;
             $c.free(selected[0]);
@@ -1434,21 +1445,21 @@ export async function print_dungeon(bymenu, rlev, rdgn) {   // dungeon.c:2290
         }
         return 0;
     }
-    for (first = 1, br = svb.branches; br; br = br.next) {
+    for (first = TRUE, br = svb.branches; br; br = br.next) {
         if (br.end1.dnum === svn.n_dgns) {
             if (first) {
-                await windowprocs.win_putstr(win, 0, $c.lit(""));
-                await windowprocs.win_putstr(win, 0, $c.lit("Floating branches"));
-                first = 0;
+                await putstr()(win, 0, $c.lit(""));
+                await putstr()(win, 0, $c.lit("Floating branches"));
+                first = FALSE;
             }
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("   %s to %s"), br_string(br.type), new $c.Ptr(svd.dungeons[br.end2.dnum].dname, 0));
-            await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
+            await putstr()(win, 0, new $c.Ptr(buf, 0));
         }
     }
     if (Invocation_lev(u.uz)) {
-        await windowprocs.win_putstr(win, 0, $c.lit(""));
+        await putstr()(win, 0, $c.lit(""));
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Invocation position @ (%d,%d), hero @ (%d,%d)"), svi.inv_pos.x, svi.inv_pos.y, u.ux, u.uy);
-        await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
+        await putstr()(win, 0, new $c.Ptr(buf, 0));
     } else {
         new $c.Ptr(buf, 0).set(0, 0);
         for (trap = gf.ftrap; trap; trap = trap.ntrap) {
@@ -1462,12 +1473,12 @@ export async function print_dungeon(bymenu, rlev, rdgn) {   // dungeon.c:2290
             $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("No portal found."), 256);
         }
         if (new $c.Ptr(buf, 0).get(0)) {
-            await windowprocs.win_putstr(win, 0, $c.lit(""));
-            await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
+            await putstr()(win, 0, $c.lit(""));
+            await putstr()(win, 0, new $c.Ptr(buf, 0));
         }
     }
-    await windowprocs.win_display_nhwindow(win, 1);
-    await windowprocs.win_destroy_nhwindow(win);
+    await display_nhwindow()(win, TRUE);
+    await destroy_nhwindow()(win);
     return 0;
 }
 export async function recbranch_mapseen(source, dest) {   // dungeon.c:2446
@@ -1567,7 +1578,7 @@ export async function save_exclusions(nhfp) {   // dungeon.c:2596
     let ez = null, nez = Int32Array.of(0);
     for (nez[0] = 0, ez = sve.exclusion_zones; ez; ez = ez.next, nez[0] = nez[0] + 1 | 0) {
     }
-    if (nhfp.mode & (COUNTING | WRITING)) {
+    if (update_file(nhfp)) {
         await sfo_int(nhfp, new $c.Ptr(nez, 0), $c.lit("exclusion_count"));
         for (ez = sve.exclusion_zones; ez; ez = ez.next) {
             await sfo_xint16(nhfp, new $c.FieldRef(ez, "zonetype", "i16"), $c.lit("exclusion-zonetype"));
@@ -1702,16 +1713,16 @@ export async function overview_stats(win, statsfmt, total_count, total_size) {  
     }
     $c.__builtin___sprintf_chk(new $c.Ptr(hdrbuf, 0), 0, 128, $c.lit("general, size %ld"), 384);
     $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, statsfmt, new $c.Ptr(hdrbuf, 0), ocount, osize);
-    await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
+    await putstr()(win, 0, new $c.Ptr(buf, 0));
     if (bcount) {
         $c.__builtin___sprintf_chk(new $c.Ptr(hdrbuf, 0), 0, 128, $c.lit("cemetery, size %ld"), 184);
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, statsfmt, new $c.Ptr(hdrbuf, 0), bcount, bsize);
-        await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
+        await putstr()(win, 0, new $c.Ptr(buf, 0));
     }
     if (acount) {
         $c.__builtin___sprintf_chk(new $c.Ptr(hdrbuf, 0), 0, 128, $c.lit("annotations, text"));
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, statsfmt, new $c.Ptr(hdrbuf, 0), acount, asize);
-        await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
+        await putstr()(win, 0, new $c.Ptr(buf, 0));
     }
     total_count.set(0, $c.add64(total_count.get(0), $c.add64($c.add64(ocount, bcount), acount)));
     total_size.set(0, $c.add64(total_size.get(0), $c.add64($c.add64(osize, bsize), asize)));
@@ -1751,28 +1762,28 @@ export async function init_mapseen(lev) {   // dungeon.c:2835
 }
 function interest_mapseen(mptr) {   // dungeon.c:2880
     if (on_level(u.uz, mptr.lev)) {
-        return 1;
+        return TRUE;
     }
     if (mptr.flags.notreachable | 0 || mptr.flags.forgot | 0) {
-        return 0;
+        return FALSE;
     }
-    if (u.uz.dnum === svd.dungeon_topology.d_tutorial_dnum) {
-        return $c.i8(mptr.lev.dnum === svd.dungeon_topology.d_tutorial_dnum ? 1 : 0);
+    if (In_tutorial(u.uz)) {
+        return $c.i8(In_tutorial(mptr.lev));
     } else {
-        if (mptr.lev.dnum === svd.dungeon_topology.d_tutorial_dnum) {
-            return 0;
+        if (In_tutorial(mptr.lev)) {
+            return FALSE;
         }
     }
     if (mptr.flags.oracle | 0 || mptr.flags.bigroom | 0 || mptr.flags.roguelevel | 0 || mptr.flags.castle | 0 || mptr.flags.valley | 0 || mptr.flags.msanctum | 0 || mptr.flags.vibrating_square | 0 || mptr.flags.quest_summons | 0 || mptr.flags.questing | 0) {
-        return 1;
+        return TRUE;
     }
-    if (mptr.lev.dnum === svd.dungeon_topology.d_sokoban_dnum && (u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum || !mptr.flags.sokosolved)) {
-        return 1;
+    if (In_sokoban(mptr.lev) && (In_sokoban(u.uz) || !mptr.flags.sokosolved)) {
+        return TRUE;
     }
-    if (u.uz.dnum === svd.dungeon_topology.d_astral_level.dnum) {
-        return $c.i8(mptr.lev.dnum === svd.dungeon_topology.d_astral_level.dnum ? 1 : 0);
+    if (In_endgame(u.uz)) {
+        return $c.i8(In_endgame(mptr.lev));
     }
-    return $c.i8(mptr.feat.nfount | 0 || mptr.feat.nsink | 0 || mptr.feat.nthrone | 0 || mptr.feat.naltar | 0 || mptr.feat.ngrave | 0 || mptr.feat.ntree | 0 || mptr.feat.nshop | 0 || mptr.feat.ntemple | 0 || mptr.final_resting_place && (mptr.flags.knownbones | 0 || flags.debug) || mptr.custom || mptr.br || mptr.lev.dlevel === svd.dungeons[mptr.lev.dnum].dunlev_ureached ? 1 : 0);
+    return $c.i8(mptr.feat.nfount | 0 || mptr.feat.nsink | 0 || mptr.feat.nthrone | 0 || mptr.feat.naltar | 0 || mptr.feat.ngrave | 0 || mptr.feat.ntree | 0 || mptr.feat.nshop | 0 || mptr.feat.ntemple | 0 || mptr.final_resting_place && (mptr.flags.knownbones | 0 || wizard()) || mptr.custom || mptr.br || mptr.lev.dlevel === svd.dungeons[mptr.lev.dnum].dunlev_ureached ? 1 : 0);
 }
 export function update_lastseentyp(x, y) {   // dungeon.c:2927
     let mtmp = null, ltyp = 0;
@@ -1780,7 +1791,7 @@ export function update_lastseentyp(x, y) {   // dungeon.c:2927
     if (ltyp === DRAWBRIDGE_UP) {
         ltyp = db_under_typ(svl.level.locations[x][y].flags | 0);
     }
-    if ((mtmp = svl.level.monsters[x][y]) !== null && (mtmp.m_ap_type & M_AP_TYPMASK) === M_AP_FURNITURE && canseemon(mtmp)) {
+    if ((mtmp = svl.level.monsters[x][y]) !== null && M_AP_TYPE(mtmp) === M_AP_FURNITURE && canseemon(mtmp)) {
         ltyp = cmap_to_type(mtmp.mappearance | 0);
     }
     svl.lastseentyp[x][y] = $c.i8(ltyp);
@@ -1824,7 +1835,7 @@ function count_feat_lastseentyp(mptr, x, y) {   // dungeon.c:2951
             break;
         case ALTAR:
             atmp = altarmask_at(x, y) >>> 0;
-            atmp = (svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level) && (svl.level.locations[x][y].seenv & 255) !== 255 ? MSA_NONE : (atmp & AM_MASK) >>> 0 === 4 ? 3 : (atmp & AM_MASK) >>> 0;
+            atmp = (svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level) && (svl.level.locations[x][y].seenv & SVALL) !== SVALL ? MSA_NONE : Amask2msa(atmp);
             if (!mptr.feat.naltar) {
                 mptr.feat.msalign = (atmp) & 3;
             } else if (mptr.feat.msalign !== atmp) {
@@ -1878,8 +1889,8 @@ export async function recalc_mapseen() {   // dungeon.c:3075
         }
     }
     mptr.flags.knownbones = (0) & 1;
-    mptr.flags.sokosolved = ((u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum && !svl.level.flags.sokoban_rules ? 1 : 0) >>> 0) & 1;
-    if (!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked)) {
+    mptr.flags.sokosolved = ((In_sokoban(u.uz) && !Sokoban() ? 1 : 0) >>> 0) & 1;
+    if (!Blind()) {
         $t1 = ((svd.dungeon_topology.d_bigroom_level.dlevel || svd.dungeon_topology.d_bigroom_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_bigroom_level) ? 1 : 0) >>> 0, mptr.flags.bigroom = ($t1) & 1;
     } else if (mptr.flags.forgot) {
         mptr.flags.bigroom = (0) & 1;
@@ -1891,7 +1902,7 @@ export async function recalc_mapseen() {   // dungeon.c:3075
     $t3 = (await at_dgn_entrance($c.lit("The Quest")) && u.uevent.qcalled | 0 && !(u.uevent.qcompleted | 0 || u.uevent.qexpelled | 0 || svq.quest_status.leader_is_dead | 0) ? 1 : 0) >>> 0, mptr.flags.quest_summons = ($t3) & 1;
     $t4 = (on_level(u.uz, svd.dungeon_topology.d_qstart_level) && svq.quest_status.got_quest | 0 ? 1 : 0) >>> 0, mptr.flags.questing = ($t4) & 1;
     for (i = 0; (uroom = u.urooms[i]) !== 0; i = i + 1 >>> 0) {
-        ridx = (uroom >>> 0) - 3 >>> 0;
+        ridx = (uroom >>> 0) - ROOMOFFSET >>> 0;
         mptr.msrooms[ridx].seen = (1) & 1;
         $t5 = (svr.rooms[ridx].rtype >= SHOPBASE ? !(mtmp = await shop_keeper(uroom)) || !inhishop(mtmp) ? 1 : 0 : svr.rooms[ridx].rtype === TEMPLE ? !(mtmp = findpriest(uroom)) || !inhistemple(mtmp) ? 1 : 0 : 0) >>> 0, mptr.msrooms[ridx].untended = ($t5) & 1;
     }
@@ -1919,7 +1930,7 @@ export async function recalc_mapseen() {   // dungeon.c:3075
             }
         }
     }
-    if (!((u.uprops[LEVITATION].intrinsic || u.uprops[LEVITATION].extrinsic) && !u.uprops[LEVITATION].blocked)) {
+    if (!Levitation()) {
         update_lastseentyp(u.ux, u.uy);
     }
     for (x = 1; x < COLNO; x = $c.i16(x + 1)) {
@@ -1963,7 +1974,7 @@ export async function recalc_mapseen() {   // dungeon.c:3075
     }
     for (bp = mptr.final_resting_place; bp; bp = bp.next) {
         if (svl.lastseentyp[bp.frpx][bp.frpy]) {
-            bp.bonesknown = 1;
+            bp.bonesknown = TRUE;
             mptr.flags.knownbones = (1) & 1;
         }
     }
@@ -1990,22 +2001,22 @@ export async function room_discovered(roomno) {   // dungeon.c:3282
 }
 export async function dooverview() {   // dungeon.c:3294
     await show_overview(iflags.menu_requested ? -1 : 0, 0);
-    iflags.menu_requested = 0;
+    iflags.menu_requested = FALSE;
     return ECMD_OK;
 }
 export async function show_overview(why, reason) {   // dungeon.c:3305
     let win = 0, lastdun = Int32Array.of(0), selected = [null], n = 0, ledger = 0, lev = new $T.d_level(), $t1, $t2;
     lastdun[0] = -1;
     await recalc_mapseen();
-    win = await windowprocs.win_create_nhwindow(NHW_MENU);
-    await windowprocs.win_start_menu(win, MENU_BEHAVE_STANDARD);
-    if (u.uz.dnum === svd.dungeon_topology.d_astral_level.dnum) {
+    win = await create_nhwindow()(NHW_MENU);
+    await start_menu()(win, MENU_BEHAVE_STANDARD);
+    if (In_endgame(u.uz)) {
         await traverse_mapseenchn(1, win, why, reason, new $c.Ptr(lastdun, 0));
     }
-    if (why > 0 || !(u.uz.dnum === svd.dungeon_topology.d_astral_level.dnum)) {
+    if (why > 0 || !In_endgame(u.uz)) {
         await traverse_mapseenchn(0, win, why, reason, new $c.Ptr(lastdun, 0));
     }
-    await windowprocs.win_end_menu(win, null);
+    await end_menu()(win, null);
     n = await select_menu(win, why !== -1 ? PICK_NONE : PICK_ONE, new $c.Ptr(selected, 0));
     if (n > 0) {
         ledger = $c.radd(selected[0], 0).item.a_int - 1 | 0;
@@ -2014,12 +2025,12 @@ export async function show_overview(why, reason) {   // dungeon.c:3305
         await query_annotation(lev);
         $c.free(selected[0]);
     }
-    await windowprocs.win_destroy_nhwindow(win);
+    await destroy_nhwindow()(win);
 }
 async function traverse_mapseenchn(viewendgame, win, why, reason, lastdun_p) {   // dungeon.c:3344
     let mptr = null, showheader = 0;
     for (mptr = svm.mapseenchn; mptr; mptr = mptr.next) {
-        if (viewendgame ^ (mptr.lev.dnum === svd.dungeon_topology.d_astral_level.dnum ? 1 : 0)) {
+        if (viewendgame ^ In_endgame(mptr.lev)) {
             continue;
         }
         if (why !== 0 || interest_mapseen(mptr)) {
@@ -2048,9 +2059,9 @@ function br_string2(br) {   // dungeon.c:3388
     switch (br.type) {
         case BR_PORTAL:
             return closed_portal ? $c.lit("Sealed portal") : $c.lit("Portal");
-        case 1:
+        case BR_NO_END1:
             return $c.lit("Connection");
-        case 2:
+        case BR_NO_END2:
             return br.end1_up ? $c.lit("One way stairs up") : $c.lit("One way stairs down");
         case BR_STAIR:
             return br.end1_up ? $c.lit("Stairs up") : $c.lit("Stairs down");
@@ -2121,7 +2132,7 @@ async function print_mapseen(win, mptr, final, how, printdun) {   // dungeon.c:3
         depthstart = svd.dungeons[dnum].depth_start;
     }
     if (printdun) {
-        if (svd.dungeons[dnum].dunlev_ureached === svd.dungeons[dnum].entry_lev || mptr.lev.dnum === svd.dungeon_topology.d_astral_level.dnum) {
+        if (svd.dungeons[dnum].dunlev_ureached === svd.dungeons[dnum].entry_lev || In_endgame(mptr.lev)) {
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s:"), new $c.Ptr(svd.dungeons[dnum].dname, 0));
         } else if (await builds_up(mptr.lev)) {
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s: levels %d up to %d"), new $c.Ptr(svd.dungeons[dnum].dname, 0), (depthstart + svd.dungeons[dnum].entry_lev | 0) - 1 | 0, (depthstart + svd.dungeons[dnum].dunlev_ureached | 0) - 1 | 0);
@@ -2131,12 +2142,12 @@ async function print_mapseen(win, mptr, final, how, printdun) {   // dungeon.c:3
         await add_menu_heading(win, new $c.Ptr(buf, 0));
     }
     i = (depthstart + mptr.lev.dlevel | 0) - 1 | 0;
-    if (mptr.lev.dnum === svd.dungeon_topology.d_astral_level.dnum) {
+    if (In_endgame(mptr.lev)) {
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s%s:"), final !== -1 ? $c.lit("   ") : $c.lit(""), endgamelevelname(new $c.Ptr(tmpbuf, 0), i));
     } else {
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%sLevel %d:"), final !== -1 ? $c.lit("   ") : $c.lit(""), i);
     }
-    if (flags.debug) {
+    if (wizard()) {
         if ((slev = Is_special(mptr.lev)) !== null) {
             $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" [%s]"), new $c.Ptr(slev.proto, 0));
         }
@@ -2188,8 +2199,8 @@ async function print_mapseen(win, mptr, final, how, printdun) {   // dungeon.c:3
                 }
             } while (0);
             atmp = mptr.feat.msalign;
-            atmp = atmp === 3 ? 4 : atmp;
-            if ($c.i8((atmp & AM_MASK) >>> 0 === 0 ? A_NONE : (atmp & AM_MASK) >>> 0 === AM_LAWFUL ? A_LAWFUL : ((atmp & AM_MASK) >>> 0 | 0) - 2 | 0) === u.ualign.type) {
+            atmp = Msa2amask(atmp);
+            if (Amask2align(atmp) === u.ualign.type) {
                 $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" to %s"), await align_gname(u.ualign.type));
             }
         }
@@ -2226,7 +2237,7 @@ async function print_mapseen(win, mptr, final, how, printdun) {   // dungeon.c:3
     new $c.Ptr(buf, 0).set(0, 0);
     if (mptr.flags.oracle) {
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%sOracle of Delphi."), $c.lit("      "));
-    } else if (mptr.lev.dnum === svd.dungeon_topology.d_sokoban_dnum) {
+    } else if (In_sokoban(mptr.lev)) {
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s%s."), $c.lit("      "), mptr.flags.sokosolved | 0 ? $c.lit("Solved") : $c.lit("Unsolved"));
     } else if (mptr.flags.bigroom) {
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%sA very big room."), $c.lit("      "));
@@ -2259,7 +2270,7 @@ async function print_mapseen(win, mptr, final, how, printdun) {   // dungeon.c:3
     }
     if (mptr.br) {
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s%s to %s"), $c.lit("      "), br_string2(mptr.br), new $c.Ptr(svd.dungeons[mptr.br.end2.dnum].dname, 0));
-        if (mptr.br.end1_up && !(mptr.br.end2.dnum === svd.dungeon_topology.d_astral_level.dnum)) {
+        if (mptr.br.end1_up && !In_endgame(mptr.br.end2)) {
             $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(", level %d"), depth(mptr.br.end2));
         }
         $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit("."), 256);
@@ -2268,7 +2279,7 @@ async function print_mapseen(win, mptr, final, how, printdun) {   // dungeon.c:3
     if (mptr.final_resting_place || final > 0) {
         kncnt = !died_here ? 0 : 1;
         for (bp = mptr.final_resting_place; bp; bp = bp.next) {
-            if (bp.bonesknown || flags.debug || final > 0) {
+            if (bp.bonesknown || wizard() || final > 0) {
                 kncnt = kncnt + 1 | 0;
             }
         }
@@ -2276,7 +2287,7 @@ async function print_mapseen(win, mptr, final, how, printdun) {   // dungeon.c:3
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s%s"), $c.lit("      "), $c.lit("Final resting place for"));
             await add_menu_str(win, new $c.Ptr(buf, 0));
             if (died_here) {
-                await formatkiller(new $c.Ptr(tmpbuf, 0), 256, how, 1);
+                await formatkiller(new $c.Ptr(tmpbuf, 0), 256, how, TRUE);
                 strsubst(new $c.Ptr(tmpbuf, 0), $c.lit(" himself"), $c.lit(" yourself"));
                 strsubst(new $c.Ptr(tmpbuf, 0), $c.lit(" herself"), $c.lit(" yourself"));
                 strsubst(new $c.Ptr(tmpbuf, 0), $c.lit(" his "), $c.lit(" your "));
@@ -2285,13 +2296,16 @@ async function print_mapseen(win, mptr, final, how, printdun) {   // dungeon.c:3
                 await add_menu_str(win, new $c.Ptr(buf, 0));
             }
             for (bp = mptr.final_resting_place; bp; bp = bp.next) {
-                if (bp.bonesknown || flags.debug || final > 0) {
+                if (bp.bonesknown || wizard() || final > 0) {
                     $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s%s%s, %s%c"), $c.lit("      "), $c.lit("   "), new $c.Ptr(bp.who, 0), new $c.Ptr(bp.how, 0), (kncnt = kncnt - 1 | 0) ? 44 : 46);
                     await add_menu_str(win, new $c.Ptr(buf, 0));
                 }
             }
         }
     }
+}
+function branch_val(bp) {
+    return $c.add64($c.mul64($c.mul64($c.add64($c.mul64(bp.end1.dnum, MAXLEVEL + 1), bp.end1.dlevel), MAXDUNGEON + 1), MAXLEVEL + 1), $c.add64($c.mul64(bp.end2.dnum, MAXLEVEL + 1), bp.end2.dlevel));
 }
 
 export function $init() {
@@ -2386,9 +2400,9 @@ export function $init() {
     init_dungeon_branches$brdirstr[1] = $c.lit("down");
     init_dungeon_branches$brdirstr[2] = null;
     init_dungeon_branches$brdirstr2i.fill(0);
-    init_dungeon_branches$brdirstr2i[0] = 1;
-    init_dungeon_branches$brdirstr2i[1] = 0;
-    init_dungeon_branches$brdirstr2i[2] = 0;
+    init_dungeon_branches$brdirstr2i[0] = TRUE;
+    init_dungeon_branches$brdirstr2i[1] = FALSE;
+    init_dungeon_branches$brdirstr2i[2] = FALSE;
     init_dungeon_branches$brtypes.fill(null);
     init_dungeon_branches$brtypes[0] = $c.lit("stair");
     init_dungeon_branches$brtypes[1] = $c.lit("portal");

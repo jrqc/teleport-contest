@@ -9,29 +9,34 @@ import { ART_EYES_OF_THE_OVERWORLD } from './artilist.h.js';
 import { rank_of } from './botl.js';
 import { cmdq_clear, cmdq_pop, isok } from './cmd.js';
 import { NO_COLOR } from './color.h.js';
-import { c_obj_colors, cg, flags, gi, gu, gv, gy, program_state, svd, svl, svp, u } from './decl.js';
+import { c_obj_colors, cg, flags, gi, gu, gy, program_state, svd, svl, svp, u } from './decl.js';
 import { AMULET_CLASS, ARMOR_CLASS, COIN_CLASS, FOOD_CLASS, GEM_CLASS, POTION_CLASS, RING_CLASS, SCROLL_CLASS, SPBOOK_CLASS, TOOL_CLASS, VENOM_CLASS, WAND_CLASS, WEAPON_CLASS } from './defsym.h.js';
 import { canseemon, flush_screen, glyph_at, nul_glyphinfo, see_with_infrared, sensemon } from './display.js';
-import { GLYPH_BODY_OFF, GLYPH_BODY_PILETOP_OFF, GLYPH_OBJ_OFF, GLYPH_OBJ_PILETOP_OFF, GLYPH_STATUE_FEM_OFF, GLYPH_STATUE_FEM_PILETOP_OFF, GLYPH_STATUE_MALE_OFF, GLYPH_STATUE_MALE_PILETOP_OFF, GLYPH_SWALLOW_OFF } from './display.h.js';
+import { canspotmon, glyph_is_object, glyph_is_swallow } from './display.macros.js';
 import { donamelevel, on_level } from './dungeon.js';
+import { In_endgame } from './dungeon.macros.js';
 import { wipeout_text } from './engrave.js';
 import { getpos } from './getpos.js';
-import { BUFSZ, LL_ARTIFACT, LL_CONDUCT, MD_PAD_BOGONS, PL_PSIZ } from './global.h.js';
-import { ARTICLE_A, ARTICLE_NONE, ARTICLE_THE, ARTICLE_YOUR, AUGMENT_IT, CMDQ_KEY, CORPSTAT_FEMALE, CORPSTAT_GENDER, CORPSTAT_MALE, CORPSTAT_RANDOM, CQ_CANNED, ECMD_OK, EXACT_NAME, GETOBJ_DOWNPLAY, GETOBJ_EXCLUDE, GETOBJ_NOFLAGS, GETOBJ_SUGGEST, HAND, ONAME_KNOW_ARTI, ONAME_SKIP_INVUPD, SUPPRESS_HALLUCINATION, SUPPRESS_INVISIBLE, SUPPRESS_IT, SUPPRESS_MAPPEARANCE, SUPPRESS_NAME, SUPPRESS_SADDLE } from './hack.h.js';
+import { BUFSZ, FALSE, LL_ARTIFACT, LL_CONDUCT, MD_PAD_BOGONS, PL_PSIZ, TRUE } from './global.h.js';
+import { ARTICLE_A, ARTICLE_NONE, ARTICLE_THE, ARTICLE_YOUR, AUGMENT_IT, CMDQ_KEY, CORPSTAT_FEMALE, CORPSTAT_GENDER, CORPSTAT_MALE, CORPSTAT_RANDOM, CQ_CANNED, ECMD_OK, EXACT_NAME, GETOBJ_DOWNPLAY, GETOBJ_EXCLUDE, GETOBJ_NOFLAGS, GETOBJ_PROMPT, GETOBJ_SUGGEST, HAND, ONAME_KNOW_ARTI, ONAME_SKIP_INVUPD, ONAME_VIA_NAMING, SUPPRESS_HALLUCINATION, SUPPRESS_INVISIBLE, SUPPRESS_IT, SUPPRESS_MAPPEARANCE, SUPPRESS_NAME, SUPPRESS_SADDLE } from './hack.h.js';
 import { dist2, eos, fuzzymatch, highc, lcase, mungspaces, s_suffix, strncmpi, strstri, upstart } from './hacklib.js';
 import { carrying, getobj, update_inventory } from './invent.js';
+import { nhUse } from './lint.macros.js';
 import { newmextra } from './makemon.js';
+import { has_ebones, has_mgivenname } from './mextra.macros.js';
 import { dealloc_obj, newoextra } from './mkobj.js';
 import { pronoun_gender } from './mondata.js';
-import { FEMALE, G_NOGEN, G_UNIQ, M1_ANIMAL, M1_HUMANOID, M1_MINDLESS, M2_PNAME, MALE, MS_ANIMAL, NEUTRAL, NUM_MGENDERS } from './monflag.h.js';
+import { humanoid, is_animal, is_mplayer, is_rider, mindless, type_is_pname } from './mondata.macros.js';
+import { FEMALE, G_NOGEN, G_UNIQ, MALE, MS_ANIMAL, NEUTRAL, NUM_MGENDERS } from './monflag.h.js';
 import { mons } from './monst.js';
-import { M_AP_FURNITURE, M_AP_MONSTER, M_AP_OBJECT, M_AP_TYPMASK } from './monst.h.js';
-import { PM_ALIGNED_CLERIC, PM_ARCHEOLOGIST, PM_CLERIC, PM_DEATH, PM_FAMINE, PM_GHOST, PM_HIGH_CLERIC, PM_JUIBLEX, PM_LONG_WORM, PM_LONG_WORM_TAIL, PM_PESTILENCE, PM_SHOPKEEPER, PM_WIZARD, PM_WIZARD_OF_YENDOR } from './monsters.h.js';
+import { M_AP_FURNITURE, M_AP_MONSTER, M_AP_OBJECT } from './monst.h.js';
+import { M_AP_TYPE, engulfing_u, helpless, ismnum } from './monst.macros.js';
+import { PM_ALIGNED_CLERIC, PM_CLERIC, PM_GHOST, PM_HIGH_CLERIC, PM_JUIBLEX, PM_LONG_WORM, PM_LONG_WORM_TAIL, PM_SHOPKEEPER, PM_WIZARD_OF_YENDOR } from './monsters.h.js';
 import { discover_object, rename_disco, undiscover_object } from './o_init.js';
 import { OBJ_FREE, OBJ_INVENT } from './obj.h.js';
-import { NUM_OBJECTS } from './objclass.h.js';
+import { carried, has_oname } from './obj.macros.js';
 import { obj_descr, objects } from './objects.js';
-import { AMULET_OF_YENDOR, CORPSE, FAKE_AMULET_OF_YENDOR, FIGURINE, FIRST_OBJECT, HEAVY_IRON_BALL, SPE_NOVEL, STATUE, STRANGE_OBJECT, TIN, TOWEL } from './objects.h.js';
+import { AMULET_OF_YENDOR, CORPSE, FAKE_AMULET_OF_YENDOR, FIGURINE, HEAVY_IRON_BALL, SPE_NOVEL, STATUE, STRANGE_OBJECT, TIN, TOWEL } from './objects.h.js';
 import { The, Ysimple_name2, an, ansimpleoname, bare_artifactname, just_an, makeplural, safe_qbuf, simpleonames, vtense, xname } from './objnam.js';
 import { nh_getenv } from './options.js';
 import { object_from_map } from './pager.js';
@@ -39,17 +44,20 @@ import { LOW_PM, NON_PM, NUMMONS, SPECIAL_PM } from './permonst.h.js';
 import { There, You, impossible, livelog_printf, pline, verbalize } from './pline.js';
 import { body_part } from './polyself.js';
 import { priestname } from './priest.js';
-import { BLINDED, DEAF, HALLUC, HALLUC_RES, SEE_INVIS, W_SADDLE, W_WEP } from './prop.h.js';
+import { HALLUC_RES, W_SADDLE, W_WEP } from './prop.h.js';
 import { rn2, rn2_on_display_rng, rnd_on_display_rng } from './rnd.js';
 import { genders } from './role.js';
 import { get_rnd_text } from './rumors.js';
 import { alter_cost } from './shk.js';
 import { shkname } from './shknam.js';
-import { IN_SIGHT } from './vision.h.js';
+import { cansee } from './vision.macros.js';
 import { untwoweapon } from './wield.js';
-import { add_menu, getlin, select_menu, windowprocs } from './windows.js';
+import { add_menu, getlin, select_menu } from './windows.js';
+import { create_nhwindow, destroy_nhwindow, display_nhwindow, end_menu, start_menu } from './winprocs.macros.js';
 import { ATR_NONE, MENU_BEHAVE_STANDARD, MENU_ITEMFLAGS_NONE, NHW_MENU, PICK_ONE } from './wintype.h.js';
 import { PRONOUN_HALLU } from './you.h.js';
+import { Upolyd, u_at } from './you.macros.js';
+import { Blind, Deaf, Hallucination, See_invisible } from './youprop.macros.js';
 
 const NUMMBUF = 5;
 const BOGUSMONSIZE = 100;
@@ -84,13 +92,13 @@ export async function new_mgivenname(mon, lth) {   // do_name.c:31
         }
         $t2 = $c.asArr(await alloc(lth >>> 0), Int8Array), mon.mextra.mgivenname = $t2;
     } else {
-        if (mon.mextra && mon.mextra.mgivenname) {
+        if (has_mgivenname(mon)) {
             free_mgivenname(mon);
         }
     }
 }
 export function free_mgivenname(mon) {   // do_name.c:51
-    if (mon.mextra && mon.mextra.mgivenname) {
+    if (has_mgivenname(mon)) {
         $c.free(mon.mextra.mgivenname);
         mon.mextra.mgivenname = null;
     }
@@ -105,26 +113,26 @@ export async function new_oname(obj, lth) {   // do_name.c:61
         }
         $t2 = $c.asArr(await alloc(lth >>> 0), Int8Array), obj.oextra.oname = $t2;
     } else {
-        if (obj.oextra && obj.oextra.oname) {
+        if (has_oname(obj)) {
             free_oname(obj);
         }
     }
 }
 export function free_oname(obj) {   // do_name.c:81
-    if (obj.oextra && obj.oextra.oname) {
+    if (has_oname(obj)) {
         $c.free(obj.oextra.oname);
         obj.oextra.oname = null;
     }
 }
 export function safe_oname(obj) {   // do_name.c:95
-    if (obj.oextra && obj.oextra.oname) {
+    if (has_oname(obj)) {
         return obj.oextra.oname;
     }
     return $c.lit("");
 }
 async function name_from_player(outbuf, prompt, defres) {   // do_name.c:105
     outbuf.set(0, 0);
-    defres;
+    nhUse(defres);
     await getlin(prompt, outbuf);
     if (!outbuf.get(0) || outbuf.get(0) === 27) {
         return null;
@@ -155,37 +163,37 @@ export async function christen_monst(mtmp, name) {   // do_name.c:133
 async function alreadynamed(mtmp, monnambuf, usrbuf) {   // do_name.c:158
     let pronounbuf = new Int8Array(10), p = null, name_not_title = 0;
     if (!usrbuf.get(0)) {
-        name_not_title = $c.i8(mtmp.mextra && mtmp.mextra.mgivenname || $c.andu64(mtmp.data.mflags2, M2_PNAME) !== 0 || mtmp.isshk | 0 ? 1 : 0);
-        await pline($c.lit("%s would rather keep %s existing %s."), upstart(monnambuf), $c.peq(mtmp.data, $c.relem(mons, PM_DEATH)) || $c.peq(mtmp.data, $c.relem(mons, PM_FAMINE)) || $c.peq(mtmp.data, $c.relem(mons, PM_PESTILENCE)) ? $c.lit("its") : genders[pronoun_gender(mtmp, PRONOUN_HALLU)].his, name_not_title ? $c.lit("name") : $c.lit("title"));
-        return 1;
-    } else if (fuzzymatch(usrbuf, monnambuf, $c.lit(" -_"), 1) || !strncmpi(monnambuf, $c.lit("the "), 4) && fuzzymatch(usrbuf, monnambuf.add(4), $c.lit(" -_"), 1) || (p = strstri(monnambuf, $c.lit("invisible "))) !== null && fuzzymatch(usrbuf, p.add(10), $c.lit(" -_"), 1) || (p = strstri(monnambuf, $c.lit(" of "))) !== null && fuzzymatch(usrbuf, p.add(4), $c.lit(" -_"), 1)) {
-        if ($c.peq(mtmp.data, $c.relem(mons, PM_DEATH)) || $c.peq(mtmp.data, $c.relem(mons, PM_FAMINE)) || $c.peq(mtmp.data, $c.relem(mons, PM_PESTILENCE))) {
+        name_not_title = $c.i8(has_mgivenname(mtmp) || type_is_pname(mtmp.data) || mtmp.isshk | 0 ? 1 : 0);
+        await pline($c.lit("%s would rather keep %s existing %s."), upstart(monnambuf), is_rider(mtmp.data) ? $c.lit("its") : genders[pronoun_gender(mtmp, PRONOUN_HALLU)].his, name_not_title ? $c.lit("name") : $c.lit("title"));
+        return TRUE;
+    } else if (fuzzymatch(usrbuf, monnambuf, $c.lit(" -_"), TRUE) || !strncmpi(monnambuf, $c.lit("the "), 4) && fuzzymatch(usrbuf, monnambuf.add(4), $c.lit(" -_"), TRUE) || (p = strstri(monnambuf, $c.lit("invisible "))) !== null && fuzzymatch(usrbuf, p.add(10), $c.lit(" -_"), TRUE) || (p = strstri(monnambuf, $c.lit(" of "))) !== null && fuzzymatch(usrbuf, p.add(4), $c.lit(" -_"), TRUE)) {
+        if (is_rider(mtmp.data)) {
             await pline($c.lit("%s is already called that."), upstart(monnambuf));
         } else {
             await pline($c.lit("%s is already called %s."), upstart($c.__builtin___strcpy_chk(new $c.Ptr(pronounbuf, 0), genders[pronoun_gender(mtmp, 2)].he, 10)), monnambuf);
         }
-        return 1;
+        return TRUE;
     } else if ($c.peq(mtmp.data, $c.relem(mons, PM_JUIBLEX)) && strstri(monnambuf, $c.lit("Juiblex")) && !strncmpi(usrbuf, $c.lit("Jubilex"), -1)) {
         await pline($c.lit("%s doesn't like being called %s."), upstart(monnambuf), usrbuf);
-        return 1;
+        return TRUE;
     }
-    return 0;
+    return FALSE;
 }
 async function do_mgivenname() {   // do_name.c:199
     let buf = new Int8Array(256), monnambuf = new Int8Array(256), qbuf = new Int8Array(128), cc = new $T.nhcoord(), cx = 0, cy = 0, mtmp = null, do_swallow = 0, glyph = 0;
     mtmp = null;
-    do_swallow = 0;
-    if (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic)) {
+    do_swallow = FALSE;
+    if (Hallucination()) {
         await You($c.lit("would never recognize it anyway."));
         return;
     }
     cc.x = u.ux;
     cc.y = u.uy;
-    if (await getpos(cc, 0, $c.lit("the monster you want to name")) < 0 || !isok(cc.x, cc.y)) {
+    if (await getpos(cc, FALSE, $c.lit("the monster you want to name")) < 0 || !isok(cc.x, cc.y)) {
         return;
     }
     cx = cc.x, cy = cc.y;
-    if (cx === u.ux && cy === u.uy) {
+    if (u_at(cx, cy)) {
         if (u.usteed && (canseemon(u.usteed) || sensemon(u.usteed))) {
             mtmp = u.usteed;
         } else {
@@ -197,28 +205,28 @@ async function do_mgivenname() {   // do_name.c:199
     }
     if (!mtmp && u.uswallow | 0) {
         glyph = glyph_at($c.i16(cx), $c.i16(cy));
-        if (glyph >= GLYPH_SWALLOW_OFF && glyph < (NUMMONS << 3) + GLYPH_SWALLOW_OFF) {
+        if (glyph_is_swallow(glyph)) {
             mtmp = u.ustuck;
-            do_swallow = 1;
+            do_swallow = TRUE;
         }
     }
-    if (!do_swallow && (!mtmp || !sensemon(mtmp) && (!((gv.viz_array.get(cy).get(cx) & IN_SIGHT) !== 0 || see_with_infrared(mtmp)) || mtmp.mundetected | 0 || (mtmp.m_ap_type & M_AP_TYPMASK) === M_AP_FURNITURE || (mtmp.m_ap_type & M_AP_TYPMASK) === M_AP_OBJECT || mtmp.minvis | 0 && !(u.uprops[SEE_INVIS].intrinsic || u.uprops[SEE_INVIS].extrinsic)))) {
+    if (!do_swallow && (!mtmp || !sensemon(mtmp) && (!(cansee(cx, cy) || see_with_infrared(mtmp)) || mtmp.mundetected | 0 || M_AP_TYPE(mtmp) === M_AP_FURNITURE || M_AP_TYPE(mtmp) === M_AP_OBJECT || mtmp.minvis | 0 && !See_invisible()))) {
         await pline($c.lit("I see no monster there."));
         return;
     }
     $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("What do you want to call %s?"), await distant_monnam(mtmp, 1, new $c.Ptr(monnambuf, 0)));
-    if (!await name_from_player(new $c.Ptr(buf, 0), new $c.Ptr(qbuf, 0), mtmp.mextra && mtmp.mextra.mgivenname ? mtmp.mextra.mgivenname : null)) {
+    if (!await name_from_player(new $c.Ptr(buf, 0), new $c.Ptr(qbuf, 0), has_mgivenname(mtmp) ? mtmp.mextra.mgivenname : null)) {
         return;
     }
     if (mtmp.data.geno & G_UNIQ && !mtmp.ispriest) {
         if (!await alreadynamed(mtmp, new $c.Ptr(monnambuf, 0), new $c.Ptr(buf, 0))) {
             await pline($c.lit("%s doesn't like being called names!"), upstart(new $c.Ptr(monnambuf, 0)));
         }
-    } else if (mtmp.isshk | 0 && !(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf || (mtmp.msleeping | 0 || !mtmp.mcanmove) || mtmp.data.msound <= MS_ANIMAL)) {
+    } else if (mtmp.isshk | 0 && !(Deaf() || helpless(mtmp) || mtmp.data.msound <= MS_ANIMAL)) {
         if (!await alreadynamed(mtmp, new $c.Ptr(monnambuf, 0), new $c.Ptr(buf, 0))) {
             await verbalize($c.lit("I'm %s, not %s."), await shkname(mtmp), new $c.Ptr(buf, 0));
         }
-    } else if (mtmp.ispriest | 0 || mtmp.isminion | 0 || mtmp.isshk | 0 || $c.peq(mtmp.data, $c.relem(mons, PM_GHOST)) || mtmp.mextra && mtmp.mextra.ebones) {
+    } else if (mtmp.ispriest | 0 || mtmp.isminion | 0 || mtmp.isshk | 0 || $c.peq(mtmp.data, $c.relem(mons, PM_GHOST)) || has_ebones(mtmp)) {
         if (!await alreadynamed(mtmp, new $c.Ptr(monnambuf, 0), new $c.Ptr(buf, 0))) {
             await pline($c.lit("%s will not accept the name %s."), upstart(new $c.Ptr(monnambuf, 0)), new $c.Ptr(buf, 0));
         }
@@ -239,10 +247,10 @@ async function do_oname(obj) {   // do_name.c:290
         return;
     }
     if (obj.oartifact) {
-        await pline($c.lit("%s resists the attempt."), obj.oextra && obj.oextra.oname ? obj.oextra.oname : $c.lit("The artifact"));
+        await pline($c.lit("%s resists the attempt."), has_oname(obj) ? obj.oextra.oname : $c.lit("The artifact"));
         return;
     }
-    if ((aname = artifact_name(new $c.Ptr(buf, 0), new $c.Ptr(objtyp, 0), 1)) !== null && (restrict_name(obj, aname) || exist_artifact(obj.otyp, aname))) {
+    if ((aname = artifact_name(new $c.Ptr(buf, 0), new $c.Ptr(objtyp, 0), TRUE)) !== null && (restrict_name(obj, aname) || exist_artifact(obj.otyp, aname))) {
         $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), aname, 256);
         $c.__builtin___strcpy_chk(new $c.Ptr(bufcpy, 0), new $c.Ptr(buf, 0), 256);
         bufp = !strncmpi(new $c.Ptr(buf, 0), $c.lit("the "), 4) ? new $c.Ptr(buf, 0).add(4) : new $c.Ptr(buf, 0);
@@ -250,19 +258,19 @@ async function do_oname(obj) {   // do_name.c:290
             wipeout_text(bufp, rnd_on_display_rng(2), 0);
         } while (!$c.strcmp(new $c.Ptr(buf, 0), new $c.Ptr(bufcpy, 0)));
         await pline($c.lit("While engraving, your %s slips."), await body_part(HAND));
-        await windowprocs.win_display_nhwindow($G.WIN_MESSAGE, 0);
+        await display_nhwindow()($G.WIN_MESSAGE, FALSE);
         await You($c.lit("engrave: \"%s\"."), new $c.Ptr(buf, 0));
         u.uconduct.literate = $c.add64(u.uconduct.literate, 1);
     } else if (obj.otyp === objtyp[0]) {
         (!(aname !== null) ? 1 : 0) ? $c.__assert_rtn($c.lit("do_oname"), $c.lit("do_name.c"), 359, $c.lit("aname != 0")) : 0;
         $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), aname, 256);
     }
-    obj = await oname(obj, new $c.Ptr(buf, 0), 2 | ONAME_KNOW_ARTI);
-    obj;
+    obj = await oname(obj, new $c.Ptr(buf, 0), ONAME_VIA_NAMING | ONAME_KNOW_ARTI);
+    nhUse(obj);
 }
 export async function oname(obj, name, oflgs) {   // do_name.c:372
     let lth = 0, buf = new Int8Array(63), via_naming = 0, skip_inv_update = 0, $t1;
-    via_naming = $c.i8((oflgs & 2) >>> 0 !== 0 ? 1 : 0);
+    via_naming = $c.i8((oflgs & ONAME_VIA_NAMING) >>> 0 !== 0 ? 1 : 0);
     skip_inv_update = $c.i8((oflgs & ONAME_SKIP_INVUPD) >>> 0 !== 0 ? 1 : 0);
     lth = name.get(0) ? $c.i32($c.addu64($c.strlen(name), 1)) : 0;
     if (lth > PL_PSIZ) {
@@ -278,14 +286,14 @@ export async function oname(obj, name, oflgs) {   // do_name.c:372
         $c.__builtin___strcpy_chk(obj.oextra.oname, name, -1);
     }
     if (lth) {
-        await artifact_exists(obj, name, 1, oflgs);
+        await artifact_exists(obj, name, TRUE, oflgs);
     }
     if (obj.oartifact) {
         if ($c.peq(obj, $G.uswapwep)) {
             await untwoweapon();
         }
         if ($c.peq(obj, $G.uwep)) {
-            await set_artifact_intrinsic(obj, 1, W_WEP);
+            await set_artifact_intrinsic(obj, TRUE, W_WEP);
         }
         if (obj.unpaid) {
             await alter_cost(obj, 0);
@@ -298,14 +306,14 @@ export async function oname(obj, name, oflgs) {   // do_name.c:372
             }
         }
     }
-    if (obj.where === OBJ_INVENT && !skip_inv_update) {
+    if (carried(obj) && !skip_inv_update) {
         await update_inventory();
     }
     return obj;
 }
 export function objtyp_is_callable(i) {   // do_name.c:429
     if (objects[i].oc_uname) {
-        return 1;
+        return TRUE;
     }
     switch (objects[i].oc_class) {
         case AMULET_CLASS:
@@ -322,13 +330,13 @@ export function objtyp_is_callable(i) {   // do_name.c:429
         case TOOL_CLASS:
         case VENOM_CLASS:
             if (obj_descr[objects[i].oc_descr_idx].oc_descr) {
-                return 1;
+                return TRUE;
             }
             break;
         default:
             break;
     }
-    return 0;
+    return FALSE;
 }
 export function name_ok(obj) {   // do_name.c:467
     if (!obj || obj.oclass === COIN_CLASS) {
@@ -365,8 +373,8 @@ export async function docallcmd() {   // do_name.c:499
             }
             break docallcmd$;
         }
-        win = await windowprocs.win_create_nhwindow(NHW_MENU);
-        await windowprocs.win_start_menu(win, MENU_BEHAVE_STANDARD);
+        win = await create_nhwindow()(NHW_MENU);
+        await start_menu()(win, MENU_BEHAVE_STANDARD);
         any.$copyFrom(cg.zeroany);
         any.a_char = 109;
         await add_menu(win, nul_glyphinfo, any, $c.i8(abc ? 0 : any.a_char), 67, ATR_NONE, clr, $c.lit("a monster"), MENU_ITEMFLAGS_NONE);
@@ -382,14 +390,14 @@ export async function docallcmd() {   // do_name.c:499
         await add_menu(win, nul_glyphinfo, any, $c.i8(abc ? 0 : any.a_char), 92, ATR_NONE, clr, $c.lit("the type of an object on discoveries list"), MENU_ITEMFLAGS_NONE);
         any.a_char = 97;
         await add_menu(win, nul_glyphinfo, any, $c.i8(abc ? 0 : any.a_char), 108, ATR_NONE, clr, $c.lit("record an annotation for the current level"), MENU_ITEMFLAGS_NONE);
-        await windowprocs.win_end_menu(win, $c.lit("What do you want to name?"));
+        await end_menu()(win, $c.lit("What do you want to name?"));
         if (await select_menu(win, PICK_ONE, new $c.Ptr(pick_list, 0)) > 0) {
             ch = $c.radd(pick_list[0], 0).item.a_char;
             $c.free(pick_list[0]);
         } else {
             ch = 113;
         }
-        await windowprocs.win_destroy_nhwindow(win);
+        await destroy_nhwindow()(win);
     }
     switch (ch) {
         default:
@@ -399,7 +407,7 @@ export async function docallcmd() {   // do_name.c:499
             await do_mgivenname();
             break;
         case 105:
-            obj = await getobj($c.lit("name"), name_ok, 2);
+            obj = await getobj($c.lit("name"), name_ok, GETOBJ_PROMPT);
             if (obj) {
                 await do_oname(obj);
             }
@@ -452,7 +460,7 @@ async function docall_xname(obj) {   // do_name.c:605
 }
 export async function docall(obj) {   // do_name.c:636
     let buf = new Int8Array(256), qbuf = new Int8Array(128), uname_p = null, had_name = 0, $t1;
-    had_name = 0;
+    had_name = FALSE;
     if (!obj.dknown) {
         return;
     }
@@ -467,7 +475,7 @@ export async function docall(obj) {   // do_name.c:636
         return;
     }
     if (uname_p.get(0)) {
-        had_name = 1;
+        had_name = TRUE;
         $c.free(uname_p.get(0)), uname_p.set(0, null);
     }
     mungspaces(new $c.Ptr(buf, 0));
@@ -477,7 +485,7 @@ export async function docall(obj) {   // do_name.c:636
         }
     } else {
         $t1 = await dupstr(new $c.Ptr(buf, 0)), uname_p.set(0, $t1);
-        await discover_object(obj.otyp, 0, 1, 1);
+        await discover_object(obj.otyp, FALSE, TRUE, TRUE);
     }
     if (obj.where === OBJ_INVENT || carrying(obj.otyp)) {
         await update_inventory();
@@ -486,17 +494,17 @@ export async function docall(obj) {   // do_name.c:636
 async function namefloorobj() {   // do_name.c:679
     let cc = new $T.nhcoord(), glyph = 0, buf = new Int8Array(256), obj = [null], fakeobj = 0, use_plural = 0, unames = $c.nulls(6), tmpbuf = new Int8Array(256), $t1, $t2, $t3;
     obj[0] = null;
-    fakeobj = 0;
+    fakeobj = FALSE;
     cc.x = u.ux, cc.y = u.uy;
     $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("object on map (or '.' for one %s you)"), u.uundetected | 0 && $c.andu64(gy.youmonst.data.mflags1, 128) !== 0 ? $c.lit("over") : $c.lit("under"));
-    if (await getpos(cc, 0, new $c.Ptr(buf, 0)) < 0 || cc.x <= 0) {
+    if (await getpos(cc, FALSE, new $c.Ptr(buf, 0)) < 0 || cc.x <= 0) {
         return;
     }
     if (cc.x === u.ux && cc.y === u.uy) {
         obj[0] = svl.level.objects[u.ux][u.uy];
     } else {
         glyph = glyph_at(cc.x, cc.y);
-        if (glyph === GLYPH_OBJ_OFF || glyph >= GLYPH_OBJ_OFF + FIRST_OBJECT - 1 && glyph < GLYPH_OBJ_OFF + NUM_OBJECTS || (glyph === GLYPH_OBJ_PILETOP_OFF || glyph > GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT - 1 && glyph < GLYPH_OBJ_PILETOP_OFF + NUM_OBJECTS) || (glyph > GLYPH_OBJ_OFF && glyph < GLYPH_OBJ_OFF + FIRST_OBJECT - 1 || glyph > GLYPH_OBJ_PILETOP_OFF && glyph < GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT - 1) || (glyph >= GLYPH_STATUE_MALE_OFF && glyph < GLYPH_STATUE_MALE_OFF + NUMMONS || glyph >= GLYPH_STATUE_MALE_PILETOP_OFF && glyph < GLYPH_STATUE_MALE_PILETOP_OFF + NUMMONS || (glyph >= GLYPH_STATUE_FEM_OFF && glyph < GLYPH_STATUE_FEM_OFF + NUMMONS || glyph >= GLYPH_STATUE_FEM_PILETOP_OFF && glyph < GLYPH_STATUE_FEM_PILETOP_OFF + NUMMONS)) || (glyph >= GLYPH_BODY_OFF && glyph < GLYPH_BODY_OFF + NUMMONS || glyph >= GLYPH_BODY_PILETOP_OFF && glyph < GLYPH_BODY_PILETOP_OFF + NUMMONS)) {
+        if (glyph_is_object(glyph)) {
             fakeobj = await object_from_map(glyph, cc.x, cc.y, new $c.Ptr(obj, 0));
         }
     }
@@ -506,8 +514,8 @@ async function namefloorobj() {   // do_name.c:679
     }
     $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), obj[0].otyp !== STRANGE_OBJECT ? await simpleonames(obj[0]) : obj_descr[STRANGE_OBJECT].oc_name, 256);
     use_plural = $c.i8(obj[0].quan > 1 ? 1 : 0);
-    if (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic)) {
-        unames[0] = (u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female) && gu.urole.name.f ? gu.urole.name.f : gu.urole.name.m;
+    if (Hallucination()) {
+        unames[0] = (Upolyd() ? u.mfemale | 0 : flags.female) && gu.urole.name.f ? gu.urole.name.f : gu.urole.name.m;
         $t1 = rank_of(rn2_on_display_rng(30) + 1 | 0, gu.urole.mnum, flags.female), unames[1] = $t1;
         $t2 = await bogusmon(new $c.Ptr(tmpbuf, 0), null), unames[2] = $t2;
         unames[3] = unames[2];
@@ -533,7 +541,7 @@ export async function x_monnam(mtmp, article, adjective, suppress, called) {   /
     let buf = null, mdat = null, pm_name = null, do_hallu = 0, do_invis = 0, do_it = 0, do_saddle = 0, do_mappear = 0, do_exact = 0, do_name = 0, augment_it = 0, name_at_start = 0, has_adjectives = 0, insertbuf2 = 0, mappear_as_mon = 0, bp = null, buf2 = new Int8Array(256), s_one = 0, name = null, save_prop = 0, save_invis = 0, rnamecode = Int8Array.of(0), rname = null, name$2 = null, pbuf = new Int8Array(256), pbuf$2 = new Int8Array(256);
     buf = nextmbuf();
     mdat = mtmp.data;
-    mappear_as_mon = $c.i8((mtmp.m_ap_type & M_AP_TYPMASK) === M_AP_MONSTER ? 1 : 0);
+    mappear_as_mon = $c.i8(M_AP_TYPE(mtmp) === M_AP_MONSTER ? 1 : 0);
     if ($c.peq(mtmp, gy.youmonst)) {
         return $c.__builtin___strcpy_chk(buf, $c.lit("you"), -1);
     }
@@ -547,17 +555,17 @@ export async function x_monnam(mtmp, article, adjective, suppress, called) {   /
         article = ARTICLE_THE;
         suppress = suppress | SUPPRESS_INVISIBLE;
     }
-    do_hallu = $c.i8(u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) && !(suppress & SUPPRESS_HALLUCINATION) ? 1 : 0);
+    do_hallu = $c.i8(Hallucination() && !(suppress & SUPPRESS_HALLUCINATION) ? 1 : 0);
     do_invis = $c.i8(mtmp.minvis | 0 && !(suppress & SUPPRESS_INVISIBLE) ? 1 : 0);
-    do_it = $c.i8(!(canseemon(mtmp) || sensemon(mtmp)) && article !== ARTICLE_YOUR && !program_state.gameover && !$c.peq(mtmp, u.usteed) && !(u.uswallow | 0 && $c.peq(u.ustuck, mtmp)) && !(suppress & SUPPRESS_IT) ? 1 : 0);
+    do_it = $c.i8(!canspotmon(mtmp) && article !== ARTICLE_YOUR && !program_state.gameover && !$c.peq(mtmp, u.usteed) && !engulfing_u(mtmp) && !(suppress & SUPPRESS_IT) ? 1 : 0);
     do_saddle = $c.i8(!(suppress & SUPPRESS_SADDLE) ? 1 : 0);
     do_mappear = $c.i8(mappear_as_mon && !(suppress & SUPPRESS_MAPPEARANCE) ? 1 : 0);
     do_exact = $c.i8((suppress & EXACT_NAME) === EXACT_NAME ? 1 : 0);
-    do_name = $c.i8(!(suppress & SUPPRESS_NAME) || $c.andu64(mdat.mflags2, M2_PNAME) !== 0 ? 1 : 0);
+    do_name = $c.i8(!(suppress & SUPPRESS_NAME) || type_is_pname(mdat) ? 1 : 0);
     augment_it = $c.i8((suppress & AUGMENT_IT) !== 0 ? 1 : 0);
     buf.set(0, 0);
     if (do_it) {
-        s_one = $c.i8($c.andu64(mdat.mflags1, M1_HUMANOID) !== 0 && !($c.andu64(mdat.mflags1, M1_ANIMAL) !== 0) && !($c.andu64(mdat.mflags1, M1_MINDLESS) !== 0) ? 1 : 0);
+        s_one = $c.i8(humanoid(mdat) && !is_animal(mdat) && !mindless(mdat) ? 1 : 0);
         $c.__builtin___strcpy_chk(buf, !augment_it ? $c.lit("it") : (!do_hallu ? s_one : !rn2(2)) ? $c.lit("someone") : $c.lit("something"), -1);
         return buf;
     }
@@ -606,7 +614,7 @@ export async function x_monnam(mtmp, article, adjective, suppress, called) {   /
     if (do_invis) {
         $c.__builtin___strcat_chk(buf, $c.lit("invisible "), -1);
     }
-    if (do_saddle && $c.and64(mtmp.misc_worn_check, W_SADDLE) && !((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked) && !(u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic))) {
+    if (do_saddle && $c.and64(mtmp.misc_worn_check, W_SADDLE) && !Blind() && !Hallucination()) {
         $c.__builtin___strcat_chk(buf, $c.lit("saddled "), -1);
     }
     has_adjectives = $c.i8(buf.get(0) !== 0 ? 1 : 0);
@@ -614,15 +622,15 @@ export async function x_monnam(mtmp, article, adjective, suppress, called) {   /
         rname = await rndmonnam(new $c.Ptr(rnamecode, 0));
         $c.__builtin___strcat_chk(buf, rname, -1);
         name_at_start = bogon_is_pname(rnamecode[0]);
-    } else if (do_name && (mtmp.mextra && mtmp.mextra.mgivenname)) {
+    } else if (do_name && has_mgivenname(mtmp)) {
         name$2 = mtmp.mextra.mgivenname;
         if ($c.peq(mdat, $c.relem(mons, PM_GHOST))) {
             $c.__builtin___sprintf_chk(eos(buf), 0, -1, $c.lit("%s ghost"), s_suffix(name$2));
-            name_at_start = 1;
+            name_at_start = TRUE;
         } else if (called) {
             $c.__builtin___sprintf_chk(eos(buf), 0, -1, $c.lit("%s called %s"), pm_name, name$2);
-            name_at_start = $c.i8($c.andu64(mdat.mflags2, M2_PNAME) !== 0 ? 1 : 0);
-        } else if ($c.pcmp(mdat, $c.relem(mons, PM_ARCHEOLOGIST)) >= 0 && $c.pcmp(mdat, $c.relem(mons, PM_WIZARD)) <= 0 && (bp = strstri(name$2, $c.lit(" the "))) !== null) {
+            name_at_start = $c.i8(type_is_pname(mdat));
+        } else if (is_mplayer(mdat) && (bp = strstri(name$2, $c.lit(" the "))) !== null) {
             $c.__builtin___strcpy_chk(new $c.Ptr(pbuf, 0), name$2, 256);
             pbuf[$c.idx($c.add64($c.pdiff(bp, name$2), 5))] = 0;
             if (has_adjectives) {
@@ -631,18 +639,18 @@ export async function x_monnam(mtmp, article, adjective, suppress, called) {   /
             $c.__builtin___strcat_chk(new $c.Ptr(pbuf, 0), bp.add(5), 256);
             $c.__builtin___strcpy_chk(buf, new $c.Ptr(pbuf, 0), -1);
             article = ARTICLE_NONE;
-            name_at_start = 1;
+            name_at_start = TRUE;
         } else {
             $c.__builtin___strcat_chk(buf, name$2, -1);
-            name_at_start = 1;
+            name_at_start = TRUE;
         }
-    } else if ($c.pcmp(mdat, $c.relem(mons, PM_ARCHEOLOGIST)) >= 0 && $c.pcmp(mdat, $c.relem(mons, PM_WIZARD)) <= 0 && !(u.uz.dnum === svd.dungeon_topology.d_astral_level.dnum)) {
+    } else if (is_mplayer(mdat) && !In_endgame(u.uz)) {
         $c.__builtin___strcpy_chk(new $c.Ptr(pbuf$2, 0), rank_of(mtmp.m_lev, $c.i16(mdat.pmidx), $c.i8(mtmp.female)), 256);
         $c.__builtin___strcat_chk(buf, lcase(new $c.Ptr(pbuf$2, 0)), -1);
-        name_at_start = 0;
+        name_at_start = FALSE;
     } else {
         $c.__builtin___strcat_chk(buf, pm_name, -1);
-        name_at_start = $c.i8($c.andu64(mdat.mflags2, M2_PNAME) !== 0 ? 1 : 0);
+        name_at_start = $c.i8(type_is_pname(mdat));
     }
     if (name_at_start && (article === ARTICLE_YOUR || !has_adjectives)) {
         if ($c.peq(mdat, $c.relem(mons, PM_WIZARD_OF_YENDOR))) {
@@ -653,7 +661,7 @@ export async function x_monnam(mtmp, article, adjective, suppress, called) {   /
     } else if ((mdat.geno & G_UNIQ) !== 0 && article === ARTICLE_A) {
         article = ARTICLE_THE;
     }
-    insertbuf2 = 1;
+    insertbuf2 = TRUE;
     buf2[0] = 0;
     switch (article) {
         case ARTICLE_YOUR:
@@ -667,7 +675,7 @@ export async function x_monnam(mtmp, article, adjective, suppress, called) {   /
             break;
         case ARTICLE_NONE:
         default:
-            insertbuf2 = 0;
+            insertbuf2 = FALSE;
             break;
     }
     if (insertbuf2) {
@@ -677,16 +685,16 @@ export async function x_monnam(mtmp, article, adjective, suppress, called) {   /
     return buf;
 }
 export async function l_monnam(mtmp) {   // do_name.c:1035
-    return await x_monnam(mtmp, ARTICLE_NONE, null, mtmp.mextra && mtmp.mextra.mgivenname ? SUPPRESS_SADDLE : 0, 1);
+    return await x_monnam(mtmp, ARTICLE_NONE, null, mtmp.mextra && mtmp.mextra.mgivenname ? SUPPRESS_SADDLE : 0, TRUE);
 }
 export async function mon_nam(mtmp) {   // do_name.c:1042
-    return await x_monnam(mtmp, ARTICLE_THE, null, mtmp.mextra && mtmp.mextra.mgivenname ? SUPPRESS_SADDLE : 0, 0);
+    return await x_monnam(mtmp, ARTICLE_THE, null, mtmp.mextra && mtmp.mextra.mgivenname ? SUPPRESS_SADDLE : 0, FALSE);
 }
 export async function noit_mon_nam(mtmp) {   // do_name.c:1054
-    return await x_monnam(mtmp, ARTICLE_YOUR, null, mtmp.mextra && mtmp.mextra.mgivenname ? SUPPRESS_SADDLE | SUPPRESS_IT : SUPPRESS_IT, 0);
+    return await x_monnam(mtmp, ARTICLE_YOUR, null, has_mgivenname(mtmp) ? SUPPRESS_SADDLE | SUPPRESS_IT : SUPPRESS_IT, FALSE);
 }
 export async function some_mon_nam(mtmp) {   // do_name.c:1065
-    return await x_monnam(mtmp, ARTICLE_THE, null, mtmp.mextra && mtmp.mextra.mgivenname ? SUPPRESS_SADDLE | AUGMENT_IT : AUGMENT_IT, 0);
+    return await x_monnam(mtmp, ARTICLE_THE, null, has_mgivenname(mtmp) ? SUPPRESS_SADDLE | AUGMENT_IT : AUGMENT_IT, FALSE);
 }
 export async function Monnam(mtmp) {   // do_name.c:1074
     let bp = null, $t1;
@@ -707,16 +715,16 @@ export async function Some_Monnam(mtmp) {   // do_name.c:1092
     return bp;
 }
 export async function noname_monnam(mtmp, article) {   // do_name.c:1102
-    return await x_monnam(mtmp, article, null, SUPPRESS_NAME, 0);
+    return await x_monnam(mtmp, article, null, SUPPRESS_NAME, FALSE);
 }
 export async function m_monnam(mtmp) {   // do_name.c:1110
-    return await x_monnam(mtmp, ARTICLE_NONE, null, EXACT_NAME, 0);
+    return await x_monnam(mtmp, ARTICLE_NONE, null, EXACT_NAME, FALSE);
 }
 export async function y_monnam(mtmp) {   // do_name.c:1117
     let prefix = 0, suppression_flag = 0;
     prefix = mtmp.mtame ? ARTICLE_YOUR : ARTICLE_THE;
-    suppression_flag = mtmp.mextra && mtmp.mextra.mgivenname || $c.peq(mtmp, u.usteed) ? SUPPRESS_SADDLE : 0;
-    return await x_monnam(mtmp, prefix, null, suppression_flag, 0);
+    suppression_flag = has_mgivenname(mtmp) || $c.peq(mtmp, u.usteed) ? SUPPRESS_SADDLE : 0;
+    return await x_monnam(mtmp, prefix, null, suppression_flag, FALSE);
 }
 export async function YMonnam(mtmp) {   // do_name.c:1133
     let bp = null, $t1;
@@ -726,12 +734,12 @@ export async function YMonnam(mtmp) {   // do_name.c:1133
 }
 export async function Adjmonnam(mtmp, adj) {   // do_name.c:1142
     let bp = null, $t1;
-    bp = await x_monnam(mtmp, ARTICLE_THE, adj, mtmp.mextra && mtmp.mextra.mgivenname ? SUPPRESS_SADDLE : 0, 0);
+    bp = await x_monnam(mtmp, ARTICLE_THE, adj, has_mgivenname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE);
     $t1 = highc(bp.get(0)), bp.set(0, $t1);
     return bp;
 }
 export async function a_monnam(mtmp) {   // do_name.c:1152
-    return await x_monnam(mtmp, ARTICLE_A, null, mtmp.mextra && mtmp.mextra.mgivenname ? SUPPRESS_SADDLE : 0, 0);
+    return await x_monnam(mtmp, ARTICLE_A, null, has_mgivenname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE);
 }
 export async function Amonnam(mtmp) {   // do_name.c:1159
     let bp = null, $t1;
@@ -740,7 +748,7 @@ export async function Amonnam(mtmp) {   // do_name.c:1159
     return bp;
 }
 export async function distant_monnam(mon, article, outbuf) {   // do_name.c:1170
-    if ($c.peq(mon.data, $c.relem(mons, PM_HIGH_CLERIC)) && !(u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic)) && ((svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level)) && !(dist2(mon.mx, mon.my, u.ux, u.uy) <= 2)) {
+    if ($c.peq(mon.data, $c.relem(mons, PM_HIGH_CLERIC)) && !Hallucination() && ((svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level)) && !(dist2(mon.mx, mon.my, u.ux, u.uy) <= 2)) {
         $c.__builtin___strcpy_chk(outbuf, article === 1 ? $c.lit("the ") : $c.lit(""), -1);
         $c.__builtin___strcat_chk(outbuf, mon.female | 0 ? $c.lit("high priestess") : $c.lit("high priest"), -1);
     } else {
@@ -818,7 +826,7 @@ export function Mgender(mtmp) {   // do_name.c:1289
     let mgender = 0;
     mgender = MALE;
     if ($c.peq(mtmp, gy.youmonst)) {
-        if (u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female) {
+        if (Upolyd() ? u.mfemale | 0 : flags.female) {
             mgender = FEMALE;
         }
     } else if (mtmp.female) {
@@ -837,7 +845,7 @@ export function mon_pmname(mon) {   // do_name.c:1313
 }
 export async function obj_pmname(obj) {   // do_name.c:1321
     let cgend = 0, mgend = 0, mndx = 0;
-    if ((obj.otyp === CORPSE || obj.otyp === STATUE || obj.otyp === FIGURINE) && (obj.corpsenm >= LOW_PM && obj.corpsenm < NUMMONS)) {
+    if ((obj.otyp === CORPSE || obj.otyp === STATUE || obj.otyp === FIGURINE) && ismnum(obj.corpsenm)) {
         cgend = obj.spe & CORPSTAT_GENDER;
         mgend = cgend === CORPSTAT_MALE ? MALE : cgend === CORPSTAT_FEMALE ? FEMALE : NEUTRAL;
         mndx = obj.corpsenm;
@@ -873,7 +881,7 @@ export async function rndmonnam(code) {   // do_name.c:1389
     }
     do {
         name = rn2_on_display_rng(SPECIAL_PM + BOGUSMONSIZE - LOW_PM) + LOW_PM | 0;
-    } while (name < SPECIAL_PM && ($c.andu64($c.relem(mons, name).mflags2, M2_PNAME) !== 0 || mons[name].geno & G_NOGEN));
+    } while (name < SPECIAL_PM && (type_is_pname($c.relem(mons, name)) || mons[name].geno & G_NOGEN));
     if (name >= SPECIAL_PM) {
         mnam = await bogusmon(new $c.Ptr(rndmonnam$buf, 0), code);
     } else {
@@ -883,9 +891,9 @@ export async function rndmonnam(code) {   // do_name.c:1389
 }
 export function bogon_is_pname(code) {   // do_name.c:1415
     if (!code) {
-        return 0;
+        return FALSE;
     }
-    return $c.i8($c.strchr($c.lit("-+="), code) ? 1 : 0);
+    return $c.i8($c.strchr($c.lit("-+="), code) ? TRUE : FALSE);
 }
 export function roguename() {   // do_name.c:1424
     let i = null, opts = null, j = null;
@@ -902,16 +910,16 @@ export function roguename() {   // do_name.c:1424
     return rn2(3) ? rn2(2) ? $c.lit("Michael Toy") : $c.lit("Kenneth Arnold") : $c.lit("Glenn Wichman");
 }
 export function hcolor(colorpref) {   // do_name.c:1461
-    return u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) || !colorpref ? hcolors[rn2_on_display_rng(74)] : colorpref;
+    return Hallucination() || !colorpref ? hcolors[rn2_on_display_rng(74)] : colorpref;
 }
 export function rndcolor() {   // do_name.c:1470
     let k = 0;
     k = rn2(16);
-    return u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? hcolor(null) : k === NO_COLOR ? $c.lit("colorless") : c_obj_colors[k];
+    return Hallucination() ? hcolor(null) : k === NO_COLOR ? $c.lit("colorless") : c_obj_colors[k];
 }
 export function hliquid(liquidpref) {   // do_name.c:1493
     let hallucinate = 0, indx = 0, count = 0;
-    hallucinate = $c.i8(u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) && !program_state.gameover ? 1 : 0);
+    hallucinate = $c.i8(Hallucination() && !program_state.gameover ? 1 : 0);
     if (hallucinate || !liquidpref || !liquidpref.get(0)) {
         count = 40;
         if (liquidpref && liquidpref.get(0)) {
@@ -954,13 +962,13 @@ export async function christen_orc(mtmp, gang, other) {   // do_name.c:1557
         sz = sz + $c.i32($c.strlen(other)) | 0;
     }
     if (sz < BUFSZ) {
-        nameit = 0;
+        nameit = FALSE;
         if (gang) {
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s of %s"), upstart(orcname), upstart($c.__builtin___strcpy_chk(new $c.Ptr(gbuf, 0), gang, 256)));
-            nameit = 1;
+            nameit = TRUE;
         } else if (other) {
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s%s"), upstart(orcname), other);
-            nameit = 1;
+            nameit = TRUE;
         }
         if (nameit) {
             mtmp = await christen_monst(mtmp, new $c.Ptr(buf, 0));

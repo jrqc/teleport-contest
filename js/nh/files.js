@@ -13,11 +13,14 @@ import { In_quest, Is_special, maxledgerno } from './dungeon.js';
 import { LFILE_EXISTS, MIGR_NOBREAK, MIGR_NOSCATTER, MIGR_WITH_HERO } from './dungeon.h.js';
 import { after_opt_showpaths } from './earlyarg.js';
 import { nh_terminate } from './end.js';
-import { BUFSZ, PL_NSIZ } from './global.h.js';
+import { discover, wizard } from './flag.macros.js';
+import { BUFSZ, PL_NSIZ_PLUS } from './global.h.js';
+import { strcmpi } from './global.macros.js';
 import { inv_cnt } from './hack.js';
 import { BONESPREFIX, COUNTING, FREEING, HACKPREFIX, LEVELPREFIX, NHF_BONESFILE, NHF_LEVELFILE, NHF_SAVEFILE, READING, SAVEPREFIX, SCOREPREFIX, SF_CRITICAL_BYTE_COUNT_MISMATCH, SF_DM_I32LP64_ON_IL32LLP64, SF_DM_I32LP64_ON_ILP32LL64, SF_DM_IL32LLP64_ON_I32LP64, SF_DM_IL32LLP64_ON_ILP32LL64, SF_DM_ILP32LL64_ON_I32LP64, SF_DM_ILP32LL64_ON_IL32LLP64, SF_DM_MISMATCH, SF_OUTDATED, SF_UPTODATE, SYSCONFPREFIX, TROUBLEPREFIX, WRITING, exportascii, historical, invlet_basic } from './hack.h.js';
 import { c_eos, copynchars, eos, fuzzymatch, mungspaces, nh_snprintf, s_suffix, strip_newline, strncmpi } from './hacklib.js';
 import { addinv, merge_choice } from './invent.js';
+import { nhUse } from './lint.macros.js';
 import { add_to_migration } from './mkobj.js';
 import { PM_CLERIC } from './monsters.h.js';
 import { l_nhcore_done } from './nhlua.js';
@@ -38,8 +41,8 @@ import { FCMASK } from './unixconf.h.js';
 import { sethanguphandler } from './unixmain.js';
 import { regularize } from './unixunix.js';
 import { validate, version_string } from './version.js';
-import { windowprocs } from './windows.js';
-import { NHW_MENU } from './wintype.h.js';
+import { create_nhwindow, destroy_nhwindow, display_nhwindow, putmsghistory, putstr, raw_print, wait_synch } from './winprocs.macros.js';
+import { NHW_MENU, WIN_ERR } from './wintype.h.js';
 import { wish_history_add } from './zap.js';
 
 const O_BINARY = 0;
@@ -175,7 +178,7 @@ export async function init_nhfile(nhfp) {   // files.c:461
     nhfp.structlevel = 1;
     nhfp.fieldlevel = 0;
     nhfp.addinfo = 0;
-    nhfp.bendian = $c.i8($c.retype(new $c.Ptr(bei, 0), Int8Array).get(0) === 0 ? 1 : 0);
+    nhfp.bendian = $c.i8(IS_BIGENDIAN());
     nhfp.fplog = null;
     nhfp.fpdebug = null;
     $t1 = nhfp.wcount = 0, nhfp.rcount = $t1;
@@ -418,7 +421,7 @@ export async function commit_bonesfile(lev) {   // files.c:915
     tempname = set_bonestemp_name();
     tempname = fqname(tempname, BONESPREFIX, 1);
     ret = $c.rename(tempname, fq_bones);
-    if (flags.debug && ret !== 0) {
+    if (wizard() && ret !== 0) {
         await pline($c.lit("couldn't rename %s to %s."), tempname, fq_bones);
     }
 }
@@ -518,7 +521,7 @@ export async function create_savefile() {   // files.c:1159
         nhfp.ftype = NHF_SAVEFILE;
         nhfp.mode = WRITING;
         if (program_state.in_self_recover || do_historical) {
-            do_historical;
+            nhUse(do_historical);
             nhfp.structlevel = 1;
             nhfp.fieldlevel = 0;
             nhfp.addinfo = 0;
@@ -544,7 +547,7 @@ export async function open_savefile() {   // files.c:1217
         nhfp.mode = READING;
         if (program_state.in_self_recover || do_historical) {
             do_historical = 1;
-            do_historical;
+            nhUse(do_historical);
             nhfp.structlevel = 1;
             nhfp.fieldlevel = 0;
             nhfp.addinfo = 0;
@@ -628,7 +631,7 @@ export async function plname_from_file(filename, without_wait_synch_per_file) { 
     await nh_uncompress(new $c.Ptr(gs.SAVEF, 0));
     if ((nhfp = await open_savefile()) !== null) {
         if ((sfstatus = await validate(nhfp, filename, without_wait_synch_per_file)) === SF_UPTODATE) {
-            ln = PL_NSIZ + 4 * (1 + 3) + 1;
+            ln = PL_NSIZ_PLUS;
             result = $c.asArr($c.__builtin___memset_chk(await alloc(ln), 0, ln, -1), Int8Array);
             await get_plname_from_file(nhfp, result, 0);
         }
@@ -732,9 +735,9 @@ async function problematic_savefile(sfstatus, savefilenm) {   // files.c:2015
     return nhfp;
 }
 function doconvert_file(filename, sfstatus, unconvert) {   // files.c:2062
-    filename;
-    sfstatus;
-    unconvert;
+    nhUse(filename);
+    nhUse(sfstatus);
+    nhUse(unconvert);
     return 1;
 }
 export function nh_sfconvert(filename) {   // files.c:2072
@@ -842,7 +845,7 @@ export async function lock_file(filename, whichprefix, retryct) {   // files.c:2
             $c.sleep(1);
         } else {
             if (!program_state.done_hup) {
-                await windowprocs.win_raw_print($c.lit("I give up.  Sorry."));
+                await raw_print()($c.lit("I give up.  Sorry."));
             }
             if (!program_state.done_hup) {
                 await raw_printf($c.lit("Some other process has an unnatural grip on %s."), filename);
@@ -878,12 +881,12 @@ async function fopen_wizkit_file() {   // files.c:2465
     }
     if ($c.access(new $c.Ptr(gw.wizkit, 0), 4) === -1) {
         await raw_printf($c.lit("Access to %s denied (%d)."), new $c.Ptr(gw.wizkit, 0), $c.__error().get(0));
-        await windowprocs.win_wait_synch();
+        await wait_synch()();
     } else if ((fp = $c.fopen(new $c.Ptr(gw.wizkit, 0), $c.lit("r"))) !== null) {
         return fp;
     } else {
         await raw_printf($c.lit("Couldn't open requested wizkit file %s (%d)."), new $c.Ptr(gw.wizkit, 0), $c.__error().get(0));
-        await windowprocs.win_wait_synch();
+        await wait_synch()();
     }
     envp = nh_getenv($c.lit("HOME"));
     if (envp) {
@@ -895,7 +898,7 @@ async function fopen_wizkit_file() {   // files.c:2465
         return fp;
     } else if ($c.__error().get(0) !== 2) {
         await raw_printf($c.lit("Couldn't open default gw.wizkit file %s (%d)."), new $c.Ptr(tmp_wizkit, 0), $c.__error().get(0));
-        await windowprocs.win_wait_synch();
+        await wait_synch()();
     }
     return null;
 }
@@ -935,7 +938,7 @@ export async function proc_wizkit_line(buf) {   // files.c:2562
 }
 export async function read_wizkit() {   // files.c:2584
     let fp = null;
-    if (!flags.debug || !(fp = await fopen_wizkit_file())) {
+    if (!wizard() || !(fp = await fopen_wizkit_file())) {
         return;
     }
     program_state.wizkit_wishing = 1;
@@ -991,7 +994,7 @@ export async function check_recordfile(dir) {   // files.c:2689
         await nhclose(fd);
     } else {
         await raw_printf($c.lit("Warning: cannot write scoreboard file '%s'"), fq_record);
-        await windowprocs.win_wait_synch();
+        await wait_synch()();
     }
 }
 export function paniclog(type, reason) {   // files.c:2801
@@ -1002,7 +1005,7 @@ export function paniclog(type, reason) {   // files.c:2801
         if (lfile) {
             now = getnow();
             uid = $c.getuid() | 0;
-            playmode = $c.i8(flags.debug ? 68 : flags.explore ? 88 : 45);
+            playmode = $c.i8(wizard() ? 68 : discover() ? 88 : 45);
             $c.fprintf(lfile, $c.lit("%s %08ld %06ld %d %c: %s %s\n"), version_string(new $c.Ptr(buf, 0), 256), yyyymmdd(now), hhmmss(now), uid, playmode, type, reason);
             $c.fclose(lfile);
         }
@@ -1035,7 +1038,7 @@ export async function do_deferred_showpaths(code) {   // files.c:3090
 }
 export function debugcore(filename, wildcards) {   // files.c:3126
     let debugfiles = null, p = null, l = 0;
-    if (!flags.debug) {
+    if (!wizard()) {
         return 0;
     }
     if (!filename || !filename.get(0)) {
@@ -1077,7 +1080,7 @@ export async function reveal_paths(code) {   // files.c:3175
     buf[0] = 0;
     envp = $c.getcwd(new $c.Ptr(cwdbuf, 0), 1024);
     if (envp) {
-        await windowprocs.win_raw_print($c.lit("The loadable symbols file:"));
+        await raw_print()($c.lit("The loadable symbols file:"));
         await raw_printf($c.lit("    \"%s/%s\""), envp, $c.lit("symbols"));
     }
     buf[0] = 0;
@@ -1105,9 +1108,9 @@ export async function reveal_paths(code) {   // files.c:3175
         }
     }
     await raw_printf($c.lit("    \"%s\""), new $c.Ptr(buf, 0));
-    await windowprocs.win_raw_print($c.lit(""));
-    skip_sysopt;
-    nodumpreason;
+    await raw_print()($c.lit(""));
+    nhUse(skip_sysopt);
+    nhUse(nodumpreason);
 }
 function choose_passage(passagecnt, oid) {   // files.c:3431
     let idx = 0, res = 0, i = 0, range = 0, limit = 0, $t1, $t2;
@@ -1147,7 +1150,7 @@ export async function read_tribute(tribsection, tribtitle, tribpassage, nowin_bu
     badtranslation = $c.lit("an incomprehensible foreign translation");
     matchedsection = 0;
     matchedtitle = 0;
-    tribwin = -1;
+    tribwin = WIN_ERR;
     grasped = 0;
     foundpassage = 0;
     if (nowin_buf) {
@@ -1183,7 +1186,7 @@ export async function read_tribute(tribsection, tribtitle, tribpassage, nowin_bu
                     if (!strncmpi(new $c.Ptr(line, 1), $c.lit("section "), 8)) {
                         st = new $c.Ptr(line, 9);
                         scope = SECTIONSCOPE;
-                        matchedsection = $c.i8(!strncmpi(st, tribsection, -1) ? 1 : 0);
+                        matchedsection = $c.i8(!strcmpi(st, tribsection) ? 1 : 0);
                     } else if (!strncmpi(new $c.Ptr(line, 1), $c.lit("title "), 6)) {
                         st$2 = new $c.Ptr(line, 7);
                         if ((p1 = $c.strchr(st$2, 40)) !== null) {
@@ -1193,7 +1196,7 @@ export async function read_tribute(tribsection, tribtitle, tribpassage, nowin_bu
                                 p2.set(0, 0);
                                 passagecnt = $c.atoi(p1);
                                 scope = TITLESCOPE;
-                                if (matchedsection && !strncmpi(st$2, tribtitle, -1)) {
+                                if (matchedsection && !strcmpi(st$2, tribtitle)) {
                                     matchedtitle = 1;
                                     targetpassage = !tribpassage ? choose_passage(passagecnt, oid) : tribpassage <= passagecnt ? tribpassage : 0;
                                 } else {
@@ -1211,8 +1214,8 @@ export async function read_tribute(tribsection, tribtitle, tribpassage, nowin_bu
                             if (matchedtitle && passagenum === targetpassage) {
                                 foundpassage = 1;
                                 if (!nowin_buf) {
-                                    tribwin = await windowprocs.win_create_nhwindow(NHW_MENU);
-                                    if (tribwin === -1) {
+                                    tribwin = await create_nhwindow()(NHW_MENU);
+                                    if (tribwin === WIN_ERR) {
                                         break cleanup$;
                                     }
                                 }
@@ -1246,7 +1249,7 @@ export async function read_tribute(tribsection, tribtitle, tribpassage, nowin_bu
                 default:
                     if (foundpassage) {
                         if (!nowin_buf) {
-                            await windowprocs.win_putstr(tribwin, 0, new $c.Ptr(line, 0));
+                            await putstr()(tribwin, 0, new $c.Ptr(line, 0));
                             if (new $c.Ptr(line, 0).get(0)) {
                                 $c.__builtin___strcpy_chk(new $c.Ptr(lastline, 0), new $c.Ptr(line, 0), 256);
                             }
@@ -1262,9 +1265,9 @@ export async function read_tribute(tribsection, tribtitle, tribpassage, nowin_bu
     if (nowin_buf) {
         grasped = $c.i8(nowin_buf.get(0) ? 1 : 0);
     } else {
-        if (tribwin !== -1) {
+        if (tribwin !== WIN_ERR) {
             if (new $c.Ptr(lastline, 0).get(0)) {
-                await windowprocs.win_display_nhwindow(tribwin, 0);
+                await display_nhwindow()(tribwin, 0);
                 if ($c.strchr(new $c.Ptr(lastline, 0), 91)) {
                     mungspaces(new $c.Ptr(lastline, 0));
                 } else {
@@ -1273,10 +1276,10 @@ export async function read_tribute(tribsection, tribtitle, tribpassage, nowin_bu
                 if ((p = $c.strrchr(new $c.Ptr(lastline, 0), 93)) !== null) {
                     $c.__builtin___sprintf_chk(p, 0, -1, $c.lit("; passage #%d]"), targetpassage);
                 }
-                await windowprocs.win_putmsghistory(new $c.Ptr(lastline, 0), 0);
+                await putmsghistory()(new $c.Ptr(lastline, 0), 0);
                 grasped = 1;
             }
-            await windowprocs.win_destroy_nhwindow(tribwin);
+            await destroy_nhwindow()(tribwin);
         }
         if (!grasped) {
             await pline($c.lit("It seems to be %s of \"%s\"!"), badtranslation, tribtitle);
@@ -1307,6 +1310,9 @@ export async function livelog_add(ll_type, str) {   // files.c:3667
         $c.fclose(livelogfile);
         await unlock_file($c.lit("livelog"));
     }
+}
+function IS_BIGENDIAN() {
+    return $c.retype(new $c.Ptr(bei, 0), Int8Array).get(0) === 0 ? 1 : 0;
 }
 
 export function $init() {

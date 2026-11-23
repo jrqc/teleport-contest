@@ -5,10 +5,11 @@ import { $G } from './globals.js';
 import { program_state } from './decl.js';
 import { nh_terminate, panic } from './end.js';
 import { delete_savefile, nhclose } from './files.js';
+import { FALSE, TRUE } from './global.h.js';
 import { impossible, pline } from './pline.js';
 import { norm_ptrs_any, norm_ptrs_arti_info, norm_ptrs_branch, norm_ptrs_bubble, norm_ptrs_cemetery, norm_ptrs_context_info, norm_ptrs_d_level, norm_ptrs_damage, norm_ptrs_dest_area, norm_ptrs_dgn_topology, norm_ptrs_dungeon, norm_ptrs_ebones, norm_ptrs_edog, norm_ptrs_egd, norm_ptrs_emin, norm_ptrs_engr, norm_ptrs_epri, norm_ptrs_eshk, norm_ptrs_fe, norm_ptrs_flag, norm_ptrs_fruit, norm_ptrs_gamelog_line, norm_ptrs_kinfo, norm_ptrs_levelflags, norm_ptrs_linfo, norm_ptrs_ls_t, norm_ptrs_mapseen_feat, norm_ptrs_mapseen_flags, norm_ptrs_mapseen_rooms, norm_ptrs_mkroom, norm_ptrs_monst, norm_ptrs_mvitals, norm_ptrs_nhcoord, norm_ptrs_nhrect, norm_ptrs_obj, norm_ptrs_objclass, norm_ptrs_q_score, norm_ptrs_rm, norm_ptrs_s_level, norm_ptrs_spell, norm_ptrs_stairway, norm_ptrs_trap, norm_ptrs_version_info, norm_ptrs_you } from './sfbase.js';
 import { error } from './unixtty.js';
-import { windowprocs } from './windows.js';
+import { display_nhwindow } from './winprocs.macros.js';
 
 const MAXFD = 5;
 const NOFLG = 0;
@@ -31,7 +32,7 @@ export async function historical_sfi_arti_info(nhfp, d_arti_info, myname) {   //
     await mread(nhfp.fd, d_arti_info, 4);
     norm_ptrs_arti_info(d_arti_info);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_nhrect(nhfp, d_nhrect, myname) {   // sfmacros.h:10
@@ -45,7 +46,7 @@ export async function historical_sfi_nhrect(nhfp, d_nhrect, myname) {   // sfmac
     await mread(nhfp.fd, d_nhrect, 8);
     norm_ptrs_nhrect(d_nhrect);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_branch(nhfp, d_branch, myname) {   // sfmacros.h:11
@@ -59,7 +60,7 @@ export async function historical_sfi_branch(nhfp, d_branch, myname) {   // sfmac
     await mread(nhfp.fd, d_branch, 32);
     norm_ptrs_branch(d_branch);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_bubble(nhfp, d_bubble, myname) {   // sfmacros.h:12
@@ -73,7 +74,7 @@ export async function historical_sfi_bubble(nhfp, d_bubble, myname) {   // sfmac
     await mread(nhfp.fd, d_bubble, 40);
     norm_ptrs_bubble(d_bubble);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_cemetery(nhfp, d_cemetery, myname) {   // sfmacros.h:13
@@ -87,7 +88,7 @@ export async function historical_sfi_cemetery(nhfp, d_cemetery, myname) {   // s
     await mread(nhfp.fd, d_cemetery, 184);
     norm_ptrs_cemetery(d_cemetery);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_context_info(nhfp, d_context_info, myname) {   // sfmacros.h:14
@@ -101,7 +102,7 @@ export async function historical_sfi_context_info(nhfp, d_context_info, myname) 
     await mread(nhfp.fd, d_context_info, 704);
     norm_ptrs_context_info(d_context_info);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_nhcoord(nhfp, d_nhcoord, myname) {   // sfmacros.h:15
@@ -115,7 +116,7 @@ export async function historical_sfi_nhcoord(nhfp, d_nhcoord, myname) {   // sfm
     await mread(nhfp.fd, d_nhcoord, 4);
     norm_ptrs_nhcoord(d_nhcoord);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_damage(nhfp, d_damage, myname) {   // sfmacros.h:16
@@ -129,7 +130,7 @@ export async function historical_sfi_damage(nhfp, d_damage, myname) {   // sfmac
     await mread(nhfp.fd, d_damage, 32);
     norm_ptrs_damage(d_damage);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_dest_area(nhfp, d_dest_area, myname) {   // sfmacros.h:17
@@ -143,7 +144,7 @@ export async function historical_sfi_dest_area(nhfp, d_dest_area, myname) {   //
     await mread(nhfp.fd, d_dest_area, 16);
     norm_ptrs_dest_area(d_dest_area);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_dgn_topology(nhfp, d_dgn_topology, myname) {   // sfmacros.h:18
@@ -157,7 +158,7 @@ export async function historical_sfi_dgn_topology(nhfp, d_dgn_topology, myname) 
     await mread(nhfp.fd, d_dgn_topology, 114);
     norm_ptrs_dgn_topology(d_dgn_topology);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_dungeon(nhfp, d_dungeon, myname) {   // sfmacros.h:19
@@ -171,7 +172,7 @@ export async function historical_sfi_dungeon(nhfp, d_dungeon, myname) {   // sfm
     await mread(nhfp.fd, d_dungeon, 92);
     norm_ptrs_dungeon(d_dungeon);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_d_level(nhfp, d_d_level, myname) {   // sfmacros.h:20
@@ -185,7 +186,7 @@ export async function historical_sfi_d_level(nhfp, d_d_level, myname) {   // sfm
     await mread(nhfp.fd, d_d_level, 4);
     norm_ptrs_d_level(d_d_level);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_ebones(nhfp, d_ebones, myname) {   // sfmacros.h:21
@@ -199,7 +200,7 @@ export async function historical_sfi_ebones(nhfp, d_ebones, myname) {   // sfmac
     await mread(nhfp.fd, d_ebones, 28);
     norm_ptrs_ebones(d_ebones);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_edog(nhfp, d_edog, myname) {   // sfmacros.h:22
@@ -213,7 +214,7 @@ export async function historical_sfi_edog(nhfp, d_edog, myname) {   // sfmacros.
     await mread(nhfp.fd, d_edog, 64);
     norm_ptrs_edog(d_edog);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_egd(nhfp, d_egd, myname) {   // sfmacros.h:23
@@ -227,7 +228,7 @@ export async function historical_sfi_egd(nhfp, d_egd, myname) {   // sfmacros.h:
     await mread(nhfp.fd, d_egd, 640);
     norm_ptrs_egd(d_egd);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_emin(nhfp, d_emin, myname) {   // sfmacros.h:24
@@ -241,7 +242,7 @@ export async function historical_sfi_emin(nhfp, d_emin, myname) {   // sfmacros.
     await mread(nhfp.fd, d_emin, 8);
     norm_ptrs_emin(d_emin);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_engr(nhfp, d_engr, myname) {   // sfmacros.h:25
@@ -255,7 +256,7 @@ export async function historical_sfi_engr(nhfp, d_engr, myname) {   // sfmacros.
     await mread(nhfp.fd, d_engr, 64);
     norm_ptrs_engr(d_engr);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_epri(nhfp, d_epri, myname) {   // sfmacros.h:26
@@ -269,7 +270,7 @@ export async function historical_sfi_epri(nhfp, d_epri, myname) {   // sfmacros.
     await mread(nhfp.fd, d_epri, 56);
     norm_ptrs_epri(d_epri);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_eshk(nhfp, d_eshk, myname) {   // sfmacros.h:27
@@ -283,7 +284,7 @@ export async function historical_sfi_eshk(nhfp, d_eshk, myname) {   // sfmacros.
     await mread(nhfp.fd, d_eshk, 4960);
     norm_ptrs_eshk(d_eshk);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_fe(nhfp, d_fe, myname) {   // sfmacros.h:28
@@ -297,7 +298,7 @@ export async function historical_sfi_fe(nhfp, d_fe, myname) {   // sfmacros.h:28
     await mread(nhfp.fd, d_fe, 48);
     norm_ptrs_fe(d_fe);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_flag(nhfp, d_flag, myname) {   // sfmacros.h:29
@@ -311,7 +312,7 @@ export async function historical_sfi_flag(nhfp, d_flag, myname) {   // sfmacros.
     await mread(nhfp.fd, d_flag, 208);
     norm_ptrs_flag(d_flag);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_fruit(nhfp, d_fruit, myname) {   // sfmacros.h:30
@@ -325,7 +326,7 @@ export async function historical_sfi_fruit(nhfp, d_fruit, myname) {   // sfmacro
     await mread(nhfp.fd, d_fruit, 48);
     norm_ptrs_fruit(d_fruit);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_gamelog_line(nhfp, d_gamelog_line, myname) {   // sfmacros.h:31
@@ -339,7 +340,7 @@ export async function historical_sfi_gamelog_line(nhfp, d_gamelog_line, myname) 
     await mread(nhfp.fd, d_gamelog_line, 32);
     norm_ptrs_gamelog_line(d_gamelog_line);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_kinfo(nhfp, d_kinfo, myname) {   // sfmacros.h:32
@@ -353,7 +354,7 @@ export async function historical_sfi_kinfo(nhfp, d_kinfo, myname) {   // sfmacro
     await mread(nhfp.fd, d_kinfo, 272);
     norm_ptrs_kinfo(d_kinfo);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_levelflags(nhfp, d_levelflags, myname) {   // sfmacros.h:33
@@ -367,7 +368,7 @@ export async function historical_sfi_levelflags(nhfp, d_levelflags, myname) {   
     await mread(nhfp.fd, d_levelflags, 16);
     norm_ptrs_levelflags(d_levelflags);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_ls_t(nhfp, d_ls_t, myname) {   // sfmacros.h:34
@@ -381,7 +382,7 @@ export async function historical_sfi_ls_t(nhfp, d_ls_t, myname) {   // sfmacros.
     await mread(nhfp.fd, d_ls_t, 32);
     norm_ptrs_ls_t(d_ls_t);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_linfo(nhfp, d_linfo, myname) {   // sfmacros.h:35
@@ -395,7 +396,7 @@ export async function historical_sfi_linfo(nhfp, d_linfo, myname) {   // sfmacro
     await mread(nhfp.fd, d_linfo, 1);
     norm_ptrs_linfo(d_linfo);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_mapseen_feat(nhfp, d_mapseen_feat, myname) {   // sfmacros.h:36
@@ -409,7 +410,7 @@ export async function historical_sfi_mapseen_feat(nhfp, d_mapseen_feat, myname) 
     await mread(nhfp.fd, d_mapseen_feat, 4);
     norm_ptrs_mapseen_feat(d_mapseen_feat);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_mapseen_flags(nhfp, d_mapseen_flags, myname) {   // sfmacros.h:37
@@ -423,7 +424,7 @@ export async function historical_sfi_mapseen_flags(nhfp, d_mapseen_flags, myname
     await mread(nhfp.fd, d_mapseen_flags, 4);
     norm_ptrs_mapseen_flags(d_mapseen_flags);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_mapseen_rooms(nhfp, d_mapseen_rooms, myname) {   // sfmacros.h:38
@@ -437,7 +438,7 @@ export async function historical_sfi_mapseen_rooms(nhfp, d_mapseen_rooms, myname
     await mread(nhfp.fd, d_mapseen_rooms, 4);
     norm_ptrs_mapseen_rooms(d_mapseen_rooms);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_mkroom(nhfp, d_mkroom, myname) {   // sfmacros.h:39
@@ -451,7 +452,7 @@ export async function historical_sfi_mkroom(nhfp, d_mkroom, myname) {   // sfmac
     await mread(nhfp.fd, d_mkroom, 224);
     norm_ptrs_mkroom(d_mkroom);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_monst(nhfp, d_monst, myname) {   // sfmacros.h:40
@@ -465,7 +466,7 @@ export async function historical_sfi_monst(nhfp, d_monst, myname) {   // sfmacro
     await mread(nhfp.fd, d_monst, 192);
     norm_ptrs_monst(d_monst);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_mvitals(nhfp, d_mvitals, myname) {   // sfmacros.h:41
@@ -479,7 +480,7 @@ export async function historical_sfi_mvitals(nhfp, d_mvitals, myname) {   // sfm
     await mread(nhfp.fd, d_mvitals, 4);
     norm_ptrs_mvitals(d_mvitals);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_obj(nhfp, d_obj, myname) {   // sfmacros.h:42
@@ -493,7 +494,7 @@ export async function historical_sfi_obj(nhfp, d_obj, myname) {   // sfmacros.h:
     await mread(nhfp.fd, d_obj, 112);
     norm_ptrs_obj(d_obj);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_objclass(nhfp, d_objclass, myname) {   // sfmacros.h:43
@@ -507,7 +508,7 @@ export async function historical_sfi_objclass(nhfp, d_objclass, myname) {   // s
     await mread(nhfp.fd, d_objclass, 72);
     norm_ptrs_objclass(d_objclass);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_q_score(nhfp, d_q_score, myname) {   // sfmacros.h:44
@@ -521,7 +522,7 @@ export async function historical_sfi_q_score(nhfp, d_q_score, myname) {   // sfm
     await mread(nhfp.fd, d_q_score, 8);
     norm_ptrs_q_score(d_q_score);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_rm(nhfp, d_rm, myname) {   // sfmacros.h:45
@@ -535,7 +536,7 @@ export async function historical_sfi_rm(nhfp, d_rm, myname) {   // sfmacros.h:45
     await mread(nhfp.fd, d_rm, 8);
     norm_ptrs_rm(d_rm);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_spell(nhfp, d_spell, myname) {   // sfmacros.h:46
@@ -549,7 +550,7 @@ export async function historical_sfi_spell(nhfp, d_spell, myname) {   // sfmacro
     await mread(nhfp.fd, d_spell, 8);
     norm_ptrs_spell(d_spell);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_stairway(nhfp, d_stairway, myname) {   // sfmacros.h:47
@@ -563,7 +564,7 @@ export async function historical_sfi_stairway(nhfp, d_stairway, myname) {   // s
     await mread(nhfp.fd, d_stairway, 24);
     norm_ptrs_stairway(d_stairway);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_s_level(nhfp, d_s_level, myname) {   // sfmacros.h:48
@@ -577,7 +578,7 @@ export async function historical_sfi_s_level(nhfp, d_s_level, myname) {   // sfm
     await mread(nhfp.fd, d_s_level, 40);
     norm_ptrs_s_level(d_s_level);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_trap(nhfp, d_trap, myname) {   // sfmacros.h:49
@@ -591,7 +592,7 @@ export async function historical_sfi_trap(nhfp, d_trap, myname) {   // sfmacros.
     await mread(nhfp.fd, d_trap, 32);
     norm_ptrs_trap(d_trap);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_you(nhfp, d_you, myname) {   // sfmacros.h:50
@@ -605,7 +606,7 @@ export async function historical_sfi_you(nhfp, d_you, myname) {   // sfmacros.h:
     await mread(nhfp.fd, d_you, 2760);
     norm_ptrs_you(d_you);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_any(nhfp, d_any, myname) {   // sfmacros.h:51
@@ -619,7 +620,7 @@ export async function historical_sfi_any(nhfp, d_any, myname) {   // sfmacros.h:
     await mread(nhfp.fd, d_any, 8);
     norm_ptrs_any(d_any);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_aligntyp(nhfp, d_aligntyp, myname) {   // sfmacros.h:53
@@ -631,7 +632,7 @@ export async function historical_sfi_aligntyp(nhfp, d_aligntyp, myname) {   // s
     }
     await mread(nhfp.fd, d_aligntyp, 1);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_boolean(nhfp, d_boolean, myname) {   // sfmacros.h:54
@@ -643,7 +644,7 @@ export async function historical_sfi_boolean(nhfp, d_boolean, myname) {   // sfm
     }
     await mread(nhfp.fd, d_boolean, 1);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_coordxy(nhfp, d_coordxy, myname) {   // sfmacros.h:55
@@ -655,7 +656,7 @@ export async function historical_sfi_coordxy(nhfp, d_coordxy, myname) {   // sfm
     }
     await mread(nhfp.fd, d_coordxy, 2);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_int(nhfp, d_int, myname) {   // sfmacros.h:57
@@ -667,7 +668,7 @@ export async function historical_sfi_int(nhfp, d_int, myname) {   // sfmacros.h:
     }
     await mread(nhfp.fd, d_int, 4);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_int16(nhfp, d_int16, myname) {   // sfmacros.h:58
@@ -679,7 +680,7 @@ export async function historical_sfi_int16(nhfp, d_int16, myname) {   // sfmacro
     }
     await mread(nhfp.fd, d_int16, 2);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_int32(nhfp, d_int32, myname) {   // sfmacros.h:59
@@ -691,7 +692,7 @@ export async function historical_sfi_int32(nhfp, d_int32, myname) {   // sfmacro
     }
     await mread(nhfp.fd, d_int32, 4);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_int64(nhfp, d_int64, myname) {   // sfmacros.h:60
@@ -703,7 +704,7 @@ export async function historical_sfi_int64(nhfp, d_int64, myname) {   // sfmacro
     }
     await mread(nhfp.fd, d_int64, 8);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_long(nhfp, d_long, myname) {   // sfmacros.h:61
@@ -715,7 +716,7 @@ export async function historical_sfi_long(nhfp, d_long, myname) {   // sfmacros.
     }
     await mread(nhfp.fd, d_long, 8);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_schar(nhfp, d_schar, myname) {   // sfmacros.h:62
@@ -727,7 +728,7 @@ export async function historical_sfi_schar(nhfp, d_schar, myname) {   // sfmacro
     }
     await mread(nhfp.fd, d_schar, 1);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_short(nhfp, d_short, myname) {   // sfmacros.h:63
@@ -739,7 +740,7 @@ export async function historical_sfi_short(nhfp, d_short, myname) {   // sfmacro
     }
     await mread(nhfp.fd, d_short, 2);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_size_t(nhfp, d_size_t, myname) {   // sfmacros.h:64
@@ -751,7 +752,7 @@ export async function historical_sfi_size_t(nhfp, d_size_t, myname) {   // sfmac
     }
     await mread(nhfp.fd, d_size_t, 8);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_time_t(nhfp, d_time_t, myname) {   // sfmacros.h:65
@@ -763,7 +764,7 @@ export async function historical_sfi_time_t(nhfp, d_time_t, myname) {   // sfmac
     }
     await mread(nhfp.fd, d_time_t, 8);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_uchar(nhfp, d_uchar, myname) {   // sfmacros.h:66
@@ -775,7 +776,7 @@ export async function historical_sfi_uchar(nhfp, d_uchar, myname) {   // sfmacro
     }
     await mread(nhfp.fd, d_uchar, 1);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_uint16(nhfp, d_uint16, myname) {   // sfmacros.h:67
@@ -787,7 +788,7 @@ export async function historical_sfi_uint16(nhfp, d_uint16, myname) {   // sfmac
     }
     await mread(nhfp.fd, d_uint16, 2);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_uint32(nhfp, d_uint32, myname) {   // sfmacros.h:68
@@ -799,7 +800,7 @@ export async function historical_sfi_uint32(nhfp, d_uint32, myname) {   // sfmac
     }
     await mread(nhfp.fd, d_uint32, 4);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_uint64(nhfp, d_uint64, myname) {   // sfmacros.h:69
@@ -811,7 +812,7 @@ export async function historical_sfi_uint64(nhfp, d_uint64, myname) {   // sfmac
     }
     await mread(nhfp.fd, d_uint64, 8);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_ulong(nhfp, d_ulong, myname) {   // sfmacros.h:70
@@ -823,7 +824,7 @@ export async function historical_sfi_ulong(nhfp, d_ulong, myname) {   // sfmacro
     }
     await mread(nhfp.fd, d_ulong, 8);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_unsigned(nhfp, d_unsigned, myname) {   // sfmacros.h:71
@@ -835,7 +836,7 @@ export async function historical_sfi_unsigned(nhfp, d_unsigned, myname) {   // s
     }
     await mread(nhfp.fd, d_unsigned, 4);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_ushort(nhfp, d_ushort, myname) {   // sfmacros.h:72
@@ -847,7 +848,7 @@ export async function historical_sfi_ushort(nhfp, d_ushort, myname) {   // sfmac
     }
     await mread(nhfp.fd, d_ushort, 2);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_xint16(nhfp, d_xint16, myname) {   // sfmacros.h:73
@@ -859,7 +860,7 @@ export async function historical_sfi_xint16(nhfp, d_xint16, myname) {   // sfmac
     }
     await mread(nhfp.fd, d_xint16, 2);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_xint8(nhfp, d_xint8, myname) {   // sfmacros.h:74
@@ -871,7 +872,7 @@ export async function historical_sfi_xint8(nhfp, d_xint8, myname) {   // sfmacro
     }
     await mread(nhfp.fd, d_xint8, 1);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_version_info(nhfp, d_version_info, myname) {   // sfstruct.c:100
@@ -885,7 +886,7 @@ export async function historical_sfi_version_info(nhfp, d_version_info, myname) 
     await mread(nhfp.fd, d_version_info, 24);
     norm_ptrs_version_info(d_version_info);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_char(nhfp, d_char, myname, cnt) {   // sfstruct.c:106
@@ -894,7 +895,7 @@ export async function historical_sfo_char(nhfp, d_char, myname, cnt) {   // sfst
 export async function historical_sfi_char(nhfp, d_char, myname, cnt) {   // sfstruct.c:113
     await mread(nhfp.fd, d_char, $c.u32($c.mulu64($c.u64(cnt), 1)));
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_genericptr_t(nhfp, d_genericptr_t, myname) {   // sfstruct.c:130
@@ -906,7 +907,7 @@ export async function historical_sfi_genericptr_t(nhfp, d_genericptr_t, myname) 
     }
     await mread(nhfp.fd, d_genericptr_t, 8);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 export async function historical_sfo_bitfield(nhfp, d_bitfield, myname, bflen) {   // sfstruct.c:147
@@ -918,7 +919,7 @@ export async function historical_sfi_bitfield(nhfp, d_bitfield, myname, bflen) {
     }
     await mread(nhfp.fd, d_bitfield, 1);
     if (restoreinfo.mread_flags === -1) {
-        nhfp.eof = 1;
+        nhfp.eof = TRUE;
     }
 }
 function getidx(fd, flg) {   // sfstruct.c:384
@@ -944,9 +945,9 @@ function getidx(fd, flg) {   // sfstruct.c:384
 export function close_check(fd) {   // sfstruct.c:404
     let idx = 0, retval = 0;
     idx = getidx(fd, NOSLOT);
-    retval = 0;
+    retval = FALSE;
     if (idx >= 0) {
-        retval = 1;
+        retval = TRUE;
     }
     return retval;
 }
@@ -1033,7 +1034,7 @@ export async function mread(fd, buf, len) {   // sfstruct.c:549
             return;
         } else {
             await pline($c.lit("Read %d instead of %u bytes."), rlen | 0, len);
-            await windowprocs.win_display_nhwindow($G.WIN_MESSAGE, 1);
+            await display_nhwindow()($G.WIN_MESSAGE, TRUE);
             if (program_state.restoring) {
                 await nhclose(fd);
                 await delete_savefile();

@@ -9,24 +9,25 @@ import { SCROLL_CLASS, SPBOOK_CLASS } from './defsym.h.js';
 import { dropx } from './do.js';
 import { fingers_or_gloves } from './do_wear.js';
 import { wipeout_text } from './engrave.js';
-import { LL_CONDUCT, MAXULEV } from './global.h.js';
+import { FALSE, LL_CONDUCT, MAXULEV, TRUE } from './global.h.js';
 import { ECMD_CANCEL, ECMD_OK, ECMD_TIME, GETOBJ_DOWNPLAY, GETOBJ_EXCLUDE, GETOBJ_NOFLAGS, GETOBJ_SUGGEST } from './hack.h.js';
 import { mungspaces, strncmpi, strstri, upstart } from './hacklib.js';
 import { getobj, hold_another_object, update_inventory, useup } from './invent.js';
+import { nhUse } from './lint.macros.js';
 import { bcsign, mksobj } from './mkobj.js';
-import { M1_NOHANDS } from './monflag.h.js';
+import { nohands } from './mondata.macros.js';
 import { PM_WIZARD } from './monsters.h.js';
 import { discover_object, observe_object } from './o_init.js';
 import { obj_descr, objects } from './objects.js';
 import { SCR_AMNESIA, SCR_BLANK_PAPER, SCR_CHARGING, SCR_CONFUSE_MONSTER, SCR_CREATE_MONSTER, SCR_DESTROY_ARMOR, SCR_EARTH, SCR_ENCHANT_ARMOR, SCR_ENCHANT_WEAPON, SCR_FIRE, SCR_FOOD_DETECTION, SCR_GENOCIDE, SCR_GOLD_DETECTION, SCR_IDENTIFY, SCR_LIGHT, SCR_MAGIC_MAPPING, SCR_MAIL, SCR_PUNISHMENT, SCR_REMOVE_CURSE, SCR_SCARE_MONSTER, SCR_STINKING_CLOUD, SCR_TAMING, SCR_TELEPORTATION, SPE_BLANK_PAPER, SPE_BOOK_OF_THE_DEAD, SPE_NOVEL } from './objects.h.js';
 import { The, Tobjnam, an, aobjnam, ysimple_name } from './objnam.js';
 import { There, You, You_cant, Your, impossible, livelog_printf, pline, pline_The } from './pline.js';
-import { BLINDED, GLIB, HALLUC, HALLUC_RES } from './prop.h.js';
 import { rn2, rnl } from './rnd.js';
 import { check_unpaid, obfree } from './shk.js';
 import { known_spell } from './spell.js';
 import { spe_Fresh, spe_GoingStale, spe_Unknown } from './spell.h.js';
 import { getlin } from './windows.js';
+import { Blind, Glib, Hallucination } from './youprop.macros.js';
 
 const new_book_description$compositions = $c.nulls(4);   // static in new_book_description()
 async function cost(otmp) {   // write.c:14
@@ -83,12 +84,12 @@ export async function dowrite(pen) {   // write.c:74
     let paper = null, namebuf = new Int8Array(256), nm = null, bp = null, new_obj = null, basecost = 0, actualcost = 0, curseval = 0, qbuf = new Int8Array(128), first = 0, last = 0, i = 0, deferred = 0, deferralchance = 0, real = 0, by_descr = 0, typeword = null, spell_knowledge = 0, fanfic = 0, tearup = 0, $t1;
     namebuf.fill(0);
     namebuf[0] = 0;
-    by_descr = 0;
-    if ($c.andu64(gy.youmonst.data.mflags1, M1_NOHANDS) !== 0) {
+    by_descr = FALSE;
+    if (nohands(gy.youmonst.data)) {
         await You($c.lit("need hands to be able to write!"));
         return ECMD_OK;
-    } else if (u.uprops[GLIB].intrinsic) {
-        await pline($c.lit("%s from your %s."), await Tobjnam(pen, $c.lit("slip")), await fingers_or_gloves(0));
+    } else if (Glib()) {
+        await pline($c.lit("%s from your %s."), await Tobjnam(pen, $c.lit("slip")), await fingers_or_gloves(FALSE));
         await dropx(pen);
         return ECMD_TIME;
     }
@@ -97,7 +98,7 @@ export async function dowrite(pen) {   // write.c:74
         return ECMD_CANCEL;
     }
     typeword = paper.otyp === SPE_NOVEL ? $c.lit("book") : paper.oclass === SPBOOK_CLASS ? $c.lit("spellbook") : $c.lit("scroll");
-    if ((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked) {
+    if (Blind()) {
         if (!paper.dknown) {
             await You($c.lit("don't know whether that %s is blank or not."), typeword);
             return ECMD_OK;
@@ -109,10 +110,10 @@ export async function dowrite(pen) {   // write.c:74
     await observe_object(paper);
     if (paper.otyp !== SCR_BLANK_PAPER && paper.otyp !== SPE_BLANK_PAPER) {
         await pline($c.lit("That %s is not blank!"), typeword);
-        await exercise(A_WIS, 0);
+        await exercise(A_WIS, FALSE);
         return ECMD_TIME;
     }
-    await discover_object(SCR_BLANK_PAPER, 1, 1, 1);
+    await discover_object(SCR_BLANK_PAPER, TRUE, TRUE, TRUE);
     $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("What type of %s do you want to write?"), typeword);
     await getlin(new $c.Ptr(qbuf, 0), new $c.Ptr(namebuf, 0));
     mungspaces(new $c.Ptr(namebuf, 0));
@@ -150,14 +151,14 @@ export async function dowrite(pen) {   // write.c:74
                 }
             }
             if (!strncmpi(obj_descr[objects[i].oc_descr_idx].oc_descr, nm, -1)) {
-                by_descr = 1;
+                by_descr = TRUE;
                 break found$;
             }
         }
         for (i = first; i <= last; i = i + 1 | 0) {
             if (objects[i].oc_uname && !strncmpi(objects[i].oc_uname, nm, -1) && !(real && objects[i].oc_name_known | 0) && !rn2(deferralchance = deferralchance + 1 | 0)) {
                 deferred = i;
-                by_descr = 1;
+                by_descr = TRUE;
             }
         }
         if (deferred) {
@@ -175,9 +176,9 @@ export async function dowrite(pen) {   // write.c:74
         fanfic = $c.i8(!rn2(3) ? 1 : 0);
         tearup = $c.i8(!rn2(3) ? 1 : 0);
         if (!fanfic) {
-            await You($c.lit("%s to write the Great Yendorian Novel, but %s inspiration."), !tearup ? $c.lit("prepare") : $c.lit("try"), !(u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic)) ? $c.lit("lack") : $c.lit("have too much"));
+            await You($c.lit("%s to write the Great Yendorian Novel, but %s inspiration."), !tearup ? $c.lit("prepare") : $c.lit("try"), !Hallucination() ? $c.lit("lack") : $c.lit("have too much"));
         } else {
-            await You($c.lit("%sproduce really %s fan-fiction."), !tearup ? $c.lit("start to ") : $c.lit(""), !(u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic)) ? $c.lit("lame") : $c.lit("awesome"));
+            await You($c.lit("%sproduce really %s fan-fiction."), !tearup ? $c.lit("start to ") : $c.lit(""), !Hallucination() ? $c.lit("lame") : $c.lit("awesome"));
         }
         if (!tearup) {
             await You($c.lit("give up on the idea."));
@@ -196,7 +197,7 @@ export async function dowrite(pen) {   // write.c:74
     if (!($t1 = u.uconduct.literate, u.uconduct.literate = $c.add64($t1, 1), $t1)) {
         await livelog_printf(LL_CONDUCT, $c.lit("became literate by writing %s"), await an(typeword));
     }
-    new_obj = await mksobj(i, 0, 0);
+    new_obj = await mksobj(i, FALSE, FALSE);
     new_obj.bknown = ((paper.bknown | 0 && pen.bknown | 0 ? 1 : 0) >>> 0) & 1;
     await check_unpaid(pen);
     basecost = await cost(new_obj);
@@ -207,7 +208,7 @@ export async function dowrite(pen) {   // write.c:74
     }
     actualcost = rn2($c.div32(basecost, 2)) + $c.div32(basecost, 2) | 0;
     curseval = bcsign(pen) + bcsign(paper) | 0;
-    await exercise(A_WIS, 1);
+    await exercise(A_WIS, TRUE);
     if (pen.spe < actualcost) {
         pen.spe = 0;
         await Your($c.lit("marker dries out!"));
@@ -245,7 +246,7 @@ export async function dowrite(pen) {   // write.c:74
         await obfree(new_obj, null);
         return ECMD_TIME;
     }
-    if ((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked && rnl(3)) {
+    if (Blind() && rnl(3)) {
         await You($c.lit("fail to write the scroll correctly and it disappears."));
         await useup(paper);
         await obfree(new_obj, null);
@@ -260,12 +261,12 @@ export async function dowrite(pen) {   // write.c:74
     if (new_obj.otyp === SCR_MAIL) {
         new_obj.spe = 2;
     }
-    new_obj.dknown = (0) & 1;
+    new_obj.dknown = (FALSE) & 1;
     if (objects[new_obj.otyp].oc_name_known | 0 || by_descr) {
         await observe_object(new_obj);
     }
     new_obj = await hold_another_object(new_obj, $c.lit("Oops!  %s out of your grasp!"), await The(await aobjnam(new_obj, $c.lit("slip"))), null);
-    new_obj;
+    nhUse(new_obj);
     return ECMD_TIME;
 }
 function new_book_description(booktype, outbuf) {   // write.c:395

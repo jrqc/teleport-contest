@@ -4,55 +4,62 @@ import * as $T from './types.js';
 import { $G } from './globals.js';
 import { A_CHAOTIC, A_LAWFUL, A_NEUTRAL, A_NONE } from './align.h.js';
 import { timet_delta } from './allmain.js';
-import { is_art } from './artifact.js';
 import { ART_OGRESMASHER } from './artilist.h.js';
-import { acurr, attrname, from_what, stone_luck } from './attrib.js';
+import { attrname, from_what, stone_luck } from './attrib.js';
 import { A_CHA, A_CON, A_DEX, A_INT, A_STR, A_WIS } from './attrib.h.js';
+import { ACURR, ATTRMAX } from './attrib.macros.js';
 import { enc_stat, rank_of, rank_to_xlev } from './botl.js';
 import { getnow, midnight, night } from './calendar.js';
 import { yn_function } from './cmd.js';
 import { NO_COLOR } from './color.h.js';
 import { is_lava, is_pool, is_pool_or_lava } from './dbridge.js';
 import { c_common_strings, cg, flags, ga, gb, ge, gf, gg, gi, gu, gy, iflags, program_state, svc, svd, svk, svl, svm, svp, svs, u, urealtime, ynaqchars, ynqchars } from './decl.js';
-import { GEM_CLASS, S_DEMON, S_EEL, S_GHOST, S_GOLEM, S_HUMAN, S_LIZARD, S_VAMPIRE, S_ZOMBIE, WEAPON_CLASS } from './defsym.h.js';
+import { S_DEMON, S_EEL, S_GHOST, S_GOLEM, S_HUMAN, S_LIZARD, S_VAMPIRE, S_ZOMBIE } from './defsym.h.js';
 import { nul_glyphinfo } from './display.js';
 import { a_monnam, hliquid, pmname, x_monnam } from './do_name.js';
 import { find_ac, fingers_or_gloves, stuck_ring } from './do_wear.js';
 import { def_monsyms } from './drawing.js';
 import { In_quest, ceiling, depth, dunlev, endgamelevelname, has_ceiling, on_level, surface } from './dungeon.js';
+import { In_endgame } from './dungeon.macros.js';
 import { hu_stat, temp_resist } from './eat.js';
 import { newuexp } from './exper.js';
 import { debugcore } from './files.js';
 import { FULL_MOON, NEW_MOON } from './flag.h.js';
+import { discover, wizard } from './flag.macros.js';
 import { dxdy_to_dist_descr } from './getpos.js';
-import { LL_ACHIEVE, LL_ARTIFACT, LL_DIVINEGIFT, LL_DUMP, LL_GENOCIDE, LL_LIFESAVE, LL_MINORAC, LL_UMONST, LL_WISH } from './global.h.js';
+import { FALSE, LL_ACHIEVE, LL_DUMP, LL_MINORAC, LL_SPOILER, LL_UMONST, TRUE } from './global.h.js';
+import { strcmpi } from './global.macros.js';
 import { inv_weight, money_cnt, near_capacity } from './hack.js';
 import { ARTICLE_THE, ARTICLE_YOUR, BASICENLIGHTENMENT, ECMD_OK, ENL_GAMEINPROGRESS, ENL_GAMEOVERDEAD, EXT_ENCUMBER, HANDED, HVY_ENCUMBER, LEG, MAGICENLIGHTENMENT, MHID_ALTMON, MHID_ARTICLE, MHID_PREFIX, MHID_REGION, MOD_ENCUMBER, OVERLOADED, SLT_ENCUMBER, SUPPRESS_HALLUCINATION, SUPPRESS_SADDLE, UNENCUMBERED, VANQ_ALPHA_MIX, VANQ_ALPHA_SEP, VANQ_COUNT_H_L, VANQ_COUNT_L_H, VANQ_MCLS_HTOL, VANQ_MCLS_LTOH, VANQ_MLVL_MNDX, VANQ_MSTR_MNDX } from './hack.h.js';
 import { digit, eos, highc, lcase, lowc, mungspaces, nh_snprintf, ordin, s_suffix, strncmpi, strstri, strsubst, upstart } from './hacklib.js';
 import { carrying, currency } from './invent.js';
+import { has_mgivenname } from './mextra.macros.js';
 import { magic_negation } from './mhitu.js';
-import { AD_ACID, AD_COLD, AD_DGST, AD_DISE, AD_DISN, AD_ELEC, AD_FIRE } from './monattk.h.js';
-import { defended, dmgtype, dmgtype_fromattack, hates_silver, sticks } from './mondata.js';
-import { FEMALE, G_EXTINCT, G_GENOD, G_UNIQ, M1_AMPHIBIOUS, M1_BREATHLESS, M1_CLING, M1_CONCEAL, M1_FLY, M1_NOEYES, M1_OVIPAROUS, M1_SWIM, M2_FEMALE, M2_MALE, M2_NEUTER, MALE, MZ_GIGANTIC, MZ_HUGE, MZ_LARGE, MZ_MEDIUM, MZ_SMALL, MZ_TINY, NEUTRAL } from './monflag.h.js';
+import { AD_ACID, AD_COLD, AD_DGST, AD_DISN, AD_ELEC, AD_FIRE } from './monattk.h.js';
+import { dmgtype, dmgtype_fromattack, sticks } from './mondata.js';
+import { haseyes, hides_under, is_clinger, is_female, is_male, is_neuter, is_rider, lays_eggs } from './mondata.macros.js';
+import { FEMALE, G_EXTINCT, G_GENOD, G_GONE, G_UNIQ, M1_AMPHIBIOUS, M1_BREATHLESS, M1_FLY, M1_SWIM, MALE, MZ_GIGANTIC, MZ_HUGE, MZ_LARGE, MZ_MEDIUM, MZ_SMALL, MZ_TINY, NEUTRAL } from './monflag.h.js';
 import { mons } from './monst.js';
-import { M_AP_FURNITURE, M_AP_MONSTER, M_AP_NOTHING, M_AP_OBJECT, M_AP_TYPMASK, STRAT_CLOSE, STRAT_WAITFORU } from './monst.h.js';
-import { PM_DEATH, PM_FAMINE, PM_GREEN_SLIME, PM_HIGH_CLERIC, PM_LONG_WORM, PM_PESTILENCE, PM_VAMPIRE, PM_VAMPIRE_LEADER, PM_VLAD_THE_IMPALER } from './monsters.h.js';
-import { IRON, MITHRIL } from './objclass.h.js';
+import { M_AP_FURNITURE, M_AP_MONSTER, M_AP_NOTHING, M_AP_OBJECT, STRAT_WAITMASK } from './monst.h.js';
+import { U_AP_TYPE, ismnum } from './monst.macros.js';
+import { PM_GREEN_SLIME, PM_HIGH_CLERIC, PM_LONG_WORM, PM_VAMPIRE, PM_VAMPIRE_LEADER, PM_VLAD_THE_IMPALER } from './monsters.h.js';
+import { is_ammo, is_wet_towel, u_wield_art } from './obj.macros.js';
+import { is_metallic } from './objclass.macros.js';
 import { obj_descr, objects } from './objects.js';
-import { AMULET_OF_GUARDING, DUNCE_CAP, GAUNTLETS_OF_POWER, LUCKSTONE, RIN_ADORNMENT, RIN_PROTECTION, RIN_SUSTAIN_ABILITY, ROBE, SHIELD_OF_REFLECTION, TOWEL } from './objects.h.js';
+import { AMULET_OF_GUARDING, DUNCE_CAP, GAUNTLETS_OF_POWER, LUCKSTONE, RIN_ADORNMENT, RIN_PROTECTION, RIN_SUSTAIN_ABILITY, ROBE, SHIELD_OF_REFLECTION } from './objects.h.js';
 import { an, ansimpleoname, just_an, makeplural, reorder_fruit, shield_simple_name, simple_typename, simpleonames, suit_simple_name, the } from './objnam.js';
 import { oc_to_str } from './options.js';
 import { mhidden_description, waterbody_name } from './pager.js';
 import { LOW_PM, NUMMONS } from './permonst.h.js';
 import { You, impossible, livelog_printf, pline } from './pline.js';
-import { body_part, mbodypart, uasmon_maxStr, udeadinside, ugenocided } from './polyself.js';
+import { body_part, mbodypart, udeadinside, ugenocided } from './polyself.js';
 import { align_gname, can_pray, u_gname } from './pray.js';
 import { mon_aligntyp } from './priest.js';
-import { ACID_RES, ADORNED, AGGRAVATE_MONSTER, ANTIMAGIC, BLINDED, BLND_RES, CLAIRVOYANT, COLD_RES, CONFLICT, CONFUSION, DEAF, DETECT_MONSTERS, DISINT_RES, DISPLACED, DRAIN_RES, FAST, FIRE_RES, FIXED_ABIL, FLYING, FREE_ACTION, FROMEXPER, FROMOUTSIDE, FROMRACE, FUMBLING, GLIB, HALF_PHDAM, HALF_SPDAM, HALLUC, HALLUC_RES, HUNGER, INFRAVISION, INVIS, INVULNERABLE, I_SPECIAL, JUMPING, LEVITATION, LIFESAVED, MAGICAL_BREATHING, PASSES_WALLS, POISON_RES, POLYMORPH, POLYMORPH_CONTROL, PROTECTION, PROT_FROM_SHAPE_CHANGERS, REFLECTING, REGENERATION, SEARCHING, SEE_INVIS, SHOCK_RES, SICK, SICK_RES, SLEEPY, SLEEP_RES, SLIMED, SLOW_DIGESTION, STEALTH, STONED, STONE_RES, STRANGLED, STUNNED, SWIMMING, TELEPAT, TELEPORT, TELEPORT_CONTROL, TIMEOUT, UNCHANGING, VOMITING, WARNING, WARN_OF_MON, WARN_UNDEAD, WOUNDED_LEGS, WWALKING, W_AMUL, W_ARM, W_ARMC, W_ARMF, W_ARMG, W_ARMH, W_ARMS, W_ARMU, W_ARTI, W_RINGL, W_RINGR, W_SADDLE, W_TOOL } from './prop.h.js';
+import { ACID_RES, ADORNED, AGGRAVATE_MONSTER, ANTIMAGIC, BLINDED, BLND_RES, BOTH_SIDES, CLAIRVOYANT, COLD_RES, CONFLICT, CONFUSION, DEAF, DETECT_MONSTERS, DISINT_RES, DISPLACED, DRAIN_RES, FAST, FIRE_RES, FIXED_ABIL, FLYING, FREE_ACTION, FROMOUTSIDE, FUMBLING, GLIB, HALF_PHDAM, HALF_SPDAM, HALLUC_RES, HUNGER, INFRAVISION, INTRINSIC, INVIS, INVULNERABLE, I_SPECIAL, JUMPING, LEVITATION, MAGICAL_BREATHING, PASSES_WALLS, POISON_RES, POLYMORPH, POLYMORPH_CONTROL, PROTECTION, PROT_FROM_SHAPE_CHANGERS, REFLECTING, REGENERATION, SEARCHING, SEE_INVIS, SHOCK_RES, SICK, SICK_RES, SLEEPY, SLEEP_RES, SLIMED, SLOW_DIGESTION, STEALTH, STONED, STONE_RES, STRANGLED, STUNNED, SWIMMING, TELEPAT, TELEPORT, TELEPORT_CONTROL, TIMEOUT, UNCHANGING, WARNING, WARN_OF_MON, WARN_UNDEAD, WOUNDED_LEGS, WWALKING, W_AMUL, W_ARMOR, W_RING, W_RINGL, W_SADDLE, W_TOOL } from './prop.h.js';
 import { reg_damg, visible_region_at } from './region.js';
 import { genders } from './role.js';
 import { costly_spot } from './shk.js';
-import { P_BOW, P_CROSSBOW, P_ISRESTRICTED, P_NONE, P_SKILLED, P_TWO_WEAPON_COMBAT, P_UNSKILLED } from './skills.h.js';
+import { P_ISRESTRICTED, P_NONE, P_SKILLED, P_TWO_WEAPON_COMBAT, P_UNSKILLED } from './skills.h.js';
 import { NO_SPELL } from './spell.h.js';
 import { observable_depth } from './topten.js';
 import { t_at, trapname } from './trap.js';
@@ -60,12 +67,17 @@ import { SPIKED_PIT } from './trap.h.js';
 import { hidden_gold } from './vault.js';
 import { can_advance, skill_level_name, skill_name, weapon_descr, weapon_type } from './weapon.js';
 import { empty_handed } from './wield.js';
-import { add_menu, add_menu_str, select_menu, windowprocs } from './windows.js';
-import { ATR_NONE, MENU_BEHAVE_STANDARD, MENU_ITEMFLAGS_NONE, MENU_ITEMFLAGS_SELECTED, NHW_MENU, NHW_TEXT, PICK_NONE, PICK_ONE } from './wintype.h.js';
+import { add_menu, add_menu_str, select_menu } from './windows.js';
+import { create_nhwindow, destroy_nhwindow, display_nhwindow, end_menu, putstr, start_menu } from './winprocs.macros.js';
+import { ATR_NONE, MENU_BEHAVE_STANDARD, MENU_ITEMFLAGS_NONE, MENU_ITEMFLAGS_SELECTED, NHW_MENU, NHW_TEXT, PICK_NONE, PICK_ONE, WIN_ERR } from './wintype.h.js';
 import { count_wsegs, wseg_at } from './worm.js';
 import { find_mac, which_armor } from './worn.js';
 import { ACH_AMUL, ACH_ASTR, ACH_BELL, ACH_BGRM, ACH_BLND, ACH_BOOK, ACH_CNDL, ACH_ENDG, ACH_HELL, ACH_INVK, ACH_MEDU, ACH_MINE, ACH_MINE_PRIZE, ACH_NOVL, ACH_NUDE, ACH_ORCL, ACH_RNK1, ACH_RNK2, ACH_RNK3, ACH_RNK4, ACH_RNK5, ACH_RNK6, ACH_RNK7, ACH_RNK8, ACH_SHOP, ACH_SOKO, ACH_SOKO_PRIZE, ACH_TMPL, ACH_TOWN, ACH_TUNE, ACH_UWIN, AC_MAX, A_CURRENT, A_ORIGINAL, N_ACH, ROLE_FEMALE, ROLE_GENDMASK, ROLE_MALE, SICK_NONVOMITABLE, SICK_VOMITABLE, TT_BURIEDBALL, TT_INFLOOR, TT_LAVA, TT_PIT } from './you.h.js';
+import { Luck, Upolyd } from './you.macros.js';
+import { Acid_resistance, Adornment, Aggravate_monster, Antimagic, BBlinded, BClairvoyant, BFlying, BInvis, BLevitation, BStealth, Blind, Blind_telepat, BlindedTimeout, Blnd_resist, Clairvoyant, Cold_resistance, Conflict, Deaf, Detect_monsters, Disint_resistance, Displaced, Drain_resistance, EBlinded, EClairvoyant, EInvis, EStealth, Fast, Fire_resistance, Fixed_abil, Free_action, Fumbling, Glib, HBlinded, HClairvoyant, HInvis, HStealth, Half_gas_damage, Half_physical_damage, Half_spell_damage, Halluc_resistance, Hallucination, Hate_silver, Hunger, Infravision, Invis, Invisible, Invulnerable, Jumping, Lev_at_will, Levitation, Lifesaved, Passes_walls, PermaBlind, Poison_resistance, Polymorph, Polymorph_control, Protection, Protection_from_shape_changers, Punished, Reflecting, Regeneration, Searching, See_invisible, Shock_resistance, Sick, Sick_resistance, Sleep_resistance, Sleepy, Slimed, Slow_digestion, Stealth, Stone_resistance, Stoned, Strangled, Teleport_control, Teleportation, Unchanging, Undead_warning, Underwater, Vomiting, Warn_of_mon, Warning, Wounded_legs } from './youprop.macros.js';
 import { item_what, u_adtyp_resistance_obj } from './zap.js';
+
+const LL_majors = 16607;
 
 const enlght_line$contra = $c.recArray($T.contrctn, 6);   // static in enlght_line()
 const basics_enlightenment$Power = new Int8Array(28);   // static in basics_enlightenment()
@@ -94,7 +106,7 @@ async function enlght_out(buf) {   // insight.c:118
     if (ge.en_via_menu) {
         await add_menu_str(ge.en_win, buf);
     } else {
-        await windowprocs.win_putstr(ge.en_win, 0, buf);
+        await putstr()(ge.en_win, 0, buf);
     }
 }
 async function enlght_line(start, middle, end, ps) {   // insight.c:127
@@ -124,9 +136,9 @@ async function enlght_combatinc(inctyp, incamt, final, outbuf) {   // insight.c:
     }
     modif = !incamt ? $c.lit("no") : await an(modif);
     bonus = incamt >= 0 ? $c.lit("bonus") : $c.lit("penalty");
-    invrt = $c.i8($c.strcmp(inctyp, $c.lit("to hit")) ? 1 : 0);
+    invrt = $c.i8($c.strcmp(inctyp, $c.lit("to hit")) ? TRUE : FALSE);
     $c.__builtin___sprintf_chk(outbuf, 0, -1, $c.lit("%s %s %s"), modif, invrt ? inctyp : bonus, invrt ? bonus : inctyp);
-    if (final || flags.debug) {
+    if (final || wizard()) {
         $c.__builtin___sprintf_chk(eos(outbuf), 0, -1, $c.lit(" (%s%d)"), incamt > 0 ? $c.lit("+") : $c.lit(""), incamt);
     }
     return outbuf;
@@ -148,8 +160,8 @@ async function enlght_halfdmg(category, final) {   // insight.c:201
     await enlght_line(new $c.Ptr(You_, 0), final ? $c.lit("took") : $c.lit("take"), new $c.Ptr(buf, 0), await from_what(category));
 }
 function walking_on_water() {   // insight.c:224
-    if (u.uinwater | 0 || (u.uprops[LEVITATION].intrinsic || u.uprops[LEVITATION].extrinsic) && !u.uprops[LEVITATION].blocked || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked) {
-        return 0;
+    if (u.uinwater | 0 || Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked) {
+        return FALSE;
     }
     return $c.i8((u.uprops[WWALKING].intrinsic || u.uprops[WWALKING].extrinsic) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) && is_pool_or_lava(u.ux, u.uy) ? 1 : 0);
 }
@@ -180,16 +192,16 @@ export async function trap_predicament(outbuf, final, wizxtra) {   // insight.c:
 }
 function cause_known(propindx) {   // insight.c:267
     let o = null, mask = 0;
-    mask = W_ARM | W_ARMC | W_ARMH | W_ARMS | W_ARMG | W_ARMF | W_ARMU | W_AMUL | (W_RINGL | W_RINGR) | W_TOOL;
+    mask = W_ARMOR | W_AMUL | W_RING | W_TOOL;
     for (o = gi.invent; o; o = o.nobj) {
         if (!$c.and64(o.owornmask, mask)) {
             continue;
         }
         if (objects[o.otyp].oc_oprop === propindx && objects[o.otyp].oc_name_known | 0 && o.dknown | 0) {
-            return 1;
+            return TRUE;
         }
     }
-    return 0;
+    return FALSE;
 }
 function attrval(attrindx, attrvalue, resultbuf) {   // insight.c:287
     if (attrindx !== A_STR || attrvalue <= 18) {
@@ -258,10 +270,10 @@ function N_times(n, outbuf) {   // insight.c:362
 }
 export async function enlightenment(mode, final) {   // insight.c:383
     let buf = new Int8Array(256), tmpbuf = new Int8Array(256), selected = [null], $t1, $t2;
-    $t1 = await windowprocs.win_create_nhwindow(NHW_MENU), ge.en_win = $t1;
+    $t1 = await create_nhwindow()(NHW_MENU), ge.en_win = $t1;
     ge.en_via_menu = $c.i8(!final ? 1 : 0);
     if (ge.en_via_menu) {
-        await windowprocs.win_start_menu(ge.en_win, MENU_BEHAVE_STANDARD);
+        await start_menu()(ge.en_win, MENU_BEHAVE_STANDARD);
     }
     $c.__builtin___strcpy_chk(new $c.Ptr(tmpbuf, 0), new $c.Ptr(svp.plname, 0), 256);
     $t2 = highc(new $c.Ptr(tmpbuf, 0).get(0)), new $c.Ptr(tmpbuf, 0).set(0, $t2);
@@ -278,8 +290,8 @@ export async function enlightenment(mode, final) {   // insight.c:383
     }
     await enlght_out($c.lit(""));
     await enlght_out($c.lit("Miscellaneous:"));
-    if ((mode & BASICENLIGHTENMENT) !== 0 && (flags.debug || flags.explore || final)) {
-        if (flags.debug || flags.explore) {
+    if ((mode & BASICENLIGHTENMENT) !== 0 && (wizard() || discover() || final)) {
+        if (wizard() || discover()) {
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("running in %s mode"), flags.debug ? $c.lit("debug") : $c.lit("explore"));
             await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), new $c.Ptr(buf, 0), $c.lit(""));
         }
@@ -296,30 +308,30 @@ export async function enlightenment(mode, final) {   // insight.c:383
     fmt_elapsed_time(new $c.Ptr(buf, 0), final);
     await enlght_line($c.lit("Total elapsed playing time "), final ? $c.lit("was") : $c.lit("is"), new $c.Ptr(buf, 0), $c.lit(""));
     if (!ge.en_via_menu) {
-        await windowprocs.win_display_nhwindow(ge.en_win, 1);
+        await display_nhwindow()(ge.en_win, TRUE);
     } else {
         selected[0] = null;
-        await windowprocs.win_end_menu(ge.en_win, null);
+        await end_menu()(ge.en_win, null);
         if (await select_menu(ge.en_win, PICK_NONE, new $c.Ptr(selected, 0)) > 0) {
             $c.free(selected[0]);
         }
-        ge.en_via_menu = 0;
+        ge.en_via_menu = FALSE;
     }
-    await windowprocs.win_destroy_nhwindow(ge.en_win);
-    ge.en_win = -1;
+    await destroy_nhwindow()(ge.en_win);
+    ge.en_win = WIN_ERR;
 }
 async function background_enlightenment(unused_mode, final) {   // insight.c:468
     let role_titl = null, rank_titl = null, innategend = 0, difgend = 0, difalgn = 0, buf = new Int8Array(256), tmpbuf = new Int8Array(256), anbuf = new Int8Array(20), uasmon = null, altphrasing = 0, egdepth = 0, dgnbuf = new Int8Array(128), ulvl = 0, nxtlvl = 0, delta = 0, $t1, $t2;
-    innategend = (u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female) ? 1 : 0;
+    innategend = (Upolyd() ? u.mfemale | 0 : flags.female) ? 1 : 0;
     role_titl = innategend && gu.urole.name.f ? gu.urole.name.f : gu.urole.name.m;
     rank_titl = rank_of(u.ulevel, gu.urole.mnum, $c.i8(innategend));
     await enlght_out($c.lit(""));
     await enlght_out($c.lit("Background:"));
-    if (u.umonnum !== u.umonster) {
+    if (Upolyd()) {
         uasmon = gy.youmonst.data;
         altphrasing = $c.i8((gy.youmonst.cham === PM_VAMPIRE || gy.youmonst.cham === PM_VAMPIRE_LEADER || gy.youmonst.cham === PM_VLAD_THE_IMPALER) && !(gy.youmonst.data.mlet === S_VAMPIRE) ? 1 : 0);
         tmpbuf[0] = 0;
-        if (!($c.andu64(uasmon.mflags2, M2_MALE) !== 0) && !($c.andu64(uasmon.mflags2, M2_FEMALE) !== 0) && !($c.andu64(uasmon.mflags2, M2_NEUTER) !== 0)) {
+        if (!is_male(uasmon) && !is_female(uasmon) && !is_neuter(uasmon)) {
             $c.__builtin___sprintf_chk(new $c.Ptr(tmpbuf, 0), 0, 256, $c.lit("%s "), genders[flags.female ? 1 : 0].adj);
         }
         if (altphrasing) {
@@ -333,10 +345,10 @@ async function background_enlightenment(unused_mode, final) {   // insight.c:468
         $c.__builtin___sprintf_chk(new $c.Ptr(tmpbuf, 0), 0, 256, $c.lit("%s "), genders[innategend].adj);
     }
     buf[0] = 0;
-    if (u.umonnum !== u.umonster) {
+    if (Upolyd()) {
         $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("actually "), 256);
     }
-    if (!strncmpi(rank_titl, role_titl, -1)) {
+    if (!strcmpi(rank_titl, role_titl)) {
         $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit("%s, level %d %s%s"), await an(rank_titl), u.ulevel, new $c.Ptr(tmpbuf, 0), gu.urace.noun);
     } else {
         $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit("%s, a level %d %s%s %s"), await an(rank_titl), u.ulevel, new $c.Ptr(tmpbuf, 0), gu.urace.adj, role_titl);
@@ -370,7 +382,7 @@ async function background_enlightenment(unused_mode, final) {   // insight.c:468
     $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s%s-handed"), !$c.strcmp(await body_part(HANDED), $c.lit("handed")) ? $c.lit("") : $c.lit("normally "), (u.uhandedness | 0) === 0 ? $c.lit("right") : $c.lit("left"));
     await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), new $c.Ptr(buf, 0), $c.lit(""));
     $t1 = new $c.Ptr(tmpbuf, 0).set(0, 0), new $c.Ptr(buf, 0).set(0, $t1);
-    if (u.uz.dnum === svd.dungeon_topology.d_astral_level.dnum) {
+    if (In_endgame(u.uz)) {
         egdepth = observable_depth(u.uz);
         endgamelevelname(new $c.Ptr(tmpbuf, 0), egdepth);
         nh_snprintf($c.lit("background_enlightenment"), 609, new $c.Ptr(buf, 0), 256, $c.lit("in the endgame, on the %s%s"), !$c.strncmp(new $c.Ptr(tmpbuf, 0), $c.lit("Plane"), 5) ? $c.lit("Elemental ") : $c.lit(""), new $c.Ptr(tmpbuf, 0));
@@ -384,7 +396,7 @@ async function background_enlightenment(unused_mode, final) {   // insight.c:468
         $c.__builtin___sprintf_chk(new $c.Ptr(tmpbuf, 0), 0, 256, $c.lit("level %d"), In_quest(u.uz) ? dunlev(u.uz) : depth(u.uz));
         if ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level)) {
             $c.__builtin___strcat_chk(new $c.Ptr(tmpbuf, 0), $c.lit(", a primitive area"), 256);
-        } else if ((svd.dungeon_topology.d_bigroom_level.dlevel || svd.dungeon_topology.d_bigroom_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_bigroom_level) && !((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked)) {
+        } else if ((svd.dungeon_topology.d_bigroom_level.dlevel || svd.dungeon_topology.d_bigroom_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_bigroom_level) && !Blind()) {
             $c.__builtin___strcat_chk(new $c.Ptr(tmpbuf, 0), $c.lit(", a very big room"), 256);
         }
         nh_snprintf($c.lit("background_enlightenment"), 629, new $c.Ptr(buf, 0), 256, $c.lit("in %s, on %s"), new $c.Ptr(dgnbuf, 0), new $c.Ptr(tmpbuf, 0));
@@ -409,10 +421,10 @@ async function background_enlightenment(unused_mode, final) {   // insight.c:468
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit(" Bad things %s on Friday the 13th."), !final ? $c.lit("can happen") : final === 1 ? $c.lit("could have happened") : $c.lit("happened"));
         await enlght_out(new $c.Ptr(buf, 0));
     }
-    if (!(u.umonnum !== u.umonster)) {
+    if (!Upolyd()) {
         ulvl = u.ulevel;
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%-1ld experience point%s"), u.uexp, u.uexp === 1 ? $c.lit("") : $c.lit("s"));
-        if (ulvl < 30 && (final || flags.debug)) {
+        if (ulvl < 30 && (final || wizard())) {
             nxtlvl = newuexp(ulvl);
             delta = $c.sub64(nxtlvl, u.uexp);
             $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(", %ld %s%sneeded %s level %d"), delta, u.uexp > 0 ? $c.lit("more ") : $c.lit(""), !final ? $c.lit("") : delta === 1 ? $c.lit("was ") : $c.lit("were "), ulvl < 18 ? $c.lit("to attain") : $c.lit("for"), ulvl + 1 | 0);
@@ -423,9 +435,9 @@ async function background_enlightenment(unused_mode, final) {   // insight.c:468
 async function basics_enlightenment(mode, final) {   // insight.c:728
     let buf = new Int8Array(256), pw = 0, hp = 0, pwmax = 0, hpmax = 0, umoney = 0, hmoney = 0, ocl = new Int8Array(19);
     pw = u.uen;
-    hp = u.umonnum !== u.umonster ? u.mh : u.uhp;
+    hp = Upolyd() ? u.mh : u.uhp;
     pwmax = u.uenmax;
-    hpmax = u.umonnum !== u.umonster ? u.mhmax : u.uhpmax;
+    hpmax = Upolyd() ? u.mhmax : u.uhpmax;
     await enlght_out($c.lit(""));
     await enlght_out($c.lit("Basics:"));
     if (hp < 0) {
@@ -445,7 +457,7 @@ async function basics_enlightenment(mode, final) {   // insight.c:728
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%d out of %d %s"), pw, pwmax, new $c.Ptr(basics_enlightenment$Power, 0));
     }
     await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(had, 0) : new $c.Ptr(have, 0), new $c.Ptr(buf, 0), $c.lit(""));
-    if (u.umonnum !== u.umonster) {
+    if (Upolyd()) {
         switch (mons[u.umonnum].mlevel) {
             case 0:
                 $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("0 hit dice (actually 1/2)"), 256);
@@ -513,35 +525,35 @@ async function characteristics_enlightenment(mode, final) {   // insight.c:827
 }
 async function one_characteristic(mode, final, attrindx) {   // insight.c:846
     let hide_innate_value = 0, interesting_alimit = 0, acurrent = 0, abase = 0, apeak = 0, alimit = 0, paren_pfx = null, subjbuf = new Int8Array(256), valubuf = new Int8Array(256), valstring = new Int8Array(32);
-    hide_innate_value = 0;
-    if (u.umonnum !== u.umonster) {
-        hide_innate_value = 1;
-    } else if (u.uprops[FIXED_ABIL].extrinsic) {
+    hide_innate_value = FALSE;
+    if (Upolyd()) {
+        hide_innate_value = TRUE;
+    } else if (Fixed_abil()) {
         if (await stuck_ring($G.uleft, RIN_SUSTAIN_ABILITY) || await stuck_ring($G.uright, RIN_SUSTAIN_ABILITY)) {
-            hide_innate_value = 1;
+            hide_innate_value = TRUE;
         }
     }
     switch (attrindx) {
         case A_STR:
             if ($G.uarmg && $G.uarmg.otyp === GAUNTLETS_OF_POWER && $G.uarmg.cursed | 0) {
-                hide_innate_value = 1;
+                hide_innate_value = TRUE;
             }
             break;
         case A_DEX:
             break;
         case A_CON:
-            if (is_art($G.uwep, ART_OGRESMASHER) && $G.uwep.cursed | 0) {
-                hide_innate_value = 1;
+            if (u_wield_art(ART_OGRESMASHER) && $G.uwep.cursed | 0) {
+                hide_innate_value = TRUE;
             }
             break;
         case A_INT:
             if ($G.uarmh && $G.uarmh.otyp === DUNCE_CAP && $G.uarmh.cursed | 0) {
-                hide_innate_value = 1;
+                hide_innate_value = TRUE;
             }
             break;
         case A_WIS:
             if ($G.uarmh && $G.uarmh.otyp === DUNCE_CAP && $G.uarmh.cursed | 0) {
-                hide_innate_value = 1;
+                hide_innate_value = TRUE;
             }
             break;
         case A_CHA:
@@ -549,17 +561,17 @@ async function one_characteristic(mode, final, attrindx) {   // insight.c:846
         default:
             return;
     }
-    if (mode & MAGICENLIGHTENMENT && !(u.umonnum !== u.umonster)) {
-        hide_innate_value = 0;
+    if (mode & MAGICENLIGHTENMENT && !Upolyd()) {
+        hide_innate_value = FALSE;
     }
-    acurrent = acurr(attrindx);
+    acurrent = ACURR(attrindx);
     attrval(attrindx, acurrent, new $c.Ptr(valubuf, 0));
     $c.__builtin___sprintf_chk(new $c.Ptr(subjbuf, 0), 0, 256, $c.lit("Your %s "), attrname[attrindx]);
     if (!hide_innate_value) {
         abase = u.acurr.a[attrindx];
         apeak = u.amax.a[attrindx];
-        alimit = attrindx === A_STR && u.umonnum !== u.umonster ? uasmon_maxStr() : gu.urace.attrmax[attrindx];
-        interesting_alimit = $c.i8(final ? 1 : alimit !== (attrindx !== A_STR ? 18 : 118) ? 1 : 0);
+        alimit = ATTRMAX(attrindx);
+        interesting_alimit = $c.i8(final ? TRUE : alimit !== (attrindx !== A_STR ? 18 : 118) ? 1 : 0);
         paren_pfx = final ? $c.lit(" (") : $c.lit(" (current; ");
         if (acurrent !== abase) {
             $c.__builtin___sprintf_chk(eos(new $c.Ptr(valubuf, 0)), 0, -1, $c.lit("%sbase:%s"), paren_pfx, attrval(attrindx, abase, new $c.Ptr(valstring, 0)));
@@ -580,13 +592,13 @@ async function one_characteristic(mode, final, attrindx) {   // insight.c:846
 }
 async function status_enlightenment(mode, final) {   // insight.c:940
     let magic = 0, cap = 0, buf = new Int8Array(256), youtoo = new Int8Array(256), heldmon = new Int8Array(256), Riding = 0, steedname = null, predicament = new Int8Array(256), anchored = 0, ustick = 0, dx = 0, dy = 0, saddle = null, whichleg = 0, bp = null, article = null, leftright = null, steednambuf = new Int8Array(256), adj = null, $t1, $t2, $t3, $t4;
-    magic = $c.i8(mode & MAGICENLIGHTENMENT ? 1 : 0);
+    magic = $c.i8(mode & MAGICENLIGHTENMENT ? TRUE : FALSE);
     Riding = $c.i8(u.usteed && !(final === ENL_GAMEOVERDEAD && !$c.strcmp(new $c.Ptr(svk.killer.name, 0), $c.lit("riding accident"))) ? 1 : 0);
-    steedname = !Riding ? null : await x_monnam(u.usteed, u.usteed.mtame ? ARTICLE_YOUR : ARTICLE_THE, null, SUPPRESS_SADDLE | SUPPRESS_HALLUCINATION, 0);
+    steedname = !Riding ? null : await x_monnam(u.usteed, u.usteed.mtame ? ARTICLE_YOUR : ARTICLE_THE, null, SUPPRESS_SADDLE | SUPPRESS_HALLUCINATION, FALSE);
     await enlght_out($c.lit(""));
     await enlght_out(final ? $c.lit("Final Status:") : $c.lit("Status:"));
     $c.__builtin___strcpy_chk(new $c.Ptr(youtoo, 0), new $c.Ptr(You_, 0), 256);
-    if (u.umonnum !== u.umonster) {
+    if (Upolyd()) {
         $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("transformed"), 256);
         if (ugenocided()) {
             $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" and %s %s inside"), final ? $c.lit("felt") : $c.lit("feel"), udeadinside());
@@ -598,8 +610,8 @@ async function status_enlightenment(mode, final) {   // insight.c:940
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), new $c.Ptr(buf, 0), $c.lit(""));
         $c.__builtin___sprintf_chk(eos(new $c.Ptr(youtoo, 0)), 0, -1, $c.lit("and %s "), steedname);
     }
-    if ((u.uprops[LEVITATION].intrinsic || u.uprops[LEVITATION].extrinsic) && !u.uprops[LEVITATION].blocked) {
-        if (($c.and64(u.uprops[LEVITATION].intrinsic, I_SPECIAL) !== 0 || $c.and64(u.uprops[LEVITATION].extrinsic, W_ARTI) !== 0) && $c.and64(u.uprops[LEVITATION].intrinsic, ~(I_SPECIAL | TIMEOUT)) === 0 && $c.and64(u.uprops[LEVITATION].extrinsic, ~W_ARTI) === 0 && magic) {
+    if (Levitation()) {
+        if (Lev_at_will() && magic) {
             await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), $c.lit("levitating, at will"), $c.lit(""));
         } else {
             await enlght_line(new $c.Ptr(youtoo, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), $c.lit("levitating"), await from_what(LEVITATION));
@@ -607,7 +619,7 @@ async function status_enlightenment(mode, final) {   // insight.c:940
     } else if ((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked) {
         await enlght_line(new $c.Ptr(youtoo, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), $c.lit("flying"), await from_what(FLYING));
     }
-    if (u.uinwater) {
+    if (Underwater()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), $c.lit("underwater"), $c.lit(""));
     } else if (u.uinwater) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), u.uprops[SWIMMING].intrinsic || u.uprops[SWIMMING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, 2) !== 0 ? $c.lit("swimming") : $c.lit("in water"), await from_what(SWIMMING));
@@ -615,24 +627,24 @@ async function status_enlightenment(mode, final) {   // insight.c:940
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("walking on %s"), is_pool(u.ux, u.uy) ? $c.lit("water") : is_lava(u.ux, u.uy) ? $c.lit("lava") : surface(u.ux, u.uy));
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), new $c.Ptr(buf, 0), await from_what(WWALKING));
     }
-    if (u.umonnum !== u.umonster && (u.uundetected | 0 || (gy.youmonst.m_ap_type & M_AP_TYPMASK) !== M_AP_NOTHING)) {
-        await youhiding(1, final);
+    if (Upolyd() && (u.uundetected | 0 || U_AP_TYPE() !== M_AP_NOTHING)) {
+        await youhiding(TRUE, final);
     }
-    if (u.uprops[STONED].intrinsic) {
+    if (Stoned()) {
         if (final && $c.and64(u.uprops[STONED].intrinsic, I_SPECIAL)) {
             await enlght_out($c.lit(" You turned into stone."));
         } else {
             await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), $c.lit("turning to stone"), $c.lit(""));
         }
     }
-    if (u.uprops[SLIMED].intrinsic) {
+    if (Slimed()) {
         if (final && $c.and64(u.uprops[SLIMED].intrinsic, I_SPECIAL)) {
             await enlght_out($c.lit(" You turned into slime."));
         } else {
             await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), $c.lit("turning into slime"), $c.lit(""));
         }
     }
-    if (u.uprops[STRANGLED].intrinsic) {
+    if (Strangled()) {
         if (u.uburied) {
             await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), $c.lit("buried"), $c.lit(""));
         } else {
@@ -640,14 +652,14 @@ async function status_enlightenment(mode, final) {   // insight.c:940
                 await enlght_out($c.lit(" You died from strangulation."));
             } else {
                 $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("being strangled"), 256);
-                if (flags.debug) {
+                if (wizard()) {
                     $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" (%ld)"), $c.and64(u.uprops[STRANGLED].intrinsic, 16777215));
                 }
                 await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), new $c.Ptr(buf, 0), await from_what(STRANGLED));
             }
         }
     }
-    if (u.uprops[SICK].intrinsic) {
+    if (Sick()) {
         if (final && $c.and64(u.uprops[SICK].intrinsic, I_SPECIAL)) {
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit(" %sdied from %s."), new $c.Ptr(You_, 0), (u.usick_type | 0) & 2 ? $c.lit("terminal illness") : $c.lit("food poisoning"));
             await enlght_out(new $c.Ptr(buf, 0));
@@ -660,7 +672,7 @@ async function status_enlightenment(mode, final) {   // insight.c:940
             }
         }
     }
-    if (u.uprops[VOMITING].intrinsic) {
+    if (Vomiting()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), $c.lit("nauseated"), $c.lit(""));
     }
     if (u.uprops[STUNNED].intrinsic) {
@@ -669,20 +681,20 @@ async function status_enlightenment(mode, final) {   // insight.c:940
     if (u.uprops[CONFUSION].intrinsic) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), $c.lit("confused"), $c.lit(""));
     }
-    if (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic)) {
+    if (Hallucination()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), $c.lit("hallucinating"), $c.lit(""));
     }
-    if ((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked) {
+    if (Blind()) {
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s blind"), $c.and64(u.uprops[BLINDED].intrinsic, 67108864) !== 0 ? $c.lit("permanently") : $c.and64(u.uprops[BLINDED].intrinsic, 268435456) ? $c.lit("innately") : u.uprops[BLINDED].extrinsic && !(u.uprops[BLINDED].intrinsic && !u.uprops[BLINDED].blocked) ? $c.lit("deliberately") : $c.lit("temporarily"));
-        if (flags.debug && (u.uprops[BLINDED].intrinsic === $c.and64(u.uprops[BLINDED].intrinsic, TIMEOUT) && !u.uprops[BLINDED].extrinsic)) {
+        if (wizard() && (u.uprops[BLINDED].intrinsic === BlindedTimeout() && !u.uprops[BLINDED].extrinsic)) {
             $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" (%ld)"), $c.and64(u.uprops[BLINDED].intrinsic, 16777215));
         }
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), new $c.Ptr(buf, 0), !($c.andu64(gy.youmonst.data.mflags1, 4096) === 0) ? $c.lit("") : await from_what(BLINDED));
     }
-    if (u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf) {
+    if (Deaf()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), $c.lit("deaf"), await from_what(DEAF));
     }
-    if ($G.uball !== null) {
+    if (Punished()) {
         if ($G.uball) {
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("chained to %s"), await ansimpleoname($G.uball));
         } else {
@@ -705,7 +717,7 @@ async function status_enlightenment(mode, final) {   // insight.c:940
     heldmon[0] = 0;
     if (u.ustuck) {
         $c.__builtin___strcpy_chk(new $c.Ptr(heldmon, 0), await a_monnam(u.ustuck), 256);
-        if (!$c.strcmp(new $c.Ptr(heldmon, 0), $c.lit("it")) && (!(u.ustuck.mextra && u.ustuck.mextra.mgivenname) || $c.strcmp(u.ustuck.mextra.mgivenname, $c.lit("it")) !== 0)) {
+        if (!$c.strcmp(new $c.Ptr(heldmon, 0), $c.lit("it")) && (!has_mgivenname(u.ustuck) || $c.strcmp(u.ustuck.mextra.mgivenname, $c.lit("it")) !== 0)) {
             $c.__builtin___strcpy_chk(new $c.Ptr(heldmon, 0), $c.lit("an unseen creature"), 256);
         }
     }
@@ -719,12 +731,12 @@ async function status_enlightenment(mode, final) {   // insight.c:940
                 $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" and %s being digested"), final ? $c.lit("were") : $c.lit("are"));
             }
         }
-        if (flags.debug) {
+        if (wizard()) {
             $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" (%u)"), u.uswldtim);
         }
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), new $c.Ptr(buf, 0), $c.lit(""));
     } else if (u.ustuck) {
-        ustick = $c.i8(u.umonnum !== u.umonster && sticks(gy.youmonst.data) ? 1 : 0);
+        ustick = $c.i8(Upolyd() && sticks(gy.youmonst.data) ? 1 : 0);
         dx = u.ustuck.mx - u.ux | 0;
         dy = u.ustuck.my - u.uy | 0;
         nh_snprintf($c.lit("status_enlightenment"), 1130, new $c.Ptr(buf, 0), 256, $c.lit("%s %s (%s)"), ustick ? $c.lit("holding") : $c.lit("held by"), new $c.Ptr(heldmon, 0), dxdy_to_dist_descr($c.i16(dx), $c.i16(dy), 1));
@@ -737,19 +749,19 @@ async function status_enlightenment(mode, final) {   // insight.c:940
             await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), new $c.Ptr(buf, 0), $c.lit(""));
         }
     }
-    if (u.uprops[WOUNDED_LEGS].intrinsic || u.uprops[WOUNDED_LEGS].extrinsic) {
-        whichleg = $c.and64(u.uprops[WOUNDED_LEGS].extrinsic, W_RINGL | W_RINGR);
+    if (Wounded_legs()) {
+        whichleg = $c.and64(u.uprops[WOUNDED_LEGS].extrinsic, BOTH_SIDES);
         bp = u.usteed ? await mbodypart(u.usteed, LEG) : await body_part(LEG);
         article = $c.lit("a ");
         leftright = $c.lit("");
-        if (whichleg === (W_RINGL | W_RINGR)) {
+        if (whichleg === BOTH_SIDES) {
             bp = await makeplural(bp), article = $c.lit("");
         } else {
             leftright = whichleg === W_RINGL ? $c.lit("left ") : $c.lit("right ");
         }
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%swounded %s%s"), article, leftright, bp);
         if (u.usteed) {
-            if (flags.debug && steedname) {
+            if (wizard() && steedname) {
                 $c.__builtin___strcpy_chk(new $c.Ptr(steednambuf, 0), steedname, 256);
                 $t2 = highc(new $c.Ptr(steednambuf, 0).get(0)), new $c.Ptr(steednambuf, 0).set(0, $t2);
                 await enlght_line(new $c.Ptr(steednambuf, 0), final ? $c.lit(" had ") : $c.lit(" has "), new $c.Ptr(buf, 0), $c.lit(""));
@@ -758,28 +770,28 @@ async function status_enlightenment(mode, final) {   // insight.c:940
             await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(had, 0) : new $c.Ptr(have, 0), new $c.Ptr(buf, 0), $c.lit(""));
         }
     }
-    if (u.uprops[GLIB].intrinsic) {
+    if (Glib()) {
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("slippery %s"), await fingers_or_gloves(1));
-        if (flags.debug) {
+        if (wizard()) {
             $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" (%ld)"), $c.and64(u.uprops[GLIB].intrinsic, 16777215));
         }
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(had, 0) : new $c.Ptr(have, 0), new $c.Ptr(buf, 0), $c.lit(""));
     }
-    if (u.uprops[FUMBLING].intrinsic || u.uprops[FUMBLING].extrinsic) {
+    if (Fumbling()) {
         if (magic || cause_known(FUMBLING)) {
             await enlght_line(new $c.Ptr(You_, 0), final ? $c.lit("fumbled") : $c.lit("fumble"), $c.lit(""), await from_what(FUMBLING));
         }
     }
-    if (u.uprops[SLEEPY].intrinsic || u.uprops[SLEEPY].extrinsic) {
+    if (Sleepy()) {
         if (magic || cause_known(SLEEPY)) {
             $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), await from_what(SLEEPY), 256);
-            if (flags.debug) {
+            if (wizard()) {
                 $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" (%ld)"), $c.and64(u.uprops[SLEEPY].intrinsic, 16777215));
             }
             await enlght_line($c.lit("You "), final ? $c.lit("fell") : $c.lit("fall"), $c.lit(" asleep uncontrollably"), new $c.Ptr(buf, 0));
         }
     }
-    if (u.uprops[HUNGER].intrinsic || u.uprops[HUNGER].extrinsic) {
+    if (Hunger()) {
         if (magic || cause_known(HUNGER)) {
             await enlght_line(new $c.Ptr(You_, 0), final ? $c.lit("hungered") : $c.lit("hunger"), $c.lit(" rapidly"), await from_what(HUNGER));
         }
@@ -796,7 +808,7 @@ async function status_enlightenment(mode, final) {   // insight.c:940
         } else if (!$c.strncmp(new $c.Ptr(buf, 0), $c.lit("faint"), 5)) {
             $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit(" due to starvation"), 256);
         }
-        if (flags.debug) {
+        if (wizard()) {
             $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" <%d>"), u.uhunger);
         }
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), new $c.Ptr(buf, 0), $c.lit(""));
@@ -822,20 +834,20 @@ async function status_enlightenment(mode, final) {   // insight.c:940
                 adj = $c.lit("not possible");
                 break;
         }
-        if (flags.debug) {
+        if (wizard()) {
             $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" <%d>"), inv_weight());
         }
         $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit("; movement %s %s%s"), !final ? $c.lit("is") : $c.lit("was"), adj, cap < OVERLOADED ? $c.lit(" slowed") : $c.lit(""));
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), new $c.Ptr(buf, 0), $c.lit(""));
     } else {
         $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("unencumbered"), 256);
-        if (flags.debug) {
+        if (wizard()) {
             $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" <%d>"), inv_weight());
         }
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), new $c.Ptr(buf, 0), $c.lit(""));
     }
     await weapon_insight(final);
-    if (iflags.tux_penalty && !(u.umonnum !== u.umonster)) {
+    if (iflags.tux_penalty && !Upolyd()) {
         await enlght_combatinc($c.lit("to hit"), -gu.urole.spelarmr | 0, final, new $c.Ptr(buf, 0));
         $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" due to your %s"), suit_simple_name($G.uarm));
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(had, 0) : new $c.Ptr(have, 0), new $c.Ptr(buf, 0), $c.lit(""));
@@ -858,7 +870,7 @@ async function weapon_insight(final) {   // insight.c:1270
         what = await weapon_descr($G.uwep);
         if ($G.uwep.otyp === SHIELD_OF_REFLECTION) {
             what = shield_simple_name($G.uwep);
-        } else if ($G.uwep.otyp === TOWEL && $G.uwep.spe > 0) {
+        } else if (is_wet_towel($G.uwep)) {
             what = $c.lit("wet towel");
         }
         if (!strncmpi(what, $c.lit("armor"), -1) || !strncmpi(what, $c.lit("food"), -1) || !strncmpi(what, $c.lit("venom"), -1)) {
@@ -868,7 +880,7 @@ async function weapon_insight(final) {   // insight.c:1270
         }
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), new $c.Ptr(buf, 0), $c.lit(""));
     }
-    if ((wtype = weapon_type($G.uwep)) !== P_NONE && (!$G.uwep || !(($G.uwep.oclass === WEAPON_CLASS || $G.uwep.oclass === GEM_CLASS) && objects[$G.uwep.otyp].oc_subtyp >= -P_CROSSBOW && objects[$G.uwep.otyp].oc_subtyp <= -P_BOW))) {
+    if ((wtype = weapon_type($G.uwep)) !== P_NONE && (!$G.uwep || !is_ammo($G.uwep))) {
         sklvl = u.weapon_skills[wtype].skill;
         hav = $c.i8(sklvl !== P_UNSKILLED && sklvl !== P_SKILLED ? 1 : 0);
         if (sklvl === P_ISRESTRICTED) {
@@ -878,7 +890,7 @@ async function weapon_insight(final) {   // insight.c:1270
         }
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s %s %s"), new $c.Ptr(sklvlbuf, 0), hav ? $c.lit("skill with") : $c.lit("in"), skill_name(wtype));
         if (!u.twoweap) {
-            if (can_advance(wtype, 0)) {
+            if (can_advance(wtype, FALSE)) {
                 $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" and %s that"), !final ? $c.lit("can enhance") : $c.lit("could have enhanced"));
             }
             if (hav) {
@@ -961,9 +973,9 @@ async function weapon_insight(final) {   // insight.c:1270
                     await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), new $c.Ptr(buf, 0), $c.lit(""));
                 }
             }
-            a1 = can_advance(wtype, 0);
-            a2 = $c.i8(wtype2 !== wtype ? can_advance(wtype2, 0) : 0);
-            ab = can_advance(P_TWO_WEAPON_COMBAT, 0);
+            a1 = can_advance(wtype, FALSE);
+            a2 = $c.i8(wtype2 !== wtype ? can_advance(wtype2, FALSE) : FALSE);
+            ab = can_advance(P_TWO_WEAPON_COMBAT, FALSE);
             if (a1 || a2 || ab) {
                 $c.__builtin___sprintf_chk(new $c.Ptr(sfx, 0), 0, 128, $c.lit(" skill%s with %s%s%s%s%s"), ((a1 + a2 | 0) + ab | 0) > 1 ? $c.lit("s") : $c.lit(""), a1 ? skill_name(wtype) : $c.lit(""), a1 && a2 && ab ? $c.lit(", ") : a1 && (a2 || ab) ? new $c.Ptr(weapon_insight$also_wik_, 0) : $c.lit(""), a2 ? skill_name(wtype2) : $c.lit(""), a1 && a2 && ab ? $c.lit(", and ") : a2 && ab ? new $c.Ptr(weapon_insight$also_wik_, 0) : $c.lit(""), ab ? $c.lit("two weapons") : $c.lit(""));
                 await enlght_line(new $c.Ptr(You_, 0), final ? $c.lit("could have enhanced") : $c.lit("can enhance"), new $c.Ptr(sfx, 0), $c.lit(""));
@@ -992,112 +1004,112 @@ async function attributes_enlightenment(unused_mode, final) {   // insight.c:148
     } else {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(had, 0) : new $c.Ptr(have, 0), new $c.Ptr(buf, 0), $c.lit(""));
     }
-    if (flags.debug) {
+    if (wizard()) {
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit(" %d"), u.ualign.record);
         await enlght_line($c.lit("Your alignment "), final ? $c.lit("was") : $c.lit("is"), new $c.Ptr(buf, 0), $c.lit(""));
     }
-    if (u.uprops[INVULNERABLE].intrinsic) {
+    if (Invulnerable()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), $c.lit("invulnerable"), await from_what(INVULNERABLE));
     }
-    if (u.uprops[ANTIMAGIC].intrinsic || u.uprops[ANTIMAGIC].extrinsic) {
+    if (Antimagic()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), $c.lit("magic-protected"), await from_what(ANTIMAGIC));
     }
-    if (u.uprops[FIRE_RES].intrinsic || u.uprops[FIRE_RES].extrinsic) {
+    if (Fire_resistance()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), $c.lit("fire resistant"), await from_what(FIRE_RES));
     }
     await item_resistance_message(AD_FIRE, $c.lit(" protected from fire"), final);
-    if (u.uprops[COLD_RES].intrinsic || u.uprops[COLD_RES].extrinsic) {
+    if (Cold_resistance()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), $c.lit("cold resistant"), await from_what(COLD_RES));
     }
     await item_resistance_message(AD_COLD, $c.lit(" protected from cold"), final);
-    if (u.uprops[SLEEP_RES].intrinsic || u.uprops[SLEEP_RES].extrinsic) {
+    if (Sleep_resistance()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), $c.lit("sleep resistant"), await from_what(SLEEP_RES));
     }
-    if (u.uprops[DISINT_RES].intrinsic || u.uprops[DISINT_RES].extrinsic) {
+    if (Disint_resistance()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), $c.lit("disintegration resistant"), await from_what(DISINT_RES));
     }
     await item_resistance_message(AD_DISN, $c.lit(" protected from disintegration"), final);
-    if (u.uprops[SHOCK_RES].intrinsic || u.uprops[SHOCK_RES].extrinsic) {
+    if (Shock_resistance()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), $c.lit("shock resistant"), await from_what(SHOCK_RES));
     }
     await item_resistance_message(AD_ELEC, $c.lit(" protected from electric shocks"), final);
-    if (u.uprops[POISON_RES].intrinsic || u.uprops[POISON_RES].extrinsic) {
+    if (Poison_resistance()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), $c.lit("poison resistant"), await from_what(POISON_RES));
     }
-    if (u.uprops[ACID_RES].intrinsic || u.uprops[ACID_RES].extrinsic) {
+    if (Acid_resistance()) {
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%.20s%.30s"), temp_resist(ACID_RES) ? $c.lit("temporarily ") : $c.lit(""), $c.lit("acid resistant"));
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), new $c.Ptr(buf, 0), await from_what(ACID_RES));
     }
     await item_resistance_message(AD_ACID, $c.lit(" protected from acid"), final);
-    if (u.uprops[DRAIN_RES].intrinsic || u.uprops[DRAIN_RES].extrinsic) {
+    if (Drain_resistance()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), $c.lit("level-drain resistant"), await from_what(DRAIN_RES));
     }
-    if (u.uprops[SICK_RES].intrinsic || u.uprops[SICK_RES].extrinsic || await defended(gy.youmonst, AD_DISE)) {
+    if (await Sick_resistance()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), $c.lit("immune to sickness"), await from_what(SICK_RES));
     }
-    if (u.uprops[STONE_RES].intrinsic || u.uprops[STONE_RES].extrinsic) {
+    if (Stone_resistance()) {
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%.20s%.30s"), temp_resist(STONE_RES) ? $c.lit("temporarily ") : $c.lit(""), $c.lit("petrification resistant"));
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), new $c.Ptr(buf, 0), await from_what(STONE_RES));
     }
-    if (u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) {
+    if (Halluc_resistance()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? $c.lit("resisted") : $c.lit("resist"), $c.lit(" hallucinations"), await from_what(HALLUC_RES));
     }
     if (u.uedibility) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(could, 0) : new $c.Ptr(can, 0), $c.lit("recognize detrimental food"), $c.lit(""));
     }
-    if ((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && u.uprops[BLINDED].blocked) {
+    if ((HBlinded() || EBlinded()) && BBlinded()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(could, 0) : new $c.Ptr(can, 0), $c.lit("see"), await from_what(-BLINDED));
     }
-    if ((u.uprops[BLND_RES].intrinsic || u.uprops[BLND_RES].extrinsic) && !((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked)) {
+    if (Blnd_resist() && !Blind()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), $c.lit("not subject to light-induced blindness"), await from_what(BLND_RES));
     }
-    if (u.uprops[SEE_INVIS].intrinsic || u.uprops[SEE_INVIS].extrinsic) {
-        if (!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked)) {
+    if (See_invisible()) {
+        if (!Blind()) {
             await enlght_line(new $c.Ptr(You_, 0), final ? $c.lit("saw") : $c.lit("see"), $c.lit(" invisible"), await from_what(SEE_INVIS));
-        } else if (!($c.and64(u.uprops[BLINDED].intrinsic, FROMOUTSIDE) !== 0)) {
+        } else if (!PermaBlind()) {
             await enlght_line(new $c.Ptr(You_, 0), final ? $c.lit("would have seen") : $c.lit("will see"), $c.lit(" invisible when not blind"), $c.lit(""));
         } else {
             await enlght_line(new $c.Ptr(You_, 0), final ? $c.lit("would have seen") : $c.lit("would see"), $c.lit(" invisible if not blind"), $c.lit(""));
         }
     }
-    if (u.uprops[TELEPAT].intrinsic || u.uprops[TELEPAT].extrinsic) {
+    if (Blind_telepat()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), $c.lit("telepathic"), await from_what(TELEPAT));
     }
-    if (u.uprops[WARNING].intrinsic || u.uprops[WARNING].extrinsic) {
+    if (Warning()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), $c.lit("warned"), await from_what(WARNING));
     }
-    if ((u.uprops[WARN_OF_MON].intrinsic || u.uprops[WARN_OF_MON].extrinsic) && svc.context.warntype.obj) {
+    if (Warn_of_mon() && svc.context.warntype.obj) {
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("aware of the presence of %s"), $c.andu64(svc.context.warntype.obj, 128) ? $c.lit("orcs") : $c.andu64(svc.context.warntype.obj, 16) ? $c.lit("elves") : $c.andu64(svc.context.warntype.obj, 256) ? $c.lit("demons") : c_common_strings.c_something);
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), new $c.Ptr(buf, 0), await from_what(WARN_OF_MON));
     }
-    if ((u.uprops[WARN_OF_MON].intrinsic || u.uprops[WARN_OF_MON].extrinsic) && svc.context.warntype.polyd) {
+    if (Warn_of_mon() && svc.context.warntype.polyd) {
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("aware of the presence of %s"), $c.andu64(svc.context.warntype.polyd, 24) === 24 ? $c.lit("humans and elves") : $c.andu64(svc.context.warntype.polyd, 8) ? $c.lit("humans") : $c.andu64(svc.context.warntype.polyd, 16) ? $c.lit("elves") : $c.andu64(svc.context.warntype.polyd, 128) ? $c.lit("orcs") : $c.andu64(svc.context.warntype.polyd, 256) ? $c.lit("demons") : $c.lit("certain monsters"));
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), new $c.Ptr(buf, 0), $c.lit(""));
     }
     warnspecies = svc.context.warntype.speciesidx;
-    if ((u.uprops[WARN_OF_MON].intrinsic || u.uprops[WARN_OF_MON].extrinsic) && (warnspecies >= LOW_PM && warnspecies < NUMMONS)) {
+    if (Warn_of_mon() && ismnum(warnspecies)) {
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("aware of the presence of %s"), await makeplural(mons[warnspecies].pmnames[NEUTRAL]));
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), new $c.Ptr(buf, 0), await from_what(WARN_OF_MON));
     }
-    if (u.uprops[WARN_UNDEAD].intrinsic) {
+    if (Undead_warning()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), $c.lit("warned of undead"), await from_what(WARN_UNDEAD));
     }
-    if (u.uprops[SEARCHING].intrinsic || u.uprops[SEARCHING].extrinsic) {
+    if (Searching()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(had, 0) : new $c.Ptr(have, 0), $c.lit("automatic searching"), await from_what(SEARCHING));
     }
-    if ((u.uprops[CLAIRVOYANT].intrinsic || u.uprops[CLAIRVOYANT].extrinsic) && !u.uprops[CLAIRVOYANT].blocked) {
+    if (Clairvoyant()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), $c.lit("clairvoyant"), await from_what(CLAIRVOYANT));
-    } else if ((u.uprops[CLAIRVOYANT].intrinsic || u.uprops[CLAIRVOYANT].extrinsic) && u.uprops[CLAIRVOYANT].blocked) {
+    } else if ((HClairvoyant() || EClairvoyant()) && BClairvoyant()) {
         $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), await from_what(-CLAIRVOYANT), 256);
         strsubst(new $c.Ptr(buf, 0), $c.lit(" because of "), $c.lit(" if not for "));
         await enlght_line(new $c.Ptr(You_, 0), final ? $c.lit("could have been") : $c.lit("could be"), $c.lit(" clairvoyant"), new $c.Ptr(buf, 0));
     }
-    if (u.uprops[INFRAVISION].intrinsic || u.uprops[INFRAVISION].extrinsic) {
+    if (Infravision()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(had, 0) : new $c.Ptr(have, 0), $c.lit("infravision"), await from_what(INFRAVISION));
     }
-    if (u.uprops[DETECT_MONSTERS].intrinsic || u.uprops[DETECT_MONSTERS].extrinsic) {
+    if (Detect_monsters()) {
         $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("sensing the presence of monsters"), 256);
-        if (flags.debug) {
+        if (wizard()) {
             detectmon_timeout = $c.and64(u.uprops[DETECT_MONSTERS].intrinsic, TIMEOUT);
             if (detectmon_timeout) {
                 $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" (%ld)"), detectmon_timeout);
@@ -1107,7 +1119,7 @@ async function attributes_enlightenment(unused_mode, final) {   // insight.c:148
     }
     if (u.umconf) {
         $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit(" monsters when hitting them"), 256);
-        if (flags.debug && !final) {
+        if (wizard() && !final) {
             if (u.umconf === 1) {
                 $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit(" (next hit only)"), 256);
             } else {
@@ -1116,7 +1128,7 @@ async function attributes_enlightenment(unused_mode, final) {   // insight.c:148
         }
         await enlght_line(new $c.Ptr(You_, 0), final ? $c.lit("would have confused") : $c.lit("will confuse"), new $c.Ptr(buf, 0), $c.lit(""));
     }
-    if (u.uprops[ADORNED].extrinsic) {
+    if (Adornment()) {
         adorn = 0;
         if ($G.uleft && $G.uleft.otyp === RIN_ADORNMENT) {
             adorn = adorn + $G.uleft.spe | 0;
@@ -1127,41 +1139,41 @@ async function attributes_enlightenment(unused_mode, final) {   // insight.c:148
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%scharismatic"), adorn > 0 ? $c.lit("more ") : adorn < 0 ? $c.lit("less ") : $c.lit(""));
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), new $c.Ptr(buf, 0), await from_what(ADORNED));
     }
-    if ((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked && !(u.uprops[SEE_INVIS].intrinsic || u.uprops[SEE_INVIS].extrinsic)) {
+    if (Invisible()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), $c.lit("invisible"), await from_what(INVIS));
-    } else if ((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked) {
+    } else if (Invis()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), $c.lit("invisible to others"), await from_what(INVIS));
-    } else if ((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && u.uprops[INVIS].blocked) {
+    } else if ((HInvis() || EInvis()) && BInvis()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), $c.lit("visible"), await from_what(-INVIS));
     }
-    if (u.uprops[DISPLACED].intrinsic || u.uprops[DISPLACED].extrinsic) {
+    if (Displaced()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), $c.lit("displaced"), await from_what(DISPLACED));
     }
-    if ((u.uprops[STEALTH].intrinsic || u.uprops[STEALTH].extrinsic) && !u.uprops[STEALTH].blocked) {
+    if (Stealth()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), $c.lit("stealthy"), await from_what(STEALTH));
-    } else if (u.uprops[STEALTH].blocked && (u.uprops[STEALTH].intrinsic || u.uprops[STEALTH].extrinsic)) {
+    } else if (BStealth() && (HStealth() || EStealth())) {
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit(" stealthy%s"), u.uprops[STEALTH].blocked === 67108864 ? $c.lit(" if not mounted") : $c.lit(""));
         await enlght_line(new $c.Ptr(You_, 0), final ? $c.lit("would have been") : $c.lit("would be"), new $c.Ptr(buf, 0), $c.lit(""));
     }
-    if (u.uprops[AGGRAVATE_MONSTER].intrinsic || u.uprops[AGGRAVATE_MONSTER].extrinsic) {
+    if (Aggravate_monster()) {
         await enlght_line($c.lit("You aggravate"), final ? $c.lit("d") : $c.lit(""), $c.lit(" monsters"), await from_what(AGGRAVATE_MONSTER));
     }
-    if (u.uprops[CONFLICT].intrinsic || u.uprops[CONFLICT].extrinsic) {
+    if (Conflict()) {
         await enlght_line($c.lit("You cause"), final ? $c.lit("d") : $c.lit(""), $c.lit(" conflict"), await from_what(CONFLICT));
     }
-    if (u.uprops[JUMPING].intrinsic || u.uprops[JUMPING].extrinsic) {
+    if (Jumping()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(could, 0) : new $c.Ptr(can, 0), $c.lit("jump"), await from_what(JUMPING));
     }
-    if (u.uprops[TELEPORT].intrinsic || u.uprops[TELEPORT].extrinsic) {
+    if (Teleportation()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(could, 0) : new $c.Ptr(can, 0), $c.lit("teleport"), await from_what(TELEPORT));
     }
-    if (u.uprops[TELEPORT_CONTROL].intrinsic || u.uprops[TELEPORT_CONTROL].extrinsic) {
+    if (Teleport_control()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(had, 0) : new $c.Ptr(have, 0), $c.lit("teleport control"), await from_what(TELEPORT_CONTROL));
     }
-    if (u.uprops[LEVITATION].blocked) {
+    if (BLevitation()) {
         save_BLev = u.uprops[LEVITATION].blocked;
         u.uprops[LEVITATION].blocked = 0;
-        if ((u.uprops[LEVITATION].intrinsic || u.uprops[LEVITATION].extrinsic) && !u.uprops[LEVITATION].blocked) {
+        if (Levitation()) {
             trapped = $c.i8($c.and64(save_BLev, I_SPECIAL) !== 0 ? 1 : 0);
             terrain = $c.i8($c.and64(save_BLev, FROMOUTSIDE) !== 0 ? 1 : 0);
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s%s%s"), trapped ? $c.lit(" if not trapped") : $c.lit(""), trapped && terrain ? $c.lit(" and") : $c.lit(""), terrain ? new $c.Ptr(attributes_enlightenment$if_surroundings_permitted, 0) : $c.lit(""));
@@ -1169,7 +1181,7 @@ async function attributes_enlightenment(unused_mode, final) {   // insight.c:148
         }
         u.uprops[LEVITATION].blocked = save_BLev;
     }
-    if (u.uprops[FLYING].blocked) {
+    if (BFlying()) {
         save_BFly = u.uprops[FLYING].blocked;
         u.uprops[FLYING].blocked = 0;
         if ((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked) {
@@ -1177,7 +1189,7 @@ async function attributes_enlightenment(unused_mode, final) {   // insight.c:148
         }
         u.uprops[FLYING].blocked = save_BFly;
     }
-    if ($c.andu64(gy.youmonst.data.mflags1, M1_CLING) !== 0) {
+    if (is_clinger(gy.youmonst.data)) {
         has_lid = has_ceiling(u.uz);
         if (has_lid && !u.uinwater) {
             await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(could, 0) : new $c.Ptr(can, 0), $c.lit("cling to the ceiling"), $c.lit(""));
@@ -1189,7 +1201,7 @@ async function attributes_enlightenment(unused_mode, final) {   // insight.c:148
     if ((u.uprops[WWALKING].intrinsic || u.uprops[WWALKING].extrinsic) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) && !walking_on_water()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(could, 0) : new $c.Ptr(can, 0), $c.lit("walk on water"), await from_what(WWALKING));
     }
-    if ((u.uprops[SWIMMING].intrinsic || u.uprops[SWIMMING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_SWIM) !== 0) && (u.uinwater | 0 || !u.uinwater)) {
+    if ((u.uprops[SWIMMING].intrinsic || u.uprops[SWIMMING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_SWIM) !== 0) && ((u.uinwater | 0) || !u.uinwater)) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(could, 0) : new $c.Ptr(can, 0), $c.lit("swim"), await from_what(SWIMMING));
     }
     if (u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1_BREATHLESS) !== 0) {
@@ -1197,18 +1209,18 @@ async function attributes_enlightenment(unused_mode, final) {   // insight.c:148
     } else if (u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1_AMPHIBIOUS) !== 0) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(could, 0) : new $c.Ptr(can, 0), $c.lit("breathe water"), await from_what(MAGICAL_BREATHING));
     }
-    if (u.uprops[PASSES_WALLS].intrinsic || u.uprops[PASSES_WALLS].extrinsic) {
+    if (Passes_walls()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(could, 0) : new $c.Ptr(can, 0), $c.lit("walk through walls"), await from_what(PASSES_WALLS));
     }
-    if (u.uprops[REGENERATION].intrinsic || u.uprops[REGENERATION].extrinsic) {
+    if (Regeneration()) {
         await enlght_line($c.lit("You regenerate"), final ? $c.lit("d") : $c.lit(""), $c.lit(""), await from_what(REGENERATION));
     }
-    if (u.uprops[SLOW_DIGESTION].intrinsic || u.uprops[SLOW_DIGESTION].extrinsic) {
+    if (Slow_digestion()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(had, 0) : new $c.Ptr(have, 0), $c.lit("slower digestion"), await from_what(SLOW_DIGESTION));
     }
     if (u.uhitinc) {
         await enlght_combatinc($c.lit("to hit"), u.uhitinc, final, new $c.Ptr(buf, 0));
-        if (iflags.tux_penalty && !(u.umonnum !== u.umonster)) {
+        if (iflags.tux_penalty && !Upolyd()) {
             $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" %s your suit's penalty"), u.uhitinc < 0 ? $c.lit("increasing") : u.uhitinc < $c.div32(Math.imul(4, gu.urole.spelarmr), 5) ? $c.lit("partly offsetting") : u.uhitinc < gu.urole.spelarmr ? $c.lit("nearly offsetting") : $c.lit("overcoming"));
         }
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(had, 0) : new $c.Ptr(have, 0), new $c.Ptr(buf, 0), $c.lit(""));
@@ -1216,7 +1228,7 @@ async function attributes_enlightenment(unused_mode, final) {   // insight.c:148
     if (u.udaminc) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(had, 0) : new $c.Ptr(have, 0), await enlght_combatinc($c.lit("damage"), u.udaminc, final, new $c.Ptr(buf, 0)), $c.lit(""));
     }
-    if (u.uspellprot || (u.uprops[PROTECTION].intrinsic || u.uprops[PROTECTION].extrinsic)) {
+    if (u.uspellprot || Protection()) {
         prot = 0;
         if ($G.uleft && $G.uleft.otyp === RIN_PROTECTION) {
             prot = prot + $G.uleft.spe | 0;
@@ -1227,7 +1239,7 @@ async function attributes_enlightenment(unused_mode, final) {   // insight.c:148
         if ($G.uamul && $G.uamul.otyp === AMULET_OF_GUARDING) {
             prot = prot + 2 | 0;
         }
-        if ($c.and64(u.uprops[PROTECTION].intrinsic, FROMOUTSIDE | FROMRACE | FROMEXPER)) {
+        if ($c.and64(u.uprops[PROTECTION].intrinsic, INTRINSIC)) {
             prot = prot + u.ublessed | 0;
         }
         prot = prot + u.uspellprot | 0;
@@ -1241,17 +1253,17 @@ async function attributes_enlightenment(unused_mode, final) {   // insight.c:148
         }
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), attributes_enlightenment$mc_types[armpro], $c.lit(""));
     }
-    if (u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic) {
+    if (Half_physical_damage()) {
         await enlght_halfdmg(HALF_PHDAM, final);
     }
-    if (u.uprops[HALF_SPDAM].intrinsic || u.uprops[HALF_SPDAM].extrinsic) {
+    if (Half_spell_damage()) {
         await enlght_halfdmg(HALF_SPDAM, final);
     }
-    if ($G.ublindf && $G.ublindf.otyp === TOWEL && $G.ublindf.spe > 0) {
+    if (Half_gas_damage()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? $c.lit("took") : $c.lit("take"), $c.lit(" reduced poison gas damage"), $c.lit(""));
     }
     if (svs.spl_book[0].sp_id > NO_SPELL) {
-        suit = $c.i8($G.uarm && ((objects[$G.uarm.otyp].oc_material | 0) >= IRON && (objects[$G.uarm.otyp].oc_material | 0) <= MITHRIL) ? 1 : 0);
+        suit = $c.i8($G.uarm && is_metallic($G.uarm) ? 1 : 0);
         robe = $c.i8($G.uarmc && $G.uarmc.otyp === ROBE ? 1 : 0);
         new $c.Ptr(cast_adj, 0).set(0, 0);
         if (suit) {
@@ -1263,82 +1275,82 @@ async function attributes_enlightenment(unused_mode, final) {   // insight.c:148
             await enlght_line($c.lit("Your spell casting "), final ? $c.lit("was") : $c.lit("is"), new $c.Ptr(cast_adj, 0), $c.lit(""));
         }
     }
-    if (u.uprops[PROT_FROM_SHAPE_CHANGERS].intrinsic || u.uprops[PROT_FROM_SHAPE_CHANGERS].extrinsic) {
+    if (Protection_from_shape_changers()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), $c.lit("protected from shape changers"), await from_what(PROT_FROM_SHAPE_CHANGERS));
     }
-    if (u.uprops[UNCHANGING].intrinsic || u.uprops[UNCHANGING].extrinsic) {
+    if (Unchanging()) {
         what = null;
-        if (!(u.umonnum !== u.umonster)) {
+        if (!Upolyd()) {
             await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(could, 0) : new $c.Ptr(can, 0), $c.lit("not change from your current form"), await from_what(UNCHANGING));
         }
-        if (u.uprops[POLYMORPH].intrinsic || u.uprops[POLYMORPH].extrinsic) {
+        if (Polymorph()) {
             what = !final ? $c.lit("polymorph") : $c.lit("have polymorphed");
-        } else if (u.ulycn >= LOW_PM && u.ulycn < NUMMONS) {
+        } else if (ismnum(u.ulycn)) {
             what = !final ? $c.lit("change shape") : $c.lit("have changed shape");
         }
         if (what) {
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("would %s periodically"), what);
             await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(buf, 0) : new $c.Ptr(buf, 0), $c.lit(" if not locked into your current form"), $c.lit(""));
         }
-    } else if (u.uprops[POLYMORPH].intrinsic || u.uprops[POLYMORPH].extrinsic) {
+    } else if (Polymorph()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), $c.lit("polymorphing periodically"), await from_what(POLYMORPH));
     }
-    if (u.uprops[POLYMORPH_CONTROL].intrinsic || u.uprops[POLYMORPH_CONTROL].extrinsic) {
+    if (Polymorph_control()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(had, 0) : new $c.Ptr(have, 0), $c.lit("polymorph control"), await from_what(POLYMORPH_CONTROL));
     }
-    if (u.umonnum !== u.umonster && u.umonnum !== u.ulycn && !(final === ENL_GAMEOVERDEAD && u.umonnum === PM_GREEN_SLIME && !(u.uprops[UNCHANGING].intrinsic || u.uprops[UNCHANGING].extrinsic))) {
+    if (Upolyd() && u.umonnum !== u.ulycn && !(final === ENL_GAMEOVERDEAD && u.umonnum === PM_GREEN_SLIME && !Unchanging())) {
         if (!((gy.youmonst.cham === PM_VAMPIRE || gy.youmonst.cham === PM_VAMPIRE_LEADER || gy.youmonst.cham === PM_VLAD_THE_IMPALER) && !(gy.youmonst.data.mlet === S_VAMPIRE))) {
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("polymorphed into %s"), await an(pmname(gy.youmonst.data, flags.female ? FEMALE : MALE)));
         } else {
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("polymorphed into %s in %s form"), await an(pmname($c.relem(mons, gy.youmonst.cham), flags.female ? FEMALE : MALE)), pmname(gy.youmonst.data, flags.female ? FEMALE : MALE));
         }
-        if (flags.debug) {
+        if (wizard()) {
             $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" (%d)"), u.mtimedone);
         }
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), new $c.Ptr(buf, 0), $c.lit(""));
     }
-    if ($c.andu64(gy.youmonst.data.mflags1, M1_OVIPAROUS) !== 0 && flags.female) {
+    if (lays_eggs(gy.youmonst.data) && flags.female) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(could, 0) : new $c.Ptr(can, 0), $c.lit("lay eggs"), $c.lit(""));
     }
-    if (u.ulycn >= LOW_PM && u.ulycn < NUMMONS) {
+    if (ismnum(u.ulycn)) {
         $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), await an(pmname($c.relem(mons, u.ulycn), flags.female ? FEMALE : MALE)), 256);
         if (u.umonnum === u.ulycn) {
             $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit(" in beast form"), 256);
-            if (flags.debug) {
+            if (wizard()) {
                 $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" (%d)"), u.mtimedone);
             }
         }
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), new $c.Ptr(buf, 0), $c.lit(""));
     }
-    if ((u.uprops[UNCHANGING].intrinsic || u.uprops[UNCHANGING].extrinsic) && u.umonnum !== u.umonster) {
+    if (Unchanging() && Upolyd()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(could, 0) : new $c.Ptr(can, 0), $c.lit("not change from your current form"), await from_what(UNCHANGING));
     }
-    if (u.ulycn >= LOW_PM || hates_silver(gy.youmonst.data)) {
+    if (Hate_silver()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), $c.lit("harmed by silver"), $c.lit(""));
     }
-    if (u.uprops[FAST].intrinsic || u.uprops[FAST].extrinsic) {
+    if (Fast()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), $c.and64(u.uprops[FAST].intrinsic, -117440513) || u.uprops[FAST].extrinsic ? $c.lit("very fast") : $c.lit("fast"), await from_what(FAST));
     }
-    if (u.uprops[REFLECTING].intrinsic || u.uprops[REFLECTING].extrinsic) {
+    if (Reflecting()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(had, 0) : new $c.Ptr(have, 0), $c.lit("reflection"), await from_what(REFLECTING));
     }
-    if (u.uprops[FREE_ACTION].extrinsic) {
+    if (Free_action()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(had, 0) : new $c.Ptr(have, 0), $c.lit("free action"), await from_what(FREE_ACTION));
     }
-    if (u.uprops[FIXED_ABIL].extrinsic) {
+    if (Fixed_abil()) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(had, 0) : new $c.Ptr(have, 0), $c.lit("fixed abilities"), await from_what(FIXED_ABIL));
     }
-    if (u.uprops[LIFESAVED].extrinsic) {
+    if (Lifesaved()) {
         await enlght_line($c.lit("Your life "), final ? $c.lit("would have been") : $c.lit("will be"), $c.lit(" saved"), $c.lit(""));
     }
-    if (u.uluck + u.moreluck | 0) {
-        ltmp = $c.abs(u.uluck + u.moreluck | 0);
+    if (Luck()) {
+        ltmp = $c.abs(Luck());
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s%slucky"), ltmp >= 10 ? $c.lit("extremely ") : ltmp >= 5 ? $c.lit("very ") : $c.lit(""), (u.uluck + u.moreluck | 0) < 0 ? $c.lit("un") : $c.lit(""));
-        if (flags.debug) {
+        if (wizard()) {
             $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" (%d)"), u.uluck + u.moreluck | 0);
         }
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(are, 0), new $c.Ptr(buf, 0), $c.lit(""));
-    } else if (flags.debug) {
+    } else if (wizard()) {
         await enlght_line($c.lit("Your luck "), final ? $c.lit("was") : $c.lit("is"), $c.lit(" zero"), $c.lit(""));
     }
     if (u.moreluck > 0) {
@@ -1346,8 +1358,8 @@ async function attributes_enlightenment(unused_mode, final) {   // insight.c:148
     } else if (u.moreluck < 0) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(had, 0) : new $c.Ptr(have, 0), $c.lit("reduced luck"), $c.lit(""));
     }
-    if (carrying(LUCKSTONE) || stone_luck(1)) {
-        ltmp = stone_luck(0);
+    if (carrying(LUCKSTONE) || stone_luck(TRUE)) {
+        ltmp = stone_luck(FALSE);
         if (ltmp <= 0) {
             await enlght_line($c.lit("Bad luck "), final ? $c.lit("did") : $c.lit("does"), $c.lit(" not time out for you"), $c.lit(""));
         }
@@ -1357,21 +1369,21 @@ async function attributes_enlightenment(unused_mode, final) {   // insight.c:148
     }
     if (u.ugangr) {
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit(" %sangry with you"), u.ugangr > 6 ? $c.lit("extremely ") : u.ugangr > 3 ? $c.lit("very ") : $c.lit(""));
-        if (flags.debug) {
+        if (wizard()) {
             $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" (%d)"), u.ugangr);
         }
         await enlght_line(await u_gname(), final ? $c.lit(" was") : $c.lit(" is"), new $c.Ptr(buf, 0), $c.lit(""));
     } else {
         if (!final) {
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%ssafely pray"), await can_pray(0) ? $c.lit("") : $c.lit("not "));
-            if (flags.debug) {
+            if (wizard()) {
                 $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" (%d)"), u.ublesscnt);
             }
             await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(could, 0) : new $c.Ptr(can, 0), new $c.Ptr(buf, 0), $c.lit(""));
         }
     }
-    if (flags.debug && debugcore($c.lit("fruit"), 0)) {
-        await reorder_fruit(1);
+    if (wizard() && debugcore($c.lit("fruit"), FALSE)) {
+        await reorder_fruit(TRUE);
         for (f = gf.ffruit; f; f = f.nextf) {
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Fruit #%d "), f.fid);
             await enlght_line(new $c.Ptr(buf, 0), final ? $c.lit("was ") : $c.lit("is "), new $c.Ptr(f.fname, 0), $c.lit(""));
@@ -1409,7 +1421,7 @@ async function attributes_enlightenment(unused_mode, final) {   // insight.c:148
 export async function doattributes() {   // insight.c:2009
     let mode = 0;
     mode = BASICENLIGHTENMENT;
-    if (flags.debug || flags.explore) {
+    if (wizard() || discover()) {
         mode = mode | MAGICENLIGHTENMENT;
     }
     await enlightenment(mode, ENL_GAMEINPROGRESS);
@@ -1418,13 +1430,13 @@ export async function doattributes() {   // insight.c:2009
 export async function youhiding(via_enlghtmt, msgflag) {   // insight.c:2022
     let bp = null, buf = new Int8Array(256), o = null, t = null, final = 0;
     $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("hiding"), 256);
-    if ((gy.youmonst.m_ap_type & M_AP_TYPMASK) !== M_AP_NOTHING) {
+    if (U_AP_TYPE() !== M_AP_NOTHING) {
         bp = eos($c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("mimicking"), 256));
-        if ((gy.youmonst.m_ap_type & M_AP_TYPMASK) === M_AP_OBJECT) {
+        if (U_AP_TYPE() === M_AP_OBJECT) {
             $c.__builtin___sprintf_chk(bp, 0, -1, $c.lit(" %s"), await an(await simple_typename(gy.youmonst.mappearance | 0)));
-        } else if ((gy.youmonst.m_ap_type & M_AP_TYPMASK) === M_AP_FURNITURE) {
+        } else if (U_AP_TYPE() === M_AP_FURNITURE) {
             $c.__builtin___strcpy_chk(bp, $c.lit(" something"), -1);
-        } else if ((gy.youmonst.m_ap_type & M_AP_TYPMASK) === M_AP_MONSTER) {
+        } else if (U_AP_TYPE() === M_AP_MONSTER) {
             $c.__builtin___strcpy_chk(bp, $c.lit(" someone"), -1);
         } else {
         }
@@ -1434,12 +1446,12 @@ export async function youhiding(via_enlghtmt, msgflag) {   // insight.c:2022
             if (is_pool(u.ux, u.uy)) {
                 $c.__builtin___sprintf_chk(bp, 0, -1, $c.lit(" in the %s"), waterbody_name(u.ux, u.uy));
             }
-        } else if ($c.andu64(gy.youmonst.data.mflags1, M1_CONCEAL) !== 0) {
+        } else if (hides_under(gy.youmonst.data)) {
             o = svl.level.objects[u.ux][u.uy];
             if (o) {
                 $c.__builtin___sprintf_chk(bp, 0, -1, $c.lit(" underneath %s"), await ansimpleoname(o));
             }
-        } else if ($c.andu64(gy.youmonst.data.mflags1, M1_CLING) !== 0 || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked) {
+        } else if (is_clinger(gy.youmonst.data) || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked) {
             $c.__builtin___sprintf_chk(bp, 0, -1, $c.lit(" on the %s"), ceiling(u.ux, u.uy));
         } else {
             if (u.utrap && u.utraptype === TT_PIT) {
@@ -1464,8 +1476,8 @@ export async function doconduct() {   // insight.c:2081
 }
 export async function show_conduct(final) {   // insight.c:2089
     let buf = new Int8Array(256), bufN = new Int8Array(40), ngenocided = 0, presentverb = null, pastverb = null, $t1;
-    $t1 = await windowprocs.win_create_nhwindow(NHW_MENU), ge.en_win = $t1;
-    await windowprocs.win_putstr(ge.en_win, 0, $c.lit("Voluntary challenges:"));
+    $t1 = await create_nhwindow()(NHW_MENU), ge.en_win = $t1;
+    await putstr()(ge.en_win, 0, $c.lit("Voluntary challenges:"));
     if (!u.uroleplay.reroll) {
         $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit(" Character rerolling was not enabled."), 256);
     } else if (!u.uroleplay.numrerolls) {
@@ -1498,7 +1510,7 @@ export async function show_conduct(final) {   // insight.c:2089
     }
     if (!u.uconduct.weaphit) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(never, 0) : new $c.Ptr(have_never, 0), $c.lit("hit with a wielded weapon"), $c.lit(""));
-    } else if (flags.debug) {
+    } else if (wizard()) {
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("hit with a wielded weapon %ld time%s"), u.uconduct.weaphit, u.uconduct.weaphit === 1 ? $c.lit("") : $c.lit("s"));
         await enlght_line(new $c.Ptr(You_, 0), final ? $c.lit("") : new $c.Ptr(have, 0), new $c.Ptr(buf, 0), $c.lit(""));
     }
@@ -1507,7 +1519,7 @@ export async function show_conduct(final) {   // insight.c:2089
     }
     if (!u.uconduct.literate) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(were, 0) : new $c.Ptr(have_been, 0), $c.lit("illiterate"), $c.lit(""));
-    } else if (flags.debug) {
+    } else if (wizard()) {
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("read items or engraved %ld time%s"), u.uconduct.literate, u.uconduct.literate === 1 ? $c.lit("") : $c.lit("s"));
         await enlght_line(new $c.Ptr(You_, 0), final ? $c.lit("") : new $c.Ptr(have, 0), new $c.Ptr(buf, 0), $c.lit(""));
     }
@@ -1523,13 +1535,13 @@ export async function show_conduct(final) {   // insight.c:2089
     }
     if (!u.uconduct.polypiles) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(never, 0) : new $c.Ptr(have_never, 0), $c.lit("polymorphed an object"), $c.lit(""));
-    } else if (flags.debug) {
+    } else if (wizard()) {
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("polymorphed %ld item%s"), u.uconduct.polypiles, u.uconduct.polypiles === 1 ? $c.lit("") : $c.lit("s"));
         await enlght_line(new $c.Ptr(You_, 0), final ? $c.lit("") : new $c.Ptr(have, 0), new $c.Ptr(buf, 0), $c.lit(""));
     }
     if (!u.uconduct.polyselfs) {
         await enlght_line(new $c.Ptr(You_, 0), final ? new $c.Ptr(never, 0) : new $c.Ptr(have_never, 0), $c.lit("changed form"), $c.lit(""));
-    } else if (flags.debug) {
+    } else if (wizard()) {
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("changed form %ld time%s"), u.uconduct.polyselfs, u.uconduct.polyselfs === 1 ? $c.lit("") : $c.lit("s"));
         await enlght_line(new $c.Ptr(You_, 0), final ? $c.lit("") : new $c.Ptr(have, 0), new $c.Ptr(buf, 0), $c.lit(""));
     }
@@ -1564,27 +1576,27 @@ export async function show_conduct(final) {   // insight.c:2089
         await enlght_line(new $c.Ptr(You_, 0), final ? pastverb : presentverb, new $c.Ptr(buf, 0), $c.lit(""));
     }
     await show_achievements(final);
-    await windowprocs.win_display_nhwindow(ge.en_win, 1);
-    await windowprocs.win_destroy_nhwindow(ge.en_win);
-    ge.en_win = -1;
+    await display_nhwindow()(ge.en_win, TRUE);
+    await destroy_nhwindow()(ge.en_win);
+    ge.en_win = WIN_ERR;
 }
 async function show_achievements(final) {   // insight.c:2243
     let i = 0, achidx = 0, absidx = 0, acnt = 0, title = new Int8Array(128), buf = new Int8Array(128), awin = 0;
-    awin = -1;
-    if (!final && !flags.debug) {
+    awin = WIN_ERR;
+    if (!final && !wizard()) {
         return;
     }
     if ((acnt = count_achievements()) === 0) {
         return;
     }
-    if (ge.en_win !== -1) {
+    if (ge.en_win !== WIN_ERR) {
         awin = ge.en_win;
-        await windowprocs.win_putstr(awin, 0, $c.lit(""));
+        await putstr()(awin, 0, $c.lit(""));
     } else {
-        awin = await windowprocs.win_create_nhwindow(NHW_MENU);
+        awin = await create_nhwindow()(NHW_MENU);
     }
     $c.__builtin___sprintf_chk(new $c.Ptr(title, 0), 0, 128, $c.lit("Achievement%s:"), acnt === 1 ? $c.lit("") : $c.lit("s"));
-    await windowprocs.win_putstr(awin, 0, new $c.Ptr(title, 0));
+    await putstr()(awin, 0, new $c.Ptr(title, 0));
     if (remove_achievement(ACH_UWIN)) {
         if (remove_achievement(ACH_AMUL)) {
             await record_achievement(ACH_AMUL);
@@ -1682,8 +1694,8 @@ async function show_achievements(final) {   // insight.c:2243
         }
     }
     if (awin !== ge.en_win) {
-        await windowprocs.win_display_nhwindow(awin, 1);
-        await windowprocs.win_destroy_nhwindow(awin);
+        await display_nhwindow()(awin, TRUE);
+        await destroy_nhwindow()(awin);
     }
 }
 export async function record_achievement(achidx) {   // insight.c:2407
@@ -1708,7 +1720,7 @@ export async function record_achievement(achidx) {   // insight.c:2407
         return;
     }
     if (absidx >= ACH_RNK1 && absidx <= ACH_RNK8) {
-        await livelog_printf(achieve_msg[absidx].llflag, $c.lit("attained the rank of %s (level %d)"), rank_of(rank_to_xlev(absidx - (ACH_RNK1 - 1) | 0), gu.urole.mnum, $c.i8(achidx < 0 ? 1 : 0)), u.ulevel);
+        await livelog_printf(achieve_msg[absidx].llflag, $c.lit("attained the rank of %s (level %d)"), rank_of(rank_to_xlev(absidx - (ACH_RNK1 - 1) | 0), gu.urole.mnum, $c.i8(achidx < 0 ? TRUE : FALSE)), u.ulevel);
     } else if (achidx === ACH_SOKO_PRIZE || achidx === ACH_MINE_PRIZE) {
         otyp = $c.i16(achidx === ACH_SOKO_PRIZE ? svc.context.achieveo.soko_prize_otyp : svc.context.achieveo.mines_prize_otyp);
         await livelog_printf(achieve_msg[achidx].llflag, $c.lit("%s %s"), achieve_msg[achidx].msg, obj_descr[objects[otyp].oc_name_idx].oc_name);
@@ -1724,12 +1736,12 @@ export function remove_achievement(achidx) {   // insight.c:2476
         }
     }
     if (!u.uachieved[i]) {
-        return 0;
+        return FALSE;
     }
     do {
         u.uachieved[i] = u.uachieved[i + 1 | 0];
     } while (u.uachieved[i = i + 1 | 0]);
-    return 1;
+    return TRUE;
 }
 export function count_achievements() {   // insight.c:2494
     let i = 0, acnt = 0;
@@ -1751,10 +1763,10 @@ export function sokoban_in_play() {   // insight.c:2517
     let achidx = 0;
     for (achidx = 0; u.uachieved[achidx]; achidx = achidx + 1 | 0) {
         if (u.uachieved[achidx] === ACH_SOKO) {
-            return 1;
+            return TRUE;
         }
     }
-    return 0;
+    return FALSE;
 }
 export async function do_gamelog() {   // insight.c:2532
     if (gg.gamelog) {
@@ -1767,27 +1779,27 @@ export async function do_gamelog() {   // insight.c:2532
 export async function show_gamelog(final) {   // insight.c:2561
     let llmsg = null, win = 0, buf = new Int8Array(256), eventcnt = 0, $t1;
     eventcnt = 0;
-    win = await windowprocs.win_create_nhwindow(NHW_TEXT);
+    win = await create_nhwindow()(NHW_TEXT);
     $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s events:"), final ? $c.lit("Major") : $c.lit("Logged"));
-    await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
+    await putstr()(win, 0, new $c.Ptr(buf, 0));
     for (llmsg = gg.gamelog; llmsg; llmsg = llmsg.next) {
-        if (final && !($c.and64(llmsg.flags, 0 | LL_WISH | LL_ACHIEVE | LL_UMONST | LL_DIVINEGIFT | LL_LIFESAVE | LL_ARTIFACT | LL_GENOCIDE | LL_DUMP) !== 0)) {
+        if (final && !majorevent(llmsg)) {
             continue;
         }
-        if (!final && !flags.debug && $c.and64(llmsg.flags, 8192) !== 0) {
+        if (!final && !wizard() && spoilerevent(llmsg)) {
             continue;
         }
         if (!($t1 = eventcnt, eventcnt = $t1 + 1 | 0, $t1)) {
-            await windowprocs.win_putstr(win, 0, $c.lit(" Turn"));
+            await putstr()(win, 0, $c.lit(" Turn"));
         }
         nh_snprintf($c.lit("show_gamelog"), 2579, new $c.Ptr(buf, 0), 256, $c.lit("%5ld: %s"), llmsg.turn, llmsg.text);
-        await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
+        await putstr()(win, 0, new $c.Ptr(buf, 0));
     }
     if (!eventcnt) {
-        await windowprocs.win_putstr(win, 0, $c.lit(" none"));
+        await putstr()(win, 0, $c.lit(" none"));
     }
-    await windowprocs.win_display_nhwindow(win, 1);
-    await windowprocs.win_destroy_nhwindow(win);
+    await display_nhwindow()(win, TRUE);
+    await destroy_nhwindow()(win);
     return;
 }
 function vanqsort_cmp(vptr1, vptr2) {   // insight.c:2621
@@ -1816,7 +1828,7 @@ function vanqsort_cmp(vptr1, vptr2) {   // insight.c:2621
         case VANQ_ALPHA_MIX:
             name1 = mons[indx1].pmnames[NEUTRAL];
             name2 = mons[indx2].pmnames[NEUTRAL];
-            res = strncmpi(name1, name2, -1);
+            res = strcmpi(name1, name2);
             break;
         case VANQ_MCLS_HTOL:
         case VANQ_MCLS_LTOH:
@@ -1832,7 +1844,7 @@ function vanqsort_cmp(vptr1, vptr2) {   // insight.c:2621
             }
             res = mcls1 - mcls2 | 0;
             if (res === 0) {
-                res = ($c.peq($c.relem(mons, indx2), $c.relem(mons, PM_DEATH)) || $c.peq($c.relem(mons, indx2), $c.relem(mons, PM_FAMINE)) || $c.peq($c.relem(mons, indx2), $c.relem(mons, PM_PESTILENCE)) ? 1 : 0) - ($c.peq($c.relem(mons, indx1), $c.relem(mons, PM_DEATH)) || $c.peq($c.relem(mons, indx1), $c.relem(mons, PM_FAMINE)) || $c.peq($c.relem(mons, indx1), $c.relem(mons, PM_PESTILENCE)) ? 1 : 0) | 0;
+                res = is_rider($c.relem(mons, indx2)) - is_rider($c.relem(mons, indx1)) | 0;
                 if (res) {
                     break;
                 }
@@ -1862,8 +1874,8 @@ function vanqsort_cmp(vptr1, vptr2) {   // insight.c:2621
 export async function set_vanq_order(for_vanq) {   // insight.c:2718
     let tmpwin = 0, selected = [null], any = new $T.any(), buf = new Int8Array(256), desc = null, i = 0, n = 0, choice = 0, clr = 0;
     clr = NO_COLOR;
-    tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
-    await windowprocs.win_start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW_MENU);
+    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     for (i = 0; i < 8; i = i + 1 | 0) {
         if (i === VANQ_ALPHA_MIX || i === VANQ_MCLS_HTOL) {
@@ -1880,9 +1892,9 @@ export async function set_vanq_order(for_vanq) {   // insight.c:2718
         await add_menu(tmpwin, nul_glyphinfo, any, vanqorders[i][0].get(0), 0, ATR_NONE, clr, desc, i === flags.vanq_sortmode ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     }
     $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Sort order for %s"), for_vanq ? $c.lit("vanquished monster counts (also genocided types)") : $c.lit("genocided monster types (also vanquished counts)"));
-    await windowprocs.win_end_menu(tmpwin, new $c.Ptr(buf, 0));
+    await end_menu()(tmpwin, new $c.Ptr(buf, 0));
     n = await select_menu(tmpwin, PICK_ONE, new $c.Ptr(selected, 0));
-    await windowprocs.win_destroy_nhwindow(tmpwin);
+    await destroy_nhwindow()(tmpwin);
     if (n > 0) {
         choice = $c.radd(selected[0], 0).item.a_int - 1 | 0;
         if (n > 1 && choice === flags.vanq_sortmode) {
@@ -1894,8 +1906,8 @@ export async function set_vanq_order(for_vanq) {   // insight.c:2718
     return n < 0 ? -1 : flags.vanq_sortmode;
 }
 export async function dovanquished() {   // insight.c:2769
-    await list_vanquished($c.i8(iflags.menu_requested ? 65 : 121), 0);
-    iflags.menu_requested = 0;
+    await list_vanquished($c.i8(iflags.menu_requested ? 65 : 121), FALSE);
+    iflags.menu_requested = FALSE;
     return ECMD_OK;
 }
 export async function list_vanquished(defquery, ask) {   // insight.c:2784
@@ -1904,11 +1916,11 @@ export async function list_vanquished(defquery, ask) {   // insight.c:2784
     force_sort = $c.i8(defquery === 65 ? 1 : 0);
     dumping = $c.i8(defquery === 100 ? 1 : 0);
     if (force_sort) {
-        await set_vanq_order(1);
+        await set_vanq_order(TRUE);
     }
     if (dumping || force_sort) {
         defquery = 121;
-        ask = 0;
+        ask = FALSE;
     }
     ntypes = 0;
     for (i = LOW_PM; i < NUMMONS; i = i + 1 | 0) {
@@ -1920,8 +1932,8 @@ export async function list_vanquished(defquery, ask) {   // insight.c:2784
     }
     if (ntypes !== 0) {
         prev_mlet = 0;
-        was_uniq = 0;
-        special_hdr = 0;
+        was_uniq = FALSE;
+        special_hdr = FALSE;
         if (ask) {
             if (ntypes > 1) {
                 $c.__builtin___strcpy_chk(new $c.Ptr(allow_yn, 0), new $c.Ptr(ynaqchars, 0), 10);
@@ -1932,7 +1944,7 @@ export async function list_vanquished(defquery, ask) {   // insight.c:2784
                     defquery = 121;
                 }
             }
-            c = await yn_function($c.lit("Do you want an account of creatures vanquished?"), new $c.Ptr(allow_yn, 0), defquery, 1);
+            c = await yn_function($c.lit("Do you want an account of creatures vanquished?"), new $c.Ptr(allow_yn, 0), defquery, TRUE);
         } else {
             c = defquery;
         }
@@ -1941,44 +1953,44 @@ export async function list_vanquished(defquery, ask) {   // insight.c:2784
         }
         if (c === 121 || c === 97) {
             if (c === 97 && ntypes > 1) {
-                if (await set_vanq_order(1) < 0) {
+                if (await set_vanq_order(TRUE) < 0) {
                     return;
                 }
             }
             uniq_header = $c.i8(flags.vanq_sortmode === VANQ_ALPHA_SEP ? 1 : 0);
             class_header = $c.i8((flags.vanq_sortmode === VANQ_MCLS_LTOH || flags.vanq_sortmode === VANQ_MCLS_HTOL) && ntypes > 1 ? 1 : 0);
-            klwin = await windowprocs.win_create_nhwindow(NHW_MENU);
-            await windowprocs.win_putstr(klwin, 0, $c.lit("Vanquished creatures:"));
+            klwin = await create_nhwindow()(NHW_MENU);
+            await putstr()(klwin, 0, $c.lit("Vanquished creatures:"));
             if (!dumping) {
-                await windowprocs.win_putstr(klwin, 0, $c.lit(""));
+                await putstr()(klwin, 0, $c.lit(""));
             }
             $c.nh_deterministic_qsort(new $c.Ptr(mindx, 0), ntypes, 2, vanqsort_cmp);
             for (ni = 0; ni < ntypes; ni = ni + 1 >>> 0) {
                 i = mindx[ni];
                 nkilled = svm.mvitals[i].died;
-                Rider = $c.i8($c.peq($c.relem(mons, i), $c.relem(mons, PM_DEATH)) || $c.peq($c.relem(mons, i), $c.relem(mons, PM_FAMINE)) || $c.peq($c.relem(mons, i), $c.relem(mons, PM_PESTILENCE)) ? 1 : 0);
+                Rider = $c.i8(is_rider($c.relem(mons, i)));
                 mlet = mons[i].mlet;
                 if (class_header && (mlet !== prev_mlet || special_hdr && !Rider)) {
                     if (!Rider) {
                         $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), def_monsyms[mlet].explain, 256);
-                        special_hdr = 0;
+                        special_hdr = FALSE;
                     } else {
                         $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("Rider"), 256);
-                        special_hdr = 1;
+                        special_hdr = TRUE;
                     }
-                    await windowprocs.win_putstr(klwin, ask ? ATR_NONE : iflags.menu_headings.attr, upstart(new $c.Ptr(buf, 0)));
+                    await putstr()(klwin, ask ? ATR_NONE : iflags.menu_headings.attr, upstart(new $c.Ptr(buf, 0)));
                     prev_mlet = mlet;
                 }
-                if ((mons[i].geno & G_UNIQ) !== 0 && i !== PM_HIGH_CLERIC) {
+                if (UniqCritterIndx(i)) {
                     $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s%s"), !($c.andu64($c.relem(mons, i).mflags2, 524288) !== 0) ? $c.lit("the ") : $c.lit(""), mons[i].pmnames[NEUTRAL]);
                     if (nkilled > 1) {
                         $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" (%s)"), N_times(nkilled, new $c.Ptr(buftoo, 0)));
                     }
-                    was_uniq = 1;
+                    was_uniq = TRUE;
                 } else {
                     if (uniq_header && was_uniq) {
-                        await windowprocs.win_putstr(klwin, 0, $c.lit(""));
-                        was_uniq = 0;
+                        await putstr()(klwin, 0, $c.lit(""));
+                        was_uniq = FALSE;
                     }
                     if (nkilled === 1) {
                         $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), await an(mons[i].pmnames[NEUTRAL]), 256);
@@ -1991,17 +2003,17 @@ export async function list_vanquished(defquery, ask) {   // insight.c:2784
                     pfx = pfx + 1 | 0;
                 }
                 nh_snprintf($c.lit("list_vanquished"), 2916, new $c.Ptr(buftoo, 0), 256, $c.lit("%*s%s"), pfx, $c.lit(""), new $c.Ptr(buf, 0));
-                await windowprocs.win_putstr(klwin, 0, new $c.Ptr(buftoo, 0));
+                await putstr()(klwin, 0, new $c.Ptr(buftoo, 0));
             }
             if (ntypes > 1) {
                 if (!dumping) {
-                    await windowprocs.win_putstr(klwin, 0, $c.lit(""));
+                    await putstr()(klwin, 0, $c.lit(""));
                 }
                 $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%ld creatures vanquished."), total_killed);
-                await windowprocs.win_putstr(klwin, 0, new $c.Ptr(buf, 0));
+                await putstr()(klwin, 0, new $c.Ptr(buf, 0));
             }
-            await windowprocs.win_display_nhwindow(klwin, 1);
-            await windowprocs.win_destroy_nhwindow(klwin);
+            await display_nhwindow()(klwin, TRUE);
+            await destroy_nhwindow()(klwin);
         }
     } else if (!program_state.gameover) {
         await pline($c.lit("No creatures have been vanquished."));
@@ -2013,7 +2025,7 @@ export async function num_genocides() {   // insight.c:2953
     for (i = LOW_PM; i < NUMMONS; i = i + 1 | 0) {
         if (svm.mvitals[i].mvflags & G_GENOD) {
             n = n + 1 | 0;
-            if ((mons[i].geno & G_UNIQ) !== 0 && i !== PM_HIGH_CLERIC) {
+            if (UniqCritterIndx(i)) {
                 await impossible($c.lit("unique creature '%d: %s' genocided?"), i, mons[i].pmnames[NEUTRAL]);
             }
         }
@@ -2024,10 +2036,10 @@ function num_extinct() {   // insight.c:2970
     let i = 0, n = 0;
     n = 0;
     for (i = LOW_PM; i < NUMMONS; i = i + 1 | 0) {
-        if ((mons[i].geno & G_UNIQ) !== 0 && i !== PM_HIGH_CLERIC) {
+        if (UniqCritterIndx(i)) {
             continue;
         }
-        if ((svm.mvitals[i].mvflags & (G_GENOD | G_EXTINCT)) === G_EXTINCT) {
+        if ((svm.mvitals[i].mvflags & G_GONE) === G_EXTINCT) {
             n = n + 1 | 0;
         }
     }
@@ -2039,7 +2051,7 @@ function num_gone(mvflags, mindx) {   // insight.c:2985
     n = 0;
     $c.__builtin___memset_chk(mindx, 0, 1532, -1);
     for (i = LOW_PM; i < NUMMONS; i = i + 1 | 0) {
-        if ((mons[i].geno & G_UNIQ) !== 0 && i !== PM_HIGH_CLERIC) {
+        if (UniqCritterIndx(i)) {
             continue;
         }
         if ((svm.mvitals[i].mvflags & mflg) !== 0) {
@@ -2050,14 +2062,14 @@ function num_gone(mvflags, mindx) {   // insight.c:2985
 }
 export async function list_genocided(defquery, ask) {   // insight.c:3007
     let i = 0, mndx = 0, ngenocided = 0, nextinct = 0, ngone = 0, mvflags = 0, mindx = new Int32Array(383), c = 0, klwin = 0, buf = new Int8Array(256), genoing = 0, dumping = 0, both = 0, save_sortmode = 0, mlet = 0, prev_mlet = 0, class_header = 0;
-    both = $c.i8(program_state.gameover || flags.debug || flags.explore ? 1 : 0);
+    both = $c.i8(program_state.gameover || wizard() || discover() ? 1 : 0);
     dumping = $c.i8(defquery === 100 ? 1 : 0);
     genoing = $c.i8(defquery === 103 ? 1 : 0);
     if (dumping || genoing) {
         defquery = 121;
     }
     if (genoing) {
-        both = 0;
+        both = FALSE;
     }
     ngenocided = await num_genocides();
     nextinct = both ? num_extinct() : 0;
@@ -2065,16 +2077,16 @@ export async function list_genocided(defquery, ask) {   // insight.c:3007
     ngone = num_gone(mvflags, new $c.Ptr(mindx, 0));
     if (ngone > 0) {
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Do you want a list of %sspecies%s%s?"), nextinct && !ngenocided ? $c.lit("extinct ") : $c.lit(""), ngenocided ? $c.lit(" genocided") : $c.lit(""), nextinct && ngenocided ? $c.lit(" and extinct") : $c.lit(""));
-        c = $c.i8(ask ? await yn_function(new $c.Ptr(buf, 0), ngone > 1 ? $c.lit("ynaq") : $c.lit("ynq\x1ba"), defquery, 1) : defquery);
+        c = $c.i8(ask ? await yn_function(new $c.Ptr(buf, 0), ngone > 1 ? $c.lit("ynaq") : $c.lit("ynq\x1ba"), defquery, TRUE) : defquery);
         if (c === 113) {
             program_state.stopprint = program_state.stopprint + 1 | 0;
         }
         if (c === 121 || c === 97) {
             prev_mlet = 0;
-            class_header = 0;
+            class_header = FALSE;
             if (ngone > 1) {
                 if (c === 97) {
-                    if (await set_vanq_order(0) < 0) {
+                    if (await set_vanq_order(FALSE) < 0) {
                         return;
                     }
                 }
@@ -2086,66 +2098,66 @@ export async function list_genocided(defquery, ask) {   // insight.c:3007
                 class_header = $c.i8(flags.vanq_sortmode === VANQ_MCLS_LTOH || flags.vanq_sortmode === VANQ_MCLS_HTOL ? 1 : 0);
                 flags.vanq_sortmode = $c.u8(save_sortmode);
             }
-            klwin = await windowprocs.win_create_nhwindow(NHW_MENU);
+            klwin = await create_nhwindow()(NHW_MENU);
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s%s species:"), ngenocided ? $c.lit("Genocided") : $c.lit("Extinct"), nextinct && ngenocided ? $c.lit(" or extinct") : $c.lit(""));
-            await windowprocs.win_putstr(klwin, 0, new $c.Ptr(buf, 0));
+            await putstr()(klwin, 0, new $c.Ptr(buf, 0));
             if (!dumping) {
-                await windowprocs.win_putstr(klwin, 0, $c.lit(""));
+                await putstr()(klwin, 0, $c.lit(""));
             }
             for (i = 0; i < ngone; i = i + 1 | 0) {
                 mndx = mindx[i];
                 mlet = mons[mndx].mlet;
                 if (class_header && mlet !== prev_mlet) {
                     $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), def_monsyms[mlet].explain, 256);
-                    await windowprocs.win_putstr(klwin, ask ? ATR_NONE : iflags.menu_headings.attr, upstart(new $c.Ptr(buf, 0)));
+                    await putstr()(klwin, ask ? ATR_NONE : iflags.menu_headings.attr, upstart(new $c.Ptr(buf, 0)));
                     prev_mlet = mlet;
                 }
                 $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit(" %s"), await makeplural(mons[mndx].pmnames[NEUTRAL]));
-                if ((svm.mvitals[mndx].mvflags & (G_GENOD | G_EXTINCT)) === G_EXTINCT) {
+                if ((svm.mvitals[mndx].mvflags & G_GONE) === G_EXTINCT) {
                     $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit(" (extinct)"), 256);
                 }
-                await windowprocs.win_putstr(klwin, 0, new $c.Ptr(buf, 0));
+                await putstr()(klwin, 0, new $c.Ptr(buf, 0));
             }
             if (!dumping) {
-                await windowprocs.win_putstr(klwin, 0, $c.lit(""));
+                await putstr()(klwin, 0, $c.lit(""));
             }
             if (ngenocided > 0) {
                 $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%d species genocided."), ngenocided);
-                await windowprocs.win_putstr(klwin, 0, new $c.Ptr(buf, 0));
+                await putstr()(klwin, 0, new $c.Ptr(buf, 0));
             }
             if (nextinct > 0) {
                 $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%d species extinct."), nextinct);
-                await windowprocs.win_putstr(klwin, 0, new $c.Ptr(buf, 0));
+                await putstr()(klwin, 0, new $c.Ptr(buf, 0));
             }
-            await windowprocs.win_display_nhwindow(klwin, 1);
-            await windowprocs.win_destroy_nhwindow(klwin);
+            await display_nhwindow()(klwin, TRUE);
+            await destroy_nhwindow()(klwin);
         }
     } else if (!program_state.gameover) {
         await pline($c.lit("No creatures have been genocided%s."), genoing ? $c.lit(" yet") : $c.lit(""));
     }
 }
 export async function dogenocided() {   // insight.c:3135
-    await list_genocided($c.i8(iflags.menu_requested ? 97 : 121), 0);
+    await list_genocided($c.i8(iflags.menu_requested ? 97 : 121), FALSE);
     return ECMD_OK;
 }
 export async function doborn() {   // insight.c:3145
     let i = 0, datawin = 0, buf = new Int8Array(256), nborn = 0, ndied = 0;
-    datawin = await windowprocs.win_create_nhwindow(NHW_TEXT);
+    datawin = await create_nhwindow()(NHW_TEXT);
     nborn = 0;
     ndied = 0;
-    await windowprocs.win_putstr(datawin, 0, $c.lit("died born"));
+    await putstr()(datawin, 0, $c.lit("died born"));
     for (i = LOW_PM; i < NUMMONS; i = i + 1 | 0) {
-        if (svm.mvitals[i].born || svm.mvitals[i].died || (svm.mvitals[i].mvflags & (G_GENOD | G_EXTINCT)) !== 0) {
+        if (svm.mvitals[i].born || svm.mvitals[i].died || (svm.mvitals[i].mvflags & G_GONE) !== 0) {
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(doborn$fmt, 0), svm.mvitals[i].died, svm.mvitals[i].born, (svm.mvitals[i].mvflags & 3) === 1 ? 69 : (svm.mvitals[i].mvflags & 3) === 2 ? 71 : (svm.mvitals[i].mvflags & 3) !== 0 ? 88 : 32, mons[i].pmnames[NEUTRAL]);
-            await windowprocs.win_putstr(datawin, 0, new $c.Ptr(buf, 0));
+            await putstr()(datawin, 0, new $c.Ptr(buf, 0));
             nborn = nborn + svm.mvitals[i].born | 0;
             ndied = ndied + svm.mvitals[i].died | 0;
         }
     }
-    await windowprocs.win_putstr(datawin, 0, $c.lit(""));
+    await putstr()(datawin, 0, $c.lit(""));
     $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(doborn$fmt, 0), ndied, nborn, 32, $c.lit(""));
-    await windowprocs.win_display_nhwindow(datawin, 0);
-    await windowprocs.win_destroy_nhwindow(datawin);
+    await display_nhwindow()(datawin, FALSE);
+    await destroy_nhwindow()(datawin);
     return ECMD_OK;
 }
 export function align_str(alignment) {   // insight.c:3187
@@ -2227,7 +2239,7 @@ export async function mstatusline(mtmp) {   // insight.c:3275
     info[0] = 0;
     if (mtmp.mtame) {
         $c.__builtin___strcat_chk(new $c.Ptr(info, 0), $c.lit(", tame"), 256);
-        if (flags.debug) {
+        if (wizard()) {
             $c.__builtin___sprintf_chk(eos(new $c.Ptr(info, 0)), 0, -1, $c.lit(" (%d"), mtmp.mtame);
             if (!mtmp.isminion) {
                 $c.__builtin___sprintf_chk(eos(new $c.Ptr(info, 0)), 0, -1, $c.lit("; hungry %ld; apport %d"), mtmp.mextra.edog.hungrytime, mtmp.mextra.edog.apport);
@@ -2247,7 +2259,7 @@ export async function mstatusline(mtmp) {   // insight.c:3275
             $c.__builtin___sprintf_chk(eos(new $c.Ptr(info, 0)), 0, -1, $c.lit(", %d%s of %d segments"), segndx, ordin(segndx), nsegs);
         }
     }
-    if (mtmp.cham >= LOW_PM && mtmp.cham < NUMMONS && !$c.peq(mtmp.data, $c.relem(mons, mtmp.cham))) {
+    if (ismnum(mtmp.cham) && !$c.peq(mtmp.data, $c.relem(mons, mtmp.cham))) {
         $c.__builtin___strcat_chk(new $c.Ptr(info, 0), $c.lit(", shapechanger"), 256);
     }
     if (mtmp.meating) {
@@ -2272,7 +2284,7 @@ export async function mstatusline(mtmp) {   // insight.c:3275
         $c.__builtin___strcat_chk(new $c.Ptr(info, 0), $c.lit(", asleep"), 256);
     } else if (mtmp.mfrozen | 0 || !mtmp.mcanmove) {
         $c.__builtin___strcat_chk(new $c.Ptr(info, 0), $c.lit(", can't move"), 256);
-    } else if ($c.andu64(mtmp.mstrategy, STRAT_CLOSE | STRAT_WAITFORU) !== 0) {
+    } else if ($c.andu64(mtmp.mstrategy, STRAT_WAITMASK) !== 0) {
         $c.__builtin___strcat_chk(new $c.Ptr(info, 0), $c.lit(", meditating"), 256);
     }
     if (mtmp.mflee) {
@@ -2293,10 +2305,10 @@ export async function mstatusline(mtmp) {   // insight.c:3275
     }
     if ($c.peq(mtmp, u.usteed)) {
         $c.__builtin___strcat_chk(new $c.Ptr(info, 0), $c.lit(", carrying you"), 256);
-        if (u.uprops[WOUNDED_LEGS].intrinsic || u.uprops[WOUNDED_LEGS].extrinsic) {
-            legs = $c.and64(u.uprops[WOUNDED_LEGS].extrinsic, W_RINGL | W_RINGR);
+        if (Wounded_legs()) {
+            legs = $c.and64(u.uprops[WOUNDED_LEGS].extrinsic, BOTH_SIDES);
             what = await mbodypart(mtmp, LEG);
-            if (legs === (W_RINGL | W_RINGR)) {
+            if (legs === BOTH_SIDES) {
                 what = await makeplural(what);
             }
             $c.__builtin___sprintf_chk(eos(new $c.Ptr(info, 0)), 0, -1, $c.lit(", injured %s"), what);
@@ -2311,7 +2323,7 @@ export async function mstatusline(mtmp) {   // insight.c:3275
 export async function ustatusline() {   // insight.c:3402
     let reg = null, info = new Int8Array(256), ln = 0, legs = 0, what = null;
     info[0] = 0;
-    if (u.uprops[SICK].intrinsic) {
+    if (Sick()) {
         $c.__builtin___strcat_chk(new $c.Ptr(info, 0), $c.lit(", dying from"), 256);
         if ((u.usick_type | 0) & SICK_VOMITABLE) {
             $c.__builtin___strcat_chk(new $c.Ptr(info, 0), $c.lit(" food poisoning"), 256);
@@ -2323,25 +2335,25 @@ export async function ustatusline() {   // insight.c:3402
             $c.__builtin___strcat_chk(new $c.Ptr(info, 0), $c.lit(" illness"), 256);
         }
     }
-    if (u.uprops[STONED].intrinsic) {
+    if (Stoned()) {
         $c.__builtin___strcat_chk(new $c.Ptr(info, 0), $c.lit(", solidifying"), 256);
     }
-    if (u.uprops[SLIMED].intrinsic) {
+    if (Slimed()) {
         $c.__builtin___strcat_chk(new $c.Ptr(info, 0), $c.lit(", becoming slimy"), 256);
     }
-    if (u.uprops[STRANGLED].intrinsic) {
+    if (Strangled()) {
         $c.__builtin___strcat_chk(new $c.Ptr(info, 0), $c.lit(", being strangled"), 256);
     }
-    if (u.uprops[VOMITING].intrinsic) {
+    if (Vomiting()) {
         $c.__builtin___strcat_chk(new $c.Ptr(info, 0), $c.lit(", nauseated"), 256);
     }
     if (u.uprops[CONFUSION].intrinsic) {
         $c.__builtin___strcat_chk(new $c.Ptr(info, 0), $c.lit(", confused"), 256);
     }
-    if ((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked) {
+    if (Blind()) {
         $c.__builtin___strcat_chk(new $c.Ptr(info, 0), $c.lit(", blind"), 256);
         if (u.ucreamed) {
-            if (u.ucreamed < $c.and64(u.uprops[BLINDED].intrinsic, TIMEOUT) || u.uprops[BLINDED].extrinsic || !($c.andu64(gy.youmonst.data.mflags1, M1_NOEYES) === 0)) {
+            if (u.ucreamed < BlindedTimeout() || u.uprops[BLINDED].extrinsic || !haseyes(gy.youmonst.data)) {
                 $c.__builtin___strcat_chk(new $c.Ptr(info, 0), $c.lit(", cover"), 256);
             }
             $c.__builtin___strcat_chk(new $c.Ptr(info, 0), $c.lit("ed by sticky goop"), 256);
@@ -2350,29 +2362,29 @@ export async function ustatusline() {   // insight.c:3402
     if (u.uprops[STUNNED].intrinsic) {
         $c.__builtin___strcat_chk(new $c.Ptr(info, 0), $c.lit(", stunned"), 256);
     }
-    if ((u.uprops[WOUNDED_LEGS].intrinsic || u.uprops[WOUNDED_LEGS].extrinsic) && !u.usteed) {
-        legs = $c.and64(u.uprops[WOUNDED_LEGS].extrinsic, W_RINGL | W_RINGR);
+    if (Wounded_legs() && !u.usteed) {
+        legs = $c.and64(u.uprops[WOUNDED_LEGS].extrinsic, BOTH_SIDES);
         what = await body_part(LEG);
-        if (legs === (W_RINGL | W_RINGR)) {
+        if (legs === BOTH_SIDES) {
             what = await makeplural(what);
         }
         $c.__builtin___sprintf_chk(eos(new $c.Ptr(info, 0)), 0, -1, $c.lit(", injured %s"), what);
     }
-    if (u.uprops[GLIB].intrinsic) {
+    if (Glib()) {
         $c.__builtin___sprintf_chk(eos(new $c.Ptr(info, 0)), 0, -1, $c.lit(", slippery %s"), await fingers_or_gloves(1));
     }
     if (u.utrap) {
         $c.__builtin___strcat_chk(new $c.Ptr(info, 0), $c.lit(", trapped"), 256);
     }
-    if (u.uprops[FAST].intrinsic || u.uprops[FAST].extrinsic) {
+    if (Fast()) {
         $c.__builtin___strcat_chk(new $c.Ptr(info, 0), $c.and64(u.uprops[FAST].intrinsic, -117440513) || u.uprops[FAST].extrinsic ? $c.lit(", very fast") : $c.lit(", fast"), 256);
     }
     if (u.uundetected) {
         $c.__builtin___strcat_chk(new $c.Ptr(info, 0), $c.lit(", concealed"), 256);
-    } else if ((gy.youmonst.m_ap_type & M_AP_TYPMASK) !== M_AP_NOTHING) {
+    } else if (U_AP_TYPE() !== M_AP_NOTHING) {
         $c.__builtin___strcat_chk(new $c.Ptr(info, 0), $c.lit(", disguised"), 256);
     }
-    if ((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked) {
+    if (Invis()) {
         $c.__builtin___strcat_chk(new $c.Ptr(info, 0), $c.lit(", invisible"), 256);
     }
     if (u.ustuck) {
@@ -2388,7 +2400,16 @@ export async function ustatusline() {   // insight.c:3402
     if (!u.uswallow && (reg = visible_region_at(u.ux, u.uy)) !== null && (ln = $c.strlen(new $c.Ptr(info, 0))) < 256) {
         nh_snprintf($c.lit("ustatusline"), 3483, eos(new $c.Ptr(info, 0)), $c.subu64(256, ln), $c.lit(", in a cloud of %s"), reg_damg(reg) ? $c.lit("poison gas") : $c.lit("vapor"));
     }
-    await pline($c.lit("Status of %s (%s):  Level %d  HP %d(%d)  AC %d%s."), new $c.Ptr(svp.plname, 0), piousness(0, align_str(u.ualign.type)), u.umonnum !== u.umonster ? mons[u.umonnum].mlevel : u.ulevel, u.umonnum !== u.umonster ? u.mh : u.uhp, u.umonnum !== u.umonster ? u.mhmax : u.uhpmax, u.uac, new $c.Ptr(info, 0));
+    await pline($c.lit("Status of %s (%s):  Level %d  HP %d(%d)  AC %d%s."), new $c.Ptr(svp.plname, 0), piousness(FALSE, align_str(u.ualign.type)), Upolyd() ? mons[u.umonnum].mlevel : u.ulevel, Upolyd() ? u.mh : u.uhp, Upolyd() ? u.mhmax : u.uhpmax, u.uac, new $c.Ptr(info, 0));
+}
+function majorevent(llmsg) {
+    return $c.and64(llmsg.flags, LL_majors) !== 0 ? 1 : 0;
+}
+function spoilerevent(llmsg) {
+    return $c.and64(llmsg.flags, LL_SPOILER) !== 0 ? 1 : 0;
+}
+function UniqCritterIndx(mndx) {
+    return (mons[mndx].geno & G_UNIQ) !== 0 && mndx !== PM_HIGH_CLERIC ? 1 : 0;
 }
 
 export function $init() {
@@ -2435,9 +2456,9 @@ export function $init() {
     achieve_msg[8].msg = $c.lit("entered the Astral Plane");
     achieve_msg[9].llflag = LL_ACHIEVE;
     achieve_msg[9].msg = $c.lit("ascended");
-    achieve_msg[10].llflag = LL_ACHIEVE | 8192;
+    achieve_msg[10].llflag = LL_ACHIEVE | LL_SPOILER;
     achieve_msg[10].msg = $c.lit("acquired the Mines' End");
-    achieve_msg[11].llflag = LL_ACHIEVE | 8192;
+    achieve_msg[11].llflag = LL_ACHIEVE | LL_SPOILER;
     achieve_msg[11].msg = $c.lit("acquired the Sokoban");
     achieve_msg[12].llflag = LL_ACHIEVE | LL_UMONST;
     achieve_msg[12].msg = $c.lit("killed Medusa");

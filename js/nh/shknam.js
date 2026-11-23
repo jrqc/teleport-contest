@@ -4,8 +4,8 @@ import * as $T from './types.js';
 import { $G } from './globals.js';
 import { alloc } from './alloc.js';
 import { isok } from './cmd.js';
-import { flags, gd, program_state, svb, svc, svd, svl, svr, u } from './decl.js';
-import { AMULET_CLASS, ARMOR_CLASS, FOOD_CLASS, GEM_CLASS, POTION_CLASS, RING_CLASS, SCROLL_CLASS, SPBOOK_CLASS, S_BLOB, S_ELEMENTAL, S_FUNGUS, S_GHOST, S_GOLEM, S_JELLY, S_LIGHT, S_MIMIC, S_PUDDING, S_VORTEX, TOOL_CLASS, WAND_CLASS, WEAPON_CLASS } from './defsym.h.js';
+import { gd, program_state, svb, svc, svd, svl, svr, u } from './decl.js';
+import { AMULET_CLASS, ARMOR_CLASS, FOOD_CLASS, GEM_CLASS, POTION_CLASS, RING_CLASS, SCROLL_CLASS, SPBOOK_CLASS, S_MIMIC, TOOL_CLASS, WAND_CLASS, WEAPON_CLASS } from './defsym.h.js';
 import { cvt_sdoor_to_door } from './detect.js';
 import { newsym } from './display.js';
 import { noit_mon_nam } from './do_name.js';
@@ -14,29 +14,36 @@ import { set_tin_variety } from './eat.js';
 import { panic } from './end.js';
 import { make_engr_at } from './engrave.js';
 import { DUST } from './engrave.h.js';
-import { PL_NSIZ } from './global.h.js';
+import { wizard } from './flag.macros.js';
+import { FALSE, PL_NSIZ, TRUE } from './global.h.js';
 import { in_rooms, in_town } from './hack.js';
 import { HEALTHY_TIN, MM_ESHK, NO_MM_FLAGS, RLOC_NOMSG } from './hack.h.js';
 import { distmin, highc, letter } from './hacklib.js';
 import { makemon, mkclass, mkmonmoney, mongets, newmextra, set_malign } from './makemon.js';
+import { ESHK, has_eshk } from './mextra.macros.js';
 import { mkobj_at, mksobj_at } from './mkobj.js';
-import { D_SHOP, SHOPBASE } from './mkroom.h.js';
+import { D_SHOP, ROOMOFFSET, SHOPBASE } from './mkroom.h.js';
 import { mongone } from './mon.js';
 import { mon_learns_traps } from './mondata.js';
+import { vegetarian } from './mondata.macros.js';
 import { mons } from './monst.js';
-import { PM_BLACK_PUDDING, PM_FLESH_GOLEM, PM_LEATHER_GOLEM, PM_LICHEN, PM_SHOPKEEPER, PM_STALKER } from './monsters.h.js';
+import { DEADMONSTER, ismnum } from './monst.macros.js';
+import { PM_LICHEN, PM_SHOPKEEPER } from './monsters.h.js';
 import { MAXOCLASSES, NUM_OBJECTS, RANDOM_CLASS, VEGGY } from './objclass.h.js';
 import { obj_descr, objects } from './objects.js';
 import { BRASS_LANTERN, CORPSE, EGG, ELVEN_CLOAK, ICE_BOX, LEATHER_GLOVES, LUMP_OF_ROYAL_JELLY, MAGIC_LAMP, OIL_LAMP, POT_BOOZE, POT_FRUIT_JUICE, POT_FULL_HEALING, POT_HEALING, POT_OIL, POT_WATER, SCR_CHARGING, SCR_FOOD_DETECTION, SCR_LIGHT, SPE_LIGHT, SPE_NOVEL, TALLOW_CANDLE, TIN, TOUCHSTONE, WAN_LIGHT, WAX_CANDLE } from './objects.h.js';
-import { LOW_PM, NON_PM, NUMMONS } from './permonst.h.js';
+import { NON_PM } from './permonst.h.js';
 import { impossible, pline } from './pline.js';
-import { HALLUC, HALLUC_RES } from './prop.h.js';
 import { CORR, D_ISOPEN, D_LOCKED, D_NODOOR, D_TRAPPED, ROOM, SDOOR } from './rm.h.js';
+import { MON_AT } from './rm.macros.js';
 import { rn2, rnd } from './rnd.js';
 import { inside_shop, shop_keeper } from './shk.js';
 import { rloc } from './teleport.js';
 import { ALL_TRAPS } from './trap.h.js';
-import { windowprocs } from './windows.js';
+import { display_nhwindow } from './winprocs.macros.js';
+import { Hallucination } from './youprop.macros.js';
+
+const VEGETARIAN_CLASS = 19;
 
 const shkliquors = $c.nulls(31);
 const shkbooks = $c.nulls(27);
@@ -62,16 +69,16 @@ function veggy_item(obj, otyp) {   // shknam.c:380
     }
     if (oclass === FOOD_CLASS) {
         if ((objects[otyp].oc_material | 0) === VEGGY || otyp === EGG) {
-            return 1;
+            return TRUE;
         }
         if (otyp === TIN && corpsenm === NON_PM) {
             return $c.i8(obj.spe === 1 ? 1 : 0);
         }
         if (otyp === TIN || otyp === CORPSE) {
-            return $c.i8(corpsenm >= LOW_PM && corpsenm < NUMMONS && ($c.relem(mons, corpsenm).mlet === S_BLOB || $c.relem(mons, corpsenm).mlet === S_JELLY || $c.relem(mons, corpsenm).mlet === S_FUNGUS || $c.relem(mons, corpsenm).mlet === S_VORTEX || $c.relem(mons, corpsenm).mlet === S_LIGHT || $c.relem(mons, corpsenm).mlet === S_ELEMENTAL && !$c.peq($c.relem(mons, corpsenm), $c.relem(mons, PM_STALKER)) || $c.relem(mons, corpsenm).mlet === S_GOLEM && !$c.peq($c.relem(mons, corpsenm), $c.relem(mons, PM_FLESH_GOLEM)) && !$c.peq($c.relem(mons, corpsenm), $c.relem(mons, PM_LEATHER_GOLEM)) || $c.relem(mons, corpsenm).mlet === S_GHOST || $c.relem(mons, corpsenm).mlet === S_PUDDING && !$c.peq($c.relem(mons, corpsenm), $c.relem(mons, PM_BLACK_PUDDING))) ? 1 : 0);
+            return $c.i8(ismnum(corpsenm) && vegetarian($c.relem(mons, corpsenm)) ? 1 : 0);
         }
     }
-    return 0;
+    return FALSE;
 }
 async function shkveg() {   // shknam.c:408
     let i = 0, j = 0, maxprob = 0, prob = 0, oclass = 0, ok = new Int32Array(481), $t1;
@@ -104,7 +111,7 @@ async function shkveg() {   // shknam.c:408
 }
 async function mkveggy_at(sx, sy) {   // shknam.c:443
     let obj = null;
-    obj = await mksobj_at(await shkveg(), $c.i16(sx), $c.i16(sy), 1, 1);
+    obj = await mksobj_at(await shkveg(), $c.i16(sx), $c.i16(sy), TRUE, TRUE);
     if (obj && obj.otyp === TIN) {
         set_tin_variety(obj, HEALTHY_TIN);
     }
@@ -113,21 +120,21 @@ async function mkveggy_at(sx, sy) {   // shknam.c:443
 async function mkshobj_at(shp, sx, sy, mkspecl) {   // shknam.c:454
     let mtmp = null, ptr = null, atype = 0, novel = null;
     if (mkspecl && (!$c.strcmp(shp.name, $c.lit("rare books")) || !$c.strcmp(shp.name, $c.lit("second-hand bookstore")))) {
-        novel = await mksobj_at(SPE_NOVEL, $c.i16(sx), $c.i16(sy), 0, 0);
+        novel = await mksobj_at(SPE_NOVEL, $c.i16(sx), $c.i16(sy), FALSE, FALSE);
         if (novel) {
-            svc.context.tribute.bookstock = (1) & 1;
+            svc.context.tribute.bookstock = (TRUE) & 1;
         }
         return;
     }
-    if (rn2(100) < depth(u.uz) && !(svl.level.monsters[sx][sy] !== null) && (ptr = await mkclass(S_MIMIC, 0)) !== null && (mtmp = await makemon(ptr, $c.i16(sx), $c.i16(sy), NO_MM_FLAGS)) !== null) {
+    if (rn2(100) < depth(u.uz) && !MON_AT(sx, sy) && (ptr = await mkclass(S_MIMIC, 0)) !== null && (mtmp = await makemon(ptr, $c.i16(sx), $c.i16(sy), NO_MM_FLAGS)) !== null) {
     } else {
         atype = get_shop_item($c.i32($c.rdiff(shp, $c.relem(shtypes, 0))));
-        if (atype === MAXOCLASSES + 1) {
+        if (atype === VEGETARIAN_CLASS) {
             await mkveggy_at(sx, sy);
         } else if (atype < 0) {
-            await mksobj_at(-atype | 0, $c.i16(sx), $c.i16(sy), 1, 1);
+            await mksobj_at(-atype | 0, $c.i16(sx), $c.i16(sy), TRUE, TRUE);
         } else {
-            await mkobj_at($c.i8(atype), $c.i16(sx), $c.i16(sy), 1);
+            await mkobj_at($c.i8(atype), $c.i16(sx), $c.i16(sy), TRUE);
         }
     }
 }
@@ -137,7 +144,7 @@ function nameshk(shk, nlp) {   // shknam.c:487
     name_wanted = shk.m_id | 0;
     if ($c.peq(nlp, new $c.Ptr(shklight, 0)) && In_mines(u.uz) && (sptr = Is_special(u.uz)) !== null && sptr.flags.town | 0) {
         shname = $c.lit("+Izchak");
-        shk.female = (0) & 1;
+        shk.female = (FALSE) & 1;
     } else {
         nseed = $c.i32($c.div64($G.ubirthday, 257));
         name_wanted = name_wanted + ((ledger_no(u.uz) + $c.rem32(nseed, 13) | 0) - $c.rem32(nseed, 5) | 0) | 0;
@@ -173,7 +180,7 @@ function nameshk(shk, nlp) {   // shknam.c:487
                 shk.female = (0) & 1;
             }
             for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
-                if (mtmp.mhp < 1 || $c.peq(mtmp, shk) || !mtmp.isshk) {
+                if (DEADMONSTER(mtmp) || $c.peq(mtmp, shk) || !mtmp.isshk) {
                     continue;
                 }
                 (!(mtmp.mextra && mtmp.mextra.eshk) ? 1 : 0) ? $c.__assert_rtn($c.lit("nameshk"), $c.lit("shknam.c"), 542, $c.lit("has_eshk(mtmp)")) : 0;
@@ -196,7 +203,7 @@ export async function neweshk(mtmp) {   // shknam.c:557
     if (!mtmp.mextra) {
         $t1 = await newmextra(), mtmp.mextra = $t1;
     }
-    if (!mtmp.mextra.eshk) {
+    if (!ESHK(mtmp)) {
         $t2 = $c.asRec(await alloc(4960), $T.eshk, 4960), mtmp.mextra.eshk = $t2;
     }
     $c.__builtin___memset_chk(mtmp.mextra.eshk, 0, 4960, -1);
@@ -204,7 +211,7 @@ export async function neweshk(mtmp) {   // shknam.c:557
     mtmp.mextra.eshk.bill_p = null;
 }
 export function free_eshk(mtmp) {   // shknam.c:569
-    if (mtmp.mextra && mtmp.mextra.eshk) {
+    if (mtmp.mextra && ESHK(mtmp)) {
         $c.free(mtmp.mextra.eshk);
         mtmp.mextra.eshk = null;
     }
@@ -217,7 +224,7 @@ function good_shopdoor(sroom, sx, sy) {   // shknam.c:582
         sx.set(0, $c.radd(svd.doors, di).x);
         sy.set(0, $c.radd(svd.doors, di).y);
         if (sroom.irregular) {
-            rmno = $c.i32($c.add64($c.rdiff(sroom, $c.relem(svr.rooms, 0)), 3));
+            rmno = $c.i32($c.add64($c.rdiff(sroom, $c.relem(svr.rooms, 0)), ROOMOFFSET));
             if (isok($c.i16(sx.get(0) - 1 | 0), sy.get(0)) && !svl.level.locations[sx.get(0) - 1 | 0][sy.get(0)].edge && (svl.level.locations[sx.get(0) - 1 | 0][sy.get(0)].roomno | 0) === rmno) {
                 sx.set(0, $c.i16(sx.get(0) - 1));
             } else if (isok($c.i16(sx.get(0) + 1 | 0), sy.get(0)) && !svl.level.locations[sx.get(0) + 1 | 0][sy.get(0)].edge && (svl.level.locations[sx.get(0) + 1 | 0][sy.get(0)].roomno | 0) === rmno) {
@@ -248,7 +255,7 @@ async function shkinit(shp, sroom) {   // shknam.c:628
     let sh = 0, sx = Int16Array.of(0), sy = Int16Array.of(0), shk = null, eshkp = null, j = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8;
     sh = good_shopdoor(sroom, new $c.Ptr(sx, 0), new $c.Ptr(sy, 0));
     if (sh < 0) {
-        if (flags.debug) {
+        if (wizard()) {
             j = sroom.doorct;
             await impossible($c.lit("Where is shopdoor?"));
             await pline($c.lit("Room at (%d,%d),(%d,%d)."), sroom.lx, sroom.ly, sroom.hx, sroom.hy);
@@ -257,11 +264,11 @@ async function shkinit(shp, sroom) {   // shknam.c:628
                 await pline($c.lit("door [%d,%d]"), $c.radd(svd.doors, sh).x, $c.radd(svd.doors, sh).y);
                 sh = sh + 1 | 0;
             }
-            await windowprocs.win_display_nhwindow($G.WIN_MESSAGE, 0);
+            await display_nhwindow()($G.WIN_MESSAGE, FALSE);
         }
         return -1;
     }
-    if (svl.level.monsters[sx[0]][sy[0]] !== null) {
+    if (MON_AT(sx[0], sy[0])) {
         await rloc(svl.level.monsters[sx[0]][sy[0]], RLOC_NOMSG);
     }
     if (!(shk = await makemon($c.relem(mons, PM_SHOPKEEPER), sx[0], sy[0], MM_ESHK))) {
@@ -272,7 +279,7 @@ async function shkinit(shp, sroom) {   // shknam.c:628
     set_malign(shk);
     shk.msleeping = (0) & 1;
     mon_learns_traps(shk, ALL_TRAPS);
-    eshkp.shoproom = $c.i8($c.add64($c.rdiff(sroom, $c.relem(svr.rooms, 0)), 3));
+    eshkp.shoproom = $c.i8($c.add64($c.rdiff(sroom, $c.relem(svr.rooms, 0)), ROOMOFFSET));
     sroom.resident = shk;
     eshkp.shoptype = sroom.rtype;
     assign_level(eshkp.shoplevel, u.uz);
@@ -280,7 +287,7 @@ async function shkinit(shp, sroom) {   // shknam.c:628
     eshkp.shk.x = sx[0];
     eshkp.shk.y = sy[0];
     $t5 = ($t4 = ($t3 = eshkp.loan = 0, eshkp.debit = $t3), eshkp.credit = $t4), eshkp.robbed = $t5;
-    $t7 = ($t6 = eshkp.dismiss_kops = 0, eshkp.surcharge = $t6), eshkp.following = $t7;
+    $t7 = ($t6 = eshkp.dismiss_kops = FALSE, eshkp.surcharge = $t6), eshkp.following = $t7;
     $t8 = eshkp.visitct = 0, eshkp.billct = $t8;
     eshkp.bill_p = null;
     eshkp.customer[0] = 0;
@@ -297,21 +304,21 @@ async function shkinit(shp, sroom) {   // shknam.c:628
 function stock_room_goodpos(sroom, rmno, sh, sx, sy) {   // shknam.c:695
     if (sroom.irregular) {
         if (svl.level.locations[sx][sy].edge | 0 || (svl.level.locations[sx][sy].roomno | 0) !== rmno || distmin($c.i16(sx), $c.i16(sy), $c.radd(svd.doors, sh).x, $c.radd(svd.doors, sh).y) <= 1) {
-            return 0;
+            return FALSE;
         }
     } else if (sx === sroom.lx && $c.radd(svd.doors, sh).x === (sx - 1 | 0) || sx === sroom.hx && $c.radd(svd.doors, sh).x === (sx + 1 | 0) || sy === sroom.ly && $c.radd(svd.doors, sh).y === (sy - 1 | 0) || sy === sroom.hy && $c.radd(svd.doors, sh).y === (sy + 1 | 0)) {
-        return 0;
+        return FALSE;
     }
     if (!(svl.level.locations[sx][sy].typ >= ROOM)) {
-        return 0;
+        return FALSE;
     }
-    return 1;
+    return TRUE;
 }
 export async function stock_room(shp_indx, sroom) {   // shknam.c:718
     let sx = 0, sy = 0, sh = 0, stockcount = 0, specialspot = 0, buf = new Int8Array(256), rmno = 0, shp = null, m = 0, n = 0, mtmp = null, $t1;
     stockcount = 0;
     specialspot = 0;
-    rmno = $c.i32($c.add64($c.rdiff(sroom, $c.relem(svr.rooms, 0)), 3));
+    rmno = $c.i32($c.add64($c.rdiff(sroom, $c.relem(svr.rooms, 0)), ROOMOFFSET));
     shp = $c.relem(shtypes, shp_indx);
     if ((sh = await shkinit(shp, sroom)) < 0) {
         return;
@@ -371,25 +378,25 @@ export async function stock_room(shp_indx, sroom) {   // shknam.c:718
         mtmp = await shop_keeper($c.i8(rmno));
         await mongone(mtmp);
     }
-    svl.level.flags.has_shop = (1) & 1;
+    svl.level.flags.has_shop = (TRUE) & 1;
 }
 export function saleable(shkp, obj) {   // shknam.c:805
     let i = 0, shp_indx = 0, shp = null;
     shp_indx = shkp.mextra.eshk.shoptype - SHOPBASE | 0;
     shp = $c.relem(shtypes, shp_indx);
     if (shp.symb === RANDOM_CLASS) {
-        return 1;
+        return TRUE;
     }
     for (i = 0; i < 9 && shp.iprobs[i].iprob; i = i + 1 | 0) {
-        if (shp.iprobs[i].itype === MAXOCLASSES + 1) {
+        if (shp.iprobs[i].itype === VEGETARIAN_CLASS) {
             if (veggy_item(obj, 0)) {
-                return 1;
+                return TRUE;
             }
         } else if (shp.iprobs[i].itype < 0 ? shp.iprobs[i].itype === (-obj.otyp | 0) : shp.iprobs[i].itype === obj.oclass) {
-            return 1;
+            return TRUE;
         }
     }
-    return 0;
+    return FALSE;
 }
 export function get_shop_item(type) {   // shknam.c:829
     let shp = null, i = 0, j = 0;
@@ -413,11 +420,11 @@ export async function shkname(mtmp) {   // shknam.c:856
     mtmp.isshk = (save_isshk) & 1;
     if (!mtmp.isshk) {
         await impossible($c.lit("shkname: \"%s\" is not a shopkeeper."), nam);
-    } else if (!(mtmp.mextra && mtmp.mextra.eshk)) {
+    } else if (!has_eshk(mtmp)) {
         await panic($c.lit("shkname: shopkeeper \"%s\" lacks 'eshk' data."), nam);
     } else {
         shknm = new $c.Ptr(mtmp.mextra.eshk.shknam, 0);
-        if (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) && !program_state.gameover) {
+        if (Hallucination() && !program_state.gameover) {
             for (num = 0; num < 13; num = num + 1 | 0) {
                 if (shtypes[num].prob === 0) {
                     break;
@@ -447,14 +454,14 @@ export function shkname_is_pname(mtmp) {   // shknam.c:900
 }
 export function is_izchak(shkp, override_hallucination) {   // shknam.c:908
     let shknm = null;
-    if (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) && !override_hallucination) {
-        return 0;
+    if (Hallucination() && !override_hallucination) {
+        return FALSE;
     }
     if (!shkp.isshk) {
-        return 0;
+        return FALSE;
     }
     if (!in_town(shkp.mx, shkp.my)) {
-        return 0;
+        return FALSE;
     }
     shknm = new $c.Ptr(shkp.mextra.eshk.shknam, 0);
     if (!letter(shknm.get(0))) {

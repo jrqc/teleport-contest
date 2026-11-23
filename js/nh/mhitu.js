@@ -9,25 +9,27 @@ import { is_art, protects } from './artifact.js';
 import { ART_SNICKERSNEE, ART_STORMBRINGER, ART_VORPAL_BLADE } from './artilist.h.js';
 import { acurr, adjalign, adjattrib, exercise, minuhpmax } from './attrib.js';
 import { A_CHA, A_CON, A_DEX, A_INT, A_STR, A_WIS } from './attrib.h.js';
+import { ACURR } from './attrib.macros.js';
 import { placebc, unplacebc } from './ball.js';
 import { bot } from './botl.js';
 import { getyear, midnight, night, yyyymmdd } from './calendar.js';
-import { reset_occupations, yn_function } from './cmd.js';
+import { reset_occupations } from './cmd.js';
 import { is_pool, is_waterwall } from './dbridge.js';
-import { c_common_strings, disp, flags, gb, gh, gi, gm, gn, gs, gu, gv, gy, svd, svk, svl, svm, svp, u, ynchars } from './decl.js';
-import { S_EEL, S_MIMIC, S_NYMPH, S_PIERCER, S_VORTEX, TOOL_CLASS, WEAPON_CLASS } from './defsym.h.js';
+import { c_common_strings, disp, flags, gb, gh, gi, gm, gn, gs, gu, gv, gy, svd, svk, svl, svm, svp, u } from './decl.js';
+import { S_EEL, S_MIMIC, S_NYMPH, S_PIERCER, TOOL_CLASS, WEAPON_CLASS } from './defsym.h.js';
 import { canseemon, flush_screen, map_invisible, mon_visible, newsym, sensemon, shieldeff, swallowed, tp_sensemon } from './display.js';
+import { canspotmon } from './display.macros.js';
 import { Amonnam, Mgender, Monnam, Some_Monnam, christen_monst, hliquid, m_monnam, mon_nam, noit_Monnam, noit_mon_nam, pmname } from './do_name.js';
 import { Ring_gone, Ring_on, hard_helmet, stop_donning } from './do_wear.js';
 import { initedog } from './dog.js';
 import { In_hell, ceiling, on_level } from './dungeon.js';
-import { is_fainted } from './eat.js';
 import { done, done_in_by } from './end.js';
 import { losexp, pluslvl } from './exper.js';
 import { mon_explodes } from './explode.js';
-import { LARGEST_INT } from './global.h.js';
+import { FALSE, LARGEST_INT, TRUE } from './global.h.js';
 import { losehp, money_cnt, nomul, showdamage, spoteffects, unmul } from './hack.js';
 import { BOLT_LIM, DIED, DISMOUNT_ENGULFED, HAIR, HAND, KILLED_BY, MM_EDOG, MM_NOMSG, NO_MINVENT, RLOC_MSG, RLOC_NOMSG, STONING, TELEDS_ALLOW_DRAG, XKILL_NOMSG } from './hack.h.js';
+import { Maybe_Half_Phys, max, min, y_n } from './hack.macros.js';
 import { dist2, s_suffix, upstart } from './hacklib.js';
 import { currency, freeinv, prinv, sobj_at, u_carried_gloves, update_inventory } from './invent.js';
 import { is_home_elemental, makemon } from './makemon.js';
@@ -36,48 +38,56 @@ import { attk_protection, engulf_target, failed_grab, mattackm, paralyze_monst }
 import { msummon } from './minion.js';
 import { golemeffects, killed, mnexto, mon_to_stone, mondead, monnear, set_ustuck, unstuck, wake_nearto, xkilled } from './mon.js';
 import { AD_ACID, AD_ANY, AD_BLND, AD_COLD, AD_CONF, AD_DGST, AD_DISE, AD_DREN, AD_DRIN, AD_DRLI, AD_ELEC, AD_ENCH, AD_FAMN, AD_FIRE, AD_HALU, AD_PEST, AD_PHYS, AD_PLYS, AD_POLY, AD_SEDU, AD_SITM, AD_SSEX, AD_STCK, AD_STON, AD_STUN, AD_WRAP, AT_BITE, AT_BOOM, AT_BREA, AT_BUTT, AT_CLAW, AT_ENGL, AT_EXPL, AT_GAZE, AT_HUGS, AT_KICK, AT_MAGC, AT_NONE, AT_SPIT, AT_STNG, AT_TENT, AT_TUCH, AT_WEAP, M_ATTK_AGR_DIED, M_ATTK_AGR_DONE, M_ATTK_DEF_DIED, M_ATTK_HIT, M_ATTK_MISS } from './monattk.h.js';
-import { Resists_Elem, attacktype_fordmg, can_blnd, cvt_adtyp_to_mseenres, defended, dmgtype, dmgtype_fromattack, gender, get_atkdam_type, mon_hates_blessings, monstseesu, monstunseesu, poly_when_stoned, pronoun_gender, resists_blnd, resists_drli, stagger, sticks } from './mondata.js';
-import { FEMALE, G_EXTINCT, M1_AMORPHOUS, M1_AMPHIBIOUS, M1_ANIMAL, M1_BREATHLESS, M1_CONCEAL, M1_HIDE, M1_NOEYES, M1_NOLIMBS, M1_SEE_INVIS, M1_SWIM, M1_THICK_HIDE, M1_UNSOLID, M2_DEMON, M2_GREEDY, M2_HUMAN, M2_MINION, M2_UNDEAD, M2_WERE, MALE, MZ_HUGE, NEUTRAL } from './monflag.h.js';
+import { DISTANCE_ATTK_TYPE } from './monattk.macros.js';
+import { attacktype_fordmg, can_blnd, cvt_adtyp_to_mseenres, defended, dmgtype, dmgtype_fromattack, gender, get_atkdam_type, mon_hates_blessings, monstseesu, monstunseesu, poly_when_stoned, pronoun_gender, resists_blnd, resists_drli, stagger, sticks } from './mondata.js';
+import { amorphous, amphibious, digests, enfolds, flaming, haseyes, hides_under, is_animal, is_demon, is_hider, is_human, is_minion, is_swimmer, is_undead, is_were, is_whirly, likes_gold, nolimbs, perceives, thick_skinned, touch_petrifies, unsolid } from './mondata.macros.js';
+import { FEMALE, G_EXTINCT, M1_AMPHIBIOUS, M1_BREATHLESS, M1_SEE_INVIS, MALE, MZ_HUGE, NEUTRAL } from './monflag.h.js';
 import { set_apparxy } from './monmove.js';
 import { c_sa_no, mons } from './monst.js';
-import { M_AP_NOTHING, M_AP_OBJECT, M_AP_TYPMASK, M_SEEN_ACID, M_SEEN_COLD, M_SEEN_ELEC, M_SEEN_FIRE, NEED_HTH_WEAPON, NEED_WEAPON } from './monst.h.js';
-import { PM_AIR_ELEMENTAL, PM_ALIGNED_CLERIC, PM_AMOROUS_DEMON, PM_ARCHON, PM_BALROG, PM_BLACK_LIGHT, PM_CHICKATRICE, PM_CLERIC, PM_COCKATRICE, PM_FIRE_ELEMENTAL, PM_FIRE_VORTEX, PM_FLAMING_SPHERE, PM_FLOATING_EYE, PM_FOG_CLOUD, PM_HIGH_CLERIC, PM_LEPRECHAUN, PM_MEDUSA, PM_SALAMANDER, PM_SHADE, PM_STONE_GOLEM, PM_TRAPPER, PM_VAMPIRE, PM_VAMPIRE_LEADER, PM_VIOLET_FUNGUS, PM_VLAD_THE_IMPALER } from './monsters.h.js';
+import { M_AP_NOTHING, M_AP_OBJECT, M_SEEN_ACID, M_SEEN_COLD, M_SEEN_ELEC, M_SEEN_FIRE, NEED_HTH_WEAPON, NEED_WEAPON } from './monst.h.js';
+import { DEADMONSTER, MON_WEP, U_AP_TYPE, is_vampshifter, resists_acid, resists_cold, resists_elec, resists_fire, resists_ston } from './monst.macros.js';
+import { PM_ALIGNED_CLERIC, PM_AMOROUS_DEMON, PM_ARCHON, PM_BALROG, PM_BLACK_LIGHT, PM_CLERIC, PM_FLOATING_EYE, PM_FOG_CLOUD, PM_HIGH_CLERIC, PM_LEPRECHAUN, PM_MEDUSA, PM_SHADE, PM_STONE_GOLEM, PM_TRAPPER, PM_VIOLET_FUNGUS } from './monsters.h.js';
 import { breamu, spitmu, thrwmu } from './mthrowu.js';
 import { find_offensive, mon_reflects, ureflects, use_offensive } from './muse.js';
 import { discover_object, observe_object } from './o_init.js';
 import { ERODE_CORRODE, OBJ_FREE } from './obj.h.js';
+import { is_weptool, is_wet_towel } from './obj.macros.js';
 import { PIERCE } from './objclass.h.js';
 import { objects } from './objects.js';
-import { AMULET_OF_GUARDING, BOULDER, CORPSE, EGG, GOLD_PIECE, OILSKIN_CLOAK, RIN_ADORNMENT, TOWEL } from './objects.h.js';
+import { AMULET_OF_GUARDING, BOULDER, CORPSE, EGG, GOLD_PIECE, OILSKIN_CLOAK, RIN_ADORNMENT } from './objects.h.js';
 import { an, cloak_simple_name, doname, helm_simple_name, makeplural, mimic_obj_name, safe_qbuf, simpleonames, suit_simple_name, the, vtense, xname, yname } from './objnam.js';
 import { NATTK, NON_PM } from './permonst.h.js';
 import { You, You_cant, You_feel, You_hear, Your, impossible, pline, pline_The, pline_mon, set_msg_xy, urgent_pline, verbalize } from './pline.js';
 import { body_part, poly_gender, polymon, rehumanize, ugolemeffects } from './polyself.js';
 import { incr_itimeout, make_blinded, make_confused, make_hallucinated, make_sick, make_stunned, split_mon } from './potion.js';
-import { ACID_RES, BLINDED, COLD_RES, CONFLICT, CONFUSION, DEAF, DETECT_MONSTERS, DISPLACED, FAST, FIRE_RES, HALF_PHDAM, HALLUC, HALLUC_RES, INVIS, MAGICAL_BREATHING, PROTECTION, PROT_FROM_SHAPE_CHANGERS, REFLECTING, SEE_INVIS, SHOCK_RES, SICK, SICK_RES, SLOW_DIGESTION, STONE_RES, STUNNED, TIMEOUT, W_AMUL, W_ARM, W_ARMC, W_ARMF, W_ARMG, W_ARMH, W_ARMS, W_ARMU, W_RINGL, W_RINGR, W_TOOL, W_WEP } from './prop.h.js';
+import { BLINDED, CONFUSION, FAST, HALF_PHDAM, HALLUC, INVIS, MAGICAL_BREATHING, PROTECTION, SICK, STUNNED, TIMEOUT, W_ACCESSORY, W_AMUL, W_ARMG, W_ARMH, W_ARMOR, W_RINGL, W_RINGR, W_WEP } from './prop.h.js';
 import { is_quest_artifact } from './questpgr.js';
+import { m_at, remove_monster } from './rm.macros.js';
 import { d, rn2, rnd } from './rnd.js';
 import { genders } from './role.js';
 import { money2mon } from './shk.js';
-import { P_LANCE, P_NONE, P_POLEARMS, P_WHIP } from './skills.h.js';
+import { P_LANCE, P_POLEARMS, P_WHIP } from './skills.h.js';
 import { growl_sound } from './sounds.js';
 import { mpickobj, remove_worn_item, unresponsive } from './steal.js';
 import { dismount_steed, place_monster } from './steed.js';
-import { sysopt } from './sys.js';
+import { SYSOPT_SEDUCE } from './sys.macros.js';
 import { enexto, rloc, tele_restrict, teleds } from './teleport.js';
 import { burn_away_slime } from './timeout.js';
-import { acid_damage, burnarmor, drain_en, ignite_items, minstapetrify, reset_utrap, t_at, unconscious } from './trap.js';
-import { PIT, SPIKED_PIT } from './trap.h.js';
+import { acid_damage, burnarmor, drain_en, ignite_items, minstapetrify, reset_utrap, t_at } from './trap.js';
+import { is_pit } from './trap.macros.js';
 import { erode_armor, mhitm_adtyping, mhitm_knockback } from './uhitm.js';
 import { vision_recalc } from './vision.js';
-import { COULD_SEE, IN_SIGHT } from './vision.h.js';
+import { COULD_SEE } from './vision.h.js';
+import { cansee, couldsee } from './vision.macros.js';
 import { hitval, mon_wield_item } from './weapon.js';
 import { new_were, were_summon } from './were.js';
 import { welded } from './wield.js';
-import { windowprocs } from './windows.js';
+import { display_nhwindow } from './winprocs.macros.js';
 import { worm_move } from './worm.js';
 import { find_mac, setworn, which_armor } from './worn.js';
 import { PRONOUN_HALLU, PRONOUN_NO_IT, SICK_NONVOMITABLE, TT_PIT, TT_WEB } from './you.h.js';
+import { Ugender, Upolyd } from './you.macros.js';
+import { Acid_resistance, Blind, Blinded, Cold_resistance, Conflict, Deaf, Detect_monsters, Displaced, Fast, Fire_resistance, HProtection, Half_physical_damage, Hallucination, Invis, Protection_from_shape_changers, Punished, Reflecting, See_invisible, Shock_resistance, Sick, Sick_resistance, Slow_digestion, Stone_resistance, Unaware, Underwater } from './youprop.macros.js';
 import { destroy_items, drain_item } from './zap.js';
 
 const gazemu$reactions = $c.nulls(8);   // static in gazemu()
@@ -88,14 +98,14 @@ export async function hitmsg(mtmp, mattk) {   // mhitu.c:29
     punct = $c.lit("!");
     Monst_name = await Monnam(mtmp);
     if ((compat = could_seduce(mtmp, gy.youmonst, mattk)) !== 0 && !mtmp.mcan && !mtmp.mspec_used) {
-        await pline_mon(mtmp, $c.lit("%s %s you %s."), Monst_name, !((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked) ? $c.lit("smiles at") : !(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf) ? $c.lit("talks to") : $c.lit("touches"), compat === 2 ? $c.lit("engagingly") : $c.lit("seductively"));
+        await pline_mon(mtmp, $c.lit("%s %s you %s."), Monst_name, !Blind() ? $c.lit("smiles at") : !Deaf() ? $c.lit("talks to") : $c.lit("touches"), compat === 2 ? $c.lit("engagingly") : $c.lit("seductively"));
     } else {
         switch (mattk.aatyp) {
             case AT_BITE:
                 verb = $c.lit("bites");
                 break;
             case AT_KICK:
-                if ($c.andu64(gy.youmonst.data.mflags1, M1_THICK_HIDE) !== 0) {
+                if (thick_skinned(gy.youmonst.data)) {
                     punct = $c.lit(".");
                 }
                 verb = $c.lit("kicks");
@@ -129,7 +139,7 @@ export async function hitmsg(mtmp, mattk) {   // mhitu.c:29
 async function missmu(mtmp, nearmiss, mattk) {   // mhitu.c:85
     gh.hitmsg_mid = 0;
     gh.hitmsg_prev = null;
-    if (!(canseemon(mtmp) || sensemon(mtmp))) {
+    if (!canspotmon(mtmp)) {
         await map_invisible(mtmp.mx, mtmp.my);
     }
     if (could_seduce(mtmp, gy.youmonst, mattk) && !mtmp.mcan) {
@@ -142,13 +152,13 @@ async function missmu(mtmp, nearmiss, mattk) {   // mhitu.c:85
 export function mswings_verb(mwep, bash) {   // mhitu.c:105
     let verb = null, otyp = 0, lash = 0, thrust = 0;
     otyp = mwep.otyp;
-    lash = objects[otyp].oc_subtyp === P_WHIP || mwep.otyp === TOWEL && mwep.spe > 0 ? 1 : 0;
+    lash = objects[otyp].oc_subtyp === P_WHIP || is_wet_towel(mwep) ? 1 : 0;
     thrust = ((objects[otyp].oc_dir | 0) & PIERCE) !== 0 && (((objects[otyp].oc_dir | 0) & ~PIERCE) === 0 || !rn2(2)) ? 1 : 0;
     verb = bash ? $c.lit("bashes with") : lash ? $c.lit("lashes") : thrust ? $c.lit("thrusts") : $c.lit("swings");
     return verb;
 }
 async function mswings(mtmp, otemp, bash) {   // mhitu.c:130
-    if (flags.verbose && !((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked) && mon_visible(mtmp)) {
+    if (flags.verbose && !Blind() && mon_visible(mtmp)) {
         await pline_mon(mtmp, $c.lit("%s %s %s%s %s."), await Monnam(mtmp), mswings_verb(otemp, bash), otemp.quan > 1 ? $c.lit("one of ") : $c.lit(""), genders[pronoun_gender(mtmp, PRONOUN_HALLU)].his, await xname(otemp));
     }
 }
@@ -163,17 +173,17 @@ export function mpoisons_subj(mtmp, mattk) {   // mhitu.c:145
 }
 export async function u_slow_down() {   // mhitu.c:163
     u.uprops[FAST].intrinsic = 0;
-    if (!(u.uprops[FAST].intrinsic || u.uprops[FAST].extrinsic)) {
+    if (!Fast()) {
         await You($c.lit("slow down."));
     } else {
         await Your($c.lit("quickness feels less natural."));
     }
-    await exercise(A_DEX, 0);
+    await exercise(A_DEX, FALSE);
 }
 async function wildmiss(mtmp, mattk) {   // mhitu.c:176
     let compat = 0, Monst_name = null, unotseen = 0, unotthere = 0, usubmerged = 0, swings = null;
-    unotseen = $c.i8(!mtmp.mcansee || (u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked && !($c.andu64(mtmp.data.mflags1, M1_SEE_INVIS) !== 0) ? 1 : 0);
-    unotthere = $c.i8((u.uprops[DISPLACED].intrinsic || u.uprops[DISPLACED].extrinsic ? 1 : 0) !== 0 ? 1 : 0);
+    unotseen = $c.i8(!mtmp.mcansee || Invis() && !perceives(mtmp.data) ? 1 : 0);
+    unotthere = $c.i8(Displaced() !== 0 ? 1 : 0);
     usubmerged = $c.i8((u.uinwater | 0) !== 0 ? 1 : 0);
     if (!unotseen && !unotthere && !usubmerged) {
         await impossible($c.lit("%s attacks you without knowing your location?"), await Some_Monnam(mtmp));
@@ -182,14 +192,14 @@ async function wildmiss(mtmp, mattk) {   // mhitu.c:176
     if (!flags.verbose) {
         return;
     }
-    if (!((gv.viz_array.get(mtmp.my).get(mtmp.mx) & IN_SIGHT) !== 0)) {
+    if (!cansee(mtmp.mx, mtmp.my)) {
         return;
     }
     compat = mattk.adtyp === AD_SEDU || mattk.adtyp === AD_SSEX ? could_seduce(mtmp, gy.youmonst, mattk) : 0;
     Monst_name = await Monnam(mtmp);
     set_msg_xy(mtmp.mx, mtmp.my);
     if (unotseen) {
-        swings = mattk.aatyp === AT_BITE ? $c.lit("snaps") : mattk.aatyp === AT_KICK ? $c.lit("kicks") : mattk.aatyp === AT_STNG || mattk.aatyp === AT_BUTT || $c.andu64(mtmp.data.mflags1, M1_NOLIMBS) === M1_NOLIMBS ? $c.lit("lunges") : $c.lit("swings");
+        swings = mattk.aatyp === AT_BITE ? $c.lit("snaps") : mattk.aatyp === AT_KICK ? $c.lit("kicks") : mattk.aatyp === AT_STNG || mattk.aatyp === AT_BUTT || nolimbs(mtmp.data) ? $c.lit("lunges") : $c.lit("swings");
         if (compat) {
             await pline($c.lit("%s tries to touch you and misses!"), Monst_name);
         } else {
@@ -210,9 +220,9 @@ async function wildmiss(mtmp, mattk) {   // mhitu.c:176
         }
     } else if (unotthere) {
         if (compat) {
-            await pline($c.lit("%s smiles %s at your %sdisplaced image..."), Monst_name, compat === 2 ? $c.lit("engagingly") : $c.lit("seductively"), (u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked ? $c.lit("invisible ") : $c.lit(""));
+            await pline($c.lit("%s smiles %s at your %sdisplaced image..."), Monst_name, compat === 2 ? $c.lit("engagingly") : $c.lit("seductively"), Invis() ? $c.lit("invisible ") : $c.lit(""));
         } else {
-            await pline($c.lit("%s strikes at your %sdisplaced image and misses you!"), Monst_name, (u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked ? $c.lit("invisible ") : $c.lit(""));
+            await pline($c.lit("%s strikes at your %sdisplaced image and misses you!"), Monst_name, Invis() ? $c.lit("invisible ") : $c.lit(""));
         }
     } else if (usubmerged) {
         if (compat) {
@@ -225,11 +235,11 @@ async function wildmiss(mtmp, mattk) {   // mhitu.c:176
 }
 export async function expels(mtmp, mdat, message) {   // mhitu.c:264
     let blast = new Int8Array(40), attk = null;
-    disp.botl = 1;
+    disp.botl = TRUE;
     if (message) {
-        if (dmgtype_fromattack(mdat, AD_DGST, AT_ENGL) !== null) {
+        if (digests(mdat)) {
             await You($c.lit("get regurgitated!"));
-        } else if (dmgtype_fromattack(mdat, AD_WRAP, AT_ENGL) !== null) {
+        } else if (enfolds(mdat)) {
             await pline_mon(mtmp, $c.lit("%s unfolds and you are released!"), await Monnam(mtmp));
         } else {
             attk = attacktype_fordmg(mdat, AT_ENGL, AD_ANY);
@@ -237,7 +247,7 @@ export async function expels(mtmp, mdat, message) {   // mhitu.c:264
             if (!attk) {
                 await impossible($c.lit("Swallower has no engulfing attack?"));
             } else {
-                if (mdat.mlet === S_VORTEX || $c.peq(mdat, $c.relem(mons, PM_AIR_ELEMENTAL))) {
+                if (is_whirly(mdat)) {
                     switch (attk.adtyp) {
                         case AD_ELEC:
                             $c.__builtin___strcpy_chk(new $c.Ptr(blast, 0), $c.lit(" in a shower of sparks"), 40);
@@ -259,7 +269,7 @@ export async function expels(mtmp, mdat, message) {   // mhitu.c:264
     if (um_dist(mtmp.mx, mtmp.my, 1)) {
         await pline($c.lit("Brrooaa...  You land hard at some distance."));
     }
-    await spoteffects(1);
+    await spoteffects(TRUE);
 }
 export async function getmattk(magr, mdef, indx, prev_result, alt_attk_buf) {   // mhitu.c:310
     let mptr = null, attk = null, weap = null, udefend = 0, ulev = 0, wimpy = 0, $t1;
@@ -267,7 +277,7 @@ export async function getmattk(magr, mdef, indx, prev_result, alt_attk_buf) {   
     attk = $c.relem(mptr.mattk, indx);
     weap = $c.peq(magr, gy.youmonst) ? $G.uwep : magr.mw;
     udefend = $c.i8($c.peq(mdef, gy.youmonst) ? 1 : 0);
-    if (!sysopt.seduce) {
+    if (!SYSOPT_SEDUCE()) {
         if (mptr.mattk[0].adtyp === AD_SSEX) {
             alt_attk_buf.$copyFrom(c_sa_no[indx]);
             attk = alt_attk_buf;
@@ -312,11 +322,11 @@ export async function getmattk(magr, mdef, indx, prev_result, alt_attk_buf) {   
             attk.aatyp = AT_TUCH;
             $t1 = attk.damd = 0, attk.damn = $t1;
         }
-    } else if (indx === 0 && !$c.peq(magr, gy.youmonst) && attk.aatyp === AT_WEAP && attk.adtyp !== AD_PHYS && !(mptr.mattk[1].aatyp === AT_WEAP && mptr.mattk[1].adtyp === AD_PHYS) && (magr.mcan | 0 || weap && (weap.otyp === CORPSE && ($c.peq($c.relem(mons, weap.corpsenm), $c.relem(mons, PM_COCKATRICE)) || $c.peq($c.relem(mons, weap.corpsenm), $c.relem(mons, PM_CHICKATRICE))) || is_art(weap, ART_STORMBRINGER) || is_art(weap, ART_VORPAL_BLADE)))) {
+    } else if (indx === 0 && !$c.peq(magr, gy.youmonst) && attk.aatyp === AT_WEAP && attk.adtyp !== AD_PHYS && !(mptr.mattk[1].aatyp === AT_WEAP && mptr.mattk[1].adtyp === AD_PHYS) && (magr.mcan | 0 || weap && (weap.otyp === CORPSE && touch_petrifies($c.relem(mons, weap.corpsenm)) || is_art(weap, ART_STORMBRINGER) || is_art(weap, ART_VORPAL_BLADE)))) {
         alt_attk_buf.$copyFrom(attk);
         attk = alt_attk_buf;
         attk.adtyp = AD_PHYS;
-    } else if (indx === 0 && attk.aatyp === AT_TUCH && attk.adtyp === AD_COLD && (udefend ? u.uprops[COLD_RES].intrinsic || u.uprops[COLD_RES].extrinsic : await Resists_Elem(mdef, COLD_RES)) && !$c.peq(mdef.data, $c.relem(mons, PM_SHADE))) {
+    } else if (indx === 0 && attk.aatyp === AT_TUCH && attk.adtyp === AD_COLD && (udefend ? Cold_resistance() : await resists_cold(mdef)) && !$c.peq(mdef.data, $c.relem(mons, PM_SHADE))) {
         alt_attk_buf.$copyFrom(attk);
         attk = alt_attk_buf;
         attk.adtyp = AD_PHYS;
@@ -339,7 +349,7 @@ function calc_mattacku_vars(mtmp, ranged, range2, foundyou, youseeit) {   // mhi
     foundyou.set(0, $c.i8(mtmp.mux === u.ux && mtmp.muy === u.uy ? 1 : 0));
     $t3 = $c.i8(canseemon(mtmp)), youseeit.set(0, $t3);
     gb.bhitpos.x = u.ux, gb.bhitpos.y = u.uy;
-    gn.notonhead = 0;
+    gn.notonhead = FALSE;
 }
 export function mtrapped_in_pit(mtmp) {   // mhitu.c:467
     let ttmp = null;
@@ -349,24 +359,24 @@ export function mtrapped_in_pit(mtmp) {   // mhitu.c:467
     } else {
         ttmp = mtmp.mtrapped | 0 ? t_at(mtmp.mx, mtmp.my) : null;
     }
-    if (ttmp && ((ttmp.ttyp | 0) === PIT || (ttmp.ttyp | 0) === SPIKED_PIT)) {
-        return 1;
+    if (ttmp && is_pit(ttmp.ttyp)) {
+        return TRUE;
     }
-    return 0;
+    return FALSE;
 }
 export async function mattacku(mtmp) {   // mhitu.c:491
     let mattk = null, alt_attk = new $T.attack(), i = 0, j = 0, tmp = 0, sum = new Int32Array(6), mdat = null, ranged = Int8Array.of(0), range2 = Int8Array.of(0), foundyou = Int8Array.of(0), firstfoundyou = 0, youseeit = Int8Array.of(0), skipnonmagc = 0, cc = new $T.nhcoord(), obj = null, obj$2 = null, save_spe = 0, sticky = 0, buf = new Int8Array(256), already_fleeing = 0, offended = 0, hittmp = 0, bash = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12;
     j = 0;
     mdat = mtmp.data;
-    skipnonmagc = 0;
+    skipnonmagc = FALSE;
     calc_mattacku_vars(mtmp, new $c.Ptr(ranged, 0), new $c.Ptr(range2, 0), new $c.Ptr(foundyou, 0), new $c.Ptr(youseeit, 0));
     if (!ranged[0]) {
         nomul(0);
     }
-    if (mtmp.mhp < 1) {
+    if (DEADMONSTER(mtmp)) {
         return 1;
     }
-    if (u.uinwater | 0 && !($c.andu64(mtmp.data.mflags1, M1_SWIM) !== 0)) {
+    if ((u.uinwater | 0) && !is_swimmer(mtmp.data)) {
         return 0;
     }
     if (u.uswallow) {
@@ -393,16 +403,16 @@ export async function mattacku(mtmp) {   // mhitu.c:491
                 return 0;
             }
             gb.bhitpos.x = mtmp.mx, gb.bhitpos.y = mtmp.my;
-            gn.notonhead = 0;
+            gn.notonhead = FALSE;
             return !!(await mattackm(u.usteed, mtmp) & M_ATTK_DEF_DIED) ? 1 : 0;
         }
     }
     if (u.uundetected | 0 && !range2[0] && foundyou[0] && !u.uswallow) {
-        if (!(canseemon(mtmp) || sensemon(mtmp))) {
+        if (!canspotmon(mtmp)) {
             await map_invisible(mtmp.mx, mtmp.my);
         }
         u.uundetected = (0) & 1;
-        if ($c.andu64(gy.youmonst.data.mflags1, M1_HIDE) !== 0 && u.umonnum !== PM_TRAPPER) {
+        if (is_hider(gy.youmonst.data) && u.umonnum !== PM_TRAPPER) {
             await You($c.lit("fall from the %s!"), ceiling(u.ux, u.uy));
             svl.level.monsters[mtmp.mx][mtmp.my] = null;
             if (!await enexto(cc, u.ux, u.uy, gy.youmonst.data) || mtmp.data.mlet === S_EEL && is_pool(mtmp.mx, mtmp.my) && !is_pool(u.ux, u.uy)) {
@@ -415,7 +425,7 @@ export async function mattacku(mtmp) {   // mhitu.c:491
             await place_monster(mtmp, u.ux, u.uy);
             if (mtmp.wormno) {
                 await worm_move(mtmp);
-                if (svl.level.monsters[cc.x][cc.y]) {
+                if (m_at(cc.x, cc.y)) {
                     await enexto(cc, u.ux, u.uy, gy.youmonst.data);
                 }
             }
@@ -452,9 +462,9 @@ export async function mattacku(mtmp) {   // mhitu.c:491
                         }
                     }
                     if (gy.youmonst.data.mlet === S_EEL || u.umonnum === PM_TRAPPER) {
-                        await pline($c.lit("Wait, %s!  There's a hidden %s named %s there!"), await m_monnam(mtmp), pmname(gy.youmonst.data, (u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female) ? 1 : 0), new $c.Ptr(svp.plname, 0));
+                        await pline($c.lit("Wait, %s!  There's a hidden %s named %s there!"), await m_monnam(mtmp), pmname(gy.youmonst.data, Ugender()), new $c.Ptr(svp.plname, 0));
                     } else {
-                        await pline($c.lit("Wait, %s!  There's a %s named %s hiding under %s!"), await m_monnam(mtmp), pmname(gy.youmonst.data, (u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female) ? 1 : 0), new $c.Ptr(svp.plname, 0), await doname(svl.level.objects[u.ux][u.uy]));
+                        await pline($c.lit("Wait, %s!  There's a %s named %s hiding under %s!"), await m_monnam(mtmp), pmname(gy.youmonst.data, Ugender()), new $c.Ptr(svp.plname, 0), await doname(svl.level.objects[u.ux][u.uy]));
                     }
                     if (obj$2) {
                         obj$2.spe = $c.i8(save_spe);
@@ -467,15 +477,15 @@ export async function mattacku(mtmp) {   // mhitu.c:491
         }
         return 0;
     }
-    if (gy.youmonst.data.mlet === S_MIMIC && gy.youmonst.m_ap_type & M_AP_TYPMASK && !range2[0] && foundyou[0] && !u.uswallow) {
+    if (gy.youmonst.data.mlet === S_MIMIC && U_AP_TYPE() && !range2[0] && foundyou[0] && !u.uswallow) {
         sticky = sticks(gy.youmonst.data);
-        if (!(canseemon(mtmp) || sensemon(mtmp))) {
+        if (!canspotmon(mtmp)) {
             await map_invisible(mtmp.mx, mtmp.my);
         }
         if (sticky && !youseeit[0]) {
             await pline($c.lit("It gets stuck on you."));
         } else {
-            await pline($c.lit("Wait, %s!  That's a %s named %s!"), await m_monnam(mtmp), pmname(gy.youmonst.data, (u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female) ? 1 : 0), new $c.Ptr(svp.plname, 0));
+            await pline($c.lit("Wait, %s!  That's a %s named %s!"), await m_monnam(mtmp), pmname(gy.youmonst.data, Ugender()), new $c.Ptr(svp.plname, 0));
         }
         if (sticky) {
             await set_ustuck(mtmp);
@@ -485,14 +495,14 @@ export async function mattacku(mtmp) {   // mhitu.c:491
         await newsym(u.ux, u.uy);
         return 0;
     }
-    if ((gy.youmonst.m_ap_type & M_AP_TYPMASK) === M_AP_OBJECT && !range2[0] && foundyou[0] && !u.uswallow) {
-        if (!(canseemon(mtmp) || sensemon(mtmp))) {
+    if (U_AP_TYPE() === M_AP_OBJECT && !range2[0] && foundyou[0] && !u.uswallow) {
+        if (!canspotmon(mtmp)) {
             await map_invisible(mtmp.mx, mtmp.my);
         }
         if (!youseeit[0]) {
-            await pline($c.lit("%s %s!"), c_common_strings.c_Something, $c.andu64(mtmp.data.mflags2, M2_GREEDY) !== 0 && gy.youmonst.mappearance === GOLD_PIECE ? $c.lit("tries to pick you up") : $c.lit("disturbs you"));
+            await pline($c.lit("%s %s!"), c_common_strings.c_Something, likes_gold(mtmp.data) && gy.youmonst.mappearance === GOLD_PIECE ? $c.lit("tries to pick you up") : $c.lit("disturbs you"));
         } else {
-            await pline($c.lit("Wait, %s!  That %s is really %s named %s!"), await m_monnam(mtmp), await mimic_obj_name(gy.youmonst), await an(pmname($c.relem(mons, u.umonnum), (u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female) ? 1 : 0)), new $c.Ptr(svp.plname, 0));
+            await pline($c.lit("Wait, %s!  That %s is really %s named %s!"), await m_monnam(mtmp), await mimic_obj_name(gy.youmonst), await an(pmname($c.relem(mons, u.umonnum), Ugender())), new $c.Ptr(svp.plname, 0));
         }
         if (gm.multi < 0) {
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("You appear to be %s again."), u.umonnum !== u.umonster ? await an(pmname(gy.youmonst.data, flags.female)) : $c.lit("yourself"));
@@ -505,7 +515,7 @@ export async function mattacku(mtmp) {   // mhitu.c:491
     if (gm.multi < 0) {
         tmp = tmp + 4 | 0;
     }
-    if ((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked && !($c.andu64(mdat.mflags1, M1_SEE_INVIS) !== 0) || !mtmp.mcansee) {
+    if (Invis() && !perceives(mdat) || !mtmp.mcansee) {
         tmp = tmp - 2 | 0;
     }
     if (mtmp.mtrapped) {
@@ -514,11 +524,11 @@ export async function mattacku(mtmp) {   // mhitu.c:491
     if (tmp <= 0) {
         tmp = 1;
     }
-    if (mdat.mlet === S_EEL && mtmp.minvis | 0 && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & IN_SIGHT) !== 0) {
+    if (mdat.mlet === S_EEL && mtmp.minvis | 0 && cansee(mtmp.mx, mtmp.my)) {
         mtmp.minvis = (0) & 1;
         await newsym(mtmp.mx, mtmp.my);
     }
-    if (mtmp.cham === NON_PM && !mtmp.mcan && !range2[0] && ($c.andu64(mdat.mflags2, M2_DEMON) !== 0 || $c.andu64(mdat.mflags2, M2_WERE) !== 0)) {
+    if (mtmp.cham === NON_PM && !mtmp.mcan && !range2[0] && (is_demon(mdat) || is_were(mdat))) {
         already_fleeing = $c.i8((mtmp.mflee | 0) !== 0 ? 1 : 0);
         await summonmu(mtmp, youseeit[0]);
         if (mtmp.mflee | 0 && !already_fleeing) {
@@ -544,11 +554,11 @@ export async function mattacku(mtmp) {   // mhitu.c:491
             return offended === 1 ? 1 : 0;
         }
     }
-    gs.skipdrin = 0;
+    gs.skipdrin = FALSE;
     firstfoundyou = foundyou[0];
     L1: for (i = 0; i < NATTK; i = i + 1 | 0) {
         sum[i] = M_ATTK_MISS;
-        if (mtmp.mhp < 1) {
+        if (DEADMONSTER(mtmp)) {
             return 1;
         }
         if (i > 0) {
@@ -576,13 +586,13 @@ export async function mattacku(mtmp) {   // mhitu.c:491
                 if (mattk.aatyp === AT_KICK && mtrapped_in_pit(mtmp)) {
                     continue L1;
                 }
-                if (!range2[0] && (!mtmp.mw || mtmp.mconf | 0 || (u.uprops[CONFLICT].intrinsic || u.uprops[CONFLICT].extrinsic) || !($c.peq(gy.youmonst.data, $c.relem(mons, PM_COCKATRICE)) || $c.peq(gy.youmonst.data, $c.relem(mons, PM_CHICKATRICE))))) {
+                if (!range2[0] && (!MON_WEP(mtmp) || mtmp.mconf | 0 || Conflict() || !touch_petrifies(gy.youmonst.data))) {
                     if (foundyou[0]) {
                         if (tmp > (j = rnd(20 + i | 0))) {
-                            if ($c.andu64(gy.youmonst.data.mflags1, M1_UNSOLID) !== 0 && await failed_grab(mtmp, gy.youmonst, mattk)) {
+                            if (unsolid(gy.youmonst.data) && await failed_grab(mtmp, gy.youmonst, mattk)) {
                                 continue L1;
                             }
-                            if (mattk.aatyp !== AT_KICK || !($c.andu64(gy.youmonst.data.mflags1, M1_THICK_HIDE) !== 0)) {
+                            if (mattk.aatyp !== AT_KICK || !thick_skinned(gy.youmonst.data)) {
                                 $t2 = await hitmu(mtmp, mattk), sum[i] = $t2;
                             }
                         } else {
@@ -590,7 +600,7 @@ export async function mattacku(mtmp) {   // mhitu.c:491
                         }
                     } else {
                         await wildmiss(mtmp, mattk);
-                        skipnonmagc = 1;
+                        skipnonmagc = TRUE;
                     }
                 }
                 break;
@@ -626,9 +636,9 @@ export async function mattacku(mtmp) {   // mhitu.c:491
                         if (youseeit[0]) {
                             await pline_mon(mtmp, $c.lit("%s lunges forward and recoils!"), await Monnam(mtmp));
                         } else {
-                            if (mtmp.data.mlet === S_VORTEX || $c.peq(mtmp.data, $c.relem(mons, PM_AIR_ELEMENTAL))) {
+                            if (is_whirly(mtmp.data)) {
                             }
-                            await You_hear($c.lit("a %s nearby."), mtmp.data.mlet === S_VORTEX || $c.peq(mtmp.data, $c.relem(mons, PM_AIR_ELEMENTAL)) ? $c.lit("rushing noise") : $c.lit("splat"));
+                            await You_hear($c.lit("a %s nearby."), is_whirly(mtmp.data) ? $c.lit("rushing noise") : $c.lit("splat"));
                         }
                     }
                 }
@@ -650,7 +660,7 @@ export async function mattacku(mtmp) {   // mhitu.c:491
                     }
                 } else {
                     hittmp = 0;
-                    if (mtmp.weapon_check === NEED_WEAPON || !mtmp.mw) {
+                    if (mtmp.weapon_check === NEED_WEAPON || !MON_WEP(mtmp)) {
                         mtmp.weapon_check = NEED_HTH_WEAPON;
                         if (await mon_wield_item(mtmp) !== 0) {
                             break;
@@ -674,7 +684,7 @@ export async function mattacku(mtmp) {   // mhitu.c:491
                         }
                     } else {
                         await wildmiss(mtmp, mattk);
-                        skipnonmagc = 1;
+                        skipnonmagc = TRUE;
                     }
                 }
                 break;
@@ -682,7 +692,7 @@ export async function mattacku(mtmp) {   // mhitu.c:491
                 if (range2[0]) {
                     $t11 = await buzzmu(mtmp, mattk), sum[i] = $t11;
                 } else {
-                    $t12 = await castmu(mtmp, mattk, 1, foundyou[0]), sum[i] = $t12;
+                    $t12 = await castmu(mtmp, mattk, TRUE, foundyou[0]), sum[i] = $t12;
                 }
                 break;
             default:
@@ -709,7 +719,7 @@ export async function mattacku(mtmp) {   // mhitu.c:491
 async function summonmu(mtmp, youseeit) {   // mhitu.c:956
     let mdat = null, numseen = Int32Array.of(0), numhelp = 0, buf = new Int8Array(256), genericwere = new Int8Array(256), from_nowhere = null;
     mdat = mtmp.data;
-    if ($c.andu64(mdat.mflags2, M2_DEMON) !== 0) {
+    if (is_demon(mdat)) {
         if (!$c.peq(mdat, $c.relem(mons, PM_BALROG)) && !$c.peq(mdat, $c.relem(mons, PM_AMOROUS_DEMON))) {
             if (!rn2(In_hell(u.uz) ? 10 : 16)) {
                 await msummon(mtmp);
@@ -717,13 +727,13 @@ async function summonmu(mtmp, youseeit) {   // mhitu.c:956
         }
         return;
     }
-    if ($c.andu64(mdat.mflags2, M2_WERE) !== 0) {
-        if ($c.andu64(mdat.mflags2, M2_HUMAN) !== 0) {
-            if (!(u.uprops[PROT_FROM_SHAPE_CHANGERS].intrinsic || u.uprops[PROT_FROM_SHAPE_CHANGERS].extrinsic) && !rn2(5 - Math.imul(night(), 2) | 0)) {
+    if (is_were(mdat)) {
+        if (is_human(mdat)) {
+            if (!Protection_from_shape_changers() && !rn2(5 - Math.imul(night(), 2) | 0)) {
                 await new_were(mtmp);
             }
         } else {
-            if (u.uprops[PROT_FROM_SHAPE_CHANGERS].intrinsic || u.uprops[PROT_FROM_SHAPE_CHANGERS].extrinsic || !rn2(30)) {
+            if (Protection_from_shape_changers() || !rn2(30)) {
                 await new_were(mtmp);
             }
         }
@@ -733,7 +743,7 @@ async function summonmu(mtmp, youseeit) {   // mhitu.c:956
             if (youseeit) {
                 await pline_mon(mtmp, $c.lit("%s summons help!"), await Monnam(mtmp));
             }
-            numhelp = await were_summon(mdat, 0, new $c.Ptr(numseen, 0), new $c.Ptr(genericwere, 0));
+            numhelp = await were_summon(mdat, FALSE, new $c.Ptr(numseen, 0), new $c.Ptr(genericwere, 0));
             if (youseeit) {
                 if (numhelp > 0) {
                     if (numseen[0] === 0) {
@@ -743,7 +753,7 @@ async function summonmu(mtmp, youseeit) {   // mhitu.c:956
                     await pline($c.lit("But none comes."));
                 }
             } else {
-                if (!(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf)) {
+                if (!Deaf()) {
                     await pline($c.lit("%s %s!"), c_common_strings.c_Something, await makeplural(growl_sound(mtmp)));
                     from_nowhere = $c.lit("");
                 } else {
@@ -767,18 +777,18 @@ async function summonmu(mtmp, youseeit) {   // mhitu.c:956
     }
 }
 export async function diseasemu(mdat) {   // mhitu.c:1033
-    if (u.uprops[SICK_RES].intrinsic || u.uprops[SICK_RES].extrinsic || await defended(gy.youmonst, AD_DISE)) {
+    if (await Sick_resistance()) {
         await You_feel($c.lit("a slight illness."));
-        return 0;
+        return FALSE;
     } else {
-        await make_sick(u.uprops[SICK].intrinsic ? $c.add64($c.div64(u.uprops[SICK].intrinsic, 3), 1) : rn2(acurr(A_CON)) + 20 | 0, mdat.pmnames[NEUTRAL], 1, SICK_NONVOMITABLE);
-        return 1;
+        await make_sick(Sick() ? $c.add64($c.div64(u.uprops[SICK].intrinsic, 3), 1) : rn2(acurr(A_CON)) + 20 | 0, mdat.pmnames[NEUTRAL], TRUE, SICK_NONVOMITABLE);
+        return TRUE;
     }
 }
 export async function u_slip_free(mtmp, mattk) {   // mhitu.c:1047
     let obj = null;
     if (mattk.aatyp === AT_ENGL) {
-        return 0;
+        return FALSE;
     }
     obj = $G.uarmc ? $G.uarmc : $G.uarm;
     if (!obj) {
@@ -794,18 +804,18 @@ export async function u_slip_free(mtmp, mattk) {   // mhitu.c:1047
             obj.greased = (0) & 1;
             await update_inventory();
         }
-        return 1;
+        return TRUE;
     }
-    return 0;
+    return FALSE;
 }
 export function magic_negation(mon) {   // mhitu.c:1089
     let o = null, wearmask = 0, armpro = 0, mc = 0, is_you = 0, via_amul = 0, gotprot = 0;
     mc = 0;
     is_you = $c.i8($c.peq(mon, gy.youmonst) ? 1 : 0);
-    via_amul = 0;
+    via_amul = FALSE;
     gotprot = $c.i8(is_you ? u.uprops[PROTECTION].extrinsic !== 0 ? 1 : 0 : $c.peq(mon.data, $c.relem(mons, PM_HIGH_CLERIC)) ? 1 : 0);
     for (o = is_you ? gi.invent : mon.minvent; o; o = o.nobj) {
-        if ($c.and64(o.owornmask, W_ARM | W_ARMC | W_ARMH | W_ARMS | W_ARMG | W_ARMF | W_ARMU) !== 0) {
+        if ($c.and64(o.owornmask, W_ARMOR) !== 0) {
             armpro = objects[o.otyp].oc_oc2;
             if (armpro > mc) {
                 mc = armpro;
@@ -816,12 +826,12 @@ export function magic_negation(mon) {   // mhitu.c:1089
         if (is_you || gotprot) {
             continue;
         }
-        wearmask = W_ARM | W_ARMC | W_ARMH | W_ARMS | W_ARMG | W_ARMF | W_ARMU | (W_RINGL | W_RINGR | W_AMUL | W_TOOL);
-        if (o.oclass === WEAPON_CLASS || o.oclass === TOOL_CLASS && objects[o.otyp].oc_subtyp !== P_NONE) {
+        wearmask = W_ARMOR | W_ACCESSORY;
+        if (o.oclass === WEAPON_CLASS || is_weptool(o)) {
             wearmask = $c.or64(wearmask, W_WEP);
         }
-        if (protects(o, $c.i8($c.and64(o.owornmask, wearmask) !== 0 ? 1 : 0))) {
-            gotprot = 1;
+        if (protects(o, $c.i8($c.and64(o.owornmask, wearmask) !== 0 ? TRUE : FALSE))) {
+            gotprot = TRUE;
         }
     }
     if (gotprot) {
@@ -830,7 +840,7 @@ export function magic_negation(mon) {   // mhitu.c:1089
             mc = 3;
         }
     } else if (mc < 1) {
-        if (is_you && (u.uprops[PROTECTION].intrinsic && u.ublessed > 0 || u.uspellprot) || ($c.peq(mon.data, $c.relem(mons, PM_ALIGNED_CLERIC)) || $c.andu64(mon.data.mflags2, M2_MINION) !== 0)) {
+        if (is_you && (HProtection() && u.ublessed > 0 || u.uspellprot) || ($c.peq(mon.data, $c.relem(mons, PM_ALIGNED_CLERIC)) || is_minion(mon.data))) {
             mc = 1;
         }
     }
@@ -843,17 +853,17 @@ async function hitmu(mtmp, mattk) {   // mhitu.c:1144
     mhm.hitflags = M_ATTK_MISS;
     mhm.permdmg = 0;
     mhm.specialdmg = 0;
-    mhm.done = 0;
-    if (!(canseemon(mtmp) || sensemon(mtmp))) {
+    mhm.done = FALSE;
+    if (!canspotmon(mtmp)) {
         await map_invisible(mtmp.mx, mtmp.my);
     }
-    if (mtmp.mundetected | 0 && ($c.andu64(mdat.mflags1, M1_CONCEAL) !== 0 || mdat.mlet === S_EEL)) {
+    if (mtmp.mundetected | 0 && (hides_under(mdat) || mdat.mlet === S_EEL)) {
         mtmp.mundetected = (0) & 1;
-        if (!tp_sensemon(mtmp) && !(u.uprops[DETECT_MONSTERS].intrinsic || u.uprops[DETECT_MONSTERS].extrinsic)) {
+        if (!tp_sensemon(mtmp) && !Detect_monsters()) {
             if ((obj = svl.level.objects[mtmp.mx][mtmp.my]) !== null) {
-                if ((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked && !obj.dknown) {
+                if (Blind() && !obj.dknown) {
                     what = c_common_strings.c_something;
-                } else if (is_pool(mtmp.mx, mtmp.my) && !u.uinwater) {
+                } else if (is_pool(mtmp.mx, mtmp.my) && !Underwater()) {
                     what = $c.lit("the water");
                 } else {
                     what = await doname(obj);
@@ -868,7 +878,7 @@ async function hitmu(mtmp, mattk) {   // mhitu.c:1144
         }
     }
     $t1 = d(mattk.damn, mattk.damd), mhm.damage = $t1;
-    if (($c.andu64(mdat.mflags2, M2_UNDEAD) !== 0 || (mtmp.cham === PM_VAMPIRE || mtmp.cham === PM_VAMPIRE_LEADER || mtmp.cham === PM_VLAD_THE_IMPALER)) && midnight()) {
+    if ((is_undead(mdat) || is_vampshifter(mtmp)) && midnight()) {
         $t2 = d(mattk.damn, mattk.damd), mhm.damage = mhm.damage + $t2 | 0;
     }
     await mhitm_adtyping(mtmp, mattk, gy.youmonst, mhm);
@@ -876,7 +886,7 @@ async function hitmu(mtmp, mattk) {   // mhitu.c:1144
     if (mhm.done) {
         return mhm.hitflags;
     }
-    if ((u.umonnum !== u.umonster ? u.mh : u.uhp) < 1) {
+    if ((Upolyd() ? u.mh : u.uhp) < 1) {
         await mdamageu(mtmp, 1);
         mhm.damage = 0;
     }
@@ -887,21 +897,21 @@ async function hitmu(mtmp, mattk) {   // mhitu.c:1144
         }
     }
     if (mhm.damage > 0) {
-        if (u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic || gu.urole.mnum === PM_CLERIC && $G.uarmh && is_quest_artifact($G.uarmh) && mon_hates_blessings(mtmp)) {
+        if (Half_physical_damage() || gu.urole.mnum === PM_CLERIC && $G.uarmh && is_quest_artifact($G.uarmh) && mon_hates_blessings(mtmp)) {
             mhm.damage = $c.div32(mhm.damage + 1 | 0, 2);
         }
         if (mhm.permdmg) {
             $t4 = $c.i8(rn2($c.div32(mhm.damage, 2) + 1 | 0)), mhm.permdmg = $t4;
-            if (u.umonnum !== u.umonster || u.uhpmax > Math.imul(25, u.ulevel)) {
+            if (Upolyd() || u.uhpmax > Math.imul(25, u.ulevel)) {
                 mhm.permdmg = $c.i8(mhm.damage);
             } else if (u.uhpmax > Math.imul(10, u.ulevel)) {
                 mhm.permdmg = $c.i8(mhm.permdmg + $c.div32(mhm.damage, 2) | 0);
             } else if (u.uhpmax > Math.imul(5, u.ulevel)) {
                 mhm.permdmg = $c.i8(mhm.permdmg + $c.div32(mhm.damage, 4) | 0);
             }
-            if (u.umonnum !== u.umonster) {
+            if (Upolyd()) {
                 hpmax_p = new $c.FieldRef(u, "mhmax", "i32");
-                lowerlimit = gy.youmonst.data.mlevel < u.ulevel ? gy.youmonst.data.mlevel : u.ulevel;
+                lowerlimit = min(gy.youmonst.data.mlevel, u.ulevel);
             } else {
                 hpmax_p = new $c.FieldRef(u, "uhpmax", "i32");
                 lowerlimit = minuhpmax(1);
@@ -911,7 +921,7 @@ async function hitmu(mtmp, mattk) {   // mhitu.c:1144
             } else if (hpmax_p.get(0) > lowerlimit) {
                 hpmax_p.set(0, lowerlimit);
             }
-            disp.botl = 1;
+            disp.botl = TRUE;
         }
         await mdamageu(mtmp, mhm.damage);
     }
@@ -925,41 +935,41 @@ async function hitmu(mtmp, mattk) {   // mhitu.c:1144
 }
 export async function gulp_blnd_check() {   // mhitu.c:1273
     let mattk = null;
-    if (!(u.uprops[BLINDED].intrinsic && !u.uprops[BLINDED].blocked) && u.uswallow | 0 && (mattk = attacktype_fordmg(u.ustuck.data, AT_ENGL, AD_BLND)) && await can_blnd(u.ustuck, gy.youmonst, mattk.aatyp, null)) {
+    if (!Blinded() && u.uswallow | 0 && (mattk = attacktype_fordmg(u.ustuck.data, AT_ENGL, AD_BLND)) && await can_blnd(u.ustuck, gy.youmonst, mattk.aatyp, null)) {
         u.uswldtim = u.uswldtim + 1 >>> 0;
         await gulpmu(u.ustuck, mattk);
-        return 1;
+        return TRUE;
     }
-    return 0;
+    return FALSE;
 }
 async function gulpmu(mtmp, mattk) {   // mhitu.c:1289
     let t = null, tmp = 0, tim_tmp = 0, otmp2 = null, nextobj = null, i = 0, physical_damage = 0, omx = 0, omy = 0, buf = new Int8Array(256), s = null, was_blinded = 0;
     t = t_at(u.ux, u.uy);
     tmp = d(mattk.damn, mattk.damd);
-    physical_damage = 0;
+    physical_damage = FALSE;
     if (!u.uswallow) {
         omx = mtmp.mx;
         omy = mtmp.my;
         if (!engulf_target(mtmp, gy.youmonst)) {
             return M_ATTK_MISS;
         }
-        if (t && ((t.ttyp | 0) === PIT || (t.ttyp | 0) === SPIKED_PIT) && sobj_at(BOULDER, u.ux, u.uy)) {
+        if (t && is_pit(t.ttyp) && sobj_at(BOULDER, u.ux, u.uy)) {
             return M_ATTK_MISS;
         }
         if (await failed_grab(mtmp, gy.youmonst, mattk)) {
             return M_ATTK_MISS;
         }
-        if ($G.uball !== null) {
+        if (Punished()) {
             await unplacebc();
         }
-        svl.level.monsters[omx][omy] = null;
+        remove_monster(omx, omy);
         mtmp.mtrapped = (0) & 1;
         await place_monster(mtmp, u.ux, u.uy);
         await set_ustuck(mtmp);
         await newsym(mtmp.mx, mtmp.my);
         if (u.usteed) {
             $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), await mon_nam(u.usteed), 256);
-            await urgent_pline($c.lit("%s %s forward and plucks you off %s!"), await Some_Monnam(mtmp), $c.andu64(mtmp.data.mflags1, M1_ANIMAL) !== 0 ? $c.lit("lunges") : mtmp.data.mlet === S_VORTEX || $c.peq(mtmp.data, $c.relem(mons, PM_AIR_ELEMENTAL)) ? $c.lit("whirls") : $c.andu64(mtmp.data.mflags1, M1_UNSOLID) !== 0 ? $c.lit("flows") : $c.andu64(mtmp.data.mflags1, M1_AMORPHOUS) !== 0 ? $c.lit("oozes") : $c.lit("surges"), new $c.Ptr(buf, 0));
+            await urgent_pline($c.lit("%s %s forward and plucks you off %s!"), await Some_Monnam(mtmp), is_animal(mtmp.data) ? $c.lit("lunges") : is_whirly(mtmp.data) ? $c.lit("whirls") : unsolid(mtmp.data) ? $c.lit("flows") : amorphous(mtmp.data) ? $c.lit("oozes") : $c.lit("surges"), new $c.Ptr(buf, 0));
             await dismount_steed(DISMOUNT_ENGULFED);
         } else {
             await urgent_pline($c.lit("%s %s!"), await Monnam(mtmp), dmgtype_fromattack(mtmp.data, AD_DGST, AT_ENGL) !== null ? $c.lit("swallows you whole") : dmgtype_fromattack(mtmp.data, AD_WRAP, AT_ENGL) !== null ? $c.lit("folds itself around you") : $c.lit("engulfs you"));
@@ -968,7 +978,7 @@ async function gulpmu(mtmp, mattk) {   // mhitu.c:1289
         reset_occupations();
         if (u.utrap) {
             await You($c.lit("are released from the %s!"), u.utraptype === TT_WEB ? $c.lit("web") : $c.lit("trap"));
-            await reset_utrap(0);
+            await reset_utrap(FALSE);
         }
         i = number_leashed();
         if (i > 0) {
@@ -976,21 +986,21 @@ async function gulpmu(mtmp, mattk) {   // mhitu.c:1289
             await pline_The($c.lit("%s %s loose."), s, await vtense(s, $c.lit("snap")));
             unleash_all();
         }
-        if (($c.peq(gy.youmonst.data, $c.relem(mons, PM_COCKATRICE)) || $c.peq(gy.youmonst.data, $c.relem(mons, PM_CHICKATRICE))) && !await Resists_Elem(mtmp, STONE_RES)) {
+        if (touch_petrifies(gy.youmonst.data) && !await resists_ston(mtmp)) {
             svl.level.monsters[mtmp.mx][mtmp.my] = null;
             await place_monster(mtmp, $c.i16(omx), $c.i16(omy));
-            await minstapetrify(mtmp, 1);
-            if ($G.uball !== null) {
+            await minstapetrify(mtmp, TRUE);
+            if (Punished()) {
                 await placebc();
             }
             await set_ustuck(null);
-            return !(mtmp.mhp < 1) ? M_ATTK_MISS : M_ATTK_AGR_DIED;
+            return !DEADMONSTER(mtmp) ? M_ATTK_MISS : M_ATTK_AGR_DIED;
         }
-        await windowprocs.win_display_nhwindow($G.WIN_MESSAGE, 0);
+        await display_nhwindow()($G.WIN_MESSAGE, FALSE);
         await vision_recalc(2);
         u.uswallow = (1) & 1;
         if (mattk.adtyp === AD_DGST) {
-            tim_tmp = ((acurr(A_CON) + 10 | 0) - u.uac | 0) + rn2(20) | 0;
+            tim_tmp = ((ACURR(A_CON) + 10 | 0) - u.uac | 0) + rn2(20) | 0;
             if (tim_tmp < 0) {
                 tim_tmp = 0;
             }
@@ -1001,7 +1011,7 @@ async function gulpmu(mtmp, mattk) {   // mhitu.c:1289
         }
         u.uswldtim = (tim_tmp < 2 ? 2 : tim_tmp) >>> 0;
         await swallowed(1);
-        if (!($c.peq(mtmp.data, $c.relem(mons, PM_FIRE_VORTEX)) || $c.peq(mtmp.data, $c.relem(mons, PM_FLAMING_SPHERE)) || $c.peq(mtmp.data, $c.relem(mons, PM_FIRE_ELEMENTAL)) || $c.peq(mtmp.data, $c.relem(mons, PM_SALAMANDER)))) {
+        if (!flaming(mtmp.data)) {
             for (otmp2 = gi.invent; otmp2; otmp2 = nextobj) {
                 nextobj = otmp2.nobj;
                 await snuff_lit(otmp2);
@@ -1011,7 +1021,7 @@ async function gulpmu(mtmp, mattk) {   // mhitu.c:1289
     if (!$c.peq(mtmp, u.ustuck)) {
         return M_ATTK_MISS;
     }
-    if ($G.uball !== null) {
+    if (Punished()) {
         if ($G.uchain.where === OBJ_FREE) {
             $G.uchain.ox = mtmp.mx, $G.uchain.oy = mtmp.my;
         }
@@ -1024,57 +1034,57 @@ async function gulpmu(mtmp, mattk) {   // mhitu.c:1289
     }
     switch (mattk.adtyp) {
         case AD_DGST:
-            physical_damage = 1;
-            if (u.uprops[SLOW_DIGESTION].intrinsic || u.uprops[SLOW_DIGESTION].extrinsic) {
+            physical_damage = TRUE;
+            if (Slow_digestion()) {
                 u.uswldtim = 0;
                 tmp = 0;
             } else if (u.uswldtim === 0) {
                 await pline($c.lit("%s totally digests you!"), await Monnam(mtmp));
                 tmp = u.uhp;
-                if (u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic) {
+                if (Half_physical_damage()) {
                     tmp = Math.imul(tmp, 2);
                 }
             } else {
                 await pline($c.lit("%s%s digests you!"), await Monnam(mtmp), u.uswldtim === 2 ? $c.lit(" thoroughly") : u.uswldtim === 1 ? $c.lit(" utterly") : $c.lit(""));
-                await exercise(A_STR, 0);
+                await exercise(A_STR, FALSE);
             }
             break;
         case AD_PHYS:
-            physical_damage = 1;
+            physical_damage = TRUE;
             if ($c.peq(mtmp.data, $c.relem(mons, PM_FOG_CLOUD))) {
-                await You($c.lit("are laden with moisture and %s"), $c.peq(gy.youmonst.data, $c.relem(mons, PM_FIRE_VORTEX)) || $c.peq(gy.youmonst.data, $c.relem(mons, PM_FLAMING_SPHERE)) || $c.peq(gy.youmonst.data, $c.relem(mons, PM_FIRE_ELEMENTAL)) || $c.peq(gy.youmonst.data, $c.relem(mons, PM_SALAMANDER)) ? $c.lit("are smoldering out!") : u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1_BREATHLESS) !== 0 ? $c.lit("find it mildly uncomfortable.") : $c.andu64(gy.youmonst.data.mflags1, M1_AMPHIBIOUS) !== 0 ? $c.lit("feel comforted.") : $c.lit("can barely breathe!"));
-                if ((u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1_AMPHIBIOUS) !== 0 || (u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1_BREATHLESS) !== 0)) && !($c.peq(gy.youmonst.data, $c.relem(mons, PM_FIRE_VORTEX)) || $c.peq(gy.youmonst.data, $c.relem(mons, PM_FLAMING_SPHERE)) || $c.peq(gy.youmonst.data, $c.relem(mons, PM_FIRE_ELEMENTAL)) || $c.peq(gy.youmonst.data, $c.relem(mons, PM_SALAMANDER)))) {
+                await You($c.lit("are laden with moisture and %s"), flaming(gy.youmonst.data) ? $c.lit("are smoldering out!") : u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1_BREATHLESS) !== 0 ? $c.lit("find it mildly uncomfortable.") : amphibious(gy.youmonst.data) ? $c.lit("feel comforted.") : $c.lit("can barely breathe!"));
+                if ((u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1_AMPHIBIOUS) !== 0 || (u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1_BREATHLESS) !== 0)) && !flaming(gy.youmonst.data)) {
                     tmp = 0;
                 }
             } else {
                 await You($c.lit("are %s!"), dmgtype_fromattack(mtmp.data, AD_WRAP, AT_ENGL) !== null ? $c.lit("being squashed") : $c.lit("pummeled with debris"));
-                await exercise(A_STR, 0);
+                await exercise(A_STR, FALSE);
             }
             break;
         case AD_ACID:
-            if (u.uprops[ACID_RES].intrinsic || u.uprops[ACID_RES].extrinsic) {
+            if (Acid_resistance()) {
                 await You($c.lit("are covered with a seemingly harmless goo."));
                 monstseesu(M_SEEN_ACID);
                 tmp = 0;
             } else {
-                if (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic)) {
+                if (Hallucination()) {
                     await pline($c.lit("Ouch!  You've been slimed!"));
                 } else {
                     await You($c.lit("are covered in slime!  It burns!"));
                 }
-                await exercise(A_STR, 0);
+                await exercise(A_STR, FALSE);
                 monstunseesu(M_SEEN_ACID);
             }
             break;
         case AD_BLND:
             if (await can_blnd(mtmp, gy.youmonst, mattk.aatyp, null)) {
-                if (!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked)) {
-                    was_blinded = u.uprops[BLINDED].intrinsic && !u.uprops[BLINDED].blocked ? 1 : 0;
-                    if (!(u.uprops[BLINDED].intrinsic && !u.uprops[BLINDED].blocked)) {
+                if (!Blind()) {
+                    was_blinded = Blinded();
+                    if (!Blinded()) {
                         await You_cant($c.lit("see in here!"));
                     }
-                    await make_blinded(tmp, 0);
-                    if (!was_blinded && !((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked)) {
+                    await make_blinded(tmp, FALSE);
+                    if (!was_blinded && !Blind()) {
                         await Your($c.lit("%s"), c_common_strings.c_vision_clears);
                     }
                 } else {
@@ -1086,7 +1096,7 @@ async function gulpmu(mtmp, mattk) {   // mhitu.c:1289
         case AD_ELEC:
             if (!mtmp.mcan && rn2(2)) {
                 await pline_The($c.lit("air around you crackles with electricity."));
-                if (u.uprops[SHOCK_RES].intrinsic || u.uprops[SHOCK_RES].extrinsic) {
+                if (Shock_resistance()) {
                     await shieldeff(u.ux, u.uy);
                     await You($c.lit("seem unhurt."));
                     monstseesu(M_SEEN_ELEC);
@@ -1101,7 +1111,7 @@ async function gulpmu(mtmp, mattk) {   // mhitu.c:1289
             break;
         case AD_COLD:
             if (!mtmp.mcan && rn2(2)) {
-                if (u.uprops[COLD_RES].intrinsic || u.uprops[COLD_RES].extrinsic) {
+                if (Cold_resistance()) {
                     await shieldeff(u.ux, u.uy);
                     await You_feel($c.lit("mildly chilly."));
                     monstseesu(M_SEEN_COLD);
@@ -1117,7 +1127,7 @@ async function gulpmu(mtmp, mattk) {   // mhitu.c:1289
             break;
         case AD_FIRE:
             if (!mtmp.mcan && rn2(2)) {
-                if (u.uprops[FIRE_RES].intrinsic || u.uprops[FIRE_RES].extrinsic) {
+                if (Fire_resistance()) {
                     await shieldeff(u.ux, u.uy);
                     await You_feel($c.lit("mildly hot."));
                     monstseesu(M_SEEN_FIRE);
@@ -1139,12 +1149,12 @@ async function gulpmu(mtmp, mattk) {   // mhitu.c:1289
             break;
         case AD_DREN:
             if (!mtmp.mcan && rn2(4)) {
-                await drain_en(tmp, 0);
+                await drain_en(tmp, FALSE);
             }
             tmp = 0;
             break;
         default:
-            physical_damage = 1;
+            physical_damage = TRUE;
             tmp = 0;
             break;
     }
@@ -1155,7 +1165,7 @@ async function gulpmu(mtmp, mattk) {   // mhitu.c:1289
         if (tmp < 0) {
             tmp = 1;
         }
-        tmp = u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(tmp + 1 | 0, 2) : tmp;
+        tmp = Maybe_Half_Phys(tmp);
     }
     gm.mswallower = mtmp;
     await mdamageu(mtmp, tmp);
@@ -1164,21 +1174,21 @@ async function gulpmu(mtmp, mattk) {   // mhitu.c:1289
         await stop_occupation();
     }
     if (!u.uswallow) {
-    } else if (($c.peq(gy.youmonst.data, $c.relem(mons, PM_COCKATRICE)) || $c.peq(gy.youmonst.data, $c.relem(mons, PM_CHICKATRICE))) && !await Resists_Elem(mtmp, STONE_RES)) {
+    } else if (touch_petrifies(gy.youmonst.data) && !await resists_ston(mtmp)) {
         await pline($c.lit("%s very hurriedly %s you!"), await Monnam(mtmp), dmgtype_fromattack(mtmp.data, AD_DGST, AT_ENGL) !== null ? $c.lit("regurgitates") : dmgtype_fromattack(mtmp.data, AD_WRAP, AT_ENGL) !== null ? $c.lit("releases") : $c.lit("expels"));
-        await expels(mtmp, mtmp.data, 0);
+        await expels(mtmp, mtmp.data, FALSE);
     } else if (!u.uswldtim || gy.youmonst.data.msize >= MZ_HUGE) {
         await You($c.lit("get %s!"), dmgtype_fromattack(mtmp.data, AD_DGST, AT_ENGL) !== null ? $c.lit("regurgitated") : dmgtype_fromattack(mtmp.data, AD_WRAP, AT_ENGL) !== null ? $c.lit("released") : $c.lit("expelled"));
-        if (flags.verbose && (dmgtype_fromattack(mtmp.data, AD_DGST, AT_ENGL) !== null && (u.uprops[SLOW_DIGESTION].intrinsic || u.uprops[SLOW_DIGESTION].extrinsic))) {
+        if (flags.verbose && (dmgtype_fromattack(mtmp.data, AD_DGST, AT_ENGL) !== null && Slow_digestion())) {
             await pline($c.lit("Obviously %s doesn't like your taste."), await mon_nam(mtmp));
         }
-        await expels(mtmp, mtmp.data, 0);
+        await expels(mtmp, mtmp.data, FALSE);
     }
     return M_ATTK_HIT;
 }
 async function explmu(mtmp, mattk, ufound) {   // mhitu.c:1591
     let kill_agr = 0, not_affected = 0, tmp = 0, chg = 0;
-    kill_agr = 1;
+    kill_agr = TRUE;
     if (mtmp.mcan) {
         return M_ATTK_MISS;
     }
@@ -1194,8 +1204,8 @@ async function explmu(mtmp, mattk, ufound) {   // mhitu.c:1591
         case AD_FIRE:
         case AD_ELEC:
             await mon_explodes(mtmp, mattk);
-            if (!(mtmp.mhp < 1)) {
-                kill_agr = 0;
+            if (!DEADMONSTER(mtmp)) {
+                kill_agr = FALSE;
             }
             break;
         case AD_BLND:
@@ -1203,8 +1213,8 @@ async function explmu(mtmp, mattk, ufound) {   // mhitu.c:1591
             if (ufound && !not_affected) {
                 if (mon_visible(mtmp) || rnd(tmp = $c.div32(tmp, 2)) > u.ulevel) {
                     await You($c.lit("are blinded by a blast of light!"));
-                    await make_blinded(tmp, 0);
-                    if (!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked)) {
+                    await make_blinded(tmp, FALSE);
+                    if (!Blind()) {
                         await Your($c.lit("%s"), c_common_strings.c_vision_clears);
                     }
                 } else if (flags.verbose) {
@@ -1213,14 +1223,14 @@ async function explmu(mtmp, mattk, ufound) {   // mhitu.c:1591
             }
             break;
         case AD_HALU:
-            not_affected = $c.i8(not_affected | ((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked || (u.umonnum === PM_BLACK_LIGHT || u.umonnum === PM_VIOLET_FUNGUS || dmgtype(gy.youmonst.data, AD_STUN)) ? 1 : 0));
+            not_affected = $c.i8(not_affected | (Blind() || (u.umonnum === PM_BLACK_LIGHT || u.umonnum === PM_VIOLET_FUNGUS || dmgtype(gy.youmonst.data, AD_STUN)) ? 1 : 0));
             if (ufound && !not_affected) {
-                if (!(u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic))) {
+                if (!Hallucination()) {
                     await You($c.lit("are caught in a blast of kaleidoscopic light!"));
                 }
                 await mondead(mtmp);
-                kill_agr = 0;
-                chg = await make_hallucinated($c.add64(u.uprops[HALLUC].intrinsic, tmp), 0, 0);
+                kill_agr = FALSE;
+                chg = await make_hallucinated($c.add64(u.uprops[HALLUC].intrinsic, tmp), FALSE, 0);
                 await You($c.lit("%s."), chg ? $c.lit("are freaked out") : $c.lit("seem unaffected"));
             }
             break;
@@ -1232,25 +1242,25 @@ async function explmu(mtmp, mattk, ufound) {   // mhitu.c:1591
         await You($c.lit("seem unaffected by it."));
         await ugolemeffects(mattk.adtyp, tmp);
     }
-    if (kill_agr && !(mtmp.mhp < 1)) {
+    if (kill_agr && !DEADMONSTER(mtmp)) {
         await mondead(mtmp);
     }
     await wake_nearto(mtmp.mx, mtmp.my, 49);
-    return !(mtmp.mhp < 1) ? M_ATTK_MISS : M_ATTK_AGR_DIED;
+    return !DEADMONSTER(mtmp) ? M_ATTK_MISS : M_ATTK_AGR_DIED;
 }
 export async function gazemu(mtmp, mattk) {   // mhitu.c:1668
     let react = 0, is_medusa = 0, reflectable = 0, cancelled = 0, already = 0, mcanseeu = 0, useeit = 0, conf = 0, stun = 0, blnd = 0, oldstun = 0, newstun = 0, dmg = 0, orig_dmg = 0, lev = 0, $t1, $t2;
     react = -1;
     cancelled = $c.i8((mtmp.mcan | 0) !== 0 ? 1 : 0);
-    already = 0;
-    mcanseeu = $c.i8(canseemon(mtmp) && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & COULD_SEE) !== 0 && mtmp.mcansee | 0 ? 1 : 0);
+    already = FALSE;
+    mcanseeu = $c.i8(canseemon(mtmp) && couldsee(mtmp.mx, mtmp.my) && mtmp.mcansee | 0 ? 1 : 0);
     if ($c.andu64(mtmp.seen_resistance, cvt_adtyp_to_mseenres(mattk.adtyp))) {
         return M_ATTK_MISS;
     }
     is_medusa = $c.i8($c.peq(mtmp.data, $c.relem(mons, PM_MEDUSA)) ? 1 : 0);
-    reflectable = $c.i8((u.uprops[REFLECTING].intrinsic || u.uprops[REFLECTING].extrinsic) && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & COULD_SEE) !== 0 && is_medusa ? 1 : 0);
-    if (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) && rn2(4) || gm.multi < 0 && (unconscious() || is_fainted()) && !reflectable) {
-        cancelled = 1;
+    reflectable = $c.i8(Reflecting() && couldsee(mtmp.mx, mtmp.my) && is_medusa ? 1 : 0);
+    if (Hallucination() && rn2(4) || Unaware() && !reflectable) {
+        cancelled = TRUE;
     }
     switch (mattk.adtyp) {
         case AD_STON:
@@ -1258,11 +1268,11 @@ export async function gazemu(mtmp, mattk) {   // mhitu.c:1668
                 if (!canseemon(mtmp)) {
                     break;
                 }
-                if (gm.multi < 0 && (unconscious() || is_fainted())) {
+                if (Unaware()) {
                     react = is_medusa ? 4 : 2;
                     break;
                 }
-                if (is_medusa && (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic)) && !rn2(3)) {
+                if (is_medusa && Hallucination() && !rn2(3)) {
                     await pline($c.lit("Someone seems overdue for a serpent cut."));
                 } else {
                     await pline_mon(mtmp, $c.lit("%s %s."), await Monnam(mtmp), is_medusa && mtmp.mcan | 0 && !react ? $c.lit("doesn't look all that ugly") : $c.lit("gazes ineffectually"));
@@ -1286,14 +1296,14 @@ export async function gazemu(mtmp, mattk) {   // mhitu.c:1668
                 if (useeit) {
                     await pline_mon(mtmp, $c.lit("%s is turned to stone!"), await Monnam(mtmp));
                 }
-                gs.stoned = 1;
+                gs.stoned = TRUE;
                 await killed(mtmp);
-                if (!(mtmp.mhp < 1)) {
+                if (!DEADMONSTER(mtmp)) {
                     break;
                 }
                 return M_ATTK_AGR_DIED;
             }
-            if (canseemon(mtmp) && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & COULD_SEE) !== 0 && !(u.uprops[STONE_RES].intrinsic || u.uprops[STONE_RES].extrinsic) && !(gm.multi < 0 && (unconscious() || is_fainted()))) {
+            if (canseemon(mtmp) && couldsee(mtmp.mx, mtmp.my) && !Stone_resistance() && !Unaware()) {
                 await You($c.lit("meet %s gaze."), s_suffix(await mon_nam(mtmp)));
                 await stop_occupation();
                 if (poly_when_stoned(gy.youmonst.data) && await polymon(PM_STONE_GOLEM)) {
@@ -1318,7 +1328,7 @@ export async function gazemu(mtmp, mattk) {   // mhitu.c:1668
                     } else {
                         await You($c.lit("are getting more and more confused."));
                     }
-                    await make_confused($c.add64(u.uprops[CONFUSION].intrinsic, conf), 0);
+                    await make_confused($c.add64(u.uprops[CONFUSION].intrinsic, conf), FALSE);
                     await stop_occupation();
                 }
             }
@@ -1332,7 +1342,7 @@ export async function gazemu(mtmp, mattk) {   // mhitu.c:1668
                     stun = d(2, 6);
                     $t2 = mtmp.mspec_used + (stun + rn2(6) | 0) | 0, mtmp.mspec_used = $t2;
                     await pline_mon(mtmp, $c.lit("%s stares piercingly at you!"), await Monnam(mtmp));
-                    await make_stunned($c.add64($c.and64(u.uprops[STUNNED].intrinsic, TIMEOUT), stun), 1);
+                    await make_stunned($c.add64($c.and64(u.uprops[STUNNED].intrinsic, TIMEOUT), stun), TRUE);
                     await stop_occupation();
                 }
             }
@@ -1348,14 +1358,14 @@ export async function gazemu(mtmp, mattk) {   // mhitu.c:1668
                 } else {
                     blnd = d(mattk.damn, mattk.damd);
                     await You($c.lit("are blinded by %s radiance!"), s_suffix(await mon_nam(mtmp)));
-                    await make_blinded(blnd, 0);
+                    await make_blinded(blnd, FALSE);
                     await stop_occupation();
-                    if (!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked)) {
+                    if (!Blind()) {
                         await Your($c.lit("%s"), c_common_strings.c_vision_clears);
                     } else {
                         oldstun = $c.and64(u.uprops[STUNNED].intrinsic, TIMEOUT);
                         newstun = rnd(3);
-                        await make_stunned(oldstun > newstun ? oldstun : newstun, 1);
+                        await make_stunned(max(oldstun, newstun), TRUE);
                     }
                 }
             }
@@ -1370,7 +1380,7 @@ export async function gazemu(mtmp, mattk) {   // mhitu.c:1668
                     lev = mtmp.m_lev;
                     await pline_mon(mtmp, $c.lit("%s attacks you with a fiery gaze!"), await Monnam(mtmp));
                     await stop_occupation();
-                    if (u.uprops[FIRE_RES].intrinsic || u.uprops[FIRE_RES].extrinsic) {
+                    if (Fire_resistance()) {
                         await shieldeff(u.ux, u.uy);
                         await pline_The($c.lit("fire doesn't feel hot!"));
                         monstseesu(M_SEEN_FIRE);
@@ -1398,7 +1408,7 @@ export async function gazemu(mtmp, mattk) {   // mhitu.c:1668
             break;
     }
     if (react >= 0) {
-        if (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) && rn2(3)) {
+        if (Hallucination() && rn2(3)) {
             react = rn2(8);
         }
         await pline_mon(mtmp, $c.lit("%s looks %s%s."), await Monnam(mtmp), !rn2(3) ? $c.lit("") : already ? $c.lit("quite ") : !rn2(2) ? $c.lit("a bit ") : $c.lit("somewhat "), gazemu$reactions[react]);
@@ -1410,8 +1420,8 @@ export async function mdamageu(mtmp, n) {   // mhitu.c:1902
         await impossible($c.lit("mdamageu for negative damage? (%d)"), n);
         n = 0;
     }
-    disp.botl = 1;
-    if (u.umonnum !== u.umonster) {
+    disp.botl = TRUE;
+    if (Upolyd()) {
         u.mh = u.mh - n | 0;
         await showdamage(n);
         if (u.mh > u.mhmax) {
@@ -1433,12 +1443,12 @@ export async function mdamageu(mtmp, n) {   // mhitu.c:1902
 }
 export function could_seduce(magr, mdef, mattk) {   // mhitu.c:1934
     let pagr = null, agrinvis = 0, defperc = 0, genagr = 0, gendef = 0, adtyp = 0;
-    if ($c.andu64(magr.data.mflags1, M1_ANIMAL) !== 0) {
+    if (is_animal(magr.data)) {
         return 0;
     }
     if ($c.peq(magr, gy.youmonst)) {
         pagr = gy.youmonst.data;
-        agrinvis = $c.i8(((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked ? 1 : 0) !== 0 ? 1 : 0);
+        agrinvis = $c.i8(Invis() !== 0 ? 1 : 0);
         genagr = $c.i16(poly_gender());
     } else {
         pagr = magr.data;
@@ -1446,14 +1456,14 @@ export function could_seduce(magr, mdef, mattk) {   // mhitu.c:1934
         genagr = $c.i16(gender(magr));
     }
     if ($c.peq(mdef, gy.youmonst)) {
-        defperc = $c.i8((u.uprops[SEE_INVIS].intrinsic || u.uprops[SEE_INVIS].extrinsic ? 1 : 0) !== 0 ? 1 : 0);
+        defperc = $c.i8(See_invisible() !== 0 ? 1 : 0);
         gendef = $c.i16(poly_gender());
     } else {
-        defperc = $c.i8($c.andu64(mdef.data.mflags1, M1_SEE_INVIS) !== 0 ? 1 : 0);
+        defperc = $c.i8(perceives(mdef.data));
         gendef = $c.i16(gender(mdef));
     }
     adtyp = mattk ? mattk.adtyp : dmgtype(pagr, AD_SSEX) ? AD_SSEX : dmgtype(pagr, AD_SEDU) ? AD_SEDU : AD_PHYS;
-    if (adtyp === AD_SSEX && !sysopt.seduce) {
+    if (adtyp === AD_SSEX && !SYSOPT_SEDUCE()) {
         adtyp = AD_SEDU;
     }
     if (agrinvis && !defperc && adtyp === AD_SEDU) {
@@ -1501,18 +1511,18 @@ export async function doseduce(mon) {   // mhitu.c:1985
                     continue;
                 }
             }
-            if (!(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf) && rn2(20) < acurr(A_CHA)) {
+            if (!Deaf() && rn2(20) < ACURR(A_CHA)) {
                 await safe_qbuf(new $c.Ptr(qbuf, 0), $c.lit("\"That "), $c.lit(" looks pretty.  May I have it?\""), ring, xname, simpleonames, $c.lit("ring"));
-                await discover_object(RIN_ADORNMENT, 1, 1, 1);
-                if (await yn_function(new $c.Ptr(qbuf, 0), new $c.Ptr(ynchars, 0), 110, 1) === 110) {
+                await discover_object(RIN_ADORNMENT, TRUE, TRUE, TRUE);
+                if (await y_n(new $c.Ptr(qbuf, 0)) === 110) {
                     continue;
                 }
             } else {
                 await pline($c.lit("%s decides she'd like %s, and takes it."), new $c.Ptr(Who, 0), await yname(ring));
             }
-            await discover_object(RIN_ADORNMENT, 1, 1, 1);
+            await discover_object(RIN_ADORNMENT, TRUE, TRUE, TRUE);
             if (ring.owornmask) {
-                await remove_worn_item(ring, 0);
+                await remove_worn_item(ring, FALSE);
             }
             await freeinv(ring);
             await mpickobj(mon, ring);
@@ -1531,17 +1541,17 @@ export async function doseduce(mon) {   // mhitu.c:1985
                     break;
                 }
             }
-            if (!(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf) && rn2(20) < acurr(A_CHA)) {
+            if (!Deaf() && rn2(20) < ACURR(A_CHA)) {
                 await safe_qbuf(new $c.Ptr(qbuf, 0), $c.lit("\"That "), $c.lit(" looks pretty.  Would you wear it for me?\""), ring, xname, simpleonames, $c.lit("ring"));
-                await discover_object(RIN_ADORNMENT, 1, 1, 1);
-                if (await yn_function(new $c.Ptr(qbuf, 0), new $c.Ptr(ynchars, 0), 110, 1) === 110) {
+                await discover_object(RIN_ADORNMENT, TRUE, TRUE, TRUE);
+                if (await y_n(new $c.Ptr(qbuf, 0)) === 110) {
                     continue;
                 }
             } else {
                 await pline($c.lit("%s decides you'd look prettier wearing %s,"), new $c.Ptr(Who, 0), await yname(ring));
                 await pline($c.lit("and puts it on your finger."));
             }
-            await discover_object(RIN_ADORNMENT, 1, 1, 1);
+            await discover_object(RIN_ADORNMENT, TRUE, TRUE, TRUE);
             if (!$G.uright) {
                 await pline($c.lit("%s puts %s on your right %s."), new $c.Ptr(Who, 0), await the(await xname(ring)), await body_part(HAND));
                 await setworn(ring, W_RINGR);
@@ -1570,7 +1580,7 @@ export async function doseduce(mon) {   // mhitu.c:1985
         }
     }
     naked = $c.i8(!$G.uarmc && !$G.uarmf && !$G.uarmg && !$G.uarms && !$G.uarmh && !$G.uarmu ? 1 : 0);
-    await urgent_pline($c.lit("%s %s%s."), new $c.Ptr(Who, 0), u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf ? $c.lit("seems to murmur into your ear") : naked ? $c.lit("murmurs sweet nothings into your ear") : $c.lit("murmurs in your ear"), naked ? $c.lit("") : $c.lit(", while helping you undress"));
+    await urgent_pline($c.lit("%s %s%s."), new $c.Ptr(Who, 0), Deaf() ? $c.lit("seems to murmur into your ear") : naked ? $c.lit("murmurs sweet nothings into your ear") : $c.lit("murmurs in your ear"), naked ? $c.lit("") : $c.lit(", while helping you undress"));
     await mayberem(mon, new $c.Ptr(Who, 0), $G.uarmc, cloak_simple_name($G.uarmc));
     if (!$G.uarmc) {
         await mayberem(mon, new $c.Ptr(Who, 0), $G.uarm, suit_simple_name($G.uarm));
@@ -1588,8 +1598,8 @@ export async function doseduce(mon) {   // mhitu.c:1985
         return 1;
     }
     if ($G.uarm || $G.uarmc) {
-        if (!(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf)) {
-            if (!($c.sub64(yyyymmdd(0), $c.mul64(getyear(), 10000)) === 229 && mon.female | 0)) {
+        if (!Deaf()) {
+            if (!(ld() && mon.female | 0)) {
                 await verbalize($c.lit("You're such a %s; I wish..."), flags.female ? $c.lit("sweet lady") : $c.lit("nice guy"));
             } else {
                 yourgloves = u_carried_gloves();
@@ -1610,7 +1620,7 @@ export async function doseduce(mon) {   // mhitu.c:1985
         adjalign(1);
     }
     await urgent_pline($c.lit("Time stands still while you and %s lie in each other's arms..."), await noit_mon_nam(mon));
-    attr_tot = acurr(A_CHA) + acurr(A_INT) | 0;
+    attr_tot = ACURR(A_CHA) + ACURR(A_INT) | 0;
     if (rn2(35) > (attr_tot < 32 ? attr_tot : 32)) {
         await pline($c.lit("%s seems to have enjoyed it more than you..."), await noit_Monnam(mon));
         switch (rn2(5)) {
@@ -1618,22 +1628,22 @@ export async function doseduce(mon) {   // mhitu.c:1985
                 await You_feel($c.lit("drained of energy."));
                 u.uen = 0;
                 $t3 = rnd(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? 5 : 10), u.uenmax = u.uenmax - $t3 | 0;
-                await exercise(A_CON, 0);
+                await exercise(A_CON, FALSE);
                 if (u.uenmax < 0) {
                     u.uenmax = 0;
                 }
                 break;
             case 1:
                 await You($c.lit("are down in the dumps."));
-                await adjattrib(A_CON, -1, 1);
-                await exercise(A_CON, 0);
-                disp.botl = 1;
+                await adjattrib(A_CON, -1, TRUE);
+                await exercise(A_CON, FALSE);
+                disp.botl = TRUE;
                 break;
             case 2:
                 await Your($c.lit("senses are dulled."));
-                await adjattrib(A_WIS, -1, 1);
-                await exercise(A_WIS, 0);
-                disp.botl = 1;
+                await adjattrib(A_WIS, -1, TRUE);
+                await exercise(A_WIS, FALSE);
+                disp.botl = TRUE;
                 break;
             case 3:
                 if (!await resists_drli(gy.youmonst)) {
@@ -1642,16 +1652,16 @@ export async function doseduce(mon) {   // mhitu.c:1985
                 } else {
                     await You($c.lit("have a curious feeling..."));
                 }
-                await exercise(A_CON, 0);
-                await exercise(A_DEX, 0);
-                await exercise(A_WIS, 0);
+                await exercise(A_CON, FALSE);
+                await exercise(A_DEX, FALSE);
+                await exercise(A_WIS, FALSE);
                 break;
             case 4:
                 {
                     await You_feel($c.lit("exhausted."));
-                    await exercise(A_STR, 0);
+                    await exercise(A_STR, FALSE);
                     tmp = rn2(10) + 6 | 0;
-                    await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(tmp + 1 | 0, 2) : tmp, $c.lit("exhaustion"), KILLED_BY);
+                    await losehp(Maybe_Half_Phys(tmp), $c.lit("exhaustion"), KILLED_BY);
                     break;
                 }
         }
@@ -1661,7 +1671,7 @@ export async function doseduce(mon) {   // mhitu.c:1985
         switch (rn2(5)) {
             case 0:
                 await You_feel($c.lit("raised to your full potential."));
-                await exercise(A_CON, 1);
+                await exercise(A_CON, TRUE);
                 $t6 = ($t5 = rnd(5), u.uenmax = u.uenmax + $t5 | 0), u.uen = $t6;
                 if (u.uenmax > u.uenpeak) {
                     u.uenpeak = u.uenmax;
@@ -1669,34 +1679,34 @@ export async function doseduce(mon) {   // mhitu.c:1985
                 break;
             case 1:
                 await You_feel($c.lit("good enough to do it again."));
-                await adjattrib(A_CON, 1, 1);
-                await exercise(A_CON, 1);
-                disp.botl = 1;
+                await adjattrib(A_CON, 1, TRUE);
+                await exercise(A_CON, TRUE);
+                disp.botl = TRUE;
                 break;
             case 2:
                 await You($c.lit("will always remember %s..."), await noit_mon_nam(mon));
-                await adjattrib(A_WIS, 1, 1);
-                await exercise(A_WIS, 1);
-                disp.botl = 1;
+                await adjattrib(A_WIS, 1, TRUE);
+                await exercise(A_WIS, TRUE);
+                disp.botl = TRUE;
                 break;
             case 3:
                 await pline($c.lit("That was a very educational experience."));
-                await pluslvl(0);
-                await exercise(A_WIS, 1);
+                await pluslvl(FALSE);
+                await exercise(A_WIS, TRUE);
                 break;
             case 4:
                 await You_feel($c.lit("restored to health!"));
                 u.uhp = u.uhpmax;
-                if (u.umonnum !== u.umonster) {
+                if (Upolyd()) {
                     u.mh = u.mhmax;
                 }
-                await exercise(A_STR, 1);
-                disp.botl = 1;
+                await exercise(A_STR, TRUE);
+                disp.botl = TRUE;
                 break;
         }
     }
     if (mon.mtame) {
-    } else if (rn2(20) < acurr(A_CHA)) {
+    } else if (rn2(20) < ACURR(A_CHA)) {
         await pline($c.lit("%s demands that you pay %s, but you refuse..."), await noit_Monnam(mon), genders[pronoun_gender(mon, PRONOUN_NO_IT | PRONOUN_HALLU)].him);
     } else if (u.umonnum === PM_LEPRECHAUN) {
         await pline_mon(mon, $c.lit("%s tries to take your gold, but fails..."), await noit_Monnam(mon));
@@ -1717,7 +1727,7 @@ export async function doseduce(mon) {   // mhitu.c:1985
             cost = umoney;
         }
         if (!cost) {
-            if (!(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf)) {
+            if (!Deaf()) {
                 await verbalize($c.lit("It's on the house!"));
             } else {
                 await pline($c.lit("No charge."));
@@ -1725,7 +1735,7 @@ export async function doseduce(mon) {   // mhitu.c:1985
         } else {
             await pline_mon(mon, $c.lit("%s takes %ld %s for services rendered!"), await noit_Monnam(mon), cost, await currency(cost));
             await money2mon(mon, cost);
-            disp.botl = 1;
+            disp.botl = TRUE;
         }
     }
     if (!rn2(25)) {
@@ -1744,24 +1754,24 @@ async function mayberem(mon, seducer, obj, str) {   // mhitu.c:2309
     if (u.utotype || !(dist2(mon.mx, mon.my, u.ux, u.uy) <= 2)) {
         return;
     }
-    if (u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf) {
+    if (Deaf()) {
         await pline($c.lit("%s takes off your %s."), seducer, str);
-    } else if (rn2(20) < acurr(A_CHA)) {
+    } else if (rn2(20) < ACURR(A_CHA)) {
         $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("\"Shall I remove your %s, %s?\""), str, !rn2(2) ? $c.lit("lover") : !rn2(2) ? $c.lit("dear") : $c.lit("sweetheart"));
-        if (await yn_function(new $c.Ptr(qbuf, 0), new $c.Ptr(ynchars, 0), 110, 1) === 110) {
+        if (await y_n(new $c.Ptr(qbuf, 0)) === 110) {
             return;
         }
     } else {
         $c.__builtin___sprintf_chk(new $c.Ptr(hairbuf, 0), 0, 256, $c.lit("let me run my fingers through your %s"), await body_part(HAIR));
         await verbalize($c.lit("Take off your %s; %s."), str, $c.peq(obj, $G.uarm) ? $c.lit("let's get a little closer") : $c.peq(obj, $G.uarmc) || $c.peq(obj, $G.uarms) ? $c.lit("it's in the way") : $c.peq(obj, $G.uarmf) ? $c.lit("let me rub your feet") : $c.peq(obj, $G.uarmg) ? $c.lit("they're too clumsy") : $c.peq(obj, $G.uarmu) ? $c.lit("let me massage you") : new $c.Ptr(hairbuf, 0));
     }
-    await remove_worn_item(obj, 1);
+    await remove_worn_item(obj, TRUE);
 }
 async function assess_dmg(mtmp, tmp) {   // mhitu.c:2355
     if ((mtmp.mhp = mtmp.mhp - tmp | 0) <= 0) {
         await pline_mon(mtmp, $c.lit("%s dies!"), await Monnam(mtmp));
         await xkilled(mtmp, XKILL_NOMSG);
-        if (!(mtmp.mhp < 1)) {
+        if (!DEADMONSTER(mtmp)) {
             return M_ATTK_HIT;
         }
         return M_ATTK_AGR_DIED;
@@ -1773,20 +1783,20 @@ export function mon_avoiding_this_attack(mtmp, attkidx) {   // mhitu.c:2393
     ptr = mtmp.data;
     typ = -1;
     if (attkidx >= 0 && (typ = get_atkdam_type(ptr.mattk[attkidx].adtyp)) >= 0 && $c.andu64(mtmp.seen_resistance, cvt_adtyp_to_mseenres($c.u8(typ)))) {
-        return 1;
+        return TRUE;
     }
-    return 0;
+    return FALSE;
 }
 export function ranged_attk_available(mtmp) {   // mhitu.c:2413
     let i = 0, typ = 0, ptr = null;
     typ = -1;
     ptr = mtmp.data;
     for (i = 0; i < NATTK; i = i + 1 | 0) {
-        if ((ptr.mattk[i].aatyp === AT_SPIT || ptr.mattk[i].aatyp === AT_BREA || ptr.mattk[i].aatyp === AT_MAGC || ptr.mattk[i].aatyp === AT_GAZE) && (typ = get_atkdam_type(ptr.mattk[i].adtyp)) >= 0 && $c.andu64(mtmp.seen_resistance, cvt_adtyp_to_mseenres($c.u8(typ))) === 0) {
-            return 1;
+        if (DISTANCE_ATTK_TYPE(ptr.mattk[i].aatyp) && (typ = get_atkdam_type(ptr.mattk[i].adtyp)) >= 0 && $c.andu64(mtmp.seen_resistance, cvt_adtyp_to_mseenres($c.u8(typ))) === 0) {
+            return TRUE;
         }
     }
-    return 0;
+    return FALSE;
 }
 async function passiveum(olduasmon, mtmp, mattk) {   // mhitu.c:2435
     let i = 0, tmp = 0, oldu_mattk = null, protector = 0, wornitems = 0, $t1;
@@ -1809,8 +1819,8 @@ async function passiveum(olduasmon, mtmp, mattk) {   // mhitu.c:2435
     switch (oldu_mattk.adtyp) {
         case AD_ACID:
             if (!rn2(2)) {
-                await pline_mon(mtmp, $c.lit("%s is splashed by %s%s!"), await Monnam(mtmp), !(u.umonnum !== u.umonster) ? $c.lit("") : $c.lit("your "), hliquid($c.lit("acid")));
-                if (await Resists_Elem(mtmp, ACID_RES)) {
+                await pline_mon(mtmp, $c.lit("%s is splashed by %s%s!"), await Monnam(mtmp), !Upolyd() ? $c.lit("") : $c.lit("your "), hliquid($c.lit("acid")));
+                if (await resists_acid(mtmp)) {
                     await pline_mon(mtmp, $c.lit("%s is not affected."), await Monnam(mtmp));
                     tmp = 0;
                 }
@@ -1831,7 +1841,7 @@ async function passiveum(olduasmon, mtmp, mattk) {   // mhitu.c:2435
                 if (mtmp.mw !== null) {
                     wornitems = $c.or64(wornitems, W_ARMG);
                 }
-                if (!await Resists_Elem(mtmp, STONE_RES) && (protector === 0 || protector !== -1 && $c.and64(wornitems, protector) !== protector)) {
+                if (!await resists_ston(mtmp) && (protector === 0 || protector !== -1 && $c.and64(wornitems, protector) !== protector)) {
                     if (poly_when_stoned(mtmp.data)) {
                         await mon_to_stone(mtmp);
                         return 1;
@@ -1839,7 +1849,7 @@ async function passiveum(olduasmon, mtmp, mattk) {   // mhitu.c:2435
                     await pline_mon(mtmp, $c.lit("%s turns to stone!"), await Monnam(mtmp));
                     gs.stoned = 1;
                     await xkilled(mtmp, XKILL_NOMSG);
-                    if (!(mtmp.mhp < 1)) {
+                    if (!DEADMONSTER(mtmp)) {
                         return M_ATTK_HIT;
                     }
                     return M_ATTK_AGR_DIED;
@@ -1848,13 +1858,13 @@ async function passiveum(olduasmon, mtmp, mattk) {   // mhitu.c:2435
             }
         case AD_ENCH:
             if (mon_currwep) {
-                await drain_item(mon_currwep, 1);
+                await drain_item(mon_currwep, TRUE);
             }
             return M_ATTK_HIT;
         default:
             break;
     }
-    if (!(u.umonnum !== u.umonster)) {
+    if (!Upolyd()) {
         return M_ATTK_HIT;
     }
     if (rn2(3)) {
@@ -1874,8 +1884,8 @@ async function passiveum(olduasmon, mtmp, mattk) {   // mhitu.c:2435
                     if (!rn2(4)) {
                         tmp = 127;
                     }
-                    if (mtmp.mcansee | 0 && $c.andu64(mtmp.data.mflags1, M1_NOEYES) === 0 && rn2(3) && ($c.andu64(mtmp.data.mflags1, M1_SEE_INVIS) !== 0 || !((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked))) {
-                        if ((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked) {
+                    if (mtmp.mcansee | 0 && haseyes(mtmp.data) && rn2(3) && (perceives(mtmp.data) || !Invis())) {
+                        if (Blind()) {
                             await pline($c.lit("As a blind %s, you cannot defend yourself."), pmname(gy.youmonst.data, flags.female ? FEMALE : MALE));
                         } else {
                             if (await mon_reflects(mtmp, $c.lit("Your gaze is reflected by %s %s."))) {
@@ -1893,7 +1903,7 @@ async function passiveum(olduasmon, mtmp, mattk) {   // mhitu.c:2435
                 }
                 return M_ATTK_HIT;
             case AD_COLD:
-                if (await Resists_Elem(mtmp, COLD_RES)) {
+                if (await resists_cold(mtmp)) {
                     await shieldeff(mtmp.mx, mtmp.my);
                     await pline_mon(mtmp, $c.lit("%s is mildly chilly."), await Monnam(mtmp));
                     await golemeffects(mtmp, AD_COLD, tmp);
@@ -1917,7 +1927,7 @@ async function passiveum(olduasmon, mtmp, mattk) {   // mhitu.c:2435
                 tmp = 0;
                 break;
             case AD_FIRE:
-                if (await Resists_Elem(mtmp, FIRE_RES)) {
+                if (await resists_fire(mtmp)) {
                     await shieldeff(mtmp.mx, mtmp.my);
                     await pline_mon(mtmp, $c.lit("%s is mildly warm."), await Monnam(mtmp));
                     await golemeffects(mtmp, AD_FIRE, tmp);
@@ -1927,7 +1937,7 @@ async function passiveum(olduasmon, mtmp, mattk) {   // mhitu.c:2435
                 await pline_mon(mtmp, $c.lit("%s is suddenly very hot!"), await Monnam(mtmp));
                 break;
             case AD_ELEC:
-                if (await Resists_Elem(mtmp, SHOCK_RES)) {
+                if (await resists_elec(mtmp)) {
                     await shieldeff(mtmp.mx, mtmp.my);
                     await pline_mon(mtmp, $c.lit("%s is slightly tingled."), await Monnam(mtmp));
                     await golemeffects(mtmp, AD_ELEC, tmp);
@@ -1960,13 +1970,16 @@ export async function cloneu() {   // mhitu.c:2616
     }
     mon.mcloned = (1) & 1;
     mon = await christen_monst(mon, new $c.Ptr(svp.plname, 0));
-    await initedog(mon, 1);
+    await initedog(mon, TRUE);
     mon.m_lev = $c.u8(gy.youmonst.data.mlevel);
     mon.mhpmax = u.mhmax;
     mon.mhp = $c.div32(u.mh, 2);
     u.mh = u.mh - mon.mhp | 0;
-    disp.botl = 1;
+    disp.botl = TRUE;
     return mon;
+}
+function ld() {
+    return $c.sub64(yyyymmdd(0), $c.mul64(getyear(), 10000)) === 229 ? 1 : 0;
 }
 
 export function $init() {

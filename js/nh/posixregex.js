@@ -3,7 +3,7 @@ import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
 import { alloc } from './alloc.js';
-import { BUFSZ } from './global.h.js';
+import { BUFSZ, FALSE, TRUE } from './global.h.js';
 import { regcomp, regerror, regexec, regfree } from './luabridge.js';
 
 export const regex_id = new Int8Array(11);
@@ -13,12 +13,12 @@ export async function regex_init() {   // posixregex.c:60
 export function regex_compile(s, re) {   // posixregex.c:66
     let $t1;
     if (!re) {
-        return 0;
+        return FALSE;
     }
     if ($t1 = regcomp(re.re, s, 5), re.err = $t1) {
-        return 0;
+        return FALSE;
     }
-    return 1;
+    return TRUE;
 }
 export function regex_error_desc(re, errbuf) {   // posixregex.c:76
     if (!re) {
@@ -37,15 +37,15 @@ export function regex_error_desc(re, errbuf) {   // posixregex.c:76
 export function regex_match(s, re) {   // posixregex.c:92
     let result = 0;
     if (!re || !s) {
-        return 0;
+        return FALSE;
     }
     if (result = regexec(re.re, s, 0, null, 0)) {
         if (result !== 1) {
             re.err = result;
         }
-        return 0;
+        return FALSE;
     }
-    return 1;
+    return TRUE;
 }
 export function regex_free(re) {   // posixregex.c:108
     regfree(re.re);

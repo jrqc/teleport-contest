@@ -5,6 +5,7 @@ export const ALLOW_TRAPS = 0x00020000;
 export const ALLOW_U = 0x00040000;
 export const ALLOW_M = 0x00080000;
 export const ALLOW_TM = 0x00100000;
+export const ALLOW_ALL = 1966080;
 export const NOTONL = 0x00200000;
 export const OPENDOOR = 0x00400000;
 export const UNLOCKDOOR = 0x00800000;

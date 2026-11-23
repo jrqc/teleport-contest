@@ -6,14 +6,16 @@ import { A_NONE } from './align.h.js';
 import { is_art, mk_artifact } from './artifact.js';
 import { ART_MAGICBANE } from './artilist.h.js';
 import { rank_of } from './botl.js';
-import { cg, gu, svd, svl, u } from './decl.js';
+import { cg, gu, svl, u } from './decl.js';
 import { WEAPON_CLASS } from './defsym.h.js';
 import { christen_monst } from './do_name.js';
+import { In_endgame } from './dungeon.macros.js';
+import { FALSE, TRUE } from './global.h.js';
 import { MM_NOMSG, NO_MM_FLAGS, RLOC_ERR, RLOC_NOMSG } from './hack.h.js';
 import { makemon, mkmonmoney, mongets, set_malign } from './makemon.js';
 import { bless, curse, mkobj, mksobj, weight } from './mkobj.js';
 import { set_mon_data } from './mondata.js';
-import { M2_FEMALE } from './monflag.h.js';
+import { is_female, is_mplayer } from './mondata.macros.js';
 import { mons } from './monst.js';
 import { PM_ARCHEOLOGIST, PM_BARBARIAN, PM_CAVE_DWELLER, PM_CLERIC, PM_HEALER, PM_KNIGHT, PM_MONK, PM_RANGER, PM_ROGUE, PM_SAMURAI, PM_TOURIST, PM_VALKYRIE, PM_WIZARD } from './monsters.h.js';
 import { rnd_defensive_item, rnd_misc_item, rnd_offensive_item } from './muse.js';
@@ -22,6 +24,7 @@ import { objects } from './objects.js';
 import { ATHAME, BATTLE_AXE, BLACK_DRAGON_SCALE_MAIL, BULLWHIP, CHAIN_MAIL, CLOAK_OF_DISPLACEMENT, CLOAK_OF_MAGIC_RESISTANCE, CLUB, DILITHIUM_CRYSTAL, ELVEN_DAGGER, ELVEN_LEATHER_HELM, ELVEN_SHIELD, FAKE_AMULET_OF_YENDOR, GAUNTLETS_OF_DEXTERITY, GAUNTLETS_OF_POWER, GRAY_DRAGON_SCALE_MAIL, HELM_OF_BRILLIANCE, HELM_OF_TELEPATHY, JADE, KATANA, LEATHER_GLOVES, LEVITATION_BOOTS, LOADSTONE, LONG_SWORD, LOW_BOOTS, LUCKSTONE, MACE, OILSKIN_CLOAK, ORCISH_DAGGER, PLATE_MAIL, QUARTERSTAFF, ROBE, SCALPEL, SHIELD_OF_REFLECTION, SHORT_SWORD, SHURIKEN, SILVER_DRAGON_SCALE_MAIL, SPEAR, STRANGE_OBJECT, TWO_HANDED_SWORD, UNICORN_HORN, WAR_HAMMER, YELLOW_DRAGON_SCALE_MAIL } from './objects.h.js';
 import { rnd_class } from './objnam.js';
 import { impossible, verbalize } from './pline.js';
+import { MON_AT } from './rm.macros.js';
 import { d, rn2, rnd } from './rnd.js';
 import { P_SPEAR } from './skills.h.js';
 import { mpickobj } from './steal.js';
@@ -37,14 +40,14 @@ function dev_name() {   // mplayer.c:44
     m = 0;
     n = 58;
     do {
-        match = 0;
+        match = FALSE;
         i = rn2(n);
         for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
-            if (!($c.pcmp(mtmp.data, $c.relem(mons, PM_ARCHEOLOGIST)) >= 0 && $c.pcmp(mtmp.data, $c.relem(mons, PM_WIZARD)) <= 0)) {
+            if (!is_mplayer(mtmp.data)) {
                 continue;
             }
             if (!$c.strncmp(developers[i], mtmp.mextra && mtmp.mextra.mgivenname ? mtmp.mextra.mgivenname : $c.lit(""), $c.strlen(developers[i]))) {
-                match = 1;
+                match = TRUE;
                 break;
             }
         }
@@ -57,7 +60,7 @@ function dev_name() {   // mplayer.c:44
 }
 function get_mplname(mtmp, nam) {   // mplayer.c:72
     let fmlkind = 0, devnam = null;
-    fmlkind = $c.i8($c.andu64(mtmp.data.mflags2, M2_FEMALE) !== 0 ? 1 : 0);
+    fmlkind = $c.i8(is_female(mtmp.data));
     devnam = dev_name();
     if (!devnam) {
         $c.__builtin___strcpy_chk(nam, fmlkind ? $c.lit("Eve") : $c.lit("Adam"), -1);
@@ -79,7 +82,7 @@ async function mk_mplayer_armor(mon, typ) {   // mplayer.c:95
     if (typ === STRANGE_OBJECT) {
         return;
     }
-    obj = await mksobj(typ, 0, 0);
+    obj = await mksobj(typ, FALSE, FALSE);
     $t1 = obj.oeroded2 = (0) & 3, obj.oeroded = ($t1) & 3;
     if (!rn2(3)) {
         obj.oerodeproof = (1) & 1;
@@ -95,14 +98,14 @@ async function mk_mplayer_armor(mon, typ) {   // mplayer.c:95
 }
 export async function mk_mplayer(ptr, x, y, special) {   // mplayer.c:118
     let mtmp = null, nam = new Int8Array(32), weapon = 0, armor = 0, cloak = 0, helm = 0, shield = 0, quan = 0, otmp = null, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12, $t13;
-    if (!($c.pcmp(ptr, $c.relem(mons, PM_ARCHEOLOGIST)) >= 0 && $c.pcmp(ptr, $c.relem(mons, PM_WIZARD)) <= 0)) {
+    if (!is_mplayer(ptr)) {
         return null;
     }
-    if (svl.level.monsters[x][y] !== null) {
+    if (MON_AT(x, y)) {
         await rloc(svl.level.monsters[x][y], RLOC_ERR | RLOC_NOMSG);
     }
-    if (!(u.uz.dnum === svd.dungeon_topology.d_astral_level.dnum)) {
-        special = 0;
+    if (!In_endgame(u.uz)) {
+        special = FALSE;
     }
     if ((mtmp = await makemon(ptr, x, y, $c.u32(special ? MM_NOMSG : NO_MM_FLAGS))) !== null) {
         $t1 = $c.u8(special ? rn2(16) + 15 | 0 : rnd(16)), mtmp.m_lev = $t1;
@@ -237,7 +240,7 @@ export async function mk_mplayer(ptr, x, y, special) {   // mplayer.c:118
                 break;
         }
         if (weapon !== STRANGE_OBJECT) {
-            otmp = await mksobj(weapon, 1, 0);
+            otmp = await mksobj(weapon, TRUE, FALSE);
             $t4 = otmp.oeroded2 = (0) & 3, otmp.oeroded = ($t4) & 3;
             $t5 = $c.i8(special ? rn2(5) + 4 | 0 : rn2(4)), otmp.spe = $t5;
             if (!rn2(3)) {
@@ -246,7 +249,7 @@ export async function mk_mplayer(ptr, x, y, special) {   // mplayer.c:118
                 otmp.greased = (1) & 1;
             }
             if (special && rn2(2)) {
-                otmp = await mk_artifact(otmp, A_NONE, 99, 0);
+                otmp = await mk_artifact(otmp, A_NONE, 99, FALSE);
             }
             if (objects[otmp.otyp].oc_merge | 0 && !otmp.oartifact && monmightthrowwep(otmp)) {
                 $t6 = rn2(otmp.oclass === WEAPON_CLASS && objects[otmp.otyp].oc_subtyp === P_SPEAR ? 4 : 8), otmp.quan = $c.add64(otmp.quan, $t6);
@@ -273,7 +276,7 @@ export async function mk_mplayer(ptr, x, y, special) {   // mplayer.c:118
             if (rn2(8)) {
                 await mk_mplayer_armor(mtmp, $c.i16(rnd_class(LOW_BOOTS, LEVITATION_BOOTS)));
             }
-            await m_dowear(mtmp, 1);
+            await m_dowear(mtmp, TRUE);
             quan = rn2(3) ? rn2(3) : rn2(16);
             while ($t9 = quan, quan = $t9 - 1 | 0, $t9) {
                 await mongets(mtmp, rnd_class(DILITHIUM_CRYSTAL, JADE));
@@ -281,7 +284,7 @@ export async function mk_mplayer(ptr, x, y, special) {   // mplayer.c:118
             await mkmonmoney(mtmp, rn2(1000));
             quan = rn2(10);
             while ($t10 = quan, quan = $t10 - 1 | 0, $t10) {
-                await mpickobj(mtmp, await mkobj(RANDOM_CLASS, 0));
+                await mpickobj(mtmp, await mkobj(RANDOM_CLASS, FALSE));
             }
         }
         quan = rnd(3);

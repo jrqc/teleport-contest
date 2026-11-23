@@ -2,19 +2,21 @@
 import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
-import { acurr, adjabil, minuhpmax, newhp, setuhpmax } from './attrib.js';
+import { adjabil, minuhpmax, newhp, setuhpmax } from './attrib.js';
 import { A_WIS } from './attrib.h.js';
+import { ACURR } from './attrib.macros.js';
 import { exp_percent_changing, xlev_to_rank } from './botl.js';
 import { disp, flags, gu, gy, svk, u } from './decl.js';
 import { S_EEL } from './defsym.h.js';
 import { done } from './end.js';
-import { LARGEST_INT, LL_MINORAC, MAXULEV } from './global.h.js';
+import { FALSE, LARGEST_INT, LL_MINORAC, MAXULEV, TRUE } from './global.h.js';
 import { DIED, KILLED_BY } from './hack.h.js';
 import { achieve_rank, count_achievements, record_achievement } from './insight.js';
 import { monhp_per_lvl } from './makemon.js';
 import { AD_BLND, AD_DRLI, AD_PHYS, AD_SLIM, AD_STON, AD_WRAP, AT_BUTT, AT_MAGC, AT_WEAP } from './monattk.h.js';
 import { resists_drli } from './mondata.js';
-import { M1_AMPHIBIOUS, M2_NASTY } from './monflag.h.js';
+import { extra_nasty } from './mondata.macros.js';
+import { M1_AMPHIBIOUS } from './monflag.h.js';
 import { mons } from './monst.js';
 import { PM_BARBARIAN, PM_CLERIC, PM_HEALER, PM_KNIGHT, PM_MAIL_DAEMON, PM_VALKYRIE, PM_WIZARD } from './monsters.h.js';
 import { NATTK, NORMAL_SPEED } from './permonst.h.js';
@@ -24,6 +26,7 @@ import { MAGICAL_BREATHING } from './prop.h.js';
 import { rn2, rnd } from './rnd.js';
 import { Goodbye } from './role.js';
 import { find_mac } from './worn.js';
+import { Upolyd } from './you.macros.js';
 
 export function newuexp(lev) {   // exper.c:14
     if (lev < 1) {
@@ -64,7 +67,7 @@ export function newpw() {   // exper.c:45
             en = en + rnd(gu.urace.enadv.inrnd) | 0;
         }
     } else {
-        enrnd = $c.div32(acurr(A_WIS), 2);
+        enrnd = $c.div32(ACURR(A_WIS), 2);
         if (u.ulevel < gu.urole.xlev) {
             enrnd = enrnd + (gu.urole.enadv.lornd + gu.urace.enadv.lornd | 0) | 0;
             enfix = gu.urole.enadv.lofix + gu.urace.enadv.lofix | 0;
@@ -126,7 +129,7 @@ export function experience(mtmp, nk) {   // exper.c:85
             tmp = tmp + 1000 | 0;
         }
     }
-    if ($c.andu64(ptr.mflags2, M2_NASTY) !== 0) {
+    if (extra_nasty(ptr)) {
         tmp = tmp + Math.imul(7, mtmp.m_lev) | 0;
     }
     if (mtmp.m_lev > 8) {
@@ -162,17 +165,17 @@ export async function more_experienced(exper, rexp) {   // exper.c:169
     if (newexp !== oldexp) {
         u.uexp = newexp;
         if (flags.showexp) {
-            disp.botl = 1;
+            disp.botl = TRUE;
         }
         if (!disp.botl && await exp_percent_changing()) {
-            disp.botl = 1;
+            disp.botl = TRUE;
         }
     }
     if (newrexp !== oldrexp) {
         u.urexp = newrexp;
     }
     if (u.urexp >= (gu.urole.mnum === PM_WIZARD ? 1000 : 2000)) {
-        flags.beginner = 0;
+        flags.beginner = FALSE;
     }
 }
 export async function losexp(drainer) {   // exper.c:207
@@ -209,10 +212,10 @@ export async function losexp(drainer) {   // exper.c:207
     num = u.uhpinc[u.ulevel];
     u.uhpmax = u.uhpmax - num | 0;
     if (u.uhpmax < uhpmin) {
-        setuhpmax(uhpmin, 1);
+        setuhpmax(uhpmin, TRUE);
     }
     if (u.uhpmax > olduhpmax) {
-        setuhpmax(olduhpmax, 1);
+        setuhpmax(olduhpmax, TRUE);
     }
     u.uhp = u.uhp - num | 0;
     if (u.uhp < 1) {
@@ -234,7 +237,7 @@ export async function losexp(drainer) {   // exper.c:207
     if (u.uexp > 0) {
         $t1 = $c.sub64(newuexp(u.ulevel), 1), u.uexp = $t1;
     }
-    if (u.umonnum !== u.umonster) {
+    if (Upolyd()) {
         num = monhp_per_lvl(gy.youmonst);
         u.mhmax = u.mhmax - num | 0;
         u.mh = u.mh - num | 0;
@@ -242,11 +245,11 @@ export async function losexp(drainer) {   // exper.c:207
             await rehumanize();
         }
     }
-    disp.botl = 1;
+    disp.botl = TRUE;
 }
 export async function newexplevel() {   // exper.c:300
     if (u.ulevel < MAXULEV && u.uexp >= newuexp(u.ulevel)) {
-        await pluslvl(1);
+        await pluslvl(TRUE);
     }
 }
 export async function pluslvl(incr) {   // exper.c:307
@@ -254,14 +257,14 @@ export async function pluslvl(incr) {   // exper.c:307
     if (!incr) {
         await You_feel($c.lit("more experienced."));
     }
-    if (u.umonnum !== u.umonster) {
+    if (Upolyd()) {
         hpinc = monhp_per_lvl(gy.youmonst);
         u.mh = u.mh + hpinc | 0;
-        setuhpmax(u.mhmax, 0);
+        setuhpmax(u.mhmax, FALSE);
     }
     hpinc = newhp();
     u.uhp = u.uhp + hpinc | 0;
-    setuhpmax(u.uhpmax + hpinc | 0, 1);
+    setuhpmax(u.uhpmax + hpinc | 0, TRUE);
     eninc = newpw();
     u.uenmax = u.uenmax + eninc | 0;
     if (u.uenmax > u.uenpeak) {
@@ -296,7 +299,7 @@ export async function pluslvl(incr) {   // exper.c:307
             u.ulevelpeak = u.ulevel;
         }
     }
-    disp.botl = 1;
+    disp.botl = TRUE;
 }
 export function rndexp(gaining) {   // exper.c:378
     let minexp = 0, maxexp = 0, diff = 0, factor = 0, result = 0;

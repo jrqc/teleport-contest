@@ -2,15 +2,15 @@
 import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
-import { is_art, spec_ability } from './artifact.js';
+import { spec_ability } from './artifact.js';
 import { SPFX_INTEL } from './artifact.h.js';
 import { ART_MAGICBANE } from './artilist.h.js';
 import { adjattrib, change_luck, exercise } from './attrib.js';
 import { A_CON, A_MAX, A_STR, A_WIS } from './attrib.h.js';
 import { yn_function } from './cmd.js';
 import { is_ice, is_lava, is_pool } from './dbridge.js';
-import { c_color_names, c_common_strings, cg, disp, flags, gi, gv, gy, iflags, svd, svl, u, ynchars } from './decl.js';
-import { COIN_CLASS, SPBOOK_CLASS, S_DRAGON, S_EEL, S_VAMPIRE, S_altar, S_grave, S_ice, S_sink, S_throne } from './defsym.h.js';
+import { c_color_names, c_common_strings, cg, disp, flags, gi, gy, iflags, svd, svl, u, ynchars } from './decl.js';
+import { COIN_CLASS, SPBOOK_CLASS, S_DRAGON, S_altar, S_grave, S_ice, S_sink, S_throne } from './defsym.h.js';
 import { do_mapping } from './detect.js';
 import { map_background, newsym, newsym_force, see_monsters, set_mimic_blocking, shieldeff } from './display.js';
 import { dropy, heal_legs, schedule_goto } from './do.js';
@@ -20,7 +20,9 @@ import { In_V_tower, find_hell, on_level, surface } from './dungeon.js';
 import { morehungry } from './eat.js';
 import { can_reach_floor } from './engrave.js';
 import { losexp } from './exper.js';
+import { wizard } from './flag.macros.js';
 import { dryup } from './fountain.js';
+import { FALSE, TRUE } from './global.h.js';
 import { losehp, money_cnt } from './hack.js';
 import { ECMD_OK, ECMD_TIME, EYE, FOOT, HEAD, KILLED_BY, KILLED_BY_AN, NO_MM_FLAGS, POLY_NOFLAGS, VIASITTING } from './hack.h.js';
 import { delobj, identify_pack, stackobj, update_inventory, useupf } from './invent.js';
@@ -30,21 +32,24 @@ import { curse, mksobj, set_corpsenm, unbless, weight } from './mkobj.js';
 import { courtmon } from './mkroom.js';
 import { egg_type_from_parent } from './mon.js';
 import { pronoun_gender, sticks } from './mondata.js';
-import { M1_AMORPHOUS, M1_FLY, M1_HIDE, M1_HUMANOID, M1_NOEYES, M1_OVIPAROUS, M1_SLITHY, M1_SWIM, M2_PRINCE } from './monflag.h.js';
+import { amorphous, eggs_in_water, eyecount, humanoid, is_hider, is_prince, is_vampire, lays_eggs, likes_lava, slithy } from './mondata.macros.js';
+import { M1_FLY } from './monflag.h.js';
 import { mons } from './monst.js';
-import { PM_CYCLOPS, PM_ELECTRIC_EEL, PM_FIRE_ELEMENTAL, PM_FLOATING_EYE, PM_GIANT_EEL, PM_GREMLIN, PM_SALAMANDER, PM_TRAPPER } from './monsters.h.js';
+import { PM_ELECTRIC_EEL, PM_GIANT_EEL, PM_GREMLIN, PM_TRAPPER } from './monsters.h.js';
 import { observe_object } from './o_init.js';
+import { Is_box, u_wield_art } from './obj.macros.js';
 import { CLOTH } from './objclass.h.js';
 import { objects } from './objects.js';
-import { CHEST, CORPSE, CREAM_PIE, EGG, LARGE_BOX, SPE_REMOVE_CURSE, TOWEL, WATER_WALKING_BOOTS } from './objects.h.js';
+import { CORPSE, CREAM_PIE, EGG, SPE_REMOVE_CURSE, TOWEL, WATER_WALKING_BOOTS } from './objects.h.js';
 import { Tobjnam, Yobjnam2, makeplural, the, vtense, xname } from './objnam.js';
 import { There, You, You_cant, You_feel, Your, impossible, pline, pline_The, verbalize } from './pline.js';
 import { body_part, polyself } from './polyself.js';
 import { make_blinded, make_confused, make_glib, make_sick, split_mon } from './potion.js';
 import { altar_wrath } from './pray.js';
-import { ACID_RES, AGGRAVATE_MONSTER, ANTIMAGIC, BLINDED, COLD_RES, CONFUSION, DEAF, DRAIN_RES, FAST, FIRE_RES, FLYING, FROMEXPER, FROMOUTSIDE, FROMRACE, HALF_PHDAM, HALF_SPDAM, HALLUC, HALLUC_RES, INVIS, LEVITATION, POISON_RES, PROTECTION, SEE_INVIS, SHOCK_RES, SLIMED, STEALTH, TELEPAT, TELEPORT, TIMEOUT, W_SADDLE } from './prop.h.js';
+import { AGGRAVATE_MONSTER, ANTIMAGIC, COLD_RES, CONFUSION, FAST, FIRE_RES, FLYING, FROMOUTSIDE, HALF_SPDAM, INTRINSIC, INVIS, POISON_RES, PROTECTION, SEE_INVIS, SHOCK_RES, STEALTH, TELEPAT, TELEPORT, TIMEOUT, W_SADDLE } from './prop.h.js';
 import { do_genocide, seffects } from './read.js';
-import { ALTAR, DRAWBRIDGE_DOWN, FOUNTAIN, GRAVE, LADDER, ROOM, SINK, STAIRS, THRONE } from './rm.h.js';
+import { DRAWBRIDGE_DOWN, FOUNTAIN, LADDER, ROOM, STAIRS } from './rm.h.js';
+import { IS_ALTAR, IS_GRAVE, IS_SINK, IS_THRONE, OBJ_AT } from './rm.macros.js';
 import { d, rn2, rnd } from './rnd.js';
 import { genders } from './role.js';
 import { remove_worn_item } from './steal.js';
@@ -52,11 +57,13 @@ import { tele } from './teleport.js';
 import { burn_away_slime } from './timeout.js';
 import { dotrap, t_at, uescaped_shaft, uteetering_at_seen_pit, water_damage } from './trap.js';
 import { SPIKED_PIT } from './trap.h.js';
-import { IN_SIGHT } from './vision.h.js';
+import { cansee } from './vision.macros.js';
 import { getlin } from './windows.js';
 import { aggravate } from './wizard.js';
 import { which_armor } from './worn.js';
 import { PRONOUN_HALLU, SICK_ALL, TT_BEARTRAP, TT_BURIEDBALL, TT_INFLOOR, TT_LAVA, TT_PIT, TT_WEB, UTOTYPE_NONE } from './you.h.js';
+import { Luck, Upolyd } from './you.macros.js';
+import { Acid_resistance, Antimagic, Blind, Blind_telepat, BlindedTimeout, Cold_resistance, Deaf, Drain_resistance, Half_physical_damage, Hallucination, Levitation, See_invisible, Shock_resistance, Slimed, Underwater } from './youprop.macros.js';
 import { makewish } from './zap.js';
 
 const dosit$sit_message = new Int8Array(15);   // static in dosit()
@@ -68,7 +75,7 @@ export async function take_gold() {   // sit.c:14
         nobj = otmp.nobj;
         if (otmp.oclass === COIN_CLASS) {
             lost_money = 1;
-            await remove_worn_item(otmp, 0);
+            await remove_worn_item(otmp, FALSE);
             await delobj(otmp);
         }
     }
@@ -76,7 +83,7 @@ export async function take_gold() {   // sit.c:14
         await You_feel($c.lit("a strange sensation."));
     } else {
         await You($c.lit("notice you have no gold!"));
-        disp.botl = 1;
+        disp.botl = TRUE;
     }
 }
 async function throne_sit_effect() {   // sit.c:39
@@ -86,7 +93,7 @@ async function throne_sit_effect() {   // sit.c:39
     special_throne = $c.i8(!!In_V_tower(u.uz) ? 1 : 0);
     if (rnd(6) > 4) {
         effect = rnd(13);
-        if (flags.debug && !iflags.debug_fuzzer) {
+        if (wizard() && !iflags.debug_fuzzer) {
             buf[0] = 0;
             await getlin($c.lit("Throne sit effect (1..13) [0=random]"), new $c.Ptr(buf, 0));
             if (buf[0] === 27) {
@@ -104,20 +111,20 @@ async function throne_sit_effect() {   // sit.c:39
         }
         switch (effect) {
             case 1:
-                await adjattrib(rn2(A_MAX), -(rn2(4) + 3 | 0) | 0, 0);
+                await adjattrib(rn2(A_MAX), -(rn2(4) + 3 | 0) | 0, FALSE);
                 await losehp(rnd(10), $c.lit("cursed throne"), KILLED_BY_AN);
                 break;
             case 2:
-                await adjattrib(rn2(A_MAX), 1, 0);
+                await adjattrib(rn2(A_MAX), 1, FALSE);
                 break;
             case 3:
                 await pline($c.lit("A%s electric shock shoots through your body!"), u.uprops[SHOCK_RES].intrinsic || u.uprops[SHOCK_RES].extrinsic ? $c.lit("n") : $c.lit(" massive"));
-                await losehp(u.uprops[SHOCK_RES].intrinsic || u.uprops[SHOCK_RES].extrinsic ? rnd(6) : rnd(30), $c.lit("electric chair"), KILLED_BY_AN);
-                await exercise(A_CON, 0);
+                await losehp(Shock_resistance() ? rnd(6) : rnd(30), $c.lit("electric chair"), KILLED_BY_AN);
+                await exercise(A_CON, FALSE);
                 break;
             case 4:
                 await You_feel($c.lit("much, much better!"));
-                if (u.umonnum !== u.umonster) {
+                if (Upolyd()) {
                     if (u.mh >= (u.mhmax - 5 | 0)) {
                         u.mhmax = u.mhmax + 4 | 0;
                     }
@@ -131,10 +138,10 @@ async function throne_sit_effect() {   // sit.c:39
                 }
                 u.uhp = u.uhpmax;
                 u.ucreamed = 0;
-                await make_blinded(0, 1);
-                await make_sick(0, null, 0, SICK_ALL);
+                await make_blinded(0, TRUE);
+                await make_sick(0, null, FALSE, SICK_ALL);
                 await heal_legs(0);
-                disp.botl = 1;
+                disp.botl = TRUE;
                 break;
             case 5:
                 await take_gold();
@@ -165,27 +172,27 @@ async function throne_sit_effect() {   // sit.c:39
             case 9:
                 await pline($c.lit("A voice echoes:"));
                 await verbalize($c.lit("A curse upon thee for sitting upon this most holy throne!"));
-                if ((u.uluck + u.moreluck | 0) > 0) {
-                    await make_blinded($c.add64($c.and64(u.uprops[BLINDED].intrinsic, TIMEOUT), rn2(100) + 250 | 0), 1);
-                    change_luck($c.i8((u.uluck + u.moreluck | 0) > 1 ? -rnd(2) | 0 : -1));
+                if (Luck() > 0) {
+                    await make_blinded($c.add64(BlindedTimeout(), rn2(100) + 250 | 0), TRUE);
+                    change_luck($c.i8(Luck() > 1 ? -rnd(2) | 0 : -1));
                 } else {
                     await rndcurse();
                 }
                 break;
             case 10:
-                if ((u.uluck + u.moreluck | 0) < 0 || $c.and64(u.uprops[SEE_INVIS].intrinsic, FROMOUTSIDE | FROMRACE | FROMEXPER)) {
+                if (Luck() < 0 || $c.and64(u.uprops[SEE_INVIS].intrinsic, INTRINSIC)) {
                     if (svl.level.flags.nommap) {
                         await pline($c.lit("A terrible drone fills your head!"));
-                        await make_confused($c.add64($c.and64(u.uprops[CONFUSION].intrinsic, TIMEOUT), rnd(30)), 0);
+                        await make_confused($c.add64($c.and64(u.uprops[CONFUSION].intrinsic, TIMEOUT), rnd(30)), FALSE);
                     } else {
                         await pline($c.lit("An image forms in your mind."));
                         await do_mapping();
                     }
                 } else {
-                    if (!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked)) {
+                    if (!Blind()) {
                         await Your($c.lit("vision becomes clear."));
                     } else {
-                        num_of_eyes = !($c.andu64(gy.youmonst.data.mflags1, M1_NOEYES) === 0) ? 0 : $c.peq(gy.youmonst.data, $c.relem(mons, PM_CYCLOPS)) || $c.peq(gy.youmonst.data, $c.relem(mons, PM_FLOATING_EYE)) ? 1 : 2;
+                        num_of_eyes = eyecount(gy.youmonst.data);
                         eye = await body_part(EYE);
                         switch (num_of_eyes) {
                             default:
@@ -204,7 +211,7 @@ async function throne_sit_effect() {   // sit.c:39
                 }
                 break;
             case 11:
-                if ((u.uluck + u.moreluck | 0) < 0) {
+                if (Luck() < 0) {
                     await You_feel($c.lit("threatened."));
                     await aggravate();
                 } else {
@@ -215,29 +222,29 @@ async function throne_sit_effect() {   // sit.c:39
             case 12:
                 await You($c.lit("are granted an insight!"));
                 if (gi.invent) {
-                    await identify_pack(rn2(5), 0);
+                    await identify_pack(rn2(5), FALSE);
                 }
                 break;
             case 13:
                 await Your($c.lit("mind turns into a pretzel!"));
-                await make_confused($c.add64($c.and64(u.uprops[CONFUSION].intrinsic, TIMEOUT), rn2(7) + 16 | 0), 0);
+                await make_confused($c.add64($c.and64(u.uprops[CONFUSION].intrinsic, TIMEOUT), rn2(7) + 16 | 0), FALSE);
                 break;
             default:
                 await impossible($c.lit("throne effect"));
                 break;
         }
     } else {
-        if ($c.andu64(gy.youmonst.data.mflags2, M2_PRINCE) !== 0 || u.uevent.uhand_of_elbereth | 0) {
+        if (is_prince(gy.youmonst.data) || u.uevent.uhand_of_elbereth | 0) {
             await You_feel($c.lit("very comfortable here."));
         } else {
             await You_feel($c.lit("somehow out of place..."));
         }
     }
-    if (!special_throne && !rn2(3) && (!flags.debug || await yn_function($c.lit("Analyze throne?"), new $c.Ptr(ynchars, 0), 110, 1) === 121)) {
+    if (!special_throne && !rn2(3) && (!wizard() || await yn_function($c.lit("Analyze throne?"), new $c.Ptr(ynchars, 0), 110, TRUE) === 121)) {
         svl.level.locations[tx][ty].typ = ROOM, svl.level.locations[tx][ty].flags = (0) & 31;
-        await map_background(tx, ty, 0);
+        await map_background(tx, ty, FALSE);
         await newsym_force(tx, ty);
-        await pline_The($c.lit("throne %s in a puff of logic."), (gv.viz_array.get(ty).get(tx) & IN_SIGHT) !== 0 ? $c.lit("vanishes") : $c.lit("has vanished"));
+        await pline_The($c.lit("throne %s in a puff of logic."), cansee(tx, ty) ? $c.lit("vanishes") : $c.lit("has vanished"));
     }
 }
 async function special_throne_effect(effect) {   // sit.c:238
@@ -251,13 +258,13 @@ async function special_throne_effect(effect) {   // sit.c:238
         case 4:
             await makewish();
             svl.level.locations[tx][ty].typ = ROOM, svl.level.locations[tx][ty].flags = (0) & 31;
-            await map_background(tx, ty, 0);
+            await map_background(tx, ty, FALSE);
             await newsym_force(tx, ty);
             await pline_The($c.lit("throne disintegrates, having spent its power."));
             break;
         case 5:
             await pline($c.lit("Sitting on the throne was a terrible experience."));
-            if (!(u.uprops[DRAIN_RES].intrinsic || u.uprops[DRAIN_RES].extrinsic)) {
+            if (!Drain_resistance()) {
                 await losexp($c.lit("a bad experience sitting on a throne"));
                 if (u.ulevelmax > u.ulevel) {
                     u.ulevelmax = u.ulevelmax - 1 | 0;
@@ -312,7 +319,7 @@ async function special_throne_effect(effect) {   // sit.c:238
                 break;
             }
         case 11:
-            if (gy.youmonst.data.mlet === S_VAMPIRE) {
+            if (is_vampire(gy.youmonst.data)) {
                 await You_feel($c.lit("unworthy."));
             } else {
                 await pline($c.lit("This throne was not meant for those such as you!"));
@@ -322,8 +329,8 @@ async function special_throne_effect(effect) {   // sit.c:238
             break;
         case 12:
             await pline($c.lit("The throne is covered in acid!"));
-            await losehp(u.uprops[ACID_RES].intrinsic || u.uprops[ACID_RES].extrinsic ? rnd(16) : rnd(80), $c.lit("acidic chair"), KILLED_BY_AN);
-            await exercise(A_CON, 0);
+            await losehp(Acid_resistance() ? rnd(16) : rnd(80), $c.lit("acidic chair"), KILLED_BY_AN);
+            await exercise(A_CON, FALSE);
             break;
         case 13:
             {
@@ -338,29 +345,29 @@ async function special_throne_effect(effect) {   // sit.c:238
 async function lay_an_egg() {   // sit.c:358
     let uegg = null, $t1;
     if (!flags.female) {
-        await pline($c.lit("%s can't lay eggs!"), u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? $c.lit("You may think you are a platypus, but a male still") : $c.lit("Males"));
+        await pline($c.lit("%s can't lay eggs!"), Hallucination() ? $c.lit("You may think you are a platypus, but a male still") : $c.lit("Males"));
         return ECMD_OK;
     } else if (u.uhunger < objects[EGG].oc_nutrition) {
         await You($c.lit("don't have enough energy to lay an egg."));
         return ECMD_OK;
-    } else if ($c.andu64(gy.youmonst.data.mflags1, M1_OVIPAROUS) !== 0 && gy.youmonst.data.mlet === S_EEL && $c.andu64(gy.youmonst.data.mflags1, M1_SWIM) !== 0) {
-        if (!(u.uinwater | 0 || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) {
+    } else if (eggs_in_water(gy.youmonst.data)) {
+        if (!((u.uinwater | 0) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) {
             await pline($c.lit("A splash tetra you are not."));
             return ECMD_OK;
         }
-        if (u.umonnum !== u.umonster && ($c.peq(gy.youmonst.data, $c.relem(mons, PM_GIANT_EEL)) || $c.peq(gy.youmonst.data, $c.relem(mons, PM_ELECTRIC_EEL)))) {
+        if (Upolyd() && ($c.peq(gy.youmonst.data, $c.relem(mons, PM_GIANT_EEL)) || $c.peq(gy.youmonst.data, $c.relem(mons, PM_ELECTRIC_EEL)))) {
             await You($c.lit("yearn for the Sargasso Sea."));
             return ECMD_OK;
         }
     }
-    uegg = await mksobj(EGG, 0, 0);
+    uegg = await mksobj(EGG, FALSE, FALSE);
     uegg.spe = 1;
     uegg.quan = 1;
     $t1 = await weight(uegg) >>> 0, uegg.owt = $t1;
-    await set_corpsenm(uegg, egg_type_from_parent(u.umonnum, 0));
+    await set_corpsenm(uegg, egg_type_from_parent(u.umonnum, FALSE));
     uegg.known = (1) & 1;
     await observe_object(uegg);
-    await You($c.lit("%s an egg."), $c.andu64(gy.youmonst.data.mflags1, M1_OVIPAROUS) !== 0 && gy.youmonst.data.mlet === S_EEL && $c.andu64(gy.youmonst.data.mflags1, M1_SWIM) !== 0 ? $c.lit("spawn") : $c.lit("lay"));
+    await You($c.lit("%s an egg."), eggs_in_water(gy.youmonst.data) ? $c.lit("spawn") : $c.lit("lay"));
     await dropy(uegg);
     await stackobj(uegg);
     await morehungry(objects[EGG].oc_nutrition);
@@ -377,65 +384,65 @@ export async function dosit() {   // sit.c:400
                 await You($c.lit("are already sitting on %s."), await mon_nam(u.usteed));
                 return ECMD_OK;
             }
-            if (u.uundetected | 0 && $c.andu64(gy.youmonst.data.mflags1, M1_HIDE) !== 0 && u.umonnum !== PM_TRAPPER) {
+            if (u.uundetected | 0 && is_hider(gy.youmonst.data) && u.umonnum !== PM_TRAPPER) {
                 u.uundetected = (0) & 1;
             }
-            if (!can_reach_floor(0)) {
+            if (!can_reach_floor(FALSE)) {
                 if (u.uswallow) {
                     await There($c.lit("are no seats in here!"));
-                } else if ((u.uprops[LEVITATION].intrinsic || u.uprops[LEVITATION].extrinsic) && !u.uprops[LEVITATION].blocked) {
+                } else if (Levitation()) {
                     await You($c.lit("tumble in place."));
                 } else {
                     await You($c.lit("are sitting on air."));
                 }
                 return ECMD_OK;
             } else if (u.ustuck && !sticks(gy.youmonst.data)) {
-                if ($c.andu64(u.ustuck.data.mflags1, M1_HUMANOID) !== 0) {
+                if (humanoid(u.ustuck.data)) {
                     await pline($c.lit("%s won't offer %s lap."), await Monnam(u.ustuck), genders[pronoun_gender(u.ustuck, PRONOUN_HALLU)].his);
                 } else {
                     await pline($c.lit("%s has no lap."), await Monnam(u.ustuck));
                 }
                 return ECMD_OK;
-            } else if (is_pool(u.ux, u.uy) && !u.uinwater) {
+            } else if (is_pool(u.ux, u.uy) && !Underwater()) {
                 $goto = "in_water"; continue D1;
-            } else if (u.umonnum !== u.umonster && u.umonnum === PM_GREMLIN && (svl.level.locations[u.ux][u.uy].typ === FOUNTAIN || is_pool(u.ux, u.uy))) {
+            } else if (Upolyd() && u.umonnum === PM_GREMLIN && (svl.level.locations[u.ux][u.uy].typ === FOUNTAIN || is_pool(u.ux, u.uy))) {
                 $goto = "in_water"; continue D1;
             }
         case "in_water":
-            if ($goto !== "in_water" && (svl.level.objects[u.ux][u.uy] !== null && !(uteetering_at_seen_pit(trap) || uescaped_shaft(trap)))) {
+            if ($goto !== "in_water" && (OBJ_AT(u.ux, u.uy) && !(uteetering_at_seen_pit(trap) || uescaped_shaft(trap)))) {
                 obj = svl.level.objects[u.ux][u.uy];
                 if (gy.youmonst.data.mlet === S_DRAGON && obj.oclass === COIN_CLASS) {
                     await You($c.lit("coil up around your %shoard."), $c.add64(obj.quan, money_cnt(gi.invent)) < Math.imul(u.ulevel, 1000) ? $c.lit("meager ") : $c.lit(""));
                 } else if (obj.otyp === TOWEL) {
                     await pline($c.lit("It's probably not a good time for a picnic..."));
                 } else {
-                    if ($c.andu64(gy.youmonst.data.mflags1, M1_SLITHY) !== 0) {
+                    if (slithy(gy.youmonst.data)) {
                         await You($c.lit("coil up around %s."), await the(await xname(obj)));
                     } else {
                         await You($c.lit("sit on %s."), await the(await xname(obj)));
                     }
-                    if (obj.otyp === CORPSE && $c.andu64($c.relem(mons, obj.corpsenm).mflags1, M1_AMORPHOUS) !== 0) {
+                    if (obj.otyp === CORPSE && amorphous($c.relem(mons, obj.corpsenm))) {
                         await pline($c.lit("It's squishy..."));
                     } else if (obj.otyp === CREAM_PIE) {
-                        if (!(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf)) {
+                        if (!Deaf()) {
                             await pline($c.lit("Squelch!"));
                         }
                         await useupf(obj, obj.quan);
-                    } else if (!(obj.otyp === LARGE_BOX || obj.otyp === CHEST || (objects[obj.otyp].oc_material | 0) === CLOTH)) {
+                    } else if (!(Is_box(obj) || (objects[obj.otyp].oc_material | 0) === CLOTH)) {
                         await pline($c.lit("It's not very comfortable..."));
                     }
                 }
             } else if ($goto !== "in_water" && (trap !== null || u.utrap && u.utraptype >= TT_LAVA)) {
                 if (u.utrap) {
-                    await exercise(A_WIS, 0);
+                    await exercise(A_WIS, FALSE);
                     if (u.utraptype === TT_BEARTRAP) {
                         await You_cant($c.lit("sit down with your %s in the bear trap."), await body_part(FOOT));
                         u.utrap = u.utrap + 1 >>> 0;
                     } else if (u.utraptype === TT_PIT) {
                         if (trap && (trap.ttyp | 0) === SPIKED_PIT) {
                             await You($c.lit("sit down on a spike.  Ouch!"));
-                            await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? rn2(2) : 1, $c.lit("sitting on an iron spike"), KILLED_BY);
-                            await exercise(A_STR, 0);
+                            await losehp(Half_physical_damage() ? rn2(2) : 1, $c.lit("sitting on an iron spike"), KILLED_BY);
+                            await exercise(A_STR, FALSE);
                         } else {
                             await You($c.lit("sit down in the pit."));
                         }
@@ -445,7 +452,7 @@ export async function dosit() {   // sit.c:400
                         $t2 = (rn2(10) + 5 | 0) >>> 0, u.utrap = u.utrap + $t2 >>> 0;
                     } else if (u.utraptype === TT_LAVA) {
                         await You($c.lit("sit in the %s!"), hliquid($c.lit("lava")));
-                        if (u.uprops[SLIMED].intrinsic) {
+                        if (Slimed()) {
                             await burn_away_slime();
                         }
                         $t3 = rnd(4) >>> 0, u.utrap = u.utrap + $t3 >>> 0;
@@ -458,36 +465,36 @@ export async function dosit() {   // sit.c:400
                     await You($c.lit("%s."), (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked ? $c.lit("land") : $c.lit("sit down"));
                     await dotrap(trap, VIASITTING);
                 }
-            } else if ($goto !== "in_water" && ((u.uinwater | 0 || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) && !($c.andu64(gy.youmonst.data.mflags1, M1_OVIPAROUS) !== 0 && gy.youmonst.data.mlet === S_EEL && $c.andu64(gy.youmonst.data.mflags1, M1_SWIM) !== 0))) {
+            } else if ($goto !== "in_water" && (((u.uinwater | 0) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) && !eggs_in_water(gy.youmonst.data))) {
                 if ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) {
                     await There($c.lit("are no cushions floating nearby."));
                 } else {
                     await You($c.lit("sit down on the muddy bottom."));
                 }
-            } else if ($goto === "in_water" || is_pool(u.ux, u.uy) && !($c.andu64(gy.youmonst.data.mflags1, M1_OVIPAROUS) !== 0 && gy.youmonst.data.mlet === S_EEL && $c.andu64(gy.youmonst.data.mflags1, M1_SWIM) !== 0)) {
+            } else if ($goto === "in_water" || is_pool(u.ux, u.uy) && !eggs_in_water(gy.youmonst.data)) {
                 $goto = null;   // in_water:
                 await You($c.lit("sit in the %s."), hliquid($c.lit("water")));
-                if (u.umonnum !== u.umonster && u.umonnum === PM_GREMLIN) {
+                if (Upolyd() && u.umonnum === PM_GREMLIN) {
                     if (await split_mon(gy.youmonst, null)) {
                         if (svl.level.locations[u.ux][u.uy].typ === FOUNTAIN) {
-                            await dryup(u.ux, u.uy, 1);
+                            await dryup(u.ux, u.uy, TRUE);
                         }
                     }
                 } else {
                     if (!rn2(10) && $G.uarm) {
-                        await water_damage($G.uarm, $c.lit("armor"), 1);
+                        await water_damage($G.uarm, $c.lit("armor"), TRUE);
                     }
                     if (!rn2(10) && $G.uarmf && $G.uarmf.otyp !== WATER_WALKING_BOOTS) {
-                        await water_damage($G.uarm, $c.lit("armor"), 1);
+                        await water_damage($G.uarm, $c.lit("armor"), TRUE);
                     }
                 }
-            } else if (typ === SINK) {
+            } else if (IS_SINK(typ)) {
                 await You(new $c.Ptr(dosit$sit_message, 0), defsyms[S_sink].explanation);
-                await Your($c.lit("%s gets wet."), $c.andu64(gy.youmonst.data.mflags1, M1_HUMANOID) !== 0 ? $c.lit("rump") : $c.lit("underside"));
-            } else if (typ === ALTAR) {
+                await Your($c.lit("%s gets wet."), humanoid(gy.youmonst.data) ? $c.lit("rump") : $c.lit("underside"));
+            } else if (IS_ALTAR(typ)) {
                 await You(new $c.Ptr(dosit$sit_message, 0), defsyms[S_altar].explanation);
                 await altar_wrath(u.ux, u.uy);
-            } else if (typ === GRAVE) {
+            } else if (IS_GRAVE(typ)) {
                 await You(new $c.Ptr(dosit$sit_message, 0), defsyms[S_grave].explanation);
             } else if (typ === STAIRS) {
                 await You(new $c.Ptr(dosit$sit_message, 0), $c.lit("stairs"));
@@ -496,7 +503,7 @@ export async function dosit() {   // sit.c:400
             } else if (is_lava(u.ux, u.uy)) {
                 await You(new $c.Ptr(dosit$sit_message, 0), hliquid($c.lit("lava")));
                 await burn_away_slime();
-                if ($c.peq(gy.youmonst.data, $c.relem(mons, PM_FIRE_ELEMENTAL)) || $c.peq(gy.youmonst.data, $c.relem(mons, PM_SALAMANDER))) {
+                if (likes_lava(gy.youmonst.data)) {
                     await pline_The($c.lit("%s feels warm."), hliquid($c.lit("lava")));
                     return ECMD_TIME;
                 }
@@ -504,15 +511,15 @@ export async function dosit() {   // sit.c:400
                 await losehp(d(u.uprops[FIRE_RES].intrinsic || u.uprops[FIRE_RES].extrinsic ? 2 : 10, 10), $c.lit("sitting on lava"), KILLED_BY);
             } else if (is_ice(u.ux, u.uy)) {
                 await You(new $c.Ptr(dosit$sit_message, 0), defsyms[S_ice].explanation);
-                if (!(u.uprops[COLD_RES].intrinsic || u.uprops[COLD_RES].extrinsic)) {
+                if (!Cold_resistance()) {
                     await pline_The($c.lit("ice feels cold."));
                 }
             } else if (typ === DRAWBRIDGE_DOWN) {
                 await You(new $c.Ptr(dosit$sit_message, 0), $c.lit("drawbridge"));
-            } else if (typ === THRONE) {
+            } else if (IS_THRONE(typ)) {
                 await You(new $c.Ptr(dosit$sit_message, 0), defsyms[S_throne].explanation);
                 await throne_sit_effect();
-            } else if ($c.andu64(gy.youmonst.data.mflags1, M1_OVIPAROUS) !== 0) {
+            } else if (lays_eggs(gy.youmonst.data)) {
                 return await lay_an_egg();
             } else {
                 await pline($c.lit("Having fun sitting on the %s?"), surface(u.ux, u.uy));
@@ -525,11 +532,11 @@ export async function dosit() {   // sit.c:400
 export async function rndcurse() {   // sit.c:569
     let nobj = 0, cnt = 0, onum = 0, otmp = null;
     nobj = 0;
-    if (is_art($G.uwep, ART_MAGICBANE) && rn2(20)) {
+    if (u_wield_art(ART_MAGICBANE) && rn2(20)) {
         await You(new $c.Ptr(rndcurse$mal_aura, 0), $c.lit("the magic-absorbing blade"));
         return;
     }
-    if (u.uprops[ANTIMAGIC].intrinsic || u.uprops[ANTIMAGIC].extrinsic) {
+    if (Antimagic()) {
         await shieldeff(u.ux, u.uy);
     }
     await You(new $c.Ptr(rndcurse$mal_aura, 0), $c.lit("you"));
@@ -572,9 +579,9 @@ export async function rndcurse() {   // sit.c:569
         } else {
             await curse(otmp);
         }
-        if (!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked)) {
+        if (!Blind()) {
             await pline($c.lit("%s %s."), await Yobjnam2(otmp, $c.lit("glow")), hcolor(otmp.cursed | 0 ? c_color_names.c_black : $c.lit("brown")));
-            otmp.bknown = ((u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? 0 : 1) >>> 0) & 1;
+            otmp.bknown = ((Hallucination() ? 0 : 1) >>> 0) & 1;
         } else {
             otmp.bknown = (0) & 1;
         }
@@ -585,30 +592,30 @@ export async function attrcurse() {   // sit.c:644
     ret = 0;
     switch (rnd(11)) {
         case 1:
-            if ($c.and64(u.uprops[FIRE_RES].intrinsic, FROMOUTSIDE | FROMRACE | FROMEXPER)) {
-                u.uprops[FIRE_RES].intrinsic = $c.and64(u.uprops[FIRE_RES].intrinsic, ~(FROMOUTSIDE | FROMRACE | FROMEXPER));
+            if ($c.and64(u.uprops[FIRE_RES].intrinsic, INTRINSIC)) {
+                u.uprops[FIRE_RES].intrinsic = $c.and64(u.uprops[FIRE_RES].intrinsic, ~INTRINSIC);
                 await You_feel($c.lit("warmer."));
                 ret = FIRE_RES;
                 break;
             }
         case 2:
-            if ($c.and64(u.uprops[TELEPORT].intrinsic, FROMOUTSIDE | FROMRACE | FROMEXPER)) {
-                u.uprops[TELEPORT].intrinsic = $c.and64(u.uprops[TELEPORT].intrinsic, ~(FROMOUTSIDE | FROMRACE | FROMEXPER));
+            if ($c.and64(u.uprops[TELEPORT].intrinsic, INTRINSIC)) {
+                u.uprops[TELEPORT].intrinsic = $c.and64(u.uprops[TELEPORT].intrinsic, ~INTRINSIC);
                 await You_feel($c.lit("less jumpy."));
                 ret = TELEPORT;
                 break;
             }
         case 3:
-            if ($c.and64(u.uprops[POISON_RES].intrinsic, FROMOUTSIDE | FROMRACE | FROMEXPER)) {
-                u.uprops[POISON_RES].intrinsic = $c.and64(u.uprops[POISON_RES].intrinsic, ~(FROMOUTSIDE | FROMRACE | FROMEXPER));
+            if ($c.and64(u.uprops[POISON_RES].intrinsic, INTRINSIC)) {
+                u.uprops[POISON_RES].intrinsic = $c.and64(u.uprops[POISON_RES].intrinsic, ~INTRINSIC);
                 await You_feel($c.lit("a little sick!"));
                 ret = POISON_RES;
                 break;
             }
         case 4:
-            if ($c.and64(u.uprops[TELEPAT].intrinsic, FROMOUTSIDE | FROMRACE | FROMEXPER)) {
-                u.uprops[TELEPAT].intrinsic = $c.and64(u.uprops[TELEPAT].intrinsic, ~(FROMOUTSIDE | FROMRACE | FROMEXPER));
-                if ((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked && !(u.uprops[TELEPAT].intrinsic || u.uprops[TELEPAT].extrinsic)) {
+            if ($c.and64(u.uprops[TELEPAT].intrinsic, INTRINSIC)) {
+                u.uprops[TELEPAT].intrinsic = $c.and64(u.uprops[TELEPAT].intrinsic, ~INTRINSIC);
+                if (Blind() && !Blind_telepat()) {
                     await see_monsters();
                 }
                 await Your($c.lit("senses fail!"));
@@ -616,55 +623,55 @@ export async function attrcurse() {   // sit.c:644
                 break;
             }
         case 5:
-            if ($c.and64(u.uprops[COLD_RES].intrinsic, FROMOUTSIDE | FROMRACE | FROMEXPER)) {
-                u.uprops[COLD_RES].intrinsic = $c.and64(u.uprops[COLD_RES].intrinsic, ~(FROMOUTSIDE | FROMRACE | FROMEXPER));
+            if ($c.and64(u.uprops[COLD_RES].intrinsic, INTRINSIC)) {
+                u.uprops[COLD_RES].intrinsic = $c.and64(u.uprops[COLD_RES].intrinsic, ~INTRINSIC);
                 await You_feel($c.lit("cooler."));
                 ret = COLD_RES;
                 break;
             }
         case 6:
-            if ($c.and64(u.uprops[INVIS].intrinsic, FROMOUTSIDE | FROMRACE | FROMEXPER)) {
-                u.uprops[INVIS].intrinsic = $c.and64(u.uprops[INVIS].intrinsic, ~(FROMOUTSIDE | FROMRACE | FROMEXPER));
+            if ($c.and64(u.uprops[INVIS].intrinsic, INTRINSIC)) {
+                u.uprops[INVIS].intrinsic = $c.and64(u.uprops[INVIS].intrinsic, ~INTRINSIC);
                 await You_feel($c.lit("paranoid."));
                 ret = INVIS;
                 break;
             }
         case 7:
-            if ($c.and64(u.uprops[SEE_INVIS].intrinsic, FROMOUTSIDE | FROMRACE | FROMEXPER)) {
-                u.uprops[SEE_INVIS].intrinsic = $c.and64(u.uprops[SEE_INVIS].intrinsic, ~(FROMOUTSIDE | FROMRACE | FROMEXPER));
-                if (!(u.uprops[SEE_INVIS].intrinsic || u.uprops[SEE_INVIS].extrinsic)) {
+            if ($c.and64(u.uprops[SEE_INVIS].intrinsic, INTRINSIC)) {
+                u.uprops[SEE_INVIS].intrinsic = $c.and64(u.uprops[SEE_INVIS].intrinsic, ~INTRINSIC);
+                if (!See_invisible()) {
                     await set_mimic_blocking();
                     await see_monsters();
                     await newsym(u.ux, u.uy);
                 }
-                await You($c.lit("%s!"), u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? $c.lit("tawt you taw a puttie tat") : $c.lit("thought you saw something"));
+                await You($c.lit("%s!"), Hallucination() ? $c.lit("tawt you taw a puttie tat") : $c.lit("thought you saw something"));
                 ret = SEE_INVIS;
                 break;
             }
         case 8:
-            if ($c.and64(u.uprops[FAST].intrinsic, FROMOUTSIDE | FROMRACE | FROMEXPER)) {
-                u.uprops[FAST].intrinsic = $c.and64(u.uprops[FAST].intrinsic, ~(FROMOUTSIDE | FROMRACE | FROMEXPER));
+            if ($c.and64(u.uprops[FAST].intrinsic, INTRINSIC)) {
+                u.uprops[FAST].intrinsic = $c.and64(u.uprops[FAST].intrinsic, ~INTRINSIC);
                 await You_feel($c.lit("slower."));
                 ret = FAST;
                 break;
             }
         case 9:
-            if ($c.and64(u.uprops[STEALTH].intrinsic, FROMOUTSIDE | FROMRACE | FROMEXPER)) {
-                u.uprops[STEALTH].intrinsic = $c.and64(u.uprops[STEALTH].intrinsic, ~(FROMOUTSIDE | FROMRACE | FROMEXPER));
+            if ($c.and64(u.uprops[STEALTH].intrinsic, INTRINSIC)) {
+                u.uprops[STEALTH].intrinsic = $c.and64(u.uprops[STEALTH].intrinsic, ~INTRINSIC);
                 await You_feel($c.lit("clumsy."));
                 ret = STEALTH;
                 break;
             }
         case 10:
-            if ($c.and64(u.uprops[PROTECTION].intrinsic, FROMOUTSIDE | FROMRACE | FROMEXPER)) {
-                u.uprops[PROTECTION].intrinsic = $c.and64(u.uprops[PROTECTION].intrinsic, ~(FROMOUTSIDE | FROMRACE | FROMEXPER));
+            if ($c.and64(u.uprops[PROTECTION].intrinsic, INTRINSIC)) {
+                u.uprops[PROTECTION].intrinsic = $c.and64(u.uprops[PROTECTION].intrinsic, ~INTRINSIC);
                 await You_feel($c.lit("vulnerable."));
                 ret = PROTECTION;
                 break;
             }
         case 11:
-            if ($c.and64(u.uprops[AGGRAVATE_MONSTER].intrinsic, FROMOUTSIDE | FROMRACE | FROMEXPER)) {
-                u.uprops[AGGRAVATE_MONSTER].intrinsic = $c.and64(u.uprops[AGGRAVATE_MONSTER].intrinsic, ~(FROMOUTSIDE | FROMRACE | FROMEXPER));
+            if ($c.and64(u.uprops[AGGRAVATE_MONSTER].intrinsic, INTRINSIC)) {
+                u.uprops[AGGRAVATE_MONSTER].intrinsic = $c.and64(u.uprops[AGGRAVATE_MONSTER].intrinsic, ~INTRINSIC);
                 await You_feel($c.lit("less attractive."));
                 ret = AGGRAVATE_MONSTER;
                 break;

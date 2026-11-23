@@ -5,10 +5,11 @@ import { $G } from './globals.js';
 import { AM_LAWFUL, AM_MASK, AM_SANCTUM, A_LAWFUL, A_NONE } from './align.h.js';
 import { acurr, exercise } from './attrib.js';
 import { A_DEX, A_WIS } from './attrib.h.js';
+import { ACURR } from './attrib.macros.js';
 import { getdir, isok, yn_function } from './cmd.js';
 import { close_drawbridge, find_drawbridge, is_drawbridge_wall, open_drawbridge } from './dbridge.js';
-import { c_common_strings, disp, flags, gc, gu, gv, gy, svc, svd, svl, svt, u, ynqchars } from './decl.js';
-import { S_MIMIC, S_NYMPH, S_SNAKE, TOOL_CLASS } from './defsym.h.js';
+import { c_common_strings, disp, flags, gc, gu, gy, svc, svd, svl, svt, u, ynqchars } from './decl.js';
+import { S_NYMPH, S_SNAKE, TOOL_CLASS } from './defsym.h.js';
 import { cvt_sdoor_to_door } from './detect.js';
 import { fillholetyp, liquid_flow } from './dig.js';
 import { canseemon, newsym } from './display.js';
@@ -16,12 +17,16 @@ import { flooreffects } from './do.js';
 import { Amonnam, Monnam, a_monnam, mon_nam, x_monnam } from './do_name.js';
 import { tamedog } from './dog.js';
 import { In_V_tower, on_level } from './dungeon.js';
-import { COLNO, ROWNO } from './global.h.js';
+import { In_endgame, In_sokoban } from './dungeon.macros.js';
+import { COLNO, FALSE, ROWNO, TRUE } from './global.h.js';
 import { in_rooms, losehp } from './hack.js';
 import { ARTICLE_THE, ECMD_OK, ECMD_TIME, KILLED_BY, NOTELL, NO_KILLER_PREFIX, SUPPRESS_SADDLE, XKILL_NOMSG } from './hack.h.js';
+import { BZ_U_WAND, plur } from './hack.macros.js';
 import { dist2, highc, mungspaces } from './hacklib.js';
 import { align_str, record_achievement } from './insight.js';
 import { consume_obj_charge, sobj_at } from './invent.js';
+import { nhUse } from './lint.macros.js';
+import { has_mgivenname } from './mextra.macros.js';
 import { sleep_monst, slept_monst } from './mhitm.js';
 import { set_levltyp } from './mkmaze.js';
 import { obj_extract_self } from './mkobj.js';
@@ -29,10 +34,12 @@ import { SHOPBASE } from './mkroom.h.js';
 import { seemimic, wakeup, xkilled } from './mon.js';
 import { AD_MAGM } from './monattk.h.js';
 import { can_blow } from './mondata.js';
-import { G_UNIQ, M1_CLING, M1_FLY, M1_HIDE, M1_HUMANOID, M1_MINDLESS, M1_NOLIMBS, M1_SLITHY, M2_MERC } from './monflag.h.js';
+import { ceiling_hider, humanoid, is_clinger, is_flyer, is_mercenary, mindless, nolimbs, slithy, unique_corpstat } from './mondata.macros.js';
+import { M1_FLY } from './monflag.h.js';
 import { monflee, onscary } from './monmove.js';
 import { mons } from './monst.js';
-import { M_AP_MONSTER, M_AP_NOTHING, M_AP_TYPMASK, STRAT_CLOSE, STRAT_WAITFORU } from './monst.h.js';
+import { M_AP_MONSTER, M_AP_NOTHING, STRAT_WAITMASK } from './monst.h.js';
+import { DEADMONSTER, M_AP_TYPE } from './monst.macros.js';
 import { PM_ARCHEOLOGIST, PM_GUARD } from './monsters.h.js';
 import { discover_object } from './o_init.js';
 import { objects } from './objects.js';
@@ -41,18 +48,21 @@ import { Tobjnam, Yname2, an, the, thesimpleoname, xname, yname } from './objnam
 import { Norep, You, You_cant, You_feel, You_hear, Your, impossible, pline, pline_The } from './pline.js';
 import { incr_itimeout } from './potion.js';
 import { altarmask_at, desecrate_altar } from './pray.js';
-import { BLINDED, CONFUSION, DEAF, FLYING, FUMBLING, HALF_PHDAM, HALLUC, HALLUC_RES, LEVITATION, STUNNED, UNCHANGING } from './prop.h.js';
+import { CONFUSION, DEAF, FLYING, HALF_PHDAM, STUNNED } from './prop.h.js';
 import { ALTAR, CORR, DOOR, DRAWBRIDGE_DOWN, DRAWBRIDGE_UP, D_NODOOR, FOUNTAIN, GRAVE, ROOM, SCORR, SDOOR, SINK, THRONE } from './rm.h.js';
 import { d, rn2, rnd, rnl } from './rnd.js';
 import { genders } from './role.js';
 import { add_damage } from './shk.js';
 import { ins_no_instrument } from './sndprocs.h.js';
 import { maketrap, mselftouch, reset_utrap, selftouch, set_utrap, t_at } from './trap.js';
-import { PIT, SPIKED_PIT } from './trap.h.js';
+import { PIT } from './trap.h.js';
+import { is_pit } from './trap.macros.js';
 import { recalc_block_point, unblock_point } from './vision.js';
-import { IN_SIGHT } from './vision.h.js';
+import { cansee } from './vision.macros.js';
 import { getlin } from './windows.js';
 import { ACH_TUNE, TT_BURIEDBALL, TT_PIT } from './you.h.js';
+import { Upolyd, u_at } from './you.macros.js';
+import { Blind, Deaf, Fumbling, Hallucination, Levitation, Unchanging, Underwater } from './youprop.macros.js';
 import { flash_str, resist, ubuzz, zapyourself } from './zap.js';
 
 const PLAY_NORMAL = 0x00;
@@ -69,16 +79,16 @@ async function awaken_scare(mtmp, scary) {   // music.c:45
     mtmp.msleeping = (0) & 1;
     mtmp.mcanmove = (1) & 1;
     mtmp.mfrozen = (0) & 127;
-    if (!((mtmp.data.geno & G_UNIQ) !== 0) && $c.andu64(mtmp.mstrategy, STRAT_CLOSE | STRAT_WAITFORU) !== 0) {
+    if (!unique_corpstat(mtmp.data) && $c.andu64(mtmp.mstrategy, STRAT_WAITMASK) !== 0) {
         mtmp.mstrategy = $c.andu64(mtmp.mstrategy, 18446744072904245247n);
-    } else if (scary && !($c.andu64(mtmp.data.mflags1, M1_MINDLESS) !== 0) && !await resist(mtmp, TOOL_CLASS, 0, NOTELL) && onscary(0, 0, mtmp)) {
-        await monflee(mtmp, 0, 0, 1);
+    } else if (scary && !mindless(mtmp.data) && !await resist(mtmp, TOOL_CLASS, 0, NOTELL) && onscary(0, 0, mtmp)) {
+        await monflee(mtmp, 0, FALSE, TRUE);
     }
 }
 async function awaken_monsters(distance) {   // music.c:67
     let mtmp = null, distm = 0;
     for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
-        if (mtmp.mhp < 1) {
+        if (DEADMONSTER(mtmp)) {
             continue;
         }
         if ((distm = dist2(mtmp.mx, mtmp.my, u.ux, u.uy)) < distance) {
@@ -89,7 +99,7 @@ async function awaken_monsters(distance) {   // music.c:67
 async function put_monsters_to_sleep(distance) {   // music.c:85
     let mtmp = null;
     for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
-        if (mtmp.mhp < 1) {
+        if (DEADMONSTER(mtmp)) {
             continue;
         }
         if (dist2(mtmp.mx, mtmp.my, u.ux, u.uy) < distance && await sleep_monst(mtmp, d(10, 10), TOOL_CLASS)) {
@@ -101,7 +111,7 @@ async function put_monsters_to_sleep(distance) {   // music.c:85
 async function charm_snakes(distance) {   // music.c:105
     let mtmp = null, could_see_mon = 0, was_peaceful = 0;
     for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
-        if (mtmp.mhp < 1) {
+        if (DEADMONSTER(mtmp)) {
             continue;
         }
         if (mtmp.data.mlet === S_SNAKE && mtmp.mcanmove | 0 && dist2(mtmp.mx, mtmp.my, u.ux, u.uy) < distance) {
@@ -125,7 +135,7 @@ async function charm_snakes(distance) {   // music.c:105
 async function calm_nymphs(distance) {   // music.c:139
     let mtmp = null;
     for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
-        if (mtmp.mhp < 1) {
+        if (DEADMONSTER(mtmp)) {
             continue;
         }
         if (mtmp.data.mlet === S_NYMPH && mtmp.mcanmove | 0 && dist2(mtmp.mx, mtmp.my, u.ux, u.uy) < distance) {
@@ -143,10 +153,10 @@ export async function awaken_soldiers(bugler) {   // music.c:162
     let mtmp = null, distance = 0, distm = 0, $t1;
     distance = Math.imul($c.peq(bugler, gy.youmonst) ? u.ulevel : bugler.data.mlevel, 30);
     for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
-        if (mtmp.mhp < 1) {
+        if (DEADMONSTER(mtmp)) {
             continue;
         }
-        if ($c.andu64(mtmp.data.mflags2, M2_MERC) !== 0 && !$c.peq(mtmp.data, $c.relem(mons, PM_GUARD))) {
+        if (is_mercenary(mtmp.data) && !$c.peq(mtmp.data, $c.relem(mons, PM_GUARD))) {
             if (!mtmp.mtame) {
                 mtmp.mpeaceful = (0) & 1;
             }
@@ -155,7 +165,7 @@ export async function awaken_soldiers(bugler) {   // music.c:162
             mtmp.mstrategy = $c.andu64(mtmp.mstrategy, 18446744072904245247n);
             if (canseemon(mtmp)) {
                 await pline($c.lit("%s is now ready for battle!"), await Monnam(mtmp));
-            } else if (!(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf)) {
+            } else if (!Deaf()) {
                 await Norep($c.lit("%s the rattle of battle gear being readied."), $c.lit("You hear"));
             }
         } else if ((distm = $c.peq(bugler, gy.youmonst) ? dist2(mtmp.mx, mtmp.my, u.ux, u.uy) : dist2(bugler.mx, bugler.my, mtmp.mx, mtmp.my)) < distance) {
@@ -170,12 +180,12 @@ async function charm_monsters(distance) {   // music.c:196
     }
     for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp2) {
         mtmp2 = mtmp.nmon;
-        if (mtmp.mhp < 1) {
+        if (DEADMONSTER(mtmp)) {
             continue;
         }
         if (dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= distance) {
             if (!await resist(mtmp, TOOL_CLASS, 0, NOTELL) || mtmp.isshk | 0) {
-                await tamedog(mtmp, null, 1);
+                await tamedog(mtmp, null, TRUE);
             }
         }
     }
@@ -189,8 +199,8 @@ async function do_pit(x, y, tu_pit) {   // music.c:221
     chasm.tseen = (1) & 1;
     mtmp = svl.level.monsters[x][y];
     if ((otmp = sobj_at(BOULDER, x, y)) !== null) {
-        if ((gv.viz_array.get(y).get(x) & IN_SIGHT) !== 0) {
-            await pline($c.lit("KADOOM!  The boulder falls into a chasm%s!"), x === u.ux && y === u.uy ? $c.lit(" below you") : $c.lit(""));
+        if (cansee(x, y)) {
+            await pline($c.lit("KADOOM!  The boulder falls into a chasm%s!"), u_at(x, y) ? $c.lit(" below you") : $c.lit(""));
         }
         if (mtmp) {
             mtmp.mtrapped = (0) & 1;
@@ -199,7 +209,7 @@ async function do_pit(x, y, tu_pit) {   // music.c:221
         await flooreffects(otmp, x, y, $c.lit(""));
         return;
     }
-    filltype = fillholetyp(x, y, 0);
+    filltype = fillholetyp(x, y, FALSE);
     if (filltype !== ROOM) {
         await set_levltyp(x, y, filltype);
         await liquid_flow(x, y, filltype, chasm, null);
@@ -208,35 +218,35 @@ async function do_pit(x, y, tu_pit) {   // music.c:221
         }
     }
     if (mtmp) {
-        if (!($c.andu64(mtmp.data.mflags1, M1_FLY) !== 0) && !($c.andu64(mtmp.data.mflags1, M1_CLING) !== 0)) {
+        if (!is_flyer(mtmp.data) && !is_clinger(mtmp.data)) {
             m_already_trapped = $c.i8(mtmp.mtrapped);
             mtmp.mtrapped = (1) & 1;
             if (!m_already_trapped) {
-                if ((gv.viz_array.get(y).get(x) & IN_SIGHT) !== 0) {
+                if (cansee(x, y)) {
                     await pline($c.lit("%s falls into a chasm!"), await Monnam(mtmp));
-                } else if ($c.andu64(mtmp.data.mflags1, M1_HUMANOID) !== 0) {
+                } else if (humanoid(mtmp.data)) {
                     await You_hear($c.lit("a scream!"));
                 }
             }
-            await mselftouch(mtmp, $c.lit("Falling, "), 1);
-            if (!(mtmp.mhp < 1)) {
+            await mselftouch(mtmp, $c.lit("Falling, "), TRUE);
+            if (!DEADMONSTER(mtmp)) {
                 $t1 = rnd(m_already_trapped ? 4 : 6), mtmp.mhp = mtmp.mhp - $t1 | 0;
-                if (mtmp.mhp < 1) {
-                    if (!((gv.viz_array.get(y).get(x) & IN_SIGHT) !== 0)) {
+                if (DEADMONSTER(mtmp)) {
+                    if (!cansee(x, y)) {
                         await pline($c.lit("It is destroyed!"));
                     } else {
-                        await You($c.lit("destroy %s!"), mtmp.mtame ? await x_monnam(mtmp, ARTICLE_THE, $c.lit("poor"), mtmp.mextra && mtmp.mextra.mgivenname ? SUPPRESS_SADDLE : 0, 0) : await mon_nam(mtmp));
+                        await You($c.lit("destroy %s!"), mtmp.mtame ? await x_monnam(mtmp, ARTICLE_THE, $c.lit("poor"), has_mgivenname(mtmp) ? SUPPRESS_SADDLE : 0, FALSE) : await mon_nam(mtmp));
                     }
                     await xkilled(mtmp, XKILL_NOMSG);
                 }
             }
         }
-    } else if (x === u.ux && y === u.uy) {
+    } else if (u_at(x, y)) {
         if (u.utrap && u.utraptype === TT_BURIEDBALL) {
             await Your($c.lit("chain breaks!"));
-            await reset_utrap(1);
+            await reset_utrap(TRUE);
         }
-        if ((u.uprops[LEVITATION].intrinsic || u.uprops[LEVITATION].extrinsic) && !u.uprops[LEVITATION].blocked || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked || $c.andu64(gy.youmonst.data.mflags1, M1_CLING) !== 0) {
+        if (Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked || is_clinger(gy.youmonst.data)) {
             if (!tu_pit) {
                 await pline($c.lit("A chasm opens up under you!"));
                 await You($c.lit("don't fall in!"));
@@ -247,14 +257,14 @@ async function do_pit(x, y, tu_pit) {   // music.c:221
             await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(rnd(6) + 1 | 0, 2) : rnd(6), $c.lit("fell into a chasm"), NO_KILLER_PREFIX);
             await selftouch($c.lit("Falling, you"));
         } else if (u.utrap && u.utraptype === TT_PIT) {
-            keepfooting = $c.i8(!((u.uprops[FUMBLING].intrinsic || u.uprops[FUMBLING].extrinsic) && rn2(5)) && (!rnl(gu.urole.mnum === PM_ARCHEOLOGIST ? 3 : 9) || acurr(A_DEX) > 7 && rn2(5)) ? 1 : 0);
+            keepfooting = $c.i8(!(Fumbling() && rn2(5)) && (!rnl(gu.urole.mnum === PM_ARCHEOLOGIST ? 3 : 9) || ACURR(A_DEX) > 7 && rn2(5)) ? 1 : 0);
             await You($c.lit("are jostled around violently!"));
             set_utrap((rn2(6) + 2 | 0) >>> 0, TT_PIT);
             await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(rnd(keepfooting ? 2 : 4) + 1 | 0, 2) : rnd(keepfooting ? 2 : 4), $c.lit("hurt in a chasm"), NO_KILLER_PREFIX);
             if (keepfooting) {
-                await exercise(A_DEX, 1);
+                await exercise(A_DEX, TRUE);
             } else {
-                await selftouch(u.umonnum !== u.umonster && ($c.andu64(gy.youmonst.data.mflags1, M1_SLITHY) !== 0 || $c.andu64(gy.youmonst.data.mflags1, M1_NOLIMBS) === M1_NOLIMBS) ? $c.lit("Shaken, you") : $c.lit("Falling down, you"));
+                await selftouch(Upolyd() && (slithy(gy.youmonst.data) || nolimbs(gy.youmonst.data)) ? $c.lit("Shaken, you") : $c.lit("Falling down, you"));
             }
         }
     } else {
@@ -266,7 +276,7 @@ async function do_earthquake(force) {   // music.c:344
     trap_at_u = t_at(u.ux, u.uy);
     tu_pit = 0;
     if (trap_at_u) {
-        tu_pit = ((trap_at_u.ttyp | 0) === PIT || (trap_at_u.ttyp | 0) === SPIKED_PIT ? 1 : 0) >>> 0;
+        tu_pit = is_pit(trap_at_u.ttyp) >>> 0;
     }
     if (force > 13) {
         force = 13;
@@ -282,19 +292,19 @@ async function do_earthquake(force) {   // music.c:344
     for (x = $c.i16(start_x); x <= end_x; x = $c.i16(x + 1)) {
         for (y = $c.i16(start_y); y <= end_y; y = $c.i16(y + 1)) {
             if ((mtmp = svl.level.monsters[x][y]) !== null) {
-                await wakeup(mtmp, 1);
+                await wakeup(mtmp, TRUE);
                 if (mtmp.mundetected) {
                     mtmp.mundetected = (0) & 1;
                     await newsym(x, y);
-                    if ($c.andu64(mtmp.data.mflags1, M1_HIDE) !== 0 && ($c.andu64(mtmp.data.mflags1, M1_CLING) !== 0 && mtmp.data.mlet !== S_MIMIC || $c.andu64(mtmp.data.mflags1, M1_FLY) !== 0)) {
-                        if ((gv.viz_array.get(y).get(x) & IN_SIGHT) !== 0) {
+                    if (ceiling_hider(mtmp.data)) {
+                        if (cansee(x, y)) {
                             await pline($c.lit("%s is shaken loose from the ceiling!"), await Amonnam(mtmp));
-                        } else if (!($c.andu64(mtmp.data.mflags1, M1_FLY) !== 0)) {
+                        } else if (!is_flyer(mtmp.data)) {
                             await You_hear($c.lit("a thump."));
                         }
                     }
                 }
-                if ((mtmp.m_ap_type & M_AP_TYPMASK) !== M_AP_NOTHING && (mtmp.m_ap_type & M_AP_TYPMASK) !== M_AP_MONSTER) {
+                if (M_AP_TYPE(mtmp) !== M_AP_NOTHING && M_AP_TYPE(mtmp) !== M_AP_MONSTER) {
                     await seemimic(mtmp);
                 }
             }
@@ -303,13 +313,13 @@ async function do_earthquake(force) {   // music.c:344
             }
             switch (svl.level.locations[x][y].typ) {
                 case FOUNTAIN:
-                    if ((gv.viz_array.get(y).get(x) & IN_SIGHT) !== 0) {
+                    if (cansee(x, y)) {
                         await pline_The($c.lit("fountain falls%s."), new $c.Ptr(do_earthquake$into_a_chasm, 0));
                     }
                     await do_pit(x, y, tu_pit);
                     break;
                 case SINK:
-                    if ((gv.viz_array.get(y).get(x) & IN_SIGHT) !== 0) {
+                    if (cansee(x, y)) {
                         await pline_The($c.lit("kitchen sink falls%s."), new $c.Ptr(do_earthquake$into_a_chasm, 0));
                     }
                     await do_pit(x, y, tu_pit);
@@ -320,20 +330,20 @@ async function do_earthquake(force) {   // music.c:344
                         break;
                     }
                     algn = $c.i8((amsk & 7 & AM_MASK) === 0 ? A_NONE : (amsk & 7 & AM_MASK) === AM_LAWFUL ? A_LAWFUL : (amsk & 7 & AM_MASK) - 2 | 0);
-                    if ((gv.viz_array.get(y).get(x) & IN_SIGHT) !== 0) {
+                    if (cansee(x, y)) {
                         await pline_The($c.lit("%s altar falls%s."), align_str(algn), new $c.Ptr(do_earthquake$into_a_chasm, 0));
                     }
-                    await desecrate_altar(0, algn);
+                    await desecrate_altar(FALSE, algn);
                     await do_pit(x, y, tu_pit);
                     break;
                 case GRAVE:
-                    if ((gv.viz_array.get(y).get(x) & IN_SIGHT) !== 0) {
+                    if (cansee(x, y)) {
                         await pline_The($c.lit("headstone topples%s."), new $c.Ptr(do_earthquake$into_a_chasm, 0));
                     }
                     await do_pit(x, y, tu_pit);
                     break;
                 case THRONE:
-                    if ((gv.viz_array.get(y).get(x) & IN_SIGHT) !== 0) {
+                    if (cansee(x, y)) {
                         await pline_The($c.lit("throne falls%s."), new $c.Ptr(do_earthquake$into_a_chasm, 0));
                     }
                     await do_pit(x, y, tu_pit);
@@ -341,7 +351,7 @@ async function do_earthquake(force) {   // music.c:344
                 case SCORR:
                     svl.level.locations[x][y].typ = CORR;
                     unblock_point(x, y);
-                    if ((gv.viz_array.get(y).get(x) & IN_SIGHT) !== 0) {
+                    if (cansee(x, y)) {
                         await pline($c.lit("A secret corridor is revealed."));
                     }
                 case CORR:
@@ -350,7 +360,7 @@ async function do_earthquake(force) {   // music.c:344
                     break;
                 case SDOOR:
                     cvt_sdoor_to_door($c.relem(svl.level.locations[x], y));
-                    if ((gv.viz_array.get(y).get(x) & IN_SIGHT) !== 0) {
+                    if (cansee(x, y)) {
                         await pline($c.lit("A secret door is revealed."));
                     }
                 case DOOR:
@@ -361,7 +371,7 @@ async function do_earthquake(force) {   // music.c:344
                     svl.level.locations[x][y].flags = (D_NODOOR) & 31;
                     recalc_block_point(x, y);
                     await newsym(x, y);
-                    if ((gv.viz_array.get(y).get(x) & IN_SIGHT) !== 0) {
+                    if (cansee(x, y)) {
                         await pline_The($c.lit("door collapses."));
                     }
                     if (in_rooms(x, y, SHOPBASE).get(0)) {
@@ -375,11 +385,11 @@ async function do_earthquake(force) {   // music.c:344
 function generic_lvl_desc() {   // music.c:478
     if ((svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level)) {
         return $c.lit("astral plane");
-    } else if (u.uz.dnum === svd.dungeon_topology.d_astral_level.dnum) {
+    } else if (In_endgame(u.uz)) {
         return $c.lit("plane");
     } else if ((svd.dungeon_topology.d_sanctum_level.dlevel || svd.dungeon_topology.d_sanctum_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_sanctum_level)) {
         return $c.lit("sanctum");
-    } else if (u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum) {
+    } else if (In_sokoban(u.uz)) {
         return $c.lit("puzzle");
     } else if (In_V_tower(u.uz)) {
         return $c.lit("tower");
@@ -390,14 +400,14 @@ function generic_lvl_desc() {   // music.c:478
 async function do_improvisation(instr) {   // music.c:503
     let damage = 0, mode = 0, do_spec = 0, itmp = new $T.obj(), mundane = 0, same_old_song = Int8Array.of(0), buf = new Int8Array(256), type = 0;
     do_spec = !(u.uprops[STUNNED].intrinsic || u.uprops[CONFUSION].intrinsic) ? 1 : 0;
-    mundane = 0;
-    same_old_song[0] = 0;
+    mundane = FALSE;
+    same_old_song[0] = FALSE;
     itmp.$copyFrom(instr);
     itmp.oextra = null;
     if (!do_spec || instr.spe <= 0) {
         while (objects[itmp.otyp].oc_magic) {
             itmp.otyp = $c.i16(itmp.otyp - 1 | 0);
-            mundane = 1;
+            mundane = TRUE;
         }
     }
     mode = PLAY_NORMAL;
@@ -407,7 +417,7 @@ async function do_improvisation(instr) {   // music.c:503
     if (u.uprops[CONFUSION].intrinsic) {
         mode = mode | PLAY_CONFUSED;
     }
-    if (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic)) {
+    if (Hallucination()) {
         mode = mode | PLAY_HALLU;
     }
     if (!rn2(2)) {
@@ -423,14 +433,14 @@ async function do_improvisation(instr) {   // music.c:503
             await You($c.lit("start playing %s."), await yname(instr));
             break;
         case PLAY_STUNNED:
-            if (!(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf)) {
+            if (!Deaf()) {
                 await You($c.lit("radiate an obnoxious droning sound."));
             } else {
                 await You_feel($c.lit("a monotonous vibration."));
             }
             break;
         case PLAY_CONFUSED:
-            if (!(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf)) {
+            if (!Deaf()) {
                 await You($c.lit("generate a raucous noise."));
             } else {
                 await You_feel($c.lit("a jarring vibration."));
@@ -450,14 +460,14 @@ async function do_improvisation(instr) {   // music.c:503
     do_improvisation$improvisation = improvised_notes(new $c.Ptr(same_old_song, 0));
     switch (itmp.otyp) {
         case MAGIC_FLUTE:
-            await consume_obj_charge(instr, 1);
-            await You($c.lit("%sproduce %s%s music."), !(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf) ? $c.lit("") : $c.lit("seem to "), u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? $c.lit("piped") : $c.lit("soft"), same_old_song[0] ? $c.lit(", familiar") : $c.lit(""));
+            await consume_obj_charge(instr, TRUE);
+            await You($c.lit("%sproduce %s%s music."), !Deaf() ? $c.lit("") : $c.lit("seem to "), Hallucination() ? $c.lit("piped") : $c.lit("soft"), same_old_song[0] ? $c.lit(", familiar") : $c.lit(""));
             await put_monsters_to_sleep(Math.imul(u.ulevel, 5));
-            await exercise(A_DEX, 1);
+            await exercise(A_DEX, TRUE);
             break;
         case WOODEN_FLUTE:
             do_spec = do_spec & ((rn2(acurr(A_DEX)) + u.ulevel | 0) > 25 ? 1 : 0);
-            if (!(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf)) {
+            if (!Deaf()) {
                 await pline($c.lit("%s%s."), await Tobjnam(instr, do_spec ? $c.lit("trill") : $c.lit("toot")), same_old_song[0] ? $c.lit(" a familiar tune") : $c.lit(""));
             } else {
                 await You_feel($c.lit("%s %s."), await yname(instr), do_spec ? $c.lit("trill") : $c.lit("toot"));
@@ -465,61 +475,61 @@ async function do_improvisation(instr) {   // music.c:503
             if (do_spec) {
                 await charm_snakes(Math.imul(u.ulevel, 3));
             }
-            await exercise(A_DEX, 1);
+            await exercise(A_DEX, TRUE);
             break;
         case FIRE_HORN:
         case FROST_HORN:
-            await consume_obj_charge(instr, 1);
+            await consume_obj_charge(instr, TRUE);
             if (!await getdir(null)) {
                 await pline($c.lit("%s."), await Tobjnam(instr, $c.lit("vibrate")));
                 break;
             } else if (!u.dx && !u.dy && !u.dz) {
-                if ((damage = await zapyourself(instr, 1)) !== 0) {
+                if ((damage = await zapyourself(instr, TRUE)) !== 0) {
                     $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("using a magical horn on %sself"), genders[flags.female ? 1 : 0].him);
                     await losehp(damage, new $c.Ptr(buf, 0), KILLED_BY);
                 }
             } else {
                 type = $c.rem32($c.abs((instr.otyp === FROST_HORN ? 3 : 2) - AD_MAGM | 0), 10);
-                if (!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked)) {
-                    await pline($c.lit("A %s blasts out of the horn!"), flash_str(type, 0));
+                if (!Blind()) {
+                    await pline($c.lit("A %s blasts out of the horn!"), flash_str(type, FALSE));
                 }
                 gc.current_wand = instr;
-                await ubuzz(0 + type | 0, rn2(6) + 6 | 0);
+                await ubuzz(BZ_U_WAND(type), rn2(6) + 6 | 0);
                 gc.current_wand = null;
             }
-            await discover_object(instr.otyp, 1, 1, 1);
+            await discover_object(instr.otyp, TRUE, TRUE, TRUE);
             break;
         case TOOLED_HORN:
-            if (!(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf)) {
+            if (!Deaf()) {
                 await You($c.lit("produce a frightful, grave%s sound."), same_old_song[0] ? $c.lit(", yet familiar,") : $c.lit(""));
             } else {
                 await You($c.lit("blow into the horn."));
             }
             await awaken_monsters(Math.imul(u.ulevel, 30));
-            await exercise(A_WIS, 0);
+            await exercise(A_WIS, FALSE);
             break;
         case BUGLE:
-            if (!(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf)) {
+            if (!Deaf()) {
                 await You($c.lit("extract a loud%s noise from %s."), same_old_song[0] ? $c.lit(", familiar") : $c.lit(""), await yname(instr));
             } else {
                 await You($c.lit("blow into the bugle."));
             }
             await awaken_soldiers(gy.youmonst);
-            await exercise(A_WIS, 0);
+            await exercise(A_WIS, FALSE);
             break;
         case MAGIC_HARP:
-            await consume_obj_charge(instr, 1);
-            if (!(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf)) {
+            await consume_obj_charge(instr, TRUE);
+            if (!Deaf()) {
                 await pline($c.lit("%s very attractive%s music."), await Tobjnam(instr, $c.lit("produce")), same_old_song[0] ? $c.lit(" and familiar") : $c.lit(""));
             } else {
                 await You_feel($c.lit("very soothing vibrations."));
             }
             await charm_monsters($c.div32(u.ulevel - 1 | 0, 3) + 1 | 0);
-            await exercise(A_DEX, 1);
+            await exercise(A_DEX, TRUE);
             break;
         case WOODEN_HARP:
             do_spec = do_spec & ((rn2(acurr(A_DEX)) + u.ulevel | 0) > 25 ? 1 : 0);
-            if (!(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf)) {
+            if (!Deaf()) {
                 await pline($c.lit("%s %s."), await Yname2(instr), do_spec && same_old_song[0] ? $c.lit("produces a familiar, lilting melody") : do_spec ? $c.lit("produces a lilting melody") : same_old_song[0] ? $c.lit("twangs a familiar tune") : $c.lit("twangs"));
             } else {
                 await You_feel($c.lit("soothing vibrations."));
@@ -527,49 +537,49 @@ async function do_improvisation(instr) {   // music.c:503
             if (do_spec) {
                 await calm_nymphs(Math.imul(u.ulevel, 3));
             }
-            await exercise(A_DEX, 1);
+            await exercise(A_DEX, TRUE);
             break;
         case DRUM_OF_EARTHQUAKE:
-            await consume_obj_charge(instr, 1);
+            await consume_obj_charge(instr, TRUE);
             await You($c.lit("produce a heavy, thunderous rolling!"));
             await pline_The($c.lit("entire %s is shaking around you!"), generic_lvl_desc());
             await do_earthquake($c.div32(u.ulevel - 1 | 0, 3) + 1 | 0);
             await awaken_monsters(ROWNO * COLNO);
-            await discover_object(DRUM_OF_EARTHQUAKE, 1, 1, 1);
+            await discover_object(DRUM_OF_EARTHQUAKE, TRUE, TRUE, TRUE);
             break;
         case LEATHER_DRUM:
             if (!mundane) {
-                if (!(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf)) {
+                if (!Deaf()) {
                     await You($c.lit("beat a %sdeafening row!"), same_old_song[0] ? $c.lit("familiar ") : $c.lit(""));
                     incr_itimeout(new $c.FieldRef(u.uprops[DEAF], "intrinsic", "i64"), rn2(20) + 30 | 0);
                 } else {
                     await You($c.lit("pound on the drum."));
                 }
-                await exercise(A_WIS, 0);
+                await exercise(A_WIS, FALSE);
             } else {
                 await You($c.lit("%s %s."), rn2(2) ? $c.lit("butcher") : rn2(2) ? $c.lit("manage") : $c.lit("pull off"), await an(beats[rn2(8)]));
             }
             await awaken_monsters(Math.imul(u.ulevel, mundane ? 5 : 40));
-            disp.botl = 1;
+            disp.botl = TRUE;
             break;
         default:
             await impossible($c.lit("What a weird instrument (%d)!"), instr.otyp);
             return 0;
     }
-    do_improvisation$improvisation;
+    nhUse(do_improvisation$improvisation);
     return 2;
 }
 function improvised_notes(same_as_last_time) {   // music.c:733
     let i = 0, notecount = 0, $t1;
-    if (!((u.uprops[UNCHANGING].intrinsic || u.uprops[UNCHANGING].extrinsic) && svc.context.jingle[0] !== 0)) {
+    if (!(Unchanging() && svc.context.jingle[0] !== 0)) {
         notecount = rnd(5);
         for (i = 0; i < notecount; i = i + 1 | 0) {
             $t1 = improvised_notes$notes[rn2(7)], svc.context.jingle[i] = $t1;
         }
         svc.context.jingle[notecount] = 0;
-        same_as_last_time.set(0, 0);
+        same_as_last_time.set(0, FALSE);
     } else {
-        same_as_last_time.set(0, 1);
+        same_as_last_time.set(0, TRUE);
     }
     return new $c.Ptr(svc.context.jingle, 0);
 }
@@ -578,7 +588,7 @@ export async function do_play_instrument(instr) {   // music.c:759
     buf.fill(0);
     buf[0] = 0;
     c = 121;
-    if (u.uinwater) {
+    if (Underwater()) {
         await You_cant($c.lit("play music underwater!"));
         return ECMD_OK;
     } else if ((instr.otyp === WOODEN_FLUTE || instr.otyp === MAGIC_FLUTE || instr.otyp === TOOLED_HORN || instr.otyp === FROST_HORN || instr.otyp === FIRE_HORN || instr.otyp === BUGLE) && !can_blow(gy.youmonst)) {
@@ -586,8 +596,8 @@ export async function do_play_instrument(instr) {   // music.c:759
         return ECMD_OK;
     }
     nevermind$: {
-        if (instr.otyp !== LEATHER_DRUM && instr.otyp !== DRUM_OF_EARTHQUAKE && !(u.uprops[STUNNED].intrinsic || u.uprops[CONFUSION].intrinsic || u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic))) {
-            c = await yn_function($c.lit("Improvise?"), new $c.Ptr(ynqchars, 0), 113, 1);
+        if (instr.otyp !== LEATHER_DRUM && instr.otyp !== DRUM_OF_EARTHQUAKE && !(u.uprops[STUNNED].intrinsic || u.uprops[CONFUSION].intrinsic || Hallucination())) {
+            c = await yn_function($c.lit("Improvise?"), new $c.Ptr(ynqchars, 0), 113, TRUE);
             if (c === 113) {
                 break nevermind$;
             }
@@ -596,7 +606,7 @@ export async function do_play_instrument(instr) {   // music.c:759
             return await do_improvisation(instr) ? ECMD_TIME : ECMD_OK;
         }
         if ((u.uevent.uheard_tune | 0) === 2) {
-            c = await yn_function($c.lit("Play the passtune?"), new $c.Ptr(ynqchars, 0), 113, 1);
+            c = await yn_function($c.lit("Play the passtune?"), new $c.Ptr(ynqchars, 0), 113, TRUE);
         }
         if (c === 113) {
             break nevermind$;
@@ -615,9 +625,9 @@ export async function do_play_instrument(instr) {   // music.c:759
                 }
             }
         }
-        await You(!(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf) ? $c.lit("extract a strange sound from %s!") : $c.lit("can feel %s emitting vibrations."), await the(await xname(instr)));
+        await You(!Deaf() ? $c.lit("extract a strange sound from %s!") : $c.lit("can feel %s emitting vibrations."), await the(await xname(instr)));
         if ((svd.dungeon_topology.d_stronghold_level.dlevel || svd.dungeon_topology.d_stronghold_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_stronghold_level)) {
-            await exercise(A_WIS, 1);
+            await exercise(A_WIS, TRUE);
             if (!$c.strcmp(new $c.Ptr(buf, 0), new $c.Ptr(svt.tune, 0))) {
                 for (y[0] = $c.i16(u.uy - 1 | 0); y[0] <= (u.uy + 1 | 0); y[0] = $c.i16(y[0] + 1)) {
                     for (x[0] = $c.i16(u.ux - 1 | 0); x[0] <= (u.ux + 1 | 0); x[0] = $c.i16(x[0] + 1)) {
@@ -636,16 +646,16 @@ export async function do_play_instrument(instr) {   // music.c:759
                         }
                     }
                 }
-            } else if (!(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf)) {
+            } else if (!Deaf()) {
                 if ((u.uevent.uheard_tune | 0) < 1) {
                     u.uevent.uheard_tune = (1) & 3;
                 }
-                ok = 0;
+                ok = FALSE;
                 for (y[0] = $c.i16(u.uy - 1 | 0); y[0] <= (u.uy + 1 | 0) && !ok; y[0] = $c.i16(y[0] + 1)) {
                     for (x[0] = $c.i16(u.ux - 1 | 0); x[0] <= (u.ux + 1 | 0) && !ok; x[0] = $c.i16(x[0] + 1)) {
                         if (isok(x[0], y[0])) {
                             if (svl.level.locations[x[0]][y[0]].typ === DRAWBRIDGE_UP || svl.level.locations[x[0]][y[0]].typ === DRAWBRIDGE_DOWN || is_drawbridge_wall(x[0], y[0]) >= 0) {
-                                ok = 1;
+                                ok = TRUE;
                             }
                         }
                     }
@@ -653,18 +663,18 @@ export async function do_play_instrument(instr) {   // music.c:759
                 if (ok) {
                     tumblers = gears = 0;
                     for (x[0] = 0; x[0] < 5; x[0] = $c.i16(x[0] + 1)) {
-                        matched[x[0]] = 0;
+                        matched[x[0]] = FALSE;
                     }
                     for (x[0] = 0; x[0] < $c.i32($c.strlen(new $c.Ptr(buf, 0))); x[0] = $c.i16(x[0] + 1)) {
                         if (x[0] < 5) {
                             if (buf[x[0]] === svt.tune[x[0]]) {
                                 gears = gears + 1 | 0;
-                                matched[x[0]] = 1;
+                                matched[x[0]] = TRUE;
                             } else {
                                 for (y[0] = 0; y[0] < 5; y[0] = $c.i16(y[0] + 1)) {
                                     if (!matched[y[0]] && buf[x[0]] === svt.tune[y[0]] && buf[y[0]] !== svt.tune[y[0]]) {
                                         tumblers = tumblers + 1 | 0;
-                                        matched[y[0]] = 1;
+                                        matched[y[0]] = TRUE;
                                         break;
                                     }
                                 }
@@ -673,12 +683,12 @@ export async function do_play_instrument(instr) {   // music.c:759
                     }
                     if (tumblers) {
                         if (gears) {
-                            await You_hear($c.lit("%d tumbler%s click and %d gear%s turn."), tumblers, tumblers === 1 ? $c.lit("") : $c.lit("s"), gears, gears === 1 ? $c.lit("") : $c.lit("s"));
+                            await You_hear($c.lit("%d tumbler%s click and %d gear%s turn."), tumblers, plur(tumblers), gears, plur(gears));
                         } else {
-                            await You_hear($c.lit("%d tumbler%s click."), tumblers, tumblers === 1 ? $c.lit("") : $c.lit("s"));
+                            await You_hear($c.lit("%d tumbler%s click."), tumblers, plur(tumblers));
                         }
                     } else if (gears) {
-                        await You_hear($c.lit("%d gear%s turn."), gears, gears === 1 ? $c.lit("") : $c.lit("s"));
+                        await You_hear($c.lit("%d gear%s turn."), gears, plur(gears));
                         if (gears === 5) {
                             u.uevent.uheard_tune = (2) & 3;
                             await record_achievement(ACH_TUNE);

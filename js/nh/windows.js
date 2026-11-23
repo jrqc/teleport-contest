@@ -9,18 +9,20 @@ import { cmdq_pop } from './cmd.js';
 import { NO_COLOR } from './color.h.js';
 import { cg, flags, gb, gl, gm, go, gs, hexdd, iflags, program_state, svc } from './decl.js';
 import { map_glyphinfo, nul_glyphinfo } from './display.js';
-import { MAX_GLYPH } from './display.h.js';
+import { NO_GLYPH } from './display.h.js';
 import { def_char_to_monclass, def_char_to_objclass, def_monsyms, def_oc_syms } from './drawing.js';
 import { nh_terminate, panic } from './end.js';
 import { debugcore } from './files.js';
 import { BUFSZ, COLNO } from './global.h.js';
 import { CMDQ_KEY } from './hack.h.js';
 import { eos, mungspaces, strncmpi } from './hacklib.js';
+import { nhUse } from './lint.macros.js';
 import { pline, raw_printf } from './pline.js';
 import { regex_match } from './posixregex.js';
-import { WC_COLOR, WININIT, WININIT_UNDO, wp_hup } from './winprocs.h.js';
+import { WC2_FLUSH_STATUS, WC_COLOR, WININIT, WININIT_UNDO, wp_hup } from './winprocs.h.js';
+import { create_nhwindow, ctrl_nhwindow, curs, destroy_nhwindow, display_nhwindow, end_menu, putmixed, putstr, start_menu } from './winprocs.macros.js';
 import { tty_procs, win_tty_init } from './wintty.js';
-import { ATR_NONE, MENU_BEHAVE_STANDARD, MENU_ITEMFLAGS_NONE, MENU_ITEMFLAGS_SELECTED, MENU_ITEMFLAGS_SKIPINVERT, MENU_ITEMFLAGS_SKIPMENUCOLORS, NHW_MENU, NHW_STATUS, PICK_ANY, PICK_ONE, set_menu_promptstyle } from './wintype.h.js';
+import { ATR_NONE, MENU_BEHAVE_STANDARD, MENU_ITEMFLAGS_NONE, MENU_ITEMFLAGS_SELECTED, MENU_ITEMFLAGS_SKIPINVERT, MENU_ITEMFLAGS_SKIPMENUCOLORS, NHW_MENU, NHW_STATUS, PICK_ANY, PICK_ONE, WIN_ERR, set_menu_promptstyle } from './wintype.h.js';
 
 const WINDOW_TYPE_MAXLEN = 50;
 
@@ -197,7 +199,7 @@ function hup_init_nhwindows(argc_p, argv) {   // windows.c:690
     iflags.window_inited = 1;
 }
 function hup_create_nhwindow(type) {   // windows.c:697
-    return -1;
+    return WIN_ERR;
 }
 function hup_select_menu(window, how, menu_list) {   // windows.c:704
     return -1;
@@ -261,8 +263,8 @@ export async function genl_status_init() {   // windows.c:893
         status_activefields[i] = 0;
         status_fieldfmt[i] = null;
     }
-    $G.WIN_STATUS = await windowprocs.win_create_nhwindow(NHW_STATUS);
-    await windowprocs.win_display_nhwindow($G.WIN_STATUS, 0);
+    $G.WIN_STATUS = await create_nhwindow()(NHW_STATUS);
+    await display_nhwindow()($G.WIN_STATUS, 0);
 }
 export function genl_status_finish() {   // windows.c:909
     let i = 0;
@@ -281,7 +283,7 @@ export async function genl_status_update(idx, ptr, chg, percent, color, colormas
     let newbot1 = new Int8Array(200), newbot2 = new Int8Array(200), cond = 0, condptr = null, i = 0, pass = 0, lndelta = 0, idx1 = 0, idx2 = 0, fieldlist = null, nb = null, text = null, val = null;
     condptr = ptr;
     text = $c.asArr(ptr, Int8Array);
-    windowprocs.wincap2 = $c.oru64(windowprocs.wincap2, 128);
+    windowprocs.wincap2 = $c.oru64(windowprocs.wincap2, WC2_FLUSH_STATUS);
     if (idx >= 0) {
         if (!status_activefields[idx]) {
             return;
@@ -393,13 +395,13 @@ export async function genl_status_update(idx, ptr, chg, percent, color, colormas
             break;
         }
     }
-    await windowprocs.win_curs($G.WIN_STATUS, 1, 0);
-    await windowprocs.win_putstr($G.WIN_STATUS, 0, new $c.Ptr(newbot1, 0));
-    await windowprocs.win_curs($G.WIN_STATUS, 1, 1);
-    await windowprocs.win_putmixed($G.WIN_STATUS, 0, new $c.Ptr(newbot2, 0));
+    await curs()($G.WIN_STATUS, 1, 0);
+    await putstr()($G.WIN_STATUS, 0, new $c.Ptr(newbot1, 0));
+    await curs()($G.WIN_STATUS, 1, 1);
+    await putmixed()($G.WIN_STATUS, 0, new $c.Ptr(newbot2, 0));
 }
 export function dump_open_log(now) {   // windows.c:1244
-    now;
+    nhUse(now);
 }
 export function dump_close_log() {   // windows.c:1267
     if (dumplog_file) {
@@ -412,7 +414,7 @@ export async function dump_forward_putstr(win, attr, str, no_forward) {   // win
         $c.fprintf(dumplog_file, $c.lit("%s\n"), str);
     }
     if (!no_forward) {
-        await windowprocs.win_putstr(win, attr, str);
+        await putstr()(win, attr, str);
     }
 }
 function dump_putstr(win, attr, str) {   // windows.c:1286
@@ -421,7 +423,7 @@ function dump_putstr(win, attr, str) {   // windows.c:1286
     }
 }
 function dump_create_nhwindow(type) {   // windows.c:1293
-    return -1;
+    return WIN_ERR;
 }
 function dump_clear_nhwindow(win) {   // windows.c:1300
     return;
@@ -437,7 +439,7 @@ function dump_start_menu(win, mbehavior) {   // windows.c:1321
 }
 function dump_add_menu(win, glyphinfo, identifier, ch, gch, attr, clr, str, itemflags) {   // windows.c:1328
     if (dumplog_file) {
-        if (glyphinfo.glyph === MAX_GLYPH) {
+        if (glyphinfo.glyph === NO_GLYPH) {
             $c.fprintf(dumplog_file, $c.lit(" %s\n"), str);
         } else {
             $c.fprintf(dumplog_file, $c.lit("  %c - %s\n"), ch, str);
@@ -557,7 +559,7 @@ export function decode_mixed(buf, str) {   // windows.c:1466
 }
 export async function genl_putmixed(window, attr, str) {   // windows.c:1528
     let buf = new Int8Array(256);
-    await windowprocs.win_putstr(window, attr, decode_mixed(new $c.Ptr(buf, 0), str));
+    await putstr()(window, attr, decode_mixed(new $c.Ptr(buf, 0), str));
 }
 export function genl_display_file(fname, complain) {   // windows.c:1539
     let buf = new Int8Array(256), f = null;
@@ -613,8 +615,8 @@ export async function choose_classes_menu(prompt, category, way, class_list, cla
     }
     next_accelerator = 97;
     any.$copyFrom(cg.zeroany);
-    win = await windowprocs.win_create_nhwindow(NHW_MENU);
-    await windowprocs.win_start_menu(win, MENU_BEHAVE_STANDARD);
+    win = await create_nhwindow()(NHW_MENU);
+    await start_menu()(win, MENU_BEHAVE_STANDARD);
     while (class_list.get(0)) {
         selected = 0;
         switch (category) {
@@ -668,9 +670,9 @@ export async function choose_classes_menu(prompt, category, way, class_list, cla
             await add_menu_str(win, flags.pickup ? $c.lit("Toggle off 'autopickup' to not pick up anything.") : $c.lit("Toggle on 'autopickup' to automatically pick these things up."));
         }
     }
-    await windowprocs.win_end_menu(win, prompt);
+    await end_menu()(win, prompt);
     n = await select_menu(win, way ? PICK_ANY : PICK_ONE, new $c.Ptr(pick_list, 0));
-    await windowprocs.win_destroy_nhwindow(win);
+    await destroy_nhwindow()(win);
     if (n > 0) {
         if (category === 1) {
             for (i = 0; i < n; i = i + 1 | 0) {
@@ -699,7 +701,7 @@ export function adjust_menu_promptstyle(window, style) {   // windows.c:1769
     wri.$copyFrom(zerowri);
     wri.fromcore.menu_promptstyle.color = style.color;
     wri.fromcore.menu_promptstyle.attr = style.attr;
-    windowprocs.win_ctrl_nhwindow(window, set_menu_promptstyle, wri);
+    ctrl_nhwindow()(window, set_menu_promptstyle, wri);
     go.opt_need_promptstyle = 0;
 }
 export async function add_menu(window, glyphinfo, identifier, ch, gch, attr$in, color$in, str, itemflags) {   // windows.c:1785

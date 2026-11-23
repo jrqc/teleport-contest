@@ -4,7 +4,7 @@ import * as $T from './types.js';
 import { $G } from './globals.js';
 import { dupstr } from './alloc.js';
 import { free_nomakedefs, populate_nomakedefs } from './date.js';
-import { COLNO, SFCTOOL_BIT } from './global.h.js';
+import { COLNO, FALSE, SFCTOOL_BIT, TRUE } from './global.h.js';
 import { datamodel, eos, nh_snprintf } from './hacklib.js';
 import { NUM_OBJECTS } from './objclass.h.js';
 import { EDITLEVEL, PATCHLEVEL, VERSION_MAJOR, VERSION_MINOR } from './patchlevel.h.js';
@@ -69,7 +69,7 @@ function count_and_validate_winopts() {   // mdlib.c:602
     cnt = 0;
     for (i = 0; i < 1; i = i + 1 | 0) {
         cnt = cnt + 1 | 0;
-        window_opts[i].valid = 1;
+        window_opts[i].valid = TRUE;
     }
     return cnt;
 }
@@ -78,7 +78,7 @@ function count_and_validate_soundlibopts() {   // mdlib.c:627
     cnt = 0;
     for (i = 0; i < 1; i = i + 1 | 0) {
         cnt = cnt + 1 | 0;
-        soundlib_opts[i].valid = 1;
+        soundlib_opts[i].valid = TRUE;
     }
     return cnt;
 }
@@ -243,7 +243,7 @@ export function $init() {
     artifact_names[32] = $c.lit("The Orb of Fate");
     artifact_names[33] = $c.lit("The Eye of the Aethiopica");
     artifact_names[34] = null;
-    date_via_env = 0;
+    date_via_env = FALSE;
     idxopttext = 0;
     done_runtime_opt_init_once = 0;
     opttext.fill(null);

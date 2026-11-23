@@ -31,4 +31,7 @@ export const ANY_TYPE = (-1);
 export const ANY_SHOP = (-2);
 export const NO_ROOM = 0;
 export const SHARED = 1;
+export const SHARED_PLUS = 2;
+export const ROOMOFFSET = 3;
 export const FILL_NONE = 0;
+export const FILL_NORMAL = 1;

@@ -9,6 +9,7 @@ export const NOFUZZERCMD = 0x0020;
 export const INTERNALCMD = 0x0040;
 export const CMD_M_PREFIX = 0x0080;
 export const CMD_gGF_PREFIX = 0x0100;
+export const CMD_MOVE_PREFIXES = 384;
 export const PREFIXCMD = 0x0200;
 export const MOVEMENTCMD = 0x0400;
 export const MOUSECMD = 0x0800;

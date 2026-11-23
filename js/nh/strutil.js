@@ -4,7 +4,7 @@ import * as $T from './types.js';
 import { $G } from './globals.js';
 import { alloc } from './alloc.js';
 import { panic } from './end.js';
-import { LARGEST_INT } from './global.h.js';
+import { FALSE, LARGEST_INT, TRUE } from './global.h.js';
 import { lowc } from './hacklib.js';
 
 export function strbuf_init(strbuf) {   // strutil.c:9
@@ -91,9 +91,9 @@ function pmatch_internal(patrn, strng, ci, sk) {   // strutil.c:105
         if (!p) {
             return $c.i8(s === 0 ? 1 : 0);
         } else if (p === 42) {
-            return $c.i8(!patrn.get(0) || pmatch_internal(patrn, strng.add(-1), ci, sk) ? 1 : s ? pmatch_internal(patrn.add(-1), strng, ci, sk) : 0);
+            return $c.i8(!patrn.get(0) || pmatch_internal(patrn, strng.add(-1), ci, sk) ? TRUE : s ? pmatch_internal(patrn.add(-1), strng, ci, sk) : FALSE);
         } else if ((ci ? lowc(p) !== lowc(s) : p !== s) && (p !== 63 || !s)) {
-            return 0;
+            return FALSE;
         } else {
             continue pmatch_top$;
         }
@@ -101,10 +101,10 @@ function pmatch_internal(patrn, strng, ci, sk) {   // strutil.c:105
     }
 }
 export function pmatch(patrn, strng) {   // strutil.c:145
-    return pmatch_internal(patrn, strng, 0, null);
+    return pmatch_internal(patrn, strng, FALSE, null);
 }
 export function pmatchi(patrn, strng) {   // strutil.c:152
-    return pmatch_internal(patrn, strng, 1, null);
+    return pmatch_internal(patrn, strng, TRUE, null);
 }
 
 export function $init() {

@@ -5,6 +5,7 @@ export const W_NORTH = 1;
 export const W_SOUTH = 2;
 export const W_EAST = 4;
 export const W_WEST = 8;
+export const W_ANY = 15;
 export const MAP_Y_LIM = 21;
 export const LVLINIT_NONE = 0;
 export const LVLINIT_SOLIDFILL = LVLINIT_NONE + 1;

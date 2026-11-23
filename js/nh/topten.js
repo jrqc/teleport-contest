@@ -11,7 +11,8 @@ import { canseemon } from './display.js';
 import { christen_monst, oname } from './do_name.js';
 import { deepest_lev_reached, depth, init_dungeons } from './dungeon.js';
 import { fopen_datafile, lock_file, unlock_file } from './files.js';
-import { BUFSZ, COLNO } from './global.h.js';
+import { discover, wizard } from './flag.macros.js';
+import { BUFSZ, COLNO, FALSE, TRUE } from './global.h.js';
 import { money_cnt } from './hack.js';
 import { CORPSTAT_FEMALE, CORPSTAT_MALE, KILLED_BY, KILLED_BY_AN, NO_KILLER_PREFIX, ONAME_NO_FLAGS, PANICKED, SCOREPREFIX } from './hack.h.js';
 import { copynchars, digit, eos, highc, lcase, nh_snprintf, onlyspace, ordin, strNsubst, strsubst } from './hacklib.js';
@@ -28,8 +29,8 @@ import { free_dungeons } from './save.js';
 import { Strlen_ } from './strutil.js';
 import { sysopt } from './sys.js';
 import { hidden_gold } from './vault.js';
-import { windowprocs } from './windows.js';
-import { ATR_BOLD, ATR_NONE, NHW_TEXT } from './wintype.h.js';
+import { create_nhwindow, destroy_nhwindow, display_nhwindow, putstr, raw_print, raw_print_bold } from './winprocs.macros.js';
+import { ATR_BOLD, ATR_NONE, NHW_TEXT, WIN_ERR } from './wintype.h.js';
 import { ACH_AMUL, ACH_ASTR, ACH_BELL, ACH_BGRM, ACH_BOOK, ACH_CNDL, ACH_ENDG, ACH_HELL, ACH_INVK, ACH_MEDU, ACH_MINE, ACH_MINE_PRIZE, ACH_NOVL, ACH_ORCL, ACH_RNK1, ACH_RNK2, ACH_RNK3, ACH_RNK4, ACH_RNK5, ACH_RNK6, ACH_RNK7, ACH_RNK8, ACH_SHOP, ACH_SOKO, ACH_SOKO_PRIZE, ACH_TMPL, ACH_TOWN, ACH_TUNE, ACH_UWIN, A_ORIGINAL } from './you.h.js';
 
 const NAMSZ = 10;
@@ -87,17 +88,17 @@ export async function formatkiller(buf, siz, how, incl_helpless) {   // topten.c
     }
 }
 async function topten_print(x) {   // topten.c:165
-    if (gt.toptenwin === -1) {
-        await windowprocs.win_raw_print(x);
+    if (gt.toptenwin === WIN_ERR) {
+        await raw_print()(x);
     } else {
-        await windowprocs.win_putstr(gt.toptenwin, ATR_NONE, x);
+        await putstr()(gt.toptenwin, ATR_NONE, x);
     }
 }
 async function topten_print_bold(x) {   // topten.c:174
-    if (gt.toptenwin === -1) {
-        await windowprocs.win_raw_print_bold(x);
+    if (gt.toptenwin === WIN_ERR) {
+        await raw_print_bold()(x);
     } else {
-        await windowprocs.win_putstr(gt.toptenwin, ATR_BOLD, x);
+        await putstr()(gt.toptenwin, ATR_BOLD, x);
     }
 }
 export function observable_depth(lev) {   // topten.c:183
@@ -173,18 +174,18 @@ async function writexlentry(rfile, tt, how) {   // topten.c:340
     $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit("%cdeaths=%d%cdeathdate=%ld%cbirthdate=%ld%cuid=%d"), 9, tt.deaths, 9, tt.deathdate, 9, tt.birthdate, 9, tt.uid);
     $c.fprintf(rfile, $c.lit("%s"), new $c.Ptr(buf, 0));
     $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%crole=%s%crace=%s%cgender=%s%calign=%s"), 9, new $c.Ptr(tt.plrole, 0), 9, new $c.Ptr(tt.plrace, 0), 9, new $c.Ptr(tt.plgend, 0), 9, new $c.Ptr(tt.plalign, 0));
-    await formatkiller(new $c.Ptr(tmpbuf, 0), 101, how, 0);
+    await formatkiller(new $c.Ptr(tmpbuf, 0), 101, how, FALSE);
     $c.fprintf(rfile, $c.lit("%s%cname=%s%cdeath=%s"), new $c.Ptr(buf, 0), 9, new $c.Ptr(svp.plname, 0), 9, new $c.Ptr(tmpbuf, 0));
     if (gm.multi < 0) {
         $c.fprintf(rfile, $c.lit("%cwhile=%s"), 9, gm.multi_reason ? gm.multi_reason : $c.lit("helpless"));
     }
-    $c.fprintf(rfile, $c.lit("%cconduct=0x%lx%cturns=%ld%cachieve=0x%lx"), 9, await encodeconduct(), 9, svm.moves, 9, encodeachieve(0));
+    $c.fprintf(rfile, $c.lit("%cconduct=0x%lx%cturns=%ld%cachieve=0x%lx"), 9, await encodeconduct(), 9, svm.moves, 9, encodeachieve(FALSE));
     $c.fprintf(rfile, $c.lit("%cachieveX=%s"), 9, encode_extended_achievements(new $c.Ptr(achbuf, 0)));
     $c.fprintf(rfile, $c.lit("%cconductX=%s"), 9, await encode_extended_conducts(new $c.Ptr(buf, 0)));
     $c.fprintf(rfile, $c.lit("%crealtime=%ld%cstarttime=%ld%cendtime=%ld"), 9, urealtime.realtime, 9, timet_to_seconds($G.ubirthday), 9, timet_to_seconds(urealtime.finish_time));
     $c.fprintf(rfile, $c.lit("%cgender0=%s%calign0=%s"), 9, genders[flags.initgend].filecode, 9, aligns[1 - u.ualignbase[A_ORIGINAL] | 0].filecode);
     $c.fprintf(rfile, $c.lit("%cflags=0x%lx"), 9, encodexlogflags());
-    $c.fprintf(rfile, $c.lit("%cgold=%ld"), 9, $c.add64(money_cnt(gi.invent), hidden_gold(1)));
+    $c.fprintf(rfile, $c.lit("%cgold=%ld"), 9, $c.add64(money_cnt(gi.invent), hidden_gold(TRUE)));
     $c.fprintf(rfile, $c.lit("%cwish_cnt=%ld"), 9, u.uconduct.wishes);
     $c.fprintf(rfile, $c.lit("%carti_wish_cnt=%ld"), 9, u.uconduct.wisharti);
     $c.fprintf(rfile, $c.lit("%cbones=%ld"), 9, u.uroleplay.numbones);
@@ -194,10 +195,10 @@ async function writexlentry(rfile, tt, how) {   // topten.c:340
 function encodexlogflags() {   // topten.c:394
     let e = 0;
     e = 0;
-    if (flags.debug) {
+    if (wizard()) {
         e = $c.or64(e, 1);
     }
-    if (flags.explore) {
+    if (discover()) {
         e = $c.or64(e, 2);
     }
     if (!u.uroleplay.numbones) {
@@ -361,7 +362,7 @@ function encode_extended_achievements(buf) {   // topten.c:491
             default:
                 continue L1;
         }
-        add_achieveX(buf, achievement, 1);
+        add_achieveX(buf, achievement, TRUE);
     }
     return buf;
 }
@@ -395,10 +396,10 @@ function free_ttlist(tt) {   // topten.c:615
     let ttnext = null;
     while (tt.points > 0) {
         ttnext = tt.tt_next;
-        $c.free(tt);
+        dealloc_ttentry(tt);
         tt = ttnext;
     }
-    $c.free(tt);
+    dealloc_ttentry(tt);
 }
 export async function topten(how, when) {   // topten.c:628
     let t0 = null, tprev = null, t1 = null, rfile = null, lfile = null, xlfile = null, uid = 0, rank = 0, rank0 = 0, rank1 = 0, occ_cnt = 0, flg = 0, t0_used = 0, skip_scores = 0, pbuf = new Int8Array(256), pbuf$2 = new Int8Array(256), pbuf$3 = new Int8Array(256), $goto = null, $t1, $t2, $t3, $t4, $t5, $t6, $t7;
@@ -414,10 +415,10 @@ export async function topten(how, when) {   // topten.c:628
                 return;
             }
             if (iflags.toptenwin) {
-                $t1 = await windowprocs.win_create_nhwindow(NHW_TEXT), gt.toptenwin = $t1;
+                $t1 = await create_nhwindow()(NHW_TEXT), gt.toptenwin = $t1;
             }
-            t0_used = 0;
-            t0 = $c.asRec(await alloc(208), $T.toptenentry, 208);
+            t0_used = FALSE;
+            t0 = await newttentry();
             t0.$copyFrom(zerott);
             t0.ver_major = VERSION_MAJOR;
             t0.ver_minor = VERSION_MINOR;
@@ -425,7 +426,7 @@ export async function topten(how, when) {   // topten.c:628
             t0.points = u.urexp;
             t0.deathdnum = u.uz.dnum;
             $t2 = observable_depth(u.uz), t0.deathlev = $t2;
-            $t3 = deepest_lev_reached(1), t0.maxlvl = $t3;
+            $t3 = deepest_lev_reached(TRUE), t0.maxlvl = $t3;
             t0.hp = u.uhp;
             t0.maxhp = u.uhpmax;
             t0.deaths = u.umortality;
@@ -435,14 +436,14 @@ export async function topten(how, when) {   // topten.c:628
             copynchars(new $c.Ptr(t0.plgend, 0), genders[flags.female].filecode, ROLESZ);
             copynchars(new $c.Ptr(t0.plalign, 0), aligns[1 - u.ualign.type | 0].filecode, ROLESZ);
             copynchars(new $c.Ptr(t0.name, 0), new $c.Ptr(svp.plname, 0), NAMSZ);
-            await formatkiller(new $c.Ptr(t0.death, 0), 101, how, 1);
+            await formatkiller(new $c.Ptr(t0.death, 0), 101, how, TRUE);
             $t4 = yyyymmdd($G.ubirthday), t0.birthdate = $t4;
             $t5 = yyyymmdd(when), t0.deathdate = $t5;
             t0.tt_next = null;
             if (await lock_file($c.lit("logfile"), SCOREPREFIX, 10)) {
                 if (!(lfile = fopen_datafile($c.lit("logfile"), $c.lit("a"), SCOREPREFIX))) {
                     if (!program_state.done_hup) {
-                        await windowprocs.win_raw_print($c.lit("Cannot open log file!"));
+                        await raw_print()($c.lit("Cannot open log file!"));
                     }
                 } else {
                     writeentry(lfile, t0);
@@ -453,7 +454,7 @@ export async function topten(how, when) {   // topten.c:628
             if (await lock_file($c.lit("xlogfile"), SCOREPREFIX, 10)) {
                 if (!(xlfile = fopen_datafile($c.lit("xlogfile"), $c.lit("a"), SCOREPREFIX))) {
                     if (!program_state.done_hup) {
-                        await windowprocs.win_raw_print($c.lit("Cannot open extended log file!"));
+                        await raw_print()($c.lit("Cannot open extended log file!"));
                     }
                 } else {
                     await writexlentry(xlfile, t0, how);
@@ -461,7 +462,7 @@ export async function topten(how, when) {   // topten.c:628
                 }
                 await unlock_file($c.lit("xlogfile"));
             }
-            if (flags.debug || flags.explore) {
+            if (wizard() || discover()) {
                 if (how !== PANICKED) {
                     if (!program_state.done_hup) {
                         await topten_print($c.lit(""));
@@ -477,7 +478,7 @@ export async function topten(how, when) {   // topten.c:628
             rfile = fopen_datafile($c.lit("record"), $c.lit("r"), SCOREPREFIX);
             if (!rfile) {
                 if (!program_state.done_hup) {
-                    await windowprocs.win_raw_print($c.lit("Cannot open record file!"));
+                    await raw_print()($c.lit("Cannot open record file!"));
                 }
                 await unlock_file($c.lit("record"));
                 $goto = "destroywin"; continue D1;
@@ -488,7 +489,7 @@ export async function topten(how, when) {   // topten.c:628
             if (t0.points < sysopt.pointsmin) {
                 t0.points = 0;
             }
-            t1 = tt_head = $c.asRec(await alloc(208), $T.toptenentry, 208);
+            t1 = tt_head = await newttentry();
             tprev = null;
             for (rank = 1; ; ) {
                 await readentry(rfile, t1);
@@ -503,7 +504,7 @@ export async function topten(how, when) {   // topten.c:628
                         tprev.tt_next = t0;
                     }
                     t0.tt_next = t1;
-                    t0_used = 1;
+                    t0_used = TRUE;
                     occ_cnt = occ_cnt - 1 | 0;
                     flg = flg + 1 | 0;
                 } else {
@@ -528,7 +529,7 @@ export async function topten(how, when) {   // topten.c:628
                     }
                 }
                 if (rank <= sysopt.entrymax) {
-                    $t7 = $c.asRec(await alloc(208), $T.toptenentry, 208), t1.tt_next = $t7;
+                    $t7 = await newttentry(), t1.tt_next = $t7;
                     t1 = t1.tt_next;
                     rank = rank + 1 | 0;
                 }
@@ -541,7 +542,7 @@ export async function topten(how, when) {   // topten.c:628
                 $c.fclose(rfile);
                 if (!(rfile = fopen_datafile($c.lit("record"), $c.lit("w"), SCOREPREFIX))) {
                     if (!program_state.done_hup) {
-                        await windowprocs.win_raw_print($c.lit("Cannot write record file"));
+                        await raw_print()($c.lit("Cannot write record file"));
                     }
                     await unlock_file($c.lit("record"));
                     free_ttlist(tt_head);
@@ -581,18 +582,18 @@ export async function topten(how, when) {   // topten.c:628
                         await topten_print($c.lit(""));
                     }
                     if (rank !== rank0) {
-                        await outentry(rank, t1, 0);
+                        await outentry(rank, t1, FALSE);
                     } else if (!rank1) {
-                        await outentry(rank, t1, 1);
+                        await outentry(rank, t1, TRUE);
                     } else {
-                        await outentry(rank, t1, 1);
-                        await outentry(0, t0, 1);
+                        await outentry(rank, t1, TRUE);
+                        await outentry(0, t0, TRUE);
                     }
                 }
             }
             if (rank0 >= rank) {
                 if (!skip_scores && !program_state.stopprint) {
-                    await outentry(0, t0, 1);
+                    await outentry(0, t0, TRUE);
                 }
             }
             $c.fclose(rfile);
@@ -602,18 +603,18 @@ export async function topten(how, when) {   // topten.c:628
             $goto = null;   // showwin:
             if (!program_state.stopprint) {
                 if (iflags.toptenwin) {
-                    await windowprocs.win_display_nhwindow(gt.toptenwin, 1);
+                    await display_nhwindow()(gt.toptenwin, TRUE);
                 } else {
                 }
             }
         case "destroywin":
             $goto = null;   // destroywin:
             if (!t0_used) {
-                $c.free(t0);
+                dealloc_ttentry(t0);
             }
             if (iflags.toptenwin) {
-                await windowprocs.win_destroy_nhwindow(gt.toptenwin);
-                gt.toptenwin = -1;
+                await destroy_nhwindow()(gt.toptenwin);
+                gt.toptenwin = WIN_ERR;
             }
         }
         break;
@@ -631,7 +632,7 @@ async function outheader() {   // topten.c:929
 }
 async function outentry(rank, t1, so) {   // topten.c:946
     let second_line = 0, linebuf = new Int8Array(256), bp = null, hpbuf = new Int8Array(24), linebuf3 = new Int8Array(256), hppos = 0, lngr = 0, arg = null, fmt = null, $t1, $t2, $t3;
-    second_line = 1;
+    second_line = TRUE;
     linebuf[0] = 0;
     if (rank) {
         $c.__builtin___sprintf_chk(eos(new $c.Ptr(linebuf, 0)), 0, -1, $c.lit("%3d"), rank);
@@ -654,17 +655,17 @@ async function outentry(rank, t1, so) {   // topten.c:946
         if ((bp = $c.strchr(new $c.Ptr(linebuf, 0), 41)) !== null) {
             bp.set(0, $c.i8(t1.deathdnum === svd.dungeon_topology.d_astral_level.dnum ? 0 : 32));
         }
-        second_line = 0;
+        second_line = FALSE;
     } else if (!$c.strncmp($c.lit("ascended"), new $c.Ptr(t1.death, 0), 8)) {
         $c.__builtin___sprintf_chk(eos(new $c.Ptr(linebuf, 0)), 0, -1, $c.lit("ascended to demigod%s-hood"), t1.plgend[0] === 70 ? $c.lit("dess") : $c.lit(""));
-        second_line = 0;
+        second_line = FALSE;
     } else {
         if (!$c.strncmp(new $c.Ptr(t1.death, 0), $c.lit("quit"), 4)) {
             $c.__builtin___strcat_chk(new $c.Ptr(linebuf, 0), $c.lit("quit"), 256);
-            second_line = 0;
+            second_line = FALSE;
         } else if (!$c.strncmp(new $c.Ptr(t1.death, 0), $c.lit("died of st"), 10)) {
             $c.__builtin___strcat_chk(new $c.Ptr(linebuf, 0), $c.lit("starved to death"), 256);
-            second_line = 0;
+            second_line = FALSE;
         } else if (!$c.strncmp(new $c.Ptr(t1.death, 0), $c.lit("choked"), 6)) {
             $c.__builtin___sprintf_chk(eos(new $c.Ptr(linebuf, 0)), 0, -1, $c.lit("choked on h%s food"), t1.plgend[0] === 70 ? $c.lit("er") : $c.lit("is"));
         } else if (!$c.strncmp(new $c.Ptr(t1.death, 0), $c.lit("poisoned"), 8)) {
@@ -801,9 +802,9 @@ async function score_wanted(current_ver, rank, t1, playerct, players, uid) {   /
 export async function prscore(argc, argv) {   // topten.c:1194
     let players = null, player0 = [null], i = 0, playerct = 0, rank = 0, t1 = null, rfile = null, pbuf = new Int8Array(256), p = null, ln = 0, uid = 0, current_ver = 0, init_done = 0, match_found = 0, $t1;
     uid = -1;
-    current_ver = 1;
-    init_done = 0;
-    match_found = 0;
+    current_ver = TRUE;
+    init_done = FALSE;
+    match_found = FALSE;
     ln = argc < 2 ? 0 : (p = $c.strchr(argv.get(1), 32)) !== null ? $c.u32($c.pdiff(p, argv.get(1))) : await Strlen_(argv.get(1), $c.lit("prscore"), 1208);
     if (ln < 2 || $c.strncmp(argv.get(1), $c.lit("-s"), 2) && $c.strcmp(argv.get(1), $c.lit("--scores"))) {
         await raw_printf($c.lit("prscore: bad arguments (%d)"), argc);
@@ -811,12 +812,12 @@ export async function prscore(argc, argv) {   // topten.c:1194
     }
     rfile = fopen_datafile($c.lit("record"), $c.lit("r"), SCOREPREFIX);
     if (!rfile) {
-        await windowprocs.win_raw_print($c.lit("Cannot open record file!"));
+        await raw_print()($c.lit("Cannot open record file!"));
         return;
     }
     if (svd.dungeon_topology.d_wiz1_level.dlevel === 0) {
         await init_dungeons();
-        init_done = 1;
+        init_done = TRUE;
     }
     if (argv.get(1).get(1) === 45 || !argv.get(1).get(2)) {
         argc = argc - 1 | 0;
@@ -825,7 +826,7 @@ export async function prscore(argc, argv) {   // topten.c:1194
         argv.set(1, argv.get(1).add(2));
     }
     if (argc > 1 && !$c.strcmp(argv.get(1), $c.lit("-v"))) {
-        current_ver = 0;
+        current_ver = FALSE;
         argc = argc - 1 | 0;
         argv = argv.add(1);
     }
@@ -846,17 +847,17 @@ export async function prscore(argc, argv) {   // topten.c:1194
         playerct = argc = argc - 1 | 0;
         players = argv = argv.add(1);
     }
-    await windowprocs.win_raw_print($c.lit(""));
-    t1 = tt_head = $c.asRec(await alloc(208), $T.toptenentry, 208);
+    await raw_print()($c.lit(""));
+    t1 = tt_head = await newttentry();
     for (rank = 1; ; rank = rank + 1 | 0) {
         await readentry(rfile, t1);
         if (t1.points === 0) {
             break;
         }
         if (!match_found && await score_wanted(current_ver, rank, t1, playerct, players, uid)) {
-            match_found = 1;
+            match_found = TRUE;
         }
-        $t1 = $c.asRec(await alloc(208), $T.toptenentry, 208), t1.tt_next = $t1;
+        $t1 = await newttentry(), t1.tt_next = $t1;
         t1 = t1.tt_next;
     }
     $c.fclose(rfile);
@@ -868,7 +869,7 @@ export async function prscore(argc, argv) {   // topten.c:1194
         t1 = tt_head;
         for (rank = 1; t1.points !== 0; rank = rank + 1 | 0, t1 = t1.tt_next) {
             if (await score_wanted(current_ver, rank, t1, playerct, players, uid)) {
-                await outentry(rank, t1, 0);
+                await outentry(rank, t1, FALSE);
             }
         }
     } else {
@@ -907,7 +908,7 @@ export async function prscore(argc, argv) {   // topten.c:1194
         if ($c.strlen(new $c.Ptr(pbuf, 0)) < BUFSZ - 1) {
             $c.__builtin___strcat_chk(new $c.Ptr(pbuf, 0), $c.lit("."), 256);
         }
-        await windowprocs.win_raw_print(new $c.Ptr(pbuf, 0));
+        await raw_print()(new $c.Ptr(pbuf, 0));
         await raw_printf($c.lit("Usage: %s -s [-v] <playertypes> [maxrank] [playernames]"), gh.hname);
         await raw_printf($c.lit("Player types are: [-p role] [-r race]"));
     }
@@ -994,6 +995,12 @@ export async function tt_doppel(mon) {   // topten.c:1445
         }
     }
     return ret;
+}
+async function newttentry() {
+    return $c.asRec(await alloc(208), $T.toptenentry, 208);
+}
+function dealloc_ttentry(ttent) {
+    $c.free(ttent);
 }
 
 export function $init() {

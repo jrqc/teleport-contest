@@ -6,31 +6,33 @@ import { alloc } from './alloc.js';
 import { cmd_from_func, cmdq_add_key, cmdq_clear, cmdq_pop, directionname, do_move_east, do_move_north, do_move_south, do_move_west, do_run, do_run_east, do_run_north, do_run_south, do_run_west, do_rush, isok, lock_mouse_buttons, movecmd, readchar_poskey, redraw_cmd, xytodir } from './cmd.js';
 import { CLR_BRIGHT_BLUE, NO_COLOR } from './color.h.js';
 import { TIP_GETPOS } from './context.h.js';
-import { cg, flags, gc, gg, gi, gs, gv, gw, iflags, quitchars, svl, u } from './decl.js';
-import { S_air, S_arrow_trap, S_bars, S_cloud, S_corr, S_darkroom, S_digbeam, S_engrcorr, S_engroom, S_fountain, S_goodpos, S_hcdbridge, S_hcdoor, S_ice, S_lava, S_lavawall, S_litcorr, S_ndoor, S_pool, S_room, S_stone, S_tree, S_trwall, S_upstair, S_vodbridge, S_vodoor, S_water } from './defsym.h.js';
+import { cg, flags, gc, gg, gi, gs, gw, iflags, quitchars, svl, u } from './decl.js';
+import { S_air, S_bars, S_cloud, S_engroom, S_ice, S_ndoor, S_tree } from './defsym.h.js';
 import { back_to_glyph, docrt_flags, flush_screen, glyph_at, nul_glyphinfo } from './display.js';
-import { GLYPH_BODY_OFF, GLYPH_BODY_PILETOP_OFF, GLYPH_CMAP_C_OFF, GLYPH_CMAP_STONE_OFF, GLYPH_DETECT_FEM_OFF, GLYPH_DETECT_MALE_OFF, GLYPH_MON_FEM_OFF, GLYPH_MON_MALE_OFF, GLYPH_NOTHING_OFF, GLYPH_OBJ_OFF, GLYPH_OBJ_PILETOP_OFF, GLYPH_PET_FEM_OFF, GLYPH_PET_MALE_OFF, GLYPH_RIDDEN_FEM_OFF, GLYPH_RIDDEN_MALE_OFF, GLYPH_STATUE_FEM_OFF, GLYPH_STATUE_FEM_PILETOP_OFF, GLYPH_STATUE_MALE_OFF, GLYPH_STATUE_MALE_PILETOP_OFF, GLYPH_UNEXPLORED_OFF, docrtRefresh } from './display.h.js';
+import { GLYPH_NOTHING, GLYPH_OBJ_OFF, GLYPH_UNEXPLORED, docrtRefresh } from './display.h.js';
+import { glyph_is_cmap, glyph_is_monster, glyph_is_nothing, glyph_is_object, glyph_is_unexplored } from './display.macros.js';
 import { defsyms } from './drawing.js';
 import { GFILTER_AREA, GFILTER_VIEW, GLOC_DOOR, GLOC_EXPLORE, GLOC_INTERESTING, GLOC_MONS, GLOC_OBJS, GLOC_VALID, NUM_GFILTER, NUM_GLOCS, TER_DETECT, TER_MAP, TER_MON, TER_OBJ } from './flag.h.js';
-import { COLNO, ROWNO } from './global.h.js';
+import { COLNO, FALSE, ROWNO, TRUE } from './global.h.js';
 import { glyph_to_cmap } from './glyphs.js';
 import { handle_tip, invocation_pos, is_valid_travelpt } from './hack.js';
 import { CMDQ_DIR, CMDQ_KEY, CQ_CANNED, CQ_REPEAT, LOOK_ONCE, LOOK_QUICK, LOOK_TRADITIONAL, LOOK_VERBOSE, MV_RUN, MV_RUSH, MV_WALK, NHKF_ESC, NHKF_GETPOS_AUTODESC, NHKF_GETPOS_DOOR_NEXT, NHKF_GETPOS_DOOR_PREV, NHKF_GETPOS_HELP, NHKF_GETPOS_INTERESTING_NEXT, NHKF_GETPOS_INTERESTING_PREV, NHKF_GETPOS_LIMITVIEW, NHKF_GETPOS_MENU, NHKF_GETPOS_MON_NEXT, NHKF_GETPOS_MON_PREV, NHKF_GETPOS_MOVESKIP, NHKF_GETPOS_OBJ_NEXT, NHKF_GETPOS_OBJ_PREV, NHKF_GETPOS_PICK, NHKF_GETPOS_PICK_O, NHKF_GETPOS_PICK_Q, NHKF_GETPOS_PICK_V, NHKF_GETPOS_SELF, NHKF_GETPOS_SHOWVALID, NHKF_GETPOS_UNEX_NEXT, NHKF_GETPOS_UNEX_PREV, NHKF_GETPOS_VALID_NEXT, NHKF_GETPOS_VALID_PREV, NO_CURS_ON_U, OVERRIDE_MSGTYPE, SUPPRESS_HISTORY } from './hack.h.js';
 import { eos, nh_snprintf, sgn, strsubst, visctrl } from './hacklib.js';
-import { NUM_OBJECTS } from './objclass.h.js';
-import { BOULDER, FIRST_OBJECT, ROCK } from './objects.h.js';
+import { BOULDER, ROCK } from './objects.h.js';
 import { an } from './objnam.js';
 import { do_screen_description, what_is_a_location } from './pager.js';
-import { NUMMONS } from './permonst.h.js';
 import { You, custompline, pline } from './pline.js';
 import { DOOR } from './rm.h.js';
 import { selection_floodfill, selection_force_newsyms, selection_free, selection_getpoint, selection_new, selection_setpoint, set_selection_floodfillchk } from './selvar.js';
 import { MAXPCHARS } from './sym.h.js';
+import { is_cmap_corr, is_cmap_door, is_cmap_drawbridge, is_cmap_engraving, is_cmap_furniture, is_cmap_lava, is_cmap_room, is_cmap_trap, is_cmap_wall, is_cmap_water } from './sym.macros.js';
 import { t_at } from './trap.js';
-import { TRAPNUM, VIBRATING_SQUARE } from './trap.h.js';
-import { IN_SIGHT } from './vision.h.js';
-import { add_menu, select_menu, windowprocs } from './windows.js';
+import { VIBRATING_SQUARE } from './trap.h.js';
+import { cansee } from './vision.macros.js';
+import { add_menu, select_menu } from './windows.js';
+import { clear_nhwindow, cliparound, create_nhwindow, curs, destroy_nhwindow, display_nhwindow, end_menu, putstr, start_menu } from './winprocs.macros.js';
 import { ATR_NONE, MENU_BEHAVE_STANDARD, MENU_ITEMFLAGS_NONE, NHW_MENU, PICK_ONE } from './wintype.h.js';
+import { u_at } from './you.macros.js';
 
 const HiliteNormalMap = 0;
 const HiliteGoodposSymbol = 1;
@@ -66,23 +68,23 @@ export async function getpos_sethilite(gp_hilitef, gp_getvalidf) {   // getpos.c
     if (getpos_getvalid !== old_getvalid || gw.wsettings.map_frame_color !== old_map_frame_color) {
         await selection_force_newsyms(sel);
     }
-    selection_free(sel, 1);
+    selection_free(sel, TRUE);
 }
 async function getpos_toggle_hilite_state() {   // getpos.c:72
     if (getpos_hilite_state === HiliteGoodposSymbol) {
-        await getpos_hilitefunc(0);
+        await getpos_hilitefunc(FALSE);
     }
     getpos_hilite_state = $c.remu32(getpos_hilite_state + 1 >>> 0, (iflags.bgcolors ? 3 : 2) >>> 0);
     await getpos_sethilite(getpos_hilitefunc, getpos_getvalid);
     if (getpos_hilite_state === HiliteGoodposSymbol) {
-        await getpos_hilitefunc(1);
+        await getpos_hilitefunc(TRUE);
     }
 }
 export async function mapxy_valid(x, y) {   // getpos.c:94
     if (getpos_getvalid) {
         return await getpos_getvalid(x, y);
     }
-    return 0;
+    return FALSE;
 }
 async function getpos_getvalids_selection(sel, validf) {   // getpos.c:102
     let x = 0, y = 0;
@@ -108,23 +110,23 @@ async function getpos_help_keyxhelp(tmpwin, k1, k2, gloc) {   // getpos.c:137
         }
     }
     $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("Use '%s'/'%s' to %s%s%s."), k1, k2, iflags.getloc_usemenu ? $c.lit("get a menu of ") : move_cursor_to, gloc_descr[gloc][2 + iflags.getloc_usemenu | 0], filtertxt);
-    await windowprocs.win_putstr(tmpwin, 0, new $c.Ptr(sbuf, 0));
+    await putstr()(tmpwin, 0, new $c.Ptr(sbuf, 0));
 }
 async function getpos_help(force, goal) {   // getpos.c:167
     let sbuf = new Int8Array(256), doing_what_is = 0, tmpwin = 0, kbuf = new Int8Array(256), $goto = null;
     D1: for (;;) {
         switch ($goto) {
         case null:
-            tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
+            tmpwin = await create_nhwindow()(NHW_MENU);
             $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("Use '%s', '%s', '%s', '%s' to move the cursor to %s."), visctrl(cmd_from_func(do_move_west)), visctrl(cmd_from_func(do_move_south)), visctrl(cmd_from_func(do_move_north)), visctrl(cmd_from_func(do_move_east)), goal);
-            await windowprocs.win_putstr(tmpwin, 0, new $c.Ptr(sbuf, 0));
+            await putstr()(tmpwin, 0, new $c.Ptr(sbuf, 0));
             $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("Use '%s', '%s', '%s', '%s' to fast-move the cursor, %s."), visctrl(cmd_from_func(do_run_west)), visctrl(cmd_from_func(do_run_south)), visctrl(cmd_from_func(do_run_north)), visctrl(cmd_from_func(do_run_east)), getpos_help$fastmovemode[iflags.getloc_moveskip]);
-            await windowprocs.win_putstr(tmpwin, 0, new $c.Ptr(sbuf, 0));
+            await putstr()(tmpwin, 0, new $c.Ptr(sbuf, 0));
             $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("(or prefix normal move with '%s' or '%s' to fast-move)"), visctrl(cmd_from_func(do_run)), visctrl(cmd_from_func(do_rush)));
-            await windowprocs.win_putstr(tmpwin, 0, new $c.Ptr(sbuf, 0));
-            await windowprocs.win_putstr(tmpwin, 0, $c.lit("Or enter a background symbol (ex. '<')."));
+            await putstr()(tmpwin, 0, new $c.Ptr(sbuf, 0));
+            await putstr()(tmpwin, 0, $c.lit("Or enter a background symbol (ex. '<')."));
             $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("Use '%s' to move the cursor on yourself."), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_SELF]));
-            await windowprocs.win_putstr(tmpwin, 0, new $c.Ptr(sbuf, 0));
+            await putstr()(tmpwin, 0, new $c.Ptr(sbuf, 0));
             if (!iflags.terrainmode || (iflags.terrainmode & TER_MON) >>> 0 !== 0) {
                 await getpos_help_keyxhelp(tmpwin, visctrl(gc.Cmd.spkeys[NHKF_GETPOS_MON_NEXT]), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_MON_PREV]), GLOC_MONS);
             }
@@ -140,12 +142,12 @@ async function getpos_help(force, goal) {   // getpos.c:167
                 await getpos_help_keyxhelp(tmpwin, visctrl(gc.Cmd.spkeys[NHKF_GETPOS_INTERESTING_NEXT]), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_INTERESTING_PREV]), GLOC_INTERESTING);
             }
             $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("Use '%s' to change fast-move mode to %s."), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_MOVESKIP]), getpos_help$fastmovemode[!iflags.getloc_moveskip ? 1 : 0]);
-            await windowprocs.win_putstr(tmpwin, 0, new $c.Ptr(sbuf, 0));
+            await putstr()(tmpwin, 0, new $c.Ptr(sbuf, 0));
             if (!iflags.terrainmode || (iflags.terrainmode & TER_DETECT) >>> 0 === 0) {
                 $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("Use '%s' to toggle menu listing for possible targets."), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_MENU]));
-                await windowprocs.win_putstr(tmpwin, 0, new $c.Ptr(sbuf, 0));
+                await putstr()(tmpwin, 0, new $c.Ptr(sbuf, 0));
                 $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("Use '%s' to change the mode of limiting possible targets."), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_LIMITVIEW]));
-                await windowprocs.win_putstr(tmpwin, 0, new $c.Ptr(sbuf, 0));
+                await putstr()(tmpwin, 0, new $c.Ptr(sbuf, 0));
             }
         case "skip_non_mons":
             if ($goto === "skip_non_mons" || !iflags.terrainmode) {
@@ -154,14 +156,14 @@ async function getpos_help(force, goal) {   // getpos.c:167
                     case null:
                         if (getpos_getvalid) {
                             $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("Use '%s' or '%s' to move to valid locations."), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_VALID_NEXT]), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_VALID_PREV]));
-                            await windowprocs.win_putstr(tmpwin, 0, new $c.Ptr(sbuf, 0));
+                            await putstr()(tmpwin, 0, new $c.Ptr(sbuf, 0));
                         }
                         if (getpos_hilitefunc) {
                             $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("Use '%s' to toggle marking of valid locations."), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_SHOWVALID]));
-                            await windowprocs.win_putstr(tmpwin, 0, new $c.Ptr(sbuf, 0));
+                            await putstr()(tmpwin, 0, new $c.Ptr(sbuf, 0));
                         }
                         $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("Use '%s' to toggle automatic description."), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_AUTODESC]));
-                        await windowprocs.win_putstr(tmpwin, 0, new $c.Ptr(sbuf, 0));
+                        await putstr()(tmpwin, 0, new $c.Ptr(sbuf, 0));
                         if (iflags.cmdassist) {
                             $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, iflags.getpos_coords === 110 ? $c.lit("(Set 'whatis_coord' option to include coordinates with '%s' text.)") : $c.lit("(Reset 'whatis_coord' option to omit coordinates from '%s' text.)"), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_AUTODESC]));
                         }
@@ -174,27 +176,27 @@ async function getpos_help(force, goal) {   // getpos.c:167
                             $c.__builtin___sprintf_chk(new $c.Ptr(kbuf, 0), 0, 256, $c.lit("'%s'"), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK]));
                         }
                         nh_snprintf($c.lit("getpos_help"), 280, new $c.Ptr(sbuf, 0), 256, $c.lit("Type a %s when you are at the right place."), new $c.Ptr(kbuf, 0));
-                        await windowprocs.win_putstr(tmpwin, 0, new $c.Ptr(sbuf, 0));
+                        await putstr()(tmpwin, 0, new $c.Ptr(sbuf, 0));
                         if (doing_what_is) {
                             $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("  '%s' describe current spot, show 'more info', move to another spot."), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK_V]));
-                            await windowprocs.win_putstr(tmpwin, 0, new $c.Ptr(sbuf, 0));
+                            await putstr()(tmpwin, 0, new $c.Ptr(sbuf, 0));
                             $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("  '%s' describe current spot,%s move to another spot;"), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK]), flags.help && !force ? $c.lit(" prompt if 'more info',") : $c.lit(""));
-                            await windowprocs.win_putstr(tmpwin, 0, new $c.Ptr(sbuf, 0));
+                            await putstr()(tmpwin, 0, new $c.Ptr(sbuf, 0));
                             $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("  '%s' describe current spot, move to another spot;"), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK_Q]));
-                            await windowprocs.win_putstr(tmpwin, 0, new $c.Ptr(sbuf, 0));
+                            await putstr()(tmpwin, 0, new $c.Ptr(sbuf, 0));
                             $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("  '%s' describe current spot, stop looking at things;"), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK_O]));
-                            await windowprocs.win_putstr(tmpwin, 0, new $c.Ptr(sbuf, 0));
+                            await putstr()(tmpwin, 0, new $c.Ptr(sbuf, 0));
                         }
                     }
                     break;
                 }
             }
             if (!force) {
-                await windowprocs.win_putstr(tmpwin, 0, $c.lit("Type Space or Escape when you're done."));
+                await putstr()(tmpwin, 0, $c.lit("Type Space or Escape when you're done."));
             }
-            await windowprocs.win_putstr(tmpwin, 0, $c.lit(""));
-            await windowprocs.win_display_nhwindow(tmpwin, 1);
-            await windowprocs.win_destroy_nhwindow(tmpwin);
+            await putstr()(tmpwin, 0, $c.lit(""));
+            await display_nhwindow()(tmpwin, TRUE);
+            await destroy_nhwindow()(tmpwin);
         }
         break;
     }
@@ -216,19 +218,19 @@ function cmp_coord_distu(a, b) {   // getpos.c:312
 }
 function gloc_filter_classify_glyph(glyph) {   // getpos.c:341
     let c = 0;
-    if (!(glyph >= GLYPH_CMAP_STONE_OFF && glyph < GLYPH_CMAP_C_OFF + (S_goodpos - S_digbeam + 1))) {
+    if (!glyph_is_cmap(glyph)) {
         return 0;
     }
     c = glyph_to_cmap(glyph);
-    if (c >= S_room && c <= S_darkroom || c >= S_upstair && c <= S_fountain) {
+    if (is_cmap_room(c) || is_cmap_furniture(c)) {
         return 1;
-    } else if (c >= S_stone && c <= S_trwall || c === S_tree) {
+    } else if (is_cmap_wall(c) || c === S_tree) {
         return 2;
-    } else if (c >= S_corr && c <= S_litcorr) {
+    } else if (is_cmap_corr(c)) {
         return 3;
-    } else if (c === S_pool || c === S_water) {
+    } else if (is_cmap_water(c)) {
         return 4;
-    } else if (c === S_lava || c === S_lavawall) {
+    } else if (is_cmap_lava(c)) {
         return 5;
     }
     return 0;
@@ -237,21 +239,21 @@ async function gloc_filter_floodfill_matcharea(x, y) {   // getpos.c:364
     let glyph = 0;
     glyph = await back_to_glyph(x, y);
     if (!svl.level.locations[x][y].seenv) {
-        return 0;
+        return FALSE;
     }
     if (glyph === gg.gloc_filter_floodfill_match_glyph) {
-        return 1;
+        return TRUE;
     }
     if (gloc_filter_classify_glyph(glyph) === gloc_filter_classify_glyph(gg.gloc_filter_floodfill_match_glyph)) {
-        return 1;
+        return TRUE;
     }
-    return 0;
+    return FALSE;
 }
 async function gloc_filter_floodfill(x, y) {   // getpos.c:382
     let $t1;
     $t1 = await back_to_glyph(x, y), gg.gloc_filter_floodfill_match_glyph = $t1;
     set_selection_floodfillchk(gloc_filter_floodfill_matcharea);
-    await selection_floodfill(gg.gloc_filter_map, x, y, 0);
+    await selection_floodfill(gg.gloc_filter_map, x, y, FALSE);
 }
 async function gloc_filter_init() {   // getpos.c:391
     let $t1;
@@ -271,7 +273,7 @@ async function gloc_filter_init() {   // getpos.c:391
 }
 function gloc_filter_done() {   // getpos.c:412
     if (gg.gloc_filter_map) {
-        selection_free(gg.gloc_filter_map, 1);
+        selection_free(gg.gloc_filter_map, TRUE);
         gg.gloc_filter_map = null;
     }
 }
@@ -281,36 +283,36 @@ function known_vibrating_square_at(x, y) {   // getpos.c:422
         ttmp = t_at(x, y);
         return $c.i8(ttmp && (ttmp.ttyp | 0) === VIBRATING_SQUARE && ttmp.tseen | 0 ? 1 : 0);
     }
-    return 0;
+    return FALSE;
 }
 export async function gather_locs_interesting(x, y, gloc) {   // getpos.c:438
     let glyph = 0, sym = 0;
-    if (iflags.getloc_filter === GFILTER_VIEW && !((gv.viz_array.get(y).get(x) & IN_SIGHT) !== 0)) {
-        return 0;
+    if (iflags.getloc_filter === GFILTER_VIEW && !cansee(x, y)) {
+        return FALSE;
     }
-    if (iflags.getloc_filter === GFILTER_AREA && !(isok(x, y) && selection_getpoint(x, y, gg.gloc_filter_map)) && !(isok($c.i16(x - 1 | 0), y) && selection_getpoint($c.i16(x - 1 | 0), y, gg.gloc_filter_map)) && !(isok(x, $c.i16(y - 1 | 0)) && selection_getpoint(x, $c.i16(y - 1 | 0), gg.gloc_filter_map)) && !(isok($c.i16(x + 1 | 0), y) && selection_getpoint($c.i16(x + 1 | 0), y, gg.gloc_filter_map)) && !(isok(x, $c.i16(y + 1 | 0)) && selection_getpoint(x, $c.i16(y + 1 | 0), gg.gloc_filter_map))) {
-        return 0;
+    if (iflags.getloc_filter === GFILTER_AREA && !GLOC_SAME_AREA(x, y) && !(isok($c.i16(x - 1 | 0), y) && selection_getpoint($c.i16(x - 1 | 0), y, gg.gloc_filter_map)) && !(isok(x, $c.i16(y - 1 | 0)) && selection_getpoint(x, $c.i16(y - 1 | 0), gg.gloc_filter_map)) && !(isok($c.i16(x + 1 | 0), y) && selection_getpoint($c.i16(x + 1 | 0), y, gg.gloc_filter_map)) && !(isok(x, $c.i16(y + 1 | 0)) && selection_getpoint(x, $c.i16(y + 1 | 0), gg.gloc_filter_map))) {
+        return FALSE;
     }
     glyph = glyph_at(x, y);
-    sym = glyph >= GLYPH_CMAP_STONE_OFF && glyph < GLYPH_CMAP_C_OFF + (S_goodpos - S_digbeam + 1) ? glyph_to_cmap(glyph) : -1;
+    sym = glyph_is_cmap(glyph) ? glyph_to_cmap(glyph) : -1;
     switch (gloc) {
         default:
         case GLOC_MONS:
-            return $c.i8((glyph >= GLYPH_MON_MALE_OFF && glyph < GLYPH_MON_MALE_OFF + NUMMONS || glyph >= GLYPH_MON_FEM_OFF && glyph < GLYPH_MON_FEM_OFF + NUMMONS || (glyph >= GLYPH_PET_MALE_OFF && glyph < GLYPH_PET_MALE_OFF + NUMMONS || glyph >= GLYPH_PET_FEM_OFF && glyph < GLYPH_PET_FEM_OFF + NUMMONS) || (glyph >= GLYPH_RIDDEN_MALE_OFF && glyph < GLYPH_RIDDEN_MALE_OFF + NUMMONS || glyph >= GLYPH_RIDDEN_FEM_OFF && glyph < GLYPH_RIDDEN_FEM_OFF + NUMMONS) || (glyph >= GLYPH_DETECT_MALE_OFF && glyph < GLYPH_DETECT_MALE_OFF + NUMMONS || glyph >= GLYPH_DETECT_FEM_OFF && glyph < GLYPH_DETECT_FEM_OFF + NUMMONS)) && glyph !== 330 && glyph !== 713 ? 1 : 0);
+            return $c.i8(glyph_is_monster(glyph) && glyph !== 330 && glyph !== 713 ? 1 : 0);
         case GLOC_OBJS:
-            return $c.i8((glyph === GLYPH_OBJ_OFF || glyph >= GLYPH_OBJ_OFF + FIRST_OBJECT - 1 && glyph < GLYPH_OBJ_OFF + NUM_OBJECTS || (glyph === GLYPH_OBJ_PILETOP_OFF || glyph > GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT - 1 && glyph < GLYPH_OBJ_PILETOP_OFF + NUM_OBJECTS) || (glyph > GLYPH_OBJ_OFF && glyph < GLYPH_OBJ_OFF + FIRST_OBJECT - 1 || glyph > GLYPH_OBJ_PILETOP_OFF && glyph < GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT - 1) || (glyph >= GLYPH_STATUE_MALE_OFF && glyph < GLYPH_STATUE_MALE_OFF + NUMMONS || glyph >= GLYPH_STATUE_MALE_PILETOP_OFF && glyph < GLYPH_STATUE_MALE_PILETOP_OFF + NUMMONS || (glyph >= GLYPH_STATUE_FEM_OFF && glyph < GLYPH_STATUE_FEM_OFF + NUMMONS || glyph >= GLYPH_STATUE_FEM_PILETOP_OFF && glyph < GLYPH_STATUE_FEM_PILETOP_OFF + NUMMONS)) || (glyph >= GLYPH_BODY_OFF && glyph < GLYPH_BODY_OFF + NUMMONS || glyph >= GLYPH_BODY_PILETOP_OFF && glyph < GLYPH_BODY_PILETOP_OFF + NUMMONS)) && glyph !== BOULDER + GLYPH_OBJ_OFF && glyph !== ROCK + GLYPH_OBJ_OFF ? 1 : 0);
+            return $c.i8(glyph_is_object(glyph) && glyph !== BOULDER + GLYPH_OBJ_OFF && glyph !== ROCK + GLYPH_OBJ_OFF ? 1 : 0);
         case GLOC_DOOR:
-            return $c.i8(glyph >= GLYPH_CMAP_STONE_OFF && glyph < GLYPH_CMAP_C_OFF + (S_goodpos - S_digbeam + 1) && (sym >= S_vodoor && sym <= S_hcdoor || sym >= S_vodbridge && sym <= S_hcdbridge || sym === S_ndoor) ? 1 : 0);
+            return $c.i8(glyph_is_cmap(glyph) && (is_cmap_door(sym) || is_cmap_drawbridge(sym) || sym === S_ndoor) ? 1 : 0);
         case GLOC_EXPLORE:
-            return $c.i8(glyph >= GLYPH_CMAP_STONE_OFF && glyph < GLYPH_CMAP_C_OFF + (S_goodpos - S_digbeam + 1) && !(glyph_to_cmap(glyph) === GLYPH_NOTHING_OFF) && (sym >= S_vodoor && sym <= S_hcdoor || sym >= S_vodbridge && sym <= S_hcdbridge || sym === S_ndoor || sym >= S_room && sym <= S_darkroom || sym >= S_corr && sym <= S_litcorr) && (isok($c.i16(x + 1 | 0), y) && svl.level.locations[x + 1 | 0][y].glyph === GLYPH_UNEXPLORED_OFF && !svl.level.locations[x + 1 | 0][y].seenv || isok($c.i16(x - 1 | 0), y) && svl.level.locations[x - 1 | 0][y].glyph === GLYPH_UNEXPLORED_OFF && !svl.level.locations[x - 1 | 0][y].seenv || isok(x, $c.i16(y + 1 | 0)) && svl.level.locations[x][y + 1 | 0].glyph === GLYPH_UNEXPLORED_OFF && !svl.level.locations[x][y + 1 | 0].seenv || isok(x, $c.i16(y - 1 | 0)) && svl.level.locations[x][y - 1 | 0].glyph === GLYPH_UNEXPLORED_OFF && !svl.level.locations[x][y - 1 | 0].seenv) ? 1 : 0);
+            return $c.i8(glyph_is_cmap(glyph) && !(glyph_to_cmap(glyph) === GLYPH_NOTHING) && (is_cmap_door(sym) || is_cmap_drawbridge(sym) || sym === S_ndoor || is_cmap_room(sym) || is_cmap_corr(sym)) && (isok($c.i16(x + 1 | 0), y) && svl.level.locations[x + 1 | 0][y].glyph === GLYPH_UNEXPLORED && !svl.level.locations[x + 1 | 0][y].seenv || isok($c.i16(x - 1 | 0), y) && svl.level.locations[x - 1 | 0][y].glyph === GLYPH_UNEXPLORED && !svl.level.locations[x - 1 | 0][y].seenv || isok(x, $c.i16(y + 1 | 0)) && svl.level.locations[x][y + 1 | 0].glyph === GLYPH_UNEXPLORED && !svl.level.locations[x][y + 1 | 0].seenv || isok(x, $c.i16(y - 1 | 0)) && svl.level.locations[x][y - 1 | 0].glyph === GLYPH_UNEXPLORED && !svl.level.locations[x][y - 1 | 0].seenv) ? 1 : 0);
         case GLOC_VALID:
             if (getpos_getvalid) {
                 return await getpos_getvalid(x, y);
             }
         case GLOC_INTERESTING:
-            return $c.i8(await gather_locs_interesting(x, y, GLOC_DOOR) || !(glyph >= GLYPH_CMAP_STONE_OFF && glyph < GLYPH_CMAP_C_OFF + (S_goodpos - S_digbeam + 1) && (sym >= S_stone && sym <= S_trwall || sym === S_tree || sym === S_bars || sym === S_ice || sym === S_air || sym === S_cloud || (sym === S_lava || sym === S_lavawall) || (sym === S_pool || sym === S_water) || sym === S_ndoor || sym >= S_room && sym <= S_darkroom || sym >= S_corr && sym <= S_litcorr) || glyph === GLYPH_NOTHING_OFF || glyph === GLYPH_UNEXPLORED_OFF) || known_vibrating_square_at(x, y) ? 1 : 0);
+            return $c.i8(await gather_locs_interesting(x, y, GLOC_DOOR) || !(glyph_is_cmap(glyph) && (is_cmap_wall(sym) || sym === S_tree || sym === S_bars || sym === S_ice || sym === S_air || sym === S_cloud || is_cmap_lava(sym) || is_cmap_water(sym) || sym === S_ndoor || is_cmap_room(sym) || is_cmap_corr(sym)) || glyph_is_nothing(glyph) || glyph_is_unexplored(glyph)) || known_vibrating_square_at(x, y) ? 1 : 0);
     }
-    return 0;
+    return FALSE;
 }
 async function gather_locs(arr_p, cnt_p, gloc) {   // getpos.c:513
     let pass = 0, idx = 0, x = 0, y = 0, $t1, $t2;
@@ -319,7 +321,7 @@ async function gather_locs(arr_p, cnt_p, gloc) {   // getpos.c:513
     for (pass = 0; pass < 2; pass = pass + 1 | 0) {
         for (x = 1; x < COLNO; x = $c.i16(x + 1)) {
             for (y = 0; y < ROWNO; y = $c.i16(y + 1)) {
-                if (x === u.ux && y === u.uy || await gather_locs_interesting(x, y, gloc)) {
+                if (u_at(x, y) || await gather_locs_interesting(x, y, gloc)) {
                     if (!pass) {
                         cnt_p.set(0, cnt_p.get(0) + 1 | 0);
                     } else {
@@ -391,10 +393,10 @@ export async function auto_describe(cx, cy) {   // getpos.c:640
     firstmatch[0] = $c.lit("unknown");
     cc.x = cx;
     cc.y = cy;
-    if (await do_screen_description(cc.$clone(), 1, sym, new $c.Ptr(tmpbuf, 0), new $c.Ptr(firstmatch, 0), null)) {
+    if (await do_screen_description(cc.$clone(), TRUE, sym, new $c.Ptr(tmpbuf, 0), new $c.Ptr(firstmatch, 0), null)) {
         coord_desc(cx, cy, new $c.Ptr(tmpbuf, 0), $c.i8(iflags.getpos_coords));
         await custompline(SUPPRESS_HISTORY | OVERRIDE_MSGTYPE | NO_CURS_ON_U, $c.lit("%s%s%s%s%s"), firstmatch[0], new $c.Ptr(tmpbuf, 0).get(0) ? $c.lit(" ") : $c.lit(""), new $c.Ptr(tmpbuf, 0), iflags.autodescribe && getpos_getvalid && !await getpos_getvalid(cx, cy) ? $c.lit(" (invalid target)") : $c.lit(""), iflags.getloc_travelmode && !await is_valid_travelpt(cx, cy) ? $c.lit(" (no travel path)") : $c.lit(""));
-        await windowprocs.win_curs($G.WIN_MAP, cx, cy);
+        await curs()($G.WIN_MAP, cx, cy);
         await flush_screen(0);
     }
 }
@@ -408,10 +410,10 @@ export async function getpos_menu(ccp, gloc) {   // getpos.c:665
     if (gcount[0] < 2) {
         $c.free(garr[0]);
         await You($c.lit("cannot %s %s."), iflags.getloc_filter === GFILTER_VIEW ? $c.lit("see") : $c.lit("detect"), gloc_descr[gloc][0]);
-        return 0;
+        return FALSE;
     }
-    tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
-    await windowprocs.win_start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW_MENU);
+    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     for (i = 1; i < gcount[0]; i = i + 1 | 0) {
         firstmatch[0] = $c.lit("unknown");
@@ -419,16 +421,16 @@ export async function getpos_menu(ccp, gloc) {   // getpos.c:665
         any.a_int = i + 1 | 0;
         tmpcc.x = $c.radd(garr[0], i).x;
         tmpcc.y = $c.radd(garr[0], i).y;
-        if (await do_screen_description(tmpcc.$clone(), 1, sym, new $c.Ptr(tmpbuf, 0), new $c.Ptr(firstmatch, 0), null)) {
+        if (await do_screen_description(tmpcc.$clone(), TRUE, sym, new $c.Ptr(tmpbuf, 0), new $c.Ptr(firstmatch, 0), null)) {
             coord_desc($c.radd(garr[0], i).x, $c.radd(garr[0], i).y, new $c.Ptr(tmpbuf, 0), $c.i8(iflags.getpos_coords));
             nh_snprintf($c.lit("getpos_menu"), 705, new $c.Ptr(fullbuf, 0), 256, $c.lit("%s%s%s"), firstmatch[0], new $c.Ptr(tmpbuf, 0).get(0) ? $c.lit(" ") : $c.lit(""), new $c.Ptr(tmpbuf, 0));
             await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR_NONE, clr, new $c.Ptr(fullbuf, 0), MENU_ITEMFLAGS_NONE);
         }
     }
     $c.__builtin___sprintf_chk(new $c.Ptr(tmpbuf, 0), 0, 256, $c.lit("Pick %s%s%s"), await an(gloc_descr[gloc][1]), gloc_filtertxt[iflags.getloc_filter], iflags.getloc_travelmode ? $c.lit(" for travel destination") : $c.lit(""));
-    await windowprocs.win_end_menu(tmpwin, new $c.Ptr(tmpbuf, 0));
+    await end_menu()(tmpwin, new $c.Ptr(tmpbuf, 0));
     pick_cnt = await select_menu(tmpwin, PICK_ONE, new $c.Ptr(picks, 0));
-    await windowprocs.win_destroy_nhwindow(tmpwin);
+    await destroy_nhwindow()(tmpwin);
     if (pick_cnt > 0) {
         ccp.x = $c.radd(garr[0], picks[0].item.a_int - 1 | 0).x;
         ccp.y = $c.radd(garr[0], picks[0].item.a_int - 1 | 0).y;
@@ -457,7 +459,7 @@ function truncate_to_map(cx, cy, dx, dy) {   // getpos.c:729
 }
 async function getpos_refresh() {   // getpos.c:753
     if (getpos_hilitefunc && getpos_hilite_state === HiliteGoodposSymbol) {
-        await getpos_hilitefunc(0);
+        await getpos_hilitefunc(FALSE);
         getpos_hilite_state = defaultHiliteState;
     }
     await docrt_flags(docrtRefresh);
@@ -470,8 +472,8 @@ export async function getpos(ccp, force, goal) {   // getpos.c:771
     result = 0;
     tx[0] = u.ux;
     ty[0] = u.uy;
-    msg_given = 1;
-    show_goal_msg = 0;
+    msg_given = TRUE;
+    show_goal_msg = FALSE;
     garr.fill(null);
     garr[0] = null;
     gcount.fill(0);
@@ -481,7 +483,7 @@ export async function getpos(ccp, force, goal) {   // getpos.c:771
     udx = $c.i8(u.dx);
     udy = $c.i8(u.dy);
     udz = $c.i8(u.dz);
-    rushrun = 0;
+    rushrun = FALSE;
     if (!gi.in_doagain) {
         if ((cmdq = cmdq_pop()) !== null) {
             cq.$copyFrom(cmdq);
@@ -505,21 +507,21 @@ export async function getpos(ccp, force, goal) {   // getpos.c:771
     }
     mMoOdDxX[12] = 0;
     if (await handle_tip(TIP_GETPOS)) {
-        show_goal_msg = 1;
+        show_goal_msg = TRUE;
     }
     if (!goal) {
         goal = $c.lit("desired location");
     }
     if (flags.verbose) {
         await pline($c.lit("(For instructions type a '%s')"), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_HELP]));
-        msg_given = 1;
+        msg_given = TRUE;
     }
     cx[0] = gg.getposx = ccp.x;
     cy[0] = gg.getposy = ccp.y;
-    await windowprocs.win_cliparound(cx[0], cy[0]);
-    await windowprocs.win_curs($G.WIN_MAP, cx[0], cy[0]);
+    await cliparound()(cx[0], cy[0]);
+    await curs()($G.WIN_MAP, cx[0], cy[0]);
     await flush_screen(0);
-    lock_mouse_buttons(1);
+    lock_mouse_buttons(TRUE);
     exitgetpos$: {
         L2: for (; ; ) {
             D1: for (;;) {
@@ -527,13 +529,13 @@ export async function getpos(ccp, force, goal) {   // getpos.c:771
                 case null:
                     if (show_goal_msg) {
                         await pline($c.lit("Move cursor to %s:"), goal);
-                        await windowprocs.win_curs($G.WIN_MAP, cx[0], cy[0]);
+                        await curs()($G.WIN_MAP, cx[0], cy[0]);
                         await flush_screen(0);
-                        show_goal_msg = 0;
+                        show_goal_msg = FALSE;
                     } else if (iflags.autodescribe && !msg_given) {
                         await auto_describe(cx[0], cy[0]);
                     }
-                    rushrun = 0;
+                    rushrun = FALSE;
                     if ((cmdq = cmdq_pop()) !== null) {
                         if (cmdq.typ === CMDQ_KEY) {
                             c = cmdq.key;
@@ -550,17 +552,17 @@ export async function getpos(ccp, force, goal) {   // getpos.c:771
                         }
                     }
                     if (iflags.autodescribe) {
-                        msg_given = 0;
+                        msg_given = FALSE;
                     }
                     if (c === gc.Cmd.spkeys[NHKF_ESC]) {
                         cx[0] = cy[0] = -10;
-                        msg_given = 1;
+                        msg_given = TRUE;
                         result = -1;
                         break L2;
                     }
                     if (c === cmd_from_func(do_run) || c === cmd_from_func(do_rush)) {
                         c = await readchar_poskey(new $c.Ptr(tx, 0), new $c.Ptr(ty, 0), new $c.Ptr(sidx, 0));
-                        rushrun = 1;
+                        rushrun = TRUE;
                     }
                     if (c === 0) {
                         if (!isok(tx[0], ty[0])) {
@@ -604,22 +606,22 @@ export async function getpos(ccp, force, goal) {   // getpos.c:771
                             await getpos_help(force, goal);
                         }
                         await getpos_refresh();
-                        await windowprocs.win_curs($G.WIN_MAP, cx[0], cy[0]);
-                        show_goal_msg = 1;
+                        await curs()($G.WIN_MAP, cx[0], cy[0]);
+                        show_goal_msg = TRUE;
                     } else if (c === gc.Cmd.spkeys[NHKF_GETPOS_SHOWVALID]) {
                         if (getpos_hilitefunc) {
                             await getpos_toggle_hilite_state();
-                            await windowprocs.win_curs($G.WIN_MAP, cx[0], cy[0]);
+                            await curs()($G.WIN_MAP, cx[0], cy[0]);
                         }
-                        show_goal_msg = 1;
+                        show_goal_msg = TRUE;
                         $goto = "nxtc"; continue D1;
                     } else if (c === gc.Cmd.spkeys[NHKF_GETPOS_AUTODESC]) {
                         iflags.autodescribe = $c.i8(!iflags.autodescribe ? 1 : 0);
                         await pline($c.lit("Automatic description %sis %s."), flags.verbose ? $c.lit("of features under cursor ") : $c.lit(""), iflags.autodescribe ? $c.lit("on") : $c.lit("off"));
                         if (!iflags.autodescribe) {
-                            show_goal_msg = 1;
+                            show_goal_msg = TRUE;
                         }
-                        msg_given = 1;
+                        msg_given = TRUE;
                         $goto = "nxtc"; continue D1;
                     } else if (c === gc.Cmd.spkeys[NHKF_GETPOS_LIMITVIEW]) {
                         iflags.getloc_filter = $c.rem32(iflags.getloc_filter + 1 | 0, NUM_GFILTER);
@@ -631,12 +633,12 @@ export async function getpos(ccp, force, goal) {   // getpos.c:771
                             $t1 = gcount[i] = 0, gidx[i] = $t1;
                         }
                         await pline($c.lit("%s."), getpos$view_filters[iflags.getloc_filter]);
-                        msg_given = 1;
+                        msg_given = TRUE;
                         $goto = "nxtc"; continue D1;
                     } else if (c === gc.Cmd.spkeys[NHKF_GETPOS_MENU]) {
                         iflags.getloc_usemenu = $c.i8(!iflags.getloc_usemenu ? 1 : 0);
                         await pline($c.lit("%s a menu to show possible targets%s."), iflags.getloc_usemenu ? $c.lit("Using") : $c.lit("Not using"), iflags.getloc_usemenu ? $c.lit(" for 'm|M', 'o|O', 'd|D', and 'x|X'") : $c.lit(""));
-                        msg_given = 1;
+                        msg_given = TRUE;
                         $goto = "nxtc"; continue D1;
                     } else if (c === gc.Cmd.spkeys[NHKF_GETPOS_SELF]) {
                         for (i = 0; i < NUM_GLOCS; i = i + 1 | 0) {
@@ -648,7 +650,7 @@ export async function getpos(ccp, force, goal) {   // getpos.c:771
                     } else if (c === gc.Cmd.spkeys[NHKF_GETPOS_MOVESKIP]) {
                         iflags.getloc_moveskip = $c.i8(!iflags.getloc_moveskip ? 1 : 0);
                         await pline($c.lit("%skipping over similar terrain when fastmoving the cursor."), iflags.getloc_moveskip ? $c.lit("S") : $c.lit("Not s"));
-                        msg_given = 1;
+                        msg_given = TRUE;
                         $goto = "nxtc"; continue D1;
                     } else if ((cp = $c.strchr(new $c.Ptr(mMoOdDxX, 0), c)) !== null) {
                         gtmp = $c.i32($c.pdiff(cp, new $c.Ptr(mMoOdDxX, 0)));
@@ -679,10 +681,10 @@ export async function getpos(ccp, force, goal) {   // getpos.c:771
                             k = 0;
                             $c.__builtin___memset_chk(new $c.Ptr(matching, 0), 0, 105, 105);
                             for (sidx[0] = 0; sidx[0] < MAXPCHARS; sidx[0] = sidx[0] + 1 | 0) {
-                                if (sidx[0] >= S_stone && sidx[0] <= S_trwall || sidx[0] >= S_room && sidx[0] <= S_darkroom || sidx[0] >= S_corr && sidx[0] <= S_litcorr || sidx[0] >= S_vodoor && sidx[0] <= S_hcdoor || sidx[0] === S_ndoor) {
+                                if (is_cmap_wall(sidx[0]) || is_cmap_room(sidx[0]) || is_cmap_corr(sidx[0]) || is_cmap_door(sidx[0]) || sidx[0] === S_ndoor) {
                                     continue;
                                 }
-                                if (c === defsyms[sidx[0]].sym || c === gs.showsyms[sidx[0]] || c === 94 && (sidx[0] >= S_arrow_trap && sidx[0] < S_arrow_trap + (TRAPNUM - 1)) || c === gs.showsyms[S_engroom] && (sidx[0] === S_engroom || sidx[0] === S_engrcorr)) {
+                                if (c === defsyms[sidx[0]].sym || c === gs.showsyms[sidx[0]] || c === 94 && is_cmap_trap(sidx[0]) || c === gs.showsyms[S_engroom] && is_cmap_engraving(sidx[0])) {
                                     $t2 = $c.i8(k = k + 1 | 0), matching[sidx[0]] = $t2;
                                 }
                             }
@@ -696,12 +698,12 @@ export async function getpos(ccp, force, goal) {   // getpos.c:771
                                         for (tx[0] = lo_x; tx[0] <= hi_x; tx[0] = $c.i16(tx[0] + 1)) {
                                             k = glyph_at(tx[0], ty[0]);
                                             foundc$: {
-                                                if (k >= GLYPH_CMAP_STONE_OFF && k < GLYPH_CMAP_C_OFF + (S_goodpos - S_digbeam + 1) && matching[glyph_to_cmap(k)]) {
+                                                if (glyph_is_cmap(k) && matching[glyph_to_cmap(k)]) {
                                                     break foundc$;
                                                 }
                                                 if (svl.level.flags.hero_memory | 0 && !iflags.terrainmode) {
                                                     k = svl.level.locations[tx[0]][ty[0]].glyph;
-                                                    if (k >= GLYPH_CMAP_STONE_OFF && k < GLYPH_CMAP_C_OFF + (S_goodpos - S_digbeam + 1) && matching[glyph_to_cmap(k)]) {
+                                                    if (glyph_is_cmap(k) && matching[glyph_to_cmap(k)]) {
                                                         break foundc$;
                                                     }
                                                 }
@@ -710,7 +712,7 @@ export async function getpos(ccp, force, goal) {   // getpos.c:771
                                                 }
                                                 if (svl.level.locations[tx[0]][ty[0]].seenv) {
                                                     k = await back_to_glyph(tx[0], ty[0]);
-                                                    if (k >= GLYPH_CMAP_STONE_OFF && k < GLYPH_CMAP_C_OFF + (S_goodpos - S_digbeam + 1) && matching[glyph_to_cmap(k)]) {
+                                                    if (glyph_is_cmap(k) && matching[glyph_to_cmap(k)]) {
                                                         break foundc$;
                                                     }
                                                 }
@@ -718,15 +720,15 @@ export async function getpos(ccp, force, goal) {   // getpos.c:771
                                             }
                                             cx[0] = tx[0], cy[0] = ty[0];
                                             if (msg_given) {
-                                                await windowprocs.win_clear_nhwindow($G.WIN_MESSAGE);
-                                                msg_given = 0;
+                                                await clear_nhwindow()($G.WIN_MESSAGE);
+                                                msg_given = FALSE;
                                             }
                                             $goto = "nxtc"; continue D1;
                                         }
                                     }
                                 }
                                 await pline($c.lit("Can't find dungeon feature '%c'."), c);
-                                msg_given = 1;
+                                msg_given = TRUE;
                                 $goto = "nxtc"; continue D1;
                             } else {
                                 if (!force) {
@@ -735,14 +737,14 @@ export async function getpos(ccp, force, goal) {   // getpos.c:771
                                     $c.__builtin___sprintf_chk(new $c.Ptr(note, 0), 0, 128, $c.lit("use '%s', '%s', '%s', '%s' or '%s'"), visctrl(cmd_from_func(do_move_west)), visctrl(cmd_from_func(do_move_south)), visctrl(cmd_from_func(do_move_north)), visctrl(cmd_from_func(do_move_east)), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK]));
                                 }
                                 await pline($c.lit("Unknown direction: '%s' (%s)."), visctrl($c.i8(c)), new $c.Ptr(note, 0));
-                                msg_given = 1;
+                                msg_given = TRUE;
                             }
                         }
                         if (force) {
                             $goto = "nxtc"; continue D1;
                         }
                         await pline($c.lit("Done."));
-                        msg_given = 0;
+                        msg_given = FALSE;
                         cx[0] = -1;
                         cy[0] = 0;
                         result = 0;
@@ -751,17 +753,17 @@ export async function getpos(ccp, force, goal) {   // getpos.c:771
                 case "nxtc":
                     $goto = null;   // nxtc:
                     gg.getposx = cx[0], gg.getposy = cy[0];
-                    await windowprocs.win_cliparound(cx[0], cy[0]);
-                    await windowprocs.win_curs($G.WIN_MAP, cx[0], cy[0]);
+                    await cliparound()(cx[0], cy[0]);
+                    await curs()($G.WIN_MAP, cx[0], cy[0]);
                     await flush_screen(0);
                 }
                 break;
             }
         }
     }
-    lock_mouse_buttons(0);
+    lock_mouse_buttons(FALSE);
     if (msg_given) {
-        await windowprocs.win_clear_nhwindow($G.WIN_MESSAGE);
+        await clear_nhwindow()($G.WIN_MESSAGE);
     }
     ccp.x = cx[0];
     ccp.y = cy[0];
@@ -774,6 +776,9 @@ export async function getpos(ccp, force, goal) {   // getpos.c:771
     await getpos_sethilite(null, null);
     u.dx = udx, u.dy = udy, u.dz = udz;
     return result;
+}
+function GLOC_SAME_AREA(x, y) {
+    return isok(x, y) && selection_getpoint(x, y, gg.gloc_filter_map) ? 1 : 0;
 }
 
 export function $init() {

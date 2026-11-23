@@ -4,50 +4,59 @@ import * as $T from './types.js';
 import { $G } from './globals.js';
 import { alloc } from './alloc.js';
 import { m_unleash } from './apply.js';
-import { acurr } from './attrib.js';
 import { A_CHA } from './attrib.h.js';
+import { ACURR } from './attrib.macros.js';
 import { night } from './calendar.js';
 import { is_pool } from './dbridge.js';
-import { flags, gb, gc, gd, gf, gh, gm, gn, gp, gu, gv, gy, iflags, program_state, svc, svd, svl, svm, svq, svr, svu, u } from './decl.js';
-import { BALL_CLASS, CHAIN_CLASS, FOOD_CLASS, ROCK_CLASS, SCROLL_CLASS, SPBOOK_CLASS, S_BLOB, S_DOG, S_ELEMENTAL, S_FUNGUS, S_GHOST, S_GOLEM, S_JELLY, S_KOBOLD, S_LIGHT, S_OGRE, S_ORC, S_VORTEX, S_YETI } from './defsym.h.js';
-import { canseemon, newsym, sensemon } from './display.js';
+import { flags, gb, gc, gd, gf, gh, gm, gn, gp, gu, gy, iflags, program_state, svc, svd, svl, svm, svq, svr, svu, u } from './decl.js';
+import { BALL_CLASS, CHAIN_CLASS, FOOD_CLASS, ROCK_CLASS, SCROLL_CLASS, SPBOOK_CLASS, S_DOG, S_FUNGUS, S_KOBOLD, S_OGRE, S_ORC, S_YETI } from './defsym.h.js';
+import { canseemon, newsym } from './display.js';
+import { canspotmon } from './display.macros.js';
 import { Monnam, christen_monst, mon_pmname } from './do_name.js';
 import { dog_eat, finish_meating } from './dogmove.js';
 import { deliver_obj_to_mon } from './dokick.js';
 import { In_W_tower, builds_up, depth, ledger_no, ledger_to_dlev, ledger_to_dnum, on_level } from './dungeon.js';
 import { MIGR_APPROX_XY, MIGR_EXACT_XY, MIGR_LADDER_DOWN, MIGR_LADDER_UP, MIGR_LEFTOVERS, MIGR_PORTAL, MIGR_RANDOM, MIGR_SSTAIRS, MIGR_STAIRS_DOWN, MIGR_STAIRS_UP, MIGR_WITH_HERO } from './dungeon.h.js';
+import { In_endgame } from './dungeon.macros.js';
 import { panic } from './end.js';
 import { FULL_MOON } from './flag.h.js';
-import { LARGEST_INT, LL_CONDUCT, MAXMONNO } from './global.h.js';
+import { FALSE, LARGEST_INT, LL_CONDUCT, MAXMONNO, TRUE } from './global.h.js';
 import { in_rooms, monst_to_any } from './hack.js';
 import { CORPSTAT_FEMALE, CORPSTAT_GENDER, CORPSTAT_MALE, DF_ALL, DISMOUNT_GENERIC, DISMOUNT_THROWN, EYE, MM_EDOG, MM_FEMALE, MM_IGNOREWATER, MM_MALE, MM_NOMSG, NO_MINVENT, NO_TRAP_FLAGS, RLOC_NOMSG } from './hack.h.js';
+import { max } from './hack.macros.js';
 import { s_suffix } from './hacklib.js';
 import { carrying } from './invent.js';
 import { del_light_source } from './light.js';
 import { makemon, mbirth_limit, newmextra, rndmonst_adj, set_malign } from './makemon.js';
 import { ACCFOOD, APPORT, CADAVER, DOGFOOD, MANFOOD, POISON, TABU, UNDEF } from './mextra.h.js';
+import { EDOG, has_edog } from './mextra.macros.js';
 import { expels } from './mhitu.js';
 import { free_emin } from './minion.js';
 import { discard_minvent, peek_at_iced_corpse_age, place_object } from './mkobj.js';
 import { somexy } from './mkroom.js';
-import { dealloc_monst, healmon, iter_mons, m_into_limbo, minliquid, mnearto, mnexto, monnear, pm_to_cham, relmon, restore_cham, see_monster_closeup, unstuck, wake_nearto } from './mon.js';
-import { AD_POLY, AT_WEAP } from './monattk.h.js';
-import { Resists_Elem, attacktype, dmgtype, levl_follower, mon_hates_silver, same_race, sticks } from './mondata.js';
-import { G_EXTINCT, M1_ACID, M1_CARNIVORE, M1_HERBIVORE, M1_HUMANOID, M1_NOEYES, M1_POIS, M1_REGEN, M2_DEMON, M2_DOMESTIC, M2_ELF, M2_HUMAN, M2_UNDEAD, M3_COVETOUS, M3_WANTSARTI } from './monflag.h.js';
+import { ROOMOFFSET } from './mkroom.h.js';
+import { dealloc_monst, healmon, iter_mons, m_into_limbo, minliquid, mnearto, mnexto, monnear, relmon, restore_cham, see_monster_closeup, unstuck, wake_nearto } from './mon.js';
+import { AT_WEAP } from './monattk.h.js';
+import { attacktype, levl_follower, mon_hates_silver, same_race, sticks } from './mondata.js';
+import { acidic, carnivorous, emits_light, flesh_petrifies, haseyes, herbivorous, humanoid, is_covetous, is_demon, is_domestic, is_elf, is_human, is_rider, is_undead, likes_fire, metallivorous, poisonous, regenerates, slimeproof, vegan } from './mondata.macros.js';
+import { G_EXTINCT, M3_WANTSARTI } from './monflag.h.js';
 import { find_pmmonst, mon_track_clear } from './monmove.js';
 import { mons } from './monst.js';
 import { MON_LIMBO, MON_MIGRATING, MON_STILL_ARRIVING, NEED_HTH_WEAPON, STRAT_ARRIVE, STRAT_WAITFORU } from './monst.h.js';
-import { PM_BABY_GOLD_DRAGON, PM_BARBARIAN, PM_CAVE_DWELLER, PM_CHICKATRICE, PM_COCKATRICE, PM_DEATH, PM_FAMINE, PM_FIRE_ELEMENTAL, PM_FIRE_VORTEX, PM_FLAMING_SPHERE, PM_FLESH_GOLEM, PM_GELATINOUS_CUBE, PM_GHOUL, PM_GOLD_DRAGON, PM_GREEN_SLIME, PM_KILLER_BEE, PM_KITTEN, PM_LEATHER_GOLEM, PM_LICHEN, PM_LITTLE_DOG, PM_LIZARD, PM_LONG_WORM, PM_MEDUSA, PM_PESTILENCE, PM_PONY, PM_PYROLISK, PM_QUEEN_BEE, PM_RANGER, PM_RUST_MONSTER, PM_SALAMANDER, PM_SAMURAI, PM_SHOCKING_SPHERE, PM_STALKER, PM_VAMPIRE, PM_VAMPIRE_LEADER, PM_VLAD_THE_IMPALER } from './monsters.h.js';
-import { MAX_EGG_HATCH_TIME, OBJ_FREE } from './obj.h.js';
-import { IRON, MITHRIL, SILVER, WOOD } from './objclass.h.js';
+import { DEADMONSTER, helpless, is_vampshifter, ismnum, resists_acid, resists_poison, resists_ston } from './monst.macros.js';
+import { PM_BARBARIAN, PM_CAVE_DWELLER, PM_GELATINOUS_CUBE, PM_GHOUL, PM_KILLER_BEE, PM_KITTEN, PM_LICHEN, PM_LITTLE_DOG, PM_LIZARD, PM_LONG_WORM, PM_MEDUSA, PM_PONY, PM_PYROLISK, PM_QUEEN_BEE, PM_RANGER, PM_RUST_MONSTER, PM_SAMURAI } from './monsters.h.js';
+import { OBJ_FREE } from './obj.h.js';
+import { Has_contents, has_oname, polyfood, stale_egg } from './obj.macros.js';
+import { SILVER } from './objclass.h.js';
+import { is_metallic, is_organic, is_rustprone } from './objclass.macros.js';
 import { objects } from './objects.js';
 import { AMULET_OF_STRANGULATION, APPLE, BANANA, CARROT, CLOVE_OF_GARLIC, CORPSE, EGG, ENORMOUS_MEATBALL, EXPENSIVE_CAMERA, GLOB_OF_GREEN_SLIME, LUMP_OF_ROYAL_JELLY, MEATBALL, MEAT_RING, MEAT_STICK, RIN_SLOW_DIGESTION, SLIME_MOLD, SPE_CREATE_FAMILIAR, TIN, TRIPE_RATION } from './objects.h.js';
 import { Tobjnam, an, the, xname } from './objnam.js';
 import { LOW_PM, NON_PM, NUMMONS } from './permonst.h.js';
 import { There, You, impossible, livelog_printf, pline, pline_The, pline_mon } from './pline.js';
 import { body_part } from './polyself.js';
-import { ACID_RES, AGGRAVATE_MONSTER, CONFLICT, HALLUC, HALLUC_RES, POISON_RES, STONE_RES } from './prop.h.js';
 import { is_quest_artifact } from './questpgr.js';
+import { MON_AT } from './rm.macros.js';
 import { rn2, rnd } from './rnd.js';
 import { genders } from './role.js';
 import { make_happy_shk, make_happy_shoppers, obfree, picked_container, set_residency } from './shk.js';
@@ -60,10 +69,13 @@ import { rloc, rloc_to } from './teleport.js';
 import { mintrap } from './trap.js';
 import { MAGIC_PORTAL } from './trap.h.js';
 import { vision_recalc } from './vision.js';
-import { IN_SIGHT, LS_MONSTER } from './vision.h.js';
+import { LS_MONSTER } from './vision.h.js';
+import { cansee } from './vision.macros.js';
 import { mon_wield_item } from './weapon.js';
 import { mon_has_amulet } from './wizard.js';
 import { count_wsegs, get_wormno, initworm, redraw_worm, wormgone } from './worm.js';
+import { Upolyd } from './you.macros.js';
+import { Aggravate_monster, Conflict, Hallucination } from './youprop.macros.js';
 import { obj_resists } from './zap.js';
 
 const Before_you = 0;
@@ -77,14 +89,14 @@ export async function newedog(mtmp) {   // dog.c:23
     if (!mtmp.mextra) {
         $t1 = await newmextra(), mtmp.mextra = $t1;
     }
-    if (!mtmp.mextra.edog) {
+    if (!EDOG(mtmp)) {
         $t2 = $c.asRec(await alloc(64), $T.edog, 64), mtmp.mextra.edog = $t2;
         $c.__builtin___memset_chk(mtmp.mextra.edog, 0, 64, -1);
         mtmp.mextra.edog.parentmid = mtmp.m_id;
     }
 }
 export function free_edog(mtmp) {   // dog.c:35
-    if (mtmp.mextra && mtmp.mextra.edog) {
+    if (mtmp.mextra && EDOG(mtmp)) {
         $c.free(mtmp.mextra.edog);
         mtmp.mextra.edog = null;
     }
@@ -94,8 +106,8 @@ export async function initedog(mtmp, everything) {   // dog.c:45
     let edogp = null, minhungry = 0, minimumtame = 0, $t1;
     edogp = mtmp.mextra.edog;
     minhungry = $c.add64(svm.moves, 1000);
-    minimumtame = $c.i8($c.andu64(mtmp.data.mflags2, M2_DOMESTIC) !== 0 ? 10 : 5);
-    mtmp.mtame = $c.i8(minimumtame > mtmp.mtame ? minimumtame : mtmp.mtame);
+    minimumtame = $c.i8(is_domestic(mtmp.data) ? 10 : 5);
+    mtmp.mtame = $c.i8(max(minimumtame, mtmp.mtame));
     mtmp.mpeaceful = (1) & 1;
     mtmp.mavenge = (0) & 1;
     set_malign(mtmp);
@@ -104,7 +116,7 @@ export async function initedog(mtmp, everything) {   // dog.c:45
         mtmp.meating = 0;
         edogp.droptime = 0;
         edogp.dropdist = 10000;
-        $t1 = acurr(A_CHA), edogp.apport = $t1;
+        $t1 = ACURR(A_CHA), edogp.apport = $t1;
         edogp.whistletime = 0;
         edogp.ogoal.x = -1;
         edogp.ogoal.y = -1;
@@ -165,7 +177,7 @@ export async function make_familiar(otmp, x, y, quietly) {   // dog.c:138
     let pm = null, mtmp = null, chance = 0, trycnt = 0, reallytame = 0, mmflags = 0, cgend = 0;
     mtmp = null;
     trycnt = 100;
-    reallytame = 1;
+    reallytame = TRUE;
     do {
         if (!(pm = await pick_familiar_pm(otmp, quietly))) {
             break;
@@ -198,7 +210,7 @@ export async function make_familiar(otmp, x, y, quietly) {   // dog.c:138
             chance = otmp.blessed | 0 ? 0 : !otmp.cursed ? 1 : 2;
         }
         if (chance > 0) {
-            reallytame = 0;
+            reallytame = FALSE;
             if (chance === 2) {
                 if (!quietly) {
                     await You($c.lit("get a bad feeling about this."));
@@ -207,12 +219,12 @@ export async function make_familiar(otmp, x, y, quietly) {   // dog.c:138
                 set_malign(mtmp);
             }
         }
-        if (otmp.oextra && otmp.oextra.oname) {
+        if (has_oname(otmp)) {
             mtmp = await christen_monst(mtmp, otmp.oextra.oname);
         }
     }
     if (reallytame) {
-        await initedog(mtmp, 1);
+        await initedog(mtmp, TRUE);
     }
     mtmp.msleeping = (0) & 1;
     set_malign(mtmp);
@@ -257,15 +269,15 @@ export async function makedog() {   // dog.c:219
             }
         }
         gb.bhitpos.x = mtmp.mx, gb.bhitpos.y = mtmp.my;
-        gn.notonhead = 0;
-        await see_monster_closeup(mtmp, $c.i8(carrying(EXPENSIVE_CAMERA) ? 1 : 0));
+        gn.notonhead = FALSE;
+        await see_monster_closeup(mtmp, $c.i8(carrying(EXPENSIVE_CAMERA) ? TRUE : FALSE));
     } else {
         await impossible($c.lit("makedog() when startingpet_mid is already non-zero?"));
     }
     if (!($t2 = gp.petname_used, gp.petname_used = $t2 + 1 | 0, $t2) && petname.get(0)) {
         mtmp = await christen_monst(mtmp, petname);
     }
-    await initedog(mtmp, 1);
+    await initedog(mtmp, TRUE);
     return mtmp;
 }
 function set_mon_lastmove(mtmp) {   // dog.c:287
@@ -287,7 +299,7 @@ export async function losedogs() {   // dog.c:304
                 if (dismissKops === 0) {
                     dismissKops = 1;
                 }
-                mtmp.mextra.eshk.dismiss_kops = 0;
+                mtmp.mextra.eshk.dismiss_kops = FALSE;
             } else if (!mtmp.mpeaceful) {
                 dismissKops = -1;
             }
@@ -301,7 +313,7 @@ export async function losedogs() {   // dog.c:304
         }
     }
     if (dismissKops > 0) {
-        await make_happy_shoppers(1);
+        await make_happy_shoppers(TRUE);
     }
     for (mprev = new $c.FieldRef(gm, "migrating_mons", "ptr"); (mtmp = mprev.get(0)) !== null; ) {
         xyloc = mtmp.mtrack[0].x;
@@ -334,12 +346,12 @@ export async function losedogs() {   // dog.c:304
 }
 export async function mon_arrive(mtmp, when) {   // dog.c:420
     let t = null, xlocale = 0, ylocale = 0, xyloc = 0, xyflags = 0, wander = 0, num_segs = 0, failed_to_place = 0, stway = null, fromdlev = new $T.d_level(), nmv = 0, r = null, c = new $T.nhcoord(), i = 0, j = 0, $t1;
-    failed_to_place = 0;
+    failed_to_place = FALSE;
     mtmp.mstate = $c.or64(mtmp.mstate, MON_STILL_ARRIVING);
     mtmp.nmon = svl.level.monlist;
     svl.level.monlist = mtmp;
     if (mtmp.isshk) {
-        set_residency(mtmp, 0);
+        set_residency(mtmp, FALSE);
     }
     num_segs = mtmp.wormno | 0;
     if ($c.peq(mtmp.data, $c.relem(mons, PM_LONG_WORM))) {
@@ -365,7 +377,7 @@ export async function mon_arrive(mtmp, when) {   // dog.c:420
         return;
     }
     if (when === With_you) {
-        if (!(svl.level.monsters[u.ux][u.uy] !== null) && !rn2(mtmp.mtame ? 10 : mtmp.mpeaceful | 0 ? 5 : 2)) {
+        if (!MON_AT(u.ux, u.uy) && !rn2(mtmp.mtame ? 10 : mtmp.mpeaceful | 0 ? 5 : 2)) {
             await rloc_to(mtmp, u.ux, u.uy);
         } else {
             await mnexto(mtmp, RLOC_NOMSG);
@@ -392,25 +404,25 @@ export async function mon_arrive(mtmp, when) {   // dog.c:420
             xlocale = u.ux, ylocale = u.uy;
             break;
         case MIGR_STAIRS_UP:
-            if ((stway = stairway_find_from(fromdlev, 0)) !== null) {
+            if ((stway = stairway_find_from(fromdlev, FALSE)) !== null) {
                 xlocale = stway.sx;
                 ylocale = stway.sy;
             }
             break;
         case MIGR_STAIRS_DOWN:
-            if ((stway = stairway_find_from(fromdlev, 0)) !== null) {
+            if ((stway = stairway_find_from(fromdlev, FALSE)) !== null) {
                 xlocale = stway.sx;
                 ylocale = stway.sy;
             }
             break;
         case MIGR_LADDER_UP:
-            if ((stway = stairway_find_from(fromdlev, 1)) !== null) {
+            if ((stway = stairway_find_from(fromdlev, TRUE)) !== null) {
                 xlocale = stway.sx;
                 ylocale = stway.sy;
             }
             break;
         case MIGR_LADDER_DOWN:
-            if ((stway = stairway_find_from(fromdlev, 1)) !== null) {
+            if ((stway = stairway_find_from(fromdlev, TRUE)) !== null) {
                 xlocale = stway.sx;
                 ylocale = stway.sy;
             }
@@ -422,7 +434,7 @@ export async function mon_arrive(mtmp, when) {   // dog.c:420
             }
             break;
         case MIGR_PORTAL:
-            if (u.uz.dnum === svd.dungeon_topology.d_astral_level.dnum) {
+            if (In_endgame(u.uz)) {
                 xlocale = $c.i16(rn2((svu.updest.hx - svu.updest.lx | 0) + 1 | 0) + svu.updest.lx | 0);
                 ylocale = $c.i16(rn2((svu.updest.hy - svu.updest.ly | 0) + 1 | 0) + svu.updest.ly | 0);
                 break;
@@ -454,7 +466,7 @@ export async function mon_arrive(mtmp, when) {   // dog.c:420
     if (xlocale && wander) {
         r = in_rooms(xlocale, ylocale, 0);
         if (r && r.get(0)) {
-            if (somexy($c.relem(svr.rooms, r.get(0) - 3 | 0), c)) {
+            if (somexy($c.relem(svr.rooms, r.get(0) - ROOMOFFSET | 0), c)) {
                 xlocale = c.x, ylocale = c.y;
             } else {
                 xlocale = ylocale = 0;
@@ -471,7 +483,7 @@ export async function mon_arrive(mtmp, when) {   // dog.c:420
     mtmp.mx = 0;
     mtmp.my = xyflags;
     if (xlocale) {
-        failed_to_place = $c.i8(!await mnearto(mtmp, xlocale, ylocale, 0, RLOC_NOMSG) ? 1 : 0);
+        failed_to_place = $c.i8(!await mnearto(mtmp, xlocale, ylocale, FALSE, RLOC_NOMSG) ? 1 : 0);
     } else {
         failed_to_place = $c.i8(!await rloc(mtmp, RLOC_NOMSG) ? 1 : 0);
     }
@@ -549,7 +561,7 @@ export async function mon_catchup_elapsed_time(mtmp, nmv) {   // dog.c:627
             $t1 = $c.i8(mtmp.mpeaceful = (0) & 1), mtmp.mtame = $t1;
         }
     }
-    if (mtmp.mtame && !mtmp.isminion && ($c.andu64(mtmp.data.mflags1, M1_CARNIVORE) !== 0 || $c.andu64(mtmp.data.mflags1, M1_HERBIVORE) !== 0)) {
+    if (mtmp.mtame && !mtmp.isminion && (carnivorous(mtmp.data) || herbivorous(mtmp.data))) {
         edog = mtmp.mextra.edog;
         if (svm.moves > $c.add64(edog.hungrytime, 500) && mtmp.mhp < 3 || svm.moves > $c.add64(edog.hungrytime, 750)) {
             $t2 = $c.i8(mtmp.mpeaceful = (0) & 1), mtmp.mtame = $t2;
@@ -557,9 +569,9 @@ export async function mon_catchup_elapsed_time(mtmp, nmv) {   // dog.c:627
     }
     if (!mtmp.mtame && mtmp.mleashed | 0) {
         await impossible($c.lit("catching up for leashed monster?"));
-        await m_unleash(mtmp, 0);
+        await m_unleash(mtmp, FALSE);
     }
-    if (!($c.andu64(mtmp.data.mflags1, M1_REGEN) !== 0)) {
+    if (!regenerates(mtmp.data)) {
         imv = $c.div32(imv, 20);
     }
     await healmon(mtmp, imv, 0);
@@ -569,13 +581,13 @@ async function mon_leave(mtmp) {   // dog.c:729
     let obj = null, num_segs = 0, cnt = 0, mx = 0, my = 0;
     num_segs = 0;
     for (obj = mtmp.minvent; obj; obj = obj.nobj) {
-        if (obj.cobj !== null) {
+        if (Has_contents(obj)) {
             picked_container(obj);
         }
         obj.no_charge = (0) & 1;
     }
     if (mtmp.isshk) {
-        set_residency(mtmp, 1);
+        set_residency(mtmp, TRUE);
     }
     if (mtmp.wormno) {
         cnt = count_wsegs(mtmp);
@@ -591,18 +603,18 @@ async function mon_leave(mtmp) {   // dog.c:729
 }
 function keep_mon_accessible(mon) {   // dog.c:768
     if (mon.iswiz) {
-        return 1;
+        return TRUE;
     }
     if (mon.mextra && (mon.isshk | 0 && !on_level(u.uz, mon.mextra.eshk.shoplevel) || mon.ispriest | 0 && !on_level(u.uz, mon.mextra.epri.shrlevel) || mon.isgd | 0 && !on_level(u.uz, mon.mextra.egd.gdlevel))) {
-        return 1;
+        return TRUE;
     }
-    return 0;
+    return FALSE;
 }
 export async function keepdogs(pets_only) {   // dog.c:789
     let mtmp = null, mtmp2 = null, num_segs = 0, stay_behind = 0, $t1;
     for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp2) {
         mtmp2 = mtmp.nmon;
-        if (mtmp.mhp < 1) {
+        if (DEADMONSTER(mtmp)) {
             continue;
         }
         if (pets_only) {
@@ -615,8 +627,8 @@ export async function keepdogs(pets_only) {   // dog.c:789
             mtmp.mfrozen = (0) & 127;
             mtmp.mcanmove = (1) & 1;
         }
-        if ((monnear(mtmp, u.ux, u.uy) && levl_follower(mtmp) || u.uhave.amulet | 0 && mtmp.iswiz | 0) && (!(mtmp.msleeping | 0 || !mtmp.mcanmove) || $c.peq(mtmp, u.usteed)) && !$c.andu64(mtmp.mstrategy, STRAT_WAITFORU)) {
-            stay_behind = 0;
+        if ((monnear(mtmp, u.ux, u.uy) && levl_follower(mtmp) || u.uhave.amulet | 0 && mtmp.iswiz | 0) && (!helpless(mtmp) || $c.peq(mtmp, u.usteed)) && !$c.andu64(mtmp.mstrategy, STRAT_WAITFORU)) {
+            stay_behind = FALSE;
             if (mtmp.mtrapped) {
                 await mintrap(mtmp, NO_TRAP_FLAGS);
             }
@@ -628,17 +640,17 @@ export async function keepdogs(pets_only) {   // dog.c:789
                 if (canseemon(mtmp)) {
                     await pline_mon(mtmp, $c.lit("%s is still %s."), await Monnam(mtmp), mtmp.meating ? $c.lit("eating") : $c.lit("trapped"));
                 }
-                stay_behind = 1;
+                stay_behind = TRUE;
             } else if (mon_has_amulet(mtmp)) {
                 if (canseemon(mtmp)) {
                     await pline($c.lit("%s seems very disoriented for a moment."), await Monnam(mtmp));
                 }
-                stay_behind = 1;
+                stay_behind = TRUE;
             }
             if (stay_behind) {
                 if (mtmp.mleashed) {
-                    await pline($c.lit("%s leash suddenly comes loose."), $c.andu64(mtmp.data.mflags1, M1_HUMANOID) !== 0 ? mtmp.female | 0 ? $c.lit("Her") : $c.lit("His") : $c.lit("Its"));
-                    await m_unleash(mtmp, 0);
+                    await pline($c.lit("%s leash suddenly comes loose."), humanoid(mtmp.data) ? mtmp.female | 0 ? $c.lit("Her") : $c.lit("His") : $c.lit("Its"));
+                    await m_unleash(mtmp, FALSE);
                 }
                 if ($c.peq(mtmp, u.usteed)) {
                     await impossible($c.lit("steed left behind?"));
@@ -655,7 +667,7 @@ export async function keepdogs(pets_only) {   // dog.c:789
             await migrate_to_level(mtmp, ledger_no(u.uz), MIGR_EXACT_XY, null);
         } else if (mtmp.mleashed) {
             await pline($c.lit("%s leash goes slack."), s_suffix(await Monnam(mtmp)));
-            await m_unleash(mtmp, 0);
+            await m_unleash(mtmp, FALSE);
         }
     }
 }
@@ -665,7 +677,7 @@ export async function migrate_to_level(mtmp, tolev, xyloc, cc) {   // dog.c:887
     my = mtmp.my;
     if (mtmp.mleashed) {
         mtmp.mtame = $c.i8(mtmp.mtame - 1);
-        await m_unleash(mtmp, 1);
+        await m_unleash(mtmp, TRUE);
     }
     num_segs = await mon_leave(mtmp);
     await relmon(mtmp, new $c.FieldRef(gm, "migrating_mons", "ptr"));
@@ -687,7 +699,7 @@ export async function migrate_to_level(mtmp, tolev, xyloc, cc) {   // dog.c:887
     mtmp.mux = new_lev.dnum;
     mtmp.muy = new_lev.dlevel;
     $t3 = mtmp.my = 0, mtmp.mx = $t3;
-    if (mtmp.data.mlet === S_LIGHT || $c.peq(mtmp.data, $c.relem(mons, PM_FLAMING_SPHERE)) || $c.peq(mtmp.data, $c.relem(mons, PM_SHOCKING_SPHERE)) || $c.peq(mtmp.data, $c.relem(mons, PM_BABY_GOLD_DRAGON)) || $c.peq(mtmp.data, $c.relem(mons, PM_FIRE_VORTEX)) ? 1 : $c.peq(mtmp.data, $c.relem(mons, PM_FIRE_ELEMENTAL)) || $c.peq(mtmp.data, $c.relem(mons, PM_GOLD_DRAGON)) ? 1 : 0) {
+    if (emits_light(mtmp.data)) {
         await vision_recalc(0);
     }
 }
@@ -696,13 +708,13 @@ export async function discard_migrations() {   // dog.c:938
     for (mprev = new $c.FieldRef(gm, "migrating_mons", "ptr"); (mtmp = mprev.get(0)) !== null; ) {
         dest.dnum = mtmp.mux;
         dest.dlevel = mtmp.muy;
-        if (mtmp.iswiz | 0 || dest.dnum === svd.dungeon_topology.d_astral_level.dnum) {
+        if (mtmp.iswiz | 0 || In_endgame(dest)) {
             mprev = new $c.FieldRef(mtmp, "nmon", "ptr");
         } else {
             mprev.set(0, mtmp.nmon);
             mtmp.nmon = null;
-            await discard_minvent(mtmp, 0);
-            if (mtmp.data.mlet === S_LIGHT || $c.peq(mtmp.data, $c.relem(mons, PM_FLAMING_SPHERE)) || $c.peq(mtmp.data, $c.relem(mons, PM_SHOCKING_SPHERE)) || $c.peq(mtmp.data, $c.relem(mons, PM_BABY_GOLD_DRAGON)) || $c.peq(mtmp.data, $c.relem(mons, PM_FIRE_VORTEX)) ? 1 : $c.peq(mtmp.data, $c.relem(mons, PM_FIRE_ELEMENTAL)) || $c.peq(mtmp.data, $c.relem(mons, PM_GOLD_DRAGON)) ? 1 : 0) {
+            await discard_minvent(mtmp, FALSE);
+            if (emits_light(mtmp.data)) {
                 await del_light_source(LS_MONSTER, monst_to_any(mtmp));
             }
             await dealloc_monst(mtmp);
@@ -711,7 +723,7 @@ export async function discard_migrations() {   // dog.c:938
     for (oprev = new $c.FieldRef(gm, "migrating_objs", "ptr"); (otmp = oprev.get(0)) !== null; ) {
         dest.dnum = otmp.ox;
         dest.dlevel = otmp.oy;
-        if (dest.dnum === svd.dungeon_topology.d_astral_level.dnum) {
+        if (In_endgame(dest)) {
             oprev = new $c.FieldRef(otmp, "nobj", "ptr");
         } else {
             oprev.set(0, otmp.nobj);
@@ -725,9 +737,9 @@ export async function discard_migrations() {   // dog.c:938
 export async function dogfood(mon, obj) {   // dog.c:995
     let mptr = null, fptr = null, carni = 0, herbi = 0, starving = 0, mblind = 0, fx = 0, mtmp = null;
     mptr = mon.data;
-    carni = $c.i8($c.andu64(mptr.mflags1, M1_CARNIVORE) !== 0 ? 1 : 0);
-    herbi = $c.i8($c.andu64(mptr.mflags1, M1_HERBIVORE) !== 0 ? 1 : 0);
-    if (obj.otrapped | 0 && !await Resists_Elem(mon, POISON_RES)) {
+    carni = $c.i8(carnivorous(mptr));
+    herbi = $c.i8(herbivorous(mptr));
+    if (obj.otrapped | 0 && !await resists_poison(mon)) {
         return POISON;
     }
     if (is_quest_artifact(obj) || obj_resists(obj, 0, 95)) {
@@ -736,11 +748,11 @@ export async function dogfood(mon, obj) {   // dog.c:995
     switch (obj.oclass) {
         case FOOD_CLASS:
             fx = obj.otyp === CORPSE || obj.otyp === TIN || obj.otyp === EGG ? obj.corpsenm : NON_PM;
-            fptr = $c.relem(mons, fx >= LOW_PM && fx < NUMMONS ? fx : NUMMONS);
-            if (obj.otyp === CORPSE && ($c.peq(fptr, $c.relem(mons, PM_DEATH)) || $c.peq(fptr, $c.relem(mons, PM_FAMINE)) || $c.peq(fptr, $c.relem(mons, PM_PESTILENCE)))) {
+            fptr = $c.relem(mons, ismnum(fx) ? fx : NUMMONS);
+            if (obj.otyp === CORPSE && is_rider(fptr)) {
                 return TABU;
             }
-            if ((obj.otyp === CORPSE || obj.otyp === EGG) && ($c.peq(fptr, $c.relem(mons, PM_COCKATRICE)) || $c.peq(fptr, $c.relem(mons, PM_CHICKATRICE)) || $c.peq(fptr, $c.relem(mons, PM_MEDUSA))) && !await Resists_Elem(mon, STONE_RES)) {
+            if ((obj.otyp === CORPSE || obj.otyp === EGG) && flesh_petrifies(fptr) && !await resists_ston(mon)) {
                 return POISON;
             }
             if (obj.otyp === LUMP_OF_ROYAL_JELLY && $c.peq(mon.data, $c.relem(mons, PM_KILLER_BEE))) {
@@ -751,13 +763,13 @@ export async function dogfood(mon, obj) {   // dog.c:995
                 return obj.cursed | 0 ? UNDEF : APPORT;
             }
             starving = $c.i8(mon.mtame && !mon.isminion && mon.mextra.edog.mhpmax_penalty ? 1 : 0);
-            mblind = $c.i8(!mon.mcansee && $c.andu64(mon.data.mflags1, M1_NOEYES) === 0 ? 1 : 0);
+            mblind = $c.i8(!mon.mcansee && haseyes(mon.data) ? 1 : 0);
             if ($c.peq(mptr, $c.relem(mons, PM_GHOUL))) {
                 if (obj.otyp === CORPSE) {
-                    return $c.add64(await peek_at_iced_corpse_age(obj), 50) <= svm.moves && !(fx === PM_LIZARD || fx === PM_LICHEN) ? DOGFOOD : starving && !(fptr.mlet === S_BLOB || fptr.mlet === S_JELLY || fptr.mlet === S_FUNGUS || fptr.mlet === S_VORTEX || fptr.mlet === S_LIGHT || fptr.mlet === S_ELEMENTAL && !$c.peq(fptr, $c.relem(mons, PM_STALKER)) || fptr.mlet === S_GOLEM && !$c.peq(fptr, $c.relem(mons, PM_FLESH_GOLEM)) && !$c.peq(fptr, $c.relem(mons, PM_LEATHER_GOLEM)) || fptr.mlet === S_GHOST) ? ACCFOOD : POISON;
+                    return $c.add64(await peek_at_iced_corpse_age(obj), 50) <= svm.moves && !(fx === PM_LIZARD || fx === PM_LICHEN) ? DOGFOOD : starving && !vegan(fptr) ? ACCFOOD : POISON;
                 }
                 if (obj.otyp === EGG) {
-                    return $c.sub64(svm.moves, obj.age) > 2 * MAX_EGG_HATCH_TIME ? CADAVER : starving ? ACCFOOD : POISON;
+                    return stale_egg(obj) ? CADAVER : starving ? ACCFOOD : POISON;
                 }
                 return TABU;
             }
@@ -769,28 +781,28 @@ export async function dogfood(mon, obj) {   // dog.c:995
                 case ENORMOUS_MEATBALL:
                     return carni ? DOGFOOD : MANFOOD;
                 case EGG:
-                    if (obj.corpsenm === PM_PYROLISK && !($c.peq(mptr, $c.relem(mons, PM_FIRE_VORTEX)) || $c.peq(mptr, $c.relem(mons, PM_FLAMING_SPHERE)) || ($c.peq(mptr, $c.relem(mons, PM_FIRE_ELEMENTAL)) || $c.peq(mptr, $c.relem(mons, PM_SALAMANDER))))) {
+                    if (obj.corpsenm === PM_PYROLISK && !likes_fire(mptr)) {
                         return POISON;
                     }
                     return carni ? CADAVER : MANFOOD;
                 case CORPSE:
-                    if ($c.add64(await peek_at_iced_corpse_age(obj), 50) <= svm.moves && !(fx === PM_LIZARD || fx === PM_LICHEN) && mptr.mlet !== S_FUNGUS || $c.andu64(fptr.mflags1, M1_ACID) !== 0 && !await Resists_Elem(mon, ACID_RES) || $c.andu64(fptr.mflags1, M1_POIS) !== 0 && !await Resists_Elem(mon, POISON_RES)) {
+                    if ($c.add64(await peek_at_iced_corpse_age(obj), 50) <= svm.moves && !(fx === PM_LIZARD || fx === PM_LICHEN) && mptr.mlet !== S_FUNGUS || acidic(fptr) && !await resists_acid(mon) || poisonous(fptr) && !await resists_poison(mon)) {
                         return POISON;
-                    } else if ((obj.otyp === CORPSE || obj.otyp === EGG || obj.otyp === TIN) && obj.corpsenm >= LOW_PM && (pm_to_cham(obj.corpsenm) !== NON_PM || dmgtype($c.relem(mons, obj.corpsenm), AD_POLY)) && mon.mtame > 1 && !starving) {
+                    } else if (polyfood(obj) && mon.mtame > 1 && !starving) {
                         return MANFOOD;
-                    } else if (fptr.mlet === S_BLOB || fptr.mlet === S_JELLY || fptr.mlet === S_FUNGUS || fptr.mlet === S_VORTEX || fptr.mlet === S_LIGHT || fptr.mlet === S_ELEMENTAL && !$c.peq(fptr, $c.relem(mons, PM_STALKER)) || fptr.mlet === S_GOLEM && !$c.peq(fptr, $c.relem(mons, PM_FLESH_GOLEM)) && !$c.peq(fptr, $c.relem(mons, PM_LEATHER_GOLEM)) || fptr.mlet === S_GHOST) {
+                    } else if (vegan(fptr)) {
                         return herbi ? CADAVER : MANFOOD;
-                    } else if ($c.andu64(mptr.mflags1, M1_HUMANOID) !== 0 && same_race(mptr, fptr) && (!($c.andu64(mptr.mflags2, M2_UNDEAD) !== 0) && fptr.mlet !== S_KOBOLD && fptr.mlet !== S_ORC && fptr.mlet !== S_OGRE)) {
-                        return starving && carni && !($c.andu64(mptr.mflags2, M2_ELF) !== 0) ? ACCFOOD : TABU;
+                    } else if (humanoid(mptr) && same_race(mptr, fptr) && (!is_undead(mptr) && fptr.mlet !== S_KOBOLD && fptr.mlet !== S_ORC && fptr.mlet !== S_OGRE)) {
+                        return starving && carni && !is_elf(mptr) ? ACCFOOD : TABU;
                     } else {
                         return carni ? CADAVER : MANFOOD;
                     }
                 case GLOB_OF_GREEN_SLIME:
-                    return starving || ($c.peq(mon.data, $c.relem(mons, PM_GREEN_SLIME)) || ($c.peq(mon.data, $c.relem(mons, PM_FIRE_VORTEX)) || $c.peq(mon.data, $c.relem(mons, PM_FLAMING_SPHERE)) || $c.peq(mon.data, $c.relem(mons, PM_FIRE_ELEMENTAL)) || $c.peq(mon.data, $c.relem(mons, PM_SALAMANDER))) || mon.data.mlet === S_GHOST) ? ACCFOOD : POISON;
+                    return starving || slimeproof(mon.data) ? ACCFOOD : POISON;
                 case CLOVE_OF_GARLIC:
-                    return $c.andu64(mptr.mflags2, M2_UNDEAD) !== 0 || (mon.cham === PM_VAMPIRE || mon.cham === PM_VAMPIRE_LEADER || mon.cham === PM_VLAD_THE_IMPALER) ? TABU : herbi || starving ? ACCFOOD : MANFOOD;
+                    return is_undead(mptr) || is_vampshifter(mon) ? TABU : herbi || starving ? ACCFOOD : MANFOOD;
                 case TIN:
-                    return $c.andu64(mptr.mflags1, 2147483648) !== 0 ? ACCFOOD : MANFOOD;
+                    return metallivorous(mptr) ? ACCFOOD : MANFOOD;
                 case APPLE:
                     return herbi ? DOGFOOD : starving ? ACCFOOD : MANFOOD;
                 case CARROT:
@@ -810,11 +822,11 @@ export async function dogfood(mon, obj) {   // dog.c:995
             if (mon_hates_silver(mon) && (objects[obj.otyp].oc_material | 0) === SILVER) {
                 return TABU;
             }
-            if ($c.peq(mptr, $c.relem(mons, PM_GELATINOUS_CUBE)) && (objects[obj.otyp].oc_material | 0) <= WOOD) {
+            if ($c.peq(mptr, $c.relem(mons, PM_GELATINOUS_CUBE)) && is_organic(obj)) {
                 return ACCFOOD;
             }
-            if ($c.andu64(mptr.mflags1, 2147483648) !== 0 && ((objects[obj.otyp].oc_material | 0) >= IRON && (objects[obj.otyp].oc_material | 0) <= MITHRIL) && ((objects[obj.otyp].oc_material | 0) === IRON || !$c.peq(mptr, $c.relem(mons, PM_RUST_MONSTER)))) {
-                return (objects[obj.otyp].oc_material | 0) === IRON && !obj.oerodeproof ? DOGFOOD : ACCFOOD;
+            if (metallivorous(mptr) && is_metallic(obj) && (is_rustprone(obj) || !$c.peq(mptr, $c.relem(mons, PM_RUST_MONSTER)))) {
+                return is_rustprone(obj) && !obj.oerodeproof ? DOGFOOD : ACCFOOD;
             }
             if (!obj.cursed && obj.oclass !== BALL_CLASS && obj.oclass !== CHAIN_CLASS) {
                 return APPORT;
@@ -825,9 +837,9 @@ export async function dogfood(mon, obj) {   // dog.c:995
 }
 export async function tamedog(mtmp, obj, givemsg) {   // dog.c:1143
     let blessed_scroll = 0, tasty = 0, big_corpse = 0;
-    blessed_scroll = 0;
+    blessed_scroll = FALSE;
     if (obj && (obj.oclass === SCROLL_CLASS || obj.oclass === SPBOOK_CLASS)) {
-        blessed_scroll = $c.i8(obj.blessed | 0 ? 1 : 0);
+        blessed_scroll = $c.i8(obj.blessed | 0 ? TRUE : FALSE);
         obj = $c.asRec(null, $T.obj, 112);
     }
     if (mtmp.mfrozen) {
@@ -837,39 +849,39 @@ export async function tamedog(mtmp, obj, givemsg) {   // dog.c:1143
         await wake_nearto(mtmp.mx, mtmp.my, 1);
     }
     if (mtmp.iswiz | 0 || $c.peq(mtmp.data, $c.relem(mons, PM_MEDUSA)) || mtmp.data.mflags3 & M3_WANTSARTI) {
-        return 0;
+        return FALSE;
     }
-    if (givemsg && !mtmp.mpeaceful && (canseemon(mtmp) || sensemon(mtmp))) {
-        await pline_mon(mtmp, $c.lit("%s seems %s."), await Monnam(mtmp), u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? $c.lit("really chill") : $c.lit("more amiable"));
-        givemsg = 0;
+    if (givemsg && !mtmp.mpeaceful && canspotmon(mtmp)) {
+        await pline_mon(mtmp, $c.lit("%s seems %s."), await Monnam(mtmp), Hallucination() ? $c.lit("really chill") : $c.lit("more amiable"));
+        givemsg = FALSE;
     }
     mtmp.mpeaceful = (1) & 1;
     set_malign(mtmp);
     if (flags.moonphase === FULL_MOON && night() && rn2(6) && obj && mtmp.data.mlet === S_DOG) {
-        return 0;
+        return FALSE;
     }
     mtmp.mflee = (0) & 1;
     mtmp.mfleetim = (0) & 127;
     if ($c.peq(mtmp, u.ustuck)) {
         if (u.uswallow) {
-            await expels(mtmp, mtmp.data, 1);
-        } else if (!(u.umonnum !== u.umonster && sticks(gy.youmonst.data))) {
+            await expels(mtmp, mtmp.data, TRUE);
+        } else if (!(Upolyd() && sticks(gy.youmonst.data))) {
             await unstuck(mtmp);
         }
     }
     if (mtmp.mtame && obj) {
         if (mtmp.mcanmove | 0 && !mtmp.mconf && !mtmp.meating && ((tasty = await dogfood(mtmp, obj)) === DOGFOOD || tasty <= ACCFOOD && mtmp.mextra.edog.hungrytime <= svm.moves)) {
             if (canseemon(mtmp)) {
-                big_corpse = $c.i8(obj.otyp === CORPSE && (obj.corpsenm >= LOW_PM && obj.corpsenm < NUMMONS) && mons[obj.corpsenm].msize > mtmp.data.msize ? 1 : 0);
+                big_corpse = $c.i8(obj.otyp === CORPSE && ismnum(obj.corpsenm) && mons[obj.corpsenm].msize > mtmp.data.msize ? 1 : 0);
                 await pline_mon(mtmp, $c.lit("%s catches %s%s"), await Monnam(mtmp), await the(await xname(obj)), !big_corpse ? $c.lit(".") : $c.lit(", or vice versa!"));
-            } else if ((gv.viz_array.get(mtmp.my).get(mtmp.mx) & IN_SIGHT) !== 0) {
+            } else if (cansee(mtmp.mx, mtmp.my)) {
                 await pline($c.lit("%s."), await Tobjnam(obj, $c.lit("stop")));
             }
             await place_object(obj, mtmp.mx, mtmp.my);
-            await dog_eat(mtmp, obj, mtmp.mx, mtmp.my, 0);
-            return 1;
+            await dog_eat(mtmp, obj, mtmp.mx, mtmp.my, FALSE);
+            return TRUE;
         } else {
-            return 0;
+            return FALSE;
         }
     }
     if (mtmp.mtame && mtmp.mtame < 10) {
@@ -882,32 +894,32 @@ export async function tamedog(mtmp, obj, givemsg) {   // dog.c:1143
                 mtmp.mtame = 10;
             }
         }
-        return 0;
+        return FALSE;
     }
     if (mtmp.isshk) {
-        await make_happy_shk(mtmp, 0);
-        return 0;
+        await make_happy_shk(mtmp, FALSE);
+        return FALSE;
     }
-    if (!mtmp.mcanmove || mtmp.isshk | 0 || mtmp.isgd | 0 || mtmp.ispriest | 0 || mtmp.isminion | 0 || mtmp.data.mflags3 & M3_COVETOUS || $c.andu64(mtmp.data.mflags2, M2_HUMAN) !== 0 || $c.andu64(mtmp.data.mflags2, M2_DEMON) !== 0 && !($c.andu64(gy.youmonst.data.mflags2, M2_DEMON) !== 0) || obj && await dogfood(mtmp, obj) >= MANFOOD) {
-        return 0;
+    if (!mtmp.mcanmove || mtmp.isshk | 0 || mtmp.isgd | 0 || mtmp.ispriest | 0 || mtmp.isminion | 0 || is_covetous(mtmp.data) || is_human(mtmp.data) || is_demon(mtmp.data) && !is_demon(gy.youmonst.data) || obj && await dogfood(mtmp, obj) >= MANFOOD) {
+        return FALSE;
     }
     if (mtmp.m_id === svq.quest_status.leader_m_id) {
-        return 0;
+        return FALSE;
     }
-    if (!(mtmp.mextra && mtmp.mextra.edog)) {
+    if (!has_edog(mtmp)) {
         await newedog(mtmp);
-        await initedog(mtmp, 1);
+        await initedog(mtmp, TRUE);
     } else {
-        await initedog(mtmp, 0);
+        await initedog(mtmp, FALSE);
     }
     if (obj) {
         await place_object(obj, mtmp.mx, mtmp.my);
-        if (await dog_eat(mtmp, obj, mtmp.mx, mtmp.my, 1) === 2) {
-            return 1;
+        if (await dog_eat(mtmp, obj, mtmp.mx, mtmp.my, TRUE) === 2) {
+            return TRUE;
         }
     }
-    if (givemsg && (canseemon(mtmp) || sensemon(mtmp))) {
-        await pline_mon(mtmp, $c.lit("%s seems quite %s."), await Monnam(mtmp), u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? $c.lit("approachable") : $c.lit("friendly"));
+    if (givemsg && canspotmon(mtmp)) {
+        await pline_mon(mtmp, $c.lit("%s seems quite %s."), await Monnam(mtmp), Hallucination() ? $c.lit("approachable") : $c.lit("friendly"));
     }
     await newsym(mtmp.mx, mtmp.my);
     if (mtmp.wormno) {
@@ -917,7 +929,7 @@ export async function tamedog(mtmp, obj, givemsg) {   // dog.c:1143
         mtmp.weapon_check = NEED_HTH_WEAPON;
         await mon_wield_item(mtmp);
     }
-    return 1;
+    return TRUE;
 }
 export async function wary_dog(mtmp, was_dead) {   // dog.c:1292
     let edog = null, quietly = 0, $t1, $t2, $t3, $t4;
@@ -939,9 +951,9 @@ export async function wary_dog(mtmp, was_dead) {   // dog.c:1292
                 mtmp.mpeaceful = (1) & 1;
             }
         }
-        if (!quietly && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & IN_SIGHT) !== 0) {
-            if ($c.andu64(gy.youmonst.data.mflags1, M1_NOEYES) === 0) {
-                if ($c.andu64(mtmp.data.mflags1, M1_NOEYES) === 0) {
+        if (!quietly && cansee(mtmp.mx, mtmp.my)) {
+            if (haseyes(gy.youmonst.data)) {
+                if (haseyes(mtmp.data)) {
                     await pline_mon(mtmp, $c.lit("%s %s to look you in the %s."), await Monnam(mtmp), mtmp.mpeaceful | 0 ? $c.lit("seems unable") : $c.lit("refuses"), await body_part(EYE));
                 } else {
                     await pline_mon(mtmp, $c.lit("%s avoids your gaze."), await Monnam(mtmp));
@@ -955,12 +967,12 @@ export async function wary_dog(mtmp, was_dead) {   // dog.c:1292
         }
     }
     if (!mtmp.mtame) {
-        if (!quietly && (canseemon(mtmp) || sensemon(mtmp))) {
+        if (!quietly && canspotmon(mtmp)) {
             await pline_mon(mtmp, $c.lit("%s %s."), await Monnam(mtmp), mtmp.mpeaceful | 0 ? $c.lit("is no longer tame") : $c.lit("has become feral"));
         }
         await newsym(mtmp.mx, mtmp.my);
         if (mtmp.mleashed) {
-            await m_unleash(mtmp, 1);
+            await m_unleash(mtmp, TRUE);
         }
         if ($c.peq(mtmp, u.usteed)) {
             await dismount_steed(DISMOUNT_THROWN);
@@ -985,7 +997,7 @@ export async function abuse_dog(mtmp) {   // dog.c:1362
     if (!mtmp.mtame) {
         return;
     }
-    if (u.uprops[AGGRAVATE_MONSTER].intrinsic || u.uprops[AGGRAVATE_MONSTER].extrinsic || (u.uprops[CONFLICT].intrinsic || u.uprops[CONFLICT].extrinsic)) {
+    if (Aggravate_monster() || Conflict()) {
         mtmp.mtame = $c.i8($c.div32(mtmp.mtame, 2));
     } else {
         mtmp.mtame = $c.i8(mtmp.mtame - 1);
@@ -994,7 +1006,7 @@ export async function abuse_dog(mtmp) {   // dog.c:1362
         mtmp.mextra.edog.abuse = mtmp.mextra.edog.abuse + 1 | 0;
     }
     if (!mtmp.mtame && mtmp.mleashed | 0) {
-        await m_unleash(mtmp, 1);
+        await m_unleash(mtmp, TRUE);
     }
     if (mtmp.mx !== 0) {
         if (mtmp.mtame && rn2(mtmp.mtame)) {

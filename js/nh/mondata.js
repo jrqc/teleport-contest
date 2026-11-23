@@ -2,40 +2,45 @@
 import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
-import { defends, defends_when_carried, is_art } from './artifact.js';
+import { defends, defends_when_carried } from './artifact.js';
 import { ART_EXCALIBUR } from './artilist.h.js';
 import { acurr } from './attrib.js';
 import { A_CHA } from './attrib.h.js';
 import { title_to_mon } from './botl.js';
-import { cg, gi, gm, gu, gv, gy, svl, svm, u } from './decl.js';
-import { ARMOR_CLASS, DEF_INVISIBLE, S_ANGEL, S_BLOB, S_CENTAUR, S_DEMON, S_DRAGON, S_EEL, S_ELEMENTAL, S_EYE, S_FUNGUS, S_GHOST, S_GOLEM, S_IMP, S_JELLY, S_KOBOLD, S_LICH, S_LIGHT, S_MIMIC, S_MIMIC_DEF, S_MUMMY, S_NAGA, S_NYMPH, S_OGRE, S_PUDDING, S_RODENT, S_UNICORN, S_VAMPIRE, S_VORTEX, S_WORM, S_WORM_TAIL, S_WRAITH, S_XAN, S_ZOMBIE, S_invisible, TOOL_CLASS, WEAPON_CLASS } from './defsym.h.js';
-import { canseemon, sensemon } from './display.js';
+import { cg, gi, gu, gv, gy, svl, svm, u } from './decl.js';
+import { ARMOR_CLASS, DEF_INVISIBLE, S_ANGEL, S_BLOB, S_CENTAUR, S_DEMON, S_DRAGON, S_EEL, S_ELEMENTAL, S_EYE, S_FUNGUS, S_GHOST, S_IMP, S_JELLY, S_KOBOLD, S_LICH, S_LIGHT, S_MIMIC, S_MIMIC_DEF, S_MUMMY, S_NAGA, S_NYMPH, S_OGRE, S_PUDDING, S_RODENT, S_VAMPIRE, S_VORTEX, S_WORM, S_WORM_TAIL, S_WRAITH, S_XAN, S_ZOMBIE, S_invisible, WEAPON_CLASS } from './defsym.h.js';
+import { canspotmon } from './display.macros.js';
 import { def_char_to_monclass, def_monsyms } from './drawing.js';
-import { is_fainted } from './eat.js';
+import { FALSE, TRUE } from './global.h.js';
 import { dist2, highc, strncmpi, strstri } from './hacklib.js';
 import { AD_ACID, AD_ANY, AD_BLND, AD_COLD, AD_CORR, AD_DCAY, AD_DISN, AD_DRCO, AD_DRDX, AD_DRLI, AD_DRST, AD_ELEC, AD_FIRE, AD_MAGM, AD_PHYS, AD_RBRE, AD_RUST, AD_SLEE, AD_STCK, AD_STON, AD_WERE, AD_WRAP, AT_ANY, AT_BITE, AT_BOOM, AT_BREA, AT_BUTT, AT_CLAW, AT_ENGL, AT_EXPL, AT_GAZE, AT_HUGS, AT_KICK, AT_MAGC, AT_NONE, AT_SPIT, AT_STNG, AT_TENT, AT_TUCH, AT_WEAP } from './monattk.h.js';
-import { FEMALE, G_GENOD, G_LGROUP, G_SGROUP, G_UNIQ, M1_AMORPHOUS, M1_ANIMAL, M1_BREATHLESS, M1_FLY, M1_HUMANOID, M1_MINDLESS, M1_NOEYES, M1_NOHEAD, M1_NOLIMBS, M1_SEE_INVIS, M1_SLITHY, M1_UNSOLID, M1_WALLWALK, M2_DEMON, M2_DWARF, M2_ELF, M2_GIANT, M2_GNOME, M2_HUMAN, M2_JEWELS, M2_MINION, M2_NEUTER, M2_ORC, M2_PNAME, M2_STALK, M2_STRONG, M2_UNDEAD, M2_WERE, MALE, MS_BURBLE, MS_BUZZ, MS_SILENT, MZ_LARGE, MZ_SMALL, NEUTRAL, NUM_MGENDERS } from './monflag.h.js';
+import { DISTANCE_ATTK_TYPE } from './monattk.macros.js';
+import { amorphous, bigmonst, breathless, completelyburns, completelyrots, completelyrusts, has_head, haseyes, hates_light, humanoid, is_animal, is_demon, is_dwarf, is_elf, is_floater, is_flyer, is_giant, is_gnome, is_golem, is_human, is_longworm, is_mind_flayer, is_minion, is_neuter, is_orc, is_rider, is_silent, is_undead, is_unicorn, is_were, is_whirly, metallivorous, mindless, nolimbs, noncorporeal, passes_walls, slithy, type_is_pname, unsolid, verysmall } from './mondata.macros.js';
+import { FEMALE, G_GENOD, G_LGROUP, G_SGROUP, G_UNIQ, M1_BREATHLESS, M1_SEE_INVIS, M2_STALK, M2_STRONG, MALE, MS_BURBLE, MS_BUZZ, MZ_SMALL, NEUTRAL, NUM_MGENDERS } from './monflag.h.js';
 import { mons } from './monst.js';
 import { M_SEEN_ACID, M_SEEN_COLD, M_SEEN_DISINT, M_SEEN_ELEC, M_SEEN_FIRE, M_SEEN_MAGR, M_SEEN_NOTHING, M_SEEN_POISON, M_SEEN_REFL, M_SEEN_SLEEP } from './monst.h.js';
-import { PM_ACOLYTE, PM_AIR_ELEMENTAL, PM_ALIGNED_CLERIC, PM_AMOROUS_DEMON, PM_ANGEL, PM_APPRENTICE, PM_ARCHEOLOGIST, PM_ARCH_LICH, PM_ASMODEUS, PM_ATTENDANT, PM_BABY_BLACK_DRAGON, PM_BABY_BLUE_DRAGON, PM_BABY_CROCODILE, PM_BABY_GOLD_DRAGON, PM_BABY_GRAY_DRAGON, PM_BABY_GREEN_DRAGON, PM_BABY_LONG_WORM, PM_BABY_ORANGE_DRAGON, PM_BABY_PURPLE_WORM, PM_BABY_RED_DRAGON, PM_BABY_SILVER_DRAGON, PM_BABY_WHITE_DRAGON, PM_BABY_YELLOW_DRAGON, PM_BALROG, PM_BALUCHITHERIUM, PM_BAT, PM_BLACK_DRAGON, PM_BLACK_NAGA, PM_BLACK_NAGA_HATCHLING, PM_BLACK_UNICORN, PM_BLUE_DRAGON, PM_CAPTAIN, PM_CAVE_DWELLER, PM_CAVE_SPIDER, PM_CHICKATRICE, PM_CLAY_GOLEM, PM_CLERIC, PM_COCKATRICE, PM_CROCODILE, PM_DEATH, PM_DEMILICH, PM_DJINNI, PM_DOG, PM_DUST_VORTEX, PM_DWARF, PM_DWARF_LEADER, PM_DWARF_RULER, PM_EARTH_ELEMENTAL, PM_ELF, PM_ELF_NOBLE, PM_ELVEN_MONARCH, PM_ENERGY_VORTEX, PM_ERINYS, PM_FAMINE, PM_FIRE_ELEMENTAL, PM_FIRE_VORTEX, PM_FLAMING_SPHERE, PM_FOG_CLOUD, PM_FREEZING_SPHERE, PM_GARGOYLE, PM_GIANT_BAT, PM_GIANT_MIMIC, PM_GIANT_RAT, PM_GIANT_SPIDER, PM_GLASS_GOLEM, PM_GNOME, PM_GNOME_LEADER, PM_GNOME_RULER, PM_GOLDEN_NAGA, PM_GOLDEN_NAGA_HATCHLING, PM_GOLD_DRAGON, PM_GOLD_GOLEM, PM_GRAY_DRAGON, PM_GRAY_OOZE, PM_GRAY_UNICORN, PM_GREEN_DRAGON, PM_GREEN_ELF, PM_GREMLIN, PM_GREY_ELF, PM_GUARDIAN_NAGA, PM_GUARDIAN_NAGA_HATCHLING, PM_HEALER, PM_HELL_HOUND, PM_HELL_HOUND_PUP, PM_HIGH_CLERIC, PM_HILL_ORC, PM_HOBBIT, PM_HOMUNCULUS, PM_HORNED_DEVIL, PM_HORSE, PM_HOUSECAT, PM_HUMAN_WEREJACKAL, PM_HUMAN_WERERAT, PM_HUMAN_WEREWOLF, PM_ICE_VORTEX, PM_IRON_GOLEM, PM_KEYSTONE_KOP, PM_KILLER_BEE, PM_KITTEN, PM_KI_RIN, PM_KNIGHT, PM_KOBOLD, PM_KOBOLD_LEADER, PM_KOBOLD_MUMMY, PM_KOBOLD_ZOMBIE, PM_KOP_KAPTAIN, PM_KOP_LIEUTENANT, PM_KOP_SERGEANT, PM_LARGE_CAT, PM_LARGE_DOG, PM_LARGE_KOBOLD, PM_LARGE_MIMIC, PM_LEATHER_GOLEM, PM_LEMURE, PM_LICH, PM_LIEUTENANT, PM_LITTLE_DOG, PM_LONG_WORM, PM_LONG_WORM_TAIL, PM_LURKER_ABOVE, PM_MANES, PM_MARILITH, PM_MASTER_ASSASSIN, PM_MASTER_LICH, PM_MASTER_MIND_FLAYER, PM_MASTER_OF_THIEVES, PM_MIND_FLAYER, PM_MINOTAUR, PM_MORDOR_ORC, PM_MUMAK, PM_OGRE, PM_OGRE_LEADER, PM_OGRE_TYRANT, PM_OLOG_HAI, PM_ORANGE_DRAGON, PM_ORC, PM_ORC_CAPTAIN, PM_PAGE, PM_PAPER_GOLEM, PM_PESTILENCE, PM_PONY, PM_PURPLE_WORM, PM_QUEEN_BEE, PM_RAVEN, PM_RED_DRAGON, PM_RED_NAGA, PM_RED_NAGA_HATCHLING, PM_ROCK_MOLE, PM_SALAMANDER, PM_SERGEANT, PM_SEWER_RAT, PM_SHADE, PM_SHOCKING_SPHERE, PM_SILVER_DRAGON, PM_SMALL_MIMIC, PM_SOLDIER, PM_STALKER, PM_STEAM_VORTEX, PM_STONE_GOLEM, PM_STRAW_GOLEM, PM_STUDENT, PM_TENGU, PM_URUK_HAI, PM_VAMPIRE, PM_VAMPIRE_LEADER, PM_VIOLET_FUNGUS, PM_VLAD_THE_IMPALER, PM_WARHORSE, PM_WATCHMAN, PM_WATCH_CAPTAIN, PM_WATER_DEMON, PM_WATER_ELEMENTAL, PM_WEREJACKAL, PM_WERERAT, PM_WEREWOLF, PM_WHITE_DRAGON, PM_WHITE_UNICORN, PM_WINGED_GARGOYLE, PM_WINTER_WOLF, PM_WINTER_WOLF_CUB, PM_WIZARD, PM_WOODCHUCK, PM_WOODLAND_ELF, PM_WOOD_GOLEM, PM_WOOD_NYMPH, PM_YELLOW_DRAGON, PM_YELLOW_LIGHT } from './monsters.h.js';
+import { DEADMONSTER, is_vampshifter, m_clearseenres, m_setseenres, mon_perma_blind, mon_resistancebits, resists_acid, resists_cold, resists_elec, resists_fire } from './monst.macros.js';
+import { PM_ACOLYTE, PM_AIR_ELEMENTAL, PM_ALIGNED_CLERIC, PM_AMOROUS_DEMON, PM_ANGEL, PM_APPRENTICE, PM_ARCHEOLOGIST, PM_ARCH_LICH, PM_ASMODEUS, PM_ATTENDANT, PM_BABY_BLACK_DRAGON, PM_BABY_BLUE_DRAGON, PM_BABY_CROCODILE, PM_BABY_GOLD_DRAGON, PM_BABY_GRAY_DRAGON, PM_BABY_GREEN_DRAGON, PM_BABY_LONG_WORM, PM_BABY_ORANGE_DRAGON, PM_BABY_PURPLE_WORM, PM_BABY_RED_DRAGON, PM_BABY_SILVER_DRAGON, PM_BABY_WHITE_DRAGON, PM_BABY_YELLOW_DRAGON, PM_BALROG, PM_BALUCHITHERIUM, PM_BAT, PM_BLACK_DRAGON, PM_BLACK_NAGA, PM_BLACK_NAGA_HATCHLING, PM_BLACK_UNICORN, PM_BLUE_DRAGON, PM_CAPTAIN, PM_CAVE_DWELLER, PM_CAVE_SPIDER, PM_CHICKATRICE, PM_CLAY_GOLEM, PM_CLERIC, PM_COCKATRICE, PM_CROCODILE, PM_DEATH, PM_DEMILICH, PM_DJINNI, PM_DOG, PM_DUST_VORTEX, PM_DWARF, PM_DWARF_LEADER, PM_DWARF_RULER, PM_EARTH_ELEMENTAL, PM_ELF, PM_ELF_NOBLE, PM_ELVEN_MONARCH, PM_ENERGY_VORTEX, PM_ERINYS, PM_FIRE_ELEMENTAL, PM_FIRE_VORTEX, PM_FLAMING_SPHERE, PM_FOG_CLOUD, PM_FREEZING_SPHERE, PM_GARGOYLE, PM_GIANT_BAT, PM_GIANT_MIMIC, PM_GIANT_RAT, PM_GIANT_SPIDER, PM_GLASS_GOLEM, PM_GNOME, PM_GNOME_LEADER, PM_GNOME_RULER, PM_GOLDEN_NAGA, PM_GOLDEN_NAGA_HATCHLING, PM_GOLD_DRAGON, PM_GOLD_GOLEM, PM_GRAY_DRAGON, PM_GRAY_OOZE, PM_GRAY_UNICORN, PM_GREEN_DRAGON, PM_GREEN_ELF, PM_GREY_ELF, PM_GUARDIAN_NAGA, PM_GUARDIAN_NAGA_HATCHLING, PM_HEALER, PM_HELL_HOUND, PM_HELL_HOUND_PUP, PM_HIGH_CLERIC, PM_HILL_ORC, PM_HOBBIT, PM_HOMUNCULUS, PM_HORNED_DEVIL, PM_HORSE, PM_HOUSECAT, PM_HUMAN_WEREJACKAL, PM_HUMAN_WERERAT, PM_HUMAN_WEREWOLF, PM_ICE_VORTEX, PM_KEYSTONE_KOP, PM_KILLER_BEE, PM_KITTEN, PM_KI_RIN, PM_KNIGHT, PM_KOBOLD, PM_KOBOLD_LEADER, PM_KOBOLD_MUMMY, PM_KOBOLD_ZOMBIE, PM_KOP_KAPTAIN, PM_KOP_LIEUTENANT, PM_KOP_SERGEANT, PM_LARGE_CAT, PM_LARGE_DOG, PM_LARGE_KOBOLD, PM_LARGE_MIMIC, PM_LEMURE, PM_LICH, PM_LIEUTENANT, PM_LITTLE_DOG, PM_LONG_WORM, PM_LURKER_ABOVE, PM_MANES, PM_MARILITH, PM_MASTER_ASSASSIN, PM_MASTER_LICH, PM_MASTER_MIND_FLAYER, PM_MASTER_OF_THIEVES, PM_MIND_FLAYER, PM_MINOTAUR, PM_MORDOR_ORC, PM_MUMAK, PM_OGRE, PM_OGRE_LEADER, PM_OGRE_TYRANT, PM_OLOG_HAI, PM_ORANGE_DRAGON, PM_ORC, PM_ORC_CAPTAIN, PM_PAGE, PM_PONY, PM_PURPLE_WORM, PM_QUEEN_BEE, PM_RAVEN, PM_RED_DRAGON, PM_RED_NAGA, PM_RED_NAGA_HATCHLING, PM_ROCK_MOLE, PM_SALAMANDER, PM_SERGEANT, PM_SEWER_RAT, PM_SHADE, PM_SHOCKING_SPHERE, PM_SILVER_DRAGON, PM_SMALL_MIMIC, PM_SOLDIER, PM_STALKER, PM_STEAM_VORTEX, PM_STONE_GOLEM, PM_STUDENT, PM_TENGU, PM_URUK_HAI, PM_VAMPIRE, PM_VAMPIRE_LEADER, PM_VIOLET_FUNGUS, PM_WARHORSE, PM_WATCHMAN, PM_WATCH_CAPTAIN, PM_WATER_DEMON, PM_WATER_ELEMENTAL, PM_WEREJACKAL, PM_WERERAT, PM_WEREWOLF, PM_WHITE_DRAGON, PM_WHITE_UNICORN, PM_WINGED_GARGOYLE, PM_WINTER_WOLF, PM_WINTER_WOLF_CUB, PM_WIZARD, PM_WOODCHUCK, PM_WOODLAND_ELF, PM_WOOD_NYMPH, PM_YELLOW_DRAGON, PM_YELLOW_LIGHT } from './monsters.h.js';
 import { objdescr_is } from './o_init.js';
+import { Is_dragon_armor, is_weptool, u_wield_art } from './obj.macros.js';
 import { objects } from './objects.js';
-import { ALCHEMY_SMOCK, AMULET_OF_MAGICAL_BREATHING, BLINDING_VENOM, CREAM_PIE, GRAY_DRAGON_SCALES, GRAY_DRAGON_SCALE_MAIL, POT_BLINDNESS, YELLOW_DRAGON_SCALES, YELLOW_DRAGON_SCALE_MAIL } from './objects.h.js';
+import { ALCHEMY_SMOCK, AMULET_OF_MAGICAL_BREATHING, BLINDING_VENOM, CREAM_PIE, GRAY_DRAGON_SCALES, POT_BLINDNESS } from './objects.h.js';
 import { makesingular } from './objnam.js';
 import { LOW_PM, NATTK, NON_PM, NUMMONS } from './permonst.h.js';
 import { impossible } from './pline.js';
-import { ACID_RES, ANTIMAGIC, BLINDED, BLND_RES, COLD_RES, DISINT_RES, DRAIN_RES, FIRE_RES, FROMEXPER, FROMOUTSIDE, FROMRACE, HALLUC, HALLUC_RES, INVIS, MAGICAL_BREATHING, POISON_RES, REFLECTING, SHOCK_RES, SLEEP_RES, STONE_RES, STRANGLED, W_AMUL, W_ARM, W_ARMC, W_ARMF, W_ARMG, W_ARMH, W_ARMS, W_ARMU, W_RINGL, W_RINGR, W_SWAPWEP, W_TOOL, W_WEP } from './prop.h.js';
+import { ACID_RES, ANTIMAGIC, BLINDED, BLND_RES, COLD_RES, DISINT_RES, DRAIN_RES, FIRE_RES, INTRINSIC, INVIS, MAGICAL_BREATHING, POISON_RES, REFLECTING, SHOCK_RES, SLEEP_RES, STONE_RES, W_ACCESSORY, W_AMUL, W_ARM, W_ARMC, W_ARMH, W_ARMOR, W_SWAPWEP, W_WEP } from './prop.h.js';
+import { res_to_mr } from './prop.macros.js';
 import { rn2, rnd } from './rnd.js';
 import { is_fshk } from './shk.js';
-import { P_NONE } from './skills.h.js';
 import { MAXMCLASSES } from './sym.h.js';
-import { unconscious } from './trap.js';
 import { ALL_TRAPS, NO_TRAP } from './trap.h.js';
-import { clear_path } from './vision.js';
 import { COULD_SEE } from './vision.h.js';
+import { m_cansee } from './vision.macros.js';
 import { mon_has_amulet } from './wizard.js';
 import { which_armor } from './worn.js';
 import { PRONOUN_HALLU, PRONOUN_NO_IT } from './you.h.js';
+import { Upolyd } from './you.macros.js';
+import { Blind, Blnd_resist, Hallucination, Strangled, Unaware } from './youprop.macros.js';
 
 const name_to_monplus$names = $c.recArray($T.alt_spl, 56);   // static in name_to_monplus()
 const name_to_monclass$falsematch = $c.nulls(6);   // static in name_to_monclass()
@@ -76,7 +81,7 @@ export function attacktype_fordmg(ptr, atyp, dtyp) {   // mondata.c:42
     return null;
 }
 export function attacktype(ptr, atyp) {   // mondata.c:54
-    return $c.i8(attacktype_fordmg(ptr, atyp, AD_ANY) ? 1 : 0);
+    return $c.i8(attacktype_fordmg(ptr, atyp, AD_ANY) ? TRUE : FALSE);
 }
 export function noattacks(ptr) {   // mondata.c:61
     let i = 0, mattk = null;
@@ -86,20 +91,20 @@ export function noattacks(ptr) {   // mondata.c:61
             continue;
         }
         if ($c.radd(mattk, i).aatyp) {
-            return 0;
+            return FALSE;
         }
     }
-    return 1;
+    return TRUE;
 }
 export function poly_when_stoned(ptr) {   // mondata.c:80
-    return $c.i8(ptr.mlet === S_GOLEM && !$c.peq(ptr, $c.relem(mons, PM_STONE_GOLEM)) && !(svm.mvitals[PM_STONE_GOLEM].mvflags & G_GENOD) ? 1 : 0);
+    return $c.i8(is_golem(ptr) && !$c.peq(ptr, $c.relem(mons, PM_STONE_GOLEM)) && !(svm.mvitals[PM_STONE_GOLEM].mvflags & G_GENOD) ? 1 : 0);
 }
 export async function defended(mon, adtyp) {   // mondata.c:91
     let o = null, otemp = new $T.obj(), mndx = 0, is_you = 0;
     is_you = $c.i8($c.peq(mon, gy.youmonst) ? 1 : 0);
     o = is_you ? $G.uwep : mon.mw;
     if (o && o.oartifact && defends(adtyp, o)) {
-        return 1;
+        return TRUE;
     }
     mndx = mon.data.pmidx;
     if (mndx >= PM_GRAY_DRAGON && mndx <= PM_YELLOW_DRAGON) {
@@ -110,10 +115,10 @@ export async function defended(mon, adtyp) {   // mondata.c:91
     } else {
         o = is_you ? $G.uarm : await which_armor(mon, W_ARM);
     }
-    if (o && (o.otyp >= GRAY_DRAGON_SCALES && o.otyp <= YELLOW_DRAGON_SCALES || o.otyp >= GRAY_DRAGON_SCALE_MAIL && o.otyp <= YELLOW_DRAGON_SCALE_MAIL) && defends(adtyp, o)) {
-        return 1;
+    if (o && Is_dragon_armor(o) && defends(adtyp, o)) {
+        return TRUE;
     }
-    return 0;
+    return FALSE;
 }
 export async function Resists_Elem(mon, propindx) {   // mondata.c:129
     let o = null, slotmask = 0, is_you = 0, u_resist = 0, damgtype = 0, rsstmask = 0;
@@ -142,18 +147,18 @@ export async function Resists_Elem(mon, propindx) {   // mondata.c:129
             return await resists_blnd(mon);
         default:
             await impossible($c.lit("Resists_Elem(%d), unexpected property type"), propindx);
-            return 0;
+            return FALSE;
     }
-    if (is_you ? u_resist : ((mon.data.mresists | mon.mextrinsics | mon.mintrinsics) & rsstmask) !== 0) {
-        return 1;
+    if (is_you ? u_resist : (mon_resistancebits(mon) & rsstmask) !== 0) {
+        return TRUE;
     }
     o = is_you ? $G.uwep : mon.mw;
     if (o && o.oartifact && defends(damgtype, o)) {
-        return 1;
+        return TRUE;
     }
     o = is_you ? gi.invent : mon.minvent;
-    slotmask = W_ARM | W_ARMC | W_ARMH | W_ARMS | W_ARMG | W_ARMF | W_ARMU | (W_RINGL | W_RINGR | W_AMUL | W_TOOL);
-    if (!is_you || $G.uwep && ($G.uwep.oclass === WEAPON_CLASS || $G.uwep.oclass === TOOL_CLASS && objects[$G.uwep.otyp].oc_subtyp !== P_NONE)) {
+    slotmask = W_ARMOR | W_ACCESSORY;
+    if (!is_you || $G.uwep && ($G.uwep.oclass === WEAPON_CLASS || is_weptool($G.uwep))) {
         slotmask = $c.or64(slotmask, W_WEP);
     }
     if (is_you && u.twoweap) {
@@ -161,16 +166,16 @@ export async function Resists_Elem(mon, propindx) {   // mondata.c:129
     }
     for (; o; o = o.nobj) {
         if ($c.and64(o.owornmask, slotmask) !== 0 && objects[o.otyp].oc_oprop === propindx || $c.and64(o.owornmask, W_ARMC) === W_ARMC && o.otyp === ALCHEMY_SMOCK && (propindx === POISON_RES || propindx === ACID_RES) || o.oartifact && defends_when_carried(damgtype, o)) {
-            return 1;
+            return TRUE;
         }
     }
-    return 0;
+    return FALSE;
 }
 export async function resists_drli(mon) {   // mondata.c:201
     let ptr = null;
     ptr = mon.data;
-    if ($c.andu64(ptr.mflags2, M2_UNDEAD) !== 0 || $c.andu64(ptr.mflags2, M2_DEMON) !== 0 || $c.andu64(ptr.mflags2, M2_WERE) !== 0 || $c.peq(mon, gy.youmonst) && u.ulycn >= LOW_PM || $c.peq(ptr, $c.relem(mons, PM_DEATH)) || (mon.cham === PM_VAMPIRE || mon.cham === PM_VAMPIRE_LEADER || mon.cham === PM_VLAD_THE_IMPALER)) {
-        return 1;
+    if (is_undead(ptr) || is_demon(ptr) || is_were(ptr) || $c.peq(mon, gy.youmonst) && u.ulycn >= LOW_PM || $c.peq(ptr, $c.relem(mons, PM_DEATH)) || is_vampshifter(mon)) {
+        return TRUE;
     }
     return await defended(mon, AD_DRLI);
 }
@@ -179,15 +184,15 @@ export function resists_magm(mon) {   // mondata.c:215
     ptr = mon.data;
     is_you = $c.i8($c.peq(mon, gy.youmonst) ? 1 : 0);
     if (dmgtype(ptr, AD_MAGM) || $c.peq(ptr, $c.relem(mons, PM_BABY_GRAY_DRAGON)) || dmgtype(ptr, AD_RBRE)) {
-        return 1;
+        return TRUE;
     }
     o = is_you ? $G.uwep : mon.mw;
     if (o && o.oartifact && defends(AD_MAGM, o)) {
-        return 1;
+        return TRUE;
     }
     o = is_you ? gi.invent : mon.minvent;
-    slotmask = W_ARM | W_ARMC | W_ARMH | W_ARMS | W_ARMG | W_ARMF | W_ARMU | (W_RINGL | W_RINGR | W_AMUL | W_TOOL);
-    if (!is_you || $G.uwep && ($G.uwep.oclass === WEAPON_CLASS || $G.uwep.oclass === TOOL_CLASS && objects[$G.uwep.otyp].oc_subtyp !== P_NONE)) {
+    slotmask = W_ARMOR | W_ACCESSORY;
+    if (!is_you || $G.uwep && ($G.uwep.oclass === WEAPON_CLASS || is_weptool($G.uwep))) {
         slotmask = $c.or64(slotmask, W_WEP);
     }
     if (is_you && u.twoweap) {
@@ -195,57 +200,57 @@ export function resists_magm(mon) {   // mondata.c:215
     }
     for (; o; o = o.nobj) {
         if ($c.and64(o.owornmask, slotmask) !== 0 && objects[o.otyp].oc_oprop === ANTIMAGIC || o.oartifact && defends_when_carried(AD_MAGM, o)) {
-            return 1;
+            return TRUE;
         }
     }
-    return 0;
+    return FALSE;
 }
 export async function resists_blnd(mon) {   // mondata.c:248
     let ptr = null, is_you = 0;
     ptr = mon.data;
     is_you = $c.i8($c.peq(mon, gy.youmonst) ? 1 : 0);
-    if (is_you ? (u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked || gm.multi < 0 && (unconscious() || is_fainted()) : mon.mblinded | 0 || !mon.mcansee || !($c.andu64(ptr.mflags1, M1_NOEYES) === 0) || mon.msleeping | 0) {
-        return 1;
+    if (is_you ? Blind() || Unaware() : mon.mblinded | 0 || !mon.mcansee || !haseyes(ptr) || mon.msleeping | 0) {
+        return TRUE;
     }
     if (dmgtype_fromattack(ptr, AD_BLND, AT_EXPL) || dmgtype_fromattack(ptr, AD_BLND, AT_GAZE)) {
-        return 1;
+        return TRUE;
     }
     if (resists_blnd_by_arti(mon)) {
-        return 1;
+        return TRUE;
     }
-    if (is_you && (u.uprops[BLND_RES].intrinsic || u.uprops[BLND_RES].extrinsic)) {
+    if (is_you && Blnd_resist()) {
         await impossible($c.lit("'Blnd_resist' but not resists_blnd()?"));
-        return 1;
+        return TRUE;
     }
-    return 0;
+    return FALSE;
 }
 export function resists_blnd_by_arti(mon) {   // mondata.c:278
     let o = null, is_you = 0;
     is_you = $c.i8($c.peq(mon, gy.youmonst) ? 1 : 0);
     o = is_you ? $G.uwep : mon.mw;
     if (o && o.oartifact && defends(AD_BLND, o)) {
-        return 1;
+        return TRUE;
     }
     o = is_you ? gi.invent : mon.minvent;
     for (; o; o = o.nobj) {
         if (defends_when_carried(AD_BLND, o)) {
-            return 1;
+            return TRUE;
         }
     }
-    return 0;
+    return FALSE;
 }
 export async function can_blnd(magr, mdef, aatyp, obj) {   // mondata.c:305
     let is_you = 0, check_visor = 0, o = null;
     is_you = $c.i8($c.peq(mdef, gy.youmonst) ? 1 : 0);
-    check_visor = 0;
-    if (!($c.andu64(mdef.data.mflags1, M1_NOEYES) === 0)) {
-        return 0;
+    check_visor = FALSE;
+    if (!haseyes(mdef.data)) {
+        return FALSE;
     }
-    if (!is_you && (!mdef.mcansee && !mdef.mblinded)) {
-        return 0;
+    if (!is_you && mon_perma_blind(mdef)) {
+        return FALSE;
     }
     if (magr && $c.peq(magr.data, $c.relem(mons, PM_RAVEN)) && $c.peq(mdef.data, $c.relem(mons, PM_RAVEN))) {
-        return 0;
+        return FALSE;
     }
     switch (aatyp) {
         case AT_EXPL:
@@ -254,7 +259,7 @@ export async function can_blnd(magr, mdef, aatyp, obj) {   // mondata.c:305
         case AT_MAGC:
         case AT_BREA:
             if (magr && magr.mcan | 0) {
-                return 0;
+                return FALSE;
             }
             return $c.i8(!await resists_blnd(mdef) ? 1 : 0);
         case AT_WEAP:
@@ -262,43 +267,43 @@ export async function can_blnd(magr, mdef, aatyp, obj) {   // mondata.c:305
         case AT_NONE:
             if (obj && obj.otyp === CREAM_PIE) {
                 if (is_you && u.uprops[BLINDED].extrinsic) {
-                    return 0;
+                    return FALSE;
                 }
             } else if (obj && obj.otyp === BLINDING_VENOM) {
                 if (is_you && ($G.ublindf || u.ucreamed)) {
-                    return 0;
+                    return FALSE;
                 }
-                check_visor = 1;
+                check_visor = TRUE;
             } else if (obj && obj.otyp === POT_BLINDNESS) {
-                return 1;
+                return TRUE;
             } else {
-                return 0;
+                return FALSE;
             }
             if ($c.peq(magr, gy.youmonst) && u.uswallow | 0) {
-                return 0;
+                return FALSE;
             }
             break;
         case AT_ENGL:
-            if (is_you && (u.uprops[BLINDED].extrinsic || gm.multi < 0 && (unconscious() || is_fainted()) || u.ucreamed)) {
-                return 0;
+            if (is_you && (u.uprops[BLINDED].extrinsic || Unaware() || u.ucreamed)) {
+                return FALSE;
             }
             if (!is_you && mdef.msleeping | 0) {
-                return 0;
+                return FALSE;
             }
             break;
         case AT_CLAW:
             if (is_you && $G.ublindf) {
-                return 0;
+                return FALSE;
             }
             if ($c.peq(magr, gy.youmonst) && u.uswallow | 0) {
-                return 0;
+                return FALSE;
             }
-            check_visor = 1;
+            check_visor = TRUE;
             break;
         case AT_TUCH:
         case AT_STNG:
             if (magr && magr.mcan | 0) {
-                return 0;
+                return FALSE;
             }
             break;
         default:
@@ -308,20 +313,20 @@ export async function can_blnd(magr, mdef, aatyp, obj) {   // mondata.c:305
         o = $c.peq(mdef, gy.youmonst) ? gi.invent : mdef.minvent;
         for (; o; o = o.nobj) {
             if ($c.and64(o.owornmask, W_ARMH) && await objdescr_is(o, $c.lit("visored helmet"))) {
-                return 0;
+                return FALSE;
             }
         }
     }
-    return 1;
+    return TRUE;
 }
 export function ranged_attk(ptr) {   // mondata.c:402
     let i = 0;
     for (i = 0; i < NATTK; i = i + 1 | 0) {
-        if (ptr.mattk[i].aatyp === AT_SPIT || ptr.mattk[i].aatyp === AT_BREA || ptr.mattk[i].aatyp === AT_MAGC || ptr.mattk[i].aatyp === AT_GAZE) {
-            return 1;
+        if (DISTANCE_ATTK_TYPE(ptr.mattk[i].aatyp)) {
+            return TRUE;
         }
     }
-    return 0;
+    return FALSE;
 }
 export function mstrength(ptr) {   // mondata.c:428
     let i = 0, tmp2 = 0, n = 0, tmp = 0, tmp3 = 0;
@@ -376,84 +381,84 @@ function mstrength_ranged_attk(ptr) {   // mondata.c:501
     atk_mask = 1 << AT_BREA | 1 << AT_SPIT | 1 << AT_GAZE;
     for (i = 0; i < NATTK; i = i + 1 | 0) {
         if ((j = ptr.mattk[i].aatyp) >= AT_WEAP || j < 32 && (atk_mask & 1 << j) !== 0) {
-            return 1;
+            return TRUE;
         }
     }
-    return 0;
+    return FALSE;
 }
 export function mon_hates_silver(mon) {   // mondata.c:517
-    return $c.i8(mon.cham === PM_VAMPIRE || mon.cham === PM_VAMPIRE_LEADER || mon.cham === PM_VLAD_THE_IMPALER || hates_silver(mon.data) ? 1 : 0);
+    return $c.i8(is_vampshifter(mon) || hates_silver(mon.data) ? 1 : 0);
 }
 export function hates_silver(ptr) {   // mondata.c:524
-    return $c.i8($c.andu64(ptr.mflags2, M2_WERE) !== 0 || ptr.mlet === S_VAMPIRE || $c.andu64(ptr.mflags2, M2_DEMON) !== 0 || $c.peq(ptr, $c.relem(mons, PM_SHADE)) || ptr.mlet === S_IMP && !$c.peq(ptr, $c.relem(mons, PM_TENGU)) ? 1 : 0);
+    return $c.i8(is_were(ptr) || ptr.mlet === S_VAMPIRE || is_demon(ptr) || $c.peq(ptr, $c.relem(mons, PM_SHADE)) || ptr.mlet === S_IMP && !$c.peq(ptr, $c.relem(mons, PM_TENGU)) ? 1 : 0);
 }
 export function mon_hates_blessings(mon) {   // mondata.c:533
-    return $c.i8(mon.cham === PM_VAMPIRE || mon.cham === PM_VAMPIRE_LEADER || mon.cham === PM_VLAD_THE_IMPALER || hates_blessings(mon.data) ? 1 : 0);
+    return $c.i8(is_vampshifter(mon) || hates_blessings(mon.data) ? 1 : 0);
 }
 export function hates_blessings(ptr) {   // mondata.c:540
-    return $c.i8($c.andu64(ptr.mflags2, M2_UNDEAD) !== 0 || $c.andu64(ptr.mflags2, M2_DEMON) !== 0 ? 1 : 0);
+    return $c.i8(is_undead(ptr) || is_demon(ptr) ? 1 : 0);
 }
 export function mon_hates_light(mon) {   // mondata.c:547
-    return $c.i8($c.peq(mon.data, $c.relem(mons, PM_GREMLIN)) ? 1 : 0);
+    return $c.i8(hates_light(mon.data));
 }
 export function passes_bars(mptr) {   // mondata.c:554
-    return $c.i8($c.andu64(mptr.mflags1, M1_WALLWALK) !== 0 || $c.andu64(mptr.mflags1, M1_AMORPHOUS) !== 0 || $c.andu64(mptr.mflags1, M1_UNSOLID) !== 0 || (mptr.mlet === S_VORTEX || $c.peq(mptr, $c.relem(mons, PM_AIR_ELEMENTAL))) || mptr.msize < MZ_SMALL || dmgtype(mptr, AD_RUST) || dmgtype(mptr, AD_CORR) || $c.andu64(mptr.mflags1, 2147483648) !== 0 || $c.andu64(mptr.mflags1, M1_SLITHY) !== 0 && !(mptr.msize >= MZ_LARGE) ? 1 : 0);
+    return $c.i8(passes_walls(mptr) || amorphous(mptr) || unsolid(mptr) || is_whirly(mptr) || verysmall(mptr) || dmgtype(mptr, AD_RUST) || dmgtype(mptr, AD_CORR) || metallivorous(mptr) || slithy(mptr) && !bigmonst(mptr) ? 1 : 0);
 }
 export function can_blow(mtmp) {   // mondata.c:567
-    if ((mtmp.data.msound === MS_SILENT || mtmp.data.msound === MS_BUZZ) && ($c.andu64(mtmp.data.mflags1, M1_BREATHLESS) !== 0 || mtmp.data.msize < MZ_SMALL || !($c.andu64(mtmp.data.mflags1, M1_NOHEAD) === 0) || mtmp.data.mlet === S_EEL)) {
-        return 0;
+    if ((is_silent(mtmp.data) || mtmp.data.msound === MS_BUZZ) && (breathless(mtmp.data) || verysmall(mtmp.data) || !has_head(mtmp.data) || mtmp.data.mlet === S_EEL)) {
+        return FALSE;
     }
-    if ($c.peq(mtmp, gy.youmonst) && u.uprops[STRANGLED].intrinsic) {
-        return 0;
+    if ($c.peq(mtmp, gy.youmonst) && Strangled()) {
+        return FALSE;
     }
-    return 1;
+    return TRUE;
 }
 export function can_chant(mtmp) {   // mondata.c:580
-    if ($c.peq(mtmp, gy.youmonst) && u.uprops[STRANGLED].intrinsic || mtmp.data.msound === MS_SILENT || !($c.andu64(mtmp.data.mflags1, M1_NOHEAD) === 0) || mtmp.data.msound === MS_BUZZ || mtmp.data.msound === MS_BURBLE) {
-        return 0;
+    if ($c.peq(mtmp, gy.youmonst) && Strangled() || is_silent(mtmp.data) || !has_head(mtmp.data) || mtmp.data.msound === MS_BUZZ || mtmp.data.msound === MS_BURBLE) {
+        return FALSE;
     }
-    return 1;
+    return TRUE;
 }
 export async function can_be_strangled(mon) {   // mondata.c:591
     let mamul = null, nonbreathing = 0, nobrainer = 0;
-    if (!($c.andu64(mon.data.mflags1, M1_NOHEAD) === 0)) {
-        return 0;
+    if (!has_head(mon.data)) {
+        return FALSE;
     }
     if ($c.peq(mon, gy.youmonst)) {
-        nobrainer = $c.i8($c.andu64(gy.youmonst.data.mflags1, M1_MINDLESS) !== 0 ? 1 : 0);
+        nobrainer = $c.i8(mindless(gy.youmonst.data));
         nonbreathing = $c.i8(u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1_BREATHLESS) !== 0 ? 1 : 0);
     } else {
-        nobrainer = $c.i8($c.andu64(mon.data.mflags1, M1_MINDLESS) !== 0 ? 1 : 0);
-        nonbreathing = $c.i8($c.andu64(mon.data.mflags1, M1_BREATHLESS) !== 0 || (mamul = await which_armor(mon, W_AMUL)) !== null && mamul.otyp === AMULET_OF_MAGICAL_BREATHING ? 1 : 0);
+        nobrainer = $c.i8(mindless(mon.data));
+        nonbreathing = $c.i8(breathless(mon.data) || (mamul = await which_armor(mon, W_AMUL)) !== null && mamul.otyp === AMULET_OF_MAGICAL_BREATHING ? 1 : 0);
     }
     return $c.i8(!nobrainer || !nonbreathing ? 1 : 0);
 }
 export function can_track(ptr) {   // mondata.c:623
-    if (is_art($G.uwep, ART_EXCALIBUR)) {
-        return 1;
+    if (u_wield_art(ART_EXCALIBUR)) {
+        return TRUE;
     }
-    return $c.i8($c.andu64(ptr.mflags1, M1_NOEYES) === 0 ? 1 : 0);
+    return $c.i8(haseyes(ptr));
 }
 export function sliparm(ptr) {   // mondata.c:632
-    return $c.i8(ptr.mlet === S_VORTEX || $c.peq(ptr, $c.relem(mons, PM_AIR_ELEMENTAL)) || ptr.msize <= MZ_SMALL || ptr.mlet === S_GHOST ? 1 : 0);
+    return $c.i8(is_whirly(ptr) || ptr.msize <= MZ_SMALL || noncorporeal(ptr) ? 1 : 0);
 }
 export function breakarm(ptr) {   // mondata.c:640
     if (sliparm(ptr)) {
-        return 0;
+        return FALSE;
     }
-    return $c.i8(ptr.msize >= MZ_LARGE || ptr.msize > MZ_SMALL && !($c.andu64(ptr.mflags1, M1_HUMANOID) !== 0) || $c.peq(ptr, $c.relem(mons, PM_MARILITH)) || $c.peq(ptr, $c.relem(mons, PM_WINGED_GARGOYLE)) ? 1 : 0);
+    return $c.i8(bigmonst(ptr) || ptr.msize > MZ_SMALL && !humanoid(ptr) || $c.peq(ptr, $c.relem(mons, PM_MARILITH)) || $c.peq(ptr, $c.relem(mons, PM_WINGED_GARGOYLE)) ? 1 : 0);
 }
 export function sticks(ptr) {   // mondata.c:654
     return $c.i8(dmgtype(ptr, AD_STCK) || dmgtype(ptr, AD_WRAP) && !attacktype(ptr, AT_ENGL) || attacktype(ptr, AT_HUGS) ? 1 : 0);
 }
 export function cantvomit(ptr) {   // mondata.c:663
     if (ptr.mlet === S_RODENT && !$c.peq(ptr, $c.relem(mons, PM_ROCK_MOLE)) && !$c.peq(ptr, $c.relem(mons, PM_WOODCHUCK))) {
-        return 1;
+        return TRUE;
     }
     if ($c.peq(ptr, $c.relem(mons, PM_WARHORSE)) || $c.peq(ptr, $c.relem(mons, PM_HORSE)) || $c.peq(ptr, $c.relem(mons, PM_PONY))) {
-        return 1;
+        return TRUE;
     }
-    return 0;
+    return FALSE;
 }
 export function num_horns(ptr) {   // mondata.c:678
     switch (ptr.pmidx) {
@@ -482,7 +487,7 @@ export function dmgtype_fromattack(ptr, dtyp, atyp) {   // mondata.c:700
     return null;
 }
 export function dmgtype(ptr, dtyp) {   // mondata.c:712
-    return $c.i8(dmgtype_fromattack(ptr, dtyp, AT_ANY) ? 1 : 0);
+    return $c.i8(dmgtype_fromattack(ptr, dtyp, AT_ANY) ? TRUE : FALSE);
 }
 export async function max_passive_dmg(mdef, magr) {   // mondata.c:720
     let i = 0, dmg = 0, multi2 = 0, adtyp = 0;
@@ -509,9 +514,9 @@ export async function max_passive_dmg(mdef, magr) {   // mondata.c:720
     for (i = 0; i < NATTK; i = i + 1 | 0) {
         if (mdef.data.mattk[i].aatyp === AT_NONE || mdef.data.mattk[i].aatyp === AT_BOOM) {
             adtyp = mdef.data.mattk[i].adtyp;
-            if (adtyp === AD_FIRE && ($c.peq(magr.data, $c.relem(mons, PM_PAPER_GOLEM)) || $c.peq(magr.data, $c.relem(mons, PM_STRAW_GOLEM))) || adtyp === AD_DCAY && ($c.peq(magr.data, $c.relem(mons, PM_WOOD_GOLEM)) || $c.peq(magr.data, $c.relem(mons, PM_LEATHER_GOLEM))) || adtyp === AD_RUST && $c.peq(magr.data, $c.relem(mons, PM_IRON_GOLEM))) {
+            if (adtyp === AD_FIRE && completelyburns(magr.data) || adtyp === AD_DCAY && completelyrots(magr.data) || adtyp === AD_RUST && completelyrusts(magr.data)) {
                 dmg = magr.mhp;
-            } else if (adtyp === AD_ACID && !await Resists_Elem(magr, ACID_RES) || adtyp === AD_COLD && !await Resists_Elem(magr, COLD_RES) || adtyp === AD_FIRE && !await Resists_Elem(magr, FIRE_RES) || adtyp === AD_ELEC && !await Resists_Elem(magr, SHOCK_RES) || adtyp === AD_PHYS) {
+            } else if (adtyp === AD_ACID && !await resists_acid(magr) || adtyp === AD_COLD && !await resists_cold(magr) || adtyp === AD_FIRE && !await resists_fire(magr) || adtyp === AD_ELEC && !await resists_elec(magr) || adtyp === AD_PHYS) {
                 dmg = mdef.data.mattk[i].damn;
                 if (!dmg) {
                     dmg = mdef.data.mlevel + 1 | 0;
@@ -529,31 +534,31 @@ export function same_race(pm1, pm2) {   // mondata.c:771
     let1 = pm1.mlet;
     let2 = pm2.mlet;
     if ($c.peq(pm1, pm2)) {
-        return 1;
+        return TRUE;
     }
-    if ($c.andu64(pm1.mflags2, M2_HUMAN) !== 0) {
-        return $c.i8($c.andu64(pm2.mflags2, M2_HUMAN) !== 0 ? 1 : 0);
+    if (is_human(pm1)) {
+        return $c.i8(is_human(pm2));
     }
-    if ($c.andu64(pm1.mflags2, M2_ELF) !== 0) {
-        return $c.i8($c.andu64(pm2.mflags2, M2_ELF) !== 0 ? 1 : 0);
+    if (is_elf(pm1)) {
+        return $c.i8(is_elf(pm2));
     }
-    if ($c.andu64(pm1.mflags2, M2_DWARF) !== 0) {
-        return $c.i8($c.andu64(pm2.mflags2, M2_DWARF) !== 0 ? 1 : 0);
+    if (is_dwarf(pm1)) {
+        return $c.i8(is_dwarf(pm2));
     }
-    if ($c.andu64(pm1.mflags2, M2_GNOME) !== 0) {
-        return $c.i8($c.andu64(pm2.mflags2, M2_GNOME) !== 0 ? 1 : 0);
+    if (is_gnome(pm1)) {
+        return $c.i8(is_gnome(pm2));
     }
-    if ($c.andu64(pm1.mflags2, M2_ORC) !== 0) {
-        return $c.i8($c.andu64(pm2.mflags2, M2_ORC) !== 0 ? 1 : 0);
+    if (is_orc(pm1)) {
+        return $c.i8(is_orc(pm2));
     }
-    if ($c.andu64(pm1.mflags2, M2_GIANT) !== 0) {
-        return $c.i8($c.andu64(pm2.mflags2, M2_GIANT) !== 0 ? 1 : 0);
+    if (is_giant(pm1)) {
+        return $c.i8(is_giant(pm2));
     }
-    if (pm1.mlet === S_GOLEM) {
-        return $c.i8(pm2.mlet === S_GOLEM ? 1 : 0);
+    if (is_golem(pm1)) {
+        return $c.i8(is_golem(pm2));
     }
-    if ($c.peq(pm1, $c.relem(mons, PM_MIND_FLAYER)) || $c.peq(pm1, $c.relem(mons, PM_MASTER_MIND_FLAYER))) {
-        return $c.i8($c.peq(pm2, $c.relem(mons, PM_MIND_FLAYER)) || $c.peq(pm2, $c.relem(mons, PM_MASTER_MIND_FLAYER)) ? 1 : 0);
+    if (is_mind_flayer(pm1)) {
+        return $c.i8(is_mind_flayer(pm2));
     }
     if (let1 === S_KOBOLD || $c.peq(pm1, $c.relem(mons, PM_KOBOLD_ZOMBIE)) || $c.peq(pm1, $c.relem(mons, PM_KOBOLD_MUMMY))) {
         return $c.i8(let2 === S_KOBOLD || $c.peq(pm2, $c.relem(mons, PM_KOBOLD_ZOMBIE)) || $c.peq(pm2, $c.relem(mons, PM_KOBOLD_MUMMY)) ? 1 : 0);
@@ -567,8 +572,8 @@ export function same_race(pm1, pm2) {   // mondata.c:771
     if (let1 === S_CENTAUR) {
         return $c.i8(let2 === S_CENTAUR ? 1 : 0);
     }
-    if (pm1.mlet === S_UNICORN && $c.andu64(pm1.mflags2, M2_JEWELS) !== 0) {
-        return $c.i8(pm2.mlet === S_UNICORN && $c.andu64(pm2.mflags2, M2_JEWELS) !== 0 ? 1 : 0);
+    if (is_unicorn(pm1)) {
+        return $c.i8(is_unicorn(pm2));
     }
     if (let1 === S_DRAGON) {
         return $c.i8(let2 === S_DRAGON ? 1 : 0);
@@ -576,24 +581,24 @@ export function same_race(pm1, pm2) {   // mondata.c:771
     if (let1 === S_NAGA) {
         return $c.i8(let2 === S_NAGA ? 1 : 0);
     }
-    if ($c.peq(pm1, $c.relem(mons, PM_DEATH)) || $c.peq(pm1, $c.relem(mons, PM_FAMINE)) || $c.peq(pm1, $c.relem(mons, PM_PESTILENCE))) {
-        return $c.i8($c.peq(pm2, $c.relem(mons, PM_DEATH)) || $c.peq(pm2, $c.relem(mons, PM_FAMINE)) || $c.peq(pm2, $c.relem(mons, PM_PESTILENCE)) ? 1 : 0);
+    if (is_rider(pm1)) {
+        return $c.i8(is_rider(pm2));
     }
-    if ($c.andu64(pm1.mflags2, M2_MINION) !== 0) {
-        return $c.i8($c.andu64(pm2.mflags2, M2_MINION) !== 0 ? 1 : 0);
+    if (is_minion(pm1)) {
+        return $c.i8(is_minion(pm2));
     }
     if ($c.peq(pm1, $c.relem(mons, PM_TENGU)) || $c.peq(pm2, $c.relem(mons, PM_TENGU))) {
-        return 0;
+        return FALSE;
     }
     if (let1 === S_IMP) {
         return $c.i8(let2 === S_IMP ? 1 : 0);
     } else if (let2 === S_IMP) {
-        return 0;
+        return FALSE;
     }
-    if ($c.andu64(pm1.mflags2, M2_DEMON) !== 0) {
-        return $c.i8($c.andu64(pm2.mflags2, M2_DEMON) !== 0 ? 1 : 0);
+    if (is_demon(pm1)) {
+        return $c.i8(is_demon(pm2));
     }
-    if ($c.andu64(pm1.mflags2, M2_UNDEAD) !== 0) {
+    if (is_undead(pm1)) {
         if (let1 === S_ZOMBIE) {
             return $c.i8(let2 === S_ZOMBIE ? 1 : 0);
         }
@@ -612,20 +617,20 @@ export function same_race(pm1, pm2) {   // mondata.c:771
         if (let1 === S_GHOST) {
             return $c.i8(let2 === S_GHOST ? 1 : 0);
         }
-    } else if ($c.andu64(pm2.mflags2, M2_UNDEAD) !== 0) {
-        return 0;
+    } else if (is_undead(pm2)) {
+        return FALSE;
     }
     if (let1 === let2) {
         m1 = pm1.pmidx;
         m2 = pm2.pmidx;
         for (prv = m1, nxt = big_to_little(m1); nxt !== prv; prv = nxt, nxt = big_to_little(nxt)) {
             if (nxt === m2) {
-                return 1;
+                return TRUE;
             }
         }
         for (prv = m1, nxt = little_to_big(m1); nxt !== prv; prv = nxt, nxt = little_to_big(nxt)) {
             if (nxt === m2) {
-                return 1;
+                return TRUE;
             }
         }
     }
@@ -635,10 +640,10 @@ export function same_race(pm1, pm2) {   // mondata.c:771
     if ($c.peq(pm1, $c.relem(mons, PM_KILLER_BEE)) || $c.peq(pm1, $c.relem(mons, PM_QUEEN_BEE))) {
         return $c.i8($c.peq(pm2, $c.relem(mons, PM_KILLER_BEE)) || $c.peq(pm2, $c.relem(mons, PM_QUEEN_BEE)) ? 1 : 0);
     }
-    if ($c.peq(pm1, $c.relem(mons, PM_BABY_LONG_WORM)) || $c.peq(pm1, $c.relem(mons, PM_LONG_WORM)) || $c.peq(pm1, $c.relem(mons, PM_LONG_WORM_TAIL))) {
-        return $c.i8($c.peq(pm2, $c.relem(mons, PM_BABY_LONG_WORM)) || $c.peq(pm2, $c.relem(mons, PM_LONG_WORM)) || $c.peq(pm2, $c.relem(mons, PM_LONG_WORM_TAIL)) ? 1 : 0);
+    if (is_longworm(pm1)) {
+        return $c.i8(is_longworm(pm2));
     }
-    return 0;
+    return FALSE;
 }
 export async function name_to_mon(in_str, gender_name_var) {   // mondata.c:883
     return await name_to_monplus(in_str, null, gender_name_var);
@@ -647,7 +652,7 @@ export async function name_to_monplus(in_str, remainder_p, gender_name_var) {   
     let i = 0, mntmp = 0, s = null, str = null, term = null, buf = new Int8Array(256), len = Int32Array.of(0), mgend = 0, matchgend = 0, slen = 0, exact_match = 0, namep = null, m_i_len = 0;
     mntmp = NON_PM;
     matchgend = -1;
-    exact_match = 0;
+    exact_match = FALSE;
     if (remainder_p) {
         remainder_p.set(0, null);
     }
@@ -694,7 +699,7 @@ export async function name_to_monplus(in_str, remainder_p, gender_name_var) {   
                     mntmp = i;
                     len[0] = $c.i32(m_i_len);
                     matchgend = mgend;
-                    exact_match = 1;
+                    exact_match = TRUE;
                     break;
                 } else if (slen > m_i_len && (str.get($c.idx(m_i_len)) === 32 || !strncmpi(str.add($c.idx(m_i_len)), $c.lit("s"), -1) || !strncmpi(str.add($c.idx(m_i_len)), $c.lit("s "), 2) || !strncmpi(str.add($c.idx(m_i_len)), $c.lit("'"), -1) || !strncmpi(str.add($c.idx(m_i_len)), $c.lit("' "), 2) || !strncmpi(str.add($c.idx(m_i_len)), $c.lit("'s"), -1) || !strncmpi(str.add($c.idx(m_i_len)), $c.lit("'s "), 3) || !strncmpi(str.add($c.idx(m_i_len)), $c.lit("es"), -1) || !strncmpi(str.add($c.idx(m_i_len)), $c.lit("es "), 3))) {
                     mntmp = i;
@@ -780,35 +785,35 @@ export async function name_to_monclass(in_str, mndx_p) {   // mondata.c:1090
     return 0;
 }
 export function gender(mtmp) {   // mondata.c:1180
-    if ($c.andu64(mtmp.data.mflags2, M2_NEUTER) !== 0) {
+    if (is_neuter(mtmp.data)) {
         return 2;
     }
     return mtmp.female | 0;
 }
 export function pronoun_gender(mtmp, pg_flags) {   // mondata.c:1191
     let override_vis = 0, hallu_rand = 0;
-    override_vis = $c.i8((pg_flags & PRONOUN_NO_IT) >>> 0 ? 1 : 0);
-    hallu_rand = $c.i8((pg_flags & PRONOUN_HALLU) >>> 0 ? 1 : 0);
-    if (hallu_rand && (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic))) {
+    override_vis = $c.i8((pg_flags & PRONOUN_NO_IT) >>> 0 ? TRUE : FALSE);
+    hallu_rand = $c.i8((pg_flags & PRONOUN_HALLU) >>> 0 ? TRUE : FALSE);
+    if (hallu_rand && Hallucination()) {
         return rn2(4);
     }
-    if (!override_vis && !(canseemon(mtmp) || sensemon(mtmp))) {
+    if (!override_vis && !canspotmon(mtmp)) {
         return 2;
     }
-    if ($c.andu64(mtmp.data.mflags2, M2_NEUTER) !== 0) {
+    if (is_neuter(mtmp.data)) {
         return 2;
     }
-    return $c.andu64(mtmp.data.mflags1, M1_HUMANOID) !== 0 || mtmp.data.geno & G_UNIQ || $c.andu64(mtmp.data.mflags2, M2_PNAME) !== 0 ? mtmp.female | 0 : 2;
+    return humanoid(mtmp.data) || mtmp.data.geno & G_UNIQ || type_is_pname(mtmp.data) ? mtmp.female | 0 : 2;
 }
 export function levl_follower(mtmp) {   // mondata.c:1211
     if ($c.peq(mtmp, u.usteed)) {
-        return 1;
+        return TRUE;
     }
     if (mtmp.iswiz | 0 && mon_has_amulet(mtmp)) {
-        return 0;
+        return FALSE;
     }
     if (mtmp.mtame || mtmp.iswiz | 0 || is_fshk(mtmp)) {
-        return 1;
+        return TRUE;
     }
     return $c.i8($c.andu64(mtmp.data.mflags2, M2_STALK) && (!mtmp.mflee || u.uhave.amulet | 0) ? 1 : 0);
 }
@@ -835,25 +840,25 @@ export function big_to_little(montype) {   // mondata.c:1316
 export function big_little_match(montyp1, montyp2) {   // mondata.c:1331
     let l = 0, b = 0;
     if (montyp1 === montyp2) {
-        return 1;
+        return TRUE;
     }
     if (mons[montyp1].mlet !== mons[montyp2].mlet) {
-        return 0;
+        return FALSE;
     }
     for (l = montyp1; (b = little_to_big(l)) !== l; l = b) {
         if (b === montyp2) {
-            return 1;
+            return TRUE;
         }
     }
     for (l = montyp2; (b = little_to_big(l)) !== l; l = b) {
         if (b === montyp1) {
-            return 1;
+            return TRUE;
         }
     }
-    return 0;
+    return FALSE;
 }
 export function raceptr(mtmp) {   // mondata.c:1359
-    if ($c.peq(mtmp, gy.youmonst) && !(u.umonnum !== u.umonster)) {
+    if ($c.peq(mtmp, gy.youmonst) && !Upolyd()) {
         return $c.relem(mons, gu.urace.mnum);
     }
     return mtmp.data;
@@ -861,12 +866,12 @@ export function raceptr(mtmp) {   // mondata.c:1359
 export function locomotion(ptr, def) {   // mondata.c:1380
     let locoindx = 0;
     locoindx = def.get(0) !== highc(def.get(0)) ? 0 : 1;
-    return ptr.mlet === S_EYE || ptr.mlet === S_LIGHT ? levitate[locoindx] : $c.andu64(ptr.mflags1, M1_FLY) !== 0 && ptr.msize <= MZ_SMALL ? flys[locoindx] : $c.andu64(ptr.mflags1, M1_FLY) !== 0 && ptr.msize > MZ_SMALL ? flyl[locoindx] : $c.andu64(ptr.mflags1, M1_SLITHY) !== 0 ? slither[locoindx] : $c.andu64(ptr.mflags1, M1_AMORPHOUS) !== 0 ? ooze[locoindx] : !ptr.mmove ? immobile[locoindx] : $c.andu64(ptr.mflags1, M1_NOLIMBS) === M1_NOLIMBS ? crawl[locoindx] : def;
+    return is_floater(ptr) ? levitate[locoindx] : is_flyer(ptr) && ptr.msize <= MZ_SMALL ? flys[locoindx] : is_flyer(ptr) && ptr.msize > MZ_SMALL ? flyl[locoindx] : slithy(ptr) ? slither[locoindx] : amorphous(ptr) ? ooze[locoindx] : !ptr.mmove ? immobile[locoindx] : nolimbs(ptr) ? crawl[locoindx] : def;
 }
 export function stagger(ptr, def) {   // mondata.c:1395
     let locoindx = 0;
     locoindx = def.get(0) !== highc(def.get(0)) ? 2 : 3;
-    return ptr.mlet === S_EYE || ptr.mlet === S_LIGHT ? levitate[locoindx] : $c.andu64(ptr.mflags1, M1_FLY) !== 0 && ptr.msize <= MZ_SMALL ? flys[locoindx] : $c.andu64(ptr.mflags1, M1_FLY) !== 0 && ptr.msize > MZ_SMALL ? flyl[locoindx] : $c.andu64(ptr.mflags1, M1_SLITHY) !== 0 ? slither[locoindx] : $c.andu64(ptr.mflags1, M1_AMORPHOUS) !== 0 ? ooze[locoindx] : !ptr.mmove ? immobile[locoindx] : $c.andu64(ptr.mflags1, M1_NOLIMBS) === M1_NOLIMBS ? crawl[locoindx] : def;
+    return is_floater(ptr) ? levitate[locoindx] : is_flyer(ptr) && ptr.msize <= MZ_SMALL ? flys[locoindx] : is_flyer(ptr) && ptr.msize > MZ_SMALL ? flyl[locoindx] : slithy(ptr) ? slither[locoindx] : amorphous(ptr) ? ooze[locoindx] : !ptr.mmove ? immobile[locoindx] : nolimbs(ptr) ? crawl[locoindx] : def;
 }
 export function on_fire(mptr, mattk) {   // mondata.c:1411
     let what = null;
@@ -944,10 +949,10 @@ export function msummon_environ(mptr, cloud) {   // mondata.c:1449
     return what;
 }
 export function olfaction(mdat) {   // mondata.c:1507
-    if (mdat.mlet === S_GOLEM || mdat.mlet === S_EYE || mdat.mlet === S_JELLY || mdat.mlet === S_PUDDING || mdat.mlet === S_BLOB || mdat.mlet === S_VORTEX || mdat.mlet === S_ELEMENTAL || mdat.mlet === S_FUNGUS || mdat.mlet === S_LIGHT) {
-        return 0;
+    if (is_golem(mdat) || mdat.mlet === S_EYE || mdat.mlet === S_JELLY || mdat.mlet === S_PUDDING || mdat.mlet === S_BLOB || mdat.mlet === S_VORTEX || mdat.mlet === S_ELEMENTAL || mdat.mlet === S_FUNGUS || mdat.mlet === S_LIGHT) {
+        return FALSE;
     }
-    return 1;
+    return TRUE;
 }
 export function cvt_adtyp_to_mseenres(adtyp) {   // mondata.c:1522
     switch (adtyp) {
@@ -1001,8 +1006,8 @@ export function monstseesu(seenres) {   // mondata.c:1558
         return;
     }
     for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
-        if (!(mtmp.mhp < 1) && ((!((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked) || $c.andu64(mtmp.data.mflags1, M1_SEE_INVIS) !== 0) && !u.uinwater && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & COULD_SEE) !== 0)) {
-            mtmp.seen_resistance = $c.oru64(mtmp.seen_resistance, seenres);
+        if (!DEADMONSTER(mtmp) && ((!((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked) || $c.andu64(mtmp.data.mflags1, M1_SEE_INVIS) !== 0) && !u.uinwater && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & COULD_SEE) !== 0)) {
+            m_setseenres(mtmp, seenres);
         }
     }
 }
@@ -1012,16 +1017,16 @@ export function monstunseesu(seenres) {   // mondata.c:1572
         return;
     }
     for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
-        if (!(mtmp.mhp < 1) && ((!((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked) || $c.andu64(mtmp.data.mflags1, M1_SEE_INVIS) !== 0) && !u.uinwater && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & COULD_SEE) !== 0)) {
-            mtmp.seen_resistance = $c.andu64(mtmp.seen_resistance, $c.notu64(seenres));
+        if (!DEADMONSTER(mtmp) && ((!((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked) || $c.andu64(mtmp.data.mflags1, M1_SEE_INVIS) !== 0) && !u.uinwater && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & COULD_SEE) !== 0)) {
+            m_clearseenres(mtmp, seenres);
         }
     }
 }
 export function give_u_to_m_resistances(mtmp) {   // mondata.c:1586
     let intr = 0;
     for (intr = FIRE_RES; intr <= STONE_RES; intr = intr + 1 | 0) {
-        if ($c.and64(u.uprops[intr].intrinsic, FROMOUTSIDE | FROMRACE | FROMEXPER) !== 0) {
-            mtmp.mintrinsics = $c.u16(mtmp.mintrinsics | $c.u16(FIRE_RES <= intr && intr <= STONE_RES ? $c.u8(1 << (intr - 1 | 0)) : 0));
+        if ($c.and64(u.uprops[intr].intrinsic, INTRINSIC) !== 0) {
+            mtmp.mintrinsics = $c.u16(mtmp.mintrinsics | $c.u16(res_to_mr(intr)));
         }
     }
 }
@@ -1054,13 +1059,13 @@ export function mons_see_trap(ttmp) {   // mondata.c:1641
     ty = ttmp.ty;
     maxdist = svl.level.locations[tx][ty].lit | 0 ? 49 : 2;
     for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
-        if ($c.andu64(mtmp.data.mflags1, M1_ANIMAL) !== 0 || $c.andu64(mtmp.data.mflags1, M1_MINDLESS) !== 0 || !($c.andu64(mtmp.data.mflags1, M1_NOEYES) === 0) || !mtmp.mcansee) {
+        if (is_animal(mtmp.data) || mindless(mtmp.data) || !haseyes(mtmp.data) || !mtmp.mcansee) {
             continue;
         }
         if (dist2(mtmp.mx, mtmp.my, tx, ty) > maxdist) {
             continue;
         }
-        if (!clear_path(mtmp.mx, mtmp.my, tx, ty)) {
+        if (!m_cansee(mtmp, tx, ty)) {
             continue;
         }
         mon_learns_traps(mtmp, ttmp.ttyp | 0);

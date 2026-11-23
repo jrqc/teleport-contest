@@ -3,39 +3,48 @@ import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
 import { A_CG_CONVERT, A_CG_HELM_OFF, A_CG_HELM_ON } from './align.h.js';
+import { ALIGNLIM } from './align.macros.js';
 import { confers_luck, is_art, retouch_equipment, what_gives } from './artifact.js';
 import { ART_EYES_OF_THE_OVERWORLD, ART_OGRESMASHER } from './artilist.h.js';
 import { A_CHA, A_CON, A_DEX, A_INT, A_MAX, A_STR, A_WIS } from './attrib.h.js';
+import { ACURR, ATEMP, ATTRMAX } from './attrib.macros.js';
 import { c_common_strings, disp, flags, gi, gm, gu, gy, iflags, program_state, svc, svd, svk, svm, u } from './decl.js';
 import { S_NYMPH } from './defsym.h.js';
 import { see_monsters, shieldeff } from './display.js';
 import { on_level } from './dungeon.js';
 import { done } from './end.js';
 import { debugcore } from './files.js';
-import { BUFSZ, LL_ALIGNMENT, MAXULEV } from './global.h.js';
+import { wizard } from './flag.macros.js';
+import { BUFSZ, FALSE, LL_ALIGNMENT, MAXULEV, TRUE } from './global.h.js';
 import { losehp, near_capacity } from './hack.js';
 import { DIED, EXT_ENCUMBER, FACE, FAINTED, FAINTING, HUNGRY, HVY_ENCUMBER, KILLED_BY, KILLED_BY_AN, MOD_ENCUMBER, NOT_HUNGRY, POISONING, SATIATED, WEAK } from './hack.h.js';
+import { max } from './hack.macros.js';
 import { copynchars, sgn, strncmpi, strstri } from './hacklib.js';
 import { carrying } from './invent.js';
+import { nhUse } from './lint.macros.js';
 import { summon_furies } from './makemon.js';
 import { adj_erinys } from './mon.js';
 import { name_to_mon } from './mondata.js';
-import { G_UNIQ, M1_NOEYES, M2_PNAME } from './monflag.h.js';
+import { haseyes, type_is_pname } from './mondata.macros.js';
+import { G_UNIQ } from './monflag.h.js';
 import { mons } from './monst.js';
+import { ismnum } from './monst.macros.js';
 import { PM_AMOROUS_DEMON, PM_ARCHEOLOGIST, PM_BARBARIAN, PM_CAVE_DWELLER, PM_CLERIC, PM_DWARF, PM_ELF, PM_GNOME, PM_HEALER, PM_HUMAN, PM_KNIGHT, PM_MONK, PM_ORC, PM_RANGER, PM_ROGUE, PM_SAMURAI, PM_TOURIST, PM_VALKYRIE, PM_WIZARD } from './monsters.h.js';
+import { u_wield_art } from './obj.macros.js';
 import { objects } from './objects.js';
-import { DUNCE_CAP, GAUNTLETS_OF_POWER, HELM_OF_OPPOSITE_ALIGNMENT, LUCKSTONE, TOWEL } from './objects.h.js';
+import { DUNCE_CAP, GAUNTLETS_OF_POWER, HELM_OF_OPPOSITE_ALIGNMENT, LUCKSTONE } from './objects.h.js';
 import { bare_artifactname, the, ysimple_name } from './objnam.js';
-import { LOW_PM, NUMMONS } from './permonst.h.js';
 import { encumber_msg } from './pickup.js';
 import { You, You_feel, Your, impossible, livelog_printf, pline, pline_The } from './pline.js';
-import { body_part, uasmon_maxStr } from './polyself.js';
+import { body_part } from './polyself.js';
 import { make_confused } from './potion.js';
-import { BLINDED, BLND_RES, CLAIRVOYANT, COLD_RES, CONFUSION, DEAF, DRAIN_RES, FAST, FIRE_RES, FIXED_ABIL, FROMEXPER, FROMFORM, FROMOUTSIDE, FROMRACE, FUMBLING, HALLUC, HALLUC_RES, INFRAVISION, INVIS, JUMPING, POISON_RES, REGENERATION, SEARCHING, SEE_INVIS, SHOCK_RES, SICK, SLEEP_RES, STEALTH, STRANGLED, STUNNED, TELEPORT_CONTROL, TIMEOUT, VOMITING, WARNING, WOUNDED_LEGS, W_ARMC, W_ARMH } from './prop.h.js';
+import { BLINDED, BLND_RES, CLAIRVOYANT, COLD_RES, CONFUSION, DEAF, DRAIN_RES, FAST, FIRE_RES, FROMEXPER, FROMFORM, FROMOUTSIDE, FROMRACE, INFRAVISION, INTRINSIC, INVIS, JUMPING, POISON_RES, SEARCHING, SEE_INVIS, SHOCK_RES, SLEEP_RES, STEALTH, STRANGLED, TELEPORT_CONTROL, TIMEOUT, WARNING, W_ARMC, W_ARMH } from './prop.h.js';
 import { d, rn2, rnd } from './rnd.js';
 import { aligns } from './role.js';
 import { add_weapon_skill, lose_weapon_skill } from './weapon.js';
-import { A_CURRENT, LUCKMAX, LUCKMIN } from './you.h.js';
+import { A_CURRENT, LUCKADD, LUCKMAX, LUCKMIN } from './you.h.js';
+import { Upolyd } from './you.macros.js';
+import { BBlinded, BClairvoyant, BlindedTimeout, Blindfolded_only, EBlinded, Fixed_abil, Fumbling, HRegeneration, HStun, Half_gas_damage, Hallucination, Poison_resistance, Sick, Very_fast, Vomiting, Wounded_legs } from './youprop.macros.js';
 
 const AVAL = 50;
 const FROM_NONE = 0;
@@ -73,24 +82,24 @@ const poiseff = $c.recArray($T.poison_effect_message, 6);
 const exertext = $c.arrayOf(6, () => $c.nulls(2));
 export async function adjattrib(ndx, incr, msgflg) {   // attrib.c:117
     let old_acurr = 0, old_abase = 0, old_amax = 0, decr = 0, abonflg = 0, attrstr = null, $t1, $t2;
-    if (u.uprops[FIXED_ABIL].extrinsic || !incr) {
-        return 0;
+    if (Fixed_abil() || !incr) {
+        return FALSE;
     }
     if ((ndx === A_INT || ndx === A_WIS) && $G.uarmh && $G.uarmh.otyp === DUNCE_CAP) {
         if (msgflg === 0) {
             await Your($c.lit("cap constricts briefly, then relaxes again."));
         }
-        return 0;
+        return FALSE;
     }
-    old_acurr = acurr(ndx);
+    old_acurr = ACURR(ndx);
     old_abase = u.acurr.a[ndx];
     old_amax = u.amax.a[ndx];
     u.acurr.a[ndx] = $c.i8(u.acurr.a[ndx] + incr | 0);
     if (incr > 0) {
         if (u.acurr.a[ndx] > u.amax.a[ndx]) {
             u.amax.a[ndx] = u.acurr.a[ndx];
-            if (u.amax.a[ndx] > (ndx === A_STR && u.umonnum !== u.umonster ? uasmon_maxStr() : gu.urace.attrmax[ndx])) {
-                $t2 = ($t1 = $c.i8(ndx === A_STR && u.umonnum !== u.umonster ? uasmon_maxStr() : gu.urace.attrmax[ndx]), u.amax.a[ndx] = $t1), u.acurr.a[ndx] = $t2;
+            if (u.amax.a[ndx] > ATTRMAX(ndx)) {
+                $t2 = ($t1 = $c.i8(ATTRMAX(ndx)), u.amax.a[ndx] = $t1), u.acurr.a[ndx] = $t2;
             }
         }
         attrstr = plusattr[ndx];
@@ -107,7 +116,7 @@ export async function adjattrib(ndx, incr, msgflg) {   // attrib.c:117
         attrstr = minusattr[ndx];
         abonflg = $c.i8(u.abon.a[ndx] > 0 ? 1 : 0);
     }
-    if (acurr(ndx) === old_acurr) {
+    if (ACURR(ndx) === old_acurr) {
         if (msgflg === 0 && flags.verbose) {
             if (u.acurr.a[ndx] === old_abase && u.amax.a[ndx] === old_amax) {
                 await pline($c.lit("You're %s as %s as you can get."), abonflg ? $c.lit("currently") : $c.lit("already"), attrstr);
@@ -115,17 +124,17 @@ export async function adjattrib(ndx, incr, msgflg) {   // attrib.c:117
                 await Your($c.lit("innate %s has %s."), attrname[ndx], incr > 0 ? $c.lit("improved") : $c.lit("declined"));
             }
         }
-        return 0;
+        return FALSE;
     }
     u.aexe.a[ndx] = 0;
-    disp.botl = 1;
+    disp.botl = TRUE;
     if (msgflg <= 0) {
         await You_feel($c.lit("%s%s!"), incr > 1 || incr < -1 ? $c.lit("very ") : $c.lit(""), attrstr);
     }
     if (program_state.in_moveloop && (ndx === A_STR || ndx === A_CON)) {
         await encumber_msg();
     }
-    return 1;
+    return TRUE;
 }
 export async function gainstr(otmp, incr, givemsg) {   // attrib.c:203
     let num = 0;
@@ -146,7 +155,7 @@ export async function losestr(num, knam, k_format) {   // attrib.c:221
     uhpmin = minuhpmax(1);
     olduhpmax = u.uhpmax;
     ustr = u.acurr.a[A_STR] - num | 0;
-    waspolyd = $c.i8(u.umonnum !== u.umonster ? 1 : 0);
+    waspolyd = $c.i8(Upolyd());
     if (num <= 0 || u.acurr.a[A_STR] < gu.urace.attrmin[A_STR]) {
         await impossible($c.lit("losestr: %d - %d"), u.acurr.a[A_STR], num);
         return;
@@ -164,17 +173,17 @@ export async function losestr(num, knam, k_format) {   // attrib.c:221
             k_format = KILLED_BY;
         }
         await losehp(dmg, knam, k_format);
-        if (u.umonnum !== u.umonster) {
-            setuhpmax((u.mhmax - dmg | 0) > 1 ? u.mhmax - dmg | 0 : 1, 0);
+        if (Upolyd()) {
+            setuhpmax((u.mhmax - dmg | 0) > 1 ? u.mhmax - dmg | 0 : 1, FALSE);
         } else if (!waspolyd) {
             if (u.uhpmax > uhpmin) {
-                setuhpmax((u.uhpmax - dmg | 0) > uhpmin ? u.uhpmax - dmg | 0 : uhpmin, 0);
+                setuhpmax(max(u.uhpmax - dmg | 0, uhpmin), FALSE);
             }
         }
-        disp.botl = 1;
+        disp.botl = TRUE;
     }
-    olduhpmax;
-    if (num > 0 && (u.umonnum !== u.umonster || !waspolyd)) {
+    nhUse(olduhpmax);
+    if (num > 0 && (Upolyd() || !waspolyd)) {
         await adjattrib(A_STR, -num | 0, 1);
     }
 }
@@ -186,9 +195,9 @@ export async function poisontell(typ, exclaim) {   // attrib.c:294
     let func = null, msg_txt = null;
     func = poiseff[typ].delivery_func;
     msg_txt = poiseff[typ].effect_msg;
-    if (typ === A_STR && acurr(A_STR) === 125) {
+    if (typ === A_STR && ACURR(A_STR) === 125) {
         msg_txt = $c.lit("innately weaker");
-    } else if (typ === A_CON && acurr(A_CON) === 25) {
+    } else if (typ === A_CON && ACURR(A_CON) === 25) {
         msg_txt = $c.lit("sick inside");
     }
     await func($c.lit("%s%c"), msg_txt, exclaim ? 33 : 46);
@@ -201,7 +210,7 @@ export async function poisoned(reason, typ, pkiller, fatal, thrown_weapon) {   /
         plural = $c.i8(reason.get($c.idx($c.subu64($c.strlen(reason), 1))) === 115 ? 1 : 0);
         await pline($c.lit("%s%s %s poisoned!"), $c.isupper($c.u8(reason.get(0))) ? $c.lit("") : $c.lit("The "), reason, plural ? $c.lit("were") : $c.lit("was"));
     }
-    if (u.uprops[POISON_RES].intrinsic || u.uprops[POISON_RES].extrinsic) {
+    if (Poison_resistance()) {
         if (blast) {
             await shieldeff(u.ux, u.uy);
         }
@@ -209,9 +218,9 @@ export async function poisoned(reason, typ, pkiller, fatal, thrown_weapon) {   /
         return;
     }
     i = await name_to_mon(pkiller, null);
-    if (i >= LOW_PM && i < NUMMONS && mons[i].geno & G_UNIQ) {
+    if (ismnum(i) && mons[i].geno & G_UNIQ) {
         kprefix = KILLED_BY;
-        if (!($c.andu64($c.relem(mons, i).mflags2, M2_PNAME) !== 0)) {
+        if (!type_is_pname($c.relem(mons, i))) {
             pkiller = await the(pkiller);
         }
     } else if (!strncmpi(pkiller, $c.lit("the "), 4) || !strncmpi(pkiller, $c.lit("an "), 3) || !strncmpi(pkiller, $c.lit("a "), 2)) {
@@ -222,32 +231,32 @@ export async function poisoned(reason, typ, pkiller, fatal, thrown_weapon) {   /
         loss = 6 + d(4, 6) | 0;
         if (u.uhp <= loss) {
             u.uhp = -1;
-            disp.botl = 1;
+            disp.botl = TRUE;
             await pline_The($c.lit("poison was deadly..."));
         } else {
             olduhp = u.uhp;
             newuhpmax = u.uhpmax - $c.div32(loss, 2) | 0;
-            setuhpmax(newuhpmax > minuhpmax(3) ? newuhpmax : minuhpmax(3), 1);
+            setuhpmax(newuhpmax > minuhpmax(3) ? newuhpmax : minuhpmax(3), TRUE);
             loss = adjuhploss(loss, olduhp);
             await losehp(loss, pkiller, $c.i8(kprefix));
-            if (await adjattrib(A_CON, typ !== A_CON ? -1 : -3, 1)) {
-                await poisontell(A_CON, 1);
+            if (await adjattrib(A_CON, typ !== A_CON ? -1 : -3, TRUE)) {
+                await poisontell(A_CON, TRUE);
             }
             if (typ !== A_CON && await adjattrib(typ, -3, 1)) {
-                await poisontell(typ, 1);
+                await poisontell(typ, TRUE);
             }
         }
     } else if (i > 5) {
         cloud = $c.i8(!$c.strcmp(reason, $c.lit("gas cloud")) ? 1 : 0);
         loss = thrown_weapon ? rnd(6) : rn2(10) + 6 | 0;
-        if ((blast || cloud) && ($G.ublindf && $G.ublindf.otyp === TOWEL && $G.ublindf.spe > 0)) {
+        if ((blast || cloud) && Half_gas_damage()) {
             loss = $c.div32(loss + 1 | 0, 2);
         }
         await losehp(loss, pkiller, $c.i8(kprefix));
     } else {
         loss = thrown_weapon || !fatal ? 1 : d(2, 2);
         if (await adjattrib(typ, -loss | 0, 1)) {
-            await poisontell(typ, 1);
+            await poisontell(typ, TRUE);
         }
     }
     if (u.uhp < 1) {
@@ -282,25 +291,25 @@ export function stone_luck(include_uncursed) {   // attrib.c:423
 }
 export function set_moreluck() {   // attrib.c:441
     let luckbon = 0;
-    luckbon = stone_luck(1);
+    luckbon = stone_luck(TRUE);
     if (!luckbon && !carrying(LUCKSTONE)) {
         u.moreluck = 0;
     } else if (luckbon >= 0) {
-        u.moreluck = 3;
+        u.moreluck = LUCKADD;
     } else {
-        u.moreluck = -3;
+        u.moreluck = -LUCKADD;
     }
 }
 export async function restore_attrib() {   // attrib.c:455
     let i = 0, equilibrium = 0, $t1;
     for (i = 0; i < A_MAX; i = i + 1 | 0) {
-        equilibrium = i === A_STR && u.uhs >= WEAK || i === A_DEX && (u.uprops[WOUNDED_LEGS].intrinsic || u.uprops[WOUNDED_LEGS].extrinsic) ? -1 : 0;
+        equilibrium = i === A_STR && u.uhs >= WEAK || i === A_DEX && Wounded_legs() ? -1 : 0;
         if (u.atemp.a[i] !== equilibrium && u.atime.a[i] !== 0) {
             if (!(u.atime.a[i] = $c.i8(u.atime.a[i] - 1))) {
                 u.atemp.a[i] = $c.i8(u.atemp.a[i] + (u.atemp.a[i] > 0 ? -1 : 1) | 0);
-                disp.botl = 1;
-                if (u.atemp.a[i]) {
-                    $t1 = $c.i8($c.div32(100, acurr(A_CON))), u.atime.a[i] = $t1;
+                disp.botl = TRUE;
+                if (ATEMP(i)) {
+                    $t1 = $c.i8($c.div32(100, ACURR(A_CON))), u.atime.a[i] = $t1;
                 }
             }
         }
@@ -312,7 +321,7 @@ export async function restore_attrib() {   // attrib.c:455
 export async function exercise(i, inc_or_dec) {   // attrib.c:489
     let save_plnmsg = 0, save_plnmsg$2 = 0, $t1;
     do {
-        if (debugcore($c.lit("attrib.c"), 1)) {
+        if (debugcore($c.lit("attrib.c"), TRUE)) {
             save_plnmsg = iflags.last_msg;
             await pline($c.lit("Exercise:"));
             iflags.last_msg = save_plnmsg;
@@ -321,13 +330,13 @@ export async function exercise(i, inc_or_dec) {   // attrib.c:489
     if (i === A_INT || i === A_CHA) {
         return;
     }
-    if (u.umonnum !== u.umonster && i !== A_WIS) {
+    if (Upolyd() && i !== A_WIS) {
         return;
     }
     if ($c.abs(u.aexe.a[i]) < AVAL) {
-        $t1 = inc_or_dec ? rn2(19) > acurr(i) ? 1 : 0 : -rn2(2) | 0, u.aexe.a[i] = $c.i8(u.aexe.a[i] + $t1 | 0);
+        $t1 = inc_or_dec ? rn2(19) > ACURR(i) ? 1 : 0 : -rn2(2) | 0, u.aexe.a[i] = $c.i8(u.aexe.a[i] + $t1 | 0);
         do {
-            if (debugcore($c.lit("attrib.c"), 1)) {
+            if (debugcore($c.lit("attrib.c"), TRUE)) {
                 save_plnmsg$2 = iflags.last_msg;
                 await pline($c.lit("%s, %s AEXE = %d"), i === A_STR ? $c.lit("Str") : i === A_WIS ? $c.lit("Wis") : i === A_DEX ? $c.lit("Dex") : $c.lit("Con"), inc_or_dec ? $c.lit("inc") : $c.lit("dec"), u.aexe.a[i]);
                 iflags.last_msg = save_plnmsg$2;
@@ -343,7 +352,7 @@ async function exerper() {   // attrib.c:521
     if (!$c.rem64(svm.moves, 10)) {
         hs = u.uhunger > 1000 ? SATIATED : u.uhunger > 150 ? NOT_HUNGRY : u.uhunger > 50 ? HUNGRY : u.uhunger > 0 ? WEAK : FAINTING;
         do {
-            if (debugcore($c.lit("attrib.c"), 1)) {
+            if (debugcore($c.lit("attrib.c"), TRUE)) {
                 save_plnmsg = iflags.last_msg;
                 await pline($c.lit("exerper: Hunger checks"));
                 iflags.last_msg = save_plnmsg;
@@ -351,27 +360,27 @@ async function exerper() {   // attrib.c:521
         } while (0);
         switch (hs) {
             case SATIATED:
-                await exercise(A_DEX, 0);
+                await exercise(A_DEX, FALSE);
                 if (gu.urole.mnum === PM_MONK) {
-                    await exercise(A_WIS, 0);
+                    await exercise(A_WIS, FALSE);
                 }
                 break;
             case NOT_HUNGRY:
-                await exercise(A_CON, 1);
+                await exercise(A_CON, TRUE);
                 break;
             case WEAK:
-                await exercise(A_STR, 0);
+                await exercise(A_STR, FALSE);
                 if (gu.urole.mnum === PM_MONK) {
-                    await exercise(A_WIS, 1);
+                    await exercise(A_WIS, TRUE);
                 }
                 break;
             case FAINTING:
             case FAINTED:
-                await exercise(A_CON, 0);
+                await exercise(A_CON, FALSE);
                 break;
         }
         do {
-            if (debugcore($c.lit("attrib.c"), 1)) {
+            if (debugcore($c.lit("attrib.c"), TRUE)) {
                 save_plnmsg$2 = iflags.last_msg;
                 await pline($c.lit("exerper: Encumber checks"));
                 iflags.last_msg = save_plnmsg$2;
@@ -379,40 +388,40 @@ async function exerper() {   // attrib.c:521
         } while (0);
         switch (near_capacity()) {
             case MOD_ENCUMBER:
-                await exercise(A_STR, 1);
+                await exercise(A_STR, TRUE);
                 break;
             case HVY_ENCUMBER:
-                await exercise(A_STR, 1);
-                await exercise(A_DEX, 0);
+                await exercise(A_STR, TRUE);
+                await exercise(A_DEX, FALSE);
                 break;
             case EXT_ENCUMBER:
-                await exercise(A_DEX, 0);
-                await exercise(A_CON, 0);
+                await exercise(A_DEX, FALSE);
+                await exercise(A_CON, FALSE);
                 break;
         }
     }
     if (!$c.rem64(svm.moves, 5)) {
         do {
-            if (debugcore($c.lit("attrib.c"), 1)) {
+            if (debugcore($c.lit("attrib.c"), TRUE)) {
                 save_plnmsg$3 = iflags.last_msg;
                 await pline($c.lit("exerper: Status checks"));
                 iflags.last_msg = save_plnmsg$3;
             }
         } while (0);
-        if ($c.and64(u.uprops[CLAIRVOYANT].intrinsic, FROMOUTSIDE | FROMRACE | FROMEXPER | TIMEOUT) && !u.uprops[CLAIRVOYANT].blocked) {
-            await exercise(A_WIS, 1);
+        if ($c.and64(u.uprops[CLAIRVOYANT].intrinsic, INTRINSIC | TIMEOUT) && !BClairvoyant()) {
+            await exercise(A_WIS, TRUE);
         }
-        if (u.uprops[REGENERATION].intrinsic) {
-            await exercise(A_STR, 1);
+        if (HRegeneration()) {
+            await exercise(A_STR, TRUE);
         }
-        if (u.uprops[SICK].intrinsic || u.uprops[VOMITING].intrinsic) {
-            await exercise(A_CON, 0);
+        if (Sick() || Vomiting()) {
+            await exercise(A_CON, FALSE);
         }
-        if (u.uprops[CONFUSION].intrinsic || u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic)) {
-            await exercise(A_WIS, 0);
+        if (u.uprops[CONFUSION].intrinsic || Hallucination()) {
+            await exercise(A_WIS, FALSE);
         }
-        if ((u.uprops[WOUNDED_LEGS].intrinsic || u.uprops[WOUNDED_LEGS].extrinsic) && !u.usteed || (u.uprops[FUMBLING].intrinsic || u.uprops[FUMBLING].extrinsic) || u.uprops[STUNNED].intrinsic) {
-            await exercise(A_DEX, 0);
+        if (Wounded_legs() && !u.usteed || Fumbling() || HStun()) {
+            await exercise(A_DEX, FALSE);
         }
     }
 }
@@ -421,7 +430,7 @@ export async function exerchk() {   // attrib.c:598
     await exerper();
     if (svm.moves >= svc.context.next_attrib_check) {
         do {
-            if (debugcore($c.lit("attrib.c"), 1)) {
+            if (debugcore($c.lit("attrib.c"), TRUE)) {
                 save_plnmsg = iflags.last_msg;
                 await pline($c.lit("exerchk: ready to test. multi = %ld."), gm.multi);
                 iflags.last_msg = save_plnmsg;
@@ -430,7 +439,7 @@ export async function exerchk() {   // attrib.c:598
     }
     if (svm.moves >= svc.context.next_attrib_check && !gm.multi) {
         do {
-            if (debugcore($c.lit("attrib.c"), 1)) {
+            if (debugcore($c.lit("attrib.c"), TRUE)) {
                 save_plnmsg$2 = iflags.last_msg;
                 await pline($c.lit("exerchk: testing."));
                 iflags.last_msg = save_plnmsg$2;
@@ -443,7 +452,7 @@ export async function exerchk() {   // attrib.c:598
             }
             mod_val = sgn(ax);
             lolim = gu.urace.attrmin[i];
-            hilim = i === A_STR && u.umonnum !== u.umonster ? uasmon_maxStr() : gu.urace.attrmax[i];
+            hilim = ATTRMAX(i);
             if (hilim > 18) {
                 hilim = 18;
             }
@@ -451,11 +460,11 @@ export async function exerchk() {   // attrib.c:598
                 if (ax < 0 ? u.acurr.a[i] <= lolim : u.acurr.a[i] >= hilim) {
                     break nextattrib$;
                 }
-                if (u.umonnum !== u.umonster && i !== A_WIS) {
+                if (Upolyd() && i !== A_WIS) {
                     break nextattrib$;
                 }
                 do {
-                    if (debugcore($c.lit("attrib.c"), 1)) {
+                    if (debugcore($c.lit("attrib.c"), TRUE)) {
                         save_plnmsg$3 = iflags.last_msg;
                         await pline($c.lit("exerchk: testing %s (%d)."), i === A_STR ? $c.lit("Str") : i === A_INT ? $c.lit("Int?") : i === A_WIS ? $c.lit("Wis") : i === A_DEX ? $c.lit("Dex") : i === A_CON ? $c.lit("Con") : i === A_CHA ? $c.lit("Cha?") : $c.lit("???"), ax);
                         iflags.last_msg = save_plnmsg$3;
@@ -465,7 +474,7 @@ export async function exerchk() {   // attrib.c:598
                     break nextattrib$;
                 }
                 do {
-                    if (debugcore($c.lit("attrib.c"), 1)) {
+                    if (debugcore($c.lit("attrib.c"), TRUE)) {
                         save_plnmsg$4 = iflags.last_msg;
                         await pline($c.lit("exerchk: changing %d."), i);
                         iflags.last_msg = save_plnmsg$4;
@@ -473,7 +482,7 @@ export async function exerchk() {   // attrib.c:598
                 } while (0);
                 if (await adjattrib(i, mod_val, -1)) {
                     do {
-                        if (debugcore($c.lit("attrib.c"), 1)) {
+                        if (debugcore($c.lit("attrib.c"), TRUE)) {
                             save_plnmsg$5 = iflags.last_msg;
                             await pline($c.lit("exerchk: changed %d."), i);
                             iflags.last_msg = save_plnmsg$5;
@@ -487,7 +496,7 @@ export async function exerchk() {   // attrib.c:598
         }
         $t3 = rn2(200) + 800 | 0, svc.context.next_attrib_check = $c.add64(svc.context.next_attrib_check, $t3);
         do {
-            if (debugcore($c.lit("attrib.c"), 1)) {
+            if (debugcore($c.lit("attrib.c"), TRUE)) {
                 save_plnmsg$6 = iflags.last_msg;
                 await pline($c.lit("exerchk: next check at %ld."), svc.context.next_attrib_check);
                 iflags.last_msg = save_plnmsg$6;
@@ -511,7 +520,7 @@ function init_attr_role_redist(np, addition) {   // attrib.c:699
     adj = addition ? 1 : -1;
     while ((addition ? np > 0 : np < 0) && tryct < 100) {
         i = rnd_attr();
-        if (i >= A_MAX || (addition ? u.acurr.a[i] >= (i === A_STR && u.umonnum !== u.umonster ? uasmon_maxStr() : gu.urace.attrmax[i]) : u.acurr.a[i] <= gu.urace.attrmin[i])) {
+        if (i >= A_MAX || (addition ? u.acurr.a[i] >= ATTRMAX(i) : u.acurr.a[i] <= gu.urace.attrmin[i])) {
             tryct = tryct + 1 | 0;
             continue;
         }
@@ -529,8 +538,8 @@ export function init_attr(np) {   // attrib.c:723
         $t2 = u.atime.a[i] = 0, u.atemp.a[i] = $t2;
         np = np - gu.urole.attrbase[i] | 0;
     }
-    np = init_attr_role_redist(np, 1);
-    np = init_attr_role_redist(np, 0);
+    np = init_attr_role_redist(np, TRUE);
+    np = init_attr_role_redist(np, FALSE);
 }
 export function redist_attr() {   // attrib.c:740
     let i = 0, tmp = 0, $t1, $t2;
@@ -540,8 +549,8 @@ export function redist_attr() {   // attrib.c:740
         }
         tmp = u.amax.a[i];
         $t1 = rn2(5) - 2 | 0, u.amax.a[i] = $c.i8(u.amax.a[i] + $t1 | 0);
-        if (u.amax.a[i] > (i === A_STR && u.umonnum !== u.umonster ? uasmon_maxStr() : gu.urace.attrmax[i])) {
-            $t2 = $c.i8(i === A_STR && u.umonnum !== u.umonster ? uasmon_maxStr() : gu.urace.attrmax[i]), u.amax.a[i] = $t2;
+        if (u.amax.a[i] > ATTRMAX(i)) {
+            $t2 = $c.i8(ATTRMAX(i)), u.amax.a[i] = $t2;
         }
         if (u.amax.a[i] < gu.urace.attrmin[i]) {
             u.amax.a[i] = $c.i8(gu.urace.attrmin[i]);
@@ -557,7 +566,7 @@ export async function vary_init_attr() {   // attrib.c:764
     for (i = 0; i < A_MAX; i = i + 1 | 0) {
         if (!rn2(20)) {
             xd = rn2(7) - 2 | 0;
-            await adjattrib(i, xd, 1);
+            await adjattrib(i, xd, TRUE);
             if (u.acurr.a[i] < u.amax.a[i]) {
                 u.amax.a[i] = u.acurr.a[i];
             }
@@ -662,10 +671,10 @@ function innately(ability) {   // attrib.c:864
 }
 export function is_innate(propidx) {   // attrib.c:880
     let innateness = 0;
-    if (propidx === DRAIN_RES && (u.ulycn >= LOW_PM && u.ulycn < NUMMONS)) {
+    if (propidx === DRAIN_RES && ismnum(u.ulycn)) {
         return FROM_LYCN;
     }
-    if (propidx === FAST && ($c.and64(u.uprops[FAST].intrinsic, ~(FROMOUTSIDE | FROMRACE | FROMEXPER)) || u.uprops[FAST].extrinsic)) {
+    if (propidx === FAST && Very_fast()) {
         return FROM_NONE;
     }
     if ((innateness = innately(new $c.FieldRef(u.uprops[propidx], "intrinsic", "i64"))) !== FROM_NONE) {
@@ -674,7 +683,7 @@ export function is_innate(propidx) {   // attrib.c:880
     if (propidx === JUMPING && gu.urole.mnum === PM_KNIGHT && !u.uprops[propidx].extrinsic) {
         return FROM_ROLE;
     }
-    if (propidx === BLINDED && !($c.andu64(gy.youmonst.data.mflags1, M1_NOEYES) === 0) || propidx === BLND_RES && $c.and64(u.uprops[BLND_RES].intrinsic, FROMFORM) !== 0) {
+    if (propidx === BLINDED && !haseyes(gy.youmonst.data) || propidx === BLND_RES && $c.and64(u.uprops[BLND_RES].intrinsic, FROMFORM) !== 0) {
         return FROM_FORM;
     }
     return FROM_NONE;
@@ -682,7 +691,7 @@ export function is_innate(propidx) {   // attrib.c:880
 export async function from_what(propidx) {   // attrib.c:905
     let p = null, obj = null, innateness = 0;
     from_what$buf[0] = 0;
-    if (flags.debug) {
+    if (wizard()) {
         if (propidx >= 0) {
             obj = null;
             innateness = is_innate(propidx);
@@ -698,13 +707,13 @@ export async function from_what(propidx) {   // attrib.c:905
                 $c.__builtin___strcpy_chk(new $c.Ptr(from_what$buf, 0), $c.lit(" due to your lycanthropy"), 256);
             } else if (innateness === FROM_FORM) {
                 $c.__builtin___strcpy_chk(new $c.Ptr(from_what$buf, 0), $c.lit(" from your creature form"), 256);
-            } else if (propidx === FAST && ($c.and64(u.uprops[FAST].intrinsic, ~(FROMOUTSIDE | FROMRACE | FROMEXPER)) || u.uprops[FAST].extrinsic)) {
+            } else if (propidx === FAST && Very_fast()) {
                 $c.__builtin___sprintf_chk(new $c.Ptr(from_what$buf, 0), 0, 256, new $c.Ptr(from_what$because_of, 0), $c.and64(u.uprops[FAST].intrinsic, 16777215) !== 0 ? $c.lit("a potion or spell") : $c.and64(u.uprops[FAST].extrinsic, 32) !== 0 && $G.uarmf.dknown | 0 && objects[$G.uarmf.otyp].oc_name_known | 0 ? await ysimple_name($G.uarmf) : u.uprops[FAST].extrinsic ? $c.lit("worn equipment") : c_common_strings.c_something);
-            } else if (flags.debug && (obj = what_gives(new $c.FieldRef(u.uprops[propidx], "extrinsic", "i64"))) !== null) {
+            } else if (wizard() && (obj = what_gives(new $c.FieldRef(u.uprops[propidx], "extrinsic", "i64"))) !== null) {
                 $c.__builtin___sprintf_chk(new $c.Ptr(from_what$buf, 0), 0, 256, new $c.Ptr(from_what$because_of, 0), obj.oartifact ? await bare_artifactname(obj) : await ysimple_name(obj));
-            } else if (propidx === BLINDED && (u.uprops[BLINDED].extrinsic && !(u.uprops[BLINDED].intrinsic && !u.uprops[BLINDED].blocked))) {
+            } else if (propidx === BLINDED && Blindfolded_only()) {
                 $c.__builtin___sprintf_chk(new $c.Ptr(from_what$buf, 0), 0, 256, new $c.Ptr(from_what$because_of, 0), await ysimple_name($G.ublindf));
-            } else if (propidx === BLINDED && u.ucreamed && $c.and64(u.uprops[BLINDED].intrinsic, TIMEOUT) === u.ucreamed && !u.uprops[BLINDED].extrinsic && !$c.and64(u.uprops[BLINDED].intrinsic, ~TIMEOUT)) {
+            } else if (propidx === BLINDED && u.ucreamed && BlindedTimeout() === u.ucreamed && !EBlinded() && !$c.and64(u.uprops[BLINDED].intrinsic, ~TIMEOUT)) {
                 $c.__builtin___sprintf_chk(new $c.Ptr(from_what$buf, 0), 0, 256, $c.lit("due to goop covering your %s"), await body_part(FACE));
             }
             if ((p = strstri(new $c.Ptr(from_what$buf, 0), $c.lit(" pair of "))) !== null) {
@@ -715,7 +724,7 @@ export async function from_what(propidx) {   // attrib.c:905
         } else {
             switch (-propidx | 0) {
                 case BLINDED:
-                    if (u.uprops[BLINDED].blocked && is_art($G.ublindf, ART_EYES_OF_THE_OVERWORLD)) {
+                    if (BBlinded() && is_art($G.ublindf, ART_EYES_OF_THE_OVERWORLD)) {
                         $c.__builtin___sprintf_chk(new $c.Ptr(from_what$buf, 0), 0, 256, new $c.Ptr(from_what$because_of, 0), await bare_artifactname($G.ublindf));
                     }
                     break;
@@ -725,7 +734,7 @@ export async function from_what(propidx) {   // attrib.c:905
                     }
                     break;
                 case CLAIRVOYANT:
-                    if (flags.debug && $c.and64(u.uprops[CLAIRVOYANT].blocked, W_ARMH)) {
+                    if (wizard() && $c.and64(u.uprops[CLAIRVOYANT].blocked, W_ARMH)) {
                         $c.__builtin___sprintf_chk(new $c.Ptr(from_what$buf, 0), 0, 256, new $c.Ptr(from_what$because_of, 0), await ysimple_name($G.uarmh));
                     }
                     break;
@@ -768,14 +777,14 @@ export async function adjabil(oldlevel, newlevel) {   // attrib.c:1006
             } else {
                 abil.ability.set(0, $c.or64(abil.ability.get(0), mask));
             }
-            if (!$c.and64($c.and64(abil.ability.get(0), FROMOUTSIDE | FROMRACE | FROMEXPER), $c.not64(mask))) {
+            if (!$c.and64($c.and64(abil.ability.get(0), INTRINSIC), $c.not64(mask))) {
                 if (abil.gainstr.get(0)) {
                     await You_feel($c.lit("%s!"), abil.gainstr);
                 }
             }
         } else if (oldlevel >= abil.ulevel && newlevel < abil.ulevel) {
             abil.ability.set(0, $c.and64(abil.ability.get(0), $c.not64(mask)));
-            if (!$c.and64(abil.ability.get(0), FROMOUTSIDE | FROMRACE | FROMEXPER)) {
+            if (!$c.and64(abil.ability.get(0), INTRINSIC)) {
                 if (abil.losestr.get(0)) {
                     await You_feel($c.lit("%s!"), abil.losestr);
                 } else if (abil.gainstr.get(0)) {
@@ -828,17 +837,17 @@ export function newhp() {   // attrib.c:1080
                 hp = hp + rnd(gu.urace.hpadv.hirnd) | 0;
             }
         }
-        if (acurr(A_CON) <= 3) {
+        if (ACURR(A_CON) <= 3) {
             conplus = -2;
-        } else if (acurr(A_CON) <= 6) {
+        } else if (ACURR(A_CON) <= 6) {
             conplus = -1;
-        } else if (acurr(A_CON) <= 14) {
+        } else if (ACURR(A_CON) <= 14) {
             conplus = 0;
-        } else if (acurr(A_CON) <= 16) {
+        } else if (ACURR(A_CON) <= 16) {
             conplus = 1;
-        } else if (acurr(A_CON) === 17) {
+        } else if (ACURR(A_CON) === 17) {
             conplus = 2;
-        } else if (acurr(A_CON) === 18) {
+        } else if (ACURR(A_CON) === 18) {
             conplus = 3;
         } else {
             conplus = 4;
@@ -863,32 +872,32 @@ export function minuhpmax(altmin) {   // attrib.c:1147
     if (altmin < 1) {
         altmin = 1;
     }
-    return u.ulevel > altmin ? u.ulevel : altmin;
+    return max(u.ulevel, altmin);
 }
 export function setuhpmax(newmax, even_when_polyd) {   // attrib.c:1157
-    if (!(u.umonnum !== u.umonster) || even_when_polyd) {
+    if (!Upolyd() || even_when_polyd) {
         if (newmax !== u.uhpmax) {
             u.uhpmax = newmax;
             if (u.uhpmax > u.uhppeak) {
                 u.uhppeak = u.uhpmax;
             }
-            disp.botl = 1;
+            disp.botl = TRUE;
         }
         if (u.uhp > u.uhpmax) {
-            u.uhp = u.uhpmax, disp.botl = 1;
+            u.uhp = u.uhpmax, disp.botl = TRUE;
         }
     } else {
         if (newmax !== u.mhmax) {
             u.mhmax = newmax;
-            disp.botl = 1;
+            disp.botl = TRUE;
         }
         if (u.mh > u.mhmax) {
-            u.mh = u.mhmax, disp.botl = 1;
+            u.mh = u.mhmax, disp.botl = TRUE;
         }
     }
 }
 export function adjuhploss(loss, olduhp) {   // attrib.c:1182
-    if (!(u.umonnum !== u.umonster)) {
+    if (!Upolyd()) {
         if (u.uhp < olduhp) {
             loss = loss - (olduhp - u.uhp | 0) | 0;
         }
@@ -915,7 +924,7 @@ export function acurr(chridx) {   // attrib.c:1200
             result = 18;
         }
     } else if (chridx === A_CON) {
-        if (is_art($G.uwep, ART_OGRESMASHER)) {
+        if (u_wield_art(ART_OGRESMASHER)) {
             result = 25;
         }
     } else if (chridx === A_INT || chridx === A_WIS) {
@@ -931,7 +940,7 @@ export function acurr(chridx) {   // attrib.c:1200
 }
 export function acurrstr() {   // attrib.c:1245
     let str = 0, result = 0;
-    str = acurr(A_STR);
+    str = ACURR(A_STR);
     if (str <= 18) {
         result = str > 3 ? str : 3;
     } else if (str <= 121) {
@@ -945,14 +954,14 @@ export function extremeattr(attrindx) {   // attrib.c:1268
     let lolimit = 0, hilimit = 0, curval = 0;
     lolimit = 3;
     hilimit = 25;
-    curval = acurr(attrindx);
+    curval = ACURR(attrindx);
     if (attrindx === A_STR) {
         hilimit = 125;
         if ($G.uarmg && $G.uarmg.otyp === GAUNTLETS_OF_POWER) {
             lolimit = hilimit;
         }
     } else if (attrindx === A_CON) {
-        if (is_art($G.uwep, ART_OGRESMASHER)) {
+        if (u_wield_art(ART_OGRESMASHER)) {
             lolimit = hilimit;
         }
     }
@@ -961,7 +970,7 @@ export function extremeattr(attrindx) {   // attrib.c:1268
             hilimit = lolimit = 6;
         }
     }
-    return $c.i8(curval === lolimit || curval === hilimit ? 1 : 0);
+    return $c.i8(curval === lolimit || curval === hilimit ? TRUE : FALSE);
 }
 export function adjalign(n) {   // attrib.c:1298
     let newalign = 0, newabuse = 0;
@@ -977,8 +986,8 @@ export function adjalign(n) {   // attrib.c:1298
         }
     } else if (newalign > u.ualign.record) {
         u.ualign.record = newalign;
-        if (u.ualign.record > $c.add64(10, $c.div64(svm.moves, 200))) {
-            u.ualign.record = $c.i32($c.add64(10, $c.div64(svm.moves, 200)));
+        if (u.ualign.record > ALIGNLIM()) {
+            u.ualign.record = $c.i32(ALIGNLIM());
         }
     }
 }
@@ -986,7 +995,7 @@ export async function uchangealign(newalign, reason) {   // attrib.c:1320
     let oldalign = 0;
     oldalign = u.ualign.type;
     u.ublessed = 0;
-    disp.botl = 1;
+    disp.botl = TRUE;
     if (reason === A_CG_CONVERT) {
         await livelog_printf(LL_ALIGNMENT, $c.lit("permanently converted to %s"), aligns[1 - newalign | 0].adj);
         u.ualignbase[A_CURRENT] = $c.i8(newalign);
@@ -998,14 +1007,14 @@ export async function uchangealign(newalign, reason) {   // attrib.c:1320
         u.ualign.type = $c.i8(newalign);
         if (reason === A_CG_HELM_ON) {
             adjalign(-7);
-            await Your($c.lit("mind oscillates %s."), u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? $c.lit("wildly") : $c.lit("briefly"));
-            await make_confused(rn2(2) + 3 | 0, 0);
+            await Your($c.lit("mind oscillates %s."), Hallucination() ? $c.lit("wildly") : $c.lit("briefly"));
+            await make_confused(rn2(2) + 3 | 0, FALSE);
             if ((svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level) || rn2(50) >>> 0 < u.ualign.abuse) {
                 await summon_furies((svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level) ? 0 : 1);
             }
             await livelog_printf(LL_ALIGNMENT, $c.lit("used a helm to turn %s"), aligns[1 - newalign | 0].adj);
         } else if (reason === A_CG_HELM_OFF) {
-            await Your($c.lit("mind is %s."), u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? $c.lit("much of a muchness") : $c.lit("back in sync with your body"));
+            await Your($c.lit("mind is %s."), Hallucination() ? $c.lit("much of a muchness") : $c.lit("back in sync with your body"));
         }
     }
     if (u.ualign.type !== oldalign) {

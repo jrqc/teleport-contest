@@ -4,8 +4,10 @@ import * as $T from './types.js';
 import { $G } from './globals.js';
 import { u } from './decl.js';
 import { panic } from './end.js';
+import { FALSE, TRUE } from './global.h.js';
 import { sgn } from './hacklib.js';
 import { sys_random_seed } from './unixmain.js';
+import { Luck } from './you.macros.js';
 
 const CORE = 0;
 const DISP = 1;
@@ -27,10 +29,10 @@ export function rng_log_init() {   // rnd.c:38
             $c.setvbuf(rng_logfile, null, 1, 0);
         }
     }
-    rng_log_disp = $c.i8(disp && disp.get(0) && disp.get(0) !== 48 ? 1 : 0);
+    rng_log_disp = $c.i8(disp && disp.get(0) && disp.get(0) !== 48 ? TRUE : FALSE);
 }
 export function rng_log_enabled() {   // rnd.c:52
-    return $c.i8(rng_logfile ? 1 : 0);
+    return $c.i8(rng_logfile ? TRUE : FALSE);
 }
 export function rng_log_set_caller(file, line, func) {   // rnd.c:58
     rng_caller_file = file;
@@ -107,7 +109,7 @@ export function rn2(x) {   // rnd.c:199
 }
 export function rnl(x) {   // rnd.c:220
     let i = 0, adjustment = 0, buf = new Int8Array(32);
-    adjustment = u.uluck + u.moreluck | 0;
+    adjustment = Luck();
     if (x <= 15) {
         adjustment = Math.imul($c.div32($c.abs(adjustment) + 1 | 0, 3), sgn(adjustment));
     }
@@ -208,7 +210,7 @@ export function shuffle_int_array(indices, count) {   // rnd.c:440
 
 export function $init() {
     rng_logfile = null;
-    rng_log_disp = 0;
+    rng_log_disp = FALSE;
     rng_call_count = 0;
     rng_caller_file = null;
     rng_caller_line = 0;

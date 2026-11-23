@@ -2,7 +2,7 @@
 import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
-import { BUFSZ, LARGEST_INT } from './global.h.js';
+import { BUFSZ, FALSE, LARGEST_INT, TRUE } from './global.h.js';
 
 const VISCTRL_NBUF = 5;
 const TABSIZ = 0x20;
@@ -72,22 +72,22 @@ export function upstart(s) {   // hacklib.c:178
 }
 export function upwords(s) {   // hacklib.c:187
     let p = null, space = 0, $t1;
-    space = 1;
+    space = TRUE;
     for (p = s; p.get(0); p = p.add(1)) {
         if (p.get(0) === 32) {
-            space = 1;
+            space = TRUE;
         } else if (space && letter(p.get(0))) {
             $t1 = highc(p.get(0)), p.set(0, $t1);
-            space = 0;
+            space = FALSE;
         } else {
-            space = 0;
+            space = FALSE;
         }
     }
     return s;
 }
 export function mungspaces(bp) {   // hacklib.c:206
     let c = 0, p = null, p2 = null, was_space = 0, $t1;
-    was_space = 1;
+    was_space = TRUE;
     for (p = p2 = bp; (c = p.get(0)) !== 0; p = p.add(1)) {
         if (c === 10) {
             break;
@@ -147,16 +147,16 @@ export function str_start_is(str, chkstr, caseblind) {   // hacklib.c:277
         if (!str.get(0)) {
             return $c.i8(chkstr.get(0) === 0 ? 1 : 0);
         } else if (!chkstr.get(0)) {
-            return 1;
+            return TRUE;
         }
         t1 = $c.i8(caseblind ? lowc(str.get(0)) : str.get(0));
         t2 = $c.i8(caseblind ? lowc(chkstr.get(0)) : chkstr.get(0));
         str = str.add(1), chkstr = chkstr.add(1);
         if (t1 !== t2) {
-            return 0;
+            return FALSE;
         }
     }
-    return 1;
+    return TRUE;
 }
 export function str_end_is(str, chkstr) {   // hacklib.c:305
     let clen = 0;
@@ -164,7 +164,7 @@ export function str_end_is(str, chkstr) {   // hacklib.c:305
     if ($c.i32($c.strlen(str)) >= clen) {
         return $c.i8(!$c.strncmp(eos(str).add(-clen), chkstr, $c.u64(clen)) ? 1 : 0);
     }
-    return 0;
+    return FALSE;
 }
 export function str_lines_maxlen(str) {   // hacklib.c:316
     let s1 = null, s2 = null, len = 0, max_len = 0;
@@ -282,10 +282,10 @@ export function xcrypt(str, buf) {   // hacklib.c:464
 export function onlyspace(s) {   // hacklib.c:483
     for (; s.get(0); s = s.add(1)) {
         if (s.get(0) !== 32 && s.get(0) !== 9) {
-            return 0;
+            return FALSE;
         }
     }
-    return 1;
+    return TRUE;
 }
 export function tabexpand(sbuf) {   // hacklib.c:493
     let buf = new Int8Array(266), bp = null, s = null, idx = 0, $t1, $t2;
@@ -597,10 +597,10 @@ export function copy_bytes(ifd, ofd) {   // hacklib.c:1010
             nto = $c.write(ofd, new $c.Ptr(buf, 0), $c.u64(nfrom));
         }
         if (nto !== nfrom || nfrom < 0) {
-            return 0;
+            return FALSE;
         }
     } while (nfrom === 1024);
-    return 1;
+    return TRUE;
 }
 export function datamodel(retidx) {   // hacklib.c:1046
     let i = 0, j = 0, matchcount = 0;

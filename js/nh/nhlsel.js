@@ -5,15 +5,18 @@ import { $G } from './globals.js';
 import { dupstr } from './alloc.js';
 import { isok } from './cmd.js';
 import { cg, gc, gx, gy, svl, svn, svr } from './decl.js';
-import { NHLpa_impossible } from './global.h.js';
-import { LUA_GCCOLLECT, LUA_TFUNCTION, LUA_TNUMBER, LUA_TTABLE, LUA_TUSERDATA, LUA_VERSION_NUM } from './lua.h.js';
-import { luaL_checkinteger, luaL_checklstring, luaL_checkoption, luaL_checktype, luaL_checkudata, luaL_checkversion_, luaL_newmetatable, luaL_optinteger, luaL_setfuncs, lua_createtable, lua_gc, lua_getfield, lua_gettop, lua_newuserdatauv, lua_pushinteger, lua_pushnumber, lua_pushstring, lua_pushvalue, lua_rotate, lua_setfield, lua_setglobal, lua_setmetatable, lua_settop, lua_toboolean, lua_type } from './luabridge.js';
+import { FALSE, NHLpa_impossible, TRUE } from './global.h.js';
+import { LUAL_NUMSIZES } from './lauxlib.h.js';
+import { LUA_GCCOLLECT, LUA_REGISTRYINDEX, LUA_TFUNCTION, LUA_TNUMBER, LUA_TTABLE, LUA_TUSERDATA, LUA_VERSION_NUM } from './lua.h.js';
+import { lua_newtable, lua_newuserdata, lua_pop } from './lua.macros.js';
+import { luaL_checkinteger, luaL_checklstring, luaL_checkoption, luaL_checktype, luaL_checkudata, luaL_checkversion_, luaL_newmetatable, luaL_optinteger, luaL_setfuncs, lua_createtable, lua_gc, lua_getfield, lua_gettop, lua_pushinteger, lua_pushnumber, lua_pushstring, lua_pushvalue, lua_rotate, lua_setfield, lua_setglobal, lua_setmetatable, lua_settop, lua_toboolean, lua_type } from './luabridge.js';
 import { check_mapchr, get_table_int, get_table_int_opt, get_table_option, lcheck_param_table, nhl_add_table_entry_int, nhl_error, nhl_get_xy_params, nhl_pcall_handle } from './nhlua.js';
 import { rect_bounds } from './rect.js';
 import { INVALID_TYPE } from './rm.h.js';
 import { selection_clear, selection_do_ellipse, selection_do_gradient, selection_do_grow, selection_do_line, selection_do_randline, selection_filter_mapchar, selection_filter_percent, selection_floodfill, selection_free, selection_from_mkroom, selection_getbounds, selection_getpoint, selection_new, selection_not, selection_recalc_bounds, selection_rndcoord, selection_setpoint, selection_size_description } from './selvar.js';
 import { cvt_to_abscoord, cvt_to_relcoord, get_location_coord, mapfrag_error, mapfrag_free, mapfrag_fromstr, mapfrag_match, set_floodfillchk_match_under, update_croom } from './sp_lev.js';
 import { ANY_LOC, SEL_GRADIENT_RADIAL, SEL_GRADIENT_SQUARE, SP_COORD_IS_RANDOM, W_EAST, W_NORTH, W_RANDOM, W_SOUTH, W_WEST } from './sp_lev.h.js';
+import { SP_COORD_PACK } from './sp_lev.macros.js';
 
 const l_selection_grow$growdirs = $c.nulls(7);   // static in l_selection_grow()
 const l_selection_grow$growdirs2i = new Int32Array(7);   // static in l_selection_grow()
@@ -34,25 +37,25 @@ async function l_selection_gc(L) {   // nhlsel.c:70
     let sel = null;
     sel = await l_selection_check(L, 1);
     if (sel) {
-        selection_free(sel, 0);
+        selection_free(sel, FALSE);
     }
     return 0;
 }
 async function l_selection_push_new(L) {   // nhlsel.c:94
     let tmp = null, sel = null, $t1;
     tmp = await selection_new();
-    sel = $c.asRec(await lua_newuserdatauv(L, 32, 1), $T.selectionvar, 32);
-    await lua_getfield(L, -1001000, $c.lit("selection"));
+    sel = $c.asRec(await lua_newuserdata(L, 32), $T.selectionvar, 32);
+    await lua_getfield(L, LUA_REGISTRYINDEX, $c.lit("selection"));
     await lua_setmetatable(L, -2);
     sel.$copyFrom(tmp);
     $t1 = await dupstr(tmp.map), sel.map = $t1;
-    selection_free(tmp, 1);
+    selection_free(tmp, TRUE);
     return sel;
 }
 export async function l_selection_push_copy(L, tmp) {   // nhlsel.c:112
     let sel = null, $t1;
-    sel = $c.asRec(await lua_newuserdatauv(L, 32, 1), $T.selectionvar, 32);
-    await lua_getfield(L, -1001000, $c.lit("selection"));
+    sel = $c.asRec(await lua_newuserdata(L, 32), $T.selectionvar, 32);
+    await lua_getfield(L, LUA_REGISTRYINDEX, $c.lit("selection"));
     await lua_setmetatable(L, -2);
     sel.$copyFrom(tmp);
     $t1 = await dupstr(tmp.map), sel.map = $t1;
@@ -104,7 +107,7 @@ async function l_selection_setpoint(L) {   // nhlsel.c:159
     if (x[0] === -1 && y[0] === -1) {
         crd = SP_COORD_IS_RANDOM | 0;
     } else {
-        crd = (x[0] & 255) + ((y[0] & 255) << 16) | 0;
+        crd = SP_COORD_PACK(x[0], y[0]);
     }
     await get_location_coord(new $c.Ptr(x, 0), new $c.Ptr(y, 0), ANY_LOC, gc.coder ? gc.coder.croom : null, crd);
     selection_setpoint(x[0], y[0], sel, val);
@@ -141,7 +144,7 @@ async function l_selection_getpoint(L) {   // nhlsel.c:224
     if (x[0] === -1 && y[0] === -1) {
         crd = SP_COORD_IS_RANDOM | 0;
     } else {
-        crd = (x[0] & 255) + ((y[0] & 255) << 16) | 0;
+        crd = SP_COORD_PACK(x[0], y[0]);
     }
     await get_location_coord(new $c.Ptr(x, 0), new $c.Ptr(y, 0), ANY_LOC, gc.coder ? gc.coder.croom : null, crd);
     val = selection_getpoint(x[0], y[0], sel);
@@ -244,9 +247,9 @@ async function l_selection_filter_percent(L) {   // nhlsel.c:389
     sel = await l_selection_check(L, 1);
     p = $c.i32(await luaL_checkinteger(L, 2));
     tmp = await selection_filter_percent(sel, p);
-    await lua_settop(L, (-argc | 0) - 1 | 0);
+    await lua_pop(L, argc);
     await l_selection_push_copy(L, tmp);
-    selection_free(tmp, 1);
+    selection_free(tmp, TRUE);
     return 1;
 }
 async function l_selection_rndcoord(L) {   // nhlsel.c:407
@@ -267,7 +270,7 @@ async function l_selection_rndcoord(L) {   // nhlsel.c:407
         }
     }
     await lua_settop(L, 0);
-    await lua_createtable(L, 0, 0);
+    await lua_newtable(L);
     await nhl_add_table_entry_int(L, $c.lit("x"), x[0]);
     await nhl_add_table_entry_int(L, $c.lit("y"), y[0]);
     return 1;
@@ -282,7 +285,7 @@ async function l_selection_room(L) {   // nhlsel.c:432
     }
     sel = await selection_from_mkroom(croom);
     await l_selection_push_copy(L, sel);
-    selection_free(sel, 1);
+    selection_free(sel, TRUE);
     return 1;
 }
 async function l_selection_getbounds(L) {   // nhlsel.c:454
@@ -291,7 +294,7 @@ async function l_selection_getbounds(L) {   // nhlsel.c:454
     rect.$copyFrom(cg.zeroNhRect);
     selection_getbounds(sel, rect);
     await lua_settop(L, 0);
-    await lua_createtable(L, 0, 0);
+    await lua_newtable(L);
     await nhl_add_table_entry_int(L, $c.lit("lx"), rect.lx);
     await nhl_add_table_entry_int(L, $c.lit("ly"), rect.ly);
     await nhl_add_table_entry_int(L, $c.lit("hx"), rect.hx);
@@ -312,7 +315,7 @@ async function params_sel_2coords(L, sel, x1, y1, x2, y2) {   // nhlsel.c:476
         lua_rotate(L, 1, -1), await lua_settop(L, -2);
         lua_rotate(L, 1, -1), await lua_settop(L, -2);
         lua_rotate(L, 1, -1), await lua_settop(L, -2);
-        return 1;
+        return TRUE;
     } else if (argc === 5) {
         $t6 = await l_selection_check(L, 1), sel.set(0, $t6);
         $t7 = $c.i16(await luaL_checkinteger(L, 2)), x1.set(0, $t7);
@@ -320,9 +323,9 @@ async function params_sel_2coords(L, sel, x1, y1, x2, y2) {   // nhlsel.c:476
         $t9 = $c.i16(await luaL_checkinteger(L, 4)), x2.set(0, $t9);
         $t10 = $c.i16(await luaL_checkinteger(L, 5)), y2.set(0, $t10);
         await lua_settop(L, -5);
-        return 1;
+        return TRUE;
     }
-    return 0;
+    return FALSE;
 }
 async function l_selection_line(L) {   // nhlsel.c:509
     let sel = [null], x1 = Int16Array.of(0), y1 = Int16Array.of(0), x2 = Int16Array.of(0), y2 = Int16Array.of(0);
@@ -330,8 +333,8 @@ async function l_selection_line(L) {   // nhlsel.c:509
     if (!await params_sel_2coords(L, new $c.Ptr(sel, 0), new $c.Ptr(x1, 0), new $c.Ptr(y1, 0), new $c.Ptr(x2, 0), new $c.Ptr(y2, 0))) {
         await nhl_error(L, $c.lit("selection.line: illegal arguments"));
     }
-    await get_location_coord(new $c.Ptr(x1, 0), new $c.Ptr(y1, 0), ANY_LOC, gc.coder ? gc.coder.croom : null, (x1[0] & 255) + ((y1[0] & 255) << 16) | 0);
-    await get_location_coord(new $c.Ptr(x2, 0), new $c.Ptr(y2, 0), ANY_LOC, gc.coder ? gc.coder.croom : null, (x2[0] & 255) + ((y2[0] & 255) << 16) | 0);
+    await get_location_coord(new $c.Ptr(x1, 0), new $c.Ptr(y1, 0), ANY_LOC, gc.coder ? gc.coder.croom : null, SP_COORD_PACK(x1[0], y1[0]));
+    await get_location_coord(new $c.Ptr(x2, 0), new $c.Ptr(y2, 0), ANY_LOC, gc.coder ? gc.coder.croom : null, SP_COORD_PACK(x2[0], y2[0]));
     await l_selection_clone(L);
     sel[0] = await l_selection_check(L, 2);
     selection_do_line(x1[0], y1[0], x2[0], y2[0], sel[0]);
@@ -343,8 +346,8 @@ async function l_selection_rect(L) {   // nhlsel.c:531
     if (!await params_sel_2coords(L, new $c.Ptr(sel, 0), new $c.Ptr(x1, 0), new $c.Ptr(y1, 0), new $c.Ptr(x2, 0), new $c.Ptr(y2, 0))) {
         await nhl_error(L, $c.lit("selection.rect: illegal arguments"));
     }
-    await get_location_coord(new $c.Ptr(x1, 0), new $c.Ptr(y1, 0), ANY_LOC, gc.coder ? gc.coder.croom : null, (x1[0] & 255) + ((y1[0] & 255) << 16) | 0);
-    await get_location_coord(new $c.Ptr(x2, 0), new $c.Ptr(y2, 0), ANY_LOC, gc.coder ? gc.coder.croom : null, (x2[0] & 255) + ((y2[0] & 255) << 16) | 0);
+    await get_location_coord(new $c.Ptr(x1, 0), new $c.Ptr(y1, 0), ANY_LOC, gc.coder ? gc.coder.croom : null, SP_COORD_PACK(x1[0], y1[0]));
+    await get_location_coord(new $c.Ptr(x2, 0), new $c.Ptr(y2, 0), ANY_LOC, gc.coder ? gc.coder.croom : null, SP_COORD_PACK(x2[0], y2[0]));
     await l_selection_clone(L);
     sel[0] = await l_selection_check(L, 2);
     selection_do_line(x1[0], y1[0], x2[0], y1[0], sel[0]);
@@ -359,8 +362,8 @@ async function l_selection_fillrect(L) {   // nhlsel.c:559
     if (!await params_sel_2coords(L, new $c.Ptr(sel, 0), new $c.Ptr(x1, 0), new $c.Ptr(y1, 0), new $c.Ptr(x2, 0), new $c.Ptr(y2, 0))) {
         await nhl_error(L, $c.lit("selection.fillrect: illegal arguments"));
     }
-    await get_location_coord(new $c.Ptr(x1, 0), new $c.Ptr(y1, 0), ANY_LOC, gc.coder ? gc.coder.croom : null, (x1[0] & 255) + ((y1[0] & 255) << 16) | 0);
-    await get_location_coord(new $c.Ptr(x2, 0), new $c.Ptr(y2, 0), ANY_LOC, gc.coder ? gc.coder.croom : null, (x2[0] & 255) + ((y2[0] & 255) << 16) | 0);
+    await get_location_coord(new $c.Ptr(x1, 0), new $c.Ptr(y1, 0), ANY_LOC, gc.coder ? gc.coder.croom : null, SP_COORD_PACK(x1[0], y1[0]));
+    await get_location_coord(new $c.Ptr(x2, 0), new $c.Ptr(y2, 0), ANY_LOC, gc.coder ? gc.coder.croom : null, SP_COORD_PACK(x2[0], y2[0]));
     await l_selection_clone(L);
     sel[0] = await l_selection_check(L, 2);
     if (x1[0] === x2[0]) {
@@ -400,8 +403,8 @@ async function l_selection_randline(L) {   // nhlsel.c:591
         await l_selection_new(L);
         await l_selection_check(L, 1);
     }
-    await get_location_coord(new $c.Ptr(x1, 0), new $c.Ptr(y1, 0), ANY_LOC, gc.coder ? gc.coder.croom : null, (x1[0] & 255) + ((y1[0] & 255) << 16) | 0);
-    await get_location_coord(new $c.Ptr(x2, 0), new $c.Ptr(y2, 0), ANY_LOC, gc.coder ? gc.coder.croom : null, (x2[0] & 255) + ((y2[0] & 255) << 16) | 0);
+    await get_location_coord(new $c.Ptr(x1, 0), new $c.Ptr(y1, 0), ANY_LOC, gc.coder ? gc.coder.croom : null, SP_COORD_PACK(x1[0], y1[0]));
+    await get_location_coord(new $c.Ptr(x2, 0), new $c.Ptr(y2, 0), ANY_LOC, gc.coder ? gc.coder.croom : null, SP_COORD_PACK(x2[0], y2[0]));
     await l_selection_clone(L);
     sel = await l_selection_check(L, 2);
     selection_do_randline(x1[0], y1[0], x2[0], y2[0], $c.i8(roughness), 12, sel);
@@ -431,9 +434,9 @@ async function l_selection_filter_mapchar(L) {   // nhlsel.c:657
         await nhl_error(L, $c.lit("Erroneous map char"));
     }
     tmp = await selection_filter_mapchar(sel, typ, lit);
-    await lua_settop(L, (-argc | 0) - 1 | 0);
+    await lua_pop(L, argc);
     await l_selection_push_copy(L, tmp);
-    selection_free(tmp, 1);
+    selection_free(tmp, TRUE);
     if (mapchr) {
         $c.free(mapchr);
     }
@@ -472,20 +475,20 @@ async function l_selection_flood(L) {   // nhlsel.c:726
     sel = null;
     x[0] = 0;
     y[0] = 0;
-    diagonals = 0;
+    diagonals = FALSE;
     if (argc === 2 || argc === 3) {
         x[0] = $c.i16(await luaL_checkinteger(L, 1));
         y[0] = $c.i16(await luaL_checkinteger(L, 2));
         if (argc === 3) {
             diagonals = $c.i8(lua_toboolean(L, 3));
         }
-        await lua_settop(L, (-argc | 0) - 1 | 0);
+        await lua_pop(L, argc);
         await l_selection_new(L);
         sel = await l_selection_check(L, 1);
     } else {
         await nhl_error(L, $c.lit("wrong parameters"));
     }
-    await get_location_coord(new $c.Ptr(x, 0), new $c.Ptr(y, 0), ANY_LOC, gc.coder ? gc.coder.croom : null, (x[0] & 255) + ((y[0] & 255) << 16) | 0);
+    await get_location_coord(new $c.Ptr(x, 0), new $c.Ptr(y, 0), ANY_LOC, gc.coder ? gc.coder.croom : null, SP_COORD_PACK(x[0], y[0]));
     if (isok(x[0], y[0])) {
         set_floodfillchk_match_under($c.i16(svl.level.locations[x[0]][y[0]].typ));
         await selection_floodfill(sel, x[0], y[0], diagonals);
@@ -525,7 +528,7 @@ async function l_selection_circle(L) {   // nhlsel.c:762
     } else {
         await nhl_error(L, $c.lit("wrong parameters"));
     }
-    await get_location_coord(new $c.Ptr(x, 0), new $c.Ptr(y, 0), ANY_LOC, gc.coder ? gc.coder.croom : null, (x[0] & 255) + ((y[0] & 255) << 16) | 0);
+    await get_location_coord(new $c.Ptr(x, 0), new $c.Ptr(y, 0), ANY_LOC, gc.coder ? gc.coder.croom : null, SP_COORD_PACK(x[0], y[0]));
     selection_do_ellipse(sel, x[0], y[0], r, r, !filled ? 1 : 0);
     await lua_settop(L, 1);
     return 1;
@@ -567,7 +570,7 @@ async function l_selection_ellipse(L) {   // nhlsel.c:810
     } else {
         await nhl_error(L, $c.lit("wrong parameters"));
     }
-    await get_location_coord(new $c.Ptr(x, 0), new $c.Ptr(y, 0), ANY_LOC, gc.coder ? gc.coder.croom : null, (x[0] & 255) + ((y[0] & 255) << 16) | 0);
+    await get_location_coord(new $c.Ptr(x, 0), new $c.Ptr(y, 0), ANY_LOC, gc.coder ? gc.coder.croom : null, SP_COORD_PACK(x[0], y[0]));
     selection_do_ellipse(sel, x[0], y[0], r1, r2, !filled ? 1 : 0);
     await lua_settop(L, 1);
     return 1;
@@ -652,12 +655,12 @@ async function l_selection_size_description(L) {   // nhlsel.c:962
     return 0;
 }
 export async function l_selection_register(L) {   // nhlsel.c:1025
-    await luaL_checkversion_(L, LUA_VERSION_NUM, 136), await lua_createtable(L, 0, 24), await luaL_setfuncs(L, $c.relem(l_selection_methods, 0), 0);
+    await luaL_checkversion_(L, LUA_VERSION_NUM, LUAL_NUMSIZES), await lua_createtable(L, 0, 24), await luaL_setfuncs(L, $c.relem(l_selection_methods, 0), 0);
     await luaL_newmetatable(L, $c.lit("selection"));
     await luaL_setfuncs(L, $c.relem(l_selection_meta, 0), 0);
     lua_pushvalue(L, -2);
     await lua_setfield(L, -2, $c.lit("__index"));
-    await luaL_checkversion_(L, LUA_VERSION_NUM, 136), await lua_createtable(L, 0, 8), await luaL_setfuncs(L, $c.relem(l_selection_meta, 0), 0);
+    await luaL_checkversion_(L, LUA_VERSION_NUM, LUAL_NUMSIZES), await lua_createtable(L, 0, 8), await luaL_setfuncs(L, $c.relem(l_selection_meta, 0), 0);
     await lua_setfield(L, -2, $c.lit("__metatable"));
     await lua_settop(L, -2);
     await lua_setglobal(L, $c.lit("selection"));

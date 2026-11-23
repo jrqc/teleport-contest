@@ -17,15 +17,16 @@ import { dofire, dothrow } from './dothrow.js';
 import { surface } from './dungeon.js';
 import { doeat, is_edible } from './eat.js';
 import { doengrave } from './engrave.js';
+import { FALSE, TRUE } from './global.h.js';
 import { in_rooms } from './hack.js';
-import { CQ_CANNED, ECMD_OK, FINGER, GETOBJ_SUGGEST, HAND } from './hack.h.js';
+import { CQ_CANNED, ECMD_OK, FINGER, GETOBJ_SUGGEST, HAND, HANDS_SYM } from './hack.h.js';
 import { eos } from './hacklib.js';
 import { adjust_split, carrying, check_invent_gold, doorganize } from './invent.js';
 import { SHOPBASE } from './mkroom.h.js';
-import { AT_WEAP } from './monattk.h.js';
-import { M1_NOHANDS, MZ_SMALL } from './monflag.h.js';
+import { cantwield, could_twoweap } from './mondata.macros.js';
+import { Has_contents, Is_container, ammo_and_launcher, is_graystone, is_plural, is_weptool, is_wet_towel } from './obj.macros.js';
 import { objects } from './objects.js';
-import { ALCHEMY_SMOCK, AMULET_OF_YENDOR, BAG_OF_TRICKS, BEARTRAP, BELL, BELL_OF_OPENING, BLINDFOLD, BRASS_LANTERN, BULLWHIP, CANDELABRUM_OF_INVOCATION, CAN_OF_GREASE, CORPSE, CREAM_PIE, CREDIT_CARD, CRYSTAL_BALL, DRUM_OF_EARTHQUAKE, DWARVISH_MATTOCK, EUCALYPTUS_LEAF, EXPENSIVE_CAMERA, FAKE_AMULET_OF_YENDOR, FIGURINE, FLINT, FORTUNE_COOKIE, GOLD_PIECE, GRAPPLING_HOOK, HAWAIIAN_SHIRT, HEAVY_IRON_BALL, HORN_OF_PLENTY, LAND_MINE, LARGE_BOX, LEASH, LENSES, LOADSTONE, LOCK_PICK, LUCKSTONE, MAGIC_LAMP, MAGIC_MARKER, MAGIC_WHISTLE, MEAT_RING, MIRROR, OIL_LAMP, PICK_AXE, POT_OIL, SADDLE, SCR_BLANK_PAPER, SCR_MAIL, SKELETON_KEY, SPE_BLANK_PAPER, SPE_BOOK_OF_THE_DEAD, SPE_NOVEL, STETHOSCOPE, TALLOW_CANDLE, TIN, TINNING_KIT, TIN_OPENER, TIN_WHISTLE, TOUCHSTONE, TOWEL, T_SHIRT, UNICORN_HORN, WAX_CANDLE, WOODEN_FLUTE } from './objects.h.js';
+import { ALCHEMY_SMOCK, AMULET_OF_YENDOR, BAG_OF_TRICKS, BEARTRAP, BELL, BELL_OF_OPENING, BLINDFOLD, BRASS_LANTERN, BULLWHIP, CANDELABRUM_OF_INVOCATION, CAN_OF_GREASE, CORPSE, CREAM_PIE, CREDIT_CARD, CRYSTAL_BALL, DRUM_OF_EARTHQUAKE, DWARVISH_MATTOCK, EUCALYPTUS_LEAF, EXPENSIVE_CAMERA, FAKE_AMULET_OF_YENDOR, FIGURINE, FORTUNE_COOKIE, GOLD_PIECE, GRAPPLING_HOOK, HAWAIIAN_SHIRT, HEAVY_IRON_BALL, HORN_OF_PLENTY, LAND_MINE, LEASH, LENSES, LOCK_PICK, MAGIC_LAMP, MAGIC_MARKER, MAGIC_WHISTLE, MEAT_RING, MIRROR, OIL_LAMP, PICK_AXE, POT_OIL, SADDLE, SCR_BLANK_PAPER, SCR_MAIL, SKELETON_KEY, SPE_BLANK_PAPER, SPE_BOOK_OF_THE_DEAD, SPE_NOVEL, STETHOSCOPE, TALLOW_CANDLE, TIN, TINNING_KIT, TIN_OPENER, TIN_WHISTLE, TOWEL, T_SHIRT, UNICORN_HORN, WAX_CANDLE, WOODEN_FLUTE } from './objects.h.js';
 import { an, armor_simple_name, cxname, makeplural, simpleonames, the, the_unique_obj } from './objnam.js';
 import { dowhatis, ia_checkfile } from './pager.js';
 import { dotip } from './pickup.js';
@@ -33,13 +34,14 @@ import { impossible } from './pline.js';
 import { body_part } from './polyself.js';
 import { dip_into, dodrink } from './potion.js';
 import { dosacrifice } from './pray.js';
-import { W_AMUL, W_ARM, W_ARMC, W_ARMF, W_ARMG, W_ARMH, W_ARMS, W_ARMU, W_RINGL, W_RINGR, W_TOOL } from './prop.h.js';
+import { W_ACCESSORY, W_ARMOR } from './prop.h.js';
 import { doread } from './read.js';
 import { ALTAR } from './rm.h.js';
 import { dopay, inhishop, shop_keeper } from './shk.js';
 import { P_BOOMERANG, P_BOW, P_CROSSBOW, P_DAGGER, P_DART, P_NONE, P_SABER } from './skills.h.js';
 import { doswapweapon, dotwoweapon, dowield, dowieldquiver } from './wield.js';
-import { add_menu, select_menu, windowprocs } from './windows.js';
+import { add_menu, select_menu } from './windows.js';
+import { create_nhwindow, destroy_nhwindow, end_menu, start_menu } from './winprocs.macros.js';
 import { ATR_NONE, MENU_BEHAVE_STANDARD, MENU_ITEMFLAGS_NONE, NHW_MENU, PICK_ONE } from './wintype.h.js';
 import { armcat_to_wornmask, wearmask_to_obj } from './worn.js';
 import { dozap } from './zap.js';
@@ -87,12 +89,12 @@ async function item_naming_classification(obj, onamebuf, ocallbuf) {   // iactio
         callname = await simpleonames(obj);
         if (the_unique_obj(obj)) {
             callname = await the(callname);
-        } else if (!(obj.quan !== 1 || obj.oartifact === ART_EYES_OF_THE_OVERWORLD && !undiscovered_artifact(ART_EYES_OF_THE_OVERWORLD))) {
+        } else if (!is_plural(obj)) {
             callname = await makeplural(callname);
         }
         $c.__builtin___sprintf_chk(ocallbuf, 0, -1, $c.lit("%s the type for %s"), !objects[obj.otyp].oc_uname || !objects[obj.otyp].oc_uname.get(0) ? new $c.Ptr(item_naming_classification$Call, 0) : new $c.Ptr(item_naming_classification$Recall, 0), callname);
     }
-    return $c.i8(onamebuf.get(0) || ocallbuf.get(0) ? 1 : 0);
+    return $c.i8(onamebuf.get(0) || ocallbuf.get(0) ? TRUE : FALSE);
 }
 async function item_reading_classification(obj, outbuf) {   // iactions.c:86
     let otyp = 0, res = 0, magic = null, novel = 0, blank = 0, tome = 0;
@@ -136,7 +138,7 @@ async function itemactions_pushkeys(otmp, act) {   // iactions.c:140
             break;
         case IA_UNWIELD:
             await cmdq_add_ec(CQ_CANNED, $c.peq(otmp, $G.uwep) ? dowield : $c.peq(otmp, $G.uswapwep) ? remarm_swapwep : $c.peq(otmp, $G.uquiver) ? dowieldquiver : donull);
-            await cmdq_add_key(CQ_CANNED, 45);
+            await cmdq_add_key(CQ_CANNED, HANDS_SYM);
             break;
         case IA_APPLY_OBJ:
             await cmdq_add_ec(CQ_CANNED, doapply);
@@ -247,14 +249,14 @@ export async function itemactions(otmp) {   // iactions.c:278
     let n = 0, act = 0, win = 0, buf = new Int8Array(256), buf2 = new Int8Array(256), selected = [null], mtmp = null, light = null, already_worn = 0, verb = null, action = null, which = null, what = null, multiple = 0, s = null, o = null, shoot = 0, shoot$2 = 0, Wmask = 0, o$2 = null;
     act = IA_NONE;
     light = otmp.lamplit | 0 ? $c.lit("Extinguish") : $c.lit("Light");
-    already_worn = $c.i8($c.and64(otmp.owornmask, W_ARM | W_ARMC | W_ARMH | W_ARMS | W_ARMG | W_ARMF | W_ARMU | (W_RINGL | W_RINGR | W_AMUL | W_TOOL)) !== 0 ? 1 : 0);
-    win = await windowprocs.win_create_nhwindow(NHW_MENU);
-    await windowprocs.win_start_menu(win, MENU_BEHAVE_STANDARD);
+    already_worn = $c.i8($c.and64(otmp.owornmask, W_ARMOR | W_ACCESSORY) !== 0 ? 1 : 0);
+    win = await create_nhwindow()(NHW_MENU);
+    await start_menu()(win, MENU_BEHAVE_STANDARD);
     if ($c.peq(otmp, $G.uwep) || $c.peq(otmp, $G.uswapwep) || $c.peq(otmp, $G.uquiver)) {
         verb = $c.peq(otmp, $G.uquiver) ? $c.lit("Quiver") : $c.lit("Wield");
         action = $c.peq(otmp, $G.uquiver) ? $c.lit("un-ready") : $c.lit("un-wield");
-        which = otmp.quan !== 1 || otmp.oartifact === ART_EYES_OF_THE_OVERWORLD && !undiscovered_artifact(ART_EYES_OF_THE_OVERWORLD) ? $c.lit("these") : $c.lit("this");
-        what = otmp.oclass === WEAPON_CLASS || otmp.oclass === TOOL_CLASS && objects[otmp.otyp].oc_subtyp !== P_NONE ? $c.lit("weapon") : $c.lit("item");
+        which = is_plural(otmp) ? $c.lit("these") : $c.lit("this");
+        what = otmp.oclass === WEAPON_CLASS || is_weptool(otmp) ? $c.lit("weapon") : $c.lit("item");
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s '%c' to %s %s %s"), verb, 45, action, which, otmp.quan !== 1 || otmp.oartifact === ART_EYES_OF_THE_OVERWORLD && !undiscovered_artifact(ART_EYES_OF_THE_OVERWORLD) ? await makeplural(what) : what);
         await ia_addmenu(win, IA_UNWIELD, 45, new $c.Ptr(buf, 0));
     }
@@ -268,7 +270,7 @@ export async function itemactions(otmp) {   // iactions.c:278
         await ia_addmenu(win, IA_APPLY_OBJ, 97, $c.lit("Grapple something with this hook"));
     } else if (otmp.otyp === BAG_OF_TRICKS && objects[otmp.otyp].oc_name_known | 0) {
         await ia_addmenu(win, IA_APPLY_OBJ, 97, $c.lit("Reach into this bag"));
-    } else if (otmp.otyp >= LARGE_BOX && otmp.otyp <= BAG_OF_TRICKS) {
+    } else if (Is_container(otmp)) {
         await ia_addmenu(win, IA_APPLY_OBJ, 97, $c.lit("Open this container"));
     } else if (otmp.otyp === CAN_OF_GREASE) {
         await ia_addmenu(win, IA_APPLY_OBJ, 97, $c.lit("Use the can to grease an item"));
@@ -294,7 +296,7 @@ export async function itemactions(otmp) {   // iactions.c:278
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s the candelabrum"), light);
         await ia_addmenu(win, IA_APPLY_OBJ, 97, new $c.Ptr(buf, 0));
     } else if (otmp.otyp === WAX_CANDLE || otmp.otyp === TALLOW_CANDLE) {
-        multiple = $c.i8(otmp.quan === 1 ? 0 : 1);
+        multiple = $c.i8(otmp.quan === 1 ? FALSE : TRUE);
         s = multiple ? $c.lit("these") : $c.lit("this");
         o = carrying(CANDELABRUM_OF_INVOCATION);
         if (o && o.spe < 7) {
@@ -363,7 +365,7 @@ export async function itemactions(otmp) {   // iactions.c:278
         await ia_addmenu(win, IA_ENGRAVE_OBJ, 69, new $c.Ptr(buf, 0));
     }
     if ($c.peq(otmp, $G.uquiver)) {
-        shoot = $c.i8((otmp.oclass === WEAPON_CLASS || otmp.oclass === GEM_CLASS) && objects[otmp.otyp].oc_subtyp >= -P_CROSSBOW && objects[otmp.otyp].oc_subtyp <= -P_BOW && ($G.uwep && objects[otmp.otyp].oc_subtyp === (-objects[$G.uwep.otyp].oc_subtyp | 0)) ? 1 : 0);
+        shoot = $c.i8(ammo_and_launcher(otmp, $G.uwep));
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s %s"), shoot ? $c.lit("Shoot") : $c.lit("Throw"), otmp.quan > 1 ? $c.lit("one of these") : $c.lit("this"));
         if (shoot) {
             (!!$c.peq($G.uwep, $c.asRec(null, $T.obj, 112)) ? 1 : 0) ? $c.__assert_rtn($c.lit("itemactions"), $c.lit("iactions.c"), 456, $c.lit("uwep != NULL")) : 0;
@@ -422,32 +424,32 @@ export async function itemactions(otmp) {   // iactions.c:278
     if (await item_reading_classification(otmp, new $c.Ptr(buf, 0)) === IA_READ_OBJ) {
         await ia_addmenu(win, IA_READ_OBJ, 114, new $c.Ptr(buf, 0));
     }
-    if ($c.and64(otmp.owornmask, W_RINGL | W_RINGR | W_AMUL | W_TOOL)) {
+    if ($c.and64(otmp.owornmask, W_ACCESSORY)) {
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Remove this %s"), $c.and64(otmp.owornmask, 65536) ? $c.lit("amulet") : $c.and64(otmp.owornmask, 393216) ? $c.lit("ring") : $c.and64(otmp.owornmask, 524288) ? $c.lit("eyewear") : $c.lit("accessory"));
         await ia_addmenu(win, IA_TAKEOFF_OBJ, 82, new $c.Ptr(buf, 0));
     }
     if (otmp.otyp === OIL_LAMP || otmp.otyp === MAGIC_LAMP || otmp.otyp === BRASS_LANTERN) {
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Rub this %s"), await simpleonames(otmp));
         await ia_addmenu(win, IA_RUB_OBJ, 82, new $c.Ptr(buf, 0));
-    } else if (otmp.oclass === GEM_CLASS && (otmp.otyp === LUCKSTONE || otmp.otyp === LOADSTONE || otmp.otyp === FLINT || otmp.otyp === TOUCHSTONE)) {
+    } else if (otmp.oclass === GEM_CLASS && is_graystone(otmp)) {
         await ia_addmenu(win, IA_RUB_OBJ, 82, $c.lit("Rub something on this stone"));
     }
     if (!already_worn) {
-        shoot$2 = $c.i8((otmp.oclass === WEAPON_CLASS || otmp.oclass === GEM_CLASS) && objects[otmp.otyp].oc_subtyp >= -P_CROSSBOW && objects[otmp.otyp].oc_subtyp <= -P_BOW && ($G.uwep && objects[otmp.otyp].oc_subtyp === (-objects[$G.uwep.otyp].oc_subtyp | 0)) ? 1 : 0);
+        shoot$2 = $c.i8(ammo_and_launcher(otmp, $G.uwep));
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s %s%s"), shoot$2 ? $c.lit("Shoot") : $c.lit("Throw"), otmp.quan === 1 ? $c.lit("this item") : otmp.otyp === GOLD_PIECE ? $c.lit("them") : $c.lit("one of these"), $c.peq(otmp, $G.uquiver) && (otmp.otyp !== GOLD_PIECE || otmp.quan === 1) ? $c.lit(" (same as 'f')") : $c.lit(""));
         await ia_addmenu(win, IA_THROW_OBJ, 116, new $c.Ptr(buf, 0));
     }
-    if ($c.and64(otmp.owornmask, W_ARM | W_ARMC | W_ARMH | W_ARMS | W_ARMG | W_ARMF | W_ARMU)) {
+    if ($c.and64(otmp.owornmask, W_ARMOR)) {
         await ia_addmenu(win, IA_TAKEOFF_OBJ, 84, $c.lit("Take off this armor"));
     }
-    if (otmp.otyp >= LARGE_BOX && otmp.otyp <= BAG_OF_TRICKS && (otmp.cobj !== null || !otmp.cknown) || otmp.otyp === HORN_OF_PLENTY && (otmp.spe > 0 || !otmp.known)) {
+    if (Is_container(otmp) && (Has_contents(otmp) || !otmp.cknown) || otmp.otyp === HORN_OF_PLENTY && (otmp.spe > 0 || !otmp.known)) {
         await ia_addmenu(win, IA_TIP_CONTAINER, 84, $c.lit("Tip all the contents out of this container"));
     }
     if (otmp.otyp === FAKE_AMULET_OF_YENDOR && !otmp.known || otmp.oartifact || objects[otmp.otyp].oc_unique | 0 || otmp.otyp === CRYSTAL_BALL) {
         await ia_addmenu(win, IA_INVOKE_OBJ, 86, $c.lit("Try to invoke a unique power of this object"));
     }
-    if ($c.peq(otmp, $G.uwep) || ($c.andu64(gy.youmonst.data.mflags1, M1_NOHANDS) !== 0 || gy.youmonst.data.msize < MZ_SMALL)) {
-    } else if (otmp.oclass === WEAPON_CLASS || otmp.oclass === TOOL_CLASS && objects[otmp.otyp].oc_subtyp !== P_NONE || otmp.otyp === TOWEL && otmp.spe > 0 || otmp.otyp === HEAVY_IRON_BALL) {
+    if ($c.peq(otmp, $G.uwep) || cantwield(gy.youmonst.data)) {
+    } else if (otmp.oclass === WEAPON_CLASS || is_weptool(otmp) || is_wet_towel(otmp) || otmp.otyp === HEAVY_IRON_BALL) {
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Wield this %s as your weapon"), otmp.quan > 1 ? $c.lit("stack") : $c.lit("item"));
         await ia_addmenu(win, IA_WIELD_OBJ, 119, new $c.Ptr(buf, 0));
     } else if (otmp.otyp === TIN_OPENER) {
@@ -475,7 +477,7 @@ export async function itemactions(otmp) {   // iactions.c:278
     } else if ($c.peq(otmp, $G.uswapwep)) {
         await ia_addmenu(win, IA_SWAPWEAPON, 120, $c.lit("Swap this with your main weapon"));
     }
-    if (($c.peq(otmp, $G.uwep) || $c.peq(otmp, $G.uswapwep)) && (u.twoweap || (((gy.youmonst.data.mattk[0].aatyp === AT_WEAP ? 1 : 0) + (gy.youmonst.data.mattk[1].aatyp === AT_WEAP ? 1 : 0) | 0) + (gy.youmonst.data.mattk[2].aatyp === AT_WEAP ? 1 : 0) | 0) > 1 && !$G.uarms && $G.uwep && (($G.uwep.oclass === WEAPON_CLASS ? !($G.uwep.oclass === WEAPON_CLASS && objects[$G.uwep.otyp].oc_subtyp >= P_BOW && objects[$G.uwep.otyp].oc_subtyp <= P_CROSSBOW || ($G.uwep.oclass === WEAPON_CLASS || $G.uwep.oclass === GEM_CLASS) && objects[$G.uwep.otyp].oc_subtyp >= -P_CROSSBOW && objects[$G.uwep.otyp].oc_subtyp <= -P_BOW || ($G.uwep.oclass === WEAPON_CLASS || $G.uwep.oclass === TOOL_CLASS) && objects[$G.uwep.otyp].oc_subtyp >= -P_BOOMERANG && objects[$G.uwep.otyp].oc_subtyp <= -P_DART) : $G.uwep.oclass === TOOL_CLASS && objects[$G.uwep.otyp].oc_subtyp !== P_NONE) && !(($G.uwep.oclass === WEAPON_CLASS || $G.uwep.oclass === TOOL_CLASS) && objects[$G.uwep.otyp].oc_big | 0)) && $G.uswapwep && (($G.uswapwep.oclass === WEAPON_CLASS ? !($G.uswapwep.oclass === WEAPON_CLASS && objects[$G.uswapwep.otyp].oc_subtyp >= P_BOW && objects[$G.uswapwep.otyp].oc_subtyp <= P_CROSSBOW || ($G.uswapwep.oclass === WEAPON_CLASS || $G.uswapwep.oclass === GEM_CLASS) && objects[$G.uswapwep.otyp].oc_subtyp >= -P_CROSSBOW && objects[$G.uswapwep.otyp].oc_subtyp <= -P_BOW || ($G.uswapwep.oclass === WEAPON_CLASS || $G.uswapwep.oclass === TOOL_CLASS) && objects[$G.uswapwep.otyp].oc_subtyp >= -P_BOOMERANG && objects[$G.uswapwep.otyp].oc_subtyp <= -P_DART) : $G.uswapwep.oclass === TOOL_CLASS && objects[$G.uswapwep.otyp].oc_subtyp !== P_NONE) && !(($G.uswapwep.oclass === WEAPON_CLASS || $G.uswapwep.oclass === TOOL_CLASS) && objects[$G.uswapwep.otyp].oc_big | 0)))) {
+    if (($c.peq(otmp, $G.uwep) || $c.peq(otmp, $G.uswapwep)) && (u.twoweap || could_twoweap(gy.youmonst.data) && !$G.uarms && $G.uwep && MAYBETWOWEAPON($G.uwep) && $G.uswapwep && MAYBETWOWEAPON($G.uswapwep))) {
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Toggle two-weapon combat %s"), u.twoweap ? $c.lit("off") : $c.lit("on"));
         await ia_addmenu(win, IA_TWOWEAPON, 88, new $c.Ptr(buf, 0));
     }
@@ -487,15 +489,18 @@ export async function itemactions(otmp) {   // iactions.c:278
         await ia_addmenu(win, IA_WHATIS_OBJ, 47, new $c.Ptr(buf, 0));
     }
     $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Do what with %s?"), await the(await cxname(otmp)));
-    await windowprocs.win_end_menu(win, new $c.Ptr(buf, 0));
+    await end_menu()(win, new $c.Ptr(buf, 0));
     n = await select_menu(win, PICK_ONE, new $c.Ptr(selected, 0));
     if (n > 0) {
         act = $c.radd(selected[0], 0).item.a_int;
         $c.free(selected[0]);
         await itemactions_pushkeys(otmp, act);
     }
-    await windowprocs.win_destroy_nhwindow(win);
+    await destroy_nhwindow()(win);
     return ECMD_OK;
+}
+function MAYBETWOWEAPON(obj) {
+    return (obj.oclass === WEAPON_CLASS ? !(obj.oclass === WEAPON_CLASS && objects[obj.otyp].oc_subtyp >= P_BOW && objects[obj.otyp].oc_subtyp <= P_CROSSBOW || (obj.oclass === WEAPON_CLASS || obj.oclass === GEM_CLASS) && objects[obj.otyp].oc_subtyp >= -P_CROSSBOW && objects[obj.otyp].oc_subtyp <= -P_BOW || (obj.oclass === WEAPON_CLASS || obj.oclass === TOOL_CLASS) && objects[obj.otyp].oc_subtyp >= -P_BOOMERANG && objects[obj.otyp].oc_subtyp <= -P_DART) : obj.oclass === TOOL_CLASS && objects[obj.otyp].oc_subtyp !== P_NONE) && !((obj.oclass === WEAPON_CLASS || obj.oclass === TOOL_CLASS) && objects[obj.otyp].oc_big | 0) ? 1 : 0;
 }
 
 export function $init() {

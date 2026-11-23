@@ -4,7 +4,8 @@ import * as $T from './types.js';
 import { $G } from './globals.js';
 import { alloc } from './alloc.js';
 import { panic } from './end.js';
-import { COLNO, ROWNO } from './global.h.js';
+import { COLNO, FALSE, ROWNO, TRUE } from './global.h.js';
+import { max, min } from './hack.macros.js';
 import { impossible } from './pline.js';
 import { rn2 } from './rnd.js';
 
@@ -66,24 +67,24 @@ export function rnd_rect() {   // rect.c:104
 }
 function intersect(r1, r2, r3) {   // rect.c:116
     if (r2.lx > r1.hx || r2.ly > r1.hy || r2.hx < r1.lx || r2.hy < r1.ly) {
-        return 0;
+        return FALSE;
     }
     r3.lx = $c.i16(r2.lx > r1.lx ? r2.lx : r1.lx);
     r3.ly = $c.i16(r2.ly > r1.ly ? r2.ly : r1.ly);
     r3.hx = $c.i16(r2.hx > r1.hx ? r1.hx : r2.hx);
     r3.hy = $c.i16(r2.hy > r1.hy ? r1.hy : r2.hy);
     if (r3.lx > r3.hx || r3.ly > r3.hy) {
-        return 0;
+        return FALSE;
     }
-    return 1;
+    return TRUE;
 }
 export function rect_bounds(r1$in, r2$in, r3) {   // rect.c:134
     const r1 = r1$in;   // passed by value: the caller copies
     const r2 = r2$in;   // passed by value: the caller copies
-    r3.lx = $c.i16(r1.lx < r2.lx ? r1.lx : r2.lx);
-    r3.ly = $c.i16(r1.ly < r2.ly ? r1.ly : r2.ly);
-    r3.hx = $c.i16(r1.hx > r2.hx ? r1.hx : r2.hx);
-    r3.hy = $c.i16(r1.hy > r2.hy ? r1.hy : r2.hy);
+    r3.lx = $c.i16(min(r1.lx, r2.lx));
+    r3.ly = $c.i16(min(r1.ly, r2.ly));
+    r3.hx = $c.i16(max(r1.hx, r2.hx));
+    r3.hy = $c.i16(max(r1.hy, r2.hy));
 }
 export function remove_rect(r) {   // rect.c:147
     let ind = 0;

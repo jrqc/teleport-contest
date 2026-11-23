@@ -13,11 +13,12 @@ import { NO_COLOR } from './color.h.js';
 import { is_pool } from './dbridge.js';
 import { a11y, c_common_strings, cg, dirs_ord, flags, gc, gd, ge, gi, gk, gl, gm, go, gs, gt, gu, gv, gy, hidespinchars, iflags, nhcb_counts, nhcb_name, program_state, quitchars, rightleftchars, svc, svd, svl, svu, u, urealtime, xdir, ydir, ynaqchars, ynchars, ynqchars, zdir } from './decl.js';
 import { DOMOVE_RUSH, DOMOVE_WALK } from './decl.h.js';
-import { AMULET_SYM, ARMOR_SYM, FOOD_CLASS, GOLD_SYM, RING_SYM, SPBOOK_SYM, S_NYMPH, S_UNICORN, S_VAMPIRE, S_corr, S_digbeam, S_fountain, S_goodpos, S_litcorr, S_sink, TOOL_SYM, WEAPON_SYM } from './defsym.h.js';
+import { AMULET_SYM, ARMOR_SYM, FOOD_CLASS, GOLD_SYM, RING_SYM, SPBOOK_SYM, S_NYMPH, S_corr, S_fountain, S_litcorr, S_sink, TOOL_SYM, WEAPON_SYM } from './defsym.h.js';
 import { dosearch, reveal_terrain } from './detect.js';
 import { wiz_debug_cmd_bury } from './dig.js';
-import { canseemon, cls, docrt, docrt_flags, doredraw, flush_screen, glyph_at, nul_glyphinfo, sensemon } from './display.js';
-import { GLYPH_CMAP_C_OFF, GLYPH_CMAP_STONE_OFF, GLYPH_INVIS_OFF, GLYPH_MON_FEM_OFF, GLYPH_MON_MALE_OFF, GLYPH_OBJ_OFF, GLYPH_UNEXPLORED_OFF, docrtRefresh } from './display.h.js';
+import { cls, docrt, docrt_flags, doredraw, flush_screen, glyph_at, nul_glyphinfo } from './display.js';
+import { GLYPH_INVISIBLE, GLYPH_MON_FEM_OFF, GLYPH_MON_MALE_OFF, GLYPH_OBJ_OFF, GLYPH_UNEXPLORED, docrtRefresh } from './display.h.js';
+import { canspotmon, glyph_is_cmap } from './display.macros.js';
 import { doddrop, dodown, dodrop, donull, doup, dowipe, save_currentstate, u_collide_m } from './do.js';
 import { docallcmd, mon_nam, x_monnam } from './do_name.js';
 import { doddoremarm, doputon, doremring, dotakeoff, dowear, ia_dotakeoff, remarm_swapwep, reset_remarm } from './do_wear.js';
@@ -27,36 +28,45 @@ import { dokick } from './dokick.js';
 import { dofire, dothrow } from './dothrow.js';
 import { defsyms } from './drawing.js';
 import { donamelevel, dooverview, ledger_no, on_level, recalc_mapseen, rm_mapseen, u_on_rndspot } from './dungeon.js';
+import { In_tutorial } from './dungeon.macros.js';
 import { doeat } from './eat.js';
 import { done2, nh_terminate } from './end.js';
 import { can_reach_floor, doengrave } from './engrave.js';
 import { clearlocks, close_nhfile, debugcore, get_freeing_nhfile, paniclog } from './files.js';
-import { GFILTER_VIEW, GLOC_INTERESTING, PARANOID_CONFIRM, PARANOID_QUIT, PLNMSG_UNKNOWN, TER_FULL, TER_MAP, TER_OBJ, TER_TRP, fuzzer_impossible_continue } from './flag.h.js';
+import { GFILTER_VIEW, GLOC_INTERESTING, PLNMSG_UNKNOWN, TER_FULL, TER_MAP, TER_OBJ, TER_TRP, fuzzer_impossible_continue } from './flag.h.js';
+import { ParanoidConfirm, ParanoidQuit, discover, wizard } from './flag.macros.js';
 import { dryup } from './fountain.js';
-import { AUTOCOMPLETE, AUTOCOMP_ADJ, CMD_INSANE, CMD_M_PREFIX, CMD_NOT_AVAILABLE, CMD_PARAM, CMD_gGF_PREFIX, ECM_EXACTMATCH, ECM_IGNOREAC, ECM_NO1CHARCMD, GENERALCMD, IFBURIED, INTERNALCMD, MOUSECMD, MOVEMENTCMD, NOFUZZERCMD, PREFIXCMD, WIZMODECMD } from './func_tab.h.js';
+import { AUTOCOMPLETE, AUTOCOMP_ADJ, CMD_INSANE, CMD_MOVE_PREFIXES, CMD_M_PREFIX, CMD_NOT_AVAILABLE, CMD_PARAM, CMD_gGF_PREFIX, ECM_EXACTMATCH, ECM_IGNOREAC, ECM_NO1CHARCMD, GENERALCMD, IFBURIED, INTERNALCMD, MOUSECMD, MOVEMENTCMD, NOFUZZERCMD, PREFIXCMD, WIZMODECMD } from './func_tab.h.js';
 import { auto_describe, gather_locs_interesting, getpos, getpos_menu } from './getpos.js';
-import { BUFSZ, COLNO, LARGEST_INT, NHLpa_panic, QBUFSZ, ROWNO } from './global.h.js';
+import { BUFSZ, COLNO, FALSE, LARGEST_INT, NHLpa_panic, QBUFSZ, ROWNO, TRUE } from './global.h.js';
+import { C, M, unmeta } from './global.macros.js';
 import { glyph_to_cmap } from './glyphs.js';
 import { check_special_room, domove, dopickup, set_uinwater, test_move, u_maybe_impaired } from './hack.js';
-import { ARTICLE_THE, CMDQ_DIR, CMDQ_EXTCMD, CMDQ_INT, CMDQ_KEY, CMDQ_USER_INPUT, CQ_CANNED, CQ_REPEAT, DIR_DOWN, DIR_E, DIR_ERR, DIR_N, DIR_NE, DIR_NW, DIR_S, DIR_SE, DIR_SW, DIR_UP, DIR_W, ECMD_CANCEL, ECMD_FAIL, ECMD_OK, ECMD_TIME, GC_ECHOFIRST, GC_NOFLAGS, GC_SAVEHIST, MV_ANY, MV_RUN, MV_RUSH, MV_WALK, NHCB_CMD_BEFORE, NHKF_COUNT, NHKF_ESC, NHKF_GETDIR_HELP, NHKF_GETDIR_MOUSE, NHKF_GETDIR_SELF, NHKF_GETDIR_SELF2, NHKF_GETPOS_AUTODESC, NHKF_GETPOS_DOOR_NEXT, NHKF_GETPOS_DOOR_PREV, NHKF_GETPOS_HELP, NHKF_GETPOS_INTERESTING_NEXT, NHKF_GETPOS_INTERESTING_PREV, NHKF_GETPOS_LIMITVIEW, NHKF_GETPOS_MENU, NHKF_GETPOS_MON_NEXT, NHKF_GETPOS_MON_PREV, NHKF_GETPOS_MOVESKIP, NHKF_GETPOS_OBJ_NEXT, NHKF_GETPOS_OBJ_PREV, NHKF_GETPOS_PICK, NHKF_GETPOS_PICK_O, NHKF_GETPOS_PICK_Q, NHKF_GETPOS_PICK_V, NHKF_GETPOS_SELF, NHKF_GETPOS_SHOWVALID, NHKF_GETPOS_UNEX_NEXT, NHKF_GETPOS_UNEX_PREV, NHKF_GETPOS_VALID_NEXT, NHKF_GETPOS_VALID_PREV, N_DIRS_Z, N_MOVEMODES, SUPPRESS_HISTORY, SUPPRESS_SADDLE, TEST_MOVE, commandInp, getdirInp, getposInp, otherInp } from './hack.h.js';
+import { ARTICLE_THE, CMDQ_DIR, CMDQ_EXTCMD, CMDQ_INT, CMDQ_KEY, CMDQ_USER_INPUT, CQ_CANNED, CQ_REPEAT, DIR_DOWN, DIR_E, DIR_ERR, DIR_N, DIR_NE, DIR_NW, DIR_S, DIR_SE, DIR_SW, DIR_UP, DIR_W, ECMD_CANCEL, ECMD_FAIL, ECMD_OK, ECMD_TIME, GC_CONDHIST, GC_ECHOFIRST, GC_NOFLAGS, GC_SAVEHIST, MV_ANY, MV_RUN, MV_RUSH, MV_WALK, NHCB_CMD_BEFORE, NHKF_COUNT, NHKF_ESC, NHKF_GETDIR_HELP, NHKF_GETDIR_MOUSE, NHKF_GETDIR_SELF, NHKF_GETDIR_SELF2, NHKF_GETPOS_AUTODESC, NHKF_GETPOS_DOOR_NEXT, NHKF_GETPOS_DOOR_PREV, NHKF_GETPOS_HELP, NHKF_GETPOS_INTERESTING_NEXT, NHKF_GETPOS_INTERESTING_PREV, NHKF_GETPOS_LIMITVIEW, NHKF_GETPOS_MENU, NHKF_GETPOS_MON_NEXT, NHKF_GETPOS_MON_PREV, NHKF_GETPOS_MOVESKIP, NHKF_GETPOS_OBJ_NEXT, NHKF_GETPOS_OBJ_PREV, NHKF_GETPOS_PICK, NHKF_GETPOS_PICK_O, NHKF_GETPOS_PICK_Q, NHKF_GETPOS_PICK_V, NHKF_GETPOS_SELF, NHKF_GETPOS_SHOWVALID, NHKF_GETPOS_UNEX_NEXT, NHKF_GETPOS_UNEX_PREV, NHKF_GETPOS_VALID_NEXT, NHKF_GETPOS_VALID_PREV, N_DIRS, N_DIRS_Z, N_MOVEMODES, SUPPRESS_HISTORY, SUPPRESS_SADDLE, TEST_MOVE, commandInp, getdirInp, getposInp, otherInp } from './hack.h.js';
+import { NODIAG, pline1 } from './hack.macros.js';
 import { copynchars, digit, dist2, eos, highc, letter, mungspaces, nh_snprintf, sgn, strncmpi, strstri, strsubst, trimspaces, upstart, visctrl } from './hacklib.js';
 import { do_gamelog, doattributes, doborn, doconduct, dogenocided, dovanquished, remove_achievement } from './insight.js';
+import { AppendLongDigit } from './integer.macros.js';
 import { adjust_split, carrying, ddoinv, dolook, doorganize, doperminv, dopramulet, doprarm, doprgold, doprinuse, doprring, doprtool, doprwep, dotypeinv } from './invent.js';
 import { dosuspend } from './ioctl.js';
 import { wiz_light_sources } from './light.js';
+import { nhUse } from './lint.macros.js';
 import { doclose, doforce, doopen, maybe_reset_pick, reset_pick } from './lock.js';
 import { lua_getglobal, lua_pushstring, lua_settop, lua_toboolean } from './luabridge.js';
 import { dobjsfree } from './mkobj.js';
+import { ROOMOFFSET } from './mkroom.h.js';
 import { dmonsfree, kill_genocided_monsters } from './mon.js';
 import { AT_BREA, AT_GAZE, AT_SPIT } from './monattk.h.js';
 import { attacktype } from './mondata.js';
-import { M1_CONCEAL, M1_HIDE, M2_JEWELS, M2_WERE, MALE, MS_SHRIEK } from './monflag.h.js';
-import { mons } from './monst.js';
-import { PM_CAVE_SPIDER, PM_GIANT_SPIDER, PM_GREMLIN, PM_GRID_BUG, PM_MASTER_MIND_FLAYER, PM_MIND_FLAYER, PM_VAMPIRE, PM_VAMPIRE_LEADER, PM_VLAD_THE_IMPALER } from './monsters.h.js';
+import { can_breathe, hides_under, is_hider, is_mind_flayer, is_unicorn, is_vampire, is_were, webmaker } from './mondata.macros.js';
+import { MALE, MS_SHRIEK } from './monflag.h.js';
+import { is_vampshifter } from './monst.macros.js';
+import { PM_GREMLIN, PM_GRID_BUG } from './monsters.h.js';
 import { linedup } from './mthrowu.js';
 import { nhl_pcall_handle } from './nhlua.js';
 import { doclassdisco, dodiscovered } from './o_init.js';
-import { BAG_OF_TRICKS, BOULDER, CREDIT_CARD, LARGE_BOX, LOCK_PICK, SADDLE, SKELETON_KEY } from './objects.h.js';
+import { Is_container } from './obj.macros.js';
+import { BOULDER, CREDIT_CARD, LOCK_PICK, SADDLE, SKELETON_KEY } from './objects.h.js';
 import { an, doname } from './objnam.js';
 import { doset, doset_simple, dotogglepickup, show_menu_controls, toggle_bool_option } from './options.js';
 import { do_screen_description, dohelp, dohistory, doidtrap, doquickwhatis, dowhatdoes, dowhatdoes_core, dowhatis } from './pager.js';
@@ -69,7 +79,8 @@ import { W_SADDLE } from './prop.h.js';
 import { deliver_splev_message } from './questpgr.js';
 import { doread } from './read.js';
 import { dobugreport } from './report.js';
-import { ALTAR, CORR, DBWALL, DOOR, DRAWBRIDGE_UP, D_CLOSED, D_ISOPEN, D_LOCKED, FOUNTAIN, IRONBARS, LAVAWALL, MAX_TYPE, ROOM, SCORR, SDOOR, SINK, STONE, THRONE, TREE, WATER } from './rm.h.js';
+import { CORR, DOOR, DRAWBRIDGE_UP, D_CLOSED, D_ISOPEN, D_LOCKED, FOUNTAIN, IRONBARS, LAVAWALL, MAX_TYPE, ROOM, SCORR, SDOOR, SINK, THRONE } from './rm.h.js';
+import { IS_ALTAR, IS_DOOR, IS_FOUNTAIN, IS_SINK, IS_STWALL, IS_THRONE, IS_TREE, IS_WATERWALL, OBJ_AT, m_at } from './rm.macros.js';
 import { rn2, rnd } from './rnd.js';
 import { dosave, dosave0, savelev } from './save.js';
 import { selection_floodfill, selection_free, selection_getbounds, selection_getpoint, selection_new, selection_size_description, set_selection_floodfillchk } from './selvar.js';
@@ -89,19 +100,23 @@ import { authorize_explore_mode } from './unixmain.js';
 import { dosh } from './unixunix.js';
 import { doextversion, doversion } from './version.js';
 import { vision_reset } from './vision.js';
-import { IN_SIGHT } from './vision.h.js';
+import { cansee } from './vision.macros.js';
 import { enhance_weapon_skill } from './weapon.js';
 import { doswapweapon, dotwoweapon, dowield, dowieldquiver } from './wield.js';
 import { add_menu, add_menu_heading, add_menu_str, getlin, nhwindows_hangup, select_menu, windowprocs } from './windows.js';
-import { ATR_NONE, CLICK_1, CLICK_2, MENU_BEHAVE_STANDARD, MENU_ITEMFLAGS_NONE, MENU_ITEMFLAGS_SELECTED, NHW_MENU, NHW_TEXT, NUM_MOUSE_BUTTONS, PICK_ANY, PICK_ONE } from './wintype.h.js';
+import { clear_nhwindow, create_nhwindow, destroy_nhwindow, display_nhwindow, end_menu, exit_nhwindows, get_ext_cmd, mark_synch, nh_doprev_message, nh_poskey, nhbell, nhgetch, putmsghistory, putstr, start_menu, wait_synch } from './winprocs.macros.js';
+import { ATR_NONE, CLICK_1, CLICK_2, MENU_BEHAVE_STANDARD, MENU_ITEMFLAGS_NONE, MENU_ITEMFLAGS_SELECTED, NHW_MENU, NHW_TEXT, NUM_MOUSE_BUTTONS, PICK_ANY, PICK_ONE, WIN_ERR } from './wintype.h.js';
 import { aggravate } from './wizard.js';
 import { makemap_remove_mons, wiz_custom, wiz_detect, wiz_display_macros, wiz_flip_level, wiz_fuzzer, wiz_genesis, wiz_identify, wiz_intrinsic, wiz_kill, wiz_level_change, wiz_level_tele, wiz_levltyp_legend, wiz_load_lua, wiz_load_splua, wiz_makemap, wiz_map, wiz_map_levltyp, wiz_migrate_mons, wiz_mon_diff, wiz_objprobs, wiz_panic, wiz_polyself, wiz_rumor_check, wiz_show_nhuuid, wiz_show_seenv, wiz_show_stats, wiz_show_vision, wiz_show_wmodes, wiz_smell, wiz_telekinesis, wiz_where, wiz_wish } from './wizcmds.js';
 import { which_armor } from './worn.js';
 import { ACH_MINE_PRIZE, ACH_SOKO_PRIZE } from './you.h.js';
+import { Upolyd, u_at } from './you.macros.js';
+import { Punished } from './youprop.macros.js';
 import { dozap } from './zap.js';
 
 const NR_OF_EOFS = 20;
 const MAX_EXT_CMD = 200;
+const IGNORECMD = 1092;
 const MCMD_NOTHING = 0;
 const MCMD_OPEN_DOOR = MCMD_NOTHING + 1;
 const MCMD_LOCK_DOOR = MCMD_OPEN_DOOR + 1;
@@ -172,7 +187,7 @@ const misc_keys = $c.recArray($T.anon_cmd_2086, 3);
 let extcmdlist_length = 0;
 const spkeys_binds = $c.recArray($T.anon_cmd_3157, 29);
 async function doprev_message() {   // cmd.c:164
-    await windowprocs.win_doprev_message();
+    await nh_doprev_message()();
     return ECMD_OK;
 }
 async function timed_occupation() {   // cmd.c:172
@@ -350,7 +365,7 @@ export async function pgetchar() {   // cmd.c:445
     if (iflags.debug_fuzzer) {
         return await randomkey();
     }
-    ch = await windowprocs.win_nhgetch();
+    ch = await nhgetch()();
     return $c.i8(ch);
 }
 export function extcmd_initiator() {   // cmd.c:457
@@ -366,25 +381,25 @@ async function can_do_extcmd(extcmd) {   // cmd.c:463
         await nhl_pcall_handle(gl.luacore, 2, 1, $c.lit("can_do_extcmd"), NHLpa_panic);
         if (!lua_toboolean(gl.luacore, -1)) {
             await lua_settop(gl.luacore, 0);
-            return 0;
+            return FALSE;
         }
         await lua_settop(gl.luacore, 0);
     }
-    if (!flags.debug && ecflags & WIZMODECMD) {
+    if (!wizard() && ecflags & WIZMODECMD) {
         await pline(new $c.Ptr(unavailcmd, 0), extcmd.ef_txt);
-        return 0;
+        return FALSE;
     } else if (u.uburied | 0 && !(ecflags & IFBURIED)) {
         await You_cant($c.lit("do that while you are buried!"));
-        return 0;
+        return FALSE;
     } else if (iflags.debug_fuzzer && ecflags & NOFUZZERCMD) {
-        return 0;
+        return FALSE;
     }
-    return 1;
+    return TRUE;
 }
 export async function doextcmd() {   // cmd.c:493
     let idx = 0, retval = 0, func = null;
     do {
-        idx = await windowprocs.win_get_ext_cmd();
+        idx = await get_ext_cmd()();
         if (idx < 0) {
             return ECMD_OK;
         }
@@ -394,7 +409,7 @@ export async function doextcmd() {   // cmd.c:493
         }
         if (iflags.menu_requested && !accept_menu_prefix($c.relem(extcmdlist, idx))) {
             await pline($c.lit("'%s' prefix has no effect for the %s command."), visctrl(cmd_from_func(do_reqmenu)), extcmdlist[idx].ef_txt);
-            iflags.menu_requested = 0;
+            iflags.menu_requested = FALSE;
         }
         ge.ext_tlist = $c.relem(extcmdlist, idx);
         retval = await func();
@@ -431,15 +446,15 @@ export async function doextlist() {   // cmd.c:562
     efp = null;
     menumode = 0;
     onelist = 0;
-    redisplay = 1;
-    search = 0;
+    redisplay = TRUE;
+    search = FALSE;
     clr = NO_COLOR;
     searchbuf[0] = 0;
-    menuwin = await windowprocs.win_create_nhwindow(NHW_MENU);
+    menuwin = await create_nhwindow()(NHW_MENU);
     while (redisplay) {
-        redisplay = 0;
+        redisplay = FALSE;
         any.$copyFrom(cg.zeroany);
-        await windowprocs.win_start_menu(menuwin, MENU_BEHAVE_STANDARD);
+        await start_menu()(menuwin, MENU_BEHAVE_STANDARD);
         await add_menu_str(menuwin, $c.lit("Extended Commands List"));
         await add_menu_str(menuwin, $c.lit(""));
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Switch to %s commands that don't autocomplete"), menumode ? $c.lit("including") : $c.lit("excluding"));
@@ -456,7 +471,7 @@ export async function doextlist() {   // cmd.c:562
             any.a_int = 3;
             await add_menu(menuwin, nul_glyphinfo, any, 115, 58, ATR_NONE, clr, new $c.Ptr(buf, 0), MENU_ITEMFLAGS_NONE);
         }
-        if (flags.debug) {
+        if (wizard()) {
             any.a_int = 4;
             await add_menu(menuwin, nul_glyphinfo, any, 122, 0, ATR_NONE, clr, onelist ? $c.lit("Switch to showing debugging commands in separate section") : $c.lit("Switch to showing all alphabetically, including debugging commands"), MENU_ITEMFLAGS_NONE);
         }
@@ -464,7 +479,7 @@ export async function doextlist() {   // cmd.c:562
         $t1 = menushown[1] = 0, menushown[0] = $t1;
         n = 0;
         for (pass = 0; pass <= 1; pass = pass + 1 | 0) {
-            if (pass === 1 && (onelist || !flags.debug)) {
+            if (pass === 1 && (onelist || !wizard())) {
                 break;
             }
             for (efp = $c.relem(extcmdlist, 0); efp.ef_txt; efp = $c.radd(efp, 1)) {
@@ -475,14 +490,14 @@ export async function doextlist() {   // cmd.c:562
                     continue;
                 }
                 wizc = (efp.flags & WIZMODECMD) >>> 0 !== 0 ? 1 : 0;
-                if (wizc && !flags.debug) {
+                if (wizc && !wizard()) {
                     continue;
                 }
                 if (!onelist && pass !== wizc) {
                     continue;
                 }
                 cmd_desc = efp.ef_desc;
-                if (!flags.debug && !flags.explore && (efp.flags & GENERALCMD) >>> 0 !== 0 && strstri(cmd_desc, $c.lit("extinct"))) {
+                if (!wizard() && !discover() && (efp.flags & GENERALCMD) >>> 0 !== 0 && strstri(cmd_desc, $c.lit("extinct"))) {
                     cmd_desc = strsubst($c.__builtin___strcpy_chk(new $c.Ptr(descbuf, 0), cmd_desc, 256), $c.lit(" been genocided or become extinct"), $c.lit(" been genocided"));
                 }
                 if (new $c.Ptr(searchbuf, 0).get(0) && !strstri(efp.ef_txt, new $c.Ptr(searchbuf, 0)) && !strstri(cmd_desc, new $c.Ptr(searchbuf, 0)) && !pmatchi(new $c.Ptr(searchbuf, 0), efp.ef_txt) && !pmatchi(new $c.Ptr(searchbuf, 0), cmd_desc)) {
@@ -506,32 +521,32 @@ export async function doextlist() {   // cmd.c:562
         } else {
             await doc_extcmd_flagstr(menuwin, null);
         }
-        await windowprocs.win_end_menu(menuwin, null);
+        await end_menu()(menuwin, null);
         n = await select_menu(menuwin, PICK_ONE, new $c.Ptr(selected, 0));
         if (n > 0) {
             switch ($c.radd(selected[0], 0).item.a_int) {
                 case 1:
                     menumode = 1 - menumode | 0;
-                    redisplay = 1;
+                    redisplay = TRUE;
                     break;
                 case 2:
-                    search = 1;
+                    search = TRUE;
                     break;
                 case 3:
-                    search = 0;
+                    search = FALSE;
                     searchbuf[0] = 0;
-                    redisplay = 1;
+                    redisplay = TRUE;
                     break;
                 case 4:
-                    search = 0;
+                    search = FALSE;
                     searchbuf[0] = 0;
                     onelist = 1 - onelist | 0;
-                    redisplay = 1;
+                    redisplay = TRUE;
                     break;
             }
             $c.free(selected[0]);
         } else {
-            search = 0;
+            search = FALSE;
             searchbuf[0] = 0;
         }
         if (search) {
@@ -543,12 +558,12 @@ export async function doextlist() {   // cmd.c:562
                 searchbuf[0] = 0;
             }
             if (new $c.Ptr(searchbuf, 0).get(0)) {
-                redisplay = 1;
+                redisplay = TRUE;
             }
-            search = 0;
+            search = FALSE;
         }
     }
-    await windowprocs.win_destroy_nhwindow(menuwin);
+    await destroy_nhwindow()(menuwin);
     return ECMD_OK;
 }
 export async function extcmd_via_menu() {   // cmd.c:752
@@ -563,7 +578,7 @@ export async function extcmd_via_menu() {   // cmd.c:752
         i = n = 0;
         any.$copyFrom(cg.zeroany);
         for (efp = $c.relem(extcmdlist, 0); efp.ef_txt; efp = $c.radd(efp, 1)) {
-            if ((efp.flags & (CMD_NOT_AVAILABLE | INTERNALCMD)) >>> 0 || !((efp.flags & AUTOCOMPLETE) >>> 0) || !flags.debug && (efp.flags & WIZMODECMD) >>> 0) {
+            if ((efp.flags & (CMD_NOT_AVAILABLE | INTERNALCMD)) >>> 0 || !((efp.flags & AUTOCOMPLETE) >>> 0) || !wizard() && (efp.flags & WIZMODECMD) >>> 0) {
                 continue;
             }
             if (!matchlevel || !$c.strncmp(efp.ef_txt, new $c.Ptr(cbuf, 0), $c.u64(matchlevel))) {
@@ -572,7 +587,7 @@ export async function extcmd_via_menu() {   // cmd.c:752
                     biggest = len;
                 }
                 if ((i = i + 1 | 0) > MAX_EXT_CMD) {
-                    iflags.extmenu = 0;
+                    iflags.extmenu = FALSE;
                     return -1;
                 }
             }
@@ -583,18 +598,18 @@ export async function extcmd_via_menu() {   // cmd.c:752
             ret = nchoices === 1 ? $c.i32($c.rdiff(choices[0], $c.relem(extcmdlist, 0))) : -1;
             break;
         }
-        win = await windowprocs.win_create_nhwindow(NHW_MENU);
-        await windowprocs.win_start_menu(win, MENU_BEHAVE_STANDARD);
+        win = await create_nhwindow()(NHW_MENU);
+        await start_menu()(win, MENU_BEHAVE_STANDARD);
         $c.__builtin___sprintf_chk(new $c.Ptr(fmtstr, 0), 0, 20, $c.lit("%%-%ds"), biggest + 15 | 0);
         prompt[0] = 0;
-        wastoolong = 0;
+        wastoolong = FALSE;
         one_per_line = $c.i8(nchoices < ROWNO - 3 ? 1 : 0);
         prevaccelerator = 0;
         acount = 0;
         for (i = 0; choices[i]; i = i + 1 | 0) {
             accelerator = choices[i].ef_txt.get(matchlevel);
             if (accelerator !== prevaccelerator || one_per_line) {
-                wastoolong = 0;
+                wastoolong = FALSE;
             }
             if (accelerator !== prevaccelerator || one_per_line || acount >= 2 && $c.addu64($c.addu64($c.strlen(new $c.Ptr(prompt, 0)), 4), $c.strlen(choices[i].ef_txt)) >= 74) {
                 if (acount) {
@@ -603,7 +618,7 @@ export async function extcmd_via_menu() {   // cmd.c:752
                     await add_menu(win, nul_glyphinfo, any, any.a_char, 0, ATR_NONE, clr, new $c.Ptr(buf, 0), MENU_ITEMFLAGS_NONE);
                     acount = 0;
                     if (!(accelerator !== prevaccelerator || one_per_line)) {
-                        wastoolong = 1;
+                        wastoolong = TRUE;
                     }
                 }
             }
@@ -624,9 +639,9 @@ export async function extcmd_via_menu() {   // cmd.c:752
             await add_menu(win, nul_glyphinfo, any, any.a_char, 0, ATR_NONE, clr, new $c.Ptr(buf, 0), MENU_ITEMFLAGS_NONE);
         }
         nh_snprintf($c.lit("extcmd_via_menu"), 856, new $c.Ptr(prompt, 0), 128, $c.lit("Extended Command: %s"), new $c.Ptr(cbuf, 0));
-        await windowprocs.win_end_menu(win, new $c.Ptr(prompt, 0));
+        await end_menu()(win, new $c.Ptr(prompt, 0));
         n = await select_menu(win, PICK_ONE, new $c.Ptr(pick_list, 0));
-        await windowprocs.win_destroy_nhwindow(win);
+        await destroy_nhwindow()(win);
         if (n === 1) {
             if (matchlevel > QBUFSZ - 2) {
                 $c.free(pick_list[0]);
@@ -650,15 +665,15 @@ export async function extcmd_via_menu() {   // cmd.c:752
 export async function domonability() {   // cmd.c:890
     let uptr = null, might_hide = 0, c = 0;
     uptr = gy.youmonst.data;
-    might_hide = $c.i8($c.andu64(uptr.mflags1, M1_HIDE) !== 0 || $c.andu64(uptr.mflags1, M1_CONCEAL) !== 0 ? 1 : 0);
+    might_hide = $c.i8(is_hider(uptr) || hides_under(uptr) ? 1 : 0);
     c = 0;
-    if (might_hide && ($c.peq(uptr, $c.relem(mons, PM_CAVE_SPIDER)) || $c.peq(uptr, $c.relem(mons, PM_GIANT_SPIDER)))) {
-        c = await yn_function($c.lit("Hide [h] or spin a web [s]?"), new $c.Ptr(hidespinchars, 0), 113, 1);
+    if (might_hide && webmaker(uptr)) {
+        c = await yn_function($c.lit("Hide [h] or spin a web [s]?"), new $c.Ptr(hidespinchars, 0), 113, TRUE);
         if (c === 113 || c === 27) {
             return ECMD_OK;
         }
     }
-    if (attacktype(uptr, AT_BREA)) {
+    if (can_breathe(uptr)) {
         return await dobreathe();
     } else if (attacktype(uptr, AT_SPIT)) {
         return await dospit();
@@ -666,25 +681,25 @@ export async function domonability() {   // cmd.c:890
         return await doremove();
     } else if (attacktype(uptr, AT_GAZE)) {
         return await dogaze();
-    } else if ($c.andu64(uptr.mflags2, M2_WERE) !== 0) {
+    } else if (is_were(uptr)) {
         return await dosummon();
     } else if (c ? c === 104 : might_hide) {
         return await dohide();
-    } else if (c ? c === 115 : $c.peq(uptr, $c.relem(mons, PM_CAVE_SPIDER)) || $c.peq(uptr, $c.relem(mons, PM_GIANT_SPIDER))) {
+    } else if (c ? c === 115 : webmaker(uptr)) {
         return await dospinweb();
-    } else if ($c.peq(uptr, $c.relem(mons, PM_MIND_FLAYER)) || $c.peq(uptr, $c.relem(mons, PM_MASTER_MIND_FLAYER))) {
+    } else if (is_mind_flayer(uptr)) {
         return await domindblast();
     } else if (u.umonnum === PM_GREMLIN) {
         if (svl.level.locations[u.ux][u.uy].typ === FOUNTAIN) {
             if (await split_mon(gy.youmonst, null)) {
-                await dryup(u.ux, u.uy, 1);
+                await dryup(u.ux, u.uy, TRUE);
             }
         } else if (is_pool(u.ux, u.uy)) {
             await split_mon(gy.youmonst, null);
         } else {
             await There($c.lit("is no fountain here."));
         }
-    } else if (uptr.mlet === S_UNICORN && $c.andu64(uptr.mflags2, M2_JEWELS) !== 0) {
+    } else if (is_unicorn(uptr)) {
         await use_unicorn_horn(null);
         return ECMD_TIME;
     } else if (uptr.msound === MS_SHRIEK) {
@@ -694,12 +709,12 @@ export async function domonability() {   // cmd.c:890
         } else {
             await aggravate();
         }
-    } else if (uptr.mlet === S_VAMPIRE || (gy.youmonst.cham === PM_VAMPIRE || gy.youmonst.cham === PM_VAMPIRE_LEADER || gy.youmonst.cham === PM_VLAD_THE_IMPALER)) {
+    } else if (is_vampire(uptr) || is_vampshifter(gy.youmonst)) {
         return await dopoly();
     } else if (u.usteed && attacktype(u.usteed.data, AT_BREA)) {
-        await pet_ranged_attk(u.usteed, 1);
+        await pet_ranged_attk(u.usteed, TRUE);
         return ECMD_TIME;
-    } else if (u.umonnum !== u.umonster) {
+    } else if (Upolyd()) {
         await pline($c.lit("Any special ability you may have is purely reflexive."));
     } else {
         await You($c.lit("don't have a special ability in your normal form!"));
@@ -708,12 +723,12 @@ export async function domonability() {   // cmd.c:890
 }
 export async function enter_explore_mode() {   // cmd.c:952
     let oldmode = null;
-    if (flags.explore) {
+    if (discover()) {
         await You($c.lit("are already in explore mode."));
     } else {
-        oldmode = !flags.debug ? $c.lit("normal game") : $c.lit("debug mode");
+        oldmode = !wizard() ? $c.lit("normal game") : $c.lit("debug mode");
         if (!authorize_explore_mode()) {
-            if (!flags.debug) {
+            if (!wizard()) {
                 await You($c.lit("cannot access explore mode."));
                 return ECMD_OK;
             } else {
@@ -721,13 +736,13 @@ export async function enter_explore_mode() {   // cmd.c:952
             }
         }
         await pline($c.lit("Beware!  From explore mode there will be no return to %s,"), oldmode);
-        if (await paranoid_query($c.i8((flags.paranoia_bits & PARANOID_QUIT) >>> 0 !== 0 ? 1 : 0), $c.lit("Do you want to enter explore mode?"))) {
-            flags.explore = 1;
-            flags.debug = 0;
-            await windowprocs.win_clear_nhwindow($G.WIN_MESSAGE);
+        if (await paranoid_query($c.i8(ParanoidQuit()), $c.lit("Do you want to enter explore mode?"))) {
+            flags.explore = TRUE;
+            flags.debug = FALSE;
+            await clear_nhwindow()($G.WIN_MESSAGE);
             await You($c.lit("are now in non-scoring explore mode."));
         } else {
-            await windowprocs.win_clear_nhwindow($G.WIN_MESSAGE);
+            await clear_nhwindow()($G.WIN_MESSAGE);
             await pline($c.lit("Continuing with %s."), oldmode);
         }
     }
@@ -751,8 +766,8 @@ export async function makemap_prepost(pre, wiztower) {   // cmd.c:986
                 svc.context.achieveo.soko_prize_oid = 0;
             }
         }
-        if ($G.uball !== null) {
-            await ballrelease(0);
+        if (Punished()) {
+            await ballrelease(FALSE);
             await unplacebc();
         }
         maybe_reset_pick(null);
@@ -761,8 +776,8 @@ export async function makemap_prepost(pre, wiztower) {   // cmd.c:986
         }
         $t1 = iflags.travelcc.y = 0, iflags.travelcc.x = $t1;
         svc.context.polearm.hitmon = null;
-        await reset_utrap(0);
-        await check_special_room(1);
+        await reset_utrap(FALSE);
+        await check_special_room(TRUE);
         $c.__builtin___memset_chk(svd.dndest, 0, 16, 998);
         $c.__builtin___memset_chk(svu.updest, 0, 16, 16);
         u.ustuck = null;
@@ -785,14 +800,14 @@ export async function makemap_prepost(pre, wiztower) {   // cmd.c:986
             await u_collide_m(mtmp);
         }
         initrack();
-        if ($G.uball !== null) {
+        if (Punished()) {
             await unplacebc();
             await placebc();
         }
         await docrt();
         await flush_screen(1);
         await deliver_splev_message();
-        await check_special_room(0);
+        await check_special_room(FALSE);
         await save_currentstate();
     }
 }
@@ -806,8 +821,8 @@ async function doterrain() {   // cmd.c:1098
     let men = 0, sel = [null], any = new $T.any(), n = 0, which = 0, clr = 0;
     clr = NO_COLOR;
     await recalc_mapseen();
-    men = await windowprocs.win_create_nhwindow(NHW_MENU);
-    await windowprocs.win_start_menu(men, MENU_BEHAVE_STANDARD);
+    men = await create_nhwindow()(NHW_MENU);
+    await start_menu()(men, MENU_BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     any.a_int = 1;
     await add_menu(men, nul_glyphinfo, any, 0, 0, ATR_NONE, clr, $c.lit("known map without monsters, objects, and traps"), MENU_ITEMFLAGS_SELECTED);
@@ -815,19 +830,19 @@ async function doterrain() {   // cmd.c:1098
     await add_menu(men, nul_glyphinfo, any, 0, 0, ATR_NONE, clr, $c.lit("known map without monsters and objects"), MENU_ITEMFLAGS_NONE);
     any.a_int = 3;
     await add_menu(men, nul_glyphinfo, any, 0, 0, ATR_NONE, clr, $c.lit("known map without monsters"), MENU_ITEMFLAGS_NONE);
-    if (flags.explore || flags.debug) {
+    if (discover() || wizard()) {
         any.a_int = 4;
         await add_menu(men, nul_glyphinfo, any, 0, 0, ATR_NONE, clr, $c.lit("full map without monsters, objects, and traps"), MENU_ITEMFLAGS_NONE);
-        if (flags.debug) {
+        if (wizard()) {
             any.a_int = 5;
             await add_menu(men, nul_glyphinfo, any, 0, 0, ATR_NONE, clr, $c.lit("internal levl[][].typ codes in base-36"), MENU_ITEMFLAGS_NONE);
             any.a_int = 6;
             await add_menu(men, nul_glyphinfo, any, 0, 0, ATR_NONE, clr, $c.lit("legend of base-36 levl[][].typ codes"), MENU_ITEMFLAGS_NONE);
         }
     }
-    await windowprocs.win_end_menu(men, $c.lit("View which?"));
+    await end_menu()(men, $c.lit("View which?"));
     n = await select_menu(men, PICK_ONE, new $c.Ptr(sel, 0));
-    await windowprocs.win_destroy_nhwindow(men);
+    await destroy_nhwindow()(men);
     which = n < 0 ? -1 : n === 0 ? 1 : $c.radd(sel[0], 0).item.a_int;
     if (n > 1 && which === 1) {
         which = $c.radd(sel[0], 1).item.a_int;
@@ -865,12 +880,12 @@ function u_have_seen_whole_selection(sel) {   // cmd.c:1195
     selection_getbounds(sel, rect);
     for (x = rect.lx; x <= rect.hx; x = $c.i16(x + 1)) {
         for (y = rect.ly; y <= rect.hy; y = $c.i16(y + 1)) {
-            if (isok(x, y) && selection_getpoint(x, y, sel) && glyph_at(x, y) === GLYPH_UNEXPLORED_OFF) {
-                return 0;
+            if (isok(x, y) && selection_getpoint(x, y, sel) && glyph_at(x, y) === GLYPH_UNEXPLORED) {
+                return FALSE;
             }
         }
     }
-    return 1;
+    return TRUE;
 }
 function u_have_seen_bounds_selection(sel) {   // cmd.c:1213
     let x = 0, y = 0, rect = new $T.nhrect();
@@ -878,25 +893,25 @@ function u_have_seen_bounds_selection(sel) {   // cmd.c:1213
     selection_getbounds(sel, rect);
     for (x = rect.lx; x <= rect.hx; x = $c.i16(x + 1)) {
         y = rect.ly;
-        if (isok(x, y) && selection_getpoint(x, y, sel) && glyph_at(x, y) === GLYPH_UNEXPLORED_OFF) {
-            return 0;
+        if (isok(x, y) && selection_getpoint(x, y, sel) && glyph_at(x, y) === GLYPH_UNEXPLORED) {
+            return FALSE;
         }
         y = rect.hy;
-        if (isok(x, y) && selection_getpoint(x, y, sel) && glyph_at(x, y) === GLYPH_UNEXPLORED_OFF) {
-            return 0;
+        if (isok(x, y) && selection_getpoint(x, y, sel) && glyph_at(x, y) === GLYPH_UNEXPLORED) {
+            return FALSE;
         }
     }
     for (y = rect.ly; y <= rect.hy; y = $c.i16(y + 1)) {
         x = rect.lx;
-        if (isok(x, y) && selection_getpoint(x, y, sel) && glyph_at(x, y) === GLYPH_UNEXPLORED_OFF) {
-            return 0;
+        if (isok(x, y) && selection_getpoint(x, y, sel) && glyph_at(x, y) === GLYPH_UNEXPLORED) {
+            return FALSE;
         }
         x = rect.hx;
-        if (isok(x, y) && selection_getpoint(x, y, sel) && glyph_at(x, y) === GLYPH_UNEXPLORED_OFF) {
-            return 0;
+        if (isok(x, y) && selection_getpoint(x, y, sel) && glyph_at(x, y) === GLYPH_UNEXPLORED) {
+            return FALSE;
         }
     }
-    return 1;
+    return TRUE;
 }
 function u_can_see_whole_selection(sel) {   // cmd.c:1246
     let x = 0, y = 0, rect = new $T.nhrect();
@@ -904,69 +919,69 @@ function u_can_see_whole_selection(sel) {   // cmd.c:1246
     selection_getbounds(sel, rect);
     for (x = rect.lx; x <= rect.hx; x = $c.i16(x + 1)) {
         for (y = rect.ly; y <= rect.hy; y = $c.i16(y + 1)) {
-            if (isok(x, y) && selection_getpoint(x, y, sel) && !((gv.viz_array.get(y).get(x) & IN_SIGHT) !== 0)) {
-                return 0;
+            if (isok(x, y) && selection_getpoint(x, y, sel) && !cansee(x, y)) {
+                return FALSE;
             }
         }
     }
-    return 1;
+    return TRUE;
 }
 function dolookaround_floodfill_findroom(x, y) {   // cmd.c:1263
     let typ = 0;
     typ = svl.level.locations[x][y].typ;
-    if (typ <= DBWALL || typ === DOOR || (typ === TREE || svl.level.flags.arboreal | 0 && typ === STONE) || typ === WATER || typ === LAVAWALL || typ === IRONBARS || typ === SCORR || typ === SDOOR || typ === DRAWBRIDGE_UP) {
-        return 0;
+    if (IS_STWALL(typ) || IS_DOOR(typ) || IS_TREE(typ) || IS_WATERWALL(typ) || typ === LAVAWALL || typ === IRONBARS || typ === SCORR || typ === SDOOR || typ === DRAWBRIDGE_UP) {
+        return FALSE;
     }
-    return 1;
+    return TRUE;
 }
 async function lookaround_known_room(x, y) {   // cmd.c:1276
     let sel = null, rmno = 0, qbuf = new Int8Array(128), u_in = 0;
     sel = await selection_new();
-    rmno = u.urooms[0] - 3 | 0;
+    rmno = u.urooms[0] - ROOMOFFSET | 0;
     set_selection_floodfillchk(dolookaround_floodfill_findroom);
-    await selection_floodfill(sel, x, y, 1);
-    if (!(x === u.ux && y === u.uy)) {
+    await selection_floodfill(sel, x, y, TRUE);
+    if (!u_at(x, y)) {
         set_msg_xy(x, y);
     }
     if (u_have_seen_whole_selection(sel)) {
         u_in = $c.i8(selection_getpoint(x, y, sel));
-        await You($c.lit("%s %s %s."), x === u.ux && y === u.uy && u_in && u_can_see_whole_selection(sel) ? $c.lit("are in") : x === u.ux && y === u.uy ? $c.lit("remember this as") : $c.lit("remember that as"), await an(selection_size_description(sel, new $c.Ptr(qbuf, 0))), rmno >= 0 ? $c.lit("room") : $c.lit("area"));
+        await You($c.lit("%s %s %s."), u_at(x, y) && u_in && u_can_see_whole_selection(sel) ? $c.lit("are in") : u_at(x, y) ? $c.lit("remember this as") : $c.lit("remember that as"), await an(selection_size_description(sel, new $c.Ptr(qbuf, 0))), rmno >= 0 ? $c.lit("room") : $c.lit("area"));
     } else if (u_have_seen_bounds_selection(sel)) {
-        await You($c.lit("guess %s to be %s %s."), x === u.ux && y === u.uy ? $c.lit("this") : $c.lit("that"), await an(selection_size_description(sel, new $c.Ptr(qbuf, 0))), rmno >= 0 ? $c.lit("room") : $c.lit("area"));
+        await You($c.lit("guess %s to be %s %s."), u_at(x, y) ? $c.lit("this") : $c.lit("that"), await an(selection_size_description(sel, new $c.Ptr(qbuf, 0))), rmno >= 0 ? $c.lit("room") : $c.lit("area"));
     } else {
-        await You($c.lit("can't guess the size of %s area."), x === u.ux && y === u.uy ? $c.lit("this") : $c.lit("that"));
+        await You($c.lit("can't guess the size of %s area."), u_at(x, y) ? $c.lit("this") : $c.lit("that"));
     }
-    selection_free(sel, 1);
+    selection_free(sel, TRUE);
 }
 export async function dolookaround() {   // cmd.c:1310
     let x = 0, y = 0, tmp_getloc_filter = 0, tmp_accessiblemsg = 0, corr_next2u = 0, i = 0, glyph = 0, mapsym = 0, iscorr = 0, buf = new Int8Array(256), cc = new $T.nhcoord(), sym = 0, firstmatch = [null];
     tmp_getloc_filter = iflags.getloc_filter;
     tmp_accessiblemsg = a11y.accessiblemsg;
-    corr_next2u = 0;
-    a11y.accessiblemsg = 1;
+    corr_next2u = FALSE;
+    a11y.accessiblemsg = TRUE;
     if (svl.level.locations[u.ux][u.uy].typ === CORR) {
-        corr_next2u = 1;
+        corr_next2u = TRUE;
     } else if (svl.level.locations[u.ux][u.uy].typ === DOOR) {
-        for (i = DIR_W; i < N_DIRS_Z - 2; i = i + 2 | 0) {
+        for (i = DIR_W; i < N_DIRS; i = i + 2 | 0) {
             x = $c.i16(u.ux + xdir[i] | 0);
             y = $c.i16(u.uy + ydir[i] | 0);
             if (isok(x, y) && svl.level.locations[x][y].typ >= ROOM) {
                 await lookaround_known_room(x, y);
             }
         }
-        corr_next2u = 1;
+        corr_next2u = TRUE;
     } else {
         await lookaround_known_room(u.ux, u.uy);
     }
     iflags.getloc_filter = GFILTER_VIEW;
     for (y = 0; y < ROWNO; y = $c.i16(y + 1)) {
         for (x = 1; x < COLNO; x = $c.i16(x + 1)) {
-            iscorr = $c.i8(corr_next2u && (glyph = glyph_at(x, y)) >= 0 && (glyph >= GLYPH_CMAP_STONE_OFF && glyph < GLYPH_CMAP_C_OFF + (S_goodpos - S_digbeam + 1)) && ((mapsym = glyph_to_cmap(glyph)) === S_corr || mapsym === S_litcorr) ? 1 : 0);
-            if (!(x === u.ux && y === u.uy) && (await gather_locs_interesting(x, y, GLOC_INTERESTING) || iscorr)) {
+            iscorr = $c.i8(corr_next2u && (glyph = glyph_at(x, y)) >= 0 && glyph_is_cmap(glyph) && ((mapsym = glyph_to_cmap(glyph)) === S_corr || mapsym === S_litcorr) ? 1 : 0);
+            if (!u_at(x, y) && (await gather_locs_interesting(x, y, GLOC_INTERESTING) || iscorr)) {
                 sym = 0;
                 firstmatch[0] = null;
                 cc.x = x, cc.y = y;
-                await do_screen_description(cc.$clone(), 1, sym, new $c.Ptr(buf, 0), new $c.Ptr(firstmatch, 0), null);
+                await do_screen_description(cc.$clone(), TRUE, sym, new $c.Ptr(buf, 0), new $c.Ptr(firstmatch, 0), null);
                 await pline_xy(x, y, $c.lit("%s."), firstmatch[0]);
             }
         }
@@ -1096,10 +1111,10 @@ export function do_run_southwest() {   // cmd.c:1567
 export async function do_reqmenu() {   // cmd.c:1575
     if (iflags.menu_requested) {
         await Norep($c.lit("Double %s prefix, canceled."), visctrl(cmd_from_func(do_reqmenu)));
-        iflags.menu_requested = 0;
+        iflags.menu_requested = FALSE;
         return ECMD_CANCEL;
     }
-    iflags.menu_requested = 1;
+    iflags.menu_requested = TRUE;
     return ECMD_OK;
 }
 export async function do_rush() {   // cmd.c:1590
@@ -1144,12 +1159,12 @@ export async function do_repeat() {   // cmd.c:1638
             return ECMD_FAIL;
         }
         repeat_copy = await cmdq_copy(CQ_REPEAT);
-        gi.in_doagain = 1;
+        gi.in_doagain = TRUE;
         await rhack(0);
-        gi.in_doagain = 0;
+        gi.in_doagain = FALSE;
         cmdq_clear(CQ_REPEAT);
         gc.command_queue[CQ_REPEAT] = repeat_copy;
-        iflags.menu_requested = 0;
+        iflags.menu_requested = FALSE;
         if (svc.context.move) {
             res = ECMD_TIME;
         }
@@ -1266,11 +1281,11 @@ export function count_bind_keys() {   // cmd.c:2208
 }
 export async function get_changed_key_binds(sbuf) {   // cmd.c:2235
     let win = 0, i = 0, buf = new Int8Array(256), buf2 = new Int8Array(128), bind = null, keys = new Uint8Array(256), ec = null;
-    win = -1;
+    win = WIN_ERR;
     bind = gc.Cmd.cmdbinds;
     $c.__builtin___memset_chk(new $c.Ptr(keys, 0), 0, 256, 256);
     if (!sbuf) {
-        win = await windowprocs.win_create_nhwindow(NHW_TEXT);
+        win = await create_nhwindow()(NHW_TEXT);
     }
     while (bind) {
         keys[bind.key] = 1;
@@ -1283,7 +1298,7 @@ export async function get_changed_key_binds(sbuf) {   // cmd.c:2235
             if (sbuf) {
                 await strbuf_append(sbuf, new $c.Ptr(buf, 0));
             } else {
-                await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
+                await putstr()(win, 0, new $c.Ptr(buf, 0));
             }
         }
         bind = bind.next;
@@ -1295,13 +1310,13 @@ export async function get_changed_key_binds(sbuf) {   // cmd.c:2235
             if (sbuf) {
                 await strbuf_append(sbuf, new $c.Ptr(buf, 0));
             } else {
-                await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
+                await putstr()(win, 0, new $c.Ptr(buf, 0));
             }
         }
     }
     if (!sbuf) {
-        await windowprocs.win_display_nhwindow(win, 1);
-        await windowprocs.win_destroy_nhwindow(win);
+        await display_nhwindow()(win, TRUE);
+        await destroy_nhwindow()(win);
     }
 }
 async function handler_rebind_keys_add(keyfirst) {   // cmd.c:2291
@@ -1316,8 +1331,8 @@ async function handler_rebind_keys_add(keyfirst) {   // cmd.c:2291
             return;
         }
     }
-    win = await windowprocs.win_create_nhwindow(NHW_MENU);
-    await windowprocs.win_start_menu(win, MENU_BEHAVE_STANDARD);
+    win = await create_nhwindow()(NHW_MENU);
+    await start_menu()(win, MENU_BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     if (key) {
         bind = cmdbind_get(key);
@@ -1346,9 +1361,9 @@ async function handler_rebind_keys_add(keyfirst) {   // cmd.c:2291
     } else {
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Bind what command?"));
     }
-    await windowprocs.win_end_menu(win, new $c.Ptr(buf, 0));
+    await end_menu()(win, new $c.Ptr(buf, 0));
     npick = await select_menu(win, PICK_ONE, new $c.Ptr(picks, 0));
-    await windowprocs.win_destroy_nhwindow(win);
+    await destroy_nhwindow()(win);
     if (npick > 0) {
         i = picks[0].item.a_int;
         $c.free(picks[0]);
@@ -1379,7 +1394,7 @@ async function handler_rebind_keys_add(keyfirst) {   // cmd.c:2291
             }
         }
         prevcmd = cmdbind_get(key);
-        if (await bind_key(key, new $c.Ptr(cmdstr, 0), 1)) {
+        if (await bind_key(key, new $c.Ptr(cmdstr, 0), TRUE)) {
             if (prevcmd && !$c.peq(prevcmd.cmd, ec)) {
                 await pline($c.lit("Changed key '%s' from \"%s\" to \"%s\"."), key2txt(key, new $c.Ptr(buf2, 0)), prevcmd.cmd.ef_txt, new $c.Ptr(cmdstr, 0));
             } else if (!prevcmd) {
@@ -1395,8 +1410,8 @@ export async function handler_rebind_keys() {   // cmd.c:2408
     picks[0] = null;
     clr = NO_COLOR;
     redo_rebind$: for (;;) {
-        win = await windowprocs.win_create_nhwindow(NHW_MENU);
-        await windowprocs.win_start_menu(win, MENU_BEHAVE_STANDARD);
+        win = await create_nhwindow()(NHW_MENU);
+        await start_menu()(win, MENU_BEHAVE_STANDARD);
         any.$copyFrom(cg.zeroany);
         any.a_int = 1;
         await add_menu(win, nul_glyphinfo, any, 0, 0, ATR_NONE, clr, $c.lit("bind key to a command"), MENU_ITEMFLAGS_NONE);
@@ -1406,9 +1421,9 @@ export async function handler_rebind_keys() {   // cmd.c:2408
             any.a_int = 3;
             await add_menu(win, nul_glyphinfo, any, 0, 0, ATR_NONE, clr, $c.lit("view changed key binds"), MENU_ITEMFLAGS_NONE);
         }
-        await windowprocs.win_end_menu(win, $c.lit("Do what?"));
+        await end_menu()(win, $c.lit("Do what?"));
         npick = await select_menu(win, PICK_ONE, new $c.Ptr(picks, 0));
-        await windowprocs.win_destroy_nhwindow(win);
+        await destroy_nhwindow()(win);
         if (npick > 0) {
             i = picks[0].item.a_int;
             $c.free(picks[0]);
@@ -1426,8 +1441,8 @@ export async function handler_change_autocompletions() {   // cmd.c:2449
     let win = 0, any = new $T.any(), i = 0, n = 0, picks = [null], clr = 0, ec = null, buf = new Int8Array(256), j = 0, setit = 0;
     picks[0] = null;
     clr = NO_COLOR;
-    win = await windowprocs.win_create_nhwindow(NHW_MENU);
-    await windowprocs.win_start_menu(win, MENU_BEHAVE_STANDARD);
+    win = await create_nhwindow()(NHW_MENU);
+    await start_menu()(win, MENU_BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     for (i = 0; i < extcmdlist_length; i = i + 1 | 0) {
         ec = $c.relem(extcmdlist, i);
@@ -1441,11 +1456,11 @@ export async function handler_change_autocompletions() {   // cmd.c:2449
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%c %s: %s"), (ec.flags & 8192) >>> 0 ? 42 : 32, ec.ef_txt, ec.ef_desc);
         await add_menu(win, nul_glyphinfo, any, 0, 0, ATR_NONE, clr, new $c.Ptr(buf, 0), (ec.flags & AUTOCOMPLETE) >>> 0 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     }
-    await windowprocs.win_end_menu(win, $c.lit("Which commands autocomplete?"));
+    await end_menu()(win, $c.lit("Which commands autocomplete?"));
     n = await select_menu(win, PICK_ANY, new $c.Ptr(picks, 0));
     if (n >= 0) {
         for (i = 0; i < extcmdlist_length; i = i + 1 | 0) {
-            setit = 0;
+            setit = FALSE;
             ec = $c.relem(extcmdlist, i);
             if ((ec.flags & (INTERNALCMD | CMD_NOT_AVAILABLE)) >>> 0 !== 0) {
                 continue;
@@ -1456,20 +1471,20 @@ export async function handler_change_autocompletions() {   // cmd.c:2449
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s"), ec.ef_txt);
             for (j = 0; j < n; j = j + 1 | 0) {
                 if ($c.peq(ec, $c.relem(extcmdlist, $c.radd(picks[0], j).item.a_int - 1 | 0))) {
-                    await parseautocomplete(new $c.Ptr(buf, 0), 1);
-                    setit = 1;
+                    await parseautocomplete(new $c.Ptr(buf, 0), TRUE);
+                    setit = TRUE;
                     break;
                 }
             }
             if (!setit) {
-                await parseautocomplete(new $c.Ptr(buf, 0), 0);
+                await parseautocomplete(new $c.Ptr(buf, 0), FALSE);
             }
         }
         if (n > 0) {
             $c.free(picks[0]);
         }
     }
-    await windowprocs.win_destroy_nhwindow(win);
+    await destroy_nhwindow()(win);
 }
 export async function extcmds_match(findstr, ecmflags, matchlist) {   // cmd.c:2523
     let i = 0, mi = 0, fslen = 0, ignoreac = 0, exactmatch = 0, no1charcmd = 0, $t1, $t2, $t3;
@@ -1482,7 +1497,7 @@ export async function extcmds_match(findstr, ecmflags, matchlist) {   // cmd.c:2
         if ((extcmdlist[i].flags & (CMD_NOT_AVAILABLE | INTERNALCMD)) >>> 0) {
             continue;
         }
-        if (!flags.debug && (extcmdlist[i].flags & WIZMODECMD) >>> 0) {
+        if (!wizard() && (extcmdlist[i].flags & WIZMODECMD) >>> 0) {
             continue;
         }
         if (!ignoreac && !((extcmdlist[i].flags & AUTOCOMPLETE) >>> 0)) {
@@ -1520,7 +1535,7 @@ export function key2extcmddesc(key) {   // cmd.c:2561
     } else if (movecmd($c.i8(k = key), MV_RUN)) {
         $c.__builtin___strcpy_chk(new $c.Ptr(key2extcmddesc$key2cmdbuf, 0), $c.lit("run"), 128);
     }
-    if (digit($c.i8(key)) || gc.Cmd.num_pad && digit($c.i8(127 & key))) {
+    if (digit($c.i8(key)) || gc.Cmd.num_pad && digit($c.i8(unmeta(key)))) {
         key2extcmddesc$key2cmdbuf[0] = 0;
         if (!gc.Cmd.num_pad) {
             $c.__builtin___strcpy_chk(new $c.Ptr(key2extcmddesc$key2cmdbuf, 0), $c.lit("start of, or continuation of, a count"), 128);
@@ -1555,12 +1570,12 @@ export async function bind_mousebtn(btn, command) {   // cmd.c:2624
     let extcmd = null;
     if (btn < 1 || btn > NUM_MOUSE_BUTTONS) {
         await config_error_add($c.lit("Wrong mouse button, valid are 1-%i"), NUM_MOUSE_BUTTONS);
-        return 0;
+        return FALSE;
     }
     btn = btn - 1 | 0;
     if (!strncmpi(command, $c.lit("nothing"), -1)) {
         gc.Cmd.mousebtn[btn] = null;
-        return 1;
+        return TRUE;
     }
     for (extcmd = $c.relem(extcmdlist, 0); extcmd.ef_txt; extcmd = $c.radd(extcmd, 1)) {
         if (strncmpi(command, extcmd.ef_txt, -1)) {
@@ -1570,9 +1585,9 @@ export async function bind_mousebtn(btn, command) {   // cmd.c:2624
             continue;
         }
         gc.Cmd.mousebtn[btn] = extcmd;
-        return 1;
+        return TRUE;
     }
-    return 0;
+    return FALSE;
 }
 export async function bind_key(key, command, user) {   // cmd.c:2662
     let extcmd = null, len = 0, buf = null, p = null, lastp = null, bind = null, maxlen = 0, $t1;
@@ -1580,7 +1595,7 @@ export async function bind_key(key, command, user) {   // cmd.c:2662
     lastp = null;
     if (!strncmpi(command, $c.lit("nothing"), -1)) {
         cmdbind_remove(key);
-        return 1;
+        return TRUE;
     }
     len = $c.i64($c.addu64($c.strlen(command), 1));
     buf = $c.asArr(await alloc($c.u32(len)), Int8Array);
@@ -1616,10 +1631,10 @@ export async function bind_key(key, command, user) {   // cmd.c:2662
             await config_error_add($c.lit("'%s' does not take a parameter"), buf);
         }
         $c.free(buf);
-        return 1;
+        return TRUE;
     }
     $c.free(buf);
-    return 0;
+    return FALSE;
 }
 async function bind_key_fn(key, fn) {   // cmd.c:2732
     let extcmd = null;
@@ -1630,34 +1645,34 @@ async function bind_key_fn(key, fn) {   // cmd.c:2732
         if ((extcmd.flags & INTERNALCMD) >>> 0 !== 0) {
             continue;
         }
-        await cmdbind_add(key, extcmd, 0);
-        return 1;
+        await cmdbind_add(key, extcmd, FALSE);
+        return TRUE;
     }
-    return 0;
+    return FALSE;
 }
 async function commands_init() {   // cmd.c:2750
     let extcmd = null;
     for (extcmd = $c.relem(extcmdlist, 0); extcmd.ef_txt; extcmd = $c.radd(extcmd, 1)) {
         if (extcmd.key) {
-            await cmdbind_add(extcmd.key, extcmd, 0);
+            await cmdbind_add(extcmd.key, extcmd, FALSE);
         }
     }
     await bind_mousebtn(1, $c.lit("therecmdmenu"));
     await bind_mousebtn(2, $c.lit("clicklook"));
-    await bind_key(12, $c.lit("redraw"), 0);
-    await bind_key(104, $c.lit("help"), 0);
-    await bind_key(106, $c.lit("jump"), 0);
-    await bind_key(107, $c.lit("kick"), 0);
-    await bind_key(108, $c.lit("loot"), 0);
-    await bind_key(14, $c.lit("annotate"), 0);
-    await bind_key(78, $c.lit("name"), 0);
-    await bind_key(117, $c.lit("untrap"), 0);
-    await bind_key(53, $c.lit("run"), 0);
-    await bind_key(181, $c.lit("rush"), 0);
-    await bind_key(45, $c.lit("fight"), 0);
-    await bind_key(207, $c.lit("overview"), 0);
-    await bind_key(178, $c.lit("twoweapon"), 0);
-    await bind_key(206, $c.lit("name"), 0);
+    await bind_key(12, $c.lit("redraw"), FALSE);
+    await bind_key(104, $c.lit("help"), FALSE);
+    await bind_key(106, $c.lit("jump"), FALSE);
+    await bind_key(107, $c.lit("kick"), FALSE);
+    await bind_key(108, $c.lit("loot"), FALSE);
+    await bind_key(14, $c.lit("annotate"), FALSE);
+    await bind_key(78, $c.lit("name"), FALSE);
+    await bind_key(117, $c.lit("untrap"), FALSE);
+    await bind_key(53, $c.lit("run"), FALSE);
+    await bind_key(181, $c.lit("rush"), FALSE);
+    await bind_key(45, $c.lit("fight"), FALSE);
+    await bind_key(207, $c.lit("overview"), FALSE);
+    await bind_key(178, $c.lit("twoweapon"), FALSE);
+    await bind_key(206, $c.lit("name"), FALSE);
 }
 function keylist_func_has_key(extcmd, skip_keys_used) {   // cmd.c:2785
     let i = 0, bind = null;
@@ -1666,10 +1681,10 @@ function keylist_func_has_key(extcmd, skip_keys_used) {   // cmd.c:2785
             continue;
         }
         if ((bind = cmdbind_get($c.u8(i))) !== null && $c.peq(bind.cmd, extcmd)) {
-            return 1;
+            return TRUE;
         }
     }
-    return 0;
+    return FALSE;
 }
 async function keylist_putcmds(datawin, docount, incl_flags, excl_flags, keys_used) {   // cmd.c:2802
     let extcmd = null, i = 0, buf = new Int8Array(256), buf2 = new Int8Array(128), keys_already_used = new Int8Array(256), count = 0, bind = null, key = 0;
@@ -1697,8 +1712,8 @@ async function keylist_putcmds(datawin, docount, incl_flags, excl_flags, keys_us
             } else {
                 $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%-7s %-13s %s"), key2txt(key, new $c.Ptr(buf2, 0)), bind.cmd.ef_txt, bind.cmd.ef_desc);
             }
-            await windowprocs.win_putstr(datawin, 0, new $c.Ptr(buf, 0));
-            keys_used.set(i, 1);
+            await putstr()(datawin, 0, new $c.Ptr(buf, 0));
+            keys_used.set(i, TRUE);
         }
     }
     for (extcmd = $c.relem(extcmdlist, 0); extcmd.ef_txt; extcmd = $c.radd(extcmd, 1)) {
@@ -1713,7 +1728,7 @@ async function keylist_putcmds(datawin, docount, incl_flags, excl_flags, keys_us
             continue;
         }
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("#%-20s %s"), extcmd.ef_txt, extcmd.ef_desc);
-        await windowprocs.win_putstr(datawin, 0, new $c.Ptr(buf, 0));
+        await putstr()(datawin, 0, new $c.Ptr(buf, 0));
     }
     return count;
 }
@@ -1722,9 +1737,9 @@ export async function dokeylist() {   // cmd.c:2867
     $c.__builtin___memset_chk(new $c.Ptr(keys_used, 0), 0, 256, 256);
     $c.__builtin___memset_chk(new $c.Ptr(pfx_seen, 0), 0, 1024, 1024);
     key = 3;
-    keys_used[key] = 1;
+    keys_used[key] = TRUE;
     $c.__builtin___memcpy_chk(new $c.Ptr(mov_seen, 0), new $c.Ptr(keys_used, 0), 256, 256);
-    spkey_gap = 0;
+    spkey_gap = FALSE;
     for (i = 0; misc_keys[i].desc; i = i + 1 | 0) {
         if (misc_keys[i].numpad && !iflags.num_pad) {
             continue;
@@ -1732,42 +1747,42 @@ export async function dokeylist() {   // cmd.c:2867
         j = misc_keys[i].nhkf;
         key = $c.u8(gc.Cmd.spkeys[j]);
         if (key && !mov_seen[key] && !pfx_seen[key]) {
-            keys_used[key] = 1;
+            keys_used[key] = TRUE;
             pfx_seen[key] = j;
         } else {
-            spkey_gap = 1;
+            spkey_gap = TRUE;
         }
     }
-    datawin = await windowprocs.win_create_nhwindow(NHW_TEXT);
-    await windowprocs.win_putstr(datawin, 0, $c.lit(""));
+    datawin = await create_nhwindow()(NHW_TEXT);
+    await putstr()(datawin, 0, $c.lit(""));
     $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%7s %s"), $c.lit(""), $c.lit("    Full Current Key Bindings List"));
-    await windowprocs.win_putstr(datawin, 0, new $c.Ptr(buf, 0));
+    await putstr()(datawin, 0, new $c.Ptr(buf, 0));
     for (extcmd = $c.relem(extcmdlist, 0); extcmd.ef_txt; extcmd = $c.radd(extcmd, 1)) {
         if (spkey_gap || !keylist_func_has_key(extcmd, new $c.Ptr(keys_used, 0))) {
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%7s %s"), $c.lit(""), $c.lit("(also commands with no key assignment)"));
-            await windowprocs.win_putstr(datawin, 0, new $c.Ptr(buf, 0));
+            await putstr()(datawin, 0, new $c.Ptr(buf, 0));
             break;
         }
     }
-    await windowprocs.win_putstr(datawin, 0, $c.lit(""));
-    await windowprocs.win_putstr(datawin, 0, $c.lit("Directional keys:"));
-    await show_direction_keys(datawin, 46, 0);
+    await putstr()(datawin, 0, $c.lit(""));
+    await putstr()(datawin, 0, $c.lit("Directional keys:"));
+    await show_direction_keys(datawin, 46, FALSE);
     if (!iflags.num_pad) {
-        await windowprocs.win_putstr(datawin, 0, $c.lit(""));
-        await windowprocs.win_putstr(datawin, 0, $c.lit("Ctrl+<direction> will run in specified direction until something very"));
+        await putstr()(datawin, 0, $c.lit(""));
+        await putstr()(datawin, 0, $c.lit("Ctrl+<direction> will run in specified direction until something very"));
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%7s %s"), $c.lit(""), $c.lit("interesting is seen."));
-        await windowprocs.win_putstr(datawin, 0, new $c.Ptr(buf, 0));
+        await putstr()(datawin, 0, new $c.Ptr(buf, 0));
         $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("Shift"), 256);
     } else {
-        await windowprocs.win_putstr(datawin, 0, $c.lit(""));
+        await putstr()(datawin, 0, $c.lit(""));
         $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("Meta"), 256);
     }
     $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit("+<direction> will run in specified direction until you encounter"), 256);
-    await windowprocs.win_putstr(datawin, 0, new $c.Ptr(buf, 0));
+    await putstr()(datawin, 0, new $c.Ptr(buf, 0));
     $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%7s %s"), $c.lit(""), $c.lit("an obstacle."));
-    await windowprocs.win_putstr(datawin, 0, new $c.Ptr(buf, 0));
-    await windowprocs.win_putstr(datawin, 0, $c.lit(""));
-    await windowprocs.win_putstr(datawin, 0, $c.lit("Miscellaneous keys:"));
+    await putstr()(datawin, 0, new $c.Ptr(buf, 0));
+    await putstr()(datawin, 0, $c.lit(""));
+    await putstr()(datawin, 0, $c.lit("Miscellaneous keys:"));
     for (i = 0; misc_keys[i].desc; i = i + 1 | 0) {
         if (misc_keys[i].numpad && !iflags.num_pad) {
             continue;
@@ -1776,13 +1791,13 @@ export async function dokeylist() {   // cmd.c:2867
         key = $c.u8(gc.Cmd.spkeys[j]);
         if (key && !mov_seen[key] && pfx_seen[key] === j) {
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%-7s %s"), key2txt(key, new $c.Ptr(buf2, 0)), misc_keys[i].desc);
-            await windowprocs.win_putstr(datawin, 0, new $c.Ptr(buf, 0));
+            await putstr()(datawin, 0, new $c.Ptr(buf, 0));
         }
     }
     key = 3;
     $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%-7s"), key2txt(key, new $c.Ptr(buf2, 0)));
     $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit(" interrupt: break out of NetHack (SIGINT)"), 256);
-    await windowprocs.win_putstr(datawin, 0, new $c.Ptr(buf, 0));
+    await putstr()(datawin, 0, new $c.Ptr(buf, 0));
     if (spkey_gap) {
         for (i = 0; misc_keys[i].desc; i = i + 1 | 0) {
             if (misc_keys[i].numpad && !iflags.num_pad) {
@@ -1793,29 +1808,29 @@ export async function dokeylist() {   // cmd.c:2867
             if (!key || pfx_seen[key] !== j) {
                 $c.__builtin___sprintf_chk(new $c.Ptr(buf2, 0), 0, 256, $c.lit("[%s]"), spkey_name(j));
                 nh_snprintf($c.lit("dokeylist"), 2976, new $c.Ptr(buf, 0), 256, $c.lit("%-21s %s"), new $c.Ptr(buf2, 0), misc_keys[i].desc);
-                await windowprocs.win_putstr(datawin, 0, new $c.Ptr(buf, 0));
+                await putstr()(datawin, 0, new $c.Ptr(buf, 0));
             }
         }
     }
-    await windowprocs.win_putstr(datawin, 0, $c.lit(""));
-    await show_menu_controls(datawin, 1);
-    if (await keylist_putcmds(datawin, 1, GENERALCMD, WIZMODECMD | INTERNALCMD | MOVEMENTCMD, new $c.Ptr(keys_used, 0))) {
-        await windowprocs.win_putstr(datawin, 0, $c.lit(""));
-        await windowprocs.win_putstr(datawin, 0, $c.lit("General commands:"));
-        await keylist_putcmds(datawin, 0, GENERALCMD, WIZMODECMD | INTERNALCMD | MOVEMENTCMD, new $c.Ptr(keys_used, 0));
+    await putstr()(datawin, 0, $c.lit(""));
+    await show_menu_controls(datawin, TRUE);
+    if (await keylist_putcmds(datawin, TRUE, GENERALCMD, IGNORECMD, new $c.Ptr(keys_used, 0))) {
+        await putstr()(datawin, 0, $c.lit(""));
+        await putstr()(datawin, 0, $c.lit("General commands:"));
+        await keylist_putcmds(datawin, FALSE, GENERALCMD, IGNORECMD, new $c.Ptr(keys_used, 0));
     }
-    if (await keylist_putcmds(datawin, 1, 0, GENERALCMD | (WIZMODECMD | INTERNALCMD | MOVEMENTCMD), new $c.Ptr(keys_used, 0))) {
-        await windowprocs.win_putstr(datawin, 0, $c.lit(""));
-        await windowprocs.win_putstr(datawin, 0, $c.lit("Game commands:"));
-        await keylist_putcmds(datawin, 0, 0, GENERALCMD | (WIZMODECMD | INTERNALCMD | MOVEMENTCMD), new $c.Ptr(keys_used, 0));
+    if (await keylist_putcmds(datawin, TRUE, 0, GENERALCMD | IGNORECMD, new $c.Ptr(keys_used, 0))) {
+        await putstr()(datawin, 0, $c.lit(""));
+        await putstr()(datawin, 0, $c.lit("Game commands:"));
+        await keylist_putcmds(datawin, FALSE, 0, GENERALCMD | IGNORECMD, new $c.Ptr(keys_used, 0));
     }
-    if (flags.debug && await keylist_putcmds(datawin, 1, WIZMODECMD, INTERNALCMD, new $c.Ptr(keys_used, 0))) {
-        await windowprocs.win_putstr(datawin, 0, $c.lit(""));
-        await windowprocs.win_putstr(datawin, 0, $c.lit("Debug mode commands:"));
-        await keylist_putcmds(datawin, 0, WIZMODECMD, INTERNALCMD, new $c.Ptr(keys_used, 0));
+    if (wizard() && await keylist_putcmds(datawin, TRUE, WIZMODECMD, INTERNALCMD, new $c.Ptr(keys_used, 0))) {
+        await putstr()(datawin, 0, $c.lit(""));
+        await putstr()(datawin, 0, $c.lit("Debug mode commands:"));
+        await keylist_putcmds(datawin, FALSE, WIZMODECMD, INTERNALCMD, new $c.Ptr(keys_used, 0));
     }
-    await windowprocs.win_display_nhwindow(datawin, 0);
-    await windowprocs.win_destroy_nhwindow(datawin);
+    await display_nhwindow()(datawin, FALSE);
+    await destroy_nhwindow()(datawin);
 }
 export function ext_func_tab_from_func(fn) {   // cmd.c:3016
     let extcmd = null;
@@ -1907,7 +1922,7 @@ export async function cmdname_from_func(fn, outbuf, fullname) {   // cmd.c:3106
                 if ($c.peq(extcmd, cmdptr)) {
                     continue;
                 }
-                if ((extcmd.flags & CMD_NOT_AVAILABLE) >>> 0 !== 0 || (extcmd.flags & WIZMODECMD) >>> 0 !== 0 && !flags.debug) {
+                if ((extcmd.flags & CMD_NOT_AVAILABLE) >>> 0 !== 0 || (extcmd.flags & WIZMODECMD) >>> 0 !== 0 && !wizard()) {
                     continue;
                 }
                 if (!$c.strncmp(res, extcmd.ef_txt, len)) {
@@ -1918,7 +1933,7 @@ export async function cmdname_from_func(fn, outbuf, fullname) {   // cmd.c:3106
         } while (extcmd.ef_txt);
         copynchars(outbuf, res, len | 0);
         do {
-            if (debugcore($c.lit("cmd.c"), 1)) {
+            if (debugcore($c.lit("cmd.c"), TRUE)) {
                 save_plnmsg = iflags.last_msg;
                 await pline($c.lit("shortened %s: \"%s\""), res, outbuf);
                 iflags.last_msg = save_plnmsg;
@@ -1935,9 +1950,9 @@ export function bind_specialkey(key, command) {   // cmd.c:3194
             continue;
         }
         gc.Cmd.spkeys[spkeys_binds[i].nhkf] = $c.i8(key);
-        return 1;
+        return TRUE;
     }
-    return 0;
+    return FALSE;
 }
 function spkey_name(nhkf) {   // cmd.c:3208
     let name = null, i = 0;
@@ -1981,7 +1996,7 @@ export async function parseautocomplete(autocomplete, condition) {   // cmd.c:32
     }
     for (efp = $c.relem(extcmdlist, 0); efp.ef_txt; efp = $c.radd(efp, 1)) {
         if (!$c.strcmp(autocomplete, efp.ef_txt)) {
-            if (condition === ((efp.flags & AUTOCOMPLETE) >>> 0 ? 0 : 1)) {
+            if (condition === ((efp.flags & AUTOCOMPLETE) >>> 0 ? FALSE : TRUE)) {
                 if ((efp.flags & AUTOCOMP_ADJ) >>> 0) {
                     efp.flags = (efp.flags & 4294959103) >>> 0;
                 } else {
@@ -1997,7 +2012,7 @@ export async function parseautocomplete(autocomplete, condition) {   // cmd.c:32
         }
     }
     await raw_printf($c.lit("Bad autocomplete: invalid extended command '%s'."), autocomplete);
-    await windowprocs.win_wait_synch();
+    await wait_synch()();
 }
 export async function all_options_autocomplete(sbuf) {   // cmd.c:3296
     let efp = null, buf = new Int8Array(256);
@@ -2036,17 +2051,17 @@ export async function reset_commands(initial) {   // cmd.c:3344
     updated = 0;
     if (initial) {
         updated = 1;
-        gc.Cmd.num_pad = 0;
-        $t2 = ($t1 = gc.Cmd.swap_yz = 0, gc.Cmd.phone_layout = $t1), gc.Cmd.pcHack_compat = $t2;
+        gc.Cmd.num_pad = FALSE;
+        $t2 = ($t1 = gc.Cmd.swap_yz = FALSE, gc.Cmd.phone_layout = $t1), gc.Cmd.pcHack_compat = $t2;
         for (i = 0; i < 29; i = i + 1 | 0) {
             gc.Cmd.spkeys[spkeys_binds[i].nhkf] = $c.i8(spkeys_binds[i].key);
         }
         await commands_init();
     } else {
         if (reset_commands$backed_dir_cmd) {
-            for (dir = 0; dir < N_DIRS_Z - 2; dir = dir + 1 | 0) {
+            for (dir = 0; dir < N_DIRS; dir = dir + 1 | 0) {
                 for (mode = 0; mode < N_MOVEMODES; mode = mode + 1 | 0) {
-                    await cmdbind_add(reset_commands$back_dir_key[dir][mode], reset_commands$back_dir_cmd[dir][mode], 0);
+                    await cmdbind_add(reset_commands$back_dir_key[dir][mode], reset_commands$back_dir_cmd[dir][mode], FALSE);
                 }
             }
         }
@@ -2055,7 +2070,7 @@ export async function reset_commands(initial) {   // cmd.c:3344
             gc.Cmd.num_pad = flagtemp;
             updated = updated + 1 | 0;
         }
-        flagtemp = $c.i8(iflags.num_pad_mode & 1 ? !gc.Cmd.num_pad ? 1 : 0 : 0);
+        flagtemp = $c.i8(iflags.num_pad_mode & 1 ? !gc.Cmd.num_pad ? 1 : 0 : FALSE);
         if (flagtemp !== gc.Cmd.swap_yz) {
             gc.Cmd.swap_yz = flagtemp;
             updated = updated + 1 | 0;
@@ -2064,18 +2079,18 @@ export async function reset_commands(initial) {   // cmd.c:3344
                 cmdbind_swapkeys($c.u8(c), $c.u8(c + 1 | 0));
             }
         }
-        flagtemp = $c.i8(iflags.num_pad_mode & 1 ? gc.Cmd.num_pad : 0);
+        flagtemp = $c.i8(iflags.num_pad_mode & 1 ? gc.Cmd.num_pad : FALSE);
         if (flagtemp !== gc.Cmd.pcHack_compat) {
             gc.Cmd.pcHack_compat = flagtemp;
             updated = updated + 1 | 0;
             c = 176;
             if (gc.Cmd.pcHack_compat) {
-                await cmdbind_add($c.u8(c), ext_func_tab_from_func(dotypeinv), 0);
+                await cmdbind_add($c.u8(c), ext_func_tab_from_func(dotypeinv), FALSE);
             } else {
                 cmdbind_remove($c.u8(c));
             }
         }
-        flagtemp = $c.i8(iflags.num_pad_mode & 2 ? gc.Cmd.num_pad : 0);
+        flagtemp = $c.i8(iflags.num_pad_mode & 2 ? gc.Cmd.num_pad : FALSE);
         if (flagtemp !== gc.Cmd.phone_layout) {
             gc.Cmd.phone_layout = flagtemp;
             updated = updated + 1 | 0;
@@ -2092,20 +2107,20 @@ export async function reset_commands(initial) {   // cmd.c:3344
     }
     gc.Cmd.dirchars = !gc.Cmd.num_pad ? !gc.Cmd.swap_yz ? new $c.Ptr(reset_commands$sdir, 0) : new $c.Ptr(reset_commands$sdir_swap_yz, 0) : !gc.Cmd.phone_layout ? new $c.Ptr(reset_commands$ndir, 0) : new $c.Ptr(reset_commands$ndir_phone_layout, 0);
     gc.Cmd.alphadirchars = !gc.Cmd.num_pad ? gc.Cmd.dirchars : new $c.Ptr(reset_commands$sdir, 0);
-    for (dir = 0; dir < N_DIRS_Z - 2; dir = dir + 1 | 0) {
+    for (dir = 0; dir < N_DIRS; dir = dir + 1 | 0) {
         for (mode = MV_WALK; mode < N_MOVEMODES; mode = mode + 1 | 0) {
             di = $c.u8(gc.Cmd.dirchars.get(dir));
             if (!gc.Cmd.num_pad) {
                 if (mode === MV_RUN) {
                     di = $c.u8(highc($c.i8(di)));
                 } else if (mode === MV_RUSH) {
-                    di = $c.u8(31 & di);
+                    di = $c.u8(C(di));
                 }
             } else {
                 if (mode === MV_RUN) {
-                    di = $c.u8(di - 128 | 0);
+                    di = $c.u8(M(di));
                 } else if (mode === MV_RUSH) {
-                    di = $c.u8(di - 128 | 0);
+                    di = $c.u8(M(di));
                 }
             }
             reset_commands$back_dir_key[dir][mode] = di;
@@ -2117,14 +2132,14 @@ export async function reset_commands(initial) {   // cmd.c:3344
             cmdbind_remove(di);
         }
     }
-    reset_commands$backed_dir_cmd = 1;
-    for (i = 0; i < N_DIRS_Z - 2; i = i + 1 | 0) {
+    reset_commands$backed_dir_cmd = TRUE;
+    for (i = 0; i < N_DIRS; i = i + 1 | 0) {
         await bind_key_fn($c.u8(gc.Cmd.dirchars.get(i)), move_funcs[i][MV_WALK]);
         if (!gc.Cmd.num_pad) {
             await bind_key_fn($c.u8(highc(gc.Cmd.dirchars.get(i))), move_funcs[i][MV_RUN]);
-            await bind_key_fn($c.u8(31 & gc.Cmd.dirchars.get(i)), move_funcs[i][MV_RUSH]);
+            await bind_key_fn($c.u8(C(gc.Cmd.dirchars.get(i))), move_funcs[i][MV_RUSH]);
         } else {
-            await bind_key_fn($c.u8(gc.Cmd.dirchars.get(i) - 128 | 0), move_funcs[i][MV_RUN]);
+            await bind_key_fn($c.u8(M(gc.Cmd.dirchars.get(i))), move_funcs[i][MV_RUN]);
         }
     }
     await update_rest_on_space();
@@ -2136,7 +2151,7 @@ export async function update_rest_on_space() {   // cmd.c:3483
     if (bind && !$c.peq(bind.cmd, update_rest_on_space$restonspace)) {
         update_rest_on_space$unrestonspace = bind.cmd;
     }
-    await cmdbind_add(32, flags.rest_on_space ? update_rest_on_space$restonspace : update_rest_on_space$unrestonspace, 0);
+    await cmdbind_add(32, flags.rest_on_space ? update_rest_on_space$restonspace : update_rest_on_space$unrestonspace, FALSE);
 }
 function accept_menu_prefix(ec) {   // cmd.c:3509
     return $c.i8(ec && (ec.flags & CMD_M_PREFIX) >>> 0 !== 0 ? 1 : 0);
@@ -2219,14 +2234,14 @@ export function rnd_extcmd_idx() {   // cmd.c:3601
 function reset_cmd_vars(reset_cmdq) {   // cmd.c:3607
     let $t1, $t2, $t3;
     svc.context.run = 0;
-    $t1 = svc.context.forcefight = 0, svc.context.nopick = $t1;
-    $t2 = svc.context.mv = 0, svc.context.move = $t2;
+    $t1 = svc.context.forcefight = FALSE, svc.context.nopick = $t1;
+    $t2 = svc.context.mv = FALSE, svc.context.move = $t2;
     gd.domove_attempting = 0;
     gm.multi = 0;
-    iflags.menu_requested = 0;
+    iflags.menu_requested = FALSE;
     $t3 = svc.context.travel1 = 0, svc.context.travel = $t3;
     if (gt.travelmap) {
-        selection_free(gt.travelmap, 1);
+        selection_free(gt.travelmap, TRUE);
         gt.travelmap = null;
     }
     if (reset_cmdq) {
@@ -2243,9 +2258,9 @@ export async function rhack(key) {   // cmd.c:3627
             cmdq = null;
             cmdq_ec = null;
             prefix_seen = null;
-            was_m_prefix = 0;
+            was_m_prefix = FALSE;
             func = dummyfunction;
-            iflags.menu_requested = 0;
+            iflags.menu_requested = FALSE;
             svc.context.nopick = 0;
         case "got_prefix_input":
             $goto = null;   // got_prefix_input:
@@ -2269,9 +2284,9 @@ export async function rhack(key) {   // cmd.c:3627
                 if (key === gc.Cmd.spkeys[NHKF_ESC]) {
                     iflags.sanity_no_check = iflags.sanity_check;
                 } else {
-                    await windowprocs.win_nhbell();
+                    await nhbell()();
                 }
-                reset_cmd_vars(1);
+                reset_cmd_vars(TRUE);
                 return;
             }
             $t1 = svc.context.travel1 = 0, svc.context.travel = $t1;
@@ -2290,7 +2305,7 @@ export async function rhack(key) {   // cmd.c:3627
                         }
                         if (tlist !== null) {
                             if (!await can_do_extcmd(tlist)) {
-                                reset_cmd_vars(1);
+                                reset_cmd_vars(TRUE);
                                 res = ECMD_OK;
                             } else if (prefix_seen && !((tlist.flags & PREFIXCMD) >>> 0) && !((tlist.flags & (was_m_prefix ? CMD_M_PREFIX : CMD_gGF_PREFIX) >>> 0) >>> 0)) {
                                 pfxidx = cmd_from_func(prefix_seen.ef_funct);
@@ -2332,27 +2347,27 @@ export async function rhack(key) {   // cmd.c:3627
                                 }
                                 if ((tlist.flags & PREFIXCMD) >>> 0 !== 0) {
                                     if ((res & ECMD_CANCEL) !== 0) {
-                                        reset_cmd_vars(1);
+                                        reset_cmd_vars(TRUE);
                                         return;
                                     }
                                     prefix_seen = tlist;
                                     cmdq_ec = null;
                                     if (func === do_reqmenu) {
-                                        was_m_prefix = 1;
+                                        was_m_prefix = TRUE;
                                     }
                                     $goto = "got_prefix_input"; continue D1;
                                 } else if (!((tlist.flags & MOVEMENTCMD) >>> 0) && gd.domove_attempting) {
                                 } else if ($c.and64(gd.domove_attempting, DOMOVE_RUSH | DOMOVE_WALK) !== 0 && !svc.context.travel && !dxdy_moveok()) {
                                     await You_cant($c.lit("get there from here..."));
-                                    reset_cmd_vars(1);
+                                    reset_cmd_vars(TRUE);
                                     return;
                                 } else if ($c.and64(gd.domove_attempting, DOMOVE_WALK) !== 0) {
                                     if (gm.multi) {
-                                        svc.context.mv = 1;
+                                        svc.context.mv = TRUE;
                                     }
                                     await domove();
                                     svc.context.forcefight = 0;
-                                    iflags.menu_requested = 0;
+                                    iflags.menu_requested = FALSE;
                                     return;
                                 } else if ($c.and64(gd.domove_attempting, DOMOVE_RUSH) !== 0) {
                                     if (firsttime) {
@@ -2361,27 +2376,27 @@ export async function rhack(key) {   // cmd.c:3627
                                         }
                                         u.last_str_turn = 0;
                                     }
-                                    svc.context.mv = 1;
+                                    svc.context.mv = TRUE;
                                     await domove();
-                                    iflags.menu_requested = 0;
+                                    iflags.menu_requested = FALSE;
                                     return;
                                 }
                                 prefix_seen = null;
                             }
                             if ((res & (ECMD_CANCEL | ECMD_FAIL)) !== 0) {
-                                reset_cmd_vars(1);
+                                reset_cmd_vars(TRUE);
                             } else if ((res & (ECMD_OK | ECMD_TIME)) === ECMD_OK) {
                                 reset_cmd_vars($c.i8(gm.multi < 0 ? 1 : 0));
                             }
                             if ((res & ECMD_TIME) !== 0) {
-                                svc.context.move = 1;
+                                svc.context.move = TRUE;
                                 if (func !== dokick) {
                                     gk.kickedloc.x = 0, gk.kickedloc.y = 0;
                                 }
                             }
                             return;
                         }
-                        bad_command = 1;
+                        bad_command = TRUE;
                     }
                     break;
                 }
@@ -2392,7 +2407,7 @@ export async function rhack(key) {   // cmd.c:3627
                 cmdq_clear(CQ_REPEAT);
                 iflags.sanity_no_check = iflags.sanity_check;
             }
-            svc.context.move = 0;
+            svc.context.move = FALSE;
             gm.multi = 0;
             return;
         }
@@ -2401,7 +2416,7 @@ export async function rhack(key) {   // cmd.c:3627
 }
 export function xytodir(x, y) {   // cmd.c:3847
     let dd = 0;
-    for (dd = 0; dd < N_DIRS_Z - 2; dd = dd + 1 | 0) {
+    for (dd = 0; dd < N_DIRS; dd = dd + 1 | 0) {
         if (x === xdir[dd] && y === ydir[dd]) {
             return dd;
         }
@@ -2445,7 +2460,7 @@ export function movecmd(sym, mode) {   // cmd.c:3869
 }
 export function dxdy_moveok() {   // cmd.c:3902
     let $t1;
-    if (u.dx && u.dy && u.umonnum === PM_GRID_BUG) {
+    if (u.dx && u.dy && NODIAG(u.umonnum)) {
         $t1 = u.dy = 0, u.dx = $t1;
     }
     return u.dx || u.dy ? 1 : 0;
@@ -2469,7 +2484,7 @@ export async function get_adjacent_loc(prompt, emsg, x, y, cc) {   // cmd.c:3931
         cc.y = new_y;
     } else {
         if (emsg) {
-            await pline($c.lit("%s"), emsg);
+            await pline1(emsg);
         }
         return 0;
     }
@@ -2504,7 +2519,7 @@ export async function getdir(s) {   // cmd.c:3958
             if (gi.in_doagain || readchar_queue.get(0)) {
                 dirsym = await readchar();
             } else {
-                dirsym = await yn_function(s && s.get(0) !== 94 ? s : $c.lit("In what direction?"), null, 0, 0);
+                dirsym = await yn_function(s && s.get(0) !== 94 ? s : $c.lit("In what direction?"), null, 0, FALSE);
                 if (iflags.debug_fuzzer && rn2(20)) {
                     switch (rn2(20)) {
                         case 0:
@@ -2519,7 +2534,7 @@ export async function getdir(s) {   // cmd.c:3958
                     }
                 }
             }
-            await windowprocs.win_clear_nhwindow($G.WIN_MESSAGE);
+            await clear_nhwindow()($G.WIN_MESSAGE);
             if (redraw_cmd(dirsym)) {
                 await docrt_flags(docrtRefresh);
                 $goto = "retry"; continue D1;
@@ -2534,7 +2549,7 @@ export async function getdir(s) {   // cmd.c:3958
             } else if (dirsym === gc.Cmd.spkeys[NHKF_GETDIR_MOUSE]) {
                 $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("desired location, then type '%s' for left click, '%s' for right"), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK_Q]), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK]));
                 cc.x = u.ux, cc.y = u.uy;
-                pos = await getpos(cc, 1, new $c.Ptr(qbuf, 0));
+                pos = await getpos(cc, TRUE, new $c.Ptr(qbuf, 0));
                 if (pos < 0) {
                     $t4 = ($t3 = u.dz = 0, u.dy = $t3), u.dx = $t4;
                     mod = 0;
@@ -2567,7 +2582,7 @@ export async function getdir(s) {   // cmd.c:3958
                 }
                 return pos >= 0 ? 1 : 0;
             } else if (!(is_mov = movecmd(dirsym, MV_ANY)) && !u.dz) {
-                did_help = 0;
+                did_help = FALSE;
                 if (!$c.strchr(new $c.Ptr(quitchars, 0), dirsym)) {
                     help_requested = $c.i8(dirsym === gc.Cmd.spkeys[NHKF_GETDIR_HELP] ? 1 : 0);
                     if (help_requested || iflags.cmdassist) {
@@ -2586,7 +2601,7 @@ export async function getdir(s) {   // cmd.c:3958
                 return 0;
             }
             if (!u.dz) {
-                confdir(0);
+                confdir(FALSE);
             }
             return 1;
         }
@@ -2600,22 +2615,22 @@ async function show_direction_keys(win, centerchar, nodiag) {   // cmd.c:4122
     }
     if (nodiag) {
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("             %s   "), visctrl(cmd_from_func(do_move_north)));
-        await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
-        await windowprocs.win_putstr(win, 0, $c.lit("             |   "));
+        await putstr()(win, 0, new $c.Ptr(buf, 0));
+        await putstr()(win, 0, $c.lit("             |   "));
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("          %s- %c -%s"), visctrl(cmd_from_func(do_move_west)), centerchar, visctrl(cmd_from_func(do_move_east)));
-        await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
-        await windowprocs.win_putstr(win, 0, $c.lit("             |   "));
+        await putstr()(win, 0, new $c.Ptr(buf, 0));
+        await putstr()(win, 0, $c.lit("             |   "));
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("             %s   "), visctrl(cmd_from_func(do_move_south)));
-        await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
+        await putstr()(win, 0, new $c.Ptr(buf, 0));
     } else {
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("          %s  %s  %s"), visctrl(cmd_from_func(do_move_northwest)), visctrl(cmd_from_func(do_move_north)), visctrl(cmd_from_func(do_move_northeast)));
-        await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
-        await windowprocs.win_putstr(win, 0, $c.lit("           \\ | / "));
+        await putstr()(win, 0, new $c.Ptr(buf, 0));
+        await putstr()(win, 0, $c.lit("           \\ | / "));
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("          %s- %c -%s"), visctrl(cmd_from_func(do_move_west)), centerchar, visctrl(cmd_from_func(do_move_east)));
-        await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
-        await windowprocs.win_putstr(win, 0, $c.lit("           / | \\ "));
+        await putstr()(win, 0, new $c.Ptr(buf, 0));
+        await putstr()(win, 0, $c.lit("           / | \\ "));
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("          %s  %s  %s"), visctrl(cmd_from_func(do_move_southwest)), visctrl(cmd_from_func(do_move_south)), visctrl(cmd_from_func(do_move_southeast)));
-        await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
+        await putstr()(win, 0, new $c.Ptr(buf, 0));
     }
 }
 async function help_dir(sym, spkey, msg) {   // cmd.c:4171
@@ -2623,59 +2638,59 @@ async function help_dir(sym, spkey, msg) {   // cmd.c:4171
     prefixhandling = $c.i8(spkey !== gc.Cmd.spkeys[NHKF_ESC] ? 1 : 0);
     dothat = $c.lit("do that");
     buf[0] = 0;
-    prefixhandling;
-    win = await windowprocs.win_create_nhwindow(NHW_TEXT);
+    nhUse(prefixhandling);
+    win = await create_nhwindow()(NHW_TEXT);
     if (!win) {
-        return 0;
+        return FALSE;
     }
     if (new $c.Ptr(buf, 0).get(0)) {
-        await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
-        await windowprocs.win_putstr(win, 0, $c.lit(""));
+        await putstr()(win, 0, new $c.Ptr(buf, 0));
+        await putstr()(win, 0, $c.lit(""));
     } else if (msg) {
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("cmdassist: %s"), msg);
-        await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
-        await windowprocs.win_putstr(win, 0, $c.lit(""));
+        await putstr()(win, 0, new $c.Ptr(buf, 0));
+        await putstr()(win, 0, $c.lit(""));
     }
     if (!prefixhandling && (letter(sym) || sym === 91)) {
         sym = highc(sym);
         ctrl = $c.i8((sym - 65 | 0) + 1 | 0);
-        if ((explain = dowhatdoes_core(ctrl, new $c.Ptr(buf2, 0))) !== null && (!$c.strchr(new $c.Ptr(help_dir$wiz_only_list, 0), sym) || flags.debug)) {
+        if ((explain = dowhatdoes_core(ctrl, new $c.Ptr(buf2, 0))) !== null && (!$c.strchr(new $c.Ptr(help_dir$wiz_only_list, 0), sym) || wizard())) {
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Are you trying to use ^%c%s?"), sym, $c.strchr(new $c.Ptr(help_dir$wiz_only_list, 0), sym) ? $c.lit("") : $c.lit(" as specified in the Guidebook"));
-            await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
-            await windowprocs.win_putstr(win, 0, $c.lit(""));
-            await windowprocs.win_putstr(win, 0, explain);
-            await windowprocs.win_putstr(win, 0, $c.lit(""));
-            await windowprocs.win_putstr(win, 0, $c.lit("To use that command, hold down the <Ctrl> key as a shift"));
+            await putstr()(win, 0, new $c.Ptr(buf, 0));
+            await putstr()(win, 0, $c.lit(""));
+            await putstr()(win, 0, explain);
+            await putstr()(win, 0, $c.lit(""));
+            await putstr()(win, 0, $c.lit("To use that command, hold down the <Ctrl> key as a shift"));
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("and press the <%c> key."), sym);
-            await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
-            await windowprocs.win_putstr(win, 0, $c.lit(""));
+            await putstr()(win, 0, new $c.Ptr(buf, 0));
+            await putstr()(win, 0, $c.lit(""));
         }
     }
     $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Valid direction keys%s%s%s are:"), prefixhandling ? $c.lit(" to ") : $c.lit(""), prefixhandling ? dothat : $c.lit(""), u.umonnum === PM_GRID_BUG ? $c.lit(" in your current form") : $c.lit(""));
-    await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
-    await show_direction_keys(win, $c.i8(!prefixhandling ? 46 : 32), $c.i8(u.umonnum === PM_GRID_BUG ? 1 : 0));
+    await putstr()(win, 0, new $c.Ptr(buf, 0));
+    await show_direction_keys(win, $c.i8(!prefixhandling ? 46 : 32), $c.i8(NODIAG(u.umonnum)));
     if (!prefixhandling) {
-        await windowprocs.win_putstr(win, 0, $c.lit(""));
-        await windowprocs.win_putstr(win, 0, $c.lit("          <  up"));
-        await windowprocs.win_putstr(win, 0, $c.lit("          >  down"));
+        await putstr()(win, 0, $c.lit(""));
+        await putstr()(win, 0, $c.lit("          <  up"));
+        await putstr()(win, 0, $c.lit("          >  down"));
         if (!prefixhandling) {
             selfi = gc.Cmd.num_pad ? NHKF_GETDIR_SELF2 : NHKF_GETDIR_SELF;
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("       %4s  direct at yourself"), visctrl(gc.Cmd.spkeys[selfi]));
-            await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
+            await putstr()(win, 0, new $c.Ptr(buf, 0));
         }
     }
     if (msg) {
-        await windowprocs.win_putstr(win, 0, $c.lit(""));
-        await windowprocs.win_putstr(win, 0, $c.lit("(Suppress this message with !cmdassist in config file.)"));
+        await putstr()(win, 0, $c.lit(""));
+        await putstr()(win, 0, $c.lit("(Suppress this message with !cmdassist in config file.)"));
     }
-    await windowprocs.win_display_nhwindow(win, 0);
-    await windowprocs.win_destroy_nhwindow(win);
-    return 1;
+    await display_nhwindow()(win, FALSE);
+    await destroy_nhwindow()(win);
+    return TRUE;
 }
 export function confdir(force_impairment) {   // cmd.c:4300
     let kmax = 0, k = 0;
     if (force_impairment || u_maybe_impaired()) {
-        kmax = u.umonnum === PM_GRID_BUG ? 4 : N_DIRS_Z - 2;
+        kmax = NODIAG(u.umonnum) ? 4 : N_DIRS;
         k = dirs_ord[rn2(kmax)];
         u.dx = xdir[k];
         u.dy = ydir[k];
@@ -2736,20 +2751,20 @@ async function there_cmd_menu_self(win, x, y, act) {   // cmd.c:4435
     K = 0;
     typ = svl.level.locations[x][y].typ;
     stway = stairway_at(x, y);
-    if (!(x === u.ux && y === u.uy)) {
+    if (!u_at(x, y)) {
         return K;
     }
-    if ((typ === FOUNTAIN || typ === SINK) && can_reach_floor(0)) {
+    if ((IS_FOUNTAIN(typ) || IS_SINK(typ)) && can_reach_floor(FALSE)) {
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Drink from the %s"), defsyms[typ === FOUNTAIN ? S_fountain : S_sink].explanation);
         await mcmd_addmenu(win, MCMD_QUAFF, new $c.Ptr(buf, 0)), K = K + 1 | 0;
     }
-    if (typ === FOUNTAIN && can_reach_floor(0)) {
+    if (IS_FOUNTAIN(typ) && can_reach_floor(FALSE)) {
         await mcmd_addmenu(win, MCMD_DIP, $c.lit("Dip something into the fountain")), K = K + 1 | 0;
     }
-    if (typ === THRONE) {
+    if (IS_THRONE(typ)) {
         await mcmd_addmenu(win, MCMD_SIT, $c.lit("Sit on the throne")), K = K + 1 | 0;
     }
-    if (typ === ALTAR) {
+    if (IS_ALTAR(typ)) {
         await mcmd_addmenu(win, MCMD_OFFER, $c.lit("Sacrifice something on the altar")), K = K + 1 | 0;
     }
     if (stway && stway.up) {
@@ -2764,11 +2779,11 @@ async function there_cmd_menu_self(win, x, y, act) {   // cmd.c:4435
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Dismount %s"), await x_monnam(u.usteed, 1, null, 8, 0));
         await mcmd_addmenu(win, MCMD_DISMOUNT, new $c.Ptr(buf, 0)), K = K + 1 | 0;
     }
-    if (svl.level.objects[x][y] !== null) {
+    if (OBJ_AT(x, y)) {
         otmp = svl.level.objects[x][y];
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Pick up %s"), otmp.v.v_nexthere ? $c.lit("items") : await doname(otmp));
         await mcmd_addmenu(win, MCMD_PICKUP, new $c.Ptr(buf, 0)), K = K + 1 | 0;
-        if (otmp.otyp >= LARGE_BOX && otmp.otyp <= BAG_OF_TRICKS) {
+        if (Is_container(otmp)) {
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Loot %s"), await doname(otmp));
             await mcmd_addmenu(win, MCMD_LOOT, new $c.Ptr(buf, 0)), K = K + 1 | 0;
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Tip %s"), await doname(otmp));
@@ -2803,7 +2818,7 @@ async function there_cmd_menu_next2u(win, x, y, mod, act) {   // cmd.c:4524
     if (!(dist2(x, y, u.ux, u.uy) <= 2)) {
         return K;
     }
-    if (typ === DOOR) {
+    if (IS_DOOR(typ)) {
         dm = svl.level.locations[x][y].flags | 0;
         if (dm & (D_CLOSED | D_LOCKED)) {
             await mcmd_addmenu(win, MCMD_OPEN_DOOR, $c.lit("Open the door")), K = K + 1 | 0;
@@ -2833,11 +2848,11 @@ async function there_cmd_menu_next2u(win, x, y, mod, act) {   // cmd.c:4524
         await mcmd_addmenu(win, MCMD_MOVE_DIR, $c.lit("Push the boulder")), K = K + 1 | 0;
     }
     mtmp = svl.level.monsters[x][y];
-    if (mtmp && !(canseemon(mtmp) || sensemon(mtmp))) {
+    if (mtmp && !canspotmon(mtmp)) {
         mtmp = null;
     }
     if (mtmp && await which_armor(mtmp, W_SADDLE)) {
-        mnam = await x_monnam(mtmp, ARTICLE_THE, null, SUPPRESS_SADDLE, 0);
+        mnam = await x_monnam(mtmp, ARTICLE_THE, null, SUPPRESS_SADDLE, FALSE);
         if (!u.usteed) {
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Ride %s"), mnam);
             await mcmd_addmenu(win, MCMD_RIDE, new $c.Ptr(buf, 0)), K = K + 1 | 0;
@@ -2857,7 +2872,7 @@ async function there_cmd_menu_next2u(win, x, y, mod, act) {   // cmd.c:4524
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s %s"), !(mtmp.mextra && mtmp.mextra.mgivenname) ? $c.lit("Name") : $c.lit("Rename"), await mon_nam(mtmp));
         await mcmd_addmenu(win, MCMD_NAME, new $c.Ptr(buf, 0)), K = K + 1 | 0;
     }
-    if (mtmp && !(mtmp.mpeaceful | 0 || mtmp.mtame) || glyph_at(x, y) === GLYPH_INVIS_OFF) {
+    if (mtmp && !(mtmp.mpeaceful | 0 || mtmp.mtame) || glyph_at(x, y) === GLYPH_INVISIBLE) {
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Attack %s"), mtmp ? await mon_nam(mtmp) : $c.lit("unseen creature"));
         await mcmd_addmenu(win, MCMD_ATTACK_NEXT2U, new $c.Ptr(buf, 0)), K = K + 1 | 0;
         act.set(0, MCMD_ATTACK_NEXT2U);
@@ -2880,7 +2895,7 @@ async function there_cmd_menu_common(win, x, y, mod, act) {   // cmd.c:4639
     let K = 0;
     K = 0;
     if (mod === CLICK_1 || mod === CLICK_2) {
-        if (!(x === u.ux && y === u.uy) || u.umonnum !== u.umonster || glyph_at(x, y) !== ((u.umonnum !== u.umonster || !flags.showrace ? u.umonnum : gu.urace.mnum) + (((u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female) ? 1 : 0) === MALE ? GLYPH_MON_MALE_OFF : GLYPH_MON_FEM_OFF) | 0)) {
+        if (!u_at(x, y) || Upolyd() || glyph_at(x, y) !== ((u.umonnum !== u.umonster || !flags.showrace ? u.umonnum : gu.urace.mnum) + (((u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female) ? 1 : 0) === MALE ? GLYPH_MON_MALE_OFF : GLYPH_MON_FEM_OFF) | 0)) {
             await mcmd_addmenu(win, MCMD_LOOK_AT, $c.lit("Look at map symbol")), K = K + 1 | 0;
         }
     }
@@ -3064,9 +3079,9 @@ async function there_cmd_menu(x, y, mod) {   // cmd.c:4843
     dx = $c.i16(x - u.ux | 0);
     dy = $c.i16(y - u.uy | 0);
     act[0] = MCMD_NOTHING;
-    win = await windowprocs.win_create_nhwindow(NHW_MENU);
-    await windowprocs.win_start_menu(win, MENU_BEHAVE_STANDARD);
-    if (x === u.ux && y === u.uy) {
+    win = await create_nhwindow()(NHW_MENU);
+    await start_menu()(win, MENU_BEHAVE_STANDARD);
+    if (u_at(x, y)) {
         K = K + await there_cmd_menu_self(win, x, y, new $c.Ptr(act, 0)) | 0;
     } else if (dist2(x, y, u.ux, u.uy) <= 2) {
         K = K + await there_cmd_menu_next2u(win, x, y, mod, new $c.Ptr(act, 0)) | 0;
@@ -3086,15 +3101,15 @@ async function there_cmd_menu(x, y, mod) {   // cmd.c:4843
         npick = 0;
         ch = 0;
     } else if (K === 1 && act[0] !== MCMD_NOTHING && act[0] !== MCMD_TRAVEL) {
-        await windowprocs.win_destroy_nhwindow(win);
+        await destroy_nhwindow()(win);
         await act_on_act(act[0], dx, dy);
         return 0;
     } else {
-        await windowprocs.win_end_menu(win, $c.lit("What do you want to do?"));
+        await end_menu()(win, $c.lit("What do you want to do?"));
         npick = await select_menu(win, PICK_ONE, new $c.Ptr(picks, 0));
         ch = 27;
     }
-    await windowprocs.win_destroy_nhwindow(win);
+    await destroy_nhwindow()(win);
     if (npick > 0) {
         act[0] = picks[0].item.a_int;
         $c.free(picks[0]);
@@ -3141,7 +3156,7 @@ async function domouseaction() {   // cmd.c:4916
                 await cmdq_add_ec(CQ_CANNED, dodown);
                 return ECMD_OK;
             } else if ((o = svl.level.objects[u.ux][u.uy]) !== null) {
-                await cmdq_add_ec(CQ_CANNED, o.otyp >= LARGE_BOX && o.otyp <= BAG_OF_TRICKS ? doloot : dopickup);
+                await cmdq_add_ec(CQ_CANNED, Is_container(o) ? doloot : dopickup);
                 return ECMD_OK;
             } else {
                 await cmdq_add_ec(CQ_CANNED, donull);
@@ -3149,7 +3164,7 @@ async function domouseaction() {   // cmd.c:4916
             }
         }
         dir = xytodir(x, y);
-        if (!svl.level.monsters[u.ux + x | 0][u.uy + y | 0] && !await test_move(u.ux, u.uy, x, y, TEST_MOVE)) {
+        if (!m_at(u.ux + x | 0, u.uy + y | 0) && !await test_move(u.ux, u.uy, x, y, TEST_MOVE)) {
             if (svl.level.locations[u.ux + x | 0][u.uy + y | 0].typ === DOOR) {
                 if ((svl.level.locations[u.ux + x | 0][u.uy + y | 0].flags | 0) & D_LOCKED) {
                     await cmdq_add_ec(CQ_CANNED, dokick);
@@ -3193,10 +3208,10 @@ export async function get_count(allowchars, inkey, maxcount, count, gc_flags) { 
     save_input_state = program_state.input_state;
     cnt = 0;
     first = inkey ? inkey - 48 | 0 : 0;
-    backspaced = 0;
-    showzero = 1;
+    backspaced = FALSE;
+    showzero = TRUE;
     historicmsg = $c.i8((gc_flags & GC_SAVEHIST) >>> 0 !== 0 ? 1 : 0);
-    conditionalmsg = $c.i8((gc_flags & 2) >>> 0 !== 0 ? 1 : 0);
+    conditionalmsg = $c.i8((gc_flags & GC_CONDHIST) >>> 0 !== 0 ? 1 : 0);
     echoalways = $c.i8((gc_flags & GC_ECHOFIRST) >>> 0 !== 0 ? 1 : 0);
     count.set(0, 0);
     for (; ; ) {
@@ -3209,7 +3224,7 @@ export async function get_count(allowchars, inkey, maxcount, count, gc_flags) { 
         }
         if (digit($c.i8(key))) {
             dgt = key - 48 | 0;
-            cnt = cnt < 922337203685477580n || cnt === 922337203685477580n && dgt <= 7 ? $c.add64($c.mul64(cnt, 10), dgt) : -1;
+            cnt = AppendLongDigit(cnt, dgt);
             if (cnt < 0) {
                 cnt = 0;
             } else if (maxcount > 0 && cnt > maxcount) {
@@ -3220,9 +3235,9 @@ export async function get_count(allowchars, inkey, maxcount, count, gc_flags) { 
             if (!cnt && !echoalways) {
                 break;
             }
-            showzero = 0;
+            showzero = FALSE;
             cnt = $c.div64(cnt, 10);
-            backspaced = 1;
+            backspaced = TRUE;
         } else if (key === gc.Cmd.spkeys[NHKF_ESC]) {
             break;
         } else if (!allowchars || $c.strchr(allowchars, key)) {
@@ -3233,29 +3248,29 @@ export async function get_count(allowchars, inkey, maxcount, count, gc_flags) { 
             break;
         }
         if (cnt > 9 || backspaced || echoalways) {
-            await windowprocs.win_clear_nhwindow($G.WIN_MESSAGE);
+            await clear_nhwindow()($G.WIN_MESSAGE);
             if (backspaced && !cnt && !showzero) {
                 $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("Count: "));
             } else {
                 $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("Count: %ld"), cnt);
-                backspaced = 0;
+                backspaced = FALSE;
             }
             await custompline(SUPPRESS_HISTORY, $c.lit("%s"), new $c.Ptr(qbuf, 0));
-            await windowprocs.win_mark_synch();
+            await mark_synch()();
         }
     }
     if (historicmsg || conditionalmsg && count.get(0) !== first) {
         $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("Count: %ld "), count.get(0));
         key2txt($c.u8(key), eos(new $c.Ptr(qbuf, 0)));
-        await windowprocs.win_putmsghistory(new $c.Ptr(qbuf, 0), 0);
+        await putmsghistory()(new $c.Ptr(qbuf, 0), FALSE);
     }
     return $c.i8(key);
 }
 async function parse() {   // cmd.c:5096
     let foo = 0, bind = null;
-    iflags.in_parse = 1;
+    iflags.in_parse = TRUE;
     gc.command_count = 0;
-    svc.context.move = 1;
+    svc.context.move = TRUE;
     await flush_screen(1);
     program_state.input_state = commandInp;
     if (!gc.Cmd.num_pad || (foo = await readchar()) === gc.Cmd.spkeys[NHKF_COUNT]) {
@@ -3264,7 +3279,7 @@ async function parse() {   // cmd.c:5096
     }
     gl.last_command_count = gc.command_count;
     if (foo === gc.Cmd.spkeys[NHKF_ESC]) {
-        await windowprocs.win_clear_nhwindow($G.WIN_MESSAGE);
+        await clear_nhwindow()($G.WIN_MESSAGE);
         gc.command_count = 0;
         gl.last_command_count = 0;
     } else if (gi.in_doagain) {
@@ -3277,8 +3292,8 @@ async function parse() {   // cmd.c:5096
         gm.multi = $c.sub64(gm.multi, 1);
     }
     gc.cmd_key = foo;
-    await windowprocs.win_clear_nhwindow($G.WIN_MESSAGE);
-    iflags.in_parse = 0;
+    await clear_nhwindow()($G.WIN_MESSAGE);
+    iflags.in_parse = FALSE;
     return gc.cmd_key;
 }
 export async function hangup(sig_unused) {   // cmd.c:5159
@@ -3293,7 +3308,7 @@ export async function hangup(sig_unused) {   // cmd.c:5159
     await end_of_input();
 }
 export async function end_of_input() {   // cmd.c:5183
-    if (u.uz.dnum === svd.dungeon_topology.d_tutorial_dnum) {
+    if (In_tutorial(u.uz)) {
         program_state.something_worth_saving = 0;
     }
     if (program_state.something_worth_saving) {
@@ -3303,7 +3318,7 @@ export async function end_of_input() {   // cmd.c:5183
         await soundprocs.sound_exit_nhsound($c.lit("end_of_input"));
     }
     if (iflags.window_inited) {
-        await windowprocs.win_exit_nhwindows(null);
+        await exit_nhwindows()(null);
     }
     await clearlocks();
     await nh_terminate(0);
@@ -3321,7 +3336,7 @@ async function readchar_core(x, y, mod) {   // cmd.c:5213
         } else if (gi.in_doagain) {
             sym = await pgetchar();
         } else {
-            sym = await windowprocs.win_nh_poskey(x, y, mod);
+            sym = await nh_poskey()(x, y, mod);
         }
         if (sym === -1) {
             cnt = NR_OF_EOFS;
@@ -3370,20 +3385,20 @@ async function dotravel() {   // cmd.c:5299
         cc.x = u.ux;
         cc.y = u.uy;
     }
-    iflags.getloc_travelmode = 1;
+    iflags.getloc_travelmode = TRUE;
     if (iflags.menu_requested) {
         gfilt = iflags.getloc_filter;
         iflags.getloc_filter = GFILTER_VIEW;
         if (!await getpos_menu(cc, GLOC_INTERESTING)) {
             iflags.getloc_filter = gfilt;
-            iflags.getloc_travelmode = 0;
+            iflags.getloc_travelmode = FALSE;
             return ECMD_OK;
         }
         iflags.getloc_filter = gfilt;
     } else {
         await pline($c.lit("Where do you want to travel to?"));
-        if (await getpos(cc, 1, $c.lit("the desired destination")) < 0) {
-            iflags.getloc_travelmode = 0;
+        if (await getpos(cc, TRUE, $c.lit("the desired destination")) < 0) {
+            iflags.getloc_travelmode = FALSE;
             return ECMD_CANCEL;
         }
     }
@@ -3401,7 +3416,7 @@ async function dotravel_target() {   // cmd.c:5348
         $t1 = iflags.travelcc.y = 0, iflags.travelcc.x = $t1;
         return ECMD_OK;
     }
-    iflags.getloc_travelmode = 0;
+    iflags.getloc_travelmode = FALSE;
     svc.context.travel = 1;
     svc.context.travel1 = 1;
     svc.context.run = 8;
@@ -3411,7 +3426,7 @@ async function dotravel_target() {   // cmd.c:5348
         gm.multi = 80;
     }
     u.last_str_turn = 0;
-    svc.context.mv = 1;
+    svc.context.mv = TRUE;
     await domove();
     return ECMD_TIME;
 }
@@ -3419,7 +3434,7 @@ async function doclicklook() {   // cmd.c:5381
     if (!isok(gc.clicklook_cc.x, gc.clicklook_cc.y)) {
         return ECMD_OK;
     }
-    svc.context.move = 0;
+    svc.context.move = FALSE;
     await auto_describe(gc.clicklook_cc.x, gc.clicklook_cc.y);
     return ECMD_OK;
 }
@@ -3435,8 +3450,8 @@ async function yn_func_menu_opt(win, key, text, def) {   // cmd.c:5402
 async function yn_function_menu(query, resp, def, res) {   // cmd.c:5419
     let win = 0, sel = [null], n = 0, keybuf = new Int8Array(128);
     if (yn_menuable_resp(resp)) {
-        win = await windowprocs.win_create_nhwindow(NHW_MENU);
-        await windowprocs.win_start_menu(win, MENU_BEHAVE_STANDARD);
+        win = await create_nhwindow()(NHW_MENU);
+        await start_menu()(win, MENU_BEHAVE_STANDARD);
         if ($c.peq(resp, new $c.Ptr(rightleftchars, 0))) {
             await yn_func_menu_opt(win, 114, $c.lit("Right"), def);
             await yn_func_menu_opt(win, 108, $c.lit("Left"), def);
@@ -3453,9 +3468,9 @@ async function yn_function_menu(query, resp, def, res) {   // cmd.c:5419
         if ($c.peq(resp, new $c.Ptr(ynqchars, 0)) || $c.peq(resp, new $c.Ptr(ynaqchars, 0)) || $c.peq(resp, new $c.Ptr(hidespinchars, 0))) {
             await yn_func_menu_opt(win, 113, $c.lit("Quit"), def);
         }
-        await windowprocs.win_end_menu(win, query);
+        await end_menu()(win, query);
         n = await select_menu(win, PICK_ONE, new $c.Ptr(sel, 0));
-        await windowprocs.win_destroy_nhwindow(win);
+        await destroy_nhwindow()(win);
         if (n > 0) {
             res.set(0, $c.radd(sel[0], 0).item.a_char);
             if (n > 1 && res.get(0) === def) {
@@ -3466,10 +3481,10 @@ async function yn_function_menu(query, resp, def, res) {   // cmd.c:5419
             res.set(0, def);
         }
         await pline($c.lit("%s %s"), query, key2txt($c.u8(res.get(0)), new $c.Ptr(keybuf, 0)));
-        await windowprocs.win_clear_nhwindow($G.WIN_MESSAGE);
-        return 1;
+        await clear_nhwindow()($G.WIN_MESSAGE);
+        return TRUE;
     }
-    return 0;
+    return FALSE;
 }
 export async function yn_function(query, resp, def, addcmdq) {   // cmd.c:5471
     let res = Int8Array.of(0), qbuf = new Int8Array(128), cq = new $T._cmd_queue(), cmdq = null, idx = 0, dumplog_buf = new Int8Array(144), ln = 0, ridx = 0, altres = 0, fuzzing = 0, dbg_buf = new Int8Array(256);
@@ -3495,7 +3510,7 @@ export async function yn_function(query, resp, def, addcmdq) {   // cmd.c:5471
         } else {
             cmdq_clear(CQ_CANNED);
         }
-        addcmdq = 0;
+        addcmdq = FALSE;
     } else if (iflags.debug_fuzzer && resp && resp.get(0) && rn2(20)) {
         ln = $c.i32($c.strlen(resp));
         ridx = rn2(ln);
@@ -3523,7 +3538,7 @@ export async function yn_function(query, resp, def, addcmdq) {   // cmd.c:5471
     }
     if (resp && resp.get(0) && res[0] && !$c.strchr(resp, res[0])) {
         altres = def ? def : 27;
-        if (!gi.in_doagain || flags.debug) {
+        if (!gi.in_doagain || wizard()) {
             fuzzing = iflags.debug_fuzzer;
             nh_snprintf($c.lit("yn_function"), 5570, new $c.Ptr(dbg_buf, 0), 256, $c.lit("%s [%s] (%s)"), query, resp ? resp : $c.lit(""), def ? visctrl(def) : $c.lit(""));
             paniclog($c.lit("yn debug"), new $c.Ptr(dbg_buf, 0));
@@ -3541,7 +3556,7 @@ export async function paranoid_ynq(be_paranoid, prompt, accept_q) {   // cmd.c:5
     c = 110;
     if (be_paranoid) {
         promptprefix = $c.lit("");
-        responsetype = (flags.paranoia_bits & PARANOID_CONFIRM) >>> 0 !== 0 ? accept_q ? $c.lit("[yes|no|quit]") : $c.lit("[yes|no]") : accept_q ? $c.lit("[yes|n|q] (n)") : $c.lit("[yes|n] (n)");
+        responsetype = ParanoidConfirm() ? accept_q ? $c.lit("[yes|no|quit]") : $c.lit("[yes|no]") : accept_q ? $c.lit("[yes|n|q] (n)") : $c.lit("[yes|n] (n)");
         trylimit = 6;
         copynchars(new $c.Ptr(pbuf, 0), prompt, BUFSZ - 1);
         do {
@@ -3562,11 +3577,11 @@ export async function paranoid_ynq(be_paranoid, prompt, accept_q) {   // cmd.c:5
                 break;
             }
             promptprefix = $c.lit("\"Yes\" or \"No\": ");
-        } while ((flags.paranoia_bits & PARANOID_CONFIRM) >>> 0 !== 0 && strncmpi(new $c.Ptr(ans, 0), $c.lit("no"), -1) && (trylimit = trylimit - 1 | 0));
+        } while (ParanoidConfirm() && strncmpi(new $c.Ptr(ans, 0), $c.lit("no"), -1) && (trylimit = trylimit - 1 | 0));
     } else if (accept_q) {
-        c = await yn_function(prompt, new $c.Ptr(ynqchars, 0), 110, 0);
+        c = await yn_function(prompt, new $c.Ptr(ynqchars, 0), 110, FALSE);
     } else {
-        c = await yn_function(prompt, new $c.Ptr(ynchars, 0), 110, 0);
+        c = await yn_function(prompt, new $c.Ptr(ynchars, 0), 110, FALSE);
     }
     if (c !== 121 && (c !== 113 || !accept_q)) {
         c = 110;
@@ -3574,7 +3589,7 @@ export async function paranoid_ynq(be_paranoid, prompt, accept_q) {   // cmd.c:5
     return c;
 }
 export async function paranoid_query(be_paranoid, prompt) {   // cmd.c:5655
-    return $c.i8(await paranoid_ynq(be_paranoid, prompt, 0) === 121 ? 1 : 0);
+    return $c.i8(await paranoid_ynq(be_paranoid, prompt, FALSE) === 121 ? 1 : 0);
 }
 async function dosuspend_core() {   // cmd.c:5662
     let now = 0, $t1, $t2;
@@ -4496,49 +4511,49 @@ export function $init() {
     extcmdlist[140].ef_txt = $c.lit("movewest");
     extcmdlist[140].ef_desc = $c.lit("move west (screen left)");
     extcmdlist[140].ef_funct = do_move_west;
-    extcmdlist[140].flags = MOVEMENTCMD | (CMD_M_PREFIX | CMD_gGF_PREFIX);
+    extcmdlist[140].flags = MOVEMENTCMD | CMD_MOVE_PREFIXES;
     extcmdlist[140].f_text = null;
     extcmdlist[141].key = 0;
     extcmdlist[141].ef_txt = $c.lit("movenorthwest");
     extcmdlist[141].ef_desc = $c.lit("move northwest (screen upper left)");
     extcmdlist[141].ef_funct = do_move_northwest;
-    extcmdlist[141].flags = MOVEMENTCMD | (CMD_M_PREFIX | CMD_gGF_PREFIX);
+    extcmdlist[141].flags = MOVEMENTCMD | CMD_MOVE_PREFIXES;
     extcmdlist[141].f_text = null;
     extcmdlist[142].key = 0;
     extcmdlist[142].ef_txt = $c.lit("movenorth");
     extcmdlist[142].ef_desc = $c.lit("move north (screen up)");
     extcmdlist[142].ef_funct = do_move_north;
-    extcmdlist[142].flags = MOVEMENTCMD | (CMD_M_PREFIX | CMD_gGF_PREFIX);
+    extcmdlist[142].flags = MOVEMENTCMD | CMD_MOVE_PREFIXES;
     extcmdlist[142].f_text = null;
     extcmdlist[143].key = 0;
     extcmdlist[143].ef_txt = $c.lit("movenortheast");
     extcmdlist[143].ef_desc = $c.lit("move northeast (screen upper right)");
     extcmdlist[143].ef_funct = do_move_northeast;
-    extcmdlist[143].flags = MOVEMENTCMD | (CMD_M_PREFIX | CMD_gGF_PREFIX);
+    extcmdlist[143].flags = MOVEMENTCMD | CMD_MOVE_PREFIXES;
     extcmdlist[143].f_text = null;
     extcmdlist[144].key = 0;
     extcmdlist[144].ef_txt = $c.lit("moveeast");
     extcmdlist[144].ef_desc = $c.lit("move east (screen right)");
     extcmdlist[144].ef_funct = do_move_east;
-    extcmdlist[144].flags = MOVEMENTCMD | (CMD_M_PREFIX | CMD_gGF_PREFIX);
+    extcmdlist[144].flags = MOVEMENTCMD | CMD_MOVE_PREFIXES;
     extcmdlist[144].f_text = null;
     extcmdlist[145].key = 0;
     extcmdlist[145].ef_txt = $c.lit("movesoutheast");
     extcmdlist[145].ef_desc = $c.lit("move southeast (screen lower right)");
     extcmdlist[145].ef_funct = do_move_southeast;
-    extcmdlist[145].flags = MOVEMENTCMD | (CMD_M_PREFIX | CMD_gGF_PREFIX);
+    extcmdlist[145].flags = MOVEMENTCMD | CMD_MOVE_PREFIXES;
     extcmdlist[145].f_text = null;
     extcmdlist[146].key = 0;
     extcmdlist[146].ef_txt = $c.lit("movesouth");
     extcmdlist[146].ef_desc = $c.lit("move south (screen down)");
     extcmdlist[146].ef_funct = do_move_south;
-    extcmdlist[146].flags = MOVEMENTCMD | (CMD_M_PREFIX | CMD_gGF_PREFIX);
+    extcmdlist[146].flags = MOVEMENTCMD | CMD_MOVE_PREFIXES;
     extcmdlist[146].f_text = null;
     extcmdlist[147].key = 0;
     extcmdlist[147].ef_txt = $c.lit("movesouthwest");
     extcmdlist[147].ef_desc = $c.lit("move southwest (screen lower left)");
     extcmdlist[147].ef_funct = do_move_southwest;
-    extcmdlist[147].flags = MOVEMENTCMD | (CMD_M_PREFIX | CMD_gGF_PREFIX);
+    extcmdlist[147].flags = MOVEMENTCMD | CMD_MOVE_PREFIXES;
     extcmdlist[147].f_text = null;
     extcmdlist[148].key = 0;
     extcmdlist[148].ef_txt = $c.lit("rushwest");
@@ -4847,7 +4862,7 @@ export function $init() {
     for (let $i0 = 0; $i0 < 8; $i0++) {
         reset_commands$back_dir_key[$i0].fill(0);
     }
-    reset_commands$backed_dir_cmd = 0;
+    reset_commands$backed_dir_cmd = FALSE;
     update_rest_on_space$restonspace.$copyFrom(new $T.ext_func_tab());
     update_rest_on_space$restonspace.key = 32;
     update_rest_on_space$restonspace.ef_txt = $c.lit("wait");

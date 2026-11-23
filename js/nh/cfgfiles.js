@@ -9,23 +9,25 @@ import { add_menu_coloring } from './coloratt.js';
 import { flags, gc, gd, gn, go, gw, iflags, program_state, svp } from './decl.js';
 import { build_english_list } from './end.js';
 import { debugcore, do_deferred_showpaths, fqname } from './files.js';
-import { BUFSZ, environ_opt, rc_file_opt, set_in_config, set_in_sysconf } from './global.h.js';
-import { ECMD_OK, SYM_OFF_P, SYSCONFPREFIX } from './hack.h.js';
+import { BUFSZ, FALSE, TRUE, environ_opt, rc_file_opt, set_in_config, set_in_sysconf } from './global.h.js';
+import { ECMD_OK, SYM_OFF_X, SYSCONFPREFIX } from './hack.h.js';
+import { plur } from './hack.macros.js';
 import { c_eos, eos, mungspaces, nh_snprintf, trimspaces } from './hacklib.js';
-import { lua_createtable, lua_pushinteger, lua_settable } from './luabridge.js';
+import { nhUse } from './lint.macros.js';
+import { lua_newtable } from './lua.macros.js';
+import { lua_pushinteger, lua_settable } from './luabridge.js';
 import { nhl_add_table_entry_int, nhl_add_table_entry_str } from './nhlua.js';
-import { MAXOCLASSES } from './objclass.h.js';
 import { add_autopickup_exception, all_options_strbuf, allopt_array_init, assign_warnings, disregard_all_options, disregard_this_option, heed_all_options, heed_this_option, match_optname, msgtype_parse_add, nh_getenv, parsebindings, parseoptions, reset_duplicate_opt_detection } from './options.js';
 import { opt_soundlib, opt_windowtype } from './optlist.h.js';
 import { pline, raw_printf } from './pline.js';
 import { rn2 } from './rnd.js';
 import { str2role } from './role.js';
 import { strbuf_empty, strbuf_init } from './strutil.js';
-import { MAXMCLASSES, MAXPCHARS, PRIMARYSET, ROGUESET, SYM_BOULDER, WARNCOUNT } from './sym.h.js';
+import { PRIMARYSET, ROGUESET, SYM_BOULDER, WARNCOUNT } from './sym.h.js';
 import { parsesymbols, switch_symbols } from './symbols.js';
 import { sysopt, sysopt_seduce_set } from './sys.js';
 import { file_exists } from './unixunix.js';
-import { windowprocs } from './windows.js';
+import { wait_synch } from './winprocs.macros.js';
 
 let ignore_errors_on_unmatched = 0;
 let ignore_statement_errors = 0;
@@ -49,14 +51,14 @@ export async function do_write_config_file() {   // cfgfiles.c:169
     }
     if (flags.suppress_alert < 50790400) {
         await pline($c.lit("Warning: saveoptions is highly experimental!"));
-        await windowprocs.win_wait_synch();
+        await wait_synch()();
         await pline($c.lit("Some settings are not saved!"));
-        await windowprocs.win_wait_synch();
+        await wait_synch()();
         await pline($c.lit("All manual customization and comments are removed from the file!"));
-        await windowprocs.win_wait_synch();
+        await wait_synch()();
     }
     $c.__builtin___sprintf_chk(new $c.Ptr(tmp, 0), 0, 256, $c.lit("Overwrite config file %.*s?"), 226, new $c.Ptr(configfile, 0));
-    if (!await paranoid_query(1, new $c.Ptr(tmp, 0))) {
+    if (!await paranoid_query(TRUE, new $c.Ptr(tmp, 0))) {
         return ECMD_OK;
     }
     fp = $c.fopen(new $c.Ptr(configfile, 0), $c.lit("w"));
@@ -96,12 +98,12 @@ async function fopen_config_file(filename, src) {   // cfgfiles.c:223
         }
         if ($c.access(new $c.Ptr(configfile, 0), 4) === -1) {
             await raw_printf($c.lit("Access to %s denied (%d)."), new $c.Ptr(configfile, 0), $c.__error().get(0));
-            await windowprocs.win_wait_synch();
+            await wait_synch()();
         } else if ((fp = $c.fopen(new $c.Ptr(configfile, 0), $c.lit("r"))) !== null) {
             return fp;
         } else {
             await raw_printf($c.lit("Couldn't open requested config file %s (%d)."), new $c.Ptr(configfile, 0), $c.__error().get(0));
-            await windowprocs.win_wait_synch();
+            await wait_synch()();
         }
     }
     envp = nh_getenv($c.lit("HOME"));
@@ -135,7 +137,7 @@ async function fopen_config_file(filename, src) {   // cfgfiles.c:223
             details = $c.lit("");
         }
         await raw_printf($c.lit("Couldn't open default config file %s %s(%d)."), new $c.Ptr(configfile, 0), details, $c.__error().get(0));
-        await windowprocs.win_wait_synch();
+        await wait_synch()();
     }
     return null;
 }
@@ -143,7 +145,7 @@ async function get_uchars(bufp, list, modlist, size, name) {   // cfgfiles.c:381
     let num = 0, count = 0, havenum = 0, $goto = null;
     num = 0;
     count = 0;
-    havenum = 0;
+    havenum = FALSE;
     while (1) {
         S1: for (;;) {
             switch ($goto !== null ? $goto : bufp.get(0)) {
@@ -157,7 +159,7 @@ async function get_uchars(bufp, list, modlist, size, name) {   // cfgfiles.c:381
                         }
                         count = count + 1 | 0;
                         num = 0;
-                        havenum = 0;
+                        havenum = FALSE;
                     }
                     if (count === size || !bufp.get(0)) {
                         return count;
@@ -174,7 +176,7 @@ async function get_uchars(bufp, list, modlist, size, name) {   // cfgfiles.c:381
                 case 55:
                 case 56:
                 case 57:
-                    havenum = 1;
+                    havenum = TRUE;
                     num = (Math.imul(num, 10) >>> 0) + ((bufp.get(0) - 48 | 0) >>> 0) >>> 0;
                     bufp = bufp.add(1);
                     break;
@@ -185,7 +187,7 @@ async function get_uchars(bufp, list, modlist, size, name) {   // cfgfiles.c:381
                 case "gi_error":
                     $goto = null;   // gi_error:
                     await raw_printf($c.lit("Syntax error in %s"), name);
-                    await windowprocs.win_wait_synch();
+                    await wait_synch()();
                     return count;
             }
             break;
@@ -268,12 +270,12 @@ async function handle_config_section(buf) {   // cfgfiles.c:552
         }
         if (!gc.config_section_chosen) {
             await config_error_add($c.lit("Section \"[%s]\" without CHOOSE"), sect);
-            return 1;
+            return TRUE;
         }
         if (sect.get(0)) {
             $t1 = await dupstr(sect), gc.config_section_current = $t1;
             do {
-                if (debugcore($c.lit("cfgfiles.c"), 1)) {
+                if (debugcore($c.lit("cfgfiles.c"), TRUE)) {
                     save_plnmsg = iflags.last_msg;
                     await pline($c.lit("set config section: '%s'"), gc.config_section_current);
                     iflags.last_msg = save_plnmsg;
@@ -282,24 +284,24 @@ async function handle_config_section(buf) {   // cfgfiles.c:552
         } else {
             free_config_sections();
             do {
-                if (debugcore($c.lit("cfgfiles.c"), 1)) {
+                if (debugcore($c.lit("cfgfiles.c"), TRUE)) {
                     save_plnmsg$2 = iflags.last_msg;
                     await pline($c.lit("unset config section"));
                     iflags.last_msg = save_plnmsg$2;
                 }
             } while (0);
         }
-        return 1;
+        return TRUE;
     }
     if (gc.config_section_current) {
         if (!gc.config_section_chosen) {
-            return 1;
+            return TRUE;
         }
         if ($c.strcmp(gc.config_section_current, gc.config_section_chosen)) {
-            return 1;
+            return TRUE;
         }
     }
-    return 0;
+    return FALSE;
 }
 function find_optparam(buf) {   // cfgfiles.c:588
     let bufp = null, altp = null;
@@ -314,76 +316,76 @@ async function cnf_line_OPTIONS(origbuf) {   // cfgfiles.c:603
     let bufp = null;
     bufp = find_optparam(origbuf);
     bufp = bufp.add(1);
-    return await parseoptions(bufp, 1, 1);
+    return await parseoptions(bufp, TRUE, TRUE);
 }
 async function cnf_line_AUTOPICKUP_EXCEPTION(bufp) {   // cfgfiles.c:612
     await add_autopickup_exception(bufp);
-    return 1;
+    return TRUE;
 }
 async function cnf_line_BINDINGS(bufp) {   // cfgfiles.c:619
     return await parsebindings(bufp);
 }
 async function cnf_line_AUTOCOMPLETE(bufp) {   // cfgfiles.c:625
-    await parseautocomplete(bufp, 1);
-    return 1;
+    await parseautocomplete(bufp, TRUE);
+    return TRUE;
 }
 async function cnf_line_MSGTYPE(bufp) {   // cfgfiles.c:632
     return await msgtype_parse_add(bufp);
 }
 function cnf_line_HACKDIR(bufp) {   // cfgfiles.c:638
-    bufp;
-    return 1;
+    nhUse(bufp);
+    return TRUE;
 }
 function cnf_line_LEVELDIR(bufp) {   // cfgfiles.c:653
-    bufp;
-    return 1;
+    nhUse(bufp);
+    return TRUE;
 }
 function cnf_line_SAVEDIR(bufp) {   // cfgfiles.c:673
-    bufp;
-    return 1;
+    nhUse(bufp);
+    return TRUE;
 }
 function cnf_line_BONESDIR(bufp) {   // cfgfiles.c:695
-    bufp;
-    return 1;
+    nhUse(bufp);
+    return TRUE;
 }
 function cnf_line_DATADIR(bufp) {   // cfgfiles.c:706
-    bufp;
-    return 1;
+    nhUse(bufp);
+    return TRUE;
 }
 function cnf_line_SCOREDIR(bufp) {   // cfgfiles.c:717
-    bufp;
-    return 1;
+    nhUse(bufp);
+    return TRUE;
 }
 function cnf_line_LOCKDIR(bufp) {   // cfgfiles.c:728
-    bufp;
-    return 1;
+    nhUse(bufp);
+    return TRUE;
 }
 function cnf_line_CONFIGDIR(bufp) {   // cfgfiles.c:739
-    bufp;
-    return 1;
+    nhUse(bufp);
+    return TRUE;
 }
 function cnf_line_TROUBLEDIR(bufp) {   // cfgfiles.c:750
-    bufp;
-    return 1;
+    nhUse(bufp);
+    return TRUE;
 }
 function cnf_line_NAME(bufp) {   // cfgfiles.c:761
     $c.__builtin___strncpy_chk(new $c.Ptr(svp.plname, 0), bufp, 31, 32);
-    return 1;
+    return TRUE;
 }
 async function cnf_line_ROLE(bufp) {   // cfgfiles.c:768
     let len = 0;
     if ((len = await str2role(bufp)) >= 0) {
         flags.initrole = len;
     }
-    return 1;
+    return TRUE;
 }
 function cnf_line_dogname(bufp) {   // cfgfiles.c:778
     $c.__builtin___strncpy_chk(new $c.Ptr(gd.dogname, 0), bufp, 62, 63);
-    return 1;
+    return TRUE;
 }
 function cnf_line_catname(bufp) {   // cfgfiles.c:785
     $c.__builtin___strncpy_chk(new $c.Ptr(gc.catname, 0), bufp, 62, 63);
-    return 1;
+    return TRUE;
 }
 async function cnf_line_WIZARDS(bufp) {   // cfgfiles.c:795
     let $t1, $t2;
@@ -397,7 +399,7 @@ async function cnf_line_WIZARDS(bufp) {   // cfgfiles.c:795
         }
         $t2 = await build_english_list(sysopt.wizards), sysopt.fmtd_wizard_list = $t2;
     }
-    return 1;
+    return TRUE;
 }
 async function cnf_line_SHELLERS(bufp) {   // cfgfiles.c:812
     let $t1;
@@ -405,7 +407,7 @@ async function cnf_line_SHELLERS(bufp) {   // cfgfiles.c:812
         $c.free(sysopt.shellers);
     }
     $t1 = await dupstr(bufp), sysopt.shellers = $t1;
-    return 1;
+    return TRUE;
 }
 async function cnf_line_MSGHANDLER(bufp) {   // cfgfiles.c:821
     let $t1;
@@ -413,7 +415,7 @@ async function cnf_line_MSGHANDLER(bufp) {   // cfgfiles.c:821
         $c.free(sysopt.msghandler);
     }
     $t1 = await dupstr(bufp), sysopt.msghandler = $t1;
-    return 1;
+    return TRUE;
 }
 async function cnf_line_EXPLORERS(bufp) {   // cfgfiles.c:830
     let $t1;
@@ -421,7 +423,7 @@ async function cnf_line_EXPLORERS(bufp) {   // cfgfiles.c:830
         $c.free(sysopt.explorers);
     }
     $t1 = await dupstr(bufp), sysopt.explorers = $t1;
-    return 1;
+    return TRUE;
 }
 async function cnf_line_DEBUGFILES(bufp) {   // cfgfiles.c:839
     let $t1;
@@ -431,11 +433,11 @@ async function cnf_line_DEBUGFILES(bufp) {   // cfgfiles.c:839
         }
         $t1 = await dupstr(bufp), sysopt.debugfiles = $t1;
     }
-    return 1;
+    return TRUE;
 }
 function cnf_line_DUMPLOGFILE(bufp) {   // cfgfiles.c:852
-    bufp;
-    return 1;
+    nhUse(bufp);
+    return TRUE;
 }
 async function cnf_line_GENERICUSERS(bufp) {   // cfgfiles.c:865
     let $t1;
@@ -443,13 +445,13 @@ async function cnf_line_GENERICUSERS(bufp) {   // cfgfiles.c:865
         $c.free(sysopt.genericusers);
     }
     $t1 = await dupstr(bufp), sysopt.genericusers = $t1;
-    return 1;
+    return TRUE;
 }
 function cnf_line_BONES_POOLS(bufp) {   // cfgfiles.c:874
     let n = 0;
     n = $c.atoi(bufp);
     sysopt.bones_pools = n <= 0 ? 0 : n < 10 ? n : 10;
-    return 1;
+    return TRUE;
 }
 async function cnf_line_SUPPORT(bufp) {   // cfgfiles.c:888
     let $t1;
@@ -457,7 +459,7 @@ async function cnf_line_SUPPORT(bufp) {   // cfgfiles.c:888
         $c.free(sysopt.support);
     }
     $t1 = await dupstr(bufp), sysopt.support = $t1;
-    return 1;
+    return TRUE;
 }
 async function cnf_line_RECOVER(bufp) {   // cfgfiles.c:897
     let $t1;
@@ -465,19 +467,19 @@ async function cnf_line_RECOVER(bufp) {   // cfgfiles.c:897
         $c.free(sysopt.recover);
     }
     $t1 = await dupstr(bufp), sysopt.recover = $t1;
-    return 1;
+    return TRUE;
 }
 function cnf_line_CHECK_SAVE_UID(bufp) {   // cfgfiles.c:906
     let n = 0;
     n = $c.atoi(bufp);
     sysopt.check_save_uid = n;
-    return 1;
+    return TRUE;
 }
 function cnf_line_CHECK_PLNAME(bufp) {   // cfgfiles.c:915
     let n = 0;
     n = $c.atoi(bufp);
     sysopt.check_plname = n;
-    return 1;
+    return TRUE;
 }
 async function cnf_line_SEDUCE(bufp) {   // cfgfiles.c:924
     let n = 0, src = 0, in_sysconf = 0;
@@ -490,13 +492,13 @@ async function cnf_line_SEDUCE(bufp) {   // cfgfiles.c:924
     }
     sysopt.seduce = n;
     sysopt_seduce_set(sysopt.seduce);
-    return 1;
+    return TRUE;
 }
 function cnf_line_HIDEUSAGE(bufp) {   // cfgfiles.c:946
     let n = 0;
     n = !!$c.atoi(bufp) ? 1 : 0;
     sysopt.hideusage = n;
-    return 1;
+    return TRUE;
 }
 async function cnf_line_MAXPLAYERS(bufp) {   // cfgfiles.c:955
     let n = 0;
@@ -506,7 +508,7 @@ async function cnf_line_MAXPLAYERS(bufp) {   // cfgfiles.c:955
         n = 5;
     }
     sysopt.maxplayers = n;
-    return 1;
+    return TRUE;
 }
 async function cnf_line_PERSMAX(bufp) {   // cfgfiles.c:969
     let n = 0;
@@ -516,7 +518,7 @@ async function cnf_line_PERSMAX(bufp) {   // cfgfiles.c:969
         n = 0;
     }
     sysopt.persmax = n;
-    return 1;
+    return TRUE;
 }
 async function cnf_line_PERS_IS_UID(bufp) {   // cfgfiles.c:982
     let n = 0;
@@ -526,7 +528,7 @@ async function cnf_line_PERS_IS_UID(bufp) {   // cfgfiles.c:982
         n = 0;
     }
     sysopt.pers_is_uid = n;
-    return 1;
+    return TRUE;
 }
 async function cnf_line_ENTRYMAX(bufp) {   // cfgfiles.c:995
     let n = 0;
@@ -536,7 +538,7 @@ async function cnf_line_ENTRYMAX(bufp) {   // cfgfiles.c:995
         n = 10;
     }
     sysopt.entrymax = n;
-    return 1;
+    return TRUE;
 }
 async function cnf_line_POINTSMIN(bufp) {   // cfgfiles.c:1008
     let n = 0;
@@ -546,7 +548,7 @@ async function cnf_line_POINTSMIN(bufp) {   // cfgfiles.c:1008
         n = 100;
     }
     sysopt.pointsmin = n;
-    return 1;
+    return TRUE;
 }
 async function cnf_line_MAX_STATUENAME_RANK(bufp) {   // cfgfiles.c:1021
     let n = 0;
@@ -556,7 +558,7 @@ async function cnf_line_MAX_STATUENAME_RANK(bufp) {   // cfgfiles.c:1021
         n = 10;
     }
     sysopt.tt_oname_maxrank = n;
-    return 1;
+    return TRUE;
 }
 async function cnf_line_LIVELOG(bufp) {   // cfgfiles.c:1035
     let L = 0;
@@ -566,7 +568,7 @@ async function cnf_line_LIVELOG(bufp) {   // cfgfiles.c:1035
         return 0;
     }
     sysopt.livelog = L;
-    return 1;
+    return TRUE;
 }
 async function cnf_line_PANICTRACE_LIBC(bufp) {   // cfgfiles.c:1052
     let n = 0;
@@ -576,7 +578,7 @@ async function cnf_line_PANICTRACE_LIBC(bufp) {   // cfgfiles.c:1052
         n = 0;
     }
     sysopt.panictrace_libc = n;
-    return 1;
+    return TRUE;
 }
 async function cnf_line_PANICTRACE_GDB(bufp) {   // cfgfiles.c:1067
     let n = 0;
@@ -586,31 +588,31 @@ async function cnf_line_PANICTRACE_GDB(bufp) {   // cfgfiles.c:1067
         n = 0;
     }
     sysopt.panictrace_gdb = n;
-    return 1;
+    return TRUE;
 }
 async function cnf_line_GDBPATH(bufp) {   // cfgfiles.c:1082
     let $t1;
     if (!file_exists(bufp)) {
         await config_error_add($c.lit("File specified in GDBPATH does not exist"));
-        return 0;
+        return FALSE;
     }
     if (sysopt.gdbpath) {
         $c.free(sysopt.gdbpath);
     }
     $t1 = await dupstr(bufp), sysopt.gdbpath = $t1;
-    return 1;
+    return TRUE;
 }
 async function cnf_line_GREPPATH(bufp) {   // cfgfiles.c:1097
     let $t1;
     if (!file_exists(bufp)) {
         await config_error_add($c.lit("File specified in GREPPATH does not exist"));
-        return 0;
+        return FALSE;
     }
     if (sysopt.greppath) {
         $c.free(sysopt.greppath);
     }
     $t1 = await dupstr(bufp), sysopt.greppath = $t1;
-    return 1;
+    return TRUE;
 }
 async function cnf_line_CRASHREPORTURL(bufp) {   // cfgfiles.c:1112
     let $t1;
@@ -618,7 +620,7 @@ async function cnf_line_CRASHREPORTURL(bufp) {   // cfgfiles.c:1112
         $c.free(sysopt.crashreporturl);
     }
     $t1 = await dupstr(bufp), sysopt.crashreporturl = $t1;
-    return 1;
+    return TRUE;
 }
 async function cnf_line_ACCESSIBILITY(bufp) {   // cfgfiles.c:1121
     let n = 0;
@@ -628,66 +630,66 @@ async function cnf_line_ACCESSIBILITY(bufp) {   // cfgfiles.c:1121
         n = 0;
     }
     sysopt.accessibility = n;
-    return 1;
+    return TRUE;
 }
 async function cnf_line_PORTABLE_DEVICE_PATHS(bufp) {   // cfgfiles.c:1134
-    bufp;
+    nhUse(bufp);
     await config_error_add($c.lit("PORTABLE_DEVICE_PATHS is not supported"));
-    return 1;
+    return TRUE;
 }
 async function cnf_line_BOULDER(bufp) {   // cfgfiles.c:1156
-    await get_uchars(bufp, new $c.Ptr(go.ov_primary_syms, SYM_BOULDER + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES + MAXMCLASSES + WARNCOUNT)), 1, 1, $c.lit("BOULDER"));
-    return 1;
+    await get_uchars(bufp, new $c.Ptr(go.ov_primary_syms, SYM_BOULDER + SYM_OFF_X), TRUE, 1, $c.lit("BOULDER"));
+    return TRUE;
 }
 async function cnf_line_MENUCOLOR(bufp) {   // cfgfiles.c:1164
     return await add_menu_coloring(bufp);
 }
 async function cnf_line_HILITE_STATUS(bufp) {   // cfgfiles.c:1170
-    return await parse_status_hl1(bufp, 1);
+    return await parse_status_hl1(bufp, TRUE);
 }
 async function cnf_line_WARNINGS(bufp) {   // cfgfiles.c:1181
     let translate = new Uint8Array(105);
-    await get_uchars(bufp, new $c.Ptr(translate, 0), 0, WARNCOUNT, $c.lit("WARNINGS"));
+    await get_uchars(bufp, new $c.Ptr(translate, 0), FALSE, WARNCOUNT, $c.lit("WARNINGS"));
     assign_warnings(new $c.Ptr(translate, 0));
-    return 1;
+    return TRUE;
 }
 async function cnf_line_ROGUESYMBOLS(bufp) {   // cfgfiles.c:1191
     if (await parsesymbols(bufp, ROGUESET)) {
-        await switch_symbols(1);
-        return 1;
+        await switch_symbols(TRUE);
+        return TRUE;
     }
     await config_error_add($c.lit("Error in ROGUESYMBOLS definition '%s'"), bufp);
-    return 0;
+    return FALSE;
 }
 async function cnf_line_SYMBOLS(bufp) {   // cfgfiles.c:1202
     if (await parsesymbols(bufp, PRIMARYSET)) {
-        await switch_symbols(1);
-        return 1;
+        await switch_symbols(TRUE);
+        return TRUE;
     }
     if (!config_unmatched_ignored()) {
         await config_error_add($c.lit("Error in SYMBOLS definition '%s'"), bufp);
     }
-    return 0;
+    return FALSE;
 }
 function cnf_line_WIZKIT(bufp) {   // cfgfiles.c:1214
     $c.__builtin___strncpy_chk(new $c.Ptr(gw.wizkit, 0), bufp, 127, 128);
-    return 1;
+    return TRUE;
 }
 function cnf_line_QT_TILEWIDTH(bufp) {   // cfgfiles.c:1239
-    bufp;
-    return 1;
+    nhUse(bufp);
+    return TRUE;
 }
 function cnf_line_QT_TILEHEIGHT(bufp) {   // cfgfiles.c:1253
-    bufp;
-    return 1;
+    nhUse(bufp);
+    return TRUE;
 }
 function cnf_line_QT_FONTSIZE(bufp) {   // cfgfiles.c:1267
-    bufp;
-    return 1;
+    nhUse(bufp);
+    return TRUE;
 }
 function cnf_line_QT_COMPACT(bufp) {   // cfgfiles.c:1281
-    bufp;
-    return 1;
+    nhUse(bufp);
+    return TRUE;
 }
 export async function parse_config_line(origbuf) {   // cfgfiles.c:1389
     let src = 0, in_sysconf = 0, bufp = null, buf = new Int8Array(1024), i = 0, parm = null;
@@ -704,7 +706,7 @@ export async function parse_config_line(origbuf) {   // cfgfiles.c:1389
         if (!ignore_statement_errors) {
             await config_error_add($c.lit("Not a config statement, missing '='"));
         }
-        return 0;
+        return FALSE;
     }
     bufp = bufp.add(1);
     if (bufp.get(0) === 32) {
@@ -714,7 +716,7 @@ export async function parse_config_line(origbuf) {   // cfgfiles.c:1389
         if (config_line_stmt[i].syscnf_only && !in_sysconf) {
             continue;
         }
-        if (match_optname(new $c.Ptr(buf, 0), config_line_stmt[i].name, config_line_stmt[i].len, 1)) {
+        if (match_optname(new $c.Ptr(buf, 0), config_line_stmt[i].name, config_line_stmt[i].len, TRUE)) {
             parm = config_line_stmt[i].origbuf ? origbuf : bufp;
             if (!disregarded_config_lines[i]) {
                 return await config_line_stmt[i].fn(parm);
@@ -724,14 +726,14 @@ export async function parse_config_line(origbuf) {   // cfgfiles.c:1389
     if (!ignore_errors_on_unmatched) {
         await config_error_add($c.lit("Unknown config statement"));
     }
-    return 0;
+    return FALSE;
 }
 export async function config_error_init(from_file, sourcename, secure) {   // cfgfiles.c:1470
     let tmp = null;
     tmp = $c.asRec(await alloc(1304), $T._config_error_frame, 1304);
     tmp.line_num = 0;
     tmp.num_errors = 0;
-    tmp.origline_shown = 0;
+    tmp.origline_shown = FALSE;
     tmp.fromfile = from_file;
     tmp.secure = secure;
     tmp.origline[0] = 0;
@@ -743,35 +745,35 @@ export async function config_error_init(from_file, sourcename, secure) {   // cf
     }
     tmp.next = config_error_data;
     config_error_data = tmp;
-    program_state.config_error_ready = 1;
+    program_state.config_error_ready = TRUE;
 }
 function config_error_nextline(line) {   // cfgfiles.c:1493
     let ced = null;
     ced = config_error_data;
     if (!ced) {
-        return 0;
+        return FALSE;
     }
     if (ced.num_errors && ced.secure) {
-        return 0;
+        return FALSE;
     }
     ced.line_num = ced.line_num + 1 | 0;
-    ced.origline_shown = 0;
+    ced.origline_shown = FALSE;
     if (line && line.get(0)) {
         $c.__builtin___strncpy_chk(new $c.Ptr(ced.origline, 0), line, 1023, 1024);
         ced.origline[$c.idx(1023)] = 0;
     } else {
         ced.origline[0] = 0;
     }
-    return 1;
+    return TRUE;
 }
 export async function l_get_config_errors(L) {   // cfgfiles.c:1516
     let dat = null, tmp = null, idx = 0, $t1;
     dat = config_error_msg;
     idx = 1;
-    await lua_createtable(L, 0, 0);
+    await lua_newtable(L);
     while (dat) {
         lua_pushinteger(L, ($t1 = idx, idx = $t1 + 1 | 0, $t1));
-        await lua_createtable(L, 0, 0);
+        await lua_newtable(L);
         await nhl_add_table_entry_int(L, $c.lit("line"), dat.line_num);
         await nhl_add_table_entry_str(L, $c.lit("error"), dat.errormsg);
         await lua_settable(L, -3);
@@ -793,7 +795,7 @@ export async function config_erradd(buf) {   // cfgfiles.c:1544
     punct = $c.strchr($c.lit(".!?"), punct.get(0)) ? $c.lit("") : $c.lit(".");
     if (!program_state.config_error_ready) {
         await pline($c.lit("%s%s%s"), !iflags.window_inited ? $c.lit("config_error_add: ") : $c.lit(""), buf, punct);
-        await windowprocs.win_wait_synch();
+        await wait_synch()();
         return;
     }
     if (iflags.in_lua) {
@@ -807,7 +809,7 @@ export async function config_erradd(buf) {   // cfgfiles.c:1544
     config_error_data.num_errors = config_error_data.num_errors + 1 | 0;
     if (!config_error_data.origline_shown && !config_error_data.secure) {
         await pline($c.lit("\n%s"), new $c.Ptr(config_error_data.origline, 0));
-        config_error_data.origline_shown = 1;
+        config_error_data.origline_shown = TRUE;
     }
     if (config_error_data.line_num > 0 && !config_error_data.secure) {
         $c.__builtin___sprintf_chk(new $c.Ptr(lineno, 0), 0, 128, $c.lit("Line %d: "), config_error_data.line_num);
@@ -829,8 +831,8 @@ export async function config_error_done() {   // cfgfiles.c:1592
     }
     if (n) {
         cmdline = $c.i8(!$c.strcmp(new $c.Ptr(config_error_data.source, 0), $c.lit("command line")) ? 1 : 0);
-        await pline($c.lit("\n%d error%s %s %s.\n"), n, n === 1 ? $c.lit("") : $c.lit("s"), cmdline ? $c.lit("on") : $c.lit("in"), new $c.Ptr(config_error_data.source, 0).get(0) ? new $c.Ptr(config_error_data.source, 0) : new $c.Ptr(configfile, 0));
-        await windowprocs.win_wait_synch();
+        await pline($c.lit("\n%d error%s %s %s.\n"), n, plur(n), cmdline ? $c.lit("on") : $c.lit("in"), new $c.Ptr(config_error_data.source, 0).get(0) ? new $c.Ptr(config_error_data.source, 0) : new $c.Ptr(configfile, 0));
+        await wait_synch()();
     }
     config_error_data = tmp.next;
     $c.free(tmp);
@@ -839,9 +841,9 @@ export async function config_error_done() {   // cfgfiles.c:1592
 }
 export async function read_config_file(filename, src) {   // cfgfiles.c:1624
     let fp = null, rv = 0;
-    rv = 1;
+    rv = TRUE;
     if (!(fp = await fopen_config_file(filename, src))) {
-        return 0;
+        return FALSE;
     }
     reset_duplicate_opt_detection();
     free_config_sections();
@@ -854,14 +856,14 @@ export async function read_config_file(filename, src) {   // cfgfiles.c:1624
 }
 async function cnf_parser_init(parser) {   // cfgfiles.c:1662
     let $t1, $t2;
-    parser.rv = 1;
+    parser.rv = TRUE;
     $t1 = parser.buf = null, parser.ep = $t1;
-    parser.skip = 0;
-    parser.morelines = 0;
+    parser.skip = FALSE;
+    parser.morelines = FALSE;
     parser.inbufsz = 4 * BUFSZ;
     $t2 = $c.asArr(await alloc(parser.inbufsz), Int8Array), parser.inbuf = $t2;
-    parser.cont = 0;
-    parser.pbreak = 0;
+    parser.cont = FALSE;
+    parser.pbreak = FALSE;
     $c.__builtin___memset_chk(parser.inbuf, 0, parser.inbufsz, -1);
 }
 function cnf_parser_done(parser) {   // cfgfiles.c:1677
@@ -875,12 +877,12 @@ function cnf_parser_done(parser) {   // cfgfiles.c:1677
 }
 async function parse_conf_buf(p, proc) {   // cfgfiles.c:1693
     let tmpbuf = null, len = 0, ignoreline = 0, oldline = 0, section = null, bufp = null, $t1, $t2, $t3, $t4, $t5, $t6;
-    p.cont = 0;
-    p.pbreak = 0;
+    p.cont = FALSE;
+    p.pbreak = FALSE;
     $t1 = $c.strchr(p.inbuf, 10), p.ep = $t1;
     if (p.skip) {
         if (p.ep) {
-            p.skip = 0;
+            p.skip = FALSE;
         }
     } else {
         if (!p.ep) {
@@ -888,15 +890,15 @@ async function parse_conf_buf(p, proc) {   // cfgfiles.c:1693
                 $t2 = eos(p.inbuf), p.ep = $t2;
             } else {
                 await config_error_add($c.lit("Line too long, skipping"));
-                p.skip = 1;
+                p.skip = TRUE;
             }
         } else {
             p.ep.set(0, 0);
         }
         if (p.ep) {
             tmpbuf = null;
-            ignoreline = 0;
-            oldline = 0;
+            ignoreline = FALSE;
+            oldline = FALSE;
             $t3 = $c.i8($c.pcmp(p.ep = p.ep.add(-1), p.inbuf) >= 0 && p.ep.get(0) === 92 ? 1 : 0), p.morelines = $t3;
             if (p.morelines) {
                 p.ep.set(0, 0);
@@ -905,11 +907,11 @@ async function parse_conf_buf(p, proc) {   // cfgfiles.c:1693
                 ($t4 = p.ep, p.ep = $t4.add(-1), $t4).set(0, 0);
             }
             if (!config_error_nextline(p.inbuf)) {
-                p.rv = 0;
+                p.rv = FALSE;
                 if (p.buf) {
                     $c.free(p.buf), p.buf = null;
                 }
-                p.pbreak = 1;
+                p.pbreak = TRUE;
                 return;
             }
             p.ep = p.inbuf;
@@ -917,10 +919,10 @@ async function parse_conf_buf(p, proc) {   // cfgfiles.c:1693
                 p.ep = p.ep.add(1);
             }
             if (!p.ep.get(0) || p.ep.get(0) === 35) {
-                ignoreline = 1;
+                ignoreline = TRUE;
             }
             if (p.buf) {
-                oldline = 1;
+                oldline = TRUE;
             }
             if (!ignoreline) {
                 len = $c.i32($c.strlen(p.ep)) + 1 | 0;
@@ -945,11 +947,11 @@ async function parse_conf_buf(p, proc) {   // cfgfiles.c:1693
                 $c.free(p.buf), p.buf = null;
                 return;
             }
-            if (match_optname(p.buf, $c.lit("CHOOSE"), 6, 1)) {
+            if (match_optname(p.buf, $c.lit("CHOOSE"), 6, TRUE)) {
                 bufp = find_optparam(p.buf);
                 if (!bufp) {
                     await config_error_add($c.lit("Format is CHOOSE=section1,section2,..."));
-                    p.rv = 0;
+                    p.rv = FALSE;
                     $c.free(p.buf), p.buf = null;
                     return;
                 }
@@ -962,13 +964,13 @@ async function parse_conf_buf(p, proc) {   // cfgfiles.c:1693
                     $t6 = await dupstr(section), gc.config_section_chosen = $t6;
                 } else {
                     await config_error_add($c.lit("No config section to choose"));
-                    p.rv = 0;
+                    p.rv = FALSE;
                 }
                 $c.free(p.buf), p.buf = null;
                 return;
             }
             if (!await proc(p.buf)) {
-                p.rv = 0;
+                p.rv = FALSE;
             }
             $c.free(p.buf), p.buf = null;
         }
@@ -978,7 +980,7 @@ export async function parse_conf_str(str, proc) {   // cfgfiles.c:1810
     let len = 0, parser = new $T._cnf_parser_state();
     await cnf_parser_init(parser);
     free_config_sections();
-    await config_error_init(0, $c.lit("parse_conf_str"), 0);
+    await config_error_init(FALSE, $c.lit("parse_conf_str"), FALSE);
     while (str && str.get(0)) {
         len = 0;
         while (str.get(0) && len < parser.inbufsz - 1 >>> 0) {
@@ -1024,7 +1026,7 @@ async function vconfig_error_add(str, the_args) {   // cfgfiles.c:1875
     let vlen = 0, buf = new Int8Array(1280);
     vlen = 0;
     vlen = $c.__builtin___vsnprintf_chk(new $c.Ptr(buf, 0), 1280, 0, 1280, str, the_args);
-    vlen;
+    nhUse(vlen);
     buf[BUFSZ - 1] = 0;
     await config_erradd(new $c.Ptr(buf, 0));
 }
@@ -1059,18 +1061,18 @@ export async function rcfile() {   // cfgfiles.c:1894
     }
     go.opt_phase = rc_file_opt;
     if (nameval && $c.i32($c.strlen(nameval)) >= 128) {
-        await config_error_init(1, namesrc, 0);
+        await config_error_init(TRUE, namesrc, FALSE);
         await config_error_add($c.lit("nethackrc file name \"%.40s\"... too long; using default"), nameval);
         await config_error_done();
         nameval = namesrc = null;
     }
-    await config_error_init(1, nameval, $c.i8(nameval ? 1 : 0));
+    await config_error_init(TRUE, nameval, $c.i8(nameval ? TRUE : FALSE));
     await read_config_file(nameval, set_in_config);
     await config_error_done();
     if (xtraopts) {
         go.opt_phase = environ_opt;
-        await config_error_init(0, envname, 0);
-        await parseoptions(xtraopts, 1, 0);
+        await config_error_init(FALSE, envname, FALSE);
+        await parseoptions(xtraopts, TRUE, FALSE);
         await config_error_done();
     }
     if (gc.cmdline_rcfile) {
@@ -1084,48 +1086,48 @@ export async function rcfile_interface_options() {   // cfgfiles.c:1960
     heed_this_option(opt_windowtype);
     heed_this_option(opt_soundlib);
     set_ignore_errors_on_unmatched();
-    ignore_statement_errors = 1;
+    ignore_statement_errors = TRUE;
     await rcfile();
     heed_all_config_statements();
     heed_all_options();
     disregard_this_option(opt_windowtype);
     disregard_this_option(opt_soundlib);
     clear_ignore_errors_on_unmatched();
-    ignore_statement_errors = 0;
+    ignore_statement_errors = FALSE;
 }
 export function heed_all_config_statements() {   // cfgfiles.c:1979
     let i = 0;
     for (i = 0; i < 59; i = i + 1 | 0) {
-        disregarded_config_lines[i] = 0;
+        disregarded_config_lines[i] = FALSE;
     }
 }
 export function disregard_all_config_statements() {   // cfgfiles.c:1988
     let i = 0;
     for (i = 0; i < 59; i = i + 1 | 0) {
-        disregarded_config_lines[i] = 1;
+        disregarded_config_lines[i] = TRUE;
     }
 }
 export function heed_this_config_statement(statement_idx) {   // cfgfiles.c:1997
     if (statement_idx >= 0 && statement_idx < 59) {
-        disregarded_config_lines[statement_idx] = 0;
+        disregarded_config_lines[statement_idx] = FALSE;
     }
 }
 export function disregard_this_config_statement(statement_idx) {   // cfgfiles.c:2003
     if (statement_idx >= 0 && statement_idx < 59) {
-        disregarded_config_lines[statement_idx] = 1;
+        disregarded_config_lines[statement_idx] = TRUE;
     }
 }
 export function clear_ignore_errors_on_unmatched() {   // cfgfiles.c:2010
-    ignore_errors_on_unmatched = 0;
+    ignore_errors_on_unmatched = FALSE;
 }
 export function set_ignore_errors_on_unmatched() {   // cfgfiles.c:2015
-    ignore_errors_on_unmatched = 1;
+    ignore_errors_on_unmatched = TRUE;
 }
 export function config_unmatched_ignored() {   // cfgfiles.c:2020
     if (ignore_errors_on_unmatched) {
-        return 1;
+        return TRUE;
     }
-    return 0;
+    return FALSE;
 }
 export async function assure_syscf_file() {   // cfgfiles.c:2031
     let fd = 0;
@@ -1142,8 +1144,8 @@ export async function assure_syscf_file() {   // cfgfiles.c:2031
 }
 
 export function $init() {
-    ignore_errors_on_unmatched = 0;
-    ignore_statement_errors = 0;
+    ignore_errors_on_unmatched = FALSE;
+    ignore_statement_errors = FALSE;
     default_configfile = $c.lit(".nethackrc");
     configfile.fill(0);
     for (let $i0 = 0; $i0 < 59; $i0++) {

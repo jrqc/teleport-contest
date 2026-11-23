@@ -41,6 +41,7 @@ export const MAX_NUM_WORMS = 32;
 export const STRAT_ARRIVE = 0x40000000;
 export const STRAT_WAITFORU = 0x20000000;
 export const STRAT_CLOSE = 0x10000000;
+export const STRAT_WAITMASK = 805306368;
 export const STRAT_HEAL = 0x08000000;
 export const STRAT_GROUND = 0x04000000;
 export const STRAT_MONSTR = 0x02000000;

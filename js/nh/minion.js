@@ -5,36 +5,41 @@ import { $G } from './globals.js';
 import { A_CHAOTIC, A_LAWFUL, A_NEUTRAL, A_NONE } from './align.h.js';
 import { stop_occupation } from './allmain.js';
 import { alloc } from './alloc.js';
-import { is_art } from './artifact.js';
 import { ART_DEMONBANE, ART_EXCALIBUR } from './artilist.h.js';
 import { acurr } from './attrib.js';
 import { A_CHA } from './attrib.h.js';
-import { disp, flags, gi, gm, gy, svd, svl, svm, u } from './decl.js';
+import { disp, flags, gi, gm, gy, svl, svm, u } from './decl.js';
 import { S_ANGEL, S_DEMON } from './defsym.h.js';
-import { canseemon, newsym, sensemon } from './display.js';
+import { canseemon, newsym } from './display.js';
+import { canspotmon } from './display.macros.js';
 import { Amonnam, Monnam, mon_nam, x_monnam } from './do_name.js';
 import { In_hell } from './dungeon.js';
+import { In_endgame } from './dungeon.macros.js';
 import { Hear_again, is_fainted, reset_faint } from './eat.js';
 import { panic } from './end.js';
-import { LL_UMONST } from './global.h.js';
+import { FALSE, LL_UMONST, TRUE } from './global.h.js';
 import { money_cnt, nomul, unmul } from './hack.js';
 import { ARTICLE_A, EXACT_NAME, MM_EMIN, MM_NOMSG, RLOC_MSG } from './hack.h.js';
 import { s_suffix, sgn } from './hacklib.js';
 import { currency } from './invent.js';
 import { show_transient_light, transient_light_cleanup } from './light.js';
 import { makemon, mkclass, mkclass_aligned, mongets, newmextra, set_malign } from './makemon.js';
+import { EMIN } from './mextra.macros.js';
 import { bless, mksobj } from './mkobj.js';
 import { mongone } from './mon.js';
 import { msummon_environ } from './mondata.js';
-import { G_EXTINCT, G_GENOD, G_UNIQ, M2_DEMON, M2_LORD, M2_MINION, M2_PRINCE } from './monflag.h.js';
+import { is_demon, is_dlord, is_dprince, is_lord, is_ndemon } from './mondata.macros.js';
+import { G_GONE, G_UNIQ, M2_MINION } from './monflag.h.js';
 import { mons } from './monst.js';
+import { DEADMONSTER } from './monst.macros.js';
 import { PM_AIR_ELEMENTAL, PM_ALIGNED_CLERIC, PM_ANGEL, PM_ARCHON, PM_BONE_DEVIL, PM_DEMOGORGON, PM_EARTH_ELEMENTAL, PM_FIRE_ELEMENTAL, PM_GUARD, PM_HIGH_CLERIC, PM_JUIBLEX, PM_ORCUS, PM_SHOPKEEPER, PM_SKELETON, PM_WATER_ELEMENTAL, PM_WIZARD_OF_YENDOR, PM_YEENOGHU } from './monsters.h.js';
+import { u_wield_art } from './obj.macros.js';
 import { AMULET_OF_REFLECTION, SHIELD_OF_REFLECTION, SILVER_SABER } from './objects.h.js';
 import { NON_PM } from './permonst.h.js';
 import { You, You_feel, impossible, livelog_printf, pline, pline_The, verbalize } from './pline.js';
 import { align_gname } from './pray.js';
 import { mk_roamer, mon_aligntyp } from './priest.js';
-import { BLINDED, CONFLICT, DEAF, W_ARMS } from './prop.h.js';
+import { W_ARMS } from './prop.h.js';
 import { d, rn2, rnd } from './rnd.js';
 import { money2mon } from './shk.js';
 import { mpickobj } from './steal.js';
@@ -43,6 +48,7 @@ import { select_hwep } from './weapon.js';
 import { getlin } from './windows.js';
 import { mon_has_amulet } from './wizard.js';
 import { m_dowear, which_armor } from './worn.js';
+import { Blind, Conflict, Deaf } from './youprop.macros.js';
 
 const elementals = new Int32Array(4);
 export async function newemin(mtmp) {   // minion.c:17
@@ -50,14 +56,14 @@ export async function newemin(mtmp) {   // minion.c:17
     if (!mtmp.mextra) {
         $t1 = await newmextra(), mtmp.mextra = $t1;
     }
-    if (!mtmp.mextra.emin) {
+    if (!EMIN(mtmp)) {
         $t2 = $c.asRec(await alloc(8), $T.emin, 8), mtmp.mextra.emin = $t2;
         $c.__builtin___memset_chk(mtmp.mextra.emin, 0, 8, -1);
         mtmp.mextra.emin.parentmid = mtmp.m_id;
     }
 }
 export function free_emin(mtmp) {   // minion.c:29
-    if (mtmp.mextra && mtmp.mextra.emin) {
+    if (mtmp.mextra && EMIN(mtmp)) {
         $c.free(mtmp.mextra.emin);
         mtmp.mextra.emin = null;
     }
@@ -67,13 +73,13 @@ export function monster_census(spotted) {   // minion.c:40
     let mtmp = null, count = 0;
     count = 0;
     for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
-        if (mtmp.mhp < 1) {
+        if (DEADMONSTER(mtmp)) {
             continue;
         }
         if (mtmp.isgd | 0 && mtmp.mx === 0) {
             continue;
         }
-        if (spotted && !(canseemon(mtmp) || sensemon(mtmp))) {
+        if (spotted && !canspotmon(mtmp)) {
             continue;
         }
         count = count + 1 | 0;
@@ -87,7 +93,7 @@ export async function msummon(mon) {   // minion.c:59
     result = 0;
     if (mon) {
         ptr = mon.data;
-        if (is_art($G.uwep, ART_DEMONBANE) && $c.andu64(ptr.mflags2, M2_DEMON) !== 0) {
+        if (u_wield_art(ART_DEMONBANE) && is_demon(ptr)) {
             if (canseemon(mon)) {
                 await pline($c.lit("%s looks puzzled for a moment."), await Monnam(mon));
             }
@@ -98,21 +104,21 @@ export async function msummon(mon) {   // minion.c:59
         ptr = $c.relem(mons, PM_WIZARD_OF_YENDOR);
         atyp = $c.i8(ptr.maligntyp === A_NONE ? A_NONE : sgn(ptr.maligntyp));
     }
-    if ($c.andu64(ptr.mflags2, M2_DEMON) !== 0 && $c.andu64(ptr.mflags2, M2_PRINCE) !== 0 || $c.peq(ptr, $c.relem(mons, PM_WIZARD_OF_YENDOR))) {
+    if (is_dprince(ptr) || $c.peq(ptr, $c.relem(mons, PM_WIZARD_OF_YENDOR))) {
         dtype = !rn2(20) ? await dprince(atyp) : !rn2(4) ? await dlord(atyp) : await ndemon(atyp);
-        cnt = dtype !== NON_PM && !rn2(4) && ($c.andu64($c.relem(mons, dtype).mflags2, M2_DEMON) !== 0 && $c.andu64($c.relem(mons, dtype).mflags2, M2_LORD | M2_PRINCE) === 0) ? 2 : 1;
-    } else if ($c.andu64(ptr.mflags2, M2_DEMON) !== 0 && $c.andu64(ptr.mflags2, M2_LORD) !== 0) {
+        cnt = dtype !== NON_PM && !rn2(4) && is_ndemon($c.relem(mons, dtype)) ? 2 : 1;
+    } else if (is_dlord(ptr)) {
         dtype = !rn2(50) ? await dprince(atyp) : !rn2(20) ? await dlord(atyp) : await ndemon(atyp);
-        cnt = dtype !== NON_PM && !rn2(4) && ($c.andu64($c.relem(mons, dtype).mflags2, M2_DEMON) !== 0 && $c.andu64($c.relem(mons, dtype).mflags2, M2_LORD | M2_PRINCE) === 0) ? 2 : 1;
+        cnt = dtype !== NON_PM && !rn2(4) && is_ndemon($c.relem(mons, dtype)) ? 2 : 1;
     } else if ($c.peq(ptr, $c.relem(mons, PM_BONE_DEVIL))) {
         dtype = PM_SKELETON;
         cnt = 1;
-    } else if ($c.andu64(ptr.mflags2, M2_DEMON) !== 0 && $c.andu64(ptr.mflags2, M2_LORD | M2_PRINCE) === 0) {
+    } else if (is_ndemon(ptr)) {
         dtype = !rn2(20) ? await dlord(atyp) : !rn2(6) ? await ndemon(atyp) : ptr.pmidx;
         cnt = 1;
     } else if ($c.andu64(mon.data.mflags2, M2_MINION) !== 0 && mon_aligntyp(mon) === A_LAWFUL) {
-        dtype = $c.andu64(ptr.mflags2, M2_LORD) !== 0 && !rn2(20) ? await llord() : $c.andu64(ptr.mflags2, M2_LORD) !== 0 || !rn2(6) ? await lminion() : ptr.pmidx;
-        cnt = dtype !== NON_PM && !rn2(4) && !($c.andu64($c.relem(mons, dtype).mflags2, M2_LORD) !== 0) ? 2 : 1;
+        dtype = is_lord(ptr) && !rn2(20) ? await llord() : is_lord(ptr) || !rn2(6) ? await lminion() : ptr.pmidx;
+        cnt = dtype !== NON_PM && !rn2(4) && !is_lord($c.relem(mons, dtype)) ? 2 : 1;
     } else if ($c.peq(ptr, $c.relem(mons, PM_ANGEL))) {
         if (!rn2(6)) {
             switch (atyp) {
@@ -127,7 +133,7 @@ export async function msummon(mon) {   // minion.c:59
         } else {
             dtype = PM_ANGEL;
         }
-        cnt = dtype !== NON_PM && !rn2(4) && !($c.andu64($c.relem(mons, dtype).mflags2, M2_LORD) !== 0) ? 2 : 1;
+        cnt = dtype !== NON_PM && !rn2(4) && !is_lord($c.relem(mons, dtype)) ? 2 : 1;
     }
     if (dtype === NON_PM) {
         return 0;
@@ -135,14 +141,14 @@ export async function msummon(mon) {   // minion.c:59
     if (cnt > 1 && (mons[dtype].geno & G_UNIQ) !== 0) {
         cnt = 1;
     }
-    if ((svm.mvitals[dtype].mvflags & (G_GENOD | G_EXTINCT)) !== 0) {
+    if ((svm.mvitals[dtype].mvflags & G_GONE) !== 0) {
         dtype = await ndemon(atyp);
         if (dtype === NON_PM) {
             return 0;
         }
     }
-    census = monster_census(0);
-    xlight = 0;
+    census = monster_census(FALSE);
+    xlight = FALSE;
     while (cnt > 0) {
         mtmp = await makemon($c.relem(mons, dtype), u.ux, u.uy, MM_EMIN | MM_NOMSG);
         if (mtmp) {
@@ -152,9 +158,9 @@ export async function msummon(mon) {   // minion.c:59
                 mtmp.mextra.emin.min_align = atyp;
                 mtmp.mextra.emin.renegade = $c.i8((atyp !== u.ualign.type ? 1 : 0) ^ (!mtmp.mpeaceful ? 1 : 0));
             }
-            if (mtmp.data.mlet === S_ANGEL && !((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked)) {
+            if (mtmp.data.mlet === S_ANGEL && !Blind()) {
                 await show_transient_light(null, mtmp.mx, mtmp.my);
-                xlight = 1;
+                xlight = TRUE;
             }
             if (cnt === 1 && canseemon(mtmp)) {
                 cloud[0] = null;
@@ -168,7 +174,7 @@ export async function msummon(mon) {   // minion.c:59
         await transient_light_cleanup();
     }
     if (result) {
-        result = monster_census(0) - census | 0;
+        result = monster_census(FALSE) - census | 0;
     }
     return result;
 }
@@ -197,38 +203,38 @@ export async function summon_minion(alignment, talk) {   // minion.c:198
         if (mon) {
             mon.isminion = (1) & 1;
             mon.mextra.emin.min_align = alignment;
-            mon.mextra.emin.renegade = 0;
+            mon.mextra.emin.renegade = FALSE;
         }
     } else if (mnum !== PM_SHOPKEEPER && mnum !== PM_GUARD && mnum !== PM_ALIGNED_CLERIC && mnum !== PM_HIGH_CLERIC) {
         mon = await makemon($c.relem(mons, mnum), u.ux, u.uy, MM_EMIN | MM_NOMSG);
         if (mon) {
             mon.isminion = (1) & 1;
             mon.mextra.emin.min_align = alignment;
-            mon.mextra.emin.renegade = 0;
+            mon.mextra.emin.renegade = FALSE;
         }
     } else {
         mon = await makemon($c.relem(mons, mnum), u.ux, u.uy, MM_NOMSG);
     }
     if (mon) {
         if (talk) {
-            if (!(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf)) {
+            if (!Deaf()) {
                 await pline_The($c.lit("voice of %s booms:"), await align_gname(alignment));
             } else {
                 await You_feel($c.lit("%s booming voice:"), s_suffix(await align_gname(alignment)));
             }
             await verbalize($c.lit("Thou shalt pay for thine indiscretion!"));
-            if (canseemon(mon) || sensemon(mon)) {
+            if (canspotmon(mon)) {
                 await pline($c.lit("%s appears before you."), await Amonnam(mon));
             }
             mon.mstrategy = $c.andu64(mon.mstrategy, 18446744071562067967n);
         }
-        mon.mpeaceful = (0) & 1;
+        mon.mpeaceful = (FALSE) & 1;
     }
 }
 export async function demon_talk(mtmp) {   // minion.c:263
     let cash = 0, demand = 0, offer = 0, wasunseen = 0, $t1, $t2;
-    if (is_art($G.uwep, ART_EXCALIBUR) || is_art($G.uwep, ART_DEMONBANE)) {
-        if (canseemon(mtmp) || sensemon(mtmp)) {
+    if (u_wield_art(ART_EXCALIBUR) || u_wield_art(ART_DEMONBANE)) {
+        if (canspotmon(mtmp)) {
             await pline($c.lit("%s looks very angry."), await Amonnam(mtmp));
         } else {
             await You_feel($c.lit("tension building."));
@@ -247,17 +253,17 @@ export async function demon_talk(mtmp) {   // minion.c:263
             await unmul(null);
         }
     }
-    if ($c.andu64(mtmp.data.mflags2, M2_DEMON) !== 0 && $c.andu64(mtmp.data.mflags2, M2_PRINCE) !== 0 && mtmp.minvis | 0) {
-        wasunseen = $c.i8(!(canseemon(mtmp) || sensemon(mtmp)) ? 1 : 0);
+    if (is_dprince(mtmp.data) && mtmp.minvis | 0) {
+        wasunseen = $c.i8(!canspotmon(mtmp) ? 1 : 0);
         $t2 = mtmp.perminvis = (0) & 1, mtmp.minvis = ($t2) & 1;
-        if (wasunseen && (canseemon(mtmp) || sensemon(mtmp))) {
+        if (wasunseen && canspotmon(mtmp)) {
             await pline($c.lit("%s appears before you."), await Amonnam(mtmp));
             mtmp.mstrategy = $c.andu64(mtmp.mstrategy, 18446744071562067967n);
         }
         await newsym(mtmp.mx, mtmp.my);
     }
     if (gy.youmonst.data.mlet === S_DEMON) {
-        if (!(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf)) {
+        if (!Deaf()) {
             await pline($c.lit("%s says, \"Good hunting, %s.\""), await Amonnam(mtmp), flags.female ? $c.lit("Sister") : $c.lit("Brother"));
         } else if (canseemon(mtmp)) {
             await pline($c.lit("%s says something."), await Amonnam(mtmp));
@@ -274,16 +280,16 @@ export async function demon_talk(mtmp) {   // minion.c:263
         set_malign(mtmp);
         return 0;
     } else {
-        if (mon_has_amulet(mtmp) || (u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf)) {
+        if (mon_has_amulet(mtmp) || Deaf()) {
             demand = $c.add64(cash, rn2(1000) + 125 | 0);
         }
-        if (!(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf)) {
+        if (!Deaf()) {
             await pline($c.lit("%s demands %ld %s for safe passage."), await Amonnam(mtmp), demand, await currency(demand));
         } else if (canseemon(mtmp)) {
             await pline($c.lit("%s seems to be demanding something."), await Amonnam(mtmp));
         }
         offer = 0;
-        if (!(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf) && (offer = await bribe(mtmp, $c.lit("How much will you offer?"))) >= demand) {
+        if (!Deaf() && (offer = await bribe(mtmp, $c.lit("How much will you offer?"))) >= demand) {
             await pline($c.lit("%s vanishes, laughing about cowardly mortals."), await Amonnam(mtmp));
         } else if (offer > 0 && rnd(Math.imul(5, acurr(A_CHA))) > $c.sub64(demand, offer)) {
             await pline($c.lit("%s scowls at you menacingly, then vanishes."), await Amonnam(mtmp));
@@ -294,7 +300,7 @@ export async function demon_talk(mtmp) {   // minion.c:263
             return 0;
         }
     }
-    await livelog_printf(LL_UMONST, $c.lit("bribed %s with %ld %s for safe passage"), await x_monnam(mtmp, ARTICLE_A, null, EXACT_NAME, 0), offer, offer === 1 ? $c.lit("zorkmid") : $c.lit("zorkmids"));
+    await livelog_printf(LL_UMONST, $c.lit("bribed %s with %ld %s for safe passage"), await x_monnam(mtmp, ARTICLE_A, null, EXACT_NAME, FALSE), offer, offer === 1 ? $c.lit("zorkmid") : $c.lit("zorkmids"));
     await mongone(mtmp);
     return 1;
 }
@@ -320,14 +326,14 @@ export async function bribe(mtmp, prompt) {   // minion.c:361
         await You($c.lit("give %s %ld %s."), await mon_nam(mtmp), offer[0], await currency(offer[0]));
     }
     await money2mon(mtmp, offer[0]);
-    disp.botl = 1;
+    disp.botl = TRUE;
     return offer[0];
 }
 export async function dprince(atyp) {   // minion.c:391
     let tryct = 0, pm = 0;
-    for (tryct = !(u.uz.dnum === svd.dungeon_topology.d_astral_level.dnum) ? 20 : 0; tryct > 0; tryct = tryct - 1 | 0) {
+    for (tryct = !In_endgame(u.uz) ? 20 : 0; tryct > 0; tryct = tryct - 1 | 0) {
         pm = rn2(PM_DEMOGORGON + 1 - PM_ORCUS) + PM_ORCUS | 0;
-        if (!(svm.mvitals[pm].mvflags & (G_GENOD | G_EXTINCT)) && (atyp === A_NONE || sgn(mons[pm].maligntyp) === sgn(atyp))) {
+        if (!(svm.mvitals[pm].mvflags & G_GONE) && (atyp === A_NONE || sgn(mons[pm].maligntyp) === sgn(atyp))) {
             return pm;
         }
     }
@@ -335,16 +341,16 @@ export async function dprince(atyp) {   // minion.c:391
 }
 export async function dlord(atyp) {   // minion.c:405
     let tryct = 0, pm = 0;
-    for (tryct = !(u.uz.dnum === svd.dungeon_topology.d_astral_level.dnum) ? 20 : 0; tryct > 0; tryct = tryct - 1 | 0) {
+    for (tryct = !In_endgame(u.uz) ? 20 : 0; tryct > 0; tryct = tryct - 1 | 0) {
         pm = rn2(PM_YEENOGHU + 1 - PM_JUIBLEX) + PM_JUIBLEX | 0;
-        if (!(svm.mvitals[pm].mvflags & (G_GENOD | G_EXTINCT)) && (atyp === A_NONE || sgn(mons[pm].maligntyp) === sgn(atyp))) {
+        if (!(svm.mvitals[pm].mvflags & G_GONE) && (atyp === A_NONE || sgn(mons[pm].maligntyp) === sgn(atyp))) {
             return pm;
         }
     }
     return await ndemon(atyp);
 }
 export async function llord() {   // minion.c:420
-    if (!(svm.mvitals[PM_ARCHON].mvflags & (G_GENOD | G_EXTINCT))) {
+    if (!(svm.mvitals[PM_ARCHON].mvflags & G_GONE)) {
         return PM_ARCHON;
     }
     return await lminion();
@@ -353,7 +359,7 @@ export async function lminion() {   // minion.c:429
     let tryct = 0, ptr = null;
     for (tryct = 0; tryct < 20; tryct = tryct + 1 | 0) {
         ptr = await mkclass(S_ANGEL, 0);
-        if (ptr && !($c.andu64(ptr.mflags2, M2_LORD) !== 0)) {
+        if (ptr && !is_lord(ptr)) {
             return ptr.pmidx;
         }
     }
@@ -362,13 +368,13 @@ export async function lminion() {   // minion.c:429
 export async function ndemon(atyp) {   // minion.c:444
     let ptr = null;
     ptr = await mkclass_aligned(S_DEMON, 0, atyp);
-    return ptr && ($c.andu64(ptr.mflags2, M2_DEMON) !== 0 && $c.andu64(ptr.mflags2, M2_LORD | M2_PRINCE) === 0) ? ptr.pmidx : NON_PM;
+    return ptr && is_ndemon(ptr) ? ptr.pmidx : NON_PM;
 }
 export async function lose_guardian_angel(mon) {   // minion.c:468
     let mm = new $T.nhcoord(), i = 0;
     if (mon) {
-        if (canseemon(mon) || sensemon(mon)) {
-            if (!(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf)) {
+        if (canspotmon(mon)) {
+            if (!Deaf()) {
                 await pline($c.lit("%s rebukes you, saying:"), await Monnam(mon));
                 await verbalize($c.lit("Since you desire conflict, have some more!"));
             } else {
@@ -381,15 +387,15 @@ export async function lose_guardian_angel(mon) {   // minion.c:468
         mm.x = u.ux;
         mm.y = u.uy;
         if (await enexto(mm, mm.x, mm.y, $c.relem(mons, PM_ANGEL))) {
-            await mk_roamer($c.relem(mons, PM_ANGEL), u.ualign.type, mm.x, mm.y, 0);
+            await mk_roamer($c.relem(mons, PM_ANGEL), u.ualign.type, mm.x, mm.y, FALSE);
         }
     }
 }
 export async function gain_guardian_angel() {   // minion.c:498
     let mtmp = null, otmp = null, mm = new $T.nhcoord(), $t1, $t2, $t3, $t4;
     await Hear_again();
-    if (u.uprops[CONFLICT].intrinsic || u.uprops[CONFLICT].extrinsic) {
-        if (!(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf)) {
+    if (Conflict()) {
+        if (!Deaf()) {
             await pline($c.lit("A voice booms:"));
         } else {
             await You_feel($c.lit("a booming voice:"));
@@ -397,7 +403,7 @@ export async function gain_guardian_angel() {   // minion.c:498
         await verbalize($c.lit("Thy desire for conflict shall be fulfilled!"));
         await lose_guardian_angel(null);
     } else if (u.ualign.record > 8) {
-        if (!(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf)) {
+        if (!Deaf()) {
             await pline($c.lit("A voice whispers:"));
         } else {
             await You_feel($c.lit("a soft voice:"));
@@ -405,14 +411,14 @@ export async function gain_guardian_angel() {   // minion.c:498
         await verbalize($c.lit("Thou hast been worthy of me!"));
         mm.x = u.ux;
         mm.y = u.uy;
-        if (await enexto(mm, mm.x, mm.y, $c.relem(mons, PM_ANGEL)) && (mtmp = await mk_roamer($c.relem(mons, PM_ANGEL), u.ualign.type, mm.x, mm.y, 1)) !== null) {
+        if (await enexto(mm, mm.x, mm.y, $c.relem(mons, PM_ANGEL)) && (mtmp = await mk_roamer($c.relem(mons, PM_ANGEL), u.ualign.type, mm.x, mm.y, TRUE)) !== null) {
             mtmp.mstrategy = $c.andu64(mtmp.mstrategy, 18446744071562067967n);
             if (u.uconduct.pets) {
                 mtmp.mtame = 10;
                 u.uconduct.pets = $c.add64(u.uconduct.pets, 1);
             }
             await newsym(mtmp.mx, mtmp.my);
-            if (!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked)) {
+            if (!Blind()) {
                 await pline($c.lit("An angel appears near you."));
             } else {
                 await You_feel($c.lit("the presence of a friendly angel near you."));
@@ -420,7 +426,7 @@ export async function gain_guardian_angel() {   // minion.c:498
             $t1 = $c.u8(rn2(8) + 15 | 0), mtmp.m_lev = $t1;
             $t3 = ($t2 = (d(mtmp.m_lev, 10) + 30 | 0) + rnd(30) | 0, mtmp.mhpmax = $t2), mtmp.mhp = $t3;
             if ((otmp = await select_hwep(mtmp)) === null) {
-                otmp = await mksobj(SILVER_SABER, 0, 0);
+                otmp = await mksobj(SILVER_SABER, FALSE, FALSE);
                 if (await mpickobj(mtmp, otmp)) {
                     await panic($c.lit("merged weapon?"));
                 }
@@ -431,7 +437,7 @@ export async function gain_guardian_angel() {   // minion.c:498
             }
             if ((otmp = await which_armor(mtmp, W_ARMS)) === null || otmp.otyp !== SHIELD_OF_REFLECTION) {
                 await mongets(mtmp, AMULET_OF_REFLECTION);
-                await m_dowear(mtmp, 1);
+                await m_dowear(mtmp, TRUE);
             }
         }
     }

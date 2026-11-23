@@ -3,6 +3,7 @@ import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
 import { AM_CHAOTIC, AM_LAWFUL, AM_MASK, AM_NEUTRAL, AM_NONE, AM_SANCTUM, AM_SHRINE, AM_SPLEV_CO, AM_SPLEV_NONCO, AM_SPLEV_RANDOM, A_LAWFUL, A_NONE } from './align.h.js';
+import { Align2amask, Amask2align } from './align.macros.js';
 import { alloc, dupstr } from './alloc.js';
 import { artifact_exists } from './artifact.js';
 import { placebc, unplacebc } from './ball.js';
@@ -10,47 +11,55 @@ import { describe_level } from './botl.js';
 import { isok, makemap_prepost } from './cmd.js';
 import { create_drawbridge, is_lava, is_pool } from './dbridge.js';
 import { cg, emptystr, gc, gd, gf, gi, gl, gm, gn, gr, gs, gt, gu, gx, gy, iflags, svc, svd, sve, svi, svl, svm, svn, svr, u } from './decl.js';
-import { COIN_CLASS, GEM_CLASS, POTION_CLASS, RING_CLASS, SCROLL_CLASS, SPBOOK_CLASS, S_EEL, S_EYE, S_GHOST, S_HUMAN, S_LIGHT, S_MIMIC, S_VAMPIRE, S_digbeam, S_goodpos, WAND_CLASS } from './defsym.h.js';
+import { COIN_CLASS, GEM_CLASS, POTION_CLASS, RING_CLASS, SCROLL_CLASS, SPBOOK_CLASS, S_EEL, S_HUMAN, S_MIMIC, S_VAMPIRE, WAND_CLASS } from './defsym.h.js';
 import { premap_detect } from './detect.js';
 import { bury_an_obj } from './dig.js';
 import { back_to_glyph, set_wall_state } from './display.js';
-import { GLYPH_CMAP_C_OFF, GLYPH_CMAP_STONE_OFF } from './display.h.js';
+import { glyph_is_cmap } from './display.macros.js';
 import { christen_monst, lookup_novel, oname, safe_oname } from './do_name.js';
 import { def_char_to_monclass, def_char_to_objclass, def_monsyms, defsyms } from './drawing.js';
 import { Can_dig_down, Can_fall_thru, In_W_tower, In_hell, In_mines, depth, induced_align, on_level } from './dungeon.js';
 import { LR_BRANCH, LR_DOWNSTAIR, LR_DOWNTELE, LR_MONGEN, LR_PORTAL, LR_TELE, LR_UPSTAIR, LR_UPTELE } from './dungeon.h.js';
+import { In_endgame } from './dungeon.macros.js';
 import { panic } from './end.js';
 import { del_engr, del_engr_at, engr_at, make_engr_at, make_grave } from './engrave.js';
 import { BURN, DUST, ENGRAVE, ENGR_BLOOD, MARK } from './engrave.h.js';
 import { makeroguerooms } from './extralev.js';
 import { debugcore } from './files.js';
-import { BOOL_RANDOM, COLNO, MAXNROFROOMS, NHL_SB_SAFE, NHLpa_panic, ROWNO } from './global.h.js';
+import { BOOL_RANDOM, COLNO, FALSE, MAXNROFROOMS, NHL_SB_SAFE, NHLpa_panic, ROWNO, TRUE } from './global.h.js';
+import { strcmpi } from './global.macros.js';
 import { in_rooms, monst_to_any } from './hack.js';
 import { CORPSTAT_FEMALE, CORPSTAT_HISTORIC, CORPSTAT_MALE, MKTRAP_MAZEFLAG, MKTRAP_NOSPIDERONWEB, MKTRAP_NOVICTIM, MKTRAP_SEEN, MM_ADJACENTOK, MM_IGNOREWATER, MM_NOCOUNTBIRTH, MM_NOGRP, MM_NOMSG, MM_NOTAIL, NO_MM_FLAGS, NO_NC_FLAGS, ONAME_LEVEL_DEF, ONAME_NO_FLAGS } from './hack.h.js';
+import { max, min } from './hack.macros.js';
 import { eos, str_lines_maxlen, stripdigits, strncmpi, strstri, swapbits } from './hacklib.js';
 import { sobj_at, stackobj } from './invent.js';
+import { luaL_checkstring } from './lauxlib.macros.js';
 import { del_light_source, new_light_source } from './light.js';
 import { LUA_TFUNCTION, LUA_TNIL, LUA_TNUMBER, LUA_TSTRING, LUA_TTABLE } from './lua.h.js';
-import { luaL_checkinteger, luaL_checklstring, luaL_checkoption, luaL_checktype, luaL_optinteger, luaL_setfuncs, lua_createtable, lua_getfield, lua_gettable, lua_gettop, lua_isnumber, lua_len, lua_pushinteger, lua_rotate, lua_setglobal, lua_settop, lua_tointegerx, lua_tolstring, lua_type, lua_typename } from './luabridge.js';
+import { lua_newtable } from './lua.macros.js';
+import { luaL_checkinteger, luaL_checklstring, luaL_checkoption, luaL_checktype, luaL_optinteger, luaL_setfuncs, lua_getfield, lua_gettable, lua_gettop, lua_isnumber, lua_len, lua_pushinteger, lua_rotate, lua_setglobal, lua_settop, lua_tointegerx, lua_tolstring, lua_type, lua_typename } from './luabridge.js';
 import { makemon, mkclass, propagate, set_malign, set_mimic_sym } from './makemon.js';
 import { add_door, add_room, add_subroom, clear_level_structures, count_level_features, level_finalize_topology, makecorridors, maybe_sdoor, mineralize, mkstairs, mktrap, okdoor, topologize } from './mklev.js';
 import { flood_fill_rm, litstate_rnd, mkmap } from './mkmap.js';
 import { create_maze, fix_wall_spines, fixup_special, get_level_extends, pick_vibrasquare_location, set_levltyp, set_levltyp_lit, walkfrom, wallification } from './mkmaze.js';
 import { add_to_container, bless, blessorcurse, curse, discard_minvent, mkgold, mkobj_at, mksobj_at, obj_extract_self, remove_object, rndmonnum, set_corpsenm, unbless, uncurse, weight } from './mkobj.js';
 import { fill_zoo, inside_room, somex, somexy, somey } from './mkroom.js';
-import { ANTHOLE, ARMORSHOP, BARRACKS, BEEHIVE, BOOKSHOP, CANDLESHOP, COCKNEST, COURT, DELPHI, FILL_NONE, FODDERSHOP, FOODSHOP, LEPREHALL, MORGUE, NO_ROOM, OROOM, POTIONSHOP, RINGSHOP, SCROLLSHOP, SHOPBASE, SWAMP, TEMPLE, THEMEROOM, TOOLSHOP, VAULT, WANDSHOP, WEAPONSHOP, ZOO } from './mkroom.h.js';
+import { ANTHOLE, ARMORSHOP, BARRACKS, BEEHIVE, BOOKSHOP, CANDLESHOP, COCKNEST, COURT, DELPHI, FILL_NONE, FILL_NORMAL, FODDERSHOP, FOODSHOP, LEPREHALL, MORGUE, NO_ROOM, OROOM, POTIONSHOP, RINGSHOP, ROOMOFFSET, SCROLLSHOP, SHOPBASE, SWAMP, TEMPLE, THEMEROOM, TOOLSHOP, VAULT, WANDSHOP, WEAPONSHOP, ZOO } from './mkroom.h.js';
 import { mgender_from_permonst, mongone, newcham, select_newcham_form, validvamp } from './mon.js';
-import { Resists_Elem, name_to_mon, name_to_monplus, poly_when_stoned, set_mon_data } from './mondata.js';
-import { FEMALE, G_EXTINCT, G_GENOD, G_IGNORE, G_NOGEN, G_UNIQ, M1_AMPHIBIOUS, M1_FLY, M1_SWIM, M1_WALLWALK, M2_FEMALE, M2_MALE, MALE, NEUTRAL } from './monflag.h.js';
+import { name_to_mon, name_to_monplus, poly_when_stoned, set_mon_data } from './mondata.js';
+import { amphibious, emits_light, is_female, is_floater, is_flyer, is_male, is_swimmer, likes_fire, noncorporeal, passes_walls, pm_invisible, your_race } from './mondata.macros.js';
+import { FEMALE, G_EXTINCT, G_GONE, G_IGNORE, G_NOGEN, G_UNIQ, MALE, NEUTRAL } from './monflag.h.js';
 import { mons } from './monst.js';
 import { M_AP_FURNITURE, M_AP_MONSTER, M_AP_NOTHING, M_AP_OBJECT, STRAT_WAITFORU } from './monst.h.js';
-import { PM_ARCHEOLOGIST, PM_BABY_GOLD_DRAGON, PM_BLACK_LIGHT, PM_DWARF, PM_FIRE_ELEMENTAL, PM_FIRE_VORTEX, PM_FLAMING_SPHERE, PM_GNOME, PM_GOLD_DRAGON, PM_MINOTAUR, PM_SALAMANDER, PM_SHOCKING_SPHERE, PM_STALKER, PM_VAMPIRE, PM_VAMPIRE_LEADER, PM_VLAD_THE_IMPALER, PM_WIZARD, PM_WIZARD_OF_YENDOR } from './monsters.h.js';
+import { is_vampshifter, ismnum, resists_ston } from './monst.macros.js';
+import { PM_ARCHEOLOGIST, PM_DWARF, PM_GNOME, PM_MINOTAUR, PM_VAMPIRE, PM_VAMPIRE_LEADER, PM_VLAD_THE_IMPALER, PM_WIZARD, PM_WIZARD_OF_YENDOR } from './monsters.h.js';
 import { mk_mplayer } from './mplayer.js';
 import { nhl_push_obj } from './nhlobj.js';
 import { l_selection_check, l_selection_push_copy } from './nhlsel.js';
 import { check_mapchr, get_table_boolean_opt, get_table_int, get_table_int_opt, get_table_mapchr, get_table_mapchr_opt, get_table_option, get_table_str, get_table_str_opt, lcheck_param_table, load_lua, nhl_add_table_entry_bool, nhl_add_table_entry_int, nhl_add_table_entry_region, nhl_add_table_entry_str, nhl_error, nhl_get_xy_params, nhl_pcall_handle, splev_chr2typ } from './nhlua.js';
 import { oinit } from './o_init.js';
-import { OBJ_FREE, OBJ_INVENT } from './obj.h.js';
+import { OBJ_FREE } from './obj.h.js';
+import { carried } from './obj.macros.js';
 import { MAXOCLASSES, NUM_OBJECTS, RANDOM_CLASS } from './objclass.h.js';
 import { obj_descr, objects } from './objects.js';
 import { BOULDER, CORPSE, DWARVISH_MATTOCK, EGG, FIGURINE, PICK_AXE, RIN_TELEPORTATION, SADDLE, SCR_TELEPORTATION, SPE_NOVEL, STATUE, STRANGE_OBJECT, TIN, WAN_DIGGING, WAN_TELEPORTATION } from './objects.h.js';
@@ -58,15 +67,16 @@ import { simpleonames } from './objnam.js';
 import { LOW_PM, NON_PM, NUMMONS } from './permonst.h.js';
 import { impossible, pline } from './pline.js';
 import { mk_roamer, priestini } from './priest.js';
-import { PROT_FROM_SHAPE_CHANGERS, STONE_RES } from './prop.h.js';
 import { get_rect, rnd_rect, split_rects } from './rect.js';
 import { create_gas_cloud, create_gas_cloud_selection } from './region.js';
-import { ALTAR, CLOUD, CORR, CROSSWALL, DBWALL, DB_DIR, DB_EAST, DB_NORTH, DB_SOUTH, DB_WEST, DOOR, DRAWBRIDGE_DOWN, DRAWBRIDGE_UP, D_BROKEN, D_CLOSED, D_ISOPEN, D_LOCKED, D_NODOOR, D_SECRET, D_TRAPPED, FOUNTAIN, F_LOOTED, F_WARNED, GRAVE, HWALL, ICE, ICED_MOAT, ICED_POOL, INVALID_TYPE, IRONBARS, LADDER, LAVAPOOL, LAVAWALL, LA_DOWN, LA_UP, MATCH_WALL, MAX_TYPE, MOAT, POOL, ROOM, SCORR, SDOOR, SET_LIT_NOCHANGE, SINK, STAIRS, STONE, S_LDWASHER, S_LPUDDING, S_LRING, THRONE, TREE, TREE_LOOTED, TREE_SWARM, T_LOOTED, VWALL, W_NONDIGGABLE, W_NONPASSWALL } from './rm.h.js';
+import { ALTAR, CLOUD, CORR, CROSSWALL, DBWALL, DB_DIR, DB_EAST, DB_NORTH, DB_SOUTH, DB_WEST, DOOR, D_BROKEN, D_CLOSED, D_ISOPEN, D_LOCKED, D_NODOOR, D_SECRET, D_TRAPPED, FOUNTAIN, F_LOOTED, F_WARNED, GRAVE, HWALL, ICE, ICED_MOAT, ICED_POOL, INVALID_TYPE, IRONBARS, LADDER, LAVAPOOL, LAVAWALL, LA_DOWN, LA_UP, MATCH_WALL, MAX_TYPE, MOAT, POOL, ROOM, SCORR, SDOOR, SET_LIT_NOCHANGE, SINK, STAIRS, STONE, SVALL, S_LDWASHER, S_LPUDDING, S_LRING, THRONE, TREE, TREE_LOOTED, TREE_SWARM, T_LOOTED, VWALL, W_NONDIGGABLE, W_NONPASSWALL } from './rm.h.js';
+import { IS_DOOR, IS_DRAWBRIDGE, IS_LAVA, IS_OBSTRUCTED, IS_POOL, IS_STWALL, IS_WALL, MON_AT, SPACE_POS } from './rm.macros.js';
 import { rn2, rnd } from './rnd.js';
 import { selection_clear, selection_clone, selection_do_grow, selection_floodfill, selection_free, selection_getbounds, selection_getpoint, selection_iterate, selection_new, selection_rndcoord, selection_setpoint, set_selection_floodfillchk } from './selvar.js';
 import { delete_contents, obfree } from './shk.js';
 import { stock_room } from './shknam.js';
-import { ANY_LOC, CUSTOM_INVENT, DEFAULT_INVENT, DRY, HOT, LVLINIT_MAZE, LVLINIT_MAZEGRID, LVLINIT_MINES, LVLINIT_NONE, LVLINIT_ROGUE, LVLINIT_SOLIDFILL, LVLINIT_SWAMP, MAP_Y_LIM, MAX_NESTED_ROOMS, NO_INVENT, NO_LOC_WARN, SOLID, SPACELOC, SP_COORD_IS_RANDOM, SP_OBJ_CONTAINER, SP_OBJ_CONTENT, WET, W_EAST, W_NORTH, W_RANDOM, W_SOUTH, W_WEST } from './sp_lev.h.js';
+import { ANY_LOC, CUSTOM_INVENT, DEFAULT_INVENT, DRY, HOT, LVLINIT_MAZE, LVLINIT_MAZEGRID, LVLINIT_MINES, LVLINIT_NONE, LVLINIT_ROGUE, LVLINIT_SOLIDFILL, LVLINIT_SWAMP, MAP_Y_LIM, MAX_NESTED_ROOMS, NO_INVENT, NO_LOC_WARN, SOLID, SPACELOC, SP_COORD_IS_RANDOM, SP_OBJ_CONTAINER, SP_OBJ_CONTENT, WET, W_ANY, W_EAST, W_NORTH, W_RANDOM, W_SOUTH, W_WEST } from './sp_lev.h.js';
+import { SP_COORD_PACK, SP_COORD_X, SP_COORD_Y } from './sp_lev.macros.js';
 import { stairway_add } from './stairs.js';
 import { mdrop_special_objs, mpickobj } from './steal.js';
 import { can_saddle, place_monster, put_saddle_on_mon } from './steed.js';
@@ -77,10 +87,12 @@ import { begin_burn } from './timeout.js';
 import { MELT_ICE_AWAY } from './timeout.h.js';
 import { deltrap, maketrap, t_at } from './trap.js';
 import { ANTI_MAGIC, ARROW_TRAP, BEAR_TRAP, DART_TRAP, FIRE_TRAP, HOLE, LANDMINE, LEVEL_TELEP, MAGIC_PORTAL, MAGIC_TRAP, NO_TRAP, PIT, POLY_TRAP, ROCKTRAP, ROLLING_BOULDER_TRAP, RUST_TRAP, SLP_GAS_TRAP, SPIKED_PIT, SQKY_BOARD, STATUE_TRAP, TELEP_TRAP, TRAPDOOR, TRAPNUM, VIBRATING_SQUARE, WEB } from './trap.h.js';
+import { is_hole, is_pit, undestroyable_trap } from './trap.macros.js';
 import { block_point, does_block, vision_reset } from './vision.js';
 import { LS_MONSTER } from './vision.h.js';
 import { flip_worm_segs_horizontal, flip_worm_segs_vertical } from './worm.js';
 import { m_dowear } from './worn.js';
+import { Protection_from_shape_changers, Punished } from './youprop.macros.js';
 
 const SPLEV_LEFT = 1;
 const SPLEV_H_LEFT = 2;
@@ -161,13 +173,13 @@ export function reset_xystart_size() {   // sp_lev.c:206
     gy.ysize = ROWNO;
 }
 export function match_maptyps(typ, levltyp) {   // sp_lev.c:217
-    if (typ === MATCH_WALL && !(levltyp <= DBWALL)) {
-        return 0;
+    if (typ === MATCH_WALL && !IS_STWALL(levltyp)) {
+        return FALSE;
     }
     if (typ < MAX_TYPE && typ !== levltyp) {
-        return 0;
+        return FALSE;
     }
-    return 1;
+    return TRUE;
 }
 export async function mapfrag_fromstr(str) {   // sp_lev.c:227
     let mf = null, tmps = null, s1 = null, $t1, $t2;
@@ -230,11 +242,11 @@ export async function mapfrag_match(mf, x, y) {   // sp_lev.c:298
             mapc = await mapfrag_get(mf, rx + $c.div32(mf.wid, 2) | 0, ry + $c.div32(mf.hei, 2) | 0);
             levc = $c.i8(isok($c.i16(x + rx | 0), $c.i16(y + ry | 0)) ? svl.level.locations[x + rx | 0][y + ry | 0].typ : STONE);
             if (!match_maptyps($c.i16(mapc), $c.i16(levc))) {
-                return 0;
+                return FALSE;
             }
         }
     }
-    return 1;
+    return TRUE;
 }
 function solidify_map() {   // sp_lev.c:315
     let x = 0, y = 0;
@@ -251,12 +263,12 @@ async function map_cleanup() {   // sp_lev.c:328
     for (x = 0; x < COLNO; x = $c.i16(x + 1)) {
         for (y = 0; y < ROWNO; y = $c.i16(y + 1)) {
             typ = svl.level.locations[x][y].typ;
-            if (typ === LAVAPOOL || typ === LAVAWALL || typ >= POOL && typ <= DRAWBRIDGE_UP) {
+            if (IS_LAVA(typ) || IS_POOL(typ)) {
                 while ((otmp = sobj_at(BOULDER, x, y)) !== null) {
                     await obj_extract_self(otmp);
                     await obfree(otmp, null);
                 }
-                if ((ttmp = t_at(x, y)) !== null && !((ttmp.ttyp | 0) === MAGIC_PORTAL || (ttmp.ttyp | 0) === VIBRATING_SQUARE)) {
+                if ((ttmp = t_at(x, y)) !== null && !undestroyable_trap(ttmp.ttyp)) {
                     await deltrap(ttmp);
                 }
                 if ((etmp = engr_at(x, y)) !== null) {
@@ -327,7 +339,7 @@ async function lvlfill_swamp(fg, bg, lit) {   // sp_lev.c:391
     }
 }
 function flip_dbridge_horizontal(lev) {   // sp_lev.c:428
-    if (lev.typ === DRAWBRIDGE_UP || lev.typ === DRAWBRIDGE_DOWN) {
+    if (IS_DRAWBRIDGE(lev.typ)) {
         if (((lev.flags | 0) & DB_DIR) === DB_WEST) {
             lev.flags = (((lev.flags | 0) & ~DB_WEST) >>> 0) & 31;
             lev.flags = ((lev.flags | 0 | DB_EAST) >>> 0) & 31;
@@ -338,7 +350,7 @@ function flip_dbridge_horizontal(lev) {   // sp_lev.c:428
     }
 }
 function flip_dbridge_vertical(lev) {   // sp_lev.c:442
-    if (lev.typ === DRAWBRIDGE_UP || lev.typ === DRAWBRIDGE_DOWN) {
+    if (IS_DRAWBRIDGE(lev.typ)) {
         if (((lev.flags | 0) & DB_DIR) === DB_NORTH) {
             lev.flags = (((lev.flags | 0) & ~DB_NORTH) >>> 0) & 31;
             lev.flags = ((lev.flags | 0 | DB_SOUTH) >>> 0) & 31;
@@ -357,7 +369,7 @@ async function flip_visuals(flp, minx, miny, maxx, maxy) {   // sp_lev.c:458
             if (seenv === 0) {
                 continue;
             }
-            if (seenv !== 255) {
+            if (seenv !== SVALL) {
                 if (flp & 1) {
                     seenv = swapbits(seenv, 2, 4);
                     seenv = swapbits(seenv, 1, 5);
@@ -370,7 +382,7 @@ async function flip_visuals(flp, minx, miny, maxx, maxy) {   // sp_lev.c:458
                 }
                 lev.seenv = $c.u8(seenv);
             }
-            if ((lev.typ && lev.typ <= DBWALL || lev.typ === SDOOR) && (lev.glyph >= GLYPH_CMAP_STONE_OFF && lev.glyph < GLYPH_CMAP_C_OFF + (S_goodpos - S_digbeam + 1))) {
+            if ((IS_WALL(lev.typ) || lev.typ === SDOOR) && glyph_is_cmap(lev.glyph)) {
                 $t1 = await back_to_glyph($c.i16(x), $c.i16(y)), lev.glyph = $t1;
             }
         }
@@ -391,8 +403,8 @@ function flip_encoded_dir_bits(flp, val) {   // sp_lev.c:499
 }
 export async function flip_level(flp, extras) {   // sp_lev.c:533
     let x = 0, y = 0, i = 0, itmp = 0, minx = Int16Array.of(0), miny = Int16Array.of(0), maxx = Int16Array.of(0), maxy = Int16Array.of(0), trm = new $T.rm(), ttmp = null, otmp = null, mtmp = null, etmp = null, sroom = null, timer = null, ball_active = 0, ball_fliparea = 0, stway = null, ez = null, j = 0, tmp1 = 0, tmp2 = 0, rroom = null, ny = 0, nx = 0, ty = 0, tx = 0, $t1, $t2;
-    ball_active = 0;
-    ball_fliparea = 0;
+    ball_active = FALSE;
+    ball_fliparea = FALSE;
     if ((flp & 3) === 0) {
         return;
     }
@@ -410,9 +422,9 @@ export async function flip_level(flp, extras) {   // sp_lev.c:533
         maxy[0] = ROWNO - 1;
     }
     if (extras) {
-        if ($G.uball !== null && $G.uball.where !== OBJ_FREE) {
-            ball_active = 1;
-            if ($G.uball.where === OBJ_INVENT) {
+        if (Punished() && $G.uball.where !== OBJ_FREE) {
+            ball_active = TRUE;
+            if (carried($G.uball)) {
                 $G.uball.ox = u.ux, $G.uball.oy = u.uy;
             }
             ball_fliparea = $c.i8(($G.uball.ox >= minx[0] && $G.uball.ox <= maxx[0] && $G.uball.oy >= miny[0] && $G.uball.oy <= maxy[0] ? 1 : 0) === ($G.uchain.ox >= minx[0] && $G.uchain.ox <= maxx[0] && $G.uchain.oy >= miny[0] && $G.uchain.oy <= maxy[0] ? 1 : 0) && ($G.uball.ox >= minx[0] && $G.uball.ox <= maxx[0] && $G.uball.oy >= miny[0] && $G.uball.oy <= maxy[0] ? 1 : 0) === (u.ux >= minx[0] && u.ux <= maxx[0] && u.uy >= miny[0] && u.uy <= maxy[0] ? 1 : 0) ? 1 : 0);
@@ -438,7 +450,7 @@ export async function flip_level(flp, extras) {   // sp_lev.c:533
             if ((ttmp.ttyp | 0) === ROLLING_BOULDER_TRAP) {
                 ttmp.launch.y = $c.i16((maxy[0] - ttmp.launch.y | 0) + miny[0] | 0);
                 ttmp.vl.v_launch2.y = $c.i16((maxy[0] - ttmp.vl.v_launch2.y | 0) + miny[0] | 0);
-            } else if (((ttmp.ttyp | 0) === PIT || (ttmp.ttyp | 0) === SPIKED_PIT) && ttmp.vl.v_conjoined) {
+            } else if (is_pit(ttmp.ttyp) && ttmp.vl.v_conjoined) {
                 $t1 = $c.u8(flip_encoded_dir_bits(flp, ttmp.vl.v_conjoined)), ttmp.vl.v_conjoined = $t1;
             }
         }
@@ -447,7 +459,7 @@ export async function flip_level(flp, extras) {   // sp_lev.c:533
             if ((ttmp.ttyp | 0) === ROLLING_BOULDER_TRAP) {
                 ttmp.launch.x = $c.i16((maxx[0] - ttmp.launch.x | 0) + minx[0] | 0);
                 ttmp.vl.v_launch2.x = $c.i16((maxx[0] - ttmp.vl.v_launch2.x | 0) + minx[0] | 0);
-            } else if (((ttmp.ttyp | 0) === PIT || (ttmp.ttyp | 0) === SPIKED_PIT) && ttmp.vl.v_conjoined) {
+            } else if (is_pit(ttmp.ttyp) && ttmp.vl.v_conjoined) {
                 $t2 = $c.u8(flip_encoded_dir_bits(flp, ttmp.vl.v_conjoined)), ttmp.vl.v_conjoined = $t2;
             }
         }
@@ -628,25 +640,25 @@ export async function flip_level(flp, extras) {   // sp_lev.c:533
         if (flp & 1) {
             tmp1 = (maxy[0] - gr.regions.get(i).bounding_box.ly | 0) + miny[0] | 0;
             tmp2 = (maxy[0] - gr.regions.get(i).bounding_box.hy | 0) + miny[0] | 0;
-            gr.regions.get(i).bounding_box.ly = $c.i16(tmp1 < tmp2 ? tmp1 : tmp2);
-            gr.regions.get(i).bounding_box.hy = $c.i16(tmp1 > tmp2 ? tmp1 : tmp2);
+            gr.regions.get(i).bounding_box.ly = $c.i16(min(tmp1, tmp2));
+            gr.regions.get(i).bounding_box.hy = $c.i16(max(tmp1, tmp2));
             for (j = 0; j < gr.regions.get(i).nrects; j = j + 1 | 0) {
                 tmp1 = (maxy[0] - $c.radd(gr.regions.get(i).rects, j).ly | 0) + miny[0] | 0;
                 tmp2 = (maxy[0] - $c.radd(gr.regions.get(i).rects, j).hy | 0) + miny[0] | 0;
-                $c.radd(gr.regions.get(i).rects, j).ly = $c.i16(tmp1 < tmp2 ? tmp1 : tmp2);
-                $c.radd(gr.regions.get(i).rects, j).hy = $c.i16(tmp1 > tmp2 ? tmp1 : tmp2);
+                $c.radd(gr.regions.get(i).rects, j).ly = $c.i16(min(tmp1, tmp2));
+                $c.radd(gr.regions.get(i).rects, j).hy = $c.i16(max(tmp1, tmp2));
             }
         }
         if (flp & 2) {
             tmp1 = (maxx[0] - gr.regions.get(i).bounding_box.lx | 0) + minx[0] | 0;
             tmp2 = (maxx[0] - gr.regions.get(i).bounding_box.hx | 0) + minx[0] | 0;
-            gr.regions.get(i).bounding_box.lx = $c.i16(tmp1 < tmp2 ? tmp1 : tmp2);
-            gr.regions.get(i).bounding_box.hx = $c.i16(tmp1 > tmp2 ? tmp1 : tmp2);
+            gr.regions.get(i).bounding_box.lx = $c.i16(min(tmp1, tmp2));
+            gr.regions.get(i).bounding_box.hx = $c.i16(max(tmp1, tmp2));
             for (j = 0; j < gr.regions.get(i).nrects; j = j + 1 | 0) {
                 tmp1 = (maxx[0] - $c.radd(gr.regions.get(i).rects, j).lx | 0) + minx[0] | 0;
                 tmp2 = (maxx[0] - $c.radd(gr.regions.get(i).rects, j).hx | 0) + minx[0] | 0;
-                $c.radd(gr.regions.get(i).rects, j).lx = $c.i16(tmp1 < tmp2 ? tmp1 : tmp2);
-                $c.radd(gr.regions.get(i).rects, j).hx = $c.i16(tmp1 > tmp2 ? tmp1 : tmp2);
+                $c.radd(gr.regions.get(i).rects, j).lx = $c.i16(min(tmp1, tmp2));
+                $c.radd(gr.regions.get(i).rects, j).hx = $c.i16(max(tmp1, tmp2));
             }
         }
     }
@@ -886,11 +898,11 @@ function set_wall_property(x1, y1, x2, y2, prop$in) {   // sp_lev.c:1001
 }
 function remove_boundary_syms() {   // sp_lev.c:1016
     let x = 0, y = 0, has_bounds = 0;
-    has_bounds = 0;
+    has_bounds = FALSE;
     for (x = 0; x < COLNO - 1; x = $c.i16(x + 1)) {
         for (y = 0; y < ROWNO - 1; y = $c.i16(y + 1)) {
             if (svl.level.locations[x][y].typ === CROSSWALL) {
-                has_bounds = 1;
+                has_bounds = TRUE;
                 break;
             }
         }
@@ -921,29 +933,29 @@ function set_door_orientation(x, y) {   // sp_lev.c:1042
 }
 function shared_with_room(x, y, droom) {   // sp_lev.c:1089
     let rmno = 0;
-    rmno = $c.i32($c.add64($c.rdiff(droom, $c.relem(svr.rooms, 0)), 3));
+    rmno = $c.i32($c.add64($c.rdiff(droom, $c.relem(svr.rooms, 0)), ROOMOFFSET));
     if (!isok($c.i16(x), $c.i16(y))) {
-        return 0;
+        return FALSE;
     }
     if ((svl.level.locations[x][y].roomno | 0) === rmno && !svl.level.locations[x][y].edge) {
-        return 0;
+        return FALSE;
     }
     if (isok($c.i16(x - 1 | 0), $c.i16(y)) && (svl.level.locations[x - 1 | 0][y].roomno | 0) === rmno && (x - 1 | 0) <= droom.hx) {
-        return 1;
+        return TRUE;
     }
     if (isok($c.i16(x + 1 | 0), $c.i16(y)) && (svl.level.locations[x + 1 | 0][y].roomno | 0) === rmno && (x + 1 | 0) >= droom.lx) {
-        return 1;
+        return TRUE;
     }
     if (isok($c.i16(x), $c.i16(y - 1 | 0)) && (svl.level.locations[x][y - 1 | 0].roomno | 0) === rmno && (y - 1 | 0) <= droom.hy) {
-        return 1;
+        return TRUE;
     }
     if (isok($c.i16(x), $c.i16(y + 1 | 0)) && (svl.level.locations[x][y + 1 | 0].roomno | 0) === rmno && (y + 1 | 0) >= droom.ly) {
-        return 1;
+        return TRUE;
     }
-    return 0;
+    return FALSE;
 }
 async function maybe_add_door(x, y, droom) {   // sp_lev.c:1110
-    if (droom.hx >= 0 && (!droom.irregular && inside_room(droom, $c.i16(x), $c.i16(y)) || (svl.level.locations[x][y].roomno | 0) === $c.add64($c.rdiff(droom, $c.relem(svr.rooms, 0)), 3) || shared_with_room(x, y, droom))) {
+    if (droom.hx >= 0 && (!droom.irregular && inside_room(droom, $c.i16(x), $c.i16(y)) || (svl.level.locations[x][y].roomno | 0) === $c.add64($c.rdiff(droom, $c.relem(svr.rooms, 0)), ROOMOFFSET) || shared_with_room(x, y, droom))) {
         await add_door($c.i16(x), $c.i16(y), droom);
     }
 }
@@ -989,7 +1001,7 @@ function rndtrap() {   // sp_lev.c:1159
                 break;
             case ROLLING_BOULDER_TRAP:
             case ROCKTRAP:
-                if (u.uz.dnum === svd.dungeon_topology.d_astral_level.dnum) {
+                if (In_endgame(u.uz)) {
                     rtrap = NO_TRAP;
                 }
                 break;
@@ -1063,30 +1075,30 @@ async function is_ok_location(x, y, humidity) {   // sp_lev.c:1280
     let typ = 0, bould = 0;
     typ = svl.level.locations[x][y].typ;
     if ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) {
-        return 1;
+        return TRUE;
     }
     if (is_ok_location_func) {
         return await is_ok_location_func(x, y);
     }
     if ((humidity & ANY_LOC) >>> 0) {
-        return 1;
+        return TRUE;
     }
-    if ((humidity & SOLID) >>> 0 && typ < POOL) {
-        return 1;
+    if ((humidity & SOLID) >>> 0 && IS_OBSTRUCTED(typ)) {
+        return TRUE;
     }
-    if ((humidity & (DRY | SPACELOC)) >>> 0 && typ > DOOR) {
+    if ((humidity & (DRY | SPACELOC)) >>> 0 && SPACE_POS(typ)) {
         bould = $c.i8(!$c.peq(sobj_at(BOULDER, x, y), $c.asRec(null, $T.obj, 112)) ? 1 : 0);
         if (!bould || bould && (humidity & SOLID) >>> 0) {
-            return 1;
+            return TRUE;
         }
     }
     if ((humidity & WET) >>> 0 && is_pool(x, y)) {
-        return 1;
+        return TRUE;
     }
     if ((humidity & HOT) >>> 0 && is_lava(x, y)) {
-        return 1;
+        return TRUE;
     }
-    return 0;
+    return FALSE;
 }
 export async function pm_good_location(x, y, pm) {   // sp_lev.c:1311
     return await is_ok_location(x, y, pm_to_humidity(pm) >>> 0);
@@ -1103,8 +1115,8 @@ function get_unpacked_coord(loc, defhumidity) {   // sp_lev.c:1317
     } else {
         get_unpacked_coord$c.is_random = 0;
         get_unpacked_coord$c.getloc_flags = defhumidity >>> 0;
-        get_unpacked_coord$c.x = $c.i32($c.and64(loc, 255));
-        get_unpacked_coord$c.y = $c.i32($c.and64($c.shr64(loc, 16), 255));
+        get_unpacked_coord$c.x = $c.i32(SP_COORD_X(loc));
+        get_unpacked_coord$c.y = $c.i32(SP_COORD_Y(loc));
     }
     return get_unpacked_coord$c.$clone();
 }
@@ -1177,10 +1189,10 @@ export async function check_room(lowx, ddx, lowy, ddy, vault) {   // sp_lev.c:14
     }
     chk$: for (;;) {
         if (hix <= lowx.get(0) || hiy <= lowy.get(0)) {
-            return 0;
+            return FALSE;
         }
         if (gi.in_mk_themerooms && s_lowx !== lowx.get(0) && s_ddx !== ddx.get(0) && s_lowy !== lowy.get(0) && s_ddy !== ddy.get(0)) {
-            return 0;
+            return FALSE;
         }
         for (x = lowx.get(0) - xlim | 0; x <= (hix + xlim | 0); x = x + 1 | 0) {
             if (x <= 0 || x >= COLNO) {
@@ -1199,7 +1211,7 @@ export async function check_room(lowx, ddx, lowy, ddy, vault) {   // sp_lev.c:14
                 if (($t1 = lev, lev = $c.radd($t1, 1), $t1).typ !== STONE) {
                     if (!vault) {
                         do {
-                            if (debugcore($c.lit("sp_lev.c"), 1)) {
+                            if (debugcore($c.lit("sp_lev.c"), TRUE)) {
                                 save_plnmsg = iflags.last_msg;
                                 await pline($c.lit("strange area [%d,%d] in check_room."), x, y);
                                 iflags.last_msg = save_plnmsg;
@@ -1207,10 +1219,10 @@ export async function check_room(lowx, ddx, lowy, ddy, vault) {   // sp_lev.c:14
                         } while (0);
                     }
                     if (!rn2(3)) {
-                        return 0;
+                        return FALSE;
                     }
                     if (gi.in_mk_themerooms) {
-                        return 0;
+                        return FALSE;
                     }
                     if (x < lowx.get(0)) {
                         lowx.set(0, $c.i16((x + xlim | 0) + 1 | 0));
@@ -1231,9 +1243,9 @@ export async function check_room(lowx, ddx, lowy, ddy, vault) {   // sp_lev.c:14
     ddx.set(0, $c.i16(hix - lowx.get(0) | 0));
     ddy.set(0, $c.i16(hiy - lowy.get(0) | 0));
     if (gi.in_mk_themerooms && s_lowx !== lowx.get(0) && s_ddx !== ddx.get(0) && s_lowy !== lowy.get(0) && s_ddy !== ddy.get(0)) {
-        return 0;
+        return FALSE;
     }
-    return 1;
+    return TRUE;
 }
 export async function create_room(x, y, w, h, xal, yal, rtype, rlit) {   // sp_lev.c:1486
     let xabs = Int16Array.of(0), yabs = Int16Array.of(0), wtmp = 0, htmp = 0, xaltmp = 0, yaltmp = 0, xtmp = 0, ytmp = 0, r1 = null, r2 = new $T.nhrect(), trycnt = 0, vault = 0, xlim = 0, ylim = 0, xborder = 0, yborder = 0, hx = 0, hy = 0, lx = 0, ly = 0, dx = Int16Array.of(0), dy = Int16Array.of(0), save_plnmsg = 0, rndpos = 0, dx$2 = Int16Array.of(0), dy$2 = Int16Array.of(0);
@@ -1241,14 +1253,14 @@ export async function create_room(x, y, w, h, xal, yal, rtype, rlit) {   // sp_l
     yabs[0] = 0;
     r1 = null;
     trycnt = 0;
-    vault = 0;
+    vault = FALSE;
     xlim = XLIM;
     ylim = YLIM;
     if (rtype === -1) {
         rtype = OROOM;
     }
     if (rtype === VAULT) {
-        vault = 1;
+        vault = TRUE;
         xlim = xlim + 1 | 0;
         ylim = ylim + 1 | 0;
     }
@@ -1264,13 +1276,13 @@ export async function create_room(x, y, w, h, xal, yal, rtype, rlit) {   // sp_l
             r1 = rnd_rect();
             if (!r1) {
                 do {
-                    if (debugcore($c.lit("sp_lev.c"), 1)) {
+                    if (debugcore($c.lit("sp_lev.c"), TRUE)) {
                         save_plnmsg = iflags.last_msg;
                         await pline($c.lit("No more rects..."));
                         iflags.last_msg = save_plnmsg;
                     }
                 } while (0);
-                return 0;
+                return FALSE;
             }
             hx = r1.hx;
             hy = r1.hy;
@@ -1373,24 +1385,24 @@ export async function create_room(x, y, w, h, xal, yal, rtype, rlit) {   // sp_l
         }
     } while ((trycnt = trycnt + 1 | 0) <= 100 && !r1);
     if (!r1) {
-        return 0;
+        return FALSE;
     }
     await split_rects(r1, r2);
     if (!vault) {
         gs.smeq[svn.nroom] = svn.nroom;
-        await add_room(xabs[0], yabs[0], $c.i16((xabs[0] + wtmp | 0) - 1 | 0), $c.i16((yabs[0] + htmp | 0) - 1 | 0), $c.i8(rlit), $c.i8(rtype), 0);
+        await add_room(xabs[0], yabs[0], $c.i16((xabs[0] + wtmp | 0) - 1 | 0), $c.i16((yabs[0] + htmp | 0) - 1 | 0), $c.i8(rlit), $c.i8(rtype), FALSE);
     } else {
         svr.rooms[svn.nroom].lx = xabs[0];
         svr.rooms[svn.nroom].ly = yabs[0];
     }
-    return 1;
+    return TRUE;
 }
 async function create_subroom(proom, x, y, w, h, rtype, rlit) {   // sp_lev.c:1668
     let width = 0, height = 0;
     width = $c.i16((proom.hx - proom.lx | 0) + 1 | 0);
     height = $c.i16((proom.hy - proom.ly | 0) + 1 | 0);
     if (width < 4 || height < 4) {
-        return 0;
+        return FALSE;
     }
     if (w === -1) {
         w = $c.i16(rnd(width - 3 | 0));
@@ -1420,8 +1432,8 @@ async function create_subroom(proom, x, y, w, h, rtype, rlit) {   // sp_lev.c:16
         rtype = OROOM;
     }
     rlit = $c.i16(litstate_rnd(rlit));
-    await add_subroom(proom, $c.i16(proom.lx + x | 0), $c.i16(proom.ly + y | 0), $c.i16(((proom.lx + x | 0) + w | 0) - 1 | 0), $c.i16(((proom.ly + y | 0) + h | 0) - 1 | 0), $c.i8(rlit), $c.i8(rtype), 0);
-    return 1;
+    await add_subroom(proom, $c.i16(proom.lx + x | 0), $c.i16(proom.ly + y | 0), $c.i16(((proom.lx + x | 0) + w | 0) - 1 | 0), $c.i16(((proom.ly + y | 0) + h | 0) - 1 | 0), $c.i8(rlit), $c.i8(rtype), FALSE);
+    return TRUE;
 }
 async function create_door(dd, broom) {   // sp_lev.c:1714
     let x = 0, y = 0, trycnt = 0, dwall = 0, dpos = 0, $t1;
@@ -1431,7 +1443,7 @@ async function create_door(dd, broom) {   // sp_lev.c:1714
         $t1 = $c.i16(rn2(2)), dd.secret = $t1;
     }
     if (dd.wall === W_RANDOM) {
-        dd.wall = W_NORTH | W_SOUTH | W_EAST | W_WEST;
+        dd.wall = W_ANY;
     }
     if (dd.mask === -1) {
         if (!dd.secret) {
@@ -1564,16 +1576,16 @@ function noncoalignment(alignment) {   // sp_lev.c:1852
 function m_bad_boulder_spot(x, y) {   // sp_lev.c:1864
     let lev = null;
     if (t_at(x, y)) {
-        return 1;
+        return TRUE;
     }
     if (sobj_at(BOULDER, x, y)) {
-        return 1;
+        return TRUE;
     }
     lev = $c.relem(svl.level.locations[x], y);
-    if (lev.typ === DOOR && ((lev.flags | 0) & (D_CLOSED | D_LOCKED)) !== 0) {
-        return 1;
+    if (IS_DOOR(lev.typ) && ((lev.flags | 0) & (D_CLOSED | D_LOCKED)) !== 0) {
+        return TRUE;
     }
-    return 0;
+    return FALSE;
 }
 function pm_to_humidity(pm) {   // sp_lev.c:1884
     let loc = 0;
@@ -1581,16 +1593,16 @@ function pm_to_humidity(pm) {   // sp_lev.c:1884
     if (!pm) {
         return loc;
     }
-    if (pm.mlet === S_EEL || $c.andu64(pm.mflags1, M1_AMPHIBIOUS) !== 0 || $c.andu64(pm.mflags1, M1_SWIM) !== 0) {
+    if (pm.mlet === S_EEL || amphibious(pm) || is_swimmer(pm)) {
         loc = WET;
     }
-    if ($c.andu64(pm.mflags1, M1_FLY) !== 0 || (pm.mlet === S_EYE || pm.mlet === S_LIGHT)) {
+    if (is_flyer(pm) || is_floater(pm)) {
         loc = loc | (HOT | WET);
     }
-    if ($c.andu64(pm.mflags1, M1_WALLWALK) !== 0 || pm.mlet === S_GHOST) {
+    if (passes_walls(pm) || noncorporeal(pm)) {
         loc = loc | SOLID;
     }
-    if ($c.peq(pm, $c.relem(mons, PM_FIRE_VORTEX)) || $c.peq(pm, $c.relem(mons, PM_FLAMING_SPHERE)) || ($c.peq(pm, $c.relem(mons, PM_FIRE_ELEMENTAL)) || $c.peq(pm, $c.relem(mons, PM_SALAMANDER)))) {
+    if (likes_fire(pm)) {
         loc = loc | HOT;
     }
     return loc;
@@ -1598,7 +1610,7 @@ function pm_to_humidity(pm) {   // sp_lev.c:1884
 function sp_amask_to_amask(sp_amask) {   // sp_lev.c:1908
     let amask = 0;
     if (sp_amask === AM_SPLEV_CO) {
-        amask = (u.ualignbase[1] === A_NONE ? AM_NONE : u.ualignbase[1] === A_LAWFUL ? AM_LAWFUL : u.ualignbase[1] + 2 | 0) >>> 0;
+        amask = Align2amask(u.ualignbase[1]);
     } else if (sp_amask === AM_SPLEV_NONCO) {
         amask = (noncoalignment(u.ualignbase[1]) === A_NONE ? AM_NONE : noncoalignment(u.ualignbase[1]) === A_LAWFUL ? AM_LAWFUL : noncoalignment(u.ualignbase[1]) + 2 | 0) >>> 0;
     } else if (sp_amask === AM_SPLEV_RANDOM) {
@@ -1627,13 +1639,13 @@ async function create_monster(m, croom) {   // sp_lev.c:1925
         if (pm.geno & G_UNIQ && (g_mvflags & G_EXTINCT) >>> 0) {
             return;
         }
-        if ((g_mvflags & (G_GENOD | G_EXTINCT)) >>> 0) {
+        if ((g_mvflags & G_GONE) >>> 0) {
             pm = null;
         }
     } else {
         pm = await mkclass(class_, G_NOGEN);
     }
-    if (In_mines(u.uz) && pm && $c.andu64(pm.mflags2, $c.u64(gu.urace.selfmask)) !== 0 && (gu.urace.mnum === PM_DWARF || gu.urace.mnum === PM_GNOME) && rn2(3)) {
+    if (In_mines(u.uz) && pm && your_race(pm) && (gu.urace.mnum === PM_DWARF || gu.urace.mnum === PM_GNOME) && rn2(3)) {
         pm = null;
     }
     if (pm) {
@@ -1646,16 +1658,16 @@ async function create_monster(m, croom) {   // sp_lev.c:1925
     } else {
         await get_location_coord(new $c.Ptr(x, 0), new $c.Ptr(y, 0), DRY, croom, m.coord);
     }
-    if (svl.level.monsters[x[0]][y[0]] !== null && await enexto(cc, x[0], y[0], pm)) {
+    if (MON_AT(x[0], y[0]) && await enexto(cc, x[0], y[0], pm)) {
         x[0] = cc.x, y[0] = cc.y;
     }
     if (croom && !inside_room(croom, x[0], y[0])) {
         return;
     }
     if (m.sp_amask !== AM_SPLEV_RANDOM) {
-        mtmp = await mk_roamer(pm, $c.i8((amask & AM_MASK) >>> 0 === 0 ? A_NONE : (amask & AM_MASK) >>> 0 === AM_LAWFUL ? A_LAWFUL : ((amask & AM_MASK) >>> 0 | 0) - 2 | 0), x[0], y[0], m.peaceful);
+        mtmp = await mk_roamer(pm, Amask2align(amask), x[0], y[0], m.peaceful);
     } else if (PM_ARCHEOLOGIST <= m.id && m.id <= PM_WIZARD) {
-        mtmp = await mk_mplayer(pm, x[0], y[0], 0);
+        mtmp = await mk_mplayer(pm, x[0], y[0], FALSE);
     } else {
         mtmp = await makemon(pm, x[0], y[0], m.mm_flags);
     }
@@ -1665,7 +1677,7 @@ async function create_monster(m, croom) {   // sp_lev.c:1925
         if (m.name.str) {
             mtmp = await christen_monst(mtmp, m.name.str);
         }
-        if (m.appear_as.str && (mtmp.data.mlet === S_MIMIC || mtmp.cham >= LOW_PM && mtmp.cham < NUMMONS && m.appear === M_AP_MONSTER) && !(u.uprops[PROT_FROM_SHAPE_CHANGERS].intrinsic || u.uprops[PROT_FROM_SHAPE_CHANGERS].extrinsic)) {
+        if (m.appear_as.str && (mtmp.data.mlet === S_MIMIC || ismnum(mtmp.cham) && m.appear === M_AP_MONSTER) && !Protection_from_shape_changers()) {
             switch (m.appear) {
                 case M_AP_NOTHING:
                     await impossible($c.lit("create_monster: mon has an appearance, \"%s\", but no type"), m.appear_as.str);
@@ -1701,7 +1713,7 @@ async function create_monster(m, croom) {   // sp_lev.c:1925
                                 x[0] = m.x;
                                 y[0] = m.y;
                                 await get_location(new $c.Ptr(x, 0), new $c.Ptr(y, 0), DRY, croom);
-                                if (svl.level.monsters[x[0]][y[0]] !== null && await enexto(cc, x[0], y[0], pm)) {
+                                if (MON_AT(x[0], y[0]) && await enexto(cc, x[0], y[0], pm)) {
                                     x[0] = cc.x, y[0] = cc.y;
                                 }
                             } while (m_bad_boulder_spot(x[0], y[0]) && (retrylimit = retrylimit - 1 | 0) > 0);
@@ -1720,8 +1732,8 @@ async function create_monster(m, croom) {   // sp_lev.c:1925
                         } else {
                             mndx[0] = await name_to_mon(m.appear_as.str, new $c.Ptr(gender_name_var, 0));
                         }
-                        if (mndx[0] === NON_PM || (mtmp.cham === PM_VAMPIRE || mtmp.cham === PM_VAMPIRE_LEADER || mtmp.cham === PM_VLAD_THE_IMPALER) && !validvamp(mtmp, new $c.Ptr(mndx, 0), S_HUMAN)) {
-                            await impossible($c.lit("create_monster: invalid %s (\"%s\")"), mtmp.data.mlet === S_MIMIC ? $c.lit("mimic appearance") : $c.peq(mtmp.data, $c.relem(mons, PM_WIZARD_OF_YENDOR)) ? $c.lit("Wizard appearance") : mtmp.cham === PM_VAMPIRE || mtmp.cham === PM_VAMPIRE_LEADER || mtmp.cham === PM_VLAD_THE_IMPALER ? $c.lit("vampire shape") : $c.lit("chameleon shape"), m.appear_as.str);
+                        if (mndx[0] === NON_PM || is_vampshifter(mtmp) && !validvamp(mtmp, new $c.Ptr(mndx, 0), S_HUMAN)) {
+                            await impossible($c.lit("create_monster: invalid %s (\"%s\")"), mtmp.data.mlet === S_MIMIC ? $c.lit("mimic appearance") : $c.peq(mtmp.data, $c.relem(mons, PM_WIZARD_OF_YENDOR)) ? $c.lit("Wizard appearance") : is_vampshifter(mtmp) ? $c.lit("vampire shape") : $c.lit("chameleon shape"), m.appear_as.str);
                         } else if ($c.peq($c.relem(mons, mndx[0]), mtmp.data)) {
                             mtmp.m_ap_type = M_AP_NOTHING;
                             mtmp.mappearance = 0;
@@ -1736,16 +1748,16 @@ async function create_monster(m, croom) {   // sp_lev.c:1925
                                 mtmp.female = (gender_name_var[0] >>> 0) & 1;
                             }
                             set_mon_data(mtmp, mdat);
-                            if ((olddata.mlet === S_LIGHT || $c.peq(olddata, $c.relem(mons, PM_FLAMING_SPHERE)) || $c.peq(olddata, $c.relem(mons, PM_SHOCKING_SPHERE)) || $c.peq(olddata, $c.relem(mons, PM_BABY_GOLD_DRAGON)) || $c.peq(olddata, $c.relem(mons, PM_FIRE_VORTEX)) ? 1 : $c.peq(olddata, $c.relem(mons, PM_FIRE_ELEMENTAL)) || $c.peq(olddata, $c.relem(mons, PM_GOLD_DRAGON)) ? 1 : 0) !== (mtmp.data.mlet === S_LIGHT || $c.peq(mtmp.data, $c.relem(mons, PM_FLAMING_SPHERE)) || $c.peq(mtmp.data, $c.relem(mons, PM_SHOCKING_SPHERE)) || $c.peq(mtmp.data, $c.relem(mons, PM_BABY_GOLD_DRAGON)) || $c.peq(mtmp.data, $c.relem(mons, PM_FIRE_VORTEX)) ? 1 : $c.peq(mtmp.data, $c.relem(mons, PM_FIRE_ELEMENTAL)) || $c.peq(mtmp.data, $c.relem(mons, PM_GOLD_DRAGON)) ? 1 : 0)) {
-                                if (olddata.mlet === S_LIGHT || $c.peq(olddata, $c.relem(mons, PM_FLAMING_SPHERE)) || $c.peq(olddata, $c.relem(mons, PM_SHOCKING_SPHERE)) || $c.peq(olddata, $c.relem(mons, PM_BABY_GOLD_DRAGON)) || $c.peq(olddata, $c.relem(mons, PM_FIRE_VORTEX)) ? 1 : $c.peq(olddata, $c.relem(mons, PM_FIRE_ELEMENTAL)) || $c.peq(olddata, $c.relem(mons, PM_GOLD_DRAGON)) ? 1 : 0) {
+                            if (emits_light(olddata) !== emits_light(mtmp.data)) {
+                                if (emits_light(olddata)) {
                                     await del_light_source(LS_MONSTER, monst_to_any(mtmp));
                                 }
-                                if (mtmp.data.mlet === S_LIGHT || $c.peq(mtmp.data, $c.relem(mons, PM_FLAMING_SPHERE)) || $c.peq(mtmp.data, $c.relem(mons, PM_SHOCKING_SPHERE)) || $c.peq(mtmp.data, $c.relem(mons, PM_BABY_GOLD_DRAGON)) || $c.peq(mtmp.data, $c.relem(mons, PM_FIRE_VORTEX)) ? 1 : $c.peq(mtmp.data, $c.relem(mons, PM_FIRE_ELEMENTAL)) || $c.peq(mtmp.data, $c.relem(mons, PM_GOLD_DRAGON)) ? 1 : 0) {
-                                    await new_light_source(mtmp.mx, mtmp.my, mtmp.data.mlet === S_LIGHT || $c.peq(mtmp.data, $c.relem(mons, PM_FLAMING_SPHERE)) || $c.peq(mtmp.data, $c.relem(mons, PM_SHOCKING_SPHERE)) || $c.peq(mtmp.data, $c.relem(mons, PM_BABY_GOLD_DRAGON)) || $c.peq(mtmp.data, $c.relem(mons, PM_FIRE_VORTEX)) ? 1 : $c.peq(mtmp.data, $c.relem(mons, PM_FIRE_ELEMENTAL)) || $c.peq(mtmp.data, $c.relem(mons, PM_GOLD_DRAGON)) ? 1 : 0, LS_MONSTER, monst_to_any(mtmp));
+                                if (emits_light(mtmp.data)) {
+                                    await new_light_source(mtmp.mx, mtmp.my, emits_light(mtmp.data), LS_MONSTER, monst_to_any(mtmp));
                                 }
                             }
-                            if (!mtmp.perminvis || ($c.peq(olddata, $c.relem(mons, PM_STALKER)) || $c.peq(olddata, $c.relem(mons, PM_BLACK_LIGHT)))) {
-                                mtmp.perminvis = (($c.peq(mdat, $c.relem(mons, PM_STALKER)) || $c.peq(mdat, $c.relem(mons, PM_BLACK_LIGHT)) ? 1 : 0) >>> 0) & 1;
+                            if (!mtmp.perminvis || pm_invisible(olddata)) {
+                                mtmp.perminvis = (pm_invisible(mdat) >>> 0) & 1;
                             }
                         }
                         break;
@@ -1816,7 +1828,7 @@ async function create_monster(m, croom) {   // sp_lev.c:1925
         }
         if (!(m.has_invent & DEFAULT_INVENT)) {
             await mdrop_special_objs(mtmp);
-            await discard_minvent(mtmp, 1);
+            await discard_minvent(mtmp, TRUE);
         }
         if (m.has_invent & CUSTOM_INVENT) {
             invent_carrying_monster = mtmp;
@@ -1825,7 +1837,7 @@ async function create_monster(m, croom) {   // sp_lev.c:1925
 }
 async function create_object(o, croom) {   // sp_lev.c:2193
     let otmp = null, x = Int16Array.of(0), y = Int16Array.of(0), c = 0, named = 0, oclass = 0, cobj = null, was = null, obj = null, wastyp = 0, i = 0, lbuf = new Int8Array(128), dealloced = Int8Array.of(0), $t1, $t2, $t3, $t4;
-    named = $c.i8(o.name.str ? 1 : 0);
+    named = $c.i8(o.name.str ? TRUE : FALSE);
     await get_location_coord(new $c.Ptr(x, 0), new $c.Ptr(y, 0), DRY, croom, o.coord);
     if (o.class >= 0) {
         c = $c.i8(o.class);
@@ -1835,7 +1847,7 @@ async function create_object(o, croom) {   // sp_lev.c:2193
     if (!c) {
         otmp = await mkobj_at(RANDOM_CLASS, x[0], y[0], $c.i8(!named ? 1 : 0));
     } else if (o.id !== -1) {
-        otmp = await mksobj_at(o.id, x[0], y[0], 1, $c.i8(!named ? 1 : 0));
+        otmp = await mksobj_at(o.id, x[0], y[0], TRUE, $c.i8(!named ? 1 : 0));
     } else {
         oclass = $c.i8(def_char_to_objclass(c));
         if (oclass === MAXOCLASSES) {
@@ -1937,7 +1949,7 @@ async function create_object(o, croom) {   // sp_lev.c:2193
             } else {
                 await obj_extract_self(otmp);
                 if (otmp.oartifact) {
-                    await artifact_exists(otmp, safe_oname(otmp), 0, ONAME_NO_FLAGS);
+                    await artifact_exists(otmp, safe_oname(otmp), FALSE, ONAME_NO_FLAGS);
                 }
                 await obfree(otmp, null);
                 return null;
@@ -1959,8 +1971,8 @@ async function create_object(o, croom) {   // sp_lev.c:2193
         for (wastyp = otmp.corpsenm; i < 1000; i = i + 1 | 0, wastyp = await rndmonnum()) {
             was = await makemon($c.relem(mons, wastyp), 0, 0, MM_NOCOUNTBIRTH | MM_NOMSG);
             if (was) {
-                if (!await Resists_Elem(was, STONE_RES) && !poly_when_stoned($c.relem(mons, wastyp))) {
-                    await propagate(wastyp, 1, 0);
+                if (!await resists_ston(was) && !poly_when_stoned($c.relem(mons, wastyp))) {
+                    await propagate(wastyp, TRUE, FALSE);
                     break;
                 }
                 await mongone(was);
@@ -2004,7 +2016,7 @@ async function create_object(o, croom) {   // sp_lev.c:2193
     if (!(o.containment & SP_OBJ_CONTENT)) {
         await stackobj(otmp);
         if (o.lit) {
-            await begin_burn(otmp, 0);
+            await begin_burn(otmp, FALSE);
         }
         if (o.buried) {
             await bury_an_obj(otmp, new $c.Ptr(dealloced, 0));
@@ -2022,18 +2034,18 @@ async function create_altar(a, croom) {   // sp_lev.c:2446
     let sproom = 0, x = Int16Array.of(0), y = Int16Array.of(0), amask = 0, croom_is_temple = 0, $t1;
     x[0] = -1;
     y[0] = -1;
-    croom_is_temple = 1;
+    croom_is_temple = TRUE;
     if (croom) {
         await get_free_room_loc(new $c.Ptr(x, 0), new $c.Ptr(y, 0), croom, a.coord);
         if (croom.rtype !== TEMPLE) {
-            croom_is_temple = 0;
+            croom_is_temple = FALSE;
         }
     } else {
         await get_location_coord(new $c.Ptr(x, 0), new $c.Ptr(y, 0), DRY, croom, a.coord);
         if ((sproom = in_rooms(x[0], y[0], TEMPLE).get(0)) !== 0) {
-            croom = $c.relem(svr.rooms, sproom - 3 | 0);
+            croom = $c.relem(svr.rooms, sproom - ROOMOFFSET | 0);
         } else {
-            croom_is_temple = 0;
+            croom_is_temple = FALSE;
         }
     }
     if (!await set_levltyp(x[0], y[0], ALTAR)) {
@@ -2053,7 +2065,7 @@ async function create_altar(a, croom) {   // sp_lev.c:2446
         if (a.shrine === 2) {
             svl.level.locations[x[0]][y[0]].flags = ((svl.level.locations[x[0]][y[0]].flags | 0 | AM_SANCTUM) >>> 0) & 31;
         }
-        svl.level.flags.has_temple = (1) & 1;
+        svl.level.flags.has_temple = (TRUE) & 1;
     }
 }
 async function search_door(croom, x, y, wall, cnt) {   // sp_lev.c:2492
@@ -2091,13 +2103,13 @@ async function search_door(croom, x, y, wall, cnt) {   // sp_lev.c:2492
             x.set(0, $c.i16(xx));
             y.set(0, $c.i16(yy));
             if (($t1 = cnt, cnt = $t1 - 1 | 0, $t1) <= 0) {
-                return 1;
+                return TRUE;
             }
         }
         xx = xx + dx | 0;
         yy = yy + dy | 0;
     }
-    return 0;
+    return FALSE;
 }
 export async function dig_corridor(org, dest, npoints, nxcor, ftyp, btyp) {   // sp_lev.c:2549
     let dx = 0, dy = 0, dix = 0, diy = 0, cct = 0, crm = null, tx = 0, ty = 0, xx = 0, yy = 0, save_plnmsg = 0, ddx = 0, ddy = 0, $t1;
@@ -2112,13 +2124,13 @@ export async function dig_corridor(org, dest, npoints, nxcor, ftyp, btyp) {   //
     ty = dest.y;
     if (xx <= 0 || yy <= 0 || tx <= 0 || ty <= 0 || xx > COLNO - 1 || tx > COLNO - 1 || yy > ROWNO - 1 || ty > ROWNO - 1) {
         do {
-            if (debugcore($c.lit("sp_lev.c"), 1)) {
+            if (debugcore($c.lit("sp_lev.c"), TRUE)) {
                 save_plnmsg = iflags.last_msg;
                 await pline($c.lit("dig_corridor: bad coords <%d,%d> <%d,%d>."), xx, yy, tx, ty);
                 iflags.last_msg = save_plnmsg;
             }
         } while (0);
-        return 0;
+        return FALSE;
     }
     if (tx > xx) {
         dx = 1;
@@ -2134,12 +2146,12 @@ export async function dig_corridor(org, dest, npoints, nxcor, ftyp, btyp) {   //
     cct = 0;
     while (xx !== tx || yy !== ty) {
         if (($t1 = cct, cct = $t1 + 1 | 0, $t1) > 500 || nxcor && !rn2(35)) {
-            return 0;
+            return FALSE;
         }
         xx = xx + dx | 0;
         yy = yy + dy | 0;
         if (xx >= COLNO - 1 || xx <= 0 || yy <= 0 || yy >= ROWNO - 1) {
-            return 0;
+            return FALSE;
         }
         crm = $c.relem(svl.level.locations[xx], yy);
         if (crm.typ === btyp) {
@@ -2154,11 +2166,11 @@ export async function dig_corridor(org, dest, npoints, nxcor, ftyp, btyp) {   //
                 }
                 crm.typ = ftyp;
                 if (nxcor && !rn2(50)) {
-                    await mksobj_at(BOULDER, $c.i16(xx), $c.i16(yy), 1, 0);
+                    await mksobj_at(BOULDER, $c.i16(xx), $c.i16(yy), TRUE, FALSE);
                 }
             }
         } else if (crm.typ !== ftyp && crm.typ !== SCORR) {
-            return 0;
+            return FALSE;
         }
         dix = $c.abs(xx - tx | 0);
         diy = $c.abs(yy - ty | 0);
@@ -2202,7 +2214,7 @@ export async function dig_corridor(org, dest, npoints, nxcor, ftyp, btyp) {   //
         dy = -dy | 0;
         dx = -dx | 0;
     }
-    return 1;
+    return TRUE;
 }
 async function create_corridor(c) {   // sp_lev.c:2671
     let org = new $T.nhcoord(), dest = new $T.nhcoord();
@@ -2210,7 +2222,7 @@ async function create_corridor(c) {   // sp_lev.c:2671
         await makecorridors();
         return;
     }
-    if (c.src.wall === (W_NORTH | W_SOUTH | W_EAST | W_WEST) || c.src.wall === W_RANDOM || c.dest.wall === (W_NORTH | W_SOUTH | W_EAST | W_WEST) || c.dest.wall === W_RANDOM) {
+    if (c.src.wall === W_ANY || c.src.wall === W_RANDOM || c.dest.wall === W_ANY || c.dest.wall === W_RANDOM) {
         await impossible($c.lit("create_corridor to/from a random wall"));
         return;
     }
@@ -2249,7 +2261,7 @@ async function create_corridor(c) {   // sp_lev.c:2671
                 dest.x = $c.i16(dest.x + 1);
                 break;
         }
-        await dig_corridor(org, dest, null, 0, CORR, STONE);
+        await dig_corridor(org, dest, null, FALSE, CORR, STONE);
     }
 }
 export async function fill_special_room(croom) {   // sp_lev.c:2731
@@ -2263,10 +2275,10 @@ export async function fill_special_room(croom) {   // sp_lev.c:2731
     if (croom.rtype === OROOM || croom.rtype === THEMEROOM || croom.needfill === FILL_NONE) {
         return;
     }
-    if (croom.needfill === 1) {
+    if (croom.needfill === FILL_NORMAL) {
         if (croom.rtype >= SHOPBASE) {
             await stock_room(croom.rtype - SHOPBASE | 0, croom);
-            svl.level.flags.has_shop = (1) & 1;
+            svl.level.flags.has_shop = (TRUE) & 1;
             return;
         }
         switch (croom.rtype) {
@@ -2291,28 +2303,28 @@ export async function fill_special_room(croom) {   // sp_lev.c:2731
     }
     switch (croom.rtype) {
         case VAULT:
-            svl.level.flags.has_vault = (1) & 1;
+            svl.level.flags.has_vault = (TRUE) & 1;
             break;
         case ZOO:
-            svl.level.flags.has_zoo = (1) & 1;
+            svl.level.flags.has_zoo = (TRUE) & 1;
             break;
         case COURT:
-            svl.level.flags.has_court = (1) & 1;
+            svl.level.flags.has_court = (TRUE) & 1;
             break;
         case MORGUE:
-            svl.level.flags.has_morgue = (1) & 1;
+            svl.level.flags.has_morgue = (TRUE) & 1;
             break;
         case BEEHIVE:
-            svl.level.flags.has_beehive = (1) & 1;
+            svl.level.flags.has_beehive = (TRUE) & 1;
             break;
         case BARRACKS:
-            svl.level.flags.has_barracks = (1) & 1;
+            svl.level.flags.has_barracks = (TRUE) & 1;
             break;
         case TEMPLE:
-            svl.level.flags.has_temple = (1) & 1;
+            svl.level.flags.has_temple = (TRUE) & 1;
             break;
         case SWAMP:
-            svl.level.flags.has_swamp = (1) & 1;
+            svl.level.flags.has_swamp = (TRUE) & 1;
             break;
     }
 }
@@ -2350,7 +2362,7 @@ function light_region(tmpregion) {   // sp_lev.c:2839
     for (x = lowx; x <= hix; x = x + 1 | 0) {
         lev = $c.relem(svl.level.locations[x], lowy);
         for (y = lowy; y <= hiy; y = y + 1 | 0) {
-            lev.lit = ((lev.typ === LAVAPOOL || lev.typ === LAVAWALL ? 1 : litstate) >>> 0) & 1;
+            lev.lit = ((IS_LAVA(lev.typ) ? 1 : litstate) >>> 0) & 1;
             lev = $c.radd(lev, 1);
         }
     }
@@ -2409,14 +2421,14 @@ async function fill_empty_maze() {   // sp_lev.c:2926
         mapfact = $c.i32($c.div64($c.mul64(mapcount, 100), mapcountmax));
         for (x = $c.i16(rnd($c.div32(Math.imul(20, mapfact), 100))); x; x = $c.i16(x - 1)) {
             await maze1xy(mm, DRY);
-            await mkobj_at($c.i8(rn2(2) ? GEM_CLASS : RANDOM_CLASS), mm.x, mm.y, 1);
+            await mkobj_at($c.i8(rn2(2) ? GEM_CLASS : RANDOM_CLASS), mm.x, mm.y, TRUE);
         }
         for (x = $c.i16(rnd($c.div32(Math.imul(12, mapfact), 100))); x; x = $c.i16(x - 1)) {
             await maze1xy(mm, DRY);
-            if ((ttmp = t_at(mm.x, mm.y)) !== null && ((ttmp.ttyp | 0) === PIT || (ttmp.ttyp | 0) === SPIKED_PIT || ((ttmp.ttyp | 0) === HOLE || (ttmp.ttyp | 0) === TRAPDOOR))) {
+            if ((ttmp = t_at(mm.x, mm.y)) !== null && (is_pit(ttmp.ttyp) || is_hole(ttmp.ttyp))) {
                 continue;
             }
-            await mksobj_at(BOULDER, mm.x, mm.y, 1, 0);
+            await mksobj_at(BOULDER, mm.x, mm.y, TRUE, FALSE);
         }
         for (x = $c.i16(rn2(2)); x; x = $c.i16(x - 1)) {
             await maze1xy(mm, DRY);
@@ -2434,7 +2446,7 @@ async function fill_empty_maze() {   // sp_lev.c:2926
             await maze1xy(mm, DRY);
             trytrap = rndtrap();
             if (sobj_at(BOULDER, mm.x, mm.y)) {
-                while (trytrap === PIT || trytrap === SPIKED_PIT || (trytrap === HOLE || trytrap === TRAPDOOR)) {
+                while ((trytrap === PIT || trytrap === SPIKED_PIT) || (trytrap === HOLE || trytrap === TRAPDOOR)) {
                     trytrap = rndtrap();
                 }
             }
@@ -2485,7 +2497,7 @@ async function splev_initlev(linit) {   // sp_lev.c:2982
 }
 async function spo_end_moninvent() {   // sp_lev.c:3031
     if (invent_carrying_monster) {
-        await m_dowear(invent_carrying_monster, 1);
+        await m_dowear(invent_carrying_monster, TRUE);
     }
     invent_carrying_monster = null;
 }
@@ -2496,12 +2508,12 @@ function spo_pop_container() {   // sp_lev.c:3040
     }
 }
 async function l_push_wid_hei_table(L, wid, hei) {   // sp_lev.c:3050
-    await lua_createtable(L, 0, 0);
+    await lua_newtable(L);
     await nhl_add_table_entry_int(L, $c.lit("width"), wid);
     await nhl_add_table_entry_int(L, $c.lit("height"), hei);
 }
 async function l_push_mkroom_table(L, tmpr) {   // sp_lev.c:3059
-    await lua_createtable(L, 0, 0);
+    await lua_newtable(L);
     await nhl_add_table_entry_int(L, $c.lit("width"), 1 + (tmpr.hx - tmpr.lx | 0) | 0);
     await nhl_add_table_entry_int(L, $c.lit("height"), 1 + (tmpr.hy - tmpr.ly | 0) | 0);
     await nhl_add_table_entry_region(L, $c.lit("region"), tmpr.lx, tmpr.ly, tmpr.hx, tmpr.hy);
@@ -2562,8 +2574,8 @@ async function find_montype(L, s, mgender) {   // sp_lev.c:3143
     mgend[0] = NEUTRAL;
     i = await name_to_monplus(s, null, new $c.Ptr(mgend, 0));
     if (i >= LOW_PM && i < NUMMONS) {
-        if ($c.andu64($c.relem(mons, i).mflags2, M2_MALE) !== 0 || $c.andu64($c.relem(mons, i).mflags2, M2_FEMALE) !== 0) {
-            mgend[0] = $c.andu64($c.relem(mons, i).mflags2, M2_FEMALE) !== 0 ? FEMALE : MALE;
+        if (is_male($c.relem(mons, i)) || is_female($c.relem(mons, i))) {
+            mgend[0] = is_female($c.relem(mons, i)) ? FEMALE : MALE;
         } else {
             mgend[0] = mgend[0] === FEMALE ? FEMALE : mgend[0] === MALE ? MALE : rn2(2);
         }
@@ -2678,32 +2690,32 @@ export async function lspo_monster(L) {   // sp_lev.c:3214
         tmpmons.appear_as.str = null;
         $t10 = await get_table_align(L) >>> 0, tmpmons.sp_amask = $t10;
         $t11 = $c.i16(await get_table_boolean_opt(L, $c.lit("female"), BOOL_RANDOM)), tmpmons.female = $t11;
-        $t12 = $c.i16(await get_table_boolean_opt(L, $c.lit("invisible"), 0)), tmpmons.invis = $t12;
-        $t13 = $c.i16(await get_table_boolean_opt(L, $c.lit("cancelled"), 0)), tmpmons.cancelled = $t13;
-        $t14 = $c.i16(await get_table_boolean_opt(L, $c.lit("revived"), 0)), tmpmons.revived = $t14;
-        $t15 = $c.i16(await get_table_boolean_opt(L, $c.lit("avenge"), 0)), tmpmons.avenge = $t15;
+        $t12 = $c.i16(await get_table_boolean_opt(L, $c.lit("invisible"), FALSE)), tmpmons.invis = $t12;
+        $t13 = $c.i16(await get_table_boolean_opt(L, $c.lit("cancelled"), FALSE)), tmpmons.cancelled = $t13;
+        $t14 = $c.i16(await get_table_boolean_opt(L, $c.lit("revived"), FALSE)), tmpmons.revived = $t14;
+        $t15 = $c.i16(await get_table_boolean_opt(L, $c.lit("avenge"), FALSE)), tmpmons.avenge = $t15;
         $t16 = $c.i16(await get_table_int_opt(L, $c.lit("fleeing"), 0)), tmpmons.fleeing = $t16;
         $t17 = $c.i16(await get_table_int_opt(L, $c.lit("blinded"), 0)), tmpmons.blinded = $t17;
         $t18 = $c.i16(await get_table_int_opt(L, $c.lit("paralyzed"), 0)), tmpmons.paralyzed = $t18;
-        $t19 = $c.i16(await get_table_boolean_opt(L, $c.lit("stunned"), 0)), tmpmons.stunned = $t19;
-        $t20 = $c.i16(await get_table_boolean_opt(L, $c.lit("confused"), 0)), tmpmons.confused = $t20;
-        $t21 = $c.i16(await get_table_boolean_opt(L, $c.lit("waiting"), 0)), tmpmons.waiting = $t21;
+        $t19 = $c.i16(await get_table_boolean_opt(L, $c.lit("stunned"), FALSE)), tmpmons.stunned = $t19;
+        $t20 = $c.i16(await get_table_boolean_opt(L, $c.lit("confused"), FALSE)), tmpmons.confused = $t20;
+        $t21 = $c.i16(await get_table_boolean_opt(L, $c.lit("waiting"), FALSE)), tmpmons.waiting = $t21;
         $t22 = $c.i16(await get_table_int_opt(L, $c.lit("m_lev_adj"), 0)), tmpmons.m_lev_adj = $t22;
         tmpmons.seentraps = 0;
         keep_default_invent = await get_table_boolean_opt(L, $c.lit("keep_default_invent"), -1);
-        if (!await get_table_boolean_opt(L, $c.lit("tail"), 1)) {
+        if (!await get_table_boolean_opt(L, $c.lit("tail"), TRUE)) {
             tmpmons.mm_flags = $c.u32($c.or64(tmpmons.mm_flags, MM_NOTAIL));
         }
-        if (!await get_table_boolean_opt(L, $c.lit("group"), 1)) {
+        if (!await get_table_boolean_opt(L, $c.lit("group"), TRUE)) {
             tmpmons.mm_flags = $c.u32($c.or64(tmpmons.mm_flags, MM_NOGRP));
         }
-        if (await get_table_boolean_opt(L, $c.lit("adjacentok"), 0)) {
+        if (await get_table_boolean_opt(L, $c.lit("adjacentok"), FALSE)) {
             tmpmons.mm_flags = $c.u32($c.or64(tmpmons.mm_flags, MM_ADJACENTOK));
         }
-        if (await get_table_boolean_opt(L, $c.lit("ignorewater"), 0)) {
+        if (await get_table_boolean_opt(L, $c.lit("ignorewater"), FALSE)) {
             tmpmons.mm_flags = $c.u32($c.or64(tmpmons.mm_flags, MM_IGNOREWATER));
         }
-        if (!await get_table_boolean_opt(L, $c.lit("countbirth"), 1)) {
+        if (!await get_table_boolean_opt(L, $c.lit("countbirth"), TRUE)) {
             tmpmons.mm_flags = $c.u32($c.or64(tmpmons.mm_flags, MM_NOCOUNTBIRTH));
         }
         mappear = await get_table_str_opt(L, $c.lit("appear_as"), null);
@@ -2726,7 +2738,7 @@ export async function lspo_monster(L) {   // sp_lev.c:3214
         }
         await get_table_xy_or_coord(L, new $c.Ptr(mx, 0), new $c.Ptr(my, 0));
         $t24 = $c.i16(await get_table_montype(L, new $c.Ptr(mgend, 0))), tmpmons.id = $t24;
-        if (mgend[0] !== NEUTRAL && (tmpmons.female === BOOL_RANDOM || $c.andu64($c.relem(mons, tmpmons.id).mflags2, M2_FEMALE) !== 0 || $c.andu64($c.relem(mons, tmpmons.id).mflags2, M2_MALE) !== 0)) {
+        if (mgend[0] !== NEUTRAL && (tmpmons.female === BOOL_RANDOM || is_female($c.relem(mons, tmpmons.id)) || is_male($c.relem(mons, tmpmons.id)))) {
             tmpmons.female = $c.i16(mgend[0]);
         }
         if (tmpmons.female === BOOL_RANDOM) {
@@ -2736,11 +2748,11 @@ export async function lspo_monster(L) {   // sp_lev.c:3214
         await lua_getfield(L, 1, $c.lit("inventory"));
         if (!(lua_type(L, -1) === LUA_TNIL)) {
             tmpmons.has_invent = CUSTOM_INVENT;
-            if (keep_default_invent === 1) {
+            if (keep_default_invent === TRUE) {
                 tmpmons.has_invent = $c.i16(tmpmons.has_invent | DEFAULT_INVENT);
             }
         } else {
-            if (keep_default_invent === 0) {
+            if (keep_default_invent === FALSE) {
                 tmpmons.has_invent = NO_INVENT;
             }
         }
@@ -2838,13 +2850,13 @@ async function find_objtype(L, s, oclass) {   // sp_lev.c:3468
         }
         for (i = 0; i < NUM_OBJECTS; i = i + 1 | 0) {
             objname = obj_descr[objects[i].oc_name_idx].oc_name;
-            if ((!class_ || class_ === objects[i].oc_class) && objname && !strncmpi(s, objname, -1)) {
+            if ((!class_ || class_ === objects[i].oc_class) && objname && !strcmpi(s, objname)) {
                 return i;
             }
         }
         for (i = 0; i < NUM_OBJECTS; i = i + 1 | 0) {
             objname = obj_descr[objects[i].oc_descr_idx].oc_descr;
-            if (objname && !strncmpi(s, objname, -1)) {
+            if (objname && !strcmpi(s, objname)) {
                 return i;
             }
         }
@@ -2944,13 +2956,13 @@ export async function lspo_object(L) {   // sp_lev.c:3557
     }
     if (tmpobj.id === STATUE || tmpobj.id === EGG || tmpobj.id === CORPSE || tmpobj.id === TIN || tmpobj.id === FIGURINE) {
         pm = null;
-        nonpmobj = 0;
+        nonpmobj = FALSE;
         montype = await get_table_str_opt(L, $c.lit("montype"), null);
         if (montype) {
             if (tmpobj.id === TIN && (!strncmpi(montype, $c.lit("spinach"), -1) || !strncmpi(montype, $c.lit("empty"), -1)) || tmpobj.id === EGG && !strncmpi(montype, $c.lit("empty"), -1)) {
                 tmpobj.corpsenm = NON_PM;
                 $t20 = $c.i16(!strncmpi(montype, $c.lit("spinach"), -1) ? 1 : 0), tmpobj.spe = $t20;
-                nonpmobj = 1;
+                nonpmobj = TRUE;
             } else if ($c.strlen(montype) === 1 && def_char_to_monclass(montype.get(0)) !== MAXMCLASSES) {
                 pm = await mkclass($c.i8(def_char_to_monclass(montype.get(0))), G_NOGEN | G_IGNORE);
             } else {
@@ -3026,7 +3038,7 @@ export async function lspo_level_flags(L) {   // sp_lev.c:3759
         await nhl_error(L, $c.lit("expected string params"));
     }
     for (i = 1; i <= argc; i = i + 1 | 0) {
-        s = await luaL_checklstring(L, i, null);
+        s = await luaL_checkstring(L, i);
         if (!strncmpi(s, $c.lit("noteleport"), -1)) {
             svl.level.flags.noteleport = (1) & 1;
         } else if (!strncmpi(s, $c.lit("hardfloor"), -1)) {
@@ -3088,18 +3100,18 @@ export async function lspo_level_init(L) {   // sp_lev.c:3837
     let init_lev = new $T.lev_init(), $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11;
     await create_des_coder();
     await lcheck_param_table(L);
-    splev_init_present = 1;
+    splev_init_present = TRUE;
     $t1 = $c.i16(lspo_level_init$initstyles2i[await get_table_option(L, $c.lit("style"), $c.lit("solidfill"), new $c.Ptr(lspo_level_init$initstyles, 0))]), init_lev.init_style = $t1;
     $t2 = await get_table_mapchr_opt(L, $c.lit("fg"), ROOM), init_lev.fg = $t2;
     $t3 = await get_table_mapchr_opt(L, $c.lit("bg"), INVALID_TYPE), init_lev.bg = $t3;
-    $t4 = $c.i8(await get_table_boolean_opt(L, $c.lit("smoothed"), 0)), init_lev.smoothed = $t4;
-    $t5 = $c.i8(await get_table_boolean_opt(L, $c.lit("joined"), 0)), init_lev.joined = $t5;
+    $t4 = $c.i8(await get_table_boolean_opt(L, $c.lit("smoothed"), FALSE)), init_lev.smoothed = $t4;
+    $t5 = $c.i8(await get_table_boolean_opt(L, $c.lit("joined"), FALSE)), init_lev.joined = $t5;
     $t6 = $c.i16(await get_table_boolean_opt(L, $c.lit("lit"), BOOL_RANDOM)), init_lev.lit = $t6;
-    $t7 = $c.i16(await get_table_boolean_opt(L, $c.lit("walled"), 0)), init_lev.walled = $t7;
+    $t7 = $c.i16(await get_table_boolean_opt(L, $c.lit("walled"), FALSE)), init_lev.walled = $t7;
     $t8 = await get_table_mapchr_opt(L, $c.lit("filling"), init_lev.fg), init_lev.filling = $t8;
     $t9 = await get_table_int_opt(L, $c.lit("corrwid"), -1), init_lev.corrwid = $t9;
     $t10 = await get_table_int_opt(L, $c.lit("wallthick"), -1), init_lev.wallthick = $t10;
-    $t11 = $c.i8(!await get_table_boolean_opt(L, $c.lit("deadends"), 1) ? 1 : 0), init_lev.rm_deadends = $t11;
+    $t11 = $c.i8(!await get_table_boolean_opt(L, $c.lit("deadends"), TRUE) ? 1 : 0), init_lev.rm_deadends = $t11;
     gc.coder.lvl_is_joined = init_lev.joined;
     if (init_lev.bg === INVALID_TYPE) {
         init_lev.bg = $c.i8(init_lev.init_style === LVLINIT_SWAMP ? MOAT : STONE);
@@ -3114,8 +3126,8 @@ export async function lspo_engraving(L) {   // sp_lev.c:3881
     x[0] = -1;
     y[0] = -1;
     argc = lua_gettop(L);
-    guardobjs = 0;
-    wipeout = 1;
+    guardobjs = FALSE;
+    wipeout = TRUE;
     await create_des_coder();
     if (argc === 1) {
         await lcheck_param_table(L);
@@ -3124,8 +3136,8 @@ export async function lspo_engraving(L) {   // sp_lev.c:3881
         y[0] = $c.i16(ey[0]);
         etyp = lspo_engraving$engrtypes2i[await get_table_option(L, $c.lit("type"), $c.lit("engrave"), new $c.Ptr(lspo_engraving$engrtypes, 0))];
         txt = await get_table_str(L, $c.lit("text"));
-        wipeout = $c.i8(await get_table_boolean_opt(L, $c.lit("degrade"), 1));
-        guardobjs = $c.i8(await get_table_boolean_opt(L, $c.lit("guardobjects"), 0));
+        wipeout = $c.i8(await get_table_boolean_opt(L, $c.lit("degrade"), TRUE));
+        guardobjs = $c.i8(await get_table_boolean_opt(L, $c.lit("guardobjects"), FALSE));
     } else if (argc === 3) {
         await get_coord(L, 1, new $c.Ptr(ex$2, 0), new $c.Ptr(ey$2, 0));
         x[0] = $c.i16(ex$2[0]);
@@ -3138,7 +3150,7 @@ export async function lspo_engraving(L) {   // sp_lev.c:3881
     if (x[0] === -1 && y[0] === -1) {
         ecoord = SP_COORD_IS_RANDOM | 0;
     } else {
-        ecoord = (x[0] & 255) + ((y[0] & 255) << 16) | 0;
+        ecoord = SP_COORD_PACK(x[0], y[0]);
     }
     await get_location_coord(new $c.Ptr(x, 0), new $c.Ptr(y, 0), DRY, gc.coder.croom, ecoord);
     await make_engr_at(x[0], y[0], txt, null, 0, etyp);
@@ -3162,7 +3174,7 @@ export async function lspo_mineralize(L) {   // sp_lev.c:3939
     gold_prob = await get_table_int_opt(L, $c.lit("gold_prob"), -1);
     kelp_moat = await get_table_int_opt(L, $c.lit("kelp_moat"), -1);
     kelp_pool = await get_table_int_opt(L, $c.lit("kelp_pool"), -1);
-    await mineralize(kelp_pool, kelp_moat, gold_prob, gem_prob, 1);
+    await mineralize(kelp_pool, kelp_moat, gold_prob, gem_prob, TRUE);
     return 0;
 }
 async function get_mkroom_name(rtype) {   // sp_lev.c:3991
@@ -3223,15 +3235,15 @@ export async function lspo_room(L) {   // sp_lev.c:4028
         $t6 = $c.i16(await get_table_int_opt(L, $c.lit("chance"), 100)), tmproom.chance = $t6;
         $t7 = $c.i16(await get_table_int_opt(L, $c.lit("lit"), -1)), tmproom.rlit = $t7;
         $t8 = $c.i16(await get_table_int_opt(L, $c.lit("filled"), gi.in_mk_themerooms ? 0 : 1)), tmproom.needfill = $t8;
-        $t9 = $c.i8(await get_table_boolean_opt(L, $c.lit("joined"), 1)), tmproom.joined = $t9;
+        $t9 = $c.i8(await get_table_boolean_opt(L, $c.lit("joined"), TRUE)), tmproom.joined = $t9;
         if (!gc.coder.failed_room[gc.coder.n_subroom - 1 | 0]) {
             tmpcr = await build_room(tmproom, gc.coder.croom);
             if (tmpcr) {
                 n = gc.coder.n_subroom;
                 gc.coder.tmproomlist[n] = tmpcr;
-                gc.coder.failed_room[n] = 0;
+                gc.coder.failed_room[n] = FALSE;
                 if (gc.coder.tmproomlist[n - 1 | 0]) {
-                    gc.coder.tmproomlist[n - 1 | 0].irregular = 1;
+                    gc.coder.tmproomlist[n - 1 | 0].irregular = TRUE;
                 }
                 gc.coder.n_subroom = gc.coder.n_subroom + 1 | 0;
                 update_croom();
@@ -3248,17 +3260,17 @@ export async function lspo_room(L) {   // sp_lev.c:4028
                 return 0;
             }
             if (gi.in_mk_themerooms) {
-                gt.themeroom_failed = 1;
+                gt.themeroom_failed = TRUE;
             }
         }
     }
     gc.coder.tmproomlist[gc.coder.n_subroom] = null;
-    gc.coder.failed_room[gc.coder.n_subroom] = 1;
+    gc.coder.failed_room[gc.coder.n_subroom] = TRUE;
     gc.coder.n_subroom = gc.coder.n_subroom + 1 | 0;
     update_croom();
     spo_endroom(gc.coder);
     if (gi.in_mk_themerooms) {
-        gt.themeroom_failed = 1;
+        gt.themeroom_failed = TRUE;
     }
     return 0;
 }
@@ -3266,7 +3278,7 @@ function spo_endroom(coder) {   // sp_lev.c:4119
     if (gc.coder.n_subroom > 1) {
         gc.coder.n_subroom = gc.coder.n_subroom - 1 | 0;
         gc.coder.tmproomlist[gc.coder.n_subroom] = null;
-        gc.coder.failed_room[gc.coder.n_subroom] = 1;
+        gc.coder.failed_room[gc.coder.n_subroom] = TRUE;
     } else {
         if (gx.xsize <= 1 && gy.ysize <= 1) {
             reset_xystart_size();
@@ -3310,7 +3322,7 @@ async function l_create_stairway(L, using_ladder) {   // sp_lev.c:4147
         set_ok_location_func(good_stair_loc);
         scoord = SP_COORD_IS_RANDOM | 0;
     } else {
-        scoord = (x[0] & 255) + ((y[0] & 255) << 16) | 0;
+        scoord = SP_COORD_PACK(x[0], y[0]);
     }
     await get_location_coord(new $c.Ptr(x, 0), new $c.Ptr(y, 0), DRY, gc.coder.croom, scoord);
     set_ok_location_func(null);
@@ -3323,12 +3335,12 @@ async function l_create_stairway(L, using_ladder) {   // sp_lev.c:4147
         if (up) {
             dest.dnum = u.uz.dnum;
             dest.dlevel = $c.i16(u.uz.dlevel - 1 | 0);
-            await stairway_add(x[0], y[0], 1, 1, dest);
+            await stairway_add(x[0], y[0], TRUE, TRUE, dest);
             svl.level.locations[x[0]][y[0]].flags = (LA_UP) & 31;
         } else {
             dest$2.dnum = u.uz.dnum;
             dest$2.dlevel = $c.i16(u.uz.dlevel + 1 | 0);
-            await stairway_add(x[0], y[0], 0, 1, dest$2);
+            await stairway_add(x[0], y[0], FALSE, TRUE, dest$2);
             svl.level.locations[x[0]][y[0]].flags = (LA_DOWN) & 31;
         }
     } else {
@@ -3337,10 +3349,10 @@ async function l_create_stairway(L, using_ladder) {   // sp_lev.c:4147
     return 0;
 }
 export async function lspo_stair(L) {   // sp_lev.c:4223
-    return await l_create_stairway(L, 0);
+    return await l_create_stairway(L, FALSE);
 }
 export async function lspo_ladder(L) {   // sp_lev.c:4232
-    return await l_create_stairway(L, 1);
+    return await l_create_stairway(L, TRUE);
 }
 export async function lspo_grave(L) {   // sp_lev.c:4243
     let argc = 0, x = Int16Array.of(0), y = Int16Array.of(0), scoord = 0, ax = [0], ay = [0], txt = null;
@@ -3432,9 +3444,9 @@ export async function lspo_trap(L) {   // sp_lev.c:4397
     let tmptrap = new $T.spltrap(), x = [0], y = [0], argc = 0, trapstr = null, trapstr$2 = null, trapstr$3 = null, lx = [0], ly = [0], lx$2 = [0], ly$2 = [0], $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8;
     argc = lua_gettop(L);
     await create_des_coder();
-    tmptrap.spider_on_web = 1;
-    tmptrap.seen = 0;
-    tmptrap.novictim = 0;
+    tmptrap.spider_on_web = TRUE;
+    tmptrap.seen = FALSE;
+    tmptrap.novictim = FALSE;
     if (argc === 1 && lua_type(L, 1) === LUA_TSTRING) {
         trapstr = await luaL_checklstring(L, 1, null);
         $t1 = $c.i16(get_traptype_byname(trapstr)), tmptrap.type = $t1;
@@ -3453,8 +3465,8 @@ export async function lspo_trap(L) {   // sp_lev.c:4397
         await get_table_xy_or_coord(L, new $c.Ptr(x, 0), new $c.Ptr(y, 0));
         $t4 = $c.i16(await get_table_traptype_opt(L, $c.lit("type"), -1)), tmptrap.type = $t4;
         $t5 = $c.i8(await get_table_boolean_opt(L, $c.lit("spider_on_web"), 1)), tmptrap.spider_on_web = $t5;
-        $t6 = $c.i8(await get_table_boolean_opt(L, $c.lit("seen"), 0)), tmptrap.seen = $t6;
-        $t7 = $c.i8(!await get_table_boolean_opt(L, $c.lit("victim"), 1) ? 1 : 0), tmptrap.novictim = $t7;
+        $t6 = $c.i8(await get_table_boolean_opt(L, $c.lit("seen"), FALSE)), tmptrap.seen = $t6;
+        $t7 = $c.i8(!await get_table_boolean_opt(L, $c.lit("victim"), TRUE) ? 1 : 0), tmptrap.novictim = $t7;
         await lua_getfield(L, -1, $c.lit("launchfrom"));
         if (lua_type(L, -1) === LUA_TTABLE) {
             lx[0] = -1;
@@ -3632,7 +3644,7 @@ export async function lspo_door(L) {   // sp_lev.c:4671
         $t2 = $c.i16(lspo_door$walldirs2i[await get_table_option(L, $c.lit("wall"), $c.lit("all"), new $c.Ptr(lspo_door$walldirs, 0))]), tmpd.wall = $t2;
         await create_door(tmpd, gc.coder.croom);
     } else {
-        await get_location_coord(new $c.Ptr(x, 0), new $c.Ptr(y, 0), ANY_LOC, gc.coder.croom, (x[0] & 255) + ((y[0] & 255) << 16) | 0);
+        await get_location_coord(new $c.Ptr(x, 0), new $c.Ptr(y, 0), ANY_LOC, gc.coder.croom, SP_COORD_PACK(x[0], y[0]));
         if (!isok(x[0], y[0])) {
             await nhl_error(L, $c.lit("door coord not ok"));
             return 0;
@@ -3689,7 +3701,7 @@ export async function nhl_abs_coord(L) {   // sp_lev.c:4811
         x[0] = $c.i16(await get_table_int(L, $c.lit("x")));
         y[0] = $c.i16(await get_table_int(L, $c.lit("y")));
         cvt_to_abscoord(new $c.Ptr(x, 0), new $c.Ptr(y, 0));
-        await lua_createtable(L, 0, 0);
+        await lua_newtable(L);
         await nhl_add_table_entry_int(L, $c.lit("x"), x[0]);
         await nhl_add_table_entry_int(L, $c.lit("y"), y[0]);
         return 1;
@@ -3701,7 +3713,7 @@ export async function nhl_abs_coord(L) {   // sp_lev.c:4811
 export async function lspo_feature(L) {   // sp_lev.c:4844
     let x = Int16Array.of(0), y = Int16Array.of(0), typ = Int32Array.of(0), argc = 0, can_have_flags = 0, fcoord = 0, humidity = 0, fx = [0], fy = [0], fx$2 = [0], fy$2 = [0];
     argc = lua_gettop(L);
-    can_have_flags = 0;
+    can_have_flags = FALSE;
     await create_des_coder();
     if (argc === 1 && lua_type(L, 1) === LUA_TSTRING) {
         typ[0] = lspo_feature$features2i[await luaL_checkoption(L, 1, null, new $c.Ptr(lspo_feature$features, 0))];
@@ -3720,13 +3732,13 @@ export async function lspo_feature(L) {   // sp_lev.c:4844
         await get_table_xy_or_coord(L, new $c.Ptr(fx$2, 0), new $c.Ptr(fy$2, 0));
         x[0] = $c.i16(fx$2[0]), y[0] = $c.i16(fy$2[0]);
         typ[0] = lspo_feature$features2i[await get_table_option(L, $c.lit("type"), null, new $c.Ptr(lspo_feature$features, 0))];
-        can_have_flags = 1;
+        can_have_flags = TRUE;
     }
     if (x[0] === -1 && y[0] === -1) {
         fcoord = SP_COORD_IS_RANDOM | 0;
         humidity = DRY;
     } else {
-        fcoord = (x[0] & 255) + ((y[0] & 255) << 16) | 0;
+        fcoord = SP_COORD_PACK(x[0], y[0]);
         humidity = ANY_LOC;
     }
     await get_location_coord(new $c.Ptr(x, 0), new $c.Ptr(y, 0), humidity, gc.coder.croom, fcoord);
@@ -3835,7 +3847,7 @@ export async function lspo_terrain(L) {   // sp_lev.c:4978
     if (sel) {
         await selection_iterate(sel, sel_set_ter, tmpterrain);
     } else {
-        await get_location_coord(new $c.Ptr(x, 0), new $c.Ptr(y, 0), ANY_LOC, gc.coder.croom, (x[0] & 255) + ((y[0] & 255) << 16) | 0);
+        await get_location_coord(new $c.Ptr(x, 0), new $c.Ptr(y, 0), ANY_LOC, gc.coder.croom, SP_COORD_PACK(x[0], y[0]));
         if (!isok(x[0], y[0])) {
             await nhl_error(L, $c.lit("terrain coord not ok"));
             return 0;
@@ -3848,7 +3860,7 @@ export async function lspo_replace_terrain(L) {   // sp_lev.c:5051
     let totyp = 0, fromtyp = 0, mf = [null], sel = null, freesel = 0, x = 0, y = 0, x1 = [0], y1 = [0], x2 = [0], y2 = [0], chance = 0, tolit = 0, rect = new $T.nhrect(), err = null, tmpstr = null, rx1 = Int16Array.of(0), ry1 = Int16Array.of(0), rx2 = Int16Array.of(0), ry2 = Int16Array.of(0);
     mf[0] = null;
     sel = null;
-    freesel = 0;
+    freesel = FALSE;
     rect.$copyFrom(cg.zeroNhRect);
     await create_des_coder();
     await lcheck_param_table(L);
@@ -3872,7 +3884,7 @@ export async function lspo_replace_terrain(L) {   // sp_lev.c:5051
     x2[0] = await get_table_int_opt(L, $c.lit("x2"), -1);
     y2[0] = await get_table_int_opt(L, $c.lit("y2"), -1);
     if (x1[0] === -1 && y1[0] === -1 && x2[0] === -1 && y2[0] === -1) {
-        await get_table_region(L, $c.lit("region"), new $c.Ptr(x1, 0), new $c.Ptr(y1, 0), new $c.Ptr(x2, 0), new $c.Ptr(y2, 0), 1);
+        await get_table_region(L, $c.lit("region"), new $c.Ptr(x1, 0), new $c.Ptr(y1, 0), new $c.Ptr(x2, 0), new $c.Ptr(y2, 0), TRUE);
     }
     if (x1[0] === -1 && y1[0] === -1 && x2[0] === -1 && y2[0] === -1) {
         await lua_getfield(L, 1, $c.lit("selection"));
@@ -3883,7 +3895,7 @@ export async function lspo_replace_terrain(L) {   // sp_lev.c:5051
     }
     if (!sel) {
         sel = await selection_new();
-        freesel = 1;
+        freesel = TRUE;
         if (x1[0] === -1 && y1[0] === -1 && x2[0] === -1 && y2[0] === -1) {
             selection_clear(sel, 1);
         } else {
@@ -3914,7 +3926,7 @@ export async function lspo_replace_terrain(L) {   // sp_lev.c:5051
         }
     }
     if (freesel) {
-        selection_free(sel, 1);
+        selection_free(sel, TRUE);
     }
     mapfrag_free(new $c.Ptr(mf, 0));
     return 0;
@@ -3922,11 +3934,11 @@ export async function lspo_replace_terrain(L) {   // sp_lev.c:5051
 async function generate_way_out_method(nx, ny, ov) {   // sp_lev.c:5146
     let ov2 = null, ov3 = null, x = Int16Array.of(0), y = Int16Array.of(0), res = 0;
     ov2 = await selection_new();
-    res = 1;
-    await selection_floodfill(ov2, nx, ny, 1);
+    res = TRUE;
+    await selection_floodfill(ov2, nx, ny, TRUE);
     ov3 = await selection_clone(ov2);
     gotitdone$: {
-        while (selection_rndcoord(ov3, new $c.Ptr(x, 0), new $c.Ptr(y, 0), 1)) {
+        while (selection_rndcoord(ov3, new $c.Ptr(x, 0), new $c.Ptr(y, 0), TRUE)) {
             if (isok($c.i16(x[0] + 1 | 0), y[0]) && !selection_getpoint($c.i16(x[0] + 1 | 0), y[0], ov) && (svl.level.locations[x[0] + 1 | 0][y[0]].typ && svl.level.locations[x[0] + 1 | 0][y[0]].typ <= DBWALL) && isok($c.i16(x[0] + 2 | 0), y[0]) && selection_getpoint($c.i16(x[0] + 2 | 0), y[0], ov) && svl.level.locations[x[0] + 2 | 0][y[0]].typ >= DOOR) {
                 svl.level.locations[x[0] + 1 | 0][y[0]].typ = SDOOR;
                 break gotitdone$;
@@ -3945,60 +3957,60 @@ async function generate_way_out_method(nx, ny, ov) {   // sp_lev.c:5146
             }
         }
         if (Can_fall_thru(u.uz)) {
-            selection_free(ov3, 1);
+            selection_free(ov3, TRUE);
             ov3 = await selection_clone(ov2);
-            while (selection_rndcoord(ov3, new $c.Ptr(x, 0), new $c.Ptr(y, 0), 1)) {
+            while (selection_rndcoord(ov3, new $c.Ptr(x, 0), new $c.Ptr(y, 0), TRUE)) {
                 if (await maketrap(x[0], y[0], rn2(2) ? HOLE : TRAPDOOR)) {
                     break gotitdone$;
                 }
             }
         }
-        if (selection_rndcoord(ov2, new $c.Ptr(x, 0), new $c.Ptr(y, 0), 0)) {
-            await mksobj_at(generate_way_out_method$escapeitems[rn2(6)], x[0], y[0], 1, 0);
+        if (selection_rndcoord(ov2, new $c.Ptr(x, 0), new $c.Ptr(y, 0), FALSE)) {
+            await mksobj_at(generate_way_out_method$escapeitems[rn2(6)], x[0], y[0], TRUE, FALSE);
             break gotitdone$;
         }
-        res = 0;
+        res = FALSE;
     }
-    selection_free(ov2, 1);
-    selection_free(ov3, 1);
+    selection_free(ov2, TRUE);
+    selection_free(ov3, TRUE);
     return res;
 }
 async function ensure_way_out() {   // sp_lev.c:5217
     let ov = null, ttmp = null, x = 0, y = 0, ret = 0, stway = null;
     ov = await selection_new();
     ttmp = gf.ftrap;
-    ret = 1;
+    ret = TRUE;
     stway = gs.stairs;
     set_selection_floodfillchk(floodfillchk_match_accessible);
     while (stway) {
         if (stway.tolev.dnum === u.uz.dnum) {
-            await selection_floodfill(ov, stway.sx, stway.sy, 1);
+            await selection_floodfill(ov, stway.sx, stway.sy, TRUE);
         }
         stway = stway.next;
     }
     while (ttmp) {
-        if (((ttmp.ttyp | 0) === MAGIC_PORTAL || (ttmp.ttyp | 0) === VIBRATING_SQUARE || ((ttmp.ttyp | 0) === HOLE || (ttmp.ttyp | 0) === TRAPDOOR)) && !selection_getpoint(ttmp.tx, ttmp.ty, ov)) {
-            await selection_floodfill(ov, ttmp.tx, ttmp.ty, 1);
+        if ((undestroyable_trap(ttmp.ttyp) || is_hole(ttmp.ttyp)) && !selection_getpoint(ttmp.tx, ttmp.ty, ov)) {
+            await selection_floodfill(ov, ttmp.tx, ttmp.ty, TRUE);
         }
         ttmp = ttmp.ntrap;
     }
     do {
-        ret = 1;
+        ret = TRUE;
         outhere$: {
             for (x = 1; x < COLNO; x = $c.i16(x + 1)) {
                 for (y = 0; y < ROWNO; y = $c.i16(y + 1)) {
                     if (svl.level.locations[x][y].typ >= DOOR && !selection_getpoint(x, y, ov)) {
                         if (await generate_way_out_method(x, y, ov)) {
-                            await selection_floodfill(ov, x, y, 1);
+                            await selection_floodfill(ov, x, y, TRUE);
                         }
-                        ret = 0;
+                        ret = FALSE;
                         break outhere$;
                     }
                 }
             }
         }
     } while (!ret);
-    selection_free(ov, 1);
+    selection_free(ov, TRUE);
 }
 async function get_table_intarray_entry(L, tableidx, entrynum) {   // sp_lev.c:5260
     let ret = 0, buf = new Int8Array(256);
@@ -4042,14 +4054,14 @@ async function get_table_region(L, name, x1, y1, x2, y2, optional) {   // sp_lev
 }
 export async function get_coord(L, i, x, y) {   // sp_lev.c:5319
     let ret = 0, ltyp = 0, arrlen = 0, gotx = 0, $t1, $t2, $t3, $t4;
-    ret = 0;
+    ret = FALSE;
     ltyp = lua_type(L, i);
     if (ltyp === LUA_TTABLE) {
-        gotx = 0;
+        gotx = FALSE;
         await lua_getfield(L, i, $c.lit("x"));
         if (!(lua_type(L, -1) === LUA_TNIL)) {
             $t1 = await luaL_checkinteger(L, -1), x.set(0, $t1);
-            gotx = 1;
+            gotx = TRUE;
         }
         await lua_settop(L, -2);
         if (gotx) {
@@ -4057,10 +4069,10 @@ export async function get_coord(L, i, x, y) {   // sp_lev.c:5319
             if (!(lua_type(L, -1) === LUA_TNIL)) {
                 $t2 = await luaL_checkinteger(L, -1), y.set(0, $t2);
                 await lua_settop(L, -2);
-                ret = 1;
+                ret = TRUE;
             } else {
                 await nhl_error(L, $c.lit("Not a coordinate"));
-                return 0;
+                return FALSE;
             }
         } else {
             await lua_len(L, i);
@@ -4068,11 +4080,11 @@ export async function get_coord(L, i, x, y) {   // sp_lev.c:5319
             await lua_settop(L, -2);
             if (arrlen !== 2) {
                 await nhl_error(L, $c.lit("Not a coordinate"));
-                return 0;
+                return FALSE;
             }
             $t3 = await get_table_intarray_entry(L, i, 1), x.set(0, $t3);
             $t4 = await get_table_intarray_entry(L, i, 2), y.set(0, $t4);
-            return 1;
+            return TRUE;
         }
     } else if (ltyp !== LUA_TNIL) {
         await nhl_error(L, $c.lit("non-table coord specified"));
@@ -4107,13 +4119,13 @@ async function levregion_add(lregion) {   // sp_lev.c:5371
 }
 async function l_get_lregion(L, tmplregion) {   // sp_lev.c:5410
     let x1 = [0], y1 = [0], x2 = [0], y2 = [0], $t1, $t2;
-    await get_table_region(L, $c.lit("region"), new $c.Ptr(x1, 0), new $c.Ptr(y1, 0), new $c.Ptr(x2, 0), new $c.Ptr(y2, 0), 0);
+    await get_table_region(L, $c.lit("region"), new $c.Ptr(x1, 0), new $c.Ptr(y1, 0), new $c.Ptr(x2, 0), new $c.Ptr(y2, 0), FALSE);
     tmplregion.inarea.x1 = $c.i16(x1[0]);
     tmplregion.inarea.y1 = $c.i16(y1[0]);
     tmplregion.inarea.x2 = $c.i16(x2[0]);
     tmplregion.inarea.y2 = $c.i16(y2[0]);
     x1[0] = y1[0] = x2[0] = y2[0] = -1;
-    await get_table_region(L, $c.lit("exclude"), new $c.Ptr(x1, 0), new $c.Ptr(y1, 0), new $c.Ptr(x2, 0), new $c.Ptr(y2, 0), 1);
+    await get_table_region(L, $c.lit("exclude"), new $c.Ptr(x1, 0), new $c.Ptr(y1, 0), new $c.Ptr(x2, 0), new $c.Ptr(y2, 0), TRUE);
     tmplregion.delarea.x1 = $c.i16(x1[0]);
     tmplregion.delarea.y1 = $c.i16(y1[0]);
     tmplregion.delarea.x2 = $c.i16(x2[0]);
@@ -4121,7 +4133,7 @@ async function l_get_lregion(L, tmplregion) {   // sp_lev.c:5410
     $t1 = $c.i8(await get_table_boolean_opt(L, $c.lit("region_islev"), 0)), tmplregion.in_islev = $t1;
     $t2 = $c.i8(await get_table_boolean_opt(L, $c.lit("exclude_islev"), 0)), tmplregion.del_islev = $t2;
     if (x1[0] < 0) {
-        tmplregion.del_islev = 1;
+        tmplregion.del_islev = TRUE;
     }
 }
 export async function lspo_teleport_region(L) {   // sp_lev.c:5443
@@ -4152,11 +4164,11 @@ export async function lspo_exclusion(L) {   // sp_lev.c:5498
     await create_des_coder();
     await lcheck_param_table(L);
     $t1 = $c.i16(lspo_exclusion$ez_types2i[await get_table_option(L, $c.lit("type"), $c.lit("teleport"), new $c.Ptr(lspo_exclusion$ez_types, 0))]), ez.zonetype = $t1;
-    await get_table_region(L, $c.lit("region"), new $c.Ptr(x1, 0), new $c.Ptr(y1, 0), new $c.Ptr(x2, 0), new $c.Ptr(y2, 0), 0);
+    await get_table_region(L, $c.lit("region"), new $c.Ptr(x1, 0), new $c.Ptr(y1, 0), new $c.Ptr(x2, 0), new $c.Ptr(y2, 0), FALSE);
     a1[0] = $c.i16(x1[0]), b1[0] = $c.i16(y1[0]);
     a2[0] = $c.i16(x2[0]), b2[0] = $c.i16(y2[0]);
-    await get_location_coord(new $c.Ptr(a1, 0), new $c.Ptr(b1, 0), ANY_LOC | NO_LOC_WARN, gc.coder.croom, (a1[0] & 255) + ((b1[0] & 255) << 16) | 0);
-    await get_location_coord(new $c.Ptr(a2, 0), new $c.Ptr(b2, 0), ANY_LOC | NO_LOC_WARN, gc.coder.croom, (a2[0] & 255) + ((b2[0] & 255) << 16) | 0);
+    await get_location_coord(new $c.Ptr(a1, 0), new $c.Ptr(b1, 0), ANY_LOC | NO_LOC_WARN, gc.coder.croom, SP_COORD_PACK(a1[0], b1[0]));
+    await get_location_coord(new $c.Ptr(a2, 0), new $c.Ptr(b2, 0), ANY_LOC | NO_LOC_WARN, gc.coder.croom, SP_COORD_PACK(a2[0], b2[0]));
     ez.lx = a1[0];
     ez.ly = b1[0];
     ez.hx = a2[0];
@@ -4190,7 +4202,7 @@ async function get_table_coords_or_region(L, dx1, dy1, dx2, dy2) {   // sp_lev.c
     $t3 = $c.i16(await get_table_int_opt(L, $c.lit("x2"), -1)), dx2.set(0, $t3);
     $t4 = $c.i16(await get_table_int_opt(L, $c.lit("y2"), -1)), dy2.set(0, $t4);
     if (dx1.get(0) === -1 && dy1.get(0) === -1 && dx2.get(0) === -1 && dy2.get(0) === -1) {
-        await get_table_region(L, $c.lit("region"), new $c.Ptr(rx1, 0), new $c.Ptr(ry1, 0), new $c.Ptr(rx2, 0), new $c.Ptr(ry2, 0), 0);
+        await get_table_region(L, $c.lit("region"), new $c.Ptr(rx1, 0), new $c.Ptr(ry1, 0), new $c.Ptr(rx2, 0), new $c.Ptr(ry2, 0), FALSE);
         dx1.set(0, $c.i16(rx1[0]));
         dy1.set(0, $c.i16(ry1[0]));
         dx2.set(0, $c.i16(rx2[0]));
@@ -4199,9 +4211,9 @@ async function get_table_coords_or_region(L, dx1, dy1, dx2, dy2) {   // sp_lev.c
 }
 export async function lspo_region(L) {   // sp_lev.c:5584
     let dx1 = Int16Array.of(0), dy1 = Int16Array.of(0), dx2 = Int16Array.of(0), dy2 = Int16Array.of(0), troom = null, do_arrival_room = 0, room_not_needed = 0, irregular = 0, joined = 0, rtype = 0, rlit = Int32Array.of(0), needfill = 0, argc = 0, orig = null, sel = null, tmpregion = new $T.region(), $t1, $t2;
-    do_arrival_room = 0;
-    irregular = 0;
-    joined = 1;
+    do_arrival_room = FALSE;
+    irregular = FALSE;
+    joined = TRUE;
     rtype = OROOM;
     rlit[0] = 1;
     needfill = 0;
@@ -4211,7 +4223,7 @@ export async function lspo_region(L) {   // sp_lev.c:5584
         await lcheck_param_table(L);
         needfill = await get_table_int_opt(L, $c.lit("filled"), 0);
         irregular = $c.i8(await get_table_boolean_opt(L, $c.lit("irregular"), 0));
-        joined = $c.i8(await get_table_boolean_opt(L, $c.lit("joined"), 1));
+        joined = $c.i8(await get_table_boolean_opt(L, $c.lit("joined"), TRUE));
         do_arrival_room = $c.i8(await get_table_boolean_opt(L, $c.lit("arrival_room"), 0));
         rtype = await get_table_roomtype_opt(L, $c.lit("type"), OROOM);
         rlit[0] = await get_table_int_opt(L, $c.lit("lit"), -1);
@@ -4224,10 +4236,10 @@ export async function lspo_region(L) {   // sp_lev.c:5584
         sel = await selection_clone(orig);
         rlit[0] = await luaL_checkoption(L, 2, $c.lit("lit"), new $c.Ptr(lspo_region$lits, 0));
         if (rlit[0]) {
-            await selection_do_grow(sel, W_NORTH | W_SOUTH | W_EAST | W_WEST);
+            await selection_do_grow(sel, W_ANY);
         }
         await selection_iterate(sel, sel_set_lit, new $c.Ptr(rlit, 0));
-        selection_free(sel, 1);
+        selection_free(sel, TRUE);
         return 0;
     } else {
         await nhl_error(L, $c.lit("Wrong parameters"));
@@ -4256,12 +4268,12 @@ export async function lspo_region(L) {   // sp_lev.c:5584
         $t1 = gm.max_rx = dx1[0], gm.min_rx = $t1;
         $t2 = gm.max_ry = dy1[0], gm.min_ry = $t2;
         gs.smeq[svn.nroom] = svn.nroom;
-        flood_fill_rm(dx1[0], dy1[0], svn.nroom + 3 | 0, $c.i8(rlit[0]), 1);
-        await add_room(gm.min_rx, gm.min_ry, gm.max_rx, gm.max_ry, 0, $c.i8(rtype), 1);
+        flood_fill_rm(dx1[0], dy1[0], svn.nroom + ROOMOFFSET | 0, $c.i8(rlit[0]), TRUE);
+        await add_room(gm.min_rx, gm.min_ry, gm.max_rx, gm.max_ry, FALSE, $c.i8(rtype), TRUE);
         troom.rlit = $c.i8(rlit[0]);
-        troom.irregular = 1;
+        troom.irregular = TRUE;
     } else {
-        await add_room(dx1[0], dy1[0], dx2[0], dy2[0], $c.i8(rlit[0]), $c.i8(rtype), 1);
+        await add_room(dx1[0], dy1[0], dx2[0], dy2[0], $c.i8(rlit[0]), $c.i8(rtype), TRUE);
         topologize(troom);
     }
     if (!room_not_needed) {
@@ -4269,7 +4281,7 @@ export async function lspo_region(L) {   // sp_lev.c:5584
             await impossible($c.lit("region as subroom"));
         } else {
             gc.coder.tmproomlist[gc.coder.n_subroom] = troom;
-            gc.coder.failed_room[gc.coder.n_subroom] = 0;
+            gc.coder.failed_room[gc.coder.n_subroom] = FALSE;
             gc.coder.n_subroom = gc.coder.n_subroom + 1 | 0;
             update_croom();
             await lua_getfield(L, 1, $c.lit("contents"));
@@ -4304,7 +4316,7 @@ export async function lspo_drawbridge(L) {   // sp_lev.c:5720
     if (db_open === -1) {
         db_open = !rn2(2) ? 1 : 0;
     }
-    if (!await create_drawbridge(x[0], y[0], dir, $c.i8(db_open ? 1 : 0))) {
+    if (!await create_drawbridge(x[0], y[0], dir, $c.i8(db_open ? TRUE : FALSE))) {
         await impossible($c.lit("Cannot create drawbridge."));
     }
     SpLev_Map[x[0]][y[0]] = 1;
@@ -4415,20 +4427,20 @@ async function set_wallprop_in_selection(L, prop$in) {   // sp_lev.c:5911
     const prop = Int32Array.of(prop$in);
     let argc = 0, freesel = 0, sel = null;
     argc = lua_gettop(L);
-    freesel = 0;
+    freesel = FALSE;
     sel = null;
     await create_des_coder();
     if (argc === 1) {
         sel = await l_selection_check(L, -1);
     } else if (argc === 0) {
-        freesel = 1;
+        freesel = TRUE;
         sel = await selection_new();
         selection_clear(sel, 1);
     }
     if (sel) {
         await selection_iterate(sel, sel_set_wall_property, new $c.Ptr(prop, 0));
         if (freesel) {
-            selection_free(sel, 1);
+            selection_free(sel, TRUE);
         }
     }
 }
@@ -4459,7 +4471,7 @@ export async function lspo_wallify(L) {   // sp_lev.c:5965
 export async function lspo_reset_level(L) {   // sp_lev.c:5993
     let wtower = 0;
     wtower = await In_W_tower(u.ux, u.uy, u.uz);
-    iflags.lua_testing = 1;
+    iflags.lua_testing = TRUE;
     if (L) {
         if (gc.coder) {
             do {
@@ -4471,8 +4483,8 @@ export async function lspo_reset_level(L) {   // sp_lev.c:5993
         }
         await create_des_coder();
     }
-    await makemap_prepost(1, wtower);
-    gi.in_mklev = 1;
+    await makemap_prepost(TRUE, wtower);
+    gi.in_mklev = TRUE;
     await oinit();
     await clear_level_structures();
     return 0;
@@ -4493,7 +4505,7 @@ export async function lspo_finalize_level(L) {   // sp_lev.c:6014
         await wallification(1, 0, COLNO - 1, ROWNO - 1);
     }
     if (L) {
-        await flip_level_rnd(gc.coder.allow_flips, 0);
+        await flip_level_rnd(gc.coder.allow_flips, FALSE);
     }
     count_level_features();
     if (L && gc.coder.solidify) {
@@ -4507,8 +4519,8 @@ export async function lspo_finalize_level(L) {   // sp_lev.c:6014
     for (i = 0; i < svn.nroom; i = i + 1 | 0) {
         await fill_special_room($c.relem(svr.rooms, i));
     }
-    await makemap_prepost(0, wtower);
-    iflags.lua_testing = 0;
+    await makemap_prepost(FALSE, wtower);
+    iflags.lua_testing = FALSE;
     return 0;
 }
 export async function lspo_map(L) {   // sp_lev.c:6075
@@ -4516,9 +4528,9 @@ export async function lspo_map(L) {   // sp_lev.c:6075
     x[0] = -1;
     y[0] = -1;
     argc = lua_gettop(L);
-    has_contents = 0;
+    has_contents = FALSE;
     tryct = 0;
-    lit = 0;
+    lit = FALSE;
     await create_des_coder();
     if (gi.in_mk_themerooms && gt.themeroom_failed) {
         return 0;
@@ -4534,11 +4546,11 @@ export async function lspo_map(L) {   // sp_lev.c:6075
         tb = lspo_map$t_or_b2i[await get_table_option(L, $c.lit("valign"), $c.lit("none"), new $c.Ptr(lspo_map$top_or_bot, 0))];
         await get_table_xy_or_coord(L, new $c.Ptr(x, 0), new $c.Ptr(y, 0));
         tmpstr = await get_table_str(L, $c.lit("map"));
-        lit = $c.i8(await get_table_boolean_opt(L, $c.lit("lit"), 0));
+        lit = $c.i8(await get_table_boolean_opt(L, $c.lit("lit"), FALSE));
         await lua_getfield(L, 1, $c.lit("contents"));
         if (lua_type(L, -1) === LUA_TFUNCTION) {
             lua_rotate(L, -2, -1), await lua_settop(L, -2);
-            has_contents = 1;
+            has_contents = TRUE;
         } else {
             await lua_settop(L, -2);
         }
@@ -4582,8 +4594,8 @@ export async function lspo_map(L) {   // sp_lev.c:6075
                 if (gc.coder.croom) {
                     gx.xstart = $c.i16($c.add64(x[0], gc.coder.croom.lx));
                     gy.ystart = $c.i16($c.add64(y[0], gc.coder.croom.ly));
-                    gx.xsize = $c.i16(mf[0].wid < (gc.coder.croom.hx - gc.coder.croom.lx | 0) ? mf[0].wid : gc.coder.croom.hx - gc.coder.croom.lx | 0);
-                    gy.ysize = $c.i16(mf[0].hei < (gc.coder.croom.hy - gc.coder.croom.ly | 0) ? mf[0].hei : gc.coder.croom.hy - gc.coder.croom.ly | 0);
+                    gx.xsize = $c.i16(min(mf[0].wid, gc.coder.croom.hx - gc.coder.croom.lx | 0));
+                    gy.ysize = $c.i16(min(mf[0].hei, gc.coder.croom.hy - gc.coder.croom.ly | 0));
                 } else {
                     gx.xsize = $c.i16(mf[0].wid);
                     gy.ysize = $c.i16(mf[0].hei);
@@ -4593,7 +4605,7 @@ export async function lspo_map(L) {   // sp_lev.c:6075
             } else {
                 mapfrag_free(new $c.Ptr(mf, 0));
                 await nhl_error(L, $c.lit("Map requires either x,y or halign,valign params"));
-                selection_free(sel, 1);
+                selection_free(sel, TRUE);
                 return 0;
             }
         } else {
@@ -4635,7 +4647,7 @@ export async function lspo_map(L) {   // sp_lev.c:6075
         skipmap$: {
             if (gy.ystart < 0 || (gy.ystart + gy.ysize | 0) > ROWNO) {
                 if (gi.in_mk_themerooms) {
-                    gt.themeroom_failed = 1;
+                    gt.themeroom_failed = TRUE;
                     break skipmap$;
                 }
                 gy.ystart = $c.i16(gy.ystart + (gy.ystart > 0 ? -2 : 2) | 0);
@@ -4650,14 +4662,14 @@ export async function lspo_map(L) {   // sp_lev.c:6075
                 reset_xystart_size();
             } else {
                 if (gi.in_mk_themerooms) {
-                    isokp = 1;
+                    isokp = TRUE;
                     for (y[0] = gy.ystart - 1 | 0; y[0] < ((21 < (gy.ystart + gy.ysize | 0) ? 21 : gy.ystart + gy.ysize | 0) + 1 | 0); y[0] = $c.add64(y[0], 1)) {
                         for (x[0] = gx.xstart - 1 | 0; x[0] < ((80 < (gx.xstart + gx.xsize | 0) ? 80 : gx.xstart + gx.xsize | 0) + 1 | 0); x[0] = $c.add64(x[0], 1)) {
                             if (!isok($c.i16(x[0]), $c.i16(y[0]))) {
-                                isokp = 0;
+                                isokp = FALSE;
                             } else if (y[0] < gy.ystart || y[0] >= (gy.ystart + gy.ysize | 0) || x[0] < gx.xstart || x[0] >= (gx.xstart + gx.xsize | 0)) {
                                 if (svl.level.locations[$c.idx(x[0])][$c.idx(y[0])].typ !== STONE || (svl.level.locations[$c.idx(x[0])][$c.idx(y[0])].roomno | 0) !== NO_ROOM) {
-                                    isokp = 0;
+                                    isokp = FALSE;
                                 }
                             } else {
                                 mptyp = $c.i16(await mapfrag_get(mf[0], $c.i32($c.sub64(x[0], gx.xstart)), $c.i32($c.sub64(y[0], gy.ystart))));
@@ -4665,14 +4677,14 @@ export async function lspo_map(L) {   // sp_lev.c:6075
                                     continue;
                                 }
                                 if (svl.level.locations[$c.idx(x[0])][$c.idx(y[0])].typ !== STONE && svl.level.locations[$c.idx(x[0])][$c.idx(y[0])].typ !== mptyp || (svl.level.locations[$c.idx(x[0])][$c.idx(y[0])].roomno | 0) !== NO_ROOM) {
-                                    isokp = 0;
+                                    isokp = FALSE;
                                 }
                             }
                             if (!isokp) {
                                 if (($t1 = tryct, tryct = $t1 + 1 | 0, $t1) < 100 && (lr === -1 || tb === -1)) {
                                     continue redo_maploc$;
                                 }
-                                gt.themeroom_failed = 1;
+                                gt.themeroom_failed = TRUE;
                                 break skipmap$;
                             }
                         }
@@ -4711,7 +4723,7 @@ export async function lspo_map(L) {   // sp_lev.c:6075
         reset_xystart_size();
     }
     await l_selection_push_copy(L, sel);
-    selection_free(sel, 1);
+    selection_free(sel, TRUE);
     return 1;
 }
 export function update_croom() {   // sp_lev.c:6324
@@ -4727,19 +4739,19 @@ export function update_croom() {   // sp_lev.c:6324
 async function sp_level_coder_init() {   // sp_lev.c:6336
     let tmpi = 0, coder = null, $t1;
     coder = $c.asRec(await alloc(96), $T.sp_coder, 96);
-    coder.premapped = 0;
-    coder.solidify = 0;
-    coder.check_inaccessibles = 0;
+    coder.premapped = FALSE;
+    coder.solidify = FALSE;
+    coder.check_inaccessibles = FALSE;
     coder.allow_flips = 3;
     coder.croom = null;
     coder.n_subroom = 1;
-    coder.lvl_is_joined = 0;
+    coder.lvl_is_joined = FALSE;
     coder.room_stack = 0;
-    splev_init_present = 0;
-    icedpools = 0;
+    splev_init_present = FALSE;
+    icedpools = FALSE;
     for (tmpi = 0; tmpi <= MAX_NESTED_ROOMS; tmpi = tmpi + 1 | 0) {
         coder.tmproomlist[tmpi] = null;
-        coder.failed_room[tmpi] = 0;
+        coder.failed_room[tmpi] = FALSE;
     }
     update_croom();
     for (tmpi = 0; tmpi < MAX_CONTAINMENT; tmpi = tmpi + 1 | 0) {
@@ -4756,7 +4768,7 @@ async function sp_level_coder_init() {   // sp_lev.c:6336
     return coder;
 }
 export async function l_register_des(L) {   // sp_lev.c:6435
-    await lua_createtable(L, 0, 0);
+    await lua_newtable(L);
     await luaL_setfuncs(L, $c.relem(nhl_functions, 0), 0);
     await lua_setglobal(L, $c.lit("des"));
 }
@@ -4768,7 +4780,7 @@ export async function create_des_coder() {   // sp_lev.c:6444
 }
 export async function load_special(name) {   // sp_lev.c:6454
     let result = 0, sbi = new $T.nhl_sandbox_info();
-    result = 0;
+    result = FALSE;
     sbi.$copyFrom(new $T.nhl_sandbox_info());
     sbi.flags = NHL_SB_SAFE;
     sbi.memlimit = 1048576;
@@ -4788,7 +4800,7 @@ export async function load_special(name) {   // sp_lev.c:6454
         if (!svl.level.flags.corrmaze) {
             await wallification(1, 0, COLNO - 1, ROWNO - 1);
         }
-        await flip_level_rnd(gc.coder.allow_flips, 0);
+        await flip_level_rnd(gc.coder.allow_flips, FALSE);
         count_level_features();
         if (gc.coder.solidify) {
             solidify_map();
@@ -4797,7 +4809,7 @@ export async function load_special(name) {   // sp_lev.c:6454
         if (gc.coder.premapped) {
             await premap_detect();
         }
-        result = 1;
+        result = TRUE;
     }
     do {
         if (gc.coder) {

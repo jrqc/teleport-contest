@@ -6,6 +6,7 @@ import { alloc, dupstr } from './alloc.js';
 import { sanitize_name } from './bones.js';
 import { all_options_statushilites, bot, check_gold_symbol, clear_status_hilites, cond_menu, condopt, condtests, count_status_hilites, opt_next_cond, parse_cond_option, parse_status_hl1, reset_status_hilites, status_hilite_menu, status_initialize } from './botl.js';
 import { CONDITION_COUNT } from './botl.h.js';
+import { VIA_WINDOWPORT } from './botl.macros.js';
 import { yyyymmddhhmmss } from './calendar.js';
 import { assure_syscf_file, config_error_add, config_error_done, config_error_init, config_unmatched_ignored, get_configfile, rcfile, read_config_file } from './cfgfiles.js';
 import { all_options_autocomplete, bind_key, bind_mousebtn, bind_specialkey, cmd_from_func, cmdname_from_func, count_autocompletions, count_bind_keys, do_reqmenu, get_changed_key_binds, handler_change_autocompletions, handler_rebind_keys, reset_commands, update_rest_on_space } from './cmd.js';
@@ -13,6 +14,7 @@ import { NO_COLOR } from './color.h.js';
 import { add_menu_coloring_parsed, attr2attrname, check_enhanced_colors, clr2colorname, color_attr_parse_str, color_attr_to_str, count_menucolors, free_one_menu_coloring, match_str2attr, query_attr, query_color, query_color_attr, wc_color_name } from './coloratt.js';
 import { nomakedefs } from './date.js';
 import { a11y, cg, disclosure_options, disp, flags, ga, gc, gd, gf, gh, gm, gn, go, gp, gs, gt, gv, gw, hexdd, iflags, program_state, svb, svc, svd, svp, u } from './decl.js';
+import { AE, AS } from './decl.macros.js';
 import { AMULET_CLASS, ARMOR_CLASS, BALL_CLASS, CHAIN_CLASS, COIN_CLASS, FOOD_CLASS, GEM_CLASS, GOLD_SYM, POTION_CLASS, RING_CLASS, ROCK_CLASS, SCROLL_CLASS, SPBOOK_CLASS, S_expl_br, S_stone, S_vbeam, S_water, TOOL_CLASS, VENOM_SYM, WAND_CLASS, WEAPON_CLASS } from './defsym.h.js';
 import { docrt, flush_screen, nul_glyphinfo, reglyph_darkroom, reset_glyphmap } from './display.js';
 import { gm_optionchange } from './display.h.js';
@@ -20,17 +22,21 @@ import { def_char_to_monclass, def_char_to_objclass, def_oc_syms, def_warnsyms }
 import { on_level } from './dungeon.js';
 import { nh_terminate, panic } from './end.js';
 import { do_deferred_showpaths, nh_basename, read_sym_file } from './files.js';
-import { AUTOUNLOCK_APPLY_KEY, AUTOUNLOCK_FORCE, AUTOUNLOCK_KICK, AUTOUNLOCK_UNTRAP, GFILTER_AREA, GFILTER_NONE, GFILTER_VIEW, NUM_DISCLOSURE_OPTIONS, PARANOID_AUTOALL, PARANOID_BONES, PARANOID_BREAKWAND, PARANOID_CONFIRM, PARANOID_DIE, PARANOID_EATING, PARANOID_HIT, PARANOID_PRAY, PARANOID_QUIT, PARANOID_REMOVE, PARANOID_SWIM, PARANOID_TRAP, PARANOID_WERECHANGE, RUN_CRAWL, RUN_LEAP, RUN_STEP, RUN_TPORT, VI_BRANCH, VI_NAME, VI_NUMBER, WC_COUNT, wcolor_menu, wcolor_message, wcolor_status, wcolor_text } from './flag.h.js';
-import { BUFSZ, COLNO, LARGEST_INT, OPTCOUNT, PL_FSIZ, PL_NSIZ, PL_PSIZ, builtin_opt, cmdline_opt, environ_opt, num_opt_phases, opt_in, opt_out, play_opt, set_gameview, set_hidden, set_in_config, set_in_game, set_in_sysconf, set_wiznofuz, set_wizonly, syscf_opt } from './global.h.js';
+import { AUTOUNLOCK_APPLY_KEY, AUTOUNLOCK_FORCE, AUTOUNLOCK_KICK, AUTOUNLOCK_UNTRAP, DISCLOSE_NO_WITHOUT_PROMPT, DISCLOSE_PROMPT_DEFAULT_NO, DISCLOSE_PROMPT_DEFAULT_SPECIAL, DISCLOSE_PROMPT_DEFAULT_YES, DISCLOSE_SPECIAL_WITHOUT_PROMPT, DISCLOSE_YES_WITHOUT_PROMPT, GFILTER_AREA, GFILTER_NONE, GFILTER_VIEW, GPCOORDS_COMFULL, GPCOORDS_COMPASS, GPCOORDS_MAP, GPCOORDS_NONE, GPCOORDS_SCREEN, NUM_DISCLOSURE_OPTIONS, PARANOID_AUTOALL, PARANOID_BONES, PARANOID_BREAKWAND, PARANOID_CONFIRM, PARANOID_DIE, PARANOID_EATING, PARANOID_HIT, PARANOID_PRAY, PARANOID_QUIT, PARANOID_REMOVE, PARANOID_SWIM, PARANOID_TRAP, PARANOID_WERECHANGE, RUN_CRAWL, RUN_LEAP, RUN_STEP, RUN_TPORT, VI_BRANCH, VI_NAME, VI_NUMBER, WC_COUNT, wcolor_menu, wcolor_message, wcolor_status, wcolor_text } from './flag.h.js';
+import { discover, wizard } from './flag.macros.js';
+import { BUFSZ, COLNO, FALSE, LARGEST_INT, OPTCOUNT, PL_FSIZ, PL_NSIZ, PL_PSIZ, TRUE, builtin_opt, cmdline_opt, environ_opt, num_opt_phases, opt_in, opt_out, play_opt, set_gameview, set_hidden, set_in_config, set_in_game, set_in_sysconf, set_wiznofuz, set_wizonly, syscf_opt } from './global.h.js';
+import { C, M, SET__IS_VALUE_VALID } from './global.macros.js';
 import { apply_customizations, fill_glyphid_cache, free_glyphid_cache, glyphid_cache_status, glyphrep_to_custom_map_entries, reset_customcolors } from './glyphs.js';
 import { classify_terrain } from './hack.js';
-import { ECMD_FAIL, ECMD_OK, EXT_ENCUMBER, HVY_ENCUMBER, MAX_MENU_MAPPED_CMDS, MENU_COMBINATION, MENU_FULL, MENU_PARTIAL, MENU_TRADITIONAL, MOD_ENCUMBER, MSGTYP_NOREP, MSGTYP_NORMAL, MSGTYP_NOSHOW, MSGTYP_STOP, OVERLOADED, SLT_ENCUMBER, SYM_OFF_P, UNENCUMBERED, VANQ_MLVL_MNDX, WINTYPELEN } from './hack.h.js';
+import { ECMD_FAIL, ECMD_OK, EXT_ENCUMBER, HVY_ENCUMBER, MAX_MENU_MAPPED_CMDS, MENU_COMBINATION, MENU_FULL, MENU_PARTIAL, MENU_TRADITIONAL, MOD_ENCUMBER, MSGTYP_NOREP, MSGTYP_NORMAL, MSGTYP_NOSHOW, MSGTYP_STOP, OVERLOADED, SLT_ENCUMBER, SYM_OFF_X, UNENCUMBERED, VANQ_MLVL_MNDX, WINTYPELEN } from './hack.h.js';
 import { copynchars, digit, eos, fuzzymatch, highc, letter, lowc, mungspaces, nh_snprintf, strNsubst, str_end_is, str_start_is, strkitten, strncmpi, strstri, strsubst, trimspaces, visctrl } from './hacklib.js';
 import { set_vanq_order, vanqorders } from './insight.js';
 import { reassign, update_inventory } from './invent.js';
+import { nhUse } from './lint.macros.js';
 import { name_to_mon } from './mondata.js';
 import { choose_disco_sort, get_sortdisco } from './o_init.js';
 import { MAXOCLASSES } from './objclass.h.js';
+import { newfruit } from './objclass.macros.js';
 import { obj_descr, objects } from './objects.js';
 import { BOULDER, SLIME_MOLD } from './objects.h.js';
 import { fruit_from_name, makeplural, makesingular } from './objnam.js';
@@ -52,8 +58,9 @@ import { reset_customsymbols } from './utf8map.js';
 import { get_current_feature_ver, get_feature_notice_ver, status_version } from './version.js';
 import { vision_recalc } from './vision.js';
 import { add_menu, add_menu_heading, add_menu_str, adjust_menu_promptstyle, choose_classes_menu, choose_windows, getlin, select_menu, windowprocs } from './windows.js';
-import { ALIGN_BOTTOM, ALIGN_LEFT, ALIGN_RIGHT, ALIGN_TOP, MAP_MODE_ASCII10x18, MAP_MODE_ASCII12x16, MAP_MODE_ASCII16x12, MAP_MODE_ASCII16x8, MAP_MODE_ASCII4x6, MAP_MODE_ASCII6x8, MAP_MODE_ASCII7x12, MAP_MODE_ASCII8x12, MAP_MODE_ASCII8x8, MAP_MODE_ASCII_FIT_TO_SCREEN, MAP_MODE_TILES, MAP_MODE_TILES_FIT_TO_SCREEN, RS_ALGNMNT, RS_GENDER, RS_RACE, RS_ROLE, RS_filter, VIA_DIALOG, VIA_PROMPTS, WC2_DARKGRAY, WC2_FULLSCREEN, WC2_GUICOLOR, WC2_HILITE_STATUS, WC2_HITPOINTBAR, WC2_MENU_SHIFT, WC2_PETATTR, WC2_SOFTKEYBOARD, WC2_STATUSLINES, WC2_TERM_SIZE, WC2_WINDOWBORDERS, WC2_WRAPTEXT, WC_ALIGN_MESSAGE, WC_ALIGN_STATUS, WC_ASCII_MAP, WC_COLOR, WC_EIGHT_BIT_IN, WC_FONTSIZ_MAP, WC_FONTSIZ_MENU, WC_FONTSIZ_MESSAGE, WC_FONTSIZ_STATUS, WC_FONTSIZ_TEXT, WC_FONT_MAP, WC_FONT_MENU, WC_FONT_MESSAGE, WC_FONT_STATUS, WC_FONT_TEXT, WC_HILITE_PET, WC_INVERSE, WC_MAP_MODE, WC_PERM_INVENT, WC_PLAYER_SELECTION, WC_POPUP_DIALOG, WC_PRELOAD_TILES, WC_SCROLL_AMOUNT, WC_SCROLL_MARGIN, WC_SPLASH_SCREEN, WC_TILED_MAP, WC_TILE_FILE, WC_TILE_HEIGHT, WC_TILE_WIDTH, WC_VARY_MSGCOUNT, WC_WINDOWCOLORS, wp_curses, wp_tty } from './winprocs.h.js';
-import { ATR_INVERSE, ATR_NONE, InvOptInUse, InvOptNone, InvOptOn, InvSparse, MENU_BEHAVE_STANDARD, MENU_ITEMFLAGS_NONE, MENU_ITEMFLAGS_SELECTED, MENU_ITEMFLAGS_SKIPINVERT, NHW_MENU, NHW_TEXT, PICK_ANY, PICK_NONE, PICK_ONE } from './wintype.h.js';
+import { ALIGN_BOTTOM, ALIGN_LEFT, ALIGN_RIGHT, ALIGN_TOP, MAP_MODE_ASCII10x18, MAP_MODE_ASCII12x16, MAP_MODE_ASCII16x12, MAP_MODE_ASCII16x8, MAP_MODE_ASCII4x6, MAP_MODE_ASCII6x8, MAP_MODE_ASCII7x12, MAP_MODE_ASCII8x12, MAP_MODE_ASCII8x8, MAP_MODE_ASCII_FIT_TO_SCREEN, MAP_MODE_TILES, MAP_MODE_TILES_FIT_TO_SCREEN, RS_ALGNMNT, RS_GENDER, RS_RACE, RS_ROLE, RS_filter, VIA_DIALOG, VIA_PROMPTS, WC2_DARKGRAY, WC2_EXTRASTATUS, WC2_FULLSCREEN, WC2_GUICOLOR, WC2_HILITE_STATUS, WC2_HITPOINTBAR, WC2_MENU_SHIFT, WC2_PETATTR, WC2_SOFTKEYBOARD, WC2_STATUSLINES, WC2_TERM_SIZE, WC2_WINDOWBORDERS, WC2_WRAPTEXT, WC_ALIGN_MESSAGE, WC_ALIGN_STATUS, WC_ASCII_MAP, WC_COLOR, WC_EIGHT_BIT_IN, WC_FONTSIZ_MAP, WC_FONTSIZ_MENU, WC_FONTSIZ_MESSAGE, WC_FONTSIZ_STATUS, WC_FONTSIZ_TEXT, WC_FONT_MAP, WC_FONT_MENU, WC_FONT_MESSAGE, WC_FONT_STATUS, WC_FONT_TEXT, WC_HILITE_PET, WC_INVERSE, WC_MAP_MODE, WC_PERM_INVENT, WC_PLAYER_SELECTION, WC_POPUP_DIALOG, WC_PRELOAD_TILES, WC_SCROLL_AMOUNT, WC_SCROLL_MARGIN, WC_SPLASH_SCREEN, WC_TILED_MAP, WC_TILE_FILE, WC_TILE_HEIGHT, WC_TILE_WIDTH, WC_VARY_MSGCOUNT, WC_WINDOWCOLORS, wp_curses, wp_tty } from './winprocs.h.js';
+import { create_nhwindow, destroy_nhwindow, display_file, display_nhwindow, end_menu, number_pad, preference_update, putstr, start_menu, wait_synch } from './winprocs.macros.js';
+import { ATR_INVERSE, ATR_NONE, InvOptInUse, InvOptNone, InvOptOn, InvSparse, MENU_BEHAVE_STANDARD, MENU_FIRST_PAGE, MENU_INVERT_ALL, MENU_INVERT_PAGE, MENU_ITEMFLAGS_NONE, MENU_ITEMFLAGS_SELECTED, MENU_ITEMFLAGS_SKIPINVERT, MENU_LAST_PAGE, MENU_NEXT_PAGE, MENU_PREVIOUS_PAGE, MENU_SEARCH, MENU_SELECT_ALL, MENU_SELECT_PAGE, MENU_SHIFT_LEFT, MENU_SHIFT_RIGHT, MENU_UNSELECT_ALL, MENU_UNSELECT_PAGE, NHW_MENU, NHW_TEXT, PICK_ANY, PICK_NONE, PICK_ONE } from './wintype.h.js';
 import { ROLE_NONE, ROLE_RANDOM } from './you.h.js';
 
 const PILE_LIMIT_DFLT = 5;
@@ -72,6 +79,7 @@ const do_handler = do_set + 1;
 const get_val = do_handler + 1;
 const get_cnf_val = get_val + 1;
 const MAX_ROLEOPT = 4;
+const HELP_IDX = 218;
 const CONFIG_SLOT = 3;
 
 const optfn_autounlock$plus = new Int8Array(4);   // static in optfn_autounlock()
@@ -146,12 +154,12 @@ export async function ask_do_tutorial() {   // options.c:430
     dotut = flags.tutorial;
     if (!opt_set_in_config[opt_tutorial]) {
         pass = 0;
-        rc = nh_basename(get_configfile(), 1);
+        rc = nh_basename(get_configfile(), TRUE);
         norc = $c.i8(!$c.strcmp(get_configfile(), $c.lit("/dev/null")) ? 1 : 0);
         nh_snprintf($c.lit("ask_do_tutorial"), 447, new $c.Ptr(buf, 0), 256, $c.lit("Put \"OPTIONS=!tutorial\" in %s to skip this query."), rc && rc.get(0) && !norc ? rc : $c.lit("your configuration file"));
         do {
-            win = await windowprocs.win_create_nhwindow(NHW_MENU);
-            await windowprocs.win_start_menu(win, MENU_BEHAVE_STANDARD);
+            win = await create_nhwindow()(NHW_MENU);
+            await start_menu()(win, MENU_BEHAVE_STANDARD);
             any.$copyFrom(cg.zeroany);
             any.a_char = 121;
             await add_menu(win, nul_glyphinfo, any, any.a_char, 0, ATR_NONE, NO_COLOR, $c.lit("Yes, do a tutorial"), MENU_ITEMFLAGS_NONE);
@@ -162,39 +170,39 @@ export async function ask_do_tutorial() {   // options.c:430
             if ($t1 = pass, pass = $t1 + 1 | 0, $t1) {
                 await add_menu_str(win, $c.lit("(Please choose 'y' or 'n'.)"));
             }
-            await windowprocs.win_end_menu(win, $c.lit("Do you want a tutorial?"));
+            await end_menu()(win, $c.lit("Do you want a tutorial?"));
             n = await select_menu(win, PICK_ONE, new $c.Ptr(sel, 0));
-            await windowprocs.win_destroy_nhwindow(win);
+            await destroy_nhwindow()(win);
         } while (!n);
         if (n > 0) {
             dotut = $c.i8($c.radd(sel[0], 0).item.a_char === 121 ? 1 : 0);
             $c.free(sel[0]);
         } else {
-            dotut = 0;
+            dotut = FALSE;
         }
     }
     return dotut;
 }
 export async function parseoptions(opts, tinitial, tfrom_file) {   // options.c:489
     let op = null, negated = 0, got_match = 0, pfx_match = 0, i = 0, matchidx = 0, optresult = 0, optlen = 0, optlen_wo_val = 0, retval = 0, pfxbuf = new Int8Array(256), pfxp = null, $t1;
-    got_match = 0;
-    pfx_match = 0;
+    got_match = FALSE;
+    pfx_match = FALSE;
     matchidx = -1;
     optresult = optn_err;
-    retval = 1;
-    duplicate = 0;
-    using_alias = 0;
+    retval = TRUE;
+    duplicate = FALSE;
+    using_alias = FALSE;
     go.opt_initial = tinitial;
     go.opt_from_file = tfrom_file;
     if (tinitial && (op = $c.strchr(opts, 44)) !== null) {
         ($t1 = op, op = $t1.add(1), $t1).set(0, 0);
         if (!await parseoptions(op, go.opt_initial, go.opt_from_file)) {
-            retval = 0;
+            retval = FALSE;
         }
     }
     if ($c.strlen(opts) > 128) {
         await config_error_add($c.lit("Option too long, max length is %i characters"), 128);
-        return 0;
+        return FALSE;
     }
     while ($c.isspace($c.u8(opts.get(0)))) {
         opts = opts.add(1);
@@ -205,9 +213,9 @@ export async function parseoptions(opts, tinitial, tfrom_file) {   // options.c:
     }
     if (!opts.get(0)) {
         await config_error_add($c.lit("Empty statement"));
-        return 0;
+        return FALSE;
     }
-    negated = 0;
+    negated = FALSE;
     while (opts.get(0) === 33 || !strncmpi(opts, $c.lit("no"), 2)) {
         opts = opts.add(opts.get(0) === 33 ? 1 : opts.get(2) !== 45 ? 2 : 3);
         negated = $c.i8(!negated ? 1 : 0);
@@ -218,15 +226,15 @@ export async function parseoptions(opts, tinitial, tfrom_file) {   // options.c:
         optlen = optlen_wo_val;
     }
     for (i = 0; i < OPTCOUNT; i = i + 1 | 0) {
-        got_match = 0;
+        got_match = FALSE;
         if (allopt[i].pfx) {
-            if (str_start_is(opts, allopt[i].name, 1)) {
+            if (str_start_is(opts, allopt[i].name, TRUE)) {
                 matchidx = i;
-                got_match = pfx_match = 1;
+                got_match = pfx_match = TRUE;
             }
         }
         if (!got_match && allopt[i].name) {
-            got_match = match_optname(opts, allopt[i].name, allopt[i].minmatch, 1);
+            got_match = match_optname(opts, allopt[i].name, allopt[i].minmatch, TRUE);
         }
         if (got_match) {
             if (!allopt[i].pfx && optlen < allopt[i].minmatch) {
@@ -242,10 +250,10 @@ export async function parseoptions(opts, tinitial, tfrom_file) {   // options.c:
             if (!allopt[i].alias) {
                 continue;
             }
-            got_match = match_optname(opts, allopt[i].alias, $c.i32($c.strlen(allopt[i].alias)), 1);
+            got_match = match_optname(opts, allopt[i].alias, $c.i32($c.strlen(allopt[i].alias)), TRUE);
             if (got_match) {
                 matchidx = i;
-                using_alias = 1;
+                using_alias = TRUE;
                 break;
             }
         }
@@ -257,14 +265,14 @@ export async function parseoptions(opts, tinitial, tfrom_file) {   // options.c:
             await complain_about_duplicate(matchidx);
         }
         if (negated && !allopt[matchidx].negateok) {
-            await bad_negation(allopt[matchidx].name, 1);
+            await bad_negation(allopt[matchidx].name, TRUE);
             return optn_err;
         }
         if (allopt[matchidx].optfn) {
-            op = await string_for_opt(opts, 1);
+            op = await string_for_opt(opts, TRUE);
             optresult = await allopt[matchidx].optfn(allopt[matchidx].idx, do_set, negated, opts, op);
             if (optresult === optn_ok) {
-                opt_set_in_config[matchidx] = 1;
+                opt_set_in_config[matchidx] = TRUE;
             }
         }
     }
@@ -273,13 +281,13 @@ export async function parseoptions(opts, tinitial, tfrom_file) {   // options.c:
     }
     if (!got_match) {
         if ($c.peq($c.strstr(opts, $c.lit("S_")), opts) && await parsesymbols(opts, PRIMARYSET)) {
-            await switch_symbols(1);
+            await switch_symbols(TRUE);
             check_gold_symbol();
             optresult = optn_ok;
         }
     }
     if (optresult === optn_silenterr || got_match && allopt[matchidx].disregarded || !got_match && config_unmatched_ignored()) {
-        return 0;
+        return FALSE;
     }
     if (pfx_match && optresult === optn_err) {
         nh_snprintf($c.lit("parseoptions"), 677, new $c.Ptr(pfxbuf, 0), 256, $c.lit("%s"), opts);
@@ -287,22 +295,22 @@ export async function parseoptions(opts, tinitial, tfrom_file) {   // options.c:
             pfxp.set(0, 0);
         }
         await config_error_add($c.lit("bad option suffix variation '%s'"), new $c.Ptr(pfxbuf, 0));
-        return 0;
+        return FALSE;
     }
     if (got_match && optresult === optn_err) {
-        return 0;
+        return FALSE;
     }
     if (optresult === optn_ok) {
         return retval;
     }
     await config_error_add($c.lit("Unknown option '%s'"), opts);
-    return 0;
+    return FALSE;
 }
 function check_misc_menu_command(opts, op) {   // options.c:694
     let i = 0, name_to_check = null;
     for (i = 0; default_menu_cmd_info[i].name; i = i + 1 | 0) {
         name_to_check = default_menu_cmd_info[i].name;
-        if (match_optname(opts, name_to_check, $c.i32($c.strlen(name_to_check)), 1)) {
+        if (match_optname(opts, name_to_check, $c.i32($c.strlen(name_to_check)), TRUE)) {
             return i;
         }
     }
@@ -441,7 +449,7 @@ async function optfn_align_message(optidx, req, negated, opts, op) {   // option
                 return optn_err;
             }
         } else if (negated) {
-            await bad_negation(allopt[optidx].name, 1);
+            await bad_negation(allopt[optidx].name, TRUE);
             return optn_err;
         }
         return optn_ok;
@@ -477,7 +485,7 @@ async function optfn_align_status(optidx, req, negated, opts, op) {   // options
                 return optn_err;
             }
         } else if (negated) {
-            await bad_negation(allopt[optidx].name, 1);
+            await bad_negation(allopt[optidx].name, TRUE);
             return optn_err;
         }
         return optn_ok;
@@ -497,8 +505,8 @@ function optfn_altkeyhandling(optidx, req, negated, opts, op) {   // options.c:1
         return optn_ok;
     }
     if (req === do_set) {
-        negated;
-        op;
+        nhUse(negated);
+        nhUse(op);
         return optn_ok;
     }
     if (req === get_val || req === get_cnf_val) {
@@ -514,25 +522,25 @@ async function optfn_autounlock(optidx, req, negated, opts, op) {   // options.c
         return optn_ok;
     }
     if (req === do_set) {
-        if ($c.peq(op = await string_for_opt(opts, 1), new $c.Ptr(empty_optstr, 0))) {
+        if ($c.peq(op = await string_for_opt(opts, TRUE), new $c.Ptr(empty_optstr, 0))) {
             flags.autounlock = (negated ? 0 : AUTOUNLOCK_APPLY_KEY) >>> 0;
             return optn_ok;
         }
         newflags = 0;
         sep = $c.i8($c.strchr(op, 43) ? 43 : 32);
         while (op) {
-            matched = 0;
+            matched = FALSE;
             op = trimspaces(op);
             if ((nxt = $c.strchr(op, sep)) !== null) {
                 ($t1 = nxt, nxt = $t1.add(1), $t1).set(0, 0);
                 op = trimspaces(op);
             }
-            if (str_start_is($c.lit("none"), op, 1)) {
-                negated = 1, matched = 1;
+            if (str_start_is($c.lit("none"), op, TRUE)) {
+                negated = TRUE, matched = TRUE;
             }
             for (i = 0; i < 4 && !matched; i = i + 1 | 0) {
-                if (str_start_is(unlocktypes[i][0], op, 1) || fuzzymatch(op, unlocktypes[i][0], $c.lit(" -_"), 1)) {
-                    matched = 1;
+                if (str_start_is(unlocktypes[i][0], op, TRUE) || fuzzymatch(op, unlocktypes[i][0], $c.lit(" -_"), TRUE)) {
+                    matched = TRUE;
                     switch (op.get(0)) {
                         case 117:
                             newflags = (newflags | AUTOUNLOCK_UNTRAP) >>> 0;
@@ -547,7 +555,7 @@ async function optfn_autounlock(optidx, req, negated, opts, op) {   // options.c
                             newflags = (newflags | AUTOUNLOCK_FORCE) >>> 0;
                             break;
                         default:
-                            matched = 0;
+                            matched = FALSE;
                             break;
                     }
                 }
@@ -598,8 +606,8 @@ async function optfn_boulder(optidx, req, negated, opts, op) {   // options.c:11
         return optn_ok;
     }
     if (req === do_set) {
-        if ($c.peq(opts = await string_for_opt(opts, 0), new $c.Ptr(empty_optstr, 0))) {
-            return 0;
+        if ($c.peq(opts = await string_for_opt(opts, FALSE), new $c.Ptr(empty_optstr, 0))) {
+            return FALSE;
         }
         escapes(opts, opts);
         if (def_char_to_monclass(opts.get(0)) !== MAXMCLASSES) {
@@ -613,14 +621,14 @@ async function optfn_boulder(optidx, req, negated, opts, op) {   // options.c:11
         } else if (clash) {
             await config_error_add($c.lit("Badoption - boulder symbol '%s' would conflict with a %s symbol"), visctrl(opts.get(0)), clash === 1 ? $c.lit("monster") : $c.lit("warning"));
         } else {
-            go.ov_primary_syms[SYM_BOULDER + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES + MAXMCLASSES + WARNCOUNT)] = $c.u8(opts.get(0));
-            go.ov_rogue_syms[SYM_BOULDER + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES + MAXMCLASSES + WARNCOUNT)] = $c.u8(opts.get(0));
+            go.ov_primary_syms[SYM_BOULDER + SYM_OFF_X] = $c.u8(opts.get(0));
+            go.ov_rogue_syms[SYM_BOULDER + SYM_OFF_X] = $c.u8(opts.get(0));
             if (!go.opt_initial) {
                 sym = get_othersym(SYM_BOULDER, (svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? ROGUESET : PRIMARYSET);
                 if (sym) {
-                    gs.showsyms[SYM_BOULDER + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES + MAXMCLASSES + WARNCOUNT)] = sym;
+                    gs.showsyms[SYM_BOULDER + SYM_OFF_X] = sym;
                 }
-                go.opt_need_redraw = 1;
+                go.opt_need_redraw = TRUE;
             }
         }
         return optn_ok;
@@ -641,7 +649,7 @@ async function optfn_crash_email(optidx, req, negated, opts, op) {   // options.
         return optn_ok;
     }
     if (req === do_set) {
-        if ($c.peq(op = await string_for_opt(opts, 0), new $c.Ptr(empty_optstr, 0))) {
+        if ($c.peq(op = await string_for_opt(opts, FALSE), new $c.Ptr(empty_optstr, 0))) {
             return optn_err;
         }
         if (gc.crash_email) {
@@ -667,7 +675,7 @@ async function optfn_crash_name(optidx, req, negated, opts, op) {   // options.c
         return optn_ok;
     }
     if (req === do_set) {
-        if ($c.peq(op = await string_for_opt(opts, 0), new $c.Ptr(empty_optstr, 0))) {
+        if ($c.peq(op = await string_for_opt(opts, FALSE), new $c.Ptr(empty_optstr, 0))) {
             return optn_err;
         }
         if (gc.crash_name) {
@@ -693,7 +701,7 @@ async function optfn_crash_urlmax(optidx, req, negated, opts, op) {   // options
         return optn_ok;
     }
     if (req === do_set) {
-        if (!$c.peq(op = await string_for_opt(opts, 0), new $c.Ptr(empty_optstr, 0))) {
+        if (!$c.peq(op = await string_for_opt(opts, FALSE), new $c.Ptr(empty_optstr, 0))) {
             temp = $c.atoi(op);
             if (temp < 75) {
                 await config_error_add($c.lit("Invalid value %d for crash_urlmax.  Minimum value is 75."), temp);
@@ -716,21 +724,21 @@ async function optfn_crash_urlmax(optidx, req, negated, opts, op) {   // options
 }
 async function optfn_DECgraphics(optidx, req, negated, opts, op) {   // options.c:1394
     let badflag = 0, $t1;
-    badflag = 0;
+    badflag = FALSE;
     if (req === do_init) {
         return optn_ok;
     }
     if (req === do_set) {
         if (!negated) {
             if (gs.symset[PRIMARYSET].name) {
-                badflag = 1;
+                badflag = TRUE;
             } else {
                 $t1 = await dupstr(allopt[optidx].name), gs.symset[PRIMARYSET].name = $t1;
                 if (!await read_sym_file(PRIMARYSET)) {
-                    badflag = 1;
-                    clear_symsetentry(PRIMARYSET, 1);
+                    badflag = TRUE;
+                    clear_symsetentry(PRIMARYSET, TRUE);
                 } else {
-                    await switch_symbols(1);
+                    await switch_symbols(TRUE);
                 }
             }
             if (badflag) {
@@ -752,14 +760,14 @@ async function optfn_disclose(optidx, req, negated, opts, op) {   // options.c:1
         return optn_ok;
     }
     if (req === do_set) {
-        op = await string_for_opt(opts, 1);
+        op = await string_for_opt(opts, TRUE);
         if (!$c.peq(op, new $c.Ptr(empty_optstr, 0)) && negated) {
-            await bad_negation(allopt[optidx].name, 1);
+            await bad_negation(allopt[optidx].name, TRUE);
             return optn_err;
         }
         if ($c.peq(op, new $c.Ptr(empty_optstr, 0)) || !strncmpi(op, $c.lit("all"), -1) || !strncmpi(op, $c.lit("none"), -1)) {
             if (!$c.peq(op, new $c.Ptr(empty_optstr, 0)) && !strncmpi(op, $c.lit("none"), -1)) {
-                negated = 1;
+                negated = TRUE;
             }
             for (num = 0; num < NUM_DISCLOSURE_OPTIONS; num = num + 1 >>> 0) {
                 flags.end_disclose[num] = $c.i8(negated ? 45 : 121);
@@ -795,7 +803,7 @@ async function optfn_disclose(optidx, req, negated, opts, op) {   // options.c:1
                     flags.end_disclose[idx] = $c.i8(prefix_val);
                     prefix_val = -1;
                 } else {
-                    flags.end_disclose[idx] = 43;
+                    flags.end_disclose[idx] = DISCLOSE_YES_WITHOUT_PROMPT;
                 }
             } else if ($c.strchr(new $c.Ptr(optfn_disclose$valid_settings, 0), c)) {
                 prefix_val = c;
@@ -902,7 +910,7 @@ async function optfn_fruit(optidx, req, negated, opts, op) {   // options.c:1706
         goodfruit$: {
             if (negated) {
                 if (!$c.peq(op, new $c.Ptr(empty_optstr, 0))) {
-                    await bad_negation($c.lit("fruit"), 1);
+                    await bad_negation($c.lit("fruit"), TRUE);
                     return optn_err;
                 }
                 op = new $c.Ptr(empty_optstr, 0);
@@ -914,10 +922,10 @@ async function optfn_fruit(optidx, req, negated, opts, op) {   // options.c:1706
             mungspaces(op);
             if (!go.opt_initial) {
                 fnum[0] = 0;
-                f = await fruit_from_name(op, 0, new $c.Ptr(fnum, 0));
+                f = await fruit_from_name(op, FALSE, new $c.Ptr(fnum, 0));
                 if (!f) {
                     if (!flags.made_fruit) {
-                        forig = await fruit_from_name(new $c.Ptr(svp.pl_fruit, 0), 0, null);
+                        forig = await fruit_from_name(new $c.Ptr(svp.pl_fruit, 0), FALSE, null);
                     }
                     if (!forig && fnum[0] >= 100) {
                         await config_error_add($c.lit("Doing that so many times isn't very fruitful."));
@@ -984,7 +992,7 @@ async function optfn_glyph(optidx, req, negated, opts, op) {   // options.c:1815
     if (req === do_set) {
         if (negated) {
             if (!$c.peq(op, new $c.Ptr(empty_optstr, 0))) {
-                await bad_negation($c.lit("glyph"), 1);
+                await bad_negation($c.lit("glyph"), TRUE);
                 return optn_err;
             }
         }
@@ -1012,7 +1020,7 @@ async function optfn_hilite_status(optidx, req, negated, opts, op) {   // option
         return optn_ok;
     }
     if (req === do_set) {
-        op = await string_for_opt(opts, 1);
+        op = await string_for_opt(opts, TRUE);
         if (!$c.peq(op, new $c.Ptr(empty_optstr, 0)) && negated) {
             clear_status_hilites();
             return optn_ok;
@@ -1040,7 +1048,7 @@ function optfn_horsename(optidx, req, negated, opts, op) {   // options.c:1897
 async function optfn_IBMgraphics(optidx, req, negated, opts, op) {   // options.c:1906
     let sym_name = null, badflag = 0, i = 0, $t1;
     sym_name = allopt[optidx].name;
-    badflag = 0;
+    badflag = FALSE;
     if (req === do_init) {
         return optn_ok;
     }
@@ -1048,15 +1056,15 @@ async function optfn_IBMgraphics(optidx, req, negated, opts, op) {   // options.
         if (!negated) {
             for (i = 0; i < NUM_GRAPHICS; i = i + 1 | 0) {
                 if (gs.symset[i].name) {
-                    badflag = 1;
+                    badflag = TRUE;
                 } else {
                     if (i === ROGUESET) {
                         sym_name = $c.lit("RogueIBM");
                     }
                     $t1 = await dupstr(sym_name), gs.symset[i].name = $t1;
                     if (!await read_sym_file(i)) {
-                        badflag = 1;
-                        clear_symsetentry(i, 1);
+                        badflag = TRUE;
+                        clear_symsetentry(i, TRUE);
                         break;
                     }
                 }
@@ -1065,7 +1073,7 @@ async function optfn_IBMgraphics(optidx, req, negated, opts, op) {   // options.
                 await config_error_add($c.lit("Failure to load symbol set %s."), sym_name);
                 return optn_err;
             } else {
-                await switch_symbols(1);
+                await switch_symbols(TRUE);
                 if (!go.opt_initial && ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level))) {
                     assign_graphics(ROGUESET);
                 }
@@ -1120,11 +1128,11 @@ async function optfn_map_mode(optidx, req, negated, opts, op) {   // options.c:1
             }
             if (wc_supported($c.lit("map_mode"))) {
                 if (!iflags.wc_map_mode || save_map_mode !== iflags.wc_map_mode) {
-                    await windowprocs.win_preference_update($c.lit("map_mode"));
+                    await preference_update()($c.lit("map_mode"));
                 }
             }
         } else if (negated) {
-            await bad_negation(allopt[optidx].name, 1);
+            await bad_negation(allopt[optidx].name, TRUE);
             return optn_err;
         }
         return optn_ok;
@@ -1208,7 +1216,7 @@ async function optfn_menu_headings(optidx, req, negated, opts, op) {   // option
             iflags.menu_headings.color = NO_COLOR;
             return optn_ok;
         } else if (negated) {
-            await bad_negation(allopt[optidx].name, 1);
+            await bad_negation(allopt[optidx].name, TRUE);
             return optn_silenterr;
         }
         if (!await color_attr_parse_str(ca, op)) {
@@ -1399,7 +1407,7 @@ async function optfn_msg_window(optidx, req, negated, opts, op) {   // options.c
             tmp = negated ? 115 : 102;
         } else {
             if (negated) {
-                await bad_negation(allopt[optidx].name, 1);
+                await bad_negation(allopt[optidx].name, TRUE);
                 return optn_err;
             }
             tmp = lowc(op.get(0));
@@ -1443,7 +1451,7 @@ async function optfn_msghistory(optidx, req, negated, opts, op) {   // options.c
         if (negated && $c.peq(op, new $c.Ptr(empty_optstr, 0)) || !negated && !$c.peq(op, new $c.Ptr(empty_optstr, 0))) {
             $t1 = (negated ? 0 : $c.atoi(op)) >>> 0, iflags.msg_history = $t1;
         } else if (negated) {
-            await bad_negation(allopt[optidx].name, 1);
+            await bad_negation(allopt[optidx].name, TRUE);
             return optn_err;
         }
         return optn_ok;
@@ -1459,7 +1467,7 @@ async function optfn_name(optidx, req, negated, opts, op) {   // options.c:2549
         return optn_ok;
     }
     if (req === do_set) {
-        if (!$c.peq(op = await string_for_env_opt(allopt[optidx].name, opts, 0), new $c.Ptr(empty_optstr, 0))) {
+        if (!$c.peq(op = await string_for_env_opt(allopt[optidx].name, opts, FALSE), new $c.Ptr(empty_optstr, 0))) {
             nmcpy(new $c.Ptr(svp.plname, 0), op, PL_NSIZ);
         } else {
             return optn_err;
@@ -1486,7 +1494,7 @@ async function optfn_number_pad(optidx, req, negated, opts, op) {   // options.c
                 iflags.num_pad_mode = 0;
             }
         } else if (negated) {
-            await bad_negation(allopt[optidx].name, 1);
+            await bad_negation(allopt[optidx].name, TRUE);
             return optn_err;
         } else {
             mode = $c.atoi(op);
@@ -1494,10 +1502,10 @@ async function optfn_number_pad(optidx, req, negated, opts, op) {   // options.c
                 await config_error_add($c.lit("Illegal %s parameter '%s'"), allopt[optidx].name, op);
                 return optn_err;
             } else if (mode <= 0) {
-                iflags.num_pad = 0;
+                iflags.num_pad = FALSE;
                 iflags.num_pad_mode = $c.u8(mode < 0 ? 1 : 0);
             } else {
-                iflags.num_pad = 1;
+                iflags.num_pad = TRUE;
                 iflags.num_pad_mode = 0;
                 if (mode === 2 || mode === 4) {
                     iflags.num_pad_mode = $c.u8(iflags.num_pad_mode | 1);
@@ -1507,8 +1515,8 @@ async function optfn_number_pad(optidx, req, negated, opts, op) {   // options.c
                 }
             }
         }
-        await reset_commands(0);
-        await windowprocs.win_number_pad(iflags.num_pad ? 1 : 0);
+        await reset_commands(FALSE);
+        await number_pad()(iflags.num_pad ? 1 : 0);
         return optn_ok;
     }
     if (req === get_val || req === get_cnf_val) {
@@ -1569,7 +1577,7 @@ async function optfn_paranoid_confirmation(optidx, req, opt_negated, opts, op) {
         return optn_ok;
     }
     if (req === do_set) {
-        plus_or_minus = 0;
+        plus_or_minus = FALSE;
         if (!strncmpi(opts, $c.lit("prayconfirm"), 4)) {
             if (op.get(0)) {
                 await config_error_add($c.lit("deprecated %sprayconfirm option takes no parameters (found '%s')"), opt_negated ? $c.lit("!") : $c.lit(""), op);
@@ -1578,7 +1586,7 @@ async function optfn_paranoid_confirmation(optidx, req, opt_negated, opts, op) {
             await config_error_add($c.lit("%sprayconfirm option is deprecated; switching to %s:%cpray"), opt_negated ? $c.lit("!") : $c.lit(""), allopt[optidx].name, opt_negated ? 45 : 43);
             $c.__builtin___sprintf_chk(new $c.Ptr(prayconfirm, 0), 0, 6, $c.lit("%cpray"), opt_negated ? 45 : 43);
             op = new $c.Ptr(prayconfirm, 0);
-            opt_negated = 0;
+            opt_negated = FALSE;
         } else if (opt_negated) {
             if (!op.get(0)) {
                 flags.paranoia_bits = 0;
@@ -1595,7 +1603,7 @@ async function optfn_paranoid_confirmation(optidx, req, opt_negated, opts, op) {
         if (op.get(0) !== 43 && op.get(0) !== 45) {
             flags.paranoia_bits = 0;
         } else {
-            plus_or_minus = 1;
+            plus_or_minus = TRUE;
             opt_negated = $c.i8(op.get(0) === 45 ? 1 : 0);
             if ((op = op.add(1)).get(0) === 32) {
                 op = op.add(1);
@@ -1609,7 +1617,7 @@ async function optfn_paranoid_confirmation(optidx, req, opt_negated, opts, op) {
                 }
             } else {
                 if (lowc(op.get(0)) === 110 && lowc(op.get(1)) === 111 && lowc($c.i8(op.get(2) !== 110 && lowc(op.get(2)) !== 0 ? 1 : 0))) {
-                    fld_negated = 1;
+                    fld_negated = TRUE;
                     op = op.add(2);
                 }
             }
@@ -1618,7 +1626,7 @@ async function optfn_paranoid_confirmation(optidx, req, opt_negated, opts, op) {
                 pp.set(0, 0);
             }
             for (i = 0; i < 15; i = i + 1 | 0) {
-                if (match_optname(op, paranoia[i].argname, paranoia[i].argMinLen, 0) || paranoia[i].synonym && match_optname(op, paranoia[i].synonym, paranoia[i].synMinLen, 0)) {
+                if (match_optname(op, paranoia[i].argname, paranoia[i].argMinLen, FALSE) || paranoia[i].synonym && match_optname(op, paranoia[i].synonym, paranoia[i].synMinLen, FALSE)) {
                     if (!paranoia[i].flagmask) {
                         if (!plus_or_minus) {
                             flags.paranoia_bits = 0;
@@ -1646,7 +1654,7 @@ async function optfn_paranoid_confirmation(optidx, req, opt_negated, opts, op) {
     if (req === get_val || req === get_cnf_val) {
         tmpbuf[0] = 0;
         for (i = 0; paranoia[i].flagmask !== 0; i = i + 1 | 0) {
-            if ((flags.paranoia_bits & paranoia[i].flagmask >>> 0) >>> 0 !== 0 && (paranoia[i].flagmask !== PARANOID_BONES || flags.debug || req === get_cnf_val)) {
+            if ((flags.paranoia_bits & paranoia[i].flagmask >>> 0) >>> 0 !== 0 && (paranoia[i].flagmask !== PARANOID_BONES || wizard() || req === get_cnf_val)) {
                 nh_snprintf($c.lit("optfn_paranoid_confirmation"), 3032, eos(new $c.Ptr(tmpbuf, 0)), $c.subu64(256, $c.strlen(new $c.Ptr(tmpbuf, 0))), $c.lit(" %s"), paranoia[i].argname);
             }
         }
@@ -1669,7 +1677,7 @@ async function optfn_perminv_mode(optidx, req, negated, opts, op) {   // options
     } else if (req === do_set) {
         op = await string_for_opt(opts, negated);
         if (!$c.peq(op, new $c.Ptr(empty_optstr, 0)) && negated) {
-            await bad_negation(allopt[optidx].name, 1);
+            await bad_negation(allopt[optidx].name, TRUE);
             retval = optn_silenterr;
         } else if (!$c.peq(op, new $c.Ptr(empty_optstr, 0))) {
             ln = $c.u32($c.strlen(op));
@@ -1684,23 +1692,23 @@ async function optfn_perminv_mode(optidx, req, negated, opts, op) {   // options
                         await config_error_add($c.lit("%s: unavailable perm_invent mode '%s', using '%s'"), allopt[optidx].name, pi0, perminv_modes[i][0]);
                     }
                     iflags.perminv_mode = $c.u8(i);
-                    iflags.perm_invent = 1;
+                    iflags.perm_invent = TRUE;
                     break;
                 }
             }
             if (i === 9) {
                 await config_error_add($c.lit("Unknown %s parameter '%s'"), allopt[optidx].name, op);
                 iflags.perminv_mode = InvOptNone;
-                iflags.perm_invent = 0;
+                iflags.perm_invent = FALSE;
                 retval = optn_silenterr;
             }
         } else if (negated) {
             iflags.perminv_mode = InvOptNone;
-            iflags.perm_invent = 0;
+            iflags.perm_invent = FALSE;
         }
         if (!go.opt_initial) {
             if (iflags.perminv_mode !== old_perminv_mode || iflags.perm_invent !== old_perm_invent) {
-                go.opt_need_redraw = 1;
+                go.opt_need_redraw = TRUE;
             }
         }
     } else if (req === do_handler) {
@@ -1729,10 +1737,10 @@ async function optfn_petattr(optidx, req, negated, opts, op) {   // options.c:31
     if (req === do_set) {
         op = await string_for_opt(opts, negated);
         if (!$c.peq(op, new $c.Ptr(empty_optstr, 0)) && negated) {
-            await bad_negation(allopt[optidx].name, 1);
+            await bad_negation(allopt[optidx].name, TRUE);
             retval = optn_err;
         } else if (!$c.peq(op, new $c.Ptr(empty_optstr, 0))) {
-            itmp = await match_str2attr(op, 0);
+            itmp = await match_str2attr(op, FALSE);
             if (itmp === -1) {
                 await config_error_add($c.lit("Unknown %s parameter '%s'"), allopt[optidx].name, opts);
                 retval = optn_err;
@@ -1745,7 +1753,7 @@ async function optfn_petattr(optidx, req, negated, opts, op) {   // options.c:31
         if (retval !== optn_err) {
             iflags.wc_hilite_pet = $c.i8(iflags.wc2_petattr !== ATR_NONE ? 1 : 0);
             if (!go.opt_initial) {
-                go.opt_need_redraw = 1;
+                go.opt_need_redraw = TRUE;
             }
         }
         return retval;
@@ -1820,7 +1828,7 @@ async function optfn_pickup_burden(optidx, req, negated, opts, op) {   // option
         return optn_ok;
     }
     if (req === do_set) {
-        if (!$c.peq(op = await string_for_env_opt(allopt[optidx].name, opts, 0), new $c.Ptr(empty_optstr, 0))) {
+        if (!$c.peq(op = await string_for_env_opt(allopt[optidx].name, opts, FALSE), new $c.Ptr(empty_optstr, 0))) {
             switch (lowc(op.get(0))) {
                 case 117:
                     flags.pickup_burden = UNENCUMBERED;
@@ -1861,7 +1869,7 @@ async function optfn_pickup_burden(optidx, req, negated, opts, op) {   // option
 }
 async function optfn_pickup_types(optidx, req, negated, opts, op) {   // options.c:3308
     let ocl = new Int8Array(19), tbuf = new Int8Array(19), qbuf = new Int8Array(128), abuf = new Int8Array(256), oc_sym = 0, num = 0, badopt = 0, compat = 0, use_menu = 0, wasspace = 0;
-    badopt = 0;
+    badopt = FALSE;
     compat = $c.i8($c.strlen(opts) <= 6 ? 1 : 0);
     if (req === do_init) {
         return optn_ok;
@@ -1876,9 +1884,9 @@ async function optfn_pickup_types(optidx, req, negated, opts, op) {   // options
                 return optn_ok;
             }
             await oc_to_str(new $c.Ptr(flags.inv_order, 0), new $c.Ptr(ocl, 0));
-            use_menu = 1;
+            use_menu = TRUE;
             if (flags.menu_style === MENU_TRADITIONAL || flags.menu_style === MENU_COMBINATION) {
-                use_menu = 0;
+                use_menu = FALSE;
                 $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("New %s: [%s am] (%s)"), allopt[optidx].name, new $c.Ptr(ocl, 0), new $c.Ptr(tbuf, 0).get(0) ? new $c.Ptr(tbuf, 0) : $c.lit("all"));
                 abuf[0] = 0;
                 await getlin(new $c.Ptr(qbuf, 0), new $c.Ptr(abuf, 0));
@@ -1888,19 +1896,19 @@ async function optfn_pickup_types(optidx, req, negated, opts, op) {   // options
                 } else if (!abuf[0] || abuf[0] === 27) {
                     op = new $c.Ptr(tbuf, 0);
                 } else if (abuf[0] === 109) {
-                    use_menu = 1;
+                    use_menu = TRUE;
                 }
             }
             if (use_menu) {
-                if (flags.debug && !$c.strchr(new $c.Ptr(ocl, 0), VENOM_SYM)) {
+                if (wizard() && !$c.strchr(new $c.Ptr(ocl, 0), VENOM_SYM)) {
                     strkitten(new $c.Ptr(ocl, 0), VENOM_SYM);
                 }
-                await choose_classes_menu($c.lit("Autopickup what?"), 1, 1, new $c.Ptr(ocl, 0), new $c.Ptr(tbuf, 0));
+                await choose_classes_menu($c.lit("Autopickup what?"), 1, TRUE, new $c.Ptr(ocl, 0), new $c.Ptr(tbuf, 0));
                 op = new $c.Ptr(tbuf, 0);
             }
         }
         if (negated) {
-            await bad_negation(allopt[optidx].name, 1);
+            await bad_negation(allopt[optidx].name, TRUE);
             return optn_err;
         }
         while (op.get(0) === 32) {
@@ -1914,7 +1922,7 @@ async function optfn_pickup_types(optidx, req, negated, opts, op) {   // options
                     flags.pickup_types[num] = $c.i8(oc_sym);
                     flags.pickup_types[num = num + 1 >>> 0] = 0;
                 } else {
-                    badopt = 1;
+                    badopt = TRUE;
                 }
                 op = op.add(1);
             }
@@ -1945,7 +1953,7 @@ async function optfn_pile_limit(optidx, req, negated, opts, op) {   // options.c
         if (negated && $c.peq(op, new $c.Ptr(empty_optstr, 0)) || !negated && !$c.peq(op, new $c.Ptr(empty_optstr, 0))) {
             $t1 = negated ? 0 : $c.atoi(op), flags.pile_limit = $t1;
         } else if (negated) {
-            await bad_negation(allopt[optidx].name, 1);
+            await bad_negation(allopt[optidx].name, TRUE);
             return optn_err;
         } else {
             flags.pile_limit = PILE_LIMIT_DFLT;
@@ -1998,11 +2006,11 @@ async function optfn_playmode(optidx, req, negated, opts, op) {   // options.c:3
             return optn_err;
         }
         if (!strncmpi(op, $c.lit("normal"), 6) || !strncmpi(op, $c.lit("play"), -1)) {
-            $t1 = flags.explore = 0, flags.debug = $t1;
+            $t1 = flags.explore = FALSE, flags.debug = $t1;
         } else if (!strncmpi(op, $c.lit("explore"), 6) || !strncmpi(op, $c.lit("discovery"), 6)) {
-            flags.debug = 0, flags.explore = 1;
+            flags.debug = FALSE, flags.explore = TRUE;
         } else if (!strncmpi(op, $c.lit("debug"), 5) || !strncmpi(op, $c.lit("wizard"), 6)) {
-            flags.debug = 1, flags.explore = 0;
+            flags.debug = TRUE, flags.explore = FALSE;
         } else {
             await config_error_add($c.lit("Invalid value for \"%s\":%s"), allopt[optidx].name, op);
             return optn_err;
@@ -2058,15 +2066,15 @@ async function optfn_roguesymset(optidx, req, negated, opts, op) {   // options.
             }
             $t1 = await dupstr(op), gs.symset[ROGUESET].name = $t1;
             if (!await read_sym_file(ROGUESET)) {
-                clear_symsetentry(ROGUESET, 1);
+                clear_symsetentry(ROGUESET, TRUE);
                 await config_error_add($c.lit("Unable to load symbol set \"%s\" from \"%s\""), op, $c.lit("symbols"));
                 return optn_err;
             } else {
                 if (!go.opt_initial && ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level))) {
                     assign_graphics(ROGUESET);
                 }
-                $t2 = go.opt_need_glyph_reset = 1, go.opt_need_redraw = $t2;
-                go.opt_symset_changed = 1;
+                $t2 = go.opt_need_glyph_reset = TRUE, go.opt_need_redraw = $t2;
+                go.opt_symset_changed = TRUE;
             }
         } else {
             return optn_err;
@@ -2124,13 +2132,13 @@ async function optfn_runmode(optidx, req, negated, opts, op) {   // options.c:36
         if (negated) {
             flags.runmode = RUN_TPORT;
         } else if (!$c.peq(op, new $c.Ptr(empty_optstr, 0))) {
-            if (str_start_is($c.lit("teleport"), op, 1)) {
+            if (str_start_is($c.lit("teleport"), op, TRUE)) {
                 flags.runmode = RUN_TPORT;
-            } else if (str_start_is($c.lit("run"), op, 1)) {
+            } else if (str_start_is($c.lit("run"), op, TRUE)) {
                 flags.runmode = RUN_LEAP;
-            } else if (str_start_is($c.lit("walk"), op, 1)) {
+            } else if (str_start_is($c.lit("walk"), op, TRUE)) {
                 flags.runmode = RUN_STEP;
-            } else if (str_start_is($c.lit("crawl"), op, 1)) {
+            } else if (str_start_is($c.lit("crawl"), op, TRUE)) {
                 flags.runmode = RUN_CRAWL;
             } else {
                 await config_error_add($c.lit("Unknown %s parameter '%s'"), allopt[optidx].name, op);
@@ -2157,10 +2165,10 @@ async function optfn_scores(optidx, req, negated, opts, op) {   // options.c:366
         return optn_ok;
     }
     if (req === do_set) {
-        if ($c.peq(op = await string_for_opt(opts, 0), new $c.Ptr(empty_optstr, 0))) {
+        if ($c.peq(op = await string_for_opt(opts, FALSE), new $c.Ptr(empty_optstr, 0))) {
             return optn_err;
         }
-        $t1 = flags.end_around = 0, flags.end_top = $t1, flags.end_own = 0;
+        $t1 = flags.end_around = 0, flags.end_top = $t1, flags.end_own = FALSE;
         if (negated) {
             op = eos(op);
         }
@@ -2187,10 +2195,10 @@ async function optfn_scores(optidx, req, negated, opts, op) {   // options.c:366
                     flags.end_around = negated ? 0 : inum;
                     break;
                 case 111:
-                    flags.end_own = $c.i8(negated || !inum ? 0 : 1);
+                    flags.end_own = $c.i8(negated || !inum ? FALSE : TRUE);
                     break;
                 case 110:
-                    $t2 = flags.end_around = 0, flags.end_top = $t2, flags.end_own = 0;
+                    $t2 = flags.end_around = 0, flags.end_top = $t2, flags.end_own = FALSE;
                     break;
                 case 45:
                     if (digit(op.add(1).get(0))) {
@@ -2241,7 +2249,7 @@ async function optfn_scroll_amount(optidx, req, negated, opts, op) {   // option
         if (negated && $c.peq(op, new $c.Ptr(empty_optstr, 0)) || !negated && !$c.peq(op, new $c.Ptr(empty_optstr, 0))) {
             $t1 = negated ? 1 : $c.atoi(op), iflags.wc_scroll_amount = $t1;
         } else if (negated) {
-            await bad_negation(allopt[optidx].name, 1);
+            await bad_negation(allopt[optidx].name, TRUE);
             return optn_err;
         }
         return optn_ok;
@@ -2266,7 +2274,7 @@ async function optfn_scroll_margin(optidx, req, negated, opts, op) {   // option
         if (negated && $c.peq(op, new $c.Ptr(empty_optstr, 0)) || !negated && !$c.peq(op, new $c.Ptr(empty_optstr, 0))) {
             $t1 = negated ? 5 : $c.atoi(op), iflags.wc_scroll_margin = $t1;
         } else if (negated) {
-            await bad_negation(allopt[optidx].name, 1);
+            await bad_negation(allopt[optidx].name, TRUE);
             return optn_err;
         }
         return optn_ok;
@@ -2287,7 +2295,7 @@ async function optfn_soundlib(optidx, req, negated, opts, op) {   // options.c:3
         return optn_ok;
     }
     if (req === do_set) {
-        if (!$c.peq(op = await string_for_env_opt(allopt[optidx].name, opts, 0), new $c.Ptr(empty_optstr, 0))) {
+        if (!$c.peq(op = await string_for_env_opt(allopt[optidx].name, opts, FALSE), new $c.Ptr(empty_optstr, 0))) {
             await get_soundlib_name(new $c.Ptr(soundlibbuf, 0), WINTYPELEN);
             option_id = soundlib_id_from_opt(op);
             gc.chosen_soundlib = option_id;
@@ -2310,7 +2318,7 @@ async function optfn_sortdiscoveries(optidx, req, negated, opts, op) {   // opti
         return optn_ok;
     }
     if (req === do_set) {
-        op = await string_for_env_opt(allopt[optidx].name, opts, 0);
+        op = await string_for_env_opt(allopt[optidx].name, opts, FALSE);
         if (negated) {
             flags.discosort = 111;
         } else if (!$c.peq(op, new $c.Ptr(empty_optstr, 0))) {
@@ -2341,7 +2349,7 @@ async function optfn_sortdiscoveries(optidx, req, negated, opts, op) {   // opti
         return optn_ok;
     }
     if (req === get_val || req === get_cnf_val) {
-        get_sortdisco(opts, $c.i8(req === get_cnf_val ? 1 : 0));
+        get_sortdisco(opts, $c.i8(req === get_cnf_val ? TRUE : FALSE));
         return optn_ok;
     }
     if (req === do_handler) {
@@ -2355,7 +2363,7 @@ async function optfn_sortloot(optidx, req, negated, opts, op) {   // options.c:3
         return optn_ok;
     }
     if (req === do_set) {
-        op = await string_for_env_opt(allopt[optidx].name, opts, 0);
+        op = await string_for_env_opt(allopt[optidx].name, opts, FALSE);
         if (!$c.peq(op, new $c.Ptr(empty_optstr, 0))) {
             c = lowc(op.get(0));
             switch (c) {
@@ -2395,7 +2403,7 @@ async function optfn_sortvanquished(optidx, req, negated, opts, op) {   // optio
         return optn_ok;
     }
     if (req === do_set) {
-        op = await string_for_env_opt(allopt[optidx].name, opts, 0);
+        op = await string_for_env_opt(allopt[optidx].name, opts, FALSE);
         if (negated) {
             flags.vanq_sortmode = VANQ_MLVL_MNDX;
         } else if (!$c.peq(op, new $c.Ptr(empty_optstr, 0))) {
@@ -2423,7 +2431,7 @@ async function optfn_sortvanquished(optidx, req, negated, opts, op) {   // optio
     }
     if (req === do_handler) {
         prev_sortmode = flags.vanq_sortmode;
-        await set_vanq_order(1);
+        await set_vanq_order(TRUE);
         await pline($c.lit("'%s' %s \"%s: %s\"."), optname, flags.vanq_sortmode === prev_sortmode ? $c.lit("not changed, still") : $c.lit("changed to"), vanqorders[flags.vanq_sortmode][0], vanqorders[flags.vanq_sortmode][1]);
     }
     return optn_ok;
@@ -2437,7 +2445,7 @@ async function optfn_statushilites(optidx, req, negated, opts, op) {   // option
         if (negated) {
             iflags.hilite_delta = 0;
         } else {
-            op = await string_for_opt(opts, 1);
+            op = await string_for_opt(opts, TRUE);
             $t1 = $c.peq(op, new $c.Ptr(empty_optstr, 0)) || !op.get(0) ? 3 : $c.atol(op), iflags.hilite_delta = $t1;
             if (iflags.hilite_delta < 0) {
                 iflags.hilite_delta = 1;
@@ -2471,7 +2479,7 @@ async function optfn_statuslines(optidx, req, negated, opts, op) {   // options.
     if (req === do_set) {
         op = await string_for_opt(opts, negated);
         if (negated) {
-            await bad_negation(allopt[optidx].name, 1);
+            await bad_negation(allopt[optidx].name, TRUE);
             itmp = 2;
             retval = optn_err;
         } else if (!$c.peq(op, new $c.Ptr(empty_optstr, 0))) {
@@ -2483,7 +2491,7 @@ async function optfn_statuslines(optidx, req, negated, opts, op) {   // options.
         } else {
             iflags.wc2_statuslines = itmp;
             if (!go.opt_initial) {
-                go.opt_need_redraw = 1;
+                go.opt_need_redraw = TRUE;
             }
         }
         return retval;
@@ -2504,7 +2512,7 @@ async function optfn_suppress_alert(optidx, req, negated, opts, op) {   // optio
     }
     if (req === do_set) {
         if (negated) {
-            await bad_negation(allopt[optidx].name, 0);
+            await bad_negation(allopt[optidx].name, FALSE);
             return optn_err;
         } else if (!$c.peq(op, new $c.Ptr(empty_optstr, 0))) {
             await feature_alert_opts(op, allopt[optidx].name);
@@ -2535,15 +2543,15 @@ async function optfn_symset(optidx, req, negated, opts, op) {   // options.c:416
             }
             $t1 = await dupstr(op), gs.symset[PRIMARYSET].name = $t1;
             if (!await read_sym_file(PRIMARYSET)) {
-                clear_symsetentry(PRIMARYSET, 1);
+                clear_symsetentry(PRIMARYSET, TRUE);
                 await config_error_add($c.lit("Unable to load symbol set \"%s\" from \"%s\""), op, $c.lit("symbols"));
                 return optn_err;
             } else {
                 if (gs.symset[PRIMARYSET].handling) {
                 }
                 await switch_symbols(gs.symset[PRIMARYSET].name !== null ? 1 : 0);
-                $t2 = go.opt_need_glyph_reset = 1, go.opt_need_redraw = $t2;
-                go.opt_symset_changed = 1;
+                $t2 = go.opt_need_glyph_reset = TRUE, go.opt_need_redraw = $t2;
+                go.opt_symset_changed = TRUE;
             }
         } else {
             return optn_err;
@@ -2676,7 +2684,7 @@ async function optfn_tile_height(optidx, req, negated, opts, op) {   // options.
         if (negated && $c.peq(op, new $c.Ptr(empty_optstr, 0)) || !negated && !$c.peq(op, new $c.Ptr(empty_optstr, 0))) {
             $t1 = negated ? 0 : $c.atoi(op), iflags.wc_tile_height = $t1;
         } else if (negated) {
-            await bad_negation(allopt[optidx].name, 1);
+            await bad_negation(allopt[optidx].name, TRUE);
             return optn_err;
         }
         return optn_ok;
@@ -2703,7 +2711,7 @@ async function optfn_tile_width(optidx, req, negated, opts, op) {   // options.c
         if (negated && $c.peq(op, new $c.Ptr(empty_optstr, 0)) || !negated && !$c.peq(op, new $c.Ptr(empty_optstr, 0))) {
             $t1 = negated ? 0 : $c.atoi(op), iflags.wc_tile_width = $t1;
         } else if (negated) {
-            await bad_negation(allopt[optidx].name, 1);
+            await bad_negation(allopt[optidx].name, TRUE);
             return optn_err;
         }
         return optn_ok;
@@ -2747,7 +2755,7 @@ async function optfn_vary_msgcount(optidx, req, negated, opts, op) {   // option
         if (negated && $c.peq(op, new $c.Ptr(empty_optstr, 0)) || !negated && !$c.peq(op, new $c.Ptr(empty_optstr, 0))) {
             $t1 = negated ? 0 : $c.atoi(op), iflags.wc_vary_msgcount = $t1;
         } else if (negated) {
-            await bad_negation(allopt[optidx].name, 1);
+            await bad_negation(allopt[optidx].name, TRUE);
             return optn_err;
         }
         return optn_ok;
@@ -2775,10 +2783,10 @@ async function optfn_versinfo(optidx, req, negated, opts, op) {   // options.c:4
         have_branch = $c.i8(nomakedefs.git_branch && nomakedefs.git_branch.get(0) ? 1 : 0);
         dflt = have_branch ? VI_BRANCH : VI_NUMBER;
         if (negated) {
-            await bad_negation(allopt[optidx].name, 1);
+            await bad_negation(allopt[optidx].name, TRUE);
             return optn_silenterr;
         }
-        op = await string_for_opt(opts, 0);
+        op = await string_for_opt(opts, FALSE);
         if ($c.peq(op, new $c.Ptr(empty_optstr, 0))) {
             await config_error_add($c.lit("'%s' requires a value; defaulting to %d"), optname, dflt);
             return optn_silenterr;
@@ -2801,7 +2809,7 @@ async function optfn_versinfo(optidx, req, negated, opts, op) {   // options.c:4
         $c.__builtin___sprintf_chk(opts, 0, -1, $c.lit("%u"), flags.versinfo);
     }
     if (flags.versinfo !== vi && !go.opt_initial) {
-        go.opt_need_redraw = 1;
+        go.opt_need_redraw = TRUE;
     }
     return optn_ok;
 }
@@ -2829,7 +2837,7 @@ async function optfn_whatis_coord(optidx, req, negated, opts, op) {   // options
         if (negated) {
             iflags.getpos_coords = 110;
             return optn_ok;
-        } else if (!$c.peq(op = await string_for_env_opt(allopt[optidx].name, opts, 0), new $c.Ptr(empty_optstr, 0))) {
+        } else if (!$c.peq(op = await string_for_env_opt(allopt[optidx].name, opts, FALSE), new $c.Ptr(empty_optstr, 0))) {
             c = lowc(op.get(0));
             if (c && $c.strchr(new $c.Ptr(optfn_whatis_coord$gpcoords, 0), c)) {
                 iflags.getpos_coords = c;
@@ -2860,7 +2868,7 @@ async function optfn_whatis_filter(optidx, req, negated, opts, op) {   // option
         if (negated) {
             iflags.getloc_filter = GFILTER_NONE;
             return optn_ok;
-        } else if (!$c.peq(op = await string_for_env_opt(allopt[optidx].name, opts, 0), new $c.Ptr(empty_optstr, 0))) {
+        } else if (!$c.peq(op = await string_for_env_opt(allopt[optidx].name, opts, FALSE), new $c.Ptr(empty_optstr, 0))) {
             c = lowc(op.get(0));
             switch (c) {
                 case 110:
@@ -2901,7 +2909,7 @@ async function optfn_windowborders(optidx, req, negated, opts, op) {   // option
     if (req === do_set) {
         op = await string_for_opt(opts, negated);
         if (negated && !$c.peq(op, new $c.Ptr(empty_optstr, 0))) {
-            await bad_negation(allopt[optidx].name, 1);
+            await bad_negation(allopt[optidx].name, TRUE);
             retval = optn_err;
         } else {
             if (negated) {
@@ -2942,7 +2950,7 @@ async function optfn_windowcolors(optidx, req, negated, opts, op) {   // options
         return optn_ok;
     }
     if (req === do_set) {
-        if (!$c.peq(op = await string_for_opt(opts, 0), new $c.Ptr(empty_optstr, 0))) {
+        if (!$c.peq(op = await string_for_opt(opts, FALSE), new $c.Ptr(empty_optstr, 0))) {
             if (!await wc_set_window_colors(op)) {
                 await config_error_add($c.lit("Could not set %s '%s'"), allopt[optidx].name, op);
                 return optn_err;
@@ -2976,7 +2984,7 @@ async function optfn_windowtype(optidx, req, negated, opts, op) {   // options.c
             if (iflags.windowtype_locked) {
                 return optn_ok;
             }
-            if (!$c.peq(op = await string_for_env_opt(allopt[optidx].name, opts, 0), new $c.Ptr(empty_optstr, 0))) {
+            if (!$c.peq(op = await string_for_env_opt(allopt[optidx].name, opts, FALSE), new $c.Ptr(empty_optstr, 0))) {
                 nmcpy(new $c.Ptr(gc.chosen_windowtype, 0), op, WINTYPELEN);
                 if (!iflags.windowtype_deferred) {
                     await choose_windows(new $c.Ptr(gc.chosen_windowtype, 0));
@@ -3003,7 +3011,7 @@ async function pfxfn_cond_(optidx, req, negated, opts, op) {   // options.c:4994
         reslt = await parse_cond_option(negated, opts);
         switch (reslt) {
             case 0:
-                opt_set_in_config[pfx_cond_] = 1;
+                opt_set_in_config[pfx_cond_] = TRUE;
                 break;
             case 3:
                 await config_error_add($c.lit("Ambiguous condition option %s"), opts);
@@ -3017,7 +3025,7 @@ async function pfxfn_cond_(optidx, req, negated, opts, op) {   // options.c:4994
         if (reslt !== 0) {
             return optn_err;
         }
-        go.opt_need_redraw = 1;
+        go.opt_need_redraw = TRUE;
         return optn_ok;
     }
     if (req === get_val || req === get_cnf_val) {
@@ -3065,7 +3073,7 @@ async function pfxfn_font(optidx, req, negated, opts, op) {   // options.c:5039
             if (duplicate) {
                 await complain_about_duplicate(optidx);
             }
-            if (opttype > 0 && !negated && !$c.peq(op = await string_for_opt(opts, 0), new $c.Ptr(empty_optstr, 0))) {
+            if (opttype > 0 && !negated && !$c.peq(op = await string_for_opt(opts, FALSE), new $c.Ptr(empty_optstr, 0))) {
                 switch (opttype) {
                     case MAP_OPTION:
                         $t1 = $c.atoi(op), iflags.wc_fontsiz_map = $t1;
@@ -3087,13 +3095,13 @@ async function pfxfn_font(optidx, req, negated, opts, op) {   // options.c:5039
             return optn_ok;
         } else {
             await config_error_add($c.lit("Unknown %s parameter '%s'"), $c.lit("font"), opts);
-            return 0;
+            return FALSE;
         }
-        if (opttype > 0 && !$c.peq(op = await string_for_opt(opts, 0), new $c.Ptr(empty_optstr, 0))) {
+        if (opttype > 0 && !$c.peq(op = await string_for_opt(opts, FALSE), new $c.Ptr(empty_optstr, 0))) {
             await wc_set_font_name(opttype, op);
             return optn_ok;
         } else if (negated) {
-            await bad_negation(allopt[optidx].name, 1);
+            await bad_negation(allopt[optidx].name, TRUE);
             return optn_err;
         }
         return optn_ok;
@@ -3150,7 +3158,7 @@ export async function optfn_boolean(optidx, req, negated, opts, op) {   // optio
         return optn_ok;
     }
     if (req === do_set) {
-        nosexchange = 0;
+        nosexchange = FALSE;
         ln = 0;
         if (!allopt[optidx].addr) {
             return optn_ok;
@@ -3161,7 +3169,7 @@ export async function optfn_boolean(optidx, req, negated, opts, op) {   // optio
         if (go.opt_initial && allopt[optidx].setwhere === set_wiznofuz) {
             return optn_err;
         }
-        op = await string_for_opt(opts, 1);
+        op = await string_for_opt(opts, TRUE);
         if (!$c.peq(op, new $c.Ptr(empty_optstr, 0))) {
             if (negated) {
                 await config_error_add($c.lit("Negated boolean '%s' should not have a parameter"), allopt[optidx].name);
@@ -3169,9 +3177,9 @@ export async function optfn_boolean(optidx, req, negated, opts, op) {   // optio
             }
             ln = $c.i32($c.strlen(op));
             if (!strncmpi(op, $c.lit("true"), ln) || !strncmpi(op, $c.lit("yes"), ln) || !strncmpi(op, $c.lit("on"), -1) || digit(op.get(0)) && $c.atoi(op) === 1) {
-                negated = 0;
+                negated = FALSE;
             } else if (!strncmpi(op, $c.lit("false"), ln) || !strncmpi(op, $c.lit("no"), ln) || !strncmpi(op, $c.lit("off"), -1) || digit(op.get(0)) && $c.atoi(op) === 0) {
-                negated = 1;
+                negated = TRUE;
             } else if (!allopt[optidx].valok) {
                 await config_error_add($c.lit("'%s' is not valid for a boolean"), opts);
                 return optn_silenterr;
@@ -3186,7 +3194,7 @@ export async function optfn_boolean(optidx, req, negated, opts, op) {   // optio
             case opt_female:
                 if (!strncmpi(opts, $c.lit("female"), ln > 3 ? ln : 3)) {
                     if (!go.opt_initial && flags.female === negated) {
-                        nosexchange = 1;
+                        nosexchange = TRUE;
                     } else {
                         $t1 = flags.female = $c.i8(!negated ? 1 : 0), flags.initgend = $t1;
                         return optn_ok;
@@ -3194,7 +3202,7 @@ export async function optfn_boolean(optidx, req, negated, opts, op) {   // optio
                 }
                 if (!strncmpi(opts, $c.lit("male"), ln > 3 ? ln : 3)) {
                     if (!go.opt_initial && flags.female !== negated) {
-                        nosexchange = 1;
+                        nosexchange = TRUE;
                     } else {
                         $t2 = flags.female = negated, flags.initgend = $t2;
                         return optn_ok;
@@ -3230,12 +3238,12 @@ export async function optfn_boolean(optidx, req, negated, opts, op) {   // optio
                         iflags.wc2_petattr = ATR_INVERSE;
                     }
                 }
-                go.opt_need_redraw = 1;
+                go.opt_need_redraw = TRUE;
                 break;
             case opt_idlecheckpoint:
                 await pline($c.lit("There is no underlying support for 'idlecheckpoint' compiled in."));
-                iflags.idlecheckpoint = 0;
-                give_opt_msg = 0;
+                iflags.idlecheckpoint = FALSE;
+                give_opt_msg = FALSE;
                 break;
             default:
                 break;
@@ -3256,10 +3264,10 @@ export async function optfn_boolean(optidx, req, negated, opts, op) {   // optio
             case opt_showvers:
             case opt_showexp:
             case opt_time:
-                if ($c.andu64(windowprocs.wincap2, WC2_HILITE_STATUS | 128) !== 0) {
-                    await status_initialize(1);
+                if (VIA_WINDOWPORT()) {
+                    await status_initialize(TRUE);
                 }
-                disp.botl = 1;
+                disp.botl = TRUE;
                 break;
             case opt_fixinv:
             case opt_price_quotes:
@@ -3276,7 +3284,7 @@ export async function optfn_boolean(optidx, req, negated, opts, op) {   // optio
                 await vision_recalc(2);
                 gv.vision_full_recalc = 1;
                 if (iflags.wc_color) {
-                    go.opt_need_redraw = 1;
+                    go.opt_need_redraw = TRUE;
                 }
                 break;
             case opt_wizmgender:
@@ -3286,29 +3294,29 @@ export async function optfn_boolean(optidx, req, negated, opts, op) {   // optio
             case opt_perm_invent:
             case opt_ascii_map:
             case opt_tiled_map:
-                go.opt_need_redraw = 1;
-                go.opt_need_glyph_reset = 1;
+                go.opt_need_redraw = TRUE;
+                go.opt_need_glyph_reset = TRUE;
                 break;
             case opt_hitpointbar:
-                if ($c.andu64(windowprocs.wincap2, WC2_HILITE_STATUS | 128) !== 0) {
-                    await status_initialize(1);
-                    go.opt_need_redraw = 1;
+                if (VIA_WINDOWPORT()) {
+                    await status_initialize(TRUE);
+                    go.opt_need_redraw = TRUE;
                 }
                 break;
             case opt_color:
-                go.opt_need_redraw = 1;
-                go.opt_need_glyph_reset = 1;
+                go.opt_need_redraw = TRUE;
+                go.opt_need_glyph_reset = TRUE;
                 break;
             case opt_customcolors:
-                go.opt_reset_customcolors = 1;
+                go.opt_reset_customcolors = TRUE;
                 break;
             case opt_customsymbols:
-                go.opt_reset_customsymbols = 1;
+                go.opt_reset_customsymbols = TRUE;
                 break;
             case opt_menucolors:
             case opt_guicolor:
                 await update_inventory();
-                go.opt_need_promptstyle = 1;
+                go.opt_need_promptstyle = TRUE;
                 break;
             case opt_mention_decor:
                 iflags.prev_decor = STONE;
@@ -3340,9 +3348,9 @@ async function spcfn_misc_menu_cmd(midx, req, negated, opts, op) {   // options.
     }
     if (req === do_set) {
         if (negated) {
-            await bad_negation(default_menu_cmd_info[midx].name, 0);
+            await bad_negation(default_menu_cmd_info[midx].name, FALSE);
             return optn_err;
-        } else if (!$c.peq(op = await string_for_opt(opts, 0), new $c.Ptr(empty_optstr, 0))) {
+        } else if (!$c.peq(op = await string_for_opt(opts, FALSE), new $c.Ptr(empty_optstr, 0))) {
             c = $c.i8(txt2key(op));
             if (await illegal_menu_cmd_key($c.u8(c))) {
                 return optn_err;
@@ -3361,13 +3369,13 @@ function can_set_perm_invent() {   // options.c:5488
     let old_perminv_mode = 0;
     old_perminv_mode = iflags.perminv_mode;
     if (!$c.andu64(windowprocs.wincap, WC_PERM_INVENT)) {
-        return 0;
+        return FALSE;
     }
     if (iflags.perminv_mode === InvOptNone) {
         iflags.perminv_mode = InvOptOn;
     }
-    old_perminv_mode;
-    return 1;
+    nhUse(old_perminv_mode);
+    return TRUE;
 }
 async function handler_menustyle() {   // options.c:5544
     let tmpwin = 0, any = new $T.any(), chngd = 0, i = 0, n = 0, old_menu_style = 0, buf = new Int8Array(256), sep = 0, style_pick = [null], clr = 0;
@@ -3375,8 +3383,8 @@ async function handler_menustyle() {   // options.c:5544
     sep = $c.i8(iflags.menu_tab_sep ? 9 : 32);
     style_pick[0] = null;
     clr = NO_COLOR;
-    tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
-    await windowprocs.win_start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW_MENU);
+    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     for (i = 0; i < 4; i = i + 1 | 0) {
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%-12.12s%c%.60s"), menutype[i][0], sep, menutype[i][1]);
@@ -3385,7 +3393,7 @@ async function handler_menustyle() {   // options.c:5544
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%4s%-12.12s%c%.60s"), $c.lit(""), $c.lit(""), sep, menutype[i][2]);
         await add_menu_str(tmpwin, new $c.Ptr(buf, 0));
     }
-    await windowprocs.win_end_menu(tmpwin, $c.lit("Select menustyle:"));
+    await end_menu()(tmpwin, $c.lit("Select menustyle:"));
     n = await select_menu(tmpwin, PICK_ONE, new $c.Ptr(style_pick, 0));
     if (n > 0) {
         i = $c.radd(style_pick[0], 0).item.a_int - 1 | 0;
@@ -3395,7 +3403,7 @@ async function handler_menustyle() {   // options.c:5544
         flags.menu_style = $c.i8(i);
         $c.free(style_pick[0]);
     }
-    await windowprocs.win_destroy_nhwindow(tmpwin);
+    await destroy_nhwindow()(tmpwin);
     chngd = $c.i8(flags.menu_style !== old_menu_style ? 1 : 0);
     if (chngd || flags.verbose) {
         await pline($c.lit("'menustyle' %s \"%s\"."), chngd ? $c.lit("changed to") : $c.lit("is still"), menutype[flags.menu_style][0]);
@@ -3406,8 +3414,8 @@ async function handler_align_misc(optidx) {   // options.c:5586
     let tmpwin = 0, any = new $T.any(), window_pick = [null], abuf = new Int8Array(256), clr = 0;
     window_pick[0] = null;
     clr = NO_COLOR;
-    tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
-    await windowprocs.win_start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW_MENU);
+    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     any.a_int = ALIGN_TOP;
     await add_menu(tmpwin, nul_glyphinfo, any, 116, 0, ATR_NONE, clr, $c.lit("top"), MENU_ITEMFLAGS_NONE);
@@ -3418,7 +3426,7 @@ async function handler_align_misc(optidx) {   // options.c:5586
     any.a_int = ALIGN_RIGHT;
     await add_menu(tmpwin, nul_glyphinfo, any, 114, 0, ATR_NONE, clr, $c.lit("right"), MENU_ITEMFLAGS_NONE);
     $c.__builtin___sprintf_chk(new $c.Ptr(abuf, 0), 0, 256, $c.lit("Select %s window placement relative to the map:"), optidx === opt_align_message ? $c.lit("message") : $c.lit("status"));
-    await windowprocs.win_end_menu(tmpwin, new $c.Ptr(abuf, 0));
+    await end_menu()(tmpwin, new $c.Ptr(abuf, 0));
     if (await select_menu(tmpwin, PICK_ONE, new $c.Ptr(window_pick, 0)) > 0) {
         if (optidx === opt_align_message) {
             iflags.wc_align_message = window_pick[0].item.a_int;
@@ -3427,7 +3435,7 @@ async function handler_align_misc(optidx) {   // options.c:5586
         }
         $c.free(window_pick[0]);
     }
-    await windowprocs.win_destroy_nhwindow(tmpwin);
+    await destroy_nhwindow()(tmpwin);
     return optn_ok;
 }
 async function handler_autounlock(optidx) {   // options.c:5624
@@ -3438,8 +3446,8 @@ async function handler_autounlock(optidx) {   // options.c:5624
     window_pick[0] = null;
     res = optn_ok;
     clr = NO_COLOR;
-    tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
-    await windowprocs.win_start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW_MENU);
+    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     for (i = 0; i < 4; i = i + 1 | 0) {
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%-10.10s%c%.40s"), unlocktypes[i][0], sep, unlocktypes[i][1]);
@@ -3448,7 +3456,7 @@ async function handler_autounlock(optidx) {   // options.c:5624
         await add_menu(tmpwin, nul_glyphinfo, any, unlocktypes[i][0].get(0), 0, ATR_NONE, clr, new $c.Ptr(buf, 0), presel ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     }
     $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Select '%.20s' actions:"), optname);
-    await windowprocs.win_end_menu(tmpwin, new $c.Ptr(buf, 0));
+    await end_menu()(tmpwin, new $c.Ptr(buf, 0));
     n = await select_menu(tmpwin, PICK_ANY, new $c.Ptr(window_pick, 0));
     if (n > 0) {
         newflags = 0;
@@ -3460,10 +3468,10 @@ async function handler_autounlock(optidx) {   // options.c:5624
     } else if (n === 0) {
         flags.autounlock = 0;
     }
-    await windowprocs.win_destroy_nhwindow(tmpwin);
+    await destroy_nhwindow()(tmpwin);
     chngd = $c.i8(flags.autounlock !== oldflags ? 1 : 0);
     if ((chngd || flags.verbose) && give_opt_msg) {
-        await optfn_autounlock(optidx, get_val, 0, new $c.Ptr(buf, 0), $c.asArr(null, Int8Array));
+        await optfn_autounlock(optidx, get_val, FALSE, new $c.Ptr(buf, 0), $c.asArr(null, Int8Array));
         await pline($c.lit("'%s' %s '%s'."), optname, chngd ? $c.lit("changed to") : $c.lit("is still"), new $c.Ptr(buf, 0));
     }
     return res;
@@ -3472,8 +3480,8 @@ async function handler_disclose() {   // options.c:5675
     let tmpwin = 0, any = new $T.any(), i = 0, n = 0, buf = new Int8Array(256), disc_cat = new Int32Array(6), pick_cnt = 0, pick_idx = 0, opt_idx = 0, c = 0, disclosure_pick = [null], clr = 0;
     disclosure_pick[0] = null;
     clr = NO_COLOR;
-    tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
-    await windowprocs.win_start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW_MENU);
+    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i = i + 1 | 0) {
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%-12s[%c%c]"), handler_disclose$disclosure_names[i], flags.end_disclose[i], disclosure_options[i]);
@@ -3481,7 +3489,7 @@ async function handler_disclose() {   // options.c:5675
         await add_menu(tmpwin, nul_glyphinfo, any, disclosure_options[i], 0, ATR_NONE, clr, new $c.Ptr(buf, 0), MENU_ITEMFLAGS_NONE);
         disc_cat[i] = 0;
     }
-    await windowprocs.win_end_menu(tmpwin, $c.lit("Change which disclosure options categories:"));
+    await end_menu()(tmpwin, $c.lit("Change which disclosure options categories:"));
     pick_cnt = await select_menu(tmpwin, PICK_ANY, new $c.Ptr(disclosure_pick, 0));
     if (pick_cnt > 0) {
         for (pick_idx = 0; pick_idx < pick_cnt; pick_idx = pick_idx + 1 | 0) {
@@ -3491,31 +3499,31 @@ async function handler_disclose() {   // options.c:5675
         $c.free(disclosure_pick[0]);
         disclosure_pick[0] = null;
     }
-    await windowprocs.win_destroy_nhwindow(tmpwin);
+    await destroy_nhwindow()(tmpwin);
     for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i = i + 1 | 0) {
         if (disc_cat[i]) {
             c = flags.end_disclose[i];
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Disclosure options for %s:"), handler_disclose$disclosure_names[i]);
-            tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
-            await windowprocs.win_start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+            tmpwin = await create_nhwindow()(NHW_MENU);
+            await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
             any.$copyFrom(cg.zeroany);
-            any.a_char = 45;
+            any.a_char = DISCLOSE_NO_WITHOUT_PROMPT;
             await add_menu(tmpwin, nul_glyphinfo, any, 0, any.a_char, ATR_NONE, clr, $c.lit("Never disclose, without prompting"), c === any.a_char ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
-            any.a_char = 43;
+            any.a_char = DISCLOSE_YES_WITHOUT_PROMPT;
             await add_menu(tmpwin, nul_glyphinfo, any, 0, any.a_char, ATR_NONE, clr, $c.lit("Always disclose, without prompting"), c === any.a_char ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
             if (handler_disclose$disclosure_names[i].get(0) === 118 || handler_disclose$disclosure_names[i].get(0) === 103) {
-                any.a_char = 35;
+                any.a_char = DISCLOSE_SPECIAL_WITHOUT_PROMPT;
                 await add_menu(tmpwin, nul_glyphinfo, any, 0, any.a_char, ATR_NONE, clr, $c.lit("Always disclose, pick sort order from menu"), c === any.a_char ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
             }
-            any.a_char = 110;
+            any.a_char = DISCLOSE_PROMPT_DEFAULT_NO;
             await add_menu(tmpwin, nul_glyphinfo, any, 0, any.a_char, ATR_NONE, clr, $c.lit("Prompt, with default answer of \"No\""), c === any.a_char ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
-            any.a_char = 121;
+            any.a_char = DISCLOSE_PROMPT_DEFAULT_YES;
             await add_menu(tmpwin, nul_glyphinfo, any, 0, any.a_char, ATR_NONE, clr, $c.lit("Prompt, with default answer of \"Yes\""), c === any.a_char ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
             if (handler_disclose$disclosure_names[i].get(0) === 118 || handler_disclose$disclosure_names[i].get(0) === 103) {
-                any.a_char = 63;
+                any.a_char = DISCLOSE_PROMPT_DEFAULT_SPECIAL;
                 await add_menu(tmpwin, nul_glyphinfo, any, 0, any.a_char, ATR_NONE, clr, $c.lit("Prompt, with default answer of \"Ask\" to request sort menu"), c === any.a_char ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
             }
-            await windowprocs.win_end_menu(tmpwin, new $c.Ptr(buf, 0));
+            await end_menu()(tmpwin, new $c.Ptr(buf, 0));
             n = await select_menu(tmpwin, PICK_ONE, new $c.Ptr(disclosure_pick, 0));
             if (n > 0) {
                 flags.end_disclose[i] = $c.radd(disclosure_pick[0], 0).item.a_char;
@@ -3524,7 +3532,7 @@ async function handler_disclose() {   // options.c:5675
                 }
                 $c.free(disclosure_pick[0]);
             }
-            await windowprocs.win_destroy_nhwindow(tmpwin);
+            await destroy_nhwindow()(tmpwin);
         }
     }
     return optn_ok;
@@ -3545,8 +3553,8 @@ async function handler_menu_objsyms() {   // options.c:5795
     picklist[0] = null;
     sep = $c.i8(iflags.menu_tab_sep ? 9 : 32);
     clr = NO_COLOR;
-    tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
-    await windowprocs.win_start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW_MENU);
+    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     for (i = 0; i < 6; i = i + 1 | 0) {
         nh_snprintf($c.lit("handler_menu_objsyms"), 5809, new $c.Ptr(buf, 0), 256, $c.lit("%-12.12s%c%.60s"), objsymvals[i].nam, sep, objsymvals[i].descr);
@@ -3554,7 +3562,7 @@ async function handler_menu_objsyms() {   // options.c:5795
         j = objsymvals[i].num;
         await add_menu(tmpwin, nul_glyphinfo, any, $c.i8(48 + i | 0), new $c.Ptr(buf, 0).get(0), ATR_NONE, clr, new $c.Ptr(buf, 0), j === iflags.menuobjsyms ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     }
-    await windowprocs.win_end_menu(tmpwin, $c.lit("Set object symbols in menus to what?"));
+    await end_menu()(tmpwin, $c.lit("Set object symbols in menus to what?"));
     n = await select_menu(tmpwin, PICK_ONE, new $c.Ptr(picklist, 0));
     if (n > 0) {
         i = $c.radd(picklist[0], 0).item.a_int - 1 | 0;
@@ -3564,7 +3572,7 @@ async function handler_menu_objsyms() {   // options.c:5795
         set_menuobjsyms_flags(i);
         $c.free(picklist[0]);
     }
-    await windowprocs.win_destroy_nhwindow(tmpwin);
+    await destroy_nhwindow()(tmpwin);
     return optn_ok;
 }
 async function handler_msg_window() {   // options.c:5832
@@ -3576,8 +3584,8 @@ async function handler_msg_window() {   // options.c:5832
         sep = $c.i8(iflags.menu_tab_sep ? 9 : 32);
         old_prevmsg_window = iflags.prevmsg_window;
         window_pick[0] = null;
-        tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
-        await windowprocs.win_start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+        tmpwin = await create_nhwindow()(NHW_MENU);
+        await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
         any.$copyFrom(cg.zeroany);
         for (i = 0; i < 4; i = i + 1 | 0) {
             if (i < 2 && is_curses) {
@@ -3589,7 +3597,7 @@ async function handler_msg_window() {   // options.c:5832
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%4s%-12.12s%c%.60s"), $c.lit(""), $c.lit(""), sep, msgwind[i][2]);
             await add_menu_str(tmpwin, new $c.Ptr(buf, 0));
         }
-        await windowprocs.win_end_menu(tmpwin, $c.lit("Select message history display type:"));
+        await end_menu()(tmpwin, $c.lit("Select message history display type:"));
         n = await select_menu(tmpwin, PICK_ONE, new $c.Ptr(window_pick, 0));
         if (n > 0) {
             c = $c.radd(window_pick[0], 0).item.a_char;
@@ -3599,10 +3607,10 @@ async function handler_msg_window() {   // options.c:5832
             iflags.prevmsg_window = c;
             $c.free(window_pick[0]);
         }
-        await windowprocs.win_destroy_nhwindow(tmpwin);
+        await destroy_nhwindow()(tmpwin);
         chngd = $c.i8(iflags.prevmsg_window !== old_prevmsg_window ? 1 : 0);
         if (chngd || flags.verbose) {
-            await optfn_msg_window(opt_msg_window, get_val, 0, new $c.Ptr(buf, 0), new $c.Ptr(empty_optstr, 0));
+            await optfn_msg_window(opt_msg_window, get_val, FALSE, new $c.Ptr(buf, 0), new $c.Ptr(empty_optstr, 0));
             await pline($c.lit("'msg_window' %.20s \"%.20s\"."), chngd ? $c.lit("changed to") : $c.lit("is still"), new $c.Ptr(buf, 0));
         }
     } else {
@@ -3614,57 +3622,57 @@ async function handler_number_pad() {   // options.c:5893
     let tmpwin = 0, any = new $T.any(), i = 0, mode_pick = [null], clr = 0;
     mode_pick[0] = null;
     clr = NO_COLOR;
-    tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
-    await windowprocs.win_start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW_MENU);
+    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     for (i = 0; i < 6; i = i + 1 | 0) {
         any.a_int = i + 1 | 0;
         await add_menu(tmpwin, nul_glyphinfo, any, $c.i8(97 + i | 0), $c.i8(48 + i | 0), ATR_NONE, clr, handler_number_pad$npchoices[i], MENU_ITEMFLAGS_NONE);
     }
-    await windowprocs.win_end_menu(tmpwin, $c.lit("Select number_pad mode:"));
+    await end_menu()(tmpwin, $c.lit("Select number_pad mode:"));
     if (await select_menu(tmpwin, PICK_ONE, new $c.Ptr(mode_pick, 0)) > 0) {
         switch (mode_pick[0].item.a_int - 1 | 0) {
             case 0:
-                iflags.num_pad = 0;
+                iflags.num_pad = FALSE;
                 iflags.num_pad_mode = 0;
                 break;
             case 1:
-                iflags.num_pad = 1;
+                iflags.num_pad = TRUE;
                 iflags.num_pad_mode = 0;
                 break;
             case 2:
-                iflags.num_pad = 1;
+                iflags.num_pad = TRUE;
                 iflags.num_pad_mode = 1;
                 break;
             case 3:
-                iflags.num_pad = 1;
+                iflags.num_pad = TRUE;
                 iflags.num_pad_mode = 2;
                 break;
             case 4:
-                iflags.num_pad = 1;
+                iflags.num_pad = TRUE;
                 iflags.num_pad_mode = 3;
                 break;
             case 5:
-                iflags.num_pad = 0;
+                iflags.num_pad = FALSE;
                 iflags.num_pad_mode = 1;
                 break;
         }
-        await reset_commands(0);
-        await windowprocs.win_number_pad(iflags.num_pad ? 1 : 0);
+        await reset_commands(FALSE);
+        await number_pad()(iflags.num_pad ? 1 : 0);
         $c.free(mode_pick[0]);
     }
-    await windowprocs.win_destroy_nhwindow(tmpwin);
+    await destroy_nhwindow()(tmpwin);
     return optn_ok;
 }
 async function handler_paranoid_confirmation() {   // options.c:5953
     let tmpwin = 0, any = new $T.any(), i = 0, mkey = 0, mbuf = new Int8Array(128), ebuf = new Int8Array(256), cbuf = new Int8Array(128), explain = null, cmdnm = null, paranoia_picks = [null], clr = 0;
     paranoia_picks[0] = null;
     clr = NO_COLOR;
-    tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
-    await windowprocs.win_start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW_MENU);
+    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     for (i = 0; paranoia[i].flagmask !== 0; i = i + 1 | 0) {
-        if (paranoia[i].flagmask === PARANOID_BONES && !flags.debug) {
+        if (paranoia[i].flagmask === PARANOID_BONES && !wizard()) {
             continue;
         }
         explain = paranoia[i].explain;
@@ -3672,7 +3680,7 @@ async function handler_paranoid_confirmation() {   // options.c:5953
             if (mkey) {
                 $c.__builtin___sprintf_chk(new $c.Ptr(mbuf, 0), 0, 128, $c.lit("'%.9s'"), visctrl(mkey));
             } else {
-                cmdnm = await cmdname_from_func(do_reqmenu, new $c.Ptr(cbuf, 0), 1);
+                cmdnm = await cmdname_from_func(do_reqmenu, new $c.Ptr(cbuf, 0), TRUE);
                 if (!cmdnm) {
                     cmdnm = $c.lit("reqmenu");
                 }
@@ -3683,7 +3691,7 @@ async function handler_paranoid_confirmation() {   // options.c:5953
         any.a_int = paranoia[i].flagmask;
         await add_menu(tmpwin, nul_glyphinfo, any, paranoia[i].argname.get(0), 0, ATR_NONE, clr, explain, (flags.paranoia_bits & paranoia[i].flagmask >>> 0) >>> 0 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     }
-    await windowprocs.win_end_menu(tmpwin, $c.lit("Actions requiring extra confirmation:"));
+    await end_menu()(tmpwin, $c.lit("Actions requiring extra confirmation:"));
     i = await select_menu(tmpwin, PICK_ANY, new $c.Ptr(paranoia_picks, 0));
     if (i >= 0) {
         flags.paranoia_bits = 0;
@@ -3694,7 +3702,7 @@ async function handler_paranoid_confirmation() {   // options.c:5953
             $c.free(paranoia_picks[0]);
         }
     }
-    await windowprocs.win_destroy_nhwindow(tmpwin);
+    await destroy_nhwindow()(tmpwin);
     return optn_ok;
 }
 async function handler_perminv_mode() {   // options.c:6011
@@ -3704,8 +3712,8 @@ async function handler_perminv_mode() {   // options.c:6011
     old_pi = iflags.perminv_mode;
     new_pi = old_pi;
     widest = !(windowprocs.wp_id === wp_tty) ? 8 : 11;
-    tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
-    await windowprocs.win_start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW_MENU);
+    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     for (i = 0; i < 9; i = i + 1 | 0) {
         if (!(pi0 = perminv_modes[i][0])) {
@@ -3723,9 +3731,9 @@ async function handler_perminv_mode() {   // options.c:6011
         any.a_int = i + 1 | 0;
         await add_menu(tmpwin, nul_glyphinfo, any, let_, $c.i8(48 + i | 0), ATR_NONE, NO_COLOR, new $c.Ptr(buf, 0), i === old_pi ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     }
-    await windowprocs.win_end_menu(tmpwin, $c.lit("Choose permanent inventory mode:"));
+    await end_menu()(tmpwin, $c.lit("Choose permanent inventory mode:"));
     n = await select_menu(tmpwin, PICK_ONE, new $c.Ptr(pi_pick, 0));
-    await windowprocs.win_destroy_nhwindow(tmpwin);
+    await destroy_nhwindow()(tmpwin);
     if (n > 0) {
         new_pi = $c.radd(pi_pick[0], 0).item.a_int - 1 | 0;
         if (n > 1 && new_pi === old_pi) {
@@ -3736,15 +3744,15 @@ async function handler_perminv_mode() {   // options.c:6011
     }
     if (n >= 0) {
         buf[0] = 0;
-        await optfn_perminv_mode(opt_perm_invent, get_val, 0, new $c.Ptr(buf, 0), null);
+        await optfn_perminv_mode(opt_perm_invent, get_val, FALSE, new $c.Ptr(buf, 0), null);
         await pline($c.lit("'perminv_mode' %s '%s' (%s)."), new_pi !== old_pi ? $c.lit("changed to") : $c.lit("is still"), perminv_modes[new_pi][0], new $c.Ptr(buf, 0));
         if (new_pi !== InvOptNone && !old_perm_invent) {
             $t1 = can_set_perm_invent(), iflags.perm_invent = $t1;
         } else if (new_pi === InvOptNone && old_perm_invent) {
-            iflags.perm_invent = 0;
+            iflags.perm_invent = FALSE;
         }
         if (new_pi !== old_pi || iflags.perm_invent !== old_perm_invent) {
-            go.opt_need_redraw = 1;
+            go.opt_need_redraw = TRUE;
         }
     }
     return optn_ok;
@@ -3754,45 +3762,45 @@ async function handler_pickup_burden() {   // options.c:6086
     burden_letters = $c.lit("ubsntl");
     burden_pick[0] = null;
     clr = NO_COLOR;
-    tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
-    await windowprocs.win_start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW_MENU);
+    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     for (i = 0; i < 6; i = i + 1 | 0) {
         burden_name = burdentype[i];
         any.a_int = i + 1 | 0;
         await add_menu(tmpwin, nul_glyphinfo, any, burden_letters.get(i), 0, ATR_NONE, clr, burden_name, MENU_ITEMFLAGS_NONE);
     }
-    await windowprocs.win_end_menu(tmpwin, $c.lit("Select encumbrance level:"));
+    await end_menu()(tmpwin, $c.lit("Select encumbrance level:"));
     if (await select_menu(tmpwin, PICK_ONE, new $c.Ptr(burden_pick, 0)) > 0) {
         flags.pickup_burden = burden_pick[0].item.a_int - 1 | 0;
         $c.free(burden_pick[0]);
     }
-    await windowprocs.win_destroy_nhwindow(tmpwin);
+    await destroy_nhwindow()(tmpwin);
     return optn_ok;
 }
 async function handler_pickup_types() {   // options.c:6114
     let buf = new Int8Array(256);
-    await parseoptions($c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("pickup_types"), 256), 0, 0);
+    await parseoptions($c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("pickup_types"), 256), FALSE, FALSE);
     return optn_ok;
 }
 async function handler_runmode() {   // options.c:6124
     let tmpwin = 0, any = new $T.any(), i = 0, mode_name = null, mode_pick = [null], clr = 0;
     mode_pick[0] = null;
     clr = NO_COLOR;
-    tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
-    await windowprocs.win_start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW_MENU);
+    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     for (i = 0; i < 4; i = i + 1 | 0) {
         mode_name = runmodes[i];
         any.a_int = i + 1 | 0;
         await add_menu(tmpwin, nul_glyphinfo, any, mode_name.get(0), 0, ATR_NONE, clr, mode_name, MENU_ITEMFLAGS_NONE);
     }
-    await windowprocs.win_end_menu(tmpwin, $c.lit("Select run/travel display mode:"));
+    await end_menu()(tmpwin, $c.lit("Select run/travel display mode:"));
     if (await select_menu(tmpwin, PICK_ONE, new $c.Ptr(mode_pick, 0)) > 0) {
         flags.runmode = mode_pick[0].item.a_int - 1 | 0;
         $c.free(mode_pick[0]);
     }
-    await windowprocs.win_destroy_nhwindow(tmpwin);
+    await destroy_nhwindow()(tmpwin);
     return optn_ok;
 }
 async function handler_petattr() {   // options.c:6152
@@ -3802,7 +3810,7 @@ async function handler_petattr() {   // options.c:6152
         iflags.wc2_petattr = tmp;
         iflags.wc_hilite_pet = $c.i8(iflags.wc2_petattr !== ATR_NONE ? 1 : 0);
         if (!go.opt_initial) {
-            go.opt_need_redraw = 1;
+            go.opt_need_redraw = TRUE;
         }
     }
     return optn_ok;
@@ -3811,15 +3819,15 @@ async function handler_sortloot() {   // options.c:6167
     let tmpwin = 0, any = new $T.any(), i = 0, n = 0, sortl_name = null, sortl_pick = [null], clr = 0, c = 0;
     sortl_pick[0] = null;
     clr = NO_COLOR;
-    tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
-    await windowprocs.win_start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW_MENU);
+    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     for (i = 0; i < 3; i = i + 1 | 0) {
         sortl_name = sortltype[i];
         any.a_char = sortl_name.get(0);
         await add_menu(tmpwin, nul_glyphinfo, any, sortl_name.get(0), 0, ATR_NONE, clr, sortl_name, flags.sortloot === sortl_name.get(0) ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     }
-    await windowprocs.win_end_menu(tmpwin, $c.lit("Select loot sorting type:"));
+    await end_menu()(tmpwin, $c.lit("Select loot sorting type:"));
     n = await select_menu(tmpwin, PICK_ONE, new $c.Ptr(sortl_pick, 0));
     if (n > 0) {
         c = $c.radd(sortl_pick[0], 0).item.a_char;
@@ -3832,7 +3840,7 @@ async function handler_sortloot() {   // options.c:6167
         }
         $c.free(sortl_pick[0]);
     }
-    await windowprocs.win_destroy_nhwindow(tmpwin);
+    await destroy_nhwindow()(tmpwin);
     return optn_ok;
 }
 async function handler_whatis_coord() {   // options.c:6206
@@ -3840,19 +3848,19 @@ async function handler_whatis_coord() {   // options.c:6206
     window_pick[0] = null;
     gpc = $c.i8(iflags.getpos_coords);
     clr = NO_COLOR;
-    tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
-    await windowprocs.win_start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW_MENU);
+    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
-    any.a_char = 99;
-    await add_menu(tmpwin, nul_glyphinfo, any, 99, 0, ATR_NONE, clr, $c.lit("compass ('east' or '3s' or '2n,4w')"), gpc === 99 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
-    any.a_char = 102;
-    await add_menu(tmpwin, nul_glyphinfo, any, 102, 0, ATR_NONE, clr, $c.lit("full compass ('east' or '3south' or '2north,4west')"), gpc === 102 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
-    any.a_char = 109;
-    await add_menu(tmpwin, nul_glyphinfo, any, 109, 0, ATR_NONE, clr, $c.lit("map <x,y>"), gpc === 109 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
-    any.a_char = 115;
-    await add_menu(tmpwin, nul_glyphinfo, any, 115, 0, ATR_NONE, clr, $c.lit("screen [row,column]"), gpc === 115 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
-    any.a_char = 110;
-    await add_menu(tmpwin, nul_glyphinfo, any, 110, 0, ATR_NONE, clr, $c.lit("none (no coordinates displayed)"), gpc === 110 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+    any.a_char = GPCOORDS_COMPASS;
+    await add_menu(tmpwin, nul_glyphinfo, any, GPCOORDS_COMPASS, 0, ATR_NONE, clr, $c.lit("compass ('east' or '3s' or '2n,4w')"), gpc === 99 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+    any.a_char = GPCOORDS_COMFULL;
+    await add_menu(tmpwin, nul_glyphinfo, any, GPCOORDS_COMFULL, 0, ATR_NONE, clr, $c.lit("full compass ('east' or '3south' or '2north,4west')"), gpc === 102 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+    any.a_char = GPCOORDS_MAP;
+    await add_menu(tmpwin, nul_glyphinfo, any, GPCOORDS_MAP, 0, ATR_NONE, clr, $c.lit("map <x,y>"), gpc === 109 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+    any.a_char = GPCOORDS_SCREEN;
+    await add_menu(tmpwin, nul_glyphinfo, any, GPCOORDS_SCREEN, 0, ATR_NONE, clr, $c.lit("screen [row,column]"), gpc === 115 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+    any.a_char = GPCOORDS_NONE;
+    await add_menu(tmpwin, nul_glyphinfo, any, GPCOORDS_NONE, 0, ATR_NONE, clr, $c.lit("none (no coordinates displayed)"), gpc === 110 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     await add_menu_str(tmpwin, $c.lit(""));
     $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("map: upper-left: <%d,%d>, lower-right: <%d,%d>%s"), 1, 0, 79, 20, flags.verbose ? $c.lit("; column 0 unused, off left edge") : $c.lit(""));
     await add_menu_str(tmpwin, new $c.Ptr(buf, 0));
@@ -3862,7 +3870,7 @@ async function handler_whatis_coord() {   // options.c:6206
     $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("screen: upper-left: [%02d,%02d], lower-right: [%d,%d]%s"), 2, 1, 22, 79, flags.verbose ? $c.lit("; column 80 is not used") : $c.lit(""));
     await add_menu_str(tmpwin, new $c.Ptr(buf, 0));
     await add_menu_str(tmpwin, $c.lit(""));
-    await windowprocs.win_end_menu(tmpwin, $c.lit("Select coordinate display when auto-describing a map position:"));
+    await end_menu()(tmpwin, $c.lit("Select coordinate display when auto-describing a map position:"));
     if ((pick_cnt = await select_menu(tmpwin, PICK_ONE, new $c.Ptr(window_pick, 0))) > 0) {
         iflags.getpos_coords = $c.radd(window_pick[0], 0).item.a_char;
         if (pick_cnt > 1 && iflags.getpos_coords === gpc) {
@@ -3870,7 +3878,7 @@ async function handler_whatis_coord() {   // options.c:6206
         }
         $c.free(window_pick[0]);
     }
-    await windowprocs.win_destroy_nhwindow(tmpwin);
+    await destroy_nhwindow()(tmpwin);
     return optn_ok;
 }
 async function handler_whatis_filter() {   // options.c:6279
@@ -3878,8 +3886,8 @@ async function handler_whatis_filter() {   // options.c:6279
     window_pick[0] = null;
     gfilt = $c.i8(iflags.getloc_filter);
     clr = NO_COLOR;
-    tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
-    await windowprocs.win_start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW_MENU);
+    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     any.a_char = GFILTER_NONE + 1;
     await add_menu(tmpwin, nul_glyphinfo, any, 110, 0, ATR_NONE, clr, $c.lit("no filtering"), gfilt === GFILTER_NONE ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
@@ -3887,7 +3895,7 @@ async function handler_whatis_filter() {   // options.c:6279
     await add_menu(tmpwin, nul_glyphinfo, any, 118, 0, ATR_NONE, clr, $c.lit("in view only"), gfilt === GFILTER_VIEW ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     any.a_char = GFILTER_AREA + 1;
     await add_menu(tmpwin, nul_glyphinfo, any, 97, 0, ATR_NONE, clr, $c.lit("in same area"), gfilt === GFILTER_AREA ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
-    await windowprocs.win_end_menu(tmpwin, $c.lit("Select location filtering when going for next/previous map position:"));
+    await end_menu()(tmpwin, $c.lit("Select location filtering when going for next/previous map position:"));
     if ((pick_cnt = await select_menu(tmpwin, PICK_ONE, new $c.Ptr(window_pick, 0))) > 0) {
         iflags.getloc_filter = $c.radd(window_pick[0], 0).item.a_char - 1 | 0;
         if (pick_cnt > 1 && iflags.getloc_filter === gfilt) {
@@ -3895,13 +3903,13 @@ async function handler_whatis_filter() {   // options.c:6279
         }
         $c.free(window_pick[0]);
     }
-    await windowprocs.win_destroy_nhwindow(tmpwin);
+    await destroy_nhwindow()(tmpwin);
     return optn_ok;
 }
 async function handler_symset(optidx) {   // options.c:6321
     let reslt = 0;
     reslt = await do_symset($c.i8(optidx === opt_roguesymset ? 1 : 0));
-    go.opt_need_redraw = 1;
+    go.opt_need_redraw = TRUE;
     return reslt;
 }
 async function handler_autopickup_exception() {   // options.c:6331
@@ -3912,13 +3920,13 @@ async function handler_autopickup_exception() {   // options.c:6331
         numapes = count_apes();
         opt_idx = await handle_add_list_remove($c.lit("autopickup exception"), numapes);
         if (opt_idx === 3) {
-            return 1;
+            return TRUE;
         } else if (opt_idx === 0) {
             $t1 = apebuf[1] = 0, apebuf[0] = $t1;
             await getlin($c.lit("What new autopickup exception pattern?"), new $c.Ptr(apebuf, 1));
             mungspaces(new $c.Ptr(apebuf, 1));
             if (apebuf[1] === 27) {
-                return 1;
+                return TRUE;
             }
             if (apebuf[1]) {
                 apebuf[0] = 34;
@@ -3929,8 +3937,8 @@ async function handler_autopickup_exception() {   // options.c:6331
             continue ape_again$;
         } else {
             pick_list[0] = null;
-            tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
-            await windowprocs.win_start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+            tmpwin = await create_nhwindow()(NHW_MENU);
+            await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
             if (numapes) {
                 ape = ga.apelist;
                 any.$copyFrom(cg.zeroany);
@@ -3943,7 +3951,7 @@ async function handler_autopickup_exception() {   // options.c:6331
                 }
             }
             $c.__builtin___sprintf_chk(new $c.Ptr(apebuf, 0), 0, 258, $c.lit("%s autopickup exceptions"), opt_idx === 1 ? $c.lit("List of") : $c.lit("Remove which"));
-            await windowprocs.win_end_menu(tmpwin, new $c.Ptr(apebuf, 0));
+            await end_menu()(tmpwin, new $c.Ptr(apebuf, 0));
             pick_cnt = await select_menu(tmpwin, opt_idx === 1 ? PICK_NONE : PICK_ANY, new $c.Ptr(pick_list, 0));
             if (pick_cnt > 0) {
                 for (pick_idx = 0; pick_idx < pick_cnt; pick_idx = pick_idx + 1 | 0) {
@@ -3951,7 +3959,7 @@ async function handler_autopickup_exception() {   // options.c:6331
                 }
                 $c.free(pick_list[0]), pick_list[0] = null;
             }
-            await windowprocs.win_destroy_nhwindow(tmpwin);
+            await destroy_nhwindow()(tmpwin);
             if (pick_cnt >= 0) {
                 continue ape_again$;
             }
@@ -3987,14 +3995,14 @@ async function handler_menu_colors() {   // options.c:6407
                 }
                 if (new $c.Ptr(mcbuf, 0).get(0) && await test_regex_pattern(new $c.Ptr(mcbuf, 0), $c.lit("MENUCOLORS regex")) && (mcclr = await query_color(null, NO_COLOR)) !== -1 && (mcattr = await query_attr(null, ATR_NONE)) !== -1 && !await add_menu_coloring_parsed(new $c.Ptr(mcbuf, 0), mcclr, mcattr)) {
                     await pline($c.lit("Error adding the menu color."));
-                    await windowprocs.win_wait_synch();
+                    await wait_synch()();
                 }
                 $goto = "menucolors_again"; continue D1;
             } else {
                 pick_list[0] = null;
                 tmp = gm.menu_colorings;
-                tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
-                await windowprocs.win_start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+                tmpwin = await create_nhwindow()(NHW_MENU);
+                await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
                 any.$copyFrom(cg.zeroany);
                 mc_idx = 0;
                 while (tmp) {
@@ -4015,7 +4023,7 @@ async function handler_menu_colors() {   // options.c:6407
                     tmp = tmp.next;
                 }
                 $c.__builtin___sprintf_chk(new $c.Ptr(mcbuf, 0), 0, 256, $c.lit("%s menu colors"), opt_idx === 1 ? $c.lit("List of") : $c.lit("Remove which"));
-                await windowprocs.win_end_menu(tmpwin, new $c.Ptr(mcbuf, 0));
+                await end_menu()(tmpwin, new $c.Ptr(mcbuf, 0));
                 pick_cnt = await select_menu(tmpwin, opt_idx === 1 ? PICK_NONE : PICK_ANY, new $c.Ptr(pick_list, 0));
                 if (pick_cnt > 0) {
                     for (pick_idx = 0; pick_idx < pick_cnt; pick_idx = pick_idx + 1 | 0) {
@@ -4023,7 +4031,7 @@ async function handler_menu_colors() {   // options.c:6407
                     }
                     $c.free(pick_list[0]), pick_list[0] = null;
                 }
-                await windowprocs.win_destroy_nhwindow(tmpwin);
+                await destroy_nhwindow()(tmpwin);
                 if (pick_cnt >= 0) {
                     $goto = "menucolors_again"; continue D1;
                 }
@@ -4039,24 +4047,24 @@ async function handler_msgtype() {   // options.c:6502
         nmt = msgtype_count();
         opt_idx = await handle_add_list_remove($c.lit("message type"), nmt);
         if (opt_idx === 3) {
-            return 1;
+            return TRUE;
         } else if (opt_idx === 0) {
             mtbuf[0] = 0;
             await getlin($c.lit("What new message pattern?"), new $c.Ptr(mtbuf, 0));
             if (new $c.Ptr(mtbuf, 0).get(0) === 27) {
-                return 1;
+                return TRUE;
             }
             if (new $c.Ptr(mtbuf, 0).get(0) && await test_regex_pattern(new $c.Ptr(mtbuf, 0), $c.lit("MSGTYPE regex")) && (mttyp = await query_msgtype()) !== -1 && !await msgtype_add(mttyp, new $c.Ptr(mtbuf, 0))) {
                 await pline($c.lit("Error adding the message type."));
-                await windowprocs.win_wait_synch();
+                await wait_synch()();
             }
             continue msgtypes_again$;
         } else {
             pick_list[0] = null;
             tmp = gp.plinemsg_types;
             clr = NO_COLOR;
-            tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
-            await windowprocs.win_start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+            tmpwin = await create_nhwindow()(NHW_MENU);
+            await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
             any.$copyFrom(cg.zeroany);
             mt_idx = 0;
             while (tmp) {
@@ -4073,7 +4081,7 @@ async function handler_msgtype() {   // options.c:6502
                 tmp = tmp.next;
             }
             $c.__builtin___sprintf_chk(new $c.Ptr(mtbuf, 0), 0, 256, $c.lit("%s message types"), opt_idx === 1 ? $c.lit("List of") : $c.lit("Remove which"));
-            await windowprocs.win_end_menu(tmpwin, new $c.Ptr(mtbuf, 0));
+            await end_menu()(tmpwin, new $c.Ptr(mtbuf, 0));
             pick_cnt = await select_menu(tmpwin, opt_idx === 1 ? PICK_NONE : PICK_ANY, new $c.Ptr(pick_list, 0));
             if (pick_cnt > 0) {
                 for (pick_idx = 0; pick_idx < pick_cnt; pick_idx = pick_idx + 1 | 0) {
@@ -4081,7 +4089,7 @@ async function handler_msgtype() {   // options.c:6502
                 }
                 $c.free(pick_list[0]), pick_list[0] = null;
             }
-            await windowprocs.win_destroy_nhwindow(tmpwin);
+            await destroy_nhwindow()(tmpwin);
             if (pick_cnt >= 0) {
                 continue msgtypes_again$;
             }
@@ -4095,8 +4103,8 @@ async function handler_versinfo() {   // options.c:6573
     vi_pick[0] = null;
     have_branch = $c.i8(nomakedefs.git_branch && nomakedefs.git_branch.get(0) ? 1 : 0);
     vi = flags.versinfo | 0;
-    tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
-    await windowprocs.win_start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW_MENU);
+    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     $t1 = n = VI_NUMBER, any.a_int = $t1;
     await add_menu(tmpwin, nul_glyphinfo, any, 110, $c.i8(n + 48 | 0), ATR_NONE, NO_COLOR, $c.lit("version number"), vi & n ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
@@ -4104,7 +4112,7 @@ async function handler_versinfo() {   // options.c:6573
     await add_menu(tmpwin, nul_glyphinfo, any, 103, $c.i8(n + 48 | 0), ATR_NONE, NO_COLOR, $c.lit("game name"), vi & n ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     $t3 = n = VI_BRANCH, any.a_int = $t3;
     await add_menu(tmpwin, nul_glyphinfo, any, 98, $c.i8(n + 48 | 0), ATR_NONE, NO_COLOR, have_branch ? $c.lit("development branch") : $c.lit("(not applicable)"), vi & n ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
-    await windowprocs.win_end_menu(tmpwin, $c.lit("Select version information flags:"));
+    await end_menu()(tmpwin, $c.lit("Select version information flags:"));
     n = await select_menu(tmpwin, PICK_ANY, new $c.Ptr(vi_pick, 0));
     if (n > 0) {
         newval = 0;
@@ -4117,27 +4125,27 @@ async function handler_versinfo() {   // options.c:6573
         }
         $c.free(vi_pick[0]);
     }
-    await windowprocs.win_destroy_nhwindow(tmpwin);
+    await destroy_nhwindow()(tmpwin);
     return optn_ok;
 }
 async function handler_windowborders() {   // options.c:6620
     let tmpwin = 0, any = new $T.any(), i = 0, mode_name = null, mode_pick = [null], clr = 0;
     mode_pick[0] = null;
     clr = NO_COLOR;
-    tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
-    await windowprocs.win_start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW_MENU);
+    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     for (i = 0; i < 5; i = i + 1 | 0) {
         mode_name = handler_windowborders$windowborders_text[i];
         any.a_int = i + 1 | 0;
         await add_menu(tmpwin, nul_glyphinfo, any, $c.i8(97 + i | 0), $c.i8(48 + i | 0), ATR_NONE, clr, mode_name, MENU_ITEMFLAGS_NONE);
     }
-    await windowprocs.win_end_menu(tmpwin, $c.lit("Select window borders mode:"));
+    await end_menu()(tmpwin, $c.lit("Select window borders mode:"));
     if (await select_menu(tmpwin, PICK_ONE, new $c.Ptr(mode_pick, 0)) > 0) {
         iflags.wc2_windowborders = mode_pick[0].item.a_int - 1 | 0;
         $c.free(mode_pick[0]);
     }
-    await windowprocs.win_destroy_nhwindow(tmpwin);
+    await destroy_nhwindow()(tmpwin);
     return optn_ok;
 }
 async function string_for_opt(opts, val_optional) {   // options.c:6665
@@ -4230,7 +4238,7 @@ function duplicate_opt_detection(optidx) {   // options.c:6782
     if (go.opt_initial && go.opt_from_file) {
         return ($t1 = allopt[optidx].dupdetected, allopt[optidx].dupdetected = $c.i8($t1 + 1), $t1);
     }
-    return 0;
+    return FALSE;
 }
 async function complain_about_duplicate(optidx) {   // options.c:6790
     let buf = new Int8Array(256);
@@ -4322,7 +4330,7 @@ function escapes(cp, tp) {   // options.c:6896
 }
 export function txt2key(txt) {   // options.c:6971
     let uc = 0, makemeta = 0, tbuf = new Int8Array(128), key = 0, i = 0;
-    makemeta = 0;
+    makemeta = FALSE;
     txt = trimspaces(txt);
     if (!txt.get(0)) {
         return 0;
@@ -4355,14 +4363,14 @@ export function txt2key(txt) {   // options.c:6971
             txt = txt.add(1);
         }
         if (!txt.get(1)) {
-            return $c.u8($c.u8(txt.get(0)) - 128 | 0);
+            return $c.u8(M($c.u8(txt.get(0))));
         }
-        makemeta = 1;
+        makemeta = TRUE;
     }
     if (txt.get(0) === 94 || highc(txt.get(0)) === 67) {
         uc = $c.u8(txt.get(0));
         if (!txt.get(1)) {
-            return $c.u8(makemeta ? uc - 128 | 0 : uc);
+            return $c.u8(makemeta ? M(uc) : uc);
         }
         txt = txt.add(1);
         if (txt.get(0) === 45 && txt.get(1)) {
@@ -4371,11 +4379,11 @@ export function txt2key(txt) {   // options.c:6971
         if (txt.get(0) === 63) {
             return $c.u8(makemeta ? 4294967295 : 127);
         }
-        uc = $c.u8(31 & $c.u8(txt.get(0)));
-        return $c.u8(makemeta ? uc - 128 | 0 : uc);
+        uc = $c.u8(C($c.u8(txt.get(0))));
+        return $c.u8(makemeta ? M(uc) : uc);
     }
     if (makemeta && txt.get(0)) {
-        return $c.u8($c.u8(txt.get(0)) - 128 | 0);
+        return $c.u8(M($c.u8(txt.get(0))));
     }
     if (txt.get(0) >= 48 && txt.get(0) <= 57) {
         key = 0;
@@ -4394,7 +4402,7 @@ export async function initoptions() {   // options.c:7079
         await initoptions_init();
     }
     await assure_syscf_file();
-    await config_error_init(1, $c.lit("sysconf"), 0);
+    await config_error_init(TRUE, $c.lit("sysconf"), FALSE);
     go.opt_phase = syscf_opt;
     if (!await read_config_file($c.lit("sysconf"), set_in_sysconf)) {
         if (await config_error_done() && !iflags.initoptions_noterminate) {
@@ -4415,18 +4423,18 @@ export async function initoptions_init() {   // options.c:7119
     await allopt_array_init();
     if (gc.cmdline_windowsys) {
         nmcpy(new $c.Ptr(gc.chosen_windowtype, 0), gc.cmdline_windowsys, WINTYPELEN);
-        await config_error_init(0, $c.lit("command line"), 0);
+        await config_error_init(FALSE, $c.lit("command line"), FALSE);
         await choose_windows(gc.cmdline_windowsys);
         await config_error_done();
         if (windowprocs.name && !strncmpi(windowprocs.name, gc.cmdline_windowsys, -1)) {
-            iflags.windowtype_locked = 1;
+            iflags.windowtype_locked = TRUE;
         }
         $c.free(gc.cmdline_windowsys), gc.cmdline_windowsys = null;
     }
     if (!glyphid_cache_status()) {
         await fill_glyphid_cache();
     }
-    await reset_commands(1);
+    await reset_commands(TRUE);
     await init_random(rn2);
     await init_random(rn2_on_display_rng);
     go.opt_phase = builtin_opt;
@@ -4435,7 +4443,7 @@ export async function initoptions_init() {   // options.c:7119
             allopt[i].addr.set(0, allopt[i].initval);
         }
     }
-    flags.end_own = 0;
+    flags.end_own = FALSE;
     flags.end_top = 3;
     flags.end_around = 2;
     flags.paranoia_bits = PARANOID_PRAY | PARANOID_SWIM | PARANOID_TRAP;
@@ -4459,9 +4467,9 @@ export async function initoptions_init() {   // options.c:7119
     flags.pickup_burden = MOD_ENCUMBER;
     flags.sortloot = 108;
     for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i = i + 1 | 0) {
-        flags.end_disclose[i] = 110;
+        flags.end_disclose[i] = DISCLOSE_PROMPT_DEFAULT_NO;
     }
-    await switch_symbols(0);
+    await switch_symbols(FALSE);
     init_rogue_symbols();
     if ((opts = nh_getenv($c.lit("TERM"))) && !$c.strncmp(opts, $c.lit("AT"), 2)) {
         if (!gs.symset[PRIMARYSET].explicitly) {
@@ -4470,14 +4478,14 @@ export async function initoptions_init() {   // options.c:7119
         if (!gs.symset[ROGUESET].explicitly) {
             await load_symset($c.lit("RogueIBM"), ROGUESET);
         }
-        await switch_symbols(1);
-        iflags.wc_color = 1;
+        await switch_symbols(TRUE);
+        iflags.wc_color = TRUE;
     }
-    if ((opts = nh_getenv($c.lit("TERM"))) && !strncmpi(opts, $c.lit("vt"), 2) && gt.tc_gbl_data.tc_AS && gt.tc_gbl_data.tc_AE && $c.strchr(gt.tc_gbl_data.tc_AS, 14) && $c.strchr(gt.tc_gbl_data.tc_AE, 15)) {
+    if ((opts = nh_getenv($c.lit("TERM"))) && !strncmpi(opts, $c.lit("vt"), 2) && AS() && AE() && $c.strchr(gt.tc_gbl_data.tc_AS, 14) && $c.strchr(gt.tc_gbl_data.tc_AE, 15)) {
         if (!gs.symset[PRIMARYSET].explicitly) {
             await load_symset($c.lit("DECGraphics"), PRIMARYSET);
         }
-        await switch_symbols(1);
+        await switch_symbols(TRUE);
     }
     flags.menu_style = MENU_FULL;
     iflags.wc_align_message = ALIGN_TOP;
@@ -4489,7 +4497,7 @@ export async function initoptions_init() {   // options.c:7119
     objects[SLIME_MOLD].oc_name_idx = SLIME_MOLD;
     nmcpy(new $c.Ptr(svp.pl_fruit, 0), obj_descr[objects[SLIME_MOLD].oc_name_idx].oc_name, PL_FSIZ);
     await assure_syscf_file();
-    await config_error_init(1, $c.lit("sysconf"), 0);
+    await config_error_init(TRUE, $c.lit("sysconf"), FALSE);
     go.opt_phase = syscf_opt;
     if (!await read_config_file($c.lit("sysconf"), set_in_sysconf)) {
         if (await config_error_done() && !iflags.initoptions_noterminate) {
@@ -4506,7 +4514,7 @@ export async function initoptions_finish() {   // options.c:7324
     obj_descr[SLIME_MOLD].oc_name = $c.lit("fruit");
     sym = get_othersym(SYM_BOULDER, (svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? ROGUESET : PRIMARYSET);
     if (sym) {
-        gs.showsyms[SYM_BOULDER + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES + MAXMCLASSES + WARNCOUNT)] = sym;
+        gs.showsyms[SYM_BOULDER + SYM_OFF_X] = sym;
     }
     reglyph_darkroom();
     reset_glyphmap(gm_optionchange);
@@ -4516,15 +4524,15 @@ export async function initoptions_finish() {   // options.c:7324
     }
     await update_rest_on_space();
     if (iflags.wc_tiled_map && !wc_supported($c.lit("tiled_map"))) {
-        iflags.wc_tiled_map = 0, iflags.wc_ascii_map = 1;
+        iflags.wc_tiled_map = FALSE, iflags.wc_ascii_map = TRUE;
     } else if (iflags.wc_ascii_map && !wc_supported($c.lit("ascii_map")) && wc_supported($c.lit("tiled_map"))) {
-        iflags.wc_ascii_map = 0, iflags.wc_tiled_map = 1;
+        iflags.wc_ascii_map = FALSE, iflags.wc_tiled_map = TRUE;
     }
     if (glyphid_cache_status()) {
         free_glyphid_cache();
     }
     await apply_customizations(gc.currentgraphics >>> 0, do_custom_symbols | do_custom_colors);
-    go.opt_initial = 0;
+    go.opt_initial = FALSE;
     return;
 }
 export async function allopt_array_init() {   // options.c:7405
@@ -4540,16 +4548,16 @@ export async function allopt_array_init() {   // options.c:7405
         heed_all_options();
         for (i = 0; i < OPTCOUNT; i = i + 1 | 0) {
             if (allopt[i].optfn) {
-                await allopt[i].optfn(i, do_init, 0, new $c.Ptr(empty_optstr, 0), new $c.Ptr(empty_optstr, 0));
+                await allopt[i].optfn(i, do_init, FALSE, new $c.Ptr(empty_optstr, 0), new $c.Ptr(empty_optstr, 0));
             }
         }
-        allopt_array_init$options_array_inited_already = 1;
+        allopt_array_init$options_array_inited_already = TRUE;
     }
 }
 function set_menuobjsyms_flags(newobjsyms) {   // options.c:7446
     iflags.menuobjsyms = newobjsyms;
-    iflags.menu_head_objsym = $c.i8((newobjsyms & 1) !== 0 ? 1 : 0);
-    iflags.use_menu_glyphs = $c.i8((newobjsyms & 6) !== 0 ? 1 : 0);
+    iflags.menu_head_objsym = $c.i8((newobjsyms & 1) !== 0 ? TRUE : FALSE);
+    iflags.use_menu_glyphs = $c.i8((newobjsyms & 6) !== 0 ? TRUE : FALSE);
 }
 async function change_inv_order(op) {   // options.c:7466
     let oc_sym = 0, num = 0, sp = null, buf = new Int8Array(128), retval = 0, fail = 0, $t1, $t2, $t3;
@@ -4559,20 +4567,20 @@ async function change_inv_order(op) {   // options.c:7466
         buf[($t1 = num, num = $t1 + 1 | 0, $t1)] = COIN_CLASS;
     }
     for (sp = op; sp.get(0); sp = sp.add(1)) {
-        fail = 0;
+        fail = FALSE;
         oc_sym = def_char_to_objclass(sp.get(0));
         if (oc_sym === MAXOCLASSES) {
             await config_error_add($c.lit("Not an object class '%c'"), sp.get(0));
             retval = 0;
-            fail = 1;
+            fail = TRUE;
         } else if (!$c.strchr(new $c.Ptr(flags.inv_order, 0), oc_sym)) {
             await config_error_add($c.lit("Object class '%c' not allowed"), sp.get(0));
             retval = 0;
-            fail = 1;
+            fail = TRUE;
         } else if ($c.strchr(sp.add(1), sp.get(0))) {
             await config_error_add($c.lit("Duplicate object class '%c'"), sp.get(0));
             retval = 0;
-            fail = 1;
+            fail = TRUE;
         }
         if (!fail) {
             buf[($t2 = num, num = $t2 + 1 | 0, $t2)] = $c.i8(oc_sym);
@@ -4590,8 +4598,8 @@ async function change_inv_order(op) {   // options.c:7466
 }
 async function warning_opts(opts, optype) {   // options.c:7521
     let translate = new Uint8Array(6), length = 0, i = 0;
-    if ($c.peq(opts = await string_for_env_opt(optype, opts, 0), new $c.Ptr(empty_optstr, 0))) {
-        return 0;
+    if ($c.peq(opts = await string_for_env_opt(optype, opts, FALSE), new $c.Ptr(empty_optstr, 0))) {
+        return FALSE;
     }
     escapes(opts, opts);
     length = $c.i32($c.strlen(opts));
@@ -4599,7 +4607,7 @@ async function warning_opts(opts, optype) {   // options.c:7521
         translate[i] = $c.u8(i >= length ? 0 : opts.get(i) ? $c.u8(opts.get(i)) : def_warnsyms[i].sym);
     }
     assign_warnings(new $c.Ptr(translate, 0));
-    return 1;
+    return TRUE;
 }
 export function assign_warnings(graph_chars) {   // options.c:7541
     let i = 0;
@@ -4632,7 +4640,7 @@ async function feature_alert_opts(op, optn) {   // options.c:7558
 }
 export async function parsebindings(bindings) {   // options.c:7596
     let bind = null, key = 0, i = 0, ret = 0, $t1, $t2;
-    ret = 1;
+    ret = TRUE;
     if ((bind = $c.strchr(bindings, 44)) !== null) {
         if ($c.peq(bind, bindings)) {
             bind = $c.strchr(bind.add(1), 44);
@@ -4643,11 +4651,11 @@ export async function parsebindings(bindings) {   // options.c:7596
     if (bind) {
         ($t1 = bind, bind = $t1.add(1), $t1).set(0, 0);
         if (!await parsebindings(bind)) {
-            ret = 0;
+            ret = FALSE;
         }
     }
     if (!(bind = $c.strchr(bindings, 58))) {
-        return 0;
+        return FALSE;
     }
     ($t2 = bind, bind = $t2.add(1), $t2).set(0, 0);
     bind = trimspaces(bind);
@@ -4663,7 +4671,7 @@ export async function parsebindings(bindings) {   // options.c:7596
     key = txt2key(bindings);
     if (!key) {
         await config_error_add($c.lit("Unknown key binding key '%s'"), bindings);
-        return 0;
+        return FALSE;
     }
     if (bind_specialkey(key, bind)) {
         return ret;
@@ -4672,16 +4680,16 @@ export async function parsebindings(bindings) {   // options.c:7596
         if (!$c.strcmp(default_menu_cmd_info[i].name, bind)) {
             if (await illegal_menu_cmd_key(key)) {
                 await config_error_add($c.lit("Bad menu key %s:%s"), visctrl($c.i8(key)), bind);
-                return 0;
+                return FALSE;
             } else {
                 await add_menu_cmd_alias($c.i8(key), default_menu_cmd_info[i].cmd);
             }
             return ret;
         }
     }
-    if (!await bind_key(key, bind, 1)) {
+    if (!await bind_key(key, bind, TRUE)) {
         await config_error_add($c.lit("Unknown key binding command '%s'"), bind);
-        return 0;
+        return FALSE;
     }
     return ret;
 }
@@ -4698,8 +4706,8 @@ async function query_msgtype() {   // options.c:7701
     let tmpwin = 0, any = new $T.any(), i = 0, pick_cnt = 0, picks = [null], clr = 0;
     picks[0] = null;
     clr = NO_COLOR;
-    tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
-    await windowprocs.win_start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW_MENU);
+    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     for (i = 0; i < 6; i = i + 1 | 0) {
         if (msgtype_names[i].descr) {
@@ -4707,9 +4715,9 @@ async function query_msgtype() {   // options.c:7701
             await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR_NONE, clr, msgtype_names[i].descr, MENU_ITEMFLAGS_NONE);
         }
     }
-    await windowprocs.win_end_menu(tmpwin, $c.lit("How to show the message"));
+    await end_menu()(tmpwin, $c.lit("How to show the message"));
     pick_cnt = await select_menu(tmpwin, PICK_ONE, new $c.Ptr(picks, 0));
-    await windowprocs.win_destroy_nhwindow(tmpwin);
+    await destroy_nhwindow()(tmpwin);
     if (pick_cnt > 0) {
         i = picks[0].item.a_int - 1 | 0;
         $c.free(picks[0]);
@@ -4727,12 +4735,12 @@ async function msgtype_add(typ, pattern) {   // options.c:7731
         regex_free(tmp.regex);
         $c.free(tmp);
         await config_error_add($c.lit("%s: %s"), msgtype_add$re_error, re_error_desc);
-        return 0;
+        return FALSE;
     }
     $t2 = await dupstr(pattern), tmp.pattern = $t2;
     tmp.next = gp.plinemsg_types;
     gp.plinemsg_types = tmp;
-    return 1;
+    return TRUE;
 }
 export function msgtype_free() {   // options.c:7757
     let tmp = null, tmp2 = null;
@@ -4806,7 +4814,7 @@ export async function msgtype_parse_add(str) {   // options.c:7844
     if ($c.sscanf(str, $c.lit("%10s \"%255[^\"]\""), new $c.Ptr(msgtype, 0), new $c.Ptr(pattern, 0)) === 2) {
         typ = -1;
         for (i = 0; i < 6; i = i + 1 | 0) {
-            if (str_start_is(msgtype_names[i].name, new $c.Ptr(msgtype, 0), 1)) {
+            if (str_start_is(msgtype_names[i].name, new $c.Ptr(msgtype, 0), TRUE)) {
                 typ = msgtype_names[i].msgtyp;
                 break;
             }
@@ -4819,12 +4827,12 @@ export async function msgtype_parse_add(str) {   // options.c:7844
     } else {
         await config_error_add($c.lit("Malformed MSGTYPE"));
     }
-    return 0;
+    return FALSE;
 }
 async function test_regex_pattern(str, errmsg) {   // options.c:7871
     let match = null, re_error_desc = null, errbuf = new Int8Array(256), retval = 0;
     if (!str) {
-        return 0;
+        return FALSE;
     }
     if (!errmsg) {
         errmsg = new $c.Ptr(test_regex_pattern$def_errmsg, 0);
@@ -4832,7 +4840,7 @@ async function test_regex_pattern(str, errmsg) {   // options.c:7871
     match = await regex_init();
     if (!match) {
         await config_error_add($c.lit("%s"), errmsg);
-        return 0;
+        return FALSE;
     }
     retval = regex_compile(str, match);
     re_error_desc = !retval ? regex_error_desc(match, new $c.Ptr(errbuf, 0)) : null;
@@ -4845,34 +4853,34 @@ async function test_regex_pattern(str, errmsg) {   // options.c:7871
 async function parse_role_opt(optidx, negated, fullname, opts, opp) {   // options.c:7905
     let preval = null, op = null, which = 0, ok = 0, sp = null, val_negated = 0, prev_negated = 0, first = 0, negbuf = new Int8Array(256);
     which = optidx === opt_role ? RS_ROLE : optidx === opt_race ? RS_RACE : optidx === opt_gender ? RS_GENDER : optidx === opt_alignment ? RS_ALGNMNT : RS_filter;
-    ok = 0;
-    if (!$c.peq(op = await string_for_env_opt(fullname, opts, 0), new $c.Ptr(empty_optstr, 0))) {
-        prev_negated = 0;
-        first = 1;
+    ok = FALSE;
+    if (!$c.peq(op = await string_for_env_opt(fullname, opts, FALSE), new $c.Ptr(empty_optstr, 0))) {
+        prev_negated = FALSE;
+        first = TRUE;
         mungspaces(op);
         while (op.get(0)) {
             if (op.get(0) === 32) {
                 op = op.add(1);
             }
-            val_negated = 0;
+            val_negated = FALSE;
             while (op.get(0) === 33 || !strncmpi(op, $c.lit("no"), 2)) {
                 val_negated = $c.i8(!val_negated ? 1 : 0);
                 op = op.add(op.get(0) === 33 ? 1 : op.get(2) !== 45 ? 2 : 3);
             }
             if (!op.get(0) || op.get(0) === 32) {
                 await config_error_add($c.lit("Negated nothing for '%s'"), fullname);
-                return 0;
+                return FALSE;
             }
             if (!first) {
                 if (val_negated ^ prev_negated || negated && val_negated) {
                     await config_error_add($c.lit("Invalid mixed negation for '%s%s'"), negated ? $c.lit("!") : $c.lit(""), fullname);
-                    return 0;
+                    return FALSE;
                 } else if (!negated && !val_negated) {
                     await config_error_add($c.lit("Multiple role values only allowed when list is negated"));
-                    return 0;
+                    return FALSE;
                 }
             }
-            first = 0;
+            first = FALSE;
             prev_negated = val_negated;
             sp = $c.strchr(op, 32);
             if (sp) {
@@ -4885,7 +4893,7 @@ async function parse_role_opt(optidx, negated, fullname, opts, opp) {   // optio
                 }
                 if (!await setrolefilter(op)) {
                     await config_error_add($c.lit("Invalid %s '%s'"), fullname, op);
-                    return 0;
+                    return FALSE;
                 }
                 await saveoptstr(optidx, await rolefilterstring(new $c.Ptr(negbuf, 0), which));
                 opp.set(0, new $c.Ptr(parse_role_opt$neg_opt, 0));
@@ -4893,7 +4901,7 @@ async function parse_role_opt(optidx, negated, fullname, opts, opp) {   // optio
                 if (duplicate) {
                     if (preval && preval.get(0) === 33) {
                         await complain_about_duplicate(optidx);
-                        return 0;
+                        return FALSE;
                     }
                 }
                 await saveoptstr(optidx, op);
@@ -4906,7 +4914,7 @@ async function parse_role_opt(optidx, negated, fullname, opts, opp) {   // optio
                 op = op.add($c.idx($c.strlen(op)));
             }
         }
-        ok = 1;
+        ok = TRUE;
     }
     return ok;
 }
@@ -4925,16 +4933,16 @@ async function illegal_menu_cmd_key(c) {   // options.c:8037
     let j = 0;
     if (c === 0 || c === 13 || c === 10 || c === 27 || c === 32 || digit($c.i8(c)) || letter($c.i8(c)) && c !== 64) {
         await config_error_add($c.lit("Reserved menu command key '%s'"), visctrl($c.i8(c)));
-        return 1;
+        return TRUE;
     } else {
         for (j = 1; j < MAXOCLASSES; j = j + 1 | 0) {
             if (c === $c.u8(def_oc_syms[j].sym)) {
                 await config_error_add($c.lit("Menu command key '%s' is an object class"), visctrl($c.i8(c)));
-                return 1;
+                return TRUE;
             }
         }
     }
-    return 0;
+    return FALSE;
 }
 export async function oc_to_str(src, dest) {   // options.c:8062
     let i = 0, $t1, $t2;
@@ -4997,13 +5005,13 @@ export async function fruitadd(str, replace_fruit) {   // options.c:8170
     user_specified = $c.i8($c.peq(str, new $c.Ptr(svp.pl_fruit, 0)) ? 1 : 0);
     nonew$: {
         if (user_specified) {
-            found = 0;
-            numeric = 0;
+            found = FALSE;
+            numeric = FALSE;
             nmcpy(new $c.Ptr(svp.pl_fruit, 0), await makesingular(str), PL_FSIZ);
             globpfx = !$c.strncmp(new $c.Ptr(svp.pl_fruit, 0), $c.lit("small "), 6) || !$c.strncmp(new $c.Ptr(svp.pl_fruit, 0), $c.lit("large "), 6) ? 6 : !$c.strncmp(new $c.Ptr(svp.pl_fruit, 0), $c.lit("medium "), 7) ? 7 : !$c.strncmp(new $c.Ptr(svp.pl_fruit, 0), $c.lit("very large "), 11) ? 11 : 0;
             for (i = svb.bases[FOOD_CLASS]; objects[i].oc_class === FOOD_CLASS; i = i + 1 | 0) {
                 if (!$c.strcmp(obj_descr[objects[i].oc_name_idx].oc_name, new $c.Ptr(svp.pl_fruit, 0)) || globpfx > 0 && !$c.strcmp(obj_descr[objects[i].oc_name_idx].oc_name, new $c.Ptr(svp.pl_fruit, globpfx))) {
-                    found = 1;
+                    found = TRUE;
                     break;
                 }
             }
@@ -5012,7 +5020,7 @@ export async function fruitadd(str, replace_fruit) {   // options.c:8170
                     continue;
                 }
                 if (!c.get(0) || $c.isspace($c.u8(c.get(0)))) {
-                    numeric = 1;
+                    numeric = TRUE;
                 }
             }
             if (found || numeric || !$c.strncmp(new $c.Ptr(svp.pl_fruit, 0), $c.lit("cursed "), 7) || !$c.strncmp(new $c.Ptr(svp.pl_fruit, 0), $c.lit("uncursed "), 9) || !$c.strncmp(new $c.Ptr(svp.pl_fruit, 0), $c.lit("blessed "), 8) || !$c.strncmp(new $c.Ptr(svp.pl_fruit, 0), $c.lit("partly eaten "), 13) || !$c.strncmp(new $c.Ptr(svp.pl_fruit, 0), $c.lit("tin of "), 7) && (!$c.strcmp(new $c.Ptr(svp.pl_fruit, 0).add(7), $c.lit("spinach")) || await name_to_mon(new $c.Ptr(svp.pl_fruit, 0).add(7), null) >= LOW_PM && await name_to_mon(new $c.Ptr(svp.pl_fruit, 0).add(7), null) < NUMMONS) || !$c.strcmp(new $c.Ptr(svp.pl_fruit, 0), $c.lit("empty tin")) || (!$c.strcmp(new $c.Ptr(svp.pl_fruit, 0), $c.lit("glob")) || globpfx > 0 && !$c.strcmp($c.lit("glob"), new $c.Ptr(svp.pl_fruit, globpfx))) || (str_end_is(new $c.Ptr(svp.pl_fruit, 0), $c.lit(" corpse")) || str_end_is(new $c.Ptr(svp.pl_fruit, 0), $c.lit(" egg"))) && (await name_to_mon(new $c.Ptr(svp.pl_fruit, 0), null) >= LOW_PM && await name_to_mon(new $c.Ptr(svp.pl_fruit, 0), null) < NUMMONS)) {
@@ -5021,7 +5029,7 @@ export async function fruitadd(str, replace_fruit) {   // options.c:8170
                 nmcpy(new $c.Ptr(svp.pl_fruit, 0).add(8), new $c.Ptr(buf, 0), PL_FSIZ - 8);
             }
             new $c.Ptr(altname, 0).set(0, 0);
-            flags.made_fruit = 0;
+            flags.made_fruit = FALSE;
             if (replace_fruit) {
                 f = replace_fruit;
                 copynchars(new $c.Ptr(f.fname, 0), new $c.Ptr(svp.pl_fruit, 0), PL_FSIZ - 1);
@@ -5030,16 +5038,16 @@ export async function fruitadd(str, replace_fruit) {   // options.c:8170
         } else {
             copynchars(new $c.Ptr(altname, 0), str, PL_FSIZ - 1);
             sanitize_name(new $c.Ptr(altname, 0));
-            flags.made_fruit = 1;
+            flags.made_fruit = TRUE;
         }
-        f = await fruit_from_name(new $c.Ptr(altname, 0).get(0) ? new $c.Ptr(altname, 0) : str, 0, new $c.Ptr(highest_fruit_id, 0));
+        f = await fruit_from_name(new $c.Ptr(altname, 0).get(0) ? new $c.Ptr(altname, 0) : str, FALSE, new $c.Ptr(highest_fruit_id, 0));
         if (f) {
             break nonew$;
         }
         if (highest_fruit_id[0] >= 127) {
             return rnd(127);
         }
-        f = $c.asRec(await alloc(48), $T.fruit, 48);
+        f = await newfruit();
         $c.__builtin___memset_chk(f, 0, 48, -1);
         copynchars(new $c.Ptr(f.fname, 0), new $c.Ptr(altname, 0).get(0) ? new $c.Ptr(altname, 0) : str, PL_FSIZ - 1);
         $t1 = highest_fruit_id[0] = highest_fruit_id[0] + 1 | 0, f.fid = $t1;
@@ -5158,7 +5166,7 @@ async function optfn_o_status_cond(optidx, req, negated, opts, op) {   // option
     }
     if (req === do_handler) {
         if (await cond_menu()) {
-            opt_set_in_config[pfx_cond_] = 1;
+            opt_set_in_config[pfx_cond_] = TRUE;
         }
         return optn_ok;
     }
@@ -5182,7 +5190,7 @@ async function optfn_o_status_hilites(optidx, req, negated, opts, op) {   // opt
             return optn_err;
         } else {
             if (wc2_supported($c.lit("hilite_status"))) {
-                await windowprocs.win_preference_update($c.lit("hilite_status"));
+                await preference_update()($c.lit("hilite_status"));
             }
         }
         return optn_ok;
@@ -5198,7 +5206,7 @@ export async function get_option_value(optname, cnfvalid) {   // options.c:8481
                 return new $c.Ptr(get_option_value$retbuf, 0);
             } else if (allopt[i].opttyp === CompOpt && allopt[i].optfn) {
                 reslt = optn_err;
-                reslt = await allopt[i].optfn(allopt[i].idx, cnfvalid ? get_cnf_val : get_val, 0, new $c.Ptr(get_option_value$retbuf, 0), new $c.Ptr(empty_optstr, 0));
+                reslt = await allopt[i].optfn(allopt[i].idx, cnfvalid ? get_cnf_val : get_val, FALSE, new $c.Ptr(get_option_value$retbuf, 0), new $c.Ptr(empty_optstr, 0));
                 if (reslt === optn_ok && get_option_value$retbuf[0]) {
                     return new $c.Ptr(get_option_value$retbuf, 0);
                 }
@@ -5233,7 +5241,7 @@ async function longest_option_name(startpass, endpass) {   // options.c:8508
 }
 async function doset_simple_menu() {   // options.c:8536
     let fmtstr_doset_simple = new Int8Array(14), pick_list = [null], bool_p = null, name = null, fmtstr = null, buf = new Int8Array(256), buf2 = new Int8Array(256), abuf = new Int8Array(256), tmpwin = 0, any = new $T.any(), section = 0, i = 0, k = 0, pick_cnt = 0, reslt = 0, toggled_help = 0;
-    toggled_help = 0;
+    toggled_help = FALSE;
     if (!iflags.menu_tab_sep) {
         $c.__builtin___sprintf_chk(new $c.Ptr(fmtstr_doset_simple, 0), 0, 14, $c.lit("%%-%us [%%s]"), await longest_option_name(set_gameview, set_in_game));
     } else {
@@ -5241,8 +5249,8 @@ async function doset_simple_menu() {   // options.c:8536
     }
     fmtstr = new $c.Ptr(fmtstr_doset_simple, 0);
     redo_opt_help$: for (;;) {
-        tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
-        await windowprocs.win_start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+        tmpwin = await create_nhwindow()(NHW_MENU);
+        await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
         if (gs.simple_options_help) {
             $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), $c.lit("Use command '#optionsfull' to get the complete options list."), 256);
             await add_menu_str(tmpwin, new $c.Ptr(buf, 0));
@@ -5285,7 +5293,7 @@ async function doset_simple_menu() {   // options.c:8536
                         buf2[0] = 0;
                         reslt = optn_err;
                         if (allopt[k].optfn) {
-                            reslt = await allopt[k].optfn(allopt[k].idx, get_val, 0, new $c.Ptr(buf2, 0), new $c.Ptr(empty_optstr, 0));
+                            reslt = await allopt[k].optfn(allopt[k].idx, get_val, FALSE, new $c.Ptr(buf2, 0), new $c.Ptr(empty_optstr, 0));
                         }
                         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, fmtstr, name, reslt === optn_ok && buf2[0] ? new $c.Ptr(buf2, 0) : $c.lit("unknown"));
                         break;
@@ -5304,27 +5312,27 @@ async function doset_simple_menu() {   // options.c:8536
                 }
             }
         }
-        await windowprocs.win_end_menu(tmpwin, $c.lit("Options"));
-        go.opt_need_redraw = 0;
-        go.opt_need_glyph_reset = 0;
-        go.opt_reset_customcolors = 0;
-        go.opt_reset_customsymbols = 0;
-        go.opt_update_basic_palette = 0;
+        await end_menu()(tmpwin, $c.lit("Options"));
+        go.opt_need_redraw = FALSE;
+        go.opt_need_glyph_reset = FALSE;
+        go.opt_reset_customcolors = FALSE;
+        go.opt_reset_customsymbols = FALSE;
+        go.opt_update_basic_palette = FALSE;
         pick_cnt = await select_menu(tmpwin, PICK_ONE, new $c.Ptr(pick_list, 0));
         if (pick_cnt > 0) {
             k = $c.radd(pick_list[0], 0).item.a_int - 1 | 0;
             abuf[0] = 0;
             if (k === -2) {
                 gs.simple_options_help = $c.i8(!gs.simple_options_help ? 1 : 0);
-                toggled_help = 1;
+                toggled_help = TRUE;
             } else if (allopt[k].opttyp === BoolOpt) {
                 $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s%s"), allopt[k].addr.get(0) ? $c.lit("!") : $c.lit(""), allopt[k].name);
-                await parseoptions(new $c.Ptr(buf, 0), 0, 0);
+                await parseoptions(new $c.Ptr(buf, 0), FALSE, FALSE);
             } else {
                 if (allopt[k].has_handler && allopt[k].optfn) {
-                    reslt = await allopt[k].optfn(allopt[k].idx, do_handler, 0, new $c.Ptr(empty_optstr, 0), new $c.Ptr(empty_optstr, 0));
+                    reslt = await allopt[k].optfn(allopt[k].idx, do_handler, FALSE, new $c.Ptr(empty_optstr, 0), new $c.Ptr(empty_optstr, 0));
                     if (reslt === optn_ok && allopt[k].idx !== pfx_cond_) {
-                        opt_set_in_config[k] = 1;
+                        opt_set_in_config[k] = TRUE;
                     }
                 } else {
                     $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Set %s to what?"), allopt[k].name);
@@ -5332,18 +5340,18 @@ async function doset_simple_menu() {   // options.c:8536
                     if (abuf[0] !== 27) {
                         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s:"), allopt[k].name);
                         copynchars(eos(new $c.Ptr(buf, 0)), new $c.Ptr(abuf, 0), $c.i32($c.subu64(255, $c.strlen(new $c.Ptr(buf, 0)))));
-                        await parseoptions(new $c.Ptr(buf, 0), 0, 0);
+                        await parseoptions(new $c.Ptr(buf, 0), FALSE, FALSE);
                     }
                 }
             }
             if (k >= 0 && abuf[0] !== 27 && (wc_supported(allopt[k].name) || wc2_supported(allopt[k].name))) {
-                await windowprocs.win_preference_update(allopt[k].name);
+                await preference_update()(allopt[k].name);
             }
             $c.free(pick_list[0]), pick_list[0] = null;
         }
-        await windowprocs.win_destroy_nhwindow(tmpwin);
+        await destroy_nhwindow()(tmpwin);
         if (toggled_help) {
-            toggled_help = 0;
+            toggled_help = FALSE;
             continue redo_opt_help$;
         }
         break;
@@ -5353,23 +5361,23 @@ async function doset_simple_menu() {   // options.c:8536
 export async function doset_simple() {   // options.c:8707
     let pickedone = 0, flush = 0;
     pickedone = 0;
-    flush = 0;
+    flush = FALSE;
     if (iflags.menu_requested) {
-        iflags.menu_requested = 0;
+        iflags.menu_requested = FALSE;
         return await doset();
     }
     go.opt_phase = play_opt;
-    give_opt_msg = 0;
+    give_opt_msg = FALSE;
     do {
         pickedone = await doset_simple_menu();
         flush = go.opt_need_redraw;
         await reset_needed_visuals();
         if (flush) {
             await flush_screen(1);
-            flush = 0;
+            flush = FALSE;
         }
     } while (pickedone > 0);
-    give_opt_msg = 1;
+    give_opt_msg = TRUE;
     return ECMD_OK;
 }
 function term_for_boolean(idx, b) {   // options.c:8738
@@ -5385,17 +5393,17 @@ function term_for_boolean(idx, b) {   // options.c:8738
 export async function doset() {   // options.c:8758
     let fmtstr_doset = new Int8Array(16), buf = new Int8Array(256), name = null, indent = null, i = 0, pass = 0, pick_cnt = 0, pick_idx = 0, opt_indx = 0, bool_p = null, tmpwin = 0, any = new $T.any(), pick_list = [null], indexoffset = 0, startpass = 0, endpass = 0, gavehelp = 0, skiphelp = 0, clr = 0, k = 0, reslt = 0, abuf = new Int8Array(256);
     i = 0;
-    gavehelp = 0;
+    gavehelp = FALSE;
     skiphelp = $c.i8(!iflags.cmdassist ? 1 : 0);
     clr = NO_COLOR;
     if (iflags.menu_requested) {
-        iflags.menu_requested = 0;
+        iflags.menu_requested = FALSE;
         return await doset_simple();
     }
     go.opt_phase = play_opt;
     rerun$: for (;;) {
-        tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
-        await windowprocs.win_start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+        tmpwin = await create_nhwindow()(NHW_MENU);
+        await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
         if (!skiphelp) {
             any.$copyFrom(cg.zeroany);
             for (i = 0; i < 5; i = i + 1 | 0) {
@@ -5403,7 +5411,7 @@ export async function doset() {   // options.c:8758
                     $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%4s%.75s"), $c.lit(""), doset$helptext[i]);
                     await add_menu_str(tmpwin, new $c.Ptr(buf, 0));
                 } else {
-                    any.a_int = 219;
+                    any.a_int = HELP_IDX + 1;
                     await add_menu(tmpwin, nul_glyphinfo, any, 63, 63, ATR_NONE, clr, $c.lit("view help for options menu"), MENU_ITEMFLAGS_SKIPINVERT);
                 }
             }
@@ -5425,10 +5433,10 @@ export async function doset() {   // options.c:8758
                     if ($c.peq(bool_p, new $c.FieldRef(flags, "female", "i8"))) {
                         continue;
                     }
-                    if (allopt[i].setwhere === set_wizonly && !flags.debug) {
+                    if (allopt[i].setwhere === set_wizonly && !wizard()) {
                         continue;
                     }
-                    if (allopt[i].setwhere === set_wiznofuz && (!flags.debug || iflags.debug_fuzzer)) {
+                    if (allopt[i].setwhere === set_wiznofuz && (!wizard() || iflags.debug_fuzzer)) {
                         continue;
                     }
                     if (is_wc_option(name) && !wc_supported(name) || is_wc2_option(name) && !wc2_supported(name)) {
@@ -5474,15 +5482,15 @@ export async function doset() {   // options.c:8758
                 }
             }
         }
-        await windowprocs.win_end_menu(tmpwin, $c.lit("Set what options?"));
-        go.opt_need_redraw = 0;
-        go.opt_need_glyph_reset = 0;
+        await end_menu()(tmpwin, $c.lit("Set what options?"));
+        go.opt_need_redraw = FALSE;
+        go.opt_need_glyph_reset = FALSE;
         if ((pick_cnt = await select_menu(tmpwin, PICK_ANY, new $c.Ptr(pick_list, 0))) > 0) {
             for (pick_idx = 0; pick_idx < pick_cnt; pick_idx = pick_idx + 1 | 0) {
                 opt_indx = $c.radd(pick_list[0], pick_idx).item.a_int - 1 | 0;
-                if (opt_indx === 218) {
-                    await windowprocs.win_display_file($c.lit("optmenu"), 0);
-                    gavehelp = 1;
+                if (opt_indx === HELP_IDX) {
+                    await display_file()($c.lit("optmenu"), FALSE);
+                    gavehelp = TRUE;
                     continue;
                 }
                 if (opt_indx < -1) {
@@ -5492,13 +5500,13 @@ export async function doset() {   // options.c:8758
                 (!(opt_indx >= 0 && opt_indx < 218) ? 1 : 0) ? $c.__assert_rtn($c.lit("doset"), $c.lit("options.c"), 8924, $c.lit("IndexOk(opt_indx, allopt)")) : 0;
                 if (allopt[opt_indx].opttyp === BoolOpt) {
                     $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s%s"), allopt[opt_indx].addr.get(0) ? $c.lit("!") : $c.lit(""), allopt[opt_indx].name);
-                    await parseoptions(new $c.Ptr(buf, 0), 0, 0);
+                    await parseoptions(new $c.Ptr(buf, 0), FALSE, FALSE);
                 } else {
                     k = opt_indx;
                     if (allopt[k].has_handler && allopt[k].optfn) {
-                        reslt = await allopt[k].optfn(allopt[k].idx, do_handler, 0, new $c.Ptr(empty_optstr, 0), new $c.Ptr(empty_optstr, 0));
+                        reslt = await allopt[k].optfn(allopt[k].idx, do_handler, FALSE, new $c.Ptr(empty_optstr, 0), new $c.Ptr(empty_optstr, 0));
                         if (reslt === optn_ok) {
-                            opt_set_in_config[k] = 1;
+                            opt_set_in_config[k] = TRUE;
                         }
                     } else {
                         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Set %s to what?"), allopt[opt_indx].name);
@@ -5509,19 +5517,19 @@ export async function doset() {   // options.c:8758
                         }
                         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s:"), allopt[opt_indx].name);
                         $c.__builtin___strncat_chk(eos(new $c.Ptr(buf, 0)), new $c.Ptr(abuf, 0), $c.subu64(255, $c.strlen(new $c.Ptr(buf, 0))), -1);
-                        await parseoptions(new $c.Ptr(buf, 0), 0, 0);
+                        await parseoptions(new $c.Ptr(buf, 0), FALSE, FALSE);
                     }
                 }
                 if (wc_supported(allopt[opt_indx].name) || wc2_supported(allopt[opt_indx].name)) {
-                    await windowprocs.win_preference_update(allopt[opt_indx].name);
+                    await preference_update()(allopt[opt_indx].name);
                 }
             }
             $c.free(pick_list[0]), pick_list[0] = null;
         }
-        await windowprocs.win_destroy_nhwindow(tmpwin);
+        await destroy_nhwindow()(tmpwin);
         if (pick_cnt === 1 && gavehelp) {
-            skiphelp = 1;
-            gavehelp = 0;
+            skiphelp = TRUE;
+            gavehelp = FALSE;
             continue rerun$;
         }
         break;
@@ -5535,7 +5543,7 @@ async function reset_needed_visuals() {   // options.c:8980
     }
     if (go.opt_reset_customcolors || go.opt_update_basic_palette || go.opt_reset_customsymbols || go.opt_need_redraw) {
         if (go.opt_update_basic_palette) {
-            go.opt_update_basic_palette = 0;
+            go.opt_update_basic_palette = FALSE;
         }
         if (go.opt_reset_customcolors) {
             await reset_customcolors();
@@ -5555,11 +5563,11 @@ async function reset_needed_visuals() {   // options.c:8980
     if (disp.botl || disp.botlx) {
         await bot();
     }
-    go.opt_need_redraw = 0;
-    go.opt_need_glyph_reset = 0;
-    go.opt_reset_customcolors = 0;
-    go.opt_reset_customsymbols = 0;
-    go.opt_update_basic_palette = 0;
+    go.opt_need_redraw = FALSE;
+    go.opt_need_glyph_reset = FALSE;
+    go.opt_reset_customcolors = FALSE;
+    go.opt_reset_customsymbols = FALSE;
+    go.opt_update_basic_palette = FALSE;
 }
 async function doset_add_menu(win, option, fmtstr, idx, indexoffset) {   // options.c:9018
     let value = null, indent = null, buf = new Int8Array(256), buf2 = new Int8Array(256), any = new $T.any(), i = 0, reslt = 0, clr = 0;
@@ -5572,7 +5580,7 @@ async function doset_add_menu(win, option, fmtstr, idx, indexoffset) {   // opti
     if (i >= 0 && i < OPTCOUNT && allopt[i].name && allopt[i].optfn) {
         any.a_int = indexoffset === 0 ? 0 : (i + 1 | 0) + indexoffset | 0;
         if (allopt[i].optfn) {
-            reslt = await allopt[i].optfn(allopt[i].idx, get_val, 0, new $c.Ptr(buf2, 0), new $c.Ptr(empty_optstr, 0));
+            reslt = await allopt[i].optfn(allopt[i].idx, get_val, FALSE, new $c.Ptr(buf2, 0), new $c.Ptr(empty_optstr, 0));
         }
         if (reslt === optn_ok && buf2[0]) {
             value = new $c.Ptr(buf2, 0);
@@ -5591,7 +5599,7 @@ async function doset_add_menu(win, option, fmtstr, idx, indexoffset) {   // opti
 export async function show_menu_controls(win, dolist) {   // options.c:9070
     let buf = new Int8Array(256), fmt = null, arg = null, xcp = null, has_menu_shift = 0, i = 0, ch = 0;
     has_menu_shift = wc2_supported($c.lit("menu_shift"));
-    await windowprocs.win_putstr(win, 0, $c.lit("Menu control keys:"));
+    await putstr()(win, 0, $c.lit("Menu control keys:"));
     if (dolist) {
         fmt = $c.lit("%-7s %s");
         for (i = 0; default_menu_cmd_info[i].desc; i = i + 1 | 0) {
@@ -5600,47 +5608,47 @@ export async function show_menu_controls(win, dolist) {   // options.c:9070
                 continue;
             }
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, fmt, visctrl(get_menu_cmd_key(ch)), default_menu_cmd_info[i].desc);
-            await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
+            await putstr()(win, 0, new $c.Ptr(buf, 0));
         }
         fmt = $c.lit("%s%-7s %s");
         arg = $c.lit("");
     } else {
-        await windowprocs.win_putstr(win, 0, $c.lit(""));
+        await putstr()(win, 0, $c.lit(""));
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_altfmt, 0), $c.lit(""), $c.lit("Whole"), $c.lit("Current"));
-        await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
+        await putstr()(win, 0, new $c.Ptr(buf, 0));
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_altfmt, 0), $c.lit(""), $c.lit(" Menu"), $c.lit(" Page"));
-        await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
+        await putstr()(win, 0, new $c.Ptr(buf, 0));
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit("Select"), visctrl(get_menu_cmd_key(46)), visctrl(get_menu_cmd_key(44)));
-        await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
+        await putstr()(win, 0, new $c.Ptr(buf, 0));
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit("Invert"), visctrl(get_menu_cmd_key(64)), visctrl(get_menu_cmd_key(126)));
-        await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
+        await putstr()(win, 0, new $c.Ptr(buf, 0));
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit("Deselect"), visctrl(get_menu_cmd_key(45)), visctrl(get_menu_cmd_key(92)));
-        await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
-        await windowprocs.win_putstr(win, 0, $c.lit(""));
+        await putstr()(win, 0, new $c.Ptr(buf, 0));
+        await putstr()(win, 0, $c.lit(""));
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit("Go to"), visctrl(get_menu_cmd_key(62)), $c.lit("Next page"));
-        await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
+        await putstr()(win, 0, new $c.Ptr(buf, 0));
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit(""), visctrl(get_menu_cmd_key(60)), $c.lit("Previous page"));
-        await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
+        await putstr()(win, 0, new $c.Ptr(buf, 0));
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit(""), visctrl(get_menu_cmd_key(94)), $c.lit("First page"));
-        await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
+        await putstr()(win, 0, new $c.Ptr(buf, 0));
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit(""), visctrl(get_menu_cmd_key(124)), $c.lit("Last page"));
-        await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
+        await putstr()(win, 0, new $c.Ptr(buf, 0));
         if (has_menu_shift) {
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit("Pan view"), visctrl(get_menu_cmd_key(125)), $c.lit("Right (perm_invent only)"));
-            await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
+            await putstr()(win, 0, new $c.Ptr(buf, 0));
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit(""), visctrl(get_menu_cmd_key(123)), $c.lit("Left"));
-            await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
+            await putstr()(win, 0, new $c.Ptr(buf, 0));
         }
-        await windowprocs.win_putstr(win, 0, $c.lit(""));
+        await putstr()(win, 0, $c.lit(""));
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(show_menu_controls$mc_fmt, 0), $c.lit("Search"), visctrl(get_menu_cmd_key(58)), $c.lit("Exter a target string and invert all matching entries"));
-        await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
-        await windowprocs.win_putstr(win, 0, $c.lit(""));
+        await putstr()(win, 0, new $c.Ptr(buf, 0));
+        await putstr()(win, 0, $c.lit(""));
         fmt = $c.lit("%9s  %-8s %s");
         arg = $c.lit("Other ");
     }
     for (xcp = $c.relem(show_menu_controls$hardcoded, 0); xcp.key; xcp = $c.radd(xcp, 1)) {
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, fmt, arg, xcp.key, xcp.desc);
-        await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
+        await putstr()(win, 0, new $c.Ptr(buf, 0));
         arg = $c.lit("");
     }
 }
@@ -5668,8 +5676,8 @@ async function handle_add_list_remove(optname, numtotal) {   // options.c:9208
     let tmpwin = 0, any = new $T.any(), i = 0, pick_cnt = 0, opt_idx = 0, pick_list = [null], clr = 0, tmpbuf = new Int8Array(256);
     pick_list[0] = null;
     clr = NO_COLOR;
-    tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
-    await windowprocs.win_start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW_MENU);
+    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     for (i = 0; i < 4; i = i + 1 | 0) {
         any.a_int = any.a_int + 1 | 0;
@@ -5679,7 +5687,7 @@ async function handle_add_list_remove(optname, numtotal) {   // options.c:9208
         $c.__builtin___sprintf_chk(new $c.Ptr(tmpbuf, 0), 0, 256, handle_add_list_remove$action_titles[i].desc, i === 1 ? await makeplural(optname) : optname);
         await add_menu(tmpwin, nul_glyphinfo, any, handle_add_list_remove$action_titles[i].letr, 0, ATR_NONE, clr, new $c.Ptr(tmpbuf, 0), i === 3 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     }
-    await windowprocs.win_end_menu(tmpwin, $c.lit("Do what?"));
+    await end_menu()(tmpwin, $c.lit("Do what?"));
     if ((pick_cnt = await select_menu(tmpwin, PICK_ONE, new $c.Ptr(pick_list, 0))) > 0) {
         opt_idx = $c.radd(pick_list[0], 0).item.a_int - 1 | 0;
         if (pick_cnt > 1 && opt_idx === 3) {
@@ -5689,7 +5697,7 @@ async function handle_add_list_remove(optname, numtotal) {   // options.c:9208
     } else {
         opt_idx = 3;
     }
-    await windowprocs.win_destroy_nhwindow(tmpwin);
+    await destroy_nhwindow()(tmpwin);
     return opt_idx;
 }
 export async function dotogglepickup() {   // options.c:9256
@@ -5710,7 +5718,7 @@ export async function toggle_bool_option(p) {   // options.c:9278
     for (i = 0; i < OPTCOUNT; i = i + 1 | 0) {
         if (!strncmpi(allopt[i].name, p, $c.i32($c.strlen(p))) && allopt[i].opttyp === BoolOpt && allopt[i].setwhere === set_in_game && allopt[i].addr !== null) {
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s%s"), allopt[i].addr.get(0) ? $c.lit("!") : $c.lit(""), allopt[i].name);
-            if (await parseoptions(new $c.Ptr(buf, 0), 0, 0)) {
+            if (await parseoptions(new $c.Ptr(buf, 0), FALSE, FALSE)) {
                 ret = ECMD_OK;
             }
             await reset_needed_visuals();
@@ -5720,12 +5728,12 @@ export async function toggle_bool_option(p) {   // options.c:9278
 }
 export async function add_autopickup_exception(mapping) {   // options.c:9300
     let ape = null, text = new Int8Array(256), end = Int8Array.of(0), n = 0, grab = 0, errbuf = new Int8Array(256), re_error_desc = null, $t1, $t2;
-    grab = 0;
+    grab = FALSE;
     end[0] = 0;
     if ((n = $c.sscanf(mapping, $c.lit("\"<%253[^\"]\" %c"), new $c.Ptr(text, 0), new $c.Ptr(end, 0))) === 1 || n === 2 && end[0] === 35) {
-        grab = 1;
+        grab = TRUE;
     } else if ((n = $c.sscanf(mapping, $c.lit("\">%253[^\"]\" %c"), new $c.Ptr(text, 0), new $c.Ptr(end, 0))) === 1 || (n = $c.sscanf(mapping, $c.lit("\"%253[^\"]\" %c"), new $c.Ptr(text, 0), new $c.Ptr(end, 0))) === 1 || n === 2 && end[0] === 35) {
-        grab = 0;
+        grab = FALSE;
     } else {
         await config_error_add($c.lit("%s"), new $c.Ptr(add_autopickup_exception$APE_syntax_error, 0));
         return 0;
@@ -5804,17 +5812,17 @@ export function sym_val(strval) {   // options.c:9385
 }
 export async function option_help() {   // options.c:9462
     let buf = new Int8Array(256), buf2 = new Int8Array(256), optname = null, i = 0, datawin = 0;
-    datawin = await windowprocs.win_create_nhwindow(NHW_TEXT);
+    datawin = await create_nhwindow()(NHW_TEXT);
     nh_snprintf($c.lit("option_help"), 9471, new $c.Ptr(buf, 0), 256, $c.lit("Set options as OPTIONS=<options> in %s"), get_configfile());
     opt_intro[CONFIG_SLOT] = new $c.Ptr(buf, 0);
     for (i = 0; opt_intro[i]; i = i + 1 | 0) {
-        await windowprocs.win_putstr(datawin, 0, opt_intro[i]);
+        await putstr()(datawin, 0, opt_intro[i]);
     }
     for (i = 0; allopt[i].name; i = i + 1 | 0) {
-        if (allopt[i].opttyp !== BoolOpt || !allopt[i].addr || allopt[i].setwhere === set_wizonly && !flags.debug) {
+        if (allopt[i].opttyp !== BoolOpt || !allopt[i].addr || allopt[i].setwhere === set_wizonly && !wizard()) {
             continue;
         }
-        if (allopt[i].setwhere === set_wiznofuz && (!flags.debug || iflags.debug_fuzzer)) {
+        if (allopt[i].setwhere === set_wiznofuz && (!wizard() || iflags.debug_fuzzer)) {
             continue;
         }
         optname = allopt[i].name;
@@ -5824,12 +5832,12 @@ export async function option_help() {   // options.c:9462
         await next_opt(datawin, optname);
     }
     await next_opt(datawin, $c.lit(""));
-    await windowprocs.win_putstr(datawin, 0, $c.lit("Compound options:"));
+    await putstr()(datawin, 0, $c.lit("Compound options:"));
     for (i = 0; allopt[i].name; i = i + 1 | 0) {
-        if (allopt[i].opttyp !== CompOpt || allopt[i].setwhere === set_wizonly && !flags.debug) {
+        if (allopt[i].opttyp !== CompOpt || allopt[i].setwhere === set_wizonly && !wizard()) {
             continue;
         }
-        if (allopt[i].setwhere === set_wiznofuz && (!flags.debug || iflags.debug_fuzzer)) {
+        if (allopt[i].setwhere === set_wiznofuz && (!wizard() || iflags.debug_fuzzer)) {
             continue;
         }
         optname = allopt[i].name;
@@ -5838,29 +5846,29 @@ export async function option_help() {   // options.c:9462
         }
         $c.__builtin___sprintf_chk(new $c.Ptr(buf2, 0), 0, 256, $c.lit("`%s'"), optname);
         nh_snprintf($c.lit("option_help"), 9507, new $c.Ptr(buf, 0), 256, $c.lit("%-20s - %s%c"), new $c.Ptr(buf2, 0), allopt[i].descr, allopt[i + 1 | 0].name ? 44 : 46);
-        await windowprocs.win_putstr(datawin, 0, new $c.Ptr(buf, 0));
+        await putstr()(datawin, 0, new $c.Ptr(buf, 0));
     }
-    await windowprocs.win_putstr(datawin, 0, $c.lit(""));
-    await windowprocs.win_putstr(datawin, 0, $c.lit("Other settings:"));
+    await putstr()(datawin, 0, $c.lit(""));
+    await putstr()(datawin, 0, $c.lit("Other settings:"));
     for (i = 0; allopt[i].name; i = i + 1 | 0) {
         if (allopt[i].opttyp !== OthrOpt) {
             continue;
         }
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit(" %s"), allopt[i].name);
-        await windowprocs.win_putstr(datawin, 0, new $c.Ptr(buf, 0));
+        await putstr()(datawin, 0, new $c.Ptr(buf, 0));
     }
-    await windowprocs.win_putstr(datawin, 0, $c.lit(""));
+    await putstr()(datawin, 0, $c.lit(""));
     for (i = 0; opt_epilog[i]; i = i + 1 | 0) {
-        await windowprocs.win_putstr(datawin, 0, opt_epilog[i]);
+        await putstr()(datawin, 0, opt_epilog[i]);
     }
-    await windowprocs.win_display_nhwindow(datawin, 0);
-    await windowprocs.win_destroy_nhwindow(datawin);
+    await display_nhwindow()(datawin, FALSE);
+    await destroy_nhwindow()(datawin);
     return;
 }
 async function all_options_conds(sbuf) {   // options.c:9556
     let buf = new Int8Array(256), nextcond = new Int8Array(256), idx = 0, gotone = 0;
     idx = 0;
-    gotone = 0;
+    gotone = FALSE;
     buf[0] = 0;
     while (opt_next_cond(idx, new $c.Ptr(nextcond, 0))) {
         if (idx === 0) {
@@ -5873,7 +5881,7 @@ async function all_options_conds(sbuf) {   // options.c:9556
             $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit(","), 256);
         }
         if (nextcond[0]) {
-            gotone = 1;
+            gotone = TRUE;
             $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), new $c.Ptr(nextcond, 0), 256);
         }
         idx = idx + 1 | 0;
@@ -5948,7 +5956,7 @@ export async function all_options_strbuf(sbuf) {   // options.c:9678
                 if (!(allopt[i].setwhere === set_in_config || allopt[i].setwhere === set_gameview || allopt[i].setwhere === set_in_game)) {
                     break;
                 }
-                buf2 = await get_option_value(name, 1);
+                buf2 = await get_option_value(name, TRUE);
                 if (buf2) {
                     nh_snprintf($c.lit("all_options_strbuf"), 9714, new $c.Ptr(tmp, 0), 255, $c.lit("OPTIONS=%s:%s"), name, buf2);
                     $c.__builtin___strcat_chk(new $c.Ptr(tmp, 0), $c.lit("\n"), 256);
@@ -5989,26 +5997,26 @@ export async function next_opt(datawin, str) {   // options.c:9755
         i = (await Strlen_(next_opt$buf, $c.lit("next_opt"), 9770) + await Strlen_(str, $c.lit("next_opt"), 9770) >>> 0) + 2 >>> 0 | 0;
     }
     if (i > COLNO - 2) {
-        await windowprocs.win_putstr(datawin, 0, next_opt$buf);
+        await putstr()(datawin, 0, next_opt$buf);
         next_opt$buf.set(0, 0);
     }
     if (str.get(0)) {
         $c.__builtin___strcat_chk(next_opt$buf, str, -1);
         $c.__builtin___strcat_chk(next_opt$buf, $c.lit(", "), -1);
     } else {
-        await windowprocs.win_putstr(datawin, 0, str);
+        await putstr()(datawin, 0, str);
         $c.free(next_opt$buf), next_opt$buf = null;
     }
     return;
 }
 export async function set_option_mod_status(optnam, status) {   // options.c:9855
     let k = 0;
-    if (status < set_in_sysconf || status > set_wiznofuz) {
+    if (SET__IS_VALUE_VALID(status)) {
         await impossible($c.lit("set_option_mod_status: status out of range %d."), status);
         return;
     }
     for (k = 0; allopt[k].name; k = k + 1 | 0) {
-        if (str_start_is(allopt[k].name, optnam, 1)) {
+        if (str_start_is(allopt[k].name, optnam, TRUE)) {
             allopt[k].setwhere = status >>> 0;
             return;
         }
@@ -6017,7 +6025,7 @@ export async function set_option_mod_status(optnam, status) {   // options.c:985
 export async function set_wc_option_mod_status(optmask, status) {   // options.c:9881
     let k = 0;
     k = 0;
-    if (status < set_in_sysconf || status > set_wiznofuz) {
+    if (SET__IS_VALUE_VALID(status)) {
         await impossible($c.lit("set_wc_option_mod_status: status out of range %d."), status);
         return;
     }
@@ -6033,25 +6041,25 @@ function is_wc_option(optnam) {   // options.c:9899
     k = 0;
     while (wc_options[k].wc_name) {
         if ($c.strcmp(wc_options[k].wc_name, optnam) === 0) {
-            return 1;
+            return TRUE;
         }
         k = k + 1 | 0;
     }
-    return 0;
+    return FALSE;
 }
 function wc_supported(optnam) {   // options.c:9912
     let k = 0;
     for (k = 0; wc_options[k].wc_name; k = k + 1 | 0) {
         if (!$c.strcmp(wc_options[k].wc_name, optnam)) {
-            return $c.i8($c.andu64(windowprocs.wincap, wc_options[k].wc_bit) ? 1 : 0);
+            return $c.i8($c.andu64(windowprocs.wincap, wc_options[k].wc_bit) ? TRUE : FALSE);
         }
     }
-    return 0;
+    return FALSE;
 }
 export async function set_wc2_option_mod_status(optmask, status) {   // options.c:9935
     let k = 0;
     k = 0;
-    if (status < set_in_sysconf || status > set_wiznofuz) {
+    if (SET__IS_VALUE_VALID(status)) {
         await impossible($c.lit("set_wc2_option_mod_status: status out of range %d."), status);
         return;
     }
@@ -6067,20 +6075,20 @@ function is_wc2_option(optnam) {   // options.c:9953
     k = 0;
     while (wc2_options[k].wc_name) {
         if ($c.strcmp(wc2_options[k].wc_name, optnam) === 0) {
-            return 1;
+            return TRUE;
         }
         k = k + 1 | 0;
     }
-    return 0;
+    return FALSE;
 }
 function wc2_supported(optnam) {   // options.c:9966
     let k = 0;
     for (k = 0; wc2_options[k].wc_name; k = k + 1 | 0) {
         if (!$c.strcmp(wc2_options[k].wc_name, optnam)) {
-            return $c.i8($c.andu64(windowprocs.wincap2, wc2_options[k].wc_bit) ? 1 : 0);
+            return $c.i8($c.andu64(windowprocs.wincap2, wc2_options[k].wc_bit) ? TRUE : FALSE);
         }
     }
-    return 0;
+    return FALSE;
 }
 async function wc_set_font_name(opttype, fontname) {   // options.c:9979
     let fn = null, $t1;
@@ -6206,17 +6214,17 @@ export function options_free_window_colors() {   // options.c:10116
 }
 export function set_playmode() {   // options.c:10134
     let $t1, $t2;
-    if (flags.debug) {
+    if (wizard()) {
         if (authorize_wizard_mode()) {
             $t1 = $c.i32($c.strlen($c.__builtin___strcpy_chk(new $c.Ptr(svp.plname, 0), $c.lit("wizard"), 32))), gp.plnamelen = $t1;
         } else {
-            flags.debug = 0;
+            flags.debug = FALSE;
         }
-        flags.explore = $c.i8(!flags.debug ? 1 : 0);
-        iflags.deferred_X = 0;
+        flags.explore = $c.i8(!wizard() ? 1 : 0);
+        iflags.deferred_X = FALSE;
     }
-    if (flags.explore && !authorize_explore_mode()) {
-        $t2 = iflags.deferred_X = 0, flags.explore = $t2;
+    if (discover() && !authorize_explore_mode()) {
+        $t2 = iflags.deferred_X = FALSE, flags.explore = $t2;
     }
 }
 function enhance_menu_text(buf, sz, whichpass, bool_p, thisopt) {   // options.c:10155
@@ -6226,31 +6234,31 @@ function enhance_menu_text(buf, sz, whichpass, bool_p, thisopt) {   // options.c
     }
     nowsz = $c.addu64($c.strlen(buf), 1);
     availsz = $c.subu64(sz, nowsz);
-    availsz;
-    bool_p;
-    thisopt;
+    nhUse(availsz);
+    nhUse(bool_p);
+    nhUse(thisopt);
     return;
 }
 export function heed_all_options() {   // options.c:10183
     let i = 0;
     for (i = 0; i < OPTCOUNT; i = i + 1 | 0) {
-        allopt[i].disregarded = 0;
+        allopt[i].disregarded = FALSE;
     }
 }
 export function disregard_all_options() {   // options.c:10192
     let i = 0;
     for (i = 0; i < OPTCOUNT; i = i + 1 | 0) {
-        allopt[i].disregarded = 1;
+        allopt[i].disregarded = TRUE;
     }
 }
 export function heed_this_option(optidx) {   // options.c:10201
     if (optidx >= 0 && optidx < OPTCOUNT) {
-        allopt[optidx].disregarded = 0;
+        allopt[optidx].disregarded = FALSE;
     }
 }
 export function disregard_this_option(optidx) {   // options.c:10207
     if (optidx >= 0 && optidx < OPTCOUNT) {
-        allopt[optidx].disregarded = 1;
+        allopt[optidx].disregarded = TRUE;
     }
 }
 
@@ -11061,7 +11069,7 @@ export function $init() {
     empty_optstr[0] = 0;
     duplicate = 0;
     using_alias = 0;
-    give_opt_msg = 1;
+    give_opt_msg = TRUE;
     opt_set_in_config.fill(0);
     for (let $i0 = 0; $i0 < 4; $i0++) {
         roleoptvals[$i0].fill(null);
@@ -11304,43 +11312,43 @@ export function $init() {
         default_menu_cmd_info[$i0].$copyFrom(new $T.menu_cmd_t());
     }
     default_menu_cmd_info[0].name = $c.lit("menu_next_page");
-    default_menu_cmd_info[0].cmd = 62;
+    default_menu_cmd_info[0].cmd = MENU_NEXT_PAGE;
     default_menu_cmd_info[0].desc = $c.lit("Go to next page");
     default_menu_cmd_info[1].name = $c.lit("menu_previous_page");
-    default_menu_cmd_info[1].cmd = 60;
+    default_menu_cmd_info[1].cmd = MENU_PREVIOUS_PAGE;
     default_menu_cmd_info[1].desc = $c.lit("Go to previous page");
     default_menu_cmd_info[2].name = $c.lit("menu_first_page");
-    default_menu_cmd_info[2].cmd = 94;
+    default_menu_cmd_info[2].cmd = MENU_FIRST_PAGE;
     default_menu_cmd_info[2].desc = $c.lit("Go to first page");
     default_menu_cmd_info[3].name = $c.lit("menu_last_page");
-    default_menu_cmd_info[3].cmd = 124;
+    default_menu_cmd_info[3].cmd = MENU_LAST_PAGE;
     default_menu_cmd_info[3].desc = $c.lit("Go to last page");
     default_menu_cmd_info[4].name = $c.lit("menu_select_all");
-    default_menu_cmd_info[4].cmd = 46;
+    default_menu_cmd_info[4].cmd = MENU_SELECT_ALL;
     default_menu_cmd_info[4].desc = $c.lit("Select all items in entire menu");
     default_menu_cmd_info[5].name = $c.lit("menu_invert_all");
-    default_menu_cmd_info[5].cmd = 64;
+    default_menu_cmd_info[5].cmd = MENU_INVERT_ALL;
     default_menu_cmd_info[5].desc = $c.lit("Invert selection for all items");
     default_menu_cmd_info[6].name = $c.lit("menu_deselect_all");
-    default_menu_cmd_info[6].cmd = 45;
+    default_menu_cmd_info[6].cmd = MENU_UNSELECT_ALL;
     default_menu_cmd_info[6].desc = $c.lit("Unselect all items in entire menu");
     default_menu_cmd_info[7].name = $c.lit("menu_select_page");
-    default_menu_cmd_info[7].cmd = 44;
+    default_menu_cmd_info[7].cmd = MENU_SELECT_PAGE;
     default_menu_cmd_info[7].desc = $c.lit("Select all items on current page");
     default_menu_cmd_info[8].name = $c.lit("menu_invert_page");
-    default_menu_cmd_info[8].cmd = 126;
+    default_menu_cmd_info[8].cmd = MENU_INVERT_PAGE;
     default_menu_cmd_info[8].desc = $c.lit("Invert current page's selections");
     default_menu_cmd_info[9].name = $c.lit("menu_deselect_page");
-    default_menu_cmd_info[9].cmd = 92;
+    default_menu_cmd_info[9].cmd = MENU_UNSELECT_PAGE;
     default_menu_cmd_info[9].desc = $c.lit("Unselect all items on current page");
     default_menu_cmd_info[10].name = $c.lit("menu_search");
-    default_menu_cmd_info[10].cmd = 58;
+    default_menu_cmd_info[10].cmd = MENU_SEARCH;
     default_menu_cmd_info[10].desc = $c.lit("Search and invert matching items");
     default_menu_cmd_info[11].name = $c.lit("menu_shift_right");
-    default_menu_cmd_info[11].cmd = 125;
+    default_menu_cmd_info[11].cmd = MENU_SHIFT_RIGHT;
     default_menu_cmd_info[11].desc = $c.lit("Pan current page to right (perm_invent only)");
     default_menu_cmd_info[12].name = $c.lit("menu_shift_left");
-    default_menu_cmd_info[12].cmd = 123;
+    default_menu_cmd_info[12].cmd = MENU_SHIFT_LEFT;
     default_menu_cmd_info[12].desc = $c.lit("Pan current page to left (perm_invent only)");
     default_menu_cmd_info[13].name = null;
     default_menu_cmd_info[13].cmd = 0;
@@ -11481,7 +11489,7 @@ export function $init() {
         wc2_options[$i0].$copyFrom(new $T.wc_Opt());
     }
     wc2_options[0].wc_name = $c.lit("armorstatus");
-    wc2_options[0].wc_bit = 524288;
+    wc2_options[0].wc_bit = WC2_EXTRASTATUS;
     wc2_options[1].wc_name = $c.lit("fullscreen");
     wc2_options[1].wc_bit = WC2_FULLSCREEN;
     wc2_options[2].wc_name = $c.lit("guicolor");
@@ -11507,11 +11515,11 @@ export function $init() {
     wc2_options[12].wc_name = $c.lit("term_rows");
     wc2_options[12].wc_bit = WC2_TERM_SIZE;
     wc2_options[13].wc_name = $c.lit("terrainstatus");
-    wc2_options[13].wc_bit = 524288;
+    wc2_options[13].wc_bit = WC2_EXTRASTATUS;
     wc2_options[14].wc_name = $c.lit("use_darkgray");
     wc2_options[14].wc_bit = WC2_DARKGRAY;
     wc2_options[15].wc_name = $c.lit("weaponstatus");
-    wc2_options[15].wc_bit = 524288;
+    wc2_options[15].wc_bit = WC2_EXTRASTATUS;
     wc2_options[16].wc_name = $c.lit("windowborders");
     wc2_options[16].wc_bit = WC2_WINDOWBORDERS;
     wc2_options[17].wc_name = $c.lit("wraptext");
@@ -11532,12 +11540,12 @@ export function $init() {
     optfn_autounlock$plus.fill(0);
     optfn_autounlock$plus.set([32, 43, 32]);   // " + "
     optfn_disclose$valid_settings.fill(0);
-    optfn_disclose$valid_settings[0] = 121;
-    optfn_disclose$valid_settings[1] = 110;
-    optfn_disclose$valid_settings[2] = 63;
-    optfn_disclose$valid_settings[3] = 43;
-    optfn_disclose$valid_settings[4] = 45;
-    optfn_disclose$valid_settings[5] = 35;
+    optfn_disclose$valid_settings[0] = DISCLOSE_PROMPT_DEFAULT_YES;
+    optfn_disclose$valid_settings[1] = DISCLOSE_PROMPT_DEFAULT_NO;
+    optfn_disclose$valid_settings[2] = DISCLOSE_PROMPT_DEFAULT_SPECIAL;
+    optfn_disclose$valid_settings[3] = DISCLOSE_YES_WITHOUT_PROMPT;
+    optfn_disclose$valid_settings[4] = DISCLOSE_NO_WITHOUT_PROMPT;
+    optfn_disclose$valid_settings[5] = DISCLOSE_SPECIAL_WITHOUT_PROMPT;
     optfn_disclose$valid_settings[6] = 0;
     optfn_menu_objsyms$alt5.fill(0);
     optfn_menu_objsyms$alt5.set([111, 110, 101, 45, 111, 114, 45, 116, 104, 101, 45, 111, 116, 104, 101, 114]);   // "one-or-the-other"
@@ -11560,11 +11568,11 @@ export function $init() {
     optfn_sortvanquished$vanqmodes.fill(0);
     optfn_sortvanquished$vanqmodes.set([116, 100, 97, 65, 67, 99, 110, 122]);   // "tdaACcnz"
     optfn_whatis_coord$gpcoords.fill(0);
-    optfn_whatis_coord$gpcoords[0] = 110;
-    optfn_whatis_coord$gpcoords[1] = 99;
-    optfn_whatis_coord$gpcoords[2] = 102;
-    optfn_whatis_coord$gpcoords[3] = 109;
-    optfn_whatis_coord$gpcoords[4] = 115;
+    optfn_whatis_coord$gpcoords[0] = GPCOORDS_NONE;
+    optfn_whatis_coord$gpcoords[1] = GPCOORDS_COMPASS;
+    optfn_whatis_coord$gpcoords[2] = GPCOORDS_COMFULL;
+    optfn_whatis_coord$gpcoords[3] = GPCOORDS_MAP;
+    optfn_whatis_coord$gpcoords[4] = GPCOORDS_SCREEN;
     optfn_whatis_coord$gpcoords[5] = 0;
     handler_disclose$disclosure_names.fill(null);
     handler_disclose$disclosure_names[0] = $c.lit("inventory");
@@ -11590,7 +11598,7 @@ export function $init() {
     escapes$oct.set([48, 49, 50, 51, 52, 53, 54, 55]);   // "01234567"
     escapes$dec.fill(0);
     escapes$dec.set([48, 49, 50, 51, 52, 53, 54, 55, 56, 57]);   // "0123456789"
-    allopt_array_init$options_array_inited_already = 0;
+    allopt_array_init$options_array_inited_already = FALSE;
     parsebindings$mousebtn_names.fill(null);
     parsebindings$mousebtn_names[0] = $c.lit("mouse1");
     parsebindings$mousebtn_names[1] = $c.lit("mouse2");
@@ -11602,17 +11610,17 @@ export function $init() {
     for (let $i0 = 0; $i0 < 6; $i0++) {
         collect_menu_keys$scroll_keys[$i0].$copyFrom(new $T.menuscrollinfo());
     }
-    collect_menu_keys$scroll_keys[0].cmdkey = 94;
+    collect_menu_keys$scroll_keys[0].cmdkey = MENU_FIRST_PAGE;
     collect_menu_keys$scroll_keys[0].maskindx = 1;
-    collect_menu_keys$scroll_keys[1].cmdkey = 60;
+    collect_menu_keys$scroll_keys[1].cmdkey = MENU_PREVIOUS_PAGE;
     collect_menu_keys$scroll_keys[1].maskindx = 1;
-    collect_menu_keys$scroll_keys[2].cmdkey = 62;
+    collect_menu_keys$scroll_keys[2].cmdkey = MENU_NEXT_PAGE;
     collect_menu_keys$scroll_keys[2].maskindx = 2;
-    collect_menu_keys$scroll_keys[3].cmdkey = 124;
+    collect_menu_keys$scroll_keys[3].cmdkey = MENU_LAST_PAGE;
     collect_menu_keys$scroll_keys[3].maskindx = 2;
-    collect_menu_keys$scroll_keys[4].cmdkey = 123;
+    collect_menu_keys$scroll_keys[4].cmdkey = MENU_SHIFT_LEFT;
     collect_menu_keys$scroll_keys[4].maskindx = 4;
-    collect_menu_keys$scroll_keys[5].cmdkey = 125;
+    collect_menu_keys$scroll_keys[5].cmdkey = MENU_SHIFT_RIGHT;
     collect_menu_keys$scroll_keys[5].maskindx = 8;
     get_option_value$retbuf.fill(0);
     doset_simple_menu$fmtstr_tab_doset_simple.fill(0);

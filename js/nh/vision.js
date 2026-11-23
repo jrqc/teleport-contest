@@ -4,25 +4,30 @@ import * as $T from './types.js';
 import { $G } from './globals.js';
 import { isok } from './cmd.js';
 import { is_moat, is_pool } from './dbridge.js';
-import { flags, gi, gs, gv, iflags, program_state, svc, svd, svl, svr, u } from './decl.js';
+import { gi, gs, gv, iflags, program_state, svd, svl, svr, u } from './decl.js';
 import { S_hcdoor, S_ndoor, S_tree, S_vcdoor } from './defsym.h.js';
 import { detecting } from './detect.js';
 import { canseemon, mon_visible, newsym, see_with_infrared, seenv_matrix, tp_sensemon } from './display.js';
 import { on_level } from './dungeon.js';
 import { panic } from './end.js';
 import { debugcore } from './files.js';
-import { COLNO, ROWNO } from './global.h.js';
+import { wizard } from './flag.macros.js';
+import { COLNO, FALSE, ROWNO, TRUE } from './global.h.js';
 import { notice_all_mons } from './hack.js';
+import { MATCH_WARN_OF_MON, max, min } from './hack.macros.js';
 import { dist2 } from './hacklib.js';
 import { do_light_sources } from './light.js';
+import { ROOMOFFSET } from './mkroom.h.js';
 import { M_AP_FURNITURE, M_AP_OBJECT, M_AP_TYPMASK } from './monst.h.js';
 import { BOULDER } from './objects.h.js';
-import { BLINDED, DETECT_MONSTERS, SEE_INVIS, WARN_OF_MON } from './prop.h.js';
 import { visible_region_at } from './region.js';
-import { CLOUD, DBWALL, DOOR, D_CLOSED, D_LOCKED, D_TRAPPED, LAVAWALL, POOL, SDOOR, TREE, WATER } from './rm.h.js';
+import { CLOUD, DOOR, D_CLOSED, D_LOCKED, D_TRAPPED, LAVAWALL, SDOOR, SVALL, TREE } from './rm.h.js';
+import { IS_DOOR, IS_OBSTRUCTED, IS_WALL, IS_WATERWALL } from './rm.macros.js';
 import { COULD_SEE, IN_SIGHT, MAX_RADIUS, MONSEEN_DETECT, MONSEEN_INFRAVIS, MONSEEN_NORMAL, MONSEEN_SEEINVIS, MONSEEN_TELEPAT, MONSEEN_WARNMON, MONSEEN_XRAYVIS, TEMP_LIT } from './vision.h.js';
+import { cansee, circle_ptr, couldsee } from './vision.macros.js';
 import { worm_known } from './worm.js';
 import { TT_PIT } from './you.h.js';
+import { Blind, Detect_monsters, See_invisible } from './youprop.macros.js';
 
 const vision_recalc$colbump = new Int16Array(81);   // static in vision_recalc()
 export const circle_data = new Int16Array(137);
@@ -48,9 +53,9 @@ let vis_func = null;
 let varg = null;
 export function get_viz_clear(x, y) {   // vision.c:105
     if (isok($c.i16(x), $c.i16(y)) && !viz_clear[y][x]) {
-        return 1;
+        return TRUE;
     }
-    return 0;
+    return FALSE;
 }
 export function vision_init() {   // vision.c:121
     let i = 0;
@@ -69,13 +74,13 @@ export function vision_init() {   // vision.c:121
 export function does_block(x, y, lev) {   // vision.c:153
     let obj = null, mon = null, $t1;
     if (gs.seethru === 0) {
-        $t1 = flags.debug && debugcore($c.lit("seethru"), 0) ? 1 : -1, gs.seethru = $t1;
+        $t1 = wizard() && debugcore($c.lit("seethru"), FALSE) ? 1 : -1, gs.seethru = $t1;
     }
-    if (lev.typ < POOL || lev.typ === TREE || lev.typ === DOOR && (lev.flags | 0) & (D_CLOSED | D_LOCKED | D_TRAPPED)) {
+    if (IS_OBSTRUCTED(lev.typ) || lev.typ === TREE || IS_DOOR(lev.typ) && (lev.flags | 0) & (D_CLOSED | D_LOCKED | D_TRAPPED)) {
         return 1;
     }
     if (gs.seethru !== 1) {
-        if (lev.typ === CLOUD || lev.typ === WATER || lev.typ === LAVAWALL || u.uinwater | 0 && is_moat($c.i16(x), $c.i16(y))) {
+        if (lev.typ === CLOUD || IS_WATERWALL(lev.typ) || lev.typ === LAVAWALL || (u.uinwater | 0) && is_moat($c.i16(x), $c.i16(y))) {
             return 1;
         }
     }
@@ -84,7 +89,7 @@ export function does_block(x, y, lev) {   // vision.c:153
             return 1;
         }
     }
-    if ((mon = svl.level.monsters[x][y]) && (!mon.minvis || (u.uprops[SEE_INVIS].intrinsic || u.uprops[SEE_INVIS].extrinsic)) && ((mon.m_ap_type & M_AP_TYPMASK) === M_AP_OBJECT && mon.mappearance === BOULDER || (mon.m_ap_type & M_AP_TYPMASK) === M_AP_FURNITURE && (mon.mappearance === S_hcdoor || mon.mappearance === S_vcdoor || mon.mappearance < S_ndoor || mon.mappearance === S_tree))) {
+    if ((mon = svl.level.monsters[x][y]) && (!mon.minvis || See_invisible()) && ((mon.m_ap_type & M_AP_TYPMASK) === M_AP_OBJECT && mon.mappearance === BOULDER || (mon.m_ap_type & M_AP_TYPMASK) === M_AP_FURNITURE && (mon.mappearance === S_hcdoor || mon.mappearance === S_vcdoor || mon.mappearance < S_ndoor || mon.mappearance === S_tree))) {
         return 1;
     }
     if (gs.seethru !== 1) {
@@ -103,10 +108,10 @@ export function vision_reset() {   // vision.c:211
     $c.__builtin___memset_chk(new $c.Ptr(viz_clear, 0), 0, 1680, 1680);
     for (y = 0; y < ROWNO; y = y + 1 | 0) {
         dig_left = 0;
-        block = 1;
+        block = TRUE;
         lev = $c.relem(svl.level.locations[1], y);
         for (x = 1; x < COLNO; x = x + 1 | 0, lev = $c.radd(lev, ROWNO)) {
-            if (block !== (lev.typ < POOL || does_block(x, y, lev) ? 1 : 0)) {
+            if (block !== (IS_OBSTRUCTED(lev.typ) || does_block(x, y, lev) ? 1 : 0)) {
                 if (block) {
                     for (i = dig_left; i < x; i = i + 1 | 0) {
                         left_ptrs[y][i] = $c.i16(dig_left);
@@ -137,7 +142,7 @@ export function vision_reset() {   // vision.c:211
             viz_clear[y][i] = $c.i8(!block ? 1 : 0);
         }
     }
-    iflags.vision_inited = 1;
+    iflags.vision_inited = TRUE;
     gv.vision_full_recalc = 1;
 }
 function get_unused_cs(rows, rmin, rmax) {   // vision.c:274
@@ -161,7 +166,7 @@ function get_unused_cs(rows, rmin, rmax) {   // vision.c:274
 }
 async function rogue_vision(next, rmin, rmax) {   // vision.c:314
     let rnum = 0, start = 0, stop = 0, in_door = 0, xhi = 0, xlo = 0, yhi = 0, ylo = 0, zx = 0, zy = 0, $t1, $t2;
-    rnum = (svl.level.locations[u.ux][u.uy].roomno | 0) - 3 | 0;
+    rnum = (svl.level.locations[u.ux][u.uy].roomno | 0) - ROOMOFFSET | 0;
     if (rnum >= 0) {
         for (zy = svr.rooms[rnum].ly - 1 | 0; zy <= (svr.rooms[rnum].hy + 1 | 0); zy = zy + 1 | 0) {
             $t1 = $c.i16(start = svr.rooms[rnum].lx - 1 | 0), rmin.set(zy, $t1);
@@ -169,7 +174,7 @@ async function rogue_vision(next, rmin, rmax) {   // vision.c:314
             for (zx = start; zx <= stop; zx = zx + 1 | 0) {
                 if (svr.rooms[rnum].rlit) {
                     next.get(zy).set(zx, COULD_SEE | IN_SIGHT);
-                    svl.level.locations[zx][zy].seenv = 255;
+                    svl.level.locations[zx][zy].seenv = SVALL;
                 } else {
                     next.get(zy).set(zx, COULD_SEE);
                 }
@@ -206,14 +211,14 @@ export async function vision_recalc(control) {   // vision.c:512
     get_unused_cs(new $c.Ptr(next_array, 0), new $c.Ptr(next_rmin, 0), new $c.Ptr(next_rmax, 0));
     skip$: {
         if (u.uswallow | 0 || control === 2) {
-        } else if ((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked) {
+        } else if (Blind()) {
             await view_from(u.uy, u.ux, next_array[0], next_rmin[0], next_rmax[0], 0, null, null);
             temp_array = gv.viz_array;
             gv.viz_array = next_array[0];
             for (row = 0; row < ROWNO; row = row + 1 | 0) {
                 old_row = temp_array.get(row);
-                start = gv.viz_rmin.get(row) < next_rmin[0].get(row) ? gv.viz_rmin.get(row) : next_rmin[0].get(row);
-                stop = gv.viz_rmax.get(row) > next_rmax[0].get(row) ? gv.viz_rmax.get(row) : next_rmax[0].get(row);
+                start = min(gv.viz_rmin.get(row), next_rmin[0].get(row));
+                stop = max(gv.viz_rmax.get(row), next_rmax[0].get(row));
                 for (col = start; col <= stop; col = col + 1 | 0) {
                     if (old_row.get(col) & IN_SIGHT) {
                         await newsym($c.i16(col), $c.i16(row));
@@ -225,7 +230,7 @@ export async function vision_recalc(control) {   // vision.c:512
             await rogue_vision(next_array[0], next_rmin[0], next_rmax[0]);
         } else {
             has_night_vision = 1;
-            if (u.uinwater | 0 && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) {
+            if ((u.uinwater | 0) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level))) {
                 has_night_vision = 0;
                 lo_col = (u.ux - 1 | 0) > 1 ? u.ux - 1 | 0 : 1;
                 for (row = u.uy - 1 | 0; row <= (u.uy + 1 | 0); row = row + 1 | 0) {
@@ -233,8 +238,8 @@ export async function vision_recalc(control) {   // vision.c:512
                         if (!isok($c.i16(col), $c.i16(row)) || !is_pool($c.i16(col), $c.i16(row))) {
                             continue;
                         }
-                        next_rmin[0].set(row, $c.i16(next_rmin[0].get(row) < col ? next_rmin[0].get(row) : col));
-                        next_rmax[0].set(row, $c.i16(next_rmax[0].get(row) > col ? next_rmax[0].get(row) : col));
+                        next_rmin[0].set(row, $c.i16(min(next_rmin[0].get(row), col)));
+                        next_rmax[0].set(row, $c.i16(max(next_rmax[0].get(row), col)));
                         next_array[0].get(row).set(col, IN_SIGHT | COULD_SEE);
                     }
                 }
@@ -258,7 +263,7 @@ export async function vision_recalc(control) {   // vision.c:512
             }
             if (u.xray_range >= 0) {
                 if (u.xray_range) {
-                    ranges = new $c.Ptr(circle_data, circle_start[u.xray_range]);
+                    ranges = circle_ptr(u.xray_range);
                     for (row = u.uy - u.xray_range | 0; row <= (u.uy + u.xray_range | 0); row = row + 1 | 0) {
                         if (row < 0) {
                             continue;
@@ -266,7 +271,7 @@ export async function vision_recalc(control) {   // vision.c:512
                         if (row >= ROWNO) {
                             break;
                         }
-                        dy = (u.uy - row | 0) < 0 ? -(u.uy - row | 0) | 0 : u.uy - row | 0;
+                        dy = v_abs(u.uy - row | 0);
                         next_row = next_array[0].get(row);
                         start = 1 > (u.ux - ranges.get(dy) | 0) ? 1 : u.ux - ranges.get(dy) | 0;
                         stop = 79 < (u.ux + ranges.get(dy) | 0) ? 79 : u.ux + ranges.get(dy) | 0;
@@ -274,29 +279,29 @@ export async function vision_recalc(control) {   // vision.c:512
                             old_row_val = $c.i8(next_row.get(col));
                             next_row.set(col, $c.u8(next_row.get(col) | IN_SIGHT));
                             oldseenv = svl.level.locations[col][row].seenv;
-                            svl.level.locations[col][row].seenv = 255;
-                            if (!(old_row_val & IN_SIGHT) || oldseenv !== 255) {
+                            svl.level.locations[col][row].seenv = SVALL;
+                            if (!(old_row_val & IN_SIGHT) || oldseenv !== SVALL) {
                                 await newsym($c.i16(col), $c.i16(row));
                             }
                         }
-                        next_rmin[0].set(row, $c.i16(start < next_rmin[0].get(row) ? start : next_rmin[0].get(row)));
-                        next_rmax[0].set(row, $c.i16(stop > next_rmax[0].get(row) ? stop : next_rmax[0].get(row)));
+                        next_rmin[0].set(row, $c.i16(min(start, next_rmin[0].get(row))));
+                        next_rmax[0].set(row, $c.i16(max(stop, next_rmax[0].get(row))));
                     }
                 } else {
                     next_array[0].get(u.uy).set(u.ux, $c.u8(next_array[0].get(u.uy).get(u.ux) | IN_SIGHT));
-                    svl.level.locations[u.ux][u.uy].seenv = 255;
-                    next_rmin[0].set(u.uy, $c.i16(u.ux < next_rmin[0].get(u.uy) ? u.ux : next_rmin[0].get(u.uy)));
-                    next_rmax[0].set(u.uy, $c.i16(u.ux > next_rmax[0].get(u.uy) ? u.ux : next_rmax[0].get(u.uy)));
+                    svl.level.locations[u.ux][u.uy].seenv = SVALL;
+                    next_rmin[0].set(u.uy, $c.i16(min(u.ux, next_rmin[0].get(u.uy))));
+                    next_rmax[0].set(u.uy, $c.i16(max(u.ux, next_rmax[0].get(u.uy))));
                 }
             }
             if (has_night_vision && u.xray_range < u.nv_range) {
                 if (!u.nv_range) {
                     next_array[0].get(u.uy).set(u.ux, $c.u8(next_array[0].get(u.uy).get(u.ux) | IN_SIGHT));
-                    svl.level.locations[u.ux][u.uy].seenv = 255;
-                    next_rmin[0].set(u.uy, $c.i16(u.ux < next_rmin[0].get(u.uy) ? u.ux : next_rmin[0].get(u.uy)));
-                    next_rmax[0].set(u.uy, $c.i16(u.ux > next_rmax[0].get(u.uy) ? u.ux : next_rmax[0].get(u.uy)));
+                    svl.level.locations[u.ux][u.uy].seenv = SVALL;
+                    next_rmin[0].set(u.uy, $c.i16(min(u.ux, next_rmin[0].get(u.uy))));
+                    next_rmax[0].set(u.uy, $c.i16(max(u.ux, next_rmax[0].get(u.uy))));
                 } else if (u.nv_range > 0) {
-                    ranges = new $c.Ptr(circle_data, circle_start[u.nv_range]);
+                    ranges = circle_ptr(u.nv_range);
                     for (row = u.uy - u.nv_range | 0; row <= (u.uy + u.nv_range | 0); row = row + 1 | 0) {
                         if (row < 0) {
                             continue;
@@ -304,7 +309,7 @@ export async function vision_recalc(control) {   // vision.c:512
                         if (row >= ROWNO) {
                             break;
                         }
-                        dy = (u.uy - row | 0) < 0 ? -(u.uy - row | 0) | 0 : u.uy - row | 0;
+                        dy = v_abs(u.uy - row | 0);
                         next_row = next_array[0].get(row);
                         start = 1 > (u.ux - ranges.get(dy) | 0) ? 1 : u.ux - ranges.get(dy) | 0;
                         stop = 79 < (u.ux + ranges.get(dy) | 0) ? 79 : u.ux + ranges.get(dy) | 0;
@@ -313,8 +318,8 @@ export async function vision_recalc(control) {   // vision.c:512
                                 next_row.set(col, $c.u8(next_row.get(col) | IN_SIGHT));
                             }
                         }
-                        next_rmin[0].set(row, $c.i16(start < next_rmin[0].get(row) ? start : next_rmin[0].get(row)));
-                        next_rmax[0].set(row, $c.i16(stop > next_rmax[0].get(row) ? stop : next_rmax[0].get(row)));
+                        next_rmin[0].set(row, $c.i16(min(start, next_rmin[0].get(row))));
+                        next_rmax[0].set(row, $c.i16(max(stop, next_rmax[0].get(row))));
                     }
                 }
             }
@@ -325,11 +330,11 @@ export async function vision_recalc(control) {   // vision.c:512
         $t1 = vision_recalc$colbump[u.ux + 1 | 0] = 1, vision_recalc$colbump[u.ux] = $t1;
         for (row = 0; row < ROWNO; row = row + 1 | 0) {
             dy = u.uy - row | 0;
-            dy = dy < 0 ? -1 : dy ? 1 : 0;
+            dy = (dy < 0 ? -1 : dy ? 1 : 0);
             next_row = next_array[0].get(row);
             old_row = temp_array.get(row);
-            start = gv.viz_rmin.get(row) < next_rmin[0].get(row) ? gv.viz_rmin.get(row) : next_rmin[0].get(row);
-            stop = gv.viz_rmax.get(row) > next_rmax[0].get(row) ? gv.viz_rmax.get(row) : next_rmax[0].get(row);
+            start = min(gv.viz_rmin.get(row), next_rmin[0].get(row));
+            stop = max(gv.viz_rmax.get(row), next_rmax[0].get(row));
             lev = $c.relem(svl.level.locations[start], row);
             sv = new $c.Ptr(seenv_matrix[dy + 1 | 0], start < u.ux ? 0 : start > u.ux ? 2 : 1);
             for (col = start; col <= stop; lev = $c.radd(lev, ROWNO), sv = sv.add(vision_recalc$colbump[col = col + 1 | 0])) {
@@ -343,9 +348,9 @@ export async function vision_recalc(control) {   // vision.c:512
                                 await newsym($c.i16(col), $c.i16(row));
                             }
                         } else if ($goto !== "not_in_sight" && (next_row.get(col) & COULD_SEE && (lev.lit | 0 || next_row.get(col) & TEMP_LIT))) {
-                            if ((lev.typ === DOOR || lev.typ === SDOOR || lev.typ && lev.typ <= DBWALL) && !viz_clear[row][col]) {
+                            if ((IS_DOOR(lev.typ) || lev.typ === SDOOR || IS_WALL(lev.typ)) && !viz_clear[row][col]) {
                                 dx = u.ux - col | 0;
-                                dx = dx < 0 ? -1 : dx ? 1 : 0;
+                                dx = (dx < 0 ? -1 : dx ? 1 : 0);
                                 flev = $c.relem(svl.level.locations[col + dx | 0], row + dy | 0);
                                 if (flev.lit | 0 || next_array[0].get(row + dy | 0).get(col + dx | 0) & TEMP_LIT) {
                                     next_row.set(col, $c.u8(next_row.get(col) | IN_SIGHT));
@@ -388,12 +393,12 @@ export async function vision_recalc(control) {   // vision.c:512
     }
     gv.viz_rmin = next_rmin[0];
     gv.viz_rmax = next_rmax[0];
-    await notice_all_mons(1);
+    await notice_all_mons(TRUE);
 }
 export function block_point(x, y) {   // vision.c:865
     let $t1;
     if (gs.seethru === 0) {
-        $t1 = flags.debug && debugcore($c.lit("seethru"), 0) ? 1 : -1, gs.seethru = $t1;
+        $t1 = wizard() && debugcore($c.lit("seethru"), FALSE) ? 1 : -1, gs.seethru = $t1;
     }
     if (gs.seethru === 1) {
         if (!does_block(x, y, $c.relem(svl.level.locations[x], y))) {
@@ -729,7 +734,7 @@ async function right_side(row, left, right_mark, limits) {   // vision.c:1666
     row_min = null;
     row_max = null;
     nrow = row + step | 0;
-    deeper = nrow >= 0 && nrow < ROWNO && (!limits || limits.get(0) >= limits.add(1).get(0)) ? 1 : 0;
+    deeper = good_row(nrow) && (!limits || limits.get(0) >= limits.add(1).get(0)) ? 1 : 0;
     if (!vis_func) {
         rowp = cs_rows.get(row);
         row_min = cs_left.add(row);
@@ -752,9 +757,9 @@ async function right_side(row, left, right_mark, limits) {   // vision.c:1666
         if (right_edge > lim_max) {
             right_edge = lim_max;
         }
-        if (!viz_clear_rows[row].get(left)) {
+        if (!is_clear(row, left)) {
             if (right_edge > right_mark) {
-                right_edge = viz_clear_rows[row - step | 0].get(right_mark) ? right_mark + 1 | 0 : right_mark;
+                right_edge = is_clear(row - step | 0, right_mark) ? right_mark + 1 | 0 : right_mark;
             }
             if (vis_func) {
                 for (i = left; i <= right_edge; i = i + 1 | 0) {
@@ -983,7 +988,7 @@ async function right_side(row, left, right_mark, limits) {   // vision.c:1666
             right = right_edge;
         }
         if (left <= right) {
-            if (left === right && left === start_col && start_col < COLNO - 1 && !viz_clear_rows[row].get(start_col + 1 | 0)) {
+            if (left === right && left === start_col && start_col < COLNO - 1 && !is_clear(row, start_col + 1 | 0)) {
                 right = start_col + 1 | 0;
             }
             if (right > lim_max) {
@@ -1026,7 +1031,7 @@ async function left_side(row, left_mark, right, limits) {   // vision.c:1858
     row_min = null;
     row_max = null;
     nrow = row + step | 0;
-    deeper = nrow >= 0 && nrow < ROWNO && (!limits || limits.get(0) >= limits.add(1).get(0)) ? 1 : 0;
+    deeper = good_row(nrow) && (!limits || limits.get(0) >= limits.add(1).get(0)) ? 1 : 0;
     if (!vis_func) {
         rowp = cs_rows.get(row);
         row_min = cs_left.add(row);
@@ -1049,9 +1054,9 @@ async function left_side(row, left_mark, right, limits) {   // vision.c:1858
         if (left_edge < lim_min) {
             left_edge = lim_min;
         }
-        if (!viz_clear_rows[row].get(right)) {
+        if (!is_clear(row, right)) {
             if (left_edge < left_mark) {
-                left_edge = viz_clear_rows[row - step | 0].get(left_mark) ? left_mark - 1 | 0 : left_mark;
+                left_edge = is_clear(row - step | 0, left_mark) ? left_mark - 1 | 0 : left_mark;
             }
             if (vis_func) {
                 for (i = left_edge; i <= right; i = i + 1 | 0) {
@@ -1280,7 +1285,7 @@ async function left_side(row, left_mark, right, limits) {   // vision.c:1858
             left = left_edge;
         }
         if (left <= right) {
-            if (left === right && right === start_col && start_col > 0 && !viz_clear_rows[row].get(start_col - 1 | 0)) {
+            if (left === right && right === start_col && start_col > 0 && !is_clear(row, start_col - 1 | 0)) {
                 left = start_col - 1 | 0;
             }
             if (left < lim_min) {
@@ -1326,18 +1331,18 @@ async function view_from(srow, scol, loc_cs_rows, left_most, right_most, range, 
     cs_right = right_most;
     vis_func = func;
     varg = arg;
-    if (viz_clear_rows[srow].get(scol)) {
+    if (is_clear(srow, scol)) {
         left = left_ptrs[srow][scol];
         right = right_ptrs[srow][scol];
     } else {
-        left = !scol ? 0 : viz_clear_rows[srow].get(scol - 1 | 0) ? left_ptrs[srow][scol - 1 | 0] : scol - 1 | 0;
-        right = scol === COLNO - 1 ? COLNO - 1 : viz_clear_rows[srow].get(scol + 1 | 0) ? right_ptrs[srow][scol + 1 | 0] : scol + 1 | 0;
+        left = !scol ? 0 : is_clear(srow, scol - 1 | 0) ? left_ptrs[srow][scol - 1 | 0] : scol - 1 | 0;
+        right = scol === COLNO - 1 ? COLNO - 1 : is_clear(srow, scol + 1 | 0) ? right_ptrs[srow][scol + 1 | 0] : scol + 1 | 0;
     }
     if (range) {
         if (range > MAX_RADIUS || range < 1) {
             await panic($c.lit("view_from called with range %d"), range);
         }
-        limits = new $c.Ptr(circle_data, circle_start[range]).add(1);
+        limits = circle_ptr(range).add(1);
         if (left < (scol - range | 0)) {
             left = scol - range | 0;
         }
@@ -1393,7 +1398,7 @@ export async function do_clear_area(scol, srow, range, func, arg) {   // vision.
         if (gv.vision_full_recalc) {
             await vision_recalc(0);
         }
-        limits = new $c.Ptr(circle_data, circle_start[range]);
+        limits = circle_ptr(range);
         if ((max_y = srow + range | 0) >= ROWNO) {
             max_y = ROWNO - 1;
         }
@@ -1401,7 +1406,7 @@ export async function do_clear_area(scol, srow, range, func, arg) {   // vision.
             y = 0;
         }
         for (; y <= max_y; y = y + 1 | 0) {
-            offset = limits.get((y - srow | 0) < 0 ? -(y - srow | 0) | 0 : y - srow | 0);
+            offset = limits.get(v_abs(y - srow | 0));
             if ((min_x = scol - offset | 0) < 1) {
                 min_x = 1;
             }
@@ -1409,7 +1414,7 @@ export async function do_clear_area(scol, srow, range, func, arg) {   // vision.
                 max_x = COLNO - 1;
             }
             for (x = min_x; x <= max_x; x = x + 1 | 0) {
-                if ((gv.viz_array.get(y).get(x) & COULD_SEE) !== 0 || override_vision) {
+                if (couldsee(x, y) || override_vision) {
                     await func($c.i16(x), $c.i16(y), arg);
                 }
             }
@@ -1421,13 +1426,13 @@ export function howmonseen(mon) {   // vision.c:2152
     useemon = $c.i8(canseemon(mon));
     xraydist = u.xray_range < 0 ? -1 : Math.imul(u.xray_range, u.xray_range);
     how_seen = 0;
-    if ((mon.wormno | 0 ? worm_known(mon) : (gv.viz_array.get(mon.my).get(mon.mx) & IN_SIGHT) !== 0 && (gv.viz_array.get(mon.my).get(mon.mx) & COULD_SEE) !== 0) && mon_visible(mon) && !mon.minvis) {
+    if ((mon.wormno | 0 ? worm_known(mon) : cansee(mon.mx, mon.my) && couldsee(mon.mx, mon.my)) && mon_visible(mon) && !mon.minvis) {
         how_seen = (how_seen | MONSEEN_NORMAL) >>> 0;
     }
     if (useemon && mon.minvis | 0) {
         how_seen = (how_seen | MONSEEN_SEEINVIS) >>> 0;
     }
-    if ((!mon.minvis || (u.uprops[SEE_INVIS].intrinsic || u.uprops[SEE_INVIS].extrinsic)) && see_with_infrared(mon)) {
+    if ((!mon.minvis || See_invisible()) && see_with_infrared(mon)) {
         how_seen = (how_seen | MONSEEN_INFRAVIS) >>> 0;
     }
     if (tp_sensemon(mon)) {
@@ -1436,13 +1441,22 @@ export function howmonseen(mon) {   // vision.c:2152
     if (useemon && xraydist > 0 && dist2(mon.mx, mon.my, u.ux, u.uy) <= xraydist) {
         how_seen = (how_seen | MONSEEN_XRAYVIS) >>> 0;
     }
-    if (u.uprops[DETECT_MONSTERS].intrinsic || u.uprops[DETECT_MONSTERS].extrinsic) {
+    if (Detect_monsters()) {
         how_seen = (how_seen | MONSEEN_DETECT) >>> 0;
     }
-    if ((u.uprops[WARN_OF_MON].intrinsic || u.uprops[WARN_OF_MON].extrinsic) && ($c.andu64(svc.context.warntype.obj, mon.data.mflags2) !== 0 || $c.andu64(svc.context.warntype.polyd, mon.data.mflags2) !== 0 || svc.context.warntype.species && $c.peq(svc.context.warntype.species, mon.data))) {
+    if (MATCH_WARN_OF_MON(mon)) {
         how_seen = (how_seen | MONSEEN_WARNMON) >>> 0;
     }
     return how_seen;
+}
+function v_abs(z) {
+    return z < 0 ? -z | 0 : z;
+}
+function is_clear(row, col) {
+    return viz_clear_rows[row].get(col);
+}
+function good_row(z) {
+    return z >= 0 && z < ROWNO ? 1 : 0;
 }
 
 export function $init() {

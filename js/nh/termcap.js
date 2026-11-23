@@ -6,9 +6,12 @@ import { alloc, dupstr } from './alloc.js';
 import { HL_BLINK, HL_BOLD, HL_DIM, HL_ULINE } from './botl.h.js';
 import { BRIGHT, CLR_BLACK, CLR_BLUE, CLR_BRIGHT_BLUE, CLR_BRIGHT_CYAN, CLR_BRIGHT_GREEN, CLR_BRIGHT_MAGENTA, CLR_BROWN, CLR_CYAN, CLR_GRAY, CLR_GREEN, CLR_MAGENTA, CLR_MAX, CLR_ORANGE, CLR_RED, CLR_WHITE, CLR_YELLOW, NO_COLOR } from './color.h.js';
 import { flags, gc, gs, gt, iflags } from './decl.js';
+import { AE, AS, CO, LI } from './decl.macros.js';
 import { BUFSZ, COLNO, ROWNO } from './global.h.js';
 import { digit, nh_snprintf } from './hacklib.js';
+import { nhStr } from './lint.macros.js';
 import { H_DEC } from './sym.h.js';
+import { nh_CD, nh_CM, nh_HE, nh_HI, nh_ND, nh_UE, nh_US } from './tcap.macros.js';
 import { error, tty_utf8graphics_fixup } from './unixtty.js';
 import { erase_tty_screen, setclipped, tty_curs, tty_raw_print, tty_wait_synch } from './wintty.js';
 import { ATR_BLINK, ATR_BOLD, ATR_DIM, ATR_INVERSE, ATR_ITALIC, ATR_ULINE } from './wintype.h.js';
@@ -90,20 +93,20 @@ export async function term_startup(wid, hgt) {   // termcap.c:82
         await error($c.lit("Terminal must backspace."));
     }
     HO = $c.tgetstr($c.lit("ho"), new $c.Ptr(tbufptr, 0));
-    if (!gt.tc_gbl_data.tc_CO) {
-        $t1 = $c.tgetnum($c.lit("co")), gt.tc_gbl_data.tc_CO = $t1;
+    if (!CO()) {
+        $t1 = $c.tgetnum(nhStr($c.lit("co"))), gt.tc_gbl_data.tc_CO = $t1;
     }
-    if (!gt.tc_gbl_data.tc_LI) {
-        $t2 = $c.tgetnum($c.lit("li")), gt.tc_gbl_data.tc_LI = $t2;
+    if (!LI()) {
+        $t2 = $c.tgetnum(nhStr($c.lit("li"))), gt.tc_gbl_data.tc_LI = $t2;
     }
     if (gt.tc_gbl_data.tc_CO < COLNO || gt.tc_gbl_data.tc_LI < ROWNO + 3) {
         setclipped();
     }
     $t3 = $c.tgetstr($c.lit("nd"), new $c.Ptr(tbufptr, 0)), tc_lcl_data.tc_ND = $t3;
-    if ($c.tgetflag($c.lit("os"))) {
+    if ($c.tgetflag(nhStr($c.lit("os")))) {
         await error($c.lit("NetHack can't have OS."));
     }
-    if ($c.tgetflag($c.lit("ul"))) {
+    if ($c.tgetflag(nhStr($c.lit("ul")))) {
         tc_lcl_data.tc_ul_hack = 1;
     }
     CE = $c.tgetstr($c.lit("ce"), new $c.Ptr(tbufptr, 0));
@@ -122,7 +125,7 @@ export async function term_startup(wid, hgt) {   // termcap.c:82
     $t6 = $c.tgetstr($c.lit("ue"), new $c.Ptr(tbufptr, 0)), tc_lcl_data.tc_UE = $t6;
     ZH = $c.tgetstr($c.lit("ZH"), new $c.Ptr(tbufptr, 0));
     ZR = $c.tgetstr($c.lit("ZR"), new $c.Ptr(tbufptr, 0));
-    SG = $c.tgetnum($c.lit("sg"));
+    SG = $c.tgetnum(nhStr($c.lit("sg")));
     if (!SO || !SE || SG > 0) {
         SO = SE = ($t7 = tc_lcl_data.tc_UE = new $c.Ptr(nullstr, 0), tc_lcl_data.tc_US = $t7);
     }
@@ -171,10 +174,10 @@ export async function term_startup(wid, hgt) {   // termcap.c:82
         await error($c.lit("TERMCAP entry too big...\n"));
     }
     $c.free(tptr);
-    if (tc_lcl_data.tc_HI && $c.strlen(tc_lcl_data.tc_HI) < 16) {
+    if (nh_HI() && $c.strlen(tc_lcl_data.tc_HI) < 16) {
         $c.__builtin___strcpy_chk(new $c.Ptr(tty_standout_on, 0), tc_lcl_data.tc_HI, 16);
     }
-    if (tc_lcl_data.tc_HE && $c.strlen(tc_lcl_data.tc_HE) < 16) {
+    if (nh_HE() && $c.strlen(tc_lcl_data.tc_HE) < 16) {
         $c.__builtin___strcpy_chk(new $c.Ptr(tty_standout_off, 0), tc_lcl_data.tc_HE, 16);
     }
 }
@@ -206,10 +209,10 @@ export function tty_number_pad(state) {   // termcap.c:359
 }
 function tty_decgraphics_termcap_fixup() {   // termcap.c:388
     let ae = null;
-    if (!gt.tc_gbl_data.tc_AS) {
+    if (!AS()) {
         gt.tc_gbl_data.tc_AS = new $c.Ptr(tty_decgraphics_termcap_fixup$ctrlN, 0);
     }
-    if (!gt.tc_gbl_data.tc_AE) {
+    if (!AE()) {
         gt.tc_gbl_data.tc_AE = new $c.Ptr(tty_decgraphics_termcap_fixup$ctrlO, 0);
     }
     if (!KS) {
@@ -237,7 +240,7 @@ function tty_decgraphics_termcap_fixup() {   // termcap.c:388
             ae = ae.add(1);
         }
     }
-    if (tc_lcl_data.tc_HE && $c.strstr(tc_lcl_data.tc_HE, ae) || ME && $c.strstr(ME, ae)) {
+    if (nh_HE() && $c.strstr(tc_lcl_data.tc_HE, ae) || ME && $c.strstr(ME, ae)) {
         $G.HE_resets_AS = 1;
     }
     xputs(gt.tc_gbl_data.tc_AE);
@@ -266,7 +269,7 @@ export async function nocmov(x, y) {   // termcap.c:559
                 xputs(UP);
                 $G.ttyDisplay.cury = $c.i16($G.ttyDisplay.cury - 1);
             }
-        } else if (tc_lcl_data.tc_CM) {
+        } else if (nh_CM()) {
             cmov(x, y);
         } else if (HO) {
             await home();
@@ -278,7 +281,7 @@ export async function nocmov(x, y) {   // termcap.c:559
                 xputs(XD);
                 $G.ttyDisplay.cury = $c.i16($G.ttyDisplay.cury + 1);
             }
-        } else if (tc_lcl_data.tc_CM) {
+        } else if (nh_CM()) {
             cmov(x, y);
         } else {
             while ($G.ttyDisplay.cury < y) {
@@ -289,7 +292,7 @@ export async function nocmov(x, y) {   // termcap.c:559
         }
     }
     if ($G.ttyDisplay.curx < x) {
-        if (!tc_lcl_data.tc_ND) {
+        if (!nh_ND()) {
             cmov(x, y);
         } else {
             while ($G.ttyDisplay.curx < x) {
@@ -574,7 +577,7 @@ export async function home() {   // termcap.c:1013
     let $t1;
     if (HO) {
         xputs(HO);
-    } else if (tc_lcl_data.tc_CM) {
+    } else if (nh_CM()) {
         xputs($c.tgoto(tc_lcl_data.tc_CM, 0, 0));
     } else {
         await tty_curs($G.BASE_WINDOW, 1, 0);
@@ -603,13 +606,13 @@ export function tty_nhbell() {   // termcap.c:1083
 }
 export function graph_on() {   // termcap.c:1093
     nomux_decgfx_cur = 1;
-    if (gt.tc_gbl_data.tc_AS) {
+    if (AS()) {
         xputs(gt.tc_gbl_data.tc_AS);
     }
 }
 export function graph_off() {   // termcap.c:1103
     nomux_decgfx_cur = 0;
-    if (gt.tc_gbl_data.tc_AE) {
+    if (AE()) {
         xputs(gt.tc_gbl_data.tc_AE);
     }
 }
@@ -629,7 +632,7 @@ export async function tty_delay_output() {   // termcap.c:1129
     }
     if (flags.null) {
         $c.tputs($c.lit("$<50>"), 1, xputc);
-    } else if ($c.$libc.ospeed > 0 && $c.$libc.ospeed < 15 && tc_lcl_data.tc_CM) {
+    } else if ($c.$libc.ospeed > 0 && $c.$libc.ospeed < 15 && nh_CM()) {
         cmlen = $c.i32($c.strlen($c.tgoto(tc_lcl_data.tc_CM, $G.ttyDisplay.curx, $G.ttyDisplay.cury)));
         i = 500 + $c.div32(tmspc10[$c.$libc.ospeed], 2) | 0;
         while (i > 0) {
@@ -640,7 +643,7 @@ export async function tty_delay_output() {   // termcap.c:1129
 }
 export async function cl_eos() {   // termcap.c:1198
     let r = 0, cy = 0;
-    if (tc_lcl_data.tc_CD) {
+    if (nh_CD()) {
         xputs(tc_lcl_data.tc_CD);
         {
             nomux_clear_to_eol($G.ttyDisplay.cury, $G.ttyDisplay.curx);
@@ -661,10 +664,10 @@ export async function cl_eos() {   // termcap.c:1198
 }
 async function init_hilite() {   // termcap.c:1300
     let c = 0, colors = 0, setf = null, scratch = null, md_len = 0, work = null, $t1, $t2, $t3, $t4, $t5, $t6, $t7;
-    colors = $c.tgetnum($c.lit("Co"));
+    colors = $c.tgetnum(nhStr($c.lit("Co")));
     iflags.colorcount = colors >>> 0;
     md_len = 0;
-    if (colors < 8 || !MD || !MD.get(0) || (setf = $c.tgetstr($c.lit("AF"), null)) === null && (setf = $c.tgetstr($c.lit("Sf"), null)) === null) {
+    if (colors < 8 || !MD || !MD.get(0) || (setf = $c.tgetstr(nhStr($c.lit("AF")), null)) === null && (setf = $c.tgetstr(nhStr($c.lit("Sf")), null)) === null) {
         hilites[CLR_BLACK] = tc_lcl_data.tc_HI;
         hilites[CLR_RED] = tc_lcl_data.tc_HI;
         hilites[CLR_GREEN] = tc_lcl_data.tc_HI;
@@ -738,7 +741,7 @@ function kill_hilite() {   // termcap.c:1400
             $c.free(hilites[CLR_BLACK]), hilites[CLR_BLACK] = null;
         }
     }
-    if ($c.tgetnum($c.lit("Co")) >= 16) {
+    if ($c.tgetnum(nhStr($c.lit("Co"))) >= 16) {
         if (hilites[CLR_BLUE]) {
             $c.free(hilites[CLR_BLUE]);
         }
@@ -797,7 +800,7 @@ function s_atr2str(n) {   // termcap.c:1702
                     return MB;
                 }
             } else {
-                if (tc_lcl_data.tc_US && tc_lcl_data.tc_US.get(0)) {
+                if (nh_US() && tc_lcl_data.tc_US.get(0)) {
                     return tc_lcl_data.tc_US;
                 }
             }
@@ -805,7 +808,7 @@ function s_atr2str(n) {   // termcap.c:1702
             if (MD && MD.get(0)) {
                 return MD;
             }
-            if (tc_lcl_data.tc_HI && tc_lcl_data.tc_HI.get(0)) {
+            if (nh_HI() && tc_lcl_data.tc_HI.get(0)) {
                 return tc_lcl_data.tc_HI;
             }
             break;
@@ -829,12 +832,12 @@ function e_atr2str(n) {   // termcap.c:1741
                 return ZR;
             }
         case ATR_ULINE:
-            if (tc_lcl_data.tc_UE && tc_lcl_data.tc_UE.get(0)) {
+            if (nh_UE() && tc_lcl_data.tc_UE.get(0)) {
                 return tc_lcl_data.tc_UE;
             }
         case ATR_BOLD:
         case ATR_BLINK:
-            if (tc_lcl_data.tc_HE && tc_lcl_data.tc_HE.get(0)) {
+            if (nh_HE() && tc_lcl_data.tc_HE.get(0)) {
                 return tc_lcl_data.tc_HE;
             }
         case ATR_DIM:
@@ -847,7 +850,7 @@ function e_atr2str(n) {   // termcap.c:1741
     return new $c.Ptr(nulstr, 0);
 }
 export function term_attr_fixup(msk) {   // termcap.c:1773
-    if (msk & HL_ULINE && (!tc_lcl_data.tc_US || !tc_lcl_data.tc_US.get(0))) {
+    if (msk & HL_ULINE && (!nh_US() || !tc_lcl_data.tc_US.get(0))) {
         msk = msk | HL_BOLD;
         msk = msk & ~HL_ULINE;
     }
@@ -882,14 +885,14 @@ export function term_end_attr(attr) {   // termcap.c:1807
 }
 export function term_start_raw_bold() {   // termcap.c:1823
     let soOn = null;
-    soOn = tc_lcl_data.tc_HI ? tc_lcl_data.tc_HI : new $c.Ptr(tty_standout_on, 0);
+    soOn = nh_HI() ? tc_lcl_data.tc_HI : new $c.Ptr(tty_standout_on, 0);
     if (soOn.get(0)) {
         xputs(soOn);
     }
 }
 export function term_end_raw_bold() {   // termcap.c:1833
     let soOff = null;
-    soOff = tc_lcl_data.tc_HE ? tc_lcl_data.tc_HE : new $c.Ptr(tty_standout_off, 0);
+    soOff = nh_HE() ? tc_lcl_data.tc_HE : new $c.Ptr(tty_standout_off, 0);
     if (soOff.get(0)) {
         xputs(soOff);
     }

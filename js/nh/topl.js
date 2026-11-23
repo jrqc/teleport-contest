@@ -7,15 +7,16 @@ import { key2txt, readchar } from './cmd.js';
 import { flags, gs, gt, iflags, program_state, quitchars } from './decl.js';
 import { panic } from './end.js';
 import { xwaitforspace } from './getline.js';
-import { QBUFSZ } from './global.h.js';
+import { QBUFSZ, TBUFSZ } from './global.h.js';
 import { OVERRIDE_MSGTYPE, SUPPRESS_HISTORY } from './hack.h.js';
 import { digit, eos, lowc } from './hacklib.js';
+import { AppendLongDigit } from './integer.macros.js';
 import { custompline, dumplogmsg, nhassert_failed } from './pline.js';
 import { backsp, cl_end, home, nomux_putch, standoutbeg, standoutend, tty_nhbell } from './termcap.js';
-import { windowprocs } from './windows.js';
+import { create_nhwindow, destroy_nhwindow, display_nhwindow, putstr } from './winprocs.macros.js';
 import { defmorestr, docorner, end_glyphout, g_putch, tty_clear_nhwindow, tty_curs, wins } from './wintty.js';
-import { TOPLINE_EMPTY, TOPLINE_NEED_MORE, TOPLINE_NON_EMPTY, TOPLINE_SPECIAL_PROMPT, WIN_LOCKHISTORY } from './wintty.h.js';
-import { NHW_MENU } from './wintype.h.js';
+import { TOPLINE_EMPTY, TOPLINE_NEED_MORE, TOPLINE_NON_EMPTY, TOPLINE_SPECIAL_PROMPT, WIN_LOCKHISTORY, WIN_NOSTOP, WIN_STOP } from './wintty.h.js';
+import { NHW_MENU, WIN_ERR } from './wintype.h.js';
 
 let tty_getmsghistory$nxtidx = 0;   // static in tty_getmsghistory()
 let tty_putmsghistory$initd = 0;   // static in tty_putmsghistory()
@@ -25,20 +26,20 @@ export async function tty_doprev_message() {   // topl.c:20
     cw = wins[$G.WIN_MESSAGE];
     if (iflags.prevmsg_window !== 115 && !$G.ttyDisplay.inread) {
         if (iflags.prevmsg_window === 102) {
-            prevmsg_win = await windowprocs.win_create_nhwindow(NHW_MENU);
-            await windowprocs.win_putstr(prevmsg_win, 0, $c.lit("Message History"));
-            await windowprocs.win_putstr(prevmsg_win, 0, $c.lit(""));
+            prevmsg_win = await create_nhwindow()(NHW_MENU);
+            await putstr()(prevmsg_win, 0, $c.lit("Message History"));
+            await putstr()(prevmsg_win, 0, $c.lit(""));
             cw.maxcol = cw.maxrow;
             i = $c.i32(cw.maxcol);
             do {
                 if (cw.data.get(i) && $c.strcmp(cw.data.get(i), $c.lit(""))) {
-                    await windowprocs.win_putstr(prevmsg_win, 0, cw.data.get(i));
+                    await putstr()(prevmsg_win, 0, cw.data.get(i));
                 }
                 i = $c.i32($c.rem64(i + 1 | 0, cw.rows));
             } while (i !== cw.maxcol);
-            await windowprocs.win_putstr(prevmsg_win, 0, new $c.Ptr(gt.toplines, 0));
-            await windowprocs.win_display_nhwindow(prevmsg_win, 1);
-            await windowprocs.win_destroy_nhwindow(prevmsg_win);
+            await putstr()(prevmsg_win, 0, new $c.Ptr(gt.toplines, 0));
+            await display_nhwindow()(prevmsg_win, 1);
+            await destroy_nhwindow()(prevmsg_win);
         } else if (iflags.prevmsg_window === 99) {
             do {
                 $G.morc = 0;
@@ -63,35 +64,35 @@ export async function tty_doprev_message() {   // topl.c:20
                         cw.maxcol = cw.maxrow;
                     }
                 } else {
-                    prevmsg_win = await windowprocs.win_create_nhwindow(NHW_MENU);
-                    await windowprocs.win_putstr(prevmsg_win, 0, $c.lit("Message History"));
-                    await windowprocs.win_putstr(prevmsg_win, 0, $c.lit(""));
+                    prevmsg_win = await create_nhwindow()(NHW_MENU);
+                    await putstr()(prevmsg_win, 0, $c.lit("Message History"));
+                    await putstr()(prevmsg_win, 0, $c.lit(""));
                     cw.maxcol = cw.maxrow;
                     i = $c.i32(cw.maxcol);
                     do {
                         if (cw.data.get(i) && $c.strcmp(cw.data.get(i), $c.lit(""))) {
-                            await windowprocs.win_putstr(prevmsg_win, 0, cw.data.get(i));
+                            await putstr()(prevmsg_win, 0, cw.data.get(i));
                         }
                         i = $c.i32($c.rem64(i + 1 | 0, cw.rows));
                     } while (i !== cw.maxcol);
-                    await windowprocs.win_putstr(prevmsg_win, 0, new $c.Ptr(gt.toplines, 0));
-                    await windowprocs.win_display_nhwindow(prevmsg_win, 1);
-                    await windowprocs.win_destroy_nhwindow(prevmsg_win);
+                    await putstr()(prevmsg_win, 0, new $c.Ptr(gt.toplines, 0));
+                    await display_nhwindow()(prevmsg_win, 1);
+                    await destroy_nhwindow()(prevmsg_win);
                 }
             } while ($G.morc === 16);
             $G.ttyDisplay.dismiss_more = 0;
         } else {
             $G.morc = 0;
-            prevmsg_win = await windowprocs.win_create_nhwindow(NHW_MENU);
-            await windowprocs.win_putstr(prevmsg_win, 0, $c.lit("Message History"));
-            await windowprocs.win_putstr(prevmsg_win, 0, $c.lit(""));
-            await windowprocs.win_putstr(prevmsg_win, 0, new $c.Ptr(gt.toplines, 0));
+            prevmsg_win = await create_nhwindow()(NHW_MENU);
+            await putstr()(prevmsg_win, 0, $c.lit("Message History"));
+            await putstr()(prevmsg_win, 0, $c.lit(""));
+            await putstr()(prevmsg_win, 0, new $c.Ptr(gt.toplines, 0));
             cw.maxcol = $c.sub64(cw.maxrow, 1);
             if (cw.maxcol < 0) {
                 cw.maxcol = $c.sub64(cw.rows, 1);
             }
             do {
-                await windowprocs.win_putstr(prevmsg_win, 0, cw.data.get($c.idx(cw.maxcol)));
+                await putstr()(prevmsg_win, 0, cw.data.get($c.idx(cw.maxcol)));
                 cw.maxcol = $c.sub64(cw.maxcol, 1);
                 if (cw.maxcol < 0) {
                     cw.maxcol = $c.sub64(cw.rows, 1);
@@ -100,8 +101,8 @@ export async function tty_doprev_message() {   // topl.c:20
                     cw.maxcol = cw.maxrow;
                 }
             } while (cw.maxcol !== cw.maxrow);
-            await windowprocs.win_display_nhwindow(prevmsg_win, 1);
-            await windowprocs.win_destroy_nhwindow(prevmsg_win);
+            await display_nhwindow()(prevmsg_win, 1);
+            await destroy_nhwindow()(prevmsg_win);
             cw.maxcol = cw.maxrow;
             $G.ttyDisplay.dismiss_more = 0;
         }
@@ -147,8 +148,8 @@ async function redotoplin(str) {   // topl.c:122
 export async function show_topl(str) {   // topl.c:145
     let cw = null, $t1;
     cw = wins[$G.WIN_MESSAGE];
-    if ((cw.flags & 5) !== 1) {
-        cw.flags = cw.flags & -6;
+    if ((cw.flags & (WIN_STOP | WIN_NOSTOP)) !== WIN_STOP) {
+        cw.flags = cw.flags & ~(WIN_STOP | WIN_NOSTOP);
         if ($G.ttyDisplay.cury && $G.ttyDisplay.toplin === TOPLINE_NON_EMPTY) {
             await tty_clear_nhwindow($G.WIN_MESSAGE);
         }
@@ -216,8 +217,8 @@ export async function more() {   // topl.c:205
     }
     await xwaitforspace($c.lit("\x1b "));
     if ($G.morc === 27) {
-        if (!(cw.flags & 4)) {
-            cw.flags = cw.flags | 1;
+        if (!(cw.flags & WIN_NOSTOP)) {
+            cw.flags = cw.flags | WIN_STOP;
         }
     }
     if ($G.ttyDisplay.toplin && cw.cury) {
@@ -236,7 +237,7 @@ export async function update_topl(bp) {   // topl.c:251
     let tl = null, otl = null, n0 = 0, notdied = 0, cw = null, skip = 0, $t1, $t2;
     notdied = 1;
     cw = wins[$G.WIN_MESSAGE];
-    skip = $c.i8((cw.flags & 5) === 1 ? 1 : 0);
+    skip = $c.i8((cw.flags & (WIN_STOP | WIN_NOSTOP)) === WIN_STOP ? 1 : 0);
     n0 = $c.i32($c.strlen(bp));
     if (($G.ttyDisplay.toplin === TOPLINE_NEED_MORE || skip) && cw.cury === 0 && ((n0 + $c.i32($c.strlen(new $c.Ptr(gt.toplines, 0))) | 0) + 3 | 0) < (gt.tc_gbl_data.tc_CO - 8 | 0) && (notdied = $c.strncmp(bp, $c.lit("You die"), 7)) !== 0) {
         $c.__builtin___strcat_chk(new $c.Ptr(gt.toplines, 0), $c.lit("  "), 300);
@@ -256,7 +257,7 @@ export async function update_topl(bp) {   // topl.c:251
     }
     await remember_topl();
     $c.__builtin___strncpy_chk(new $c.Ptr(gt.toplines, 0), bp, 300, 300);
-    gt.toplines[299] = 0;
+    gt.toplines[TBUFSZ - 1] = 0;
     for (tl = new $c.Ptr(gt.toplines, 0); n0 >= gt.tc_gbl_data.tc_CO; ) {
         otl = tl;
         for (tl = tl.add(gt.tc_gbl_data.tc_CO - 1 | 0); !$c.peq(tl, otl); tl = tl.add(-1)) {
@@ -274,7 +275,7 @@ export async function update_topl(bp) {   // topl.c:251
         n0 = $c.i32($c.strlen(tl));
     }
     if (!notdied) {
-        cw.flags = cw.flags & -2, skip = 0;
+        cw.flags = cw.flags & ~WIN_STOP, skip = 0;
     }
     if (!skip) {
         await redotoplin(new $c.Ptr(gt.toplines, 0));
@@ -338,10 +339,10 @@ export async function tty_yn_function(query, resp, def) {   // topl.c:373
     cw = wins[$G.WIN_MESSAGE];
     doprev = 0;
     $G.yn_number = 0;
-    if ($G.ttyDisplay.toplin === TOPLINE_NEED_MORE && (cw.flags & 5) !== 1) {
+    if ($G.ttyDisplay.toplin === TOPLINE_NEED_MORE && (cw.flags & (WIN_STOP | WIN_NOSTOP)) !== WIN_STOP) {
         await more();
     }
-    cw.flags = cw.flags & -6;
+    cw.flags = cw.flags & ~(WIN_STOP | WIN_NOSTOP);
     $G.ttyDisplay.toplin = TOPLINE_SPECIAL_PROMPT;
     $G.ttyDisplay.inread = $G.ttyDisplay.inread + 1 | 0;
     clean_up$: {
@@ -437,7 +438,7 @@ export async function tty_yn_function(query, resp, def) {   // topl.c:373
                     }
                     if (digit(z)) {
                         dgt = z - 48 | 0;
-                        value = value < 922337203685477580n || value === 922337203685477580n && dgt <= 7 ? $c.add64($c.mul64(value, 10), dgt) : -1;
+                        value = AppendLongDigit(value, dgt);
                         if (value < 0) {
                             break;
                         }
@@ -492,7 +493,7 @@ export async function tty_yn_function(query, resp, def) {   // topl.c:373
 }
 async function msghistory_snapshot(purge) {   // topl.c:567
     let mesg = null, i = 0, inidx = 0, outidx = 0, cw = null, $t1, $t2;
-    if ($G.WIN_MESSAGE === -1 || !wins[$G.WIN_MESSAGE]) {
+    if ($G.WIN_MESSAGE === WIN_ERR || !wins[$G.WIN_MESSAGE]) {
         return;
     }
     cw = wins[$G.WIN_MESSAGE];

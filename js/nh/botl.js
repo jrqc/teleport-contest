@@ -6,46 +6,52 @@ import { alloc, dupstr, fmt_ptr } from './alloc.js';
 import { ART_MITRE_OF_HOLINESS, ART_TSURUGI_OF_MURAMASA } from './artilist.h.js';
 import { acurr } from './attrib.js';
 import { A_CHA, A_CON, A_DEX, A_INT, A_STR, A_WIS } from './attrib.h.js';
+import { ACURR } from './attrib.macros.js';
 import { BL_AC, BL_ALIGN, BL_ARMOR, BL_CAP, BL_CH, BL_CHARACTERISTICS, BL_CO, BL_CONDITION, BL_DX, BL_ENE, BL_ENEMAX, BL_EXP, BL_FLUSH, BL_GOLD, BL_HD, BL_HP, BL_HPMAX, BL_HUNGER, BL_IN, BL_LEVELDESC, BL_MASK_BAREH, BL_MASK_BLIND, BL_MASK_BUSY, BL_MASK_CONF, BL_MASK_DEAF, BL_MASK_ELF_IRON, BL_MASK_FLY, BL_MASK_FOODPOIS, BL_MASK_GLOWHANDS, BL_MASK_GRAB, BL_MASK_HALLU, BL_MASK_HELD, BL_MASK_HOLDING, BL_MASK_ICY, BL_MASK_INLAVA, BL_MASK_LEV, BL_MASK_PARLYZ, BL_MASK_RIDE, BL_MASK_SLEEPING, BL_MASK_SLIME, BL_MASK_SLIPPERY, BL_MASK_STONE, BL_MASK_STRNGL, BL_MASK_STUN, BL_MASK_SUBMERGED, BL_MASK_TERMILL, BL_MASK_TETHERED, BL_MASK_TRAPPED, BL_MASK_UNCONSC, BL_MASK_WOUNDEDL, BL_RESET, BL_SCORE, BL_STR, BL_TERRAIN, BL_TH_ALWAYS_HILITE, BL_TH_CONDITION, BL_TH_CRITICALHP, BL_TH_NONE, BL_TH_TEXTMATCH, BL_TH_UPDOWN, BL_TH_VAL_ABSOLUTE, BL_TH_VAL_PERCENTAGE, BL_TIME, BL_TITLE, BL_VERS, BL_WEAPON, BL_WI, BL_XP, BOTL_NSIZ, CONDITION_COUNT, EQ_VALUE, GE_VALUE, GT_VALUE, HL_BLINK, HL_BOLD, HL_DIM, HL_INVERSE, HL_ITALIC, HL_NONE, HL_ULINE, HL_UNDEF, LE_VALUE, LT_VALUE, MAXBLSTATS, NO_LTEQGT, TXT_VALUE, bl_bareh, bl_blind, bl_busy, bl_conf, bl_deaf, bl_elf_iron, bl_fly, bl_foodpois, bl_glowhands, bl_grab, bl_hallu, bl_held, bl_holding, bl_icy, bl_inlava, bl_lev, bl_parlyz, bl_ride, bl_sleeping, bl_slime, bl_slippery, bl_stone, bl_strngl, bl_stun, bl_submerged, bl_termill, bl_tethered, bl_trapped, bl_unconsc, bl_woundedl } from './botl.h.js';
+import { VIA_WINDOWPORT } from './botl.macros.js';
 import { config_error_add } from './cfgfiles.js';
 import { CLR_MAX, NO_COLOR } from './color.h.js';
 import { clr2colorname, match_str2attr, match_str2clr, query_attr, query_color } from './coloratt.js';
 import { cg, disp, flags, gb, gc, gi, gm, gn, gs, gu, gv, gy, iflags, svc, svd, svl, svm, svp, u } from './decl.js';
-import { COIN_CLASS, S_EEL, TOOL_CLASS, WEAPON_CLASS } from './defsym.h.js';
+import { COIN_CLASS, S_EEL, WEAPON_CLASS } from './defsym.h.js';
 import { nul_glyphinfo, suppress_map_output } from './display.js';
 import { GLYPH_OBJ_OFF } from './display.h.js';
 import { pmname } from './do_name.js';
 import { In_quest, depth, dunlev, endgamelevelname, on_level } from './dungeon.js';
+import { In_endgame } from './dungeon.macros.js';
 import { hu_stat } from './eat.js';
 import { panic } from './end.js';
 import { newuexp } from './exper.js';
-import { BUFSZ, COLNO, LARGEST_INT, QBUFSZ, opt_in, opt_out } from './global.h.js';
+import { BUFSZ, COLNO, FALSE, LARGEST_INT, QBUFSZ, TRUE, opt_in, opt_out } from './global.h.js';
 import { classify_terrain, money_cnt, near_capacity } from './hack.js';
-import { NOT_HUNGRY, OVERLOADED, SATIATED, SLT_ENCUMBER, STARVED, SYM_OFF_P, UNENCUMBERED } from './hack.h.js';
+import { NOT_HUNGRY, OVERLOADED, SATIATED, SLT_ENCUMBER, STARVED, SYM_OFF_O, UNENCUMBERED } from './hack.h.js';
 import { digit, eos, fuzzymatch, highc, lowc, mungspaces, nh_snprintf, sgn, strNsubst, str_start_is, stripchars, strkitten, strncmpi, strstri, strsubst, trimspaces, upstart } from './hacklib.js';
 import { sticks } from './mondata.js';
-import { M1_FLY, M1_HUMANOID } from './monflag.h.js';
+import { humanoid } from './mondata.macros.js';
+import { M1_FLY } from './monflag.h.js';
 import { mons } from './monst.js';
-import { objects } from './objects.js';
+import { bimanual, is_sword, is_weptool } from './obj.macros.js';
 import { AKLYS, AMULET_OF_GUARDING, CLOAK_OF_PROTECTION, CREAM_PIE, GOLD_PIECE, RIN_PROTECTION } from './objects.h.js';
 import { helm_simple_name } from './objnam.js';
 import { match_optname } from './options.js';
 import { NON_PM } from './permonst.h.js';
 import { impossible, pline } from './pline.js';
 import { critically_low_hp } from './pray.js';
-import { BLINDED, CONFUSION, DEAF, FLYING, GLIB, HALLUC, HALLUC_RES, LEVITATION, SICK, SLIMED, STONED, STRANGLED, STUNNED, WOUNDED_LEGS } from './prop.h.js';
+import { BLINDED, CONFUSION, DEAF, FLYING, GLIB, HALLUC, HALLUC_RES, LEVITATION, SLIMED, STONED, STRANGLED, STUNNED, WOUNDED_LEGS } from './prop.h.js';
 import { ICE, MAX_TYPE } from './rm.h.js';
 import { roles } from './role.js';
-import { P_LANCE, P_MORNING_STAR, P_NONE, P_POLEARMS, P_QUARTERSTAFF, P_SABER, P_SHORT_SWORD, P_UNICORN_HORN } from './skills.h.js';
+import { P_LANCE, P_MORNING_STAR, P_POLEARMS, P_QUARTERSTAFF, P_UNICORN_HORN } from './skills.h.js';
 import { Strlen_, strbuf_append } from './strutil.js';
-import { MAXPCHARS } from './sym.h.js';
 import { unconscious } from './trap.js';
 import { status_version } from './version.js';
 import { weapon_descr, weapon_type } from './weapon.js';
 import { add_menu, add_menu_heading, add_menu_str, encglyph, getlin, select_menu, windowprocs } from './windows.js';
-import { WC2_HILITE_STATUS } from './winprocs.h.js';
+import { WC2_FLUSH_STATUS, WC2_RESET_STATUS } from './winprocs.h.js';
+import { create_nhwindow, curs, destroy_nhwindow, display_nhwindow, end_menu, putmixed, putstr, start_menu, status_enablefield, status_update } from './winprocs.macros.js';
 import { ANY_INT, ANY_INVALID, ANY_IPTR, ANY_LONG, ANY_LPTR, ANY_MASK32, ANY_STR, ANY_UINT, ANY_ULONG, ANY_ULPTR, ANY_UPTR, ATR_BLINK, ATR_BOLD, ATR_DIM, ATR_INVERSE, ATR_ITALIC, ATR_NONE, ATR_ULINE, MENU_BEHAVE_STANDARD, MENU_ITEMFLAGS_NONE, MENU_ITEMFLAGS_SELECTED, MENU_ITEMFLAGS_SKIPINVERT, NHW_MENU, NHW_TEXT, PICK_ANY, PICK_ONE } from './wintype.h.js';
 import { SICK_NONVOMITABLE, SICK_VOMITABLE, TT_BURIEDBALL, TT_LAVA } from './you.h.js';
+import { Ugender, Upolyd } from './you.macros.js';
+import { Blind, Deaf, Hallucination, Levitation, Sick, Slimed, Stoned, Strangled } from './youprop.macros.js';
 
 const MAX_THRESH = 21;
 const MAX_SUBFIELDS = 16;
@@ -89,7 +95,7 @@ let status_hilite_str = null;
 let status_hilite_str_id = 0;
 export function get_strength_str() {   // botl.c:21
     let st = 0;
-    st = acurr(A_STR);
+    st = ACURR(A_STR);
     if (st > 18) {
         if (st > 118) {
             $c.__builtin___sprintf_chk(new $c.Ptr(get_strength_str$buf, 0), 0, 32, $c.lit("%2d"), st - 100 | 0);
@@ -105,7 +111,7 @@ export function get_strength_str() {   // botl.c:21
 }
 export function check_gold_symbol() {   // botl.c:40
     let goldch = 0;
-    goldch = gs.showsyms[COIN_CLASS + (SYM_OFF_P + MAXPCHARS)];
+    goldch = gs.showsyms[COIN_CLASS + SYM_OFF_O];
     iflags.invis_goldsym = $c.i8(goldch <= 32 ? 1 : 0);
 }
 export function do_statusline1() {   // botl.c:48
@@ -119,7 +125,7 @@ export function do_statusline1() {   // botl.c:48
     }
     do_statusline1$newbot1[BOTL_NSIZ] = 0;
     $c.__builtin___sprintf_chk(nb = eos(new $c.Ptr(do_statusline1$newbot1, 0)), 0, -1, $c.lit(" the "));
-    if (u.umonnum !== u.umonster) {
+    if (Upolyd()) {
         k = 0;
         $c.__builtin___strcpy_chk(new $c.Ptr(mbot, 0), pmname($c.relem(mons, u.umonnum), (u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female) ? 1 : 0), 256);
         while (mbot[k] !== 0) {
@@ -154,14 +160,14 @@ export async function do_statusline2() {   // botl.c:101
     $c.__builtin___sprintf_chk(eos(new $c.Ptr(do_statusline2$dloc, 0)), 0, -1, $c.lit("%s:%-2ld"), iflags.in_dumplog || iflags.invis_goldsym ? $c.lit("$") : encglyph(GOLD_PIECE + GLYPH_OBJ_OFF), money < 999999 ? money : 999999);
     dln = $c.strlen(new $c.Ptr(do_statusline2$dloc, 0));
     dx = $c.u64(strstri(new $c.Ptr(do_statusline2$dloc, 0), $c.lit("\\G")) ? 9 : 0);
-    hp = u.umonnum !== u.umonster ? u.mh : u.uhp;
-    hpmax = u.umonnum !== u.umonster ? u.mhmax : u.uhpmax;
+    hp = Upolyd() ? u.mh : u.uhp;
+    hpmax = Upolyd() ? u.mhmax : u.uhpmax;
     if (hp < 0) {
         hp = 0;
     }
     $c.__builtin___sprintf_chk(new $c.Ptr(do_statusline2$hlth, 0), 0, 128, $c.lit("HP:%d(%d) Pw:%d(%d) AC:%-2d"), hp < 9999 ? hp : 9999, hpmax < 9999 ? hpmax : 9999, u.uen < 9999 ? u.uen : 9999, u.uenmax < 9999 ? u.uenmax : 9999, u.uac);
     hln = $c.strlen(new $c.Ptr(do_statusline2$hlth, 0));
-    if (u.umonnum !== u.umonster) {
+    if (Upolyd()) {
         $c.__builtin___sprintf_chk(new $c.Ptr(do_statusline2$expr, 0), 0, 128, $c.lit("HD:%d"), mons[u.umonnum].mlevel);
     } else if (flags.showexp) {
         $c.__builtin___sprintf_chk(new $c.Ptr(do_statusline2$expr, 0), 0, 128, $c.lit("Xp:%d/%-1ld"), u.ulevel, u.uexp);
@@ -177,16 +183,16 @@ export async function do_statusline2() {   // botl.c:101
     tln = $c.strlen(new $c.Ptr(do_statusline2$tmmv, 0));
     do_statusline2$cond[0] = 0;
     nb = new $c.Ptr(do_statusline2$cond, 0);
-    if (u.uprops[STONED].intrinsic) {
+    if (Stoned()) {
         $c.__builtin___strcpy_chk(nb = eos(nb), $c.lit(" Stone"), -1);
     }
-    if (u.uprops[SLIMED].intrinsic) {
+    if (Slimed()) {
         $c.__builtin___strcpy_chk(nb = eos(nb), $c.lit(" Slime"), -1);
     }
-    if (u.uprops[STRANGLED].intrinsic) {
+    if (Strangled()) {
         $c.__builtin___strcpy_chk(nb = eos(nb), $c.lit(" Strngl"), -1);
     }
-    if (u.uprops[SICK].intrinsic) {
+    if (Sick()) {
         if ((u.usick_type | 0) & SICK_VOMITABLE) {
             $c.__builtin___strcpy_chk(nb = eos(nb), $c.lit(" FoodPois"), -1);
         }
@@ -200,10 +206,10 @@ export async function do_statusline2() {   // botl.c:101
     if ((cap = near_capacity()) > UNENCUMBERED) {
         $c.__builtin___sprintf_chk(nb = eos(nb), 0, -1, $c.lit(" %s"), enc_stat[cap]);
     }
-    if ((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked) {
+    if (Blind()) {
         $c.__builtin___strcpy_chk(nb = eos(nb), $c.lit(" Blind"), -1);
     }
-    if (u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf) {
+    if (Deaf()) {
         $c.__builtin___strcpy_chk(nb = eos(nb), $c.lit(" Deaf"), -1);
     }
     if (u.uprops[STUNNED].intrinsic) {
@@ -212,10 +218,10 @@ export async function do_statusline2() {   // botl.c:101
     if (u.uprops[CONFUSION].intrinsic) {
         $c.__builtin___strcpy_chk(nb = eos(nb), $c.lit(" Conf"), -1);
     }
-    if (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic)) {
+    if (Hallucination()) {
         $c.__builtin___strcpy_chk(nb = eos(nb), $c.lit(" Hallu"), -1);
     }
-    if ((u.uprops[LEVITATION].intrinsic || u.uprops[LEVITATION].extrinsic) && !u.uprops[LEVITATION].blocked) {
+    if (Levitation()) {
         $c.__builtin___strcpy_chk(nb = eos(nb), $c.lit(" Lev"), -1);
     }
     if ((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked) {
@@ -226,7 +232,7 @@ export async function do_statusline2() {   // botl.c:101
     }
     cln = $c.strlen(new $c.Ptr(do_statusline2$cond, 0));
     if (flags.showvers) {
-        status_version(new $c.Ptr(do_statusline2$vers, 0), 128, 1);
+        status_version(new $c.Ptr(do_statusline2$vers, 0), 128, TRUE);
     } else {
         do_statusline2$vers[0] = 0;
     }
@@ -253,29 +259,29 @@ export async function bot() {   // botl.c:253
         return;
     }
     if (u.uhp !== -1 && gy.youmonst.data && iflags.status_updates && !suppress_map_output()) {
-        if ($c.andu64(windowprocs.wincap2, WC2_HILITE_STATUS | 128) !== 0) {
+        if (VIA_WINDOWPORT()) {
             await bot_via_windowport();
         } else {
-            await windowprocs.win_curs($G.WIN_STATUS, 1, 0);
-            await windowprocs.win_putstr($G.WIN_STATUS, 0, do_statusline1());
-            await windowprocs.win_curs($G.WIN_STATUS, 1, 1);
-            await windowprocs.win_putmixed($G.WIN_STATUS, 0, await do_statusline2());
+            await curs()($G.WIN_STATUS, 1, 0);
+            await putstr()($G.WIN_STATUS, 0, do_statusline1());
+            await curs()($G.WIN_STATUS, 1, 1);
+            await putmixed()($G.WIN_STATUS, 0, await do_statusline2());
         }
     }
-    $t2 = ($t1 = disp.time_botl = 0, disp.botlx = $t1), disp.botl = $t2;
+    $t2 = ($t1 = disp.time_botl = FALSE, disp.botlx = $t1), disp.botl = $t2;
 }
 export async function timebot() {   // botl.c:275
     if (gb.bot_disabled) {
         return;
     }
     if (flags.time && iflags.status_updates && !suppress_map_output()) {
-        if ($c.andu64(windowprocs.wincap2, WC2_HILITE_STATUS | 128) !== 0) {
+        if (VIA_WINDOWPORT()) {
             await stat_update_time();
         } else {
             await bot();
         }
     }
-    disp.time_botl = 0;
+    disp.time_botl = FALSE;
 }
 export function xlev_to_rank(xlev) {   // botl.c:298
     return xlev <= 2 ? 0 : xlev <= 30 ? $c.div32(xlev + 2 | 0, 4) : 8;
@@ -315,7 +321,7 @@ export async function title_to_mon(str, rank_indx, title_length) {   // botl.c:3
     let i = 0, j = 0, $t1, $t2;
     for (i = 0; roles[i].name.m; i = i + 1 | 0) {
         for (j = 0; j < 9; j = j + 1 | 0) {
-            if (roles[i].rank[j].m && str_start_is(str, roles[i].rank[j].m, 1)) {
+            if (roles[i].rank[j].m && str_start_is(str, roles[i].rank[j].m, TRUE)) {
                 if (rank_indx) {
                     rank_indx.set(0, j);
                 }
@@ -324,7 +330,7 @@ export async function title_to_mon(str, rank_indx, title_length) {   // botl.c:3
                 }
                 return roles[i].mnum;
             }
-            if (roles[i].rank[j].f && str_start_is(str, roles[i].rank[j].f, 1)) {
+            if (roles[i].rank[j].f && str_start_is(str, roles[i].rank[j].f, TRUE)) {
                 if (rank_indx) {
                     rank_indx.set(0, j);
                 }
@@ -361,15 +367,15 @@ export function describe_level(buf, dflgs) {   // botl.c:441
     ret = 1;
     if ((svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level)) {
         $c.__builtin___sprintf_chk(buf, 0, -1, $c.lit("%s"), new $c.Ptr(svd.dungeons[u.uz.dnum].dname, 0));
-        addbranch = 0;
+        addbranch = FALSE;
     } else if (In_quest(u.uz)) {
         $c.__builtin___sprintf_chk(buf, 0, -1, $c.lit("Home %d"), dunlev(u.uz));
-    } else if (u.uz.dnum === svd.dungeon_topology.d_astral_level.dnum) {
+    } else if (In_endgame(u.uz)) {
         endgamelevelname(buf, depth(u.uz));
         if (!addbranch) {
             strsubst(buf, $c.lit("Plane of "), $c.lit(""));
         }
-        addbranch = 0;
+        addbranch = FALSE;
     } else {
         if (!addbranch) {
             $c.__builtin___sprintf_chk(buf, 0, -1, $c.lit("%s:%-2d"), u.uz.dnum === svd.dungeon_topology.d_tutorial_dnum ? $c.lit("Tutorial") : $c.lit("Dlvl"), depth(u.uz));
@@ -392,7 +398,7 @@ export async function weapon_status(outbuf) {   // botl.c:481
     res = null;
     outbuf.set(0, 0);
     if (!$G.uwep) {
-        res = $G.uarmg ? $c.lit("Empty-hnd") : $c.andu64(gy.youmonst.data.mflags1, M1_HUMANOID) !== 0 ? $c.lit("Bare-hnds") : $c.lit("No-weapon");
+        res = $G.uarmg ? $c.lit("Empty-hnd") : humanoid(gy.youmonst.data) ? $c.lit("Bare-hnds") : $c.lit("No-weapon");
     } else if (u.twoweap) {
         res = $c.lit("Dual-weps");
         if (u.usteed && (weapon_type($G.uwep) === P_LANCE || weapon_type($G.uswapwep) === P_LANCE)) {
@@ -404,7 +410,7 @@ export async function weapon_status(outbuf) {   // botl.c:481
             res = $c.lit("joust");
         } else if ($G.uwep.otyp === AKLYS) {
             res = $c.lit("aklys");
-        } else if ($G.uwep.oclass === WEAPON_CLASS && objects[$G.uwep.otyp].oc_subtyp >= P_SHORT_SWORD && objects[$G.uwep.otyp].oc_subtyp <= P_SABER) {
+        } else if (is_sword($G.uwep)) {
             res = $c.lit("sword");
         } else {
             switch (skill) {
@@ -428,7 +434,7 @@ export async function weapon_status(outbuf) {   // botl.c:481
                     break;
             }
         }
-        if (($G.uwep.oclass === WEAPON_CLASS || $G.uwep.oclass === TOOL_CLASS && objects[$G.uwep.otyp].oc_subtyp !== P_NONE) && (($G.uwep.oclass === WEAPON_CLASS || $G.uwep.oclass === TOOL_CLASS) && objects[$G.uwep.otyp].oc_big | 0) && res.get(0) !== 50 && strncmpi(res, $c.lit("two"), 3)) {
+        if (($G.uwep.oclass === WEAPON_CLASS || is_weptool($G.uwep)) && bimanual($G.uwep) && res.get(0) !== 50 && strncmpi(res, $c.lit("two"), 3)) {
             $c.__builtin___strcat_chk(outbuf, $c.lit("2H-"), -1);
         }
         $c.__builtin___strcpy_chk(p = eos(outbuf), res, -1), res = outbuf;
@@ -484,7 +490,7 @@ async function bot_via_windowport() {   // botl.c:962
     $c.__builtin___memset_chk(new $c.Ptr(gv.valset, 0), 0, 27, 200);
     $c.__builtin___strcpy_chk(nb = new $c.Ptr(buf, 0), new $c.Ptr(svp.plname, 0), -1);
     $t1 = highc(nb.get(0)), nb.set(0, $t1);
-    titl = !(u.umonnum !== u.umonster) ? rank() : pmname($c.relem(mons, u.umonnum), (u.umonnum !== u.umonster ? u.mfemale | 0 : flags.female) ? 1 : 0);
+    titl = !Upolyd() ? rank() : pmname($c.relem(mons, u.umonnum), Ugender());
     i = $c.i32($c.subu64($c.addu64($c.addu64($c.strlen(new $c.Ptr(buf, 0)), 6), $c.strlen(titl)), 1));
     if (i > 30) {
         i = 30 - $c.i32($c.subu64($c.addu64(6, $c.strlen(titl)), 1)) | 0;
@@ -492,7 +498,7 @@ async function bot_via_windowport() {   // botl.c:962
     }
     $c.__builtin___strcpy_chk(nb = eos(nb), $c.lit(" the "), -1);
     $c.__builtin___strcpy_chk(nb = eos(nb), titl, -1);
-    if (u.umonnum !== u.umonster) {
+    if (Upolyd()) {
         for (i = 0; nb.get(i); i = i + 1 | 0) {
             if (i === 0 || nb.get(i - 1 | 0) === 32) {
                 $t2 = highc(nb.get(i)), nb.set(i, $t2);
@@ -500,62 +506,62 @@ async function bot_via_windowport() {   // botl.c:962
         }
     }
     $c.__builtin___sprintf_chk(gb.blstats[idx][BL_TITLE].val, 0, -1, $c.lit("%-30s"), new $c.Ptr(buf, 0));
-    gv.valset[BL_TITLE] = 1;
-    $t3 = acurr(A_STR), gb.blstats[idx][BL_STR].a.a_int = $t3;
+    gv.valset[BL_TITLE] = TRUE;
+    $t3 = ACURR(A_STR), gb.blstats[idx][BL_STR].a.a_int = $t3;
     $c.__builtin___strcpy_chk(gb.blstats[idx][BL_STR].val, get_strength_str(), -1);
-    gv.valset[BL_STR] = 1;
-    $t4 = acurr(A_DEX), gb.blstats[idx][BL_DX].a.a_int = $t4;
-    $t5 = acurr(A_CON), gb.blstats[idx][BL_CO].a.a_int = $t5;
-    $t6 = acurr(A_INT), gb.blstats[idx][BL_IN].a.a_int = $t6;
-    $t7 = acurr(A_WIS), gb.blstats[idx][BL_WI].a.a_int = $t7;
-    $t8 = acurr(A_CHA), gb.blstats[idx][BL_CH].a.a_int = $t8;
+    gv.valset[BL_STR] = TRUE;
+    $t4 = ACURR(A_DEX), gb.blstats[idx][BL_DX].a.a_int = $t4;
+    $t5 = ACURR(A_CON), gb.blstats[idx][BL_CO].a.a_int = $t5;
+    $t6 = ACURR(A_INT), gb.blstats[idx][BL_IN].a.a_int = $t6;
+    $t7 = ACURR(A_WIS), gb.blstats[idx][BL_WI].a.a_int = $t7;
+    $t8 = ACURR(A_CHA), gb.blstats[idx][BL_CH].a.a_int = $t8;
     $c.__builtin___strcpy_chk(gb.blstats[idx][BL_ALIGN].val, u.ualign.type === -1 ? $c.lit("Chaotic") : u.ualign.type === 0 ? $c.lit("Neutral") : $c.lit("Lawful"), -1);
     gb.blstats[idx][BL_SCORE].a.a_long = 0;
-    i = u.umonnum !== u.umonster ? u.mh : u.uhp;
+    i = Upolyd() ? u.mh : u.uhp;
     if (i < 0) {
         i = 0;
     }
     gb.blstats[idx][BL_HP].rawval.a_int = i;
     gb.blstats[idx][BL_HP].a.a_int = i < 9999 ? i : 9999;
-    i = u.umonnum !== u.umonster ? u.mhmax : u.uhpmax;
+    i = Upolyd() ? u.mhmax : u.uhpmax;
     gb.blstats[idx][BL_HPMAX].rawval.a_int = i;
     gb.blstats[idx][BL_HPMAX].a.a_int = i < 9999 ? i : 9999;
     describe_level(gb.blstats[idx][BL_LEVELDESC].val, 1);
-    gv.valset[BL_LEVELDESC] = 1;
+    gv.valset[BL_LEVELDESC] = TRUE;
     if ((money = money_cnt(gi.invent)) < 0) {
         money = 0;
     }
     gb.blstats[idx][BL_GOLD].rawval.a_long = money;
     gb.blstats[idx][BL_GOLD].a.a_long = money < 999999 ? money : 999999;
     $c.__builtin___sprintf_chk(gb.blstats[idx][BL_GOLD].val, 0, -1, $c.lit("%s:%ld"), iflags.in_dumplog || iflags.invis_goldsym ? $c.lit("$") : encglyph(GOLD_PIECE + GLYPH_OBJ_OFF), gb.blstats[idx][BL_GOLD].a.a_long);
-    gv.valset[BL_GOLD] = 1;
+    gv.valset[BL_GOLD] = TRUE;
     gb.blstats[idx][BL_ENE].rawval.a_int = u.uen;
     gb.blstats[idx][BL_ENE].a.a_int = u.uen < 9999 ? u.uen : 9999;
     gb.blstats[idx][BL_ENEMAX].rawval.a_int = u.uenmax;
     gb.blstats[idx][BL_ENEMAX].a.a_int = u.uenmax < 9999 ? u.uenmax : 9999;
     gb.blstats[idx][BL_AC].a.a_int = u.uac;
-    gb.blstats[idx][BL_HD].a.a_int = u.umonnum !== u.umonster ? mons[u.umonnum].mlevel : 0;
+    gb.blstats[idx][BL_HD].a.a_int = Upolyd() ? mons[u.umonnum].mlevel : 0;
     gb.blstats[idx][BL_XP].a.a_int = u.ulevel;
     gb.blstats[idx][BL_EXP].a.a_long = u.uexp;
     gb.blstats[idx][BL_TIME].a.a_long = svm.moves;
     gb.blstats[idx][BL_HUNGER].a.a_int = u.uhs | 0;
     $c.__builtin___strcpy_chk(gb.blstats[idx][BL_HUNGER].val, u.uhs !== NOT_HUNGRY ? hu_stat[u.uhs] : $c.lit(""), -1);
-    gv.valset[BL_HUNGER] = 1;
+    gv.valset[BL_HUNGER] = TRUE;
     cap = near_capacity();
     gb.blstats[idx][BL_CAP].a.a_int = cap;
     $c.__builtin___strcpy_chk(gb.blstats[idx][BL_CAP].val, cap > UNENCUMBERED ? enc_stat[cap] : $c.lit(""), -1);
-    gv.valset[BL_CAP] = 1;
+    gv.valset[BL_CAP] = TRUE;
     if (gb.blstats[idx][BL_VERS].a.a_int !== (flags.versinfo | 0)) {
         gb.blstats[idx][BL_VERS].a.a_int = flags.versinfo | 0;
-        gv.valset[BL_VERS] = 0;
+        gv.valset[BL_VERS] = FALSE;
     }
     if (!gv.valset[BL_VERS]) {
-        status_version(gb.blstats[idx][BL_VERS].val, $c.u64(gb.blstats[idx][BL_VERS].valwidth), 0);
-        gv.valset[BL_VERS] = 1;
+        status_version(gb.blstats[idx][BL_VERS].val, $c.u64(gb.blstats[idx][BL_VERS].valwidth), FALSE);
+        gv.valset[BL_VERS] = TRUE;
     }
     gb.blstats[idx][BL_CONDITION].a.a_ulong = 0;
-    $t9 = condtests[bl_termill].test = 0, condtests[bl_foodpois].test = $t9;
-    if (u.uprops[SICK].intrinsic) {
+    $t9 = condtests[bl_termill].test = FALSE, condtests[bl_foodpois].test = $t9;
+    if (Sick()) {
         if (condtests[bl_foodpois].enabled) {
             condtests[bl_foodpois].test = $c.i8(((u.usick_type | 0) & SICK_VOMITABLE) !== 0 ? 1 : 0);
         }
@@ -563,7 +569,7 @@ async function bot_via_windowport() {   // botl.c:962
             condtests[bl_termill].test = $c.i8(((u.usick_type | 0) & SICK_NONVOMITABLE) !== 0 ? 1 : 0);
         }
     }
-    $t11 = ($t10 = condtests[bl_trapped].test = 0, condtests[bl_tethered].test = $t10), condtests[bl_inlava].test = $t11;
+    $t11 = ($t10 = condtests[bl_trapped].test = FALSE, condtests[bl_tethered].test = $t10), condtests[bl_inlava].test = $t11;
     if (u.utrap) {
         if (condtests[bl_inlava].enabled) {
             condtests[bl_inlava].test = $c.i8(u.utraptype === TT_LAVA ? 1 : 0);
@@ -575,15 +581,15 @@ async function bot_via_windowport() {   // botl.c:962
             condtests[bl_trapped].test = $c.i8(!condtests[bl_inlava].test && !condtests[bl_tethered].test ? 1 : 0);
         }
     }
-    $t13 = ($t12 = condtests[bl_holding].test = 0, condtests[bl_held].test = $t12), condtests[bl_grab].test = $t13;
+    $t13 = ($t12 = condtests[bl_holding].test = FALSE, condtests[bl_held].test = $t12), condtests[bl_grab].test = $t13;
     if (u.ustuck) {
         if (u.uswallow) {
             if (condtests[bl_held].enabled) {
-                condtests[bl_held].test = 1;
+                condtests[bl_held].test = TRUE;
             }
-        } else if (u.umonnum !== u.umonster && sticks(gy.youmonst.data)) {
+        } else if (Upolyd() && sticks(gy.youmonst.data)) {
             if (condtests[bl_holding].enabled) {
-                condtests[bl_holding].test = 1;
+                condtests[bl_holding].test = TRUE;
             }
         } else {
             if (condtests[bl_grab].enabled) {
@@ -594,21 +600,21 @@ async function bot_via_windowport() {   // botl.c:962
             }
         }
     }
-    condtests[bl_blind].test = $c.i8((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked ? 1 : 0);
-    condtests[bl_conf].test = $c.i8(u.uprops[CONFUSION].intrinsic ? 1 : 0);
-    condtests[bl_deaf].test = $c.i8(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf ? 1 : 0);
-    condtests[bl_fly].test = $c.i8((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked ? 1 : 0);
-    condtests[bl_glowhands].test = $c.i8(u.umconf ? 1 : 0);
-    condtests[bl_hallu].test = $c.i8(u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? 1 : 0);
-    condtests[bl_lev].test = $c.i8((u.uprops[LEVITATION].intrinsic || u.uprops[LEVITATION].extrinsic) && !u.uprops[LEVITATION].blocked ? 1 : 0);
-    condtests[bl_ride].test = $c.i8(u.usteed ? 1 : 0);
-    condtests[bl_slime].test = $c.i8(u.uprops[SLIMED].intrinsic ? 1 : 0);
-    condtests[bl_stone].test = $c.i8(u.uprops[STONED].intrinsic ? 1 : 0);
-    condtests[bl_strngl].test = $c.i8(u.uprops[STRANGLED].intrinsic ? 1 : 0);
-    condtests[bl_stun].test = $c.i8(u.uprops[STUNNED].intrinsic ? 1 : 0);
-    condtests[bl_submerged].test = $c.i8(u.uinwater | 0 ? 1 : 0);
+    condtests[bl_blind].test = $c.i8((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked ? TRUE : FALSE);
+    condtests[bl_conf].test = $c.i8(u.uprops[CONFUSION].intrinsic ? TRUE : FALSE);
+    condtests[bl_deaf].test = $c.i8(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf ? TRUE : FALSE);
+    condtests[bl_fly].test = $c.i8((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked ? TRUE : FALSE);
+    condtests[bl_glowhands].test = $c.i8(u.umconf ? TRUE : FALSE);
+    condtests[bl_hallu].test = $c.i8(u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? TRUE : FALSE);
+    condtests[bl_lev].test = $c.i8((u.uprops[LEVITATION].intrinsic || u.uprops[LEVITATION].extrinsic) && !u.uprops[LEVITATION].blocked ? TRUE : FALSE);
+    condtests[bl_ride].test = $c.i8(u.usteed ? TRUE : FALSE);
+    condtests[bl_slime].test = $c.i8(u.uprops[SLIMED].intrinsic ? TRUE : FALSE);
+    condtests[bl_stone].test = $c.i8(u.uprops[STONED].intrinsic ? TRUE : FALSE);
+    condtests[bl_strngl].test = $c.i8(u.uprops[STRANGLED].intrinsic ? TRUE : FALSE);
+    condtests[bl_stun].test = $c.i8(u.uprops[STUNNED].intrinsic ? TRUE : FALSE);
+    condtests[bl_submerged].test = $c.i8(u.uinwater | 0 ? TRUE : FALSE);
     if (condtests[bl_elf_iron].enabled) {
-        condtests[bl_elf_iron].test = 0;
+        condtests[bl_elf_iron].test = FALSE;
     }
     if (condtests[bl_bareh].enabled) {
         condtests[bl_bareh].test = $c.i8(!$G.uarmg && !$G.uwep ? 1 : 0);
@@ -617,28 +623,28 @@ async function bot_via_windowport() {   // botl.c:962
         condtests[bl_icy].test = $c.i8(svl.level.locations[u.ux][u.uy].typ === ICE ? 1 : 0);
     }
     if (condtests[bl_slippery].enabled) {
-        condtests[bl_slippery].test = $c.i8(u.uprops[GLIB].intrinsic ? 1 : 0);
+        condtests[bl_slippery].test = $c.i8(u.uprops[GLIB].intrinsic ? TRUE : FALSE);
     }
     if (condtests[bl_woundedl].enabled) {
-        condtests[bl_woundedl].test = $c.i8(u.uprops[WOUNDED_LEGS].intrinsic || u.uprops[WOUNDED_LEGS].extrinsic ? 1 : 0);
+        condtests[bl_woundedl].test = $c.i8(u.uprops[WOUNDED_LEGS].intrinsic || u.uprops[WOUNDED_LEGS].extrinsic ? TRUE : FALSE);
     }
     if (gm.multi < 0) {
         do {
-            clear_cache = 0;
-            refresh_cache = 0;
+            clear_cache = FALSE;
+            refresh_cache = FALSE;
             if (gm.multi < 0) {
                 if (gn.nomovemsg || gm.multi_reason) {
                     if (!$c.peq(cache_nomovemsg, gn.nomovemsg)) {
-                        refresh_cache = 1;
+                        refresh_cache = TRUE;
                     }
                     if (!$c.peq(cache_multi_reason, gm.multi_reason)) {
-                        refresh_cache = 1;
+                        refresh_cache = TRUE;
                     }
                 } else {
-                    clear_cache = 1;
+                    clear_cache = TRUE;
                 }
             } else {
-                clear_cache = 1;
+                clear_cache = TRUE;
             }
             if (clear_cache) {
                 cache_nomovemsg = null;
@@ -649,29 +655,29 @@ async function bot_via_windowport() {   // botl.c:962
                 cache_multi_reason = gm.multi_reason;
             }
             if (clear_cache || refresh_cache) {
-                $t14 = cache_avail[0] = 0, cache_reslt[0] = $t14;
-                $t15 = cache_avail[1] = 0, cache_reslt[1] = $t15;
+                $t14 = cache_avail[0] = FALSE, cache_reslt[0] = $t14;
+                $t15 = cache_avail[1] = FALSE, cache_reslt[1] = $t15;
             }
         } while (0);
         if (condtests[bl_unconsc].enabled && cache_nomovemsg && !cache_avail[0]) {
             $t16 = $c.i8(!u.usleep && unconscious() ? 1 : 0), cache_reslt[0] = $t16;
-            cache_avail[0] = 1;
+            cache_avail[0] = TRUE;
         }
         if (condtests[bl_parlyz].enabled && cache_multi_reason && !cache_avail[1]) {
             $t17 = $c.i8(!$c.strncmp(cache_multi_reason, $c.lit("paralyzed"), 9) || !$c.strncmp(cache_multi_reason, $c.lit("frozen"), 6) ? 1 : 0), cache_reslt[1] = $t17;
-            cache_avail[1] = 1;
+            cache_avail[1] = TRUE;
         }
         if (cache_avail[0] && cache_reslt[0]) {
             condtests[bl_unconsc].test = cache_reslt[0];
         } else if (cache_avail[1] && cache_reslt[1]) {
             condtests[bl_parlyz].test = cache_reslt[1];
         } else if (condtests[bl_sleeping].enabled && u.usleep) {
-            condtests[bl_sleeping].test = 1;
+            condtests[bl_sleeping].test = TRUE;
         } else if (condtests[bl_busy].enabled) {
-            condtests[bl_busy].test = 1;
+            condtests[bl_busy].test = TRUE;
         }
     } else {
-        $t20 = ($t19 = ($t18 = condtests[bl_busy].test = 0, condtests[bl_sleeping].test = $t18), condtests[bl_parlyz].test = $t19), condtests[bl_unconsc].test = $t20;
+        $t20 = ($t19 = ($t18 = condtests[bl_busy].test = FALSE, condtests[bl_sleeping].test = $t18), condtests[bl_parlyz].test = $t19), condtests[bl_unconsc].test = $t20;
     }
     for (i = 0; i < CONDITION_COUNT; i = i + 1 | 0) {
         if (condtests[i].enabled && condtests[i].test) {
@@ -701,7 +707,7 @@ async function bot_via_windowport() {   // botl.c:962
         gb.blstats[idx][BL_TERRAIN].val.set(0, 0);
         gb.blstats[idx][BL_TERRAIN].a.a_int = MAX_TYPE;
     }
-    gv.valset[BL_TERRAIN] = 1;
+    gv.valset[BL_TERRAIN] = TRUE;
     await evaluate_and_notify_windowport(new $c.Ptr(gv.valset, 0), idx);
 }
 async function stat_update_time() {   // botl.c:1285
@@ -709,10 +715,10 @@ async function stat_update_time() {   // botl.c:1285
     idx = gn.now_or_before_idx;
     fld = BL_TIME;
     gb.blstats[idx][fld].a.a_long = svm.moves;
-    gv.valset[fld] = 0;
+    gv.valset[fld] = FALSE;
     await eval_notify_windowport_field(fld, new $c.Ptr(gv.valset, 0), idx);
-    if ($c.andu64(windowprocs.wincap2, 128) !== 0) {
-        await windowprocs.win_status_update(BL_FLUSH, null, 0, 0, NO_COLOR, null);
+    if ($c.andu64(windowprocs.wincap2, WC2_FLUSH_STATUS) !== 0) {
+        await status_update()(BL_FLUSH, null, 0, 0, NO_COLOR, null);
     }
     return;
 }
@@ -729,9 +735,9 @@ export async function condopt(idx, addr, negated) {   // botl.c:1303
         }
         $c.nh_deterministic_qsort(new $c.Ptr(cond_idx, 0), CONDITION_COUNT, 4, cond_cmp);
     } else {
-        condtests[idx].enabled = $c.i8(negated ? 0 : 1);
+        condtests[idx].enabled = $c.i8(negated ? FALSE : TRUE);
         condtests[idx].choice = condtests[idx].enabled;
-        condtests[idx].test = 0;
+        condtests[idx].test = FALSE;
     }
 }
 function cond_cmp(vptr1, vptr2) {   // botl.c:1333
@@ -762,7 +768,7 @@ export async function parse_cond_option(negated, opts) {   // botl.c:1354
     for (i = 0; i < CONDITION_COUNT; i = i + 1 | 0) {
         compareto = condtests[i].useroption;
         sl = await Strlen_(compareto, $c.lit("parse_cond_option"), 1364) | 0;
-        if (match_optname(uniqpart, compareto, sl >= 4 ? 4 : sl, 0)) {
+        if (match_optname(uniqpart, compareto, sl >= 4 ? 4 : sl, FALSE)) {
             await condopt(i, new $c.FieldRef(condtests[i], "choice", "i8"), negated);
             return 0;
         }
@@ -773,16 +779,16 @@ export async function cond_menu() {   // botl.c:1376
     let i = 0, res = 0, idx = 0, sequence = new Int32Array(30), tmpwin = 0, any = new $T.any(), picks = [null], mbuf = new Int8Array(128), showmenu = 0, clr = 0, changed = 0, $t1;
     idx = 0;
     picks[0] = null;
-    showmenu = 1;
+    showmenu = TRUE;
     clr = NO_COLOR;
-    changed = 0;
+    changed = FALSE;
     do {
         for (i = 0; i < CONDITION_COUNT; i = i + 1 | 0) {
             sequence[i] = i;
         }
         await $c.nh_deterministic_qsort$async(new $c.Ptr(sequence, 0), CONDITION_COUNT, 4, gc.condmenu_sortorder ? cond_cmp : menualpha_cmp);
-        tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
-        await windowprocs.win_start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+        tmpwin = await create_nhwindow()(NHW_MENU);
+        await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
         any.$copyFrom(cg.zeroany);
         any.a_int = 1;
         $c.__builtin___sprintf_chk(new $c.Ptr(mbuf, 0), 0, 128, $c.lit("change sort order from \"%s\" to \"%s\""), cond_menu$menutitle[gc.condmenu_sortorder], cond_menu$menutitle[1 - gc.condmenu_sortorder | 0]);
@@ -795,23 +801,23 @@ export async function cond_menu() {   // botl.c:1376
             $c.__builtin___sprintf_chk(new $c.Ptr(mbuf, 0), 0, 128, $c.lit("cond_%-14s"), condtests[idx].useroption);
             any.$copyFrom(cg.zeroany);
             any.a_int = idx + 2 | 0;
-            condtests[idx].choice = 0;
+            condtests[idx].choice = FALSE;
             await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR_NONE, clr, new $c.Ptr(mbuf, 0), condtests[idx].enabled ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
         }
-        await windowprocs.win_end_menu(tmpwin, $c.lit("Choose status conditions to toggle"));
+        await end_menu()(tmpwin, $c.lit("Choose status conditions to toggle"));
         res = await select_menu(tmpwin, PICK_ANY, new $c.Ptr(picks, 0));
-        await windowprocs.win_destroy_nhwindow(tmpwin);
-        showmenu = 0;
+        await destroy_nhwindow()(tmpwin);
+        showmenu = FALSE;
         if (res > 0) {
             for (i = 0; i < res; i = i + 1 | 0) {
                 idx = $c.radd(picks[0], i).item.a_int;
                 if (idx === 1) {
                     gc.condmenu_sortorder = 1 - gc.condmenu_sortorder | 0;
-                    showmenu = 1;
+                    showmenu = TRUE;
                     break;
                 } else {
                     idx = idx - 2 | 0;
-                    condtests[idx].choice = 1;
+                    condtests[idx].choice = TRUE;
                 }
             }
             $c.free(picks[0]);
@@ -821,8 +827,8 @@ export async function cond_menu() {   // botl.c:1376
         for (i = 0; i < CONDITION_COUNT; i = i + 1 | 0) {
             if (condtests[i].enabled !== condtests[i].choice) {
                 condtests[i].enabled = condtests[i].choice;
-                condtests[idx].test = 0;
-                $t1 = changed = 1, disp.botl = $t1;
+                condtests[idx].test = FALSE;
+                $t1 = changed = TRUE, disp.botl = $t1;
             }
         }
     }
@@ -831,17 +837,17 @@ export async function cond_menu() {   // botl.c:1376
 export function opt_next_cond(indx, outbuf) {   // botl.c:1460
     outbuf.set(0, 0);
     if (indx >= CONDITION_COUNT) {
-        return 0;
+        return FALSE;
     }
     if (condtests[indx].opt === opt_in && condtests[indx].enabled || condtests[indx].opt === opt_out && !condtests[indx].enabled) {
         $c.__builtin___sprintf_chk(outbuf, 0, -1, $c.lit("%scond_%s"), condtests[indx].enabled ? $c.lit("") : $c.lit("!"), condtests[indx].useroption);
     }
-    return 1;
+    return TRUE;
 }
 async function eval_notify_windowport_field(fld, valsetlist, idx) {   // botl.c:1493
     let pc = 0, chg = 0, color = Int32Array.of(0), anytype = 0, updated = 0, reset = 0, curr = null, prev = null, fldmax = 0, $t1, $t2, $t3, $t4;
     color[0] = NO_COLOR;
-    updated = 0;
+    updated = FALSE;
     anytype = gb.blstats[idx][fld].anytype;
     curr = $c.relem(gb.blstats[idx], fld);
     prev = $c.relem(gb.blstats[1 - idx | 0], fld);
@@ -857,12 +863,12 @@ async function eval_notify_windowport_field(fld, valsetlist, idx) {   // botl.c:
     } else {
         pc = 0;
     }
-    if (fld === BL_GOLD && (svc.context.rndencode !== eval_notify_windowport_field$oldrndencode || gs.showsyms[COIN_CLASS + (SYM_OFF_P + MAXPCHARS)] !== eval_notify_windowport_field$oldgoldsym)) {
-        gu.update_all = 1;
+    if (fld === BL_GOLD && (svc.context.rndencode !== eval_notify_windowport_field$oldrndencode || gs.showsyms[COIN_CLASS + SYM_OFF_O] !== eval_notify_windowport_field$oldgoldsym)) {
+        gu.update_all = TRUE;
         eval_notify_windowport_field$oldrndencode = svc.context.rndencode;
-        eval_notify_windowport_field$oldgoldsym = gs.showsyms[COIN_CLASS + (SYM_OFF_P + MAXPCHARS)];
+        eval_notify_windowport_field$oldgoldsym = gs.showsyms[COIN_CLASS + SYM_OFF_O];
     }
-    reset = 0;
+    reset = FALSE;
     if (gu.update_all) {
         chg = 0;
         $t1 = prev.time = 0, curr.time = $t1;
@@ -888,12 +894,12 @@ async function eval_notify_windowport_field(fld, valsetlist, idx) {   // botl.c:
                     chg = 0;
                 }
             }
-            await windowprocs.win_status_update(fld, curr.val, chg, pc, color[0], null);
+            await status_update()(fld, curr.val, chg, pc, color[0], null);
         } else {
-            await windowprocs.win_status_update(fld, new $c.FieldRef(curr.a, "a_ulong", "u64"), chg, pc, color[0], new $c.Ptr(gc.cond_hilites, 0));
+            await status_update()(fld, new $c.FieldRef(curr.a, "a_ulong", "u64"), chg, pc, color[0], new $c.Ptr(gc.cond_hilites, 0));
         }
-        $t4 = prev.chg = 1, curr.chg = $t4;
-        updated = 1;
+        $t4 = prev.chg = TRUE, curr.chg = $t4;
+        updated = TRUE;
     }
     return updated;
 }
@@ -902,20 +908,20 @@ async function evaluate_and_notify_windowport(valsetlist, idx) {   // botl.c:162
     updated = 0;
     for (i = 0; i < MAXBLSTATS; i = i + 1 | 0) {
         fld = initblstats[i].fld;
-        if (fld === BL_SCORE && !flags.showscore || fld === BL_EXP && !flags.showexp || fld === BL_TIME && !flags.time || fld === BL_HD && !(u.umonnum !== u.umonster) || (fld === BL_XP || fld === BL_EXP) && u.umonnum !== u.umonster || fld === BL_VERS && !flags.showvers || fld === BL_TERRAIN && !flags.terrainstatus || fld === BL_WEAPON && !flags.weaponstatus || fld === BL_ARMOR && !flags.armorstatus) {
+        if (fld === BL_SCORE && !flags.showscore || fld === BL_EXP && !flags.showexp || fld === BL_TIME && !flags.time || fld === BL_HD && !Upolyd() || (fld === BL_XP || fld === BL_EXP) && Upolyd() || fld === BL_VERS && !flags.showvers || fld === BL_TERRAIN && !flags.terrainstatus || fld === BL_WEAPON && !flags.weaponstatus || fld === BL_ARMOR && !flags.armorstatus) {
             continue;
         }
         if (await eval_notify_windowport_field(fld, valsetlist, idx)) {
             updated = updated + 1 | 0;
         }
     }
-    if (disp.botlx && $c.andu64(windowprocs.wincap2, 256) !== 0) {
-        await windowprocs.win_status_update(BL_RESET, null, 0, 0, NO_COLOR, null);
-    } else if ((updated || disp.botlx) && $c.andu64(windowprocs.wincap2, 128) !== 0) {
-        await windowprocs.win_status_update(BL_FLUSH, null, 0, 0, NO_COLOR, null);
+    if (disp.botlx && $c.andu64(windowprocs.wincap2, WC2_RESET_STATUS) !== 0) {
+        await status_update()(BL_RESET, null, 0, 0, NO_COLOR, null);
+    } else if ((updated || disp.botlx) && $c.andu64(windowprocs.wincap2, WC2_FLUSH_STATUS) !== 0) {
+        await status_update()(BL_FLUSH, null, 0, 0, NO_COLOR, null);
     }
-    $t2 = ($t1 = disp.time_botl = 0, disp.botlx = $t1), disp.botl = $t2;
-    gu.update_all = 0;
+    $t2 = ($t1 = disp.time_botl = FALSE, disp.botlx = $t1), disp.botl = $t2;
+    gu.update_all = FALSE;
 }
 export async function status_initialize(reassessment) {   // botl.c:1683
     let fld = 0, fldenabl = 0, i = 0, fieldfmt = null, fieldname = null;
@@ -925,19 +931,19 @@ export async function status_initialize(reassessment) {   // botl.c:1683
         }
         await init_blstats();
         await windowprocs.win_status_init();
-        gb.blinit = 1;
+        gb.blinit = TRUE;
     } else if (!gb.blinit) {
         await panic($c.lit("status 'reassess' before init"));
     }
     for (i = 0; i < MAXBLSTATS; i = i + 1 | 0) {
         fld = initblstats[i].fld;
-        fldenabl = $c.i8(fld === BL_SCORE ? flags.showscore : fld === BL_TIME ? flags.time : fld === BL_EXP ? $c.i8(flags.showexp && !(u.umonnum !== u.umonster) ? 1 : 0) : fld === BL_XP ? $c.i8(!(u.umonnum !== u.umonster) ? 1 : 0) : fld === BL_HD ? $c.i8(u.umonnum !== u.umonster ? 1 : 0) : fld === BL_VERS ? flags.showvers : fld === BL_WEAPON ? flags.weaponstatus : fld === BL_ARMOR ? flags.armorstatus : fld === BL_TERRAIN ? flags.terrainstatus : 1);
+        fldenabl = $c.i8(fld === BL_SCORE ? flags.showscore : fld === BL_TIME ? flags.time : fld === BL_EXP ? $c.i8(flags.showexp && !Upolyd() ? 1 : 0) : fld === BL_XP ? $c.i8(!Upolyd() ? 1 : 0) : fld === BL_HD ? $c.i8(Upolyd()) : fld === BL_VERS ? flags.showvers : fld === BL_WEAPON ? flags.weaponstatus : fld === BL_ARMOR ? flags.armorstatus : fld === BL_TERRAIN ? flags.terrainstatus : TRUE);
         fieldname = initblstats[i].fldname;
         fieldfmt = fld === BL_TITLE && iflags.wc2_hitpointbar ? $c.lit("%-30.30s") : initblstats[i].fldfmt;
-        windowprocs.win_status_enablefield(fld, fieldname, fieldfmt, fldenabl);
+        status_enablefield()(fld, fieldname, fieldfmt, fldenabl);
     }
-    gu.update_all = 1;
-    disp.botlx = 1;
+    gu.update_all = TRUE;
+    disp.botlx = TRUE;
 }
 export async function status_finish() {   // botl.c:1723
     let i = 0, temp = null, next = null, $t1, $t2;
@@ -981,7 +987,7 @@ async function init_blstats() {   // botl.c:1759
             gb.blstats[i][j].thresholds = keep_hilite_chain;
         }
     }
-    init_blstats$initalready = 1;
+    init_blstats$initalready = TRUE;
 }
 async function compare_blstats(bl1, bl2) {   // botl.c:1809
     let a1 = null, a2 = null, use_rawval = 0, anytype = 0, fld = 0, result = 0;
@@ -1204,11 +1210,11 @@ export async function exp_percent_changing() {   // botl.c:2090
             a.a_int = u.ulevel;
             rule = get_hilite(gn.now_or_before_idx, BL_XP, a, 0, pc, new $c.Ptr(color_dummy, 0));
             if (!$c.peq(rule, curr.hilite_rule)) {
-                return 1;
+                return TRUE;
             }
         }
     }
-    return 0;
+    return FALSE;
 }
 export function stat_cap_indx() {   // botl.c:2131
     let cap = 0;
@@ -1240,14 +1246,14 @@ function fldname_to_bl_indx(name) {   // botl.c:2221
     fld = 0;
     if (name && name.get(0)) {
         for (i = 0; i < 27; i = i + 1 | 0) {
-            if (fuzzymatch(initblstats[i].fldname, name, $c.lit(" -_"), 1)) {
+            if (fuzzymatch(initblstats[i].fldname, name, $c.lit(" -_"), TRUE)) {
                 fld = initblstats[i].fld;
                 nmatches = nmatches + 1 | 0;
             }
         }
         if (!nmatches) {
             for (i = 0; fieldids_alias[i].fieldname; i = i + 1 | 0) {
-                if (fuzzymatch(fieldids_alias[i].fieldname, name, $c.lit(" -_"), 1)) {
+                if (fuzzymatch(fieldids_alias[i].fieldname, name, $c.lit(" -_"), TRUE)) {
                     fld = fieldids_alias[i].fldid;
                     nmatches = nmatches + 1 | 0;
                 }
@@ -1267,15 +1273,15 @@ function fldname_to_bl_indx(name) {   // botl.c:2221
 }
 function hilite_reset_needed(bl_p, augmented_time) {   // botl.c:2257
     if (gm.multi) {
-        return 0;
+        return FALSE;
     }
-    if (!(bl_p.hilite_rule && bl_p.hilite_rule.behavior === BL_TH_UPDOWN)) {
-        return 0;
+    if (!Is_Temp_Hilite(bl_p.hilite_rule)) {
+        return FALSE;
     }
     if (bl_p.time === 0 || bl_p.time >= augmented_time) {
-        return 0;
+        return FALSE;
     }
-    return 1;
+    return TRUE;
 }
 export function status_eval_next_unhilite() {   // botl.c:2279
     let i = 0, curr = null, next_unhilite = 0, this_unhilite = 0, prev = null, $t1;
@@ -1285,14 +1291,14 @@ export function status_eval_next_unhilite() {   // botl.c:2279
         curr = $c.relem(gb.blstats[0], i);
         if (curr.chg) {
             prev = $c.relem(gb.blstats[1], i);
-            if (curr.hilite_rule && curr.hilite_rule.behavior === BL_TH_UPDOWN) {
+            if (Is_Temp_Hilite(curr.hilite_rule)) {
                 curr.time = $c.add64(gb.bl_hilite_moves, iflags.hilite_delta);
             } else {
                 curr.time = 0;
             }
             prev.time = curr.time;
-            $t1 = prev.chg = 0, curr.chg = $t1;
-            disp.botl = 1;
+            $t1 = prev.chg = FALSE, curr.chg = $t1;
+            disp.botl = TRUE;
         }
         if (disp.botl) {
             continue;
@@ -1301,7 +1307,7 @@ export function status_eval_next_unhilite() {   // botl.c:2279
         if (this_unhilite > 0 && (next_unhilite === 0 || this_unhilite < next_unhilite) && hilite_reset_needed(curr, $c.add64(this_unhilite, 1))) {
             next_unhilite = this_unhilite;
             if (next_unhilite < gb.bl_hilite_moves) {
-                disp.botl = 1;
+                disp.botl = TRUE;
             }
         }
     }
@@ -1312,15 +1318,15 @@ export function reset_status_hilites() {   // botl.c:2321
         for (i = 0; i < MAXBLSTATS; i = i + 1 | 0) {
             $t1 = gb.blstats[1][i].time = 0, gb.blstats[0][i].time = $t1;
         }
-        gu.update_all = 1;
+        gu.update_all = TRUE;
     }
-    disp.botlx = 1;
+    disp.botlx = TRUE;
 }
 function noneoftheabove(hl_text) {   // botl.c:2336
-    if (fuzzymatch(hl_text, $c.lit("none of the above"), $c.lit("\" -_"), 1) || fuzzymatch(hl_text, $c.lit("(polymorphed)"), $c.lit("\"()"), 1) || fuzzymatch(hl_text, $c.lit("none of the above (polymorphed)"), $c.lit("\" -_()"), 1)) {
-        return 1;
+    if (fuzzymatch(hl_text, $c.lit("none of the above"), $c.lit("\" -_"), TRUE) || fuzzymatch(hl_text, $c.lit("(polymorphed)"), $c.lit("\"()"), TRUE) || fuzzymatch(hl_text, $c.lit("none of the above (polymorphed)"), $c.lit("\" -_()"), TRUE)) {
+        return TRUE;
     }
-    return 0;
+    return FALSE;
 }
 function get_hilite(idx, fldidx, vp, chg, pc, colorptr) {   // botl.c:2364
     let hl = null, rule = null, value = null, txtstr = null, dt = 0, max_pc = 0, min_pc = 0, max_ival = 0, min_ival = 0, max_lval = 0, min_lval = 0, exactmatch = 0, updown = 0, changed = 0, perc_or_abs = 0, crit_hp = 0;
@@ -1329,18 +1335,18 @@ function get_hilite(idx, fldidx, vp, chg, pc, colorptr) {   // botl.c:2364
     if (fldidx < 0 || fldidx >= MAXBLSTATS) {
         return null;
     }
-    if (gb.blstats[0][fldidx].thresholds) {
+    if (has_hilite(fldidx)) {
         max_pc = -1;
         min_pc = 101;
         max_ival = -LARGEST_INT;
         min_ival = LARGEST_INT;
         max_lval = -9223372036854775807n;
         min_lval = 9223372036854775807n;
-        exactmatch = 0;
-        updown = 0;
-        changed = 0;
-        perc_or_abs = 0;
-        crit_hp = 0;
+        exactmatch = FALSE;
+        updown = FALSE;
+        changed = FALSE;
+        perc_or_abs = FALSE;
+        crit_hp = FALSE;
         for (hl = gb.blstats[0][fldidx].thresholds; hl; hl = hl.next) {
             dt = initblstats[fldidx].anytype | 0;
             if (crit_hp && hl.behavior !== BL_TH_CRITICALHP) {
@@ -1357,36 +1363,36 @@ function get_hilite(idx, fldidx, vp, chg, pc, colorptr) {   // botl.c:2364
                     if (hl.rel === EQ_VALUE && pc === hl.value.a_int) {
                         rule = hl;
                         min_pc = max_pc = hl.value.a_int;
-                        exactmatch = perc_or_abs = 1;
+                        exactmatch = perc_or_abs = TRUE;
                     } else if (exactmatch) {
                     } else if (hl.rel === LT_VALUE && pc < hl.value.a_int && hl.value.a_int <= min_pc) {
                         rule = hl;
                         min_pc = hl.value.a_int;
-                        perc_or_abs = 1;
+                        perc_or_abs = TRUE;
                     } else if (hl.rel === LE_VALUE && pc <= hl.value.a_int && hl.value.a_int <= min_pc) {
                         rule = hl;
                         min_pc = hl.value.a_int;
-                        perc_or_abs = 1;
+                        perc_or_abs = TRUE;
                     } else if (hl.rel === GT_VALUE && pc > hl.value.a_int && hl.value.a_int >= max_pc) {
                         rule = hl;
                         max_pc = hl.value.a_int;
-                        perc_or_abs = 1;
+                        perc_or_abs = TRUE;
                     } else if (hl.rel === GE_VALUE && pc >= hl.value.a_int && hl.value.a_int >= max_pc) {
                         rule = hl;
                         max_pc = hl.value.a_int;
-                        perc_or_abs = 1;
+                        perc_or_abs = TRUE;
                     }
                     break;
                 case BL_TH_UPDOWN:
                     if (chg < 0 && hl.rel === LT_VALUE) {
                         rule = hl;
-                        updown = 1;
+                        updown = TRUE;
                     } else if (chg > 0 && hl.rel === GT_VALUE) {
                         rule = hl;
-                        updown = 1;
+                        updown = TRUE;
                     } else if (chg !== 0 && hl.rel === EQ_VALUE && !updown) {
                         rule = hl;
-                        changed = 1;
+                        changed = TRUE;
                     }
                     break;
                 case BL_TH_VAL_ABSOLUTE:
@@ -1394,47 +1400,47 @@ function get_hilite(idx, fldidx, vp, chg, pc, colorptr) {   // botl.c:2364
                         if (hl.rel === EQ_VALUE && hl.value.a_int === value.a_int) {
                             rule = hl;
                             min_ival = max_ival = hl.value.a_int;
-                            exactmatch = perc_or_abs = 1;
+                            exactmatch = perc_or_abs = TRUE;
                         } else if (exactmatch) {
                         } else if (hl.rel === LT_VALUE && value.a_int < hl.value.a_int && hl.value.a_int <= min_ival) {
                             rule = hl;
                             min_ival = hl.value.a_int;
-                            perc_or_abs = 1;
+                            perc_or_abs = TRUE;
                         } else if (hl.rel === LE_VALUE && value.a_int <= hl.value.a_int && hl.value.a_int <= min_ival) {
                             rule = hl;
                             min_ival = hl.value.a_int;
-                            perc_or_abs = 1;
+                            perc_or_abs = TRUE;
                         } else if (hl.rel === GT_VALUE && value.a_int > hl.value.a_int && hl.value.a_int >= max_ival) {
                             rule = hl;
                             max_ival = hl.value.a_int;
-                            perc_or_abs = 1;
+                            perc_or_abs = TRUE;
                         } else if (hl.rel === GE_VALUE && value.a_int >= hl.value.a_int && hl.value.a_int >= max_ival) {
                             rule = hl;
                             max_ival = hl.value.a_int;
-                            perc_or_abs = 1;
+                            perc_or_abs = TRUE;
                         }
                     } else {
                         if (hl.rel === EQ_VALUE && hl.value.a_long === value.a_long) {
                             rule = hl;
                             min_lval = max_lval = hl.value.a_long;
-                            exactmatch = perc_or_abs = 1;
+                            exactmatch = perc_or_abs = TRUE;
                         } else if (exactmatch) {
                         } else if (hl.rel === LT_VALUE && value.a_long < hl.value.a_long && hl.value.a_long <= min_lval) {
                             rule = hl;
                             min_lval = hl.value.a_long;
-                            perc_or_abs = 1;
+                            perc_or_abs = TRUE;
                         } else if (hl.rel === LE_VALUE && value.a_long <= hl.value.a_long && hl.value.a_long <= min_lval) {
                             rule = hl;
                             min_lval = hl.value.a_long;
-                            perc_or_abs = 1;
+                            perc_or_abs = TRUE;
                         } else if (hl.rel === GT_VALUE && value.a_long > hl.value.a_long && hl.value.a_long >= max_lval) {
                             rule = hl;
                             max_lval = hl.value.a_long;
-                            perc_or_abs = 1;
+                            perc_or_abs = TRUE;
                         } else if (hl.rel === GE_VALUE && value.a_long >= hl.value.a_long && hl.value.a_long >= max_lval) {
                             rule = hl;
                             max_lval = hl.value.a_long;
-                            perc_or_abs = 1;
+                            perc_or_abs = TRUE;
                         }
                     }
                     break;
@@ -1444,11 +1450,11 @@ function get_hilite(idx, fldidx, vp, chg, pc, colorptr) {   // botl.c:2364
                         txtstr = txtstr.add($c.idx($c.subu64($c.addu64($c.strlen(new $c.Ptr(svp.plname, 0)), 6), 1)));
                     }
                     if (hl.rel === TXT_VALUE && hl.textmatch[0]) {
-                        if (fuzzymatch(new $c.Ptr(hl.textmatch, 0), txtstr, $c.lit("\" -_"), 1)) {
+                        if (fuzzymatch(new $c.Ptr(hl.textmatch, 0), txtstr, $c.lit("\" -_"), TRUE)) {
                             rule = hl;
-                            exactmatch = 1;
+                            exactmatch = TRUE;
                         } else if (exactmatch) {
-                        } else if (fldidx === BL_TITLE && u.umonnum !== u.umonster && noneoftheabove(new $c.Ptr(hl.textmatch, 0))) {
+                        } else if (fldidx === BL_TITLE && Upolyd() && noneoftheabove(new $c.Ptr(hl.textmatch, 0))) {
                             rule = hl;
                         }
                     }
@@ -1457,10 +1463,10 @@ function get_hilite(idx, fldidx, vp, chg, pc, colorptr) {   // botl.c:2364
                     rule = hl;
                     break;
                 case BL_TH_CRITICALHP:
-                    if (fldidx === BL_HP && critically_low_hp(0)) {
+                    if (fldidx === BL_HP && critically_low_hp(FALSE)) {
                         rule = hl;
-                        crit_hp = 1;
-                        updown = changed = perc_or_abs = 0;
+                        crit_hp = TRUE;
+                        updown = changed = perc_or_abs = FALSE;
                     }
                     break;
                 case BL_TH_NONE:
@@ -1483,7 +1489,7 @@ function split_clridx(idx, coloridx, attrib) {   // botl.c:2576
 }
 export async function parse_status_hl1(op, from_configfile) {   // botl.c:2593
     let hsbuf = $c.matrix(Int8Array, [21, 128]), rslt = 0, badopt = 0, i = 0, fldnum = 0, ccount = 0, c = 0, $t1, $t2;
-    badopt = 0;
+    badopt = FALSE;
     ccount = 0;
     fldnum = 0;
     for (i = 0; i < MAX_THRESH; i = i + 1 | 0) {
@@ -1501,7 +1507,7 @@ export async function parse_status_hl1(op, from_configfile) {   // botl.c:2593
                 }
                 rslt = await parse_status_hl2(new $c.Ptr(hsbuf, 0), from_configfile);
                 if (!rslt) {
-                    badopt = 1;
+                    badopt = TRUE;
                     break;
                 }
             }
@@ -1522,16 +1528,16 @@ export async function parse_status_hl1(op, from_configfile) {   // botl.c:2593
     if (fldnum >= 1 && !badopt) {
         rslt = await parse_status_hl2(new $c.Ptr(hsbuf, 0), from_configfile);
         if (!rslt) {
-            badopt = 1;
+            badopt = TRUE;
         }
     }
     if (badopt) {
-        return 0;
+        return FALSE;
     }
     if (!iflags.hilite_delta) {
         iflags.hilite_delta = 3;
     }
-    return 1;
+    return TRUE;
 }
 function is_ltgt_percentnumber(str) {   // botl.c:2652
     let s = null;
@@ -1546,7 +1552,7 @@ function is_ltgt_percentnumber(str) {   // botl.c:2652
         s = s.add(1);
     }
     if (!digit(s.get(0))) {
-        return 0;
+        return FALSE;
     }
     while (digit(s.get(0))) {
         s = s.add(1);
@@ -1561,11 +1567,11 @@ function has_ltgt_percentnumber(str) {   // botl.c:2673
     s = str;
     while (s.get(0)) {
         if (!$c.strchr($c.lit("<>=-+0123456789%"), s.get(0))) {
-            return 0;
+            return FALSE;
         }
         s = s.add(1);
     }
-    return 1;
+    return TRUE;
 }
 function splitsubfields(str, sfarr, maxsf) {   // botl.c:2688
     let st = null, sf = 0, c = null, $t1;
@@ -1609,10 +1615,10 @@ function is_fld_arrayvalues(str, arr, arrmin, arrmax, retidx) {   // botl.c:2730
     for (i = arrmin; i < arrmax; i = i + 1 | 0) {
         if (!strncmpi(str, arr.get(i), -1)) {
             retidx.set(0, i);
-            return 1;
+            return TRUE;
         }
     }
-    return 0;
+    return FALSE;
 }
 async function query_arrayvalue(querystr, arr, arrmin, arrmax) {   // botl.c:2747
     let i = 0, res = 0, ret = 0, tmpwin = 0, any = new $T.any(), picks = [null], adj = 0, clr = 0;
@@ -1620,8 +1626,8 @@ async function query_arrayvalue(querystr, arr, arrmin, arrmax) {   // botl.c:274
     picks[0] = null;
     adj = arrmin > 0 ? 1 : arrmax;
     clr = NO_COLOR;
-    tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
-    await windowprocs.win_start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW_MENU);
+    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
     for (i = arrmin; i < arrmax; i = i + 1 | 0) {
         if (!arr.get(i)) {
             continue;
@@ -1630,9 +1636,9 @@ async function query_arrayvalue(querystr, arr, arrmin, arrmax) {   // botl.c:274
         any.a_int = i + adj | 0;
         await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR_NONE, clr, arr.get(i), MENU_ITEMFLAGS_NONE);
     }
-    await windowprocs.win_end_menu(tmpwin, querystr);
+    await end_menu()(tmpwin, querystr);
     res = await select_menu(tmpwin, PICK_ONE, new $c.Ptr(picks, 0));
-    await windowprocs.win_destroy_nhwindow(tmpwin);
+    await destroy_nhwindow()(tmpwin);
     if (res > 0) {
         ret = picks[0].item.a_int - adj | 0;
         $c.free(picks[0]);
@@ -1646,7 +1652,7 @@ async function status_hilite_add_threshold(fld, hilite) {   // botl.c:2784
     }
     new_hilite = $c.asRec(await alloc(128), $T.hilite_s, 128);
     new_hilite.$copyFrom(hilite);
-    new_hilite.set = 1;
+    new_hilite.set = TRUE;
     new_hilite.fld = fld;
     new_hilite.next = null;
     if (!gb.blstats[0][fld].thresholds) {
@@ -1670,19 +1676,19 @@ async function parse_status_hl2(s, from_configfile) {   // botl.c:2814
     fld = BL_FLUSH;
     fld = fldname_to_bl_indx(new $c.Ptr(s.get(sidx), 0));
     if (fld === BL_CHARACTERISTICS) {
-        res = 0;
+        res = FALSE;
         for (fld = BL_STR; fld <= BL_CH; fld = fld + 1 | 0) {
             $c.__builtin___strcpy_chk(new $c.Ptr(s.get(sidx), 0), initblstats[fld].fldname, -1);
             res = await parse_status_hl2(s, from_configfile);
             if (!res) {
-                return 0;
+                return FALSE;
             }
         }
-        return 1;
+        return TRUE;
     }
     if (fld === BL_FLUSH) {
         await config_error_add($c.lit("Unknown status field '%s'"), new $c.Ptr(s.get(sidx), 0));
-        return 0;
+        return FALSE;
     }
     if (fld === BL_CONDITION) {
         return await parse_condition(s, sidx);
@@ -1691,75 +1697,75 @@ async function parse_status_hl2(s, from_configfile) {   // botl.c:2814
     while (s.get(sidx)[0]) {
         sf = 0;
         txt = null;
-        percent = numeric = always = 0;
-        down = up = changed = 0;
-        criticalhp = 0;
-        grt = gte = eq = le = lt = txtval = 0;
+        percent = numeric = always = FALSE;
+        down = up = changed = FALSE;
+        criticalhp = FALSE;
+        grt = gte = eq = le = lt = txtval = FALSE;
         $c.__builtin___memset_chk(hilite, 0, 128, 128);
-        hilite.set = 0;
+        hilite.set = FALSE;
         hilite.fld = fld;
         if (new $c.Ptr(s.get(sidx + 1 | 0), 0).get(0) === 0 || !strncmpi(new $c.Ptr(s.get(sidx), 0), $c.lit("always"), -1)) {
-            always = 1;
+            always = TRUE;
             if (new $c.Ptr(s.get(sidx + 1 | 0), 0).get(0) === 0) {
                 sidx = sidx - 1 | 0;
             }
         } else if (!strncmpi(new $c.Ptr(s.get(sidx), 0), $c.lit("up"), -1) || !strncmpi(new $c.Ptr(s.get(sidx), 0), $c.lit("down"), -1)) {
             if (initblstats[fld].anytype === ANY_STR) {
             } else if (!strncmpi(new $c.Ptr(s.get(sidx), 0), $c.lit("down"), -1)) {
-                down = 1;
+                down = TRUE;
             } else {
-                up = 1;
+                up = TRUE;
             }
-            changed = 1;
+            changed = TRUE;
         } else if (fld === BL_CAP && is_fld_arrayvalues(new $c.Ptr(s.get(sidx), 0), new $c.Ptr(enc_stat, 0), SLT_ENCUMBER, OVERLOADED + 1, new $c.Ptr(kidx, 0))) {
             txt = enc_stat[kidx[0]];
-            txtval = 1;
+            txtval = TRUE;
         } else if (fld === BL_ALIGN && is_fld_arrayvalues(new $c.Ptr(s.get(sidx), 0), new $c.Ptr(parse_status_hl2$aligntxt, 0), 0, 3, new $c.Ptr(kidx, 0))) {
             txt = parse_status_hl2$aligntxt[kidx[0]];
-            txtval = 1;
+            txtval = TRUE;
         } else if (fld === BL_HUNGER && is_fld_arrayvalues(new $c.Ptr(s.get(sidx), 0), new $c.Ptr(parse_status_hl2$hutxt, 0), SATIATED, STARVED + 1, new $c.Ptr(kidx, 0))) {
             txt = hu_stat[kidx[0]];
-            txtval = 1;
+            txtval = TRUE;
         } else if (!strncmpi(new $c.Ptr(s.get(sidx), 0), $c.lit("changed"), -1)) {
-            changed = 1;
+            changed = TRUE;
         } else if (fld === BL_HP && !strncmpi(new $c.Ptr(s.get(sidx), 0), $c.lit("criticalhp"), -1)) {
-            criticalhp = 1;
+            criticalhp = TRUE;
         } else if (is_ltgt_percentnumber(new $c.Ptr(s.get(sidx), 0))) {
             tmp = new $c.Ptr(s.get(sidx), 0);
             if ($c.strchr(tmp, 37)) {
-                percent = 1;
+                percent = TRUE;
             }
             if (tmp.get(0) === 60) {
                 if (tmp.get(1) === 61) {
-                    le = 1;
+                    le = TRUE;
                 } else {
-                    lt = 1;
+                    lt = TRUE;
                 }
             } else if (tmp.get(0) === 62) {
                 if (tmp.get(1) === 61) {
-                    gte = 1;
+                    gte = TRUE;
                 } else {
-                    grt = 1;
+                    grt = TRUE;
                 }
             }
             tmp = stripchars(new $c.Ptr(tmpbuf, 0), $c.lit("%<>=+"), tmp);
-            numeric = 1;
+            numeric = TRUE;
             dt = (percent ? ANY_INT : initblstats[fld].anytype) | 0;
             s_to_anything(hilite.value, tmp, dt);
             op = grt ? $c.lit(">") : gte ? $c.lit(">=") : lt ? $c.lit("<") : le ? $c.lit("<=") : $c.lit("=");
             if (dt === ANY_INT && (hilite.value.a_int < (fld === BL_AC ? -128 : grt ? -1 : lt ? 1 : 0) || hilite.value.a_int > (percent ? lt ? 101 : 100 : LARGEST_INT))) {
                 await config_error_add($c.lit("%s'%s%d%s'%s"), new $c.Ptr(threshold_value, 0), op, hilite.value.a_int, percent ? $c.lit("%") : $c.lit(""), new $c.Ptr(is_out_of_range, 0));
-                return 0;
+                return FALSE;
             } else if (dt === ANY_LONG && hilite.value.a_long < (grt ? -1 : lt ? 1 : 0)) {
                 await config_error_add($c.lit("%s'%s%ld'%s"), new $c.Ptr(threshold_value, 0), op, hilite.value.a_long, new $c.Ptr(is_out_of_range, 0));
-                return 0;
+                return FALSE;
             }
         } else if (initblstats[fld].anytype === ANY_STR) {
             txt = new $c.Ptr(s.get(sidx), 0);
-            txtval = 1;
+            txtval = TRUE;
         } else {
             await config_error_add(has_ltgt_percentnumber(new $c.Ptr(s.get(sidx), 0)) ? $c.lit("Wrong format '%s', expected a threshold number or percent") : $c.lit("Unknown behavior '%s'"), new $c.Ptr(s.get(sidx), 0));
-            return 0;
+            return FALSE;
         }
         if (grt || up) {
             hilite.rel = GT_VALUE;
@@ -1778,33 +1784,33 @@ async function parse_status_hl2(s, from_configfile) {   // botl.c:2814
         }
         if (initblstats[fld].anytype === ANY_STR && (percent || numeric)) {
             await config_error_add($c.lit("Field '%s' does not support numeric values"), initblstats[fld].fldname);
-            return 0;
+            return FALSE;
         }
         if (percent) {
             if (initblstats[fld].idxmax < 0) {
                 await config_error_add($c.lit("Cannot use percent with '%s'"), initblstats[fld].fldname);
-                return 0;
+                return FALSE;
             } else if (hilite.value.a_int < -1 || hilite.value.a_int === -1 && hilite.value.a_int !== GT_VALUE || hilite.value.a_int === 0 && hilite.rel === LT_VALUE || hilite.value.a_int === 100 && hilite.rel === GT_VALUE || hilite.value.a_int === 101 && hilite.value.a_int !== LT_VALUE || hilite.value.a_int > 101) {
                 await config_error_add($c.lit("hilite_status: invalid percentage value '%s%d%%'"), hilite.rel === LT_VALUE ? $c.lit("<") : hilite.rel === LE_VALUE ? $c.lit("<=") : hilite.rel === GT_VALUE ? $c.lit(">") : hilite.rel === GE_VALUE ? $c.lit(">=") : $c.lit("="), hilite.value.a_int);
-                return 0;
+                return FALSE;
             }
         }
         sidx = sidx + 1 | 0;
         how = new $c.Ptr(s.get(sidx), 0);
         if (!how) {
             if (!successes) {
-                return 0;
+                return FALSE;
             }
         }
         coloridx = -1;
         $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), how, 256);
         sf = splitsubfields(new $c.Ptr(buf, 0), new $c.Ptr(subfields, 0), 0);
         if (sf < 1) {
-            return 0;
+            return FALSE;
         }
         disp_attrib = HL_UNDEF;
         for (i = 0; i < sf; i = i + 1 | 0) {
-            a = await match_str2attr(subfields[0].get(i), 0);
+            a = await match_str2attr(subfields[0].get(i), FALSE);
             if (a === ATR_BOLD) {
                 disp_attrib = disp_attrib | HL_BOLD;
             } else if (a === ATR_DIM) {
@@ -1820,10 +1826,10 @@ async function parse_status_hl2(s, from_configfile) {   // botl.c:2814
             } else if (a === ATR_NONE) {
                 disp_attrib = HL_NONE;
             } else {
-                c = await match_str2clr(subfields[0].get(i), 0);
+                c = await match_str2clr(subfields[0].get(i), FALSE);
                 if (c >= CLR_MAX || coloridx !== -1) {
                     await config_error_add($c.lit("bad color '%d %d'"), c, coloridx);
-                    return 0;
+                    return FALSE;
                 }
                 coloridx = c;
             }
@@ -1866,16 +1872,16 @@ async function query_conditions() {   // botl.c:3109
     ret = 0;
     picks[0] = null;
     clr = NO_COLOR;
-    tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
-    await windowprocs.win_start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW_MENU);
+    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
     for (i = 0; i < 30; i = i + 1 | 0) {
         any.$copyFrom(cg.zeroany);
         any.a_ulong = $c.u64(conditions[i].mask);
         await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR_NONE, clr, conditions[i].text[0], MENU_ITEMFLAGS_NONE);
     }
-    await windowprocs.win_end_menu(tmpwin, $c.lit("Choose status conditions"));
+    await end_menu()(tmpwin, $c.lit("Choose status conditions"));
     res = await select_menu(tmpwin, PICK_ANY, new $c.Ptr(picks, 0));
-    await windowprocs.win_destroy_nhwindow(tmpwin);
+    await destroy_nhwindow()(tmpwin);
     if (res > 0) {
         for (i = 0; i < res; i = i + 1 | 0) {
             ret = $c.oru64(ret, $c.radd(picks[0], i).item.a_ulong);
@@ -1886,7 +1892,7 @@ async function query_conditions() {   // botl.c:3109
 }
 function conditionbitmask2str(ul) {   // botl.c:3141
     let i = 0, first = 0, alias = null;
-    first = 1;
+    first = TRUE;
     alias = null;
     conditionbitmask2str$buf[0] = 0;
     if (!ul) {
@@ -1900,7 +1906,7 @@ function conditionbitmask2str(ul) {   // botl.c:3141
     for (i = 0; i < 30; i = i + 1 | 0) {
         if ($c.andu64($c.u64(conditions[i].mask), ul) !== 0) {
             $c.__builtin___sprintf_chk(eos(new $c.Ptr(conditionbitmask2str$buf, 0)), 0, -1, $c.lit("%s%s"), first ? $c.lit("") : $c.lit("+"), conditions[i].text[0]);
-            first = 0;
+            first = FALSE;
         }
     }
     if (!first && alias) {
@@ -1914,14 +1920,14 @@ function match_str2conditionbitmask(str) {   // botl.c:3171
     mask = 0;
     if (str && str.get(0)) {
         for (i = 0; i < 30; i = i + 1 | 0) {
-            if (fuzzymatch(conditions[i].text[0], str, $c.lit(" -_"), 1)) {
+            if (fuzzymatch(conditions[i].text[0], str, $c.lit(" -_"), TRUE)) {
                 mask = $c.oru64(mask, $c.u64(conditions[i].mask));
                 nmatches = nmatches + 1 | 0;
             }
         }
         if (!nmatches) {
             for (i = 0; i < 6; i = i + 1 | 0) {
-                if (fuzzymatch(condition_aliases[i].id, str, $c.lit(" -_"), 1)) {
+                if (fuzzymatch(condition_aliases[i].id, str, $c.lit(" -_"), TRUE)) {
                     mask = $c.oru64(mask, condition_aliases[i].bitmask);
                     nmatches = nmatches + 1 | 0;
                 }
@@ -1960,14 +1966,14 @@ async function parse_condition(s, sidx) {   // botl.c:3233
     let i = 0, coloridx = 0, tmp = null, how = null, conditions_bitmask = 0, result = 0, sf = 0, buf = new Int8Array(256), subfields = [null], a = 0, k = 0;
     coloridx = NO_COLOR;
     conditions_bitmask = 0;
-    result = 0;
+    result = FALSE;
     if (!s) {
-        return 0;
+        return FALSE;
     }
     sidx = sidx + 1 | 0;
     if (!s.get(sidx)[0]) {
         await config_error_add($c.lit("Missing condition(s)"));
-        return 0;
+        return FALSE;
     }
     while (s.get(sidx)[0]) {
         sf = 0;
@@ -1975,18 +1981,18 @@ async function parse_condition(s, sidx) {   // botl.c:3233
         $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), tmp, 256);
         conditions_bitmask = await str2conditionbitmask(new $c.Ptr(buf, 0));
         if (!conditions_bitmask) {
-            return 0;
+            return FALSE;
         }
         sidx = sidx + 1 | 0;
         how = new $c.Ptr(s.get(sidx), 0);
         if (!how || !how.get(0)) {
             await config_error_add($c.lit("Missing color+attribute"));
-            return 0;
+            return FALSE;
         }
         $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), how, 256);
         sf = splitsubfields(new $c.Ptr(buf, 0), new $c.Ptr(subfields, 0), 0);
         for (i = 0; i < sf; i = i + 1 | 0) {
-            a = await match_str2attr(subfields[0].get(i), 0);
+            a = await match_str2attr(subfields[0].get(i), FALSE);
             if (a === ATR_BOLD) {
                 gc.cond_hilites[CLR_MAX + 2] = $c.oru64(gc.cond_hilites[CLR_MAX + 2], conditions_bitmask);
             } else if (a === ATR_DIM) {
@@ -2007,16 +2013,16 @@ async function parse_condition(s, sidx) {   // botl.c:3233
                 gc.cond_hilites[CLR_MAX + 6] = $c.andu64(gc.cond_hilites[CLR_MAX + 6], $c.notu64(conditions_bitmask));
                 gc.cond_hilites[CLR_MAX + 7] = $c.andu64(gc.cond_hilites[CLR_MAX + 7], $c.notu64(conditions_bitmask));
             } else {
-                k = await match_str2clr(subfields[0].get(i), 0);
+                k = await match_str2clr(subfields[0].get(i), FALSE);
                 if (k >= CLR_MAX) {
                     await config_error_add($c.lit("bad color %d"), k);
-                    return 0;
+                    return FALSE;
                 }
                 coloridx = k;
             }
         }
         gc.cond_hilites[coloridx] = $c.oru64(gc.cond_hilites[coloridx], conditions_bitmask);
-        result = 1;
+        result = TRUE;
         sidx = sidx + 1 | 0;
     }
     return result;
@@ -2154,11 +2160,11 @@ async function status_hilite_linestr_gather_conditions() {   // botl.c:3488
         }
         if (clr !== NO_COLOR || atr !== HL_NONE) {
             ca = (clr | atr << 8) >>> 0;
-            added_condmap = 0;
+            added_condmap = FALSE;
             for (j = 0; j < 30; j = j + 1 | 0) {
                 if (cond_maps[j].clratr === ca) {
                     cond_maps[j].bm = $c.oru64(cond_maps[j].bm, $c.u64(conditions[i].mask));
-                    added_condmap = 1;
+                    added_condmap = TRUE;
                     break;
                 }
             }
@@ -2278,8 +2284,8 @@ async function status_hilite_menu_choose_field() {   // botl.c:3672
     fld = BL_FLUSH;
     picks[0] = null;
     clr = NO_COLOR;
-    tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
-    await windowprocs.win_start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW_MENU);
+    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
     for (i = 0; i < MAXBLSTATS; i = i + 1 | 0) {
         if (initblstats[i].fld === BL_SCORE && !gb.blstats[0][BL_SCORE].thresholds) {
             continue;
@@ -2288,9 +2294,9 @@ async function status_hilite_menu_choose_field() {   // botl.c:3672
         any.a_int = i + 1 | 0;
         await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR_NONE, clr, initblstats[i].fldname, MENU_ITEMFLAGS_NONE);
     }
-    await windowprocs.win_end_menu(tmpwin, $c.lit("Select a hilite field:"));
+    await end_menu()(tmpwin, $c.lit("Select a hilite field:"));
     res = await select_menu(tmpwin, PICK_ONE, new $c.Ptr(picks, 0));
-    await windowprocs.win_destroy_nhwindow(tmpwin);
+    await destroy_nhwindow()(tmpwin);
     if (res > 0) {
         fld = picks[0].item.a_int - 1 | 0;
         $c.free(picks[0]);
@@ -2309,8 +2315,8 @@ async function status_hilite_menu_choose_behavior(fld) {   // botl.c:3707
         return BL_TH_NONE;
     }
     at = initblstats[fld].anytype | 0;
-    tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
-    await windowprocs.win_start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW_MENU);
+    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
     if (fld !== BL_CONDITION) {
         any.$copyFrom(cg.zeroany);
         $t1 = onlybeh = BL_TH_ALWAYS_HILITE, any.a_int = $t1;
@@ -2358,7 +2364,7 @@ async function status_hilite_menu_choose_behavior(fld) {   // botl.c:3707
         nopts = nopts + 1 | 0;
     }
     $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Select %s field hilite behavior:"), initblstats[fld].fldname);
-    await windowprocs.win_end_menu(tmpwin, new $c.Ptr(buf, 0));
+    await end_menu()(tmpwin, new $c.Ptr(buf, 0));
     if (nopts > 1) {
         res = await select_menu(tmpwin, PICK_ONE, new $c.Ptr(picks, 0));
         if (res === 0) {
@@ -2369,7 +2375,7 @@ async function status_hilite_menu_choose_behavior(fld) {   // botl.c:3707
     } else if (onlybeh !== BL_TH_NONE) {
         beh = onlybeh;
     }
-    await windowprocs.win_destroy_nhwindow(tmpwin);
+    await destroy_nhwindow()(tmpwin);
     if (res > 0) {
         beh = picks[0].item.a_int;
         $c.free(picks[0]);
@@ -2381,8 +2387,8 @@ async function status_hilite_menu_choose_updownboth(fld, str, ltok, gtok) {   //
     ret = NO_LTEQGT;
     picks[0] = null;
     clr = NO_COLOR;
-    tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
-    await windowprocs.win_start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW_MENU);
+    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
     if (ltok) {
         if (str) {
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s than %s"), fld === BL_AC ? $c.lit("Better (lower)") : $c.lit("Less"), str);
@@ -2424,9 +2430,9 @@ async function status_hilite_menu_choose_updownboth(fld, str, ltok, gtok) {   //
         await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR_NONE, clr, new $c.Ptr(buf, 0), MENU_ITEMFLAGS_NONE);
     }
     $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Select field %s value:"), initblstats[fld].fldname);
-    await windowprocs.win_end_menu(tmpwin, new $c.Ptr(buf, 0));
+    await end_menu()(tmpwin, new $c.Ptr(buf, 0));
     res = await select_menu(tmpwin, PICK_ONE, new $c.Ptr(picks, 0));
-    await windowprocs.win_destroy_nhwindow(tmpwin);
+    await destroy_nhwindow()(tmpwin);
     if (res > 0) {
         ret = picks[0].item.a_int - 10 | 0;
         $c.free(picks[0]);
@@ -2448,38 +2454,38 @@ async function status_hilite_menu_add(origfld) {   // botl.c:3890
             if (fld === BL_FLUSH) {
                 fld = await status_hilite_menu_choose_field();
                 if (fld === BL_FLUSH) {
-                    return 0;
+                    return FALSE;
                 }
             }
             if (fld === BL_FLUSH) {
-                return 0;
+                return FALSE;
             }
             colorqry[0] = 0;
             attrqry[0] = 0;
             $c.__builtin___memset_chk(hilite, 0, 128, 128);
             hilite.next = null;
-            hilite.set = 0;
+            hilite.set = FALSE;
             hilite.fld = fld;
         case "choose_behavior":
             $goto = null;   // choose_behavior:
             behavior = await status_hilite_menu_choose_behavior(fld);
             if (behavior === BL_TH_NONE - 1) {
-                return 0;
+                return FALSE;
             } else if (behavior === BL_TH_NONE) {
                 if (origfld === BL_FLUSH) {
                     $goto = "choose_field"; continue D1;
                 }
-                return 0;
+                return FALSE;
             }
             hilite.behavior = behavior;
         case "choose_value":
             $goto = null;   // choose_value:
             if (($t1 = retry, retry = $t1 + 1 | 0, $t1) > 5) {
                 await pline($c.lit("That's enough tries."));
-                return 0;
+                return FALSE;
             }
             if (behavior === BL_TH_VAL_PERCENTAGE || behavior === BL_TH_VAL_ABSOLUTE) {
-                gotnum = 0;
+                gotnum = FALSE;
                 percent = $c.i8(behavior === BL_TH_VAL_PERCENTAGE ? 1 : 0);
                 lt_gt_eq = NO_LTEQGT;
                 inbuf[0] = 0;
@@ -2509,7 +2515,7 @@ async function status_hilite_menu_add(origfld) {   // botl.c:3890
                 }
                 while (digit(inp.get(0))) {
                     inp = inp.add(1);
-                    gotnum = 1;
+                    gotnum = TRUE;
                 }
                 if (inp.get(0) === 37) {
                     if (!percent) {
@@ -2565,7 +2571,7 @@ async function status_hilite_menu_add(origfld) {   // botl.c:3890
             } else if (behavior === BL_TH_UPDOWN) {
                 if (initblstats[fld].anytype !== ANY_STR) {
                     ltok$2 = $c.i8(fld !== BL_TIME ? 1 : 0);
-                    gtok$2 = 1;
+                    gtok$2 = TRUE;
                     lt_gt_eq = await status_hilite_menu_choose_updownboth(fld, null, ltok$2, gtok$2);
                     if (lt_gt_eq === NO_LTEQGT) {
                         $goto = "choose_behavior"; continue D1;
@@ -2582,7 +2588,7 @@ async function status_hilite_menu_add(origfld) {   // botl.c:3890
                     if (origfld === BL_FLUSH) {
                         $goto = "choose_field"; continue D1;
                     }
-                    return 0;
+                    return FALSE;
                 }
                 nh_snprintf($c.lit("status_hilite_menu_add"), 4121, new $c.Ptr(colorqry, 0), 256, $c.lit("Choose a color for conditions %s:"), conditionbitmask2str(cond));
                 nh_snprintf($c.lit("status_hilite_menu_add"), 4124, new $c.Ptr(attrqry, 0), 256, $c.lit("Choose attribute for conditions %s:"), conditionbitmask2str(cond));
@@ -2658,7 +2664,7 @@ async function status_hilite_menu_add(origfld) {   // botl.c:3890
                     if ($c.strlen(new $c.Ptr(inbuf$2, 0)) < 80) {
                         $c.__builtin___strcpy_chk(new $c.Ptr(hilite.textmatch, 0), new $c.Ptr(inbuf$2, 0), 80);
                     } else {
-                        return 0;
+                        return FALSE;
                     }
                 }
                 $c.__builtin___sprintf_chk(new $c.Ptr(colorqry, 0), 0, 256, $c.lit("Choose a color for when %s is '%s':"), initblstats[fld].fldname, new $c.Ptr(hilite.textmatch, 0));
@@ -2732,7 +2738,7 @@ async function status_hilite_menu_add(origfld) {   // botl.c:3890
                 await pline($c.lit("Added hilite %s"), await status_hilite2str(hilite));
             }
             reset_status_hilites();
-            return 1;
+            return TRUE;
         }
         break;
     }
@@ -2744,7 +2750,7 @@ function status_hilite_remove(id) {   // botl.c:4305
         hlstr = hlstr.next;
     }
     if (!hlstr) {
-        return 0;
+        return FALSE;
     }
     if (hlstr.fld === BL_CONDITION) {
         for (i = 0; i < CLR_MAX; i = i + 1 | 0) {
@@ -2756,7 +2762,7 @@ function status_hilite_remove(id) {   // botl.c:4305
         gc.cond_hilites[CLR_MAX + 5] = $c.andu64(gc.cond_hilites[CLR_MAX + 5], $c.notu64(hlstr.mask));
         gc.cond_hilites[CLR_MAX + 6] = $c.andu64(gc.cond_hilites[CLR_MAX + 6], $c.notu64(hlstr.mask));
         gc.cond_hilites[CLR_MAX + 7] = $c.andu64(gc.cond_hilites[CLR_MAX + 7], $c.notu64(hlstr.mask));
-        return 1;
+        return TRUE;
     } else {
         fld = hlstr.fld;
         hlprev = null;
@@ -2773,12 +2779,12 @@ function status_hilite_remove(id) {   // botl.c:4305
                     $t2 = gb.blstats[1][fld].time = 0, gb.blstats[0][fld].time = $t2;
                 }
                 $c.free(hl);
-                return 1;
+                return TRUE;
             }
             hlprev = hl;
         }
     }
-    return 0;
+    return FALSE;
 }
 async function status_hilite_menu_fld(fld) {   // botl.c:4357
     let tmpwin = 0, i = 0, res = 0, picks = [null], any = new $T.any(), count = 0, hlstr = null, buf = new Int8Array(256), acted = 0, clr = 0, idx = 0, mode = 0;
@@ -2791,11 +2797,11 @@ async function status_hilite_menu_fld(fld) {   // botl.c:4357
             await status_hilite_linestr_gather();
             count = status_hilite_linestr_countfield(fld);
         } else {
-            return 0;
+            return FALSE;
         }
     }
-    tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
-    await windowprocs.win_start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW_MENU);
+    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
     if (count) {
         hlstr = status_hilite_str;
         while (hlstr) {
@@ -2823,8 +2829,8 @@ async function status_hilite_menu_fld(fld) {   // botl.c:4357
         await add_menu(tmpwin, nul_glyphinfo, any, 90, 0, ATR_NONE, clr, $c.lit("Add new hilites"), MENU_ITEMFLAGS_NONE);
     }
     $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Current %s hilites:"), initblstats[fld].fldname);
-    await windowprocs.win_end_menu(tmpwin, new $c.Ptr(buf, 0));
-    acted = 0;
+    await end_menu()(tmpwin, new $c.Ptr(buf, 0));
+    acted = FALSE;
     if ((res = await select_menu(tmpwin, PICK_ANY, new $c.Ptr(picks, 0))) > 0) {
         mode = 0;
         for (i = 0; i < res; i = i + 1 | 0) {
@@ -2839,31 +2845,31 @@ async function status_hilite_menu_fld(fld) {   // botl.c:4357
             for (i = 0; i < res; i = i + 1 | 0) {
                 idx = $c.radd(picks[0], i).item.a_int;
                 if (idx > 0 && status_hilite_remove(idx)) {
-                    acted = 1;
+                    acted = TRUE;
                 }
             }
         }
         if ((mode & 2) >>> 0) {
             while (await status_hilite_menu_add(fld)) {
-                acted = 1;
+                acted = TRUE;
             }
         }
         $c.free(picks[0]), picks[0] = null;
     }
-    await windowprocs.win_destroy_nhwindow(tmpwin);
+    await destroy_nhwindow()(tmpwin);
     return acted;
 }
 async function status_hilites_viewall() {   // botl.c:4456
     let datawin = 0, hlstr = null, buf = new Int8Array(256);
     hlstr = status_hilite_str;
-    datawin = await windowprocs.win_create_nhwindow(NHW_TEXT);
+    datawin = await create_nhwindow()(NHW_TEXT);
     while (hlstr) {
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("OPTIONS=hilite_status: %.*s"), 231, new $c.Ptr(hlstr.str, 0));
-        await windowprocs.win_putstr(datawin, 0, new $c.Ptr(buf, 0));
+        await putstr()(datawin, 0, new $c.Ptr(buf, 0));
         hlstr = hlstr.next;
     }
-    await windowprocs.win_display_nhwindow(datawin, 0);
-    await windowprocs.win_destroy_nhwindow(datawin);
+    await display_nhwindow()(datawin, FALSE);
+    await destroy_nhwindow()(datawin);
 }
 export async function all_options_statushilites(sbuf) {   // botl.c:4477
     let hlstr = null, buf = new Int8Array(256);
@@ -2882,9 +2888,9 @@ export async function status_hilite_menu() {   // botl.c:4498
     picks[0] = null;
     clr = NO_COLOR;
     shlmenu_redo$: for (;;) {
-        redo = 0;
-        tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
-        await windowprocs.win_start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+        redo = FALSE;
+        tmpwin = await create_nhwindow()(NHW_MENU);
+        await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
         await status_hilite_linestr_gather();
         countall = status_hilite_linestr_countfield(BL_FLUSH);
         if (countall) {
@@ -2907,7 +2913,7 @@ export async function status_hilite_menu() {   // botl.c:4498
             }
             await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR_NONE, clr, new $c.Ptr(buf, 0), MENU_ITEMFLAGS_NONE);
         }
-        await windowprocs.win_end_menu(tmpwin, $c.lit("Status hilites:"));
+        await end_menu()(tmpwin, $c.lit("Status hilites:"));
         if ((res = await select_menu(tmpwin, PICK_ONE, new $c.Ptr(picks, 0))) > 0) {
             fld = picks[0].item.a_int - 1 | 0;
             if (fld < 0) {
@@ -2918,9 +2924,9 @@ export async function status_hilite_menu() {   // botl.c:4498
                 }
             }
             $c.free(picks[0]), picks[0] = null;
-            redo = 1;
+            redo = TRUE;
         }
-        await windowprocs.win_destroy_nhwindow(tmpwin);
+        await destroy_nhwindow()(tmpwin);
         countall = status_hilite_linestr_countfield(BL_FLUSH);
         status_hilite_linestr_done();
         if (redo && !iflags.debug_fuzzer) {
@@ -2931,7 +2937,13 @@ export async function status_hilite_menu() {   // botl.c:4498
     if (countall > 0 && !iflags.hilite_delta) {
         iflags.hilite_delta = 3;
     }
-    return 1;
+    return TRUE;
+}
+function has_hilite(i) {
+    return gb.blstats[0][i].thresholds;
+}
+function Is_Temp_Hilite(rule) {
+    return rule && rule.behavior === BL_TH_UPDOWN ? 1 : 0;
 }
 
 export function $init() {
@@ -3860,7 +3872,7 @@ export function $init() {
     cond_menu$menutitle[1] = $c.lit("by ranking");
     eval_notify_windowport_field$oldrndencode = 0;
     eval_notify_windowport_field$oldgoldsym = 0;
-    init_blstats$initalready = 0;
+    init_blstats$initalready = FALSE;
     splitsubfields$subfields.fill(null);
     parse_status_hl2$aligntxt.fill(null);
     parse_status_hl2$aligntxt[0] = $c.lit("chaotic");

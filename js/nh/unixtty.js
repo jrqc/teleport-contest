@@ -8,6 +8,7 @@ import { getioctls, setioctls } from './ioctl.js';
 import { term_end_screen, term_start_screen } from './termcap.js';
 import { windowprocs } from './windows.js';
 import { wp_tty } from './winprocs.h.js';
+import { exit_nhwindows, raw_print } from './winprocs.macros.js';
 
 let settty_needed = 0;
 export const inittyb = new $T.termios();
@@ -85,7 +86,7 @@ export async function settty(s) {   // unixtty.c:247
         await term_end_screen();
     }
     if (s) {
-        await windowprocs.win_raw_print(s);
+        await raw_print()(s);
     }
     if ($c.tcsetattr(0, 1, inittyb) < 0 || 0) {
         if (!$c.getenv($c.lit("NOMUX_MARKERS"))) {
@@ -114,18 +115,18 @@ export function setftty() {   // unixtty.c:267
         curttyb.c_lflag = $c.oru64(curttyb.c_lflag, cf);
         curttyb.c_cc[16] = 1;
         curttyb.c_cc[17] = 0;
-        $t1 = $c.u8($c.fpathconf(0, 9)), curttyb.c_cc[10] = $t1;
-        $t2 = $c.u8($c.fpathconf(0, 9)), curttyb.c_cc[11] = $t2;
-        $t3 = $c.u8($c.fpathconf(0, 9)), curttyb.c_cc[6] = $t3;
-        $t4 = $c.u8($c.fpathconf(0, 9)), curttyb.c_cc[15] = $t4;
-        $t5 = $c.u8($c.fpathconf(0, 9)), curttyb.c_cc[4] = $t5;
-        $t6 = $c.u8($c.fpathconf(0, 9)), curttyb.c_cc[14] = $t6;
+        $t1 = $c.u8(nonesuch()), curttyb.c_cc[10] = $t1;
+        $t2 = $c.u8(nonesuch()), curttyb.c_cc[11] = $t2;
+        $t3 = $c.u8(nonesuch()), curttyb.c_cc[6] = $t3;
+        $t4 = $c.u8(nonesuch()), curttyb.c_cc[15] = $t4;
+        $t5 = $c.u8(nonesuch()), curttyb.c_cc[4] = $t5;
+        $t6 = $c.u8(nonesuch()), curttyb.c_cc[14] = $t6;
         change = change + 1 | 0;
     }
     if (!$c.andu64(inittyb.c_cflag, 512)) {
         curttyb.c_iflag = $c.andu64(curttyb.c_iflag, 18446744073709551583n);
     }
-    if ($G.intr_char !== $c.fpathconf(0, 9) && curttyb.c_cc[8] !== 3) {
+    if ($G.intr_char !== nonesuch() && curttyb.c_cc[8] !== 3) {
         curttyb.c_cc[8] = 3;
         change = change + 1 | 0;
     }
@@ -137,15 +138,15 @@ export function setftty() {   // unixtty.c:267
     }
 }
 export function intron() {   // unixtty.c:338
-    if (windowprocs.wp_id === wp_tty && $G.intr_char !== $c.fpathconf(0, 9) && curttyb.c_cc[8] !== 3) {
+    if (windowprocs.wp_id === wp_tty && $G.intr_char !== nonesuch() && curttyb.c_cc[8] !== 3) {
         curttyb.c_cc[8] = 3;
         setctty();
     }
 }
 export function introff() {   // unixtty.c:350
     let $t1;
-    if (windowprocs.wp_id === wp_tty && curttyb.c_cc[8] !== $c.fpathconf(0, 9)) {
-        $t1 = $c.u8($c.fpathconf(0, 9)), curttyb.c_cc[8] = $t1;
+    if (windowprocs.wp_id === wp_tty && curttyb.c_cc[8] !== nonesuch()) {
+        $t1 = $c.u8(nonesuch()), curttyb.c_cc[8] = $t1;
         setctty();
     }
 }
@@ -153,7 +154,7 @@ export async function error(s, ...$va) {   // unixtty.c:489
     let the_args = null;
     the_args = new $c.VaList($va);
     if (iflags.window_inited) {
-        await windowprocs.win_exit_nhwindows(null);
+        await exit_nhwindows()(null);
     }
     if (settty_needed) {
         await settty(null);
@@ -164,6 +165,9 @@ export async function error(s, ...$va) {   // unixtty.c:489
     $c.exit(1);
 }
 export function tty_utf8graphics_fixup() {   // unixtty.c:514
+}
+function nonesuch() {
+    return $c.fpathconf(0, 9);
 }
 
 export function $init() {

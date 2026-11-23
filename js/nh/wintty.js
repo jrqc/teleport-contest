@@ -7,17 +7,21 @@ import { bot, cond_idx, conditions, repad_with_dashes, stat_cap_indx, status_ini
 import { BEFORE, BL_AC, BL_ALIGN, BL_ARMOR, BL_CAP, BL_CH, BL_CO, BL_CONDITION, BL_DX, BL_ENE, BL_ENEMAX, BL_EXP, BL_FLUSH, BL_GOLD, BL_HD, BL_HP, BL_HPMAX, BL_HUNGER, BL_IN, BL_LEVELDESC, BL_RESET, BL_SCORE, BL_STR, BL_TERRAIN, BL_TIME, BL_TITLE, BL_VERS, BL_WEAPON, BL_WI, BL_XP, HL_BLINK, HL_BOLD, HL_DIM, HL_INVERSE, HL_ITALIC, HL_ULINE, MAXBLSTATS, NOW } from './botl.h.js';
 import { randomkey } from './cmd.js';
 import { CLR_MAX, NH_BASIC_COLOR, NO_COLOR } from './color.h.js';
+import { COLORVAL } from './color.macros.js';
 import { cg, disp, flags, gc, gg, gm, gs, gt, iflags, program_state, quitchars, svp, u } from './decl.js';
 import { GOLD_SYM } from './defsym.h.js';
 import { docrt, docrt_flags, flush_screen, nul_glyphinfo, redraw_map, row_refresh } from './display.js';
-import { MAX_GLYPH, MG_BW_ENGR, MG_BW_ICE, MG_DETECT, MG_FEMALE, MG_OBJPILE, MG_PET, docrtRefresh } from './display.h.js';
+import { MG_BW_ENGR, MG_BW_ICE, MG_BW_LAVA, MG_BW_SINK, MG_DETECT, MG_FEMALE, MG_OBJPILE, MG_PET, NO_GLYPH, docrtRefresh } from './display.h.js';
 import { nh_terminate, panic } from './end.js';
 import { clearlocks, debugcore, paniclog } from './files.js';
+import { wizard } from './flag.macros.js';
 import { tty_get_ext_cmd, tty_getlin, xwaitforspace } from './getline.js';
 import { BUFSZ, COLNO, MAX_MSG_HISTORY, QBUFSZ, ROWNO, set_in_game } from './global.h.js';
 import { eos, tabexpand } from './hacklib.js';
+import { AppendLongDigit } from './integer.macros.js';
 import { free_pickinv_cache } from './invent.js';
 import { getwindowsz } from './ioctl.js';
+import { nhUse } from './lint.macros.js';
 import { map_menu_cmd, set_wc2_option_mod_status } from './options.js';
 import { impossible, nhassert_failed, pline } from './pline.js';
 import { critically_low_hp } from './pray.js';
@@ -26,18 +30,20 @@ import { genl_outrip } from './rip.js';
 import { genl_player_setup } from './role.js';
 import { pmatchi } from './strutil.js';
 import { H_DEC, H_IBM, H_UTF8 } from './sym.h.js';
-import { backsp, cl_end, cl_eos, cmov, graph_off, graph_on, home, nocmov, nomux_capture_write_input_boundary, nomux_putch, nomux_raw_emit, standoutbeg, standoutend, tc_lcl_data, term_attr_fixup, term_clear_screen, term_curs_set, term_end_attr, term_end_color, term_end_extracolor, term_end_raw_bold, term_shutdown, term_start_attr, term_start_bgcolor, term_start_color, term_start_extracolor, term_start_raw_bold, term_startup, tty_delay_output, tty_nhbell, tty_number_pad, xputs } from './termcap.js';
+import { nh_CD, nh_CM, nh_ND, ul_hack } from './tcap.macros.js';
+import { backsp, cl_end, cl_eos, cmov, graph_off, graph_on, home, nocmov, nomux_capture_write_input_boundary, nomux_putch, nomux_raw_emit, standoutbeg, standoutend, term_attr_fixup, term_clear_screen, term_curs_set, term_end_attr, term_end_color, term_end_extracolor, term_end_raw_bold, term_shutdown, term_start_attr, term_start_bgcolor, term_start_color, term_start_extracolor, term_start_raw_bold, term_startup, tty_delay_output, tty_nhbell, tty_number_pad, xputs } from './termcap.js';
 import { addtopl, more, remember_topl, show_topl, tty_doprev_message, tty_getmsghistory, tty_putmsghistory, tty_yn_function, update_topl } from './topl.js';
 import { gettty, setftty, settty } from './unixtty.js';
 import { mixed_to_utf8 } from './utf8map.js';
 import { copyright_banner_line } from './version.js';
 import { decode_mixed, genl_can_suspend_yes, genl_preference_update, genl_status_enablefield, genl_status_finish, genl_status_init, menuitem_invert_test, status_activefields, status_fieldfmt, status_vals, windowprocs } from './windows.js';
-import { WC2_DARKGRAY, WC2_EXTRACOLORS, WC2_HILITE_STATUS, WC2_HITPOINTBAR, WC2_PETATTR, WC2_SELECTSAVED, WC2_STATUSLINES, WC2_U_UTF8STR, WC_COLOR, WC_EIGHT_BIT_IN, WC_HILITE_PET, WC_INVERSE, WININIT, wp_tty } from './winprocs.h.js';
-import { MAXWIN, TOPLINE_EMPTY, TOPLINE_NEED_MORE, TOPLINE_NON_EMPTY, TOPLINE_SPECIAL_PROMPT, WIN_CANCELLED } from './wintty.h.js';
-import { ATR_BLINK, ATR_BOLD, ATR_DIM, ATR_INVERSE, ATR_ITALIC, ATR_NOHISTORY, ATR_NONE, ATR_ULINE, ATR_URGENT, MENU_BEHAVE_PERMINV, MENU_ITEMFLAGS_NONE, MENU_ITEMFLAGS_SELECTED, NHW_MAP, NHW_MENU, NHW_MESSAGE, NHW_PERMINVENT, NHW_STATUS, NHW_TEXT, PICK_ANY, PICK_NONE, PICK_ONE, request_settings, set_menu_promptstyle, set_mode } from './wintype.h.js';
+import { WC2_DARKGRAY, WC2_EXTRACOLORS, WC2_EXTRASTATUS, WC2_FLUSH_STATUS, WC2_HILITE_STATUS, WC2_HITPOINTBAR, WC2_PETATTR, WC2_RESET_STATUS, WC2_SELECTSAVED, WC2_STATUSLINES, WC2_SUPPRESS_HIST, WC2_URGENT_MESG, WC2_U_UTF8STR, WC_COLOR, WC_EIGHT_BIT_IN, WC_HILITE_PET, WC_INVERSE, WININIT, wp_tty } from './winprocs.h.js';
+import { MAXWIN, NHW_BASE, TOPLINE_EMPTY, TOPLINE_NEED_MORE, TOPLINE_NON_EMPTY, TOPLINE_SPECIAL_PROMPT, WIN_CANCELLED, WIN_NOSTOP, WIN_STOP } from './wintty.h.js';
+import { ATR_BLINK, ATR_BOLD, ATR_DIM, ATR_INVERSE, ATR_ITALIC, ATR_NOHISTORY, ATR_NONE, ATR_ULINE, ATR_URGENT, MENU_BEHAVE_PERMINV, MENU_FIRST_PAGE, MENU_INVERT_ALL, MENU_INVERT_PAGE, MENU_ITEMFLAGS_NONE, MENU_ITEMFLAGS_SELECTED, MENU_LAST_PAGE, MENU_NEXT_PAGE, MENU_PREVIOUS_PAGE, MENU_SEARCH, MENU_SELECT_ALL, MENU_SELECT_PAGE, MENU_UNSELECT_ALL, MENU_UNSELECT_PAGE, NHW_MAP, NHW_MENU, NHW_MESSAGE, NHW_PERMINVENT, NHW_STATUS, NHW_TEXT, PICK_ANY, PICK_NONE, PICK_ONE, WIN_ERR, request_settings, set_menu_promptstyle, set_mode } from './wintype.h.js';
 
 const MAX_STATUS_ROWS = 3;
 const MENU_EXPLICIT_CHOICE = 0x7f;
+const blPAD = -1;
 
 const tty_askname$who_are_you = new Int8Array(14);   // static in tty_askname()
 const compress_str$cbuf = new Int8Array(256);   // static in compress_str()
@@ -104,7 +110,7 @@ async function resize_tty() {   // wintty.c:392
     if (!iflags.window_inited) {
         return;
     }
-    cw = $G.WIN_MAP !== -1 ? wins[$G.WIN_MAP] : null;
+    cw = $G.WIN_MAP !== WIN_ERR ? wins[$G.WIN_MAP] : null;
     map_active = $c.i8(cw && cw.active ? 1 : 0);
     if (!map_active) {
         mapx = 1, mapy = 0;
@@ -157,9 +163,9 @@ async function newclipping(x, y) {   // wintty.c:471
     return;
 }
 async function new_status_window() {   // wintty.c:491
-    if ($G.WIN_STATUS !== -1) {
+    if ($G.WIN_STATUS !== WIN_ERR) {
         await tty_clear_nhwindow($G.WIN_STATUS);
-        await tty_destroy_nhwindow($G.WIN_STATUS), $G.WIN_STATUS = -1;
+        await tty_destroy_nhwindow($G.WIN_STATUS), $G.WIN_STATUS = WIN_ERR;
     }
     genl_status_finish();
     await tty_status_init();
@@ -168,7 +174,7 @@ async function new_status_window() {   // wintty.c:491
 }
 export async function tty_init_nhwindows(argcp, argv) {   // wintty.c:511
     let wid = Int32Array.of(0), hgt = Int32Array.of(0), i = 0, $t1, $t2, $t3;
-    iflags.wc2_statuslines = iflags.wc2_statuslines <= 2 ? 2 : MAX_STATUS_ROWS;
+    iflags.wc2_statuslines = StatusRows();
     $c.setbuf($c.__stdoutp, new $c.Ptr(obuf, 0));
     gettty();
     await term_startup(new $c.Ptr(wid, 0), new $c.Ptr(hgt, 0));
@@ -186,9 +192,9 @@ export async function tty_init_nhwindows(argcp, argv) {   // wintty.c:511
     $G.ttyDisplay.attrs = 0;
     $G.ttyDisplay.topl_utf8 = 0;
     $G.ttyDisplay.mixed = 0;
-    $G.BASE_WINDOW = await tty_create_nhwindow(NHW_PERMINVENT + 1);
+    $G.BASE_WINDOW = await tty_create_nhwindow(NHW_BASE);
     wins[$G.BASE_WINDOW].active = 1;
-    $G.ttyDisplay.lastwin = -1;
+    $G.ttyDisplay.lastwin = WIN_ERR;
     $c.signal(28, winch_handler);
     await tty_clear_nhwindow($G.BASE_WINDOW);
     await tty_curs($G.BASE_WINDOW, 1, 4);
@@ -336,13 +342,13 @@ export async function tty_exit_nhwindows(str) {   // wintty.c:834
             wins[i] = null;
         }
     }
-    $G.WIN_MAP = $G.WIN_MESSAGE = $G.WIN_INVEN = -1;
-    $G.WIN_STATUS = -1;
-    if ($G.BASE_WINDOW !== -1 && wins[$G.BASE_WINDOW]) {
+    $G.WIN_MAP = $G.WIN_MESSAGE = $G.WIN_INVEN = WIN_ERR;
+    $G.WIN_STATUS = WIN_ERR;
+    if ($G.BASE_WINDOW !== WIN_ERR && wins[$G.BASE_WINDOW]) {
         free_window_info(wins[$G.BASE_WINDOW], 1);
         $c.free(wins[$G.BASE_WINDOW]);
         wins[$G.BASE_WINDOW] = null;
-        $G.BASE_WINDOW = -1;
+        $G.BASE_WINDOW = WIN_ERR;
     }
     $c.free($G.ttyDisplay);
     $G.ttyDisplay = null;
@@ -358,7 +364,7 @@ export async function tty_create_nhwindow(type) {   // wintty.c:874
     }
     if (newid === MAXWIN) {
         await panic($c.lit("No window slots!"));
-        return -1;
+        return WIN_ERR;
     }
     newwin = $c.asRec(await alloc(144), $T.WinDesc, 144);
     wins[newid] = newwin;
@@ -372,7 +378,7 @@ export async function tty_create_nhwindow(type) {   // wintty.c:874
     $t4 = ($t3 = ($t2 = newwin.how = 0, newwin.nitems = $t2), newwin.plist_size = $t3), newwin.npages = $t4;
     newwin.mbehavior = 0;
     switch (type) {
-        case NHW_PERMINVENT + 1:
+        case NHW_BASE:
             $t5 = newwin.offy = 0, newwin.offx = $t5;
             newwin.rows = $G.ttyDisplay.rows;
             newwin.cols = $G.ttyDisplay.cols;
@@ -415,7 +421,7 @@ export async function tty_create_nhwindow(type) {   // wintty.c:874
             break;
         default:
             await panic($c.lit("Tried to create window type %d\n"), type);
-            return -1;
+            return WIN_ERR;
     }
     if (newwin.maxrow) {
         $t14 = $c.asArr(await alloc($c.u32($c.mulu64($c.u64(newwin.maxrow), 8))), 'ptr'), newwin.data = $t14;
@@ -456,7 +462,7 @@ async function erase_menu_or_text(window, cw, clear) {   // wintty.c:990
 function free_window_info(cw, free_data) {   // wintty.c:1011
     let i = 0, temp = null, $t1, $t2, $t3, $t4;
     if (cw.data) {
-        if ($G.WIN_MESSAGE !== -1 && $c.peq(cw, wins[$G.WIN_MESSAGE]) && cw.rows > cw.maxrow) {
+        if ($G.WIN_MESSAGE !== WIN_ERR && $c.peq(cw, wins[$G.WIN_MESSAGE]) && cw.rows > cw.maxrow) {
             cw.maxrow = cw.rows;
         }
         for (i = 0; i < cw.maxrow; i = i + 1 | 0) {
@@ -507,7 +513,7 @@ export async function tty_clear_nhwindow(window) {   // wintty.c:1058
             return;
         }
     } while (0);
-    if (window === -1 || (cw = wins[window]) === null) {
+    if (window === WIN_ERR || (cw = wins[window]) === null) {
         await panic(new $c.Ptr(winpanicstr, 0), window, $c.lit("tty_clear_nhwindow"));
     }
     $G.ttyDisplay.lastwin = window;
@@ -542,7 +548,7 @@ export async function tty_clear_nhwindow(window) {   // wintty.c:1058
             break;
         case NHW_MAP:
             disp.botlx = 1;
-        case NHW_PERMINVENT + 1:
+        case NHW_BASE:
             if (!erasing_tty_screen) {
                 await term_clear_screen();
             }
@@ -740,12 +746,12 @@ async function process_menu_window(window, cw) {   // wintty.c:1359
         for (n = 0, curr = cw.mlist; curr; curr = curr.next) {
             if (curr.gselector && curr.gselector !== curr.selector) {
                 n = n + 1 | 0;
-                gcnt[curr.gselector & 127] = gcnt[curr.gselector & 127] + 1 | 0;
+                gcnt[GSELIDX(curr.gselector)] = gcnt[GSELIDX(curr.gselector)] + 1 | 0;
             }
         }
         if (n > 0) {
             for (rp = new $c.Ptr(gacc, 0), curr = cw.mlist; curr; curr = curr.next) {
-                if (curr.gselector && (curr.gselector !== curr.selector || curr.gselector === GOLD_SYM) && !$c.strchr(new $c.Ptr(gacc, 0), curr.gselector) && (cw.how === PICK_ANY || gcnt[curr.gselector & 127] === 1)) {
+                if (curr.gselector && (curr.gselector !== curr.selector || curr.gselector === GOLD_SYM) && !$c.strchr(new $c.Ptr(gacc, 0), curr.gselector) && (cw.how === PICK_ANY || gcnt[GSELIDX(curr.gselector)] === 1)) {
                     ($t2 = rp, rp = $t2.add(1), $t2).set(0, curr.gselector);
                     rp.set(0, 0);
                 }
@@ -821,7 +827,7 @@ async function process_menu_window(window, cw) {   // wintty.c:1359
                                 $G.ttyDisplay.curx = $c.i16(svx);
                             }
                             $c.putchar(c);
-                        } else if (n === 2 && curr.identifier.a_void !== null && show_obj_syms && curr.glyphinfo.glyph !== MAX_GLYPH) {
+                        } else if (n === 2 && curr.identifier.a_void !== null && show_obj_syms && curr.glyphinfo.glyph !== NO_GLYPH) {
                             gcolor = curr.glyphinfo.gm.sym.color;
                             toggle_menu_attr(1, gcolor, ATR_NONE);
                             $c.putchar(curr.glyphinfo.ttychar);
@@ -913,7 +919,7 @@ async function process_menu_window(window, cw) {   // wintty.c:1359
                     }
                     {
                         dgt = $G.morc - 48 | 0;
-                        count = count < 922337203685477580n || count === 922337203685477580n && dgt <= 7 ? $c.add64($c.mul64(count, 10), dgt) : -1;
+                        count = AppendLongDigit(count, dgt);
                         if (count < 0) {
                             continue L2;
                         }
@@ -1157,7 +1163,7 @@ export async function tty_display_nhwindow(window, blocking) {   // wintty.c:190
             return;
         }
     } while (0);
-    if (window === -1 || (cw = wins[window]) === null) {
+    if (window === WIN_ERR || (cw = wins[window]) === null) {
         await panic(new $c.Ptr(winpanicstr, 0), window, $c.lit("tty_display_nhwindow"));
     }
     if (cw.flags & WIN_CANCELLED) {
@@ -1189,7 +1195,7 @@ export async function tty_display_nhwindow(window, blocking) {   // wintty.c:190
                 await tty_display_nhwindow($G.WIN_MESSAGE, 1);
                 return;
             }
-        case NHW_PERMINVENT + 1:
+        case NHW_BASE:
             $c.fflush($c.__stdoutp);
             break;
         case NHW_TEXT:
@@ -1217,7 +1223,7 @@ export async function tty_display_nhwindow(window, blocking) {   // wintty.c:190
                 }
                 $G.ttyDisplay.toplin = TOPLINE_EMPTY;
             } else {
-                if ($G.WIN_MESSAGE !== -1) {
+                if ($G.WIN_MESSAGE !== WIN_ERR) {
                     await tty_clear_nhwindow($G.WIN_MESSAGE);
                 }
             }
@@ -1239,7 +1245,7 @@ export async function tty_dismiss_nhwindow(window) {   // wintty.c:2001
             return;
         }
     } while (0);
-    if (window === -1 || (cw = wins[window]) === null) {
+    if (window === WIN_ERR || (cw = wins[window]) === null) {
         await panic(new $c.Ptr(winpanicstr, 0), window, $c.lit("tty_dismiss_nhwindow"));
     }
     switch (cw.type) {
@@ -1249,7 +1255,7 @@ export async function tty_dismiss_nhwindow(window) {   // wintty.c:2001
             }
             !!($G.ttyDisplay.toplin === 0) || (await nhassert_failed($c.lit("ttyDisplay->toplin == TOPLINE_EMPTY"), $c.lit("../win/tty/wintty.c"), 2015), 0);
         case NHW_STATUS:
-        case NHW_PERMINVENT + 1:
+        case NHW_BASE:
         case NHW_MAP:
             await tty_curs($G.BASE_WINDOW, 1, $G.ttyDisplay.rows - 1 | 0);
             cw.active = 0;
@@ -1274,7 +1280,7 @@ export async function tty_dismiss_nhwindow(window) {   // wintty.c:2001
 export async function tty_destroy_nhwindow(window) {   // wintty.c:2057
     let cw = null;
     cw = null;
-    if (window === -1 || (cw = wins[window]) === null) {
+    if (window === WIN_ERR || (cw = wins[window]) === null) {
         if (window === $G.WIN_INVEN) {
             return;
         }
@@ -1324,7 +1330,7 @@ export async function tty_curs(window, x, y) {   // wintty.c:2106
             return;
         }
     } while (0);
-    if (window === -1 || (cw = wins[window]) === null) {
+    if (window === WIN_ERR || (cw = wins[window]) === null) {
         await panic(new $c.Ptr(winpanicstr, 0), window, $c.lit("tty_curs"));
     }
     $G.ttyDisplay.lastwin = window;
@@ -1346,7 +1352,7 @@ export async function tty_curs(window, x, y) {   // wintty.c:2106
             case NHW_TEXT:
                 s = $c.lit("[text window]");
                 break;
-            case NHW_PERMINVENT + 1:
+            case NHW_BASE:
                 s = $c.lit("[base window]");
                 break;
         }
@@ -1374,7 +1380,7 @@ export async function tty_curs(window, x, y) {   // wintty.c:2106
     if (cw.type === NHW_MAP) {
         end_glyphout();
     }
-    if (!tc_lcl_data.tc_ND && (cx !== x || x <= 3)) {
+    if (!nh_ND() && (cx !== x || x <= 3)) {
         cmov(x, y);
         return;
     }
@@ -1386,11 +1392,11 @@ export async function tty_curs(window, x, y) {   // wintty.c:2106
     }
     if (cy <= 3 && cx <= 3) {
         await nocmov(x, y);
-    } else if (x <= 3 && cy <= 3 || !tc_lcl_data.tc_CM && x < cx) {
+    } else if (x <= 3 && cy <= 3 || !nh_CM() && x < cx) {
         $c.putchar(13);
         $G.ttyDisplay.curx = 0;
         await nocmov(x, y);
-    } else if (!tc_lcl_data.tc_CM) {
+    } else if (!nh_CM()) {
         await nocmov(x, y);
     } else {
         cmov(x, y);
@@ -1432,7 +1438,7 @@ export async function tty_putstr(window, attr, str) {   // wintty.c:2277
             return;
         }
     } while (0);
-    if (window === -1 || (cw = wins[window]) === null) {
+    if (window === WIN_ERR || (cw = wins[window]) === null) {
         tty_raw_print(str);
         return;
     }
@@ -1450,11 +1456,11 @@ export async function tty_putstr(window, attr, str) {   // wintty.c:2277
                 urgent_message = attr & ATR_URGENT;
                 end_glyphout();
                 if (urgent_message) {
-                    if ((cw.flags & 1) !== 0) {
+                    if ((cw.flags & WIN_STOP) !== 0) {
                         await tty_clear_nhwindow($G.WIN_MESSAGE);
-                        cw.flags = cw.flags & -2;
+                        cw.flags = cw.flags & ~WIN_STOP;
                     }
-                    cw.flags = cw.flags | 4;
+                    cw.flags = cw.flags | WIN_NOSTOP;
                 }
                 if (!suppress_history) {
                     await update_topl(str);
@@ -1462,7 +1468,7 @@ export async function tty_putstr(window, attr, str) {   // wintty.c:2277
                     await remember_topl();
                     await show_topl(str);
                 }
-                cw.flags = cw.flags & -5;
+                cw.flags = cw.flags & ~WIN_NOSTOP;
                 break;
             }
         case NHW_MAP:
@@ -1478,7 +1484,7 @@ export async function tty_putstr(window, attr, str) {   // wintty.c:2277
             cw.cury = $c.add64(cw.cury, 1);
             term_end_attr(attr);
             break;
-        case NHW_PERMINVENT + 1:
+        case NHW_BASE:
             await tty_curs(window, $c.i32($c.add64(cw.curx, 1)), $c.i32(cw.cury));
             term_start_attr(attr);
             while (str.get(0)) {
@@ -1569,8 +1575,8 @@ export async function tty_display_file(fname, complain) {   // wintty.c:2482
         } else {
             datawin = await tty_create_nhwindow(NHW_TEXT);
             empty = 1;
-            if (complain && tc_lcl_data.tc_CD) {
-                wins[datawin].offy = $c.i16(wins[$G.WIN_STATUS].offy + (iflags.wc2_statuslines <= 2 ? 2 : MAX_STATUS_ROWS) | 0);
+            if (complain && nh_CD()) {
+                wins[datawin].offy = $c.i16(wins[$G.WIN_STATUS].offy + StatusRows() | 0);
                 if ((wins[datawin].offy + 12 | 0) > $G.ttyDisplay.rows) {
                     wins[datawin].offy = 0;
                 }
@@ -1600,10 +1606,10 @@ export async function tty_display_file(fname, complain) {   // wintty.c:2482
 export async function tty_start_menu(window, mbehavior) {   // wintty.c:2576
     let cw = null;
     cw = null;
-    if (window === -1 || (cw = wins[window]) === null) {
+    if (window === WIN_ERR || (cw = wins[window]) === null) {
         await panic(new $c.Ptr(winpanicstr, 0), window, $c.lit("tty_start_menu"));
     }
-    mbehavior;
+    nhUse(mbehavior);
     await tty_clear_nhwindow(window);
     return;
 }
@@ -1620,7 +1626,7 @@ export async function tty_add_menu(window, glyphinfo, identifier, ch, gch, attr,
     if (str === null) {
         return;
     }
-    if (window === -1 || (cw = wins[window]) === null || cw.type !== NHW_MENU) {
+    if (window === WIN_ERR || (cw = wins[window]) === null || cw.type !== NHW_MENU) {
         await panic(new $c.Ptr(winpanicstr, 0), window, $c.lit("tty_add_menu"));
     }
     cw.nitems = $c.add64(cw.nitems, 1);
@@ -1666,7 +1672,7 @@ export async function tty_end_menu(window, prompt) {   // wintty.c:2706
     let cw = null, curr = null, len = 0, lmax = 0, n = 0, menu_ch = 0, clr = 0, any = new $T.any(), buf = new Int8Array(128), $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8;
     cw = null;
     clr = NO_COLOR;
-    if (window === -1 || (cw = wins[window]) === null || cw.type !== NHW_MENU) {
+    if (window === WIN_ERR || (cw = wins[window]) === null || cw.type !== NHW_MENU) {
         if (window === $G.WIN_INVEN && !cw) {
             return;
         }
@@ -1737,7 +1743,7 @@ export async function tty_end_menu(window, prompt) {   // wintty.c:2706
 export async function tty_select_menu(window, how, menu_list) {   // wintty.c:2832
     let cw = null, curr = null, mi = null, n = 0, cancelled = 0, $t1;
     cw = null;
-    if (window === -1 || (cw = wins[window]) === null || cw.type !== NHW_MENU) {
+    if (window === WIN_ERR || (cw = wins[window]) === null || cw.type !== NHW_MENU) {
         await panic(new $c.Ptr(winpanicstr, 0), window, $c.lit("tty_select_menu"));
     }
     if (cw.mbehavior === MENU_BEHAVE_PERMINV) {
@@ -1828,7 +1834,7 @@ export async function tty_wait_synch() {   // wintty.c:3681
             return;
         }
     } while (0);
-    if ($G.WIN_MAP === -1 || !$G.ttyDisplay || $G.ttyDisplay.rawprint) {
+    if ($G.WIN_MAP === WIN_ERR || !$G.ttyDisplay || $G.ttyDisplay.rawprint) {
         await getret();
         if ($G.ttyDisplay) {
             $G.ttyDisplay.rawprint = 0;
@@ -1995,7 +2001,7 @@ export async function tty_print_glyph(window, x, y, glyphinfo, bkglyphinfo) {   
     color = glyphinfo.gm.sym.color >>> 0;
     special = glyphinfo.gm.glyphflags;
     await tty_curs(window, x, y);
-    if (tc_lcl_data.tc_ul_hack && ch === 95) {
+    if (ul_hack() && ch === 95) {
         $c.putchar(32);
         backsp();
     }
@@ -2012,7 +2018,7 @@ export async function tty_print_glyph(window, x, y, glyphinfo, bkglyphinfo) {   
                 $G.ttyDisplay.colorflags = 0;
                 colordone = 1;
             } else {
-                color = (glyphinfo.gm.customcolor & 16777215) >>> 0;
+                color = COLORVAL(glyphinfo.gm.customcolor);
             }
         }
         if (!colordone) {
@@ -2028,7 +2034,7 @@ export async function tty_print_glyph(window, x, y, glyphinfo, bkglyphinfo) {   
     } else if ((special & MG_PET) >>> 0 !== 0 && iflags.wc_hilite_pet) {
         term_start_attr(iflags.wc2_petattr);
         petattr = 1;
-    } else if (((special & MG_OBJPILE) >>> 0 !== 0 && iflags.hilite_pile || (special & MG_FEMALE) >>> 0 !== 0 && flags.debug && iflags.wizmgender || (special & (MG_DETECT | 256 | MG_BW_ICE | 512 | MG_BW_ENGR)) >>> 0 !== 0) && iflags.wc_inverse) {
+    } else if (((special & MG_OBJPILE) >>> 0 !== 0 && iflags.hilite_pile || (special & MG_FEMALE) >>> 0 !== 0 && wizard() && iflags.wizmgender || (special & (MG_DETECT | MG_BW_LAVA | MG_BW_ICE | MG_BW_SINK | MG_BW_ENGR)) >>> 0 !== 0) && iflags.wc_inverse) {
         term_start_attr(ATR_INVERSE);
         inverse_on = 1;
     }
@@ -2101,8 +2107,8 @@ export async function tty_nhgetch() {   // wintty.c:4112
     term_curs_set(1);
     $c.fflush($c.__stdoutp);
     nomux_capture_write_input_boundary();
-    if ($G.WIN_MESSAGE !== -1 && wins[$G.WIN_MESSAGE]) {
-        wins[$G.WIN_MESSAGE].flags = wins[$G.WIN_MESSAGE].flags & -2;
+    if ($G.WIN_MESSAGE !== WIN_ERR && wins[$G.WIN_MESSAGE]) {
+        wins[$G.WIN_MESSAGE].flags = wins[$G.WIN_MESSAGE].flags & ~WIN_STOP;
     }
     if (iflags.debug_fuzzer) {
         i = await randomkey();
@@ -2150,7 +2156,7 @@ export function win_tty_init(dir) {   // wintty.c:4225
 export async function tty_putmixed(window, attr, str) {   // wintty.c:4243
     let cw = null, buf = new Int8Array(256), utf8flag = Int32Array.of(0);
     utf8flag[0] = 0;
-    if (window === -1 || (cw = wins[window]) === null) {
+    if (window === WIN_ERR || (cw = wins[window]) === null) {
         tty_raw_print(str);
         return;
     }
@@ -2169,7 +2175,7 @@ export async function tty_putmixed(window, attr, str) {   // wintty.c:4243
 }
 export async function tty_status_init() {   // wintty.c:4409
     let i = 0, num_rows = 0, $t1;
-    num_rows = iflags.wc2_statuslines <= 2 ? 2 : MAX_STATUS_ROWS;
+    num_rows = StatusRows();
     fieldorder = num_rows !== 3 ? new $c.Ptr(twolineorder, 0) : new $c.Ptr(threelineorder, 0);
     for (i = 0; i < MAXBLSTATS; i = i + 1 | 0) {
         tty_status[NOW][i].idx = BL_FLUSH;
@@ -2285,7 +2291,7 @@ async function make_things_fit(force_update) {   // wintty.c:4657
     let trycnt = 0, fitting = 0, requirement = 0, rowsz = new Int32Array(3), num_rows = 0, condrow = 0, otheroptions = 0;
     fitting = 0;
     otheroptions = 0;
-    num_rows = iflags.wc2_statuslines <= 2 ? 2 : MAX_STATUS_ROWS;
+    num_rows = StatusRows();
     condrow = num_rows - 1 | 0;
     cond_shrinklvl = 0;
     if (enc_shrinklvl > 0 && num_rows === 2) {
@@ -2334,7 +2340,7 @@ async function check_fields(forcefields, sz) {   // wintty.c:4720
     if (!windowdata_init && !await check_windowdata()) {
         return 0;
     }
-    num_rows = iflags.wc2_statuslines <= 2 ? 2 : MAX_STATUS_ROWS;
+    num_rows = StatusRows();
     for (row = 0; row < num_rows; row = row + 1 | 0) {
         sz.set(row, 0);
         col = 1;
@@ -2392,7 +2398,7 @@ async function tty_putstatusfield(text, x, y) {   // wintty.c:4876
     let i = 0, n = 0, ncols = 0, nrows = 0, lth = 0, cw = null;
     lth = 0;
     cw = null;
-    if ($G.WIN_STATUS === -1 || (cw = wins[$G.WIN_STATUS]) === null) {
+    if ($G.WIN_STATUS === WIN_ERR || (cw = wins[$G.WIN_STATUS]) === null) {
         await panic($c.lit("tty_putstatusfield: Invalid WinDesc\n"));
     }
     ncols = $c.i32(cw.cols);
@@ -2448,7 +2454,7 @@ function shrink_dlvl(lvl) {   // wintty.c:4947
     }
 }
 async function check_windowdata() {   // wintty.c:4967
-    if ($G.WIN_STATUS === -1 || wins[$G.WIN_STATUS] === null) {
+    if ($G.WIN_STATUS === WIN_ERR || wins[$G.WIN_STATUS] === null) {
         paniclog($c.lit("check_windowdata"), $c.lit(" null status window."));
         return 0;
     } else if (!windowdata_init) {
@@ -2504,11 +2510,11 @@ async function render_status() {   // wintty.c:5068
     coloridx = 0;
     attrmask = 0;
     cw = null;
-    if ($G.WIN_STATUS === -1 || (cw = wins[$G.WIN_STATUS]) === null) {
+    if ($G.WIN_STATUS === WIN_ERR || (cw = wins[$G.WIN_STATUS]) === null) {
         paniclog($c.lit("render_status"), $c.lit("WIN_ERR on status window."));
         return;
     }
-    num_rows = iflags.wc2_statuslines <= 2 ? 2 : MAX_STATUS_ROWS;
+    num_rows = StatusRows();
     for (row = 0; row < num_rows; row = row + 1 | 0) {
         do {
             if (program_state.done_hup) {
@@ -2830,13 +2836,19 @@ async function render_status() {   // wintty.c:5068
     }
     return;
 }
+function StatusRows() {
+    return iflags.wc2_statuslines <= 2 ? 2 : MAX_STATUS_ROWS;
+}
+function GSELIDX(c) {
+    return c & 127;
+}
 
 export function $init() {
     tty_procs.$copyFrom(new $T.window_procs());
     tty_procs.name = $c.lit("tty");
     tty_procs.wp_id = wp_tty;
     tty_procs.wincap = 0 | WC_COLOR | WC_HILITE_PET | WC_INVERSE | WC_EIGHT_BIT_IN;
-    tty_procs.wincap2 = 0 | WC2_SELECTSAVED | WC2_HILITE_STATUS | WC2_HITPOINTBAR | 128 | 256 | WC2_DARKGRAY | 32768 | 16384 | WC2_STATUSLINES | WC2_U_UTF8STR | WC2_PETATTR | WC2_EXTRACOLORS | 524288;
+    tty_procs.wincap2 = 0 | WC2_SELECTSAVED | WC2_HILITE_STATUS | WC2_HITPOINTBAR | WC2_FLUSH_STATUS | WC2_RESET_STATUS | WC2_DARKGRAY | WC2_SUPPRESS_HIST | WC2_URGENT_MESG | WC2_STATUSLINES | WC2_U_UTF8STR | WC2_PETATTR | WC2_EXTRACOLORS | WC2_EXTRASTATUS;
     tty_procs.has_color[0] = 1;
     tty_procs.has_color[1] = 1;
     tty_procs.has_color[2] = 1;
@@ -2914,17 +2926,17 @@ export function $init() {
     $G.GFlag = 0;
     calling_from_update_inventory = 0;
     default_menu_cmds.fill(0);
-    default_menu_cmds[0] = 94;
-    default_menu_cmds[1] = 124;
-    default_menu_cmds[2] = 62;
-    default_menu_cmds[3] = 60;
-    default_menu_cmds[4] = 46;
-    default_menu_cmds[5] = 45;
-    default_menu_cmds[6] = 64;
-    default_menu_cmds[7] = 44;
-    default_menu_cmds[8] = 92;
-    default_menu_cmds[9] = 126;
-    default_menu_cmds[10] = 58;
+    default_menu_cmds[0] = MENU_FIRST_PAGE;
+    default_menu_cmds[1] = MENU_LAST_PAGE;
+    default_menu_cmds[2] = MENU_NEXT_PAGE;
+    default_menu_cmds[3] = MENU_PREVIOUS_PAGE;
+    default_menu_cmds[4] = MENU_SELECT_ALL;
+    default_menu_cmds[5] = MENU_UNSELECT_ALL;
+    default_menu_cmds[6] = MENU_INVERT_ALL;
+    default_menu_cmds[7] = MENU_SELECT_PAGE;
+    default_menu_cmds[8] = MENU_UNSELECT_PAGE;
+    default_menu_cmds[9] = MENU_INVERT_PAGE;
+    default_menu_cmds[10] = MENU_SEARCH;
     default_menu_cmds[11] = 0;
     resize_mesg = 0;
     tty_menu_promptstyle.$copyFrom(new $T.color_and_attr());
@@ -2973,15 +2985,15 @@ export function $init() {
     twolineorder[0][7] = BL_ALIGN;
     twolineorder[0][8] = BL_SCORE;
     twolineorder[0][9] = BL_FLUSH;
-    twolineorder[0][10] = BL_FLUSH;
-    twolineorder[0][11] = BL_FLUSH;
-    twolineorder[0][12] = BL_FLUSH;
-    twolineorder[0][13] = BL_FLUSH;
-    twolineorder[0][14] = BL_FLUSH;
-    twolineorder[0][15] = BL_FLUSH;
-    twolineorder[0][16] = BL_FLUSH;
-    twolineorder[0][17] = BL_FLUSH;
-    twolineorder[0][18] = BL_FLUSH;
+    twolineorder[0][10] = blPAD;
+    twolineorder[0][11] = blPAD;
+    twolineorder[0][12] = blPAD;
+    twolineorder[0][13] = blPAD;
+    twolineorder[0][14] = blPAD;
+    twolineorder[0][15] = blPAD;
+    twolineorder[0][16] = blPAD;
+    twolineorder[0][17] = blPAD;
+    twolineorder[0][18] = blPAD;
     twolineorder[1][0] = BL_LEVELDESC;
     twolineorder[1][1] = BL_GOLD;
     twolineorder[1][2] = BL_HP;
@@ -3002,21 +3014,21 @@ export function $init() {
     twolineorder[1][17] = BL_VERS;
     twolineorder[1][18] = BL_FLUSH;
     twolineorder[2][0] = BL_FLUSH;
-    twolineorder[2][1] = BL_FLUSH;
-    twolineorder[2][2] = BL_FLUSH;
-    twolineorder[2][3] = BL_FLUSH;
-    twolineorder[2][4] = BL_FLUSH;
-    twolineorder[2][5] = BL_FLUSH;
-    twolineorder[2][6] = BL_FLUSH;
-    twolineorder[2][7] = BL_FLUSH;
-    twolineorder[2][8] = BL_FLUSH;
-    twolineorder[2][9] = BL_FLUSH;
-    twolineorder[2][10] = BL_FLUSH;
-    twolineorder[2][11] = BL_FLUSH;
-    twolineorder[2][12] = BL_FLUSH;
-    twolineorder[2][13] = BL_FLUSH;
-    twolineorder[2][14] = BL_FLUSH;
-    twolineorder[2][15] = BL_FLUSH;
+    twolineorder[2][1] = blPAD;
+    twolineorder[2][2] = blPAD;
+    twolineorder[2][3] = blPAD;
+    twolineorder[2][4] = blPAD;
+    twolineorder[2][5] = blPAD;
+    twolineorder[2][6] = blPAD;
+    twolineorder[2][7] = blPAD;
+    twolineorder[2][8] = blPAD;
+    twolineorder[2][9] = blPAD;
+    twolineorder[2][10] = blPAD;
+    twolineorder[2][11] = blPAD;
+    twolineorder[2][12] = blPAD;
+    twolineorder[2][13] = blPAD;
+    twolineorder[2][14] = blPAD;
+    twolineorder[2][15] = blPAD;
     for (let $i0 = 0; $i0 < 3; $i0++) {
         threelineorder[$i0].fill(0);
     }
@@ -3029,16 +3041,16 @@ export function $init() {
     threelineorder[0][6] = BL_CH;
     threelineorder[0][7] = BL_SCORE;
     threelineorder[0][8] = BL_FLUSH;
-    threelineorder[0][9] = BL_FLUSH;
-    threelineorder[0][10] = BL_FLUSH;
-    threelineorder[0][11] = BL_FLUSH;
-    threelineorder[0][12] = BL_FLUSH;
-    threelineorder[0][13] = BL_FLUSH;
-    threelineorder[0][14] = BL_FLUSH;
-    threelineorder[0][15] = BL_FLUSH;
-    threelineorder[0][16] = BL_FLUSH;
-    threelineorder[0][17] = BL_FLUSH;
-    threelineorder[0][18] = BL_FLUSH;
+    threelineorder[0][9] = blPAD;
+    threelineorder[0][10] = blPAD;
+    threelineorder[0][11] = blPAD;
+    threelineorder[0][12] = blPAD;
+    threelineorder[0][13] = blPAD;
+    threelineorder[0][14] = blPAD;
+    threelineorder[0][15] = blPAD;
+    threelineorder[0][16] = blPAD;
+    threelineorder[0][17] = blPAD;
+    threelineorder[0][18] = blPAD;
     threelineorder[1][0] = BL_ALIGN;
     threelineorder[1][1] = BL_GOLD;
     threelineorder[1][2] = BL_HP;
@@ -3052,12 +3064,12 @@ export function $init() {
     threelineorder[1][10] = BL_HUNGER;
     threelineorder[1][11] = BL_CAP;
     threelineorder[1][12] = BL_FLUSH;
-    threelineorder[1][13] = BL_FLUSH;
-    threelineorder[1][14] = BL_FLUSH;
-    threelineorder[1][15] = BL_FLUSH;
-    threelineorder[1][16] = BL_FLUSH;
-    threelineorder[1][17] = BL_FLUSH;
-    threelineorder[1][18] = BL_FLUSH;
+    threelineorder[1][13] = blPAD;
+    threelineorder[1][14] = blPAD;
+    threelineorder[1][15] = blPAD;
+    threelineorder[1][16] = blPAD;
+    threelineorder[1][17] = blPAD;
+    threelineorder[1][18] = blPAD;
     threelineorder[2][0] = BL_LEVELDESC;
     threelineorder[2][1] = BL_TIME;
     threelineorder[2][2] = BL_CONDITION;
@@ -3066,17 +3078,17 @@ export function $init() {
     threelineorder[2][5] = BL_TERRAIN;
     threelineorder[2][6] = BL_VERS;
     threelineorder[2][7] = BL_FLUSH;
-    threelineorder[2][8] = BL_FLUSH;
-    threelineorder[2][9] = BL_FLUSH;
-    threelineorder[2][10] = BL_FLUSH;
-    threelineorder[2][11] = BL_FLUSH;
-    threelineorder[2][12] = BL_FLUSH;
-    threelineorder[2][13] = BL_FLUSH;
-    threelineorder[2][14] = BL_FLUSH;
-    threelineorder[2][15] = BL_FLUSH;
-    threelineorder[2][16] = BL_FLUSH;
-    threelineorder[2][17] = BL_FLUSH;
-    threelineorder[2][18] = BL_FLUSH;
+    threelineorder[2][8] = blPAD;
+    threelineorder[2][9] = blPAD;
+    threelineorder[2][10] = blPAD;
+    threelineorder[2][11] = blPAD;
+    threelineorder[2][12] = blPAD;
+    threelineorder[2][13] = blPAD;
+    threelineorder[2][14] = blPAD;
+    threelineorder[2][15] = blPAD;
+    threelineorder[2][16] = blPAD;
+    threelineorder[2][17] = blPAD;
+    threelineorder[2][18] = blPAD;
     fieldorder = null;
     for (let $i0 = 0; $i0 < 3; $i0++) {
         finalx[$i0].fill(0);

@@ -4,7 +4,8 @@ import * as $T from './types.js';
 import { $G } from './globals.js';
 import { u } from './decl.js';
 import { panic } from './end.js';
-import { COUNTING, FREEING, WRITING } from './hack.h.js';
+import { FALSE, TRUE } from './global.h.js';
+import { release_data, update_file } from './hack.macros.js';
 import { distmin } from './hacklib.js';
 import { RIN_STEALTH } from './objects.h.js';
 import { sfi_int, sfi_nhcoord, sfo_int, sfo_nhcoord } from './sfbase.js';
@@ -52,21 +53,21 @@ export function hastrack(x, y) {   // track.c:63
     let i = 0;
     for (i = 0; i < utcnt[0]; i = i + 1 | 0) {
         if (utrack[i].x === x && utrack[i].y === y) {
-            return 1;
+            return TRUE;
         }
     }
-    return 0;
+    return FALSE;
 }
 export async function save_track(nhfp) {   // track.c:76
     let i = 0;
-    if (nhfp.mode & (COUNTING | WRITING)) {
+    if (update_file(nhfp)) {
         await sfo_int(nhfp, new $c.Ptr(utcnt, 0), $c.lit("track-utcnt"));
         await sfo_int(nhfp, new $c.Ptr(utpnt, 0), $c.lit("track-utpnt"));
         for (i = 0; i < utcnt[0]; i = i + 1 | 0) {
             await sfo_nhcoord(nhfp, $c.relem(utrack, i), $c.lit("utrack"));
         }
     }
-    if (nhfp.mode & FREEING) {
+    if (release_data(nhfp)) {
         initrack();
     }
 }

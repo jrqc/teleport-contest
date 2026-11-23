@@ -4,6 +4,7 @@ import * as $T from './types.js';
 import { $G } from './globals.js';
 import { CLR_BRIGHT_MAGENTA, CLR_MAGENTA, CLR_RED, CLR_WHITE, NO_COLOR } from './color.h.js';
 import { AMULET_SYM, ARMOR_SYM, BALL_SYM, CHAIN_SYM, DEF_ANGEL, DEF_ANT, DEF_BAT, DEF_BLOB, DEF_CENTAUR, DEF_COCKATRICE, DEF_DEMON, DEF_DOG, DEF_DRAGON, DEF_EEL, DEF_ELEMENTAL, DEF_EYE, DEF_FELINE, DEF_FUNGUS, DEF_GHOST, DEF_GIANT, DEF_GNOME, DEF_GOLEM, DEF_GREMLIN, DEF_HUMAN, DEF_HUMANOID, DEF_IMP, DEF_INVISIBLE, DEF_JABBERWOCK, DEF_JELLY, DEF_KOBOLD, DEF_KOP, DEF_LEPRECHAUN, DEF_LICH, DEF_LIGHT, DEF_LIZARD, DEF_MIMIC, DEF_MIMIC_DEF, DEF_MUMMY, DEF_NAGA, DEF_NYMPH, DEF_OGRE, DEF_ORC, DEF_PIERCER, DEF_PUDDING, DEF_QUADRUPED, DEF_QUANTMECH, DEF_RODENT, DEF_RUSTMONST, DEF_SNAKE, DEF_SPIDER, DEF_TRAPPER, DEF_TROLL, DEF_UMBER, DEF_UNICORN, DEF_VAMPIRE, DEF_VORTEX, DEF_WORM, DEF_WORM_TAIL, DEF_WRAITH, DEF_XAN, DEF_XORN, DEF_YETI, DEF_ZOMBIE, DEF_ZRUTY, FOOD_SYM, GEM_SYM, GOLD_SYM, ILLOBJ_SYM, POTION_SYM, RING_SYM, ROCK_SYM, SCROLL_SYM, SPBOOK_SYM, TOOL_SYM, VENOM_SYM, WAND_SYM, WEAPON_SYM } from './defsym.h.js';
+import { FALSE, TRUE } from './global.h.js';
 import { MAXOCLASSES } from './objclass.h.js';
 import { MAXMCLASSES, MAXPCHARS } from './sym.h.js';
 
@@ -34,11 +35,11 @@ export function def_char_to_monclass(ch) {   // drawing.c:108
 }
 export function def_char_is_furniture(ch) {   // drawing.c:120
     let i = 0, furniture = 0;
-    furniture = 0;
+    furniture = FALSE;
     for (i = 0; i < MAXPCHARS; i = i + 1 | 0) {
         if (!furniture) {
             if (!$c.strncmp(defsyms[i].explanation, new $c.Ptr(def_char_is_furniture$first_furniture, 0), 5)) {
-                furniture = 1;
+                furniture = TRUE;
             }
         }
         if (furniture) {

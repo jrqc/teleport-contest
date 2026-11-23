@@ -3,17 +3,18 @@ import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
 import { A_LAWFUL } from './align.h.js';
-import { ART_ORB_OF_DETECTION } from './artilist.h.js';
 import { isok } from './cmd.js';
-import { c_color_names, gf, gm, gs, gv, svc, svd, svl, svm, u } from './decl.js';
+import { c_color_names, gf, gm, gs, svc, svd, svl, svm, u } from './decl.js';
 import { S_ANGEL, S_DEMON } from './defsym.h.js';
 import { newsym } from './display.js';
 import { Monnam, hcolor } from './do_name.js';
 import { mon_arrive, mon_catchup_elapsed_time } from './dog.js';
 import { def_monsyms } from './drawing.js';
-import { In_W_tower, In_hell, builds_up, on_level } from './dungeon.js';
-import { LARGEST_INT } from './global.h.js';
+import { In_W_tower, builds_up, on_level } from './dungeon.js';
+import { Inhell } from './dungeon.macros.js';
+import { FALSE, LARGEST_INT, TRUE } from './global.h.js';
 import { BOLT_LIM, MM_NOMSG, MM_NOWAIT, NO_MM_FLAGS, RLOC_MSG } from './hack.h.js';
+import { distu, min } from './hack.macros.js';
 import { dist2, sgn } from './hacklib.js';
 import { makemon, set_malign, unmakemon } from './makemon.js';
 import { expels } from './mhitu.js';
@@ -22,16 +23,19 @@ import { add_to_minv, mksobj, obj_extract_self } from './mkobj.js';
 import { healmon, mnearto, mnexto, monnear, wake_nearto } from './mon.js';
 import { AT_MAGC } from './monattk.h.js';
 import { attacktype, big_to_little } from './mondata.js';
-import { G_GENOD, G_HELL, G_NOHELL, M2_MINION, M3_COVETOUS, M3_WANTSAMUL, M3_WANTSARTI, M3_WANTSBELL, M3_WANTSBOOK, M3_WANTSCAND, NEUTRAL } from './monflag.h.js';
+import { is_covetous } from './mondata.macros.js';
+import { G_GENOD, G_HELL, G_NOHELL, M2_MINION, M3_WANTSAMUL, M3_WANTSARTI, M3_WANTSBELL, M3_WANTSBOOK, M3_WANTSCAND, NEUTRAL } from './monflag.h.js';
 import { mons } from './monst.js';
 import { M_AP_MONSTER, STRAT_GOAL, STRAT_GROUND, STRAT_HEAL, STRAT_MONSTR, STRAT_NONE, STRAT_PLAYER, STRAT_STRATMASK, STRAT_WAITFORU } from './monst.h.js';
+import { DEADMONSTER, helpless } from './monst.macros.js';
 import { PM_ALEAX, PM_ARCHON, PM_ARCH_LICH, PM_BALUCHITHERIUM, PM_BARBED_DEVIL, PM_BLACK_DRAGON, PM_CAPTAIN, PM_CARNIVOROUS_APE, PM_COCKATRICE, PM_COUATL, PM_DISENCHANTER, PM_DISPLACER_BEAST, PM_ELF_NOBLE, PM_ELVEN_MONARCH, PM_ETTIN, PM_FIRE_ELEMENTAL, PM_FIRE_GIANT, PM_FLOATING_EYE, PM_GENETIC_ENGINEER, PM_GREEN_DRAGON, PM_GREEN_SLIME, PM_GREMLIN, PM_GUARDIAN_NAGA, PM_HORNED_DEVIL, PM_HUMAN, PM_IRON_GOLEM, PM_JABBERWOCK, PM_LEOCROTTA, PM_MASTER_MIND_FLAYER, PM_MINOTAUR, PM_OCHRE_JELLY, PM_OGRE_TYRANT, PM_OLOG_HAI, PM_ORANGE_DRAGON, PM_OWLBEAR, PM_PURPLE_WORM, PM_RED_DRAGON, PM_SILVER_DRAGON, PM_STALKER, PM_STORM_GIANT, PM_TRAPPER, PM_TROLL, PM_UMBER_HULK, PM_VAMPIRE, PM_VAMPIRE_LEADER, PM_WATER_DEMON, PM_WINGED_GARGOYLE, PM_WIZARD_OF_YENDOR, PM_XAN, PM_XORN, PM_YELLOW_DRAGON, PM_ZRUTY } from './monsters.h.js';
+import { any_quest_artifact } from './obj.macros.js';
 import { AMULET_OF_YENDOR, BELL_OF_OPENING, CANDELABRUM_OF_INVOCATION, FAKE_AMULET_OF_YENDOR, SPE_BOOK_OF_THE_DEAD } from './objects.h.js';
 import { Tobjnam, distant_name, doname } from './objnam.js';
 import { You, You_feel, pline, verbalize } from './pline.js';
 import { inhistemple, mon_aligntyp } from './priest.js';
-import { BLINDED, DEAF, PROT_FROM_SHAPE_CHANGERS } from './prop.h.js';
 import { com_pager } from './questpgr.js';
+import { MON_AT } from './rm.macros.js';
 import { rn2, rnd } from './rnd.js';
 import { inhishop } from './shk.js';
 import { rndcurse } from './sit.js';
@@ -39,7 +43,9 @@ import { stairway_find_type_dir } from './stairs.js';
 import { mpickobj } from './steal.js';
 import { enexto, noteleport_level, rloc, rloc_to } from './teleport.js';
 import { MAGIC_PORTAL } from './trap.h.js';
-import { IN_SIGHT } from './vision.h.js';
+import { cansee } from './vision.macros.js';
+import { u_at } from './you.macros.js';
+import { Blind, Deaf, Protection_from_shape_changers } from './youprop.macros.js';
 
 const MAXNASTIES = 10;
 
@@ -68,7 +74,7 @@ export async function amulet() {   // wizard.c:61
         return;
     }
     for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
-        if (mtmp.mhp < 1) {
+        if (DEADMONSTER(mtmp)) {
             continue;
         }
         if (mtmp.iswiz | 0 && mtmp.msleeping | 0 && !rn2(40)) {
@@ -92,7 +98,7 @@ export function mon_has_amulet(mtmp) {   // wizard.c:106
 export function mon_has_special(mtmp) {   // wizard.c:117
     let otmp = null;
     for (otmp = mtmp.minvent; otmp; otmp = otmp.nobj) {
-        if (otmp.otyp === AMULET_OF_YENDOR || otmp.oartifact >= ART_ORB_OF_DETECTION || otmp.otyp === BELL_OF_OPENING || otmp.otyp === CANDELABRUM_OF_INVOCATION || otmp.otyp === SPE_BOOK_OF_THE_DEAD) {
+        if (otmp.otyp === AMULET_OF_YENDOR || any_quest_artifact(otmp) || otmp.otyp === BELL_OF_OPENING || otmp.otyp === CANDELABRUM_OF_INVOCATION || otmp.otyp === SPE_BOOK_OF_THE_DEAD) {
             return 1;
         }
     }
@@ -120,7 +126,7 @@ function mon_has_arti(mtmp, otyp) {   // wizard.c:165
             if (otmp.otyp === otyp) {
                 return 1;
             }
-        } else if (otmp.oartifact >= ART_ORB_OF_DETECTION) {
+        } else if (any_quest_artifact(otmp)) {
             return 1;
         }
     }
@@ -144,7 +150,7 @@ function on_ground(otyp) {   // wizard.c:202
             if (otmp.otyp === otyp) {
                 return otmp;
             }
-        } else if (otmp.oartifact >= ART_ORB_OF_DETECTION) {
+        } else if (any_quest_artifact(otmp)) {
             return otmp;
         }
     }
@@ -193,7 +199,7 @@ function target_on(mask, mtmp) {   // wizard.c:236
 }
 function strategy(mtmp) {   // wizard.c:270
     let strat = 0, dstrat = 0;
-    if (!(mtmp.data.mflags3 & M3_COVETOUS) || mtmp.isshk | 0 && inhishop(mtmp) || mtmp.ispriest | 0 && inhistemple(mtmp)) {
+    if (!is_covetous(mtmp.data) || mtmp.isshk | 0 && inhishop(mtmp) || mtmp.ispriest | 0 && inhistemple(mtmp)) {
         return STRAT_NONE;
     }
     switch ($c.div32(Math.imul(mtmp.mhp, 3), mtmp.mhpmax)) {
@@ -248,9 +254,9 @@ function strategy(mtmp) {   // wizard.c:270
 export async function choose_stairs(sx, sy, dir) {   // wizard.c:332
     let stway = null, stdir = 0;
     stdir = $c.i8(await builds_up(u.uz) ? dir : !dir ? 1 : 0);
-    stway = stairway_find_type_dir(0, stdir);
+    stway = stairway_find_type_dir(FALSE, stdir);
     if (!stway) {
-        stway = stairway_find_type_dir(1, stdir);
+        stway = stairway_find_type_dir(TRUE, stdir);
         if (!stway) {
             for (stway = gs.stairs; stway; stway = stway.next) {
                 if (stway.tolev.dnum !== u.uz.dnum) {
@@ -258,9 +264,9 @@ export async function choose_stairs(sx, sy, dir) {   // wizard.c:332
                 }
             }
             if (!stway) {
-                stway = stairway_find_type_dir(0, $c.i8(!stdir ? 1 : 0));
+                stway = stairway_find_type_dir(FALSE, $c.i8(!stdir ? 1 : 0));
                 if (!stway) {
-                    stway = stairway_find_type_dir(1, $c.i8(!stdir ? 1 : 0));
+                    stway = stairway_find_type_dir(TRUE, $c.i8(!stdir ? 1 : 0));
                 }
             }
         }
@@ -279,7 +285,7 @@ export async function tactics(mtmp) {   // wizard.c:369
         case STRAT_HEAL:
             mx = mtmp.mx, my = mtmp.my;
             if (u.uswallow | 0 && $c.peq(u.ustuck, mtmp)) {
-                await expels(mtmp, mtmp.data, 1);
+                await expels(mtmp, mtmp.data, TRUE);
             }
             await choose_stairs(new $c.Ptr(sx, 0), new $c.Ptr(sy, 0), $c.i8($c.remu32(mtmp.m_id, 2)));
             mtmp.mavenge = (1) & 1;
@@ -288,13 +294,13 @@ export async function tactics(mtmp) {   // wizard.c:369
                     await rloc(mtmp, RLOC_MSG);
                 }
             } else if (sx[0] && (mx !== sx[0] || my !== sy[0])) {
-                if (!await noteleport_level(mtmp) && !await mnearto(mtmp, sx[0], sy[0], 1, RLOC_MSG)) {
+                if (!await noteleport_level(mtmp) && !await mnearto(mtmp, sx[0], sy[0], TRUE, RLOC_MSG)) {
                     await rloc_to(mtmp, mx, my);
                     return 0;
                 }
                 mx = mtmp.mx, my = mtmp.my;
             }
-            if (dist2(mx, my, u.ux, u.uy) > BOLT_LIM * BOLT_LIM) {
+            if (distu(mx, my) > BOLT_LIM * BOLT_LIM) {
                 if (mtmp.mhp <= (mtmp.mhpmax - 8 | 0)) {
                     await healmon(mtmp, rnd(8), 0);
                     return 1;
@@ -317,18 +323,18 @@ export async function tactics(mtmp) {   // wizard.c:369
                 if (await noteleport_level(mtmp) && !monnear(mtmp, tx, ty)) {
                     return 0;
                 }
-                if (tx === u.ux && ty === u.uy || where === STRAT_PLAYER) {
+                if (u_at(tx, ty) || where === STRAT_PLAYER) {
                     mx = mtmp.mx, my = mtmp.my;
-                    if (await noteleport_level(mtmp) || !await mnearto(mtmp, tx, ty, 0, RLOC_MSG)) {
+                    if (await noteleport_level(mtmp) || !await mnearto(mtmp, tx, ty, FALSE, RLOC_MSG)) {
                         await rloc_to(mtmp, mx, my);
                     }
                     return 0;
                 }
                 if (where === STRAT_GROUND) {
-                    if (!(svl.level.monsters[tx][ty] !== null) || mtmp.mx === tx && mtmp.my === ty) {
+                    if (!MON_AT(tx, ty) || mtmp.mx === tx && mtmp.my === ty) {
                         await rloc_to(mtmp, tx, ty);
                         if ((otmp = on_ground(which_arti(targ))) !== null) {
-                            if ((gv.viz_array.get(mtmp.my).get(mtmp.mx) & IN_SIGHT) !== 0) {
+                            if (cansee(mtmp.mx, mtmp.my)) {
                                 await pline($c.lit("%s picks up %s."), await Monnam(mtmp), await distant_name(otmp, doname));
                             }
                             await obj_extract_self(otmp);
@@ -345,7 +351,7 @@ export async function tactics(mtmp) {   // wizard.c:369
                     }
                 } else {
                     mx = mtmp.mx, my = mtmp.my;
-                    if (!await noteleport_level(mtmp) && !await mnearto(mtmp, tx, ty, 0, RLOC_MSG)) {
+                    if (!await noteleport_level(mtmp) && !await mnearto(mtmp, tx, ty, FALSE, RLOC_MSG)) {
                         await rloc_to(mtmp, mx, my);
                     }
                     return 0;
@@ -358,26 +364,26 @@ export async function has_aggravatables(mon) {   // wizard.c:474
     let mtmp = null, in_w_tower = 0;
     in_w_tower = await In_W_tower(mon.mx, mon.my, u.uz);
     if (in_w_tower !== await In_W_tower(u.ux, u.uy, u.uz)) {
-        return 0;
+        return FALSE;
     }
     for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
-        if (mtmp.mhp < 1) {
+        if (DEADMONSTER(mtmp)) {
             continue;
         }
         if (in_w_tower !== await In_W_tower(mtmp.mx, mtmp.my, u.uz)) {
             continue;
         }
-        if ($c.andu64(mtmp.mstrategy, STRAT_WAITFORU) !== 0 || (mtmp.msleeping | 0 || !mtmp.mcanmove)) {
-            return 1;
+        if ($c.andu64(mtmp.mstrategy, STRAT_WAITFORU) !== 0 || helpless(mtmp)) {
+            return TRUE;
         }
     }
-    return 0;
+    return FALSE;
 }
 export async function aggravate() {   // wizard.c:494
     let mtmp = null, in_w_tower = 0;
     in_w_tower = await In_W_tower(u.ux, u.uy, u.uz);
     for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
-        if (mtmp.mhp < 1) {
+        if (DEADMONSTER(mtmp)) {
             continue;
         }
         if (in_w_tower !== await In_W_tower(mtmp.mx, mtmp.my, u.uz)) {
@@ -396,9 +402,9 @@ export async function clonewiz() {   // wizard.c:517
     if ((mtmp2 = await makemon($c.relem(mons, PM_WIZARD_OF_YENDOR), u.ux, u.uy, MM_NOWAIT)) !== null) {
         $t2 = ($t1 = $c.i8(mtmp2.mpeaceful = (0) & 1), mtmp2.mtame = $t1) >>> 0, mtmp2.msleeping = ($t2) & 1;
         if (!u.uhave.amulet && rn2(2)) {
-            await add_to_minv(mtmp2, await mksobj(FAKE_AMULET_OF_YENDOR, 1, 0));
+            await add_to_minv(mtmp2, await mksobj(FAKE_AMULET_OF_YENDOR, TRUE, FALSE));
         }
-        if (!(u.uprops[PROT_FROM_SHAPE_CHANGERS].intrinsic || u.uprops[PROT_FROM_SHAPE_CHANGERS].extrinsic)) {
+        if (!Protection_from_shape_changers()) {
             mtmp2.m_ap_type = M_AP_MONSTER;
             $t3 = wizapp[rn2(12)], mtmp2.mappearance = $t3;
         }
@@ -412,7 +418,7 @@ export function pick_nasty(difcap) {   // wizard.c:538
         res = nasties[rn2(44)];
     }
     alt = res;
-    if ((svm.mvitals[res].mvflags & G_GENOD) !== 0 || difcap > 0 && mons[res].difficulty >= difcap || (mons[res].geno & (In_hell(u.uz) ? G_NOHELL : G_HELL)) !== 0) {
+    if ((svm.mvitals[res].mvflags & G_GENOD) !== 0 || difcap > 0 && mons[res].difficulty >= difcap || (mons[res].geno & (Inhell() ? G_NOHELL : G_HELL)) !== 0) {
         alt = big_to_little(res);
     }
     if (alt !== res && (svm.mvitals[alt].mvflags & G_GENOD) === 0) {
@@ -427,8 +433,8 @@ export function pick_nasty(difcap) {   // wizard.c:538
 export async function nasty(summoner) {   // wizard.c:591
     let mtmp = null, bypos = new $T.nhcoord(), i = 0, j = 0, count = 0, census = 0, tmp = 0, makeindex = 0, s_cls = 0, m_cls = 0, difcap = 0, trylimit = 0, castalign = 0, mmflags = 0, $t1, $t2, $t3;
     mmflags = $c.u32(summoner ? MM_NOMSG : NO_MM_FLAGS);
-    census = monster_census(0);
-    if (!rn2(10) && In_hell(u.uz)) {
+    census = monster_census(FALSE);
+    if (!rn2(10) && Inhell()) {
         count = await msummon(null);
     } else {
         count = 0;
@@ -465,7 +471,7 @@ export async function nasty(summoner) {   // wizard.c:591
                     }
                     if (mtmp) {
                         if ($c.peq(mtmp.data, $c.relem(mons, PM_ARCH_LICH)) || $c.peq(mtmp.data, $c.relem(mons, PM_ARCHON))) {
-                            tmp = mons[PM_ARCHON].difficulty < mons[PM_ARCH_LICH].difficulty ? mons[PM_ARCHON].difficulty : mons[PM_ARCH_LICH].difficulty;
+                            tmp = min(mons[PM_ARCHON].difficulty, mons[PM_ARCH_LICH].difficulty);
                             if (!difcap || difcap > tmp) {
                                 difcap = tmp;
                             }
@@ -480,7 +486,7 @@ export async function nasty(summoner) {   // wizard.c:591
         }
     }
     if (count) {
-        count = monster_census(0) - census | 0;
+        count = monster_census(FALSE) - census | 0;
     }
     return count;
 }
@@ -508,7 +514,7 @@ export async function resurrect() {   // wizard.c:715
                 if ((mtmp.mfrozen | 0) === 1) {
                     mtmp.mfrozen = (0) & 127, mtmp.mcanmove = (1) & 1;
                 }
-                if (!(mtmp.msleeping | 0 || !mtmp.mcanmove)) {
+                if (!helpless(mtmp)) {
                     mmtmp.set(0, mtmp.nmon);
                     await mon_arrive(mtmp, -1);
                     if (!mtmp.mx) {
@@ -524,7 +530,7 @@ export async function resurrect() {   // wizard.c:715
         mtmp.mstrategy = $c.andu64(mtmp.mstrategy, 18446744072904245247n);
         mtmp.mtame = 0, mtmp.mpeaceful = (0) & 1;
         set_malign(mtmp);
-        if (!(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf)) {
+        if (!Deaf()) {
             await pline($c.lit("A voice booms out..."));
             await verbalize($c.lit("So thou thought thou couldst %s me, fool."), verb);
         }
@@ -539,7 +545,7 @@ export async function intervene() {   // wizard.c:785
             await You_feel($c.lit("vaguely nervous."));
             break;
         case 2:
-            if (!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked)) {
+            if (!Blind()) {
                 await You($c.lit("notice a %s glow surrounding you."), hcolor(c_color_names.c_black));
             }
             await rndcurse();
@@ -559,12 +565,12 @@ export function wizdeadorgone() {   // wizard.c:815
     let $t1;
     svc.context.no_of_wizards = svc.context.no_of_wizards - 1 >>> 0;
     if (!u.uevent.udemigod) {
-        u.uevent.udemigod = (1) & 1;
+        u.uevent.udemigod = (TRUE) & 1;
         $t1 = (rn2(250) + 50 | 0) >>> 0, u.udg_cnt = $t1;
     }
 }
 export async function cuss(mtmp) {   // wizard.c:846
-    if (u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf) {
+    if (Deaf()) {
         return;
     }
     if (mtmp.iswiz) {

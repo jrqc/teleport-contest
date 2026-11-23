@@ -4,7 +4,10 @@ import * as $T from './types.js';
 import { $G } from './globals.js';
 import { gr, gs, svl, svn, svr } from './decl.js';
 import { christen_monst, roguename } from './do_name.js';
+import { FALSE, TRUE } from './global.h.js';
 import { NO_MM_FLAGS } from './hack.h.js';
+import { max, min } from './hack.macros.js';
+import { nhUse } from './lint.macros.js';
 import { makemon } from './makemon.js';
 import { add_room, dodoor } from './mklev.js';
 import { curse, mksobj_at, weight } from './mkobj.js';
@@ -26,24 +29,24 @@ function roguejoin(x1, y1, x2, y2, horiz) {   // extralev.c:21
     let x = 0, y = 0, middle = 0;
     if (horiz) {
         middle = $c.i16(x1 + rn2((x2 - x1 | 0) + 1 | 0) | 0);
-        for (x = $c.i16(x1 < middle ? x1 : middle); x <= (x1 > middle ? x1 : middle); x = $c.i16(x + 1)) {
+        for (x = $c.i16(min(x1, middle)); x <= max(x1, middle); x = $c.i16(x + 1)) {
             corr(x, y1);
         }
-        for (y = $c.i16(y1 < y2 ? y1 : y2); y <= (y1 > y2 ? y1 : y2); y = $c.i16(y + 1)) {
+        for (y = $c.i16(min(y1, y2)); y <= max(y1, y2); y = $c.i16(y + 1)) {
             corr(middle, y);
         }
-        for (x = $c.i16(middle < x2 ? middle : x2); x <= (middle > x2 ? middle : x2); x = $c.i16(x + 1)) {
+        for (x = $c.i16(min(middle, x2)); x <= max(middle, x2); x = $c.i16(x + 1)) {
             corr(x, y2);
         }
     } else {
         middle = $c.i16(y1 + rn2((y2 - y1 | 0) + 1 | 0) | 0);
-        for (y = $c.i16(y1 < middle ? y1 : middle); y <= (y1 > middle ? y1 : middle); y = $c.i16(y + 1)) {
+        for (y = $c.i16(min(y1, middle)); y <= max(y1, middle); y = $c.i16(y + 1)) {
             corr(x1, y);
         }
-        for (x = $c.i16(x1 < x2 ? x1 : x2); x <= (x1 > x2 ? x1 : x2); x = $c.i16(x + 1)) {
+        for (x = $c.i16(min(x1, x2)); x <= max(x1, x2); x = $c.i16(x + 1)) {
             corr(x, middle);
         }
-        for (y = $c.i16(middle < y2 ? middle : y2); y <= (middle > y2 ? middle : y2); y = $c.i16(y + 1)) {
+        for (y = $c.i16(min(middle, y2)); y <= max(middle, y2); y = $c.i16(y + 1)) {
             corr(x2, y);
         }
     }
@@ -92,7 +95,7 @@ async function roguecorr(x, y, dir) {   // extralev.c:45
             svl.level.locations[tox][toy].flags = (D_NODOOR) & 31;
             toy = $c.i16(toy - 1);
         }
-        roguejoin(fromx, fromy, tox, toy, 0);
+        roguejoin(fromx, fromy, tox, toy, FALSE);
         return;
     } else if (dir === XL_RIGHT) {
         gr.r[x][y].doortable = $c.u8(gr.r[x][y].doortable & ~XL_RIGHT);
@@ -136,7 +139,7 @@ async function roguecorr(x, y, dir) {   // extralev.c:45
             svl.level.locations[tox][toy].flags = (D_NODOOR) & 31;
             tox = $c.i16(tox - 1);
         }
-        roguejoin(fromx, fromy, tox, toy, 1);
+        roguejoin(fromx, fromy, tox, toy, TRUE);
         return;
     } else {
         await impossible($c.lit("corridor in direction %d?"), dir);
@@ -193,11 +196,11 @@ export async function makeroguerooms() {   // extralev.c:193
     for (y = 0; y < 3; y = $c.i16(y + 1)) {
         for (x = 0; x < 3; x = $c.i16(x + 1)) {
             if (!rn2(5) && (svn.nroom || x < 2 && y < 2)) {
-                gr.r[x][y].real = 0;
+                gr.r[x][y].real = FALSE;
                 $t1 = $c.i16(rn2(22) + 2 | 0), gr.r[x][y].rlx = $t1;
                 $t2 = $c.i16(rn2(y === 2 ? 4 : 3) + 2 | 0), gr.r[x][y].rly = $t2;
             } else {
-                gr.r[x][y].real = 1;
+                gr.r[x][y].real = TRUE;
                 $t3 = $c.i16(rn2(22) + 2 | 0), gr.r[x][y].dx = $t3;
                 $t4 = $c.i16(rn2(y === 2 ? 4 : 3) + 2 | 0), gr.r[x][y].dy = $t4;
                 $t5 = $c.i16(rnd((23 - gr.r[x][y].dx | 0) + 1 | 0)), gr.r[x][y].rlx = $t5;
@@ -218,7 +221,7 @@ export async function makeroguerooms() {   // extralev.c:193
                 lowy = $c.i16(Math.imul(7, y) + gr.r[x][y].rly | 0);
                 hix = $c.i16((((1 + Math.imul(26, x) | 0) + gr.r[x][y].rlx | 0) + gr.r[x][y].dx | 0) - 1 | 0);
                 hiy = $c.i16(((Math.imul(7, y) + gr.r[x][y].rly | 0) + gr.r[x][y].dy | 0) - 1 | 0);
-                await add_room(lowx, lowy, hix, hiy, $c.i8(!rn2(7) ? 1 : 0), OROOM, 0);
+                await add_room(lowx, lowy, hix, hiy, $c.i8(!rn2(7) ? 1 : 0), OROOM, FALSE);
             }
         }
     }
@@ -259,31 +262,31 @@ export async function makerogueghost() {   // extralev.c:288
     }
     ghost.msleeping = (1) & 1;
     ghost = await christen_monst(ghost, roguename());
-    ghost;
+    nhUse(ghost);
     if (rn2(4)) {
-        ghostobj = await mksobj_at(FOOD_RATION, x, y, 0, 0);
+        ghostobj = await mksobj_at(FOOD_RATION, x, y, FALSE, FALSE);
         $t1 = rnd(7), ghostobj.quan = $t1;
         $t2 = await weight(ghostobj) >>> 0, ghostobj.owt = $t2;
     }
     if (rn2(2)) {
-        ghostobj = await mksobj_at(MACE, x, y, 0, 0);
+        ghostobj = await mksobj_at(MACE, x, y, FALSE, FALSE);
         $t3 = $c.i8(rnd(3)), ghostobj.spe = $t3;
         if (rn2(4)) {
             await curse(ghostobj);
         }
     } else {
-        ghostobj = await mksobj_at(TWO_HANDED_SWORD, x, y, 0, 0);
+        ghostobj = await mksobj_at(TWO_HANDED_SWORD, x, y, FALSE, FALSE);
         $t4 = $c.i8(rnd(5) - 2 | 0), ghostobj.spe = $t4;
         if (rn2(4)) {
             await curse(ghostobj);
         }
     }
-    ghostobj = await mksobj_at(BOW, x, y, 0, 0);
+    ghostobj = await mksobj_at(BOW, x, y, FALSE, FALSE);
     ghostobj.spe = 1;
     if (rn2(4)) {
         await curse(ghostobj);
     }
-    ghostobj = await mksobj_at(ARROW, x, y, 0, 0);
+    ghostobj = await mksobj_at(ARROW, x, y, FALSE, FALSE);
     ghostobj.spe = 0;
     $t5 = rn2(10) + 25 | 0, ghostobj.quan = $t5;
     $t6 = await weight(ghostobj) >>> 0, ghostobj.owt = $t6;
@@ -291,27 +294,27 @@ export async function makerogueghost() {   // extralev.c:288
         await curse(ghostobj);
     }
     if (rn2(2)) {
-        ghostobj = await mksobj_at(RING_MAIL, x, y, 0, 0);
+        ghostobj = await mksobj_at(RING_MAIL, x, y, FALSE, FALSE);
         $t7 = $c.i8(rn2(3)), ghostobj.spe = $t7;
         if (!rn2(3)) {
-            ghostobj.oerodeproof = (1) & 1;
+            ghostobj.oerodeproof = (TRUE) & 1;
         }
         if (rn2(4)) {
             await curse(ghostobj);
         }
     } else {
-        ghostobj = await mksobj_at(PLATE_MAIL, x, y, 0, 0);
+        ghostobj = await mksobj_at(PLATE_MAIL, x, y, FALSE, FALSE);
         $t8 = $c.i8(rnd(5) - 2 | 0), ghostobj.spe = $t8;
         if (!rn2(3)) {
-            ghostobj.oerodeproof = (1) & 1;
+            ghostobj.oerodeproof = (TRUE) & 1;
         }
         if (rn2(4)) {
             await curse(ghostobj);
         }
     }
     if (rn2(2)) {
-        ghostobj = await mksobj_at(FAKE_AMULET_OF_YENDOR, x, y, 1, 0);
-        ghostobj.known = (1) & 1;
+        ghostobj = await mksobj_at(FAKE_AMULET_OF_YENDOR, x, y, TRUE, FALSE);
+        ghostobj.known = (TRUE) & 1;
     }
 }
 

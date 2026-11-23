@@ -3,8 +3,6 @@ import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
 import { A_CHAOTIC } from './align.h.js';
-import { is_art } from './artifact.js';
-import { ART_SNICKERSNEE } from './artilist.h.js';
 import { adjabil, adjattrib, init_attr, newhp, vary_init_attr } from './attrib.js';
 import { A_CON, A_STR } from './attrib.h.js';
 import { max_rank_sz } from './botl.js';
@@ -16,14 +14,18 @@ import { init_uhunger } from './eat.js';
 import { panic } from './end.js';
 import { newpw } from './exper.js';
 import { debugcore } from './files.js';
+import { discover } from './flag.macros.js';
+import { FALSE, TRUE } from './global.h.js';
 import { inv_weight } from './hack.js';
 import { addinv, useupall } from './invent.js';
+import { nhUse } from './lint.macros.js';
 import { dealloc_obj, mkobj, mksobj, weight } from './mkobj.js';
 import { PM_ARCHEOLOGIST, PM_BARBARIAN, PM_CAVE_DWELLER, PM_CLERIC, PM_DWARF, PM_ELF, PM_GNOME, PM_HEALER, PM_HUMAN, PM_KNIGHT, PM_MONK, PM_ORC, PM_RANGER, PM_ROGUE, PM_SAMURAI, PM_TOURIST, PM_VALKYRIE, PM_WIZARD } from './monsters.h.js';
 import { discover_object } from './o_init.js';
-import { ARM_BOOTS, ARM_CLOAK, ARM_GLOVES, ARM_HELM, ARM_SHIELD, ARM_SHIRT, ARM_SUIT, MAXOCLASSES, MAXSPELL, NUM_OBJECTS } from './objclass.h.js';
+import { Is_container, bimanual, is_ammo, is_boots, is_cloak, is_gloves, is_graystone, is_helmet, is_launcher, is_missile, is_pole, is_shield, is_shirt, is_spear, is_suit, is_weptool } from './obj.macros.js';
+import { MAXOCLASSES, MAXSPELL, NUM_OBJECTS } from './objclass.h.js';
 import { obj_descr, objects } from './objects.js';
-import { APPLE, ARROW, AXE, BAG_OF_TRICKS, BATTLE_AXE, BELL, BLINDFOLD, BOW, BUGLE, BULLWHIP, CARROT, CHAIN_MAIL, CLOAK_OF_DISPLACEMENT, CLOAK_OF_MAGIC_RESISTANCE, CLOVE_OF_GARLIC, CLUB, CORNUTHAUM, CRAM_RATION, CREDIT_CARD, CROSSBOW, CROSSBOW_BOLT, DAGGER, DART, DUNCE_CAP, DWARVISH_CLOAK, DWARVISH_IRON_HELM, DWARVISH_MATTOCK, DWARVISH_MITHRIL_COAT, DWARVISH_ROUNDSHIELD, DWARVISH_SHORT_SWORD, DWARVISH_SPEAR, ELVEN_ARROW, ELVEN_BOOTS, ELVEN_BOW, ELVEN_BROADSWORD, ELVEN_CLOAK, ELVEN_DAGGER, ELVEN_LEATHER_HELM, ELVEN_MITHRIL_COAT, ELVEN_SHIELD, ELVEN_SHORT_SWORD, ELVEN_SPEAR, EXPENSIVE_CAMERA, FEDORA, FLINT, FOOD_RATION, FORTUNE_COOKIE, GOLD_PIECE, HAWAIIAN_SHIRT, HELMET, KATANA, LANCE, LARGE_BOX, LEASH, LEATHER_ARMOR, LEATHER_DRUM, LEATHER_GLOVES, LEATHER_JACKET, LEMBAS_WAFER, LOADSTONE, LOCK_PICK, LONG_SWORD, LUCKSTONE, MACE, MAGIC_MARKER, OIL_LAMP, ORANGE, ORCISH_ARROW, ORCISH_BOW, ORCISH_CHAIN_MAIL, ORCISH_CLOAK, ORCISH_DAGGER, ORCISH_HELM, ORCISH_RING_MAIL, ORCISH_SHIELD, ORCISH_SHORT_SWORD, ORCISH_SPEAR, PANCAKE, PICK_AXE, POT_ACID, POT_EXTRA_HEALING, POT_FULL_HEALING, POT_HALLUCINATION, POT_HEALING, POT_OIL, POT_POLYMORPH, POT_SICKNESS, POT_WATER, QUARTERSTAFF, RING_MAIL, RIN_AGGRAVATE_MONSTER, RIN_HUNGER, RIN_LEVITATION, RIN_POISON_RESISTANCE, RIN_POLYMORPH, RIN_POLYMORPH_CONTROL, ROBE, ROCK, SACK, SCALPEL, SCR_AMNESIA, SCR_BLANK_PAPER, SCR_ENCHANT_WEAPON, SCR_FIRE, SCR_MAGIC_MAPPING, SHORT_SWORD, SHURIKEN, SLING, SMALL_SHIELD, SPEAR, SPE_BLANK_PAPER, SPE_CONFUSE_MONSTER, SPE_EXTRA_HEALING, SPE_FORCE_BOLT, SPE_HEALING, SPE_NOVEL, SPE_POLYMORPH, SPE_PROTECTION, SPE_STONE_TO_FLESH, SPLINT_MAIL, SPRIG_OF_WOLFSBANE, STATUE, STETHOSCOPE, STRANGE_OBJECT, TINNING_KIT, TIN_OPENER, TOOLED_HORN, TOUCHSTONE, TOWEL, TRIPE_RATION, TWO_HANDED_SWORD, URUK_HAI_SHIELD, WAN_NOTHING, WAN_POLYMORPH, WAN_SLEEP, WAN_WISHING, WOODEN_FLUTE, WOODEN_HARP, YA, YUMI } from './objects.h.js';
+import { APPLE, ARROW, AXE, BATTLE_AXE, BELL, BLINDFOLD, BOW, BUGLE, BULLWHIP, CARROT, CHAIN_MAIL, CLOAK_OF_DISPLACEMENT, CLOAK_OF_MAGIC_RESISTANCE, CLOVE_OF_GARLIC, CLUB, CORNUTHAUM, CRAM_RATION, CREDIT_CARD, CROSSBOW, CROSSBOW_BOLT, DAGGER, DART, DUNCE_CAP, DWARVISH_CLOAK, DWARVISH_IRON_HELM, DWARVISH_MATTOCK, DWARVISH_MITHRIL_COAT, DWARVISH_ROUNDSHIELD, DWARVISH_SHORT_SWORD, DWARVISH_SPEAR, ELVEN_ARROW, ELVEN_BOOTS, ELVEN_BOW, ELVEN_BROADSWORD, ELVEN_CLOAK, ELVEN_DAGGER, ELVEN_LEATHER_HELM, ELVEN_MITHRIL_COAT, ELVEN_SHIELD, ELVEN_SHORT_SWORD, ELVEN_SPEAR, EXPENSIVE_CAMERA, FEDORA, FLINT, FOOD_RATION, FORTUNE_COOKIE, GOLD_PIECE, HAWAIIAN_SHIRT, HELMET, KATANA, LANCE, LEASH, LEATHER_ARMOR, LEATHER_DRUM, LEATHER_GLOVES, LEATHER_JACKET, LEMBAS_WAFER, LOCK_PICK, LONG_SWORD, MACE, MAGIC_MARKER, OIL_LAMP, ORANGE, ORCISH_ARROW, ORCISH_BOW, ORCISH_CHAIN_MAIL, ORCISH_CLOAK, ORCISH_DAGGER, ORCISH_HELM, ORCISH_RING_MAIL, ORCISH_SHIELD, ORCISH_SHORT_SWORD, ORCISH_SPEAR, PANCAKE, PICK_AXE, POT_ACID, POT_EXTRA_HEALING, POT_FULL_HEALING, POT_HALLUCINATION, POT_HEALING, POT_OIL, POT_POLYMORPH, POT_SICKNESS, POT_WATER, QUARTERSTAFF, RING_MAIL, RIN_AGGRAVATE_MONSTER, RIN_HUNGER, RIN_LEVITATION, RIN_POISON_RESISTANCE, RIN_POLYMORPH, RIN_POLYMORPH_CONTROL, ROBE, ROCK, SACK, SCALPEL, SCR_AMNESIA, SCR_BLANK_PAPER, SCR_ENCHANT_WEAPON, SCR_FIRE, SCR_MAGIC_MAPPING, SHORT_SWORD, SHURIKEN, SLING, SMALL_SHIELD, SPEAR, SPE_BLANK_PAPER, SPE_CONFUSE_MONSTER, SPE_EXTRA_HEALING, SPE_FORCE_BOLT, SPE_HEALING, SPE_NOVEL, SPE_POLYMORPH, SPE_PROTECTION, SPE_STONE_TO_FLESH, SPLINT_MAIL, SPRIG_OF_WOLFSBANE, STATUE, STETHOSCOPE, STRANGE_OBJECT, TINNING_KIT, TIN_OPENER, TOOLED_HORN, TOUCHSTONE, TOWEL, TRIPE_RATION, TWO_HANDED_SWORD, URUK_HAI_SHIELD, WAN_NOTHING, WAN_POLYMORPH, WAN_SLEEP, WAN_WISHING, WOODEN_FLUTE, WOODEN_HARP, YA, YUMI } from './objects.h.js';
 import { Japanese_item_name } from './objnam.js';
 import { NON_PM } from './permonst.h.js';
 import { pline } from './pline.js';
@@ -31,7 +33,7 @@ import { set_uasmon } from './polyself.js';
 import { BLINDED, FROMOUTSIDE, JUMPING, W_ARM, W_ARMC, W_ARMF, W_ARMG, W_ARMH, W_ARMS, W_ARMU } from './prop.h.js';
 import { rn2, rnd, rne } from './rnd.js';
 import { aligns } from './role.js';
-import { P_ATTACK_SPELL, P_AXE, P_BARE_HANDED_COMBAT, P_BASIC, P_BOOMERANG, P_BOW, P_BROAD_SWORD, P_CLERIC_SPELL, P_CLUB, P_CROSSBOW, P_DAGGER, P_DART, P_DIVINATION_SPELL, P_ENCHANTMENT_SPELL, P_ESCAPE_SPELL, P_EXPERT, P_FLAIL, P_GRAND_MASTER, P_HAMMER, P_HEALING_SPELL, P_KNIFE, P_LANCE, P_LONG_SWORD, P_MACE, P_MASTER, P_MATTER_SPELL, P_MORNING_STAR, P_NONE, P_NUM_SKILLS, P_PICK_AXE, P_POLEARMS, P_QUARTERSTAFF, P_RIDING, P_SABER, P_SHORT_SWORD, P_SHURIKEN, P_SKILLED, P_SLING, P_SPEAR, P_TRIDENT, P_TWO_HANDED_SWORD, P_TWO_WEAPON_COMBAT, P_UNICORN_HORN, P_UNSKILLED, P_WHIP } from './skills.h.js';
+import { P_ATTACK_SPELL, P_AXE, P_BARE_HANDED_COMBAT, P_BASIC, P_BOOMERANG, P_BOW, P_BROAD_SWORD, P_CLERIC_SPELL, P_CLUB, P_CROSSBOW, P_DAGGER, P_DART, P_DIVINATION_SPELL, P_ENCHANTMENT_SPELL, P_ESCAPE_SPELL, P_EXPERT, P_FLAIL, P_GRAND_MASTER, P_HAMMER, P_HEALING_SPELL, P_KNIFE, P_LANCE, P_LONG_SWORD, P_MACE, P_MARTIAL_ARTS, P_MASTER, P_MATTER_SPELL, P_MORNING_STAR, P_NONE, P_NUM_SKILLS, P_PICK_AXE, P_POLEARMS, P_QUARTERSTAFF, P_RIDING, P_SABER, P_SHORT_SWORD, P_SHURIKEN, P_SKILLED, P_SLING, P_SPEAR, P_TRIDENT, P_TWO_HANDED_SWORD, P_TWO_WEAPON_COMBAT, P_UNICORN_HORN, P_UNSKILLED, P_WHIP } from './skills.h.js';
 import { initialspell, num_spells, spell_skilltype } from './spell.js';
 import { NO_SPELL } from './spell.h.js';
 import { hidden_gold } from './vault.js';
@@ -41,6 +43,7 @@ import { setworn } from './worn.js';
 import { A_CURRENT, A_ORIGINAL, LEFT_HANDED, RIGHT_HANDED } from './you.h.js';
 
 const UNDEF_TYP = 0;
+const UNDEF_SPE = 127;
 const UNDEF_BLESS = 2;
 
 const u_init_role$M_spell = $c.nulls(3);   // static in u_init_role()
@@ -89,7 +92,7 @@ async function knows_object(obj, override_pauper) {   // u_init.c:575
     if (u.uroleplay.pauper && !override_pauper) {
         return;
     }
-    await discover_object(obj, 1, 0, 0);
+    await discover_object(obj, TRUE, FALSE, FALSE);
 }
 async function knows_class(sym) {   // u_init.c:586
     let odummy = new $T.obj(), o = null, ct = 0;
@@ -105,10 +108,10 @@ async function knows_class(sym) {   // u_init.c:586
         }
         if (sym === WEAPON_CLASS) {
             odummy.otyp = $c.i16(ct);
-            if (!(gu.urole.mnum === PM_KNIGHT) && !(gu.urole.mnum === PM_SAMURAI) && ((o.oclass === WEAPON_CLASS || o.oclass === TOOL_CLASS) && (objects[o.otyp].oc_subtyp === P_POLEARMS || objects[o.otyp].oc_subtyp === P_LANCE || is_art(o, ART_SNICKERSNEE)))) {
+            if (!(gu.urole.mnum === PM_KNIGHT) && !(gu.urole.mnum === PM_SAMURAI) && is_pole(o)) {
                 continue;
             }
-            if (gu.urole.mnum === PM_RANGER && (!(o.oclass === WEAPON_CLASS && objects[o.otyp].oc_subtyp >= P_BOW && objects[o.otyp].oc_subtyp <= P_CROSSBOW) && !((o.oclass === WEAPON_CLASS || o.oclass === GEM_CLASS) && objects[o.otyp].oc_subtyp >= -P_CROSSBOW && objects[o.otyp].oc_subtyp <= -P_BOW) && !(o.oclass === WEAPON_CLASS && objects[o.otyp].oc_subtyp === P_SPEAR))) {
+            if (gu.urole.mnum === PM_RANGER && (!is_launcher(o) && !is_ammo(o) && !is_spear(o))) {
                 continue;
             }
             if (gu.urole.mnum === PM_ROGUE && objects[o.otyp].oc_subtyp !== P_DAGGER) {
@@ -116,7 +119,7 @@ async function knows_class(sym) {   // u_init.c:586
             }
         }
         if (objects[ct].oc_class === sym && !objects[ct].oc_magic) {
-            await knows_object(ct, 0);
+            await knows_object(ct, FALSE);
         }
     }
 }
@@ -133,8 +136,8 @@ async function u_init_role() {   // u_init.c:637
             } else if (!rn2(5)) {
                 await ini_inv($c.relem(Magicmarker, 0));
             }
-            await knows_object(SACK, 0);
-            await knows_object(TOUCHSTONE, 0);
+            await knows_object(SACK, FALSE);
+            await knows_object(TOUCHSTONE, FALSE);
             break;
         case PM_BARBARIAN:
             if (rn2(100) >= 50) {
@@ -157,7 +160,7 @@ async function u_init_role() {   // u_init.c:637
             if (!rn2(25)) {
                 await ini_inv($c.relem(Lamp, 0));
             }
-            await knows_object(POT_FULL_HEALING, 0);
+            await knows_object(POT_FULL_HEALING, FALSE);
             break;
         case PM_KNIGHT:
             await ini_inv($c.relem(Knight, 0));
@@ -175,7 +178,7 @@ async function u_init_role() {   // u_init.c:637
                     await ini_inv($c.relem(Lamp, 0));
                 }
                 await knows_class(ARMOR_CLASS);
-                await knows_object(SHURIKEN, 0);
+                await knows_object(SHURIKEN, FALSE);
                 break;
             }
         case PM_CLERIC:
@@ -185,7 +188,7 @@ async function u_init_role() {   // u_init.c:637
             } else if (!rn2(10)) {
                 await ini_inv($c.relem(Lamp, 0));
             }
-            await knows_object(POT_WATER, 1);
+            await knows_object(POT_WATER, TRUE);
             break;
         case PM_RANGER:
             await ini_inv($c.relem(Ranger, 0));
@@ -197,7 +200,7 @@ async function u_init_role() {   // u_init.c:637
             if (!rn2(5)) {
                 await ini_inv($c.relem(Blindfold, 0));
             }
-            await knows_object(SACK, 0);
+            await knows_object(SACK, FALSE);
             await knows_class(WEAPON_CLASS);
             break;
         case PM_SAMURAI:
@@ -212,7 +215,7 @@ async function u_init_role() {   // u_init.c:637
                     continue;
                 }
                 if (Japanese_item_name(i, null)) {
-                    await knows_object(i, 0);
+                    await knows_object(i, FALSE);
                 }
             }
             break;
@@ -275,26 +278,26 @@ async function u_init_race() {   // u_init.c:792
                 Instrument[1].trbless = 0;
                 await ini_inv($c.relem(Instrument, 0));
             }
-            await knows_object(ELVEN_SHORT_SWORD, 0);
-            await knows_object(ELVEN_ARROW, 0);
-            await knows_object(ELVEN_BOW, 0);
-            await knows_object(ELVEN_SPEAR, 0);
-            await knows_object(ELVEN_DAGGER, 0);
-            await knows_object(ELVEN_BROADSWORD, 0);
-            await knows_object(ELVEN_MITHRIL_COAT, 0);
-            await knows_object(ELVEN_LEATHER_HELM, 0);
-            await knows_object(ELVEN_SHIELD, 0);
-            await knows_object(ELVEN_BOOTS, 0);
-            await knows_object(ELVEN_CLOAK, 0);
+            await knows_object(ELVEN_SHORT_SWORD, FALSE);
+            await knows_object(ELVEN_ARROW, FALSE);
+            await knows_object(ELVEN_BOW, FALSE);
+            await knows_object(ELVEN_SPEAR, FALSE);
+            await knows_object(ELVEN_DAGGER, FALSE);
+            await knows_object(ELVEN_BROADSWORD, FALSE);
+            await knows_object(ELVEN_MITHRIL_COAT, FALSE);
+            await knows_object(ELVEN_LEATHER_HELM, FALSE);
+            await knows_object(ELVEN_SHIELD, FALSE);
+            await knows_object(ELVEN_BOOTS, FALSE);
+            await knows_object(ELVEN_CLOAK, FALSE);
             break;
         case PM_DWARF:
-            await knows_object(DWARVISH_SPEAR, 0);
-            await knows_object(DWARVISH_SHORT_SWORD, 0);
-            await knows_object(DWARVISH_MATTOCK, 0);
-            await knows_object(DWARVISH_IRON_HELM, 0);
-            await knows_object(DWARVISH_MITHRIL_COAT, 0);
-            await knows_object(DWARVISH_CLOAK, 0);
-            await knows_object(DWARVISH_ROUNDSHIELD, 0);
+            await knows_object(DWARVISH_SPEAR, FALSE);
+            await knows_object(DWARVISH_SHORT_SWORD, FALSE);
+            await knows_object(DWARVISH_MATTOCK, FALSE);
+            await knows_object(DWARVISH_IRON_HELM, FALSE);
+            await knows_object(DWARVISH_MITHRIL_COAT, FALSE);
+            await knows_object(DWARVISH_CLOAK, FALSE);
+            await knows_object(DWARVISH_ROUNDSHIELD, FALSE);
             break;
         case PM_GNOME:
             break;
@@ -302,17 +305,17 @@ async function u_init_race() {   // u_init.c:792
             if (!(gu.urole.mnum === PM_WIZARD)) {
                 await ini_inv($c.relem(Xtra_food, 0));
             }
-            await knows_object(ORCISH_SHORT_SWORD, 0);
-            await knows_object(ORCISH_ARROW, 0);
-            await knows_object(ORCISH_BOW, 0);
-            await knows_object(ORCISH_SPEAR, 0);
-            await knows_object(ORCISH_DAGGER, 0);
-            await knows_object(ORCISH_CHAIN_MAIL, 0);
-            await knows_object(ORCISH_RING_MAIL, 0);
-            await knows_object(ORCISH_HELM, 0);
-            await knows_object(ORCISH_SHIELD, 0);
-            await knows_object(URUK_HAI_SHIELD, 0);
-            await knows_object(ORCISH_CLOAK, 0);
+            await knows_object(ORCISH_SHORT_SWORD, FALSE);
+            await knows_object(ORCISH_ARROW, FALSE);
+            await knows_object(ORCISH_BOW, FALSE);
+            await knows_object(ORCISH_SPEAR, FALSE);
+            await knows_object(ORCISH_DAGGER, FALSE);
+            await knows_object(ORCISH_CHAIN_MAIL, FALSE);
+            await knows_object(ORCISH_RING_MAIL, FALSE);
+            await knows_object(ORCISH_HELM, FALSE);
+            await knows_object(ORCISH_SHIELD, FALSE);
+            await knows_object(URUK_HAI_SHIELD, FALSE);
+            await knows_object(ORCISH_CLOAK, FALSE);
             break;
         default:
             break;
@@ -363,15 +366,15 @@ async function pauper_reinit() {   // u_init.c:870
             break;
     }
     if (preknown !== STRANGE_OBJECT) {
-        await knows_object(preknown, 1);
+        await knows_object(preknown, TRUE);
     }
 }
 async function u_init_carry_attr_boost() {   // u_init.c:929
     while (inv_weight() > 0) {
-        if (await adjattrib(A_STR, 1, 1)) {
+        if (await adjattrib(A_STR, 1, TRUE)) {
             continue;
         }
-        if (await adjattrib(A_CON, 1, 1)) {
+        if (await adjattrib(A_CON, 1, TRUE)) {
             continue;
         }
         break;
@@ -381,7 +384,7 @@ export async function u_init_misc() {   // u_init.c:944
     let i = 0, tmpuroleplay = new $T.u_roleplay(), $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11;
     tmpuroleplay.$copyFrom(u.uroleplay);
     flags.female = $c.i8(flags.initgend);
-    flags.beginner = 1;
+    flags.beginner = TRUE;
     $c.__builtin___memset_chk(u, 0, 2760, 2760);
     u.ustuck = null;
     $c.__builtin___memset_chk(new $c.FieldRef($G, "ubirthday", "i64"), 0, 8, 8);
@@ -390,7 +393,7 @@ export async function u_init_misc() {   // u_init.c:944
     u.uz.dlevel = 1;
     u.uz0.dlevel = 0;
     u.utolev.$copyFrom(u.uz);
-    u.umoved = 0;
+    u.umoved = FALSE;
     u.umortality = 0;
     u.ugrave_arise = NON_PM;
     $t1 = u.umonster = gu.urole.mnum, u.umonnum = $t1;
@@ -473,11 +476,11 @@ async function restricted_spell_discipline(otyp) {   // u_init.c:1091
     this_skill = spell_skilltype(otyp);
     while (skills && skills.skill !== P_NONE) {
         if (skills.skill === this_skill) {
-            return 0;
+            return FALSE;
         }
         skills = $c.radd(skills, 1);
     }
-    return 1;
+    return TRUE;
 }
 function trquan(trop) {   // u_init.c:1106
     if (!trop.trquan_min) {
@@ -488,15 +491,15 @@ function trquan(trop) {   // u_init.c:1106
 async function ini_inv_mkobj_filter(oclass, got_level1_spellbook) {   // u_init.c:1115
     let obj = null, otyp = 0, trycnt = 0;
     trycnt = 0;
-    obj = await mkobj(oclass, 0);
+    obj = await mkobj(oclass, FALSE);
     otyp = obj.otyp;
     while (otyp === WAN_WISHING || otyp === gn.nocreate || otyp === gn.nocreate2 || otyp === gn.nocreate3 || otyp === gn.nocreate4 || otyp === RIN_LEVITATION || otyp === POT_HALLUCINATION || otyp === POT_ACID || otyp === SCR_AMNESIA || otyp === SCR_FIRE || otyp === SCR_BLANK_PAPER || otyp === SPE_BLANK_PAPER || otyp === RIN_AGGRAVATE_MONSTER || otyp === RIN_HUNGER || otyp === WAN_NOTHING || otyp === RIN_POISON_RESISTANCE && gu.urace.mnum === PM_ORC || otyp === SCR_ENCHANT_WEAPON && gu.urole.mnum === PM_MONK || otyp === SPE_FORCE_BOLT && gu.urole.mnum === PM_WIZARD || obj.oclass === SPBOOK_CLASS && (objects[otyp].oc_oc2 > (got_level1_spellbook ? 3 : 1) || await restricted_spell_discipline(otyp)) || otyp === SPE_NOVEL) {
         await dealloc_obj(obj);
         if ((trycnt = trycnt + 1 | 0) > 1000) {
-            obj = await mksobj(PANCAKE, 1, 0);
+            obj = await mksobj(PANCAKE, TRUE, FALSE);
             break;
         }
-        obj = await mkobj(oclass, 0);
+        obj = await mkobj(oclass, FALSE);
         otyp = obj.otyp;
     }
     return obj;
@@ -507,7 +510,7 @@ async function ini_inv_obj_substitution(trop, obj) {   // u_init.c:1179
         for (i = 0; inv_subs[i].race_pm !== NON_PM; i = i + 1 | 0) {
             if (inv_subs[i].race_pm === gu.urace.mnum && obj.otyp === inv_subs[i].item_otyp) {
                 do {
-                    if (debugcore($c.lit("u_init.c"), 1)) {
+                    if (debugcore($c.lit("u_init.c"), TRUE)) {
                         save_plnmsg = iflags.last_msg;
                         await pline($c.lit("ini_inv: substituting %s for %s%s"), obj_descr[objects[inv_subs[i].subs_otyp].oc_name_idx].oc_name, trop.trotyp === 0 ? $c.lit("random ") : $c.lit(""), obj_descr[objects[obj.otyp].oc_name_idx].oc_name);
                         iflags.last_msg = save_plnmsg;
@@ -522,7 +525,7 @@ async function ini_inv_obj_substitution(trop, obj) {   // u_init.c:1179
 }
 async function ini_inv_adjust_obj(trop, obj) {   // u_init.c:1205
     let stop = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7;
-    stop = 0;
+    stop = FALSE;
     if (trop.trclass === COIN_CLASS) {
         obj.quan = u.umoney0;
     } else {
@@ -530,7 +533,7 @@ async function ini_inv_adjust_obj(trop, obj) {   // u_init.c:1205
             obj.known = (1) & 1;
         }
         $t2 = ($t1 = obj.rknown = (1) & 1, obj.bknown = ($t1) & 1), obj.dknown = ($t2) & 1;
-        if (obj.otyp >= LARGE_BOX && obj.otyp <= BAG_OF_TRICKS || obj.otyp === STATUE) {
+        if (Is_container(obj) || obj.otyp === STATUE) {
             $t3 = obj.lknown = (1) & 1, obj.cknown = ($t3) & 1;
             obj.otrapped = (0) & 1;
         }
@@ -540,8 +543,8 @@ async function ini_inv_adjust_obj(trop, obj) {   // u_init.c:1205
         }
         if (obj.oclass === WEAPON_CLASS || obj.oclass === TOOL_CLASS) {
             $t4 = trquan(trop), obj.quan = $t4;
-            stop = 1;
-        } else if (obj.oclass === GEM_CLASS && (obj.otyp === LUCKSTONE || obj.otyp === LOADSTONE || obj.otyp === FLINT || obj.otyp === TOUCHSTONE) && obj.otyp !== FLINT) {
+            stop = TRUE;
+        } else if (obj.oclass === GEM_CLASS && is_graystone(obj) && obj.otyp !== FLINT) {
             obj.quan = 1;
         }
         if (trop.trspe !== 127) {
@@ -563,35 +566,35 @@ async function ini_inv_adjust_obj(trop, obj) {   // u_init.c:1205
 }
 async function ini_inv_use_obj(obj) {   // u_init.c:1251
     if (obj_descr[objects[obj.otyp].oc_descr_idx].oc_descr && obj.known | 0) {
-        await discover_object(obj.otyp, 1, 1, 0);
+        await discover_object(obj.otyp, TRUE, TRUE, FALSE);
     }
     if (obj.otyp === OIL_LAMP) {
-        await discover_object(POT_OIL, 1, 1, 0);
+        await discover_object(POT_OIL, TRUE, TRUE, FALSE);
     }
     if (obj.oclass === ARMOR_CLASS) {
-        if (obj.oclass === ARMOR_CLASS && objects[obj.otyp].oc_subtyp === ARM_SHIELD && !$G.uarms && !($G.uwep && (($G.uwep.oclass === WEAPON_CLASS || $G.uwep.oclass === TOOL_CLASS) && objects[$G.uwep.otyp].oc_big | 0))) {
-            set_twoweap(0);
+        if (is_shield(obj) && !$G.uarms && !($G.uwep && bimanual($G.uwep))) {
+            set_twoweap(FALSE);
             await setworn(obj, W_ARMS);
-        } else if (obj.oclass === ARMOR_CLASS && objects[obj.otyp].oc_subtyp === ARM_HELM && !$G.uarmh) {
+        } else if (is_helmet(obj) && !$G.uarmh) {
             await setworn(obj, W_ARMH);
-        } else if (obj.oclass === ARMOR_CLASS && objects[obj.otyp].oc_subtyp === ARM_GLOVES && !$G.uarmg) {
+        } else if (is_gloves(obj) && !$G.uarmg) {
             await setworn(obj, W_ARMG);
-        } else if (obj.oclass === ARMOR_CLASS && objects[obj.otyp].oc_subtyp === ARM_SHIRT && !$G.uarmu) {
+        } else if (is_shirt(obj) && !$G.uarmu) {
             await setworn(obj, W_ARMU);
-        } else if (obj.oclass === ARMOR_CLASS && objects[obj.otyp].oc_subtyp === ARM_CLOAK && !$G.uarmc) {
+        } else if (is_cloak(obj) && !$G.uarmc) {
             await setworn(obj, W_ARMC);
-        } else if (obj.oclass === ARMOR_CLASS && objects[obj.otyp].oc_subtyp === ARM_BOOTS && !$G.uarmf) {
+        } else if (is_boots(obj) && !$G.uarmf) {
             await setworn(obj, W_ARMF);
-        } else if (obj.oclass === ARMOR_CLASS && objects[obj.otyp].oc_subtyp === ARM_SUIT && !$G.uarm) {
+        } else if (is_suit(obj) && !$G.uarm) {
             await setworn(obj, W_ARM);
         }
     }
-    if (obj.oclass === WEAPON_CLASS || obj.oclass === TOOL_CLASS && objects[obj.otyp].oc_subtyp !== P_NONE || obj.otyp === TIN_OPENER || obj.otyp === FLINT || obj.otyp === ROCK) {
-        if ((obj.oclass === WEAPON_CLASS || obj.oclass === GEM_CLASS) && objects[obj.otyp].oc_subtyp >= -P_CROSSBOW && objects[obj.otyp].oc_subtyp <= -P_BOW || (obj.oclass === WEAPON_CLASS || obj.oclass === TOOL_CLASS) && objects[obj.otyp].oc_subtyp >= -P_BOOMERANG && objects[obj.otyp].oc_subtyp <= -P_DART) {
+    if (obj.oclass === WEAPON_CLASS || is_weptool(obj) || obj.otyp === TIN_OPENER || obj.otyp === FLINT || obj.otyp === ROCK) {
+        if (is_ammo(obj) || is_missile(obj)) {
             if (!$G.uquiver) {
                 await setuqwep(obj);
             }
-        } else if (!$G.uwep && (!$G.uarms || !((obj.oclass === WEAPON_CLASS || obj.oclass === TOOL_CLASS) && objects[obj.otyp].oc_big | 0))) {
+        } else if (!$G.uwep && (!$G.uarms || !bimanual(obj))) {
             await setuwep(obj);
         } else if (!$G.uswapwep) {
             await setuswapwep(obj);
@@ -603,7 +606,7 @@ async function ini_inv_use_obj(obj) {   // u_init.c:1251
 }
 async function ini_inv(trop) {   // u_init.c:1298
     let obj = null, otyp = 0, got_sp1 = 0, quan = 0;
-    got_sp1 = 0;
+    got_sp1 = FALSE;
     if (u.uroleplay.pauper) {
         return;
     }
@@ -611,7 +614,7 @@ async function ini_inv(trop) {   // u_init.c:1298
     while (trop.trclass) {
         otyp = trop.trotyp;
         if (otyp !== UNDEF_TYP) {
-            obj = await mksobj(otyp, 1, 0);
+            obj = await mksobj(otyp, TRUE, FALSE);
         } else {
             obj = await ini_inv_mkobj_filter(trop.trclass, got_sp1);
             otyp = obj.otyp;
@@ -631,7 +634,7 @@ async function ini_inv(trop) {   // u_init.c:1298
             }
         }
         otyp = await ini_inv_obj_substitution(trop, obj);
-        otyp;
+        nhUse(otyp);
         if (u.uroleplay.nudist && obj.oclass === ARMOR_CLASS) {
             await dealloc_obj(obj);
             trop = $c.radd(trop, 1);
@@ -642,7 +645,7 @@ async function ini_inv(trop) {   // u_init.c:1298
         }
         obj = await addinv(obj);
         if (obj.oclass === SPBOOK_CLASS && objects[obj.otyp].oc_oc2 === 1) {
-            got_sp1 = 1;
+            got_sp1 = TRUE;
         }
         if (quan = $c.sub64(quan, 1)) {
             continue;
@@ -660,13 +663,13 @@ export async function u_init_inventory_attrs() {   // u_init.c:1370
     u.umoney0 = 0;
     await u_init_role();
     await u_init_race();
-    if (flags.explore) {
+    if (discover()) {
         await ini_inv($c.relem(Wishing, 0));
     }
     if (u.umoney0) {
         await ini_inv($c.relem(Money, 0));
     }
-    $t1 = hidden_gold(1), u.umoney0 = $c.add64(u.umoney0, $t1);
+    $t1 = hidden_gold(TRUE), u.umoney0 = $c.add64(u.umoney0, $t1);
     init_attr(75);
     await vary_init_attr();
     await u_init_carry_attr_boost();
@@ -715,13 +718,13 @@ export function $init() {
     Archeologist[3].trquan_max = 3;
     Archeologist[3].trbless = 0;
     Archeologist[4].trotyp = PICK_AXE;
-    Archeologist[4].trspe = 127;
+    Archeologist[4].trspe = UNDEF_SPE;
     Archeologist[4].trclass = TOOL_CLASS;
     Archeologist[4].trquan_min = 1;
     Archeologist[4].trquan_max = 1;
     Archeologist[4].trbless = UNDEF_BLESS;
     Archeologist[5].trotyp = TINNING_KIT;
-    Archeologist[5].trspe = 127;
+    Archeologist[5].trspe = UNDEF_SPE;
     Archeologist[5].trclass = TOOL_CLASS;
     Archeologist[5].trquan_min = 1;
     Archeologist[5].trquan_max = 1;
@@ -883,7 +886,7 @@ export function $init() {
     Healer[4].trquan_max = 4;
     Healer[4].trbless = UNDEF_BLESS;
     Healer[5].trotyp = WAN_SLEEP;
-    Healer[5].trspe = 127;
+    Healer[5].trspe = UNDEF_SPE;
     Healer[5].trclass = WAND_CLASS;
     Healer[5].trquan_min = 1;
     Healer[5].trquan_max = 1;
@@ -991,7 +994,7 @@ export function $init() {
     Monk[1].trquan_max = 1;
     Monk[1].trbless = UNDEF_BLESS;
     Monk[2].trotyp = UNDEF_TYP;
-    Monk[2].trspe = 127;
+    Monk[2].trspe = UNDEF_SPE;
     Monk[2].trclass = SCROLL_CLASS;
     Monk[2].trquan_min = 1;
     Monk[2].trquan_max = 1;
@@ -1072,7 +1075,7 @@ export function $init() {
     Priest[5].trquan_max = 1;
     Priest[5].trbless = 0;
     Priest[6].trotyp = UNDEF_TYP;
-    Priest[6].trspe = 127;
+    Priest[6].trspe = UNDEF_SPE;
     Priest[6].trclass = SPBOOK_CLASS;
     Priest[6].trquan_min = 2;
     Priest[6].trquan_max = 2;
@@ -1222,7 +1225,7 @@ export function $init() {
     Tourist[0].trquan_max = 40;
     Tourist[0].trbless = UNDEF_BLESS;
     Tourist[1].trotyp = UNDEF_TYP;
-    Tourist[1].trspe = 127;
+    Tourist[1].trspe = UNDEF_SPE;
     Tourist[1].trclass = FOOD_CLASS;
     Tourist[1].trquan_min = 10;
     Tourist[1].trquan_max = 10;
@@ -1246,7 +1249,7 @@ export function $init() {
     Tourist[4].trquan_max = 1;
     Tourist[4].trbless = UNDEF_BLESS;
     Tourist[5].trotyp = EXPENSIVE_CAMERA;
-    Tourist[5].trspe = 127;
+    Tourist[5].trspe = UNDEF_SPE;
     Tourist[5].trclass = TOOL_CLASS;
     Tourist[5].trquan_min = 1;
     Tourist[5].trquan_max = 1;
@@ -1312,25 +1315,25 @@ export function $init() {
     Wizard[1].trquan_max = 1;
     Wizard[1].trbless = UNDEF_BLESS;
     Wizard[2].trotyp = UNDEF_TYP;
-    Wizard[2].trspe = 127;
+    Wizard[2].trspe = UNDEF_SPE;
     Wizard[2].trclass = WAND_CLASS;
     Wizard[2].trquan_min = 1;
     Wizard[2].trquan_max = 1;
     Wizard[2].trbless = UNDEF_BLESS;
     Wizard[3].trotyp = UNDEF_TYP;
-    Wizard[3].trspe = 127;
+    Wizard[3].trspe = UNDEF_SPE;
     Wizard[3].trclass = RING_CLASS;
     Wizard[3].trquan_min = 2;
     Wizard[3].trquan_max = 2;
     Wizard[3].trbless = UNDEF_BLESS;
     Wizard[4].trotyp = UNDEF_TYP;
-    Wizard[4].trspe = 127;
+    Wizard[4].trspe = UNDEF_SPE;
     Wizard[4].trclass = POTION_CLASS;
     Wizard[4].trquan_min = 3;
     Wizard[4].trquan_max = 3;
     Wizard[4].trbless = UNDEF_BLESS;
     Wizard[5].trotyp = UNDEF_TYP;
-    Wizard[5].trspe = 127;
+    Wizard[5].trspe = UNDEF_SPE;
     Wizard[5].trclass = SCROLL_CLASS;
     Wizard[5].trquan_min = 3;
     Wizard[5].trquan_max = 3;
@@ -1342,7 +1345,7 @@ export function $init() {
     Wizard[6].trquan_max = 1;
     Wizard[6].trbless = 1;
     Wizard[7].trotyp = UNDEF_TYP;
-    Wizard[7].trspe = 127;
+    Wizard[7].trspe = UNDEF_SPE;
     Wizard[7].trclass = SPBOOK_CLASS;
     Wizard[7].trquan_min = 1;
     Wizard[7].trquan_max = 1;
@@ -1363,7 +1366,7 @@ export function $init() {
         Healing_book[$i0].$copyFrom(new $T.trobj());
     }
     Healing_book[0].trotyp = SPE_HEALING;
-    Healing_book[0].trspe = 127;
+    Healing_book[0].trspe = UNDEF_SPE;
     Healing_book[0].trclass = SPBOOK_CLASS;
     Healing_book[0].trquan_min = 1;
     Healing_book[0].trquan_max = 1;
@@ -1378,7 +1381,7 @@ export function $init() {
         Protection_book[$i0].$copyFrom(new $T.trobj());
     }
     Protection_book[0].trotyp = SPE_PROTECTION;
-    Protection_book[0].trspe = 127;
+    Protection_book[0].trspe = UNDEF_SPE;
     Protection_book[0].trclass = SPBOOK_CLASS;
     Protection_book[0].trquan_min = 1;
     Protection_book[0].trquan_max = 1;
@@ -1393,7 +1396,7 @@ export function $init() {
         Confuse_monster_book[$i0].$copyFrom(new $T.trobj());
     }
     Confuse_monster_book[0].trotyp = SPE_CONFUSE_MONSTER;
-    Confuse_monster_book[0].trspe = 127;
+    Confuse_monster_book[0].trspe = UNDEF_SPE;
     Confuse_monster_book[0].trclass = SPBOOK_CLASS;
     Confuse_monster_book[0].trquan_min = 1;
     Confuse_monster_book[0].trquan_max = 1;
@@ -1468,7 +1471,7 @@ export function $init() {
         Xtra_food[$i0].$copyFrom(new $T.trobj());
     }
     Xtra_food[0].trotyp = UNDEF_TYP;
-    Xtra_food[0].trspe = 127;
+    Xtra_food[0].trspe = UNDEF_SPE;
     Xtra_food[0].trclass = FOOD_CLASS;
     Xtra_food[0].trquan_min = 2;
     Xtra_food[0].trquan_max = 2;
@@ -1876,7 +1879,7 @@ export function $init() {
     Skill_Mon[9].skmax = P_SKILLED;
     Skill_Mon[10].skill = P_MATTER_SPELL;
     Skill_Mon[10].skmax = P_BASIC;
-    Skill_Mon[11].skill = P_BARE_HANDED_COMBAT;
+    Skill_Mon[11].skill = P_MARTIAL_ARTS;
     Skill_Mon[11].skmax = P_GRAND_MASTER;
     Skill_Mon[12].skill = P_NONE;
     Skill_Mon[12].skmax = 0;
@@ -2072,7 +2075,7 @@ export function $init() {
     Skill_S[17].skmax = P_SKILLED;
     Skill_S[18].skill = P_TWO_WEAPON_COMBAT;
     Skill_S[18].skmax = P_EXPERT;
-    Skill_S[19].skill = P_BARE_HANDED_COMBAT;
+    Skill_S[19].skill = P_MARTIAL_ARTS;
     Skill_S[19].skmax = P_MASTER;
     Skill_S[20].skill = P_NONE;
     Skill_S[20].skmax = 0;

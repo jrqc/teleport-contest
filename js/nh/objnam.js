@@ -2,12 +2,13 @@
 import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
-import { AM_LAWFUL, AM_NONE, A_CHAOTIC, A_LAWFUL, A_NEUTRAL, A_NONE } from './align.h.js';
+import { A_CHAOTIC, A_LAWFUL, A_NEUTRAL, A_NONE } from './align.h.js';
+import { Align2amask } from './align.macros.js';
 import { artifact_exists, artifact_light, artifact_name, artiname, find_artifact, glow_color, glow_verb, nartifact_exist, permapoisoned, undiscovered_artifact } from './artifact.js';
-import { ART_EYES_OF_THE_OVERWORLD, ART_ORB_OF_DETECTION } from './artilist.h.js';
+import { ART_ORB_OF_DETECTION } from './artilist.h.js';
 import { isok, yn_function } from './cmd.js';
 import { is_ice, is_lava, is_pool, is_pool_or_lava } from './dbridge.js';
-import { c_common_strings, cg, disp, flags, gd, gf, gm, gu, gv, gw, gx, hands_obj, iflags, program_state, svb, svc, svd, svl, svm, svp, u, vowels, ynchars } from './decl.js';
+import { c_common_strings, cg, disp, flags, gd, gf, gm, gu, gw, gx, hands_obj, iflags, program_state, svb, svc, svd, svl, svm, svp, u, vowels, ynchars } from './decl.js';
 import { AMULET_CLASS, ARMOR_CLASS, BALL_CLASS, CHAIN_CLASS, COIN_CLASS, FOOD_CLASS, GEM_CLASS, GOLD_SYM, ILLOBJ_CLASS, POTION_CLASS, RING_CLASS, ROCK_CLASS, SCROLL_CLASS, SPBOOK_CLASS, S_PUDDING, TOOL_CLASS, VENOM_CLASS, WAND_CLASS, WEAPON_CLASS } from './defsym.h.js';
 import { docrt, feel_newsym } from './display.js';
 import { lookup_novel, mon_pmname, noit_mon_nam, obj_pmname, oname, safe_oname } from './do_name.js';
@@ -18,50 +19,59 @@ import { consume_oeaten, obj_nutrition, set_tin_variety, tin_details, tin_variet
 import { panic } from './end.js';
 import { del_engr_at, make_grave } from './engrave.js';
 import { paniclog } from './files.js';
-import { BUFSZ, QBUFSZ } from './global.h.js';
+import { wizard } from './flag.macros.js';
+import { BUFSZ, FALSE, QBUFSZ, TRUE } from './global.h.js';
 import { obj_to_any, pooleffects, set_uinwater, switch_terrain } from './hack.js';
 import { CORPSTAT_FEMALE, CORPSTAT_GENDER, CORPSTAT_HISTORIC, CORPSTAT_MALE, CORPSTAT_NEUTER, CORPSTAT_RANDOM, COST_CONTENTS, CXN_ARTICLE, CXN_NOCORPSE, CXN_NORMAL, CXN_NO_PFX, CXN_PFX_THE, CXN_SINGULAR, FM_FMON, HAND, ONAME_NO_FLAGS, ONAME_WISH, RANDOM_TIN } from './hack.h.js';
 import { copynchars, digit, dist2, eos, fuzzymatch, highc, letter, lowc, mungspaces, nh_snprintf, ordin, s_suffix, str_start_is, strcasecpy, strncmpi, strstri, strsubst, upstart } from './hacklib.js';
 import { align_str } from './insight.js';
 import { count_contents, currency } from './invent.js';
 import { arti_light_description, find_mid } from './light.js';
+import { nhUse } from './lint.macros.js';
 import { count_level_features } from './mklev.js';
 import { fix_wall_spines } from './mkmaze.js';
 import { curse, is_flammable, is_rottable, mkobj, mksobj, obj_extract_self, place_object, set_corpsenm, weight } from './mkobj.js';
 import { can_be_hatched, dead_species, genus, zombie_form } from './mon.js';
 import { name_to_mon, name_to_monplus } from './mondata.js';
-import { FEMALE, G_NOCORPSE, G_UNIQ, M1_FLY, M2_FEMALE, M2_HUMAN, M2_MALE, M2_NEUTER, M2_PNAME, M2_WERE, MALE, MS_GUARDIAN, MV_KNOWS_EGG, MZ_SMALL, NEUTRAL } from './monflag.h.js';
+import { is_female, is_human, is_male, is_neuter, is_were, type_is_pname, verysmall } from './mondata.macros.js';
+import { FEMALE, G_NOCORPSE, G_UNIQ, M1_FLY, MALE, MS_GUARDIAN, MV_KNOWS_EGG, NEUTRAL } from './monflag.h.js';
 import { mons } from './monst.js';
-import { M_AP_OBJECT, M_AP_TYPMASK } from './monst.h.js';
+import { M_AP_OBJECT } from './monst.h.js';
+import { DEADMONSTER, M_AP_TYPE, ismnum } from './monst.macros.js';
 import { PM_ARCHEOLOGIST, PM_BLACK_PUDDING, PM_CLERIC, PM_GRAY_DRAGON, PM_GRAY_OOZE, PM_HIGH_CLERIC, PM_LONG_WORM, PM_LONG_WORM_TAIL, PM_MAIL_DAEMON, PM_SAMURAI, PM_WIZARD_OF_YENDOR, PM_YELLOW_DRAGON } from './monsters.h.js';
 import { observe_object } from './o_init.js';
-import { OBJ_INVENT } from './obj.h.js';
+import { SPE_LIM } from './obj.h.js';
+import { Has_contents, Is_box, Is_candle, Is_container, Is_dragon_mail, Is_dragon_scales, bimanual, carried, has_oname, is_ammo, is_boots, is_gloves, is_missile, is_plural, is_poisonable, is_shield, is_weptool, is_wet_towel } from './obj.macros.js';
 import { ARM_BOOTS, ARM_CLOAK, ARM_GLOVES, ARM_HELM, ARM_SHIELD, ARM_SHIRT, ARM_SUIT, COPPER, GEMSTONE, GLASS, IRON, MAXOCLASSES, MINERAL, NUM_GLASS_GEMS, NUM_OBJECTS } from './objclass.h.js';
+import { is_corrodeable, is_crackable, is_damageable, is_rustprone } from './objclass.macros.js';
 import { obj_descr, objects } from './objects.js';
 import { ACID_VENOM, AKLYS, ALCHEMY_SMOCK, AMULET_OF_ESP, AMULET_OF_GUARDING, AMULET_OF_YENDOR, AMULET_VERSUS_POISON, BAG_OF_TRICKS, BEARTRAP, BELL, BELL_OF_OPENING, BLACK_OPAL, BLINDING_VENOM, BOULDER, BRASS_LANTERN, BROADSWORD, BULLWHIP, CANDELABRUM_OF_INVOCATION, CANDY_BAR, CHEST, CLOAK_OF_DISPLACEMENT, CORPSE, CREAM_PIE, CRYSKNIFE, CRYSTAL_BALL, DIAMOND, DILITHIUM_CRYSTAL, DUNCE_CAP, DWARVISH_MATTOCK, EGG, ELVEN_LEATHER_HELM, ELVEN_MITHRIL_COAT, ELVEN_SHIELD, EMERALD, ENORMOUS_MEATBALL, EUCALYPTUS_LEAF, EXPENSIVE_CAMERA, FAKE_AMULET_OF_YENDOR, FEDORA, FIGURINE, FIRST_GLASS_GEM, FLAIL, FLINT, FOOD_RATION, FORTUNE_COOKIE, GAUNTLETS_OF_DEXTERITY, GAUNTLETS_OF_POWER, GLAIVE, GLOB_OF_BLACK_PUDDING, GLOB_OF_GRAY_OOZE, GOLD_PIECE, GRAPPLING_HOOK, GRAY_DRAGON_SCALES, GRAY_DRAGON_SCALE_MAIL, HAWAIIAN_SHIRT, HEAVY_IRON_BALL, HELMET, HELM_OF_TELEPATHY, HORN_OF_PLENTY, IRON_CHAIN, IRON_SHOES, KATANA, KELP_FROND, KNIFE, LAND_MINE, LARGE_BOX, LAST_REAL_GEM, LEASH, LEATHER_GLOVES, LEMBAS_WAFER, LENSES, LEVITATION_BOOTS, LOADSTONE, LOCK_PICK, LOW_BOOTS, LUCKSTONE, MAGIC_HARP, MAGIC_LAMP, MAGIC_MARKER, MEAT_RING, MUMMY_WRAPPING, OIL_LAMP, OPAL, ORANGE, ORCISH_SHIELD, PICK_AXE, PLATE_MAIL, POT_BOOZE, POT_OIL, POT_SLEEPING, POT_WATER, RIN_INCREASE_ACCURACY, RIN_PROTECTION_FROM_SHAPE_CHAN, ROBE, ROCK, RUBY, SACK, SAPPHIRE, SCALE_MAIL, SCR_BLANK_PAPER, SCR_CHARGING, SCR_MAIL, SHIELD_OF_REFLECTION, SHORT_SWORD, SILVER_SABER, SKELETON_KEY, SLIME_MOLD, SMALL_SHIELD, SPE_BLANK_PAPER, SPE_BOOK_OF_THE_DEAD, SPE_NOVEL, STATUE, STRANGE_OBJECT, TALLOW_CANDLE, TIN, TIN_OPENER, TOOLED_HORN, TOUCHSTONE, TOWEL, TRIPE_RATION, T_SHIRT, WAN_WISHING, WAX_CANDLE, WOODEN_HARP, YELLOW_DRAGON_SCALES, YELLOW_DRAGON_SCALE_MAIL } from './objects.h.js';
 import { ice_descr, waterbody_name } from './pager.js';
-import { LOW_PM, NON_PM, NUMMONS } from './permonst.h.js';
+import { LOW_PM, NON_PM } from './permonst.h.js';
 import { impossible, pline } from './pline.js';
 import { body_part } from './polyself.js';
-import { BLINDED, FLYING, GLIB, HALLUC_RES, LEVITATION, WARN_OF_MON, W_AMUL, W_ARM, W_ARMC, W_ARMF, W_ARMG, W_ARMH, W_ARMS, W_ARMU, W_BALL, W_CHAIN, W_QUIVER, W_RINGL, W_RINGR, W_SADDLE, W_SWAPWEP, W_TOOL, W_WEP } from './prop.h.js';
+import { FLYING, HALLUC_RES, WARN_OF_MON, W_AMUL, W_ARMOR, W_BALL, W_CHAIN, W_QUIVER, W_RING, W_RINGL, W_RINGR, W_SADDLE, W_SWAPWEP, W_TOOL, W_WEP } from './prop.h.js';
 import { is_quest_artifact } from './questpgr.js';
 import { apron_text, candy_wrapper_text, hawaiian_motif, tshirt_text } from './read.js';
-import { ALTAR, CLOUD, CORR, DBWALL, DB_FLOOR, DB_ICE, DB_LAVA, DB_MOAT, DB_UNDER, DOOR, DRAWBRIDGE_DOWN, DRAWBRIDGE_UP, D_BROKEN, D_CLOSED, D_ISOPEN, D_LOCKED, D_NODOOR, D_TRAPPED, FOUNTAIN, F_LOOTED, GRAVE, HWALL, ICE, ICED_MOAT, ICED_POOL, IRONBARS, LADDER, LAVAPOOL, LAVAWALL, MOAT, POOL, ROOM, SCORR, SDOOR, SINK, STAIRS, S_LDWASHER, S_LPUDDING, S_LRING, THRONE, TREE, TREE_LOOTED, TREE_SWARM, T_LOOTED, VWALL, WATER, WM_MASK, W_NONDIGGABLE, W_NONPASSWALL } from './rm.h.js';
+import { ALTAR, CLOUD, CORR, DBWALL, DB_FLOOR, DB_ICE, DB_LAVA, DB_MOAT, DB_UNDER, DOOR, DRAWBRIDGE_DOWN, DRAWBRIDGE_UP, D_BROKEN, D_CLOSED, D_ISOPEN, D_LOCKED, D_NODOOR, D_TRAPPED, FOUNTAIN, F_LOOTED, HWALL, ICE, ICED_MOAT, ICED_POOL, IRONBARS, LAVAPOOL, LAVAWALL, MOAT, POOL, ROOM, SCORR, SDOOR, SINK, S_LDWASHER, S_LPUDDING, S_LRING, THRONE, TREE, TREE_LOOTED, TREE_SWARM, T_LOOTED, VWALL, WATER, WM_MASK, W_NONDIGGABLE, W_NONPASSWALL } from './rm.h.js';
+import { CAN_OVERWRITE_TERRAIN, IS_DOOR, IS_FOUNTAIN, IS_FURNITURE, IS_GRAVE, IS_SINK, IS_WALL } from './rm.macros.js';
 import { rn2, rnd } from './rnd.js';
 import { genders } from './role.js';
 import { CapitalMon } from './rumors.js';
 import { append_price_quote, delete_contents, get_cost_of_shop_item, is_unpaid, obfree, record_price_quote, shk_your, unpaid_cost } from './shk.js';
-import { P_BOOMERANG, P_BOW, P_CROSSBOW, P_DART, P_HAMMER, P_NONE, P_POLEARMS, P_SHURIKEN } from './skills.h.js';
+import { P_BOW, P_HAMMER, P_POLEARMS, P_SHURIKEN } from './skills.h.js';
 import { Strlen_ } from './strutil.js';
 import { begin_burn, peek_timer, spot_stop_timers, start_timer } from './timeout.js';
 import { BURN_OBJECT, MELT_ICE_AWAY, TIMER_OBJECT, ZOMBIFY_MON } from './timeout.h.js';
 import { deltrap, fire_damage_chain, maketrap, reset_utrap, t_at, trapname, water_damage_chain } from './trap.js';
 import { BEAR_TRAP, HOLE, LANDMINE, MAGIC_PORTAL, NO_TRAP, ROCKTRAP, TRAPDOOR, TRAPNUM } from './trap.h.js';
 import { recalc_block_point } from './vision.js';
-import { IN_SIGHT } from './vision.h.js';
+import { cansee } from './vision.macros.js';
 import { WT_IRON_BALL_INCR } from './weight.h.js';
 import { counter_were } from './were.js';
 import { TT_LAVA } from './you.h.js';
+import { Luck } from './you.macros.js';
+import { Blind, Glib, Levitation } from './youprop.macros.js';
 import { get_obj_location, start_melt_ice_timeout } from './zap.js';
 
 const PREFIX = 80;
@@ -183,7 +193,7 @@ export async function obj_typename(otyp) {   // objnam.c:201
         default:
             if (nn) {
                 $c.__builtin___strcat_chk(buf, actualn, -1);
-                if (otyp === FLINT || (objects[otyp].oc_material | 0) === GEMSTONE && (otyp !== DILITHIUM_CRYSTAL && otyp !== RUBY && otyp !== DIAMOND && otyp !== SAPPHIRE && otyp !== BLACK_OPAL && otyp !== EMERALD && otyp !== OPAL)) {
+                if (GemStone(otyp)) {
                     $c.__builtin___strcat_chk(buf, $c.lit(" stone"), -1);
                 }
                 if (un) {
@@ -245,15 +255,15 @@ export async function safe_typename(otyp) {   // objnam.c:312
     return res;
 }
 export function obj_is_pname(obj) {   // objnam.c:333
-    if (!obj.oartifact || !(obj.oextra && obj.oextra.oname)) {
-        return 0;
+    if (!obj.oartifact || !has_oname(obj)) {
+        return FALSE;
     }
     if (!program_state.gameover && !iflags.override_ID) {
         if (not_fully_identified(obj)) {
-            return 0;
+            return FALSE;
         }
     }
-    return 1;
+    return TRUE;
 }
 export async function distant_name(obj, func) {   // objnam.c:347
     let str = null, save_oid = 0, ox = Int16Array.of(0), oy = Int16Array.of(0), r = 0, neardist = 0;
@@ -265,7 +275,7 @@ export async function distant_name(obj, func) {   // objnam.c:347
     if (program_state.gameover) {
         obj.o_id = 0;
     }
-    if (get_obj_location(obj, new $c.Ptr(ox, 0), new $c.Ptr(oy, 0), 0) && (gv.viz_array.get(oy[0]).get(ox[0]) & IN_SIGHT) !== 0 && (obj.oartifact || dist2(ox[0], oy[0], u.ux, u.uy) <= neardist)) {
+    if (get_obj_location(obj, new $c.Ptr(ox, 0), new $c.Ptr(oy, 0), 0) && cansee(ox[0], oy[0]) && (obj.oartifact || dist2(ox[0], oy[0], u.ux, u.uy) <= neardist)) {
         str = await func(obj);
     } else {
         gd.distantname = gd.distantname + 1 | 0;
@@ -418,14 +428,14 @@ async function xname_flags(obj, cxn_flags) {   // objnam.c:581
             if (!nn && ocl.oc_uses_known | 0 && ocl.oc_unique | 0) {
                 obj.known = (0) & 1;
             }
-            if (!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked) && !gd.distantname) {
+            if (!Blind() && !gd.distantname) {
                 await observe_object(obj);
             }
             if (gu.urole.mnum === PM_CLERIC) {
                 obj.bknown = (1) & 1;
             }
             if (iflags.override_ID) {
-                known = dknown = bknown = 1;
+                known = dknown = bknown = TRUE;
                 nn = 1;
             } else {
                 known = $c.i8(obj.known);
@@ -453,14 +463,14 @@ async function xname_flags(obj, cxn_flags) {   // objnam.c:581
                     }
                     break;
                 case WEAPON_CLASS:
-                    if ((obj.oclass === WEAPON_CLASS && objects[obj.otyp].oc_subtyp >= -P_SHURIKEN && objects[obj.otyp].oc_subtyp <= -P_BOW || permapoisoned(obj)) && obj.otrapped | 0) {
+                    if (is_poisonable(obj) && obj.otrapped | 0) {
                         $c.__builtin___strcpy_chk(buf, $c.lit("poisoned "), -1);
                     }
                 case VENOM_CLASS:
                 case TOOL_CLASS:
                     if (typ === LENSES) {
                         $c.__builtin___strcpy_chk(buf, $c.lit("pair of "), -1);
-                    } else if (obj.otyp === TOWEL && obj.spe > 0) {
+                    } else if (is_wet_towel(obj)) {
                         $c.__builtin___strcpy_chk(buf, obj.spe < 3 ? $c.lit("moist ") : $c.lit("wet "), -1);
                     }
                     if (!dknown) {
@@ -479,8 +489,8 @@ async function xname_flags(obj, cxn_flags) {   // objnam.c:581
                             nh_snprintf($c.lit("xname_flags"), 713, buf_eos.add(-0), $c.addu64(bufspaceleft, 0), $c.lit(" of %s%s"), just_an(new $c.Ptr(anbuf, 0), pm_name), pm_name);
                             buf_eos = eos(buf), bufspaceleft = $c.u64($c.pdiff(buf_end, buf_eos));
                         } while (0);
-                    } else if (obj.otyp === TOWEL && obj.spe > 0) {
-                        if (flags.debug) {
+                    } else if (is_wet_towel(obj)) {
+                        if (wizard()) {
                             do {
                                 nh_snprintf($c.lit("xname_flags"), 716, buf_eos.add(-0), $c.addu64(bufspaceleft, 0), $c.lit(" (%d)"), obj.spe);
                                 buf_eos = eos(buf), bufspaceleft = $c.u64($c.pdiff(buf_end, buf_eos));
@@ -492,9 +502,9 @@ async function xname_flags(obj, cxn_flags) {   // objnam.c:581
                     if (typ >= GRAY_DRAGON_SCALES && typ <= YELLOW_DRAGON_SCALES) {
                         $c.__builtin___sprintf_chk(buf, 0, -1, $c.lit("set of %s"), actualn);
                         break;
-                    } else if (obj.oclass === ARMOR_CLASS && objects[obj.otyp].oc_subtyp === ARM_BOOTS || obj.oclass === ARMOR_CLASS && objects[obj.otyp].oc_subtyp === ARM_GLOVES) {
+                    } else if (is_boots(obj) || is_gloves(obj)) {
                         $c.__builtin___strcpy_chk(buf, $c.lit("pair of "), -1);
-                    } else if (obj.oclass === ARMOR_CLASS && objects[obj.otyp].oc_subtyp === ARM_SHIELD && !dknown) {
+                    } else if (is_shield(obj) && !dknown) {
                         if (obj.otyp >= ELVEN_SHIELD && obj.otyp <= ORCISH_SHIELD) {
                             $c.__builtin___strcpy_chk(buf, $c.lit("shield"), -1);
                             break;
@@ -531,7 +541,7 @@ async function xname_flags(obj, cxn_flags) {   // objnam.c:581
                                 releaseobuf(obufp);
                                 $c.__builtin___strcpy_chk(buf, obufp = await makeplural(buf), -1);
                                 releaseobuf(obufp);
-                                pluralize = 0;
+                                pluralize = FALSE;
                             }
                         }
                         break;
@@ -676,7 +686,7 @@ async function xname_flags(obj, cxn_flags) {   // objnam.c:581
                             }
                         } else {
                             $c.__builtin___strcpy_chk(buf, actualn, -1);
-                            if (typ === FLINT || (objects[typ].oc_material | 0) === GEMSTONE && (typ !== DILITHIUM_CRYSTAL && typ !== RUBY && typ !== DIAMOND && typ !== SAPPHIRE && typ !== BLACK_OPAL && typ !== EMERALD && typ !== OPAL)) {
+                            if (GemStone(typ)) {
                                 $c.__builtin___strcat_chk(buf, $c.lit(" stone"), -1);
                             }
                         }
@@ -732,7 +742,7 @@ async function xname_flags(obj, cxn_flags) {   // objnam.c:581
                 }
             }
         case "nameit":
-            if ($goto === "nameit" || obj.oextra && obj.oextra.oname && dknown) {
+            if ($goto === "nameit" || has_oname(obj) && dknown) {
                 D2: for (;;) {
                     switch ($goto) {
                     case null:
@@ -813,32 +823,32 @@ export function the_unique_obj(obj) {   // objnam.c:1106
     let known = 0;
     known = $c.i8(obj.known | 0 || iflags.override_ID ? 1 : 0);
     if (!obj.dknown && !iflags.override_ID) {
-        return 0;
+        return FALSE;
     } else if (obj.otyp === FAKE_AMULET_OF_YENDOR && !known) {
-        return 1;
+        return TRUE;
     } else {
         return $c.i8(objects[obj.otyp].oc_unique | 0 && (known || obj.otyp === AMULET_OF_YENDOR) ? 1 : 0);
     }
 }
 export function the_unique_pm(ptr) {   // objnam.c:1121
     let uniq = 0;
-    if ($c.andu64(ptr.mflags2, M2_PNAME) !== 0) {
-        return 0;
+    if (type_is_pname(ptr)) {
+        return FALSE;
     }
-    uniq = $c.i8(ptr.geno & G_UNIQ ? 1 : 0);
+    uniq = $c.i8(ptr.geno & G_UNIQ ? TRUE : FALSE);
     if ($c.peq(ptr, $c.relem(mons, PM_HIGH_CLERIC)) || $c.peq(ptr, $c.relem(mons, PM_LONG_WORM_TAIL))) {
-        uniq = 0;
+        uniq = FALSE;
     }
     if ($c.peq(ptr, $c.relem(mons, PM_WIZARD_OF_YENDOR))) {
-        uniq = 1;
+        uniq = TRUE;
     }
     return uniq;
 }
 function add_erosion_words(obj, prefix) {   // objnam.c:1143
     let iscrys = 0, rknown = 0;
     iscrys = $c.i8(obj.otyp === CRYSKNIFE ? 1 : 0);
-    rknown = $c.i8(iflags.override_ID === 0 ? obj.rknown | 0 : 1);
-    if (!((objects[obj.otyp].oc_material | 0) === IRON || is_flammable(obj) || is_rottable(obj) || ((objects[obj.otyp].oc_material | 0) === COPPER || (objects[obj.otyp].oc_material | 0) === IRON) || (objects[obj.otyp].oc_material | 0) === GLASS && obj.oclass === ARMOR_CLASS) && !iscrys) {
+    rknown = $c.i8(iflags.override_ID === 0 ? obj.rknown | 0 : TRUE);
+    if (!is_damageable(obj) && !iscrys) {
         return;
     }
     if (obj.oeroded | 0 && !iscrys) {
@@ -870,20 +880,20 @@ function add_erosion_words(obj, prefix) {   // objnam.c:1143
 export function erosion_matters(obj) {   // objnam.c:1195
     switch (obj.oclass) {
         case TOOL_CLASS:
-            return $c.i8(obj.oclass === TOOL_CLASS && objects[obj.otyp].oc_subtyp !== P_NONE ? 1 : 0);
+            return $c.i8(is_weptool(obj) ? TRUE : FALSE);
         case WEAPON_CLASS:
         case ARMOR_CLASS:
         case BALL_CLASS:
         case CHAIN_CLASS:
-            return 1;
+            return TRUE;
         default:
             break;
     }
-    return 0;
+    return FALSE;
 }
 async function doname_base(obj, doname_flags) {   // objnam.c:1223
     let ispoisoned = 0, with_price = 0, vague_quan = 0, for_menu = 0, known = 0, dknown = 0, cknown = 0, bknown = 0, lknown = 0, fake_arti = 0, force_the = 0, prefix = new Int8Array(80), tmpbuf = new Int8Array(81), aname = null, omndx = 0, bp = null, bp_eos = [null], bp_end = null, bpspaceleft = 0, itemcount = 0, mlsh = null, suffix = new Int8Array(20), timer = new $T.any(), full_burn_time = 0, turns_left = 0, cxarg = 0, cxstr = null, save_xnamep = null, cgend = 0, mgend = 0, twoweap_primary = 0, tethered = 0, hand_s = null, obufp = null, handsbuf = new Int8Array(40), Qtyp = 0, pricebuf = new Int8Array(40), quotedprice = 0, nochrg = Int32Array.of(0), price = 0, pricebuf$2 = new Int8Array(40), offsetbp = 0, $goto = null, $t1;
-    ispoisoned = 0;
+    ispoisoned = FALSE;
     with_price = $c.i8((doname_flags & DONAME_WITH_PRICE) >>> 0 !== 0 ? 1 : 0);
     vague_quan = $c.i8((doname_flags & DONAME_VAGUE_QUAN) >>> 0 !== 0 ? 1 : 0);
     for_menu = $c.i8((doname_flags & DONAME_FOR_MENU) >>> 0 !== 0 ? 1 : 0);
@@ -895,7 +905,7 @@ async function doname_base(obj, doname_flags) {   // objnam.c:1223
     (!($c.pcmp(bp_end, bp_eos[0]) >= 0) ? 1 : 0) ? $c.__assert_rtn($c.lit("doname_base"), $c.lit("objnam.c"), 1250, $c.lit("bp_end >= bp_eos")) : 0;
     bpspaceleft = $c.u64($c.pdiff(bp_end, bp_eos[0]));
     if (iflags.override_ID) {
-        known = dknown = cknown = bknown = lknown = 1;
+        known = dknown = cknown = bknown = lknown = TRUE;
     } else {
         known = $c.i8(obj.known);
         dknown = $c.i8(obj.dknown);
@@ -905,9 +915,9 @@ async function doname_base(obj, doname_flags) {   // objnam.c:1223
     }
     if (!$c.strncmp(bp, $c.lit("poisoned "), 9) && obj.otrapped | 0) {
         bp = bp.add(9);
-        ispoisoned = 1;
+        ispoisoned = TRUE;
     }
-    fake_arti = $c.i8(obj.otyp === SLIME_MOLD && (aname = artifact_name(bp, null, 0)) !== null ? 1 : 0);
+    fake_arti = $c.i8(obj.otyp === SLIME_MOLD && (aname = artifact_name(bp, null, FALSE)) !== null ? 1 : 0);
     force_the = $c.i8(fake_arti && !strncmpi(aname, $c.lit("the "), 4) ? 1 : 0);
     prefix[0] = 0;
     if (obj.quan !== 1) {
@@ -925,7 +935,7 @@ async function doname_base(obj, doname_flags) {   // objnam.c:1223
     } else if (!fake_arti) {
         $c.__builtin___strcpy_chk(new $c.Ptr(prefix, 0), $c.lit("a "), 80);
     }
-    if (cknown && (obj.otyp === BAG_OF_TRICKS || obj.otyp === HORN_OF_PLENTY ? obj.spe === 0 && !known : (obj.otyp >= LARGE_BOX && obj.otyp <= BAG_OF_TRICKS || obj.otyp === STATUE) && !(obj.cobj !== null))) {
+    if (cknown && (obj.otyp === BAG_OF_TRICKS || obj.otyp === HORN_OF_PLENTY ? obj.spe === 0 && !known : (Is_container(obj) || obj.otyp === STATUE) && !Has_contents(obj))) {
         $c.__builtin___strcat_chk(new $c.Ptr(prefix, 0), $c.lit("empty "), 80);
     }
     if (bknown && obj.oclass !== COIN_CLASS && (obj.otyp !== POT_WATER || !objects[POT_WATER].oc_name_known || !obj.cursed && !obj.blessed)) {
@@ -937,10 +947,10 @@ async function doname_base(obj, doname_flags) {   // objnam.c:1223
             $c.__builtin___strcat_chk(new $c.Ptr(prefix, 0), $c.lit("uncursed "), 80);
         }
     }
-    if ((obj.otyp === LARGE_BOX || obj.otyp === CHEST) && obj.otrapped | 0 && obj.tknown | 0 && obj.dknown | 0) {
+    if (Is_box(obj) && obj.otrapped | 0 && obj.tknown | 0 && obj.dknown | 0) {
         $c.__builtin___strcat_chk(new $c.Ptr(prefix, 0), $c.lit("trapped "), 80);
     }
-    if (lknown && (obj.otyp === LARGE_BOX || obj.otyp === CHEST)) {
+    if (lknown && Is_box(obj)) {
         if (obj.obroken) {
             $c.__builtin___strcat_chk(new $c.Ptr(prefix, 0), $c.lit("broken "), 80);
         } else if (obj.olocked) {
@@ -952,15 +962,15 @@ async function doname_base(obj, doname_flags) {   // objnam.c:1223
     if (obj.greased) {
         $c.__builtin___strcat_chk(new $c.Ptr(prefix, 0), $c.lit("greased "), 80);
     }
-    if (cknown && obj.cobj !== null && bpspaceleft > 0) {
-        itemcount = await count_contents(obj, 0, 0, 1, 0);
+    if (cknown && Has_contents(obj) && bpspaceleft > 0) {
+        itemcount = await count_contents(obj, FALSE, FALSE, TRUE, FALSE);
         do {
             nh_snprintf($c.lit("doname_base"), 1379, bp_eos[0].add(-0), $c.addu64(bpspaceleft, 0), $c.lit(" containing %ld item%s"), itemcount, itemcount === 1 ? $c.lit("") : $c.lit("s"));
             bp_eos[0] = eos(bp), bpspaceleft = $c.u64($c.pdiff(bp_end, bp_eos[0]));
         } while (0);
     }
     S1: for (;;) {
-        switch ($goto !== null ? $goto : (obj.oclass === TOOL_CLASS && objects[obj.otyp].oc_subtyp !== P_NONE ? WEAPON_CLASS : obj.oclass)) {
+        switch ($goto !== null ? $goto : (is_weptool(obj) ? WEAPON_CLASS : obj.oclass)) {
             case AMULET_CLASS:
                 if ($c.and64(obj.owornmask, W_AMUL)) {
                     do {
@@ -970,13 +980,13 @@ async function doname_base(obj, doname_flags) {   // objnam.c:1223
                 }
                 break;
             case ARMOR_CLASS:
-                if ($c.and64(obj.owornmask, W_ARM | W_ARMC | W_ARMH | W_ARMS | W_ARMG | W_ARMF | W_ARMU)) {
+                if ($c.and64(obj.owornmask, W_ARMOR)) {
                     do {
                         $c.__builtin___strncat_chk(bp_eos[0].add(-0), $c.peq(obj, $G.uskin) ? $c.lit(" (embedded in your skin)") : doffing(obj) ? $c.lit(" (being doffed)") : donning(obj) ? $c.lit(" (being donned)") : $c.lit(" (being worn)"), $c.addu64(bpspaceleft, 0), -1);
                         bp_eos[0] = eos(bp), bpspaceleft = $c.u64($c.pdiff(bp_end, bp_eos[0]));
                     } while (0);
                     if (bp_eos[0].get(-1) === 41) {
-                        if ($c.peq(obj, $G.uarmg) && u.uprops[GLIB].intrinsic) {
+                        if ($c.peq(obj, $G.uarmg) && Glib()) {
                             do {
                                 $c.__builtin___strncat_chk(bp_eos[0].add(-1), $c.lit("; slippery)"), $c.addu64(bpspaceleft, 1), -1);
                                 bp_eos[0] = eos(bp), bpspaceleft = $c.u64($c.pdiff(bp_end, bp_eos[0]));
@@ -984,7 +994,7 @@ async function doname_base(obj, doname_flags) {   // objnam.c:1223
                         }
                     }
                     if (bp_eos[0].get(-1) === 41) {
-                        if (!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked) && obj.lamplit | 0 && artifact_light(obj)) {
+                        if (!Blind() && obj.lamplit | 0 && artifact_light(obj)) {
                             do {
                                 nh_snprintf($c.lit("doname_base"), 1413, bp_eos[0].add(-1), $c.addu64(bpspaceleft, 1), $c.lit(", %s lit)"), arti_light_description(obj));
                                 bp_eos[0] = eos(bp), bpspaceleft = $c.u64($c.pdiff(bp_end, bp_eos[0]));
@@ -1011,7 +1021,7 @@ async function doname_base(obj, doname_flags) {   // objnam.c:1223
                 }
                 if (obj.otyp === LEASH && obj.corpsenm !== 0) {
                     mlsh = find_mid(obj.corpsenm >>> 0, FM_FMON);
-                    if (mlsh && !(mlsh.mhp < 1)) {
+                    if (mlsh && !DEADMONSTER(mlsh)) {
                         do {
                             nh_snprintf($c.lit("doname_base"), 1435, bp_eos[0].add(-0), $c.addu64(bpspaceleft, 0), $c.lit(" (attached to %s)"), await noit_mon_nam(mlsh));
                             bp_eos[0] = eos(bp), bpspaceleft = $c.u64($c.pdiff(bp_end, bp_eos[0]));
@@ -1033,8 +1043,8 @@ async function doname_base(obj, doname_flags) {   // objnam.c:1223
                         bp_eos[0] = eos(bp), bpspaceleft = $c.u64($c.pdiff(bp_end, bp_eos[0]));
                     } while (0);
                     break;
-                } else if (obj.otyp === OIL_LAMP || obj.otyp === MAGIC_LAMP || obj.otyp === BRASS_LANTERN || (obj.otyp === TALLOW_CANDLE || obj.otyp === WAX_CANDLE)) {
-                    if (obj.otyp === TALLOW_CANDLE || obj.otyp === WAX_CANDLE) {
+                } else if (obj.otyp === OIL_LAMP || obj.otyp === MAGIC_LAMP || obj.otyp === BRASS_LANTERN || Is_candle(obj)) {
+                    if (Is_candle(obj)) {
                         full_burn_time = $c.mul64(20, objects[obj.otyp].oc_cost);
                         turns_left = obj.age;
                         if (obj.lamplit) {
@@ -1091,7 +1101,7 @@ async function doname_base(obj, doname_flags) {   // objnam.c:1223
                         bp_eos[0] = eos(bp), bpspaceleft = $c.u64($c.pdiff(bp_end, bp_eos[0]));
                     } while (0);
                 }
-                if ($c.and64(obj.owornmask, W_RINGL | W_RINGR)) {
+                if ($c.and64(obj.owornmask, W_RING)) {
                     do {
                         nh_snprintf($c.lit("doname_base"), 1499, bp_eos[0].add(-0), $c.addu64(bpspaceleft, 0), $c.lit("%s)"), await body_part(HAND));
                         bp_eos[0] = eos(bp), bpspaceleft = $c.u64($c.pdiff(bp_end, bp_eos[0]));
@@ -1113,7 +1123,7 @@ async function doname_base(obj, doname_flags) {   // objnam.c:1223
                     releaseobuf(cxstr);
                     gx.xnamep = save_xnamep;
                 } else if (obj.otyp === EGG) {
-                    if (omndx >= LOW_PM && omndx < NUMMONS && (known || svm.mvitals[omndx].mvflags & MV_KNOWS_EGG)) {
+                    if (ismnum(omndx) && (known || svm.mvitals[omndx].mvflags & MV_KNOWS_EGG)) {
                         $c.__builtin___strcat_chk(new $c.Ptr(prefix, 0), mons[omndx].pmnames[NEUTRAL], 80);
                         $c.__builtin___strcat_chk(new $c.Ptr(prefix, 0), $c.lit(" "), 80);
                         if (obj.spe === 1) {
@@ -1140,7 +1150,7 @@ async function doname_base(obj, doname_flags) {   // objnam.c:1223
         }
         break;
     }
-    if ((obj.otyp === STATUE || obj.otyp === CORPSE || obj.otyp === FIGURINE) && flags.debug && iflags.wizmgender) {
+    if ((obj.otyp === STATUE || obj.otyp === CORPSE || obj.otyp === FIGURINE) && wizard() && iflags.wizmgender) {
         cgend = obj.spe & CORPSTAT_GENDER;
         mgend = cgend === CORPSTAT_MALE ? MALE : cgend === CORPSTAT_FEMALE ? FEMALE : NEUTRAL;
         do {
@@ -1151,14 +1161,14 @@ async function doname_base(obj, doname_flags) {   // objnam.c:1223
     if ($c.and64(obj.owornmask, W_WEP) && !gm.mrg_to_wielded) {
         twoweap_primary = $c.i8($c.peq(obj, $G.uwep) && u.twoweap ? 1 : 0);
         tethered = $c.i8(obj.otyp === AKLYS ? 1 : 0);
-        if ((obj.quan !== 1 || (obj.oclass === WEAPON_CLASS ? (obj.oclass === WEAPON_CLASS || obj.oclass === GEM_CLASS) && objects[obj.otyp].oc_subtyp >= -P_CROSSBOW && objects[obj.otyp].oc_subtyp <= -P_BOW || (obj.oclass === WEAPON_CLASS || obj.oclass === TOOL_CLASS) && objects[obj.otyp].oc_subtyp >= -P_BOOMERANG && objects[obj.otyp].oc_subtyp <= -P_DART : !(obj.oclass === TOOL_CLASS && objects[obj.otyp].oc_subtyp !== P_NONE))) && !twoweap_primary) {
+        if ((obj.quan !== 1 || (obj.oclass === WEAPON_CLASS ? is_ammo(obj) || is_missile(obj) : !is_weptool(obj))) && !twoweap_primary) {
             do {
                 $c.__builtin___strncat_chk(bp_eos[0].add(-0), $c.lit(" (wielded)"), $c.addu64(bpspaceleft, 0), -1);
                 bp_eos[0] = eos(bp), bpspaceleft = $c.u64($c.pdiff(bp_end, bp_eos[0]));
             } while (0);
         } else {
             hand_s = await body_part(HAND);
-            if ((obj.oclass === WEAPON_CLASS || obj.oclass === TOOL_CLASS) && objects[obj.otyp].oc_big | 0) {
+            if (bimanual(obj)) {
                 hand_s = $c.__builtin___strcpy_chk(new $c.Ptr(handsbuf, 0), obufp = await makeplural(hand_s), 40);
                 releaseobuf(obufp);
             } else {
@@ -1169,7 +1179,7 @@ async function doname_base(obj, doname_flags) {   // objnam.c:1223
                 nh_snprintf($c.lit("doname_base"), 1595, bp_eos[0].add(-0), $c.addu64(bpspaceleft, 0), $c.lit(" (%s %s)"), tethered ? $c.lit("tethered to") : twoweap_primary ? $c.lit("wielded in") : $c.lit("weapon in"), hand_s);
                 bp_eos[0] = eos(bp), bpspaceleft = $c.u64($c.pdiff(bp_end, bp_eos[0]));
             } while (0);
-            if (!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked) && bpspaceleft && bp_eos[0].get(-1) === 41) {
+            if (!Blind() && bpspaceleft && bp_eos[0].get(-1) === 41) {
                 if (gw.warn_obj_cnt && $c.peq(obj, $G.uwep) && $c.and64(u.uprops[WARN_OF_MON].extrinsic, W_WEP) !== 0) {
                     do {
                         nh_snprintf($c.lit("doname_base"), 1605, bp_eos[0].add(-1), $c.addu64(bpspaceleft, 1), $c.lit(", %s %s)"), glow_verb(gw.warn_obj_cnt, 1), glow_color(obj.oartifact));
@@ -1200,7 +1210,7 @@ async function doname_base(obj, doname_flags) {   // objnam.c:1223
     if ($c.and64(obj.owornmask, W_QUIVER)) {
         switch (obj.oclass) {
             case WEAPON_CLASS:
-                Qtyp = !((obj.oclass === WEAPON_CLASS || obj.oclass === GEM_CLASS) && objects[obj.otyp].oc_subtyp >= -P_CROSSBOW && objects[obj.otyp].oc_subtyp <= -P_BOW) ? 3 : objects[obj.otyp].oc_subtyp !== -P_BOW ? 2 : 1;
+                Qtyp = !is_ammo(obj) ? 3 : objects[obj.otyp].oc_subtyp !== -P_BOW ? 2 : 1;
                 break;
             case RING_CLASS:
             case AMULET_CLASS:
@@ -1226,7 +1236,7 @@ async function doname_base(obj, doname_flags) {   // objnam.c:1223
             nh_snprintf($c.lit("doname_base"), 1661, bp_eos[0].add(-0), $c.addu64(bpspaceleft, 0), $c.lit(" (%s, %s)"), obj.unpaid | 0 ? $c.lit("unpaid") : $c.lit("contents"), new $c.Ptr(pricebuf, 0));
             bp_eos[0] = eos(bp), bpspaceleft = $c.u64($c.pdiff(bp_end, bp_eos[0]));
         } while (0);
-        record_price_quote(obj.otyp, $c.u64($c.div64(quotedprice, obj.quan)), 1);
+        record_price_quote(obj.otyp, $c.u64($c.div64(quotedprice, obj.quan)), TRUE);
     } else if (with_price) {
         nochrg[0] = 0;
         price = await get_cost_of_shop_item(obj, new $c.Ptr(nochrg, 0));
@@ -1245,7 +1255,7 @@ async function doname_base(obj, doname_flags) {   // objnam.c:1223
             append_price_quote(bp, new $c.Ptr(bp_eos, 0), obj.otyp);
         }
         if (price > 0) {
-            record_price_quote(obj.otyp, $c.u64($c.div64(price, obj.quan)), 1);
+            record_price_quote(obj.otyp, $c.u64($c.div64(price, obj.quan)), TRUE);
         }
     } else if (iflags.pricequotes && !objects[obj.otyp].oc_name_known) {
         append_price_quote(bp, new $c.Ptr(bp_eos, 0), obj.otyp);
@@ -1255,7 +1265,7 @@ async function doname_base(obj, doname_flags) {   // objnam.c:1223
         just_an(new $c.Ptr(prefix, 0), new $c.Ptr(tmpbuf, 0).get(0) ? new $c.Ptr(tmpbuf, 0) : bp);
         $c.__builtin___strcat_chk(new $c.Ptr(prefix, 0), new $c.Ptr(tmpbuf, 0), 80);
     }
-    if (flags.debug && iflags.wizweight) {
+    if (wizard() && iflags.wizweight) {
         if (with_price && bp_eos[0].get(-1) === 41) {
             do {
                 nh_snprintf($c.lit("doname_base"), 1700, bp_eos[0].add(-1), $c.addu64(bpspaceleft, 1), $c.lit(", %u aum)"), obj.owt);
@@ -1267,8 +1277,8 @@ async function doname_base(obj, doname_flags) {   // objnam.c:1223
                 bp_eos[0] = eos(bp), bpspaceleft = $c.u64($c.pdiff(bp_end, bp_eos[0]));
             } while (0);
         }
-        bp_eos[0];
-        bpspaceleft;
+        nhUse(bp_eos[0]);
+        nhUse(bpspaceleft);
     }
     bp = await strprepend(bp, new $c.Ptr(prefix, 0));
     if ($c.strlen(bp) > BUFSZ - 1) {
@@ -1298,21 +1308,21 @@ export async function doname_vague_quan(obj) {   // objnam.c:1768
 }
 export function not_fully_identified(otmp) {   // objnam.c:1787
     if (otmp.oclass === COIN_CLASS) {
-        return 0;
+        return FALSE;
     }
     if (!otmp.known || !otmp.dknown || !otmp.bknown && otmp.otyp !== SCR_MAIL || !objects[otmp.otyp].oc_name_known) {
-        return 1;
+        return TRUE;
     }
-    if (!otmp.cknown && (otmp.otyp >= LARGE_BOX && otmp.otyp <= BAG_OF_TRICKS || otmp.otyp === STATUE) || !otmp.lknown && (otmp.otyp === LARGE_BOX || otmp.otyp === CHEST)) {
-        return 1;
+    if (!otmp.cknown && (Is_container(otmp) || otmp.otyp === STATUE) || !otmp.lknown && Is_box(otmp)) {
+        return TRUE;
     }
     if (otmp.oartifact && undiscovered_artifact($c.i16(otmp.oartifact))) {
-        return 1;
+        return TRUE;
     }
-    if (otmp.rknown | 0 || otmp.oclass !== ARMOR_CLASS && otmp.oclass !== WEAPON_CLASS && !(otmp.oclass === TOOL_CLASS && objects[otmp.otyp].oc_subtyp !== P_NONE) && otmp.oclass !== BALL_CLASS) {
-        return 0;
+    if (otmp.rknown | 0 || otmp.oclass !== ARMOR_CLASS && otmp.oclass !== WEAPON_CLASS && !is_weptool(otmp) && otmp.oclass !== BALL_CLASS) {
+        return FALSE;
     } else {
-        return $c.i8((objects[otmp.otyp].oc_material | 0) === IRON || is_flammable(otmp) || is_rottable(otmp) || ((objects[otmp.otyp].oc_material | 0) === COPPER || (objects[otmp.otyp].oc_material | 0) === IRON) || (objects[otmp.otyp].oc_material | 0) === GLASS && otmp.oclass === ARMOR_CLASS ? 1 : 0);
+        return $c.i8(is_damageable(otmp));
     }
 }
 export async function corpse_xname(otmp, adjective, cxn_flags) {   // objnam.c:1824
@@ -1323,7 +1333,7 @@ export async function corpse_xname(otmp, adjective, cxn_flags) {   // objnam.c:1
     the_prefix = $c.i8((cxn_flags & CXN_PFX_THE) >>> 0 !== 0 ? 1 : 0);
     any_prefix = $c.i8((cxn_flags & CXN_ARTICLE) >>> 0 !== 0 ? 1 : 0);
     omit_corpse = $c.i8((cxn_flags & CXN_NOCORPSE) >>> 0 !== 0 ? 1 : 0);
-    possessive = 0;
+    possessive = FALSE;
     glob = $c.i8(otmp.otyp !== CORPSE && otmp.globby | 0 ? 1 : 0);
     $t1 = nextobuf(), gx.xnamep = $t1;
     nambuf = gx.xnamep.add(PREFIX);
@@ -1333,20 +1343,20 @@ export async function corpse_xname(otmp, adjective, cxn_flags) {   // objnam.c:1
         mnam = $c.lit("thing");
     } else {
         mnam = await obj_pmname(otmp);
-        if (the_unique_pm($c.relem(mons, omndx)) || $c.andu64($c.relem(mons, omndx).mflags2, M2_PNAME) !== 0) {
+        if (the_unique_pm($c.relem(mons, omndx)) || type_is_pname($c.relem(mons, omndx))) {
             mnam = s_suffix(mnam);
-            possessive = 1;
-            if ($c.andu64($c.relem(mons, omndx).mflags2, M2_PNAME) !== 0) {
-                no_prefix = 1;
+            possessive = TRUE;
+            if (type_is_pname($c.relem(mons, omndx))) {
+                no_prefix = TRUE;
             } else if (the_unique_pm($c.relem(mons, omndx)) && !no_prefix) {
-                the_prefix = 1;
+                the_prefix = TRUE;
             }
         }
     }
     if (no_prefix) {
-        the_prefix = any_prefix = 0;
+        the_prefix = any_prefix = FALSE;
     } else if (the_prefix) {
-        any_prefix = 0;
+        any_prefix = FALSE;
     }
     nambuf.set(0, 0);
     if (the_prefix) {
@@ -1362,7 +1372,7 @@ export async function corpse_xname(otmp, adjective, cxn_flags) {   // objnam.c:1
         }
         mungspaces(nambuf);
         if (digit(adjective.get(0))) {
-            any_prefix = 0;
+            any_prefix = FALSE;
         }
     }
     if (glob) {
@@ -1370,7 +1380,7 @@ export async function corpse_xname(otmp, adjective, cxn_flags) {   // objnam.c:1
         $c.__builtin___strcat_chk(nambuf, $c.lit(" corpse"), -1);
         if (otmp.quan > 1 && !ignore_quan) {
             $c.__builtin___strcat_chk(nambuf, $c.lit("s"), -1);
-            any_prefix = 0;
+            any_prefix = FALSE;
         }
     }
     if (any_prefix) {
@@ -1398,7 +1408,7 @@ export async function killer_xname(obj) {   // objnam.c:1942
         return await bare_artifactname(obj);
     }
     save_obj.$copyFrom(obj);
-    if (obj.oextra && obj.oextra.oname) {
+    if (has_oname(obj)) {
         save_oname = obj.oextra.oname;
     }
     $t1 = obj.dknown = (1) & 1, obj.known = ($t1) & 1;
@@ -1453,7 +1463,7 @@ export async function short_oname(obj, func, altfunc, lenlimit) {   // objnam.c:
             return outbuf;
         }
     }
-    save_oname = obj.oextra && obj.oextra.oname ? obj.oextra.oname : null;
+    save_oname = has_oname(obj) ? obj.oextra.oname : null;
     if (save_oname && $c.strlen(save_oname) >= 12) {
         $c.__builtin___strncpy_chk(new $c.Ptr(onamebuf, 0), save_oname, 8, 12);
         $c.__builtin___strcpy_chk(new $c.Ptr(onamebuf, 0).add($c.idx(12)).add(-4), $c.lit("..."), 4);
@@ -1540,7 +1550,7 @@ export async function An(str) {   // objnam.c:2158
 export async function the(str) {   // objnam.c:2171
     let aname = null, buf = null, insert_the = 0, named = null, called = null, tmp = null, l = 0, $t1;
     buf = nextobuf();
-    insert_the = 0;
+    insert_the = FALSE;
     if (!str || !str.get(0)) {
         await impossible($c.lit("Alphabet soup: 'the(%s)'."), str ? $c.lit("\"\"") : $c.lit("<null>"));
         return $c.__builtin___strcpy_chk(buf, $c.lit("the []"), -1);
@@ -1549,8 +1559,8 @@ export async function the(str) {   // objnam.c:2171
         $t1 = lowc(str.get(0)), buf.set(0, $t1);
         $c.__builtin___strcpy_chk(buf.add(1), str.add(1), -1);
         return buf;
-    } else if (str.get(0) < 65 || str.get(0) > 90 || await CapitalMon(str) || await fruit_from_name(str, 1, null) && ((aname = artifact_name(str, null, 0)) === null || strncmpi(aname, $c.lit("the "), 4) === 0)) {
-        insert_the = 1;
+    } else if (str.get(0) < 65 || str.get(0) > 90 || await CapitalMon(str) || await fruit_from_name(str, TRUE, null) && ((aname = artifact_name(str, null, FALSE)) === null || strncmpi(aname, $c.lit("the "), 4) === 0)) {
+        insert_the = TRUE;
     } else {
         if (((tmp = $c.strrchr(str, 32)) !== null || (tmp = $c.strrchr(str, 45)) !== null) && (tmp.get(1) < 65 || tmp.get(1) > 90)) {
             insert_the = $c.i8(!$c.strchr(str, 39) ? 1 : 0);
@@ -1562,9 +1572,9 @@ export async function the(str) {   // objnam.c:2171
                 named = called;
             }
             if (tmp && (!named || $c.pcmp(tmp, named) < 0)) {
-                insert_the = 1;
+                insert_the = TRUE;
             } else if (!named && (l = await Strlen_(str, $c.lit("the"), 2220) | 0) >= 31 && !$c.strcmp(str.add(l - 31 | 0), $c.lit("Platinum Yendorian Express Card"))) {
-                insert_the = 1;
+                insert_the = TRUE;
             }
         }
     }
@@ -1597,7 +1607,7 @@ export async function aobjnam(otmp, verb) {   // objnam.c:2244
 export async function yobjnam(obj, verb) {   // objnam.c:2262
     let s = null, outbuf = null, space_left = 0;
     s = await aobjnam(obj, verb);
-    if (!(obj.where === OBJ_INVENT) || !obj_is_pname(obj) || obj.oartifact >= ART_ORB_OF_DETECTION) {
+    if (!carried(obj) || !obj_is_pname(obj) || obj.oartifact >= ART_ORB_OF_DETECTION) {
         outbuf = await shk_your(nextobuf(), obj);
         space_left = BUFSZ - 1 - await Strlen_(outbuf, $c.lit("yobjnam"), 2271) >>> 0 | 0;
         s = $c.__builtin___strncat_chk(outbuf, s, $c.u64(space_left), -1);
@@ -1629,15 +1639,15 @@ export async function paydoname(obj) {   // objnam.c:2313
     let p = null, save_cknown = 0, save_wizweight = 0;
     save_cknown = obj.cknown;
     save_wizweight = iflags.wizweight;
-    if (obj.cobj !== null) {
+    if (Has_contents(obj)) {
         obj.cknown = (0) & 1;
     }
-    iflags.wizweight = 0;
+    iflags.wizweight = FALSE;
     iflags.suppress_price = iflags.suppress_price + 1 | 0;
     p = await doname_base(obj, 0);
     iflags.suppress_price = iflags.suppress_price - 1 | 0;
     iflags.wizweight = save_wizweight;
-    if (obj.cobj !== null) {
+    if (Has_contents(obj)) {
         if (!obj.no_charge) {
             if (!$c.strncmp(p, $c.lit("a "), 2)) {
                 p = p.add(2);
@@ -1662,7 +1672,7 @@ export async function paydoname(obj) {   // objnam.c:2313
 export async function yname(obj) {   // objnam.c:2359
     let s = null, outbuf = null, space_left = 0;
     s = await cxname(obj);
-    if (!(obj.where === OBJ_INVENT) || !obj_is_pname(obj) || obj.oartifact >= ART_ORB_OF_DETECTION) {
+    if (!carried(obj) || !obj_is_pname(obj) || obj.oartifact >= ART_ORB_OF_DETECTION) {
         outbuf = await shk_your(nextobuf(), obj);
         space_left = BUFSZ - 1 - await Strlen_(outbuf, $c.lit("yname"), 2368) >>> 0 | 0;
         s = $c.__builtin___strncat_chk(outbuf, s, $c.u64(space_left), -1);
@@ -1725,9 +1735,9 @@ export async function thesimpleoname(obj) {   // objnam.c:2474
 }
 export async function actualoname(obj) {   // objnam.c:2490
     let res = null;
-    iflags.override_ID = 1;
+    iflags.override_ID = TRUE;
     res = await minimal_xname(obj);
-    iflags.override_ID = 0;
+    iflags.override_ID = FALSE;
     return res;
 }
 export async function bare_artifactname(obj) {   // objnam.c:2502
@@ -1745,7 +1755,7 @@ export async function bare_artifactname(obj) {   // objnam.c:2502
 }
 export async function otense(otmp, verb) {   // objnam.c:2531
     let buf = null;
-    if (!(otmp.quan !== 1 || otmp.oartifact === ART_EYES_OF_THE_OVERWORLD && !undiscovered_artifact(ART_EYES_OF_THE_OVERWORLD))) {
+    if (!is_plural(otmp)) {
         return await vtense(null, verb);
     }
     buf = nextobuf();
@@ -1813,54 +1823,54 @@ async function singplur_lookup(basestr, endstring, to_plural, alt_as_is) {   // 
     for (as = new $c.Ptr(as_is, 0); as.get(0); as = as.add(1)) {
         al = $c.i32($c.strlen(as.get(0)));
         if (!($c.pcmp(endstring.add(-al), basestr) < 0 || strncmpi(endstring.add(-al), as.get(0), -1))) {
-            return 1;
+            return TRUE;
         }
     }
     if (alt_as_is) {
         for (as = alt_as_is; as.get(0); as = as.add(1)) {
             al = $c.i32($c.strlen(as.get(0)));
             if (!($c.pcmp(endstring.add(-al), basestr) < 0 || strncmpi(endstring.add(-al), as.get(0), -1))) {
-                return 1;
+                return TRUE;
             }
         }
     }
     if (baselen > 5 && !($c.pcmp(endstring.add(-5), basestr) < 0 || strncmpi(endstring.add(-5), $c.lit("craft"), -1))) {
-        return 1;
+        return TRUE;
     }
     if (!strncmpi(basestr, $c.lit("slice"), -1) || !strncmpi(basestr, $c.lit("mongoose"), -1)) {
         if (to_plural) {
             strcasecpy(endstring, $c.lit("s"));
         }
-        return 1;
+        return TRUE;
     }
     if (to_plural && baselen > 2 && !strncmpi(endstring.add(-2), $c.lit("ox"), -1) && !(baselen > 5 && !strncmpi(endstring.add(-6), $c.lit("muskox"), -1))) {
         strcasecpy(endstring, $c.lit("es"));
-        return 1;
+        return TRUE;
     }
     if (to_plural) {
         if (baselen > 2 && !strncmpi(endstring.add(-3), $c.lit("man"), -1) && badman(basestr, to_plural)) {
             strcasecpy(endstring, $c.lit("s"));
-            return 1;
+            return TRUE;
         }
     } else {
         if (baselen > 2 && !strncmpi(endstring.add(-3), $c.lit("men"), -1) && badman(basestr, to_plural)) {
-            return 1;
+            return TRUE;
         }
     }
     for (sp = $c.relem(one_off, 0); sp.sing; sp = $c.radd(sp, 1)) {
         same = to_plural ? sp.plur : sp.sing;
         al = $c.i32($c.strlen(same));
         if (!($c.pcmp(endstring.add(-al), basestr) < 0 || strncmpi(endstring.add(-al), same, -1))) {
-            return 1;
+            return TRUE;
         }
         other = to_plural ? sp.sing : sp.plur;
         al = $c.i32($c.strlen(other));
         if (!($c.pcmp(endstring.add(-al), basestr) < 0 || strncmpi(endstring.add(-al), other, -1))) {
             strcasecpy(endstring.add(-al), same);
-            return 1;
+            return TRUE;
         }
     }
-    return 0;
+    return FALSE;
 }
 function singplur_compound(str) {   // objnam.c:2783
     let cmpd = null, p = null;
@@ -1928,14 +1938,14 @@ export async function makeplural(oldstr) {   // objnam.c:2836
             break bottom$;
         }
         {
-            if (await singplur_lookup(str, spot.add(1), 1, new $c.Ptr(makeplural$already_plural, 0))) {
+            if (await singplur_lookup(str, spot.add(1), TRUE, new $c.Ptr(makeplural$already_plural, 0))) {
                 break bottom$;
             }
             if (len === 2 && !strncmpi(str, $c.lit("ya"), -1) || len >= 3 && !strncmpi(spot.add(-2), $c.lit(" ya"), -1)) {
                 break bottom$;
             }
         }
-        if (len >= 3 && !strncmpi(spot.add(-2), $c.lit("man"), -1) && !badman(str, 1)) {
+        if (len >= 3 && !strncmpi(spot.add(-2), $c.lit("man"), -1) && !badman(str, TRUE)) {
             strcasecpy(spot.add(-1), $c.lit("en"));
             break bottom$;
         }
@@ -2031,7 +2041,7 @@ export async function makesingular(oldstr) {   // objnam.c:3037
         p = eos(bp);
     }
     bottom$: {
-        if (await singplur_lookup(bp, p, 0, new $c.Ptr(special_subjs, 0))) {
+        if (await singplur_lookup(bp, p, FALSE, new $c.Ptr(special_subjs, 0))) {
             break bottom$;
         }
         if ($c.pcmp(p, bp.add(1)) >= 0 && lowc(p.get(-1)) === 115) {
@@ -2065,7 +2075,7 @@ export async function makesingular(oldstr) {   // objnam.c:3037
             }
             p.add(-1).set(0, 0);
         } else {
-            if (!($c.pcmp(p.add(-3), bp) < 0 || strncmpi(p.add(-3), $c.lit("men"), -1)) && !badman(bp, 0)) {
+            if (!($c.pcmp(p.add(-3), bp) < 0 || strncmpi(p.add(-3), $c.lit("men"), -1)) && !badman(bp, FALSE)) {
                 strcasecpy(p.add(-2), $c.lit("an"));
                 break bottom$;
             }
@@ -2086,21 +2096,21 @@ export async function makesingular(oldstr) {   // objnam.c:3037
 function ch_ksound(basestr) {   // objnam.c:3168
     let i = 0, al = 0, endstr = null;
     if (!basestr || $c.strlen(basestr) < 4) {
-        return 0;
+        return FALSE;
     }
     endstr = eos(basestr);
     for (i = 0; i < 19; i = i + 1 | 0) {
         al = $c.i32($c.strlen(ch_ksound$ch_k[i]));
         if (!($c.pcmp(endstr.add(-al), basestr) < 0 || strncmpi(endstr.add(-al), ch_ksound$ch_k[i], -1))) {
-            return 1;
+            return TRUE;
         }
     }
-    return 0;
+    return FALSE;
 }
 function badman(basestr, to_plural) {   // objnam.c:3194
     let i = 0, al = 0, endstr = null, spot = null;
     if (!basestr || $c.strlen(basestr) < 4) {
-        return 0;
+        return FALSE;
     }
     endstr = eos(basestr);
     if (to_plural) {
@@ -2108,7 +2118,7 @@ function badman(basestr, to_plural) {   // objnam.c:3194
             al = $c.i32($c.strlen(badman$no_men[i]));
             spot = endstr.add(-(al + 3 | 0));
             if (!($c.pcmp(spot, basestr) < 0 || strncmpi(spot, badman$no_men[i], al)) && ($c.peq(spot, basestr) || spot.add(-1).get(0) === 32)) {
-                return 1;
+                return TRUE;
             }
         }
     } else {
@@ -2116,16 +2126,16 @@ function badman(basestr, to_plural) {   // objnam.c:3194
             al = $c.i32($c.strlen(badman$no_man[i]));
             spot = endstr.add(-(al + 3 | 0));
             if (!($c.pcmp(spot, basestr) < 0 || strncmpi(spot, badman$no_man[i], al)) && ($c.peq(spot, basestr) || spot.add(-1).get(0) === 32)) {
-                return 1;
+                return TRUE;
             }
         }
     }
-    return 0;
+    return FALSE;
 }
 async function wishymatch(u_str, o_str, retry_inverted) {   // objnam.c:3243
     let p = null, buf = new Int8Array(256), u_of = null, o_of = null;
-    if (fuzzymatch(u_str, o_str, $c.lit(" -"), 1)) {
-        return 1;
+    if (fuzzymatch(u_str, o_str, $c.lit(" -"), TRUE)) {
+        return TRUE;
     }
     if (retry_inverted) {
         u_of = strstri(u_str, $c.lit(" of "));
@@ -2133,35 +2143,35 @@ async function wishymatch(u_str, o_str, retry_inverted) {   // objnam.c:3243
         if (u_of && !o_of) {
             $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), u_of.add(4), 256);
             copynchars(eos($c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit(" "), 256)), u_str, $c.i32($c.pdiff(u_of, u_str)));
-            if (fuzzymatch(new $c.Ptr(buf, 0), o_str, $c.lit(" -"), 1)) {
-                return 1;
+            if (fuzzymatch(new $c.Ptr(buf, 0), o_str, $c.lit(" -"), TRUE)) {
+                return TRUE;
             }
         } else if (o_of && !u_of) {
             $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), o_of.add(4), 256);
             copynchars(eos($c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit(" "), 256)), o_str, $c.i32($c.pdiff(o_of, o_str)));
-            if (fuzzymatch(u_str, new $c.Ptr(buf, 0), $c.lit(" -"), 1)) {
-                return 1;
+            if (fuzzymatch(u_str, new $c.Ptr(buf, 0), $c.lit(" -"), TRUE)) {
+                return TRUE;
             }
         }
     }
     if (!$c.strncmp(o_str, $c.lit("dwarvish "), 9)) {
         if (!strncmpi(u_str, $c.lit("dwarven "), 8)) {
-            return fuzzymatch(u_str.add(8), o_str.add(9), $c.lit(" -"), 1);
+            return fuzzymatch(u_str.add(8), o_str.add(9), $c.lit(" -"), TRUE);
         }
     } else if (!$c.strncmp(o_str, $c.lit("elven "), 6)) {
         if (!strncmpi(u_str, $c.lit("elvish "), 7)) {
-            return fuzzymatch(u_str.add(7), o_str.add(6), $c.lit(" -"), 1);
+            return fuzzymatch(u_str.add(7), o_str.add(6), $c.lit(" -"), TRUE);
         } else if (!strncmpi(u_str, $c.lit("elfin "), 6)) {
-            return fuzzymatch(u_str.add(6), o_str.add(6), $c.lit(" -"), 1);
+            return fuzzymatch(u_str.add(6), o_str.add(6), $c.lit(" -"), TRUE);
         }
     } else if (strstri(o_str, $c.lit("helm")) && strstri(u_str, $c.lit("helmet"))) {
         copynchars(new $c.Ptr(buf, 0), u_str, 255);
         strsubst(new $c.Ptr(buf, 0), $c.lit("helmet"), $c.lit("helm"));
-        return await wishymatch(new $c.Ptr(buf, 0), o_str, 1);
+        return await wishymatch(new $c.Ptr(buf, 0), o_str, TRUE);
     } else if (strstri(o_str, $c.lit("gauntlets")) && strstri(u_str, $c.lit("gloves"))) {
         copynchars(new $c.Ptr(buf, 0), u_str, 252);
         strsubst(new $c.Ptr(buf, 0), $c.lit("gloves"), $c.lit("gauntlets"));
-        return await wishymatch(new $c.Ptr(buf, 0), o_str, 1);
+        return await wishymatch(new $c.Ptr(buf, 0), o_str, TRUE);
     } else if (!$c.strncmp(o_str, new $c.Ptr(wishymatch$detect_SP, 0), 7)) {
         if ((p = strstri(u_str, new $c.Ptr(wishymatch$SP_detection, 0))) !== null && !p.add($c.idx(11)).add(-1).get(0)) {
             p.set(0, 0);
@@ -2170,27 +2180,27 @@ async function wishymatch(u_str, o_str, retry_inverted) {   // objnam.c:3243
                 $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit("s"), 256);
             }
             p.set(0, 32);
-            return fuzzymatch(new $c.Ptr(buf, 0), o_str, $c.lit(" -"), 1);
+            return fuzzymatch(new $c.Ptr(buf, 0), o_str, $c.lit(" -"), TRUE);
         }
     } else if (strstri(o_str, new $c.Ptr(wishymatch$SP_detection, 0))) {
         if (!strncmpi(u_str, new $c.Ptr(wishymatch$detect_SP, 0), 7)) {
             p = await makesingular(u_str.add($c.idx(8)).add(-1));
             $c.__builtin___strcat_chk($c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), p, 256), new $c.Ptr(wishymatch$SP_detection, 0), -1);
             releaseobuf(p);
-            return fuzzymatch(new $c.Ptr(buf, 0), o_str, $c.lit(" -"), 1);
+            return fuzzymatch(new $c.Ptr(buf, 0), o_str, $c.lit(" -"), TRUE);
         }
     } else if (strstri(o_str, $c.lit("ability"))) {
         if ((p = strstri(u_str, $c.lit("abilities"))) !== null && !p.add($c.idx(10)).add(-1).get(0)) {
             $c.__builtin___strncpy_chk(new $c.Ptr(buf, 0), u_str, $c.u32($c.pdiff(p, u_str)), 256);
             $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0).add($c.idx($c.pdiff(p, u_str))), $c.lit("ability"), -1);
-            return fuzzymatch(new $c.Ptr(buf, 0), o_str, $c.lit(" -"), 1);
+            return fuzzymatch(new $c.Ptr(buf, 0), o_str, $c.lit(" -"), TRUE);
         }
     } else if (!$c.strcmp(o_str, $c.lit("aluminum"))) {
         if (!strncmpi(u_str, $c.lit("aluminium"), -1)) {
-            return fuzzymatch(u_str.add(9), o_str.add(8), $c.lit(" -"), 1);
+            return fuzzymatch(u_str.add(9), o_str.add(8), $c.lit(" -"), TRUE);
         }
     }
-    return 0;
+    return FALSE;
 }
 function rnd_otyp_by_wpnskill(skill) {   // objnam.c:3432
     let i = 0, n = 0, otyp = 0;
@@ -2236,7 +2246,7 @@ async function rnd_otyp_by_namedesc(name, oclass, xtra_prob) {   // objnam.c:345
         if ((zn = obj_descr[objects[i].oc_name_idx].oc_name) === null) {
             continue;
         }
-        if (await wishymatch(name, zn, 1) || check_of && i !== BELL_OF_OPENING && (i < minglob || i > maxglob) && (of = strstri(zn, $c.lit(" of "))) !== null && await wishymatch(name, of.add(4), 0) || (zn = obj_descr[objects[i].oc_descr_idx].oc_descr) !== null && await wishymatch(name, zn, 0) || zn && check_of && (of = strstri(zn, $c.lit(" of "))) !== null && await wishymatch(name, of.add(4), 0) || (zn = objects[i].oc_uname) !== null && await wishymatch(name, zn, 0)) {
+        if (await wishymatch(name, zn, TRUE) || check_of && i !== BELL_OF_OPENING && (i < minglob || i > maxglob) && (of = strstri(zn, $c.lit(" of "))) !== null && await wishymatch(name, of.add(4), FALSE) || (zn = obj_descr[objects[i].oc_descr_idx].oc_descr) !== null && await wishymatch(name, zn, FALSE) || zn && check_of && (of = strstri(zn, $c.lit(" of "))) !== null && await wishymatch(name, of.add(4), FALSE) || (zn = objects[i].oc_uname) !== null && await wishymatch(name, zn, FALSE)) {
             validobjs[($t1 = n, n = $t1 + 1 | 0, $t1)] = $c.i16(i);
             maxprob = maxprob + (objects[i].oc_prob + xtra_prob | 0) | 0;
         }
@@ -2270,14 +2280,14 @@ function set_wallprop_from_str(bp) {   // objnam.c:3539
 }
 async function wizterrainwish(d) {   // objnam.c:3554
     let lev = null, madeterrain = 0, badterrain = 0, is_dbridge = 0, trap = 0, oldtyp = 0, ltyp = 0, x = 0, y = 0, bp = null, p = null, t = null, tname = null, save_prop = 0, new_water = null, icebuf = new Int8Array(40), al = 0, dbuf = new Int8Array(40), old_wall_info = 0, secret = 0, wall = 0, t$2 = null, $t1, $t2, $t3, $t4;
-    madeterrain = 0;
-    badterrain = 0;
+    madeterrain = FALSE;
+    badterrain = FALSE;
     x = u.ux;
     y = u.uy;
     bp = d.bp;
     for (trap = NO_TRAP + 1; trap < TRAPNUM; trap = trap + 1 | 0) {
-        tname = trapname(trap, 1);
-        if (!str_start_is(bp, tname, 1)) {
+        tname = trapname(trap, TRUE);
+        if (!str_start_is(bp, tname, TRUE)) {
             continue;
         }
         if ((trap === HOLE || trap === TRAPDOOR) && !Can_fall_thru(u.uz)) {
@@ -2285,7 +2295,7 @@ async function wizterrainwish(d) {   // objnam.c:3554
         }
         if ((t = await maketrap(x, y, trap)) !== null) {
             trap = t.ttyp | 0;
-            tname = trapname(trap, 1);
+            tname = trapname(trap, TRUE);
             await pline($c.lit("%s%s."), await An(tname), trap !== MAGIC_PORTAL ? $c.lit("") : $c.lit(" to nowhere"));
         } else {
             await pline($c.lit("Creation of %s failed."), await an(tname));
@@ -2304,12 +2314,12 @@ async function wizterrainwish(d) {   // objnam.c:3554
         lev.flags = ((d.flags ? F_LOOTED : 0) >>> 0) & 31;
         $t1 = (d.blessed || !strncmpi(bp, $c.lit("magic "), 6) ? 1 : 0) >>> 0, lev.horizontal = ($t1) & 1;
         await pline($c.lit("A %sfountain."), lev.horizontal | 0 ? $c.lit("magic ") : $c.lit(""));
-        madeterrain = 1;
+        madeterrain = TRUE;
     } else if (!($c.pcmp(p.add(-6), bp) < 0 || strncmpi(p.add(-6), $c.lit("throne"), -1))) {
         lev.typ = THRONE;
         lev.flags = ((d.flags ? T_LOOTED : 0) >>> 0) & 31;
         await pline($c.lit("A throne."));
-        madeterrain = 1;
+        madeterrain = TRUE;
     } else if (!($c.pcmp(p.add(-4), bp) < 0 || strncmpi(p.add(-4), $c.lit("sink"), -1))) {
         lev.typ = SINK;
         if (oldtyp !== SINK) {
@@ -2317,7 +2327,7 @@ async function wizterrainwish(d) {   // objnam.c:3554
         }
         lev.flags = ((d.flags ? S_LPUDDING | S_LDWASHER | S_LRING : 0) >>> 0) & 31;
         await pline($c.lit("A sink."));
-        madeterrain = 1;
+        madeterrain = TRUE;
     } else if (!($c.pcmp(p.add(-4), bp) < 0 || strncmpi(p.add(-4), $c.lit("pool"), -1)) || !($c.pcmp(p.add(-4), bp) < 0 || strncmpi(p.add(-4), $c.lit("moat"), -1)) || !($c.pcmp(p.add(-13), bp) < 0 || strncmpi(p.add(-13), $c.lit("wall of water"), -1))) {
         ltyp = (!($c.pcmp(p.add(-4), bp) < 0 || strncmpi(p.add(-4), $c.lit("pool"), -1)) ? POOL : !($c.pcmp(p.add(-4), bp) < 0 || strncmpi(p.add(-4), $c.lit("moat"), -1)) ? MOAT : WATER) >>> 0;
         if (!is_dbridge) {
@@ -2337,8 +2347,8 @@ async function wizterrainwish(d) {   // objnam.c:3554
         } else {
             await dbterrainmesg($c.lit("Moat"), x, y);
         }
-        await water_damage_chain(svl.level.objects[x][y], 1);
-        madeterrain = 1;
+        await water_damage_chain(svl.level.objects[x][y], TRUE);
+        madeterrain = TRUE;
     } else if (!($c.pcmp(p.add(-4), bp) < 0 || strncmpi(p.add(-4), $c.lit("lava"), -1)) || !($c.pcmp(p.add(-12), bp) < 0 || strncmpi(p.add(-12), $c.lit("wall of lava"), -1))) {
         ltyp = (!($c.pcmp(p.add(-12), bp) < 0 || strncmpi(p.add(-12), $c.lit("wall of lava"), -1)) ? LAVAWALL : LAVAPOOL) >>> 0;
         if (!is_dbridge) {
@@ -2351,14 +2361,14 @@ async function wizterrainwish(d) {   // objnam.c:3554
         await del_engr_at(x, y);
         if (!is_dbridge) {
             await pline($c.lit("A %s of molten lava."), lev.typ === LAVAPOOL ? $c.lit("pool") : $c.lit("wall"));
-            if (!((u.uprops[LEVITATION].intrinsic || u.uprops[LEVITATION].extrinsic) && !u.uprops[LEVITATION].blocked || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked) || lev.typ === LAVAWALL) {
-                await pooleffects(0);
+            if (!(Levitation() || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked) || lev.typ === LAVAWALL) {
+                await pooleffects(FALSE);
             }
         } else {
             await dbterrainmesg($c.lit("Lava"), x, y);
         }
-        await fire_damage_chain(svl.level.objects[x][y], 1, 1, x, y);
-        madeterrain = 1;
+        await fire_damage_chain(svl.level.objects[x][y], TRUE, TRUE, x, y);
+        madeterrain = TRUE;
     } else if (!($c.pcmp(p.add(-3), bp) < 0 || strncmpi(p.add(-3), $c.lit("ice"), -1))) {
         if (!is_dbridge) {
             lev.typ = ICE;
@@ -2376,7 +2386,7 @@ async function wizterrainwish(d) {   // objnam.c:3554
         } else {
             await dbterrainmesg($c.lit("Ice"), x, y);
         }
-        madeterrain = 1;
+        madeterrain = TRUE;
     } else if (!($c.pcmp(p.add(-5), bp) < 0 || strncmpi(p.add(-5), $c.lit("altar"), -1))) {
         lev.typ = ALTAR;
         if (!strncmpi(bp, $c.lit("chaotic "), 8)) {
@@ -2390,41 +2400,41 @@ async function wizterrainwish(d) {   // objnam.c:3554
         } else {
             al = $c.i8(!rn2(6) ? A_NONE : rn2(3) - 1 | 0);
         }
-        lev.flags = ((al === A_NONE ? AM_NONE : al === A_LAWFUL ? AM_LAWFUL : al + 2 | 0) >>> 0) & 31;
+        lev.flags = (Align2amask(al)) & 31;
         await pline($c.lit("%s altar."), await An(align_str(al)));
-        madeterrain = 1;
+        madeterrain = TRUE;
     } else if (!($c.pcmp(p.add(-5), bp) < 0 || strncmpi(p.add(-5), $c.lit("grave"), -1)) || !($c.pcmp(p.add(-9), bp) < 0 || strncmpi(p.add(-9), $c.lit("headstone"), -1))) {
         await make_grave(x, y, null);
-        if (lev.typ === GRAVE) {
+        if (IS_GRAVE(lev.typ)) {
             lev.flags = (0) & 31;
             lev.horizontal = ((d.flags ? 1 : 0) >>> 0) & 1;
             await pline($c.lit("A %sgrave."), lev.horizontal | 0 ? $c.lit("disturbed ") : $c.lit(""));
-            madeterrain = 1;
+            madeterrain = TRUE;
         } else {
             await pline($c.lit("Can't place a grave here."));
-            badterrain = 1;
+            badterrain = TRUE;
         }
     } else if (!($c.pcmp(p.add(-4), bp) < 0 || strncmpi(p.add(-4), $c.lit("tree"), -1))) {
         lev.typ = TREE;
         lev.flags = ((d.flags ? TREE_LOOTED | TREE_SWARM : 0) >>> 0) & 31;
         set_wallprop_from_str(bp);
         await pline($c.lit("A tree."));
-        madeterrain = 1;
+        madeterrain = TRUE;
     } else if (!($c.pcmp(p.add(-4), bp) < 0 || strncmpi(p.add(-4), $c.lit("bars"), -1))) {
         lev.typ = IRONBARS;
         lev.flags = (0) & 31;
         set_wallprop_from_str(bp);
         await pline($c.lit("Iron bars."));
-        madeterrain = 1;
+        madeterrain = TRUE;
     } else if (!($c.pcmp(p.add(-5), bp) < 0 || strncmpi(p.add(-5), $c.lit("cloud"), -1))) {
         lev.typ = CLOUD;
         lev.flags = (0) & 31;
         await pline($c.lit("A cloud."));
         await del_engr_at(x, y);
-        madeterrain = 1;
+        madeterrain = TRUE;
     } else if (!($c.pcmp(p.add(-4), bp) < 0 || strncmpi(p.add(-4), $c.lit("door"), -1)) || d.doorless && !($c.pcmp(p.add(-7), bp) < 0 || strncmpi(p.add(-7), $c.lit("doorway"), -1))) {
         secret = $c.i8(!($c.pcmp(p.add(-11), bp) < 0 || strncmpi(p.add(-11), $c.lit("secret door"), -1)) ? 1 : 0);
-        if (lev.typ === DOOR || lev.typ === SDOOR || lev.typ && lev.typ <= DBWALL && lev.typ !== DBWALL || lev.typ === IRONBARS) {
+        if (lev.typ === DOOR || lev.typ === SDOOR || IS_WALL(lev.typ) && lev.typ !== DBWALL || lev.typ === IRONBARS) {
             old_wall_info = (lev.typ !== DOOR ? lev.flags | 0 : 0) >>> 0;
             lev.typ = $c.i8(secret ? SDOOR : DOOR);
             lev.flags = (0) & 31;
@@ -2468,18 +2478,18 @@ async function wizterrainwish(d) {   // objnam.c:3554
                 }
             }
             await pline($c.lit("%s."), upstart(await an(new $c.Ptr(dbuf, 0))));
-            madeterrain = 1;
+            madeterrain = TRUE;
         } else {
             $c.__builtin___strcpy_chk(new $c.Ptr(dbuf, 0), secret ? $c.lit("secret door") : $c.lit("door"), 40);
             await pline($c.lit("%s requires door or wall location."), upstart(new $c.Ptr(dbuf, 0)));
-            badterrain = 1;
+            badterrain = TRUE;
         }
     } else if (!($c.pcmp(p.add(-4), bp) < 0 || strncmpi(p.add(-4), $c.lit("wall"), -1)) && ($c.peq(bp, p.add(-4)) || p.get(-5) === 32)) {
         wall = HWALL;
         if (isok(u.ux, $c.i16(u.uy - 1 | 0)) && (svl.level.locations[u.ux][u.uy - 1 | 0].typ && svl.level.locations[u.ux][u.uy - 1 | 0].typ <= DBWALL) || isok(u.ux, $c.i16(u.uy + 1 | 0)) && (svl.level.locations[u.ux][u.uy + 1 | 0].typ && svl.level.locations[u.ux][u.uy + 1 | 0].typ <= DBWALL)) {
             wall = VWALL;
         }
-        madeterrain = 1;
+        madeterrain = TRUE;
         lev.typ = wall;
         lev.flags = (0) & 31;
         set_wallprop_from_str(bp);
@@ -2489,30 +2499,30 @@ async function wizterrainwish(d) {   // objnam.c:3554
         if (lev.typ === CORR) {
             lev.typ = SCORR;
             await pline($c.lit("Secret corridor."));
-            madeterrain = 1;
+            madeterrain = TRUE;
         } else {
             await pline($c.lit("Secret corridor requires corridor location."));
-            badterrain = 1;
+            badterrain = TRUE;
         }
     } else if (!($c.pcmp(p.add(-4), bp) < 0 || strncmpi(p.add(-4), $c.lit("room"), -1)) || !($c.pcmp(p.add(-5), bp) < 0 || strncmpi(p.add(-5), $c.lit("floor"), -1)) || !($c.pcmp(p.add(-6), bp) < 0 || strncmpi(p.add(-6), $c.lit("ground"), -1))) {
-        if (oldtyp === ROOM || oldtyp >= STAIRS && oldtyp <= ALTAR && (iflags.debug_overwrite_stairs || !(oldtyp === LADDER || oldtyp === STAIRS)) || oldtyp === ICE || is_pool_or_lava(x, y)) {
+        if (oldtyp === ROOM || IS_FURNITURE(oldtyp) && CAN_OVERWRITE_TERRAIN(oldtyp) || oldtyp === ICE || is_pool_or_lava(x, y)) {
             lev.typ = ROOM;
             await pline($c.lit("Room floor."));
-            if (oldtyp >= STAIRS && oldtyp <= ALTAR) {
+            if (IS_FURNITURE(oldtyp)) {
                 count_level_features();
             }
             if ((t$2 = t_at(x, y)) !== null && (t$2.ttyp | 0) !== MAGIC_PORTAL) {
                 await deltrap(t$2);
             }
-            madeterrain = 1;
+            madeterrain = TRUE;
         } else if (is_dbridge) {
             lev.flags = (((lev.flags | 0) & ~DB_UNDER) >>> 0) & 31;
             lev.flags = ((lev.flags | 0 | DB_FLOOR) >>> 0) & 31;
             await dbterrainmesg($c.lit("Floor"), x, y);
-            madeterrain = 1;
+            madeterrain = TRUE;
         } else {
             await pline($c.lit("Room|floor|ground not allowed here."));
-            badterrain = 1;
+            badterrain = TRUE;
         }
     }
     if (madeterrain) {
@@ -2522,18 +2532,18 @@ async function wizterrainwish(d) {   // objnam.c:3554
             await docrt();
         } else {
             if (u.utrap && u.utraptype === TT_LAVA && !is_lava(u.ux, u.uy)) {
-                await reset_utrap(0);
+                await reset_utrap(FALSE);
             }
             recalc_block_point(x, y);
         }
-        if (oldtyp === FOUNTAIN || oldtyp === SINK) {
+        if (IS_FOUNTAIN(oldtyp) || IS_SINK(oldtyp)) {
             count_level_features();
         }
         if (!is_ice(x, y)) {
             await spot_stop_timers(x, y, MELT_ICE_AWAY);
         }
-        if (oldtyp === FOUNTAIN || oldtyp === GRAVE || oldtyp && oldtyp <= DBWALL || oldtyp === IRONBARS || oldtyp === DOOR || oldtyp === SDOOR) {
-            if (!(lev.typ === FOUNTAIN) && !(lev.typ === GRAVE) && !(lev.typ === DOOR) && lev.typ !== SDOOR) {
+        if (IS_FOUNTAIN(oldtyp) || IS_GRAVE(oldtyp) || IS_WALL(oldtyp) || oldtyp === IRONBARS || IS_DOOR(oldtyp) || oldtyp === SDOOR) {
+            if (!IS_FOUNTAIN(lev.typ) && !IS_GRAVE(lev.typ) && !IS_DOOR(lev.typ) && lev.typ !== SDOOR) {
                 lev.horizontal = (0) & 1;
             }
         }
@@ -2560,7 +2570,7 @@ function readobjnam_init(bp, d) {   // objnam.c:3933
     $t29 = ($t28 = d.un = null, d.dn = $t28), d.actualn = $t29;
     d.wetness = 0;
     d.gsize = 0;
-    d.zombify = 0;
+    d.zombify = FALSE;
     $t30 = d.origbp = bp, d.bp = $t30;
     d.p = null;
     d.name = null;
@@ -2624,7 +2634,7 @@ function readobjnam_preparse(d) {   // objnam.c:3966
             d.ispoisoned = 1;
         } else if (!strncmpi(d.bp, $c.lit("trapped "), l = 8)) {
             d.trapped = 0;
-            if (flags.debug) {
+            if (wizard()) {
                 d.trapped = 1;
             }
         } else if (!strncmpi(d.bp, $c.lit("untrapped "), l = 10)) {
@@ -2646,7 +2656,7 @@ function readobjnam_preparse(d) {   // objnam.c:3966
         } else if (!strncmpi(d.bp, $c.lit("greased "), l = 8)) {
             d.isgreased = 1;
         } else if (!strncmpi(d.bp, $c.lit("zombifying "), l = 11)) {
-            d.zombify = 1;
+            d.zombify = TRUE;
         } else if (!strncmpi(d.bp, $c.lit("very "), l = 5)) {
             d.very = 1;
         } else if (!strncmpi(d.bp, $c.lit("thoroughly "), l = 11)) {
@@ -2715,7 +2725,7 @@ function readobjnam_preparse(d) {   // objnam.c:3966
 function readobjnam_parse_charges(d) {   // objnam.c:4178
     let keeptrailingchars = 0, idx = 0, pp = null, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8;
     if ($c.strlen(d.bp) > 1 && ($t1 = $c.strrchr(d.bp, 40), d.p = $t1) !== null) {
-        keeptrailingchars = 1;
+        keeptrailingchars = TRUE;
         idx = 0;
         if ($c.pcmp(d.p, d.bp) > 0 && d.p.get(-1) === 32) {
             idx = -1;
@@ -2740,7 +2750,7 @@ function readobjnam_parse_charges(d) {   // objnam.c:4178
             }
             if (d.p.get(0) !== 41) {
                 $t4 = d.rechrg = 0, d.spe = $t4;
-                keeptrailingchars = 0;
+                keeptrailingchars = FALSE;
             } else {
                 d.spesgn = 1;
             }
@@ -2756,8 +2766,8 @@ function readobjnam_parse_charges(d) {   // objnam.c:4178
         d.spesgn = -1;
         $t8 = $c.abs(d.spe), d.spe = $t8;
     }
-    if (d.spe > 99) {
-        d.spe = 99;
+    if (d.spe > SPE_LIM) {
+        d.spe = SPE_LIM;
     }
     if (d.rechrg < 0 || d.rechrg > 7) {
         d.rechrg = 7;
@@ -2801,7 +2811,7 @@ async function readobjnam_postparse1(d) {   // objnam.c:4240
         if (!strncmpi(s, $c.lit("imitation "), 10)) {
             d.fake = 1, s = s.add(10);
         }
-        s;
+        nhUse(s);
         d.real = !d.fake ? 1 : 0;
         d.typ = d.real ? AMULET_OF_YENDOR : FAKE_AMULET_OF_YENDOR;
         return 2;
@@ -2882,7 +2892,7 @@ async function readobjnam_postparse1(d) {   // objnam.c:4240
     {
         as = $c.relem(spellings, 0);
         while (as.sp) {
-            if (await wishymatch(d.bp, as.sp, 1)) {
+            if (await wishymatch(d.bp, as.sp, TRUE)) {
                 d.typ = as.ob;
                 return 2;
             }
@@ -2936,18 +2946,18 @@ async function readobjnam_postparse1(d) {   // objnam.c:4240
         return 2;
     }
     if (!($c.pcmp(d.p.add(-10), d.bp) < 0 || strncmpi(d.p.add(-10), $c.lit("gold piece"), -1)) || !($c.pcmp(d.p.add(-7), d.bp) < 0 || strncmpi(d.p.add(-7), $c.lit("zorkmid"), -1)) || !strncmpi(d.bp, $c.lit("gold"), -1) || !strncmpi(d.bp, $c.lit("money"), -1) || !strncmpi(d.bp, $c.lit("coin"), -1) || d.bp.get(0) === GOLD_SYM) {
-        if (d.cnt > 5000 && !flags.debug) {
+        if (d.cnt > 5000 && !wizard()) {
             d.cnt = 5000;
         } else if (d.cnt < 1) {
             d.cnt = 1;
         }
-        $t21 = await mksobj(GOLD_PIECE, 0, 0), d.otmp = $t21;
+        $t21 = await mksobj(GOLD_PIECE, FALSE, FALSE), d.otmp = $t21;
         d.otmp.quan = d.cnt;
         $t22 = await weight(d.otmp) >>> 0, d.otmp.owt = $t22;
-        disp.botl = 1;
+        disp.botl = TRUE;
         return 3;
     }
-    if ($c.strlen(d.bp) === 1 && (i = def_char_to_objclass(d.bp.get(0))) < MAXOCLASSES && i > ILLOBJ_CLASS && (i !== VENOM_CLASS || flags.debug)) {
+    if ($c.strlen(d.bp) === 1 && (i = def_char_to_objclass(d.bp.get(0))) < MAXOCLASSES && i > ILLOBJ_CLASS && (i !== VENOM_CLASS || wizard())) {
         d.oclass = $c.i8(i);
         return 4;
     }
@@ -2995,7 +3005,7 @@ async function readobjnam_postparse1(d) {   // objnam.c:4240
             }
         }
     }
-    if (flags.debug && (!strncmpi(d.bp, $c.lit("bear"), 4) || !strncmpi(d.bp, $c.lit("land"), 4))) {
+    if (wizard() && (!strncmpi(d.bp, $c.lit("bear"), 4) || !strncmpi(d.bp, $c.lit("land"), 4))) {
         beartrap = $c.i8(lowc(d.bp.get(0)) === 98 ? 1 : 0);
         zp = d.bp.add(4);
         if (zp.get(0) === 32) {
@@ -3160,7 +3170,7 @@ async function readobjnam_postparse3(d) {   // objnam.c:4727
         }
     }
     if (!d.oclass && d.actualn) {
-        $t5 = artifact_name(d.actualn, new $c.Ptr(objtyp, 0), 1), d.name = $t5;
+        $t5 = artifact_name(d.actualn, new $c.Ptr(objtyp, 0), TRUE), d.name = $t5;
         if (d.name) {
             d.typ = objtyp[0];
             return 2;
@@ -3169,7 +3179,7 @@ async function readobjnam_postparse3(d) {   // objnam.c:4727
     if (d.oclass && !d.typ) {
         as = $c.relem(spellings, 0);
         while (as.sp) {
-            if (objects[as.ob].oc_class === d.oclass && await wishymatch(d.bp, as.sp, 1)) {
+            if (objects[as.ob].oc_class === d.oclass && await wishymatch(d.bp, as.sp, TRUE)) {
                 d.typ = as.ob;
                 return 2;
             }
@@ -3252,7 +3262,7 @@ export async function readobjnam(bp, no_wish) {   // objnam.c:4910
             }
         case "wiztrap":
             $goto = null;   // wiztrap:
-            if (flags.debug && !program_state.wizkit_wishing && !d.oclass) {
+            if (wizard() && !program_state.wizkit_wishing && !d.oclass) {
                 if (($t1 = await wizterrainwish(d), d.otmp = $t1) !== null) {
                     return d.otmp;
                 }
@@ -3279,7 +3289,7 @@ export async function readobjnam(bp, no_wish) {   // objnam.c:4910
             if (d.typ) {
                 d.oclass = objects[d.typ].oc_class;
             }
-            if (d.typ && !flags.debug) {
+            if (d.typ && !wizard()) {
                 switch (d.typ) {
                     case AMULET_OF_YENDOR:
                         d.typ = FAKE_AMULET_OF_YENDOR;
@@ -3307,7 +3317,7 @@ export async function readobjnam(bp, no_wish) {   // objnam.c:4910
                 d.typ = GLOB_OF_GRAY_OOZE + (d.mntmp - PM_GRAY_OOZE | 0) | 0;
                 d.mntmp = NON_PM;
             }
-            $t6 = d.typ ? await mksobj(d.typ, 1, 0) : await mkobj(d.oclass, 0), d.otmp = $t6;
+            $t6 = d.typ ? await mksobj(d.typ, TRUE, FALSE) : await mkobj(d.oclass, FALSE), d.otmp = $t6;
             d.typ = d.otmp.otyp, d.oclass = d.otmp.oclass;
             if (d.otmp.globby) {
                 d.otmp.quan = 1;
@@ -3320,30 +3330,30 @@ export async function readobjnam(bp, no_wish) {   // objnam.c:4910
                     if (rn1cnt > (6 - d.gsize | 0)) {
                         rn1cnt = 6 - d.gsize | 0;
                     }
-                    if (d.cnt > rn1cnt && (!flags.debug || program_state.wizkit_wishing || await yn_function($c.lit("Override glob weight limit?"), new $c.Ptr(ynchars, 0), 110, 1) !== 121)) {
+                    if (d.cnt > rn1cnt && (!wizard() || program_state.wizkit_wishing || await yn_function($c.lit("Override glob weight limit?"), new $c.Ptr(ynchars, 0), 110, TRUE) !== 121)) {
                         d.cnt = rn1cnt;
                     }
                     d.otmp.owt = Math.imul(d.otmp.owt, d.cnt >>> 0) >>> 0;
                 }
                 d.cnt = 0;
             } else if (d.cnt > 0) {
-                if (objects[d.typ].oc_merge | 0 && (flags.debug || d.cnt < rnd(6) || d.cnt <= 7 && (d.otmp.otyp === TALLOW_CANDLE || d.otmp.otyp === WAX_CANDLE) || d.cnt <= 20 && (d.typ === ROCK || d.typ === FLINT || (d.otmp.oclass === WEAPON_CLASS || d.otmp.oclass === TOOL_CLASS) && objects[d.otmp.otyp].oc_subtyp >= -P_BOOMERANG && objects[d.otmp.otyp].oc_subtyp <= -P_DART || d.oclass === WEAPON_CLASS && ((d.otmp.oclass === WEAPON_CLASS || d.otmp.oclass === GEM_CLASS) && objects[d.otmp.otyp].oc_subtyp >= -P_CROSSBOW && objects[d.otmp.otyp].oc_subtyp <= -P_BOW)))) {
+                if (objects[d.typ].oc_merge | 0 && (wizard() || d.cnt < rnd(6) || d.cnt <= 7 && Is_candle(d.otmp) || d.cnt <= 20 && (d.typ === ROCK || d.typ === FLINT || is_missile(d.otmp) || d.oclass === WEAPON_CLASS && is_ammo(d.otmp)))) {
                     d.otmp.quan = d.cnt;
                 }
             }
-            if (d.islit && (d.typ === OIL_LAMP || d.typ === MAGIC_LAMP || d.typ === BRASS_LANTERN || (d.otmp.otyp === TALLOW_CANDLE || d.otmp.otyp === WAX_CANDLE) || d.typ === POT_OIL)) {
+            if (d.islit && (d.typ === OIL_LAMP || d.typ === MAGIC_LAMP || d.typ === BRASS_LANTERN || Is_candle(d.otmp) || d.typ === POT_OIL)) {
                 await place_object(d.otmp, u.ux, u.uy);
-                await begin_burn(d.otmp, 0);
+                await begin_burn(d.otmp, FALSE);
                 await obj_extract_self(d.otmp);
             }
             if (d.spesgn === 0) {
                 d.spe = d.otmp.spe;
-            } else if (flags.debug) {
-            } else if (d.oclass === ARMOR_CLASS || d.oclass === WEAPON_CLASS || d.otmp.oclass === TOOL_CLASS && objects[d.otmp.otyp].oc_subtyp !== P_NONE || d.oclass === RING_CLASS && objects[d.typ].oc_charged | 0) {
+            } else if (wizard()) {
+            } else if (d.oclass === ARMOR_CLASS || d.oclass === WEAPON_CLASS || is_weptool(d.otmp) || d.oclass === RING_CLASS && objects[d.typ].oc_charged | 0) {
                 if (d.spe > rnd(5) && d.spe > d.otmp.spe) {
                     d.spe = 0;
                 }
-                if (d.spe > 2 && (u.uluck + u.moreluck | 0) < 0) {
+                if (d.spe > 2 && Luck() < 0) {
                     d.spesgn = -1;
                 }
             } else {
@@ -3390,10 +3400,10 @@ export async function readobjnam(bp, no_wish) {   // objnam.c:4910
                 case FIGURINE:
                 case CORPSE:
                     {
-                        P = d.mntmp >= LOW_PM && d.mntmp < NUMMONS ? $c.relem(mons, d.mntmp) : null;
-                        d.otmp.spe = $c.i8(!P ? CORPSTAT_RANDOM : $c.andu64(P.mflags2, M2_NEUTER) !== 0 ? CORPSTAT_NEUTER : d.mgend === FEMALE && !($c.andu64(P.mflags2, M2_MALE) !== 0) ? CORPSTAT_FEMALE : d.mgend === MALE && !($c.andu64(P.mflags2, M2_FEMALE) !== 0) ? CORPSTAT_MALE : CORPSTAT_RANDOM);
+                        P = ismnum(d.mntmp) ? $c.relem(mons, d.mntmp) : null;
+                        d.otmp.spe = $c.i8(!P ? CORPSTAT_RANDOM : is_neuter(P) ? CORPSTAT_NEUTER : d.mgend === FEMALE && !is_male(P) ? CORPSTAT_FEMALE : d.mgend === MALE && !is_female(P) ? CORPSTAT_MALE : CORPSTAT_RANDOM);
                         if (P && d.otmp.spe === CORPSTAT_RANDOM) {
-                            $t8 = $c.i8($c.andu64(P.mflags2, M2_MALE) !== 0 ? CORPSTAT_MALE : $c.andu64(P.mflags2, M2_FEMALE) !== 0 ? CORPSTAT_FEMALE : rn2(2) ? CORPSTAT_MALE : CORPSTAT_FEMALE), d.otmp.spe = $t8;
+                            $t8 = $c.i8(is_male(P) ? CORPSTAT_MALE : is_female(P) ? CORPSTAT_FEMALE : rn2(2) ? CORPSTAT_MALE : CORPSTAT_FEMALE), d.otmp.spe = $t8;
                         }
                         if (d.ishistoric && d.typ === STATUE) {
                             d.otmp.spe = $c.i8(d.otmp.spe | CORPSTAT_HISTORIC);
@@ -3408,30 +3418,30 @@ export async function readobjnam(bp, no_wish) {   // objnam.c:4910
                     d.otmp.spe = 1;
                     break;
                 case WAN_WISHING:
-                    if (!flags.debug) {
+                    if (!wizard()) {
                         $t9 = $c.i8(rn2(10) ? -1 : 0), d.otmp.spe = $t9;
                         break;
                     }
                 default:
                     d.otmp.spe = $c.i8(d.spe);
             }
-            if (d.mntmp >= LOW_PM && d.mntmp < NUMMONS) {
+            if (ismnum(d.mntmp)) {
                 if (d.mntmp === PM_LONG_WORM_TAIL) {
                     d.mntmp = PM_LONG_WORM;
                 }
-                if (d.typ !== FIGURINE && $c.andu64($c.relem(mons, d.mntmp).mflags2, M2_WERE) !== 0 && (svm.mvitals[d.mntmp].mvflags & G_NOCORPSE) !== 0 && (humanwere = counter_were(d.mntmp)) !== NON_PM) {
+                if (d.typ !== FIGURINE && is_were($c.relem(mons, d.mntmp)) && (svm.mvitals[d.mntmp].mvflags & G_NOCORPSE) !== 0 && (humanwere = counter_were(d.mntmp)) !== NON_PM) {
                     d.mntmp = humanwere;
                 }
                 switch (d.typ) {
                     case TIN:
-                        if (dead_species(d.mntmp, 0)) {
+                        if (dead_species(d.mntmp, FALSE)) {
                             d.otmp.corpsenm = NON_PM;
-                        } else if ((!(mons[d.mntmp].geno & G_UNIQ) || flags.debug) && !(svm.mvitals[d.mntmp].mvflags & G_NOCORPSE) && mons[d.mntmp].cnutrit !== 0) {
+                        } else if ((!(mons[d.mntmp].geno & G_UNIQ) || wizard()) && !(svm.mvitals[d.mntmp].mvflags & G_NOCORPSE) && mons[d.mntmp].cnutrit !== 0) {
                             d.otmp.corpsenm = d.mntmp;
                         }
                         break;
                     case CORPSE:
-                        if ((!(mons[d.mntmp].geno & G_UNIQ) || flags.debug) && !(svm.mvitals[d.mntmp].mvflags & G_NOCORPSE)) {
+                        if ((!(mons[d.mntmp].geno & G_UNIQ) || wizard()) && !(svm.mvitals[d.mntmp].mvflags & G_NOCORPSE)) {
                             if (mons[d.mntmp].msound === MS_GUARDIAN) {
                                 $t10 = genus(d.mntmp, 1), d.mntmp = $t10;
                             }
@@ -3446,13 +3456,13 @@ export async function readobjnam(bp, no_wish) {   // objnam.c:4910
                         await set_corpsenm(d.otmp, d.mntmp);
                         break;
                     case FIGURINE:
-                        if (!(mons[d.mntmp].geno & G_UNIQ) && (!($c.andu64($c.relem(mons, d.mntmp).mflags2, M2_HUMAN) !== 0) || $c.andu64($c.relem(mons, d.mntmp).mflags2, M2_WERE) !== 0) && d.mntmp !== PM_MAIL_DAEMON) {
+                        if (!(mons[d.mntmp].geno & G_UNIQ) && (!is_human($c.relem(mons, d.mntmp)) || is_were($c.relem(mons, d.mntmp))) && d.mntmp !== PM_MAIL_DAEMON) {
                             d.otmp.corpsenm = d.mntmp;
                         }
                         break;
                     case STATUE:
                         d.otmp.corpsenm = d.mntmp;
-                        if (d.otmp.cobj !== null && $c.relem(mons, d.mntmp).msize < MZ_SMALL) {
+                        if (Has_contents(d.otmp) && verysmall($c.relem(mons, d.mntmp))) {
                             await delete_contents(d.otmp);
                         }
                         break;
@@ -3467,40 +3477,40 @@ export async function readobjnam(bp, no_wish) {   // objnam.c:4910
                 await curse(d.otmp);
             } else if (d.uncursed) {
                 d.otmp.blessed = (0) & 1;
-                d.otmp.cursed = (((u.uluck + u.moreluck | 0) < 0 && !flags.debug ? 1 : 0) >>> 0) & 1;
+                d.otmp.cursed = ((Luck() < 0 && !wizard() ? 1 : 0) >>> 0) & 1;
             } else if (d.blessed) {
-                d.otmp.blessed = (((u.uluck + u.moreluck | 0) >= 0 || flags.debug ? 1 : 0) >>> 0) & 1;
-                d.otmp.cursed = (((u.uluck + u.moreluck | 0) < 0 && !flags.debug ? 1 : 0) >>> 0) & 1;
+                d.otmp.blessed = ((Luck() >= 0 || wizard() ? 1 : 0) >>> 0) & 1;
+                d.otmp.cursed = ((Luck() < 0 && !wizard() ? 1 : 0) >>> 0) & 1;
             } else if (d.spesgn < 0) {
                 await curse(d.otmp);
             }
             if (erosion_matters(d.otmp)) {
                 $t12 = d.otmp.oeroded2 = (0) & 3, d.otmp.oeroded = ($t12) & 3;
-                if (d.eroded && (is_flammable(d.otmp) || (objects[d.otmp.otyp].oc_material | 0) === IRON || (objects[d.otmp.otyp].oc_material | 0) === GLASS && d.otmp.oclass === ARMOR_CLASS)) {
+                if (d.eroded && (is_flammable(d.otmp) || is_rustprone(d.otmp) || is_crackable(d.otmp))) {
                     d.otmp.oeroded = (d.eroded >>> 0) & 3;
                 }
-                if (d.eroded2 && ((objects[d.otmp.otyp].oc_material | 0) === COPPER || (objects[d.otmp.otyp].oc_material | 0) === IRON || is_rottable(d.otmp))) {
+                if (d.eroded2 && (is_corrodeable(d.otmp) || is_rottable(d.otmp))) {
                     d.otmp.oeroded2 = (d.eroded2 >>> 0) & 3;
                 }
                 if (d.erodeproof && ((objects[d.otmp.otyp].oc_material | 0) === IRON || is_flammable(d.otmp) || is_rottable(d.otmp) || ((objects[d.otmp.otyp].oc_material | 0) === COPPER || (objects[d.otmp.otyp].oc_material | 0) === IRON) || (objects[d.otmp.otyp].oc_material | 0) === GLASS && d.otmp.oclass === ARMOR_CLASS || d.otmp.otyp === CRYSKNIFE)) {
-                    d.otmp.oerodeproof = (((u.uluck + u.moreluck | 0) >= 0 || flags.debug ? 1 : 0) >>> 0) & 1;
+                    d.otmp.oerodeproof = ((Luck() >= 0 || wizard() ? 1 : 0) >>> 0) & 1;
                 }
             }
             if (d.oclass === WAND_CLASS) {
-                if (d.otmp.otyp === WAN_WISHING && !flags.debug) {
+                if (d.otmp.otyp === WAN_WISHING && !wizard()) {
                     d.rechrg = 1;
                 }
                 d.otmp.recharged = (d.rechrg >>> 0) & 7;
             }
             if (d.ispoisoned) {
                 if (d.otmp.oclass === WEAPON_CLASS && objects[d.otmp.otyp].oc_subtyp >= -P_SHURIKEN && objects[d.otmp.otyp].oc_subtyp <= -P_BOW || permapoisoned(d.otmp)) {
-                    d.otmp.otrapped = (((u.uluck + u.moreluck | 0) >= 0 ? 1 : 0) >>> 0) & 1;
+                    d.otmp.otrapped = ((Luck() >= 0 ? 1 : 0) >>> 0) & 1;
                 } else if (d.oclass === FOOD_CLASS) {
                     d.otmp.age = 1;
                 }
             }
             if (d.trapped) {
-                if (d.otmp.otyp === LARGE_BOX || d.otmp.otyp === CHEST || d.typ === TIN) {
+                if (Is_box(d.otmp) || d.typ === TIN) {
                     d.otmp.otrapped = ((d.trapped === 1 ? 1 : 0) >>> 0) & 1;
                 }
             }
@@ -3509,12 +3519,12 @@ export async function readobjnam(bp, no_wish) {   // objnam.c:4910
                     if (d.otmp.spe > 0) {
                         d.otmp.spe = 0;
                     }
-                } else if (d.otmp.cobj !== null) {
+                } else if (Has_contents(d.otmp)) {
                     await delete_contents(d.otmp);
                     $t13 = await weight(d.otmp) >>> 0, d.otmp.owt = $t13;
                 }
             }
-            if (d.otmp.otyp === LARGE_BOX || d.otmp.otyp === CHEST) {
+            if (Is_box(d.otmp)) {
                 if (d.locked) {
                     d.otmp.olocked = (1) & 1, d.otmp.obroken = (0) & 1;
                 } else if (d.unlocked) {
@@ -3532,11 +3542,11 @@ export async function readobjnam(bp, no_wish) {   // objnam.c:4910
             if (d.isdiluted && d.otmp.oclass === POTION_CLASS) {
                 d.otmp.oeroded = ((d.otmp.otyp !== POT_WATER ? 1 : 0) >>> 0) & 3;
             }
-            if (d.otmp.otyp === TIN && d.tvariety >= 0 && (rn2(4) || flags.debug)) {
+            if (d.otmp.otyp === TIN && d.tvariety >= 0 && (rn2(4) || wizard())) {
                 set_tin_variety(d.otmp, d.tvariety);
             }
             if (d.name) {
-                aname = artifact_name(d.name, new $c.Ptr(objtyp, 0), 1);
+                aname = artifact_name(d.name, new $c.Ptr(objtyp, 0), TRUE);
                 if (aname && objtyp[0] === d.otmp.otyp) {
                     d.name = aname;
                 }
@@ -3552,8 +3562,8 @@ export async function readobjnam(bp, no_wish) {   // objnam.c:4910
             if (permapoisoned(d.otmp)) {
                 d.otmp.otrapped = (1) & 1;
             }
-            if ((is_quest_artifact(d.otmp) || d.otmp.oartifact && rn2(nartifact_exist()) > 1) && !flags.debug) {
-                await artifact_exists(d.otmp, safe_oname(d.otmp), 0, ONAME_NO_FLAGS);
+            if ((is_quest_artifact(d.otmp) || d.otmp.oartifact && rn2(nartifact_exist()) > 1) && !wizard()) {
+                await artifact_exists(d.otmp, safe_oname(d.otmp), FALSE, ONAME_NO_FLAGS);
                 await obfree(d.otmp, null);
                 d.otmp = hands_obj;
                 await pline($c.lit("For a moment, you feel %s in your %s, but it disappears!"), c_common_strings.c_something, await makeplural(await body_part(HAND)));
@@ -3641,9 +3651,9 @@ export async function armor_simple_name(armor) {   // objnam.c:5435
 export function suit_simple_name(suit) {   // objnam.c:5471
     let suitnm = null, esuitp = null;
     if (suit) {
-        if (suit.otyp >= GRAY_DRAGON_SCALE_MAIL && suit.otyp <= YELLOW_DRAGON_SCALE_MAIL) {
+        if (Is_dragon_mail(suit)) {
             return $c.lit("dragon mail");
-        } else if (suit.otyp >= GRAY_DRAGON_SCALES && suit.otyp <= YELLOW_DRAGON_SCALES) {
+        } else if (Is_dragon_scales(suit)) {
             return $c.lit("dragon scales");
         }
         suitnm = obj_descr[objects[suit.otyp].oc_name_idx].oc_name;
@@ -3712,7 +3722,7 @@ export function shirt_simple_name(shirt) {   // objnam.c:5600
     return $c.lit("shirt");
 }
 export async function mimic_obj_name(mtmp) {   // objnam.c:5606
-    if ((mtmp.m_ap_type & M_AP_TYPMASK) === M_AP_OBJECT) {
+    if (M_AP_TYPE(mtmp) === M_AP_OBJECT) {
         if (mtmp.mappearance === GOLD_PIECE) {
             return $c.lit("gold");
         }
@@ -3770,6 +3780,9 @@ export async function safe_qbuf(qbuf, qprefix, qsuffix, obj, func, altfunc, last
         }
     }
     return qbuf;
+}
+function GemStone(typ) {
+    return typ === FLINT || (objects[typ].oc_material | 0) === GEMSTONE && (typ !== DILITHIUM_CRYSTAL && typ !== RUBY && typ !== DIAMOND && typ !== SAPPHIRE && typ !== BLACK_OPAL && typ !== EMERALD && typ !== OPAL) ? 1 : 0;
 }
 
 export function $init() {

@@ -5,26 +5,27 @@ import { $G } from './globals.js';
 import { adjalign, exercise } from './attrib.js';
 import { A_WIS } from './attrib.h.js';
 import { yn_function } from './cmd.js';
-import { flags, gf, gi, svc, svd, svq, u } from './decl.js';
+import { gf, gi, svc, svd, svq, u } from './decl.js';
 import { canseemon } from './display.js';
 import { schedule_goto } from './do.js';
 import { Monnam, mon_nam, noit_mon_nam } from './do_name.js';
 import { Is_special, dungeon_branch, on_level, remdun_mapseen } from './dungeon.js';
-import { LL_ACHIEVE } from './global.h.js';
+import { wizard } from './flag.macros.js';
+import { FALSE, LL_ACHIEVE, TRUE } from './global.h.js';
 import { nomul } from './hack.js';
 import { align_str } from './insight.js';
 import { carrying, fully_identify_obj, update_inventory } from './invent.js';
 import { angry_guards, monnear, setmangry } from './mon.js';
 import { MS_DJINNI, MS_GUARDIAN, MS_NEMESIS } from './monflag.h.js';
 import { mons } from './monst.js';
-import { STRAT_CLOSE, STRAT_WAITFORU } from './monst.h.js';
+import { STRAT_WAITMASK } from './monst.h.js';
+import { helpless } from './monst.macros.js';
 import { PM_PRISONER } from './monsters.h.js';
 import { observe_object } from './o_init.js';
 import { OBJ_BURIED, OBJ_FLOOR, OBJ_MINVENT } from './obj.h.js';
 import { AMULET_OF_YENDOR, BELL_OF_OPENING, FAKE_AMULET_OF_YENDOR } from './objects.h.js';
 import { the, xname } from './objnam.js';
 import { You, impossible, livelog_printf, pline, verbalize } from './pline.js';
-import { DEAF } from './prop.h.js';
 import { MIN_QUEST_ALIGN, MIN_QUEST_LEVEL } from './quest.h.js';
 import { com_pager, find_quest_artifact, is_quest_artifact, qt_pager } from './questpgr.js';
 import { create_gas_cloud } from './region.js';
@@ -32,11 +33,12 @@ import { rn2 } from './rnd.js';
 import { deltrap } from './trap.js';
 import { MAGIC_PORTAL } from './trap.h.js';
 import { A_CURRENT, A_ORIGINAL, UTOTYPE_NONE, UTOTYPE_PORTAL, UTOTYPE_RMPORTAL } from './you.h.js';
+import { Deaf } from './youprop.macros.js';
 
 async function on_start() {   // quest.c:26
     if (!svq.quest_status.first_start) {
         await qt_pager($c.lit("firsttime"));
-        svq.quest_status.first_start = (1) & 1;
+        svq.quest_status.first_start = (TRUE) & 1;
     } else if (u.uz0.dnum !== u.uz.dnum || u.uz0.dlevel < u.uz.dlevel) {
         if ((svq.quest_status.not_ready | 0) <= 2) {
             await qt_pager($c.lit("nexttime"));
@@ -54,7 +56,7 @@ async function on_locate() {   // quest.c:40
         if (from_above) {
             await qt_pager($c.lit("locate_first"));
         }
-        svq.quest_status.first_locate = (1) & 1;
+        svq.quest_status.first_locate = (TRUE) & 1;
     } else {
         if (from_above) {
             await qt_pager($c.lit("locate_next"));
@@ -78,7 +80,7 @@ async function on_goal() {   // quest.c:62
     }
 }
 export async function onquest() {   // quest.c:90
-    if (u.uevent.qcompleted | 0 || on_level(u.uz0, u.uz)) {
+    if (u.uevent.qcompleted | 0 || Not_firsttime()) {
         return;
     }
     if (!Is_special(u.uz)) {
@@ -95,25 +97,25 @@ export async function onquest() {   // quest.c:90
 }
 export async function nemdead() {   // quest.c:107
     if (!svq.quest_status.killed_nemesis) {
-        svq.quest_status.killed_nemesis = (1) & 1;
+        svq.quest_status.killed_nemesis = (TRUE) & 1;
         await qt_pager($c.lit("killed_nemesis"));
     }
 }
 export function leaddead() {   // quest.c:116
     if (!svq.quest_status.killed_leader) {
-        svq.quest_status.killed_leader = (1) & 1;
+        svq.quest_status.killed_leader = (TRUE) & 1;
     }
 }
 export async function artitouch(obj) {   // quest.c:125
     if (!svq.quest_status.touched_artifact) {
         await observe_object(obj);
-        svq.quest_status.touched_artifact = (1) & 1;
+        svq.quest_status.touched_artifact = (TRUE) & 1;
         await qt_pager($c.lit("gotit"));
-        await exercise(A_WIS, 1);
+        await exercise(A_WIS, TRUE);
     }
 }
 export async function ok_to_quest() {   // quest.c:140
-    return $c.i8((svq.quest_status.got_quest | 0 || svq.quest_status.got_thanks | 0) && await is_pure(0) > 0 || svq.quest_status.killed_leader | 0 ? 1 : 0);
+    return $c.i8((svq.quest_status.got_quest | 0 || svq.quest_status.got_thanks | 0) && await is_pure(FALSE) > 0 || svq.quest_status.killed_leader | 0 ? 1 : 0);
 }
 function not_capable() {   // quest.c:147
     return $c.i8(u.ulevel < MIN_QUEST_LEVEL ? 1 : 0);
@@ -121,14 +123,14 @@ function not_capable() {   // quest.c:147
 async function is_pure(talk) {   // quest.c:153
     let purity = 0, original_alignment = 0;
     original_alignment = u.ualignbase[A_ORIGINAL];
-    if (flags.debug && talk) {
+    if (wizard() && talk) {
         if (u.ualign.type !== original_alignment) {
             await You($c.lit("are currently %s instead of %s."), align_str(u.ualign.type), align_str(original_alignment));
         } else if (u.ualignbase[A_CURRENT] !== original_alignment) {
             await You($c.lit("have converted."));
         } else if (u.ualign.record < MIN_QUEST_ALIGN) {
             await You($c.lit("are currently %d and require %d."), u.ualign.record, MIN_QUEST_ALIGN);
-            if (await yn_function($c.lit("adjust?"), null, 121, 1) === 121) {
+            if (await yn_function($c.lit("adjust?"), null, 121, TRUE) === 121) {
                 u.ualign.record = MIN_QUEST_ALIGN;
             }
         }
@@ -165,7 +167,7 @@ async function expulsion(seal) {   // quest.c:186
 export async function finish_quest(obj) {   // quest.c:226
     let otmp = null;
     if (obj && !is_quest_artifact(obj)) {
-        if (u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf) {
+        if (Deaf()) {
             return;
         }
         await fully_identify_obj(obj);
@@ -190,7 +192,7 @@ export async function finish_quest(obj) {   // quest.c:226
             await com_pager($c.lit("quest_complete_no_bell"));
         }
     }
-    svq.quest_status.got_thanks = (1) & 1;
+    svq.quest_status.got_thanks = (TRUE) & 1;
     if (obj) {
         u.uevent.qcompleted = (1) & 1;
         await fully_identify_obj(obj);
@@ -203,7 +205,7 @@ async function chat_with_leader(mtmp) {   // quest.c:282
         return;
     }
     if (u.uhave.questart | 0 && !svq.quest_status.met_nemesis) {
-        svq.quest_status.cheater = (1) & 1;
+        svq.quest_status.cheater = (TRUE) & 1;
     }
     if (svq.quest_status.got_thanks) {
         if (u.uhave.amulet) {
@@ -224,7 +226,7 @@ async function chat_with_leader(mtmp) {   // quest.c:282
         purity = 0;
         if (!svq.quest_status.met_leader) {
             await qt_pager($c.lit("leader_first"));
-            svq.quest_status.met_leader = (1) & 1;
+            svq.quest_status.met_leader = (TRUE) & 1;
             svq.quest_status.not_ready = (0) & 7;
         } else {
             await qt_pager($c.lit("leader_next"));
@@ -234,24 +236,24 @@ async function chat_with_leader(mtmp) {   // quest.c:282
         }
         if (not_capable()) {
             await qt_pager($c.lit("badlevel"));
-            await exercise(A_WIS, 1);
-            await expulsion(0);
-        } else if ((purity = await is_pure(1)) < 0) {
+            await exercise(A_WIS, TRUE);
+            await expulsion(FALSE);
+        } else if ((purity = await is_pure(TRUE)) < 0) {
             if (!svq.quest_status.pissed_off) {
                 await com_pager($c.lit("banished"));
-                svq.quest_status.pissed_off = (1) & 1;
-                await expulsion(0);
+                svq.quest_status.pissed_off = (TRUE) & 1;
+                await expulsion(FALSE);
                 await livelog_printf(LL_ACHIEVE, $c.lit("%s has expelled you from the quest"), await noit_mon_nam(mtmp));
             }
         } else if (purity === 0) {
             await qt_pager($c.lit("badalign"));
             svq.quest_status.not_ready = (1) & 7;
-            await exercise(A_WIS, 1);
-            await expulsion(0);
+            await exercise(A_WIS, TRUE);
+            await expulsion(FALSE);
         } else {
             await qt_pager($c.lit("assignquest"));
-            await exercise(A_WIS, 1);
-            svq.quest_status.got_quest = (1) & 1;
+            await exercise(A_WIS, TRUE);
+            svq.quest_status.got_quest = (TRUE) & 1;
             await livelog_printf(LL_ACHIEVE, $c.lit("%s has granted access to proceed deeper into the quest"), await noit_mon_nam(mtmp));
         }
     }
@@ -261,7 +263,7 @@ export async function leader_speaks(mtmp) {   // quest.c:371
         if (!svq.quest_status.pissed_off) {
             await qt_pager($c.lit("leader_last"));
         }
-        svq.quest_status.pissed_off = (1) & 1;
+        svq.quest_status.pissed_off = (TRUE) & 1;
         mtmp.mstrategy = $c.andu64(mtmp.mstrategy, 18446744072904245247n);
     }
     if (!on_level(u.uz, svd.dungeon_topology.d_qstart_level)) {
@@ -293,7 +295,7 @@ export async function nemesis_speaks() {   // quest.c:403
         if ((svq.quest_status.made_goal | 0) < 7) {
             svq.quest_status.made_goal = (svq.quest_status.made_goal + 1 >>> 0) & 7;
         }
-        svq.quest_status.met_nemesis = (1) & 1;
+        svq.quest_status.met_nemesis = (TRUE) & 1;
     } else if (!rn2(5)) {
         await qt_pager($c.lit("discourage"));
     }
@@ -301,7 +303,7 @@ export async function nemesis_speaks() {   // quest.c:403
 export async function nemesis_stinks(mx, my) {   // quest.c:426
     let save_mon_moving = 0;
     save_mon_moving = svc.context.mon_moving;
-    svc.context.mon_moving = 1;
+    svc.context.mon_moving = TRUE;
     await create_gas_cloud(mx, my, 5, 8);
     svc.context.mon_moving = save_mon_moving;
 }
@@ -313,7 +315,7 @@ async function chat_with_guardian() {   // quest.c:441
     }
 }
 async function prisoner_speaks(mtmp) {   // quest.c:451
-    if ($c.peq(mtmp.data, $c.relem(mons, PM_PRISONER)) && $c.andu64(mtmp.mstrategy, STRAT_CLOSE | STRAT_WAITFORU)) {
+    if ($c.peq(mtmp.data, $c.relem(mons, PM_PRISONER)) && $c.andu64(mtmp.mstrategy, STRAT_WAITMASK)) {
         if (canseemon(mtmp)) {
             await pline($c.lit("%s speaks:"), await Monnam(mtmp));
         }
@@ -321,7 +323,7 @@ async function prisoner_speaks(mtmp) {   // quest.c:451
         mtmp.mstrategy = $c.andu64(mtmp.mstrategy, 18446744072904245247n);
         mtmp.mpeaceful = (1) & 1;
         adjalign(3);
-        await angry_guards(0);
+        await angry_guards(FALSE);
     }
     return;
 }
@@ -329,7 +331,7 @@ export async function quest_chat(mtmp) {   // quest.c:473
     if (mtmp.m_id === svq.quest_status.leader_m_id) {
         await chat_with_leader(mtmp);
         if (svq.quest_status.pissed_off) {
-            await setmangry(mtmp, 0);
+            await setmangry(mtmp, FALSE);
         }
         return;
     }
@@ -363,8 +365,11 @@ export async function quest_talk(mtmp) {   // quest.c:495
 export function quest_stat_check(mtmp) {   // quest.c:514
     let $t1;
     if (mtmp.data.msound === MS_NEMESIS) {
-        $t1 = (!(mtmp.msleeping | 0 || !mtmp.mcanmove) && monnear(mtmp, u.ux, u.uy) ? 1 : 0) >>> 0, svq.quest_status.in_battle = ($t1) & 1;
+        $t1 = (!helpless(mtmp) && monnear(mtmp, u.ux, u.uy) ? 1 : 0) >>> 0, svq.quest_status.in_battle = ($t1) & 1;
     }
+}
+function Not_firsttime() {
+    return on_level(u.uz0, u.uz);
 }
 
 export function $init() {

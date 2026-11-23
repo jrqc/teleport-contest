@@ -5,42 +5,52 @@ import { $G } from './globals.js';
 import { m_unleash } from './apply.js';
 import { is_art } from './artifact.js';
 import { ART_SNICKERSNEE } from './artilist.h.js';
-import { acurr, adjalign, exercise } from './attrib.js';
+import { adjalign, exercise } from './attrib.js';
 import { A_CHA, A_DEX, A_WIS } from './attrib.h.js';
+import { ACURR } from './attrib.macros.js';
 import { describe_level } from './botl.js';
 import { directionname, dirtocoord, getdir, isok, xytodir, yn_function } from './cmd.js';
 import { is_lava, is_pool } from './dbridge.js';
-import { c_common_strings, disp, flags, gi, gu, gv, gy, iflags, svl, u, ynchars } from './decl.js';
-import { S_ANGEL, S_CENTAUR, S_DRAGON, S_EYE, S_GHOST, S_JABBERWOCK, S_LIGHT, S_QUADRUPED, S_UNICORN, S_VORTEX, TOOL_CLASS, WEAPON_CLASS } from './defsym.h.js';
-import { canseemon, newsym, sensemon } from './display.js';
+import { c_common_strings, disp, gi, gu, gv, gy, iflags, svl, u, ynchars } from './decl.js';
+import { S_ANGEL, S_CENTAUR, S_DRAGON, S_JABBERWOCK, S_QUADRUPED, S_UNICORN, TOOL_CLASS, WEAPON_CLASS } from './defsym.h.js';
+import { newsym } from './display.js';
+import { canspotmon } from './display.macros.js';
 import { heal_legs, legs_in_no_shape, set_wounded_legs } from './do.js';
 import { Mgender, Monnam, YMonnam, a_monnam, hliquid, minimal_monnam, mon_nam, monverbself, pmname, x_monnam, y_monnam } from './do_name.js';
 import { finish_meating } from './dogmove.js';
-import { has_ceiling, surface } from './dungeon.js';
+import { surface } from './dungeon.js';
 import { panic } from './end.js';
 import { debugcore } from './files.js';
+import { wizard } from './flag.macros.js';
+import { FALSE, TRUE } from './global.h.js';
 import { losehp, near_capacity, test_move, u_locomotion } from './hack.js';
-import { DIR_ERR, DISMOUNT_BONES, DISMOUNT_BYCHOICE, DISMOUNT_ENGULFED, DISMOUNT_FELL, DISMOUNT_GENERIC, DISMOUNT_KNOCKED, DISMOUNT_POLY, DISMOUNT_THROWN, ECMD_CANCEL, ECMD_OK, ECMD_TIME, KILLED_BY_AN, LEG, NO_KILLER_PREFIX, NO_TRAP_FLAGS, N_DIRS_Z, RLOC_ERR, RLOC_NOMSG, SLT_ENCUMBER, TELEDS_ALLOW_DRAG, TEST_MOVE } from './hack.h.js';
-import { dist2, highc, strsubst } from './hacklib.js';
+import { DIR_ERR, DISMOUNT_BONES, DISMOUNT_BYCHOICE, DISMOUNT_ENGULFED, DISMOUNT_FELL, DISMOUNT_GENERIC, DISMOUNT_KNOCKED, DISMOUNT_POLY, DISMOUNT_THROWN, ECMD_CANCEL, ECMD_OK, ECMD_TIME, KILLED_BY_AN, LEG, NO_KILLER_PREFIX, NO_TRAP_FLAGS, N_DIRS, RLOC_ERR, RLOC_NOMSG, SLT_ENCUMBER, TELEDS_ALLOW_DRAG, TEST_MOVE } from './hack.h.js';
+import { DIR_LEFT, DIR_RIGHT, NODIAG, distu, y_n } from './hack.macros.js';
+import { highc, strsubst } from './hacklib.js';
 import { freeinv, fully_identify_obj, sobj_at } from './invent.js';
+import { has_mgivenname } from './mextra.macros.js';
 import { mksobj } from './mkobj.js';
 import { killed, monkilled } from './mon.js';
 import { AD_PHYS } from './monattk.h.js';
 import { poly_when_stoned, pronoun_gender } from './mondata.js';
-import { M1_AMORPHOUS, M1_AMPHIBIOUS, M1_BREATHLESS, M1_CLING, M1_FLY, M1_HUMANOID, M1_SLITHY, M1_SWIM, M1_UNSOLID, M2_ROCKTHROW, MZ_LARGE, MZ_MEDIUM, MZ_SMALL } from './monflag.h.js';
+import { amorphous, bigmonst, cant_drown, grounded, humanoid, is_floater, is_flyer, is_swimmer, is_whirly, likes_lava, noncorporeal, slithy, throws_rocks, touch_petrifies, unsolid, verysmall } from './mondata.macros.js';
+import { M1_FLY, MZ_MEDIUM } from './monflag.h.js';
 import { accessible } from './monmove.js';
 import { mons } from './monst.js';
-import { MON_FLOOR, M_AP_FURNITURE, M_AP_OBJECT, M_AP_TYPMASK } from './monst.h.js';
-import { PM_AIR_ELEMENTAL, PM_AMOROUS_DEMON, PM_BAT, PM_CHICKATRICE, PM_COCKATRICE, PM_FIRE_ELEMENTAL, PM_GHOST, PM_GRID_BUG, PM_KNIGHT, PM_LONG_WORM, PM_SALAMANDER, PM_STONE_GOLEM } from './monsters.h.js';
+import { MON_FLOOR, M_AP_FURNITURE, M_AP_OBJECT } from './monst.h.js';
+import { DEADMONSTER, M_AP_TYPE, helpless } from './monst.macros.js';
+import { PM_AMOROUS_DEMON, PM_BAT, PM_GHOST, PM_KNIGHT, PM_LONG_WORM, PM_STONE_GOLEM } from './monsters.h.js';
 import { objdescr_is } from './o_init.js';
-import { IRON, MITHRIL } from './objclass.h.js';
+import { greatest_erosion } from './obj.macros.js';
+import { is_metallic } from './objclass.macros.js';
 import { objects } from './objects.js';
 import { BOULDER, SADDLE } from './objects.h.js';
 import { an } from './objnam.js';
 import { encumber_msg, u_handsy } from './pickup.js';
 import { You, You_cant, Your, impossible, pline } from './pline.js';
 import { body_part, polymon, steed_vs_stealth } from './polyself.js';
-import { BLINDED, CONFUSION, FLYING, FUMBLING, GLIB, HALF_PHDAM, HALLUC, HALLUC_RES, I_SPECIAL, LEVITATION, STEALTH, STONE_RES, STUNNED, TELEPAT, TIMEOUT, WOUNDED_LEGS, W_ARTI, W_RINGL, W_RINGR, W_SADDLE } from './prop.h.js';
+import { BOTH_SIDES, CONFUSION, FLYING, HALF_PHDAM, STUNNED, WOUNDED_LEGS, W_SADDLE } from './prop.h.js';
+import { MON_AT, m_at } from './rm.macros.js';
 import { rn2, rnd } from './rnd.js';
 import { genders } from './role.js';
 import { P_BASIC, P_EXPERT, P_ISRESTRICTED, P_LANCE, P_POLEARMS, P_RIDING, P_SKILLED, P_UNSKILLED } from './skills.h.js';
@@ -51,6 +61,8 @@ import { VIBRATING_SQUARE } from './trap.h.js';
 import { use_skill } from './weapon.js';
 import { update_mon_extrinsics, which_armor } from './worn.js';
 import { PRONOUN_HALLU, TT_BEARTRAP, TT_PIT, TT_WEB } from './you.h.js';
+import { Upolyd, u_at } from './you.macros.js';
+import { Blind, Blind_telepat, Fumbling, Glib, Hallucination, Lev_at_will, Levitation, Punished, Stealth, Stone_resistance, Underwater, Wounded_legs } from './youprop.macros.js';
 
 const steeds = new Int8Array(7);
 export async function rider_cant_reach() {   // steed.c:17
@@ -59,14 +71,14 @@ export async function rider_cant_reach() {   // steed.c:17
 export function can_saddle(mtmp) {   // steed.c:26
     let ptr = null;
     ptr = mtmp.data;
-    return $c.i8($c.strchr(new $c.Ptr(steeds, 0), ptr.mlet) && ptr.msize >= MZ_MEDIUM && (!($c.andu64(ptr.mflags1, M1_HUMANOID) !== 0) || ptr.mlet === S_CENTAUR) && !($c.andu64(ptr.mflags1, M1_AMORPHOUS) !== 0) && !(ptr.mlet === S_GHOST) && !(ptr.mlet === S_VORTEX || $c.peq(ptr, $c.relem(mons, PM_AIR_ELEMENTAL))) && !($c.andu64(ptr.mflags1, M1_UNSOLID) !== 0) ? 1 : 0);
+    return $c.i8($c.strchr(new $c.Ptr(steeds, 0), ptr.mlet) && ptr.msize >= MZ_MEDIUM && (!humanoid(ptr) || ptr.mlet === S_CENTAUR) && !amorphous(ptr) && !noncorporeal(ptr) && !is_whirly(ptr) && !unsolid(ptr) ? 1 : 0);
 }
 export async function use_saddle(otmp) {   // steed.c:36
     let mtmp = null, ptr = null, chance = 0, kbuf = new Int8Array(256);
     if (!await u_handsy()) {
         return ECMD_OK;
     }
-    if (u.uswallow | 0 || u.uinwater | 0 || !await getdir(null)) {
+    if (u.uswallow | 0 || (u.uinwater | 0) || !await getdir(null)) {
         await pline($c.lit("%s"), c_common_strings.c_Never_mind);
         return ECMD_CANCEL;
     }
@@ -74,7 +86,7 @@ export async function use_saddle(otmp) {   // steed.c:36
         await pline($c.lit("Saddle yourself?  Very funny..."));
         return ECMD_OK;
     }
-    if (!isok($c.i16(u.ux + u.dx | 0), $c.i16(u.uy + u.dy | 0)) || !(mtmp = svl.level.monsters[u.ux + u.dx | 0][u.uy + u.dy | 0]) || !(canseemon(mtmp) || sensemon(mtmp))) {
+    if (!isok($c.i16(u.ux + u.dx | 0), $c.i16(u.uy + u.dy | 0)) || !(mtmp = svl.level.monsters[u.ux + u.dx | 0][u.uy + u.dy | 0]) || !canspotmon(mtmp)) {
         await pline($c.lit("I see nobody there."));
         return ECMD_TIME;
     }
@@ -83,7 +95,7 @@ export async function use_saddle(otmp) {   // steed.c:36
         return ECMD_TIME;
     }
     ptr = mtmp.data;
-    if (($c.peq(ptr, $c.relem(mons, PM_COCKATRICE)) || $c.peq(ptr, $c.relem(mons, PM_CHICKATRICE))) && !$G.uarmg && !(u.uprops[STONE_RES].intrinsic || u.uprops[STONE_RES].extrinsic)) {
+    if (touch_petrifies(ptr) && !$G.uarmg && !Stone_resistance()) {
         await You($c.lit("touch %s."), await mon_nam(mtmp));
         if (!(poly_when_stoned(gy.youmonst.data) && await polymon(PM_STONE_GOLEM))) {
             $c.__builtin___sprintf_chk(new $c.Ptr(kbuf, 0), 0, 256, $c.lit("attempting to saddle %s"), await an(pmname(mtmp.data, Mgender(mtmp))));
@@ -92,7 +104,7 @@ export async function use_saddle(otmp) {   // steed.c:36
     }
     if ($c.peq(ptr, $c.relem(mons, PM_AMOROUS_DEMON))) {
         await pline($c.lit("Shame on you!"));
-        await exercise(A_WIS, 0);
+        await exercise(A_WIS, FALSE);
         return ECMD_TIME;
     }
     if (mtmp.isminion | 0 || mtmp.isshk | 0 || mtmp.ispriest | 0 || mtmp.isgd | 0 || mtmp.iswiz | 0) {
@@ -103,7 +115,7 @@ export async function use_saddle(otmp) {   // steed.c:36
         await You_cant($c.lit("saddle such a creature."));
         return ECMD_TIME;
     }
-    chance = (acurr(A_DEX) + $c.div32(acurr(A_CHA), 2) | 0) + Math.imul(2, mtmp.mtame) | 0;
+    chance = (ACURR(A_DEX) + $c.div32(ACURR(A_CHA), 2) | 0) + Math.imul(2, mtmp.mtame) | 0;
     chance = chance + Math.imul(u.ulevel, mtmp.mtame ? 20 : 5) | 0;
     if (!mtmp.mtame) {
         chance = chance - Math.imul(10, mtmp.m_lev) | 0;
@@ -126,7 +138,7 @@ export async function use_saddle(otmp) {   // steed.c:36
             chance = chance + 30 | 0;
             break;
     }
-    if (u.uprops[CONFUSION].intrinsic || (u.uprops[FUMBLING].intrinsic || u.uprops[FUMBLING].extrinsic) || u.uprops[GLIB].intrinsic) {
+    if (u.uprops[CONFUSION].intrinsic || Fumbling() || Glib()) {
         chance = chance - 20 | 0;
     } else if ($G.uarmg && await objdescr_is($G.uarmg, $c.lit("riding gloves"))) {
         chance = chance + 10 | 0;
@@ -140,7 +152,7 @@ export async function use_saddle(otmp) {   // steed.c:36
     if (rn2(100) < chance) {
         await You($c.lit("put the saddle on %s."), await mon_nam(mtmp));
         if (otmp.owornmask) {
-            await remove_worn_item(otmp, 0);
+            await remove_worn_item(otmp, FALSE);
         }
         await freeinv(otmp);
         await put_saddle_on_mon(otmp, mtmp);
@@ -157,7 +169,7 @@ export async function put_saddle_on_mon(saddle, mtmp) {   // steed.c:142
         return;
     }
     if (!saddle) {
-        if ((saddle = await mksobj(SADDLE, 1, 0)) !== null) {
+        if ((saddle = await mksobj(SADDLE, TRUE, FALSE)) !== null) {
             await fully_identify_obj(saddle);
         } else {
             return;
@@ -169,19 +181,19 @@ export async function put_saddle_on_mon(saddle, mtmp) {   // steed.c:142
     mtmp.misc_worn_check = $c.or64(mtmp.misc_worn_check, W_SADDLE);
     saddle.owornmask = W_SADDLE;
     saddle.corpsenm = mtmp.m_id | 0;
-    await update_mon_extrinsics(mtmp, saddle, 1, 0);
+    await update_mon_extrinsics(mtmp, saddle, TRUE, FALSE);
 }
 export function can_ride(mtmp) {   // steed.c:169
-    return $c.i8(mtmp.mtame && $c.andu64(gy.youmonst.data.mflags1, M1_HUMANOID) !== 0 && !(gy.youmonst.data.msize < MZ_SMALL) && !(gy.youmonst.data.msize >= MZ_LARGE) && (!u.uinwater || $c.andu64(mtmp.data.mflags1, M1_SWIM) !== 0) ? 1 : 0);
+    return $c.i8(mtmp.mtame && humanoid(gy.youmonst.data) && !verysmall(gy.youmonst.data) && !bigmonst(gy.youmonst.data) && (!Underwater() || is_swimmer(mtmp.data)) ? 1 : 0);
 }
 export async function doride() {   // steed.c:178
     let forcemount = 0;
-    forcemount = 0;
+    forcemount = FALSE;
     if (u.usteed) {
         await dismount_steed(DISMOUNT_BYCHOICE);
     } else if (await getdir(null) && isok($c.i16(u.ux + u.dx | 0), $c.i16(u.uy + u.dy | 0))) {
-        if (flags.debug && await yn_function($c.lit("Force the mount to succeed?"), new $c.Ptr(ynchars, 0), 110, 1) === 121) {
-            forcemount = 1;
+        if (wizard() && await yn_function($c.lit("Force the mount to succeed?"), new $c.Ptr(ynchars, 0), 110, TRUE) === 121) {
+            forcemount = TRUE;
         }
         return await mount_steed(svl.level.monsters[u.ux + u.dx | 0][u.uy + u.dy | 0], forcemount) ? ECMD_TIME : ECMD_OK;
     } else {
@@ -193,102 +205,102 @@ export async function mount_steed(mtmp, force) {   // steed.c:197
     let otmp = null, buf = new Int8Array(256), ptr = null, qbuf = new Int8Array(128), kbuf = new Int8Array(256), t = null, was_stealthy = 0;
     if (u.usteed) {
         await You($c.lit("are already riding %s."), await mon_nam(u.usteed));
-        return 0;
+        return FALSE;
     }
-    if (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) && !force) {
+    if (Hallucination() && !force) {
         await pline($c.lit("Maybe you should find a designated driver."));
-        return 0;
+        return FALSE;
     }
-    if (u.uprops[WOUNDED_LEGS].intrinsic || u.uprops[WOUNDED_LEGS].extrinsic) {
-        await legs_in_no_shape($c.lit("riding"), 0);
+    if (Wounded_legs()) {
+        await legs_in_no_shape($c.lit("riding"), FALSE);
         $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("Heal your leg%s?"), $c.and64(u.uprops[WOUNDED_LEGS].intrinsic, 393216) === 393216 ? $c.lit("s") : $c.lit(""));
-        if (force && flags.debug && await yn_function(new $c.Ptr(qbuf, 0), new $c.Ptr(ynchars, 0), 110, 1) === 121) {
+        if (force && wizard() && await y_n(new $c.Ptr(qbuf, 0)) === 121) {
             await heal_legs(0);
         } else {
-            return 0;
+            return FALSE;
         }
     }
-    if (u.umonnum !== u.umonster && (!($c.andu64(gy.youmonst.data.mflags1, M1_HUMANOID) !== 0) || gy.youmonst.data.msize < MZ_SMALL || gy.youmonst.data.msize >= MZ_LARGE || $c.andu64(gy.youmonst.data.mflags1, M1_SLITHY) !== 0)) {
+    if (Upolyd() && (!humanoid(gy.youmonst.data) || verysmall(gy.youmonst.data) || bigmonst(gy.youmonst.data) || slithy(gy.youmonst.data))) {
         await You($c.lit("won't fit on a saddle."));
-        return 0;
+        return FALSE;
     }
     if (!force && near_capacity() > SLT_ENCUMBER) {
         await You_cant($c.lit("do that while carrying so much stuff."));
-        return 0;
+        return FALSE;
     }
-    if (!mtmp || !force && ((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked && !(u.uprops[TELEPAT].intrinsic || u.uprops[TELEPAT].extrinsic) || mtmp.mundetected | 0 || (mtmp.m_ap_type & M_AP_TYPMASK) === M_AP_FURNITURE || (mtmp.m_ap_type & M_AP_TYPMASK) === M_AP_OBJECT)) {
+    if (!mtmp || !force && (Blind() && !Blind_telepat() || mtmp.mundetected | 0 || M_AP_TYPE(mtmp) === M_AP_FURNITURE || M_AP_TYPE(mtmp) === M_AP_OBJECT)) {
         await pline($c.lit("I see nobody there."));
-        return 0;
+        return FALSE;
     }
     if ($c.peq(mtmp.data, $c.relem(mons, PM_LONG_WORM)) && ((u.ux + u.dx | 0) !== mtmp.mx || (u.uy + u.dy | 0) !== mtmp.my)) {
         await You($c.lit("couldn't ride %s, let alone its tail."), await a_monnam(mtmp));
-        return 0;
+        return FALSE;
     }
-    if (u.uswallow | 0 || u.ustuck || u.utrap || $G.uball !== null || !await test_move(u.ux, u.uy, $c.i16(mtmp.mx - u.ux | 0), $c.i16(mtmp.my - u.uy | 0), TEST_MOVE)) {
-        if ($G.uball !== null || !(u.uswallow | 0 || u.ustuck || u.utrap)) {
+    if (u.uswallow | 0 || u.ustuck || u.utrap || Punished() || !await test_move(u.ux, u.uy, $c.i16(mtmp.mx - u.ux | 0), $c.i16(mtmp.my - u.uy | 0), TEST_MOVE)) {
+        if (Punished() || !(u.uswallow | 0 || u.ustuck || u.utrap)) {
             await You($c.lit("are unable to swing your %s over."), await body_part(LEG));
         } else {
             await You($c.lit("are stuck here for now."));
         }
-        return 0;
+        return FALSE;
     }
     otmp = await which_armor(mtmp, W_SADDLE);
     if (!otmp) {
         await pline($c.lit("%s is not saddled."), await Monnam(mtmp));
-        return 0;
+        return FALSE;
     }
     ptr = mtmp.data;
-    if (($c.peq(ptr, $c.relem(mons, PM_COCKATRICE)) || $c.peq(ptr, $c.relem(mons, PM_CHICKATRICE))) && !(u.uprops[STONE_RES].intrinsic || u.uprops[STONE_RES].extrinsic)) {
+    if (touch_petrifies(ptr) && !Stone_resistance()) {
         await You($c.lit("touch %s."), await mon_nam(mtmp));
         $c.__builtin___sprintf_chk(new $c.Ptr(kbuf, 0), 0, 256, $c.lit("attempting to ride %s"), await an(pmname(mtmp.data, Mgender(mtmp))));
         await instapetrify(new $c.Ptr(kbuf, 0));
     }
     if (!mtmp.mtame || mtmp.isminion | 0) {
         await pline($c.lit("I think %s would mind."), await mon_nam(mtmp));
-        return 0;
+        return FALSE;
     }
     if (mtmp.mtrapped) {
         t = t_at(mtmp.mx, mtmp.my);
-        await You_cant($c.lit("mount %s while %s's trapped in %s."), await mon_nam(mtmp), genders[pronoun_gender(mtmp, PRONOUN_HALLU)].he, await an(trapname(t.ttyp | 0, 0)));
-        return 0;
+        await You_cant($c.lit("mount %s while %s's trapped in %s."), await mon_nam(mtmp), genders[pronoun_gender(mtmp, PRONOUN_HALLU)].he, await an(trapname(t.ttyp | 0, FALSE)));
+        return FALSE;
     }
     if (!force && !(gu.urole.mnum === PM_KNIGHT) && !(mtmp.mtame = $c.i8(mtmp.mtame - 1))) {
         await newsym(mtmp.mx, mtmp.my);
         await pline($c.lit("%s resists%s!"), await Monnam(mtmp), mtmp.mleashed | 0 ? $c.lit(" and its leash comes off") : $c.lit(""));
         if (mtmp.mleashed) {
-            await m_unleash(mtmp, 0);
+            await m_unleash(mtmp, FALSE);
         }
-        return 0;
+        return FALSE;
     }
-    if (!force && u.uinwater | 0 && !($c.andu64(ptr.mflags1, M1_SWIM) !== 0)) {
+    if (!force && (u.uinwater | 0) && !is_swimmer(ptr)) {
         await You_cant($c.lit("ride that creature while under %s."), hliquid($c.lit("water")));
-        return 0;
+        return FALSE;
     }
     if (!can_saddle(mtmp) || !can_ride(mtmp)) {
         await You_cant($c.lit("ride such a creature."));
-        return 0;
+        return FALSE;
     }
-    if (!force && !(ptr.mlet === S_EYE || ptr.mlet === S_LIGHT) && !($c.andu64(ptr.mflags1, M1_FLY) !== 0) && ((u.uprops[LEVITATION].intrinsic || u.uprops[LEVITATION].extrinsic) && !u.uprops[LEVITATION].blocked) && !(($c.and64(u.uprops[LEVITATION].intrinsic, I_SPECIAL) !== 0 || $c.and64(u.uprops[LEVITATION].extrinsic, W_ARTI) !== 0) && $c.and64(u.uprops[LEVITATION].intrinsic, ~(I_SPECIAL | TIMEOUT)) === 0 && $c.and64(u.uprops[LEVITATION].extrinsic, ~W_ARTI) === 0)) {
+    if (!force && !is_floater(ptr) && !is_flyer(ptr) && Levitation() && !Lev_at_will()) {
         await You($c.lit("cannot reach %s."), await mon_nam(mtmp));
-        return 0;
+        return FALSE;
     }
-    if (!force && $G.uarm && ((objects[$G.uarm.otyp].oc_material | 0) >= IRON && (objects[$G.uarm.otyp].oc_material | 0) <= MITHRIL) && (($G.uarm.oeroded | 0) > ($G.uarm.oeroded2 | 0) ? $G.uarm.oeroded | 0 : $G.uarm.oeroded2 | 0)) {
+    if (!force && $G.uarm && is_metallic($G.uarm) && greatest_erosion($G.uarm)) {
         await Your($c.lit("%s armor is too stiff to be able to mount %s."), $G.uarm.oeroded | 0 ? $c.lit("rusty") : $c.lit("corroded"), await mon_nam(mtmp));
-        return 0;
+        return FALSE;
     }
-    if (!force && (u.uprops[CONFUSION].intrinsic || (u.uprops[FUMBLING].intrinsic || u.uprops[FUMBLING].extrinsic) || u.uprops[GLIB].intrinsic || (u.uprops[WOUNDED_LEGS].intrinsic || u.uprops[WOUNDED_LEGS].extrinsic) || otmp.cursed | 0 || otmp.greased | 0 || (u.ulevel + mtmp.mtame | 0) < rnd(20))) {
-        if ((u.uprops[LEVITATION].intrinsic || u.uprops[LEVITATION].extrinsic) && !u.uprops[LEVITATION].blocked) {
+    if (!force && (u.uprops[CONFUSION].intrinsic || Fumbling() || Glib() || Wounded_legs() || otmp.cursed | 0 || otmp.greased | 0 || (u.ulevel + mtmp.mtame | 0) < rnd(20))) {
+        if (Levitation()) {
             await pline($c.lit("%s slips away from you."), await Monnam(mtmp));
-            return 0;
+            return FALSE;
         }
         await You($c.lit("slip while trying to get on %s."), await mon_nam(mtmp));
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("slipped while mounting %s"), await x_monnam(mtmp, 2, null, 7, 1));
         await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32((rn2(5) + 10 | 0) + 1 | 0, 2) : rn2(5) + 10 | 0, new $c.Ptr(buf, 0), NO_KILLER_PREFIX);
-        return 0;
+        return FALSE;
     }
     await maybewakesteed(mtmp);
     if (!force) {
-        if ((u.uprops[LEVITATION].intrinsic || u.uprops[LEVITATION].extrinsic) && !u.uprops[LEVITATION].blocked && !(ptr.mlet === S_EYE || ptr.mlet === S_LIGHT) && !($c.andu64(ptr.mflags1, M1_FLY) !== 0)) {
+        if (Levitation() && !is_floater(ptr) && !is_flyer(ptr)) {
             await pline($c.lit("%s magically floats up!"), await Monnam(mtmp));
         }
         await You($c.lit("mount %s."), await mon_nam(mtmp));
@@ -297,20 +309,20 @@ export async function mount_steed(mtmp, force) {   // steed.c:197
         }
     }
     if ($G.uwep && (($G.uwep.oclass === WEAPON_CLASS || $G.uwep.oclass === TOOL_CLASS) && (objects[$G.uwep.otyp].oc_subtyp === P_POLEARMS || objects[$G.uwep.otyp].oc_subtyp === P_LANCE || is_art($G.uwep, ART_SNICKERSNEE)))) {
-        gu.unweapon = 0;
+        gu.unweapon = FALSE;
     }
     u.usteed = mtmp;
     {
-        was_stealthy = $c.i8(((u.uprops[STEALTH].intrinsic || u.uprops[STEALTH].extrinsic) && !u.uprops[STEALTH].blocked ? 1 : 0) !== 0 ? 1 : 0);
+        was_stealthy = $c.i8(Stealth() !== 0 ? 1 : 0);
         steed_vs_stealth();
-        if (was_stealthy && !((u.uprops[STEALTH].intrinsic || u.uprops[STEALTH].extrinsic) && !u.uprops[STEALTH].blocked)) {
+        if (was_stealthy && !Stealth()) {
             await You($c.lit("aren't stealthy anymore."));
         }
     }
     svl.level.monsters[mtmp.mx][mtmp.my] = null;
     await teleds(mtmp.mx, mtmp.my, TELEDS_ALLOW_DRAG);
-    disp.botl = 1;
-    return 1;
+    disp.botl = TRUE;
+    return TRUE;
 }
 export async function exercise_steed() {   // steed.c:387
     if (!u.usteed) {
@@ -327,7 +339,7 @@ export async function kick_steed() {   // steed.c:402
     if (!u.usteed) {
         return;
     }
-    if (u.usteed.msleeping | 0 || !u.usteed.mcanmove) {
+    if (helpless(u.usteed)) {
         $c.__builtin___strcpy_chk(new $c.Ptr(He, 0), genders[pronoun_gender(u.usteed, 2)].he, 256);
         $t1 = highc(new $c.Ptr(He, 0).get(0)), new $c.Ptr(He, 0).set(0, $t1);
         if ((u.usteed.mcanmove | 0 || u.usteed.mfrozen | 0) && !rn2(2)) {
@@ -339,7 +351,7 @@ export async function kick_steed() {   // steed.c:402
                 u.usteed.mfrozen = (0) & 127;
                 u.usteed.mcanmove = (1) & 1;
             }
-            if (u.usteed.msleeping | 0 || !u.usteed.mcanmove) {
+            if (helpless(u.usteed)) {
                 await pline($c.lit("%s stirs."), new $c.Ptr(He, 0));
             } else {
                 await pline($c.lit("%s!"), await monverbself(u.usteed, new $c.Ptr(He, 0), $c.lit("rouse"), null));
@@ -353,7 +365,7 @@ export async function kick_steed() {   // steed.c:402
         u.usteed.mtame = $c.i8(u.usteed.mtame - 1);
     }
     if (!u.usteed.mtame && u.usteed.mleashed | 0) {
-        await m_unleash(u.usteed, 1);
+        await m_unleash(u.usteed, TRUE);
     }
     if (!u.usteed.mtame || (u.ulevel + u.usteed.mtame | 0) < rnd(20)) {
         await newsym(u.usteed.mx, u.usteed.my);
@@ -374,15 +386,15 @@ async function landing_spot(spot, reason, forceit) {   // steed.c:460
         best_j = j;
         try_[0].x = $c.i16(u.dx), try_[0].y = $c.i16(u.dy);
         i = rn2(2);
-        clockwise_j = $c.rem32(j + 1 | 0, N_DIRS_Z - 2);
+        clockwise_j = DIR_RIGHT(j);
         dirtocoord(cc, clockwise_j);
         try_[1 + i | 0].x = cc.x, try_[1 + i | 0].y = cc.y;
-        counterclk_j = $c.rem32(j + 7 | 0, N_DIRS_Z - 2);
+        counterclk_j = DIR_LEFT(j);
         dirtocoord(cc, counterclk_j);
         try_[2 - i | 0].x = cc.x, try_[2 - i | 0].y = cc.y;
         n = 3;
         do {
-            if (debugcore($c.lit("steed.c"), 1)) {
+            if (debugcore($c.lit("steed.c"), TRUE)) {
                 save_plnmsg = iflags.last_msg;
                 await pline($c.lit("knock from saddle: best %s, next %s or %s"), directionname(best_j), directionname(clockwise_j), directionname(counterclk_j));
                 iflags.last_msg = save_plnmsg;
@@ -391,37 +403,37 @@ async function landing_spot(spot, reason, forceit) {   // steed.c:460
     } else {
         best_j = clockwise_j = counterclk_j = -1;
     }
-    for (j = 0; j < N_DIRS_Z - 2; j = j + 1 | 0) {
+    for (j = 0; j < N_DIRS; j = j + 1 | 0) {
         if (j === best_j || j === clockwise_j || j === counterclk_j) {
             continue;
         }
-        if (reason === DISMOUNT_POLY && u.umonnum === PM_GRID_BUG && $c.rem32(j, 1) !== 0) {
+        if (reason === DISMOUNT_POLY && NODIAG(u.umonnum) && $c.rem32(j, 1) !== 0) {
             continue;
         }
         dirtocoord(cc, j);
         try_[($t1 = n, n = $t1 + 1 | 0, $t1)].$copyFrom(cc);
     }
-    impaird = $c.i8(u.uprops[STUNNED].intrinsic || u.uprops[CONFUSION].intrinsic || (u.uprops[FUMBLING].intrinsic || u.uprops[FUMBLING].extrinsic) ? 1 : 0);
+    impaird = $c.i8(u.uprops[STUNNED].intrinsic || u.uprops[CONFUSION].intrinsic || Fumbling() ? 1 : 0);
     viable = 0;
-    found = 0;
+    found = FALSE;
     for (i = reason === DISMOUNT_BYCHOICE && !impaird ? 0 : reason === DISMOUNT_BYCHOICE && impaird || reason === DISMOUNT_KNOCKED ? 1 : 2; i <= 2 && !found; i = i + 1 | 0) {
         for (j = 0; j < n; j = j + 1 | 0) {
             x = $c.i16(u.ux + try_[j].x | 0);
             y = $c.i16(u.uy + try_[j].y | 0);
-            if (!isok(x, y) || x === u.ux && y === u.uy) {
+            if (!isok(x, y) || u_at(x, y)) {
                 continue;
             }
-            if (accessible(x, y) && !(svl.level.monsters[x][y] !== null) && await test_move(u.ux, u.uy, $c.i16(x - u.ux | 0), $c.i16(y - u.uy | 0), TEST_MOVE)) {
+            if (accessible(x, y) && !MON_AT(x, y) && await test_move(u.ux, u.uy, $c.i16(x - u.ux | 0), $c.i16(y - u.uy | 0), TEST_MOVE)) {
                 viable = viable + 1 | 0;
-                distance = dist2(x, y, u.ux, u.uy);
+                distance = distu(x, y);
                 if (min_distance < 0 || (best_j === -1 ? distance < min_distance : j < 3) || distance === min_distance && !rn2(viable)) {
                     kn_trap = $c.i8(i === 0 && ((t = t_at(x, y)) !== null && t.tseen | 0 && (t.ttyp | 0) !== VIBRATING_SQUARE) ? 1 : 0);
-                    boulder = $c.i8(i <= 1 && (sobj_at(BOULDER, x, y) && !($c.andu64(gy.youmonst.data.mflags2, M2_ROCKTHROW) !== 0)) ? 1 : 0);
+                    boulder = $c.i8(i <= 1 && (sobj_at(BOULDER, x, y) && !throws_rocks(gy.youmonst.data)) ? 1 : 0);
                     if (!kn_trap && !boulder) {
                         spot.x = x;
                         spot.y = y;
                         min_distance = distance;
-                        found = 1;
+                        found = TRUE;
                         if (best_j !== -1 && j < 3) {
                             break;
                         }
@@ -438,15 +450,15 @@ async function landing_spot(spot, reason, forceit) {   // steed.c:460
 export async function dismount_steed(reason) {   // steed.c:576
     let mtmp = null, otmp = null, verb = null, cc = new $T.nhcoord(), steedcc = new $T.nhcoord(), save_utrap = 0, ulev = 0, ufly = 0, repair_leg_damage = 0, have_spot = 0, was_stealthy = 0, mdat = null;
     save_utrap = u.utrap;
-    repair_leg_damage = $c.i8((u.uprops[WOUNDED_LEGS].intrinsic || u.uprops[WOUNDED_LEGS].extrinsic ? 1 : 0) !== 0 ? 1 : 0);
+    repair_leg_damage = $c.i8(Wounded_legs() !== 0 ? 1 : 0);
     have_spot = await landing_spot(cc, reason, 0);
     mtmp = u.usteed;
     if (!mtmp) {
         return;
     }
     u.usteed = null;
-    ufly = $c.i8((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked ? 1 : 0);
-    ulev = $c.i8((u.uprops[LEVITATION].intrinsic || u.uprops[LEVITATION].extrinsic) && !u.uprops[LEVITATION].blocked ? 1 : 0);
+    ufly = $c.i8((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked ? TRUE : FALSE);
+    ulev = $c.i8(Levitation() ? TRUE : FALSE);
     verb = u_locomotion($c.lit("fall"));
     u.usteed = mtmp;
     otmp = await which_armor(mtmp, W_SADDLE);
@@ -461,8 +473,8 @@ export async function dismount_steed(reason) {   // steed.c:576
             }
             if (!ulev && !ufly) {
                 await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32((rn2(10) + 10 | 0) + 1 | 0, 2) : rn2(10) + 10 | 0, $c.lit("riding accident"), KILLED_BY_AN);
-                await set_wounded_legs(W_RINGL | W_RINGR, $c.i32(u.uprops[WOUNDED_LEGS].intrinsic) + (rn2(5) + 5 | 0) | 0);
-                repair_leg_damage = 0;
+                await set_wounded_legs(BOTH_SIDES, $c.i32(u.uprops[WOUNDED_LEGS].intrinsic) + (rn2(5) + 5 | 0) | 0);
+                repair_leg_damage = FALSE;
             }
             break;
         case DISMOUNT_POLY:
@@ -488,9 +500,9 @@ export async function dismount_steed(reason) {   // steed.c:576
                 await You($c.lit("can't.  There isn't anywhere for you to stand."));
                 return;
             }
-            if (!(mtmp.mextra && mtmp.mextra.mgivenname)) {
+            if (!has_mgivenname(mtmp)) {
                 await pline($c.lit("You've been through the dungeon on %s with no name."), await an(pmname(mtmp.data, Mgender(mtmp))));
-                if (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic)) {
+                if (Hallucination()) {
                     await pline($c.lit("It felt good to get out of the rain."));
                 }
             } else {
@@ -503,9 +515,9 @@ export async function dismount_steed(reason) {   // steed.c:576
     u.usteed = $c.asRec(null, $T.monst, 192);
     u.ugallop = 0;
     {
-        was_stealthy = $c.i8(((u.uprops[STEALTH].intrinsic || u.uprops[STEALTH].extrinsic) && !u.uprops[STEALTH].blocked ? 1 : 0) !== 0 ? 1 : 0);
+        was_stealthy = $c.i8(Stealth() !== 0 ? 1 : 0);
         steed_vs_stealth();
-        if ((u.uprops[STEALTH].intrinsic || u.uprops[STEALTH].extrinsic) && !u.uprops[STEALTH].blocked && !was_stealthy) {
+        if (Stealth() && !was_stealthy) {
             await You($c.lit("seem less noisy now."));
         }
     }
@@ -513,12 +525,12 @@ export async function dismount_steed(reason) {   // steed.c:576
         mtmp.mtrapped = (1) & 1;
     }
     steedcc.x = u.ux, steedcc.y = u.uy;
-    if (svl.level.monsters[u.ux][u.uy]) {
+    if (m_at(u.ux, u.uy)) {
         if (!await enexto(steedcc, u.ux, u.uy, mtmp.data) && !await enexto(steedcc, u.ux, u.uy, $c.relem(mons, PM_BAT))) {
             await enexto(steedcc, u.ux, u.uy, $c.relem(mons, PM_GHOST));
         }
     }
-    if (!(mtmp.mhp < 1)) {
+    if (!DEADMONSTER(mtmp)) {
         gi.in_steed_dismounting = $c.i8(gi.in_steed_dismounting + 1);
         await place_monster(mtmp, steedcc.x, steedcc.y);
         gi.in_steed_dismounting = $c.i8(gi.in_steed_dismounting - 1);
@@ -532,30 +544,30 @@ export async function dismount_steed(reason) {   // steed.c:576
         }
         if (!u.uswallow && !u.ustuck && have_spot) {
             mdat = mtmp.data;
-            if (!($c.andu64(mdat.mflags1, M1_FLY) !== 0) && !(mdat.mlet === S_EYE || mdat.mlet === S_LIGHT) && (!($c.andu64(mdat.mflags1, M1_CLING) !== 0) || !has_ceiling(u.uz))) {
+            if (grounded(mdat)) {
                 if (is_pool(u.ux, u.uy)) {
-                    if (!u.uinwater) {
+                    if (!Underwater()) {
                         await pline($c.lit("%s falls into the %s!"), await Monnam(mtmp), surface(u.ux, u.uy));
                     }
-                    if (!($c.andu64(mdat.mflags1, M1_SWIM) !== 0 || $c.andu64(mdat.mflags1, M1_AMPHIBIOUS) !== 0 || $c.andu64(mdat.mflags1, M1_BREATHLESS) !== 0)) {
+                    if (!cant_drown(mdat)) {
                         await killed(mtmp);
                         adjalign(-1);
                     }
                 } else if (is_lava(u.ux, u.uy)) {
                     await pline($c.lit("%s is pulled into the %s!"), await Monnam(mtmp), hliquid($c.lit("lava")));
-                    if (!($c.peq(mdat, $c.relem(mons, PM_FIRE_ELEMENTAL)) || $c.peq(mdat, $c.relem(mons, PM_SALAMANDER)))) {
+                    if (!likes_lava(mdat)) {
                         await killed(mtmp);
                         adjalign(-1);
                     }
                 }
             }
-            if (!(mtmp.mhp < 1)) {
-                gi.in_steed_dismounting = 1;
+            if (!DEADMONSTER(mtmp)) {
+                gi.in_steed_dismounting = TRUE;
                 await teleds(cc.x, cc.y, TELEDS_ALLOW_DRAG);
                 if (sobj_at(BOULDER, cc.x, cc.y)) {
                     sokoban_guilt();
                 }
-                gi.in_steed_dismounting = 0;
+                gi.in_steed_dismounting = FALSE;
                 if (save_utrap) {
                     await mintrap(mtmp, NO_TRAP_FLAGS);
                 }
@@ -572,24 +584,24 @@ export async function dismount_steed(reason) {   // steed.c:576
         }
     }
     if (reason !== DISMOUNT_ENGULFED && reason !== DISMOUNT_BONES) {
-        gi.in_steed_dismounting = 1;
+        gi.in_steed_dismounting = TRUE;
         await float_down(0, W_SADDLE);
-        gi.in_steed_dismounting = 0;
-        disp.botl = 1;
+        gi.in_steed_dismounting = FALSE;
+        disp.botl = TRUE;
         await encumber_msg();
         gv.vision_full_recalc = 1;
     } else {
-        disp.botl = 1;
+        disp.botl = TRUE;
     }
     if ($G.uwep && (($G.uwep.oclass === WEAPON_CLASS || $G.uwep.oclass === TOOL_CLASS) && (objects[$G.uwep.otyp].oc_subtyp === P_POLEARMS || objects[$G.uwep.otyp].oc_subtyp === P_LANCE || is_art($G.uwep, ART_SNICKERSNEE)))) {
-        gu.unweapon = 1;
+        gu.unweapon = TRUE;
     }
     return;
 }
 async function maybewakesteed(steed) {   // steed.c:827
     let frozen = 0, wasimmobile = 0;
     frozen = steed.mfrozen | 0;
-    wasimmobile = $c.i8(steed.msleeping | 0 || !steed.mcanmove ? 1 : 0);
+    wasimmobile = $c.i8(helpless(steed));
     steed.msleeping = (0) & 1;
     if (frozen) {
         frozen = $c.div32(frozen + 1 | 0, 2);
@@ -600,7 +612,7 @@ async function maybewakesteed(steed) {   // steed.c:827
             steed.mfrozen = (frozen >>> 0) & 127;
         }
     }
-    if (wasimmobile && !(steed.msleeping | 0 || !steed.mcanmove)) {
+    if (wasimmobile && !helpless(steed)) {
         await pline($c.lit("%s wakes up."), await Monnam(steed));
     }
     await finish_meating(steed);
@@ -622,34 +634,34 @@ export async function stucksteed(checkfeeding) {   // steed.c:878
     let steed = null;
     steed = u.usteed;
     if (steed) {
-        if (steed.msleeping | 0 || !steed.mcanmove) {
+        if (helpless(steed)) {
             await pline($c.lit("%s won't move!"), await YMonnam(steed));
-            return 1;
+            return TRUE;
         }
         if (checkfeeding && steed.meating) {
             await pline($c.lit("%s is still eating."), await YMonnam(steed));
-            return 1;
+            return TRUE;
         }
     }
-    return 0;
+    return FALSE;
 }
 export async function place_monster(mon, x, y) {   // steed.c:898
     let othermon = null, monnm = null, othnm = null, buf = new Int8Array(128);
     buf[0] = 0;
     if (!isok(x, y) && (x !== 0 || y !== 0 || !mon.isgd)) {
         describe_level(new $c.Ptr(buf, 0), 0);
-        await impossible($c.lit("trying to place %s at <%d,%d> mstate:%lx on %s"), minimal_monnam(mon, 1), x, y, mon.mstate, new $c.Ptr(buf, 0));
+        await impossible($c.lit("trying to place %s at <%d,%d> mstate:%lx on %s"), minimal_monnam(mon, TRUE), x, y, mon.mstate, new $c.Ptr(buf, 0));
         x = y = 0;
     }
-    if ($c.peq(mon, u.usteed) && !gi.in_steed_dismounting || mon.mhp < 1 && !(mon.isgd | 0 && x === 0 && y === 0)) {
+    if ($c.peq(mon, u.usteed) && !gi.in_steed_dismounting || DEADMONSTER(mon) && !(mon.isgd | 0 && x === 0 && y === 0)) {
         describe_level(new $c.Ptr(buf, 0), 0);
         await impossible($c.lit("placing %s onto map, mstate:%lx, on %s?"), $c.peq(mon, u.usteed) ? $c.lit("steed") : $c.lit("defunct monster"), mon.mstate, new $c.Ptr(buf, 0));
         return;
     }
     if ((othermon = svl.level.monsters[x][y]) !== null) {
         describe_level(new $c.Ptr(buf, 0), 0);
-        monnm = minimal_monnam(mon, 0);
-        othnm = !$c.peq(mon, othermon) ? minimal_monnam(othermon, 1) : $c.lit("itself");
+        monnm = minimal_monnam(mon, FALSE);
+        othnm = !$c.peq(mon, othermon) ? minimal_monnam(othermon, TRUE) : $c.lit("itself");
         await impossible($c.lit("placing %s over %s at <%d,%d>, mstates:%lx %lx on %s?"), monnm, othnm, x, y, othermon.mstate, mon.mstate, new $c.Ptr(buf, 0));
     }
     mon.mx = x, mon.my = y;

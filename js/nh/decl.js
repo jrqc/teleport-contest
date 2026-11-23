@@ -5,13 +5,13 @@ import { $G } from './globals.js';
 import { A_INT } from './attrib.h.js';
 import { NO_COLOR } from './color.h.js';
 import { S_ss1, S_ss2, S_ss3, S_ss4 } from './defsym.h.js';
-import { COLNO, MAXNROFROOMS, ROWNO, phase_not_set } from './global.h.js';
+import { COLNO, FALSE, MAXNROFROOMS, ROWNO, TRUE, phase_not_set } from './global.h.js';
 import { DIR_E, DIR_N, DIR_NE, DIR_NW, DIR_S, DIR_SE, DIR_SW, DIR_W, UNDEFINED_VALUE } from './hack.h.js';
 import { STRANGE_OBJECT } from './objects.h.js';
 import { NON_PM } from './permonst.h.js';
 import { raw_printf } from './pline.js';
 import { soundlib_nosound } from './sndprocs.h.js';
-import { ANY_INVALID, wdmode_traditional } from './wintype.h.js';
+import { ANY_INVALID, WIN_ERR, wdmode_traditional } from './wintype.h.js';
 
 export const nhcb_name = $c.nulls(4);
 export const nhcb_counts = new Int32Array(4);
@@ -196,157 +196,157 @@ export async function decl_globals_init() {   // decl.c:1080
     gv.valuables[2].list = null;
     gv.valuables[2].size = 0;
     do {
-        if (g_init_a.havestate !== 1) {
+        if (g_init_a.havestate !== TRUE) {
             await raw_printf($c.lit("decl_globals_init: %s.havestate not True."), $c.lit("g_init_a"));
             $c.exit(1);
         }
     } while (0);
     do {
-        if (g_init_b.havestate !== 1) {
+        if (g_init_b.havestate !== TRUE) {
             await raw_printf($c.lit("decl_globals_init: %s.havestate not True."), $c.lit("g_init_b"));
             $c.exit(1);
         }
     } while (0);
     do {
-        if (g_init_c.havestate !== 1) {
+        if (g_init_c.havestate !== TRUE) {
             await raw_printf($c.lit("decl_globals_init: %s.havestate not True."), $c.lit("g_init_c"));
             $c.exit(1);
         }
     } while (0);
     do {
-        if (g_init_d.havestate !== 1) {
+        if (g_init_d.havestate !== TRUE) {
             await raw_printf($c.lit("decl_globals_init: %s.havestate not True."), $c.lit("g_init_d"));
             $c.exit(1);
         }
     } while (0);
     do {
-        if (g_init_e.havestate !== 1) {
+        if (g_init_e.havestate !== TRUE) {
             await raw_printf($c.lit("decl_globals_init: %s.havestate not True."), $c.lit("g_init_e"));
             $c.exit(1);
         }
     } while (0);
     do {
-        if (g_init_f.havestate !== 1) {
+        if (g_init_f.havestate !== TRUE) {
             await raw_printf($c.lit("decl_globals_init: %s.havestate not True."), $c.lit("g_init_f"));
             $c.exit(1);
         }
     } while (0);
     do {
-        if (g_init_g.havestate !== 1) {
+        if (g_init_g.havestate !== TRUE) {
             await raw_printf($c.lit("decl_globals_init: %s.havestate not True."), $c.lit("g_init_g"));
             $c.exit(1);
         }
     } while (0);
     do {
-        if (g_init_h.havestate !== 1) {
+        if (g_init_h.havestate !== TRUE) {
             await raw_printf($c.lit("decl_globals_init: %s.havestate not True."), $c.lit("g_init_h"));
             $c.exit(1);
         }
     } while (0);
     do {
-        if (g_init_i.havestate !== 1) {
+        if (g_init_i.havestate !== TRUE) {
             await raw_printf($c.lit("decl_globals_init: %s.havestate not True."), $c.lit("g_init_i"));
             $c.exit(1);
         }
     } while (0);
     do {
-        if (g_init_j.havestate !== 1) {
+        if (g_init_j.havestate !== TRUE) {
             await raw_printf($c.lit("decl_globals_init: %s.havestate not True."), $c.lit("g_init_j"));
             $c.exit(1);
         }
     } while (0);
     do {
-        if (g_init_k.havestate !== 1) {
+        if (g_init_k.havestate !== TRUE) {
             await raw_printf($c.lit("decl_globals_init: %s.havestate not True."), $c.lit("g_init_k"));
             $c.exit(1);
         }
     } while (0);
     do {
-        if (g_init_l.havestate !== 1) {
+        if (g_init_l.havestate !== TRUE) {
             await raw_printf($c.lit("decl_globals_init: %s.havestate not True."), $c.lit("g_init_l"));
             $c.exit(1);
         }
     } while (0);
     do {
-        if (g_init_m.havestate !== 1) {
+        if (g_init_m.havestate !== TRUE) {
             await raw_printf($c.lit("decl_globals_init: %s.havestate not True."), $c.lit("g_init_m"));
             $c.exit(1);
         }
     } while (0);
     do {
-        if (g_init_n.havestate !== 1) {
+        if (g_init_n.havestate !== TRUE) {
             await raw_printf($c.lit("decl_globals_init: %s.havestate not True."), $c.lit("g_init_n"));
             $c.exit(1);
         }
     } while (0);
     do {
-        if (g_init_o.havestate !== 1) {
+        if (g_init_o.havestate !== TRUE) {
             await raw_printf($c.lit("decl_globals_init: %s.havestate not True."), $c.lit("g_init_o"));
             $c.exit(1);
         }
     } while (0);
     do {
-        if (g_init_p.havestate !== 1) {
+        if (g_init_p.havestate !== TRUE) {
             await raw_printf($c.lit("decl_globals_init: %s.havestate not True."), $c.lit("g_init_p"));
             $c.exit(1);
         }
     } while (0);
     do {
-        if (g_init_q.havestate !== 1) {
+        if (g_init_q.havestate !== TRUE) {
             await raw_printf($c.lit("decl_globals_init: %s.havestate not True."), $c.lit("g_init_q"));
             $c.exit(1);
         }
     } while (0);
     do {
-        if (g_init_r.havestate !== 1) {
+        if (g_init_r.havestate !== TRUE) {
             await raw_printf($c.lit("decl_globals_init: %s.havestate not True."), $c.lit("g_init_r"));
             $c.exit(1);
         }
     } while (0);
     do {
-        if (g_init_s.havestate !== 1) {
+        if (g_init_s.havestate !== TRUE) {
             await raw_printf($c.lit("decl_globals_init: %s.havestate not True."), $c.lit("g_init_s"));
             $c.exit(1);
         }
     } while (0);
     do {
-        if (g_init_t.havestate !== 1) {
+        if (g_init_t.havestate !== TRUE) {
             await raw_printf($c.lit("decl_globals_init: %s.havestate not True."), $c.lit("g_init_t"));
             $c.exit(1);
         }
     } while (0);
     do {
-        if (g_init_u.havestate !== 1) {
+        if (g_init_u.havestate !== TRUE) {
             await raw_printf($c.lit("decl_globals_init: %s.havestate not True."), $c.lit("g_init_u"));
             $c.exit(1);
         }
     } while (0);
     do {
-        if (g_init_v.havestate !== 1) {
+        if (g_init_v.havestate !== TRUE) {
             await raw_printf($c.lit("decl_globals_init: %s.havestate not True."), $c.lit("g_init_v"));
             $c.exit(1);
         }
     } while (0);
     do {
-        if (g_init_w.havestate !== 1) {
+        if (g_init_w.havestate !== TRUE) {
             await raw_printf($c.lit("decl_globals_init: %s.havestate not True."), $c.lit("g_init_w"));
             $c.exit(1);
         }
     } while (0);
     do {
-        if (g_init_x.havestate !== 1) {
+        if (g_init_x.havestate !== TRUE) {
             await raw_printf($c.lit("decl_globals_init: %s.havestate not True."), $c.lit("g_init_x"));
             $c.exit(1);
         }
     } while (0);
     do {
-        if (g_init_y.havestate !== 1) {
+        if (g_init_y.havestate !== TRUE) {
             await raw_printf($c.lit("decl_globals_init: %s.havestate not True."), $c.lit("g_init_y"));
             $c.exit(1);
         }
     } while (0);
     do {
-        if (g_init_z.havestate !== 1) {
+        if (g_init_z.havestate !== TRUE) {
             await raw_printf($c.lit("decl_globals_init: %s.havestate not True."), $c.lit("g_init_z"));
             $c.exit(1);
         }
@@ -362,7 +362,7 @@ export async function decl_globals_init() {   // decl.c:1080
     $G.uwep = $G.uarm = $G.uswapwep = $G.uquiver = $G.uarmu = $G.uskin = $G.uarmc = null;
     $G.uarmh = $G.uarms = $G.uarmg = $G.uarmf = $G.uamul = $G.uright = $G.uleft = null;
     $G.ublindf = $G.uchain = $G.uball = null;
-    $G.WIN_MESSAGE = $G.WIN_STATUS = $G.WIN_MAP = $G.WIN_INVEN = -1;
+    $G.WIN_MESSAGE = $G.WIN_STATUS = $G.WIN_MAP = $G.WIN_INVEN = WIN_ERR;
     gu.urole.$copyFrom(urole_init_data);
     gu.urace.$copyFrom(urace_init_data);
 }
@@ -471,7 +471,7 @@ export function $init() {
     dirs_ord[5] = DIR_NE;
     dirs_ord[6] = DIR_SE;
     dirs_ord[7] = DIR_SW;
-    $G.has_strong_rngseed = 0;
+    $G.has_strong_rngseed = FALSE;
     iflags.$copyFrom(new $T.instance_flags());
     a11y.$copyFrom(new $T.accessibility_data());
     materialnm.fill(null);

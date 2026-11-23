@@ -9,10 +9,12 @@ import { gc, gd, gh, iflags, program_state } from './decl.js';
 import { AMULET_CLASS, AMULET_SYM, ARMOR_CLASS, ARMOR_SYM, BALL_CLASS, BALL_SYM, CHAIN_CLASS, CHAIN_SYM, COIN_CLASS, DEF_ANGEL, DEF_ANT, DEF_BAT, DEF_BLOB, DEF_CENTAUR, DEF_COCKATRICE, DEF_DEMON, DEF_DOG, DEF_DRAGON, DEF_EEL, DEF_ELEMENTAL, DEF_EYE, DEF_FELINE, DEF_FUNGUS, DEF_GHOST, DEF_GIANT, DEF_GNOME, DEF_GOLEM, DEF_GREMLIN, DEF_HUMAN, DEF_HUMANOID, DEF_IMP, DEF_INVISIBLE, DEF_JABBERWOCK, DEF_JELLY, DEF_KOBOLD, DEF_KOP, DEF_LEPRECHAUN, DEF_LICH, DEF_LIGHT, DEF_LIZARD, DEF_MIMIC, DEF_MIMIC_DEF, DEF_MUMMY, DEF_NAGA, DEF_NYMPH, DEF_OGRE, DEF_ORC, DEF_PIERCER, DEF_PUDDING, DEF_QUADRUPED, DEF_QUANTMECH, DEF_RODENT, DEF_RUSTMONST, DEF_SNAKE, DEF_SPIDER, DEF_TRAPPER, DEF_TROLL, DEF_UMBER, DEF_UNICORN, DEF_VAMPIRE, DEF_VORTEX, DEF_WORM, DEF_WORM_TAIL, DEF_WRAITH, DEF_XAN, DEF_XORN, DEF_YETI, DEF_ZOMBIE, DEF_ZRUTY, FOOD_CLASS, FOOD_SYM, GEM_CLASS, GEM_SYM, GOLD_SYM, ILLOBJ_CLASS, ILLOBJ_SYM, POTION_CLASS, POTION_SYM, RING_CLASS, RING_SYM, ROCK_CLASS, ROCK_SYM, SCROLL_CLASS, SCROLL_SYM, SPBOOK_CLASS, SPBOOK_SYM, S_ANGEL, S_ANT, S_BAT, S_BLOB, S_CENTAUR, S_COCKATRICE, S_DEMON, S_DOG, S_DRAGON, S_EEL, S_ELEMENTAL, S_EYE, S_FELINE, S_FUNGUS, S_GHOST, S_GIANT, S_GNOME, S_GOLEM, S_GREMLIN, S_HUMAN, S_HUMANOID, S_IMP, S_JABBERWOCK, S_JELLY, S_KOBOLD, S_KOP, S_LEPRECHAUN, S_LICH, S_LIGHT, S_LIZARD, S_MIMIC, S_MIMIC_DEF, S_MUMMY, S_NAGA, S_NYMPH, S_OGRE, S_ORC, S_PIERCER, S_PUDDING, S_QUADRUPED, S_QUANTMECH, S_RODENT, S_RUSTMONST, S_SNAKE, S_SPIDER, S_TRAPPER, S_TROLL, S_UMBER, S_UNICORN, S_VAMPIRE, S_VORTEX, S_WORM, S_WORM_TAIL, S_WRAITH, S_XAN, S_XORN, S_YETI, S_ZOMBIE, S_ZRUTY, S_air, S_altar, S_amulet, S_anti_magic_trap, S_armor, S_arrow_trap, S_ball, S_bars, S_bear_trap, S_blcorn, S_book, S_boomleft, S_boomright, S_brcorn, S_brdnladder, S_brdnstair, S_brupladder, S_brupstair, S_chain, S_cloud, S_coin, S_corr, S_crwall, S_darkroom, S_dart_trap, S_digbeam, S_dnladder, S_dnstair, S_engrcorr, S_engroom, S_expl_bc, S_expl_bl, S_expl_br, S_expl_mc, S_expl_ml, S_expl_mr, S_expl_tc, S_expl_tl, S_expl_tr, S_falling_rock_trap, S_fire_trap, S_flashbeam, S_food, S_fountain, S_gem, S_goodpos, S_grave, S_hbeam, S_hcdbridge, S_hcdoor, S_hodbridge, S_hodoor, S_hole, S_hwall, S_ice, S_invisible, S_land_mine, S_lava, S_lavawall, S_level_teleporter, S_litcorr, S_lslant, S_magic_portal, S_magic_trap, S_ndoor, S_pit, S_poisoncloud, S_polymorph_trap, S_pool, S_potion, S_ring, S_rock, S_rolling_boulder_trap, S_room, S_rslant, S_rust_trap, S_scroll, S_sink, S_sleeping_gas_trap, S_spiked_pit, S_squeaky_board, S_ss1, S_ss2, S_ss3, S_ss4, S_statue_trap, S_stone, S_strange_obj, S_sw_bc, S_sw_bl, S_sw_br, S_sw_ml, S_sw_mr, S_sw_tc, S_sw_tl, S_sw_tr, S_tdwall, S_teleportation_trap, S_throne, S_tlcorn, S_tlwall, S_tool, S_trap_door, S_trapped_chest, S_trapped_door, S_trcorn, S_tree, S_trwall, S_tuwall, S_upladder, S_upstair, S_vbeam, S_vcdbridge, S_vcdoor, S_venom, S_vibrating_square, S_vodbridge, S_vodoor, S_vwall, S_wand, S_water, S_weapon, S_web, TOOL_CLASS, TOOL_SYM, VENOM_CLASS, VENOM_SYM, WAND_CLASS, WAND_SYM, WEAPON_CLASS, WEAPON_SYM } from './defsym.h.js';
 import { MAX_GLYPH } from './display.h.js';
 import { nh_terminate } from './end.js';
+import { FALSE, TRUE } from './global.h.js';
 import { dump_all_glyphids } from './glyphs.js';
 import { dump_weights } from './hack.js';
 import { AFTER_LAST_ARTIFACT, ARG_BIDSHOW, ARG_DEBUG, ARG_DUMPENUMS, ARG_DUMPGLYPHIDS, ARG_DUMPMONGEN, ARG_DUMPWEIGHTS, ARG_SHOWPATHS, ARG_VERSION } from './hack.h.js';
 import { eos, nh_snprintf, strncmpi } from './hacklib.js';
+import { nhStr } from './lint.macros.js';
 import { dump_mongen } from './makemon.js';
 import { MCAST_DUMPENUM_AGGRAVATION, MCAST_DUMPENUM_BLIND_YOU, MCAST_DUMPENUM_CLONE_WIZ, MCAST_DUMPENUM_CONFUSE_YOU, MCAST_DUMPENUM_CURE_SELF, MCAST_DUMPENUM_CURSE_ITEMS, MCAST_DUMPENUM_DEATH_TOUCH, MCAST_DUMPENUM_DESTRY_ARMR, MCAST_DUMPENUM_DISAPPEAR, MCAST_DUMPENUM_FIRE_PILLAR, MCAST_DUMPENUM_GEYSER, MCAST_DUMPENUM_HASTE_SELF, MCAST_DUMPENUM_INSECTS, MCAST_DUMPENUM_LIGHTNING, MCAST_DUMPENUM_OPEN_WOUNDS, MCAST_DUMPENUM_PARALYZE, MCAST_DUMPENUM_PSI_BOLT, MCAST_DUMPENUM_STUN_YOU, MCAST_DUMPENUM_SUMMON_MONS, MCAST_DUMPENUM_WEAKEN_YOU } from './mcastu.h.js';
 import { PM_ABBOT, PM_ACID_BLOB, PM_ACOLYTE, PM_AIR_ELEMENTAL, PM_ALEAX, PM_ALIGNED_CLERIC, PM_AMOROUS_DEMON, PM_ANGEL, PM_APE, PM_APPRENTICE, PM_ARCHEOLOGIST, PM_ARCHON, PM_ARCH_LICH, PM_ARCH_PRIEST, PM_ASHIKAGA_TAKAUJI, PM_ASMODEUS, PM_ATTENDANT, PM_BAALZEBUB, PM_BABY_BLACK_DRAGON, PM_BABY_BLUE_DRAGON, PM_BABY_CROCODILE, PM_BABY_GOLD_DRAGON, PM_BABY_GRAY_DRAGON, PM_BABY_GREEN_DRAGON, PM_BABY_LONG_WORM, PM_BABY_ORANGE_DRAGON, PM_BABY_PURPLE_WORM, PM_BABY_RED_DRAGON, PM_BABY_SILVER_DRAGON, PM_BABY_WHITE_DRAGON, PM_BABY_YELLOW_DRAGON, PM_BALROG, PM_BALUCHITHERIUM, PM_BARBARIAN, PM_BARBED_DEVIL, PM_BARROW_WIGHT, PM_BAT, PM_BLACK_DRAGON, PM_BLACK_LIGHT, PM_BLACK_NAGA, PM_BLACK_NAGA_HATCHLING, PM_BLACK_PUDDING, PM_BLACK_UNICORN, PM_BLUE_DRAGON, PM_BLUE_JELLY, PM_BONE_DEVIL, PM_BROWN_MOLD, PM_BROWN_PUDDING, PM_BUGBEAR, PM_CAPTAIN, PM_CARNIVOROUS_APE, PM_CAVE_DWELLER, PM_CAVE_SPIDER, PM_CENTIPEDE, PM_CHAMELEON, PM_CHICKATRICE, PM_CHIEFTAIN, PM_CHROMATIC_DRAGON, PM_CLAY_GOLEM, PM_CLERIC, PM_COBRA, PM_COCKATRICE, PM_COUATL, PM_COYOTE, PM_CROCODILE, PM_CROESUS, PM_CYCLOPS, PM_DARK_ONE, PM_DEATH, PM_DEMILICH, PM_DEMOGORGON, PM_DINGO, PM_DISENCHANTER, PM_DISPATER, PM_DISPLACER_BEAST, PM_DJINNI, PM_DOG, PM_DOPPELGANGER, PM_DUST_VORTEX, PM_DWARF, PM_DWARF_LEADER, PM_DWARF_MUMMY, PM_DWARF_RULER, PM_DWARF_ZOMBIE, PM_EARTH_ELEMENTAL, PM_ELECTRIC_EEL, PM_ELF, PM_ELF_MUMMY, PM_ELF_NOBLE, PM_ELF_ZOMBIE, PM_ELVEN_MONARCH, PM_ENERGY_VORTEX, PM_ERINYS, PM_ETTIN, PM_ETTIN_MUMMY, PM_ETTIN_ZOMBIE, PM_FAMINE, PM_FIRE_ANT, PM_FIRE_ELEMENTAL, PM_FIRE_GIANT, PM_FIRE_VORTEX, PM_FLAMING_SPHERE, PM_FLESH_GOLEM, PM_FLOATING_EYE, PM_FOG_CLOUD, PM_FOREST_CENTAUR, PM_FOX, PM_FREEZING_SPHERE, PM_FROST_GIANT, PM_GARGOYLE, PM_GARTER_SNAKE, PM_GAS_SPORE, PM_GECKO, PM_GELATINOUS_CUBE, PM_GENETIC_ENGINEER, PM_GERYON, PM_GHOST, PM_GHOUL, PM_GIANT, PM_GIANT_ANT, PM_GIANT_BAT, PM_GIANT_BEETLE, PM_GIANT_EEL, PM_GIANT_MIMIC, PM_GIANT_MUMMY, PM_GIANT_RAT, PM_GIANT_SPIDER, PM_GIANT_ZOMBIE, PM_GLASS_GOLEM, PM_GLASS_PIERCER, PM_GNOME, PM_GNOME_LEADER, PM_GNOME_MUMMY, PM_GNOME_RULER, PM_GNOME_ZOMBIE, PM_GNOMISH_WIZARD, PM_GOBLIN, PM_GOLDEN_NAGA, PM_GOLDEN_NAGA_HATCHLING, PM_GOLD_DRAGON, PM_GOLD_GOLEM, PM_GRAND_MASTER, PM_GRAY_DRAGON, PM_GRAY_OOZE, PM_GRAY_UNICORN, PM_GREEN_DRAGON, PM_GREEN_ELF, PM_GREEN_MOLD, PM_GREEN_SLIME, PM_GREMLIN, PM_GREY_ELF, PM_GRID_BUG, PM_GUARD, PM_GUARDIAN_NAGA, PM_GUARDIAN_NAGA_HATCHLING, PM_GUIDE, PM_HEALER, PM_HELL_HOUND, PM_HELL_HOUND_PUP, PM_HEZROU, PM_HIGH_CLERIC, PM_HILL_GIANT, PM_HILL_ORC, PM_HIPPOCRATES, PM_HOBBIT, PM_HOBGOBLIN, PM_HOMUNCULUS, PM_HORNED_DEVIL, PM_HORSE, PM_HOUSECAT, PM_HUMAN, PM_HUMAN_MUMMY, PM_HUMAN_WEREJACKAL, PM_HUMAN_WERERAT, PM_HUMAN_WEREWOLF, PM_HUMAN_ZOMBIE, PM_HUNTER, PM_ICE_DEVIL, PM_ICE_TROLL, PM_ICE_VORTEX, PM_IGUANA, PM_IMP, PM_IRON_GOLEM, PM_IRON_PIERCER, PM_IXOTH, PM_JABBERWOCK, PM_JACKAL, PM_JAGUAR, PM_JELLYFISH, PM_JUIBLEX, PM_KEYSTONE_KOP, PM_KILLER_BEE, PM_KING_ARTHUR, PM_KITTEN, PM_KI_RIN, PM_KNIGHT, PM_KOBOLD, PM_KOBOLD_LEADER, PM_KOBOLD_MUMMY, PM_KOBOLD_SHAMAN, PM_KOBOLD_ZOMBIE, PM_KOP_KAPTAIN, PM_KOP_LIEUTENANT, PM_KOP_SERGEANT, PM_KRAKEN, PM_LARGE_CAT, PM_LARGE_DOG, PM_LARGE_KOBOLD, PM_LARGE_MIMIC, PM_LEATHER_GOLEM, PM_LEMURE, PM_LEOCROTTA, PM_LEPRECHAUN, PM_LICH, PM_LICHEN, PM_LIEUTENANT, PM_LITTLE_DOG, PM_LIZARD, PM_LONG_WORM, PM_LONG_WORM_TAIL, PM_LORD_CARNARVON, PM_LORD_SATO, PM_LORD_SURTUR, PM_LURKER_ABOVE, PM_LYNX, PM_MAIL_DAEMON, PM_MANES, PM_MARILITH, PM_MASTER_ASSASSIN, PM_MASTER_KAEN, PM_MASTER_LICH, PM_MASTER_MIND_FLAYER, PM_MASTER_OF_THIEVES, PM_MASTODON, PM_MEDUSA, PM_MIND_FLAYER, PM_MINION_OF_HUHETOTL, PM_MINOTAUR, PM_MONK, PM_MONKEY, PM_MORDOR_ORC, PM_MOUNTAIN_CENTAUR, PM_MOUNTAIN_NYMPH, PM_MUMAK, PM_NALFESHNEE, PM_NALZOK, PM_NAZGUL, PM_NEANDERTHAL, PM_NEFERET_THE_GREEN, PM_NEWT, PM_NINJA, PM_NORN, PM_NURSE, PM_OCHRE_JELLY, PM_OGRE, PM_OGRE_LEADER, PM_OGRE_TYRANT, PM_OLOG_HAI, PM_ORACLE, PM_ORANGE_DRAGON, PM_ORC, PM_ORCUS, PM_ORC_CAPTAIN, PM_ORC_MUMMY, PM_ORC_SHAMAN, PM_ORC_ZOMBIE, PM_ORION, PM_OWLBEAR, PM_PAGE, PM_PANTHER, PM_PAPER_GOLEM, PM_PELIAS, PM_PESTILENCE, PM_PIRANHA, PM_PIT_FIEND, PM_PIT_VIPER, PM_PLAINS_CENTAUR, PM_PONY, PM_PRISONER, PM_PURPLE_WORM, PM_PYROLISK, PM_PYTHON, PM_QUANTUM_MECHANIC, PM_QUASIT, PM_QUEEN_BEE, PM_QUIVERING_BLOB, PM_RABID_RAT, PM_RANGER, PM_RAVEN, PM_RED_DRAGON, PM_RED_MOLD, PM_RED_NAGA, PM_RED_NAGA_HATCHLING, PM_ROCK_MOLE, PM_ROCK_PIERCER, PM_ROCK_TROLL, PM_ROGUE, PM_ROPE_GOLEM, PM_ROSHI, PM_ROTHE, PM_RUST_MONSTER, PM_SALAMANDER, PM_SAMURAI, PM_SANDESTIN, PM_SASQUATCH, PM_SCORPION, PM_SCORPIUS, PM_SERGEANT, PM_SEWER_RAT, PM_SHADE, PM_SHAMAN_KARNOV, PM_SHARK, PM_SHOCKING_SPHERE, PM_SHOPKEEPER, PM_SHRIEKER, PM_SILVER_DRAGON, PM_SKELETON, PM_SMALL_MIMIC, PM_SNAKE, PM_SOLDIER, PM_SOLDIER_ANT, PM_SPOTTED_JELLY, PM_STALKER, PM_STEAM_VORTEX, PM_STONE_GIANT, PM_STONE_GOLEM, PM_STORM_GIANT, PM_STRAW_GOLEM, PM_STUDENT, PM_TENGU, PM_THOTH_AMON, PM_THUG, PM_TIGER, PM_TITAN, PM_TITANOTHERE, PM_TOURIST, PM_TRAPPER, PM_TROLL, PM_TWOFLOWER, PM_UMBER_HULK, PM_URUK_HAI, PM_VALKYRIE, PM_VAMPIRE, PM_VAMPIRE_BAT, PM_VAMPIRE_LEADER, PM_VIOLET_FUNGUS, PM_VLAD_THE_IMPALER, PM_VROCK, PM_WARG, PM_WARHORSE, PM_WARRIOR, PM_WATCHMAN, PM_WATCH_CAPTAIN, PM_WATER_DEMON, PM_WATER_ELEMENTAL, PM_WATER_MOCCASIN, PM_WATER_NYMPH, PM_WATER_TROLL, PM_WEREJACKAL, PM_WERERAT, PM_WEREWOLF, PM_WHITE_DRAGON, PM_WHITE_UNICORN, PM_WINGED_GARGOYLE, PM_WINTER_WOLF, PM_WINTER_WOLF_CUB, PM_WIZARD, PM_WIZARD_OF_YENDOR, PM_WOLF, PM_WOODCHUCK, PM_WOODLAND_ELF, PM_WOOD_GOLEM, PM_WOOD_NYMPH, PM_WRAITH, PM_WUMPUS, PM_XAN, PM_XORN, PM_YEENOGHU, PM_YELLOW_DRAGON, PM_YELLOW_LIGHT, PM_YELLOW_MOLD, PM_YETI, PM_ZRUTY } from './monsters.h.js';
@@ -27,7 +29,8 @@ import { prscore } from './topten.js';
 import { chdirx, whoami } from './unixmain.js';
 import { error } from './unixtty.js';
 import { dump_version_info, early_version_info } from './version.js';
-import { genl_display_file, windowprocs } from './windows.js';
+import { genl_display_file } from './windows.js';
+import { raw_print } from './winprocs.macros.js';
 
 const ArgValRequired = 0;
 const ArgValOptional = 1;
@@ -155,7 +158,7 @@ export async function early_options(argc_p, argv_p, hackdir_p) {   // earlyarg.c
     if (await argcheck(argc_p.get(0), argv_p.get(0), ARG_DUMPGLYPHIDS) === 2) {
         await opt_terminate();
     }
-    await config_error_init(0, $c.lit("command line"), 0);
+    await config_error_init(FALSE, $c.lit("command line"), FALSE);
     if (argc_p.get(0) > 1 && !$c.strcmp(argv_p.get(0).get(1), $c.lit("?"))) {
         await opt_usage(hackdir_p.get(0));
     }
@@ -210,7 +213,7 @@ export async function early_options(argc_p, argv_p, hackdir_p) {   // earlyarg.c
             case 110:
                 oldargc = argc[0];
                 if (!$c.strcmp(arg, $c.lit("-no-nethackrc"))) {
-                    arg = $c.lit("/dev/null");
+                    arg = nhStr($c.lit("/dev/null"));
                 } else {
                     arg = await lopt(arg, ArgValRequired | ArgErrComplain, $c.lit("-nethackrc"), origarg, new $c.Ptr(argc, 0), new $c.Ptr(argv, 0));
                 }
@@ -225,7 +228,7 @@ export async function early_options(argc_p, argv_p, hackdir_p) {   // earlyarg.c
                 break;
             case 115:
                 if (await argcheck(argc[0], argv[0], ARG_SHOWPATHS) === 2) {
-                    gd.deferred_showpaths = 1;
+                    gd.deferred_showpaths = TRUE;
                     gd.deferred_showpaths_dir = hackdir_p.get(0);
                     await config_error_done();
                     return;
@@ -264,29 +267,29 @@ async function opt_terminate() {   // earlyarg.c:366
     await nh_terminate(0);
 }
 async function opt_usage(hackdir) {   // earlyarg.c:376
-    await chdirx(hackdir, 1);
-    genl_display_file($c.lit("usagehlp"), 1);
+    await chdirx(hackdir, TRUE);
+    genl_display_file($c.lit("usagehlp"), TRUE);
     await opt_terminate();
 }
 export async function after_opt_showpaths(dir) {   // earlyarg.c:391
-    await chdirx(dir, 0);
+    await chdirx(dir, FALSE);
     await opt_terminate();
 }
 async function scores_only(argc, argv, dir) {   // earlyarg.c:406
     await config_error_done();
-    await chdirx(dir, 0);
-    iflags.initoptions_noterminate = 1;
+    await chdirx(dir, FALSE);
+    iflags.initoptions_noterminate = TRUE;
     await initoptions();
-    iflags.initoptions_noterminate = 0;
+    iflags.initoptions_noterminate = FALSE;
     $G.ARGV0 = gh.hname;
-    await panictrace_setsignals(1);
+    await panictrace_setsignals(TRUE);
     whoami();
     await prscore(argc, argv);
     await nh_terminate(0);
 }
 export async function argcheck(argc, argv, e_arg) {   // earlyarg.c:450
     let i = 0, idx = 0, match = 0, userea = null, dashdash = null, extended_opt = null, cpy_extended_opt = null, insert_into_pastebuf = 0;
-    match = 0;
+    match = FALSE;
     userea = null;
     dashdash = $c.lit("");
     for (idx = 0; idx < 8; idx = idx + 1 | 0) {
@@ -327,17 +330,17 @@ export async function argcheck(argc, argv, e_arg) {   // earlyarg.c:450
                 return 1;
             case ARG_VERSION:
                 {
-                    insert_into_pastebuf = 0;
+                    insert_into_pastebuf = FALSE;
                     if (extended_opt) {
                         extended_opt = extended_opt.add(1);
-                        if (match_optname(extended_opt, $c.lit("paste"), 5, 0)) {
-                            insert_into_pastebuf = 1;
-                        } else if (match_optname(extended_opt, $c.lit("copy"), 4, 0)) {
-                            insert_into_pastebuf = 1;
-                        } else if (match_optname(extended_opt, $c.lit("dump"), 4, 0)) {
+                        if (match_optname(extended_opt, $c.lit("paste"), 5, FALSE)) {
+                            insert_into_pastebuf = TRUE;
+                        } else if (match_optname(extended_opt, $c.lit("copy"), 4, FALSE)) {
+                            insert_into_pastebuf = TRUE;
+                        } else if (match_optname(extended_opt, $c.lit("dump"), 4, FALSE)) {
                             await dump_version_info();
                             return 2;
-                        } else if (!match_optname(extended_opt, $c.lit("show"), 4, 0)) {
+                        } else if (!match_optname(extended_opt, $c.lit("show"), 4, FALSE)) {
                             await raw_printf($c.lit("-%sversion can only be extended with -%sversion:copy or :dump or :show.\n"), dashdash, dashdash);
                             return 2;
                         }
@@ -370,7 +373,7 @@ export async function argcheck(argc, argv, e_arg) {   // earlyarg.c:450
 }
 function debug_fields(opts) {   // earlyarg.c:576
     let op = null, negated = 0, $t1;
-    negated = 0;
+    negated = FALSE;
     while ((op = $c.strchr(opts, 44)) !== null) {
         ($t1 = op, op = $t1.add(1), $t1).set(0, 0);
         debug_fields(op);
@@ -396,14 +399,14 @@ function debug_fields(opts) {   // earlyarg.c:576
         }
         negated = $c.i8(!negated ? 1 : 0);
     }
-    if (match_optname(opts, $c.lit("test"), 4, 0)) {
-        iflags.debug.test = $c.i8(negated ? 0 : 1);
+    if (match_optname(opts, $c.lit("test"), 4, FALSE)) {
+        iflags.debug.test = $c.i8(negated ? FALSE : TRUE);
     }
-    if (match_optname(opts, $c.lit("ttystatus"), 9, 0)) {
-        iflags.debug.ttystatus = $c.i8(negated ? 0 : 1);
+    if (match_optname(opts, $c.lit("ttystatus"), 9, FALSE)) {
+        iflags.debug.ttystatus = $c.i8(negated ? FALSE : TRUE);
     }
-    if (match_optname(opts, $c.lit("fuzzer"), 4, 0)) {
-        iflags.fuzzerpending = 1;
+    if (match_optname(opts, $c.lit("fuzzer"), 4, FALSE)) {
+        iflags.fuzzerpending = TRUE;
     }
     return;
 }
@@ -421,10 +424,10 @@ async function dump_enums() {   // earlyarg.c:706
             }
             await raw_printf($c.lit("    %s%*s = %3d,%s"), nmprefix, -nmwidth | 0, $c.radd(dump_enums$ed[i], j).nm, $c.radd(dump_enums$ed[i], j).val, new $c.Ptr(comment, 0));
         }
-        await windowprocs.win_raw_print($c.lit("};"));
-        await windowprocs.win_raw_print($c.lit(""));
+        await raw_print()($c.lit("};"));
+        await raw_print()($c.lit(""));
     }
-    await windowprocs.win_raw_print($c.lit(""));
+    await raw_print()($c.lit(""));
 }
 export async function dump_glyphids() {   // earlyarg.c:806
     await dump_all_glyphids($c.__stdoutp);

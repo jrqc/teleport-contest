@@ -144,6 +144,7 @@ export const G_FREQ = 0x0007;
 export const G_IGNORE = 0x8000;
 export const G_GENOD = 0x02;
 export const G_EXTINCT = 0x01;
+export const G_GONE = 3;
 export const MV_KNOWS_EGG = 0x08;
 export const MALE = 0;
 export const FEMALE = MALE + 1;

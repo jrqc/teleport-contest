@@ -7,13 +7,15 @@ import { alloc } from './alloc.js';
 import { jump } from './apply.js';
 import { acurr, exercise, poison_strdmg } from './attrib.js';
 import { A_INT, A_STR, A_WIS } from './attrib.h.js';
+import { ACURR } from './attrib.macros.js';
 import { cmdq_add_key, cmdq_pop, getdir, isok, set_occupation, yn_function } from './cmd.js';
 import { NO_COLOR } from './color.h.js';
-import { c_color_names, c_common_strings, cg, disp, flags, gb, gi, gm, gn, go, gs, gu, gv, gy, iflags, quitchars, svb, svc, svd, svl, svm, svs, u, xdir, ydir, ynchars } from './decl.js';
-import { SPBOOK_CLASS, S_VORTEX } from './defsym.h.js';
+import { c_color_names, c_common_strings, cg, disp, flags, gb, gi, gm, gn, go, gs, gu, gy, iflags, quitchars, svb, svc, svd, svl, svm, svs, u, xdir, ydir, ynchars } from './decl.js';
+import { SPBOOK_CLASS } from './defsym.h.js';
 import { do_vicinity_map } from './detect.js';
-import { canseemon, map_invisible, nul_glyphinfo, sensemon, shieldeff, tmp_at, zapdir_to_glyph } from './display.js';
+import { canseemon, map_invisible, nul_glyphinfo, shieldeff, tmp_at, zapdir_to_glyph } from './display.js';
 import { DISP_BEAM, DISP_CHANGE, DISP_END, EXPL_FIERY, EXPL_FROSTY } from './display.h.js';
+import { canspotmon } from './display.macros.js';
 import { trycall } from './do.js';
 import { Monnam, hcolor, hliquid, mon_nam, noveltitle } from './do_name.js';
 import { find_ac } from './do_wear.js';
@@ -25,10 +27,12 @@ import { freehand } from './engrave.js';
 import { more_experienced, newexplevel } from './exper.js';
 import { explode } from './explode.js';
 import { read_tribute } from './files.js';
+import { wizard } from './flag.macros.js';
 import { getpos, getpos_sethilite } from './getpos.js';
-import { LL_CONDUCT } from './global.h.js';
+import { FALSE, LL_CONDUCT, TRUE } from './global.h.js';
 import { check_capacity, invocation_pos, losehp, nomul } from './hack.js';
-import { CMDQ_KEY, CQ_REPEAT, ECMD_FAIL, ECMD_OK, ECMD_TIME, EYE, FACE, HEAD, KILLED_BY_AN, MENU_TRADITIONAL, NO_KILLER_PREFIX, NO_MINVENT, N_DIRS_Z, SPINE, XKILL_GIVEMSG } from './hack.h.js';
+import { CMDQ_KEY, CQ_REPEAT, ECMD_FAIL, ECMD_OK, ECMD_TIME, EYE, FACE, HEAD, KILLED_BY_AN, MENU_TRADITIONAL, NO_KILLER_PREFIX, NO_MINVENT, N_DIRS, SPINE, XKILL_GIVEMSG } from './hack.h.js';
+import { DIR_LEFT, DIR_RIGHT2, Maybe_Half_Phys, makeknown, y_n } from './hack.macros.js';
 import { dist2, distmin, eos, isqrt, nh_snprintf, sgn, strncmpi } from './hacklib.js';
 import { record_achievement } from './insight.js';
 import { update_inventory, useup } from './invent.js';
@@ -37,45 +41,53 @@ import { mkinvokearea } from './mklev.js';
 import { mksobj, set_bknown, weight } from './mkobj.js';
 import { mkundead } from './mkroom.js';
 import { iter_mons, wakeup, xkilled } from './mon.js';
-import { AD_ELEC, AD_WRAP, AT_ENGL } from './monattk.h.js';
-import { Resists_Elem, can_chant, defended, dmgtype_fromattack } from './mondata.js';
-import { M1_ANIMAL, M1_NOEYES, M2_UNDEAD } from './monflag.h.js';
+import { AD_ELEC } from './monattk.h.js';
+import { can_chant, defended } from './mondata.js';
+import { enfolds, eyecount, is_animal, is_undead, is_whirly } from './mondata.macros.js';
 import { monflee } from './monmove.js';
 import { mons } from './monst.js';
-import { PM_AIR_ELEMENTAL, PM_CYCLOPS, PM_FLOATING_EYE, PM_FOG_CLOUD, PM_KNIGHT, PM_MASTER_LICH, PM_NALFESHNEE, PM_VAMPIRE, PM_VAMPIRE_LEADER, PM_VLAD_THE_IMPALER, PM_WIZARD } from './monsters.h.js';
+import { DEADMONSTER, is_vampshifter, resists_elec } from './monst.macros.js';
+import { PM_FOG_CLOUD, PM_KNIGHT, PM_MASTER_LICH, PM_NALFESHNEE, PM_WIZARD } from './monsters.h.js';
 import { discover_object, objdescr_is, observe_object } from './o_init.js';
 import { EF_GREASE, EF_VERBOSE, ERODE_CORRODE } from './obj.h.js';
-import { IRON, MAXSPELL, MITHRIL, NODIR } from './objclass.h.js';
+import { MAXSPELL, NODIR } from './objclass.h.js';
+import { is_metallic } from './objclass.macros.js';
 import { obj_descr, objects } from './objects.js';
 import { BELL_OF_OPENING, CANDELABRUM_OF_INVOCATION, CORNUTHAUM, LENSES, QUARTERSTAFF, ROBE, SMALL_SHIELD, SPE_BLANK_PAPER, SPE_BOOK_OF_THE_DEAD, SPE_CANCELLATION, SPE_CAUSE_FEAR, SPE_CHAIN_LIGHTNING, SPE_CHARM_MONSTER, SPE_CLAIRVOYANCE, SPE_CONE_OF_COLD, SPE_CONFUSE_MONSTER, SPE_CREATE_FAMILIAR, SPE_CREATE_MONSTER, SPE_CURE_BLINDNESS, SPE_CURE_SICKNESS, SPE_DETECT_FOOD, SPE_DETECT_MONSTERS, SPE_DETECT_TREASURE, SPE_DETECT_UNSEEN, SPE_DIG, SPE_DRAIN_LIFE, SPE_EXTRA_HEALING, SPE_FINGER_OF_DEATH, SPE_FIREBALL, SPE_FORCE_BOLT, SPE_HASTE_SELF, SPE_HEALING, SPE_IDENTIFY, SPE_INVISIBILITY, SPE_JUMPING, SPE_KNOCK, SPE_LEVITATION, SPE_LIGHT, SPE_MAGIC_MAPPING, SPE_MAGIC_MISSILE, SPE_NOVEL, SPE_POLYMORPH, SPE_PROTECTION, SPE_REMOVE_CURSE, SPE_RESTORE_ABILITY, SPE_SLEEP, SPE_SLOW_MONSTER, SPE_STONE_TO_FLESH, SPE_TELEPORT_AWAY, SPE_TURN_UNDEAD, SPE_WIZARD_LOCK } from './objects.h.js';
 import { Tobjnam, an, makeplural } from './objnam.js';
 import { You, You_feel, You_hear, Your, impossible, livelog_printf, pline, pline_The } from './pline.js';
 import { body_part } from './polyself.js';
 import { healup, make_blinded, make_confused, make_slimed, make_stunned, peffects } from './potion.js';
-import { ANTIMAGIC, BLINDED, CLAIRVOYANT, CONFUSION, HALF_PHDAM, HALLUC, HALLUC_RES, POISON_RES, SHOCK_RES, SICK, SLEEP_RES, SLIMED, STUNNED, TIMEOUT } from './prop.h.js';
+import { CONFUSION, POISON_RES, STUNNED, TIMEOUT } from './prop.h.js';
 import { seffects } from './read.js';
-import { CLOUD, DBWALL, DOOR, DRAWBRIDGE_UP, D_CLOSED, D_ISOPEN, D_LOCKED, LAVAPOOL, MOAT, POOL, STONE, TREE } from './rm.h.js';
+import { CLOUD, DBWALL, DOOR, DRAWBRIDGE_UP, D_CLOSED, D_ISOPEN, D_LOCKED, LAVAPOOL, MOAT, POOL } from './rm.h.js';
+import { IS_STWALL, IS_TREE } from './rm.macros.js';
 import { d, rn2, rn2_on_display_rng, rnd, rnl } from './rnd.js';
 import { genders } from './role.js';
 import { check_unpaid, obfree } from './shk.js';
 import { rndcurse, take_gold } from './sit.js';
 import { P_ATTACK_SPELL, P_BASIC, P_CLERIC_SPELL, P_DIVINATION_SPELL, P_ENCHANTMENT_SPELL, P_ESCAPE_SPELL, P_EXPERT, P_GRAND_MASTER, P_HEALING_SPELL, P_MASTER, P_MATTER_SPELL, P_NONE, P_SKILLED, P_UNSKILLED } from './skills.h.js';
 import { MAX_SPELL_STUDY, NO_SPELL, UNKNOWN_SPELL, spe_Forgotten, spe_Fresh, spe_GoingStale, spe_Unknown } from './spell.h.js';
+import { spellknow } from './spell.macros.js';
 import { On_stairs } from './stairs.js';
 import { tele } from './teleport.js';
 import { fall_asleep } from './timeout.js';
 import { erode_obj } from './trap.js';
-import { IN_SIGHT } from './vision.h.js';
+import { cansee } from './vision.macros.js';
 import { use_skill } from './weapon.js';
-import { add_menu, add_menu_heading, add_menu_str, select_menu, windowprocs } from './windows.js';
+import { add_menu, add_menu_heading, add_menu_str, select_menu } from './windows.js';
+import { clear_nhwindow, create_nhwindow, destroy_nhwindow, display_nhwindow, end_menu, nh_delay_output, start_menu } from './winprocs.macros.js';
 import { ATR_NONE, MENU_BEHAVE_STANDARD, MENU_ITEMFLAGS_NONE, MENU_ITEMFLAGS_SELECTED, NHW_MENU, PICK_NONE, PICK_ONE } from './wintype.h.js';
 import { aggravate } from './wizard.js';
 import { ACH_INVK, ACH_NOVL } from './you.h.js';
+import { u_at } from './you.macros.js';
+import { Antimagic, BClairvoyant, Blind, BlindedTimeout, Hallucination, Poison_resistance, Sick, Sleep_resistance, Slimed } from './youprop.macros.js';
 import { exclam, spell_damage_bonus, unturn_dead, weffects, zapyourself, zhitm } from './zap.js';
 
 const SPELLMENU_DUMP = (-3);
 const SPELLMENU_CAST = (-2);
 const SPELLMENU_VIEW = (-1);
+const SPELLMENU_SORT = 42;
 const KEEN = 20000;
 const uarmhbon = 4;
 const uarmgbon = 6;
@@ -126,14 +138,14 @@ async function cursed_book(bp) {   // spell.c:130
             await aggravate();
             break;
         case 2:
-            await make_blinded($c.add64($c.and64(u.uprops[BLINDED].intrinsic, TIMEOUT), rn2(100) + 250 | 0), 1);
+            await make_blinded($c.add64(BlindedTimeout(), rn2(100) + 250 | 0), TRUE);
             break;
         case 3:
             await take_gold();
             break;
         case 4:
             await pline($c.lit("These runes were just too much to comprehend."));
-            await make_confused($c.add64(u.uprops[CONFUSION].intrinsic, rn2(7) + 16 | 0), 0);
+            await make_confused($c.add64(u.uprops[CONFUSION].intrinsic, rn2(7) + 16 | 0), FALSE);
             break;
         case 5:
             await pline_The($c.lit("book was coated with contact poison!"));
@@ -142,55 +154,55 @@ async function cursed_book(bp) {   // spell.c:130
                 break;
             }
             was_in_use = $c.i8(bp.in_use);
-            bp.in_use = (0) & 1;
-            await poison_strdmg(u.uprops[POISON_RES].intrinsic || u.uprops[POISON_RES].extrinsic ? rn2(2) + 1 | 0 : rn2(4) + 3 | 0, rnd(u.uprops[POISON_RES].intrinsic || u.uprops[POISON_RES].extrinsic ? 6 : 10), $c.lit("contact-poisoned spellbook"), KILLED_BY_AN);
+            bp.in_use = (FALSE) & 1;
+            await poison_strdmg(Poison_resistance() ? rn2(2) + 1 | 0 : rn2(4) + 3 | 0, rnd(u.uprops[POISON_RES].intrinsic || u.uprops[POISON_RES].extrinsic ? 6 : 10), $c.lit("contact-poisoned spellbook"), KILLED_BY_AN);
             bp.in_use = (was_in_use >>> 0) & 1;
             break;
         case 6:
-            if (u.uprops[ANTIMAGIC].intrinsic || u.uprops[ANTIMAGIC].extrinsic) {
+            if (Antimagic()) {
                 await shieldeff(u.ux, u.uy);
                 await pline_The($c.lit("book %s, but you are unharmed!"), new $c.Ptr(explodes, 0));
             } else {
                 await pline($c.lit("As you read the book, it %s in your %s!"), new $c.Ptr(explodes, 0), await body_part(FACE));
                 dmg = Math.imul(2, rnd(10)) + 5 | 0;
-                await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(dmg + 1 | 0, 2) : dmg, $c.lit("exploding rune"), KILLED_BY_AN);
+                await losehp(Maybe_Half_Phys(dmg), $c.lit("exploding rune"), KILLED_BY_AN);
             }
-            return 1;
+            return TRUE;
         default:
             await rndcurse();
             break;
     }
-    return 0;
+    return FALSE;
 }
 async function confused_book(spellbook) {   // spell.c:189
     let gone = 0;
-    gone = 0;
+    gone = FALSE;
     if (!rn2(3) && spellbook.otyp !== SPE_BOOK_OF_THE_DEAD) {
-        spellbook.in_use = (1) & 1;
+        spellbook.in_use = (TRUE) & 1;
         await pline($c.lit("Being confused you have difficulties in controlling your actions."));
-        await windowprocs.win_display_nhwindow($G.WIN_MESSAGE, 0);
+        await display_nhwindow()($G.WIN_MESSAGE, FALSE);
         await You($c.lit("accidentally tear the spellbook to pieces."));
         await trycall(spellbook);
         await useup(spellbook);
-        gone = 1;
+        gone = TRUE;
     } else {
         await You($c.lit("find yourself reading the %s line over and over again."), $c.peq(spellbook, svc.context.spbook.book) ? $c.lit("next") : $c.lit("first"));
     }
     return gone;
 }
 async function deadbook_pacify_undead(mtmp) {   // spell.c:211
-    if (($c.andu64(mtmp.data.mflags2, M2_UNDEAD) !== 0 || (mtmp.cham === PM_VAMPIRE || mtmp.cham === PM_VAMPIRE_LEADER || mtmp.cham === PM_VLAD_THE_IMPALER)) && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & IN_SIGHT) !== 0) {
-        mtmp.mpeaceful = (1) & 1;
+    if ((is_undead(mtmp.data) || is_vampshifter(mtmp)) && cansee(mtmp.mx, mtmp.my)) {
+        mtmp.mpeaceful = (TRUE) & 1;
         if (sgn(mtmp.data.maligntyp) === sgn(u.ualign.type) && dist2(mtmp.mx, mtmp.my, u.ux, u.uy) < 4) {
             if (mtmp.mtame) {
                 if (mtmp.mtame < 20) {
                     mtmp.mtame = $c.i8(mtmp.mtame + 1);
                 }
             } else {
-                await tamedog(mtmp, null, 1);
+                await tamedog(mtmp, null, TRUE);
             }
         } else {
-            await monflee(mtmp, 0, 0, 1);
+            await monflee(mtmp, 0, FALSE, TRUE);
         }
     }
 }
@@ -200,15 +212,15 @@ async function deadbook(book2) {   // spell.c:231
         switch ($goto) {
         case null:
             await You($c.lit("turn the pages of the Book of the Dead..."));
-            await discover_object(SPE_BOOK_OF_THE_DEAD, 1, 1, 1);
+            await discover_object(SPE_BOOK_OF_THE_DEAD, TRUE, TRUE, TRUE);
             await observe_object(book2);
             book2.known = (1) & 1;
             if (invocation_pos(u.ux, u.uy) && !On_stairs(u.ux, u.uy)) {
-                arti1_primed = 0;
-                arti2_primed = 0;
-                arti_cursed = 0;
+                arti1_primed = FALSE;
+                arti2_primed = FALSE;
+                arti_cursed = FALSE;
                 if (book2.cursed) {
-                    await pline_The($c.lit("%s!"), (u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked ? $c.lit("Book seems to be ignoring you") : $c.lit("runes appear scrambled.  You can't read them"));
+                    await pline_The($c.lit("%s!"), Blind() ? $c.lit("Book seems to be ignoring you") : $c.lit("runes appear scrambled.  You can't read them"));
                     return;
                 }
                 if (!u.uhave.bell || !u.uhave.menorah) {
@@ -224,16 +236,16 @@ async function deadbook(book2) {   // spell.c:231
                 for (otmp = gi.invent; otmp; otmp = otmp.nobj) {
                     if (otmp.otyp === CANDELABRUM_OF_INVOCATION && otmp.spe === 7 && otmp.lamplit | 0) {
                         if (!otmp.cursed) {
-                            arti1_primed = 1;
+                            arti1_primed = TRUE;
                         } else {
-                            arti_cursed = 1;
+                            arti_cursed = TRUE;
                         }
                     }
                     if (otmp.otyp === BELL_OF_OPENING && $c.sub64(svm.moves, otmp.age) < 5) {
                         if (!otmp.cursed) {
-                            arti2_primed = 1;
+                            arti2_primed = TRUE;
                         } else {
-                            arti_cursed = 1;
+                            arti_cursed = TRUE;
                         }
                     }
                 }
@@ -266,7 +278,7 @@ async function deadbook(book2) {   // spell.c:231
                 await unturn_dead(gy.youmonst);
                 mm.x = u.ux;
                 mm.y = u.uy;
-                await mkundead(mm, 1, NO_MINVENT);
+                await mkundead(mm, TRUE, NO_MINVENT);
             } else if (book2.blessed) {
                 await iter_mons(deadbook_pacify_undead);
             } else {
@@ -295,8 +307,8 @@ export async function book_cursed(book) {   // spell.c:343
 }
 async function learn() {   // spell.c:356
     let i = 0, booktype = 0, splname = new Int8Array(256), costly = 0, faded_to_blank = 0, book = null, $t1, $t2, $t3, $t4;
-    costly = 1;
-    faded_to_blank = 0;
+    costly = TRUE;
+    faded_to_blank = FALSE;
     book = svc.context.spbook.book;
     if (svc.context.spbook.delay && $G.ublindf && $G.ublindf.otyp === LENSES && rn2(2)) {
         svc.context.spbook.delay = $c.i8(svc.context.spbook.delay + 1);
@@ -315,7 +327,7 @@ async function learn() {   // spell.c:356
         svc.context.spbook.delay = $c.i8(svc.context.spbook.delay + 1);
         return 1;
     }
-    await exercise(A_WIS, 1);
+    await exercise(A_WIS, TRUE);
     booktype = book.otyp;
     if (booktype === SPE_BOOK_OF_THE_DEAD) {
         await deadbook(book);
@@ -333,19 +345,19 @@ async function learn() {   // spell.c:356
         if (book.usecount > MAX_SPELL_STUDY) {
             await pline($c.lit("This spellbook is too faint to be read any more."));
             $t1 = booktype = SPE_BLANK_PAPER, book.otyp = $t1;
-            faded_to_blank = 1;
+            faded_to_blank = TRUE;
             $t2 = rn2(book.usecount), book.usecount = $t2;
         } else {
-            await Your($c.lit("knowledge of %s is %s."), new $c.Ptr(splname, 0), svs.spl_book[i].sp_know ? $c.lit("keener") : $c.lit("restored"));
+            await Your($c.lit("knowledge of %s is %s."), new $c.Ptr(splname, 0), spellknow(i) ? $c.lit("keener") : $c.lit("restored"));
             svs.spl_book[i].sp_know = KEEN + 1;
             book.usecount = book.usecount + 1 | 0;
-            await exercise(A_WIS, 1);
+            await exercise(A_WIS, TRUE);
         }
     } else {
         if (book.usecount >= MAX_SPELL_STUDY) {
             await pline($c.lit("This spellbook is too faint to read even once."));
             $t3 = booktype = SPE_BLANK_PAPER, book.otyp = $t3;
-            faded_to_blank = 1;
+            faded_to_blank = TRUE;
             $t4 = rn2(book.usecount), book.usecount = $t4;
         } else {
             svs.spl_book[i].sp_id = booktype;
@@ -355,12 +367,12 @@ async function learn() {   // spell.c:356
             if (!i) {
                 await You($c.lit("learn %s."), new $c.Ptr(splname, 0));
             } else {
-                await You($c.lit("add %s to your repertoire, as '%c'."), new $c.Ptr(splname, 0), $c.i8(i < 26 ? 97 + i | 0 : (65 + i | 0) - 26 | 0));
+                await You($c.lit("add %s to your repertoire, as '%c'."), new $c.Ptr(splname, 0), spellet(i));
             }
         }
     }
     if (i < MAXSPELL) {
-        await discover_object(booktype, 1, 1, 1);
+        await makeknown(booktype);
         if (faded_to_blank) {
             await update_inventory();
         }
@@ -384,20 +396,20 @@ export async function study_book(spellbook) {   // spell.c:468
     let booktype = 0, i = 0, confused = 0, too_hard = 0, eyes = null, dullbook = 0, tribtitle = null, read_ability = 0, qbuf = new Int8Array(128), gone = 0, $t1;
     booktype = spellbook.otyp;
     confused = $c.i8(u.uprops[CONFUSION].intrinsic !== 0 ? 1 : 0);
-    too_hard = 0;
-    if (!confused && !(u.uprops[SLEEP_RES].intrinsic || u.uprops[SLEEP_RES].extrinsic) && await objdescr_is(spellbook, $c.lit("dull"))) {
-        dullbook = rnd(25) - acurr(A_WIS) | 0;
+    too_hard = FALSE;
+    if (!confused && !Sleep_resistance() && await objdescr_is(spellbook, $c.lit("dull"))) {
+        dullbook = rnd(25) - ACURR(A_WIS) | 0;
         if (svc.context.spbook.delay && $c.peq(spellbook, svc.context.spbook.book)) {
             dullbook = dullbook - rnd(objects[booktype].oc_oc2) | 0;
         }
         if (dullbook > 0) {
             eyes = await body_part(EYE);
-            if ((!($c.andu64(gy.youmonst.data.mflags1, M1_NOEYES) === 0) ? 0 : $c.peq(gy.youmonst.data, $c.relem(mons, PM_CYCLOPS)) || $c.peq(gy.youmonst.data, $c.relem(mons, PM_FLOATING_EYE)) ? 1 : 2) > 1) {
+            if (eyecount(gy.youmonst.data) > 1) {
                 eyes = await makeplural(eyes);
             }
             await pline($c.lit("This book is so dull that you can't keep your %s open."), eyes);
             dullbook = dullbook + rnd(Math.imul(2, objects[booktype].oc_oc2)) | 0;
-            await fall_asleep(-dullbook | 0, 1);
+            await fall_asleep(-dullbook | 0, TRUE);
             return 1;
         }
     }
@@ -406,7 +418,7 @@ export async function study_book(spellbook) {   // spell.c:468
     } else {
         if (booktype === SPE_BLANK_PAPER) {
             await pline($c.lit("This spellbook is all blank."));
-            await discover_object(booktype, 1, 1, 1);
+            await makeknown(booktype);
             return 1;
         }
         if (booktype === SPE_NOVEL) {
@@ -416,7 +428,7 @@ export async function study_book(spellbook) {   // spell.c:468
                     await livelog_printf(LL_CONDUCT, $c.lit("became literate by reading %s"), tribtitle);
                 }
                 await check_unpaid(spellbook);
-                await discover_object(booktype, 1, 1, 1);
+                await makeknown(booktype);
                 if (!u.uevent.read_tribute) {
                     await record_achievement(ACH_NOVL);
                     await more_experienced(20, 0);
@@ -453,26 +465,26 @@ export async function study_book(spellbook) {   // spell.c:468
         }
         if (svs.spl_book[i].sp_id === booktype && svs.spl_book[i].sp_know > 2000) {
             await You($c.lit("know \"%s\" quite well already."), obj_descr[objects[booktype].oc_name_idx].oc_name);
-            await discover_object(booktype, 1, 1, 1);
-            if (await yn_function($c.lit("Refresh your memory anyway?"), new $c.Ptr(ynchars, 0), 110, 1) === 110) {
+            await makeknown(booktype);
+            if (await yn_function($c.lit("Refresh your memory anyway?"), new $c.Ptr(ynchars, 0), 110, TRUE) === 110) {
                 return 0;
             }
         }
-        spellbook.in_use = (1) & 1;
+        spellbook.in_use = (TRUE) & 1;
         if (!spellbook.blessed && spellbook.otyp !== SPE_BOOK_OF_THE_DEAD) {
             if (spellbook.cursed) {
-                too_hard = 1;
+                too_hard = TRUE;
             } else {
-                read_ability = (((acurr(A_INT) + 4 | 0) + $c.div32(u.ulevel, 2) | 0) - Math.imul(2, objects[booktype].oc_oc2) | 0) + ($G.ublindf && $G.ublindf.otyp === LENSES ? 2 : 0) | 0;
+                read_ability = (((ACURR(A_INT) + 4 | 0) + $c.div32(u.ulevel, 2) | 0) - Math.imul(2, objects[booktype].oc_oc2) | 0) + ($G.ublindf && $G.ublindf.otyp === LENSES ? 2 : 0) | 0;
                 if (gu.urole.mnum === PM_WIZARD && read_ability < 20 && !confused) {
                     $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("This spellbook is %sdifficult to comprehend.  Continue?"), read_ability < 12 ? $c.lit("very ") : $c.lit(""));
-                    if (await yn_function(new $c.Ptr(qbuf, 0), new $c.Ptr(ynchars, 0), 110, 1) !== 121) {
-                        spellbook.in_use = (0) & 1;
+                    if (await y_n(new $c.Ptr(qbuf, 0)) !== 121) {
+                        spellbook.in_use = (FALSE) & 1;
                         return 1;
                     }
                 }
                 if (rnd(20) > read_ability) {
-                    too_hard = 1;
+                    too_hard = TRUE;
                 }
             }
         }
@@ -489,12 +501,12 @@ export async function study_book(spellbook) {   // spell.c:468
                 await trycall(spellbook);
                 await useup(spellbook);
             } else {
-                spellbook.in_use = (0) & 1;
+                spellbook.in_use = (FALSE) & 1;
             }
             return 1;
         } else if (confused) {
             if (!await confused_book(spellbook)) {
-                spellbook.in_use = (0) & 1;
+                spellbook.in_use = (FALSE) & 1;
             }
             nomul(svc.context.spbook.delay);
             gm.multi_reason = $c.lit("reading a book");
@@ -502,7 +514,7 @@ export async function study_book(spellbook) {   // spell.c:468
             svc.context.spbook.delay = 0;
             return 1;
         }
-        spellbook.in_use = (0) & 1;
+        spellbook.in_use = (FALSE) & 1;
         await You($c.lit("begin to %s the runes."), spellbook.otyp === SPE_BOOK_OF_THE_DEAD ? $c.lit("recite") : $c.lit("memorize"));
     }
     svc.context.spbook.book = spellbook;
@@ -527,9 +539,9 @@ export function book_substitution(old_obj, new_obj) {   // spell.c:658
     }
 }
 export function age_spells() {   // spell.c:669
-    let i = 0;
+    let i = 0, $t1;
     for (i = 0; i < MAXSPELL && svs.spl_book[i].sp_id !== NO_SPELL; i = i + 1 | 0) {
-        if (svs.spl_book[i].sp_know) {
+        if (spellknow(i)) {
             svs.spl_book[i].sp_know = svs.spl_book[i].sp_know - 1 | 0;
         }
     }
@@ -538,25 +550,25 @@ export function age_spells() {   // spell.c:669
 async function rejectcasting() {   // spell.c:687
     if (u.uprops[STUNNED].intrinsic) {
         await You($c.lit("are too impaired to cast a spell."));
-        return 1;
+        return TRUE;
     } else if (!can_chant(gy.youmonst)) {
         await You($c.lit("are unable to chant the incantation."));
-        return 1;
+        return TRUE;
     } else if (!await freehand() && !($G.uwep && $G.uwep.otyp === QUARTERSTAFF)) {
         await Your($c.lit("arms are not free to cast!"));
-        return 1;
+        return TRUE;
     }
-    return 0;
+    return FALSE;
 }
 async function getspell(spell_no) {   // spell.c:715
     let nspells = 0, idx = 0, retry_limit = 0, ilet = 0, lets = new Int8Array(256), qbuf = new Int8Array(128), cq = new $T._cmd_queue(), cmdq = null;
     nspells = num_spells();
     if (!nspells) {
         await You($c.lit("don't know any spells right now."));
-        return 0;
+        return FALSE;
     }
     if (await rejectcasting()) {
-        return 0;
+        return FALSE;
     }
     if ((cmdq = cmdq_pop()) !== null) {
         cq.$copyFrom(cmdq);
@@ -564,12 +576,12 @@ async function getspell(spell_no) {   // spell.c:715
         if (cq.typ === CMDQ_KEY) {
             idx = spell_let_to_idx(cq.key);
             if (idx < 0 || idx >= nspells) {
-                return 0;
+                return FALSE;
             }
             spell_no.set(0, idx);
-            return 1;
+            return TRUE;
         } else {
-            return 0;
+            return FALSE;
         }
     }
     if (flags.menu_style === MENU_TRADITIONAL) {
@@ -586,15 +598,15 @@ async function getspell(spell_no) {   // spell.c:715
         for (retry_limit = 0; ; retry_limit = retry_limit + 1 | 0) {
             if (retry_limit === 10) {
                 await pline($c.lit("That's enough tries."));
-                return 0;
+                return FALSE;
             }
-            ilet = await yn_function(new $c.Ptr(qbuf, 0), null, 0, 1);
+            ilet = await yn_function(new $c.Ptr(qbuf, 0), null, 0, TRUE);
             if (ilet === 42 || ilet === 63) {
                 break;
             }
             if ($c.strchr(new $c.Ptr(quitchars, 0), ilet)) {
                 await pline($c.lit("%s"), c_common_strings.c_Never_mind);
-                return 0;
+                return FALSE;
             }
             idx = spell_let_to_idx(ilet);
             if (idx < 0 || idx >= nspells) {
@@ -602,15 +614,15 @@ async function getspell(spell_no) {   // spell.c:715
                 continue;
             }
             spell_no.set(0, idx);
-            return 1;
+            return TRUE;
         }
     }
     return await dospellmenu($c.lit("Choose which spell to cast"), SPELLMENU_CAST, spell_no);
 }
 export async function dowizcast() {   // spell.c:787
     let win = 0, selected = [null], any = new $T.any(), i = 0, n = 0;
-    win = await windowprocs.win_create_nhwindow(NHW_MENU);
-    await windowprocs.win_start_menu(win, MENU_BEHAVE_STANDARD);
+    win = await create_nhwindow()(NHW_MENU);
+    await start_menu()(win, MENU_BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     for (i = 0; i < MAXSPELL; i = i + 1 | 0) {
         n = SPE_DIG + i | 0;
@@ -620,21 +632,21 @@ export async function dowizcast() {   // spell.c:787
         any.a_int = n;
         await add_menu(win, nul_glyphinfo, any, 0, 0, ATR_NONE, NO_COLOR, obj_descr[objects[n].oc_name_idx].oc_name, MENU_ITEMFLAGS_NONE);
     }
-    await windowprocs.win_end_menu(win, $c.lit("Cast which spell?"));
+    await end_menu()(win, $c.lit("Cast which spell?"));
     n = await select_menu(win, PICK_ONE, new $c.Ptr(selected, 0));
-    await windowprocs.win_destroy_nhwindow(win);
+    await destroy_nhwindow()(win);
     if (n > 0) {
         i = $c.radd(selected[0], 0).item.a_int;
         $c.free(selected[0]);
-        return await spelleffects(i, 0, 1);
+        return await spelleffects(i, FALSE, TRUE);
     }
     return ECMD_OK;
 }
 export async function docast() {   // spell.c:820
     let spell_no = Int32Array.of(0);
     if (await getspell(new $c.Ptr(spell_no, 0))) {
-        await cmdq_add_key(CQ_REPEAT, $c.i8(spell_no[0] < 26 ? 97 + spell_no[0] | 0 : (65 + spell_no[0] | 0) - 26 | 0));
-        return await spelleffects(svs.spl_book[spell_no[0]].sp_id, 0, 0);
+        await cmdq_add_key(CQ_REPEAT, spellet(spell_no[0]));
+        return await spelleffects(svs.spl_book[spell_no[0]].sp_id, FALSE, FALSE);
     }
     return ECMD_FAIL;
 }
@@ -691,7 +703,7 @@ export async function skill_based_spellbook_id() {   // spell.c:864
                 break;
         }
         if (objects[booktype].oc_oc2 <= known_up_to_level) {
-            await discover_object(booktype, 1, 0, 0);
+            await discover_object(booktype, TRUE, FALSE, FALSE);
         }
     }
 }
@@ -710,7 +722,7 @@ async function propagate_chain_lightning(clq, zap$in) {   // spell.c:952
     if (mon && mon.mpeaceful | 0) {
         return;
     }
-    if (mon && !await Resists_Elem(mon, SHOCK_RES) && !await defended(mon, AD_ELEC)) {
+    if (mon && !await resists_elec(mon) && !await defended(mon, AD_ELEC)) {
         zap.strength = 3;
     } else if (mon) {
         zap.strength = 0;
@@ -733,12 +745,12 @@ async function cast_chain_lightning() {   // spell.c:1003
     clq.q[0].dir = 0;
     clq.head = 0;
     clq.tail = 0;
-    clq.displayed_beam = u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? rn2_on_display_rng(6) : AD_ELEC - 1;
+    clq.displayed_beam = Hallucination() ? rn2_on_display_rng(6) : AD_ELEC - 1;
     if (u.uswallow) {
         return;
     }
     await tmp_at(DISP_BEAM, $c.i16(await zapdir_to_glyph(0, 1, clq.displayed_beam)));
-    for (dir = 0; dir < N_DIRS_Z - 2; dir = dir + 1 | 0) {
+    for (dir = 0; dir < N_DIRS; dir = dir + 1 | 0) {
         zap.$copyFrom(new $T.chain_lightning_zap());
         zap.dir = $c.u8(dir);
         zap.x = u.ux;
@@ -746,7 +758,7 @@ async function cast_chain_lightning() {   // spell.c:1003
         zap.strength = 2;
         await propagate_chain_lightning(clq, zap.$clone());
     }
-    await windowprocs.win_delay_output();
+    await nh_delay_output()();
     while (clq.head < clq.tail) {
         delay_tail = clq.tail;
         while (clq.head < delay_tail) {
@@ -757,7 +769,7 @@ async function cast_chain_lightning() {   // spell.c:1003
                 gn.notonhead = $c.i8(mon.mx !== gb.bhitpos.x || mon.my !== gb.bhitpos.y ? 1 : 0);
                 dmg = await zhitm(mon, 15, 2, new $c.Ptr(unused, 0));
                 if (dmg) {
-                    if (mon.mhp < 1) {
+                    if (DEADMONSTER(mon)) {
                         await xkilled(mon, XKILL_GIVEMSG);
                     } else {
                         await pline($c.lit("You shock %s%s"), await mon_nam(mon), exclam(dmg));
@@ -768,9 +780,9 @@ async function cast_chain_lightning() {   // spell.c:1003
                 } else if (canseemon(mon)) {
                     await pline($c.lit("%s resists."), await Monnam(mon));
                 }
-                if (!(mon.mhp < 1)) {
+                if (!DEADMONSTER(mon)) {
                     svc.context.forcefight = $c.i8(svc.context.forcefight + 1);
-                    await wakeup(mon, 0);
+                    await wakeup(mon, FALSE);
                     svc.context.forcefight = $c.i8(svc.context.forcefight - 1);
                 }
             }
@@ -784,15 +796,15 @@ async function cast_chain_lightning() {   // spell.c:1003
             } else if (u.uen > 0) {
                 u.uen = u.uen - 1 | 0;
             }
-            zap$2.dir = $c.u8($c.rem32(zap$2.dir + 7 | 0, N_DIRS_Z - 2));
+            zap$2.dir = $c.u8(DIR_LEFT(zap$2.dir));
             await propagate_chain_lightning(clq, zap$2.$clone());
-            zap$2.dir = $c.u8($c.rem32(zap$2.dir + 2 | 0, N_DIRS_Z - 2));
+            zap$2.dir = $c.u8(DIR_RIGHT2(zap$2.dir));
             await propagate_chain_lightning(clq, zap$2.$clone());
         }
-        await windowprocs.win_delay_output();
+        await nh_delay_output()();
     }
-    await windowprocs.win_delay_output();
-    await windowprocs.win_delay_output();
+    await nh_delay_output()();
+    await nh_delay_output()();
     await tmp_at(DISP_END, 0);
 }
 async function cast_protection() {   // spell.c:1104
@@ -807,14 +819,14 @@ async function cast_protection() {   // spell.c:1104
     natac = $c.div32(10 - natac | 0, 10);
     gain = loglev - $c.div32(u.uspellprot, 4 - (3 < natac ? 3 : natac) | 0) | 0;
     if (gain > 0) {
-        if (!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked)) {
+        if (!Blind()) {
             hgolden = hcolor(c_color_names.c_golden);
             if (u.uspellprot) {
                 await pline_The($c.lit("%s haze around you becomes more dense."), hgolden);
             } else {
                 pm = u.ustuck ? u.ustuck.data : null;
                 rmtyp = svl.level.locations[u.ux][u.uy].typ;
-                atmosphere = pm && u.uswallow | 0 ? $c.peq(pm, $c.relem(mons, PM_FOG_CLOUD)) ? $c.lit("mist") : pm.mlet === S_VORTEX || $c.peq(pm, $c.relem(mons, PM_AIR_ELEMENTAL)) ? $c.lit("maelstrom") : dmgtype_fromattack(pm, AD_WRAP, AT_ENGL) !== null ? $c.lit("folds") : $c.andu64(pm.mflags1, M1_ANIMAL) !== 0 ? $c.lit("maw") : $c.lit("ooze") : u.uinwater | 0 ? hliquid($c.lit("water")) : rmtyp === CLOUD ? $c.lit("cloud") : rmtyp === TREE || svl.level.flags.arboreal | 0 && rmtyp === STONE ? $c.lit("vegetation") : rmtyp <= DBWALL ? $c.lit("stone") : $c.lit("air");
+                atmosphere = pm && u.uswallow | 0 ? $c.peq(pm, $c.relem(mons, PM_FOG_CLOUD)) ? $c.lit("mist") : is_whirly(pm) ? $c.lit("maelstrom") : enfolds(pm) ? $c.lit("folds") : is_animal(pm) ? $c.lit("maw") : $c.lit("ooze") : u.uinwater | 0 ? hliquid($c.lit("water")) : rmtyp === CLOUD ? $c.lit("cloud") : IS_TREE(rmtyp) ? $c.lit("vegetation") : IS_STWALL(rmtyp) ? $c.lit("stone") : $c.lit("air");
                 await pline_The($c.lit("%s around you begins to shimmer with %s haze."), atmosphere, await an(hgolden));
             }
         }
@@ -838,21 +850,21 @@ async function spell_backfire(spell) {   // spell.c:1181
         case 1:
         case 2:
         case 3:
-            await make_confused($c.add64(old_conf, duration), 0);
+            await make_confused($c.add64(old_conf, duration), FALSE);
             break;
         case 4:
         case 5:
         case 6:
-            await make_confused($c.add64(old_conf, $c.div64($c.mul64(2, duration), 3)), 0);
-            await make_stunned($c.add64(old_stun, $c.div64(duration, 3)), 0);
+            await make_confused($c.add64(old_conf, $c.div64($c.mul64(2, duration), 3)), FALSE);
+            await make_stunned($c.add64(old_stun, $c.div64(duration, 3)), FALSE);
             break;
         case 7:
         case 8:
-            await make_stunned($c.add64(old_stun, $c.div64($c.mul64(2, duration), 3)), 0);
-            await make_confused($c.add64(old_conf, $c.div64(duration, 3)), 0);
+            await make_stunned($c.add64(old_stun, $c.div64($c.mul64(2, duration), 3)), FALSE);
+            await make_confused($c.add64(old_conf, $c.div64(duration, 3)), FALSE);
             break;
         case 9:
-            await make_stunned($c.add64(old_stun, duration), 0);
+            await make_stunned($c.add64(old_stun, duration), FALSE);
             break;
     }
     return;
@@ -863,7 +875,7 @@ async function spelleffects_check(spell, res, energy) {   // spell.c:1220
     energy.set(0, 0);
     if (spell === UNKNOWN_SPELL || await rejectcasting()) {
         res.set(0, ECMD_OK);
-        return 1;
+        return TRUE;
     }
     energy.set(0, Math.imul(svs.spl_book[spell].sp_lev, 5));
     if (svs.spl_book[spell].sp_know <= 0) {
@@ -874,9 +886,9 @@ async function spelleffects_check(spell, res, energy) {   // spell.c:1220
         if (u.uen < 0) {
             u.uen = 0;
         }
-        disp.botl = 1;
+        disp.botl = TRUE;
         res.set(0, ECMD_TIME);
-        return 1;
+        return TRUE;
     } else if (svs.spl_book[spell].sp_know <= 100) {
         await You($c.lit("strain to recall the spell."));
     } else if (svs.spl_book[spell].sp_know <= 500) {
@@ -889,14 +901,14 @@ async function spelleffects_check(spell, res, energy) {   // spell.c:1220
     if (u.uhunger <= 10 && svs.spl_book[spell].sp_id !== SPE_DETECT_FOOD) {
         await You($c.lit("are too hungry to cast that spell."));
         res.set(0, ECMD_OK);
-        return 1;
-    } else if (acurr(A_STR) < 4 && svs.spl_book[spell].sp_id !== SPE_RESTORE_ABILITY) {
+        return TRUE;
+    } else if (ACURR(A_STR) < 4 && svs.spl_book[spell].sp_id !== SPE_RESTORE_ABILITY) {
         await You($c.lit("lack the strength to cast spells."));
         res.set(0, ECMD_OK);
-        return 1;
+        return TRUE;
     } else if (await check_capacity($c.lit("Your concentration falters while carrying so much stuff."))) {
         res.set(0, ECMD_TIME);
-        return 1;
+        return TRUE;
     }
     if (u.uhave.amulet | 0 && u.uen >= energy.get(0)) {
         await You_feel($c.lit("the amulet draining your energy away."));
@@ -904,12 +916,12 @@ async function spelleffects_check(spell, res, energy) {   // spell.c:1220
         if (u.uen < 0) {
             u.uen = 0;
         }
-        disp.botl = 1;
+        disp.botl = TRUE;
         res.set(0, ECMD_TIME);
     }
     if (energy.get(0) > u.uen) {
         await You($c.lit("don't have enough energy to cast that spell%s."), u.uen < u.uenmax ? $c.lit("") : energy.get(0) > u.uenpeak ? $c.lit(" yet") : $c.lit(" anymore"));
-        return 1;
+        return TRUE;
     } else {
         if (svs.spl_book[spell].sp_id !== SPE_DETECT_FOOD) {
             hungr = Math.imul(energy.get(0), 2);
@@ -946,25 +958,25 @@ async function spelleffects_check(spell, res, energy) {   // spell.c:1220
     if (confused || rnd(100) > chance) {
         await You($c.lit("fail to cast the spell correctly."));
         u.uen = u.uen - $c.div32(energy.get(0), 2) | 0;
-        disp.botl = 1;
+        disp.botl = TRUE;
         res.set(0, ECMD_TIME);
-        return 1;
+        return TRUE;
     }
-    return 0;
+    return FALSE;
 }
 export async function spelleffects(spell_otyp, atme, force) {   // spell.c:1385
     let spell = 0, energy = Int32Array.of(0), damage = 0, n = 0, otyp = 0, skill = 0, role_skill = 0, res = Int32Array.of(0), physical_damage = 0, pseudo = null, cc = new $T.nhcoord(), buf = new Int8Array(256), buf$2 = new Int8Array(256), was_sick = 0, was_slimed = 0, $t1, $t2, $t3, $t4, $t5, $t6;
     spell = force ? spell_otyp : spell_idx($c.i16(spell_otyp));
     energy[0] = 0;
     res[0] = ECMD_OK;
-    physical_damage = 0;
+    physical_damage = FALSE;
     if (!force && await spelleffects_check(spell, new $c.Ptr(res, 0), new $c.Ptr(energy, 0))) {
         return res[0];
     }
     u.uen = u.uen - energy[0] | 0;
-    disp.botl = 1;
-    await exercise(A_WIS, 1);
-    pseudo = await mksobj(force ? spell : svs.spl_book[spell].sp_id, 0, 0);
+    disp.botl = TRUE;
+    await exercise(A_WIS, TRUE);
+    pseudo = await mksobj(force ? spell : svs.spl_book[spell].sp_id, FALSE, FALSE);
     $t1 = pseudo.cursed = (0) & 1, pseudo.blessed = ($t1) & 1;
     pseudo.quan = 20;
     otyp = pseudo.otyp;
@@ -980,7 +992,7 @@ export async function spelleffects(spell_otyp, atme, force) {   // spell.c:1385
                     n = rnd(8) + 1 | 0;
                     while ($t2 = n, n = $t2 - 1 | 0, $t2) {
                         if (!u.dx && !u.dy && !u.dz) {
-                            if ((damage = await zapyourself(pseudo, 1)) !== 0) {
+                            if ((damage = await zapyourself(pseudo, TRUE)) !== 0) {
                                 $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("zapped %sself with a spell"), genders[flags.female ? 1 : 0].him);
                                 await losehp(damage, new $c.Ptr(buf, 0), NO_KILLER_PREFIX);
                             }
@@ -989,7 +1001,7 @@ export async function spelleffects(spell_otyp, atme, force) {   // spell.c:1385
                         }
                         $t3 = (cc.x + rnd(3) | 0) - 2 | 0, u.dx = $t3;
                         $t4 = (cc.y + rnd(3) | 0) - 2 | 0, u.dy = $t4;
-                        if (!isok($c.i16(u.dx), $c.i16(u.dy)) || !((gv.viz_array.get(u.dy).get(u.dx) & IN_SIGHT) !== 0) || svl.level.locations[u.dx][u.dy].typ <= DBWALL || u.uswallow | 0) {
+                        if (!isok($c.i16(u.dx), $c.i16(u.dy)) || !cansee(u.dx, u.dy) || svl.level.locations[u.dx][u.dy].typ <= DBWALL || u.uswallow | 0) {
                             u.dx = cc.x;
                             u.dy = cc.y;
                         }
@@ -998,7 +1010,7 @@ export async function spelleffects(spell_otyp, atme, force) {   // spell.c:1385
                 break;
             }
         case SPE_FORCE_BOLT:
-            physical_damage = 1;
+            physical_damage = TRUE;
         case SPE_SLEEP:
         case SPE_MAGIC_MISSILE:
         case SPE_KNOCK:
@@ -1028,10 +1040,10 @@ export async function spelleffects(spell_otyp, atme, force) {   // spell.c:1385
                     await pline_The($c.lit("magical energy is released!"));
                 }
                 if (!u.dx && !u.dy && !u.dz) {
-                    if ((damage = await zapyourself(pseudo, 1)) !== 0) {
+                    if ((damage = await zapyourself(pseudo, TRUE)) !== 0) {
                         $c.__builtin___sprintf_chk(new $c.Ptr(buf$2, 0), 0, 256, $c.lit("zapped %sself with a spell"), genders[flags.female ? 1 : 0].him);
                         if (physical_damage) {
-                            damage = u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(damage + 1 | 0, 2) : damage;
+                            damage = Maybe_Half_Phys(damage);
                         }
                         await losehp(damage, new $c.Ptr(buf$2, 0), NO_KILLER_PREFIX);
                     }
@@ -1068,13 +1080,13 @@ export async function spelleffects(spell_otyp, atme, force) {   // spell.c:1385
             await peffects(pseudo);
             break;
         case SPE_CURE_BLINDNESS:
-            await healup(0, 0, 0, 1);
+            await healup(0, 0, FALSE, TRUE);
             break;
         case SPE_CURE_SICKNESS:
             {
-                was_sick = $c.i8(!!u.uprops[SICK].intrinsic ? 1 : 0);
-                was_slimed = $c.i8(!!u.uprops[SLIMED].intrinsic ? 1 : 0);
-                await healup(0, 0, 1, 0);
+                was_sick = $c.i8(!!Sick() ? 1 : 0);
+                was_slimed = $c.i8(!!Slimed() ? 1 : 0);
+                await healup(0, 0, TRUE, FALSE);
                 if (was_sick || !was_slimed) {
                     await You($c.lit("are %s ill."), was_sick ? $c.lit("no longer") : $c.lit("not"));
                 }
@@ -1084,10 +1096,10 @@ export async function spelleffects(spell_otyp, atme, force) {   // spell.c:1385
                 break;
             }
         case SPE_CREATE_FAMILIAR:
-            await make_familiar(null, u.ux, u.uy, 0);
+            await make_familiar(null, u.ux, u.uy, FALSE);
             break;
         case SPE_CLAIRVOYANCE:
-            if (!u.uprops[CLAIRVOYANT].blocked) {
+            if (!BClairvoyant()) {
                 if (role_skill >= P_SKILLED) {
                     pseudo.blessed = (1) & 1;
                 }
@@ -1120,18 +1132,18 @@ export async function spelleffects(spell_otyp, atme, force) {   // spell.c:1385
 }
 function spell_aim_step(arg, x, y) {   // spell.c:1607
     if (!isok(x, y)) {
-        return 0;
+        return FALSE;
     }
     if (!(svl.level.locations[x][y].typ >= POOL) && !(svl.level.locations[x][y].typ === DOOR && (svl.level.locations[x][y].flags | 0) & D_ISOPEN)) {
-        return 0;
+        return FALSE;
     }
-    return 1;
+    return TRUE;
 }
 function can_center_spell_location(x, y) {   // spell.c:1619
     if (distmin(u.ux, u.uy, x, y) > 10) {
-        return 0;
+        return FALSE;
     }
-    return $c.i8(isok(x, y) && (gv.viz_array.get(y).get(x) & IN_SIGHT) !== 0 && !(svl.level.locations[x][y].typ <= DBWALL) ? 1 : 0);
+    return $c.i8(isok(x, y) && cansee(x, y) && !(svl.level.locations[x][y].typ <= DBWALL) ? 1 : 0);
 }
 async function display_spell_target_positions(on_off) {   // spell.c:1627
     let x = 0, y = 0, dx = 0, dy = 0, dist = 0;
@@ -1142,7 +1154,7 @@ async function display_spell_target_positions(on_off) {   // spell.c:1627
             for (dy = $c.i16(-dist | 0); dy <= dist; dy = $c.i16(dy + 1)) {
                 x = $c.i16(u.ux + dx | 0);
                 y = $c.i16(u.uy + dy | 0);
-                if (x === u.ux && y === u.uy) {
+                if (u_at(x, y)) {
                     continue;
                 }
                 if (can_center_spell_location(x, y)) {
@@ -1167,20 +1179,20 @@ async function throwspell() {   // spell.c:1655
     cc.x = u.ux;
     cc.y = u.uy;
     await getpos_sethilite(display_spell_target_positions, can_center_spell_location);
-    if (await getpos(cc, 1, $c.lit("the desired position")) < 0) {
+    if (await getpos(cc, TRUE, $c.lit("the desired position")) < 0) {
         return 0;
     }
-    await windowprocs.win_clear_nhwindow($G.WIN_MESSAGE);
+    await clear_nhwindow()($G.WIN_MESSAGE);
     if (distmin(u.ux, u.uy, cc.x, cc.y) > 10) {
         await pline_The($c.lit("spell dissipates over the distance!"));
         return 0;
     } else if (u.uswallow) {
         await pline_The($c.lit("spell is cut short!"));
-        await exercise(A_WIS, 0);
+        await exercise(A_WIS, FALSE);
         u.dx = 0;
         u.dy = 0;
         return 1;
-    } else if ((cc.x !== u.ux || cc.y !== u.uy) && !((gv.viz_array.get(cc.y).get(cc.x) & IN_SIGHT) !== 0) && (!(mtmp = svl.level.monsters[cc.x][cc.y]) || !(canseemon(mtmp) || sensemon(mtmp))) || svl.level.locations[cc.x][cc.y].typ <= DBWALL) {
+    } else if ((cc.x !== u.ux || cc.y !== u.uy) && !cansee(cc.x, cc.y) && (!(mtmp = svl.level.monsters[cc.x][cc.y]) || !canspotmon(mtmp)) || svl.level.locations[cc.x][cc.y].typ <= DBWALL) {
         await Your($c.lit("mind fails to lock onto that location!"));
         return 0;
     }
@@ -1251,7 +1263,7 @@ export async function losespells() {   // spell.c:1763
     for (i = 0; nzap > 0; i = i + 1 | 0) {
         if (rn2(n - i | 0) < nzap) {
             svs.spl_book[i].sp_know = 0;
-            await exercise(A_WIS, 0);
+            await exercise(A_WIS, FALSE);
             nzap = nzap - 1 | 0;
         }
     }
@@ -1344,8 +1356,8 @@ async function sortspells() {   // spell.c:1927
 async function spellsortmenu() {   // spell.c:1976
     let tmpwin = 0, selected = [null], any = new $T.any(), let_ = 0, i = 0, n = 0, choice = 0, clr = 0;
     clr = NO_COLOR;
-    tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
-    await windowprocs.win_start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW_MENU);
+    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     for (i = 0; i < 9; i = i + 1 | 0) {
         if (i === SORTRETAINORDER) {
@@ -1357,9 +1369,9 @@ async function spellsortmenu() {   // spell.c:1976
         any.a_int = i + 1 | 0;
         await add_menu(tmpwin, nul_glyphinfo, any, let_, 0, ATR_NONE, clr, spl_sortchoices[i], i === gs.spl_sortmode ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     }
-    await windowprocs.win_end_menu(tmpwin, $c.lit("View known spells list sorted"));
+    await end_menu()(tmpwin, $c.lit("View known spells list sorted"));
     n = await select_menu(tmpwin, PICK_ONE, new $c.Ptr(selected, 0));
-    await windowprocs.win_destroy_nhwindow(tmpwin);
+    await destroy_nhwindow()(tmpwin);
     if (n > 0) {
         choice = $c.radd(selected[0], 0).item.a_int - 1 | 0;
         if (n > 1 && choice === gs.spl_sortmode) {
@@ -1367,9 +1379,9 @@ async function spellsortmenu() {   // spell.c:1976
         }
         $c.free(selected[0]);
         gs.spl_sortmode = choice;
-        return 1;
+        return TRUE;
     }
-    return 0;
+    return FALSE;
 }
 export async function dovspell() {   // spell.c:2021
     let qbuf = new Int8Array(128), splnum = Int32Array.of(0), othnum = Int32Array.of(0), spl_tmp = new $T.spell();
@@ -1377,7 +1389,7 @@ export async function dovspell() {   // spell.c:2021
         await You($c.lit("don't know any spells right now."));
     } else {
         while (await dospellmenu($c.lit("Currently known spells"), SPELLMENU_VIEW, new $c.Ptr(splnum, 0))) {
-            if (splnum[0] === MAXSPELL) {
+            if (splnum[0] === SPELLMENU_SORT) {
                 if (await spellsortmenu()) {
                     await sortspells();
                 }
@@ -1413,8 +1425,8 @@ export async function show_spells() {   // spell.c:2059
 async function dospellmenu(prompt, splaction, spell_no) {   // spell.c:2075
     let tmpwin = 0, i = 0, n = 0, how = 0, splnum = 0, buf = new Int8Array(256), retentionbuf = new Int8Array(24), sep = 0, fmt = null, selected = [null], any = new $T.any(), clr = 0;
     clr = NO_COLOR;
-    tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
-    await windowprocs.win_start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+    tmpwin = await create_nhwindow()(NHW_MENU);
+    await start_menu()(tmpwin, MENU_BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     if (!iflags.menu_tab_sep) {
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s%-20s Level %-12s Fail Retention"), splaction === -3 ? $c.lit("") : $c.lit("    "), $c.lit("Name"), $c.lit("Category"));
@@ -1425,31 +1437,31 @@ async function dospellmenu(prompt, splaction, spell_no) {   // spell.c:2075
         fmt = $c.lit("%s\t%-d\t%s\t%-d%%\t%s");
         sep = 9;
     }
-    if (flags.debug) {
+    if (wizard()) {
         $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit("%c%6s"), sep, $c.lit("turns"));
     }
     await add_menu_heading(tmpwin, new $c.Ptr(buf, 0));
     for (i = 0; i < MAXSPELL && svs.spl_book[i].sp_id !== NO_SPELL; i = i + 1 | 0) {
         splnum = !gs.spl_orderindx ? i : gs.spl_orderindx.get(i);
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, fmt, obj_descr[objects[svs.spl_book[splnum].sp_id].oc_name_idx].oc_name, svs.spl_book[splnum].sp_lev, await spelltypemnemonic(spell_skilltype(svs.spl_book[splnum].sp_id)), 100 - await percent_success(splnum) | 0, spellretention(splnum, new $c.Ptr(retentionbuf, 0)));
-        if (flags.debug) {
+        if (wizard()) {
             $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit("%c%6d"), sep, svs.spl_book[i].sp_know);
         }
         any.a_int = splnum + 1 | 0;
-        await add_menu(tmpwin, nul_glyphinfo, any, $c.i8(splnum < 26 ? 97 + splnum | 0 : (65 + splnum | 0) - 26 | 0), 0, ATR_NONE, clr, new $c.Ptr(buf, 0), splnum === splaction ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+        await add_menu(tmpwin, nul_glyphinfo, any, spellet(splnum), 0, ATR_NONE, clr, new $c.Ptr(buf, 0), splnum === splaction ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     }
     how = PICK_ONE;
     if (splaction === SPELLMENU_VIEW) {
         if (svs.spl_book[1].sp_id === NO_SPELL) {
             how = PICK_NONE;
         } else {
-            any.a_int = MAXSPELL + 1;
+            any.a_int = SPELLMENU_SORT + 1;
             await add_menu(tmpwin, nul_glyphinfo, any, 43, 0, ATR_NONE, clr, $c.lit("[sort spells]"), MENU_ITEMFLAGS_NONE);
         }
     }
-    await windowprocs.win_end_menu(tmpwin, prompt);
+    await end_menu()(tmpwin, prompt);
     n = await select_menu(tmpwin, how, new $c.Ptr(selected, 0));
-    await windowprocs.win_destroy_nhwindow(tmpwin);
+    await destroy_nhwindow()(tmpwin);
     if (n > 0) {
         spell_no.set(0, $c.radd(selected[0], 0).item.a_int - 1 | 0);
         if (n > 1 && spell_no.get(0) === splaction) {
@@ -1457,14 +1469,14 @@ async function dospellmenu(prompt, splaction, spell_no) {   // spell.c:2075
         }
         $c.free(selected[0]);
         if (spell_no.get(0) === splaction) {
-            return 0;
+            return FALSE;
         }
-        return 1;
+        return TRUE;
     } else if (splaction >= 0) {
         spell_no.set(0, splaction);
-        return 1;
+        return TRUE;
     }
-    return 0;
+    return FALSE;
 }
 async function percent_success(spell) {   // spell.c:2173
     let chance = 0, splcaster = 0, special = 0, statused = 0, difficulty = 0, skill = 0, skilltype = 0, paladin_bonus = 0, learning = 0;
@@ -1473,7 +1485,7 @@ async function percent_success(spell) {   // spell.c:2173
     splcaster = gu.urole.spelbase;
     special = gu.urole.spelheal;
     statused = acurr(gu.urole.spelstat);
-    if ($G.uarm && ((objects[$G.uarm.otyp].oc_material | 0) >= IRON && (objects[$G.uarm.otyp].oc_material | 0) <= MITHRIL) && !paladin_bonus) {
+    if ($G.uarm && is_metallic($G.uarm) && !paladin_bonus) {
         splcaster = splcaster + ($G.uarmc && $G.uarmc.otyp === ROBE ? $c.div32(gu.urole.spelarmr, 2) : gu.urole.spelarmr) | 0;
     } else if ($G.uarmc && $G.uarmc.otyp === ROBE) {
         splcaster = splcaster - gu.urole.spelarmr | 0;
@@ -1485,13 +1497,13 @@ async function percent_success(spell) {   // spell.c:2173
         splcaster = splcaster - 3 | 0;
     }
     if (!paladin_bonus) {
-        if ($G.uarmh && ((objects[$G.uarmh.otyp].oc_material | 0) >= IRON && (objects[$G.uarmh.otyp].oc_material | 0) <= MITHRIL)) {
+        if ($G.uarmh && is_metallic($G.uarmh)) {
             splcaster = splcaster + uarmhbon | 0;
         }
-        if ($G.uarmg && ((objects[$G.uarmg.otyp].oc_material | 0) >= IRON && (objects[$G.uarmg.otyp].oc_material | 0) <= MITHRIL)) {
+        if ($G.uarmg && is_metallic($G.uarmg)) {
             splcaster = splcaster + uarmgbon | 0;
         }
-        if ($G.uarmf && ((objects[$G.uarmf.otyp].oc_material | 0) >= IRON && (objects[$G.uarmf.otyp].oc_material | 0) <= MITHRIL)) {
+        if ($G.uarmf && is_metallic($G.uarmf)) {
             splcaster = splcaster + uarmfbon | 0;
         }
     }
@@ -1609,7 +1621,7 @@ export async function force_learn_spell(otyp) {   // spell.c:2391
     svs.spl_book[i].sp_id = otyp;
     svs.spl_book[i].sp_lev = $c.i16(objects[otyp].oc_oc2);
     svs.spl_book[i].sp_know = KEEN + 0;
-    return $c.i8(i < 26 ? 97 + i | 0 : (65 + i | 0) - 26 | 0);
+    return spellet(i);
 }
 export function num_spells() {   // spell.c:2417
     let i = 0;
@@ -1619,6 +1631,9 @@ export function num_spells() {   // spell.c:2417
         }
     }
     return i;
+}
+function spellet(spell) {
+    return $c.i8(spell < 26 ? 97 + spell | 0 : (65 + spell | 0) - 26 | 0);
 }
 
 export function $init() {

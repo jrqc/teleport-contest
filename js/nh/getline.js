@@ -11,9 +11,9 @@ import { eos, mungspaces, visctrl } from './hacklib.js';
 import { custompline, dumplogmsg, pline } from './pline.js';
 import { term_curs_set, tty_nhbell } from './termcap.js';
 import { addtopl, more, putsyms, tty_doprev_message } from './topl.js';
-import { windowprocs } from './windows.js';
+import { clear_nhwindow } from './winprocs.macros.js';
 import { tty_clear_nhwindow, tty_nhgetch, wins } from './wintty.js';
-import { TOPLINE_NEED_MORE, TOPLINE_NON_EMPTY, TOPLINE_SPECIAL_PROMPT } from './wintty.h.js';
+import { TOPLINE_NEED_MORE, TOPLINE_NON_EMPTY, TOPLINE_SPECIAL_PROMPT, WIN_STOP } from './wintty.h.js';
 
 let suppress_history = 0;
 export async function tty_getlin(query, bufp) {   // getline.c:36
@@ -25,10 +25,10 @@ async function hooked_tty_getlin(query, bufp, hook) {   // getline.c:43
     obufp = bufp;
     cw = wins[$G.WIN_MESSAGE];
     doprev = 0;
-    if ($G.ttyDisplay.toplin === TOPLINE_NEED_MORE && !(cw.flags & 1)) {
+    if ($G.ttyDisplay.toplin === TOPLINE_NEED_MORE && !(cw.flags & WIN_STOP)) {
         await more();
     }
-    cw.flags = cw.flags & -2;
+    cw.flags = cw.flags & ~WIN_STOP;
     $G.ttyDisplay.toplin = TOPLINE_SPECIAL_PROMPT;
     $G.ttyDisplay.inread = $G.ttyDisplay.inread + 1 | 0;
     await custompline(OVERRIDE_MSGTYPE | SUPPRESS_HISTORY, $c.lit("%s "), query);
@@ -142,7 +142,7 @@ async function hooked_tty_getlin(query, bufp, hook) {   // getline.c:43
     }
     $G.ttyDisplay.toplin = TOPLINE_NON_EMPTY;
     $G.ttyDisplay.inread = $G.ttyDisplay.inread - 1 | 0;
-    await windowprocs.win_clear_nhwindow($G.WIN_MESSAGE);
+    await clear_nhwindow()($G.WIN_MESSAGE);
     if (suppress_history) {
         new $c.Ptr(gt.toplines, 0).set(0, 0);
     } else {

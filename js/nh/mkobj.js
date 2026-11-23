@@ -9,7 +9,7 @@ import { artifact_exists, confers_luck, mk_artifact, nartifact_exist, permapoiso
 import { set_moreluck } from './attrib.js';
 import { isok } from './cmd.js';
 import { is_ice, is_pool, is_pool_or_lava } from './dbridge.js';
-import { c_common_strings, cg, flags, gb, gc, gi, gk, gm, go, gt, gu, gv, gz, hands_obj, iflags, program_state, svb, svc, svd, svl, svm, u } from './decl.js';
+import { c_common_strings, cg, flags, gb, gc, gi, gk, gm, go, gt, gu, gz, hands_obj, iflags, program_state, svb, svc, svd, svl, svm, u } from './decl.js';
 import { AMULET_CLASS, ARMOR_CLASS, BALL_CLASS, CHAIN_CLASS, COIN_CLASS, FOOD_CLASS, GEM_CLASS, POTION_CLASS, RING_CLASS, ROCK_CLASS, SCROLL_CLASS, SPBOOK_CLASS, S_TROLL, S_altar, S_brdnstair, S_brupstair, S_dnstair, S_sink, S_throne, S_trwall, S_upstair, S_vwall, TOOL_CLASS, VENOM_CLASS, WAND_CLASS, WEAPON_CLASS } from './defsym.h.js';
 import { newsym } from './display.js';
 import { doaltarobj, dropy, obj_no_longer_held } from './do.js';
@@ -17,45 +17,50 @@ import { Mgender, mon_pmname, noveltitle, oname, pmname, safe_oname, x_monnam } 
 import { reset_remarm } from './do_wear.js';
 import { hitfloor } from './dothrow.js';
 import { def_oc_syms } from './drawing.js';
-import { In_hell, In_quest, depth, level_difficulty, on_level, surface } from './dungeon.js';
+import { In_quest, depth, level_difficulty, on_level, surface } from './dungeon.js';
 import { MIGR_TO_SPECIES } from './dungeon.h.js';
+import { Inhell } from './dungeon.macros.js';
 import { eaten_stat, eating_glob, set_tin_variety } from './eat.js';
 import { panic } from './end.js';
 import { can_reach_floor } from './engrave.js';
 import { debugcore } from './files.js';
 import { PLNMSG_OBJ_GLOWS } from './flag.h.js';
-import { COLNO, LARGEST_INT, ROWNO } from './global.h.js';
+import { COLNO, FALSE, LARGEST_INT, ROWNO, TRUE } from './global.h.js';
 import { in_rooms, near_capacity, obj_to_any } from './hack.js';
 import { ARTICLE_A, CORPSTAT_FEMALE, CORPSTAT_INIT, CORPSTAT_MALE, CORPSTAT_NEUTER, CORPSTAT_NONE, CORPSTAT_SPE_VAL, COST_SINGLEOBJ, COST_UNBLSS, COST_UNCURS, EXACT_NAME, FM_FMON, ONAME_NO_FLAGS, ONAME_SKIP_INVUPD, RANDOM_TIN, ROT_AGE, SPINACH_TIN, TAINT_AGE } from './hack.h.js';
 import { copynchars, eos, s_suffix, strstri, strsubst } from './hacklib.js';
 import { consume_obj_charge, freeinv, g_at, hold_another_object, mergable, merged, nxtobj, sobj_at, update_inventory, useupall } from './invent.js';
 import { arti_light_radius, del_light_source, find_mid, obj_adjust_light_radius, obj_sheds_light, obj_split_light_source } from './light.js';
+import { nhUse } from './lint.macros.js';
 import { maybe_reset_pick } from './lock.js';
 import { rndmonst_adj } from './makemon.js';
 import { SHOPBASE } from './mkroom.h.js';
 import { can_be_hatched, copy_mextra, dead_species, dealloc_mextra, maybe_unhide_at, undead_to_corpse, zombie_form } from './mon.js';
 import { pronoun_gender } from './mondata.js';
-import { G_EXTINCT, G_GENOD, G_HELL, G_NOCORPSE, G_NOGEN, G_NOHELL, G_UNIQ, M2_FEMALE, M2_HUMAN, M2_MALE, M2_NEUTER, MZ_SMALL } from './monflag.h.js';
+import { is_female, is_human, is_male, is_neuter, is_rider, verysmall } from './mondata.macros.js';
+import { G_GONE, G_HELL, G_NOCORPSE, G_NOGEN, G_NOHELL, G_UNIQ } from './monflag.h.js';
 import { mons } from './monst.js';
 import { MON_DETACH } from './monst.h.js';
+import { DEADMONSTER, MON_NOWEP, ismnum, newmonst } from './monst.macros.js';
 import { PM_ARCHEOLOGIST, PM_DEATH, PM_FAMINE, PM_GRAY_OOZE, PM_HUMAN, PM_LICHEN, PM_LIZARD, PM_PESTILENCE, PM_SAMURAI, PM_WIZARD } from './monsters.h.js';
 import { discover_object } from './o_init.js';
 import { BURIED_TOO, CONTAINED_TOO, LOST_NONE, MAX_OIL_IN_FLASK, NOBJ_STATES, OBJ_BURIED, OBJ_CONTAINED, OBJ_DELETED, OBJ_FLOOR, OBJ_FREE, OBJ_INVENT, OBJ_LUAFREE, OBJ_MIGRATING, OBJ_MINVENT, OBJ_ONBILL } from './obj.h.js';
-import { COPPER, DRAGON_HIDE, GLASS, IRON, LIQUID, PLASTIC, RANDOM_CLASS, WOOD } from './objclass.h.js';
+import { Has_contents, Is_candle, Is_container, Is_dragon_scales, Is_mbag, Is_pudding, OMAILCMD, OMID, OMONST, bimanual, carried, has_omailcmd, has_omid, has_omonst, has_oname, is_mines_prize, is_multigen, is_poisonable, is_soko_prize, mcarried, newobj } from './obj.macros.js';
+import { DRAGON_HIDE, LIQUID, PLASTIC, RANDOM_CLASS, SPBOOK_no_NOVEL, WOOD } from './objclass.h.js';
+import { is_corrodeable, is_crackable, is_damageable, is_rustprone } from './objclass.macros.js';
 import { obj_descr, objects } from './objects.js';
-import { AMULET_OF_CHANGE, AMULET_OF_RESTFUL_SLEEP, AMULET_OF_STRANGULATION, AMULET_OF_YENDOR, APPLE, BAG_OF_HOLDING, BAG_OF_TRICKS, BANANA, BELL_OF_OPENING, BLINDFOLD, BOULDER, BRASS_LANTERN, CANDELABRUM_OF_INVOCATION, CANDY_BAR, CAN_OF_GREASE, CHEST, CORPSE, CRYSTAL_BALL, DILITHIUM_CRYSTAL, DRUM_OF_EARTHQUAKE, EGG, ELVEN_SHIELD, EUCALYPTUS_LEAF, EXPENSIVE_CAMERA, FIGURINE, FIRE_HORN, FOOD_RATION, FROST_HORN, FUMBLE_BOOTS, GAUNTLETS_OF_FUMBLING, GLOB_OF_BLACK_PUDDING, GLOB_OF_BROWN_PUDDING, GLOB_OF_GRAY_OOZE, GLOB_OF_GREEN_SLIME, GOLD_PIECE, GRAY_DRAGON_SCALES, HEAVY_IRON_BALL, HELM_OF_OPPOSITE_ALIGNMENT, HORN_OF_PLENTY, ICE_BOX, KELP_FROND, LARGE_BOX, LEASH, LENSES, LEVITATION_BOOTS, LOADSTONE, LUCKSTONE, LUMP_OF_ROYAL_JELLY, MAGIC_FLUTE, MAGIC_HARP, MAGIC_LAMP, MAGIC_MARKER, MEAT_RING, OILSKIN_SACK, OIL_LAMP, ORANGE, ORCISH_SHIELD, PEAR, POT_BOOZE, POT_OIL, POT_SICKNESS, POT_WATER, RIN_AGGRAVATE_MONSTER, RIN_HUNGER, RIN_POLYMORPH, RIN_TELEPORTATION, ROCK, SACK, SADDLE, SCR_MAIL, SHIELD_OF_REFLECTION, SLIME_MOLD, SPE_BLANK_PAPER, SPE_NOVEL, SPLINT_MAIL, STATUE, TALLOW_CANDLE, TIN, TINNING_KIT, TOWEL, UNICORN_HORN, WAN_CANCELLATION, WAN_FIRE, WAN_LIGHT, WAN_LIGHTNING, WAN_STASIS, WAN_WISHING, WAX_CANDLE, WORM_TOOTH, YELLOW_DRAGON_SCALES } from './objects.h.js';
+import { AMULET_OF_CHANGE, AMULET_OF_RESTFUL_SLEEP, AMULET_OF_STRANGULATION, AMULET_OF_YENDOR, APPLE, BAG_OF_HOLDING, BAG_OF_TRICKS, BANANA, BELL_OF_OPENING, BLINDFOLD, BOULDER, BRASS_LANTERN, CANDELABRUM_OF_INVOCATION, CANDY_BAR, CAN_OF_GREASE, CHEST, CORPSE, CRYSTAL_BALL, DILITHIUM_CRYSTAL, DRUM_OF_EARTHQUAKE, EGG, ELVEN_SHIELD, EUCALYPTUS_LEAF, EXPENSIVE_CAMERA, FIGURINE, FIRE_HORN, FOOD_RATION, FROST_HORN, FUMBLE_BOOTS, GAUNTLETS_OF_FUMBLING, GLOB_OF_GRAY_OOZE, GOLD_PIECE, HEAVY_IRON_BALL, HELM_OF_OPPOSITE_ALIGNMENT, HORN_OF_PLENTY, ICE_BOX, KELP_FROND, LARGE_BOX, LEASH, LENSES, LEVITATION_BOOTS, LOADSTONE, LUCKSTONE, LUMP_OF_ROYAL_JELLY, MAGIC_FLUTE, MAGIC_HARP, MAGIC_LAMP, MAGIC_MARKER, MEAT_RING, OILSKIN_SACK, OIL_LAMP, ORANGE, ORCISH_SHIELD, PEAR, POT_BOOZE, POT_OIL, POT_SICKNESS, POT_WATER, RIN_AGGRAVATE_MONSTER, RIN_HUNGER, RIN_POLYMORPH, RIN_TELEPORTATION, ROCK, SACK, SADDLE, SCR_MAIL, SHIELD_OF_REFLECTION, SLIME_MOLD, SPE_BLANK_PAPER, SPE_NOVEL, SPLINT_MAIL, STATUE, TALLOW_CANDLE, TIN, TINNING_KIT, TOWEL, UNICORN_HORN, WAN_CANCELLATION, WAN_FIRE, WAN_LIGHT, WAN_LIGHTNING, WAN_STASIS, WAN_WISHING, WAX_CANDLE, WORM_TOOTH } from './objects.h.js';
 import { Doname2, The, Yname2, aobjnam, doname, erosion_matters, makeplural, makesingular, obj_typename, otense, rnd_class, safe_typename, simpleonames, vtense, xname } from './objnam.js';
-import { LOW_PM, NON_PM, NUMMONS, SPECIAL_PM } from './permonst.h.js';
+import { LOW_PM, NON_PM, SPECIAL_PM } from './permonst.h.js';
 import { encumber_msg } from './pickup.js';
 import { You_hear, You_see, Your, impossible, pline, verbalize } from './pline.js';
 import { forget_temple_entry } from './priest.js';
-import { BLINDED, FIRE_RES, HALLUC, HALLUC_RES, I_SPECIAL, W_AMUL, W_ARM, W_ARMC, W_ARMF, W_ARMG, W_ARMH, W_ARMS, W_ARMU, W_BALL, W_CHAIN, W_QUIVER, W_RINGL, W_RINGR, W_SADDLE, W_SWAPWEP, W_TOOL, W_WEP } from './prop.h.js';
+import { FIRE_RES, I_SPECIAL, W_AMUL, W_ARM, W_ARMC, W_ARMF, W_ARMG, W_ARMH, W_ARMOR, W_ARMS, W_ARMU, W_BALL, W_CHAIN, W_QUIVER, W_RING, W_RINGL, W_RINGR, W_SADDLE, W_SWAPWEP, W_TOOL, W_WEAPONS, W_WEP } from './prop.h.js';
 import { assign_candy_wrapper } from './read.js';
 import { ALTAR, ICE, IRONBARS } from './rm.h.js';
 import { rn2, rnd, rne, rnz } from './rnd.js';
 import { genders } from './role.js';
 import { addtobill, alter_cost, billable, costly_adjacent, costly_spot, find_objowner, globby_bill_fixup, obfree, oid_price_adjustment, onshopbill, shop_keeper, splitbill, stolen_value, subfrombill, unpaid_cost } from './shk.js';
-import { P_BOW, P_SHURIKEN } from './skills.h.js';
 import { book_cursed } from './spell.js';
 import { remove_worn_item } from './steal.js';
 import { rloco } from './teleport.js';
@@ -63,17 +68,21 @@ import { attach_egg_hatch_timeout, attach_fig_transform_timeout, obj_split_timer
 import { FIG_TRANSFORM, HATCH_EGG, REVIVE_MON, ROT_CORPSE, SHRINK_GLOB, TIMER_OBJECT, ZOMBIFY_MON } from './timeout.h.js';
 import { tt_oname } from './topten.js';
 import { block_point, recalc_block_point } from './vision.js';
-import { IN_SIGHT, LS_OBJECT } from './vision.h.js';
+import { LS_OBJECT } from './vision.h.js';
+import { cansee } from './vision.macros.js';
 import { setmnotwielded } from './weapon.js';
 import { drop_uswapwep } from './wield.js';
 import { extract_from_minvent } from './worn.js';
 import { PRONOUN_HALLU } from './you.h.js';
+import { Blind, Hallucination } from './youprop.macros.js';
 import { get_obj_location } from './zap.js';
 
 const NOT_ON_ICE = 0;
 const SET_ON_ICE = 1;
 const BURIED_UNDER_ICE = 2;
 const ROT_ICE_ADJUSTMENT = 2;
+const LOWEST_GLOB = 271;
+const HIGHEST_GLOB = 274;
 
 const where_name$unknown = new Int8Array(32);   // static in where_name()
 const sanity_check_worn$wearbits = $c.zeros(18);   // static in sanity_check_worn()
@@ -121,8 +130,8 @@ export async function newomonst(otmp) {   // mkobj.c:114
     if (!otmp.oextra) {
         $t1 = await newoextra(), otmp.oextra = $t1;
     }
-    if (!otmp.oextra.omonst) {
-        m = $c.asRec(await alloc(192), $T.monst, 192);
+    if (!OMONST(otmp)) {
+        m = await newmonst();
         m.$copyFrom(cg.zeromonst);
         otmp.oextra.omonst = m;
     }
@@ -155,43 +164,43 @@ export async function new_omailcmd(otmp, response_cmd) {   // mkobj.c:157
     if (!otmp.oextra) {
         $t1 = await newoextra(), otmp.oextra = $t1;
     }
-    if (otmp.oextra.omailcmd) {
+    if (OMAILCMD(otmp)) {
         free_omailcmd(otmp);
     }
     $t2 = await dupstr(response_cmd), otmp.oextra.omailcmd = $t2;
 }
 export function free_omailcmd(otmp) {   // mkobj.c:167
-    if (otmp.oextra && otmp.oextra.omailcmd) {
+    if (otmp.oextra && OMAILCMD(otmp)) {
         $c.free(otmp.oextra.omailcmd);
         otmp.oextra.omailcmd = null;
     }
 }
 function may_generate_eroded(otmp) {   // mkobj.c:177
     if (svm.moves <= 1 && !gi.in_mklev) {
-        return 0;
+        return FALSE;
     }
-    if (otmp.oerodeproof | 0 || !erosion_matters(otmp) || !((objects[otmp.otyp].oc_material | 0) === IRON || is_flammable(otmp) || is_rottable(otmp) || ((objects[otmp.otyp].oc_material | 0) === COPPER || (objects[otmp.otyp].oc_material | 0) === IRON) || (objects[otmp.otyp].oc_material | 0) === GLASS && otmp.oclass === ARMOR_CLASS)) {
-        return 0;
+    if (otmp.oerodeproof | 0 || !erosion_matters(otmp) || !is_damageable(otmp)) {
+        return FALSE;
     }
     if (otmp.otyp === WORM_TOOTH || otmp.otyp === UNICORN_HORN) {
-        return 0;
+        return FALSE;
     }
     if (otmp.oartifact) {
-        return 0;
+        return FALSE;
     }
-    return 1;
+    return TRUE;
 }
 function mkobj_erosions(otmp) {   // mkobj.c:196
     if (may_generate_eroded(otmp)) {
         if (!rn2(100)) {
             otmp.oerodeproof = (1) & 1;
         } else {
-            if (!rn2(80) && (is_flammable(otmp) || (objects[otmp.otyp].oc_material | 0) === IRON || (objects[otmp.otyp].oc_material | 0) === GLASS && otmp.oclass === ARMOR_CLASS)) {
+            if (!rn2(80) && (is_flammable(otmp) || is_rustprone(otmp) || is_crackable(otmp))) {
                 do {
                     otmp.oeroded = (otmp.oeroded + 1 >>> 0) & 3;
                 } while ((otmp.oeroded | 0) < 3 && !rn2(9));
             }
-            if (!rn2(80) && (is_rottable(otmp) || ((objects[otmp.otyp].oc_material | 0) === COPPER || (objects[otmp.otyp].oc_material | 0) === IRON))) {
+            if (!rn2(80) && (is_rottable(otmp) || is_corrodeable(otmp))) {
                 do {
                     otmp.oeroded2 = (otmp.oeroded2 + 1 >>> 0) & 3;
                 } while ((otmp.oeroded2 | 0) < 3 && !rn2(9));
@@ -225,13 +234,13 @@ export async function mksobj_migr_to_species(otyp, mflags2, init, artif) {   // 
 export async function mkobj(oclass, artif) {   // mkobj.c:270
     let tprob = 0, i = 0, prob = 0, iprobs = null;
     if (oclass === RANDOM_CLASS) {
-        iprobs = (svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? $c.relem(rogueprobs, 0) : In_hell(u.uz) ? $c.relem(hellprobs, 0) : $c.relem(mkobjprobs, 0);
+        iprobs = (svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? $c.relem(rogueprobs, 0) : Inhell() ? $c.relem(hellprobs, 0) : $c.relem(mkobjprobs, 0);
         for (tprob = rnd(100); (tprob = tprob - iprobs.iprob | 0) > 0; iprobs = $c.radd(iprobs, 1)) {
             continue;
         }
         oclass = iprobs.iclass;
     }
-    if (oclass === 0 - SPBOOK_CLASS) {
+    if (oclass === SPBOOK_no_NOVEL) {
         i = rnd_class(svb.bases[SPBOOK_CLASS], SPE_BLANK_PAPER);
         oclass = SPBOOK_CLASS;
     } else {
@@ -245,7 +254,7 @@ export async function mkobj(oclass, artif) {   // mkobj.c:270
         await impossible($c.lit("probtype error, oclass=%d i=%d"), oclass, i);
         i = svb.bases[oclass];
     }
-    return await mksobj(i, 1, artif);
+    return await mksobj(i, TRUE, artif);
 }
 async function mkbox_cnts(box) {   // mkobj.c:304
     let n = 0, otmp = null, tprob = 0, iprobs = null, $t1, $t2, $t3, $t4, $t5, $t6;
@@ -275,7 +284,7 @@ async function mkbox_cnts(box) {   // mkobj.c:304
     }
     for (n = rn2(n + 1 | 0); n > 0; n = n - 1 | 0) {
         if (box.otyp === ICE_BOX) {
-            otmp = await mksobj(CORPSE, 1, 0);
+            otmp = await mksobj(CORPSE, TRUE, FALSE);
             otmp.age = 0;
             if (otmp.timed) {
                 await stop_timer(ROT_CORPSE, obj_to_any(otmp));
@@ -286,7 +295,7 @@ async function mkbox_cnts(box) {   // mkobj.c:304
             iprobs = $c.relem(boxiprobs, 0);
             for (tprob = rnd(100); (tprob = tprob - iprobs.iprob | 0) > 0; iprobs = $c.radd(iprobs, 1)) {
             }
-            if (!(otmp = await mkobj(iprobs.iclass, 0))) {
+            if (!(otmp = await mkobj(iprobs.iclass, FALSE))) {
                 continue;
             }
             if (otmp.oclass === COIN_CLASS) {
@@ -302,7 +311,7 @@ async function mkbox_cnts(box) {   // mkobj.c:304
                 }
             }
             if (box.otyp === BAG_OF_HOLDING) {
-                if (otmp.otyp === BAG_OF_HOLDING || otmp.otyp === BAG_OF_TRICKS) {
+                if (Is_mbag(otmp)) {
                     otmp.otyp = SACK;
                     otmp.spe = 0;
                     $t5 = await weight(otmp) >>> 0, otmp.owt = $t5;
@@ -325,7 +334,7 @@ export async function rndmonnum_adj(minadj, maxadj) {   // mkobj.c:395
     if (ptr) {
         return ptr.pmidx;
     }
-    excludeflags = $c.u16(G_UNIQ | G_NOGEN | (In_hell(u.uz) ? G_NOHELL : G_HELL));
+    excludeflags = $c.u16(G_UNIQ | G_NOGEN | (Inhell() ? G_NOHELL : G_HELL));
     do {
         i = rn2(SPECIAL_PM - LOW_PM) + LOW_PM | 0;
         ptr = $c.relem(mons, i);
@@ -340,11 +349,11 @@ export async function copy_oextra(obj2, obj1) {   // mkobj.c:417
     if (!obj2.oextra) {
         $t1 = await newoextra(), obj2.oextra = $t1;
     }
-    if (obj1.oextra && obj1.oextra.oname) {
+    if (has_oname(obj1)) {
         await oname(obj2, obj1.oextra.oname, ONAME_SKIP_INVUPD);
     }
-    if (obj1.oextra && obj1.oextra.omonst) {
-        if (!obj2.oextra.omonst) {
+    if (has_omonst(obj1)) {
+        if (!OMONST(obj2)) {
             await newomonst(obj2);
         }
         (!(obj2.oextra && obj2.oextra.omonst) ? 1 : 0) ? $c.__assert_rtn($c.lit("copy_oextra"), $c.lit("mkobj.c"), 429, $c.lit("has_omonst(obj2)")) : 0;
@@ -355,11 +364,11 @@ export async function copy_oextra(obj2, obj1) {   // mkobj.c:417
             await copy_mextra(obj2.oextra.omonst, obj1.oextra.omonst);
         }
     }
-    if (obj1.oextra && obj1.oextra.omailcmd) {
+    if (has_omailcmd(obj1)) {
         await new_omailcmd(obj2, obj1.oextra.omailcmd);
     }
-    if (obj1.oextra && obj1.oextra.omid) {
-        if (!obj2.oextra.omid) {
+    if (has_omid(obj1)) {
+        if (!OMID(obj2)) {
             await newomid(obj2);
         }
         obj2.oextra.omid = obj1.oextra.omid;
@@ -370,7 +379,7 @@ export async function splitobj(obj, num) {   // mkobj.c:457
     if (obj.cobj || num <= 0 || obj.quan <= num) {
         await panic($c.lit("splitobj [cobj=%s num=%ld quan=%ld]"), obj.cobj ? $c.lit("non-empty container") : $c.lit("(null)"), num, obj.quan);
     }
-    otmp = $c.asRec(await alloc(112), $T.obj, 112);
+    otmp = await newobj();
     otmp.$copyFrom(obj);
     otmp.oextra = null;
     $t1 = nextoid(obj, otmp), otmp.o_id = $t1;
@@ -396,7 +405,7 @@ export async function splitobj(obj, num) {   // mkobj.c:457
         await splitbill(obj, otmp);
     }
     await copy_oextra(otmp, obj);
-    if (otmp.oextra && otmp.oextra.omid) {
+    if (has_omid(otmp)) {
         free_omid(otmp);
     }
     if (obj.timed) {
@@ -546,21 +555,21 @@ export async function bill_dummy_object(otmp) {   // mkobj.c:712
         cost = await unpaid_cost(otmp, COST_SINGLEOBJ);
         await subfrombill(otmp, await shop_keeper(new $c.Ptr(u.ushops, 0).get(0)));
     }
-    dummy = $c.asRec(await alloc(112), $T.obj, 112);
+    dummy = await newobj();
     dummy.$copyFrom(otmp);
     dummy.oextra = null;
     dummy.where = OBJ_FREE;
     $t1 = nextoid(otmp, dummy), dummy.o_id = $t1;
     dummy.timed = 0;
     await copy_oextra(dummy, otmp);
-    if (dummy.oextra && dummy.oextra.omid) {
+    if (has_omid(dummy)) {
         free_omid(dummy);
     }
-    if (dummy.otyp === TALLOW_CANDLE || dummy.otyp === WAX_CANDLE) {
+    if (Is_candle(dummy)) {
         dummy.lamplit = (0) & 1;
     }
     dummy.owornmask = 0;
-    await addtobill(dummy, 0, 1, 1);
+    await addtobill(dummy, FALSE, TRUE, TRUE);
     if (cost && dummy.where !== OBJ_DELETED) {
         await alter_cost(dummy, $c.neg64(cost));
     }
@@ -577,7 +586,7 @@ export async function costly_alteration(obj, alter_type) {   // mkobj.c:752
     }
     ox[0] = oy[0] = 0;
     objroom = 0;
-    if (obj.where === OBJ_INVENT || obj.where === OBJ_FREE) {
+    if (carried(obj) || obj.where === OBJ_FREE) {
         if (!obj.unpaid) {
             return;
         }
@@ -589,7 +598,7 @@ export async function costly_alteration(obj, alter_type) {   // mkobj.c:752
             return;
         }
         objroom = in_rooms(ox[0], oy[0], SHOPBASE).get(0);
-        if (!await billable(new $c.Ptr(shkp, 0), obj, objroom, 0)) {
+        if (!await billable(new $c.Ptr(shkp, 0), obj, objroom, FALSE)) {
             return;
         }
     }
@@ -620,7 +629,7 @@ export async function costly_alteration(obj, alter_type) {   // mkobj.c:752
                 await verbalize($c.lit("You %s %s, you pay for %s!"), alteration_verbs[alter_type], those, them);
                 await bill_dummy_object(obj);
             } else {
-                await stolen_value(obj, ox[0], oy[0], 0, 0);
+                await stolen_value(obj, ox[0], oy[0], FALSE, FALSE);
             }
             break;
     }
@@ -631,7 +640,7 @@ export function clear_dknown(obj) {   // mkobj.c:835
     if (obj.otyp >= ELVEN_SHIELD && obj.otyp <= ORCISH_SHIELD || obj.otyp === SHIELD_OF_REFLECTION || objects[obj.otyp].oc_merge | 0) {
         obj.dknown = (0) & 1;
     }
-    if (obj.otyp === GLOB_OF_GRAY_OOZE || obj.otyp === GLOB_OF_BROWN_PUDDING || obj.otyp === GLOB_OF_GREEN_SLIME || obj.otyp === GLOB_OF_BLACK_PUDDING) {
+    if (Is_pudding(obj)) {
         obj.dknown = (1) & 1;
     }
 }
@@ -649,7 +658,7 @@ async function mksobj_init(obj, artif) {   // mkobj.c:869
     let_ = objects[otmp.otyp].oc_class;
     switch (let_) {
         case WEAPON_CLASS:
-            $t1 = otmp.oclass === WEAPON_CLASS && objects[otmp.otyp].oc_subtyp >= -P_SHURIKEN && objects[otmp.otyp].oc_subtyp <= -P_BOW ? rn2(6) + 6 | 0 : 1, otmp.quan = $t1;
+            $t1 = is_multigen(otmp) ? rn2(6) + 6 | 0 : 1, otmp.quan = $t1;
             if (!rn2(11)) {
                 $t2 = $c.i8(rne(3)), otmp.spe = $t2;
                 $t3 = rn2(2) >>> 0, otmp.blessed = ($t3) & 1;
@@ -659,11 +668,11 @@ async function mksobj_init(obj, artif) {   // mkobj.c:869
             } else {
                 await blessorcurse(otmp, 10);
             }
-            if ((otmp.oclass === WEAPON_CLASS && objects[otmp.otyp].oc_subtyp >= -P_SHURIKEN && objects[otmp.otyp].oc_subtyp <= -P_BOW || permapoisoned(otmp)) && !rn2(100)) {
+            if (is_poisonable(otmp) && !rn2(100)) {
                 otmp.otrapped = (1) & 1;
             }
             if (artif && !rn2(20 + Math.imul(10, nartifact_exist()) | 0)) {
-                otmp = await mk_artifact(otmp, A_NONE, 99, 1);
+                otmp = await mk_artifact(otmp, A_NONE, 99, TRUE);
                 obj.set(0, otmp);
             }
             break;
@@ -684,7 +693,7 @@ async function mksobj_init(obj, artif) {   // mkobj.c:869
                     if (!rn2(3)) {
                         for (tryct = 200; tryct > 0; tryct = tryct - 1 | 0) {
                             mndx = can_be_hatched(await rndmonnum());
-                            if (mndx !== NON_PM && !dead_species(mndx, 1)) {
+                            if (mndx !== NON_PM && !dead_species(mndx, TRUE)) {
                                 otmp.corpsenm = mndx;
                                 break;
                             }
@@ -709,7 +718,7 @@ async function mksobj_init(obj, artif) {   // mkobj.c:869
                     break;
                 case SLIME_MOLD:
                     otmp.spe = $c.i8(svc.context.current_fruit);
-                    flags.made_fruit = 1;
+                    flags.made_fruit = TRUE;
                     break;
                 case KELP_FROND:
                     $t6 = rnd(2), otmp.quan = $t6;
@@ -720,7 +729,7 @@ async function mksobj_init(obj, artif) {   // mkobj.c:869
                 default:
                     break;
             }
-            if (otmp.otyp === GLOB_OF_GRAY_OOZE || otmp.otyp === GLOB_OF_BROWN_PUDDING || otmp.otyp === GLOB_OF_GREEN_SLIME || otmp.otyp === GLOB_OF_BLACK_PUDDING) {
+            if (Is_pudding(otmp)) {
                 otmp.globby = (1) & 1;
                 otmp.quan = 1;
                 otmp.owt = objects[otmp.otyp].oc_weight;
@@ -799,7 +808,7 @@ async function mksobj_init(obj, artif) {   // mkobj.c:869
                     tryct = 0;
                     do {
                         $t18 = await rndmonnum_adj(5, 10), otmp.corpsenm = $t18;
-                    } while ($c.andu64($c.relem(mons, otmp.corpsenm).mflags2, M2_HUMAN) !== 0 && ($t19 = tryct, tryct = $t19 + 1 | 0, $t19) < 30);
+                    } while (is_human($c.relem(mons, otmp.corpsenm)) && ($t19 = tryct, tryct = $t19 + 1 | 0, $t19) < 30);
                     await blessorcurse(otmp, 4);
                     break;
                 case BELL_OF_OPENING:
@@ -816,7 +825,7 @@ async function mksobj_init(obj, artif) {   // mkobj.c:869
             break;
         case AMULET_CLASS:
             if (otmp.otyp === AMULET_OF_YENDOR) {
-                svc.context.made_amulet = 1;
+                svc.context.made_amulet = TRUE;
             }
             if (rn2(10) && (otmp.otyp === AMULET_OF_STRANGULATION || otmp.otyp === AMULET_OF_CHANGE || otmp.otyp === AMULET_OF_RESTFUL_SLEEP)) {
                 await curse(otmp);
@@ -849,7 +858,7 @@ async function mksobj_init(obj, artif) {   // mkobj.c:869
                 await blessorcurse(otmp, 10);
             }
             if (artif && !rn2(40 + Math.imul(10, nartifact_exist()) | 0)) {
-                otmp = await mk_artifact(otmp, A_NONE, 99, 1);
+                otmp = await mk_artifact(otmp, A_NONE, 99, TRUE);
                 obj.set(0, otmp);
             }
             if (gu.urole.mnum === PM_SAMURAI && otmp.otyp === SPLINT_MAIL && (svm.moves <= 1 || In_quest(u.uz))) {
@@ -890,8 +899,8 @@ async function mksobj_init(obj, artif) {   // mkobj.c:869
         case ROCK_CLASS:
             if (otmp.otyp === STATUE) {
                 $t30 = await rndmonnum(), otmp.corpsenm = $t30;
-                if (!($c.relem(mons, otmp.corpsenm).msize < MZ_SMALL) && rn2($c.div32(await level_difficulty(), 2) + 10 | 0) > 10) {
-                    await add_to_container(otmp, await mkobj(0 - SPBOOK_CLASS, 0));
+                if (!verysmall($c.relem(mons, otmp.corpsenm)) && rn2($c.div32(await level_difficulty(), 2) + 10 | 0) > 10) {
+                    await add_to_container(otmp, await mkobj(SPBOOK_no_NOVEL, FALSE));
                 }
             }
             break;
@@ -908,7 +917,7 @@ async function mksobj_init(obj, artif) {   // mkobj.c:869
 export async function mksobj(otyp, init, artif) {   // mkobj.c:1179
     let otmp = [null], let_ = 0, ptr = null, $t1, $t2, $t3, $t4, $t5;
     let_ = objects[otyp].oc_class;
-    otmp[0] = $c.asRec(await alloc(112), $T.obj, 112);
+    otmp[0] = await newobj();
     otmp[0].$copyFrom(cg.zeroobj);
     otmp[0].age = svm.moves > 1 ? svm.moves : 1;
     $t1 = next_ident(), otmp[0].o_id = $t1;
@@ -927,7 +936,7 @@ export async function mksobj(otyp, init, artif) {   // mkobj.c:1179
         case CORPSE:
             if (otmp[0].corpsenm === NON_PM) {
                 $t2 = undead_to_corpse(await rndmonnum()), otmp[0].corpsenm = $t2;
-                if (svm.mvitals[otmp[0].corpsenm].mvflags & (G_NOCORPSE | (G_GENOD | G_EXTINCT))) {
+                if (svm.mvitals[otmp[0].corpsenm].mvflags & (G_NOCORPSE | G_GONE)) {
                     otmp[0].corpsenm = gu.urole.mnum;
                 }
             }
@@ -938,7 +947,7 @@ export async function mksobj(otyp, init, artif) {   // mkobj.c:1179
             }
             if (otmp[0].corpsenm !== NON_PM) {
                 ptr = $c.relem(mons, otmp[0].corpsenm);
-                $t4 = $c.i8($c.andu64(ptr.mflags2, M2_NEUTER) !== 0 ? CORPSTAT_NEUTER : $c.andu64(ptr.mflags2, M2_FEMALE) !== 0 ? CORPSTAT_FEMALE : $c.andu64(ptr.mflags2, M2_MALE) !== 0 ? CORPSTAT_MALE : rn2(2) ? CORPSTAT_FEMALE : CORPSTAT_MALE), otmp[0].spe = $t4;
+                $t4 = $c.i8(is_neuter(ptr) ? CORPSTAT_NEUTER : is_female(ptr) ? CORPSTAT_FEMALE : is_male(ptr) ? CORPSTAT_MALE : rn2(2) ? CORPSTAT_FEMALE : CORPSTAT_MALE), otmp[0].spe = $t4;
             }
         case EGG:
             await set_corpsenm(otmp[0], otmp[0].corpsenm);
@@ -960,7 +969,7 @@ export async function mksobj(otyp, init, artif) {   // mkobj.c:1179
             break;
     }
     if (objects[otyp].oc_unique | 0 && !otmp[0].oartifact) {
-        otmp[0] = await mk_artifact(otmp[0], A_NONE, 99, 0);
+        otmp[0] = await mk_artifact(otmp[0], A_NONE, 99, FALSE);
     }
     $t5 = await weight(otmp[0]) >>> 0, otmp[0].owt = $t5;
     return otmp[0];
@@ -981,14 +990,14 @@ export function stone_furniture_type(mappearance) {   // mkobj.c:1276
         case S_altar:
         case S_throne:
         case S_sink:
-            return 1;
+            return TRUE;
         default:
             if (sym >= S_vwall && sym <= S_trwall) {
-                return 1;
+                return TRUE;
             }
             break;
     }
-    return 0;
+    return FALSE;
 }
 export async function set_corpsenm(obj, id) {   // mkobj.c:1318
     let old_id = 0, when = 0, $t1, $t2, $t3;
@@ -1012,13 +1021,13 @@ export async function set_corpsenm(obj, id) {   // mkobj.c:1318
             $t1 = await weight(obj) >>> 0, obj.owt = $t1;
             break;
         case FIGURINE:
-            if (obj.corpsenm !== NON_PM && !dead_species(obj.corpsenm, 1) && (obj.where === OBJ_INVENT || obj.where === OBJ_MINVENT)) {
+            if (obj.corpsenm !== NON_PM && !dead_species(obj.corpsenm, TRUE) && (carried(obj) || mcarried(obj))) {
                 await attach_fig_transform_timeout(obj);
             }
             $t2 = await weight(obj) >>> 0, obj.owt = $t2;
             break;
         case EGG:
-            if (obj.corpsenm !== NON_PM && !dead_species(obj.corpsenm, 1)) {
+            if (obj.corpsenm !== NON_PM && !dead_species(obj.corpsenm, TRUE)) {
                 await attach_egg_hatch_timeout(obj, when);
             }
             break;
@@ -1051,9 +1060,9 @@ export async function start_corpse_timeout(body) {   // mkobj.c:1389
         when = $c.sub64(ROT_AGE, age);
     }
     when = $c.add64(when, rnz(rot_adjust) - rot_adjust | 0);
-    if ($c.peq($c.relem(mons, body.corpsenm), $c.relem(mons, PM_DEATH)) || $c.peq($c.relem(mons, body.corpsenm), $c.relem(mons, PM_FAMINE)) || $c.peq($c.relem(mons, body.corpsenm), $c.relem(mons, PM_PESTILENCE))) {
+    if (is_rider($c.relem(mons, body.corpsenm))) {
         action = REVIVE_MON;
-        when = rider_revival_time(body, 0);
+        when = rider_revival_time(body, FALSE);
     } else if (mons[body.corpsenm].mlet === S_TROLL) {
         for (age = 2; age <= TAINT_AGE; age = $c.add64(age, 1)) {
             if (!rn2(37)) {
@@ -1110,9 +1119,9 @@ export async function shrink_glob(arg, expire_time) {   // mkobj.c:1500
     obj = arg.a_obj;
     globloc = item_on_ice(obj);
     ininv = $c.i8(obj.where === OBJ_INVENT ? 1 : 0);
-    shrink = 0;
-    gone = 0;
-    updinv = 0;
+    shrink = FALSE;
+    gone = FALSE;
+    updinv = FALSE;
     contnr = obj.where === OBJ_CONTAINED ? obj.v.v_ocontainer : null;
     topcontnr = null;
     old_top_owt = 0;
@@ -1143,9 +1152,9 @@ export async function shrink_glob(arg, expire_time) {   // mkobj.c:1500
         await start_glob_timeout(obj, 0);
         return;
     }
-    iflags.partly_eaten_hack = 1;
+    iflags.partly_eaten_hack = TRUE;
     $c.__builtin___strcpy_chk(new $c.Ptr(globnambuf, 0), await Yname2(obj), 256);
-    iflags.partly_eaten_hack = 0;
+    iflags.partly_eaten_hack = FALSE;
     if (obj.owt > 0) {
         basewt = objects[obj.otyp].oc_weight;
         msgwt = $c.divu32((basewt > 1 ? basewt : 1) + 1 >>> 0, 2);
@@ -1160,7 +1169,7 @@ export async function shrink_glob(arg, expire_time) {   // mkobj.c:1500
         if (shrink || gone) {
             await pline($c.lit("%s %s."), new $c.Ptr(globnambuf, 0), gone ? $c.lit("dissolves completely") : $c.lit("shrinks"));
         }
-        updinv = 1;
+        updinv = TRUE;
     } else if (contnr) {
         topcontnr = contnr;
         while (topcontnr.where === OBJ_CONTAINED) {
@@ -1172,13 +1181,13 @@ export async function shrink_glob(arg, expire_time) {   // mkobj.c:1500
             if (gone || shrink && topcontnr.owt !== old_top_owt || near_capacity() !== go.oldcap) {
                 await pline($c.lit("%s %s%s lighter."), await Yname2(topcontnr), topcontnr.owt !== old_top_owt ? $c.lit("becomes") : $c.lit("seems"), !gone ? $c.lit(" slightly") : $c.lit(""));
             }
-            updinv = 1;
+            updinv = TRUE;
         }
     }
     if (gone) {
         ox[0] = 0;
         oy[0] = 0;
-        seeit = $c.i8(obj.where === OBJ_FLOOR && get_obj_location(obj, new $c.Ptr(ox, 0), new $c.Ptr(oy, 0), 0) && (gv.viz_array.get(oy[0]).get(ox[0]) & IN_SIGHT) !== 0 ? 1 : 0);
+        seeit = $c.i8(obj.where === OBJ_FLOOR && get_obj_location(obj, new $c.Ptr(ox, 0), new $c.Ptr(oy, 0), 0) && cansee(ox[0], oy[0]) ? 1 : 0);
         await shrinking_glob_gone(obj);
         if (seeit) {
             await newsym(ox[0], oy[0]);
@@ -1200,7 +1209,7 @@ async function shrinking_glob_gone(obj) {   // mkobj.c:1673
     owhere = $c.i16(obj.where);
     if (owhere === OBJ_INVENT) {
         if (obj.owornmask) {
-            await remove_worn_item(obj, 0);
+            await remove_worn_item(obj, FALSE);
             await stop_occupation();
         }
         await useupall(obj);
@@ -1225,11 +1234,11 @@ export async function maybe_adjust_light(obj, old_range) {   // mkobj.c:1704
     delta = new_range - old_range | 0;
     if (delta) {
         await obj_adjust_light_radius(obj, new_range);
-        if (!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked) && get_obj_location(obj, new $c.Ptr(ox, 0), new $c.Ptr(oy, 0), 0)) {
+        if (!Blind() && get_obj_location(obj, new $c.Ptr(ox, 0), new $c.Ptr(oy, 0), 0)) {
             new $c.Ptr(buf, 0).set(0, 0);
             if (iflags.last_msg === PLNMSG_OBJ_GLOWS) {
                 $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), obj.quan === 1 ? $c.lit("It") : $c.lit("They"), 256);
-            } else if (obj.where === OBJ_INVENT || (gv.viz_array.get(oy[0]).get(ox[0]) & IN_SIGHT) !== 0) {
+            } else if (carried(obj) || cansee(ox[0], oy[0])) {
                 $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), await Yname2(obj), 256);
             }
             if (new $c.Ptr(buf, 0).get(0)) {
@@ -1249,7 +1258,7 @@ export async function bless(otmp) {   // mkobj.c:1745
     }
     otmp.cursed = (0) & 1;
     otmp.blessed = (1) & 1;
-    if (otmp.where === OBJ_INVENT && confers_luck(otmp)) {
+    if (carried(otmp) && confers_luck(otmp)) {
         set_moreluck();
     } else if (otmp.otyp === BAG_OF_HOLDING) {
         $t1 = await weight(otmp) >>> 0, otmp.owt = $t1;
@@ -1268,7 +1277,7 @@ export async function unbless(otmp) {   // mkobj.c:1767
         old_light = arti_light_radius(otmp);
     }
     otmp.blessed = (0) & 1;
-    if (otmp.where === OBJ_INVENT && confers_luck(otmp)) {
+    if (carried(otmp) && confers_luck(otmp)) {
         set_moreluck();
     } else if (otmp.otyp === BAG_OF_HOLDING) {
         $t1 = await weight(otmp) >>> 0, otmp.owt = $t1;
@@ -1289,18 +1298,18 @@ export async function curse(otmp) {   // mkobj.c:1783
     already_cursed = otmp.cursed;
     otmp.blessed = (0) & 1;
     otmp.cursed = (1) & 1;
-    if ($c.peq(otmp, $G.uwep) && (($G.uwep.oclass === WEAPON_CLASS || $G.uwep.oclass === TOOL_CLASS) && objects[$G.uwep.otyp].oc_big | 0)) {
+    if ($c.peq(otmp, $G.uwep) && bimanual($G.uwep)) {
         reset_remarm();
     }
     if ($c.peq(otmp, $G.uswapwep) && u.twoweap) {
         await drop_uswapwep();
     }
-    if (otmp.where === OBJ_INVENT && confers_luck(otmp)) {
+    if (carried(otmp) && confers_luck(otmp)) {
         set_moreluck();
     } else if (otmp.otyp === BAG_OF_HOLDING) {
         $t1 = await weight(otmp) >>> 0, otmp.owt = $t1;
     } else if (otmp.otyp === FIGURINE) {
-        if (otmp.corpsenm !== NON_PM && !dead_species(otmp.corpsenm, 1) && (otmp.where === OBJ_INVENT || otmp.where === OBJ_MINVENT)) {
+        if (otmp.corpsenm !== NON_PM && !dead_species(otmp.corpsenm, TRUE) && (carried(otmp) || mcarried(otmp))) {
             await attach_fig_transform_timeout(otmp);
         }
     } else if (otmp.oclass === SPBOOK_CLASS) {
@@ -1320,7 +1329,7 @@ export async function uncurse(otmp) {   // mkobj.c:1822
         old_light = arti_light_radius(otmp);
     }
     otmp.cursed = (0) & 1;
-    if (otmp.where === OBJ_INVENT && confers_luck(otmp)) {
+    if (carried(otmp) && confers_luck(otmp)) {
         set_moreluck();
     } else if (otmp.otyp === BAG_OF_HOLDING) {
         $t1 = await weight(otmp) >>> 0, otmp.owt = $t1;
@@ -1366,8 +1375,8 @@ export async function weight(obj) {   // mkobj.c:1888
     if (obj.globby) {
         return obj.owt | 0;
     }
-    if (obj.otyp >= LARGE_BOX && obj.otyp <= BAG_OF_TRICKS || obj.otyp === STATUE) {
-        if (obj.otyp === STATUE && (obj.corpsenm >= LOW_PM && obj.corpsenm < NUMMONS)) {
+    if (Is_container(obj) || obj.otyp === STATUE) {
+        if (obj.otyp === STATUE && ismnum(obj.corpsenm)) {
             msize = mons[obj.corpsenm].msize;
             minwt = Math.imul((msize + msize | 0) + 1 | 0, 100);
             wt = $c.div32(Math.imul(3, mons[obj.corpsenm].cwt | 0), 2);
@@ -1385,7 +1394,7 @@ export async function weight(obj) {   // mkobj.c:1888
         }
         return wt + cwt | 0;
     }
-    if (obj.otyp === CORPSE && (obj.corpsenm >= LOW_PM && obj.corpsenm < NUMMONS)) {
+    if (obj.otyp === CORPSE && ismnum(obj.corpsenm)) {
         long_wt = $c.mul64(obj.quan, mons[obj.corpsenm].cwt);
         wt = long_wt > LARGEST_INT ? LARGEST_INT : $c.i32(long_wt);
         if (obj.oeaten) {
@@ -1405,16 +1414,16 @@ export async function weight(obj) {   // mkobj.c:1888
     return wt ? Math.imul(wt, $c.i32(obj.quan)) : ($c.i32(obj.quan) + 1 | 0) >> 1;
 }
 export async function rnd_treefruit_at(x, y) {   // mkobj.c:1984
-    return await mksobj_at(treefruits[rn2(5)], x, y, 1, 0);
+    return await mksobj_at(treefruits[rn2(5)], x, y, TRUE, FALSE);
 }
 export function is_treefruit(otmp) {   // mkobj.c:1991
     let fruitidx = 0;
     for (fruitidx = 0; fruitidx < 5; fruitidx = fruitidx + 1 | 0) {
         if (treefruits[fruitidx] === otmp.otyp) {
-            return 1;
+            return TRUE;
         }
     }
-    return 0;
+    return FALSE;
 }
 export async function mkgold(amount, x, y) {   // mkobj.c:2003
     let gold = null, mul = 0, $t1;
@@ -1426,7 +1435,7 @@ export async function mkgold(amount, x, y) {   // mkobj.c:2003
     if (gold) {
         gold.quan = $c.add64(gold.quan, amount);
     } else {
-        gold = await mksobj_at(GOLD_PIECE, x, y, 1, 0);
+        gold = await mksobj_at(GOLD_PIECE, x, y, TRUE, FALSE);
         gold.quan = amount;
     }
     $t1 = await weight(gold) >>> 0, gold.owt = $t1;
@@ -1455,10 +1464,10 @@ export async function mkcorpstat(objtype, mtmp, ptr, x, y, corpstatflags) {   //
         await impossible($c.lit("making corpstat type %d"), objtype);
     }
     if (x === 0 && y === 0) {
-        otmp = await mksobj(objtype, init, 0);
+        otmp = await mksobj(objtype, init, FALSE);
         await rloco(otmp);
     } else {
-        otmp = await mksobj_at(objtype, x, y, init, 0);
+        otmp = await mksobj_at(objtype, x, y, init, FALSE);
     }
     otmp.spe = $c.i8((corpstatflags & CORPSTAT_SPE_VAL) >>> 0);
     otmp.oeroded2 = (gm.mkcorpstat_norevive >>> 0) & 3;
@@ -1467,7 +1476,7 @@ export async function mkcorpstat(objtype, mtmp, ptr, x, y, corpstatflags) {   //
         if (!ptr) {
             ptr = mtmp.data;
         }
-        if (mtmp.mcan | 0 && !($c.peq(ptr, $c.relem(mons, PM_DEATH)) || $c.peq(ptr, $c.relem(mons, PM_FAMINE)) || $c.peq(ptr, $c.relem(mons, PM_PESTILENCE)))) {
+        if (mtmp.mcan | 0 && !is_rider(ptr)) {
             otmp.oeroded2 = (1) & 3;
         }
     }
@@ -1485,7 +1494,7 @@ export async function mkcorpstat(objtype, mtmp, ptr, x, y, corpstatflags) {   //
 export async function corpse_revive_type(obj) {   // mkobj.c:2129
     let revivetype = 0, mtmp = null;
     revivetype = obj.corpsenm;
-    if (obj.oextra && obj.oextra.omonst && (mtmp = await get_mtraits(obj, 0)) !== null) {
+    if (has_omonst(obj) && (mtmp = await get_mtraits(obj, FALSE)) !== null) {
         revivetype = mtmp.mnum;
     }
     return revivetype;
@@ -1503,10 +1512,10 @@ async function save_mtraits(obj, mtmp) {   // mkobj.c:2157
     if (mtmp.ispriest) {
         await forget_temple_entry(mtmp);
     }
-    if (!(obj.oextra && obj.oextra.omonst)) {
+    if (!has_omonst(obj)) {
         await newomonst(obj);
     }
-    if (obj.oextra && obj.oextra.omonst) {
+    if (has_omonst(obj)) {
         baselevel = mtmp.data.mlevel;
         mtmp2 = obj.oextra.omonst;
         mtmp2.$copyFrom(mtmp);
@@ -1515,7 +1524,7 @@ async function save_mtraits(obj, mtmp) {   // mkobj.c:2157
         mtmp2.nmon = null;
         mtmp2.data = null;
         mtmp2.minvent = null;
-        mtmp2.mw = null;
+        MON_NOWEP(mtmp2);
         if (mtmp.mextra) {
             await copy_mextra(mtmp2, mtmp);
         }
@@ -1537,12 +1546,12 @@ export async function get_mtraits(obj, copyof) {   // mkobj.c:2201
     let mtmp = null, mnew = null;
     mtmp = null;
     mnew = null;
-    if (obj.oextra && obj.oextra.omonst) {
+    if (has_omonst(obj)) {
         mtmp = obj.oextra.omonst;
     }
     if (mtmp) {
         if (copyof) {
-            mnew = $c.asRec(await alloc(192), $T.monst, 192);
+            mnew = await newmonst();
             mnew.$copyFrom(mtmp);
             mnew.mextra = null;
             if (mtmp.mextra) {
@@ -1558,7 +1567,7 @@ export async function get_mtraits(obj, copyof) {   // mkobj.c:2201
 export async function mk_tt_object(objtype, x, y) {   // mkobj.c:2227
     let otmp = null, initialize_it = 0, pm = 0;
     initialize_it = $c.i8(objtype !== STATUE ? 1 : 0);
-    otmp = await mksobj_at(objtype, x, y, initialize_it, 0);
+    otmp = await mksobj_at(objtype, x, y, initialize_it, FALSE);
     if (!await tt_oname(otmp)) {
         pm = rn2(PM_WIZARD - PM_ARCHEOLOGIST + 1) + PM_ARCHEOLOGIST | 0;
         await set_corpsenm(otmp, pm);
@@ -1578,11 +1587,11 @@ export function is_flammable(otmp) {   // mkobj.c:2270
     let otyp = 0, omat = 0;
     otyp = otmp.otyp;
     omat = objects[otyp].oc_material | 0;
-    if (otmp.otyp === TALLOW_CANDLE || otmp.otyp === WAX_CANDLE) {
-        return 0;
+    if (Is_candle(otmp)) {
+        return FALSE;
     }
     if (objects[otyp].oc_oprop === FIRE_RES || otyp === WAN_FIRE) {
-        return 0;
+        return FALSE;
     }
     return $c.i8(omat <= WOOD && omat !== LIQUID || omat === PLASTIC ? 1 : 0);
 }
@@ -1669,14 +1678,14 @@ export async function peek_at_iced_corpse_age(otmp) {   // mkobj.c:2423
         age = $c.sub64(svm.moves, otmp.age);
         retval = $c.add64(retval, $c.div64($c.mul64(age, ROT_ICE_ADJUSTMENT - 1), ROT_ICE_ADJUSTMENT));
         do {
-            if (debugcore($c.lit("mkobj.c"), 1)) {
+            if (debugcore($c.lit("mkobj.c"), TRUE)) {
                 save_plnmsg = iflags.last_msg;
                 await pline($c.lit("The %s age has ice modifications: otmp->age = %ld, returning %ld."), s_suffix(await doname(otmp)), otmp.age, retval);
                 iflags.last_msg = save_plnmsg;
             }
         } while (0);
         do {
-            if (debugcore($c.lit("mkobj.c"), 1)) {
+            if (debugcore($c.lit("mkobj.c"), TRUE)) {
                 save_plnmsg$2 = iflags.last_msg;
                 await pline($c.lit("Effective age of corpse: %ld."), $c.sub64(svm.moves, retval));
                 iflags.last_msg = save_plnmsg$2;
@@ -1689,7 +1698,7 @@ async function obj_timer_checks(otmp, x, y, force) {   // mkobj.c:2440
     let tleft = 0, action = 0, restart_timer = 0, on_floor = 0, buried = 0, age = 0, save_plnmsg = 0, age$2 = 0, save_plnmsg$2 = 0;
     tleft = 0;
     action = ROT_CORPSE;
-    restart_timer = 0;
+    restart_timer = FALSE;
     on_floor = $c.i8(otmp.where === OBJ_FLOOR ? 1 : 0);
     buried = $c.i8(otmp.where === OBJ_BURIED ? 1 : 0);
     if (otmp.otyp === CORPSE && (on_floor || buried) && is_ice(x, y)) {
@@ -1701,14 +1710,14 @@ async function obj_timer_checks(otmp, x, y, force) {   // mkobj.c:2440
         if (tleft !== 0) {
             otmp.recharged = (1) & 7;
             do {
-                if (debugcore($c.lit("mkobj.c"), 1)) {
+                if (debugcore($c.lit("mkobj.c"), TRUE)) {
                     save_plnmsg = iflags.last_msg;
                     await pline($c.lit("%s is now on ice at <%d,%d>."), await The(await xname(otmp)), x, y);
                     iflags.last_msg = save_plnmsg;
                 }
             } while (0);
             tleft = $c.mul64(tleft, ROT_ICE_ADJUSTMENT);
-            restart_timer = 1;
+            restart_timer = TRUE;
             age = $c.sub64(svm.moves, otmp.age);
             otmp.age = $c.sub64(svm.moves, $c.mul64(age, ROT_ICE_ADJUSTMENT));
         }
@@ -1721,14 +1730,14 @@ async function obj_timer_checks(otmp, x, y, force) {   // mkobj.c:2440
         if (tleft !== 0) {
             otmp.recharged = (0) & 7;
             do {
-                if (debugcore($c.lit("mkobj.c"), 1)) {
+                if (debugcore($c.lit("mkobj.c"), TRUE)) {
                     save_plnmsg$2 = iflags.last_msg;
                     await pline($c.lit("%s is no longer on ice at <%d,%d>."), await The(await xname(otmp)), x, y);
                     iflags.last_msg = save_plnmsg$2;
                 }
             } while (0);
             tleft = $c.div64(tleft, ROT_ICE_ADJUSTMENT);
-            restart_timer = 1;
+            restart_timer = TRUE;
             age$2 = $c.sub64(svm.moves, otmp.age);
             otmp.age = $c.add64(otmp.age, $c.div64($c.mul64(age$2, ROT_ICE_ADJUSTMENT - 1), ROT_ICE_ADJUSTMENT));
         }
@@ -1756,9 +1765,9 @@ export async function remove_object(otmp) {   // mkobj.c:2508
 export async function discard_minvent(mtmp, uncreate_artifacts) {   // mkobj.c:2525
     let otmp = null;
     while ((otmp = mtmp.minvent) !== null) {
-        await extract_from_minvent(mtmp, otmp, 1, 1);
+        await extract_from_minvent(mtmp, otmp, TRUE, TRUE);
         if (uncreate_artifacts && otmp.oartifact) {
-            await artifact_exists(otmp, safe_oname(otmp), 0, ONAME_NO_FLAGS);
+            await artifact_exists(otmp, safe_oname(otmp), FALSE, ONAME_NO_FLAGS);
         }
         await obfree(otmp, null);
     }
@@ -1880,7 +1889,7 @@ export async function add_to_migration(obj) {   // mkobj.c:2698
         await impossible($c.lit("unpaid object migrating to another level? [%s]"), await simpleonames(obj));
     }
     obj.no_charge = (0) & 1;
-    if (obj.otyp >= LARGE_BOX && obj.otyp <= BAG_OF_TRICKS) {
+    if (Is_container(obj)) {
         maybe_reset_pick(obj);
     }
     obj.where = OBJ_MIGRATING;
@@ -1990,7 +1999,7 @@ export async function hornoplenty(horn, tipping, targetbox) {   // mkobj.c:2847
     } else {
         await consume_obj_charge(horn, $c.i8(!tipping ? 1 : 0));
         if (!rn2(13)) {
-            obj = await mkobj(POTION_CLASS, 0);
+            obj = await mkobj(POTION_CLASS, FALSE);
             if (objects[obj.otyp].oc_magic) {
                 do {
                     $t1 = $c.i16(rnd_class(POT_BOOZE, POT_WATER)), obj.otyp = $t1;
@@ -2001,7 +2010,7 @@ export async function hornoplenty(horn, tipping, targetbox) {   // mkobj.c:2847
             }
             what = obj.quan > 1 ? $c.lit("Some potions") : $c.lit("A potion");
         } else {
-            obj = await mkobj(FOOD_CLASS, 0);
+            obj = await mkobj(FOOD_CLASS, FALSE);
             if (obj.otyp === FOOD_RATION && !rn2(7)) {
                 obj.otyp = LUMP_OF_ROYAL_JELLY;
             }
@@ -2013,22 +2022,22 @@ export async function hornoplenty(horn, tipping, targetbox) {   // mkobj.c:2847
         obj.cursed = (horn.cursed) & 1;
         $t2 = await weight(obj) >>> 0, obj.owt = $t2;
         if (horn.unpaid) {
-            await addtobill(obj, 0, 0, tipping);
+            await addtobill(obj, FALSE, FALSE, tipping);
         }
         iflags.suppress_price = iflags.suppress_price + 1 | 0;
         if (!tipping) {
             obj = await hold_another_object(obj, u.uswallow | 0 ? $c.lit("Oops!  %s out of your reach!") : (svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) || svl.level.locations[u.ux][u.uy].typ < IRONBARS || svl.level.locations[u.ux][u.uy].typ >= ICE ? $c.lit("Oops!  %s away from you!") : $c.lit("Oops!  %s to the floor!"), await The(await aobjnam(obj, $c.lit("slip"))), null);
-            obj;
+            nhUse(obj);
         } else if (targetbox) {
             await add_to_container(targetbox, obj);
             $t3 = await weight(targetbox) >>> 0, targetbox.owt = $t3;
-            if (targetbox.where === OBJ_INVENT) {
+            if (carried(targetbox)) {
                 await encumber_msg();
                 await update_inventory();
             }
         } else {
-            if (!can_reach_floor(1)) {
-                await hitfloor(obj, 1);
+            if (!can_reach_floor(TRUE)) {
+                await hitfloor(obj, TRUE);
             } else {
                 if (svl.level.locations[u.ux][u.uy].typ === ALTAR) {
                     await doaltarobj(obj);
@@ -2040,7 +2049,7 @@ export async function hornoplenty(horn, tipping, targetbox) {   // mkobj.c:2847
         }
         iflags.suppress_price = iflags.suppress_price - 1 | 0;
         if (horn.dknown) {
-            await discover_object(HORN_OF_PLENTY, 1, 1, 1);
+            await discover_object(HORN_OF_PLENTY, TRUE, TRUE, TRUE);
         }
     }
     return objcount;
@@ -2103,7 +2112,7 @@ async function objlist_sanity(objlist, wheretype, mesg) {   // mkobj.c:3032
             $c.__builtin___sprintf_chk(new $c.Ptr(lostbuf, 0), 0, 40, $c.lit("how_lost=%d obj in inventory!"), obj.how_lost | 0);
             await insane_object(obj, new $c.Ptr(ofmt0, 0), new $c.Ptr(lostbuf, 0), null);
         }
-        if (obj.cobj !== null) {
+        if (Has_contents(obj)) {
             if (wheretype === OBJ_ONBILL) {
                 await insane_object(obj, $c.lit("%s obj contains something! %s %s: %s"), mesg, null);
             }
@@ -2113,7 +2122,7 @@ async function objlist_sanity(objlist, wheretype, mesg) {   // mkobj.c:3032
             await shop_obj_sanity(obj, mesg);
         }
         if (obj.owornmask) {
-            bc_ok = 0;
+            bc_ok = FALSE;
             switch (obj.where) {
                 case OBJ_INVENT:
                 case OBJ_MINVENT:
@@ -2122,7 +2131,7 @@ async function objlist_sanity(objlist, wheretype, mesg) {   // mkobj.c:3032
                 case OBJ_MIGRATING:
                     break;
                 case OBJ_FLOOR:
-                    bc_ok = 1;
+                    bc_ok = TRUE;
                 default:
                     if (!$c.peq(obj, $G.uchain) && !$c.peq(obj, $G.uball) || !bc_ok) {
                         $c.__builtin___sprintf_chk(new $c.Ptr(maskbuf, 0), 0, 40, $c.lit("worn mask 0x%08lx"), obj.owornmask);
@@ -2185,7 +2194,7 @@ async function shop_obj_sanity(obj, mesg) {   // mkobj.c:3134
             why = $c.lit("%s unpaid obj not inside tended shop! %s %s: %s");
         } else if (!shkp) {
             why = $c.lit("%s unpaid obj inside untended shop! %s %s: %s");
-        } else if (!await onshopbill(obj, shkp, 1)) {
+        } else if (!await onshopbill(obj, shkp, TRUE)) {
             why = $c.lit("%s unpaid obj not on shop bill! %s %s: %s");
         }
     } else if (obj.no_charge) {
@@ -2195,24 +2204,24 @@ async function shop_obj_sanity(obj, mesg) {   // mkobj.c:3134
             why = $c.lit("%s no_charge obj not inside tended shop! %s %s: %s");
         } else if (!shkp) {
             why = $c.lit("%s no_charge obj inside untended shop! %s %s: %s");
-        } else if (await onshopbill(obj, shkp, 1)) {
+        } else if (await onshopbill(obj, shkp, TRUE)) {
             why = $c.lit("%s no_charge obj on shop bill! %s %s: %s");
         }
     }
     if (why) {
-        await insane_object(obj, why, mesg, otop.where === OBJ_MINVENT ? otop.v.v_ocarry : null);
+        await insane_object(obj, why, mesg, mcarried(otop) ? otop.v.v_ocarry : null);
     }
     return;
 }
 async function mon_obj_sanity(monlist, mesg) {   // mkobj.c:3204
     let mon = null, obj = null, mwep = null;
     for (mon = monlist; mon; mon = mon.nmon) {
-        if (mon.mhp < 1) {
+        if (DEADMONSTER(mon)) {
             continue;
         }
         mwep = mon.mw;
         if (mwep) {
-            if (!(mwep.where === OBJ_MINVENT)) {
+            if (!mcarried(mwep)) {
                 await insane_object(mwep, new $c.Ptr(mfmt1, 0), mesg, mon);
             }
             if (!$c.peq(mwep.v.v_ocarry, mon)) {
@@ -2260,10 +2269,10 @@ async function insane_obj_bits(obj, mon) {   // mkobj.c:3249
     }
 }
 function nomerge_exception(obj) {   // mkobj.c:3278
-    if (obj.o_id === svc.context.achieveo.mines_prize_oid || obj.o_id === svc.context.achieveo.soko_prize_oid) {
-        return 1;
+    if (is_mines_prize(obj) || is_soko_prize(obj)) {
+        return TRUE;
     }
-    return 0;
+    return FALSE;
 }
 function where_name(obj) {   // mkobj.c:3296
     let where = 0;
@@ -2288,7 +2297,7 @@ async function insane_object(obj, fmt, mesg, mon) {   // mkobj.c:3314
     if (mon || strstri(mesg, $c.lit("minvent")) && !strstri(mesg, $c.lit("contained"))) {
         $c.__builtin___strcat_chk($c.__builtin___strcpy_chk(new $c.Ptr(altfmt, 0), fmt, 256), $c.lit(" held by mon %s (%s)"), -1);
         if (mon) {
-            monnm = await x_monnam(mon, ARTICLE_A, null, EXACT_NAME, 1);
+            monnm = await x_monnam(mon, ARTICLE_A, null, EXACT_NAME, TRUE);
         }
         await impossible(new $c.Ptr(altfmt, 0), mesg, fmt_ptr(obj), where_name(obj), objnm, fmt_ptr(mon), monnm);
     } else {
@@ -2317,7 +2326,7 @@ export function init_dummyobj(obj, otyp, oquan) {   // mkobj.c:3347
 }
 async function check_contained(container, mesg) {   // mkobj.c:3374
     let obj = null, mesgbuf = new Int8Array(40), nestedmesg = new Int8Array(120);
-    if (!(container.cobj !== null)) {
+    if (!Has_contents(container)) {
         return;
     }
     if (!strstri(mesg, $c.lit("contained"))) {
@@ -2335,7 +2344,7 @@ async function check_contained(container, mesg) {   // mkobj.c:3374
         if (obj.globby) {
             await check_glob(obj, mesg);
         }
-        if (obj.cobj !== null) {
+        if (Has_contents(obj)) {
             if ($c.peq(obj.cobj, container)) {
                 await panic($c.lit("failed sanity check: container holds its parent"));
             }
@@ -2347,7 +2356,7 @@ async function check_contained(container, mesg) {   // mkobj.c:3374
 }
 async function check_glob(obj, mesg) {   // mkobj.c:3420
     let mesgbuf = new Int8Array(256), globbuf = new Int8Array(128);
-    if (obj.quan !== 1 || obj.owt === 0 || obj.otyp < GLOB_OF_GRAY_OOZE || obj.otyp > GLOB_OF_BLACK_PUDDING) {
+    if (obj.quan !== 1 || obj.owt === 0 || obj.otyp < LOWEST_GLOB || obj.otyp > HIGHEST_GLOB) {
         $c.__builtin___sprintf_chk(new $c.Ptr(globbuf, 0), 0, 128, $c.lit(" glob %d,quan=%ld,owt=%u "), obj.otyp, obj.quan, obj.owt);
         mesg = strsubst($c.__builtin___strcpy_chk(new $c.Ptr(mesgbuf, 0), mesg, 256), $c.lit(" obj "), new $c.Ptr(globbuf, 0));
         await insane_object(obj, new $c.Ptr(ofmt0, 0), mesg, obj.where === OBJ_MINVENT ? obj.v.v_ocarry : null);
@@ -2356,7 +2365,7 @@ async function check_glob(obj, mesg) {   // mkobj.c:3420
 async function sanity_check_worn(obj) {   // mkobj.c:3447
     let maskbuf = new Int8Array(60), what = null, owornmask = 0, allmask = 0, embedded = 0, i = 0, n = 0, oclassname = new Int8Array(30), mon = null;
     allmask = 0;
-    embedded = 0;
+    embedded = FALSE;
     n = 0;
     owornmask = $c.u64(obj.owornmask);
     for (i = 0; sanity_check_worn$wearbits[i]; i = i + 1 | 0) {
@@ -2366,14 +2375,14 @@ async function sanity_check_worn(obj) {   // mkobj.c:3447
         allmask = $c.oru64(allmask, sanity_check_worn$wearbits[i]);
     }
     if ($c.peq(obj, $G.uskin)) {
-        embedded = 1;
+        embedded = TRUE;
         if ($c.andu64(owornmask, W_ARM | I_SPECIAL) === (W_ARM | I_SPECIAL)) {
             owornmask = $c.andu64(owornmask, 18446744073172680703n);
         } else {
             n = 0, owornmask = 18446744073709551615n;
         }
     }
-    if (n === 2 && obj.where === OBJ_INVENT && $c.peq(obj, $G.uball) && $c.andu64(owornmask, W_BALL) !== 0 && $c.andu64(owornmask, W_WEP | W_SWAPWEP | W_QUIVER) !== 0) {
+    if (n === 2 && carried(obj) && $c.peq(obj, $G.uball) && $c.andu64(owornmask, W_BALL) !== 0 && $c.andu64(owornmask, W_WEAPONS) !== 0) {
         owornmask = $c.andu64(owornmask, 18446744073707454463n);
         n = 1;
     }
@@ -2381,11 +2390,11 @@ async function sanity_check_worn(obj) {   // mkobj.c:3447
         $c.__builtin___sprintf_chk(new $c.Ptr(maskbuf, 0), 0, 60, $c.lit("worn mask (multiple) 0x%08lx"), obj.owornmask);
         await insane_object(obj, new $c.Ptr(ofmt0, 0), new $c.Ptr(maskbuf, 0), null);
     }
-    if ($c.andu64(owornmask, $c.notu64(allmask)) !== 0 || obj.where === OBJ_INVENT && $c.andu64(owornmask, W_SADDLE) !== 0) {
+    if ($c.andu64(owornmask, $c.notu64(allmask)) !== 0 || carried(obj) && $c.andu64(owornmask, W_SADDLE) !== 0) {
         $c.__builtin___sprintf_chk(new $c.Ptr(maskbuf, 0), 0, 60, $c.lit("worn mask (bogus)) 0x%08lx"), obj.owornmask);
         await insane_object(obj, new $c.Ptr(ofmt0, 0), new $c.Ptr(maskbuf, 0), null);
     }
-    if (n === 1 && (obj.where === OBJ_INVENT || $c.andu64(owornmask, W_BALL | W_CHAIN) !== 0)) {
+    if (n === 1 && (carried(obj) || $c.andu64(owornmask, W_BALL | W_CHAIN) !== 0)) {
         what = null;
         switch (owornmask) {
             case W_ARM:
@@ -2476,17 +2485,17 @@ async function sanity_check_worn(obj) {   // mkobj.c:3447
             await insane_object(obj, new $c.Ptr(ofmt0, 0), new $c.Ptr(maskbuf, 0), null);
         }
     }
-    if (n === 1 && (obj.where === OBJ_INVENT || $c.andu64(owornmask, W_BALL | W_CHAIN) !== 0 || obj.where === OBJ_MINVENT)) {
+    if (n === 1 && (carried(obj) || $c.andu64(owornmask, W_BALL | W_CHAIN) !== 0 || mcarried(obj))) {
         what = null;
-        if ($c.andu64(owornmask, W_ARM | W_ARMC | W_ARMH | W_ARMS | W_ARMG | W_ARMF | W_ARMU)) {
+        if ($c.andu64(owornmask, W_ARMOR)) {
             if (obj.oclass !== ARMOR_CLASS) {
                 what = $c.lit("armor");
             }
-            if (embedded && !(obj.otyp >= GRAY_DRAGON_SCALES && obj.otyp <= YELLOW_DRAGON_SCALES)) {
+            if (embedded && !Is_dragon_scales(obj)) {
                 what = $c.lit("skin");
             }
-        } else if ($c.andu64(owornmask, W_WEP | W_SWAPWEP | W_QUIVER)) {
-            if (obj.where === OBJ_MINVENT && $c.andu64(owornmask, W_SWAPWEP | W_QUIVER) !== 0) {
+        } else if ($c.andu64(owornmask, W_WEAPONS)) {
+            if (mcarried(obj) && $c.andu64(owornmask, W_SWAPWEP | W_QUIVER) !== 0) {
                 what = $c.andu64(owornmask, W_SWAPWEP) !== 0 ? $c.lit("monst alt weapon?") : $c.lit("monst quiver?");
             } else if (obj.oclass === COIN_CLASS && $c.andu64(owornmask, W_WEP | W_SWAPWEP) !== 0) {
                 what = $c.andu64(owornmask, W_WEP) !== 0 ? $c.lit("weapon") : $c.lit("alt weapon");
@@ -2495,7 +2504,7 @@ async function sanity_check_worn(obj) {   // mkobj.c:3447
             if (obj.oclass !== AMULET_CLASS) {
                 what = $c.lit("amulet");
             }
-        } else if ($c.andu64(owornmask, W_RINGL | W_RINGR)) {
+        } else if ($c.andu64(owornmask, W_RING)) {
             if (obj.oclass !== RING_CLASS && obj.otyp !== MEAT_RING) {
                 what = $c.lit("ring");
             }
@@ -2517,7 +2526,7 @@ async function sanity_check_worn(obj) {   // mkobj.c:3447
             }
         }
         if (what) {
-            mon = obj.where === OBJ_MINVENT ? obj.v.v_ocarry : null;
+            mon = mcarried(obj) ? obj.v.v_ocarry : null;
             $c.__builtin___strcpy_chk(new $c.Ptr(oclassname, 0), def_oc_syms[$c.u8(obj.oclass)].name, 30);
             $c.__builtin___sprintf_chk(new $c.Ptr(maskbuf, 0), 0, 60, $c.lit("worn (%s %s)"), await makesingular(new $c.Ptr(oclassname, 0)), what);
             await insane_object(obj, new $c.Ptr(ofmt0, 0), new $c.Ptr(maskbuf, 0), mon);
@@ -2529,7 +2538,7 @@ export async function obj_nexto(otmp) {   // mkobj.c:3643
         await impossible($c.lit("obj_nexto: wasn't given an object to check"));
         return null;
     }
-    return await obj_nexto_xy(otmp, otmp.ox, otmp.oy, 1);
+    return await obj_nexto_xy(otmp, otmp.ox, otmp.oy, TRUE);
 }
 export async function obj_nexto_xy(obj, x, y, recurs) {   // mkobj.c:3661
     let otmp = null, fx = 0, fy = 0, ex = 0, ey = 0, otyp = 0, dx = 0, dy = 0;
@@ -2539,7 +2548,7 @@ export async function obj_nexto_xy(obj, x, y, recurs) {   // mkobj.c:3661
         if (!$c.peq(otmp, obj) && await mergable(otmp, obj)) {
             return otmp;
         }
-        otmp = nxtobj(otmp, otyp, 1);
+        otmp = nxtobj(otmp, otyp, TRUE);
     }
     if (!recurs) {
         return null;
@@ -2551,7 +2560,7 @@ export async function obj_nexto_xy(obj, x, y, recurs) {   // mkobj.c:3661
     for (fx = ex; $c.abs(fx - ex | 0) < 3; fx = fx + dx | 0) {
         for (fy = ey; $c.abs(fy - ey | 0) < 3; fy = fy + dy | 0) {
             if (isok($c.i16(fx), $c.i16(fy)) && (fx !== x || fy !== y)) {
-                if ((otmp = await obj_nexto_xy(obj, $c.i16(fx), $c.i16(fy), 0)) !== null) {
+                if ((otmp = await obj_nexto_xy(obj, $c.i16(fx), $c.i16(fy), FALSE)) !== null) {
                     return otmp;
                 }
             }
@@ -2622,7 +2631,7 @@ export async function obj_meld(obj1, obj2) {   // mkobj.c:3768
                 result = await obj_absorb(obj2, obj1);
             }
             if (ox) {
-                if ((gv.viz_array.get(oy).get(ox) & IN_SIGHT) !== 0) {
+                if (cansee(ox, oy)) {
                     await newsym($c.i16(ox), $c.i16(oy));
                 }
                 await maybe_unhide_at($c.i16(ox), $c.i16(oy));
@@ -2635,11 +2644,11 @@ export async function obj_meld(obj1, obj2) {   // mkobj.c:3768
 }
 export async function pudding_merge_message(otmp, otmp2) {   // mkobj.c:3818
     let visible = 0, onfloor = 0, inpack = 0, adj = 0;
-    visible = $c.i8((gv.viz_array.get(otmp.oy).get(otmp.ox) & IN_SIGHT) !== 0 || (gv.viz_array.get(otmp2.oy).get(otmp2.ox) & IN_SIGHT) !== 0 ? 1 : 0);
+    visible = $c.i8(cansee(otmp.ox, otmp.oy) || cansee(otmp2.ox, otmp2.oy) ? 1 : 0);
     onfloor = $c.i8(otmp.where === OBJ_FLOOR || otmp2.where === OBJ_FLOOR ? 1 : 0);
-    inpack = $c.i8(otmp.where === OBJ_INVENT || otmp2.where === OBJ_INVENT ? 1 : 0);
-    if (!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked) && visible || inpack) {
-        if (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic)) {
+    inpack = $c.i8(carried(otmp) || carried(otmp2) ? 1 : 0);
+    if (!Blind() && visible || inpack) {
+        if (Hallucination()) {
             if (onfloor) {
                 await You_see($c.lit("parts of the floor melting!"));
             } else if (inpack) {
