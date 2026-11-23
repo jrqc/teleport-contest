@@ -5,20 +5,27 @@ import { $G } from './globals.js';
 import { alloc } from './alloc.js';
 import { bc_sanity_check } from './ball.js';
 import { cmd_from_func, ecname_from_fn, getdir, levltyp, makemap_prepost, paranoid_query, unavailcmd, yn_function } from './cmd.js';
+import { NO_COLOR } from './color.h.js';
 import { a11y, c_common_strings, cg, disp, flags, gb, gc, gf, gi, gm, gs, gu, gv, gy, iflags, program_state, svc, svd, svk, svl, svm, svn, u, ynchars, ynqchars } from './decl.js';
+import { S_GOLEM, S_VORTEX, S_digbeam, S_fountain, S_goodpos, S_rslant, S_sink, S_vbeam } from './defsym.h.js';
 import { do_mapping, findit } from './detect.js';
 import { canseemon, docrt, glyph_at, glyphmap, map_engraving, map_invisible, map_trap, nul_glyphinfo, sensemon, unmap_invisible } from './display.js';
+import { GLYPH_BODY_OFF, GLYPH_BODY_PILETOP_OFF, GLYPH_CMAP_C_OFF, GLYPH_CMAP_STONE_OFF, GLYPH_DETECT_FEM_OFF, GLYPH_DETECT_MALE_OFF, GLYPH_INVIS_OFF, GLYPH_MON_FEM_OFF, GLYPH_MON_MALE_OFF, GLYPH_OBJ_OFF, GLYPH_OBJ_PILETOP_OFF, GLYPH_PET_FEM_OFF, GLYPH_PET_MALE_OFF, GLYPH_RIDDEN_FEM_OFF, GLYPH_RIDDEN_MALE_OFF, GLYPH_STATUE_FEM_OFF, GLYPH_STATUE_FEM_PILETOP_OFF, GLYPH_STATUE_MALE_OFF, GLYPH_STATUE_MALE_PILETOP_OFF, GLYPH_ZAP_OFF, MAX_GLYPH, NUM_ZAP } from './display.h.js';
 import { minimal_monnam, mon_nam, x_monnam } from './do_name.js';
 import { keepdogs, migrate_to_level } from './dog.js';
 import { hurtle, mhurtle } from './dothrow.js';
 import { defsyms } from './drawing.js';
 import { In_W_tower, Invocation_lev, Is_botlevel, Is_special, On_W_tower_level, assign_level, depth, get_level, ledger_no, on_level, overview_stats, print_dungeon } from './dungeon.js';
+import { MIGR_EXACT_XY, MIGR_RANDOM } from './dungeon.h.js';
 import { done, panic } from './end.js';
 import { engr_stats, engraving_sanity_check } from './engrave.js';
 import { losexp, pluslvl } from './exper.js';
+import { fuzzer_impossible_continue, fuzzer_impossible_panic } from './flag.h.js';
 import { getpos } from './getpos.js';
+import { COLNO, MAXULEV, ROWNO } from './global.h.js';
 import { fill_glyphid_cache, free_glyphid_cache, glyph_to_cmap, glyphid_cache_status, wizcustom_glyphids } from './glyphs.js';
 import { may_dig, pooleffects } from './hack.js';
+import { ARM, ARTICLE_A, ARTICLE_THE, ARTICLE_YOUR, DIED, ECMD_CANCEL, ECMD_OK, KILLED_BY, MM_NOMSG, POLY_CONTROLLED, SUPPRESS_HALLUCINATION, SUPPRESS_IT, SUPPRESS_SADDLE, XKILL_NOMSG } from './hack.h.js';
 import { dist2, eos, mungspaces, nh_snprintf, strkitten, strncmpi, strsubst, upstart } from './hacklib.js';
 import { check_invent_gold, display_inventory } from './invent.js';
 import { light_sources_sanity_check, light_stats } from './light.js';
@@ -26,30 +33,45 @@ import { makemon, rndmonst } from './makemon.js';
 import { mklev } from './mklev.js';
 import { obj_sanity_check } from './mkobj.js';
 import { dmonsfree, mon_sanity_check, mongone, monkilled, rescham, usmellmon, xkilled } from './mon.js';
+import { AD_PHYS } from './monattk.h.js';
 import { mstrength, olfaction } from './mondata.js';
+import { G_EXTINCT, G_UNIQ, M2_UNDEAD, NEUTRAL } from './monflag.h.js';
 import { mons } from './monst.js';
+import { MON_ENDGAME_MIGR, MON_LIMBO, MON_MIGRATING, MON_OFFMAP } from './monst.h.js';
+import { PM_GRID_BUG, PM_MANES, PM_SAMURAI } from './monsters.h.js';
 import { load_lua } from './nhlua.js';
+import { NUM_OBJECTS } from './objclass.h.js';
 import { obj_descr, objects } from './objects.js';
+import { CORPSE, FIRST_OBJECT, STATUE } from './objects.h.js';
+import { NUMMONS } from './permonst.h.js';
 import { encumber_msg } from './pickup.js';
 import { There, You, impossible, pline } from './pline.js';
 import { body_part, float_vs_flight, polyself } from './polyself.js';
 import { incr_itimeout, make_blinded, make_deaf, make_glib, make_hallucinated, make_sick, make_slimed, make_stoned, make_stunned, make_vomiting } from './potion.js';
+import { BLINDED, CONFUSION, DEAF, FIRE_RES, FLYING, GLIB, HALLUC, HALLUC_RES, LEVITATION, PROT_FROM_SHAPE_CHANGERS, SICK, SLIMED, STONED, STUNNED, TIMEOUT, VOMITING, WARN_OF_MON, WWALKING } from './prop.h.js';
 import { create_particular } from './read.js';
 import { region_stats } from './region.js';
+import { CORR, DBWALL, DOOR, ROOM, SDOOR, STONE, WM_MASK } from './rm.h.js';
 import { rn2 } from './rnd.js';
 import { genders } from './role.js';
 import { rumor_check } from './rumors.js';
 import { setpaid } from './shk.js';
 import { flip_level, flip_level_rnd, load_special, lspo_finalize_level, lspo_reset_level } from './sp_lev.js';
+import { PRIMARYSET } from './sym.h.js';
 import { known_handling } from './symbols.js';
 import { level_tele } from './teleport.js';
 import { property_by_index, timer_sanity_check, timer_stats } from './timeout.js';
 import { trap_sanity_check } from './trap.js';
 import { does_block, get_viz_clear } from './vision.js';
 import { add_menu, add_menu_heading, add_menu_str, getlin, select_menu, windowprocs } from './windows.js';
+import { wp_tty } from './winprocs.h.js';
+import { ATR_NONE, MENU_BEHAVE_STANDARD, MENU_ITEMFLAGS_NONE, NHW_MENU, NHW_TEXT, PICK_ANY, PICK_NONE } from './wintype.h.js';
 import { size_wseg } from './worm.js';
 import { check_wornmask_slots } from './worn.js';
+import { SICK_NONVOMITABLE, SICK_VOMITABLE, UTOTYPE_NONE } from './you.h.js';
 import { makewish } from './zap.js';
+
+const DEFAULT_TIMEOUT_INCR = 30;
 
 const wiz_flip_level$choices = new Int8Array(5);   // static in wiz_flip_level()
 const wiz_flip_level$prmpt = new Int8Array(55);   // static in wiz_flip_level()
@@ -72,7 +94,7 @@ export async function wiz_wish() {   // wizcmds.c:32
     } else {
         await pline(new $c.Ptr(unavailcmd, 0), ecname_from_fn(wiz_wish));
     }
-    return 0;
+    return ECMD_OK;
 }
 export async function wiz_identify() {   // wizcmds.c:50
     let $t1;
@@ -86,13 +108,13 @@ export async function wiz_identify() {   // wizcmds.c:50
     } else {
         await pline(new $c.Ptr(unavailcmd, 0), ecname_from_fn(wiz_identify));
     }
-    return 0;
+    return ECMD_OK;
 }
 async function makemap_unmakemon(mtmp, migratory) {   // wizcmds.c:73
     let ndx = 0;
     ndx = mtmp.data.pmidx;
-    if (mtmp.data.geno & 4096) {
-        svm.mvitals[ndx].mvflags = $c.u8(svm.mvitals[ndx].mvflags & -2);
+    if (mtmp.data.geno & G_UNIQ) {
+        svm.mvitals[ndx].mvflags = $c.u8(svm.mvitals[ndx].mvflags & ~G_EXTINCT);
     }
     if (svm.mvitals[ndx].born) {
         svm.mvitals[ndx].born = $c.u8(svm.mvitals[ndx].born - 1);
@@ -105,8 +127,8 @@ async function makemap_unmakemon(mtmp, migratory) {   // wizcmds.c:73
         await setpaid(mtmp);
     }
     if (migratory) {
-        mtmp.mstate = $c.or64(mtmp.mstate, 1);
-        mtmp.mstate = $c.and64(mtmp.mstate, -77);
+        mtmp.mstate = $c.or64(mtmp.mstate, MON_OFFMAP);
+        mtmp.mstate = $c.and64(mtmp.mstate, ~(MON_MIGRATING | MON_LIMBO | MON_ENDGAME_MIGR));
         mtmp.nmon = svl.level.monlist;
         svl.level.monlist = mtmp;
     }
@@ -145,17 +167,17 @@ export async function wiz_makemap() {   // wizcmds.c:156
     } else {
         await pline(new $c.Ptr(unavailcmd, 0), ecname_from_fn(wiz_makemap));
     }
-    return 0;
+    return ECMD_OK;
 }
 export async function wiz_map() {   // wizcmds.c:176
     let t = null, ep = null, save_Hconf = 0, save_Hhallu = 0, $t1;
     if (flags.debug) {
-        save_Hconf = u.uprops[14 /* CONFUSION */].intrinsic;
-        save_Hhallu = u.uprops[23 /* HALLUC */].intrinsic;
+        save_Hconf = u.uprops[CONFUSION].intrinsic;
+        save_Hhallu = u.uprops[HALLUC].intrinsic;
         do {
             a11y.mon_notices_blocked = a11y.mon_notices_blocked + 1 | 0;
         } while (0);
-        $t1 = u.uprops[23 /* HALLUC */].intrinsic = 0, u.uprops[14 /* CONFUSION */].intrinsic = $t1;
+        $t1 = u.uprops[HALLUC].intrinsic = 0, u.uprops[CONFUSION].intrinsic = $t1;
         for (t = gf.ftrap; t !== null; t = t.ntrap) {
             t.tseen = (1) & 1;
             await map_trap(t, 1);
@@ -170,12 +192,12 @@ export async function wiz_map() {   // wizcmds.c:176
                 a11y.mon_notices_blocked = 0;
             }
         } while (0);
-        u.uprops[14 /* CONFUSION */].intrinsic = save_Hconf;
-        u.uprops[23 /* HALLUC */].intrinsic = save_Hhallu;
+        u.uprops[CONFUSION].intrinsic = save_Hconf;
+        u.uprops[HALLUC].intrinsic = save_Hhallu;
     } else {
         await pline(new $c.Ptr(unavailcmd, 0), ecname_from_fn(wiz_map));
     }
-    return 0;
+    return ECMD_OK;
 }
 export async function wiz_genesis() {   // wizcmds.c:203
     let mongen_saved = 0;
@@ -187,7 +209,7 @@ export async function wiz_genesis() {   // wizcmds.c:203
     } else {
         await pline(new $c.Ptr(unavailcmd, 0), ecname_from_fn(wiz_genesis));
     }
-    return 0;
+    return ECMD_OK;
 }
 export async function wiz_where() {   // wizcmds.c:218
     if (flags.debug) {
@@ -195,7 +217,7 @@ export async function wiz_where() {   // wizcmds.c:218
     } else {
         await pline(new $c.Ptr(unavailcmd, 0), ecname_from_fn(wiz_where));
     }
-    return 0;
+    return ECMD_OK;
 }
 export async function wiz_detect() {   // wizcmds.c:229
     if (flags.debug) {
@@ -203,7 +225,7 @@ export async function wiz_detect() {   // wizcmds.c:229
     } else {
         await pline(new $c.Ptr(unavailcmd, 0), ecname_from_fn(wiz_detect));
     }
-    return 0;
+    return ECMD_OK;
 }
 export async function wiz_kill() {   // wizcmds.c:243
     let mtmp = null, cc = new $T.nhcoord(), ans = 0, c = 0, qbuf = new Int8Array(128), prompt = null, save_verbose = 0, save_autodescribe = 0, uarehere = new $T.d_level(), tame = 0, seen = 0, flgs = 0, articl = 0, adjs = null, Mn = null;
@@ -235,11 +257,11 @@ export async function wiz_kill() {   // wizcmds.c:243
                 }
             }
             if (!mtmp) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("%s?"), gu.urole.mnum === 340 ? $c.lit("Perform seppuku") : $c.lit("Commit suicide"));
+                $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("%s?"), gu.urole.mnum === PM_SAMURAI ? $c.lit("Perform seppuku") : $c.lit("Commit suicide"));
                 if (await paranoid_query(1, new $c.Ptr(qbuf, 0))) {
                     $c.__builtin___sprintf_chk(new $c.Ptr(svk.killer.name, 0), 0, 256, $c.lit("%s own player"), genders[flags.female ? 1 : 0].his);
-                    svk.killer.format = 1;
-                    await done(0 /* DIED */);
+                    svk.killer.format = KILLED_BY;
+                    await done(DIED);
                 }
                 break;
             }
@@ -252,17 +274,17 @@ export async function wiz_kill() {   // wizcmds.c:243
         if (mtmp) {
             tame = !!mtmp.mtame ? 1 : 0;
             seen = canseemon(mtmp) || sensemon(mtmp) || u.uswallow | 0 && $c.peq(mtmp, u.ustuck) ? 1 : 0;
-            flgs = 5 | (tame && (mtmp.mextra && mtmp.mextra.mgivenname) ? 8 : 0);
-            articl = tame ? 3 : seen ? 1 : 2;
+            flgs = SUPPRESS_IT | SUPPRESS_HALLUCINATION | (tame && (mtmp.mextra && mtmp.mextra.mgivenname) ? SUPPRESS_SADDLE : 0);
+            articl = tame ? ARTICLE_YOUR : seen ? ARTICLE_THE : ARTICLE_A;
             adjs = tame ? !seen ? $c.lit("poor, unseen") : $c.lit("poor") : !seen ? $c.lit("unseen") : null;
             Mn = await x_monnam(mtmp, articl, adjs, flgs, 0);
             if (!iflags.menu_requested) {
-                await You($c.lit("%s %s!"), $c.andu64(mtmp.data.mflags2, 2) !== 0 || $c.peq(mtmp.data, $c.relem(mons, 50 /* PM_MANES */)) || (mtmp.data.mlet === 55 /* S_GOLEM */ || mtmp.data.mlet === 22 /* S_VORTEX */) ? $c.lit("destroy") : $c.lit("kill"), Mn);
-                await xkilled(mtmp, 1);
+                await You($c.lit("%s %s!"), $c.andu64(mtmp.data.mflags2, M2_UNDEAD) !== 0 || $c.peq(mtmp.data, $c.relem(mons, PM_MANES)) || (mtmp.data.mlet === S_GOLEM || mtmp.data.mlet === S_VORTEX) ? $c.lit("destroy") : $c.lit("kill"), Mn);
+                await xkilled(mtmp, XKILL_NOMSG);
             } else {
                 svc.context.mon_moving = 1;
-                await pline($c.lit("%s is %s."), upstart(Mn), $c.andu64(mtmp.data.mflags2, 2) !== 0 || $c.peq(mtmp.data, $c.relem(mons, 50 /* PM_MANES */)) || (mtmp.data.mlet === 55 /* S_GOLEM */ || mtmp.data.mlet === 22 /* S_VORTEX */) ? $c.lit("destroyed") : $c.lit("killed"));
-                await monkilled(mtmp, null, 0);
+                await pline($c.lit("%s is %s."), upstart(Mn), $c.andu64(mtmp.data.mflags2, M2_UNDEAD) !== 0 || $c.peq(mtmp.data, $c.relem(mons, PM_MANES)) || (mtmp.data.mlet === S_GOLEM || mtmp.data.mlet === S_VORTEX) ? $c.lit("destroyed") : $c.lit("killed"));
+                await monkilled(mtmp, null, AD_PHYS);
                 svc.context.mon_moving = 0;
             }
             if (u.utotype || !on_level(u.uz, uarehere)) {
@@ -274,7 +296,7 @@ export async function wiz_kill() {   // wizcmds.c:243
         }
     }
     await dmonsfree();
-    return 0;
+    return ECMD_OK;
 }
 export async function wiz_load_lua() {   // wizcmds.c:353
     let buf = new Int8Array(256), sbi = new $T.nhl_sandbox_info();
@@ -287,7 +309,7 @@ export async function wiz_load_lua() {   // wizcmds.c:353
         buf[0] = 0;
         await getlin($c.lit("Load which lua file?"), new $c.Ptr(buf, 0));
         if (buf[0] === 27 || buf[0] === 0) {
-            return 2;
+            return ECMD_CANCEL;
         }
         if (!$c.strchr(new $c.Ptr(buf, 0), 46)) {
             $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit(".lua"), 256);
@@ -296,7 +318,7 @@ export async function wiz_load_lua() {   // wizcmds.c:353
     } else {
         await pline(new $c.Ptr(unavailcmd, 0), ecname_from_fn(wiz_load_lua));
     }
-    return 0;
+    return ECMD_OK;
 }
 export async function wiz_load_splua() {   // wizcmds.c:376
     let buf = new Int8Array(256);
@@ -304,7 +326,7 @@ export async function wiz_load_splua() {   // wizcmds.c:376
         buf[0] = 0;
         await getlin($c.lit("Load which des lua file?"), new $c.Ptr(buf, 0));
         if (buf[0] === 27 || buf[0] === 0) {
-            return 2;
+            return ECMD_CANCEL;
         }
         if (!$c.strchr(new $c.Ptr(buf, 0), 46)) {
             $c.__builtin___strcat_chk(new $c.Ptr(buf, 0), $c.lit(".lua"), 256);
@@ -315,7 +337,7 @@ export async function wiz_load_splua() {   // wizcmds.c:376
     } else {
         await pline(new $c.Ptr(unavailcmd, 0), ecname_from_fn(wiz_load_splua));
     }
-    return 0;
+    return ECMD_OK;
 }
 export async function wiz_level_tele() {   // wizcmds.c:399
     if (flags.debug) {
@@ -323,7 +345,7 @@ export async function wiz_level_tele() {   // wizcmds.c:399
     } else {
         await pline(new $c.Ptr(unavailcmd, 0), ecname_from_fn(wiz_level_tele));
     }
-    return 0;
+    return ECMD_OK;
 }
 export async function wiz_flip_level() {   // wizcmds.c:412
     let c = 0;
@@ -341,7 +363,7 @@ export async function wiz_flip_level() {   // wizcmds.c:412
             await pline($c.lit("%s"), c_common_strings.c_Never_mind);
         }
     }
-    return 0;
+    return ECMD_OK;
 }
 export async function wiz_level_change() {   // wizcmds.c:446
     let buf = new Int8Array(256), dummy = Int8Array.of(0), newlevel = Int32Array.of(0), ret = 0;
@@ -357,14 +379,14 @@ export async function wiz_level_change() {   // wizcmds.c:446
     }
     if (ret !== 1) {
         await pline($c.lit("%s"), c_common_strings.c_Never_mind);
-        return 0;
+        return ECMD_OK;
     }
     if (newlevel[0] === u.ulevel) {
         await You($c.lit("are already that experienced."));
     } else if (newlevel[0] < u.ulevel) {
         if (u.ulevel === 1) {
             await You($c.lit("are already as inexperienced as you can get."));
-            return 0;
+            return ECMD_OK;
         }
         if (newlevel[0] < 1) {
             newlevel[0] = 1;
@@ -373,19 +395,19 @@ export async function wiz_level_change() {   // wizcmds.c:446
             await losexp($c.lit("#levelchange"));
         }
     } else {
-        if (u.ulevel >= 30) {
+        if (u.ulevel >= MAXULEV) {
             await You($c.lit("are already as experienced as you can get."));
-            return 0;
+            return ECMD_OK;
         }
-        if (newlevel[0] > 30) {
-            newlevel[0] = 30;
+        if (newlevel[0] > MAXULEV) {
+            newlevel[0] = MAXULEV;
         }
         while (u.ulevel < newlevel[0]) {
             await pluslvl(0);
         }
     }
     u.ulevelmax = u.ulevel;
-    return 0;
+    return ECMD_OK;
 }
 export async function wiz_telekinesis() {   // wizcmds.c:494
     let ans = 0, cc = new $T.nhcoord(), mtmp = null;
@@ -397,11 +419,11 @@ export async function wiz_telekinesis() {   // wizcmds.c:494
     do {
         ans = await getpos(cc, 1, $c.lit("a monster"));
         if (ans < 0 || cc.x < 1) {
-            return 2;
+            return ECMD_CANCEL;
         }
         if ((mtmp = svl.level.monsters[cc.x][cc.y]) !== null && (canseemon(mtmp) || sensemon(mtmp)) || cc.x === u.ux && cc.y === u.uy) {
             if (!await getdir($c.lit("which direction?"))) {
-                return 2;
+                return ECMD_CANCEL;
             }
             if (mtmp) {
                 await mhurtle(mtmp, u.dx, u.dy, 6);
@@ -414,20 +436,20 @@ export async function wiz_telekinesis() {   // wizcmds.c:494
                 cc.x = u.ux, cc.y = u.uy;
             }
         }
-    } while (u.utotype === 0 /* UTOTYPE_NONE */);
-    return 0;
+    } while (u.utotype === UTOTYPE_NONE);
+    return ECMD_OK;
 }
 export async function wiz_panic() {   // wizcmds.c:534
     let $t1, $t2;
     if (iflags.debug_fuzzer) {
         $t1 = u.uhpmax = 1000, u.uhp = $t1;
         $t2 = u.uenmax = 1000, u.uen = $t2;
-        return 0;
+        return ECMD_OK;
     }
     if (await paranoid_query(1, $c.lit("Do you want to call panic() and end your game?"))) {
         await panic($c.lit("Crash test (#panic)."));
     }
-    return 0;
+    return ECMD_OK;
 }
 export async function wiz_fuzzer() {   // wizcmds.c:549
     if (flags.suppress_alert < 50790400) {
@@ -436,26 +458,26 @@ export async function wiz_fuzzer() {   // wizcmds.c:549
     }
     if (await paranoid_query(1, $c.lit("Do you want to start fuzz testing?"))) {
         if (await yn_function($c.lit("Do you want to call panic() after impossible()?"), new $c.Ptr(ynchars, 0), 110, 1) === 110) {
-            iflags.debug_fuzzer = 2;
+            iflags.debug_fuzzer = fuzzer_impossible_continue;
         } else {
-            iflags.debug_fuzzer = 1;
+            iflags.debug_fuzzer = fuzzer_impossible_panic;
         }
     }
-    return 0;
+    return ECMD_OK;
 }
 export async function wiz_polyself() {   // wizcmds.c:568
-    await polyself(1 /* POLY_CONTROLLED */);
-    return 0;
+    await polyself(POLY_CONTROLLED);
+    return ECMD_OK;
 }
 export async function wiz_show_seenv() {   // wizcmds.c:576
     let win = 0, x = 0, y = 0, startx = 0, stopx = 0, curx = 0, v = 0, row = new Int8Array(81), $t1, $t2;
-    win = await windowprocs.win_create_nhwindow(5);
+    win = await windowprocs.win_create_nhwindow(NHW_TEXT);
     startx = $c.i16(1 > (u.ux - 20 | 0) ? 1 : u.ux - 20 | 0);
     stopx = $c.i16((startx + 40 | 0) < 80 ? startx + 40 | 0 : 80);
     if ((stopx - startx | 0) === 40) {
         startx = $c.i16(startx + 1);
     }
-    for (y = 0; y < 21; y = $c.i16(y + 1)) {
+    for (y = 0; y < ROWNO; y = $c.i16(y + 1)) {
         for (x = startx, curx = 0; x < stopx; x = $c.i16(x + 1), curx = $c.i16(curx + 2 | 0)) {
             if (x === u.ux && y === u.uy) {
                 $t1 = row[curx + 1 | 0] = 64, row[curx] = $t1;
@@ -478,16 +500,16 @@ export async function wiz_show_seenv() {   // wizcmds.c:576
     }
     await windowprocs.win_display_nhwindow(win, 1);
     await windowprocs.win_destroy_nhwindow(win);
-    return 0;
+    return ECMD_OK;
 }
 export async function wiz_show_vision() {   // wizcmds.c:621
     let win = 0, x = 0, y = 0, v = 0, row = new Int8Array(81);
-    win = await windowprocs.win_create_nhwindow(5);
+    win = await windowprocs.win_create_nhwindow(NHW_TEXT);
     $c.__builtin___sprintf_chk(new $c.Ptr(row, 0), 0, 81, $c.lit("Flags: 0x%x could see, 0x%x in sight, 0x%x temp lit"), 1, 2, 4);
     await windowprocs.win_putstr(win, 0, new $c.Ptr(row, 0));
     await windowprocs.win_putstr(win, 0, $c.lit(""));
-    for (y = 0; y < 21; y = $c.i16(y + 1)) {
-        for (x = 1; x < 80; x = $c.i16(x + 1)) {
+    for (y = 0; y < ROWNO; y = $c.i16(y + 1)) {
+        for (x = 1; x < COLNO; x = $c.i16(x + 1)) {
             if (x === u.ux && y === u.uy) {
                 row[x] = 64;
             } else {
@@ -495,7 +517,7 @@ export async function wiz_show_vision() {   // wizcmds.c:621
                 row[x] = $c.i8(v === 0 ? 32 : 48 + v | 0);
             }
         }
-        for (x = 79; x >= 1; x = $c.i16(x - 1)) {
+        for (x = COLNO - 1; x >= 1; x = $c.i16(x - 1)) {
             if (row[x] !== 32) {
                 break;
             }
@@ -505,51 +527,51 @@ export async function wiz_show_vision() {   // wizcmds.c:621
     }
     await windowprocs.win_display_nhwindow(win, 1);
     await windowprocs.win_destroy_nhwindow(win);
-    return 0;
+    return ECMD_OK;
 }
 export async function wiz_show_wmodes() {   // wizcmds.c:657
     let win = 0, x = 0, y = 0, row = new Int8Array(81), lev = null, istty = 0;
-    istty = $c.i8(windowprocs.wp_id === 1 ? 1 : 0);
-    win = await windowprocs.win_create_nhwindow(5);
+    istty = $c.i8(windowprocs.wp_id === wp_tty ? 1 : 0);
+    win = await windowprocs.win_create_nhwindow(NHW_TEXT);
     if (istty) {
         await windowprocs.win_putstr(win, 0, $c.lit(""));
     }
-    for (y = 0; y < 21; y = $c.i16(y + 1)) {
-        for (x = 0; x < 80; x = $c.i16(x + 1)) {
+    for (y = 0; y < ROWNO; y = $c.i16(y + 1)) {
+        for (x = 0; x < COLNO; x = $c.i16(x + 1)) {
             lev = $c.relem(svl.level.locations[x], y);
             if (x === u.ux && y === u.uy) {
                 row[x] = 64;
-            } else if (lev.typ && lev.typ <= 12 /* DBWALL */ || lev.typ === 14 /* SDOOR */) {
-                row[x] = $c.i8(48 + ((lev.flags | 0) & 7) | 0);
-            } else if (lev.typ === 24 /* CORR */) {
+            } else if (lev.typ && lev.typ <= DBWALL || lev.typ === SDOOR) {
+                row[x] = $c.i8(48 + ((lev.flags | 0) & WM_MASK) | 0);
+            } else if (lev.typ === CORR) {
                 row[x] = 35;
-            } else if (lev.typ >= 25 /* ROOM */ || lev.typ === 23 /* DOOR */) {
+            } else if (lev.typ >= ROOM || lev.typ === DOOR) {
                 row[x] = 46;
             } else {
                 row[x] = 120;
             }
         }
-        row[80] = 0;
+        row[COLNO] = 0;
         await windowprocs.win_putstr(win, 0, new $c.Ptr(row, 1));
     }
     await windowprocs.win_display_nhwindow(win, 1);
     await windowprocs.win_destroy_nhwindow(win);
-    return 0;
+    return ECMD_OK;
 }
 export async function wiz_map_levltyp() {   // wizcmds.c:693
     let win = 0, x = 0, y = 0, terrain = 0, row = new Int8Array(81), istty = 0, dsc = new Int8Array(256), slev = null, brname = null, $t1, $t2;
     istty = $c.i8(!$c.strcmp(windowprocs.name, $c.lit("tty")) ? 1 : 0);
-    win = await windowprocs.win_create_nhwindow(5);
+    win = await windowprocs.win_create_nhwindow(NHW_TEXT);
     if (istty) {
         await windowprocs.win_putstr(win, 0, $c.lit(""));
     }
-    for (y = 0; y < 21; y = $c.i16(y + 1)) {
-        for (x = 1; x < 80; x = $c.i16(x + 1)) {
+    for (y = 0; y < ROWNO; y = $c.i16(y + 1)) {
+        for (x = 1; x < COLNO; x = $c.i16(x + 1)) {
             terrain = svl.level.locations[x][y].typ;
-            $t1 = $c.i8(terrain === 0 /* STONE */ && !may_dig(x, y) ? 42 : terrain < 10 ? 48 + terrain | 0 : terrain < 36 ? (97 + terrain | 0) - 10 | 0 : (65 + terrain | 0) - 36 | 0), row[x - 1 | 0] = $t1;
+            $t1 = $c.i8(terrain === STONE && !may_dig(x, y) ? 42 : terrain < 10 ? 48 + terrain | 0 : terrain < 36 ? (97 + terrain | 0) - 10 | 0 : (65 + terrain | 0) - 36 | 0), row[x - 1 | 0] = $t1;
         }
         x = $c.i16(x - 1);
-        if (svl.level.locations[0][y].typ !== 0 /* STONE */ || may_dig(0, y)) {
+        if (svl.level.locations[0][y].typ !== STONE || may_dig(0, y)) {
             row[($t2 = x, x = $c.i16($t2 + 1), $t2)] = 33;
         }
         row[x] = 0;
@@ -574,10 +596,10 @@ export async function wiz_map_levltyp() {   // wizcmds.c:693
             }
         }
         if (svl.level.flags.nfountains) {
-            $c.__builtin___sprintf_chk(eos(new $c.Ptr(dsc, 0)), 0, -1, $c.lit(" %c:%d"), defsyms[37 /* S_fountain */].sym, svl.level.flags.nfountains);
+            $c.__builtin___sprintf_chk(eos(new $c.Ptr(dsc, 0)), 0, -1, $c.lit(" %c:%d"), defsyms[S_fountain].sym, svl.level.flags.nfountains);
         }
         if (svl.level.flags.nsinks) {
-            $c.__builtin___sprintf_chk(eos(new $c.Ptr(dsc, 0)), 0, -1, $c.lit(" %c:%d"), defsyms[36 /* S_sink */].sym, svl.level.flags.nsinks);
+            $c.__builtin___sprintf_chk(eos(new $c.Ptr(dsc, 0)), 0, -1, $c.lit(" %c:%d"), defsyms[S_sink].sym, svl.level.flags.nsinks);
         }
         if (svl.level.flags.has_vault) {
             $c.__builtin___strcat_chk(new $c.Ptr(dsc, 0), $c.lit(" vault"), 256);
@@ -668,8 +690,8 @@ export async function wiz_map_levltyp() {   // wizcmds.c:693
             }
             $c.__builtin___sprintf_chk(eos(new $c.Ptr(dsc, 0)), 0, -1, $c.lit(" %s"), brname);
         }
-        if ($c.strlen(new $c.Ptr(dsc, 0)) >= 80) {
-            dsc[79] = 0;
+        if ($c.strlen(new $c.Ptr(dsc, 0)) >= COLNO) {
+            dsc[COLNO - 1] = 0;
         }
         await windowprocs.win_putstr(win, 0, new $c.Ptr(dsc, 0));
     }
@@ -679,7 +701,7 @@ export async function wiz_map_levltyp() {   // wizcmds.c:693
 }
 export async function wiz_levltyp_legend() {   // wizcmds.c:841
     let win = 0, i = 0, j = 0, last = 0, c = 0, dsc = null, fmt = null, buf = new Int8Array(256);
-    win = await windowprocs.win_create_nhwindow(5);
+    win = await windowprocs.win_create_nhwindow(NHW_TEXT);
     await windowprocs.win_putstr(win, 0, $c.lit("#terrain encodings:"));
     await windowprocs.win_putstr(win, 0, $c.lit(""));
     fmt = $c.lit(" %c - %-28s");
@@ -706,14 +728,14 @@ export async function wiz_smell() {   // wizcmds.c:885
     cc.y = u.uy;
     if (!olfaction(gy.youmonst.data)) {
         await You($c.lit("are incapable of detecting odors in your present form."));
-        return 0;
+        return ECMD_OK;
     }
     await You($c.lit("can move the cursor to a monster that you want to smell."));
     do {
         await pline($c.lit("Pick a monster to smell."));
         ans = await getpos(cc, 1, $c.lit("a monster"));
         if (ans < 0 || cc.x < 0) {
-            return 2;
+            return ECMD_CANCEL;
         }
         is_you = 0;
         if (cc.x === u.ux && cc.y === u.uy) {
@@ -731,68 +753,68 @@ export async function wiz_smell() {   // wizcmds.c:885
         glyph = glyph_at(cc.x, cc.y);
         if (mptr) {
             if (is_you) {
-                await You($c.lit("surreptitiously sniff under your %s."), await body_part(0 /* ARM */));
+                await You($c.lit("surreptitiously sniff under your %s."), await body_part(ARM));
             }
             if (!await usmellmon(mptr)) {
                 await pline($c.lit("%s to not give off any smell."), is_you ? $c.lit("You seem") : $c.lit("That monster seems"));
             }
-            if (!(glyph >= 0 /* GLYPH_MON_MALE_OFF */ && glyph < 383 || glyph >= 383 /* GLYPH_MON_FEM_OFF */ && glyph < 766 || (glyph >= 766 /* GLYPH_PET_MALE_OFF */ && glyph < 1149 || glyph >= 1149 /* GLYPH_PET_FEM_OFF */ && glyph < 1532) || (glyph >= 2682 /* GLYPH_RIDDEN_MALE_OFF */ && glyph < 3065 || glyph >= 3065 /* GLYPH_RIDDEN_FEM_OFF */ && glyph < 3448) || (glyph >= 1533 /* GLYPH_DETECT_MALE_OFF */ && glyph < 1916 || glyph >= 1916 /* GLYPH_DETECT_FEM_OFF */ && glyph < 2299))) {
+            if (!(glyph >= GLYPH_MON_MALE_OFF && glyph < GLYPH_MON_MALE_OFF + NUMMONS || glyph >= GLYPH_MON_FEM_OFF && glyph < GLYPH_MON_FEM_OFF + NUMMONS || (glyph >= GLYPH_PET_MALE_OFF && glyph < GLYPH_PET_MALE_OFF + NUMMONS || glyph >= GLYPH_PET_FEM_OFF && glyph < GLYPH_PET_FEM_OFF + NUMMONS) || (glyph >= GLYPH_RIDDEN_MALE_OFF && glyph < GLYPH_RIDDEN_MALE_OFF + NUMMONS || glyph >= GLYPH_RIDDEN_FEM_OFF && glyph < GLYPH_RIDDEN_FEM_OFF + NUMMONS) || (glyph >= GLYPH_DETECT_MALE_OFF && glyph < GLYPH_DETECT_MALE_OFF + NUMMONS || glyph >= GLYPH_DETECT_FEM_OFF && glyph < GLYPH_DETECT_FEM_OFF + NUMMONS))) {
                 await map_invisible(cc.x, cc.y);
             }
         } else {
             await You($c.lit("don't smell any monster there."));
-            if (glyph === 1532 /* GLYPH_INVIS_OFF */) {
+            if (glyph === GLYPH_INVIS_OFF) {
                 await unmap_invisible(cc.x, cc.y);
             }
         }
     } while (1);
-    return 0;
+    return ECMD_OK;
 }
 export async function wiz_intrinsic() {   // wizcmds.c:949
     let win = 0, any = new $T.any(), buf = new Int8Array(256), i = 0, j = 0, n = 0, amt = 0, typ = 0, p = Int32Array.of(0), oldtimeout = 0, newtimeout = 0, propname = null, pick_list = [null], clr = 0, $goto = null;
     if (flags.debug) {
         p[0] = 0;
         pick_list[0] = null;
-        clr = 8;
+        clr = NO_COLOR;
         any.$copyFrom(cg.zeroany);
-        win = await windowprocs.win_create_nhwindow(4);
-        await windowprocs.win_start_menu(win, 0);
+        win = await windowprocs.win_create_nhwindow(NHW_MENU);
+        await windowprocs.win_start_menu(win, MENU_BEHAVE_STANDARD);
         if (iflags.cmdassist) {
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("[Precede any selection with a count to increment by other than %d.]"), 30);
             await add_menu_str(win, new $c.Ptr(buf, 0));
         }
         for (i = 0; (propname = property_by_index(i, new $c.Ptr(p, 0))) !== null; i = i + 1 | 0) {
-            if (p[0] === 24 /* HALLUC_RES */) {
+            if (p[0] === HALLUC_RES) {
                 continue;
             }
-            if (p[0] === 1 /* FIRE_RES */) {
+            if (p[0] === FIRE_RES) {
                 await add_menu_str(win, $c.lit("--"));
             }
             any.a_int = i + 1 | 0;
-            oldtimeout = $c.and64(u.uprops[p[0]].intrinsic, 16777215);
+            oldtimeout = $c.and64(u.uprops[p[0]].intrinsic, TIMEOUT);
             if (oldtimeout) {
                 $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%-27s [%li]"), propname, oldtimeout);
             } else {
                 $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s"), propname);
             }
-            await add_menu(win, nul_glyphinfo, any, 0, 0, 0, clr, new $c.Ptr(buf, 0), 0);
+            await add_menu(win, nul_glyphinfo, any, 0, 0, ATR_NONE, clr, new $c.Ptr(buf, 0), MENU_ITEMFLAGS_NONE);
         }
         await windowprocs.win_end_menu(win, $c.lit("Which intrinsics?"));
-        n = await select_menu(win, 2, new $c.Ptr(pick_list, 0));
+        n = await select_menu(win, PICK_ANY, new $c.Ptr(pick_list, 0));
         await windowprocs.win_destroy_nhwindow(win);
         for (j = 0; j < n; j = j + 1 | 0) {
             i = $c.radd(pick_list[0], j).item.a_int - 1 | 0;
             propname = property_by_index(i, new $c.Ptr(p, 0));
-            oldtimeout = $c.and64(u.uprops[p[0]].intrinsic, 16777215);
-            amt = $c.radd(pick_list[0], j).count === -1 ? 30 : $c.i32($c.radd(pick_list[0], j).count);
+            oldtimeout = $c.and64(u.uprops[p[0]].intrinsic, TIMEOUT);
+            amt = $c.radd(pick_list[0], j).count === -1 ? DEFAULT_TIMEOUT_INCR : $c.i32($c.radd(pick_list[0], j).count);
             if (amt <= 0) {
                 continue;
             }
             newtimeout = $c.add64(oldtimeout, amt);
             switch (p[0]) {
-                case 17 /* SICK */:
-                case 22 /* SLIMED */:
-                case 18 /* STONED */:
+                case SICK:
+                case SLIMED:
+                case STONED:
                     if (oldtimeout > 0 && newtimeout > oldtimeout) {
                         newtimeout = oldtimeout;
                     }
@@ -800,47 +822,47 @@ export async function wiz_intrinsic() {   // wizcmds.c:949
             }
             S1: for (;;) {
                 switch ($goto !== null ? $goto : p[0]) {
-                    case 15 /* BLINDED */:
+                    case BLINDED:
                         await make_blinded(newtimeout, 1);
                         break;
-                    case 16 /* DEAF */:
+                    case DEAF:
                         await make_deaf(newtimeout, 1);
                         break;
-                    case 23 /* HALLUC */:
+                    case HALLUC:
                         await make_hallucinated(newtimeout, 1, 0);
                         break;
-                    case 17 /* SICK */:
-                        typ = !rn2(2) ? 1 : 2;
+                    case SICK:
+                        typ = !rn2(2) ? SICK_VOMITABLE : SICK_NONVOMITABLE;
                         await make_sick(newtimeout, new $c.Ptr(wiz_intrinsic$wizintrinsic, 0), 1, typ);
                         break;
-                    case 22 /* SLIMED */:
-                        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(wiz_intrinsic$fmt, 0), !u.uprops[22 /* SLIMED */].intrinsic ? $c.lit("") : $c.lit(" still"), $c.lit("turning into slime"));
+                    case SLIMED:
+                        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(wiz_intrinsic$fmt, 0), !u.uprops[SLIMED].intrinsic ? $c.lit("") : $c.lit(" still"), $c.lit("turning into slime"));
                         await make_slimed(newtimeout, new $c.Ptr(buf, 0));
                         break;
-                    case 18 /* STONED */:
-                        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(wiz_intrinsic$fmt, 0), !u.uprops[18 /* STONED */].intrinsic ? $c.lit("") : $c.lit(" still"), $c.lit("turning into stone"));
-                        await make_stoned(newtimeout, new $c.Ptr(buf, 0), 1, new $c.Ptr(wiz_intrinsic$wizintrinsic, 0));
+                    case STONED:
+                        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(wiz_intrinsic$fmt, 0), !u.uprops[STONED].intrinsic ? $c.lit("") : $c.lit(" still"), $c.lit("turning into stone"));
+                        await make_stoned(newtimeout, new $c.Ptr(buf, 0), KILLED_BY, new $c.Ptr(wiz_intrinsic$wizintrinsic, 0));
                         break;
-                    case 13 /* STUNNED */:
+                    case STUNNED:
                         await make_stunned(newtimeout, 1);
                         break;
-                    case 20 /* VOMITING */:
-                        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(wiz_intrinsic$fmt, 0), !u.uprops[20 /* VOMITING */].intrinsic ? $c.lit("") : $c.lit(" still"), $c.lit("vomiting"));
+                    case VOMITING:
+                        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(wiz_intrinsic$fmt, 0), !u.uprops[VOMITING].intrinsic ? $c.lit("") : $c.lit(" still"), $c.lit("vomiting"));
                         await make_vomiting(newtimeout, 0);
                         await pline($c.lit("%s"), new $c.Ptr(buf, 0));
                         break;
-                    case 32 /* WARN_OF_MON */:
-                        if (!(u.uprops[32 /* WARN_OF_MON */].intrinsic || u.uprops[32 /* WARN_OF_MON */].extrinsic)) {
-                            svc.context.warntype.speciesidx = 116;
+                    case WARN_OF_MON:
+                        if (!(u.uprops[WARN_OF_MON].intrinsic || u.uprops[WARN_OF_MON].extrinsic)) {
+                            svc.context.warntype.speciesidx = PM_GRID_BUG;
                             svc.context.warntype.species = $c.relem(mons, svc.context.warntype.speciesidx);
                         }
                         $goto = "def_feedback"; continue S1;
-                    case 21 /* GLIB */:
+                    case GLIB:
                         await make_glib($c.i32(newtimeout));
                     default:
                     case "def_feedback":
                         $goto = null;   // def_feedback:
-                        if (p[0] !== 21 /* GLIB */) {
+                        if (p[0] !== GLIB) {
                             incr_itimeout(new $c.FieldRef(u.uprops[p[0]], "intrinsic", "i64"), amt);
                         }
                         disp.botl = 1;
@@ -849,12 +871,12 @@ export async function wiz_intrinsic() {   // wizcmds.c:949
                 }
                 break;
             }
-            if (p[0] === 48 /* LEVITATION */ || p[0] === 49 /* FLYING */) {
+            if (p[0] === LEVITATION || p[0] === FLYING) {
                 float_vs_flight();
-            } else if (p[0] === 60 /* PROT_FROM_SHAPE_CHANGERS */) {
+            } else if (p[0] === PROT_FROM_SHAPE_CHANGERS) {
                 await rescham();
             }
-            if (p[0] === 50 /* WWALKING */ || p[0] === 48 /* LEVITATION */ || p[0] === 49 /* FLYING */) {
+            if (p[0] === WWALKING || p[0] === LEVITATION || p[0] === FLYING) {
                 if (u.uinwater) {
                     await pooleffects(0);
                 }
@@ -867,11 +889,11 @@ export async function wiz_intrinsic() {   // wizcmds.c:949
     } else {
         await pline(new $c.Ptr(unavailcmd, 0), ecname_from_fn(wiz_intrinsic));
     }
-    return 0;
+    return ECMD_OK;
 }
 export async function wiz_rumor_check() {   // wizcmds.c:1102
     await rumor_check();
-    return 0;
+    return ECMD_OK;
 }
 function size_obj(otmp) {   // wizcmds.c:1117
     let sz = 0;
@@ -1077,7 +1099,7 @@ async function misc_stats(win, total_count, total_size) {   // wizcmds.c:1284
         await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
     }
     count[0] = size[0] = 0;
-    for (idx = 0; idx < 481 /* NUM_OBJECTS */; idx = idx + 1 | 0) {
+    for (idx = 0; idx < NUM_OBJECTS; idx = idx + 1 | 0) {
         if (objects[idx].oc_uname) {
             count[0] = $c.add64(count[0], 1);
             size[0] = $c.add64(size[0], $c.i64($c.addu64($c.strlen(objects[idx].oc_uname), 1)));
@@ -1125,8 +1147,8 @@ async function levl_sanity_check() {   // wizcmds.c:1444
     if (u.uinwater) {
         return;
     }
-    for (y = 0; y < 21; y = $c.i16(y + 1)) {
-        for (x = 1; x < 80; x = $c.i16(x + 1)) {
+    for (y = 0; y < ROWNO; y = $c.i16(y + 1)) {
+        for (x = 1; x < COLNO; x = $c.i16(x + 1)) {
             if ((does_block(x, y, $c.relem(svl.level.locations[x], y)) ? 1 : 0) !== get_viz_clear(x, y)) {
                 await impossible($c.lit("levl[%i][%i] vision blocking"), x, y);
             }
@@ -1197,7 +1219,7 @@ async function list_migrating_mons(nextlevl) {   // wizcmds.c:1506
         c = await yn_function($c.lit("List which?"), new $c.Ptr(prmpt, 0), 113, 1);
         n = (c === 99 ? here : c === 110 ? nxtlv : c === 111 ? other : c === 97 ? (here + nxtlv | 0) + other | 0 : 0) >>> 0;
         if (n > 0) {
-            win = await windowprocs.win_create_nhwindow(5);
+            win = await windowprocs.win_create_nhwindow(NHW_TEXT);
             switch (c) {
                 case 99:
                 case 110:
@@ -1240,7 +1262,7 @@ async function list_migrating_mons(nextlevl) {   // wizcmds.c:1506
                     $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" to %d:%d"), mtmp.mux, mtmp.muy);
                 }
                 xyloc = mtmp.mtrack[0].x;
-                if (xyloc === 2) {
+                if (xyloc === MIGR_EXACT_XY) {
                     x = mtmp.mtrack[1].x;
                     y = mtmp.mtrack[1].y;
                     $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" at <%d,%d>"), x, y);
@@ -1257,7 +1279,7 @@ async function list_migrating_mons(nextlevl) {   // wizcmds.c:1506
 }
 export async function wiz_show_stats() {   // wizcmds.c:1616
     let buf = new Int8Array(256), win = 0, total_obj_size = [0], total_obj_count = [0], total_mon_size = [0], total_mon_count = [0], total_ovr_size = [0], total_ovr_count = [0], total_misc_size = [0], total_misc_count = [0];
-    win = await windowprocs.win_create_nhwindow(5);
+    win = await windowprocs.win_create_nhwindow(NHW_TEXT);
     await windowprocs.win_putstr(win, 0, $c.lit("Current memory statistics:"));
     total_obj_count[0] = total_obj_size[0] = 0;
     await windowprocs.win_putstr(win, 0, new $c.Ptr(stats_hdr, 0));
@@ -1306,16 +1328,16 @@ export async function wiz_show_stats() {   // wizcmds.c:1616
     await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
     await windowprocs.win_display_nhwindow(win, 0);
     await windowprocs.win_destroy_nhwindow(win);
-    return 0;
+    return ECMD_OK;
 }
 export async function wiz_display_macros() {   // wizcmds.c:1705
     let buf = new Int8Array(256), win = 0, glyph = 0, test = 0, trouble = 0, no_glyph = 0, max_glyph = 0, $t1, $t2, $t3, $t4, $t5;
     trouble = 0;
-    no_glyph = 9624 /* MAX_GLYPH */;
-    max_glyph = 9624 /* MAX_GLYPH */;
-    win = await windowprocs.win_create_nhwindow(5);
-    for (glyph = 0; glyph < 9624 /* MAX_GLYPH */; glyph = glyph + 1 | 0) {
-        if (glyph >= 3929 /* GLYPH_CMAP_STONE_OFF */ && glyph < 4093) {
+    no_glyph = MAX_GLYPH;
+    max_glyph = MAX_GLYPH;
+    win = await windowprocs.win_create_nhwindow(NHW_TEXT);
+    for (glyph = 0; glyph < MAX_GLYPH; glyph = glyph + 1 | 0) {
+        if (glyph >= GLYPH_CMAP_STONE_OFF && glyph < GLYPH_CMAP_C_OFF + (S_goodpos - S_digbeam + 1)) {
             test = glyph_to_cmap(glyph);
             if (test === no_glyph) {
                 if (!($t1 = trouble, trouble = $t1 + 1 | 0, $t1)) {
@@ -1324,7 +1346,7 @@ export async function wiz_display_macros() {   // wizcmds.c:1705
                 $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("glyph_is_cmap() / glyph_to_cmap(glyph=%d) sync failure, returned NO_GLYPH (%d)"), glyph, test);
                 await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
             }
-            if (glyph >= 4051 /* GLYPH_ZAP_OFF */ && glyph < 4083 && !(test >= 74 /* S_vbeam */ && test <= 77 /* S_rslant */)) {
+            if (glyph >= GLYPH_ZAP_OFF && glyph < (NUM_ZAP << 2) + GLYPH_ZAP_OFF && !(test >= S_vbeam && test <= S_rslant)) {
                 if (!($t2 = trouble, trouble = $t2 + 1 | 0, $t2)) {
                     await windowprocs.win_putstr(win, 0, new $c.Ptr(wiz_display_macros$display_issues, 0));
                 }
@@ -1339,23 +1361,23 @@ export async function wiz_display_macros() {   // wizcmds.c:1705
                 await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
             }
         }
-        if (glyph >= 0 /* GLYPH_MON_MALE_OFF */ && glyph < 383 || glyph >= 383 /* GLYPH_MON_FEM_OFF */ && glyph < 766 || (glyph >= 766 /* GLYPH_PET_MALE_OFF */ && glyph < 1149 || glyph >= 1149 /* GLYPH_PET_FEM_OFF */ && glyph < 1532) || (glyph >= 2682 /* GLYPH_RIDDEN_MALE_OFF */ && glyph < 3065 || glyph >= 3065 /* GLYPH_RIDDEN_FEM_OFF */ && glyph < 3448) || (glyph >= 1533 /* GLYPH_DETECT_MALE_OFF */ && glyph < 1916 || glyph >= 1916 /* GLYPH_DETECT_FEM_OFF */ && glyph < 2299)) {
-            test = glyph >= 383 /* GLYPH_MON_FEM_OFF */ && glyph < 766 ? glyph - 383 /* GLYPH_MON_FEM_OFF */ | 0 : glyph >= 0 /* GLYPH_MON_MALE_OFF */ && glyph < 383 ? glyph - 0 /* GLYPH_MON_MALE_OFF */ | 0 : glyph >= 1149 /* GLYPH_PET_FEM_OFF */ && glyph < 1532 ? glyph - 1149 /* GLYPH_PET_FEM_OFF */ | 0 : glyph >= 766 /* GLYPH_PET_MALE_OFF */ && glyph < 1149 ? glyph - 766 /* GLYPH_PET_MALE_OFF */ | 0 : glyph >= 1916 /* GLYPH_DETECT_FEM_OFF */ && glyph < 2299 ? glyph - 1916 /* GLYPH_DETECT_FEM_OFF */ | 0 : glyph >= 1533 /* GLYPH_DETECT_MALE_OFF */ && glyph < 1916 ? glyph - 1533 /* GLYPH_DETECT_MALE_OFF */ | 0 : glyph >= 3065 /* GLYPH_RIDDEN_FEM_OFF */ && glyph < 3448 ? glyph - 3065 /* GLYPH_RIDDEN_FEM_OFF */ | 0 : glyph >= 2682 /* GLYPH_RIDDEN_MALE_OFF */ && glyph < 3065 ? glyph - 2682 /* GLYPH_RIDDEN_MALE_OFF */ | 0 : 383 /* NUMMONS */;
-            if (test < 0 || test >= 383 /* NUMMONS */) {
+        if (glyph >= GLYPH_MON_MALE_OFF && glyph < GLYPH_MON_MALE_OFF + NUMMONS || glyph >= GLYPH_MON_FEM_OFF && glyph < GLYPH_MON_FEM_OFF + NUMMONS || (glyph >= GLYPH_PET_MALE_OFF && glyph < GLYPH_PET_MALE_OFF + NUMMONS || glyph >= GLYPH_PET_FEM_OFF && glyph < GLYPH_PET_FEM_OFF + NUMMONS) || (glyph >= GLYPH_RIDDEN_MALE_OFF && glyph < GLYPH_RIDDEN_MALE_OFF + NUMMONS || glyph >= GLYPH_RIDDEN_FEM_OFF && glyph < GLYPH_RIDDEN_FEM_OFF + NUMMONS) || (glyph >= GLYPH_DETECT_MALE_OFF && glyph < GLYPH_DETECT_MALE_OFF + NUMMONS || glyph >= GLYPH_DETECT_FEM_OFF && glyph < GLYPH_DETECT_FEM_OFF + NUMMONS)) {
+            test = glyph >= GLYPH_MON_FEM_OFF && glyph < GLYPH_MON_FEM_OFF + NUMMONS ? glyph - GLYPH_MON_FEM_OFF | 0 : glyph >= GLYPH_MON_MALE_OFF && glyph < GLYPH_MON_MALE_OFF + NUMMONS ? glyph - GLYPH_MON_MALE_OFF | 0 : glyph >= GLYPH_PET_FEM_OFF && glyph < GLYPH_PET_FEM_OFF + NUMMONS ? glyph - GLYPH_PET_FEM_OFF | 0 : glyph >= GLYPH_PET_MALE_OFF && glyph < GLYPH_PET_MALE_OFF + NUMMONS ? glyph - GLYPH_PET_MALE_OFF | 0 : glyph >= GLYPH_DETECT_FEM_OFF && glyph < GLYPH_DETECT_FEM_OFF + NUMMONS ? glyph - GLYPH_DETECT_FEM_OFF | 0 : glyph >= GLYPH_DETECT_MALE_OFF && glyph < GLYPH_DETECT_MALE_OFF + NUMMONS ? glyph - GLYPH_DETECT_MALE_OFF | 0 : glyph >= GLYPH_RIDDEN_FEM_OFF && glyph < GLYPH_RIDDEN_FEM_OFF + NUMMONS ? glyph - GLYPH_RIDDEN_FEM_OFF | 0 : glyph >= GLYPH_RIDDEN_MALE_OFF && glyph < GLYPH_RIDDEN_MALE_OFF + NUMMONS ? glyph - GLYPH_RIDDEN_MALE_OFF | 0 : NUMMONS;
+            if (test < 0 || test >= NUMMONS) {
                 if (!($t4 = trouble, trouble = $t4 + 1 | 0, $t4)) {
                     await windowprocs.win_putstr(win, 0, new $c.Ptr(wiz_display_macros$display_issues, 0));
                 }
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("glyph_to_mon(glyph=%d) returns %d exceeds mons[%d] bounds"), glyph, test, 383 /* NUMMONS */);
+                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("glyph_to_mon(glyph=%d) returns %d exceeds mons[%d] bounds"), glyph, test, NUMMONS);
                 await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
             }
         }
-        if (glyph === 3448 /* GLYPH_OBJ_OFF */ || glyph >= 3465 && glyph < 3929 || (glyph === 7992 /* GLYPH_OBJ_PILETOP_OFF */ || glyph > 8009 && glyph < 8473) || (glyph > 3448 /* GLYPH_OBJ_OFF */ && glyph < 3465 || glyph > 7992 /* GLYPH_OBJ_PILETOP_OFF */ && glyph < 8009) || (glyph >= 7226 /* GLYPH_STATUE_MALE_OFF */ && glyph < 7609 || glyph >= 8856 /* GLYPH_STATUE_MALE_PILETOP_OFF */ && glyph < 9239 || (glyph >= 7609 /* GLYPH_STATUE_FEM_OFF */ && glyph < 7992 || glyph >= 9239 /* GLYPH_STATUE_FEM_PILETOP_OFF */ && glyph < 9622)) || (glyph >= 2299 /* GLYPH_BODY_OFF */ && glyph < 2682 || glyph >= 8473 /* GLYPH_BODY_PILETOP_OFF */ && glyph < 8856)) {
-            test = glyph >= 2299 /* GLYPH_BODY_OFF */ && glyph < 2682 || glyph >= 8473 /* GLYPH_BODY_PILETOP_OFF */ && glyph < 8856 ? 265 /* CORPSE */ : glyph >= 7226 /* GLYPH_STATUE_MALE_OFF */ && glyph < 7609 || glyph >= 8856 /* GLYPH_STATUE_MALE_PILETOP_OFF */ && glyph < 9239 || (glyph >= 7609 /* GLYPH_STATUE_FEM_OFF */ && glyph < 7992 || glyph >= 9239 /* GLYPH_STATUE_FEM_PILETOP_OFF */ && glyph < 9622) ? 476 /* STATUE */ : glyph > 3448 /* GLYPH_OBJ_OFF */ && glyph < 3465 || glyph > 7992 /* GLYPH_OBJ_PILETOP_OFF */ && glyph < 8009 ? glyph - (glyph > 7992 /* GLYPH_OBJ_PILETOP_OFF */ && glyph < 8009 ? 7992 /* GLYPH_OBJ_PILETOP_OFF */ : 3448 /* GLYPH_OBJ_OFF */) | 0 : glyph === 3448 /* GLYPH_OBJ_OFF */ || glyph >= 3465 && glyph < 3929 || (glyph === 7992 /* GLYPH_OBJ_PILETOP_OFF */ || glyph > 8009 && glyph < 8473) ? glyph - (glyph === 7992 /* GLYPH_OBJ_PILETOP_OFF */ || glyph > 8009 && glyph < 8473 ? 7992 /* GLYPH_OBJ_PILETOP_OFF */ : 3448 /* GLYPH_OBJ_OFF */) | 0 : 481 /* NUM_OBJECTS */;
-            if (test < 0 || test > 481 /* NUM_OBJECTS */) {
+        if (glyph === GLYPH_OBJ_OFF || glyph >= GLYPH_OBJ_OFF + FIRST_OBJECT - 1 && glyph < GLYPH_OBJ_OFF + NUM_OBJECTS || (glyph === GLYPH_OBJ_PILETOP_OFF || glyph > GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT - 1 && glyph < GLYPH_OBJ_PILETOP_OFF + NUM_OBJECTS) || (glyph > GLYPH_OBJ_OFF && glyph < GLYPH_OBJ_OFF + FIRST_OBJECT - 1 || glyph > GLYPH_OBJ_PILETOP_OFF && glyph < GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT - 1) || (glyph >= GLYPH_STATUE_MALE_OFF && glyph < GLYPH_STATUE_MALE_OFF + NUMMONS || glyph >= GLYPH_STATUE_MALE_PILETOP_OFF && glyph < GLYPH_STATUE_MALE_PILETOP_OFF + NUMMONS || (glyph >= GLYPH_STATUE_FEM_OFF && glyph < GLYPH_STATUE_FEM_OFF + NUMMONS || glyph >= GLYPH_STATUE_FEM_PILETOP_OFF && glyph < GLYPH_STATUE_FEM_PILETOP_OFF + NUMMONS)) || (glyph >= GLYPH_BODY_OFF && glyph < GLYPH_BODY_OFF + NUMMONS || glyph >= GLYPH_BODY_PILETOP_OFF && glyph < GLYPH_BODY_PILETOP_OFF + NUMMONS)) {
+            test = glyph >= GLYPH_BODY_OFF && glyph < GLYPH_BODY_OFF + NUMMONS || glyph >= GLYPH_BODY_PILETOP_OFF && glyph < GLYPH_BODY_PILETOP_OFF + NUMMONS ? CORPSE : glyph >= GLYPH_STATUE_MALE_OFF && glyph < GLYPH_STATUE_MALE_OFF + NUMMONS || glyph >= GLYPH_STATUE_MALE_PILETOP_OFF && glyph < GLYPH_STATUE_MALE_PILETOP_OFF + NUMMONS || (glyph >= GLYPH_STATUE_FEM_OFF && glyph < GLYPH_STATUE_FEM_OFF + NUMMONS || glyph >= GLYPH_STATUE_FEM_PILETOP_OFF && glyph < GLYPH_STATUE_FEM_PILETOP_OFF + NUMMONS) ? STATUE : glyph > GLYPH_OBJ_OFF && glyph < GLYPH_OBJ_OFF + FIRST_OBJECT - 1 || glyph > GLYPH_OBJ_PILETOP_OFF && glyph < GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT - 1 ? glyph - (glyph > GLYPH_OBJ_PILETOP_OFF && glyph < GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT - 1 ? GLYPH_OBJ_PILETOP_OFF : GLYPH_OBJ_OFF) | 0 : glyph === GLYPH_OBJ_OFF || glyph >= GLYPH_OBJ_OFF + FIRST_OBJECT - 1 && glyph < GLYPH_OBJ_OFF + NUM_OBJECTS || (glyph === GLYPH_OBJ_PILETOP_OFF || glyph > GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT - 1 && glyph < GLYPH_OBJ_PILETOP_OFF + NUM_OBJECTS) ? glyph - (glyph === GLYPH_OBJ_PILETOP_OFF || glyph > GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT - 1 && glyph < GLYPH_OBJ_PILETOP_OFF + NUM_OBJECTS ? GLYPH_OBJ_PILETOP_OFF : GLYPH_OBJ_OFF) | 0 : NUM_OBJECTS;
+            if (test < 0 || test > NUM_OBJECTS) {
                 if (!($t5 = trouble, trouble = $t5 + 1 | 0, $t5)) {
                     await windowprocs.win_putstr(win, 0, new $c.Ptr(wiz_display_macros$display_issues, 0));
                 }
-                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("glyph_to_obj(glyph=%d) returns %d exceeds objects[%d] bounds"), glyph, test, 481 /* NUM_OBJECTS */);
+                $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("glyph_to_obj(glyph=%d) returns %d exceeds objects[%d] bounds"), glyph, test, NUM_OBJECTS);
                 await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
             }
         }
@@ -1365,11 +1387,11 @@ export async function wiz_display_macros() {   // wizcmds.c:1705
     }
     await windowprocs.win_display_nhwindow(win, 0);
     await windowprocs.win_destroy_nhwindow(win);
-    return 0;
+    return ECMD_OK;
 }
 export async function wiz_show_nhuuid() {   // wizcmds.c:1782
     await pline($c.lit("The NHUUID for this game is { %s }."), new $c.Ptr(svn.nhuuid, 0));
-    return 0;
+    return ECMD_OK;
 }
 export async function wiz_mon_diff() {   // wizcmds.c:1790
     let buf = new Int8Array(256), win = 0, mhardcoded = 0, mcalculated = 0, trouble = 0, cnt = 0, mdiff = 0, mlev = 0, ptr = null, $t1;
@@ -1378,7 +1400,7 @@ export async function wiz_mon_diff() {   // wizcmds.c:1790
     trouble = 0;
     cnt = 0;
     mdiff = 0;
-    win = await windowprocs.win_create_nhwindow(5);
+    win = await windowprocs.win_create_nhwindow(NHW_TEXT);
     for (ptr = $c.relem(mons, 0); ptr.mlet; ptr = $c.radd(ptr, 1), cnt = cnt + 1 | 0) {
         mcalculated = mstrength(ptr);
         mhardcoded = ptr.difficulty;
@@ -1391,7 +1413,7 @@ export async function wiz_mon_diff() {   // wizcmds.c:1790
             if (mlev > 50) {
                 mlev = 50;
             }
-            nh_snprintf($c.lit("wiz_mon_diff"), 1819, new $c.Ptr(buf, 0), 256, $c.lit("%-18s [%3d:%2d]: calculated: %2d, hardcoded: %2d (%+d)"), ptr.pmnames[2 /* NEUTRAL */], cnt, mlev, mcalculated, mhardcoded, mdiff);
+            nh_snprintf($c.lit("wiz_mon_diff"), 1819, new $c.Ptr(buf, 0), 256, $c.lit("%-18s [%3d:%2d]: calculated: %2d, hardcoded: %2d (%+d)"), ptr.pmnames[NEUTRAL], cnt, mlev, mcalculated, mhardcoded, mdiff);
             await windowprocs.win_putstr(win, 0, new $c.Ptr(buf, 0));
         }
     }
@@ -1400,17 +1422,17 @@ export async function wiz_mon_diff() {   // wizcmds.c:1790
     }
     await windowprocs.win_display_nhwindow(win, 0);
     await windowprocs.win_destroy_nhwindow(win);
-    return 0;
+    return ECMD_OK;
 }
 export async function wiz_objprobs() {   // wizcmds.c:1832
     let win = 0, buf = new Int8Array(256), probsum = new Int32Array(18), otyp = 0, oclass = 0;
-    oclass = objects[18 /* FIRST_OBJECT */].oc_class;
+    oclass = objects[FIRST_OBJECT].oc_class;
     $c.__builtin___memset_chk(new $c.Ptr(probsum, 0), 0, 72, 72);
-    for (otyp = 18 /* FIRST_OBJECT */; otyp < 481 /* NUM_OBJECTS */; otyp = otyp + 1 | 0) {
+    for (otyp = FIRST_OBJECT; otyp < NUM_OBJECTS; otyp = otyp + 1 | 0) {
         probsum[objects[otyp].oc_class] = probsum[objects[otyp].oc_class] + objects[otyp].oc_prob | 0;
     }
-    win = await windowprocs.win_create_nhwindow(5);
-    for (otyp = 18 /* FIRST_OBJECT */; otyp < 481 /* NUM_OBJECTS */; otyp = otyp + 1 | 0) {
+    win = await windowprocs.win_create_nhwindow(NHW_TEXT);
+    for (otyp = FIRST_OBJECT; otyp < NUM_OBJECTS; otyp = otyp + 1 | 0) {
         if (!obj_descr[objects[otyp].oc_name_idx].oc_name) {
             continue;
         }
@@ -1423,7 +1445,7 @@ export async function wiz_objprobs() {   // wizcmds.c:1832
     }
     await windowprocs.win_display_nhwindow(win, 0);
     await windowprocs.win_destroy_nhwindow(win);
-    return 0;
+    return ECMD_OK;
 }
 export async function wiz_migrate_mons() {   // wizcmds.c:1873
     let mcount = 0, inbuf = new Int8Array(256), ptr = null, mtmp = null, use_random_mon = 0, mongen_saved = 0, tolevel = new $T.d_level(), $t1;
@@ -1444,7 +1466,7 @@ export async function wiz_migrate_mons() {   // wizcmds.c:1873
         await pline($c.lit("Can't get there from here."));
     }
     if (new $c.Ptr(inbuf, 0).get(0) === 27 || new $c.Ptr(inbuf, 0).get(0) === 0) {
-        return 0;
+        return ECMD_OK;
     }
     mcount = $c.atoi(new $c.Ptr(inbuf, 0));
     if (mcount < 0) {
@@ -1453,24 +1475,24 @@ export async function wiz_migrate_mons() {   // wizcmds.c:1873
     }
     if (mcount < 1) {
         mcount = 0;
-    } else if (mcount > 1659) {
-        mcount = 1659;
+    } else if (mcount > (COLNO - 1) * ROWNO) {
+        mcount = (COLNO - 1) * ROWNO;
     }
     iflags.debug_mongen = 0;
     while (mcount > 0) {
         if (use_random_mon) {
             ptr = await rndmonst();
-            mtmp = await makemon(ptr, 0, 0, 131072);
+            mtmp = await makemon(ptr, 0, 0, MM_NOMSG);
         } else {
             mtmp = svl.level.monlist;
         }
         if (mtmp) {
-            await migrate_to_level(mtmp, ledger_no(tolevel), 0, null);
+            await migrate_to_level(mtmp, ledger_no(tolevel), MIGR_RANDOM, null);
         }
         mcount = mcount - 1 | 0;
     }
     iflags.debug_mongen = mongen_saved;
-    return 0;
+    return ECMD_OK;
 }
 export async function wiz_custom() {   // wizcmds.c:1934
     let win = 0, buf = new Int8Array(256), bufa = new Int8Array(256), n = 0, pick_list = [null];
@@ -1479,20 +1501,20 @@ export async function wiz_custom() {   // wizcmds.c:1934
         if (!glyphid_cache_status()) {
             await fill_glyphid_cache();
         }
-        win = await windowprocs.win_create_nhwindow(4);
-        await windowprocs.win_start_menu(win, 0);
+        win = await windowprocs.win_create_nhwindow(NHW_MENU);
+        await windowprocs.win_start_menu(win, MENU_BEHAVE_STANDARD);
         await add_menu_heading(win, $c.lit("    glyph  glyph identifier                             sym   clr customcolor unicode utf8"));
-        $c.__builtin___sprintf_chk(new $c.Ptr(bufa, 0), 0, 256, $c.lit("%s: colorcount=%ld %s"), new $c.Ptr(wiz_custom$wizcustom, 0), iflags.colorcount, gs.symset[0 /* PRIMARYSET */].name ? gs.symset[0 /* PRIMARYSET */].name : $c.lit("default"));
-        if (gc.currentgraphics === 0 /* PRIMARYSET */ && gs.symset[0 /* PRIMARYSET */].name) {
+        $c.__builtin___sprintf_chk(new $c.Ptr(bufa, 0), 0, 256, $c.lit("%s: colorcount=%ld %s"), new $c.Ptr(wiz_custom$wizcustom, 0), iflags.colorcount, gs.symset[PRIMARYSET].name ? gs.symset[PRIMARYSET].name : $c.lit("default"));
+        if (gc.currentgraphics === PRIMARYSET && gs.symset[PRIMARYSET].name) {
             $c.__builtin___strcat_chk(new $c.Ptr(bufa, 0), $c.lit(", active"), 256);
         }
-        if (gs.symset[0 /* PRIMARYSET */].handling) {
-            $c.__builtin___sprintf_chk(eos(new $c.Ptr(bufa, 0)), 0, -1, $c.lit(", handler=%s"), known_handling[gs.symset[0 /* PRIMARYSET */].handling]);
+        if (gs.symset[PRIMARYSET].handling) {
+            $c.__builtin___sprintf_chk(eos(new $c.Ptr(bufa, 0)), 0, -1, $c.lit(", handler=%s"), known_handling[gs.symset[PRIMARYSET].handling]);
         }
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s"), new $c.Ptr(bufa, 0));
         await wizcustom_glyphids(win);
         await windowprocs.win_end_menu(win, new $c.Ptr(bufa, 0));
-        n = await select_menu(win, 0, new $c.Ptr(pick_list, 0));
+        n = await select_menu(win, PICK_NONE, new $c.Ptr(pick_list, 0));
         await windowprocs.win_destroy_nhwindow(win);
         if (n >= 1) {
             $c.free(pick_list[0]);
@@ -1504,11 +1526,11 @@ export async function wiz_custom() {   // wizcmds.c:1934
     } else {
         await pline(new $c.Ptr(unavailcmd, 0), ecname_from_fn(wiz_custom));
     }
-    return 0;
+    return ECMD_OK;
 }
 export async function wizcustom_callback(win, glyphnum, id) {   // wizcmds.c:1987
     let cgm = null, clr = 0, buf = new Int8Array(256), bufa = new Int8Array(256), bufb = new Int8Array(256), bufc = new Int8Array(256), bufd = new Int8Array(256), bufu = new Int8Array(256), any = new $T.any(), cp = null;
-    clr = 8;
+    clr = NO_COLOR;
     if (win && id) {
         cgm = $c.relem(glyphmap, glyphnum);
         if (cgm.u || cgm.customcolor !== 0) {
@@ -1527,7 +1549,7 @@ export async function wizcustom_callback(win, glyphnum, id) {   // wizcmds.c:198
             }
             any.a_int = glyphnum + 1 | 0;
             nh_snprintf($c.lit("wizcustom_callback"), 2021, new $c.Ptr(buf, 0), 256, $c.lit("%s %s %s %s"), new $c.Ptr(bufa, 0), new $c.Ptr(bufb, 0), new $c.Ptr(bufc, 0), new $c.Ptr(bufu, 0));
-            await add_menu(win, nul_glyphinfo, any, 0, 0, 0, clr, new $c.Ptr(buf, 0), 0);
+            await add_menu(win, nul_glyphinfo, any, 0, 0, ATR_NONE, clr, new $c.Ptr(buf, 0), MENU_ITEMFLAGS_NONE);
         }
     }
     return;

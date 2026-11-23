@@ -2,14 +2,19 @@
 import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
+import { A_LAWFUL } from './align.h.js';
 import { snuff_lit } from './apply.js';
 import { artifact_hit, artifact_light, defends, find_artifact, is_art, permapoisoned, retouch_equipment, shade_glare, undiscovered_artifact } from './artifact.js';
+import { ART_CLEAVER, ART_EYES_OF_THE_OVERWORLD, ART_GIANTSLAYER, ART_OGRESMASHER, ART_SNICKERSNEE, ART_STORMBRINGER, ART_TROLLSBANE } from './artilist.h.js';
 import { acurr, adjalign, adjattrib, change_luck, exercise, poisoned } from './attrib.js';
+import { A_CON, A_DEX, A_INT, A_STR, A_WIS } from './attrib.h.js';
 import { night } from './calendar.js';
 import { isok, paranoid_query, xytodir } from './cmd.js';
 import { is_pool, is_waterwall } from './dbridge.js';
 import { c_color_names, c_common_strings, disp, flags, ga, gb, gc, gi, gm, gn, go, gs, gt, gu, gv, gy, svc, svd, svk, svl, svm, svr, u, xdir, ydir } from './decl.js';
+import { ARMOR_CLASS, COIN_CLASS, GEM_CLASS, POTION_CLASS, RING_CLASS, SPBOOK_CLASS, S_BLOB, S_EEL, S_EYE, S_FUNGUS, S_GHOST, S_GNOME, S_GOLEM, S_HUMAN, S_KOBOLD, S_LEPRECHAUN, S_LICH, S_LIGHT, S_MIMIC, S_MUMMY, S_NAGA, S_NYMPH, S_ORC, S_SNAKE, S_TROLL, S_VORTEX, S_ZOMBIE, S_digbeam, S_goodpos, S_trapped_chest, TOOL_CLASS, WEAPON_CLASS } from './defsym.h.js';
 import { canseemon, glyph_at, is_safemon, map_invisible, map_location, newsym, sensemon, shieldeff, tmp_at, tp_sensemon, unmap_invisible } from './display.js';
+import { DISP_ALWAYS, DISP_END, EXPL_FIERY, GLYPH_BODY_OFF, GLYPH_BODY_PILETOP_OFF, GLYPH_CMAP_C_OFF, GLYPH_CMAP_STONE_OFF, GLYPH_DETECT_FEM_OFF, GLYPH_DETECT_MALE_OFF, GLYPH_INVIS_OFF, GLYPH_MON_FEM_OFF, GLYPH_MON_MALE_OFF, GLYPH_OBJ_OFF, GLYPH_OBJ_PILETOP_OFF, GLYPH_PET_FEM_OFF, GLYPH_PET_MALE_OFF, GLYPH_RIDDEN_FEM_OFF, GLYPH_RIDDEN_MALE_OFF, GLYPH_STATUE_FEM_OFF, GLYPH_STATUE_FEM_PILETOP_OFF, GLYPH_STATUE_MALE_OFF, GLYPH_STATUE_MALE_PILETOP_OFF, GLYPH_WARNING_OFF } from './display.h.js';
 import { dropy, set_wounded_legs } from './do.js';
 import { Adjmonnam, Mgender, Monnam, Some_Monnam, a_monnam, hcolor, hliquid, l_monnam, mon_nam, mon_nam_too, pmname, some_mon_nam, x_monnam, y_monnam } from './do_name.js';
 import { some_armor } from './do_wear.js';
@@ -23,8 +28,11 @@ import { delayed_killer, done, done_in_by, panic } from './end.js';
 import { u_wipe_engr } from './engrave.js';
 import { losexp } from './exper.js';
 import { adtyp_to_expltype, explode } from './explode.js';
+import { NEW_MOON, PARANOID_HIT } from './flag.h.js';
+import { LL_CONDUCT } from './global.h.js';
 import { glyph_to_cmap } from './glyphs.js';
 import { check_capacity, doorless_door, end_running, in_rooms, inv_cnt, near_capacity, nomul, overexertion, test_move } from './hack.js';
+import { ARTICLE_A, ARTICLE_YOUR, CXN_ARTICLE, CXN_PFX_THE, DIED, DIR_ERR, DISMOUNT_KNOCKED, DISMOUNT_POLY, DROWNING, ECMD_TIME, EXACT_NAME, FACE, HAND, HMON_APPLIED, HMON_KICKED, HMON_MELEE, HMON_THROWN, KILLED_BY, KILLED_BY_AN, LEG, MHID_ALTMON, MIM_OMIT_WAIT, MIM_REVEAL, MMOVE_DIED, NC_SHOW_MSG, NOTELL, NO_KILLER_PREFIX, NO_MM_FLAGS, NO_NC_FLAGS, NO_TRAP_FLAGS, N_DIRS_Z, RLOC_MSG, RLOC_NOMSG, STOMACH, STONING, SUPPRESS_HALLUCINATION, SUPPRESS_INVISIBLE, SUPPRESS_IT, SUPPRESS_NAME, SUPPRESS_SADDLE, TEST_MOVE, XKILL_GIVEMSG, XKILL_NOCORPSE, XKILL_NOMSG, invlet_basic } from './hack.h.js';
 import { dist2, eos, highc, ing_suffix, nh_snprintf, s_suffix, sgn, strNsubst, strstri, upstart } from './hacklib.js';
 import { addinv, carrying, freeinv, hold_another_object, merge_choice, update_inventory, useup, useupall } from './invent.js';
 import { clone_mon, grow_up, makemon } from './makemon.js';
@@ -33,37 +41,52 @@ import { attk_protection, engulf_target, failed_grab, mon_poly, paralyze_monst, 
 import { cloneu, could_seduce, diseasemu, doseduce, getmattk, hitmsg, magic_negation, mdamageu, mpoisons_subj, mtrapped_in_pit, u_slip_free, u_slow_down } from './mhitu.js';
 import { ndemon } from './minion.js';
 import { add_to_minv, dealloc_obj, mksobj, obj_extract_self, place_object, set_corpsenm, splitobj, weight } from './mkobj.js';
+import { SHOPBASE } from './mkroom.h.js';
 import { angry_guards, corpse_chance, golemeffects, healmon, killed, mlifesaver, mon_give_prop, mon_to_stone, mondied, mongone, monkilled, monnear, monstone, newcham, seemimic, set_ustuck, setmangry, unstuck, wake_nearto, wakeup, xkilled } from './mon.js';
+import { AD_ACID, AD_BLND, AD_COLD, AD_CONF, AD_CORR, AD_CURS, AD_DCAY, AD_DETH, AD_DGST, AD_DISE, AD_DRCO, AD_DRDX, AD_DREN, AD_DRIN, AD_DRLI, AD_DRST, AD_ELEC, AD_ENCH, AD_FAMN, AD_FIRE, AD_HALU, AD_HEAL, AD_LEGS, AD_MAGM, AD_PEST, AD_PHYS, AD_PLYS, AD_POLY, AD_RUST, AD_SAMU, AD_SEDU, AD_SGLD, AD_SITM, AD_SLEE, AD_SLIM, AD_SLOW, AD_SPEL, AD_SSEX, AD_STCK, AD_STON, AD_STUN, AD_TLPT, AD_WERE, AD_WRAP, AT_BITE, AT_BOOM, AT_BREA, AT_BUTT, AT_CLAW, AT_ENGL, AT_EXPL, AT_GAZE, AT_HUGS, AT_KICK, AT_MAGC, AT_NONE, AT_SPIT, AT_STNG, AT_TENT, AT_TUCH, AT_WEAP, M_ATTK_AGR_DIED, M_ATTK_AGR_DONE, M_ATTK_DEF_DIED, M_ATTK_HIT, M_ATTK_MISS } from './monattk.h.js';
 import { Resists_Elem, attacktype, can_be_strangled, can_blnd, defended, dmgtype, dmgtype_fromattack, gender, hates_silver, locomotion, mon_hates_blessings, mon_hates_light, mon_hates_silver, monstseesu, monstunseesu, noattacks, on_fire, poly_when_stoned, pronoun_gender, resists_blnd, resists_blnd_by_arti, resists_drli, stagger, sticks } from './mondata.js';
+import { G_NOCORPSE, G_UNIQ, M1_AMORPHOUS, M1_AMPHIBIOUS, M1_ANIMAL, M1_BREATHLESS, M1_CARNIVORE, M1_CONCEAL, M1_FLY, M1_HERBIVORE, M1_HUMANOID, M1_MINDLESS, M1_NOEYES, M1_NOHANDS, M1_NOHEAD, M1_SLITHY, M1_SWIM, M1_THICK_HIDE, M1_UNSOLID, M1_WALLWALK, M2_DEMON, M2_ORC, M2_PNAME, M2_UNDEAD, M2_WERE, MZ_LARGE, MZ_SMALL, NEUTRAL } from './monflag.h.js';
 import { m_move, monflee, set_apparxy } from './monmove.js';
 import { mons } from './monst.js';
+import { MSLOW, M_AP_FURNITURE, M_AP_MONSTER, M_AP_NOTHING, M_AP_OBJECT, M_AP_TYPMASK, M_SEEN_ACID, M_SEEN_COLD, M_SEEN_ELEC, M_SEEN_FIRE, M_SEEN_MAGR, M_SEEN_SLEEP, NEED_WEAPON } from './monst.h.js';
+import { PM_AIR_ELEMENTAL, PM_AMOROUS_DEMON, PM_ARCHON, PM_BABY_LONG_WORM, PM_BALROG, PM_BARBARIAN, PM_BARBED_DEVIL, PM_BLACK_PUDDING, PM_BROWN_PUDDING, PM_CHICKATRICE, PM_CLAY_GOLEM, PM_COCKATRICE, PM_DEATH, PM_ELF, PM_FAMINE, PM_FIRE_ELEMENTAL, PM_FIRE_VORTEX, PM_FLAMING_SPHERE, PM_FLOATING_EYE, PM_FOG_CLOUD, PM_GHOUL, PM_GREEN_SLIME, PM_GREMLIN, PM_GRID_BUG, PM_HEALER, PM_IRON_GOLEM, PM_KNIGHT, PM_LEATHER_GOLEM, PM_LONG_WORM, PM_LONG_WORM_TAIL, PM_MANES, PM_MEDUSA, PM_MONK, PM_PAPER_GOLEM, PM_PESTILENCE, PM_PURPLE_WORM, PM_PYROLISK, PM_ROGUE, PM_ROPE_GOLEM, PM_SALAMANDER, PM_SAMURAI, PM_SHADE, PM_SHRIEKER, PM_STEAM_VORTEX, PM_STONE_GOLEM, PM_STRAW_GOLEM, PM_VAMPIRE, PM_VAMPIRE_LEADER, PM_VLAD_THE_IMPALER, PM_WATCHMAN, PM_WATCH_CAPTAIN, PM_WOOD_GOLEM } from './monsters.h.js';
 import { m_carrying, m_useup, m_useupall } from './mthrowu.js';
 import { munslime, munstone, ureflects } from './muse.js';
 import { observe_object } from './o_init.js';
+import { EF_GREASE, EF_NONE, EF_VERBOSE, ERODE_BURN, ERODE_CORRODE, ERODE_ROT, ERODE_RUST, ER_NOTHING, MAX_EGG_HATCH_TIME, OBJ_FREE, OBJ_INVENT, POTHIT_HERO_BASH, POTHIT_HERO_THROW } from './obj.h.js';
+import { ARM_SHIELD, GEMSTONE, IRON, LEATHER, MAXOCLASSES, METAL, MINERAL, NO_MATERIAL, NUM_OBJECTS, PAPER, SILVER, VEGGY, WHACK } from './objclass.h.js';
 import { objects } from './objects.js';
+import { ACID_VENOM, AMULET_OF_LIFE_SAVING, BLINDING_VENOM, BOOMERANG, BOULDER, CLOVE_OF_GARLIC, CORPSE, CREAM_PIE, DUNCE_CAP, EGG, ELVEN_ARROW, ELVEN_BOW, EXPENSIVE_CAMERA, FIRST_OBJECT, GAUNTLETS_OF_POWER, HEAVY_IRON_BALL, IRON_CHAIN, IRON_SHOES, KATANA, LOADSTONE, LOW_BOOTS, MIRROR, OILSKIN_CLOAK, ROCK, RUBBER_HOSE, STRANGE_OBJECT, TOWEL, WAN_LIGHT, YA, YUMI } from './objects.h.js';
 import { An, The, Yname2, Yobjnam2, an, bare_artifactname, cloak_simple_name, corpse_xname, cxname, doname, helm_simple_name, makeplural, mshot_xname, obj_is_pname, otense, simpleonames, singular, the, vtense, xname, yname, ysimple_name } from './objnam.js';
 import { mhidden_description, object_from_map } from './pager.js';
+import { HIGH_PM, LOW_PM, NATTK, NON_PM, NUMMONS } from './permonst.h.js';
 import { You, You_feel, You_hear, Your, impossible, livelog_printf, pline, pline_The, pline_mon, urgent_pline, verbalize } from './pline.js';
 import { body_part, mbodypart, polymon, rehumanize, ugolemeffects, uunstick } from './polyself.js';
 import { make_blinded, make_confused, make_sick, make_slimed, make_stoned, make_stunned, potionhit, split_mon } from './potion.js';
 import { ghod_hitsu } from './priest.js';
+import { ACID_RES, ANTIMAGIC, BLINDED, COLD_RES, CONFUSION, DEAF, DETECT_MONSTERS, DRAIN_RES, FAST, FIRE_RES, FLYING, FREE_ACTION, FUMBLING, HALF_PHDAM, HALLUC, HALLUC_RES, INVIS, LEVITATION, MAGICAL_BREATHING, POISON_RES, PROT_FROM_SHAPE_CHANGERS, SEE_INVIS, SHOCK_RES, SICK, SICK_RES, SLEEP_RES, SLIMED, SLOW_DIGESTION, STONED, STONE_RES, STUNNED, SWIMMING, TELEPAT, TELEPORT_CONTROL, TIMEOUT, UNCHANGING, W_AMUL, W_ARM, W_ARMC, W_ARMF, W_ARMG, W_ARMH, W_ARMS, W_ARMU, W_RINGL, W_RINGR, W_SADDLE, W_WEP } from './prop.h.js';
+import { DOOR, POOL } from './rm.h.js';
 import { d, rn2, rn2_on_display_rng, rnd, rnl } from './rnd.js';
 import { genders } from './role.js';
 import { dopay, obfree, tended_shop } from './shk.js';
 import { attrcurse } from './sit.js';
+import { P_AXE, P_BARE_HANDED_COMBAT, P_BASIC, P_BOOMERANG, P_BOW, P_CROSSBOW, P_DAGGER, P_DART, P_ISRESTRICTED, P_KNIFE, P_LANCE, P_NONE, P_POLEARMS, P_SABER, P_SHURIKEN, P_SKILLED, P_TWO_WEAPON_COMBAT, P_UNSKILLED, P_WHIP } from './skills.h.js';
 import { losespells } from './spell.js';
 import { findgold, mpickobj, steal, stealamulet, stealgold } from './steal.js';
 import { dismount_steed } from './steed.js';
+import { WARNCOUNT } from './sym.h.js';
 import { sysopt } from './sys.js';
 import { rloc, tele, tele_restrict, u_teleport_mon } from './teleport.js';
 import { burn_away_slime, fall_asleep, obj_stop_timers } from './timeout.js';
 import { acid_damage, drain_en, erode_obj, ignite_items, instapetrify, minstapetrify, mintrap, mselftouch, unconscious } from './trap.js';
+import { IN_SIGHT } from './vision.h.js';
 import { abon, dbon, dmgval, drain_weapon_skill, dry_a_towel, hitval, possibly_unwield, setmnotwielded, silver_sears, special_dmgval, use_skill, uwep_skill_type, weapon_dam_bonus, weapon_hit_bonus, weapon_type } from './weapon.js';
 import { set_ulycn, were_change } from './were.js';
 import { can_twoweapon, drop_uswapwep, set_twoweap, setuwep, untwoweapon, uwepgone } from './wield.js';
 import { windowprocs } from './windows.js';
 import { cutworm } from './worm.js';
 import { extract_from_minvent, find_mac, mon_adjust_speed, which_armor } from './worn.js';
+import { PRONOUN_HALLU, SICK_ALL } from './you.h.js';
 import { destroy_items, drain_item, exclam, hit, obj_resists, resist } from './zap.js';
 
 let hitum_cleave$clockwise = 0;   // static in hitum_cleave()
@@ -93,7 +116,7 @@ async function mhitm_mgc_atk_negated(magr, mdef, verbosely) {   // uhitm.c:75
 }
 export async function dynamic_multi_reason(mon, verb, by_gaze) {   // uhitm.c:104
     let who = null, p = null;
-    who = await x_monnam(mon, 2, null, 47, 0);
+    who = await x_monnam(mon, ARTICLE_A, null, SUPPRESS_IT | SUPPRESS_INVISIBLE | SUPPRESS_HALLUCINATION | SUPPRESS_SADDLE | SUPPRESS_NAME, 0);
     p = new $c.Ptr(gm.multireasonbuf, 0);
     $c.__builtin___sprintf_chk(p, 0, -1, $c.lit("%u:"), mon.m_id);
     p = eos(p);
@@ -105,38 +128,38 @@ export async function erode_armor(mdef, hurt) {   // uhitm.c:126
     L1: while (1) {
         switch (rn2(5)) {
             case 0:
-                target = await which_armor(mdef, 4);
-                if (!target || await erode_obj(target, await xname(target), hurt, 1) === 0) {
+                target = await which_armor(mdef, W_ARMH);
+                if (!target || await erode_obj(target, await xname(target), hurt, EF_GREASE) === ER_NOTHING) {
                     continue L1;
                 }
                 break;
             case 1:
-                target = await which_armor(mdef, 2);
+                target = await which_armor(mdef, W_ARMC);
                 if (target) {
-                    await erode_obj(target, await xname(target), hurt, 5);
+                    await erode_obj(target, await xname(target), hurt, EF_GREASE | EF_VERBOSE);
                     break;
                 }
-                if ((target = await which_armor(mdef, 1)) !== null) {
-                    await erode_obj(target, await xname(target), hurt, 5);
-                } else if ((target = await which_armor(mdef, 64)) !== null) {
-                    await erode_obj(target, await xname(target), hurt, 5);
+                if ((target = await which_armor(mdef, W_ARM)) !== null) {
+                    await erode_obj(target, await xname(target), hurt, EF_GREASE | EF_VERBOSE);
+                } else if ((target = await which_armor(mdef, W_ARMU)) !== null) {
+                    await erode_obj(target, await xname(target), hurt, EF_GREASE | EF_VERBOSE);
                 }
                 break;
             case 2:
-                target = await which_armor(mdef, 8);
-                if (!target || await erode_obj(target, await xname(target), hurt, 1) === 0) {
+                target = await which_armor(mdef, W_ARMS);
+                if (!target || await erode_obj(target, await xname(target), hurt, EF_GREASE) === ER_NOTHING) {
                     continue L1;
                 }
                 break;
             case 3:
-                target = await which_armor(mdef, 16);
-                if (!target || await erode_obj(target, await xname(target), hurt, 1) === 0) {
+                target = await which_armor(mdef, W_ARMG);
+                if (!target || await erode_obj(target, await xname(target), hurt, EF_GREASE) === ER_NOTHING) {
                     continue L1;
                 }
                 break;
             case 4:
-                target = await which_armor(mdef, 32);
-                if (!target || await erode_obj(target, await xname(target), hurt, 1) === 0) {
+                target = await which_armor(mdef, W_ARMF);
+                if (!target || await erode_obj(target, await xname(target), hurt, EF_GREASE) === ER_NOTHING) {
                     continue L1;
                 }
                 break;
@@ -154,38 +177,38 @@ export async function attack_checks(mtmp, wep) {   // uhitm.c:189
         return 0;
     }
     glyph = glyph_at(gb.bhitpos.x, gb.bhitpos.y);
-    if (!(canseemon(mtmp) || sensemon(mtmp)) && !(glyph >= 7220 /* GLYPH_WARNING_OFF */ && glyph < 7226) && !(glyph === 1532 /* GLYPH_INVIS_OFF */) && !(!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked) && mtmp.mundetected | 0 && $c.andu64(mtmp.data.mflags1, 128) !== 0)) {
+    if (!(canseemon(mtmp) || sensemon(mtmp)) && !(glyph >= GLYPH_WARNING_OFF && glyph < GLYPH_WARNING_OFF + WARNCOUNT) && !(glyph === GLYPH_INVIS_OFF) && !(!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked) && mtmp.mundetected | 0 && $c.andu64(mtmp.data.mflags1, M1_CONCEAL) !== 0)) {
         await pline($c.lit("Wait!  There's %s there you can't see!"), c_common_strings.c_something);
         await map_invisible(gb.bhitpos.x, gb.bhitpos.y);
-        if (mtmp.m_ap_type & 7 && !(u.uprops[60 /* PROT_FROM_SHAPE_CHANGERS */].intrinsic || u.uprops[60 /* PROT_FROM_SHAPE_CHANGERS */].extrinsic)) {
-            if (!u.ustuck && !mtmp.mflee && dmgtype(mtmp.data, 19) && dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 2) {
+        if (mtmp.m_ap_type & M_AP_TYPMASK && !(u.uprops[PROT_FROM_SHAPE_CHANGERS].intrinsic || u.uprops[PROT_FROM_SHAPE_CHANGERS].extrinsic)) {
+            if (!u.ustuck && !mtmp.mflee && dmgtype(mtmp.data, AD_STCK) && dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 2) {
                 await set_ustuck(mtmp);
             }
         }
         await wakeup(mtmp, 1);
         return 1;
     }
-    if (mtmp.m_ap_type & 7 && !(u.uprops[60 /* PROT_FROM_SHAPE_CHANGERS */].intrinsic || u.uprops[60 /* PROT_FROM_SHAPE_CHANGERS */].extrinsic) && !sensemon(mtmp) && !(glyph >= 7220 /* GLYPH_WARNING_OFF */ && glyph < 7226)) {
-        if (glyph === 1532 /* GLYPH_INVIS_OFF */) {
+    if (mtmp.m_ap_type & M_AP_TYPMASK && !(u.uprops[PROT_FROM_SHAPE_CHANGERS].intrinsic || u.uprops[PROT_FROM_SHAPE_CHANGERS].extrinsic) && !sensemon(mtmp) && !(glyph >= GLYPH_WARNING_OFF && glyph < GLYPH_WARNING_OFF + WARNCOUNT)) {
+        if (glyph === GLYPH_INVIS_OFF) {
             await seemimic(mtmp);
             return 0;
         }
         await stumble_onto_mimic(mtmp);
         return 1;
     }
-    if (mtmp.mundetected | 0 && !canseemon(mtmp) && !(glyph >= 7220 /* GLYPH_WARNING_OFF */ && glyph < 7226) && ($c.andu64(mtmp.data.mflags1, 128) !== 0 || mtmp.data.mlet === 57 /* S_EEL */)) {
+    if (mtmp.mundetected | 0 && !canseemon(mtmp) && !(glyph >= GLYPH_WARNING_OFF && glyph < GLYPH_WARNING_OFF + WARNCOUNT) && ($c.andu64(mtmp.data.mflags1, M1_CONCEAL) !== 0 || mtmp.data.mlet === S_EEL)) {
         $t1 = mtmp.msleeping = (0) & 1, mtmp.mundetected = ($t1) & 1;
         await newsym(mtmp.mx, mtmp.my);
-        if (glyph === 1532 /* GLYPH_INVIS_OFF */) {
+        if (glyph === GLYPH_INVIS_OFF) {
             await seemimic(mtmp);
             return 0;
         }
-        if (!tp_sensemon(mtmp) && !(u.uprops[37 /* DETECT_MONSTERS */].intrinsic || u.uprops[37 /* DETECT_MONSTERS */].extrinsic)) {
+        if (!tp_sensemon(mtmp) && !(u.uprops[DETECT_MONSTERS].intrinsic || u.uprops[DETECT_MONSTERS].extrinsic)) {
             $c.__builtin___strcpy_chk(new $c.Ptr(lmonbuf, 0), await l_monnam(mtmp), 256);
             notseen = $c.i8(!$c.strcmp(new $c.Ptr(lmonbuf, 0), $c.lit("it")) ? 1 : 0);
-            if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked) && (u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic))) {
+            if (!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked) && (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic))) {
                 await pline($c.lit("A %s %s %s!"), mtmp.mtame ? $c.lit("tame") : $c.lit("wild"), notseen ? $c.lit("creature") : new $c.Ptr(lmonbuf, 0), notseen ? $c.lit("is present") : $c.lit("appears"));
-            } else if ((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked || is_pool(mtmp.mx, mtmp.my) && !u.uinwater) {
+            } else if ((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked || is_pool(mtmp.mx, mtmp.my) && !u.uinwater) {
                 await pline($c.lit("Wait!  There's a hidden monster there!"));
             } else if ((obj = svl.level.objects[mtmp.mx][mtmp.my]) !== null) {
                 await pline($c.lit("Wait!  There's %s hiding under %s!"), notseen ? c_common_strings.c_something : await an(new $c.Ptr(lmonbuf, 0)), await doname(obj));
@@ -193,18 +216,18 @@ export async function attack_checks(mtmp, wep) {   // uhitm.c:189
             return 1;
         }
     }
-    if ((mtmp.mundetected | 0 || mtmp.m_ap_type & 7) && sensemon(mtmp)) {
+    if ((mtmp.mundetected | 0 || mtmp.m_ap_type & M_AP_TYPMASK) && sensemon(mtmp)) {
         mtmp.mundetected = (0) & 1;
         await wakeup(mtmp, 1);
     }
-    if (flags.confirm && mtmp.mpeaceful | 0 && !u.uprops[14 /* CONFUSION */].intrinsic && !(u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic)) && !u.uprops[13 /* STUNNED */].intrinsic) {
-        if (is_art(wep, 2 /* ART_STORMBRINGER */)) {
+    if (flags.confirm && mtmp.mpeaceful | 0 && !u.uprops[CONFUSION].intrinsic && !(u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic)) && !u.uprops[STUNNED].intrinsic) {
+        if (is_art(wep, ART_STORMBRINGER)) {
             go.override_confirmation = 1;
             return 0;
         }
         if (canseemon(mtmp) || sensemon(mtmp)) {
             $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("Really attack %s?"), await mon_nam(mtmp));
-            if (!await paranoid_query($c.i8((flags.paranoia_bits & 16) >>> 0 !== 0 ? 1 : 0), new $c.Ptr(qbuf, 0))) {
+            if (!await paranoid_query($c.i8((flags.paranoia_bits & PARANOID_HIT) >>> 0 !== 0 ? 1 : 0), new $c.Ptr(qbuf, 0))) {
                 svc.context.move = 0;
                 return 1;
             }
@@ -216,10 +239,10 @@ export async function check_caitiff(mtmp) {   // uhitm.c:331
     if (u.ualign.record <= -10) {
         return;
     }
-    if (gu.urole.mnum === 335 && u.ualign.type === 1 && !($c.andu64(mtmp.data.mflags2, 2) !== 0) && (mtmp.msleeping | 0 || !mtmp.mcanmove || mtmp.mflee | 0 && !mtmp.mavenge)) {
+    if (gu.urole.mnum === PM_KNIGHT && u.ualign.type === A_LAWFUL && !($c.andu64(mtmp.data.mflags2, M2_UNDEAD) !== 0) && (mtmp.msleeping | 0 || !mtmp.mcanmove || mtmp.mflee | 0 && !mtmp.mavenge)) {
         await You($c.lit("caitiff!"));
         adjalign(-1);
-    } else if (gu.urole.mnum === 340 && mtmp.mpeaceful | 0) {
+    } else if (gu.urole.mnum === PM_SAMURAI && mtmp.mpeaceful | 0) {
         await You($c.lit("dishonorably attack the innocent!"));
         adjalign(-1);
     }
@@ -251,14 +274,14 @@ export async function find_roll_to_hit(mtmp, aatyp, weapon, attk_count, role_rol
     if (!mtmp.mcanmove) {
         tmp = tmp + 4 | 0;
     }
-    if (gu.urole.mnum === 336 && !(u.umonnum !== u.umonster)) {
+    if (gu.urole.mnum === PM_MONK && !(u.umonnum !== u.umonster)) {
         if ($G.uarm) {
             tmp = tmp - role_roll_penalty.set(0, gu.urole.spelarmr) | 0;
         } else if (!$G.uwep && !$G.uarms) {
             tmp = tmp + ($c.div32(u.ulevel, 3) + 2 | 0) | 0;
         }
     }
-    if ($c.andu64(mtmp.data.mflags2, 128) !== 0 && (u.umonnum !== u.umonster ? $c.andu64(gy.youmonst.data.mflags2, 16) !== 0 : gu.urace.mnum === 264)) {
+    if ($c.andu64(mtmp.data.mflags2, M2_ORC) !== 0 && (u.umonnum !== u.umonster ? $c.andu64(gy.youmonst.data.mflags2, 16) !== 0 : gu.urace.mnum === PM_ELF)) {
         tmp = tmp + 1 | 0;
     }
     if ((tmp2 = near_capacity()) !== 0) {
@@ -267,12 +290,12 @@ export async function find_roll_to_hit(mtmp, aatyp, weapon, attk_count, role_rol
     if (u.utrap) {
         tmp = tmp - 3 | 0;
     }
-    if (aatyp === 254 || aatyp === 1) {
+    if (aatyp === AT_WEAP || aatyp === AT_CLAW) {
         if (weapon) {
             tmp = tmp + await hitval(weapon, mtmp) | 0;
         }
         tmp = tmp + await weapon_hit_bonus(weapon) | 0;
-    } else if (aatyp === 3 && (gu.urole.mnum === 340 || gu.urole.mnum === 336)) {
+    } else if (aatyp === AT_KICK && (gu.urole.mnum === PM_SAMURAI || gu.urole.mnum === PM_MONK)) {
         tmp = tmp + await weapon_hit_bonus(null) | 0;
     }
     return tmp;
@@ -291,11 +314,11 @@ export async function do_attack(mtmp) {   // uhitm.c:448
     let mdat = null, foo = 0, inshop = 0, p = null, buf = new Int8Array(256), $t1;
     mdat = mtmp.data;
     if (is_safemon(mtmp) && !svc.context.forcefight) {
-        if (!is_art($G.uwep, 2 /* ART_STORMBRINGER */)) {
-            foo = $c.i8($G.uball !== null || !rn2(7) || ($c.peq(mtmp.data, $c.relem(mons, 112 /* PM_BABY_LONG_WORM */)) || $c.peq(mtmp.data, $c.relem(mons, 114 /* PM_LONG_WORM */)) || $c.peq(mtmp.data, $c.relem(mons, 330 /* PM_LONG_WORM_TAIL */))) && mtmp.wormno | 0 || svl.level.locations[u.ux][u.uy].typ < 16 /* POOL */ && !($c.andu64(mtmp.data.mflags1, 8) !== 0) ? 1 : 0);
+        if (!is_art($G.uwep, ART_STORMBRINGER)) {
+            foo = $c.i8($G.uball !== null || !rn2(7) || ($c.peq(mtmp.data, $c.relem(mons, PM_BABY_LONG_WORM)) || $c.peq(mtmp.data, $c.relem(mons, PM_LONG_WORM)) || $c.peq(mtmp.data, $c.relem(mons, PM_LONG_WORM_TAIL))) && mtmp.wormno | 0 || svl.level.locations[u.ux][u.uy].typ < POOL && !($c.andu64(mtmp.data.mflags1, M1_WALLWALK) !== 0) ? 1 : 0);
             inshop = 0;
             if (!foo) {
-                for (p = in_rooms(mtmp.mx, mtmp.my, 14 /* SHOPBASE */); p.get(0); p = p.add(1)) {
+                for (p = in_rooms(mtmp.mx, mtmp.my, SHOPBASE); p.get(0); p = p.add(1)) {
                     if (tended_shop($c.relem(svr.rooms, p.get(0) - 3 | 0))) {
                         inshop = 1;
                         break;
@@ -305,7 +328,7 @@ export async function do_attack(mtmp) {   // uhitm.c:448
             if (inshop || foo) {
                 if (!svc.context.travel && !svc.context.run) {
                     if ((canseemon(mtmp) || sensemon(mtmp)) && mtmp.isshk | 0) {
-                        return $c.i8(1 | await dopay());
+                        return $c.i8(ECMD_TIME | await dopay());
                     }
                 }
                 if (mtmp.mtame) {
@@ -349,14 +372,14 @@ export async function do_attack(mtmp) {   // uhitm.c:448
             if (flags.verbose) {
                 if ($G.uwep) {
                     await You($c.lit("begin bashing monsters with %s."), await yname($G.uwep));
-                } else if (!($c.andu64(gy.youmonst.data.mflags1, 8192) !== 0 || gy.youmonst.data.msize < 1)) {
-                    await You($c.lit("begin %s monsters with your %s %s."), ing_suffix(gu.urole.mnum === 336 ? $c.lit("strike") : $c.lit("bash")), $G.uarmg ? $c.lit("gloved") : $c.lit("bare"), await makeplural(await body_part(6 /* HAND */)));
+                } else if (!($c.andu64(gy.youmonst.data.mflags1, M1_NOHANDS) !== 0 || gy.youmonst.data.msize < MZ_SMALL)) {
+                    await You($c.lit("begin %s monsters with your %s %s."), ing_suffix(gu.urole.mnum === PM_MONK ? $c.lit("strike") : $c.lit("bash")), $G.uarmg ? $c.lit("gloved") : $c.lit("bare"), await makeplural(await body_part(HAND)));
                 }
             }
         }
-        await exercise(0 /* A_STR */, 1);
+        await exercise(A_STR, 1);
         await u_wipe_engr(3);
-        if (mdat.mlet === 12 /* S_LEPRECHAUN */ && !mtmp.mfrozen && !(mtmp.msleeping | 0 || !mtmp.mcanmove) && !mtmp.mconf && mtmp.mcansee | 0 && !rn2(7) && (await m_move(mtmp, 0) === 2 || mtmp.mx !== (u.ux + u.dx | 0) || mtmp.my !== (u.uy + u.dy | 0))) {
+        if (mdat.mlet === S_LEPRECHAUN && !mtmp.mfrozen && !(mtmp.msleeping | 0 || !mtmp.mcanmove) && !mtmp.mconf && mtmp.mcansee | 0 && !rn2(7) && (await m_move(mtmp, 0) === MMOVE_DIED || mtmp.mx !== (u.ux + u.dx | 0) || mtmp.my !== (u.uy + u.dy | 0))) {
             await You($c.lit("miss wildly and stumble forwards."));
             return 0;
         }
@@ -367,7 +390,7 @@ export async function do_attack(mtmp) {   // uhitm.c:448
         }
         mtmp.mstrategy = $c.andu64(mtmp.mstrategy, 18446744072904245247n);
     }
-    if (svc.context.forcefight && !(mtmp.mhp < 1) && !(canseemon(mtmp) || sensemon(mtmp)) && !(svl.level.locations[u.ux + u.dx | 0][u.uy + u.dy | 0].glyph === 1532 /* GLYPH_INVIS_OFF */) && !(u.uswallow | 0 && $c.peq(u.ustuck, mtmp))) {
+    if (svc.context.forcefight && !(mtmp.mhp < 1) && !(canseemon(mtmp) || sensemon(mtmp)) && !(svl.level.locations[u.ux + u.dx | 0][u.uy + u.dy | 0].glyph === GLYPH_INVIS_OFF) && !(u.uswallow | 0 && $c.peq(u.ustuck, mtmp))) {
         await map_invisible($c.i16(u.ux + u.dx | 0), $c.i16(u.uy + u.dy | 0));
     }
     return 1;
@@ -375,7 +398,7 @@ export async function do_attack(mtmp) {   // uhitm.c:448
 async function known_hitum(mon, weapon, mhit, rollneeded, armorpenalty, uattk, dieroll) {   // uhitm.c:587
     let malive = 0, slice_or_chop = 0, oldhp = 0, oldweaphit = 0;
     malive = 1;
-    slice_or_chop = $c.i8(weapon && (weapon.oclass === 2 /* WEAPON_CLASS */ && objects[weapon.otyp].oc_subtyp >= 1 /* P_DAGGER */ && objects[weapon.otyp].oc_subtyp <= 9 /* P_SABER */ || (weapon.oclass === 2 /* WEAPON_CLASS */ || weapon.oclass === 6 /* TOOL_CLASS */) && objects[weapon.otyp].oc_subtyp === 3 /* P_AXE */) ? 1 : 0);
+    slice_or_chop = $c.i8(weapon && (weapon.oclass === WEAPON_CLASS && objects[weapon.otyp].oc_subtyp >= P_DAGGER && objects[weapon.otyp].oc_subtyp <= P_SABER || (weapon.oclass === WEAPON_CLASS || weapon.oclass === TOOL_CLASS) && objects[weapon.otyp].oc_subtyp === P_AXE) ? 1 : 0);
     if (go.override_confirmation) {
         if (flags.verbose) {
             await Your($c.lit("bloodthirsty blade attacks!"));
@@ -386,11 +409,11 @@ async function known_hitum(mon, weapon, mhit, rollneeded, armorpenalty, uattk, d
     } else {
         oldhp = mon.mhp;
         oldweaphit = u.uconduct.weaphit;
-        if (weapon && (weapon.oclass === 2 /* WEAPON_CLASS */ || weapon.oclass === 6 /* TOOL_CLASS */ && objects[weapon.otyp].oc_subtyp !== 0 /* P_NONE */)) {
+        if (weapon && (weapon.oclass === WEAPON_CLASS || weapon.oclass === TOOL_CLASS && objects[weapon.otyp].oc_subtyp !== P_NONE)) {
             u.uconduct.weaphit = $c.add64(u.uconduct.weaphit, 1);
         }
         gn.notonhead = $c.i8(mon.mx !== gb.bhitpos.x || mon.my !== gb.bhitpos.y ? 1 : 0);
-        malive = await hmon(mon, weapon, 0 /* HMON_MELEE */, dieroll);
+        malive = await hmon(mon, weapon, HMON_MELEE, dieroll);
         if (malive) {
             if (!rn2(25) && mon.mhp < $c.div32(mon.mhpmax, 2) && !(u.uswallow | 0 && $c.peq(u.ustuck, mon))) {
                 await monflee(mon, !rn2(3) ? rnd(100) : 0, 0, 1);
@@ -414,24 +437,24 @@ async function hitum_cleave(target, uattk) {   // uhitm.c:651
     x = u.ux;
     y = u.uy;
     i = xytodir(u.dx, u.dy);
-    if (i === -1 /* DIR_ERR */) {
+    if (i === DIR_ERR) {
         await impossible($c.lit("hitum_cleave: unknown target direction [%d,%d,%d]?"), u.dx, u.dy, u.dz);
         return 1;
     }
-    i = hitum_cleave$clockwise ? $c.rem32(i + 6 | 0, 8) : $c.rem32(i + 2 | 0, 8);
+    i = hitum_cleave$clockwise ? $c.rem32(i + 6 | 0, N_DIRS_Z - 2) : $c.rem32(i + 2 | 0, N_DIRS_Z - 2);
     umort = u.umortality;
     save_bhitpos.$copyFrom(gb.bhitpos);
     save_notonhead = gn.notonhead;
     for (count = 3; count > 0; count = count - 1 | 0) {
         attknum[0] = 0;
-        i = hitum_cleave$clockwise ? $c.rem32(i + 1 | 0, 8) : $c.rem32(i + 7 | 0, 8);
+        i = hitum_cleave$clockwise ? $c.rem32(i + 1 | 0, N_DIRS_Z - 2) : $c.rem32(i + 7 | 0, N_DIRS_Z - 2);
         tx = x + xdir[i] | 0, ty = y + ydir[i] | 0;
         if (!isok($c.i16(tx), $c.i16(ty))) {
             continue;
         }
         mtmp = svl.level.monsters[tx][ty];
         if (!mtmp) {
-            if (svl.level.locations[tx][ty].glyph === 1532 /* GLYPH_INVIS_OFF */) {
+            if (svl.level.locations[tx][ty].glyph === GLYPH_INVIS_OFF) {
                 await unmap_invisible($c.i16(tx), $c.i16(ty));
             }
             continue;
@@ -443,7 +466,7 @@ async function hitum_cleave(target, uattk) {   // uhitm.c:651
         gb.bhitpos.x = $c.i16(tx), gb.bhitpos.y = $c.i16(ty);
         gn.notonhead = $c.i8(mtmp.mx !== tx || mtmp.my !== ty ? 1 : 0);
         await known_hitum(mtmp, $G.uwep, new $c.Ptr(mhit, 0), tmp, armorpenalty[0], uattk, dieroll);
-        await passive(mtmp, $G.uwep, $c.i8(mhit[0]), $c.i8(!(mtmp.mhp < 1) ? 1 : 0), 254, $c.i8(!$G.uwep ? 1 : 0));
+        await passive(mtmp, $G.uwep, $c.i8(mhit[0]), $c.i8(!(mtmp.mhp < 1) ? 1 : 0), AT_WEAP, $c.i8(!$G.uwep ? 1 : 0));
         if (!$G.uwep || gm.multi < 0 || u.umortality > umort) {
             break;
         }
@@ -455,9 +478,9 @@ async function hitum_cleave(target, uattk) {   // uhitm.c:651
 }
 function double_punch() {   // uhitm.c:736
     let skl_lvl = 0;
-    skl_lvl = u.weapon_skills[35 /* P_BARE_HANDED_COMBAT */].skill;
-    if (!$G.uwep && !$G.uarms && skl_lvl > 2 /* P_BASIC */) {
-        return $c.i8((skl_lvl - 2 /* P_BASIC */ | 0) > rn2(5) ? 1 : 0);
+    skl_lvl = u.weapon_skills[P_BARE_HANDED_COMBAT].skill;
+    if (!$G.uwep && !$G.uarms && skl_lvl > P_BASIC) {
+        return $c.i8((skl_lvl - P_BASIC | 0) > rn2(5) ? 1 : 0);
     }
     return 0;
 }
@@ -470,7 +493,7 @@ async function hitum(mon, uattk) {   // uhitm.c:758
     x = u.ux + u.dx | 0;
     y = u.uy + u.dy | 0;
     oldumort = u.umortality;
-    if (is_art($G.uwep, 4 /* ART_CLEAVER */) && !u.twoweap && !u.uswallow && !u.ustuck && !(u.umonnum === 116 /* PM_GRID_BUG */)) {
+    if (is_art($G.uwep, ART_CLEAVER) && !u.twoweap && !u.uswallow && !u.ustuck && !(u.umonnum === PM_GRID_BUG)) {
         return await hitum_cleave(mon, uattk);
     }
     $t1 = ($G.uwep ? u.twoweap : double_punch()) ? 1 : 0, gt.twohits = $t1;
@@ -479,13 +502,13 @@ async function hitum(mon, uattk) {   // uhitm.c:758
     dieroll = rnd(20);
     mhit[0] = tmp > dieroll || u.uswallow | 0 ? 1 : 0;
     if (tmp > dieroll) {
-        await exercise(3 /* A_DEX */, 1);
+        await exercise(A_DEX, 1);
     }
     malive = await known_hitum(mon, $G.uwep, new $c.Ptr(mhit, 0), tmp, armorpenalty[0], uattk, dieroll);
     if (wepbefore && !$G.uwep) {
         wep_was_destroyed = 1;
     }
-    await passive(mon, $G.uwep, $c.i8(mhit[0]), malive, 254, wep_was_destroyed);
+    await passive(mon, $G.uwep, $c.i8(mhit[0]), malive, AT_WEAP, wep_was_destroyed);
     if (gt.twohits && !(go.override_confirmation || gm.multi < 0 || u.umortality > oldumort || !malive || !$c.peq(svl.level.monsters[x][y], mon))) {
         gt.twohits = 2;
         tmp = await find_roll_to_hit(mon, uattk.aatyp, $G.uswapwep, new $c.Ptr(attknum, 0), new $c.Ptr(armorpenalty, 0));
@@ -494,7 +517,7 @@ async function hitum(mon, uattk) {   // uhitm.c:758
         mhit[0] = tmp > dieroll || u.uswallow | 0 ? 1 : 0;
         malive = await known_hitum(mon, secondwep, new $c.Ptr(mhit, 0), tmp, armorpenalty[0], uattk, dieroll);
         if (mhit[0]) {
-            await passive(mon, secondwep, $c.i8(mhit[0]), malive, 254, $c.i8(secondwep && !$G.uswapwep ? 1 : 0));
+            await passive(mon, secondwep, $c.i8(mhit[0]), malive, AT_WEAP, $c.i8(secondwep && !$G.uswapwep ? 1 : 0));
         }
     }
     gt.twohits = 0;
@@ -502,37 +525,37 @@ async function hitum(mon, uattk) {   // uhitm.c:758
 }
 export async function hmon(mon, obj, thrown, dieroll) {   // uhitm.c:819
     let result = 0, anger_guards = 0;
-    anger_guards = $c.i8(mon.mpeaceful | 0 && (mon.ispriest | 0 || mon.isshk | 0 || ($c.peq(mon.data, $c.relem(mons, 282 /* PM_WATCHMAN */)) || $c.peq(mon.data, $c.relem(mons, 283 /* PM_WATCH_CAPTAIN */)))) ? 1 : 0);
+    anger_guards = $c.i8(mon.mpeaceful | 0 && (mon.ispriest | 0 || mon.isshk | 0 || ($c.peq(mon.data, $c.relem(mons, PM_WATCHMAN)) || $c.peq(mon.data, $c.relem(mons, PM_WATCH_CAPTAIN)))) ? 1 : 0);
     result = await hmon_hitmon(mon, obj, thrown, dieroll);
     if (mon.ispriest | 0 && !rn2(2)) {
         await ghod_hitsu(mon);
     }
     if (anger_guards) {
-        await angry_guards($c.i8(!!(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf) ? 1 : 0));
+        await angry_guards($c.i8(!!(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf) ? 1 : 0));
     }
     return result;
 }
 async function hmon_hitmon_barehands(hmd, mon) {   // uhitm.c:838
     let spcdmgflg = 0, silverhit = [0], $t1, $t2;
     silverhit[0] = 0;
-    if ($c.peq(hmd.mdat, $c.relem(mons, 288 /* PM_SHADE */))) {
+    if ($c.peq(hmd.mdat, $c.relem(mons, PM_SHADE))) {
         hmd.dmg = 0;
     } else {
-        $t1 = rnd(!(gu.urole.mnum === 340 || gu.urole.mnum === 336) ? 2 : 4), hmd.dmg = $t1;
+        $t1 = rnd(!(gu.urole.mnum === PM_SAMURAI || gu.urole.mnum === PM_MONK) ? 2 : 4), hmd.dmg = $t1;
         hmd.use_weapon_skill = 1;
         hmd.train_weapon_skill = $c.i8(hmd.dmg > 1 ? 1 : 0);
     }
-    spcdmgflg = $G.uarmg ? 16 : $c.or64(hmd.twohits === 0 || hmd.twohits === 1 ? 262144 : 0, hmd.twohits === 0 || hmd.twohits === 2 ? 131072 : 0);
+    spcdmgflg = $G.uarmg ? W_ARMG : $c.or64(hmd.twohits === 0 || hmd.twohits === 1 ? W_RINGR : 0, hmd.twohits === 0 || hmd.twohits === 2 ? W_RINGL : 0);
     $t2 = await special_dmgval(gy.youmonst, mon, spcdmgflg, new $c.Ptr(silverhit, 0)), hmd.dmg = hmd.dmg + $t2 | 0;
     switch (hmd.twohits) {
         case 0:
-            hmd.barehand_silver_rings = $c.and64(silverhit[0], 393216) ? 1 : 0;
+            hmd.barehand_silver_rings = $c.and64(silverhit[0], W_RINGR | W_RINGL) ? 1 : 0;
             break;
         case 1:
-            hmd.barehand_silver_rings = $c.and64(silverhit[0], 262144) ? 1 : 0;
+            hmd.barehand_silver_rings = $c.and64(silverhit[0], W_RINGR) ? 1 : 0;
             break;
         case 2:
-            hmd.barehand_silver_rings = $c.and64(silverhit[0], 131072) ? 1 : 0;
+            hmd.barehand_silver_rings = $c.and64(silverhit[0], W_RINGL) ? 1 : 0;
             break;
         default:
             hmd.barehand_silver_rings = 0;
@@ -544,16 +567,16 @@ async function hmon_hitmon_barehands(hmd, mon) {   // uhitm.c:838
 }
 async function hmon_hitmon_weapon_ranged(hmd, mon, obj) {   // uhitm.c:885
     let more_than_1 = 0, $t1, $t2, $t3;
-    if ($c.peq(hmd.mdat, $c.relem(mons, 288 /* PM_SHADE */)) && !shade_glare(obj)) {
+    if ($c.peq(hmd.mdat, $c.relem(mons, PM_SHADE)) && !shade_glare(obj)) {
         hmd.dmg = 0;
     } else {
         $t1 = rnd(2), hmd.dmg = $t1;
     }
-    if (hmd.material === 14 /* SILVER */ && mon_hates_silver(mon)) {
+    if (hmd.material === SILVER && mon_hates_silver(mon)) {
         $t2 = hmd.silverobj = 1, hmd.silvermsg = $t2;
         $t3 = rnd(hmd.dmg ? 20 : 10), hmd.dmg = hmd.dmg + $t3 | 0;
     }
-    if (!hmd.thrown && $c.peq(obj, $G.uwep) && obj.otyp === 26 /* BOOMERANG */ && rnl(4) === 3) {
+    if (!hmd.thrown && $c.peq(obj, $G.uwep) && obj.otyp === BOOMERANG && rnl(4) === 3) {
         more_than_1 = $c.i8(obj.quan > 1 ? 1 : 0);
         await pline($c.lit("As you hit %s, %s%s breaks into splinters."), await mon_nam(mon), more_than_1 ? $c.lit("one of ") : $c.lit(""), await yname(obj));
         if (!more_than_1) {
@@ -564,30 +587,30 @@ async function hmon_hitmon_weapon_ranged(hmd, mon, obj) {   // uhitm.c:885
             obj = null;
         }
         hmd.hittxt = 1;
-        if (!$c.peq(hmd.mdat, $c.relem(mons, 288 /* PM_SHADE */))) {
+        if (!$c.peq(hmd.mdat, $c.relem(mons, PM_SHADE))) {
             hmd.dmg = hmd.dmg + 1 | 0;
         }
     }
 }
 function backstabbable(mon) {   // uhitm.c:921
-    return $c.i8(!($c.andu64(mon.data.mflags1, 4) !== 0) && !(mon.data.mlet === 22 /* S_VORTEX */ || $c.peq(mon.data, $c.relem(mons, 154 /* PM_AIR_ELEMENTAL */))) && !(mon.data.mlet === 54 /* S_GHOST */) && mon.data.mlet !== 2 /* S_BLOB */ && mon.data.mlet !== 5 /* S_EYE */ && mon.data.mlet !== 32 /* S_FUNGUS */ && canseemon(mon) && (mon.mflee | 0 || (mon.msleeping | 0 || !mon.mcanmove)) ? 1 : 0);
+    return $c.i8(!($c.andu64(mon.data.mflags1, M1_AMORPHOUS) !== 0) && !(mon.data.mlet === S_VORTEX || $c.peq(mon.data, $c.relem(mons, PM_AIR_ELEMENTAL))) && !(mon.data.mlet === S_GHOST) && mon.data.mlet !== S_BLOB && mon.data.mlet !== S_EYE && mon.data.mlet !== S_FUNGUS && canseemon(mon) && (mon.mflee | 0 || (mon.msleeping | 0 || !mon.mcanmove)) ? 1 : 0);
 }
 async function hmon_hitmon_weapon_melee(hmd, mon, obj) {   // uhitm.c:934
     let wtype = 0, monwep = null, buf = new Int8Array(256), $t1, $t2, $t3, $t4;
     hmd.use_weapon_skill = 1;
     $t1 = await dmgval(obj, mon), hmd.dmg = $t1;
     hmd.train_weapon_skill = $c.i8(hmd.dmg > 1 ? 1 : 0);
-    if (gu.urole.mnum === 334 && hmd.hand_to_hand && obj.oclass === 2 /* WEAPON_CLASS */ && objects[obj.otyp].oc_subtyp === 2 /* P_KNIFE */) {
+    if (gu.urole.mnum === PM_HEALER && hmd.hand_to_hand && obj.oclass === WEAPON_CLASS && objects[obj.otyp].oc_subtyp === P_KNIFE) {
         hmd.dmg = hmd.dmg + (3 < $c.div32(svm.mvitals[mon.data.pmidx].died, 6) ? 3 : $c.div32(svm.mvitals[mon.data.pmidx].died, 6)) | 0;
     }
-    if (!hmd.train_weapon_skill || $c.peq(mon, u.ustuck) || u.twoweap || hmd.hand_to_hand && is_art(obj, 4 /* ART_CLEAVER */)) {
-    } else if (gu.urole.mnum === 339 && backstabbable(mon) && !(u.umonnum !== u.umonster) && hmd.hand_to_hand) {
+    if (!hmd.train_weapon_skill || $c.peq(mon, u.ustuck) || u.twoweap || hmd.hand_to_hand && is_art(obj, ART_CLEAVER)) {
+    } else if (gu.urole.mnum === PM_ROGUE && backstabbable(mon) && !(u.umonnum !== u.umonster) && hmd.hand_to_hand) {
         await You($c.lit("strike %s from behind!"), await mon_nam(mon));
         $t2 = rnd(u.ulevel), hmd.dmg = hmd.dmg + $t2 | 0;
         hmd.hittxt = 1;
-    } else if (hmd.dieroll === 2 && $c.peq(obj, $G.uwep) && obj.oclass === 2 /* WEAPON_CLASS */ && ((obj.oclass === 2 /* WEAPON_CLASS */ || obj.oclass === 6 /* TOOL_CLASS */) && objects[obj.otyp].oc_big | 0 || gu.urole.mnum === 340 && obj.otyp === 56 /* KATANA */ && !$G.uarms) && ((wtype = uwep_skill_type()) !== 0 /* P_NONE */ && u.weapon_skills[wtype].skill >= 3 /* P_SKILLED */) && ((monwep = mon.mw) !== null && !((objects[monwep.otyp].oc_material | 0) <= 7 /* LEATHER */ || monwep.otyp === 78 /* RUBBER_HOSE */) && !obj_resists(monwep, 50 + Math.imul(15, ((obj.oeroded | 0) > (obj.oeroded2 | 0) ? obj.oeroded | 0 : obj.oeroded2 | 0) - ((monwep.oeroded | 0) > (monwep.oeroded2 | 0) ? monwep.oeroded | 0 : monwep.oeroded2 | 0) | 0) | 0, 100))) {
+    } else if (hmd.dieroll === 2 && $c.peq(obj, $G.uwep) && obj.oclass === WEAPON_CLASS && ((obj.oclass === WEAPON_CLASS || obj.oclass === TOOL_CLASS) && objects[obj.otyp].oc_big | 0 || gu.urole.mnum === PM_SAMURAI && obj.otyp === KATANA && !$G.uarms) && ((wtype = uwep_skill_type()) !== P_NONE && u.weapon_skills[wtype].skill >= P_SKILLED) && ((monwep = mon.mw) !== null && !((objects[monwep.otyp].oc_material | 0) <= LEATHER || monwep.otyp === RUBBER_HOSE) && !obj_resists(monwep, 50 + Math.imul(15, ((obj.oeroded | 0) > (obj.oeroded2 | 0) ? obj.oeroded | 0 : obj.oeroded2 | 0) - ((monwep.oeroded | 0) > (monwep.oeroded2 | 0) ? monwep.oeroded | 0 : monwep.oeroded2 | 0) | 0) | 0, 100))) {
         await setmnotwielded(mon, monwep);
-        mon.weapon_check = 1;
+        mon.weapon_check = NEED_WEAPON;
         if (canseemon(mon)) {
             $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), await Yobjnam2(monwep, $c.lit("shatter")), 256);
         } else {
@@ -614,28 +637,28 @@ async function hmon_hitmon_weapon_melee(hmd, mon, obj) {   // uhitm.c:934
         }
         hmd.hittxt = 1;
     }
-    if (hmd.material === 14 /* SILVER */ && mon_hates_silver(mon)) {
+    if (hmd.material === SILVER && mon_hates_silver(mon)) {
         $t3 = hmd.silverobj = 1, hmd.silvermsg = $t3;
     }
     if (artifact_light(obj) && obj.lamplit | 0 && mon_hates_light(mon)) {
         hmd.lightobj = 1;
     }
-    if (u.usteed && !hmd.thrown && hmd.dmg > 0 && weapon_type(obj) === 19 /* P_LANCE */ && !$c.peq(mon, u.ustuck)) {
+    if (u.usteed && !hmd.thrown && hmd.dmg > 0 && weapon_type(obj) === P_LANCE && !$c.peq(mon, u.ustuck)) {
         $t4 = joust(mon, obj), hmd.jousting = $t4;
         if (hmd.jousting) {
             hmd.train_weapon_skill = 1;
         }
     }
-    if (hmd.thrown === 1 /* HMON_THROWN */ && ((obj.oclass === 2 /* WEAPON_CLASS */ || obj.oclass === 13 /* GEM_CLASS */) && objects[obj.otyp].oc_subtyp >= -22 && objects[obj.otyp].oc_subtyp <= -20 || (obj.oclass === 2 /* WEAPON_CLASS */ || obj.oclass === 6 /* TOOL_CLASS */) && objects[obj.otyp].oc_subtyp >= -25 && objects[obj.otyp].oc_subtyp <= -23)) {
-        if ((obj.oclass === 2 /* WEAPON_CLASS */ || obj.oclass === 13 /* GEM_CLASS */) && objects[obj.otyp].oc_subtyp >= -22 && objects[obj.otyp].oc_subtyp <= -20 && ($G.uwep && objects[obj.otyp].oc_subtyp === (-objects[$G.uwep.otyp].oc_subtyp | 0))) {
-            if (gu.urole.mnum === 340 && obj.otyp === 22 /* YA */ && $G.uwep.otyp === 86 /* YUMI */) {
+    if (hmd.thrown === HMON_THROWN && ((obj.oclass === WEAPON_CLASS || obj.oclass === GEM_CLASS) && objects[obj.otyp].oc_subtyp >= -P_CROSSBOW && objects[obj.otyp].oc_subtyp <= -P_BOW || (obj.oclass === WEAPON_CLASS || obj.oclass === TOOL_CLASS) && objects[obj.otyp].oc_subtyp >= -P_BOOMERANG && objects[obj.otyp].oc_subtyp <= -P_DART)) {
+        if ((obj.oclass === WEAPON_CLASS || obj.oclass === GEM_CLASS) && objects[obj.otyp].oc_subtyp >= -P_CROSSBOW && objects[obj.otyp].oc_subtyp <= -P_BOW && ($G.uwep && objects[obj.otyp].oc_subtyp === (-objects[$G.uwep.otyp].oc_subtyp | 0))) {
+            if (gu.urole.mnum === PM_SAMURAI && obj.otyp === YA && $G.uwep.otyp === YUMI) {
                 hmd.dmg = hmd.dmg + 1 | 0;
-            } else if (gu.urace.mnum === 264 && obj.otyp === 19 /* ELVEN_ARROW */ && $G.uwep.otyp === 84 /* ELVEN_BOW */) {
+            } else if (gu.urace.mnum === PM_ELF && obj.otyp === ELVEN_ARROW && $G.uwep.otyp === ELVEN_BOW) {
                 hmd.dmg = hmd.dmg + 1 | 0;
             }
             hmd.train_weapon_skill = $c.i8(hmd.dmg > 0 ? 1 : 0);
         }
-        if (obj.otrapped | 0 && (obj.oclass === 2 /* WEAPON_CLASS */ && objects[obj.otyp].oc_subtyp >= -24 && objects[obj.otyp].oc_subtyp <= -20 || permapoisoned(obj))) {
+        if (obj.otrapped | 0 && (obj.oclass === WEAPON_CLASS && objects[obj.otyp].oc_subtyp >= -P_SHURIKEN && objects[obj.otyp].oc_subtyp <= -P_BOW || permapoisoned(obj))) {
             hmd.ispoisoned = 1;
         }
     }
@@ -644,7 +667,7 @@ async function hmon_hitmon_weapon_melee(hmd, mon, obj) {   // uhitm.c:934
     }
 }
 async function hmon_hitmon_weapon(hmd, mon, obj) {   // uhitm.c:1070
-    if (obj.oclass === 2 /* WEAPON_CLASS */ && objects[obj.otyp].oc_subtyp >= 20 /* P_BOW */ && objects[obj.otyp].oc_subtyp <= 22 /* P_CROSSBOW */ || !hmd.thrown && ((obj.oclass === 2 /* WEAPON_CLASS */ || obj.oclass === 6 /* TOOL_CLASS */) && objects[obj.otyp].oc_subtyp >= -25 && objects[obj.otyp].oc_subtyp <= -23 || (obj.oclass === 2 /* WEAPON_CLASS */ || obj.oclass === 13 /* GEM_CLASS */) && objects[obj.otyp].oc_subtyp >= -22 && objects[obj.otyp].oc_subtyp <= -20) || !hmd.thrown && !u.usteed && ((obj.oclass === 2 /* WEAPON_CLASS */ || obj.oclass === 6 /* TOOL_CLASS */) && (objects[obj.otyp].oc_subtyp === 16 /* P_POLEARMS */ || objects[obj.otyp].oc_subtyp === 19 /* P_LANCE */ || is_art(obj, 19 /* ART_SNICKERSNEE */))) && !is_art(obj, 19 /* ART_SNICKERSNEE */) || (obj.oclass === 2 /* WEAPON_CLASS */ || obj.oclass === 13 /* GEM_CLASS */) && objects[obj.otyp].oc_subtyp >= -22 && objects[obj.otyp].oc_subtyp <= -20 && (hmd.thrown !== 1 /* HMON_THROWN */ || !((obj.oclass === 2 /* WEAPON_CLASS */ || obj.oclass === 13 /* GEM_CLASS */) && objects[obj.otyp].oc_subtyp >= -22 && objects[obj.otyp].oc_subtyp <= -20 && ($G.uwep && objects[obj.otyp].oc_subtyp === (-objects[$G.uwep.otyp].oc_subtyp | 0))))) {
+    if (obj.oclass === WEAPON_CLASS && objects[obj.otyp].oc_subtyp >= P_BOW && objects[obj.otyp].oc_subtyp <= P_CROSSBOW || !hmd.thrown && ((obj.oclass === WEAPON_CLASS || obj.oclass === TOOL_CLASS) && objects[obj.otyp].oc_subtyp >= -P_BOOMERANG && objects[obj.otyp].oc_subtyp <= -P_DART || (obj.oclass === WEAPON_CLASS || obj.oclass === GEM_CLASS) && objects[obj.otyp].oc_subtyp >= -P_CROSSBOW && objects[obj.otyp].oc_subtyp <= -P_BOW) || !hmd.thrown && !u.usteed && ((obj.oclass === WEAPON_CLASS || obj.oclass === TOOL_CLASS) && (objects[obj.otyp].oc_subtyp === P_POLEARMS || objects[obj.otyp].oc_subtyp === P_LANCE || is_art(obj, ART_SNICKERSNEE))) && !is_art(obj, ART_SNICKERSNEE) || (obj.oclass === WEAPON_CLASS || obj.oclass === GEM_CLASS) && objects[obj.otyp].oc_subtyp >= -P_CROSSBOW && objects[obj.otyp].oc_subtyp <= -P_BOW && (hmd.thrown !== HMON_THROWN || !((obj.oclass === WEAPON_CLASS || obj.oclass === GEM_CLASS) && objects[obj.otyp].oc_subtyp >= -P_CROSSBOW && objects[obj.otyp].oc_subtyp <= -P_BOW && ($G.uwep && objects[obj.otyp].oc_subtyp === (-objects[$G.uwep.otyp].oc_subtyp | 0))))) {
         await hmon_hitmon_weapon_ranged(hmd, mon, obj);
     } else {
         await hmon_hitmon_weapon_melee(hmd, mon, obj);
@@ -660,7 +683,7 @@ async function hmon_hitmon_potion(hmd, mon, obj) {   // uhitm.c:1095
         await setuwep(null);
     }
     await freeinv(obj);
-    await potionhit(mon, obj, hmd.hand_to_hand ? 0 : 1);
+    await potionhit(mon, obj, hmd.hand_to_hand ? POTHIT_HERO_BASH : POTHIT_HERO_THROW);
     if (mon.mhp < 1) {
         hmd.doreturn = 1;
         hmd.retval = 0;
@@ -668,17 +691,17 @@ async function hmon_hitmon_potion(hmd, mon, obj) {   // uhitm.c:1095
     }
     hmd.hittxt = 1;
     hmd.mdat = mon.data;
-    hmd.dmg = $c.peq(hmd.mdat, $c.relem(mons, 288 /* PM_SHADE */)) ? 0 : 1;
+    hmd.dmg = $c.peq(hmd.mdat, $c.relem(mons, PM_SHADE)) ? 0 : 1;
 }
 async function hmon_hitmon_misc_obj(hmd, mon, obj) {   // uhitm.c:1119
     let cnt = 0, mnum = 0, eggp = null, whom = null, what = null, more_than_1 = 0, more_than_1$2 = 0, doubld = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12;
     switch (obj.otyp) {
-        case 475 /* BOULDER */:
-        case 477 /* HEAVY_IRON_BALL */:
-        case 478 /* IRON_CHAIN */:
+        case BOULDER:
+        case HEAVY_IRON_BALL:
+        case IRON_CHAIN:
             $t1 = await dmgval(obj, mon), hmd.dmg = $t1;
             break;
-        case 230 /* MIRROR */:
+        case MIRROR:
             if (breaktest(obj)) {
                 await You($c.lit("break %s.  That's bad luck!"), await ysimple_name(obj));
                 change_luck(-2);
@@ -690,32 +713,32 @@ async function hmon_hitmon_misc_obj(hmd, mon, obj) {   // uhitm.c:1119
             }
             hmd.dmg = 1;
             break;
-        case 229 /* EXPENSIVE_CAMERA */:
+        case EXPENSIVE_CAMERA:
             await You($c.lit("succeed in destroying %s.  Congratulations!"), await ysimple_name(obj));
             await release_camera_demon(obj, u.ux, u.uy);
             await useup(obj);
             hmd.doreturn = 1;
             hmd.retval = 1;
             return;
-        case 265 /* CORPSE */:
-            if ($c.peq($c.relem(mons, obj.corpsenm), $c.relem(mons, 10 /* PM_COCKATRICE */)) || $c.peq($c.relem(mons, obj.corpsenm), $c.relem(mons, 9 /* PM_CHICKATRICE */))) {
+        case CORPSE:
+            if ($c.peq($c.relem(mons, obj.corpsenm), $c.relem(mons, PM_COCKATRICE)) || $c.peq($c.relem(mons, obj.corpsenm), $c.relem(mons, PM_CHICKATRICE))) {
                 hmd.dmg = 1;
                 hmd.hittxt = 1;
-                await You($c.lit("hit %s with %s."), await mon_nam(mon), await corpse_xname(obj, null, (obj.dknown | 0 ? 4 : 8) >>> 0));
+                await You($c.lit("hit %s with %s."), await mon_nam(mon), await corpse_xname(obj, null, (obj.dknown | 0 ? CXN_PFX_THE : CXN_ARTICLE) >>> 0));
                 await observe_object(obj);
                 if (!await munstone(mon, 1)) {
                     await minstapetrify(mon, 1);
                 }
-                if (await Resists_Elem(mon, 8 /* STONE_RES */)) {
+                if (await Resists_Elem(mon, STONE_RES)) {
                     break;
                 }
                 hmd.doreturn = 1;
                 hmd.retval = $c.i8(!(mon.mhp < 1) ? 1 : 0);
                 return;
             }
-            hmd.dmg = (obj.corpsenm >= 0 /* LOW_PM */ && obj.corpsenm < 383 /* NUMMONS */ ? mons[obj.corpsenm].msize : 0) + 1 | 0;
+            hmd.dmg = (obj.corpsenm >= LOW_PM && obj.corpsenm < NUMMONS ? mons[obj.corpsenm].msize : 0) + 1 | 0;
             break;
-        case 266 /* EGG */:
+        case EGG:
             {
                 cnt = obj.quan;
                 hmd.dmg = 1;
@@ -724,15 +747,15 @@ async function hmon_hitmon_misc_obj(hmd, mon, obj) {   // uhitm.c:1119
                 if ($c.peq(obj, $G.uwep)) {
                     gu.unweapon = 1;
                 }
-                if (obj.spe && (obj.corpsenm >= 0 /* LOW_PM */ && obj.corpsenm < 383 /* NUMMONS */)) {
+                if (obj.spe && (obj.corpsenm >= LOW_PM && obj.corpsenm < NUMMONS)) {
                     if (obj.quan < 5) {
                         change_luck($c.i8($c.neg64(obj.quan)));
                     } else {
                         change_luck(-5);
                     }
                 }
-                if (obj.corpsenm >= 0 /* LOW_PM */ && obj.corpsenm < 383 /* NUMMONS */ && ($c.peq($c.relem(mons, obj.corpsenm), $c.relem(mons, 10 /* PM_COCKATRICE */)) || $c.peq($c.relem(mons, obj.corpsenm), $c.relem(mons, 9 /* PM_CHICKATRICE */)))) {
-                    await pline($c.lit("Splat!  You hit %s with %s %s egg%s!"), await mon_nam(mon), obj.known | 0 ? $c.lit("the") : cnt > 1 ? $c.lit("some") : $c.lit("a"), obj.known | 0 ? mons[obj.corpsenm].pmnames[2 /* NEUTRAL */] : $c.lit("petrifying"), cnt === 1 ? $c.lit("") : $c.lit("s"));
+                if (obj.corpsenm >= LOW_PM && obj.corpsenm < NUMMONS && ($c.peq($c.relem(mons, obj.corpsenm), $c.relem(mons, PM_COCKATRICE)) || $c.peq($c.relem(mons, obj.corpsenm), $c.relem(mons, PM_CHICKATRICE)))) {
+                    await pline($c.lit("Splat!  You hit %s with %s %s egg%s!"), await mon_nam(mon), obj.known | 0 ? $c.lit("the") : cnt > 1 ? $c.lit("some") : $c.lit("a"), obj.known | 0 ? mons[obj.corpsenm].pmnames[NEUTRAL] : $c.lit("petrifying"), cnt === 1 ? $c.lit("") : $c.lit("s"));
                     obj.known = (1) & 1;
                     do {
                         if (hmd.thrown) {
@@ -745,7 +768,7 @@ async function hmon_hitmon_misc_obj(hmd, mon, obj) {   // uhitm.c:1119
                     if (!await munstone(mon, 1)) {
                         await minstapetrify(mon, 1);
                     }
-                    if (await Resists_Elem(mon, 8 /* STONE_RES */)) {
+                    if (await Resists_Elem(mon, STONE_RES)) {
                         break;
                     }
                     hmd.doreturn = 1;
@@ -753,15 +776,15 @@ async function hmon_hitmon_misc_obj(hmd, mon, obj) {   // uhitm.c:1119
                     return;
                 } else {
                     mnum = obj.corpsenm;
-                    eggp = mnum >= 0 /* LOW_PM */ && mnum < 383 /* NUMMONS */ && obj.known | 0 ? await the(mons[mnum].pmnames[2 /* NEUTRAL */]) : cnt > 1 ? $c.lit("some") : $c.lit("an");
+                    eggp = mnum >= LOW_PM && mnum < NUMMONS && obj.known | 0 ? await the(mons[mnum].pmnames[NEUTRAL]) : cnt > 1 ? $c.lit("some") : $c.lit("an");
                     await You($c.lit("hit %s with %s egg%s."), await mon_nam(mon), eggp, cnt === 1 ? $c.lit("") : $c.lit("s"));
-                    if (($c.peq(hmd.mdat, $c.relem(mons, 10 /* PM_COCKATRICE */)) || $c.peq(hmd.mdat, $c.relem(mons, 9 /* PM_CHICKATRICE */))) && !($c.sub64(svm.moves, obj.age) > 400)) {
+                    if (($c.peq(hmd.mdat, $c.relem(mons, PM_COCKATRICE)) || $c.peq(hmd.mdat, $c.relem(mons, PM_CHICKATRICE))) && !($c.sub64(svm.moves, obj.age) > 2 * MAX_EGG_HATCH_TIME)) {
                         await pline_The($c.lit("egg%s %s alive any more..."), cnt === 1 ? $c.lit("") : $c.lit("s"), cnt === 1 ? $c.lit("isn't") : $c.lit("aren't"));
                         if (obj.timed) {
                             await obj_stop_timers(obj);
                         }
-                        obj.otyp = 474;
-                        obj.oclass = 13;
+                        obj.otyp = ROCK;
+                        obj.oclass = GEM_CLASS;
                         obj.oartifact = 0;
                         obj.spe = 0;
                         $t3 = ($t2 = obj.bknown = (0) & 1, obj.dknown = ($t2) & 1), obj.known = ($t3) & 1;
@@ -769,7 +792,7 @@ async function hmon_hitmon_misc_obj(hmd, mon, obj) {   // uhitm.c:1119
                         if (hmd.thrown) {
                             await place_object(obj, mon.mx, mon.my);
                         }
-                    } else if (obj.corpsenm === 11 /* PM_PYROLISK */) {
+                    } else if (obj.corpsenm === PM_PYROLISK) {
                         do {
                             if (hmd.thrown) {
                                 await obfree(obj, null);
@@ -778,7 +801,7 @@ async function hmon_hitmon_misc_obj(hmd, mon, obj) {   // uhitm.c:1119
                             }
                             obj = null;
                         } while (0);
-                        await explode(mon.mx, mon.my, -11, d(3, 6), 0, 5 /* EXPL_FIERY */);
+                        await explode(mon.mx, mon.my, -11, d(3, 6), 0, EXPL_FIERY);
                         hmd.doreturn = 1;
                         hmd.retval = $c.i8(!(mon.mhp < 1) ? 1 : 0);
                         return;
@@ -792,24 +815,24 @@ async function hmon_hitmon_misc_obj(hmd, mon, obj) {   // uhitm.c:1119
                             }
                             obj = null;
                         } while (0);
-                        await exercise(2 /* A_WIS */, 0);
+                        await exercise(A_WIS, 0);
                     }
                 }
                 break;
             }
-        case 284 /* CLOVE_OF_GARLIC */:
-            if ($c.andu64(hmd.mdat.mflags2, 2) !== 0 || (mon.cham === 226 /* PM_VAMPIRE */ || mon.cham === 227 /* PM_VAMPIRE_LEADER */ || mon.cham === 228 /* PM_VLAD_THE_IMPALER */)) {
+        case CLOVE_OF_GARLIC:
+            if ($c.andu64(hmd.mdat.mflags2, M2_UNDEAD) !== 0 || (mon.cham === PM_VAMPIRE || mon.cham === PM_VAMPIRE_LEADER || mon.cham === PM_VLAD_THE_IMPALER)) {
                 await monflee(mon, d(2, 4), 0, 1);
             }
             hmd.dmg = 1;
             break;
-        case 287 /* CREAM_PIE */:
-        case 479 /* BLINDING_VENOM */:
+        case CREAM_PIE:
+        case BLINDING_VENOM:
             mon.msleeping = (0) & 1;
-            if (await can_blnd(gy.youmonst, mon, $c.u8(obj.otyp === 479 /* BLINDING_VENOM */ ? 10 : 254), obj)) {
-                if ((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked) {
-                    await pline(obj.otyp === 287 /* CREAM_PIE */ ? $c.lit("Splat!") : $c.lit("Splash!"));
-                } else if (obj.otyp === 479 /* BLINDING_VENOM */) {
+            if (await can_blnd(gy.youmonst, mon, $c.u8(obj.otyp === BLINDING_VENOM ? AT_SPIT : AT_WEAP), obj)) {
+                if ((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked) {
+                    await pline(obj.otyp === CREAM_PIE ? $c.lit("Splat!") : $c.lit("Splash!"));
+                } else if (obj.otyp === BLINDING_VENOM) {
                     await pline_The($c.lit("venom blinds %s%s!"), await mon_nam(mon), mon.mcansee | 0 ? $c.lit("") : $c.lit(" further"));
                 } else {
                     whom = await mon_nam(mon);
@@ -817,8 +840,8 @@ async function hmon_hitmon_misc_obj(hmd, mon, obj) {   // uhitm.c:1119
                     if (!hmd.thrown && obj.quan > 1) {
                         what = await An(await singular(obj, xname));
                     }
-                    if ($c.andu64(hmd.mdat.mflags1, 4096) === 0 && !$c.peq(hmd.mdat, $c.relem(mons, 28 /* PM_FLOATING_EYE */))) {
-                        whom = $c.__builtin___strcat_chk($c.__builtin___strcat_chk(s_suffix(whom), $c.lit(" "), -1), await mbodypart(mon, 2 /* FACE */), -1);
+                    if ($c.andu64(hmd.mdat.mflags1, M1_NOEYES) === 0 && !$c.peq(hmd.mdat, $c.relem(mons, PM_FLOATING_EYE))) {
+                        whom = $c.__builtin___strcat_chk($c.__builtin___strcat_chk(s_suffix(whom), $c.lit(" "), -1), await mbodypart(mon, FACE), -1);
                     }
                     await pline($c.lit("%s %s over %s!"), what, await vtense(what, $c.lit("splash")), whom);
                 }
@@ -831,7 +854,7 @@ async function hmon_hitmon_misc_obj(hmd, mon, obj) {   // uhitm.c:1119
                     mon.mblinded = (((mon.mblinded | 0) + hmd.dmg | 0) >>> 0) & 127;
                 }
             } else {
-                await pline(obj.otyp === 287 /* CREAM_PIE */ ? $c.lit("Splat!") : $c.lit("Splash!"));
+                await pline(obj.otyp === CREAM_PIE ? $c.lit("Splat!") : $c.lit("Splash!"));
                 await setmangry(mon, 1);
             }
             {
@@ -849,8 +872,8 @@ async function hmon_hitmon_misc_obj(hmd, mon, obj) {   // uhitm.c:1119
             hmd.get_dmg_bonus = 0;
             hmd.dmg = 0;
             break;
-        case 480 /* ACID_VENOM */:
-            if (await Resists_Elem(mon, 7 /* ACID_RES */)) {
+        case ACID_VENOM:
+            if (await Resists_Elem(mon, ACID_RES)) {
                 await Your($c.lit("venom hits %s harmlessly."), await mon_nam(mon));
                 hmd.dmg = 0;
             } else {
@@ -872,7 +895,7 @@ async function hmon_hitmon_misc_obj(hmd, mon, obj) {   // uhitm.c:1119
             hmd.get_dmg_bonus = 0;
             break;
         default:
-            if (((objects[obj.otyp].oc_material | 0) === 3 /* VEGGY */ || (objects[obj.otyp].oc_material | 0) === 5 /* PAPER */) && obj.oclass !== 10 /* SPBOOK_CLASS */) {
+            if (((objects[obj.otyp].oc_material | 0) === VEGGY || (objects[obj.otyp].oc_material | 0) === PAPER) && obj.oclass !== SPBOOK_CLASS) {
                 hmd.dmg = 0;
                 hmd.get_dmg_bonus = 0;
                 break;
@@ -882,13 +905,13 @@ async function hmon_hitmon_misc_obj(hmd, mon, obj) {   // uhitm.c:1119
             if (hmd.dmg > 6) {
                 hmd.dmg = 6;
             }
-            if (obj.otyp === 234 /* TOWEL */ && obj.spe > 0) {
-                doubld = $c.i8($c.peq(mon.data, $c.relem(mons, 259 /* PM_IRON_GOLEM */)) ? 1 : 0);
+            if (obj.otyp === TOWEL && obj.spe > 0) {
+                doubld = $c.i8($c.peq(mon.data, $c.relem(mons, PM_IRON_GOLEM)) ? 1 : 0);
                 hmd.dmg = hmd.dmg + Math.imul(obj.spe, doubld ? 2 : 1) | 0;
                 $t8 = rnd(hmd.dmg), hmd.dmg = $t8;
                 $t9 = $c.i8(rn2(obj.spe + 1 | 0) > 0 ? 1 : 0), hmd.dryit = $t9;
             }
-            if (hmd.material === 14 /* SILVER */ && mon_hates_silver(mon)) {
+            if (hmd.material === SILVER && mon_hates_silver(mon)) {
                 $t10 = rnd(20), hmd.dmg = hmd.dmg + $t10 | 0;
                 $t11 = hmd.silverobj = 1, hmd.silvermsg = $t11;
             }
@@ -901,7 +924,7 @@ async function hmon_hitmon_do_hit(hmd, mon, obj) {   // uhitm.c:1387
     if (!obj) {
         await hmon_hitmon_barehands(hmd, mon);
     } else {
-        if ((hmd.thrown === 1 /* HMON_THROWN */ || hmd.thrown === 2 /* HMON_KICKED */) && (((objects[obj.otyp].oc_material | 0) === 20 /* GEMSTONE */ || (objects[obj.otyp].oc_material | 0) === 21 /* MINERAL */) && obj.oclass !== 4 /* RING_CLASS */) && ($c.andu64(hmd.mdat.mflags1, 8) !== 0 && !($c.andu64(hmd.mdat.mflags1, 1048576) !== 0))) {
+        if ((hmd.thrown === HMON_THROWN || hmd.thrown === HMON_KICKED) && (((objects[obj.otyp].oc_material | 0) === GEMSTONE || (objects[obj.otyp].oc_material | 0) === MINERAL) && obj.oclass !== RING_CLASS) && ($c.andu64(hmd.mdat.mflags1, M1_WALLWALK) !== 0 && !($c.andu64(hmd.mdat.mflags1, M1_UNSOLID) !== 0))) {
             await hit(await mshot_xname(obj), mon, $c.lit(" but does no harm."));
             await wakeup(mon, 1);
             hmd.doreturn = 1;
@@ -913,18 +936,18 @@ async function hmon_hitmon_do_hit(hmd, mon, obj) {   // uhitm.c:1387
         } else {
             $c.__builtin___strcpy_chk(new $c.Ptr(hmd.saved_oname, 0), await bare_artifactname(obj), -1);
         }
-        if (obj.oclass === 2 /* WEAPON_CLASS */ || obj.oclass === 6 /* TOOL_CLASS */ && objects[obj.otyp].oc_subtyp !== 0 /* P_NONE */ || obj.oclass === 13 /* GEM_CLASS */) {
+        if (obj.oclass === WEAPON_CLASS || obj.oclass === TOOL_CLASS && objects[obj.otyp].oc_subtyp !== P_NONE || obj.oclass === GEM_CLASS) {
             await hmon_hitmon_weapon(hmd, mon, obj);
             if (hmd.doreturn) {
                 return;
             }
-        } else if (obj.oclass === 8 /* POTION_CLASS */) {
+        } else if (obj.oclass === POTION_CLASS) {
             await hmon_hitmon_potion(hmd, mon, obj);
             if (hmd.doreturn) {
                 return;
             }
         } else {
-            if ($c.peq(hmd.mdat, $c.relem(mons, 288 /* PM_SHADE */)) && !shade_aware(obj)) {
+            if ($c.peq(hmd.mdat, $c.relem(mons, PM_SHADE)) && !shade_aware(obj)) {
                 hmd.dmg = 0;
             } else {
                 await hmon_hitmon_misc_obj(hmd, mon, obj);
@@ -937,12 +960,12 @@ async function hmon_hitmon_dmg_recalc(hmd, obj) {   // uhitm.c:1436
     dmgbonus = 0;
     if (hmd.get_dmg_bonus) {
         dmgbonus = u.udaminc;
-        if (hmd.thrown !== 1 /* HMON_THROWN */ || !obj || !$G.uwep || !((obj.oclass === 2 /* WEAPON_CLASS */ || obj.oclass === 13 /* GEM_CLASS */) && objects[obj.otyp].oc_subtyp >= -22 && objects[obj.otyp].oc_subtyp <= -20 && ($G.uwep && objects[obj.otyp].oc_subtyp === (-objects[$G.uwep.otyp].oc_subtyp | 0)))) {
+        if (hmd.thrown !== HMON_THROWN || !obj || !$G.uwep || !((obj.oclass === WEAPON_CLASS || obj.oclass === GEM_CLASS) && objects[obj.otyp].oc_subtyp >= -P_CROSSBOW && objects[obj.otyp].oc_subtyp <= -P_BOW && ($G.uwep && objects[obj.otyp].oc_subtyp === (-objects[$G.uwep.otyp].oc_subtyp | 0)))) {
             strbonus = dbon();
             absbonus = $c.abs(strbonus);
             if (hmd.twohits) {
                 strbonus = Math.imul($c.div32(Math.imul(3, absbonus) + 2 | 0, 4), sgn(strbonus));
-            } else if (hmd.thrown === 0 /* HMON_MELEE */ && $G.uwep && (($G.uwep.oclass === 2 /* WEAPON_CLASS */ || $G.uwep.oclass === 6 /* TOOL_CLASS */) && objects[$G.uwep.otyp].oc_big | 0)) {
+            } else if (hmd.thrown === HMON_MELEE && $G.uwep && (($G.uwep.oclass === WEAPON_CLASS || $G.uwep.oclass === TOOL_CLASS) && objects[$G.uwep.otyp].oc_big | 0)) {
                 strbonus = Math.imul($c.div32(Math.imul(3, absbonus) + 1 | 0, 2), sgn(strbonus));
             }
             dmgbonus = dmgbonus + strbonus | 0;
@@ -950,7 +973,7 @@ async function hmon_hitmon_dmg_recalc(hmd, obj) {   // uhitm.c:1436
     }
     if (hmd.use_weapon_skill) {
         skillwep = obj;
-        if (obj && ((obj.oclass === 2 /* WEAPON_CLASS */ || obj.oclass === 13 /* GEM_CLASS */) && objects[obj.otyp].oc_subtyp >= -22 && objects[obj.otyp].oc_subtyp <= -20) && ((obj.oclass === 2 /* WEAPON_CLASS */ || obj.oclass === 13 /* GEM_CLASS */) && objects[obj.otyp].oc_subtyp >= -22 && objects[obj.otyp].oc_subtyp <= -20 && ($G.uwep && objects[obj.otyp].oc_subtyp === (-objects[$G.uwep.otyp].oc_subtyp | 0)))) {
+        if (obj && ((obj.oclass === WEAPON_CLASS || obj.oclass === GEM_CLASS) && objects[obj.otyp].oc_subtyp >= -P_CROSSBOW && objects[obj.otyp].oc_subtyp <= -P_BOW) && ((obj.oclass === WEAPON_CLASS || obj.oclass === GEM_CLASS) && objects[obj.otyp].oc_subtyp >= -P_CROSSBOW && objects[obj.otyp].oc_subtyp <= -P_BOW && ($G.uwep && objects[obj.otyp].oc_subtyp === (-objects[$G.uwep.otyp].oc_subtyp | 0)))) {
             skillwep = $G.uwep;
         }
         dmgbonus = dmgbonus + await weapon_dam_bonus(skillwep) | 0;
@@ -970,10 +993,10 @@ async function hmon_hitmon_poison(hmd, mon, obj) {   // uhitm.c:1510
     if (nopoison < 2) {
         nopoison = 2;
     }
-    if (gu.urole.mnum === 340) {
+    if (gu.urole.mnum === PM_SAMURAI) {
         await You($c.lit("dishonorably use a poisoned weapon!"));
         adjalign(-sgn(u.ualign.type) | 0);
-    } else if (u.ualign.type === 1 && u.ualign.record > -10) {
+    } else if (u.ualign.type === A_LAWFUL && u.ualign.record > -10) {
         await You_feel($c.lit("like an evil coward for using a poisoned weapon."));
         adjalign(-1);
     }
@@ -981,7 +1004,7 @@ async function hmon_hitmon_poison(hmd, mon, obj) {   // uhitm.c:1510
         obj.otrapped = (0) & 1;
         hmd.unpoisonmsg = 1;
     }
-    if (await Resists_Elem(mon, 6 /* POISON_RES */)) {
+    if (await Resists_Elem(mon, POISON_RES)) {
         hmd.needpoismsg = 1;
     } else if (rn2(10)) {
         $t1 = rnd(6), hmd.dmg = hmd.dmg + $t1 | 0;
@@ -1011,7 +1034,7 @@ async function hmon_hitmon_jousting(hmd, mon, obj) {   // uhitm.c:1541
     hmd.hittxt = 1;
 }
 async function hmon_hitmon_stagger(hmd, mon, obj) {   // uhitm.c:1570
-    if (rnd(100) < u.weapon_skills[35 /* P_BARE_HANDED_COMBAT */].skill && !(hmd.mdat.msize >= 3) && !($c.andu64(hmd.mdat.mflags1, 2097152) !== 0)) {
+    if (rnd(100) < u.weapon_skills[P_BARE_HANDED_COMBAT].skill && !(hmd.mdat.msize >= MZ_LARGE) && !($c.andu64(hmd.mdat.mflags1, M1_THICK_HIDE) !== 0)) {
         if (canseemon(mon) || sensemon(mon)) {
             await pline($c.lit("%s %s from your powerful strike!"), await Monnam(mon), await makeplural(stagger(mon.data, $c.lit("stagger"))));
         }
@@ -1031,7 +1054,7 @@ async function hmon_hitmon_pet(hmd, mon, obj) {   // uhitm.c:1588
 }
 async function hmon_hitmon_splitmon(hmd, mon, obj) {   // uhitm.c:1604
     let mclone = null, withwhat = new Int8Array(256);
-    if (($c.peq(hmd.mdat, $c.relem(mons, 209 /* PM_BLACK_PUDDING */)) || $c.peq(hmd.mdat, $c.relem(mons, 207 /* PM_BROWN_PUDDING */))) && mon.mhp > 1 && !mon.mcan && !hmd.offmap && obj && ($c.peq(obj, $G.uwep) || u.twoweap && $c.peq(obj, $G.uswapwep)) && ((hmd.material === 11 /* IRON */ || hmd.material === 12 /* METAL */) && !((obj.oclass === 2 /* WEAPON_CLASS */ || obj.oclass === 13 /* GEM_CLASS */) && objects[obj.otyp].oc_subtyp >= -22 && objects[obj.otyp].oc_subtyp <= -20 || (obj.oclass === 2 /* WEAPON_CLASS */ || obj.oclass === 6 /* TOOL_CLASS */) && objects[obj.otyp].oc_subtyp >= -25 && objects[obj.otyp].oc_subtyp <= -23)) && hmd.hand_to_hand) {
+    if (($c.peq(hmd.mdat, $c.relem(mons, PM_BLACK_PUDDING)) || $c.peq(hmd.mdat, $c.relem(mons, PM_BROWN_PUDDING))) && mon.mhp > 1 && !mon.mcan && !hmd.offmap && obj && ($c.peq(obj, $G.uwep) || u.twoweap && $c.peq(obj, $G.uswapwep)) && ((hmd.material === IRON || hmd.material === METAL) && !((obj.oclass === WEAPON_CLASS || obj.oclass === GEM_CLASS) && objects[obj.otyp].oc_subtyp >= -P_CROSSBOW && objects[obj.otyp].oc_subtyp <= -P_BOW || (obj.oclass === WEAPON_CLASS || obj.oclass === TOOL_CLASS) && objects[obj.otyp].oc_subtyp >= -P_BOOMERANG && objects[obj.otyp].oc_subtyp <= -P_DART)) && hmd.hand_to_hand) {
         if ((mclone = await clone_mon(mon, 0, 0)) !== null) {
             withwhat[0] = 0;
             if (u.twoweap && flags.verbose) {
@@ -1039,7 +1062,7 @@ async function hmon_hitmon_splitmon(hmd, mon, obj) {   // uhitm.c:1604
             }
             await pline($c.lit("%s divides as you hit it%s!"), await Monnam(mon), new $c.Ptr(withwhat, 0));
             hmd.hittxt = 1;
-            await mintrap(mclone, 0);
+            await mintrap(mclone, NO_TRAP_FLAGS);
         }
     }
 }
@@ -1050,7 +1073,7 @@ async function hmon_hitmon_msg_hit(hmd, mon, obj) {   // uhitm.c:1637
         } else if (!flags.verbose) {
             await You($c.lit("hit it."));
         } else {
-            await You($c.lit("%s %s%s"), obj && (obj.oclass === 3 /* ARMOR_CLASS */ && objects[obj.otyp].oc_subtyp === 1 /* ARM_SHIELD */ || obj.otyp === 477 /* HEAVY_IRON_BALL */) ? $c.lit("bash") : obj && (objects[obj.otyp].oc_subtyp === 26 /* P_WHIP */ || obj.otyp === 234 /* TOWEL */ && obj.spe > 0) ? $c.lit("lash") : gu.urole.mnum === 332 ? $c.lit("smite") : $c.lit("hit"), await mon_nam(mon), canseemon(mon) ? exclam(hmd.dmg) : $c.lit("."));
+            await You($c.lit("%s %s%s"), obj && (obj.oclass === ARMOR_CLASS && objects[obj.otyp].oc_subtyp === ARM_SHIELD || obj.otyp === HEAVY_IRON_BALL) ? $c.lit("bash") : obj && (objects[obj.otyp].oc_subtyp === P_WHIP || obj.otyp === TOWEL && obj.spe > 0) ? $c.lit("lash") : gu.urole.mnum === PM_BARBARIAN ? $c.lit("smite") : $c.lit("hit"), await mon_nam(mon), canseemon(mon) ? exclam(hmd.dmg) : $c.lit("."));
         }
     }
 }
@@ -1074,7 +1097,7 @@ async function hmon_hitmon_msg_silver(hmd, mon, obj) {   // uhitm.c:1663
         $t1 = highc(whom.get(0)), whom.set(0, $t1);
         fmt = $c.lit("%s is seared!");
     }
-    if (!(hmd.mdat.mlet === 54 /* S_GHOST */) && !($c.andu64(hmd.mdat.mflags1, 4) !== 0)) {
+    if (!(hmd.mdat.mlet === S_GHOST) && !($c.andu64(hmd.mdat.mflags1, M1_AMORPHOUS) !== 0)) {
         whom = $c.__builtin___strcat_chk(s_suffix(whom), $c.lit(" flesh"), -1);
     }
     await pline(fmt, whom);
@@ -1094,7 +1117,7 @@ async function hmon_hitmon_msg_lightobj(hmd, mon, obj) {   // uhitm.c:1702
         $t1 = highc(whom.get(0)), whom.set(0, $t1);
         fmt = $c.lit("%s is seared!");
     }
-    if (!(hmd.mdat.mlet === 54 /* S_GHOST */) && !($c.andu64(hmd.mdat.mflags1, 4) !== 0)) {
+    if (!(hmd.mdat.mlet === S_GHOST) && !($c.andu64(hmd.mdat.mflags1, M1_AMORPHOUS) !== 0)) {
         whom = $c.__builtin___strcat_chk(s_suffix(whom), $c.lit(" flesh"), -1);
     }
     await pline(fmt, whom);
@@ -1113,12 +1136,12 @@ async function hmon_hitmon(mon, obj, thrown, dieroll) {   // uhitm.c:1754
     hmd.silvermsg = 0;
     hmd.silverobj = 0;
     hmd.lightobj = 0;
-    hmd.material = obj ? objects[obj.otyp].oc_material | 0 : 0 /* NO_MATERIAL */;
+    hmd.material = obj ? objects[obj.otyp].oc_material | 0 : NO_MATERIAL;
     hmd.jousting = 0;
     hmd.hittxt = 0;
     hmd.get_dmg_bonus = 1;
     hmd.unarmed = $c.i8(!$G.uwep && !$G.uarm && !$G.uarms ? 1 : 0);
-    $t1 = $c.i8(thrown === 0 /* HMON_MELEE */ || thrown === 3 /* HMON_APPLIED */ && (($G.uwep.oclass === 2 /* WEAPON_CLASS */ || $G.uwep.oclass === 6 /* TOOL_CLASS */) && (objects[$G.uwep.otyp].oc_subtyp === 16 /* P_POLEARMS */ || objects[$G.uwep.otyp].oc_subtyp === 19 /* P_LANCE */ || is_art($G.uwep, 19 /* ART_SNICKERSNEE */))) ? 1 : 0), hmd.hand_to_hand = $t1;
+    $t1 = $c.i8(thrown === HMON_MELEE || thrown === HMON_APPLIED && (($G.uwep.oclass === WEAPON_CLASS || $G.uwep.oclass === TOOL_CLASS) && (objects[$G.uwep.otyp].oc_subtyp === P_POLEARMS || objects[$G.uwep.otyp].oc_subtyp === P_LANCE || is_art($G.uwep, ART_SNICKERSNEE))) ? 1 : 0), hmd.hand_to_hand = $t1;
     hmd.ispoisoned = 0;
     hmd.unpoisonmsg = 0;
     hmd.needpoismsg = 0;
@@ -1141,9 +1164,9 @@ async function hmon_hitmon(mon, obj, thrown, dieroll) {   // uhitm.c:1754
         await hmon_hitmon_poison(hmd, mon, obj);
     }
     if (hmd.dmg < 1) {
-        mon_is_shade = $c.i8($c.peq(mon.data, $c.relem(mons, 288 /* PM_SHADE */)) ? 1 : 0);
+        mon_is_shade = $c.i8($c.peq(mon.data, $c.relem(mons, PM_SHADE)) ? 1 : 0);
         hmd.dmg = hmd.get_dmg_bonus && !mon_is_shade ? 1 : 0;
-        if (mon_is_shade && !hmd.hittxt && thrown !== 1 /* HMON_THROWN */ && thrown !== 2 /* HMON_KICKED */) {
+        if (mon_is_shade && !hmd.hittxt && thrown !== HMON_THROWN && thrown !== HMON_KICKED) {
             $t2 = await shade_miss(gy.youmonst, mon, obj, 0, 1), hmd.hittxt = $t2;
         }
     }
@@ -1155,7 +1178,7 @@ async function hmon_hitmon(mon, obj, thrown, dieroll) {   // uhitm.c:1754
         maybe_knockback = 1;
     }
     if (!hmd.already_killed) {
-        if (obj && ($c.peq(obj, $G.uwep) || $c.peq(obj, $G.uswapwep) && u.twoweap) && (obj.oclass === 2 /* WEAPON_CLASS */ || obj.oclass === 6 /* TOOL_CLASS */ && objects[obj.otyp].oc_subtyp !== 0 /* P_NONE */) && (thrown === 0 /* HMON_MELEE */ || thrown === 3 /* HMON_APPLIED */) && !hmd.jousting && hmd.dmg > 0 && u.uconduct.weaphit <= 1) {
+        if (obj && ($c.peq(obj, $G.uwep) || $c.peq(obj, $G.uswapwep) && u.twoweap) && (obj.oclass === WEAPON_CLASS || obj.oclass === TOOL_CLASS && objects[obj.otyp].oc_subtyp !== P_NONE) && (thrown === HMON_MELEE || thrown === HMON_APPLIED) && !hmd.jousting && hmd.dmg > 0 && u.uconduct.weaphit <= 1) {
             await first_weapon_hit(obj);
         }
         mon.mhp = mon.mhp - hmd.dmg | 0;
@@ -1192,12 +1215,12 @@ async function hmon_hitmon(mon, obj, thrown, dieroll) {   // uhitm.c:1754
     if (hmd.poiskilled) {
         await pline_The($c.lit("poison was deadly..."));
         if (!hmd.already_killed) {
-            await xkilled(mon, 1);
+            await xkilled(mon, XKILL_NOMSG);
         }
         hmd.destroyed = 1;
     } else if (hmd.destroyed) {
         if (!hmd.already_killed) {
-            if (mon.data.mlet === 46 /* S_TROLL */ && obj && obj.oartifact === 17 /* ART_TROLLSBANE */) {
+            if (mon.data.mlet === S_TROLL && obj && obj.oartifact === ART_TROLLSBANE) {
                 gm.mkcorpstat_norevive = 1;
             }
             await killed(mon);
@@ -1205,7 +1228,7 @@ async function hmon_hitmon(mon, obj, thrown, dieroll) {   // uhitm.c:1754
         }
     } else if (u.umconf && hmd.hand_to_hand) {
         await nohandglow(mon);
-        if (!mon.mconf && !await resist(mon, 10, 0, 0)) {
+        if (!mon.mconf && !await resist(mon, SPBOOK_CLASS, 0, NOTELL)) {
             mon.mconf = (1) & 1;
             if (!mon.mstun && !(mon.msleeping | 0 || !mon.mcanmove) && canseemon(mon)) {
                 await pline($c.lit("%s appears confused."), await Monnam(mon));
@@ -1216,10 +1239,10 @@ async function hmon_hitmon(mon, obj, thrown, dieroll) {   // uhitm.c:1754
         await Your($c.lit("%s %s no longer poisoned."), new $c.Ptr(hmd.saved_oname, 0), await vtense(new $c.Ptr(hmd.saved_oname, 0), $c.lit("are")));
     }
     if (!hmd.destroyed && !hmd.offmap) {
-        hitflags[0] = 1;
+        hitflags[0] = M_ATTK_HIT;
         await wakeup(mon, 1);
         if (maybe_knockback && await mhitm_knockback(gy.youmonst, mon, $c.relem(gy.youmonst.data.mattk, 0), new $c.Ptr(hitflags, 0), 1)) {
-            if ((hitflags[0] & 2) !== 0) {
+            if ((hitflags[0] & M_ATTK_DEF_DIED) !== 0) {
                 hmd.destroyed = 1;
             }
         }
@@ -1250,13 +1273,13 @@ async function first_weapon_hit(weapon) {   // uhitm.c:1963
             $c.__builtin___sprintf_chk(eos(new $c.Ptr(buf, 0)), 0, -1, $c.lit(" named %s"), await bare_artifactname(weapon));
         }
     }
-    await livelog_printf(32, $c.lit("hit with a wielded weapon (%s) for the first time"), new $c.Ptr(buf, 0));
+    await livelog_printf(LL_CONDUCT, $c.lit("hit with a wielded weapon (%s) for the first time"), new $c.Ptr(buf, 0));
 }
 function shade_aware(obj) {   // uhitm.c:1992
     if (!obj) {
         return 0;
     }
-    if (obj.otyp === 475 /* BOULDER */ || obj.otyp === 477 /* HEAVY_IRON_BALL */ || obj.otyp === 478 /* IRON_CHAIN */ || obj.otyp === 230 /* MIRROR */ || obj.otyp === 284 /* CLOVE_OF_GARLIC */ || (objects[obj.otyp].oc_material | 0) === 14 /* SILVER */) {
+    if (obj.otyp === BOULDER || obj.otyp === HEAVY_IRON_BALL || obj.otyp === IRON_CHAIN || obj.otyp === MIRROR || obj.otyp === CLOVE_OF_GARLIC || (objects[obj.otyp].oc_material | 0) === SILVER) {
         return 1;
     }
     return 0;
@@ -1265,10 +1288,10 @@ export async function shade_miss(magr, mdef, obj, thrown, verbose) {   // uhitm.
     let what = null, whose = null, target = null, youagr = 0, youdef = 0;
     youagr = $c.i8($c.peq(magr, gy.youmonst) ? 1 : 0);
     youdef = $c.i8($c.peq(mdef, gy.youmonst) ? 1 : 0);
-    if (!$c.peq(mdef.data, $c.relem(mons, 288 /* PM_SHADE */)) || obj && await dmgval(obj, mdef)) {
+    if (!$c.peq(mdef.data, $c.relem(mons, PM_SHADE)) || obj && await dmgval(obj, mdef)) {
         return 0;
     }
-    if (verbose && (youdef || (gv.viz_array.get(mdef.my).get(mdef.mx) & 2) !== 0 || sensemon(mdef) || $c.peq(magr, gy.youmonst) && dist2(mdef.mx, mdef.my, u.ux, u.uy) <= 2)) {
+    if (verbose && (youdef || (gv.viz_array.get(mdef.my).get(mdef.mx) & IN_SIGHT) !== 0 || sensemon(mdef) || $c.peq(magr, gy.youmonst) && dist2(mdef.mx, mdef.my, u.ux, u.uy) <= 2)) {
         what = !obj || shade_aware(obj) ? $c.lit("attack") : await cxname(obj);
         target = youdef ? $c.lit("you") : await mon_nam(mdef);
         if (!thrown) {
@@ -1288,19 +1311,19 @@ export async function shade_miss(magr, mdef, obj, thrown, verbose) {   // uhitm.
 }
 async function m_slips_free(mdef, mattk) {   // uhitm.c:2056
     let obj = null;
-    if (mattk.adtyp === 32) {
-        obj = await which_armor(mdef, 4);
+    if (mattk.adtyp === AD_DRIN) {
+        obj = await which_armor(mdef, W_ARMH);
     } else {
-        obj = await which_armor(mdef, 2);
+        obj = await which_armor(mdef, W_ARMC);
         if (!obj) {
-            obj = await which_armor(mdef, 1);
+            obj = await which_armor(mdef, W_ARM);
         }
         if (!obj) {
-            obj = await which_armor(mdef, 64);
+            obj = await which_armor(mdef, W_ARMU);
         }
     }
-    if (obj && (obj.greased | 0 || obj.otyp === 142 /* OILSKIN_CLOAK */) && (!obj.cursed || rn2(3))) {
-        await You($c.lit("%s %s %s %s!"), mattk.adtyp === 28 ? $c.lit("slip off of") : $c.lit("grab, but cannot hold onto"), s_suffix(await mon_nam(mdef)), obj.greased | 0 ? $c.lit("greased") : $c.lit("slippery"), obj.greased | 0 || objects[obj.otyp].oc_name_known | 0 ? await xname(obj) : cloak_simple_name(obj));
+    if (obj && (obj.greased | 0 || obj.otyp === OILSKIN_CLOAK) && (!obj.cursed || rn2(3))) {
+        await You($c.lit("%s %s %s %s!"), mattk.adtyp === AD_WRAP ? $c.lit("slip off of") : $c.lit("grab, but cannot hold onto"), s_suffix(await mon_nam(mdef)), obj.greased | 0 ? $c.lit("greased") : $c.lit("slippery"), obj.greased | 0 || objects[obj.otyp].oc_name_known | 0 ? await xname(obj) : cloak_simple_name(obj));
         if (obj.greased | 0 && !rn2(2)) {
             await pline_The($c.lit("grease wears off."));
             obj.greased = (0) & 1;
@@ -1311,7 +1334,7 @@ async function m_slips_free(mdef, mattk) {   // uhitm.c:2056
 }
 function joust(mon, obj) {   // uhitm.c:2098
     let skill_rating = 0, joust_dieroll = 0;
-    if (u.uprops[25 /* FUMBLING */].intrinsic || u.uprops[25 /* FUMBLING */].extrinsic || u.uprops[13 /* STUNNED */].intrinsic) {
+    if (u.uprops[FUMBLING].intrinsic || u.uprops[FUMBLING].extrinsic || u.uprops[STUNNED].intrinsic) {
         return 0;
     }
     if (!$c.peq(obj, $G.uwep) && (!$c.peq(obj, $G.uswapwep) || !u.twoweap)) {
@@ -1321,14 +1344,14 @@ function joust(mon, obj) {   // uhitm.c:2098
         return 0;
     }
     skill_rating = u.weapon_skills[weapon_type(obj)].skill;
-    if (u.twoweap && u.weapon_skills[36 /* P_TWO_WEAPON_COMBAT */].skill < skill_rating) {
-        skill_rating = u.weapon_skills[36 /* P_TWO_WEAPON_COMBAT */].skill;
+    if (u.twoweap && u.weapon_skills[P_TWO_WEAPON_COMBAT].skill < skill_rating) {
+        skill_rating = u.weapon_skills[P_TWO_WEAPON_COMBAT].skill;
     }
-    if (skill_rating === 0 /* P_ISRESTRICTED */) {
-        skill_rating = 1 /* P_UNSKILLED */;
+    if (skill_rating === P_ISRESTRICTED) {
+        skill_rating = P_UNSKILLED;
     }
     if ((joust_dieroll = rn2(5)) < skill_rating) {
-        if (joust_dieroll === 0 && rnl(50) === 49 && !($c.andu64(mon.data.mflags1, 1048576) !== 0) && !obj_resists(obj, 0, 100)) {
+        if (joust_dieroll === 0 && rnl(50) === 49 && !($c.andu64(mon.data.mflags1, M1_UNSOLID) !== 0) && !obj_resists(obj, 0, 100)) {
             return -1;
         }
         return 1;
@@ -1338,32 +1361,32 @@ function joust(mon, obj) {   // uhitm.c:2098
 async function demonpet() {   // uhitm.c:2133
     let i = 0, pm = null, dtmp = null;
     await pline($c.lit("Some hell-p has arrived!"));
-    i = !rn2(6) ? await ndemon(u.ualign.type) : -1 /* NON_PM */;
-    pm = i !== -1 /* NON_PM */ ? $c.relem(mons, i) : gy.youmonst.data;
-    if ((dtmp = await makemon(pm, u.ux, u.uy, 0)) !== null) {
+    i = !rn2(6) ? await ndemon(u.ualign.type) : NON_PM;
+    pm = i !== NON_PM ? $c.relem(mons, i) : gy.youmonst.data;
+    if ((dtmp = await makemon(pm, u.ux, u.uy, NO_MM_FLAGS)) !== null) {
         await tamedog(dtmp, null, 0);
     }
-    await exercise(2 /* A_WIS */, 1);
+    await exercise(A_WIS, 1);
 }
 async function theft_petrifies(otmp) {   // uhitm.c:2148
-    if ($G.uarmg || otmp.otyp !== 265 /* CORPSE */ || !($c.peq($c.relem(mons, otmp.corpsenm), $c.relem(mons, 10 /* PM_COCKATRICE */)) || $c.peq($c.relem(mons, otmp.corpsenm), $c.relem(mons, 9 /* PM_CHICKATRICE */))) || (u.uprops[8 /* STONE_RES */].intrinsic || u.uprops[8 /* STONE_RES */].extrinsic)) {
+    if ($G.uarmg || otmp.otyp !== CORPSE || !($c.peq($c.relem(mons, otmp.corpsenm), $c.relem(mons, PM_COCKATRICE)) || $c.peq($c.relem(mons, otmp.corpsenm), $c.relem(mons, PM_CHICKATRICE))) || (u.uprops[STONE_RES].intrinsic || u.uprops[STONE_RES].extrinsic)) {
         return 0;
     }
-    await instapetrify(await corpse_xname(otmp, $c.lit("stolen"), 8));
+    await instapetrify(await corpse_xname(otmp, $c.lit("stolen"), CXN_ARTICLE));
     return 1;
 }
 async function steal_it(mdef, mattk) {   // uhitm.c:2174
     let otmp = null, gold = null, ustealo = null, minvent_ptr = null, unwornmask = 0, heshe = new Int8Array(20);
     gold = null;
     otmp = mdef.minvent;
-    if (!otmp || otmp.oclass === 12 /* COIN_CLASS */ && !otmp.nobj) {
+    if (!otmp || otmp.oclass === COIN_CLASS && !otmp.nobj) {
         return;
     }
     ustealo = null;
     if (could_seduce(gy.youmonst, mdef, mattk) && mdef.mcanmove | 0) {
         minvent_ptr = new $c.FieldRef(mdef, "minvent", "ptr");
         while ((otmp = minvent_ptr.get(0)) !== null) {
-            if ($c.and64(otmp.owornmask, 1)) {
+            if ($c.and64(otmp.owornmask, W_ARM)) {
                 if (ustealo) {
                     await panic($c.lit("steal_it: multiple worn suits"));
                 }
@@ -1378,10 +1401,10 @@ async function steal_it(mdef, mattk) {   // uhitm.c:2174
     }
     gold = findgold(mdef.minvent);
     if (ustealo) {
-        if (gender(mdef) === (u.mfemale | 0) && gy.youmonst.data.mlet === 14 /* S_NYMPH */) {
-            await You($c.lit("charm %s.  %s gladly hands over %s%s possessions."), await mon_nam(mdef), upstart($c.__builtin___strcpy_chk(new $c.Ptr(heshe, 0), genders[pronoun_gender(mdef, 2)].he, 20)), !gold ? $c.lit("") : $c.lit("most of "), genders[pronoun_gender(mdef, 2)].his);
+        if (gender(mdef) === (u.mfemale | 0) && gy.youmonst.data.mlet === S_NYMPH) {
+            await You($c.lit("charm %s.  %s gladly hands over %s%s possessions."), await mon_nam(mdef), upstart($c.__builtin___strcpy_chk(new $c.Ptr(heshe, 0), genders[pronoun_gender(mdef, 2)].he, 20)), !gold ? $c.lit("") : $c.lit("most of "), genders[pronoun_gender(mdef, PRONOUN_HALLU)].his);
         } else {
-            await You($c.lit("seduce %s and %s starts to take off %s clothes."), await mon_nam(mdef), genders[pronoun_gender(mdef, 2)].he, genders[pronoun_gender(mdef, 2)].his);
+            await You($c.lit("seduce %s and %s starts to take off %s clothes."), await mon_nam(mdef), genders[pronoun_gender(mdef, PRONOUN_HALLU)].he, genders[pronoun_gender(mdef, PRONOUN_HALLU)].his);
         }
     }
     if (gold) {
@@ -1395,23 +1418,23 @@ async function steal_it(mdef, mattk) {   // uhitm.c:2174
             break;
         }
         unwornmask = otmp.owornmask;
-        if (otmp.oartifact && !((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
+        if (otmp.oartifact && !((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked)) {
             await find_artifact(otmp);
         }
         await extract_from_minvent(mdef, otmp, 1, 0);
         if ($c.peq(otmp, ustealo)) {
-            await pline($c.lit("%s finishes taking off %s suit."), await Monnam(mdef), genders[pronoun_gender(mdef, 2)].his);
+            await pline($c.lit("%s finishes taking off %s suit."), await Monnam(mdef), genders[pronoun_gender(mdef, PRONOUN_HALLU)].his);
         }
         otmp = await hold_another_object(otmp, $c.lit("You snatched but dropped %s."), await doname(otmp), $c.lit("You steal: "));
-        if (!otmp || otmp.where !== 3) {
+        if (!otmp || otmp.where !== OBJ_INVENT) {
             continue;
         }
         if (await theft_petrifies(otmp)) {
             break;
         }
-        if ($c.and64(unwornmask, 256)) {
+        if ($c.and64(unwornmask, W_WEP)) {
             await possibly_unwield(mdef, 0);
-        } else if ($c.and64(unwornmask, 16)) {
+        } else if ($c.and64(unwornmask, W_ARMG)) {
             await mselftouch(mdef, null, 1);
             if (mdef.mhp < 1) {
                 break;
@@ -1432,62 +1455,62 @@ export async function mhitm_ad_rust(magr, mattk, mdef, mhm) {   // uhitm.c:2281
     let pd = null, $t1;
     pd = mdef.data;
     if ($c.peq(magr, gy.youmonst)) {
-        if ($c.peq(pd, $c.relem(mons, 259 /* PM_IRON_GOLEM */))) {
+        if ($c.peq(pd, $c.relem(mons, PM_IRON_GOLEM))) {
             await pline($c.lit("%s %s to pieces!"), await Monnam(mdef), !await mlifesaver(mdef) ? $c.lit("falls") : $c.lit("starts to fall"));
-            await xkilled(mdef, 1);
-            mhm.hitflags = mhm.hitflags | 2;
+            await xkilled(mdef, XKILL_NOMSG);
+            mhm.hitflags = mhm.hitflags | M_ATTK_DEF_DIED;
         }
-        await erode_armor(mdef, 1);
+        await erode_armor(mdef, ERODE_RUST);
         mhm.damage = 0;
     } else if ($c.peq(mdef, gy.youmonst)) {
         await hitmsg(magr, mattk);
         if (magr.mcan) {
             return;
         }
-        if ($c.peq(pd, $c.relem(mons, 259 /* PM_IRON_GOLEM */))) {
+        if ($c.peq(pd, $c.relem(mons, PM_IRON_GOLEM))) {
             await You($c.lit("rust!"));
             await rehumanize();
             return;
         }
-        await erode_armor(gy.youmonst, 1);
+        await erode_armor(gy.youmonst, ERODE_RUST);
     } else {
         if (magr.mcan) {
             return;
         }
-        if ($c.peq(pd, $c.relem(mons, 259 /* PM_IRON_GOLEM */))) {
+        if ($c.peq(pd, $c.relem(mons, PM_IRON_GOLEM))) {
             if (gv.vis && canseemon(mdef)) {
                 await pline_mon(mdef, $c.lit("%s %s to pieces!"), await Monnam(mdef), !await mlifesaver(mdef) ? $c.lit("falls") : $c.lit("starts to fall"));
             }
-            await monkilled(mdef, null, 24);
+            await monkilled(mdef, null, AD_RUST);
             if (!(mdef.mhp < 1)) {
-                mhm.hitflags = 0;
+                mhm.hitflags = M_ATTK_MISS;
                 mhm.done = 1;
                 return;
             }
-            $t1 = 2 | (await grow_up(magr, mdef) ? 0 : 4), mhm.hitflags = $t1;
+            $t1 = M_ATTK_DEF_DIED | (await grow_up(magr, mdef) ? 0 : M_ATTK_AGR_DIED), mhm.hitflags = $t1;
             mhm.done = 1;
             return;
         }
-        await erode_armor(mdef, 1);
+        await erode_armor(mdef, ERODE_RUST);
         mdef.mstrategy = $c.andu64(mdef.mstrategy, 18446744073172680703n);
         mhm.damage = 0;
     }
 }
 export async function mhitm_ad_corr(magr, mattk, mdef, mhm) {   // uhitm.c:2338
     if ($c.peq(magr, gy.youmonst)) {
-        await erode_armor(mdef, 3);
+        await erode_armor(mdef, ERODE_CORRODE);
         mhm.damage = 0;
     } else if ($c.peq(mdef, gy.youmonst)) {
         await hitmsg(magr, mattk);
         if (magr.mcan) {
             return;
         }
-        await erode_armor(mdef, 3);
+        await erode_armor(mdef, ERODE_CORRODE);
     } else {
         if (magr.mcan) {
             return;
         }
-        await erode_armor(mdef, 3);
+        await erode_armor(mdef, ERODE_CORRODE);
         mdef.mstrategy = $c.andu64(mdef.mstrategy, 18446744073172680703n);
         mhm.damage = 0;
     }
@@ -1496,42 +1519,42 @@ export async function mhitm_ad_dcay(magr, mattk, mdef, mhm) {   // uhitm.c:2363
     let pd = null, $t1;
     pd = mdef.data;
     if ($c.peq(magr, gy.youmonst)) {
-        if ($c.peq(pd, $c.relem(mons, 254 /* PM_WOOD_GOLEM */)) || $c.peq(pd, $c.relem(mons, 253 /* PM_LEATHER_GOLEM */))) {
+        if ($c.peq(pd, $c.relem(mons, PM_WOOD_GOLEM)) || $c.peq(pd, $c.relem(mons, PM_LEATHER_GOLEM))) {
             await pline($c.lit("%s %s to pieces!"), await Monnam(mdef), !await mlifesaver(mdef) ? $c.lit("falls") : $c.lit("starts to fall"));
-            await xkilled(mdef, 1);
+            await xkilled(mdef, XKILL_NOMSG);
         }
-        await erode_armor(mdef, 2);
+        await erode_armor(mdef, ERODE_ROT);
         mhm.damage = 0;
     } else if ($c.peq(mdef, gy.youmonst)) {
         await hitmsg(magr, mattk);
         if (magr.mcan) {
             return;
         }
-        if ($c.peq(pd, $c.relem(mons, 254 /* PM_WOOD_GOLEM */)) || $c.peq(pd, $c.relem(mons, 253 /* PM_LEATHER_GOLEM */))) {
+        if ($c.peq(pd, $c.relem(mons, PM_WOOD_GOLEM)) || $c.peq(pd, $c.relem(mons, PM_LEATHER_GOLEM))) {
             await You($c.lit("rot!"));
             await rehumanize();
             return;
         }
-        await erode_armor(mdef, 2);
+        await erode_armor(mdef, ERODE_ROT);
     } else {
         if (magr.mcan) {
             return;
         }
-        if ($c.peq(pd, $c.relem(mons, 254 /* PM_WOOD_GOLEM */)) || $c.peq(pd, $c.relem(mons, 253 /* PM_LEATHER_GOLEM */))) {
+        if ($c.peq(pd, $c.relem(mons, PM_WOOD_GOLEM)) || $c.peq(pd, $c.relem(mons, PM_LEATHER_GOLEM))) {
             if (gv.vis && canseemon(mdef)) {
                 await pline_mon(mdef, $c.lit("%s %s to pieces!"), await Monnam(mdef), !await mlifesaver(mdef) ? $c.lit("falls") : $c.lit("starts to fall"));
             }
-            await monkilled(mdef, null, 34);
+            await monkilled(mdef, null, AD_DCAY);
             if (!(mdef.mhp < 1)) {
                 mhm.done = 1;
-                mhm.hitflags = 0;
+                mhm.hitflags = M_ATTK_MISS;
                 return;
             }
             mhm.done = 1;
-            $t1 = 2 | (await grow_up(magr, mdef) ? 0 : 4), mhm.hitflags = $t1;
+            $t1 = M_ATTK_DEF_DIED | (await grow_up(magr, mdef) ? 0 : M_ATTK_AGR_DIED), mhm.hitflags = $t1;
             return;
         }
-        await erode_armor(mdef, 2);
+        await erode_armor(mdef, ERODE_ROT);
         mdef.mstrategy = $c.andu64(mdef.mstrategy, 18446744073172680703n);
         mhm.damage = 0;
     }
@@ -1552,7 +1575,7 @@ export async function mhitm_ad_dren(magr, mattk, mdef, mhm) {   // uhitm.c:2418
         mhm.damage = 0;
     } else {
         if (!negated && !rn2(4)) {
-            await xdrainenergym(mdef, $c.i8(gv.vis && (canseemon(mdef) || sensemon(mdef)) && mattk.aatyp !== 11 ? 1 : 0));
+            await xdrainenergym(mdef, $c.i8(gv.vis && (canseemon(mdef) || sensemon(mdef)) && mattk.aatyp !== AT_ENGL ? 1 : 0));
         }
         mhm.damage = 0;
     }
@@ -1560,7 +1583,7 @@ export async function mhitm_ad_dren(magr, mattk, mdef, mhm) {   // uhitm.c:2418
 export async function mhitm_ad_drli(magr, mattk, mdef, mhm) {   // uhitm.c:2445
     let is_death = 0, $t1, $t2;
     if ($c.peq(magr, gy.youmonst)) {
-        if (!rn2(3) && !(await resists_drli(mdef) || await defended(mdef, 15)) && !await mhitm_mgc_atk_negated(magr, mdef, 1)) {
+        if (!rn2(3) && !(await resists_drli(mdef) || await defended(mdef, AD_DRLI)) && !await mhitm_mgc_atk_negated(magr, mdef, 1)) {
             $t1 = d(2, 6), mhm.damage = $t1;
             await pline($c.lit("%s becomes weaker!"), await Monnam(mdef));
             if ((mdef.mhpmax - mhm.damage | 0) > mdef.m_lev) {
@@ -1572,8 +1595,8 @@ export async function mhitm_ad_drli(magr, mattk, mdef, mhm) {   // uhitm.c:2445
             }
             mdef.mhp = mdef.mhp - mhm.damage | 0;
             if (mdef.mhp < 1 || !mdef.m_lev) {
-                await pline($c.lit("%s %s!"), await Monnam(mdef), $c.andu64(mdef.data.mflags2, 2) !== 0 || $c.peq(mdef.data, $c.relem(mons, 50 /* PM_MANES */)) || (mdef.data.mlet === 55 /* S_GOLEM */ || mdef.data.mlet === 22 /* S_VORTEX */) ? $c.lit("expires") : $c.lit("dies"));
-                await xkilled(mdef, 1);
+                await pline($c.lit("%s %s!"), await Monnam(mdef), $c.andu64(mdef.data.mflags2, M2_UNDEAD) !== 0 || $c.peq(mdef.data, $c.relem(mons, PM_MANES)) || (mdef.data.mlet === S_GOLEM || mdef.data.mlet === S_VORTEX) ? $c.lit("expires") : $c.lit("dies"));
+                await xkilled(mdef, XKILL_NOMSG);
             } else {
                 mdef.m_lev = $c.u8(mdef.m_lev - 1);
             }
@@ -1581,12 +1604,12 @@ export async function mhitm_ad_drli(magr, mattk, mdef, mhm) {   // uhitm.c:2445
         }
     } else if ($c.peq(mdef, gy.youmonst)) {
         await hitmsg(magr, mattk);
-        if (!rn2(3) && !(u.uprops[9 /* DRAIN_RES */].intrinsic || u.uprops[9 /* DRAIN_RES */].extrinsic) && !await mhitm_mgc_atk_negated(magr, mdef, 1)) {
+        if (!rn2(3) && !(u.uprops[DRAIN_RES].intrinsic || u.uprops[DRAIN_RES].extrinsic) && !await mhitm_mgc_atk_negated(magr, mdef, 1)) {
             await losexp($c.lit("life drainage"));
         }
     } else {
-        is_death = $c.i8(mattk.adtyp === 37 ? 1 : 0);
-        if (is_death || !rn2(3) && !(await resists_drli(mdef) || await defended(mdef, 15)) && !await mhitm_mgc_atk_negated(magr, mdef, 1)) {
+        is_death = $c.i8(mattk.adtyp === AD_DETH ? 1 : 0);
+        if (is_death || !rn2(3) && !(await resists_drli(mdef) || await defended(mdef, AD_DRLI)) && !await mhitm_mgc_atk_negated(magr, mdef, 1)) {
             if (!is_death) {
                 $t2 = d(2, 6), mhm.damage = $t2;
             }
@@ -1617,47 +1640,47 @@ export async function mhitm_ad_fire(magr, mattk, mdef, mhm) {   // uhitm.c:2521
             mhm.damage = 0;
             return;
         }
-        if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
+        if (!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked)) {
             await pline($c.lit("%s is %s!"), await Monnam(mdef), on_fire(pd, mattk));
         }
-        if ($c.peq(pd, $c.relem(mons, 250 /* PM_PAPER_GOLEM */)) || $c.peq(pd, $c.relem(mons, 249 /* PM_STRAW_GOLEM */))) {
-            if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
+        if ($c.peq(pd, $c.relem(mons, PM_PAPER_GOLEM)) || $c.peq(pd, $c.relem(mons, PM_STRAW_GOLEM))) {
+            if (!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked)) {
                 await pline($c.lit("%s %s!"), await Monnam(mdef), !await mlifesaver(mdef) ? $c.lit("burns completely") : $c.lit("is totally engulfed in flames"));
             } else {
-                await You($c.lit("smell burning%s."), $c.peq(pd, $c.relem(mons, 250 /* PM_PAPER_GOLEM */)) ? $c.lit(" paper") : $c.peq(pd, $c.relem(mons, 249 /* PM_STRAW_GOLEM */)) ? $c.lit(" straw") : $c.lit(""));
+                await You($c.lit("smell burning%s."), $c.peq(pd, $c.relem(mons, PM_PAPER_GOLEM)) ? $c.lit(" paper") : $c.peq(pd, $c.relem(mons, PM_STRAW_GOLEM)) ? $c.lit(" straw") : $c.lit(""));
             }
-            await xkilled(mdef, 3);
+            await xkilled(mdef, XKILL_NOMSG | XKILL_NOCORPSE);
             mhm.damage = 0;
             return;
         }
-        if (await Resists_Elem(mdef, 1 /* FIRE_RES */) || await defended(mdef, 2)) {
-            if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
+        if (await Resists_Elem(mdef, FIRE_RES) || await defended(mdef, AD_FIRE)) {
+            if (!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked)) {
                 await pline_The($c.lit("fire doesn't heat %s!"), await mon_nam(mdef));
             }
-            await golemeffects(mdef, 2, mhm.damage);
+            await golemeffects(mdef, AD_FIRE, mhm.damage);
             await shieldeff(mdef.mx, mdef.my);
             mhm.damage = 0;
         }
-        $t1 = await destroy_items(mdef, 2, orig_dmg), mhm.damage = mhm.damage + $t1 | 0;
+        $t1 = await destroy_items(mdef, AD_FIRE, orig_dmg), mhm.damage = mhm.damage + $t1 | 0;
         await ignite_items(mdef.minvent);
     } else if ($c.peq(mdef, gy.youmonst)) {
         await hitmsg(magr, mattk);
         if (!await mhitm_mgc_atk_negated(magr, mdef, 1)) {
             await pline($c.lit("You're %s!"), on_fire(pd, mattk));
-            if ($c.peq(pd, $c.relem(mons, 250 /* PM_PAPER_GOLEM */)) || $c.peq(pd, $c.relem(mons, 249 /* PM_STRAW_GOLEM */))) {
+            if ($c.peq(pd, $c.relem(mons, PM_PAPER_GOLEM)) || $c.peq(pd, $c.relem(mons, PM_STRAW_GOLEM))) {
                 await You($c.lit("go up in flames!"));
-                monstunseesu(2);
+                monstunseesu(M_SEEN_FIRE);
                 await rehumanize();
                 return;
-            } else if (u.uprops[1 /* FIRE_RES */].intrinsic || u.uprops[1 /* FIRE_RES */].extrinsic) {
+            } else if (u.uprops[FIRE_RES].intrinsic || u.uprops[FIRE_RES].extrinsic) {
                 await pline_The($c.lit("fire doesn't feel hot!"));
-                monstseesu(2);
+                monstseesu(M_SEEN_FIRE);
                 mhm.damage = 0;
             } else {
-                monstunseesu(2);
+                monstunseesu(M_SEEN_FIRE);
             }
             if (magr.m_lev > rn2(20)) {
-                await destroy_items(gy.youmonst, 2, orig_dmg);
+                await destroy_items(gy.youmonst, AD_FIRE, orig_dmg);
                 await ignite_items(gi.invent);
             }
             await burn_away_slime();
@@ -1672,29 +1695,29 @@ export async function mhitm_ad_fire(magr, mattk, mdef, mhm) {   // uhitm.c:2521
         if (gv.vis && canseemon(mdef)) {
             await pline_mon(mdef, $c.lit("%s is %s!"), await Monnam(mdef), on_fire(pd, mattk));
         }
-        if ($c.peq(pd, $c.relem(mons, 250 /* PM_PAPER_GOLEM */)) || $c.peq(pd, $c.relem(mons, 249 /* PM_STRAW_GOLEM */))) {
+        if ($c.peq(pd, $c.relem(mons, PM_PAPER_GOLEM)) || $c.peq(pd, $c.relem(mons, PM_STRAW_GOLEM))) {
             if (gv.vis && canseemon(mdef)) {
                 await pline_mon(mdef, $c.lit("%s %s!"), await Monnam(mdef), !await mlifesaver(mdef) ? $c.lit("burns completely") : $c.lit("is totally engulfed in flames"));
             }
-            await monkilled(mdef, null, 2);
+            await monkilled(mdef, null, AD_FIRE);
             if (!(mdef.mhp < 1)) {
-                mhm.hitflags = 0;
+                mhm.hitflags = M_ATTK_MISS;
                 mhm.done = 1;
                 return;
             }
-            $t2 = 2 | (await grow_up(magr, mdef) ? 0 : 4), mhm.hitflags = $t2;
+            $t2 = M_ATTK_DEF_DIED | (await grow_up(magr, mdef) ? 0 : M_ATTK_AGR_DIED), mhm.hitflags = $t2;
             mhm.done = 1;
             return;
         }
-        if (await Resists_Elem(mdef, 1 /* FIRE_RES */) || await defended(mdef, 2)) {
+        if (await Resists_Elem(mdef, FIRE_RES) || await defended(mdef, AD_FIRE)) {
             if (gv.vis && canseemon(mdef)) {
                 await pline_The($c.lit("fire doesn't seem to burn %s!"), await mon_nam(mdef));
             }
             await shieldeff(mdef.mx, mdef.my);
-            await golemeffects(mdef, 2, mhm.damage);
+            await golemeffects(mdef, AD_FIRE, mhm.damage);
             mhm.damage = 0;
         }
-        $t3 = await destroy_items(mdef, 2, orig_dmg), mhm.damage = mhm.damage + $t3 | 0;
+        $t3 = await destroy_items(mdef, AD_FIRE, orig_dmg), mhm.damage = mhm.damage + $t3 | 0;
         await ignite_items(mdef.minvent);
     }
 }
@@ -1706,31 +1729,31 @@ export async function mhitm_ad_cold(magr, mattk, mdef, mhm) {   // uhitm.c:2626
             mhm.damage = 0;
             return;
         }
-        if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
+        if (!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked)) {
             await pline($c.lit("%s is covered in frost!"), await Monnam(mdef));
         }
-        if (await Resists_Elem(mdef, 2 /* COLD_RES */) || await defended(mdef, 3)) {
+        if (await Resists_Elem(mdef, COLD_RES) || await defended(mdef, AD_COLD)) {
             await shieldeff(mdef.mx, mdef.my);
-            if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
+            if (!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked)) {
                 await pline_The($c.lit("frost doesn't chill %s!"), await mon_nam(mdef));
             }
-            await golemeffects(mdef, 3, mhm.damage);
+            await golemeffects(mdef, AD_COLD, mhm.damage);
             mhm.damage = 0;
         }
-        $t1 = await destroy_items(mdef, 3, orig_dmg), mhm.damage = mhm.damage + $t1 | 0;
+        $t1 = await destroy_items(mdef, AD_COLD, orig_dmg), mhm.damage = mhm.damage + $t1 | 0;
     } else if ($c.peq(mdef, gy.youmonst)) {
         await hitmsg(magr, mattk);
         if (!await mhitm_mgc_atk_negated(magr, mdef, 1)) {
             await pline($c.lit("You're covered in frost!"));
-            if (u.uprops[2 /* COLD_RES */].intrinsic || u.uprops[2 /* COLD_RES */].extrinsic) {
+            if (u.uprops[COLD_RES].intrinsic || u.uprops[COLD_RES].extrinsic) {
                 await pline_The($c.lit("frost doesn't seem cold!"));
-                monstseesu(4);
+                monstseesu(M_SEEN_COLD);
                 mhm.damage = 0;
             } else {
-                monstunseesu(4);
+                monstunseesu(M_SEEN_COLD);
             }
             if (magr.m_lev > rn2(20)) {
-                await destroy_items(gy.youmonst, 3, orig_dmg);
+                await destroy_items(gy.youmonst, AD_COLD, orig_dmg);
             }
         } else {
             mhm.damage = 0;
@@ -1743,15 +1766,15 @@ export async function mhitm_ad_cold(magr, mattk, mdef, mhm) {   // uhitm.c:2626
         if (gv.vis && canseemon(mdef)) {
             await pline_mon(mdef, $c.lit("%s is covered in frost!"), await Monnam(mdef));
         }
-        if (await Resists_Elem(mdef, 2 /* COLD_RES */) || await defended(mdef, 3)) {
+        if (await Resists_Elem(mdef, COLD_RES) || await defended(mdef, AD_COLD)) {
             if (gv.vis && canseemon(mdef)) {
                 await pline_The($c.lit("frost doesn't seem to chill %s!"), await mon_nam(mdef));
             }
             await shieldeff(mdef.mx, mdef.my);
-            await golemeffects(mdef, 3, mhm.damage);
+            await golemeffects(mdef, AD_COLD, mhm.damage);
             mhm.damage = 0;
         }
-        $t2 = await destroy_items(mdef, 3, orig_dmg), mhm.damage = mhm.damage + $t2 | 0;
+        $t2 = await destroy_items(mdef, AD_COLD, orig_dmg), mhm.damage = mhm.damage + $t2 | 0;
     }
 }
 export async function mhitm_ad_elec(magr, mattk, mdef, mhm) {   // uhitm.c:2684
@@ -1762,31 +1785,31 @@ export async function mhitm_ad_elec(magr, mattk, mdef, mhm) {   // uhitm.c:2684
             mhm.damage = 0;
             return;
         }
-        if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
+        if (!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked)) {
             await pline($c.lit("%s is zapped!"), await Monnam(mdef));
         }
-        if (await Resists_Elem(mdef, 5 /* SHOCK_RES */) || await defended(mdef, 6)) {
-            if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
+        if (await Resists_Elem(mdef, SHOCK_RES) || await defended(mdef, AD_ELEC)) {
+            if (!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked)) {
                 await pline_The($c.lit("zap doesn't shock %s!"), await mon_nam(mdef));
             }
-            await golemeffects(mdef, 6, mhm.damage);
+            await golemeffects(mdef, AD_ELEC, mhm.damage);
             await shieldeff(mdef.mx, mdef.my);
             mhm.damage = 0;
         }
-        $t1 = await destroy_items(mdef, 6, orig_dmg), mhm.damage = mhm.damage + $t1 | 0;
+        $t1 = await destroy_items(mdef, AD_ELEC, orig_dmg), mhm.damage = mhm.damage + $t1 | 0;
     } else if ($c.peq(mdef, gy.youmonst)) {
         await hitmsg(magr, mattk);
         if (!await mhitm_mgc_atk_negated(magr, mdef, 1)) {
             await You($c.lit("get zapped!"));
-            if (u.uprops[5 /* SHOCK_RES */].intrinsic || u.uprops[5 /* SHOCK_RES */].extrinsic) {
+            if (u.uprops[SHOCK_RES].intrinsic || u.uprops[SHOCK_RES].extrinsic) {
                 await pline_The($c.lit("zap doesn't shock you!"));
-                monstseesu(32);
+                monstseesu(M_SEEN_ELEC);
                 mhm.damage = 0;
             } else {
-                monstunseesu(32);
+                monstunseesu(M_SEEN_ELEC);
             }
             if (magr.m_lev > rn2(20)) {
-                await destroy_items(gy.youmonst, 6, orig_dmg);
+                await destroy_items(gy.youmonst, AD_ELEC, orig_dmg);
             }
         } else {
             mhm.damage = 0;
@@ -1799,33 +1822,33 @@ export async function mhitm_ad_elec(magr, mattk, mdef, mhm) {   // uhitm.c:2684
         if (gv.vis && canseemon(mdef)) {
             await pline_mon(mdef, $c.lit("%s gets zapped!"), await Monnam(mdef));
         }
-        if (await Resists_Elem(mdef, 5 /* SHOCK_RES */) || await defended(mdef, 6)) {
+        if (await Resists_Elem(mdef, SHOCK_RES) || await defended(mdef, AD_ELEC)) {
             if (gv.vis && canseemon(mdef)) {
                 await pline_The($c.lit("zap doesn't shock %s!"), await mon_nam(mdef));
             }
             await shieldeff(mdef.mx, mdef.my);
-            await golemeffects(mdef, 6, mhm.damage);
+            await golemeffects(mdef, AD_ELEC, mhm.damage);
             mhm.damage = 0;
         }
-        $t2 = await destroy_items(mdef, 6, orig_dmg), mhm.damage = mhm.damage + $t2 | 0;
+        $t2 = await destroy_items(mdef, AD_ELEC, orig_dmg), mhm.damage = mhm.damage + $t2 | 0;
     }
 }
 export async function mhitm_ad_acid(magr, mattk, mdef, mhm) {   // uhitm.c:2742
     if ($c.peq(magr, gy.youmonst)) {
-        if (await Resists_Elem(mdef, 7 /* ACID_RES */) || await defended(mdef, 8)) {
+        if (await Resists_Elem(mdef, ACID_RES) || await defended(mdef, AD_ACID)) {
             mhm.damage = 0;
         }
     } else if ($c.peq(mdef, gy.youmonst)) {
         await hitmsg(magr, mattk);
         if (!magr.mcan && !rn2(3)) {
-            if (u.uprops[7 /* ACID_RES */].intrinsic || u.uprops[7 /* ACID_RES */].extrinsic) {
+            if (u.uprops[ACID_RES].intrinsic || u.uprops[ACID_RES].extrinsic) {
                 await pline($c.lit("You're covered in %s, but it seems harmless."), hliquid($c.lit("acid")));
-                monstseesu(128);
+                monstseesu(M_SEEN_ACID);
                 mhm.damage = 0;
             } else {
                 await pline($c.lit("You're covered in %s!  It burns!"), hliquid($c.lit("acid")));
-                await exercise(0 /* A_STR */, 0);
-                monstunseesu(128);
+                await exercise(A_STR, 0);
+                monstunseesu(M_SEEN_ACID);
             }
         } else {
             mhm.damage = 0;
@@ -1835,7 +1858,7 @@ export async function mhitm_ad_acid(magr, mattk, mdef, mhm) {   // uhitm.c:2742
             mhm.damage = 0;
             return;
         }
-        if (await Resists_Elem(mdef, 7 /* ACID_RES */) || await defended(mdef, 8)) {
+        if (await Resists_Elem(mdef, ACID_RES) || await defended(mdef, AD_ACID)) {
             if (gv.vis && canseemon(mdef)) {
                 await pline($c.lit("%s is covered in %s, but it seems harmless."), await Monnam(mdef), hliquid($c.lit("acid")));
             }
@@ -1845,7 +1868,7 @@ export async function mhitm_ad_acid(magr, mattk, mdef, mhm) {   // uhitm.c:2742
             await pline($c.lit("It burns %s!"), await mon_nam(mdef));
         }
         if (!rn2(30)) {
-            await erode_armor(mdef, 3);
+            await erode_armor(mdef, ERODE_CORRODE);
         }
         if (!rn2(6)) {
             await acid_damage(mdef.mw);
@@ -1860,7 +1883,7 @@ export async function mhitm_ad_sgld(magr, mattk, mdef, mhm) {   // uhitm.c:2790
         mongold = findgold(mdef.minvent);
         if (mongold) {
             await obj_extract_self(mongold);
-            if (await merge_choice(gi.invent, mongold) || inv_cnt(0) < 52 /* invlet_basic */) {
+            if (await merge_choice(gi.invent, mongold) || inv_cnt(0) < invlet_basic) {
                 await addinv(mongold);
                 await Your($c.lit("purse feels heavier."));
             } else {
@@ -1868,7 +1891,7 @@ export async function mhitm_ad_sgld(magr, mattk, mdef, mhm) {   // uhitm.c:2790
                 await dropy(mongold);
             }
         }
-        await exercise(3 /* A_DEX */, 1);
+        await exercise(A_DEX, 1);
         mhm.damage = 0;
     } else if ($c.peq(mdef, gy.youmonst)) {
         await hitmsg(magr, mattk);
@@ -1898,8 +1921,8 @@ export async function mhitm_ad_sgld(magr, mattk, mdef, mhm) {   // uhitm.c:2790
         }
         if (!await tele_restrict(magr)) {
             couldspot = $c.i8(canseemon(magr) || sensemon(magr) ? 1 : 0);
-            mhm.hitflags = 8;
-            await rloc(magr, 4);
+            mhm.hitflags = M_ATTK_AGR_DONE;
+            await rloc(magr, RLOC_NOMSG);
             if (gv.vis && couldspot && !(canseemon(magr) || sensemon(magr))) {
                 await pline($c.lit("%s suddenly disappears!"), new $c.Ptr(buf, 0));
             }
@@ -1933,12 +1956,12 @@ export async function mhitm_ad_tlpt(magr, mattk, mdef, mhm) {   // uhitm.c:2859
             await You($c.lit("are not affected."));
         } else {
             if (flags.verbose) {
-                await Your($c.lit("position suddenly seems %suncertain!"), (u.uprops[47 /* TELEPORT_CONTROL */].intrinsic || u.uprops[47 /* TELEPORT_CONTROL */].extrinsic) && !u.uprops[13 /* STUNNED */].intrinsic && !unconscious() ? $c.lit("") : $c.lit("very "));
+                await Your($c.lit("position suddenly seems %suncertain!"), (u.uprops[TELEPORT_CONTROL].intrinsic || u.uprops[TELEPORT_CONTROL].extrinsic) && !u.uprops[STUNNED].intrinsic && !unconscious() ? $c.lit("") : $c.lit("very "));
             }
             await tele();
-            if ((u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(mhm.damage - 1 | 0, 2) : mhm.damage) >= (tmphp = u.umonnum !== u.umonster ? u.mh : u.uhp)) {
+            if ((u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(mhm.damage - 1 | 0, 2) : mhm.damage) >= (tmphp = u.umonnum !== u.umonster ? u.mh : u.uhp)) {
                 mhm.damage = tmphp - 1 | 0;
-                if (u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic) {
+                if (u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic) {
                     mhm.damage = Math.imul(mhm.damage, 2);
                 }
                 if (mhm.damage < 1) {
@@ -1963,7 +1986,7 @@ export async function mhitm_ad_tlpt(magr, mattk, mdef, mhm) {   // uhitm.c:2859
                 $c.__builtin___strcpy_chk(new $c.Ptr(mdef_Monnam, 0), await Monnam(mdef), 256);
             }
             mdef.mstrategy = $c.andu64(mdef.mstrategy, 18446744073172680703n);
-            await rloc(mdef, 4);
+            await rloc(mdef, RLOC_NOMSG);
             if (gv.vis && wasseen && !(canseemon(mdef) || sensemon(mdef)) && !$c.peq(mdef, u.usteed)) {
                 await pline($c.lit("%s suddenly disappears!"), new $c.Ptr(mdef_Monnam, 0));
             }
@@ -1980,7 +2003,7 @@ export async function mhitm_ad_blnd(magr, mattk, mdef, mhm) {   // uhitm.c:2958
     let buf = new Int8Array(256), rnd_tmp = 0;
     if ($c.peq(magr, gy.youmonst)) {
         if (await can_blnd(magr, mdef, mattk.aatyp, null)) {
-            if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked) && mdef.mcansee | 0) {
+            if (!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked) && mdef.mcansee | 0) {
                 await pline($c.lit("%s is blinded."), await Monnam(mdef));
             }
             mdef.mcansee = (0) & 1;
@@ -1993,11 +2016,11 @@ export async function mhitm_ad_blnd(magr, mattk, mdef, mhm) {   // uhitm.c:2958
         mhm.damage = 0;
     } else if ($c.peq(mdef, gy.youmonst)) {
         if (await can_blnd(magr, mdef, mattk.aatyp, null)) {
-            if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
+            if (!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked)) {
                 await pline($c.lit("%s blinds you!"), await Monnam(magr));
             }
-            await make_blinded($c.add64($c.and64(u.uprops[15 /* BLINDED */].intrinsic, 16777215), mhm.damage), 0);
-            if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
+            await make_blinded($c.add64($c.and64(u.uprops[BLINDED].intrinsic, TIMEOUT), mhm.damage), 0);
+            if (!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked)) {
                 await Your($c.lit("%s"), c_common_strings.c_vision_clears);
             }
         }
@@ -2006,7 +2029,7 @@ export async function mhitm_ad_blnd(magr, mattk, mdef, mhm) {   // uhitm.c:2958
         if (await can_blnd(magr, mdef, mattk.aatyp, null)) {
             if (gv.vis && mdef.mcansee | 0 && (canseemon(mdef) || sensemon(mdef))) {
                 nh_snprintf($c.lit("mhitm_ad_blnd"), 2996, new $c.Ptr(buf, 0), 256, $c.lit("%s is blinded"), await Monnam(mdef));
-                if ($c.peq(mdef.data, $c.relem(mons, 125 /* PM_ARCHON */)) && canseemon(mdef)) {
+                if ($c.peq(mdef.data, $c.relem(mons, PM_ARCHON)) && canseemon(mdef)) {
                     nh_snprintf($c.lit("mhitm_ad_blnd"), 2999, eos(new $c.Ptr(buf, 0)), $c.subu64(256, $c.strlen(new $c.Ptr(buf, 0))), $c.lit(" by %s radiance"), s_suffix(await mon_nam(magr)));
                 }
                 await pline($c.lit("%s."), new $c.Ptr(buf, 0));
@@ -2030,11 +2053,11 @@ export async function mhitm_ad_curs(magr, mattk, mdef, mhm) {   // uhitm.c:3015
     pd = mdef.data;
     if ($c.peq(magr, gy.youmonst)) {
         if (night() && !rn2(10) && !mdef.mcan) {
-            if ($c.peq(pd, $c.relem(mons, 256 /* PM_CLAY_GOLEM */))) {
-                if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
+            if ($c.peq(pd, $c.relem(mons, PM_CLAY_GOLEM))) {
+                if (!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked)) {
                     await pline($c.lit("Some writing vanishes from %s head!"), s_suffix(await mon_nam(mdef)));
                 }
-                await xkilled(mdef, 1);
+                await xkilled(mdef, XKILL_NOMSG);
             } else {
                 mdef.mcan = (1) & 1;
                 await You($c.lit("chuckle."));
@@ -2043,18 +2066,18 @@ export async function mhitm_ad_curs(magr, mattk, mdef, mhm) {   // uhitm.c:3015
         mhm.damage = 0;
     } else if ($c.peq(mdef, gy.youmonst)) {
         await hitmsg(magr, mattk);
-        if (!night() && $c.peq(pa, $c.relem(mons, 40 /* PM_GREMLIN */))) {
+        if (!night() && $c.peq(pa, $c.relem(mons, PM_GREMLIN))) {
             return;
         }
         if (!magr.mcan && !rn2(10)) {
-            if (!(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf)) {
-                if ((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked) {
+            if (!(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf)) {
+                if ((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked) {
                     await You_hear($c.lit("laughter."));
                 } else {
                     await pline_mon(magr, $c.lit("%s chuckles."), await Monnam(magr));
                 }
             }
-            if (u.umonnum === 256 /* PM_CLAY_GOLEM */) {
+            if (u.umonnum === PM_CLAY_GOLEM) {
                 await pline($c.lit("Some writing vanishes from your head!"));
                 await rehumanize();
                 return;
@@ -2062,33 +2085,33 @@ export async function mhitm_ad_curs(magr, mattk, mdef, mhm) {   // uhitm.c:3015
             await mon_give_prop(magr, await attrcurse());
         }
     } else {
-        if (!night() && $c.peq(pa, $c.relem(mons, 40 /* PM_GREMLIN */))) {
+        if (!night() && $c.peq(pa, $c.relem(mons, PM_GREMLIN))) {
             return;
         }
         if (!magr.mcan && !rn2(10)) {
             mdef.mcan = (1) & 1;
             mdef.mstrategy = $c.andu64(mdef.mstrategy, 18446744073172680703n);
-            if ($c.andu64(pd.mflags2, 4) !== 0 && pd.mlet !== 53 /* S_HUMAN */) {
+            if ($c.andu64(pd.mflags2, M2_WERE) !== 0 && pd.mlet !== S_HUMAN) {
                 await were_change(mdef);
             }
-            if ($c.peq(pd, $c.relem(mons, 256 /* PM_CLAY_GOLEM */))) {
+            if ($c.peq(pd, $c.relem(mons, PM_CLAY_GOLEM))) {
                 if (gv.vis && canseemon(mdef)) {
                     await pline($c.lit("Some writing vanishes from %s head!"), s_suffix(await mon_nam(mdef)));
                     await pline_mon(mdef, $c.lit("%s is destroyed!"), await Monnam(mdef));
                 }
                 await mondied(mdef);
                 if (!(mdef.mhp < 1)) {
-                    mhm.hitflags = 0;
+                    mhm.hitflags = M_ATTK_MISS;
                     mhm.done = 1;
                     return;
                 } else if (mdef.mtame && !gv.vis) {
                     await You(new $c.Ptr(brief_feeling, 0), $c.lit("strangely sad"));
                 }
-                $t1 = 2 | (await grow_up(magr, mdef) ? 0 : 4), mhm.hitflags = $t1;
+                $t1 = M_ATTK_DEF_DIED | (await grow_up(magr, mdef) ? 0 : M_ATTK_AGR_DIED), mhm.hitflags = $t1;
                 mhm.done = 1;
                 return;
             }
-            if (!(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf)) {
+            if (!(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf)) {
                 if (!gv.vis) {
                     await You_hear($c.lit("laughter."));
                 } else if (canseemon(magr)) {
@@ -2103,7 +2126,7 @@ async function mhitm_really_poison(magr, mattk, mdef, mhm) {   // uhitm.c:3104
     if (gv.vis && (canseemon(magr) || sensemon(magr))) {
         await pline($c.lit("%s %s was poisoned!"), s_suffix(await Monnam(magr)), mpoisons_subj(magr, mattk));
     }
-    if (await Resists_Elem(mdef, 6 /* POISON_RES */)) {
+    if (await Resists_Elem(mdef, POISON_RES)) {
         if (gv.vis && (canseemon(mdef) || sensemon(mdef)) && (canseemon(magr) || sensemon(magr))) {
             await pline_The($c.lit("poison doesn't seem to affect %s."), await mon_nam(mdef));
         }
@@ -2121,7 +2144,7 @@ export async function mhitm_ad_drst(magr, mattk, mdef, mhm) {   // uhitm.c:3122
     if ($c.peq(magr, gy.youmonst)) {
         if (!negated && !rn2(8)) {
             await Your($c.lit("%s was poisoned!"), mpoisons_subj(magr, mattk));
-            if (await Resists_Elem(mdef, 6 /* POISON_RES */)) {
+            if (await Resists_Elem(mdef, POISON_RES)) {
                 await pline_The($c.lit("poison doesn't seem to affect %s."), await mon_nam(mdef));
             } else {
                 if (!rn2(10)) {
@@ -2133,16 +2156,16 @@ export async function mhitm_ad_drst(magr, mattk, mdef, mhm) {   // uhitm.c:3122
             }
         }
     } else if ($c.peq(mdef, gy.youmonst)) {
-        ptmp = 0 /* A_STR */;
+        ptmp = A_STR;
         switch (mattk.adtyp) {
-            case 7:
-                ptmp = 0 /* A_STR */;
+            case AD_DRST:
+                ptmp = A_STR;
                 break;
-            case 30:
-                ptmp = 3 /* A_DEX */;
+            case AD_DRDX:
+                ptmp = A_DEX;
                 break;
-            case 31:
-                ptmp = 4 /* A_CON */;
+            case AD_DRCO:
+                ptmp = A_CON;
                 break;
         }
         await hitmsg(magr, mattk);
@@ -2160,12 +2183,12 @@ export async function mhitm_ad_drin(magr, mattk, mdef, mhm) {   // uhitm.c:3168
     let pd = null, amu = null, lifsav = 0, helmet = null, oldmort = 0, mhitu = 0, buf = new Int8Array(256), $t1;
     pd = mdef.data;
     if ($c.peq(magr, gy.youmonst)) {
-        if (gn.notonhead || !($c.andu64(pd.mflags1, 32768) === 0)) {
+        if (gn.notonhead || !($c.andu64(pd.mflags1, M1_NOHEAD) === 0)) {
             await pline($c.lit("%s doesn't seem harmed."), await Monnam(mdef));
             gs.skipdrin = 1;
             mhm.damage = 0;
-            if (!(u.uprops[63 /* UNCHANGING */].intrinsic || u.uprops[63 /* UNCHANGING */].extrinsic) && $c.peq(pd, $c.relem(mons, 208 /* PM_GREEN_SLIME */))) {
-                if (!u.uprops[22 /* SLIMED */].intrinsic) {
+            if (!(u.uprops[UNCHANGING].intrinsic || u.uprops[UNCHANGING].extrinsic) && $c.peq(pd, $c.relem(mons, PM_GREEN_SLIME))) {
+                if (!u.uprops[SLIMED].intrinsic) {
                     await You($c.lit("suck in some slime and don't feel very well."));
                     await make_slimed(10, null);
                 }
@@ -2175,19 +2198,19 @@ export async function mhitm_ad_drin(magr, mattk, mdef, mhm) {   // uhitm.c:3168
         if (await m_slips_free(mdef, mattk)) {
             return;
         }
-        if ((helmet = await which_armor(mdef, 4)) !== null && rn2(8)) {
-            await pline($c.lit("%s %s blocks your attack to %s head."), s_suffix(await Monnam(mdef)), helm_simple_name(helmet), genders[pronoun_gender(mdef, 2)].his);
+        if ((helmet = await which_armor(mdef, W_ARMH)) !== null && rn2(8)) {
+            await pline($c.lit("%s %s blocks your attack to %s head."), s_suffix(await Monnam(mdef)), helm_simple_name(helmet), genders[pronoun_gender(mdef, PRONOUN_HALLU)].his);
             return;
         }
-        amu = await which_armor(mdef, 65536);
-        lifsav = $c.i8(amu && amu.otyp === 202 /* AMULET_OF_LIFE_SAVING */ ? 1 : 0);
+        amu = await which_armor(mdef, W_AMUL);
+        lifsav = $c.i8(amu && amu.otyp === AMULET_OF_LIFE_SAVING ? 1 : 0);
         await eat_brains(gy.youmonst, mdef, 1, new $c.FieldRef(mhm, "damage", "i32"));
-        if (lifsav && !await which_armor(mdef, 65536)) {
+        if (lifsav && !await which_armor(mdef, W_AMUL)) {
             gs.skipdrin = 1;
         }
     } else if ($c.peq(mdef, gy.youmonst)) {
         await hitmsg(magr, mattk);
-        if (defends(32, $G.uwep) || !($c.andu64(pd.mflags1, 32768) === 0)) {
+        if (defends(AD_DRIN, $G.uwep) || !($c.andu64(pd.mflags1, M1_NOHEAD) === 0)) {
             await You($c.lit("don't seem harmed."));
             gs.skipdrin = 1;
             return;
@@ -2199,22 +2222,22 @@ export async function mhitm_ad_drin(magr, mattk, mdef, mhm) {   // uhitm.c:3168
             await Your($c.lit("%s blocks the attack to your head."), helm_simple_name($G.uarmh));
             return;
         }
-        if (u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic) {
+        if (u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic) {
             mhm.damage = $c.div32(mhm.damage + 1 | 0, 2);
         }
         await mdamageu(magr, mhm.damage);
         mhm.damage = 0;
-        if (!$G.uarmh || $G.uarmh.otyp !== 94 /* DUNCE_CAP */) {
+        if (!$G.uarmh || $G.uarmh.otyp !== DUNCE_CAP) {
             oldmort = u.umortality;
             mhitu = await eat_brains(magr, mdef, 1, null);
             if (u.umortality > oldmort) {
                 gs.skipdrin = 1;
             }
-            if (mhitu === 0) {
+            if (mhitu === M_ATTK_MISS) {
                 return;
             }
         }
-        await adjattrib(1 /* A_INT */, -rnd(2) | 0, 0);
+        await adjattrib(A_INT, -rnd(2) | 0, 0);
         if (!rn2(5)) {
             await losespells();
             gs.skipdrin = 1;
@@ -2224,7 +2247,7 @@ export async function mhitm_ad_drin(magr, mattk, mdef, mhm) {   // uhitm.c:3168
             gs.skipdrin = 1;
         }
     } else {
-        if (gn.notonhead || !($c.andu64(pd.mflags1, 32768) === 0)) {
+        if (gn.notonhead || !($c.andu64(pd.mflags1, M1_NOHEAD) === 0)) {
             if (gv.vis && (canseemon(mdef) || sensemon(mdef))) {
                 await pline_mon(mdef, $c.lit("%s doesn't seem harmed."), await Monnam(mdef));
             }
@@ -2232,17 +2255,17 @@ export async function mhitm_ad_drin(magr, mattk, mdef, mhm) {   // uhitm.c:3168
             gs.skipdrin = 1;
             return;
         }
-        if ($c.and64(mdef.misc_worn_check, 4) && rn2(8)) {
+        if ($c.and64(mdef.misc_worn_check, W_ARMH) && rn2(8)) {
             if (gv.vis && (canseemon(magr) || sensemon(magr)) && canseemon(mdef)) {
                 $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), s_suffix(await Monnam(mdef)), 256);
-                await pline($c.lit("%s helmet blocks %s attack to %s head."), new $c.Ptr(buf, 0), s_suffix(await mon_nam(magr)), genders[pronoun_gender(mdef, 2)].his);
+                await pline($c.lit("%s helmet blocks %s attack to %s head."), new $c.Ptr(buf, 0), s_suffix(await mon_nam(magr)), genders[pronoun_gender(mdef, PRONOUN_HALLU)].his);
             }
             return;
         }
-        amu = await which_armor(mdef, 65536);
-        lifsav = $c.i8(amu && amu.otyp === 202 /* AMULET_OF_LIFE_SAVING */ ? 1 : 0);
+        amu = await which_armor(mdef, W_AMUL);
+        lifsav = $c.i8(amu && amu.otyp === AMULET_OF_LIFE_SAVING ? 1 : 0);
         $t1 = await eat_brains(magr, mdef, gv.vis, new $c.FieldRef(mhm, "damage", "i32")), mhm.hitflags = $t1;
-        if (lifsav && !await which_armor(mdef, 65536)) {
+        if (lifsav && !await which_armor(mdef, W_AMUL)) {
             gs.skipdrin = 1;
         }
     }
@@ -2251,7 +2274,7 @@ export async function mhitm_ad_stck(magr, mattk, mdef, mhm) {   // uhitm.c:3306
     let negated = 0, pd = null, barbs = 0;
     negated = await mhitm_mgc_atk_negated(magr, mdef, 0);
     pd = mdef.data;
-    barbs = $c.i8($c.peq(magr.data, $c.relem(mons, 293 /* PM_BARBED_DEVIL */)) ? 1 : 0);
+    barbs = $c.i8($c.peq(magr.data, $c.relem(mons, PM_BARBED_DEVIL)) ? 1 : 0);
     if ($c.peq(magr, gy.youmonst)) {
         if (!negated && !sticks(pd) && dist2(mdef.mx, mdef.my, u.ux, u.uy) <= 2) {
             await set_ustuck(mdef);
@@ -2277,7 +2300,7 @@ export async function mhitm_ad_wrap(magr, mattk, mdef, mhm) {   // uhitm.c:3337
     let pd = null, pa = null, coil = 0, tailmiss = 0, moat = 0;
     pd = mdef.data;
     pa = magr.data;
-    coil = $c.i8($c.andu64(pa.mflags1, 524288) !== 0 && (pa.mlet === 45 /* S_SNAKE */ || pa.mlet === 40 /* S_NAGA */) ? 1 : 0);
+    coil = $c.i8($c.andu64(pa.mflags1, M1_SLITHY) !== 0 && (pa.mlet === S_SNAKE || pa.mlet === S_NAGA) ? 1 : 0);
     if ($c.peq(magr, gy.youmonst)) {
         if (!sticks(pd)) {
             tailmiss = $c.i8(!gn.notonhead ? 1 : 0);
@@ -2289,10 +2312,10 @@ export async function mhitm_ad_wrap(magr, mattk, mdef, mhm) {   // uhitm.c:3337
                     await set_ustuck(mdef);
                 }
             } else if ($c.peq(u.ustuck, mdef) && !tailmiss) {
-                if (is_pool(u.ux, u.uy) && !($c.andu64(pd.mflags1, 2) !== 0 || $c.andu64(pd.mflags1, 512) !== 0 || $c.andu64(pd.mflags1, 1024) !== 0)) {
+                if (is_pool(u.ux, u.uy) && !($c.andu64(pd.mflags1, M1_SWIM) !== 0 || $c.andu64(pd.mflags1, M1_AMPHIBIOUS) !== 0 || $c.andu64(pd.mflags1, M1_BREATHLESS) !== 0)) {
                     await You($c.lit("drown %s..."), await mon_nam(mdef));
                     mhm.damage = mdef.mhp;
-                } else if (mattk.aatyp === 7) {
+                } else if (mattk.aatyp === AT_HUGS) {
                     await pline($c.lit("%s is being crushed."), await Monnam(mdef));
                 }
             } else {
@@ -2301,7 +2324,7 @@ export async function mhitm_ad_wrap(magr, mattk, mdef, mhm) {   // uhitm.c:3337
                     if (coil && !tailmiss) {
                         await You($c.lit("brush against %s."), await mon_nam(mdef));
                     } else {
-                        await You($c.lit("brush against %s %s."), s_suffix(await mon_nam(mdef)), tailmiss ? $c.lit("tail") : await mbodypart(mdef, 9 /* LEG */));
+                        await You($c.lit("brush against %s %s."), s_suffix(await mon_nam(mdef)), tailmiss ? $c.lit("tail") : await mbodypart(mdef, LEG));
                     }
                 }
             }
@@ -2318,13 +2341,13 @@ export async function mhitm_ad_wrap(magr, mattk, mdef, mhm) {   // uhitm.c:3337
                     await urgent_pline($c.lit("%s %s itself around you!"), await Some_Monnam(magr), coil ? $c.lit("coils") : $c.lit("swings"));
                 }
             } else if ($c.peq(u.ustuck, magr)) {
-                if (is_pool(magr.mx, magr.my) && !(u.uprops[51 /* SWIMMING */].intrinsic || u.uprops[51 /* SWIMMING */].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, 2) !== 0) && !(u.uprops[52 /* MAGICAL_BREATHING */].intrinsic || u.uprops[52 /* MAGICAL_BREATHING */].extrinsic || $c.andu64(gy.youmonst.data.mflags1, 512) !== 0) && !(u.uprops[52 /* MAGICAL_BREATHING */].intrinsic || u.uprops[52 /* MAGICAL_BREATHING */].extrinsic || $c.andu64(gy.youmonst.data.mflags1, 1024) !== 0)) {
-                    moat = $c.i8(svl.level.locations[magr.mx][magr.my].typ !== 16 /* POOL */ && !is_waterwall(magr.mx, magr.my) && !((svd.dungeon_topology.d_medusa_level.dlevel || svd.dungeon_topology.d_medusa_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_medusa_level)) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) ? 1 : 0);
+                if (is_pool(magr.mx, magr.my) && !(u.uprops[SWIMMING].intrinsic || u.uprops[SWIMMING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_SWIM) !== 0) && !(u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1_AMPHIBIOUS) !== 0) && !(u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1_BREATHLESS) !== 0)) {
+                    moat = $c.i8(svl.level.locations[magr.mx][magr.my].typ !== POOL && !is_waterwall(magr.mx, magr.my) && !((svd.dungeon_topology.d_medusa_level.dlevel || svd.dungeon_topology.d_medusa_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_medusa_level)) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) ? 1 : 0);
                     await urgent_pline($c.lit("%s drowns you..."), await Monnam(magr));
-                    svk.killer.format = 0;
+                    svk.killer.format = KILLED_BY_AN;
                     $c.__builtin___sprintf_chk(new $c.Ptr(svk.killer.name, 0), 0, 256, $c.lit("%s by %s"), moat ? $c.lit("moat") : $c.lit("pool of water"), await an(pmname(magr.data, Mgender(magr))));
-                    await done(4 /* DROWNING */);
-                } else if (mattk.aatyp === 7) {
+                    await done(DROWNING);
+                } else if (mattk.aatyp === AT_HUGS) {
                     await You($c.lit("are being crushed."));
                 }
             } else {
@@ -2333,7 +2356,7 @@ export async function mhitm_ad_wrap(magr, mattk, mdef, mhm) {   // uhitm.c:3337
                     if (coil) {
                         await pline_mon(magr, $c.lit("%s brushes against you."), await Monnam(magr));
                     } else {
-                        await pline_mon(magr, $c.lit("%s brushes against your %s."), await Monnam(magr), await body_part(9 /* LEG */));
+                        await pline_mon(magr, $c.lit("%s brushes against your %s."), await Monnam(magr), await body_part(LEG));
                     }
                 }
             }
@@ -2353,7 +2376,7 @@ export async function mhitm_ad_plys(magr, mattk, mdef, mhm) {   // uhitm.c:3431
     let buf = new Int8Array(256);
     if ($c.peq(magr, gy.youmonst)) {
         if (!rn2(3) && mhm.damage < mdef.mhp && !await mhitm_mgc_atk_negated(magr, mdef, 1)) {
-            if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
+            if (!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked)) {
                 await pline($c.lit("%s is frozen by you!"), await Monnam(mdef));
             }
             paralyze_monst(mdef, rnd(10));
@@ -2361,10 +2384,10 @@ export async function mhitm_ad_plys(magr, mattk, mdef, mhm) {   // uhitm.c:3431
     } else if ($c.peq(mdef, gy.youmonst)) {
         await hitmsg(magr, mattk);
         if (gm.multi >= 0 && !rn2(3) && !await mhitm_mgc_atk_negated(magr, mdef, 1)) {
-            if (u.uprops[66 /* FREE_ACTION */].extrinsic) {
+            if (u.uprops[FREE_ACTION].extrinsic) {
                 await You($c.lit("momentarily stiffen."));
             } else {
-                if ((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked) {
+                if ((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked) {
                     await You($c.lit("are frozen!"));
                 } else {
                     await You($c.lit("are frozen by %s!"), await mon_nam(magr));
@@ -2372,7 +2395,7 @@ export async function mhitm_ad_plys(magr, mattk, mdef, mhm) {   // uhitm.c:3431
                 gn.nomovemsg = c_common_strings.c_You_can_move_again;
                 nomul(-rnd(10) | 0);
                 await dynamic_multi_reason(magr, $c.lit("paralyzed"), 0);
-                await exercise(3 /* A_DEX */, 0);
+                await exercise(A_DEX, 0);
             }
         }
     } else {
@@ -2389,7 +2412,7 @@ export async function mhitm_ad_slee(magr, mattk, mdef, mhm) {   // uhitm.c:3479
     let buf = new Int8Array(256);
     if ($c.peq(magr, gy.youmonst)) {
         if (!mdef.msleeping && !await mhitm_mgc_atk_negated(magr, mdef, 0) && await sleep_monst(mdef, rnd(10), -1)) {
-            if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
+            if (!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked)) {
                 await pline($c.lit("%s is put to sleep by you!"), await Monnam(mdef));
             }
             await slept_monst(mdef);
@@ -2397,13 +2420,13 @@ export async function mhitm_ad_slee(magr, mattk, mdef, mhm) {   // uhitm.c:3479
     } else if ($c.peq(mdef, gy.youmonst)) {
         await hitmsg(magr, mattk);
         if (gm.multi >= 0 && !rn2(5) && !await mhitm_mgc_atk_negated(magr, mdef, 1)) {
-            if (u.uprops[3 /* SLEEP_RES */].intrinsic || u.uprops[3 /* SLEEP_RES */].extrinsic) {
-                monstseesu(8);
+            if (u.uprops[SLEEP_RES].intrinsic || u.uprops[SLEEP_RES].extrinsic) {
+                monstseesu(M_SEEN_SLEEP);
                 return;
             }
-            monstunseesu(8);
+            monstunseesu(M_SEEN_SLEEP);
             await fall_asleep(-rnd(10) | 0, 1);
-            if ((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked) {
+            if ((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked) {
                 await You($c.lit("are put to sleep!"));
             } else {
                 await You($c.lit("are put to sleep by %s!"), await mon_nam(magr));
@@ -2428,15 +2451,15 @@ export async function mhitm_ad_slim(magr, mattk, mdef, mhm) {   // uhitm.c:3526
         if (negated) {
             return;
         }
-        if (!rn2(4) && !($c.peq(pd, $c.relem(mons, 208 /* PM_GREEN_SLIME */)) || ($c.peq(pd, $c.relem(mons, 111 /* PM_FIRE_VORTEX */)) || $c.peq(pd, $c.relem(mons, 30 /* PM_FLAMING_SPHERE */)) || $c.peq(pd, $c.relem(mons, 155 /* PM_FIRE_ELEMENTAL */)) || $c.peq(pd, $c.relem(mons, 329 /* PM_SALAMANDER */))) || pd.mlet === 54 /* S_GHOST */)) {
+        if (!rn2(4) && !($c.peq(pd, $c.relem(mons, PM_GREEN_SLIME)) || ($c.peq(pd, $c.relem(mons, PM_FIRE_VORTEX)) || $c.peq(pd, $c.relem(mons, PM_FLAMING_SPHERE)) || $c.peq(pd, $c.relem(mons, PM_FIRE_ELEMENTAL)) || $c.peq(pd, $c.relem(mons, PM_SALAMANDER))) || pd.mlet === S_GHOST)) {
             if (!await munslime(mdef, 1) && !(mdef.mhp < 1)) {
                 await You($c.lit("turn %s into slime."), await mon_nam(mdef));
-                if (await newcham(mdef, $c.relem(mons, 208 /* PM_GREEN_SLIME */), 0)) {
+                if (await newcham(mdef, $c.relem(mons, PM_GREEN_SLIME), NO_NC_FLAGS)) {
                     pd = mdef.data;
                 }
             }
             if (mdef.mhp < 1) {
-                mhm.hitflags = 2;
+                mhm.hitflags = M_ATTK_DEF_DIED;
                 mhm.done = 1;
                 return;
             }
@@ -2450,16 +2473,16 @@ export async function mhitm_ad_slim(magr, mattk, mdef, mhm) {   // uhitm.c:3526
             }
             return;
         }
-        if ($c.peq(pd, $c.relem(mons, 111 /* PM_FIRE_VORTEX */)) || $c.peq(pd, $c.relem(mons, 30 /* PM_FLAMING_SPHERE */)) || $c.peq(pd, $c.relem(mons, 155 /* PM_FIRE_ELEMENTAL */)) || $c.peq(pd, $c.relem(mons, 329 /* PM_SALAMANDER */))) {
+        if ($c.peq(pd, $c.relem(mons, PM_FIRE_VORTEX)) || $c.peq(pd, $c.relem(mons, PM_FLAMING_SPHERE)) || $c.peq(pd, $c.relem(mons, PM_FIRE_ELEMENTAL)) || $c.peq(pd, $c.relem(mons, PM_SALAMANDER))) {
             await pline_The($c.lit("slime burns away!"));
             mhm.damage = 0;
-        } else if (u.uprops[63 /* UNCHANGING */].intrinsic || u.uprops[63 /* UNCHANGING */].extrinsic || pd.mlet === 54 /* S_GHOST */ || $c.peq(pd, $c.relem(mons, 208 /* PM_GREEN_SLIME */))) {
+        } else if (u.uprops[UNCHANGING].intrinsic || u.uprops[UNCHANGING].extrinsic || pd.mlet === S_GHOST || $c.peq(pd, $c.relem(mons, PM_GREEN_SLIME))) {
             await You($c.lit("are unaffected."));
             mhm.damage = 0;
-        } else if (!u.uprops[22 /* SLIMED */].intrinsic) {
+        } else if (!u.uprops[SLIMED].intrinsic) {
             await You($c.lit("don't feel very well."));
             await make_slimed(10, null);
-            await delayed_killer(22 /* SLIMED */, 0, pmname(magr.data, Mgender(magr)));
+            await delayed_killer(SLIMED, KILLED_BY_AN, pmname(magr.data, Mgender(magr)));
         } else {
             await pline($c.lit("Yuck!"));
         }
@@ -2467,23 +2490,23 @@ export async function mhitm_ad_slim(magr, mattk, mdef, mhm) {   // uhitm.c:3526
         if (negated) {
             return;
         }
-        if (!rn2(4) && !($c.peq(pd, $c.relem(mons, 208 /* PM_GREEN_SLIME */)) || ($c.peq(pd, $c.relem(mons, 111 /* PM_FIRE_VORTEX */)) || $c.peq(pd, $c.relem(mons, 30 /* PM_FLAMING_SPHERE */)) || $c.peq(pd, $c.relem(mons, 155 /* PM_FIRE_ELEMENTAL */)) || $c.peq(pd, $c.relem(mons, 329 /* PM_SALAMANDER */))) || pd.mlet === 54 /* S_GHOST */)) {
+        if (!rn2(4) && !($c.peq(pd, $c.relem(mons, PM_GREEN_SLIME)) || ($c.peq(pd, $c.relem(mons, PM_FIRE_VORTEX)) || $c.peq(pd, $c.relem(mons, PM_FLAMING_SPHERE)) || $c.peq(pd, $c.relem(mons, PM_FIRE_ELEMENTAL)) || $c.peq(pd, $c.relem(mons, PM_SALAMANDER))) || pd.mlet === S_GHOST)) {
             if (!await munslime(mdef, 0) && !(mdef.mhp < 1)) {
-                ncflags = 0;
+                ncflags = NO_NC_FLAGS;
                 if (gv.vis && canseemon(mdef)) {
-                    ncflags = (ncflags | 1) >>> 0;
+                    ncflags = (ncflags | NC_SHOW_MSG) >>> 0;
                 }
-                if (await newcham(mdef, $c.relem(mons, 208 /* PM_GREEN_SLIME */), ncflags)) {
+                if (await newcham(mdef, $c.relem(mons, PM_GREEN_SLIME), ncflags)) {
                     pd = mdef.data;
                 }
                 mdef.mstrategy = $c.andu64(mdef.mstrategy, 18446744073172680703n);
-                mhm.hitflags = 1;
+                mhm.hitflags = M_ATTK_HIT;
             }
             if (magr.mhp < 1) {
-                mhm.hitflags = mhm.hitflags | 4;
+                mhm.hitflags = mhm.hitflags | M_ATTK_AGR_DIED;
             }
             if (mdef.mhp < 1) {
-                mhm.hitflags = mhm.hitflags | 2;
+                mhm.hitflags = mhm.hitflags | M_ATTK_DEF_DIED;
             }
             mhm.damage = 0;
         }
@@ -2526,11 +2549,11 @@ export async function mhitm_ad_ench(magr, mattk, mdef, mhm) {   // uhitm.c:3603
 export async function mhitm_ad_slow(magr, mattk, mdef, mhm) {   // uhitm.c:3652
     let negated = 0, oldspeed = 0, oldspeed$2 = 0;
     negated = await mhitm_mgc_atk_negated(magr, mdef, 0);
-    if (await defended(mdef, 13)) {
+    if (await defended(mdef, AD_SLOW)) {
         return;
     }
     if ($c.peq(magr, gy.youmonst)) {
-        if (!negated && (mdef.mspeed | 0) !== 1) {
+        if (!negated && (mdef.mspeed | 0) !== MSLOW) {
             oldspeed = mdef.mspeed;
             await mon_adjust_speed(mdef, -1, null);
             if (mdef.mspeed !== oldspeed && canseemon(mdef)) {
@@ -2539,11 +2562,11 @@ export async function mhitm_ad_slow(magr, mattk, mdef, mhm) {   // uhitm.c:3652
         }
     } else if ($c.peq(mdef, gy.youmonst)) {
         await hitmsg(magr, mattk);
-        if (!negated && u.uprops[64 /* FAST */].intrinsic && !rn2(4)) {
+        if (!negated && u.uprops[FAST].intrinsic && !rn2(4)) {
             await u_slow_down();
         }
     } else {
-        if (!negated && (mdef.mspeed | 0) !== 1) {
+        if (!negated && (mdef.mspeed | 0) !== MSLOW) {
             oldspeed$2 = mdef.mspeed;
             await mon_adjust_speed(mdef, -1, null);
             mdef.mstrategy = $c.andu64(mdef.mstrategy, 18446744073172680703n);
@@ -2566,12 +2589,12 @@ export async function mhitm_ad_conf(magr, mattk, mdef, mhm) {   // uhitm.c:3690
         await hitmsg(magr, mattk);
         if (!magr.mcan && !rn2(4) && !magr.mspec_used) {
             $t1 = magr.mspec_used + (mhm.damage + rn2(6) | 0) | 0, magr.mspec_used = $t1;
-            if (u.uprops[14 /* CONFUSION */].intrinsic) {
+            if (u.uprops[CONFUSION].intrinsic) {
                 await You($c.lit("are getting even more confused."));
             } else {
                 await You($c.lit("are getting confused."));
             }
-            await make_confused($c.add64(u.uprops[14 /* CONFUSION */].intrinsic, mhm.damage), 0);
+            await make_confused($c.add64(u.uprops[CONFUSION].intrinsic, mhm.damage), 0);
         }
         mhm.damage = 0;
     } else {
@@ -2594,22 +2617,22 @@ export async function mhitm_ad_poly(magr, mattk, mdef, mhm) {   // uhitm.c:3729
             } else {
                 $t1 = await mon_poly(gy.youmonst, mdef, mhm.damage), mhm.damage = $t1;
                 if (mdef.mhp < 1) {
-                    mhm.hitflags = mhm.hitflags | 2;
+                    mhm.hitflags = mhm.hitflags | M_ATTK_DEF_DIED;
                 }
-                mhm.hitflags = mhm.hitflags | 1;
+                mhm.hitflags = mhm.hitflags | M_ATTK_HIT;
                 mhm.done = 1;
             }
         }
     } else if ($c.peq(mdef, gy.youmonst)) {
         await hitmsg(magr, mattk);
-        if ((u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(mhm.damage + 1 | 0, 2) : mhm.damage) < (u.umonnum !== u.umonster ? u.mh : u.uhp)) {
+        if ((u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(mhm.damage + 1 | 0, 2) : mhm.damage) < (u.umonnum !== u.umonster ? u.mh : u.uhp)) {
             if (negated) {
                 if (magr.mcan) {
                     await You($c.lit("aren't transformed."));
                 }
             } else {
                 $t2 = await mon_poly(magr, gy.youmonst, mhm.damage), mhm.damage = $t2;
-                mhm.hitflags = mhm.hitflags | 1;
+                mhm.hitflags = mhm.hitflags | M_ATTK_HIT;
                 mhm.done = 1;
             }
         }
@@ -2617,9 +2640,9 @@ export async function mhitm_ad_poly(magr, mattk, mdef, mhm) {   // uhitm.c:3729
         if (mhm.damage < mdef.mhp && !negated) {
             $t3 = await mon_poly(magr, mdef, mhm.damage), mhm.damage = $t3;
             if (mdef.mhp < 1) {
-                mhm.hitflags = mhm.hitflags | 2;
+                mhm.hitflags = mhm.hitflags | M_ATTK_DEF_DIED;
             }
-            mhm.hitflags = mhm.hitflags | 1;
+            mhm.hitflags = mhm.hitflags | M_ATTK_HIT;
             mhm.done = 1;
         }
     }
@@ -2635,13 +2658,13 @@ export async function mhitm_ad_famn(magr, mattk, mdef, mhm) {   // uhitm.c:3777
                 $goto = "mhitm_famn"; continue D1;
             } else if ($goto !== "mhitm_famn" && $c.peq(mdef, gy.youmonst)) {
                 await pline_mon(magr, $c.lit("%s reaches out, and your body shrivels."), await Monnam(magr));
-                await exercise(4 /* A_CON */, 0);
+                await exercise(A_CON, 0);
                 if (!is_fainted()) {
                     await morehungry(rn2(40) + 40 | 0);
                 }
             } else {
                 $goto = null;   // mhitm_famn:
-                if (!($c.andu64(pd.mflags1, 536870912) !== 0 || $c.andu64(pd.mflags1, 1073741824) !== 0 || $c.andu64(pd.mflags1, 2147483648) !== 0)) {
+                if (!($c.andu64(pd.mflags1, M1_CARNIVORE) !== 0 || $c.andu64(pd.mflags1, M1_HERBIVORE) !== 0 || $c.andu64(pd.mflags1, 2147483648) !== 0)) {
                     mhm.damage = 0;
                 }
             }
@@ -2664,7 +2687,7 @@ export async function mhitm_ad_pest(magr, mattk, mdef, mhm) {   // uhitm.c:3808
             } else {
                 $goto = null;   // mhitm_pest:
                 alt_attk.$copyFrom(mattk);
-                alt_attk.adtyp = 33;
+                alt_attk.adtyp = AD_DISE;
                 await mhitm_ad_dise(magr, alt_attk, mdef, mhm);
             }
         }
@@ -2682,7 +2705,7 @@ export async function mhitm_ad_deth(magr, mattk, mdef, mhm) {   // uhitm.c:3837
                 $goto = "mhitm_deth"; continue D1;
             } else if ($goto !== "mhitm_deth" && $c.peq(mdef, gy.youmonst)) {
                 await pline_mon(magr, $c.lit("%s reaches out with its deadly touch."), await Monnam(magr));
-                if ($c.andu64(pd.mflags2, 2) !== 0) {
+                if ($c.andu64(pd.mflags2, M2_UNDEAD) !== 0) {
                     mhm.damage = $c.div32(mhm.damage + 1 | 0, 2);
                     await pline($c.lit("Was that the touch of death?"));
                     return;
@@ -2691,7 +2714,7 @@ export async function mhitm_ad_deth(magr, mattk, mdef, mhm) {   // uhitm.c:3837
                     case 19:
                     case 18:
                     case 17:
-                        if (!(u.uprops[12 /* ANTIMAGIC */].intrinsic || u.uprops[12 /* ANTIMAGIC */].extrinsic)) {
+                        if (!(u.uprops[ANTIMAGIC].intrinsic || u.uprops[ANTIMAGIC].extrinsic)) {
                             await touch_of_death(magr);
                             mhm.damage = 0;
                             return;
@@ -2705,7 +2728,7 @@ export async function mhitm_ad_deth(magr, mattk, mdef, mhm) {   // uhitm.c:3837
                     case 2:
                     case 1:
                     case 0:
-                        if (u.uprops[12 /* ANTIMAGIC */].intrinsic || u.uprops[12 /* ANTIMAGIC */].extrinsic) {
+                        if (u.uprops[ANTIMAGIC].intrinsic || u.uprops[ANTIMAGIC].extrinsic) {
                             await shieldeff(u.ux, u.uy);
                         }
                         await pline($c.lit("Lucky for you, it didn't work!"));
@@ -2714,7 +2737,7 @@ export async function mhitm_ad_deth(magr, mattk, mdef, mhm) {   // uhitm.c:3837
                 }
             } else {
                 $goto = null;   // mhitm_deth:
-                if ($c.andu64(pd.mflags2, 2) !== 0 && mhm.damage > 1) {
+                if ($c.andu64(pd.mflags2, M2_UNDEAD) !== 0 && mhm.damage > 1) {
                     $t1 = rnd($c.div32(mhm.damage, 2)), mhm.damage = $t1;
                 }
                 await mhitm_ad_drli(magr, mattk, mdef, mhm);
@@ -2731,7 +2754,7 @@ export async function mhitm_ad_halu(magr, mattk, mdef, mhm) {   // uhitm.c:3897
     } else if ($c.peq(mdef, gy.youmonst)) {
         mhm.damage = 0;
     } else {
-        if (!magr.mcan && $c.andu64(pd.mflags1, 4096) === 0 && mdef.mcansee | 0) {
+        if (!magr.mcan && $c.andu64(pd.mflags1, M1_NOEYES) === 0 && mdef.mcansee | 0) {
             if (gv.vis && canseemon(mdef)) {
                 await pline_mon(mdef, $c.lit("%s looks %sconfused."), await Monnam(mdef), mdef.mconf | 0 ? $c.lit("more ") : $c.lit(""));
             }
@@ -2743,14 +2766,14 @@ export async function mhitm_ad_halu(magr, mattk, mdef, mhm) {   // uhitm.c:3897
 }
 export async function do_stone_u(mtmp) {   // uhitm.c:3924
     let kformat = 0, kname = null;
-    if (!u.uprops[18 /* STONED */].intrinsic && !(u.uprops[8 /* STONE_RES */].intrinsic || u.uprops[8 /* STONE_RES */].extrinsic) && !(poly_when_stoned(gy.youmonst.data) && await polymon(257 /* PM_STONE_GOLEM */))) {
-        kformat = 0;
+    if (!u.uprops[STONED].intrinsic && !(u.uprops[STONE_RES].intrinsic || u.uprops[STONE_RES].extrinsic) && !(poly_when_stoned(gy.youmonst.data) && await polymon(PM_STONE_GOLEM))) {
+        kformat = KILLED_BY_AN;
         kname = pmname(mtmp.data, Mgender(mtmp));
-        if (mtmp.data.geno & 4096) {
-            if (!($c.andu64(mtmp.data.mflags2, 524288) !== 0)) {
+        if (mtmp.data.geno & G_UNIQ) {
+            if (!($c.andu64(mtmp.data.mflags2, M2_PNAME) !== 0)) {
                 kname = await the(kname);
             }
-            kformat = 1;
+            kformat = KILLED_BY;
         }
         await make_stoned(5, null, kformat, kname);
         return 1;
@@ -2772,7 +2795,7 @@ export async function do_stone_mon(magr, mattk, mdef, mhm) {   // uhitm.c:3945
                 return;
             }
         case "post_stone":
-            if ($goto === "post_stone" || !await Resists_Elem(mdef, 8 /* STONE_RES */)) {
+            if ($goto === "post_stone" || !await Resists_Elem(mdef, STONE_RES)) {
                 D2: for (;;) {
                     switch ($goto) {
                     case null:
@@ -2783,20 +2806,20 @@ export async function do_stone_mon(magr, mattk, mdef, mhm) {   // uhitm.c:3945
                     case "post_stone":
                         $goto = null;   // post_stone:
                         if (!(mdef.mhp < 1)) {
-                            mhm.hitflags = 0;
+                            mhm.hitflags = M_ATTK_MISS;
                             mhm.done = 1;
                             return;
                         } else if (mdef.mtame && !gv.vis) {
                             await You(new $c.Ptr(brief_feeling, 0), $c.lit("peculiarly sad"));
                         }
-                        $t1 = 2 | (await grow_up(magr, mdef) ? 0 : 4), mhm.hitflags = $t1;
+                        $t1 = M_ATTK_DEF_DIED | (await grow_up(magr, mdef) ? 0 : M_ATTK_AGR_DIED), mhm.hitflags = $t1;
                         mhm.done = 1;
                         return;
                     }
                     break;
                 }
             }
-            mhm.damage = mattk.adtyp === 18 ? 0 : 1;
+            mhm.damage = mattk.adtyp === AD_STON ? 0 : 1;
         }
         break;
     }
@@ -2806,18 +2829,18 @@ export async function mhitm_ad_phys(magr, mattk, mdef, mhm) {   // uhitm.c:3981
     pa = magr.data;
     pd = mdef.data;
     if ($c.peq(magr, gy.youmonst)) {
-        if ($c.peq(pd, $c.relem(mons, 288 /* PM_SHADE */))) {
+        if ($c.peq(pd, $c.relem(mons, PM_SHADE))) {
             mhm.damage = 0;
             if (!mhm.specialdmg) {
                 await impossible($c.lit("bad shade attack function flow?"));
             }
         }
         mhm.damage = mhm.damage + mhm.specialdmg | 0;
-        if (mattk.aatyp === 254) {
+        if (mattk.aatyp === AT_WEAP) {
             mhm.damage = 0;
-        } else if (mattk.aatyp === 3 || mattk.aatyp === 1 || mattk.aatyp === 5 || mattk.aatyp === 7) {
-            if ($c.andu64(pd.mflags1, 2097152) !== 0) {
-                mhm.damage = mattk.aatyp === 3 ? 0 : $c.div32(mhm.damage + 1 | 0, 2);
+        } else if (mattk.aatyp === AT_KICK || mattk.aatyp === AT_CLAW || mattk.aatyp === AT_TUCH || mattk.aatyp === AT_HUGS) {
+            if ($c.andu64(pd.mflags1, M1_THICK_HIDE) !== 0) {
+                mhm.damage = mattk.aatyp === AT_KICK ? 0 : $c.div32(mhm.damage + 1 | 0, 2);
             }
             if (u.udaminc > 0) {
                 mhm.damage = mhm.damage + u.udaminc | 0;
@@ -2829,37 +2852,37 @@ export async function mhitm_ad_phys(magr, mattk, mdef, mhm) {   // uhitm.c:3981
             }
         }
     } else if ($c.peq(mdef, gy.youmonst)) {
-        if (mattk.aatyp === 7 && !sticks(pd)) {
+        if (mattk.aatyp === AT_HUGS && !sticks(pd)) {
             if (!u.ustuck && rn2(2)) {
                 if (await u_slip_free(magr, mattk)) {
                     mhm.damage = 0;
-                    mhm.hitflags = mhm.hitflags | 0;
+                    mhm.hitflags = mhm.hitflags | M_ATTK_MISS;
                 } else {
                     await set_ustuck(magr);
                     await pline_mon(magr, $c.lit("%s grabs you!"), await Monnam(magr));
-                    mhm.hitflags = mhm.hitflags | 1;
+                    mhm.hitflags = mhm.hitflags | M_ATTK_HIT;
                 }
             } else if ($c.peq(u.ustuck, magr)) {
-                await exercise(0 /* A_STR */, 0);
-                await You($c.lit("are being %s."), $c.peq(pa, $c.relem(mons, 251 /* PM_ROPE_GOLEM */)) ? $c.lit("choked") : $c.lit("crushed"));
+                await exercise(A_STR, 0);
+                await You($c.lit("are being %s."), $c.peq(pa, $c.relem(mons, PM_ROPE_GOLEM)) ? $c.lit("choked") : $c.lit("crushed"));
             }
         } else {
             otmp = magr.mw;
-            if (mattk.aatyp === 254 && otmp) {
+            if (mattk.aatyp === AT_WEAP && otmp) {
                 was_poisoned = $c.i8(otmp.otrapped | 0 || permapoisoned(otmp) ? 1 : 0);
-                if (otmp.otyp === 265 /* CORPSE */ && ($c.peq($c.relem(mons, otmp.corpsenm), $c.relem(mons, 10 /* PM_COCKATRICE */)) || $c.peq($c.relem(mons, otmp.corpsenm), $c.relem(mons, 9 /* PM_CHICKATRICE */)))) {
+                if (otmp.otyp === CORPSE && ($c.peq($c.relem(mons, otmp.corpsenm), $c.relem(mons, PM_COCKATRICE)) || $c.peq($c.relem(mons, otmp.corpsenm), $c.relem(mons, PM_CHICKATRICE)))) {
                     mhm.damage = 1;
-                    await pline_mon(magr, $c.lit("%s hits you with the %s corpse."), await Monnam(magr), mons[otmp.corpsenm].pmnames[2 /* NEUTRAL */]);
-                    if (!u.uprops[18 /* STONED */].intrinsic) {
+                    await pline_mon(magr, $c.lit("%s hits you with the %s corpse."), await Monnam(magr), mons[otmp.corpsenm].pmnames[NEUTRAL]);
+                    if (!u.uprops[STONED].intrinsic) {
                         if (await do_stone_u(magr)) {
-                            mhm.hitflags = 1;
+                            mhm.hitflags = M_ATTK_HIT;
                             mhm.done = 1;
                             return;
                         }
                     }
                 }
                 $t1 = await dmgval(otmp, mdef), mhm.damage = mhm.damage + $t1 | 0;
-                if ((marmg = await which_armor(magr, 16)) !== null && marmg.otyp === 161 /* GAUNTLETS_OF_POWER */) {
+                if ((marmg = await which_armor(magr, W_ARMG)) !== null && marmg.otyp === GAUNTLETS_OF_POWER) {
                     $t2 = rn2(4) + 3 | 0, mhm.damage = mhm.damage + $t2 | 0;
                 }
                 if (mhm.damage <= 0) {
@@ -2867,14 +2890,14 @@ export async function mhitm_ad_phys(magr, mattk, mdef, mhm) {   // uhitm.c:3981
                 }
                 if (!otmp.oartifact || !await artifact_hit(magr, mdef, otmp, new $c.FieldRef(mhm, "damage", "i32"), gm.mhitu_dieroll)) {
                     await hitmsg(magr, mattk);
-                    mhm.hitflags = mhm.hitflags | 1;
+                    mhm.hitflags = mhm.hitflags | M_ATTK_HIT;
                 }
                 if (!mhm.damage) {
                     return;
                 }
-                if ((objects[otmp.otyp].oc_material | 0) === 14 /* SILVER */ && (u.ulycn >= 0 /* LOW_PM */ || hates_silver(gy.youmonst.data))) {
+                if ((objects[otmp.otyp].oc_material | 0) === SILVER && (u.ulycn >= LOW_PM || hates_silver(gy.youmonst.data))) {
                     await pline_The($c.lit("silver sears your flesh!"));
-                    await exercise(4 /* A_CON */, 0);
+                    await exercise(A_CON, 0);
                 }
                 tmp = mhm.damage;
                 if (u.uac < 0) {
@@ -2883,12 +2906,12 @@ export async function mhitm_ad_phys(magr, mattk, mdef, mhm) {   // uhitm.c:3981
                 if (tmp < 1) {
                     tmp = 1;
                 }
-                if (u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic) {
+                if (u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic) {
                     tmp = $c.div32(tmp + 1 | 0, 2);
                 }
-                if ((u.mh - tmp | 0) > 1 && ((objects[otmp.otyp].oc_material | 0) === 11 /* IRON */ || (objects[otmp.otyp].oc_material | 0) === 12 /* METAL */) && (u.umonnum === 209 /* PM_BLACK_PUDDING */ || u.umonnum === 207 /* PM_BROWN_PUDDING */)) {
+                if ((u.mh - tmp | 0) > 1 && ((objects[otmp.otyp].oc_material | 0) === IRON || (objects[otmp.otyp].oc_material | 0) === METAL) && (u.umonnum === PM_BLACK_PUDDING || u.umonnum === PM_BROWN_PUDDING)) {
                     if (tmp > 1) {
-                        await exercise(0 /* A_STR */, 0);
+                        await exercise(A_STR, 0);
                     }
                     u.mh = u.mh - tmp | 0;
                     disp.botl = 1;
@@ -2900,32 +2923,32 @@ export async function mhitm_ad_phys(magr, mattk, mdef, mhm) {   // uhitm.c:3981
                 await rustm(gy.youmonst, otmp);
                 if (was_poisoned && gm.mhitu_dieroll <= 5) {
                     $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s %s"), s_suffix(await Monnam(magr)), mpoisons_subj(magr, mattk));
-                    await poisoned(new $c.Ptr(buf, 0), 0 /* A_STR */, pmname(magr.data, Mgender(magr)), 10, 0);
+                    await poisoned(new $c.Ptr(buf, 0), A_STR, pmname(magr.data, Mgender(magr)), 10, 0);
                 }
-            } else if (mattk.aatyp !== 5 || mhm.damage !== 0 || !$c.peq(magr, u.ustuck)) {
+            } else if (mattk.aatyp !== AT_TUCH || mhm.damage !== 0 || !$c.peq(magr, u.ustuck)) {
                 await hitmsg(magr, mattk);
-                mhm.hitflags = mhm.hitflags | 1;
+                mhm.hitflags = mhm.hitflags | M_ATTK_HIT;
             }
         }
     } else {
         mwep = magr.mw;
         vis = $c.i8(canseemon(magr) && canseemon(mdef) ? 1 : 0);
-        if (mattk.aatyp !== 254 && mattk.aatyp !== 1) {
+        if (mattk.aatyp !== AT_WEAP && mattk.aatyp !== AT_CLAW) {
             mwep = null;
         }
         if (await shade_miss(magr, mdef, mwep, 0, vis)) {
             mhm.damage = 0;
-        } else if (mattk.aatyp === 3 && $c.andu64(pd.mflags1, 2097152) !== 0) {
+        } else if (mattk.aatyp === AT_KICK && $c.andu64(pd.mflags1, M1_THICK_HIDE) !== 0) {
             mhm.damage = 0;
         } else if (mwep) {
-            if (mwep.otyp === 265 /* CORPSE */ && ($c.peq($c.relem(mons, mwep.corpsenm), $c.relem(mons, 10 /* PM_COCKATRICE */)) || $c.peq($c.relem(mons, mwep.corpsenm), $c.relem(mons, 9 /* PM_CHICKATRICE */)))) {
+            if (mwep.otyp === CORPSE && ($c.peq($c.relem(mons, mwep.corpsenm), $c.relem(mons, PM_COCKATRICE)) || $c.peq($c.relem(mons, mwep.corpsenm), $c.relem(mons, PM_CHICKATRICE)))) {
                 await do_stone_mon(magr, mattk, mdef, mhm);
                 if (mhm.done) {
                     return;
                 }
             }
             $t3 = await dmgval(mwep, mdef), mhm.damage = mhm.damage + $t3 | 0;
-            if ((marmg$2 = await which_armor(magr, 16)) !== null && marmg$2.otyp === 161 /* GAUNTLETS_OF_POWER */) {
+            if ((marmg$2 = await which_armor(magr, W_ARMG)) !== null && marmg$2.otyp === GAUNTLETS_OF_POWER) {
                 $t4 = rn2(4) + 3 | 0, mhm.damage = mhm.damage + $t4 | 0;
             }
             if (mhm.damage < 1) {
@@ -2936,10 +2959,10 @@ export async function mhitm_ad_phys(magr, mattk, mdef, mhm) {   // uhitm.c:3981
                     if (gv.vis) {
                         await pline_mon(magr, $c.lit("%s hits %s."), await Monnam(magr), await mon_nam_too(mdef, magr));
                     }
-                    mhm.hitflags = mhm.hitflags | 1;
+                    mhm.hitflags = mhm.hitflags | M_ATTK_HIT;
                 }
                 if (mdef.mhp < 1) {
-                    $t5 = 2 | (await grow_up(magr, mdef) ? 0 : 4), mhm.hitflags = $t5;
+                    $t5 = M_ATTK_DEF_DIED | (await grow_up(magr, mdef) ? 0 : M_ATTK_AGR_DIED), mhm.hitflags = $t5;
                     mhm.done = 1;
                     return;
                 }
@@ -2950,7 +2973,7 @@ export async function mhitm_ad_phys(magr, mattk, mdef, mhm) {   // uhitm.c:3981
             if ((mwep.otrapped | 0 || permapoisoned(mwep)) && !rn2(4)) {
                 await mhitm_really_poison(magr, mattk, mdef, mhm);
             }
-        } else if ($c.peq(pa, $c.relem(mons, 115 /* PM_PURPLE_WORM */)) && $c.peq(pd, $c.relem(mons, 163 /* PM_SHRIEKER */))) {
+        } else if ($c.peq(pa, $c.relem(mons, PM_PURPLE_WORM)) && $c.peq(pd, $c.relem(mons, PM_SHRIEKER))) {
             if (mhm.damage >= mdef.mhp && mdef.mhp > 1) {
                 mhm.damage = mdef.mhp - 1 | 0;
             }
@@ -2967,21 +2990,21 @@ export async function mhitm_ad_ston(magr, mattk, mdef, mhm) {   // uhitm.c:4203
         await hitmsg(magr, mattk);
         if (!rn2(3)) {
             if (magr.mcan) {
-                if (!(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf)) {
+                if (!(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf)) {
                     await You_hear($c.lit("a cough from %s!"), await mon_nam(magr));
                 }
             } else {
-                if (u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic) && !((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
+                if (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) && !((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked)) {
                     await You_hear($c.lit("hissing."));
                     await pline($c.lit("%s appears to be blowing you a kiss..."), await Monnam(magr));
-                } else if (!(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf)) {
+                } else if (!(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf)) {
                     await You_hear($c.lit("%s hissing!"), s_suffix(await mon_nam(magr)));
-                } else if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
+                } else if (!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked)) {
                     await pline($c.lit("%s seems to grimace."), await Monnam(magr));
                 }
-                if (!rn2(10) || flags.moonphase === 0) {
+                if (!rn2(10) || flags.moonphase === NEW_MOON) {
                     if (await do_stone_u(magr)) {
-                        mhm.hitflags = 1;
+                        mhm.hitflags = M_ATTK_HIT;
                         mhm.done = 1;
                         return;
                     }
@@ -3008,9 +3031,9 @@ export async function mhitm_ad_were(magr, mattk, mdef, mhm) {   // uhitm.c:4265
         }
     } else if ($c.peq(mdef, gy.youmonst)) {
         await hitmsg(magr, mattk);
-        if (!rn2(4) && u.ulycn === -1 /* NON_PM */ && !(u.uprops[60 /* PROT_FROM_SHAPE_CHANGERS */].intrinsic || u.uprops[60 /* PROT_FROM_SHAPE_CHANGERS */].extrinsic) && !defends(29, $G.uwep) && !await mhitm_mgc_atk_negated(magr, mdef, 1)) {
+        if (!rn2(4) && u.ulycn === NON_PM && !(u.uprops[PROT_FROM_SHAPE_CHANGERS].intrinsic || u.uprops[PROT_FROM_SHAPE_CHANGERS].extrinsic) && !defends(AD_WERE, $G.uwep) && !await mhitm_mgc_atk_negated(magr, mdef, 1)) {
             await urgent_pline($c.lit("You feel feverish."));
-            await exercise(4 /* A_CON */, 0);
+            await exercise(A_CON, 0);
             await set_ulycn(pa.pmidx);
             await retouch_equipment(2);
         }
@@ -3030,11 +3053,11 @@ export async function mhitm_ad_heal(magr, mattk, mdef, mhm) {   // uhitm.c:4296
             return;
         }
     } else if ($c.peq(mdef, gy.youmonst)) {
-        if (magr.mcan | 0 || u.umonnum !== u.umonster && ($c.peq(pd, $c.relem(mons, 10 /* PM_COCKATRICE */)) || $c.peq(pd, $c.relem(mons, 9 /* PM_CHICKATRICE */)))) {
+        if (magr.mcan | 0 || u.umonnum !== u.umonster && ($c.peq(pd, $c.relem(mons, PM_COCKATRICE)) || $c.peq(pd, $c.relem(mons, PM_CHICKATRICE)))) {
             await hitmsg(magr, mattk);
             return;
         }
-        if (!($G.uwep && ($G.uwep.oclass === 2 /* WEAPON_CLASS */ || $G.uwep.oclass === 6 /* TOOL_CLASS */ && objects[$G.uwep.otyp].oc_subtyp !== 0 /* P_NONE */)) && !$G.uarmu && !$G.uarm && !$G.uarmc && !$G.uarms && !$G.uarmg && !$G.uarmf && !$G.uarmh) {
+        if (!($G.uwep && ($G.uwep.oclass === WEAPON_CLASS || $G.uwep.oclass === TOOL_CLASS && objects[$G.uwep.otyp].oc_subtyp !== P_NONE)) && !$G.uarmu && !$G.uarm && !$G.uarmc && !$G.uarms && !$G.uarmg && !$G.uarmf && !$G.uarmh) {
             goaway = 0;
             await pline_mon(magr, $c.lit("%s hits!  (I hope you don't mind.)"), await Monnam(magr));
             if (u.umonnum !== u.umonster) {
@@ -3066,33 +3089,33 @@ export async function mhitm_ad_heal(magr, mattk, mdef, mhm) {   // uhitm.c:4296
                 }
             }
             if (!rn2(3)) {
-                await exercise(0 /* A_STR */, 1);
+                await exercise(A_STR, 1);
             }
             if (!rn2(3)) {
-                await exercise(4 /* A_CON */, 1);
+                await exercise(A_CON, 1);
             }
-            if (u.uprops[17 /* SICK */].intrinsic) {
-                await make_sick(0, null, 0, 3);
+            if (u.uprops[SICK].intrinsic) {
+                await make_sick(0, null, 0, SICK_ALL);
             }
             disp.botl = 1;
             if (goaway) {
                 await mongone(magr);
                 mhm.done = 1;
-                mhm.hitflags = 2;
+                mhm.hitflags = M_ATTK_DEF_DIED;
                 return;
             } else if (!rn2(33)) {
                 if (!await tele_restrict(magr)) {
-                    await rloc(magr, 2);
+                    await rloc(magr, RLOC_MSG);
                 }
                 await monflee(magr, d(3, 6), 1, 0);
                 mhm.done = 1;
-                mhm.hitflags = 3;
+                mhm.hitflags = M_ATTK_HIT | M_ATTK_DEF_DIED;
                 return;
             }
             mhm.damage = 0;
         } else {
-            if (gu.urole.mnum === 334) {
-                if (!(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf) && !$c.rem64(svm.moves, 5)) {
+            if (gu.urole.mnum === PM_HEALER) {
+                if (!(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf) && !$c.rem64(svm.moves, 5)) {
                     await verbalize($c.lit("Doc, I can't help you unless you cooperate."));
                 }
                 mhm.damage = 0;
@@ -3111,7 +3134,7 @@ export async function mhitm_ad_stun(magr, mattk, mdef, mhm) {   // uhitm.c:4388
     let pd = null;
     pd = mdef.data;
     if ($c.peq(magr, gy.youmonst)) {
-        if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
+        if (!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked)) {
             await pline($c.lit("%s %s for a moment."), await Monnam(mdef), await makeplural(stagger(pd, $c.lit("stagger"))));
         }
         mdef.mstun = (1) & 1;
@@ -3122,7 +3145,7 @@ export async function mhitm_ad_stun(magr, mattk, mdef, mhm) {   // uhitm.c:4388
     } else if ($c.peq(mdef, gy.youmonst)) {
         await hitmsg(magr, mattk);
         if (!magr.mcan && !rn2(4)) {
-            await make_stunned($c.add64($c.and64(u.uprops[13 /* STUNNED */].intrinsic, 16777215), mhm.damage), 1);
+            await make_stunned($c.add64($c.and64(u.uprops[STUNNED].intrinsic, TIMEOUT), mhm.damage), 1);
             mhm.damage = $c.div32(mhm.damage, 2);
         }
     } else {
@@ -3147,11 +3170,11 @@ export async function mhitm_ad_legs(magr, mattk, mdef, mhm) {   // uhitm.c:4425
             return;
         }
     } else if ($c.peq(mdef, gy.youmonst)) {
-        side = rn2(2) ? 262144 : 131072;
-        sidestr = side === 262144 ? $c.lit("right") : $c.lit("left");
+        side = rn2(2) ? W_RINGR : W_RINGL;
+        sidestr = side === W_RINGR ? $c.lit("right") : $c.lit("left");
         Monst_name = await Monnam(magr);
-        leg = await body_part(9 /* LEG */);
-        if ((u.usteed || (u.uprops[48 /* LEVITATION */].intrinsic || u.uprops[48 /* LEVITATION */].extrinsic) && !u.uprops[48 /* LEVITATION */].blocked || (u.uprops[49 /* FLYING */].intrinsic || u.uprops[49 /* FLYING */].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, 1) !== 0) && !u.uprops[49 /* FLYING */].blocked) && !($c.andu64(magr.data.mflags1, 1) !== 0)) {
+        leg = await body_part(LEG);
+        if ((u.usteed || (u.uprops[LEVITATION].intrinsic || u.uprops[LEVITATION].extrinsic) && !u.uprops[LEVITATION].blocked || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked) && !($c.andu64(magr.data.mflags1, M1_FLY) !== 0)) {
             await pline($c.lit("%s tries to reach your %s %s!"), Monst_name, sidestr, leg);
             mhm.damage = 0;
         } else if (magr.mcan) {
@@ -3159,7 +3182,7 @@ export async function mhitm_ad_legs(magr, mattk, mdef, mhm) {   // uhitm.c:4425
             mhm.damage = 0;
         } else {
             if ($G.uarmf) {
-                if (rn2(2) && ($G.uarmf.otyp === 163 /* LOW_BOOTS */ || $G.uarmf.otyp === 164 /* IRON_SHOES */)) {
+                if (rn2(2) && ($G.uarmf.otyp === LOW_BOOTS || $G.uarmf.otyp === IRON_SHOES)) {
                     await pline($c.lit("%s pricks the exposed part of your %s %s!"), Monst_name, sidestr, leg);
                 } else if (!rn2(5)) {
                     await pline($c.lit("%s pricks through your %s boot!"), Monst_name, sidestr);
@@ -3171,9 +3194,9 @@ export async function mhitm_ad_legs(magr, mattk, mdef, mhm) {   // uhitm.c:4425
             } else {
                 await pline($c.lit("%s pricks your %s %s!"), Monst_name, sidestr, leg);
             }
-            await set_wounded_legs(side, rnd(60 - acurr(3 /* A_DEX */) | 0));
-            await exercise(0 /* A_STR */, 0);
-            await exercise(3 /* A_DEX */, 0);
+            await set_wounded_legs(side, rnd(60 - acurr(A_DEX) | 0));
+            await exercise(A_STR, 0);
+            await exercise(A_DEX, 0);
         }
     } else {
         if (magr.mcan) {
@@ -3194,23 +3217,23 @@ export async function mhitm_ad_dgst(magr, mattk, mdef, mhm) {   // uhitm.c:4492
     } else if ($c.peq(mdef, gy.youmonst)) {
         mhm.damage = 0;
     } else {
-        if ($c.peq(pd, $c.relem(mons, 311 /* PM_DEATH */)) || $c.peq(pd, $c.relem(mons, 313 /* PM_FAMINE */)) || $c.peq(pd, $c.relem(mons, 312 /* PM_PESTILENCE */))) {
+        if ($c.peq(pd, $c.relem(mons, PM_DEATH)) || $c.peq(pd, $c.relem(mons, PM_FAMINE)) || $c.peq(pd, $c.relem(mons, PM_PESTILENCE))) {
             if (gv.vis && canseemon(magr)) {
-                await pline_mon(magr, $c.lit("%s %s!"), await Monnam(magr), $c.peq(pd, $c.relem(mons, 313 /* PM_FAMINE */)) ? $c.lit("belches feebly, shrivels up and dies") : $c.peq(pd, $c.relem(mons, 312 /* PM_PESTILENCE */)) ? $c.lit("coughs spasmodically and collapses") : $c.lit("vomits violently and drops dead"));
+                await pline_mon(magr, $c.lit("%s %s!"), await Monnam(magr), $c.peq(pd, $c.relem(mons, PM_FAMINE)) ? $c.lit("belches feebly, shrivels up and dies") : $c.peq(pd, $c.relem(mons, PM_PESTILENCE)) ? $c.lit("coughs spasmodically and collapses") : $c.lit("vomits violently and drops dead"));
             }
             await mondied(magr);
             if (!(magr.mhp < 1)) {
-                mhm.hitflags = 0;
+                mhm.hitflags = M_ATTK_MISS;
                 mhm.done = 1;
                 return;
             } else if (magr.mtame && !gv.vis) {
                 await You(new $c.Ptr(brief_feeling, 0), $c.lit("queasy"));
             }
-            mhm.hitflags = 4;
+            mhm.hitflags = M_ATTK_AGR_DIED;
             mhm.done = 1;
             return;
         }
-        if (flags.verbose && !(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf)) {
+        if (flags.verbose && !(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf)) {
             await verbalize($c.lit("Burrrrp!"));
         }
         await wake_nearto(magr.mx, magr.my, 4);
@@ -3222,8 +3245,8 @@ export async function mhitm_ad_dgst(magr, mattk, mdef, mhm) {   // uhitm.c:4492
             return;
         }
         num = pd.pmidx;
-        if (magr.mtame && !magr.isminion && !(svm.mvitals[num].mvflags & 16)) {
-            virtualcorpse = await mksobj(265 /* CORPSE */, 0, 0);
+        if (magr.mtame && !magr.isminion && !(svm.mvitals[num].mvflags & G_NOCORPSE)) {
+            virtualcorpse = await mksobj(CORPSE, 0, 0);
             await set_corpsenm(virtualcorpse, num);
             nutrit = await dog_nutrition(magr, virtualcorpse);
             await dealloc_obj(virtualcorpse);
@@ -3266,7 +3289,7 @@ export async function mhitm_ad_dise(magr, mattk, mdef, mhm) {   // uhitm.c:4593
                 }
             } else {
                 $goto = null;   // mhitm_dise:
-                if (pd.mlet === 32 /* S_FUNGUS */ || $c.peq(pd, $c.relem(mons, 246 /* PM_GHOUL */)) || await defended(mdef, 33)) {
+                if (pd.mlet === S_FUNGUS || $c.peq(pd, $c.relem(mons, PM_GHOUL)) || await defended(mdef, AD_DISE)) {
                     mhm.damage = 0;
                 }
             }
@@ -3281,28 +3304,28 @@ export async function mhitm_ad_sedu(magr, mattk, mdef, mhm) {   // uhitm.c:4623
         await steal_it(mdef, mattk);
         mhm.damage = 0;
     } else if ($c.peq(mdef, gy.youmonst)) {
-        if ($c.andu64(magr.data.mflags1, 262144) !== 0) {
+        if ($c.andu64(magr.data.mflags1, M1_ANIMAL) !== 0) {
             await hitmsg(magr, mattk);
             if (magr.mcan) {
                 return;
             }
-        } else if (dmgtype(gy.youmonst.data, 22) || dmgtype(gy.youmonst.data, 35)) {
-            await pline_mon(magr, $c.lit("%s %s."), await Monnam(magr), u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf ? $c.lit("says something but you can't hear it") : magr.minvent ? $c.lit("brags about the goods some dungeon explorer provided") : $c.lit("makes some remarks about how difficult theft is lately"));
+        } else if (dmgtype(gy.youmonst.data, AD_SEDU) || dmgtype(gy.youmonst.data, AD_SSEX)) {
+            await pline_mon(magr, $c.lit("%s %s."), await Monnam(magr), u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf ? $c.lit("says something but you can't hear it") : magr.minvent ? $c.lit("brags about the goods some dungeon explorer provided") : $c.lit("makes some remarks about how difficult theft is lately"));
             if (!await tele_restrict(magr)) {
-                await rloc(magr, 2);
+                await rloc(magr, RLOC_MSG);
             }
-            mhm.hitflags = 8;
+            mhm.hitflags = M_ATTK_AGR_DONE;
             mhm.done = 1;
             return;
         } else if (magr.mcan) {
-            if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
+            if (!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked)) {
                 await pline($c.lit("%s tries to %s you, but you seem %s."), await Adjmonnam(magr, $c.lit("plain")), flags.female ? $c.lit("charm") : $c.lit("seduce"), flags.female ? $c.lit("unaffected") : $c.lit("uninterested"));
             }
             if (rn2(3)) {
                 if (!await tele_restrict(magr)) {
-                    await rloc(magr, 2);
+                    await rloc(magr, RLOC_MSG);
                 }
-                mhm.hitflags = 8;
+                mhm.hitflags = M_ATTK_AGR_DONE;
                 mhm.done = 1;
                 return;
             }
@@ -3311,22 +3334,22 @@ export async function mhitm_ad_sedu(magr, mattk, mdef, mhm) {   // uhitm.c:4623
         buf[0] = 0;
         switch (await steal(magr, new $c.Ptr(buf, 0))) {
             case -1:
-                mhm.hitflags = 4;
+                mhm.hitflags = M_ATTK_AGR_DIED;
                 mhm.done = 1;
                 return;
             case 0:
                 return;
             default:
-                if (!($c.andu64(magr.data.mflags1, 262144) !== 0) && !await tele_restrict(magr)) {
-                    await rloc(magr, 2);
+                if (!($c.andu64(magr.data.mflags1, M1_ANIMAL) !== 0) && !await tele_restrict(magr)) {
+                    await rloc(magr, RLOC_MSG);
                 }
-                if ($c.andu64(magr.data.mflags1, 262144) !== 0 && new $c.Ptr(buf, 0).get(0)) {
+                if ($c.andu64(magr.data.mflags1, M1_ANIMAL) !== 0 && new $c.Ptr(buf, 0).get(0)) {
                     if (canseemon(magr)) {
                         await pline_mon(magr, $c.lit("%s tries to %s away with %s."), await Monnam(magr), locomotion(magr.data, $c.lit("run")), new $c.Ptr(buf, 0));
                     }
                 }
                 await monflee(magr, 0, 0, 0);
-                mhm.hitflags = 8;
+                mhm.hitflags = M_ATTK_AGR_DONE;
                 mhm.done = 1;
                 return;
         }
@@ -3341,8 +3364,8 @@ export async function mhitm_ad_sedu(magr, mattk, mdef, mhm) {   // uhitm.c:4623
         }
         if (obj) {
             $c.__builtin___strcpy_chk(new $c.Ptr(mdefnambuf, 0), await x_monnam(mdef, 1, null, 0, 0), 256);
-            if ($c.peq(u.usteed, mdef) && $c.peq(obj, await which_armor(mdef, 1048576))) {
-                await dismount_steed(4 /* DISMOUNT_POLY */);
+            if ($c.peq(u.usteed, mdef) && $c.peq(obj, await which_armor(mdef, W_SADDLE))) {
+                await dismount_steed(DISMOUNT_POLY);
             }
             await extract_from_minvent(mdef, obj, 1, 0);
             if (gv.vis) {
@@ -3357,14 +3380,14 @@ export async function mhitm_ad_sedu(magr, mattk, mdef, mhm) {   // uhitm.c:4623
             mdef.mstrategy = $c.andu64(mdef.mstrategy, 18446744073172680703n);
             await mselftouch(mdef, null, 0);
             if (mdef.mhp < 1) {
-                $t1 = 2 | (await grow_up(magr, mdef) ? 0 : 4), mhm.hitflags = $t1;
+                $t1 = M_ATTK_DEF_DIED | (await grow_up(magr, mdef) ? 0 : M_ATTK_AGR_DIED), mhm.hitflags = $t1;
                 mhm.done = 1;
                 return;
             }
-            if (pa.mlet === 14 /* S_NYMPH */ && !await tele_restrict(magr)) {
+            if (pa.mlet === S_NYMPH && !await tele_restrict(magr)) {
                 couldspot = $c.i8(canseemon(magr) || sensemon(magr) ? 1 : 0);
-                mhm.hitflags = 8;
-                await rloc(magr, 4);
+                mhm.hitflags = M_ATTK_AGR_DONE;
+                await rloc(magr, RLOC_NOMSG);
                 if (gv.vis && couldspot && !(canseemon(magr) || sensemon(magr))) {
                     await pline($c.lit("%s suddenly disappears!"), new $c.Ptr(buf$2, 0));
                 }
@@ -3383,7 +3406,7 @@ export async function mhitm_ad_ssex(magr, mattk, mdef, mhm) {   // uhitm.c:4751
         if (sysopt.seduce) {
             if (could_seduce(magr, mdef, mattk) === 1 && !magr.mcan) {
                 if (await doseduce(magr)) {
-                    mhm.hitflags = 8;
+                    mhm.hitflags = M_ATTK_AGR_DONE;
                     mhm.done = 1;
                     return;
                 }
@@ -3403,124 +3426,124 @@ export async function mhitm_ad_ssex(magr, mattk, mdef, mhm) {   // uhitm.c:4751
 }
 export async function mhitm_adtyping(magr, mattk, mdef, mhm) {   // uhitm.c:4782
     switch (mattk.adtyp) {
-        case 12:
+        case AD_STUN:
             await mhitm_ad_stun(magr, mattk, mdef, mhm);
             break;
-        case 17:
+        case AD_LEGS:
             await mhitm_ad_legs(magr, mattk, mdef, mhm);
             break;
-        case 29:
+        case AD_WERE:
             await mhitm_ad_were(magr, mattk, mdef, mhm);
             break;
-        case 27:
+        case AD_HEAL:
             await mhitm_ad_heal(magr, mattk, mdef, mhm);
             break;
-        case 0:
+        case AD_PHYS:
             await mhitm_ad_phys(magr, mattk, mdef, mhm);
             break;
-        case 2:
+        case AD_FIRE:
             await mhitm_ad_fire(magr, mattk, mdef, mhm);
             break;
-        case 3:
+        case AD_COLD:
             await mhitm_ad_cold(magr, mattk, mdef, mhm);
             break;
-        case 6:
+        case AD_ELEC:
             await mhitm_ad_elec(magr, mattk, mdef, mhm);
             break;
-        case 8:
+        case AD_ACID:
             await mhitm_ad_acid(magr, mattk, mdef, mhm);
             break;
-        case 18:
+        case AD_STON:
             await mhitm_ad_ston(magr, mattk, mdef, mhm);
             break;
-        case 35:
+        case AD_SSEX:
             await mhitm_ad_ssex(magr, mattk, mdef, mhm);
             break;
-        case 21:
-        case 22:
+        case AD_SITM:
+        case AD_SEDU:
             await mhitm_ad_sedu(magr, mattk, mdef, mhm);
             break;
-        case 20:
+        case AD_SGLD:
             await mhitm_ad_sgld(magr, mattk, mdef, mhm);
             break;
-        case 23:
+        case AD_TLPT:
             await mhitm_ad_tlpt(magr, mattk, mdef, mhm);
             break;
-        case 11:
+        case AD_BLND:
             await mhitm_ad_blnd(magr, mattk, mdef, mhm);
             break;
-        case 253:
+        case AD_CURS:
             await mhitm_ad_curs(magr, mattk, mdef, mhm);
             break;
-        case 15:
+        case AD_DRLI:
             await mhitm_ad_drli(magr, mattk, mdef, mhm);
             break;
-        case 24:
+        case AD_RUST:
             await mhitm_ad_rust(magr, mattk, mdef, mhm);
             break;
-        case 42:
+        case AD_CORR:
             await mhitm_ad_corr(magr, mattk, mdef, mhm);
             break;
-        case 34:
+        case AD_DCAY:
             await mhitm_ad_dcay(magr, mattk, mdef, mhm);
             break;
-        case 16:
+        case AD_DREN:
             await mhitm_ad_dren(magr, mattk, mdef, mhm);
             break;
-        case 7:
-        case 30:
-        case 31:
+        case AD_DRST:
+        case AD_DRDX:
+        case AD_DRCO:
             await mhitm_ad_drst(magr, mattk, mdef, mhm);
             break;
-        case 32:
+        case AD_DRIN:
             await mhitm_ad_drin(magr, mattk, mdef, mhm);
             break;
-        case 19:
+        case AD_STCK:
             await mhitm_ad_stck(magr, mattk, mdef, mhm);
             break;
-        case 28:
+        case AD_WRAP:
             await mhitm_ad_wrap(magr, mattk, mdef, mhm);
             break;
-        case 14:
+        case AD_PLYS:
             await mhitm_ad_plys(magr, mattk, mdef, mhm);
             break;
-        case 4:
+        case AD_SLEE:
             await mhitm_ad_slee(magr, mattk, mdef, mhm);
             break;
-        case 40:
+        case AD_SLIM:
             await mhitm_ad_slim(magr, mattk, mdef, mhm);
             break;
-        case 41:
+        case AD_ENCH:
             await mhitm_ad_ench(magr, mattk, mdef, mhm);
             break;
-        case 13:
+        case AD_SLOW:
             await mhitm_ad_slow(magr, mattk, mdef, mhm);
             break;
-        case 25:
+        case AD_CONF:
             await mhitm_ad_conf(magr, mattk, mdef, mhm);
             break;
-        case 43:
+        case AD_POLY:
             await mhitm_ad_poly(magr, mattk, mdef, mhm);
             break;
-        case 33:
+        case AD_DISE:
             await mhitm_ad_dise(magr, mattk, mdef, mhm);
             break;
-        case 252:
+        case AD_SAMU:
             await mhitm_ad_samu(magr, mattk, mdef, mhm);
             break;
-        case 37:
+        case AD_DETH:
             await mhitm_ad_deth(magr, mattk, mdef, mhm);
             break;
-        case 38:
+        case AD_PEST:
             await mhitm_ad_pest(magr, mattk, mdef, mhm);
             break;
-        case 39:
+        case AD_FAMN:
             await mhitm_ad_famn(magr, mattk, mdef, mhm);
             break;
-        case 26:
+        case AD_DGST:
             await mhitm_ad_dgst(magr, mattk, mdef, mhm);
             break;
-        case 36:
+        case AD_HALU:
             await mhitm_ad_halu(magr, mattk, mdef, mhm);
             break;
         default:
@@ -3530,13 +3553,13 @@ export async function mhitm_adtyping(magr, mattk, mdef, mhm) {   // uhitm.c:4782
 export async function damageum(mdef, mattk, specialdmg) {   // uhitm.c:4835
     let mhm = new $T.mhitm_data(), $t1;
     $t1 = d(mattk.damn, mattk.damd), mhm.damage = $t1;
-    mhm.hitflags = 0;
+    mhm.hitflags = M_ATTK_MISS;
     mhm.permdmg = 0;
     mhm.specialdmg = specialdmg;
     mhm.done = 0;
-    if ($c.andu64(gy.youmonst.data.mflags2, 256) !== 0 && !rn2(13) && !$G.uwep && u.umonnum !== 290 /* PM_AMOROUS_DEMON */ && u.umonnum !== 302 /* PM_BALROG */) {
+    if ($c.andu64(gy.youmonst.data.mflags2, M2_DEMON) !== 0 && !rn2(13) && !$G.uwep && u.umonnum !== PM_AMOROUS_DEMON && u.umonnum !== PM_BALROG) {
         await demonpet();
-        return 0;
+        return M_ATTK_MISS;
     }
     await mhitm_adtyping(gy.youmonst, mattk, mdef, mhm);
     if (mhm.done) {
@@ -3545,65 +3568,65 @@ export async function damageum(mdef, mattk, specialdmg) {   // uhitm.c:4835
     mdef.mstrategy = $c.andu64(mdef.mstrategy, 18446744073172680703n);
     mdef.mhp = mdef.mhp - mhm.damage | 0;
     if (mdef.mhp < 1) {
-        if (mattk.aatyp === 254 || mattk.aatyp === 1) {
-            gm.mkcorpstat_norevive = $c.i8(mdef.data.mlet === 46 /* S_TROLL */ && $G.uwep && $G.uwep.oartifact === 17 /* ART_TROLLSBANE */ ? 1 : 0);
+        if (mattk.aatyp === AT_WEAP || mattk.aatyp === AT_CLAW) {
+            gm.mkcorpstat_norevive = $c.i8(mdef.data.mlet === S_TROLL && $G.uwep && $G.uwep.oartifact === ART_TROLLSBANE ? 1 : 0);
         }
-        if (mdef.mtame && !((gv.viz_array.get(mdef.my).get(mdef.mx) & 2) !== 0)) {
+        if (mdef.mtame && !((gv.viz_array.get(mdef.my).get(mdef.mx) & IN_SIGHT) !== 0)) {
             await You_feel($c.lit("embarrassed for a moment."));
             if (mhm.damage) {
-                await xkilled(mdef, 1);
+                await xkilled(mdef, XKILL_NOMSG);
             }
         } else if (!flags.verbose) {
             await You($c.lit("destroy it!"));
             if (mhm.damage) {
-                await xkilled(mdef, 1);
+                await xkilled(mdef, XKILL_NOMSG);
             }
         } else if (mhm.damage) {
             await killed(mdef);
         }
         gm.mkcorpstat_norevive = 0;
-        return 2;
+        return M_ATTK_DEF_DIED;
     }
-    return 1;
+    return M_ATTK_HIT;
 }
 export async function explum(mdef, mattk) {   // uhitm.c:4891
     let tmp = 0;
     tmp = d(mattk.damn, mattk.damd);
     switch (mattk.adtyp) {
-        case 11:
+        case AD_BLND:
             if (mdef && !await resists_blnd(mdef)) {
                 await pline($c.lit("%s is blinded by your flash of light!"), await Monnam(mdef));
                 mdef.mblinded = ((((mdef.mblinded | 0) + tmp | 0) < 127 ? (mdef.mblinded | 0) + tmp | 0 : 127) >>> 0) & 127;
                 mdef.mcansee = (0) & 1;
             }
             break;
-        case 36:
-            if (mdef && $c.andu64(mdef.data.mflags1, 4096) === 0 && mdef.mcansee | 0) {
+        case AD_HALU:
+            if (mdef && $c.andu64(mdef.data.mflags1, M1_NOEYES) === 0 && mdef.mcansee | 0) {
                 await pline($c.lit("%s is affected by your flash of light!"), await Monnam(mdef));
                 mdef.mconf = (1) & 1;
             }
             break;
-        case 3:
-        case 2:
-        case 6:
-            await explode(u.ux, u.uy, (mattk.adtyp - 1 | 0) + 20 | 0, tmp, 20, await adtyp_to_expltype(mattk.adtyp));
+        case AD_COLD:
+        case AD_FIRE:
+        case AD_ELEC:
+            await explode(u.ux, u.uy, (mattk.adtyp - 1 | 0) + 20 | 0, tmp, MAXOCLASSES + 2, await adtyp_to_expltype(mattk.adtyp));
             if (mdef && mdef.mhp < 1) {
-                return 2;
+                return M_ATTK_DEF_DIED;
             }
             break;
         default:
             break;
     }
     await wake_nearto(u.ux, u.uy, 49);
-    return 1;
+    return M_ATTK_HIT;
 }
 async function start_engulf(mdef) {   // uhitm.c:4931
     let u_digest = 0, u_enfold = 0;
-    u_digest = $c.i8(dmgtype_fromattack(gy.youmonst.data, 26, 11) !== null ? 1 : 0);
-    u_enfold = $c.i8(dmgtype_fromattack(gy.youmonst.data, 28, 11) !== null ? 1 : 0);
-    if (!((u.uprops[40 /* INVIS */].intrinsic || u.uprops[40 /* INVIS */].extrinsic) && !u.uprops[40 /* INVIS */].blocked && !(u.uprops[29 /* SEE_INVIS */].intrinsic || u.uprops[29 /* SEE_INVIS */].extrinsic))) {
+    u_digest = $c.i8(dmgtype_fromattack(gy.youmonst.data, AD_DGST, AT_ENGL) !== null ? 1 : 0);
+    u_enfold = $c.i8(dmgtype_fromattack(gy.youmonst.data, AD_WRAP, AT_ENGL) !== null ? 1 : 0);
+    if (!((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked && !(u.uprops[SEE_INVIS].intrinsic || u.uprops[SEE_INVIS].extrinsic))) {
         await map_location(u.ux, u.uy, 1);
-        await tmp_at(-5, $c.i16((u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic) ? await rn2_on_display_rng(383 /* NUMMONS */) : gy.youmonst.data.pmidx) + ((gy.youmonst.female | 0) === 0 ? 0 /* GLYPH_MON_MALE_OFF */ : 383 /* GLYPH_MON_FEM_OFF */) | 0));
+        await tmp_at(DISP_ALWAYS, $c.i16((u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) : gy.youmonst.data.pmidx) + ((gy.youmonst.female | 0) === 0 ? GLYPH_MON_MALE_OFF : GLYPH_MON_FEM_OFF) | 0));
         await tmp_at(mdef.mx, mdef.my);
     }
     await You($c.lit("%s %s%s!"), u_digest ? $c.lit("swallow") : u_enfold ? $c.lit("enclose") : $c.lit("engulf"), await mon_nam(mdef), u_digest ? $c.lit(" whole") : $c.lit(""));
@@ -3611,43 +3634,43 @@ async function start_engulf(mdef) {   // uhitm.c:4931
     await windowprocs.win_delay_output();
 }
 async function end_engulf() {   // uhitm.c:4949
-    if (!((u.uprops[40 /* INVIS */].intrinsic || u.uprops[40 /* INVIS */].extrinsic) && !u.uprops[40 /* INVIS */].blocked && !(u.uprops[29 /* SEE_INVIS */].intrinsic || u.uprops[29 /* SEE_INVIS */].extrinsic))) {
-        await tmp_at(-7, 0);
+    if (!((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked && !(u.uprops[SEE_INVIS].intrinsic || u.uprops[SEE_INVIS].extrinsic))) {
+        await tmp_at(DISP_END, 0);
         await newsym(u.ux, u.uy);
     }
 }
 async function gulpum(mdef, mattk) {   // uhitm.c:4958
     let tmp = 0, dam = 0, fatal_gulp = 0, u_digest = 0, u_enfold = 0, otmp = null, pd = null, expel_verb = null, kbuf = new Int8Array(256), mnam = null;
     dam = d(mattk.damn, mattk.damd);
-    u_digest = $c.i8(dmgtype_fromattack(gy.youmonst.data, 26, 11) !== null ? 1 : 0);
-    u_enfold = $c.i8(dmgtype_fromattack(gy.youmonst.data, 28, 11) !== null ? 1 : 0);
+    u_digest = $c.i8(dmgtype_fromattack(gy.youmonst.data, AD_DGST, AT_ENGL) !== null ? 1 : 0);
+    u_enfold = $c.i8(dmgtype_fromattack(gy.youmonst.data, AD_WRAP, AT_ENGL) !== null ? 1 : 0);
     pd = mdef.data;
     expel_verb = u_digest ? $c.lit("regurgitate") : u_enfold ? $c.lit("release") : $c.lit("expel");
     if (!engulf_target(gy.youmonst, mdef)) {
-        return 0;
+        return M_ATTK_MISS;
     }
     if (!(u_digest && u.uhunger >= 1500) && !u.uswallow) {
-        if (!($c.peq(gy.youmonst.data, $c.relem(mons, 111 /* PM_FIRE_VORTEX */)) || $c.peq(gy.youmonst.data, $c.relem(mons, 30 /* PM_FLAMING_SPHERE */)) || $c.peq(gy.youmonst.data, $c.relem(mons, 155 /* PM_FIRE_ELEMENTAL */)) || $c.peq(gy.youmonst.data, $c.relem(mons, 329 /* PM_SALAMANDER */)))) {
+        if (!($c.peq(gy.youmonst.data, $c.relem(mons, PM_FIRE_VORTEX)) || $c.peq(gy.youmonst.data, $c.relem(mons, PM_FLAMING_SPHERE)) || $c.peq(gy.youmonst.data, $c.relem(mons, PM_FIRE_ELEMENTAL)) || $c.peq(gy.youmonst.data, $c.relem(mons, PM_SALAMANDER)))) {
             for (otmp = mdef.minvent; otmp; otmp = otmp.nobj) {
                 await snuff_lit(otmp);
             }
         }
-        if ((mdef.cham === 226 /* PM_VAMPIRE */ || mdef.cham === 227 /* PM_VAMPIRE_LEADER */ || mdef.cham === 228 /* PM_VLAD_THE_IMPALER */) && await newcham(mdef, $c.relem(mons, mdef.cham), 0)) {
+        if ((mdef.cham === PM_VAMPIRE || mdef.cham === PM_VAMPIRE_LEADER || mdef.cham === PM_VLAD_THE_IMPALER) && await newcham(mdef, $c.relem(mons, mdef.cham), NO_NC_FLAGS)) {
             await You($c.lit("%s it, then %s it."), u_digest ? $c.lit("swallow") : u_enfold ? $c.lit("enclose") : $c.lit("engulf"), expel_verb);
             if (canseemon(mdef) || sensemon(mdef)) {
-                await pline($c.lit("It turns into %s."), await x_monnam(mdef, 2, null, 35, 0));
+                await pline($c.lit("It turns into %s."), await x_monnam(mdef, ARTICLE_A, null, SUPPRESS_NAME | SUPPRESS_IT | SUPPRESS_INVISIBLE, 0));
             } else {
                 await map_invisible(mdef.mx, mdef.my);
             }
-            return 1;
+            return M_ATTK_HIT;
         }
-        fatal_gulp = $c.i8(($c.peq(pd, $c.relem(mons, 10 /* PM_COCKATRICE */)) || $c.peq(pd, $c.relem(mons, 9 /* PM_CHICKATRICE */))) && !(u.uprops[8 /* STONE_RES */].intrinsic || u.uprops[8 /* STONE_RES */].extrinsic) || mattk.adtyp === 26 && ($c.peq(pd, $c.relem(mons, 311 /* PM_DEATH */)) || $c.peq(pd, $c.relem(mons, 313 /* PM_FAMINE */)) || $c.peq(pd, $c.relem(mons, 312 /* PM_PESTILENCE */)) || $c.peq(pd, $c.relem(mons, 284 /* PM_MEDUSA */)) && !(u.uprops[8 /* STONE_RES */].intrinsic || u.uprops[8 /* STONE_RES */].extrinsic)) ? 1 : 0);
-        if (mattk.adtyp === 26 && (!(u.uprops[54 /* SLOW_DIGESTION */].intrinsic || u.uprops[54 /* SLOW_DIGESTION */].extrinsic) || fatal_gulp)) {
+        fatal_gulp = $c.i8(($c.peq(pd, $c.relem(mons, PM_COCKATRICE)) || $c.peq(pd, $c.relem(mons, PM_CHICKATRICE))) && !(u.uprops[STONE_RES].intrinsic || u.uprops[STONE_RES].extrinsic) || mattk.adtyp === AD_DGST && ($c.peq(pd, $c.relem(mons, PM_DEATH)) || $c.peq(pd, $c.relem(mons, PM_FAMINE)) || $c.peq(pd, $c.relem(mons, PM_PESTILENCE)) || $c.peq(pd, $c.relem(mons, PM_MEDUSA)) && !(u.uprops[STONE_RES].intrinsic || u.uprops[STONE_RES].extrinsic)) ? 1 : 0);
+        if (mattk.adtyp === AD_DGST && (!(u.uprops[SLOW_DIGESTION].intrinsic || u.uprops[SLOW_DIGESTION].extrinsic) || fatal_gulp)) {
             await eating_conducts(pd);
         }
-        if (fatal_gulp && !($c.peq(pd, $c.relem(mons, 311 /* PM_DEATH */)) || $c.peq(pd, $c.relem(mons, 313 /* PM_FAMINE */)) || $c.peq(pd, $c.relem(mons, 312 /* PM_PESTILENCE */)))) {
+        if (fatal_gulp && !($c.peq(pd, $c.relem(mons, PM_DEATH)) || $c.peq(pd, $c.relem(mons, PM_FAMINE)) || $c.peq(pd, $c.relem(mons, PM_PESTILENCE)))) {
             mnam = pmname(pd, Mgender(mdef));
-            if (!($c.andu64(pd.mflags2, 524288) !== 0)) {
+            if (!($c.andu64(pd.mflags2, M2_PNAME) !== 0)) {
                 mnam = await an(mnam);
             }
             await You($c.lit("%s %s."), u_digest ? $c.lit("englut") : $c.lit("engulf"), await mon_nam(mdef));
@@ -3656,16 +3679,16 @@ async function gulpum(mdef, mattk) {   // uhitm.c:4958
         } else {
             await start_engulf(mdef);
             switch (mattk.adtyp) {
-                case 26:
-                    if ($c.peq(pd, $c.relem(mons, 311 /* PM_DEATH */)) || $c.peq(pd, $c.relem(mons, 313 /* PM_FAMINE */)) || $c.peq(pd, $c.relem(mons, 312 /* PM_PESTILENCE */))) {
+                case AD_DGST:
+                    if ($c.peq(pd, $c.relem(mons, PM_DEATH)) || $c.peq(pd, $c.relem(mons, PM_FAMINE)) || $c.peq(pd, $c.relem(mons, PM_PESTILENCE))) {
                         await pline($c.lit("Unfortunately, digesting any of it is fatal."));
                         await end_engulf();
                         $c.__builtin___sprintf_chk(new $c.Ptr(svk.killer.name, 0), 0, 256, $c.lit("unwisely tried to eat %s"), pmname(pd, Mgender(mdef)));
-                        svk.killer.format = 2;
-                        await done(0 /* DIED */);
-                        return 0;
+                        svk.killer.format = NO_KILLER_PREFIX;
+                        await done(DIED);
+                        return M_ATTK_MISS;
                     }
-                    if (u.uprops[54 /* SLOW_DIGESTION */].intrinsic || u.uprops[54 /* SLOW_DIGESTION */].extrinsic) {
+                    if (u.uprops[SLOW_DIGESTION].intrinsic || u.uprops[SLOW_DIGESTION].extrinsic) {
                         dam = 0;
                         break;
                     }
@@ -3674,12 +3697,12 @@ async function gulpum(mdef, mattk) {   // uhitm.c:4958
                     }
                     await newuhs(0);
                     gm.mswallower = gy.youmonst;
-                    await xkilled(mdef, 2);
+                    await xkilled(mdef, XKILL_GIVEMSG | XKILL_NOCORPSE);
                     if (!(mdef.mhp < 1)) {
-                        await You($c.lit("hurriedly regurgitate the sizzling in your %s."), await body_part(18 /* STOMACH */));
+                        await You($c.lit("hurriedly regurgitate the sizzling in your %s."), await body_part(STOMACH));
                     } else {
                         tmp = 1 + (pd.cwt >>> 8) >>> 0 | 0;
-                        if (await corpse_chance(mdef, gy.youmonst, 1) && !(svm.mvitals[pd.pmidx].mvflags & 16)) {
+                        if (await corpse_chance(mdef, gy.youmonst, 1) && !(svm.mvitals[pd.pmidx].mvflags & G_NOCORPSE)) {
                             u.uhunger = u.uhunger + $c.div32(pd.cnutrit + 1 | 0, 2) | 0;
                         } else {
                             tmp = 0;
@@ -3687,7 +3710,7 @@ async function gulpum(mdef, mattk) {   // uhitm.c:4958
                         $c.__builtin___sprintf_chk(new $c.Ptr(gulpum$msgbuf, 0), 0, 256, $c.lit("You totally digest %s."), await mon_nam(mdef));
                         if (tmp !== 0) {
                             await You($c.lit("digest %s."), await mon_nam(mdef));
-                            if (u.uprops[54 /* SLOW_DIGESTION */].intrinsic || u.uprops[54 /* SLOW_DIGESTION */].extrinsic) {
+                            if (u.uprops[SLOW_DIGESTION].intrinsic || u.uprops[SLOW_DIGESTION].extrinsic) {
                                 tmp = Math.imul(tmp, 2);
                             }
                             nomul(-tmp | 0);
@@ -3698,37 +3721,37 @@ async function gulpum(mdef, mattk) {   // uhitm.c:4958
                         } else {
                             await pline($c.lit("%s"), new $c.Ptr(gulpum$msgbuf, 0));
                         }
-                        if ($c.peq(pd, $c.relem(mons, 208 /* PM_GREEN_SLIME */))) {
+                        if ($c.peq(pd, $c.relem(mons, PM_GREEN_SLIME))) {
                             $c.__builtin___sprintf_chk(new $c.Ptr(gulpum$msgbuf, 0), 0, 256, $c.lit("%s isn't sitting well with you."), await The(pmname(pd, Mgender(mdef))));
-                            if (!(u.uprops[63 /* UNCHANGING */].intrinsic || u.uprops[63 /* UNCHANGING */].extrinsic)) {
+                            if (!(u.uprops[UNCHANGING].intrinsic || u.uprops[UNCHANGING].extrinsic)) {
                                 await make_slimed(5, null);
                             }
                         } else {
-                            await exercise(4 /* A_CON */, 1);
+                            await exercise(A_CON, 1);
                         }
                     }
                     gm.mswallower = null;
                     await end_engulf();
-                    return 2;
-                case 0:
-                    if ($c.peq(gy.youmonst.data, $c.relem(mons, 106 /* PM_FOG_CLOUD */))) {
+                    return M_ATTK_DEF_DIED;
+                case AD_PHYS:
+                    if ($c.peq(gy.youmonst.data, $c.relem(mons, PM_FOG_CLOUD))) {
                         await pline($c.lit("%s is laden with your moisture."), await Monnam(mdef));
-                        if (($c.andu64(pd.mflags1, 1024) !== 0 || $c.andu64(pd.mflags1, 512) !== 0) && !($c.peq(pd, $c.relem(mons, 111 /* PM_FIRE_VORTEX */)) || $c.peq(pd, $c.relem(mons, 30 /* PM_FLAMING_SPHERE */)) || $c.peq(pd, $c.relem(mons, 155 /* PM_FIRE_ELEMENTAL */)) || $c.peq(pd, $c.relem(mons, 329 /* PM_SALAMANDER */)))) {
+                        if (($c.andu64(pd.mflags1, M1_BREATHLESS) !== 0 || $c.andu64(pd.mflags1, M1_AMPHIBIOUS) !== 0) && !($c.peq(pd, $c.relem(mons, PM_FIRE_VORTEX)) || $c.peq(pd, $c.relem(mons, PM_FLAMING_SPHERE)) || $c.peq(pd, $c.relem(mons, PM_FIRE_ELEMENTAL)) || $c.peq(pd, $c.relem(mons, PM_SALAMANDER)))) {
                             dam = 0;
                             await pline($c.lit("%s seems unharmed."), await Monnam(mdef));
                         }
                     } else {
-                        await pline($c.lit("%s is %s!"), await Monnam(mdef), dmgtype_fromattack(gy.youmonst.data, 28, 11) !== null ? $c.lit("being squashed") : $c.lit("pummeled with your debris"));
+                        await pline($c.lit("%s is %s!"), await Monnam(mdef), dmgtype_fromattack(gy.youmonst.data, AD_WRAP, AT_ENGL) !== null ? $c.lit("being squashed") : $c.lit("pummeled with your debris"));
                     }
                     break;
-                case 8:
+                case AD_ACID:
                     await pline($c.lit("%s is covered with your goo!"), await Monnam(mdef));
-                    if (await Resists_Elem(mdef, 7 /* ACID_RES */)) {
+                    if (await Resists_Elem(mdef, ACID_RES)) {
                         await pline($c.lit("It seems harmless to %s."), await mon_nam(mdef));
                         dam = 0;
                     }
                     break;
-                case 11:
+                case AD_BLND:
                     if (await can_blnd(gy.youmonst, mdef, mattk.aatyp, null)) {
                         if (mdef.mcansee) {
                             await pline($c.lit("%s can't see in there!"), await Monnam(mdef));
@@ -3742,10 +3765,10 @@ async function gulpum(mdef, mattk) {   // uhitm.c:4958
                     }
                     dam = 0;
                     break;
-                case 6:
+                case AD_ELEC:
                     if (rn2(2)) {
                         await pline_The($c.lit("air around %s crackles with electricity."), await mon_nam(mdef));
-                        if (await Resists_Elem(mdef, 5 /* SHOCK_RES */)) {
+                        if (await Resists_Elem(mdef, SHOCK_RES)) {
                             await pline($c.lit("%s seems unhurt."), await Monnam(mdef));
                             dam = 0;
                         }
@@ -3754,9 +3777,9 @@ async function gulpum(mdef, mattk) {   // uhitm.c:4958
                         dam = 0;
                     }
                     break;
-                case 3:
+                case AD_COLD:
                     if (rn2(2)) {
-                        if (await Resists_Elem(mdef, 2 /* COLD_RES */)) {
+                        if (await Resists_Elem(mdef, COLD_RES)) {
                             await pline($c.lit("%s seems mildly chilly."), await Monnam(mdef));
                             dam = 0;
                         } else {
@@ -3767,9 +3790,9 @@ async function gulpum(mdef, mattk) {   // uhitm.c:4958
                         dam = 0;
                     }
                     break;
-                case 2:
+                case AD_FIRE:
                     if (rn2(2)) {
-                        if (await Resists_Elem(mdef, 1 /* FIRE_RES */)) {
+                        if (await Resists_Elem(mdef, FIRE_RES)) {
                             await pline($c.lit("%s seems mildly hot."), await Monnam(mdef));
                             dam = 0;
                         } else {
@@ -3780,7 +3803,7 @@ async function gulpum(mdef, mattk) {   // uhitm.c:4958
                         dam = 0;
                     }
                     break;
-                case 16:
+                case AD_DREN:
                     if (!rn2(4)) {
                         await xdrainenergym(mdef, 1);
                     }
@@ -3792,16 +3815,16 @@ async function gulpum(mdef, mattk) {   // uhitm.c:4958
             if (mdef.mhp < 1) {
                 await killed(mdef);
                 if (mdef.mhp < 1) {
-                    return 2;
+                    return M_ATTK_DEF_DIED;
                 }
             }
             await You($c.lit("%s %s!"), expel_verb, await mon_nam(mdef));
-            if ((u.uprops[54 /* SLOW_DIGESTION */].intrinsic || u.uprops[54 /* SLOW_DIGESTION */].extrinsic || $c.andu64(gy.youmonst.data.mflags1, 262144) !== 0) && u_digest) {
+            if ((u.uprops[SLOW_DIGESTION].intrinsic || u.uprops[SLOW_DIGESTION].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1_ANIMAL) !== 0) && u_digest) {
                 await pline($c.lit("Obviously, you didn't like %s taste."), s_suffix(await mon_nam(mdef)));
             }
         }
     }
-    return 0;
+    return M_ATTK_MISS;
 }
 export async function missum(mdef, mattk, wouldhavehit) {   // uhitm.c:5198
     if (wouldhavehit) {
@@ -3822,16 +3845,16 @@ export function m_is_steadfast(mtmp) {   // uhitm.c:5218
     let is_u = 0, otmp = null;
     is_u = $c.i8($c.peq(mtmp, gy.youmonst) ? 1 : 0);
     otmp = is_u ? $G.uwep : mtmp.mw;
-    if ((is_u ? (u.uprops[49 /* FLYING */].intrinsic || u.uprops[49 /* FLYING */].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, 1) !== 0) && !u.uprops[49 /* FLYING */].blocked || (u.uprops[48 /* LEVITATION */].intrinsic || u.uprops[48 /* LEVITATION */].extrinsic) && !u.uprops[48 /* LEVITATION */].blocked : $c.andu64(mtmp.data.mflags1, 1) !== 0 || (mtmp.data.mlet === 5 /* S_EYE */ || mtmp.data.mlet === 25 /* S_LIGHT */)) || (svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) && !is_pool(u.ux, u.uy)) {
+    if ((is_u ? (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked || (u.uprops[LEVITATION].intrinsic || u.uprops[LEVITATION].extrinsic) && !u.uprops[LEVITATION].blocked : $c.andu64(mtmp.data.mflags1, M1_FLY) !== 0 || (mtmp.data.mlet === S_EYE || mtmp.data.mlet === S_LIGHT)) || (svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) || (svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) && !is_pool(u.ux, u.uy)) {
         return 0;
     }
-    if (is_art(otmp, 15 /* ART_GIANTSLAYER */)) {
+    if (is_art(otmp, ART_GIANTSLAYER)) {
         return 1;
     }
-    if (m_carrying(mtmp, 471 /* LOADSTONE */)) {
+    if (m_carrying(mtmp, LOADSTONE)) {
         return 1;
     }
-    if (u.usteed && $c.peq(mtmp, u.usteed) && carrying(471 /* LOADSTONE */)) {
+    if (u.usteed && $c.peq(mtmp, u.usteed) && carrying(LOADSTONE)) {
         return 1;
     }
     return 0;
@@ -3845,16 +3868,16 @@ export async function mhitm_knockback(magr, mdef, mattk, hitflags, weapon_used) 
     was_u = 0;
     dismount = 0;
     wep = weapon_used ? u_agr ? $G.uwep : magr.mw : null;
-    if (wep && is_art(wep, 16 /* ART_OGRESMASHER */)) {
+    if (wep && is_art(wep, ART_OGRESMASHER)) {
         chance = 2;
     }
     if (rn2(chance)) {
         return 0;
     }
-    if (!(mattk.adtyp === 0 && (mattk.aatyp === 1 || mattk.aatyp === 3 || mattk.aatyp === 4 || mattk.aatyp === 254))) {
+    if (!(mattk.adtyp === AD_PHYS && (mattk.aatyp === AT_CLAW || mattk.aatyp === AT_KICK || mattk.aatyp === AT_BUTT || mattk.aatyp === AT_WEAP))) {
         return 0;
     }
-    if (attacktype(magr.data, 11) || attacktype(magr.data, 7) || sticks(magr.data)) {
+    if (attacktype(magr.data, AT_ENGL) || attacktype(magr.data, AT_HUGS) || sticks(magr.data)) {
         return 0;
     }
     defx = $c.i16(u_def ? u.ux : mdef.mx);
@@ -3862,19 +3885,19 @@ export async function mhitm_knockback(magr, mdef, mattk, hitflags, weapon_used) 
     dx = $c.i16(sgn(defx - (u_agr ? u.ux : magr.mx) | 0));
     dy = $c.i16(sgn(defy - (u_agr ? u.uy : magr.my) | 0));
     if (u_def) {
-        if (!await test_move(defx, defy, dx, dy, 1)) {
+        if (!await test_move(defx, defy, dx, dy, TEST_MOVE)) {
             return 0;
         }
     } else {
         if (!isok($c.i16(defx + dx | 0), $c.i16(defy + dy | 0))) {
             return 0;
         }
-        if (svl.level.locations[defx][defy].typ === 23 /* DOOR */ && (defx - magr.mx | 0 && defy - magr.my | 0) && !doorless_door(defx, defy)) {
+        if (svl.level.locations[defx][defy].typ === DOOR && (defx - magr.mx | 0 && defy - magr.my | 0) && !doorless_door(defx, defy)) {
             return 0;
         }
     }
     if (u_def && u.usteed) {
-        if ((otmp = await which_armor(u.usteed, 1048576)) !== null && otmp.cursed | 0) {
+        if ((otmp = await which_armor(u.usteed, W_SADDLE)) !== null && otmp.cursed | 0) {
             mdef = u.usteed;
             was_u = 1;
             u_def = 0;
@@ -3888,13 +3911,13 @@ export async function mhitm_knockback(magr, mdef, mattk, hitflags, weapon_used) 
     if (!(magr.data.msize > (mdef.data.msize + 1 | 0))) {
         return 0;
     }
-    if (wep && ((objects[wep.otyp].oc_material | 0) <= 7 /* LEATHER */ || wep.otyp === 78 /* RUBBER_HOSE */ || !((wep.oclass === 2 /* WEAPON_CLASS */ || wep.oclass === 6 /* TOOL_CLASS */ && objects[wep.otyp].oc_subtyp !== 0 /* P_NONE */) && ((objects[wep.otyp].oc_dir | 0) & 4) !== 0))) {
+    if (wep && ((objects[wep.otyp].oc_material | 0) <= LEATHER || wep.otyp === RUBBER_HOSE || !((wep.oclass === WEAPON_CLASS || wep.oclass === TOOL_CLASS && objects[wep.otyp].oc_subtyp !== P_NONE) && ((objects[wep.otyp].oc_dir | 0) & WHACK) !== 0))) {
         return 0;
     }
-    if ($c.andu64(magr.data.mflags1, 1048576) !== 0) {
+    if ($c.andu64(magr.data.mflags1, M1_UNSOLID) !== 0) {
         return 0;
     }
-    if ((u_agr || u_def) && !(hitflags.get(0) & 1)) {
+    if ((u_agr || u_def) && !(hitflags.get(0) & M_ATTK_HIT)) {
         return 0;
     }
     if (m_is_steadfast(mdef)) {
@@ -3927,23 +3950,23 @@ export async function mhitm_knockback(magr, mdef, mattk, hitflags, weapon_used) 
         if (dismount) {
             u.dx = dx;
             u.dy = dy;
-            await dismount_steed(3 /* DISMOUNT_KNOCKED */);
+            await dismount_steed(DISMOUNT_KNOCKED);
         } else {
             await hurtle(dx, dy, knockdistance, 0);
-            hitflags.set(0, hitflags.get(0) | 1);
+            hitflags.set(0, hitflags.get(0) | M_ATTK_HIT);
         }
         set_apparxy(magr);
-        if (!u.uprops[13 /* STUNNED */].intrinsic && !rn2(4)) {
+        if (!u.uprops[STUNNED].intrinsic && !rn2(4)) {
             await make_stunned(knockdistance + 1 | 0, 1);
         }
     } else {
         await mhurtle(mdef, dx, dy, knockdistance);
         if (!u_agr) {
-            hitflags.set(0, hitflags.get(0) | 1);
+            hitflags.set(0, hitflags.get(0) | M_ATTK_HIT);
         }
         if (mdef.mhp < 1) {
             if (!was_u) {
-                hitflags.set(0, hitflags.get(0) | 2);
+                hitflags.set(0, hitflags.get(0) | M_ATTK_DEF_DIED);
             }
         } else if (!rn2(4)) {
             mdef.mstun = (1) & 1;
@@ -3954,7 +3977,7 @@ export async function mhitm_knockback(magr, mdef, mattk, hitflags, weapon_used) 
     }
     if (!u_agr) {
         if (magr.mhp < 1) {
-            hitflags.set(0, hitflags.get(0) | 4);
+            hitflags.set(0, hitflags.get(0) | M_ATTK_AGR_DIED);
         }
     }
     return 1;
@@ -3969,48 +3992,48 @@ async function hmonas(mon) {   // uhitm.c:5424
     multi_claw = 0;
     multi_weap = 0;
     $t1 = $c.i8(canseemon(mon) || dist2(mon.mx, mon.my, u.ux, u.uy) <= 2 ? 1 : 0), gv.vis = $t1;
-    for (i = 0; i < 6; i = i + 1 | 0) {
-        sum[i] = 0;
+    for (i = 0; i < NATTK; i = i + 1 | 0) {
+        sum[i] = M_ATTK_MISS;
         mattk = await getmattk(gy.youmonst, mon, i, new $c.Ptr(sum, 0), alt_attk);
-        if (mattk.aatyp === 254) {
+        if (mattk.aatyp === AT_WEAP) {
             multi_weap = multi_weap + 1 | 0;
         }
-        if (mattk.aatyp === 254 || mattk.aatyp === 1 || mattk.aatyp === 5) {
+        if (mattk.aatyp === AT_WEAP || mattk.aatyp === AT_CLAW || mattk.aatyp === AT_TUCH) {
             multi_claw = multi_claw + 1 | 0;
         }
     }
     multi_claw = multi_claw > 1 ? 1 : 0;
     gt.twohits = 0;
     gs.skipdrin = 0;
-    L2: for (i = 0; i < 6; i = i + 1 | 0) {
+    L2: for (i = 0; i < NATTK; i = i + 1 | 0) {
         if (i > 0 && (!$c.peq(svl.level.monsters[gb.bhitpos.x][gb.bhitpos.y], mon) || mon.mhp < 1)) {
             continue;
         }
         mattk = await getmattk(gy.youmonst, mon, i, new $c.Ptr(sum, 0), alt_attk);
-        if (gs.skipdrin && mattk.aatyp === 16 && mattk.adtyp === 32) {
+        if (gs.skipdrin && mattk.aatyp === AT_TENT && mattk.adtyp === AD_DRIN) {
             continue;
         }
         weapon = null;
         passivedone$: {
             S1: for (;;) {
                 switch ($goto !== null ? $goto : mattk.aatyp) {
-                    case 254:
+                    case AT_WEAP:
                     case "use_weapon":
                         $goto = null;   // use_weapon:
                         odd_claw = $c.i8(!odd_claw ? 1 : 0);
-                        if (weapon_used && sum[i - 1 | 0] > 0 && $G.uwep && (($G.uwep.oclass === 2 /* WEAPON_CLASS */ || $G.uwep.oclass === 6 /* TOOL_CLASS */) && objects[$G.uwep.otyp].oc_big | 0)) {
+                        if (weapon_used && sum[i - 1 | 0] > M_ATTK_MISS && $G.uwep && (($G.uwep.oclass === WEAPON_CLASS || $G.uwep.oclass === TOOL_CLASS) && objects[$G.uwep.otyp].oc_big | 0)) {
                             continue L2;
                         }
                         weapon_used = 1;
                         originalweapon = altwep && $G.uswapwep ? new $c.FieldRef($G, "uswapwep", "ptr") : new $c.FieldRef($G, "uwep", "ptr");
-                        if ($G.uswapwep && $G.uwep && ($G.uwep.oclass === 2 /* WEAPON_CLASS */ || $G.uwep.oclass === 6 /* TOOL_CLASS */ && objects[$G.uwep.otyp].oc_subtyp !== 0 /* P_NONE */) && !(($G.uwep.oclass === 2 /* WEAPON_CLASS */ || $G.uwep.oclass === 6 /* TOOL_CLASS */) && objects[$G.uwep.otyp].oc_big | 0) && !$G.uarms && !$G.uswapwep.oartifact && ($G.uswapwep.oclass === 2 /* WEAPON_CLASS */ || $G.uswapwep.oclass === 6 /* TOOL_CLASS */ && objects[$G.uswapwep.otyp].oc_subtyp !== 0 /* P_NONE */) && !($G.uswapwep.oclass === 2 /* WEAPON_CLASS */ && objects[$G.uswapwep.otyp].oc_subtyp >= 20 /* P_BOW */ && objects[$G.uswapwep.otyp].oc_subtyp <= 22 /* P_CROSSBOW */ || ($G.uswapwep.oclass === 2 /* WEAPON_CLASS */ || $G.uswapwep.oclass === 13 /* GEM_CLASS */) && objects[$G.uswapwep.otyp].oc_subtyp >= -22 && objects[$G.uswapwep.otyp].oc_subtyp <= -20 || ($G.uswapwep.oclass === 2 /* WEAPON_CLASS */ || $G.uswapwep.oclass === 6 /* TOOL_CLASS */) && objects[$G.uswapwep.otyp].oc_subtyp >= -25 && objects[$G.uswapwep.otyp].oc_subtyp <= -23) && !(($G.uswapwep.oclass === 2 /* WEAPON_CLASS */ || $G.uswapwep.oclass === 6 /* TOOL_CLASS */) && objects[$G.uswapwep.otyp].oc_big | 0) && !((objects[$G.uswapwep.otyp].oc_material | 0) === 14 /* SILVER */ && (u.ulycn >= 0 /* LOW_PM */ || hates_silver(gy.youmonst.data)))) {
+                        if ($G.uswapwep && $G.uwep && ($G.uwep.oclass === WEAPON_CLASS || $G.uwep.oclass === TOOL_CLASS && objects[$G.uwep.otyp].oc_subtyp !== P_NONE) && !(($G.uwep.oclass === WEAPON_CLASS || $G.uwep.oclass === TOOL_CLASS) && objects[$G.uwep.otyp].oc_big | 0) && !$G.uarms && !$G.uswapwep.oartifact && ($G.uswapwep.oclass === WEAPON_CLASS || $G.uswapwep.oclass === TOOL_CLASS && objects[$G.uswapwep.otyp].oc_subtyp !== P_NONE) && !($G.uswapwep.oclass === WEAPON_CLASS && objects[$G.uswapwep.otyp].oc_subtyp >= P_BOW && objects[$G.uswapwep.otyp].oc_subtyp <= P_CROSSBOW || ($G.uswapwep.oclass === WEAPON_CLASS || $G.uswapwep.oclass === GEM_CLASS) && objects[$G.uswapwep.otyp].oc_subtyp >= -P_CROSSBOW && objects[$G.uswapwep.otyp].oc_subtyp <= -P_BOW || ($G.uswapwep.oclass === WEAPON_CLASS || $G.uswapwep.oclass === TOOL_CLASS) && objects[$G.uswapwep.otyp].oc_subtyp >= -P_BOOMERANG && objects[$G.uswapwep.otyp].oc_subtyp <= -P_DART) && !(($G.uswapwep.oclass === WEAPON_CLASS || $G.uswapwep.oclass === TOOL_CLASS) && objects[$G.uswapwep.otyp].oc_big | 0) && !((objects[$G.uswapwep.otyp].oc_material | 0) === SILVER && (u.ulycn >= LOW_PM || hates_silver(gy.youmonst.data)))) {
                             altwep = $c.i8(!altwep ? 1 : 0);
                         }
                         weapon = originalweapon.get(0);
                         if (!weapon) {
                             originalweapon = new $c.FieldRef($G, "uarmg", "ptr");
                         }
-                        tmp = await find_roll_to_hit(mon, 254, weapon, new $c.Ptr(attknum, 0), new $c.Ptr(armorpenalty, 0));
+                        tmp = await find_roll_to_hit(mon, AT_WEAP, weapon, new $c.Ptr(attknum, 0), new $c.Ptr(armorpenalty, 0));
                         mon_maybe_unparalyze(mon);
                         dieroll = rnd(20);
                         dhit[0] = tmp > dieroll || u.uswallow | 0 ? 1 : 0;
@@ -4020,35 +4043,35 @@ async function hmonas(mon) {   // uhitm.c:5424
                         monster_survived = await known_hitum(mon, weapon, new $c.Ptr(dhit, 0), tmp, armorpenalty[0], mattk, dieroll);
                         weapon = originalweapon.get(0);
                         if (!monster_survived) {
-                            sum[i] = 2;
+                            sum[i] = M_ATTK_DEF_DIED;
                             break;
                         } else {
-                            sum[i] = dhit[0] ? 1 : 0;
+                            sum[i] = dhit[0] ? M_ATTK_HIT : M_ATTK_MISS;
                         }
                         if (!$c.peq(svl.level.monsters[u.ux + u.dx | 0][u.uy + u.dy | 0], mon)) {
-                            i = 6;
+                            i = NATTK;
                             break passivedone$;
                         }
-                        if (dhit[0] && mattk.adtyp !== 241 && mattk.adtyp !== 0) {
+                        if (dhit[0] && mattk.adtyp !== AD_SPEL && mattk.adtyp !== AD_PHYS) {
                             $t2 = await damageum(mon, mattk, 0), sum[i] = $t2;
                         }
                         break;
-                    case 1:
-                        if ($G.uwep && !($c.andu64(gy.youmonst.data.mflags1, 8192) !== 0 || gy.youmonst.data.msize < 1) && !weapon_used) {
+                    case AT_CLAW:
+                        if ($G.uwep && !($c.andu64(gy.youmonst.data.mflags1, M1_NOHANDS) !== 0 || gy.youmonst.data.msize < MZ_SMALL) && !weapon_used) {
                             $goto = "use_weapon"; continue S1;
                         }
-                    case 5:
-                        if ($G.uwep && gy.youmonst.data.mlet === 38 /* S_LICH */ && !weapon_used) {
+                    case AT_TUCH:
+                        if ($G.uwep && gy.youmonst.data.mlet === S_LICH && !weapon_used) {
                             $goto = "use_weapon"; continue S1;
                         }
-                    case 3:
-                        if (mattk.aatyp === 3 && mtrapped_in_pit(gy.youmonst)) {
+                    case AT_KICK:
+                        if (mattk.aatyp === AT_KICK && mtrapped_in_pit(gy.youmonst)) {
                             continue L2;
                         }
-                    case 2:
-                    case 6:
-                    case 4:
-                    case 16:
+                    case AT_BITE:
+                    case AT_STNG:
+                    case AT_BUTT:
+                    case AT_TENT:
                         tmp = await find_roll_to_hit(mon, mattk.aatyp, null, new $c.Ptr(attknum, 0), new $c.Ptr(armorpenalty, 0));
                         mon_maybe_unparalyze(mon);
                         dieroll = rnd(20);
@@ -4057,42 +4080,42 @@ async function hmonas(mon) {   // uhitm.c:5424
                             silverhit[0] = 0;
                             verb = null;
                             if (!u.uswallow && (compat = could_seduce(gy.youmonst, mon, mattk)) !== 0) {
-                                await You($c.lit("%s %s %s."), mon.mcansee | 0 && $c.andu64(mon.data.mflags1, 4096) === 0 ? $c.lit("smile at") : $c.lit("talk to"), await mon_nam(mon), compat === 2 ? $c.lit("engagingly") : $c.lit("seductively"));
+                                await You($c.lit("%s %s %s."), mon.mcansee | 0 && $c.andu64(mon.data.mflags1, M1_NOEYES) === 0 ? $c.lit("smile at") : $c.lit("talk to"), await mon_nam(mon), compat === 2 ? $c.lit("engagingly") : $c.lit("seductively"));
                                 $t3 = await damageum(mon, mattk, 0), sum[i] = $t3;
                                 break;
                             }
                             await wakeup(mon, 1);
                             specialdmg = 0;
                             switch (mattk.aatyp) {
-                                case 1:
-                                case 5:
-                                    verb = mattk.aatyp === 5 ? $c.lit("touch") : $c.lit("claws");
+                                case AT_CLAW:
+                                case AT_TUCH:
+                                    verb = mattk.aatyp === AT_TUCH ? $c.lit("touch") : $c.lit("claws");
                                     odd_claw = $c.i8(!odd_claw ? 1 : 0);
-                                    specialdmg = await special_dmgval(gy.youmonst, mon, $c.or64($c.or64(16, odd_claw || !multi_claw ? 131072 : 0), !odd_claw || !multi_claw ? 262144 : 0), new $c.Ptr(silverhit, 0));
+                                    specialdmg = await special_dmgval(gy.youmonst, mon, $c.or64($c.or64(W_ARMG, odd_claw || !multi_claw ? W_RINGL : 0), !odd_claw || !multi_claw ? W_RINGR : 0), new $c.Ptr(silverhit, 0));
                                     break;
-                                case 16:
+                                case AT_TENT:
                                     verb = $c.lit("tentacles");
                                     break;
-                                case 3:
+                                case AT_KICK:
                                     verb = $c.lit("kick");
-                                    specialdmg = await special_dmgval(gy.youmonst, mon, 32, new $c.Ptr(silverhit, 0));
+                                    specialdmg = await special_dmgval(gy.youmonst, mon, W_ARMF, new $c.Ptr(silverhit, 0));
                                     break;
-                                case 4:
+                                case AT_BUTT:
                                     verb = $c.lit("head butt");
-                                    specialdmg = await special_dmgval(gy.youmonst, mon, 4, new $c.Ptr(silverhit, 0));
+                                    specialdmg = await special_dmgval(gy.youmonst, mon, W_ARMH, new $c.Ptr(silverhit, 0));
                                     break;
-                                case 2:
+                                case AT_BITE:
                                     verb = $c.lit("bite");
                                     break;
-                                case 6:
+                                case AT_STNG:
                                     verb = $c.lit("sting");
                                     break;
                                 default:
                                     verb = $c.lit("hit");
                                     break;
                             }
-                            if ($c.peq(mon.data, $c.relem(mons, 288 /* PM_SHADE */)) && !specialdmg) {
-                                if (!$c.strcmp(verb, $c.lit("hit")) || mattk.aatyp === 1 && $c.andu64(mon.data.mflags1, 131072) !== 0) {
+                            if ($c.peq(mon.data, $c.relem(mons, PM_SHADE)) && !specialdmg) {
+                                if (!$c.strcmp(verb, $c.lit("hit")) || mattk.aatyp === AT_CLAW && $c.andu64(mon.data.mflags1, M1_HUMANOID) !== 0) {
                                     verb = $c.lit("attack");
                                 }
                                 await Your($c.lit("%s %s harmlessly through %s."), verb, await vtense(verb, $c.lit("pass")), await mon_nam(mon));
@@ -4100,10 +4123,10 @@ async function hmonas(mon) {   // uhitm.c:5424
                                 if (await failed_grab(gy.youmonst, mon, mattk)) {
                                     break;
                                 }
-                                if (mattk.aatyp === 16) {
+                                if (mattk.aatyp === AT_TENT) {
                                     await Your($c.lit("tentacles suck %s."), await mon_nam(mon));
                                 } else {
-                                    if (mattk.aatyp === 1) {
+                                    if (mattk.aatyp === AT_CLAW) {
                                         verb = $c.lit("hit");
                                     }
                                     await You($c.lit("%s %s."), verb, await mon_nam(mon));
@@ -4117,12 +4140,12 @@ async function hmonas(mon) {   // uhitm.c:5424
                             await missum(mon, mattk, $c.i8((tmp + armorpenalty[0] | 0) > dieroll ? 1 : 0));
                         }
                         break;
-                    case 7:
+                    case AT_HUGS:
                         {
                             silverhit$2[0] = 0;
-                            byhand = $c.i8($c.peq($c.relem(mons, u.umonnum), $c.relem(mons, 251 /* PM_ROPE_GOLEM */)) ? 1 : 0);
+                            byhand = $c.i8($c.peq($c.relem(mons, u.umonnum), $c.relem(mons, PM_ROPE_GOLEM)) ? 1 : 0);
                             unconcerned = $c.i8(byhand && !await can_be_strangled(mon) ? 1 : 0);
-                            if (sticks(mon.data) || u.uswallow | 0 || gn.notonhead || byhand && ($G.uwep || !($c.andu64(mon.data.mflags1, 32768) === 0))) {
+                            if (sticks(mon.data) || u.uswallow | 0 || gn.notonhead || byhand && ($G.uwep || !($c.andu64(mon.data.mflags1, M1_NOHEAD) === 0))) {
                                 if (byhand && $G.uwep && u.ustuck && !(sticks(u.ustuck.data) || u.uswallow | 0)) {
                                     await uunstick();
                                 }
@@ -4130,18 +4153,18 @@ async function hmonas(mon) {   // uhitm.c:5424
                             }
                             dhit[0] = 1;
                             await wakeup(mon, 1);
-                            specialdmg$2 = await special_dmgval(gy.youmonst, mon, byhand ? 393232 : 67, new $c.Ptr(silverhit$2, 0));
+                            specialdmg$2 = await special_dmgval(gy.youmonst, mon, byhand ? W_ARMG | W_RINGL | W_RINGR : W_ARMC | W_ARM | W_ARMU, new $c.Ptr(silverhit$2, 0));
                             if (unconcerned) {
                                 if (!$c.peq(mattk, alt_attk)) {
                                     alt_attk.$copyFrom(mattk);
                                     mattk = alt_attk;
                                 }
                                 $t5 = mattk.damd = 1, mattk.damn = $t5;
-                                if (specialdmg$2 || $c.andu64(mon.data.mflags1, 65536) !== 0 || mon.mhp <= (1 + (u.udaminc > 1 ? u.udaminc : 1) | 0)) {
+                                if (specialdmg$2 || $c.andu64(mon.data.mflags1, M1_MINDLESS) !== 0 || mon.mhp <= (1 + (u.udaminc > 1 ? u.udaminc : 1) | 0)) {
                                     unconcerned = 0;
                                 }
                             }
-                            if ($c.peq(mon.data, $c.relem(mons, 288 /* PM_SHADE */))) {
+                            if ($c.peq(mon.data, $c.relem(mons, PM_SHADE))) {
                                 verb$2 = byhand ? $c.lit("grasp") : $c.lit("hug");
                                 if (specialdmg$2) {
                                     await You($c.lit("%s %s%s"), verb$2, await mon_nam(mon), exclam(specialdmg$2));
@@ -4163,7 +4186,7 @@ async function hmonas(mon) {   // uhitm.c:5424
                                     await silver_sears(gy.youmonst, mon, silverhit$2[0]);
                                 }
                                 $t7 = await damageum(mon, mattk, specialdmg$2), sum[i] = $t7;
-                            } else if (i >= 2 && sum[i - 1 | 0] > 0 && sum[i - 2 | 0] > 0) {
+                            } else if (i >= 2 && sum[i - 1 | 0] > M_ATTK_MISS && sum[i - 2 | 0] > M_ATTK_MISS) {
                                 if (u.ustuck && !$c.peq(u.ustuck, mon)) {
                                     await uunstick();
                                 }
@@ -4176,24 +4199,24 @@ async function hmonas(mon) {   // uhitm.c:5424
                             }
                             break;
                         }
-                    case 13:
+                    case AT_EXPL:
                         dhit[0] = -1;
                         await wakeup(mon, 1);
                         await You($c.lit("explode!"));
                         $t9 = await explum(mon, mattk), sum[i] = $t9;
                         break;
-                    case 11:
+                    case AT_ENGL:
                         tmp = await find_roll_to_hit(mon, mattk.aatyp, null, new $c.Ptr(attknum, 0), new $c.Ptr(armorpenalty, 0));
                         mon_maybe_unparalyze(mon);
                         if (dhit[0] = tmp > rnd(20 + i | 0) ? 1 : 0) {
                             await wakeup(mon, 1);
-                            if ($c.peq(mon.data, $c.relem(mons, 288 /* PM_SHADE */))) {
+                            if ($c.peq(mon.data, $c.relem(mons, PM_SHADE))) {
                                 await Your($c.lit("attempt to surround %s is harmless."), await mon_nam(mon));
                             } else if (await failed_grab(gy.youmonst, mon, mattk)) {
                             } else {
                                 $t10 = await gulpum(mon, mattk), sum[i] = $t10;
-                                if (sum[i] === 2 && (mon.data.mlet === 52 /* S_ZOMBIE */ || mon.data.mlet === 39 /* S_MUMMY */) && rn2(5) && !(u.uprops[10 /* SICK_RES */].intrinsic || u.uprops[10 /* SICK_RES */].extrinsic || await defended(gy.youmonst, 33))) {
-                                    await You_feel($c.lit("%ssick."), u.uprops[17 /* SICK */].intrinsic ? $c.lit("very ") : $c.lit(""));
+                                if (sum[i] === M_ATTK_DEF_DIED && (mon.data.mlet === S_ZOMBIE || mon.data.mlet === S_MUMMY) && rn2(5) && !(u.uprops[SICK_RES].intrinsic || u.uprops[SICK_RES].extrinsic || await defended(gy.youmonst, AD_DISE))) {
+                                    await You_feel($c.lit("%ssick."), u.uprops[SICK].intrinsic ? $c.lit("very ") : $c.lit(""));
                                     await mdamageu(mon, rnd(8));
                                 }
                             }
@@ -4201,16 +4224,16 @@ async function hmonas(mon) {   // uhitm.c:5424
                             await missum(mon, mattk, 0);
                         }
                         break;
-                    case 255:
-                        if ((gy.youmonst.data.mlet === 11 /* S_KOBOLD */ || gy.youmonst.data.mlet === 15 /* S_ORC */ || gy.youmonst.data.mlet === 33 /* S_GNOME */) && !weapon_used) {
+                    case AT_MAGC:
+                        if ((gy.youmonst.data.mlet === S_KOBOLD || gy.youmonst.data.mlet === S_ORC || gy.youmonst.data.mlet === S_GNOME) && !weapon_used) {
                             $goto = "use_weapon"; continue S1;
                         }
-                    case 0:
-                    case 14:
+                    case AT_NONE:
+                    case AT_BOOM:
                         continue L2;
-                    case 12:
-                    case 10:
-                    case 15:
+                    case AT_BREA:
+                    case AT_SPIT:
+                    case AT_GAZE:
                         dhit[0] = 0;
                         break;
                     default:
@@ -4222,10 +4245,10 @@ async function hmonas(mon) {   // uhitm.c:5424
                 u.mh = -1;
                 await rehumanize();
             }
-            if (sum[i] === 2) {
+            if (sum[i] === M_ATTK_DEF_DIED) {
                 await passive(mon, weapon, 1, 0, mattk.aatyp, 0);
             } else {
-                await passive(mon, weapon, $c.i8(sum[i] !== 0 ? 1 : 0), 1, mattk.aatyp, 0);
+                await passive(mon, weapon, $c.i8(sum[i] !== M_ATTK_MISS ? 1 : 0), 1, mattk.aatyp, 0);
             }
             if (await mhitm_knockback(gy.youmonst, mon, mattk, new $c.Ptr(sum, i), weapon_used)) {
                 break;
@@ -4252,13 +4275,13 @@ async function hmonas(mon) {   // uhitm.c:5424
 export async function passive(mon, weapon, mhitb, maliveb, aatyp, wep_was_destroyed) {   // uhitm.c:5865
     let ptr = null, i = 0, tmp = 0, mhit = 0, malive = 0, protector = 0;
     ptr = mon.data;
-    mhit = mhitb ? 1 : 0;
-    malive = maliveb ? 1 : 0;
+    mhit = mhitb ? M_ATTK_HIT : M_ATTK_MISS;
+    malive = maliveb ? M_ATTK_HIT : M_ATTK_MISS;
     for (i = 0; ; i = i + 1 | 0) {
-        if (i >= 6) {
+        if (i >= NATTK) {
             return malive | mhit;
         }
-        if (ptr.mattk[i].aatyp === 0) {
+        if (ptr.mattk[i].aatyp === AT_NONE) {
             break;
         }
     }
@@ -4270,99 +4293,99 @@ export async function passive(mon, weapon, mhitb, maliveb, aatyp, wep_was_destro
         tmp = 0;
     }
     switch (ptr.mattk[i].adtyp) {
-        case 2:
+        case AD_FIRE:
             if (mhitb && !mon.mcan && weapon) {
-                if (aatyp === 3) {
+                if (aatyp === AT_KICK) {
                     if ($G.uarmf && !rn2(6)) {
-                        await erode_obj($G.uarmf, await xname($G.uarmf), 0, 5);
+                        await erode_obj($G.uarmf, await xname($G.uarmf), ERODE_BURN, EF_GREASE | EF_VERBOSE);
                     }
-                } else if (aatyp === 254 || aatyp === 1 || aatyp === 255 || aatyp === 5) {
+                } else if (aatyp === AT_WEAP || aatyp === AT_CLAW || aatyp === AT_MAGC || aatyp === AT_TUCH) {
                     await passive_obj(mon, weapon, $c.relem(ptr.mattk, i));
                 }
             }
             break;
-        case 8:
+        case AD_ACID:
             if (mhitb && rn2(2)) {
-                if ((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked || !flags.verbose) {
+                if ((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked || !flags.verbose) {
                     await You($c.lit("are splashed!"));
                 } else {
                     await You($c.lit("are splashed by %s %s!"), s_suffix(await mon_nam(mon)), hliquid($c.lit("acid")));
                 }
-                if (!(u.uprops[7 /* ACID_RES */].intrinsic || u.uprops[7 /* ACID_RES */].extrinsic)) {
+                if (!(u.uprops[ACID_RES].intrinsic || u.uprops[ACID_RES].extrinsic)) {
                     await mdamageu(mon, tmp);
-                    monstunseesu(128);
+                    monstunseesu(M_SEEN_ACID);
                 } else {
-                    monstseesu(128);
+                    monstseesu(M_SEEN_ACID);
                 }
                 if (!rn2(30)) {
-                    await erode_armor(gy.youmonst, 3);
+                    await erode_armor(gy.youmonst, ERODE_CORRODE);
                 }
             }
             if (mhitb && weapon) {
-                if (aatyp === 3) {
+                if (aatyp === AT_KICK) {
                     if ($G.uarmf && !rn2(6)) {
-                        await erode_obj($G.uarmf, await xname($G.uarmf), 3, 5);
+                        await erode_obj($G.uarmf, await xname($G.uarmf), ERODE_CORRODE, EF_GREASE | EF_VERBOSE);
                     }
-                } else if (aatyp === 254 || aatyp === 1 || aatyp === 255 || aatyp === 5) {
+                } else if (aatyp === AT_WEAP || aatyp === AT_CLAW || aatyp === AT_MAGC || aatyp === AT_TUCH) {
                     await passive_obj(mon, weapon, $c.relem(ptr.mattk, i));
                 }
             }
-            await exercise(0 /* A_STR */, 0);
+            await exercise(A_STR, 0);
             break;
-        case 18:
+        case AD_STON:
             if (mhitb) {
                 protector = attk_protection(aatyp);
-                if (aatyp === 255) {
-                    protector = 16;
+                if (aatyp === AT_MAGC) {
+                    protector = W_ARMG;
                 }
-                if (protector === 0 || protector === 16 && !$G.uarmg && !$G.uwep && !wep_was_destroyed || protector === 32 && !$G.uarmf || protector === 4 && !$G.uarmh || protector === 18 && (!$G.uarmc || !$G.uarmg)) {
-                    if (!(u.uprops[8 /* STONE_RES */].intrinsic || u.uprops[8 /* STONE_RES */].extrinsic) && !(poly_when_stoned(gy.youmonst.data) && await polymon(257 /* PM_STONE_GOLEM */))) {
-                        await done_in_by(mon, 8 /* STONING */);
-                        return 2;
+                if (protector === 0 || protector === W_ARMG && !$G.uarmg && !$G.uwep && !wep_was_destroyed || protector === W_ARMF && !$G.uarmf || protector === W_ARMH && !$G.uarmh || protector === (W_ARMC | W_ARMG) && (!$G.uarmc || !$G.uarmg)) {
+                    if (!(u.uprops[STONE_RES].intrinsic || u.uprops[STONE_RES].extrinsic) && !(poly_when_stoned(gy.youmonst.data) && await polymon(PM_STONE_GOLEM))) {
+                        await done_in_by(mon, STONING);
+                        return M_ATTK_DEF_DIED;
                     }
                 }
             }
             break;
-        case 24:
+        case AD_RUST:
             if (mhitb && !mon.mcan && weapon) {
-                if (aatyp === 3) {
+                if (aatyp === AT_KICK) {
                     if ($G.uarmf) {
-                        await erode_obj($G.uarmf, await xname($G.uarmf), 1, 5);
+                        await erode_obj($G.uarmf, await xname($G.uarmf), ERODE_RUST, EF_GREASE | EF_VERBOSE);
                     }
-                } else if (aatyp === 254 || aatyp === 1 || aatyp === 255 || aatyp === 5) {
+                } else if (aatyp === AT_WEAP || aatyp === AT_CLAW || aatyp === AT_MAGC || aatyp === AT_TUCH) {
                     await passive_obj(mon, weapon, $c.relem(ptr.mattk, i));
                 }
             }
             break;
-        case 42:
+        case AD_CORR:
             if (mhitb && !mon.mcan && weapon) {
-                if (aatyp === 3) {
+                if (aatyp === AT_KICK) {
                     if ($G.uarmf) {
-                        await erode_obj($G.uarmf, await xname($G.uarmf), 3, 5);
+                        await erode_obj($G.uarmf, await xname($G.uarmf), ERODE_CORRODE, EF_GREASE | EF_VERBOSE);
                     }
-                } else if (aatyp === 254 || aatyp === 1 || aatyp === 255 || aatyp === 5) {
+                } else if (aatyp === AT_WEAP || aatyp === AT_CLAW || aatyp === AT_MAGC || aatyp === AT_TUCH) {
                     await passive_obj(mon, weapon, $c.relem(ptr.mattk, i));
                 }
             }
             break;
-        case 1:
-            if (u.uprops[12 /* ANTIMAGIC */].intrinsic || u.uprops[12 /* ANTIMAGIC */].extrinsic) {
+        case AD_MAGM:
+            if (u.uprops[ANTIMAGIC].intrinsic || u.uprops[ANTIMAGIC].extrinsic) {
                 await shieldeff(u.ux, u.uy);
-                monstseesu(1);
+                monstseesu(M_SEEN_MAGR);
                 await pline($c.lit("A hail of magic missiles narrowly misses you!"));
             } else {
                 await You($c.lit("are hit by magic missiles appearing from thin air!"));
                 await mdamageu(mon, tmp);
-                monstunseesu(1);
+                monstunseesu(M_SEEN_MAGR);
             }
             break;
-        case 41:
+        case AD_ENCH:
             if (mhitb) {
-                if (aatyp === 3) {
+                if (aatyp === AT_KICK) {
                     if (!weapon) {
                         break;
                     }
-                } else if (aatyp === 2 || aatyp === 4 || aatyp >= 6 && aatyp < 254) {
+                } else if (aatyp === AT_BITE || aatyp === AT_BUTT || aatyp >= AT_STNG && aatyp < AT_WEAP) {
                     break;
                 } else {
                 }
@@ -4374,20 +4397,20 @@ export async function passive(mon, weapon, mhitb, maliveb, aatyp, wep_was_destro
     }
     if (malive && !mon.mcan && rn2(3)) {
         switch (ptr.mattk[i].adtyp) {
-            case 14:
-                if ($c.peq(ptr, $c.relem(mons, 28 /* PM_FLOATING_EYE */))) {
+            case AD_PLYS:
+                if ($c.peq(ptr, $c.relem(mons, PM_FLOATING_EYE))) {
                     if (!canseemon(mon)) {
                         break;
                     }
                     if (mon.mcansee) {
                         if (await ureflects($c.lit("%s gaze is reflected by your %s."), s_suffix(await Monnam(mon)))) {
-                        } else if (u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic) && rn2(4)) {
+                        } else if (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) && rn2(4)) {
                             await pline($c.lit("%s looks %s%s."), await Monnam(mon), !rn2(2) ? $c.lit("") : $c.lit("rather "), !rn2(2) ? $c.lit("numb") : $c.lit("stupefied"));
-                        } else if (u.uprops[66 /* FREE_ACTION */].extrinsic) {
+                        } else if (u.uprops[FREE_ACTION].extrinsic) {
                             await You($c.lit("momentarily stiffen under %s gaze!"), s_suffix(await mon_nam(mon)));
                         } else {
                             await You($c.lit("are frozen by %s gaze!"), s_suffix(await mon_nam(mon)));
-                            nomul(acurr(2 /* A_WIS */) > 12 || rn2(4) ? -tmp | 0 : -127);
+                            nomul(acurr(A_WIS) > 12 || rn2(4) ? -tmp | 0 : -127);
                             await dynamic_multi_reason(mon, $c.lit("frozen"), 1);
                             gn.nomovemsg = null;
                         }
@@ -4397,26 +4420,26 @@ export async function passive(mon, weapon, mhitb, maliveb, aatyp, wep_was_destro
                             change_luck(-1);
                         }
                     }
-                } else if (u.uprops[66 /* FREE_ACTION */].extrinsic) {
+                } else if (u.uprops[FREE_ACTION].extrinsic) {
                     await You($c.lit("momentarily stiffen."));
                 } else {
                     await You($c.lit("are frozen by %s!"), await mon_nam(mon));
                     gn.nomovemsg = c_common_strings.c_You_can_move_again;
                     nomul(-tmp | 0);
                     await dynamic_multi_reason(mon, $c.lit("frozen"), 0);
-                    await exercise(3 /* A_DEX */, 0);
+                    await exercise(A_DEX, 0);
                 }
                 break;
-            case 3:
+            case AD_COLD:
                 if (monnear(mon, u.ux, u.uy)) {
-                    if (u.uprops[2 /* COLD_RES */].intrinsic || u.uprops[2 /* COLD_RES */].extrinsic) {
+                    if (u.uprops[COLD_RES].intrinsic || u.uprops[COLD_RES].extrinsic) {
                         await shieldeff(u.ux, u.uy);
                         await You_feel($c.lit("a mild chill."));
-                        monstseesu(4);
-                        await ugolemeffects(3, tmp);
+                        monstseesu(M_SEEN_COLD);
+                        await ugolemeffects(AD_COLD, tmp);
                         break;
                     }
-                    monstunseesu(4);
+                    monstunseesu(M_SEEN_COLD);
                     await You($c.lit("are suddenly very cold!"));
                     await mdamageu(mon, tmp);
                     await healmon(mon, $c.div32(tmp + rn2(2) | 0, 2), $c.div32(tmp + 1 | 0, 2));
@@ -4425,34 +4448,34 @@ export async function passive(mon, weapon, mhitb, maliveb, aatyp, wep_was_destro
                     }
                 }
                 break;
-            case 12:
-                if (!u.uprops[13 /* STUNNED */].intrinsic) {
+            case AD_STUN:
+                if (!u.uprops[STUNNED].intrinsic) {
                     await make_stunned(tmp, 1);
                 }
                 break;
-            case 2:
+            case AD_FIRE:
                 if (monnear(mon, u.ux, u.uy)) {
-                    if (u.uprops[1 /* FIRE_RES */].intrinsic || u.uprops[1 /* FIRE_RES */].extrinsic) {
+                    if (u.uprops[FIRE_RES].intrinsic || u.uprops[FIRE_RES].extrinsic) {
                         await shieldeff(u.ux, u.uy);
                         await You_feel($c.lit("mildly warm."));
-                        monstseesu(2);
-                        await ugolemeffects(2, tmp);
+                        monstseesu(M_SEEN_FIRE);
+                        await ugolemeffects(AD_FIRE, tmp);
                         break;
                     }
-                    monstunseesu(2);
+                    monstunseesu(M_SEEN_FIRE);
                     await You($c.lit("are suddenly very hot!"));
                     await mdamageu(mon, tmp);
                 }
                 break;
-            case 6:
-                if (u.uprops[5 /* SHOCK_RES */].intrinsic || u.uprops[5 /* SHOCK_RES */].extrinsic) {
+            case AD_ELEC:
+                if (u.uprops[SHOCK_RES].intrinsic || u.uprops[SHOCK_RES].extrinsic) {
                     await shieldeff(u.ux, u.uy);
                     await You_feel($c.lit("a mild tingle."));
-                    monstseesu(32);
-                    await ugolemeffects(6, tmp);
+                    monstseesu(M_SEEN_ELEC);
+                    await ugolemeffects(AD_ELEC, tmp);
                     break;
                 }
-                monstunseesu(32);
+                monstunseesu(M_SEEN_ELEC);
                 await You($c.lit("are jolted with electricity!"));
                 await mdamageu(mon, tmp);
                 break;
@@ -4467,7 +4490,7 @@ export async function passive_obj(mon, obj, mattk) {   // uhitm.c:6127
     ptr = mon.data;
     if (!obj) {
         obj = u.twoweap && $G.uswapwep && !rn2(2) ? $G.uswapwep : $G.uwep;
-        if (!obj && mattk.adtyp === 41) {
+        if (!obj && mattk.adtyp === AD_ENCH) {
             obj = $G.uarmg;
         }
         if (!obj) {
@@ -4476,39 +4499,39 @@ export async function passive_obj(mon, obj, mattk) {   // uhitm.c:6127
     }
     if (!mattk) {
         for (i = 0; ; i = i + 1 | 0) {
-            if (i >= 6) {
+            if (i >= NATTK) {
                 return;
             }
-            if (ptr.mattk[i].aatyp === 0) {
+            if (ptr.mattk[i].aatyp === AT_NONE) {
                 break;
             }
         }
         mattk = $c.relem(ptr.mattk, i);
     }
     switch (mattk.adtyp) {
-        case 2:
-            if (!rn2(6) && !mon.mcan && !$c.peq(mon.data, $c.relem(mons, 110 /* PM_STEAM_VORTEX */))) {
-                await erode_obj(obj, null, 0, 0);
+        case AD_FIRE:
+            if (!rn2(6) && !mon.mcan && !$c.peq(mon.data, $c.relem(mons, PM_STEAM_VORTEX))) {
+                await erode_obj(obj, null, ERODE_BURN, EF_NONE);
             }
             break;
-        case 8:
+        case AD_ACID:
             if (!rn2(6)) {
-                await erode_obj(obj, null, 3, 1);
+                await erode_obj(obj, null, ERODE_CORRODE, EF_GREASE);
             }
             break;
-        case 24:
+        case AD_RUST:
             if (!mon.mcan) {
-                await erode_obj(obj, null, 1, 1);
+                await erode_obj(obj, null, ERODE_RUST, EF_GREASE);
             }
             break;
-        case 42:
+        case AD_CORR:
             if (!mon.mcan) {
-                await erode_obj(obj, null, 3, 1);
+                await erode_obj(obj, null, ERODE_CORRODE, EF_GREASE);
             }
             break;
-        case 41:
+        case AD_ENCH:
             if (!mon.mcan) {
-                if (await drain_item(obj, 1) && obj.where === 3 && (obj.known | 0 || obj.oclass === 3 /* ARMOR_CLASS */)) {
+                if (await drain_item(obj, 1) && obj.where === OBJ_INVENT && (obj.known | 0 || obj.oclass === ARMOR_CLASS)) {
                     await pline($c.lit("%s less effective."), await Yobjnam2(obj, $c.lit("seem")));
                 }
                 break;
@@ -4516,52 +4539,52 @@ export async function passive_obj(mon, obj, mattk) {   // uhitm.c:6127
         default:
             break;
     }
-    if (obj.where === 3) {
+    if (obj.where === OBJ_INVENT) {
         await update_inventory();
     }
 }
 export async function that_is_a_mimic(mtmp, mimic_flags) {   // uhitm.c:6201
     let fmtbuf = new Int8Array(256), what = null, reveal_it = 0, omit_wait = 0, x = 0, y = 0, glyph = 0, sym = 0, fakeobj = 0, otmp_name = null, otmp = [null], mtmp_name = null, mndx = 0, i = 0;
     what = null;
-    reveal_it = $c.i8((mimic_flags & 1) >>> 0 !== 0 ? 1 : 0);
-    omit_wait = $c.i8((mimic_flags & 2) >>> 0 !== 0 ? 1 : 0);
+    reveal_it = $c.i8((mimic_flags & MIM_REVEAL) >>> 0 !== 0 ? 1 : 0);
+    omit_wait = $c.i8((mimic_flags & MIM_OMIT_WAIT) >>> 0 !== 0 ? 1 : 0);
     $c.__builtin___strcpy_chk(new $c.Ptr(fmtbuf, 0), $c.lit("Wait!  That's %s!"), 256);
-    if ((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked) {
-        if (!(u.uprops[30 /* TELEPAT */].intrinsic || u.uprops[30 /* TELEPAT */].extrinsic)) {
+    if ((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked) {
+        if (!(u.uprops[TELEPAT].intrinsic || u.uprops[TELEPAT].extrinsic)) {
             what = new $c.Ptr(that_is_a_mimic$generic, 0);
-        } else if ((mtmp.m_ap_type & 7) === 3 /* M_AP_MONSTER */) {
+        } else if ((mtmp.m_ap_type & M_AP_TYPMASK) === M_AP_MONSTER) {
             what = await a_monnam(mtmp);
         }
     } else {
         x = mtmp.mx;
         y = mtmp.my;
         glyph = glyph_at(x, y);
-        if (glyph >= 3929 /* GLYPH_CMAP_STONE_OFF */ && glyph < 4093) {
+        if (glyph >= GLYPH_CMAP_STONE_OFF && glyph < GLYPH_CMAP_C_OFF + (S_goodpos - S_digbeam + 1)) {
             sym = glyph_to_cmap(glyph);
-            if ((mtmp.m_ap_type & 7) === 1 /* M_AP_FURNITURE */ || (mtmp.m_ap_type & 7) === 2 /* M_AP_OBJECT */ && sym === 73 /* S_trapped_chest */) {
+            if ((mtmp.m_ap_type & M_AP_TYPMASK) === M_AP_FURNITURE || (mtmp.m_ap_type & M_AP_TYPMASK) === M_AP_OBJECT && sym === S_trapped_chest) {
                 nh_snprintf($c.lit("that_is_a_mimic"), 6227, new $c.Ptr(fmtbuf, 0), 256, $c.lit("That %s actually is %%s!"), defsyms[sym].explanation);
             }
-        } else if (glyph === 3448 /* GLYPH_OBJ_OFF */ || glyph >= 3465 && glyph < 3929 || (glyph === 7992 /* GLYPH_OBJ_PILETOP_OFF */ || glyph > 8009 && glyph < 8473) || (glyph > 3448 /* GLYPH_OBJ_OFF */ && glyph < 3465 || glyph > 7992 /* GLYPH_OBJ_PILETOP_OFF */ && glyph < 8009) || (glyph >= 7226 /* GLYPH_STATUE_MALE_OFF */ && glyph < 7609 || glyph >= 8856 /* GLYPH_STATUE_MALE_PILETOP_OFF */ && glyph < 9239 || (glyph >= 7609 /* GLYPH_STATUE_FEM_OFF */ && glyph < 7992 || glyph >= 9239 /* GLYPH_STATUE_FEM_PILETOP_OFF */ && glyph < 9622)) || (glyph >= 2299 /* GLYPH_BODY_OFF */ && glyph < 2682 || glyph >= 8473 /* GLYPH_BODY_PILETOP_OFF */ && glyph < 8856)) {
+        } else if (glyph === GLYPH_OBJ_OFF || glyph >= GLYPH_OBJ_OFF + FIRST_OBJECT - 1 && glyph < GLYPH_OBJ_OFF + NUM_OBJECTS || (glyph === GLYPH_OBJ_PILETOP_OFF || glyph > GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT - 1 && glyph < GLYPH_OBJ_PILETOP_OFF + NUM_OBJECTS) || (glyph > GLYPH_OBJ_OFF && glyph < GLYPH_OBJ_OFF + FIRST_OBJECT - 1 || glyph > GLYPH_OBJ_PILETOP_OFF && glyph < GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT - 1) || (glyph >= GLYPH_STATUE_MALE_OFF && glyph < GLYPH_STATUE_MALE_OFF + NUMMONS || glyph >= GLYPH_STATUE_MALE_PILETOP_OFF && glyph < GLYPH_STATUE_MALE_PILETOP_OFF + NUMMONS || (glyph >= GLYPH_STATUE_FEM_OFF && glyph < GLYPH_STATUE_FEM_OFF + NUMMONS || glyph >= GLYPH_STATUE_FEM_PILETOP_OFF && glyph < GLYPH_STATUE_FEM_PILETOP_OFF + NUMMONS)) || (glyph >= GLYPH_BODY_OFF && glyph < GLYPH_BODY_OFF + NUMMONS || glyph >= GLYPH_BODY_PILETOP_OFF && glyph < GLYPH_BODY_PILETOP_OFF + NUMMONS)) {
             otmp[0] = null;
             fakeobj = await object_from_map(glyph, x, y, new $c.Ptr(otmp, 0));
-            otmp_name = otmp[0] && otmp[0].otyp !== 0 /* STRANGE_OBJECT */ ? await simpleonames(otmp[0]) : $c.lit("strange object");
-            nh_snprintf($c.lit("that_is_a_mimic"), 6238, new $c.Ptr(fmtbuf, 0), 256, $c.lit("%s %s %s %%s!"), otmp[0] && (otmp[0].quan !== 1 || otmp[0].oartifact === 26 /* ART_EYES_OF_THE_OVERWORLD */ && !undiscovered_artifact(26)) ? $c.lit("Those") : $c.lit("That"), otmp_name, otmp[0] ? await otense(otmp[0], $c.lit("are")) : $c.lit("is"));
+            otmp_name = otmp[0] && otmp[0].otyp !== STRANGE_OBJECT ? await simpleonames(otmp[0]) : $c.lit("strange object");
+            nh_snprintf($c.lit("that_is_a_mimic"), 6238, new $c.Ptr(fmtbuf, 0), 256, $c.lit("%s %s %s %%s!"), otmp[0] && (otmp[0].quan !== 1 || otmp[0].oartifact === ART_EYES_OF_THE_OVERWORLD && !undiscovered_artifact(ART_EYES_OF_THE_OVERWORLD)) ? $c.lit("Those") : $c.lit("That"), otmp_name, otmp[0] ? await otense(otmp[0], $c.lit("are")) : $c.lit("is"));
             if (fakeobj && otmp[0]) {
-                otmp[0].where = 0;
+                otmp[0].where = OBJ_FREE;
                 await dealloc_obj(otmp[0]);
             }
-        } else if (glyph >= 0 /* GLYPH_MON_MALE_OFF */ && glyph < 383 || glyph >= 383 /* GLYPH_MON_FEM_OFF */ && glyph < 766 || (glyph >= 766 /* GLYPH_PET_MALE_OFF */ && glyph < 1149 || glyph >= 1149 /* GLYPH_PET_FEM_OFF */ && glyph < 1532) || (glyph >= 2682 /* GLYPH_RIDDEN_MALE_OFF */ && glyph < 3065 || glyph >= 3065 /* GLYPH_RIDDEN_FEM_OFF */ && glyph < 3448) || (glyph >= 1533 /* GLYPH_DETECT_MALE_OFF */ && glyph < 1916 || glyph >= 1916 /* GLYPH_DETECT_FEM_OFF */ && glyph < 2299)) {
-            mndx = glyph >= 383 /* GLYPH_MON_FEM_OFF */ && glyph < 766 ? glyph - 383 /* GLYPH_MON_FEM_OFF */ | 0 : glyph >= 0 /* GLYPH_MON_MALE_OFF */ && glyph < 383 ? glyph - 0 /* GLYPH_MON_MALE_OFF */ | 0 : glyph >= 1149 /* GLYPH_PET_FEM_OFF */ && glyph < 1532 ? glyph - 1149 /* GLYPH_PET_FEM_OFF */ | 0 : glyph >= 766 /* GLYPH_PET_MALE_OFF */ && glyph < 1149 ? glyph - 766 /* GLYPH_PET_MALE_OFF */ | 0 : glyph >= 1916 /* GLYPH_DETECT_FEM_OFF */ && glyph < 2299 ? glyph - 1916 /* GLYPH_DETECT_FEM_OFF */ | 0 : glyph >= 1533 /* GLYPH_DETECT_MALE_OFF */ && glyph < 1916 ? glyph - 1533 /* GLYPH_DETECT_MALE_OFF */ | 0 : glyph >= 3065 /* GLYPH_RIDDEN_FEM_OFF */ && glyph < 3448 ? glyph - 3065 /* GLYPH_RIDDEN_FEM_OFF */ | 0 : glyph >= 2682 /* GLYPH_RIDDEN_MALE_OFF */ && glyph < 3065 ? glyph - 2682 /* GLYPH_RIDDEN_MALE_OFF */ | 0 : 383 /* NUMMONS */;
-            (!(mndx >= 0 /* LOW_PM */ && mndx <= 382 /* HIGH_PM */) ? 1 : 0) ? $c.__assert_rtn($c.lit("that_is_a_mimic"), $c.lit("uhitm.c"), 6247, $c.lit("mndx >= LOW_PM && mndx <= HIGH_PM")) : 0;
+        } else if (glyph >= GLYPH_MON_MALE_OFF && glyph < GLYPH_MON_MALE_OFF + NUMMONS || glyph >= GLYPH_MON_FEM_OFF && glyph < GLYPH_MON_FEM_OFF + NUMMONS || (glyph >= GLYPH_PET_MALE_OFF && glyph < GLYPH_PET_MALE_OFF + NUMMONS || glyph >= GLYPH_PET_FEM_OFF && glyph < GLYPH_PET_FEM_OFF + NUMMONS) || (glyph >= GLYPH_RIDDEN_MALE_OFF && glyph < GLYPH_RIDDEN_MALE_OFF + NUMMONS || glyph >= GLYPH_RIDDEN_FEM_OFF && glyph < GLYPH_RIDDEN_FEM_OFF + NUMMONS) || (glyph >= GLYPH_DETECT_MALE_OFF && glyph < GLYPH_DETECT_MALE_OFF + NUMMONS || glyph >= GLYPH_DETECT_FEM_OFF && glyph < GLYPH_DETECT_FEM_OFF + NUMMONS)) {
+            mndx = glyph >= GLYPH_MON_FEM_OFF && glyph < GLYPH_MON_FEM_OFF + NUMMONS ? glyph - GLYPH_MON_FEM_OFF | 0 : glyph >= GLYPH_MON_MALE_OFF && glyph < GLYPH_MON_MALE_OFF + NUMMONS ? glyph - GLYPH_MON_MALE_OFF | 0 : glyph >= GLYPH_PET_FEM_OFF && glyph < GLYPH_PET_FEM_OFF + NUMMONS ? glyph - GLYPH_PET_FEM_OFF | 0 : glyph >= GLYPH_PET_MALE_OFF && glyph < GLYPH_PET_MALE_OFF + NUMMONS ? glyph - GLYPH_PET_MALE_OFF | 0 : glyph >= GLYPH_DETECT_FEM_OFF && glyph < GLYPH_DETECT_FEM_OFF + NUMMONS ? glyph - GLYPH_DETECT_FEM_OFF | 0 : glyph >= GLYPH_DETECT_MALE_OFF && glyph < GLYPH_DETECT_MALE_OFF + NUMMONS ? glyph - GLYPH_DETECT_MALE_OFF | 0 : glyph >= GLYPH_RIDDEN_FEM_OFF && glyph < GLYPH_RIDDEN_FEM_OFF + NUMMONS ? glyph - GLYPH_RIDDEN_FEM_OFF | 0 : glyph >= GLYPH_RIDDEN_MALE_OFF && glyph < GLYPH_RIDDEN_MALE_OFF + NUMMONS ? glyph - GLYPH_RIDDEN_MALE_OFF | 0 : NUMMONS;
+            (!(mndx >= LOW_PM && mndx <= HIGH_PM) ? 1 : 0) ? $c.__assert_rtn($c.lit("that_is_a_mimic"), $c.lit("uhitm.c"), 6247, $c.lit("mndx >= LOW_PM && mndx <= HIGH_PM")) : 0;
             mtmp_name = pmname($c.relem(mons, mndx), Mgender(mtmp));
             nh_snprintf($c.lit("that_is_a_mimic"), 6250, new $c.Ptr(fmtbuf, 0), 256, $c.lit("Wait!  That %s is really %%s!"), mtmp_name);
         }
-        if (mtmp.minvis | 0 && !(u.uprops[29 /* SEE_INVIS */].intrinsic || u.uprops[29 /* SEE_INVIS */].extrinsic)) {
+        if (mtmp.minvis | 0 && !(u.uprops[SEE_INVIS].intrinsic || u.uprops[SEE_INVIS].extrinsic)) {
             what = new $c.Ptr(that_is_a_mimic$generic, 0);
-        } else if ((mtmp.m_ap_type & 7) === 3 /* M_AP_MONSTER */) {
-            what = await x_monnam(mtmp, 2, $c.asArr(null, Int8Array), 31, 1);
-        } else if (mtmp.data.mlet === 13 /* S_MIMIC */ && ((mtmp.m_ap_type & 7) === 2 /* M_AP_OBJECT */ || (mtmp.m_ap_type & 7) === 1 /* M_AP_FURNITURE */) && (mtmp.msleeping | 0 || mtmp.mfrozen | 0)) {
-            what = await x_monnam(mtmp, 2, $c.lit("sleeping"), 0, 0);
+        } else if ((mtmp.m_ap_type & M_AP_TYPMASK) === M_AP_MONSTER) {
+            what = await x_monnam(mtmp, ARTICLE_A, $c.asArr(null, Int8Array), EXACT_NAME, 1);
+        } else if (mtmp.data.mlet === S_MIMIC && ((mtmp.m_ap_type & M_AP_TYPMASK) === M_AP_OBJECT || (mtmp.m_ap_type & M_AP_TYPMASK) === M_AP_FURNITURE) && (mtmp.msleeping | 0 || mtmp.mfrozen | 0)) {
+            what = await x_monnam(mtmp, ARTICLE_A, $c.lit("sleeping"), 0, 0);
         } else {
             what = await a_monnam(mtmp);
         }
@@ -4575,28 +4598,28 @@ export async function that_is_a_mimic(mtmp, mimic_flags) {   // uhitm.c:6201
     }
 }
 export async function stumble_onto_mimic(mtmp) {   // uhitm.c:6282
-    await that_is_a_mimic(mtmp, 1);
-    if (!u.ustuck && !mtmp.mflee && dmgtype(mtmp.data, 19) && dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 2) {
+    await that_is_a_mimic(mtmp, MIM_REVEAL);
+    if (!u.ustuck && !mtmp.mflee && dmgtype(mtmp.data, AD_STCK) && dist2(mtmp.mx, mtmp.my, u.ux, u.uy) <= 2) {
         await set_ustuck(mtmp);
     }
     await wakeup(mtmp, 0);
-    if (!(canseemon(mtmp) || sensemon(mtmp)) && !(svl.level.locations[mtmp.mx][mtmp.my].glyph === 1532 /* GLYPH_INVIS_OFF */)) {
+    if (!(canseemon(mtmp) || sensemon(mtmp)) && !(svl.level.locations[mtmp.mx][mtmp.my].glyph === GLYPH_INVIS_OFF)) {
         await map_invisible(mtmp.mx, mtmp.my);
     }
 }
 export function disguised_as_non_mon(mtmp) {   // uhitm.c:6300
-    return $c.i8(!sensemon(mtmp) && mtmp.m_ap_type & 7 && (mtmp.m_ap_type & 7) !== 3 /* M_AP_MONSTER */ ? 1 : 0);
+    return $c.i8(!sensemon(mtmp) && mtmp.m_ap_type & M_AP_TYPMASK && (mtmp.m_ap_type & M_AP_TYPMASK) !== M_AP_MONSTER ? 1 : 0);
 }
 export function disguised_as_mon(mtmp) {   // uhitm.c:6308
-    return $c.i8(mtmp.m_ap_type & 7 && (mtmp.m_ap_type & 7) === 3 /* M_AP_MONSTER */ ? 1 : 0);
+    return $c.i8(mtmp.m_ap_type & M_AP_TYPMASK && (mtmp.m_ap_type & M_AP_TYPMASK) === M_AP_MONSTER ? 1 : 0);
 }
 async function nohandglow(mon) {   // uhitm.c:6315
     let hands = null, altfeedback = 0;
     if (!u.umconf || mon.mconf | 0) {
         return;
     }
-    hands = await makeplural(await body_part(6 /* HAND */));
-    altfeedback = $c.i8((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked || (u.uprops[40 /* INVIS */].intrinsic || u.uprops[40 /* INVIS */].extrinsic) && !u.uprops[40 /* INVIS */].blocked && !(u.uprops[29 /* SEE_INVIS */].intrinsic || u.uprops[29 /* SEE_INVIS */].extrinsic) ? 1 : 0);
+    hands = await makeplural(await body_part(HAND));
+    altfeedback = $c.i8((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked || (u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked && !(u.uprops[SEE_INVIS].intrinsic || u.uprops[SEE_INVIS].extrinsic) ? 1 : 0);
     if (u.umconf === 1) {
         if (altfeedback) {
             await Your($c.lit("%s stop tingling."), hands);
@@ -4622,30 +4645,30 @@ export async function flash_hits_mon(mtmp, otmp) {   // uhitm.c:6341
     }
     lev = $c.relem(svl.level.locations[mx], my);
     useeit = canseemon(mtmp);
-    if ((mtmp.m_ap_type & 7) !== 0 /* M_AP_NOTHING */) {
+    if ((mtmp.m_ap_type & M_AP_TYPMASK) !== M_AP_NOTHING) {
         oldglyph = glyph_at(mx, my);
-        await mhidden_description(mtmp, 4, new $c.Ptr(whatbuf, 0));
+        await mhidden_description(mtmp, MHID_ALTMON, new $c.Ptr(whatbuf, 0));
         await wakeup(mtmp, 0);
         if (glyph_at(mx, my) !== oldglyph) {
-            await pline($c.lit("That %s is really %s%c"), new $c.Ptr(whatbuf, 0), await x_monnam(mtmp, mtmp.mtame ? 3 : 2, null, 0, 0), mtmp.mtame ? 46 : 33);
+            await pline($c.lit("That %s is really %s%c"), new $c.Ptr(whatbuf, 0), await x_monnam(mtmp, mtmp.mtame ? ARTICLE_YOUR : ARTICLE_A, null, 0, 0), mtmp.mtame ? 46 : 33);
             res = 1;
         }
     }
-    if (mtmp.msleeping | 0 && $c.andu64(mtmp.data.mflags1, 4096) === 0) {
+    if (mtmp.msleeping | 0 && $c.andu64(mtmp.data.mflags1, M1_NOEYES) === 0) {
         mtmp.msleeping = (0) & 1;
         if (useeit) {
             await pline_The($c.lit("flash awakens %s."), await mon_nam(mtmp));
             res = 1;
         }
-    } else if (mtmp.data.mlet !== 25 /* S_LIGHT */) {
+    } else if (mtmp.data.mlet !== S_LIGHT) {
         if (!await resists_blnd(mtmp)) {
             tmp = dist2(otmp.ox, otmp.oy, mx, my);
             if (useeit) {
                 await pline($c.lit("%s is blinded by the flash!"), await Monnam(mtmp));
                 res = 1;
             }
-            if ($c.peq(mtmp.data, $c.relem(mons, 40 /* PM_GREMLIN */))) {
-                amt = otmp.otyp === 410 /* WAN_LIGHT */ ? d(1 + otmp.spe | 0, 4) : rnd(mtmp.mhp < 4 ? mtmp.mhp : 4);
+            if ($c.peq(mtmp.data, $c.relem(mons, PM_GREMLIN))) {
+                amt = otmp.otyp === WAN_LIGHT ? d(1 + otmp.spe | 0, 4) : rnd(mtmp.mhp < 4 ? mtmp.mhp : 4);
                 await light_hits_gremlin(mtmp, amt);
             }
             if (!(mtmp.mhp < 1)) {
@@ -4681,7 +4704,7 @@ export async function flash_hits_mon(mtmp, otmp) {   // uhitm.c:6341
     return res;
 }
 export async function light_hits_gremlin(mon, dmg) {   // uhitm.c:6425
-    if (!(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf) && dist2(mon.mx, mon.my, u.ux, u.uy) <= 90) {
+    if (!(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf) && dist2(mon.mx, mon.my, u.ux, u.uy) <= 90) {
         await pline_mon(mon, $c.lit("%s %s!"), await Monnam(mon), dmg > $c.div32(mon.mhp, 2) ? $c.lit("wails in agony") : $c.lit("cries out in pain"));
     } else if (canseemon(mon)) {
         await pline_mon(mon, $c.lit("%s recoils from the light!"), await Monnam(mon));
@@ -4690,11 +4713,11 @@ export async function light_hits_gremlin(mon, dmg) {   // uhitm.c:6425
     await wake_nearto(mon.mx, mon.my, 30);
     if (mon.mhp < 1) {
         if (svc.context.mon_moving) {
-            await monkilled(mon, null, 11);
+            await monkilled(mon, null, AD_BLND);
         } else {
             await killed(mon);
         }
-    } else if ((gv.viz_array.get(mon.my).get(mon.mx) & 2) !== 0 && !(canseemon(mon) || sensemon(mon))) {
+    } else if ((gv.viz_array.get(mon.my).get(mon.mx) & IN_SIGHT) !== 0 && !(canseemon(mon) || sensemon(mon))) {
         await map_invisible(mon.mx, mon.my);
     }
 }

@@ -5,7 +5,9 @@ import { $G } from './globals.js';
 import { stop_occupation } from './allmain.js';
 import { o_unleash } from './apply.js';
 import { touch_artifact } from './artifact.js';
+import { ART_ORB_OF_DETECTION } from './artilist.h.js';
 import { disp, flags, ga, gi, gk, gm, gn, go, gs, gt, gv, gy, iflags, svl, u } from './decl.js';
+import { AMULET_CLASS, ARMOR_CLASS, COIN_CLASS, FOOD_CLASS, RING_CLASS, ROCK_CLASS, S_NYMPH, TOOL_CLASS, WEAPON_CLASS } from './defsym.h.js';
 import { canseemon, newsym, sensemon } from './display.js';
 import { flooreffects } from './do.js';
 import { Adjmonnam, Mgender, Monnam, Some_Monnam, pmname, y_monnam } from './do_name.js';
@@ -13,34 +15,46 @@ import { Amulet_off, Armor_off, Blindf_off, Boots_off, Cloak_off, Gloves_off, He
 import { droppables } from './dogmove.js';
 import { is_fainted, maybe_finished_meal } from './eat.js';
 import { debugcore } from './files.js';
+import { PLNMSG_MON_TAKES_OFF_ITEM } from './flag.h.js';
+import { LARGEST_INT } from './global.h.js';
 import { in_rooms, inv_cnt, money_cnt, nomul } from './hack.js';
+import { FOOT, HAND, RLOC_MSG } from './hack.h.js';
 import { copynchars, dist2, s_suffix, strstri, strsubst, upstart } from './hacklib.js';
 import { carry_obj_effects, count_unpaid, freeinv, g_at, stackobj } from './invent.js';
 import { obj_sheds_light, snuff_light_source } from './light.js';
 import { add_to_minv, obj_extract_self, place_object, splitobj, unknow_object } from './mkobj.js';
+import { SHOPBASE } from './mkroom.h.js';
 import { can_carry, monnear } from './mon.js';
+import { AD_SITM, AT_ENGL } from './monattk.h.js';
 import { attacktype, dmgtype } from './mondata.js';
+import { M1_ANIMAL, M1_FLY, M1_SLITHY, M1_TPORT, M2_ROCKTHROW } from './monflag.h.js';
 import { monflee } from './monmove.js';
 import { mons } from './monst.js';
+import { PM_CHICKATRICE, PM_COCKATRICE } from './monsters.h.js';
+import { LOST_DROPPED, LOST_NONE, LOST_STOLEN, LOST_THROWN, OBJ_DELETED, OBJ_INVENT } from './obj.h.js';
 import { objects } from './objects.js';
+import { AMULET_OF_YENDOR, BELL, BELL_OF_OPENING, BOULDER, CANDELABRUM_OF_INVOCATION, CORPSE, FAKE_AMULET_OF_YENDOR, GOLD_PIECE, LEASH, SPE_BOOK_OF_THE_DEAD } from './objects.h.js';
 import { Tobjnam, armor_simple_name, distant_name, doname, makeplural, otense, simpleonames, yname } from './objnam.js';
 import { encumber_msg } from './pickup.js';
 import { You, Your, impossible, pline, pline_mon, urgent_pline } from './pline.js';
 import { body_part, mbodypart, skinback } from './polyself.js';
+import { ADORNED, BLINDED, CONFLICT, FLYING, LEVITATION, W_AMUL, W_ARM, W_ARMC, W_ARMF, W_ARMG, W_ARMH, W_ARMS, W_ARMU, W_BALL, W_CHAIN, W_QUIVER, W_RINGL, W_RINGR, W_SADDLE, W_SWAPWEP, W_TOOL, W_WEP } from './prop.h.js';
 import { is_quest_artifact } from './questpgr.js';
 import { unpunish } from './read.js';
 import { rn2, rnd } from './rnd.js';
 import { costly_spot, find_objowner, obfree, shop_keeper, subfrombill } from './shk.js';
 import { rloc, rloco, tele_restrict } from './teleport.js';
 import { minstapetrify, openholdingtrap, unconscious } from './trap.js';
+import { IN_SIGHT } from './vision.h.js';
 import { uqwepgone, uswapwepgone, uwepgone, welded } from './wield.js';
 import { extract_from_minvent, setnotworn, setworn, update_mon_extrinsics } from './worn.js';
+import { LEFT_HANDED, TT_BURIEDBALL } from './you.h.js';
 import { obj_resists } from './zap.js';
 
 const steal$how = $c.nulls(4);   // static in steal()
 export function somegold(lmoney) {   // steal.c:14
     let igold = 0;
-    igold = lmoney >= 32767 ? 32767 : $c.i32(lmoney);
+    igold = lmoney >= LARGEST_INT ? LARGEST_INT : $c.i32(lmoney);
     if (igold < 50) {
     } else if (igold < 100) {
         igold = rn2((igold - 25 | 0) + 1 | 0) + 25 | 0;
@@ -60,7 +74,7 @@ export function somegold(lmoney) {   // steal.c:14
 export function findgold(argchain) {   // steal.c:45
     let chain = null;
     chain = argchain;
-    while (chain && chain.otyp !== 438 /* GOLD_PIECE */) {
+    while (chain && chain.otyp !== GOLD_PIECE) {
         chain = chain.nobj;
     }
     return chain;
@@ -68,7 +82,7 @@ export function findgold(argchain) {   // steal.c:45
 export async function stealgold(mtmp) {   // steal.c:58
     let fgold = null, ygold = null, tmp = 0, who = null, whose = null, what = null, gold_price = 0;
     fgold = g_at(u.ux, u.uy);
-    while (fgold && fgold.otyp !== 438 /* GOLD_PIECE */) {
+    while (fgold && fgold.otyp !== GOLD_PIECE) {
         fgold = fgold.v.v_nexthere;
     }
     ygold = findgold(gi.invent);
@@ -79,27 +93,27 @@ export async function stealgold(mtmp) {   // steal.c:58
         if (u.usteed) {
             who = u.usteed;
             whose = s_suffix(await y_monnam(who));
-            what = await makeplural(await mbodypart(who, 5 /* FOOT */));
+            what = await makeplural(await mbodypart(who, FOOT));
         } else {
             who = gy.youmonst;
             whose = $c.lit("your");
-            what = await makeplural(await body_part(5 /* FOOT */));
+            what = await makeplural(await body_part(FOOT));
         }
-        if ($c.andu64(who.data.mflags1, 524288) !== 0) {
+        if ($c.andu64(who.data.mflags1, M1_SLITHY) !== 0) {
             what = $c.lit("coils");
         }
         if (!$c.strncmp(what, $c.lit("rear "), 5)) {
             what = what.add(5);
         }
-        await pline($c.lit("%s quickly snatches some gold from %s %s %s!"), await Monnam(mtmp), (u.uprops[48 /* LEVITATION */].intrinsic || u.uprops[48 /* LEVITATION */].extrinsic) && !u.uprops[48 /* LEVITATION */].blocked || (u.uprops[49 /* FLYING */].intrinsic || u.uprops[49 /* FLYING */].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, 1) !== 0) && !u.uprops[49 /* FLYING */].blocked ? $c.lit("beneath") : $c.lit("between"), whose, what);
+        await pline($c.lit("%s quickly snatches some gold from %s %s %s!"), await Monnam(mtmp), (u.uprops[LEVITATION].intrinsic || u.uprops[LEVITATION].extrinsic) && !u.uprops[LEVITATION].blocked || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked ? $c.lit("beneath") : $c.lit("between"), whose, what);
         if (!ygold || !rn2(5)) {
             if (!await tele_restrict(mtmp)) {
-                await rloc(mtmp, 2);
+                await rloc(mtmp, RLOC_MSG);
             }
             await monflee(mtmp, 0, 0, 0);
         }
     } else if (ygold) {
-        gold_price = objects[438 /* GOLD_PIECE */].oc_cost;
+        gold_price = objects[GOLD_PIECE].oc_cost;
         tmp = $c.div64($c.sub64($c.add64(somegold(money_cnt(gi.invent)), gold_price), 1), gold_price);
         tmp = tmp < ygold.quan ? tmp : ygold.quan;
         if (tmp < ygold.quan) {
@@ -111,7 +125,7 @@ export async function stealgold(mtmp) {   // steal.c:58
         await add_to_minv(mtmp, ygold);
         await Your($c.lit("purse feels lighter."));
         if (!await tele_restrict(mtmp)) {
-            await rloc(mtmp, 2);
+            await rloc(mtmp, RLOC_MSG);
         }
         await monflee(mtmp, 0, 0, 0);
         disp.botl = 1;
@@ -158,7 +172,7 @@ async function stealarm() {   // steal.c:165
                             await impossible($c.lit("stealarm(): dead monster stealing"));
                             break botm$;
                         }
-                        if (!dmgtype(mtmp.data, 21) || dist2(mtmp.mx, mtmp.my, u.ux, u.uy) > 2) {
+                        if (!dmgtype(mtmp.data, AD_SITM) || dist2(mtmp.mx, mtmp.my, u.ux, u.uy) > 2) {
                             break botm$;
                         }
                         if (otmp.unpaid) {
@@ -169,7 +183,7 @@ async function stealarm() {   // steal.c:165
                         await mpickobj(mtmp, otmp);
                         await monflee(mtmp, 0, 0, 0);
                         if (!await tele_restrict(mtmp)) {
-                            await rloc(mtmp, 2);
+                            await rloc(mtmp, RLOC_MSG);
                         }
                         break;
                     }
@@ -191,7 +205,7 @@ export async function remove_worn_item(obj, unchain_ball) {   // steal.c:213
     }
     oldinuse = obj.in_use;
     obj.in_use = (1) & 1;
-    if ($c.and64(obj.owornmask, 127)) {
+    if ($c.and64(obj.owornmask, W_ARM | W_ARMC | W_ARMH | W_ARMS | W_ARMG | W_ARMF | W_ARMU)) {
         if ($c.peq(obj, $G.uskin)) {
             await impossible($c.lit("Removing embedded scales?"));
             await skinback(1);
@@ -211,15 +225,15 @@ export async function remove_worn_item(obj, unchain_ball) {   // steal.c:213
         } else if ($c.peq(obj, $G.uarmu)) {
             await Shirt_off();
         } else {
-            await setworn(null, $c.and64(obj.owornmask, 127));
+            await setworn(null, $c.and64(obj.owornmask, W_ARM | W_ARMC | W_ARMH | W_ARMS | W_ARMG | W_ARMF | W_ARMU));
         }
-    } else if ($c.and64(obj.owornmask, 65536)) {
+    } else if ($c.and64(obj.owornmask, W_AMUL)) {
         await Amulet_off();
-    } else if ($c.and64(obj.owornmask, 393216)) {
+    } else if ($c.and64(obj.owornmask, W_RINGL | W_RINGR)) {
         await Ring_gone(obj);
-    } else if ($c.and64(obj.owornmask, 524288)) {
+    } else if ($c.and64(obj.owornmask, W_TOOL)) {
         await Blindf_off(obj);
-    } else if ($c.and64(obj.owornmask, 1792)) {
+    } else if ($c.and64(obj.owornmask, W_WEP | W_SWAPWEP | W_QUIVER)) {
         if ($c.peq(obj, $G.uwep)) {
             await uwepgone();
         }
@@ -230,14 +244,14 @@ export async function remove_worn_item(obj, unchain_ball) {   // steal.c:213
             await uqwepgone();
         }
     }
-    if ($c.and64(obj.owornmask, 6291456)) {
+    if ($c.and64(obj.owornmask, W_BALL | W_CHAIN)) {
         if (unchain_ball) {
             await unpunish();
         }
     } else if (obj.owornmask) {
         await setnotworn(obj);
     }
-    if (obj.where === 9) {
+    if (obj.where === OBJ_DELETED) {
         do {
             if (debugcore($c.lit("steal.c"), 1)) {
                 save_plnmsg = iflags.last_msg;
@@ -261,9 +275,9 @@ async function worn_item_removal(mon, obj) {   // steal.c:294
     if ((p = strstri(new $c.Ptr(objbuf, 0), $c.lit(" (on "))) && (!$c.strncmp(p.add(5), $c.lit("left "), 5) || !$c.strncmp(p.add(5), $c.lit("right "), 6))) {
         strsubst(p.add(2), $c.lit("on"), $c.lit("from"));
     }
-    verb = $c.and64(obj.owornmask, 1792) !== 0 ? $c.lit("disarms") : $c.and64(obj.owornmask, 983040) !== 0 ? $c.lit("removes") : $c.lit("takes off");
+    verb = $c.and64(obj.owornmask, W_WEP | W_SWAPWEP | W_QUIVER) !== 0 ? $c.lit("disarms") : $c.and64(obj.owornmask, W_RINGL | W_RINGR | W_AMUL | W_TOOL) !== 0 ? $c.lit("removes") : $c.lit("takes off");
     await pline($c.lit("%s %s %s."), await Some_Monnam(mon), verb, new $c.Ptr(objbuf, 0));
-    iflags.last_msg = 11 /* PLNMSG_MON_TAKES_OFF_ITEM */;
+    iflags.last_msg = PLNMSG_MON_TAKES_OFF_ITEM;
     await remove_worn_item(obj, 1);
 }
 export async function steal(mtmp, objnambuf) {   // steal.c:343
@@ -273,7 +287,7 @@ export async function steal(mtmp, objnambuf) {   // steal.c:343
         case null:
             named = 0;
             retrycnt = 0;
-            monkey_business = $c.i8($c.andu64(mtmp.data.mflags1, 262144) !== 0 ? 1 : 0);
+            monkey_business = $c.i8($c.andu64(mtmp.data.mflags1, M1_ANIMAL) !== 0 ? 1 : 0);
             seen = $c.i8(canseemon(mtmp) || sensemon(mtmp) ? 1 : 0);
             was_punished = $c.i8($G.uball !== null ? 1 : 0);
             if (objnambuf) {
@@ -293,10 +307,10 @@ export async function steal(mtmp, objnambuf) {   // steal.c:343
                 if ($G.uball !== null && !monkey_business && rn2(4)) {
                     (!(!$c.peq($G.uball, $c.asRec(null, $T.obj, 112)) && $G.uball.where === 1) ? 1 : 0) ? $c.__assert_rtn($c.lit("steal"), $c.lit("steal.c"), 381, $c.lit("uball != NULL && uball->where == OBJ_FLOOR")) : 0;
                     await worn_item_removal(mtmp, $G.uchain);
-                } else if (u.utrap && u.utraptype === 6 && !monkey_business && !rn2(4)) {
+                } else if (u.utrap && u.utraptype === TT_BURIEDBALL && !monkey_business && !rn2(4)) {
                     await pline($c.lit("%s takes off your unseen chain."), new $c.Ptr(Monnambuf, 0));
                     await openholdingtrap(gy.youmonst, new $c.Ptr(dummy, 0));
-                } else if ((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked) {
+                } else if ((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked) {
                     await pline($c.lit("Somebody tries to rob you, but finds nothing to steal."));
                 } else if (inv_cnt(1) > inv_cnt(0)) {
                     await pline($c.lit("%s tries to rob you, but isn't interested in gold."), new $c.Ptr(Monnambuf, 0));
@@ -306,10 +320,10 @@ export async function steal(mtmp, objnambuf) {   // steal.c:343
                 return 1;
             }
             if (monkey_business || $G.uarmg) {
-            } else if ($c.and64(u.uprops[39 /* ADORNED */].extrinsic, 131072)) {
+            } else if ($c.and64(u.uprops[ADORNED].extrinsic, W_RINGL)) {
                 otmp = $G.uleft;
                 $goto = "gotobj"; continue D1;
-            } else if ($c.and64(u.uprops[39 /* ADORNED */].extrinsic, 262144)) {
+            } else if ($c.and64(u.uprops[ADORNED].extrinsic, W_RINGR)) {
                 otmp = $G.uright;
                 $goto = "gotobj"; continue D1;
             }
@@ -317,8 +331,8 @@ export async function steal(mtmp, objnambuf) {   // steal.c:343
             $goto = null;   // retry:
             tmp = 0;
             for (otmp = gi.invent; otmp; otmp = otmp.nobj) {
-                if ((!$G.uarm || !$c.peq(otmp, $G.uarmc)) && !$c.peq(otmp, $G.uskin) && otmp.oclass !== 12 /* COIN_CLASS */) {
-                    tmp = tmp + ($c.and64(otmp.owornmask, 983167) ? 5 : 1) | 0;
+                if ((!$G.uarm || !$c.peq(otmp, $G.uarmc)) && !$c.peq(otmp, $G.uskin) && otmp.oclass !== COIN_CLASS) {
+                    tmp = tmp + ($c.and64(otmp.owornmask, W_ARM | W_ARMC | W_ARMH | W_ARMS | W_ARMG | W_ARMF | W_ARMU | (W_RINGL | W_RINGR | W_AMUL | W_TOOL)) ? 5 : 1) | 0;
                 }
             }
             if (!tmp) {
@@ -326,8 +340,8 @@ export async function steal(mtmp, objnambuf) {   // steal.c:343
             }
             tmp = rn2(tmp);
             for (otmp = gi.invent; otmp; otmp = otmp.nobj) {
-                if ((!$G.uarm || !$c.peq(otmp, $G.uarmc)) && !$c.peq(otmp, $G.uskin) && otmp.oclass !== 12 /* COIN_CLASS */) {
-                    tmp = tmp - ($c.and64(otmp.owornmask, 983167) ? 5 : 1) | 0;
+                if ((!$G.uarm || !$c.peq(otmp, $G.uarmc)) && !$c.peq(otmp, $G.uskin) && otmp.oclass !== COIN_CLASS) {
+                    tmp = tmp - ($c.and64(otmp.owornmask, W_ARM | W_ARMC | W_ARMH | W_ARMS | W_ARMG | W_ARMF | W_ARMU | (W_RINGL | W_RINGR | W_AMUL | W_TOOL)) ? 5 : 1) | 0;
                     if (tmp < 0) {
                         break;
                     }
@@ -354,7 +368,7 @@ export async function steal(mtmp, objnambuf) {   // steal.c:343
             if (otmp.o_id === gs.stealoid) {
                 return 0;
             }
-            if (otmp.otyp === 475 /* BOULDER */ && !($c.andu64(mtmp.data.mflags2, 134217728) !== 0)) {
+            if (otmp.otyp === BOULDER && !($c.andu64(mtmp.data.mflags2, M2_ROCKTHROW) !== 0)) {
                 if (!($t1 = retrycnt, retrycnt = $t1 + 1 | 0, $t1)) {
                     $goto = "retry"; continue D1;
                 }
@@ -370,7 +384,7 @@ export async function steal(mtmp, objnambuf) {   // steal.c:343
                         } else if ($c.peq(otmp, $G.uquiver) || $c.peq(otmp, $G.uswapwep) && !u.twoweap) {
                             ostuck = 0;
                         } else {
-                            ostuck = $c.i8(otmp.cursed | 0 && otmp.owornmask || $c.peq(otmp, (u.uhandedness | 0) === 1 ? $G.uleft : $G.uright) && await welded($G.uwep) || $c.peq(otmp, (u.uhandedness | 0) === 1 ? $G.uright : $G.uleft) && await welded($G.uwep) && (($G.uwep.oclass === 2 /* WEAPON_CLASS */ || $G.uwep.oclass === 6 /* TOOL_CLASS */) && objects[$G.uwep.otyp].oc_big | 0) ? 1 : 0);
+                            ostuck = $c.i8(otmp.cursed | 0 && otmp.owornmask || $c.peq(otmp, (u.uhandedness | 0) === LEFT_HANDED ? $G.uleft : $G.uright) && await welded($G.uwep) || $c.peq(otmp, (u.uhandedness | 0) === LEFT_HANDED ? $G.uright : $G.uleft) && await welded($G.uwep) && (($G.uwep.oclass === WEAPON_CLASS || $G.uwep.oclass === TOOL_CLASS) && objects[$G.uwep.otyp].oc_big | 0) ? 1 : 0);
                         }
                     case "cant_take":
                         if ($goto === "cant_take" || (ostuck || await can_carry(mtmp, otmp) === 0)) {
@@ -379,7 +393,7 @@ export async function steal(mtmp, objnambuf) {   // steal.c:343
                                 case null:
                                 case "cant_take":
                                     $goto = null;   // cant_take:
-                                    await pline($c.lit("%s tries to %s %s%s but gives up."), new $c.Ptr(Monnambuf, 0), steal$how[rn2(4)], $c.and64(otmp.owornmask, 127) ? $c.lit("your ") : $c.lit(""), $c.and64(otmp.owornmask, 127) ? await armor_simple_name(otmp) : await yname(otmp));
+                                    await pline($c.lit("%s tries to %s %s%s but gives up."), new $c.Ptr(Monnambuf, 0), steal$how[rn2(4)], $c.and64(otmp.owornmask, W_ARM | W_ARMC | W_ARMH | W_ARMS | W_ARMG | W_ARMF | W_ARMU) ? $c.lit("your ") : $c.lit(""), $c.and64(otmp.owornmask, W_ARM | W_ARMC | W_ARMH | W_ARMS | W_ARMG | W_ARMF | W_ARMU) ? await armor_simple_name(otmp) : await yname(otmp));
                                     return !rn2($c.div32(inv_cnt(0), 5) + 2 | 0) ? 1 : 0;
                                 }
                                 break;
@@ -389,7 +403,7 @@ export async function steal(mtmp, objnambuf) {   // steal.c:343
                     break;
                 }
             }
-            if (otmp.otyp === 236 /* LEASH */ && otmp.corpsenm) {
+            if (otmp.otyp === LEASH && otmp.corpsenm) {
                 if (monkey_business && otmp.cursed | 0) {
                     $goto = "cant_take"; continue D1;
                 }
@@ -398,15 +412,15 @@ export async function steal(mtmp, objnambuf) {   // steal.c:343
             was_doffing = doffing(otmp);
             olddelay = await stop_donning(otmp);
             await stop_occupation();
-            if ($c.and64(otmp.owornmask, 983167)) {
+            if ($c.and64(otmp.owornmask, W_ARM | W_ARMC | W_ARMH | W_ARMS | W_ARMG | W_ARMF | W_ARMU | (W_RINGL | W_RINGR | W_AMUL | W_TOOL))) {
                 switch (otmp.oclass) {
-                    case 6 /* TOOL_CLASS */:
-                    case 5 /* AMULET_CLASS */:
-                    case 4 /* RING_CLASS */:
-                    case 7 /* FOOD_CLASS */:
+                    case TOOL_CLASS:
+                    case AMULET_CLASS:
+                    case RING_CLASS:
+                    case FOOD_CLASS:
                         await worn_item_removal(mtmp, otmp);
                         break;
-                    case 3 /* ARMOR_CLASS */:
+                    case ARMOR_CLASS:
                         armordelay = objects[otmp.otyp].oc_delay;
                         if (olddelay > 0 && olddelay < armordelay) {
                             armordelay = olddelay;
@@ -452,29 +466,29 @@ export async function steal(mtmp, objnambuf) {   // steal.c:343
                     item = $G.uchain;
                 }
                 await worn_item_removal(mtmp, item);
-                if ($c.and64(otmp.owornmask, 1792) !== 0) {
+                if ($c.and64(otmp.owornmask, W_WEP | W_SWAPWEP | W_QUIVER) !== 0) {
                     await remove_worn_item(otmp, 0);
                 }
             }
             if (objnambuf) {
                 $c.__builtin___strcpy_chk(objnambuf, await yname(otmp), -1);
             }
-            if (!(u.uprops[44 /* CONFLICT */].intrinsic || u.uprops[44 /* CONFLICT */].extrinsic) && !(was_punished && !($G.uball !== null))) {
+            if (!(u.uprops[CONFLICT].intrinsic || u.uprops[CONFLICT].extrinsic) && !(was_punished && !($G.uball !== null))) {
                 mtmp.mavenge = (1) & 1;
             }
             if (otmp.unpaid) {
                 await subfrombill(otmp, await shop_keeper(new $c.Ptr(u.ushops, 0).get(0)));
             }
             await freeinv(otmp);
-            if (iflags.last_msg === 11 /* PLNMSG_MON_TAKES_OFF_ITEM */ && mtmp.data.mlet === 14 /* S_NYMPH */) {
+            if (iflags.last_msg === PLNMSG_MON_TAKES_OFF_ITEM && mtmp.data.mlet === S_NYMPH) {
                 named = named + 1 | 0;
             }
             await urgent_pline($c.lit("%s stole %s."), named ? $c.lit("She") : new $c.Ptr(Monnambuf, 0), await doname(otmp));
             await encumber_msg();
-            could_petrify = otmp.otyp === 265 /* CORPSE */ && ($c.peq($c.relem(mons, otmp.corpsenm), $c.relem(mons, 10 /* PM_COCKATRICE */)) || $c.peq($c.relem(mons, otmp.corpsenm), $c.relem(mons, 9 /* PM_CHICKATRICE */))) ? 1 : 0;
-            otmp.how_lost = (3) & 7;
+            could_petrify = otmp.otyp === CORPSE && ($c.peq($c.relem(mons, otmp.corpsenm), $c.relem(mons, PM_COCKATRICE)) || $c.peq($c.relem(mons, otmp.corpsenm), $c.relem(mons, PM_CHICKATRICE))) ? 1 : 0;
+            otmp.how_lost = (LOST_STOLEN) & 7;
             await mpickobj(mtmp, otmp);
-            if (could_petrify && !$c.and64(mtmp.misc_worn_check, 16)) {
+            if (could_petrify && !$c.and64(mtmp.misc_worn_check, W_ARMG)) {
                 await minstapetrify(mtmp, 1);
                 return -1;
             }
@@ -501,8 +515,8 @@ export async function mpickobj(mtmp, otmp) {   // steal.c:618
     if (otmp.unpaid | 0 || otmp.cobj !== null && count_unpaid(otmp.cobj)) {
         await subfrombill(otmp, await find_objowner(otmp, otmp.ox, otmp.oy));
     }
-    if (obj_sheds_light(otmp) && attacktype(mtmp.data, 11)) {
-        if (u.uswallow | 0 && $c.peq(u.ustuck, mtmp) && !((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
+    if (obj_sheds_light(otmp) && attacktype(mtmp.data, AT_ENGL)) {
+        if (u.uswallow | 0 && $c.peq(u.ustuck, mtmp) && !((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked)) {
             await pline($c.lit("%s out."), await Tobjnam(otmp, $c.lit("go")));
         }
         snuff_otmp = 1;
@@ -512,10 +526,10 @@ export async function mpickobj(mtmp, otmp) {   // steal.c:618
         if (!canseemon(mtmp) && !$c.peq(mtmp, u.ustuck)) {
             unknow_object(otmp);
         }
-        if ((otmp.how_lost | 0) === 1) {
-            otmp.how_lost = (3) & 7;
-        } else if ((otmp.how_lost | 0) === 2) {
-            otmp.how_lost = (0) & 7;
+        if ((otmp.how_lost | 0) === LOST_THROWN) {
+            otmp.how_lost = (LOST_STOLEN) & 7;
+        } else if ((otmp.how_lost | 0) === LOST_DROPPED) {
+            otmp.how_lost = (LOST_NONE) & 7;
         }
     }
     await carry_obj_effects(otmp);
@@ -532,29 +546,29 @@ export async function stealamulet(mtmp) {   // steal.c:689
     real = 0;
     fake = 0;
     for (n = 0, obj = gi.invent; obj; obj = obj.nobj) {
-        if (obj.oartifact >= 21 /* ART_ORB_OF_DETECTION */) {
+        if (obj.oartifact >= ART_ORB_OF_DETECTION) {
             n = n + 1 | 0, otmp = obj;
         }
     }
     if (n > 1) {
         n = rnd(n);
         for (otmp = gi.invent; otmp; otmp = otmp.nobj) {
-            if (otmp.oartifact >= 21 /* ART_ORB_OF_DETECTION */ && !(n = n - 1 | 0)) {
+            if (otmp.oartifact >= ART_ORB_OF_DETECTION && !(n = n - 1 | 0)) {
                 break;
             }
         }
     }
     if (!otmp) {
         if (u.uhave.amulet) {
-            real = 213 /* AMULET_OF_YENDOR */;
-            fake = 212 /* FAKE_AMULET_OF_YENDOR */;
+            real = AMULET_OF_YENDOR;
+            fake = FAKE_AMULET_OF_YENDOR;
         } else if (u.uhave.bell) {
-            real = 263 /* BELL_OF_OPENING */;
-            fake = 255 /* BELL */;
+            real = BELL_OF_OPENING;
+            fake = BELL;
         } else if (u.uhave.book) {
-            real = 409 /* SPE_BOOK_OF_THE_DEAD */;
+            real = SPE_BOOK_OF_THE_DEAD;
         } else if (u.uhave.menorah) {
-            real = 262 /* CANDELABRUM_OF_INVOCATION */;
+            real = CANDELABRUM_OF_INVOCATION;
         } else {
             return;
         }
@@ -598,29 +612,29 @@ export async function stealamulet(mtmp) {   // steal.c:689
         $c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), await doname(otmp), 256);
         await mpickobj(mtmp, otmp);
         await pline($c.lit("%s steals %s!"), await Some_Monnam(mtmp), new $c.Ptr(buf, 0));
-        if ($c.andu64(mtmp.data.mflags1, 33554432) !== 0 && !await tele_restrict(mtmp)) {
-            await rloc(mtmp, 2);
+        if ($c.andu64(mtmp.data.mflags1, M1_TPORT) !== 0 && !await tele_restrict(mtmp)) {
+            await rloc(mtmp, RLOC_MSG);
         }
         await encumber_msg();
     }
 }
 export async function maybe_absorb_item(mon, obj, ochance, achance) {   // steal.c:772
     let hand_s = null;
-    if ($c.peq(obj, $G.uball) || $c.peq(obj, $G.uchain) || obj.oclass === 14 /* ROCK_CLASS */ || obj_resists(obj, 100 - ochance | 0, 100 - achance | 0) || !await touch_artifact(obj, mon)) {
+    if ($c.peq(obj, $G.uball) || $c.peq(obj, $G.uchain) || obj.oclass === ROCK_CLASS || obj_resists(obj, 100 - ochance | 0, 100 - achance | 0) || !await touch_artifact(obj, mon)) {
         return;
     }
-    if (obj.where === 3) {
+    if (obj.where === OBJ_INVENT) {
         if (obj.owornmask) {
             await remove_worn_item(obj, 1);
         }
         if (obj.unpaid) {
             await subfrombill(obj, await shop_keeper(new $c.Ptr(u.ushops, 0).get(0)));
         }
-        if ((gv.viz_array.get(mon.my).get(mon.mx) & 2) !== 0) {
+        if ((gv.viz_array.get(mon.my).get(mon.mx) & IN_SIGHT) !== 0) {
             await pline($c.lit("%s pulls %s away from you and absorbs %s!"), await Some_Monnam(mon), await yname(obj), obj.quan > 1 ? $c.lit("them") : $c.lit("it"));
         } else {
-            hand_s = await body_part(6 /* HAND */);
-            if ((obj.oclass === 2 /* WEAPON_CLASS */ || obj.oclass === 6 /* TOOL_CLASS */) && objects[obj.otyp].oc_big | 0) {
+            hand_s = await body_part(HAND);
+            if ((obj.oclass === WEAPON_CLASS || obj.oclass === TOOL_CLASS) && objects[obj.otyp].oc_big | 0) {
                 hand_s = await makeplural(hand_s);
             }
             await pline($c.lit("%s %s pulled from your %s!"), upstart(await yname(obj)), await otense(obj, $c.lit("are")), hand_s);
@@ -641,10 +655,10 @@ export async function mdrop_obj(mon, obj, verbosely) {   // steal.c:814
     unwornmask = obj.owornmask;
     obj_name = await distant_name(obj, doname);
     await extract_from_minvent(mon, obj, 0, 1);
-    if (unwornmask && mon.mtame && $c.and64(unwornmask, 1048576) !== 0 && !obj.unpaid && await costly_spot(omx, omy) && $c.strchr(in_rooms(u.ux, u.uy, 14 /* SHOPBASE */), svl.level.locations[omx][omy].roomno | 0)) {
+    if (unwornmask && mon.mtame && $c.and64(unwornmask, W_SADDLE) !== 0 && !obj.unpaid && await costly_spot(omx, omy) && $c.strchr(in_rooms(u.ux, u.uy, SHOPBASE), svl.level.locations[omx][omy].roomno | 0)) {
         obj.no_charge = (1) & 1;
     }
-    if (verbosely && (gv.viz_array.get(omy).get(omx) & 2) !== 0) {
+    if (verbosely && (gv.viz_array.get(omy).get(omx) & IN_SIGHT) !== 0) {
         await pline_mon(mon, $c.lit("%s drops %s."), await Monnam(mon), obj_name);
     }
     if (!await flooreffects(obj, omx, omy, $c.lit("fall"))) {
@@ -683,7 +697,7 @@ export async function relobj(mtmp, show, is_pet) {   // steal.c:875
     while ((otmp = is_pet ? await droppables(mtmp) : mtmp.minvent) !== null) {
         await mdrop_obj(mtmp, otmp, $c.i8(is_pet && flags.verbose ? 1 : 0));
     }
-    if (show && (gv.viz_array.get(omy).get(omx) & 2) !== 0) {
+    if (show && (gv.viz_array.get(omy).get(omx) & IN_SIGHT) !== 0) {
         await newsym($c.i16(omx), $c.i16(omy));
     }
 }

@@ -10,6 +10,10 @@ import { norm_ptrs_any, norm_ptrs_arti_info, norm_ptrs_branch, norm_ptrs_bubble,
 import { error } from './unixtty.js';
 import { windowprocs } from './windows.js';
 
+const MAXFD = 5;
+const NOFLG = 0;
+const NOSLOT = 1;
+
 export const historical_sfo_procs = new $T.sf_structlevel_procs();
 export const historical_sfi_procs = new $T.sf_structlevel_procs();
 export const restoreinfo = new $T.restore_info();
@@ -920,15 +924,15 @@ export async function historical_sfi_bitfield(nhfp, d_bitfield, myname, bflen) {
 function getidx(fd, flg) {   // sfstruct.c:384
     let i = 0, retval = 0;
     retval = -1;
-    for (i = 0; i < 5; i = i + 1 | 0) {
+    for (i = 0; i < MAXFD; i = i + 1 | 0) {
         if (bw_sticky[i] === fd) {
             return i;
         }
     }
-    if (flg === 1 /* NOSLOT */) {
+    if (flg === NOSLOT) {
         return retval;
     }
-    for (i = 0; i < 5; i = i + 1 | 0) {
+    for (i = 0; i < MAXFD; i = i + 1 | 0) {
         if (bw_sticky[i] < 0) {
             bw_sticky[i] = fd;
             retval = i;
@@ -939,7 +943,7 @@ function getidx(fd, flg) {   // sfstruct.c:384
 }
 export function close_check(fd) {   // sfstruct.c:404
     let idx = 0, retval = 0;
-    idx = getidx(fd, 1 /* NOSLOT */);
+    idx = getidx(fd, NOSLOT);
     retval = 0;
     if (idx >= 0) {
         retval = 1;
@@ -948,7 +952,7 @@ export function close_check(fd) {   // sfstruct.c:404
 }
 export async function bufon(fd) {   // sfstruct.c:415
     let idx = 0, $t1;
-    idx = getidx(fd, 0 /* NOFLG */);
+    idx = getidx(fd, NOFLG);
     if (idx >= 0) {
         bw_sticky[idx] = fd;
         if (bw_buffered[idx]) {
@@ -964,7 +968,7 @@ export async function bufon(fd) {   // sfstruct.c:415
 }
 export async function bufoff(fd) {   // sfstruct.c:436
     let idx = 0;
-    idx = getidx(fd, 0 /* NOFLG */);
+    idx = getidx(fd, NOFLG);
     if (idx >= 0) {
         await bflush(fd);
         bw_buffered[idx] = 0;
@@ -972,7 +976,7 @@ export async function bufoff(fd) {   // sfstruct.c:436
 }
 export async function bclose(fd) {   // sfstruct.c:447
     let idx = 0;
-    idx = getidx(fd, 1 /* NOSLOT */);
+    idx = getidx(fd, NOSLOT);
     await bufoff(fd);
     if (idx >= 0) {
         if (bw_FILE[idx]) {
@@ -987,7 +991,7 @@ export async function bclose(fd) {   // sfstruct.c:447
 }
 export async function bflush(fd) {   // sfstruct.c:478
     let idx = 0;
-    idx = getidx(fd, 0 /* NOFLG */);
+    idx = getidx(fd, NOFLG);
     if (idx >= 0) {
         if (bw_FILE[idx]) {
             if ($c.fflush(bw_FILE[idx]) === -1) {
@@ -999,7 +1003,7 @@ export async function bflush(fd) {   // sfstruct.c:478
 }
 export async function bwrite(fd, loc, num) {   // sfstruct.c:494
     let failed = 0, idx = 0;
-    idx = getidx(fd, 0 /* NOFLG */);
+    idx = getidx(fd, NOFLG);
     if (idx >= 0) {
         if (num === 0) {
             return;

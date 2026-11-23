@@ -6,9 +6,12 @@ import { yn_function } from './cmd.js';
 import { flags, gl, iflags, program_state, svh, svp, ynchars } from './decl.js';
 import { done1, nh_terminate } from './end.js';
 import { delete_levelfile, fqname, lock_file, set_levelfile_name, unlock_file } from './files.js';
+import { MAXDUNGEON, MAXLEVEL } from './global.h.js';
+import { LEVELPREFIX, LOCKPREFIX } from './hack.h.js';
 import { lowc } from './hacklib.js';
 import { Norep, pline, raw_printf } from './pline.js';
 import { sysopt } from './sys.js';
+import { FCMASK } from './unixconf.h.js';
 import { check_user_string } from './unixmain.js';
 import { error } from './unixtty.js';
 import { windowprocs } from './windows.js';
@@ -33,12 +36,12 @@ function veryold(fd) {   // unixunix.c:38
 function eraseoldlocks() {   // unixunix.c:80
     let i = 0;
     program_state.preserve_locks = 0;
-    for (i = 1; i <= 513; i = i + 1 | 0) {
+    for (i = 1; i <= MAXDUNGEON * MAXLEVEL + 1; i = i + 1 | 0) {
         set_levelfile_name(new $c.Ptr(gl.lock, 0), i);
-        $c.unlink(fqname(new $c.Ptr(gl.lock, 0), 1, 0));
+        $c.unlink(fqname(new $c.Ptr(gl.lock, 0), LEVELPREFIX, 0));
     }
     set_levelfile_name(new $c.Ptr(gl.lock, 0), 0);
-    if ($c.unlink(fqname(new $c.Ptr(gl.lock, 0), 1, 0))) {
+    if ($c.unlink(fqname(new $c.Ptr(gl.lock, 0), LEVELPREFIX, 0))) {
         return 0;
     }
     return 1;
@@ -51,7 +54,7 @@ export async function getlock() {   // unixunix.c:103
             await error($c.lit("You must play from a terminal."));
         }
     }
-    if (!await lock_file($c.lit("perm"), 6, 10)) {
+    if (!await lock_file($c.lit("perm"), LOCKPREFIX, 10)) {
         await windowprocs.win_wait_synch();
         await error($c.lit("%s"), $c.lit(""));
     }
@@ -67,7 +70,7 @@ export async function getlock() {   // unixunix.c:103
             }
             do {
                 $t2 = $c.i8(97 + ($t1 = i, i = $t1 + 1 | 0, $t1) | 0), gl.lock[0] = $t2;
-                fq_lock = fqname(new $c.Ptr(gl.lock, 0), 1, 0);
+                fq_lock = fqname(new $c.Ptr(gl.lock, 0), LEVELPREFIX, 0);
                 if ((fd = $c.open(fq_lock, 0)) === -1) {
                     if ($c.__error().get(0) === 2) {
                         break gotlock$;
@@ -85,7 +88,7 @@ export async function getlock() {   // unixunix.c:103
             await unlock_file($c.lit("perm"));
             await error($c.lit("Too many hacks running now."));
         } else {
-            fq_lock = fqname(new $c.Ptr(gl.lock, 0), 1, 0);
+            fq_lock = fqname(new $c.Ptr(gl.lock, 0), LEVELPREFIX, 0);
             if ((fd = $c.open(fq_lock, 0)) === -1) {
                 if ($c.__error().get(0) === 2) {
                     break gotlock$;
@@ -125,7 +128,7 @@ export async function getlock() {   // unixunix.c:103
             }
         }
     }
-    fd = $c.creat(fq_lock, 432);
+    fd = $c.creat(fq_lock, FCMASK);
     await unlock_file($c.lit("perm"));
     if (fd === -1) {
         await error($c.lit("cannot creat lock file (%s)."), fq_lock);

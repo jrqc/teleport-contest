@@ -2,30 +2,38 @@
 import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
+import { AM_LAWFUL, AM_NONE, A_LAWFUL, A_NONE } from './align.h.js';
 import { dupstr } from './alloc.js';
 import { next_to_u, reset_trapset } from './apply.js';
 import { artifact_has_invprop, finesse_ahriman, undiscovered_artifact } from './artifact.js';
+import { ART_EYES_OF_THE_OVERWORLD } from './artilist.h.js';
+import { A_DEX } from './attrib.h.js';
 import { ballfall, ballrelease, drag_down, drop_ball, placebc, unplacebc } from './ball.js';
 import { bones_include_name } from './bones.js';
 import { check_gold_symbol, describe_level } from './botl.js';
 import { cmd_from_func, do_reqmenu, paranoid_ynq, reset_occupations, set_move_cmd, set_occupation, yn_function } from './cmd.js';
 import { is_lava, is_pool, is_pool_or_lava } from './dbridge.js';
 import { a11y, c_color_names, c_common_strings, disp, flags, ga, gb, gd, gf, gi, gl, gm, gu, gv, gy, iflags, nhcb_counts, nhcb_name, program_state, svc, svd, svh, svl, svm, svn, svp, svq, svu, u, ynchars } from './decl.js';
+import { COIN_CLASS, POTION_CLASS, RING_CLASS, S_GOLEM, S_MIMIC, S_TROLL, S_VORTEX, S_ZOMBIE, S_altar, S_dnladder, S_dnstair, S_fountain, S_grave, S_room, S_sink, S_throne, TOOL_CLASS, WEAPON_CLASS } from './defsym.h.js';
 import { buried_ball_to_punishment, bury_objs, rot_corpse, use_pick_axe2 } from './dig.js';
 import { canseemon, docrt, flush_screen, map_background, map_object, newsym, reglyph_darkroom, reset_glyphmap, sensemon } from './display.js';
+import { gm_levelchange } from './display.h.js';
 import { Adjmonnam, Amonnam, Monnam, docall, hcolor, hliquid, mon_nam, obj_pmname, rndmonnam, y_monnam } from './do_name.js';
 import { discard_migrations, keepdogs, losedogs, update_mlstmv } from './dog.js';
 import { container_impact_dmg, impact_drop, obj_delivery, ship_object } from './dokick.js';
 import { breakobj, hitfloor } from './dothrow.js';
 import { defsyms } from './drawing.js';
 import { Can_fall_thru, In_W_tower, In_hell, In_mines, In_quest, On_W_tower_level, assign_level, assign_rnd_level, at_dgn_entrance, builds_up, depth, dunlev, dunlevs_in_dungeon, goto_hell, ledger_no, ledger_to_dnum, level_difficulty, maxledgerno, next_level, on_level, prev_level, print_level_annotation, recalc_mapseen, recbranch_mapseen, remdun_mapseen, surface, u_on_newpos, u_on_rndspot } from './dungeon.js';
+import { LFILE_EXISTS, VISITED } from './dungeon.h.js';
 import { done, panic } from './end.js';
 import { can_reach_floor, engr_at, make_grave } from './engrave.js';
 import { more_experienced, newexplevel } from './exper.js';
 import { close_nhfile, create_levelfile, delete_levelfile, open_levelfile } from './files.js';
 import { floating_above } from './fountain.js';
+import { LL_ACHIEVE, LL_CONDUCT, LL_DEBUG, NHLpa_panic } from './global.h.js';
 import { glyph_to_cmap } from './glyphs.js';
 import { check_special_room, impact_disturbs_zombies, losehp, monster_nearby, near_capacity, notice_all_mons, pooleffects, set_uinwater, u_locomotion, u_rooted } from './hack.js';
+import { ALL_FINISHED, ALL_TYPES, ALL_TYPES_SELECTED, BUC_BLESSED, BUC_CURSED, BUC_UNCURSED, BUC_UNKNOWN, CHOOSE_ALL, COST_DEGRD, DIR_DOWN, DIR_UP, DISMOUNT_FELL, ECMD_FAIL, ECMD_OK, ECMD_TIME, ESCAPED, FACE, FREEING, GETOBJ_ALLOWCNT, HAND, HMON_THROWN, INCLUDE_VENOM, INVORDER_SORT, JUSTPICKED, KILLED_BY, LEG, MENU_COMBINATION, MENU_FULL, MENU_TRADITIONAL, NC_SHOW_MSG, NHCB_LVL_LEAVE, NO_KILLER_PREFIX, NO_NC_FLAGS, RLOC_NOMSG, SELL_DELIBERATE, SELL_NORMAL, SLT_ENCUMBER, STOMACH, TELEDS_NO_FLAGS, TOOKPLUNGE, UNENCUMBERED, UNPAID_TYPES, USE_INVLET, WRITING, most_themes, st_all, tut_themes } from './hack.h.js';
 import { dist2, nh_snprintf, s_suffix, strncmpi, upstart, visctrl } from './hacklib.js';
 import { record_achievement } from './insight.js';
 import { any_obj_ok, delobj, freeinv, getobj, ggetobj, stackobj, useup, useupf } from './invent.js';
@@ -38,43 +46,59 @@ import { free_luathemes, mklev } from './mklev.js';
 import { fumaroles, movebubbles, set_levltyp } from './mkmaze.js';
 import { add_to_buried, costly_alteration, free_omid, free_omonst, obj_meld, obj_nexto_xy, place_object, pudding_merge_message, rider_revival_time, set_bknown, set_corpsenm, splitobj, weight } from './mkobj.js';
 import { healmon, iter_mons, kill_genocided_monsters, m_in_air, m_into_limbo, mnexto, mondied, newcham, pm_to_cham, set_ustuck, wake_nearto, zombie_form } from './mon.js';
+import { AD_DGST, AD_POLY, AT_ENGL } from './monattk.h.js';
 import { dmgtype, dmgtype_fromattack, locomotion, olfaction, sticks } from './mondata.js';
+import { G_GENOD, M1_CLING, M1_FLY, M1_HIDE, M1_WALLWALK, M2_ROCKTHROW, M2_UNDEAD, M3_DISPLACES, MZ_HUGE } from './monflag.h.js';
 import { mons } from './monst.js';
+import { PM_AIR_ELEMENTAL, PM_CHICKATRICE, PM_COCKATRICE, PM_CROESUS, PM_DEATH, PM_FAMINE, PM_GREEN_SLIME, PM_MANES, PM_NURSE, PM_PESTILENCE, PM_ROGUE, PM_TOURIST, PM_VAMPIRE, PM_VAMPIRE_LEADER, PM_VLAD_THE_IMPALER, PM_WRAITH } from './monsters.h.js';
 import { create_mplayers } from './mplayer.js';
 import { mcureblindness } from './muse.js';
 import { nhl_pcall_handle, tutorial } from './nhlua.js';
 import { oinit } from './o_init.js';
+import { BURIED_TOO, CONTAINED_TOO, ER_DESTROYED, LOST_DROPPED, OBJ_BURIED, OBJ_CONTAINED, OBJ_FLOOR, OBJ_FREE, OBJ_INVENT, OBJ_MINVENT } from './obj.h.js';
 import { objects } from './objects.js';
+import { BOULDER, CORPSE, CRYSKNIFE, EGG, ENORMOUS_MEATBALL, GLOB_OF_GREEN_SLIME, LEASH, LOADSTONE, MEATBALL, MEAT_RING, MEAT_STICK, POT_OIL, RIN_ADORNMENT, RIN_AGGRAVATE_MONSTER, RIN_COLD_RESISTANCE, RIN_CONFLICT, RIN_FIRE_RESISTANCE, RIN_FREE_ACTION, RIN_GAIN_CONSTITUTION, RIN_GAIN_STRENGTH, RIN_HUNGER, RIN_INCREASE_ACCURACY, RIN_INCREASE_DAMAGE, RIN_INVISIBILITY, RIN_LEVITATION, RIN_POISON_RESISTANCE, RIN_POLYMORPH, RIN_POLYMORPH_CONTROL, RIN_PROTECTION, RIN_PROTECTION_FROM_SHAPE_CHAN, RIN_REGENERATION, RIN_SEARCHING, RIN_SEE_INVISIBLE, RIN_SHOCK_RESISTANCE, RIN_SLOW_DIGESTION, RIN_STEALTH, RIN_SUSTAIN_ABILITY, RIN_TELEPORTATION, RIN_TELEPORT_CONTROL, RIN_WARNING, TIN, WORM_TOOTH } from './objects.h.js';
 import { Doname2, The, Tobjnam, an, corpse_xname, doname, fruitname, makeplural, otense, the, vtense, xname, yname, yobjnam } from './objnam.js';
 import { waterbody_name } from './pager.js';
+import { LOW_PM, NON_PM } from './permonst.h.js';
 import { add_valid_menu_class, allow_all, allow_category, count_justpicked, encumber_msg, find_justpicked, pickup, query_category, query_objlist, u_safe_from_fatal_corpse } from './pickup.js';
 import { Norep, There, You, You_cant, You_feel, You_hear, You_see, Your, impossible, livelog_printf, pline, pline_The } from './pline.js';
 import { body_part, mbodypart } from './polyself.js';
 import { incr_itimeout, make_blinded, set_itimeout } from './potion.js';
 import { reset_hostility } from './priest.js';
+import { BLINDED, DEAF, FIRE_RES, FLYING, FUMBLING, HALF_PHDAM, HALLUC, HALLUC_RES, I_SPECIAL, LEVITATION, PASSES_WALLS, SICK, SLIMED, STONED, STRANGLED, TIMEOUT, WOUNDED_LEGS, W_AMUL, W_ARM, W_ARMC, W_ARMF, W_ARMG, W_ARMH, W_ARMS, W_ARMU, W_ART, W_ARTI, W_RINGL, W_RINGR, W_SADDLE, W_TOOL } from './prop.h.js';
 import { ok_to_quest, onquest } from './quest.js';
 import { com_pager, deliver_splev_message } from './questpgr.js';
 import { in_out_region } from './region.js';
 import { getlev } from './restore.js';
+import { ALTAR, CORR, DB_FLOOR, DB_UNDER, DRAWBRIDGE_UP, FOUNTAIN, F_LOOTED, GRAVE, LADDER, ROOM, SINK, STAIRS, THRONE, T_LOOTED, WATER } from './rm.h.js';
 import { d, reseed_random, rn2, rn2_on_display_rng, rnd, rnz } from './rnd.js';
 import { savelev, savestateinlock, tricked_fileremoved } from './save.js';
 import { bufon } from './sfstruct.js';
 import { fix_shop_damage, is_unpaid, obfree, sellobj, sellobj_state, stolen_value } from './shk.js';
+import { P_PICK_AXE } from './skills.h.js';
 import { stairway_at, stairway_find_from, stairway_free_all, u_on_dnstairs, u_on_sstairs, u_on_upstairs } from './stairs.js';
 import { mpickobj } from './steal.js';
 import { dismount_steed, stucksteed } from './steed.js';
+import { PRIMARYSET, ROGUESET } from './sym.h.js';
 import { assign_graphics } from './symbols.js';
 import { enexto, rloc, safe_teleds } from './teleport.js';
 import { burn_away_slime, obj_has_timer, run_timers, start_timer } from './timeout.js';
+import { REVIVE_MON, ROT_CORPSE, TIMER_OBJECT } from './timeout.h.js';
 import { clamp_hole_destination, climb_pit, delfloortrap, deltrap, dotrap, fill_pit, float_down, lava_damage, maketrap, minstapetrify, reset_utrap, seetrap, selftouch, t_at, uescaped_shaft, uteetering_at_seen_pit, water_damage } from './trap.js';
+import { HOLE, MAGIC_PORTAL, NO_TRAP, PIT, SPIKED_PIT, TRAPDOOR, VIBRATING_SQUARE } from './trap.h.js';
 import { hmon } from './uhitm.js';
 import { error } from './unixtty.js';
 import { recalc_block_point, vision_recalc, vision_reset } from './vision.js';
+import { IN_SIGHT } from './vision.h.js';
 import { dmgval } from './weapon.js';
+import { WT_SPLASH_THRESHOLD } from './weight.h.js';
 import { setuqwep, setuswapwep, setuwep, welded, weldmsg } from './wield.js';
 import { windowprocs } from './windows.js';
+import { PICK_ANY } from './wintype.h.js';
 import { resurrect } from './wizard.js';
 import { bypass_objlist, nxt_unbypassed_obj } from './worn.js';
+import { ACH_ASTR, ACH_BGRM, ACH_ENDG, ACH_HELL, ACH_MINE, ACH_SOKO, TT_BURIEDBALL, TT_PIT, UTOTYPE_ATSTAIRS, UTOTYPE_DEFERRED, UTOTYPE_FALLING, UTOTYPE_NONE, UTOTYPE_PORTAL, UTOTYPE_RMPORTAL } from './you.h.js';
 import { get_container_location, get_obj_location, obj_resists, revive } from './zap.js';
 
 const familiar_level_msg$fam_msgs = $c.nulls(4);   // static in familiar_level_msg()
@@ -83,11 +107,11 @@ const dowipe$buf = new Int8Array(39);   // static in dowipe()
 export async function dodrop() {   // do.c:29
     let result = 0;
     if (new $c.Ptr(u.ushops, 0).get(0)) {
-        sellobj_state(1);
+        sellobj_state(SELL_DELIBERATE);
     }
-    result = await drop(await getobj($c.lit("drop"), any_obj_ok, 3));
+    result = await drop(await getobj($c.lit("drop"), any_obj_ok, 2 | GETOBJ_ALLOWCNT));
     if (new $c.Ptr(u.ushops, 0).get(0)) {
-        sellobj_state(0);
+        sellobj_state(SELL_NORMAL);
     }
     if (result) {
         reset_occupations();
@@ -96,21 +120,21 @@ export async function dodrop() {   // do.c:29
 }
 export async function boulder_hits_pool(otmp, rx, ry, pushing) {   // do.c:50
     let lava = 0, fills_up = 0, what = null, ltyp = 0, chance = 0, mtmp = null, ttmp = null, whobuf = new Int8Array(256), dmg = 0;
-    if (!otmp || otmp.otyp !== 475 /* BOULDER */) {
+    if (!otmp || otmp.otyp !== BOULDER) {
         await impossible($c.lit("Not a boulder?"));
     } else if (is_pool_or_lava(rx, ry)) {
         lava = is_lava(rx, ry);
         what = waterbody_name(rx, ry);
         ltyp = svl.level.locations[rx][ry].typ;
         chance = rn2(10);
-        fills_up = $c.i8((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? 0 : ltyp === 18 /* WATER */ ? chance < 5 ? 1 : 0 : lava ? chance === 0 ? 1 : 0 : chance !== 0 ? 1 : 0);
+        fills_up = $c.i8((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? 0 : ltyp === WATER ? chance < 5 ? 1 : 0 : lava ? chance === 0 ? 1 : 0 : chance !== 0 ? 1 : 0);
         if (fills_up) {
             ttmp = t_at(rx, ry);
-            if (ltyp === 19 /* DRAWBRIDGE_UP */) {
-                svl.level.locations[rx][ry].flags = (((svl.level.locations[rx][ry].flags | 0) & -29) >>> 0) & 31;
-                svl.level.locations[rx][ry].flags = ((svl.level.locations[rx][ry].flags | 0 | 16) >>> 0) & 31;
+            if (ltyp === DRAWBRIDGE_UP) {
+                svl.level.locations[rx][ry].flags = (((svl.level.locations[rx][ry].flags | 0) & ~DB_UNDER) >>> 0) & 31;
+                svl.level.locations[rx][ry].flags = ((svl.level.locations[rx][ry].flags | 0 | DB_FLOOR) >>> 0) & 31;
             } else {
-                svl.level.locations[rx][ry].typ = 25, svl.level.locations[rx][ry].flags = (0) & 31;
+                svl.level.locations[rx][ry].typ = ROOM, svl.level.locations[rx][ry].flags = (0) & 31;
                 recalc_block_point(rx, ry);
             }
             if ((mtmp = svl.level.monsters[rx][ry]) !== null && !(mtmp.mhp < 1) && !m_in_air(mtmp)) {
@@ -127,16 +151,16 @@ export async function boulder_hits_pool(otmp, rx, ry, pushing) {   // do.c:50
                     $c.__builtin___strcpy_chk(new $c.Ptr(whobuf, 0), await y_monnam(u.usteed), 256);
                 }
                 await pline($c.lit("%s %s %s into the %s."), upstart(new $c.Ptr(whobuf, 0)), await vtense(new $c.Ptr(whobuf, 0), $c.lit("push")), await the(await xname(otmp)), what);
-                if (flags.verbose && !((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
+                if (flags.verbose && !((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked)) {
                     await pline($c.lit("Now you can cross it!"));
                 }
             }
         }
         if (!fills_up || !pushing) {
             if (!u.uinwater) {
-                if (pushing ? !((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked) : (gv.viz_array.get(ry).get(rx) & 2) !== 0) {
+                if (pushing ? !((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked) : (gv.viz_array.get(ry).get(rx) & IN_SIGHT) !== 0) {
                     await There($c.lit("is a large splash as %s %s the %s."), await the(await xname(otmp)), fills_up ? $c.lit("fills") : $c.lit("falls into"), what);
-                } else if (!(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf)) {
+                } else if (!(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf)) {
                     if (lava) {
                     } else {
                     }
@@ -150,11 +174,11 @@ export async function boulder_hits_pool(otmp, rx, ry, pushing) {   // do.c:50
                 gv.vision_full_recalc = 1;
                 await You($c.lit("find yourself on dry land again!"));
             } else if (lava && dist2(rx, ry, u.ux, u.uy) <= 2) {
-                await You($c.lit("are hit by molten %s%c"), hliquid($c.lit("lava")), u.uprops[1 /* FIRE_RES */].intrinsic || u.uprops[1 /* FIRE_RES */].extrinsic ? 46 : 33);
+                await You($c.lit("are hit by molten %s%c"), hliquid($c.lit("lava")), u.uprops[FIRE_RES].intrinsic || u.uprops[FIRE_RES].extrinsic ? 46 : 33);
                 await burn_away_slime();
-                dmg = d(u.uprops[1 /* FIRE_RES */].intrinsic || u.uprops[1 /* FIRE_RES */].extrinsic ? 1 : 3, 6);
-                await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(dmg + 1 | 0, 2) : dmg, $c.lit("molten lava"), 1);
-            } else if (!fills_up && flags.verbose && (pushing ? !((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked) : (gv.viz_array.get(ry).get(rx) & 2) !== 0)) {
+                dmg = d(u.uprops[FIRE_RES].intrinsic || u.uprops[FIRE_RES].extrinsic ? 1 : 3, 6);
+                await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(dmg + 1 | 0, 2) : dmg, $c.lit("molten lava"), KILLED_BY);
+            } else if (!fills_up && flags.verbose && (pushing ? !((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked) : (gv.viz_array.get(ry).get(rx) & IN_SIGHT) !== 0)) {
                 await pline($c.lit("It sinks without a trace!"));
             }
         }
@@ -169,48 +193,48 @@ export async function boulder_hits_pool(otmp, rx, ry, pushing) {   // do.c:50
 }
 export async function flooreffects(obj, x, y, verb) {   // do.c:162
     let t = null, mtmp = null, otmp = [null], save_bhitpos = new $T.nhcoord(), tseen = 0, ttyp = 0, res = 0, damage = 0, dieroll = 0, globbyobj = [null], survival_chance = 0, $t1;
-    ttyp = 0 /* NO_TRAP */;
+    ttyp = NO_TRAP;
     res = 0;
-    if (obj.where !== 0) {
+    if (obj.where !== OBJ_FREE) {
         await panic($c.lit("flooreffects: obj not free"));
     }
     $t1 = obj.v.v_nexthere = null, obj.nobj = $t1;
     save_bhitpos.$copyFrom(gb.bhitpos);
     gb.bhitpos.x = x, gb.bhitpos.y = y;
-    if (obj.otyp === 475 /* BOULDER */ && await boulder_hits_pool(obj, x, y, 0)) {
+    if (obj.otyp === BOULDER && await boulder_hits_pool(obj, x, y, 0)) {
         res = 1;
-    } else if (obj.otyp === 475 /* BOULDER */ && (t = t_at(x, y)) !== null && ((t.ttyp | 0) === 11 /* PIT */ || (t.ttyp | 0) === 12 /* SPIKED_PIT */ || ((t.ttyp | 0) === 13 /* HOLE */ || (t.ttyp | 0) === 14 /* TRAPDOOR */))) {
+    } else if (obj.otyp === BOULDER && (t = t_at(x, y)) !== null && ((t.ttyp | 0) === PIT || (t.ttyp | 0) === SPIKED_PIT || ((t.ttyp | 0) === HOLE || (t.ttyp | 0) === TRAPDOOR))) {
         ttyp = t.ttyp | 0;
         tseen = $c.i8(t.tseen | 0 ? 1 : 0);
         deletedwithboulder$: {
             if ((mtmp = svl.level.monsters[x][y]) && mtmp.mtrapped | 0 || u.utrap && (x === u.ux && y === u.uy)) {
-                if (verb.get(0) && ((gv.viz_array.get(y).get(x) & 2) !== 0 || dist2(x, y, u.ux, u.uy) === 0)) {
-                    await pline($c.lit("%s boulder %s into the pit%s."), (u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked ? $c.lit("A") : $c.lit("The"), await vtense(null, verb), mtmp ? $c.lit("") : $c.lit(" with you"));
+                if (verb.get(0) && ((gv.viz_array.get(y).get(x) & IN_SIGHT) !== 0 || dist2(x, y, u.ux, u.uy) === 0)) {
+                    await pline($c.lit("%s boulder %s into the pit%s."), (u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked ? $c.lit("A") : $c.lit("The"), await vtense(null, verb), mtmp ? $c.lit("") : $c.lit(" with you"));
                 }
                 if (mtmp) {
-                    if (!($c.andu64(mtmp.data.mflags1, 8) !== 0) && !($c.andu64(mtmp.data.mflags2, 134217728) !== 0)) {
+                    if (!($c.andu64(mtmp.data.mflags1, M1_WALLWALK) !== 0) && !($c.andu64(mtmp.data.mflags2, M2_ROCKTHROW) !== 0)) {
                         dieroll = 1;
                         if (svc.context.mon_moving) {
                             damage = await dmgval(obj, mtmp);
                             mtmp.mhp = mtmp.mhp - damage | 0;
                             if (mtmp.mhp < 1) {
                                 if (canseemon(mtmp) || sensemon(mtmp)) {
-                                    await pline($c.lit("%s is %s!"), await Monnam(mtmp), $c.andu64(mtmp.data.mflags2, 2) !== 0 || $c.peq(mtmp.data, $c.relem(mons, 50 /* PM_MANES */)) || (mtmp.data.mlet === 55 /* S_GOLEM */ || mtmp.data.mlet === 22 /* S_VORTEX */) || (mtmp.cham === 226 /* PM_VAMPIRE */ || mtmp.cham === 227 /* PM_VAMPIRE_LEADER */ || mtmp.cham === 228 /* PM_VLAD_THE_IMPALER */) ? $c.lit("destroyed") : $c.lit("killed"));
+                                    await pline($c.lit("%s is %s!"), await Monnam(mtmp), $c.andu64(mtmp.data.mflags2, M2_UNDEAD) !== 0 || $c.peq(mtmp.data, $c.relem(mons, PM_MANES)) || (mtmp.data.mlet === S_GOLEM || mtmp.data.mlet === S_VORTEX) || (mtmp.cham === PM_VAMPIRE || mtmp.cham === PM_VAMPIRE_LEADER || mtmp.cham === PM_VLAD_THE_IMPALER) ? $c.lit("destroyed") : $c.lit("killed"));
                                 }
                                 await mondied(mtmp);
                             }
                         } else {
-                            await hmon(mtmp, obj, 1 /* HMON_THROWN */, dieroll);
+                            await hmon(mtmp, obj, HMON_THROWN, dieroll);
                         }
-                        if (!(mtmp.mhp < 1) && !(mtmp.data.mlet === 22 /* S_VORTEX */ || $c.peq(mtmp.data, $c.relem(mons, 154 /* PM_AIR_ELEMENTAL */)))) {
+                        if (!(mtmp.mhp < 1) && !(mtmp.data.mlet === S_VORTEX || $c.peq(mtmp.data, $c.relem(mons, PM_AIR_ELEMENTAL)))) {
                             res = 0;
                         }
                         res;
                     }
                     mtmp.mtrapped = (0) & 1;
                 } else {
-                    if (!(u.uprops[53 /* PASSES_WALLS */].intrinsic || u.uprops[53 /* PASSES_WALLS */].extrinsic) && !($c.andu64(gy.youmonst.data.mflags2, 134217728) !== 0)) {
-                        await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(rnd(15) + 1 | 0, 2) : rnd(15), $c.lit("squished under a boulder"), 2);
+                    if (!(u.uprops[PASSES_WALLS].intrinsic || u.uprops[PASSES_WALLS].extrinsic) && !($c.andu64(gy.youmonst.data.mflags2, M2_ROCKTHROW) !== 0)) {
+                        await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(rnd(15) + 1 | 0, 2) : rnd(15), $c.lit("squished under a boulder"), NO_KILLER_PREFIX);
                         break deletedwithboulder$;
                     } else {
                         await reset_utrap(1);
@@ -218,10 +242,10 @@ export async function flooreffects(obj, x, y, verb) {   // do.c:162
                 }
             }
             if (verb.get(0)) {
-                if ((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked && (x === u.ux && y === u.uy)) {
+                if ((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked && (x === u.ux && y === u.uy)) {
                     await You_hear($c.lit("a CRASH! beneath you."));
-                } else if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked) && (gv.viz_array.get(y).get(x) & 2) !== 0) {
-                    await pline_The($c.lit("boulder %s%s."), ttyp === 14 /* TRAPDOOR */ && !tseen ? $c.lit("triggers and ") : $c.lit(""), ttyp === 14 /* TRAPDOOR */ ? $c.lit("plugs a trap door") : ttyp === 13 /* HOLE */ ? $c.lit("plugs a hole") : $c.lit("fills a pit"));
+                } else if (!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked) && (gv.viz_array.get(y).get(x) & IN_SIGHT) !== 0) {
+                    await pline_The($c.lit("boulder %s%s."), ttyp === TRAPDOOR && !tseen ? $c.lit("triggers and ") : $c.lit(""), ttyp === TRAPDOOR ? $c.lit("plugs a trap door") : ttyp === HOLE ? $c.lit("plugs a hole") : $c.lit("fills a pit"));
                 } else {
                     await You_hear($c.lit("a boulder %s."), verb);
                 }
@@ -240,21 +264,21 @@ export async function flooreffects(obj, x, y, verb) {   // do.c:162
     } else if (is_lava(x, y)) {
         res = await lava_damage(obj, x, y);
     } else if (is_pool(x, y)) {
-        if (((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked || ((u.uprops[48 /* LEVITATION */].intrinsic || u.uprops[48 /* LEVITATION */].extrinsic) && !u.uprops[48 /* LEVITATION */].blocked || (u.uprops[49 /* FLYING */].intrinsic || u.uprops[49 /* FLYING */].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, 1) !== 0) && !u.uprops[49 /* FLYING */].blocked)) && !(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf) && (x === u.ux && y === u.uy)) {
+        if (((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked || ((u.uprops[LEVITATION].intrinsic || u.uprops[LEVITATION].extrinsic) && !u.uprops[LEVITATION].blocked || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked)) && !(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf) && (x === u.ux && y === u.uy)) {
             if (!u.uinwater) {
-                if (await weight(obj) > 9 /* WT_SPLASH_THRESHOLD */) {
+                if (await weight(obj) > WT_SPLASH_THRESHOLD) {
                     await pline($c.lit("Splash!"));
-                } else if ((u.uprops[48 /* LEVITATION */].intrinsic || u.uprops[48 /* LEVITATION */].extrinsic) && !u.uprops[48 /* LEVITATION */].blocked || (u.uprops[49 /* FLYING */].intrinsic || u.uprops[49 /* FLYING */].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, 1) !== 0) && !u.uprops[49 /* FLYING */].blocked) {
+                } else if ((u.uprops[LEVITATION].intrinsic || u.uprops[LEVITATION].extrinsic) && !u.uprops[LEVITATION].blocked || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked) {
                     await pline($c.lit("Plop!"));
                 }
             }
             await map_background(x, y, 0);
             await newsym(x, y);
         }
-        res = await water_damage(obj, null, 0) === 3 ? 1 : 0;
+        res = await water_damage(obj, null, 0) === ER_DESTROYED ? 1 : 0;
     } else if (x === u.ux && y === u.uy && (t = t_at(x, y)) !== null && (uteetering_at_seen_pit(t) || uescaped_shaft(t))) {
-        if ((t.ttyp | 0) === 11 /* PIT */ || (t.ttyp | 0) === 12 /* SPIKED_PIT */) {
-            if ((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked && !(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf)) {
+        if ((t.ttyp | 0) === PIT || (t.ttyp | 0) === SPIKED_PIT) {
+            if ((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked && !(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf)) {
                 await You_hear($c.lit("%s tumble downwards."), await the(await xname(obj)));
             } else {
                 await pline($c.lit("%s into %s pit."), await Tobjnam(obj, $c.lit("tumble")), c_common_strings.c_the_your[t.madeby_u]);
@@ -269,22 +293,22 @@ export async function flooreffects(obj, x, y, verb) {   // do.c:162
             await obj_meld(new $c.Ptr(globbyobj, 0), new $c.Ptr(otmp, 0));
         }
         res = $c.i8(!globbyobj[0] ? 1 : 0);
-    } else if (svc.context.mon_moving && svl.level.locations[x][y].typ === 32 /* ALTAR */ && (gv.viz_array.get(y).get(x) & 2) !== 0) {
+    } else if (svc.context.mon_moving && svl.level.locations[x][y].typ === ALTAR && (gv.viz_array.get(y).get(x) & IN_SIGHT) !== 0) {
         await doaltarobj(obj);
-    } else if (obj.oclass === 8 /* POTION_CLASS */ && svl.level.flags.temperature > 0 && (svl.level.locations[x][y].typ === 25 /* ROOM */ || svl.level.locations[x][y].typ === 24 /* CORR */)) {
-        if ((gv.viz_array.get(y).get(x) & 2) !== 0) {
-            await pline($c.lit("%s up as %s the hot ground."), await Tobjnam(obj, $c.lit("heat")), obj.quan !== 1 || obj.oartifact === 26 /* ART_EYES_OF_THE_OVERWORLD */ && !undiscovered_artifact(26) ? $c.lit("they hit") : $c.lit("it hits"));
+    } else if (obj.oclass === POTION_CLASS && svl.level.flags.temperature > 0 && (svl.level.locations[x][y].typ === ROOM || svl.level.locations[x][y].typ === CORR)) {
+        if ((gv.viz_array.get(y).get(x) & IN_SIGHT) !== 0) {
+            await pline($c.lit("%s up as %s the hot ground."), await Tobjnam(obj, $c.lit("heat")), obj.quan !== 1 || obj.oartifact === ART_EYES_OF_THE_OVERWORLD && !undiscovered_artifact(ART_EYES_OF_THE_OVERWORLD) ? $c.lit("they hit") : $c.lit("it hits"));
         }
         survival_chance = obj.blessed | 0 ? 70 : 50;
         if (obj.invlet) {
             survival_chance = survival_chance + Math.imul(u.uluck + u.moreluck | 0, 2) | 0;
         }
-        if (obj.otyp === 321 /* POT_OIL */) {
+        if (obj.otyp === POT_OIL) {
             survival_chance = 100;
         }
         if (!obj_resists(obj, survival_chance, 100)) {
-            if ((gv.viz_array.get(y).get(x) & 2) !== 0) {
-                await pline($c.lit("%s from the heat!"), obj.quan !== 1 || obj.oartifact === 26 /* ART_EYES_OF_THE_OVERWORLD */ && !undiscovered_artifact(26) ? $c.lit("They shatter") : $c.lit("It shatters"));
+            if ((gv.viz_array.get(y).get(x) & IN_SIGHT) !== 0) {
+                await pline($c.lit("%s from the heat!"), obj.quan !== 1 || obj.oartifact === ART_EYES_OF_THE_OVERWORLD && !undiscovered_artifact(ART_EYES_OF_THE_OVERWORLD) ? $c.lit("They shatter") : $c.lit("It shatters"));
             } else {
                 await You_hear($c.lit("a shattering noise."));
             }
@@ -297,24 +321,24 @@ export async function flooreffects(obj, x, y, verb) {   // do.c:162
 }
 export async function doaltarobj(obj) {   // do.c:363
     let $t1, $t2;
-    if ((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked) {
+    if ((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked) {
         return;
     }
-    if (obj.oclass !== 12 /* COIN_CLASS */) {
+    if (obj.oclass !== COIN_CLASS) {
         if (!svc.context.mon_moving && !($t1 = u.uconduct.gnostic, u.uconduct.gnostic = $c.add64($t1, 1), $t1)) {
-            await livelog_printf(32, $c.lit("eschewed atheism, by dropping %s on an altar"), await doname(obj));
+            await livelog_printf(LL_CONDUCT, $c.lit("eschewed atheism, by dropping %s on an altar"), await doname(obj));
         }
     } else {
         $t2 = obj.cursed = (0) & 1, obj.blessed = ($t2) & 1;
     }
     if (obj.blessed | 0 || obj.cursed | 0) {
         await There($c.lit("is %s flash as %s %s the altar."), await an(hcolor(obj.blessed | 0 ? c_color_names.c_amber : c_color_names.c_black)), await doname(obj), await otense(obj, $c.lit("hit")));
-        if (!(u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic))) {
+        if (!(u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic))) {
             obj.bknown = (1) & 1;
         }
     } else {
         await pline($c.lit("%s %s on the altar."), await Doname2(obj), await otense(obj, $c.lit("land")));
-        if (obj.oclass !== 12 /* COIN_CLASS */) {
+        if (obj.oclass !== COIN_CLASS) {
             obj.bknown = (1) & 1;
         }
     }
@@ -326,8 +350,8 @@ export async function trycall(obj) {   // do.c:395
 }
 export async function polymorph_sink() {   // do.c:404
     let sym = 0, sinklooted = 0, algn = 0, $t1;
-    sym = 36;
-    if (svl.level.locations[u.ux][u.uy].typ !== 30 /* SINK */) {
+    sym = S_sink;
+    if (svl.level.locations[u.ux][u.uy].typ !== SINK) {
         return;
     }
     sinklooted = $c.i8((svl.level.locations[u.ux][u.uy].flags | 0) !== 0 ? 1 : 0);
@@ -335,36 +359,36 @@ export async function polymorph_sink() {   // do.c:404
     switch (rn2(4)) {
         default:
         case 0:
-            sym = 37;
-            await set_levltyp(u.ux, u.uy, 28);
+            sym = S_fountain;
+            await set_levltyp(u.ux, u.uy, FOUNTAIN);
             svl.level.locations[u.ux][u.uy].horizontal = (0) & 1;
             if (sinklooted) {
-                svl.level.locations[u.ux][u.uy].flags = ((svl.level.locations[u.ux][u.uy].flags | 0 | 1) >>> 0) & 31;
+                svl.level.locations[u.ux][u.uy].flags = ((svl.level.locations[u.ux][u.uy].flags | 0 | F_LOOTED) >>> 0) & 31;
             }
             break;
         case 1:
-            sym = 35;
-            await set_levltyp(u.ux, u.uy, 29);
+            sym = S_throne;
+            await set_levltyp(u.ux, u.uy, THRONE);
             if (sinklooted) {
-                svl.level.locations[u.ux][u.uy].flags = (1) & 31;
+                svl.level.locations[u.ux][u.uy].flags = (T_LOOTED) & 31;
             }
             break;
         case 2:
-            sym = 33;
-            await set_levltyp(u.ux, u.uy, 32);
+            sym = S_altar;
+            await set_levltyp(u.ux, u.uy, ALTAR);
             algn = rn2(3) - 1 | 0;
-            $t1 = In_hell(u.uz) && rn2(3) ? 0 : (algn === -128 ? 0 : algn === 1 ? 4 : algn + 2 | 0) >>> 0, svl.level.locations[u.ux][u.uy].flags = ($t1) & 31;
+            $t1 = In_hell(u.uz) && rn2(3) ? AM_NONE : (algn === A_NONE ? AM_NONE : algn === A_LAWFUL ? AM_LAWFUL : algn + 2 | 0) >>> 0, svl.level.locations[u.ux][u.uy].flags = ($t1) & 31;
             break;
         case 3:
-            sym = 19;
-            await set_levltyp(u.ux, u.uy, 25);
+            sym = S_room;
+            await set_levltyp(u.ux, u.uy, ROOM);
             await make_grave(u.ux, u.uy, null);
-            if (svl.level.locations[u.ux][u.uy].typ === 31 /* GRAVE */) {
-                sym = 34;
+            if (svl.level.locations[u.ux][u.uy].typ === GRAVE) {
+                sym = S_grave;
             }
             break;
     }
-    if (svl.level.locations[u.ux][u.uy].typ !== 25 /* ROOM */) {
+    if (svl.level.locations[u.ux][u.uy].typ !== ROOM) {
         await pline_The($c.lit("sink transforms into %s!"), await an(defsyms[sym].explanation));
     } else {
         await pline_The($c.lit("sink vanishes."));
@@ -377,12 +401,12 @@ async function teleport_sink() {   // do.c:460
     do {
         cx = $c.i16(1 + rnd(77) | 0);
         cy = $c.i16(1 + rn2(19) | 0);
-        if (svl.level.locations[cx][cy].typ === 25 /* ROOM */ && !t_at(cx, cy) && !engr_at(cx, cy) && (!((gv.viz_array.get(cy).get(cx) & 2) !== 0) || dist2(cx, cy, u.ux, u.uy) > 9)) {
+        if (svl.level.locations[cx][cy].typ === ROOM && !t_at(cx, cy) && !engr_at(cx, cy) && (!((gv.viz_array.get(cy).get(cx) & IN_SIGHT) !== 0) || dist2(cx, cy, u.ux, u.uy) > 9)) {
             alreadylooted = svl.level.locations[u.ux][u.uy].flags;
-            await set_levltyp(u.ux, u.uy, 25);
+            await set_levltyp(u.ux, u.uy, ROOM);
             svl.level.locations[u.ux][u.uy].flags = (0) & 31;
             await newsym(u.ux, u.uy);
-            await set_levltyp(cx, cy, 30);
+            await set_levltyp(cx, cy, SINK);
             svl.level.locations[cx][cy].flags = ((alreadylooted ? 1 : 0) >>> 0) & 31;
             await newsym(cx, cy);
             return 1;
@@ -398,10 +422,10 @@ async function dosinkring(obj) {   // do.c:498
     obj.in_use = (1) & 1;
     S1: for (;;) {
         switch ($goto !== null ? $goto : obj.otyp) {
-            case 180 /* RIN_SEARCHING */:
+            case RIN_SEARCHING:
                 await You($c.lit("thought %s got lost in the sink, but there it is!"), await yname(obj));
                 $goto = "giveback"; continue S1;
-            case 193 /* RIN_SLOW_DIGESTION */:
+            case RIN_SLOW_DIGESTION:
                 await pline_The($c.lit("ring is regurgitated!"));
             case "giveback":
                 $goto = null;   // giveback:
@@ -409,42 +433,42 @@ async function dosinkring(obj) {   // do.c:498
                 await dropx(obj);
                 await trycall(obj);
                 return;
-            case 183 /* RIN_LEVITATION */:
+            case RIN_LEVITATION:
                 await pline_The($c.lit("sink quivers upward for a moment."));
                 break;
-            case 188 /* RIN_POISON_RESISTANCE */:
+            case RIN_POISON_RESISTANCE:
                 await You($c.lit("smell rotten %s."), await makeplural(await fruitname(0)));
                 break;
-            case 185 /* RIN_AGGRAVATE_MONSTER */:
-                await pline($c.lit("Several %s buzz angrily around the sink."), u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic) ? await makeplural(await rndmonnam(null)) : $c.lit("flies"));
+            case RIN_AGGRAVATE_MONSTER:
+                await pline($c.lit("Several %s buzz angrily around the sink."), u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await makeplural(await rndmonnam(null)) : $c.lit("flies"));
                 break;
-            case 191 /* RIN_SHOCK_RESISTANCE */:
+            case RIN_SHOCK_RESISTANCE:
                 await pline($c.lit("Static electricity surrounds the sink."));
                 break;
-            case 186 /* RIN_CONFLICT */:
+            case RIN_CONFLICT:
                 await You_hear($c.lit("loud noises coming from the drain."));
                 break;
-            case 182 /* RIN_SUSTAIN_ABILITY */:
+            case RIN_SUSTAIN_ABILITY:
                 await pline_The($c.lit("%s flow seems fixed."), hliquid($c.lit("water")));
                 break;
-            case 174 /* RIN_GAIN_STRENGTH */:
+            case RIN_GAIN_STRENGTH:
                 await pline_The($c.lit("%s flow seems %ser now."), hliquid($c.lit("water")), obj.spe < 0 ? $c.lit("weak") : $c.lit("strong"));
                 break;
-            case 175 /* RIN_GAIN_CONSTITUTION */:
+            case RIN_GAIN_CONSTITUTION:
                 await pline_The($c.lit("%s flow seems %ser now."), hliquid($c.lit("water")), obj.spe < 0 ? $c.lit("less") : $c.lit("great"));
                 break;
-            case 176 /* RIN_INCREASE_ACCURACY */:
+            case RIN_INCREASE_ACCURACY:
                 await pline_The($c.lit("%s flow %s the drain."), hliquid($c.lit("water")), obj.spe < 0 ? $c.lit("misses") : $c.lit("hits"));
                 break;
-            case 177 /* RIN_INCREASE_DAMAGE */:
+            case RIN_INCREASE_DAMAGE:
                 await pline_The($c.lit("water's force seems %ser now."), obj.spe < 0 ? $c.lit("small") : $c.lit("great"));
                 break;
-            case 184 /* RIN_HUNGER */:
+            case RIN_HUNGER:
                 ideed = 0;
                 for (otmp = svl.level.objects[u.ux][u.uy]; otmp; otmp = otmp2) {
                     otmp2 = otmp.v.v_nexthere;
                     if (!$c.peq(otmp, $G.uball) && !$c.peq(otmp, $G.uchain) && !obj_resists(otmp, 1, 99)) {
-                        if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
+                        if (!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked)) {
                             await pline($c.lit("Suddenly, %s %s from the sink!"), await doname(otmp), await otense(otmp, $c.lit("vanish")));
                             ideed = 1;
                         }
@@ -452,18 +476,18 @@ async function dosinkring(obj) {   // do.c:498
                     }
                 }
                 break;
-            case 270 /* MEAT_RING */:
+            case MEAT_RING:
                 await pline($c.lit("Several flies buzz around the sink."));
                 break;
-            case 194 /* RIN_TELEPORTATION */:
+            case RIN_TELEPORTATION:
                 nosink = await teleport_sink();
                 await pline_The($c.lit("sink %svanishes."), nosink ? $c.lit("") : $c.lit("momentarily "));
                 ideed = 0;
                 break;
-            case 196 /* RIN_POLYMORPH */:
+            case RIN_POLYMORPH:
                 await polymorph_sink();
                 nosink = 1;
-                ideed = $c.i8(svl.level.locations[u.ux][u.uy].typ !== 25 /* ROOM */ ? 1 : 0);
+                ideed = $c.i8(svl.level.locations[u.ux][u.uy].typ !== ROOM ? 1 : 0);
                 break;
             default:
                 ideed = 0;
@@ -471,46 +495,46 @@ async function dosinkring(obj) {   // do.c:498
         }
         break;
     }
-    if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked) && !ideed) {
+    if (!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked) && !ideed) {
         ideed = 1;
         switch (obj.otyp) {
-            case 173 /* RIN_ADORNMENT */:
+            case RIN_ADORNMENT:
                 await pline_The($c.lit("faucets flash brightly for a moment."));
                 break;
-            case 179 /* RIN_REGENERATION */:
+            case RIN_REGENERATION:
                 await pline_The($c.lit("sink looks as good as new."));
                 break;
-            case 198 /* RIN_INVISIBILITY */:
+            case RIN_INVISIBILITY:
                 await You($c.lit("don't see anything happen to the sink."));
                 break;
-            case 192 /* RIN_FREE_ACTION */:
+            case RIN_FREE_ACTION:
                 await You_see($c.lit("the ring slide right down the drain!"));
                 break;
-            case 199 /* RIN_SEE_INVISIBLE */:
-                await You_see($c.lit("some %s in the sink."), u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic) ? $c.lit("oxygen molecules") : $c.lit("air"));
+            case RIN_SEE_INVISIBLE:
+                await You_see($c.lit("some %s in the sink."), u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? $c.lit("oxygen molecules") : $c.lit("air"));
                 break;
-            case 181 /* RIN_STEALTH */:
+            case RIN_STEALTH:
                 await pline_The($c.lit("sink seems to blend into the floor for a moment."));
                 break;
-            case 189 /* RIN_FIRE_RESISTANCE */:
+            case RIN_FIRE_RESISTANCE:
                 await pline_The($c.lit("hot %s faucet flashes brightly for a moment."), hliquid($c.lit("water")));
                 break;
-            case 190 /* RIN_COLD_RESISTANCE */:
+            case RIN_COLD_RESISTANCE:
                 await pline_The($c.lit("cold %s faucet flashes brightly for a moment."), hliquid($c.lit("water")));
                 break;
-            case 200 /* RIN_PROTECTION_FROM_SHAPE_CHAN */:
+            case RIN_PROTECTION_FROM_SHAPE_CHAN:
                 await pline_The($c.lit("sink looks nothing like a fountain."));
                 break;
-            case 178 /* RIN_PROTECTION */:
+            case RIN_PROTECTION:
                 await pline_The($c.lit("sink glows %s for a moment."), hcolor(obj.spe < 0 ? c_color_names.c_black : c_color_names.c_silver));
                 break;
-            case 187 /* RIN_WARNING */:
+            case RIN_WARNING:
                 await pline_The($c.lit("sink glows %s for a moment."), hcolor(c_color_names.c_white));
                 break;
-            case 195 /* RIN_TELEPORT_CONTROL */:
+            case RIN_TELEPORT_CONTROL:
                 await pline_The($c.lit("sink looks like it is being beamed aboard somewhere."));
                 break;
-            case 197 /* RIN_POLYMORPH_CONTROL */:
+            case RIN_POLYMORPH_CONTROL:
                 await pline_The($c.lit("sink momentarily looks like a regularly erupting geyser."));
                 break;
             default:
@@ -538,7 +562,7 @@ async function dosinkring(obj) {   // do.c:498
 }
 export async function canletgo(obj, word) {   // do.c:665
     let hand = null;
-    if ($c.and64(obj.owornmask, 983167)) {
+    if ($c.and64(obj.owornmask, W_ARM | W_ARMC | W_ARMH | W_ARMS | W_ARMG | W_ARMF | W_ARMU | (W_RINGL | W_RINGR | W_AMUL | W_TOOL))) {
         if (word.get(0)) {
             await Norep($c.lit("You cannot %s %s you are wearing."), word, c_common_strings.c_something);
         }
@@ -546,15 +570,15 @@ export async function canletgo(obj, word) {   // do.c:665
     }
     if ($c.peq(obj, $G.uwep) && await welded($G.uwep)) {
         if (word.get(0)) {
-            hand = await body_part(6 /* HAND */);
-            if (($G.uwep.oclass === 2 /* WEAPON_CLASS */ || $G.uwep.oclass === 6 /* TOOL_CLASS */) && objects[$G.uwep.otyp].oc_big | 0) {
+            hand = await body_part(HAND);
+            if (($G.uwep.oclass === WEAPON_CLASS || $G.uwep.oclass === TOOL_CLASS) && objects[$G.uwep.otyp].oc_big | 0) {
                 hand = await makeplural(hand);
             }
             await Norep($c.lit("You cannot %s %s welded to your %s."), word, c_common_strings.c_something, hand);
         }
         return 0;
     }
-    if (obj.otyp === 471 /* LOADSTONE */ && obj.cursed | 0) {
+    if (obj.otyp === LOADSTONE && obj.cursed | 0) {
         if (word.get(0)) {
             if (!$c.strcmp(word, $c.lit("throw")) && obj.quan > 1) {
                 obj.corpsenm = 1;
@@ -565,13 +589,13 @@ export async function canletgo(obj, word) {   // do.c:665
         await set_bknown(obj, 1);
         return 0;
     }
-    if (obj.otyp === 236 /* LEASH */ && obj.corpsenm !== 0) {
+    if (obj.otyp === LEASH && obj.corpsenm !== 0) {
         if (word.get(0)) {
-            await pline_The($c.lit("leash is tied around your %s."), await body_part(6 /* HAND */));
+            await pline_The($c.lit("leash is tied around your %s."), await body_part(HAND));
         }
         return 0;
     }
-    if ($c.and64(obj.owornmask, 1048576)) {
+    if ($c.and64(obj.owornmask, W_SADDLE)) {
         if (word.get(0)) {
             await You($c.lit("cannot %s %s you are sitting on."), word, c_common_strings.c_something);
         }
@@ -582,18 +606,18 @@ export async function canletgo(obj, word) {   // do.c:665
 async function drop(obj) {   // do.c:714
     let onam_p = null, mnam_p = null, monbuf = new Int8Array(256), levhack = 0;
     if (!obj) {
-        return 4;
+        return ECMD_FAIL;
     }
     if (!await canletgo(obj, $c.lit("drop"))) {
-        return 4;
+        return ECMD_FAIL;
     }
-    if (obj.otyp === 265 /* CORPSE */ && await better_not_try_to_drop_that(obj)) {
-        return 4;
+    if (obj.otyp === CORPSE && await better_not_try_to_drop_that(obj)) {
+        return ECMD_FAIL;
     }
     if ($c.peq(obj, $G.uwep)) {
         if (await welded($G.uwep)) {
             await weldmsg(obj);
-            return 4;
+            return ECMD_FAIL;
         }
         await setuwep(null);
     }
@@ -606,22 +630,22 @@ async function drop(obj) {   // do.c:714
     if (u.uswallow) {
         if (flags.verbose) {
             mnam_p = await mon_nam(u.ustuck);
-            if (dmgtype_fromattack(u.ustuck.data, 26, 11) !== null) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(monbuf, 0), 0, 256, $c.lit("%s %s"), s_suffix(mnam_p), await mbodypart(u.ustuck, 18 /* STOMACH */));
+            if (dmgtype_fromattack(u.ustuck.data, AD_DGST, AT_ENGL) !== null) {
+                $c.__builtin___sprintf_chk(new $c.Ptr(monbuf, 0), 0, 256, $c.lit("%s %s"), s_suffix(mnam_p), await mbodypart(u.ustuck, STOMACH));
                 mnam_p = new $c.Ptr(monbuf, 0);
             }
             onam_p = is_unpaid(obj) ? await yobjnam(obj, null) : await doname(obj);
             await You($c.lit("drop %s into %s."), onam_p, mnam_p);
         }
     } else {
-        if ((obj.oclass === 4 /* RING_CLASS */ || obj.otyp === 270 /* MEAT_RING */) && svl.level.locations[u.ux][u.uy].typ === 30 /* SINK */) {
+        if ((obj.oclass === RING_CLASS || obj.otyp === MEAT_RING) && svl.level.locations[u.ux][u.uy].typ === SINK) {
             await dosinkring(obj);
-            return 1;
+            return ECMD_TIME;
         }
         if (!can_reach_floor(1)) {
             levhack = finesse_ahriman(obj);
             if (levhack) {
-                u.uprops[48 /* LEVITATION */].extrinsic = 4096;
+                u.uprops[LEVITATION].extrinsic = W_ART;
             }
             if (flags.verbose) {
                 await You($c.lit("drop %s."), await doname(obj));
@@ -629,17 +653,17 @@ async function drop(obj) {   // do.c:714
             await freeinv(obj);
             await hitfloor(obj, 1);
             if (levhack) {
-                await float_down(553648127, 12288);
+                await float_down(I_SPECIAL | TIMEOUT, W_ARTI | W_ART);
             }
-            return 1;
+            return ECMD_TIME;
         }
-        if (!(svl.level.locations[u.ux][u.uy].typ === 32 /* ALTAR */) && flags.verbose) {
+        if (!(svl.level.locations[u.ux][u.uy].typ === ALTAR) && flags.verbose) {
             await You($c.lit("drop %s."), await doname(obj));
         }
     }
-    obj.how_lost = (2) & 7;
+    obj.how_lost = (LOST_DROPPED) & 7;
     await dropx(obj);
-    return 1;
+    return ECMD_TIME;
 }
 export async function dropx(obj) {   // do.c:786
     await freeinv(obj);
@@ -647,7 +671,7 @@ export async function dropx(obj) {   // do.c:786
         if (await ship_object(obj, u.ux, u.uy, 0)) {
             return;
         }
-        if (svl.level.locations[u.ux][u.uy].typ === 32 /* ALTAR */) {
+        if (svl.level.locations[u.ux][u.uy].typ === ALTAR) {
             await doaltarobj(obj);
         }
     }
@@ -690,7 +714,7 @@ export async function dropz(obj, with_impact) {   // do.c:807
             await sellobj(obj, u.ux, u.uy);
         }
         await stackobj(obj);
-        if ((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked && ((u.uprops[48 /* LEVITATION */].intrinsic || u.uprops[48 /* LEVITATION */].extrinsic) && !u.uprops[48 /* LEVITATION */].blocked)) {
+        if ((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked && ((u.uprops[LEVITATION].intrinsic || u.uprops[LEVITATION].extrinsic) && !u.uprops[LEVITATION].blocked)) {
             await map_object(obj, 0);
         }
         await newsym(u.ux, u.uy);
@@ -699,23 +723,23 @@ export async function dropz(obj, with_impact) {   // do.c:807
 }
 async function engulfer_digests_food(obj) {   // do.c:849
     let could_petrify = 0, could_poly = 0, could_slime = 0, could_grow = 0, could_heal = 0;
-    if (dmgtype_fromattack(u.ustuck.data, 26, 11) !== null && (obj.otyp === 265 /* CORPSE */ || obj.globby | 0 || obj.otyp === 267 /* MEATBALL */ || obj.otyp === 269 /* ENORMOUS_MEATBALL */ || obj.otyp === 270 /* MEAT_RING */ || obj.otyp === 268 /* MEAT_STICK */)) {
+    if (dmgtype_fromattack(u.ustuck.data, AD_DGST, AT_ENGL) !== null && (obj.otyp === CORPSE || obj.globby | 0 || obj.otyp === MEATBALL || obj.otyp === ENORMOUS_MEATBALL || obj.otyp === MEAT_RING || obj.otyp === MEAT_STICK)) {
         could_petrify = 0;
         could_poly = 0;
         could_slime = 0;
         could_grow = 0;
         could_heal = 0;
-        if (obj.otyp === 265 /* CORPSE */) {
-            could_petrify = $c.i8($c.peq($c.relem(mons, obj.corpsenm), $c.relem(mons, 10 /* PM_COCKATRICE */)) || $c.peq($c.relem(mons, obj.corpsenm), $c.relem(mons, 9 /* PM_CHICKATRICE */)) ? 1 : 0);
-            could_poly = $c.i8((obj.otyp === 265 /* CORPSE */ || obj.otyp === 266 /* EGG */ || obj.otyp === 296 /* TIN */) && obj.corpsenm >= 0 /* LOW_PM */ && (pm_to_cham(obj.corpsenm) !== -1 /* NON_PM */ || dmgtype($c.relem(mons, obj.corpsenm), 43)) ? 1 : 0);
-            could_grow = $c.i8(obj.corpsenm === 230 /* PM_WRAITH */ ? 1 : 0);
-            could_heal = $c.i8(obj.corpsenm === 279 /* PM_NURSE */ ? 1 : 0);
-        } else if (obj.otyp === 273 /* GLOB_OF_GREEN_SLIME */) {
+        if (obj.otyp === CORPSE) {
+            could_petrify = $c.i8($c.peq($c.relem(mons, obj.corpsenm), $c.relem(mons, PM_COCKATRICE)) || $c.peq($c.relem(mons, obj.corpsenm), $c.relem(mons, PM_CHICKATRICE)) ? 1 : 0);
+            could_poly = $c.i8((obj.otyp === CORPSE || obj.otyp === EGG || obj.otyp === TIN) && obj.corpsenm >= LOW_PM && (pm_to_cham(obj.corpsenm) !== NON_PM || dmgtype($c.relem(mons, obj.corpsenm), AD_POLY)) ? 1 : 0);
+            could_grow = $c.i8(obj.corpsenm === PM_WRAITH ? 1 : 0);
+            could_heal = $c.i8(obj.corpsenm === PM_NURSE ? 1 : 0);
+        } else if (obj.otyp === GLOB_OF_GREEN_SLIME) {
             could_slime = 1;
         }
         await pline($c.lit("%s instantly digested!"), await Tobjnam(obj, $c.lit("are")));
         if (could_poly || could_slime) {
-            await newcham(u.ustuck, could_slime ? $c.relem(mons, 208 /* PM_GREEN_SLIME */) : null, could_slime ? 1 : 0);
+            await newcham(u.ustuck, could_slime ? $c.relem(mons, PM_GREEN_SLIME) : null, could_slime ? NC_SHOW_MSG : NO_NC_FLAGS);
         } else if (could_petrify) {
             await minstapetrify(u.ustuck, 1);
         } else if (could_grow) {
@@ -739,12 +763,12 @@ export async function obj_no_longer_held(obj) {   // do.c:893
         }
     }
     switch (obj.otyp) {
-        case 43 /* CRYSKNIFE */:
+        case CRYSKNIFE:
             if (!obj.oerodeproof || !rn2(10)) {
                 if (!svc.context.mon_moving && !program_state.gameover) {
-                    await costly_alteration(obj, 6 /* COST_DEGRD */);
+                    await costly_alteration(obj, COST_DEGRD);
                 }
-                obj.otyp = 42;
+                obj.otyp = WORM_TOOTH;
                 obj.oerodeproof = (0) & 1;
             }
             break;
@@ -752,20 +776,20 @@ export async function obj_no_longer_held(obj) {   // do.c:893
 }
 export async function doddrop() {   // do.c:924
     let result = 0;
-    result = 0;
+    result = ECMD_OK;
     if (!gi.invent) {
         await You($c.lit("have nothing to drop."));
-        return 0;
+        return ECMD_OK;
     }
     add_valid_menu_class(0);
     if (new $c.Ptr(u.ushops, 0).get(0)) {
-        sellobj_state(1);
+        sellobj_state(SELL_DELIBERATE);
     }
-    if (flags.menu_style !== 0 || (result = await ggetobj($c.lit("drop"), drop, 0, 0, null)) < -1) {
+    if (flags.menu_style !== MENU_TRADITIONAL || (result = await ggetobj($c.lit("drop"), drop, 0, 0, null)) < -1) {
         result = await menu_drop(result);
     }
     if (new $c.Ptr(u.ushops, 0).get(0)) {
-        sellobj_state(0);
+        sellobj_state(SELL_NORMAL);
     }
     if (result) {
         reset_occupations();
@@ -774,8 +798,8 @@ export async function doddrop() {   // do.c:924
 }
 async function better_not_try_to_drop_that(otmp) {   // do.c:947
     let buf = new Int8Array(256);
-    if (otmp.otyp === 265 /* CORPSE */ && !u_safe_from_fatal_corpse(otmp, 15 /* st_all */)) {
-        nh_snprintf($c.lit("better_not_try_to_drop_that"), 958, new $c.Ptr(buf, 0), 256, $c.lit("Drop the %s corpse without %s protection on?"), await obj_pmname(otmp), await body_part(6 /* HAND */));
+    if (otmp.otyp === CORPSE && !u_safe_from_fatal_corpse(otmp, st_all)) {
+        nh_snprintf($c.lit("better_not_try_to_drop_that"), 958, new $c.Ptr(buf, 0), 256, $c.lit("Drop the %s corpse without %s protection on?"), await obj_pmname(otmp), await body_part(HAND));
         return $c.i8(await paranoid_ynq(1, new $c.Ptr(buf, 0), 0) !== 121 ? 1 : 0);
     }
     return 0;
@@ -783,7 +807,7 @@ async function better_not_try_to_drop_that(otmp) {   // do.c:947
 async function menudrop_split(otmp, cnt) {   // do.c:964
     if (cnt && cnt < otmp.quan) {
         if (await welded(otmp)) {
-        } else if (otmp.otyp === 471 /* LOADSTONE */ && otmp.cursed | 0) {
+        } else if (otmp.otyp === LOADSTONE && otmp.cursed | 0) {
             otmp.corpsenm = $c.i32(cnt);
         } else {
             otmp = await splitobj(otmp, cnt);
@@ -802,14 +826,14 @@ async function menu_drop(retry) {   // do.c:981
     drop_done$: {
         if (retry) {
             all_categories = $c.i8(retry === -2 ? 1 : 0);
-        } else if (flags.menu_style === 2) {
+        } else if (flags.menu_style === MENU_FULL) {
             all_categories = 0;
-            n = await query_category($c.lit("Drop what type of items?"), gi.invent, 8102, new $c.Ptr(pick_list, 0), 2);
+            n = await query_category($c.lit("Drop what type of items?"), gi.invent, UNPAID_TYPES | ALL_TYPES | CHOOSE_ALL | BUC_BLESSED | BUC_CURSED | BUC_UNCURSED | BUC_UNKNOWN | JUSTPICKED | INCLUDE_VENOM, new $c.Ptr(pick_list, 0), PICK_ANY);
             if (!n) {
                 break drop_done$;
             }
             for (i = 0; i < n; i = i + 1 | 0) {
-                if ($c.radd(pick_list[0], i).item.a_int === -2) {
+                if ($c.radd(pick_list[0], i).item.a_int === ALL_TYPES_SELECTED) {
                     all_categories = 1;
                 } else if ($c.radd(pick_list[0], i).item.a_int === 65) {
                     drop_everything = autopick = 1;
@@ -824,14 +848,14 @@ async function menu_drop(retry) {   // do.c:981
                 }
             }
             $c.free(pick_list[0]);
-        } else if (flags.menu_style === 1) {
+        } else if (flags.menu_style === MENU_COMBINATION) {
             ggoresults[0] = 0;
             all_categories = 0;
             i = await ggetobj($c.lit("drop"), drop, 0, 1, new $c.Ptr(ggoresults, 0));
             if (i === -2) {
                 all_categories = 1;
             }
-            if ((ggoresults[0] & 1) >>> 0 !== 0) {
+            if ((ggoresults[0] & ALL_FINISHED) >>> 0 !== 0) {
                 n_dropped = i;
                 break drop_done$;
             }
@@ -840,17 +864,17 @@ async function menu_drop(retry) {   // do.c:981
             bypass_objlist(gi.invent, 0);
             while ((otmp = nxt_unbypassed_obj(gi.invent)) !== null) {
                 if (drop_everything || all_categories || await allow_category(otmp)) {
-                    n_dropped = n_dropped + ((await drop(otmp) & 1) !== 0 ? 1 : 0) | 0;
+                    n_dropped = n_dropped + ((await drop(otmp) & ECMD_TIME) !== 0 ? 1 : 0) | 0;
                 }
             }
             bypass_objlist(gi.invent, 0);
         } else if (drop_justpicked && count_justpicked(gi.invent) === 1) {
             otmp = find_justpicked(gi.invent);
             if (otmp) {
-                n_dropped = n_dropped + ((await menudrop_split(otmp, justpicked_quan) & 1) !== 0 ? 1 : 0) | 0;
+                n_dropped = n_dropped + ((await menudrop_split(otmp, justpicked_quan) & ECMD_TIME) !== 0 ? 1 : 0) | 0;
             }
         } else {
-            n = await query_objlist($c.lit("What would you like to drop?"), new $c.FieldRef(gi, "invent", "ptr"), 26, new $c.Ptr(pick_list, 0), 2, all_categories ? allow_all : allow_category);
+            n = await query_objlist($c.lit("What would you like to drop?"), new $c.FieldRef(gi, "invent", "ptr"), USE_INVLET | INVORDER_SORT | INCLUDE_VENOM, new $c.Ptr(pick_list, 0), PICK_ANY, all_categories ? allow_all : allow_category);
             if (n > 0) {
                 bypass_objlist(gi.invent, 1);
                 for (i = 0; i < n; i = i + 1 | 0) {
@@ -863,20 +887,20 @@ async function menu_drop(retry) {   // do.c:981
                     if (!otmp2 || !otmp2.bypass) {
                         continue;
                     }
-                    n_dropped = n_dropped + ((await menudrop_split(otmp, $c.radd(pick_list[0], i).count) & 1) !== 0 ? 1 : 0) | 0;
+                    n_dropped = n_dropped + ((await menudrop_split(otmp, $c.radd(pick_list[0], i).count) & ECMD_TIME) !== 0 ? 1 : 0) | 0;
                 }
                 bypass_objlist(gi.invent, 0);
                 $c.free(pick_list[0]);
             }
         }
     }
-    return n_dropped ? 1 : 0;
+    return n_dropped ? ECMD_TIME : ECMD_OK;
 }
 async function u_stuck_cannot_go(updn) {   // do.c:1110
     let mtmp = null;
     if (u.ustuck) {
         if (u.uswallow | 0 || !sticks(gy.youmonst.data)) {
-            await You($c.lit("are %s, and cannot go %s."), !u.uswallow ? $c.lit("being held") : dmgtype_fromattack(u.ustuck.data, 26, 11) !== null ? $c.lit("swallowed") : $c.lit("engulfed"), updn);
+            await You($c.lit("are %s, and cannot go %s."), !u.uswallow ? $c.lit("being held") : dmgtype_fromattack(u.ustuck.data, AD_DGST, AT_ENGL) !== null ? $c.lit("swallowed") : $c.lit("engulfed"), updn);
             return 1;
         } else {
             mtmp = u.ustuck;
@@ -889,23 +913,23 @@ async function u_stuck_cannot_go(updn) {   // do.c:1110
 export async function dodown() {   // do.c:1131
     let trap = null, stway = null, stairs_down = 0, ladder_down = 0, obj = null, glyph_at_uxuy = 0, down_or_thru = null, actn = null, qbuf = new Int8Array(128), tdst = new $T.d_level(), $t1;
     trap = null;
-    set_move_cmd(8 /* DIR_DOWN */, 0);
+    set_move_cmd(DIR_DOWN, 0);
     if (await u_rooted()) {
-        return 1;
+        return ECMD_TIME;
     }
     if (await stucksteed(1)) {
-        return 0;
+        return ECMD_OK;
     }
     stairs_down = ladder_down = 0;
     if ((stway = stairway_at(u.ux, u.uy)) !== null && !stway.up) {
         stairs_down = $c.i8(!stway.isladder ? 1 : 0);
         ladder_down = $c.i8(!stairs_down ? 1 : 0);
     }
-    if (u.uprops[48 /* LEVITATION */].intrinsic || u.uprops[48 /* LEVITATION */].extrinsic) {
-        if ($c.and64(u.uprops[48 /* LEVITATION */].intrinsic, 536870912) || $c.and64(u.uprops[48 /* LEVITATION */].extrinsic, 8192)) {
-            if ($c.and64(u.uprops[48 /* LEVITATION */].extrinsic, 8192)) {
+    if (u.uprops[LEVITATION].intrinsic || u.uprops[LEVITATION].extrinsic) {
+        if ($c.and64(u.uprops[LEVITATION].intrinsic, I_SPECIAL) || $c.and64(u.uprops[LEVITATION].extrinsic, W_ARTI)) {
+            if ($c.and64(u.uprops[LEVITATION].extrinsic, W_ARTI)) {
                 for (obj = gi.invent; obj; obj = obj.nobj) {
-                    if (obj.oartifact && artifact_has_invprop(obj, 48)) {
+                    if (obj.oartifact && artifact_has_invprop(obj, LEVITATION)) {
                         if (obj.age < svm.moves) {
                             obj.age = svm.moves;
                         }
@@ -913,20 +937,20 @@ export async function dodown() {   // do.c:1131
                     }
                 }
             }
-            if (await float_down(553648127, 8192)) {
-                return 1;
-            } else if (!u.uprops[48 /* LEVITATION */].intrinsic && !u.uprops[48 /* LEVITATION */].extrinsic) {
+            if (await float_down(I_SPECIAL | TIMEOUT, W_ARTI)) {
+                return ECMD_TIME;
+            } else if (!u.uprops[LEVITATION].intrinsic && !u.uprops[LEVITATION].extrinsic) {
                 await Your($c.lit("latent levitation ceases."));
-                return 1;
+                return ECMD_TIME;
             }
         }
-        if (u.uprops[48 /* LEVITATION */].blocked) {
-        } else if ((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked) {
+        if (u.uprops[LEVITATION].blocked) {
+        } else if ((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked) {
             glyph_at_uxuy = svl.level.locations[u.ux][u.uy].glyph;
             if (stairs_down) {
-                stairs_down = $c.i8(glyph_to_cmap(glyph_at_uxuy) === 26 /* S_dnstair */ ? 1 : 0);
+                stairs_down = $c.i8(glyph_to_cmap(glyph_at_uxuy) === S_dnstair ? 1 : 0);
             } else if (ladder_down) {
-                ladder_down = $c.i8(glyph_to_cmap(glyph_at_uxuy) === 28 /* S_dnladder */ ? 1 : 0);
+                ladder_down = $c.i8(glyph_to_cmap(glyph_at_uxuy) === S_dnladder ? 1 : 0);
             }
         }
         if ((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level)) {
@@ -936,11 +960,11 @@ export async function dodown() {   // do.c:1131
         } else {
             await floating_above(stairs_down ? $c.lit("stairs") : ladder_down ? $c.lit("ladder") : surface(u.ux, u.uy));
         }
-        return 0;
+        return ECMD_OK;
     }
-    if (u.umonnum !== u.umonster && ($c.andu64($c.relem(mons, u.umonnum).mflags1, 256) !== 0 && ($c.andu64($c.relem(mons, u.umonnum).mflags1, 16) !== 0 && $c.relem(mons, u.umonnum).mlet !== 13 /* S_MIMIC */ || $c.andu64($c.relem(mons, u.umonnum).mflags1, 1) !== 0)) && u.uundetected | 0) {
+    if (u.umonnum !== u.umonster && ($c.andu64($c.relem(mons, u.umonnum).mflags1, M1_HIDE) !== 0 && ($c.andu64($c.relem(mons, u.umonnum).mflags1, M1_CLING) !== 0 && $c.relem(mons, u.umonnum).mlet !== S_MIMIC || $c.andu64($c.relem(mons, u.umonnum).mflags1, M1_FLY) !== 0)) && u.uundetected | 0) {
         u.uundetected = (0) & 1;
-        if ((u.uprops[49 /* FLYING */].intrinsic || u.uprops[49 /* FLYING */].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, 1) !== 0) && !u.uprops[49 /* FLYING */].blocked) {
+        if ((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked) {
             await You($c.lit("fly out of hiding."));
         } else {
             await You($c.lit("drop to the %s."), surface(u.ux, u.uy));
@@ -949,26 +973,26 @@ export async function dodown() {   // do.c:1131
             } else {
                 await pickup(1);
                 if ((trap = t_at(u.ux, u.uy)) !== null) {
-                    await dotrap(trap, 16);
+                    await dotrap(trap, TOOKPLUNGE);
                 }
             }
         }
-        return 1;
+        return ECMD_TIME;
     }
     if (await u_stuck_cannot_go($c.lit("down"))) {
-        return 1;
+        return ECMD_TIME;
     }
     if (!stairs_down && !ladder_down) {
         trap = t_at(u.ux, u.uy);
         if (trap && (uteetering_at_seen_pit(trap) || uescaped_shaft(trap))) {
-            await dotrap(trap, 16);
-            return 1;
-        } else if (!trap || !((trap.ttyp | 0) === 13 /* HOLE */ || (trap.ttyp | 0) === 14 /* TRAPDOOR */) || !Can_fall_thru(u.uz) || !trap.tseen) {
-            if (flags.autodig && !svc.context.nopick && $G.uwep && (($G.uwep.oclass === 2 /* WEAPON_CLASS */ || $G.uwep.oclass === 6 /* TOOL_CLASS */) && objects[$G.uwep.otyp].oc_subtyp === 4 /* P_PICK_AXE */)) {
+            await dotrap(trap, TOOKPLUNGE);
+            return ECMD_TIME;
+        } else if (!trap || !((trap.ttyp | 0) === HOLE || (trap.ttyp | 0) === TRAPDOOR) || !Can_fall_thru(u.uz) || !trap.tseen) {
+            if (flags.autodig && !svc.context.nopick && $G.uwep && (($G.uwep.oclass === WEAPON_CLASS || $G.uwep.oclass === TOOL_CLASS) && objects[$G.uwep.otyp].oc_subtyp === P_PICK_AXE)) {
                 return await use_pick_axe2($G.uwep);
             } else {
-                await You_cant($c.lit("go down here%s."), trap && (trap.ttyp | 0) === 23 /* VIBRATING_SQUARE */ ? $c.lit(" yet") : $c.lit(""));
-                return 0;
+                await You_cant($c.lit("go down here%s."), trap && (trap.ttyp | 0) === VIBRATING_SQUARE ? $c.lit(" yet") : $c.lit(""));
+                return ECMD_OK;
             }
         }
     }
@@ -976,34 +1000,34 @@ export async function dodown() {   // do.c:1131
         await You($c.lit("are standing at the gate to Gehennom."));
         await pline($c.lit("Unspeakable cruelty and harm lurk down there."));
         if (await yn_function($c.lit("Are you sure you want to enter?"), new $c.Ptr(ynchars, 0), 110, 1) !== 121) {
-            return 0;
+            return ECMD_OK;
         }
         await pline($c.lit("So be it."));
         u.uevent.gehennom_entered = (1) & 1;
     }
     if (!await next_to_u()) {
         await You($c.lit("are held back by your pet!"));
-        return 0;
+        return ECMD_OK;
     }
     if (trap) {
-        down_or_thru = (trap.ttyp | 0) === 13 /* HOLE */ ? $c.lit("down") : $c.lit("through");
+        down_or_thru = (trap.ttyp | 0) === HOLE ? $c.lit("down") : $c.lit("through");
         actn = u_locomotion($c.lit("jump"));
-        if (gy.youmonst.data.msize >= 4) {
+        if (gy.youmonst.data.msize >= MZ_HUGE) {
             await You($c.lit("don't fit %s easily."), down_or_thru);
             $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 128, $c.lit("Try to squeeze %s?"), down_or_thru);
             if (await yn_function(new $c.Ptr(qbuf, 0), new $c.Ptr(ynchars, 0), 110, 1) === 121) {
                 if (!rn2(3)) {
                     actn = $c.lit("manage to squeeze");
-                    await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(rnd(4) + 1 | 0, 2) : rnd(4), $c.lit("contusion from a small passage"), 1);
+                    await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(rnd(4) + 1 | 0, 2) : rnd(4), $c.lit("contusion from a small passage"), KILLED_BY);
                 } else {
                     await You($c.lit("were unable to fit %s."), down_or_thru);
-                    return 0;
+                    return ECMD_OK;
                 }
             } else {
-                return 0;
+                return ECMD_OK;
             }
         }
-        await You($c.lit("%s %s the %s."), actn, down_or_thru, (trap.ttyp | 0) === 13 /* HOLE */ ? $c.lit("hole") : $c.lit("trap door"));
+        await You($c.lit("%s %s the %s."), actn, down_or_thru, (trap.ttyp | 0) === HOLE ? $c.lit("hole") : $c.lit("trap door"));
     }
     if (trap && ((svd.dungeon_topology.d_stronghold_level.dlevel || svd.dungeon_topology.d_stronghold_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_stronghold_level))) {
         await goto_hell(0, 1);
@@ -1012,53 +1036,53 @@ export async function dodown() {   // do.c:1131
         clamp_hole_destination(tdst);
         await goto_level(tdst, 0, 0, 0);
     } else {
-        ga.at_ladder = $c.i8(svl.level.locations[u.ux][u.uy].typ === 27 /* LADDER */ ? 1 : 0);
+        ga.at_ladder = $c.i8(svl.level.locations[u.ux][u.uy].typ === LADDER ? 1 : 0);
         await next_level($c.i8(!trap ? 1 : 0));
         ga.at_ladder = 0;
     }
-    return 1;
+    return ECMD_TIME;
 }
 export async function doup() {   // do.c:1298
     let stway = null;
     stway = stairway_at(u.ux, u.uy);
-    set_move_cmd(9 /* DIR_UP */, 0);
+    set_move_cmd(DIR_UP, 0);
     if (await u_rooted()) {
-        return 1;
+        return ECMD_TIME;
     }
-    if (u.utrap && u.utraptype === 2) {
+    if (u.utrap && u.utraptype === TT_PIT) {
         await climb_pit();
-        return 1;
+        return ECMD_TIME;
     }
     if (!stway || stway && !stway.up) {
         await You_cant($c.lit("go up here."));
-        return 0;
+        return ECMD_OK;
     }
     if (await stucksteed(1)) {
-        return 0;
+        return ECMD_OK;
     }
     if (await u_stuck_cannot_go($c.lit("up"))) {
-        return 1;
+        return ECMD_TIME;
     }
-    if (near_capacity() > 1 /* SLT_ENCUMBER */) {
-        await Your($c.lit("load is too heavy to climb the %s."), svl.level.locations[u.ux][u.uy].typ === 26 /* STAIRS */ ? $c.lit("stairs") : $c.lit("ladder"));
-        return 1;
+    if (near_capacity() > SLT_ENCUMBER) {
+        await Your($c.lit("load is too heavy to climb the %s."), svl.level.locations[u.ux][u.uy].typ === STAIRS ? $c.lit("stairs") : $c.lit("ladder"));
+        return ECMD_TIME;
     }
     if (ledger_no(u.uz) === 1) {
         if (iflags.debug_fuzzer) {
-            return 0;
+            return ECMD_OK;
         }
         if (await yn_function($c.lit("Beware, there will be no return!  Still climb?"), new $c.Ptr(ynchars, 0), 110, 1) !== 121) {
-            return 0;
+            return ECMD_OK;
         }
     }
     if (!await next_to_u()) {
         await You($c.lit("are held back by your pet!"));
-        return 0;
+        return ECMD_OK;
     }
-    ga.at_ladder = $c.i8(svl.level.locations[u.ux][u.uy].typ === 27 /* LADDER */ ? 1 : 0);
+    ga.at_ladder = $c.i8(svl.level.locations[u.ux][u.uy].typ === LADDER ? 1 : 0);
     await prev_level(1);
     ga.at_ladder = 0;
-    return 1;
+    return ECMD_TIME;
 }
 async function currentlevel_rewrite() {   // do.c:1348
     let nhfp = null, whynot = new Int8Array(256);
@@ -1081,7 +1105,7 @@ export async function save_currentstate() {   // do.c:1375
         if (nhfp.structlevel) {
             await bufon(nhfp.fd);
         }
-        nhfp.mode = 2;
+        nhfp.mode = WRITING;
         await savelev(nhfp, $c.i8(ledger_no(u.uz)));
         await close_nhfile(nhfp);
     }
@@ -1097,13 +1121,13 @@ export async function u_collide_m(mtmp) {   // do.c:1412
     if (!rn2(2) && await enexto(cc, u.ux, u.uy, gy.youmonst.data) && dist2(cc.x, cc.y, u.ux, u.uy) <= 2) {
         await u_on_newpos(cc.x, cc.y);
     } else {
-        await mnexto(mtmp, 4);
+        await mnexto(mtmp, RLOC_NOMSG);
     }
     if ((mtmp = svl.level.monsters[u.ux][u.uy]) !== null) {
         if (flags.debug) {
             await pline($c.lit("(monster in hero's way)"));
         }
-        if (!await rloc(mtmp, 4) || (mtmp = svl.level.monsters[u.ux][u.uy]) !== null) {
+        if (!await rloc(mtmp, RLOC_NOMSG) || (mtmp = svl.level.monsters[u.ux][u.uy]) !== null) {
             await m_into_limbo(mtmp);
         }
     }
@@ -1111,13 +1135,13 @@ export async function u_collide_m(mtmp) {   // do.c:1412
 async function familiar_level_msg() {   // do.c:1448
     let mesg = null, buf = new Int8Array(256), which = 0;
     which = rn2(4);
-    if (u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic)) {
+    if (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic)) {
         mesg = familiar_level_msg$halu_fam_msgs[which];
     } else {
         mesg = familiar_level_msg$fam_msgs[which];
     }
     if (mesg && $c.strchr(mesg, 37)) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, mesg, !((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked) ? $c.lit("looks") : $c.lit("seems"));
+        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, mesg, !((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked) ? $c.lit("looks") : $c.lit("seems"));
         mesg = new $c.Ptr(buf, 0);
     }
     if (mesg) {
@@ -1156,7 +1180,7 @@ export async function goto_level(newlevel, at_stairs, falling, portal) {   // do
     }
     new_ledger = ledger_no(newlevel);
     if (new_ledger <= 0) {
-        await done(14 /* ESCAPED */);
+        await done(ESCAPED);
     }
     if (In_hell(u.uz) && up && u.uhave.amulet | 0 && !newdungeon && !portal && dunlev(u.uz) < (dunlevs_in_dungeon(u.uz) - 3 | 0)) {
         if (!rn2(4 + svc.context.mysteryforce | 0)) {
@@ -1175,7 +1199,7 @@ export async function goto_level(newlevel, at_stairs, falling, portal) {   // do
             await pline($c.lit("A mysterious force momentarily surrounds you..."));
             $t2 = rn2(diff + 2 | 0), svc.context.mysteryforce = svc.context.mysteryforce + $t2 | 0;
             if (on_level(newlevel, u.uz)) {
-                await safe_teleds(0);
+                await safe_teleds(TELEDS_NO_FLAGS);
                 await next_to_u();
                 return;
             }
@@ -1190,13 +1214,13 @@ export async function goto_level(newlevel, at_stairs, falling, portal) {   // do
     if (on_level(newlevel, u.uz)) {
         return;
     }
-    if (gl.luacore && nhcb_counts[2 /* NHCB_LVL_LEAVE */]) {
+    if (gl.luacore && nhcb_counts[NHCB_LVL_LEAVE]) {
         await lua_getglobal(gl.luacore, $c.lit("nh_callback_run"));
-        await lua_pushstring(gl.luacore, nhcb_name[2 /* NHCB_LVL_LEAVE */]);
-        await nhl_pcall_handle(gl.luacore, 1, 0, $c.lit("goto_level"), 0);
+        await lua_pushstring(gl.luacore, nhcb_name[NHCB_LVL_LEAVE]);
+        await nhl_pcall_handle(gl.luacore, 1, 0, $c.lit("goto_level"), NHLpa_panic);
         await lua_settop(gl.luacore, 0);
     }
-    if (u.utrap && u.utraptype === 6) {
+    if (u.utrap && u.utraptype === TT_BURIEDBALL) {
         await buried_ball_to_punishment();
     }
     nhfp = await currentlevel_rewrite();
@@ -1231,10 +1255,10 @@ export async function goto_level(newlevel, at_stairs, falling, portal) {   // do
             await bufon(nhfp.fd);
         }
     } else {
-        await free_luathemes((leaving_tutorial ? 3 /* tut_themes */ : 2 /* most_themes */) >>> 0);
+        await free_luathemes((leaving_tutorial ? tut_themes : most_themes) >>> 0);
     }
     save_mode = nhfp.mode;
-    nhfp.mode = cant_go_back ? 4 : 6;
+    nhfp.mode = cant_go_back ? FREEING : WRITING | FREEING;
     await savelev(nhfp, $c.i8(ledger_no(u.uz)));
     nhfp.mode = save_mode;
     await close_nhfile(nhfp);
@@ -1252,7 +1276,7 @@ export async function goto_level(newlevel, at_stairs, falling, portal) {   // do
         await discard_migrations();
     }
     if ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(newlevel, svd.dungeon_topology.d_rogue_level) || (svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level)) {
-        assign_graphics((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(newlevel, svd.dungeon_topology.d_rogue_level) ? 1 /* ROGUESET */ : 0 /* PRIMARYSET */);
+        assign_graphics((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(newlevel, svd.dungeon_topology.d_rogue_level) ? ROGUESET : PRIMARYSET);
     }
     check_gold_symbol();
     if ((at_stairs || falling || portal) && u.uz.dnum !== newlevel.dnum) {
@@ -1261,7 +1285,7 @@ export async function goto_level(newlevel, at_stairs, falling, portal) {   // do
     assign_level(u.uz0, u.uz);
     assign_level(u.uz, newlevel);
     assign_level(u.utolev, newlevel);
-    u.utotype = 0;
+    u.utotype = UTOTYPE_NONE;
     if (!await builds_up(u.uz)) {
         if (dunlev(u.uz) > svd.dungeons[u.uz.dnum].dunlev_ureached) {
             $t4 = dunlev(u.uz), svd.dungeons[u.uz.dnum].dunlev_ureached = $t4;
@@ -1274,10 +1298,10 @@ export async function goto_level(newlevel, at_stairs, falling, portal) {   // do
     stairway_free_all();
     $c.__builtin___memset_chk(svu.updest, 0, 16, 16);
     $c.__builtin___memset_chk(svd.dndest, 0, 16, 998);
-    if (!(svl.level_info[new_ledger].flags & 4)) {
-        if (svl.level_info[new_ledger].flags & 1) {
+    if (!(svl.level_info[new_ledger].flags & LFILE_EXISTS)) {
+        if (svl.level_info[new_ledger].flags & VISITED) {
             await impossible($c.lit("goto_level: returning to discarded level?"));
-            svl.level_info[new_ledger].flags = $c.u8(svl.level_info[new_ledger].flags & -2);
+            svl.level_info[new_ledger].flags = $c.u8(svl.level_info[new_ledger].flags & ~VISITED);
         }
         await mklev();
         new_ = 1;
@@ -1300,7 +1324,7 @@ export async function goto_level(newlevel, at_stairs, falling, portal) {   // do
     await flush_screen(-1);
     if (portal && !(u.uz.dnum === svd.dungeon_topology.d_astral_level.dnum)) {
         for (ttrap = gf.ftrap; ttrap; ttrap = ttrap.ntrap) {
-            if ((ttrap.ttyp | 0) === 17 /* MAGIC_PORTAL */) {
+            if ((ttrap.ttyp | 0) === MAGIC_PORTAL) {
                 break;
             }
         }
@@ -1328,9 +1352,9 @@ export async function goto_level(newlevel, at_stairs, falling, portal) {   // do
             } else {
                 await u_on_dnstairs();
             }
-            great_effort = $c.i8($G.uball !== null && !((u.uprops[48 /* LEVITATION */].intrinsic || u.uprops[48 /* LEVITATION */].extrinsic) && !u.uprops[48 /* LEVITATION */].blocked) ? 1 : 0);
+            great_effort = $c.i8($G.uball !== null && !((u.uprops[LEVITATION].intrinsic || u.uprops[LEVITATION].extrinsic) && !u.uprops[LEVITATION].blocked) ? 1 : 0);
             if (flags.verbose || great_effort) {
-                await pline($c.lit("%s %s up%s the %s."), great_effort ? $c.lit("With great effort, you") : $c.lit("You"), u_locomotion($c.lit("climb")), (u.uprops[49 /* FLYING */].intrinsic || u.uprops[49 /* FLYING */].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, 1) !== 0) && !u.uprops[49 /* FLYING */].blocked && ga.at_ladder ? $c.lit(" along") : $c.lit(""), ga.at_ladder ? $c.lit("ladder") : $c.lit("stairs"));
+                await pline($c.lit("%s %s up%s the %s."), great_effort ? $c.lit("With great effort, you") : $c.lit("You"), u_locomotion($c.lit("climb")), (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked && ga.at_ladder ? $c.lit(" along") : $c.lit(""), ga.at_ladder ? $c.lit("ladder") : $c.lit("stairs"));
             }
         } else {
             stway$2 = stairway_find_from(u.uz0, ga.at_ladder);
@@ -1343,11 +1367,11 @@ export async function goto_level(newlevel, at_stairs, falling, portal) {   // do
                 await u_on_upstairs();
             }
             if (!u.dz) {
-            } else if ((u.uprops[49 /* FLYING */].intrinsic || u.uprops[49 /* FLYING */].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, 1) !== 0) && !u.uprops[49 /* FLYING */].blocked) {
+            } else if ((u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked) {
                 if (flags.verbose) {
                     await You($c.lit("fly down %s."), ga.at_ladder ? $c.lit("along the ladder") : $c.lit("the stairs"));
                 }
-            } else if (near_capacity() > 0 /* UNENCUMBERED */ || $G.uball !== null || (u.uprops[25 /* FUMBLING */].intrinsic || u.uprops[25 /* FUMBLING */].extrinsic)) {
+            } else if (near_capacity() > UNENCUMBERED || $G.uball !== null || (u.uprops[FUMBLING].intrinsic || u.uprops[FUMBLING].extrinsic)) {
                 await You($c.lit("fall down the %s."), ga.at_ladder ? $c.lit("ladder") : $c.lit("stairs"));
                 if ($G.uball !== null) {
                     await drag_down();
@@ -1356,9 +1380,9 @@ export async function goto_level(newlevel, at_stairs, falling, portal) {   // do
                     }
                 }
                 if (u.usteed) {
-                    await dismount_steed(1 /* DISMOUNT_FELL */);
+                    await dismount_steed(DISMOUNT_FELL);
                 } else {
-                    await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(rnd(3) + 1 | 0, 2) : rnd(3), ga.at_ladder ? $c.lit("falling off a ladder") : $c.lit("tumbling down a flight of stairs"), 1);
+                    await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(rnd(3) + 1 | 0, 2) : rnd(3), ga.at_ladder ? $c.lit("falling off a ladder") : $c.lit("tumbling down a flight of stairs"), KILLED_BY);
                 }
                 await selftouch($c.lit("Falling, you"));
             } else {
@@ -1393,7 +1417,7 @@ export async function goto_level(newlevel, at_stairs, falling, portal) {   // do
         await fumaroles();
     }
     vision_reset();
-    reset_glyphmap(2);
+    reset_glyphmap(gm_levelchange);
     do {
         a11y.mon_notices_blocked = a11y.mon_notices_blocked + 1 | 0;
     } while (0);
@@ -1409,7 +1433,7 @@ export async function goto_level(newlevel, at_stairs, falling, portal) {   // do
             await pline_The($c.lit("odor of burnt flesh and decay pervades the air."));
             await You_hear($c.lit("groans and moans everywhere."));
         }
-        await record_achievement(2);
+        await record_achievement(ACH_HELL);
     }
     if (In_hell(u.uz) && !((svd.dungeon_topology.d_valley_level.dlevel || svd.dungeon_topology.d_valley_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_valley_level))) {
         u.uevent.gehennom_entered = (1) & 1;
@@ -1419,18 +1443,18 @@ export async function goto_level(newlevel, at_stairs, falling, portal) {   // do
     }
     if (u.uz.dnum === svd.dungeon_topology.d_astral_level.dnum) {
         if (newdungeon) {
-            await record_achievement(7);
+            await record_achievement(ACH_ENDG);
         }
         if (new_ && on_level(u.uz, svd.dungeon_topology.d_astral_level)) {
             await final_level();
-            await record_achievement(8);
+            await record_achievement(ACH_ASTR);
         } else if (newdungeon && u.uhave.amulet | 0) {
             await resurrect();
         }
     } else if (In_quest(u.uz)) {
         await onquest();
     } else if ((svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level)) {
-        if (new_ || !svm.mvitals[286 /* PM_CROESUS */].died) {
+        if (new_ || !svm.mvitals[PM_CROESUS].died) {
             await You($c.lit("have penetrated a high security area!"));
             await pline($c.lit("An alarm sounds!"));
             for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
@@ -1442,24 +1466,24 @@ export async function goto_level(newlevel, at_stairs, falling, portal) {   // do
         }
     } else if (In_mines(u.uz)) {
         if (newdungeon) {
-            await record_achievement(15);
+            await record_achievement(ACH_MINE);
         }
     } else if (u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum) {
         if (newdungeon) {
-            await record_achievement(21);
+            await record_achievement(ACH_SOKO);
         }
     } else {
         if (new_ && ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level))) {
             await You($c.lit("enter what seems to be an older, more primitive world."));
         } else if (new_ && ((svd.dungeon_topology.d_bigroom_level.dlevel || svd.dungeon_topology.d_bigroom_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_bigroom_level))) {
-            await record_achievement(22);
+            await record_achievement(ACH_BGRM);
         }
         if (!In_quest(u.uz0) && await at_dgn_entrance($c.lit("The Quest")) && !(u.uevent.qcompleted | 0 || u.uevent.qexpelled | 0 || svq.quest_status.leader_is_dead | 0)) {
             if (!u.uevent.qcalled) {
                 u.uevent.qcalled = (1) & 1;
                 await com_pager($c.lit("quest_portal"));
             } else {
-                await com_pager(gu.urole.mnum === 339 ? $c.lit("quest_portal_demand") : $c.lit("quest_portal_again"));
+                await com_pager(gu.urole.mnum === PM_ROGUE ? $c.lit("quest_portal_demand") : $c.lit("quest_portal_again"));
             }
         }
     }
@@ -1467,8 +1491,8 @@ export async function goto_level(newlevel, at_stairs, falling, portal) {   // do
     if (new_) {
         major = $c.i8(u.uz.dnum === svd.dungeon_topology.d_astral_level.dnum && !((svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level)) || In_quest(u.uz) ? 1 : 0);
         describe_level(new $c.Ptr(dloc, 0), 2);
-        await livelog_printf(major ? 2 : 32768, $c.lit("entered %s"), new $c.Ptr(dloc, 0));
-        if (gu.urole.mnum === 341) {
+        await livelog_printf(major ? LL_ACHIEVE : LL_DEBUG, $c.lit("entered %s"), new $c.Ptr(dloc, 0));
+        if (gu.urole.mnum === PM_TOURIST) {
             await more_experienced(await level_difficulty(), 0);
             await newexplevel();
         }
@@ -1491,8 +1515,8 @@ export async function goto_level(newlevel, at_stairs, falling, portal) {   // do
     }
     if (do_fall_dmg) {
         dmg = d(dist > 1 ? dist : 1, 6);
-        dmg = u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(dmg + 1 | 0, 2) : dmg;
-        await losehp(dmg, $c.lit("falling down a mine shaft"), 1);
+        dmg = u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(dmg + 1 | 0, 2) : dmg;
+        await losehp(dmg, $c.lit("falling down a mine shaft"), KILLED_BY);
     }
     await pickup(1);
     return;
@@ -1529,7 +1553,7 @@ async function final_level() {   // do.c:2043
 }
 export async function schedule_goto(tolev, utotype_flags, pre_msg, post_msg) {   // do.c:2057
     let $t1, $t2;
-    u.utotype = $c.u8(utotype_flags | 32 /* UTOTYPE_DEFERRED */);
+    u.utotype = $c.u8(utotype_flags | UTOTYPE_DEFERRED);
     assign_level(u.utolev, tolev);
     if (pre_msg) {
         $t1 = await dupstr(pre_msg), gd.dfr_pre_msg = $t1;
@@ -1547,8 +1571,8 @@ export async function deferred_goto() {   // do.c:2075
         if (gd.dfr_pre_msg) {
             await pline($c.lit("%s"), gd.dfr_pre_msg);
         }
-        await goto_level(dest, $c.i8(!!(typmask & 1 /* UTOTYPE_ATSTAIRS */) ? 1 : 0), $c.i8(!!(typmask & 2 /* UTOTYPE_FALLING */) ? 1 : 0), $c.i8(!!(typmask & 4 /* UTOTYPE_PORTAL */) ? 1 : 0));
-        if (typmask & 16 /* UTOTYPE_RMPORTAL */) {
+        await goto_level(dest, $c.i8(!!(typmask & UTOTYPE_ATSTAIRS) ? 1 : 0), $c.i8(!!(typmask & UTOTYPE_FALLING) ? 1 : 0), $c.i8(!!(typmask & UTOTYPE_PORTAL) ? 1 : 0));
+        if (typmask & UTOTYPE_RMPORTAL) {
             t = t_at(u.ux, u.uy);
             if (t) {
                 await deltrap(t);
@@ -1559,7 +1583,7 @@ export async function deferred_goto() {   // do.c:2075
             await pline($c.lit("%s"), gd.dfr_post_msg);
         }
     }
-    u.utotype = 0;
+    u.utotype = UTOTYPE_NONE;
     if (gd.dfr_pre_msg) {
         $c.free(gd.dfr_pre_msg), gd.dfr_pre_msg = null;
     }
@@ -1573,37 +1597,37 @@ export async function revive_corpse(corpse) {   // do.c:2111
     container_where[0] = 0;
     where = $c.i16(corpse.where);
     montype = corpse.corpsenm;
-    is_zomb = $c.i8(mons[montype].mlet === 52 /* S_ZOMBIE */ || where === 6 && ($c.peq($c.relem(mons, montype), $c.relem(mons, 311 /* PM_DEATH */)) || $c.peq($c.relem(mons, montype), $c.relem(mons, 313 /* PM_FAMINE */)) || $c.peq($c.relem(mons, montype), $c.relem(mons, 312 /* PM_PESTILENCE */)) || $c.relem(mons, montype).mlet === 46 /* S_TROLL */) ? 1 : 0);
+    is_zomb = $c.i8(mons[montype].mlet === S_ZOMBIE || where === OBJ_BURIED && ($c.peq($c.relem(mons, montype), $c.relem(mons, PM_DEATH)) || $c.peq($c.relem(mons, montype), $c.relem(mons, PM_FAMINE)) || $c.peq($c.relem(mons, montype), $c.relem(mons, PM_PESTILENCE)) || $c.relem(mons, montype).mlet === S_TROLL) ? 1 : 0);
     is_uwep = $c.i8($c.peq(corpse, $G.uwep) ? 1 : 0);
     chewed = $c.i8(corpse.oeaten !== 0 ? 1 : 0);
     $c.__builtin___strcpy_chk(new $c.Ptr(cname, 0), await corpse_xname(corpse, chewed ? $c.lit("bite-covered") : null, 1), 256);
-    mcarry = where === 4 ? corpse.v.v_ocarry : null;
-    get_obj_location(corpse, new $c.Ptr(corpsex, 0), new $c.Ptr(corpsey, 0), 3);
-    if (where === 2) {
+    mcarry = where === OBJ_MINVENT ? corpse.v.v_ocarry : null;
+    get_obj_location(corpse, new $c.Ptr(corpsex, 0), new $c.Ptr(corpsey, 0), CONTAINED_TOO | BURIED_TOO);
+    if (where === OBJ_CONTAINED) {
         container = corpse.v.v_ocontainer;
         mtmp2 = get_container_location(container, new $c.Ptr(container_where, 0), null);
-        if (container_where[0] === 4 && mtmp2) {
+        if (container_where[0] === OBJ_MINVENT && mtmp2) {
             mcarry = mtmp2;
         }
     }
     mtmp = await revive(corpse, 0);
     if (mtmp) {
         switch (where) {
-            case 3:
+            case OBJ_INVENT:
                 if (is_uwep) {
                     await pline_The($c.lit("%s writhes out of your grasp!"), new $c.Ptr(cname, 0));
                 } else {
                     await You_feel($c.lit("squirming in your backpack!"));
                 }
                 break;
-            case 1:
-                if ((gv.viz_array.get(corpsey[0]).get(corpsex[0]) & 2) !== 0 || canseemon(mtmp)) {
+            case OBJ_FLOOR:
+                if ((gv.viz_array.get(corpsey[0]).get(corpsex[0]) & IN_SIGHT) !== 0 || canseemon(mtmp)) {
                     effect = $c.lit("");
-                    if ($c.peq(mtmp.data, $c.relem(mons, 311 /* PM_DEATH */))) {
+                    if ($c.peq(mtmp.data, $c.relem(mons, PM_DEATH))) {
                         effect = $c.lit(" in a whirl of spectral skulls");
-                    } else if ($c.peq(mtmp.data, $c.relem(mons, 312 /* PM_PESTILENCE */))) {
+                    } else if ($c.peq(mtmp.data, $c.relem(mons, PM_PESTILENCE))) {
                         effect = $c.lit(" in a churning pillar of flies");
-                    } else if ($c.peq(mtmp.data, $c.relem(mons, 313 /* PM_FAMINE */))) {
+                    } else if ($c.peq(mtmp.data, $c.relem(mons, PM_FAMINE))) {
                         effect = $c.lit(" in a ring of withered crops");
                     }
                     if (canseemon(mtmp)) {
@@ -1613,8 +1637,8 @@ export async function revive_corpse(corpse) {   // do.c:2111
                     }
                 }
                 break;
-            case 4:
-                if ((gv.viz_array.get(mtmp.my).get(mtmp.mx) & 2) !== 0) {
+            case OBJ_MINVENT:
+                if ((gv.viz_array.get(mtmp.my).get(mtmp.mx) & IN_SIGHT) !== 0) {
                     if (mcarry && canseemon(mcarry)) {
                         await pline($c.lit("Startled, %s drops %s as it %s!"), await mon_nam(mcarry), await an(new $c.Ptr(cname, 0)), canseemon(mtmp) || sensemon(mtmp) ? $c.lit("revives") : $c.lit("disappears"));
                     } else if (canseemon(mtmp) || sensemon(mtmp)) {
@@ -1622,26 +1646,26 @@ export async function revive_corpse(corpse) {   // do.c:2111
                     }
                 }
                 break;
-            case 2:
+            case OBJ_CONTAINED:
                 {
                     mnam = canseemon(mtmp) || sensemon(mtmp) ? await Amonnam(mtmp) : c_common_strings.c_Something;
                     if (!container) {
                         await impossible($c.lit("reviving corpse from non-existent container"));
                     } else if (mcarry && canseemon(mcarry)) {
                         await pline($c.lit("%s writhes out of %s!"), mnam, await yname(container));
-                    } else if (container_where[0] === 3) {
+                    } else if (container_where[0] === OBJ_INVENT) {
                         $c.__builtin___strcpy_chk(new $c.Ptr(sackname, 0), await an(await xname(container)), 256);
                         await pline($c.lit("%s %s out of %s in your pack!"), mnam, locomotion(mtmp.data, $c.lit("writhes")), new $c.Ptr(sackname, 0));
-                    } else if (container_where[0] === 1 && (gv.viz_array.get(corpsey[0]).get(corpsex[0]) & 2) !== 0) {
+                    } else if (container_where[0] === OBJ_FLOOR && (gv.viz_array.get(corpsey[0]).get(corpsex[0]) & IN_SIGHT) !== 0) {
                         $c.__builtin___strcpy_chk(new $c.Ptr(sackname, 0), await an(await xname(container)), 256);
                         await pline($c.lit("%s escapes from %s!"), mnam, new $c.Ptr(sackname, 0));
                     }
                     break;
                 }
-            case 6:
+            case OBJ_BURIED:
                 if (is_zomb) {
-                    await maketrap(mtmp.mx, mtmp.my, 11 /* PIT */);
-                    if ((gv.viz_array.get(mtmp.my).get(mtmp.mx) & 2) !== 0) {
+                    await maketrap(mtmp.mx, mtmp.my, PIT);
+                    if ((gv.viz_array.get(mtmp.my).get(mtmp.mx) & IN_SIGHT) !== 0) {
                         ttmp = t_at(mtmp.mx, mtmp.my);
                         if (ttmp) {
                             ttmp.tseen = (1) & 1;
@@ -1666,10 +1690,10 @@ export async function revive_mon(arg, timeout) {   // do.c:2251
     let body = null, mptr = null, mtmp = null, x = Int16Array.of(0), y = Int16Array.of(0), notice_it = 0, monname = null, when = 0, action = 0;
     body = arg.a_obj;
     mptr = $c.relem(mons, body.corpsenm);
-    if ((mptr.mflags3 & 1024) !== 0 && body.where === 1 && get_obj_location(body, new $c.Ptr(x, 0), new $c.Ptr(y, 0), 0) && (mtmp = svl.level.monsters[x[0]][y[0]]) !== null && svl.level.flags.stasis_until < svm.moves) {
+    if ((mptr.mflags3 & M3_DISPLACES) !== 0 && body.where === OBJ_FLOOR && get_obj_location(body, new $c.Ptr(x, 0), new $c.Ptr(y, 0), 0) && (mtmp = svl.level.monsters[x[0]][y[0]]) !== null && svl.level.flags.stasis_until < svm.moves) {
         notice_it = $c.i8(canseemon(mtmp));
         monname = await Monnam(mtmp);
-        if (await rloc(mtmp, 4)) {
+        if (await rloc(mtmp, RLOC_NOMSG)) {
             if (notice_it && !canseemon(mtmp)) {
                 await pline($c.lit("%s vanishes."), monname);
             } else if (!notice_it && canseemon(mtmp)) {
@@ -1680,21 +1704,21 @@ export async function revive_mon(arg, timeout) {   // do.c:2251
         }
     }
     if (!await revive_corpse(body)) {
-        if (($c.peq(mptr, $c.relem(mons, 311 /* PM_DEATH */)) || $c.peq(mptr, $c.relem(mons, 313 /* PM_FAMINE */)) || $c.peq(mptr, $c.relem(mons, 312 /* PM_PESTILENCE */))) && rn2(99)) {
-            action = 2 /* REVIVE_MON */;
+        if (($c.peq(mptr, $c.relem(mons, PM_DEATH)) || $c.peq(mptr, $c.relem(mons, PM_FAMINE)) || $c.peq(mptr, $c.relem(mons, PM_PESTILENCE))) && rn2(99)) {
+            action = REVIVE_MON;
             when = rider_revival_time(body, 1);
         } else {
-            if (!obj_has_timer(body, 1)) {
-                await You_feel($c.lit("%sless hassled."), $c.peq(mptr, $c.relem(mons, 311 /* PM_DEATH */)) || $c.peq(mptr, $c.relem(mons, 313 /* PM_FAMINE */)) || $c.peq(mptr, $c.relem(mons, 312 /* PM_PESTILENCE */)) ? $c.lit("much ") : $c.lit(""));
+            if (!obj_has_timer(body, ROT_CORPSE)) {
+                await You_feel($c.lit("%sless hassled."), $c.peq(mptr, $c.relem(mons, PM_DEATH)) || $c.peq(mptr, $c.relem(mons, PM_FAMINE)) || $c.peq(mptr, $c.relem(mons, PM_PESTILENCE)) ? $c.lit("much ") : $c.lit(""));
             }
-            action = 1 /* ROT_CORPSE */;
+            action = ROT_CORPSE;
             when = $c.sub64(d(5, 50), $c.sub64(svm.moves, body.age));
             if (when < 1) {
                 when = 1;
             }
         }
         if (!obj_has_timer(body, $c.i16(action))) {
-            await start_timer(when, 3, $c.i16(action), arg);
+            await start_timer(when, TIMER_OBJECT, $c.i16(action), arg);
         }
     }
 }
@@ -1702,7 +1726,7 @@ export async function zombify_mon(arg, timeout) {   // do.c:2299
     let body = null, zmon = 0;
     body = arg.a_obj;
     zmon = zombie_form($c.relem(mons, body.corpsenm));
-    if (zmon !== -1 /* NON_PM */ && !(svm.mvitals[zmon].mvflags & 2)) {
+    if (zmon !== NON_PM && !(svm.mvitals[zmon].mvflags & G_GENOD)) {
         if (body.oextra && body.oextra.omid) {
             free_omid(body);
         }
@@ -1716,7 +1740,7 @@ export async function zombify_mon(arg, timeout) {   // do.c:2299
     }
 }
 function danger_uprops() {   // do.c:2319
-    return $c.i8(u.uprops[18 /* STONED */].intrinsic || u.uprops[22 /* SLIMED */].intrinsic || u.uprops[19 /* STRANGLED */].intrinsic || u.uprops[17 /* SICK */].intrinsic ? 1 : 0);
+    return $c.i8(u.uprops[STONED].intrinsic || u.uprops[SLIMED].intrinsic || u.uprops[STRANGLED].intrinsic || u.uprops[SICK].intrinsic ? 1 : 0);
 }
 export async function cmd_safety_prevention(ucverb, cmddesc, act, flagcounter) {   // do.c:2325
     let buf = new Int8Array(128), $t1;
@@ -1738,14 +1762,14 @@ export async function cmd_safety_prevention(ucverb, cmddesc, act, flagcounter) {
 }
 export async function donull() {   // do.c:2351
     if (await cmd_safety_prevention($c.lit("Waiting"), $c.lit("a no-op (to rest)"), $c.lit("Are you waiting to get hit?"), new $c.FieldRef(gd, "did_nothing_flag", "i32"))) {
-        return 0;
+        return ECMD_OK;
     }
-    return 1;
+    return ECMD_TIME;
 }
 async function wipeoff() {   // do.c:2361
     let udelta = 0, ldelta = 0;
     udelta = u.ucreamed;
-    ldelta = $c.and64(u.uprops[15 /* BLINDED */].intrinsic, 16777215);
+    ldelta = $c.and64(u.uprops[BLINDED].intrinsic, TIMEOUT);
     if (udelta > 4) {
         udelta = 4;
     }
@@ -1753,69 +1777,69 @@ async function wipeoff() {   // do.c:2361
     if (ldelta > 4) {
         ldelta = 4;
     }
-    incr_itimeout(new $c.FieldRef(u.uprops[15 /* BLINDED */], "intrinsic", "i64"), $c.i32($c.neg64(ldelta)));
-    if (!u.uprops[15 /* BLINDED */].intrinsic) {
+    incr_itimeout(new $c.FieldRef(u.uprops[BLINDED], "intrinsic", "i64"), $c.i32($c.neg64(ldelta)));
+    if (!u.uprops[BLINDED].intrinsic) {
         await pline($c.lit("You've got the glop off."));
         u.ucreamed = 0;
         if (!await gulp_blnd_check()) {
-            set_itimeout(new $c.FieldRef(u.uprops[15 /* BLINDED */], "intrinsic", "i64"), 1);
+            set_itimeout(new $c.FieldRef(u.uprops[BLINDED], "intrinsic", "i64"), 1);
             await make_blinded(0, 1);
         }
         return 0;
     } else if (!u.ucreamed) {
-        await Your($c.lit("%s feels clean now."), await body_part(2 /* FACE */));
+        await Your($c.lit("%s feels clean now."), await body_part(FACE));
         return 0;
     }
     return 1;
 }
 export async function dowipe() {   // do.c:2390
     if (u.ucreamed) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(dowipe$buf, 0), 0, 39, $c.lit("wiping off your %s"), await body_part(2 /* FACE */));
+        $c.__builtin___sprintf_chk(new $c.Ptr(dowipe$buf, 0), 0, 39, $c.lit("wiping off your %s"), await body_part(FACE));
         set_occupation(wipeoff, new $c.Ptr(dowipe$buf, 0), 0);
-        return 1;
+        return ECMD_TIME;
     }
-    await Your($c.lit("%s is already clean."), await body_part(2 /* FACE */));
-    return 1;
+    await Your($c.lit("%s is already clean."), await body_part(FACE));
+    return ECMD_TIME;
 }
 export async function legs_in_no_shape(for_what, by_steed) {   // do.c:2408
     let wl = 0, bp = null;
     if (by_steed && u.usteed) {
         await pline($c.lit("%s is in no shape for %s."), await Monnam(u.usteed), for_what);
     } else {
-        wl = $c.and64(u.uprops[26 /* WOUNDED_LEGS */].extrinsic, 393216);
-        bp = await body_part(9 /* LEG */);
-        if (wl === 393216) {
+        wl = $c.and64(u.uprops[WOUNDED_LEGS].extrinsic, W_RINGL | W_RINGR);
+        bp = await body_part(LEG);
+        if (wl === (W_RINGL | W_RINGR)) {
             bp = await makeplural(bp);
         }
-        await Your($c.lit("%s%s %s in no shape for %s."), wl === 131072 ? $c.lit("left ") : wl === 262144 ? $c.lit("right ") : $c.lit(""), bp, wl === 393216 ? $c.lit("are") : $c.lit("is"), for_what);
+        await Your($c.lit("%s%s %s in no shape for %s."), wl === W_RINGL ? $c.lit("left ") : wl === W_RINGR ? $c.lit("right ") : $c.lit(""), bp, wl === (W_RINGL | W_RINGR) ? $c.lit("are") : $c.lit("is"), for_what);
     }
 }
 export async function set_wounded_legs(side, timex) {   // do.c:2426
     disp.botl = 1;
-    if (!(u.uprops[26 /* WOUNDED_LEGS */].intrinsic || u.uprops[26 /* WOUNDED_LEGS */].extrinsic)) {
-        u.atemp.a[3 /* A_DEX */] = $c.i8(u.atemp.a[3 /* A_DEX */] - 1);
+    if (!(u.uprops[WOUNDED_LEGS].intrinsic || u.uprops[WOUNDED_LEGS].extrinsic)) {
+        u.atemp.a[A_DEX] = $c.i8(u.atemp.a[A_DEX] - 1);
     }
-    if (!(u.uprops[26 /* WOUNDED_LEGS */].intrinsic || u.uprops[26 /* WOUNDED_LEGS */].extrinsic) || $c.and64(u.uprops[26 /* WOUNDED_LEGS */].intrinsic, 16777215) < timex) {
-        set_itimeout(new $c.FieldRef(u.uprops[26 /* WOUNDED_LEGS */], "intrinsic", "i64"), timex);
+    if (!(u.uprops[WOUNDED_LEGS].intrinsic || u.uprops[WOUNDED_LEGS].extrinsic) || $c.and64(u.uprops[WOUNDED_LEGS].intrinsic, TIMEOUT) < timex) {
+        set_itimeout(new $c.FieldRef(u.uprops[WOUNDED_LEGS], "intrinsic", "i64"), timex);
     }
-    u.uprops[26 /* WOUNDED_LEGS */].extrinsic = $c.or64(u.uprops[26 /* WOUNDED_LEGS */].extrinsic, side);
+    u.uprops[WOUNDED_LEGS].extrinsic = $c.or64(u.uprops[WOUNDED_LEGS].extrinsic, side);
     await encumber_msg();
 }
 export async function heal_legs(how) {   // do.c:2449
     let legs = null, $t1;
-    if (u.uprops[26 /* WOUNDED_LEGS */].intrinsic || u.uprops[26 /* WOUNDED_LEGS */].extrinsic) {
+    if (u.uprops[WOUNDED_LEGS].intrinsic || u.uprops[WOUNDED_LEGS].extrinsic) {
         disp.botl = 1;
-        if (u.atemp.a[3 /* A_DEX */] < 0) {
-            u.atemp.a[3 /* A_DEX */] = $c.i8(u.atemp.a[3 /* A_DEX */] + 1);
+        if (u.atemp.a[A_DEX] < 0) {
+            u.atemp.a[A_DEX] = $c.i8(u.atemp.a[A_DEX] + 1);
         }
         if (!u.usteed && how !== 2) {
-            legs = await body_part(9 /* LEG */);
-            if ($c.and64(u.uprops[26 /* WOUNDED_LEGS */].extrinsic, 393216) === 393216) {
+            legs = await body_part(LEG);
+            if ($c.and64(u.uprops[WOUNDED_LEGS].extrinsic, W_RINGL | W_RINGR) === (W_RINGL | W_RINGR)) {
                 legs = await makeplural(legs);
             }
             await Your($c.lit("%s %s better."), legs, await vtense(legs, $c.lit("feel")));
         }
-        $t1 = u.uprops[26 /* WOUNDED_LEGS */].extrinsic = 0, u.uprops[26 /* WOUNDED_LEGS */].intrinsic = $t1;
+        $t1 = u.uprops[WOUNDED_LEGS].extrinsic = 0, u.uprops[WOUNDED_LEGS].intrinsic = $t1;
         if (how === 0) {
             await encumber_msg();
         }

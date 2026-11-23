@@ -4,18 +4,27 @@ import * as $T from './types.js';
 import { $G } from './globals.js';
 import { alloc, dupstr } from './alloc.js';
 import { config_error_add } from './cfgfiles.js';
+import { NO_COLOR } from './color.h.js';
 import { cg, gc, go, gp, gr, gs, svd, u } from './decl.js';
+import { DEF_INVISIBLE, ROCK_CLASS, S_ANGEL, S_ANT, S_BAT, S_BLOB, S_CENTAUR, S_COCKATRICE, S_DEMON, S_DOG, S_DRAGON, S_EEL, S_ELEMENTAL, S_EYE, S_FELINE, S_FUNGUS, S_GHOST, S_GIANT, S_GNOME, S_GOLEM, S_GREMLIN, S_HUMAN, S_HUMANOID, S_IMP, S_JABBERWOCK, S_JELLY, S_KOBOLD, S_KOP, S_LEPRECHAUN, S_LICH, S_LIGHT, S_LIZARD, S_MIMIC, S_MIMIC_DEF, S_MUMMY, S_NAGA, S_NYMPH, S_OGRE, S_ORC, S_PIERCER, S_PUDDING, S_QUADRUPED, S_QUANTMECH, S_RODENT, S_RUSTMONST, S_SNAKE, S_SPIDER, S_TRAPPER, S_TROLL, S_UMBER, S_UNICORN, S_VAMPIRE, S_VORTEX, S_WORM, S_WORM_TAIL, S_WRAITH, S_XAN, S_XORN, S_YETI, S_ZOMBIE, S_ZRUTY, S_air, S_altar, S_amulet, S_anti_magic_trap, S_armor, S_arrow_trap, S_ball, S_bars, S_bear_trap, S_blcorn, S_book, S_boomleft, S_boomright, S_brcorn, S_brdnladder, S_brdnstair, S_brupladder, S_brupstair, S_chain, S_cloud, S_coin, S_corr, S_crwall, S_darkroom, S_dart_trap, S_digbeam, S_dnladder, S_dnstair, S_engrcorr, S_engroom, S_expl_bc, S_expl_bl, S_expl_br, S_expl_mc, S_expl_ml, S_expl_mr, S_expl_tc, S_expl_tl, S_expl_tr, S_falling_rock_trap, S_fire_trap, S_flashbeam, S_food, S_fountain, S_gem, S_goodpos, S_grave, S_hbeam, S_hcdbridge, S_hcdoor, S_hodbridge, S_hodoor, S_hole, S_hwall, S_ice, S_invisible, S_land_mine, S_lava, S_lavawall, S_level_teleporter, S_litcorr, S_lslant, S_magic_portal, S_magic_trap, S_ndoor, S_pit, S_poisoncloud, S_polymorph_trap, S_pool, S_potion, S_ring, S_rock, S_rolling_boulder_trap, S_room, S_rslant, S_rust_trap, S_scroll, S_sink, S_sleeping_gas_trap, S_spiked_pit, S_squeaky_board, S_ss1, S_ss2, S_ss3, S_ss4, S_statue_trap, S_stone, S_strange_obj, S_sw_bc, S_sw_bl, S_sw_br, S_sw_ml, S_sw_mr, S_sw_tc, S_sw_tl, S_sw_tr, S_tdwall, S_teleportation_trap, S_throne, S_tlcorn, S_tlwall, S_tool, S_trap_door, S_trapped_chest, S_trapped_door, S_trcorn, S_tree, S_trwall, S_tuwall, S_upladder, S_upstair, S_vbeam, S_vcdbridge, S_vcdoor, S_venom, S_vibrating_square, S_vodbridge, S_vodoor, S_vwall, S_wand, S_water, S_weapon, S_web } from './defsym.h.js';
 import { nul_glyphinfo, reset_glyphmap } from './display.js';
+import { MAX_GLYPH, gm_symchange } from './display.h.js';
 import { def_monsyms, def_oc_syms, def_r_oc_syms, def_warnsyms, defsyms } from './drawing.js';
 import { on_level } from './dungeon.js';
 import { read_sym_file } from './files.js';
+import { BUFSZ } from './global.h.js';
 import { apply_customizations, clear_all_glyphmap_colors, fill_glyphid_cache, free_glyphid_cache, glyphid_cache_status, glyphrep_to_custom_map_entries, match_glyph, purge_custom_entries } from './glyphs.js';
+import { SYM_OFF_P } from './hack.h.js';
 import { lowc, mungspaces, nh_snprintf, strncmpi } from './hacklib.js';
+import { MAXOCLASSES } from './objclass.h.js';
 import { sym_val } from './options.js';
 import { There, pline } from './pline.js';
 import { strbuf_append } from './strutil.js';
+import { H_DEC, H_MAC, H_UNK, H_UTF8, MAXMCLASSES, MAXOTHER, MAXPCHARS, PRIMARYSET, ROGUESET, SYM_BOULDER, SYM_CONTROL, SYM_HERO_OVERRIDE, SYM_INVALID, SYM_INVISIBLE, SYM_MON, SYM_NOTHING, SYM_OC, SYM_OTH, SYM_PCHAR, SYM_PET_OVERRIDE, SYM_UNEXPLORED, WARNCOUNT, do_custom_colors, do_custom_symbols } from './sym.h.js';
 import { free_all_glyphmap_u } from './utf8map.js';
 import { add_menu, select_menu, windowprocs } from './windows.js';
+import { WC2_U_UTF8STR } from './winprocs.h.js';
+import { ATR_NONE, MENU_BEHAVE_STANDARD, MENU_ITEMFLAGS_NONE, MENU_ITEMFLAGS_SELECTED, NHW_MENU, PICK_ONE } from './wintype.h.js';
 
 const match_sym$alternates = $c.recArray($T.alternate_parse, 10);   // static in match_sym()
 export const known_handling = $c.nulls(7);
@@ -30,54 +39,54 @@ export function init_symbols() {   // symbols.c:85
 }
 export function init_showsyms() {   // symbols.c:95
     let i = 0, $t1;
-    for (i = 0; i < 105 /* MAXPCHARS */; i = i + 1 | 0) {
-        gs.showsyms[i + 0 | 0] = defsyms[i].sym;
+    for (i = 0; i < MAXPCHARS; i = i + 1 | 0) {
+        gs.showsyms[i + SYM_OFF_P | 0] = defsyms[i].sym;
     }
-    for (i = 0; i < 18 /* MAXOCLASSES */; i = i + 1 | 0) {
-        gs.showsyms[i + 105 | 0] = $c.u8(def_oc_syms[i].sym);
+    for (i = 0; i < MAXOCLASSES; i = i + 1 | 0) {
+        gs.showsyms[i + (SYM_OFF_P + MAXPCHARS) | 0] = $c.u8(def_oc_syms[i].sym);
     }
-    for (i = 0; i < 61 /* MAXMCLASSES */; i = i + 1 | 0) {
-        gs.showsyms[i + 123 | 0] = $c.u8(def_monsyms[i].sym);
+    for (i = 0; i < MAXMCLASSES; i = i + 1 | 0) {
+        gs.showsyms[i + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES) | 0] = $c.u8(def_monsyms[i].sym);
     }
-    for (i = 0; i < 6; i = i + 1 | 0) {
-        gs.showsyms[i + 184 | 0] = def_warnsyms[i].sym;
+    for (i = 0; i < WARNCOUNT; i = i + 1 | 0) {
+        gs.showsyms[i + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES + MAXMCLASSES) | 0] = def_warnsyms[i].sym;
     }
-    for (i = 0; i < 6 /* MAXOTHER */; i = i + 1 | 0) {
-        $t1 = get_othersym(i, 0 /* PRIMARYSET */), gs.showsyms[i + 190 | 0] = $t1;
+    for (i = 0; i < MAXOTHER; i = i + 1 | 0) {
+        $t1 = get_othersym(i, PRIMARYSET), gs.showsyms[i + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES + MAXMCLASSES + WARNCOUNT) | 0] = $t1;
     }
 }
 export function init_ov_rogue_symbols() {   // symbols.c:113
     let i = 0;
-    for (i = 0; i < 196; i = i + 1 | 0) {
+    for (i = 0; i < SYM_OFF_P + MAXPCHARS + MAXOCLASSES + MAXMCLASSES + WARNCOUNT + MAXOTHER; i = i + 1 | 0) {
         go.ov_rogue_syms[i] = 0;
     }
 }
 export function init_ov_primary_symbols() {   // symbols.c:122
     let i = 0;
-    for (i = 0; i < 196; i = i + 1 | 0) {
+    for (i = 0; i < SYM_OFF_P + MAXPCHARS + MAXOCLASSES + MAXMCLASSES + WARNCOUNT + MAXOTHER; i = i + 1 | 0) {
         go.ov_primary_syms[i] = 0;
     }
 }
 export function get_othersym(idx, which_set) {   // symbols.c:131
     let sym = 0, oidx = 0;
     sym = 0;
-    oidx = idx + 190 | 0;
-    if (which_set === 1 /* ROGUESET */) {
+    oidx = idx + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES + MAXMCLASSES + WARNCOUNT) | 0;
+    if (which_set === ROGUESET) {
         sym = $c.u8(go.ov_rogue_syms[oidx] ? go.ov_rogue_syms[oidx] : gr.rogue_syms[oidx]);
     } else {
         sym = $c.u8(go.ov_primary_syms[oidx] ? go.ov_primary_syms[oidx] : gp.primary_syms[oidx]);
     }
     if (!sym) {
         switch (idx) {
-            case 0 /* SYM_NOTHING */:
-            case 1 /* SYM_UNEXPLORED */:
+            case SYM_NOTHING:
+            case SYM_UNEXPLORED:
                 sym = 32;
                 break;
-            case 2 /* SYM_BOULDER */:
-                sym = $c.u8(def_oc_syms[14 /* ROCK_CLASS */].sym);
+            case SYM_BOULDER:
+                sym = $c.u8(def_oc_syms[ROCK_CLASS].sym);
                 break;
-            case 3 /* SYM_INVISIBLE */:
-                sym = 73;
+            case SYM_INVISIBLE:
+                sym = DEF_INVISIBLE;
                 break;
         }
     }
@@ -85,74 +94,74 @@ export function get_othersym(idx, which_set) {   // symbols.c:131
 }
 export function init_primary_symbols() {   // symbols.c:167
     let i = 0, $t1;
-    for (i = 0; i < 105 /* MAXPCHARS */; i = i + 1 | 0) {
-        gp.primary_syms[i + 0 | 0] = defsyms[i].sym;
+    for (i = 0; i < MAXPCHARS; i = i + 1 | 0) {
+        gp.primary_syms[i + SYM_OFF_P | 0] = defsyms[i].sym;
     }
-    for (i = 0; i < 18 /* MAXOCLASSES */; i = i + 1 | 0) {
-        gp.primary_syms[i + 105 | 0] = $c.u8(def_oc_syms[i].sym);
+    for (i = 0; i < MAXOCLASSES; i = i + 1 | 0) {
+        gp.primary_syms[i + (SYM_OFF_P + MAXPCHARS) | 0] = $c.u8(def_oc_syms[i].sym);
     }
-    for (i = 0; i < 61 /* MAXMCLASSES */; i = i + 1 | 0) {
-        gp.primary_syms[i + 123 | 0] = $c.u8(def_monsyms[i].sym);
+    for (i = 0; i < MAXMCLASSES; i = i + 1 | 0) {
+        gp.primary_syms[i + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES) | 0] = $c.u8(def_monsyms[i].sym);
     }
-    for (i = 0; i < 6; i = i + 1 | 0) {
-        gp.primary_syms[i + 184 | 0] = def_warnsyms[i].sym;
+    for (i = 0; i < WARNCOUNT; i = i + 1 | 0) {
+        gp.primary_syms[i + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES + MAXMCLASSES) | 0] = def_warnsyms[i].sym;
     }
-    for (i = 0; i < 6 /* MAXOTHER */; i = i + 1 | 0) {
-        $t1 = get_othersym(i, 0 /* PRIMARYSET */), gp.primary_syms[i + 190 | 0] = $t1;
+    for (i = 0; i < MAXOTHER; i = i + 1 | 0) {
+        $t1 = get_othersym(i, PRIMARYSET), gp.primary_syms[i + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES + MAXMCLASSES + WARNCOUNT) | 0] = $t1;
     }
-    clear_symsetentry(0 /* PRIMARYSET */, 0);
+    clear_symsetentry(PRIMARYSET, 0);
 }
 export function init_rogue_symbols() {   // symbols.c:187
     let i = 0, $t1, $t2, $t3, $t4;
-    for (i = 0; i < 105 /* MAXPCHARS */; i = i + 1 | 0) {
-        gr.rogue_syms[i + 0 | 0] = defsyms[i].sym;
+    for (i = 0; i < MAXPCHARS; i = i + 1 | 0) {
+        gr.rogue_syms[i + SYM_OFF_P | 0] = defsyms[i].sym;
     }
-    $t2 = ($t1 = gr.rogue_syms[12 /* S_ndoor */] = 43, gr.rogue_syms[14 /* S_hodoor */] = $t1), gr.rogue_syms[13 /* S_vodoor */] = $t2;
-    $t3 = gr.rogue_syms[26 /* S_dnstair */] = 37, gr.rogue_syms[25 /* S_upstair */] = $t3;
-    for (i = 0; i < 18 /* MAXOCLASSES */; i = i + 1 | 0) {
-        gr.rogue_syms[i + 105 | 0] = def_r_oc_syms[i];
+    $t2 = ($t1 = gr.rogue_syms[S_ndoor] = 43, gr.rogue_syms[S_hodoor] = $t1), gr.rogue_syms[S_vodoor] = $t2;
+    $t3 = gr.rogue_syms[S_dnstair] = 37, gr.rogue_syms[S_upstair] = $t3;
+    for (i = 0; i < MAXOCLASSES; i = i + 1 | 0) {
+        gr.rogue_syms[i + (SYM_OFF_P + MAXPCHARS) | 0] = def_r_oc_syms[i];
     }
-    for (i = 0; i < 61 /* MAXMCLASSES */; i = i + 1 | 0) {
-        gr.rogue_syms[i + 123 | 0] = $c.u8(def_monsyms[i].sym);
+    for (i = 0; i < MAXMCLASSES; i = i + 1 | 0) {
+        gr.rogue_syms[i + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES) | 0] = $c.u8(def_monsyms[i].sym);
     }
-    for (i = 0; i < 6; i = i + 1 | 0) {
-        gr.rogue_syms[i + 184 | 0] = def_warnsyms[i].sym;
+    for (i = 0; i < WARNCOUNT; i = i + 1 | 0) {
+        gr.rogue_syms[i + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES + MAXMCLASSES) | 0] = def_warnsyms[i].sym;
     }
-    for (i = 0; i < 6 /* MAXOTHER */; i = i + 1 | 0) {
-        $t4 = get_othersym(i, 1 /* ROGUESET */), gr.rogue_syms[i + 190 | 0] = $t4;
+    for (i = 0; i < MAXOTHER; i = i + 1 | 0) {
+        $t4 = get_othersym(i, ROGUESET), gr.rogue_syms[i + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES + MAXMCLASSES + WARNCOUNT) | 0] = $t4;
     }
-    clear_symsetentry(1 /* ROGUESET */, 0);
-    gs.symset[1 /* ROGUESET */].nocolor = (1) & 1;
+    clear_symsetentry(ROGUESET, 0);
+    gs.symset[ROGUESET].nocolor = (1) & 1;
 }
 export function assign_graphics(whichset) {   // symbols.c:217
     let i = 0;
     switch (whichset) {
-        case 1 /* ROGUESET */:
-            for (i = 0; i < 196; i = i + 1 | 0) {
+        case ROGUESET:
+            for (i = 0; i < SYM_OFF_P + MAXPCHARS + MAXOCLASSES + MAXMCLASSES + WARNCOUNT + MAXOTHER; i = i + 1 | 0) {
                 gs.showsyms[i] = $c.u8(go.ov_rogue_syms[i] ? go.ov_rogue_syms[i] : gr.rogue_syms[i]);
             }
-            gc.currentgraphics = 1 /* ROGUESET */;
+            gc.currentgraphics = ROGUESET;
             break;
-        case 0 /* PRIMARYSET */:
+        case PRIMARYSET:
         default:
-            for (i = 0; i < 196; i = i + 1 | 0) {
+            for (i = 0; i < SYM_OFF_P + MAXPCHARS + MAXOCLASSES + MAXMCLASSES + WARNCOUNT + MAXOTHER; i = i + 1 | 0) {
                 gs.showsyms[i] = $c.u8(go.ov_primary_syms[i] ? go.ov_primary_syms[i] : gp.primary_syms[i]);
             }
-            gc.currentgraphics = 0 /* PRIMARYSET */;
+            gc.currentgraphics = PRIMARYSET;
             break;
     }
-    reset_glyphmap(4);
+    reset_glyphmap(gm_symchange);
 }
 export async function switch_symbols(nondefault) {   // symbols.c:253
     let i = 0;
     if (nondefault) {
-        for (i = 0; i < 196; i = i + 1 | 0) {
+        for (i = 0; i < SYM_OFF_P + MAXPCHARS + MAXOCLASSES + MAXMCLASSES + WARNCOUNT + MAXOTHER; i = i + 1 | 0) {
             gs.showsyms[i] = $c.u8(go.ov_primary_syms[i] ? go.ov_primary_syms[i] : gp.primary_syms[i]);
         }
-        if (gs.symset[gc.currentgraphics].handling === 2 && $G.decgraphics_mode_callback) {
+        if (gs.symset[gc.currentgraphics].handling === H_DEC && $G.decgraphics_mode_callback) {
             await $G.decgraphics_mode_callback();
         }
-        if (gs.symset[gc.currentgraphics].handling === 5 && $G.utf8graphics_mode_callback) {
+        if (gs.symset[gc.currentgraphics].handling === H_UTF8 && $G.utf8graphics_mode_callback) {
             await $G.utf8graphics_mode_callback();
         }
     } else {
@@ -174,13 +183,13 @@ export function update_rogue_symset(symp, val) {   // symbols.c:313
 }
 export function clear_symsetentry(which_set, name_too) {   // symbols.c:319
     let other_set = 0, old_handling = 0;
-    other_set = which_set === 0 /* PRIMARYSET */ ? 1 /* ROGUESET */ : 0 /* PRIMARYSET */;
+    other_set = which_set === PRIMARYSET ? ROGUESET : PRIMARYSET;
     old_handling = gs.symset[which_set].handling;
     if (gs.symset[which_set].desc) {
         $c.free(gs.symset[which_set].desc);
     }
     gs.symset[which_set].desc = null;
-    gs.symset[which_set].handling = 0;
+    gs.symset[which_set].handling = H_UNK;
     gs.symset[which_set].nocolor = (0) & 1;
     gs.symset[which_set].primary = (0) & 1;
     gs.symset[which_set].rogue = (0) & 1;
@@ -190,14 +199,14 @@ export function clear_symsetentry(which_set, name_too) {   // symbols.c:319
         }
         gs.symset[which_set].name = null;
     }
-    if (old_handling === 5 && gs.symset[other_set].handling !== 5) {
+    if (old_handling === H_UTF8 && gs.symset[other_set].handling !== H_UTF8) {
         free_all_glyphmap_u();
     }
     purge_custom_entries(which_set >>> 0);
     clear_all_glyphmap_colors();
 }
 export function symset_is_compatible(handling, wincap2) {   // symbols.c:353
-    if (handling === 5 && $c.andu64(wincap2, 131072) !== 131072) {
+    if (handling === H_UTF8 && $c.andu64(wincap2, WC2_U_UTF8STR) !== WC2_U_UTF8STR) {
         return 0;
     }
     return 1;
@@ -208,11 +217,11 @@ export async function proc_symset_line(buf) {   // symbols.c:431
 export async function parse_sym_line(buf, which_set) {   // symbols.c:438
     let val = 0, i = 0, symp = null, bufp = null, commentp = null, altp = null, glyph = Int32Array.of(0), enhanced_unavailable = 0, is_glyph = 0, tmpsp = null, lastsp = null, n = 0, $t1, $t2, $t3, $t4;
     symp = null;
-    glyph[0] = 9624 /* MAX_GLYPH */;
+    glyph[0] = MAX_GLYPH;
     enhanced_unavailable = 0;
     is_glyph = 0;
-    if ($c.strlen(buf) >= 256) {
-        buf.set(255, 0);
+    if ($c.strlen(buf) >= BUFSZ) {
+        buf.set(BUFSZ - 1, 0);
     }
     mungspaces(buf);
     if ((commentp = $c.strrchr(buf, 35)) !== null && commentp.get(-1) === 32) {
@@ -253,7 +262,7 @@ export async function parse_sym_line(buf, which_set) {   // symbols.c:438
     }
     if (symp) {
         if (!gs.symset[which_set].name) {
-            if (symp.range === 1) {
+            if (symp.range === SYM_CONTROL) {
                 for (lastsp = gs.symset_list; lastsp; lastsp = lastsp.next) {
                     if (!lastsp.next) {
                         break;
@@ -271,7 +280,7 @@ export async function parse_sym_line(buf, which_set) {   // symbols.c:438
                         $t2 = ($t1 = gs.symset_count, gs.symset_count = $t1 + 1 | 0, $t1), tmpsp.idx = $t2;
                         $t3 = await dupstr(bufp), tmpsp.name = $t3;
                         tmpsp.desc = null;
-                        tmpsp.handling = 0;
+                        tmpsp.handling = H_UNK;
                         tmpsp.nocolor = (0) & 1;
                         tmpsp.primary = (0) & 1;
                         tmpsp.rogue = (0) & 1;
@@ -315,14 +324,14 @@ export async function parse_sym_line(buf, which_set) {   // symbols.c:438
             }
             return 1;
         }
-        if (symp.range && symp.range === 1) {
+        if (symp.range && symp.range === SYM_CONTROL) {
             switch (symp.idx) {
                 case 0:
                     if (!strncmpi(bufp, gs.symset[which_set].name, -1)) {
                         gc.chosen_symset_start = 1;
-                        if (which_set === 1 /* ROGUESET */) {
+                        if (which_set === ROGUESET) {
                             init_rogue_symbols();
-                        } else if (which_set === 0 /* PRIMARYSET */) {
+                        } else if (which_set === PRIMARYSET) {
                             init_primary_symbols();
                         }
                     }
@@ -370,12 +379,12 @@ export async function parse_sym_line(buf, which_set) {   // symbols.c:438
                     break;
             }
         } else {
-            if (gs.symset[which_set].handling !== 5) {
+            if (gs.symset[which_set].handling !== H_UTF8) {
                 if (gc.chosen_symset_start) {
                     val = sym_val(bufp);
-                    if (which_set === 0 /* PRIMARYSET */) {
+                    if (which_set === PRIMARYSET) {
                         update_primary_symset(symp, val);
-                    } else if (which_set === 1 /* ROGUESET */) {
+                    } else if (which_set === ROGUESET) {
                         update_rogue_symset(symp, val);
                     }
                 }
@@ -393,7 +402,7 @@ export async function parse_sym_line(buf, which_set) {   // symbols.c:438
 export function set_symhandling(handling, which_set) {   // symbols.c:657
     let i = 0;
     i = 0;
-    gs.symset[which_set].handling = 0;
+    gs.symset[which_set].handling = H_UNK;
     while (known_handling[i]) {
         if (!strncmpi(known_handling[i], handling, -1)) {
             gs.symset[which_set].handling = i >>> 0;
@@ -411,7 +420,7 @@ export async function load_symset(s, which_set) {   // symbols.c:673
     $t1 = await dupstr(s), gs.symset[which_set].name = $t1;
     if (await read_sym_file(which_set)) {
         await switch_symbols(1);
-        await apply_customizations(gc.currentgraphics >>> 0, 3);
+        await apply_customizations(gc.currentgraphics >>> 0, do_custom_symbols | do_custom_colors);
     } else {
         clear_symsetentry(which_set, 1);
         return 0;
@@ -419,8 +428,8 @@ export async function load_symset(s, which_set) {   // symbols.c:673
     return 1;
 }
 export function free_symsets() {   // symbols.c:693
-    clear_symsetentry(0 /* PRIMARYSET */, 1);
-    clear_symsetentry(1 /* ROGUESET */, 1);
+    clear_symsetentry(PRIMARYSET, 1);
+    clear_symsetentry(ROGUESET, 1);
 }
 export function savedsym_free() {   // symbols.c:712
     let tmp = null, tmp2 = null;
@@ -463,7 +472,7 @@ export async function savedsym_strbuf(sbuf) {   // symbols.c:757
     let tmp = null, buf = new Int8Array(256);
     tmp = $G.saved_symbols;
     while (tmp) {
-        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%sSYMBOLS=%s:%s\n"), tmp.which_set === 1 /* ROGUESET */ ? $c.lit("ROGUE") : $c.lit(""), tmp.name, tmp.val);
+        $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%sSYMBOLS=%s:%s\n"), tmp.which_set === ROGUESET ? $c.lit("ROGUE") : $c.lit(""), tmp.name, tmp.val);
         await strbuf_append(sbuf, new $c.Ptr(buf, 0));
         tmp = tmp.next;
     }
@@ -524,13 +533,13 @@ export async function parsesymbols(opts, which_set) {   // symbols.c:773
         return 0;
     }
     if (symp) {
-        if (symp.range && symp.range !== 1) {
-            if (gs.symset[which_set].handling === 5 || lowc(strval.get(0)) === 117 && strval.get(1) === 43) {
+        if (symp.range && symp.range !== SYM_CONTROL) {
+            if (gs.symset[which_set].handling === H_UTF8 || lowc(strval.get(0)) === 117 && strval.get(1) === 43) {
                 nh_snprintf($c.lit("parsesymbols"), 836, new $c.Ptr(buf, 0), 256, $c.lit("%s:%s"), opts, strval);
                 await glyphrep_to_custom_map_entries(new $c.Ptr(buf, 0), new $c.Ptr(glyph, 0));
             } else {
                 val = sym_val(strval);
-                if (which_set === 1 /* ROGUESET */) {
+                if (which_set === ROGUESET) {
                     update_ov_rogue_symset(symp, val);
                 } else {
                     update_ov_primary_symset(symp, val);
@@ -586,8 +595,8 @@ export async function do_symset(rogueflag) {   // symbols.c:909
     setcount = 0;
     chosen = -2;
     defindx = 0;
-    clr = 8;
-    which_set = rogueflag ? 1 /* ROGUESET */ : 0 /* PRIMARYSET */;
+    clr = NO_COLOR;
+    which_set = rogueflag ? ROGUESET : PRIMARYSET;
     gs.symset_list = null;
     symset_name = gs.symset[which_set].name;
     gs.symset[which_set].name = null;
@@ -600,7 +609,7 @@ export async function do_symset(rogueflag) {   // symbols.c:909
             if (rogueflag ? sl.primary | 0 : sl.rogue | 0) {
                 continue;
             }
-            if (sl.handling === 4) {
+            if (sl.handling === H_MAC) {
                 continue;
             }
             setcount = setcount + 1 | 0;
@@ -618,19 +627,19 @@ export async function do_symset(rogueflag) {   // symbols.c:909
             return 1;
         }
         $c.__builtin___sprintf_chk(new $c.Ptr(fmtstr, 0), 0, 20, $c.lit("%%-%ds %%s"), biggest + 2 | 0);
-        tmpwin = await windowprocs.win_create_nhwindow(4);
-        await windowprocs.win_start_menu(tmpwin, 0);
+        tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
+        await windowprocs.win_start_menu(tmpwin, MENU_BEHAVE_STANDARD);
         any.$copyFrom(cg.zeroany);
         any.a_int = 1;
         if (!symset_name) {
             defindx = any.a_int;
         }
-        await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, 0, clr, $c.lit("Default Symbols"), any.a_int === defindx ? 1 : 0);
+        await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR_NONE, clr, $c.lit("Default Symbols"), any.a_int === defindx ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
         for (sl = gs.symset_list; sl; sl = sl.next) {
             if (rogueflag ? sl.primary | 0 : sl.rogue | 0) {
                 continue;
             }
-            if (sl.handling === 4) {
+            if (sl.handling === H_MAC) {
                 continue;
             }
             if (sl.name) {
@@ -639,12 +648,12 @@ export async function do_symset(rogueflag) {   // symbols.c:909
                     defindx = any.a_int;
                 }
                 $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, new $c.Ptr(fmtstr, 0), sl.name, sl.desc ? sl.desc : $c.lit(""));
-                await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, 0, clr, new $c.Ptr(buf, 0), any.a_int === defindx ? 1 : 0);
+                await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR_NONE, clr, new $c.Ptr(buf, 0), any.a_int === defindx ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
             }
         }
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Select %ssymbol set:"), rogueflag ? $c.lit("rogue level ") : $c.lit(""));
         await windowprocs.win_end_menu(tmpwin, new $c.Ptr(buf, 0));
-        n = await select_menu(tmpwin, 1, new $c.Ptr(symset_pick, 0));
+        n = await select_menu(tmpwin, PICK_ONE, new $c.Ptr(symset_pick, 0));
         if (n > 0) {
             chosen = $c.radd(symset_pick[0], 0).item.a_int;
             if (n === 2 && chosen === defindx) {
@@ -717,12 +726,12 @@ export async function do_symset(rogueflag) {   // symbols.c:909
     }
     if ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level)) {
         if (rogueflag) {
-            assign_graphics(1 /* ROGUESET */);
+            assign_graphics(ROGUESET);
         }
     } else if (!rogueflag) {
-        assign_graphics(0 /* PRIMARYSET */);
+        assign_graphics(PRIMARYSET);
     }
-    await apply_customizations((rogueflag ? 1 /* ROGUESET */ : 0 /* PRIMARYSET */) >>> 0, 3);
+    await apply_customizations((rogueflag ? ROGUESET : PRIMARYSET) >>> 0, do_custom_symbols | do_custom_colors);
     await windowprocs.win_preference_update($c.lit("symset"));
     return 1;
 }
@@ -745,595 +754,595 @@ export function $init() {
     for (let $i0 = 0; $i0 < 197; $i0++) {
         loadsyms[$i0].$copyFrom(new $T.symparse());
     }
-    loadsyms[0].range = 1;
+    loadsyms[0].range = SYM_CONTROL;
     loadsyms[0].idx = 0;
     loadsyms[0].name = $c.lit("start");
-    loadsyms[1].range = 1;
+    loadsyms[1].range = SYM_CONTROL;
     loadsyms[1].idx = 0;
     loadsyms[1].name = $c.lit("begin");
-    loadsyms[2].range = 1;
+    loadsyms[2].range = SYM_CONTROL;
     loadsyms[2].idx = 1;
     loadsyms[2].name = $c.lit("finish");
-    loadsyms[3].range = 1;
+    loadsyms[3].range = SYM_CONTROL;
     loadsyms[3].idx = 2;
     loadsyms[3].name = $c.lit("handling");
-    loadsyms[4].range = 1;
+    loadsyms[4].range = SYM_CONTROL;
     loadsyms[4].idx = 3;
     loadsyms[4].name = $c.lit("description");
-    loadsyms[5].range = 1;
+    loadsyms[5].range = SYM_CONTROL;
     loadsyms[5].idx = 4;
     loadsyms[5].name = $c.lit("color");
-    loadsyms[6].range = 1;
+    loadsyms[6].range = SYM_CONTROL;
     loadsyms[6].idx = 4;
     loadsyms[6].name = $c.lit("colour");
-    loadsyms[7].range = 1;
+    loadsyms[7].range = SYM_CONTROL;
     loadsyms[7].idx = 5;
     loadsyms[7].name = $c.lit("restrictions");
-    loadsyms[8].range = 2;
-    loadsyms[8].idx = 0 /* S_stone */;
+    loadsyms[8].range = SYM_PCHAR;
+    loadsyms[8].idx = S_stone;
     loadsyms[8].name = $c.lit("S_stone");
-    loadsyms[9].range = 2;
-    loadsyms[9].idx = 1 /* S_vwall */;
+    loadsyms[9].range = SYM_PCHAR;
+    loadsyms[9].idx = S_vwall;
     loadsyms[9].name = $c.lit("S_vwall");
-    loadsyms[10].range = 2;
-    loadsyms[10].idx = 2 /* S_hwall */;
+    loadsyms[10].range = SYM_PCHAR;
+    loadsyms[10].idx = S_hwall;
     loadsyms[10].name = $c.lit("S_hwall");
-    loadsyms[11].range = 2;
-    loadsyms[11].idx = 3 /* S_tlcorn */;
+    loadsyms[11].range = SYM_PCHAR;
+    loadsyms[11].idx = S_tlcorn;
     loadsyms[11].name = $c.lit("S_tlcorn");
-    loadsyms[12].range = 2;
-    loadsyms[12].idx = 4 /* S_trcorn */;
+    loadsyms[12].range = SYM_PCHAR;
+    loadsyms[12].idx = S_trcorn;
     loadsyms[12].name = $c.lit("S_trcorn");
-    loadsyms[13].range = 2;
-    loadsyms[13].idx = 5 /* S_blcorn */;
+    loadsyms[13].range = SYM_PCHAR;
+    loadsyms[13].idx = S_blcorn;
     loadsyms[13].name = $c.lit("S_blcorn");
-    loadsyms[14].range = 2;
-    loadsyms[14].idx = 6 /* S_brcorn */;
+    loadsyms[14].range = SYM_PCHAR;
+    loadsyms[14].idx = S_brcorn;
     loadsyms[14].name = $c.lit("S_brcorn");
-    loadsyms[15].range = 2;
-    loadsyms[15].idx = 7 /* S_crwall */;
+    loadsyms[15].range = SYM_PCHAR;
+    loadsyms[15].idx = S_crwall;
     loadsyms[15].name = $c.lit("S_crwall");
-    loadsyms[16].range = 2;
-    loadsyms[16].idx = 8 /* S_tuwall */;
+    loadsyms[16].range = SYM_PCHAR;
+    loadsyms[16].idx = S_tuwall;
     loadsyms[16].name = $c.lit("S_tuwall");
-    loadsyms[17].range = 2;
-    loadsyms[17].idx = 9 /* S_tdwall */;
+    loadsyms[17].range = SYM_PCHAR;
+    loadsyms[17].idx = S_tdwall;
     loadsyms[17].name = $c.lit("S_tdwall");
-    loadsyms[18].range = 2;
-    loadsyms[18].idx = 10 /* S_tlwall */;
+    loadsyms[18].range = SYM_PCHAR;
+    loadsyms[18].idx = S_tlwall;
     loadsyms[18].name = $c.lit("S_tlwall");
-    loadsyms[19].range = 2;
-    loadsyms[19].idx = 11 /* S_trwall */;
+    loadsyms[19].range = SYM_PCHAR;
+    loadsyms[19].idx = S_trwall;
     loadsyms[19].name = $c.lit("S_trwall");
-    loadsyms[20].range = 2;
-    loadsyms[20].idx = 12 /* S_ndoor */;
+    loadsyms[20].range = SYM_PCHAR;
+    loadsyms[20].idx = S_ndoor;
     loadsyms[20].name = $c.lit("S_ndoor");
-    loadsyms[21].range = 2;
-    loadsyms[21].idx = 13 /* S_vodoor */;
+    loadsyms[21].range = SYM_PCHAR;
+    loadsyms[21].idx = S_vodoor;
     loadsyms[21].name = $c.lit("S_vodoor");
-    loadsyms[22].range = 2;
-    loadsyms[22].idx = 14 /* S_hodoor */;
+    loadsyms[22].range = SYM_PCHAR;
+    loadsyms[22].idx = S_hodoor;
     loadsyms[22].name = $c.lit("S_hodoor");
-    loadsyms[23].range = 2;
-    loadsyms[23].idx = 15 /* S_vcdoor */;
+    loadsyms[23].range = SYM_PCHAR;
+    loadsyms[23].idx = S_vcdoor;
     loadsyms[23].name = $c.lit("S_vcdoor");
-    loadsyms[24].range = 2;
-    loadsyms[24].idx = 16 /* S_hcdoor */;
+    loadsyms[24].range = SYM_PCHAR;
+    loadsyms[24].idx = S_hcdoor;
     loadsyms[24].name = $c.lit("S_hcdoor");
-    loadsyms[25].range = 2;
-    loadsyms[25].idx = 17 /* S_bars */;
+    loadsyms[25].range = SYM_PCHAR;
+    loadsyms[25].idx = S_bars;
     loadsyms[25].name = $c.lit("S_bars");
-    loadsyms[26].range = 2;
-    loadsyms[26].idx = 18 /* S_tree */;
+    loadsyms[26].range = SYM_PCHAR;
+    loadsyms[26].idx = S_tree;
     loadsyms[26].name = $c.lit("S_tree");
-    loadsyms[27].range = 2;
-    loadsyms[27].idx = 19 /* S_room */;
+    loadsyms[27].range = SYM_PCHAR;
+    loadsyms[27].idx = S_room;
     loadsyms[27].name = $c.lit("S_room");
-    loadsyms[28].range = 2;
-    loadsyms[28].idx = 20 /* S_darkroom */;
+    loadsyms[28].range = SYM_PCHAR;
+    loadsyms[28].idx = S_darkroom;
     loadsyms[28].name = $c.lit("S_darkroom");
-    loadsyms[29].range = 2;
-    loadsyms[29].idx = 21 /* S_engroom */;
+    loadsyms[29].range = SYM_PCHAR;
+    loadsyms[29].idx = S_engroom;
     loadsyms[29].name = $c.lit("S_engroom");
-    loadsyms[30].range = 2;
-    loadsyms[30].idx = 22 /* S_corr */;
+    loadsyms[30].range = SYM_PCHAR;
+    loadsyms[30].idx = S_corr;
     loadsyms[30].name = $c.lit("S_corr");
-    loadsyms[31].range = 2;
-    loadsyms[31].idx = 23 /* S_litcorr */;
+    loadsyms[31].range = SYM_PCHAR;
+    loadsyms[31].idx = S_litcorr;
     loadsyms[31].name = $c.lit("S_litcorr");
-    loadsyms[32].range = 2;
-    loadsyms[32].idx = 24 /* S_engrcorr */;
+    loadsyms[32].range = SYM_PCHAR;
+    loadsyms[32].idx = S_engrcorr;
     loadsyms[32].name = $c.lit("S_engrcorr");
-    loadsyms[33].range = 2;
-    loadsyms[33].idx = 25 /* S_upstair */;
+    loadsyms[33].range = SYM_PCHAR;
+    loadsyms[33].idx = S_upstair;
     loadsyms[33].name = $c.lit("S_upstair");
-    loadsyms[34].range = 2;
-    loadsyms[34].idx = 26 /* S_dnstair */;
+    loadsyms[34].range = SYM_PCHAR;
+    loadsyms[34].idx = S_dnstair;
     loadsyms[34].name = $c.lit("S_dnstair");
-    loadsyms[35].range = 2;
-    loadsyms[35].idx = 27 /* S_upladder */;
+    loadsyms[35].range = SYM_PCHAR;
+    loadsyms[35].idx = S_upladder;
     loadsyms[35].name = $c.lit("S_upladder");
-    loadsyms[36].range = 2;
-    loadsyms[36].idx = 28 /* S_dnladder */;
+    loadsyms[36].range = SYM_PCHAR;
+    loadsyms[36].idx = S_dnladder;
     loadsyms[36].name = $c.lit("S_dnladder");
-    loadsyms[37].range = 2;
-    loadsyms[37].idx = 29 /* S_brupstair */;
+    loadsyms[37].range = SYM_PCHAR;
+    loadsyms[37].idx = S_brupstair;
     loadsyms[37].name = $c.lit("S_brupstair");
-    loadsyms[38].range = 2;
-    loadsyms[38].idx = 30 /* S_brdnstair */;
+    loadsyms[38].range = SYM_PCHAR;
+    loadsyms[38].idx = S_brdnstair;
     loadsyms[38].name = $c.lit("S_brdnstair");
-    loadsyms[39].range = 2;
-    loadsyms[39].idx = 31 /* S_brupladder */;
+    loadsyms[39].range = SYM_PCHAR;
+    loadsyms[39].idx = S_brupladder;
     loadsyms[39].name = $c.lit("S_brupladder");
-    loadsyms[40].range = 2;
-    loadsyms[40].idx = 32 /* S_brdnladder */;
+    loadsyms[40].range = SYM_PCHAR;
+    loadsyms[40].idx = S_brdnladder;
     loadsyms[40].name = $c.lit("S_brdnladder");
-    loadsyms[41].range = 2;
-    loadsyms[41].idx = 33 /* S_altar */;
+    loadsyms[41].range = SYM_PCHAR;
+    loadsyms[41].idx = S_altar;
     loadsyms[41].name = $c.lit("S_altar");
-    loadsyms[42].range = 2;
-    loadsyms[42].idx = 34 /* S_grave */;
+    loadsyms[42].range = SYM_PCHAR;
+    loadsyms[42].idx = S_grave;
     loadsyms[42].name = $c.lit("S_grave");
-    loadsyms[43].range = 2;
-    loadsyms[43].idx = 35 /* S_throne */;
+    loadsyms[43].range = SYM_PCHAR;
+    loadsyms[43].idx = S_throne;
     loadsyms[43].name = $c.lit("S_throne");
-    loadsyms[44].range = 2;
-    loadsyms[44].idx = 36 /* S_sink */;
+    loadsyms[44].range = SYM_PCHAR;
+    loadsyms[44].idx = S_sink;
     loadsyms[44].name = $c.lit("S_sink");
-    loadsyms[45].range = 2;
-    loadsyms[45].idx = 37 /* S_fountain */;
+    loadsyms[45].range = SYM_PCHAR;
+    loadsyms[45].idx = S_fountain;
     loadsyms[45].name = $c.lit("S_fountain");
-    loadsyms[46].range = 2;
-    loadsyms[46].idx = 38 /* S_pool */;
+    loadsyms[46].range = SYM_PCHAR;
+    loadsyms[46].idx = S_pool;
     loadsyms[46].name = $c.lit("S_pool");
-    loadsyms[47].range = 2;
-    loadsyms[47].idx = 39 /* S_ice */;
+    loadsyms[47].range = SYM_PCHAR;
+    loadsyms[47].idx = S_ice;
     loadsyms[47].name = $c.lit("S_ice");
-    loadsyms[48].range = 2;
-    loadsyms[48].idx = 40 /* S_lava */;
+    loadsyms[48].range = SYM_PCHAR;
+    loadsyms[48].idx = S_lava;
     loadsyms[48].name = $c.lit("S_lava");
-    loadsyms[49].range = 2;
-    loadsyms[49].idx = 41 /* S_lavawall */;
+    loadsyms[49].range = SYM_PCHAR;
+    loadsyms[49].idx = S_lavawall;
     loadsyms[49].name = $c.lit("S_lavawall");
-    loadsyms[50].range = 2;
-    loadsyms[50].idx = 42 /* S_vodbridge */;
+    loadsyms[50].range = SYM_PCHAR;
+    loadsyms[50].idx = S_vodbridge;
     loadsyms[50].name = $c.lit("S_vodbridge");
-    loadsyms[51].range = 2;
-    loadsyms[51].idx = 43 /* S_hodbridge */;
+    loadsyms[51].range = SYM_PCHAR;
+    loadsyms[51].idx = S_hodbridge;
     loadsyms[51].name = $c.lit("S_hodbridge");
-    loadsyms[52].range = 2;
-    loadsyms[52].idx = 44 /* S_vcdbridge */;
+    loadsyms[52].range = SYM_PCHAR;
+    loadsyms[52].idx = S_vcdbridge;
     loadsyms[52].name = $c.lit("S_vcdbridge");
-    loadsyms[53].range = 2;
-    loadsyms[53].idx = 45 /* S_hcdbridge */;
+    loadsyms[53].range = SYM_PCHAR;
+    loadsyms[53].idx = S_hcdbridge;
     loadsyms[53].name = $c.lit("S_hcdbridge");
-    loadsyms[54].range = 2;
-    loadsyms[54].idx = 46 /* S_air */;
+    loadsyms[54].range = SYM_PCHAR;
+    loadsyms[54].idx = S_air;
     loadsyms[54].name = $c.lit("S_air");
-    loadsyms[55].range = 2;
-    loadsyms[55].idx = 47 /* S_cloud */;
+    loadsyms[55].range = SYM_PCHAR;
+    loadsyms[55].idx = S_cloud;
     loadsyms[55].name = $c.lit("S_cloud");
-    loadsyms[56].range = 2;
-    loadsyms[56].idx = 48 /* S_water */;
+    loadsyms[56].range = SYM_PCHAR;
+    loadsyms[56].idx = S_water;
     loadsyms[56].name = $c.lit("S_water");
-    loadsyms[57].range = 2;
-    loadsyms[57].idx = 49 /* S_arrow_trap */;
+    loadsyms[57].range = SYM_PCHAR;
+    loadsyms[57].idx = S_arrow_trap;
     loadsyms[57].name = $c.lit("S_arrow_trap");
-    loadsyms[58].range = 2;
-    loadsyms[58].idx = 50 /* S_dart_trap */;
+    loadsyms[58].range = SYM_PCHAR;
+    loadsyms[58].idx = S_dart_trap;
     loadsyms[58].name = $c.lit("S_dart_trap");
-    loadsyms[59].range = 2;
-    loadsyms[59].idx = 51 /* S_falling_rock_trap */;
+    loadsyms[59].range = SYM_PCHAR;
+    loadsyms[59].idx = S_falling_rock_trap;
     loadsyms[59].name = $c.lit("S_falling_rock_trap");
-    loadsyms[60].range = 2;
-    loadsyms[60].idx = 52 /* S_squeaky_board */;
+    loadsyms[60].range = SYM_PCHAR;
+    loadsyms[60].idx = S_squeaky_board;
     loadsyms[60].name = $c.lit("S_squeaky_board");
-    loadsyms[61].range = 2;
-    loadsyms[61].idx = 53 /* S_bear_trap */;
+    loadsyms[61].range = SYM_PCHAR;
+    loadsyms[61].idx = S_bear_trap;
     loadsyms[61].name = $c.lit("S_bear_trap");
-    loadsyms[62].range = 2;
-    loadsyms[62].idx = 54 /* S_land_mine */;
+    loadsyms[62].range = SYM_PCHAR;
+    loadsyms[62].idx = S_land_mine;
     loadsyms[62].name = $c.lit("S_land_mine");
-    loadsyms[63].range = 2;
-    loadsyms[63].idx = 55 /* S_rolling_boulder_trap */;
+    loadsyms[63].range = SYM_PCHAR;
+    loadsyms[63].idx = S_rolling_boulder_trap;
     loadsyms[63].name = $c.lit("S_rolling_boulder_trap");
-    loadsyms[64].range = 2;
-    loadsyms[64].idx = 56 /* S_sleeping_gas_trap */;
+    loadsyms[64].range = SYM_PCHAR;
+    loadsyms[64].idx = S_sleeping_gas_trap;
     loadsyms[64].name = $c.lit("S_sleeping_gas_trap");
-    loadsyms[65].range = 2;
-    loadsyms[65].idx = 57 /* S_rust_trap */;
+    loadsyms[65].range = SYM_PCHAR;
+    loadsyms[65].idx = S_rust_trap;
     loadsyms[65].name = $c.lit("S_rust_trap");
-    loadsyms[66].range = 2;
-    loadsyms[66].idx = 58 /* S_fire_trap */;
+    loadsyms[66].range = SYM_PCHAR;
+    loadsyms[66].idx = S_fire_trap;
     loadsyms[66].name = $c.lit("S_fire_trap");
-    loadsyms[67].range = 2;
-    loadsyms[67].idx = 59 /* S_pit */;
+    loadsyms[67].range = SYM_PCHAR;
+    loadsyms[67].idx = S_pit;
     loadsyms[67].name = $c.lit("S_pit");
-    loadsyms[68].range = 2;
-    loadsyms[68].idx = 60 /* S_spiked_pit */;
+    loadsyms[68].range = SYM_PCHAR;
+    loadsyms[68].idx = S_spiked_pit;
     loadsyms[68].name = $c.lit("S_spiked_pit");
-    loadsyms[69].range = 2;
-    loadsyms[69].idx = 61 /* S_hole */;
+    loadsyms[69].range = SYM_PCHAR;
+    loadsyms[69].idx = S_hole;
     loadsyms[69].name = $c.lit("S_hole");
-    loadsyms[70].range = 2;
-    loadsyms[70].idx = 62 /* S_trap_door */;
+    loadsyms[70].range = SYM_PCHAR;
+    loadsyms[70].idx = S_trap_door;
     loadsyms[70].name = $c.lit("S_trap_door");
-    loadsyms[71].range = 2;
-    loadsyms[71].idx = 63 /* S_teleportation_trap */;
+    loadsyms[71].range = SYM_PCHAR;
+    loadsyms[71].idx = S_teleportation_trap;
     loadsyms[71].name = $c.lit("S_teleportation_trap");
-    loadsyms[72].range = 2;
-    loadsyms[72].idx = 64 /* S_level_teleporter */;
+    loadsyms[72].range = SYM_PCHAR;
+    loadsyms[72].idx = S_level_teleporter;
     loadsyms[72].name = $c.lit("S_level_teleporter");
-    loadsyms[73].range = 2;
-    loadsyms[73].idx = 65 /* S_magic_portal */;
+    loadsyms[73].range = SYM_PCHAR;
+    loadsyms[73].idx = S_magic_portal;
     loadsyms[73].name = $c.lit("S_magic_portal");
-    loadsyms[74].range = 2;
-    loadsyms[74].idx = 66 /* S_web */;
+    loadsyms[74].range = SYM_PCHAR;
+    loadsyms[74].idx = S_web;
     loadsyms[74].name = $c.lit("S_web");
-    loadsyms[75].range = 2;
-    loadsyms[75].idx = 67 /* S_statue_trap */;
+    loadsyms[75].range = SYM_PCHAR;
+    loadsyms[75].idx = S_statue_trap;
     loadsyms[75].name = $c.lit("S_statue_trap");
-    loadsyms[76].range = 2;
-    loadsyms[76].idx = 68 /* S_magic_trap */;
+    loadsyms[76].range = SYM_PCHAR;
+    loadsyms[76].idx = S_magic_trap;
     loadsyms[76].name = $c.lit("S_magic_trap");
-    loadsyms[77].range = 2;
-    loadsyms[77].idx = 69 /* S_anti_magic_trap */;
+    loadsyms[77].range = SYM_PCHAR;
+    loadsyms[77].idx = S_anti_magic_trap;
     loadsyms[77].name = $c.lit("S_anti_magic_trap");
-    loadsyms[78].range = 2;
-    loadsyms[78].idx = 70 /* S_polymorph_trap */;
+    loadsyms[78].range = SYM_PCHAR;
+    loadsyms[78].idx = S_polymorph_trap;
     loadsyms[78].name = $c.lit("S_polymorph_trap");
-    loadsyms[79].range = 2;
-    loadsyms[79].idx = 71 /* S_vibrating_square */;
+    loadsyms[79].range = SYM_PCHAR;
+    loadsyms[79].idx = S_vibrating_square;
     loadsyms[79].name = $c.lit("S_vibrating_square");
-    loadsyms[80].range = 2;
-    loadsyms[80].idx = 72 /* S_trapped_door */;
+    loadsyms[80].range = SYM_PCHAR;
+    loadsyms[80].idx = S_trapped_door;
     loadsyms[80].name = $c.lit("S_trapped_door");
-    loadsyms[81].range = 2;
-    loadsyms[81].idx = 73 /* S_trapped_chest */;
+    loadsyms[81].range = SYM_PCHAR;
+    loadsyms[81].idx = S_trapped_chest;
     loadsyms[81].name = $c.lit("S_trapped_chest");
-    loadsyms[82].range = 2;
-    loadsyms[82].idx = 74 /* S_vbeam */;
+    loadsyms[82].range = SYM_PCHAR;
+    loadsyms[82].idx = S_vbeam;
     loadsyms[82].name = $c.lit("S_vbeam");
-    loadsyms[83].range = 2;
-    loadsyms[83].idx = 75 /* S_hbeam */;
+    loadsyms[83].range = SYM_PCHAR;
+    loadsyms[83].idx = S_hbeam;
     loadsyms[83].name = $c.lit("S_hbeam");
-    loadsyms[84].range = 2;
-    loadsyms[84].idx = 76 /* S_lslant */;
+    loadsyms[84].range = SYM_PCHAR;
+    loadsyms[84].idx = S_lslant;
     loadsyms[84].name = $c.lit("S_lslant");
-    loadsyms[85].range = 2;
-    loadsyms[85].idx = 77 /* S_rslant */;
+    loadsyms[85].range = SYM_PCHAR;
+    loadsyms[85].idx = S_rslant;
     loadsyms[85].name = $c.lit("S_rslant");
-    loadsyms[86].range = 2;
-    loadsyms[86].idx = 78 /* S_digbeam */;
+    loadsyms[86].range = SYM_PCHAR;
+    loadsyms[86].idx = S_digbeam;
     loadsyms[86].name = $c.lit("S_digbeam");
-    loadsyms[87].range = 2;
-    loadsyms[87].idx = 79 /* S_flashbeam */;
+    loadsyms[87].range = SYM_PCHAR;
+    loadsyms[87].idx = S_flashbeam;
     loadsyms[87].name = $c.lit("S_flashbeam");
-    loadsyms[88].range = 2;
-    loadsyms[88].idx = 80 /* S_boomleft */;
+    loadsyms[88].range = SYM_PCHAR;
+    loadsyms[88].idx = S_boomleft;
     loadsyms[88].name = $c.lit("S_boomleft");
-    loadsyms[89].range = 2;
-    loadsyms[89].idx = 81 /* S_boomright */;
+    loadsyms[89].range = SYM_PCHAR;
+    loadsyms[89].idx = S_boomright;
     loadsyms[89].name = $c.lit("S_boomright");
-    loadsyms[90].range = 2;
-    loadsyms[90].idx = 82 /* S_ss1 */;
+    loadsyms[90].range = SYM_PCHAR;
+    loadsyms[90].idx = S_ss1;
     loadsyms[90].name = $c.lit("S_ss1");
-    loadsyms[91].range = 2;
-    loadsyms[91].idx = 83 /* S_ss2 */;
+    loadsyms[91].range = SYM_PCHAR;
+    loadsyms[91].idx = S_ss2;
     loadsyms[91].name = $c.lit("S_ss2");
-    loadsyms[92].range = 2;
-    loadsyms[92].idx = 84 /* S_ss3 */;
+    loadsyms[92].range = SYM_PCHAR;
+    loadsyms[92].idx = S_ss3;
     loadsyms[92].name = $c.lit("S_ss3");
-    loadsyms[93].range = 2;
-    loadsyms[93].idx = 85 /* S_ss4 */;
+    loadsyms[93].range = SYM_PCHAR;
+    loadsyms[93].idx = S_ss4;
     loadsyms[93].name = $c.lit("S_ss4");
-    loadsyms[94].range = 2;
-    loadsyms[94].idx = 86 /* S_poisoncloud */;
+    loadsyms[94].range = SYM_PCHAR;
+    loadsyms[94].idx = S_poisoncloud;
     loadsyms[94].name = $c.lit("S_poisoncloud");
-    loadsyms[95].range = 2;
-    loadsyms[95].idx = 87 /* S_goodpos */;
+    loadsyms[95].range = SYM_PCHAR;
+    loadsyms[95].idx = S_goodpos;
     loadsyms[95].name = $c.lit("S_goodpos");
-    loadsyms[96].range = 2;
-    loadsyms[96].idx = 88 /* S_sw_tl */;
+    loadsyms[96].range = SYM_PCHAR;
+    loadsyms[96].idx = S_sw_tl;
     loadsyms[96].name = $c.lit("S_sw_tl");
-    loadsyms[97].range = 2;
-    loadsyms[97].idx = 89 /* S_sw_tc */;
+    loadsyms[97].range = SYM_PCHAR;
+    loadsyms[97].idx = S_sw_tc;
     loadsyms[97].name = $c.lit("S_sw_tc");
-    loadsyms[98].range = 2;
-    loadsyms[98].idx = 90 /* S_sw_tr */;
+    loadsyms[98].range = SYM_PCHAR;
+    loadsyms[98].idx = S_sw_tr;
     loadsyms[98].name = $c.lit("S_sw_tr");
-    loadsyms[99].range = 2;
-    loadsyms[99].idx = 91 /* S_sw_ml */;
+    loadsyms[99].range = SYM_PCHAR;
+    loadsyms[99].idx = S_sw_ml;
     loadsyms[99].name = $c.lit("S_sw_ml");
-    loadsyms[100].range = 2;
-    loadsyms[100].idx = 92 /* S_sw_mr */;
+    loadsyms[100].range = SYM_PCHAR;
+    loadsyms[100].idx = S_sw_mr;
     loadsyms[100].name = $c.lit("S_sw_mr");
-    loadsyms[101].range = 2;
-    loadsyms[101].idx = 93 /* S_sw_bl */;
+    loadsyms[101].range = SYM_PCHAR;
+    loadsyms[101].idx = S_sw_bl;
     loadsyms[101].name = $c.lit("S_sw_bl");
-    loadsyms[102].range = 2;
-    loadsyms[102].idx = 94 /* S_sw_bc */;
+    loadsyms[102].range = SYM_PCHAR;
+    loadsyms[102].idx = S_sw_bc;
     loadsyms[102].name = $c.lit("S_sw_bc");
-    loadsyms[103].range = 2;
-    loadsyms[103].idx = 95 /* S_sw_br */;
+    loadsyms[103].range = SYM_PCHAR;
+    loadsyms[103].idx = S_sw_br;
     loadsyms[103].name = $c.lit("S_sw_br");
-    loadsyms[104].range = 2;
-    loadsyms[104].idx = 96 /* S_expl_tl */;
+    loadsyms[104].range = SYM_PCHAR;
+    loadsyms[104].idx = S_expl_tl;
     loadsyms[104].name = $c.lit("S_expl_tl");
-    loadsyms[105].range = 2;
-    loadsyms[105].idx = 97 /* S_expl_tc */;
+    loadsyms[105].range = SYM_PCHAR;
+    loadsyms[105].idx = S_expl_tc;
     loadsyms[105].name = $c.lit("S_expl_tc");
-    loadsyms[106].range = 2;
-    loadsyms[106].idx = 98 /* S_expl_tr */;
+    loadsyms[106].range = SYM_PCHAR;
+    loadsyms[106].idx = S_expl_tr;
     loadsyms[106].name = $c.lit("S_expl_tr");
-    loadsyms[107].range = 2;
-    loadsyms[107].idx = 99 /* S_expl_ml */;
+    loadsyms[107].range = SYM_PCHAR;
+    loadsyms[107].idx = S_expl_ml;
     loadsyms[107].name = $c.lit("S_expl_ml");
-    loadsyms[108].range = 2;
-    loadsyms[108].idx = 100 /* S_expl_mc */;
+    loadsyms[108].range = SYM_PCHAR;
+    loadsyms[108].idx = S_expl_mc;
     loadsyms[108].name = $c.lit("S_expl_mc");
-    loadsyms[109].range = 2;
-    loadsyms[109].idx = 101 /* S_expl_mr */;
+    loadsyms[109].range = SYM_PCHAR;
+    loadsyms[109].idx = S_expl_mr;
     loadsyms[109].name = $c.lit("S_expl_mr");
-    loadsyms[110].range = 2;
-    loadsyms[110].idx = 102 /* S_expl_bl */;
+    loadsyms[110].range = SYM_PCHAR;
+    loadsyms[110].idx = S_expl_bl;
     loadsyms[110].name = $c.lit("S_expl_bl");
-    loadsyms[111].range = 2;
-    loadsyms[111].idx = 103 /* S_expl_bc */;
+    loadsyms[111].range = SYM_PCHAR;
+    loadsyms[111].idx = S_expl_bc;
     loadsyms[111].name = $c.lit("S_expl_bc");
-    loadsyms[112].range = 2;
-    loadsyms[112].idx = 104 /* S_expl_br */;
+    loadsyms[112].range = SYM_PCHAR;
+    loadsyms[112].idx = S_expl_br;
     loadsyms[112].name = $c.lit("S_expl_br");
-    loadsyms[113].range = 3;
-    loadsyms[113].idx = 106;
+    loadsyms[113].range = SYM_OC;
+    loadsyms[113].idx = S_strange_obj + (SYM_OFF_P + MAXPCHARS);
     loadsyms[113].name = $c.lit("S_strange_obj");
-    loadsyms[114].range = 3;
-    loadsyms[114].idx = 107;
+    loadsyms[114].range = SYM_OC;
+    loadsyms[114].idx = S_weapon + (SYM_OFF_P + MAXPCHARS);
     loadsyms[114].name = $c.lit("S_weapon");
-    loadsyms[115].range = 3;
-    loadsyms[115].idx = 108;
+    loadsyms[115].range = SYM_OC;
+    loadsyms[115].idx = S_armor + (SYM_OFF_P + MAXPCHARS);
     loadsyms[115].name = $c.lit("S_armor");
-    loadsyms[116].range = 3;
-    loadsyms[116].idx = 109;
+    loadsyms[116].range = SYM_OC;
+    loadsyms[116].idx = S_ring + (SYM_OFF_P + MAXPCHARS);
     loadsyms[116].name = $c.lit("S_ring");
-    loadsyms[117].range = 3;
-    loadsyms[117].idx = 110;
+    loadsyms[117].range = SYM_OC;
+    loadsyms[117].idx = S_amulet + (SYM_OFF_P + MAXPCHARS);
     loadsyms[117].name = $c.lit("S_amulet");
-    loadsyms[118].range = 3;
-    loadsyms[118].idx = 111;
+    loadsyms[118].range = SYM_OC;
+    loadsyms[118].idx = S_tool + (SYM_OFF_P + MAXPCHARS);
     loadsyms[118].name = $c.lit("S_tool");
-    loadsyms[119].range = 3;
-    loadsyms[119].idx = 112;
+    loadsyms[119].range = SYM_OC;
+    loadsyms[119].idx = S_food + (SYM_OFF_P + MAXPCHARS);
     loadsyms[119].name = $c.lit("S_food");
-    loadsyms[120].range = 3;
-    loadsyms[120].idx = 113;
+    loadsyms[120].range = SYM_OC;
+    loadsyms[120].idx = S_potion + (SYM_OFF_P + MAXPCHARS);
     loadsyms[120].name = $c.lit("S_potion");
-    loadsyms[121].range = 3;
-    loadsyms[121].idx = 114;
+    loadsyms[121].range = SYM_OC;
+    loadsyms[121].idx = S_scroll + (SYM_OFF_P + MAXPCHARS);
     loadsyms[121].name = $c.lit("S_scroll");
-    loadsyms[122].range = 3;
-    loadsyms[122].idx = 115;
+    loadsyms[122].range = SYM_OC;
+    loadsyms[122].idx = S_book + (SYM_OFF_P + MAXPCHARS);
     loadsyms[122].name = $c.lit("S_book");
-    loadsyms[123].range = 3;
-    loadsyms[123].idx = 116;
+    loadsyms[123].range = SYM_OC;
+    loadsyms[123].idx = S_wand + (SYM_OFF_P + MAXPCHARS);
     loadsyms[123].name = $c.lit("S_wand");
-    loadsyms[124].range = 3;
-    loadsyms[124].idx = 117;
+    loadsyms[124].range = SYM_OC;
+    loadsyms[124].idx = S_coin + (SYM_OFF_P + MAXPCHARS);
     loadsyms[124].name = $c.lit("S_coin");
-    loadsyms[125].range = 3;
-    loadsyms[125].idx = 118;
+    loadsyms[125].range = SYM_OC;
+    loadsyms[125].idx = S_gem + (SYM_OFF_P + MAXPCHARS);
     loadsyms[125].name = $c.lit("S_gem");
-    loadsyms[126].range = 3;
-    loadsyms[126].idx = 119;
+    loadsyms[126].range = SYM_OC;
+    loadsyms[126].idx = S_rock + (SYM_OFF_P + MAXPCHARS);
     loadsyms[126].name = $c.lit("S_rock");
-    loadsyms[127].range = 3;
-    loadsyms[127].idx = 120;
+    loadsyms[127].range = SYM_OC;
+    loadsyms[127].idx = S_ball + (SYM_OFF_P + MAXPCHARS);
     loadsyms[127].name = $c.lit("S_ball");
-    loadsyms[128].range = 3;
-    loadsyms[128].idx = 121;
+    loadsyms[128].range = SYM_OC;
+    loadsyms[128].idx = S_chain + (SYM_OFF_P + MAXPCHARS);
     loadsyms[128].name = $c.lit("S_chain");
-    loadsyms[129].range = 3;
-    loadsyms[129].idx = 122;
+    loadsyms[129].range = SYM_OC;
+    loadsyms[129].idx = S_venom + (SYM_OFF_P + MAXPCHARS);
     loadsyms[129].name = $c.lit("S_venom");
-    loadsyms[130].range = 4;
-    loadsyms[130].idx = 124;
+    loadsyms[130].range = SYM_MON;
+    loadsyms[130].idx = S_ANT + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[130].name = $c.lit("S_ANT");
-    loadsyms[131].range = 4;
-    loadsyms[131].idx = 125;
+    loadsyms[131].range = SYM_MON;
+    loadsyms[131].idx = S_BLOB + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[131].name = $c.lit("S_BLOB");
-    loadsyms[132].range = 4;
-    loadsyms[132].idx = 126;
+    loadsyms[132].range = SYM_MON;
+    loadsyms[132].idx = S_COCKATRICE + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[132].name = $c.lit("S_COCKATRICE");
-    loadsyms[133].range = 4;
-    loadsyms[133].idx = 127;
+    loadsyms[133].range = SYM_MON;
+    loadsyms[133].idx = S_DOG + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[133].name = $c.lit("S_DOG");
-    loadsyms[134].range = 4;
-    loadsyms[134].idx = 128;
+    loadsyms[134].range = SYM_MON;
+    loadsyms[134].idx = S_EYE + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[134].name = $c.lit("S_EYE");
-    loadsyms[135].range = 4;
-    loadsyms[135].idx = 129;
+    loadsyms[135].range = SYM_MON;
+    loadsyms[135].idx = S_FELINE + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[135].name = $c.lit("S_FELINE");
-    loadsyms[136].range = 4;
-    loadsyms[136].idx = 130;
+    loadsyms[136].range = SYM_MON;
+    loadsyms[136].idx = S_GREMLIN + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[136].name = $c.lit("S_GREMLIN");
-    loadsyms[137].range = 4;
-    loadsyms[137].idx = 131;
+    loadsyms[137].range = SYM_MON;
+    loadsyms[137].idx = S_HUMANOID + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[137].name = $c.lit("S_HUMANOID");
-    loadsyms[138].range = 4;
-    loadsyms[138].idx = 132;
+    loadsyms[138].range = SYM_MON;
+    loadsyms[138].idx = S_IMP + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[138].name = $c.lit("S_IMP");
-    loadsyms[139].range = 4;
-    loadsyms[139].idx = 133;
+    loadsyms[139].range = SYM_MON;
+    loadsyms[139].idx = S_JELLY + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[139].name = $c.lit("S_JELLY");
-    loadsyms[140].range = 4;
-    loadsyms[140].idx = 134;
+    loadsyms[140].range = SYM_MON;
+    loadsyms[140].idx = S_KOBOLD + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[140].name = $c.lit("S_KOBOLD");
-    loadsyms[141].range = 4;
-    loadsyms[141].idx = 135;
+    loadsyms[141].range = SYM_MON;
+    loadsyms[141].idx = S_LEPRECHAUN + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[141].name = $c.lit("S_LEPRECHAUN");
-    loadsyms[142].range = 4;
-    loadsyms[142].idx = 136;
+    loadsyms[142].range = SYM_MON;
+    loadsyms[142].idx = S_MIMIC + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[142].name = $c.lit("S_MIMIC");
-    loadsyms[143].range = 4;
-    loadsyms[143].idx = 137;
+    loadsyms[143].range = SYM_MON;
+    loadsyms[143].idx = S_NYMPH + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[143].name = $c.lit("S_NYMPH");
-    loadsyms[144].range = 4;
-    loadsyms[144].idx = 138;
+    loadsyms[144].range = SYM_MON;
+    loadsyms[144].idx = S_ORC + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[144].name = $c.lit("S_ORC");
-    loadsyms[145].range = 4;
-    loadsyms[145].idx = 139;
+    loadsyms[145].range = SYM_MON;
+    loadsyms[145].idx = S_PIERCER + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[145].name = $c.lit("S_PIERCER");
-    loadsyms[146].range = 4;
-    loadsyms[146].idx = 140;
+    loadsyms[146].range = SYM_MON;
+    loadsyms[146].idx = S_QUADRUPED + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[146].name = $c.lit("S_QUADRUPED");
-    loadsyms[147].range = 4;
-    loadsyms[147].idx = 141;
+    loadsyms[147].range = SYM_MON;
+    loadsyms[147].idx = S_RODENT + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[147].name = $c.lit("S_RODENT");
-    loadsyms[148].range = 4;
-    loadsyms[148].idx = 142;
+    loadsyms[148].range = SYM_MON;
+    loadsyms[148].idx = S_SPIDER + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[148].name = $c.lit("S_SPIDER");
-    loadsyms[149].range = 4;
-    loadsyms[149].idx = 143;
+    loadsyms[149].range = SYM_MON;
+    loadsyms[149].idx = S_TRAPPER + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[149].name = $c.lit("S_TRAPPER");
-    loadsyms[150].range = 4;
-    loadsyms[150].idx = 144;
+    loadsyms[150].range = SYM_MON;
+    loadsyms[150].idx = S_UNICORN + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[150].name = $c.lit("S_UNICORN");
-    loadsyms[151].range = 4;
-    loadsyms[151].idx = 145;
+    loadsyms[151].range = SYM_MON;
+    loadsyms[151].idx = S_VORTEX + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[151].name = $c.lit("S_VORTEX");
-    loadsyms[152].range = 4;
-    loadsyms[152].idx = 146;
+    loadsyms[152].range = SYM_MON;
+    loadsyms[152].idx = S_WORM + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[152].name = $c.lit("S_WORM");
-    loadsyms[153].range = 4;
-    loadsyms[153].idx = 147;
+    loadsyms[153].range = SYM_MON;
+    loadsyms[153].idx = S_XAN + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[153].name = $c.lit("S_XAN");
-    loadsyms[154].range = 4;
-    loadsyms[154].idx = 148;
+    loadsyms[154].range = SYM_MON;
+    loadsyms[154].idx = S_LIGHT + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[154].name = $c.lit("S_LIGHT");
-    loadsyms[155].range = 4;
-    loadsyms[155].idx = 149;
+    loadsyms[155].range = SYM_MON;
+    loadsyms[155].idx = S_ZRUTY + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[155].name = $c.lit("S_ZRUTY");
-    loadsyms[156].range = 4;
-    loadsyms[156].idx = 150;
+    loadsyms[156].range = SYM_MON;
+    loadsyms[156].idx = S_ANGEL + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[156].name = $c.lit("S_ANGEL");
-    loadsyms[157].range = 4;
-    loadsyms[157].idx = 151;
+    loadsyms[157].range = SYM_MON;
+    loadsyms[157].idx = S_BAT + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[157].name = $c.lit("S_BAT");
-    loadsyms[158].range = 4;
-    loadsyms[158].idx = 152;
+    loadsyms[158].range = SYM_MON;
+    loadsyms[158].idx = S_CENTAUR + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[158].name = $c.lit("S_CENTAUR");
-    loadsyms[159].range = 4;
-    loadsyms[159].idx = 153;
+    loadsyms[159].range = SYM_MON;
+    loadsyms[159].idx = S_DRAGON + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[159].name = $c.lit("S_DRAGON");
-    loadsyms[160].range = 4;
-    loadsyms[160].idx = 154;
+    loadsyms[160].range = SYM_MON;
+    loadsyms[160].idx = S_ELEMENTAL + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[160].name = $c.lit("S_ELEMENTAL");
-    loadsyms[161].range = 4;
-    loadsyms[161].idx = 155;
+    loadsyms[161].range = SYM_MON;
+    loadsyms[161].idx = S_FUNGUS + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[161].name = $c.lit("S_FUNGUS");
-    loadsyms[162].range = 4;
-    loadsyms[162].idx = 156;
+    loadsyms[162].range = SYM_MON;
+    loadsyms[162].idx = S_GNOME + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[162].name = $c.lit("S_GNOME");
-    loadsyms[163].range = 4;
-    loadsyms[163].idx = 157;
+    loadsyms[163].range = SYM_MON;
+    loadsyms[163].idx = S_GIANT + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[163].name = $c.lit("S_GIANT");
-    loadsyms[164].range = 4;
-    loadsyms[164].idx = 158;
+    loadsyms[164].range = SYM_MON;
+    loadsyms[164].idx = S_invisible + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[164].name = $c.lit("S_invisible");
-    loadsyms[165].range = 4;
-    loadsyms[165].idx = 159;
+    loadsyms[165].range = SYM_MON;
+    loadsyms[165].idx = S_JABBERWOCK + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[165].name = $c.lit("S_JABBERWOCK");
-    loadsyms[166].range = 4;
-    loadsyms[166].idx = 160;
+    loadsyms[166].range = SYM_MON;
+    loadsyms[166].idx = S_KOP + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[166].name = $c.lit("S_KOP");
-    loadsyms[167].range = 4;
-    loadsyms[167].idx = 161;
+    loadsyms[167].range = SYM_MON;
+    loadsyms[167].idx = S_LICH + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[167].name = $c.lit("S_LICH");
-    loadsyms[168].range = 4;
-    loadsyms[168].idx = 162;
+    loadsyms[168].range = SYM_MON;
+    loadsyms[168].idx = S_MUMMY + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[168].name = $c.lit("S_MUMMY");
-    loadsyms[169].range = 4;
-    loadsyms[169].idx = 163;
+    loadsyms[169].range = SYM_MON;
+    loadsyms[169].idx = S_NAGA + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[169].name = $c.lit("S_NAGA");
-    loadsyms[170].range = 4;
-    loadsyms[170].idx = 164;
+    loadsyms[170].range = SYM_MON;
+    loadsyms[170].idx = S_OGRE + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[170].name = $c.lit("S_OGRE");
-    loadsyms[171].range = 4;
-    loadsyms[171].idx = 165;
+    loadsyms[171].range = SYM_MON;
+    loadsyms[171].idx = S_PUDDING + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[171].name = $c.lit("S_PUDDING");
-    loadsyms[172].range = 4;
-    loadsyms[172].idx = 166;
+    loadsyms[172].range = SYM_MON;
+    loadsyms[172].idx = S_QUANTMECH + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[172].name = $c.lit("S_QUANTMECH");
-    loadsyms[173].range = 4;
-    loadsyms[173].idx = 167;
+    loadsyms[173].range = SYM_MON;
+    loadsyms[173].idx = S_RUSTMONST + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[173].name = $c.lit("S_RUSTMONST");
-    loadsyms[174].range = 4;
-    loadsyms[174].idx = 168;
+    loadsyms[174].range = SYM_MON;
+    loadsyms[174].idx = S_SNAKE + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[174].name = $c.lit("S_SNAKE");
-    loadsyms[175].range = 4;
-    loadsyms[175].idx = 169;
+    loadsyms[175].range = SYM_MON;
+    loadsyms[175].idx = S_TROLL + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[175].name = $c.lit("S_TROLL");
-    loadsyms[176].range = 4;
-    loadsyms[176].idx = 170;
+    loadsyms[176].range = SYM_MON;
+    loadsyms[176].idx = S_UMBER + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[176].name = $c.lit("S_UMBER");
-    loadsyms[177].range = 4;
-    loadsyms[177].idx = 171;
+    loadsyms[177].range = SYM_MON;
+    loadsyms[177].idx = S_VAMPIRE + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[177].name = $c.lit("S_VAMPIRE");
-    loadsyms[178].range = 4;
-    loadsyms[178].idx = 172;
+    loadsyms[178].range = SYM_MON;
+    loadsyms[178].idx = S_WRAITH + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[178].name = $c.lit("S_WRAITH");
-    loadsyms[179].range = 4;
-    loadsyms[179].idx = 173;
+    loadsyms[179].range = SYM_MON;
+    loadsyms[179].idx = S_XORN + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[179].name = $c.lit("S_XORN");
-    loadsyms[180].range = 4;
-    loadsyms[180].idx = 174;
+    loadsyms[180].range = SYM_MON;
+    loadsyms[180].idx = S_YETI + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[180].name = $c.lit("S_YETI");
-    loadsyms[181].range = 4;
-    loadsyms[181].idx = 175;
+    loadsyms[181].range = SYM_MON;
+    loadsyms[181].idx = S_ZOMBIE + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[181].name = $c.lit("S_ZOMBIE");
-    loadsyms[182].range = 4;
-    loadsyms[182].idx = 176;
+    loadsyms[182].range = SYM_MON;
+    loadsyms[182].idx = S_HUMAN + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[182].name = $c.lit("S_HUMAN");
-    loadsyms[183].range = 4;
-    loadsyms[183].idx = 177;
+    loadsyms[183].range = SYM_MON;
+    loadsyms[183].idx = S_GHOST + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[183].name = $c.lit("S_GHOST");
-    loadsyms[184].range = 4;
-    loadsyms[184].idx = 178;
+    loadsyms[184].range = SYM_MON;
+    loadsyms[184].idx = S_GOLEM + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[184].name = $c.lit("S_GOLEM");
-    loadsyms[185].range = 4;
-    loadsyms[185].idx = 179;
+    loadsyms[185].range = SYM_MON;
+    loadsyms[185].idx = S_DEMON + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[185].name = $c.lit("S_DEMON");
-    loadsyms[186].range = 4;
-    loadsyms[186].idx = 180;
+    loadsyms[186].range = SYM_MON;
+    loadsyms[186].idx = S_EEL + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[186].name = $c.lit("S_EEL");
-    loadsyms[187].range = 4;
-    loadsyms[187].idx = 181;
+    loadsyms[187].range = SYM_MON;
+    loadsyms[187].idx = S_LIZARD + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[187].name = $c.lit("S_LIZARD");
-    loadsyms[188].range = 4;
-    loadsyms[188].idx = 182;
+    loadsyms[188].range = SYM_MON;
+    loadsyms[188].idx = S_WORM_TAIL + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[188].name = $c.lit("S_WORM_TAIL");
-    loadsyms[189].range = 4;
-    loadsyms[189].idx = 183;
+    loadsyms[189].range = SYM_MON;
+    loadsyms[189].idx = S_MIMIC_DEF + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES);
     loadsyms[189].name = $c.lit("S_MIMIC_DEF");
-    loadsyms[190].range = 5;
-    loadsyms[190].idx = 190;
+    loadsyms[190].range = SYM_OTH;
+    loadsyms[190].idx = SYM_NOTHING + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES + MAXMCLASSES + WARNCOUNT);
     loadsyms[190].name = $c.lit("S_nothing");
-    loadsyms[191].range = 5;
-    loadsyms[191].idx = 191;
+    loadsyms[191].range = SYM_OTH;
+    loadsyms[191].idx = SYM_UNEXPLORED + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES + MAXMCLASSES + WARNCOUNT);
     loadsyms[191].name = $c.lit("S_unexplored");
-    loadsyms[192].range = 5;
-    loadsyms[192].idx = 192;
+    loadsyms[192].range = SYM_OTH;
+    loadsyms[192].idx = SYM_BOULDER + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES + MAXMCLASSES + WARNCOUNT);
     loadsyms[192].name = $c.lit("S_boulder");
-    loadsyms[193].range = 5;
-    loadsyms[193].idx = 193;
+    loadsyms[193].range = SYM_OTH;
+    loadsyms[193].idx = SYM_INVISIBLE + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES + MAXMCLASSES + WARNCOUNT);
     loadsyms[193].name = $c.lit("S_invisible");
-    loadsyms[194].range = 5;
-    loadsyms[194].idx = 194;
+    loadsyms[194].range = SYM_OTH;
+    loadsyms[194].idx = SYM_PET_OVERRIDE + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES + MAXMCLASSES + WARNCOUNT);
     loadsyms[194].name = $c.lit("S_pet_override");
-    loadsyms[195].range = 5;
-    loadsyms[195].idx = 195;
+    loadsyms[195].range = SYM_OTH;
+    loadsyms[195].idx = SYM_HERO_OVERRIDE + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES + MAXMCLASSES + WARNCOUNT);
     loadsyms[195].name = $c.lit("S_hero_override");
-    loadsyms[196].range = 0;
+    loadsyms[196].range = SYM_INVALID;
     loadsyms[196].idx = 0;
     loadsyms[196].name = null;
     $G.saved_symbols = null;

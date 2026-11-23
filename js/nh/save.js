@@ -11,12 +11,17 @@ import { cmdbind_freeall, cmdq_clear, yn_function } from './cmd.js';
 import { free_menu_coloring } from './coloratt.js';
 import { a11y, flags, gb, gf, gg, gh, gi, gl, gm, go, gs, gu, iflags, program_state, svc, svd, svh, svk, svl, svm, svn, svp, svq, svr, svs, svu, svw, u, urealtime, ynchars } from './decl.js';
 import { docrt, tmp_at } from './display.js';
+import { DISP_FREEMEM } from './display.h.js';
 import { ledger_no, maxledgerno, save_dungeon, save_exclusions } from './dungeon.js';
+import { LFILE_EXISTS, VISITED } from './dungeon.h.js';
 import { done, done_object_cleanup, nh_terminate, panic, save_killers } from './end.js';
 import { save_engravings } from './engrave.js';
 import { close_nhfile, create_levelfile, create_savefile, debugcore, delete_levelfile, delete_savefile, fqname, free_convert_filenames, get_freeing_nhfile, nh_compress, nh_sfconvert, nh_uncompress, open_levelfile, open_savefile, save_savefile_name } from './files.js';
+import { FULL_MOON } from './flag.h.js';
+import { BUFSZ, COLNO, PL_NSIZ, ROWNO } from './global.h.js';
 import { free_glyphid_cache, glyphid_cache_status, purge_all_custom_entries } from './glyphs.js';
 import { nomul } from './hack.js';
+import { COUNTING, CQ_CANNED, CQ_REPEAT, ECMD_OK, FREEING, REST_GSTATE, SAVEPREFIX, TRICKED, WRITING, all_themes } from './hack.h.js';
 import { nh_snprintf } from './hacklib.js';
 import { free_invbuf } from './invent.js';
 import { save_light_sources } from './light.js';
@@ -29,9 +34,13 @@ import { save_rooms } from './mkroom.js';
 import { alloc_itermonarr, dealloc_monst, dmonsfree, mon_animal_list, set_ustuck } from './mon.js';
 import { free_tutorial, save_luadata } from './nhlua.js';
 import { savenames } from './o_init.js';
+import { OBJ_FREE } from './obj.h.js';
+import { MAXSPELL } from './objclass.h.js';
 import { free_autopickup_exceptions, freeroleoptvals, msgtype_free, options_free_window_colors } from './options.js';
+import { NUMMONS } from './permonst.h.js';
 import { There, dumplogfreemessages, free_youbuf, impossible, pline } from './pline.js';
 import { forget_temple_entry } from './priest.js';
+import { W_BALL, W_CHAIN } from './prop.h.js';
 import { free_rect } from './rect.js';
 import { save_regions } from './region.js';
 import { getlev, moves_to_relative_time, relative_time_to_moves, rest_adjust_levelflags } from './restore.js';
@@ -44,11 +53,13 @@ import { Strlen_ } from './strutil.js';
 import { free_symsets, savedsym_free } from './symbols.js';
 import { sysopt_release } from './sys.js';
 import { save_timers } from './timeout.js';
+import { RANGE_GLOBAL, RANGE_LEVEL } from './timeout.h.js';
 import { save_track } from './track.js';
 import { free_nhuuid, sethanguphandler } from './unixmain.js';
 import { store_version } from './version.js';
 import { vision_recalc } from './vision.js';
 import { windowprocs } from './windows.js';
+import { WC2_HILITE_STATUS } from './winprocs.h.js';
 import { save_worm } from './worm.js';
 import { allunworn, setworn } from './worn.js';
 import { wish_history_flush } from './zap.js';
@@ -79,7 +90,7 @@ export async function dosave() {   // save.c:43
             await docrt();
         }
     }
-    return 0;
+    return ECMD_OK;
 }
 export async function dosave0() {   // save.c:74
     let fq_save = null, ltmp = Int8Array.of(0), whynot = new Int8Array(256), nhfp = null, onhfp = null, res = 0, $t1, $t2, $t3;
@@ -103,7 +114,7 @@ export async function dosave0() {   // save.c:74
         if (!program_state.something_worth_saving || !gs.SAVEF[0]) {
             break done$;
         }
-        fq_save = fqname(new $c.Ptr(gs.SAVEF, 0), 2, 1);
+        fq_save = fqname(new $c.Ptr(gs.SAVEF, 0), SAVEPREFIX, 1);
         sethanguphandler($c.ptrConst(1));
         $c.signal(2, $c.ptrConst(1));
         if (!program_state.done_hup) {
@@ -137,7 +148,7 @@ export async function dosave0() {   // save.c:74
             $t1 = nhfp.wcount = 0, nhfp.rcount = $t1;
         }
         await vision_recalc(2);
-        if (flags.moonphase === 4) {
+        if (flags.moonphase === FULL_MOON) {
             change_luck(-1);
         }
         if (flags.friday13) {
@@ -148,11 +159,11 @@ export async function dosave0() {   // save.c:74
                 await windowprocs.win_clear_nhwindow($G.WIN_MESSAGE);
             }
         }
-        nhfp.mode = 6;
+        nhfp.mode = WRITING | FREEING;
         await store_version(nhfp);
         await store_plname_in_file(nhfp);
-        gl.looseball = u.uswallow | 0 && $G.uball && $G.uball.where === 0 ? $G.uball : null;
-        gl.loosechain = u.uswallow | 0 && $G.uchain && $G.uchain.where === 0 ? $G.uchain : null;
+        gl.looseball = u.uswallow | 0 && $G.uball && $G.uball.where === OBJ_FREE ? $G.uball : null;
+        gl.loosechain = u.uswallow | 0 && $G.uchain && $G.uchain.where === OBJ_FREE ? $G.uchain : null;
         await savelev(nhfp, $c.i8(ledger_no(u.uz)));
         await savegamestate(nhfp);
         gu.uz_save.$copyFrom(u.uz);
@@ -163,7 +174,7 @@ export async function dosave0() {   // save.c:74
             if (ltmp[0] === ledger_no(gu.uz_save)) {
                 continue;
             }
-            if (!(svl.level_info[ltmp[0]].flags & 4)) {
+            if (!(svl.level_info[ltmp[0]].flags & LFILE_EXISTS)) {
                 continue;
             }
             onhfp = await open_levelfile(ltmp[0], new $c.Ptr(whynot, 0));
@@ -177,7 +188,7 @@ export async function dosave0() {   // save.c:74
                     $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), new $c.Ptr(whynot, 0), 256);
                 }
                 if (!program_state.done_hup) {
-                    await done(12 /* TRICKED */);
+                    await done(TRICKED);
                 }
                 break done$;
             }
@@ -211,23 +222,23 @@ async function save_gamelog(nhfp) {   // save.c:237
     tmp = gg.gamelog;
     while (tmp) {
         tmp2 = tmp.next;
-        if (nhfp.mode & 3) {
+        if (nhfp.mode & (COUNTING | WRITING)) {
             slen[0] = await Strlen_(tmp.text, $c.lit("save_gamelog"), 245) | 0;
             await sfo_int(nhfp, new $c.Ptr(slen, 0), $c.lit("gamelog-length"));
             await sfo_char(nhfp, tmp.text, $c.lit("gamelog-gamelog_text"), slen[0]);
             await sfo_gamelog_line(nhfp, tmp, $c.lit("gamelog-gamelog_line"));
         }
-        if (nhfp.mode & 4) {
+        if (nhfp.mode & FREEING) {
             $c.free(tmp.text);
             $c.free(tmp);
         }
         tmp = tmp2;
     }
-    if (nhfp.mode & 3) {
+    if (nhfp.mode & (COUNTING | WRITING)) {
         slen[0] = -1;
         await sfo_int(nhfp, new $c.Ptr(slen, 0), $c.lit("gamelog-length"));
     }
-    if (nhfp.mode & 4) {
+    if (nhfp.mode & FREEING) {
         gg.gamelog = null;
     }
 }
@@ -254,22 +265,22 @@ async function savegamestate(nhfp) {   // save.c:265
     await sfo_char(nhfp, yyyymmddhhmmss(urealtime.start_timing), $c.lit("gamestate-start_timing"), 14);
     urealtime.start_timing = urealtime.finish_time;
     await save_killers(nhfp);
-    await save_timers(nhfp, 1);
-    await save_light_sources(nhfp, 1);
+    await save_timers(nhfp, RANGE_GLOBAL);
+    await save_light_sources(nhfp, RANGE_GLOBAL);
     await saveobjchn(nhfp, new $c.FieldRef(gi, "invent", "ptr"));
     await save_bc(nhfp);
     await saveobjchn(nhfp, new $c.FieldRef(gm, "migrating_objs", "ptr"));
     await savemonchn(nhfp, gm.migrating_mons);
-    if (nhfp.mode & 4) {
+    if (nhfp.mode & FREEING) {
         gm.migrating_mons = null;
     }
-    for (i = 0; i < 383 /* NUMMONS */; i = i + 1 | 0) {
+    for (i = 0; i < NUMMONS; i = i + 1 | 0) {
         await sfo_mvitals(nhfp, $c.relem(svm.mvitals, i), $c.lit("gamestate-mvitals"));
     }
-    await save_dungeon(nhfp, $c.i8(!!(nhfp.mode & 3) ? 1 : 0), $c.i8(!!(nhfp.mode & 4) ? 1 : 0));
+    await save_dungeon(nhfp, $c.i8(!!(nhfp.mode & (COUNTING | WRITING)) ? 1 : 0), $c.i8(!!(nhfp.mode & FREEING) ? 1 : 0));
     await savelevchn(nhfp);
     await sfo_q_score(nhfp, svq.quest_status, $c.lit("gamestate-quest_status"));
-    for (i = 0; i < 43; i = i + 1 | 0) {
+    for (i = 0; i < MAXSPELL + 1; i = i + 1 | 0) {
         await sfo_spell(nhfp, $c.relem(svs.spl_book, i), $c.lit("gamestate-spl_book"));
     }
     await save_artifacts(nhfp);
@@ -292,7 +303,7 @@ export async function tricked_fileremoved(nhfp, whynot) {   // save.c:337
         await pline($c.lit("%s"), whynot);
         await pline($c.lit("Probably someone removed it."));
         $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), whynot, 256);
-        await done(12 /* TRICKED */);
+        await done(TRICKED);
         return 1;
     }
     return 0;
@@ -327,13 +338,13 @@ export async function savestateinlock() {   // save.c:351
                             $goto = null;   // giveup:
                             $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), new $c.Ptr(whynot, 0), 256);
                             program_state.saving = program_state.saving - 1 | 0;
-                            await done(12 /* TRICKED */);
+                            await done(TRICKED);
                             return;
                         }
                         break;
                     }
                 }
-                nhfp.mode = 2;
+                nhfp.mode = WRITING;
                 await sfo_int(nhfp, new $c.FieldRef(svh, "hackpid", "i32"), $c.lit("gamestate-hackpid"));
                 if (flags.ins_chkpt) {
                     currlev[0] = ledger_no(u.uz);
@@ -341,8 +352,8 @@ export async function savestateinlock() {   // save.c:351
                     await save_savefile_name(nhfp);
                     await store_version(nhfp);
                     await store_plname_in_file(nhfp);
-                    gl.looseball = u.uswallow | 0 && $G.uball && $G.uball.where === 0 ? $G.uball : null;
-                    gl.loosechain = u.uswallow | 0 && $G.uchain && $G.uchain.where === 0 ? $G.uchain : null;
+                    gl.looseball = u.uswallow | 0 && $G.uball && $G.uball.where === OBJ_FREE ? $G.uball : null;
+                    gl.loosechain = u.uswallow | 0 && $G.uchain && $G.uchain.where === OBJ_FREE ? $G.uchain : null;
                     await savegamestate(nhfp);
                 }
                 await close_nhfile(nhfp);
@@ -357,7 +368,7 @@ export async function savestateinlock() {   // save.c:351
 export async function savelev(nhfp, lev) {   // save.c:429
     let set_uz_save = 0, $t1;
     set_uz_save = $c.i8(gu.uz_save.dnum === 0 && gu.uz_save.dlevel === 0 ? 1 : 0);
-    if (set_uz_save && nhfp.mode & 3) {
+    if (set_uz_save && nhfp.mode & (COUNTING | WRITING)) {
         if (u.uz.dnum === 0 && u.uz.dlevel === 0) {
             program_state.something_worth_saving = 0;
             await panic($c.lit("savelev: where are we?"));
@@ -376,7 +387,7 @@ async function savelev_core(nhfp, lev$in) {   // save.c:452
     if (!nhfp) {
         await panic($c.lit("Save on bad file!"));
     }
-    if (nhfp.mode !== 4) {
+    if (nhfp.mode !== FREEING) {
         if (iflags.purge_monsters) {
             await dmonsfree();
         }
@@ -384,19 +395,19 @@ async function savelev_core(nhfp, lev$in) {   // save.c:452
             await dobjsfree();
         }
         if (lev[0] >= 0 && lev[0] <= maxledgerno()) {
-            svl.level_info[lev[0]].flags = $c.u8(svl.level_info[lev[0]].flags | 1);
+            svl.level_info[lev[0]].flags = $c.u8(svl.level_info[lev[0]].flags | VISITED);
         }
         await sfo_int(nhfp, new $c.FieldRef(svh, "hackpid", "i32"), $c.lit("gamestate-hackpid"));
         await sfo_xint8(nhfp, new $c.Ptr(lev, 0), $c.lit("gamestate-dlvl"));
     }
     await savecemetery(nhfp, new $c.FieldRef(svl.level, "bonesinfo", "ptr"));
     skip_lots$: {
-        if (nhfp.mode === 4) {
+        if (nhfp.mode === FREEING) {
             break skip_lots$;
         }
         await savelevl(nhfp);
-        for (c = 0; c < 80; c = c + 1 | 0) {
-            for (r = 0; r < 21; r = r + 1 | 0) {
+        for (c = 0; c < COLNO; c = c + 1 | 0) {
+            for (r = 0; r < ROWNO; r = r + 1 | 0) {
                 await sfo_schar(nhfp, new $c.Ptr(svl.lastseentyp[c], r), $c.lit("lastseentyp"));
             }
         }
@@ -417,8 +428,8 @@ async function savelev_core(nhfp, lev$in) {   // save.c:452
         }
         await save_rooms(nhfp);
     }
-    await save_timers(nhfp, 0);
-    await save_light_sources(nhfp, 0);
+    await save_timers(nhfp, RANGE_LEVEL);
+    await save_light_sources(nhfp, RANGE_LEVEL);
     await savemonchn(nhfp, svl.level.monlist);
     await save_worm(nhfp);
     await savetrapchn(nhfp, gf.ftrap);
@@ -431,13 +442,13 @@ async function savelev_core(nhfp, lev$in) {   // save.c:452
     await save_bubbles(nhfp, lev[0]);
     await save_exclusions(nhfp);
     await save_track(nhfp);
-    if (nhfp.mode !== 4) {
+    if (nhfp.mode !== FREEING) {
         if (nhfp.structlevel) {
             await bflush(nhfp.fd);
         }
     }
     program_state.saving = program_state.saving - 1 | 0;
-    if (nhfp.mode & 4) {
+    if (nhfp.mode & FREEING) {
         await clear_level_structures();
         gf.ftrap = null;
         gb.billobjs = null;
@@ -450,8 +461,8 @@ export function save_adjust_levelflags() {   // save.c:570
 }
 async function savelevl(nhfp) {   // save.c:577
     let x = 0, y = 0;
-    for (x = 0; x < 80; x = x + 1 | 0) {
-        for (y = 0; y < 21; y = y + 1 | 0) {
+    for (x = 0; x < COLNO; x = x + 1 | 0) {
+        for (y = 0; y < ROWNO; y = y + 1 | 0) {
             await sfo_rm(nhfp, $c.relem(svl.level.locations[x], y), $c.lit("location-rm"));
         }
     }
@@ -463,7 +474,7 @@ async function save_bubbles(nhfp, lev) {   // save.c:591
     if (lev === ledger_no(svd.dungeon_topology.d_water_level) || lev === ledger_no(svd.dungeon_topology.d_air_level)) {
         bbubbly[0] = lev;
     }
-    if (nhfp.mode & 3) {
+    if (nhfp.mode & (COUNTING | WRITING)) {
         await sfo_xint8(nhfp, new $c.Ptr(bbubbly, 0), $c.lit("bubbles-bbubbly"));
     }
     if (bbubbly[0]) {
@@ -473,20 +484,20 @@ async function save_bubbles(nhfp, lev) {   // save.c:591
 export async function savecemetery(nhfp, cemeteryaddr) {   // save.c:617
     let thisbones = null, nextbones = null, flag = Int32Array.of(0);
     flag[0] = cemeteryaddr.get(0) ? 0 : -1;
-    if (nhfp.mode & 3) {
+    if (nhfp.mode & (COUNTING | WRITING)) {
         await sfo_int(nhfp, new $c.Ptr(flag, 0), $c.lit("cemetery-cemetery_flag"));
     }
     nextbones = cemeteryaddr.get(0);
     while ((thisbones = nextbones) !== null) {
         nextbones = thisbones.next;
-        if (nhfp.mode & 3) {
+        if (nhfp.mode & (COUNTING | WRITING)) {
             await sfo_cemetery(nhfp, thisbones, $c.lit("cemetery-bonesinfo"));
         }
-        if (nhfp.mode & 4) {
+        if (nhfp.mode & FREEING) {
             $c.free(thisbones);
         }
     }
-    if (nhfp.mode & 4) {
+    if (nhfp.mode & FREEING) {
         cemeteryaddr.set(0, null);
     }
 }
@@ -497,20 +508,20 @@ async function savedamage(nhfp) {   // save.c:640
     for (tmp_dam = damageptr; tmp_dam; tmp_dam = tmp_dam.next) {
         xl[0] = xl[0] + 1 >>> 0;
     }
-    if (nhfp.mode & 3) {
+    if (nhfp.mode & (COUNTING | WRITING)) {
         await sfo_unsigned(nhfp, new $c.Ptr(xl, 0), $c.lit("damage-damage_count"));
     }
     while (damageptr) {
-        if (nhfp.mode & 3) {
+        if (nhfp.mode & (COUNTING | WRITING)) {
             await sfo_damage(nhfp, damageptr, $c.lit("damage"));
         }
         tmp_dam = damageptr;
         damageptr = damageptr.next;
-        if (nhfp.mode & 4) {
+        if (nhfp.mode & FREEING) {
             $c.free(tmp_dam);
         }
     }
-    if (nhfp.mode & 4) {
+    if (nhfp.mode & FREEING) {
         svl.level.damagelist = null;
     }
 }
@@ -519,8 +530,8 @@ async function save_stairs(nhfp) {   // save.c:665
     stway = gs.stairs;
     buflen[0] = 24;
     while (stway) {
-        if (nhfp.mode & 3) {
-            use_relative = $c.i8(program_state.restoring !== 1 /* REST_GSTATE */ && stway.tolev.dnum === u.uz.dnum ? 1 : 0);
+        if (nhfp.mode & (COUNTING | WRITING)) {
+            use_relative = $c.i8(program_state.restoring !== REST_GSTATE && stway.tolev.dnum === u.uz.dnum ? 1 : 0);
             if (use_relative) {
                 stway.tolev.dlevel = $c.i16(stway.tolev.dlevel - u.uz.dlevel | 0);
             }
@@ -532,7 +543,7 @@ async function save_stairs(nhfp) {   // save.c:665
         }
         stway = stway.next;
     }
-    if (nhfp.mode & 3) {
+    if (nhfp.mode & (COUNTING | WRITING)) {
         buflen[0] = -1;
         await sfo_int(nhfp, new $c.Ptr(buflen, 0), $c.lit("stairs-staircount"));
     }
@@ -543,16 +554,16 @@ async function save_bc(nhfp) {   // save.c:696
     if (gl.loosechain) {
         gl.loosechain.nobj = bc_objs[0];
         bc_objs[0] = gl.loosechain;
-        if (nhfp.mode & 4) {
-            await setworn(null, 4194304);
+        if (nhfp.mode & FREEING) {
+            await setworn(null, W_CHAIN);
             gl.loosechain = null;
         }
     }
     if (gl.looseball) {
         gl.looseball.nobj = bc_objs[0];
         bc_objs[0] = gl.looseball;
-        if (nhfp.mode & 4) {
-            await setworn(null, 2097152);
+        if (nhfp.mode & FREEING) {
+            await setworn(null, W_BALL);
             gl.looseball = null;
         }
     }
@@ -590,13 +601,13 @@ async function saveobjchn(nhfp, obj_p) {   // save.c:762
     minusone[0] = -1;
     while (otmp) {
         otmp2 = otmp.nobj;
-        if (nhfp.mode & 3) {
+        if (nhfp.mode & (COUNTING | WRITING)) {
             await saveobj(nhfp, otmp);
         }
         if (otmp.cobj !== null) {
             await saveobjchn(nhfp, new $c.FieldRef(otmp, "cobj", "ptr"));
         }
-        if (nhfp.mode & 4) {
+        if (nhfp.mode & FREEING) {
             if ($c.peq(otmp, svc.context.victual.piece)) {
                 svc.context.victual.o_id = otmp.o_id;
                 svc.context.victual.piece = null;
@@ -609,14 +620,14 @@ async function saveobjchn(nhfp, obj_p) {   // save.c:762
                 svc.context.spbook.o_id = otmp.o_id;
                 svc.context.spbook.book = null;
             }
-            otmp.where = 0;
+            otmp.where = OBJ_FREE;
             otmp.nobj = null;
             otmp.cobj = null;
             otmp.timed = 0;
             otmp.lamplit = (0) & 1;
             otmp.corpsenm = 0;
-            if ($c.and64(otmp.owornmask, 6291456) !== 0) {
-                await setworn(null, $c.and64(otmp.owornmask, 6291456));
+            if ($c.and64(otmp.owornmask, W_BALL | W_CHAIN) !== 0) {
+                await setworn(null, $c.and64(otmp.owornmask, W_BALL | W_CHAIN));
             }
             otmp.owornmask = 0;
             program_state.freeingdata = program_state.freeingdata + 1 | 0;
@@ -625,10 +636,10 @@ async function saveobjchn(nhfp, obj_p) {   // save.c:762
         }
         otmp = otmp2;
     }
-    if (nhfp.mode & 3) {
+    if (nhfp.mode & (COUNTING | WRITING)) {
         await sfo_int(nhfp, new $c.Ptr(minusone, 0), $c.lit("obj-obj_length"));
     }
-    if (nhfp.mode & 4) {
+    if (nhfp.mode & FREEING) {
         if (is_invent) {
             allunworn();
         }
@@ -690,7 +701,7 @@ async function savemonchn(nhfp, mtmp) {   // save.c:884
     minusone[0] = -1;
     while (mtmp) {
         mtmp2 = mtmp.nmon;
-        if (nhfp.mode & 3) {
+        if (nhfp.mode & (COUNTING | WRITING)) {
             mtmp.mnum = $c.i16(mtmp.data.pmidx);
             if (mtmp.ispriest) {
                 await forget_temple_entry(mtmp);
@@ -700,7 +711,7 @@ async function savemonchn(nhfp, mtmp) {   // save.c:884
         if (mtmp.minvent) {
             await saveobjchn(nhfp, new $c.FieldRef(mtmp, "minvent", "ptr"));
         }
-        if (nhfp.mode & 4) {
+        if (nhfp.mode & FREEING) {
             if ($c.peq(mtmp, svc.context.polearm.hitmon)) {
                 svc.context.polearm.m_id = mtmp.m_id;
                 svc.context.polearm.hitmon = null;
@@ -716,30 +727,30 @@ async function savemonchn(nhfp, mtmp) {   // save.c:884
         }
         mtmp = mtmp2;
     }
-    if (nhfp.mode & 3) {
+    if (nhfp.mode & (COUNTING | WRITING)) {
         await sfo_int(nhfp, new $c.Ptr(minusone, 0), $c.lit("monst-monst_length"));
     }
 }
 async function savetrapchn(nhfp, trap) {   // save.c:920
     let trap2 = null, use_relative = 0;
     while (trap) {
-        use_relative = $c.i8(program_state.restoring !== 1 /* REST_GSTATE */ && trap.dst.dnum === u.uz.dnum ? 1 : 0);
+        use_relative = $c.i8(program_state.restoring !== REST_GSTATE && trap.dst.dnum === u.uz.dnum ? 1 : 0);
         trap2 = trap.ntrap;
         if (use_relative) {
             trap.dst.dlevel = $c.i16(trap.dst.dlevel - u.uz.dlevel | 0);
         }
-        if (nhfp.mode & 3) {
+        if (nhfp.mode & (COUNTING | WRITING)) {
             await sfo_trap(nhfp, trap, $c.lit("trap"));
         }
         if (use_relative) {
             trap.dst.dlevel = $c.i16(trap.dst.dlevel + u.uz.dlevel | 0);
         }
-        if (nhfp.mode & 4) {
+        if (nhfp.mode & FREEING) {
             $c.free(trap);
         }
         trap = trap2;
     }
-    if (nhfp.mode & 3) {
+    if (nhfp.mode & (COUNTING | WRITING)) {
         await sfo_trap(nhfp, savetrapchn$zerotrap, $c.lit("trap"));
     }
 }
@@ -748,18 +759,18 @@ export async function savefruitchn(nhfp) {   // save.c:951
     f1 = gf.ffruit;
     while (f1) {
         f2 = f1.nextf;
-        if (f1.fid >= 0 && nhfp.mode & 3) {
+        if (f1.fid >= 0 && nhfp.mode & (COUNTING | WRITING)) {
             await sfo_fruit(nhfp, f1, $c.lit("fruit"));
         }
-        if (nhfp.mode & 4) {
+        if (nhfp.mode & FREEING) {
             $c.free(f1);
         }
         f1 = f2;
     }
-    if (nhfp.mode & 3) {
+    if (nhfp.mode & (COUNTING | WRITING)) {
         await sfo_fruit(nhfp, savefruitchn$zerofruit, $c.lit("fruit"));
     }
-    if (nhfp.mode & 4) {
+    if (nhfp.mode & FREEING) {
         gf.ffruit = null;
     }
 }
@@ -769,19 +780,19 @@ async function savelevchn(nhfp) {   // save.c:974
     for (tmplev = svs.sp_levchn; tmplev; tmplev = tmplev.next) {
         cnt[0] = cnt[0] + 1 | 0;
     }
-    if (nhfp.mode & 3) {
+    if (nhfp.mode & (COUNTING | WRITING)) {
         await sfo_int(nhfp, new $c.Ptr(cnt, 0), $c.lit("levchn-lev_count"));
     }
     for (tmplev = svs.sp_levchn; tmplev; tmplev = tmplev2) {
         tmplev2 = tmplev.next;
-        if (nhfp.mode & 3) {
+        if (nhfp.mode & (COUNTING | WRITING)) {
             await sfo_s_level(nhfp, tmplev, $c.lit("levchn-s_level"));
         }
-        if (nhfp.mode & 4) {
+        if (nhfp.mode & FREEING) {
             $c.free(tmplev);
         }
     }
-    if (nhfp.mode & 4) {
+    if (nhfp.mode & FREEING) {
         svs.sp_levchn = null;
     }
 }
@@ -792,7 +803,7 @@ export async function store_plname_in_file(nhfp) {   // save.c:999
     nh_snprintf($c.lit("store_plname_in_file"), 1010, new $c.Ptr(hero, 0), 49, $c.lit("%s-%.3s-%.3s-%.3s-%.3s"), new $c.Ptr(svp.plname, 0), gu.urole.filecode, gu.urace.filecode, genders[flags.female].filecode, aligns[1 - u.ualign.type | 0].filecode);
     hero[$c.idx($c.strlen(new $c.Ptr(svp.plname, 0)))] = 0;
     (!(hero[47] === 0) ? 1 : 0) ? $c.__assert_rtn($c.lit("store_plname_in_file"), $c.lit("save.c"), 1017, $c.lit("hero[PL_NSIZ_PLUS - 1 - 1] == '\\0'")) : 0;
-    hero[48] = $c.i8(flags.debug ? 68 : flags.explore ? 88 : 45);
+    hero[PL_NSIZ + 4 * (1 + 3) + 1 - 1] = $c.i8(flags.debug ? 68 : flags.explore ? 88 : 45);
     if (nhfp.structlevel) {
         await bufoff(nhfp.fd);
     }
@@ -808,15 +819,15 @@ async function save_msghistory(nhfp) {   // save.c:1030
     msgcount = 0;
     minusone[0] = -1;
     init = 1;
-    if (nhfp.mode & 3) {
+    if (nhfp.mode & (COUNTING | WRITING)) {
         while ((msg = await windowprocs.win_getmsghistory(init)) !== null) {
             init = 0;
             msglen[0] = await Strlen_(msg, $c.lit("save_msghistory"), 1041) | 0;
             if (msglen[0] < 1) {
                 continue;
             }
-            if (msglen[0] > 255) {
-                msglen[0] = 255;
+            if (msglen[0] > BUFSZ - 1) {
+                msglen[0] = BUFSZ - 1;
             }
             await sfo_int(nhfp, new $c.Ptr(msglen, 0), $c.lit("msghistory-length"));
             await sfo_char(nhfp, msg, $c.lit("msghistory-msg"), msglen[0]);
@@ -837,7 +848,7 @@ export async function free_dungeons() {   // save.c:1060
     tnhfp = await get_freeing_nhfile();
     await savelevchn(tnhfp);
     await save_dungeon(tnhfp, 0, 1);
-    await free_luathemes(1);
+    await free_luathemes(all_themes);
     await close_nhfile(tnhfp);
     return;
 }
@@ -850,7 +861,7 @@ export async function freedynamicdata() {   // save.c:1077
     free_youbuf();
     msgtype_free();
     savedsym_free();
-    await tmp_at(-8, 0);
+    await tmp_at(DISP_FREEMEM, 0);
     purge_all_custom_entries();
     await dmonsfree();
     await alloc_itermonarr(0);
@@ -872,8 +883,8 @@ export async function freedynamicdata() {   // save.c:1077
     free_CapMons();
     free_rect();
     freeroleoptvals();
-    cmdq_clear(0 /* CQ_CANNED */);
-    cmdq_clear(1 /* CQ_REPEAT */);
+    cmdq_clear(CQ_CANNED);
+    cmdq_clear(CQ_REPEAT);
     cmdbind_freeall();
     await free_tutorial();
     wish_history_flush();
@@ -903,7 +914,7 @@ export async function freedynamicdata() {   // save.c:1077
     release_runtime_info();
     free_convert_filenames();
     free_nhuuid();
-    if ($c.andu64(windowprocs.wincap2, 136) !== 0) {
+    if ($c.andu64(windowprocs.wincap2, WC2_HILITE_STATUS | 128) !== 0) {
         await status_finish();
     }
     if ($G.options_set_window_colors_flag) {

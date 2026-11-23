@@ -2,19 +2,28 @@
 import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
+import { A_NONE } from './align.h.js';
 import { is_art, mk_artifact } from './artifact.js';
+import { ART_MAGICBANE } from './artilist.h.js';
 import { rank_of } from './botl.js';
 import { cg, gu, svd, svl, u } from './decl.js';
+import { WEAPON_CLASS } from './defsym.h.js';
 import { christen_monst } from './do_name.js';
+import { MM_NOMSG, NO_MM_FLAGS, RLOC_ERR, RLOC_NOMSG } from './hack.h.js';
 import { makemon, mkmonmoney, mongets, set_malign } from './makemon.js';
 import { bless, curse, mkobj, mksobj, weight } from './mkobj.js';
 import { set_mon_data } from './mondata.js';
+import { M2_FEMALE } from './monflag.h.js';
 import { mons } from './monst.js';
+import { PM_ARCHEOLOGIST, PM_BARBARIAN, PM_CAVE_DWELLER, PM_CLERIC, PM_HEALER, PM_KNIGHT, PM_MONK, PM_RANGER, PM_ROGUE, PM_SAMURAI, PM_TOURIST, PM_VALKYRIE, PM_WIZARD } from './monsters.h.js';
 import { rnd_defensive_item, rnd_misc_item, rnd_offensive_item } from './muse.js';
+import { RANDOM_CLASS } from './objclass.h.js';
 import { objects } from './objects.js';
+import { ATHAME, BATTLE_AXE, BLACK_DRAGON_SCALE_MAIL, BULLWHIP, CHAIN_MAIL, CLOAK_OF_DISPLACEMENT, CLOAK_OF_MAGIC_RESISTANCE, CLUB, DILITHIUM_CRYSTAL, ELVEN_DAGGER, ELVEN_LEATHER_HELM, ELVEN_SHIELD, FAKE_AMULET_OF_YENDOR, GAUNTLETS_OF_DEXTERITY, GAUNTLETS_OF_POWER, GRAY_DRAGON_SCALE_MAIL, HELM_OF_BRILLIANCE, HELM_OF_TELEPATHY, JADE, KATANA, LEATHER_GLOVES, LEVITATION_BOOTS, LOADSTONE, LONG_SWORD, LOW_BOOTS, LUCKSTONE, MACE, OILSKIN_CLOAK, ORCISH_DAGGER, PLATE_MAIL, QUARTERSTAFF, ROBE, SCALPEL, SHIELD_OF_REFLECTION, SHORT_SWORD, SHURIKEN, SILVER_DRAGON_SCALE_MAIL, SPEAR, STRANGE_OBJECT, TWO_HANDED_SWORD, UNICORN_HORN, WAR_HAMMER, YELLOW_DRAGON_SCALE_MAIL } from './objects.h.js';
 import { rnd_class } from './objnam.js';
 import { impossible, verbalize } from './pline.js';
 import { d, rn2, rnd } from './rnd.js';
+import { P_SPEAR } from './skills.h.js';
 import { mpickobj } from './steal.js';
 import { goodpos, rloc } from './teleport.js';
 import { monmightthrowwep } from './weapon.js';
@@ -31,7 +40,7 @@ function dev_name() {   // mplayer.c:44
         match = 0;
         i = rn2(n);
         for (mtmp = svl.level.monlist; mtmp; mtmp = mtmp.nmon) {
-            if (!($c.pcmp(mtmp.data, $c.relem(mons, 331 /* PM_ARCHEOLOGIST */)) >= 0 && $c.pcmp(mtmp.data, $c.relem(mons, 343 /* PM_WIZARD */)) <= 0)) {
+            if (!($c.pcmp(mtmp.data, $c.relem(mons, PM_ARCHEOLOGIST)) >= 0 && $c.pcmp(mtmp.data, $c.relem(mons, PM_WIZARD)) <= 0)) {
                 continue;
             }
             if (!$c.strncmp(developers[i], mtmp.mextra && mtmp.mextra.mgivenname ? mtmp.mextra.mgivenname : $c.lit(""), $c.strlen(developers[i]))) {
@@ -48,7 +57,7 @@ function dev_name() {   // mplayer.c:44
 }
 function get_mplname(mtmp, nam) {   // mplayer.c:72
     let fmlkind = 0, devnam = null;
-    fmlkind = $c.i8($c.andu64(mtmp.data.mflags2, 131072) !== 0 ? 1 : 0);
+    fmlkind = $c.i8($c.andu64(mtmp.data.mflags2, M2_FEMALE) !== 0 ? 1 : 0);
     devnam = dev_name();
     if (!devnam) {
         $c.__builtin___strcpy_chk(nam, fmlkind ? $c.lit("Eve") : $c.lit("Adam"), -1);
@@ -67,7 +76,7 @@ function get_mplname(mtmp, nam) {   // mplayer.c:72
 }
 async function mk_mplayer_armor(mon, typ) {   // mplayer.c:95
     let obj = null, $t1, $t2;
-    if (typ === 0 /* STRANGE_OBJECT */) {
+    if (typ === STRANGE_OBJECT) {
         return;
     }
     obj = await mksobj(typ, 0, 0);
@@ -86,148 +95,148 @@ async function mk_mplayer_armor(mon, typ) {   // mplayer.c:95
 }
 export async function mk_mplayer(ptr, x, y, special) {   // mplayer.c:118
     let mtmp = null, nam = new Int8Array(32), weapon = 0, armor = 0, cloak = 0, helm = 0, shield = 0, quan = 0, otmp = null, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11, $t12, $t13;
-    if (!($c.pcmp(ptr, $c.relem(mons, 331 /* PM_ARCHEOLOGIST */)) >= 0 && $c.pcmp(ptr, $c.relem(mons, 343 /* PM_WIZARD */)) <= 0)) {
+    if (!($c.pcmp(ptr, $c.relem(mons, PM_ARCHEOLOGIST)) >= 0 && $c.pcmp(ptr, $c.relem(mons, PM_WIZARD)) <= 0)) {
         return null;
     }
     if (svl.level.monsters[x][y] !== null) {
-        await rloc(svl.level.monsters[x][y], 5);
+        await rloc(svl.level.monsters[x][y], RLOC_ERR | RLOC_NOMSG);
     }
     if (!(u.uz.dnum === svd.dungeon_topology.d_astral_level.dnum)) {
         special = 0;
     }
-    if ((mtmp = await makemon(ptr, x, y, $c.u32(special ? 131072 : 0))) !== null) {
+    if ((mtmp = await makemon(ptr, x, y, $c.u32(special ? MM_NOMSG : NO_MM_FLAGS))) !== null) {
         $t1 = $c.u8(special ? rn2(16) + 15 | 0 : rnd(16)), mtmp.m_lev = $t1;
         $t3 = ($t2 = d(mtmp.m_lev, 10) + (special ? 30 + rnd(30) | 0 : 30) | 0, mtmp.mhpmax = $t2), mtmp.mhp = $t3;
         if (special) {
             get_mplname(mtmp, new $c.Ptr(nam, 0));
             mtmp = await christen_monst(mtmp, new $c.Ptr(nam, 0));
-            await mongets(mtmp, 212 /* FAKE_AMULET_OF_YENDOR */);
+            await mongets(mtmp, FAKE_AMULET_OF_YENDOR);
         }
         mtmp.mpeaceful = (0) & 1;
         set_malign(mtmp);
-        weapon = $c.i16(!rn2(2) ? 54 /* LONG_SWORD */ : rnd_class(27 /* SPEAR */, 82 /* BULLWHIP */));
-        armor = $c.i16(rnd_class(101 /* GRAY_DRAGON_SCALE_MAIL */, 110 /* YELLOW_DRAGON_SCALE_MAIL */));
-        cloak = $c.i16(!rn2(8) ? 0 /* STRANGE_OBJECT */ : rnd_class(142 /* OILSKIN_CLOAK */, 149 /* CLOAK_OF_DISPLACEMENT */));
-        helm = $c.i16(!rn2(8) ? 0 /* STRANGE_OBJECT */ : rnd_class(89 /* ELVEN_LEATHER_HELM */, 100 /* HELM_OF_TELEPATHY */));
-        shield = $c.i16(!rn2(8) ? 0 /* STRANGE_OBJECT */ : rnd_class(153 /* ELVEN_SHIELD */, 158 /* SHIELD_OF_REFLECTION */));
+        weapon = $c.i16(!rn2(2) ? LONG_SWORD : rnd_class(SPEAR, BULLWHIP));
+        armor = $c.i16(rnd_class(GRAY_DRAGON_SCALE_MAIL, YELLOW_DRAGON_SCALE_MAIL));
+        cloak = $c.i16(!rn2(8) ? STRANGE_OBJECT : rnd_class(OILSKIN_CLOAK, CLOAK_OF_DISPLACEMENT));
+        helm = $c.i16(!rn2(8) ? STRANGE_OBJECT : rnd_class(ELVEN_LEATHER_HELM, HELM_OF_TELEPATHY));
+        shield = $c.i16(!rn2(8) ? STRANGE_OBJECT : rnd_class(ELVEN_SHIELD, SHIELD_OF_REFLECTION));
         switch (ptr.pmidx) {
-            case 331 /* PM_ARCHEOLOGIST */:
+            case PM_ARCHEOLOGIST:
                 if (rn2(2)) {
-                    weapon = 82;
+                    weapon = BULLWHIP;
                 }
                 break;
-            case 332 /* PM_BARBARIAN */:
+            case PM_BARBARIAN:
                 if (rn2(2)) {
-                    weapon = $c.i16(rn2(2) ? 55 /* TWO_HANDED_SWORD */ : 45 /* BATTLE_AXE */);
-                    shield = 0;
+                    weapon = $c.i16(rn2(2) ? TWO_HANDED_SWORD : BATTLE_AXE);
+                    shield = STRANGE_OBJECT;
                 }
                 if (rn2(2)) {
-                    armor = $c.i16(rnd_class(121 /* PLATE_MAIL */, 128 /* CHAIN_MAIL */));
+                    armor = $c.i16(rnd_class(PLATE_MAIL, CHAIN_MAIL));
                 }
-                if (helm === 96 /* HELM_OF_BRILLIANCE */) {
-                    helm = 0;
+                if (helm === HELM_OF_BRILLIANCE) {
+                    helm = STRANGE_OBJECT;
                 }
                 break;
-            case 333 /* PM_CAVE_DWELLER */:
+            case PM_CAVE_DWELLER:
                 if (rn2(4)) {
-                    weapon = 73;
+                    weapon = MACE;
                 } else if (rn2(2)) {
-                    weapon = 77;
+                    weapon = CLUB;
                 }
-                if (helm === 96 /* HELM_OF_BRILLIANCE */) {
-                    helm = 0;
+                if (helm === HELM_OF_BRILLIANCE) {
+                    helm = STRANGE_OBJECT;
                 }
                 break;
-            case 334 /* PM_HEALER */:
+            case PM_HEALER:
                 if (rn2(4)) {
-                    weapon = 79;
+                    weapon = QUARTERSTAFF;
                 } else if (rn2(2)) {
-                    weapon = $c.i16(rn2(2) ? 261 /* UNICORN_HORN */ : 39 /* SCALPEL */);
+                    weapon = $c.i16(rn2(2) ? UNICORN_HORN : SCALPEL);
                 }
                 if (rn2(4)) {
-                    helm = $c.i16(rn2(2) ? 96 /* HELM_OF_BRILLIANCE */ : 100 /* HELM_OF_TELEPATHY */);
+                    helm = $c.i16(rn2(2) ? HELM_OF_BRILLIANCE : HELM_OF_TELEPATHY);
                 }
                 if (rn2(2)) {
-                    shield = 0;
+                    shield = STRANGE_OBJECT;
                 }
                 break;
-            case 335 /* PM_KNIGHT */:
+            case PM_KNIGHT:
                 if (rn2(4)) {
-                    weapon = 54;
+                    weapon = LONG_SWORD;
                 }
                 if (rn2(2)) {
-                    armor = $c.i16(rnd_class(121 /* PLATE_MAIL */, 128 /* CHAIN_MAIL */));
+                    armor = $c.i16(rnd_class(PLATE_MAIL, CHAIN_MAIL));
                 }
                 break;
-            case 336 /* PM_MONK */:
-                weapon = $c.i16(!rn2(3) ? 25 /* SHURIKEN */ : 0 /* STRANGE_OBJECT */);
-                armor = 0;
-                cloak = 143;
+            case PM_MONK:
+                weapon = $c.i16(!rn2(3) ? SHURIKEN : STRANGE_OBJECT);
+                armor = STRANGE_OBJECT;
+                cloak = ROBE;
                 if (rn2(2)) {
-                    shield = 0;
+                    shield = STRANGE_OBJECT;
                 }
                 break;
-            case 337 /* PM_CLERIC */:
+            case PM_CLERIC:
                 if (rn2(2)) {
-                    weapon = 73;
+                    weapon = MACE;
                 }
                 if (rn2(2)) {
-                    armor = $c.i16(rnd_class(121 /* PLATE_MAIL */, 128 /* CHAIN_MAIL */));
-                }
-                if (rn2(4)) {
-                    cloak = 143;
+                    armor = $c.i16(rnd_class(PLATE_MAIL, CHAIN_MAIL));
                 }
                 if (rn2(4)) {
-                    helm = $c.i16(rn2(2) ? 96 /* HELM_OF_BRILLIANCE */ : 100 /* HELM_OF_TELEPATHY */);
-                }
-                if (rn2(2)) {
-                    shield = 0;
-                }
-                break;
-            case 338 /* PM_RANGER */:
-                if (rn2(2)) {
-                    weapon = 35;
-                }
-                break;
-            case 339 /* PM_ROGUE */:
-                if (rn2(2)) {
-                    weapon = $c.i16(rn2(2) ? 46 /* SHORT_SWORD */ : 36 /* ORCISH_DAGGER */);
-                }
-                break;
-            case 340 /* PM_SAMURAI */:
-                if (rn2(2)) {
-                    weapon = 56;
-                }
-                break;
-            case 341 /* PM_TOURIST */:
-                break;
-            case 342 /* PM_VALKYRIE */:
-                if (rn2(2)) {
-                    weapon = 76;
-                }
-                if (rn2(2)) {
-                    armor = $c.i16(rnd_class(121 /* PLATE_MAIL */, 128 /* CHAIN_MAIL */));
-                }
-                break;
-            case 343 /* PM_WIZARD */:
-                if (rn2(4)) {
-                    weapon = $c.i16(rn2(2) ? 79 /* QUARTERSTAFF */ : 38 /* ATHAME */);
-                }
-                if (rn2(2)) {
-                    armor = $c.i16(rn2(2) ? 107 /* BLACK_DRAGON_SCALE_MAIL */ : 103 /* SILVER_DRAGON_SCALE_MAIL */);
-                    cloak = 148;
+                    cloak = ROBE;
                 }
                 if (rn2(4)) {
-                    helm = 96;
+                    helm = $c.i16(rn2(2) ? HELM_OF_BRILLIANCE : HELM_OF_TELEPATHY);
                 }
-                shield = 0;
+                if (rn2(2)) {
+                    shield = STRANGE_OBJECT;
+                }
+                break;
+            case PM_RANGER:
+                if (rn2(2)) {
+                    weapon = ELVEN_DAGGER;
+                }
+                break;
+            case PM_ROGUE:
+                if (rn2(2)) {
+                    weapon = $c.i16(rn2(2) ? SHORT_SWORD : ORCISH_DAGGER);
+                }
+                break;
+            case PM_SAMURAI:
+                if (rn2(2)) {
+                    weapon = KATANA;
+                }
+                break;
+            case PM_TOURIST:
+                break;
+            case PM_VALKYRIE:
+                if (rn2(2)) {
+                    weapon = WAR_HAMMER;
+                }
+                if (rn2(2)) {
+                    armor = $c.i16(rnd_class(PLATE_MAIL, CHAIN_MAIL));
+                }
+                break;
+            case PM_WIZARD:
+                if (rn2(4)) {
+                    weapon = $c.i16(rn2(2) ? QUARTERSTAFF : ATHAME);
+                }
+                if (rn2(2)) {
+                    armor = $c.i16(rn2(2) ? BLACK_DRAGON_SCALE_MAIL : SILVER_DRAGON_SCALE_MAIL);
+                    cloak = CLOAK_OF_MAGIC_RESISTANCE;
+                }
+                if (rn2(4)) {
+                    helm = HELM_OF_BRILLIANCE;
+                }
+                shield = STRANGE_OBJECT;
                 break;
             default:
                 await impossible($c.lit("bad mplayer monster"));
                 weapon = 0;
                 break;
         }
-        if (weapon !== 0 /* STRANGE_OBJECT */) {
+        if (weapon !== STRANGE_OBJECT) {
             otmp = await mksobj(weapon, 1, 0);
             $t4 = otmp.oeroded2 = (0) & 3, otmp.oeroded = ($t4) & 3;
             $t5 = $c.i8(special ? rn2(5) + 4 | 0 : rn2(4)), otmp.spe = $t5;
@@ -237,42 +246,42 @@ export async function mk_mplayer(ptr, x, y, special) {   // mplayer.c:118
                 otmp.greased = (1) & 1;
             }
             if (special && rn2(2)) {
-                otmp = await mk_artifact(otmp, -128, 99, 0);
+                otmp = await mk_artifact(otmp, A_NONE, 99, 0);
             }
             if (objects[otmp.otyp].oc_merge | 0 && !otmp.oartifact && monmightthrowwep(otmp)) {
-                $t6 = rn2(otmp.oclass === 2 /* WEAPON_CLASS */ && objects[otmp.otyp].oc_subtyp === 17 /* P_SPEAR */ ? 4 : 8), otmp.quan = $c.add64(otmp.quan, $t6);
+                $t6 = rn2(otmp.oclass === WEAPON_CLASS && objects[otmp.otyp].oc_subtyp === P_SPEAR ? 4 : 8), otmp.quan = $c.add64(otmp.quan, $t6);
             }
             $t7 = await weight(otmp) >>> 0, otmp.owt = $t7;
-            if (is_art(otmp, 8 /* ART_MAGICBANE */)) {
+            if (is_art(otmp, ART_MAGICBANE)) {
                 $t8 = $c.i8(rnd(4)), otmp.spe = $t8;
             }
             await mpickobj(mtmp, otmp);
         }
         if (special) {
             if (!rn2(10)) {
-                await mongets(mtmp, rn2(3) ? 470 /* LUCKSTONE */ : 471 /* LOADSTONE */);
+                await mongets(mtmp, rn2(3) ? LUCKSTONE : LOADSTONE);
             }
             await mk_mplayer_armor(mtmp, armor);
             await mk_mplayer_armor(mtmp, cloak);
             await mk_mplayer_armor(mtmp, helm);
             await mk_mplayer_armor(mtmp, shield);
-            if (weapon === 76 /* WAR_HAMMER */) {
-                await mk_mplayer_armor(mtmp, 161);
+            if (weapon === WAR_HAMMER) {
+                await mk_mplayer_armor(mtmp, GAUNTLETS_OF_POWER);
             } else if (rn2(8)) {
-                await mk_mplayer_armor(mtmp, $c.i16(rnd_class(159 /* LEATHER_GLOVES */, 162 /* GAUNTLETS_OF_DEXTERITY */)));
+                await mk_mplayer_armor(mtmp, $c.i16(rnd_class(LEATHER_GLOVES, GAUNTLETS_OF_DEXTERITY)));
             }
             if (rn2(8)) {
-                await mk_mplayer_armor(mtmp, $c.i16(rnd_class(163 /* LOW_BOOTS */, 172 /* LEVITATION_BOOTS */)));
+                await mk_mplayer_armor(mtmp, $c.i16(rnd_class(LOW_BOOTS, LEVITATION_BOOTS)));
             }
             await m_dowear(mtmp, 1);
             quan = rn2(3) ? rn2(3) : rn2(16);
             while ($t9 = quan, quan = $t9 - 1 | 0, $t9) {
-                await mongets(mtmp, rnd_class(439 /* DILITHIUM_CRYSTAL */, 460 /* JADE */));
+                await mongets(mtmp, rnd_class(DILITHIUM_CRYSTAL, JADE));
             }
             await mkmonmoney(mtmp, rn2(1000));
             quan = rn2(10);
             while ($t10 = quan, quan = $t10 - 1 | 0, $t10) {
-                await mpickobj(mtmp, await mkobj(0 /* RANDOM_CLASS */, 0));
+                await mpickobj(mtmp, await mkobj(RANDOM_CLASS, 0));
             }
         }
         quan = rnd(3);
@@ -295,7 +304,7 @@ export async function create_mplayers(num, special) {   // mplayer.c:327
     fakemon.$copyFrom(cg.zeromonst);
     while (num) {
         tryct = 0;
-        pm = rn2(13) + 331 | 0;
+        pm = rn2(PM_WIZARD - PM_ARCHEOLOGIST + 1) + PM_ARCHEOLOGIST | 0;
         set_mon_data(fakemon, $c.relem(mons, pm));
         do {
             x = rn2(76) + 2 | 0;

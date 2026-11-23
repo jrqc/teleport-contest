@@ -4,7 +4,14 @@ import * as $T from './types.js';
 import { $G } from './globals.js';
 import { dupstr } from './alloc.js';
 import { free_nomakedefs, populate_nomakedefs } from './date.js';
+import { COLNO, SFCTOOL_BIT } from './global.h.js';
 import { datamodel, eos, nh_snprintf } from './hacklib.js';
+import { NUM_OBJECTS } from './objclass.h.js';
+import { EDITLEVEL, PATCHLEVEL, VERSION_MAJOR, VERSION_MINOR } from './patchlevel.h.js';
+import { NUMMONS } from './permonst.h.js';
+import { soundlib_nosound } from './sndprocs.h.js';
+
+const MAXOPT = 60;
 
 const build_options$lua_info = $c.nulls(15);   // static in build_options()
 const artifact_names = $c.nulls(35);
@@ -20,19 +27,19 @@ const soundlib_opts = $c.recArray($T.soundlib_information, 2);
 const save_bones_compat_buf = new Int8Array(256);
 const build_opts = $c.nulls(26);
 export function md_ignored_features() {   // mdlib.c:236
-    return 1074266112;
+    return 0 | 1 << 19 | SFCTOOL_BIT;
 }
 function make_version() {   // mdlib.c:248
     let i = 0;
-    version.incarnation = 83886080;
+    version.incarnation = VERSION_MAJOR << 24 | VERSION_MINOR << 16 | PATCHLEVEL << 8 | EDITLEVEL;
     version.feature_set = 393280;
     for (i = 1; artifact_names[i]; i = i + 1 | 0) {
         continue;
     }
     version.entity_count = $c.u64(i - 1 | 0);
-    i = 481 /* NUM_OBJECTS */;
+    i = NUM_OBJECTS;
     version.entity_count = $c.oru64($c.shlu64(version.entity_count, 12), $c.u64(i));
-    i = 383 /* NUMMONS */;
+    i = NUMMONS;
     version.entity_count = $c.oru64($c.shlu64(version.entity_count, 12), $c.u64(i));
     return;
 }
@@ -82,8 +89,8 @@ async function opt_out_words(str, length_p) {   // mdlib.c:641
         if (word) {
             word.set(0, 0);
         }
-        if ((length_p.get(0) + $c.i32($c.strlen(str)) | 0) > 75) {
-            idxopttext < 60 ? ($t2 = await dupstr(new $c.Ptr(optbuf, 0)), $t3 = new $c.Ptr(opttext, ($t1 = idxopttext, idxopttext = $t1 + 1 | 0, $t1)), $t3.set(0, $t2)) : null;
+        if ((length_p.get(0) + $c.i32($c.strlen(str)) | 0) > COLNO - 5) {
+            idxopttext < MAXOPT ? ($t2 = await dupstr(new $c.Ptr(optbuf, 0)), $t3 = new $c.Ptr(opttext, ($t1 = idxopttext, idxopttext = $t1 + 1 | 0, $t1)), $t3.set(0, $t2)) : null;
             $c.__builtin___sprintf_chk(new $c.Ptr(optbuf, 0), 0, 256, $c.lit("%s"), new $c.Ptr(opt_indent, 0)), ($t4 = $c.i32($c.strlen(new $c.Ptr(opt_indent, 0))), length_p.set(0, $t4));
         } else {
             $c.__builtin___sprintf_chk(eos(new $c.Ptr(optbuf, 0)), 0, -1, $c.lit(" ")), length_p.set(0, length_p.get(0) + 1 | 0);
@@ -97,27 +104,27 @@ async function build_options() {   // mdlib.c:669
     cnt = 0;
     defwinsys = $c.lit("tty");
     build_savebones_compat_string();
-    idxopttext < 60 ? ($t2 = await dupstr(new $c.Ptr(optbuf, 0)), $t3 = new $c.Ptr(opttext, ($t1 = idxopttext, idxopttext = $t1 + 1 | 0, $t1)), $t3.set(0, $t2)) : null;
+    idxopttext < MAXOPT ? ($t2 = await dupstr(new $c.Ptr(optbuf, 0)), $t3 = new $c.Ptr(opttext, ($t1 = idxopttext, idxopttext = $t1 + 1 | 0, $t1)), $t3.set(0, $t2)) : null;
     $c.__builtin___sprintf_chk(new $c.Ptr(optbuf, 0), 0, 256, $c.lit("%sNetHack version %d.%d.%d%s\n"), new $c.Ptr(opt_indent, 0), 5, 0, 0, $c.lit(""));
-    idxopttext < 60 ? ($t5 = await dupstr(new $c.Ptr(optbuf, 0)), $t6 = new $c.Ptr(opttext, ($t4 = idxopttext, idxopttext = $t4 + 1 | 0, $t4)), $t6.set(0, $t5)) : null;
+    idxopttext < MAXOPT ? ($t5 = await dupstr(new $c.Ptr(optbuf, 0)), $t6 = new $c.Ptr(opttext, ($t4 = idxopttext, idxopttext = $t4 + 1 | 0, $t4)), $t6.set(0, $t5)) : null;
     $c.__builtin___sprintf_chk(new $c.Ptr(optbuf, 0), 0, 256, $c.lit("Options compiled into this edition:"));
-    idxopttext < 60 ? ($t8 = await dupstr(new $c.Ptr(optbuf, 0)), $t9 = new $c.Ptr(opttext, ($t7 = idxopttext, idxopttext = $t7 + 1 | 0, $t7)), $t9.set(0, $t8)) : null;
+    idxopttext < MAXOPT ? ($t8 = await dupstr(new $c.Ptr(optbuf, 0)), $t9 = new $c.Ptr(opttext, ($t7 = idxopttext, idxopttext = $t7 + 1 | 0, $t7)), $t9.set(0, $t8)) : null;
     optbuf[0] = 0;
-    length[0] = 81;
+    length[0] = COLNO + 1;
     $c.__builtin___strcat_chk($c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), datamodel(0), 256), $c.lit(" data model,"), -1);
     await opt_out_words(new $c.Ptr(buf, 0), new $c.Ptr(length, 0));
     for (i = 0; i < 26; i = i + 1 | 0) {
         $c.__builtin___strcat_chk($c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), build_opts[i], 256), i < 25 ? $c.lit(",") : $c.lit("."), -1);
         await opt_out_words(new $c.Ptr(buf, 0), new $c.Ptr(length, 0));
     }
-    idxopttext < 60 ? ($t11 = await dupstr(new $c.Ptr(optbuf, 0)), $t12 = new $c.Ptr(opttext, ($t10 = idxopttext, idxopttext = $t10 + 1 | 0, $t10)), $t12.set(0, $t11)) : null;
+    idxopttext < MAXOPT ? ($t11 = await dupstr(new $c.Ptr(optbuf, 0)), $t12 = new $c.Ptr(opttext, ($t10 = idxopttext, idxopttext = $t10 + 1 | 0, $t10)), $t12.set(0, $t11)) : null;
     optbuf[0] = 0;
     winsyscnt = count_and_validate_winopts();
-    idxopttext < 60 ? ($t14 = await dupstr(new $c.Ptr(optbuf, 0)), $t15 = new $c.Ptr(opttext, ($t13 = idxopttext, idxopttext = $t13 + 1 | 0, $t13)), $t15.set(0, $t14)) : null;
+    idxopttext < MAXOPT ? ($t14 = await dupstr(new $c.Ptr(optbuf, 0)), $t15 = new $c.Ptr(opttext, ($t13 = idxopttext, idxopttext = $t13 + 1 | 0, $t13)), $t15.set(0, $t14)) : null;
     $c.__builtin___sprintf_chk(new $c.Ptr(optbuf, 0), 0, 256, $c.lit("Supported windowing system%s:"), winsyscnt > 1 ? $c.lit("s") : $c.lit(""));
-    idxopttext < 60 ? ($t17 = await dupstr(new $c.Ptr(optbuf, 0)), $t18 = new $c.Ptr(opttext, ($t16 = idxopttext, idxopttext = $t16 + 1 | 0, $t16)), $t18.set(0, $t17)) : null;
+    idxopttext < MAXOPT ? ($t17 = await dupstr(new $c.Ptr(optbuf, 0)), $t18 = new $c.Ptr(opttext, ($t16 = idxopttext, idxopttext = $t16 + 1 | 0, $t16)), $t18.set(0, $t17)) : null;
     optbuf[0] = 0;
-    length[0] = 81;
+    length[0] = COLNO + 1;
     for (i = 0; i < 1; i = i + 1 | 0) {
         if (!window_opts[i].valid) {
             continue;
@@ -135,14 +142,14 @@ async function build_options() {   // mdlib.c:669
         await opt_out_words(new $c.Ptr(buf, 0), new $c.Ptr(length, 0));
     }
     cnt = 0;
-    idxopttext < 60 ? ($t20 = await dupstr(new $c.Ptr(optbuf, 0)), $t21 = new $c.Ptr(opttext, ($t19 = idxopttext, idxopttext = $t19 + 1 | 0, $t19)), $t21.set(0, $t20)) : null;
+    idxopttext < MAXOPT ? ($t20 = await dupstr(new $c.Ptr(optbuf, 0)), $t21 = new $c.Ptr(opttext, ($t19 = idxopttext, idxopttext = $t19 + 1 | 0, $t19)), $t21.set(0, $t20)) : null;
     optbuf[0] = 0;
     soundlibcnt = count_and_validate_soundlibopts();
-    idxopttext < 60 ? ($t23 = await dupstr(new $c.Ptr(optbuf, 0)), $t24 = new $c.Ptr(opttext, ($t22 = idxopttext, idxopttext = $t22 + 1 | 0, $t22)), $t24.set(0, $t23)) : null;
+    idxopttext < MAXOPT ? ($t23 = await dupstr(new $c.Ptr(optbuf, 0)), $t24 = new $c.Ptr(opttext, ($t22 = idxopttext, idxopttext = $t22 + 1 | 0, $t22)), $t24.set(0, $t23)) : null;
     $c.__builtin___sprintf_chk(new $c.Ptr(optbuf, 0), 0, 256, $c.lit("Supported soundlib%s:"), soundlibcnt > 1 ? $c.lit("s") : $c.lit(""));
-    idxopttext < 60 ? ($t26 = await dupstr(new $c.Ptr(optbuf, 0)), $t27 = new $c.Ptr(opttext, ($t25 = idxopttext, idxopttext = $t25 + 1 | 0, $t25)), $t27.set(0, $t26)) : null;
+    idxopttext < MAXOPT ? ($t26 = await dupstr(new $c.Ptr(optbuf, 0)), $t27 = new $c.Ptr(opttext, ($t25 = idxopttext, idxopttext = $t25 + 1 | 0, $t25)), $t27.set(0, $t26)) : null;
     optbuf[0] = 0;
-    length[0] = 81;
+    length[0] = COLNO + 1;
     for (i = 0; i < 1; i = i + 1 | 0) {
         if (!soundlib_opts[i].valid) {
             continue;
@@ -156,14 +163,14 @@ async function build_options() {   // mdlib.c:669
         await opt_out_words(new $c.Ptr(buf, 0), new $c.Ptr(length, 0));
         cnt = cnt + 1 | 0;
     }
-    idxopttext < 60 ? ($t29 = await dupstr(new $c.Ptr(optbuf, 0)), $t30 = new $c.Ptr(opttext, ($t28 = idxopttext, idxopttext = $t28 + 1 | 0, $t28)), $t30.set(0, $t29)) : null;
+    idxopttext < MAXOPT ? ($t29 = await dupstr(new $c.Ptr(optbuf, 0)), $t30 = new $c.Ptr(opttext, ($t28 = idxopttext, idxopttext = $t28 + 1 | 0, $t28)), $t30.set(0, $t29)) : null;
     optbuf[0] = 0;
     {
         for (i = 0; build_options$lua_info[i]; i = i + 1 | 0) {
-            idxopttext < 60 ? ($t32 = await dupstr(build_options$lua_info[i]), $t33 = new $c.Ptr(opttext, ($t31 = idxopttext, idxopttext = $t31 + 1 | 0, $t31)), $t33.set(0, $t32)) : null;
+            idxopttext < MAXOPT ? ($t32 = await dupstr(build_options$lua_info[i]), $t33 = new $c.Ptr(opttext, ($t31 = idxopttext, idxopttext = $t31 + 1 | 0, $t31)), $t33.set(0, $t32)) : null;
         }
     }
-    idxopttext < 60 ? ($t35 = await dupstr($c.lit("")), $t36 = new $c.Ptr(opttext, ($t34 = idxopttext, idxopttext = $t34 + 1 | 0, $t34)), $t36.set(0, $t35)) : null;
+    idxopttext < MAXOPT ? ($t35 = await dupstr($c.lit("")), $t36 = new $c.Ptr(opttext, ($t34 = idxopttext, idxopttext = $t34 + 1 | 0, $t34)), $t36.set(0, $t35)) : null;
     return;
 }
 export async function runtime_info_init() {   // mdlib.c:835
@@ -183,7 +190,7 @@ export async function do_runtime_info(rtcontext) {   // mdlib.c:849
         await runtime_info_init();
     }
     if (idxopttext && rtcontext) {
-        if (rtcontext.get(0) >= 0 && rtcontext.get(0) < 60) {
+        if (rtcontext.get(0) >= 0 && rtcontext.get(0) < MAXOPT) {
             retval = opttext[rtcontext.get(0)];
             rtcontext.set(0, rtcontext.get(0) + 1 | 0);
         }
@@ -257,7 +264,7 @@ export function $init() {
     for (let $i0 = 0; $i0 < 2; $i0++) {
         soundlib_opts[$i0].$copyFrom(new $T.soundlib_information());
     }
-    soundlib_opts[0].id = 0;
+    soundlib_opts[0].id = soundlib_nosound;
     soundlib_opts[0].text_id = $c.lit("soundlib_nosound");
     soundlib_opts[0].Url = $c.lit("");
     soundlib_opts[0].valid = 0;

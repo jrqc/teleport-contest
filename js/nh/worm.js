@@ -6,16 +6,25 @@ import { alloc, fmt_ptr } from './alloc.js';
 import { isok } from './cmd.js';
 import { gv, svc, svl, svm, u } from './decl.js';
 import { canseemon, newsym, sensemon, show_glyph } from './display.js';
+import { GLYPH_DETECT_FEM_OFF, GLYPH_DETECT_MALE_OFF, GLYPH_MON_FEM_OFF, GLYPH_MON_MALE_OFF, GLYPH_PET_FEM_OFF, GLYPH_PET_MALE_OFF } from './display.h.js';
 import { Monnam, mon_nam } from './do_name.js';
+import { MHPMAX } from './global.h.js';
+import { COUNTING, FREEING, WRITING } from './hack.h.js';
 import { dist2, distmin, s_suffix } from './hacklib.js';
 import { clone_mon } from './makemon.js';
 import { mattacku } from './mhitu.js';
 import { mcalcmove } from './mon.js';
+import { FEMALE, MALE } from './monflag.h.js';
 import { mons } from './monst.js';
+import { MAX_NUM_WORMS } from './monst.h.js';
+import { PM_LONG_WORM, PM_LONG_WORM_TAIL } from './monsters.h.js';
+import { NON_PM, NORMAL_SPEED, NUMMONS } from './permonst.h.js';
 import { You, impossible, pline } from './pline.js';
+import { HALLUC, HALLUC_RES } from './prop.h.js';
 import { d, rn2, rn2_on_display_rng, rnd } from './rnd.js';
 import { sfi_int, sfi_int16, sfi_long, sfo_int, sfo_int16, sfo_long } from './sfbase.js';
 import { rnd_nextto_goodpos } from './trap.js';
+import { IN_SIGHT } from './vision.h.js';
 
 const wheads = $c.nulls(32);
 const wtails = $c.nulls(32);
@@ -23,7 +32,7 @@ const wgrowtime = $c.zeros(32);
 export function get_wormno() {   // worm.c:96
     let new_wormno = 0;
     new_wormno = 1;
-    while (new_wormno < 32) {
+    while (new_wormno < MAX_NUM_WORMS) {
         if (!wheads[new_wormno]) {
             return new_wormno;
         }
@@ -92,7 +101,7 @@ export async function worm_move(worm) {   // worm.c:196
         } else {
             mmove = mcalcmove(worm, 0);
             incr = rn2(10) + 2 | 0;
-            incr = $c.div32(Math.imul(incr, 12), mmove > 1 ? mmove : 1);
+            incr = $c.div32(Math.imul(incr, NORMAL_SPEED), mmove > 1 ? mmove : 1);
             wgrowtime[wnum] = $c.add64(svm.moves, incr);
         }
         whplimit = !worm.m_lev ? 4 : Math.imul(8, worm.m_lev);
@@ -106,8 +115,8 @@ export async function worm_move(worm) {   // worm.c:196
             whplimit = whplimit + Math.imul(6, wsegs - 11 | 0) | 0, wsegs = 11;
         }
         whplimit = whplimit + Math.imul(8, wsegs) | 0;
-        if (whplimit > 500) {
-            whplimit = 500;
+        if (whplimit > MHPMAX) {
+            whplimit = MHPMAX;
         }
         prev_mhp = worm.mhp;
         $t2 = d(2, 2), worm.mhp = worm.mhp + $t2 | 0;
@@ -148,8 +157,8 @@ export async function wormgone(worm) {   // worm.c:308
     await toss_wsegs(wtails[wnum], 1);
     $t1 = wtails[wnum] = null, wheads[wnum] = $t1;
     wgrowtime[wnum] = 0;
-    if ($c.peq(worm.data, $c.relem(mons, 114 /* PM_LONG_WORM */)) && (worm.mextra && worm.mextra.mcorpsenm !== -1 /* NON_PM */)) {
-        worm.mextra.mcorpsenm = -1 /* NON_PM */;
+    if ($c.peq(worm.data, $c.relem(mons, PM_LONG_WORM)) && (worm.mextra && worm.mextra.mcorpsenm !== NON_PM)) {
+        worm.mextra.mcorpsenm = NON_PM;
     }
 }
 export async function wormhitu(worm) {   // worm.c:344
@@ -246,17 +255,17 @@ export async function see_wsegs(worm) {   // worm.c:487
 export async function detect_wsegs(worm, use_detection_glyph) {   // worm.c:503
     let num = 0, curr = null, what_tail = 0;
     curr = wtails[worm.wormno];
-    what_tail = u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic) ? await rn2_on_display_rng(383 /* NUMMONS */) : 330 /* PM_LONG_WORM_TAIL */;
+    what_tail = u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? await rn2_on_display_rng(NUMMONS) : PM_LONG_WORM_TAIL;
     while (!$c.peq(curr, wheads[worm.wormno])) {
-        num = use_detection_glyph ? what_tail + ((worm.female | 0 ? 1 /* FEMALE */ : 0 /* MALE */) === 0 /* MALE */ ? 1533 /* GLYPH_DETECT_MALE_OFF */ : 1916 /* GLYPH_DETECT_FEM_OFF */) | 0 : worm.mtame ? what_tail + ((worm.female | 0 ? 1 /* FEMALE */ : 0 /* MALE */) === 0 /* MALE */ ? 766 /* GLYPH_PET_MALE_OFF */ : 1149 /* GLYPH_PET_FEM_OFF */) | 0 : what_tail + ((worm.female | 0 ? 1 /* FEMALE */ : 0 /* MALE */) === 0 /* MALE */ ? 0 /* GLYPH_MON_MALE_OFF */ : 383 /* GLYPH_MON_FEM_OFF */) | 0;
+        num = use_detection_glyph ? what_tail + ((worm.female | 0 ? FEMALE : MALE) === MALE ? GLYPH_DETECT_MALE_OFF : GLYPH_DETECT_FEM_OFF) | 0 : worm.mtame ? what_tail + ((worm.female | 0 ? FEMALE : MALE) === MALE ? GLYPH_PET_MALE_OFF : GLYPH_PET_FEM_OFF) | 0 : what_tail + ((worm.female | 0 ? FEMALE : MALE) === MALE ? GLYPH_MON_MALE_OFF : GLYPH_MON_FEM_OFF) | 0;
         await show_glyph(curr.wx, curr.wy, num);
         curr = curr.nseg;
     }
 }
 export async function save_worm(nhfp) {   // worm.c:528
     let i = 0, count = Int32Array.of(0), curr = null, temp = null, $t1;
-    if (nhfp.mode & 3) {
-        for (i = 1; i < 32; i = i + 1 | 0) {
+    if (nhfp.mode & (COUNTING | WRITING)) {
+        for (i = 1; i < MAX_NUM_WORMS; i = i + 1 | 0) {
             for (count[0] = 0, curr = wtails[i]; curr; curr = curr.nseg) {
                 count[0] = count[0] + 1 | 0;
             }
@@ -268,12 +277,12 @@ export async function save_worm(nhfp) {   // worm.c:528
                 }
             }
         }
-        for (i = 0; i < 32; i = i + 1 | 0) {
+        for (i = 0; i < MAX_NUM_WORMS; i = i + 1 | 0) {
             await sfo_long(nhfp, new $c.Ptr(wgrowtime, i), $c.lit("worm-wgrowtime"));
         }
     }
-    if (nhfp.mode & 4) {
-        for (i = 1; i < 32; i = i + 1 | 0) {
+    if (nhfp.mode & FREEING) {
+        for (i = 1; i < MAX_NUM_WORMS; i = i + 1 | 0) {
             if (!(curr = wtails[i])) {
                 continue;
             }
@@ -290,7 +299,7 @@ export async function save_worm(nhfp) {   // worm.c:528
 export async function rest_worm(nhfp) {   // worm.c:577
     let i = 0, j = 0, count = Int32Array.of(0), curr = null, temp = null;
     count[0] = 0;
-    for (i = 1; i < 32; i = i + 1 | 0) {
+    for (i = 1; i < MAX_NUM_WORMS; i = i + 1 | 0) {
         await sfi_int(nhfp, new $c.Ptr(count, 0), $c.lit("worm-segment_count"));
         for (curr = null, j = 0; j < count[0]; j = j + 1 | 0) {
             temp = $c.asRec(await alloc(16), $T.wseg, 16);
@@ -306,7 +315,7 @@ export async function rest_worm(nhfp) {   // worm.c:577
         }
         wheads[i] = curr;
     }
-    for (i = 0; i < 32; i = i + 1 | 0) {
+    for (i = 0; i < MAX_NUM_WORMS; i = i + 1 | 0) {
         await sfi_long(nhfp, new $c.Ptr(wgrowtime, i), $c.lit("worm-wgrowtime"));
     }
 }
@@ -453,7 +462,7 @@ export function worm_known(worm) {   // worm.c:883
     let curr = null;
     curr = wtails[worm.wormno];
     while (curr) {
-        if ((gv.viz_array.get(curr.wy).get(curr.wx) & 2) !== 0) {
+        if ((gv.viz_array.get(curr.wy).get(curr.wx) & IN_SIGHT) !== 0) {
             return 1;
         }
         curr = curr.nseg;

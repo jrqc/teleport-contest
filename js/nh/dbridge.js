@@ -4,6 +4,7 @@ import * as $T from './types.js';
 import { $G } from './globals.js';
 import { isok } from './cmd.js';
 import { gm, go, gv, gy, iflags, svc, svd, svk, svl, u } from './decl.js';
+import { S_EYE, S_GHOST, S_LIGHT } from './defsym.h.js';
 import { canseemon, newsym, sensemon } from './display.js';
 import { flooreffects } from './do.js';
 import { Monnam, hliquid, mon_nam } from './do_name.js';
@@ -14,25 +15,34 @@ import { del_engr_at } from './engrave.js';
 import { scatter } from './explode.js';
 import { debugcore } from './files.js';
 import { revive_nasty, spoteffects } from './hack.js';
+import { BURNING, CRUSHING, DROWNING, ENTITIES, KILLED_BY_AN, MAY_HITMON, MAY_HITYOU, NO_KILLER_PREFIX, TELEDS_NO_FLAGS, XKILL_GIVEMSG, XKILL_NOCONDUCT, XKILL_NOCORPSE, XKILL_NOMSG } from './hack.h.js';
 import { dist2 } from './hacklib.js';
 import { delallobj, sobj_at } from './invent.js';
 import { mksobj_at, obj_extract_self } from './mkobj.js';
 import { minliquid, monkilled, wake_nearto, xkilled } from './mon.js';
+import { AD_DGST, AD_PHYS } from './monattk.h.js';
 import { pronoun_gender } from './mondata.js';
+import { M1_AMPHIBIOUS, M1_BREATHLESS, M1_FLY, M1_SWIM, M1_WALLWALK } from './monflag.h.js';
 import { mons } from './monst.js';
+import { PM_FIRE_ELEMENTAL, PM_LONG_WORM_TAIL, PM_SALAMANDER } from './monsters.h.js';
+import { BOULDER, IRON_CHAIN } from './objects.h.js';
 import { vtense } from './objnam.js';
 import { You, You_hear, You_see, impossible, pline, pline_The } from './pline.js';
+import { CONFUSION, DEAF, FLYING, FUMBLING, HALLUC, HALLUC_RES, LEVITATION, MAGICAL_BREATHING, PASSES_WALLS, STUNNED, SWIMMING, WWALKING } from './prop.h.js';
 import { update_monster_region } from './region.js';
+import { DBWALL, DB_DIR, DB_EAST, DB_ICE, DB_LAVA, DB_MOAT, DB_NORTH, DB_SOUTH, DB_UNDER, DB_WEST, DOOR, DRAWBRIDGE_DOWN, DRAWBRIDGE_UP, D_NODOOR, ICE, ICED_MOAT, LAVAPOOL, LAVAWALL, MOAT, POOL, ROOM, STONE, WATER, W_NONDIGGABLE } from './rm.h.js';
 import { rn2, rnd } from './rnd.js';
 import { genders } from './role.js';
 import { place_monster } from './steed.js';
 import { enexto, teleds } from './teleport.js';
 import { deltrap, drown, lava_effects, t_at, unconscious } from './trap.js';
 import { block_point, does_block, unblock_point, vision_recalc } from './vision.js';
+import { IN_SIGHT } from './vision.h.js';
+import { PRONOUN_HALLU } from './you.h.js';
 
 const E_phrase$wholebuf = new Int8Array(80);   // static in E_phrase()
 export function is_waterwall(x, y) {   // dbridge.c:38
-    if (isok(x, y) && svl.level.locations[x][y].typ === 18 /* WATER */) {
+    if (isok(x, y) && svl.level.locations[x][y].typ === WATER) {
         return 1;
     }
     return 0;
@@ -43,7 +53,7 @@ export function is_pool(x, y) {   // dbridge.c:46
         return 0;
     }
     ltyp = svl.level.locations[x][y].typ;
-    if (ltyp === 16 /* POOL */ || ltyp === 17 /* MOAT */ || ltyp === 18 /* WATER */ || is_moat(x, y)) {
+    if (ltyp === POOL || ltyp === MOAT || ltyp === WATER || is_moat(x, y)) {
         return 1;
     }
     return 0;
@@ -54,7 +64,7 @@ export function is_lava(x, y) {   // dbridge.c:62
         return 0;
     }
     ltyp = svl.level.locations[x][y].typ;
-    if (ltyp === 20 /* LAVAPOOL */ || ltyp === 21 /* LAVAWALL */ || ltyp === 19 /* DRAWBRIDGE_UP */ && ((svl.level.locations[x][y].flags | 0) & 28) === 4) {
+    if (ltyp === LAVAPOOL || ltyp === LAVAWALL || ltyp === DRAWBRIDGE_UP && ((svl.level.locations[x][y].flags | 0) & DB_UNDER) === DB_LAVA) {
         return 1;
     }
     return 0;
@@ -72,7 +82,7 @@ export function is_ice(x, y) {   // dbridge.c:86
         return 0;
     }
     ltyp = svl.level.locations[x][y].typ;
-    if (ltyp === 33 /* ICE */ || ltyp === 19 /* DRAWBRIDGE_UP */ && ((svl.level.locations[x][y].flags | 0) & 28) === 8) {
+    if (ltyp === ICE || ltyp === DRAWBRIDGE_UP && ((svl.level.locations[x][y].flags | 0) & DB_UNDER) === DB_ICE) {
         return 1;
     }
     return 0;
@@ -83,21 +93,21 @@ export function is_moat(x, y) {   // dbridge.c:100
         return 0;
     }
     ltyp = svl.level.locations[x][y].typ;
-    if (!((svd.dungeon_topology.d_juiblex_level.dlevel || svd.dungeon_topology.d_juiblex_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_juiblex_level)) && (ltyp === 17 /* MOAT */ || ltyp === 19 /* DRAWBRIDGE_UP */ && ((svl.level.locations[x][y].flags | 0) & 28) === 0)) {
+    if (!((svd.dungeon_topology.d_juiblex_level.dlevel || svd.dungeon_topology.d_juiblex_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_juiblex_level)) && (ltyp === MOAT || ltyp === DRAWBRIDGE_UP && ((svl.level.locations[x][y].flags | 0) & DB_UNDER) === DB_MOAT)) {
         return 1;
     }
     return 0;
 }
 export function db_under_typ(mask) {   // dbridge.c:116
-    switch (mask & 28) {
-        case 8:
-            return 33;
-        case 4:
-            return 20;
-        case 0:
-            return 17;
+    switch (mask & DB_UNDER) {
+        case DB_ICE:
+            return ICE;
+        case DB_LAVA:
+            return LAVAPOOL;
+        case DB_MOAT:
+            return MOAT;
         default:
-            return 0;
+            return STONE;
     }
 }
 export function is_drawbridge_wall(x, y) {   // dbridge.c:137
@@ -106,44 +116,44 @@ export function is_drawbridge_wall(x, y) {   // dbridge.c:137
         return -1;
     }
     lev = $c.relem(svl.level.locations[x], y);
-    if (lev.typ !== 23 /* DOOR */ && lev.typ !== 12 /* DBWALL */) {
+    if (lev.typ !== DOOR && lev.typ !== DBWALL) {
         return -1;
     }
-    if (isok($c.i16(x + 1 | 0), y) && (svl.level.locations[x + 1 | 0][y].typ === 19 /* DRAWBRIDGE_UP */ || svl.level.locations[x + 1 | 0][y].typ === 34 /* DRAWBRIDGE_DOWN */) && ((svl.level.locations[x + 1 | 0][y].flags | 0) & 3) === 3) {
-        return 3;
+    if (isok($c.i16(x + 1 | 0), y) && (svl.level.locations[x + 1 | 0][y].typ === DRAWBRIDGE_UP || svl.level.locations[x + 1 | 0][y].typ === DRAWBRIDGE_DOWN) && ((svl.level.locations[x + 1 | 0][y].flags | 0) & DB_DIR) === DB_WEST) {
+        return DB_WEST;
     }
-    if (isok($c.i16(x - 1 | 0), y) && (svl.level.locations[x - 1 | 0][y].typ === 19 /* DRAWBRIDGE_UP */ || svl.level.locations[x - 1 | 0][y].typ === 34 /* DRAWBRIDGE_DOWN */) && ((svl.level.locations[x - 1 | 0][y].flags | 0) & 3) === 2) {
-        return 2;
+    if (isok($c.i16(x - 1 | 0), y) && (svl.level.locations[x - 1 | 0][y].typ === DRAWBRIDGE_UP || svl.level.locations[x - 1 | 0][y].typ === DRAWBRIDGE_DOWN) && ((svl.level.locations[x - 1 | 0][y].flags | 0) & DB_DIR) === DB_EAST) {
+        return DB_EAST;
     }
-    if (isok(x, $c.i16(y - 1 | 0)) && (svl.level.locations[x][y - 1 | 0].typ === 19 /* DRAWBRIDGE_UP */ || svl.level.locations[x][y - 1 | 0].typ === 34 /* DRAWBRIDGE_DOWN */) && ((svl.level.locations[x][y - 1 | 0].flags | 0) & 3) === 1) {
-        return 1;
+    if (isok(x, $c.i16(y - 1 | 0)) && (svl.level.locations[x][y - 1 | 0].typ === DRAWBRIDGE_UP || svl.level.locations[x][y - 1 | 0].typ === DRAWBRIDGE_DOWN) && ((svl.level.locations[x][y - 1 | 0].flags | 0) & DB_DIR) === DB_SOUTH) {
+        return DB_SOUTH;
     }
-    if (isok(x, $c.i16(y + 1 | 0)) && (svl.level.locations[x][y + 1 | 0].typ === 19 /* DRAWBRIDGE_UP */ || svl.level.locations[x][y + 1 | 0].typ === 34 /* DRAWBRIDGE_DOWN */) && ((svl.level.locations[x][y + 1 | 0].flags | 0) & 3) === 0) {
-        return 0;
+    if (isok(x, $c.i16(y + 1 | 0)) && (svl.level.locations[x][y + 1 | 0].typ === DRAWBRIDGE_UP || svl.level.locations[x][y + 1 | 0].typ === DRAWBRIDGE_DOWN) && ((svl.level.locations[x][y + 1 | 0].flags | 0) & DB_DIR) === DB_NORTH) {
+        return DB_NORTH;
     }
     return -1;
 }
 export function is_db_wall(x, y) {   // dbridge.c:170
-    return $c.i8(svl.level.locations[x][y].typ === 12 /* DBWALL */ ? 1 : 0);
+    return $c.i8(svl.level.locations[x][y].typ === DBWALL ? 1 : 0);
 }
 export function find_drawbridge(x, y) {   // dbridge.c:180
     let dir = 0;
-    if (svl.level.locations[x.get(0)][y.get(0)].typ === 19 /* DRAWBRIDGE_UP */ || svl.level.locations[x.get(0)][y.get(0)].typ === 34 /* DRAWBRIDGE_DOWN */) {
+    if (svl.level.locations[x.get(0)][y.get(0)].typ === DRAWBRIDGE_UP || svl.level.locations[x.get(0)][y.get(0)].typ === DRAWBRIDGE_DOWN) {
         return 1;
     }
     dir = is_drawbridge_wall(x.get(0), y.get(0));
     if (dir >= 0) {
         switch (dir) {
-            case 0:
+            case DB_NORTH:
                 y.set(0, $c.i16(y.get(0) + 1));
                 break;
-            case 1:
+            case DB_SOUTH:
                 y.set(0, $c.i16(y.get(0) - 1));
                 break;
-            case 2:
+            case DB_EAST:
                 x.set(0, $c.i16(x.get(0) - 1));
                 break;
-            case 3:
+            case DB_WEST:
                 x.set(0, $c.i16(x.get(0) + 1));
                 break;
         }
@@ -152,69 +162,69 @@ export function find_drawbridge(x, y) {   // dbridge.c:180
     return 0;
 }
 function get_wall_for_db(x, y) {   // dbridge.c:211
-    switch ((svl.level.locations[x.get(0)][y.get(0)].flags | 0) & 3) {
-        case 0:
+    switch ((svl.level.locations[x.get(0)][y.get(0)].flags | 0) & DB_DIR) {
+        case DB_NORTH:
             y.set(0, $c.i16(y.get(0) - 1));
             break;
-        case 1:
+        case DB_SOUTH:
             y.set(0, $c.i16(y.get(0) + 1));
             break;
-        case 2:
+        case DB_EAST:
             x.set(0, $c.i16(x.get(0) + 1));
             break;
-        case 3:
+        case DB_WEST:
             x.set(0, $c.i16(x.get(0) - 1));
             break;
     }
 }
 export async function create_drawbridge(x, y, dir, flag) {   // dbridge.c:235
     let x2 = 0, y2 = 0, horiz = 0, lava = 0;
-    lava = $c.i8(svl.level.locations[x][y].typ === 20 /* LAVAPOOL */ ? 1 : 0);
+    lava = $c.i8(svl.level.locations[x][y].typ === LAVAPOOL ? 1 : 0);
     x2 = x;
     y2 = y;
     switch (dir) {
-        case 0:
+        case DB_NORTH:
             horiz = 1;
             y2 = $c.i16(y2 - 1);
             break;
-        case 1:
+        case DB_SOUTH:
             horiz = 1;
             y2 = $c.i16(y2 + 1);
             break;
-        case 2:
+        case DB_EAST:
             horiz = 0;
             x2 = $c.i16(x2 + 1);
             break;
         default:
             await impossible($c.lit("bad direction in create_drawbridge"));
-        case 3:
+        case DB_WEST:
             horiz = 0;
             x2 = $c.i16(x2 - 1);
             break;
     }
-    if (!(svl.level.locations[x2][y2].typ && svl.level.locations[x2][y2].typ <= 12 /* DBWALL */)) {
+    if (!(svl.level.locations[x2][y2].typ && svl.level.locations[x2][y2].typ <= DBWALL)) {
         return 0;
     }
     if (flag) {
-        svl.level.locations[x][y].typ = 34;
-        svl.level.locations[x2][y2].typ = 23;
-        svl.level.locations[x2][y2].flags = (0) & 31;
+        svl.level.locations[x][y].typ = DRAWBRIDGE_DOWN;
+        svl.level.locations[x2][y2].typ = DOOR;
+        svl.level.locations[x2][y2].flags = (D_NODOOR) & 31;
     } else {
-        svl.level.locations[x][y].typ = 19;
-        svl.level.locations[x2][y2].typ = 12;
-        svl.level.locations[x2][y2].flags = (8) & 31;
+        svl.level.locations[x][y].typ = DRAWBRIDGE_UP;
+        svl.level.locations[x2][y2].typ = DBWALL;
+        svl.level.locations[x2][y2].flags = (W_NONDIGGABLE) & 31;
     }
     svl.level.locations[x][y].horizontal = ((!horiz ? 1 : 0) >>> 0) & 1;
     svl.level.locations[x2][y2].horizontal = (horiz >>> 0) & 1;
     svl.level.locations[x][y].flags = (dir >>> 0) & 31;
     if (lava) {
-        svl.level.locations[x][y].flags = ((svl.level.locations[x][y].flags | 0 | 4) >>> 0) & 31;
+        svl.level.locations[x][y].flags = ((svl.level.locations[x][y].flags | 0 | DB_LAVA) >>> 0) & 31;
     }
     return 1;
 }
 async function e_at(x, y) {   // dbridge.c:286
     let entitycnt = 0, save_plnmsg = 0;
-    for (entitycnt = 0; entitycnt < 2; entitycnt = entitycnt + 1 | 0) {
+    for (entitycnt = 0; entitycnt < ENTITIES; entitycnt = entitycnt + 1 | 0) {
         if (go.occupants[entitycnt].edata && go.occupants[entitycnt].ex === x && go.occupants[entitycnt].ey === y) {
             break;
         }
@@ -226,7 +236,7 @@ async function e_at(x, y) {   // dbridge.c:286
             iflags.last_msg = save_plnmsg;
         }
     } while (0);
-    return entitycnt === 2 ? null : $c.relem(go.occupants, entitycnt);
+    return entitycnt === ENTITIES ? null : $c.relem(go.occupants, entitycnt);
 }
 function m_to_e(mtmp, x, y, etmp) {   // dbridge.c:304
     let $t1;
@@ -235,7 +245,7 @@ function m_to_e(mtmp, x, y, etmp) {   // dbridge.c:304
         etmp.ex = x;
         etmp.ey = y;
         if (mtmp.wormno | 0 && (x !== mtmp.mx || y !== mtmp.my)) {
-            etmp.edata = $c.relem(mons, 330 /* PM_LONG_WORM_TAIL */);
+            etmp.edata = $c.relem(mons, PM_LONG_WORM_TAIL);
         } else {
             etmp.edata = mtmp.data;
         }
@@ -274,39 +284,39 @@ async function E_phrase(etmp, verb) {   // dbridge.c:361
     return new $c.Ptr(E_phrase$wholebuf, 0);
 }
 function e_survives_at(etmp, x, y) {   // dbridge.c:380
-    if (etmp.edata.mlet === 54 /* S_GHOST */) {
+    if (etmp.edata.mlet === S_GHOST) {
         return 1;
     }
     if (is_pool(x, y)) {
-        return $c.i8($c.peq(etmp.emon, gy.youmonst) && ((u.uprops[50 /* WWALKING */].intrinsic || u.uprops[50 /* WWALKING */].extrinsic) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) || (u.uprops[52 /* MAGICAL_BREATHING */].intrinsic || u.uprops[52 /* MAGICAL_BREATHING */].extrinsic || $c.andu64(gy.youmonst.data.mflags1, 512) !== 0) || (u.uprops[52 /* MAGICAL_BREATHING */].intrinsic || u.uprops[52 /* MAGICAL_BREATHING */].extrinsic || $c.andu64(gy.youmonst.data.mflags1, 1024) !== 0) || (u.uprops[51 /* SWIMMING */].intrinsic || u.uprops[51 /* SWIMMING */].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, 2) !== 0) || (u.uprops[49 /* FLYING */].intrinsic || u.uprops[49 /* FLYING */].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, 1) !== 0) && !u.uprops[49 /* FLYING */].blocked || (u.uprops[48 /* LEVITATION */].intrinsic || u.uprops[48 /* LEVITATION */].extrinsic) && !u.uprops[48 /* LEVITATION */].blocked) || $c.andu64(etmp.edata.mflags1, 2) !== 0 || $c.andu64(etmp.edata.mflags1, 1) !== 0 || (etmp.edata.mlet === 5 /* S_EYE */ || etmp.edata.mlet === 25 /* S_LIGHT */) ? 1 : 0);
+        return $c.i8($c.peq(etmp.emon, gy.youmonst) && ((u.uprops[WWALKING].intrinsic || u.uprops[WWALKING].extrinsic) && !((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) || (u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1_AMPHIBIOUS) !== 0) || (u.uprops[MAGICAL_BREATHING].intrinsic || u.uprops[MAGICAL_BREATHING].extrinsic || $c.andu64(gy.youmonst.data.mflags1, M1_BREATHLESS) !== 0) || (u.uprops[SWIMMING].intrinsic || u.uprops[SWIMMING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_SWIM) !== 0) || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked || (u.uprops[LEVITATION].intrinsic || u.uprops[LEVITATION].extrinsic) && !u.uprops[LEVITATION].blocked) || $c.andu64(etmp.edata.mflags1, M1_SWIM) !== 0 || $c.andu64(etmp.edata.mflags1, M1_FLY) !== 0 || (etmp.edata.mlet === S_EYE || etmp.edata.mlet === S_LIGHT) ? 1 : 0);
     }
     if (is_lava(x, y)) {
-        return $c.i8($c.peq(etmp.emon, gy.youmonst) && ((u.uprops[48 /* LEVITATION */].intrinsic || u.uprops[48 /* LEVITATION */].extrinsic) && !u.uprops[48 /* LEVITATION */].blocked || (u.uprops[49 /* FLYING */].intrinsic || u.uprops[49 /* FLYING */].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, 1) !== 0) && !u.uprops[49 /* FLYING */].blocked) || ($c.peq(etmp.edata, $c.relem(mons, 155 /* PM_FIRE_ELEMENTAL */)) || $c.peq(etmp.edata, $c.relem(mons, 329 /* PM_SALAMANDER */))) || $c.andu64(etmp.edata.mflags1, 1) !== 0 ? 1 : 0);
+        return $c.i8($c.peq(etmp.emon, gy.youmonst) && ((u.uprops[LEVITATION].intrinsic || u.uprops[LEVITATION].extrinsic) && !u.uprops[LEVITATION].blocked || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked) || ($c.peq(etmp.edata, $c.relem(mons, PM_FIRE_ELEMENTAL)) || $c.peq(etmp.edata, $c.relem(mons, PM_SALAMANDER))) || $c.andu64(etmp.edata.mflags1, M1_FLY) !== 0 ? 1 : 0);
     }
     if (is_db_wall(x, y)) {
-        return $c.i8($c.peq(etmp.emon, gy.youmonst) ? u.uprops[53 /* PASSES_WALLS */].intrinsic || u.uprops[53 /* PASSES_WALLS */].extrinsic ? 1 : 0 : $c.andu64(etmp.edata.mflags1, 8) !== 0 ? 1 : 0);
+        return $c.i8($c.peq(etmp.emon, gy.youmonst) ? u.uprops[PASSES_WALLS].intrinsic || u.uprops[PASSES_WALLS].extrinsic ? 1 : 0 : $c.andu64(etmp.edata.mflags1, M1_WALLWALK) !== 0 ? 1 : 0);
     }
     return 1;
 }
 async function e_died(etmp, xkill_flags, how) {   // dbridge.c:402
     let xy = new $T.nhcoord(), entitycnt = 0, seeit = 0;
     if ($c.peq(etmp.emon, gy.youmonst)) {
-        if (how === 4 /* DROWNING */) {
+        if (how === DROWNING) {
             svk.killer.name[0] = 0;
             await drown();
-        } else if (how === 5 /* BURNING */) {
+        } else if (how === BURNING) {
             svk.killer.name[0] = 0;
             await lava_effects();
         } else {
             if (!svk.killer.name[0]) {
-                svk.killer.format = 0;
+                svk.killer.format = KILLED_BY_AN;
                 $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), $c.lit("falling drawbridge"), 256);
             }
             await done(how);
             if (!e_survives_at(etmp, $c.i16(etmp.ex), $c.i16(etmp.ey))) {
                 if (await enexto(xy, $c.i16(etmp.ex), $c.i16(etmp.ey), etmp.edata)) {
-                    await pline($c.lit("A %s force teleports you away..."), u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic) ? $c.lit("normal") : $c.lit("strange"));
-                    await teleds(xy.x, xy.y, 0);
+                    await pline($c.lit("A %s force teleports you away..."), u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? $c.lit("normal") : $c.lit("strange"));
+                    await teleds(xy.x, xy.y, TELEDS_NO_FLAGS);
                 }
             }
         }
@@ -314,27 +324,27 @@ async function e_died(etmp, xkill_flags, how) {   // dbridge.c:402
     } else {
         svk.killer.name[0] = 0;
         if (svc.context.mon_moving) {
-            await monkilled(etmp.emon, (xkill_flags & 1) !== 0 ? null : $c.lit(""), (xkill_flags & 2) !== 0 ? 26 : 0);
+            await monkilled(etmp.emon, (xkill_flags & XKILL_NOMSG) !== 0 ? null : $c.lit(""), (xkill_flags & XKILL_NOCORPSE) !== 0 ? AD_DGST : AD_PHYS);
         } else {
             await xkilled(etmp.emon, xkill_flags);
         }
         if (!(etmp.emon.mhp < 1)) {
             seeit = canseemon(etmp.emon) || sensemon(etmp.emon) ? 1 : 0;
-            xkill_flags = xkill_flags | 5;
+            xkill_flags = xkill_flags | (XKILL_NOMSG | XKILL_NOCONDUCT);
             if (svc.context.mon_moving) {
-                await monkilled(etmp.emon, $c.lit(""), (xkill_flags & 2) !== 0 ? 26 : 0);
+                await monkilled(etmp.emon, $c.lit(""), (xkill_flags & XKILL_NOCORPSE) !== 0 ? AD_DGST : AD_PHYS);
             } else {
                 await xkilled(etmp.emon, xkill_flags);
             }
             if (etmp.emon.mhp < 1) {
                 if (seeit) {
-                    await pline($c.lit("Unfortunately for %s, %s is still crushed."), await mon_nam(etmp.emon), genders[pronoun_gender(etmp.emon, 2)].he);
+                    await pline($c.lit("Unfortunately for %s, %s is still crushed."), await mon_nam(etmp.emon), genders[pronoun_gender(etmp.emon, PRONOUN_HALLU)].he);
                 }
             } else {
             }
         }
         etmp.edata = null;
-        for (entitycnt = 0; entitycnt < 2; entitycnt = entitycnt + 1 | 0) {
+        for (entitycnt = 0; entitycnt < ENTITIES; entitycnt = entitycnt + 1 | 0) {
             if (!$c.peq(etmp, $c.relem(go.occupants, entitycnt)) && $c.peq(etmp.emon, go.occupants[entitycnt].emon)) {
                 go.occupants[entitycnt].edata = null;
             }
@@ -342,7 +352,7 @@ async function e_died(etmp, xkill_flags, how) {   // dbridge.c:402
     }
 }
 function automiss(etmp) {   // dbridge.c:486
-    return $c.i8(($c.peq(etmp.emon, gy.youmonst) ? u.uprops[53 /* PASSES_WALLS */].intrinsic || u.uprops[53 /* PASSES_WALLS */].extrinsic : $c.andu64(etmp.edata.mflags1, 8) !== 0) || etmp.edata.mlet === 54 /* S_GHOST */ ? 1 : 0);
+    return $c.i8(($c.peq(etmp.emon, gy.youmonst) ? u.uprops[PASSES_WALLS].intrinsic || u.uprops[PASSES_WALLS].extrinsic : $c.andu64(etmp.edata.mflags1, M1_WALLWALK) !== 0) || etmp.edata.mlet === S_GHOST ? 1 : 0);
 }
 async function e_missed(etmp, chunks) {   // dbridge.c:496
     let misses = 0, save_plnmsg = 0, save_plnmsg$2 = 0;
@@ -358,9 +368,9 @@ async function e_missed(etmp, chunks) {   // dbridge.c:496
     if (automiss(etmp)) {
         return 1;
     }
-    if ($c.andu64(etmp.edata.mflags1, 1) !== 0 && ($c.peq(etmp.emon, gy.youmonst) ? !(gm.multi < 0 && (unconscious() || is_fainted())) : !(etmp.emon.msleeping | 0 || !etmp.emon.mcanmove))) {
+    if ($c.andu64(etmp.edata.mflags1, M1_FLY) !== 0 && ($c.peq(etmp.emon, gy.youmonst) ? !(gm.multi < 0 && (unconscious() || is_fainted())) : !(etmp.emon.msleeping | 0 || !etmp.emon.mcanmove))) {
         misses = 5;
-    } else if (etmp.edata.mlet === 5 /* S_EYE */ || etmp.edata.mlet === 25 /* S_LIGHT */ || $c.peq(etmp.emon, gy.youmonst) && ((u.uprops[48 /* LEVITATION */].intrinsic || u.uprops[48 /* LEVITATION */].extrinsic) && !u.uprops[48 /* LEVITATION */].blocked)) {
+    } else if (etmp.edata.mlet === S_EYE || etmp.edata.mlet === S_LIGHT || $c.peq(etmp.emon, gy.youmonst) && ((u.uprops[LEVITATION].intrinsic || u.uprops[LEVITATION].extrinsic) && !u.uprops[LEVITATION].blocked)) {
         misses = 3;
     } else if (chunks && is_pool($c.i16(etmp.ex), $c.i16(etmp.ey))) {
         misses = 2;
@@ -382,13 +392,13 @@ async function e_missed(etmp, chunks) {   // dbridge.c:496
 async function e_jumps(etmp) {   // dbridge.c:531
     let tmp = 0, save_plnmsg = 0;
     tmp = 4;
-    if ($c.peq(etmp.emon, gy.youmonst) ? gm.multi < 0 && (unconscious() || is_fainted()) || (u.uprops[25 /* FUMBLING */].intrinsic || u.uprops[25 /* FUMBLING */].extrinsic) : etmp.emon.msleeping | 0 || !etmp.emon.mcanmove || !etmp.edata.mmove || etmp.emon.wormno | 0) {
+    if ($c.peq(etmp.emon, gy.youmonst) ? gm.multi < 0 && (unconscious() || is_fainted()) || (u.uprops[FUMBLING].intrinsic || u.uprops[FUMBLING].extrinsic) : etmp.emon.msleeping | 0 || !etmp.emon.mcanmove || !etmp.edata.mmove || etmp.emon.wormno | 0) {
         return 0;
     }
-    if ($c.peq(etmp.emon, gy.youmonst) ? u.uprops[14 /* CONFUSION */].intrinsic : etmp.emon.mconf) {
+    if ($c.peq(etmp.emon, gy.youmonst) ? u.uprops[CONFUSION].intrinsic : etmp.emon.mconf) {
         tmp = tmp - 2 | 0;
     }
-    if ($c.peq(etmp.emon, gy.youmonst) ? u.uprops[13 /* STUNNED */].intrinsic : etmp.emon.mstun) {
+    if ($c.peq(etmp.emon, gy.youmonst) ? u.uprops[STUNNED].intrinsic : etmp.emon.mstun) {
         tmp = tmp - 3 | 0;
     }
     if (is_db_wall($c.i16(etmp.ex), $c.i16(etmp.ey))) {
@@ -416,7 +426,7 @@ async function do_entity(etmp) {   // dbridge.c:554
     at_portcullis = is_db_wall(oldx, oldy);
     crm = $c.relem(svl.level.locations[oldx], oldy);
     if (automiss(etmp) && e_survives_at(etmp, oldx, oldy)) {
-        if (e_inview && (at_portcullis || (crm.typ === 19 /* DRAWBRIDGE_UP */ || crm.typ === 34 /* DRAWBRIDGE_DOWN */))) {
+        if (e_inview && (at_portcullis || (crm.typ === DRAWBRIDGE_UP || crm.typ === DRAWBRIDGE_DOWN))) {
             await pline_The($c.lit("%s passes through %s!"), at_portcullis ? $c.lit("portcullis") : $c.lit("drawbridge"), await e_nam(etmp));
         }
         if ($c.peq(etmp.emon, gy.youmonst)) {
@@ -453,13 +463,13 @@ async function do_entity(etmp) {   // dbridge.c:554
             }
         }
     } else {
-        if (crm.typ === 34 /* DRAWBRIDGE_DOWN */) {
+        if (crm.typ === DRAWBRIDGE_DOWN) {
             if ($c.peq(etmp.emon, gy.youmonst)) {
-                svk.killer.format = 2;
+                svk.killer.format = NO_KILLER_PREFIX;
                 $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), $c.lit("crushed to death underneath a drawbridge"), 256);
             }
             await pline($c.lit("%s crushed underneath the drawbridge."), await E_phrase(etmp, $c.lit("are")));
-            await e_died(etmp, 2 | (e_inview ? 0 : 1), 7 /* CRUSHING */);
+            await e_died(etmp, XKILL_NOCORPSE | (e_inview ? XKILL_GIVEMSG : XKILL_NOMSG), CRUSHING);
             return;
         }
         must_jump = 1;
@@ -478,10 +488,10 @@ async function do_entity(etmp) {   // dbridge.c:554
             } else {
                 if (e_inview) {
                     await pline($c.lit("%s crushed by the falling portcullis!"), await E_phrase(etmp, $c.lit("are")));
-                } else if (!(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf)) {
+                } else if (!(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf)) {
                     await You_hear($c.lit("a crushing sound."));
                 }
-                await e_died(etmp, 2 | (e_inview ? 0 : 1), 7 /* CRUSHING */);
+                await e_died(etmp, XKILL_NOCORPSE | (e_inview ? XKILL_GIVEMSG : XKILL_NOMSG), CRUSHING);
                 return;
             }
         } else {
@@ -611,9 +621,9 @@ async function do_entity(etmp) {   // dbridge.c:554
             }
         }
         if (!e_survives_at(etmp, $c.i16(etmp.ex), $c.i16(etmp.ey))) {
-            svk.killer.format = 0;
+            svk.killer.format = KILLED_BY_AN;
             $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), $c.lit("closing drawbridge"), 256);
-            await e_died(etmp, 1, 7 /* CRUSHING */);
+            await e_died(etmp, XKILL_NOMSG, CRUSHING);
             return;
         }
         do {
@@ -632,12 +642,12 @@ async function do_entity(etmp) {   // dbridge.c:554
             }
         } while (0);
         if (is_pool($c.i16(etmp.ex), $c.i16(etmp.ey)) && !e_inview) {
-            if (!(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf)) {
+            if (!(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf)) {
                 await You_hear($c.lit("a splash."));
             }
         }
         if (e_survives_at(etmp, $c.i16(etmp.ex), $c.i16(etmp.ey))) {
-            if (e_inview && !($c.andu64(etmp.edata.mflags1, 1) !== 0) && !(etmp.edata.mlet === 5 /* S_EYE */ || etmp.edata.mlet === 25 /* S_LIGHT */)) {
+            if (e_inview && !($c.andu64(etmp.edata.mflags1, M1_FLY) !== 0) && !(etmp.edata.mlet === S_EYE || etmp.edata.mlet === S_LIGHT)) {
                 await pline($c.lit("%s from the bridge."), await E_phrase(etmp, $c.lit("fall")));
             }
             return;
@@ -652,16 +662,16 @@ async function do_entity(etmp) {   // dbridge.c:554
         if (is_pool($c.i16(etmp.ex), $c.i16(etmp.ey)) || is_lava($c.i16(etmp.ex), $c.i16(etmp.ey))) {
             if (e_inview && !$c.peq(etmp.emon, gy.youmonst)) {
                 lava = is_lava($c.i16(etmp.ex), $c.i16(etmp.ey));
-                if (u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic)) {
+                if (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic)) {
                     await pline($c.lit("%s the %s and disappears."), await E_phrase(etmp, $c.lit("drink")), lava ? $c.lit("lava") : $c.lit("moat"));
                 } else {
                     await pline($c.lit("%s into the %s."), await E_phrase(etmp, $c.lit("fall")), lava ? hliquid($c.lit("lava")) : $c.lit("moat"));
                 }
             }
         }
-        svk.killer.format = 2;
+        svk.killer.format = NO_KILLER_PREFIX;
         $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), $c.lit("fell from a drawbridge"), 256);
-        await e_died(etmp, 2 | (e_inview ? 0 : 1), is_pool($c.i16(etmp.ex), $c.i16(etmp.ey)) ? 4 /* DROWNING */ : is_lava($c.i16(etmp.ex), $c.i16(etmp.ey)) ? 5 /* BURNING */ : 7 /* CRUSHING */);
+        await e_died(etmp, XKILL_NOCORPSE | (e_inview ? XKILL_GIVEMSG : XKILL_NOMSG), is_pool($c.i16(etmp.ex), $c.i16(etmp.ey)) ? DROWNING : is_lava($c.i16(etmp.ex), $c.i16(etmp.ey)) ? BURNING : CRUSHING);
         return;
     }
 }
@@ -674,37 +684,37 @@ function nokiller() {   // dbridge.c:763
 export async function close_drawbridge(x, y) {   // dbridge.c:775
     let lev1 = null, lev2 = null, t = null, x2 = Int16Array.of(0), y2 = Int16Array.of(0);
     lev1 = $c.relem(svl.level.locations[x], y);
-    if (lev1.typ !== 34 /* DRAWBRIDGE_DOWN */) {
+    if (lev1.typ !== DRAWBRIDGE_DOWN) {
         return;
     }
     x2[0] = x;
     y2[0] = y;
     get_wall_for_db(new $c.Ptr(x2, 0), new $c.Ptr(y2, 0));
-    if ((gv.viz_array.get(y).get(x) & 2) !== 0 || (gv.viz_array.get(y2[0]).get(x2[0]) & 2) !== 0) {
+    if ((gv.viz_array.get(y).get(x) & IN_SIGHT) !== 0 || (gv.viz_array.get(y2[0]).get(x2[0]) & IN_SIGHT) !== 0) {
         await You_see($c.lit("a drawbridge %s up!"), (u.ux === x || u.uy === y) && !u.uinwater || dist2(x2[0], y2[0], u.ux, u.uy) < dist2(x, y, u.ux, u.uy) ? $c.lit("coming") : $c.lit("going"));
     } else {
         await You_hear($c.lit("chains rattling and gears turning."));
     }
-    lev1.typ = 19;
+    lev1.typ = DRAWBRIDGE_UP;
     lev2 = $c.relem(svl.level.locations[x2[0]], y2[0]);
-    lev2.typ = 12;
-    switch ((lev1.flags | 0) & 3) {
-        case 0:
-        case 1:
+    lev2.typ = DBWALL;
+    switch ((lev1.flags | 0) & DB_DIR) {
+        case DB_NORTH:
+        case DB_SOUTH:
             lev2.horizontal = (1) & 1;
             break;
-        case 3:
-        case 2:
+        case DB_WEST:
+        case DB_EAST:
             lev2.horizontal = (0) & 1;
             break;
     }
-    lev2.flags = (8) & 31;
+    lev2.flags = (W_NONDIGGABLE) & 31;
     set_entity(x, y, $c.relem(go.occupants, 0));
     set_entity(x2[0], y2[0], $c.relem(go.occupants, 1));
     await do_entity($c.relem(go.occupants, 0));
     set_entity(x2[0], y2[0], $c.relem(go.occupants, 1));
     await do_entity($c.relem(go.occupants, 1));
-    if (svl.level.objects[x][y] !== null && !(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf)) {
+    if (svl.level.objects[x][y] !== null && !(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf)) {
         await You_hear($c.lit("smashing and crushing."));
     }
     await revive_nasty(x, y, null);
@@ -727,21 +737,21 @@ export async function close_drawbridge(x, y) {   // dbridge.c:775
 export async function open_drawbridge(x, y) {   // dbridge.c:840
     let lev1 = null, lev2 = null, t = null, x2 = Int16Array.of(0), y2 = Int16Array.of(0);
     lev1 = $c.relem(svl.level.locations[x], y);
-    if (lev1.typ !== 19 /* DRAWBRIDGE_UP */) {
+    if (lev1.typ !== DRAWBRIDGE_UP) {
         return;
     }
     x2[0] = x;
     y2[0] = y;
     get_wall_for_db(new $c.Ptr(x2, 0), new $c.Ptr(y2, 0));
-    if ((gv.viz_array.get(y).get(x) & 2) !== 0 || (gv.viz_array.get(y2[0]).get(x2[0]) & 2) !== 0) {
+    if ((gv.viz_array.get(y).get(x) & IN_SIGHT) !== 0 || (gv.viz_array.get(y2[0]).get(x2[0]) & IN_SIGHT) !== 0) {
         await You_see($c.lit("a drawbridge %s down!"), dist2(x2[0], y2[0], u.ux, u.uy) < dist2(x, y, u.ux, u.uy) ? $c.lit("going") : $c.lit("coming"));
     } else {
         await You_hear($c.lit("gears turning and chains rattling."));
     }
-    lev1.typ = 34;
+    lev1.typ = DRAWBRIDGE_DOWN;
     lev2 = $c.relem(svl.level.locations[x2[0]], y2[0]);
-    lev2.typ = 23;
-    lev2.flags = (0) & 31;
+    lev2.typ = DOOR;
+    lev2.flags = (D_NODOOR) & 31;
     set_entity(x, y, $c.relem(go.occupants, 0));
     set_entity(x2[0], y2[0], $c.relem(go.occupants, 1));
     await do_entity($c.relem(go.occupants, 0));
@@ -770,46 +780,46 @@ export async function destroy_drawbridge(x, y) {   // dbridge.c:888
     etmp1 = $c.relem(go.occupants, 0);
     etmp2 = $c.relem(go.occupants, 1);
     lev1 = $c.relem(svl.level.locations[x], y);
-    if (!(lev1.typ === 19 /* DRAWBRIDGE_UP */ || lev1.typ === 34 /* DRAWBRIDGE_DOWN */)) {
+    if (!(lev1.typ === DRAWBRIDGE_UP || lev1.typ === DRAWBRIDGE_DOWN)) {
         return;
     }
     x2[0] = x;
     y2[0] = y;
     get_wall_for_db(new $c.Ptr(x2, 0), new $c.Ptr(y2, 0));
     lev2 = $c.relem(svl.level.locations[x2[0]], y2[0]);
-    if (((lev1.flags | 0) & 28) === 0 || ((lev1.flags | 0) & 28) === 4) {
-        lava = $c.i8(((lev1.flags | 0) & 28) === 4 ? 1 : 0);
-        if (lev1.typ === 19 /* DRAWBRIDGE_UP */) {
-            if ((gv.viz_array.get(y2[0]).get(x2[0]) & 2) !== 0 || x2[0] === u.ux && y2[0] === u.uy) {
+    if (((lev1.flags | 0) & DB_UNDER) === DB_MOAT || ((lev1.flags | 0) & DB_UNDER) === DB_LAVA) {
+        lava = $c.i8(((lev1.flags | 0) & DB_UNDER) === DB_LAVA ? 1 : 0);
+        if (lev1.typ === DRAWBRIDGE_UP) {
+            if ((gv.viz_array.get(y2[0]).get(x2[0]) & IN_SIGHT) !== 0 || x2[0] === u.ux && y2[0] === u.uy) {
                 await pline_The($c.lit("portcullis of the drawbridge falls into the %s!"), lava ? hliquid($c.lit("lava")) : $c.lit("moat"));
             } else {
                 await You_hear($c.lit("a loud *SPLASH*!"));
             }
         } else {
-            if ((gv.viz_array.get(y).get(x) & 2) !== 0 || x === u.ux && y === u.uy) {
+            if ((gv.viz_array.get(y).get(x) & IN_SIGHT) !== 0 || x === u.ux && y === u.uy) {
                 await pline_The($c.lit("drawbridge collapses into the %s!"), lava ? hliquid($c.lit("lava")) : $c.lit("moat"));
             } else {
                 await You_hear($c.lit("a loud *SPLASH*!"));
             }
         }
-        lev1.typ = $c.i8(lava ? 20 /* LAVAPOOL */ : 17 /* MOAT */);
+        lev1.typ = $c.i8(lava ? LAVAPOOL : MOAT);
         lev1.flags = (0) & 31;
-        if ((otmp2 = sobj_at(475 /* BOULDER */, x, y)) !== null) {
+        if ((otmp2 = sobj_at(BOULDER, x, y)) !== null) {
             await obj_extract_self(otmp2);
             await flooreffects(otmp2, x, y, $c.lit("fall"));
         }
     } else {
-        if ((gv.viz_array.get(y).get(x) & 2) !== 0 || x === u.ux && y === u.uy) {
+        if ((gv.viz_array.get(y).get(x) & IN_SIGHT) !== 0 || x === u.ux && y === u.uy) {
             await pline_The($c.lit("drawbridge disintegrates!"));
         } else {
             await You_hear($c.lit("a loud *CRASH*!"));
         }
-        lev1.typ = $c.i8((lev1.flags | 0) & 8 ? 33 /* ICE */ : 25 /* ROOM */);
-        lev1.flags = (((lev1.flags | 0) & 8 ? 16 : 0) >>> 0) & 31;
+        lev1.typ = $c.i8((lev1.flags | 0) & DB_ICE ? ICE : ROOM);
+        lev1.flags = (((lev1.flags | 0) & DB_ICE ? ICED_MOAT : 0) >>> 0) & 31;
     }
     await wake_nearto(x, y, 500);
-    lev2.typ = 23;
-    lev2.flags = (0) & 31;
+    lev2.typ = DOOR;
+    lev2.flags = (D_NODOOR) & 31;
     if ((t = t_at(x, y)) !== null) {
         await deltrap(t);
     }
@@ -819,8 +829,8 @@ export async function destroy_drawbridge(x, y) {   // dbridge.c:888
     await del_engr_at(x, y);
     await del_engr_at(x2[0], y2[0]);
     for (i = rn2(6); i > 0; i = i - 1 | 0) {
-        otmp = await mksobj_at(478 /* IRON_CHAIN */, $c.i16(rn2(2) ? x : x2[0]), $c.i16(rn2(2) ? y : y2[0]), 1, 0);
-        await scatter(otmp.ox, otmp.oy, 1, 6, otmp);
+        otmp = await mksobj_at(IRON_CHAIN, $c.i16(rn2(2) ? x : x2[0]), $c.i16(rn2(2) ? y : y2[0]), 1, 0);
+        await scatter(otmp.ox, otmp.oy, 1, MAY_HITMON | MAY_HITYOU, otmp);
     }
     await newsym(x, y);
     await newsym(x2[0], y2[0]);
@@ -838,9 +848,9 @@ export async function destroy_drawbridge(x, y) {   // dbridge.c:888
             if (e_inview) {
                 await pline($c.lit("%s blown apart by flying debris."), await E_phrase(etmp2, $c.lit("are")));
             }
-            svk.killer.format = 0;
+            svk.killer.format = KILLED_BY_AN;
             $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), $c.lit("exploding drawbridge"), 256);
-            await e_died(etmp2, 2 | (e_inview ? 0 : 1), 7 /* CRUSHING */);
+            await e_died(etmp2, XKILL_NOCORPSE | (e_inview ? XKILL_GIVEMSG : XKILL_NOMSG), CRUSHING);
         }
     }
     set_entity(x, y, etmp1);
@@ -861,13 +871,13 @@ export async function destroy_drawbridge(x, y) {   // dbridge.c:888
             }
         } else {
             if (e_inview) {
-                if (!$c.peq(etmp1.emon, gy.youmonst) && (u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic))) {
+                if (!$c.peq(etmp1.emon, gy.youmonst) && (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic))) {
                     await pline($c.lit("%s into some heavy metal!"), await E_phrase(etmp1, $c.lit("get")));
                 } else {
                     await pline($c.lit("%s hit by a huge chunk of metal!"), await E_phrase(etmp1, $c.lit("are")));
                 }
             } else {
-                if (!(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf) && !$c.peq(etmp1.emon, gy.youmonst) && !is_pool(x, y)) {
+                if (!(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf) && !$c.peq(etmp1.emon, gy.youmonst) && !is_pool(x, y)) {
                     await You_hear($c.lit("a crushing sound."));
                 } else {
                     do {
@@ -879,10 +889,10 @@ export async function destroy_drawbridge(x, y) {   // dbridge.c:888
                     } while (0);
                 }
             }
-            svk.killer.format = 0;
+            svk.killer.format = KILLED_BY_AN;
             $c.__builtin___strcpy_chk(new $c.Ptr(svk.killer.name, 0), $c.lit("collapsing drawbridge"), 256);
-            await e_died(etmp1, 2 | (e_inview ? 0 : 1), 7 /* CRUSHING */);
-            if (svl.level.locations[etmp1.ex][etmp1.ey].typ === 17 /* MOAT */) {
+            await e_died(etmp1, XKILL_NOCORPSE | (e_inview ? XKILL_GIVEMSG : XKILL_NOMSG), CRUSHING);
+            if (svl.level.locations[etmp1.ex][etmp1.ey].typ === MOAT) {
                 await do_entity(etmp1);
             }
         }

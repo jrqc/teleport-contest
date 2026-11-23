@@ -9,14 +9,19 @@ import { add_menu_coloring } from './coloratt.js';
 import { flags, gc, gd, gn, go, gw, iflags, program_state, svp } from './decl.js';
 import { build_english_list } from './end.js';
 import { debugcore, do_deferred_showpaths, fqname } from './files.js';
+import { BUFSZ, environ_opt, rc_file_opt, set_in_config, set_in_sysconf } from './global.h.js';
+import { ECMD_OK, SYM_OFF_P, SYSCONFPREFIX } from './hack.h.js';
 import { c_eos, eos, mungspaces, nh_snprintf, trimspaces } from './hacklib.js';
 import { lua_createtable, lua_pushinteger, lua_settable } from './luabridge.js';
 import { nhl_add_table_entry_int, nhl_add_table_entry_str } from './nhlua.js';
+import { MAXOCLASSES } from './objclass.h.js';
 import { add_autopickup_exception, all_options_strbuf, allopt_array_init, assign_warnings, disregard_all_options, disregard_this_option, heed_all_options, heed_this_option, match_optname, msgtype_parse_add, nh_getenv, parsebindings, parseoptions, reset_duplicate_opt_detection } from './options.js';
+import { opt_soundlib, opt_windowtype } from './optlist.h.js';
 import { pline, raw_printf } from './pline.js';
 import { rn2 } from './rnd.js';
 import { str2role } from './role.js';
 import { strbuf_empty, strbuf_init } from './strutil.js';
+import { MAXMCLASSES, MAXPCHARS, PRIMARYSET, ROGUESET, SYM_BOULDER, WARNCOUNT } from './sym.h.js';
 import { parsesymbols, switch_symbols } from './symbols.js';
 import { sysopt, sysopt_seduce_set } from './sys.js';
 import { file_exists } from './unixunix.js';
@@ -40,7 +45,7 @@ export async function do_write_config_file() {   // cfgfiles.c:169
     let fp = null, tmp = new Int8Array(256), len = 0, wrote = 0, buf = new $T.strbuf();
     if (!configfile[0]) {
         await pline($c.lit("Strange, could not figure out config file name."));
-        return 0;
+        return ECMD_OK;
     }
     if (flags.suppress_alert < 50790400) {
         await pline($c.lit("Warning: saveoptions is highly experimental!"));
@@ -52,7 +57,7 @@ export async function do_write_config_file() {   // cfgfiles.c:169
     }
     $c.__builtin___sprintf_chk(new $c.Ptr(tmp, 0), 0, 256, $c.lit("Overwrite config file %.*s?"), 226, new $c.Ptr(configfile, 0));
     if (!await paranoid_query(1, new $c.Ptr(tmp, 0))) {
-        return 0;
+        return ECMD_OK;
     }
     fp = $c.fopen(new $c.Ptr(configfile, 0), $c.lit("w"));
     if (fp) {
@@ -66,7 +71,7 @@ export async function do_write_config_file() {   // cfgfiles.c:169
             await pline($c.lit("An error occurred, wrote only partial data (%zu/%zu)."), wrote, len);
         }
     }
-    return 0;
+    return ECMD_OK;
 }
 export function set_configfile_name(fname) {   // cfgfiles.c:216
     $c.__builtin___strncpy_chk(new $c.Ptr(configfile, 0), fname, 255, 256);
@@ -74,9 +79,9 @@ export function set_configfile_name(fname) {   // cfgfiles.c:216
 }
 async function fopen_config_file(filename, src) {   // cfgfiles.c:223
     let fp = null, tmp_config = new Int8Array(256), envp = null, alt_config = new Int8Array(256), details = null;
-    if (src === 0 /* set_in_sysconf */) {
+    if (src === set_in_sysconf) {
         if (filename && filename.get(0)) {
-            set_configfile_name(fqname(filename, 7, 0));
+            set_configfile_name(fqname(filename, SYSCONFPREFIX, 0));
             fp = $c.fopen(new $c.Ptr(configfile, 0), $c.lit("r"));
         } else {
             fp = null;
@@ -478,7 +483,7 @@ async function cnf_line_SEDUCE(bufp) {   // cfgfiles.c:924
     let n = 0, src = 0, in_sysconf = 0;
     n = !!$c.atoi(bufp) ? 1 : 0;
     src = iflags.parse_config_file_src;
-    in_sysconf = $c.i8(src === 0 /* set_in_sysconf */ ? 1 : 0);
+    in_sysconf = $c.i8(src === set_in_sysconf ? 1 : 0);
     if (!in_sysconf && !sysopt.seduce && n !== 0) {
         await config_error_add($c.lit("Illegal value in SEDUCE"));
         n = 0;
@@ -631,7 +636,7 @@ async function cnf_line_PORTABLE_DEVICE_PATHS(bufp) {   // cfgfiles.c:1134
     return 1;
 }
 async function cnf_line_BOULDER(bufp) {   // cfgfiles.c:1156
-    await get_uchars(bufp, new $c.Ptr(go.ov_primary_syms, 192), 1, 1, $c.lit("BOULDER"));
+    await get_uchars(bufp, new $c.Ptr(go.ov_primary_syms, SYM_BOULDER + (SYM_OFF_P + MAXPCHARS + MAXOCLASSES + MAXMCLASSES + WARNCOUNT)), 1, 1, $c.lit("BOULDER"));
     return 1;
 }
 async function cnf_line_MENUCOLOR(bufp) {   // cfgfiles.c:1164
@@ -642,12 +647,12 @@ async function cnf_line_HILITE_STATUS(bufp) {   // cfgfiles.c:1170
 }
 async function cnf_line_WARNINGS(bufp) {   // cfgfiles.c:1181
     let translate = new Uint8Array(105);
-    await get_uchars(bufp, new $c.Ptr(translate, 0), 0, 6, $c.lit("WARNINGS"));
+    await get_uchars(bufp, new $c.Ptr(translate, 0), 0, WARNCOUNT, $c.lit("WARNINGS"));
     assign_warnings(new $c.Ptr(translate, 0));
     return 1;
 }
 async function cnf_line_ROGUESYMBOLS(bufp) {   // cfgfiles.c:1191
-    if (await parsesymbols(bufp, 1 /* ROGUESET */)) {
+    if (await parsesymbols(bufp, ROGUESET)) {
         await switch_symbols(1);
         return 1;
     }
@@ -655,7 +660,7 @@ async function cnf_line_ROGUESYMBOLS(bufp) {   // cfgfiles.c:1191
     return 0;
 }
 async function cnf_line_SYMBOLS(bufp) {   // cfgfiles.c:1202
-    if (await parsesymbols(bufp, 0 /* PRIMARYSET */)) {
+    if (await parsesymbols(bufp, PRIMARYSET)) {
         await switch_symbols(1);
         return 1;
     }
@@ -687,7 +692,7 @@ function cnf_line_QT_COMPACT(bufp) {   // cfgfiles.c:1281
 export async function parse_config_line(origbuf) {   // cfgfiles.c:1389
     let src = 0, in_sysconf = 0, bufp = null, buf = new Int8Array(1024), i = 0, parm = null;
     src = iflags.parse_config_file_src;
-    in_sysconf = $c.i8(src === 0 /* set_in_sysconf */ ? 1 : 0);
+    in_sysconf = $c.i8(src === set_in_sysconf ? 1 : 0);
     while (origbuf.get(0) === 32 || origbuf.get(0) === 9) {
         origbuf = origbuf.add(1);
     }
@@ -853,7 +858,7 @@ async function cnf_parser_init(parser) {   // cfgfiles.c:1662
     $t1 = parser.buf = null, parser.ep = $t1;
     parser.skip = 0;
     parser.morelines = 0;
-    parser.inbufsz = 1024;
+    parser.inbufsz = 4 * BUFSZ;
     $t2 = $c.asArr(await alloc(parser.inbufsz), Int8Array), parser.inbuf = $t2;
     parser.cont = 0;
     parser.pbreak = 0;
@@ -1020,14 +1025,14 @@ async function vconfig_error_add(str, the_args) {   // cfgfiles.c:1875
     vlen = 0;
     vlen = $c.__builtin___vsnprintf_chk(new $c.Ptr(buf, 0), 1280, 0, 1280, str, the_args);
     vlen;
-    buf[255] = 0;
+    buf[BUFSZ - 1] = 0;
     await config_erradd(new $c.Ptr(buf, 0));
 }
 export async function rcfile() {   // cfgfiles.c:1894
     let opts = null, xtraopts = null, envname = null, namesrc = null, nameval = null;
     opts = null;
     xtraopts = null;
-    go.opt_phase = 4;
+    go.opt_phase = environ_opt;
     envname = $c.lit("NETHACKOPTIONS");
     opts = $c.getenv(envname);
     if (!opts) {
@@ -1052,7 +1057,7 @@ export async function rcfile() {   // cfgfiles.c:1894
         nameval = namesrc = null;
         xtraopts = opts;
     }
-    go.opt_phase = 3;
+    go.opt_phase = rc_file_opt;
     if (nameval && $c.i32($c.strlen(nameval)) >= 128) {
         await config_error_init(1, namesrc, 0);
         await config_error_add($c.lit("nethackrc file name \"%.40s\"... too long; using default"), nameval);
@@ -1060,10 +1065,10 @@ export async function rcfile() {   // cfgfiles.c:1894
         nameval = namesrc = null;
     }
     await config_error_init(1, nameval, $c.i8(nameval ? 1 : 0));
-    await read_config_file(nameval, 1 /* set_in_config */);
+    await read_config_file(nameval, set_in_config);
     await config_error_done();
     if (xtraopts) {
-        go.opt_phase = 4;
+        go.opt_phase = environ_opt;
         await config_error_init(0, envname, 0);
         await parseoptions(xtraopts, 1, 0);
         await config_error_done();
@@ -1076,15 +1081,15 @@ export async function rcfile_interface_options() {   // cfgfiles.c:1960
     await allopt_array_init();
     disregard_all_options();
     disregard_all_config_statements();
-    heed_this_option(0);
-    heed_this_option(166);
+    heed_this_option(opt_windowtype);
+    heed_this_option(opt_soundlib);
     set_ignore_errors_on_unmatched();
     ignore_statement_errors = 1;
     await rcfile();
     heed_all_config_statements();
     heed_all_options();
-    disregard_this_option(0);
-    disregard_this_option(166);
+    disregard_this_option(opt_windowtype);
+    disregard_this_option(opt_soundlib);
     clear_ignore_errors_on_unmatched();
     ignore_statement_errors = 0;
 }

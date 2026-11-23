@@ -5,6 +5,9 @@ import { $G } from './globals.js';
 import { nomakedefs } from './date.js';
 import { flags, gc, gh, gl, iflags } from './decl.js';
 import { nh_basename } from './files.js';
+import { VI_BRANCH, VI_NAME, VI_NUMBER } from './flag.h.js';
+import { BUFSZ, COLNO, SFCTOOL_BIT } from './global.h.js';
+import { ECMD_OK, SF_CRITICAL_BYTE_COUNT_MISMATCH, SF_DM_I32LP64_ON_IL32LLP64, SF_DM_I32LP64_ON_ILP32LL64, SF_DM_IL32LLP64_ON_I32LP64, SF_DM_IL32LLP64_ON_ILP32LL64, SF_DM_ILP32LL64_ON_I32LP64, SF_DM_ILP32LL64_ON_IL32LLP64, SF_DM_MISMATCH, SF_OUTDATED, SF_UPTODATE, UTD_CHECKFIELDCOUNTS, UTD_CHECKSIZES, UTD_QUIETLY, UTD_SKIP_SANITY1, UTD_WITHOUT_WAITSYNCH_PERFILE, WRITING, exportascii } from './hack.h.js';
 import { datamodel, eos, nh_snprintf, strip_newline, strncmpi, strstri, strsubst, tabexpand, what_datamodel_is_this } from './hacklib.js';
 import { do_runtime_info, mdlib_version_string, release_runtime_info, runtime_info_init } from './mdlib.js';
 import { get_lua_version } from './nhlua.js';
@@ -14,6 +17,7 @@ import { sfi_char, sfi_uchar, sfi_version_info, sfo_char, sfo_uchar, sfo_version
 import { bufoff, bufon } from './sfstruct.js';
 import { port_insert_pastebuf } from './unixmain.js';
 import { windowprocs } from './windows.js';
+import { NHW_TEXT } from './wintype.h.js';
 
 const rt_opts = $c.recArray($T.rt_opt, 3);
 export const critical_sizes = $c.recArray($T.critical_sizes_with_names, 80);
@@ -55,9 +59,9 @@ export function status_version(buf, bufsz, indent) {   // version.c:89
     name = null;
     altname = null;
     vflags = flags.versinfo;
-    shownum = $c.i8((vflags & 1) >>> 0 !== 0 ? 1 : 0);
-    showname = $c.i8((vflags & 2) >>> 0 !== 0 ? 1 : 0);
-    showbranch = $c.i8((vflags & 4) >>> 0 !== 0 ? 1 : 0);
+    shownum = $c.i8((vflags & VI_NUMBER) >>> 0 !== 0 ? 1 : 0);
+    showname = $c.i8((vflags & VI_NAME) >>> 0 !== 0 ? 1 : 0);
+    showbranch = $c.i8((vflags & VI_BRANCH) >>> 0 !== 0 ? 1 : 0);
     if (showname) {
         name = nh_basename(gh.hname, 0);
         if (!name || !name.get(0)) {
@@ -98,20 +102,20 @@ export async function doversion() {   // version.c:156
         return await doextversion();
     }
     await pline($c.lit("%s"), getversionstring(new $c.Ptr(buf, 0), 256));
-    return 0;
+    return ECMD_OK;
 }
 export async function doextversion() {   // version.c:169
     let rtcontext = Int32Array.of(0), rtbuf = null, f = null, buf = new Int8Array(256), p = null, win = 0, use_dlb = 0, done_rt = 0, done_dlb = 0, prolog = 0;
     rtcontext[0] = 0;
     f = null;
     p = null;
-    win = await windowprocs.win_create_nhwindow(5);
+    win = await windowprocs.win_create_nhwindow(NHW_TEXT);
     use_dlb = 1;
     done_rt = 0;
     done_dlb = 0;
     use_dlb = 0;
     getversionstring(new $c.Ptr(buf, 0), 256);
-    if ($c.strlen(new $c.Ptr(buf, 0)) >= 80) {
+    if ($c.strlen(new $c.Ptr(buf, 0)) >= COLNO) {
         p = $c.strrchr(new $c.Ptr(buf, 0), 40);
     }
     if (p && $c.pcmp(p, new $c.Ptr(buf, 0)) > 0 && p.get(-1) === 32 && p.get(1) !== 120) {
@@ -136,7 +140,7 @@ export async function doextversion() {   // version.c:169
     prolog = 1;
     for (; ; ) {
         if (use_dlb && !done_dlb) {
-            if (!$c.fgets(new $c.Ptr(buf, 0), 256, f)) {
+            if (!$c.fgets(new $c.Ptr(buf, 0), BUFSZ, f)) {
                 done_dlb = 1;
                 continue;
             }
@@ -146,7 +150,7 @@ export async function doextversion() {   // version.c:169
                 continue;
             }
             $c.__builtin___strncpy_chk(new $c.Ptr(buf, 0), rtbuf, 255, 256);
-            buf[255] = 0;
+            buf[BUFSZ - 1] = 0;
         } else {
             break;
         }
@@ -173,7 +177,7 @@ export async function doextversion() {   // version.c:169
     }
     await windowprocs.win_display_nhwindow(win, 0);
     await windowprocs.win_destroy_nhwindow(win);
-    return 0;
+    return ECMD_OK;
 }
 export async function early_version_info(pastebuf) {   // version.c:280
     let buf1 = new Int8Array(256), buf2 = new Int8Array(256), buf = null, tmp = null, $t1;
@@ -207,7 +211,7 @@ export async function check_version(version_data, filename, complain, utdflags) 
     if (!filename) {
         complain = 0;
     }
-    if ($c.andu64(version_data.feature_set, 1073741824) !== 0) {
+    if ($c.andu64(version_data.feature_set, SFCTOOL_BIT) !== 0) {
         gc.converted_savefile_loaded = 1;
         version_data.feature_set = $c.andu64(version_data.feature_set, 18446744072635809791n);
     }
@@ -219,7 +223,7 @@ export async function check_version(version_data, filename, complain, utdflags) 
             }
         }
         return 0;
-    } else if ($c.andu64(version_data.feature_set, $c.notu64(nomakedefs.ignored_features)) !== $c.andu64(nomakedefs.version_features, $c.notu64(nomakedefs.ignored_features)) || $c.andu64(utdflags, 4) === 0 && version_data.entity_count !== nomakedefs.version_sanity1) {
+    } else if ($c.andu64(version_data.feature_set, $c.notu64(nomakedefs.ignored_features)) !== $c.andu64(nomakedefs.version_features, $c.notu64(nomakedefs.ignored_features)) || $c.andu64(utdflags, UTD_SKIP_SANITY1) === 0 && version_data.entity_count !== nomakedefs.version_sanity1) {
         if (complain) {
             await pline($c.lit("Configuration incompatibility for file \"%s\"."), filename);
             await windowprocs.win_display_nhwindow($G.WIN_MESSAGE, 1);
@@ -314,8 +318,8 @@ export async function store_critical_bytes(nhfp) {   // version.c:676
     let i = 0, cnt = 0, indicate = Int8Array.of(0), csc_count = Int8Array.of(0);
     indicate[0] = 117;
     csc_count[0] = 80;
-    if (nhfp.mode & 2) {
-        indicate[0] = $c.i8(nhfp.structlevel ? 104 : nhfp.fnidx === 2 /* exportascii */ ? 97 : 63);
+    if (nhfp.mode & WRITING) {
+        indicate[0] = $c.i8(nhfp.structlevel ? 104 : nhfp.fnidx === exportascii ? 97 : 63);
         await sfo_char(nhfp, new $c.Ptr(indicate, 0), $c.lit("indicate-format"), 1);
         await sfo_char(nhfp, new $c.Ptr(csc_count, 0), $c.lit("count-critical_sizes"), 1);
         cnt = csc_count[0];
@@ -328,10 +332,10 @@ export async function uptodate(nhfp, name, utdflags) {   // version.c:713
     let vers_info = new $T.version_info(), indicator = Int8Array.of(0), sfstatus = 0, idx_1st_mismatch = Int32Array.of(0), quietly = 0, verbose = 0;
     sfstatus = 0;
     idx_1st_mismatch[0] = 0;
-    quietly = $c.i8($c.andu64(utdflags, 32) !== 0 ? 1 : 0);
+    quietly = $c.i8($c.andu64(utdflags, UTD_QUIETLY) !== 0 ? 1 : 0);
     verbose = $c.i8(name ? 1 : 0);
     await sfi_char(nhfp, new $c.Ptr(indicator, 0), $c.lit("indicate-format"), 1);
-    if ((sfstatus = await compare_critical_bytes(nhfp, new $c.Ptr(idx_1st_mismatch, 0), utdflags)) !== 0) {
+    if ((sfstatus = await compare_critical_bytes(nhfp, new $c.Ptr(idx_1st_mismatch, 0), utdflags)) !== SF_UPTODATE) {
         if (sfstatus > 0 && idx_1st_mismatch[0]) {
             if (!quietly) {
                 await raw_printf($c.lit("comparison of critical bytes mismatched at %d (%s)."), critical_sizes[idx_1st_mismatch[0]].ucsize, critical_sizes[idx_1st_mismatch[0]].nm);
@@ -341,11 +345,11 @@ export async function uptodate(nhfp, name, utdflags) {   // version.c:713
     await sfi_version_info(nhfp, vers_info, $c.lit("version_info"));
     if (!await check_version(vers_info, name, verbose, utdflags)) {
         if (verbose) {
-            if ($c.andu64(utdflags, 16) === 0) {
+            if ($c.andu64(utdflags, UTD_WITHOUT_WAITSYNCH_PERFILE) === 0) {
                 await windowprocs.win_wait_synch();
             }
         }
-        return 1;
+        return SF_OUTDATED;
     }
     return sfstatus;
 }
@@ -353,14 +357,14 @@ export async function compare_critical_bytes(nhfp, idx_1st_mismatch, utdflags) {
     let active_csc_count = 0, file_csc_count = Int8Array.of(0), i = 0, cnt = 0, dmmismatch = 0, quietly = 0, dm = null, dmfile = null;
     active_csc_count = 80;
     cnt = active_csc_count;
-    dmmismatch = 9;
-    quietly = $c.i8($c.andu64(utdflags, 32) !== 0 ? 1 : 0);
+    dmmismatch = SF_DM_MISMATCH;
+    quietly = $c.i8($c.andu64(utdflags, UTD_QUIETLY) !== 0 ? 1 : 0);
     await sfi_char(nhfp, new $c.Ptr(file_csc_count, 0), $c.lit("count-critical_sizes"), 1);
     if (file_csc_count[0] > cnt) {
         if (!quietly) {
             await raw_printf($c.lit("critical byte counts do not match, file:%d, critical_sizes:%d."), file_csc_count[0], 80);
         }
-        return 2;
+        return SF_CRITICAL_BYTE_COUNT_MISMATCH;
     }
     for (i = 0; i < file_csc_count[0]; i = i + 1 | 0) {
         await sfi_uchar(nhfp, new $c.Ptr(cscbuf, i), $c.lit("critical_sizes"));
@@ -370,17 +374,17 @@ export async function compare_critical_bytes(nhfp, idx_1st_mismatch, utdflags) {
             dm = datamodel(0);
             dmfile = what_datamodel_is_this(0, cscbuf[1], cscbuf[2], cscbuf[3], cscbuf[4], cscbuf[5]);
             if (!$c.strcmp(dmfile, $c.lit("IL32LLP64")) && !$c.strcmp(dm, $c.lit("ILP32LL64"))) {
-                dmmismatch = 3;
+                dmmismatch = SF_DM_IL32LLP64_ON_ILP32LL64;
             } else if (!$c.strcmp(dmfile, $c.lit("I32LP64")) && !$c.strcmp(dm, $c.lit("ILP32LL64"))) {
-                dmmismatch = 4;
+                dmmismatch = SF_DM_I32LP64_ON_ILP32LL64;
             } else if (!$c.strcmp(dmfile, $c.lit("ILP32LL64")) && !$c.strcmp(dm, $c.lit("I32LP64"))) {
-                dmmismatch = 5;
+                dmmismatch = SF_DM_ILP32LL64_ON_I32LP64;
             } else if (!$c.strcmp(dmfile, $c.lit("ILP32LL64")) && !$c.strcmp(dm, $c.lit("IL32LLP64"))) {
-                dmmismatch = 6;
+                dmmismatch = SF_DM_ILP32LL64_ON_IL32LLP64;
             } else if (!$c.strcmp(dmfile, $c.lit("I32LP64")) && !$c.strcmp(dm, $c.lit("IL32LLP64"))) {
-                dmmismatch = 7;
+                dmmismatch = SF_DM_I32LP64_ON_IL32LLP64;
             } else if (!$c.strcmp(dmfile, $c.lit("IL32LLP64")) && !$c.strcmp(dm, $c.lit("I32LP64"))) {
-                dmmismatch = 8;
+                dmmismatch = SF_DM_IL32LLP64_ON_I32LP64;
             }
             if (idx_1st_mismatch) {
                 idx_1st_mismatch.set(0, i);
@@ -388,20 +392,20 @@ export async function compare_critical_bytes(nhfp, idx_1st_mismatch, utdflags) {
             return dmmismatch;
         }
     }
-    return 0;
+    return SF_UPTODATE;
 }
 export async function validate(nhfp, name, without_waitsynch_perfile) {   // version.c:840
     let utdflags = 0, validsf = 0;
     utdflags = 0;
     validsf = 0;
     if (nhfp.structlevel) {
-        utdflags = $c.oru64(utdflags, 1);
+        utdflags = $c.oru64(utdflags, UTD_CHECKSIZES);
     }
     if (without_waitsynch_perfile) {
-        utdflags = $c.oru64(utdflags, 16);
+        utdflags = $c.oru64(utdflags, UTD_WITHOUT_WAITSYNCH_PERFILE);
     }
     if (nhfp.fieldlevel) {
-        utdflags = $c.oru64(utdflags, 6);
+        utdflags = $c.oru64(utdflags, UTD_CHECKFIELDCOUNTS | UTD_SKIP_SANITY1);
     }
     validsf = await uptodate(nhfp, name, utdflags);
     return validsf;

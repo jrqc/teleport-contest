@@ -4,6 +4,7 @@ import * as $T from './types.js';
 import { $G } from './globals.js';
 import { alloc } from './alloc.js';
 import { panic } from './end.js';
+import { LARGEST_INT } from './global.h.js';
 import { lowc } from './hacklib.js';
 
 export function strbuf_init(strbuf) {   // strutil.c:9
@@ -63,12 +64,12 @@ export async function strbuf_nl_to_crlf(strbuf) {   // strutil.c:58
 }
 export async function Strlen_(str, file, line) {   // strutil.c:82
     let p = null, len = 0, $t1;
-    for (p = str, len = 0; len < 32767; len = $c.addu64(len, 1)) {
+    for (p = str, len = 0; len < LARGEST_INT; len = $c.addu64(len, 1)) {
         if (($t1 = p, p = $t1.add(1), $t1).get(0) === 0) {
             break;
         }
     }
-    if (len === 32767) {
+    if (len === LARGEST_INT) {
         await panic($c.lit("%s:%d string too long"), file, line);
     }
     return $c.u32(len);

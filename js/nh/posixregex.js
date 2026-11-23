@@ -3,6 +3,7 @@ import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
 import { alloc } from './alloc.js';
+import { BUFSZ } from './global.h.js';
 import { regcomp, regerror, regexec, regfree } from './luabridge.js';
 
 export const regex_id = new Int8Array(11);
@@ -26,7 +27,7 @@ export function regex_error_desc(re, errbuf) {   // posixregex.c:76
         $c.__builtin___strcpy_chk(errbuf, $c.lit("no explanation"), -1);
     } else {
         errbuf.set(0, 0);
-        regerror(re.err, re.re, errbuf, 256);
+        regerror(re.err, re.re, errbuf, BUFSZ);
         if (!errbuf.get(0)) {
             $c.__builtin___strcpy_chk(errbuf, $c.lit("unspecified regexp error"), -1);
         }

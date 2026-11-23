@@ -7,25 +7,27 @@ import { isok } from './cmd.js';
 import { cg, gc, svl, svr } from './decl.js';
 import { newsym_force } from './display.js';
 import { panic } from './end.js';
+import { COLNO, ROWNO } from './global.h.js';
 import { dist2 } from './hacklib.js';
 import { impossible } from './pline.js';
 import { rn2 } from './rnd.js';
 import { match_maptyps, random_wdir } from './sp_lev.js';
+import { SEL_GRADIENT_RADIAL, SEL_GRADIENT_SQUARE, W_EAST, W_NORTH, W_RANDOM, W_SOUTH, W_WEST } from './sp_lev.h.js';
 
 const selection_floodfill$floodfill_stack_overrun = new Int8Array(24);   // static in selection_floodfill()
 let selection_flood_check_func = null;
 export async function selection_new() {   // selvar.c:15
     let tmps = null, $t1, $t2;
     tmps = $c.asRec(await alloc(32), $T.selectionvar, 32);
-    tmps.wid = 80;
-    tmps.hei = 21;
+    tmps.wid = COLNO;
+    tmps.hei = ROWNO;
     tmps.bounds_dirty = 0;
-    tmps.bounds.lx = 80;
-    tmps.bounds.ly = 21;
+    tmps.bounds.lx = COLNO;
+    tmps.bounds.ly = ROWNO;
     $t1 = tmps.bounds.hy = 0, tmps.bounds.hx = $t1;
-    $t2 = $c.asArr(await alloc(1681), Int8Array), tmps.map = $t2;
+    $t2 = $c.asArr(await alloc(COLNO * ROWNO + 1), Int8Array), tmps.map = $t2;
     $c.__builtin___memset_chk(tmps.map, 1, 1680, -1);
-    tmps.map.set(1680, 0);
+    tmps.map.set(COLNO * ROWNO, 0);
     return tmps;
 }
 export function selection_free(sel, freesel) {   // selvar.c:33
@@ -47,11 +49,11 @@ export function selection_clear(sel, val) {   // selvar.c:48
     if (val) {
         sel.bounds.lx = 0;
         sel.bounds.ly = 0;
-        sel.bounds.hx = 79;
-        sel.bounds.hy = 20;
+        sel.bounds.hx = COLNO - 1;
+        sel.bounds.hy = ROWNO - 1;
     } else {
-        sel.bounds.lx = 80;
-        sel.bounds.ly = 21;
+        sel.bounds.lx = COLNO;
+        sel.bounds.ly = ROWNO;
         $t1 = sel.bounds.hy = 0, sel.bounds.hx = $t1;
     }
     sel.bounds_dirty = 0;
@@ -71,8 +73,8 @@ export function selection_getbounds(sel, b) {   // selvar.c:77
     if (sel.bounds.lx >= sel.wid) {
         b.lx = 0;
         b.ly = 0;
-        b.hx = 79;
-        b.hy = 20;
+        b.hx = COLNO - 1;
+        b.hy = ROWNO - 1;
     } else {
         b.lx = sel.bounds.lx;
         b.ly = sel.bounds.ly;
@@ -85,8 +87,8 @@ export function selection_recalc_bounds(sel) {   // selvar.c:99
     if (!sel.bounds_dirty) {
         return;
     }
-    sel.bounds.lx = 80;
-    sel.bounds.ly = 21;
+    sel.bounds.lx = COLNO;
+    sel.bounds.ly = ROWNO;
     $t1 = sel.bounds.hy = 0, sel.bounds.hx = $t1;
     $t4 = ($t3 = ($t2 = r.hy = -1, r.hx = $t2), r.ly = $t3), r.lx = $t4;
     for (x = 0; x < sel.wid; x = $c.i16(x + 1)) {
@@ -271,13 +273,13 @@ export async function selection_do_grow(ov, dir) {   // selvar.c:321
         return;
     }
     tmp = await selection_new();
-    if (dir === -1) {
+    if (dir === W_RANDOM) {
         dir = random_wdir();
     }
     selection_getbounds(ov, rect);
     for (x = $c.i16(0 > (rect.lx - 1 | 0) ? 0 : rect.lx - 1 | 0); x <= (79 < (rect.hx + 1 | 0) ? 79 : rect.hx + 1 | 0); x = $c.i16(x + 1)) {
         for (y = $c.i16(0 > (rect.ly - 1 | 0) ? 0 : rect.ly - 1 | 0); y <= (20 < (rect.hy + 1 | 0) ? 20 : rect.hy + 1 | 0); y = $c.i16(y + 1)) {
-            if (dir & 8 && selection_getpoint($c.i16(x + 1 | 0), y, ov) || (dir & 9) === 9 && selection_getpoint($c.i16(x + 1 | 0), $c.i16(y + 1 | 0), ov) || dir & 1 && selection_getpoint(x, $c.i16(y + 1 | 0), ov) || (dir & 5) === 5 && selection_getpoint($c.i16(x - 1 | 0), $c.i16(y + 1 | 0), ov) || dir & 4 && selection_getpoint($c.i16(x - 1 | 0), y, ov) || (dir & 6) === 6 && selection_getpoint($c.i16(x - 1 | 0), $c.i16(y - 1 | 0), ov) || dir & 2 && selection_getpoint(x, $c.i16(y - 1 | 0), ov) || (dir & 10) === 10 && selection_getpoint($c.i16(x + 1 | 0), $c.i16(y - 1 | 0), ov)) {
+            if (dir & W_WEST && selection_getpoint($c.i16(x + 1 | 0), y, ov) || (dir & (W_WEST | W_NORTH)) === (W_WEST | W_NORTH) && selection_getpoint($c.i16(x + 1 | 0), $c.i16(y + 1 | 0), ov) || dir & W_NORTH && selection_getpoint(x, $c.i16(y + 1 | 0), ov) || (dir & (W_NORTH | W_EAST)) === (W_NORTH | W_EAST) && selection_getpoint($c.i16(x - 1 | 0), $c.i16(y + 1 | 0), ov) || dir & W_EAST && selection_getpoint($c.i16(x - 1 | 0), y, ov) || (dir & (W_EAST | W_SOUTH)) === (W_EAST | W_SOUTH) && selection_getpoint($c.i16(x - 1 | 0), $c.i16(y - 1 | 0), ov) || dir & W_SOUTH && selection_getpoint(x, $c.i16(y - 1 | 0), ov) || (dir & (W_SOUTH | W_WEST)) === (W_SOUTH | W_WEST) && selection_getpoint($c.i16(x + 1 | 0), $c.i16(y - 1 | 0), ov)) {
                 selection_setpoint(x, y, tmp, 1);
             }
         }
@@ -316,7 +318,7 @@ export async function selection_floodfill(ov, x, y, diagonals) {   // selvar.c:3
         return;
     }
     do {
-        if (idx < 1680) {
+        if (idx < COLNO * ROWNO) {
             dx[idx] = x;
             dy[idx] = y;
             idx = idx + 1 | 0;
@@ -335,7 +337,7 @@ export async function selection_floodfill(ov, x, y, diagonals) {   // selvar.c:3
         do {
             if (isok($c.i16(x + 1 | 0), y) && await selection_flood_check_func($c.i16(x + 1 | 0), y) && !selection_getpoint($c.i16(x + 1 | 0), y, tmp) && !sel_flood_havepoint($c.i16(x + 1 | 0), y, new $c.Ptr(dx, 0), new $c.Ptr(dy, 0), idx)) {
                 do {
-                    if (idx < 1680) {
+                    if (idx < COLNO * ROWNO) {
                         dx[idx] = $c.i16(x + 1 | 0);
                         dy[idx] = y;
                         idx = idx + 1 | 0;
@@ -348,7 +350,7 @@ export async function selection_floodfill(ov, x, y, diagonals) {   // selvar.c:3
         do {
             if (isok($c.i16(x - 1 | 0), y) && await selection_flood_check_func($c.i16(x - 1 | 0), y) && !selection_getpoint($c.i16(x - 1 | 0), y, tmp) && !sel_flood_havepoint($c.i16(x - 1 | 0), y, new $c.Ptr(dx, 0), new $c.Ptr(dy, 0), idx)) {
                 do {
-                    if (idx < 1680) {
+                    if (idx < COLNO * ROWNO) {
                         dx[idx] = $c.i16(x - 1 | 0);
                         dy[idx] = y;
                         idx = idx + 1 | 0;
@@ -361,7 +363,7 @@ export async function selection_floodfill(ov, x, y, diagonals) {   // selvar.c:3
         do {
             if (isok(x, $c.i16(y + 1 | 0)) && await selection_flood_check_func(x, $c.i16(y + 1 | 0)) && !selection_getpoint(x, $c.i16(y + 1 | 0), tmp) && !sel_flood_havepoint(x, $c.i16(y + 1 | 0), new $c.Ptr(dx, 0), new $c.Ptr(dy, 0), idx)) {
                 do {
-                    if (idx < 1680) {
+                    if (idx < COLNO * ROWNO) {
                         dx[idx] = x;
                         dy[idx] = $c.i16(y + 1 | 0);
                         idx = idx + 1 | 0;
@@ -374,7 +376,7 @@ export async function selection_floodfill(ov, x, y, diagonals) {   // selvar.c:3
         do {
             if (isok(x, $c.i16(y - 1 | 0)) && await selection_flood_check_func(x, $c.i16(y - 1 | 0)) && !selection_getpoint(x, $c.i16(y - 1 | 0), tmp) && !sel_flood_havepoint(x, $c.i16(y - 1 | 0), new $c.Ptr(dx, 0), new $c.Ptr(dy, 0), idx)) {
                 do {
-                    if (idx < 1680) {
+                    if (idx < COLNO * ROWNO) {
                         dx[idx] = x;
                         dy[idx] = $c.i16(y - 1 | 0);
                         idx = idx + 1 | 0;
@@ -388,7 +390,7 @@ export async function selection_floodfill(ov, x, y, diagonals) {   // selvar.c:3
             do {
                 if (isok($c.i16(x + 1 | 0), $c.i16(y + 1 | 0)) && await selection_flood_check_func($c.i16(x + 1 | 0), $c.i16(y + 1 | 0)) && !selection_getpoint($c.i16(x + 1 | 0), $c.i16(y + 1 | 0), tmp) && !sel_flood_havepoint($c.i16(x + 1 | 0), $c.i16(y + 1 | 0), new $c.Ptr(dx, 0), new $c.Ptr(dy, 0), idx)) {
                     do {
-                        if (idx < 1680) {
+                        if (idx < COLNO * ROWNO) {
                             dx[idx] = $c.i16(x + 1 | 0);
                             dy[idx] = $c.i16(y + 1 | 0);
                             idx = idx + 1 | 0;
@@ -401,7 +403,7 @@ export async function selection_floodfill(ov, x, y, diagonals) {   // selvar.c:3
             do {
                 if (isok($c.i16(x - 1 | 0), $c.i16(y - 1 | 0)) && await selection_flood_check_func($c.i16(x - 1 | 0), $c.i16(y - 1 | 0)) && !selection_getpoint($c.i16(x - 1 | 0), $c.i16(y - 1 | 0), tmp) && !sel_flood_havepoint($c.i16(x - 1 | 0), $c.i16(y - 1 | 0), new $c.Ptr(dx, 0), new $c.Ptr(dy, 0), idx)) {
                     do {
-                        if (idx < 1680) {
+                        if (idx < COLNO * ROWNO) {
                             dx[idx] = $c.i16(x - 1 | 0);
                             dy[idx] = $c.i16(y - 1 | 0);
                             idx = idx + 1 | 0;
@@ -414,7 +416,7 @@ export async function selection_floodfill(ov, x, y, diagonals) {   // selvar.c:3
             do {
                 if (isok($c.i16(x - 1 | 0), $c.i16(y + 1 | 0)) && await selection_flood_check_func($c.i16(x - 1 | 0), $c.i16(y + 1 | 0)) && !selection_getpoint($c.i16(x - 1 | 0), $c.i16(y + 1 | 0), tmp) && !sel_flood_havepoint($c.i16(x - 1 | 0), $c.i16(y + 1 | 0), new $c.Ptr(dx, 0), new $c.Ptr(dy, 0), idx)) {
                     do {
-                        if (idx < 1680) {
+                        if (idx < COLNO * ROWNO) {
                             dx[idx] = $c.i16(x - 1 | 0);
                             dy[idx] = $c.i16(y + 1 | 0);
                             idx = idx + 1 | 0;
@@ -427,7 +429,7 @@ export async function selection_floodfill(ov, x, y, diagonals) {   // selvar.c:3
             do {
                 if (isok($c.i16(x + 1 | 0), $c.i16(y - 1 | 0)) && await selection_flood_check_func($c.i16(x + 1 | 0), $c.i16(y - 1 | 0)) && !selection_getpoint($c.i16(x + 1 | 0), $c.i16(y - 1 | 0), tmp) && !sel_flood_havepoint($c.i16(x + 1 | 0), $c.i16(y - 1 | 0), new $c.Ptr(dx, 0), new $c.Ptr(dy, 0), idx)) {
                     do {
-                        if (idx < 1680) {
+                        if (idx < COLNO * ROWNO) {
                             dx[idx] = $c.i16(x + 1 | 0);
                             dy[idx] = $c.i16(y - 1 | 0);
                             idx = idx + 1 | 0;
@@ -563,10 +565,10 @@ export async function selection_do_gradient(ov, x, y, x2, y2, gtyp, mind, maxd) 
     switch (gtyp) {
         default:
             await impossible($c.lit("Unrecognized gradient type! Defaulting to radial..."));
-        case 0:
+        case SEL_GRADIENT_RADIAL:
             {
-                for (dx = 0; dx < 80; dx = $c.add64(dx, 1)) {
-                    for (dy = 0; dy < 21; dy = $c.add64(dy, 1)) {
+                for (dx = 0; dx < COLNO; dx = $c.add64(dx, 1)) {
+                    for (dy = 0; dy < ROWNO; dy = $c.add64(dy, 1)) {
                         d0 = line_dist_coord(x, y, x2, y2, dx, dy);
                         if (d0 <= $c.mul64(mind, mind) || d0 <= $c.mul64(maxd, maxd) && $c.sub64(d0, $c.mul64(mind, mind)) < rn2($c.i32(dofs))) {
                             selection_setpoint($c.i16(dx), $c.i16(dy), ov, 1);
@@ -575,10 +577,10 @@ export async function selection_do_gradient(ov, x, y, x2, y2, gtyp, mind, maxd) 
                 }
                 break;
             }
-        case 1:
+        case SEL_GRADIENT_SQUARE:
             {
-                for (dx = 0; dx < 80; dx = $c.add64(dx, 1)) {
-                    for (dy = 0; dy < 21; dy = $c.add64(dy, 1)) {
+                for (dx = 0; dx < COLNO; dx = $c.add64(dx, 1)) {
+                    for (dy = 0; dy < ROWNO; dy = $c.add64(dy, 1)) {
                         d1 = line_dist_coord(x, y, x2, y2, x, dy);
                         d2 = line_dist_coord(x, y, x2, y2, dx, y);
                         d3 = line_dist_coord(x, y, x2, y2, x2, dy);
@@ -659,7 +661,7 @@ export function selection_do_randline(x1, y1, x2, y2, rough, rec, ov) {   // sel
             dy = rn2(rough) - $c.div32(rough, 2) | 0;
             mx = $c.div32(x1 + x2 | 0, 2) + dx | 0;
             my = $c.div32(y1 + y2 | 0, 2) + dy | 0;
-        } while (mx > 79 || mx < 0 || my < 0 || my > 20);
+        } while (mx > COLNO - 1 || mx < 0 || my < 0 || my > ROWNO - 1);
     }
     if (!selection_getpoint($c.i16(mx), $c.i16(my), ov)) {
         selection_setpoint($c.i16(mx), $c.i16(my), ov, 1);

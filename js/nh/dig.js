@@ -2,67 +2,96 @@
 import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
+import { AM_LAWFUL, AM_MASK, AM_SANCTUM, A_LAWFUL, A_NONE } from './align.h.js';
 import { stop_occupation } from './allmain.js';
 import { doapply, next_to_u, o_unleash } from './apply.js';
 import { acurr, acurrstr, adjalign, exercise } from './attrib.js';
+import { A_CHA, A_CON, A_DEX, A_INT, A_STR, A_WIS } from './attrib.h.js';
 import { cmd_from_dir, cmdq_add_ec, cmdq_add_key, confdir, dxdy_moveok, getdir, isok, movecmd, set_occupation, xytodir } from './cmd.js';
 import { destroy_drawbridge, find_drawbridge, is_db_wall, is_drawbridge_wall, is_ice, is_lava, is_moat, is_pool, is_pool_or_lava } from './dbridge.js';
 import { disp, flags, gd, gm, gn, go, gu, gv, gy, iflags, svc, svd, svl, svm, u, xdir, ydir } from './decl.js';
+import { COIN_CLASS, POTION_CLASS, S_EYE, S_LIGHT, S_MUMMY, S_VORTEX, S_ZOMBIE, TOOL_CLASS, WEAPON_CLASS } from './defsym.h.js';
 import { cvt_sdoor_to_door } from './detect.js';
 import { canseemon, feel_newsym, flush_screen, newsym, tmp_at } from './display.js';
+import { DISP_BEAM, DISP_END, EXPL_MAGICAL } from './display.h.js';
 import { dropx, goto_level, set_wounded_legs } from './do.js';
 import { Monnam, hliquid, mon_nam } from './do_name.js';
 import { hard_helmet } from './do_wear.js';
 import { migrate_to_level } from './dog.js';
 import { impact_drop } from './dokick.js';
 import { Can_dig_down, Is_botlevel, assign_level, ceiling, depth, get_level, has_ceiling, ledger_no, on_level, surface } from './dungeon.js';
+import { MIGR_RANDOM } from './dungeon.h.js';
 import { is_fainted } from './eat.js';
 import { can_reach_floor, cant_reach_floor, del_engr_at, u_wipe_engr } from './engrave.js';
 import { explode } from './explode.js';
 import { debugcore } from './files.js';
 import { breaksink, dogushforth, dryup } from './fountain.js';
+import { COLNO } from './global.h.js';
 import { in_rooms, in_town, losehp, may_dig, nomul, obj_to_any, pooleffects, spot_checks, spoteffects, switch_terrain } from './hack.js';
+import { CQ_CANNED, CXN_NO_PFX, DIGCHECK_FAILED, DIGCHECK_FAIL_AIRLEVEL, DIGCHECK_FAIL_ALTAR, DIGCHECK_FAIL_BOULDER, DIGCHECK_FAIL_CANTDIG, DIGCHECK_FAIL_OBJ_POOL_OR_TRAP, DIGCHECK_FAIL_ONLADDER, DIGCHECK_FAIL_ONSTAIRS, DIGCHECK_FAIL_THRONE, DIGCHECK_FAIL_TOOHARD, DIGCHECK_FAIL_UNDESTROYABLETRAP, DIGCHECK_FAIL_WATERLEVEL, DIGCHECK_PASSED, DIGCHECK_PASSED_DESTROY_TRAP, DIGCHECK_PASSED_PITONLY, DIR_ERR, ECMD_CANCEL, ECMD_OK, ECMD_TIME, FOOT, FORCEBUNGLE, FORCETRAP, HEAD, KILLED_BY, KILLED_BY_AN, MM_NOMSG, MV_WALK, NO_PART, NO_TRAP_FLAGS, N_DIRS_Z, RLOC_NOMSG, SHOP_DOOR_COST, SHOP_PIT_COST, SHOP_WALL_COST, STOMACH, TAINT_AGE } from './hack.h.js';
 import { dist2, s_suffix, sgn } from './hacklib.js';
 import { align_str } from './insight.js';
 import { currency, delobj, sobj_at, stackobj, update_inventory } from './invent.js';
 import { makemon, mkclass } from './makemon.js';
 import { expels } from './mhitu.js';
 import { add_to_buried, mk_tt_object, mksobj_at, obj_extract_self, obj_ice_effects, place_object, rnd_treefruit_at } from './mkobj.js';
+import { SHOPBASE } from './mkroom.h.js';
 import { angry_guards, get_iter_mons, hideunder, maybe_unhide_at, minliquid, wake_nearby } from './mon.js';
+import { AD_DGST, AT_ENGL } from './monattk.h.js';
 import { dmgtype_fromattack } from './mondata.js';
+import { G_UNIQ, M1_CLING, M1_CONCEAL, M1_FLY, M1_SEE_INVIS, M1_WALLWALK, MZ_HUGE } from './monflag.h.js';
 import { closed_door, mb_trapped } from './monmove.js';
 import { mons } from './monst.js';
+import { PM_AIR_ELEMENTAL, PM_ARCHEOLOGIST, PM_DWARF, PM_EARTH_ELEMENTAL, PM_ELF, PM_RANGER, PM_SAMURAI, PM_WATCHMAN, PM_WATCH_CAPTAIN, PM_XORN } from './monsters.h.js';
+import { OBJ_FLOOR, OBJ_INVENT, OBJ_MIGRATING, OBJ_MINVENT } from './obj.h.js';
+import { MAXOCLASSES, WOOD } from './objclass.h.js';
 import { obj_descr, objects } from './objects.js';
+import { BEARTRAP, BOULDER, CORPSE, HEAVY_IRON_BALL, LAND_MINE, LEASH, POT_OIL, ROCK, STATUE } from './objects.h.js';
 import { An, Yobjnam2, an, corpse_xname, otense, simpleonames, the, xname, yname, yobjnam } from './objnam.js';
 import { pickup } from './pickup.js';
 import { There, You, You_cant, You_feel, You_hear, Your, impossible, pline, pline_The, verbalize } from './pline.js';
 import { body_part, mbodypart } from './polyself.js';
 import { altar_wrath, altarmask_at, desecrate_altar } from './pray.js';
 import { angry_priest } from './priest.js';
+import { BLINDED, DEAF, FLYING, FUMBLING, HALF_PHDAM, HALLUC, HALLUC_RES, INVIS, LEVITATION, W_RINGR } from './prop.h.js';
 import { punish, unpunish } from './read.js';
+import { ALTAR, CORR, DBWALL, DB_LAVA, DB_MOAT, DB_UNDER, DOOR, DRAWBRIDGE_DOWN, DRAWBRIDGE_UP, D_BROKEN, D_NODOOR, D_TRAPPED, FOUNTAIN, F_WARNED, GRAVE, IRONBARS, LAVAPOOL, LAVAWALL, MOAT, POOL, ROOM, SCORR, SDOOR, SINK, STAIRS, STONE, THRONE, TREE, WATER, W_NONDIGGABLE } from './rm.h.js';
 import { d, rn2, rnd, rnl } from './rnd.js';
 import { genders } from './role.js';
 import { add_damage, costly_spot, make_angry_shk, obfree, pay_for_damage, shop_keeper, shopdig, stolen_value } from './shk.js';
 import { shkname } from './shknam.js';
+import { P_AXE, P_PICK_AXE } from './skills.h.js';
 import { On_ladder, On_stairs, stairway_at } from './stairs.js';
 import { remove_worn_item } from './steal.js';
 import { rloc, teleport_pet } from './teleport.js';
 import { end_burn, start_timer, stop_timer } from './timeout.js';
+import { ROT_ORGANIC, TIMER_OBJECT } from './timeout.h.js';
 import { b_trapped, cnv_trap_obj, conjoined_pits, delfloortrap, deltrap, dotrap, feeltrap, fire_damage, fire_damage_chain, maketrap, mintrap, reset_utrap, seetrap, set_utrap, t_at, trapname, uescaped_shaft, unconscious, uteetering_at_seen_pit, water_damage_chain } from './trap.js';
+import { ANTI_MAGIC, BEAR_TRAP, HOLE, LANDMINE, LEVEL_TELEP, MAGIC_PORTAL, MAGIC_TRAP, PIT, POLY_TRAP, SPIKED_PIT, TELEP_TRAP, TRAPDOOR, VIBRATING_SQUARE, WEB } from './trap.h.js';
 import { do_attack } from './uhitm.js';
 import { does_block, recalc_block_point, unblock_point } from './vision.js';
+import { COULD_SEE, IN_SIGHT } from './vision.h.js';
 import { abon, dbon, dmgval, setmnotwielded } from './weapon.js';
 import { welded, wield_tool } from './wield.js';
 import { windowprocs } from './windows.js';
 import { count_wsegs } from './worm.js';
+import { TT_BURIEDBALL, TT_INFLOOR, TT_PIT, TT_WEB } from './you.h.js';
 import { break_statue, fracture_rock, obj_resists } from './zap.js';
+
+const DIGTYP_UNDIGGABLE = 0;
+const DIGTYP_ROCK = DIGTYP_UNDIGGABLE + 1;
+const DIGTYP_STATUE = DIGTYP_ROCK + 1;
+const DIGTYP_BOULDER = DIGTYP_STATUE + 1;
+const DIGTYP_DOOR = DIGTYP_BOULDER + 1;
+const DIGTYP_TREE = DIGTYP_DOOR + 1;
+const STRIDENT = 4;
 
 const dig$d_target = $c.nulls(6);   // static in dig()
 const use_pick_axe2$d_action = $c.nulls(6);   // static in use_pick_axe2()
 const draft_message$draft_reaction = $c.nulls(4);   // static in draft_message()
 function rm_waslit() {   // dig.c:30
     let x = 0, y = 0;
-    if (svl.level.locations[u.ux][u.uy].typ === 25 /* ROOM */ && svl.level.locations[u.ux][u.uy].waslit | 0) {
+    if (svl.level.locations[u.ux][u.uy].typ === ROOM && svl.level.locations[u.ux][u.uy].waslit | 0) {
         return 1;
     }
     for (x = $c.i16(u.ux - 2 | 0); x < (u.ux + 3 | 0); x = $c.i16(x + 1)) {
@@ -81,18 +110,18 @@ async function mkcavepos(x, y, dist, waslit, rockit) {   // dig.c:48
     }
     lev = $c.relem(svl.level.locations[x], y);
     if (rockit) {
-        if (lev.typ < 16 /* POOL */) {
+        if (lev.typ < POOL) {
             return;
         }
         if (t_at(x, y)) {
             return;
         }
         if ((mtmp = svl.level.monsters[x][y]) !== null) {
-            if (!($c.andu64(mtmp.data.mflags1, 8) !== 0)) {
-                await rloc(mtmp, 4);
+            if (!($c.andu64(mtmp.data.mflags1, M1_WALLWALK) !== 0)) {
+                await rloc(mtmp, RLOC_NOMSG);
             }
         }
-    } else if (lev.typ === 25 /* ROOM */) {
+    } else if (lev.typ === ROOM) {
         return;
     }
     unblock_point(x, y);
@@ -105,8 +134,8 @@ async function mkcavepos(x, y, dist, waslit, rockit) {   // dig.c:48
         lev.waslit = ((rockit ? 0 : 1) >>> 0) & 1;
     }
     lev.horizontal = (0) & 1;
-    gv.viz_array.get(y).set(x, $c.u8(dist < 3 ? 3 : 1));
-    lev.typ = $c.i8(rockit ? 0 /* STONE */ : 25 /* ROOM */);
+    gv.viz_array.get(y).set(x, $c.u8(dist < 3 ? IN_SIGHT | COULD_SEE : COULD_SEE));
+    lev.typ = $c.i8(rockit ? STONE : ROOM);
     if (dist >= 3) {
         await impossible($c.lit("mkcavepos called with dist %d"), dist);
     }
@@ -122,7 +151,7 @@ async function mkcavearea(rockit) {   // dig.c:88
     if (rockit) {
         await pline($c.lit("Crash!  The ceiling collapses around you!"));
     } else {
-        await pline($c.lit("A mysterious force %s cave around you!"), svl.level.locations[u.ux][u.uy].typ === 24 /* CORR */ ? $c.lit("creates a") : $c.lit("extends the"));
+        await pline($c.lit("A mysterious force %s cave around you!"), svl.level.locations[u.ux][u.uy].typ === CORR ? $c.lit("creates a") : $c.lit("extends the"));
     }
     await windowprocs.win_display_nhwindow($G.WIN_MESSAGE, 1);
     for (dist = 1; dist <= 2; dist = dist + 1 | 0) {
@@ -143,8 +172,8 @@ async function mkcavearea(rockit) {   // dig.c:88
         await flush_screen(1);
         await windowprocs.win_delay_output();
     }
-    if (!rockit && svl.level.locations[u.ux][u.uy].typ === 24 /* CORR */) {
-        svl.level.locations[u.ux][u.uy].typ = 25;
+    if (!rockit && svl.level.locations[u.ux][u.uy].typ === CORR) {
+        svl.level.locations[u.ux][u.uy].typ = ROOM;
         if (waslit) {
             svl.level.locations[u.ux][u.uy].waslit = (1) & 1;
         }
@@ -155,14 +184,14 @@ async function mkcavearea(rockit) {   // dig.c:88
 function pick_can_reach(pick, x, y) {   // dig.c:141
     let t = null, target_in_pit = 0;
     t = t_at(x, y);
-    target_in_pit = $c.i8(t && ((t.ttyp | 0) === 11 /* PIT */ || (t.ttyp | 0) === 12 /* SPIKED_PIT */) && t.tseen | 0 ? 1 : 0);
-    if (u.utrap && u.utraptype === 2) {
+    target_in_pit = $c.i8(t && ((t.ttyp | 0) === PIT || (t.ttyp | 0) === SPIKED_PIT) && t.tseen | 0 ? 1 : 0);
+    if (u.utrap && u.utraptype === TT_PIT) {
         if (target_in_pit) {
             return conjoined_pits(t, t_at(u.ux, u.uy), 0);
         }
-        return $c.i8((pick.oclass === 2 /* WEAPON_CLASS */ || pick.oclass === 6 /* TOOL_CLASS */) && objects[pick.otyp].oc_big | 0 ? 1 : 0);
+        return $c.i8((pick.oclass === WEAPON_CLASS || pick.oclass === TOOL_CLASS) && objects[pick.otyp].oc_big | 0 ? 1 : 0);
     }
-    if ((pick.oclass === 2 /* WEAPON_CLASS */ || pick.oclass === 6 /* TOOL_CLASS */) && objects[pick.otyp].oc_big | 0 || (u.uprops[49 /* FLYING */].intrinsic || u.uprops[49 /* FLYING */].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, 1) !== 0) && !u.uprops[49 /* FLYING */].blocked) {
+    if ((pick.oclass === WEAPON_CLASS || pick.oclass === TOOL_CLASS) && objects[pick.otyp].oc_big | 0 || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked) {
         return 1;
     }
     if (!target_in_pit) {
@@ -172,14 +201,14 @@ function pick_can_reach(pick, x, y) {   // dig.c:141
 }
 export function dig_typ(otmp, x, y) {   // dig.c:169
     let ltyp = 0;
-    if (!isok(x, y) || !otmp || !((otmp.oclass === 2 /* WEAPON_CLASS */ || otmp.oclass === 6 /* TOOL_CLASS */) && objects[otmp.otyp].oc_subtyp === 4 /* P_PICK_AXE */) && !((otmp.oclass === 2 /* WEAPON_CLASS */ || otmp.oclass === 6 /* TOOL_CLASS */) && objects[otmp.otyp].oc_subtyp === 3 /* P_AXE */)) {
-        return 0 /* DIGTYP_UNDIGGABLE */;
+    if (!isok(x, y) || !otmp || !((otmp.oclass === WEAPON_CLASS || otmp.oclass === TOOL_CLASS) && objects[otmp.otyp].oc_subtyp === P_PICK_AXE) && !((otmp.oclass === WEAPON_CLASS || otmp.oclass === TOOL_CLASS) && objects[otmp.otyp].oc_subtyp === P_AXE)) {
+        return DIGTYP_UNDIGGABLE;
     }
     ltyp = svl.level.locations[x][y].typ;
-    if ((otmp.oclass === 2 /* WEAPON_CLASS */ || otmp.oclass === 6 /* TOOL_CLASS */) && objects[otmp.otyp].oc_subtyp === 3 /* P_AXE */) {
-        return closed_door(x, y) ? 4 /* DIGTYP_DOOR */ : ltyp === 13 /* TREE */ || svl.level.flags.arboreal | 0 && ltyp === 0 /* STONE */ ? 5 /* DIGTYP_TREE */ : 0 /* DIGTYP_UNDIGGABLE */;
+    if ((otmp.oclass === WEAPON_CLASS || otmp.oclass === TOOL_CLASS) && objects[otmp.otyp].oc_subtyp === P_AXE) {
+        return closed_door(x, y) ? DIGTYP_DOOR : ltyp === TREE || svl.level.flags.arboreal | 0 && ltyp === STONE ? DIGTYP_TREE : DIGTYP_UNDIGGABLE;
     }
-    return sobj_at(476 /* STATUE */, x, y) && pick_can_reach(otmp, x, y) ? 2 /* DIGTYP_STATUE */ : sobj_at(475 /* BOULDER */, x, y) && pick_can_reach(otmp, x, y) ? 3 /* DIGTYP_BOULDER */ : closed_door(x, y) ? 4 /* DIGTYP_DOOR */ : ltyp === 13 /* TREE */ || svl.level.flags.arboreal | 0 && ltyp === 0 /* STONE */ ? 0 /* DIGTYP_UNDIGGABLE */ : ltyp < 16 /* POOL */ && (!svl.level.flags.arboreal || ltyp && ltyp <= 12 /* DBWALL */) ? 1 /* DIGTYP_ROCK */ : 0 /* DIGTYP_UNDIGGABLE */;
+    return sobj_at(STATUE, x, y) && pick_can_reach(otmp, x, y) ? DIGTYP_STATUE : sobj_at(BOULDER, x, y) && pick_can_reach(otmp, x, y) ? DIGTYP_BOULDER : closed_door(x, y) ? DIGTYP_DOOR : ltyp === TREE || svl.level.flags.arboreal | 0 && ltyp === STONE ? DIGTYP_UNDIGGABLE : ltyp < POOL && (!svl.level.flags.arboreal || ltyp && ltyp <= DBWALL) ? DIGTYP_ROCK : DIGTYP_UNDIGGABLE;
 }
 export function is_digging() {   // dig.c:195
     if (go.occupation === dig) {
@@ -193,76 +222,76 @@ export function dig_check(madeby, x, y) {   // dig.c:207
     if (On_stairs(x, y)) {
         stway = stairway_at(x, y);
         if (stway.isladder) {
-            return 5;
+            return DIGCHECK_FAIL_ONLADDER;
         } else {
-            return 4;
+            return DIGCHECK_FAIL_ONSTAIRS;
         }
-    } else if (svl.level.locations[x][y].typ === 29 /* THRONE */ && madeby !== null) {
-        return 6;
-    } else if (svl.level.locations[x][y].typ === 32 /* ALTAR */ && (madeby !== null || (altarmask_at(x, y) & 16) !== 0)) {
-        return 7;
+    } else if (svl.level.locations[x][y].typ === THRONE && madeby !== null) {
+        return DIGCHECK_FAIL_THRONE;
+    } else if (svl.level.locations[x][y].typ === ALTAR && (madeby !== null || (altarmask_at(x, y) & AM_SANCTUM) !== 0)) {
+        return DIGCHECK_FAIL_ALTAR;
     } else if ((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level)) {
-        return 8;
+        return DIGCHECK_FAIL_AIRLEVEL;
     } else if ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) {
-        return 9;
-    } else if (svl.level.locations[x][y].typ < 16 /* POOL */ && svl.level.locations[x][y].typ !== 14 /* SDOOR */ && ((svl.level.locations[x][y].flags | 0) & 8) !== 0) {
-        return 10;
-    } else if (ttmp && ((ttmp.ttyp | 0) === 17 /* MAGIC_PORTAL */ || (ttmp.ttyp | 0) === 23 /* VIBRATING_SQUARE */)) {
-        return 11;
+        return DIGCHECK_FAIL_WATERLEVEL;
+    } else if (svl.level.locations[x][y].typ < POOL && svl.level.locations[x][y].typ !== SDOOR && ((svl.level.locations[x][y].flags | 0) & W_NONDIGGABLE) !== 0) {
+        return DIGCHECK_FAIL_TOOHARD;
+    } else if (ttmp && ((ttmp.ttyp | 0) === MAGIC_PORTAL || (ttmp.ttyp | 0) === VIBRATING_SQUARE)) {
+        return DIGCHECK_FAIL_UNDESTROYABLETRAP;
     } else if (!Can_dig_down(u.uz) && !svl.level.locations[x][y].candig) {
         if (ttmp) {
-            if (!((ttmp.ttyp | 0) === 13 /* HOLE */ || (ttmp.ttyp | 0) === 14 /* TRAPDOOR */) && !((ttmp.ttyp | 0) === 11 /* PIT */ || (ttmp.ttyp | 0) === 12 /* SPIKED_PIT */)) {
-                return 2;
+            if (!((ttmp.ttyp | 0) === HOLE || (ttmp.ttyp | 0) === TRAPDOOR) && !((ttmp.ttyp | 0) === PIT || (ttmp.ttyp | 0) === SPIKED_PIT)) {
+                return DIGCHECK_PASSED_DESTROY_TRAP;
             } else {
-                return 12;
+                return DIGCHECK_FAIL_CANTDIG;
             }
         } else {
-            return 3;
+            return DIGCHECK_PASSED_PITONLY;
         }
-    } else if (sobj_at(475 /* BOULDER */, x, y)) {
-        return 13;
+    } else if (sobj_at(BOULDER, x, y)) {
+        return DIGCHECK_FAIL_BOULDER;
     } else if (madeby === null && (ttmp || is_pool_or_lava(x, y))) {
-        return 14;
+        return DIGCHECK_FAIL_OBJ_POOL_OR_TRAP;
     }
-    return 1;
+    return DIGCHECK_PASSED;
 }
 export async function digcheck_fail_message(digresult, madeby, x, y) {   // dig.c:255
     let verb = null;
-    verb = $c.peq(madeby, gy.youmonst) && $G.uwep && (($G.uwep.oclass === 2 /* WEAPON_CLASS */ || $G.uwep.oclass === 6 /* TOOL_CLASS */) && objects[$G.uwep.otyp].oc_subtyp === 3 /* P_AXE */) ? $c.lit("chop") : $c.lit("dig in");
-    if (digresult < 4) {
+    verb = $c.peq(madeby, gy.youmonst) && $G.uwep && (($G.uwep.oclass === WEAPON_CLASS || $G.uwep.oclass === TOOL_CLASS) && objects[$G.uwep.otyp].oc_subtyp === P_AXE) ? $c.lit("chop") : $c.lit("dig in");
+    if (digresult < DIGCHECK_FAILED) {
         return;
     }
     switch (digresult) {
-        case 8:
+        case DIGCHECK_FAIL_AIRLEVEL:
             await You($c.lit("cannot %s thin air."), verb);
             break;
-        case 7:
+        case DIGCHECK_FAIL_ALTAR:
             await pline_The($c.lit("altar is too hard to break apart."));
             break;
-        case 13:
+        case DIGCHECK_FAIL_BOULDER:
             await There($c.lit("isn't enough room to %s here."), verb);
             break;
-        case 5:
+        case DIGCHECK_FAIL_ONLADDER:
             await pline_The($c.lit("ladder resists your effort."));
             break;
-        case 4:
+        case DIGCHECK_FAIL_ONSTAIRS:
             await pline_The($c.lit("stairs are too hard to %s."), verb);
             break;
-        case 6:
+        case DIGCHECK_FAIL_THRONE:
             await pline_The($c.lit("throne is too hard to break apart."));
             break;
-        case 12:
-        case 10:
-        case 11:
+        case DIGCHECK_FAIL_CANTDIG:
+        case DIGCHECK_FAIL_TOOHARD:
+        case DIGCHECK_FAIL_UNDESTROYABLETRAP:
             await pline_The($c.lit("%s here is too hard to %s."), surface(x, y), verb);
             break;
-        case 9:
+        case DIGCHECK_FAIL_WATERLEVEL:
             await pline_The($c.lit("%s splashes and subsides."), hliquid($c.lit("water")));
             break;
-        case 14:
-        case 1:
-        case 3:
-        case 2:
+        case DIGCHECK_FAIL_OBJ_POOL_OR_TRAP:
+        case DIGCHECK_PASSED:
+        case DIGCHECK_PASSED_PITONLY:
+        case DIGCHECK_PASSED_DESTROY_TRAP:
             break;
     }
 }
@@ -270,30 +299,30 @@ async function dig() {   // dig.c:300
     let lev = null, dpx = 0, dpy = 0, ispick = 0, verb = null, dcresult = 0, ttmp = null, kbuf = new Int8Array(256), dmg = 0, ttmpname = null, digbuf = new Int8Array(256), digtxt = null, dmgtxt = null, obj = null, bobj = null, shopedge = 0, digtyp = 0, mndx = 0, dig_target = 0, $t1;
     dpx = svc.context.digging.pos.x;
     dpy = svc.context.digging.pos.y;
-    ispick = $c.i8($G.uwep && (($G.uwep.oclass === 2 /* WEAPON_CLASS */ || $G.uwep.oclass === 6 /* TOOL_CLASS */) && objects[$G.uwep.otyp].oc_subtyp === 4 /* P_PICK_AXE */) ? 1 : 0);
-    verb = !$G.uwep || ($G.uwep.oclass === 2 /* WEAPON_CLASS */ || $G.uwep.oclass === 6 /* TOOL_CLASS */) && objects[$G.uwep.otyp].oc_subtyp === 4 /* P_PICK_AXE */ ? $c.lit("dig into") : $c.lit("chop through");
-    dcresult = 1;
+    ispick = $c.i8($G.uwep && (($G.uwep.oclass === WEAPON_CLASS || $G.uwep.oclass === TOOL_CLASS) && objects[$G.uwep.otyp].oc_subtyp === P_PICK_AXE) ? 1 : 0);
+    verb = !$G.uwep || ($G.uwep.oclass === WEAPON_CLASS || $G.uwep.oclass === TOOL_CLASS) && objects[$G.uwep.otyp].oc_subtyp === P_PICK_AXE ? $c.lit("dig into") : $c.lit("chop through");
+    dcresult = DIGCHECK_PASSED;
     lev = $c.relem(svl.level.locations[dpx], dpy);
-    if (u.uswallow | 0 || !$G.uwep || !ispick && !(($G.uwep.oclass === 2 /* WEAPON_CLASS */ || $G.uwep.oclass === 6 /* TOOL_CLASS */) && objects[$G.uwep.otyp].oc_subtyp === 3 /* P_AXE */) || !on_level(svc.context.digging.level, u.uz) || (svc.context.digging.down ? dpx !== u.ux || dpy !== u.uy : !(dist2(dpx, dpy, u.ux, u.uy) <= 2))) {
+    if (u.uswallow | 0 || !$G.uwep || !ispick && !(($G.uwep.oclass === WEAPON_CLASS || $G.uwep.oclass === TOOL_CLASS) && objects[$G.uwep.otyp].oc_subtyp === P_AXE) || !on_level(svc.context.digging.level, u.uz) || (svc.context.digging.down ? dpx !== u.ux || dpy !== u.uy : !(dist2(dpx, dpy, u.ux, u.uy) <= 2))) {
         return 0;
     }
     if (svc.context.digging.down) {
         dcresult = dig_check(gy.youmonst, u.ux, u.uy);
-        if (dcresult >= 4) {
+        if (dcresult >= DIGCHECK_FAILED) {
             await digcheck_fail_message(dcresult, gy.youmonst, u.ux, u.uy);
             return 0;
         }
     } else {
-        if ((lev.typ === 13 /* TREE */ || svl.level.flags.arboreal | 0 && lev.typ === 0 /* STONE */) && !may_dig(dpx, dpy) && dig_typ($G.uwep, dpx, dpy) === 5 /* DIGTYP_TREE */) {
+        if ((lev.typ === TREE || svl.level.flags.arboreal | 0 && lev.typ === STONE) && !may_dig(dpx, dpy) && dig_typ($G.uwep, dpx, dpy) === DIGTYP_TREE) {
             await pline($c.lit("This tree seems to be petrified."));
             return 0;
         }
-        if (lev.typ < 16 /* POOL */ && !may_dig(dpx, dpy) && dig_typ($G.uwep, dpx, dpy) === 1 /* DIGTYP_ROCK */) {
+        if (lev.typ < POOL && !may_dig(dpx, dpy) && dig_typ($G.uwep, dpx, dpy) === DIGTYP_ROCK) {
             await pline($c.lit("This %s is too hard to %s."), is_db_wall(dpx, dpy) ? $c.lit("drawbridge") : $c.lit("wall"), verb);
             return 0;
         }
     }
-    if ((u.uprops[25 /* FUMBLING */].intrinsic || u.uprops[25 /* FUMBLING */].extrinsic) && !rn2(3)) {
+    if ((u.uprops[FUMBLING].intrinsic || u.uprops[FUMBLING].extrinsic) && !rn2(3)) {
         switch (rn2(3)) {
             case 0:
                 if (!await welded($G.uwep)) {
@@ -305,7 +334,7 @@ async function dig() {   // dig.c:300
                     } else {
                         await pline($c.lit("Ouch!  %s and %s you!"), await Yobjnam2($G.uwep, $c.lit("bounce")), await otense($G.uwep, $c.lit("hit")));
                     }
-                    await set_wounded_legs(262144, 5 + rnd(5) | 0);
+                    await set_wounded_legs(W_RINGR, 5 + rnd(5) | 0);
                 }
                 break;
             case 1:
@@ -319,33 +348,33 @@ async function dig() {   // dig.c:300
         return 0;
     }
     $t1 = ((((10 + rn2(5) | 0) + await abon() | 0) + $G.uwep.spe | 0) - (($G.uwep.oeroded | 0) > ($G.uwep.oeroded2 | 0) ? $G.uwep.oeroded | 0 : $G.uwep.oeroded2 | 0) | 0) + u.udaminc | 0, svc.context.digging.effort = svc.context.digging.effort + $t1 | 0;
-    if (gu.urace.mnum === 44) {
+    if (gu.urace.mnum === PM_DWARF) {
         svc.context.digging.effort = Math.imul(svc.context.digging.effort, 2);
     }
     if (svc.context.digging.down) {
         ttmp = t_at(dpx, dpy);
-        if (svc.context.digging.effort > 250 || ttmp && (ttmp.ttyp | 0) === 13 /* HOLE */) {
+        if (svc.context.digging.effort > 250 || ttmp && (ttmp.ttyp | 0) === HOLE) {
             await dighole(0, 0, null);
             $c.__builtin___memset_chk(svc.context.digging, 0, 32, 608);
             return 0;
         }
-        if (svc.context.digging.effort <= 50 || ttmp && ((ttmp.ttyp | 0) === 14 /* TRAPDOOR */ || ((ttmp.ttyp | 0) === 11 /* PIT */ || (ttmp.ttyp | 0) === 12 /* SPIKED_PIT */))) {
+        if (svc.context.digging.effort <= 50 || ttmp && ((ttmp.ttyp | 0) === TRAPDOOR || ((ttmp.ttyp | 0) === PIT || (ttmp.ttyp | 0) === SPIKED_PIT))) {
             return 1;
-        } else if (ttmp && ((ttmp.ttyp | 0) === 6 /* LANDMINE */ || (ttmp.ttyp | 0) === 5 /* BEAR_TRAP */ && !u.utrap)) {
-            await dotrap(ttmp, 1);
+        } else if (ttmp && ((ttmp.ttyp | 0) === LANDMINE || (ttmp.ttyp | 0) === BEAR_TRAP && !u.utrap)) {
+            await dotrap(ttmp, FORCETRAP);
             $c.__builtin___memset_chk(svc.context.digging, 0, 32, 608);
             return 0;
-        } else if (ttmp && (ttmp.ttyp | 0) === 5 /* BEAR_TRAP */ && u.utrap) {
-            if (rnl(7) > (u.uprops[25 /* FUMBLING */].intrinsic || u.uprops[25 /* FUMBLING */].extrinsic ? 1 : 4)) {
+        } else if (ttmp && (ttmp.ttyp | 0) === BEAR_TRAP && u.utrap) {
+            if (rnl(7) > (u.uprops[FUMBLING].intrinsic || u.uprops[FUMBLING].extrinsic ? 1 : 4)) {
                 dmg = await dmgval($G.uwep, gy.youmonst) + dbon() | 0;
                 if (dmg < 1) {
                     dmg = 1;
                 } else if ($G.uarmf) {
                     dmg = $c.div32(dmg + 1 | 0, 2);
                 }
-                await You($c.lit("hit yourself in the %s."), await body_part(5 /* FOOT */));
-                $c.__builtin___sprintf_chk(new $c.Ptr(kbuf, 0), 0, 256, $c.lit("chopping off %s own %s"), genders[flags.female ? 1 : 0].his, await body_part(5 /* FOOT */));
-                await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(dmg + 1 | 0, 2) : dmg, new $c.Ptr(kbuf, 0), 1);
+                await You($c.lit("hit yourself in the %s."), await body_part(FOOT));
+                $c.__builtin___sprintf_chk(new $c.Ptr(kbuf, 0), 0, 256, $c.lit("chopping off %s own %s"), genders[flags.female ? 1 : 0].his, await body_part(FOOT));
+                await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(dmg + 1 | 0, 2) : dmg, new $c.Ptr(kbuf, 0), KILLED_BY);
             } else {
                 await You($c.lit("destroy the bear trap with %s."), await yobjnam($G.uwep, null));
                 await deltrap(ttmp);
@@ -353,7 +382,7 @@ async function dig() {   // dig.c:300
             }
             svc.context.digging.effort = 0;
             return 0;
-        } else if (ttmp && dcresult === 2) {
+        } else if (ttmp && dcresult === DIGCHECK_PASSED_DESTROY_TRAP) {
             ttmpname = trapname(ttmp.ttyp | 0, 0);
             if (ispick) {
                 await You($c.lit("destroy %s with %s."), ttmp.tseen | 0 ? await the(ttmpname) : await an(ttmpname), await yobjnam($G.uwep, null));
@@ -362,7 +391,7 @@ async function dig() {   // dig.c:300
             svc.context.digging.effort = 0;
             return 0;
         }
-        if (lev.typ === 32 /* ALTAR */) {
+        if (lev.typ === ALTAR) {
             await altar_wrath(dpx, dpy);
             await angry_priest();
         }
@@ -374,23 +403,23 @@ async function dig() {   // dig.c:300
     }
     if (svc.context.digging.effort > 100) {
         dmgtxt = null;
-        shopedge = in_rooms(dpx, dpy, 14 /* SHOPBASE */).get(0);
+        shopedge = in_rooms(dpx, dpy, SHOPBASE).get(0);
         digtyp = dig_typ($G.uwep, dpx, dpy);
         cleanup$: {
-            if (digtyp === 2 /* DIGTYP_STATUE */ && (obj = sobj_at(476 /* STATUE */, dpx, dpy)) !== null) {
+            if (digtyp === DIGTYP_STATUE && (obj = sobj_at(STATUE, dpx, dpy)) !== null) {
                 if (await break_statue(obj)) {
                     digtxt = $c.lit("The statue shatters.");
                 } else {
                     digtxt = null;
                 }
-            } else if (digtyp === 3 /* DIGTYP_BOULDER */ && (obj = sobj_at(475 /* BOULDER */, dpx, dpy)) !== null) {
+            } else if (digtyp === DIGTYP_BOULDER && (obj = sobj_at(BOULDER, dpx, dpy)) !== null) {
                 await fracture_rock(obj);
-                if ((bobj = sobj_at(475 /* BOULDER */, dpx, dpy)) !== null) {
+                if ((bobj = sobj_at(BOULDER, dpx, dpy)) !== null) {
                     await obj_extract_self(bobj);
                     await place_object(bobj, dpx, dpy);
                 }
                 digtxt = $c.lit("The boulder falls apart.");
-            } else if (lev.typ === 0 /* STONE */ || lev.typ === 15 /* SCORR */ || (lev.typ === 13 /* TREE */ || svl.level.flags.arboreal | 0 && lev.typ === 0 /* STONE */)) {
+            } else if (lev.typ === STONE || lev.typ === SCORR || (lev.typ === TREE || svl.level.flags.arboreal | 0 && lev.typ === STONE)) {
                 if ((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_earth_level)) {
                     if ($G.uwep.blessed | 0 && !rn2(3)) {
                         await mkcavearea(0);
@@ -400,47 +429,47 @@ async function dig() {   // dig.c:300
                         break cleanup$;
                     }
                 }
-                if (digtyp === 5 /* DIGTYP_TREE */) {
+                if (digtyp === DIGTYP_TREE) {
                     digtxt = $c.lit("You cut down the tree.");
-                    lev.typ = 25, lev.flags = (0) & 31;
+                    lev.typ = ROOM, lev.flags = (0) & 31;
                     if (!rn2(5)) {
                         await rnd_treefruit_at(dpx, dpy);
                     }
-                    if (gu.urace.mnum === 264 || gu.urole.mnum === 338) {
+                    if (gu.urace.mnum === PM_ELF || gu.urole.mnum === PM_RANGER) {
                         adjalign(-1);
                     }
                 } else {
                     digtxt = $c.lit("You succeed in cutting away some rock.");
-                    lev.typ = 24, lev.flags = (0) & 31;
+                    lev.typ = CORR, lev.flags = (0) & 31;
                 }
-            } else if (lev.typ && lev.typ <= 12 /* DBWALL */) {
+            } else if (lev.typ && lev.typ <= DBWALL) {
                 if (shopedge) {
                     await add_damage(dpx, dpy, $c.mul64(10, acurrstr()));
                     dmgtxt = $c.lit("damage");
                 }
                 if (svl.level.flags.is_maze_lev) {
-                    lev.typ = 25, lev.flags = (0) & 31;
+                    lev.typ = ROOM, lev.flags = (0) & 31;
                 } else if (svl.level.flags.is_cavernous_lev | 0 && !in_town(dpx, dpy)) {
-                    lev.typ = 24, lev.flags = (0) & 31;
+                    lev.typ = CORR, lev.flags = (0) & 31;
                 } else {
-                    lev.typ = 23, lev.flags = (0) & 31;
+                    lev.typ = DOOR, lev.flags = (D_NODOOR) & 31;
                 }
                 digtxt = $c.lit("You make an opening in the wall.");
-            } else if (lev.typ === 14 /* SDOOR */) {
+            } else if (lev.typ === SDOOR) {
                 cvt_sdoor_to_door(lev);
                 digtxt = $c.lit("You break through a secret door!");
-                if (!((lev.flags | 0) & 16)) {
-                    lev.flags = (1) & 31;
+                if (!((lev.flags | 0) & D_TRAPPED)) {
+                    lev.flags = (D_BROKEN) & 31;
                 }
             } else if (closed_door(dpx, dpy)) {
                 $c.__builtin___sprintf_chk(new $c.Ptr(digbuf, 0), 0, 256, $c.lit("You break through the door with your %s."), await simpleonames($G.uwep));
                 digtxt = new $c.Ptr(digbuf, 0);
                 if (shopedge) {
-                    await add_damage(dpx, dpy, 400);
+                    await add_damage(dpx, dpy, SHOP_DOOR_COST);
                     dmgtxt = $c.lit("break");
                 }
-                if (!((lev.flags | 0) & 16)) {
-                    lev.flags = (1) & 31;
+                if (!((lev.flags | 0) & D_TRAPPED)) {
+                    lev.flags = (D_BROKEN) & 31;
                 }
             } else {
                 return 0;
@@ -456,14 +485,14 @@ async function dig() {   // dig.c:300
                 await pay_for_damage(dmgtxt, 0);
             }
             if ((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_earth_level) && !rn2(3)) {
-                mndx = rn2(2) ? 156 /* PM_EARTH_ELEMENTAL */ : 232 /* PM_XORN */;
-                if (await makemon($c.relem(mons, mndx), dpx, dpy, 131072)) {
+                mndx = rn2(2) ? PM_EARTH_ELEMENTAL : PM_XORN;
+                if (await makemon($c.relem(mons, mndx), dpx, dpy, MM_NOMSG)) {
                     await pline_The($c.lit("debris from your digging comes to life!"));
                 }
             }
-            if (lev.typ === 23 /* DOOR */ && (lev.flags | 0) & 16) {
-                lev.flags = (0) & 31;
-                await b_trapped($c.lit("door"), -1 /* NO_PART */);
+            if (lev.typ === DOOR && (lev.flags | 0) & D_TRAPPED) {
+                lev.flags = (D_NODOOR) & 31;
+                await b_trapped($c.lit("door"), NO_PART);
                 recalc_block_point(dpx, dpy);
                 await newsym(dpx, dpy);
             }
@@ -475,12 +504,12 @@ async function dig() {   // dig.c:300
         return 0;
     } else {
         dig_target = dig_typ($G.uwep, dpx, dpy);
-        if (lev.typ && lev.typ <= 12 /* DBWALL */ || dig_target === 4 /* DIGTYP_DOOR */) {
-            if (in_rooms(dpx, dpy, 14 /* SHOPBASE */).get(0)) {
-                await pline($c.lit("This %s seems too hard to %s."), lev.typ === 23 /* DOOR */ ? $c.lit("door") : $c.lit("wall"), verb);
+        if (lev.typ && lev.typ <= DBWALL || dig_target === DIGTYP_DOOR) {
+            if (in_rooms(dpx, dpy, SHOPBASE).get(0)) {
+                await pline($c.lit("This %s seems too hard to %s."), lev.typ === DOOR ? $c.lit("door") : $c.lit("wall"), verb);
                 return 0;
             }
-        } else if (dig_target === 0 /* DIGTYP_UNDIGGABLE */ || dig_target === 1 /* DIGTYP_ROCK */ && !(lev.typ < 16 /* POOL */)) {
+        } else if (dig_target === DIGTYP_UNDIGGABLE || dig_target === DIGTYP_ROCK && !(lev.typ < POOL)) {
             return 0;
         }
         if (!gd.did_dig_msg) {
@@ -494,13 +523,13 @@ async function dig() {   // dig.c:300
 async function furniture_handled(x, y, madeby_u) {   // dig.c:571
     let lev = null, bx = Int16Array.of(0), by = Int16Array.of(0);
     lev = $c.relem(svl.level.locations[x], y);
-    if (lev.typ === 28 /* FOUNTAIN */) {
+    if (lev.typ === FOUNTAIN) {
         await dogushforth(0);
-        svl.level.locations[x][y].flags = ((svl.level.locations[x][y].flags | 0 | 2) >>> 0) & 31;
+        svl.level.locations[x][y].flags = ((svl.level.locations[x][y].flags | 0 | F_WARNED) >>> 0) & 31;
         await dryup(x, y, madeby_u);
-    } else if (lev.typ === 30 /* SINK */) {
+    } else if (lev.typ === SINK) {
         await breaksink(x, y);
-    } else if (lev.typ === 34 /* DRAWBRIDGE_DOWN */ || is_drawbridge_wall(x, y) >= 0) {
+    } else if (lev.typ === DRAWBRIDGE_DOWN || is_drawbridge_wall(x, y) >= 0) {
         bx[0] = x;
         by[0] = y;
         find_drawbridge(new $c.Ptr(bx, 0), new $c.Ptr(by, 0));
@@ -540,13 +569,13 @@ export function fillholetyp(x, y, fill_if_any) {   // dig.c:606
         pool_cnt = $c.div32(pool_cnt, 3);
     }
     if (lava_cnt > (moat_cnt + pool_cnt | 0) && rn2(lava_cnt + 1 | 0) || lava_cnt && fill_if_any) {
-        return 20;
+        return LAVAPOOL;
     } else if (moat_cnt > 0 && rn2(moat_cnt + 1 | 0) || moat_cnt && fill_if_any) {
-        return 17;
+        return MOAT;
     } else if (pool_cnt > 0 && rn2(pool_cnt + 1 | 0) || pool_cnt && fill_if_any) {
-        return 16;
+        return POOL;
     } else {
-        return 25;
+        return ROOM;
     }
 }
 export async function digactualhole(x, y, madeby, ttyp) {   // dig.c:640
@@ -557,28 +586,28 @@ export async function digactualhole(x, y, madeby, ttyp) {   // dig.c:640
     madeby_obj = $c.i8(madeby === null ? 1 : 0);
     heros_fault = $c.i8(madeby_u || madeby_obj ? 1 : 0);
     at_u = $c.i8(x === u.ux && y === u.uy ? 1 : 0);
-    wont_fall = $c.i8((u.uprops[48 /* LEVITATION */].intrinsic || u.uprops[48 /* LEVITATION */].extrinsic) && !u.uprops[48 /* LEVITATION */].blocked || (u.uprops[49 /* FLYING */].intrinsic || u.uprops[49 /* FLYING */].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, 1) !== 0) && !u.uprops[49 /* FLYING */].blocked ? 1 : 0);
-    old_aligntyp = -128;
+    wont_fall = $c.i8((u.uprops[LEVITATION].intrinsic || u.uprops[LEVITATION].extrinsic) && !u.uprops[LEVITATION].blocked || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked ? 1 : 0);
+    old_aligntyp = A_NONE;
     if (at_u && u.utrap) {
-        if (u.utraptype === 6) {
+        if (u.utraptype === TT_BURIEDBALL) {
             await buried_ball_to_punishment();
-        } else if (u.utraptype === 5) {
+        } else if (u.utraptype === TT_INFLOOR) {
             await reset_utrap(0);
         }
     }
     if (await furniture_handled(x, y, madeby_u)) {
         return;
     }
-    if (ttyp !== 11 /* PIT */ && (!Can_dig_down(u.uz) && !lev.candig)) {
+    if (ttyp !== PIT && (!Can_dig_down(u.uz) && !lev.candig)) {
         await impossible($c.lit("digactualhole: can't dig %s on this level."), trapname(ttyp, 1));
-        ttyp = 11 /* PIT */;
+        ttyp = PIT;
     }
     old_typ = lev.typ;
     furniture[0] = 0;
-    if (lev.typ >= 26 /* STAIRS */ && lev.typ <= 32 /* ALTAR */) {
-        surface_type = lev.typ >= 25 /* ROOM */ && !((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_earth_level)) ? $c.lit("floor") : $c.lit("ground");
-        if (lev.typ === 32 /* ALTAR */) {
-            old_aligntyp = $c.i8(((svl.level.locations[x][y].flags | 0) & 7 & 7) === 0 ? -128 : ((svl.level.locations[x][y].flags | 0) & 7 & 7) === 4 ? 1 : ((svl.level.locations[x][y].flags | 0) & 7 & 7) - 2 | 0);
+    if (lev.typ >= STAIRS && lev.typ <= ALTAR) {
+        surface_type = lev.typ >= ROOM && !((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_earth_level)) ? $c.lit("floor") : $c.lit("ground");
+        if (lev.typ === ALTAR) {
+            old_aligntyp = $c.i8(((svl.level.locations[x][y].flags | 0) & 7 & AM_MASK) === 0 ? A_NONE : ((svl.level.locations[x][y].flags | 0) & 7 & AM_MASK) === AM_LAWFUL ? A_LAWFUL : ((svl.level.locations[x][y].flags | 0) & 7 & AM_MASK) - 2 | 0);
             $c.__builtin___strcpy_chk(new $c.Ptr(furniture, 0), align_str($c.i8(old_aligntyp)), 256);
             $c.__builtin___strcat_chk(new $c.Ptr(furniture, 0), $c.lit(" "), 256);
         }
@@ -586,7 +615,7 @@ export async function digactualhole(x, y, madeby, ttyp) {   // dig.c:640
     } else {
         surface_type = surface(x, y);
     }
-    shopdoor = $c.i8(lev.typ === 23 /* DOOR */ && in_rooms(x, y, 14 /* SHOPBASE */).get(0) ? 1 : 0);
+    shopdoor = $c.i8(lev.typ === DOOR && in_rooms(x, y, SHOPBASE).get(0) ? 1 : 0);
     oldobjs = svl.level.objects[x][y];
     ttmp = await maketrap(x, y, ttyp);
     if (!ttmp) {
@@ -595,13 +624,13 @@ export async function digactualhole(x, y, madeby, ttyp) {   // dig.c:640
     newobjs = svl.level.objects[x][y];
     ttmp.madeby_u = (heros_fault >>> 0) & 1;
     ttmp.tseen = (0) & 1;
-    if ((gv.viz_array.get(y).get(x) & 2) !== 0) {
+    if ((gv.viz_array.get(y).get(x) & IN_SIGHT) !== 0) {
         await seetrap(ttmp);
     } else if (madeby_u) {
         await feeltrap(ttmp);
     }
     tname = trapname(ttyp, 1);
-    in_thru = ttyp === 13 /* HOLE */ ? $c.lit("through") : $c.lit("in");
+    in_thru = ttyp === HOLE ? $c.lit("through") : $c.lit("in");
     if (madeby_u) {
         if (x !== u.ux || y !== u.uy) {
             await You($c.lit("dig an adjacent %s."), tname);
@@ -610,35 +639,35 @@ export async function digactualhole(x, y, madeby, ttyp) {   // dig.c:640
         }
     } else if (!madeby_obj && canseemon(madeby)) {
         await pline($c.lit("%s digs %s %s the %s."), await Monnam(madeby), await an(tname), in_thru, surface_type);
-    } else if ((gv.viz_array.get(y).get(x) & 2) !== 0 && flags.verbose) {
-        if (old_typ <= 12 /* DBWALL */) {
+    } else if ((gv.viz_array.get(y).get(x) & IN_SIGHT) !== 0 && flags.verbose) {
+        if (old_typ <= DBWALL) {
             await pline_The($c.lit("%s crumbles into %s."), surface_type, await an(tname));
         } else {
             await pline($c.lit("%s appears in the %s."), await An(tname), surface_type);
         }
     }
-    if (old_typ >= 26 /* STAIRS */ && old_typ <= 32 /* ALTAR */ && (gv.viz_array.get(y).get(x) & 2) !== 0) {
+    if (old_typ >= STAIRS && old_typ <= ALTAR && (gv.viz_array.get(y).get(x) & IN_SIGHT) !== 0) {
         await pline_The($c.lit("%s falls into the %s!"), new $c.Ptr(furniture, 0), tname);
     }
-    if (heros_fault && old_typ === 32 /* ALTAR */) {
+    if (heros_fault && old_typ === ALTAR) {
         await desecrate_altar(0, $c.i8(old_aligntyp));
     }
-    if (ttyp === 11 /* PIT */) {
+    if (ttyp === PIT) {
         if (shopdoor && heros_fault) {
             await pay_for_damage($c.lit("ruin"), 0);
         } else {
-            await add_damage(x, y, heros_fault ? 100 : 0);
+            await add_damage(x, y, heros_fault ? SHOP_PIT_COST : 0);
         }
         if (madeby_u) {
             await wake_nearby(0);
         }
         await switch_terrain();
-        if ((u.uprops[48 /* LEVITATION */].intrinsic || u.uprops[48 /* LEVITATION */].extrinsic) && !u.uprops[48 /* LEVITATION */].blocked || (u.uprops[49 /* FLYING */].intrinsic || u.uprops[49 /* FLYING */].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, 1) !== 0) && !u.uprops[49 /* FLYING */].blocked) {
+        if ((u.uprops[LEVITATION].intrinsic || u.uprops[LEVITATION].extrinsic) && !u.uprops[LEVITATION].blocked || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked) {
             wont_fall = 1;
         }
         if (at_u) {
             if (!wont_fall) {
-                set_utrap((rn2(4) + 2 | 0) >>> 0, 2);
+                set_utrap((rn2(4) + 2 | 0) >>> 0, TT_PIT);
                 gv.vision_full_recalc = 1;
             } else {
                 await reset_utrap(1);
@@ -647,18 +676,18 @@ export async function digactualhole(x, y, madeby, ttyp) {   // dig.c:640
                 await pickup(1);
             }
         } else if (mtmp) {
-            if ($c.andu64(mtmp.data.mflags1, 1) !== 0 || (mtmp.data.mlet === 5 /* S_EYE */ || mtmp.data.mlet === 25 /* S_LIGHT */)) {
+            if ($c.andu64(mtmp.data.mflags1, M1_FLY) !== 0 || (mtmp.data.mlet === S_EYE || mtmp.data.mlet === S_LIGHT)) {
                 if (canseemon(mtmp)) {
-                    await pline($c.lit("%s %s over the pit."), await Monnam(mtmp), $c.andu64(mtmp.data.mflags1, 1) !== 0 ? $c.lit("flies") : $c.lit("floats"));
+                    await pline($c.lit("%s %s over the pit."), await Monnam(mtmp), $c.andu64(mtmp.data.mflags1, M1_FLY) !== 0 ? $c.lit("flies") : $c.lit("floats"));
                 }
             } else if (!$c.peq(mtmp, madeby)) {
-                await mintrap(mtmp, 0);
+                await mintrap(mtmp, NO_TRAP_FLAGS);
             }
         }
     } else {
         if (at_u) {
             await switch_terrain();
-            if ((u.uprops[48 /* LEVITATION */].intrinsic || u.uprops[48 /* LEVITATION */].extrinsic) && !u.uprops[48 /* LEVITATION */].blocked || (u.uprops[49 /* FLYING */].intrinsic || u.uprops[49 /* FLYING */].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, 1) !== 0) && !u.uprops[49 /* FLYING */].blocked) {
+            if ((u.uprops[LEVITATION].intrinsic || u.uprops[LEVITATION].extrinsic) && !u.uprops[LEVITATION].blocked || (u.uprops[FLYING].intrinsic || u.uprops[FLYING].extrinsic || u.usteed && $c.andu64(u.usteed.data.mflags1, M1_FLY) !== 0) && !u.uprops[FLYING].blocked) {
                 wont_fall = 1;
             }
             if (!u.ustuck && !wont_fall && !await next_to_u()) {
@@ -695,7 +724,7 @@ export async function digactualhole(x, y, madeby, ttyp) {   // dig.c:640
                 await impact_drop(null, x, y, 0);
             }
             if (mtmp) {
-                if (!(!($c.andu64(mtmp.data.mflags1, 1) !== 0) && !(mtmp.data.mlet === 5 /* S_EYE */ || mtmp.data.mlet === 25 /* S_LIGHT */) && (!($c.andu64(mtmp.data.mflags1, 16) !== 0) || !has_ceiling(u.uz))) || mtmp.wormno | 0 && count_wsegs(mtmp) > 5 || mtmp.data.msize >= 4) {
+                if (!(!($c.andu64(mtmp.data.mflags1, M1_FLY) !== 0) && !(mtmp.data.mlet === S_EYE || mtmp.data.mlet === S_LIGHT) && (!($c.andu64(mtmp.data.mflags1, M1_CLING) !== 0) || !has_ceiling(u.uz))) || mtmp.wormno | 0 && count_wsegs(mtmp) > 5 || mtmp.data.msize >= MZ_HUGE) {
                     return;
                 }
                 if ($c.peq(mtmp, u.ustuck)) {
@@ -715,7 +744,7 @@ export async function digactualhole(x, y, madeby, ttyp) {   // dig.c:640
                     if (mtmp.isshk) {
                         await make_angry_shk(mtmp, 0, 0);
                     }
-                    await migrate_to_level(mtmp, ledger_no(tolevel), 0, null);
+                    await migrate_to_level(mtmp, ledger_no(tolevel), MIGR_RANDOM, null);
                 }
             }
         }
@@ -736,10 +765,10 @@ export async function liquid_flow(x, y, typ, ttmp, fillmsg) {   // dig.c:838
     await obj_ice_effects(x, y, 1);
     await unearth_objs(x, y);
     if (fillmsg) {
-        await pline(fillmsg, hliquid(typ === 20 /* LAVAPOOL */ ? $c.lit("lava") : $c.lit("water")));
+        await pline(fillmsg, hliquid(typ === LAVAPOOL ? $c.lit("lava") : $c.lit("water")));
     }
     if ((objchain = svl.level.objects[x][y]) !== null) {
-        if (typ === 20 /* LAVAPOOL */) {
+        if (typ === LAVAPOOL) {
             await fire_damage_chain(objchain, 1, 1, x, y);
         } else {
             await water_damage_chain(objchain, 1);
@@ -767,18 +796,18 @@ export async function dighole(pit_only, by_magic, cc) {   // dig.c:885
     ttmp = t_at(dig_x, dig_y);
     lev = $c.relem(svl.level.locations[dig_x], dig_y);
     dig_check_result = dig_check(gy.youmonst, dig_x, dig_y);
-    nohole = $c.i8(dig_check_result === 12 || dig_check_result === 10 ? 1 : 0);
+    nohole = $c.i8(dig_check_result === DIGCHECK_FAIL_CANTDIG || dig_check_result === DIGCHECK_FAIL_TOOHARD ? 1 : 0);
     old_typ = lev.typ;
-    if (ttmp && ((ttmp.ttyp | 0) === 17 /* MAGIC_PORTAL */ || (ttmp.ttyp | 0) === 23 /* VIBRATING_SQUARE */ || nohole) || old_typ < 16 /* POOL */ && old_typ !== 14 /* SDOOR */ && ((lev.flags | 0) & 8) !== 0) {
+    if (ttmp && ((ttmp.ttyp | 0) === MAGIC_PORTAL || (ttmp.ttyp | 0) === VIBRATING_SQUARE || nohole) || old_typ < POOL && old_typ !== SDOOR && ((lev.flags | 0) & W_NONDIGGABLE) !== 0) {
         await pline_The($c.lit("%s %shere is too hard to dig in."), surface(dig_x, dig_y), dig_x !== u.ux || dig_y !== u.uy ? $c.lit("t") : $c.lit(""));
-    } else if (ttmp && ((ttmp.ttyp | 0) === 15 /* TELEP_TRAP */ || (ttmp.ttyp | 0) === 16 /* LEVEL_TELEP */ || (ttmp.ttyp | 0) === 20 /* MAGIC_TRAP */ || (ttmp.ttyp | 0) === 21 /* ANTI_MAGIC */ || (ttmp.ttyp | 0) === 22 /* POLY_TRAP */)) {
-        await explode(dig_x, dig_y, 0, 20 + d(3, 6) | 0, 21, 4 /* EXPL_MAGICAL */);
+    } else if (ttmp && ((ttmp.ttyp | 0) === TELEP_TRAP || (ttmp.ttyp | 0) === LEVEL_TELEP || (ttmp.ttyp | 0) === MAGIC_TRAP || (ttmp.ttyp | 0) === ANTI_MAGIC || (ttmp.ttyp | 0) === POLY_TRAP)) {
+        await explode(dig_x, dig_y, 0, 20 + d(3, 6) | 0, MAXOCLASSES + 3, EXPL_MAGICAL);
         await deltrap(ttmp);
         await newsym(dig_x, dig_y);
     } else if (is_pool_or_lava(dig_x, dig_y)) {
         await pline_The($c.lit("%s sloshes furiously for a moment, then subsides."), hliquid(is_lava(dig_x, dig_y) ? $c.lit("lava") : $c.lit("water")));
         await wake_nearby(0);
-    } else if (old_typ === 34 /* DRAWBRIDGE_DOWN */ || is_drawbridge_wall(dig_x, dig_y) >= 0) {
+    } else if (old_typ === DRAWBRIDGE_DOWN || is_drawbridge_wall(dig_x, dig_y) >= 0) {
         if (pit_only) {
             await pline_The($c.lit("drawbridge seems too hard to dig through."));
         } else {
@@ -788,52 +817,52 @@ export async function dighole(pit_only, by_magic, cc) {   // dig.c:885
             await destroy_drawbridge(x[0], y[0]);
             retval = 1;
         }
-    } else if ((boulder_here = sobj_at(475 /* BOULDER */, dig_x, dig_y)) !== null) {
-        if (ttmp && ((ttmp.ttyp | 0) === 11 /* PIT */ || (ttmp.ttyp | 0) === 12 /* SPIKED_PIT */) && rn2(2)) {
+    } else if ((boulder_here = sobj_at(BOULDER, dig_x, dig_y)) !== null) {
+        if (ttmp && ((ttmp.ttyp | 0) === PIT || (ttmp.ttyp | 0) === SPIKED_PIT) && rn2(2)) {
             await pline_The($c.lit("boulder settles into the %spit."), dig_x !== u.ux || dig_y !== u.uy ? $c.lit("adjacent ") : $c.lit(""));
-            ttmp.ttyp = (11) & 31;
+            ttmp.ttyp = (PIT) & 31;
         } else {
             await pline($c.lit("KADOOM!  The boulder falls in!"));
             await wake_nearby(0);
             await delfloortrap(ttmp);
         }
         await delobj(boulder_here);
-    } else if (old_typ === 31 /* GRAVE */) {
-        await digactualhole(dig_x, dig_y, gy.youmonst, 11 /* PIT */);
+    } else if (old_typ === GRAVE) {
+        await digactualhole(dig_x, dig_y, gy.youmonst, PIT);
         await dig_up_grave(cc);
         retval = 1;
-    } else if (old_typ === 19 /* DRAWBRIDGE_UP */) {
+    } else if (old_typ === DRAWBRIDGE_UP) {
         typ = fillholetyp(dig_x, dig_y, 0);
-        if (typ === 25 /* ROOM */) {
+        if (typ === ROOM) {
             await pline_The($c.lit("%s %shere is too hard to dig in."), surface(dig_x, dig_y), dig_x !== u.ux || dig_y !== u.uy ? $c.lit("t") : $c.lit(""));
         } else {
-            lev.flags = (((lev.flags | 0) & -29) >>> 0) & 31;
-            lev.flags = ((lev.flags | 0 | (typ === 20 /* LAVAPOOL */ ? 4 : 0)) >>> 0) & 31;
+            lev.flags = (((lev.flags | 0) & ~DB_UNDER) >>> 0) & 31;
+            lev.flags = ((lev.flags | 0 | (typ === LAVAPOOL ? DB_LAVA : DB_MOAT)) >>> 0) & 31;
             await liquid_flow(dig_x, dig_y, typ, ttmp, $c.lit("As you dig, the hole fills with %s!"));
             retval = 1;
         }
-    } else if (old_typ === 29 /* THRONE */) {
+    } else if (old_typ === THRONE) {
         await pline_The($c.lit("throne is too hard to break apart."));
-    } else if (old_typ === 32 /* ALTAR */) {
+    } else if (old_typ === ALTAR) {
         await pline_The($c.lit("altar is too hard to break apart."));
     } else {
         typ = fillholetyp(dig_x, dig_y, 0);
         lev.flags = (0) & 31;
-        if (typ !== 25 /* ROOM */) {
+        if (typ !== ROOM) {
             if (!await furniture_handled($c.i16(dig_x), $c.i16(dig_y), 1)) {
                 lev.typ = typ;
                 await liquid_flow(dig_x, dig_y, typ, ttmp, $c.lit("As you dig, the hole fills with %s!"));
             }
             retval = 1;
         } else {
-            if (by_magic && ttmp && ((ttmp.ttyp | 0) === 6 /* LANDMINE */ || (ttmp.ttyp | 0) === 5 /* BEAR_TRAP */)) {
-                otyp = (ttmp.ttyp | 0) === 6 /* LANDMINE */ ? 243 /* LAND_MINE */ : 244 /* BEARTRAP */;
+            if (by_magic && ttmp && ((ttmp.ttyp | 0) === LANDMINE || (ttmp.ttyp | 0) === BEAR_TRAP)) {
+                otyp = (ttmp.ttyp | 0) === LANDMINE ? LAND_MINE : BEARTRAP;
                 await cnv_trap_obj(otyp, 1, ttmp, 1);
             }
-            if (nohole || pit_only || dig_check_result === 2 || dig_check_result === 3) {
-                await digactualhole(dig_x, dig_y, gy.youmonst, 11 /* PIT */);
+            if (nohole || pit_only || dig_check_result === DIGCHECK_PASSED_DESTROY_TRAP || dig_check_result === DIGCHECK_PASSED_PITONLY) {
+                await digactualhole(dig_x, dig_y, gy.youmonst, PIT);
             } else {
-                await digactualhole(dig_x, dig_y, gy.youmonst, 13 /* HOLE */);
+                await digactualhole(dig_x, dig_y, gy.youmonst, HOLE);
             }
             retval = 1;
         }
@@ -853,14 +882,14 @@ async function dig_up_grave(cc) {   // dig.c:1027
             return;
         }
     }
-    await exercise(2 /* A_WIS */, 0);
-    if (gu.urole.mnum === 331) {
+    await exercise(A_WIS, 0);
+    if (gu.urole.mnum === PM_ARCHEOLOGIST) {
         adjalign(Math.imul(-sgn(u.ualign.type) | 0, 3));
         await You_feel($c.lit("like a despicable grave-robber!"));
-    } else if (gu.urole.mnum === 340) {
+    } else if (gu.urole.mnum === PM_SAMURAI) {
         adjalign(-sgn(u.ualign.type) | 0);
         await You($c.lit("disturb the honorable dead!"));
-    } else if (u.ualign.type === 1) {
+    } else if (u.ualign.type === A_LAWFUL) {
         if (u.ualign.record > -10) {
             adjalign(-1);
         }
@@ -871,27 +900,27 @@ async function dig_up_grave(cc) {   // dig.c:1027
         case 0:
         case 1:
             await You($c.lit("unearth a corpse."));
-            if ((otmp = await mk_tt_object(265 /* CORPSE */, dig_x, dig_y)) !== null) {
-                otmp.age = $c.sub64(otmp.age, 51);
+            if ((otmp = await mk_tt_object(CORPSE, dig_x, dig_y)) !== null) {
+                otmp.age = $c.sub64(otmp.age, TAINT_AGE + 1);
             }
             break;
         case 2:
-            if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
-                await pline($c.lit("%s!"), u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic) ? $c.lit("Dude!  The living dead") : $c.lit("The grave's owner is very upset"));
+            if (!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked)) {
+                await pline($c.lit("%s!"), u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? $c.lit("Dude!  The living dead") : $c.lit("The grave's owner is very upset"));
             }
-            await makemon(await mkclass(52, 0), dig_x, dig_y, 131072);
+            await makemon(await mkclass(S_ZOMBIE, 0), dig_x, dig_y, MM_NOMSG);
             break;
         case 3:
-            if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
-                await pline($c.lit("%s!"), u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic) ? $c.lit("I want my mummy") : $c.lit("You've disturbed a tomb"));
+            if (!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked)) {
+                await pline($c.lit("%s!"), u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) ? $c.lit("I want my mummy") : $c.lit("You've disturbed a tomb"));
             }
-            await makemon(await mkclass(39, 0), dig_x, dig_y, 131072);
+            await makemon(await mkclass(S_MUMMY, 0), dig_x, dig_y, MM_NOMSG);
             break;
         default:
             await pline_The($c.lit("grave is unoccupied.  Strange..."));
             break;
     }
-    svl.level.locations[dig_x][dig_y].typ = 25;
+    svl.level.locations[dig_x][dig_y].typ = ROOM;
     svl.level.locations[dig_x][dig_y].flags = (0) & 31;
     svl.level.locations[dig_x][dig_y].horizontal = (0) & 1;
     await del_engr_at(dig_x, dig_y);
@@ -900,33 +929,33 @@ async function dig_up_grave(cc) {   // dig.c:1027
 }
 export async function use_pick_axe(obj) {   // dig.c:1092
     let verb = null, dsp = null, dirsyms = new Int8Array(12), qbuf = new Int8Array(256), ispick = 0, rx = 0, ry = 0, downok = 0, res = 0, dir = 0, dirch = 0, $t1;
-    res = 0;
+    res = ECMD_OK;
     if (!$c.peq(obj, $G.uwep)) {
         if (await wield_tool(obj, $c.lit("swing"))) {
-            await cmdq_add_ec(0 /* CQ_CANNED */, doapply);
-            await cmdq_add_key(0 /* CQ_CANNED */, obj.invlet);
-            return 1;
+            await cmdq_add_ec(CQ_CANNED, doapply);
+            await cmdq_add_key(CQ_CANNED, obj.invlet);
+            return ECMD_TIME;
         }
-        return 0;
+        return ECMD_OK;
     }
-    ispick = $c.i8((obj.oclass === 2 /* WEAPON_CLASS */ || obj.oclass === 6 /* TOOL_CLASS */) && objects[obj.otyp].oc_subtyp === 4 /* P_PICK_AXE */ ? 1 : 0);
+    ispick = $c.i8((obj.oclass === WEAPON_CLASS || obj.oclass === TOOL_CLASS) && objects[obj.otyp].oc_subtyp === P_PICK_AXE ? 1 : 0);
     verb = ispick ? $c.lit("dig") : $c.lit("chop");
-    if (u.utrap && u.utraptype === 3) {
+    if (u.utrap && u.utraptype === TT_WEB) {
         await pline($c.lit("%s you can't %s while entangled in a web."), !res ? $c.lit("Unfortunately,") : $c.lit("But"), verb);
         return res;
     }
     downok = !!can_reach_floor(0) ? 1 : 0;
     dsp = new $c.Ptr(dirsyms, 0);
-    for (dir = 0; dir < 10 /* N_DIRS_Z */; dir = dir + 1 | 0) {
-        dirch = await cmd_from_dir(dir, 0 /* MV_WALK */);
+    for (dir = 0; dir < N_DIRS_Z; dir = dir + 1 | 0) {
+        dirch = await cmd_from_dir(dir, MV_WALK);
         if (u.uswallow) {
-        } else if (movecmd(dirch, 0 /* MV_WALK */)) {
+        } else if (movecmd(dirch, MV_WALK)) {
             if (!dxdy_moveok()) {
                 continue;
             }
             rx = u.ux + u.dx | 0;
             ry = u.uy + u.dy | 0;
-            if (!isok($c.i16(rx), $c.i16(ry)) || dig_typ(obj, $c.i16(rx), $c.i16(ry)) === 0 /* DIGTYP_UNDIGGABLE */) {
+            if (!isok($c.i16(rx), $c.i16(ry)) || dig_typ(obj, $c.i16(rx), $c.i16(ry)) === DIGTYP_UNDIGGABLE) {
                 continue;
             }
         } else {
@@ -939,19 +968,19 @@ export async function use_pick_axe(obj) {   // dig.c:1092
     dsp.set(0, 0);
     $c.__builtin___sprintf_chk(new $c.Ptr(qbuf, 0), 0, 256, $c.lit("In what direction do you want to %s? [%s]"), verb, new $c.Ptr(dirsyms, 0));
     if (!await getdir(new $c.Ptr(qbuf, 0))) {
-        return res | 2;
+        return res | ECMD_CANCEL;
     }
     return await use_pick_axe2(obj);
 }
 export async function use_pick_axe2(obj) {   // dig.c:1162
     let rx = 0, ry = 0, lev = null, trap = null, trap_with_u = null, dig_target = 0, ispick = 0, verbing = null, buf = new Int8Array(256), dam = 0, boulder = null, what = null, vibrate = 0, idx = 0, adjidx = 0, $t1;
-    ispick = $c.i8((obj.oclass === 2 /* WEAPON_CLASS */ || obj.oclass === 6 /* TOOL_CLASS */) && objects[obj.otyp].oc_subtyp === 4 /* P_PICK_AXE */ ? 1 : 0);
+    ispick = $c.i8((obj.oclass === WEAPON_CLASS || obj.oclass === TOOL_CLASS) && objects[obj.otyp].oc_subtyp === P_PICK_AXE ? 1 : 0);
     verbing = ispick ? $c.lit("digging") : $c.lit("chopping");
     if (u.uswallow | 0 && await do_attack(u.ustuck)) {
     } else if (u.uinwater) {
         await pline($c.lit("Turbulence torpedoes your %s attempts."), verbing);
     } else if (u.dz < 0) {
-        if ((u.uprops[48 /* LEVITATION */].intrinsic || u.uprops[48 /* LEVITATION */].extrinsic) && !u.uprops[48 /* LEVITATION */].blocked) {
+        if ((u.uprops[LEVITATION].intrinsic || u.uprops[LEVITATION].extrinsic) && !u.uprops[LEVITATION].blocked) {
             await You($c.lit("don't have enough leverage."));
         } else {
             await You_cant($c.lit("reach the %s."), ceiling(u.ux, u.uy));
@@ -963,25 +992,25 @@ export async function use_pick_axe2(obj) {   // dig.c:1162
         }
         await You($c.lit("hit yourself with %s."), await yname($G.uwep));
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s own %s"), genders[flags.female ? 1 : 0].his, obj_descr[objects[obj.otyp].oc_name_idx].oc_name);
-        await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(dam + 1 | 0, 2) : dam, new $c.Ptr(buf, 0), 1);
+        await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(dam + 1 | 0, 2) : dam, new $c.Ptr(buf, 0), KILLED_BY);
         disp.botl = 1;
-        return 1;
+        return ECMD_TIME;
     } else if (u.dz === 0) {
         confdir(0);
         rx = $c.i16(u.ux + u.dx | 0);
         ry = $c.i16(u.uy + u.dy | 0);
         if (!isok(rx, ry)) {
             await pline($c.lit("Clash!"));
-            return 1;
+            return ECMD_TIME;
         }
         lev = $c.relem(svl.level.locations[rx], ry);
         if (svl.level.monsters[rx][ry] !== null && await do_attack(svl.level.monsters[rx][ry])) {
-            return 1;
+            return ECMD_TIME;
         }
         dig_target = dig_typ(obj, rx, ry);
-        if (dig_target === 0 /* DIGTYP_UNDIGGABLE */) {
+        if (dig_target === DIGTYP_UNDIGGABLE) {
             trap = t_at(rx, ry);
-            if (trap && (trap.ttyp | 0) === 18 /* WEB */) {
+            if (trap && (trap.ttyp | 0) === WEB) {
                 if (!trap.tseen) {
                     await seetrap(trap);
                     await There($c.lit("is a spider web there!"));
@@ -990,39 +1019,39 @@ export async function use_pick_axe2(obj) {   // dig.c:1162
                 nomul(-d(2, 2) | 0);
                 gm.multi_reason = $c.lit("stuck in a spider web");
                 gn.nomovemsg = $c.lit("You pull free.");
-            } else if (lev.typ === 22 /* IRONBARS */) {
+            } else if (lev.typ === IRONBARS) {
                 await pline($c.lit("Clang!"));
                 await wake_nearby(0);
-            } else if (lev.typ === 18 /* WATER */) {
+            } else if (lev.typ === WATER) {
                 await pline($c.lit("Splash!"));
-            } else if (lev.typ === 21 /* LAVAWALL */) {
+            } else if (lev.typ === LAVAWALL) {
                 await pline($c.lit("Splash!"));
                 await fire_damage($G.uwep, 0, rx, ry);
-            } else if (lev.typ === 13 /* TREE */ || svl.level.flags.arboreal | 0 && lev.typ === 0 /* STONE */) {
+            } else if (lev.typ === TREE || svl.level.flags.arboreal | 0 && lev.typ === STONE) {
                 await You($c.lit("need an axe to cut down a tree."));
-            } else if (lev.typ < 16 /* POOL */) {
+            } else if (lev.typ < POOL) {
                 await You($c.lit("need a pick to dig rock."));
-            } else if ((boulder = sobj_at(475 /* BOULDER */, rx, ry)) !== null || sobj_at(476 /* STATUE */, rx, ry)) {
+            } else if ((boulder = sobj_at(BOULDER, rx, ry)) !== null || sobj_at(STATUE, rx, ry)) {
                 what = boulder ? $c.lit("boulder") : $c.lit("statue");
                 if (!ispick) {
                     vibrate = $c.i8(!rn2(3) ? 1 : 0);
                     await pline($c.lit("Sparks fly as you whack the %s.%s"), what, vibrate ? $c.lit("  The axe-handle vibrates violently!") : $c.lit(""));
                     if (vibrate) {
-                        await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? 1 : 2, $c.lit("axing a hard object"), 1);
+                        await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? 1 : 2, $c.lit("axing a hard object"), KILLED_BY);
                     }
                     await wake_nearby(0);
                 } else {
                     await You_cant($c.lit("reach the %s."), what);
                 }
-            } else if (u.utrap && u.utraptype === 2 && trap && (trap_with_u = t_at(u.ux, u.uy)) && ((trap.ttyp | 0) === 11 /* PIT */ || (trap.ttyp | 0) === 12 /* SPIKED_PIT */) && !conjoined_pits(trap, trap_with_u, 0)) {
+            } else if (u.utrap && u.utraptype === TT_PIT && trap && (trap_with_u = t_at(u.ux, u.uy)) && ((trap.ttyp | 0) === PIT || (trap.ttyp | 0) === SPIKED_PIT) && !conjoined_pits(trap, trap_with_u, 0)) {
                 idx = xytodir(u.dx, u.dy);
-                if (idx !== -1 /* DIR_ERR */) {
-                    adjidx = $c.rem32(idx + 4 | 0, 8);
+                if (idx !== DIR_ERR) {
+                    adjidx = $c.rem32(idx + 4 | 0, N_DIRS_Z - 2);
                     trap_with_u.vl.v_conjoined = $c.u8(trap_with_u.vl.v_conjoined | 1 << idx);
                     trap.vl.v_conjoined = $c.u8(trap.vl.v_conjoined | 1 << adjidx);
                     await You($c.lit("clear some debris from between the pits."));
                 }
-            } else if (u.utrap && u.utraptype === 2 && (trap_with_u = t_at(u.ux, u.uy)) !== null) {
+            } else if (u.utrap && u.utraptype === TT_PIT && (trap_with_u = t_at(u.ux, u.uy)) !== null) {
                 await You($c.lit("swing %s, but the rubble has no place to go."), await yobjnam(obj, null));
             } else {
                 await You($c.lit("swing %s through thin air."), await yobjnam(obj, null));
@@ -1031,7 +1060,7 @@ export async function use_pick_axe2(obj) {   // dig.c:1162
             gd.did_dig_msg = 0;
             svc.context.digging.quiet = 0;
             if (svc.context.digging.pos.x !== rx || svc.context.digging.pos.y !== ry || !on_level(svc.context.digging.level, u.uz) || svc.context.digging.down) {
-                if (flags.autodig && dig_target === 1 /* DIGTYP_ROCK */ && !svc.context.digging.down && (svc.context.digging.pos.x === u.ux && svc.context.digging.pos.y === u.uy) && (svm.moves <= $c.add64(svc.context.digging.lastdigtime, 2) && svm.moves >= svc.context.digging.lastdigtime)) {
+                if (flags.autodig && dig_target === DIGTYP_ROCK && !svc.context.digging.down && (svc.context.digging.pos.x === u.ux && svc.context.digging.pos.y === u.uy) && (svm.moves <= $c.add64(svc.context.digging.lastdigtime, 2) && svm.moves >= svc.context.digging.lastdigtime)) {
                     gd.did_dig_msg = 1;
                     svc.context.digging.quiet = 1;
                 }
@@ -1057,11 +1086,11 @@ export async function use_pick_axe2(obj) {   // dig.c:1162
     } else if (is_pool_or_lava(u.ux, u.uy)) {
         await You($c.lit("cannot stay under%s long enough."), is_pool(u.ux, u.uy) ? $c.lit("water") : $c.lit(" the lava"));
     } else if ((trap = t_at(u.ux, u.uy)) !== null && (uteetering_at_seen_pit(trap) || uescaped_shaft(trap))) {
-        await dotrap(trap, 4);
+        await dotrap(trap, FORCEBUNGLE);
         if (!u.utrap) {
             await cant_reach_floor(u.ux, u.uy, 0, 1, 0);
         }
-    } else if (!ispick && (!trap || (trap.ttyp | 0) !== 6 /* LANDMINE */ && (trap.ttyp | 0) !== 5 /* BEAR_TRAP */)) {
+    } else if (!ispick && (!trap || (trap.ttyp | 0) !== LANDMINE && (trap.ttyp | 0) !== BEAR_TRAP)) {
         await pline($c.lit("%s merely scratches the %s."), await Yobjnam2(obj, null), surface(u.ux, u.uy));
         await u_wipe_engr(3);
     } else {
@@ -1076,7 +1105,7 @@ export async function use_pick_axe2(obj) {   // dig.c:1162
             await You($c.lit("start %s downward."), verbing);
             if (new $c.Ptr(u.ushops, 0).get(0)) {
                 await shopdig(0);
-                await add_damage(u.ux, u.uy, 100);
+                await add_damage(u.ux, u.uy, SHOP_PIT_COST);
             }
         } else {
             await You($c.lit("continue %s downward."), verbing);
@@ -1084,10 +1113,10 @@ export async function use_pick_axe2(obj) {   // dig.c:1162
         gd.did_dig_msg = 0;
         set_occupation(dig, verbing, 0);
     }
-    return 1;
+    return ECMD_TIME;
 }
 function watchman_canseeu(mtmp) {   // dig.c:1362
-    if (($c.peq(mtmp.data, $c.relem(mons, 282 /* PM_WATCHMAN */)) || $c.peq(mtmp.data, $c.relem(mons, 283 /* PM_WATCH_CAPTAIN */))) && mtmp.mcansee | 0 && ((!((u.uprops[40 /* INVIS */].intrinsic || u.uprops[40 /* INVIS */].extrinsic) && !u.uprops[40 /* INVIS */].blocked) || $c.andu64(mtmp.data.mflags1, 16777216) !== 0) && !u.uinwater && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & 1) !== 0) && mtmp.mpeaceful | 0) {
+    if (($c.peq(mtmp.data, $c.relem(mons, PM_WATCHMAN)) || $c.peq(mtmp.data, $c.relem(mons, PM_WATCH_CAPTAIN))) && mtmp.mcansee | 0 && ((!((u.uprops[INVIS].intrinsic || u.uprops[INVIS].extrinsic) && !u.uprops[INVIS].blocked) || $c.andu64(mtmp.data.mflags1, M1_SEE_INVIS) !== 0) && !u.uinwater && (gv.viz_array.get(mtmp.my).get(mtmp.mx) & COULD_SEE) !== 0) && mtmp.mpeaceful | 0) {
         return 1;
     }
     return 0;
@@ -1095,20 +1124,20 @@ function watchman_canseeu(mtmp) {   // dig.c:1362
 export async function watch_dig(mtmp, x, y, zap) {   // dig.c:1377
     let lev = null, str = null;
     lev = $c.relem(svl.level.locations[x], y);
-    if (in_town(x, y) && (closed_door(x, y) || lev.typ === 14 /* SDOOR */ || lev.typ && lev.typ <= 12 /* DBWALL */ || lev.typ === 28 /* FOUNTAIN */ || (lev.typ === 13 /* TREE */ || svl.level.flags.arboreal | 0 && lev.typ === 0 /* STONE */))) {
+    if (in_town(x, y) && (closed_door(x, y) || lev.typ === SDOOR || lev.typ && lev.typ <= DBWALL || lev.typ === FOUNTAIN || (lev.typ === TREE || svl.level.flags.arboreal | 0 && lev.typ === STONE))) {
         if (!mtmp) {
             mtmp = await get_iter_mons(watchman_canseeu);
         }
         if (mtmp) {
             if (zap || svc.context.digging.warned) {
                 await verbalize($c.lit("Halt, vandal!  You're under arrest!"));
-                await angry_guards($c.i8(!!(u.uprops[16 /* DEAF */].intrinsic || u.uprops[16 /* DEAF */].extrinsic || u.uroleplay.deaf) ? 1 : 0));
+                await angry_guards($c.i8(!!(u.uprops[DEAF].intrinsic || u.uprops[DEAF].extrinsic || u.uroleplay.deaf) ? 1 : 0));
             } else {
-                if (lev.typ === 23 /* DOOR */) {
+                if (lev.typ === DOOR) {
                     str = $c.lit("door");
-                } else if (lev.typ === 13 /* TREE */ || svl.level.flags.arboreal | 0 && lev.typ === 0 /* STONE */) {
+                } else if (lev.typ === TREE || svl.level.flags.arboreal | 0 && lev.typ === STONE) {
                     str = $c.lit("tree");
-                } else if (lev.typ < 16 /* POOL */) {
+                } else if (lev.typ < POOL) {
                     str = $c.lit("wall");
                 } else {
                     str = $c.lit("fountain");
@@ -1126,16 +1155,16 @@ export async function mdig_tunnel(mtmp) {   // dig.c:1414
     let here = null, sawit = 0, seeit = 0, trapped = 0, pile = 0;
     pile = rnd(12);
     here = $c.relem(svl.level.locations[mtmp.mx], mtmp.my);
-    if (here.typ === 14 /* SDOOR */) {
+    if (here.typ === SDOOR) {
         cvt_sdoor_to_door(here);
     }
     if (closed_door(mtmp.mx, mtmp.my)) {
-        if (in_rooms(mtmp.mx, mtmp.my, 14 /* SHOPBASE */).get(0)) {
+        if (in_rooms(mtmp.mx, mtmp.my, SHOPBASE).get(0)) {
             await add_damage(mtmp.mx, mtmp.my, 0);
         }
         sawit = $c.i8(canseemon(mtmp));
-        trapped = $c.i8((here.flags | 0) & 16 ? 1 : 0);
-        here.flags = ((trapped ? 0 : 1) >>> 0) & 31;
+        trapped = $c.i8((here.flags | 0) & D_TRAPPED ? 1 : 0);
+        here.flags = ((trapped ? D_NODOOR : D_BROKEN) >>> 0) & 31;
         recalc_block_point(mtmp.mx, mtmp.my);
         await newsym(mtmp.mx, mtmp.my);
         if (trapped) {
@@ -1152,46 +1181,46 @@ export async function mdig_tunnel(mtmp) {   // dig.c:1414
             }
         }
         return 0;
-    } else if (here.typ === 15 /* SCORR */) {
-        here.typ = 24, here.flags = (0) & 31;
+    } else if (here.typ === SCORR) {
+        here.typ = CORR, here.flags = (0) & 31;
         unblock_point(mtmp.mx, mtmp.my);
         await newsym(mtmp.mx, mtmp.my);
         await draft_message(0);
         return 0;
-    } else if (!(here.typ < 16 /* POOL */) && !(here.typ === 13 /* TREE */ || svl.level.flags.arboreal | 0 && here.typ === 0 /* STONE */)) {
+    } else if (!(here.typ < POOL) && !(here.typ === TREE || svl.level.flags.arboreal | 0 && here.typ === STONE)) {
         return 0;
     }
-    if (((here.flags | 0) & 8) !== 0) {
-        await impossible($c.lit("mdig_tunnel:  %s at (%d,%d) is undiggable"), here.typ && here.typ <= 12 /* DBWALL */ ? $c.lit("wall") : here.typ === 13 /* TREE */ || svl.level.flags.arboreal | 0 && here.typ === 0 /* STONE */ ? $c.lit("tree") : $c.lit("stone"), mtmp.mx, mtmp.my);
+    if (((here.flags | 0) & W_NONDIGGABLE) !== 0) {
+        await impossible($c.lit("mdig_tunnel:  %s at (%d,%d) is undiggable"), here.typ && here.typ <= DBWALL ? $c.lit("wall") : here.typ === TREE || svl.level.flags.arboreal | 0 && here.typ === STONE ? $c.lit("tree") : $c.lit("stone"), mtmp.mx, mtmp.my);
         return 0;
     }
-    if (here.typ && here.typ <= 12 /* DBWALL */) {
+    if (here.typ && here.typ <= DBWALL) {
         if (flags.verbose && !rn2(5)) {
             await You_hear($c.lit("crashing rock."));
         }
-        if (in_rooms(mtmp.mx, mtmp.my, 14 /* SHOPBASE */).get(0)) {
+        if (in_rooms(mtmp.mx, mtmp.my, SHOPBASE).get(0)) {
             await add_damage(mtmp.mx, mtmp.my, 0);
         }
         if (svl.level.flags.is_maze_lev) {
-            here.typ = 25, here.flags = (0) & 31;
+            here.typ = ROOM, here.flags = (0) & 31;
         } else if (svl.level.flags.is_cavernous_lev | 0 && !in_town(mtmp.mx, mtmp.my)) {
-            here.typ = 24, here.flags = (0) & 31;
+            here.typ = CORR, here.flags = (0) & 31;
         } else {
-            here.typ = 23, here.flags = (0) & 31;
+            here.typ = DOOR, here.flags = (D_NODOOR) & 31;
         }
-    } else if (here.typ === 13 /* TREE */ || svl.level.flags.arboreal | 0 && here.typ === 0 /* STONE */) {
-        here.typ = 25, here.flags = (0) & 31;
+    } else if (here.typ === TREE || svl.level.flags.arboreal | 0 && here.typ === STONE) {
+        here.typ = ROOM, here.flags = (0) & 31;
         if (pile && pile < 5) {
             await rnd_treefruit_at(mtmp.mx, mtmp.my);
         }
     } else {
-        here.typ = 24, here.flags = (0) & 31;
+        here.typ = CORR, here.flags = (0) & 31;
         if (pile && pile < 5) {
-            await mksobj_at(pile === 1 ? 475 /* BOULDER */ : 474 /* ROCK */, mtmp.mx, mtmp.my, 1, 0);
+            await mksobj_at(pile === 1 ? BOULDER : ROCK, mtmp.mx, mtmp.my, 1, 0);
         }
     }
     await newsym(mtmp.mx, mtmp.my);
-    if (!sobj_at(475 /* BOULDER */, mtmp.mx, mtmp.my)) {
+    if (!sobj_at(BOULDER, mtmp.mx, mtmp.my)) {
         unblock_point(mtmp.mx, mtmp.my);
     }
     return 0;
@@ -1199,17 +1228,17 @@ export async function mdig_tunnel(mtmp) {   // dig.c:1414
 export async function draft_message(unexpected) {   // dig.c:1504
     let dridx = 0;
     if (unexpected) {
-        if (!(u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic))) {
+        if (!(u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic))) {
             await You_feel($c.lit("an unexpected draft."));
         } else {
-            await You_feel($c.lit("like you are %s."), acurr(0 /* A_STR */) < 6 || acurr(3 /* A_DEX */) < 6 || acurr(4 /* A_CON */) < 6 || acurr(5 /* A_CHA */) < 6 || acurr(1 /* A_INT */) < 6 || acurr(2 /* A_WIS */) < 6 ? $c.lit("4-F") : $c.lit("1-A"));
+            await You_feel($c.lit("like you are %s."), acurr(A_STR) < 6 || acurr(A_DEX) < 6 || acurr(A_CON) < 6 || acurr(A_CHA) < 6 || acurr(A_INT) < 6 || acurr(A_WIS) < 6 ? $c.lit("4-F") : $c.lit("1-A"));
         }
     } else {
-        if (!(u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic))) {
+        if (!(u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic))) {
             await You_feel($c.lit("a draft."));
         } else {
             dridx = rn2(2) + (1 - sgn(u.ualign.type) | 0) | 0;
-            if (u.ualign.record < 4) {
+            if (u.ualign.record < STRIDENT) {
                 dridx = dridx + (rn2(3) + (sgn(u.ualign.type) - 1 | 0) | 0) | 0;
             }
             await You_feel($c.lit("like %s."), draft_message$draft_reaction[dridx]);
@@ -1226,16 +1255,16 @@ export async function zap_dig() {   // dig.c:1548
     pitflow = 0;
     if (u.uswallow) {
         mtmp = u.ustuck;
-        if (!(mtmp.data.mlet === 22 /* S_VORTEX */ || $c.peq(mtmp.data, $c.relem(mons, 154 /* PM_AIR_ELEMENTAL */)))) {
-            if (dmgtype_fromattack(mtmp.data, 26, 11) !== null) {
-                await You($c.lit("pierce %s %s wall!"), s_suffix(await mon_nam(mtmp)), await mbodypart(mtmp, 18 /* STOMACH */));
+        if (!(mtmp.data.mlet === S_VORTEX || $c.peq(mtmp.data, $c.relem(mons, PM_AIR_ELEMENTAL)))) {
+            if (dmgtype_fromattack(mtmp.data, AD_DGST, AT_ENGL) !== null) {
+                await You($c.lit("pierce %s %s wall!"), s_suffix(await mon_nam(mtmp)), await mbodypart(mtmp, STOMACH));
             }
-            if ((mtmp.data.geno & 4096) !== 0) {
+            if ((mtmp.data.geno & G_UNIQ) !== 0) {
                 mtmp.mhp = $c.div32(mtmp.mhp + 1 | 0, 2);
             } else {
                 mtmp.mhp = 1;
             }
-            await expels(mtmp, mtmp.data, $c.i8(!(dmgtype_fromattack(mtmp.data, 26, 11) !== null) ? 1 : 0));
+            await expels(mtmp, mtmp.data, $c.i8(!(dmgtype_fromattack(mtmp.data, AD_DGST, AT_ENGL) !== null) ? 1 : 0));
         }
         return;
     }
@@ -1247,10 +1276,10 @@ export async function zap_dig() {   // dig.c:1548
                     await pline_The($c.lit("beam bounces off the %s and hits the %s."), stway.isladder ? $c.lit("ladder") : $c.lit("stairs"), ceiling(u.ux, u.uy));
                 }
                 await You($c.lit("loosen a rock from the %s."), ceiling(u.ux, u.uy));
-                await pline($c.lit("It falls on your %s!"), await body_part(8 /* HEAD */));
+                await pline($c.lit("It falls on your %s!"), await body_part(HEAD));
                 dmg = rnd(hard_helmet($G.uarmh) ? 2 : 6);
-                await losehp(u.uprops[56 /* HALF_PHDAM */].intrinsic || u.uprops[56 /* HALF_PHDAM */].extrinsic ? $c.div32(dmg + 1 | 0, 2) : dmg, $c.lit("falling rock"), 0);
-                otmp = await mksobj_at(474 /* ROCK */, u.ux, u.uy, 0, 0);
+                await losehp(u.uprops[HALF_PHDAM].intrinsic || u.uprops[HALF_PHDAM].extrinsic ? $c.div32(dmg + 1 | 0, 2) : dmg, $c.lit("falling rock"), KILLED_BY_AN);
+                otmp = await mksobj_at(ROCK, u.ux, u.uy, 0, 0);
                 if (otmp) {
                     await xname(otmp);
                     await stackobj(otmp);
@@ -1267,12 +1296,12 @@ export async function zap_dig() {   // dig.c:1548
     maze_dig = $c.i8(svl.level.flags.is_maze_lev | 0 && !((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_earth_level)) ? 1 : 0);
     zx = $c.i16(u.ux + u.dx | 0);
     zy = $c.i16(u.uy + u.dy | 0);
-    if (u.utrap && u.utraptype === 2 && (trap_with_u = t_at(u.ux, u.uy))) {
+    if (u.utrap && u.utraptype === TT_PIT && (trap_with_u = t_at(u.ux, u.uy))) {
         pitdig = 1;
         diridx = xytodir(u.dx, u.dy);
     }
     digdepth = rn2(18) + 8 | 0;
-    await tmp_at(-1, 4083);
+    await tmp_at(DISP_BEAM, 4083);
     while ((digdepth = digdepth - 1 | 0) >= 0) {
         if (!isok(zx, zy)) {
             break;
@@ -1282,10 +1311,10 @@ export async function zap_dig() {   // dig.c:1548
         await windowprocs.win_delay_output();
         if (pitdig) {
             adjpit = t_at(zx, zy);
-            if (diridx !== -1 /* DIR_ERR */ && !conjoined_pits(adjpit, trap_with_u, 0)) {
+            if (diridx !== DIR_ERR && !conjoined_pits(adjpit, trap_with_u, 0)) {
                 digdepth = 0;
                 digdepth;
-                if (!(adjpit && ((adjpit.ttyp | 0) === 11 /* PIT */ || (adjpit.ttyp | 0) === 12 /* SPIKED_PIT */))) {
+                if (!(adjpit && ((adjpit.ttyp | 0) === PIT || (adjpit.ttyp | 0) === SPIKED_PIT))) {
                     cc.x = zx;
                     cc.y = zy;
                     if (!adj_pit_checks(cc, new $c.Ptr(buf, 0))) {
@@ -1297,8 +1326,8 @@ export async function zap_dig() {   // dig.c:1548
                         adjpit = t_at(zx, zy);
                     }
                 }
-                if (adjpit && ((adjpit.ttyp | 0) === 11 /* PIT */ || (adjpit.ttyp | 0) === 12 /* SPIKED_PIT */)) {
-                    adjidx = $c.rem32(diridx + 4 | 0, 8);
+                if (adjpit && ((adjpit.ttyp | 0) === PIT || (adjpit.ttyp | 0) === SPIKED_PIT)) {
+                    adjidx = $c.rem32(diridx + 4 | 0, N_DIRS_Z - 2);
                     trap_with_u.vl.v_conjoined = $c.u8(trap_with_u.vl.v_conjoined | 1 << diridx);
                     adjpit.vl.v_conjoined = $c.u8(adjpit.vl.v_conjoined | 1 << adjidx);
                     flow_x = zx;
@@ -1312,74 +1341,74 @@ export async function zap_dig() {   // dig.c:1548
                 }
                 break;
             }
-        } else if (closed_door(zx, zy) || room.typ === 14 /* SDOOR */) {
-            if (in_rooms(zx, zy, 14 /* SHOPBASE */).get(0)) {
-                await add_damage(zx, zy, 400);
+        } else if (closed_door(zx, zy) || room.typ === SDOOR) {
+            if (in_rooms(zx, zy, SHOPBASE).get(0)) {
+                await add_damage(zx, zy, SHOP_DOOR_COST);
                 shopdoor = 1;
             }
-            if (room.typ === 14 /* SDOOR */) {
-                room.typ = 23;
-            } else if ((gv.viz_array.get(zy).get(zx) & 2) !== 0) {
+            if (room.typ === SDOOR) {
+                room.typ = DOOR;
+            } else if ((gv.viz_array.get(zy).get(zx) & IN_SIGHT) !== 0) {
                 await pline_The($c.lit("door is razed!"));
             }
             await watch_dig(null, zx, zy, 1);
-            room.flags = (0) & 31;
+            room.flags = (D_NODOOR) & 31;
             recalc_block_point(zx, zy);
             digdepth = digdepth - 2 | 0;
             if (maze_dig) {
                 break;
             }
         } else if (maze_dig) {
-            if (room.typ && room.typ <= 12 /* DBWALL */) {
-                if (!((room.flags | 0) & 8)) {
-                    if (in_rooms(zx, zy, 14 /* SHOPBASE */).get(0)) {
-                        await add_damage(zx, zy, 200);
+            if (room.typ && room.typ <= DBWALL) {
+                if (!((room.flags | 0) & W_NONDIGGABLE)) {
+                    if (in_rooms(zx, zy, SHOPBASE).get(0)) {
+                        await add_damage(zx, zy, SHOP_WALL_COST);
                         shopwall = 1;
                     }
-                    room.typ = 25, room.flags = (0) & 31;
+                    room.typ = ROOM, room.flags = (0) & 31;
                     unblock_point(zx, zy);
-                } else if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
+                } else if (!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked)) {
                     await pline_The($c.lit("wall glows then fades."));
                 }
                 break;
-            } else if (room.typ === 13 /* TREE */ || svl.level.flags.arboreal | 0 && room.typ === 0 /* STONE */) {
-                if (!((room.flags | 0) & 8)) {
-                    room.typ = 25, room.flags = (0) & 31;
+            } else if (room.typ === TREE || svl.level.flags.arboreal | 0 && room.typ === STONE) {
+                if (!((room.flags | 0) & W_NONDIGGABLE)) {
+                    room.typ = ROOM, room.flags = (0) & 31;
                     unblock_point(zx, zy);
-                } else if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
+                } else if (!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked)) {
                     await pline_The($c.lit("tree shudders but is unharmed."));
                 }
                 break;
-            } else if (room.typ === 0 /* STONE */ || room.typ === 15 /* SCORR */) {
-                if (!((room.flags | 0) & 8)) {
-                    room.typ = 24, room.flags = (0) & 31;
+            } else if (room.typ === STONE || room.typ === SCORR) {
+                if (!((room.flags | 0) & W_NONDIGGABLE)) {
+                    room.typ = CORR, room.flags = (0) & 31;
                     unblock_point(zx, zy);
-                } else if (!((u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked)) {
+                } else if (!((u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked)) {
                     await pline_The($c.lit("rock glows then fades."));
                 }
                 break;
             }
-        } else if (room.typ < 16 /* POOL */) {
+        } else if (room.typ < POOL) {
             if (!may_dig(zx, zy)) {
                 break;
             }
-            if (room.typ && room.typ <= 12 /* DBWALL */ || room.typ === 14 /* SDOOR */) {
-                if (in_rooms(zx, zy, 14 /* SHOPBASE */).get(0)) {
-                    await add_damage(zx, zy, 200);
+            if (room.typ && room.typ <= DBWALL || room.typ === SDOOR) {
+                if (in_rooms(zx, zy, SHOPBASE).get(0)) {
+                    await add_damage(zx, zy, SHOP_WALL_COST);
                     shopwall = 1;
                 }
                 await watch_dig(null, zx, zy, 1);
                 if (svl.level.flags.is_cavernous_lev | 0 && !in_town(zx, zy)) {
-                    room.typ = 24, room.flags = (0) & 31;
+                    room.typ = CORR, room.flags = (0) & 31;
                 } else {
-                    room.typ = 23, room.flags = (0) & 31;
+                    room.typ = DOOR, room.flags = (D_NODOOR) & 31;
                 }
                 digdepth = digdepth - 2 | 0;
-            } else if (room.typ === 13 /* TREE */ || svl.level.flags.arboreal | 0 && room.typ === 0 /* STONE */) {
-                room.typ = 25, room.flags = (0) & 31;
+            } else if (room.typ === TREE || svl.level.flags.arboreal | 0 && room.typ === STONE) {
+                room.typ = ROOM, room.flags = (0) & 31;
                 digdepth = digdepth - 2 | 0;
             } else {
-                room.typ = 24, room.flags = (0) & 31;
+                room.typ = CORR, room.flags = (0) & 31;
                 digdepth = digdepth - 1 | 0;
             }
             unblock_point(zx, zy);
@@ -1387,12 +1416,12 @@ export async function zap_dig() {   // dig.c:1548
         zx = $c.i16(zx + u.dx | 0);
         zy = $c.i16(zy + u.dy | 0);
     }
-    await tmp_at(-7, 0);
+    await tmp_at(DISP_END, 0);
     if (pitflow && isok(flow_x, flow_y)) {
         ttmp = t_at(flow_x, flow_y);
-        if (ttmp && ((ttmp.ttyp | 0) === 11 /* PIT */ || (ttmp.ttyp | 0) === 12 /* SPIKED_PIT */)) {
+        if (ttmp && ((ttmp.ttyp | 0) === PIT || (ttmp.ttyp | 0) === SPIKED_PIT)) {
             filltyp = fillholetyp(ttmp.tx, ttmp.ty, 1);
-            if (filltyp !== 25 /* ROOM */) {
+            if (filltyp !== ROOM) {
                 await pit_flow(ttmp, filltyp);
             }
         }
@@ -1416,24 +1445,24 @@ function adj_pit_checks(cc, msg) {   // dig.c:1763
     ltyp = room.typ, room.flags = (0) & 31;
     if (is_pool(cc.x, cc.y) || is_lava(cc.x, cc.y)) {
         return 0;
-    } else if (closed_door(cc.x, cc.y) || room.typ === 14 /* SDOOR */) {
+    } else if (closed_door(cc.x, cc.y) || room.typ === SDOOR) {
         $c.__builtin___strcpy_chk(msg, foundation_msg, -1);
         return 0;
-    } else if (ltyp && ltyp <= 12 /* DBWALL */) {
+    } else if (ltyp && ltyp <= DBWALL) {
         $c.__builtin___strcpy_chk(msg, foundation_msg, -1);
         return 0;
-    } else if (ltyp === 13 /* TREE */ || svl.level.flags.arboreal | 0 && ltyp === 0 /* STONE */) {
+    } else if (ltyp === TREE || svl.level.flags.arboreal | 0 && ltyp === STONE) {
         $c.__builtin___strcpy_chk(msg, $c.lit("The tree's roots glow then fade."), -1);
         return 0;
-    } else if (ltyp === 0 /* STONE */ || ltyp === 15 /* SCORR */) {
-        if ((room.flags | 0) & 8) {
+    } else if (ltyp === STONE || ltyp === SCORR) {
+        if ((room.flags | 0) & W_NONDIGGABLE) {
             $c.__builtin___strcpy_chk(msg, $c.lit("The rock glows then fades."), -1);
             return 0;
         }
-    } else if (ltyp === 22 /* IRONBARS */) {
+    } else if (ltyp === IRONBARS) {
         $c.__builtin___strcpy_chk(msg, $c.lit("The bars go much deeper than your pit."), -1);
         return 0;
-    } else if (ltyp === 30 /* SINK */) {
+    } else if (ltyp === SINK) {
         $c.__builtin___strcpy_chk(msg, $c.lit("A tangled mass of plumbing remains below the sink."), -1);
         return 0;
     } else if (On_ladder(cc.x, cc.y)) {
@@ -1441,15 +1470,15 @@ function adj_pit_checks(cc, msg) {   // dig.c:1763
         return 0;
     } else {
         supporting = null;
-        if (ltyp === 28 /* FOUNTAIN */) {
+        if (ltyp === FOUNTAIN) {
             supporting = $c.lit("fountain");
-        } else if (ltyp === 29 /* THRONE */) {
+        } else if (ltyp === THRONE) {
             supporting = $c.lit("throne");
-        } else if (ltyp === 32 /* ALTAR */) {
+        } else if (ltyp === ALTAR) {
             supporting = $c.lit("altar");
         } else if (On_stairs(cc.x, cc.y)) {
             supporting = $c.lit("stairs");
-        } else if (ltyp === 34 /* DRAWBRIDGE_DOWN */ || ltyp === 12 /* DBWALL */) {
+        } else if (ltyp === DRAWBRIDGE_DOWN || ltyp === DBWALL) {
             supporting = $c.lit("drawbridge");
         }
         if (supporting) {
@@ -1461,11 +1490,11 @@ function adj_pit_checks(cc, msg) {   // dig.c:1763
 }
 async function pit_flow(trap, filltyp) {   // dig.c:1844
     let t = new $T.trap(), idx = 0, x = 0, y = 0, t2 = null;
-    if (trap && filltyp !== 25 /* ROOM */ && ((trap.ttyp | 0) === 11 /* PIT */ || (trap.ttyp | 0) === 12 /* SPIKED_PIT */)) {
+    if (trap && filltyp !== ROOM && ((trap.ttyp | 0) === PIT || (trap.ttyp | 0) === SPIKED_PIT)) {
         t.$copyFrom(trap);
         svl.level.locations[t.tx][t.ty].typ = filltyp, svl.level.locations[t.tx][t.ty].flags = (0) & 31;
         await liquid_flow(t.tx, t.ty, filltyp, trap, t.tx === u.ux && t.ty === u.uy ? $c.lit("Suddenly %s flows in from the adjacent pit!") : null);
-        for (idx = 0; idx < 8; idx = idx + 1 | 0) {
+        for (idx = 0; idx < N_DIRS_Z - 2; idx = idx + 1 | 0) {
             if (t.vl.v_conjoined & 1 << idx) {
                 x = $c.i16(t.tx + xdir[idx] | 0);
                 y = $c.i16(t.ty + ydir[idx] | 0);
@@ -1477,11 +1506,11 @@ async function pit_flow(trap, filltyp) {   // dig.c:1844
 }
 export function buried_ball(cc) {   // dig.c:1885
     let odist = 0, bdist = 0, otmp = null, ball = null;
-    bdist = 80;
+    bdist = COLNO;
     ball = null;
-    if (!u.utrap || u.utraptype === 6) {
+    if (!u.utrap || u.utraptype === TT_BURIEDBALL) {
         for (otmp = svl.level.buriedobjlist; otmp; otmp = otmp.nobj) {
-            if (otmp.otyp !== 477 /* HEAVY_IRON_BALL */) {
+            if (otmp.otyp !== HEAVY_IRON_BALL) {
                 continue;
             }
             if (otmp.ox === cc.x && otmp.oy === cc.y) {
@@ -1541,31 +1570,31 @@ export async function bury_an_obj(otmp, dealloced) {   // dig.c:1984
     }
     if ($c.peq(otmp, $G.uball)) {
         await unpunish();
-        set_utrap((rn2(50) + 20 | 0) >>> 0, 6);
+        set_utrap((rn2(50) + 20 | 0) >>> 0, TT_BURIEDBALL);
         await pline_The($c.lit("iron ball gets buried!"));
     }
     otmp2 = otmp.v.v_nexthere;
     if ($c.peq(otmp, $G.uchain) || obj_resists(otmp, 0, 0)) {
         return otmp2;
     }
-    if (otmp.otyp === 236 /* LEASH */ && otmp.corpsenm !== 0) {
+    if (otmp.otyp === LEASH && otmp.corpsenm !== 0) {
         await o_unleash(otmp);
     }
-    if (otmp.lamplit | 0 && otmp.otyp !== 321 /* POT_OIL */) {
+    if (otmp.lamplit | 0 && otmp.otyp !== POT_OIL) {
         await end_burn(otmp, 1);
     }
     await obj_extract_self(otmp);
     under_ice = is_ice(otmp.ox, otmp.oy);
-    if (otmp.otyp === 474 /* ROCK */ && !under_ice || otmp.otyp === 475 /* BOULDER */) {
+    if (otmp.otyp === ROCK && !under_ice || otmp.otyp === BOULDER) {
         if (dealloced) {
             dealloced.set(0, 1);
         }
         await obfree(otmp, null);
         return otmp2;
     }
-    if (otmp.otyp === 265 /* CORPSE */) {
-    } else if ((under_ice ? otmp.oclass === 8 /* POTION_CLASS */ : (objects[otmp.otyp].oc_material | 0) <= 8 /* WOOD */) && !obj_resists(otmp, 5, 95)) {
-        await start_timer($c.add64(under_ice ? 0 : 250, rnd(250)), 3, 0, obj_to_any(otmp));
+    if (otmp.otyp === CORPSE) {
+    } else if ((under_ice ? otmp.oclass === POTION_CLASS : (objects[otmp.otyp].oc_material | 0) <= WOOD) && !obj_resists(otmp, 5, 95)) {
+        await start_timer($c.add64(under_ice ? 0 : 250, rnd(250)), TIMER_OBJECT, ROT_ORGANIC, obj_to_any(otmp));
     }
     await add_to_buried(otmp);
     return otmp2;
@@ -1573,7 +1602,7 @@ export async function bury_an_obj(otmp, dealloced) {   // dig.c:1984
 export async function bury_objs(x, y) {   // dig.c:2050
     let otmp = null, otmp2 = null, shkp = null, loss = 0, costly = 0, save_plnmsg = 0;
     loss = 0;
-    costly = $c.i8((shkp = await shop_keeper(in_rooms($c.i16(x), $c.i16(y), 14 /* SHOPBASE */).get(0))) && await costly_spot($c.i16(x), $c.i16(y)) ? 1 : 0);
+    costly = $c.i8((shkp = await shop_keeper(in_rooms($c.i16(x), $c.i16(y), SHOPBASE).get(0))) && await costly_spot($c.i16(x), $c.i16(y)) ? 1 : 0);
     if (svl.level.objects[x][y] !== null) {
         do {
             if (debugcore($c.lit("dig.c"), 1)) {
@@ -1586,7 +1615,7 @@ export async function bury_objs(x, y) {   // dig.c:2050
     for (otmp = svl.level.objects[x][y]; otmp; otmp = otmp2) {
         if (costly && !svc.context.mon_moving) {
             loss = $c.add64(loss, await stolen_value(otmp, $c.i16(x), $c.i16(y), $c.i8(shkp.mpeaceful), 1));
-            if (otmp.oclass !== 12 /* COIN_CLASS */) {
+            if (otmp.oclass !== COIN_CLASS) {
                 otmp.no_charge = (1) & 1;
             }
         }
@@ -1614,12 +1643,12 @@ export async function unearth_objs(x, y) {   // dig.c:2086
     for (otmp = svl.level.buriedobjlist; otmp; otmp = otmp2) {
         otmp2 = otmp.nobj;
         if (otmp.ox === x && otmp.oy === y) {
-            if (bball && $c.peq(otmp, bball) && u.utrap && u.utraptype === 6) {
+            if (bball && $c.peq(otmp, bball) && u.utrap && u.utraptype === TT_BURIEDBALL) {
                 await buried_ball_to_punishment();
             } else {
                 await obj_extract_self(otmp);
                 if (otmp.timed) {
-                    await stop_timer(0, obj_to_any(otmp));
+                    await stop_timer(ROT_ORGANIC, obj_to_any(otmp));
                 }
                 await place_object(otmp, $c.i16(x), $c.i16(y));
                 await stackobj(otmp);
@@ -1644,33 +1673,33 @@ export async function rot_corpse(arg, timeout) {   // dig.c:2146
     x = 0;
     y = 0;
     obj = arg.a_obj;
-    on_floor = $c.i8(obj.where === 1 ? 1 : 0);
-    in_invent = $c.i8(obj.where === 3 ? 1 : 0);
+    on_floor = $c.i8(obj.where === OBJ_FLOOR ? 1 : 0);
+    in_invent = $c.i8(obj.where === OBJ_INVENT ? 1 : 0);
     if (on_floor) {
         x = obj.ox;
         y = obj.oy;
     } else if (in_invent) {
         if (flags.verbose) {
-            cname = await corpse_xname(obj, null, 2);
+            cname = await corpse_xname(obj, null, CXN_NO_PFX);
             await Your($c.lit("%s%s %s away%c"), $c.peq(obj, $G.uwep) ? $c.lit("wielded ") : $c.lit(""), cname, await otense(obj, $c.lit("rot")), $c.peq(obj, $G.uwep) ? 33 : 46);
         }
         if (obj.owornmask) {
             await remove_worn_item(obj, 1);
             await stop_occupation();
         }
-    } else if (obj.where === 4) {
+    } else if (obj.where === OBJ_MINVENT) {
         if (obj.owornmask && $c.peq(obj, obj.v.v_ocarry.mw)) {
             await setmnotwielded(obj.v.v_ocarry, obj);
         }
-    } else if (obj.where === 5) {
+    } else if (obj.where === OBJ_MIGRATING) {
         obj.owornmask = 0;
     }
     await rot_organic(arg, timeout);
     if (on_floor) {
         mtmp = svl.level.monsters[x][y];
-        if (mtmp && !(svl.level.objects[x][y] !== null) && mtmp.mundetected | 0 && $c.andu64(mtmp.data.mflags1, 128) !== 0) {
+        if (mtmp && !(svl.level.objects[x][y] !== null) && mtmp.mundetected | 0 && $c.andu64(mtmp.data.mflags1, M1_CONCEAL) !== 0) {
             mtmp.mundetected = (0) & 1;
-        } else if (x === u.ux && y === u.uy && u.uundetected | 0 && $c.andu64(gy.youmonst.data.mflags1, 128) !== 0) {
+        } else if (x === u.ux && y === u.uy && u.uundetected | 0 && $c.andu64(gy.youmonst.data.mflags1, M1_CONCEAL) !== 0) {
             await hideunder(gy.youmonst);
         }
         await newsym(x, y);
@@ -1704,7 +1733,7 @@ export async function wiz_debug_cmd_bury() {   // dig.c:2288
     } else {
         await pline($c.lit("%d object%s buried."), diff, diff === 1 ? $c.lit("") : $c.lit("s"));
     }
-    return 0;
+    return ECMD_OK;
 }
 
 export function $init() {

@@ -5,23 +5,34 @@ import { $G } from './globals.js';
 import { alloc, dupstr } from './alloc.js';
 import { disp_artifact_discoveries, dump_artifact_info } from './artifact.js';
 import { exercise } from './attrib.js';
+import { A_WIS } from './attrib.h.js';
 import { yn_function } from './cmd.js';
+import { NO_COLOR } from './color.h.js';
 import { cg, flags, go, gu, iflags, program_state, svb, svc, svd, u, ynchars } from './decl.js';
+import { AMULET_CLASS, ARMOR_CLASS, GEM_CLASS, ILLOBJ_CLASS, POTION_CLASS, RING_CLASS, SCROLL_CLASS, SPBOOK_CLASS, VENOM_CLASS, WAND_CLASS } from './defsym.h.js';
 import { nul_glyphinfo } from './display.js';
 import { docall, objtyp_is_callable } from './do_name.js';
 import { def_char_to_objclass, def_oc_syms } from './drawing.js';
 import { ledger_no, maxledgerno } from './dungeon.js';
 import { panic } from './end.js';
+import { BUFSZ } from './global.h.js';
+import { COUNTING, ECMD_OK, FREEING, MENU_COMBINATION, MENU_PARTIAL, MENU_TRADITIONAL, NROFARTIFACTS, WRITING } from './hack.h.js';
 import { eos, lowc, strkitten, strncmpi, strstri, strsubst, upstart, visctrl } from './hacklib.js';
 import { let_to_name, loot_classify, update_inventory } from './invent.js';
+import { PM_SAMURAI } from './monsters.h.js';
+import { IMMEDIATE, MAXOCLASSES, NODIR, NUM_OBJECTS } from './objclass.h.js';
 import { obj_descr, objects } from './objects.js';
+import { AMULET_OF_YENDOR, AQUAMARINE, BELL_OF_OPENING, CANDELABRUM_OF_INVOCATION, CLOAK_OF_DISPLACEMENT, CLOAK_OF_PROTECTION, DIAMOND, EMERALD, FIRST_OBJECT, FLUORITE, GAUNTLETS_OF_DEXTERITY, HELMET, HELM_OF_TELEPATHY, LAST_REAL_GEM, LEATHER_GLOVES, LEVITATION_BOOTS, MAGIC_HARP, POT_WATER, SAPPHIRE, SLIME_MOLD, SPEED_BOOTS, SPE_BOOK_OF_THE_DEAD, STRANGE_OBJECT, TURQUOISE, WAN_NOTHING, WOODEN_HARP } from './objects.h.js';
 import { Japanese_item_name, obj_typename } from './objnam.js';
+import { NON_PM } from './permonst.h.js';
 import { You, impossible, pline, raw_printf } from './pline.js';
+import { HALLUC, HALLUC_RES } from './prop.h.js';
 import { rn2 } from './rnd.js';
 import { sfi_char, sfi_int, sfi_objclass, sfi_short, sfi_unsigned, sfo_char, sfo_int, sfo_objclass, sfo_short, sfo_unsigned } from './sfbase.js';
 import { append_price_quote, gem_learned } from './shk.js';
 import { Strlen_ } from './strutil.js';
 import { add_menu, add_menu_heading, add_menu_str, select_menu, windowprocs } from './windows.js';
+import { ATR_NONE, MENU_BEHAVE_STANDARD, MENU_ITEMFLAGS_NONE, MENU_ITEMFLAGS_SELECTED, NHW_MENU, NHW_TEXT, PICK_ONE } from './wintype.h.js';
 
 const shuffle_all$shuffle_classes = new Int8Array(7);   // static in shuffle_all()
 const shuffle_all$shuffle_types = new Int16Array(4);   // static in shuffle_all()
@@ -40,41 +51,41 @@ async function setgemprobs(dlev) {   // o_init.c:54
     } else {
         lev = 0;
     }
-    first = svb.bases[13 /* GEM_CLASS */];
+    first = svb.bases[GEM_CLASS];
     for (j = 0; j < (9 - $c.div32(lev, 3) | 0); j = j + 1 | 0) {
         objects[first + j | 0].oc_prob = 0;
     }
     first = first + j | 0;
-    if (first > 460 /* LAST_REAL_GEM */ || objects[first].oc_class !== 13 /* GEM_CLASS */ || obj_descr[objects[first].oc_name_idx].oc_name === null) {
-        await raw_printf($c.lit("Not enough gems? - first=%d j=%d LAST_GEM=%d"), first, j, 460 /* LAST_REAL_GEM */);
+    if (first > LAST_REAL_GEM || objects[first].oc_class !== GEM_CLASS || obj_descr[objects[first].oc_name_idx].oc_name === null) {
+        await raw_printf($c.lit("Not enough gems? - first=%d j=%d LAST_GEM=%d"), first, j, LAST_REAL_GEM);
         await windowprocs.win_wait_synch();
     }
-    for (j = first; j <= 460 /* LAST_REAL_GEM */; j = j + 1 | 0) {
-        objects[j].oc_prob = $c.i16($c.div32((171 + j | 0) - first | 0, 461 - first | 0));
+    for (j = first; j <= LAST_REAL_GEM; j = j + 1 | 0) {
+        objects[j].oc_prob = $c.i16($c.div32((171 + j | 0) - first | 0, LAST_REAL_GEM + 1 - first | 0));
     }
-    for (j = svb.bases[13 /* GEM_CLASS */]; j < svb.bases[14]; j = j + 1 | 0) {
+    for (j = svb.bases[GEM_CLASS]; j < svb.bases[GEM_CLASS + 1]; j = j + 1 | 0) {
         sum = sum + objects[j].oc_prob | 0;
     }
-    go.oclass_prob_totals[13 /* GEM_CLASS */] = $c.i16(sum);
+    go.oclass_prob_totals[GEM_CLASS] = $c.i16(sum);
 }
 function randomize_gem_colors() {   // o_init.c:85
     if (rn2(2)) {
-        objects[446 /* TURQUOISE */].oc_descr_idx = objects[443 /* SAPPHIRE */].oc_descr_idx, objects[446 /* TURQUOISE */].oc_color = objects[443 /* SAPPHIRE */].oc_color;
+        objects[TURQUOISE].oc_descr_idx = objects[SAPPHIRE].oc_descr_idx, objects[TURQUOISE].oc_color = objects[SAPPHIRE].oc_color;
     }
     if (rn2(2)) {
-        objects[448 /* AQUAMARINE */].oc_descr_idx = objects[443 /* SAPPHIRE */].oc_descr_idx, objects[448 /* AQUAMARINE */].oc_color = objects[443 /* SAPPHIRE */].oc_color;
+        objects[AQUAMARINE].oc_descr_idx = objects[SAPPHIRE].oc_descr_idx, objects[AQUAMARINE].oc_color = objects[SAPPHIRE].oc_color;
     }
     switch (rn2(4)) {
         case 0:
             break;
         case 1:
-            objects[457 /* FLUORITE */].oc_descr_idx = objects[443 /* SAPPHIRE */].oc_descr_idx, objects[457 /* FLUORITE */].oc_color = objects[443 /* SAPPHIRE */].oc_color;
+            objects[FLUORITE].oc_descr_idx = objects[SAPPHIRE].oc_descr_idx, objects[FLUORITE].oc_color = objects[SAPPHIRE].oc_color;
             break;
         case 2:
-            objects[457 /* FLUORITE */].oc_descr_idx = objects[440 /* DIAMOND */].oc_descr_idx, objects[457 /* FLUORITE */].oc_color = objects[440 /* DIAMOND */].oc_color;
+            objects[FLUORITE].oc_descr_idx = objects[DIAMOND].oc_descr_idx, objects[FLUORITE].oc_color = objects[DIAMOND].oc_color;
             break;
         case 3:
-            objects[457 /* FLUORITE */].oc_descr_idx = objects[445 /* EMERALD */].oc_descr_idx, objects[457 /* FLUORITE */].oc_color = objects[445 /* EMERALD */].oc_color;
+            objects[FLUORITE].oc_descr_idx = objects[EMERALD].oc_descr_idx, objects[FLUORITE].oc_color = objects[EMERALD].oc_color;
             break;
     }
 }
@@ -113,41 +124,41 @@ function shuffle(o_low, o_high, domaterial) {   // o_init.c:113
 }
 export async function init_objects() {   // o_init.c:151
     let i = 0, first = 0, last = 0, prevoclass = 0, oclass = 0, nmkn = 0, $t1, $t2, $t3;
-    for (i = 0; i <= 18 /* MAXOCLASSES */; i = i + 1 | 0) {
+    for (i = 0; i <= MAXOCLASSES; i = i + 1 | 0) {
         svb.bases[i] = 0;
-        if (i > 0 && i < 18 /* MAXOCLASSES */ && objects[i].oc_class !== i) {
+        if (i > 0 && i < MAXOCLASSES && objects[i].oc_class !== i) {
             await panic($c.lit("init_objects: class for generic object #%d doesn't match (%d)"), i, objects[i].oc_class);
         }
     }
-    for (i = 0; i < 481 /* NUM_OBJECTS */; i = i + 1 | 0) {
+    for (i = 0; i < NUM_OBJECTS; i = i + 1 | 0) {
         $t1 = objects[i].oc_descr_idx = $c.i16(i), objects[i].oc_name_idx = $t1;
     }
-    first = 18 /* MAXOCLASSES */;
+    first = MAXOCLASSES;
     prevoclass = -1;
-    while (first < 481 /* NUM_OBJECTS */) {
+    while (first < NUM_OBJECTS) {
         oclass = objects[first].oc_class;
         if (oclass < prevoclass) {
             await panic($c.lit("objects[%d] class #%d not in order!"), first, oclass);
         }
         last = first + 1 | 0;
-        while (last < 481 /* NUM_OBJECTS */ && objects[last].oc_class === oclass) {
+        while (last < NUM_OBJECTS && objects[last].oc_class === oclass) {
             last = last + 1 | 0;
         }
         svb.bases[oclass] = first;
-        if (oclass === 13 /* GEM_CLASS */) {
+        if (oclass === GEM_CLASS) {
             await setgemprobs(null);
             randomize_gem_colors();
         }
         first = last;
         prevoclass = oclass;
     }
-    $t2 = svb.bases[19] = 481 /* NUM_OBJECTS */, svb.bases[18 /* MAXOCLASSES */] = $t2;
-    for (last = 17; last >= 0; last = last - 1 | 0) {
+    $t2 = svb.bases[MAXOCLASSES + 1] = NUM_OBJECTS, svb.bases[MAXOCLASSES] = $t2;
+    for (last = MAXOCLASSES - 1; last >= 0; last = last - 1 | 0) {
         if (!svb.bases[last]) {
             svb.bases[last] = svb.bases[last + 1 | 0];
         }
     }
-    for (i = 18 /* MAXOCLASSES */; i < 481 /* NUM_OBJECTS */; i = i + 1 | 0) {
+    for (i = MAXOCLASSES; i < NUM_OBJECTS; i = i + 1 | 0) {
         nmkn = (objects[i].oc_name_known | 0) !== 0 ? 1 : 0;
         if ((!obj_descr[objects[i].oc_descr_idx].oc_descr ? 1 : 0) ^ nmkn) {
             if (iflags.sanity_check) {
@@ -158,16 +169,16 @@ export async function init_objects() {   // o_init.c:151
     }
     await init_oclass_probs();
     shuffle_all();
-    $t3 = (rn2(2) ? 1 : 2) >>> 0, objects[416 /* WAN_NOTHING */].oc_dir = ($t3) & 7;
+    $t3 = (rn2(2) ? NODIR : IMMEDIATE) >>> 0, objects[WAN_NOTHING].oc_dir = ($t3) & 7;
 }
 export async function init_oclass_probs() {   // o_init.c:240
     let i = 0, sum = 0, oclass = 0;
-    for (oclass = 0; oclass < 18 /* MAXOCLASSES */; oclass = oclass + 1 | 0) {
+    for (oclass = 0; oclass < MAXOCLASSES; oclass = oclass + 1 | 0) {
         sum = 0;
         for (i = svb.bases[oclass]; i < svb.bases[oclass + 1 | 0]; i = i + 1 | 0) {
             sum = $c.i16(sum + objects[i].oc_prob | 0);
         }
-        if (sum <= 0 && oclass !== 1 /* ILLOBJ_CLASS */ && svb.bases[oclass] !== svb.bases[oclass + 1 | 0]) {
+        if (sum <= 0 && oclass !== ILLOBJ_CLASS && svb.bases[oclass] !== svb.bases[oclass + 1 | 0]) {
             await impossible($c.lit("%s (%d) probability total for oclass %d"), !sum ? $c.lit("zero") : $c.lit("negative"), sum, oclass);
             for (i = svb.bases[oclass]; i < svb.bases[oclass + 1 | 0]; i = i + 1 | 0) {
                 objects[i].oc_prob = 1;
@@ -182,24 +193,24 @@ export function obj_shuffle_range(otyp, lo_p, hi_p) {   // o_init.c:269
     ocls = objects[otyp].oc_class;
     $t1 = hi_p.set(0, otyp), lo_p.set(0, $t1);
     switch (ocls) {
-        case 3 /* ARMOR_CLASS */:
-            if (otyp >= 97 /* HELMET */ && otyp <= 100 /* HELM_OF_TELEPATHY */) {
-                lo_p.set(0, 97 /* HELMET */), hi_p.set(0, 100 /* HELM_OF_TELEPATHY */);
-            } else if (otyp >= 159 /* LEATHER_GLOVES */ && otyp <= 162 /* GAUNTLETS_OF_DEXTERITY */) {
-                lo_p.set(0, 159 /* LEATHER_GLOVES */), hi_p.set(0, 162 /* GAUNTLETS_OF_DEXTERITY */);
-            } else if (otyp >= 146 /* CLOAK_OF_PROTECTION */ && otyp <= 149 /* CLOAK_OF_DISPLACEMENT */) {
-                lo_p.set(0, 146 /* CLOAK_OF_PROTECTION */), hi_p.set(0, 149 /* CLOAK_OF_DISPLACEMENT */);
-            } else if (otyp >= 166 /* SPEED_BOOTS */ && otyp <= 172 /* LEVITATION_BOOTS */) {
-                lo_p.set(0, 166 /* SPEED_BOOTS */), hi_p.set(0, 172 /* LEVITATION_BOOTS */);
+        case ARMOR_CLASS:
+            if (otyp >= HELMET && otyp <= HELM_OF_TELEPATHY) {
+                lo_p.set(0, HELMET), hi_p.set(0, HELM_OF_TELEPATHY);
+            } else if (otyp >= LEATHER_GLOVES && otyp <= GAUNTLETS_OF_DEXTERITY) {
+                lo_p.set(0, LEATHER_GLOVES), hi_p.set(0, GAUNTLETS_OF_DEXTERITY);
+            } else if (otyp >= CLOAK_OF_PROTECTION && otyp <= CLOAK_OF_DISPLACEMENT) {
+                lo_p.set(0, CLOAK_OF_PROTECTION), hi_p.set(0, CLOAK_OF_DISPLACEMENT);
+            } else if (otyp >= SPEED_BOOTS && otyp <= LEVITATION_BOOTS) {
+                lo_p.set(0, SPEED_BOOTS), hi_p.set(0, LEVITATION_BOOTS);
             }
             break;
-        case 8 /* POTION_CLASS */:
-            lo_p.set(0, svb.bases[8 /* POTION_CLASS */]);
-            hi_p.set(0, 321);
+        case POTION_CLASS:
+            lo_p.set(0, svb.bases[POTION_CLASS]);
+            hi_p.set(0, POT_WATER - 1);
             break;
-        case 5 /* AMULET_CLASS */:
-        case 9 /* SCROLL_CLASS */:
-        case 10 /* SPBOOK_CLASS */:
+        case AMULET_CLASS:
+        case SCROLL_CLASS:
+        case SPBOOK_CLASS:
             lo_p.set(0, svb.bases[ocls]);
             for (i = lo_p.get(0); objects[i].oc_class === ocls; i = i + 1 | 0) {
                 if (objects[i].oc_unique | 0 || !objects[i].oc_magic) {
@@ -208,9 +219,9 @@ export function obj_shuffle_range(otyp, lo_p, hi_p) {   // o_init.c:269
             }
             hi_p.set(0, i - 1 | 0);
             break;
-        case 4 /* RING_CLASS */:
-        case 11 /* WAND_CLASS */:
-        case 17 /* VENOM_CLASS */:
+        case RING_CLASS:
+        case WAND_CLASS:
+        case VENOM_CLASS:
             lo_p.set(0, svb.bases[ocls]);
             hi_p.set(0, svb.bases[ocls + 1 | 0] - 1 | 0);
             break;
@@ -249,25 +260,25 @@ export async function oinit() {   // o_init.c:369
 }
 export async function savenames(nhfp) {   // o_init.c:375
     let i = 0, len = Uint32Array.of(0);
-    if (nhfp.mode & 3) {
-        for (i = 0; i < 20; i = i + 1 | 0) {
+    if (nhfp.mode & (COUNTING | WRITING)) {
+        for (i = 0; i < MAXOCLASSES + 2; i = i + 1 | 0) {
             await sfo_int(nhfp, new $c.Ptr(svb.bases, i), $c.lit("names-bases"));
         }
-        for (i = 0; i < 481 /* NUM_OBJECTS */; i = i + 1 | 0) {
+        for (i = 0; i < NUM_OBJECTS; i = i + 1 | 0) {
             await sfo_short(nhfp, new $c.Ptr(svd.disco, i), $c.lit("names-disco"));
         }
-        for (i = 0; i < 481 /* NUM_OBJECTS */; i = i + 1 | 0) {
+        for (i = 0; i < NUM_OBJECTS; i = i + 1 | 0) {
             await sfo_objclass(nhfp, $c.relem(objects, i), $c.lit("names-objclass"));
         }
     }
-    for (i = 0; i < 481 /* NUM_OBJECTS */; i = i + 1 | 0) {
+    for (i = 0; i < NUM_OBJECTS; i = i + 1 | 0) {
         if (objects[i].oc_uname) {
-            if (nhfp.mode & 3) {
+            if (nhfp.mode & (COUNTING | WRITING)) {
                 len[0] = await Strlen_(objects[i].oc_uname, $c.lit("savenames"), 397) + 1 >>> 0;
                 await sfo_unsigned(nhfp, new $c.Ptr(len, 0), $c.lit("names-len"));
                 await sfo_char(nhfp, objects[i].oc_uname, $c.lit("names-oc_uname"), len[0] | 0);
             }
-            if (nhfp.mode & 4) {
+            if (nhfp.mode & FREEING) {
                 $c.free(objects[i].oc_uname);
                 objects[i].oc_uname = null;
             }
@@ -277,16 +288,16 @@ export async function savenames(nhfp) {   // o_init.c:375
 export async function restnames(nhfp) {   // o_init.c:411
     let i = 0, len = Uint32Array.of(0), $t1;
     len[0] = 0;
-    for (i = 0; i < 20; i = i + 1 | 0) {
+    for (i = 0; i < MAXOCLASSES + 2; i = i + 1 | 0) {
         await sfi_int(nhfp, new $c.Ptr(svb.bases, i), $c.lit("names-bases"));
     }
-    for (i = 0; i < 481 /* NUM_OBJECTS */; i = i + 1 | 0) {
+    for (i = 0; i < NUM_OBJECTS; i = i + 1 | 0) {
         await sfi_short(nhfp, new $c.Ptr(svd.disco, i), $c.lit("names-disco"));
     }
-    for (i = 0; i < 481 /* NUM_OBJECTS */; i = i + 1 | 0) {
+    for (i = 0; i < NUM_OBJECTS; i = i + 1 | 0) {
         await sfi_objclass(nhfp, $c.relem(objects, i), $c.lit("names-objclass"));
     }
-    for (i = 0; i < 481 /* NUM_OBJECTS */; i = i + 1 | 0) {
+    for (i = 0; i < NUM_OBJECTS; i = i + 1 | 0) {
         if (objects[i].oc_uname) {
             await sfi_unsigned(nhfp, new $c.Ptr(len, 0), $c.lit("names-len"));
             $t1 = $c.asArr(await alloc(len[0]), Int8Array), objects[i].oc_uname = $t1;
@@ -297,17 +308,17 @@ export async function restnames(nhfp) {   // o_init.c:411
 export async function observe_object(obj) {   // o_init.c:442
     let oindx = 0;
     oindx = obj.otyp;
-    if (oindx >= 18 /* FIRST_OBJECT */ && !(u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic))) {
+    if (oindx >= FIRST_OBJECT && !(u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic))) {
         obj.dknown = (1) & 1;
         await discover_object(oindx, 0, 1, 0);
     }
 }
 export async function discover_object(oindx, mark_as_known, mark_as_encountered, credit_hero) {   // o_init.c:454
     let dindx = 0, acls = 0;
-    if (oindx < 18 /* FIRST_OBJECT */) {
+    if (oindx < FIRST_OBJECT) {
         return;
     }
-    if (!objects[oindx].oc_name_known && mark_as_known || !objects[oindx].oc_encountered && mark_as_encountered || gu.urole.mnum === 340 && Japanese_item_name(oindx, null)) {
+    if (!objects[oindx].oc_name_known && mark_as_known || !objects[oindx].oc_encountered && mark_as_encountered || gu.urole.mnum === PM_SAMURAI && Japanese_item_name(oindx, null)) {
         acls = objects[oindx].oc_class;
         for (dindx = svb.bases[acls]; svd.disco[dindx] !== 0; dindx = dindx + 1 | 0) {
             if (svd.disco[dindx] === oindx) {
@@ -321,10 +332,10 @@ export async function discover_object(oindx, mark_as_known, mark_as_encountered,
         if (!objects[oindx].oc_name_known && mark_as_known) {
             objects[oindx].oc_name_known = (1) & 1;
             if (credit_hero) {
-                await exercise(2 /* A_WIS */, 1);
+                await exercise(A_WIS, 1);
             }
             if (program_state.in_moveloop && !program_state.gameover) {
-                if (objects[oindx].oc_class === 13 /* GEM_CLASS */) {
+                if (objects[oindx].oc_class === GEM_CLASS) {
                     await gem_learned(oindx);
                 }
                 await update_inventory();
@@ -337,7 +348,7 @@ export async function undiscover_object(oindx) {   // o_init.c:498
     if (!objects[oindx].oc_name_known && !objects[oindx].oc_encountered) {
         acls = objects[oindx].oc_class;
         found = 0;
-        for (dindx = svb.bases[acls]; dindx < 481 /* NUM_OBJECTS */ && svd.disco[dindx] !== 0 && objects[dindx].oc_class === acls; dindx = dindx + 1 | 0) {
+        for (dindx = svb.bases[acls]; dindx < NUM_OBJECTS && svd.disco[dindx] !== 0 && objects[dindx].oc_class === acls; dindx = dindx + 1 | 0) {
             if (found) {
                 svd.disco[dindx - 1 | 0] = svd.disco[dindx];
             } else if (svd.disco[dindx] === oindx) {
@@ -349,13 +360,13 @@ export async function undiscover_object(oindx) {   // o_init.c:498
         } else {
             await impossible($c.lit("named object not in disco"));
         }
-        if (objects[oindx].oc_class === 13 /* GEM_CLASS */) {
+        if (objects[oindx].oc_class === GEM_CLASS) {
             await gem_learned(oindx);
         }
     }
 }
 export function interesting_to_discover(i) {   // o_init.c:526
-    if (gu.urole.mnum === 340 && Japanese_item_name(i, null)) {
+    if (gu.urole.mnum === PM_SAMURAI && Japanese_item_name(i, null)) {
         return 1;
     }
     return $c.i8(objects[i].oc_uname !== null || (objects[i].oc_name_known | 0 || objects[i].oc_encountered | 0) && obj_descr[objects[i].oc_descr_idx].oc_descr !== null ? 1 : 0);
@@ -376,8 +387,8 @@ async function sortloot_descr(otyp, outbuf) {   // o_init.c:567
     o.oclass = objects[otyp].oc_class;
     o.dknown = (1) & 1;
     o.known = ((objects[otyp].oc_name_known | 0 || !objects[otyp].oc_uses_known ? 1 : 0) >>> 0) & 1;
-    o.corpsenm = -1 /* NON_PM */;
-    if (otyp === 285 /* SLIME_MOLD */) {
+    o.corpsenm = NON_PM;
+    if (otyp === SLIME_MOLD) {
         o.spe = $c.i8(svc.context.current_fruit);
     }
     $c.__builtin___memset_chk(sl_cookie, 0, 24, 24);
@@ -389,13 +400,13 @@ async function sortloot_descr(otyp, outbuf) {   // o_init.c:567
 }
 export async function choose_disco_sort(mode) {   // o_init.c:611
     let tmpwin = 0, selected = [null], any = new $T.any(), i = 0, n = 0, choice = 0, clr = 0;
-    clr = 8;
-    tmpwin = await windowprocs.win_create_nhwindow(4);
-    await windowprocs.win_start_menu(tmpwin, 0);
+    clr = NO_COLOR;
+    tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
+    await windowprocs.win_start_menu(tmpwin, MENU_BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     for (i = 0; disco_orders_descr[i]; i = i + 1 | 0) {
         any.a_int = disco_order_let[i];
-        await add_menu(tmpwin, nul_glyphinfo, any, $c.i8(any.a_int), 0, 0, clr, disco_orders_descr[i], disco_order_let[i] === flags.discosort ? 1 : 0);
+        await add_menu(tmpwin, nul_glyphinfo, any, $c.i8(any.a_int), 0, ATR_NONE, clr, disco_orders_descr[i], disco_order_let[i] === flags.discosort ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     }
     if (mode === 2) {
         await add_menu_str(tmpwin, $c.lit(""));
@@ -404,7 +415,7 @@ export async function choose_disco_sort(mode) {   // o_init.c:611
         await add_menu_str(tmpwin, $c.lit("      will matter for future use of total discoveries."));
     }
     await windowprocs.win_end_menu(tmpwin, $c.lit("Ordering of discoveries"));
-    n = await select_menu(tmpwin, 1, new $c.Ptr(selected, 0));
+    n = await select_menu(tmpwin, PICK_ONE, new $c.Ptr(selected, 0));
     await windowprocs.win_destroy_nhwindow(tmpwin);
     if (n > 0) {
         choice = $c.radd(selected[0], 0).item.a_int;
@@ -419,8 +430,8 @@ export async function choose_disco_sort(mode) {   // o_init.c:611
 async function disco_typename(otyp) {   // o_init.c:661
     let result = null, buf = new Int8Array(256), actualn = null;
     result = await obj_typename(otyp);
-    if (gu.urole.mnum === 340 && Japanese_item_name(otyp, null)) {
-        actualn = otyp !== 254 /* MAGIC_HARP */ && otyp !== 253 /* WOODEN_HARP */ || objects[otyp].oc_name_known | 0 ? obj_descr[objects[otyp].oc_name_idx].oc_name : $c.lit("harp");
+    if (gu.urole.mnum === PM_SAMURAI && Japanese_item_name(otyp, null)) {
+        actualn = otyp !== MAGIC_HARP && otyp !== WOODEN_HARP || objects[otyp].oc_name_known | 0 ? obj_descr[objects[otyp].oc_name_idx].oc_name : $c.lit("harp");
         if (!actualn) {
         } else if (strstri(result, $c.lit(" called"))) {
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit(" [%s] called"), actualn);
@@ -439,7 +450,7 @@ async function disco_append_typename(buf, dis) {   // o_init.c:694
     len = $c.strlen(buf);
     typnm = await disco_typename(dis);
     typnm_len = $c.strlen(typnm);
-    if ($c.addu64(len, typnm_len) < 256) {
+    if ($c.addu64(len, typnm_len) < BUFSZ) {
         $c.__builtin___strcat_chk(buf, typnm, -1);
         eos[0] = buf.add($c.idx(len)).add($c.idx(typnm_len));
     } else if ((p = $c.strrchr(typnm, 40)) !== null && $c.pcmp(p, typnm) > 0 && p.get(-1) === 32 && $c.strchr(p, 41) !== null) {
@@ -455,7 +466,7 @@ async function disco_append_typename(buf, dis) {   // o_init.c:694
 }
 function disco_fmt_uniq(uidx, outbuf) {   // o_init.c:725
     $c.__builtin___sprintf_chk(outbuf, 0, -1, $c.lit("  %s"), objects[uidx].oc_name_known | 0 ? obj_descr[objects[uidx].oc_name_idx].oc_name : obj_descr[objects[uidx].oc_descr_idx].oc_descr);
-    if (!objects[uidx].oc_name_known && objects[uidx].oc_class === 10 /* SPBOOK_CLASS */) {
+    if (!objects[uidx].oc_name_known && objects[uidx].oc_class === SPBOOK_CLASS) {
         $c.__builtin___strcat_chk(outbuf, $c.lit(" spellbook"), -1);
     }
 }
@@ -480,21 +491,21 @@ export async function dodiscovered() {   // o_init.c:764
     }
     if (iflags.menu_requested) {
         if (await choose_disco_sort(1) < 0) {
-            return 0;
+            return ECMD_OK;
         }
     }
     alphabyclass = $c.i8(flags.discosort === 99 ? 1 : 0);
     alphabetized = $c.i8(flags.discosort === 97 || alphabyclass ? 1 : 0);
     lootsort = $c.i8(flags.discosort === 115 ? 1 : 0);
     sortindx = $c.pdiff($c.strchr(new $c.Ptr(disco_order_let, 0), flags.discosort), new $c.Ptr(disco_order_let, 0));
-    tmpwin = await windowprocs.win_create_nhwindow(5);
+    tmpwin = await windowprocs.win_create_nhwindow(NHW_TEXT);
     $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Discoveries, %s"), disco_orders_descr[$c.idx(sortindx)]);
     await windowprocs.win_putstr(tmpwin, 0, new $c.Ptr(buf, 0));
     await windowprocs.win_putstr(tmpwin, 0, $c.lit(""));
     uniq_ct = 0;
     for (i = dis = 0; i < 4; i = i + 1 | 0) {
         uidx = uniq_objs[i];
-        if (objects[uidx].oc_name_known | 0 || objects[uidx].oc_encountered | 0 && uidx !== 213 /* AMULET_OF_YENDOR */) {
+        if (objects[uidx].oc_name_known | 0 || objects[uidx].oc_encountered | 0 && uidx !== AMULET_OF_YENDOR) {
             if (!($t1 = dis, dis = $t1 + 1 | 0, $t1)) {
                 await windowprocs.win_putstr(tmpwin, iflags.menu_headings.attr, $c.lit("Unique items or Relics"));
             }
@@ -505,15 +516,15 @@ export async function dodiscovered() {   // o_init.c:764
     }
     arti_ct = await disp_artifact_discoveries(tmpwin);
     $c.__builtin___strcpy_chk(new $c.Ptr(classes, 0), new $c.Ptr(flags.inv_order, 0), 18);
-    if (!$c.strchr(new $c.Ptr(classes, 0), 17 /* VENOM_CLASS */)) {
-        strkitten(new $c.Ptr(classes, 0), 17);
+    if (!$c.strchr(new $c.Ptr(classes, 0), VENOM_CLASS)) {
+        strkitten(new $c.Ptr(classes, 0), VENOM_CLASS);
     }
     ct = uniq_ct + arti_ct | 0;
     sorted_ct = 0;
     for (s = new $c.Ptr(classes, 0); s.get(0); s = s.add(1)) {
         oclass = s.get(0);
         prev_class = $c.i8(oclass + 1 | 0);
-        for (i = svb.bases[oclass]; i < 481 /* NUM_OBJECTS */ && objects[i].oc_class === oclass; i = i + 1 | 0) {
+        for (i = svb.bases[oclass]; i < NUM_OBJECTS && objects[i].oc_class === oclass; i = i + 1 | 0) {
             if ((dis = svd.disco[i]) !== 0 && interesting_to_discover(dis)) {
                 ct = ct + 1 | 0;
                 if (oclass !== prev_class) {
@@ -551,7 +562,7 @@ export async function dodiscovered() {   // o_init.c:764
         await windowprocs.win_display_nhwindow(tmpwin, 1);
     }
     await windowprocs.win_destroy_nhwindow(tmpwin);
-    return 0;
+    return ECMD_OK;
 }
 async function oclass_to_name(oclass, buf) {   // o_init.c:877
     let s = null, $t1;
@@ -565,32 +576,32 @@ export async function doclassdisco() {   // o_init.c:891
     let tmpwin = 0, pick_list = [null], any = new $T.any(), s = null, c = 0, oclass = 0, menulet = 0, allclasses = new Int8Array(18), discosyms = new Int8Array(22), buf = new Int8Array(256), sorted_lines = $c.nulls(481), p = null, i = 0, ct = 0, dis = 0, xtras = 0, sorted_ct = 0, uidx = 0, traditional = 0, alphabetized = 0, lootsort = 0, clr = 0, allclasses_plustwo = new Int8Array(21), sl = null, $t1, $t2, $t3, $t4, $t5, $t6, $t7;
     tmpwin = -1;
     pick_list[0] = null;
-    clr = 8;
+    clr = NO_COLOR;
     if (!flags.discosort || !(p = $c.strchr(new $c.Ptr(disco_order_let, 0), flags.discosort))) {
         flags.discosort = 111;
     }
     if (iflags.menu_requested) {
         if (await choose_disco_sort(2) < 0) {
-            return 0;
+            return ECMD_OK;
         }
     }
     alphabetized = $c.i8(flags.discosort === 97 || flags.discosort === 99 ? 1 : 0);
     lootsort = $c.i8(flags.discosort === 115 ? 1 : 0);
     discosyms[0] = 0;
-    traditional = $c.i8(flags.menu_style === 0 || flags.menu_style === 1 ? 1 : 0);
+    traditional = $c.i8(flags.menu_style === MENU_TRADITIONAL || flags.menu_style === MENU_COMBINATION ? 1 : 0);
     if (!traditional) {
-        tmpwin = await windowprocs.win_create_nhwindow(4);
-        await windowprocs.win_start_menu(tmpwin, 0);
+        tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
+        await windowprocs.win_start_menu(tmpwin, MENU_BEHAVE_STANDARD);
     }
     any.$copyFrom(cg.zeroany);
     menulet = 97;
     for (i = 0; i < 4; i = i + 1 | 0) {
         uidx = uniq_objs[i];
-        if (objects[uidx].oc_name_known | 0 || objects[uidx].oc_encountered | 0 && uidx !== 213 /* AMULET_OF_YENDOR */) {
+        if (objects[uidx].oc_name_known | 0 || objects[uidx].oc_encountered | 0 && uidx !== AMULET_OF_YENDOR) {
             $c.__builtin___strcat_chk(new $c.Ptr(discosyms, 0), $c.lit("u"), 22);
             if (!traditional) {
                 any.a_int = 117;
-                await add_menu(tmpwin, nul_glyphinfo, any, ($t1 = menulet, menulet = $c.i8($t1 + 1), $t1), 114, 0, clr, new $c.Ptr(doclassdisco$unique_items, 0), 0);
+                await add_menu(tmpwin, nul_glyphinfo, any, ($t1 = menulet, menulet = $c.i8($t1 + 1), $t1), 114, ATR_NONE, clr, new $c.Ptr(doclassdisco$unique_items, 0), MENU_ITEMFLAGS_NONE);
             }
             break;
         }
@@ -599,23 +610,23 @@ export async function doclassdisco() {   // o_init.c:891
         $c.__builtin___strcat_chk(new $c.Ptr(discosyms, 0), $c.lit("a"), 22);
         if (!traditional) {
             any.a_int = 97;
-            await add_menu(tmpwin, nul_glyphinfo, any, ($t2 = menulet, menulet = $c.i8($t2 + 1), $t2), 0, 0, clr, new $c.Ptr(doclassdisco$artifact_items, 0), 0);
+            await add_menu(tmpwin, nul_glyphinfo, any, ($t2 = menulet, menulet = $c.i8($t2 + 1), $t2), 0, ATR_NONE, clr, new $c.Ptr(doclassdisco$artifact_items, 0), MENU_ITEMFLAGS_NONE);
         }
     }
     $c.__builtin___strcpy_chk(new $c.Ptr(allclasses, 0), new $c.Ptr(flags.inv_order, 0), 18);
-    if (!$c.strchr(new $c.Ptr(allclasses, 0), 17 /* VENOM_CLASS */)) {
-        strkitten(new $c.Ptr(allclasses, 0), 17);
+    if (!$c.strchr(new $c.Ptr(allclasses, 0), VENOM_CLASS)) {
+        strkitten(new $c.Ptr(allclasses, 0), VENOM_CLASS);
     }
     for (s = new $c.Ptr(allclasses, 0); s.get(0); s = s.add(1)) {
         oclass = s.get(0);
         c = def_oc_syms[oclass].sym;
-        for (i = svb.bases[oclass]; i < 481 /* NUM_OBJECTS */ && objects[i].oc_class === oclass; i = i + 1 | 0) {
+        for (i = svb.bases[oclass]; i < NUM_OBJECTS && objects[i].oc_class === oclass; i = i + 1 | 0) {
             if ((dis = svd.disco[i]) !== 0 && interesting_to_discover(dis)) {
                 if (!$c.strchr(new $c.Ptr(discosyms, 0), c)) {
                     strkitten(new $c.Ptr(discosyms, 0), c);
                     if (!traditional) {
                         any.a_int = c;
-                        await add_menu(tmpwin, nul_glyphinfo, any, ($t3 = menulet, menulet = $c.i8($t3 + 1), $t3), c, 0, clr, await oclass_to_name(oclass, new $c.Ptr(buf, 0)), 0);
+                        await add_menu(tmpwin, nul_glyphinfo, any, ($t3 = menulet, menulet = $c.i8($t3 + 1), $t3), c, ATR_NONE, clr, await oclass_to_name(oclass, new $c.Ptr(buf, 0)), MENU_ITEMFLAGS_NONE);
                     }
                 }
             }
@@ -626,7 +637,7 @@ export async function doclassdisco() {   // o_init.c:891
         if (tmpwin !== -1) {
             await windowprocs.win_destroy_nhwindow(tmpwin);
         }
-        return 0;
+        return ECMD_OK;
     }
     c = 0;
     if (traditional) {
@@ -645,11 +656,11 @@ export async function doclassdisco() {   // o_init.c:891
             await windowprocs.win_clear_nhwindow($G.WIN_MESSAGE);
         }
     } else {
-        if (!discosyms[1] && flags.menu_style === 3) {
+        if (!discosyms[1] && flags.menu_style === MENU_PARTIAL) {
             c = discosyms[0];
         } else {
             await windowprocs.win_end_menu(tmpwin, new $c.Ptr(doclassdisco$prompt, 0));
-            i = await select_menu(tmpwin, 1, new $c.Ptr(pick_list, 0));
+            i = await select_menu(tmpwin, PICK_ONE, new $c.Ptr(pick_list, 0));
             if (i > 0) {
                 c = $c.i8($c.radd(pick_list[0], 0).item.a_int);
                 $c.free(pick_list[0]);
@@ -658,9 +669,9 @@ export async function doclassdisco() {   // o_init.c:891
         await windowprocs.win_destroy_nhwindow(tmpwin);
     }
     if (!c) {
-        return 0;
+        return ECMD_OK;
     }
-    tmpwin = await windowprocs.win_create_nhwindow(5);
+    tmpwin = await windowprocs.win_create_nhwindow(NHW_TEXT);
     ct = 0;
     switch (c) {
         case 117:
@@ -668,7 +679,7 @@ export async function doclassdisco() {   // o_init.c:891
             await windowprocs.win_putstr(tmpwin, iflags.menu_headings.attr, upstart($c.__builtin___strcpy_chk(new $c.Ptr(buf, 0), new $c.Ptr(doclassdisco$unique_items, 0), 256)));
             for (i = 0; i < 4; i = i + 1 | 0) {
                 uidx = uniq_objs[i];
-                if (objects[uidx].oc_name_known | 0 || objects[uidx].oc_encountered | 0 && uidx !== 213 /* AMULET_OF_YENDOR */) {
+                if (objects[uidx].oc_name_known | 0 || objects[uidx].oc_encountered | 0 && uidx !== AMULET_OF_YENDOR) {
                     ct = ct + 1 | 0;
                     disco_fmt_uniq(uidx, new $c.Ptr(buf, 0));
                     await windowprocs.win_putstr(tmpwin, 0, new $c.Ptr(buf, 0));
@@ -681,7 +692,7 @@ export async function doclassdisco() {   // o_init.c:891
         case 97:
             if (flags.debug && await yn_function($c.lit("Dump information about all artifacts?"), new $c.Ptr(ynchars, 0), 110, 1) === 121) {
                 await dump_artifact_info(tmpwin);
-                ct = 33 /* NROFARTIFACTS */;
+                ct = NROFARTIFACTS;
                 break;
             }
             ct = await disp_artifact_discoveries(tmpwin);
@@ -691,7 +702,7 @@ export async function doclassdisco() {   // o_init.c:891
             break;
         default:
             oclass = $c.i8(def_char_to_objclass(c));
-            if (oclass === 18 /* MAXOCLASSES */) {
+            if (oclass === MAXOCLASSES) {
                 await impossible($c.lit("doclassdisco: invalid object class '%s'"), visctrl(c));
             }
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Discovered %s in %s"), await let_to_name(oclass, 0, 0), flags.discosort === 111 ? $c.lit("order of discovery") : flags.discosort === 115 ? $c.lit("'sortloot' order") : $c.lit("alphabetical order"));
@@ -732,21 +743,21 @@ export async function doclassdisco() {   // o_init.c:891
         await windowprocs.win_display_nhwindow(tmpwin, 1);
     }
     await windowprocs.win_destroy_nhwindow(tmpwin);
-    return 0;
+    return ECMD_OK;
 }
 export async function rename_disco() {   // o_init.c:1131
     let i = 0, dis = 0, ct = 0, mn = 0, sl = 0, s = null, oclass = 0, prev_class = 0, tmpwin = 0, any = new $T.any(), selected = [null], clr = 0, buf = new Int8Array(256), odummy = new $T.obj();
     ct = 0;
     mn = 0;
     selected[0] = null;
-    clr = 8;
+    clr = NO_COLOR;
     any.$copyFrom(cg.zeroany);
-    tmpwin = await windowprocs.win_create_nhwindow(4);
-    await windowprocs.win_start_menu(tmpwin, 0);
+    tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
+    await windowprocs.win_start_menu(tmpwin, MENU_BEHAVE_STANDARD);
     for (s = new $c.Ptr(flags.inv_order, 0); s.get(0); s = s.add(1)) {
         oclass = s.get(0);
         prev_class = $c.i8(oclass + 1 | 0);
-        for (i = svb.bases[oclass]; i < 481 /* NUM_OBJECTS */ && objects[i].oc_class === oclass; i = i + 1 | 0) {
+        for (i = svb.bases[oclass]; i < NUM_OBJECTS && objects[i].oc_class === oclass; i = i + 1 | 0) {
             dis = svd.disco[i];
             if (!dis || !interesting_to_discover(dis)) {
                 continue;
@@ -764,7 +775,7 @@ export async function rename_disco() {   // o_init.c:1131
             any.a_int = dis;
             new $c.Ptr(buf, 0).set(0, 0);
             await disco_append_typename(new $c.Ptr(buf, 0), dis);
-            await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, 0, clr, new $c.Ptr(buf, 0), 0);
+            await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR_NONE, clr, new $c.Ptr(buf, 0), MENU_ITEMFLAGS_NONE);
         }
     }
     if (ct === 0) {
@@ -773,13 +784,13 @@ export async function rename_disco() {   // o_init.c:1131
         await pline($c.lit("None of your discoveries can be assigned names..."));
     } else {
         await windowprocs.win_end_menu(tmpwin, $c.lit("Pick an object type to name"));
-        dis = 0 /* STRANGE_OBJECT */;
-        sl = await select_menu(tmpwin, 1, new $c.Ptr(selected, 0));
+        dis = STRANGE_OBJECT;
+        sl = await select_menu(tmpwin, PICK_ONE, new $c.Ptr(selected, 0));
         if (sl > 0) {
             dis = $c.radd(selected[0], 0).item.a_int;
             $c.free(selected[0]);
         }
-        if (dis !== 0 /* STRANGE_OBJECT */) {
+        if (dis !== STRANGE_OBJECT) {
             odummy.$copyFrom(cg.zeroobj);
             odummy.otyp = $c.i16(dis);
             odummy.oclass = objects[dis].oc_class;
@@ -807,10 +818,10 @@ export function get_sortdisco(opts, cnf) {   // o_init.c:1210
 
 export function $init() {
     uniq_objs.fill(0);
-    uniq_objs[0] = 213;
-    uniq_objs[1] = 263;
-    uniq_objs[2] = 409;
-    uniq_objs[3] = 262;
+    uniq_objs[0] = AMULET_OF_YENDOR;
+    uniq_objs[1] = BELL_OF_OPENING;
+    uniq_objs[2] = SPE_BOOK_OF_THE_DEAD;
+    uniq_objs[3] = CANDELABRUM_OF_INVOCATION;
     disco_order_let.fill(0);
     disco_order_let.set([111, 115, 99, 97]);   // "osca"
     disco_orders_descr.fill(null);
@@ -820,18 +831,18 @@ export function $init() {
     disco_orders_descr[3] = $c.lit("alphabetical across all classes");
     disco_orders_descr[4] = null;
     shuffle_all$shuffle_classes.fill(0);
-    shuffle_all$shuffle_classes[0] = 5;
-    shuffle_all$shuffle_classes[1] = 8;
-    shuffle_all$shuffle_classes[2] = 4;
-    shuffle_all$shuffle_classes[3] = 9;
-    shuffle_all$shuffle_classes[4] = 10;
-    shuffle_all$shuffle_classes[5] = 11;
-    shuffle_all$shuffle_classes[6] = 17;
+    shuffle_all$shuffle_classes[0] = AMULET_CLASS;
+    shuffle_all$shuffle_classes[1] = POTION_CLASS;
+    shuffle_all$shuffle_classes[2] = RING_CLASS;
+    shuffle_all$shuffle_classes[3] = SCROLL_CLASS;
+    shuffle_all$shuffle_classes[4] = SPBOOK_CLASS;
+    shuffle_all$shuffle_classes[5] = WAND_CLASS;
+    shuffle_all$shuffle_classes[6] = VENOM_CLASS;
     shuffle_all$shuffle_types.fill(0);
-    shuffle_all$shuffle_types[0] = 97;
-    shuffle_all$shuffle_types[1] = 159;
-    shuffle_all$shuffle_types[2] = 146;
-    shuffle_all$shuffle_types[3] = 166;
+    shuffle_all$shuffle_types[0] = HELMET;
+    shuffle_all$shuffle_types[1] = LEATHER_GLOVES;
+    shuffle_all$shuffle_types[2] = CLOAK_OF_PROTECTION;
+    shuffle_all$shuffle_types[3] = SPEED_BOOTS;
     doclassdisco$prompt.fill(0);
     doclassdisco$prompt.set([86, 105, 101, 119, 32, 100, 105, 115, 99, 111, 118, 101, 114, 105, 101, 115, 32, 102, 111, 114, 32, 119, 104, 105, 99, 104, 32, 115, 111, 114, 116, 32, 111, 102, 32, 111, 98, 106, 101, 99, 116, 115, 63]);   // "View discoveries for which sort of objects?"
     doclassdisco$havent_discovered_any.fill(0);

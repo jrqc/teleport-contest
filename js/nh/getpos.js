@@ -4,18 +4,37 @@ import * as $T from './types.js';
 import { $G } from './globals.js';
 import { alloc } from './alloc.js';
 import { cmd_from_func, cmdq_add_key, cmdq_clear, cmdq_pop, directionname, do_move_east, do_move_north, do_move_south, do_move_west, do_run, do_run_east, do_run_north, do_run_south, do_run_west, do_rush, isok, lock_mouse_buttons, movecmd, readchar_poskey, redraw_cmd, xytodir } from './cmd.js';
+import { CLR_BRIGHT_BLUE, NO_COLOR } from './color.h.js';
+import { TIP_GETPOS } from './context.h.js';
 import { cg, flags, gc, gg, gi, gs, gv, gw, iflags, quitchars, svl, u } from './decl.js';
+import { S_air, S_arrow_trap, S_bars, S_cloud, S_corr, S_darkroom, S_digbeam, S_engrcorr, S_engroom, S_fountain, S_goodpos, S_hcdbridge, S_hcdoor, S_ice, S_lava, S_lavawall, S_litcorr, S_ndoor, S_pool, S_room, S_stone, S_tree, S_trwall, S_upstair, S_vodbridge, S_vodoor, S_water } from './defsym.h.js';
 import { back_to_glyph, docrt_flags, flush_screen, glyph_at, nul_glyphinfo } from './display.js';
+import { GLYPH_BODY_OFF, GLYPH_BODY_PILETOP_OFF, GLYPH_CMAP_C_OFF, GLYPH_CMAP_STONE_OFF, GLYPH_DETECT_FEM_OFF, GLYPH_DETECT_MALE_OFF, GLYPH_MON_FEM_OFF, GLYPH_MON_MALE_OFF, GLYPH_NOTHING_OFF, GLYPH_OBJ_OFF, GLYPH_OBJ_PILETOP_OFF, GLYPH_PET_FEM_OFF, GLYPH_PET_MALE_OFF, GLYPH_RIDDEN_FEM_OFF, GLYPH_RIDDEN_MALE_OFF, GLYPH_STATUE_FEM_OFF, GLYPH_STATUE_FEM_PILETOP_OFF, GLYPH_STATUE_MALE_OFF, GLYPH_STATUE_MALE_PILETOP_OFF, GLYPH_UNEXPLORED_OFF, docrtRefresh } from './display.h.js';
 import { defsyms } from './drawing.js';
+import { GFILTER_AREA, GFILTER_VIEW, GLOC_DOOR, GLOC_EXPLORE, GLOC_INTERESTING, GLOC_MONS, GLOC_OBJS, GLOC_VALID, NUM_GFILTER, NUM_GLOCS, TER_DETECT, TER_MAP, TER_MON, TER_OBJ } from './flag.h.js';
+import { COLNO, ROWNO } from './global.h.js';
 import { glyph_to_cmap } from './glyphs.js';
 import { handle_tip, invocation_pos, is_valid_travelpt } from './hack.js';
+import { CMDQ_DIR, CMDQ_KEY, CQ_CANNED, CQ_REPEAT, LOOK_ONCE, LOOK_QUICK, LOOK_TRADITIONAL, LOOK_VERBOSE, MV_RUN, MV_RUSH, MV_WALK, NHKF_ESC, NHKF_GETPOS_AUTODESC, NHKF_GETPOS_DOOR_NEXT, NHKF_GETPOS_DOOR_PREV, NHKF_GETPOS_HELP, NHKF_GETPOS_INTERESTING_NEXT, NHKF_GETPOS_INTERESTING_PREV, NHKF_GETPOS_LIMITVIEW, NHKF_GETPOS_MENU, NHKF_GETPOS_MON_NEXT, NHKF_GETPOS_MON_PREV, NHKF_GETPOS_MOVESKIP, NHKF_GETPOS_OBJ_NEXT, NHKF_GETPOS_OBJ_PREV, NHKF_GETPOS_PICK, NHKF_GETPOS_PICK_O, NHKF_GETPOS_PICK_Q, NHKF_GETPOS_PICK_V, NHKF_GETPOS_SELF, NHKF_GETPOS_SHOWVALID, NHKF_GETPOS_UNEX_NEXT, NHKF_GETPOS_UNEX_PREV, NHKF_GETPOS_VALID_NEXT, NHKF_GETPOS_VALID_PREV, NO_CURS_ON_U, OVERRIDE_MSGTYPE, SUPPRESS_HISTORY } from './hack.h.js';
 import { eos, nh_snprintf, sgn, strsubst, visctrl } from './hacklib.js';
+import { NUM_OBJECTS } from './objclass.h.js';
+import { BOULDER, FIRST_OBJECT, ROCK } from './objects.h.js';
 import { an } from './objnam.js';
 import { do_screen_description, what_is_a_location } from './pager.js';
+import { NUMMONS } from './permonst.h.js';
 import { You, custompline, pline } from './pline.js';
+import { DOOR } from './rm.h.js';
 import { selection_floodfill, selection_force_newsyms, selection_free, selection_getpoint, selection_new, selection_setpoint, set_selection_floodfillchk } from './selvar.js';
+import { MAXPCHARS } from './sym.h.js';
 import { t_at } from './trap.js';
+import { TRAPNUM, VIBRATING_SQUARE } from './trap.h.js';
+import { IN_SIGHT } from './vision.h.js';
 import { add_menu, select_menu, windowprocs } from './windows.js';
+import { ATR_NONE, MENU_BEHAVE_STANDARD, MENU_ITEMFLAGS_NONE, NHW_MENU, PICK_ONE } from './wintype.h.js';
+
+const HiliteNormalMap = 0;
+const HiliteGoodposSymbol = 1;
+const HiliteBackground = 2;
 
 const getpos_help$fastmovemode = $c.nulls(2);   // static in getpos_help()
 const dxdy_to_dist_descr$buf = new Int8Array(30);   // static in dxdy_to_dist_descr()
@@ -35,7 +54,7 @@ export async function getpos_sethilite(gp_hilitef, gp_getvalidf) {   // getpos.c
     old_getvalid = getpos_getvalid;
     old_map_frame_color = gw.wsettings.map_frame_color;
     sel = await selection_new();
-    defaultHiliteState = (iflags.bgcolors ? 2 /* HiliteBackground */ : 0 /* HiliteNormalMap */) >>> 0;
+    defaultHiliteState = (iflags.bgcolors ? HiliteBackground : HiliteNormalMap) >>> 0;
     if (gp_getvalidf !== old_getvalid) {
         getpos_hilite_state = defaultHiliteState;
     }
@@ -43,19 +62,19 @@ export async function getpos_sethilite(gp_hilitef, gp_getvalidf) {   // getpos.c
     getpos_hilitefunc = gp_hilitef;
     getpos_getvalid = gp_getvalidf;
     await getpos_getvalids_selection(sel, getpos_getvalid);
-    gw.wsettings.map_frame_color = (getpos_hilite_state === 2 ? 12 : 8) >>> 0;
+    gw.wsettings.map_frame_color = (getpos_hilite_state === HiliteBackground ? CLR_BRIGHT_BLUE : NO_COLOR) >>> 0;
     if (getpos_getvalid !== old_getvalid || gw.wsettings.map_frame_color !== old_map_frame_color) {
         await selection_force_newsyms(sel);
     }
     selection_free(sel, 1);
 }
 async function getpos_toggle_hilite_state() {   // getpos.c:72
-    if (getpos_hilite_state === 1) {
+    if (getpos_hilite_state === HiliteGoodposSymbol) {
         await getpos_hilitefunc(0);
     }
     getpos_hilite_state = $c.remu32(getpos_hilite_state + 1 >>> 0, (iflags.bgcolors ? 3 : 2) >>> 0);
     await getpos_sethilite(getpos_hilitefunc, getpos_getvalid);
-    if (getpos_hilite_state === 1) {
+    if (getpos_hilite_state === HiliteGoodposSymbol) {
         await getpos_hilitefunc(1);
     }
 }
@@ -82,7 +101,7 @@ async function getpos_help_keyxhelp(tmpwin, k1, k2, gloc) {   // getpos.c:137
     let sbuf = new Int8Array(256), fbuf = new Int8Array(128), move_cursor_to = null, filtertxt = null;
     move_cursor_to = $c.lit("move the cursor to ");
     filtertxt = gloc_filtertxt[iflags.getloc_filter];
-    if (gloc === 3 /* GLOC_EXPLORE */) {
+    if (gloc === GLOC_EXPLORE) {
         move_cursor_to = $c.lit("move the cursor next to an ");
         if (iflags.getloc_usemenu) {
             filtertxt = strsubst($c.__builtin___strcpy_chk(new $c.Ptr(fbuf, 0), filtertxt, 128), $c.lit("this area"), $c.lit("area"));
@@ -96,7 +115,7 @@ async function getpos_help(force, goal) {   // getpos.c:167
     D1: for (;;) {
         switch ($goto) {
         case null:
-            tmpwin = await windowprocs.win_create_nhwindow(4);
+            tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
             $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("Use '%s', '%s', '%s', '%s' to move the cursor to %s."), visctrl(cmd_from_func(do_move_west)), visctrl(cmd_from_func(do_move_south)), visctrl(cmd_from_func(do_move_north)), visctrl(cmd_from_func(do_move_east)), goal);
             await windowprocs.win_putstr(tmpwin, 0, new $c.Ptr(sbuf, 0));
             $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("Use '%s', '%s', '%s', '%s' to fast-move the cursor, %s."), visctrl(cmd_from_func(do_run_west)), visctrl(cmd_from_func(do_run_south)), visctrl(cmd_from_func(do_run_north)), visctrl(cmd_from_func(do_run_east)), getpos_help$fastmovemode[iflags.getloc_moveskip]);
@@ -104,28 +123,28 @@ async function getpos_help(force, goal) {   // getpos.c:167
             $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("(or prefix normal move with '%s' or '%s' to fast-move)"), visctrl(cmd_from_func(do_run)), visctrl(cmd_from_func(do_rush)));
             await windowprocs.win_putstr(tmpwin, 0, new $c.Ptr(sbuf, 0));
             await windowprocs.win_putstr(tmpwin, 0, $c.lit("Or enter a background symbol (ex. '<')."));
-            $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("Use '%s' to move the cursor on yourself."), visctrl(gc.Cmd.spkeys[6 /* NHKF_GETPOS_SELF */]));
+            $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("Use '%s' to move the cursor on yourself."), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_SELF]));
             await windowprocs.win_putstr(tmpwin, 0, new $c.Ptr(sbuf, 0));
-            if (!iflags.terrainmode || (iflags.terrainmode & 8) >>> 0 !== 0) {
-                await getpos_help_keyxhelp(tmpwin, visctrl(gc.Cmd.spkeys[13 /* NHKF_GETPOS_MON_NEXT */]), visctrl(gc.Cmd.spkeys[14 /* NHKF_GETPOS_MON_PREV */]), 0 /* GLOC_MONS */);
+            if (!iflags.terrainmode || (iflags.terrainmode & TER_MON) >>> 0 !== 0) {
+                await getpos_help_keyxhelp(tmpwin, visctrl(gc.Cmd.spkeys[NHKF_GETPOS_MON_NEXT]), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_MON_PREV]), GLOC_MONS);
             }
             if (goal && !$c.strcmp(goal, $c.lit("a monster"))) {
                 $goto = "skip_non_mons"; continue D1;
             }
-            if (!iflags.terrainmode || (iflags.terrainmode & 4) >>> 0 !== 0) {
-                await getpos_help_keyxhelp(tmpwin, visctrl(gc.Cmd.spkeys[15 /* NHKF_GETPOS_OBJ_NEXT */]), visctrl(gc.Cmd.spkeys[16 /* NHKF_GETPOS_OBJ_PREV */]), 1 /* GLOC_OBJS */);
+            if (!iflags.terrainmode || (iflags.terrainmode & TER_OBJ) >>> 0 !== 0) {
+                await getpos_help_keyxhelp(tmpwin, visctrl(gc.Cmd.spkeys[NHKF_GETPOS_OBJ_NEXT]), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_OBJ_PREV]), GLOC_OBJS);
             }
-            if (!iflags.terrainmode || (iflags.terrainmode & 1) >>> 0 !== 0) {
-                await getpos_help_keyxhelp(tmpwin, visctrl(gc.Cmd.spkeys[17 /* NHKF_GETPOS_DOOR_NEXT */]), visctrl(gc.Cmd.spkeys[18 /* NHKF_GETPOS_DOOR_PREV */]), 2 /* GLOC_DOOR */);
-                await getpos_help_keyxhelp(tmpwin, visctrl(gc.Cmd.spkeys[19 /* NHKF_GETPOS_UNEX_NEXT */]), visctrl(gc.Cmd.spkeys[20 /* NHKF_GETPOS_UNEX_PREV */]), 3 /* GLOC_EXPLORE */);
-                await getpos_help_keyxhelp(tmpwin, visctrl(gc.Cmd.spkeys[21 /* NHKF_GETPOS_INTERESTING_NEXT */]), visctrl(gc.Cmd.spkeys[22 /* NHKF_GETPOS_INTERESTING_PREV */]), 4 /* GLOC_INTERESTING */);
+            if (!iflags.terrainmode || (iflags.terrainmode & TER_MAP) >>> 0 !== 0) {
+                await getpos_help_keyxhelp(tmpwin, visctrl(gc.Cmd.spkeys[NHKF_GETPOS_DOOR_NEXT]), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_DOOR_PREV]), GLOC_DOOR);
+                await getpos_help_keyxhelp(tmpwin, visctrl(gc.Cmd.spkeys[NHKF_GETPOS_UNEX_NEXT]), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_UNEX_PREV]), GLOC_EXPLORE);
+                await getpos_help_keyxhelp(tmpwin, visctrl(gc.Cmd.spkeys[NHKF_GETPOS_INTERESTING_NEXT]), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_INTERESTING_PREV]), GLOC_INTERESTING);
             }
-            $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("Use '%s' to change fast-move mode to %s."), visctrl(gc.Cmd.spkeys[28 /* NHKF_GETPOS_MOVESKIP */]), getpos_help$fastmovemode[!iflags.getloc_moveskip ? 1 : 0]);
+            $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("Use '%s' to change fast-move mode to %s."), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_MOVESKIP]), getpos_help$fastmovemode[!iflags.getloc_moveskip ? 1 : 0]);
             await windowprocs.win_putstr(tmpwin, 0, new $c.Ptr(sbuf, 0));
-            if (!iflags.terrainmode || (iflags.terrainmode & 32) >>> 0 === 0) {
-                $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("Use '%s' to toggle menu listing for possible targets."), visctrl(gc.Cmd.spkeys[26 /* NHKF_GETPOS_MENU */]));
+            if (!iflags.terrainmode || (iflags.terrainmode & TER_DETECT) >>> 0 === 0) {
+                $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("Use '%s' to toggle menu listing for possible targets."), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_MENU]));
                 await windowprocs.win_putstr(tmpwin, 0, new $c.Ptr(sbuf, 0));
-                $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("Use '%s' to change the mode of limiting possible targets."), visctrl(gc.Cmd.spkeys[27 /* NHKF_GETPOS_LIMITVIEW */]));
+                $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("Use '%s' to change the mode of limiting possible targets."), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_LIMITVIEW]));
                 await windowprocs.win_putstr(tmpwin, 0, new $c.Ptr(sbuf, 0));
             }
         case "skip_non_mons":
@@ -134,36 +153,36 @@ async function getpos_help(force, goal) {   // getpos.c:167
                     switch ($goto) {
                     case null:
                         if (getpos_getvalid) {
-                            $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("Use '%s' or '%s' to move to valid locations."), visctrl(gc.Cmd.spkeys[23 /* NHKF_GETPOS_VALID_NEXT */]), visctrl(gc.Cmd.spkeys[24 /* NHKF_GETPOS_VALID_PREV */]));
+                            $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("Use '%s' or '%s' to move to valid locations."), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_VALID_NEXT]), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_VALID_PREV]));
                             await windowprocs.win_putstr(tmpwin, 0, new $c.Ptr(sbuf, 0));
                         }
                         if (getpos_hilitefunc) {
-                            $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("Use '%s' to toggle marking of valid locations."), visctrl(gc.Cmd.spkeys[11 /* NHKF_GETPOS_SHOWVALID */]));
+                            $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("Use '%s' to toggle marking of valid locations."), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_SHOWVALID]));
                             await windowprocs.win_putstr(tmpwin, 0, new $c.Ptr(sbuf, 0));
                         }
-                        $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("Use '%s' to toggle automatic description."), visctrl(gc.Cmd.spkeys[12 /* NHKF_GETPOS_AUTODESC */]));
+                        $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("Use '%s' to toggle automatic description."), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_AUTODESC]));
                         await windowprocs.win_putstr(tmpwin, 0, new $c.Ptr(sbuf, 0));
                         if (iflags.cmdassist) {
-                            $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, iflags.getpos_coords === 110 ? $c.lit("(Set 'whatis_coord' option to include coordinates with '%s' text.)") : $c.lit("(Reset 'whatis_coord' option to omit coordinates from '%s' text.)"), visctrl(gc.Cmd.spkeys[12 /* NHKF_GETPOS_AUTODESC */]));
+                            $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, iflags.getpos_coords === 110 ? $c.lit("(Set 'whatis_coord' option to include coordinates with '%s' text.)") : $c.lit("(Reset 'whatis_coord' option to omit coordinates from '%s' text.)"), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_AUTODESC]));
                         }
                     case "skip_non_mons":
                         $goto = null;   // skip_non_mons:
                         doing_what_is = $c.i8($c.peq(goal, new $c.Ptr(what_is_a_location, 0)) ? 1 : 0);
                         if (doing_what_is) {
-                            $c.__builtin___sprintf_chk(new $c.Ptr(kbuf, 0), 0, 256, $c.lit("'%s' or '%s' or '%s' or '%s'"), visctrl(gc.Cmd.spkeys[7 /* NHKF_GETPOS_PICK */]), visctrl(gc.Cmd.spkeys[8 /* NHKF_GETPOS_PICK_Q */]), visctrl(gc.Cmd.spkeys[9 /* NHKF_GETPOS_PICK_O */]), visctrl(gc.Cmd.spkeys[10 /* NHKF_GETPOS_PICK_V */]));
+                            $c.__builtin___sprintf_chk(new $c.Ptr(kbuf, 0), 0, 256, $c.lit("'%s' or '%s' or '%s' or '%s'"), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK]), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK_Q]), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK_O]), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK_V]));
                         } else {
-                            $c.__builtin___sprintf_chk(new $c.Ptr(kbuf, 0), 0, 256, $c.lit("'%s'"), visctrl(gc.Cmd.spkeys[7 /* NHKF_GETPOS_PICK */]));
+                            $c.__builtin___sprintf_chk(new $c.Ptr(kbuf, 0), 0, 256, $c.lit("'%s'"), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK]));
                         }
                         nh_snprintf($c.lit("getpos_help"), 280, new $c.Ptr(sbuf, 0), 256, $c.lit("Type a %s when you are at the right place."), new $c.Ptr(kbuf, 0));
                         await windowprocs.win_putstr(tmpwin, 0, new $c.Ptr(sbuf, 0));
                         if (doing_what_is) {
-                            $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("  '%s' describe current spot, show 'more info', move to another spot."), visctrl(gc.Cmd.spkeys[10 /* NHKF_GETPOS_PICK_V */]));
+                            $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("  '%s' describe current spot, show 'more info', move to another spot."), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK_V]));
                             await windowprocs.win_putstr(tmpwin, 0, new $c.Ptr(sbuf, 0));
-                            $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("  '%s' describe current spot,%s move to another spot;"), visctrl(gc.Cmd.spkeys[7 /* NHKF_GETPOS_PICK */]), flags.help && !force ? $c.lit(" prompt if 'more info',") : $c.lit(""));
+                            $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("  '%s' describe current spot,%s move to another spot;"), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK]), flags.help && !force ? $c.lit(" prompt if 'more info',") : $c.lit(""));
                             await windowprocs.win_putstr(tmpwin, 0, new $c.Ptr(sbuf, 0));
-                            $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("  '%s' describe current spot, move to another spot;"), visctrl(gc.Cmd.spkeys[8 /* NHKF_GETPOS_PICK_Q */]));
+                            $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("  '%s' describe current spot, move to another spot;"), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK_Q]));
                             await windowprocs.win_putstr(tmpwin, 0, new $c.Ptr(sbuf, 0));
-                            $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("  '%s' describe current spot, stop looking at things;"), visctrl(gc.Cmd.spkeys[9 /* NHKF_GETPOS_PICK_O */]));
+                            $c.__builtin___sprintf_chk(new $c.Ptr(sbuf, 0), 0, 256, $c.lit("  '%s' describe current spot, stop looking at things;"), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK_O]));
                             await windowprocs.win_putstr(tmpwin, 0, new $c.Ptr(sbuf, 0));
                         }
                     }
@@ -197,19 +216,19 @@ function cmp_coord_distu(a, b) {   // getpos.c:312
 }
 function gloc_filter_classify_glyph(glyph) {   // getpos.c:341
     let c = 0;
-    if (!(glyph >= 3929 /* GLYPH_CMAP_STONE_OFF */ && glyph < 4093)) {
+    if (!(glyph >= GLYPH_CMAP_STONE_OFF && glyph < GLYPH_CMAP_C_OFF + (S_goodpos - S_digbeam + 1))) {
         return 0;
     }
     c = glyph_to_cmap(glyph);
-    if (c >= 19 /* S_room */ && c <= 20 /* S_darkroom */ || c >= 25 /* S_upstair */ && c <= 37 /* S_fountain */) {
+    if (c >= S_room && c <= S_darkroom || c >= S_upstair && c <= S_fountain) {
         return 1;
-    } else if (c >= 0 /* S_stone */ && c <= 11 /* S_trwall */ || c === 18 /* S_tree */) {
+    } else if (c >= S_stone && c <= S_trwall || c === S_tree) {
         return 2;
-    } else if (c >= 22 /* S_corr */ && c <= 23 /* S_litcorr */) {
+    } else if (c >= S_corr && c <= S_litcorr) {
         return 3;
-    } else if (c === 38 /* S_pool */ || c === 48 /* S_water */) {
+    } else if (c === S_pool || c === S_water) {
         return 4;
-    } else if (c === 40 /* S_lava */ || c === 41 /* S_lavawall */) {
+    } else if (c === S_lava || c === S_lavawall) {
         return 5;
     }
     return 0;
@@ -236,11 +255,11 @@ async function gloc_filter_floodfill(x, y) {   // getpos.c:382
 }
 async function gloc_filter_init() {   // getpos.c:391
     let $t1;
-    if (iflags.getloc_filter === 2 /* GFILTER_AREA */) {
+    if (iflags.getloc_filter === GFILTER_AREA) {
         if (!gg.gloc_filter_map) {
             $t1 = await selection_new(), gg.gloc_filter_map = $t1;
         }
-        if (svl.level.locations[u.ux][u.uy].typ === 23 /* DOOR */) {
+        if (svl.level.locations[u.ux][u.uy].typ === DOOR) {
             if ((u.dx || u.dy) && isok($c.i16(u.ux + u.dx | 0), $c.i16(u.uy + u.dy | 0))) {
                 await gloc_filter_floodfill($c.i16(u.ux + u.dx | 0), $c.i16(u.uy + u.dy | 0));
             } else {
@@ -260,36 +279,36 @@ function known_vibrating_square_at(x, y) {   // getpos.c:422
     let ttmp = null;
     if (invocation_pos(x, y)) {
         ttmp = t_at(x, y);
-        return $c.i8(ttmp && (ttmp.ttyp | 0) === 23 /* VIBRATING_SQUARE */ && ttmp.tseen | 0 ? 1 : 0);
+        return $c.i8(ttmp && (ttmp.ttyp | 0) === VIBRATING_SQUARE && ttmp.tseen | 0 ? 1 : 0);
     }
     return 0;
 }
 export async function gather_locs_interesting(x, y, gloc) {   // getpos.c:438
     let glyph = 0, sym = 0;
-    if (iflags.getloc_filter === 1 /* GFILTER_VIEW */ && !((gv.viz_array.get(y).get(x) & 2) !== 0)) {
+    if (iflags.getloc_filter === GFILTER_VIEW && !((gv.viz_array.get(y).get(x) & IN_SIGHT) !== 0)) {
         return 0;
     }
-    if (iflags.getloc_filter === 2 /* GFILTER_AREA */ && !(isok(x, y) && selection_getpoint(x, y, gg.gloc_filter_map)) && !(isok($c.i16(x - 1 | 0), y) && selection_getpoint($c.i16(x - 1 | 0), y, gg.gloc_filter_map)) && !(isok(x, $c.i16(y - 1 | 0)) && selection_getpoint(x, $c.i16(y - 1 | 0), gg.gloc_filter_map)) && !(isok($c.i16(x + 1 | 0), y) && selection_getpoint($c.i16(x + 1 | 0), y, gg.gloc_filter_map)) && !(isok(x, $c.i16(y + 1 | 0)) && selection_getpoint(x, $c.i16(y + 1 | 0), gg.gloc_filter_map))) {
+    if (iflags.getloc_filter === GFILTER_AREA && !(isok(x, y) && selection_getpoint(x, y, gg.gloc_filter_map)) && !(isok($c.i16(x - 1 | 0), y) && selection_getpoint($c.i16(x - 1 | 0), y, gg.gloc_filter_map)) && !(isok(x, $c.i16(y - 1 | 0)) && selection_getpoint(x, $c.i16(y - 1 | 0), gg.gloc_filter_map)) && !(isok($c.i16(x + 1 | 0), y) && selection_getpoint($c.i16(x + 1 | 0), y, gg.gloc_filter_map)) && !(isok(x, $c.i16(y + 1 | 0)) && selection_getpoint(x, $c.i16(y + 1 | 0), gg.gloc_filter_map))) {
         return 0;
     }
     glyph = glyph_at(x, y);
-    sym = glyph >= 3929 /* GLYPH_CMAP_STONE_OFF */ && glyph < 4093 ? glyph_to_cmap(glyph) : -1;
+    sym = glyph >= GLYPH_CMAP_STONE_OFF && glyph < GLYPH_CMAP_C_OFF + (S_goodpos - S_digbeam + 1) ? glyph_to_cmap(glyph) : -1;
     switch (gloc) {
         default:
-        case 0 /* GLOC_MONS */:
-            return $c.i8((glyph >= 0 /* GLYPH_MON_MALE_OFF */ && glyph < 383 || glyph >= 383 /* GLYPH_MON_FEM_OFF */ && glyph < 766 || (glyph >= 766 /* GLYPH_PET_MALE_OFF */ && glyph < 1149 || glyph >= 1149 /* GLYPH_PET_FEM_OFF */ && glyph < 1532) || (glyph >= 2682 /* GLYPH_RIDDEN_MALE_OFF */ && glyph < 3065 || glyph >= 3065 /* GLYPH_RIDDEN_FEM_OFF */ && glyph < 3448) || (glyph >= 1533 /* GLYPH_DETECT_MALE_OFF */ && glyph < 1916 || glyph >= 1916 /* GLYPH_DETECT_FEM_OFF */ && glyph < 2299)) && glyph !== 330 && glyph !== 713 ? 1 : 0);
-        case 1 /* GLOC_OBJS */:
-            return $c.i8((glyph === 3448 /* GLYPH_OBJ_OFF */ || glyph >= 3465 && glyph < 3929 || (glyph === 7992 /* GLYPH_OBJ_PILETOP_OFF */ || glyph > 8009 && glyph < 8473) || (glyph > 3448 /* GLYPH_OBJ_OFF */ && glyph < 3465 || glyph > 7992 /* GLYPH_OBJ_PILETOP_OFF */ && glyph < 8009) || (glyph >= 7226 /* GLYPH_STATUE_MALE_OFF */ && glyph < 7609 || glyph >= 8856 /* GLYPH_STATUE_MALE_PILETOP_OFF */ && glyph < 9239 || (glyph >= 7609 /* GLYPH_STATUE_FEM_OFF */ && glyph < 7992 || glyph >= 9239 /* GLYPH_STATUE_FEM_PILETOP_OFF */ && glyph < 9622)) || (glyph >= 2299 /* GLYPH_BODY_OFF */ && glyph < 2682 || glyph >= 8473 /* GLYPH_BODY_PILETOP_OFF */ && glyph < 8856)) && glyph !== 3923 && glyph !== 3922 ? 1 : 0);
-        case 2 /* GLOC_DOOR */:
-            return $c.i8(glyph >= 3929 /* GLYPH_CMAP_STONE_OFF */ && glyph < 4093 && (sym >= 13 /* S_vodoor */ && sym <= 16 /* S_hcdoor */ || sym >= 42 /* S_vodbridge */ && sym <= 45 /* S_hcdbridge */ || sym === 12 /* S_ndoor */) ? 1 : 0);
-        case 3 /* GLOC_EXPLORE */:
-            return $c.i8(glyph >= 3929 /* GLYPH_CMAP_STONE_OFF */ && glyph < 4093 && !(glyph_to_cmap(glyph) === 9623 /* GLYPH_NOTHING_OFF */) && (sym >= 13 /* S_vodoor */ && sym <= 16 /* S_hcdoor */ || sym >= 42 /* S_vodbridge */ && sym <= 45 /* S_hcdbridge */ || sym === 12 /* S_ndoor */ || sym >= 19 /* S_room */ && sym <= 20 /* S_darkroom */ || sym >= 22 /* S_corr */ && sym <= 23 /* S_litcorr */) && (isok($c.i16(x + 1 | 0), y) && svl.level.locations[x + 1 | 0][y].glyph === 9622 /* GLYPH_UNEXPLORED_OFF */ && !svl.level.locations[x + 1 | 0][y].seenv || isok($c.i16(x - 1 | 0), y) && svl.level.locations[x - 1 | 0][y].glyph === 9622 /* GLYPH_UNEXPLORED_OFF */ && !svl.level.locations[x - 1 | 0][y].seenv || isok(x, $c.i16(y + 1 | 0)) && svl.level.locations[x][y + 1 | 0].glyph === 9622 /* GLYPH_UNEXPLORED_OFF */ && !svl.level.locations[x][y + 1 | 0].seenv || isok(x, $c.i16(y - 1 | 0)) && svl.level.locations[x][y - 1 | 0].glyph === 9622 /* GLYPH_UNEXPLORED_OFF */ && !svl.level.locations[x][y - 1 | 0].seenv) ? 1 : 0);
-        case 5 /* GLOC_VALID */:
+        case GLOC_MONS:
+            return $c.i8((glyph >= GLYPH_MON_MALE_OFF && glyph < GLYPH_MON_MALE_OFF + NUMMONS || glyph >= GLYPH_MON_FEM_OFF && glyph < GLYPH_MON_FEM_OFF + NUMMONS || (glyph >= GLYPH_PET_MALE_OFF && glyph < GLYPH_PET_MALE_OFF + NUMMONS || glyph >= GLYPH_PET_FEM_OFF && glyph < GLYPH_PET_FEM_OFF + NUMMONS) || (glyph >= GLYPH_RIDDEN_MALE_OFF && glyph < GLYPH_RIDDEN_MALE_OFF + NUMMONS || glyph >= GLYPH_RIDDEN_FEM_OFF && glyph < GLYPH_RIDDEN_FEM_OFF + NUMMONS) || (glyph >= GLYPH_DETECT_MALE_OFF && glyph < GLYPH_DETECT_MALE_OFF + NUMMONS || glyph >= GLYPH_DETECT_FEM_OFF && glyph < GLYPH_DETECT_FEM_OFF + NUMMONS)) && glyph !== 330 && glyph !== 713 ? 1 : 0);
+        case GLOC_OBJS:
+            return $c.i8((glyph === GLYPH_OBJ_OFF || glyph >= GLYPH_OBJ_OFF + FIRST_OBJECT - 1 && glyph < GLYPH_OBJ_OFF + NUM_OBJECTS || (glyph === GLYPH_OBJ_PILETOP_OFF || glyph > GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT - 1 && glyph < GLYPH_OBJ_PILETOP_OFF + NUM_OBJECTS) || (glyph > GLYPH_OBJ_OFF && glyph < GLYPH_OBJ_OFF + FIRST_OBJECT - 1 || glyph > GLYPH_OBJ_PILETOP_OFF && glyph < GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT - 1) || (glyph >= GLYPH_STATUE_MALE_OFF && glyph < GLYPH_STATUE_MALE_OFF + NUMMONS || glyph >= GLYPH_STATUE_MALE_PILETOP_OFF && glyph < GLYPH_STATUE_MALE_PILETOP_OFF + NUMMONS || (glyph >= GLYPH_STATUE_FEM_OFF && glyph < GLYPH_STATUE_FEM_OFF + NUMMONS || glyph >= GLYPH_STATUE_FEM_PILETOP_OFF && glyph < GLYPH_STATUE_FEM_PILETOP_OFF + NUMMONS)) || (glyph >= GLYPH_BODY_OFF && glyph < GLYPH_BODY_OFF + NUMMONS || glyph >= GLYPH_BODY_PILETOP_OFF && glyph < GLYPH_BODY_PILETOP_OFF + NUMMONS)) && glyph !== BOULDER + GLYPH_OBJ_OFF && glyph !== ROCK + GLYPH_OBJ_OFF ? 1 : 0);
+        case GLOC_DOOR:
+            return $c.i8(glyph >= GLYPH_CMAP_STONE_OFF && glyph < GLYPH_CMAP_C_OFF + (S_goodpos - S_digbeam + 1) && (sym >= S_vodoor && sym <= S_hcdoor || sym >= S_vodbridge && sym <= S_hcdbridge || sym === S_ndoor) ? 1 : 0);
+        case GLOC_EXPLORE:
+            return $c.i8(glyph >= GLYPH_CMAP_STONE_OFF && glyph < GLYPH_CMAP_C_OFF + (S_goodpos - S_digbeam + 1) && !(glyph_to_cmap(glyph) === GLYPH_NOTHING_OFF) && (sym >= S_vodoor && sym <= S_hcdoor || sym >= S_vodbridge && sym <= S_hcdbridge || sym === S_ndoor || sym >= S_room && sym <= S_darkroom || sym >= S_corr && sym <= S_litcorr) && (isok($c.i16(x + 1 | 0), y) && svl.level.locations[x + 1 | 0][y].glyph === GLYPH_UNEXPLORED_OFF && !svl.level.locations[x + 1 | 0][y].seenv || isok($c.i16(x - 1 | 0), y) && svl.level.locations[x - 1 | 0][y].glyph === GLYPH_UNEXPLORED_OFF && !svl.level.locations[x - 1 | 0][y].seenv || isok(x, $c.i16(y + 1 | 0)) && svl.level.locations[x][y + 1 | 0].glyph === GLYPH_UNEXPLORED_OFF && !svl.level.locations[x][y + 1 | 0].seenv || isok(x, $c.i16(y - 1 | 0)) && svl.level.locations[x][y - 1 | 0].glyph === GLYPH_UNEXPLORED_OFF && !svl.level.locations[x][y - 1 | 0].seenv) ? 1 : 0);
+        case GLOC_VALID:
             if (getpos_getvalid) {
                 return await getpos_getvalid(x, y);
             }
-        case 4 /* GLOC_INTERESTING */:
-            return $c.i8(await gather_locs_interesting(x, y, 2 /* GLOC_DOOR */) || !(glyph >= 3929 /* GLYPH_CMAP_STONE_OFF */ && glyph < 4093 && (sym >= 0 /* S_stone */ && sym <= 11 /* S_trwall */ || sym === 18 /* S_tree */ || sym === 17 /* S_bars */ || sym === 39 /* S_ice */ || sym === 46 /* S_air */ || sym === 47 /* S_cloud */ || (sym === 40 /* S_lava */ || sym === 41 /* S_lavawall */) || (sym === 38 /* S_pool */ || sym === 48 /* S_water */) || sym === 12 /* S_ndoor */ || sym >= 19 /* S_room */ && sym <= 20 /* S_darkroom */ || sym >= 22 /* S_corr */ && sym <= 23 /* S_litcorr */) || glyph === 9623 /* GLYPH_NOTHING_OFF */ || glyph === 9622 /* GLYPH_UNEXPLORED_OFF */) || known_vibrating_square_at(x, y) ? 1 : 0);
+        case GLOC_INTERESTING:
+            return $c.i8(await gather_locs_interesting(x, y, GLOC_DOOR) || !(glyph >= GLYPH_CMAP_STONE_OFF && glyph < GLYPH_CMAP_C_OFF + (S_goodpos - S_digbeam + 1) && (sym >= S_stone && sym <= S_trwall || sym === S_tree || sym === S_bars || sym === S_ice || sym === S_air || sym === S_cloud || (sym === S_lava || sym === S_lavawall) || (sym === S_pool || sym === S_water) || sym === S_ndoor || sym >= S_room && sym <= S_darkroom || sym >= S_corr && sym <= S_litcorr) || glyph === GLYPH_NOTHING_OFF || glyph === GLYPH_UNEXPLORED_OFF) || known_vibrating_square_at(x, y) ? 1 : 0);
     }
     return 0;
 }
@@ -298,8 +317,8 @@ async function gather_locs(arr_p, cnt_p, gloc) {   // getpos.c:513
     await gloc_filter_init();
     $t1 = idx = 0, cnt_p.set(0, $t1);
     for (pass = 0; pass < 2; pass = pass + 1 | 0) {
-        for (x = 1; x < 80; x = $c.i16(x + 1)) {
-            for (y = 0; y < 21; y = $c.i16(y + 1)) {
+        for (x = 1; x < COLNO; x = $c.i16(x + 1)) {
+            for (y = 0; y < ROWNO; y = $c.i16(y + 1)) {
                 if (x === u.ux && y === u.uy || await gather_locs_interesting(x, y, gloc)) {
                     if (!pass) {
                         cnt_p.set(0, cnt_p.get(0) + 1 | 0);
@@ -374,7 +393,7 @@ export async function auto_describe(cx, cy) {   // getpos.c:640
     cc.y = cy;
     if (await do_screen_description(cc.$clone(), 1, sym, new $c.Ptr(tmpbuf, 0), new $c.Ptr(firstmatch, 0), null)) {
         coord_desc(cx, cy, new $c.Ptr(tmpbuf, 0), $c.i8(iflags.getpos_coords));
-        await custompline(70, $c.lit("%s%s%s%s%s"), firstmatch[0], new $c.Ptr(tmpbuf, 0).get(0) ? $c.lit(" ") : $c.lit(""), new $c.Ptr(tmpbuf, 0), iflags.autodescribe && getpos_getvalid && !await getpos_getvalid(cx, cy) ? $c.lit(" (invalid target)") : $c.lit(""), iflags.getloc_travelmode && !await is_valid_travelpt(cx, cy) ? $c.lit(" (no travel path)") : $c.lit(""));
+        await custompline(SUPPRESS_HISTORY | OVERRIDE_MSGTYPE | NO_CURS_ON_U, $c.lit("%s%s%s%s%s"), firstmatch[0], new $c.Ptr(tmpbuf, 0).get(0) ? $c.lit(" ") : $c.lit(""), new $c.Ptr(tmpbuf, 0), iflags.autodescribe && getpos_getvalid && !await getpos_getvalid(cx, cy) ? $c.lit(" (invalid target)") : $c.lit(""), iflags.getloc_travelmode && !await is_valid_travelpt(cx, cy) ? $c.lit(" (no travel path)") : $c.lit(""));
         await windowprocs.win_curs($G.WIN_MAP, cx, cy);
         await flush_screen(0);
     }
@@ -384,15 +403,15 @@ export async function getpos_menu(ccp, gloc) {   // getpos.c:665
     garr[0] = null;
     gcount[0] = 0;
     picks[0] = null;
-    clr = 8;
+    clr = NO_COLOR;
     await gather_locs(new $c.Ptr(garr, 0), new $c.Ptr(gcount, 0), gloc);
     if (gcount[0] < 2) {
         $c.free(garr[0]);
-        await You($c.lit("cannot %s %s."), iflags.getloc_filter === 1 /* GFILTER_VIEW */ ? $c.lit("see") : $c.lit("detect"), gloc_descr[gloc][0]);
+        await You($c.lit("cannot %s %s."), iflags.getloc_filter === GFILTER_VIEW ? $c.lit("see") : $c.lit("detect"), gloc_descr[gloc][0]);
         return 0;
     }
-    tmpwin = await windowprocs.win_create_nhwindow(4);
-    await windowprocs.win_start_menu(tmpwin, 0);
+    tmpwin = await windowprocs.win_create_nhwindow(NHW_MENU);
+    await windowprocs.win_start_menu(tmpwin, MENU_BEHAVE_STANDARD);
     any.$copyFrom(cg.zeroany);
     for (i = 1; i < gcount[0]; i = i + 1 | 0) {
         firstmatch[0] = $c.lit("unknown");
@@ -403,12 +422,12 @@ export async function getpos_menu(ccp, gloc) {   // getpos.c:665
         if (await do_screen_description(tmpcc.$clone(), 1, sym, new $c.Ptr(tmpbuf, 0), new $c.Ptr(firstmatch, 0), null)) {
             coord_desc($c.radd(garr[0], i).x, $c.radd(garr[0], i).y, new $c.Ptr(tmpbuf, 0), $c.i8(iflags.getpos_coords));
             nh_snprintf($c.lit("getpos_menu"), 705, new $c.Ptr(fullbuf, 0), 256, $c.lit("%s%s%s"), firstmatch[0], new $c.Ptr(tmpbuf, 0).get(0) ? $c.lit(" ") : $c.lit(""), new $c.Ptr(tmpbuf, 0));
-            await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, 0, clr, new $c.Ptr(fullbuf, 0), 0);
+            await add_menu(tmpwin, nul_glyphinfo, any, 0, 0, ATR_NONE, clr, new $c.Ptr(fullbuf, 0), MENU_ITEMFLAGS_NONE);
         }
     }
     $c.__builtin___sprintf_chk(new $c.Ptr(tmpbuf, 0), 0, 256, $c.lit("Pick %s%s%s"), await an(gloc_descr[gloc][1]), gloc_filtertxt[iflags.getloc_filter], iflags.getloc_travelmode ? $c.lit(" for travel destination") : $c.lit(""));
     await windowprocs.win_end_menu(tmpwin, new $c.Ptr(tmpbuf, 0));
-    pick_cnt = await select_menu(tmpwin, 1, new $c.Ptr(picks, 0));
+    pick_cnt = await select_menu(tmpwin, PICK_ONE, new $c.Ptr(picks, 0));
     await windowprocs.win_destroy_nhwindow(tmpwin);
     if (pick_cnt > 0) {
         ccp.x = $c.radd(garr[0], picks[0].item.a_int - 1 | 0).x;
@@ -422,27 +441,27 @@ function truncate_to_map(cx, cy, dx, dy) {   // getpos.c:729
     if ((cx.get(0) + dx | 0) < 1) {
         dy = $c.i8(dy - Math.imul(sgn(dy), 1 - (cx.get(0) + dx | 0) | 0) | 0);
         dx = $c.i8(1 - cx.get(0) | 0);
-    } else if ((cx.get(0) + dx | 0) > 79) {
-        dy = $c.i8(dy + Math.imul(sgn(dy), 79 - (cx.get(0) + dx | 0) | 0) | 0);
-        dx = $c.i8(79 - cx.get(0) | 0);
+    } else if ((cx.get(0) + dx | 0) > COLNO - 1) {
+        dy = $c.i8(dy + Math.imul(sgn(dy), COLNO - 1 - (cx.get(0) + dx | 0) | 0) | 0);
+        dx = $c.i8(COLNO - 1 - cx.get(0) | 0);
     }
     if ((cy.get(0) + dy | 0) < 0) {
         dx = $c.i8(dx - Math.imul(sgn(dx), 0 - (cy.get(0) + dy | 0) | 0) | 0);
         dy = $c.i8(0 - cy.get(0) | 0);
-    } else if ((cy.get(0) + dy | 0) > 20) {
-        dx = $c.i8(dx + Math.imul(sgn(dx), 20 - (cy.get(0) + dy | 0) | 0) | 0);
-        dy = $c.i8(20 - cy.get(0) | 0);
+    } else if ((cy.get(0) + dy | 0) > ROWNO - 1) {
+        dx = $c.i8(dx + Math.imul(sgn(dx), ROWNO - 1 - (cy.get(0) + dy | 0) | 0) | 0);
+        dy = $c.i8(ROWNO - 1 - cy.get(0) | 0);
     }
     cx.set(0, $c.i16(cx.get(0) + dx | 0));
     cy.set(0, $c.i16(cy.get(0) + dy | 0));
 }
 async function getpos_refresh() {   // getpos.c:753
-    if (getpos_hilitefunc && getpos_hilite_state === 1) {
+    if (getpos_hilitefunc && getpos_hilite_state === HiliteGoodposSymbol) {
         await getpos_hilitefunc(0);
         getpos_hilite_state = defaultHiliteState;
     }
-    await docrt_flags(1 /* docrtRefresh */);
-    if (getpos_hilitefunc && getpos_hilite_state === 2) {
+    await docrt_flags(docrtRefresh);
+    if (getpos_hilitefunc && getpos_hilite_state === HiliteBackground) {
         await getpos_sethilite(getpos_hilitefunc, getpos_getvalid);
     }
 }
@@ -467,11 +486,11 @@ export async function getpos(ccp, force, goal) {   // getpos.c:771
         if ((cmdq = cmdq_pop()) !== null) {
             cq.$copyFrom(cmdq);
             $c.free(cmdq);
-            if (cq.typ === 2 /* CMDQ_DIR */ && !cq.dirz) {
+            if (cq.typ === CMDQ_DIR && !cq.dirz) {
                 ccp.x = $c.i16(u.ux + cq.dirx | 0);
                 ccp.y = $c.i16(u.uy + cq.diry | 0);
             } else {
-                cmdq_clear(0 /* CQ_CANNED */);
+                cmdq_clear(CQ_CANNED);
                 result = -1;
             }
             return result;
@@ -485,14 +504,14 @@ export async function getpos(ccp, force, goal) {   // getpos.c:771
         mMoOdDxX[i] = gc.Cmd.spkeys[getpos$mMoOdDxX_def[i]];
     }
     mMoOdDxX[12] = 0;
-    if (await handle_tip(3 /* TIP_GETPOS */)) {
+    if (await handle_tip(TIP_GETPOS)) {
         show_goal_msg = 1;
     }
     if (!goal) {
         goal = $c.lit("desired location");
     }
     if (flags.verbose) {
-        await pline($c.lit("(For instructions type a '%s')"), visctrl(gc.Cmd.spkeys[25 /* NHKF_GETPOS_HELP */]));
+        await pline($c.lit("(For instructions type a '%s')"), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_HELP]));
         msg_given = 1;
     }
     cx[0] = gg.getposx = ccp.x;
@@ -516,10 +535,10 @@ export async function getpos(ccp, force, goal) {   // getpos.c:771
                     }
                     rushrun = 0;
                     if ((cmdq = cmdq_pop()) !== null) {
-                        if (cmdq.typ === 0 /* CMDQ_KEY */) {
+                        if (cmdq.typ === CMDQ_KEY) {
                             c = cmdq.key;
                         } else {
-                            cmdq_clear(0 /* CQ_CANNED */);
+                            cmdq_clear(CQ_CANNED);
                             result = -1;
                             break exitgetpos$;
                         }
@@ -527,13 +546,13 @@ export async function getpos(ccp, force, goal) {   // getpos.c:771
                     } else {
                         c = await readchar_poskey(new $c.Ptr(tx, 0), new $c.Ptr(ty, 0), new $c.Ptr(sidx, 0));
                         if (iflags.remember_getpos && !gi.in_doagain) {
-                            await cmdq_add_key(1 /* CQ_REPEAT */, $c.i8(c));
+                            await cmdq_add_key(CQ_REPEAT, $c.i8(c));
                         }
                     }
                     if (iflags.autodescribe) {
                         msg_given = 0;
                     }
-                    if (c === gc.Cmd.spkeys[0 /* NHKF_ESC */]) {
+                    if (c === gc.Cmd.spkeys[NHKF_ESC]) {
                         cx[0] = cy[0] = -10;
                         msg_given = 1;
                         result = -1;
@@ -555,7 +574,7 @@ export async function getpos(ccp, force, goal) {   // getpos.c:771
                     if ($goto !== "do_rushrun" && (cp = $c.strchr(new $c.Ptr(pick_chars, 0), c)) !== null) {
                         result = getpos$pick_chars_def[$c.i32($c.pdiff(cp, new $c.Ptr(pick_chars, 0)))].ret;
                         break L2;
-                    } else if ($goto !== "do_rushrun" && movecmd($c.i8(c), 0 /* MV_WALK */)) {
+                    } else if ($goto !== "do_rushrun" && movecmd($c.i8(c), MV_WALK)) {
                         if (rushrun) {
                             $goto = "do_rushrun"; continue D1;
                         }
@@ -563,7 +582,7 @@ export async function getpos(ccp, force, goal) {   // getpos.c:771
                         dy = u.dy;
                         truncate_to_map(new $c.Ptr(cx, 0), new $c.Ptr(cy, 0), $c.i8(dx), $c.i8(dy));
                         $goto = "nxtc"; continue D1;
-                    } else if ($goto === "do_rushrun" || (movecmd($c.i8(c), 2 /* MV_RUSH */) || movecmd($c.i8(c), 1 /* MV_RUN */))) {
+                    } else if ($goto === "do_rushrun" || (movecmd($c.i8(c), MV_RUSH) || movecmd($c.i8(c), MV_RUN))) {
                         $goto = null;   // do_rushrun:
                         if (iflags.getloc_moveskip) {
                             glyph = glyph_at(cx[0], cy[0]);
@@ -580,21 +599,21 @@ export async function getpos(ccp, force, goal) {   // getpos.c:771
                         truncate_to_map(new $c.Ptr(cx, 0), new $c.Ptr(cy, 0), $c.i8(dx), $c.i8(dy));
                         $goto = "nxtc"; continue D1;
                     }
-                    if (c === gc.Cmd.spkeys[25 /* NHKF_GETPOS_HELP */] || redraw_cmd($c.i8(c))) {
-                        if (c === gc.Cmd.spkeys[25 /* NHKF_GETPOS_HELP */]) {
+                    if (c === gc.Cmd.spkeys[NHKF_GETPOS_HELP] || redraw_cmd($c.i8(c))) {
+                        if (c === gc.Cmd.spkeys[NHKF_GETPOS_HELP]) {
                             await getpos_help(force, goal);
                         }
                         await getpos_refresh();
                         await windowprocs.win_curs($G.WIN_MAP, cx[0], cy[0]);
                         show_goal_msg = 1;
-                    } else if (c === gc.Cmd.spkeys[11 /* NHKF_GETPOS_SHOWVALID */]) {
+                    } else if (c === gc.Cmd.spkeys[NHKF_GETPOS_SHOWVALID]) {
                         if (getpos_hilitefunc) {
                             await getpos_toggle_hilite_state();
                             await windowprocs.win_curs($G.WIN_MAP, cx[0], cy[0]);
                         }
                         show_goal_msg = 1;
                         $goto = "nxtc"; continue D1;
-                    } else if (c === gc.Cmd.spkeys[12 /* NHKF_GETPOS_AUTODESC */]) {
+                    } else if (c === gc.Cmd.spkeys[NHKF_GETPOS_AUTODESC]) {
                         iflags.autodescribe = $c.i8(!iflags.autodescribe ? 1 : 0);
                         await pline($c.lit("Automatic description %sis %s."), flags.verbose ? $c.lit("of features under cursor ") : $c.lit(""), iflags.autodescribe ? $c.lit("on") : $c.lit("off"));
                         if (!iflags.autodescribe) {
@@ -602,9 +621,9 @@ export async function getpos(ccp, force, goal) {   // getpos.c:771
                         }
                         msg_given = 1;
                         $goto = "nxtc"; continue D1;
-                    } else if (c === gc.Cmd.spkeys[27 /* NHKF_GETPOS_LIMITVIEW */]) {
-                        iflags.getloc_filter = $c.rem32(iflags.getloc_filter + 1 | 0, 3 /* NUM_GFILTER */);
-                        for (i = 0; i < 6 /* NUM_GLOCS */; i = i + 1 | 0) {
+                    } else if (c === gc.Cmd.spkeys[NHKF_GETPOS_LIMITVIEW]) {
+                        iflags.getloc_filter = $c.rem32(iflags.getloc_filter + 1 | 0, NUM_GFILTER);
+                        for (i = 0; i < NUM_GLOCS; i = i + 1 | 0) {
                             if (garr[i]) {
                                 $c.free(garr[i]);
                                 garr[i] = null;
@@ -614,19 +633,19 @@ export async function getpos(ccp, force, goal) {   // getpos.c:771
                         await pline($c.lit("%s."), getpos$view_filters[iflags.getloc_filter]);
                         msg_given = 1;
                         $goto = "nxtc"; continue D1;
-                    } else if (c === gc.Cmd.spkeys[26 /* NHKF_GETPOS_MENU */]) {
+                    } else if (c === gc.Cmd.spkeys[NHKF_GETPOS_MENU]) {
                         iflags.getloc_usemenu = $c.i8(!iflags.getloc_usemenu ? 1 : 0);
                         await pline($c.lit("%s a menu to show possible targets%s."), iflags.getloc_usemenu ? $c.lit("Using") : $c.lit("Not using"), iflags.getloc_usemenu ? $c.lit(" for 'm|M', 'o|O', 'd|D', and 'x|X'") : $c.lit(""));
                         msg_given = 1;
                         $goto = "nxtc"; continue D1;
-                    } else if (c === gc.Cmd.spkeys[6 /* NHKF_GETPOS_SELF */]) {
-                        for (i = 0; i < 6 /* NUM_GLOCS */; i = i + 1 | 0) {
+                    } else if (c === gc.Cmd.spkeys[NHKF_GETPOS_SELF]) {
+                        for (i = 0; i < NUM_GLOCS; i = i + 1 | 0) {
                             gidx[i] = 0;
                         }
                         cx[0] = u.ux;
                         cy[0] = u.uy;
                         $goto = "nxtc"; continue D1;
-                    } else if (c === gc.Cmd.spkeys[28 /* NHKF_GETPOS_MOVESKIP */]) {
+                    } else if (c === gc.Cmd.spkeys[NHKF_GETPOS_MOVESKIP]) {
                         iflags.getloc_moveskip = $c.i8(!iflags.getloc_moveskip ? 1 : 0);
                         await pline($c.lit("%skipping over similar terrain when fastmoving the cursor."), iflags.getloc_moveskip ? $c.lit("S") : $c.lit("Not s"));
                         msg_given = 1;
@@ -659,30 +678,30 @@ export async function getpos(ccp, force, goal) {   // getpos.c:771
                         if (!$c.strchr(new $c.Ptr(quitchars, 0), c)) {
                             k = 0;
                             $c.__builtin___memset_chk(new $c.Ptr(matching, 0), 0, 105, 105);
-                            for (sidx[0] = 0; sidx[0] < 105 /* MAXPCHARS */; sidx[0] = sidx[0] + 1 | 0) {
-                                if (sidx[0] >= 0 /* S_stone */ && sidx[0] <= 11 /* S_trwall */ || sidx[0] >= 19 /* S_room */ && sidx[0] <= 20 /* S_darkroom */ || sidx[0] >= 22 /* S_corr */ && sidx[0] <= 23 /* S_litcorr */ || sidx[0] >= 13 /* S_vodoor */ && sidx[0] <= 16 /* S_hcdoor */ || sidx[0] === 12 /* S_ndoor */) {
+                            for (sidx[0] = 0; sidx[0] < MAXPCHARS; sidx[0] = sidx[0] + 1 | 0) {
+                                if (sidx[0] >= S_stone && sidx[0] <= S_trwall || sidx[0] >= S_room && sidx[0] <= S_darkroom || sidx[0] >= S_corr && sidx[0] <= S_litcorr || sidx[0] >= S_vodoor && sidx[0] <= S_hcdoor || sidx[0] === S_ndoor) {
                                     continue;
                                 }
-                                if (c === defsyms[sidx[0]].sym || c === gs.showsyms[sidx[0]] || c === 94 && (sidx[0] >= 49 /* S_arrow_trap */ && sidx[0] < 74) || c === gs.showsyms[21 /* S_engroom */] && (sidx[0] === 21 /* S_engroom */ || sidx[0] === 24 /* S_engrcorr */)) {
+                                if (c === defsyms[sidx[0]].sym || c === gs.showsyms[sidx[0]] || c === 94 && (sidx[0] >= S_arrow_trap && sidx[0] < S_arrow_trap + (TRAPNUM - 1)) || c === gs.showsyms[S_engroom] && (sidx[0] === S_engroom || sidx[0] === S_engrcorr)) {
                                     $t2 = $c.i8(k = k + 1 | 0), matching[sidx[0]] = $t2;
                                 }
                             }
                             if (k) {
                                 for (pass = 0; pass <= 1; pass = pass + 1 | 0) {
                                     lo_y = $c.i16(pass === 0 ? cy[0] : 0);
-                                    hi_y = $c.i16(pass === 0 ? 20 : cy[0]);
+                                    hi_y = $c.i16(pass === 0 ? ROWNO - 1 : cy[0]);
                                     for (ty[0] = lo_y; ty[0] <= hi_y; ty[0] = $c.i16(ty[0] + 1)) {
                                         lo_x = $c.i16(pass === 0 && ty[0] === lo_y ? cx[0] + 1 | 0 : 1);
-                                        hi_x = $c.i16(pass === 1 && ty[0] === hi_y ? cx[0] : 79);
+                                        hi_x = $c.i16(pass === 1 && ty[0] === hi_y ? cx[0] : COLNO - 1);
                                         for (tx[0] = lo_x; tx[0] <= hi_x; tx[0] = $c.i16(tx[0] + 1)) {
                                             k = glyph_at(tx[0], ty[0]);
                                             foundc$: {
-                                                if (k >= 3929 /* GLYPH_CMAP_STONE_OFF */ && k < 4093 && matching[glyph_to_cmap(k)]) {
+                                                if (k >= GLYPH_CMAP_STONE_OFF && k < GLYPH_CMAP_C_OFF + (S_goodpos - S_digbeam + 1) && matching[glyph_to_cmap(k)]) {
                                                     break foundc$;
                                                 }
                                                 if (svl.level.flags.hero_memory | 0 && !iflags.terrainmode) {
                                                     k = svl.level.locations[tx[0]][ty[0]].glyph;
-                                                    if (k >= 3929 /* GLYPH_CMAP_STONE_OFF */ && k < 4093 && matching[glyph_to_cmap(k)]) {
+                                                    if (k >= GLYPH_CMAP_STONE_OFF && k < GLYPH_CMAP_C_OFF + (S_goodpos - S_digbeam + 1) && matching[glyph_to_cmap(k)]) {
                                                         break foundc$;
                                                     }
                                                 }
@@ -691,7 +710,7 @@ export async function getpos(ccp, force, goal) {   // getpos.c:771
                                                 }
                                                 if (svl.level.locations[tx[0]][ty[0]].seenv) {
                                                     k = await back_to_glyph(tx[0], ty[0]);
-                                                    if (k >= 3929 /* GLYPH_CMAP_STONE_OFF */ && k < 4093 && matching[glyph_to_cmap(k)]) {
+                                                    if (k >= GLYPH_CMAP_STONE_OFF && k < GLYPH_CMAP_C_OFF + (S_goodpos - S_digbeam + 1) && matching[glyph_to_cmap(k)]) {
                                                         break foundc$;
                                                     }
                                                 }
@@ -713,7 +732,7 @@ export async function getpos(ccp, force, goal) {   // getpos.c:771
                                 if (!force) {
                                     $c.__builtin___strcpy_chk(new $c.Ptr(note, 0), $c.lit("aborted"), 128);
                                 } else {
-                                    $c.__builtin___sprintf_chk(new $c.Ptr(note, 0), 0, 128, $c.lit("use '%s', '%s', '%s', '%s' or '%s'"), visctrl(cmd_from_func(do_move_west)), visctrl(cmd_from_func(do_move_south)), visctrl(cmd_from_func(do_move_north)), visctrl(cmd_from_func(do_move_east)), visctrl(gc.Cmd.spkeys[7 /* NHKF_GETPOS_PICK */]));
+                                    $c.__builtin___sprintf_chk(new $c.Ptr(note, 0), 0, 128, $c.lit("use '%s', '%s', '%s', '%s' or '%s'"), visctrl(cmd_from_func(do_move_west)), visctrl(cmd_from_func(do_move_south)), visctrl(cmd_from_func(do_move_north)), visctrl(cmd_from_func(do_move_east)), visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK]));
                                 }
                                 await pline($c.lit("Unknown direction: '%s' (%s)."), visctrl($c.i8(c)), new $c.Ptr(note, 0));
                                 msg_given = 1;
@@ -747,7 +766,7 @@ export async function getpos(ccp, force, goal) {   // getpos.c:771
     ccp.x = cx[0];
     ccp.y = cy[0];
     $t3 = gg.getposy = 0, gg.getposx = $t3;
-    for (i = 0; i < 6 /* NUM_GLOCS */; i = i + 1 | 0) {
+    for (i = 0; i < NUM_GLOCS; i = i + 1 | 0) {
         if (garr[i]) {
             $c.free(garr[i]);
         }
@@ -760,8 +779,8 @@ export async function getpos(ccp, force, goal) {   // getpos.c:771
 export function $init() {
     getpos_hilitefunc = null;
     getpos_getvalid = null;
-    getpos_hilite_state = 0;
-    defaultHiliteState = 0;
+    getpos_hilite_state = HiliteNormalMap;
+    defaultHiliteState = HiliteNormalMap;
     for (let $i0 = 0; $i0 < 6; $i0++) {
         gloc_descr[$i0].fill(null);
     }
@@ -812,27 +831,27 @@ export function $init() {
     for (let $i0 = 0; $i0 < 4; $i0++) {
         getpos$pick_chars_def[$i0].$copyFrom(new $T.anon_getpos_773());
     }
-    getpos$pick_chars_def[0].nhkf = 7 /* NHKF_GETPOS_PICK */;
-    getpos$pick_chars_def[0].ret = 0 /* LOOK_TRADITIONAL */;
-    getpos$pick_chars_def[1].nhkf = 8 /* NHKF_GETPOS_PICK_Q */;
-    getpos$pick_chars_def[1].ret = 1 /* LOOK_QUICK */;
-    getpos$pick_chars_def[2].nhkf = 9 /* NHKF_GETPOS_PICK_O */;
-    getpos$pick_chars_def[2].ret = 2 /* LOOK_ONCE */;
-    getpos$pick_chars_def[3].nhkf = 10 /* NHKF_GETPOS_PICK_V */;
-    getpos$pick_chars_def[3].ret = 3 /* LOOK_VERBOSE */;
+    getpos$pick_chars_def[0].nhkf = NHKF_GETPOS_PICK;
+    getpos$pick_chars_def[0].ret = LOOK_TRADITIONAL;
+    getpos$pick_chars_def[1].nhkf = NHKF_GETPOS_PICK_Q;
+    getpos$pick_chars_def[1].ret = LOOK_QUICK;
+    getpos$pick_chars_def[2].nhkf = NHKF_GETPOS_PICK_O;
+    getpos$pick_chars_def[2].ret = LOOK_ONCE;
+    getpos$pick_chars_def[3].nhkf = NHKF_GETPOS_PICK_V;
+    getpos$pick_chars_def[3].ret = LOOK_VERBOSE;
     getpos$mMoOdDxX_def.fill(0);
-    getpos$mMoOdDxX_def[0] = 13 /* NHKF_GETPOS_MON_NEXT */;
-    getpos$mMoOdDxX_def[1] = 14 /* NHKF_GETPOS_MON_PREV */;
-    getpos$mMoOdDxX_def[2] = 15 /* NHKF_GETPOS_OBJ_NEXT */;
-    getpos$mMoOdDxX_def[3] = 16 /* NHKF_GETPOS_OBJ_PREV */;
-    getpos$mMoOdDxX_def[4] = 17 /* NHKF_GETPOS_DOOR_NEXT */;
-    getpos$mMoOdDxX_def[5] = 18 /* NHKF_GETPOS_DOOR_PREV */;
-    getpos$mMoOdDxX_def[6] = 19 /* NHKF_GETPOS_UNEX_NEXT */;
-    getpos$mMoOdDxX_def[7] = 20 /* NHKF_GETPOS_UNEX_PREV */;
-    getpos$mMoOdDxX_def[8] = 21 /* NHKF_GETPOS_INTERESTING_NEXT */;
-    getpos$mMoOdDxX_def[9] = 22 /* NHKF_GETPOS_INTERESTING_PREV */;
-    getpos$mMoOdDxX_def[10] = 23 /* NHKF_GETPOS_VALID_NEXT */;
-    getpos$mMoOdDxX_def[11] = 24 /* NHKF_GETPOS_VALID_PREV */;
+    getpos$mMoOdDxX_def[0] = NHKF_GETPOS_MON_NEXT;
+    getpos$mMoOdDxX_def[1] = NHKF_GETPOS_MON_PREV;
+    getpos$mMoOdDxX_def[2] = NHKF_GETPOS_OBJ_NEXT;
+    getpos$mMoOdDxX_def[3] = NHKF_GETPOS_OBJ_PREV;
+    getpos$mMoOdDxX_def[4] = NHKF_GETPOS_DOOR_NEXT;
+    getpos$mMoOdDxX_def[5] = NHKF_GETPOS_DOOR_PREV;
+    getpos$mMoOdDxX_def[6] = NHKF_GETPOS_UNEX_NEXT;
+    getpos$mMoOdDxX_def[7] = NHKF_GETPOS_UNEX_PREV;
+    getpos$mMoOdDxX_def[8] = NHKF_GETPOS_INTERESTING_NEXT;
+    getpos$mMoOdDxX_def[9] = NHKF_GETPOS_INTERESTING_PREV;
+    getpos$mMoOdDxX_def[10] = NHKF_GETPOS_VALID_NEXT;
+    getpos$mMoOdDxX_def[11] = NHKF_GETPOS_VALID_PREV;
     getpos$view_filters.fill(null);
     getpos$view_filters[0] = $c.lit("Not limiting targets");
     getpos$view_filters[1] = $c.lit("Limiting targets to those in sight");

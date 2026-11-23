@@ -2,10 +2,13 @@
 import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
+import { AM_CHAOTIC, AM_LAWFUL, AM_NEUTRAL, AM_NONE, A_LAWFUL, A_NEUTRAL, A_NONE } from './align.h.js';
 import { alloc } from './alloc.js';
 import { is_art } from './artifact.js';
+import { ART_DEMONBANE, ART_EXCALIBUR } from './artilist.h.js';
 import { isok } from './cmd.js';
 import { c_common_strings, cg, flags, gi, gm, go, gs, gu, gv, iflags, svc, svd, svl, svm, svq, svr, u } from './decl.js';
+import { AMULET_CLASS, ARMOR_CLASS, COIN_CLASS, FOOD_CLASS, GEM_CLASS, POTION_CLASS, RING_CLASS, ROCK_CLASS, SCROLL_CLASS, SPBOOK_CLASS, S_ANGEL, S_BAT, S_CENTAUR, S_DEMON, S_DRAGON, S_EEL, S_ELEMENTAL, S_EYE, S_GHOST, S_GIANT, S_GNOME, S_GOLEM, S_HUMAN, S_HUMANOID, S_JABBERWOCK, S_KOBOLD, S_KOP, S_LEPRECHAUN, S_LICH, S_LIGHT, S_LIZARD, S_MIMIC, S_MIMIC_DEF, S_MUMMY, S_NYMPH, S_OGRE, S_ORC, S_QUANTMECH, S_SNAKE, S_SPIDER, S_TRAPPER, S_TROLL, S_UNICORN, S_VORTEX, S_WRAITH, S_ZOMBIE, S_altar, S_dnstair, S_fountain, S_grave, S_hcdoor, S_hwall, S_sink, S_throne, S_upstair, S_vcdoor, S_vwall, TOOL_CLASS, WAND_CLASS, WEAPON_CLASS } from './defsym.h.js';
 import { canseemon, newsym, sensemon } from './display.js';
 import { Amonnam, Mgender, YMonnam, christen_monst, mon_nam, oname, pmname, rndghostname } from './do_name.js';
 import { newedog, tamedog } from './dog.js';
@@ -14,40 +17,58 @@ import { def_monsyms } from './drawing.js';
 import { In_V_tower, In_hell, In_mines, In_quest, Is_special, depth, level_difficulty, on_level } from './dungeon.js';
 import { monsdump } from './earlyarg.js';
 import { debugcore } from './files.js';
+import { ALIGNWEIGHT, COLNO, MAXMONNO, ROWNO } from './global.h.js';
 import { in_town, monst_to_any, obj_to_any } from './hack.js';
+import { BOLT_LIM, DF_NONE, GP_AVOID_MONPOS, GP_CHECKSCARY, MHID_ALTMON, MHID_ARTICLE, MM_ADJACENTOK, MM_ANGRY, MM_ASLEEP, MM_EDOG, MM_EGD, MM_EMIN, MM_EPRI, MM_ESHK, MM_FEMALE, MM_IGNOREWATER, MM_MALE, MM_MINVIS, MM_NOCOUNTBIRTH, MM_NOGRP, MM_NOMSG, MM_NONAME, MM_NOTAIL, MM_NOWAIT, NO_MINVENT, NO_MM_FLAGS, NO_NC_FLAGS } from './hack.h.js';
 import { dist2, nh_snprintf, sgn, upstart } from './hacklib.js';
 import { consume_obj_charge, update_inventory } from './invent.js';
 import { new_light_source } from './light.js';
 import { newemin } from './minion.js';
 import { add_to_container, add_to_minv, bless, curse, discard_minvent, mkobj, mkobj_at, mksobj, next_ident, rndmonnum, set_corpsenm, weight } from './mkobj.js';
+import { DELPHI, FODDERSHOP, SHOPBASE, TEMPLE, VAULT, ZOO } from './mkroom.h.js';
 import { can_be_hatched, hideunder, mondied, mongone, newcham, pm_to_cham } from './mon.js';
+import { AT_WEAP } from './monattk.h.js';
 import { attacktype, little_to_big, mon_learns_traps, pronoun_gender, set_mon_data } from './mondata.js';
+import { G_EXTINCT, G_FREQ, G_GENOD, G_HELL, G_IGNORE, G_LGROUP, G_NOCORPSE, G_NOGEN, G_NOHELL, G_SGROUP, G_UNIQ, M1_AMORPHOUS, M1_FLY, M1_HUMANOID, M1_MINDLESS, M1_SWIM, M2_DEMON, M2_DOMESTIC, M2_DWARF, M2_ELF, M2_FEMALE, M2_GIANT, M2_GREEDY, M2_HOSTILE, M2_JEWELS, M2_LORD, M2_MALE, M2_MERC, M2_MINION, M2_NASTY, M2_NEUTER, M2_PEACEFUL, M2_PRINCE, M2_ROCKTHROW, M2_SHAPESHIFTER, M2_STRONG, M2_UNDEAD, M3_CLOSE, M3_COVETOUS, M3_WAITFORU, M3_WAITMASK, MS_BRIBE, MS_GUARDIAN, MS_LEADER, MS_NEMESIS, MS_PRIEST, NEUTRAL } from './monflag.h.js';
 import { dochugw, mon_track_clear, set_apparxy } from './monmove.js';
 import { mons, monst_globals_init } from './monst.js';
+import { M_AP_FURNITURE, M_AP_MONSTER, M_AP_NOTHING, M_AP_OBJECT, M_AP_TYPMASK, M_SEEN_NOTHING, STRAT_CLOSE, STRAT_WAITFORU } from './monst.h.js';
+import { PM_ABBOT, PM_ACOLYTE, PM_AIR_ELEMENTAL, PM_ALIGNED_CLERIC, PM_ANGEL, PM_APPRENTICE, PM_ARCHEOLOGIST, PM_ARCH_LICH, PM_ASMODEUS, PM_ATTENDANT, PM_BABY_GOLD_DRAGON, PM_BALROG, PM_BAT, PM_BLACK_LIGHT, PM_CAPTAIN, PM_CHIEFTAIN, PM_CLAY_GOLEM, PM_CLERIC, PM_CROESUS, PM_DEATH, PM_DISPATER, PM_EARTH_ELEMENTAL, PM_ELF, PM_ELVEN_MONARCH, PM_ERINYS, PM_ETTIN, PM_FAMINE, PM_FIRE_ELEMENTAL, PM_FIRE_VORTEX, PM_FLAMING_SPHERE, PM_FLESH_GOLEM, PM_FOREST_CENTAUR, PM_GHOST, PM_GIANT, PM_GIANT_BAT, PM_GIANT_EEL, PM_GLASS_GOLEM, PM_GOBLIN, PM_GOLD_DRAGON, PM_GOLD_GOLEM, PM_GRAY_DRAGON, PM_GUARD, PM_GUIDE, PM_HIGH_CLERIC, PM_HOBBIT, PM_HORNED_DEVIL, PM_HOUSECAT, PM_HUMAN, PM_HUNTER, PM_ICE_DEVIL, PM_IRON_GOLEM, PM_KILLER_BEE, PM_LEATHER_GOLEM, PM_LIEUTENANT, PM_LONG_WORM, PM_MAIL_DAEMON, PM_MANES, PM_MASTER_LICH, PM_MINOTAUR, PM_MONK, PM_MORDOR_ORC, PM_NAZGUL, PM_NEANDERTHAL, PM_NINJA, PM_OGRE_LEADER, PM_OGRE_TYRANT, PM_ORC, PM_ORCUS, PM_ORC_CAPTAIN, PM_ORC_SHAMAN, PM_PAGE, PM_PAPER_GOLEM, PM_PESTILENCE, PM_QUANTUM_MECHANIC, PM_QUEEN_BEE, PM_RAVEN, PM_ROPE_GOLEM, PM_ROSHI, PM_SALAMANDER, PM_SERGEANT, PM_SHOCKING_SPHERE, PM_SHOPKEEPER, PM_SOLDIER, PM_STALKER, PM_STONE_GOLEM, PM_STRAW_GOLEM, PM_STUDENT, PM_THUG, PM_URUK_HAI, PM_VAMPIRE_BAT, PM_VLAD_THE_IMPALER, PM_WARRIOR, PM_WATCHMAN, PM_WATCH_CAPTAIN, PM_WATER_ELEMENTAL, PM_WIZARD, PM_WIZARD_OF_YENDOR, PM_WOOD_GOLEM, PM_WUMPUS, PM_YEENOGHU } from './monsters.h.js';
 import { rnd_defensive_item, rnd_misc_item, rnd_offensive_item } from './muse.js';
 import { discover_object } from './o_init.js';
+import { MAXOCLASSES, RANDOM_CLASS } from './objclass.h.js';
 import { objects } from './objects.js';
+import { AKLYS, ARROW, ATHAME, AXE, BAG_OF_TRICKS, BANDED_MAIL, BATTLE_AXE, BEC_DE_CORBIN, BELL_OF_OPENING, BOULDER, BOW, BROADSWORD, BUGLE, BULLWHIP, CANDELABRUM_OF_INVOCATION, CHAIN_MAIL, CLOAK_OF_MAGIC_RESISTANCE, CLOAK_OF_PROTECTION, CLUB, CORPSE, CREAM_PIE, CROSSBOW, CROSSBOW_BOLT, CRYSTAL_BALL, CRYSTAL_PLATE_MAIL, C_RATION, DAGGER, DART, DENTED_POT, DILITHIUM_CRYSTAL, DWARVISH_CLOAK, DWARVISH_IRON_HELM, DWARVISH_MATTOCK, DWARVISH_MITHRIL_COAT, DWARVISH_ROUNDSHIELD, DWARVISH_SHORT_SWORD, DWARVISH_SPEAR, EGG, ELVEN_ARROW, ELVEN_BOOTS, ELVEN_BOW, ELVEN_BROADSWORD, ELVEN_CLOAK, ELVEN_DAGGER, ELVEN_LEATHER_HELM, ELVEN_MITHRIL_COAT, ELVEN_SHIELD, ELVEN_SHORT_SWORD, ELVEN_SPEAR, FIGURINE, FLAIL, FLINT, GLAIVE, GOLD_PIECE, HELMET, HIGH_BOOTS, IRON_SHOES, KNIFE, K_RATION, LARGE_BOX, LARGE_SHIELD, LEATHER_ARMOR, LEATHER_CLOAK, LEATHER_GLOVES, LEATHER_JACKET, LONG_SWORD, LOW_BOOTS, LUCERN_HAMMER, LUCKSTONE, LUMP_OF_ROYAL_JELLY, MACE, MIRROR, MUMMY_WRAPPING, ORCISH_ARROW, ORCISH_BOW, ORCISH_CHAIN_MAIL, ORCISH_CLOAK, ORCISH_DAGGER, ORCISH_HELM, ORCISH_SHIELD, ORCISH_SHORT_SWORD, PARTISAN, PICK_AXE, PLATE_MAIL, POT_EXTRA_HEALING, POT_HEALING, POT_OBJECT_DETECTION, POT_SICKNESS, QUARTERSTAFF, RANSEUR, RING_MAIL, RIN_INVISIBILITY, ROBE, ROCK, RUBBER_HOSE, SCIMITAR, SHIELD_OF_REFLECTION, SHORT_SWORD, SHURIKEN, SILVER_MACE, SILVER_SABER, SKELETON_KEY, SLIME_MOLD, SLING, SMALL_SHIELD, SPEAR, SPETUM, SPE_BOOK_OF_THE_DEAD, SPE_DIG, SPLINT_MAIL, STATUE, STILETTO, STRANGE_OBJECT, STUDDED_LEATHER_ARMOR, TALLOW_CANDLE, TIN, TIN_WHISTLE, TRIDENT, TWO_HANDED_SWORD, URUK_HAI_SHIELD, WAN_COLD, WAN_DEATH, WAN_DIGGING, WAN_FIRE, WAN_MAGIC_MISSILE, WAN_NOTHING, WAN_STRIKING, WAX_CANDLE } from './objects.h.js';
 import { an, makeplural, rnd_class, vtense } from './objnam.js';
 import { mhidden_description } from './pager.js';
+import { LOW_PM, NON_PM, NUMMONS, SPECIAL_PM } from './permonst.h.js';
 import { Norep, impossible, pline, pline_mon, raw_printf, set_msg_xy } from './pline.js';
 import { mon_aligntyp, newepri } from './priest.js';
+import { BLINDED, PROT_FROM_SHAPE_CHANGERS, W_SADDLE } from './prop.h.js';
 import { qt_montype, quest_info } from './questpgr.js';
 import { create_particular } from './read.js';
+import { BLCORNER, CROSSWALL, DBWALL, DOOR, HWALL, SCORR, SDOOR, TDWALL, TLCORNER, TRWALL, TUWALL } from './rm.h.js';
 import { d, rn2, rnd } from './rnd.js';
 import { genders } from './role.js';
 import { freedynamicdata } from './save.js';
 import { obfree } from './shk.js';
 import { get_shop_item, neweshk, shkname } from './shknam.js';
+import { P_POLEARMS, P_SABER, P_SHORT_SWORD } from './skills.h.js';
 import { findgold, mpickobj } from './steal.js';
 import { can_saddle, place_monster, put_saddle_on_mon } from './steed.js';
+import { MAXMCLASSES } from './sym.h.js';
 import { enexto, enexto_core, enexto_gpflags, goodpos } from './teleport.js';
 import { begin_burn, stop_timer } from './timeout.js';
+import { ROT_CORPSE } from './timeout.h.js';
 import { t_at } from './trap.js';
+import { ALL_TRAPS, HOLE, PIT, TRAPDOOR } from './trap.h.js';
 import { newegd } from './vault.js';
 import { block_point, does_block } from './vision.js';
+import { IN_SIGHT, LS_MONSTER } from './vision.h.js';
 import { windowprocs } from './windows.js';
 import { count_wsegs, get_wormno, initworm, place_worm_tail_randomly } from './worm.js';
 import { m_dowear, mon_adjust_speed, mon_set_minvis, which_armor } from './worn.js';
+import { PRONOUN_HALLU } from './you.h.js';
 
 let align_shift$oldmoves = 0;   // static in align_shift()
 let align_shift$lev = null;   // static in align_shift()
@@ -58,15 +79,15 @@ const mclass_maxf = new Int8Array(61);
 let mongen_order_init = 0;
 const syms = new Int8Array(17);
 export function is_home_elemental(ptr) {   // makemon.c:33
-    if (ptr.mlet === 31 /* S_ELEMENTAL */) {
+    if (ptr.mlet === S_ELEMENTAL) {
         switch (ptr.pmidx) {
-            case 154 /* PM_AIR_ELEMENTAL */:
+            case PM_AIR_ELEMENTAL:
                 return $c.i8((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level) ? 1 : 0);
-            case 155 /* PM_FIRE_ELEMENTAL */:
+            case PM_FIRE_ELEMENTAL:
                 return $c.i8((svd.dungeon_topology.d_fire_level.dlevel || svd.dungeon_topology.d_fire_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_fire_level) ? 1 : 0);
-            case 156 /* PM_EARTH_ELEMENTAL */:
+            case PM_EARTH_ELEMENTAL:
                 return $c.i8((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_earth_level) ? 1 : 0);
-            case 157 /* PM_WATER_ELEMENTAL */:
+            case PM_WATER_ELEMENTAL:
                 return $c.i8((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level) ? 1 : 0);
             default:
                 break;
@@ -75,11 +96,11 @@ export function is_home_elemental(ptr) {   // makemon.c:33
     return 0;
 }
 function wrong_elem_type(ptr) {   // makemon.c:56
-    if (ptr.mlet === 31 /* S_ELEMENTAL */) {
+    if (ptr.mlet === S_ELEMENTAL) {
         return $c.i8(!is_home_elemental(ptr) ? 1 : 0);
     } else if ((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_earth_level)) {
     } else if ((svd.dungeon_topology.d_water_level.dlevel || svd.dungeon_topology.d_water_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_water_level)) {
-        if (!($c.andu64(ptr.mflags1, 2) !== 0)) {
+        if (!($c.andu64(ptr.mflags1, M1_SWIM) !== 0)) {
             return 1;
         }
     } else if ((svd.dungeon_topology.d_fire_level.dlevel || svd.dungeon_topology.d_fire_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_fire_level)) {
@@ -87,7 +108,7 @@ function wrong_elem_type(ptr) {   // makemon.c:56
             return 1;
         }
     } else if ((svd.dungeon_topology.d_air_level.dlevel || svd.dungeon_topology.d_air_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_air_level)) {
-        if (!($c.andu64(ptr.mflags1, 1) !== 0 && ptr.mlet !== 20 /* S_TRAPPER */) && !(ptr.mlet === 5 /* S_EYE */ || ptr.mlet === 25 /* S_LIGHT */) && !($c.andu64(ptr.mflags1, 4) !== 0) && !(ptr.mlet === 54 /* S_GHOST */) && !(ptr.mlet === 22 /* S_VORTEX */ || $c.peq(ptr, $c.relem(mons, 154 /* PM_AIR_ELEMENTAL */)))) {
+        if (!($c.andu64(ptr.mflags1, M1_FLY) !== 0 && ptr.mlet !== S_TRAPPER) && !(ptr.mlet === S_EYE || ptr.mlet === S_LIGHT) && !($c.andu64(ptr.mflags1, M1_AMORPHOUS) !== 0) && !(ptr.mlet === S_GHOST) && !(ptr.mlet === S_VORTEX || $c.peq(ptr, $c.relem(mons, PM_AIR_ELEMENTAL)))) {
             return 1;
         }
     }
@@ -107,7 +128,7 @@ async function m_initgrp(mtmp, x, y, n, mmflags) {   // makemon.c:79
             continue;
         }
         if (await enexto_gpflags(mm, mm.x, mm.y, mtmp.data, mmflags)) {
-            mon = await makemon(mtmp.data, mm.x, mm.y, $c.u32($c.or64(mmflags, 8192)));
+            mon = await makemon(mtmp.data, mm.x, mm.y, $c.u32($c.or64(mmflags, MM_NOGRP)));
             if (mon) {
                 mon.mpeaceful = (0) & 1;
                 mon.mavenge = (0) & 1;
@@ -121,7 +142,7 @@ async function m_initthrow(mtmp, otyp, oquan) {   // makemon.c:148
     otmp = await mksobj(otyp, 1, 0);
     $t1 = rn2(oquan) + 3 | 0, otmp.quan = $t1;
     $t2 = await weight(otmp) >>> 0, otmp.owt = $t2;
-    if (otyp === 20 /* ORCISH_ARROW */) {
+    if (otyp === ORCISH_ARROW) {
         otmp.otrapped = (1) & 1;
     }
     await mpickobj(mtmp, otmp);
@@ -134,402 +155,402 @@ async function m_initweap(mtmp) {   // makemon.c:161
         return;
     }
     switch (ptr.mlet) {
-        case 34 /* S_GIANT */:
+        case S_GIANT:
             if (rn2(2)) {
-                await mongets(mtmp, mm !== 174 /* PM_ETTIN */ ? 475 /* BOULDER */ : 77 /* CLUB */);
+                await mongets(mtmp, mm !== PM_ETTIN ? BOULDER : CLUB);
             }
-            if (mm !== 174 /* PM_ETTIN */ && !rn2(5)) {
-                await mongets(mtmp, rn2(2) ? 55 /* TWO_HANDED_SWORD */ : 45 /* BATTLE_AXE */);
+            if (mm !== PM_ETTIN && !rn2(5)) {
+                await mongets(mtmp, rn2(2) ? TWO_HANDED_SWORD : BATTLE_AXE);
             }
             break;
-        case 53 /* S_HUMAN */:
-            if ($c.andu64(ptr.mflags2, 512) !== 0) {
+        case S_HUMAN:
+            if ($c.andu64(ptr.mflags2, M2_MERC) !== 0) {
                 w1 = w2 = 0;
                 switch (mm) {
-                    case 282 /* PM_WATCHMAN */:
-                    case 277 /* PM_SOLDIER */:
+                    case PM_WATCHMAN:
+                    case PM_SOLDIER:
                         if (!rn2(3)) {
                             do {
-                                w1 = rn2(12) + 59 | 0;
-                            } while (objects[w1].oc_subtyp !== 16 /* P_POLEARMS */);
-                            w2 = rn2(2) ? 34 /* DAGGER */ : 40 /* KNIFE */;
+                                w1 = rn2(BEC_DE_CORBIN - PARTISAN + 1) + PARTISAN | 0;
+                            } while (objects[w1].oc_subtyp !== P_POLEARMS);
+                            w2 = rn2(2) ? DAGGER : KNIFE;
                         } else {
-                            w1 = rn2(2) ? 27 /* SPEAR */ : 46 /* SHORT_SWORD */;
+                            w1 = rn2(2) ? SPEAR : SHORT_SWORD;
                         }
                         break;
-                    case 278 /* PM_SERGEANT */:
-                        w1 = rn2(2) ? 81 /* FLAIL */ : 73 /* MACE */;
+                    case PM_SERGEANT:
+                        w1 = rn2(2) ? FLAIL : MACE;
                         break;
-                    case 280 /* PM_LIEUTENANT */:
-                        w1 = rn2(2) ? 52 /* BROADSWORD */ : 54 /* LONG_SWORD */;
+                    case PM_LIEUTENANT:
+                        w1 = rn2(2) ? BROADSWORD : LONG_SWORD;
                         break;
-                    case 281 /* PM_CAPTAIN */:
-                    case 283 /* PM_WATCH_CAPTAIN */:
-                        w1 = rn2(2) ? 54 /* LONG_SWORD */ : 51 /* SILVER_SABER */;
+                    case PM_CAPTAIN:
+                    case PM_WATCH_CAPTAIN:
+                        w1 = rn2(2) ? LONG_SWORD : SILVER_SABER;
                         break;
                     default:
                         if (!rn2(4)) {
-                            w1 = 34 /* DAGGER */;
+                            w1 = DAGGER;
                         }
                         if (!rn2(7)) {
-                            w2 = 27 /* SPEAR */;
+                            w2 = SPEAR;
                         }
                         break;
                 }
                 if (w1) {
                     await mongets(mtmp, w1);
                 }
-                if (!w2 && w1 !== 34 /* DAGGER */ && !rn2(4)) {
-                    w2 = 40 /* KNIFE */;
+                if (!w2 && w1 !== DAGGER && !rn2(4)) {
+                    w2 = KNIFE;
                 }
                 if (w2) {
                     await mongets(mtmp, w2);
                 }
-            } else if ($c.andu64(ptr.mflags2, 16) !== 0) {
+            } else if ($c.andu64(ptr.mflags2, M2_ELF) !== 0) {
                 if (rn2(2)) {
-                    await mongets(mtmp, rn2(2) ? 127 /* ELVEN_MITHRIL_COAT */ : 139 /* ELVEN_CLOAK */);
+                    await mongets(mtmp, rn2(2) ? ELVEN_MITHRIL_COAT : ELVEN_CLOAK);
                 }
                 if (rn2(2)) {
-                    await mongets(mtmp, 89 /* ELVEN_LEATHER_HELM */);
+                    await mongets(mtmp, ELVEN_LEATHER_HELM);
                 } else if (!rn2(4)) {
-                    await mongets(mtmp, 169 /* ELVEN_BOOTS */);
+                    await mongets(mtmp, ELVEN_BOOTS);
                 }
                 if (rn2(2)) {
-                    await mongets(mtmp, 35 /* ELVEN_DAGGER */);
+                    await mongets(mtmp, ELVEN_DAGGER);
                 }
                 switch (rn2(3)) {
                     case 0:
                         if (!rn2(4)) {
-                            await mongets(mtmp, 153 /* ELVEN_SHIELD */);
+                            await mongets(mtmp, ELVEN_SHIELD);
                         }
                         if (rn2(3)) {
-                            await mongets(mtmp, 47 /* ELVEN_SHORT_SWORD */);
+                            await mongets(mtmp, ELVEN_SHORT_SWORD);
                         }
-                        await mongets(mtmp, 84 /* ELVEN_BOW */);
-                        await m_initthrow(mtmp, 19 /* ELVEN_ARROW */, 12);
+                        await mongets(mtmp, ELVEN_BOW);
+                        await m_initthrow(mtmp, ELVEN_ARROW, 12);
                         break;
                     case 1:
-                        await mongets(mtmp, 53 /* ELVEN_BROADSWORD */);
+                        await mongets(mtmp, ELVEN_BROADSWORD);
                         if (rn2(2)) {
-                            await mongets(mtmp, 153 /* ELVEN_SHIELD */);
+                            await mongets(mtmp, ELVEN_SHIELD);
                         }
                         break;
                     case 2:
                         if (rn2(2)) {
-                            await mongets(mtmp, 28 /* ELVEN_SPEAR */);
-                            await mongets(mtmp, 153 /* ELVEN_SHIELD */);
+                            await mongets(mtmp, ELVEN_SPEAR);
+                            await mongets(mtmp, ELVEN_SHIELD);
                         }
                         break;
                 }
-                if (mm === 269 /* PM_ELVEN_MONARCH */) {
+                if (mm === PM_ELVEN_MONARCH) {
                     if (rn2(3) || gi.in_mklev && ((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_earth_level))) {
-                        await mongets(mtmp, 259 /* PICK_AXE */);
+                        await mongets(mtmp, PICK_AXE);
                     }
                     if (!rn2(50)) {
-                        await mongets(mtmp, 231 /* CRYSTAL_BALL */);
+                        await mongets(mtmp, CRYSTAL_BALL);
                     }
                 }
-            } else if (ptr.msound === 41 /* MS_PRIEST */ || ptr.mlet === 53 /* S_HUMAN */ && gu.urole.mnum === 337 && (ptr.msound === 36 /* MS_LEADER */ || ptr.msound === 37 /* MS_NEMESIS */)) {
-                otmp = await mksobj(73 /* MACE */, 0, 0);
+            } else if (ptr.msound === MS_PRIEST || ptr.mlet === S_HUMAN && gu.urole.mnum === PM_CLERIC && (ptr.msound === MS_LEADER || ptr.msound === MS_NEMESIS)) {
+                otmp = await mksobj(MACE, 0, 0);
                 $t1 = $c.i8(rnd(3)), otmp.spe = $t1;
                 if (!rn2(2)) {
                     await curse(otmp);
                 }
                 await mpickobj(mtmp, otmp);
-            } else if (mm === 378 /* PM_NINJA */) {
-                await mongets(mtmp, rn2(4) ? 25 /* SHURIKEN */ : 24 /* DART */);
-                await mongets(mtmp, rn2(4) ? 46 /* SHORT_SWORD */ : 44 /* AXE */);
-            } else if (ptr.msound === 38 /* MS_GUARDIAN */) {
+            } else if (mm === PM_NINJA) {
+                await mongets(mtmp, rn2(4) ? SHURIKEN : DART);
+                await mongets(mtmp, rn2(4) ? SHORT_SWORD : AXE);
+            } else if (ptr.msound === MS_GUARDIAN) {
                 switch (mm) {
-                    case 369 /* PM_STUDENT */:
-                    case 372 /* PM_ATTENDANT */:
-                    case 374 /* PM_ABBOT */:
-                    case 375 /* PM_ACOLYTE */:
-                    case 380 /* PM_GUIDE */:
-                    case 382 /* PM_APPRENTICE */:
+                    case PM_STUDENT:
+                    case PM_ATTENDANT:
+                    case PM_ABBOT:
+                    case PM_ACOLYTE:
+                    case PM_GUIDE:
+                    case PM_APPRENTICE:
                         if (rn2(2)) {
-                            await mongets(mtmp, rn2(3) ? 34 /* DAGGER */ : 40 /* KNIFE */);
+                            await mongets(mtmp, rn2(3) ? DAGGER : KNIFE);
                         }
                         if (rn2(5)) {
-                            await mongets(mtmp, rn2(3) ? 135 /* LEATHER_JACKET */ : 145 /* LEATHER_CLOAK */);
+                            await mongets(mtmp, rn2(3) ? LEATHER_JACKET : LEATHER_CLOAK);
                         }
                         if (rn2(3)) {
-                            await mongets(mtmp, rn2(3) ? 163 /* LOW_BOOTS */ : 165 /* HIGH_BOOTS */);
+                            await mongets(mtmp, rn2(3) ? LOW_BOOTS : HIGH_BOOTS);
                         }
                         if (rn2(3)) {
-                            await mongets(mtmp, 307 /* POT_HEALING */);
+                            await mongets(mtmp, POT_HEALING);
                         }
                         break;
-                    case 370 /* PM_CHIEFTAIN */:
-                    case 373 /* PM_PAGE */:
-                    case 379 /* PM_ROSHI */:
-                    case 381 /* PM_WARRIOR */:
-                        await mongets(mtmp, rn2(3) ? 54 /* LONG_SWORD */ : 46 /* SHORT_SWORD */);
-                        await mongets(mtmp, rn2(3) ? 128 /* CHAIN_MAIL */ : 134 /* LEATHER_ARMOR */);
+                    case PM_CHIEFTAIN:
+                    case PM_PAGE:
+                    case PM_ROSHI:
+                    case PM_WARRIOR:
+                        await mongets(mtmp, rn2(3) ? LONG_SWORD : SHORT_SWORD);
+                        await mongets(mtmp, rn2(3) ? CHAIN_MAIL : LEATHER_ARMOR);
                         if (rn2(2)) {
-                            await mongets(mtmp, rn2(2) ? 163 /* LOW_BOOTS */ : 165 /* HIGH_BOOTS */);
+                            await mongets(mtmp, rn2(2) ? LOW_BOOTS : HIGH_BOOTS);
                         }
                         if (!rn2(3)) {
-                            await mongets(mtmp, 145 /* LEATHER_CLOAK */);
+                            await mongets(mtmp, LEATHER_CLOAK);
                         }
                         if (!rn2(3)) {
-                            await mongets(mtmp, 83 /* BOW */);
-                            await m_initthrow(mtmp, 18 /* ARROW */, 12);
+                            await mongets(mtmp, BOW);
+                            await m_initthrow(mtmp, ARROW, 12);
                         }
                         break;
-                    case 376 /* PM_HUNTER */:
-                        await mongets(mtmp, rn2(3) ? 46 /* SHORT_SWORD */ : 34 /* DAGGER */);
+                    case PM_HUNTER:
+                        await mongets(mtmp, rn2(3) ? SHORT_SWORD : DAGGER);
                         if (rn2(2)) {
-                            await mongets(mtmp, rn2(2) ? 135 /* LEATHER_JACKET */ : 134 /* LEATHER_ARMOR */);
+                            await mongets(mtmp, rn2(2) ? LEATHER_JACKET : LEATHER_ARMOR);
                         }
-                        await mongets(mtmp, 83 /* BOW */);
-                        await m_initthrow(mtmp, 18 /* ARROW */, 12);
+                        await mongets(mtmp, BOW);
+                        await m_initthrow(mtmp, ARROW, 12);
                         break;
-                    case 377 /* PM_THUG */:
-                        await mongets(mtmp, 77 /* CLUB */);
-                        await mongets(mtmp, rn2(3) ? 34 /* DAGGER */ : 40 /* KNIFE */);
+                    case PM_THUG:
+                        await mongets(mtmp, CLUB);
+                        await mongets(mtmp, rn2(3) ? DAGGER : KNIFE);
                         if (rn2(2)) {
-                            await mongets(mtmp, 159 /* LEATHER_GLOVES */);
+                            await mongets(mtmp, LEATHER_GLOVES);
                         }
-                        await mongets(mtmp, rn2(2) ? 135 /* LEATHER_JACKET */ : 134 /* LEATHER_ARMOR */);
+                        await mongets(mtmp, rn2(2) ? LEATHER_JACKET : LEATHER_ARMOR);
                         break;
-                    case 371 /* PM_NEANDERTHAL */:
-                        await mongets(mtmp, 77 /* CLUB */);
-                        await mongets(mtmp, 134 /* LEATHER_ARMOR */);
+                    case PM_NEANDERTHAL:
+                        await mongets(mtmp, CLUB);
+                        await mongets(mtmp, LEATHER_ARMOR);
                         break;
                 }
             }
             break;
-        case 27 /* S_ANGEL */:
-            if ($c.andu64(ptr.mflags1, 131072) !== 0) {
-                typ = rn2(3) ? 54 /* LONG_SWORD */ : 74 /* SILVER_MACE */;
-                nam = typ === 54 /* LONG_SWORD */ ? $c.lit("Sunsword") : $c.lit("Demonbane");
+        case S_ANGEL:
+            if ($c.andu64(ptr.mflags1, M1_HUMANOID) !== 0) {
+                typ = rn2(3) ? LONG_SWORD : SILVER_MACE;
+                nam = typ === LONG_SWORD ? $c.lit("Sunsword") : $c.lit("Demonbane");
                 otmp = await mksobj(typ, 0, 0);
-                if ((!rn2(20) || $c.andu64(ptr.mflags2, 1024) !== 0) && sgn(mtmp.isminion | 0 ? mtmp.mextra.emin.min_align : ptr.maligntyp) === 1) {
+                if ((!rn2(20) || $c.andu64(ptr.mflags2, M2_LORD) !== 0) && sgn(mtmp.isminion | 0 ? mtmp.mextra.emin.min_align : ptr.maligntyp) === A_LAWFUL) {
                     otmp = await oname(otmp, nam, 128);
                 }
                 await bless(otmp);
                 otmp.oerodeproof = (1) & 1;
                 $t2 = $c.i8(rn2(4)), otmp.spe = $t2;
-                if (typ === 74 /* SILVER_MACE */) {
+                if (typ === SILVER_MACE) {
                     otmp.spe = $c.i8(otmp.spe + 3 | 0);
                 }
                 await mpickobj(mtmp, otmp);
-                otmp = await mksobj(!rn2(4) || $c.andu64(ptr.mflags2, 1024) !== 0 ? 158 /* SHIELD_OF_REFLECTION */ : 156 /* LARGE_SHIELD */, 0, 0);
+                otmp = await mksobj(!rn2(4) || $c.andu64(ptr.mflags2, M2_LORD) !== 0 ? SHIELD_OF_REFLECTION : LARGE_SHIELD, 0, 0);
                 otmp.oerodeproof = (1) & 1;
                 otmp.spe = 0;
                 await mpickobj(mtmp, otmp);
             }
             break;
-        case 8 /* S_HUMANOID */:
-            if (mm === 43 /* PM_HOBBIT */) {
+        case S_HUMANOID:
+            if (mm === PM_HOBBIT) {
                 switch (rn2(3)) {
                     case 0:
-                        await mongets(mtmp, 34 /* DAGGER */);
+                        await mongets(mtmp, DAGGER);
                         break;
                     case 1:
-                        await mongets(mtmp, 35 /* ELVEN_DAGGER */);
+                        await mongets(mtmp, ELVEN_DAGGER);
                         break;
                     case 2:
-                        await mongets(mtmp, 87 /* SLING */);
-                        await m_initthrow(mtmp, !rn2(4) ? 473 /* FLINT */ : 474 /* ROCK */, 6);
+                        await mongets(mtmp, SLING);
+                        await m_initthrow(mtmp, !rn2(4) ? FLINT : ROCK, 6);
                         break;
                 }
                 if (!rn2(10)) {
-                    await mongets(mtmp, 127 /* ELVEN_MITHRIL_COAT */);
+                    await mongets(mtmp, ELVEN_MITHRIL_COAT);
                 }
                 if (!rn2(10)) {
-                    await mongets(mtmp, 141 /* DWARVISH_CLOAK */);
+                    await mongets(mtmp, DWARVISH_CLOAK);
                 }
-            } else if ($c.andu64(ptr.mflags2, 32) !== 0) {
+            } else if ($c.andu64(ptr.mflags2, M2_DWARF) !== 0) {
                 if (rn2(7)) {
-                    await mongets(mtmp, 141 /* DWARVISH_CLOAK */);
+                    await mongets(mtmp, DWARVISH_CLOAK);
                 }
                 if (rn2(7)) {
-                    await mongets(mtmp, 164 /* IRON_SHOES */);
+                    await mongets(mtmp, IRON_SHOES);
                 }
                 if (!rn2(4)) {
-                    await mongets(mtmp, 49 /* DWARVISH_SHORT_SWORD */);
+                    await mongets(mtmp, DWARVISH_SHORT_SWORD);
                     if (rn2(2)) {
-                        await mongets(mtmp, 71 /* DWARVISH_MATTOCK */);
+                        await mongets(mtmp, DWARVISH_MATTOCK);
                     } else {
-                        await mongets(mtmp, rn2(2) ? 44 /* AXE */ : 30 /* DWARVISH_SPEAR */);
-                        await mongets(mtmp, 157 /* DWARVISH_ROUNDSHIELD */);
+                        await mongets(mtmp, rn2(2) ? AXE : DWARVISH_SPEAR);
+                        await mongets(mtmp, DWARVISH_ROUNDSHIELD);
                     }
-                    await mongets(mtmp, 91 /* DWARVISH_IRON_HELM */);
+                    await mongets(mtmp, DWARVISH_IRON_HELM);
                     if (!rn2(3)) {
-                        await mongets(mtmp, 126 /* DWARVISH_MITHRIL_COAT */);
+                        await mongets(mtmp, DWARVISH_MITHRIL_COAT);
                     }
                 } else {
-                    await mongets(mtmp, !rn2(3) ? 259 /* PICK_AXE */ : 34 /* DAGGER */);
+                    await mongets(mtmp, !rn2(3) ? PICK_AXE : DAGGER);
                 }
             }
             break;
-        case 37 /* S_KOP */:
+        case S_KOP:
             if (!rn2(4)) {
-                await m_initthrow(mtmp, 287 /* CREAM_PIE */, 2);
+                await m_initthrow(mtmp, CREAM_PIE, 2);
             }
             if (!rn2(3)) {
-                await mongets(mtmp, rn2(2) ? 77 /* CLUB */ : 78 /* RUBBER_HOSE */);
+                await mongets(mtmp, rn2(2) ? CLUB : RUBBER_HOSE);
             }
             break;
-        case 15 /* S_ORC */:
+        case S_ORC:
             if (rn2(2)) {
-                await mongets(mtmp, 90 /* ORCISH_HELM */);
+                await mongets(mtmp, ORCISH_HELM);
             }
-            switch (mm !== 77 /* PM_ORC_CAPTAIN */ ? mm : rn2(2) ? 74 /* PM_MORDOR_ORC */ : 75 /* PM_URUK_HAI */) {
-                case 74 /* PM_MORDOR_ORC */:
+            switch (mm !== PM_ORC_CAPTAIN ? mm : rn2(2) ? PM_MORDOR_ORC : PM_URUK_HAI) {
+                case PM_MORDOR_ORC:
                     if (!rn2(3)) {
-                        await mongets(mtmp, 50 /* SCIMITAR */);
+                        await mongets(mtmp, SCIMITAR);
                     }
                     if (!rn2(3)) {
-                        await mongets(mtmp, 155 /* ORCISH_SHIELD */);
+                        await mongets(mtmp, ORCISH_SHIELD);
                     }
                     if (!rn2(3)) {
-                        await mongets(mtmp, 40 /* KNIFE */);
+                        await mongets(mtmp, KNIFE);
                     }
                     if (!rn2(3)) {
-                        await mongets(mtmp, 129 /* ORCISH_CHAIN_MAIL */);
+                        await mongets(mtmp, ORCISH_CHAIN_MAIL);
                     }
                     break;
-                case 75 /* PM_URUK_HAI */:
+                case PM_URUK_HAI:
                     if (!rn2(3)) {
-                        await mongets(mtmp, 140 /* ORCISH_CLOAK */);
+                        await mongets(mtmp, ORCISH_CLOAK);
                     }
                     if (!rn2(3)) {
-                        await mongets(mtmp, 48 /* ORCISH_SHORT_SWORD */);
+                        await mongets(mtmp, ORCISH_SHORT_SWORD);
                     }
                     if (!rn2(3)) {
-                        await mongets(mtmp, 164 /* IRON_SHOES */);
+                        await mongets(mtmp, IRON_SHOES);
                     }
                     if (!rn2(3)) {
-                        await mongets(mtmp, 85 /* ORCISH_BOW */);
-                        await m_initthrow(mtmp, 20 /* ORCISH_ARROW */, 12);
+                        await mongets(mtmp, ORCISH_BOW);
+                        await m_initthrow(mtmp, ORCISH_ARROW, 12);
                     }
                     if (!rn2(3)) {
-                        await mongets(mtmp, 154 /* URUK_HAI_SHIELD */);
+                        await mongets(mtmp, URUK_HAI_SHIELD);
                     }
                     break;
                 default:
-                    if (mm !== 76 /* PM_ORC_SHAMAN */ && rn2(2)) {
-                        await mongets(mtmp, mm === 70 /* PM_GOBLIN */ || rn2(2) === 0 ? 36 /* ORCISH_DAGGER */ : 50 /* SCIMITAR */);
+                    if (mm !== PM_ORC_SHAMAN && rn2(2)) {
+                        await mongets(mtmp, mm === PM_GOBLIN || rn2(2) === 0 ? ORCISH_DAGGER : SCIMITAR);
                     }
             }
             break;
-        case 41 /* S_OGRE */:
-            if (!rn2(mm === 205 /* PM_OGRE_TYRANT */ ? 3 : mm === 204 /* PM_OGRE_LEADER */ ? 6 : 12)) {
-                await mongets(mtmp, 45 /* BATTLE_AXE */);
+        case S_OGRE:
+            if (!rn2(mm === PM_OGRE_TYRANT ? 3 : mm === PM_OGRE_LEADER ? 6 : 12)) {
+                await mongets(mtmp, BATTLE_AXE);
             } else {
-                await mongets(mtmp, 77 /* CLUB */);
+                await mongets(mtmp, CLUB);
             }
             break;
-        case 46 /* S_TROLL */:
+        case S_TROLL:
             if (!rn2(2)) {
                 switch (rn2(4)) {
                     case 0:
-                        await mongets(mtmp, 60 /* RANSEUR */);
+                        await mongets(mtmp, RANSEUR);
                         break;
                     case 1:
-                        await mongets(mtmp, 59 /* PARTISAN */);
+                        await mongets(mtmp, PARTISAN);
                         break;
                     case 2:
-                        await mongets(mtmp, 62 /* GLAIVE */);
+                        await mongets(mtmp, GLAIVE);
                         break;
                     case 3:
-                        await mongets(mtmp, 61 /* SPETUM */);
+                        await mongets(mtmp, SPETUM);
                         break;
                 }
             }
             break;
-        case 11 /* S_KOBOLD */:
+        case S_KOBOLD:
             if (!rn2(4)) {
-                await m_initthrow(mtmp, 24 /* DART */, 12);
+                await m_initthrow(mtmp, DART, 12);
             }
             break;
-        case 29 /* S_CENTAUR */:
+        case S_CENTAUR:
             if (rn2(2)) {
-                if ($c.peq(ptr, $c.relem(mons, 131 /* PM_FOREST_CENTAUR */))) {
-                    await mongets(mtmp, 83 /* BOW */);
-                    await m_initthrow(mtmp, 18 /* ARROW */, 12);
+                if ($c.peq(ptr, $c.relem(mons, PM_FOREST_CENTAUR))) {
+                    await mongets(mtmp, BOW);
+                    await m_initthrow(mtmp, ARROW, 12);
                 } else {
-                    await mongets(mtmp, 88 /* CROSSBOW */);
-                    await m_initthrow(mtmp, 23 /* CROSSBOW_BOLT */, 12);
+                    await mongets(mtmp, CROSSBOW);
+                    await m_initthrow(mtmp, CROSSBOW_BOLT, 12);
                 }
             }
             break;
-        case 49 /* S_WRAITH */:
-            await mongets(mtmp, 40 /* KNIFE */);
-            await mongets(mtmp, 54 /* LONG_SWORD */);
+        case S_WRAITH:
+            await mongets(mtmp, KNIFE);
+            await mongets(mtmp, LONG_SWORD);
             break;
-        case 52 /* S_ZOMBIE */:
+        case S_ZOMBIE:
             if (!rn2(4)) {
-                await mongets(mtmp, 134 /* LEATHER_ARMOR */);
+                await mongets(mtmp, LEATHER_ARMOR);
             }
             if (!rn2(4)) {
-                await mongets(mtmp, rn2(3) ? 40 /* KNIFE */ : 46 /* SHORT_SWORD */);
+                await mongets(mtmp, rn2(3) ? KNIFE : SHORT_SWORD);
             }
             break;
-        case 58 /* S_LIZARD */:
-            if (mm === 329 /* PM_SALAMANDER */) {
-                await mongets(mtmp, rn2(7) ? 27 /* SPEAR */ : rn2(3) ? 33 /* TRIDENT */ : 41 /* STILETTO */);
+        case S_LIZARD:
+            if (mm === PM_SALAMANDER) {
+                await mongets(mtmp, rn2(7) ? SPEAR : rn2(3) ? TRIDENT : STILETTO);
             }
             break;
-        case 56 /* S_DEMON */:
+        case S_DEMON:
             switch (mm) {
-                case 302 /* PM_BALROG */:
-                    await mongets(mtmp, 82 /* BULLWHIP */);
-                    await mongets(mtmp, 52 /* BROADSWORD */);
+                case PM_BALROG:
+                    await mongets(mtmp, BULLWHIP);
+                    await mongets(mtmp, BROADSWORD);
                     break;
-                case 305 /* PM_ORCUS */:
-                    await mongets(mtmp, 433 /* WAN_DEATH */);
+                case PM_ORCUS:
+                    await mongets(mtmp, WAN_DEATH);
                     break;
-                case 291 /* PM_HORNED_DEVIL */:
-                    await mongets(mtmp, rn2(4) ? 33 /* TRIDENT */ : 82 /* BULLWHIP */);
+                case PM_HORNED_DEVIL:
+                    await mongets(mtmp, rn2(4) ? TRIDENT : BULLWHIP);
                     break;
-                case 307 /* PM_DISPATER */:
-                    await mongets(mtmp, 417 /* WAN_STRIKING */);
+                case PM_DISPATER:
+                    await mongets(mtmp, WAN_STRIKING);
                     break;
-                case 304 /* PM_YEENOGHU */:
-                    await mongets(mtmp, 81 /* FLAIL */);
+                case PM_YEENOGHU:
+                    await mongets(mtmp, FLAIL);
                     break;
             }
-            if (!($c.andu64(ptr.mflags2, 256) !== 0)) {
+            if (!($c.andu64(ptr.mflags2, M2_DEMON) !== 0)) {
                 break;
             }
         default:
-            bias = (($c.andu64(ptr.mflags2, 1024) !== 0 ? 1 : 0) + Math.imul($c.andu64(ptr.mflags2, 2048) !== 0 ? 1 : 0, 2) | 0) + ($c.andu64(ptr.mflags2, 33554432) !== 0 ? 1 : 0) | 0;
+            bias = (($c.andu64(ptr.mflags2, M2_LORD) !== 0 ? 1 : 0) + Math.imul($c.andu64(ptr.mflags2, M2_PRINCE) !== 0 ? 1 : 0, 2) | 0) + ($c.andu64(ptr.mflags2, M2_NASTY) !== 0 ? 1 : 0) | 0;
             switch (rnd(14 - Math.imul(2, bias) | 0)) {
                 case 1:
-                    if ($c.andu64(ptr.mflags2, 67108864) !== 0) {
-                        await mongets(mtmp, 45 /* BATTLE_AXE */);
+                    if ($c.andu64(ptr.mflags2, M2_STRONG) !== 0) {
+                        await mongets(mtmp, BATTLE_AXE);
                     } else {
-                        await m_initthrow(mtmp, 24 /* DART */, 12);
+                        await m_initthrow(mtmp, DART, 12);
                     }
                     break;
                 case 2:
-                    if ($c.andu64(ptr.mflags2, 67108864) !== 0) {
-                        await mongets(mtmp, 55 /* TWO_HANDED_SWORD */);
+                    if ($c.andu64(ptr.mflags2, M2_STRONG) !== 0) {
+                        await mongets(mtmp, TWO_HANDED_SWORD);
                     } else {
-                        await mongets(mtmp, 88 /* CROSSBOW */);
-                        await m_initthrow(mtmp, 23 /* CROSSBOW_BOLT */, 12);
+                        await mongets(mtmp, CROSSBOW);
+                        await m_initthrow(mtmp, CROSSBOW_BOLT, 12);
                     }
                     break;
                 case 3:
-                    await mongets(mtmp, 83 /* BOW */);
-                    await m_initthrow(mtmp, 18 /* ARROW */, 12);
+                    await mongets(mtmp, BOW);
+                    await m_initthrow(mtmp, ARROW, 12);
                     break;
                 case 4:
-                    if ($c.andu64(ptr.mflags2, 67108864) !== 0) {
-                        await mongets(mtmp, 54 /* LONG_SWORD */);
+                    if ($c.andu64(ptr.mflags2, M2_STRONG) !== 0) {
+                        await mongets(mtmp, LONG_SWORD);
                     } else {
-                        await m_initthrow(mtmp, 34 /* DAGGER */, 3);
+                        await m_initthrow(mtmp, DAGGER, 3);
                     }
                     break;
                 case 5:
-                    if ($c.andu64(ptr.mflags2, 67108864) !== 0) {
-                        await mongets(mtmp, 69 /* LUCERN_HAMMER */);
+                    if ($c.andu64(ptr.mflags2, M2_STRONG) !== 0) {
+                        await mongets(mtmp, LUCERN_HAMMER);
                     } else {
-                        await mongets(mtmp, 80 /* AKLYS */);
+                        await mongets(mtmp, AKLYS);
                     }
                     break;
                 default:
@@ -544,7 +565,7 @@ async function m_initweap(mtmp) {   // makemon.c:161
 export async function mkmonmoney(mtmp, amount) {   // makemon.c:576
     let gold = null, $t1;
     if (amount > 0) {
-        gold = await mksobj(438 /* GOLD_PIECE */, 0, 0);
+        gold = await mksobj(GOLD_PIECE, 0, 0);
         gold.quan = amount;
         $t1 = await weight(gold) >>> 0, gold.owt = $t1;
         await add_to_minv(mtmp, gold);
@@ -557,28 +578,28 @@ async function m_initinv(mtmp) {   // makemon.c:589
         return;
     }
     switch (ptr.mlet) {
-        case 53 /* S_HUMAN */:
-            if ($c.andu64(ptr.mflags2, 512) !== 0) {
+        case S_HUMAN:
+            if ($c.andu64(ptr.mflags2, M2_MERC) !== 0) {
                 switch (ptr.pmidx) {
-                    case 272 /* PM_GUARD */:
+                    case PM_GUARD:
                         mac = -1;
                         break;
-                    case 277 /* PM_SOLDIER */:
+                    case PM_SOLDIER:
                         mac = 3;
                         break;
-                    case 278 /* PM_SERGEANT */:
+                    case PM_SERGEANT:
                         mac = 0;
                         break;
-                    case 280 /* PM_LIEUTENANT */:
+                    case PM_LIEUTENANT:
                         mac = -2;
                         break;
-                    case 281 /* PM_CAPTAIN */:
+                    case PM_CAPTAIN:
                         mac = -3;
                         break;
-                    case 282 /* PM_WATCHMAN */:
+                    case PM_WATCHMAN:
                         mac = 3;
                         break;
-                    case 283 /* PM_WATCH_CAPTAIN */:
+                    case PM_WATCH_CAPTAIN:
                         mac = -2;
                         break;
                     default:
@@ -587,129 +608,129 @@ async function m_initinv(mtmp) {   // makemon.c:589
                         break;
                 }
                 if (mac < -1 && rn2(5)) {
-                    otmp = await mongets(mtmp, rn2(5) ? 121 /* PLATE_MAIL */ : 122 /* CRYSTAL_PLATE_MAIL */);
+                    otmp = await mongets(mtmp, rn2(5) ? PLATE_MAIL : CRYSTAL_PLATE_MAIL);
                 } else if (mac < 3 && rn2(5)) {
-                    otmp = await mongets(mtmp, rn2(3) ? 124 /* SPLINT_MAIL */ : 125 /* BANDED_MAIL */);
+                    otmp = await mongets(mtmp, rn2(3) ? SPLINT_MAIL : BANDED_MAIL);
                 } else if (rn2(5)) {
-                    otmp = await mongets(mtmp, rn2(3) ? 132 /* RING_MAIL */ : 131 /* STUDDED_LEATHER_ARMOR */);
+                    otmp = await mongets(mtmp, rn2(3) ? RING_MAIL : STUDDED_LEATHER_ARMOR);
                 } else {
-                    otmp = await mongets(mtmp, 134 /* LEATHER_ARMOR */);
+                    otmp = await mongets(mtmp, LEATHER_ARMOR);
                 }
                 if (otmp) {
                     mac = mac + ((objects[otmp.otyp].oc_oc1 + otmp.spe | 0) - (((otmp.oeroded | 0) > (otmp.oeroded2 | 0) ? otmp.oeroded | 0 : otmp.oeroded2 | 0) < objects[otmp.otyp].oc_oc1 ? (otmp.oeroded | 0) > (otmp.oeroded2 | 0) ? otmp.oeroded | 0 : otmp.oeroded2 | 0 : objects[otmp.otyp].oc_oc1) | 0) | 0;
                 }
                 otmp = null;
                 if (mac < 10 && rn2(3)) {
-                    otmp = await mongets(mtmp, 97 /* HELMET */);
+                    otmp = await mongets(mtmp, HELMET);
                 } else if (mac < 10 && rn2(2)) {
-                    otmp = await mongets(mtmp, 95 /* DENTED_POT */);
+                    otmp = await mongets(mtmp, DENTED_POT);
                 }
                 if (otmp) {
                     mac = mac + ((objects[otmp.otyp].oc_oc1 + otmp.spe | 0) - (((otmp.oeroded | 0) > (otmp.oeroded2 | 0) ? otmp.oeroded | 0 : otmp.oeroded2 | 0) < objects[otmp.otyp].oc_oc1 ? (otmp.oeroded | 0) > (otmp.oeroded2 | 0) ? otmp.oeroded | 0 : otmp.oeroded2 | 0 : objects[otmp.otyp].oc_oc1) | 0) | 0;
                 }
                 otmp = null;
                 if (mac < 10 && rn2(3)) {
-                    otmp = await mongets(mtmp, 150 /* SMALL_SHIELD */);
+                    otmp = await mongets(mtmp, SMALL_SHIELD);
                 } else if (mac < 10 && rn2(2)) {
-                    otmp = await mongets(mtmp, 156 /* LARGE_SHIELD */);
+                    otmp = await mongets(mtmp, LARGE_SHIELD);
                 }
                 if (otmp) {
                     mac = mac + ((objects[otmp.otyp].oc_oc1 + otmp.spe | 0) - (((otmp.oeroded | 0) > (otmp.oeroded2 | 0) ? otmp.oeroded | 0 : otmp.oeroded2 | 0) < objects[otmp.otyp].oc_oc1 ? (otmp.oeroded | 0) > (otmp.oeroded2 | 0) ? otmp.oeroded | 0 : otmp.oeroded2 | 0 : objects[otmp.otyp].oc_oc1) | 0) | 0;
                 }
                 otmp = null;
                 if (mac < 10 && rn2(3)) {
-                    otmp = await mongets(mtmp, 163 /* LOW_BOOTS */);
+                    otmp = await mongets(mtmp, LOW_BOOTS);
                 } else if (mac < 10 && rn2(2)) {
-                    otmp = await mongets(mtmp, 165 /* HIGH_BOOTS */);
+                    otmp = await mongets(mtmp, HIGH_BOOTS);
                 }
                 if (otmp) {
                     mac = mac + ((objects[otmp.otyp].oc_oc1 + otmp.spe | 0) - (((otmp.oeroded | 0) > (otmp.oeroded2 | 0) ? otmp.oeroded | 0 : otmp.oeroded2 | 0) < objects[otmp.otyp].oc_oc1 ? (otmp.oeroded | 0) > (otmp.oeroded2 | 0) ? otmp.oeroded | 0 : otmp.oeroded2 | 0 : objects[otmp.otyp].oc_oc1) | 0) | 0;
                 }
                 otmp = null;
                 if (mac < 10 && rn2(3)) {
-                    otmp = await mongets(mtmp, 159 /* LEATHER_GLOVES */);
+                    otmp = await mongets(mtmp, LEATHER_GLOVES);
                 } else if (mac < 10 && rn2(2)) {
-                    otmp = await mongets(mtmp, 145 /* LEATHER_CLOAK */);
+                    otmp = await mongets(mtmp, LEATHER_CLOAK);
                 }
                 if (otmp) {
                     mac = mac + ((objects[otmp.otyp].oc_oc1 + otmp.spe | 0) - (((otmp.oeroded | 0) > (otmp.oeroded2 | 0) ? otmp.oeroded | 0 : otmp.oeroded2 | 0) < objects[otmp.otyp].oc_oc1 ? (otmp.oeroded | 0) > (otmp.oeroded2 | 0) ? otmp.oeroded | 0 : otmp.oeroded2 | 0 : objects[otmp.otyp].oc_oc1) | 0) | 0;
                 }
                 otmp = null;
                 mac;
-                if ($c.peq(ptr, $c.relem(mons, 283 /* PM_WATCH_CAPTAIN */))) {
-                } else if ($c.peq(ptr, $c.relem(mons, 282 /* PM_WATCHMAN */))) {
+                if ($c.peq(ptr, $c.relem(mons, PM_WATCH_CAPTAIN))) {
+                } else if ($c.peq(ptr, $c.relem(mons, PM_WATCHMAN))) {
                     if (rn2(3)) {
-                        await mongets(mtmp, 245 /* TIN_WHISTLE */);
+                        await mongets(mtmp, TIN_WHISTLE);
                     }
-                } else if ($c.peq(ptr, $c.relem(mons, 272 /* PM_GUARD */))) {
-                    otmp = await mksobj(245 /* TIN_WHISTLE */, 1, 0);
+                } else if ($c.peq(ptr, $c.relem(mons, PM_GUARD))) {
+                    otmp = await mksobj(TIN_WHISTLE, 1, 0);
                     await curse(otmp);
                     await mpickobj(mtmp, otmp);
                 } else {
                     if (!rn2(3)) {
-                        await mongets(mtmp, 294 /* K_RATION */);
+                        await mongets(mtmp, K_RATION);
                     }
                     if (!rn2(2)) {
-                        await mongets(mtmp, 295 /* C_RATION */);
+                        await mongets(mtmp, C_RATION);
                     }
-                    if (!$c.peq(ptr, $c.relem(mons, 277 /* PM_SOLDIER */)) && !rn2(3)) {
-                        await mongets(mtmp, 256 /* BUGLE */);
+                    if (!$c.peq(ptr, $c.relem(mons, PM_SOLDIER)) && !rn2(3)) {
+                        await mongets(mtmp, BUGLE);
                     }
                 }
-            } else if ($c.peq(ptr, $c.relem(mons, 271 /* PM_SHOPKEEPER */))) {
-                await mongets(mtmp, 221 /* SKELETON_KEY */);
+            } else if ($c.peq(ptr, $c.relem(mons, PM_SHOPKEEPER))) {
+                await mongets(mtmp, SKELETON_KEY);
                 switch (rn2(4)) {
                     case 0:
-                        await mongets(mtmp, 429 /* WAN_MAGIC_MISSILE */);
+                        await mongets(mtmp, WAN_MAGIC_MISSILE);
                     case 1:
-                        await mongets(mtmp, 308 /* POT_EXTRA_HEALING */);
+                        await mongets(mtmp, POT_EXTRA_HEALING);
                     case 2:
-                        await mongets(mtmp, 307 /* POT_HEALING */);
+                        await mongets(mtmp, POT_HEALING);
                     case 3:
-                        await mongets(mtmp, 417 /* WAN_STRIKING */);
+                        await mongets(mtmp, WAN_STRIKING);
                 }
-            } else if (ptr.msound === 41 /* MS_PRIEST */ || ptr.mlet === 53 /* S_HUMAN */ && gu.urole.mnum === 337 && (ptr.msound === 36 /* MS_LEADER */ || ptr.msound === 37 /* MS_NEMESIS */)) {
-                await mongets(mtmp, rn2(7) ? 143 /* ROBE */ : rn2(3) ? 146 /* CLOAK_OF_PROTECTION */ : 148 /* CLOAK_OF_MAGIC_RESISTANCE */);
-                await mongets(mtmp, 150 /* SMALL_SHIELD */);
+            } else if (ptr.msound === MS_PRIEST || ptr.mlet === S_HUMAN && gu.urole.mnum === PM_CLERIC && (ptr.msound === MS_LEADER || ptr.msound === MS_NEMESIS)) {
+                await mongets(mtmp, rn2(7) ? ROBE : rn2(3) ? CLOAK_OF_PROTECTION : CLOAK_OF_MAGIC_RESISTANCE);
+                await mongets(mtmp, SMALL_SHIELD);
                 await mkmonmoney(mtmp, rn2(10) + 20 | 0);
-            } else if (ptr.mlet === 53 /* S_HUMAN */ && gu.urole.mnum === 336 && (ptr.msound === 36 /* MS_LEADER */ || ptr.msound === 37 /* MS_NEMESIS */)) {
-                await mongets(mtmp, rn2(11) ? 143 /* ROBE */ : 148 /* CLOAK_OF_MAGIC_RESISTANCE */);
+            } else if (ptr.mlet === S_HUMAN && gu.urole.mnum === PM_MONK && (ptr.msound === MS_LEADER || ptr.msound === MS_NEMESIS)) {
+                await mongets(mtmp, rn2(11) ? ROBE : CLOAK_OF_MAGIC_RESISTANCE);
             }
             break;
-        case 14 /* S_NYMPH */:
+        case S_NYMPH:
             if (!rn2(2)) {
-                await mongets(mtmp, 230 /* MIRROR */);
+                await mongets(mtmp, MIRROR);
             }
             if (!rn2(2)) {
-                await mongets(mtmp, 312 /* POT_OBJECT_DETECTION */);
+                await mongets(mtmp, POT_OBJECT_DETECTION);
             }
             break;
-        case 34 /* S_GIANT */:
-            if ($c.peq(ptr, $c.relem(mons, 177 /* PM_MINOTAUR */))) {
+        case S_GIANT:
+            if ($c.peq(ptr, $c.relem(mons, PM_MINOTAUR))) {
                 if (!rn2(8) || gi.in_mklev && ((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_earth_level))) {
-                    await mongets(mtmp, 428 /* WAN_DIGGING */);
+                    await mongets(mtmp, WAN_DIGGING);
                 }
-            } else if ($c.andu64(ptr.mflags2, 8192) !== 0) {
+            } else if ($c.andu64(ptr.mflags2, M2_GIANT) !== 0) {
                 for (cnt = rn2($c.div32(mtmp.m_lev, 2)); cnt; cnt = cnt - 1 | 0) {
-                    otmp = await mksobj(rnd_class(439 /* DILITHIUM_CRYSTAL */, 469), 0, 0);
+                    otmp = await mksobj(rnd_class(DILITHIUM_CRYSTAL, LUCKSTONE - 1), 0, 0);
                     $t1 = rn2(2) + 3 | 0, otmp.quan = $t1;
                     $t2 = await weight(otmp) >>> 0, otmp.owt = $t2;
                     await mpickobj(mtmp, otmp);
                 }
             }
             break;
-        case 49 /* S_WRAITH */:
-            if ($c.peq(ptr, $c.relem(mons, 231 /* PM_NAZGUL */))) {
-                otmp = await mksobj(198 /* RIN_INVISIBILITY */, 0, 0);
+        case S_WRAITH:
+            if ($c.peq(ptr, $c.relem(mons, PM_NAZGUL))) {
+                otmp = await mksobj(RIN_INVISIBILITY, 0, 0);
                 await curse(otmp);
                 await mpickobj(mtmp, otmp);
             }
             break;
-        case 38 /* S_LICH */:
-            if ($c.peq(ptr, $c.relem(mons, 185 /* PM_MASTER_LICH */)) && !rn2(13)) {
-                await mongets(mtmp, rn2(7) ? 38 /* ATHAME */ : 416 /* WAN_NOTHING */);
-            } else if ($c.peq(ptr, $c.relem(mons, 186 /* PM_ARCH_LICH */)) && !rn2(3)) {
-                otmp = await mksobj(rn2(3) ? 38 /* ATHAME */ : 79 /* QUARTERSTAFF */, 1, $c.i8(rn2(13) ? 0 : 1));
+        case S_LICH:
+            if ($c.peq(ptr, $c.relem(mons, PM_MASTER_LICH)) && !rn2(13)) {
+                await mongets(mtmp, rn2(7) ? ATHAME : WAN_NOTHING);
+            } else if ($c.peq(ptr, $c.relem(mons, PM_ARCH_LICH)) && !rn2(3)) {
+                otmp = await mksobj(rn2(3) ? ATHAME : QUARTERSTAFF, 1, $c.i8(rn2(13) ? 0 : 1));
                 if (otmp.spe < 2) {
                     $t3 = $c.i8(rnd(3)), otmp.spe = $t3;
                 }
@@ -719,38 +740,38 @@ async function m_initinv(mtmp) {   // makemon.c:589
                 await mpickobj(mtmp, otmp);
             }
             break;
-        case 39 /* S_MUMMY */:
+        case S_MUMMY:
             if (rn2(7)) {
-                await mongets(mtmp, 138 /* MUMMY_WRAPPING */);
+                await mongets(mtmp, MUMMY_WRAPPING);
             }
             break;
-        case 43 /* S_QUANTMECH */:
-            if (!rn2(20) && $c.peq(ptr, $c.relem(mons, 210 /* PM_QUANTUM_MECHANIC */))) {
-                otmp = await mksobj(214 /* LARGE_BOX */, 0, 0);
-                if ((catcorpse = await mksobj(265 /* CORPSE */, 1, 0)) !== null) {
+        case S_QUANTMECH:
+            if (!rn2(20) && $c.peq(ptr, $c.relem(mons, PM_QUANTUM_MECHANIC))) {
+                otmp = await mksobj(LARGE_BOX, 0, 0);
+                if ((catcorpse = await mksobj(CORPSE, 1, 0)) !== null) {
                     otmp.spe = 1;
-                    await set_corpsenm(catcorpse, 33 /* PM_HOUSECAT */);
-                    await stop_timer(1, obj_to_any(catcorpse));
+                    await set_corpsenm(catcorpse, PM_HOUSECAT);
+                    await stop_timer(ROT_CORPSE, obj_to_any(catcorpse));
                     await add_to_container(otmp, catcorpse);
                     $t4 = await weight(otmp) >>> 0, otmp.owt = $t4;
                 }
                 await mpickobj(mtmp, otmp);
             }
             break;
-        case 12 /* S_LEPRECHAUN */:
+        case S_LEPRECHAUN:
             await mkmonmoney(mtmp, d(await level_difficulty(), 30));
             break;
-        case 56 /* S_DEMON */:
-            if ($c.peq(ptr, $c.relem(mons, 298 /* PM_ICE_DEVIL */)) && !rn2(4)) {
-                await mongets(mtmp, 27 /* SPEAR */);
-            } else if ($c.peq(ptr, $c.relem(mons, 309 /* PM_ASMODEUS */))) {
-                await mongets(mtmp, 431 /* WAN_COLD */);
-                await mongets(mtmp, 430 /* WAN_FIRE */);
+        case S_DEMON:
+            if ($c.peq(ptr, $c.relem(mons, PM_ICE_DEVIL)) && !rn2(4)) {
+                await mongets(mtmp, SPEAR);
+            } else if ($c.peq(ptr, $c.relem(mons, PM_ASMODEUS))) {
+                await mongets(mtmp, WAN_COLD);
+                await mongets(mtmp, WAN_FIRE);
             }
             break;
-        case 33 /* S_GNOME */:
+        case S_GNOME:
             if (!rn2(In_mines(u.uz) && gi.in_mklev ? 20 : 60)) {
-                otmp = await mksobj(rn2(4) ? 224 /* TALLOW_CANDLE */ : 225 /* WAX_CANDLE */, 1, 0);
+                otmp = await mksobj(rn2(4) ? TALLOW_CANDLE : WAX_CANDLE, 1, 0);
                 otmp.quan = 1;
                 $t5 = await weight(otmp) >>> 0, otmp.owt = $t5;
                 if (!await mpickobj(mtmp, otmp) && !svl.level.locations[mtmp.mx][mtmp.my].lit) {
@@ -761,7 +782,7 @@ async function m_initinv(mtmp) {   // makemon.c:589
         default:
             break;
     }
-    if ($c.peq(ptr, $c.relem(mons, 277 /* PM_SOLDIER */)) && rn2(13)) {
+    if ($c.peq(ptr, $c.relem(mons, PM_SOLDIER)) && rn2(13)) {
         return;
     }
     if (mtmp.m_lev > rn2(50)) {
@@ -770,13 +791,13 @@ async function m_initinv(mtmp) {   // makemon.c:589
     if (mtmp.m_lev > rn2(100)) {
         await mongets(mtmp, rnd_misc_item(mtmp));
     }
-    if ($c.andu64(ptr.mflags2, 268435456) !== 0 && !findgold(mtmp.minvent) && !rn2(5)) {
+    if ($c.andu64(ptr.mflags2, M2_GREEDY) !== 0 && !findgold(mtmp.minvent) && !rn2(5)) {
         await mkmonmoney(mtmp, d(await level_difficulty(), mtmp.minvent ? 5 : 10));
     }
 }
 export async function clone_mon(mon, x, y) {   // makemon.c:837
     let mm = new $T.nhcoord(), m2 = null, atyp = 0, $t1, $t2, $t3;
-    if (mon.mhp <= 1 || (svm.mvitals[mon.data.pmidx].mvflags & 1) !== 0) {
+    if (mon.mhp <= 1 || (svm.mvitals[mon.data.pmidx].mvflags & G_EXTINCT) !== 0) {
         return null;
     }
     if (x === 0) {
@@ -816,8 +837,8 @@ export async function clone_mon(mon, x, y) {   // makemon.c:837
     m2.ispriest = (0) & 1;
     mon_track_clear(m2);
     await place_monster(m2, m2.mx, m2.my);
-    if (m2.data.mlet === 25 /* S_LIGHT */ || $c.peq(m2.data, $c.relem(mons, 30 /* PM_FLAMING_SPHERE */)) || $c.peq(m2.data, $c.relem(mons, 31 /* PM_SHOCKING_SPHERE */)) || $c.peq(m2.data, $c.relem(mons, 134 /* PM_BABY_GOLD_DRAGON */)) || $c.peq(m2.data, $c.relem(mons, 111 /* PM_FIRE_VORTEX */)) ? 1 : $c.peq(m2.data, $c.relem(mons, 155 /* PM_FIRE_ELEMENTAL */)) || $c.peq(m2.data, $c.relem(mons, 144 /* PM_GOLD_DRAGON */)) ? 1 : 0) {
-        await new_light_source(m2.mx, m2.my, m2.data.mlet === 25 /* S_LIGHT */ || $c.peq(m2.data, $c.relem(mons, 30 /* PM_FLAMING_SPHERE */)) || $c.peq(m2.data, $c.relem(mons, 31 /* PM_SHOCKING_SPHERE */)) || $c.peq(m2.data, $c.relem(mons, 134 /* PM_BABY_GOLD_DRAGON */)) || $c.peq(m2.data, $c.relem(mons, 111 /* PM_FIRE_VORTEX */)) ? 1 : $c.peq(m2.data, $c.relem(mons, 155 /* PM_FIRE_ELEMENTAL */)) || $c.peq(m2.data, $c.relem(mons, 144 /* PM_GOLD_DRAGON */)) ? 1 : 0, 2 /* LS_MONSTER */, monst_to_any(m2));
+    if (m2.data.mlet === S_LIGHT || $c.peq(m2.data, $c.relem(mons, PM_FLAMING_SPHERE)) || $c.peq(m2.data, $c.relem(mons, PM_SHOCKING_SPHERE)) || $c.peq(m2.data, $c.relem(mons, PM_BABY_GOLD_DRAGON)) || $c.peq(m2.data, $c.relem(mons, PM_FIRE_VORTEX)) ? 1 : $c.peq(m2.data, $c.relem(mons, PM_FIRE_ELEMENTAL)) || $c.peq(m2.data, $c.relem(mons, PM_GOLD_DRAGON)) ? 1 : 0) {
+        await new_light_source(m2.mx, m2.my, m2.data.mlet === S_LIGHT || $c.peq(m2.data, $c.relem(mons, PM_FLAMING_SPHERE)) || $c.peq(m2.data, $c.relem(mons, PM_SHOCKING_SPHERE)) || $c.peq(m2.data, $c.relem(mons, PM_BABY_GOLD_DRAGON)) || $c.peq(m2.data, $c.relem(mons, PM_FIRE_VORTEX)) ? 1 : $c.peq(m2.data, $c.relem(mons, PM_FIRE_ELEMENTAL)) || $c.peq(m2.data, $c.relem(mons, PM_GOLD_DRAGON)) ? 1 : 0, LS_MONSTER, monst_to_any(m2));
     }
     if (mon.mextra && mon.mextra.mgivenname) {
         m2 = await christen_monst(m2, mon.mextra.mgivenname);
@@ -851,25 +872,25 @@ export async function clone_mon(mon, x, y) {   // makemon.c:837
 export async function propagate(mndx, tally, ghostly) {   // makemon.c:958
     let gone = 0, result = 0, lim = 0, save_plnmsg = 0;
     lim = mbirth_limit(mndx);
-    gone = $c.i8((svm.mvitals[mndx].mvflags & 3) !== 0 ? 1 : 0);
+    gone = $c.i8((svm.mvitals[mndx].mvflags & (G_GENOD | G_EXTINCT)) !== 0 ? 1 : 0);
     result = $c.i8(svm.mvitals[mndx].born < lim && !gone ? 1 : 0);
-    if ((mons[mndx].geno & 4096) !== 0 && mndx !== 276 /* PM_HIGH_CLERIC */) {
-        svm.mvitals[mndx].mvflags = $c.u8(svm.mvitals[mndx].mvflags | 1);
+    if ((mons[mndx].geno & G_UNIQ) !== 0 && mndx !== PM_HIGH_CLERIC) {
+        svm.mvitals[mndx].mvflags = $c.u8(svm.mvitals[mndx].mvflags | G_EXTINCT);
     }
     if (svm.mvitals[mndx].born < 255 && tally && (!ghostly || result)) {
         svm.mvitals[mndx].born = $c.u8(svm.mvitals[mndx].born + 1);
     }
-    if (svm.mvitals[mndx].born >= lim && !(mons[mndx].geno & 512) && !(svm.mvitals[mndx].mvflags & 1)) {
+    if (svm.mvitals[mndx].born >= lim && !(mons[mndx].geno & G_NOGEN) && !(svm.mvitals[mndx].mvflags & G_EXTINCT)) {
         if (flags.debug) {
             do {
                 if (debugcore($c.lit("makemon.c"), 1)) {
                     save_plnmsg = iflags.last_msg;
-                    await pline($c.lit("Automatically extinguished %s."), await makeplural(mons[mndx].pmnames[2 /* NEUTRAL */]));
+                    await pline($c.lit("Automatically extinguished %s."), await makeplural(mons[mndx].pmnames[NEUTRAL]));
                     iflags.last_msg = save_plnmsg;
                 }
             } while (0);
         }
-        svm.mvitals[mndx].mvflags = $c.u8(svm.mvitals[mndx].mvflags | 1);
+        svm.mvitals[mndx].mvflags = $c.u8(svm.mvitals[mndx].mvflags | G_EXTINCT);
     }
     return result;
 }
@@ -877,11 +898,11 @@ export function monhp_per_lvl(mon) {   // makemon.c:986
     let ptr = null, hp = 0;
     ptr = mon.data;
     hp = rnd(8);
-    if (ptr.mlet === 55 /* S_GOLEM */) {
+    if (ptr.mlet === S_GOLEM) {
         hp = $c.div32(golemhp(ptr.pmidx), ptr.mlevel);
     } else if (ptr.mlevel > 49) {
         hp = 4 + rnd(4) | 0;
-    } else if (ptr.mlet === 30 /* S_DRAGON */ && ptr.pmidx >= 143 /* PM_GRAY_DRAGON */) {
+    } else if (ptr.mlet === S_DRAGON && ptr.pmidx >= PM_GRAY_DRAGON) {
         hp = 4 + rn2(5) | 0;
     } else if (!mon.m_lev) {
         hp = rnd(4);
@@ -893,15 +914,15 @@ export async function newmonhp(mon, mndx) {   // makemon.c:1012
     ptr = $c.relem(mons, mndx);
     basehp = 0;
     $t1 = $c.u8(await adj_lev(ptr)), mon.m_lev = $t1;
-    if (ptr.mlet === 55 /* S_GOLEM */) {
+    if (ptr.mlet === S_GOLEM) {
         $t3 = ($t2 = golemhp(mndx), mon.mhp = $t2), mon.mhpmax = $t3;
-    } else if ($c.peq(ptr, $c.relem(mons, 311 /* PM_DEATH */)) || $c.peq(ptr, $c.relem(mons, 313 /* PM_FAMINE */)) || $c.peq(ptr, $c.relem(mons, 312 /* PM_PESTILENCE */))) {
+    } else if ($c.peq(ptr, $c.relem(mons, PM_DEATH)) || $c.peq(ptr, $c.relem(mons, PM_FAMINE)) || $c.peq(ptr, $c.relem(mons, PM_PESTILENCE))) {
         basehp = 10;
         $t5 = ($t4 = d(basehp, 8), mon.mhp = $t4), mon.mhpmax = $t5;
     } else if (ptr.mlevel > 49) {
         $t6 = mon.mhp = Math.imul(2, ptr.mlevel - 6 | 0), mon.mhpmax = $t6;
         mon.m_lev = $c.u8($c.div32(mon.mhp, 4));
-    } else if (ptr.mlet === 30 /* S_DRAGON */ && mndx >= 143 /* PM_GRAY_DRAGON */) {
+    } else if (ptr.mlet === S_DRAGON && mndx >= PM_GRAY_DRAGON) {
         basehp = mon.m_lev;
         $t8 = ($t7 = u.uz.dnum === svd.dungeon_topology.d_astral_level.dnum ? Math.imul(8, basehp) : Math.imul(4, basehp) + d(basehp, 4) | 0, mon.mhp = $t7), mon.mhpmax = $t8;
     } else if (!mon.m_lev) {
@@ -921,7 +942,7 @@ export async function newmonhp(mon, mndx) {   // makemon.c:1012
 }
 function init_mextra(mex) {   // makemon.c:1059
     mex.$copyFrom(zeromextra);
-    mex.mcorpsenm = -1 /* NON_PM */;
+    mex.mcorpsenm = NON_PM;
 }
 export async function newmextra() {   // makemon.c:1066
     let mextra = null;
@@ -935,26 +956,26 @@ function makemon_rnd_goodpos(mon, gpflags, cc) {   // makemon.c:1076
         switch ($goto) {
         case null:
             tryct = 0;
-            gpflags = $c.u32($c.or64(gpflags, 16777216));
+            gpflags = $c.u32($c.or64(gpflags, GP_AVOID_MONPOS));
             do {
                 nx = $c.i16(rn2(77) + 2 | 0);
                 ny = $c.i16(rn2(21));
-                good = $c.i8(!gi.in_mklev && (gv.viz_array.get(ny).get(nx) & 2) !== 0 ? 0 : goodpos(nx, ny, mon, gpflags));
+                good = $c.i8(!gi.in_mklev && (gv.viz_array.get(ny).get(nx) & IN_SIGHT) !== 0 ? 0 : goodpos(nx, ny, mon, gpflags));
             } while ((tryct = tryct + 1 | 0) < 50 && !good);
         case "gotgood":
             if ($goto !== "gotgood" && !good) {
                 xofs = nx;
                 yofs = ny;
-                bl = gi.in_mklev || (u.uprops[15 /* BLINDED */].intrinsic || u.uprops[15 /* BLINDED */].extrinsic) && !u.uprops[15 /* BLINDED */].blocked ? 1 : 0;
+                bl = gi.in_mklev || (u.uprops[BLINDED].intrinsic || u.uprops[BLINDED].extrinsic) && !u.uprops[BLINDED].blocked ? 1 : 0;
                 for (; bl < 2; bl = bl + 1 | 0) {
                     if (!bl) {
-                        gpflags = $c.u32($c.and64(gpflags, -8388609));
+                        gpflags = $c.u32($c.and64(gpflags, ~GP_CHECKSCARY));
                     }
-                    for (dx = 0; dx < 80; dx = $c.i16(dx + 1)) {
-                        for (dy = 0; dy < 21; dy = $c.i16(dy + 1)) {
-                            nx = $c.i16($c.rem32(dx + xofs | 0, 79) + 1 | 0);
-                            ny = $c.i16($c.rem32(dy + yofs | 0, 20) + 1 | 0);
-                            if (bl === 0 && (gv.viz_array.get(ny).get(nx) & 2) !== 0) {
+                    for (dx = 0; dx < COLNO; dx = $c.i16(dx + 1)) {
+                        for (dy = 0; dy < ROWNO; dy = $c.i16(dy + 1)) {
+                            nx = $c.i16($c.rem32(dx + xofs | 0, COLNO - 1) + 1 | 0);
+                            ny = $c.i16($c.rem32(dy + yofs | 0, ROWNO - 1) + 1 | 0);
+                            if (bl === 0 && (gv.viz_array.get(ny).get(nx) & IN_SIGHT) !== 0) {
                                 continue;
                             }
                             if (goodpos(nx, ny, mon, gpflags)) {
@@ -992,10 +1013,10 @@ export async function makemon(ptr, x, y, mmflags) {   // makemon.c:1147
     let mtmp = null, fakemon = new $T.monst(), cc = new $T.nhcoord(), mndx = 0, mcham = 0, ct = 0, mitem = 0, femaleok = 0, maleok = 0, anymon = 0, byyou = 0, allow_minvent = 0, countbirth = 0, allowtail = 0, gpflags = 0, save_plnmsg = 0, tryct = 0, save_plnmsg$2 = 0, eminp = null, mbuf = new Int8Array(256), what = null, exclaim = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10, $t11;
     anymon = $c.i8(!ptr ? 1 : 0);
     byyou = $c.i8(x === u.ux && y === u.uy ? 1 : 0);
-    allow_minvent = $c.i8($c.and64(mmflags, 1) === 0 ? 1 : 0);
-    countbirth = $c.i8($c.and64(mmflags, 4) === 0 ? 1 : 0);
-    allowtail = $c.i8($c.and64(mmflags, 16384) === 0 ? 1 : 0);
-    gpflags = $c.u32($c.or64($c.or64($c.and64(mmflags, 8) ? 8 : 0, 8388608), 16777216));
+    allow_minvent = $c.i8($c.and64(mmflags, NO_MINVENT) === 0 ? 1 : 0);
+    countbirth = $c.i8($c.and64(mmflags, MM_NOCOUNTBIRTH) === 0 ? 1 : 0);
+    allowtail = $c.i8($c.and64(mmflags, MM_NOTAIL) === 0 ? 1 : 0);
+    gpflags = $c.u32($c.or64($c.or64($c.and64(mmflags, MM_IGNOREWATER) ? MM_IGNOREWATER : 0, GP_CHECKSCARY), GP_AVOID_MONPOS));
     fakemon.$copyFrom(cg.zeromonst);
     $t1 = cc.y = 0, cc.x = $t1;
     if (iflags.debug_mongen || !svl.level.flags.rndmongen && !ptr) {
@@ -1009,7 +1030,7 @@ export async function makemon(ptr, x, y, mmflags) {   // makemon.c:1147
         x = cc.x;
         y = cc.y;
     } else if (byyou && !gi.in_mklev) {
-        if (!await enexto_core(cc, u.ux, u.uy, ptr, gpflags) && !await enexto_core(cc, u.ux, u.uy, ptr, $c.u32($c.and64(gpflags, -8388609)))) {
+        if (!await enexto_core(cc, u.ux, u.uy, ptr, gpflags) && !await enexto_core(cc, u.ux, u.uy, ptr, $c.u32($c.and64(gpflags, ~GP_CHECKSCARY)))) {
             return null;
         }
         x = cc.x;
@@ -1020,7 +1041,7 @@ export async function makemon(ptr, x, y, mmflags) {   // makemon.c:1147
         return null;
     }
     if (svl.level.monsters[x][y] !== null) {
-        if (!$c.and64(mmflags, 16) || !await enexto_core(cc, x, y, ptr, gpflags)) {
+        if (!$c.and64(mmflags, MM_ADJACENTOK) || !await enexto_core(cc, x, y, ptr, gpflags)) {
             return null;
         }
         x = cc.x;
@@ -1028,14 +1049,14 @@ export async function makemon(ptr, x, y, mmflags) {   // makemon.c:1147
     }
     if (ptr) {
         mndx = ptr.pmidx;
-        if (svm.mvitals[mndx].mvflags & 2) {
+        if (svm.mvitals[mndx].mvflags & G_GENOD) {
             return null;
         }
-        if (flags.debug && svm.mvitals[mndx].mvflags & 1) {
+        if (flags.debug && svm.mvitals[mndx].mvflags & G_EXTINCT) {
             do {
                 if (debugcore($c.lit("makemon.c"), 1)) {
                     save_plnmsg = iflags.last_msg;
-                    await pline($c.lit("Explicitly creating extinct monster %s."), mons[mndx].pmnames[2 /* NEUTRAL */]);
+                    await pline($c.lit("Explicitly creating extinct monster %s."), mons[mndx].pmnames[NEUTRAL]);
                     iflags.last_msg = save_plnmsg;
                 }
             } while (0);
@@ -1054,61 +1075,61 @@ export async function makemon(ptr, x, y, mmflags) {   // makemon.c:1147
                 return null;
             }
             fakemon.data = ptr;
-        } while ((tryct = tryct + 1 | 0) <= 50 && (tryct === 1 && $c.andu64(ptr.mflags2, 134217728) !== 0 && u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum || !goodpos(x, y, fakemon, gpflags)));
+        } while ((tryct = tryct + 1 | 0) <= 50 && (tryct === 1 && $c.andu64(ptr.mflags2, M2_ROCKTHROW) !== 0 && u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum || !goodpos(x, y, fakemon, gpflags)));
         mndx = ptr.pmidx;
     }
     await propagate(mndx, countbirth, 0);
     mtmp = $c.asRec(await alloc(192), $T.monst, 192);
     mtmp.$copyFrom(cg.zeromonst);
-    if ($c.and64(mmflags, 128)) {
+    if ($c.and64(mmflags, MM_EGD)) {
         await newegd(mtmp);
     }
-    if ($c.and64(mmflags, 256)) {
+    if ($c.and64(mmflags, MM_EPRI)) {
         await newepri(mtmp);
     }
-    if ($c.and64(mmflags, 512)) {
+    if ($c.and64(mmflags, MM_ESHK)) {
         await neweshk(mtmp);
     }
-    if ($c.and64(mmflags, 1024)) {
+    if ($c.and64(mmflags, MM_EMIN)) {
         await newemin(mtmp);
     }
-    if ($c.and64(mmflags, 2048)) {
+    if ($c.and64(mmflags, MM_EDOG)) {
         await newedog(mtmp);
     }
-    if ($c.and64(mmflags, 4096)) {
+    if ($c.and64(mmflags, MM_ASLEEP)) {
         mtmp.msleeping = (1) & 1;
     }
     mtmp.nmon = svl.level.monlist;
     svl.level.monlist = mtmp;
     $t2 = next_ident(), mtmp.m_id = $t2;
     set_mon_data(mtmp, ptr);
-    if (ptr.msound === 36 /* MS_LEADER */ && await quest_info(36 /* MS_LEADER */) === mndx) {
+    if (ptr.msound === MS_LEADER && await quest_info(MS_LEADER) === mndx) {
         svq.quest_status.leader_m_id = mtmp.m_id;
     }
     mtmp.mnum = $c.i16(mndx);
     await newmonhp(mtmp, mndx);
-    femaleok = $c.i8(!($c.andu64(ptr.mflags2, 65536) !== 0) && !($c.andu64(ptr.mflags2, 262144) !== 0) ? 1 : 0);
-    maleok = $c.i8(!($c.andu64(ptr.mflags2, 131072) !== 0) && !($c.andu64(ptr.mflags2, 262144) !== 0) ? 1 : 0);
-    if ($c.andu64(ptr.mflags2, 131072) !== 0 || $c.and64(mmflags, 65536) !== 0 && femaleok) {
+    femaleok = $c.i8(!($c.andu64(ptr.mflags2, M2_MALE) !== 0) && !($c.andu64(ptr.mflags2, M2_NEUTER) !== 0) ? 1 : 0);
+    maleok = $c.i8(!($c.andu64(ptr.mflags2, M2_FEMALE) !== 0) && !($c.andu64(ptr.mflags2, M2_NEUTER) !== 0) ? 1 : 0);
+    if ($c.andu64(ptr.mflags2, M2_FEMALE) !== 0 || $c.and64(mmflags, MM_FEMALE) !== 0 && femaleok) {
         mtmp.female = (1) & 1;
-    } else if ($c.andu64(ptr.mflags2, 65536) !== 0 || $c.and64(mmflags, 32768) !== 0 && maleok) {
+    } else if ($c.andu64(ptr.mflags2, M2_MALE) !== 0 || $c.and64(mmflags, MM_MALE) !== 0 && maleok) {
         mtmp.female = (0) & 1;
-    } else if (ptr.msound === 36 /* MS_LEADER */ && await quest_info(36 /* MS_LEADER */) === mndx) {
+    } else if (ptr.msound === MS_LEADER && await quest_info(MS_LEADER) === mndx) {
         mtmp.female = (svq.quest_status.ldrgend) & 1;
-    } else if (ptr.msound === 37 /* MS_NEMESIS */ && await quest_info(37 /* MS_NEMESIS */) === mndx) {
+    } else if (ptr.msound === MS_NEMESIS && await quest_info(MS_NEMESIS) === mndx) {
         mtmp.female = (svq.quest_status.nemgend) & 1;
     } else {
         $t3 = (femaleok ? rn2(2) : 0) >>> 0, mtmp.female = ($t3) & 1;
     }
-    if (u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum && !($c.andu64(ptr.mflags1, 65536) !== 0)) {
-        mon_learns_traps(mtmp, 11 /* PIT */);
-        mon_learns_traps(mtmp, 13 /* HOLE */);
+    if (u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum && !($c.andu64(ptr.mflags1, M1_MINDLESS) !== 0)) {
+        mon_learns_traps(mtmp, PIT);
+        mon_learns_traps(mtmp, HOLE);
     }
-    if ((svd.dungeon_topology.d_stronghold_level.dlevel || svd.dungeon_topology.d_stronghold_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_stronghold_level) && !($c.andu64(ptr.mflags1, 65536) !== 0)) {
-        mon_learns_traps(mtmp, 14 /* TRAPDOOR */);
+    if ((svd.dungeon_topology.d_stronghold_level.dlevel || svd.dungeon_topology.d_stronghold_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_stronghold_level) && !($c.andu64(ptr.mflags1, M1_MINDLESS) !== 0)) {
+        mon_learns_traps(mtmp, TRAPDOOR);
     }
-    if (ptr.msound === 36 /* MS_LEADER */ || ptr.msound === 37 /* MS_NEMESIS */) {
-        mon_learns_traps(mtmp, -1 /* ALL_TRAPS */);
+    if (ptr.msound === MS_LEADER || ptr.msound === MS_NEMESIS) {
+        mon_learns_traps(mtmp, ALL_TRAPS);
     }
     if ((svd.dungeon_topology.d_stronghold_level.dlevel || svd.dungeon_topology.d_stronghold_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_stronghold_level) || (svd.dungeon_topology.d_knox_level.dlevel || svd.dungeon_topology.d_knox_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_knox_level) || u.uz.dnum === svd.dungeon_topology.d_astral_level.dnum || In_hell(u.uz) || In_V_tower(u.uz) || In_quest(u.uz)) {
         mtmp.mwandexp = (1) & 1;
@@ -1116,94 +1137,94 @@ export async function makemon(ptr, x, y, mmflags) {   // makemon.c:1147
     await place_monster(mtmp, x, y);
     $t4 = mtmp.mcanmove = (1) & 1, mtmp.mcansee = ($t4) & 1;
     mtmp.mgenmklev = (gi.in_mklev >>> 0) & 1;
-    mtmp.seen_resistance = 0;
-    $t5 = ($c.and64(mmflags, 32) ? 0 : peace_minded(ptr)) >>> 0, mtmp.mpeaceful = ($t5) & 1;
-    if ($c.and64(mmflags, 1048576) !== 0) {
+    mtmp.seen_resistance = M_SEEN_NOTHING;
+    $t5 = ($c.and64(mmflags, MM_ANGRY) ? 0 : peace_minded(ptr)) >>> 0, mtmp.mpeaceful = ($t5) & 1;
+    if ($c.and64(mmflags, MM_MINVIS) !== 0) {
         await mon_set_minvis(mtmp, 0);
     }
     switch (ptr.mlet) {
-        case 13 /* S_MIMIC */:
+        case S_MIMIC:
             await set_mimic_sym(mtmp);
             break;
-        case 19 /* S_SPIDER */:
-        case 45 /* S_SNAKE */:
+        case S_SPIDER:
+        case S_SNAKE:
             if (gi.in_mklev) {
                 if (x && y) {
-                    await mkobj_at(0, x, y, 1);
+                    await mkobj_at(RANDOM_CLASS, x, y, 1);
                 }
                 await hideunder(mtmp);
             }
             break;
-        case 25 /* S_LIGHT */:
-        case 31 /* S_ELEMENTAL */:
-            if (mndx === 153 /* PM_STALKER */ || mndx === 119 /* PM_BLACK_LIGHT */) {
+        case S_LIGHT:
+        case S_ELEMENTAL:
+            if (mndx === PM_STALKER || mndx === PM_BLACK_LIGHT) {
                 mtmp.perminvis = (1) & 1;
                 mtmp.minvis = (1) & 1;
             }
             break;
-        case 57 /* S_EEL */:
+        case S_EEL:
             if (gi.in_mklev) {
                 await hideunder(mtmp);
             }
             break;
-        case 12 /* S_LEPRECHAUN */:
+        case S_LEPRECHAUN:
             mtmp.msleeping = (1) & 1;
             break;
-        case 36 /* S_JABBERWOCK */:
-        case 14 /* S_NYMPH */:
+        case S_JABBERWOCK:
+        case S_NYMPH:
             if (rn2(5) && !u.uhave.amulet) {
                 mtmp.msleeping = (1) & 1;
             }
             break;
-        case 15 /* S_ORC */:
-            if (gu.urace.mnum === 264) {
+        case S_ORC:
+            if (gu.urace.mnum === PM_ELF) {
                 mtmp.mpeaceful = (0) & 1;
             }
             break;
-        case 21 /* S_UNICORN */:
-            if (ptr.mlet === 21 /* S_UNICORN */ && $c.andu64(ptr.mflags2, 536870912) !== 0 && sgn(u.ualign.type) === sgn(ptr.maligntyp)) {
+        case S_UNICORN:
+            if (ptr.mlet === S_UNICORN && $c.andu64(ptr.mflags2, M2_JEWELS) !== 0 && sgn(u.ualign.type) === sgn(ptr.maligntyp)) {
                 mtmp.mpeaceful = (1) & 1;
             }
             break;
-        case 28 /* S_BAT */:
-            if (In_hell(u.uz) && ($c.peq(ptr, $c.relem(mons, 126 /* PM_BAT */)) || $c.peq(ptr, $c.relem(mons, 127 /* PM_GIANT_BAT */)) || $c.peq(ptr, $c.relem(mons, 129 /* PM_VAMPIRE_BAT */)))) {
+        case S_BAT:
+            if (In_hell(u.uz) && ($c.peq(ptr, $c.relem(mons, PM_BAT)) || $c.peq(ptr, $c.relem(mons, PM_GIANT_BAT)) || $c.peq(ptr, $c.relem(mons, PM_VAMPIRE_BAT)))) {
                 await mon_adjust_speed(mtmp, 2, null);
             }
             break;
     }
-    if ((ct = mtmp.data.mlet === 25 /* S_LIGHT */ || $c.peq(mtmp.data, $c.relem(mons, 30 /* PM_FLAMING_SPHERE */)) || $c.peq(mtmp.data, $c.relem(mons, 31 /* PM_SHOCKING_SPHERE */)) || $c.peq(mtmp.data, $c.relem(mons, 134 /* PM_BABY_GOLD_DRAGON */)) || $c.peq(mtmp.data, $c.relem(mons, 111 /* PM_FIRE_VORTEX */)) ? 1 : $c.peq(mtmp.data, $c.relem(mons, 155 /* PM_FIRE_ELEMENTAL */)) || $c.peq(mtmp.data, $c.relem(mons, 144 /* PM_GOLD_DRAGON */)) ? 1 : 0) > 0) {
-        await new_light_source(mtmp.mx, mtmp.my, ct, 2 /* LS_MONSTER */, monst_to_any(mtmp));
+    if ((ct = mtmp.data.mlet === S_LIGHT || $c.peq(mtmp.data, $c.relem(mons, PM_FLAMING_SPHERE)) || $c.peq(mtmp.data, $c.relem(mons, PM_SHOCKING_SPHERE)) || $c.peq(mtmp.data, $c.relem(mons, PM_BABY_GOLD_DRAGON)) || $c.peq(mtmp.data, $c.relem(mons, PM_FIRE_VORTEX)) ? 1 : $c.peq(mtmp.data, $c.relem(mons, PM_FIRE_ELEMENTAL)) || $c.peq(mtmp.data, $c.relem(mons, PM_GOLD_DRAGON)) ? 1 : 0) > 0) {
+        await new_light_source(mtmp.mx, mtmp.my, ct, LS_MONSTER, monst_to_any(mtmp));
     }
-    mitem = 0 /* STRANGE_OBJECT */;
-    if (mndx === 228 /* PM_VLAD_THE_IMPALER */) {
-        mitem = 262 /* CANDELABRUM_OF_INVOCATION */;
+    mitem = STRANGE_OBJECT;
+    if (mndx === PM_VLAD_THE_IMPALER) {
+        mitem = CANDELABRUM_OF_INVOCATION;
     }
-    mtmp.cham = -1;
-    if (!(u.uprops[60 /* PROT_FROM_SHAPE_CHANGERS */].intrinsic || u.uprops[60 /* PROT_FROM_SHAPE_CHANGERS */].extrinsic) && (mcham = pm_to_cham(mndx)) !== -1 /* NON_PM */) {
+    mtmp.cham = NON_PM;
+    if (!(u.uprops[PROT_FROM_SHAPE_CHANGERS].intrinsic || u.uprops[PROT_FROM_SHAPE_CHANGERS].extrinsic) && (mcham = pm_to_cham(mndx)) !== NON_PM) {
         mtmp.cham = $c.i16(mcham);
-        if (mndx !== 228 /* PM_VLAD_THE_IMPALER */ && await newcham(mtmp, null, 0)) {
+        if (mndx !== PM_VLAD_THE_IMPALER && await newcham(mtmp, null, NO_NC_FLAGS)) {
             allow_minvent = 0;
         }
-    } else if (mndx === 285 /* PM_WIZARD_OF_YENDOR */) {
+    } else if (mndx === PM_WIZARD_OF_YENDOR) {
         mtmp.iswiz = (1) & 1;
         svc.context.no_of_wizards = svc.context.no_of_wizards + 1 >>> 0;
         if (svc.context.no_of_wizards === 1 && ((svd.dungeon_topology.d_earth_level.dlevel || svd.dungeon_topology.d_earth_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_earth_level))) {
-            mitem = 366 /* SPE_DIG */;
+            mitem = SPE_DIG;
         }
-    } else if (mndx === 287 /* PM_GHOST */ && !$c.and64(mmflags, 64)) {
+    } else if (mndx === PM_GHOST && !$c.and64(mmflags, MM_NONAME)) {
         mtmp = await christen_monst(mtmp, rndghostname());
-    } else if (mndx === 286 /* PM_CROESUS */) {
-        mitem = 55 /* TWO_HANDED_SWORD */;
-    } else if (ptr.msound === 37 /* MS_NEMESIS */) {
-        mitem = 263 /* BELL_OF_OPENING */;
-    } else if (mndx === 312 /* PM_PESTILENCE */) {
-        mitem = 318 /* POT_SICKNESS */;
+    } else if (mndx === PM_CROESUS) {
+        mitem = TWO_HANDED_SWORD;
+    } else if (ptr.msound === MS_NEMESIS) {
+        mitem = BELL_OF_OPENING;
+    } else if (mndx === PM_PESTILENCE) {
+        mitem = POT_SICKNESS;
     }
-    if (mitem !== 0 /* STRANGE_OBJECT */ && allow_minvent) {
+    if (mitem !== STRANGE_OBJECT && allow_minvent) {
         await mongets(mtmp, mitem);
     }
     if (gi.in_mklev) {
-        if (($c.andu64(ptr.mflags2, 256) !== 0 && $c.andu64(ptr.mflags2, 3072) === 0 || mndx === 84 /* PM_WUMPUS */ || mndx === 114 /* PM_LONG_WORM */ || mndx === 319 /* PM_GIANT_EEL */) && !u.uhave.amulet && rn2(5)) {
+        if (($c.andu64(ptr.mflags2, M2_DEMON) !== 0 && $c.andu64(ptr.mflags2, M2_LORD | M2_PRINCE) === 0 || mndx === PM_WUMPUS || mndx === PM_LONG_WORM || mndx === PM_GIANT_EEL) && !u.uhave.amulet && rn2(5)) {
             mtmp.msleeping = (1) & 1;
         }
     } else {
@@ -1212,35 +1233,35 @@ export async function makemon(ptr, x, y, mmflags) {   // makemon.c:1147
             set_apparxy(mtmp);
         }
     }
-    if ($c.andu64(ptr.mflags2, 256) !== 0 && $c.andu64(ptr.mflags2, 2048) !== 0 && ptr.msound === 33 /* MS_BRIBE */) {
+    if ($c.andu64(ptr.mflags2, M2_DEMON) !== 0 && $c.andu64(ptr.mflags2, M2_PRINCE) !== 0 && ptr.msound === MS_BRIBE) {
         $t7 = ($t6 = mtmp.perminvis = (1) & 1, mtmp.minvis = ($t6) & 1), mtmp.mpeaceful = ($t7) & 1;
         mtmp.mavenge = (0) & 1;
-        if (is_art($G.uwep, 1 /* ART_EXCALIBUR */) || is_art($G.uwep, 12 /* ART_DEMONBANE */)) {
+        if (is_art($G.uwep, ART_EXCALIBUR) || is_art($G.uwep, ART_DEMONBANE)) {
             $t8 = (mtmp.mtame = 0) >>> 0, mtmp.mpeaceful = ($t8) & 1;
         }
     }
-    if (mndx === 128 /* PM_RAVEN */ && $G.uwep && $G.uwep.otyp === 70 /* BEC_DE_CORBIN */) {
+    if (mndx === PM_RAVEN && $G.uwep && $G.uwep.otyp === BEC_DE_CORBIN) {
         mtmp.mpeaceful = (1) & 1;
     }
-    if (mndx === 114 /* PM_LONG_WORM */ && (($t9 = get_wormno() >>> 0, mtmp.wormno = ($t9) & 31) | 0) !== 0) {
+    if (mndx === PM_LONG_WORM && (($t9 = get_wormno() >>> 0, mtmp.wormno = ($t9) & 31) | 0) !== 0) {
         await initworm(mtmp, allowtail ? rn2(5) : 0);
         if (count_wsegs(mtmp)) {
             await place_worm_tail_randomly(mtmp, x, y);
         }
     }
-    if (mndx === 275 /* PM_ALIGNED_CLERIC */ || mndx === 276 /* PM_HIGH_CLERIC */ ? !$c.and64(mmflags, 1280) : mndx === 123 /* PM_ANGEL */ && !$c.and64(mmflags, 1024) && !rn2(3)) {
+    if (mndx === PM_ALIGNED_CLERIC || mndx === PM_HIGH_CLERIC ? !$c.and64(mmflags, MM_EPRI | MM_EMIN) : mndx === PM_ANGEL && !$c.and64(mmflags, MM_EMIN) && !rn2(3)) {
         await newemin(mtmp);
         eminp = mtmp.mextra.emin;
         mtmp.isminion = (1) & 1;
         $t10 = $c.i8(rn2(3) - 1 | 0), eminp.min_align = $t10;
-        $t11 = $c.i8($c.and64(mmflags, 32) ? 1 : !rn2(3) ? 1 : 0), eminp.renegade = $t11;
+        $t11 = $c.i8($c.and64(mmflags, MM_ANGRY) ? 1 : !rn2(3) ? 1 : 0), eminp.renegade = $t11;
         mtmp.mpeaceful = ((eminp.min_align === u.ualign.type ? !eminp.renegade ? 1 : 0 : eminp.renegade) >>> 0) & 1;
     }
     set_malign(mtmp);
-    if (anymon && !$c.and64(mmflags, 8192)) {
-        if (ptr.geno & 128 && rn2(2)) {
+    if (anymon && !$c.and64(mmflags, MM_NOGRP)) {
+        if (ptr.geno & G_SGROUP && rn2(2)) {
             await m_initgrp(mtmp, mtmp.mx, mtmp.my, 3, mmflags);
-        } else if (ptr.geno & 64) {
+        } else if (ptr.geno & G_LGROUP) {
             if (rn2(3)) {
                 await m_initgrp(mtmp, mtmp.mx, mtmp.my, 10, mmflags);
             } else {
@@ -1249,12 +1270,12 @@ export async function makemon(ptr, x, y, mmflags) {   // makemon.c:1147
         }
     }
     if (allow_minvent) {
-        if (attacktype(ptr, 254)) {
+        if (attacktype(ptr, AT_WEAP)) {
             await m_initweap(mtmp);
         }
         await m_initinv(mtmp);
         await m_dowear(mtmp, 1);
-        if (!rn2(100) && $c.andu64(ptr.mflags2, 4194304) !== 0 && can_saddle(mtmp) && !await which_armor(mtmp, 1048576)) {
+        if (!rn2(100) && $c.andu64(ptr.mflags2, M2_DOMESTIC) !== 0 && can_saddle(mtmp) && !await which_armor(mtmp, W_SADDLE)) {
             await put_saddle_on_mon(null, mtmp);
         }
     } else {
@@ -1263,37 +1284,37 @@ export async function makemon(ptr, x, y, mmflags) {   // makemon.c:1147
         }
         mtmp.minvent = null;
     }
-    if (ptr.mflags3 && !$c.and64(mmflags, 2)) {
-        if (ptr.mflags3 & 64) {
-            mtmp.mstrategy = $c.oru64(mtmp.mstrategy, 536870912);
+    if (ptr.mflags3 && !$c.and64(mmflags, MM_NOWAIT)) {
+        if (ptr.mflags3 & M3_WAITFORU) {
+            mtmp.mstrategy = $c.oru64(mtmp.mstrategy, STRAT_WAITFORU);
         }
-        if (ptr.mflags3 & 128) {
-            mtmp.mstrategy = $c.oru64(mtmp.mstrategy, 268435456);
+        if (ptr.mflags3 & M3_CLOSE) {
+            mtmp.mstrategy = $c.oru64(mtmp.mstrategy, STRAT_CLOSE);
         }
-        if (ptr.mflags3 & 223) {
+        if (ptr.mflags3 & (M3_WAITMASK | M3_COVETOUS)) {
             mtmp.mstrategy = $c.oru64(mtmp.mstrategy, 2147483648);
         }
     }
     if (allow_minvent && gm.migrating_objs) {
-        await deliver_obj_to_mon(mtmp, 1, 0);
+        await deliver_obj_to_mon(mtmp, 1, DF_NONE);
     }
     if (!gi.in_mklev) {
         await newsym(mtmp.mx, mtmp.my);
-        if (!$c.and64(mmflags, 131072)) {
+        if (!$c.and64(mmflags, MM_NOMSG)) {
             what = null;
             exclaim = $c.i8(!$c.and64(mmflags, 262144) ? 1 : 0);
-            if (canseemon(mtmp) && ((mtmp.m_ap_type & 7) === 0 /* M_AP_NOTHING */ || (mtmp.m_ap_type & 7) === 3 /* M_AP_MONSTER */) || sensemon(mtmp)) {
+            if (canseemon(mtmp) && ((mtmp.m_ap_type & M_AP_TYPMASK) === M_AP_NOTHING || (mtmp.m_ap_type & M_AP_TYPMASK) === M_AP_MONSTER) || sensemon(mtmp)) {
                 what = await Amonnam(mtmp);
-                if ((mtmp.m_ap_type & 7) === 3 /* M_AP_MONSTER */) {
+                if ((mtmp.m_ap_type & M_AP_TYPMASK) === M_AP_MONSTER) {
                     exclaim = 1;
                 }
             } else if (canseemon(mtmp)) {
-                await mhidden_description(mtmp, 6, new $c.Ptr(mbuf, 0));
+                await mhidden_description(mtmp, MHID_ARTICLE | MHID_ALTMON, new $c.Ptr(mbuf, 0));
                 what = upstart(new $c.Ptr(mbuf, 0));
             }
             if (what) {
                 set_msg_xy(mtmp.mx, mtmp.my);
-                await Norep($c.lit("%s%s %s%s%c"), what, exclaim ? $c.lit(" suddenly") : $c.lit(""), await vtense(what, $c.lit("appear")), dist2(x, y, u.ux, u.uy) <= 2 ? $c.lit(" next to you") : dist2(x, y, u.ux, u.uy) <= 64 ? $c.lit(" close by") : $c.lit(""), exclaim ? 33 : 46);
+                await Norep($c.lit("%s%s %s%s%c"), what, exclaim ? $c.lit(" suddenly") : $c.lit(""), await vtense(what, $c.lit("appear")), dist2(x, y, u.ux, u.uy) <= 2 ? $c.lit(" next to you") : dist2(x, y, u.ux, u.uy) <= BOLT_LIM * BOLT_LIM ? $c.lit(" close by") : $c.lit(""), exclaim ? 33 : 46);
             }
         }
         if (go.occupation) {
@@ -1304,13 +1325,13 @@ export async function makemon(ptr, x, y, mmflags) {   // makemon.c:1147
 }
 export async function unmakemon(mon, mmflags) {   // makemon.c:1514
     let countbirth = 0, mndx = 0;
-    countbirth = $c.i8($c.and64(mmflags, 4) === 0 ? 1 : 0);
+    countbirth = $c.i8($c.and64(mmflags, MM_NOCOUNTBIRTH) === 0 ? 1 : 0);
     mndx = mon.data.pmidx;
     if (countbirth && svm.mvitals[mndx].born > 0 && svm.mvitals[mndx].born < 255) {
         svm.mvitals[mndx].born = $c.u8(svm.mvitals[mndx].born - 1 | 0);
     }
-    if ((mon.data.geno & 4096) !== 0) {
-        svm.mvitals[mndx].mvflags = $c.u8(svm.mvitals[mndx].mvflags & -2);
+    if ((mon.data.geno & G_UNIQ) !== 0) {
+        svm.mvitals[mndx].mvflags = $c.u8(svm.mvitals[mndx].mvflags & ~G_EXTINCT);
     }
     mon.mhp = 0;
     await discard_minvent(mon, 1);
@@ -1318,7 +1339,7 @@ export async function unmakemon(mon, mmflags) {   // makemon.c:1514
     return null;
 }
 export function mbirth_limit(mndx) {   // makemon.c:1542
-    return mndx === 231 /* PM_NAZGUL */ ? 9 : mndx === 292 /* PM_ERINYS */ ? 3 : 120;
+    return mndx === PM_NAZGUL ? 9 : mndx === PM_ERINYS ? 3 : MAXMONNO;
 }
 export async function create_critters(cnt, mptr, neverask) {   // makemon.c:1556
     let c = new $T.nhcoord(), x = 0, y = 0, mon = null, known = 0, ask = 0, $t1;
@@ -1334,29 +1355,29 @@ export async function create_critters(cnt, mptr, neverask) {   // makemon.c:1556
             }
         }
         x = u.ux, y = u.uy;
-        if (!mptr && u.uinwater | 0 && await enexto(c, x, y, $c.relem(mons, 319 /* PM_GIANT_EEL */))) {
+        if (!mptr && u.uinwater | 0 && await enexto(c, x, y, $c.relem(mons, PM_GIANT_EEL))) {
             x = c.x, y = c.y;
         }
-        if ((mon = await makemon(mptr, x, y, 0)) === null) {
+        if ((mon = await makemon(mptr, x, y, NO_MM_FLAGS)) === null) {
             continue;
         }
-        if (canseemon(mon) && ((mon.m_ap_type & 7) === 0 /* M_AP_NOTHING */ || (mon.m_ap_type & 7) === 3 /* M_AP_MONSTER */) || sensemon(mon)) {
+        if (canseemon(mon) && ((mon.m_ap_type & M_AP_TYPMASK) === M_AP_NOTHING || (mon.m_ap_type & M_AP_TYPMASK) === M_AP_MONSTER) || sensemon(mon)) {
             known = 1;
         }
     }
     return known;
 }
 function uncommon(mndx) {   // makemon.c:1593
-    if (mons[mndx].geno & 4608) {
+    if (mons[mndx].geno & (G_NOGEN | G_UNIQ)) {
         return 1;
     }
-    if (svm.mvitals[mndx].mvflags & 3) {
+    if (svm.mvitals[mndx].mvflags & (G_GENOD | G_EXTINCT)) {
         return 1;
     }
     if (In_hell(u.uz)) {
-        return $c.i8(mons[mndx].maligntyp > 0 ? 1 : 0);
+        return $c.i8(mons[mndx].maligntyp > A_NEUTRAL ? 1 : 0);
     } else {
-        return $c.i8((mons[mndx].geno & 1024) !== 0 ? 1 : 0);
+        return $c.i8((mons[mndx].geno & G_HELL) !== 0 ? 1 : 0);
     }
 }
 function align_shift(ptr) {   // makemon.c:1611
@@ -1367,17 +1388,17 @@ function align_shift(ptr) {   // makemon.c:1611
     }
     switch (align_shift$lev ? align_shift$lev.flags.align | 0 : svd.dungeons[u.uz.dnum].flags.align | 0) {
         default:
-        case 0:
+        case AM_NONE:
             alshift = 0;
             break;
-        case 4:
-            alshift = $c.div32(ptr.maligntyp + 20 | 0, 8);
+        case AM_LAWFUL:
+            alshift = $c.div32(ptr.maligntyp + 20 | 0, 2 * ALIGNWEIGHT);
             break;
-        case 2:
-            alshift = $c.div32(20 - $c.abs(ptr.maligntyp) | 0, 4);
+        case AM_NEUTRAL:
+            alshift = $c.div32(20 - $c.abs(ptr.maligntyp) | 0, ALIGNWEIGHT);
             break;
-        case 1:
-            alshift = $c.div32(-(ptr.maligntyp - 20 | 0) | 0, 8);
+        case AM_CHAOTIC:
+            alshift = $c.div32(-(ptr.maligntyp - 20 | 0) | 0, 2 * ALIGNWEIGHT);
             break;
     }
     return alshift;
@@ -1402,8 +1423,8 @@ export async function rndmonst_adj(minadj, maxadj) {   // makemon.c:1659
     upper = $c.i8((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? 1 : 0);
     elemlevel = $c.i8(u.uz.dnum === svd.dungeon_topology.d_astral_level.dnum && !((svd.dungeon_topology.d_astral_level.dlevel || svd.dungeon_topology.d_astral_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_astral_level)) ? 1 : 0);
     totalweight = 0;
-    selected_mndx = -1 /* NON_PM */;
-    for (mndx = 0 /* LOW_PM */; mndx < 330 /* SPECIAL_PM */; mndx = mndx + 1 | 0) {
+    selected_mndx = NON_PM;
+    for (mndx = LOW_PM; mndx < SPECIAL_PM; mndx = mndx + 1 | 0) {
         ptr = $c.relem(mons, mndx);
         if (mons[mndx].difficulty < minmlev || mons[mndx].difficulty > maxmlev) {
             continue;
@@ -1417,10 +1438,10 @@ export async function rndmonst_adj(minadj, maxadj) {   // makemon.c:1659
         if (uncommon(mndx)) {
             continue;
         }
-        if (In_hell(u.uz) && ptr.geno & 2048) {
+        if (In_hell(u.uz) && ptr.geno & G_NOHELL) {
             continue;
         }
-        weight = (ptr.geno & 7) + align_shift(ptr) | 0;
+        weight = (ptr.geno & G_FREQ) + align_shift(ptr) | 0;
         weight = weight + temperature_shift(ptr) | 0;
         if (weight < 0 || weight > 127) {
             await impossible($c.lit("bad weight in rndmonst for mndx %d"), mndx);
@@ -1433,8 +1454,8 @@ export async function rndmonst_adj(minadj, maxadj) {   // makemon.c:1659
             }
         }
     }
-    if (selected_mndx === -1 /* NON_PM */ || uncommon(selected_mndx)) {
-        if (selected_mndx !== -1 /* NON_PM */) {
+    if (selected_mndx === NON_PM || uncommon(selected_mndx)) {
+        if (selected_mndx !== NON_PM) {
             do {
                 if (debugcore($c.lit("makemon.c"), 1)) {
                     save_plnmsg = iflags.last_msg;
@@ -1456,10 +1477,10 @@ function mk_gen_ok(mndx, mvflagsmask, genomask) {   // makemon.c:1736
     if ((ptr.geno & genomask) >>> 0) {
         return 0;
     }
-    if ($c.peq(ptr, $c.relem(mons, 72 /* PM_ORC */)) || $c.peq(ptr, $c.relem(mons, 169 /* PM_GIANT */)) || $c.peq(ptr, $c.relem(mons, 264 /* PM_ELF */)) || $c.peq(ptr, $c.relem(mons, 260 /* PM_HUMAN */))) {
+    if ($c.peq(ptr, $c.relem(mons, PM_ORC)) || $c.peq(ptr, $c.relem(mons, PM_GIANT)) || $c.peq(ptr, $c.relem(mons, PM_ELF)) || $c.peq(ptr, $c.relem(mons, PM_HUMAN))) {
         return 0;
     }
-    if ($c.peq(ptr, $c.relem(mons, 314 /* PM_MAIL_DAEMON */))) {
+    if ($c.peq(ptr, $c.relem(mons, PM_MAIL_DAEMON))) {
         return 0;
     }
     return 1;
@@ -1480,14 +1501,14 @@ async function init_mongen_order() {   // makemon.c:1807
         return;
     }
     mongen_order_init = 1;
-    for (i = 0 /* LOW_PM */; i < 383 /* NUMMONS */; i = i + 1 | 0) {
+    for (i = LOW_PM; i < NUMMONS; i = i + 1 | 0) {
         mongen_order[i] = i;
         mlet = mons[i].mlet;
-        if ($c.i8(mons[i].geno & 7) > mclass_maxf[mlet]) {
-            mclass_maxf[mlet] = $c.i8(mons[i].geno & 7);
+        if ($c.i8(mons[i].geno & G_FREQ) > mclass_maxf[mlet]) {
+            mclass_maxf[mlet] = $c.i8(mons[i].geno & G_FREQ);
         }
     }
-    $c.nh_deterministic_qsort(new $c.Ptr(mongen_order, 0), 330, 4, cmp_init_mongen_order);
+    $c.nh_deterministic_qsort(new $c.Ptr(mongen_order, 0), SPECIAL_PM, 4, cmp_init_mongen_order);
 }
 export async function dump_mongen() {   // makemon.c:1835
     let mlet = 0, prev_mlet = 0, i = 0, nmwidth = 0, special = 0, nmbuf = new Int8Array(80);
@@ -1496,14 +1517,14 @@ export async function dump_mongen() {   // makemon.c:1835
     monst_globals_init();
     await init_mongen_order();
     await raw_printf($c.lit("int mongen_order[] = {"));
-    for (i = 0 /* LOW_PM */; i < 330 /* SPECIAL_PM */; i = i + 1 | 0) {
-        special = mons[mongen_order[i]].geno & 4608;
+    for (i = LOW_PM; i < SPECIAL_PM; i = i + 1 | 0) {
+        special = mons[mongen_order[i]].geno & (G_NOGEN | G_UNIQ);
         mlet = def_monsyms[mons[mongen_order[i]].mlet].sym;
         if (prev_mlet && prev_mlet !== mlet) {
             await windowprocs.win_raw_print($c.lit(""));
         }
-        nh_snprintf($c.lit("dump_mongen"), 1851, new $c.Ptr(nmbuf, 0), 80, $c.lit("PM_%s%s"), monsdump[mongen_order[i]].nm, i === 329 ? $c.lit("") : $c.lit(","));
-        await raw_printf($c.lit("    %*s /* %c seq=%3d, idx=%3d, sym='%c', diff=%2d, freq=%2d[%d] %s */"), -nmwidth | 0, new $c.Ptr(nmbuf, 0), i === mongen_order[i] ? 32 : 46, i, mongen_order[i], mlet, mons[mongen_order[i]].difficulty, mons[mongen_order[i]].geno & 7, mclass_maxf[mons[mongen_order[i]].mlet], special === 4608 ? $c.lit("(G_NOGEN | G_UNIQ)") : special === 512 ? $c.lit("(G_NOGEN)") : special === 4096 ? $c.lit("(G_UNIQ)") : $c.lit(""));
+        nh_snprintf($c.lit("dump_mongen"), 1851, new $c.Ptr(nmbuf, 0), 80, $c.lit("PM_%s%s"), monsdump[mongen_order[i]].nm, i === SPECIAL_PM - 1 ? $c.lit("") : $c.lit(","));
+        await raw_printf($c.lit("    %*s /* %c seq=%3d, idx=%3d, sym='%c', diff=%2d, freq=%2d[%d] %s */"), -nmwidth | 0, new $c.Ptr(nmbuf, 0), i === mongen_order[i] ? 32 : 46, i, mongen_order[i], mlet, mons[mongen_order[i]].difficulty, mons[mongen_order[i]].geno & G_FREQ, mclass_maxf[mons[mongen_order[i]].mlet], special === (G_NOGEN | G_UNIQ) ? $c.lit("(G_NOGEN | G_UNIQ)") : special === G_NOGEN ? $c.lit("(G_NOGEN)") : special === G_UNIQ ? $c.lit("(G_UNIQ)") : $c.lit(""));
         prev_mlet = mlet;
     }
     await windowprocs.win_raw_print($c.lit("};"));
@@ -1511,7 +1532,7 @@ export async function dump_mongen() {   // makemon.c:1835
     await freedynamicdata();
 }
 export async function mkclass(class_, spc) {   // makemon.c:1873
-    return await mkclass_aligned(class_, spc, -128);
+    return await mkclass_aligned(class_, spc, A_NONE);
 }
 export async function mkclass_aligned(class_, spc, atyp) {   // makemon.c:1880
     let first = 0, last = 0, num = 0, k = 0, nums = new Int32Array(331), maxmlev = 0, gehennom = 0, mv_mask = 0, gn_mask = 0, zero_freq_for_entire_class = 0, $t1;
@@ -1519,40 +1540,40 @@ export async function mkclass_aligned(class_, spc, atyp) {   // makemon.c:1880
     gehennom = In_hell(u.uz) !== 0 ? 1 : 0;
     $c.__builtin___memset_chk(new $c.Ptr(nums, 0), 0, 1324, 1324);
     maxmlev = await level_difficulty() >> 1;
-    if (class_ < 1 || class_ >= 61 /* MAXMCLASSES */) {
+    if (class_ < 1 || class_ >= MAXMCLASSES) {
         await impossible($c.lit("mkclass called with bad class!"));
         return null;
     }
     await init_mongen_order();
     zero_freq_for_entire_class = $c.i8(mclass_maxf[class_] === 0 ? 1 : 0);
-    for (first = 0 /* LOW_PM */; first < 330 /* SPECIAL_PM */; first = first + 1 | 0) {
+    for (first = LOW_PM; first < SPECIAL_PM; first = first + 1 | 0) {
         if (mons[mongen_order[first]].mlet === class_) {
             break;
         }
     }
-    if (first === 330 /* SPECIAL_PM */) {
+    if (first === SPECIAL_PM) {
         await impossible($c.lit("mkclass found no class %d monsters"), class_);
         return null;
     }
-    mv_mask = 3;
-    if ((spc & 32768) !== 0) {
+    mv_mask = G_GENOD | G_EXTINCT;
+    if ((spc & G_IGNORE) !== 0) {
         mv_mask = 0;
-        spc = spc & -32769;
+        spc = spc & ~G_IGNORE;
     }
-    for (last = first; last < 330 /* SPECIAL_PM */ && mons[mongen_order[last]].mlet === class_; last = last + 1 | 0) {
-        if (atyp !== -128 && sgn(mons[mongen_order[last]].maligntyp) !== sgn(atyp)) {
+    for (last = first; last < SPECIAL_PM && mons[mongen_order[last]].mlet === class_; last = last + 1 | 0) {
+        if (atyp !== A_NONE && sgn(mons[mongen_order[last]].maligntyp) !== sgn(atyp)) {
             continue;
         }
-        gn_mask = 4608;
-        if (rn2(9) || class_ === 38 /* S_LICH */) {
-            gn_mask = (gn_mask | (gehennom ? 2048 : 1024) >>> 0) >>> 0;
+        gn_mask = G_NOGEN | G_UNIQ;
+        if (rn2(9) || class_ === S_LICH) {
+            gn_mask = (gn_mask | (gehennom ? G_NOHELL : G_HELL) >>> 0) >>> 0;
         }
         gn_mask = (gn_mask & ~spc >>> 0) >>> 0;
         if (mk_gen_ok(mongen_order[last], mv_mask, gn_mask)) {
             if (num && mons[mongen_order[last]].difficulty > maxmlev && mons[mongen_order[last]].difficulty > mons[mongen_order[last - 1 | 0]].difficulty && rn2(2)) {
                 break;
             }
-            if ((k = mons[mongen_order[last]].geno & 7) > 0 || (k = zero_freq_for_entire_class ? 1 : 0) > 0) {
+            if ((k = mons[mongen_order[last]].geno & G_FREQ) > 0 || (k = zero_freq_for_entire_class ? 1 : 0) > 0) {
                 $t1 = (k + 1 | 0) - (await adj_lev($c.relem(mons, mongen_order[last])) > Math.imul(u.ulevel, 2) ? 1 : 0) | 0, nums[mongen_order[last]] = $t1;
                 num = num + nums[mongen_order[last]] | 0;
             }
@@ -1571,29 +1592,29 @@ export async function mkclass_aligned(class_, spc, atyp) {   // makemon.c:1880
 export function mkclass_poly(class_) {   // makemon.c:1983
     let first = 0, last = 0, num = 0, gmask = 0;
     num = 0;
-    for (first = 0 /* LOW_PM */; first < 330 /* SPECIAL_PM */; first = first + 1 | 0) {
+    for (first = LOW_PM; first < SPECIAL_PM; first = first + 1 | 0) {
         if (mons[first].mlet === class_) {
             break;
         }
     }
-    if (first === 330 /* SPECIAL_PM */) {
-        return -1 /* NON_PM */;
+    if (first === SPECIAL_PM) {
+        return NON_PM;
     }
-    gmask = 4608;
-    if (rn2(9) || class_ === 38 /* S_LICH */) {
-        gmask = (gmask | (In_hell(u.uz) ? 2048 : 1024) >>> 0) >>> 0;
+    gmask = G_NOGEN | G_UNIQ;
+    if (rn2(9) || class_ === S_LICH) {
+        gmask = (gmask | (In_hell(u.uz) ? G_NOHELL : G_HELL) >>> 0) >>> 0;
     }
-    for (last = first; last < 330 /* SPECIAL_PM */ && mons[last].mlet === class_; last = last + 1 | 0) {
-        if (mk_gen_ok(last, 2, gmask)) {
-            num = num + (mons[last].geno & 7) | 0;
+    for (last = first; last < SPECIAL_PM && mons[last].mlet === class_; last = last + 1 | 0) {
+        if (mk_gen_ok(last, G_GENOD, gmask)) {
+            num = num + (mons[last].geno & G_FREQ) | 0;
         }
     }
     if (!num) {
-        return -1 /* NON_PM */;
+        return NON_PM;
     }
     for (num = rnd(num); num > 0; first = first + 1 | 0) {
-        if (mk_gen_ok(first, 2, gmask)) {
-            num = num - (mons[first].geno & 7) | 0;
+        if (mk_gen_ok(first, G_GENOD, gmask)) {
+            num = num - (mons[first].geno & G_FREQ) | 0;
         }
     }
     first = first - 1 | 0;
@@ -1601,8 +1622,8 @@ export function mkclass_poly(class_) {   // makemon.c:1983
 }
 export async function adj_lev(ptr) {   // makemon.c:2016
     let tmp = 0, tmp2 = 0;
-    if ($c.peq(ptr, $c.relem(mons, 285 /* PM_WIZARD_OF_YENDOR */))) {
-        tmp = ptr.mlevel + svm.mvitals[285 /* PM_WIZARD_OF_YENDOR */].died | 0;
+    if ($c.peq(ptr, $c.relem(mons, PM_WIZARD_OF_YENDOR))) {
+        tmp = ptr.mlevel + svm.mvitals[PM_WIZARD_OF_YENDOR].died | 0;
         if (tmp > 49) {
             tmp = 49;
         }
@@ -1634,12 +1655,12 @@ export async function grow_up(mtmp, victim) {   // makemon.c:2051
         return null;
     }
     oldtype = ptr.pmidx;
-    newtype = oldtype === 1 /* PM_KILLER_BEE */ && !victim ? 5 /* PM_QUEEN_BEE */ : little_to_big(oldtype);
+    newtype = oldtype === PM_KILLER_BEE && !victim ? PM_QUEEN_BEE : little_to_big(oldtype);
     if (victim) {
         hp_threshold = Math.imul(mtmp.m_lev, 8);
         if (!mtmp.m_lev) {
             hp_threshold = 4;
-        } else if (ptr.mlet === 55 /* S_GOLEM */) {
+        } else if (ptr.mlet === S_GOLEM) {
             hp_threshold = Math.imul($c.div32(mtmp.mhpmax, 10) + 1 | 0, 10) - 1 | 0;
         } else if (is_home_elemental(ptr)) {
             hp_threshold = Math.imul(hp_threshold, 3);
@@ -1663,7 +1684,7 @@ export async function grow_up(mtmp, victim) {   // makemon.c:2051
     if (mtmp.mhpmax <= hp_threshold) {
         return ptr;
     }
-    if ($c.pcmp(ptr, $c.relem(mons, 331 /* PM_ARCHEOLOGIST */)) >= 0 && $c.pcmp(ptr, $c.relem(mons, 343 /* PM_WIZARD */)) <= 0) {
+    if ($c.pcmp(ptr, $c.relem(mons, PM_ARCHEOLOGIST)) >= 0 && $c.pcmp(ptr, $c.relem(mons, PM_WIZARD)) <= 0) {
         lev_limit = 30;
     } else if (lev_limit < 5) {
         lev_limit = 5;
@@ -1672,20 +1693,20 @@ export async function grow_up(mtmp, victim) {   // makemon.c:2051
     }
     if ((mtmp.m_lev = $c.u8(mtmp.m_lev + 1)) >= mons[newtype].mlevel && newtype !== oldtype) {
         ptr = $c.relem(mons, newtype);
-        fem = ($c.andu64(ptr.mflags2, 65536) !== 0 ? 0 : $c.andu64(ptr.mflags2, 131072) !== 0 ? 1 : mtmp.female | 0) >>> 0;
-        if (svm.mvitals[newtype].mvflags & 2) {
+        fem = ($c.andu64(ptr.mflags2, M2_MALE) !== 0 ? 0 : $c.andu64(ptr.mflags2, M2_FEMALE) !== 0 ? 1 : mtmp.female | 0) >>> 0;
+        if (svm.mvitals[newtype].mvflags & G_GENOD) {
             if (canseemon(mtmp) || sensemon(mtmp)) {
-                await pline($c.lit("As %s grows up into %s, %s %s!"), await mon_nam(mtmp), await an(pmname(ptr, Mgender(mtmp))), genders[pronoun_gender(mtmp, 2)].he, $c.andu64(ptr.mflags2, 2) !== 0 || $c.peq(ptr, $c.relem(mons, 50 /* PM_MANES */)) || (ptr.mlet === 55 /* S_GOLEM */ || ptr.mlet === 22 /* S_VORTEX */) ? $c.lit("expires") : $c.lit("dies"));
+                await pline($c.lit("As %s grows up into %s, %s %s!"), await mon_nam(mtmp), await an(pmname(ptr, Mgender(mtmp))), genders[pronoun_gender(mtmp, PRONOUN_HALLU)].he, $c.andu64(ptr.mflags2, M2_UNDEAD) !== 0 || $c.peq(ptr, $c.relem(mons, PM_MANES)) || (ptr.mlet === S_GOLEM || ptr.mlet === S_VORTEX) ? $c.lit("expires") : $c.lit("dies"));
             }
             set_mon_data(mtmp, ptr);
             await mondied(mtmp);
             return null;
         } else if (canseemon(mtmp) || sensemon(mtmp)) {
             $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%s%s"), mtmp.female | 0 && !fem ? $c.lit("male ") : fem && !mtmp.female ? $c.lit("female ") : $c.lit(""), pmname(ptr, fem | 0));
-            await pline_mon(mtmp, $c.lit("%s %s %s."), await YMonnam(mtmp), fem !== mtmp.female ? $c.lit("changes into") : $c.andu64(ptr.mflags1, 131072) !== 0 ? $c.lit("becomes") : $c.lit("grows up into"), await an(new $c.Ptr(buf, 0)));
+            await pline_mon(mtmp, $c.lit("%s %s %s."), await YMonnam(mtmp), fem !== mtmp.female ? $c.lit("changes into") : $c.andu64(ptr.mflags1, M1_HUMANOID) !== 0 ? $c.lit("becomes") : $c.lit("grows up into"), await an(new $c.Ptr(buf, 0)));
         }
         set_mon_data(mtmp, ptr);
-        if (mtmp.cham === oldtype && $c.andu64(ptr.mflags2, 16384) !== 0) {
+        if (mtmp.cham === oldtype && $c.andu64(ptr.mflags2, M2_SHAPESHIFTER) !== 0) {
             mtmp.cham = $c.i16(newtype);
         }
         await newsym(mtmp.mx, mtmp.my);
@@ -1716,35 +1737,35 @@ export async function mongets(mtmp, otyp) {   // makemon.c:2181
     }
     otmp = await mksobj(otyp, 1, 0);
     if (otmp) {
-        if (mtmp.data.mlet === 56 /* S_DEMON */) {
+        if (mtmp.data.mlet === S_DEMON) {
             if (otmp.blessed) {
                 await curse(otmp);
             }
-        } else if ($c.andu64(mtmp.data.mflags2, 4096) !== 0 && mon_aligntyp(mtmp) === 1) {
+        } else if ($c.andu64(mtmp.data.mflags2, M2_MINION) !== 0 && mon_aligntyp(mtmp) === A_LAWFUL) {
             otmp.cursed = (0) & 1;
             if (otmp.spe < 0) {
                 otmp.spe = 0;
             }
             otmp.oerodeproof = (1) & 1;
             $t1 = otmp.oeroded2 = (0) & 3, otmp.oeroded = ($t1) & 3;
-        } else if ($c.pcmp(mtmp.data, $c.relem(mons, 331 /* PM_ARCHEOLOGIST */)) >= 0 && $c.pcmp(mtmp.data, $c.relem(mons, 343 /* PM_WIZARD */)) <= 0 && (otmp.oclass === 2 /* WEAPON_CLASS */ && objects[otmp.otyp].oc_subtyp >= 5 /* P_SHORT_SWORD */ && objects[otmp.otyp].oc_subtyp <= 9 /* P_SABER */)) {
+        } else if ($c.pcmp(mtmp.data, $c.relem(mons, PM_ARCHEOLOGIST)) >= 0 && $c.pcmp(mtmp.data, $c.relem(mons, PM_WIZARD)) <= 0 && (otmp.oclass === WEAPON_CLASS && objects[otmp.otyp].oc_subtyp >= P_SHORT_SWORD && objects[otmp.otyp].oc_subtyp <= P_SABER)) {
             $t2 = $c.i8(3 + rn2(4) | 0), otmp.spe = $t2;
         }
-        if (otmp.otyp === 262 /* CANDELABRUM_OF_INVOCATION */) {
+        if (otmp.otyp === CANDELABRUM_OF_INVOCATION) {
             otmp.spe = 0;
             otmp.age = 0;
             otmp.lamplit = (0) & 1;
             $t3 = otmp.cursed = (0) & 1, otmp.blessed = ($t3) & 1;
-        } else if (otmp.otyp === 263 /* BELL_OF_OPENING */) {
+        } else if (otmp.otyp === BELL_OF_OPENING) {
             $t4 = otmp.cursed = (0) & 1, otmp.blessed = ($t4) & 1;
-        } else if (otmp.otyp === 409 /* SPE_BOOK_OF_THE_DEAD */) {
+        } else if (otmp.otyp === SPE_BOOK_OF_THE_DEAD) {
             otmp.blessed = (0) & 1;
             otmp.cursed = (1) & 1;
         }
-        if ($c.andu64(mtmp.data.mflags2, 2048) !== 0) {
-            if (otmp.oclass === 2 /* WEAPON_CLASS */ && otmp.spe < 1) {
+        if ($c.andu64(mtmp.data.mflags2, M2_PRINCE) !== 0) {
+            if (otmp.oclass === WEAPON_CLASS && otmp.spe < 1) {
                 otmp.spe = 1;
-            } else if (otmp.oclass === 3 /* ARMOR_CLASS */ && otmp.spe < 0) {
+            } else if (otmp.oclass === ARMOR_CLASS && otmp.spe < 0) {
                 otmp.spe = 0;
             }
         }
@@ -1756,27 +1777,27 @@ export async function mongets(mtmp, otyp) {   // makemon.c:2181
 }
 export function golemhp(type) {   // makemon.c:2233
     switch (type) {
-        case 249 /* PM_STRAW_GOLEM */:
+        case PM_STRAW_GOLEM:
             return 20;
-        case 250 /* PM_PAPER_GOLEM */:
+        case PM_PAPER_GOLEM:
             return 20;
-        case 251 /* PM_ROPE_GOLEM */:
+        case PM_ROPE_GOLEM:
             return 30;
-        case 253 /* PM_LEATHER_GOLEM */:
+        case PM_LEATHER_GOLEM:
             return 40;
-        case 252 /* PM_GOLD_GOLEM */:
+        case PM_GOLD_GOLEM:
             return 60;
-        case 254 /* PM_WOOD_GOLEM */:
+        case PM_WOOD_GOLEM:
             return 50;
-        case 255 /* PM_FLESH_GOLEM */:
+        case PM_FLESH_GOLEM:
             return 40;
-        case 256 /* PM_CLAY_GOLEM */:
+        case PM_CLAY_GOLEM:
             return 70;
-        case 257 /* PM_STONE_GOLEM */:
+        case PM_STONE_GOLEM:
             return 100;
-        case 258 /* PM_GLASS_GOLEM */:
+        case PM_GLASS_GOLEM:
             return 80;
-        case 259 /* PM_IRON_GOLEM */:
+        case PM_IRON_GOLEM:
             return 120;
         default:
             return 0;
@@ -1786,19 +1807,19 @@ export function peace_minded(ptr) {   // makemon.c:2268
     let mal = 0, ual = 0;
     mal = ptr.maligntyp;
     ual = u.ualign.type;
-    if ($c.andu64(ptr.mflags2, 2097152) !== 0) {
+    if ($c.andu64(ptr.mflags2, M2_PEACEFUL) !== 0) {
         return 1;
     }
-    if ($c.andu64(ptr.mflags2, 1048576) !== 0) {
+    if ($c.andu64(ptr.mflags2, M2_HOSTILE) !== 0) {
         return 0;
     }
-    if (ptr.msound === 36 /* MS_LEADER */ || ptr.msound === 38 /* MS_GUARDIAN */) {
+    if (ptr.msound === MS_LEADER || ptr.msound === MS_GUARDIAN) {
         return 1;
     }
-    if (ptr.msound === 37 /* MS_NEMESIS */) {
+    if (ptr.msound === MS_NEMESIS) {
         return 0;
     }
-    if ($c.peq(ptr, $c.relem(mons, 292 /* PM_ERINYS */))) {
+    if ($c.peq(ptr, $c.relem(mons, PM_ERINYS))) {
         return $c.i8(!u.ualign.abuse ? 1 : 0);
     }
     if ($c.andu64(ptr.mflags2, $c.u64(gu.urace.lovemask)) !== 0) {
@@ -1810,10 +1831,10 @@ export function peace_minded(ptr) {   // makemon.c:2268
     if (sgn(mal) !== sgn(ual)) {
         return 0;
     }
-    if (mal < 0 && u.uhave.amulet | 0) {
+    if (mal < A_NEUTRAL && u.uhave.amulet | 0) {
         return 0;
     }
-    if ($c.andu64(ptr.mflags2, 4096) !== 0) {
+    if ($c.andu64(ptr.mflags2, M2_MINION) !== 0) {
         return $c.i8(u.ualign.record >= 0 ? 1 : 0);
     }
     return $c.i8(!!rn2(16 + (u.ualign.record < -15 ? -15 : u.ualign.record) | 0) && !!rn2(2 + $c.abs(mal) | 0) ? 1 : 0);
@@ -1827,27 +1848,27 @@ export function set_malign(mtmp) {   // makemon.c:2321
         } else if (mtmp.isminion | 0 && mtmp.mextra.emin) {
             mal = mtmp.mextra.emin.min_align;
         }
-        if (mal !== -128) {
+        if (mal !== A_NONE) {
             mal = $c.i8(Math.imul(mal, 5));
         }
     }
     coaligned = $c.i8(sgn(mal) === sgn(u.ualign.type) ? 1 : 0);
-    if (mtmp.data.msound === 36 /* MS_LEADER */) {
+    if (mtmp.data.msound === MS_LEADER) {
         mtmp.malign = -20;
-    } else if (mal === -128) {
+    } else if (mal === A_NONE) {
         if (mtmp.mpeaceful) {
             mtmp.malign = 0;
         } else {
             mtmp.malign = 20;
         }
-    } else if ($c.andu64(mtmp.data.mflags2, 2097152) !== 0) {
+    } else if ($c.andu64(mtmp.data.mflags2, M2_PEACEFUL) !== 0) {
         absmal = $c.abs(mal);
         if (mtmp.mpeaceful) {
             mtmp.malign = $c.i8(Math.imul(-3, 5 > absmal ? 5 : absmal));
         } else {
             mtmp.malign = $c.i8(Math.imul(3, 5 > absmal ? 5 : absmal));
         }
-    } else if ($c.andu64(mtmp.data.mflags2, 1048576) !== 0) {
+    } else if ($c.andu64(mtmp.data.mflags2, M2_HOSTILE) !== 0) {
         absmal$2 = $c.abs(mal);
         if (coaligned) {
             mtmp.malign = 0;
@@ -1870,11 +1891,11 @@ export async function newmcorpsenm(mtmp) {   // makemon.c:2370
     if (!mtmp.mextra) {
         $t1 = await newmextra(), mtmp.mextra = $t1;
     }
-    mtmp.mextra.mcorpsenm = -1 /* NON_PM */;
+    mtmp.mextra.mcorpsenm = NON_PM;
 }
 export function freemcorpsenm(mtmp) {   // makemon.c:2379
-    if (mtmp.mextra && mtmp.mextra.mcorpsenm !== -1 /* NON_PM */) {
-        mtmp.mextra.mcorpsenm = -1 /* NON_PM */;
+    if (mtmp.mextra && mtmp.mextra.mcorpsenm !== NON_PM) {
+        mtmp.mextra.mcorpsenm = NON_PM;
     }
 }
 export async function set_mimic_sym(mtmp) {   // makemon.c:2393
@@ -1882,7 +1903,7 @@ export async function set_mimic_sym(mtmp) {   // makemon.c:2393
     D1: for (;;) {
         switch ($goto) {
         case null:
-            if (!mtmp || (u.uprops[60 /* PROT_FROM_SHAPE_CHANGERS */].intrinsic || u.uprops[60 /* PROT_FROM_SHAPE_CHANGERS */].extrinsic)) {
+            if (!mtmp || (u.uprops[PROT_FROM_SHAPE_CHANGERS].intrinsic || u.uprops[PROT_FROM_SHAPE_CHANGERS].extrinsic)) {
                 return;
             }
             mx = mtmp.mx;
@@ -1896,49 +1917,49 @@ export async function set_mimic_sym(mtmp) {   // makemon.c:2393
             }
         case "assign_sym":
             if ($goto !== "assign_sym" && svl.level.objects[mx][my] !== null) {
-                ap_type = 2;
+                ap_type = M_AP_OBJECT;
                 appear = svl.level.objects[mx][my].otyp >>> 0;
-            } else if ($goto !== "assign_sym" && (typ === 23 /* DOOR */ || typ && typ <= 12 /* DBWALL */ || typ === 14 /* SDOOR */ || typ === 15 /* SCORR */)) {
-                ap_type = 1;
-                if (mx !== 0 && (svl.level.locations[mx - 1 | 0][my].typ === 2 /* HWALL */ || svl.level.locations[mx - 1 | 0][my].typ === 3 /* TLCORNER */ || svl.level.locations[mx - 1 | 0][my].typ === 11 /* TRWALL */ || svl.level.locations[mx - 1 | 0][my].typ === 5 /* BLCORNER */ || svl.level.locations[mx - 1 | 0][my].typ === 9 /* TDWALL */ || svl.level.locations[mx - 1 | 0][my].typ === 7 /* CROSSWALL */ || svl.level.locations[mx - 1 | 0][my].typ === 8 /* TUWALL */)) {
-                    appear = ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? 2 /* S_hwall */ : 16 /* S_hcdoor */) >>> 0;
+            } else if ($goto !== "assign_sym" && (typ === DOOR || typ && typ <= DBWALL || typ === SDOOR || typ === SCORR)) {
+                ap_type = M_AP_FURNITURE;
+                if (mx !== 0 && (svl.level.locations[mx - 1 | 0][my].typ === HWALL || svl.level.locations[mx - 1 | 0][my].typ === TLCORNER || svl.level.locations[mx - 1 | 0][my].typ === TRWALL || svl.level.locations[mx - 1 | 0][my].typ === BLCORNER || svl.level.locations[mx - 1 | 0][my].typ === TDWALL || svl.level.locations[mx - 1 | 0][my].typ === CROSSWALL || svl.level.locations[mx - 1 | 0][my].typ === TUWALL)) {
+                    appear = ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? S_hwall : S_hcdoor) >>> 0;
                 } else {
-                    appear = ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? 1 /* S_vwall */ : 15 /* S_vcdoor */) >>> 0;
+                    appear = ((svd.dungeon_topology.d_rogue_level.dlevel || svd.dungeon_topology.d_rogue_level.dnum) && on_level(u.uz, svd.dungeon_topology.d_rogue_level) ? S_vwall : S_vcdoor) >>> 0;
                 }
             } else if ($goto !== "assign_sym" && (svl.level.flags.is_maze_lev | 0 && !(In_mines(u.uz) && in_town(u.ux, u.uy)) && !(u.uz.dnum === svd.dungeon_topology.d_sokoban_dnum) && rn2(2))) {
-                ap_type = 2;
-                appear = 476;
+                ap_type = M_AP_OBJECT;
+                appear = STATUE;
             } else if ($goto !== "assign_sym" && (roomno < 0 && !t_at($c.i16(mx), $c.i16(my)))) {
-                ap_type = 2;
-                appear = 475;
-            } else if ($goto !== "assign_sym" && (rt === 8 /* ZOO */ || rt === 4 /* VAULT */)) {
-                ap_type = 2;
-                appear = 438;
-            } else if ($goto !== "assign_sym" && rt === 9 /* DELPHI */) {
+                ap_type = M_AP_OBJECT;
+                appear = BOULDER;
+            } else if ($goto !== "assign_sym" && (rt === ZOO || rt === VAULT)) {
+                ap_type = M_AP_OBJECT;
+                appear = GOLD_PIECE;
+            } else if ($goto !== "assign_sym" && rt === DELPHI) {
                 if (rn2(2)) {
-                    ap_type = 2;
-                    appear = 476;
+                    ap_type = M_AP_OBJECT;
+                    appear = STATUE;
                 } else {
-                    ap_type = 1;
-                    appear = 37;
+                    ap_type = M_AP_FURNITURE;
+                    appear = S_fountain;
                 }
-            } else if ($goto !== "assign_sym" && rt === 10 /* TEMPLE */) {
-                ap_type = 1;
-                appear = 33;
-            } else if ($goto !== "assign_sym" && rt >= 14 /* SHOPBASE */) {
+            } else if ($goto !== "assign_sym" && rt === TEMPLE) {
+                ap_type = M_AP_FURNITURE;
+                appear = S_altar;
+            } else if ($goto !== "assign_sym" && rt >= SHOPBASE) {
                 if (rn2(10) >= depth(u.uz)) {
-                    s_sym = 60 /* S_MIMIC_DEF */;
+                    s_sym = S_MIMIC_DEF;
                     $goto = "assign_sym"; continue D1;
                 }
-                s_sym = get_shop_item(rt - 14 /* SHOPBASE */ | 0);
+                s_sym = get_shop_item(rt - SHOPBASE | 0);
                 if (s_sym < 0) {
-                    ap_type = 2;
+                    ap_type = M_AP_OBJECT;
                     appear = (-s_sym | 0) >>> 0;
-                } else if (rt === 24 /* FODDERSHOP */ && s_sym > 18 /* MAXOCLASSES */) {
-                    ap_type = 2;
-                    appear = (rn2(2) ? 286 /* LUMP_OF_ROYAL_JELLY */ : 285 /* SLIME_MOLD */) >>> 0;
+                } else if (rt === FODDERSHOP && s_sym > MAXOCLASSES) {
+                    ap_type = M_AP_OBJECT;
+                    appear = (rn2(2) ? LUMP_OF_ROYAL_JELLY : SLIME_MOLD) >>> 0;
                 } else {
-                    if (s_sym === 0 /* RANDOM_CLASS */ || s_sym >= 18 /* MAXOCLASSES */) {
+                    if (s_sym === RANDOM_CLASS || s_sym >= MAXOCLASSES) {
                         s_sym = syms[rn2(15) + 2 | 0];
                     }
                     $goto = "assign_sym"; continue D1;
@@ -1950,15 +1971,15 @@ export async function set_mimic_sym(mtmp) {   // makemon.c:2393
                         s_sym = syms[rn2(17)];
                     case "assign_sym":
                         $goto = null;   // assign_sym:
-                        if (s_sym === 18 /* MAXOCLASSES */) {
-                            ap_type = 1;
+                        if (s_sym === MAXOCLASSES) {
+                            ap_type = M_AP_FURNITURE;
                             appear = set_mimic_sym$furnsyms[rn2(8)] >>> 0;
                         } else {
-                            ap_type = 2;
-                            if (s_sym === 60 /* S_MIMIC_DEF */) {
-                                appear = 0;
-                            } else if (s_sym === 12 /* COIN_CLASS */) {
-                                appear = 438;
+                            ap_type = M_AP_OBJECT;
+                            if (s_sym === S_MIMIC_DEF) {
+                                appear = STRANGE_OBJECT;
+                            } else if (s_sym === COIN_CLASS) {
+                                appear = GOLD_PIECE;
                             } else {
                                 otmp = await mkobj($c.i8(s_sym), 0);
                                 appear = otmp.otyp >>> 0;
@@ -1971,26 +1992,26 @@ export async function set_mimic_sym(mtmp) {   // makemon.c:2393
             }
             mtmp.m_ap_type = $c.u8(ap_type);
             mtmp.mappearance = appear;
-            if (ap_type === 2 && (appear === 476 || appear === 241 || appear === 265 || appear === 266 || appear === 296)) {
+            if (ap_type === M_AP_OBJECT && (appear === STATUE || appear === FIGURINE || appear === CORPSE || appear === EGG || appear === TIN)) {
                 mndx = await rndmonnum();
-                nocorpse_ndx = (svm.mvitals[mndx].mvflags & 16) !== 0 ? 1 : 0;
-                if (appear === 265 && nocorpse_ndx) {
-                    mndx = rn2(13) + 331 | 0;
-                } else if (appear === 266 && !can_be_hatched(mndx) || appear === 296 && nocorpse_ndx) {
-                    mndx = -1 /* NON_PM */;
+                nocorpse_ndx = (svm.mvitals[mndx].mvflags & G_NOCORPSE) !== 0 ? 1 : 0;
+                if (appear === CORPSE && nocorpse_ndx) {
+                    mndx = rn2(PM_WIZARD - PM_ARCHEOLOGIST + 1) + PM_ARCHEOLOGIST | 0;
+                } else if (appear === EGG && !can_be_hatched(mndx) || appear === TIN && nocorpse_ndx) {
+                    mndx = NON_PM;
                 }
                 await newmcorpsenm(mtmp);
                 mtmp.mextra.mcorpsenm = mndx;
-            } else if (ap_type === 2 && appear === 285) {
+            } else if (ap_type === M_AP_OBJECT && appear === SLIME_MOLD) {
                 await newmcorpsenm(mtmp);
                 mtmp.mextra.mcorpsenm = svc.context.current_fruit;
                 flags.made_fruit = 1;
-            } else if (ap_type === 1 && appear === 33) {
+            } else if (ap_type === M_AP_FURNITURE && appear === S_altar) {
                 algn = rn2(3) - 1 | 0;
                 await newmcorpsenm(mtmp);
-                $t1 = (In_hell(u.uz) && rn2(3) ? 0 : (algn === -128 ? 0 : algn === 1 ? 4 : algn + 2 | 0) >>> 0) | 0, mtmp.mextra.mcorpsenm = $t1;
-            } else if (mtmp.mextra && mtmp.mextra.mcorpsenm !== -1 /* NON_PM */) {
-                mtmp.mextra.mcorpsenm = -1 /* NON_PM */;
+                $t1 = (In_hell(u.uz) && rn2(3) ? AM_NONE : (algn === A_NONE ? AM_NONE : algn === A_LAWFUL ? AM_LAWFUL : algn + 2 | 0) >>> 0) | 0, mtmp.mextra.mcorpsenm = $t1;
+            } else if (mtmp.mextra && mtmp.mextra.mcorpsenm !== NON_PM) {
+                mtmp.mextra.mcorpsenm = NON_PM;
             }
             if (does_block(mx, my, $c.relem(svl.level.locations[mx], my))) {
                 block_point(mx, my);
@@ -2002,7 +2023,7 @@ export async function set_mimic_sym(mtmp) {   // makemon.c:2393
 export async function bagotricks(bag, tipping, seencount) {   // makemon.c:2554
     let moncount = 0, mtmp = null, creatcnt = 0, seecount = 0;
     moncount = 0;
-    if (!bag || bag.otyp !== 220 /* BAG_OF_TRICKS */) {
+    if (!bag || bag.otyp !== BAG_OF_TRICKS) {
         await impossible($c.lit("bad bag o' tricks"));
     } else if (bag.spe < 1) {
         await pline($c.lit("%s"), tipping && bag.cknown | 0 ? $c.lit("It's empty.") : c_common_strings.c_nothing_happens);
@@ -2018,10 +2039,10 @@ export async function bagotricks(bag, tipping, seencount) {   // makemon.c:2554
             creatcnt = creatcnt + rnd(7) | 0;
         }
         do {
-            mtmp = await makemon(null, u.ux, u.uy, 0);
+            mtmp = await makemon(null, u.ux, u.uy, NO_MM_FLAGS);
             if (mtmp) {
                 moncount = moncount + 1 | 0;
-                if (canseemon(mtmp) && ((mtmp.m_ap_type & 7) === 0 /* M_AP_NOTHING */ || (mtmp.m_ap_type & 7) === 3 /* M_AP_MONSTER */) || sensemon(mtmp)) {
+                if (canseemon(mtmp) && ((mtmp.m_ap_type & M_AP_TYPMASK) === M_AP_NOTHING || (mtmp.m_ap_type & M_AP_TYPMASK) === M_AP_MONSTER) || sensemon(mtmp)) {
                     seecount = seecount + 1 | 0;
                 }
             }
@@ -2031,7 +2052,7 @@ export async function bagotricks(bag, tipping, seencount) {   // makemon.c:2554
                 seencount.set(0, seencount.get(0) + seecount | 0);
             }
             if (bag.dknown) {
-                await discover_object(220, 1, 1, 1);
+                await discover_object(BAG_OF_TRICKS, 1, 1, 1);
                 await update_inventory();
             }
         } else if (!tipping) {
@@ -2043,8 +2064,8 @@ export async function bagotricks(bag, tipping, seencount) {   // makemon.c:2554
 export async function summon_furies(limit) {   // makemon.c:2605
     let i = 0;
     i = 0;
-    while (mk_gen_ok(292 /* PM_ERINYS */, 3, 0) && (i < limit || !limit)) {
-        await makemon($c.relem(mons, 292 /* PM_ERINYS */), u.ux, u.uy, 18);
+    while (mk_gen_ok(PM_ERINYS, G_GENOD | G_EXTINCT, 0) && (i < limit || !limit)) {
+        await makemon($c.relem(mons, PM_ERINYS), u.ux, u.uy, MM_ADJACENTOK | MM_NOWAIT);
         i = i + 1 | 0;
     }
 }
@@ -2056,32 +2077,32 @@ export function $init() {
     mclass_maxf.fill(0);
     mongen_order_init = 0;
     syms.fill(0);
-    syms[0] = 18;
-    syms[1] = 18;
-    syms[2] = 4;
-    syms[3] = 11;
-    syms[4] = 2;
-    syms[5] = 7;
-    syms[6] = 12;
-    syms[7] = 9;
-    syms[8] = 8;
-    syms[9] = 3;
-    syms[10] = 5;
-    syms[11] = 6;
-    syms[12] = 14;
-    syms[13] = 13;
-    syms[14] = 10;
-    syms[15] = 60;
-    syms[16] = 60;
+    syms[0] = MAXOCLASSES;
+    syms[1] = MAXOCLASSES;
+    syms[2] = RING_CLASS;
+    syms[3] = WAND_CLASS;
+    syms[4] = WEAPON_CLASS;
+    syms[5] = FOOD_CLASS;
+    syms[6] = COIN_CLASS;
+    syms[7] = SCROLL_CLASS;
+    syms[8] = POTION_CLASS;
+    syms[9] = ARMOR_CLASS;
+    syms[10] = AMULET_CLASS;
+    syms[11] = TOOL_CLASS;
+    syms[12] = ROCK_CLASS;
+    syms[13] = GEM_CLASS;
+    syms[14] = SPBOOK_CLASS;
+    syms[15] = S_MIMIC_DEF;
+    syms[16] = S_MIMIC_DEF;
     align_shift$oldmoves = 0;
     align_shift$lev = null;
     set_mimic_sym$furnsyms.fill(0);
-    set_mimic_sym$furnsyms[0] = 25 /* S_upstair */;
-    set_mimic_sym$furnsyms[1] = 25 /* S_upstair */;
-    set_mimic_sym$furnsyms[2] = 26 /* S_dnstair */;
-    set_mimic_sym$furnsyms[3] = 26 /* S_dnstair */;
-    set_mimic_sym$furnsyms[4] = 33 /* S_altar */;
-    set_mimic_sym$furnsyms[5] = 34 /* S_grave */;
-    set_mimic_sym$furnsyms[6] = 35 /* S_throne */;
-    set_mimic_sym$furnsyms[7] = 36 /* S_sink */;
+    set_mimic_sym$furnsyms[0] = S_upstair;
+    set_mimic_sym$furnsyms[1] = S_upstair;
+    set_mimic_sym$furnsyms[2] = S_dnstair;
+    set_mimic_sym$furnsyms[3] = S_dnstair;
+    set_mimic_sym$furnsyms[4] = S_altar;
+    set_mimic_sym$furnsyms[5] = S_grave;
+    set_mimic_sym$furnsyms[6] = S_throne;
+    set_mimic_sym$furnsyms[7] = S_sink;
 }

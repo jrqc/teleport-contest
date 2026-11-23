@@ -2,11 +2,15 @@
 import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
+import { A_CHAOTIC } from './align.h.js';
 import { is_art } from './artifact.js';
+import { ART_SNICKERSNEE } from './artilist.h.js';
 import { adjabil, adjattrib, init_attr, newhp, vary_init_attr } from './attrib.js';
+import { A_CON, A_STR } from './attrib.h.js';
 import { max_rank_sz } from './botl.js';
 import { getnow } from './calendar.js';
 import { cg, flags, gi, gl, gn, gu, iflags, svb, svm, svs, u, urealtime } from './decl.js';
+import { ARMOR_CLASS, COIN_CLASS, FOOD_CLASS, GEM_CLASS, POTION_CLASS, RING_CLASS, SCROLL_CLASS, SPBOOK_CLASS, TOOL_CLASS, WAND_CLASS, WEAPON_CLASS } from './defsym.h.js';
 import { find_ac } from './do_wear.js';
 import { init_uhunger } from './eat.js';
 import { panic } from './end.js';
@@ -15,18 +19,29 @@ import { debugcore } from './files.js';
 import { inv_weight } from './hack.js';
 import { addinv, useupall } from './invent.js';
 import { dealloc_obj, mkobj, mksobj, weight } from './mkobj.js';
+import { PM_ARCHEOLOGIST, PM_BARBARIAN, PM_CAVE_DWELLER, PM_CLERIC, PM_DWARF, PM_ELF, PM_GNOME, PM_HEALER, PM_HUMAN, PM_KNIGHT, PM_MONK, PM_ORC, PM_RANGER, PM_ROGUE, PM_SAMURAI, PM_TOURIST, PM_VALKYRIE, PM_WIZARD } from './monsters.h.js';
 import { discover_object } from './o_init.js';
+import { ARM_BOOTS, ARM_CLOAK, ARM_GLOVES, ARM_HELM, ARM_SHIELD, ARM_SHIRT, ARM_SUIT, MAXOCLASSES, MAXSPELL, NUM_OBJECTS } from './objclass.h.js';
 import { obj_descr, objects } from './objects.js';
+import { APPLE, ARROW, AXE, BAG_OF_TRICKS, BATTLE_AXE, BELL, BLINDFOLD, BOW, BUGLE, BULLWHIP, CARROT, CHAIN_MAIL, CLOAK_OF_DISPLACEMENT, CLOAK_OF_MAGIC_RESISTANCE, CLOVE_OF_GARLIC, CLUB, CORNUTHAUM, CRAM_RATION, CREDIT_CARD, CROSSBOW, CROSSBOW_BOLT, DAGGER, DART, DUNCE_CAP, DWARVISH_CLOAK, DWARVISH_IRON_HELM, DWARVISH_MATTOCK, DWARVISH_MITHRIL_COAT, DWARVISH_ROUNDSHIELD, DWARVISH_SHORT_SWORD, DWARVISH_SPEAR, ELVEN_ARROW, ELVEN_BOOTS, ELVEN_BOW, ELVEN_BROADSWORD, ELVEN_CLOAK, ELVEN_DAGGER, ELVEN_LEATHER_HELM, ELVEN_MITHRIL_COAT, ELVEN_SHIELD, ELVEN_SHORT_SWORD, ELVEN_SPEAR, EXPENSIVE_CAMERA, FEDORA, FLINT, FOOD_RATION, FORTUNE_COOKIE, GOLD_PIECE, HAWAIIAN_SHIRT, HELMET, KATANA, LANCE, LARGE_BOX, LEASH, LEATHER_ARMOR, LEATHER_DRUM, LEATHER_GLOVES, LEATHER_JACKET, LEMBAS_WAFER, LOADSTONE, LOCK_PICK, LONG_SWORD, LUCKSTONE, MACE, MAGIC_MARKER, OIL_LAMP, ORANGE, ORCISH_ARROW, ORCISH_BOW, ORCISH_CHAIN_MAIL, ORCISH_CLOAK, ORCISH_DAGGER, ORCISH_HELM, ORCISH_RING_MAIL, ORCISH_SHIELD, ORCISH_SHORT_SWORD, ORCISH_SPEAR, PANCAKE, PICK_AXE, POT_ACID, POT_EXTRA_HEALING, POT_FULL_HEALING, POT_HALLUCINATION, POT_HEALING, POT_OIL, POT_POLYMORPH, POT_SICKNESS, POT_WATER, QUARTERSTAFF, RING_MAIL, RIN_AGGRAVATE_MONSTER, RIN_HUNGER, RIN_LEVITATION, RIN_POISON_RESISTANCE, RIN_POLYMORPH, RIN_POLYMORPH_CONTROL, ROBE, ROCK, SACK, SCALPEL, SCR_AMNESIA, SCR_BLANK_PAPER, SCR_ENCHANT_WEAPON, SCR_FIRE, SCR_MAGIC_MAPPING, SHORT_SWORD, SHURIKEN, SLING, SMALL_SHIELD, SPEAR, SPE_BLANK_PAPER, SPE_CONFUSE_MONSTER, SPE_EXTRA_HEALING, SPE_FORCE_BOLT, SPE_HEALING, SPE_NOVEL, SPE_POLYMORPH, SPE_PROTECTION, SPE_STONE_TO_FLESH, SPLINT_MAIL, SPRIG_OF_WOLFSBANE, STATUE, STETHOSCOPE, STRANGE_OBJECT, TINNING_KIT, TIN_OPENER, TOOLED_HORN, TOUCHSTONE, TOWEL, TRIPE_RATION, TWO_HANDED_SWORD, URUK_HAI_SHIELD, WAN_NOTHING, WAN_POLYMORPH, WAN_SLEEP, WAN_WISHING, WOODEN_FLUTE, WOODEN_HARP, YA, YUMI } from './objects.h.js';
 import { Japanese_item_name } from './objnam.js';
+import { NON_PM } from './permonst.h.js';
 import { pline } from './pline.js';
 import { set_uasmon } from './polyself.js';
+import { BLINDED, FROMOUTSIDE, JUMPING, W_ARM, W_ARMC, W_ARMF, W_ARMG, W_ARMH, W_ARMS, W_ARMU } from './prop.h.js';
 import { rn2, rnd, rne } from './rnd.js';
 import { aligns } from './role.js';
+import { P_ATTACK_SPELL, P_AXE, P_BARE_HANDED_COMBAT, P_BASIC, P_BOOMERANG, P_BOW, P_BROAD_SWORD, P_CLERIC_SPELL, P_CLUB, P_CROSSBOW, P_DAGGER, P_DART, P_DIVINATION_SPELL, P_ENCHANTMENT_SPELL, P_ESCAPE_SPELL, P_EXPERT, P_FLAIL, P_GRAND_MASTER, P_HAMMER, P_HEALING_SPELL, P_KNIFE, P_LANCE, P_LONG_SWORD, P_MACE, P_MASTER, P_MATTER_SPELL, P_MORNING_STAR, P_NONE, P_NUM_SKILLS, P_PICK_AXE, P_POLEARMS, P_QUARTERSTAFF, P_RIDING, P_SABER, P_SHORT_SWORD, P_SHURIKEN, P_SKILLED, P_SLING, P_SPEAR, P_TRIDENT, P_TWO_HANDED_SWORD, P_TWO_WEAPON_COMBAT, P_UNICORN_HORN, P_UNSKILLED, P_WHIP } from './skills.h.js';
 import { initialspell, num_spells, spell_skilltype } from './spell.js';
+import { NO_SPELL } from './spell.h.js';
 import { hidden_gold } from './vault.js';
 import { skill_init } from './weapon.js';
 import { set_twoweap, setuqwep, setuswapwep, setuwep } from './wield.js';
 import { setworn } from './worn.js';
+import { A_CURRENT, A_ORIGINAL, LEFT_HANDED, RIGHT_HANDED } from './you.h.js';
+
+const UNDEF_TYP = 0;
+const UNDEF_BLESS = 2;
 
 const u_init_role$M_spell = $c.nulls(3);   // static in u_init_role()
 const u_init_race$trotyp = new Int32Array(6);   // static in u_init_race()
@@ -85,18 +100,18 @@ async function knows_class(sym) {   // u_init.c:586
     odummy.oclass = sym;
     o = odummy;
     for (ct = svb.bases[$c.u8(sym)]; ct < svb.bases[$c.u8(sym) + 1 | 0]; ct = ct + 1 | 0) {
-        if (ct === 93 /* CORNUTHAUM */ || ct === 94 /* DUNCE_CAP */ || ct === 150 /* SMALL_SHIELD */) {
+        if (ct === CORNUTHAUM || ct === DUNCE_CAP || ct === SMALL_SHIELD) {
             continue;
         }
-        if (sym === 2 /* WEAPON_CLASS */) {
+        if (sym === WEAPON_CLASS) {
             odummy.otyp = $c.i16(ct);
-            if (!(gu.urole.mnum === 335) && !(gu.urole.mnum === 340) && ((o.oclass === 2 /* WEAPON_CLASS */ || o.oclass === 6 /* TOOL_CLASS */) && (objects[o.otyp].oc_subtyp === 16 /* P_POLEARMS */ || objects[o.otyp].oc_subtyp === 19 /* P_LANCE */ || is_art(o, 19 /* ART_SNICKERSNEE */)))) {
+            if (!(gu.urole.mnum === PM_KNIGHT) && !(gu.urole.mnum === PM_SAMURAI) && ((o.oclass === WEAPON_CLASS || o.oclass === TOOL_CLASS) && (objects[o.otyp].oc_subtyp === P_POLEARMS || objects[o.otyp].oc_subtyp === P_LANCE || is_art(o, ART_SNICKERSNEE)))) {
                 continue;
             }
-            if (gu.urole.mnum === 338 && (!(o.oclass === 2 /* WEAPON_CLASS */ && objects[o.otyp].oc_subtyp >= 20 /* P_BOW */ && objects[o.otyp].oc_subtyp <= 22 /* P_CROSSBOW */) && !((o.oclass === 2 /* WEAPON_CLASS */ || o.oclass === 13 /* GEM_CLASS */) && objects[o.otyp].oc_subtyp >= -22 && objects[o.otyp].oc_subtyp <= -20) && !(o.oclass === 2 /* WEAPON_CLASS */ && objects[o.otyp].oc_subtyp === 17 /* P_SPEAR */))) {
+            if (gu.urole.mnum === PM_RANGER && (!(o.oclass === WEAPON_CLASS && objects[o.otyp].oc_subtyp >= P_BOW && objects[o.otyp].oc_subtyp <= P_CROSSBOW) && !((o.oclass === WEAPON_CLASS || o.oclass === GEM_CLASS) && objects[o.otyp].oc_subtyp >= -P_CROSSBOW && objects[o.otyp].oc_subtyp <= -P_BOW) && !(o.oclass === WEAPON_CLASS && objects[o.otyp].oc_subtyp === P_SPEAR))) {
                 continue;
             }
-            if (gu.urole.mnum === 339 && objects[o.otyp].oc_subtyp !== 1 /* P_DAGGER */) {
+            if (gu.urole.mnum === PM_ROGUE && objects[o.otyp].oc_subtyp !== P_DAGGER) {
                 continue;
             }
         }
@@ -109,7 +124,7 @@ async function u_init_role() {   // u_init.c:637
     let i = 0, $t1, $t2;
     svm.moves = 1;
     switch (gu.urole.mnum) {
-        case 331 /* PM_ARCHEOLOGIST */:
+        case PM_ARCHEOLOGIST:
             await ini_inv($c.relem(Archeologist, 0));
             if (!rn2(10)) {
                 await ini_inv($c.relem(Tinopener, 0));
@@ -118,10 +133,10 @@ async function u_init_role() {   // u_init.c:637
             } else if (!rn2(5)) {
                 await ini_inv($c.relem(Magicmarker, 0));
             }
-            await knows_object(217 /* SACK */, 0);
-            await knows_object(472 /* TOUCHSTONE */, 0);
+            await knows_object(SACK, 0);
+            await knows_object(TOUCHSTONE, 0);
             break;
-        case 332 /* PM_BARBARIAN */:
+        case PM_BARBARIAN:
             if (rn2(100) >= 50) {
                 await ini_inv($c.relem(Barbarian_0, 0));
             } else {
@@ -130,27 +145,27 @@ async function u_init_role() {   // u_init.c:637
             if (!rn2(6)) {
                 await ini_inv($c.relem(Lamp, 0));
             }
-            await knows_class(2);
-            await knows_class(3);
+            await knows_class(WEAPON_CLASS);
+            await knows_class(ARMOR_CLASS);
             break;
-        case 333 /* PM_CAVE_DWELLER */:
+        case PM_CAVE_DWELLER:
             await ini_inv($c.relem(Cave_man, 0));
             break;
-        case 334 /* PM_HEALER */:
+        case PM_HEALER:
             $t1 = rn2(1000) + 1001 | 0, u.umoney0 = $t1;
             await ini_inv($c.relem(Healer, 0));
             if (!rn2(25)) {
                 await ini_inv($c.relem(Lamp, 0));
             }
-            await knows_object(315 /* POT_FULL_HEALING */, 0);
+            await knows_object(POT_FULL_HEALING, 0);
             break;
-        case 335 /* PM_KNIGHT */:
+        case PM_KNIGHT:
             await ini_inv($c.relem(Knight, 0));
-            await knows_class(2);
-            await knows_class(3);
-            u.uprops[45 /* JUMPING */].intrinsic = $c.or64(u.uprops[45 /* JUMPING */].intrinsic, 67108864);
+            await knows_class(WEAPON_CLASS);
+            await knows_class(ARMOR_CLASS);
+            u.uprops[JUMPING].intrinsic = $c.or64(u.uprops[JUMPING].intrinsic, FROMOUTSIDE);
             break;
-        case 336 /* PM_MONK */:
+        case PM_MONK:
             {
                 await ini_inv($c.relem(Monk, 0));
                 await ini_inv(u_init_role$M_spell[$c.div32(rn2(90), 30)]);
@@ -159,40 +174,40 @@ async function u_init_role() {   // u_init.c:637
                 } else if (!rn2(10)) {
                     await ini_inv($c.relem(Lamp, 0));
                 }
-                await knows_class(3);
-                await knows_object(25 /* SHURIKEN */, 0);
+                await knows_class(ARMOR_CLASS);
+                await knows_object(SHURIKEN, 0);
                 break;
             }
-        case 337 /* PM_CLERIC */:
+        case PM_CLERIC:
             await ini_inv($c.relem(Priest, 0));
             if (!rn2(5)) {
                 await ini_inv($c.relem(Magicmarker, 0));
             } else if (!rn2(10)) {
                 await ini_inv($c.relem(Lamp, 0));
             }
-            await knows_object(322 /* POT_WATER */, 1);
+            await knows_object(POT_WATER, 1);
             break;
-        case 338 /* PM_RANGER */:
+        case PM_RANGER:
             await ini_inv($c.relem(Ranger, 0));
-            await knows_class(2);
+            await knows_class(WEAPON_CLASS);
             break;
-        case 339 /* PM_ROGUE */:
+        case PM_ROGUE:
             u.umoney0 = 0;
             await ini_inv($c.relem(Rogue, 0));
             if (!rn2(5)) {
                 await ini_inv($c.relem(Blindfold, 0));
             }
-            await knows_object(217 /* SACK */, 0);
-            await knows_class(2);
+            await knows_object(SACK, 0);
+            await knows_class(WEAPON_CLASS);
             break;
-        case 340 /* PM_SAMURAI */:
+        case PM_SAMURAI:
             await ini_inv($c.relem(Samurai, 0));
             if (!rn2(5)) {
                 await ini_inv($c.relem(Blindfold, 0));
             }
-            await knows_class(2);
-            await knows_class(3);
-            for (i = 18 /* MAXOCLASSES */; i < 481 /* NUM_OBJECTS */; i = i + 1 | 0) {
+            await knows_class(WEAPON_CLASS);
+            await knows_class(ARMOR_CLASS);
+            for (i = MAXOCLASSES; i < NUM_OBJECTS; i = i + 1 | 0) {
                 if (objects[i].oc_magic) {
                     continue;
                 }
@@ -201,7 +216,7 @@ async function u_init_role() {   // u_init.c:637
                 }
             }
             break;
-        case 341 /* PM_TOURIST */:
+        case PM_TOURIST:
             $t2 = rnd(1000), u.umoney0 = $t2;
             await ini_inv($c.relem(Tourist, 0));
             if (!rn2(25)) {
@@ -214,15 +229,15 @@ async function u_init_role() {   // u_init.c:637
                 await ini_inv($c.relem(Magicmarker, 0));
             }
             break;
-        case 342 /* PM_VALKYRIE */:
+        case PM_VALKYRIE:
             await ini_inv($c.relem(Valkyrie, 0));
             if (!rn2(6)) {
                 await ini_inv($c.relem(Lamp, 0));
             }
-            await knows_class(2);
-            await knows_class(3);
+            await knows_class(WEAPON_CLASS);
+            await knows_class(ARMOR_CLASS);
             break;
-        case 343 /* PM_WIZARD */:
+        case PM_WIZARD:
             await ini_inv($c.relem(Wizard, 0));
             if (!rn2(5)) {
                 await ini_inv($c.relem(Blindfold, 0));
@@ -231,24 +246,24 @@ async function u_init_role() {   // u_init.c:637
         default:
             break;
     }
-    gn.nocreate = 0;
-    gn.nocreate2 = 0;
-    gn.nocreate3 = 0;
-    gn.nocreate4 = 0;
+    gn.nocreate = STRANGE_OBJECT;
+    gn.nocreate2 = STRANGE_OBJECT;
+    gn.nocreate3 = STRANGE_OBJECT;
+    gn.nocreate4 = STRANGE_OBJECT;
 }
 async function u_init_race() {   // u_init.c:792
     let Instrument = $c.recArray($T.trobj, 2);
     switch (gu.urace.mnum) {
-        case 260 /* PM_HUMAN */:
+        case PM_HUMAN:
             break;
-        case 264 /* PM_ELF */:
-            if (gu.urole.mnum === 337 || gu.urole.mnum === 343) {
+        case PM_ELF:
+            if (gu.urole.mnum === PM_CLERIC || gu.urole.mnum === PM_WIZARD) {
                 for (let $i16 = 0; $i16 < 2; $i16++) {
                     Instrument[$i16].$copyFrom(new $T.trobj());
                 }
                 Instrument[0].trotyp = $c.i16(u_init_race$trotyp[rn2(6)]);
                 Instrument[0].trspe = 0;
-                Instrument[0].trclass = 6;
+                Instrument[0].trclass = TOOL_CLASS;
                 Instrument[0].trquan_min = 1;
                 Instrument[0].trquan_max = 1;
                 Instrument[0].trbless = 0;
@@ -260,44 +275,44 @@ async function u_init_race() {   // u_init.c:792
                 Instrument[1].trbless = 0;
                 await ini_inv($c.relem(Instrument, 0));
             }
-            await knows_object(47 /* ELVEN_SHORT_SWORD */, 0);
-            await knows_object(19 /* ELVEN_ARROW */, 0);
-            await knows_object(84 /* ELVEN_BOW */, 0);
-            await knows_object(28 /* ELVEN_SPEAR */, 0);
-            await knows_object(35 /* ELVEN_DAGGER */, 0);
-            await knows_object(53 /* ELVEN_BROADSWORD */, 0);
-            await knows_object(127 /* ELVEN_MITHRIL_COAT */, 0);
-            await knows_object(89 /* ELVEN_LEATHER_HELM */, 0);
-            await knows_object(153 /* ELVEN_SHIELD */, 0);
-            await knows_object(169 /* ELVEN_BOOTS */, 0);
-            await knows_object(139 /* ELVEN_CLOAK */, 0);
+            await knows_object(ELVEN_SHORT_SWORD, 0);
+            await knows_object(ELVEN_ARROW, 0);
+            await knows_object(ELVEN_BOW, 0);
+            await knows_object(ELVEN_SPEAR, 0);
+            await knows_object(ELVEN_DAGGER, 0);
+            await knows_object(ELVEN_BROADSWORD, 0);
+            await knows_object(ELVEN_MITHRIL_COAT, 0);
+            await knows_object(ELVEN_LEATHER_HELM, 0);
+            await knows_object(ELVEN_SHIELD, 0);
+            await knows_object(ELVEN_BOOTS, 0);
+            await knows_object(ELVEN_CLOAK, 0);
             break;
-        case 44 /* PM_DWARF */:
-            await knows_object(30 /* DWARVISH_SPEAR */, 0);
-            await knows_object(49 /* DWARVISH_SHORT_SWORD */, 0);
-            await knows_object(71 /* DWARVISH_MATTOCK */, 0);
-            await knows_object(91 /* DWARVISH_IRON_HELM */, 0);
-            await knows_object(126 /* DWARVISH_MITHRIL_COAT */, 0);
-            await knows_object(141 /* DWARVISH_CLOAK */, 0);
-            await knows_object(157 /* DWARVISH_ROUNDSHIELD */, 0);
+        case PM_DWARF:
+            await knows_object(DWARVISH_SPEAR, 0);
+            await knows_object(DWARVISH_SHORT_SWORD, 0);
+            await knows_object(DWARVISH_MATTOCK, 0);
+            await knows_object(DWARVISH_IRON_HELM, 0);
+            await knows_object(DWARVISH_MITHRIL_COAT, 0);
+            await knows_object(DWARVISH_CLOAK, 0);
+            await knows_object(DWARVISH_ROUNDSHIELD, 0);
             break;
-        case 165 /* PM_GNOME */:
+        case PM_GNOME:
             break;
-        case 72 /* PM_ORC */:
-            if (!(gu.urole.mnum === 343)) {
+        case PM_ORC:
+            if (!(gu.urole.mnum === PM_WIZARD)) {
                 await ini_inv($c.relem(Xtra_food, 0));
             }
-            await knows_object(48 /* ORCISH_SHORT_SWORD */, 0);
-            await knows_object(20 /* ORCISH_ARROW */, 0);
-            await knows_object(85 /* ORCISH_BOW */, 0);
-            await knows_object(29 /* ORCISH_SPEAR */, 0);
-            await knows_object(36 /* ORCISH_DAGGER */, 0);
-            await knows_object(129 /* ORCISH_CHAIN_MAIL */, 0);
-            await knows_object(133 /* ORCISH_RING_MAIL */, 0);
-            await knows_object(90 /* ORCISH_HELM */, 0);
-            await knows_object(155 /* ORCISH_SHIELD */, 0);
-            await knows_object(154 /* URUK_HAI_SHIELD */, 0);
-            await knows_object(140 /* ORCISH_CLOAK */, 0);
+            await knows_object(ORCISH_SHORT_SWORD, 0);
+            await knows_object(ORCISH_ARROW, 0);
+            await knows_object(ORCISH_BOW, 0);
+            await knows_object(ORCISH_SPEAR, 0);
+            await knows_object(ORCISH_DAGGER, 0);
+            await knows_object(ORCISH_CHAIN_MAIL, 0);
+            await knows_object(ORCISH_RING_MAIL, 0);
+            await knows_object(ORCISH_HELM, 0);
+            await knows_object(ORCISH_SHIELD, 0);
+            await knows_object(URUK_HAI_SHIELD, 0);
+            await knows_object(ORCISH_CLOAK, 0);
             break;
         default:
             break;
@@ -305,58 +320,58 @@ async function u_init_race() {   // u_init.c:792
 }
 async function pauper_reinit() {   // u_init.c:870
     let skill = 0, preknown = 0;
-    preknown = 0 /* STRANGE_OBJECT */;
+    preknown = STRANGE_OBJECT;
     if (!u.uroleplay.pauper) {
         return;
     }
-    for (skill = 0; skill < 38 /* P_NUM_SKILLS */; skill = skill + 1 | 0) {
-        if (u.weapon_skills[skill].skill > 1 /* P_UNSKILLED */) {
-            u.weapon_skills[skill].skill = 1;
+    for (skill = 0; skill < P_NUM_SKILLS; skill = skill + 1 | 0) {
+        if (u.weapon_skills[skill].skill > P_UNSKILLED) {
+            u.weapon_skills[skill].skill = P_UNSKILLED;
             u.weapon_skills[skill].advance = 0;
         }
     }
     u.weapon_slots = 2;
     switch (gu.urole.mnum) {
-        case 334 /* PM_HEALER */:
-            preknown = 374 /* SPE_HEALING */;
+        case PM_HEALER:
+            preknown = SPE_HEALING;
             break;
-        case 337 /* PM_CLERIC */:
-        case 335 /* PM_KNIGHT */:
-        case 336 /* PM_MONK */:
-            preknown = 403 /* SPE_PROTECTION */;
+        case PM_CLERIC:
+        case PM_KNIGHT:
+        case PM_MONK:
+            preknown = SPE_PROTECTION;
             break;
-        case 343 /* PM_WIZARD */:
-            preknown = 376 /* SPE_FORCE_BOLT */;
+        case PM_WIZARD:
+            preknown = SPE_FORCE_BOLT;
             break;
-        case 331 /* PM_ARCHEOLOGIST */:
-            preknown = 472 /* TOUCHSTONE */;
+        case PM_ARCHEOLOGIST:
+            preknown = TOUCHSTONE;
             break;
-        case 333 /* PM_CAVE_DWELLER */:
-            preknown = 473 /* FLINT */;
+        case PM_CAVE_DWELLER:
+            preknown = FLINT;
             break;
-        case 339 /* PM_ROGUE */:
-        case 341 /* PM_TOURIST */:
-            preknown = 217 /* SACK */;
+        case PM_ROGUE:
+        case PM_TOURIST:
+            preknown = SACK;
             break;
-        case 340 /* PM_SAMURAI */:
-            preknown = 293 /* FOOD_RATION */;
+        case PM_SAMURAI:
+            preknown = FOOD_RATION;
             break;
         default:
-        case 332 /* PM_BARBARIAN */:
-        case 338 /* PM_RANGER */:
-        case 342 /* PM_VALKYRIE */:
+        case PM_BARBARIAN:
+        case PM_RANGER:
+        case PM_VALKYRIE:
             break;
     }
-    if (preknown !== 0 /* STRANGE_OBJECT */) {
+    if (preknown !== STRANGE_OBJECT) {
         await knows_object(preknown, 1);
     }
 }
 async function u_init_carry_attr_boost() {   // u_init.c:929
     while (inv_weight() > 0) {
-        if (await adjattrib(0 /* A_STR */, 1, 1)) {
+        if (await adjattrib(A_STR, 1, 1)) {
             continue;
         }
-        if (await adjattrib(4 /* A_CON */, 1, 1)) {
+        if (await adjattrib(A_CON, 1, 1)) {
             continue;
         }
         break;
@@ -377,9 +392,9 @@ export async function u_init_misc() {   // u_init.c:944
     u.utolev.$copyFrom(u.uz);
     u.umoved = 0;
     u.umortality = 0;
-    u.ugrave_arise = -1 /* NON_PM */;
+    u.ugrave_arise = NON_PM;
     $t1 = u.umonster = gu.urole.mnum, u.umonnum = $t1;
-    u.ulycn = -1 /* NON_PM */;
+    u.ulycn = NON_PM;
     await set_uasmon();
     u.ulevel = 0;
     $t4 = ($t3 = ($t2 = newhp(), u.uhppeak = $t2), u.uhpmax = $t3), u.uhp = $t4;
@@ -388,62 +403,62 @@ export async function u_init_misc() {   // u_init.c:944
     await adjabil(0, 1);
     $t8 = u.ulevelmax = 1, u.ulevel = $t8;
     await init_uhunger();
-    for (i = 0; i <= 42 /* MAXSPELL */; i = i + 1 | 0) {
-        svs.spl_book[i].sp_id = 0;
+    for (i = 0; i <= MAXSPELL; i = i + 1 | 0) {
+        svs.spl_book[i].sp_id = NO_SPELL;
     }
     u.ublesscnt = 300;
-    $t10 = ($t9 = u.ualign.type = aligns[flags.initalign].value, u.ualignbase[1] = $t9), u.ualignbase[0] = $t10;
+    $t10 = ($t9 = u.ualign.type = aligns[flags.initalign].value, u.ualignbase[A_ORIGINAL] = $t9), u.ualignbase[A_CURRENT] = $t10;
     $G.ubirthday = getnow();
     u.nv_range = 1;
     u.xray_range = -1;
     u.unblind_telepat_range = -1;
     if (u.uroleplay.blind) {
-        u.uprops[15 /* BLINDED */].intrinsic = $c.or64(u.uprops[15 /* BLINDED */].intrinsic, 67108864);
+        u.uprops[BLINDED].intrinsic = $c.or64(u.uprops[BLINDED].intrinsic, FROMOUTSIDE);
     }
-    $t11 = (rn2(10) ? 0 : 1) >>> 0, u.uhandedness = ($t11) & 1;
+    $t11 = (rn2(10) ? RIGHT_HANDED : LEFT_HANDED) >>> 0, u.uhandedness = ($t11) & 1;
     max_rank_sz();
     return;
 }
 async function skills_for_role() {   // u_init.c:1037
     let skills = null;
     switch (gu.urole.mnum) {
-        case 331 /* PM_ARCHEOLOGIST */:
+        case PM_ARCHEOLOGIST:
             skills = $c.relem(Skill_A, 0);
             break;
-        case 332 /* PM_BARBARIAN */:
+        case PM_BARBARIAN:
             skills = $c.relem(Skill_B, 0);
             break;
-        case 333 /* PM_CAVE_DWELLER */:
+        case PM_CAVE_DWELLER:
             skills = $c.relem(Skill_C, 0);
             break;
-        case 334 /* PM_HEALER */:
+        case PM_HEALER:
             skills = $c.relem(Skill_H, 0);
             break;
-        case 335 /* PM_KNIGHT */:
+        case PM_KNIGHT:
             skills = $c.relem(Skill_K, 0);
             break;
-        case 336 /* PM_MONK */:
+        case PM_MONK:
             skills = $c.relem(Skill_Mon, 0);
             break;
-        case 337 /* PM_CLERIC */:
+        case PM_CLERIC:
             skills = $c.relem(Skill_P, 0);
             break;
-        case 338 /* PM_RANGER */:
+        case PM_RANGER:
             skills = $c.relem(Skill_Ran, 0);
             break;
-        case 339 /* PM_ROGUE */:
+        case PM_ROGUE:
             skills = $c.relem(Skill_R, 0);
             break;
-        case 340 /* PM_SAMURAI */:
+        case PM_SAMURAI:
             skills = $c.relem(Skill_S, 0);
             break;
-        case 341 /* PM_TOURIST */:
+        case PM_TOURIST:
             skills = $c.relem(Skill_T, 0);
             break;
-        case 342 /* PM_VALKYRIE */:
+        case PM_VALKYRIE:
             skills = $c.relem(Skill_V, 0);
             break;
-        case 343 /* PM_WIZARD */:
+        case PM_WIZARD:
             skills = $c.relem(Skill_W, 0);
             break;
         default:
@@ -456,7 +471,7 @@ async function restricted_spell_discipline(otyp) {   // u_init.c:1091
     let skills = null, this_skill = 0;
     skills = await skills_for_role();
     this_skill = spell_skilltype(otyp);
-    while (skills && skills.skill !== 0 /* P_NONE */) {
+    while (skills && skills.skill !== P_NONE) {
         if (skills.skill === this_skill) {
             return 0;
         }
@@ -475,10 +490,10 @@ async function ini_inv_mkobj_filter(oclass, got_level1_spellbook) {   // u_init.
     trycnt = 0;
     obj = await mkobj(oclass, 0);
     otyp = obj.otyp;
-    while (otyp === 414 /* WAN_WISHING */ || otyp === gn.nocreate || otyp === gn.nocreate2 || otyp === gn.nocreate3 || otyp === gn.nocreate4 || otyp === 183 /* RIN_LEVITATION */ || otyp === 304 /* POT_HALLUCINATION */ || otyp === 320 /* POT_ACID */ || otyp === 338 /* SCR_AMNESIA */ || otyp === 339 /* SCR_FIRE */ || otyp === 365 /* SCR_BLANK_PAPER */ || otyp === 407 /* SPE_BLANK_PAPER */ || otyp === 185 /* RIN_AGGRAVATE_MONSTER */ || otyp === 184 /* RIN_HUNGER */ || otyp === 416 /* WAN_NOTHING */ || otyp === 188 /* RIN_POISON_RESISTANCE */ && gu.urace.mnum === 72 || otyp === 328 /* SCR_ENCHANT_WEAPON */ && gu.urole.mnum === 336 || otyp === 376 /* SPE_FORCE_BOLT */ && gu.urole.mnum === 343 || obj.oclass === 10 /* SPBOOK_CLASS */ && (objects[otyp].oc_oc2 > (got_level1_spellbook ? 3 : 1) || await restricted_spell_discipline(otyp)) || otyp === 408 /* SPE_NOVEL */) {
+    while (otyp === WAN_WISHING || otyp === gn.nocreate || otyp === gn.nocreate2 || otyp === gn.nocreate3 || otyp === gn.nocreate4 || otyp === RIN_LEVITATION || otyp === POT_HALLUCINATION || otyp === POT_ACID || otyp === SCR_AMNESIA || otyp === SCR_FIRE || otyp === SCR_BLANK_PAPER || otyp === SPE_BLANK_PAPER || otyp === RIN_AGGRAVATE_MONSTER || otyp === RIN_HUNGER || otyp === WAN_NOTHING || otyp === RIN_POISON_RESISTANCE && gu.urace.mnum === PM_ORC || otyp === SCR_ENCHANT_WEAPON && gu.urole.mnum === PM_MONK || otyp === SPE_FORCE_BOLT && gu.urole.mnum === PM_WIZARD || obj.oclass === SPBOOK_CLASS && (objects[otyp].oc_oc2 > (got_level1_spellbook ? 3 : 1) || await restricted_spell_discipline(otyp)) || otyp === SPE_NOVEL) {
         await dealloc_obj(obj);
         if ((trycnt = trycnt + 1 | 0) > 1000) {
-            obj = await mksobj(290 /* PANCAKE */, 1, 0);
+            obj = await mksobj(PANCAKE, 1, 0);
             break;
         }
         obj = await mkobj(oclass, 0);
@@ -488,8 +503,8 @@ async function ini_inv_mkobj_filter(oclass, got_level1_spellbook) {   // u_init.
 }
 async function ini_inv_obj_substitution(trop, obj) {   // u_init.c:1179
     let i = 0, save_plnmsg = 0;
-    if (gu.urace.mnum !== 260 /* PM_HUMAN */) {
-        for (i = 0; inv_subs[i].race_pm !== -1 /* NON_PM */; i = i + 1 | 0) {
+    if (gu.urace.mnum !== PM_HUMAN) {
+        for (i = 0; inv_subs[i].race_pm !== NON_PM; i = i + 1 | 0) {
             if (inv_subs[i].race_pm === gu.urace.mnum && obj.otyp === inv_subs[i].item_otyp) {
                 do {
                     if (debugcore($c.lit("u_init.c"), 1)) {
@@ -508,38 +523,38 @@ async function ini_inv_obj_substitution(trop, obj) {   // u_init.c:1179
 async function ini_inv_adjust_obj(trop, obj) {   // u_init.c:1205
     let stop = 0, $t1, $t2, $t3, $t4, $t5, $t6, $t7;
     stop = 0;
-    if (trop.trclass === 12 /* COIN_CLASS */) {
+    if (trop.trclass === COIN_CLASS) {
         obj.quan = u.umoney0;
     } else {
         if (objects[obj.otyp].oc_uses_known) {
             obj.known = (1) & 1;
         }
         $t2 = ($t1 = obj.rknown = (1) & 1, obj.bknown = ($t1) & 1), obj.dknown = ($t2) & 1;
-        if (obj.otyp >= 214 /* LARGE_BOX */ && obj.otyp <= 220 /* BAG_OF_TRICKS */ || obj.otyp === 476 /* STATUE */) {
+        if (obj.otyp >= LARGE_BOX && obj.otyp <= BAG_OF_TRICKS || obj.otyp === STATUE) {
             $t3 = obj.lknown = (1) & 1, obj.cknown = ($t3) & 1;
             obj.otrapped = (0) & 1;
         }
         obj.cursed = (0) & 1;
-        if (obj.otrapped | 0 && u.ualign.type !== -1) {
+        if (obj.otrapped | 0 && u.ualign.type !== A_CHAOTIC) {
             obj.otrapped = (0) & 1;
         }
-        if (obj.oclass === 2 /* WEAPON_CLASS */ || obj.oclass === 6 /* TOOL_CLASS */) {
+        if (obj.oclass === WEAPON_CLASS || obj.oclass === TOOL_CLASS) {
             $t4 = trquan(trop), obj.quan = $t4;
             stop = 1;
-        } else if (obj.oclass === 13 /* GEM_CLASS */ && (obj.otyp === 470 /* LUCKSTONE */ || obj.otyp === 471 /* LOADSTONE */ || obj.otyp === 473 /* FLINT */ || obj.otyp === 472 /* TOUCHSTONE */) && obj.otyp !== 473 /* FLINT */) {
+        } else if (obj.oclass === GEM_CLASS && (obj.otyp === LUCKSTONE || obj.otyp === LOADSTONE || obj.otyp === FLINT || obj.otyp === TOUCHSTONE) && obj.otyp !== FLINT) {
             obj.quan = 1;
         }
         if (trop.trspe !== 127) {
             obj.spe = trop.trspe;
-            if (trop.trotyp === 242 /* MAGIC_MARKER */ && obj.spe < 96) {
+            if (trop.trotyp === MAGIC_MARKER && obj.spe < 96) {
                 $t5 = rn2(4), obj.spe = $c.i8(obj.spe + $t5 | 0);
             }
         } else {
-            if (objects[obj.otyp].oc_class === 4 /* RING_CLASS */ && objects[obj.otyp].oc_charged | 0 && obj.spe <= 0) {
+            if (objects[obj.otyp].oc_class === RING_CLASS && objects[obj.otyp].oc_charged | 0 && obj.spe <= 0) {
                 $t6 = $c.i8(rne(3)), obj.spe = $t6;
             }
         }
-        if (trop.trbless !== 2) {
+        if (trop.trbless !== UNDEF_BLESS) {
             obj.blessed = (trop.trbless >>> 0) & 1;
         }
     }
@@ -550,39 +565,39 @@ async function ini_inv_use_obj(obj) {   // u_init.c:1251
     if (obj_descr[objects[obj.otyp].oc_descr_idx].oc_descr && obj.known | 0) {
         await discover_object(obj.otyp, 1, 1, 0);
     }
-    if (obj.otyp === 227 /* OIL_LAMP */) {
-        await discover_object(321 /* POT_OIL */, 1, 1, 0);
+    if (obj.otyp === OIL_LAMP) {
+        await discover_object(POT_OIL, 1, 1, 0);
     }
-    if (obj.oclass === 3 /* ARMOR_CLASS */) {
-        if (obj.oclass === 3 /* ARMOR_CLASS */ && objects[obj.otyp].oc_subtyp === 1 /* ARM_SHIELD */ && !$G.uarms && !($G.uwep && (($G.uwep.oclass === 2 /* WEAPON_CLASS */ || $G.uwep.oclass === 6 /* TOOL_CLASS */) && objects[$G.uwep.otyp].oc_big | 0))) {
+    if (obj.oclass === ARMOR_CLASS) {
+        if (obj.oclass === ARMOR_CLASS && objects[obj.otyp].oc_subtyp === ARM_SHIELD && !$G.uarms && !($G.uwep && (($G.uwep.oclass === WEAPON_CLASS || $G.uwep.oclass === TOOL_CLASS) && objects[$G.uwep.otyp].oc_big | 0))) {
             set_twoweap(0);
-            await setworn(obj, 8);
-        } else if (obj.oclass === 3 /* ARMOR_CLASS */ && objects[obj.otyp].oc_subtyp === 2 /* ARM_HELM */ && !$G.uarmh) {
-            await setworn(obj, 4);
-        } else if (obj.oclass === 3 /* ARMOR_CLASS */ && objects[obj.otyp].oc_subtyp === 3 /* ARM_GLOVES */ && !$G.uarmg) {
-            await setworn(obj, 16);
-        } else if (obj.oclass === 3 /* ARMOR_CLASS */ && objects[obj.otyp].oc_subtyp === 6 /* ARM_SHIRT */ && !$G.uarmu) {
-            await setworn(obj, 64);
-        } else if (obj.oclass === 3 /* ARMOR_CLASS */ && objects[obj.otyp].oc_subtyp === 5 /* ARM_CLOAK */ && !$G.uarmc) {
-            await setworn(obj, 2);
-        } else if (obj.oclass === 3 /* ARMOR_CLASS */ && objects[obj.otyp].oc_subtyp === 4 /* ARM_BOOTS */ && !$G.uarmf) {
-            await setworn(obj, 32);
-        } else if (obj.oclass === 3 /* ARMOR_CLASS */ && objects[obj.otyp].oc_subtyp === 0 /* ARM_SUIT */ && !$G.uarm) {
-            await setworn(obj, 1);
+            await setworn(obj, W_ARMS);
+        } else if (obj.oclass === ARMOR_CLASS && objects[obj.otyp].oc_subtyp === ARM_HELM && !$G.uarmh) {
+            await setworn(obj, W_ARMH);
+        } else if (obj.oclass === ARMOR_CLASS && objects[obj.otyp].oc_subtyp === ARM_GLOVES && !$G.uarmg) {
+            await setworn(obj, W_ARMG);
+        } else if (obj.oclass === ARMOR_CLASS && objects[obj.otyp].oc_subtyp === ARM_SHIRT && !$G.uarmu) {
+            await setworn(obj, W_ARMU);
+        } else if (obj.oclass === ARMOR_CLASS && objects[obj.otyp].oc_subtyp === ARM_CLOAK && !$G.uarmc) {
+            await setworn(obj, W_ARMC);
+        } else if (obj.oclass === ARMOR_CLASS && objects[obj.otyp].oc_subtyp === ARM_BOOTS && !$G.uarmf) {
+            await setworn(obj, W_ARMF);
+        } else if (obj.oclass === ARMOR_CLASS && objects[obj.otyp].oc_subtyp === ARM_SUIT && !$G.uarm) {
+            await setworn(obj, W_ARM);
         }
     }
-    if (obj.oclass === 2 /* WEAPON_CLASS */ || obj.oclass === 6 /* TOOL_CLASS */ && objects[obj.otyp].oc_subtyp !== 0 /* P_NONE */ || obj.otyp === 239 /* TIN_OPENER */ || obj.otyp === 473 /* FLINT */ || obj.otyp === 474 /* ROCK */) {
-        if ((obj.oclass === 2 /* WEAPON_CLASS */ || obj.oclass === 13 /* GEM_CLASS */) && objects[obj.otyp].oc_subtyp >= -22 && objects[obj.otyp].oc_subtyp <= -20 || (obj.oclass === 2 /* WEAPON_CLASS */ || obj.oclass === 6 /* TOOL_CLASS */) && objects[obj.otyp].oc_subtyp >= -25 && objects[obj.otyp].oc_subtyp <= -23) {
+    if (obj.oclass === WEAPON_CLASS || obj.oclass === TOOL_CLASS && objects[obj.otyp].oc_subtyp !== P_NONE || obj.otyp === TIN_OPENER || obj.otyp === FLINT || obj.otyp === ROCK) {
+        if ((obj.oclass === WEAPON_CLASS || obj.oclass === GEM_CLASS) && objects[obj.otyp].oc_subtyp >= -P_CROSSBOW && objects[obj.otyp].oc_subtyp <= -P_BOW || (obj.oclass === WEAPON_CLASS || obj.oclass === TOOL_CLASS) && objects[obj.otyp].oc_subtyp >= -P_BOOMERANG && objects[obj.otyp].oc_subtyp <= -P_DART) {
             if (!$G.uquiver) {
                 await setuqwep(obj);
             }
-        } else if (!$G.uwep && (!$G.uarms || !((obj.oclass === 2 /* WEAPON_CLASS */ || obj.oclass === 6 /* TOOL_CLASS */) && objects[obj.otyp].oc_big | 0))) {
+        } else if (!$G.uwep && (!$G.uarms || !((obj.oclass === WEAPON_CLASS || obj.oclass === TOOL_CLASS) && objects[obj.otyp].oc_big | 0))) {
             await setuwep(obj);
         } else if (!$G.uswapwep) {
             await setuswapwep(obj);
         }
     }
-    if (obj.oclass === 10 /* SPBOOK_CLASS */ && obj.otyp !== 407 /* SPE_BLANK_PAPER */) {
+    if (obj.oclass === SPBOOK_CLASS && obj.otyp !== SPE_BLANK_PAPER) {
         await initialspell(obj);
     }
 }
@@ -595,29 +610,29 @@ async function ini_inv(trop) {   // u_init.c:1298
     quan = trquan(trop);
     while (trop.trclass) {
         otyp = trop.trotyp;
-        if (otyp !== 0) {
+        if (otyp !== UNDEF_TYP) {
             obj = await mksobj(otyp, 1, 0);
         } else {
             obj = await ini_inv_mkobj_filter(trop.trclass, got_sp1);
             otyp = obj.otyp;
             switch (otyp) {
-                case 422 /* WAN_POLYMORPH */:
-                case 196 /* RIN_POLYMORPH */:
-                case 316 /* POT_POLYMORPH */:
-                    gn.nocreate = 197;
+                case WAN_POLYMORPH:
+                case RIN_POLYMORPH:
+                case POT_POLYMORPH:
+                    gn.nocreate = RIN_POLYMORPH_CONTROL;
                     break;
-                case 197 /* RIN_POLYMORPH_CONTROL */:
-                    gn.nocreate = 196;
-                    gn.nocreate2 = 399;
-                    gn.nocreate3 = 316;
+                case RIN_POLYMORPH_CONTROL:
+                    gn.nocreate = RIN_POLYMORPH;
+                    gn.nocreate2 = SPE_POLYMORPH;
+                    gn.nocreate3 = POT_POLYMORPH;
             }
-            if (obj.oclass === 4 /* RING_CLASS */ || obj.oclass === 10 /* SPBOOK_CLASS */) {
+            if (obj.oclass === RING_CLASS || obj.oclass === SPBOOK_CLASS) {
                 gn.nocreate4 = $c.i16(otyp);
             }
         }
         otyp = await ini_inv_obj_substitution(trop, obj);
         otyp;
-        if (u.uroleplay.nudist && obj.oclass === 3 /* ARMOR_CLASS */) {
+        if (u.uroleplay.nudist && obj.oclass === ARMOR_CLASS) {
             await dealloc_obj(obj);
             trop = $c.radd(trop, 1);
             continue;
@@ -626,7 +641,7 @@ async function ini_inv(trop) {   // u_init.c:1298
             quan = 1;
         }
         obj = await addinv(obj);
-        if (obj.oclass === 10 /* SPBOOK_CLASS */ && objects[obj.otyp].oc_oc2 === 1) {
+        if (obj.oclass === SPBOOK_CLASS && objects[obj.otyp].oc_oc2 === 1) {
             got_sp1 = 1;
         }
         if (quan = $c.sub64(quan, 1)) {
@@ -675,51 +690,51 @@ export function $init() {
     for (let $i0 = 0; $i0 < 9; $i0++) {
         Archeologist[$i0].$copyFrom(new $T.trobj());
     }
-    Archeologist[0].trotyp = 82;
+    Archeologist[0].trotyp = BULLWHIP;
     Archeologist[0].trspe = 2;
-    Archeologist[0].trclass = 2;
+    Archeologist[0].trclass = WEAPON_CLASS;
     Archeologist[0].trquan_min = 1;
     Archeologist[0].trquan_max = 1;
-    Archeologist[0].trbless = 2;
-    Archeologist[1].trotyp = 135;
+    Archeologist[0].trbless = UNDEF_BLESS;
+    Archeologist[1].trotyp = LEATHER_JACKET;
     Archeologist[1].trspe = 0;
-    Archeologist[1].trclass = 3;
+    Archeologist[1].trclass = ARMOR_CLASS;
     Archeologist[1].trquan_min = 1;
     Archeologist[1].trquan_max = 1;
-    Archeologist[1].trbless = 2;
-    Archeologist[2].trotyp = 92;
+    Archeologist[1].trbless = UNDEF_BLESS;
+    Archeologist[2].trotyp = FEDORA;
     Archeologist[2].trspe = 0;
-    Archeologist[2].trclass = 3;
+    Archeologist[2].trclass = ARMOR_CLASS;
     Archeologist[2].trquan_min = 1;
     Archeologist[2].trquan_max = 1;
-    Archeologist[2].trbless = 2;
-    Archeologist[3].trotyp = 293;
+    Archeologist[2].trbless = UNDEF_BLESS;
+    Archeologist[3].trotyp = FOOD_RATION;
     Archeologist[3].trspe = 0;
-    Archeologist[3].trclass = 7;
+    Archeologist[3].trclass = FOOD_CLASS;
     Archeologist[3].trquan_min = 3;
     Archeologist[3].trquan_max = 3;
     Archeologist[3].trbless = 0;
-    Archeologist[4].trotyp = 259;
+    Archeologist[4].trotyp = PICK_AXE;
     Archeologist[4].trspe = 127;
-    Archeologist[4].trclass = 6;
+    Archeologist[4].trclass = TOOL_CLASS;
     Archeologist[4].trquan_min = 1;
     Archeologist[4].trquan_max = 1;
-    Archeologist[4].trbless = 2;
-    Archeologist[5].trotyp = 238;
+    Archeologist[4].trbless = UNDEF_BLESS;
+    Archeologist[5].trotyp = TINNING_KIT;
     Archeologist[5].trspe = 127;
-    Archeologist[5].trclass = 6;
+    Archeologist[5].trclass = TOOL_CLASS;
     Archeologist[5].trquan_min = 1;
     Archeologist[5].trquan_max = 1;
-    Archeologist[5].trbless = 2;
-    Archeologist[6].trotyp = 472;
+    Archeologist[5].trbless = UNDEF_BLESS;
+    Archeologist[6].trotyp = TOUCHSTONE;
     Archeologist[6].trspe = 0;
-    Archeologist[6].trclass = 13;
+    Archeologist[6].trclass = GEM_CLASS;
     Archeologist[6].trquan_min = 1;
     Archeologist[6].trquan_max = 1;
     Archeologist[6].trbless = 0;
-    Archeologist[7].trotyp = 217;
+    Archeologist[7].trotyp = SACK;
     Archeologist[7].trspe = 0;
-    Archeologist[7].trclass = 6;
+    Archeologist[7].trclass = TOOL_CLASS;
     Archeologist[7].trquan_min = 1;
     Archeologist[7].trquan_max = 1;
     Archeologist[7].trbless = 0;
@@ -732,27 +747,27 @@ export function $init() {
     for (let $i0 = 0; $i0 < 5; $i0++) {
         Barbarian_0[$i0].$copyFrom(new $T.trobj());
     }
-    Barbarian_0[0].trotyp = 55;
+    Barbarian_0[0].trotyp = TWO_HANDED_SWORD;
     Barbarian_0[0].trspe = 0;
-    Barbarian_0[0].trclass = 2;
+    Barbarian_0[0].trclass = WEAPON_CLASS;
     Barbarian_0[0].trquan_min = 1;
     Barbarian_0[0].trquan_max = 1;
-    Barbarian_0[0].trbless = 2;
-    Barbarian_0[1].trotyp = 44;
+    Barbarian_0[0].trbless = UNDEF_BLESS;
+    Barbarian_0[1].trotyp = AXE;
     Barbarian_0[1].trspe = 0;
-    Barbarian_0[1].trclass = 2;
+    Barbarian_0[1].trclass = WEAPON_CLASS;
     Barbarian_0[1].trquan_min = 1;
     Barbarian_0[1].trquan_max = 1;
-    Barbarian_0[1].trbless = 2;
-    Barbarian_0[2].trotyp = 132;
+    Barbarian_0[1].trbless = UNDEF_BLESS;
+    Barbarian_0[2].trotyp = RING_MAIL;
     Barbarian_0[2].trspe = 0;
-    Barbarian_0[2].trclass = 3;
+    Barbarian_0[2].trclass = ARMOR_CLASS;
     Barbarian_0[2].trquan_min = 1;
     Barbarian_0[2].trquan_max = 1;
-    Barbarian_0[2].trbless = 2;
-    Barbarian_0[3].trotyp = 293;
+    Barbarian_0[2].trbless = UNDEF_BLESS;
+    Barbarian_0[3].trotyp = FOOD_RATION;
     Barbarian_0[3].trspe = 0;
-    Barbarian_0[3].trclass = 7;
+    Barbarian_0[3].trclass = FOOD_CLASS;
     Barbarian_0[3].trquan_min = 1;
     Barbarian_0[3].trquan_max = 1;
     Barbarian_0[3].trbless = 0;
@@ -765,27 +780,27 @@ export function $init() {
     for (let $i0 = 0; $i0 < 5; $i0++) {
         Barbarian_1[$i0].$copyFrom(new $T.trobj());
     }
-    Barbarian_1[0].trotyp = 45;
+    Barbarian_1[0].trotyp = BATTLE_AXE;
     Barbarian_1[0].trspe = 0;
-    Barbarian_1[0].trclass = 2;
+    Barbarian_1[0].trclass = WEAPON_CLASS;
     Barbarian_1[0].trquan_min = 1;
     Barbarian_1[0].trquan_max = 1;
-    Barbarian_1[0].trbless = 2;
-    Barbarian_1[1].trotyp = 46;
+    Barbarian_1[0].trbless = UNDEF_BLESS;
+    Barbarian_1[1].trotyp = SHORT_SWORD;
     Barbarian_1[1].trspe = 0;
-    Barbarian_1[1].trclass = 2;
+    Barbarian_1[1].trclass = WEAPON_CLASS;
     Barbarian_1[1].trquan_min = 1;
     Barbarian_1[1].trquan_max = 1;
-    Barbarian_1[1].trbless = 2;
-    Barbarian_1[2].trotyp = 132;
+    Barbarian_1[1].trbless = UNDEF_BLESS;
+    Barbarian_1[2].trotyp = RING_MAIL;
     Barbarian_1[2].trspe = 0;
-    Barbarian_1[2].trclass = 3;
+    Barbarian_1[2].trclass = ARMOR_CLASS;
     Barbarian_1[2].trquan_min = 1;
     Barbarian_1[2].trquan_max = 1;
-    Barbarian_1[2].trbless = 2;
-    Barbarian_1[3].trotyp = 293;
+    Barbarian_1[2].trbless = UNDEF_BLESS;
+    Barbarian_1[3].trotyp = FOOD_RATION;
     Barbarian_1[3].trspe = 0;
-    Barbarian_1[3].trclass = 7;
+    Barbarian_1[3].trclass = FOOD_CLASS;
     Barbarian_1[3].trquan_min = 1;
     Barbarian_1[3].trquan_max = 1;
     Barbarian_1[3].trbless = 0;
@@ -798,36 +813,36 @@ export function $init() {
     for (let $i0 = 0; $i0 < 6; $i0++) {
         Cave_man[$i0].$copyFrom(new $T.trobj());
     }
-    Cave_man[0].trotyp = 77;
+    Cave_man[0].trotyp = CLUB;
     Cave_man[0].trspe = 1;
-    Cave_man[0].trclass = 2;
+    Cave_man[0].trclass = WEAPON_CLASS;
     Cave_man[0].trquan_min = 1;
     Cave_man[0].trquan_max = 1;
-    Cave_man[0].trbless = 2;
-    Cave_man[1].trotyp = 87;
+    Cave_man[0].trbless = UNDEF_BLESS;
+    Cave_man[1].trotyp = SLING;
     Cave_man[1].trspe = 2;
-    Cave_man[1].trclass = 2;
+    Cave_man[1].trclass = WEAPON_CLASS;
     Cave_man[1].trquan_min = 1;
     Cave_man[1].trquan_max = 1;
-    Cave_man[1].trbless = 2;
-    Cave_man[2].trotyp = 473;
+    Cave_man[1].trbless = UNDEF_BLESS;
+    Cave_man[2].trotyp = FLINT;
     Cave_man[2].trspe = 0;
-    Cave_man[2].trclass = 13;
+    Cave_man[2].trclass = GEM_CLASS;
     Cave_man[2].trquan_min = 10;
     Cave_man[2].trquan_max = 20;
-    Cave_man[2].trbless = 2;
-    Cave_man[3].trotyp = 474;
+    Cave_man[2].trbless = UNDEF_BLESS;
+    Cave_man[3].trotyp = ROCK;
     Cave_man[3].trspe = 0;
-    Cave_man[3].trclass = 13;
+    Cave_man[3].trclass = GEM_CLASS;
     Cave_man[3].trquan_min = 3;
     Cave_man[3].trquan_max = 3;
     Cave_man[3].trbless = 0;
-    Cave_man[4].trotyp = 134;
+    Cave_man[4].trotyp = LEATHER_ARMOR;
     Cave_man[4].trspe = 0;
-    Cave_man[4].trclass = 3;
+    Cave_man[4].trclass = ARMOR_CLASS;
     Cave_man[4].trquan_min = 1;
     Cave_man[4].trquan_max = 1;
-    Cave_man[4].trbless = 2;
+    Cave_man[4].trbless = UNDEF_BLESS;
     Cave_man[5].trotyp = 0;
     Cave_man[5].trspe = 0;
     Cave_man[5].trclass = 0;
@@ -837,63 +852,63 @@ export function $init() {
     for (let $i0 = 0; $i0 < 11; $i0++) {
         Healer[$i0].$copyFrom(new $T.trobj());
     }
-    Healer[0].trotyp = 39;
+    Healer[0].trotyp = SCALPEL;
     Healer[0].trspe = 0;
-    Healer[0].trclass = 2;
+    Healer[0].trclass = WEAPON_CLASS;
     Healer[0].trquan_min = 1;
     Healer[0].trquan_max = 1;
-    Healer[0].trbless = 2;
-    Healer[1].trotyp = 159;
+    Healer[0].trbless = UNDEF_BLESS;
+    Healer[1].trotyp = LEATHER_GLOVES;
     Healer[1].trspe = 1;
-    Healer[1].trclass = 3;
+    Healer[1].trclass = ARMOR_CLASS;
     Healer[1].trquan_min = 1;
     Healer[1].trquan_max = 1;
-    Healer[1].trbless = 2;
-    Healer[2].trotyp = 237;
+    Healer[1].trbless = UNDEF_BLESS;
+    Healer[2].trotyp = STETHOSCOPE;
     Healer[2].trspe = 0;
-    Healer[2].trclass = 6;
+    Healer[2].trclass = TOOL_CLASS;
     Healer[2].trquan_min = 1;
     Healer[2].trquan_max = 1;
     Healer[2].trbless = 0;
-    Healer[3].trotyp = 307;
+    Healer[3].trotyp = POT_HEALING;
     Healer[3].trspe = 0;
-    Healer[3].trclass = 8;
+    Healer[3].trclass = POTION_CLASS;
     Healer[3].trquan_min = 4;
     Healer[3].trquan_max = 4;
-    Healer[3].trbless = 2;
-    Healer[4].trotyp = 308;
+    Healer[3].trbless = UNDEF_BLESS;
+    Healer[4].trotyp = POT_EXTRA_HEALING;
     Healer[4].trspe = 0;
-    Healer[4].trclass = 8;
+    Healer[4].trclass = POTION_CLASS;
     Healer[4].trquan_min = 4;
     Healer[4].trquan_max = 4;
-    Healer[4].trbless = 2;
-    Healer[5].trotyp = 432;
+    Healer[4].trbless = UNDEF_BLESS;
+    Healer[5].trotyp = WAN_SLEEP;
     Healer[5].trspe = 127;
-    Healer[5].trclass = 11;
+    Healer[5].trclass = WAND_CLASS;
     Healer[5].trquan_min = 1;
     Healer[5].trquan_max = 1;
-    Healer[5].trbless = 2;
-    Healer[6].trotyp = 374;
+    Healer[5].trbless = UNDEF_BLESS;
+    Healer[6].trotyp = SPE_HEALING;
     Healer[6].trspe = 0;
-    Healer[6].trclass = 10;
+    Healer[6].trclass = SPBOOK_CLASS;
     Healer[6].trquan_min = 1;
     Healer[6].trquan_max = 1;
     Healer[6].trbless = 1;
-    Healer[7].trotyp = 391;
+    Healer[7].trotyp = SPE_EXTRA_HEALING;
     Healer[7].trspe = 0;
-    Healer[7].trclass = 10;
+    Healer[7].trclass = SPBOOK_CLASS;
     Healer[7].trquan_min = 1;
     Healer[7].trquan_max = 1;
     Healer[7].trbless = 1;
-    Healer[8].trotyp = 405;
+    Healer[8].trotyp = SPE_STONE_TO_FLESH;
     Healer[8].trspe = 0;
-    Healer[8].trclass = 10;
+    Healer[8].trclass = SPBOOK_CLASS;
     Healer[8].trquan_min = 1;
     Healer[8].trquan_max = 1;
     Healer[8].trbless = 1;
-    Healer[9].trotyp = 277;
+    Healer[9].trotyp = APPLE;
     Healer[9].trspe = 0;
-    Healer[9].trclass = 7;
+    Healer[9].trclass = FOOD_CLASS;
     Healer[9].trquan_min = 5;
     Healer[9].trquan_max = 5;
     Healer[9].trbless = 0;
@@ -906,51 +921,51 @@ export function $init() {
     for (let $i0 = 0; $i0 < 9; $i0++) {
         Knight[$i0].$copyFrom(new $T.trobj());
     }
-    Knight[0].trotyp = 54;
+    Knight[0].trotyp = LONG_SWORD;
     Knight[0].trspe = 1;
-    Knight[0].trclass = 2;
+    Knight[0].trclass = WEAPON_CLASS;
     Knight[0].trquan_min = 1;
     Knight[0].trquan_max = 1;
-    Knight[0].trbless = 2;
-    Knight[1].trotyp = 72;
+    Knight[0].trbless = UNDEF_BLESS;
+    Knight[1].trotyp = LANCE;
     Knight[1].trspe = 1;
-    Knight[1].trclass = 2;
+    Knight[1].trclass = WEAPON_CLASS;
     Knight[1].trquan_min = 1;
     Knight[1].trquan_max = 1;
-    Knight[1].trbless = 2;
-    Knight[2].trotyp = 132;
+    Knight[1].trbless = UNDEF_BLESS;
+    Knight[2].trotyp = RING_MAIL;
     Knight[2].trspe = 1;
-    Knight[2].trclass = 3;
+    Knight[2].trclass = ARMOR_CLASS;
     Knight[2].trquan_min = 1;
     Knight[2].trquan_max = 1;
-    Knight[2].trbless = 2;
-    Knight[3].trotyp = 97;
+    Knight[2].trbless = UNDEF_BLESS;
+    Knight[3].trotyp = HELMET;
     Knight[3].trspe = 0;
-    Knight[3].trclass = 3;
+    Knight[3].trclass = ARMOR_CLASS;
     Knight[3].trquan_min = 1;
     Knight[3].trquan_max = 1;
-    Knight[3].trbless = 2;
-    Knight[4].trotyp = 150;
+    Knight[3].trbless = UNDEF_BLESS;
+    Knight[4].trotyp = SMALL_SHIELD;
     Knight[4].trspe = 0;
-    Knight[4].trclass = 3;
+    Knight[4].trclass = ARMOR_CLASS;
     Knight[4].trquan_min = 1;
     Knight[4].trquan_max = 1;
-    Knight[4].trbless = 2;
-    Knight[5].trotyp = 159;
+    Knight[4].trbless = UNDEF_BLESS;
+    Knight[5].trotyp = LEATHER_GLOVES;
     Knight[5].trspe = 0;
-    Knight[5].trclass = 3;
+    Knight[5].trclass = ARMOR_CLASS;
     Knight[5].trquan_min = 1;
     Knight[5].trquan_max = 1;
-    Knight[5].trbless = 2;
-    Knight[6].trotyp = 277;
+    Knight[5].trbless = UNDEF_BLESS;
+    Knight[6].trotyp = APPLE;
     Knight[6].trspe = 0;
-    Knight[6].trclass = 7;
+    Knight[6].trclass = FOOD_CLASS;
     Knight[6].trquan_min = 10;
     Knight[6].trquan_max = 10;
     Knight[6].trbless = 0;
-    Knight[7].trotyp = 282;
+    Knight[7].trotyp = CARROT;
     Knight[7].trspe = 0;
-    Knight[7].trclass = 7;
+    Knight[7].trclass = FOOD_CLASS;
     Knight[7].trquan_min = 10;
     Knight[7].trquan_max = 10;
     Knight[7].trbless = 0;
@@ -963,54 +978,54 @@ export function $init() {
     for (let $i0 = 0; $i0 < 9; $i0++) {
         Monk[$i0].$copyFrom(new $T.trobj());
     }
-    Monk[0].trotyp = 159;
+    Monk[0].trotyp = LEATHER_GLOVES;
     Monk[0].trspe = 2;
-    Monk[0].trclass = 3;
+    Monk[0].trclass = ARMOR_CLASS;
     Monk[0].trquan_min = 1;
     Monk[0].trquan_max = 1;
-    Monk[0].trbless = 2;
-    Monk[1].trotyp = 143;
+    Monk[0].trbless = UNDEF_BLESS;
+    Monk[1].trotyp = ROBE;
     Monk[1].trspe = 1;
-    Monk[1].trclass = 3;
+    Monk[1].trclass = ARMOR_CLASS;
     Monk[1].trquan_min = 1;
     Monk[1].trquan_max = 1;
-    Monk[1].trbless = 2;
-    Monk[2].trotyp = 0;
+    Monk[1].trbless = UNDEF_BLESS;
+    Monk[2].trotyp = UNDEF_TYP;
     Monk[2].trspe = 127;
-    Monk[2].trclass = 9;
+    Monk[2].trclass = SCROLL_CLASS;
     Monk[2].trquan_min = 1;
     Monk[2].trquan_max = 1;
-    Monk[2].trbless = 2;
-    Monk[3].trotyp = 307;
+    Monk[2].trbless = UNDEF_BLESS;
+    Monk[3].trotyp = POT_HEALING;
     Monk[3].trspe = 0;
-    Monk[3].trclass = 8;
+    Monk[3].trclass = POTION_CLASS;
     Monk[3].trquan_min = 3;
     Monk[3].trquan_max = 3;
-    Monk[3].trbless = 2;
-    Monk[4].trotyp = 293;
+    Monk[3].trbless = UNDEF_BLESS;
+    Monk[4].trotyp = FOOD_RATION;
     Monk[4].trspe = 0;
-    Monk[4].trclass = 7;
+    Monk[4].trclass = FOOD_CLASS;
     Monk[4].trquan_min = 3;
     Monk[4].trquan_max = 3;
     Monk[4].trbless = 0;
-    Monk[5].trotyp = 277;
+    Monk[5].trotyp = APPLE;
     Monk[5].trspe = 0;
-    Monk[5].trclass = 7;
+    Monk[5].trclass = FOOD_CLASS;
     Monk[5].trquan_min = 5;
     Monk[5].trquan_max = 5;
-    Monk[5].trbless = 2;
-    Monk[6].trotyp = 278;
+    Monk[5].trbless = UNDEF_BLESS;
+    Monk[6].trotyp = ORANGE;
     Monk[6].trspe = 0;
-    Monk[6].trclass = 7;
+    Monk[6].trclass = FOOD_CLASS;
     Monk[6].trquan_min = 5;
     Monk[6].trquan_max = 5;
-    Monk[6].trbless = 2;
-    Monk[7].trotyp = 289;
+    Monk[6].trbless = UNDEF_BLESS;
+    Monk[7].trotyp = FORTUNE_COOKIE;
     Monk[7].trspe = 0;
-    Monk[7].trclass = 7;
+    Monk[7].trclass = FOOD_CLASS;
     Monk[7].trquan_min = 3;
     Monk[7].trquan_max = 3;
-    Monk[7].trbless = 2;
+    Monk[7].trbless = UNDEF_BLESS;
     Monk[8].trotyp = 0;
     Monk[8].trspe = 0;
     Monk[8].trclass = 0;
@@ -1020,48 +1035,48 @@ export function $init() {
     for (let $i0 = 0; $i0 < 8; $i0++) {
         Priest[$i0].$copyFrom(new $T.trobj());
     }
-    Priest[0].trotyp = 73;
+    Priest[0].trotyp = MACE;
     Priest[0].trspe = 1;
-    Priest[0].trclass = 2;
+    Priest[0].trclass = WEAPON_CLASS;
     Priest[0].trquan_min = 1;
     Priest[0].trquan_max = 1;
     Priest[0].trbless = 1;
-    Priest[1].trotyp = 143;
+    Priest[1].trotyp = ROBE;
     Priest[1].trspe = 0;
-    Priest[1].trclass = 3;
+    Priest[1].trclass = ARMOR_CLASS;
     Priest[1].trquan_min = 1;
     Priest[1].trquan_max = 1;
-    Priest[1].trbless = 2;
-    Priest[2].trotyp = 150;
+    Priest[1].trbless = UNDEF_BLESS;
+    Priest[2].trotyp = SMALL_SHIELD;
     Priest[2].trspe = 0;
-    Priest[2].trclass = 3;
+    Priest[2].trclass = ARMOR_CLASS;
     Priest[2].trquan_min = 1;
     Priest[2].trquan_max = 1;
-    Priest[2].trbless = 2;
-    Priest[3].trotyp = 322;
+    Priest[2].trbless = UNDEF_BLESS;
+    Priest[3].trotyp = POT_WATER;
     Priest[3].trspe = 0;
-    Priest[3].trclass = 8;
+    Priest[3].trclass = POTION_CLASS;
     Priest[3].trquan_min = 4;
     Priest[3].trquan_max = 4;
     Priest[3].trbless = 1;
-    Priest[4].trotyp = 284;
+    Priest[4].trotyp = CLOVE_OF_GARLIC;
     Priest[4].trspe = 0;
-    Priest[4].trclass = 7;
+    Priest[4].trclass = FOOD_CLASS;
     Priest[4].trquan_min = 1;
     Priest[4].trquan_max = 1;
     Priest[4].trbless = 0;
-    Priest[5].trotyp = 283;
+    Priest[5].trotyp = SPRIG_OF_WOLFSBANE;
     Priest[5].trspe = 0;
-    Priest[5].trclass = 7;
+    Priest[5].trclass = FOOD_CLASS;
     Priest[5].trquan_min = 1;
     Priest[5].trquan_max = 1;
     Priest[5].trbless = 0;
-    Priest[6].trotyp = 0;
+    Priest[6].trotyp = UNDEF_TYP;
     Priest[6].trspe = 127;
-    Priest[6].trclass = 10;
+    Priest[6].trclass = SPBOOK_CLASS;
     Priest[6].trquan_min = 2;
     Priest[6].trquan_max = 2;
-    Priest[6].trbless = 2;
+    Priest[6].trbless = UNDEF_BLESS;
     Priest[7].trotyp = 0;
     Priest[7].trspe = 0;
     Priest[7].trclass = 0;
@@ -1071,39 +1086,39 @@ export function $init() {
     for (let $i0 = 0; $i0 < 7; $i0++) {
         Ranger[$i0].$copyFrom(new $T.trobj());
     }
-    Ranger[0].trotyp = 34;
+    Ranger[0].trotyp = DAGGER;
     Ranger[0].trspe = 1;
-    Ranger[0].trclass = 2;
+    Ranger[0].trclass = WEAPON_CLASS;
     Ranger[0].trquan_min = 1;
     Ranger[0].trquan_max = 1;
-    Ranger[0].trbless = 2;
-    Ranger[1].trotyp = 83;
+    Ranger[0].trbless = UNDEF_BLESS;
+    Ranger[1].trotyp = BOW;
     Ranger[1].trspe = 1;
-    Ranger[1].trclass = 2;
+    Ranger[1].trclass = WEAPON_CLASS;
     Ranger[1].trquan_min = 1;
     Ranger[1].trquan_max = 1;
-    Ranger[1].trbless = 2;
-    Ranger[2].trotyp = 18;
+    Ranger[1].trbless = UNDEF_BLESS;
+    Ranger[2].trotyp = ARROW;
     Ranger[2].trspe = 2;
-    Ranger[2].trclass = 2;
+    Ranger[2].trclass = WEAPON_CLASS;
     Ranger[2].trquan_min = 50;
     Ranger[2].trquan_max = 59;
-    Ranger[2].trbless = 2;
-    Ranger[3].trotyp = 18;
+    Ranger[2].trbless = UNDEF_BLESS;
+    Ranger[3].trotyp = ARROW;
     Ranger[3].trspe = 0;
-    Ranger[3].trclass = 2;
+    Ranger[3].trclass = WEAPON_CLASS;
     Ranger[3].trquan_min = 30;
     Ranger[3].trquan_max = 39;
-    Ranger[3].trbless = 2;
-    Ranger[4].trotyp = 149;
+    Ranger[3].trbless = UNDEF_BLESS;
+    Ranger[4].trotyp = CLOAK_OF_DISPLACEMENT;
     Ranger[4].trspe = 2;
-    Ranger[4].trclass = 3;
+    Ranger[4].trclass = ARMOR_CLASS;
     Ranger[4].trquan_min = 1;
     Ranger[4].trquan_max = 1;
-    Ranger[4].trbless = 2;
-    Ranger[5].trotyp = 292;
+    Ranger[4].trbless = UNDEF_BLESS;
+    Ranger[5].trotyp = CRAM_RATION;
     Ranger[5].trspe = 0;
-    Ranger[5].trclass = 7;
+    Ranger[5].trclass = FOOD_CLASS;
     Ranger[5].trquan_min = 4;
     Ranger[5].trquan_max = 4;
     Ranger[5].trbless = 0;
@@ -1116,39 +1131,39 @@ export function $init() {
     for (let $i0 = 0; $i0 < 7; $i0++) {
         Rogue[$i0].$copyFrom(new $T.trobj());
     }
-    Rogue[0].trotyp = 46;
+    Rogue[0].trotyp = SHORT_SWORD;
     Rogue[0].trspe = 0;
-    Rogue[0].trclass = 2;
+    Rogue[0].trclass = WEAPON_CLASS;
     Rogue[0].trquan_min = 1;
     Rogue[0].trquan_max = 1;
-    Rogue[0].trbless = 2;
-    Rogue[1].trotyp = 34;
+    Rogue[0].trbless = UNDEF_BLESS;
+    Rogue[1].trotyp = DAGGER;
     Rogue[1].trspe = 0;
-    Rogue[1].trclass = 2;
+    Rogue[1].trclass = WEAPON_CLASS;
     Rogue[1].trquan_min = 6;
     Rogue[1].trquan_max = 15;
     Rogue[1].trbless = 0;
-    Rogue[2].trotyp = 134;
+    Rogue[2].trotyp = LEATHER_ARMOR;
     Rogue[2].trspe = 1;
-    Rogue[2].trclass = 3;
+    Rogue[2].trclass = ARMOR_CLASS;
     Rogue[2].trquan_min = 1;
     Rogue[2].trquan_max = 1;
-    Rogue[2].trbless = 2;
-    Rogue[3].trotyp = 318;
+    Rogue[2].trbless = UNDEF_BLESS;
+    Rogue[3].trotyp = POT_SICKNESS;
     Rogue[3].trspe = 0;
-    Rogue[3].trclass = 8;
+    Rogue[3].trclass = POTION_CLASS;
     Rogue[3].trquan_min = 1;
     Rogue[3].trquan_max = 1;
     Rogue[3].trbless = 0;
-    Rogue[4].trotyp = 222;
+    Rogue[4].trotyp = LOCK_PICK;
     Rogue[4].trspe = 0;
-    Rogue[4].trclass = 6;
+    Rogue[4].trclass = TOOL_CLASS;
     Rogue[4].trquan_min = 1;
     Rogue[4].trquan_max = 1;
     Rogue[4].trbless = 0;
-    Rogue[5].trotyp = 217;
+    Rogue[5].trotyp = SACK;
     Rogue[5].trspe = 0;
-    Rogue[5].trclass = 6;
+    Rogue[5].trclass = TOOL_CLASS;
     Rogue[5].trquan_min = 1;
     Rogue[5].trquan_max = 1;
     Rogue[5].trbless = 0;
@@ -1161,36 +1176,36 @@ export function $init() {
     for (let $i0 = 0; $i0 < 6; $i0++) {
         Samurai[$i0].$copyFrom(new $T.trobj());
     }
-    Samurai[0].trotyp = 56;
+    Samurai[0].trotyp = KATANA;
     Samurai[0].trspe = 0;
-    Samurai[0].trclass = 2;
+    Samurai[0].trclass = WEAPON_CLASS;
     Samurai[0].trquan_min = 1;
     Samurai[0].trquan_max = 1;
-    Samurai[0].trbless = 2;
-    Samurai[1].trotyp = 46;
+    Samurai[0].trbless = UNDEF_BLESS;
+    Samurai[1].trotyp = SHORT_SWORD;
     Samurai[1].trspe = 0;
-    Samurai[1].trclass = 2;
+    Samurai[1].trclass = WEAPON_CLASS;
     Samurai[1].trquan_min = 1;
     Samurai[1].trquan_max = 1;
-    Samurai[1].trbless = 2;
-    Samurai[2].trotyp = 86;
+    Samurai[1].trbless = UNDEF_BLESS;
+    Samurai[2].trotyp = YUMI;
     Samurai[2].trspe = 0;
-    Samurai[2].trclass = 2;
+    Samurai[2].trclass = WEAPON_CLASS;
     Samurai[2].trquan_min = 1;
     Samurai[2].trquan_max = 1;
-    Samurai[2].trbless = 2;
-    Samurai[3].trotyp = 22;
+    Samurai[2].trbless = UNDEF_BLESS;
+    Samurai[3].trotyp = YA;
     Samurai[3].trspe = 0;
-    Samurai[3].trclass = 2;
+    Samurai[3].trclass = WEAPON_CLASS;
     Samurai[3].trquan_min = 26;
     Samurai[3].trquan_max = 45;
-    Samurai[3].trbless = 2;
-    Samurai[4].trotyp = 124;
+    Samurai[3].trbless = UNDEF_BLESS;
+    Samurai[4].trotyp = SPLINT_MAIL;
     Samurai[4].trspe = 0;
-    Samurai[4].trclass = 3;
+    Samurai[4].trclass = ARMOR_CLASS;
     Samurai[4].trquan_min = 1;
     Samurai[4].trquan_max = 1;
-    Samurai[4].trbless = 2;
+    Samurai[4].trbless = UNDEF_BLESS;
     Samurai[5].trotyp = 0;
     Samurai[5].trspe = 0;
     Samurai[5].trclass = 0;
@@ -1200,45 +1215,45 @@ export function $init() {
     for (let $i0 = 0; $i0 < 8; $i0++) {
         Tourist[$i0].$copyFrom(new $T.trobj());
     }
-    Tourist[0].trotyp = 24;
+    Tourist[0].trotyp = DART;
     Tourist[0].trspe = 2;
-    Tourist[0].trclass = 2;
+    Tourist[0].trclass = WEAPON_CLASS;
     Tourist[0].trquan_min = 21;
     Tourist[0].trquan_max = 40;
-    Tourist[0].trbless = 2;
-    Tourist[1].trotyp = 0;
+    Tourist[0].trbless = UNDEF_BLESS;
+    Tourist[1].trotyp = UNDEF_TYP;
     Tourist[1].trspe = 127;
-    Tourist[1].trclass = 7;
+    Tourist[1].trclass = FOOD_CLASS;
     Tourist[1].trquan_min = 10;
     Tourist[1].trquan_max = 10;
     Tourist[1].trbless = 0;
-    Tourist[2].trotyp = 308;
+    Tourist[2].trotyp = POT_EXTRA_HEALING;
     Tourist[2].trspe = 0;
-    Tourist[2].trclass = 8;
+    Tourist[2].trclass = POTION_CLASS;
     Tourist[2].trquan_min = 2;
     Tourist[2].trquan_max = 2;
-    Tourist[2].trbless = 2;
-    Tourist[3].trotyp = 337;
+    Tourist[2].trbless = UNDEF_BLESS;
+    Tourist[3].trotyp = SCR_MAGIC_MAPPING;
     Tourist[3].trspe = 0;
-    Tourist[3].trclass = 9;
+    Tourist[3].trclass = SCROLL_CLASS;
     Tourist[3].trquan_min = 4;
     Tourist[3].trquan_max = 4;
-    Tourist[3].trbless = 2;
-    Tourist[4].trotyp = 136;
+    Tourist[3].trbless = UNDEF_BLESS;
+    Tourist[4].trotyp = HAWAIIAN_SHIRT;
     Tourist[4].trspe = 0;
-    Tourist[4].trclass = 3;
+    Tourist[4].trclass = ARMOR_CLASS;
     Tourist[4].trquan_min = 1;
     Tourist[4].trquan_max = 1;
-    Tourist[4].trbless = 2;
-    Tourist[5].trotyp = 229;
+    Tourist[4].trbless = UNDEF_BLESS;
+    Tourist[5].trotyp = EXPENSIVE_CAMERA;
     Tourist[5].trspe = 127;
-    Tourist[5].trclass = 6;
+    Tourist[5].trclass = TOOL_CLASS;
     Tourist[5].trquan_min = 1;
     Tourist[5].trquan_max = 1;
     Tourist[5].trbless = 0;
-    Tourist[6].trotyp = 223;
+    Tourist[6].trotyp = CREDIT_CARD;
     Tourist[6].trspe = 0;
-    Tourist[6].trclass = 6;
+    Tourist[6].trclass = TOOL_CLASS;
     Tourist[6].trquan_min = 1;
     Tourist[6].trquan_max = 1;
     Tourist[6].trbless = 0;
@@ -1251,27 +1266,27 @@ export function $init() {
     for (let $i0 = 0; $i0 < 5; $i0++) {
         Valkyrie[$i0].$copyFrom(new $T.trobj());
     }
-    Valkyrie[0].trotyp = 27;
+    Valkyrie[0].trotyp = SPEAR;
     Valkyrie[0].trspe = 1;
-    Valkyrie[0].trclass = 2;
+    Valkyrie[0].trclass = WEAPON_CLASS;
     Valkyrie[0].trquan_min = 1;
     Valkyrie[0].trquan_max = 1;
-    Valkyrie[0].trbless = 2;
-    Valkyrie[1].trotyp = 34;
+    Valkyrie[0].trbless = UNDEF_BLESS;
+    Valkyrie[1].trotyp = DAGGER;
     Valkyrie[1].trspe = 0;
-    Valkyrie[1].trclass = 2;
+    Valkyrie[1].trclass = WEAPON_CLASS;
     Valkyrie[1].trquan_min = 1;
     Valkyrie[1].trquan_max = 1;
-    Valkyrie[1].trbless = 2;
-    Valkyrie[2].trotyp = 150;
+    Valkyrie[1].trbless = UNDEF_BLESS;
+    Valkyrie[2].trotyp = SMALL_SHIELD;
     Valkyrie[2].trspe = 3;
-    Valkyrie[2].trclass = 3;
+    Valkyrie[2].trclass = ARMOR_CLASS;
     Valkyrie[2].trquan_min = 1;
     Valkyrie[2].trquan_max = 1;
-    Valkyrie[2].trbless = 2;
-    Valkyrie[3].trotyp = 293;
+    Valkyrie[2].trbless = UNDEF_BLESS;
+    Valkyrie[3].trotyp = FOOD_RATION;
     Valkyrie[3].trspe = 0;
-    Valkyrie[3].trclass = 7;
+    Valkyrie[3].trclass = FOOD_CLASS;
     Valkyrie[3].trquan_min = 1;
     Valkyrie[3].trquan_max = 1;
     Valkyrie[3].trbless = 0;
@@ -1284,57 +1299,57 @@ export function $init() {
     for (let $i0 = 0; $i0 < 10; $i0++) {
         Wizard[$i0].$copyFrom(new $T.trobj());
     }
-    Wizard[0].trotyp = 79;
+    Wizard[0].trotyp = QUARTERSTAFF;
     Wizard[0].trspe = 1;
-    Wizard[0].trclass = 2;
+    Wizard[0].trclass = WEAPON_CLASS;
     Wizard[0].trquan_min = 1;
     Wizard[0].trquan_max = 1;
     Wizard[0].trbless = 1;
-    Wizard[1].trotyp = 148;
+    Wizard[1].trotyp = CLOAK_OF_MAGIC_RESISTANCE;
     Wizard[1].trspe = 0;
-    Wizard[1].trclass = 3;
+    Wizard[1].trclass = ARMOR_CLASS;
     Wizard[1].trquan_min = 1;
     Wizard[1].trquan_max = 1;
-    Wizard[1].trbless = 2;
-    Wizard[2].trotyp = 0;
+    Wizard[1].trbless = UNDEF_BLESS;
+    Wizard[2].trotyp = UNDEF_TYP;
     Wizard[2].trspe = 127;
-    Wizard[2].trclass = 11;
+    Wizard[2].trclass = WAND_CLASS;
     Wizard[2].trquan_min = 1;
     Wizard[2].trquan_max = 1;
-    Wizard[2].trbless = 2;
-    Wizard[3].trotyp = 0;
+    Wizard[2].trbless = UNDEF_BLESS;
+    Wizard[3].trotyp = UNDEF_TYP;
     Wizard[3].trspe = 127;
-    Wizard[3].trclass = 4;
+    Wizard[3].trclass = RING_CLASS;
     Wizard[3].trquan_min = 2;
     Wizard[3].trquan_max = 2;
-    Wizard[3].trbless = 2;
-    Wizard[4].trotyp = 0;
+    Wizard[3].trbless = UNDEF_BLESS;
+    Wizard[4].trotyp = UNDEF_TYP;
     Wizard[4].trspe = 127;
-    Wizard[4].trclass = 8;
+    Wizard[4].trclass = POTION_CLASS;
     Wizard[4].trquan_min = 3;
     Wizard[4].trquan_max = 3;
-    Wizard[4].trbless = 2;
-    Wizard[5].trotyp = 0;
+    Wizard[4].trbless = UNDEF_BLESS;
+    Wizard[5].trotyp = UNDEF_TYP;
     Wizard[5].trspe = 127;
-    Wizard[5].trclass = 9;
+    Wizard[5].trclass = SCROLL_CLASS;
     Wizard[5].trquan_min = 3;
     Wizard[5].trquan_max = 3;
-    Wizard[5].trbless = 2;
-    Wizard[6].trotyp = 376;
+    Wizard[5].trbless = UNDEF_BLESS;
+    Wizard[6].trotyp = SPE_FORCE_BOLT;
     Wizard[6].trspe = 0;
-    Wizard[6].trclass = 10;
+    Wizard[6].trclass = SPBOOK_CLASS;
     Wizard[6].trquan_min = 1;
     Wizard[6].trquan_max = 1;
     Wizard[6].trbless = 1;
-    Wizard[7].trotyp = 0;
+    Wizard[7].trotyp = UNDEF_TYP;
     Wizard[7].trspe = 127;
-    Wizard[7].trclass = 10;
+    Wizard[7].trclass = SPBOOK_CLASS;
     Wizard[7].trquan_min = 1;
     Wizard[7].trquan_max = 1;
-    Wizard[7].trbless = 2;
-    Wizard[8].trotyp = 242;
+    Wizard[7].trbless = UNDEF_BLESS;
+    Wizard[8].trotyp = MAGIC_MARKER;
     Wizard[8].trspe = 19;
-    Wizard[8].trclass = 6;
+    Wizard[8].trclass = TOOL_CLASS;
     Wizard[8].trquan_min = 1;
     Wizard[8].trquan_max = 1;
     Wizard[8].trbless = 0;
@@ -1347,9 +1362,9 @@ export function $init() {
     for (let $i0 = 0; $i0 < 2; $i0++) {
         Healing_book[$i0].$copyFrom(new $T.trobj());
     }
-    Healing_book[0].trotyp = 374;
+    Healing_book[0].trotyp = SPE_HEALING;
     Healing_book[0].trspe = 127;
-    Healing_book[0].trclass = 10;
+    Healing_book[0].trclass = SPBOOK_CLASS;
     Healing_book[0].trquan_min = 1;
     Healing_book[0].trquan_max = 1;
     Healing_book[0].trbless = 1;
@@ -1362,9 +1377,9 @@ export function $init() {
     for (let $i0 = 0; $i0 < 2; $i0++) {
         Protection_book[$i0].$copyFrom(new $T.trobj());
     }
-    Protection_book[0].trotyp = 403;
+    Protection_book[0].trotyp = SPE_PROTECTION;
     Protection_book[0].trspe = 127;
-    Protection_book[0].trclass = 10;
+    Protection_book[0].trclass = SPBOOK_CLASS;
     Protection_book[0].trquan_min = 1;
     Protection_book[0].trquan_max = 1;
     Protection_book[0].trbless = 1;
@@ -1377,9 +1392,9 @@ export function $init() {
     for (let $i0 = 0; $i0 < 2; $i0++) {
         Confuse_monster_book[$i0].$copyFrom(new $T.trobj());
     }
-    Confuse_monster_book[0].trotyp = 377;
+    Confuse_monster_book[0].trotyp = SPE_CONFUSE_MONSTER;
     Confuse_monster_book[0].trspe = 127;
-    Confuse_monster_book[0].trclass = 10;
+    Confuse_monster_book[0].trclass = SPBOOK_CLASS;
     Confuse_monster_book[0].trquan_min = 1;
     Confuse_monster_book[0].trquan_max = 1;
     Confuse_monster_book[0].trbless = 1;
@@ -1392,9 +1407,9 @@ export function $init() {
     for (let $i0 = 0; $i0 < 2; $i0++) {
         Tinopener[$i0].$copyFrom(new $T.trobj());
     }
-    Tinopener[0].trotyp = 239;
+    Tinopener[0].trotyp = TIN_OPENER;
     Tinopener[0].trspe = 0;
-    Tinopener[0].trclass = 6;
+    Tinopener[0].trclass = TOOL_CLASS;
     Tinopener[0].trquan_min = 1;
     Tinopener[0].trquan_max = 1;
     Tinopener[0].trbless = 0;
@@ -1407,9 +1422,9 @@ export function $init() {
     for (let $i0 = 0; $i0 < 2; $i0++) {
         Magicmarker[$i0].$copyFrom(new $T.trobj());
     }
-    Magicmarker[0].trotyp = 242;
+    Magicmarker[0].trotyp = MAGIC_MARKER;
     Magicmarker[0].trspe = 19;
-    Magicmarker[0].trclass = 6;
+    Magicmarker[0].trclass = TOOL_CLASS;
     Magicmarker[0].trquan_min = 1;
     Magicmarker[0].trquan_max = 1;
     Magicmarker[0].trbless = 0;
@@ -1422,9 +1437,9 @@ export function $init() {
     for (let $i0 = 0; $i0 < 2; $i0++) {
         Lamp[$i0].$copyFrom(new $T.trobj());
     }
-    Lamp[0].trotyp = 227;
+    Lamp[0].trotyp = OIL_LAMP;
     Lamp[0].trspe = 1;
-    Lamp[0].trclass = 6;
+    Lamp[0].trclass = TOOL_CLASS;
     Lamp[0].trquan_min = 1;
     Lamp[0].trquan_max = 1;
     Lamp[0].trbless = 0;
@@ -1437,9 +1452,9 @@ export function $init() {
     for (let $i0 = 0; $i0 < 2; $i0++) {
         Blindfold[$i0].$copyFrom(new $T.trobj());
     }
-    Blindfold[0].trotyp = 233;
+    Blindfold[0].trotyp = BLINDFOLD;
     Blindfold[0].trspe = 0;
-    Blindfold[0].trclass = 6;
+    Blindfold[0].trclass = TOOL_CLASS;
     Blindfold[0].trquan_min = 1;
     Blindfold[0].trquan_max = 1;
     Blindfold[0].trbless = 0;
@@ -1452,9 +1467,9 @@ export function $init() {
     for (let $i0 = 0; $i0 < 2; $i0++) {
         Xtra_food[$i0].$copyFrom(new $T.trobj());
     }
-    Xtra_food[0].trotyp = 0;
+    Xtra_food[0].trotyp = UNDEF_TYP;
     Xtra_food[0].trspe = 127;
-    Xtra_food[0].trclass = 7;
+    Xtra_food[0].trclass = FOOD_CLASS;
     Xtra_food[0].trquan_min = 2;
     Xtra_food[0].trquan_max = 2;
     Xtra_food[0].trbless = 0;
@@ -1467,9 +1482,9 @@ export function $init() {
     for (let $i0 = 0; $i0 < 2; $i0++) {
         Leash[$i0].$copyFrom(new $T.trobj());
     }
-    Leash[0].trotyp = 236;
+    Leash[0].trotyp = LEASH;
     Leash[0].trspe = 0;
-    Leash[0].trclass = 6;
+    Leash[0].trclass = TOOL_CLASS;
     Leash[0].trquan_min = 1;
     Leash[0].trquan_max = 1;
     Leash[0].trbless = 0;
@@ -1482,9 +1497,9 @@ export function $init() {
     for (let $i0 = 0; $i0 < 2; $i0++) {
         Towel[$i0].$copyFrom(new $T.trobj());
     }
-    Towel[0].trotyp = 234;
+    Towel[0].trotyp = TOWEL;
     Towel[0].trspe = 0;
-    Towel[0].trclass = 6;
+    Towel[0].trclass = TOOL_CLASS;
     Towel[0].trquan_min = 1;
     Towel[0].trquan_max = 1;
     Towel[0].trbless = 0;
@@ -1497,9 +1512,9 @@ export function $init() {
     for (let $i0 = 0; $i0 < 2; $i0++) {
         Wishing[$i0].$copyFrom(new $T.trobj());
     }
-    Wishing[0].trotyp = 414;
+    Wishing[0].trotyp = WAN_WISHING;
     Wishing[0].trspe = 3;
-    Wishing[0].trclass = 11;
+    Wishing[0].trclass = WAND_CLASS;
     Wishing[0].trquan_min = 1;
     Wishing[0].trquan_max = 1;
     Wishing[0].trbless = 0;
@@ -1512,9 +1527,9 @@ export function $init() {
     for (let $i0 = 0; $i0 < 2; $i0++) {
         Money[$i0].$copyFrom(new $T.trobj());
     }
-    Money[0].trotyp = 438;
+    Money[0].trotyp = GOLD_PIECE;
     Money[0].trspe = 0;
-    Money[0].trclass = 12;
+    Money[0].trclass = COIN_CLASS;
     Money[0].trquan_min = 1;
     Money[0].trquan_max = 1;
     Money[0].trbless = 0;
@@ -1527,712 +1542,712 @@ export function $init() {
     for (let $i0 = 0; $i0 < 26; $i0++) {
         inv_subs[$i0].$copyFrom(new $T.inv_sub());
     }
-    inv_subs[0].race_pm = 264;
-    inv_subs[0].item_otyp = 34;
-    inv_subs[0].subs_otyp = 35;
-    inv_subs[1].race_pm = 264;
-    inv_subs[1].item_otyp = 27;
-    inv_subs[1].subs_otyp = 28;
-    inv_subs[2].race_pm = 264;
-    inv_subs[2].item_otyp = 46;
-    inv_subs[2].subs_otyp = 47;
-    inv_subs[3].race_pm = 264;
-    inv_subs[3].item_otyp = 83;
-    inv_subs[3].subs_otyp = 84;
-    inv_subs[4].race_pm = 264;
-    inv_subs[4].item_otyp = 18;
-    inv_subs[4].subs_otyp = 19;
-    inv_subs[5].race_pm = 264;
-    inv_subs[5].item_otyp = 97;
-    inv_subs[5].subs_otyp = 89;
-    inv_subs[6].race_pm = 264;
-    inv_subs[6].item_otyp = 149;
-    inv_subs[6].subs_otyp = 139;
-    inv_subs[7].race_pm = 264;
-    inv_subs[7].item_otyp = 292;
-    inv_subs[7].subs_otyp = 291;
-    inv_subs[8].race_pm = 72;
-    inv_subs[8].item_otyp = 34;
-    inv_subs[8].subs_otyp = 36;
-    inv_subs[9].race_pm = 72;
-    inv_subs[9].item_otyp = 27;
-    inv_subs[9].subs_otyp = 29;
-    inv_subs[10].race_pm = 72;
-    inv_subs[10].item_otyp = 46;
-    inv_subs[10].subs_otyp = 48;
-    inv_subs[11].race_pm = 72;
-    inv_subs[11].item_otyp = 83;
-    inv_subs[11].subs_otyp = 85;
-    inv_subs[12].race_pm = 72;
-    inv_subs[12].item_otyp = 18;
-    inv_subs[12].subs_otyp = 20;
-    inv_subs[13].race_pm = 72;
-    inv_subs[13].item_otyp = 97;
-    inv_subs[13].subs_otyp = 90;
-    inv_subs[14].race_pm = 72;
-    inv_subs[14].item_otyp = 150;
-    inv_subs[14].subs_otyp = 155;
-    inv_subs[15].race_pm = 72;
-    inv_subs[15].item_otyp = 132;
-    inv_subs[15].subs_otyp = 133;
-    inv_subs[16].race_pm = 72;
-    inv_subs[16].item_otyp = 128;
-    inv_subs[16].subs_otyp = 129;
-    inv_subs[17].race_pm = 72;
-    inv_subs[17].item_otyp = 292;
-    inv_subs[17].subs_otyp = 264;
-    inv_subs[18].race_pm = 72;
-    inv_subs[18].item_otyp = 291;
-    inv_subs[18].subs_otyp = 264;
-    inv_subs[19].race_pm = 44;
-    inv_subs[19].item_otyp = 27;
-    inv_subs[19].subs_otyp = 30;
-    inv_subs[20].race_pm = 44;
-    inv_subs[20].item_otyp = 46;
-    inv_subs[20].subs_otyp = 49;
-    inv_subs[21].race_pm = 44;
-    inv_subs[21].item_otyp = 97;
-    inv_subs[21].subs_otyp = 91;
-    inv_subs[22].race_pm = 44;
-    inv_subs[22].item_otyp = 291;
-    inv_subs[22].subs_otyp = 292;
-    inv_subs[23].race_pm = 165;
-    inv_subs[23].item_otyp = 83;
-    inv_subs[23].subs_otyp = 88;
-    inv_subs[24].race_pm = 165;
-    inv_subs[24].item_otyp = 18;
-    inv_subs[24].subs_otyp = 23;
-    inv_subs[25].race_pm = -1;
-    inv_subs[25].item_otyp = 0;
-    inv_subs[25].subs_otyp = 0;
+    inv_subs[0].race_pm = PM_ELF;
+    inv_subs[0].item_otyp = DAGGER;
+    inv_subs[0].subs_otyp = ELVEN_DAGGER;
+    inv_subs[1].race_pm = PM_ELF;
+    inv_subs[1].item_otyp = SPEAR;
+    inv_subs[1].subs_otyp = ELVEN_SPEAR;
+    inv_subs[2].race_pm = PM_ELF;
+    inv_subs[2].item_otyp = SHORT_SWORD;
+    inv_subs[2].subs_otyp = ELVEN_SHORT_SWORD;
+    inv_subs[3].race_pm = PM_ELF;
+    inv_subs[3].item_otyp = BOW;
+    inv_subs[3].subs_otyp = ELVEN_BOW;
+    inv_subs[4].race_pm = PM_ELF;
+    inv_subs[4].item_otyp = ARROW;
+    inv_subs[4].subs_otyp = ELVEN_ARROW;
+    inv_subs[5].race_pm = PM_ELF;
+    inv_subs[5].item_otyp = HELMET;
+    inv_subs[5].subs_otyp = ELVEN_LEATHER_HELM;
+    inv_subs[6].race_pm = PM_ELF;
+    inv_subs[6].item_otyp = CLOAK_OF_DISPLACEMENT;
+    inv_subs[6].subs_otyp = ELVEN_CLOAK;
+    inv_subs[7].race_pm = PM_ELF;
+    inv_subs[7].item_otyp = CRAM_RATION;
+    inv_subs[7].subs_otyp = LEMBAS_WAFER;
+    inv_subs[8].race_pm = PM_ORC;
+    inv_subs[8].item_otyp = DAGGER;
+    inv_subs[8].subs_otyp = ORCISH_DAGGER;
+    inv_subs[9].race_pm = PM_ORC;
+    inv_subs[9].item_otyp = SPEAR;
+    inv_subs[9].subs_otyp = ORCISH_SPEAR;
+    inv_subs[10].race_pm = PM_ORC;
+    inv_subs[10].item_otyp = SHORT_SWORD;
+    inv_subs[10].subs_otyp = ORCISH_SHORT_SWORD;
+    inv_subs[11].race_pm = PM_ORC;
+    inv_subs[11].item_otyp = BOW;
+    inv_subs[11].subs_otyp = ORCISH_BOW;
+    inv_subs[12].race_pm = PM_ORC;
+    inv_subs[12].item_otyp = ARROW;
+    inv_subs[12].subs_otyp = ORCISH_ARROW;
+    inv_subs[13].race_pm = PM_ORC;
+    inv_subs[13].item_otyp = HELMET;
+    inv_subs[13].subs_otyp = ORCISH_HELM;
+    inv_subs[14].race_pm = PM_ORC;
+    inv_subs[14].item_otyp = SMALL_SHIELD;
+    inv_subs[14].subs_otyp = ORCISH_SHIELD;
+    inv_subs[15].race_pm = PM_ORC;
+    inv_subs[15].item_otyp = RING_MAIL;
+    inv_subs[15].subs_otyp = ORCISH_RING_MAIL;
+    inv_subs[16].race_pm = PM_ORC;
+    inv_subs[16].item_otyp = CHAIN_MAIL;
+    inv_subs[16].subs_otyp = ORCISH_CHAIN_MAIL;
+    inv_subs[17].race_pm = PM_ORC;
+    inv_subs[17].item_otyp = CRAM_RATION;
+    inv_subs[17].subs_otyp = TRIPE_RATION;
+    inv_subs[18].race_pm = PM_ORC;
+    inv_subs[18].item_otyp = LEMBAS_WAFER;
+    inv_subs[18].subs_otyp = TRIPE_RATION;
+    inv_subs[19].race_pm = PM_DWARF;
+    inv_subs[19].item_otyp = SPEAR;
+    inv_subs[19].subs_otyp = DWARVISH_SPEAR;
+    inv_subs[20].race_pm = PM_DWARF;
+    inv_subs[20].item_otyp = SHORT_SWORD;
+    inv_subs[20].subs_otyp = DWARVISH_SHORT_SWORD;
+    inv_subs[21].race_pm = PM_DWARF;
+    inv_subs[21].item_otyp = HELMET;
+    inv_subs[21].subs_otyp = DWARVISH_IRON_HELM;
+    inv_subs[22].race_pm = PM_DWARF;
+    inv_subs[22].item_otyp = LEMBAS_WAFER;
+    inv_subs[22].subs_otyp = CRAM_RATION;
+    inv_subs[23].race_pm = PM_GNOME;
+    inv_subs[23].item_otyp = BOW;
+    inv_subs[23].subs_otyp = CROSSBOW;
+    inv_subs[24].race_pm = PM_GNOME;
+    inv_subs[24].item_otyp = ARROW;
+    inv_subs[24].subs_otyp = CROSSBOW_BOLT;
+    inv_subs[25].race_pm = NON_PM;
+    inv_subs[25].item_otyp = STRANGE_OBJECT;
+    inv_subs[25].subs_otyp = STRANGE_OBJECT;
     for (let $i0 = 0; $i0 < 20; $i0++) {
         Skill_A[$i0].$copyFrom(new $T.def_skill());
     }
-    Skill_A[0].skill = 1;
-    Skill_A[0].skmax = 2;
-    Skill_A[1].skill = 2;
-    Skill_A[1].skmax = 2;
-    Skill_A[2].skill = 4;
-    Skill_A[2].skmax = 4;
-    Skill_A[3].skill = 5;
-    Skill_A[3].skmax = 2;
-    Skill_A[4].skill = 9;
-    Skill_A[4].skmax = 4;
-    Skill_A[5].skill = 10;
-    Skill_A[5].skmax = 3;
-    Skill_A[6].skill = 15;
-    Skill_A[6].skmax = 3;
-    Skill_A[7].skill = 21;
-    Skill_A[7].skmax = 3;
-    Skill_A[8].skill = 23;
-    Skill_A[8].skmax = 2;
-    Skill_A[9].skill = 25;
-    Skill_A[9].skmax = 4;
-    Skill_A[10].skill = 26;
-    Skill_A[10].skmax = 4;
-    Skill_A[11].skill = 27;
-    Skill_A[11].skmax = 3;
-    Skill_A[12].skill = 28;
-    Skill_A[12].skmax = 2;
-    Skill_A[13].skill = 29;
-    Skill_A[13].skmax = 2;
-    Skill_A[14].skill = 30;
-    Skill_A[14].skmax = 4;
-    Skill_A[15].skill = 34;
-    Skill_A[15].skmax = 2;
-    Skill_A[16].skill = 37;
-    Skill_A[16].skmax = 2;
-    Skill_A[17].skill = 36;
-    Skill_A[17].skmax = 2;
-    Skill_A[18].skill = 35;
-    Skill_A[18].skmax = 4;
-    Skill_A[19].skill = 0;
+    Skill_A[0].skill = P_DAGGER;
+    Skill_A[0].skmax = P_BASIC;
+    Skill_A[1].skill = P_KNIFE;
+    Skill_A[1].skmax = P_BASIC;
+    Skill_A[2].skill = P_PICK_AXE;
+    Skill_A[2].skmax = P_EXPERT;
+    Skill_A[3].skill = P_SHORT_SWORD;
+    Skill_A[3].skmax = P_BASIC;
+    Skill_A[4].skill = P_SABER;
+    Skill_A[4].skmax = P_EXPERT;
+    Skill_A[5].skill = P_CLUB;
+    Skill_A[5].skmax = P_SKILLED;
+    Skill_A[6].skill = P_QUARTERSTAFF;
+    Skill_A[6].skmax = P_SKILLED;
+    Skill_A[7].skill = P_SLING;
+    Skill_A[7].skmax = P_SKILLED;
+    Skill_A[8].skill = P_DART;
+    Skill_A[8].skmax = P_BASIC;
+    Skill_A[9].skill = P_BOOMERANG;
+    Skill_A[9].skmax = P_EXPERT;
+    Skill_A[10].skill = P_WHIP;
+    Skill_A[10].skmax = P_EXPERT;
+    Skill_A[11].skill = P_UNICORN_HORN;
+    Skill_A[11].skmax = P_SKILLED;
+    Skill_A[12].skill = P_ATTACK_SPELL;
+    Skill_A[12].skmax = P_BASIC;
+    Skill_A[13].skill = P_HEALING_SPELL;
+    Skill_A[13].skmax = P_BASIC;
+    Skill_A[14].skill = P_DIVINATION_SPELL;
+    Skill_A[14].skmax = P_EXPERT;
+    Skill_A[15].skill = P_MATTER_SPELL;
+    Skill_A[15].skmax = P_BASIC;
+    Skill_A[16].skill = P_RIDING;
+    Skill_A[16].skmax = P_BASIC;
+    Skill_A[17].skill = P_TWO_WEAPON_COMBAT;
+    Skill_A[17].skmax = P_BASIC;
+    Skill_A[18].skill = P_BARE_HANDED_COMBAT;
+    Skill_A[18].skmax = P_EXPERT;
+    Skill_A[19].skill = P_NONE;
     Skill_A[19].skmax = 0;
     for (let $i0 = 0; $i0 < 23; $i0++) {
         Skill_B[$i0].$copyFrom(new $T.def_skill());
     }
-    Skill_B[0].skill = 1;
-    Skill_B[0].skmax = 2;
-    Skill_B[1].skill = 3;
-    Skill_B[1].skmax = 4;
-    Skill_B[2].skill = 4;
-    Skill_B[2].skmax = 3;
-    Skill_B[3].skill = 5;
-    Skill_B[3].skmax = 4;
-    Skill_B[4].skill = 6;
-    Skill_B[4].skmax = 3;
-    Skill_B[5].skill = 7;
-    Skill_B[5].skmax = 3;
-    Skill_B[6].skill = 8;
-    Skill_B[6].skmax = 4;
-    Skill_B[7].skill = 9;
-    Skill_B[7].skmax = 3;
-    Skill_B[8].skill = 10;
-    Skill_B[8].skmax = 3;
-    Skill_B[9].skill = 11;
-    Skill_B[9].skmax = 3;
-    Skill_B[10].skill = 12;
-    Skill_B[10].skmax = 3;
-    Skill_B[11].skill = 13;
-    Skill_B[11].skmax = 2;
-    Skill_B[12].skill = 14;
-    Skill_B[12].skmax = 4;
-    Skill_B[13].skill = 15;
-    Skill_B[13].skmax = 2;
-    Skill_B[14].skill = 17;
-    Skill_B[14].skmax = 3;
-    Skill_B[15].skill = 18;
-    Skill_B[15].skmax = 3;
-    Skill_B[16].skill = 20;
-    Skill_B[16].skmax = 2;
-    Skill_B[17].skill = 28;
-    Skill_B[17].skmax = 2;
-    Skill_B[18].skill = 33;
-    Skill_B[18].skmax = 2;
-    Skill_B[19].skill = 37;
-    Skill_B[19].skmax = 2;
-    Skill_B[20].skill = 36;
-    Skill_B[20].skmax = 2;
-    Skill_B[21].skill = 35;
-    Skill_B[21].skmax = 5;
-    Skill_B[22].skill = 0;
+    Skill_B[0].skill = P_DAGGER;
+    Skill_B[0].skmax = P_BASIC;
+    Skill_B[1].skill = P_AXE;
+    Skill_B[1].skmax = P_EXPERT;
+    Skill_B[2].skill = P_PICK_AXE;
+    Skill_B[2].skmax = P_SKILLED;
+    Skill_B[3].skill = P_SHORT_SWORD;
+    Skill_B[3].skmax = P_EXPERT;
+    Skill_B[4].skill = P_BROAD_SWORD;
+    Skill_B[4].skmax = P_SKILLED;
+    Skill_B[5].skill = P_LONG_SWORD;
+    Skill_B[5].skmax = P_SKILLED;
+    Skill_B[6].skill = P_TWO_HANDED_SWORD;
+    Skill_B[6].skmax = P_EXPERT;
+    Skill_B[7].skill = P_SABER;
+    Skill_B[7].skmax = P_SKILLED;
+    Skill_B[8].skill = P_CLUB;
+    Skill_B[8].skmax = P_SKILLED;
+    Skill_B[9].skill = P_MACE;
+    Skill_B[9].skmax = P_SKILLED;
+    Skill_B[10].skill = P_MORNING_STAR;
+    Skill_B[10].skmax = P_SKILLED;
+    Skill_B[11].skill = P_FLAIL;
+    Skill_B[11].skmax = P_BASIC;
+    Skill_B[12].skill = P_HAMMER;
+    Skill_B[12].skmax = P_EXPERT;
+    Skill_B[13].skill = P_QUARTERSTAFF;
+    Skill_B[13].skmax = P_BASIC;
+    Skill_B[14].skill = P_SPEAR;
+    Skill_B[14].skmax = P_SKILLED;
+    Skill_B[15].skill = P_TRIDENT;
+    Skill_B[15].skmax = P_SKILLED;
+    Skill_B[16].skill = P_BOW;
+    Skill_B[16].skmax = P_BASIC;
+    Skill_B[17].skill = P_ATTACK_SPELL;
+    Skill_B[17].skmax = P_BASIC;
+    Skill_B[18].skill = P_ESCAPE_SPELL;
+    Skill_B[18].skmax = P_BASIC;
+    Skill_B[19].skill = P_RIDING;
+    Skill_B[19].skmax = P_BASIC;
+    Skill_B[20].skill = P_TWO_WEAPON_COMBAT;
+    Skill_B[20].skmax = P_BASIC;
+    Skill_B[21].skill = P_BARE_HANDED_COMBAT;
+    Skill_B[21].skmax = P_MASTER;
+    Skill_B[22].skill = P_NONE;
     Skill_B[22].skmax = 0;
     for (let $i0 = 0; $i0 < 21; $i0++) {
         Skill_C[$i0].$copyFrom(new $T.def_skill());
     }
-    Skill_C[0].skill = 1;
-    Skill_C[0].skmax = 2;
-    Skill_C[1].skill = 2;
-    Skill_C[1].skmax = 3;
-    Skill_C[2].skill = 3;
-    Skill_C[2].skmax = 3;
-    Skill_C[3].skill = 4;
-    Skill_C[3].skmax = 2;
-    Skill_C[4].skill = 10;
-    Skill_C[4].skmax = 4;
-    Skill_C[5].skill = 11;
-    Skill_C[5].skmax = 4;
-    Skill_C[6].skill = 12;
-    Skill_C[6].skmax = 2;
-    Skill_C[7].skill = 13;
-    Skill_C[7].skmax = 3;
-    Skill_C[8].skill = 14;
-    Skill_C[8].skmax = 3;
-    Skill_C[9].skill = 15;
-    Skill_C[9].skmax = 4;
-    Skill_C[10].skill = 16;
-    Skill_C[10].skmax = 3;
-    Skill_C[11].skill = 17;
-    Skill_C[11].skmax = 4;
-    Skill_C[12].skill = 18;
-    Skill_C[12].skmax = 3;
-    Skill_C[13].skill = 20;
-    Skill_C[13].skmax = 3;
-    Skill_C[14].skill = 21;
-    Skill_C[14].skmax = 4;
-    Skill_C[15].skill = 28;
-    Skill_C[15].skmax = 2;
-    Skill_C[16].skill = 34;
-    Skill_C[16].skmax = 3;
-    Skill_C[17].skill = 25;
-    Skill_C[17].skmax = 4;
-    Skill_C[18].skill = 27;
-    Skill_C[18].skmax = 2;
-    Skill_C[19].skill = 35;
-    Skill_C[19].skmax = 5;
-    Skill_C[20].skill = 0;
+    Skill_C[0].skill = P_DAGGER;
+    Skill_C[0].skmax = P_BASIC;
+    Skill_C[1].skill = P_KNIFE;
+    Skill_C[1].skmax = P_SKILLED;
+    Skill_C[2].skill = P_AXE;
+    Skill_C[2].skmax = P_SKILLED;
+    Skill_C[3].skill = P_PICK_AXE;
+    Skill_C[3].skmax = P_BASIC;
+    Skill_C[4].skill = P_CLUB;
+    Skill_C[4].skmax = P_EXPERT;
+    Skill_C[5].skill = P_MACE;
+    Skill_C[5].skmax = P_EXPERT;
+    Skill_C[6].skill = P_MORNING_STAR;
+    Skill_C[6].skmax = P_BASIC;
+    Skill_C[7].skill = P_FLAIL;
+    Skill_C[7].skmax = P_SKILLED;
+    Skill_C[8].skill = P_HAMMER;
+    Skill_C[8].skmax = P_SKILLED;
+    Skill_C[9].skill = P_QUARTERSTAFF;
+    Skill_C[9].skmax = P_EXPERT;
+    Skill_C[10].skill = P_POLEARMS;
+    Skill_C[10].skmax = P_SKILLED;
+    Skill_C[11].skill = P_SPEAR;
+    Skill_C[11].skmax = P_EXPERT;
+    Skill_C[12].skill = P_TRIDENT;
+    Skill_C[12].skmax = P_SKILLED;
+    Skill_C[13].skill = P_BOW;
+    Skill_C[13].skmax = P_SKILLED;
+    Skill_C[14].skill = P_SLING;
+    Skill_C[14].skmax = P_EXPERT;
+    Skill_C[15].skill = P_ATTACK_SPELL;
+    Skill_C[15].skmax = P_BASIC;
+    Skill_C[16].skill = P_MATTER_SPELL;
+    Skill_C[16].skmax = P_SKILLED;
+    Skill_C[17].skill = P_BOOMERANG;
+    Skill_C[17].skmax = P_EXPERT;
+    Skill_C[18].skill = P_UNICORN_HORN;
+    Skill_C[18].skmax = P_BASIC;
+    Skill_C[19].skill = P_BARE_HANDED_COMBAT;
+    Skill_C[19].skmax = P_MASTER;
+    Skill_C[20].skill = P_NONE;
     Skill_C[20].skmax = 0;
     for (let $i0 = 0; $i0 < 17; $i0++) {
         Skill_H[$i0].$copyFrom(new $T.def_skill());
     }
-    Skill_H[0].skill = 1;
-    Skill_H[0].skmax = 3;
-    Skill_H[1].skill = 2;
-    Skill_H[1].skmax = 4;
-    Skill_H[2].skill = 5;
-    Skill_H[2].skmax = 3;
-    Skill_H[3].skill = 9;
-    Skill_H[3].skmax = 2;
-    Skill_H[4].skill = 10;
-    Skill_H[4].skmax = 3;
-    Skill_H[5].skill = 11;
-    Skill_H[5].skmax = 2;
-    Skill_H[6].skill = 15;
-    Skill_H[6].skmax = 4;
-    Skill_H[7].skill = 16;
-    Skill_H[7].skmax = 2;
-    Skill_H[8].skill = 17;
-    Skill_H[8].skmax = 2;
-    Skill_H[9].skill = 18;
-    Skill_H[9].skmax = 2;
-    Skill_H[10].skill = 21;
-    Skill_H[10].skmax = 3;
-    Skill_H[11].skill = 23;
-    Skill_H[11].skmax = 4;
-    Skill_H[12].skill = 24;
-    Skill_H[12].skmax = 3;
-    Skill_H[13].skill = 27;
-    Skill_H[13].skmax = 4;
-    Skill_H[14].skill = 29;
-    Skill_H[14].skmax = 4;
-    Skill_H[15].skill = 35;
-    Skill_H[15].skmax = 2;
-    Skill_H[16].skill = 0;
+    Skill_H[0].skill = P_DAGGER;
+    Skill_H[0].skmax = P_SKILLED;
+    Skill_H[1].skill = P_KNIFE;
+    Skill_H[1].skmax = P_EXPERT;
+    Skill_H[2].skill = P_SHORT_SWORD;
+    Skill_H[2].skmax = P_SKILLED;
+    Skill_H[3].skill = P_SABER;
+    Skill_H[3].skmax = P_BASIC;
+    Skill_H[4].skill = P_CLUB;
+    Skill_H[4].skmax = P_SKILLED;
+    Skill_H[5].skill = P_MACE;
+    Skill_H[5].skmax = P_BASIC;
+    Skill_H[6].skill = P_QUARTERSTAFF;
+    Skill_H[6].skmax = P_EXPERT;
+    Skill_H[7].skill = P_POLEARMS;
+    Skill_H[7].skmax = P_BASIC;
+    Skill_H[8].skill = P_SPEAR;
+    Skill_H[8].skmax = P_BASIC;
+    Skill_H[9].skill = P_TRIDENT;
+    Skill_H[9].skmax = P_BASIC;
+    Skill_H[10].skill = P_SLING;
+    Skill_H[10].skmax = P_SKILLED;
+    Skill_H[11].skill = P_DART;
+    Skill_H[11].skmax = P_EXPERT;
+    Skill_H[12].skill = P_SHURIKEN;
+    Skill_H[12].skmax = P_SKILLED;
+    Skill_H[13].skill = P_UNICORN_HORN;
+    Skill_H[13].skmax = P_EXPERT;
+    Skill_H[14].skill = P_HEALING_SPELL;
+    Skill_H[14].skmax = P_EXPERT;
+    Skill_H[15].skill = P_BARE_HANDED_COMBAT;
+    Skill_H[15].skmax = P_BASIC;
+    Skill_H[16].skill = P_NONE;
     Skill_H[16].skmax = 0;
     for (let $i0 = 0; $i0 < 27; $i0++) {
         Skill_K[$i0].$copyFrom(new $T.def_skill());
     }
-    Skill_K[0].skill = 1;
-    Skill_K[0].skmax = 2;
-    Skill_K[1].skill = 2;
-    Skill_K[1].skmax = 2;
-    Skill_K[2].skill = 3;
-    Skill_K[2].skmax = 3;
-    Skill_K[3].skill = 4;
-    Skill_K[3].skmax = 2;
-    Skill_K[4].skill = 5;
-    Skill_K[4].skmax = 3;
-    Skill_K[5].skill = 6;
-    Skill_K[5].skmax = 3;
-    Skill_K[6].skill = 7;
-    Skill_K[6].skmax = 4;
-    Skill_K[7].skill = 8;
-    Skill_K[7].skmax = 3;
-    Skill_K[8].skill = 9;
-    Skill_K[8].skmax = 3;
-    Skill_K[9].skill = 10;
-    Skill_K[9].skmax = 2;
-    Skill_K[10].skill = 11;
-    Skill_K[10].skmax = 3;
-    Skill_K[11].skill = 12;
-    Skill_K[11].skmax = 3;
-    Skill_K[12].skill = 13;
-    Skill_K[12].skmax = 2;
-    Skill_K[13].skill = 14;
-    Skill_K[13].skmax = 2;
-    Skill_K[14].skill = 16;
-    Skill_K[14].skmax = 3;
-    Skill_K[15].skill = 17;
-    Skill_K[15].skmax = 3;
-    Skill_K[16].skill = 18;
-    Skill_K[16].skmax = 2;
-    Skill_K[17].skill = 19;
-    Skill_K[17].skmax = 4;
-    Skill_K[18].skill = 20;
-    Skill_K[18].skmax = 2;
-    Skill_K[19].skill = 22;
-    Skill_K[19].skmax = 3;
-    Skill_K[20].skill = 28;
-    Skill_K[20].skmax = 3;
-    Skill_K[21].skill = 29;
-    Skill_K[21].skmax = 3;
-    Skill_K[22].skill = 32;
-    Skill_K[22].skmax = 3;
-    Skill_K[23].skill = 37;
-    Skill_K[23].skmax = 4;
-    Skill_K[24].skill = 36;
-    Skill_K[24].skmax = 3;
-    Skill_K[25].skill = 35;
-    Skill_K[25].skmax = 4;
-    Skill_K[26].skill = 0;
+    Skill_K[0].skill = P_DAGGER;
+    Skill_K[0].skmax = P_BASIC;
+    Skill_K[1].skill = P_KNIFE;
+    Skill_K[1].skmax = P_BASIC;
+    Skill_K[2].skill = P_AXE;
+    Skill_K[2].skmax = P_SKILLED;
+    Skill_K[3].skill = P_PICK_AXE;
+    Skill_K[3].skmax = P_BASIC;
+    Skill_K[4].skill = P_SHORT_SWORD;
+    Skill_K[4].skmax = P_SKILLED;
+    Skill_K[5].skill = P_BROAD_SWORD;
+    Skill_K[5].skmax = P_SKILLED;
+    Skill_K[6].skill = P_LONG_SWORD;
+    Skill_K[6].skmax = P_EXPERT;
+    Skill_K[7].skill = P_TWO_HANDED_SWORD;
+    Skill_K[7].skmax = P_SKILLED;
+    Skill_K[8].skill = P_SABER;
+    Skill_K[8].skmax = P_SKILLED;
+    Skill_K[9].skill = P_CLUB;
+    Skill_K[9].skmax = P_BASIC;
+    Skill_K[10].skill = P_MACE;
+    Skill_K[10].skmax = P_SKILLED;
+    Skill_K[11].skill = P_MORNING_STAR;
+    Skill_K[11].skmax = P_SKILLED;
+    Skill_K[12].skill = P_FLAIL;
+    Skill_K[12].skmax = P_BASIC;
+    Skill_K[13].skill = P_HAMMER;
+    Skill_K[13].skmax = P_BASIC;
+    Skill_K[14].skill = P_POLEARMS;
+    Skill_K[14].skmax = P_SKILLED;
+    Skill_K[15].skill = P_SPEAR;
+    Skill_K[15].skmax = P_SKILLED;
+    Skill_K[16].skill = P_TRIDENT;
+    Skill_K[16].skmax = P_BASIC;
+    Skill_K[17].skill = P_LANCE;
+    Skill_K[17].skmax = P_EXPERT;
+    Skill_K[18].skill = P_BOW;
+    Skill_K[18].skmax = P_BASIC;
+    Skill_K[19].skill = P_CROSSBOW;
+    Skill_K[19].skmax = P_SKILLED;
+    Skill_K[20].skill = P_ATTACK_SPELL;
+    Skill_K[20].skmax = P_SKILLED;
+    Skill_K[21].skill = P_HEALING_SPELL;
+    Skill_K[21].skmax = P_SKILLED;
+    Skill_K[22].skill = P_CLERIC_SPELL;
+    Skill_K[22].skmax = P_SKILLED;
+    Skill_K[23].skill = P_RIDING;
+    Skill_K[23].skmax = P_EXPERT;
+    Skill_K[24].skill = P_TWO_WEAPON_COMBAT;
+    Skill_K[24].skmax = P_SKILLED;
+    Skill_K[25].skill = P_BARE_HANDED_COMBAT;
+    Skill_K[25].skmax = P_EXPERT;
+    Skill_K[26].skill = P_NONE;
     Skill_K[26].skmax = 0;
     for (let $i0 = 0; $i0 < 13; $i0++) {
         Skill_Mon[$i0].$copyFrom(new $T.def_skill());
     }
-    Skill_Mon[0].skill = 15;
-    Skill_Mon[0].skmax = 2;
-    Skill_Mon[1].skill = 17;
-    Skill_Mon[1].skmax = 2;
-    Skill_Mon[2].skill = 22;
-    Skill_Mon[2].skmax = 2;
-    Skill_Mon[3].skill = 24;
-    Skill_Mon[3].skmax = 2;
-    Skill_Mon[4].skill = 28;
-    Skill_Mon[4].skmax = 2;
-    Skill_Mon[5].skill = 29;
-    Skill_Mon[5].skmax = 4;
-    Skill_Mon[6].skill = 30;
-    Skill_Mon[6].skmax = 2;
-    Skill_Mon[7].skill = 31;
-    Skill_Mon[7].skmax = 2;
-    Skill_Mon[8].skill = 32;
-    Skill_Mon[8].skmax = 3;
-    Skill_Mon[9].skill = 33;
-    Skill_Mon[9].skmax = 3;
-    Skill_Mon[10].skill = 34;
-    Skill_Mon[10].skmax = 2;
-    Skill_Mon[11].skill = 35;
-    Skill_Mon[11].skmax = 6;
-    Skill_Mon[12].skill = 0;
+    Skill_Mon[0].skill = P_QUARTERSTAFF;
+    Skill_Mon[0].skmax = P_BASIC;
+    Skill_Mon[1].skill = P_SPEAR;
+    Skill_Mon[1].skmax = P_BASIC;
+    Skill_Mon[2].skill = P_CROSSBOW;
+    Skill_Mon[2].skmax = P_BASIC;
+    Skill_Mon[3].skill = P_SHURIKEN;
+    Skill_Mon[3].skmax = P_BASIC;
+    Skill_Mon[4].skill = P_ATTACK_SPELL;
+    Skill_Mon[4].skmax = P_BASIC;
+    Skill_Mon[5].skill = P_HEALING_SPELL;
+    Skill_Mon[5].skmax = P_EXPERT;
+    Skill_Mon[6].skill = P_DIVINATION_SPELL;
+    Skill_Mon[6].skmax = P_BASIC;
+    Skill_Mon[7].skill = P_ENCHANTMENT_SPELL;
+    Skill_Mon[7].skmax = P_BASIC;
+    Skill_Mon[8].skill = P_CLERIC_SPELL;
+    Skill_Mon[8].skmax = P_SKILLED;
+    Skill_Mon[9].skill = P_ESCAPE_SPELL;
+    Skill_Mon[9].skmax = P_SKILLED;
+    Skill_Mon[10].skill = P_MATTER_SPELL;
+    Skill_Mon[10].skmax = P_BASIC;
+    Skill_Mon[11].skill = P_BARE_HANDED_COMBAT;
+    Skill_Mon[11].skmax = P_GRAND_MASTER;
+    Skill_Mon[12].skill = P_NONE;
     Skill_Mon[12].skmax = 0;
     for (let $i0 = 0; $i0 < 22; $i0++) {
         Skill_P[$i0].$copyFrom(new $T.def_skill());
     }
-    Skill_P[0].skill = 10;
-    Skill_P[0].skmax = 4;
-    Skill_P[1].skill = 11;
-    Skill_P[1].skmax = 4;
-    Skill_P[2].skill = 12;
-    Skill_P[2].skmax = 4;
-    Skill_P[3].skill = 13;
-    Skill_P[3].skmax = 4;
-    Skill_P[4].skill = 14;
-    Skill_P[4].skmax = 4;
-    Skill_P[5].skill = 15;
-    Skill_P[5].skmax = 4;
-    Skill_P[6].skill = 16;
-    Skill_P[6].skmax = 3;
-    Skill_P[7].skill = 17;
-    Skill_P[7].skmax = 3;
-    Skill_P[8].skill = 18;
-    Skill_P[8].skmax = 3;
-    Skill_P[9].skill = 19;
-    Skill_P[9].skmax = 2;
-    Skill_P[10].skill = 20;
-    Skill_P[10].skmax = 2;
-    Skill_P[11].skill = 21;
-    Skill_P[11].skmax = 2;
-    Skill_P[12].skill = 22;
-    Skill_P[12].skmax = 2;
-    Skill_P[13].skill = 23;
-    Skill_P[13].skmax = 2;
-    Skill_P[14].skill = 24;
-    Skill_P[14].skmax = 2;
-    Skill_P[15].skill = 25;
-    Skill_P[15].skmax = 2;
-    Skill_P[16].skill = 27;
-    Skill_P[16].skmax = 3;
-    Skill_P[17].skill = 29;
-    Skill_P[17].skmax = 4;
-    Skill_P[18].skill = 30;
-    Skill_P[18].skmax = 4;
-    Skill_P[19].skill = 32;
-    Skill_P[19].skmax = 4;
-    Skill_P[20].skill = 35;
-    Skill_P[20].skmax = 2;
-    Skill_P[21].skill = 0;
+    Skill_P[0].skill = P_CLUB;
+    Skill_P[0].skmax = P_EXPERT;
+    Skill_P[1].skill = P_MACE;
+    Skill_P[1].skmax = P_EXPERT;
+    Skill_P[2].skill = P_MORNING_STAR;
+    Skill_P[2].skmax = P_EXPERT;
+    Skill_P[3].skill = P_FLAIL;
+    Skill_P[3].skmax = P_EXPERT;
+    Skill_P[4].skill = P_HAMMER;
+    Skill_P[4].skmax = P_EXPERT;
+    Skill_P[5].skill = P_QUARTERSTAFF;
+    Skill_P[5].skmax = P_EXPERT;
+    Skill_P[6].skill = P_POLEARMS;
+    Skill_P[6].skmax = P_SKILLED;
+    Skill_P[7].skill = P_SPEAR;
+    Skill_P[7].skmax = P_SKILLED;
+    Skill_P[8].skill = P_TRIDENT;
+    Skill_P[8].skmax = P_SKILLED;
+    Skill_P[9].skill = P_LANCE;
+    Skill_P[9].skmax = P_BASIC;
+    Skill_P[10].skill = P_BOW;
+    Skill_P[10].skmax = P_BASIC;
+    Skill_P[11].skill = P_SLING;
+    Skill_P[11].skmax = P_BASIC;
+    Skill_P[12].skill = P_CROSSBOW;
+    Skill_P[12].skmax = P_BASIC;
+    Skill_P[13].skill = P_DART;
+    Skill_P[13].skmax = P_BASIC;
+    Skill_P[14].skill = P_SHURIKEN;
+    Skill_P[14].skmax = P_BASIC;
+    Skill_P[15].skill = P_BOOMERANG;
+    Skill_P[15].skmax = P_BASIC;
+    Skill_P[16].skill = P_UNICORN_HORN;
+    Skill_P[16].skmax = P_SKILLED;
+    Skill_P[17].skill = P_HEALING_SPELL;
+    Skill_P[17].skmax = P_EXPERT;
+    Skill_P[18].skill = P_DIVINATION_SPELL;
+    Skill_P[18].skmax = P_EXPERT;
+    Skill_P[19].skill = P_CLERIC_SPELL;
+    Skill_P[19].skmax = P_EXPERT;
+    Skill_P[20].skill = P_BARE_HANDED_COMBAT;
+    Skill_P[20].skmax = P_BASIC;
+    Skill_P[21].skill = P_NONE;
     Skill_P[21].skmax = 0;
     for (let $i0 = 0; $i0 < 24; $i0++) {
         Skill_R[$i0].$copyFrom(new $T.def_skill());
     }
-    Skill_R[0].skill = 1;
-    Skill_R[0].skmax = 4;
-    Skill_R[1].skill = 2;
-    Skill_R[1].skmax = 4;
-    Skill_R[2].skill = 5;
-    Skill_R[2].skmax = 4;
-    Skill_R[3].skill = 6;
-    Skill_R[3].skmax = 3;
-    Skill_R[4].skill = 7;
-    Skill_R[4].skmax = 3;
-    Skill_R[5].skill = 8;
-    Skill_R[5].skmax = 2;
-    Skill_R[6].skill = 9;
-    Skill_R[6].skmax = 3;
-    Skill_R[7].skill = 10;
-    Skill_R[7].skmax = 3;
-    Skill_R[8].skill = 11;
-    Skill_R[8].skmax = 3;
-    Skill_R[9].skill = 12;
-    Skill_R[9].skmax = 2;
-    Skill_R[10].skill = 13;
-    Skill_R[10].skmax = 2;
-    Skill_R[11].skill = 14;
-    Skill_R[11].skmax = 2;
-    Skill_R[12].skill = 16;
-    Skill_R[12].skmax = 2;
-    Skill_R[13].skill = 17;
-    Skill_R[13].skmax = 2;
-    Skill_R[14].skill = 22;
-    Skill_R[14].skmax = 4;
-    Skill_R[15].skill = 23;
-    Skill_R[15].skmax = 4;
-    Skill_R[16].skill = 24;
-    Skill_R[16].skmax = 3;
-    Skill_R[17].skill = 30;
-    Skill_R[17].skmax = 3;
-    Skill_R[18].skill = 33;
-    Skill_R[18].skmax = 3;
-    Skill_R[19].skill = 34;
-    Skill_R[19].skmax = 3;
-    Skill_R[20].skill = 37;
-    Skill_R[20].skmax = 2;
-    Skill_R[21].skill = 36;
-    Skill_R[21].skmax = 4;
-    Skill_R[22].skill = 35;
-    Skill_R[22].skmax = 4;
-    Skill_R[23].skill = 0;
+    Skill_R[0].skill = P_DAGGER;
+    Skill_R[0].skmax = P_EXPERT;
+    Skill_R[1].skill = P_KNIFE;
+    Skill_R[1].skmax = P_EXPERT;
+    Skill_R[2].skill = P_SHORT_SWORD;
+    Skill_R[2].skmax = P_EXPERT;
+    Skill_R[3].skill = P_BROAD_SWORD;
+    Skill_R[3].skmax = P_SKILLED;
+    Skill_R[4].skill = P_LONG_SWORD;
+    Skill_R[4].skmax = P_SKILLED;
+    Skill_R[5].skill = P_TWO_HANDED_SWORD;
+    Skill_R[5].skmax = P_BASIC;
+    Skill_R[6].skill = P_SABER;
+    Skill_R[6].skmax = P_SKILLED;
+    Skill_R[7].skill = P_CLUB;
+    Skill_R[7].skmax = P_SKILLED;
+    Skill_R[8].skill = P_MACE;
+    Skill_R[8].skmax = P_SKILLED;
+    Skill_R[9].skill = P_MORNING_STAR;
+    Skill_R[9].skmax = P_BASIC;
+    Skill_R[10].skill = P_FLAIL;
+    Skill_R[10].skmax = P_BASIC;
+    Skill_R[11].skill = P_HAMMER;
+    Skill_R[11].skmax = P_BASIC;
+    Skill_R[12].skill = P_POLEARMS;
+    Skill_R[12].skmax = P_BASIC;
+    Skill_R[13].skill = P_SPEAR;
+    Skill_R[13].skmax = P_BASIC;
+    Skill_R[14].skill = P_CROSSBOW;
+    Skill_R[14].skmax = P_EXPERT;
+    Skill_R[15].skill = P_DART;
+    Skill_R[15].skmax = P_EXPERT;
+    Skill_R[16].skill = P_SHURIKEN;
+    Skill_R[16].skmax = P_SKILLED;
+    Skill_R[17].skill = P_DIVINATION_SPELL;
+    Skill_R[17].skmax = P_SKILLED;
+    Skill_R[18].skill = P_ESCAPE_SPELL;
+    Skill_R[18].skmax = P_SKILLED;
+    Skill_R[19].skill = P_MATTER_SPELL;
+    Skill_R[19].skmax = P_SKILLED;
+    Skill_R[20].skill = P_RIDING;
+    Skill_R[20].skmax = P_BASIC;
+    Skill_R[21].skill = P_TWO_WEAPON_COMBAT;
+    Skill_R[21].skmax = P_EXPERT;
+    Skill_R[22].skill = P_BARE_HANDED_COMBAT;
+    Skill_R[22].skmax = P_EXPERT;
+    Skill_R[23].skill = P_NONE;
     Skill_R[23].skmax = 0;
     for (let $i0 = 0; $i0 < 25; $i0++) {
         Skill_Ran[$i0].$copyFrom(new $T.def_skill());
     }
-    Skill_Ran[0].skill = 1;
-    Skill_Ran[0].skmax = 4;
-    Skill_Ran[1].skill = 2;
-    Skill_Ran[1].skmax = 3;
-    Skill_Ran[2].skill = 3;
-    Skill_Ran[2].skmax = 3;
-    Skill_Ran[3].skill = 4;
-    Skill_Ran[3].skmax = 2;
-    Skill_Ran[4].skill = 5;
-    Skill_Ran[4].skmax = 2;
-    Skill_Ran[5].skill = 12;
-    Skill_Ran[5].skmax = 2;
-    Skill_Ran[6].skill = 13;
-    Skill_Ran[6].skmax = 3;
-    Skill_Ran[7].skill = 14;
-    Skill_Ran[7].skmax = 2;
-    Skill_Ran[8].skill = 15;
-    Skill_Ran[8].skmax = 2;
-    Skill_Ran[9].skill = 16;
-    Skill_Ran[9].skmax = 3;
-    Skill_Ran[10].skill = 17;
-    Skill_Ran[10].skmax = 4;
-    Skill_Ran[11].skill = 18;
-    Skill_Ran[11].skmax = 2;
-    Skill_Ran[12].skill = 20;
-    Skill_Ran[12].skmax = 4;
-    Skill_Ran[13].skill = 21;
-    Skill_Ran[13].skmax = 4;
-    Skill_Ran[14].skill = 22;
-    Skill_Ran[14].skmax = 4;
-    Skill_Ran[15].skill = 23;
-    Skill_Ran[15].skmax = 4;
-    Skill_Ran[16].skill = 24;
-    Skill_Ran[16].skmax = 3;
-    Skill_Ran[17].skill = 25;
-    Skill_Ran[17].skmax = 4;
-    Skill_Ran[18].skill = 26;
-    Skill_Ran[18].skmax = 2;
-    Skill_Ran[19].skill = 29;
-    Skill_Ran[19].skmax = 2;
-    Skill_Ran[20].skill = 30;
-    Skill_Ran[20].skmax = 4;
-    Skill_Ran[21].skill = 33;
-    Skill_Ran[21].skmax = 2;
-    Skill_Ran[22].skill = 37;
-    Skill_Ran[22].skmax = 2;
-    Skill_Ran[23].skill = 35;
-    Skill_Ran[23].skmax = 2;
-    Skill_Ran[24].skill = 0;
+    Skill_Ran[0].skill = P_DAGGER;
+    Skill_Ran[0].skmax = P_EXPERT;
+    Skill_Ran[1].skill = P_KNIFE;
+    Skill_Ran[1].skmax = P_SKILLED;
+    Skill_Ran[2].skill = P_AXE;
+    Skill_Ran[2].skmax = P_SKILLED;
+    Skill_Ran[3].skill = P_PICK_AXE;
+    Skill_Ran[3].skmax = P_BASIC;
+    Skill_Ran[4].skill = P_SHORT_SWORD;
+    Skill_Ran[4].skmax = P_BASIC;
+    Skill_Ran[5].skill = P_MORNING_STAR;
+    Skill_Ran[5].skmax = P_BASIC;
+    Skill_Ran[6].skill = P_FLAIL;
+    Skill_Ran[6].skmax = P_SKILLED;
+    Skill_Ran[7].skill = P_HAMMER;
+    Skill_Ran[7].skmax = P_BASIC;
+    Skill_Ran[8].skill = P_QUARTERSTAFF;
+    Skill_Ran[8].skmax = P_BASIC;
+    Skill_Ran[9].skill = P_POLEARMS;
+    Skill_Ran[9].skmax = P_SKILLED;
+    Skill_Ran[10].skill = P_SPEAR;
+    Skill_Ran[10].skmax = P_EXPERT;
+    Skill_Ran[11].skill = P_TRIDENT;
+    Skill_Ran[11].skmax = P_BASIC;
+    Skill_Ran[12].skill = P_BOW;
+    Skill_Ran[12].skmax = P_EXPERT;
+    Skill_Ran[13].skill = P_SLING;
+    Skill_Ran[13].skmax = P_EXPERT;
+    Skill_Ran[14].skill = P_CROSSBOW;
+    Skill_Ran[14].skmax = P_EXPERT;
+    Skill_Ran[15].skill = P_DART;
+    Skill_Ran[15].skmax = P_EXPERT;
+    Skill_Ran[16].skill = P_SHURIKEN;
+    Skill_Ran[16].skmax = P_SKILLED;
+    Skill_Ran[17].skill = P_BOOMERANG;
+    Skill_Ran[17].skmax = P_EXPERT;
+    Skill_Ran[18].skill = P_WHIP;
+    Skill_Ran[18].skmax = P_BASIC;
+    Skill_Ran[19].skill = P_HEALING_SPELL;
+    Skill_Ran[19].skmax = P_BASIC;
+    Skill_Ran[20].skill = P_DIVINATION_SPELL;
+    Skill_Ran[20].skmax = P_EXPERT;
+    Skill_Ran[21].skill = P_ESCAPE_SPELL;
+    Skill_Ran[21].skmax = P_BASIC;
+    Skill_Ran[22].skill = P_RIDING;
+    Skill_Ran[22].skmax = P_BASIC;
+    Skill_Ran[23].skill = P_BARE_HANDED_COMBAT;
+    Skill_Ran[23].skmax = P_BASIC;
+    Skill_Ran[24].skill = P_NONE;
     Skill_Ran[24].skmax = 0;
     for (let $i0 = 0; $i0 < 21; $i0++) {
         Skill_S[$i0].$copyFrom(new $T.def_skill());
     }
-    Skill_S[0].skill = 1;
-    Skill_S[0].skmax = 2;
-    Skill_S[1].skill = 2;
-    Skill_S[1].skmax = 3;
-    Skill_S[2].skill = 5;
-    Skill_S[2].skmax = 4;
-    Skill_S[3].skill = 6;
-    Skill_S[3].skmax = 3;
-    Skill_S[4].skill = 7;
-    Skill_S[4].skmax = 4;
-    Skill_S[5].skill = 8;
-    Skill_S[5].skmax = 4;
-    Skill_S[6].skill = 9;
-    Skill_S[6].skmax = 2;
-    Skill_S[7].skill = 13;
-    Skill_S[7].skmax = 3;
-    Skill_S[8].skill = 15;
-    Skill_S[8].skmax = 2;
-    Skill_S[9].skill = 16;
-    Skill_S[9].skmax = 3;
-    Skill_S[10].skill = 17;
-    Skill_S[10].skmax = 3;
-    Skill_S[11].skill = 19;
-    Skill_S[11].skmax = 3;
-    Skill_S[12].skill = 20;
-    Skill_S[12].skmax = 4;
-    Skill_S[13].skill = 24;
-    Skill_S[13].skmax = 4;
-    Skill_S[14].skill = 28;
-    Skill_S[14].skmax = 2;
-    Skill_S[15].skill = 30;
-    Skill_S[15].skmax = 2;
-    Skill_S[16].skill = 32;
-    Skill_S[16].skmax = 3;
-    Skill_S[17].skill = 37;
-    Skill_S[17].skmax = 3;
-    Skill_S[18].skill = 36;
-    Skill_S[18].skmax = 4;
-    Skill_S[19].skill = 35;
-    Skill_S[19].skmax = 5;
-    Skill_S[20].skill = 0;
+    Skill_S[0].skill = P_DAGGER;
+    Skill_S[0].skmax = P_BASIC;
+    Skill_S[1].skill = P_KNIFE;
+    Skill_S[1].skmax = P_SKILLED;
+    Skill_S[2].skill = P_SHORT_SWORD;
+    Skill_S[2].skmax = P_EXPERT;
+    Skill_S[3].skill = P_BROAD_SWORD;
+    Skill_S[3].skmax = P_SKILLED;
+    Skill_S[4].skill = P_LONG_SWORD;
+    Skill_S[4].skmax = P_EXPERT;
+    Skill_S[5].skill = P_TWO_HANDED_SWORD;
+    Skill_S[5].skmax = P_EXPERT;
+    Skill_S[6].skill = P_SABER;
+    Skill_S[6].skmax = P_BASIC;
+    Skill_S[7].skill = P_FLAIL;
+    Skill_S[7].skmax = P_SKILLED;
+    Skill_S[8].skill = P_QUARTERSTAFF;
+    Skill_S[8].skmax = P_BASIC;
+    Skill_S[9].skill = P_POLEARMS;
+    Skill_S[9].skmax = P_SKILLED;
+    Skill_S[10].skill = P_SPEAR;
+    Skill_S[10].skmax = P_SKILLED;
+    Skill_S[11].skill = P_LANCE;
+    Skill_S[11].skmax = P_SKILLED;
+    Skill_S[12].skill = P_BOW;
+    Skill_S[12].skmax = P_EXPERT;
+    Skill_S[13].skill = P_SHURIKEN;
+    Skill_S[13].skmax = P_EXPERT;
+    Skill_S[14].skill = P_ATTACK_SPELL;
+    Skill_S[14].skmax = P_BASIC;
+    Skill_S[15].skill = P_DIVINATION_SPELL;
+    Skill_S[15].skmax = P_BASIC;
+    Skill_S[16].skill = P_CLERIC_SPELL;
+    Skill_S[16].skmax = P_SKILLED;
+    Skill_S[17].skill = P_RIDING;
+    Skill_S[17].skmax = P_SKILLED;
+    Skill_S[18].skill = P_TWO_WEAPON_COMBAT;
+    Skill_S[18].skmax = P_EXPERT;
+    Skill_S[19].skill = P_BARE_HANDED_COMBAT;
+    Skill_S[19].skmax = P_MASTER;
+    Skill_S[20].skill = P_NONE;
     Skill_S[20].skmax = 0;
     for (let $i0 = 0; $i0 < 33; $i0++) {
         Skill_T[$i0].$copyFrom(new $T.def_skill());
     }
-    Skill_T[0].skill = 1;
-    Skill_T[0].skmax = 4;
-    Skill_T[1].skill = 2;
-    Skill_T[1].skmax = 3;
-    Skill_T[2].skill = 3;
-    Skill_T[2].skmax = 2;
-    Skill_T[3].skill = 4;
-    Skill_T[3].skmax = 2;
-    Skill_T[4].skill = 5;
-    Skill_T[4].skmax = 4;
-    Skill_T[5].skill = 6;
-    Skill_T[5].skmax = 2;
-    Skill_T[6].skill = 7;
-    Skill_T[6].skmax = 2;
-    Skill_T[7].skill = 8;
-    Skill_T[7].skmax = 2;
-    Skill_T[8].skill = 9;
-    Skill_T[8].skmax = 3;
-    Skill_T[9].skill = 11;
-    Skill_T[9].skmax = 2;
-    Skill_T[10].skill = 12;
-    Skill_T[10].skmax = 2;
-    Skill_T[11].skill = 13;
-    Skill_T[11].skmax = 2;
-    Skill_T[12].skill = 14;
-    Skill_T[12].skmax = 2;
-    Skill_T[13].skill = 15;
-    Skill_T[13].skmax = 2;
-    Skill_T[14].skill = 16;
-    Skill_T[14].skmax = 2;
-    Skill_T[15].skill = 17;
-    Skill_T[15].skmax = 2;
-    Skill_T[16].skill = 18;
-    Skill_T[16].skmax = 2;
-    Skill_T[17].skill = 19;
-    Skill_T[17].skmax = 2;
-    Skill_T[18].skill = 20;
-    Skill_T[18].skmax = 2;
-    Skill_T[19].skill = 21;
-    Skill_T[19].skmax = 2;
-    Skill_T[20].skill = 22;
-    Skill_T[20].skmax = 2;
-    Skill_T[21].skill = 23;
-    Skill_T[21].skmax = 4;
-    Skill_T[22].skill = 24;
-    Skill_T[22].skmax = 2;
-    Skill_T[23].skill = 25;
-    Skill_T[23].skmax = 2;
-    Skill_T[24].skill = 26;
-    Skill_T[24].skmax = 2;
-    Skill_T[25].skill = 27;
-    Skill_T[25].skmax = 3;
-    Skill_T[26].skill = 30;
-    Skill_T[26].skmax = 2;
-    Skill_T[27].skill = 31;
-    Skill_T[27].skmax = 2;
-    Skill_T[28].skill = 33;
-    Skill_T[28].skmax = 3;
-    Skill_T[29].skill = 37;
-    Skill_T[29].skmax = 2;
-    Skill_T[30].skill = 36;
-    Skill_T[30].skmax = 3;
-    Skill_T[31].skill = 35;
-    Skill_T[31].skmax = 3;
-    Skill_T[32].skill = 0;
+    Skill_T[0].skill = P_DAGGER;
+    Skill_T[0].skmax = P_EXPERT;
+    Skill_T[1].skill = P_KNIFE;
+    Skill_T[1].skmax = P_SKILLED;
+    Skill_T[2].skill = P_AXE;
+    Skill_T[2].skmax = P_BASIC;
+    Skill_T[3].skill = P_PICK_AXE;
+    Skill_T[3].skmax = P_BASIC;
+    Skill_T[4].skill = P_SHORT_SWORD;
+    Skill_T[4].skmax = P_EXPERT;
+    Skill_T[5].skill = P_BROAD_SWORD;
+    Skill_T[5].skmax = P_BASIC;
+    Skill_T[6].skill = P_LONG_SWORD;
+    Skill_T[6].skmax = P_BASIC;
+    Skill_T[7].skill = P_TWO_HANDED_SWORD;
+    Skill_T[7].skmax = P_BASIC;
+    Skill_T[8].skill = P_SABER;
+    Skill_T[8].skmax = P_SKILLED;
+    Skill_T[9].skill = P_MACE;
+    Skill_T[9].skmax = P_BASIC;
+    Skill_T[10].skill = P_MORNING_STAR;
+    Skill_T[10].skmax = P_BASIC;
+    Skill_T[11].skill = P_FLAIL;
+    Skill_T[11].skmax = P_BASIC;
+    Skill_T[12].skill = P_HAMMER;
+    Skill_T[12].skmax = P_BASIC;
+    Skill_T[13].skill = P_QUARTERSTAFF;
+    Skill_T[13].skmax = P_BASIC;
+    Skill_T[14].skill = P_POLEARMS;
+    Skill_T[14].skmax = P_BASIC;
+    Skill_T[15].skill = P_SPEAR;
+    Skill_T[15].skmax = P_BASIC;
+    Skill_T[16].skill = P_TRIDENT;
+    Skill_T[16].skmax = P_BASIC;
+    Skill_T[17].skill = P_LANCE;
+    Skill_T[17].skmax = P_BASIC;
+    Skill_T[18].skill = P_BOW;
+    Skill_T[18].skmax = P_BASIC;
+    Skill_T[19].skill = P_SLING;
+    Skill_T[19].skmax = P_BASIC;
+    Skill_T[20].skill = P_CROSSBOW;
+    Skill_T[20].skmax = P_BASIC;
+    Skill_T[21].skill = P_DART;
+    Skill_T[21].skmax = P_EXPERT;
+    Skill_T[22].skill = P_SHURIKEN;
+    Skill_T[22].skmax = P_BASIC;
+    Skill_T[23].skill = P_BOOMERANG;
+    Skill_T[23].skmax = P_BASIC;
+    Skill_T[24].skill = P_WHIP;
+    Skill_T[24].skmax = P_BASIC;
+    Skill_T[25].skill = P_UNICORN_HORN;
+    Skill_T[25].skmax = P_SKILLED;
+    Skill_T[26].skill = P_DIVINATION_SPELL;
+    Skill_T[26].skmax = P_BASIC;
+    Skill_T[27].skill = P_ENCHANTMENT_SPELL;
+    Skill_T[27].skmax = P_BASIC;
+    Skill_T[28].skill = P_ESCAPE_SPELL;
+    Skill_T[28].skmax = P_SKILLED;
+    Skill_T[29].skill = P_RIDING;
+    Skill_T[29].skmax = P_BASIC;
+    Skill_T[30].skill = P_TWO_WEAPON_COMBAT;
+    Skill_T[30].skmax = P_SKILLED;
+    Skill_T[31].skill = P_BARE_HANDED_COMBAT;
+    Skill_T[31].skmax = P_SKILLED;
+    Skill_T[32].skill = P_NONE;
     Skill_T[32].skmax = 0;
     for (let $i0 = 0; $i0 < 21; $i0++) {
         Skill_V[$i0].$copyFrom(new $T.def_skill());
     }
-    Skill_V[0].skill = 1;
-    Skill_V[0].skmax = 4;
-    Skill_V[1].skill = 3;
-    Skill_V[1].skmax = 4;
-    Skill_V[2].skill = 4;
-    Skill_V[2].skmax = 3;
-    Skill_V[3].skill = 5;
-    Skill_V[3].skmax = 3;
-    Skill_V[4].skill = 6;
-    Skill_V[4].skmax = 3;
-    Skill_V[5].skill = 7;
-    Skill_V[5].skmax = 4;
-    Skill_V[6].skill = 8;
-    Skill_V[6].skmax = 4;
-    Skill_V[7].skill = 9;
-    Skill_V[7].skmax = 2;
-    Skill_V[8].skill = 14;
-    Skill_V[8].skmax = 4;
-    Skill_V[9].skill = 15;
-    Skill_V[9].skmax = 2;
-    Skill_V[10].skill = 16;
-    Skill_V[10].skmax = 3;
-    Skill_V[11].skill = 17;
-    Skill_V[11].skmax = 4;
-    Skill_V[12].skill = 18;
-    Skill_V[12].skmax = 2;
-    Skill_V[13].skill = 19;
-    Skill_V[13].skmax = 3;
-    Skill_V[14].skill = 21;
-    Skill_V[14].skmax = 2;
-    Skill_V[15].skill = 28;
-    Skill_V[15].skmax = 2;
-    Skill_V[16].skill = 33;
-    Skill_V[16].skmax = 2;
-    Skill_V[17].skill = 37;
-    Skill_V[17].skmax = 3;
-    Skill_V[18].skill = 36;
-    Skill_V[18].skmax = 3;
-    Skill_V[19].skill = 35;
-    Skill_V[19].skmax = 4;
-    Skill_V[20].skill = 0;
+    Skill_V[0].skill = P_DAGGER;
+    Skill_V[0].skmax = P_EXPERT;
+    Skill_V[1].skill = P_AXE;
+    Skill_V[1].skmax = P_EXPERT;
+    Skill_V[2].skill = P_PICK_AXE;
+    Skill_V[2].skmax = P_SKILLED;
+    Skill_V[3].skill = P_SHORT_SWORD;
+    Skill_V[3].skmax = P_SKILLED;
+    Skill_V[4].skill = P_BROAD_SWORD;
+    Skill_V[4].skmax = P_SKILLED;
+    Skill_V[5].skill = P_LONG_SWORD;
+    Skill_V[5].skmax = P_EXPERT;
+    Skill_V[6].skill = P_TWO_HANDED_SWORD;
+    Skill_V[6].skmax = P_EXPERT;
+    Skill_V[7].skill = P_SABER;
+    Skill_V[7].skmax = P_BASIC;
+    Skill_V[8].skill = P_HAMMER;
+    Skill_V[8].skmax = P_EXPERT;
+    Skill_V[9].skill = P_QUARTERSTAFF;
+    Skill_V[9].skmax = P_BASIC;
+    Skill_V[10].skill = P_POLEARMS;
+    Skill_V[10].skmax = P_SKILLED;
+    Skill_V[11].skill = P_SPEAR;
+    Skill_V[11].skmax = P_EXPERT;
+    Skill_V[12].skill = P_TRIDENT;
+    Skill_V[12].skmax = P_BASIC;
+    Skill_V[13].skill = P_LANCE;
+    Skill_V[13].skmax = P_SKILLED;
+    Skill_V[14].skill = P_SLING;
+    Skill_V[14].skmax = P_BASIC;
+    Skill_V[15].skill = P_ATTACK_SPELL;
+    Skill_V[15].skmax = P_BASIC;
+    Skill_V[16].skill = P_ESCAPE_SPELL;
+    Skill_V[16].skmax = P_BASIC;
+    Skill_V[17].skill = P_RIDING;
+    Skill_V[17].skmax = P_SKILLED;
+    Skill_V[18].skill = P_TWO_WEAPON_COMBAT;
+    Skill_V[18].skmax = P_SKILLED;
+    Skill_V[19].skill = P_BARE_HANDED_COMBAT;
+    Skill_V[19].skmax = P_EXPERT;
+    Skill_V[20].skill = P_NONE;
     Skill_V[20].skmax = 0;
     for (let $i0 = 0; $i0 < 23; $i0++) {
         Skill_W[$i0].$copyFrom(new $T.def_skill());
     }
-    Skill_W[0].skill = 1;
-    Skill_W[0].skmax = 4;
-    Skill_W[1].skill = 2;
-    Skill_W[1].skmax = 3;
-    Skill_W[2].skill = 3;
-    Skill_W[2].skmax = 3;
-    Skill_W[3].skill = 5;
-    Skill_W[3].skmax = 2;
-    Skill_W[4].skill = 10;
-    Skill_W[4].skmax = 3;
-    Skill_W[5].skill = 11;
-    Skill_W[5].skmax = 2;
-    Skill_W[6].skill = 15;
-    Skill_W[6].skmax = 4;
-    Skill_W[7].skill = 16;
-    Skill_W[7].skmax = 3;
-    Skill_W[8].skill = 17;
-    Skill_W[8].skmax = 2;
-    Skill_W[9].skill = 18;
-    Skill_W[9].skmax = 2;
-    Skill_W[10].skill = 21;
-    Skill_W[10].skmax = 3;
-    Skill_W[11].skill = 23;
-    Skill_W[11].skmax = 4;
-    Skill_W[12].skill = 24;
-    Skill_W[12].skmax = 2;
-    Skill_W[13].skill = 28;
-    Skill_W[13].skmax = 4;
-    Skill_W[14].skill = 29;
-    Skill_W[14].skmax = 3;
-    Skill_W[15].skill = 30;
-    Skill_W[15].skmax = 4;
-    Skill_W[16].skill = 31;
-    Skill_W[16].skmax = 3;
-    Skill_W[17].skill = 32;
-    Skill_W[17].skmax = 3;
-    Skill_W[18].skill = 33;
-    Skill_W[18].skmax = 4;
-    Skill_W[19].skill = 34;
-    Skill_W[19].skmax = 4;
-    Skill_W[20].skill = 37;
-    Skill_W[20].skmax = 2;
-    Skill_W[21].skill = 35;
-    Skill_W[21].skmax = 2;
-    Skill_W[22].skill = 0;
+    Skill_W[0].skill = P_DAGGER;
+    Skill_W[0].skmax = P_EXPERT;
+    Skill_W[1].skill = P_KNIFE;
+    Skill_W[1].skmax = P_SKILLED;
+    Skill_W[2].skill = P_AXE;
+    Skill_W[2].skmax = P_SKILLED;
+    Skill_W[3].skill = P_SHORT_SWORD;
+    Skill_W[3].skmax = P_BASIC;
+    Skill_W[4].skill = P_CLUB;
+    Skill_W[4].skmax = P_SKILLED;
+    Skill_W[5].skill = P_MACE;
+    Skill_W[5].skmax = P_BASIC;
+    Skill_W[6].skill = P_QUARTERSTAFF;
+    Skill_W[6].skmax = P_EXPERT;
+    Skill_W[7].skill = P_POLEARMS;
+    Skill_W[7].skmax = P_SKILLED;
+    Skill_W[8].skill = P_SPEAR;
+    Skill_W[8].skmax = P_BASIC;
+    Skill_W[9].skill = P_TRIDENT;
+    Skill_W[9].skmax = P_BASIC;
+    Skill_W[10].skill = P_SLING;
+    Skill_W[10].skmax = P_SKILLED;
+    Skill_W[11].skill = P_DART;
+    Skill_W[11].skmax = P_EXPERT;
+    Skill_W[12].skill = P_SHURIKEN;
+    Skill_W[12].skmax = P_BASIC;
+    Skill_W[13].skill = P_ATTACK_SPELL;
+    Skill_W[13].skmax = P_EXPERT;
+    Skill_W[14].skill = P_HEALING_SPELL;
+    Skill_W[14].skmax = P_SKILLED;
+    Skill_W[15].skill = P_DIVINATION_SPELL;
+    Skill_W[15].skmax = P_EXPERT;
+    Skill_W[16].skill = P_ENCHANTMENT_SPELL;
+    Skill_W[16].skmax = P_SKILLED;
+    Skill_W[17].skill = P_CLERIC_SPELL;
+    Skill_W[17].skmax = P_SKILLED;
+    Skill_W[18].skill = P_ESCAPE_SPELL;
+    Skill_W[18].skmax = P_EXPERT;
+    Skill_W[19].skill = P_MATTER_SPELL;
+    Skill_W[19].skmax = P_EXPERT;
+    Skill_W[20].skill = P_RIDING;
+    Skill_W[20].skmax = P_BASIC;
+    Skill_W[21].skill = P_BARE_HANDED_COMBAT;
+    Skill_W[21].skmax = P_BASIC;
+    Skill_W[22].skill = P_NONE;
     Skill_W[22].skmax = 0;
     u_init_role$M_spell.fill(null);
     u_init_role$M_spell[0] = $c.relem(Healing_book, 0);
     u_init_role$M_spell[1] = $c.relem(Protection_book, 0);
     u_init_role$M_spell[2] = $c.relem(Confuse_monster_book, 0);
     u_init_race$trotyp.fill(0);
-    u_init_race$trotyp[0] = 247 /* WOODEN_FLUTE */;
-    u_init_race$trotyp[1] = 249 /* TOOLED_HORN */;
-    u_init_race$trotyp[2] = 253 /* WOODEN_HARP */;
-    u_init_race$trotyp[3] = 255 /* BELL */;
-    u_init_race$trotyp[4] = 256 /* BUGLE */;
-    u_init_race$trotyp[5] = 257 /* LEATHER_DRUM */;
+    u_init_race$trotyp[0] = WOODEN_FLUTE;
+    u_init_race$trotyp[1] = TOOLED_HORN;
+    u_init_race$trotyp[2] = WOODEN_HARP;
+    u_init_race$trotyp[3] = BELL;
+    u_init_race$trotyp[4] = BUGLE;
+    u_init_race$trotyp[5] = LEATHER_DRUM;
 }

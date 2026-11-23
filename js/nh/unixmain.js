@@ -10,6 +10,7 @@ import { flags, ge, gh, gl, gp, gs, iflags, program_state, svh, svn, svp, u, ync
 import { early_options } from './earlyarg.js';
 import { build_english_list, done1 } from './end.js';
 import { check_panic_save, check_recordfile, delete_levelfile, delete_savefile, fqname, nh_compress, paniclog, restore_saved_game } from './files.js';
+import { SAVEPREFIX } from './hack.h.js';
 import { eos, strncmpi } from './hacklib.js';
 import { getmailstatus } from './mail.js';
 import { initoptions, nh_getenv, set_playmode } from './options.js';
@@ -18,8 +19,10 @@ import { panictrace_setsignals } from './report.js';
 import { dorecover } from './restore.js';
 import { rng_log_init } from './rnd.js';
 import { plnamesuffix, str2race, str2role } from './role.js';
+import { PRIMARYSET, ROGUESET } from './sym.h.js';
 import { load_symset, switch_symbols } from './symbols.js';
 import { sysopt } from './sys.js';
+import { FCMASK } from './unixconf.h.js';
 import { error } from './unixtty.js';
 import { ask_about_panic_save, getlock } from './unixunix.js';
 import { vision_init } from './vision.js';
@@ -66,7 +69,7 @@ export async function main(argc$in, argv$in) {   // unixmain.c:58
     }
     gh.hname = argv[0].get(0);
     $t1 = $c.getpid(), svh.hackpid = $t1;
-    $c.umask(79);
+    $c.umask(511 & ~FCMASK);
     await choose_windows($c.lit("tty"));
     dir[0] = nh_getenv($c.lit("NETHACKDIR"));
     if (!dir[0]) {
@@ -103,7 +106,7 @@ export async function main(argc$in, argv$in) {   // unixmain.c:58
             program_state.preserve_locks = 0;
         }
         if (new $c.Ptr(svp.plname, 0).get(0) && (nhfp = await restore_saved_game()) !== null) {
-            fq_save = fqname(new $c.Ptr(gs.SAVEF, 0), 2, 1);
+            fq_save = fqname(new $c.Ptr(gs.SAVEF, 0), SAVEPREFIX, 1);
             $c.chmod(fq_save, 0);
             $c.signal(2, done1);
             if (iflags.news) {
@@ -123,7 +126,7 @@ export async function main(argc$in, argv$in) {   // unixmain.c:58
                     if (await yn_function($c.lit("Do you want to keep the save file?"), new $c.Ptr(ynchars, 0), 110, 1) === 110) {
                         await delete_savefile();
                     } else {
-                        $c.chmod(fq_save, 432);
+                        $c.chmod(fq_save, FCMASK);
                         await nh_compress(fq_save);
                     }
                 }
@@ -184,7 +187,7 @@ async function process_options(argc, argv) {   // unixmain.c:330
                 if (arg.get(1) === 68 && !arg.get(2) || !strncmpi(arg, $c.lit("-debug"), -1)) {
                     flags.debug = 1, flags.explore = 0;
                 } else if (!strncmpi(arg, $c.lit("-DECgraphics"), l)) {
-                    await load_symset($c.lit("DECGraphics"), 0 /* PRIMARYSET */);
+                    await load_symset($c.lit("DECGraphics"), PRIMARYSET);
                     await switch_symbols(1);
                 } else {
                     await config_error_add($c.lit("Unknown option: %.60s"), origarg);
@@ -218,8 +221,8 @@ async function process_options(argc, argv) {   // unixmain.c:330
             case 73:
             case 105:
                 if (!strncmpi(arg, $c.lit("-IBMgraphics"), l)) {
-                    await load_symset($c.lit("IBMGraphics"), 0 /* PRIMARYSET */);
-                    await load_symset($c.lit("RogueIBM"), 1 /* ROGUESET */);
+                    await load_symset($c.lit("IBMGraphics"), PRIMARYSET);
+                    await load_symset($c.lit("RogueIBM"), ROGUESET);
                     await switch_symbols(1);
                 } else {
                     await config_error_add($c.lit("Unknown option: %.60s"), origarg);

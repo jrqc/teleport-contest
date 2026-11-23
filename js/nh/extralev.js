@@ -4,13 +4,23 @@ import * as $T from './types.js';
 import { $G } from './globals.js';
 import { gr, gs, svl, svn, svr } from './decl.js';
 import { christen_monst, roguename } from './do_name.js';
+import { NO_MM_FLAGS } from './hack.h.js';
 import { makemon } from './makemon.js';
 import { add_room, dodoor } from './mklev.js';
 import { curse, mksobj_at, weight } from './mkobj.js';
 import { somex, somey } from './mkroom.js';
+import { OROOM } from './mkroom.h.js';
 import { mons } from './monst.js';
+import { PM_GHOST } from './monsters.h.js';
+import { ARROW, BOW, FAKE_AMULET_OF_YENDOR, FOOD_RATION, MACE, PLATE_MAIL, RING_MAIL, TWO_HANDED_SWORD } from './objects.h.js';
 import { impossible } from './pline.js';
+import { CORR, DBWALL, D_NODOOR, SCORR } from './rm.h.js';
 import { rn2, rnd } from './rnd.js';
+
+const XL_UP = 1;
+const XL_DOWN = 2;
+const XL_LEFT = 4;
+const XL_RIGHT = 8;
 
 function roguejoin(x1, y1, x2, y2, horiz) {   // extralev.c:21
     let x = 0, y = 0, middle = 0;
@@ -40,8 +50,8 @@ function roguejoin(x1, y1, x2, y2, horiz) {   // extralev.c:21
 }
 async function roguecorr(x, y, dir) {   // extralev.c:45
     let fromx = 0, fromy = 0, tox = 0, toy = 0;
-    if (dir === 2) {
-        gr.r[x][y].doortable = $c.u8(gr.r[x][y].doortable & -3);
+    if (dir === XL_DOWN) {
+        gr.r[x][y].doortable = $c.u8(gr.r[x][y].doortable & ~XL_DOWN);
         if (!gr.r[x][y].real) {
             fromx = gr.r[x][y].rlx;
             fromy = gr.r[x][y].rly;
@@ -52,11 +62,11 @@ async function roguecorr(x, y, dir) {   // extralev.c:45
             fromy = $c.i16(gr.r[x][y].rly + gr.r[x][y].dy | 0);
             fromx = $c.i16(fromx + (1 + Math.imul(26, x) | 0) | 0);
             fromy = $c.i16(fromy + Math.imul(7, y) | 0);
-            if (!(svl.level.locations[fromx][fromy].typ && svl.level.locations[fromx][fromy].typ <= 12 /* DBWALL */)) {
+            if (!(svl.level.locations[fromx][fromy].typ && svl.level.locations[fromx][fromy].typ <= DBWALL)) {
                 await impossible($c.lit("down: no wall at %d,%d?"), fromx, fromy);
             }
             await dodoor(fromx, fromy, $c.relem(svr.rooms, gr.r[x][y].nroom));
-            svl.level.locations[fromx][fromy].flags = (0) & 31;
+            svl.level.locations[fromx][fromy].flags = (D_NODOOR) & 31;
             fromy = $c.i16(fromy + 1);
         }
         if (y >= 2) {
@@ -64,7 +74,7 @@ async function roguecorr(x, y, dir) {   // extralev.c:45
             return;
         }
         y = $c.i16(y + 1);
-        gr.r[x][y].doortable = $c.u8(gr.r[x][y].doortable & -2);
+        gr.r[x][y].doortable = $c.u8(gr.r[x][y].doortable & ~XL_UP);
         if (!gr.r[x][y].real) {
             tox = gr.r[x][y].rlx;
             toy = gr.r[x][y].rly;
@@ -75,17 +85,17 @@ async function roguecorr(x, y, dir) {   // extralev.c:45
             toy = $c.i16(gr.r[x][y].rly - 1 | 0);
             tox = $c.i16(tox + (1 + Math.imul(26, x) | 0) | 0);
             toy = $c.i16(toy + Math.imul(7, y) | 0);
-            if (!(svl.level.locations[tox][toy].typ && svl.level.locations[tox][toy].typ <= 12 /* DBWALL */)) {
+            if (!(svl.level.locations[tox][toy].typ && svl.level.locations[tox][toy].typ <= DBWALL)) {
                 await impossible($c.lit("up: no wall at %d,%d?"), tox, toy);
             }
             await dodoor(tox, toy, $c.relem(svr.rooms, gr.r[x][y].nroom));
-            svl.level.locations[tox][toy].flags = (0) & 31;
+            svl.level.locations[tox][toy].flags = (D_NODOOR) & 31;
             toy = $c.i16(toy - 1);
         }
         roguejoin(fromx, fromy, tox, toy, 0);
         return;
-    } else if (dir === 8) {
-        gr.r[x][y].doortable = $c.u8(gr.r[x][y].doortable & -9);
+    } else if (dir === XL_RIGHT) {
+        gr.r[x][y].doortable = $c.u8(gr.r[x][y].doortable & ~XL_RIGHT);
         if (!gr.r[x][y].real) {
             fromx = gr.r[x][y].rlx;
             fromy = gr.r[x][y].rly;
@@ -96,11 +106,11 @@ async function roguecorr(x, y, dir) {   // extralev.c:45
             fromy = $c.i16(gr.r[x][y].rly + rn2(gr.r[x][y].dy) | 0);
             fromx = $c.i16(fromx + (1 + Math.imul(26, x) | 0) | 0);
             fromy = $c.i16(fromy + Math.imul(7, y) | 0);
-            if (!(svl.level.locations[fromx][fromy].typ && svl.level.locations[fromx][fromy].typ <= 12 /* DBWALL */)) {
+            if (!(svl.level.locations[fromx][fromy].typ && svl.level.locations[fromx][fromy].typ <= DBWALL)) {
                 await impossible($c.lit("down: no wall at %d,%d?"), fromx, fromy);
             }
             await dodoor(fromx, fromy, $c.relem(svr.rooms, gr.r[x][y].nroom));
-            svl.level.locations[fromx][fromy].flags = (0) & 31;
+            svl.level.locations[fromx][fromy].flags = (D_NODOOR) & 31;
             fromx = $c.i16(fromx + 1);
         }
         if (x >= 2) {
@@ -108,7 +118,7 @@ async function roguecorr(x, y, dir) {   // extralev.c:45
             return;
         }
         x = $c.i16(x + 1);
-        gr.r[x][y].doortable = $c.u8(gr.r[x][y].doortable & -5);
+        gr.r[x][y].doortable = $c.u8(gr.r[x][y].doortable & ~XL_LEFT);
         if (!gr.r[x][y].real) {
             tox = gr.r[x][y].rlx;
             toy = gr.r[x][y].rly;
@@ -119,11 +129,11 @@ async function roguecorr(x, y, dir) {   // extralev.c:45
             toy = $c.i16(gr.r[x][y].rly + rn2(gr.r[x][y].dy) | 0);
             tox = $c.i16(tox + (1 + Math.imul(26, x) | 0) | 0);
             toy = $c.i16(toy + Math.imul(7, y) | 0);
-            if (!(svl.level.locations[tox][toy].typ && svl.level.locations[tox][toy].typ <= 12 /* DBWALL */)) {
+            if (!(svl.level.locations[tox][toy].typ && svl.level.locations[tox][toy].typ <= DBWALL)) {
                 await impossible($c.lit("left: no wall at %d,%d?"), tox, toy);
             }
             await dodoor(tox, toy, $c.relem(svr.rooms, gr.r[x][y].nroom));
-            svl.level.locations[tox][toy].flags = (0) & 31;
+            svl.level.locations[tox][toy].flags = (D_NODOOR) & 31;
             tox = $c.i16(tox - 1);
         }
         roguejoin(fromx, fromy, tox, toy, 1);
@@ -136,16 +146,16 @@ function miniwalk(x, y) {   // extralev.c:139
     let q = 0, dir = 0, dirs = new Int32Array(4), $t1, $t2, $t3, $t4;
     while (1) {
         q = 0;
-        if (x > 0 && !(gr.r[x][y].doortable & 4) && (!gr.r[x - 1 | 0][y].doortable || !rn2(10))) {
+        if (x > 0 && !(gr.r[x][y].doortable & XL_LEFT) && (!gr.r[x - 1 | 0][y].doortable || !rn2(10))) {
             dirs[($t1 = q, q = $t1 + 1 | 0, $t1)] = 0;
         }
-        if (x < 2 && !(gr.r[x][y].doortable & 8) && (!gr.r[x + 1 | 0][y].doortable || !rn2(10))) {
+        if (x < 2 && !(gr.r[x][y].doortable & XL_RIGHT) && (!gr.r[x + 1 | 0][y].doortable || !rn2(10))) {
             dirs[($t2 = q, q = $t2 + 1 | 0, $t2)] = 1;
         }
-        if (y > 0 && !(gr.r[x][y].doortable & 1) && (!gr.r[x][y - 1 | 0].doortable || !rn2(10))) {
+        if (y > 0 && !(gr.r[x][y].doortable & XL_UP) && (!gr.r[x][y - 1 | 0].doortable || !rn2(10))) {
             dirs[($t3 = q, q = $t3 + 1 | 0, $t3)] = 2;
         }
-        if (y < 2 && !(gr.r[x][y].doortable & 2) && (!gr.r[x][y + 1 | 0].doortable || !rn2(10))) {
+        if (y < 2 && !(gr.r[x][y].doortable & XL_DOWN) && (!gr.r[x][y + 1 | 0].doortable || !rn2(10))) {
             dirs[($t4 = q, q = $t4 + 1 | 0, $t4)] = 3;
         }
         if (!q) {
@@ -154,24 +164,24 @@ function miniwalk(x, y) {   // extralev.c:139
         dir = dirs[rn2(q)];
         switch (dir) {
             case 0:
-                gr.r[x][y].doortable = $c.u8(gr.r[x][y].doortable | 4);
+                gr.r[x][y].doortable = $c.u8(gr.r[x][y].doortable | XL_LEFT);
                 x = $c.i16(x - 1);
-                gr.r[x][y].doortable = $c.u8(gr.r[x][y].doortable | 8);
+                gr.r[x][y].doortable = $c.u8(gr.r[x][y].doortable | XL_RIGHT);
                 break;
             case 1:
-                gr.r[x][y].doortable = $c.u8(gr.r[x][y].doortable | 8);
+                gr.r[x][y].doortable = $c.u8(gr.r[x][y].doortable | XL_RIGHT);
                 x = $c.i16(x + 1);
-                gr.r[x][y].doortable = $c.u8(gr.r[x][y].doortable | 4);
+                gr.r[x][y].doortable = $c.u8(gr.r[x][y].doortable | XL_LEFT);
                 break;
             case 2:
-                gr.r[x][y].doortable = $c.u8(gr.r[x][y].doortable | 1);
+                gr.r[x][y].doortable = $c.u8(gr.r[x][y].doortable | XL_UP);
                 y = $c.i16(y - 1);
-                gr.r[x][y].doortable = $c.u8(gr.r[x][y].doortable | 2);
+                gr.r[x][y].doortable = $c.u8(gr.r[x][y].doortable | XL_DOWN);
                 break;
             case 3:
-                gr.r[x][y].doortable = $c.u8(gr.r[x][y].doortable | 2);
+                gr.r[x][y].doortable = $c.u8(gr.r[x][y].doortable | XL_DOWN);
                 y = $c.i16(y + 1);
-                gr.r[x][y].doortable = $c.u8(gr.r[x][y].doortable | 1);
+                gr.r[x][y].doortable = $c.u8(gr.r[x][y].doortable | XL_UP);
                 break;
         }
         miniwalk(x, y);
@@ -208,22 +218,22 @@ export async function makeroguerooms() {   // extralev.c:193
                 lowy = $c.i16(Math.imul(7, y) + gr.r[x][y].rly | 0);
                 hix = $c.i16((((1 + Math.imul(26, x) | 0) + gr.r[x][y].rlx | 0) + gr.r[x][y].dx | 0) - 1 | 0);
                 hiy = $c.i16(((Math.imul(7, y) + gr.r[x][y].rly | 0) + gr.r[x][y].dy | 0) - 1 | 0);
-                await add_room(lowx, lowy, hix, hiy, $c.i8(!rn2(7) ? 1 : 0), 0, 0);
+                await add_room(lowx, lowy, hix, hiy, $c.i8(!rn2(7) ? 1 : 0), OROOM, 0);
             }
         }
     }
     for (y = 0; y < 3; y = $c.i16(y + 1)) {
         for (x = 0; x < 3; x = $c.i16(x + 1)) {
-            if (gr.r[x][y].doortable & 2) {
-                await roguecorr(x, y, 2);
+            if (gr.r[x][y].doortable & XL_DOWN) {
+                await roguecorr(x, y, XL_DOWN);
             }
-            if (gr.r[x][y].doortable & 8) {
-                await roguecorr(x, y, 8);
+            if (gr.r[x][y].doortable & XL_RIGHT) {
+                await roguecorr(x, y, XL_RIGHT);
             }
-            if (gr.r[x][y].doortable & 4) {
+            if (gr.r[x][y].doortable & XL_LEFT) {
                 await impossible($c.lit("left end of %d, %d never connected?"), x, y);
             }
-            if (gr.r[x][y].doortable & 1) {
+            if (gr.r[x][y].doortable & XL_UP) {
                 await impossible($c.lit("up end of %d, %d never connected?"), x, y);
             }
         }
@@ -231,9 +241,9 @@ export async function makeroguerooms() {   // extralev.c:193
 }
 export function corr(x, y) {   // extralev.c:278
     if (rn2(50)) {
-        svl.level.locations[x][y].typ = 24;
+        svl.level.locations[x][y].typ = CORR;
     } else {
-        svl.level.locations[x][y].typ = 15;
+        svl.level.locations[x][y].typ = SCORR;
     }
 }
 export async function makerogueghost() {   // extralev.c:288
@@ -244,36 +254,36 @@ export async function makerogueghost() {   // extralev.c:288
     croom = $c.relem(svr.rooms, rn2(svn.nroom));
     x = $c.i16(somex(croom));
     y = $c.i16(somey(croom));
-    if (!(ghost = await makemon($c.relem(mons, 287 /* PM_GHOST */), x, y, 0))) {
+    if (!(ghost = await makemon($c.relem(mons, PM_GHOST), x, y, NO_MM_FLAGS))) {
         return;
     }
     ghost.msleeping = (1) & 1;
     ghost = await christen_monst(ghost, roguename());
     ghost;
     if (rn2(4)) {
-        ghostobj = await mksobj_at(293 /* FOOD_RATION */, x, y, 0, 0);
+        ghostobj = await mksobj_at(FOOD_RATION, x, y, 0, 0);
         $t1 = rnd(7), ghostobj.quan = $t1;
         $t2 = await weight(ghostobj) >>> 0, ghostobj.owt = $t2;
     }
     if (rn2(2)) {
-        ghostobj = await mksobj_at(73 /* MACE */, x, y, 0, 0);
+        ghostobj = await mksobj_at(MACE, x, y, 0, 0);
         $t3 = $c.i8(rnd(3)), ghostobj.spe = $t3;
         if (rn2(4)) {
             await curse(ghostobj);
         }
     } else {
-        ghostobj = await mksobj_at(55 /* TWO_HANDED_SWORD */, x, y, 0, 0);
+        ghostobj = await mksobj_at(TWO_HANDED_SWORD, x, y, 0, 0);
         $t4 = $c.i8(rnd(5) - 2 | 0), ghostobj.spe = $t4;
         if (rn2(4)) {
             await curse(ghostobj);
         }
     }
-    ghostobj = await mksobj_at(83 /* BOW */, x, y, 0, 0);
+    ghostobj = await mksobj_at(BOW, x, y, 0, 0);
     ghostobj.spe = 1;
     if (rn2(4)) {
         await curse(ghostobj);
     }
-    ghostobj = await mksobj_at(18 /* ARROW */, x, y, 0, 0);
+    ghostobj = await mksobj_at(ARROW, x, y, 0, 0);
     ghostobj.spe = 0;
     $t5 = rn2(10) + 25 | 0, ghostobj.quan = $t5;
     $t6 = await weight(ghostobj) >>> 0, ghostobj.owt = $t6;
@@ -281,7 +291,7 @@ export async function makerogueghost() {   // extralev.c:288
         await curse(ghostobj);
     }
     if (rn2(2)) {
-        ghostobj = await mksobj_at(132 /* RING_MAIL */, x, y, 0, 0);
+        ghostobj = await mksobj_at(RING_MAIL, x, y, 0, 0);
         $t7 = $c.i8(rn2(3)), ghostobj.spe = $t7;
         if (!rn2(3)) {
             ghostobj.oerodeproof = (1) & 1;
@@ -290,7 +300,7 @@ export async function makerogueghost() {   // extralev.c:288
             await curse(ghostobj);
         }
     } else {
-        ghostobj = await mksobj_at(121 /* PLATE_MAIL */, x, y, 0, 0);
+        ghostobj = await mksobj_at(PLATE_MAIL, x, y, 0, 0);
         $t8 = $c.i8(rnd(5) - 2 | 0), ghostobj.spe = $t8;
         if (!rn2(3)) {
             ghostobj.oerodeproof = (1) & 1;
@@ -300,7 +310,7 @@ export async function makerogueghost() {   // extralev.c:288
         }
     }
     if (rn2(2)) {
-        ghostobj = await mksobj_at(212 /* FAKE_AMULET_OF_YENDOR */, x, y, 1, 0);
+        ghostobj = await mksobj_at(FAKE_AMULET_OF_YENDOR, x, y, 1, 0);
         ghostobj.known = (1) & 1;
     }
 }

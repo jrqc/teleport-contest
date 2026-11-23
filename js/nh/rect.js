@@ -4,8 +4,12 @@ import * as $T from './types.js';
 import { $G } from './globals.js';
 import { alloc } from './alloc.js';
 import { panic } from './end.js';
+import { COLNO, ROWNO } from './global.h.js';
 import { impossible } from './pline.js';
 import { rn2 } from './rnd.js';
+
+const XLIM = 4;
+const YLIM = 3;
 
 let rect = null;
 let n_rects = 0;
@@ -21,8 +25,8 @@ export async function init_rect() {   // rect.c:29
     }
     rect_cnt = 1;
     $t1 = $c.radd(rect, 0).ly = 0, $c.radd(rect, 0).lx = $t1;
-    $c.radd(rect, 0).hx = 79;
-    $c.radd(rect, 0).hy = 20;
+    $c.radd(rect, 0).hx = COLNO - 1;
+    $c.radd(rect, 0).hy = ROWNO - 1;
 }
 export function free_rect() {   // rect.c:45
     if (rect) {
@@ -108,22 +112,22 @@ export async function split_rects(r1, r2) {   // rect.c:182
             await split_rects($c.radd(rect, i), r);
         }
     }
-    if (((r2.ly - old_r.ly | 0) - 1 | 0) > ((old_r.hy < 20 ? 6 : 4) + 4 | 0)) {
+    if (((r2.ly - old_r.ly | 0) - 1 | 0) > ((old_r.hy < ROWNO - 1 ? 2 * YLIM : YLIM + 1) + 4 | 0)) {
         r.$copyFrom(old_r);
         r.hy = $c.i16(r2.ly - 2 | 0);
         await add_rect(r);
     }
-    if (((r2.lx - old_r.lx | 0) - 1 | 0) > ((old_r.hx < 79 ? 8 : 5) + 4 | 0)) {
+    if (((r2.lx - old_r.lx | 0) - 1 | 0) > ((old_r.hx < COLNO - 1 ? 2 * XLIM : XLIM + 1) + 4 | 0)) {
         r.$copyFrom(old_r);
         r.hx = $c.i16(r2.lx - 2 | 0);
         await add_rect(r);
     }
-    if (((old_r.hy - r2.hy | 0) - 1 | 0) > ((old_r.ly > 0 ? 6 : 4) + 4 | 0)) {
+    if (((old_r.hy - r2.hy | 0) - 1 | 0) > ((old_r.ly > 0 ? 2 * YLIM : YLIM + 1) + 4 | 0)) {
         r.$copyFrom(old_r);
         r.ly = $c.i16(r2.hy + 2 | 0);
         await add_rect(r);
     }
-    if (((old_r.hx - r2.hx | 0) - 1 | 0) > ((old_r.lx > 0 ? 8 : 5) + 4 | 0)) {
+    if (((old_r.hx - r2.hx | 0) - 1 | 0) > ((old_r.lx > 0 ? 2 * XLIM : XLIM + 1) + 4 | 0)) {
         r.$copyFrom(old_r);
         r.lx = $c.i16(r2.hx + 2 | 0);
         await add_rect(r);

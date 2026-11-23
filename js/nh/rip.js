@@ -8,6 +8,11 @@ import { gd, gr, svp } from './decl.js';
 import { formatkiller } from './topten.js';
 import { windowprocs } from './windows.js';
 
+const NAME_LINE = 6;
+const GOLD_LINE = 7;
+const DEATH_LINE = 8;
+const YEAR_LINE = 12;
+
 const rip_txt = $c.nulls(16);
 function center(line, text) {   // rip.c:76
     let ip = null, op = null, $t1, $t2, $t3, $t4;
@@ -25,15 +30,15 @@ export async function genl_outrip(tmpwin, how, when) {   // rip.c:86
     }
     dp.set(x, null);
     $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%.*s"), 16, new $c.Ptr(svp.plname, 0));
-    center(6, new $c.Ptr(buf, 0));
+    center(NAME_LINE, new $c.Ptr(buf, 0));
     cash = gd.done_money > 0 ? gd.done_money : 0;
     if (cash > 999999999) {
         cash = 999999999;
     }
     $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%ld Au"), cash);
-    center(7, new $c.Ptr(buf, 0));
+    center(GOLD_LINE, new $c.Ptr(buf, 0));
     await formatkiller(new $c.Ptr(buf, 0), 256, how, 0);
-    for (line = 8, dpx = new $c.Ptr(buf, 0); line < 12; line = line + 1 | 0) {
+    for (line = DEATH_LINE, dpx = new $c.Ptr(buf, 0); line < YEAR_LINE; line = line + 1 | 0) {
         i0 = $c.i32($c.strlen(dpx));
         if (i0 > 16) {
             for (i = 16; i > 0 && i0 > 16; i = i - 1 | 0) {
@@ -57,7 +62,7 @@ export async function genl_outrip(tmpwin, how, when) {   // rip.c:86
     }
     year = $c.i32($c.rem64($c.div64(yyyymmdd(when), 10000), 10000));
     $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("%4d"), year);
-    center(12, new $c.Ptr(buf, 0));
+    center(YEAR_LINE, new $c.Ptr(buf, 0));
     await windowprocs.win_putstr(tmpwin, 0, $c.lit(""));
     for (; dp.get(0); dp = dp.add(1)) {
         await windowprocs.win_putstr(tmpwin, 0, dp.get(0));

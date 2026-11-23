@@ -2,13 +2,17 @@
 import * as $c from '../crt/index.js';
 import * as $T from './types.js';
 import { $G } from './globals.js';
+import { DUMPLOG_MSG_COUNT } from './config.h.js';
 import { gc, gs } from './decl.js';
 import { NH_abort } from './end.js';
+import { ECMD_OK } from './hack.h.js';
 import { copynchars, nh_snprintf, strsubst } from './hacklib.js';
 import { pline, raw_printf } from './pline.js';
 import { sysopt } from './sys.js';
 import { getversionstring, version_string } from './version.js';
 import { windowprocs } from './windows.js';
+
+const MAX_URL = 8192;
 
 let crashreport_init$once = 0;   // static in crashreport_init()
 const crashreport_init$hexdigits = new Int8Array(17);   // static in crashreport_init()
@@ -114,7 +118,7 @@ export function swr_add_uricoded(in_, out, remaining, markp) {   // report.c:237
 }
 export async function submit_web_report(cos, msg, why) {   // report.c:290
     let temp = new Int8Array(200), temp2 = new Int8Array(200), countpp = 0, count = 0, bt = $c.nulls(20), x = 0, info = null, k = 0, line = null, xargv = $c.nulls(3), pid = 0, err = new Int8Array(400), status = Int32Array.of(0);
-    urem[0] = gc.crash_urlmax < 0 || gc.crash_urlmax > 8192 ? 8192 : 8192 < gc.crash_urlmax ? 8192 : gc.crash_urlmax;
+    urem[0] = gc.crash_urlmax < 0 || gc.crash_urlmax > MAX_URL ? MAX_URL : 8192 < gc.crash_urlmax ? 8192 : gc.crash_urlmax;
     countpp = 0;
     if (!sysopt.crashreporturl) {
         return 0;
@@ -297,7 +301,7 @@ export async function dobugreport() {   // report.c:461
     if (!await submit_web_report(2, null, $c.lit("#bugreport command"))) {
         await pline($c.lit("Unable to send bug report.  Please visit %s instead."), sysopt.crashreporturl && sysopt.crashreporturl.get(0) ? sysopt.crashreporturl : $c.lit("https://www.nethack.org/"));
     }
-    return 0;
+    return ECMD_OK;
 }
 export async function NH_panictrace_libc() {   // report.c:485
     let bt = $c.nulls(20), count = 0, x = 0, info = null, buf = new Int8Array(256);
@@ -337,15 +341,15 @@ export async function NH_panictrace_gdb() {   // report.c:529
 }
 export function get_saved_pline(lineno) {   // report.c:571
     let p = 0, limit = 0, $t1, $t2;
-    limit = 50;
-    if (lineno >= 50) {
+    limit = DUMPLOG_MSG_COUNT;
+    if (lineno >= DUMPLOG_MSG_COUNT) {
         return null;
     }
-    p = $c.remu32(gs.saved_pline_index - 1 >>> 0, 50) | 0;
+    p = $c.remu32(gs.saved_pline_index - 1 >>> 0, DUMPLOG_MSG_COUNT) | 0;
     while ($t1 = limit, limit = $t1 - 1 | 0, $t1) {
         if (gs.saved_plines[p]) {
             if ($t2 = lineno, lineno = $t2 - 1 | 0, $t2) {
-                p = $c.rem32((p - 1 | 0) + 50 | 0, 50);
+                p = $c.rem32((p - 1 | 0) + DUMPLOG_MSG_COUNT | 0, DUMPLOG_MSG_COUNT);
             } else {
                 return gs.saved_plines[p];
             }
@@ -373,7 +377,7 @@ export async function panictrace_setsignals(set) {   // report.c:625
 export function $init() {
     bid.fill(0);
     url.fill(0);
-    urem[0] = 8192;
+    urem[0] = MAX_URL;
     uend[0] = new $c.Ptr(url, 0);
     utmp = 0;
     mark = null;

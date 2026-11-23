@@ -5,6 +5,7 @@ import { $G } from './globals.js';
 import { alloc } from './alloc.js';
 import { isok } from './cmd.js';
 import { flags, gd, program_state, svb, svc, svd, svl, svr, u } from './decl.js';
+import { AMULET_CLASS, ARMOR_CLASS, FOOD_CLASS, GEM_CLASS, POTION_CLASS, RING_CLASS, SCROLL_CLASS, SPBOOK_CLASS, S_BLOB, S_ELEMENTAL, S_FUNGUS, S_GHOST, S_GOLEM, S_JELLY, S_LIGHT, S_MIMIC, S_PUDDING, S_VORTEX, TOOL_CLASS, WAND_CLASS, WEAPON_CLASS } from './defsym.h.js';
 import { cvt_sdoor_to_door } from './detect.js';
 import { newsym } from './display.js';
 import { noit_mon_nam } from './do_name.js';
@@ -12,18 +13,29 @@ import { In_mines, Is_special, assign_level, depth, ledger_no, on_level } from '
 import { set_tin_variety } from './eat.js';
 import { panic } from './end.js';
 import { make_engr_at } from './engrave.js';
+import { DUST } from './engrave.h.js';
+import { PL_NSIZ } from './global.h.js';
 import { in_rooms, in_town } from './hack.js';
+import { HEALTHY_TIN, MM_ESHK, NO_MM_FLAGS, RLOC_NOMSG } from './hack.h.js';
 import { distmin, highc, letter } from './hacklib.js';
 import { makemon, mkclass, mkmonmoney, mongets, newmextra, set_malign } from './makemon.js';
 import { mkobj_at, mksobj_at } from './mkobj.js';
+import { D_SHOP, SHOPBASE } from './mkroom.h.js';
 import { mongone } from './mon.js';
 import { mon_learns_traps } from './mondata.js';
 import { mons } from './monst.js';
+import { PM_BLACK_PUDDING, PM_FLESH_GOLEM, PM_LEATHER_GOLEM, PM_LICHEN, PM_SHOPKEEPER, PM_STALKER } from './monsters.h.js';
+import { MAXOCLASSES, NUM_OBJECTS, RANDOM_CLASS, VEGGY } from './objclass.h.js';
 import { obj_descr, objects } from './objects.js';
+import { BRASS_LANTERN, CORPSE, EGG, ELVEN_CLOAK, ICE_BOX, LEATHER_GLOVES, LUMP_OF_ROYAL_JELLY, MAGIC_LAMP, OIL_LAMP, POT_BOOZE, POT_FRUIT_JUICE, POT_FULL_HEALING, POT_HEALING, POT_OIL, POT_WATER, SCR_CHARGING, SCR_FOOD_DETECTION, SCR_LIGHT, SPE_LIGHT, SPE_NOVEL, TALLOW_CANDLE, TIN, TOUCHSTONE, WAN_LIGHT, WAX_CANDLE } from './objects.h.js';
+import { LOW_PM, NON_PM, NUMMONS } from './permonst.h.js';
 import { impossible, pline } from './pline.js';
+import { HALLUC, HALLUC_RES } from './prop.h.js';
+import { CORR, D_ISOPEN, D_LOCKED, D_NODOOR, D_TRAPPED, ROOM, SDOOR } from './rm.h.js';
 import { rn2, rnd } from './rnd.js';
 import { inside_shop, shop_keeper } from './shk.js';
 import { rloc } from './teleport.js';
+import { ALL_TRAPS } from './trap.h.js';
 import { windowprocs } from './windows.js';
 
 const shkliquors = $c.nulls(31);
@@ -46,27 +58,27 @@ function veggy_item(obj, otyp) {   // shknam.c:380
         corpsenm = obj.corpsenm;
     } else {
         oclass = objects[otyp].oc_class;
-        corpsenm = 158 /* PM_LICHEN */;
+        corpsenm = PM_LICHEN;
     }
-    if (oclass === 7 /* FOOD_CLASS */) {
-        if ((objects[otyp].oc_material | 0) === 3 /* VEGGY */ || otyp === 266 /* EGG */) {
+    if (oclass === FOOD_CLASS) {
+        if ((objects[otyp].oc_material | 0) === VEGGY || otyp === EGG) {
             return 1;
         }
-        if (otyp === 296 /* TIN */ && corpsenm === -1 /* NON_PM */) {
+        if (otyp === TIN && corpsenm === NON_PM) {
             return $c.i8(obj.spe === 1 ? 1 : 0);
         }
-        if (otyp === 296 /* TIN */ || otyp === 265 /* CORPSE */) {
-            return $c.i8(corpsenm >= 0 /* LOW_PM */ && corpsenm < 383 /* NUMMONS */ && ($c.relem(mons, corpsenm).mlet === 2 /* S_BLOB */ || $c.relem(mons, corpsenm).mlet === 10 /* S_JELLY */ || $c.relem(mons, corpsenm).mlet === 32 /* S_FUNGUS */ || $c.relem(mons, corpsenm).mlet === 22 /* S_VORTEX */ || $c.relem(mons, corpsenm).mlet === 25 /* S_LIGHT */ || $c.relem(mons, corpsenm).mlet === 31 /* S_ELEMENTAL */ && !$c.peq($c.relem(mons, corpsenm), $c.relem(mons, 153 /* PM_STALKER */)) || $c.relem(mons, corpsenm).mlet === 55 /* S_GOLEM */ && !$c.peq($c.relem(mons, corpsenm), $c.relem(mons, 255 /* PM_FLESH_GOLEM */)) && !$c.peq($c.relem(mons, corpsenm), $c.relem(mons, 253 /* PM_LEATHER_GOLEM */)) || $c.relem(mons, corpsenm).mlet === 54 /* S_GHOST */ || $c.relem(mons, corpsenm).mlet === 42 /* S_PUDDING */ && !$c.peq($c.relem(mons, corpsenm), $c.relem(mons, 209 /* PM_BLACK_PUDDING */))) ? 1 : 0);
+        if (otyp === TIN || otyp === CORPSE) {
+            return $c.i8(corpsenm >= LOW_PM && corpsenm < NUMMONS && ($c.relem(mons, corpsenm).mlet === S_BLOB || $c.relem(mons, corpsenm).mlet === S_JELLY || $c.relem(mons, corpsenm).mlet === S_FUNGUS || $c.relem(mons, corpsenm).mlet === S_VORTEX || $c.relem(mons, corpsenm).mlet === S_LIGHT || $c.relem(mons, corpsenm).mlet === S_ELEMENTAL && !$c.peq($c.relem(mons, corpsenm), $c.relem(mons, PM_STALKER)) || $c.relem(mons, corpsenm).mlet === S_GOLEM && !$c.peq($c.relem(mons, corpsenm), $c.relem(mons, PM_FLESH_GOLEM)) && !$c.peq($c.relem(mons, corpsenm), $c.relem(mons, PM_LEATHER_GOLEM)) || $c.relem(mons, corpsenm).mlet === S_GHOST || $c.relem(mons, corpsenm).mlet === S_PUDDING && !$c.peq($c.relem(mons, corpsenm), $c.relem(mons, PM_BLACK_PUDDING))) ? 1 : 0);
         }
     }
     return 0;
 }
 async function shkveg() {   // shknam.c:408
     let i = 0, j = 0, maxprob = 0, prob = 0, oclass = 0, ok = new Int32Array(481), $t1;
-    oclass = 7;
+    oclass = FOOD_CLASS;
     $c.__builtin___memset_chk(new $c.Ptr(ok, 0), 0, 1924, 1924);
     j = maxprob = 0;
-    for (i = svb.bases[oclass]; i < 481 /* NUM_OBJECTS */; i = i + 1 | 0) {
+    for (i = svb.bases[oclass]; i < NUM_OBJECTS; i = i + 1 | 0) {
         if (objects[i].oc_class !== oclass) {
             break;
         }
@@ -93,24 +105,24 @@ async function shkveg() {   // shknam.c:408
 async function mkveggy_at(sx, sy) {   // shknam.c:443
     let obj = null;
     obj = await mksobj_at(await shkveg(), $c.i16(sx), $c.i16(sy), 1, 1);
-    if (obj && obj.otyp === 296 /* TIN */) {
-        set_tin_variety(obj, -3);
+    if (obj && obj.otyp === TIN) {
+        set_tin_variety(obj, HEALTHY_TIN);
     }
     return;
 }
 async function mkshobj_at(shp, sx, sy, mkspecl) {   // shknam.c:454
     let mtmp = null, ptr = null, atype = 0, novel = null;
     if (mkspecl && (!$c.strcmp(shp.name, $c.lit("rare books")) || !$c.strcmp(shp.name, $c.lit("second-hand bookstore")))) {
-        novel = await mksobj_at(408 /* SPE_NOVEL */, $c.i16(sx), $c.i16(sy), 0, 0);
+        novel = await mksobj_at(SPE_NOVEL, $c.i16(sx), $c.i16(sy), 0, 0);
         if (novel) {
             svc.context.tribute.bookstock = (1) & 1;
         }
         return;
     }
-    if (rn2(100) < depth(u.uz) && !(svl.level.monsters[sx][sy] !== null) && (ptr = await mkclass(13, 0)) !== null && (mtmp = await makemon(ptr, $c.i16(sx), $c.i16(sy), 0)) !== null) {
+    if (rn2(100) < depth(u.uz) && !(svl.level.monsters[sx][sy] !== null) && (ptr = await mkclass(S_MIMIC, 0)) !== null && (mtmp = await makemon(ptr, $c.i16(sx), $c.i16(sy), NO_MM_FLAGS)) !== null) {
     } else {
         atype = get_shop_item($c.i32($c.rdiff(shp, $c.relem(shtypes, 0))));
-        if (atype === 19) {
+        if (atype === MAXOCLASSES + 1) {
             await mkveggy_at(sx, sy);
         } else if (atype < 0) {
             await mksobj_at(-atype | 0, $c.i16(sx), $c.i16(sy), 1, 1);
@@ -177,7 +189,7 @@ function nameshk(shk, nlp) {   // shknam.c:487
         }
     }
     $c.__builtin___strncpy_chk(new $c.Ptr(shk.mextra.eshk.shknam, 0), shname, 32, -1);
-    shk.mextra.eshk.shknam[31] = 0;
+    shk.mextra.eshk.shknam[PL_NSIZ - 1] = 0;
 }
 export async function neweshk(mtmp) {   // shknam.c:557
     let $t1, $t2;
@@ -250,16 +262,16 @@ async function shkinit(shp, sroom) {   // shknam.c:628
         return -1;
     }
     if (svl.level.monsters[sx[0]][sy[0]] !== null) {
-        await rloc(svl.level.monsters[sx[0]][sy[0]], 4);
+        await rloc(svl.level.monsters[sx[0]][sy[0]], RLOC_NOMSG);
     }
-    if (!(shk = await makemon($c.relem(mons, 271 /* PM_SHOPKEEPER */), sx[0], sy[0], 512))) {
+    if (!(shk = await makemon($c.relem(mons, PM_SHOPKEEPER), sx[0], sy[0], MM_ESHK))) {
         return -1;
     }
     eshkp = shk.mextra.eshk;
     $t2 = shk.mpeaceful = (1) & 1, shk.isshk = ($t2) & 1;
     set_malign(shk);
     shk.msleeping = (0) & 1;
-    mon_learns_traps(shk, -1 /* ALL_TRAPS */);
+    mon_learns_traps(shk, ALL_TRAPS);
     eshkp.shoproom = $c.i8($c.add64($c.rdiff(sroom, $c.relem(svr.rooms, 0)), 3));
     sroom.resident = shk;
     eshkp.shoptype = sroom.rtype;
@@ -274,10 +286,10 @@ async function shkinit(shp, sroom) {   // shknam.c:628
     eshkp.customer[0] = 0;
     await mkmonmoney(shk, $c.add64(1000, $c.mul64(30, rnd(100))));
     if ($c.peq(shp.shknms, new $c.Ptr(shkrings, 0))) {
-        await mongets(shk, 472 /* TOUCHSTONE */);
+        await mongets(shk, TOUCHSTONE);
     }
     if ($c.peq(shp.shknms, new $c.Ptr(shktools, 0)) || $c.peq(shp.shknms, new $c.Ptr(shkwands, 0)) || $c.peq(shp.shknms, new $c.Ptr(shkrings, 0)) && rn2(2) || $c.peq(shp.shknms, new $c.Ptr(shkgeneral, 0)) && rn2(5)) {
-        await mongets(shk, 342 /* SCR_CHARGING */);
+        await mongets(shk, SCR_CHARGING);
     }
     nameshk(shk, shp.shknms);
     return sh;
@@ -290,7 +302,7 @@ function stock_room_goodpos(sroom, rmno, sh, sx, sy) {   // shknam.c:695
     } else if (sx === sroom.lx && $c.radd(svd.doors, sh).x === (sx - 1 | 0) || sx === sroom.hx && $c.radd(svd.doors, sh).x === (sx + 1 | 0) || sy === sroom.ly && $c.radd(svd.doors, sh).y === (sy - 1 | 0) || sy === sroom.hy && $c.radd(svd.doors, sh).y === (sy + 1 | 0)) {
         return 0;
     }
-    if (!(svl.level.locations[sx][sy].typ >= 25 /* ROOM */)) {
+    if (!(svl.level.locations[sx][sy].typ >= ROOM)) {
         return 0;
     }
     return 1;
@@ -306,18 +318,18 @@ export async function stock_room(shp_indx, sroom) {   // shknam.c:718
     }
     sx = $c.radd(svd.doors, sroom.fdoor).x;
     sy = $c.radd(svd.doors, sroom.fdoor).y;
-    if ((svl.level.locations[sx][sy].flags | 0) === 0) {
-        svl.level.locations[sx][sy].flags = (2) & 31;
+    if ((svl.level.locations[sx][sy].flags | 0) === D_NODOOR) {
+        svl.level.locations[sx][sy].flags = (D_ISOPEN) & 31;
         await newsym($c.i16(sx), $c.i16(sy));
     }
-    if (svl.level.locations[sx][sy].typ === 14 /* SDOOR */) {
+    if (svl.level.locations[sx][sy].typ === SDOOR) {
         cvt_sdoor_to_door($c.relem(svl.level.locations[sx], sy));
         await newsym($c.i16(sx), $c.i16(sy));
     }
-    if ((svl.level.locations[sx][sy].flags | 0) & 16) {
-        svl.level.locations[sx][sy].flags = (8) & 31;
+    if ((svl.level.locations[sx][sy].flags | 0) & D_TRAPPED) {
+        svl.level.locations[sx][sy].flags = (D_LOCKED) & 31;
     }
-    if ((svl.level.locations[sx][sy].flags | 0) === 8) {
+    if ((svl.level.locations[sx][sy].flags | 0) === D_LOCKED) {
         m = sx;
         n = sy;
         if (inside_shop($c.i16(sx + 1 | 0), $c.i16(sy))) {
@@ -331,9 +343,9 @@ export async function stock_room(shp_indx, sroom) {   // shknam.c:718
             n = n + 1 | 0;
         }
         $c.__builtin___sprintf_chk(new $c.Ptr(buf, 0), 0, 256, $c.lit("Closed for inventory"));
-        await make_engr_at($c.i16(m), $c.i16(n), new $c.Ptr(buf, 0), null, 0, 1);
-        if (svl.level.locations[m][n].typ !== 24 /* CORR */ && svl.level.locations[m][n].typ !== 25 /* ROOM */) {
-            $t1 = $c.i8(Is_special(u.uz) || in_rooms($c.i16(m), $c.i16(n), 0).get(0) ? 25 /* ROOM */ : 24 /* CORR */), svl.level.locations[m][n].typ = $t1;
+        await make_engr_at($c.i16(m), $c.i16(n), new $c.Ptr(buf, 0), null, 0, DUST);
+        if (svl.level.locations[m][n].typ !== CORR && svl.level.locations[m][n].typ !== ROOM) {
+            $t1 = $c.i8(Is_special(u.uz) || in_rooms($c.i16(m), $c.i16(n), 0).get(0) ? ROOM : CORR), svl.level.locations[m][n].typ = $t1;
         }
     }
     if (svc.context.tribute.enabled && !svc.context.tribute.bookstock) {
@@ -363,13 +375,13 @@ export async function stock_room(shp_indx, sroom) {   // shknam.c:718
 }
 export function saleable(shkp, obj) {   // shknam.c:805
     let i = 0, shp_indx = 0, shp = null;
-    shp_indx = shkp.mextra.eshk.shoptype - 14 /* SHOPBASE */ | 0;
+    shp_indx = shkp.mextra.eshk.shoptype - SHOPBASE | 0;
     shp = $c.relem(shtypes, shp_indx);
-    if (shp.symb === 0 /* RANDOM_CLASS */) {
+    if (shp.symb === RANDOM_CLASS) {
         return 1;
     }
     for (i = 0; i < 9 && shp.iprobs[i].iprob; i = i + 1 | 0) {
-        if (shp.iprobs[i].itype === 19) {
+        if (shp.iprobs[i].itype === MAXOCLASSES + 1) {
             if (veggy_item(obj, 0)) {
                 return 1;
             }
@@ -405,7 +417,7 @@ export async function shkname(mtmp) {   // shknam.c:856
         await panic($c.lit("shkname: shopkeeper \"%s\" lacks 'eshk' data."), nam);
     } else {
         shknm = new $c.Ptr(mtmp.mextra.eshk.shknam, 0);
-        if (u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic) && !program_state.gameover) {
+        if (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) && !program_state.gameover) {
             for (num = 0; num < 13; num = num + 1 | 0) {
                 if (shtypes[num].prob === 0) {
                     break;
@@ -435,7 +447,7 @@ export function shkname_is_pname(mtmp) {   // shknam.c:900
 }
 export function is_izchak(shkp, override_hallucination) {   // shknam.c:908
     let shknm = null;
-    if (u.uprops[23 /* HALLUC */].intrinsic && !(u.uprops[24 /* HALLUC_RES */].intrinsic || u.uprops[24 /* HALLUC_RES */].extrinsic) && !override_hallucination) {
+    if (u.uprops[HALLUC].intrinsic && !(u.uprops[HALLUC_RES].intrinsic || u.uprops[HALLUC_RES].extrinsic) && !override_hallucination) {
         return 0;
     }
     if (!shkp.isshk) {
@@ -824,11 +836,11 @@ export function $init() {
     }
     shtypes[0].name = $c.lit("general store");
     shtypes[0].annotation = null;
-    shtypes[0].symb = 0;
+    shtypes[0].symb = RANDOM_CLASS;
     shtypes[0].prob = 42;
-    shtypes[0].shdist = 1;
+    shtypes[0].shdist = D_SHOP;
     shtypes[0].iprobs[0].iprob = 100;
-    shtypes[0].iprobs[0].itype = 0 /* RANDOM_CLASS */;
+    shtypes[0].iprobs[0].itype = RANDOM_CLASS;
     shtypes[0].iprobs[1].iprob = 0;
     shtypes[0].iprobs[1].itype = 0;
     shtypes[0].iprobs[2].iprob = 0;
@@ -842,13 +854,13 @@ export function $init() {
     shtypes[0].shknms = new $c.Ptr(shkgeneral, 0);
     shtypes[1].name = $c.lit("used armor dealership");
     shtypes[1].annotation = $c.lit("armor shop");
-    shtypes[1].symb = 3;
+    shtypes[1].symb = ARMOR_CLASS;
     shtypes[1].prob = 14;
-    shtypes[1].shdist = 1;
+    shtypes[1].shdist = D_SHOP;
     shtypes[1].iprobs[0].iprob = 90;
-    shtypes[1].iprobs[0].itype = 3 /* ARMOR_CLASS */;
+    shtypes[1].iprobs[0].itype = ARMOR_CLASS;
     shtypes[1].iprobs[1].iprob = 10;
-    shtypes[1].iprobs[1].itype = 2 /* WEAPON_CLASS */;
+    shtypes[1].iprobs[1].itype = WEAPON_CLASS;
     shtypes[1].iprobs[2].iprob = 0;
     shtypes[1].iprobs[2].itype = 0;
     shtypes[1].iprobs[3].iprob = 0;
@@ -860,13 +872,13 @@ export function $init() {
     shtypes[1].shknms = new $c.Ptr(shkarmors, 0);
     shtypes[2].name = $c.lit("second-hand bookstore");
     shtypes[2].annotation = $c.lit("scroll shop");
-    shtypes[2].symb = 9;
+    shtypes[2].symb = SCROLL_CLASS;
     shtypes[2].prob = 10;
-    shtypes[2].shdist = 1;
+    shtypes[2].shdist = D_SHOP;
     shtypes[2].iprobs[0].iprob = 90;
-    shtypes[2].iprobs[0].itype = 9 /* SCROLL_CLASS */;
+    shtypes[2].iprobs[0].itype = SCROLL_CLASS;
     shtypes[2].iprobs[1].iprob = 10;
-    shtypes[2].iprobs[1].itype = 10 /* SPBOOK_CLASS */;
+    shtypes[2].iprobs[1].itype = SPBOOK_CLASS;
     shtypes[2].iprobs[2].iprob = 0;
     shtypes[2].iprobs[2].itype = 0;
     shtypes[2].iprobs[3].iprob = 0;
@@ -878,11 +890,11 @@ export function $init() {
     shtypes[2].shknms = new $c.Ptr(shkbooks, 0);
     shtypes[3].name = $c.lit("liquor emporium");
     shtypes[3].annotation = $c.lit("potion shop");
-    shtypes[3].symb = 8;
+    shtypes[3].symb = POTION_CLASS;
     shtypes[3].prob = 10;
-    shtypes[3].shdist = 1;
+    shtypes[3].shdist = D_SHOP;
     shtypes[3].iprobs[0].iprob = 100;
-    shtypes[3].iprobs[0].itype = 8 /* POTION_CLASS */;
+    shtypes[3].iprobs[0].itype = POTION_CLASS;
     shtypes[3].iprobs[1].iprob = 0;
     shtypes[3].iprobs[1].itype = 0;
     shtypes[3].iprobs[2].iprob = 0;
@@ -896,13 +908,13 @@ export function $init() {
     shtypes[3].shknms = new $c.Ptr(shkliquors, 0);
     shtypes[4].name = $c.lit("antique weapons outlet");
     shtypes[4].annotation = $c.lit("weapon shop");
-    shtypes[4].symb = 2;
+    shtypes[4].symb = WEAPON_CLASS;
     shtypes[4].prob = 5;
-    shtypes[4].shdist = 1;
+    shtypes[4].shdist = D_SHOP;
     shtypes[4].iprobs[0].iprob = 90;
-    shtypes[4].iprobs[0].itype = 2 /* WEAPON_CLASS */;
+    shtypes[4].iprobs[0].itype = WEAPON_CLASS;
     shtypes[4].iprobs[1].iprob = 10;
-    shtypes[4].iprobs[1].itype = 3 /* ARMOR_CLASS */;
+    shtypes[4].iprobs[1].itype = ARMOR_CLASS;
     shtypes[4].iprobs[2].iprob = 0;
     shtypes[4].iprobs[2].itype = 0;
     shtypes[4].iprobs[3].iprob = 0;
@@ -914,33 +926,33 @@ export function $init() {
     shtypes[4].shknms = new $c.Ptr(shkweapons, 0);
     shtypes[5].name = $c.lit("delicatessen");
     shtypes[5].annotation = $c.lit("food shop");
-    shtypes[5].symb = 7;
+    shtypes[5].symb = FOOD_CLASS;
     shtypes[5].prob = 5;
-    shtypes[5].shdist = 1;
+    shtypes[5].shdist = D_SHOP;
     shtypes[5].iprobs[0].iprob = 83;
-    shtypes[5].iprobs[0].itype = 7 /* FOOD_CLASS */;
+    shtypes[5].iprobs[0].itype = FOOD_CLASS;
     shtypes[5].iprobs[1].iprob = 5;
-    shtypes[5].iprobs[1].itype = -319;
+    shtypes[5].iprobs[1].itype = -POT_FRUIT_JUICE;
     shtypes[5].iprobs[2].iprob = 4;
-    shtypes[5].iprobs[2].itype = -317;
+    shtypes[5].iprobs[2].itype = -POT_BOOZE;
     shtypes[5].iprobs[3].iprob = 5;
-    shtypes[5].iprobs[3].itype = -322;
+    shtypes[5].iprobs[3].itype = -POT_WATER;
     shtypes[5].iprobs[4].iprob = 3;
-    shtypes[5].iprobs[4].itype = -216;
+    shtypes[5].iprobs[4].itype = -ICE_BOX;
     shtypes[5].iprobs[5].iprob = 0;
     shtypes[5].iprobs[5].itype = 0;
     shtypes[5].shknms = new $c.Ptr(shkfoods, 0);
     shtypes[6].name = $c.lit("jewelers");
     shtypes[6].annotation = $c.lit("ring shop");
-    shtypes[6].symb = 4;
+    shtypes[6].symb = RING_CLASS;
     shtypes[6].prob = 3;
-    shtypes[6].shdist = 1;
+    shtypes[6].shdist = D_SHOP;
     shtypes[6].iprobs[0].iprob = 85;
-    shtypes[6].iprobs[0].itype = 4 /* RING_CLASS */;
+    shtypes[6].iprobs[0].itype = RING_CLASS;
     shtypes[6].iprobs[1].iprob = 10;
-    shtypes[6].iprobs[1].itype = 13 /* GEM_CLASS */;
+    shtypes[6].iprobs[1].itype = GEM_CLASS;
     shtypes[6].iprobs[2].iprob = 5;
-    shtypes[6].iprobs[2].itype = 5 /* AMULET_CLASS */;
+    shtypes[6].iprobs[2].itype = AMULET_CLASS;
     shtypes[6].iprobs[3].iprob = 0;
     shtypes[6].iprobs[3].itype = 0;
     shtypes[6].iprobs[4].iprob = 0;
@@ -950,25 +962,25 @@ export function $init() {
     shtypes[6].shknms = new $c.Ptr(shkrings, 0);
     shtypes[7].name = $c.lit("quality apparel and accessories");
     shtypes[7].annotation = $c.lit("wand shop");
-    shtypes[7].symb = 11;
+    shtypes[7].symb = WAND_CLASS;
     shtypes[7].prob = 3;
-    shtypes[7].shdist = 1;
+    shtypes[7].shdist = D_SHOP;
     shtypes[7].iprobs[0].iprob = 90;
-    shtypes[7].iprobs[0].itype = 11 /* WAND_CLASS */;
+    shtypes[7].iprobs[0].itype = WAND_CLASS;
     shtypes[7].iprobs[1].iprob = 5;
-    shtypes[7].iprobs[1].itype = -159;
+    shtypes[7].iprobs[1].itype = -LEATHER_GLOVES;
     shtypes[7].iprobs[2].iprob = 5;
-    shtypes[7].iprobs[2].itype = -139;
+    shtypes[7].iprobs[2].itype = -ELVEN_CLOAK;
     shtypes[7].iprobs[3].iprob = 0;
     shtypes[7].iprobs[3].itype = 0;
     shtypes[7].shknms = new $c.Ptr(shkwands, 0);
     shtypes[8].name = $c.lit("hardware store");
     shtypes[8].annotation = $c.lit("tool shop");
-    shtypes[8].symb = 6;
+    shtypes[8].symb = TOOL_CLASS;
     shtypes[8].prob = 3;
-    shtypes[8].shdist = 1;
+    shtypes[8].shdist = D_SHOP;
     shtypes[8].iprobs[0].iprob = 100;
-    shtypes[8].iprobs[0].itype = 6 /* TOOL_CLASS */;
+    shtypes[8].iprobs[0].itype = TOOL_CLASS;
     shtypes[8].iprobs[1].iprob = 0;
     shtypes[8].iprobs[1].itype = 0;
     shtypes[8].iprobs[2].iprob = 0;
@@ -982,13 +994,13 @@ export function $init() {
     shtypes[8].shknms = new $c.Ptr(shktools, 0);
     shtypes[9].name = $c.lit("rare books");
     shtypes[9].annotation = $c.lit("bookstore");
-    shtypes[9].symb = 10;
+    shtypes[9].symb = SPBOOK_CLASS;
     shtypes[9].prob = 3;
-    shtypes[9].shdist = 1;
+    shtypes[9].shdist = D_SHOP;
     shtypes[9].iprobs[0].iprob = 90;
-    shtypes[9].iprobs[0].itype = 10 /* SPBOOK_CLASS */;
+    shtypes[9].iprobs[0].itype = SPBOOK_CLASS;
     shtypes[9].iprobs[1].iprob = 10;
-    shtypes[9].iprobs[1].itype = 9 /* SCROLL_CLASS */;
+    shtypes[9].iprobs[1].itype = SCROLL_CLASS;
     shtypes[9].iprobs[2].iprob = 0;
     shtypes[9].iprobs[2].itype = 0;
     shtypes[9].iprobs[3].iprob = 0;
@@ -1000,45 +1012,45 @@ export function $init() {
     shtypes[9].shknms = new $c.Ptr(shkbooks, 0);
     shtypes[10].name = $c.lit("health food store");
     shtypes[10].annotation = $c.lit("vegetarian food shop");
-    shtypes[10].symb = 7;
+    shtypes[10].symb = FOOD_CLASS;
     shtypes[10].prob = 2;
-    shtypes[10].shdist = 1;
+    shtypes[10].shdist = D_SHOP;
     shtypes[10].iprobs[0].iprob = 70;
-    shtypes[10].iprobs[0].itype = 19;
+    shtypes[10].iprobs[0].itype = MAXOCLASSES + 1;
     shtypes[10].iprobs[1].iprob = 20;
-    shtypes[10].iprobs[1].itype = -319;
+    shtypes[10].iprobs[1].itype = -POT_FRUIT_JUICE;
     shtypes[10].iprobs[2].iprob = 4;
-    shtypes[10].iprobs[2].itype = -307;
+    shtypes[10].iprobs[2].itype = -POT_HEALING;
     shtypes[10].iprobs[3].iprob = 3;
-    shtypes[10].iprobs[3].itype = -315;
+    shtypes[10].iprobs[3].itype = -POT_FULL_HEALING;
     shtypes[10].iprobs[4].iprob = 2;
-    shtypes[10].iprobs[4].itype = -335;
+    shtypes[10].iprobs[4].itype = -SCR_FOOD_DETECTION;
     shtypes[10].iprobs[5].iprob = 1;
-    shtypes[10].iprobs[5].itype = -286;
+    shtypes[10].iprobs[5].itype = -LUMP_OF_ROYAL_JELLY;
     shtypes[10].shknms = new $c.Ptr(shkhealthfoods, 0);
     shtypes[11].name = $c.lit("lighting store");
     shtypes[11].annotation = $c.lit("lighting shop");
-    shtypes[11].symb = 6;
+    shtypes[11].symb = TOOL_CLASS;
     shtypes[11].prob = 0;
-    shtypes[11].shdist = 1;
+    shtypes[11].shdist = D_SHOP;
     shtypes[11].iprobs[0].iprob = 30;
-    shtypes[11].iprobs[0].itype = -225;
+    shtypes[11].iprobs[0].itype = -WAX_CANDLE;
     shtypes[11].iprobs[1].iprob = 44;
-    shtypes[11].iprobs[1].itype = -224;
+    shtypes[11].iprobs[1].itype = -TALLOW_CANDLE;
     shtypes[11].iprobs[2].iprob = 5;
-    shtypes[11].iprobs[2].itype = -226;
+    shtypes[11].iprobs[2].itype = -BRASS_LANTERN;
     shtypes[11].iprobs[3].iprob = 9;
-    shtypes[11].iprobs[3].itype = -227;
+    shtypes[11].iprobs[3].itype = -OIL_LAMP;
     shtypes[11].iprobs[4].iprob = 3;
-    shtypes[11].iprobs[4].itype = -228;
+    shtypes[11].iprobs[4].itype = -MAGIC_LAMP;
     shtypes[11].iprobs[5].iprob = 5;
-    shtypes[11].iprobs[5].itype = -321;
+    shtypes[11].iprobs[5].itype = -POT_OIL;
     shtypes[11].iprobs[6].iprob = 2;
-    shtypes[11].iprobs[6].itype = -410;
+    shtypes[11].iprobs[6].itype = -WAN_LIGHT;
     shtypes[11].iprobs[7].iprob = 1;
-    shtypes[11].iprobs[7].itype = -332;
+    shtypes[11].iprobs[7].itype = -SCR_LIGHT;
     shtypes[11].iprobs[8].iprob = 1;
-    shtypes[11].iprobs[8].itype = -372;
+    shtypes[11].iprobs[8].itype = -SPE_LIGHT;
     shtypes[11].shknms = new $c.Ptr(shklight, 0);
     shtypes[12].name = null;
     shtypes[12].annotation = null;

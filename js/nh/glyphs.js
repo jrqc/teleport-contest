@@ -4,17 +4,34 @@ import * as $T from './types.js';
 import { $G } from './globals.js';
 import { alloc, dupstr } from './alloc.js';
 import { config_error_add } from './cfgfiles.js';
+import { CLR_BLACK, NH_BASIC_COLOR } from './color.h.js';
 import { rgbstr_to_int32, set_map_customcolor } from './coloratt.js';
 import { gc, gs, iflags } from './decl.js';
+import { S_altar, S_arrow_trap, S_brdnladder, S_digbeam, S_expl_br, S_expl_tl, S_goodpos, S_grave, S_ndoor, S_stone, S_sw_br, S_sw_tl, S_trwall, S_vbeam, S_vwall } from './defsym.h.js';
 import { glyphmap } from './display.js';
+import { GLYPH_ALTAR_OFF, GLYPH_BODY_OFF, GLYPH_BODY_PILETOP_OFF, GLYPH_CMAP_A_OFF, GLYPH_CMAP_B_OFF, GLYPH_CMAP_C_OFF, GLYPH_CMAP_GEH_OFF, GLYPH_CMAP_KNOX_OFF, GLYPH_CMAP_MAIN_OFF, GLYPH_CMAP_MINES_OFF, GLYPH_CMAP_OFF, GLYPH_CMAP_SOKO_OFF, GLYPH_CMAP_STONE_OFF, GLYPH_DETECT_FEM_OFF, GLYPH_DETECT_MALE_OFF, GLYPH_EXPLODE_FROSTY_OFF, GLYPH_EXPLODE_OFF, GLYPH_INVIS_OFF, GLYPH_MON_FEM_OFF, GLYPH_MON_MALE_OFF, GLYPH_NOTHING_OFF, GLYPH_OBJ_OFF, GLYPH_OBJ_PILETOP_OFF, GLYPH_PET_FEM_OFF, GLYPH_PET_MALE_OFF, GLYPH_RIDDEN_FEM_OFF, GLYPH_RIDDEN_MALE_OFF, GLYPH_STATUE_FEM_OFF, GLYPH_STATUE_FEM_PILETOP_OFF, GLYPH_STATUE_MALE_OFF, GLYPH_STATUE_MALE_PILETOP_OFF, GLYPH_SWALLOW_OFF, GLYPH_UNEXPLORED_OFF, GLYPH_WARNING_OFF, GLYPH_ZAP_OFF, MAX_GLYPH, NUM_ZAP, altar_other } from './display.h.js';
 import { monsdump } from './earlyarg.js';
 import { panic } from './end.js';
 import { nh_snprintf, strncmpi, unicodeval_to_utf8str } from './hacklib.js';
 import { mons } from './monst.js';
+import { NUM_OBJECTS } from './objclass.h.js';
 import { obj_descr, objects } from './objects.js';
+import { CORPSE, FIRST_OBJECT, GOLD_PIECE, LAND_MINE, POT_GAIN_ABILITY, POT_WATER, RIN_ADORNMENT, RIN_PROTECTION_FROM_SHAPE_CHAN, SCR_BLANK_PAPER, SCR_ENCHANT_ARMOR, SCR_MAIL, SCR_STINKING_CLOUD, SLIME_MOLD, SPE_BLANK_PAPER, SPE_DIG, STATUE, WAN_LIGHT, WAN_LIGHTNING } from './objects.h.js';
+import { NUMMONS } from './permonst.h.js';
+import { H_UTF8, MAXEXPCHARS, MAXPCHARS, NUM_GRAPHICS, SYM_MON, SYM_OC, SYM_PCHAR, WARNCOUNT, custom_count, custom_nhcolor, custom_none, custom_symbols, custom_ureps, do_custom_colors, do_custom_symbols } from './sym.h.js';
 import { loadsyms } from './symbols.js';
+import { TRAPNUM } from './trap.h.js';
 import { add_custom_urep_entry, set_map_u, unicode_val } from './utf8map.js';
 import { wizcustom_callback } from './wizcmds.js';
+
+const res_nothing = 0;
+const res_dump_glyphids = res_nothing + 1;
+const res_fill_cache = res_dump_glyphids + 1;
+const find_nothing = 0;
+const find_pm = find_nothing + 1;
+const find_oc = find_pm + 1;
+const find_cmap = find_oc + 1;
+const find_glyph = find_cmap + 1;
 
 let to_custom_symset_entry_callback$glyphnag = 0;   // static in to_custom_symset_entry_callback()
 let to_custom_symset_entry_callback$colornag = 0;   // static in to_custom_symset_entry_callback()
@@ -45,7 +62,7 @@ async function to_custom_symset_entry_callback(glyph, findwhat) {   // glyphs.c:
     if (findwhat.extraval) {
         findwhat.extraval.set(0, glyph);
     }
-    (!(idx >= 0 && idx < 2 /* NUM_GRAPHICS */) ? 1 : 0) ? $c.__assert_rtn($c.lit("to_custom_symset_entry_callback"), $c.lit("glyphs.c"), 66, $c.lit("idx >= 0 && idx < NUM_GRAPHICS")) : 0;
+    (!(idx >= 0 && idx < NUM_GRAPHICS) ? 1 : 0) ? $c.__assert_rtn($c.lit("to_custom_symset_entry_callback"), $c.lit("glyphs.c"), 66, $c.lit("idx >= 0 && idx < NUM_GRAPHICS")) : 0;
     if (findwhat.unicode_val) {
         uval = unicode_val(findwhat.unicode_val);
     }
@@ -141,68 +158,68 @@ function fix_glyphname(str) {   // glyphs.c:184
     return str;
 }
 export function glyph_to_cmap(glyph) {   // glyphs.c:200
-    if (glyph === 3929 /* GLYPH_CMAP_STONE_OFF */) {
-        return 0 /* S_stone */;
-    } else if (glyph >= 3930 /* GLYPH_CMAP_MAIN_OFF */ && glyph < 3941) {
-        return (glyph - 3930 /* GLYPH_CMAP_MAIN_OFF */ | 0) + 1 /* S_vwall */ | 0;
-    } else if (glyph >= 3941 /* GLYPH_CMAP_MINES_OFF */ && glyph < 3952) {
-        return (glyph - 3941 /* GLYPH_CMAP_MINES_OFF */ | 0) + 1 /* S_vwall */ | 0;
-    } else if (glyph >= 3952 /* GLYPH_CMAP_GEH_OFF */ && glyph < 3963) {
-        return (glyph - 3952 /* GLYPH_CMAP_GEH_OFF */ | 0) + 1 /* S_vwall */ | 0;
-    } else if (glyph >= 3963 /* GLYPH_CMAP_KNOX_OFF */ && glyph < 3974) {
-        return (glyph - 3963 /* GLYPH_CMAP_KNOX_OFF */ | 0) + 1 /* S_vwall */ | 0;
-    } else if (glyph >= 3974 /* GLYPH_CMAP_SOKO_OFF */ && glyph < 3985) {
-        return (glyph - 3974 /* GLYPH_CMAP_SOKO_OFF */ | 0) + 1 /* S_vwall */ | 0;
-    } else if (glyph >= 3985 /* GLYPH_CMAP_A_OFF */ && glyph < 4006) {
-        return (glyph - 3985 /* GLYPH_CMAP_A_OFF */ | 0) + 12 /* S_ndoor */ | 0;
-    } else if (glyph >= 4006 /* GLYPH_ALTAR_OFF */ && glyph < 4011) {
-        return 33 /* S_altar */;
-    } else if (glyph >= 4011 /* GLYPH_CMAP_B_OFF */ && glyph < 4051) {
-        return (glyph - 4011 /* GLYPH_CMAP_B_OFF */ | 0) + 34 /* S_grave */ | 0;
-    } else if (glyph >= 4083 /* GLYPH_CMAP_C_OFF */ && glyph < 4093) {
-        return (glyph - 4083 /* GLYPH_CMAP_C_OFF */ | 0) + 78 /* S_digbeam */ | 0;
-    } else if (glyph >= 4051 /* GLYPH_ZAP_OFF */ && glyph < 4083) {
-        return $c.rem32(glyph - 4051 /* GLYPH_ZAP_OFF */ | 0, 4) + 74 /* S_vbeam */ | 0;
-    } else if (glyph >= 4093 /* GLYPH_SWALLOW_OFF */ && glyph < 7157) {
-        return (glyph >= 4093 /* GLYPH_SWALLOW_OFF */ && glyph < 7157 ? (glyph - 4093 /* GLYPH_SWALLOW_OFF */ | 0) & 7 : 0) + 88 /* S_sw_tl */ | 0;
-    } else if (glyph >= 7157 /* GLYPH_EXPLODE_OFF */ && glyph < 7220) {
-        return (glyph >= 7157 /* GLYPH_EXPLODE_OFF */ && glyph < 7220 ? $c.rem32(glyph - 7157 /* GLYPH_EXPLODE_OFF */ | 0, 9) : 0) + 96 /* S_expl_tl */ | 0;
+    if (glyph === GLYPH_CMAP_STONE_OFF) {
+        return S_stone;
+    } else if (glyph >= GLYPH_CMAP_MAIN_OFF && glyph < S_trwall - S_vwall + 1 + GLYPH_CMAP_MAIN_OFF) {
+        return (glyph - GLYPH_CMAP_MAIN_OFF | 0) + S_vwall | 0;
+    } else if (glyph >= GLYPH_CMAP_MINES_OFF && glyph < S_trwall - S_vwall + 1 + GLYPH_CMAP_MINES_OFF) {
+        return (glyph - GLYPH_CMAP_MINES_OFF | 0) + S_vwall | 0;
+    } else if (glyph >= GLYPH_CMAP_GEH_OFF && glyph < S_trwall - S_vwall + 1 + GLYPH_CMAP_GEH_OFF) {
+        return (glyph - GLYPH_CMAP_GEH_OFF | 0) + S_vwall | 0;
+    } else if (glyph >= GLYPH_CMAP_KNOX_OFF && glyph < S_trwall - S_vwall + 1 + GLYPH_CMAP_KNOX_OFF) {
+        return (glyph - GLYPH_CMAP_KNOX_OFF | 0) + S_vwall | 0;
+    } else if (glyph >= GLYPH_CMAP_SOKO_OFF && glyph < S_trwall - S_vwall + 1 + GLYPH_CMAP_SOKO_OFF) {
+        return (glyph - GLYPH_CMAP_SOKO_OFF | 0) + S_vwall | 0;
+    } else if (glyph >= GLYPH_CMAP_A_OFF && glyph < S_brdnladder - S_ndoor + 1 + GLYPH_CMAP_A_OFF) {
+        return (glyph - GLYPH_CMAP_A_OFF | 0) + S_ndoor | 0;
+    } else if (glyph >= GLYPH_ALTAR_OFF && glyph < 5 + GLYPH_ALTAR_OFF) {
+        return S_altar;
+    } else if (glyph >= GLYPH_CMAP_B_OFF && glyph < S_arrow_trap + (TRAPNUM - 1) - S_grave + GLYPH_CMAP_B_OFF) {
+        return (glyph - GLYPH_CMAP_B_OFF | 0) + S_grave | 0;
+    } else if (glyph >= GLYPH_CMAP_C_OFF && glyph < S_goodpos - S_digbeam + 1 + GLYPH_CMAP_C_OFF) {
+        return (glyph - GLYPH_CMAP_C_OFF | 0) + S_digbeam | 0;
+    } else if (glyph >= GLYPH_ZAP_OFF && glyph < (NUM_ZAP << 2) + GLYPH_ZAP_OFF) {
+        return $c.rem32(glyph - GLYPH_ZAP_OFF | 0, 4) + S_vbeam | 0;
+    } else if (glyph >= GLYPH_SWALLOW_OFF && glyph < (NUMMONS << 3) + GLYPH_SWALLOW_OFF) {
+        return (glyph >= GLYPH_SWALLOW_OFF && glyph < (NUMMONS << 3) + GLYPH_SWALLOW_OFF ? (glyph - GLYPH_SWALLOW_OFF | 0) & 7 : 0) + S_sw_tl | 0;
+    } else if (glyph >= GLYPH_EXPLODE_OFF && glyph < MAXEXPCHARS + GLYPH_EXPLODE_FROSTY_OFF) {
+        return (glyph >= GLYPH_EXPLODE_OFF && glyph < MAXEXPCHARS + GLYPH_EXPLODE_FROSTY_OFF ? $c.rem32(glyph - GLYPH_EXPLODE_OFF | 0, S_expl_br - S_expl_tl + 1) : 0) + S_expl_tl | 0;
     } else {
-        return 105 /* MAXPCHARS */;
+        return MAXPCHARS;
     }
 }
 async function glyph_find_core(id, findwhat) {   // glyphs.c:234
     let glyph = 0, do_callback = 0, end_find = 0;
     end_find = 0;
     if (await parse_id(id, findwhat)) {
-        if (findwhat.findtype === 4) {
+        if (findwhat.findtype === find_glyph) {
             await findwhat.callback(findwhat.val, findwhat);
         } else {
-            for (glyph = 0; glyph < 9624 /* MAX_GLYPH */; glyph = glyph + 1 | 0) {
+            for (glyph = 0; glyph < MAX_GLYPH; glyph = glyph + 1 | 0) {
                 do_callback = 0;
                 switch (findwhat.findtype) {
-                    case 3:
+                    case find_cmap:
                         if (glyph_to_cmap(glyph) === findwhat.val) {
                             do_callback = 1;
                         }
                         break;
-                    case 1:
-                        if ((glyph >= 0 /* GLYPH_MON_MALE_OFF */ && glyph < 383 || glyph >= 383 /* GLYPH_MON_FEM_OFF */ && glyph < 766 || (glyph >= 766 /* GLYPH_PET_MALE_OFF */ && glyph < 1149 || glyph >= 1149 /* GLYPH_PET_FEM_OFF */ && glyph < 1532) || (glyph >= 2682 /* GLYPH_RIDDEN_MALE_OFF */ && glyph < 3065 || glyph >= 3065 /* GLYPH_RIDDEN_FEM_OFF */ && glyph < 3448) || (glyph >= 1533 /* GLYPH_DETECT_MALE_OFF */ && glyph < 1916 || glyph >= 1916 /* GLYPH_DETECT_FEM_OFF */ && glyph < 2299)) && mons[glyph >= 383 /* GLYPH_MON_FEM_OFF */ && glyph < 766 ? glyph - 383 /* GLYPH_MON_FEM_OFF */ | 0 : glyph >= 0 /* GLYPH_MON_MALE_OFF */ && glyph < 383 ? glyph - 0 /* GLYPH_MON_MALE_OFF */ | 0 : glyph >= 1149 /* GLYPH_PET_FEM_OFF */ && glyph < 1532 ? glyph - 1149 /* GLYPH_PET_FEM_OFF */ | 0 : glyph >= 766 /* GLYPH_PET_MALE_OFF */ && glyph < 1149 ? glyph - 766 /* GLYPH_PET_MALE_OFF */ | 0 : glyph >= 1916 /* GLYPH_DETECT_FEM_OFF */ && glyph < 2299 ? glyph - 1916 /* GLYPH_DETECT_FEM_OFF */ | 0 : glyph >= 1533 /* GLYPH_DETECT_MALE_OFF */ && glyph < 1916 ? glyph - 1533 /* GLYPH_DETECT_MALE_OFF */ | 0 : glyph >= 3065 /* GLYPH_RIDDEN_FEM_OFF */ && glyph < 3448 ? glyph - 3065 /* GLYPH_RIDDEN_FEM_OFF */ | 0 : glyph >= 2682 /* GLYPH_RIDDEN_MALE_OFF */ && glyph < 3065 ? glyph - 2682 /* GLYPH_RIDDEN_MALE_OFF */ | 0 : 383 /* NUMMONS */].mlet === findwhat.val) {
+                    case find_pm:
+                        if ((glyph >= GLYPH_MON_MALE_OFF && glyph < GLYPH_MON_MALE_OFF + NUMMONS || glyph >= GLYPH_MON_FEM_OFF && glyph < GLYPH_MON_FEM_OFF + NUMMONS || (glyph >= GLYPH_PET_MALE_OFF && glyph < GLYPH_PET_MALE_OFF + NUMMONS || glyph >= GLYPH_PET_FEM_OFF && glyph < GLYPH_PET_FEM_OFF + NUMMONS) || (glyph >= GLYPH_RIDDEN_MALE_OFF && glyph < GLYPH_RIDDEN_MALE_OFF + NUMMONS || glyph >= GLYPH_RIDDEN_FEM_OFF && glyph < GLYPH_RIDDEN_FEM_OFF + NUMMONS) || (glyph >= GLYPH_DETECT_MALE_OFF && glyph < GLYPH_DETECT_MALE_OFF + NUMMONS || glyph >= GLYPH_DETECT_FEM_OFF && glyph < GLYPH_DETECT_FEM_OFF + NUMMONS)) && mons[glyph >= GLYPH_MON_FEM_OFF && glyph < GLYPH_MON_FEM_OFF + NUMMONS ? glyph - GLYPH_MON_FEM_OFF | 0 : glyph >= GLYPH_MON_MALE_OFF && glyph < GLYPH_MON_MALE_OFF + NUMMONS ? glyph - GLYPH_MON_MALE_OFF | 0 : glyph >= GLYPH_PET_FEM_OFF && glyph < GLYPH_PET_FEM_OFF + NUMMONS ? glyph - GLYPH_PET_FEM_OFF | 0 : glyph >= GLYPH_PET_MALE_OFF && glyph < GLYPH_PET_MALE_OFF + NUMMONS ? glyph - GLYPH_PET_MALE_OFF | 0 : glyph >= GLYPH_DETECT_FEM_OFF && glyph < GLYPH_DETECT_FEM_OFF + NUMMONS ? glyph - GLYPH_DETECT_FEM_OFF | 0 : glyph >= GLYPH_DETECT_MALE_OFF && glyph < GLYPH_DETECT_MALE_OFF + NUMMONS ? glyph - GLYPH_DETECT_MALE_OFF | 0 : glyph >= GLYPH_RIDDEN_FEM_OFF && glyph < GLYPH_RIDDEN_FEM_OFF + NUMMONS ? glyph - GLYPH_RIDDEN_FEM_OFF | 0 : glyph >= GLYPH_RIDDEN_MALE_OFF && glyph < GLYPH_RIDDEN_MALE_OFF + NUMMONS ? glyph - GLYPH_RIDDEN_MALE_OFF | 0 : NUMMONS].mlet === findwhat.val) {
                             do_callback = 1;
                         }
                         break;
-                    case 2:
-                        if ((glyph === 3448 /* GLYPH_OBJ_OFF */ || glyph >= 3465 && glyph < 3929 || (glyph === 7992 /* GLYPH_OBJ_PILETOP_OFF */ || glyph > 8009 && glyph < 8473) || (glyph > 3448 /* GLYPH_OBJ_OFF */ && glyph < 3465 || glyph > 7992 /* GLYPH_OBJ_PILETOP_OFF */ && glyph < 8009) || (glyph >= 7226 /* GLYPH_STATUE_MALE_OFF */ && glyph < 7609 || glyph >= 8856 /* GLYPH_STATUE_MALE_PILETOP_OFF */ && glyph < 9239 || (glyph >= 7609 /* GLYPH_STATUE_FEM_OFF */ && glyph < 7992 || glyph >= 9239 /* GLYPH_STATUE_FEM_PILETOP_OFF */ && glyph < 9622)) || (glyph >= 2299 /* GLYPH_BODY_OFF */ && glyph < 2682 || glyph >= 8473 /* GLYPH_BODY_PILETOP_OFF */ && glyph < 8856)) && (glyph >= 2299 /* GLYPH_BODY_OFF */ && glyph < 2682 || glyph >= 8473 /* GLYPH_BODY_PILETOP_OFF */ && glyph < 8856 ? 265 /* CORPSE */ : glyph >= 7226 /* GLYPH_STATUE_MALE_OFF */ && glyph < 7609 || glyph >= 8856 /* GLYPH_STATUE_MALE_PILETOP_OFF */ && glyph < 9239 || (glyph >= 7609 /* GLYPH_STATUE_FEM_OFF */ && glyph < 7992 || glyph >= 9239 /* GLYPH_STATUE_FEM_PILETOP_OFF */ && glyph < 9622) ? 476 /* STATUE */ : glyph > 3448 /* GLYPH_OBJ_OFF */ && glyph < 3465 || glyph > 7992 /* GLYPH_OBJ_PILETOP_OFF */ && glyph < 8009 ? glyph - (glyph > 7992 /* GLYPH_OBJ_PILETOP_OFF */ && glyph < 8009 ? 7992 /* GLYPH_OBJ_PILETOP_OFF */ : 3448 /* GLYPH_OBJ_OFF */) | 0 : glyph === 3448 /* GLYPH_OBJ_OFF */ || glyph >= 3465 && glyph < 3929 || (glyph === 7992 /* GLYPH_OBJ_PILETOP_OFF */ || glyph > 8009 && glyph < 8473) ? glyph - (glyph === 7992 /* GLYPH_OBJ_PILETOP_OFF */ || glyph > 8009 && glyph < 8473 ? 7992 /* GLYPH_OBJ_PILETOP_OFF */ : 3448 /* GLYPH_OBJ_OFF */) | 0 : 481 /* NUM_OBJECTS */) === findwhat.val) {
+                    case find_oc:
+                        if ((glyph === GLYPH_OBJ_OFF || glyph >= GLYPH_OBJ_OFF + FIRST_OBJECT - 1 && glyph < GLYPH_OBJ_OFF + NUM_OBJECTS || (glyph === GLYPH_OBJ_PILETOP_OFF || glyph > GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT - 1 && glyph < GLYPH_OBJ_PILETOP_OFF + NUM_OBJECTS) || (glyph > GLYPH_OBJ_OFF && glyph < GLYPH_OBJ_OFF + FIRST_OBJECT - 1 || glyph > GLYPH_OBJ_PILETOP_OFF && glyph < GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT - 1) || (glyph >= GLYPH_STATUE_MALE_OFF && glyph < GLYPH_STATUE_MALE_OFF + NUMMONS || glyph >= GLYPH_STATUE_MALE_PILETOP_OFF && glyph < GLYPH_STATUE_MALE_PILETOP_OFF + NUMMONS || (glyph >= GLYPH_STATUE_FEM_OFF && glyph < GLYPH_STATUE_FEM_OFF + NUMMONS || glyph >= GLYPH_STATUE_FEM_PILETOP_OFF && glyph < GLYPH_STATUE_FEM_PILETOP_OFF + NUMMONS)) || (glyph >= GLYPH_BODY_OFF && glyph < GLYPH_BODY_OFF + NUMMONS || glyph >= GLYPH_BODY_PILETOP_OFF && glyph < GLYPH_BODY_PILETOP_OFF + NUMMONS)) && (glyph >= GLYPH_BODY_OFF && glyph < GLYPH_BODY_OFF + NUMMONS || glyph >= GLYPH_BODY_PILETOP_OFF && glyph < GLYPH_BODY_PILETOP_OFF + NUMMONS ? CORPSE : glyph >= GLYPH_STATUE_MALE_OFF && glyph < GLYPH_STATUE_MALE_OFF + NUMMONS || glyph >= GLYPH_STATUE_MALE_PILETOP_OFF && glyph < GLYPH_STATUE_MALE_PILETOP_OFF + NUMMONS || (glyph >= GLYPH_STATUE_FEM_OFF && glyph < GLYPH_STATUE_FEM_OFF + NUMMONS || glyph >= GLYPH_STATUE_FEM_PILETOP_OFF && glyph < GLYPH_STATUE_FEM_PILETOP_OFF + NUMMONS) ? STATUE : glyph > GLYPH_OBJ_OFF && glyph < GLYPH_OBJ_OFF + FIRST_OBJECT - 1 || glyph > GLYPH_OBJ_PILETOP_OFF && glyph < GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT - 1 ? glyph - (glyph > GLYPH_OBJ_PILETOP_OFF && glyph < GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT - 1 ? GLYPH_OBJ_PILETOP_OFF : GLYPH_OBJ_OFF) | 0 : glyph === GLYPH_OBJ_OFF || glyph >= GLYPH_OBJ_OFF + FIRST_OBJECT - 1 && glyph < GLYPH_OBJ_OFF + NUM_OBJECTS || (glyph === GLYPH_OBJ_PILETOP_OFF || glyph > GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT - 1 && glyph < GLYPH_OBJ_PILETOP_OFF + NUM_OBJECTS) ? glyph - (glyph === GLYPH_OBJ_PILETOP_OFF || glyph > GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT - 1 && glyph < GLYPH_OBJ_PILETOP_OFF + NUM_OBJECTS ? GLYPH_OBJ_PILETOP_OFF : GLYPH_OBJ_OFF) | 0 : NUM_OBJECTS) === findwhat.val) {
                             do_callback = 1;
                         }
                         break;
-                    case 4:
+                    case find_glyph:
                         if (glyph === findwhat.val) {
                             do_callback = 1;
                             end_find = 1;
                         }
                         break;
-                    case 0:
+                    case find_nothing:
                     default:
                         end_find = 1;
                         break;
@@ -227,9 +244,9 @@ export async function fill_glyphid_cache() {   // glyphs.c:303
     }
     if (glyphid_cache) {
         glyphcache_find.$copyFrom(zero_find);
-        glyphcache_find.findtype = 0;
+        glyphcache_find.findtype = find_nothing;
         glyphcache_find.reserved = glyphid_cache;
-        glyphcache_find.restype = 2;
+        glyphcache_find.restype = res_fill_cache;
         reslt = await parse_id(null, glyphcache_find);
         if (!reslt) {
             free_glyphid_cache();
@@ -241,7 +258,7 @@ async function init_glyph_cache() {   // glyphs.c:334
     let glyph = 0;
     glyphid_cache_lsize = 0;
     glyphid_cache_size = 1;
-    while (glyphid_cache_size < 19248) {
+    while (glyphid_cache_size < 2 * MAX_GLYPH) {
         glyphid_cache_lsize = glyphid_cache_lsize + 1 >>> 0;
         glyphid_cache_size = $c.shlu64(glyphid_cache_size, 1);
     }
@@ -334,7 +351,7 @@ export async function match_glyph(buf) {   // glyphs.c:458
 export async function glyphrep(op) {   // glyphs.c:470
     let reslt = 0, glyph = Int32Array.of(0);
     reslt = 0;
-    glyph[0] = 9624 /* MAX_GLYPH */;
+    glyph[0] = MAX_GLYPH;
     if (!glyphid_cache) {
         reslt = 1;
     }
@@ -347,15 +364,15 @@ export async function glyphrep(op) {   // glyphs.c:470
 }
 export async function add_custom_nhcolor_entry(customization_name, glyphidx, nhcolor, which_set) {   // glyphs.c:484
     let gdc = null, details = null, newdetails = null, $t1;
-    gdc = $c.relem(gs.sym_customizations[which_set], 3 /* custom_nhcolor */);
+    gdc = $c.relem(gs.sym_customizations[which_set], custom_nhcolor);
     newdetails = null;
     if (!gdc.details) {
         $t1 = await dupstr(customization_name), gdc.customization_name = $t1;
-        gdc.custtype = 3;
+        gdc.custtype = custom_nhcolor;
         gdc.details = null;
         gdc.details_end = null;
     }
-    details = find_matching_customization(customization_name, 3, which_set);
+    details = find_matching_customization(customization_name, custom_nhcolor, which_set);
     if (details) {
         while (details) {
             if (details.content.ccolor.glyphidx === glyphidx) {
@@ -381,24 +398,24 @@ export async function add_custom_nhcolor_entry(customization_name, glyphidx, nhc
 export async function apply_customizations(which_set, docustomize) {   // glyphs.c:531
     let gmap = null, details = null, sc = null, at_least_one = 0, do_colors = 0, do_symbols = 0, custs = 0;
     at_least_one = 0;
-    do_colors = $c.i8((docustomize & 1) >>> 0 !== 0 ? 1 : 0);
-    do_symbols = $c.i8((docustomize & 2) >>> 0 !== 0 ? 1 : 0);
-    for (custs = 0; custs < 4; custs = custs + 1 | 0) {
+    do_colors = $c.i8((docustomize & do_custom_colors) >>> 0 !== 0 ? 1 : 0);
+    do_symbols = $c.i8((docustomize & do_custom_symbols) >>> 0 !== 0 ? 1 : 0);
+    for (custs = 0; custs < custom_count; custs = custs + 1 | 0) {
         sc = $c.relem(gs.sym_customizations[which_set], custs);
         if (sc.count && sc.details) {
             at_least_one = 1;
             details = sc.details;
             while (details) {
                 if (iflags.customsymbols && do_symbols) {
-                    if (sc.custtype === 2) {
+                    if (sc.custtype === custom_ureps) {
                         gmap = $c.relem(glyphmap, details.content.urep.glyphidx);
-                        if (gs.symset[which_set].handling === 5) {
+                        if (gs.symset[which_set].handling === H_UTF8) {
                             await set_map_u(gmap, details.content.urep.u.utf32ch, details.content.urep.u.utf8str);
                         }
                     }
                 }
                 if (iflags.customcolors && do_colors) {
-                    if (sc.custtype === 3) {
+                    if (sc.custtype === custom_nhcolor) {
                         gmap = $c.relem(glyphmap, details.content.ccolor.glyphidx);
                         set_map_customcolor(gmap, details.content.ccolor.nhcolor);
                     }
@@ -419,13 +436,13 @@ async function shuffle_customizations() {   // glyphs.c:646
     let j = 0, obj_glyphs = null, i = 0, tmp_u = $c.nulls(481), tmp_customcolor = new Uint32Array(481), tmp_color256idx = new Uint16Array(481), duplicate = new Int32Array(481), idx = 0, other = null, other_customcolor = 0, other_color256idx = 0, $t1, $t2;
     for (j = 0; j < 2; j = j + 1 | 0) {
         obj_glyphs = $c.radd($c.relem(glyphmap, 0), shuffle_customizations$offsets[j]);
-        for (i = 0; i < 481 /* NUM_OBJECTS */; i = i + 1 | 0) {
+        for (i = 0; i < NUM_OBJECTS; i = i + 1 | 0) {
             duplicate[i] = -1;
             tmp_u[i] = null;
             tmp_customcolor[i] = 0;
             tmp_color256idx[i] = 0;
         }
-        for (i = 0; i < 481 /* NUM_OBJECTS */; i = i + 1 | 0) {
+        for (i = 0; i < NUM_OBJECTS; i = i + 1 | 0) {
             idx = objects[i].oc_descr_idx;
             if (duplicate[idx] >= 0) {
                 other = tmp_u[duplicate[idx]];
@@ -452,7 +469,7 @@ async function shuffle_customizations() {   // glyphs.c:646
                 }
             }
         }
-        for (i = 0; i < 481 /* NUM_OBJECTS */; i = i + 1 | 0) {
+        for (i = 0; i < NUM_OBJECTS; i = i + 1 | 0) {
             if (!$c.peq($c.radd(obj_glyphs, i).u, $c.asRec(null, $T.unicode_representation, 16))) {
                 $c.free($c.radd(obj_glyphs, i).u.utf8str);
                 $c.free($c.radd(obj_glyphs, i).u);
@@ -473,26 +490,26 @@ export function find_matching_customization(customization_name, custtype, which_
 }
 export function purge_all_custom_entries() {   // glyphs.c:751
     let i = 0;
-    for (i = 0; i < 3; i = i + 1 | 0) {
+    for (i = 0; i < NUM_GRAPHICS + 1; i = i + 1 | 0) {
         purge_custom_entries(i >>> 0);
     }
 }
 export function purge_custom_entries(which_set) {   // glyphs.c:761
     let custtype = 0, gdc = null, details = null, next = null;
-    for (custtype = 0; custtype < 4; custtype = custtype + 1 >>> 0) {
+    for (custtype = custom_none; custtype < custom_count; custtype = custtype + 1 >>> 0) {
         gdc = $c.relem(gs.sym_customizations[which_set], custtype);
         details = gdc.details;
         while (details) {
             next = details.next;
-            if (gdc.custtype === 2) {
+            if (gdc.custtype === custom_ureps) {
                 if (details.content.urep.u.utf8str) {
                     $c.free(details.content.urep.u.utf8str);
                 }
                 details.content.urep.u.utf8str = null;
-            } else if (gdc.custtype === 1) {
+            } else if (gdc.custtype === custom_symbols) {
                 details.content.sym.symparse = null;
                 details.content.sym.val = 0;
-            } else if (gdc.custtype === 3) {
+            } else if (gdc.custtype === custom_nhcolor) {
                 details.content.ccolor.nhcolor = 0;
                 details.content.ccolor.glyphidx = 0;
             }
@@ -511,9 +528,9 @@ export function purge_custom_entries(which_set) {   // glyphs.c:761
 export async function dump_all_glyphids(fp) {   // glyphs.c:797
     let dump_glyphid_find = new $T.find_struct();
     dump_glyphid_find.$copyFrom(zero_find);
-    dump_glyphid_find.findtype = 0;
+    dump_glyphid_find.findtype = find_nothing;
     dump_glyphid_find.reserved = fp;
-    dump_glyphid_find.restype = 1;
+    dump_glyphid_find.restype = res_dump_glyphids;
     await parse_id(null, dump_glyphid_find);
 }
 export async function wizcustom_glyphids(win) {   // glyphs.c:808
@@ -521,7 +538,7 @@ export async function wizcustom_glyphids(win) {   // glyphs.c:808
     if (!glyphid_cache) {
         return;
     }
-    for (glyphnum = 0; glyphnum < 9624 /* MAX_GLYPH */; glyphnum = glyphnum + 1 | 0) {
+    for (glyphnum = 0; glyphnum < MAX_GLYPH; glyphnum = glyphnum + 1 | 0) {
         id = find_glyphid_in_cache_by_glyphnum(glyphnum);
         if (id) {
             await wizcustom_callback(win, glyphnum, id);
@@ -544,8 +561,8 @@ async function parse_id(id, findwhat) {   // glyphs.c:824
     filling_cache = 0;
     is_S = 0;
     is_G = 0;
-    if (findwhat.findtype === 0 && findwhat.restype) {
-        if (findwhat.restype === 1) {
+    if (findwhat.findtype === find_nothing && findwhat.restype) {
+        if (findwhat.restype === res_dump_glyphids) {
             if (findwhat.reserved) {
                 fp = $c.asRec(findwhat.reserved, $T.__sFILE, 152);
                 dump_ids = 1;
@@ -553,7 +570,7 @@ async function parse_id(id, findwhat) {   // glyphs.c:824
                 return 0;
             }
         }
-        if (findwhat.restype === 2) {
+        if (findwhat.restype === res_fill_cache) {
             if (findwhat.reserved && $c.peq(findwhat.reserved, glyphid_cache)) {
                 filling_cache = 1;
             } else {
@@ -565,22 +582,22 @@ async function parse_id(id, findwhat) {   // glyphs.c:824
     is_S = $c.i8(id && id.get(0) === 83 && id.get(1) === 95 ? 1 : 0);
     if (is_G && !glyphid_cache || filling_cache || dump_ids || is_S) {
         while (loadsyms[i].range) {
-            if (!pm_offset && loadsyms[i].range === 4) {
+            if (!pm_offset && loadsyms[i].range === SYM_MON) {
                 pm_offset = i;
             }
-            if (!pm_count && pm_offset && loadsyms[i].range !== 4) {
+            if (!pm_count && pm_offset && loadsyms[i].range !== SYM_MON) {
                 pm_count = i - pm_offset | 0;
             }
-            if (!oc_offset && loadsyms[i].range === 3) {
+            if (!oc_offset && loadsyms[i].range === SYM_OC) {
                 oc_offset = i;
             }
-            if (!oc_count && oc_offset && loadsyms[i].range !== 3) {
+            if (!oc_count && oc_offset && loadsyms[i].range !== SYM_OC) {
                 oc_count = i - oc_offset | 0;
             }
-            if (!cmap_offset && loadsyms[i].range === 2) {
+            if (!cmap_offset && loadsyms[i].range === SYM_PCHAR) {
                 cmap_offset = i;
             }
-            if (!cmap_count && cmap_offset && loadsyms[i].range !== 2) {
+            if (!cmap_count && cmap_offset && loadsyms[i].range !== SYM_PCHAR) {
                 cmap_count = i - cmap_offset | 0;
             }
             i = i + 1 | 0;
@@ -590,7 +607,7 @@ async function parse_id(id, findwhat) {   // glyphs.c:824
         if (!filling_cache && id && glyphid_cache) {
             val = find_glyph_in_cache(id);
             if (val >= 0) {
-                findwhat.findtype = 4;
+                findwhat.findtype = find_glyph;
                 findwhat.val = val;
                 findwhat.loadsyms_offset = 0;
                 return 1;
@@ -598,137 +615,137 @@ async function parse_id(id, findwhat) {   // glyphs.c:824
                 return 0;
             }
         } else {
-            for (glyph = 0; glyph < 9624 /* MAX_GLYPH */; glyph = glyph + 1 | 0) {
+            for (glyph = 0; glyph < MAX_GLYPH; glyph = glyph + 1 | 0) {
                 skip_base = 0;
                 skip_this_one = 0;
                 $t3 = ($t2 = ($t1 = buf[3][0] = 0, buf[2][0] = $t1), buf[1][0] = $t2), buf[0][0] = $t3;
-                if (glyph >= 0 /* GLYPH_MON_MALE_OFF */ && glyph < 383 || glyph >= 383 /* GLYPH_MON_FEM_OFF */ && glyph < 766 || (glyph >= 766 /* GLYPH_PET_MALE_OFF */ && glyph < 1149 || glyph >= 1149 /* GLYPH_PET_FEM_OFF */ && glyph < 1532) || (glyph >= 2682 /* GLYPH_RIDDEN_MALE_OFF */ && glyph < 3065 || glyph >= 3065 /* GLYPH_RIDDEN_FEM_OFF */ && glyph < 3448) || (glyph >= 1533 /* GLYPH_DETECT_MALE_OFF */ && glyph < 1916 || glyph >= 1916 /* GLYPH_DETECT_FEM_OFF */ && glyph < 2299)) {
+                if (glyph >= GLYPH_MON_MALE_OFF && glyph < GLYPH_MON_MALE_OFF + NUMMONS || glyph >= GLYPH_MON_FEM_OFF && glyph < GLYPH_MON_FEM_OFF + NUMMONS || (glyph >= GLYPH_PET_MALE_OFF && glyph < GLYPH_PET_MALE_OFF + NUMMONS || glyph >= GLYPH_PET_FEM_OFF && glyph < GLYPH_PET_FEM_OFF + NUMMONS) || (glyph >= GLYPH_RIDDEN_MALE_OFF && glyph < GLYPH_RIDDEN_MALE_OFF + NUMMONS || glyph >= GLYPH_RIDDEN_FEM_OFF && glyph < GLYPH_RIDDEN_FEM_OFF + NUMMONS) || (glyph >= GLYPH_DETECT_MALE_OFF && glyph < GLYPH_DETECT_MALE_OFF + NUMMONS || glyph >= GLYPH_DETECT_FEM_OFF && glyph < GLYPH_DETECT_FEM_OFF + NUMMONS)) {
                     buf2 = $c.lit("");
-                    buf3 = monsdump[glyph >= 383 /* GLYPH_MON_FEM_OFF */ && glyph < 766 ? glyph - 383 /* GLYPH_MON_FEM_OFF */ | 0 : glyph >= 0 /* GLYPH_MON_MALE_OFF */ && glyph < 383 ? glyph - 0 /* GLYPH_MON_MALE_OFF */ | 0 : glyph >= 1149 /* GLYPH_PET_FEM_OFF */ && glyph < 1532 ? glyph - 1149 /* GLYPH_PET_FEM_OFF */ | 0 : glyph >= 766 /* GLYPH_PET_MALE_OFF */ && glyph < 1149 ? glyph - 766 /* GLYPH_PET_MALE_OFF */ | 0 : glyph >= 1916 /* GLYPH_DETECT_FEM_OFF */ && glyph < 2299 ? glyph - 1916 /* GLYPH_DETECT_FEM_OFF */ | 0 : glyph >= 1533 /* GLYPH_DETECT_MALE_OFF */ && glyph < 1916 ? glyph - 1533 /* GLYPH_DETECT_MALE_OFF */ | 0 : glyph >= 3065 /* GLYPH_RIDDEN_FEM_OFF */ && glyph < 3448 ? glyph - 3065 /* GLYPH_RIDDEN_FEM_OFF */ | 0 : glyph >= 2682 /* GLYPH_RIDDEN_MALE_OFF */ && glyph < 3065 ? glyph - 2682 /* GLYPH_RIDDEN_MALE_OFF */ | 0 : 383 /* NUMMONS */].nm;
-                    if (glyph >= 0 /* GLYPH_MON_MALE_OFF */ && glyph < 383) {
+                    buf3 = monsdump[glyph >= GLYPH_MON_FEM_OFF && glyph < GLYPH_MON_FEM_OFF + NUMMONS ? glyph - GLYPH_MON_FEM_OFF | 0 : glyph >= GLYPH_MON_MALE_OFF && glyph < GLYPH_MON_MALE_OFF + NUMMONS ? glyph - GLYPH_MON_MALE_OFF | 0 : glyph >= GLYPH_PET_FEM_OFF && glyph < GLYPH_PET_FEM_OFF + NUMMONS ? glyph - GLYPH_PET_FEM_OFF | 0 : glyph >= GLYPH_PET_MALE_OFF && glyph < GLYPH_PET_MALE_OFF + NUMMONS ? glyph - GLYPH_PET_MALE_OFF | 0 : glyph >= GLYPH_DETECT_FEM_OFF && glyph < GLYPH_DETECT_FEM_OFF + NUMMONS ? glyph - GLYPH_DETECT_FEM_OFF | 0 : glyph >= GLYPH_DETECT_MALE_OFF && glyph < GLYPH_DETECT_MALE_OFF + NUMMONS ? glyph - GLYPH_DETECT_MALE_OFF | 0 : glyph >= GLYPH_RIDDEN_FEM_OFF && glyph < GLYPH_RIDDEN_FEM_OFF + NUMMONS ? glyph - GLYPH_RIDDEN_FEM_OFF | 0 : glyph >= GLYPH_RIDDEN_MALE_OFF && glyph < GLYPH_RIDDEN_MALE_OFF + NUMMONS ? glyph - GLYPH_RIDDEN_MALE_OFF | 0 : NUMMONS].nm;
+                    if (glyph >= GLYPH_MON_MALE_OFF && glyph < GLYPH_MON_MALE_OFF + NUMMONS) {
                         buf2 = $c.lit("male_");
-                    } else if (glyph >= 383 /* GLYPH_MON_FEM_OFF */ && glyph < 766) {
+                    } else if (glyph >= GLYPH_MON_FEM_OFF && glyph < GLYPH_MON_FEM_OFF + NUMMONS) {
                         buf2 = $c.lit("female_");
-                    } else if (glyph >= 2682 /* GLYPH_RIDDEN_MALE_OFF */ && glyph < 3065) {
+                    } else if (glyph >= GLYPH_RIDDEN_MALE_OFF && glyph < GLYPH_RIDDEN_MALE_OFF + NUMMONS) {
                         buf2 = $c.lit("ridden_male_");
-                    } else if (glyph >= 3065 /* GLYPH_RIDDEN_FEM_OFF */ && glyph < 3448) {
+                    } else if (glyph >= GLYPH_RIDDEN_FEM_OFF && glyph < GLYPH_RIDDEN_FEM_OFF + NUMMONS) {
                         buf2 = $c.lit("ridden_female_");
-                    } else if (glyph >= 1533 /* GLYPH_DETECT_MALE_OFF */ && glyph < 1916) {
+                    } else if (glyph >= GLYPH_DETECT_MALE_OFF && glyph < GLYPH_DETECT_MALE_OFF + NUMMONS) {
                         buf2 = $c.lit("detected_male_");
-                    } else if (glyph >= 1916 /* GLYPH_DETECT_FEM_OFF */ && glyph < 2299) {
+                    } else if (glyph >= GLYPH_DETECT_FEM_OFF && glyph < GLYPH_DETECT_FEM_OFF + NUMMONS) {
                         buf2 = $c.lit("detected_female_");
-                    } else if (glyph >= 766 /* GLYPH_PET_MALE_OFF */ && glyph < 1149) {
+                    } else if (glyph >= GLYPH_PET_MALE_OFF && glyph < GLYPH_PET_MALE_OFF + NUMMONS) {
                         buf2 = $c.lit("pet_male_");
-                    } else if (glyph >= 1149 /* GLYPH_PET_FEM_OFF */ && glyph < 1532) {
+                    } else if (glyph >= GLYPH_PET_FEM_OFF && glyph < GLYPH_PET_FEM_OFF + NUMMONS) {
                         buf2 = $c.lit("pet_female_");
                     }
                     $c.__builtin___strcpy_chk(new $c.Ptr(buf[0], 0), $c.lit("G_"), 512);
                     $c.__builtin___strcat_chk(new $c.Ptr(buf[0], 0), buf2, 512);
                     $c.__builtin___strcat_chk(new $c.Ptr(buf[0], 0), buf3, 512);
-                } else if (glyph >= 2299 /* GLYPH_BODY_OFF */ && glyph < 2682 || glyph >= 8473 /* GLYPH_BODY_PILETOP_OFF */ && glyph < 8856) {
-                    buf2 = glyph >= 8473 /* GLYPH_BODY_PILETOP_OFF */ && glyph < 8856 ? $c.lit("piletop_body_") : $c.lit("body_");
-                    buf3 = monsdump[glyph >= 8473 /* GLYPH_BODY_PILETOP_OFF */ && glyph < 8856 ? glyph - 8473 /* GLYPH_BODY_PILETOP_OFF */ | 0 : glyph - 2299 /* GLYPH_BODY_OFF */ | 0].nm;
+                } else if (glyph >= GLYPH_BODY_OFF && glyph < GLYPH_BODY_OFF + NUMMONS || glyph >= GLYPH_BODY_PILETOP_OFF && glyph < GLYPH_BODY_PILETOP_OFF + NUMMONS) {
+                    buf2 = glyph >= GLYPH_BODY_PILETOP_OFF && glyph < GLYPH_BODY_PILETOP_OFF + NUMMONS ? $c.lit("piletop_body_") : $c.lit("body_");
+                    buf3 = monsdump[glyph >= GLYPH_BODY_PILETOP_OFF && glyph < GLYPH_BODY_PILETOP_OFF + NUMMONS ? glyph - GLYPH_BODY_PILETOP_OFF | 0 : glyph - GLYPH_BODY_OFF | 0].nm;
                     $c.__builtin___strcpy_chk(new $c.Ptr(buf[0], 0), $c.lit("G_"), 512);
                     $c.__builtin___strcat_chk(new $c.Ptr(buf[0], 0), buf2, 512);
                     $c.__builtin___strcat_chk(new $c.Ptr(buf[0], 0), buf3, 512);
-                } else if (glyph >= 7226 /* GLYPH_STATUE_MALE_OFF */ && glyph < 7609 || glyph >= 8856 /* GLYPH_STATUE_MALE_PILETOP_OFF */ && glyph < 9239 || (glyph >= 7609 /* GLYPH_STATUE_FEM_OFF */ && glyph < 7992 || glyph >= 9239 /* GLYPH_STATUE_FEM_PILETOP_OFF */ && glyph < 9622)) {
-                    buf2 = glyph >= 9239 /* GLYPH_STATUE_FEM_PILETOP_OFF */ && glyph < 9622 ? $c.lit("piletop_statue_of_female_") : glyph >= 7609 /* GLYPH_STATUE_FEM_OFF */ && glyph < 7992 || glyph >= 9239 /* GLYPH_STATUE_FEM_PILETOP_OFF */ && glyph < 9622 ? $c.lit("statue_of_female_") : glyph >= 8856 /* GLYPH_STATUE_MALE_PILETOP_OFF */ && glyph < 9239 ? $c.lit("piletop_statue_of_male_") : glyph >= 7226 /* GLYPH_STATUE_MALE_OFF */ && glyph < 7609 || glyph >= 8856 /* GLYPH_STATUE_MALE_PILETOP_OFF */ && glyph < 9239 ? $c.lit("statue_of_male_") : $c.lit("");
-                    buf3 = monsdump[glyph >= 9239 /* GLYPH_STATUE_FEM_PILETOP_OFF */ && glyph < 9622 ? glyph - 9239 /* GLYPH_STATUE_FEM_PILETOP_OFF */ | 0 : glyph >= 8856 /* GLYPH_STATUE_MALE_PILETOP_OFF */ && glyph < 9239 ? glyph - 8856 /* GLYPH_STATUE_MALE_PILETOP_OFF */ | 0 : glyph >= 7609 /* GLYPH_STATUE_FEM_OFF */ && glyph < 7992 || glyph >= 9239 /* GLYPH_STATUE_FEM_PILETOP_OFF */ && glyph < 9622 ? glyph - 7609 /* GLYPH_STATUE_FEM_OFF */ | 0 : glyph >= 7226 /* GLYPH_STATUE_MALE_OFF */ && glyph < 7609 || glyph >= 8856 /* GLYPH_STATUE_MALE_PILETOP_OFF */ && glyph < 9239 ? glyph - 7226 /* GLYPH_STATUE_MALE_OFF */ | 0 : 9624 /* MAX_GLYPH */].nm;
+                } else if (glyph >= GLYPH_STATUE_MALE_OFF && glyph < GLYPH_STATUE_MALE_OFF + NUMMONS || glyph >= GLYPH_STATUE_MALE_PILETOP_OFF && glyph < GLYPH_STATUE_MALE_PILETOP_OFF + NUMMONS || (glyph >= GLYPH_STATUE_FEM_OFF && glyph < GLYPH_STATUE_FEM_OFF + NUMMONS || glyph >= GLYPH_STATUE_FEM_PILETOP_OFF && glyph < GLYPH_STATUE_FEM_PILETOP_OFF + NUMMONS)) {
+                    buf2 = glyph >= GLYPH_STATUE_FEM_PILETOP_OFF && glyph < GLYPH_STATUE_FEM_PILETOP_OFF + NUMMONS ? $c.lit("piletop_statue_of_female_") : glyph >= GLYPH_STATUE_FEM_OFF && glyph < GLYPH_STATUE_FEM_OFF + NUMMONS || glyph >= GLYPH_STATUE_FEM_PILETOP_OFF && glyph < GLYPH_STATUE_FEM_PILETOP_OFF + NUMMONS ? $c.lit("statue_of_female_") : glyph >= GLYPH_STATUE_MALE_PILETOP_OFF && glyph < GLYPH_STATUE_MALE_PILETOP_OFF + NUMMONS ? $c.lit("piletop_statue_of_male_") : glyph >= GLYPH_STATUE_MALE_OFF && glyph < GLYPH_STATUE_MALE_OFF + NUMMONS || glyph >= GLYPH_STATUE_MALE_PILETOP_OFF && glyph < GLYPH_STATUE_MALE_PILETOP_OFF + NUMMONS ? $c.lit("statue_of_male_") : $c.lit("");
+                    buf3 = monsdump[glyph >= GLYPH_STATUE_FEM_PILETOP_OFF && glyph < GLYPH_STATUE_FEM_PILETOP_OFF + NUMMONS ? glyph - GLYPH_STATUE_FEM_PILETOP_OFF | 0 : glyph >= GLYPH_STATUE_MALE_PILETOP_OFF && glyph < GLYPH_STATUE_MALE_PILETOP_OFF + NUMMONS ? glyph - GLYPH_STATUE_MALE_PILETOP_OFF | 0 : glyph >= GLYPH_STATUE_FEM_OFF && glyph < GLYPH_STATUE_FEM_OFF + NUMMONS || glyph >= GLYPH_STATUE_FEM_PILETOP_OFF && glyph < GLYPH_STATUE_FEM_PILETOP_OFF + NUMMONS ? glyph - GLYPH_STATUE_FEM_OFF | 0 : glyph >= GLYPH_STATUE_MALE_OFF && glyph < GLYPH_STATUE_MALE_OFF + NUMMONS || glyph >= GLYPH_STATUE_MALE_PILETOP_OFF && glyph < GLYPH_STATUE_MALE_PILETOP_OFF + NUMMONS ? glyph - GLYPH_STATUE_MALE_OFF | 0 : MAX_GLYPH].nm;
                     $c.__builtin___strcpy_chk(new $c.Ptr(buf[0], 0), $c.lit("G_"), 512);
                     $c.__builtin___strcat_chk(new $c.Ptr(buf[0], 0), buf2, 512);
                     $c.__builtin___strcat_chk(new $c.Ptr(buf[0], 0), buf3, 512);
-                } else if (glyph === 3448 /* GLYPH_OBJ_OFF */ || glyph >= 3465 && glyph < 3929 || (glyph === 7992 /* GLYPH_OBJ_PILETOP_OFF */ || glyph > 8009 && glyph < 8473) || (glyph > 3448 /* GLYPH_OBJ_OFF */ && glyph < 3465 || glyph > 7992 /* GLYPH_OBJ_PILETOP_OFF */ && glyph < 8009) || (glyph >= 7226 /* GLYPH_STATUE_MALE_OFF */ && glyph < 7609 || glyph >= 8856 /* GLYPH_STATUE_MALE_PILETOP_OFF */ && glyph < 9239 || (glyph >= 7609 /* GLYPH_STATUE_FEM_OFF */ && glyph < 7992 || glyph >= 9239 /* GLYPH_STATUE_FEM_PILETOP_OFF */ && glyph < 9622)) || (glyph >= 2299 /* GLYPH_BODY_OFF */ && glyph < 2682 || glyph >= 8473 /* GLYPH_BODY_PILETOP_OFF */ && glyph < 8856)) {
-                    i = glyph >= 2299 /* GLYPH_BODY_OFF */ && glyph < 2682 || glyph >= 8473 /* GLYPH_BODY_PILETOP_OFF */ && glyph < 8856 ? 265 /* CORPSE */ : glyph >= 7226 /* GLYPH_STATUE_MALE_OFF */ && glyph < 7609 || glyph >= 8856 /* GLYPH_STATUE_MALE_PILETOP_OFF */ && glyph < 9239 || (glyph >= 7609 /* GLYPH_STATUE_FEM_OFF */ && glyph < 7992 || glyph >= 9239 /* GLYPH_STATUE_FEM_PILETOP_OFF */ && glyph < 9622) ? 476 /* STATUE */ : glyph > 3448 /* GLYPH_OBJ_OFF */ && glyph < 3465 || glyph > 7992 /* GLYPH_OBJ_PILETOP_OFF */ && glyph < 8009 ? glyph - (glyph > 7992 /* GLYPH_OBJ_PILETOP_OFF */ && glyph < 8009 ? 7992 /* GLYPH_OBJ_PILETOP_OFF */ : 3448 /* GLYPH_OBJ_OFF */) | 0 : glyph === 3448 /* GLYPH_OBJ_OFF */ || glyph >= 3465 && glyph < 3929 || (glyph === 7992 /* GLYPH_OBJ_PILETOP_OFF */ || glyph > 8009 && glyph < 8473) ? glyph - (glyph === 7992 /* GLYPH_OBJ_PILETOP_OFF */ || glyph > 8009 && glyph < 8473 ? 7992 /* GLYPH_OBJ_PILETOP_OFF */ : 3448 /* GLYPH_OBJ_OFF */) | 0 : 481 /* NUM_OBJECTS */;
-                    if (i > 343 /* SCR_STINKING_CLOUD */ && i < 364 /* SCR_MAIL */ || i > 434 /* WAN_LIGHTNING */ && i < 438 /* GOLD_PIECE */) {
+                } else if (glyph === GLYPH_OBJ_OFF || glyph >= GLYPH_OBJ_OFF + FIRST_OBJECT - 1 && glyph < GLYPH_OBJ_OFF + NUM_OBJECTS || (glyph === GLYPH_OBJ_PILETOP_OFF || glyph > GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT - 1 && glyph < GLYPH_OBJ_PILETOP_OFF + NUM_OBJECTS) || (glyph > GLYPH_OBJ_OFF && glyph < GLYPH_OBJ_OFF + FIRST_OBJECT - 1 || glyph > GLYPH_OBJ_PILETOP_OFF && glyph < GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT - 1) || (glyph >= GLYPH_STATUE_MALE_OFF && glyph < GLYPH_STATUE_MALE_OFF + NUMMONS || glyph >= GLYPH_STATUE_MALE_PILETOP_OFF && glyph < GLYPH_STATUE_MALE_PILETOP_OFF + NUMMONS || (glyph >= GLYPH_STATUE_FEM_OFF && glyph < GLYPH_STATUE_FEM_OFF + NUMMONS || glyph >= GLYPH_STATUE_FEM_PILETOP_OFF && glyph < GLYPH_STATUE_FEM_PILETOP_OFF + NUMMONS)) || (glyph >= GLYPH_BODY_OFF && glyph < GLYPH_BODY_OFF + NUMMONS || glyph >= GLYPH_BODY_PILETOP_OFF && glyph < GLYPH_BODY_PILETOP_OFF + NUMMONS)) {
+                    i = glyph >= GLYPH_BODY_OFF && glyph < GLYPH_BODY_OFF + NUMMONS || glyph >= GLYPH_BODY_PILETOP_OFF && glyph < GLYPH_BODY_PILETOP_OFF + NUMMONS ? CORPSE : glyph >= GLYPH_STATUE_MALE_OFF && glyph < GLYPH_STATUE_MALE_OFF + NUMMONS || glyph >= GLYPH_STATUE_MALE_PILETOP_OFF && glyph < GLYPH_STATUE_MALE_PILETOP_OFF + NUMMONS || (glyph >= GLYPH_STATUE_FEM_OFF && glyph < GLYPH_STATUE_FEM_OFF + NUMMONS || glyph >= GLYPH_STATUE_FEM_PILETOP_OFF && glyph < GLYPH_STATUE_FEM_PILETOP_OFF + NUMMONS) ? STATUE : glyph > GLYPH_OBJ_OFF && glyph < GLYPH_OBJ_OFF + FIRST_OBJECT - 1 || glyph > GLYPH_OBJ_PILETOP_OFF && glyph < GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT - 1 ? glyph - (glyph > GLYPH_OBJ_PILETOP_OFF && glyph < GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT - 1 ? GLYPH_OBJ_PILETOP_OFF : GLYPH_OBJ_OFF) | 0 : glyph === GLYPH_OBJ_OFF || glyph >= GLYPH_OBJ_OFF + FIRST_OBJECT - 1 && glyph < GLYPH_OBJ_OFF + NUM_OBJECTS || (glyph === GLYPH_OBJ_PILETOP_OFF || glyph > GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT - 1 && glyph < GLYPH_OBJ_PILETOP_OFF + NUM_OBJECTS) ? glyph - (glyph === GLYPH_OBJ_PILETOP_OFF || glyph > GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT - 1 && glyph < GLYPH_OBJ_PILETOP_OFF + NUM_OBJECTS ? GLYPH_OBJ_PILETOP_OFF : GLYPH_OBJ_OFF) | 0 : NUM_OBJECTS;
+                    if (i > SCR_STINKING_CLOUD && i < SCR_MAIL || i > WAN_LIGHTNING && i < GOLD_PIECE) {
                         skip_this_one = 1;
                     }
                     if (!skip_this_one) {
-                        if (i >= 410 /* WAN_LIGHT */ && i <= 434 /* WAN_LIGHTNING */) {
+                        if (i >= WAN_LIGHT && i <= WAN_LIGHTNING) {
                             buf2 = $c.lit("wand of ");
-                        } else if (i >= 366 /* SPE_DIG */ && i < 407 /* SPE_BLANK_PAPER */) {
+                        } else if (i >= SPE_DIG && i < SPE_BLANK_PAPER) {
                             buf2 = $c.lit("spellbook of ");
-                        } else if (i >= 323 /* SCR_ENCHANT_ARMOR */ && i <= 343 /* SCR_STINKING_CLOUD */) {
+                        } else if (i >= SCR_ENCHANT_ARMOR && i <= SCR_STINKING_CLOUD) {
                             buf2 = $c.lit("scroll of ");
-                        } else if (i >= 297 /* POT_GAIN_ABILITY */ && i <= 322 /* POT_WATER */) {
-                            buf2 = i === 322 /* POT_WATER */ ? $c.lit("flask of n") : $c.lit("potion of ");
-                        } else if (i >= 173 /* RIN_ADORNMENT */ && i <= 200 /* RIN_PROTECTION_FROM_SHAPE_CHAN */) {
+                        } else if (i >= POT_GAIN_ABILITY && i <= POT_WATER) {
+                            buf2 = i === POT_WATER ? $c.lit("flask of n") : $c.lit("potion of ");
+                        } else if (i >= RIN_ADORNMENT && i <= RIN_PROTECTION_FROM_SHAPE_CHAN) {
                             buf2 = $c.lit("ring of ");
-                        } else if (i === 243 /* LAND_MINE */) {
+                        } else if (i === LAND_MINE) {
                             buf2 = $c.lit("unset ");
                         } else {
                             buf2 = $c.lit("");
                         }
-                        buf3 = i === 365 /* SCR_BLANK_PAPER */ ? $c.lit("blank scroll") : i === 407 /* SPE_BLANK_PAPER */ ? $c.lit("blank spellbook") : i === 285 /* SLIME_MOLD */ ? $c.lit("slime mold") : obj_descr[i].oc_name ? obj_descr[i].oc_name : obj_descr[i].oc_descr;
+                        buf3 = i === SCR_BLANK_PAPER ? $c.lit("blank scroll") : i === SPE_BLANK_PAPER ? $c.lit("blank spellbook") : i === SLIME_MOLD ? $c.lit("slime mold") : obj_descr[i].oc_name ? obj_descr[i].oc_name : obj_descr[i].oc_descr;
                         $c.__builtin___strcpy_chk(new $c.Ptr(buf[0], 0), $c.lit("G_"), 512);
-                        if (glyph === 7992 /* GLYPH_OBJ_PILETOP_OFF */ || glyph > 8009 && glyph < 8473) {
+                        if (glyph === GLYPH_OBJ_PILETOP_OFF || glyph > GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT - 1 && glyph < GLYPH_OBJ_PILETOP_OFF + NUM_OBJECTS) {
                             $c.__builtin___strcat_chk(new $c.Ptr(buf[0], 0), $c.lit("piletop_"), 512);
                         }
                         $c.__builtin___strcat_chk(new $c.Ptr(buf[0], 0), buf2, 512);
                         $c.__builtin___strcat_chk(new $c.Ptr(buf[0], 0), buf3, 512);
                     }
-                } else if (glyph >= 3929 /* GLYPH_CMAP_STONE_OFF */ && glyph < 4093 || glyph >= 4051 /* GLYPH_ZAP_OFF */ && glyph < 4083 || glyph >= 4093 /* GLYPH_SWALLOW_OFF */ && glyph < 7157 || glyph >= 7157 /* GLYPH_EXPLODE_OFF */ && glyph < 7220) {
+                } else if (glyph >= GLYPH_CMAP_STONE_OFF && glyph < GLYPH_CMAP_C_OFF + (S_goodpos - S_digbeam + 1) || glyph >= GLYPH_ZAP_OFF && glyph < (NUM_ZAP << 2) + GLYPH_ZAP_OFF || glyph >= GLYPH_SWALLOW_OFF && glyph < (NUMMONS << 3) + GLYPH_SWALLOW_OFF || glyph >= GLYPH_EXPLODE_OFF && glyph < MAXEXPCHARS + GLYPH_EXPLODE_FROSTY_OFF) {
                     cmap = -1;
                     buf2 = $c.lit("");
                     buf3 = $c.lit("");
                     buf4 = $c.lit("");
-                    if (glyph === 3929 /* GLYPH_CMAP_OFF */) {
-                        cmap = 0 /* S_stone */;
+                    if (glyph === GLYPH_CMAP_OFF) {
+                        cmap = S_stone;
                         buf3 = $c.lit("stone substrate");
                         skip_base = 1;
-                    } else if (glyph >= 3952 /* GLYPH_CMAP_GEH_OFF */ && glyph < 3963) {
-                        cmap = (glyph - 3952 /* GLYPH_CMAP_GEH_OFF */ | 0) + 1 /* S_vwall */ | 0;
+                    } else if (glyph >= GLYPH_CMAP_GEH_OFF && glyph < S_trwall - S_vwall + 1 + GLYPH_CMAP_GEH_OFF) {
+                        cmap = (glyph - GLYPH_CMAP_GEH_OFF | 0) + S_vwall | 0;
                         buf4 = $c.lit("_gehennom");
-                    } else if (glyph >= 3963 /* GLYPH_CMAP_KNOX_OFF */ && glyph < 3974) {
-                        cmap = (glyph - 3963 /* GLYPH_CMAP_KNOX_OFF */ | 0) + 1 /* S_vwall */ | 0;
+                    } else if (glyph >= GLYPH_CMAP_KNOX_OFF && glyph < S_trwall - S_vwall + 1 + GLYPH_CMAP_KNOX_OFF) {
+                        cmap = (glyph - GLYPH_CMAP_KNOX_OFF | 0) + S_vwall | 0;
                         buf4 = $c.lit("_knox");
-                    } else if (glyph >= 3930 /* GLYPH_CMAP_MAIN_OFF */ && glyph < 3941) {
-                        cmap = (glyph - 3930 /* GLYPH_CMAP_MAIN_OFF */ | 0) + 1 /* S_vwall */ | 0;
+                    } else if (glyph >= GLYPH_CMAP_MAIN_OFF && glyph < S_trwall - S_vwall + 1 + GLYPH_CMAP_MAIN_OFF) {
+                        cmap = (glyph - GLYPH_CMAP_MAIN_OFF | 0) + S_vwall | 0;
                         buf4 = $c.lit("_main");
-                    } else if (glyph >= 3941 /* GLYPH_CMAP_MINES_OFF */ && glyph < 3952) {
-                        cmap = (glyph - 3941 /* GLYPH_CMAP_MINES_OFF */ | 0) + 1 /* S_vwall */ | 0;
+                    } else if (glyph >= GLYPH_CMAP_MINES_OFF && glyph < S_trwall - S_vwall + 1 + GLYPH_CMAP_MINES_OFF) {
+                        cmap = (glyph - GLYPH_CMAP_MINES_OFF | 0) + S_vwall | 0;
                         buf4 = $c.lit("_mines");
-                    } else if (glyph >= 3974 /* GLYPH_CMAP_SOKO_OFF */ && glyph < 3985) {
-                        cmap = (glyph - 3974 /* GLYPH_CMAP_SOKO_OFF */ | 0) + 1 /* S_vwall */ | 0;
+                    } else if (glyph >= GLYPH_CMAP_SOKO_OFF && glyph < S_trwall - S_vwall + 1 + GLYPH_CMAP_SOKO_OFF) {
+                        cmap = (glyph - GLYPH_CMAP_SOKO_OFF | 0) + S_vwall | 0;
                         buf4 = $c.lit("_sokoban");
-                    } else if (glyph >= 3985 /* GLYPH_CMAP_A_OFF */ && glyph < 4006) {
-                        cmap = (glyph - 3985 /* GLYPH_CMAP_A_OFF */ | 0) + 12 /* S_ndoor */ | 0;
-                    } else if (glyph >= 4006 /* GLYPH_ALTAR_OFF */ && glyph < 4011) {
-                        j = glyph - 4006 /* GLYPH_ALTAR_OFF */ | 0;
-                        cmap = 33 /* S_altar */;
-                        if (j !== 4 /* altar_other */) {
+                    } else if (glyph >= GLYPH_CMAP_A_OFF && glyph < S_brdnladder - S_ndoor + 1 + GLYPH_CMAP_A_OFF) {
+                        cmap = (glyph - GLYPH_CMAP_A_OFF | 0) + S_ndoor | 0;
+                    } else if (glyph >= GLYPH_ALTAR_OFF && glyph < 5 + GLYPH_ALTAR_OFF) {
+                        j = glyph - GLYPH_ALTAR_OFF | 0;
+                        cmap = S_altar;
+                        if (j !== altar_other) {
                             nh_snprintf($c.lit("parse_id"), 1025, new $c.Ptr(buf[2], 0), 128, $c.lit("%s_"), parse_id$altar_text[j]);
                             buf2 = new $c.Ptr(buf[2], 0);
                         } else {
                             buf3 = $c.lit("altar other");
                             skip_base = 1;
                         }
-                    } else if (glyph >= 4011 /* GLYPH_CMAP_B_OFF */ && glyph < 4051) {
-                        cmap = (glyph - 4011 /* GLYPH_CMAP_B_OFF */ | 0) + 34 /* S_grave */ | 0;
-                    } else if (glyph >= 4051 /* GLYPH_ZAP_OFF */ && glyph < 4083) {
-                        j = glyph - 4051 /* GLYPH_ZAP_OFF */ | 0;
-                        cmap = $c.rem32(j, 4) + 74 /* S_vbeam */ | 0;
+                    } else if (glyph >= GLYPH_CMAP_B_OFF && glyph < S_arrow_trap + (TRAPNUM - 1) - S_grave + GLYPH_CMAP_B_OFF) {
+                        cmap = (glyph - GLYPH_CMAP_B_OFF | 0) + S_grave | 0;
+                    } else if (glyph >= GLYPH_ZAP_OFF && glyph < (NUM_ZAP << 2) + GLYPH_ZAP_OFF) {
+                        j = glyph - GLYPH_ZAP_OFF | 0;
+                        cmap = $c.rem32(j, 4) + S_vbeam | 0;
                         nh_snprintf($c.lit("parse_id"), 1042, new $c.Ptr(buf[2], 0), 128, $c.lit("%s"), loadsyms[cmap + cmap_offset | 0].name.add(2));
                         nh_snprintf($c.lit("parse_id"), 1044, new $c.Ptr(buf[3], 0), 128, $c.lit("%s zap %s"), parse_id$zap_texts[$c.div32(j, 4)], fix_glyphname(new $c.Ptr(buf[2], 0)));
                         buf3 = new $c.Ptr(buf[3], 0);
                         buf2 = $c.lit("");
                         skip_base = 1;
-                    } else if (glyph >= 4083 /* GLYPH_CMAP_C_OFF */ && glyph < 4093) {
-                        cmap = (glyph - 4083 /* GLYPH_CMAP_C_OFF */ | 0) + 78 /* S_digbeam */ | 0;
-                    } else if (glyph >= 4093 /* GLYPH_SWALLOW_OFF */ && glyph < 7157) {
-                        j = glyph - 4093 /* GLYPH_SWALLOW_OFF */ | 0;
-                        cmap = glyph >= 4093 /* GLYPH_SWALLOW_OFF */ && glyph < 7157 ? (glyph - 4093 /* GLYPH_SWALLOW_OFF */ | 0) & 7 : 0;
-                        mnum = $c.div32(j, 8);
+                    } else if (glyph >= GLYPH_CMAP_C_OFF && glyph < S_goodpos - S_digbeam + 1 + GLYPH_CMAP_C_OFF) {
+                        cmap = (glyph - GLYPH_CMAP_C_OFF | 0) + S_digbeam | 0;
+                    } else if (glyph >= GLYPH_SWALLOW_OFF && glyph < (NUMMONS << 3) + GLYPH_SWALLOW_OFF) {
+                        j = glyph - GLYPH_SWALLOW_OFF | 0;
+                        cmap = glyph >= GLYPH_SWALLOW_OFF && glyph < (NUMMONS << 3) + GLYPH_SWALLOW_OFF ? (glyph - GLYPH_SWALLOW_OFF | 0) & 7 : 0;
+                        mnum = $c.div32(j, S_sw_br - S_sw_tl + 1);
                         $c.__builtin___strcpy_chk(new $c.Ptr(buf[3], 0), $c.lit("swallow "), 128);
                         $c.__builtin___strcat_chk(new $c.Ptr(buf[3], 0), monsdump[mnum].nm, 128);
                         $c.__builtin___strcat_chk(new $c.Ptr(buf[3], 0), $c.lit(" "), 128);
                         $c.__builtin___strcat_chk(new $c.Ptr(buf[3], 0), parse_id$swallow_texts[cmap], 128);
                         buf3 = new $c.Ptr(buf[3], 0);
                         skip_base = 1;
-                    } else if (glyph >= 7157 /* GLYPH_EXPLODE_OFF */ && glyph < 7220) {
-                        j = glyph - 7157 /* GLYPH_EXPLODE_OFF */ | 0;
-                        expl = $c.div32(j, 9);
-                        cmap = (glyph >= 7157 /* GLYPH_EXPLODE_OFF */ && glyph < 7220 ? $c.rem32(glyph - 7157 /* GLYPH_EXPLODE_OFF */ | 0, 9) : 0) + 96 /* S_expl_tl */ | 0;
-                        i = cmap - 96 /* S_expl_tl */ | 0;
+                    } else if (glyph >= GLYPH_EXPLODE_OFF && glyph < MAXEXPCHARS + GLYPH_EXPLODE_FROSTY_OFF) {
+                        j = glyph - GLYPH_EXPLODE_OFF | 0;
+                        expl = $c.div32(j, S_expl_br - S_expl_tl + 1);
+                        cmap = (glyph >= GLYPH_EXPLODE_OFF && glyph < MAXEXPCHARS + GLYPH_EXPLODE_FROSTY_OFF ? $c.rem32(glyph - GLYPH_EXPLODE_OFF | 0, S_expl_br - S_expl_tl + 1) : 0) + S_expl_tl | 0;
+                        i = cmap - S_expl_tl | 0;
                         nh_snprintf($c.lit("parse_id"), 1082, new $c.Ptr(buf[2], 0), 128, $c.lit("%s "), parse_id$expl_type_texts[expl]);
                         buf2 = new $c.Ptr(buf[2], 0);
                         nh_snprintf($c.lit("parse_id"), 1085, new $c.Ptr(buf[3], 0), 128, $c.lit("%s%s"), $c.lit("expl_"), parse_id$expl_texts[i]);
@@ -736,7 +753,7 @@ async function parse_id(id, findwhat) {   // glyphs.c:824
                         skip_base = 1;
                     }
                     if (!skip_base) {
-                        if (cmap >= 0 && cmap < 105 /* MAXPCHARS */) {
+                        if (cmap >= 0 && cmap < MAXPCHARS) {
                             buf3 = loadsyms[cmap + cmap_offset | 0].name.add(2);
                         }
                     }
@@ -744,14 +761,14 @@ async function parse_id(id, findwhat) {   // glyphs.c:824
                     $c.__builtin___strcat_chk(new $c.Ptr(buf[0], 0), buf2, 512);
                     $c.__builtin___strcat_chk(new $c.Ptr(buf[0], 0), buf3, 512);
                     $c.__builtin___strcat_chk(new $c.Ptr(buf[0], 0), buf4, 512);
-                } else if (glyph === 1532 /* GLYPH_INVIS_OFF */) {
+                } else if (glyph === GLYPH_INVIS_OFF) {
                     $c.__builtin___strcpy_chk(new $c.Ptr(buf[0], 0), $c.lit("G_invisible"), 512);
-                } else if (glyph === 9623 /* GLYPH_NOTHING_OFF */) {
+                } else if (glyph === GLYPH_NOTHING_OFF) {
                     $c.__builtin___strcpy_chk(new $c.Ptr(buf[0], 0), $c.lit("G_nothing"), 512);
-                } else if (glyph === 9622 /* GLYPH_UNEXPLORED_OFF */) {
+                } else if (glyph === GLYPH_UNEXPLORED_OFF) {
                     $c.__builtin___strcpy_chk(new $c.Ptr(buf[0], 0), $c.lit("G_unexplored"), 512);
-                } else if (glyph >= 7220 /* GLYPH_WARNING_OFF */ && glyph < 7226) {
-                    j = glyph - 7220 /* GLYPH_WARNING_OFF */ | 0;
+                } else if (glyph >= GLYPH_WARNING_OFF && glyph < GLYPH_WARNING_OFF + WARNCOUNT) {
+                    j = glyph - GLYPH_WARNING_OFF | 0;
                     nh_snprintf($c.lit("parse_id"), 1106, new $c.Ptr(buf[0], 0), 128, $c.lit("G_%s%d"), $c.lit("warning"), j);
                 }
                 if ($c.memchr(new $c.Ptr(buf[0], 0), 0, 128) === null) {
@@ -765,7 +782,7 @@ async function parse_id(id, findwhat) {   // glyphs.c:824
                         await add_glyph_to_cache(glyph, new $c.Ptr(buf[0], 0));
                     } else if (id) {
                         if (!strncmpi(id, new $c.Ptr(buf[0], 0), -1)) {
-                            findwhat.findtype = 4;
+                            findwhat.findtype = find_glyph;
                             findwhat.val = glyph;
                             findwhat.loadsyms_offset = 0;
                             return 1;
@@ -777,7 +794,7 @@ async function parse_id(id, findwhat) {   // glyphs.c:824
     } else if (is_S) {
         for (i = 0; i < cmap_count; i = i + 1 | 0) {
             if (!strncmpi(loadsyms[i + cmap_offset | 0].name.add(2), id.add(2), -1)) {
-                findwhat.findtype = 3;
+                findwhat.findtype = find_cmap;
                 findwhat.val = i;
                 findwhat.loadsyms_offset = i + cmap_offset | 0;
                 return 1;
@@ -785,7 +802,7 @@ async function parse_id(id, findwhat) {   // glyphs.c:824
         }
         for (i = 0; i < oc_count; i = i + 1 | 0) {
             if (!strncmpi(loadsyms[i + oc_offset | 0].name.add(2), id.add(2), -1)) {
-                findwhat.findtype = 2;
+                findwhat.findtype = find_oc;
                 findwhat.val = i;
                 findwhat.loadsyms_offset = i + oc_offset | 0;
                 return 1;
@@ -793,7 +810,7 @@ async function parse_id(id, findwhat) {   // glyphs.c:824
         }
         for (i = 0; i <= pm_count; i = i + 1 | 0) {
             if (!strncmpi(loadsyms[i + pm_offset | 0].name.add(2), id.add(2), -1)) {
-                findwhat.findtype = 1;
+                findwhat.findtype = find_pm;
                 findwhat.val = i + 1 | 0;
                 findwhat.loadsyms_offset = i + pm_offset | 0;
                 return 1;
@@ -803,14 +820,14 @@ async function parse_id(id, findwhat) {   // glyphs.c:824
     if (dump_ids || filling_cache) {
         return 1;
     }
-    findwhat.findtype = 0;
+    findwhat.findtype = find_nothing;
     findwhat.val = 0;
     findwhat.loadsyms_offset = 0;
     return 0;
 }
 export function clear_all_glyphmap_colors() {   // glyphs.c:1167
     let glyph = 0;
-    for (glyph = 0; glyph < 9624 /* MAX_GLYPH */; glyph = glyph + 1 | 0) {
+    for (glyph = 0; glyph < MAX_GLYPH; glyph = glyph + 1 | 0) {
         if (glyphmap[glyph].customcolor) {
             glyphmap[glyph].customcolor = 0;
         }
@@ -819,7 +836,7 @@ export function clear_all_glyphmap_colors() {   // glyphs.c:1167
 }
 export async function reset_customcolors() {   // glyphs.c:1179
     clear_all_glyphmap_colors();
-    await apply_customizations(gc.currentgraphics >>> 0, 1);
+    await apply_customizations(gc.currentgraphics >>> 0, do_custom_colors);
 }
 
 export function $init() {
@@ -830,12 +847,12 @@ export function $init() {
     glyphid_cache_size = 0;
     glyphcache_find.$copyFrom(new $T.find_struct());
     to_custom_symbol_find.$copyFrom(new $T.find_struct());
-    nonzero_black = 16777216;
+    nonzero_black = CLR_BLACK | NH_BASIC_COLOR;
     to_custom_symset_entry_callback$glyphnag = 0;
     to_custom_symset_entry_callback$colornag = 0;
     shuffle_customizations$offsets.fill(0);
-    shuffle_customizations$offsets[0] = 3448 /* GLYPH_OBJ_OFF */;
-    shuffle_customizations$offsets[1] = 7992 /* GLYPH_OBJ_PILETOP_OFF */;
+    shuffle_customizations$offsets[0] = GLYPH_OBJ_OFF;
+    shuffle_customizations$offsets[1] = GLYPH_OBJ_PILETOP_OFF;
     parse_id$altar_text.fill(null);
     parse_id$altar_text[0] = $c.lit("unaligned");
     parse_id$altar_text[1] = $c.lit("chaotic");

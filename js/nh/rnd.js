@@ -7,6 +7,9 @@ import { panic } from './end.js';
 import { sgn } from './hacklib.js';
 import { sys_random_seed } from './unixmain.js';
 
+const CORE = 0;
+const DISP = 1;
+
 let rng_logfile = null;
 let rng_log_disp = 0;
 let rng_call_count = 0;
@@ -74,11 +77,11 @@ export async function init_isaac64(seed, fn) {   // rnd.c:131
     $c.isaac64_init(rnglist[rngindx].rng_state, new $c.Ptr(new_rng_state, 0), 8);
 }
 function RND(x) {   // rnd.c:149
-    return $c.i32($c.remu64($c.isaac64_next_uint64(rnglist[0 /* CORE */].rng_state), $c.u64(x)));
+    return $c.i32($c.remu64($c.isaac64_next_uint64(rnglist[CORE].rng_state), $c.u64(x)));
 }
 export function rn2_on_display_rng(x) {   // rnd.c:158
     let result = 0;
-    result = $c.i32($c.remu64($c.isaac64_next_uint64(rnglist[1 /* DISP */].rng_state), $c.u64(x)));
+    result = $c.i32($c.remu64($c.isaac64_next_uint64(rnglist[DISP].rng_state), $c.u64(x)));
     if (rng_logfile && rng_log_disp) {
         rng_call_count = rng_call_count + 1 | 0;
         $c.fprintf(rng_logfile, $c.lit("%d ~drn2(%d) = %d"), rng_call_count, x, result);

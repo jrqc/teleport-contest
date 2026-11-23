@@ -8,13 +8,18 @@ import { alloc } from './alloc.js';
 import { getnow, hhmmss, yyyymmdd } from './calendar.js';
 import { config_error_add, config_error_done, config_error_init, get_configfile, get_default_configfile, parse_conf_file, set_configfile_name } from './cfgfiles.js';
 import { flags, gb, gc, gd, gh, gi, gl, gn, gs, gu, gw, hands_obj, iflags, program_state, svc, svd, svl, svm, svn, svp, u } from './decl.js';
+import { COIN_CLASS } from './defsym.h.js';
 import { In_quest, Is_special, maxledgerno } from './dungeon.js';
+import { LFILE_EXISTS, MIGR_NOBREAK, MIGR_NOSCATTER, MIGR_WITH_HERO } from './dungeon.h.js';
 import { after_opt_showpaths } from './earlyarg.js';
 import { nh_terminate } from './end.js';
+import { BUFSZ, PL_NSIZ } from './global.h.js';
 import { inv_cnt } from './hack.js';
+import { BONESPREFIX, COUNTING, FREEING, HACKPREFIX, LEVELPREFIX, NHF_BONESFILE, NHF_LEVELFILE, NHF_SAVEFILE, READING, SAVEPREFIX, SCOREPREFIX, SF_CRITICAL_BYTE_COUNT_MISMATCH, SF_DM_I32LP64_ON_IL32LLP64, SF_DM_I32LP64_ON_ILP32LL64, SF_DM_IL32LLP64_ON_I32LP64, SF_DM_IL32LLP64_ON_ILP32LL64, SF_DM_ILP32LL64_ON_I32LP64, SF_DM_ILP32LL64_ON_IL32LLP64, SF_DM_MISMATCH, SF_OUTDATED, SF_UPTODATE, SYSCONFPREFIX, TROUBLEPREFIX, WRITING, exportascii, historical, invlet_basic } from './hack.h.js';
 import { c_eos, copynchars, eos, fuzzymatch, mungspaces, nh_snprintf, s_suffix, strip_newline, strncmpi } from './hacklib.js';
 import { addinv, merge_choice } from './invent.js';
 import { add_to_migration } from './mkobj.js';
+import { PM_CLERIC } from './monsters.h.js';
 import { l_nhcore_done } from './nhlua.js';
 import { observe_object } from './o_init.js';
 import { readobjnam } from './objnam.js';
@@ -29,11 +34,18 @@ import { bclose, close_check } from './sfstruct.js';
 import { pmatch } from './strutil.js';
 import { clear_symsetentry, proc_symset_line } from './symbols.js';
 import { sysopt } from './sys.js';
+import { FCMASK } from './unixconf.h.js';
 import { sethanguphandler } from './unixmain.js';
 import { regularize } from './unixunix.js';
 import { validate, version_string } from './version.js';
 import { windowprocs } from './windows.js';
+import { NHW_MENU } from './wintype.h.js';
 import { wish_history_add } from './zap.js';
+
+const O_BINARY = 0;
+const SECTIONSCOPE = 1;
+const TITLESCOPE = 2;
+const PASSAGESCOPE = 3;
 
 const nh_basename$basebuf = new Int8Array(80);   // static in nh_basename()
 const fname_encode$hexdigits = new Int8Array(17);   // static in fname_encode()
@@ -140,7 +152,7 @@ export function validate_prefix_locations(reasonbuf) {   // files.c:394
 }
 export function fopen_datafile(filename, mode, prefix) {   // files.c:444
     let fp = null;
-    filename = fqname(filename, prefix, prefix === 9 ? 3 : 0);
+    filename = fqname(filename, prefix, prefix === TROUBLEPREFIX ? 3 : 0);
     fp = $c.fopen(filename, mode);
     return fp;
 }
@@ -159,7 +171,7 @@ export async function init_nhfile(nhfp) {   // files.c:461
     }
     nhfp.fd = -1;
     nhfp.fpdef = null;
-    nhfp.mode = 1;
+    nhfp.mode = COUNTING;
     nhfp.structlevel = 1;
     nhfp.fieldlevel = 0;
     nhfp.addinfo = 0;
@@ -260,22 +272,22 @@ export async function create_levelfile(lev, errbuf) {   // files.c:621
         errbuf.set(0, 0);
     }
     set_levelfile_name(new $c.Ptr(gl.lock, 0), lev);
-    fq_lock = fqname(new $c.Ptr(gl.lock, 0), 1, 0);
+    fq_lock = fqname(new $c.Ptr(gl.lock, 0), LEVELPREFIX, 0);
     nhfp = await new_nhfile();
     if (nhfp) {
-        nhfp.ftype = 1;
-        nhfp.mode = 2;
+        nhfp.ftype = NHF_LEVELFILE;
+        nhfp.mode = WRITING;
         nhfp.structlevel = 1;
         nhfp.fieldlevel = 0;
         nhfp.addinfo = 0;
         nhfp.style.deflt = 0;
         nhfp.style.binary = 1;
-        nhfp.fnidx = 1 /* historical */;
+        nhfp.fnidx = historical;
         nhfp.fd = -1;
         nhfp.fpdef = null;
-        $t1 = $c.creat(fq_lock, 432), nhfp.fd = $t1;
+        $t1 = $c.creat(fq_lock, FCMASK), nhfp.fd = $t1;
         if (nhfp.fd >= 0) {
-            svl.level_info[lev].flags = $c.u8(svl.level_info[lev].flags | 4);
+            svl.level_info[lev].flags = $c.u8(svl.level_info[lev].flags | LFILE_EXISTS);
         } else if (errbuf) {
             $c.__builtin___sprintf_chk(errbuf, 0, -1, $c.lit("Cannot create file \"%s\" for level %d (errno %d)."), new $c.Ptr(gl.lock, 0), lev, $c.__error().get(0));
         }
@@ -290,22 +302,22 @@ export async function open_levelfile(lev, errbuf) {   // files.c:673
         errbuf.set(0, 0);
     }
     set_levelfile_name(new $c.Ptr(gl.lock, 0), lev);
-    fq_lock = fqname(new $c.Ptr(gl.lock, 0), 1, 0);
+    fq_lock = fqname(new $c.Ptr(gl.lock, 0), LEVELPREFIX, 0);
     nhfp = await new_nhfile();
     if (nhfp) {
-        nhfp.mode = 0;
+        nhfp.mode = READING;
         nhfp.structlevel = 1;
         nhfp.fieldlevel = 0;
         nhfp.addinfo = 0;
         nhfp.style.deflt = 0;
         nhfp.style.binary = 1;
-        nhfp.ftype = 1;
-        nhfp.fnidx = 1 /* historical */;
+        nhfp.ftype = NHF_LEVELFILE;
+        nhfp.fnidx = historical;
         nhfp.fd = -1;
         nhfp.fpdef = null;
     }
     if (nhfp && nhfp.structlevel) {
-        $t1 = $c.open(fq_lock, 0, 0), nhfp.fd = $t1;
+        $t1 = $c.open(fq_lock, 0 | O_BINARY, 0), nhfp.fd = $t1;
         if (nhfp.fd < 0 && errbuf) {
             $c.__builtin___sprintf_chk(errbuf, 0, -1, $c.lit("Cannot open file \"%s\" for level %d (errno %d)."), new $c.Ptr(gl.lock, 0), lev, $c.__error().get(0));
         }
@@ -314,10 +326,10 @@ export async function open_levelfile(lev, errbuf) {   // files.c:673
     return nhfp;
 }
 export function delete_levelfile(lev) {   // files.c:719
-    if (lev === 0 || svl.level_info[lev].flags & 4) {
+    if (lev === 0 || svl.level_info[lev].flags & LFILE_EXISTS) {
         set_levelfile_name(new $c.Ptr(gl.lock, 0), lev);
-        $c.unlink(fqname(new $c.Ptr(gl.lock, 0), 1, 0));
-        svl.level_info[lev].flags = $c.u8(svl.level_info[lev].flags & -5);
+        $c.unlink(fqname(new $c.Ptr(gl.lock, 0), LEVELPREFIX, 0));
+        svl.level_info[lev].flags = $c.u8(svl.level_info[lev].flags & ~LFILE_EXISTS);
     }
 }
 export async function clearlocks() {   // files.c:733
@@ -369,17 +381,17 @@ export async function create_bonesfile(lev, bonesid, errbuf) {   // files.c:833
     }
     $t1 = set_bonesfile_name(new $c.Ptr(gb.bones, 0), lev), bonesid.set(0, $t1);
     file = set_bonestemp_name();
-    file = fqname(file, 3, 0);
+    file = fqname(file, BONESPREFIX, 0);
     nhfp = await new_nhfile();
     if (nhfp) {
-        nhfp.ftype = 3;
-        nhfp.mode = 2;
+        nhfp.ftype = NHF_BONESFILE;
+        nhfp.mode = WRITING;
         nhfp.structlevel = 1;
         nhfp.fieldlevel = 0;
         nhfp.addinfo = 1;
         nhfp.style.deflt = 1;
         nhfp.style.binary = 1;
-        nhfp.fnidx = 1 /* historical */;
+        nhfp.fnidx = historical;
         nhfp.fd = -1;
         nhfp.fpdef = null;
         if (nhfp.fpdef) {
@@ -387,7 +399,7 @@ export async function create_bonesfile(lev, bonesid, errbuf) {   // files.c:833
             failed = $c.__error().get(0);
         }
         if (nhfp.structlevel) {
-            $t2 = $c.creat(file, 432), nhfp.fd = $t2;
+            $t2 = $c.creat(file, FCMASK), nhfp.fd = $t2;
             if (nhfp.fd < 0) {
                 failed = $c.__error().get(0);
             }
@@ -402,9 +414,9 @@ export async function create_bonesfile(lev, bonesid, errbuf) {   // files.c:833
 export async function commit_bonesfile(lev) {   // files.c:915
     let fq_bones = null, tempname = null, ret = 0;
     set_bonesfile_name(new $c.Ptr(gb.bones, 0), lev);
-    fq_bones = fqname(new $c.Ptr(gb.bones, 0), 3, 0);
+    fq_bones = fqname(new $c.Ptr(gb.bones, 0), BONESPREFIX, 0);
     tempname = set_bonestemp_name();
-    tempname = fqname(tempname, 3, 1);
+    tempname = fqname(tempname, BONESPREFIX, 1);
     ret = $c.rename(tempname, fq_bones);
     if (flags.debug && ret !== 0) {
         await pline($c.lit("couldn't rename %s to %s."), tempname, fq_bones);
@@ -414,24 +426,24 @@ export async function open_bonesfile(lev, bonesid) {   // files.c:940
     let fq_bones = null, nhfp = null, $t1, $t2;
     nhfp = null;
     $t1 = set_bonesfile_name(new $c.Ptr(gb.bones, 0), lev), bonesid.set(0, $t1);
-    fq_bones = fqname(new $c.Ptr(gb.bones, 0), 3, 0);
+    fq_bones = fqname(new $c.Ptr(gb.bones, 0), BONESPREFIX, 0);
     await nh_uncompress(fq_bones);
     nhfp = await new_nhfile();
     if (nhfp) {
         nhfp.structlevel = 1;
         nhfp.fieldlevel = 0;
-        nhfp.ftype = 3;
-        nhfp.mode = 0;
+        nhfp.ftype = NHF_BONESFILE;
+        nhfp.mode = READING;
         nhfp.addinfo = 1;
         nhfp.style.deflt = 1;
-        nhfp.style.binary = $c.i8(sysopt.bonesformat[0] !== 2 /* exportascii */ ? 1 : 0);
+        nhfp.style.binary = $c.i8(sysopt.bonesformat[0] !== exportascii ? 1 : 0);
         nhfp.fnidx = sysopt.bonesformat[0];
         nhfp.fd = -1;
         nhfp.fpdef = null;
         if (nhfp.fpdef) {
         }
         if (nhfp.structlevel) {
-            $t2 = $c.open(fq_bones, 0, 0), nhfp.fd = $t2;
+            $t2 = $c.open(fq_bones, 0 | O_BINARY, 0), nhfp.fd = $t2;
         }
     }
     nhfp = await viable_nhfile(nhfp);
@@ -440,13 +452,13 @@ export async function open_bonesfile(lev, bonesid) {   // files.c:940
 export async function delete_bonesfile(lev) {   // files.c:993
     let reslt = 0;
     set_bonesfile_name(new $c.Ptr(gb.bones, 0), lev);
-    reslt = $c.unlink(fqname(new $c.Ptr(gb.bones, 0), 3, 0));
-    await delete_convertedfile(fqname(new $c.Ptr(gb.bones, 0), 3, 0));
+    reslt = $c.unlink(fqname(new $c.Ptr(gb.bones, 0), BONESPREFIX, 0));
+    await delete_convertedfile(fqname(new $c.Ptr(gb.bones, 0), BONESPREFIX, 0));
     return !(reslt < 0) ? 1 : 0;
 }
 export async function compress_bonesfile() {   // files.c:1006
-    nh_sfconvert(fqname(new $c.Ptr(gb.bones, 0), 3, 0));
-    await nh_compress(fqname(new $c.Ptr(gb.bones, 0), 3, 0));
+    nh_sfconvert(fqname(new $c.Ptr(gb.bones, 0), BONESPREFIX, 0));
+    await nh_compress(fqname(new $c.Ptr(gb.bones, 0), BONESPREFIX, 0));
 }
 export function set_savefile_name(regularize_it) {   // files.c:1020
     let regoffset = 0, overflow = 0, indicator_spot = 0, postappend = null, sfindicator = null;
@@ -500,11 +512,11 @@ export async function create_savefile() {   // files.c:1159
     let fq_save = null, nhfp = null, do_historical = 0, $t1;
     nhfp = null;
     do_historical = 1;
-    fq_save = fqname(new $c.Ptr(gs.SAVEF, 0), 2, 0);
+    fq_save = fqname(new $c.Ptr(gs.SAVEF, 0), SAVEPREFIX, 0);
     nhfp = await new_nhfile();
     if (nhfp) {
-        nhfp.ftype = 2;
-        nhfp.mode = 2;
+        nhfp.ftype = NHF_SAVEFILE;
+        nhfp.mode = WRITING;
         if (program_state.in_self_recover || do_historical) {
             do_historical;
             nhfp.structlevel = 1;
@@ -512,10 +524,10 @@ export async function create_savefile() {   // files.c:1159
             nhfp.addinfo = 0;
             nhfp.style.deflt = 0;
             nhfp.style.binary = 1;
-            nhfp.fnidx = 1 /* historical */;
+            nhfp.fnidx = historical;
             nhfp.fd = -1;
             nhfp.fpdef = null;
-            $t1 = $c.creat(fq_save, 432), nhfp.fd = $t1;
+            $t1 = $c.creat(fq_save, FCMASK), nhfp.fd = $t1;
         }
     }
     nhfp = await viable_nhfile(nhfp);
@@ -525,11 +537,11 @@ export async function open_savefile() {   // files.c:1217
     let fq_save = null, nhfp = null, do_historical = 0, $t1;
     nhfp = null;
     do_historical = 1;
-    fq_save = fqname(new $c.Ptr(gs.SAVEF, 0), 2, 0);
+    fq_save = fqname(new $c.Ptr(gs.SAVEF, 0), SAVEPREFIX, 0);
     nhfp = await new_nhfile();
     if (nhfp) {
-        nhfp.ftype = 2;
-        nhfp.mode = 0;
+        nhfp.ftype = NHF_SAVEFILE;
+        nhfp.mode = READING;
         if (program_state.in_self_recover || do_historical) {
             do_historical = 1;
             do_historical;
@@ -538,18 +550,18 @@ export async function open_savefile() {   // files.c:1217
             nhfp.addinfo = 0;
             nhfp.style.deflt = 0;
             nhfp.style.binary = 1;
-            nhfp.fnidx = 1 /* historical */;
+            nhfp.fnidx = historical;
             nhfp.fd = -1;
             nhfp.fpdef = null;
         }
-        $t1 = $c.open(fq_save, 0, 0), nhfp.fd = $t1;
+        $t1 = $c.open(fq_save, 0 | O_BINARY, 0), nhfp.fd = $t1;
     }
     nhfp = await viable_nhfile(nhfp);
     return nhfp;
 }
 export async function delete_savefile() {   // files.c:1259
     let sfname = null;
-    sfname = fqname(new $c.Ptr(gs.SAVEF, 0), 2, 0);
+    sfname = fqname(new $c.Ptr(gs.SAVEF, 0), SAVEPREFIX, 0);
     $c.unlink(sfname);
     await delete_convertedfile(sfname);
     return 0;
@@ -559,10 +571,10 @@ export async function restore_saved_game() {   // files.c:1270
     nhfp = null;
     sfstatus = 0;
     set_savefile_name(1);
-    fq_save = fqname(new $c.Ptr(gs.SAVEF, 0), 2, 0);
+    fq_save = fqname(new $c.Ptr(gs.SAVEF, 0), SAVEPREFIX, 0);
     await nh_uncompress(fq_save);
     if ((nhfp = await open_savefile()) !== null) {
-        if ((sfstatus = await validate(nhfp, fq_save, 0)) !== 0) {
+        if ((sfstatus = await validate(nhfp, fq_save, 0)) !== SF_UPTODATE) {
             await close_nhfile(nhfp);
             nhfp = await problematic_savefile(sfstatus, fq_save);
         }
@@ -574,7 +586,7 @@ export async function get_freeing_nhfile() {   // files.c:1299
     nhfp = null;
     nhfp = await new_nhfile();
     if (nhfp) {
-        nhfp.mode = 4;
+        nhfp.mode = FREEING;
     }
     return nhfp;
 }
@@ -582,7 +594,7 @@ export async function check_panic_save() {   // files.c:1312
     let result = 0, cf = null, savef = null, ln = 0, cfn = null;
     result = 0;
     set_error_savefile();
-    savef = fqname(new $c.Ptr(gs.SAVEF, 0), 2, 0);
+    savef = fqname(new $c.Ptr(gs.SAVEF, 0), SAVEPREFIX, 0);
     ln = $c.u32($c.addu64($c.strlen(savef), $c.strlen($c.lit(".Z"))));
     cfn = $c.asArr(await alloc(ln + 1 >>> 0), Int8Array);
     $c.__builtin___strcpy_chk(cfn, savef, -1);
@@ -615,8 +627,8 @@ export async function plname_from_file(filename, without_wait_synch_per_file) { 
     }
     await nh_uncompress(new $c.Ptr(gs.SAVEF, 0));
     if ((nhfp = await open_savefile()) !== null) {
-        if ((sfstatus = await validate(nhfp, filename, without_wait_synch_per_file)) === 0) {
-            ln = 49;
+        if ((sfstatus = await validate(nhfp, filename, without_wait_synch_per_file)) === SF_UPTODATE) {
+            ln = PL_NSIZ + 4 * (1 + 3) + 1;
             result = $c.asArr($c.__builtin___memset_chk(await alloc(ln), 0, ln, -1), Int8Array);
             await get_plname_from_file(nhfp, result, 0);
         }
@@ -630,12 +642,12 @@ export async function get_saved_games() {   // files.c:1399
     result = null;
     j = 0;
     myuid = $c.getuid() | 0;
-    if (dir = $c.opendir(fqname($c.lit("save"), 2, 0))) {
+    if (dir = $c.opendir(fqname($c.lit("save"), SAVEPREFIX, 0))) {
         for (n = 0; $c.readdir(dir); n = n + 1 | 0) {
         }
         $c.closedir(dir);
         if (n > 0) {
-            if (!(dir = $c.opendir(fqname($c.lit("save"), 2, 0)))) {
+            if (!(dir = $c.opendir(fqname($c.lit("save"), SAVEPREFIX, 0)))) {
                 return null;
             }
             result = $c.asArr(await alloc($c.u32($c.mulu64($c.u64(n + 1 | 0), 8))), 'ptr');
@@ -698,21 +710,21 @@ async function problematic_savefile(sfstatus, savefilenm) {   // files.c:2015
     let i = 0, nhfp = null;
     nhfp = null;
     switch (sfstatus) {
-        case 0:
+        case SF_UPTODATE:
             break;
-        case 3:
-        case 4:
-        case 5:
-        case 6:
-        case 7:
-        case 8:
-        case 9:
-        case 1:
-        case 2:
+        case SF_DM_IL32LLP64_ON_ILP32LL64:
+        case SF_DM_I32LP64_ON_ILP32LL64:
+        case SF_DM_ILP32LL64_ON_I32LP64:
+        case SF_DM_ILP32LL64_ON_IL32LLP64:
+        case SF_DM_I32LP64_ON_IL32LLP64:
+        case SF_DM_IL32LLP64_ON_I32LP64:
+        case SF_DM_MISMATCH:
+        case SF_OUTDATED:
+        case SF_CRITICAL_BYTE_COUNT_MISMATCH:
         default:
             for (i = 0; i < 10; i = i + 1 | 0) {
                 if (sf2msg[i].sfstatus === sfstatus) {
-                    await raw_printf($c.lit("\n%s is %s %s\n"), savefilenm, sfstatus === 1 ? $c.lit("an") : $c.lit("a"), sf2msg[i].msg);
+                    await raw_printf($c.lit("\n%s is %s %s\n"), savefilenm, sfstatus === SF_OUTDATED ? $c.lit("an") : $c.lit("a"), sf2msg[i].msg);
                     break;
                 }
             }
@@ -892,22 +904,22 @@ async function wizkit_addinv(obj) {   // files.c:2537
         return;
     }
     await observe_object(obj);
-    if (gu.urole.mnum === 337) {
+    if (gu.urole.mnum === PM_CLERIC) {
         obj.bknown = (1) & 1;
     }
-    if (obj.oclass !== 12 /* COIN_CLASS */ && inv_cnt(0) >= 52 /* invlet_basic */ && !await merge_choice(gi.invent, obj)) {
+    if (obj.oclass !== COIN_CLASS && inv_cnt(0) >= invlet_basic && !await merge_choice(gi.invent, obj)) {
         await add_to_migration(obj);
         obj.ox = 0;
         obj.oy = 1;
-        obj.owornmask = 3081;
+        obj.owornmask = MIGR_WITH_HERO | MIGR_NOBREAK | MIGR_NOSCATTER;
     } else {
         await addinv(obj);
     }
 }
 export async function proc_wizkit_line(buf) {   // files.c:2562
     let otmp = null;
-    if ($c.strlen(buf) >= 256) {
-        buf.set(255, 0);
+    if ($c.strlen(buf) >= BUFSZ) {
+        buf.set(BUFSZ - 1, 0);
     }
     otmp = await readobjnam(buf, null);
     if (otmp) {
@@ -936,7 +948,7 @@ export async function read_wizkit() {   // files.c:2584
 }
 function fopen_sym_file() {   // files.c:2611
     let fp = null;
-    fp = fopen_datafile($c.lit("symbols"), $c.lit("r"), 0);
+    fp = fopen_datafile($c.lit("symbols"), $c.lit("r"), HACKPREFIX);
     return fp;
 }
 export async function read_sym_file(which_set) {   // files.c:2631
@@ -971,11 +983,11 @@ export async function read_sym_file(which_set) {   // files.c:2631
 }
 export async function check_recordfile(dir) {   // files.c:2689
     let fq_record = null, fd = 0;
-    fq_record = fqname($c.lit("record"), 5, 0);
+    fq_record = fqname($c.lit("record"), SCOREPREFIX, 0);
     fd = $c.open(fq_record, 2, 0);
     if (fd >= 0) {
         await nhclose(fd);
-    } else if ((fd = $c.open(fq_record, 514, 432)) >= 0) {
+    } else if ((fd = $c.open(fq_record, 514, FCMASK)) >= 0) {
         await nhclose(fd);
     } else {
         await raw_printf($c.lit("Warning: cannot write scoreboard file '%s'"), fq_record);
@@ -986,7 +998,7 @@ export function paniclog(type, reason) {   // files.c:2801
     let lfile = null, buf = new Int8Array(256), now = 0, uid = 0, playmode = 0;
     if (!program_state.in_paniclog) {
         program_state.in_paniclog = 1;
-        lfile = fopen_datafile($c.lit("paniclog"), $c.lit("a"), 9);
+        lfile = fopen_datafile($c.lit("paniclog"), $c.lit("a"), TROUBLEPREFIX);
         if (lfile) {
             now = getnow();
             uid = $c.getuid() | 0;
@@ -1007,7 +1019,7 @@ export function testinglog(filenm, type, reason) {   // files.c:2836
     if ($c.strchr(new $c.Ptr(fnbuf, 0), 46) === null) {
         $c.__builtin___strcat_chk(new $c.Ptr(fnbuf, 0), $c.lit(".log"), 256);
     }
-    lfile = fopen_datafile(new $c.Ptr(fnbuf, 0), $c.lit("a"), 9);
+    lfile = fopen_datafile(new $c.Ptr(fnbuf, 0), $c.lit("a"), TROUBLEPREFIX);
     if (lfile) {
         $c.fprintf(lfile, $c.lit("%s\n%s\n"), type, reason);
         $c.fclose(lfile);
@@ -1052,7 +1064,7 @@ export async function reveal_paths(code) {   // files.c:3175
     buf[0] = 0;
     await raw_printf($c.lit("%s %s%s:"), s_suffix(gamename), $c.lit("system configuration file"), new $c.Ptr(buf, 0));
     filep = $c.lit("sysconf");
-    fqn = fqname(filep, 7, 0);
+    fqn = fqname(filep, SYSCONFPREFIX, 0);
     if (fqn) {
         set_configfile_name(fqn);
         filep = get_configfile();
@@ -1170,7 +1182,7 @@ export async function read_tribute(tribsection, tribtitle, tribpassage, nowin_bu
                 case 37:
                     if (!strncmpi(new $c.Ptr(line, 1), $c.lit("section "), 8)) {
                         st = new $c.Ptr(line, 9);
-                        scope = 1;
+                        scope = SECTIONSCOPE;
                         matchedsection = $c.i8(!strncmpi(st, tribsection, -1) ? 1 : 0);
                     } else if (!strncmpi(new $c.Ptr(line, 1), $c.lit("title "), 6)) {
                         st$2 = new $c.Ptr(line, 7);
@@ -1180,7 +1192,7 @@ export async function read_tribute(tribsection, tribtitle, tribpassage, nowin_bu
                             if ((p2 = $c.strchr(p1, 41)) !== null) {
                                 p2.set(0, 0);
                                 passagecnt = $c.atoi(p1);
-                                scope = 2;
+                                scope = TITLESCOPE;
                                 if (matchedsection && !strncmpi(st$2, tribtitle, -1)) {
                                     matchedtitle = 1;
                                     targetpassage = !tribpassage ? choose_passage(passagecnt, oid) : tribpassage <= passagecnt ? tribpassage : 0;
@@ -1195,11 +1207,11 @@ export async function read_tribute(tribsection, tribtitle, tribpassage, nowin_bu
                         mungspaces(st$3);
                         passagenum = $c.atoi(st$3);
                         if (passagenum > 0 && passagenum <= passagecnt) {
-                            scope = 3;
+                            scope = PASSAGESCOPE;
                             if (matchedtitle && passagenum === targetpassage) {
                                 foundpassage = 1;
                                 if (!nowin_buf) {
-                                    tribwin = await windowprocs.win_create_nhwindow(4);
+                                    tribwin = await windowprocs.win_create_nhwindow(NHW_MENU);
                                     if (tribwin === -1) {
                                         break cleanup$;
                                     }
@@ -1210,10 +1222,10 @@ export async function read_tribute(tribsection, tribtitle, tribpassage, nowin_bu
                         if (foundpassage) {
                             break cleanup$;
                         }
-                        if (scope === 2) {
+                        if (scope === TITLESCOPE) {
                             matchedtitle = 0;
                         }
-                        if (scope === 1) {
+                        if (scope === SECTIONSCOPE) {
                             matchedsection = 0;
                         }
                         if (scope) {
@@ -1282,8 +1294,8 @@ export async function livelog_add(ll_type, str) {   // files.c:3667
     if (!$c.and64(ll_type, sysopt.livelog)) {
         return;
     }
-    if (await lock_file($c.lit("livelog"), 5, 10)) {
-        if (!(livelogfile = fopen_datafile($c.lit("livelog"), $c.lit("a"), 5))) {
+    if (await lock_file($c.lit("livelog"), SCOREPREFIX, 10)) {
+        if (!(livelogfile = fopen_datafile($c.lit("livelog"), $c.lit("a"), SCOREPREFIX))) {
             await pline($c.lit("Cannot open live log file!"));
             await unlock_file($c.lit("livelog"));
             return;
@@ -1302,25 +1314,25 @@ export function $init() {
     for (let $i0 = 0; $i0 < 10; $i0++) {
         sf2msg[$i0].$copyFrom(new $T.sfstatus_to_msg());
     }
-    sf2msg[0].sfstatus = 0;
+    sf2msg[0].sfstatus = SF_UPTODATE;
     sf2msg[0].msg = $c.lit("everything matches");
-    sf2msg[1].sfstatus = 1;
+    sf2msg[1].sfstatus = SF_OUTDATED;
     sf2msg[1].msg = $c.lit("outdated savefile");
-    sf2msg[2].sfstatus = 2;
+    sf2msg[2].sfstatus = SF_CRITICAL_BYTE_COUNT_MISMATCH;
     sf2msg[2].msg = $c.lit("savefile critical byte-count mismatch");
-    sf2msg[3].sfstatus = 3;
+    sf2msg[3].sfstatus = SF_DM_IL32LLP64_ON_ILP32LL64;
     sf2msg[3].msg = $c.lit("Windows x64 savefile on x86");
-    sf2msg[4].sfstatus = 4;
+    sf2msg[4].sfstatus = SF_DM_I32LP64_ON_ILP32LL64;
     sf2msg[4].msg = $c.lit("Unix 64 savefile on x86");
-    sf2msg[5].sfstatus = 5;
+    sf2msg[5].sfstatus = SF_DM_ILP32LL64_ON_I32LP64;
     sf2msg[5].msg = $c.lit("x86 savefile on Unix 64");
-    sf2msg[6].sfstatus = 6;
+    sf2msg[6].sfstatus = SF_DM_ILP32LL64_ON_IL32LLP64;
     sf2msg[6].msg = $c.lit("x86 savefile on Windows x64");
-    sf2msg[7].sfstatus = 7;
+    sf2msg[7].sfstatus = SF_DM_I32LP64_ON_IL32LLP64;
     sf2msg[7].msg = $c.lit("Unix 64 savefile on Windows x64");
-    sf2msg[8].sfstatus = 8;
+    sf2msg[8].sfstatus = SF_DM_IL32LLP64_ON_I32LP64;
     sf2msg[8].msg = $c.lit("Windows x64 savefile on Unix 64");
-    sf2msg[9].sfstatus = 9;
+    sf2msg[9].sfstatus = SF_DM_MISMATCH;
     sf2msg[9].msg = $c.lit("generic savefile mismatch");
     cvtinit = 0;
     unconverted_filename = null;
